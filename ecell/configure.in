@@ -195,23 +195,11 @@ if test "$BOOST_INCLUDE" = "" ; then
 	AC_MSG_ERROR(boost includes not found);
 else
 	BOOST_INCLUDE="-I$BOOST_INCLUDE"
+	BOOST_PYTHON_LIB="-lboost_python"
+	BOOST_LIB="-L$ac_dir/lib"
 fi
 AC_MSG_RESULT($BOOST_INCLUDE)
 AC_SUBST(BOOST_INCLUDE)
-
-AC_MSG_CHECKING( for boost python lib );
-BOOST_PYTHON_LIB=""	
-for ac_dir in $EXT_GUESS ; do
-  BOOST_PYTHON_LIST=($ac_dir/lib/libboost_python*)
-	if test ${#BOOST_PYTHON_LIST[*]} -ge 2; then
-		BOOST_PYTHON_LIB="-lboost_python"
-		BOOST_LIB="-L$ac_dir/lib"
-	fi
-done
-if test "$BOOST_PYTHON_LIB" = "" ; then
-	AC_MSG_ERROR(boost python lib not found);
-fi
-AC_MSG_RESULT($BOOST_LIB $BOOST_PYTHON_LIB)
 AC_SUBST(BOOST_PYTHON_LIB)
 AC_SUBST(BOOST_LIB)
 
