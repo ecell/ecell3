@@ -4,6 +4,7 @@ modeleditorgladedir = ${pkglibdir}/glade
 
 modeleditorglade_DATA = \
 AboutModelEditor.glade\
+AutosaveWindow.glade\
 ConnectionObjectEditorWindow.glade\
 DialogWindow.glade\
 EntityListWindow.glade\
@@ -28,7 +29,10 @@ icon_modeleditor.png\
 icon_pathway.png\
 icon_process.png\
 icon_selector.png\
+icon_start.png\
+icon_step.png\
 icon_stepper.png\
+icon_stop.png\
 icon_system.png\
 icon_textbox.png\
 icon_variable.png\
