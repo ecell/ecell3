@@ -413,7 +413,6 @@ class StepperWindow(OsogoWindow):
 		# ----------------------------------------------------
 		# get new stepper list
 		self.theStepperIDList = self.theSession.getStepperList()
-		print self.theStepperIDList
 
                 aModel = self.theStepperIDListWidget.get_model()
 
