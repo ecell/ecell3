@@ -147,7 +147,7 @@ class EntryListWindow(Window):
         self.theSelectedFullPNList = []
         for aRowNumber in aCList.selection:
             aPropertyName =  aCList.get_text( aRowNumber, 0 )
-            aFullID = self.thePropertyWindow.theFullID
+            aFullID = self.thePropertyWindow.theFullID()
             aFullPN = convertFullIDToFullPN( aFullID, aPropertyName )
             self.theSelectedFullPNList.append( aFullPN )
         self.updateStatusBar()

@@ -19,7 +19,7 @@ class PluginWindow(ViewWindow):
 
         self.thePluginManager = pluginmanager
 
-        self.theRawFullPNList = fpns
+        self.theRawFullPNList = data
 
     def theFullPNList( self ):
         return map( self.supplementFullPN, self.theRawFullPNList )
