@@ -79,6 +79,7 @@ class PluginManager:
                 if( os.path.isfile( aModulePath + '.py' ) ):
                     aModuleName = os.path.basename( aModulePath )
                     self.loadModule( aModuleName )
+                    self.theInterfaceWindow.thePluginWindowsNoDict[ aModuleName[ : -6 ] ] = 0
 
     def updateAllPluginWindow( self ):
 	

@@ -128,6 +128,17 @@ class PluginWindow(ViewWindow):
             aFullPNString = createFullPNString( fullpn )
             self.theSession.printMessage('%s is not settable\n' % aFullPNString )
 
+    def exit( self, obj ):
+
+	self.thePluginManager.theInterfaceWindow.removeRecord( self )
+	self.thePluginManager.removeInstance( self )
+        self.thePluginManager.theInterfaceWindow.theSelectedRow = -1
+
+    def editTitle( self, aTitle ):
+
+        self.theTitle = aTitle
+        self.getWidget( self.theClassName )[ 'title' ] = self.theTitle
+
 
 
 

@@ -66,20 +66,8 @@ class DigitalWindow( PluginWindow ):
     def decreaseValue( self, obj ):
 
         self.setValue( self.theFullPN(), self.getValue( self.theFullPN() ) * 0.5 )
+
 			
-
-    def exit( self, obj ):
-
-	self.thePluginManager.theInterfaceWindow.removeRecord( self )
-	self.thePluginManager.removeInstance( self )
-        self.thePluginManager.theInterfaceWindow.theSelectedRow = -1
-
-    def editTitle( self, aTitle ):
-
-            self.theTitle = aTitle
-	    self.getWidget('DigitalWindow')['title'] = self.theTitle
-	    
-
     def test( self, obj ):
         print 'you did it'
 

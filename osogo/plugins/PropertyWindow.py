@@ -54,8 +54,10 @@ class PropertyWindow(PluginWindow):
         aNameFullPN = convertFullIDToFullPN( self.theFullID(),
                                                       'Name' )
         aNameList = list( self.theDriver.getProperty( aNameFullPN ) )
-        self.theClassName = aNameList[0]
         
+#        self.theClassName = aNameList[0]
+        aClassName = aNameList[0]
+#        print 'Here', self.theClassName
         self.theType = PrimitiveTypeString[ self.theFullID()[TYPE] ]
         self.theID   = str( self.theFullID()[ID] )
         self.thePath = str( self.theFullID()[SYSTEMPATH] )
@@ -66,7 +68,8 @@ class PropertyWindow(PluginWindow):
         self.theTypeEntry.set_text( self.theType  )
         self.theIDEntry.set_text  ( self.theID )
         self.thePathEntry.set_text( self.thePath )
-        self.theClassNameEntry.set_text( self.theClassName )
+#        self.theClassNameEntry.set_text( self.theClassName )
+        self.theClassNameEntry.set_text( aClassName )
 
         self.update()
 
@@ -173,18 +176,7 @@ class PropertyWindow(PluginWindow):
 
         print self.theSelected
 
-    def exit( self, obj ):
-	self.thePluginManager.theInterfaceWindow.removeRecord( self )
-	self.thePluginManager.removeInstance( self )
-        self.thePluginManager.theInterfaceWindow.theSelectedRow = -1
-
-    def editTitle( self, aTitle ):
-
-        self.theTitle = aTitle
-        self.getWidget('PropertyWindow')['title'] = self.theTitle
-
-
-
+   
 if __name__ == "__main__":
 
 

@@ -10,22 +10,19 @@ class InterfaceWindow( Window ):
     def __init__( self, aMainWindow ):
 
         Window.__init__( self )
+
 	self.theMainWindow = aMainWindow
 	self.theInterfaceList = self[ 'InterfaceCList' ]
-	self.thePluginWindowsNoDict = { 'Substance' : 0 ,
-                                        'Property'  : 0 ,
-                                        'Bargraph'  : 0 ,
-                                        'Digital'   : 0 }
-        
+        self.thePluginWindowsNoDict = {}
+	self.thePluginWindowsDict = {}
+        self.theCount = 0
+        self.theSelectedRow = -1
+        self.theTitle = ""
+
         self.addHandlers( { 'interfacelist_select_row' : self.rowSelected,
 	   		    'ShowButton_clicked'       : self.showWindow,
 			    'SaveButton_clicked'       : self.editTitle,
 			    'DeleteButton_clicked'     : self.deleteWindow } )
-
-	self.thePluginWindowsDict = {}
-	self.theCount = 0
-        self.theSelectedRow = -1
-        self.theTitle = ""
 
     def addNewRecord( self , classname , data ):
         

@@ -160,17 +160,7 @@ class BargraphWindow( PluginWindow ):
     def changeValue( self, value ):
         self.updateByAuto( value )
 
-    def exit( self, obj ):
-	self.thePluginManager.theInterfaceWindow.removeRecord( self )
-	self.thePluginManager.removeInstance( self )
-        self.thePluginManager.theInterfaceWindow.theSelectedRow = -1
-    
-    def editTitle( self, aTitle ):
-
-        self.theTitle = aTitle
-        self.getWidget('BargraphWindow')['title'] = self.theTitle  
-
-
+   
 if __name__ == "__main__":
 
     class simulator:

@@ -117,17 +117,7 @@ class SubstanceWindow( PluginWindow ):
         self.theConcValue *= 0.5
         self.setValue( self.theConcFPN, self.theConcValue )
 
-    def exit( self, obj ):
-	self.thePluginManager.theInterfaceWindow.removeRecord( self )
-	self.thePluginManager.removeInstance( self )
-        self.thePluginManager.theInterfaceWindow.theSelectedRow = -1
-        
-    def editTitle( self, aTitle ):
-
-        self.theTitle = aTitle
-        self.getWidget('SubstanceWindow')['title'] = self.theTitle
-
-
+    
     def mainLoop():
         # FIXME: should be a custom function
         gtk.mainloop()
