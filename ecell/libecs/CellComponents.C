@@ -36,10 +36,10 @@ char const CellComponents_C_rcsid[] = "$Id$";
 
 
 #include "assert.h"
-#include "Koyurugi/CellComponents.h"
+#include "CellComponents.h"
 //FIXME: #include "ecell/MessageWindow.h"
-#include "Koyurugi/RootSystem.h"
-#include "Koyurugi/SystemMaker.h"
+#include "RootSystem.h"
+#include "SystemMaker.h"
 
 
 //// register all cell components to SystemMaker

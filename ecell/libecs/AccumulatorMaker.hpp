@@ -37,7 +37,7 @@
 #ifndef ___ACCUMULATORMAKER_H___
 #define ___ACCUMULATORMAKER_H___
 #include <stl.h>
-#include "Koyurugi/Accumulators.h"
+#include "Accumulators.h"
 #include "util/ModuleMaker.h"
 
 class AccumulatorMaker : public MultiClassModuleMaker<Accumulator>

@@ -36,12 +36,12 @@ char const Reactor_C_rcsid[] = "$Id$";
 
 
 //FIXME: #include "ecell/MessageWindow.h"
-#include "Koyurugi/Reactant.h"
-#include "Koyurugi/RootSystem.h"
-#include "Koyurugi/Stepper.h"
-#include "Koyurugi/FQPN.h"
+#include "Reactant.h"
+#include "RootSystem.h"
+#include "Stepper.h"
+#include "FQPN.h"
 
-#include "Koyurugi/Reactor.h"
+#include "Reactor.h"
 
 Reactor::Condition Reactor::_globalCondition;// = Reactor::Condition::Good;
 const char* Reactor::LIGAND_STRING_TABLE[] = {"substrate","product","catalyst"

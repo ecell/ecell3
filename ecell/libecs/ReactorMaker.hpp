@@ -37,7 +37,7 @@
 #ifndef ___REACTORMAKER_H___
 #define ___REACTORMAKER_H___
 #include <stl.h>
-#include "Koyurugi/Reactor.h"
+#include "Reactor.h"
 #include "util/SharedModuleMaker.h"
 
 class ReactorMaker : public SharedModuleMaker<Reactor>

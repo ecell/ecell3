@@ -36,7 +36,7 @@
 
 #ifndef __REACTANT_H___
 #define __REACTANT_H___
-#include "Koyurugi/Substance.h"
+#include "Substance.h"
 
 
 class Reactant

@@ -44,9 +44,9 @@
 #endif /* HAVE_LIMITS */
 
 #include <stl.h>
-#include "Koyurugi/Defs.h"
+#include "Defs.h"
 #include "util/Util.h"
-#include "Koyurugi/Entity.h"
+#include "Entity.h"
 #include "util/Message.h"
 
 class Substance;

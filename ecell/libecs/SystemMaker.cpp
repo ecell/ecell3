@@ -35,8 +35,8 @@ char const SystemMaker_C_rcsid[] = "$Id$";
 
 
 
-#include "Koyurugi/SystemMaker.h"
-#include "Koyurugi/RootSystem.h"
+#include "SystemMaker.h"
+#include "RootSystem.h"
 
 
 ////////////////////// SystemMaker

@@ -39,7 +39,7 @@
 #include <cassert>
 #include <string>
 #include "util/Message.h"
-#include "Koyurugi/Defs.h"
+#include "Defs.h"
 
 class System;
 class RootSystem;

@@ -38,7 +38,7 @@
 #define ___SUBSTANCEMAKER_H___
 #include "util/ModuleMaker.h"
 
-#include "Koyurugi/Substance.h"
+#include "Substance.h"
 
 //class Substance;
 

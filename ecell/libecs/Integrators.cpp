@@ -35,7 +35,7 @@ char const Integrators_C_rcsid[] = "$Id$";
 
 
 
-#include "Koyurugi/Integrators.h"
+#include "Integrators.h"
 
 
 ////////////////////////////// Integrator

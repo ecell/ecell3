@@ -44,14 +44,14 @@ char const RootSystem_C_rcsid[] = "$Id$";
 //FIXME: #include "ecell/ECSMainWindow.h"
 //FIXME: #include "InfoDialogManager.h"
 //FIXME: #include "WorkingDialogManager.h"
-#include "Koyurugi/RootSystem.h"
-#include "Koyurugi/CellComponents.h"
+#include "RootSystem.h"
+#include "CellComponents.h"
 //FIXME: #include "util/Datafile.h"
-#include "Koyurugi/Primitive.h"
-#include "Koyurugi/SubstanceMaker.h"
-#include "Koyurugi/ReactorMaker.h"
-#include "Koyurugi/SystemMaker.h"
-#include "Koyurugi/AccumulatorMaker.h"
+#include "Primitive.h"
+#include "SubstanceMaker.h"
+#include "ReactorMaker.h"
+#include "SystemMaker.h"
+#include "AccumulatorMaker.h"
 
 RootSystem::RootSystem() :
 _stepperLeader(*new StepperLeader()),

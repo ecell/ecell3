@@ -37,9 +37,8 @@ char const Message_C_rcsid[] = "$Id$";
 
 #include <strstream>
 #include <stdio.h>
-#include "util/Message.h"
+#include "Message.h"
 //FIXME: #include "ecell/MessageWindow.h"
-#include "Koyurugi/Defs.h"
 
 ////////////////////// Message
 

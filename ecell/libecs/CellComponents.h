@@ -36,9 +36,9 @@
 
 #ifndef ___CELLCOMPONENTS_H___
 #define ___CELLCOMPONENTS_H___
-#include "Koyurugi/System.h"
-#include "Koyurugi/Substance.h"
-#include "Koyurugi/Reactor.h"
+#include "System.h"
+#include "Substance.h"
+#include "Reactor.h"
 
 class RootSystem;
 

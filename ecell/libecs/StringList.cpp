@@ -35,7 +35,7 @@ char const StringList_C_rcsid[] = "$Id$";
 
 
 
-#include "util/StringList.h"
+#include "StringList.h"
 
 
 

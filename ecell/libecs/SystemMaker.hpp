@@ -37,8 +37,8 @@
 #ifndef ___SYSTEMMAKER_H___
 #define ___SYSTEMMAKER_H___
 #include <stl.h>
-#include "Koyurugi/System.h"
-#include "Koyurugi/StepperMaker.h"
+#include "System.h"
+#include "StepperMaker.h"
 #include "util/ModuleMaker.h"
 
 

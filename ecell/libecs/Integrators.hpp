@@ -36,7 +36,7 @@
 
 #ifndef ___INTEGRATORS_H___
 #define ___INTEGRATORS_H___
-#include "Koyurugi/Substance.h"
+#include "Substance.h"
 
 class Integrator
 {

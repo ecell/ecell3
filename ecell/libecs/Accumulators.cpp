@@ -37,8 +37,8 @@ char const Accumulators_C_rcsid[] = "$Id$";
 
 #include <math.h>
 
-#include "Koyurugi/Accumulators.h"
-#include "Koyurugi/AccumulatorMaker.h"
+#include "Accumulators.h"
+#include "AccumulatorMaker.h"
 
 void AccumulatorMaker::makeClassList()
 {

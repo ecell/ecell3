@@ -39,10 +39,10 @@
 #include <math.h>
 #include <errno.h>
 #include <iostream.h>
-#include "Koyurugi/Defs.h"
+#include "Defs.h"
 //#include "ecell/TimeManager.h"
 //#include "ecell/MessageWindow.h"
-#include "Koyurugi/Entity.h"
+#include "Entity.h"
 
 
 class RootSystem;

@@ -37,7 +37,7 @@
 #ifndef ___ACCUMULATOR_H___
 #define ___ACCUMULATOR_H___
 
-#include "Koyurugi/Substance.h"
+#include "Substance.h"
 
 
 

@@ -40,10 +40,10 @@
 #include <stl.h>
 #include <string.h>
 
-#include "Koyurugi/Entity.h"
-#include "Koyurugi/Primitive.h"
-#include "Koyurugi/Exceptions.h"
-#include "Koyurugi/FQPN.h"
+#include "Entity.h"
+#include "Primitive.h"
+#include "Exceptions.h"
+#include "FQPN.h"
 
 class Gene;
 class Genome;
@@ -510,7 +510,7 @@ public:
 
 
 
-#include "Koyurugi/Reactor.h"
+#include "Reactor.h"
 /*!
   Equivalent to Reactor::isRegularReactor except that
   this function object takes a reference to a ReactorList::value_type.

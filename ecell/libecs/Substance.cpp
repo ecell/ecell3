@@ -35,13 +35,13 @@ char const Substance_C_rcsid[] = "$Id$";
 
 
 
-#include "Koyurugi/Substance.h"
-#include "Koyurugi/Integrators.h"
-#include "Koyurugi/System.h"
-#include "Koyurugi/RootSystem.h"
+#include "Substance.h"
+#include "Integrators.h"
+#include "System.h"
+#include "RootSystem.h"
 #include "util/Util.h"
-#include "Koyurugi/Accumulators.h"
-#include "Koyurugi/AccumulatorMaker.h"
+#include "Accumulators.h"
+#include "AccumulatorMaker.h"
 //FIXME: #include "ecell/MessageWindow.h"
 
 
