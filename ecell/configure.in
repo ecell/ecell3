@@ -239,12 +239,7 @@ dnl AC_FUNC_VPRINTF
 AC_CHECK_FUNCS(mkdir select strdup strerror strtod uname modf modfl)
 AC_CHECK_FUNCS(strdup strstr)
 
-AC_OUTPUT(Makefile 
-libecs/Makefile
-libemc/Makefile
-pyecs/Makefile
-pyecs/ecell3-python
-pyecell/Makefile
-pyecell/ecell/Makefile
-dm/Makefile
-pyecell/ecell/gui_config.py,chmod +x pyecs/ecell3-python)
+AC_CONFIG_FILES([pyecs/ecell3-python], [chmod +x pyecs/ecell3-python])
+AC_CONFIG_FILES([Makefile libecs/Makefile libemc/Makefile pyecs/Makefile pyecell/Makefile pyecell/ecell/Makefile dm/Makefile pyecell/ecell/gui_config.py])
+AC_OUTPUT
+
