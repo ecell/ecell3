@@ -274,12 +274,12 @@ class ECDDataFile( DataFile ):
 	def getHeaderList( self ):
 
 		aHeaderList = []		
-		aHeaderList.append( 'DATA: %s' %self.theDataName )
-		aHeaderList.append( 'SIZE: %d %d' %(self.theSizeOfColumn,self.theSizeOfLine) )
-		aHeaderList.append( 'LABEL: %s' %self.theLabel )
-		aHeaderList.append( 'NOTE: %s' %self.theNote )
-		aHeaderList.append( '' )
-		aHeaderList.append( '----------------------' )
+		aHeaderList.append( '# DATA: %s' %self.theDataName )
+		aHeaderList.append( '# SIZE: %d %d' %(self.theSizeOfColumn,self.theSizeOfLine) )
+		aHeaderList.append( '# LABEL: %s' %self.theLabel )
+		aHeaderList.append( '# NOTE: %s' %self.theNote )
+		aHeaderList.append( '# ' )
+		aHeaderList.append( '# ----------------------' )
 
 		return aHeaderList
 
@@ -311,7 +311,7 @@ class ECDDataFile( DataFile ):
 	# ------------------------------------------------------------------
 	def save( self, aFileName = None ):
 
-		if aFilename is not None:
+		if aFileName is not None:
 			self.saveWithFileName( aFileName )
 			return
 

@@ -40,7 +40,7 @@ namespace libecs
     //    addClass( new Module( "Variable", PlainVariable::createInstance ) );
 
     NewVariableModule( Variable );
-    //    NewVariableModule( PositiveVariable );
+    NewVariableModule( PositiveVariable );
   }
 
 } // namespace libecs
