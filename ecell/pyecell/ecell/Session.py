@@ -68,7 +68,6 @@ class Session:
 
 
 
-
     def loadStepper( self ):
         """stepper loader"""
 
@@ -85,38 +84,6 @@ class Session:
             self.theSimulator.createStepper( aClass, anId )
 
 
-
-    def loadSystemStepper( self ):
-        
-        for aTargetStepperSystem in( self.__thePreModel[ 'stepper_system' ] ):
-
-            aFullPath = aTargetStepperSystem[0]
-            aFullPathList = aFullPath.split( '/' )
-
-            aClass  = aTargetStepperSystem[1]
-            aValueList = [ aClass ]
-            aName = 'StepperID'
-
-
-            if aFullPath == '/':
-                aFullPn = 'System::/:' + aName
-                
-            else:
-                anId    = aFullPathList[-1]
-                aFullPathList.remove( aFullPathList[ len(aFullPathList) - 1 ] )
-                aPath = string.join( aFullPathList, '/' )
-                if aPath == '':
-                    aPath = '/'
-                aFullPn = 'System' + ':' + aPath + ':' + anId + ':' + aName
-
-                self.theSimulator.setProperty( aFullPn, aValueList )
-            
-            ## TemporarySample ---------------------------------------
-            #aPrintFullId = "self.theSimulator.setProperty('" + aFullPn + "',"
-            #print aPrintFullId, aValueList, ")"
-            ##-------------------------------------------------------
-
-            
 
 
     def loadEntity( self ):
@@ -149,20 +116,44 @@ class Session:
                 aFullId = aType + ':' + aPath + ':' + anId
 
 
-            ## Temporary
-            #aPrintFullId = "aSimulator.createEntity('" + aType + "',"
-            #aPrintType   = "'" + aFullId + "',"
-            #aPrintName   = "'" + aName + "')"
-            #print aPrintFullId, aPrintType, aPrintName
-
 
             ## check!!
             if not aPath == '':
                 self.theSimulator.createEntity( aType, aFullId, aName )
 
+                ##Temporary
+                #print 'self.theSimulator.createEntity(', aType, ',', aFullId, ',', aName, ')'
             
 
 
+    def loadSystemStepper( self ):
+        
+        for aTargetStepperSystem in( self.__thePreModel[ 'stepper_system' ] ):
+
+            aFullPath = aTargetStepperSystem[0]
+            aFullPathList = aFullPath.split( '/' )
+
+            aClass  = aTargetStepperSystem[1]
+            aValueList = [ aClass ]
+            aName = 'StepperID'
+
+
+            if aFullPath == '/':
+                aFullPn = 'System::/:' + aName
+                
+            else:
+                anId    = aFullPathList[-1]
+                aFullPathList.remove( aFullPathList[ len(aFullPathList) - 1 ] )
+                aPath = string.join( aFullPathList, '/' )
+                if aPath == '':
+                    aPath = '/'
+                aFullPn = 'System' + ':' + aPath + ':' + anId + ':' + aName
+
+            self.theSimulator.setProperty( aFullPn, aValueList )
+
+            ##Temporary
+            #print 'self.theSimulator.setProperty(', aFullPn, ',', aValueList, ')'
+            
 
 
 
@@ -176,12 +167,12 @@ class Session:
             aValue  = aTargetProperty[1]
 
             
+            self.theSimulator.setProperty( aFullPn, aValue )
+
             ## TemporarySample ---------------------------------
             #aPrintFullPn = "self.theSimulator.setProperty('" + aFullPn + "',"
             #print aPrintFullPn, aValue, ')'
             ## -------------------------------------------------
-
-            self.theSimulator.setProperty( aFullPn, aValue )
 
 
 
