@@ -488,16 +488,22 @@ class Session:
 
             for aProperty in aPropertyList:
                 
-                aValue = self.theSimulator.getStepperProperty( aStepper, aProperty )
                 anAttribute = self.theSimulator.getStepperPropertyAttributes( aStepper, aProperty)
 
-                if anAttribute[0] == 0:
+                # check get attribute 
+                if anAttribute[1] == 0:
                     pass
                 
-                elif aValue == '':
+                # check set attribute
+                elif anAttribute[0] == 0:
                     pass
-                
+
                 else:
+                                    
+                    aValue = self.theSimulator.getStepperProperty( aStepper, aProperty )
+                    #if aValue == '':
+                    #    pass
+                    
                     aValueList = list()
                     if type( aValue ) != tuple:
                         aValueList.append( str(aValue) )
