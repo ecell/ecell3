@@ -1,0 +1,22 @@
+Release notes for E-Cell version 3.0a by Chris Pickett (incomplete - 
+documentation only)
+
+Documentation:
+
+To generate documentation of the E-Cell source, you need doxygen.  You can get 
+it at:
+
+http://www.stack.nl/~dimitri/doxygen/
+
+Read the installation instructions, make sure to get GraphViz.  To generate
+documentation type '% make doc'.  Browsable html is in '~/ecell3/doc/html/' and
+latex source is in 'ecell3/doc/latex/'.  Point your browser to
+'~/ecell3/doc/html/index.html' to browse the html files.  To compile the latex
+source, type '% make' in '~/ecell3/doc/latex/'.  This generates 'refman.dvi'.
+To create a PostScript file type '% make ps'.  '% make ps_2on1'.  '% make pdf'
+and '% make pdf_2on1' generate pdf files instead.
+
+Edit ECell3.doxy to configure the documentation generated.  Currently, the
+internals as well as the API are visible in the output.
+
+The documentation is currently incomplete.
