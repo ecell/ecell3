@@ -5,7 +5,8 @@ SUBDIRS = libltdl korandom dmtool ecell osogo
 
 EXTRA_DIST = autogen.sh\
 PyCXX\
-doc
+doc\
+test
 
 dist-hook:
 	rm -rf $(distdir)/CVS
