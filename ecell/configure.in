@@ -7,7 +7,7 @@ AC_INIT
 AC_CONFIG_SRCDIR([libecs/Entity.hpp])
 
 AM_CONFIG_HEADER(config.h)
-
+AC_SYS_LARGEFILE
 ECELL_MAJOR_VERSION=3
 ECELL_MINOR_VERSION=1
 ECELL_MICRO_VERSION=99
@@ -139,6 +139,8 @@ dnl 	AC_MSG_ERROR([stl.h not found.])
 dnl )
 AC_CHECK_HEADERS(math,,)
 AC_CHECK_HEADERS(cmath,,)
+
+
 dnl
 dnl
 EXT_GUESS="../../../.. ../../.. ../.. ../ ./ $prefix /usr /usr/local /opt"

@@ -44,7 +44,7 @@ case $CC in
 *xlc | *xlc\ * | *lcc | *lcc\ *) am_opt=--include-deps;;
 esac
 
-for dir in . libltdl dmtool ecell osogo bin
+for dir in . libltdl dmtool ecell osogo bin modeleditor
 do 
   echo processing $dir
   (cd $dir; \

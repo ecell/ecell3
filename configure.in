@@ -31,8 +31,9 @@ AC_ARG_ENABLE(gtk,
   AC_HELP_STRING([--disable-gtk],
                [build ecell without gtk.]),
   [ECELL_SUBDIR="libltdl ecell bin dmtool "],
-  [ECELL_SUBDIR="libltdl ecell bin dmtool osogo "
-  AC_CONFIG_SUBDIRS(osogo)]
+  [ECELL_SUBDIR="libltdl ecell bin dmtool osogo modeleditor"
+  AC_CONFIG_SUBDIRS(osogo)
+  AC_CONFIG_SUBDIRS(modeleditor)]
 )
 dnl
 AC_SUBST(ECELL_SUBDIR)

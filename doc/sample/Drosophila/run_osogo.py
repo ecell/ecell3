@@ -64,7 +64,7 @@ logger1=getWindow('LoggerWindow')
 
 #here comes loggerwindow specific code
 
-logger1.saveDataFile(fpn_p0, aDirectory='/home/gabor/data', anInterval=0.2, aStartTime=10, anEndTime=20, fileType='ecd')
+logger1.saveDataFile(fpn_p0, aDirectory='data', anInterval=0.2, aStartTime=10, anEndTime=20, fileType='ecd')
 
 print logger1.getDataFileType()
 
