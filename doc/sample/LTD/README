@@ -55,7 +55,7 @@ LTD.em:     Model file(em file) for this model
 
    Run emtool -a for each .dm file.
 
-   % ecell3-dmc ...dm
+   % ecell3-dmc ...cpp
 
    Or, to do this job at once,
 
