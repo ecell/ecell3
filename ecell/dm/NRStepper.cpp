@@ -35,6 +35,8 @@
 
 #include <time.h>
 
+#include <limits>
+
 #include "NRStepper.hpp"
 
 #include "NRProcess.hpp"
@@ -51,11 +53,13 @@ NRStepper::NRStepper()
   theTolerance( 0.1 ),
   theRng( gsl_rng_alloc( gsl_rng_mt19937 ) )
 {
+  // unset the default MinStepInterval.  
+  setMinStepInterval( std::numeric_limits<Real>::min() );
+
   // set a seed.   
   // This can cause a problem in simultaneous multiple runs, because
   // time() can return the same value within 1 sec.
   gsl_rng_set( theRng, static_cast<unsigned long int>( time( NULL ) ) );
-
 
   CREATE_PROPERTYSLOT_GET    ( Real, TimeScale, NRStepper );
   CREATE_PROPERTYSLOT_SET_GET( Real, Tolerance, NRStepper );
