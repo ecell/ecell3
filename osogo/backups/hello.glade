@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<GTK-Interface>
+
+<project>
+  <name>Hello</name>
+  <program_name>hello</program_name>
+  <directory></directory>
+  <source_directory>src</source_directory>
+  <pixmaps_directory>pixmaps</pixmaps_directory>
+  <language>C</language>
+  <gnome_support>True</gnome_support>
+  <gettext_support>True</gettext_support>
+</project>
+
+<widget>
+  <class>GtkWindow</class>
+  <name>window1</name>
+  <border_width>55</border_width>
+  <title>window1</title>
+  <type>GTK_WINDOW_TOPLEVEL</type>
+  <position>GTK_WIN_POS_NONE</position>
+  <modal>False</modal>
+  <allow_shrink>False</allow_shrink>
+  <allow_grow>True</allow_grow>
+  <auto_shrink>False</auto_shrink>
+
+  <widget>
+    <class>GtkButton</class>
+    <name>button1</name>
+    <can_focus>True</can_focus>
+    <signal>
+      <name>clicked</name>
+      <handler>on_button1_clicked</handler>
+      <last_modification_time>Mon, 06 Aug 2001 04:07:21 GMT</last_modification_time>
+    </signal>
+    <label>Hello!</label>
+  </widget>
+</widget>
+
+</GTK-Interface>

@@ -1,0 +1,101 @@
+<?xml version="1.0"?>
+<GTK-Interface>
+
+<project>
+  <name>EcellGUI</name>
+  <program_name>ecellgui</program_name>
+  <directory></directory>
+  <source_directory>src</source_directory>
+  <pixmaps_directory>pixmaps</pixmaps_directory>
+  <language>C</language>
+  <gnome_support>True</gnome_support>
+  <gettext_support>True</gettext_support>
+</project>
+
+<widget>
+  <class>GtkWindow</class>
+  <name>Pallete Window</name>
+  <title>Pallete</title>
+  <type>GTK_WINDOW_TOPLEVEL</type>
+  <position>GTK_WIN_POS_NONE</position>
+  <modal>False</modal>
+  <allow_shrink>False</allow_shrink>
+  <allow_grow>True</allow_grow>
+  <auto_shrink>False</auto_shrink>
+
+  <widget>
+    <class>GtkToolbar</class>
+    <name>toolbar20</name>
+    <orientation>GTK_ORIENTATION_VERTICAL</orientation>
+    <type>GTK_TOOLBAR_BOTH</type>
+    <space_size>5</space_size>
+    <space_style>GTK_TOOLBAR_SPACE_EMPTY</space_style>
+    <relief>GTK_RELIEF_NORMAL</relief>
+    <tooltips>True</tooltips>
+
+    <widget>
+      <class>GtkRadioButton</class>
+      <child_name>Toolbar:button</child_name>
+      <name>radiobutton11</name>
+      <label>Property</label>
+      <stock_pixmap>GNOME_STOCK_PIXMAP_SEARCH</stock_pixmap>
+      <active>False</active>
+    </widget>
+
+    <widget>
+      <class>GtkRadioButton</class>
+      <child_name>Toolbar:button</child_name>
+      <name>radiobutton12</name>
+      <label>Substance</label>
+      <stock_pixmap>GNOME_STOCK_PIXMAP_UP</stock_pixmap>
+      <active>False</active>
+    </widget>
+
+    <widget>
+      <class>GtkRadioButton</class>
+      <child_name>Toolbar:button</child_name>
+      <name>radiobutton13</name>
+      <label>Reactor</label>
+      <stock_pixmap>GNOME_STOCK_PIXMAP_CONVERT</stock_pixmap>
+      <active>False</active>
+    </widget>
+
+    <widget>
+      <class>GtkRadioButton</class>
+      <child_name>Toolbar:button</child_name>
+      <name>radiobutton14</name>
+      <label>System</label>
+      <stock_pixmap>GNOME_STOCK_PIXMAP_ABOUT</stock_pixmap>
+      <active>False</active>
+    </widget>
+
+    <widget>
+      <class>GtkRadioButton</class>
+      <child_name>Toolbar:button</child_name>
+      <name>radiobutton15</name>
+      <label>Digital</label>
+      <stock_pixmap>GNOME_STOCK_PIXMAP_EXEC</stock_pixmap>
+      <active>False</active>
+    </widget>
+
+    <widget>
+      <class>GtkRadioButton</class>
+      <child_name>Toolbar:button</child_name>
+      <name>radiobutton16</name>
+      <label>Bar</label>
+      <stock_pixmap>GNOME_STOCK_PIXMAP_ALIGN_LEFT</stock_pixmap>
+      <active>False</active>
+    </widget>
+
+    <widget>
+      <class>GtkRadioButton</class>
+      <child_name>Toolbar:button</child_name>
+      <name>radiobutton17</name>
+      <label>Tracer</label>
+      <stock_pixmap>GNOME_STOCK_PIXMAP_REDO</stock_pixmap>
+      <active>False</active>
+    </widget>
+  </widget>
+</widget>
+
+</GTK-Interface>
