@@ -39,7 +39,6 @@ LayoutBufferFactory.py\
 LayoutCommand.py\
 LayoutEml.py\
 LayoutManager.py\
-LayoutManagerWindow.py\
 LayoutXML.py\
 LinePropertyEditor.py\
 LineDescriptor.py\
