@@ -70,8 +70,8 @@ namespace libecs
     const StepperPtr aStepperPtr( aTopEvent.getStepper() );
     setCurrentTime( aTopEvent.getTime() );
  
-    aStepperPtr->integrate();
     aStepperPtr->setCurrentTime( getCurrentTime() );
+    aStepperPtr->integrate();
     aStepperPtr->step();
     aStepperPtr->dispatchInterruptions();
     aStepperPtr->log();

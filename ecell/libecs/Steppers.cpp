@@ -149,7 +149,7 @@ namespace libecs
 			      + theValueBuffer[ c ] );
 
 	// clear velocity
-	aVariable->setVelocity( 0 );
+	aVariable->setVelocity( 0.0 );
       }
 
     // ========= 4 ===========
@@ -237,7 +237,6 @@ namespace libecs
   {
     const UnsignedInt aSize( getReadOnlyVariableOffset() );
 
-    // don't expect too much from euler
     const Real eps_rel( getTolerance() );
     const Real eps_abs( getTolerance() * getAbsoluteToleranceFactor() );
     const Real a_y( getStateToleranceFactor() );
@@ -259,7 +258,7 @@ namespace libecs
 			      + theValueBuffer[ c ] );
 
 	// clear velocity
-	aVariable->setVelocity( 0 );
+	aVariable->setVelocity( 0.0 );
       }
 
     // ========= 2 ===========
@@ -278,18 +277,16 @@ namespace libecs
 	const Real anErrorEstimate( theVelocityBuffer[ c ] );
 
 	// ( k1 + k2 ) / 2 for ~Yn+1
-	theVelocityBuffer[ c ] = 
-	  ( theVelocityBuffer[ c ] + aVelocity ) * 0.5;
+	theVelocityBuffer[ c ] += aVelocity;
+	theVelocityBuffer[ c ] *= 0.5;
 
-	const Real 
-	  aTolerance( eps_rel * 
-		      ( a_y * fabs( theValueBuffer[ c ] ) 
-			+ a_dydt * fabs( theVelocityBuffer[ c ] ) )
-		      + eps_abs );
+	const Real aTolerance( eps_rel * 
+			       ( a_y * fabs( theValueBuffer[ c ] ) 
+				 + a_dydt * fabs( theVelocityBuffer[ c ] ) )
+			       + eps_abs );
 
-	const Real
-	  anError( fabs( ( theVelocityBuffer[ c ] 
-			   - anErrorEstimate ) / aTolerance ) );
+	const Real anError( fabs( ( theVelocityBuffer[ c ] 
+				    - anErrorEstimate ) / aTolerance ) );
 
 	if( anError > maxError )
 	  {
@@ -359,8 +356,7 @@ namespace libecs
     // grow it if error is 50% less than desired
     if ( maxError < 0.5 )
       {
-	Real aNewStepInterval( getStepInterval()
-			       * pow(maxError , -0.5)
+	Real aNewStepInterval( getStepInterval() * pow(maxError , -0.5)
 			       * safety );
 	//  	    Real aNewStepInterval( getStepInterval() * 2.0 );
 
@@ -444,22 +440,20 @@ namespace libecs
 	const Real aVelocity( aVariable->getVelocity() );
 	
 	// ( k1 + k2 + k3 * 4 ) / 6 for ~Yn+1
-	const Real
-	  anErrorEstimate( ( theK1[ c ] + theVelocityBuffer[ c ]
-			     + aVelocity * 4.0 ) * ( 1.0 / 6.0 ) );
+	const Real anErrorEstimate( ( theK1[ c ] + theVelocityBuffer[ c ]
+				      + aVelocity * 4.0 ) * ( 1.0 / 6.0 ) );
 
 	// ( k1 + k2 ) / 2 for Yn+1
-	theVelocityBuffer[ c ] = ( theK1[ c ] + theVelocityBuffer[ c ] ) * 0.5;
+	theVelocityBuffer[ c ] += theK1[ c ];
+	theVelocityBuffer[ c ] *= 0.5;
 
-	const Real 
-	  aTolerance( eps_rel *
-		      ( a_y * fabs( theValueBuffer[ c ] ) 
-			+  a_dydt * fabs( theVelocityBuffer[ c ] ) )
-		      + eps_abs );
+	const Real aTolerance( eps_rel *
+				( a_y * fabs( theValueBuffer[ c ] ) 
+				  +  a_dydt * fabs( theVelocityBuffer[ c ] ) )
+				+ eps_abs );
 
-	const Real
-	  anError( fabs( ( theVelocityBuffer[ c ] 
-			   - anErrorEstimate ) / aTolerance ) );
+	const Real anError( fabs( ( theVelocityBuffer[ c ] 
+				    - anErrorEstimate ) / aTolerance ) );
 	    
 	if( anError > maxError )
 	  {
@@ -528,7 +522,7 @@ namespace libecs
     const Real maxError( getMaxErrorRatio() );
 
     // grow it if error is 50% less than desired
-    if (maxError <= 0.5)
+    if( maxError <= 0.5 )
       {
 	Real aNewStepInterval( getStepInterval() 
 			       * pow(maxError , -0.25) * safety );
@@ -566,9 +560,8 @@ namespace libecs
 	theK1[ c ] = aVariable->getVelocity();
 
 	// restore k1 / 5 + x
-	aVariable->
-	  loadValue( theK1[ c ] * .2  * getStepInterval()
-		     + theValueBuffer[ c ] );
+	aVariable->loadValue( theK1[ c ] * .2  * getStepInterval()
+			      + theValueBuffer[ c ] );
 
 	// k1 * 37/378 for Yn+1
 	theVelocityBuffer[ c ] = theK1[ c ] * ( 37.0 / 378.0 );
@@ -576,7 +569,7 @@ namespace libecs
 	theErrorEstimate[ c ] = theK1[ c ] * ( 2825.0 / 27648.0 );
 
 	// clear velocity
-	aVariable->setVelocity( 0 );
+	aVariable->setVelocity( 0.0 );
       }
 
     // ========= 2 ===========
@@ -590,8 +583,8 @@ namespace libecs
 	    
 	// restore k1 * 3/40+ k2 * 9/40 + x
 	aVariable->
-	  loadValue( theK1[ c ] * ( 3.0 / 40.0 ) * getStepInterval()
-		     + theK2[ c ] * ( 9.0 / 40.0 ) * getStepInterval()
+	  loadValue( ( theK1[ c ] * ( 3.0 / 40.0 ) 
+		       + theK2[ c ] * ( 9.0 / 40.0 ) ) * getStepInterval()
 		     + theValueBuffer[ c ] );
 	    
 	// k2 * 0 for Yn+1 (do nothing)
@@ -600,7 +593,7 @@ namespace libecs
 	//	    theErrorEstimate[ c ] += theK2[ c ] * 0;
 	    
 	// clear velocity
-	aVariable->setVelocity( 0 );
+	aVariable->setVelocity( 0.0 );
       }
 	
     // ========= 3 ===========
@@ -614,9 +607,9 @@ namespace libecs
 	
 	// restore k1 * 3/10 - k2 * 9/10 + k3 * 6/5 + x
 	aVariable->
-	  loadValue( theK1[ c ] * ( 3.0 / 10.0 ) * getStepInterval()
-		     - theK2[ c ] * ( 9.0 / 10.0 ) * getStepInterval()
-		     + theK3[ c ] * ( 6.0 / 5.0 ) * getStepInterval()
+	  loadValue( ( theK1[ c ] * ( 3.0 / 10.0 )
+		       - theK2[ c ] * ( 9.0 / 10.0 )
+		       + theK3[ c ] * ( 6.0 / 5.0 ) ) * getStepInterval()
 		     + theValueBuffer[ c ] );
 	
 	// k3 * 250/621 for Yn+1
@@ -625,7 +618,7 @@ namespace libecs
 	theErrorEstimate[ c ] += theK3[ c ] * ( 18575.0 / 48384.0 );
 	
 	// clear velocity
-	aVariable->setVelocity( 0 );
+	aVariable->setVelocity( 0.0 );
       }
     
     // ========= 4 ===========
@@ -639,10 +632,10 @@ namespace libecs
 	
 	// restore k2 * 5/2 - k1 * 11/54 - k3 * 70/27 + k4 * 35/27 + x
 	aVariable->
-	  loadValue( theK2[ c ] * ( 5.0 / 2.0 ) * getStepInterval()
-		     - theK1[ c ] * ( 11.0 / 54.0 ) * getStepInterval()
-		     - theK3[ c ] * ( 70.0 / 27.0 ) * getStepInterval()
-		     + theK4[ c ] * ( 35.0 / 27.0 ) * getStepInterval()
+	  loadValue( ( theK2[ c ] * ( 5.0 / 2.0 ) 
+		       - theK1[ c ] * ( 11.0 / 54.0 )
+		       - theK3[ c ] * ( 70.0 / 27.0 )
+		       + theK4[ c ] * ( 35.0 / 27.0 ) ) * getStepInterval()
 		     + theValueBuffer[ c ] );
 	
 	// k4 * 125/594 for Yn+1
@@ -651,7 +644,7 @@ namespace libecs
 	theErrorEstimate[ c ] += theK4[ c ] * ( 13525.0 / 55296.0 );
 	    
 	// clear velocity
-	aVariable->setVelocity( 0 );
+	aVariable->setVelocity( 0.0 );
       }
 		
     // ========= 5 ===========
@@ -682,7 +675,7 @@ namespace libecs
 	theErrorEstimate[ c ] += theK5[ c ] * ( 277.0 / 14336.0 );
 	    
 	// clear velocity
-	aVariable->setVelocity( 0 );
+	aVariable->setVelocity( 0.0 );
       }
 
     // ========= 6 ===========
@@ -838,7 +831,7 @@ namespace libecs
 	theMidVelocityBuffer[ c ] = theK1[ c ] * ( 5783653.0 / 57600000.0 );
 
 	// clear velocity
-	aVariable->setVelocity( 0 );
+	aVariable->setVelocity( 0.0 );
       }
 
     // ========= 2 ===========
@@ -864,7 +857,7 @@ namespace libecs
 	//	    theMidVelocityBuffer[ c ] += theK2[ c ] * 0;
 
 	// clear velocity
-	aVariable->setVelocity( 0 );
+	aVariable->setVelocity( 0.0 );
       }
 
 
@@ -892,7 +885,7 @@ namespace libecs
 	theMidVelocityBuffer[ c ] += theK3[ c ] * ( 466123.0 / 1192500.0 );
 
 	// clear velocity
-	aVariable->setVelocity( 0 );
+	aVariable->setVelocity( 0.0 );
       }
 
 
@@ -921,7 +914,7 @@ namespace libecs
 	theMidVelocityBuffer[ c ] += theK4[ c ] * ( -41347.0 / 1920000.0 );
 
 	// clear velocity
-	aVariable->setVelocity( 0 );
+	aVariable->setVelocity( 0.0 );
       }
 
     // ========= 5 ===========
@@ -950,7 +943,7 @@ namespace libecs
 	theMidVelocityBuffer[ c ] += theK5[ c ] * ( 16122321.0 / 339200000.0 );
 
 	// clear velocity
-	aVariable->setVelocity( 0 );
+	aVariable->setVelocity( 0.0 );
       }
 
     // ========= 6 ===========
@@ -980,7 +973,7 @@ namespace libecs
 	theMidVelocityBuffer[ c ] += theK6[ c ] * ( -7117.0 / 20000.0 );
 
 	// clear velocity
-	aVariable->setVelocity( 0 );
+	aVariable->setVelocity( 0.0 );
       }
 
     // ========= 7 ===========
