@@ -14,7 +14,6 @@ CXXFLAGS= @CXXFLAGS@ # -D_REENTRANT
 
 libecs_la_LDFLAGS= #-rpath ${libdir}
 libecs_la_LIBADD= ${LIBLTDL} -L${KORANDOM_DIR}/korandom/.libs -lkorandom -lstdc++
-libecs_la_DEPENDENCIES=${KORANDOM_LIBS} 
 libecs_la_SOURCES=\
 Util.cpp\
 UVariable.cpp\

@@ -50,7 +50,7 @@ case $CC in
 *xlc | *xlc\ * | *lcc | *lcc\ *) am_opt=--include-deps;;
 esac
 
-for dir in . libltdl korandom dmtool ecell 
+for dir in . libltdl korandom dmtool ecell osogo
 do 
   echo processing $dir
   (cd $dir; \

@@ -3,6 +3,7 @@
 import sys
 import os
 import imp
+import glob
 
 from config import *
 
@@ -46,13 +47,26 @@ class PluginManager:
         try:
             aPlugin = self.thePluginMap[ classname ]
         except KeyError:
-            aPlugin = PluginModule( classname )
-            self.thePluginMap[ classname ] = aPlugin
+            self.loadModule( classname )
+
 
         anInstance = aPlugin.createInstance( data, self, parent )
         self.appendInstance( anInstance )
 
         return anInstance
+
+    def loadModule( self, classname ):
+        aPlugin = PluginModule( classname )
+        self.thePluginMap[ classname ] = aPlugin
+
+    def loadAll( self ):
+        for aPath in PLUGIN_PATH:
+            aFileList = glob.glob( os.path.join( aPath, '*.glade' ) )
+            for aFile in aFileList:
+                aModulePath = os.path.splitext( aFile )[0]
+                if( os.path.isfile( aModulePath + '.py' ) ):
+                    aModuleName = os.path.basename( aModulePath )
+                    self.loadModule( aModuleName )
 
     def printMessage( self, aMessageString ):
         self.theMainWindow.printMessage( aMessageString )

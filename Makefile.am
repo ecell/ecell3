@@ -1,7 +1,7 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-SUBDIRS = libltdl korandom dmtool ecell
+SUBDIRS = libltdl korandom dmtool ecell osogo
 
 EXTRA_DIST = autogen.sh\
 PyCXX

@@ -1,0 +1,10 @@
+#!@SHELL@
+
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+
+export OSOGOPATH=@libdir@/@PACKAGE@
+export PYTHONPATH="${OSOGOPATH}:${PYTHONPATH}"
+
+exec ecell3 ${OSOGOPATH}/MainWindow.py $*
+

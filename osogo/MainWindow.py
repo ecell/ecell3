@@ -60,6 +60,7 @@ class MainWindow(Window):
         self.addHandlers( self.theHandlerMap )
 
         self.thePluginManager = PluginManager( self )
+        self.thePluginManager.loadAll()
 
         #### create Script File Selection ####
         self.theScriptFileSelection = gtk.GtkFileSelection( 'Select Script File' )
@@ -78,6 +79,7 @@ class MainWindow(Window):
         
         #### create Palette Window ####
         self.thePaletteWindow = PaletteWindow.PaletteWindow()
+        self.thePaletteWindow.setPluginList( self.thePluginManager.thePluginMap )
 
         #### create Message Window ####
         self.theMessageWindow = MessageWindow.MessageWindow()

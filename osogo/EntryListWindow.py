@@ -19,7 +19,7 @@ class EntryListWindow(Window):
 
         self.theSelectedFullPNList = []
 
-        Window.__init__( self, 'EntryListWindow.glade' )
+        Window.__init__( self )
         self.addHandlers( { 'show_button_clicked' : self.openNewPluginWindow,
                             'system_tree_selection_changed' : self.updateEntryList,
                             'entry_list_selection_changed' : self.selectEntity
