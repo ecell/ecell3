@@ -36,6 +36,7 @@
 #include <map>
 #include <string>
 #include <ltdl.h>
+#include <assert.h>
 #include "DynamicModule.hpp"
 
 
