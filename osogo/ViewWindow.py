@@ -4,8 +4,15 @@ from Window import *
 
 import string
 import sys
+from ecssupport import *
 
 class ViewWindow(Window):
+    '''
+    theFullPNList()
+    theFullIDList()
+    theFullPN()
+    theFullID()
+    '''
 
     theClipBoard = ''
 
@@ -14,19 +21,14 @@ class ViewWindow(Window):
 
         self.theSimulator = sim
         
-        self.theFPNs = fpns
+        self.theRawFullPNList = fpns
+        
         self.addHandlers(
             { 'copy_fqpps':            self.copyFPNs,
               'paste_fqpps':           self.pasteFPNs,
               'add_fqpps':             self.addFPNs,
-              'print_fqpps_to_stdout': self.printFPNs,
-              'drag_data_received':    self.printTest,
-              'drag_motion':           self.printTest,
-              'drag_leave':            self.printTest,
-              'drag_drop':             self.printTest,
-              'drag_data_get':         self.printTest,
-              'drag_data_delete':      self.printTest }
-            )
+              'print_fqpps_to_stdout': self.printFPNs
+              } )
 
     def update( self ):
         pass
@@ -38,25 +40,48 @@ class ViewWindow(Window):
         print obj, data
 
     def copyFPNs(self, a, b):
-        ViewWindow.theClipBoard = self.theFPNs
+        ViewWindow.theClipBoard = self.theRawFullPNList
         print 'copy'
 
     def pasteFPNs(self, a, b):
-        self.theFPNs = ViewWindow.theClipBoard
+        self.theRawFullPNList = ViewWindow.theClipBoard
         initialize()
-        print 'paste' + ' : ' + self.theFPNs
+        print 'paste' + ' : ' + self.theFullRawPNList
 
     # overwrite in subclass if needed
     def addFPNs(self, a, b):
-        self.theFPNs = self.theFPNs + ',' + ViewWindow.theClipBoard
-        print 'add' + ' : ' + self.theFPNs
+        self.theRawFullPNList.extend( ViewWindow.theClipBoard )
+        print 'add' + ' : ' + self.theRawFullPNList
+
+    def theFullPNList( self ):
+        return map( self.supplementFullPN, self.theRawFullPNList )
+
+    def theFullIDList( self ):
+        return map( convertFullPNToFullID, self.theRawFullPNList )
+
+    def theFullPN( self ):
+        return self.supplementFullPN( self.theRawFullPNList[0] )
+
+    def theFullID( self ):
+        return convertFullPNToFullID( self.theFullPN() )
+
+
+    def supplementFullPN( self, aFullPN ):
+        if aFullPN[PROPERTY] != '' :
+            return aFullPN
+        else :
+            if aFullPN[TYPE] == SUBSTANCE :
+                aPropertyName = 'Quantity'
+            elif aFullPN[TYPE] == REACTOR :
+                aPropertyName = 'Activity'
+            elif aFullPN[TYPE] == SYSTEM :
+                aPropertyName = 'Activity'
+            aNewFullPN = convertFullIDToFullPN( convertFullPNToFullID(aFullPN),
+                                                aPropertyName )
+            return aNewFullPN
 
     def printFPNs(self, a, b):
-        print self.theFPNs
-    
-        
-
-
+        print self.theFullPNList
 
 if __name__ == "__main__":
     def mainLoop():

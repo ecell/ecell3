@@ -137,7 +137,8 @@ class EntryListWindow(Window):
             aEntityFullPN = aEntityListItem.get_data( 'FULLPN' )
             self.theSelectedFullPNList.append( aEntityFullPN )
 
-        self.thePropertyWindow.setFullPNList( self.theSelectedFullPNList )
+        self.thePropertyWindow.theRawFullPNList = self.theSelectedFullPNList
+        self.thePropertyWindow.setFullPNList()
 
         self.updateStatusBar()
 

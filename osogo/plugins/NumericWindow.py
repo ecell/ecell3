@@ -11,7 +11,6 @@ class NumericWindow( PluginWindow ):
 
         PluginWindow.__init__( self, dirname, sim, data, pluginmanager )
 
-        # test
         self['toolbar5'].set_style( GTK.TOOLBAR_ICONS )
         self['toolbar5'].set_button_relief( GTK.RELIEF_HALF )
 
@@ -19,73 +18,55 @@ class NumericWindow( PluginWindow ):
                             'increase_value' :self.increaseValue,
                             'decrease_value' :self.decreaseValue } )
 
-        self.theFPN = data[0]
-        self.theFullID = convertFullPNToFullID(self.theFPNs[0])
-        aFullPropertyName = convertFullIDToFullPN(self.theFullID,
-                                                  'PropertyList')
-        aPropertyList =\
-        list( self.theSimulator.getProperty( aFullPropertyName ) )
-        aAttributeList = convertFullIDToFullPN(self.theFullID,
-                                                  'PropertyAttributes')
-        aAttributeList =\
-        list(self.theSimulator.getProperty( aAttributeList ))
-        num = 0
+        aPropertyListFullPN = \
+                  convertFullIDToFullPN(self.theFullID(),'PropertyList')
+        aPropertyList = \
+                  list( self.theSimulator.getProperty( aPropertyListFullPN ) )
 
+        aAttributeListFullPN = \
+                  convertFullIDToFullPN(self.theFullID(), 'PropertyAttributes')
+        aAttributeList = \
+                  list(self.theSimulator.getProperty( aAttributeListFullPN ))
+
+        num = 0
         for aProperty in aPropertyList:
-            if (aProperty =='Quantity'):
+            if (aProperty == 'Quantity' ):
                 print aProperty,
                 print "=",
                 print aAttributeList[num]
             else :
                 pass
             num += 1        
-        self.initialize(self.theFPN)
-        self.thePluginManager = pluginmanager
+
+        self.initialize( self.theFullPN() )
 
     def initialize( self, fpn ):
-
-        self.theFPN = fpn
-        self.theID = str( self.theFPN[ID] )
-        
-        self["id_label"].set_text( self.theID )
-        value = self.theSimulator.getProperty( self.theFPN )
-        self.theCurValue = value[0]
-        self["value_frame"].set_text(str(self.theCurValue))
-
+        aString = str( self.theFullPN()[ID] )
+        aString += ':\n' + str( self.theFullPN()[PROPERTY] )
+        self["id_label"].set_text( aString )
+        self.update()
         
     def update( self ):
-
-        value = self.theSimulator.getProperty( self.theFPN )
-        self.theCurValue = value[0]
-        self["value_frame"].set_text(str(self.theCurValue))
+        self["value_frame"].set_text( str( self.getValue() ) )
 
     def inputValue( self, obj ):
+        aValue =  string.atof( obj.get_text() )
+        self.setValue( aValue )
 
-        aNumberString =  obj.get_text()
-        self.theCurValue = string.atof( aNumberString )
-        self.changeValue()
-
-    def increaseValue( self, value ):
-
-        self.theCurValue *= 2.0
-        self["value_frame"].set_text(str(self.theCurValue))
-        self.changeValue()
+    def increaseValue( self, obj ):
+        self.setValue( self.getValue() * 2.0 )
 
     def decreaseValue( self, obj ):
+        self.setValue( self.getValue() * 0.5 )
 
-        self.theCurValue *= 0.5
-        self["value_frame"].set_text(str(self.theCurValue))
-        self.changeValue()
+    def getValue( self ):
+        aValueList = self.theSimulator.getProperty( self.theFullPN() )
+        return aValueList[0]
 
-    def changeValue( self ):
-
-        value = (self.theCurValue,)
-        self.theSimulator.setProperty(self.theFPN, value)
+    def setValue( self, aValue ):
+        aValueList = ( aValue, )
+        self.theSimulator.setProperty( self.theFullPN(), aValueList )
         self.thePluginManager.updateAllPluginWindow()
-
-        ### for check
-        print self.theSimulator.getProperty(self.theFPN)
-
 
 ### test code
 

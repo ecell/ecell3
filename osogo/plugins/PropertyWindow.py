@@ -34,36 +34,31 @@ class PropertyWindow(PluginWindow):
         
     def initialize( self ):
 
-        if self.theFPNs == ():
+        if self.theRawFullPNList == ():
             return
-        self.setFullPNList( self.theFPNs )
+        self.setFullPNList()
     
-    def setFullPNList( self, aFullPNList ):
-        self.theFPNs = aFullPNList
-#        print self.theFPNs
-        
+    def setFullPNList( self ):
         self.theSelected = ''
         
-        self.theFullID = convertFullPNToFullID( self.theFPNs[0] )
-        aFullName = convertFullIDToFullPN( self.theFullID,
+        aNameFullPN = convertFullIDToFullPN( self.theFullID(),
                                                       'Name' )
-        aNameList =\
-        list( self.theSimulator.getProperty( aFullName ) )
+        aNameList = list( self.theSimulator.getProperty( aNameFullPN ) )
         self.theClassName = aNameList[0]
         
-        self.theType = PrimitiveTypeString[ self.theFullID[TYPE] ]
-        self.theID   = str( self.theFullID[ID] )
-        self.thePath = str( self.theFullID[SYSTEMPATH] )
-        aFullPropertyName = convertFullIDToFullPN( self.theFullID,
-                                                      'ClassName' )
-        aList = self.theSimulator.getProperty( aFullPropertyName )
+        self.theType = PrimitiveTypeString[ self.theFullID()[TYPE] ]
+        self.theID   = str( self.theFullID()[ID] )
+        self.thePath = str( self.theFullID()[SYSTEMPATH] )
+        aClassNameFullPN = convertFullIDToFullPN( self.theFullID(),
+                                                  'ClassName' )
+        aList = self.theSimulator.getProperty( aClassNameFullPN )
+
         self.theTypeEntry.set_text( self.theType  )
         self.theIDEntry.set_text  ( self.theID )
         self.thePathEntry.set_text( self.thePath )
         self.theClassNameEntry.set_text( self.theClassName )
 
         self.update()
-        
 
     def update( self ):
         self.updatePropertyList()
@@ -73,15 +68,14 @@ class PropertyWindow(PluginWindow):
 
         
     def updatePropertyList( self ):
-
         self.theList = []
 
-        aFullPropertyName = convertFullIDToFullPN( self.theFullID,
-                                                      'PropertyList' )
+        aPropertyListFullPN = convertFullIDToFullPN( self.theFullID(),
+                                                     'PropertyList' )
         aPropertyList =\
-        list( self.theSimulator.getProperty( aFullPropertyName ) )
+               list( self.theSimulator.getProperty( aPropertyListFullPN ) )
 
-        aAttributeList = convertFullIDToFullPN(self.theFullID,
+        aAttributeList = convertFullIDToFullPN(self.theFullID(),
                                                   'PropertyAttributes')
         aAttributeList =\
         list(self.theSimulator.getProperty( aAttributeList ))
@@ -108,7 +102,7 @@ class PropertyWindow(PluginWindow):
 
             else :
                 
-                aFullPropertyName = convertFullIDToFullPN( self.theFullID,
+                aFullPropertyName = convertFullIDToFullPN( self.theFullID(),
                                                           aProperty )
             
                 aValueList = self.theSimulator.getProperty( aFullPropertyName ) 
