@@ -4,9 +4,8 @@ AC_INIT(dmtool.in)
 dnl AC_CONFIG_AUX_DIR()
 dnl
 dnl 
-dnl 
 AC_CANONICAL_SYSTEM
-AM_INIT_AUTOMAKE(dmtool,0.0)
+AM_INIT_AUTOMAKE(dmtool,3.0.4)
 AC_PROG_MAKE_SET
 AC_CHECK_PROGS(BASENAME,basename)
 if test -z $BASENAME ; then
@@ -14,6 +13,12 @@ if test -z $BASENAME ; then
 fi
 dnl
 AC_PROG_CXX
+
+dnl
+AM_PATH_PYTHON(2.2)
+AC_SUBST(PYTHON)
+AM_CHECK_PYTHON_HEADERS()
+dnl
  
 dnl
 AC_PROG_LIBTOOL
@@ -49,6 +54,6 @@ dnl
 dnl
 dnl Create the top-level Makefile.
 dnl
-AC_OUTPUT(Makefile dmtool dmcompile,chmod +x dmtool dmcompile)
+AC_OUTPUT(Makefile dmtool dmcompile dmgen,chmod +x dmtool dmcompile dmgen)
 
 
