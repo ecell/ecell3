@@ -55,54 +55,36 @@ reserved_map = { }
 for r in reserved:
 	reserved_map['r'] = r
 
+# Delimeters
+t_LPAREN   = r'\('
+t_RPAREN   = r'\)'
+t_LBRACKET = r'\['
+t_RBRACKET = r'\]'
+t_LBRACE   = r'\{'
+t_RBRACE   = r'\}'
+t_SEMI     = r';'
+
+
 def t_Stepper(t):
 	r' Stepper[\s|\t] '
-	t.value = string.strip( t.value )
+	t.value = t.value[:-1]
 	return t
 
 def t_System(t):
 	r' System[\s|\t] '
-	t.value = string.strip( t.value )
+	t.value = t.value[:-1]
 	return t
 
 def t_Process(t):
 	r' Process[\s|\t] '
-	t.value = string.strip( t.value )
+	t.value = t.value[:-1]
 	return t
 
 def t_Variable(t):
 	r' Variable[\s|\t] '
-	t.value = string.strip( t.value )
+	t.value = t.value[:-1]
 	return t
 
-# Delimeters
-def t_LPAREN(t):
-	r'\('
-	return t
-
-def t_RPAREN(t):
-	r'\)'
-	return t
-
-def t_LBRACKET(t):
-	r'\['
-	return t
-
-def t_RBRACKET(t):
-	r'\]'
-	return t
-
-def t_LBRACE(t):
-	r'\{'
-	return t
-
-def t_RBRACE(t):
-	r'\}'
-	return t
-
-def t_SEMI(t):
-	r';'
-	return t
 
 def t_number(t):
 	r' [+-]?(\d+(\.\d*)?|\d*\.\d+)([eE][+-]?\d+)? '
@@ -130,7 +112,7 @@ def t_quotedstring(t):
 
 def t_control(t):
 	r' \%line [^\n]*\n '
-	seq = string.split(t.value)
+	seq = t.value.split()
 	t.lineno = int(seq[1])
 	t.lexer.filename = seq[2]
 
@@ -139,8 +121,8 @@ def t_comment(t):
 	pass
 
 def t_nl(t):
-	r' \n '
-	t.lineno = t.lineno + 1
+	r' \n+ '
+	t.lineno += len( t.value )
 
 def t_whitespace(t):
 	r' [ |\t]+ '
@@ -242,10 +224,10 @@ def p_system_object_decl(t):
 	t.type = t[1]
 	t.classname = t[2][0]
 	t.path      = t[2][1]
-	t.fullid = convert2FullID(t.type, t.path)
-	anEml.createEntity(t.classname, t.fullid)
+	t.id = ecell.eml.convertSystemID2SystemFullID( t.path )
+	anEml.createEntity(t.classname, t.id)
 	if len(t[2]) == 3:
-		anEml.setEntityInfo( t.fullid, t[2][2])
+		anEml.setEntityInfo( t.id, t[2][2] )
 	
 	t[0] = t[1], t[2]
 	
@@ -257,10 +239,10 @@ def p_entity_other_object_decl (t):
 	t.type = t[1]
 	t.classname = t[2][0]
 	t.id        = t.path + ':' + t[2][1]
-	t.fullid = convert2FullID(t.type, t.id)
-	anEml.createEntity(t.classname, t.fullid)
+	t.id = t.type + ':' + t.id
+	anEml.createEntity( t.classname, t.id )
 	if len(t[2]) == 3:
-		anEml.setEntityInfo( t.fullid, t[2][2])
+		anEml.setEntityInfo( t.id, t[2][2] )
 	
 	t[0] = t[1], t[2]
 
@@ -284,9 +266,9 @@ def p_property(t):
 	if t.type == 'Stepper':
 		anEml.setStepperProperty(t.id, t[1], t[2])
 	else:
-		anEml.setEntityProperty(t.fullid, t[1], t[2])
+		anEml.setEntityProperty(t.id, t[1], t[2])
 		
-	t[0] = t[1], t[2]
+		#t[0] = t[1], t[2]
 
 # property or entity ( for System statement )
 
@@ -402,7 +384,7 @@ def convertEm2Eml( anEmFileObject, debug=0 ):
 
 	# Parsing
 	aParser = yacc.yacc(optimize=1, tabmodule="emparsetab")
-	anAst = aParser.parse( anEmFileObject.read() ,lexer=aLexer ,debug=debug)
+	anAst = aParser.parse( anEmFileObject.read(), lexer=aLexer ,debug=debug )
 	
 		
 	import pprint
@@ -413,23 +395,6 @@ def convertEm2Eml( anEmFileObject, debug=0 ):
 		sys.exit(0)
 	
 	return anEml
-
-
-            
-		
-def convert2FullID( aType, aSystemID ):
-
-        if aType == 'System':
-		#FIXME: convertSystemID2SystemFullID() will be deprecated
-		return ecell.eml.convertSystemID2SystemFullID( aSystemID )
-	elif aType == 'Variable':
-		return 'Variable:' + aSystemID
-	elif aType == 'Process':
-		return 'Process:' + aSystemID
-
-	# error
-	raise ValueError, 'Type Error in conver2FullID() (%s)' % aType
-    
 
 
 #

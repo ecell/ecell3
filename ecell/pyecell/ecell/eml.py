@@ -51,7 +51,6 @@ class Eml:
         return self.__theDocument.toprettyxml(indent="", newl="\n")
 
 
-
     def save( self, anOutputFile ):
         """save domtree as an EML file"""
         
@@ -202,21 +201,14 @@ class Eml:
             anEntityElement.setAttribute( 'id', anID )
             self.__theDocument.documentElement.appendChild( anEntityElement )
 
-        elif( anEntityType == 'Variable' or anEntityType == 'Process' ):
-
-            anID = aFullID.split( ':' )[2]
+            #        elif( anEntityType == 'Variable' or anEntityType == 'Process' ):
+        else:
+            (_dummy, aTargetPath, anID ) = aFullID.split( ':' )
             anEntityElement.setAttribute( 'id', anID )
 
-            aTargetFullPath = aFullID.split( ':' )[1]
-            for aTargetNode in self.__theDocument.documentElement.childNodes:
+            aTargetSystemNode = self.__getSystemNode( aTargetPath )
 
-                if aTargetNode.nodeName == 'system':
-                    aTargetSystem = aTargetNode
-
-                    aSystemFullPath = aTargetSystem.getAttribute( 'id' )
-               
-                    if aTargetFullPath == aSystemFullPath:
-                        aTargetSystem.appendChild( anEntityElement )
+            aTargetSystemNode.appendChild( anEntityElement )
 
         self.__addToCache( aFullID, anEntityElement )
 
@@ -520,35 +512,27 @@ class Eml:
         aPropertyElement = self.__createElement( 'property' )
         aPropertyElement.setAttribute( 'name', aPropertyName )
 
-        for aValue in aValueList:
-            aValueNode = self.__createValueNode( aValue )
-
-            if aValueNode:
-                aPropertyElement.appendChild( aValueNode )
+        map( aPropertyElement.appendChild,\
+             map( self.__createValueNode, aValueList ) )
 
         return aPropertyElement
-    
+
 
     def __createValueNode( self, aValue ):
+
+        aValueNode = self.__createElement( 'value' )
 
         if type( aValue ) is types.TupleType or \
                type( aValue ) is types.ListType:    # vector value
 
-            aValueNode = self.__createElement( 'value' )
-
-            for anItem in aValue:
-                aChildValueData = self.__createValueNode( anItem )
-                aValueNode.appendChild( aChildValueData )
-
-            return aValueNode
-
+            map( aValueNode.appendChild,\
+                 map( self.__createValueNode, aValue ) )
         else:        # scaler value
  
-            aValueNode = self.__createElement( 'value' )
             aValueData = self.__theDocument.createTextNode( aValue )
             aValueNode.appendChild( aValueData )
 
-            return aValueNode
+        return aValueNode
 
 
 def convertSystemFullID2SystemID( aSystemFullID ):
