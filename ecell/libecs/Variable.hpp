@@ -364,8 +364,8 @@ namespace libecs
 
     LOAD_METHOD( Real, NumberConc );
 
-    void registerProxy( InterpolantPtr const anInterpolant );
-    //    void removeProxy( InterpolantPtr const anInterpolant );
+    void registerInterpolant( InterpolantPtr const anInterpolant );
+    //    void removeInterpolant( InterpolantPtr const anInterpolant );
 
 
   protected:

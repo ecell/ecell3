@@ -579,7 +579,7 @@ namespace libecs
        @see Variable::registerInterpolant()
     */
 
-    void createVariableProxies();
+    void createInterpolants();
 
     /**
        Scan all the relevant Entity objects to this Stepper and construct

@@ -99,7 +99,7 @@ namespace libecs
 
     
     //  Don't call
-    //    createVariableProxies();
+    //    createInterpolants();
     //  here:  only DifferentialSteppers need this.
   }
 
@@ -245,14 +245,14 @@ namespace libecs
   }
 
 
-  void Stepper::createVariableProxies()
+  void Stepper::createInterpolants()
   {
-    // create VariableProxies.
+    // create Interpolants.
     for( VariableVector::size_type c( 0 );  
 	 c != theReadOnlyVariableOffset; ++c )
       {
 	VariablePtr aVariablePtr( theVariableVector[ c ] );
-	aVariablePtr->registerProxy( createInterpolant( aVariablePtr ) );
+	aVariablePtr->registerInterpolant( createInterpolant( aVariablePtr ) );
       }
   }
 

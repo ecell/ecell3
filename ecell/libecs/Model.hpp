@@ -79,7 +79,7 @@ namespace libecs
 
        1. Initialize Systems recursively starting from theRootSystem.
           ( System::initialize() )
-       2. Check if all the Systems have a Stepper.
+       2. Check if all the Systems have a Stepper each.
        3. Initialize Steppers. ( Stepper::initialize() )
        4. Construct Stepper interdependency graph 
           ( Stepper::updateDependentStepperVector() )

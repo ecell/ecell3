@@ -40,7 +40,7 @@ namespace libecs
     :
     theVariable( aVariable )
   {
-    //    theVariable->registerProxy( this );
+    //    theVariable->registerInterpolant( this );
   }
 
 
@@ -48,7 +48,7 @@ namespace libecs
   {
     //    if( theVariable != NULLPTR )
     //      {
-    //	theVariable->removeProxy( this );
+    //	theVariable->removeInterpolant( this );
     //      }
   }
 

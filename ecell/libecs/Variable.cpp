@@ -94,12 +94,12 @@ namespace libecs
   }
 
 
-  void Variable::registerProxy( InterpolantPtr const anInterpolantPtr )
+  void Variable::registerInterpolant( InterpolantPtr const anInterpolantPtr )
   {
     theInterpolantVector.push_back( anInterpolantPtr );
   }
 
-  //  void Variable::removeProxy( InterpolantPtr const anInterpolantPtr )
+  //  void Variable::removeInterpolant( InterpolantPtr const anInterpolantPtr )
   //  {
   //    theInterpolantVector.erase( std::remove( theInterpolantVector.begin(),
   //					       theInterpolantVector.end(),

@@ -28,8 +28,8 @@
 // E-Cell Project, Institute for Advanced Biosciences, Keio University.
 //
 
-#ifndef __VARIABLEPROXY_HPP
-#define __VARIABLEPROXY_HPP
+#ifndef __INTERPOLANT_HPP
+#define __INTERPOLANT_HPP
 
 #include "libecs.hpp"
 
@@ -111,7 +111,7 @@ namespace libecs
 
 
 
-#endif /* __VARIABLEPROXY_HPP */
+#endif /* __INTERPOLANT_HPP */
 
 
 
