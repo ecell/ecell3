@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
-from Window import *
+#from Window import *
+from OsogoWindow import *
 
 from gtk import *
 from ecell.ecssupport import *
@@ -12,186 +13,198 @@ import copy
 
 # import test
 
-class EntryListWindow(Window):
+#class EntryListWindow(Window):
+class EntryListWindow(OsogoWindow):
 
-    def __init__( self, aMainWindow ):
-        self.theSelectedFullPNList = []
+	def __init__( self, aMainWindow ):
+		self.theSelectedFullPNList = []
 
-        Window.__init__( self )
-        self.addHandlers( { 'show_button_clicked'           : self.openNewPluginWindow,
-                            'system_tree_selection_changed' : self.updateEntryList,
-                            'entry_list_selection_changed'  : self.selectEntity } )
+		#Window.__init__( self )
+		OsogoWindow.__init__( self )
+		OsogoWindow.openWindow(self)
 
-        self.theMainWindow = aMainWindow
-        self.thePaletteWindow = aMainWindow.thePaletteWindow
+		self.addHandlers( { 'show_button_clicked' : self.openNewPluginWindow,
+		                    'system_tree_selection_changed'    : self.updateEntryList,
+		                     'entry_list_selection_changed'    : self.selectEntity,
+						} )
 
-        self.theSystemTree = self.getWidget( 'system_tree' )
-        self.theEntryList = self.getWidget( 'entry_list' )
-        self.theTypeOptionMenu = self.getWidget( 'type_optionmenu' )
-        self.theStatusBar = self.getWidget( 'statusbar' )
+		self.theMainWindow = aMainWindow
+		self.thePaletteWindow = aMainWindow.thePaletteWindow
 
-        self.theTypeMenu = self.theTypeOptionMenu.get_menu()
-        self.theTypeMenu.connect( 'selection-done', self.updateEntryList)
-        aTypeMenuItemMap = self.theTypeMenu.children()
-        aTypeMenuItemMap[0].set_data( 'LABEL', 'Substance' )
-        aTypeMenuItemMap[1].set_data( 'LABEL', 'Reactor' )
-        aTypeMenuItemMap[2].set_data( 'LABEL', 'All' )
+		self.theSystemTree = self.getWidget( 'system_tree' )
+		self.theEntryList = self.getWidget( 'entry_list' )
+		self.theTypeOptionMenu = self.getWidget( 'type_optionmenu' )
+		self.theStatusBar = self.getWidget( 'statusbar' )
 
-        self.theSystemTree.show()
-        self.theEntryList.show()
+		self.theTypeMenu = self.theTypeOptionMenu.get_menu()
+		self.theTypeMenu.connect( 'selection-done', self.updateEntryList)
+		aTypeMenuItemMap = self.theTypeMenu.children()
+		aTypeMenuItemMap[0].set_data( 'LABEL', 'Substance' )
+		aTypeMenuItemMap[1].set_data( 'LABEL', 'Reactor' )
+		aTypeMenuItemMap[2].set_data( 'LABEL', 'All' )
 
-        aPManager = self.theMainWindow.thePluginManager
-        self.thePropertyWindow = aPManager.createInstance( 'PropertyWindow',
-                                                           [(4, '', '/', '')],'top_vbox' )
+		self.theSystemTree.show()
+		self.theEntryList.show()
+
+		aPManager = self.theMainWindow.thePluginManager
+		self.thePropertyWindow = aPManager.createInstance( 'PropertyWindow',
+		                                                   [(4, '', '/', '')],'top_vbox' )
 
 #        self.theSystemTree.select_item( -1 )
 
-        aPropertyWindowTopVBox = self.thePropertyWindow['top_vbox']
-        self['property_frame'].add( aPropertyWindowTopVBox )
-        self.thePropertyWindow['property_clist'].connect( 'select_row', self.selectPropertyName )
+		aPropertyWindowTopVBox = self.thePropertyWindow['top_vbox']
+		self['property_frame'].add( aPropertyWindowTopVBox )
+		self.thePropertyWindow['property_clist'].connect( 'select_row', self.selectPropertyName )
         
-        self.update()
+		self.update()
 
-    def update( self ):
-        self.theSystemTree.clear_items(0, 999)
-        self.theEntryList.clear_items(0, 999)
-        aRootSystemFullID = createFullID( 'System::/' )
-        self.constructTree( self.theSystemTree, aRootSystemFullID )
-        self.updateEntryList()
+
+	def update( self ):
+		self.theSystemTree.clear_items(0, 999)
+		self.theEntryList.clear_items(0, 999)
+		aRootSystemFullID = createFullID( 'System::/' )
+		self.constructTree( self.theSystemTree, aRootSystemFullID )
+		self.updateEntryList()
             
-    def constructTree( self, aParentTree, aSystemFullID ):
-        aLeaf = gtk.GtkTreeItem( label=aSystemFullID[ID] )
-        aLeaf.set_data( 'FULLID', aSystemFullID )
-        aLeaf.connect( 'select', self.selectSystem )
-        aParentTree.append( aLeaf )
-        aLeaf.show()
+	def constructTree( self, aParentTree, aSystemFullID ):
+		aLeaf = gtk.GtkTreeItem( label=aSystemFullID[ID] )
+		aLeaf.set_data( 'FULLID', aSystemFullID )
+		aLeaf.connect( 'select', self.selectSystem )
+		aParentTree.append( aLeaf )
+		aLeaf.show()
 
-        aSystemListFullPN = convertFullIDToFullPN( aSystemFullID, 'SystemList' ) 
-        aSystemList = self.theMainWindow.theSession.theSimulator.getProperty( createFullPNString( aSystemListFullPN ) )
-        if aSystemList != ():
-            aTree = gtk.GtkTree()
-            aLeaf.set_subtree( aTree )
-            aLeaf.expand()
+		aSystemListFullPN = convertFullIDToFullPN( aSystemFullID, 'SystemList' ) 
+		aSystemList = self.theMainWindow.theSession.theSimulator.getProperty( createFullPNString( aSystemListFullPN ) )
+		if aSystemList != ():
+			aTree = gtk.GtkTree()
+			aLeaf.set_subtree( aTree )
+			aLeaf.expand()
 
-            for aSystemID in aSystemList:
-                aSystemPath = createSystemPathFromFullID( aSystemFullID )
-                aNewSystemFullID = ( SYSTEM, aSystemPath, aSystemID )
-                self.constructTree( aTree, aNewSystemFullID )
+			for aSystemID in aSystemList:
+				aSystemPath = createSystemPathFromFullID( aSystemFullID )
+				aNewSystemFullID = ( SYSTEM, aSystemPath, aSystemID )
+				self.constructTree( aTree, aNewSystemFullID )
 
-    def updateEntryList( self, obj=None ):
+	def updateEntryList( self, obj=None ):
 
-        aSelectedSystemLeafMap = self.theSystemTree.get_selection()
-        if aSelectedSystemLeafMap == [] :
-            return
+		aSelectedSystemLeafMap = self.theSystemTree.get_selection()
+		if aSelectedSystemLeafMap == [] :
+			return
         
-        aSelectedTypeMenuItem = self.theTypeMenu.get_active()
-        aEntityTYpeString = aSelectedTypeMenuItem.get_data( 'LABEL' )
+		aSelectedTypeMenuItem = self.theTypeMenu.get_active()
+		#aPrimitiveTypeString = aSelectedTypeMenuItem.get_data( 'LABEL' )
+		aEntryTypeString = aSelectedTypeMenuItem.get_data( 'LABEL' )
 
-        aSystemFullID = aSelectedSystemLeafMap[0].get_data( 'FULLID' )
-        #print aSystemFullID
-        self.theEntryList.clear_items( 0,-1 )
+		aSystemFullID = aSelectedSystemLeafMap[0].get_data( 'FULLID' )
+		self.theEntryList.clear_items( 0,-1 )
 
-        if aEntityTYpeString == 'All':
-            self.listEntity( 'Substance', aSystemFullID )
-            self.listEntity( 'Reactor', aSystemFullID )
-        else:
-            self.listEntity( aEntityTYpeString, aSystemFullID )
+		#if aPrimitiveTypeString == 'All':
+		if aEntryTypeString == 'All':
+			self.listEntity( 'Substance', aSystemFullID )
+			self.listEntity( 'Reactor', aSystemFullID )
+		else:
+			#self.listEntity( aPrimitiveTypeString, aSystemFullID )
+			self.listEntity( aEntryTypeString, aSystemFullID )
 
-    def listEntity( self, aEntityTYpeString, aSystemFullID ):
-        aListPN = aEntityTYpeString + 'List'
-        aListFullPN = convertFullIDToFullPN( aSystemFullID, aListPN ) 
-        aEntityList = self.theMainWindow.theSession.theSimulator.getProperty( createFullPNString( aListFullPN ) )
+	#def listEntity( self, aPrimitiveTypeString, aSystemFullID ):
+	def listEntity( self, aEntryTypeString, aSystemFullID ):
+		#aListPN = aPrimitiveTypeString + 'List'
+		aListPN = aEntryTypeString + 'List'
+		aListFullPN = convertFullIDToFullPN( aSystemFullID, aListPN ) 
+		aEntityList = self.theMainWindow.theSession.theSimulator.getProperty( createFullPNString( aListFullPN ) )
 
-        for aEntityID in aEntityList:
-            aListItem = gtk.GtkListItem( aEntityID )
+		for aEntityID in aEntityList:
+			aListItem = gtk.GtkListItem( aEntityID )
             
-            if aEntityTYpeString == 'Substance':
-                aEntityTYpe = SUBSTANCE
-            elif aEntityTYpeString == 'Reactor':
-                aEntityTYpe = REACTOR
+			#if aPrimitiveTypeString == 'Substance':
+			if aEntryTypeString == 'Substance':
+				#aPrimitiveType = SUBSTANCE
+				aEntryType = SUBSTANCE
+			#elif aPrimitiveTypeString == 'Reactor':
+			elif aEntryTypeString == 'Reactor':
+				aEntryType = REACTOR
 
-            aSystemPath = createSystemPathFromFullID( aSystemFullID )
+			aSystemPath = createSystemPathFromFullID( aSystemFullID )
 
-            aEntityFullPN = ( aEntityTYpe, aSystemPath, aEntityID, '' )
-#            aEntityFullPN = ( aEntityTYpe, aSystemPath, aEntityID, 'Quantity' )
+			#aEntityFullPN = ( aPrimitiveType, aSystemPath, aEntityID, '' )
+			aEntityFullPN = ( aEntryType, aSystemPath, aEntityID, '' )
+#            aEntityFullPN = ( aPrimitiveType, aSystemPath, aEntityID, 'Quantity' )
 
-            aListItem.set_data( 'FULLPN', aEntityFullPN)
+			aListItem.set_data( 'FULLPN', aEntityFullPN)
 #            aFullPNList = ( aEntityFullPN, )
 
-            self.theEntryList.add( aListItem )
-            aListItem.show()
+			self.theEntryList.add( aListItem )
+			aListItem.show()
 
-    def selectEntity( self, aEntryList ):
-        aSelectedEntityListItemList = aEntryList.get_selection()
+	def selectEntity( self, aEntryList ):
+		aSelectedEntityListItemList = aEntryList.get_selection()
 
-        if len(aSelectedEntityListItemList) == 0 :
-            return
+		if len(aSelectedEntityListItemList) == 0 :
+			return
 
-        self.theSelectedFullPNList = []
-        for aEntityListItem in aSelectedEntityListItemList:
-            aEntityFullPN = aEntityListItem.get_data( 'FULLPN' )
-            self.theSelectedFullPNList.append( aEntityFullPN )
+		self.theSelectedFullPNList = []
+		for aEntityListItem in aSelectedEntityListItemList:
+			aEntityFullPN = aEntityListItem.get_data( 'FULLPN' )
+			self.theSelectedFullPNList.append( aEntityFullPN )
 
-        self.thePropertyWindow.theRawFullPNList = self.theSelectedFullPNList
-        self.thePropertyWindow.setFullPNList()
+		self.thePropertyWindow.theRawFullPNList = self.theSelectedFullPNList
+		self.thePropertyWindow.setFullPNList()
+		self.updateStatusBar()
 
-        self.updateStatusBar()
+	def selectPropertyName( self, aCList, row, column, event_obj ):
 
-    def selectPropertyName( self, aCList, row, column, event_obj ):
-
-        self.theSelectedFullPNList = []
-        for aRowNumber in aCList.selection:
-            aPropertyName =  aCList.get_text( aRowNumber, 0 )
-            aFullID = self.thePropertyWindow.theFullID()
-            aFullPN = convertFullIDToFullPN( aFullID, aPropertyName )
-            self.theSelectedFullPNList.append( aFullPN )
-        self.updateStatusBar()
+		self.theSelectedFullPNList = []
+		for aRowNumber in aCList.selection:
+			aPropertyName =  aCList.get_text( aRowNumber, 0 )
+			aFullID = self.thePropertyWindow.theFullID()
+			aFullPN = convertFullIDToFullPN( aFullID, aPropertyName )
+			self.theSelectedFullPNList.append( aFullPN )
+		self.updateStatusBar()
         
-    def selectSystem( self, aTreeItemObj ):
-        aFullID = aTreeItemObj.get_data('FULLID')
-        aFullPN = convertFullIDToFullPN( aFullID )
-        self.theSelectedFullPNList = [ aFullPN ]
+	def selectSystem( self, aTreeItemObj ):
+		aFullID = aTreeItemObj.get_data('FULLID')
+		aFullPN = convertFullIDToFullPN( aFullID )
+		self.theSelectedFullPNList = [ aFullPN ]
 
-        self.thePropertyWindow.theRawFullPNList = self.theSelectedFullPNList
-        self.thePropertyWindow.setFullPNList()
-        
-        self.updateStatusBar()
+		self.thePropertyWindow.theRawFullPNList = self.theSelectedFullPNList
+		self.thePropertyWindow.setFullPNList()
+		self.updateStatusBar()
 
-    def updateStatusBar( self ):
-        aStatusString = 'Selected: '
-        for aFullPN in self.theSelectedFullPNList:
-            aStatusString += createFullPNString( aFullPN )
-            aStatusString += ', '
-        self.theStatusBar.push( 1, aStatusString )
+	def updateStatusBar( self ):
+		aStatusString = 'Selected: '
+		for aFullPN in self.theSelectedFullPNList:
+			aStatusString += createFullPNString( aFullPN )
+			aStatusString += ', '
+		self.theStatusBar.push( 1, aStatusString )
 
-    def openNewPluginWindow( self, obj ) :
-        aPluginName = self.thePaletteWindow.getSelectedPluginName()
-        aPluginManager = self.theMainWindow.thePluginManager
-        aPluginManager.createInstance( aPluginName,
-                                       self.theSelectedFullPNList)
+	def openNewPluginWindow( self, obj ) :
+		aPluginName = self.thePaletteWindow.getSelectedPluginName()
+		aPluginManager = self.theMainWindow.thePluginManager
+		aPluginManager.createInstance( aPluginName,
+		                               self.theSelectedFullPNList)
 	
-
-def mainQuit( obj, data ):
-    gtk.mainquit()
-
-def mainLoop():
-    gtk.mainloop()
-
-def main():
-    aWindow = EntryListWindow( 'EntryListWindow.glade' )
-    aWindow.addHandler( 'gtk_main_quit', mainQuit )    
-    mainLoop()
-
-def ecstest():
-    aWindow = EntryListWindow( 'EntryListWindow.glade' )
-    aWindow.addHandler( 'gtk_main_quit', mainQuit )    
-    mainLoop()
-    
 if __name__ == "__main__":
-    main()
+
+	def mainQuit( obj, data ):
+		gtk.mainquit()
+
+	def mainLoop():
+		gtk.mainloop()
+
+	def main():
+		aWindow = EntryListWindow( 'EntryListWindow.glade' )
+		aWindow.addHandler( 'gtk_main_quit', mainQuit )    
+		mainLoop()
+
+	def ecstest():
+		aWindow = EntryListWindow( 'EntryListWindow.glade' )
+		aWindow.addHandler( 'gtk_main_quit', mainQuit )    
+		mainLoop()
+    
+	main()
 
 if __name__ == "__ecstest__":
-    ecstest()
+	ecstest()
 
 
 
