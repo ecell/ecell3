@@ -13,7 +13,7 @@
 
 # if you want to set default directory, please modfy here.
 $output_directory = ".";
-$default_template_directory = "@DM_TEMPLATE_DIR@" . "/reactor";
+$default_template_directory = "@DM_SHARE_DIR@/template/reactor";
 
 &search_template;
 &option;
