@@ -5,7 +5,7 @@ from main import *
 from Plugin import *
 
 from gtk import *
-import ecssupport
+from ecssupport import *
 
 import ecs
 
@@ -138,7 +138,7 @@ class MainWindow(Window):
 
     def printProperty( self, fullpn ):
         value = self.theSimulator.getProperty( fullpn )
-        fullpnstring = ecssupport.getFullPNString(fullpn)
+        fullpnstring = getFullPNString(fullpn)
         self.printMessage( fullpnstring )
         self.printMessage( ' = ' )
         self.printMessage( str(value[0]) )
