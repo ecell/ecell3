@@ -20,7 +20,7 @@ INIT_V = 0.1
 
 def declareStepper( aName ):
 
-	print "Stepper ODE23Stepper( %s )" % ( aName ) 
+	print "Stepper ODEStepper( %s )" % ( aName ) 
 	print '{'
 	print '	# no property'
 	print '}'

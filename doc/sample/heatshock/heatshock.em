@@ -3,7 +3,7 @@
 # deterministic composite model using ECELL 3.
 #     July 8, 2003
 
-Stepper ODE45Stepper( DE1 )
+Stepper ODEStepper( DE1 )
 {
         # no property
 }

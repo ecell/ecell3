@@ -2,9 +2,8 @@
 # Drosophila.em
 #
 
-#Stepper FixedODE1Stepper( DE )
-#Stepper ODE23Stepper( DE )
-Stepper ODE45Stepper( DE )
+# Stepper FixedODE1Stepper( DE )
+Stepper ODEStepper( DE )
 {
 	# no property
 }
