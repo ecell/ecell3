@@ -21,10 +21,10 @@
       <property name="spacing">0</property>
 
       <child>
-	<widget class="GtkHBox" id="hbox5">
+	<widget class="GtkHPaned" id="hpaned1">
 	  <property name="visible">True</property>
-	  <property name="homogeneous">False</property>
-	  <property name="spacing">3</property>
+	  <property name="can_focus">True</property>
+	  <property name="position">184</property>
 
 	  <child>
 	    <widget class="GtkFrame" id="StepperIDFrame">
@@ -83,9 +83,8 @@
 	      </child>
 	    </widget>
 	    <packing>
-	      <property name="padding">0</property>
-	      <property name="expand">True</property>
-	      <property name="fill">True</property>
+	      <property name="shrink">True</property>
+	      <property name="resize">False</property>
 	    </packing>
 	  </child>
 
@@ -142,9 +141,8 @@
 	      </child>
 	    </widget>
 	    <packing>
-	      <property name="padding">0</property>
-	      <property name="expand">True</property>
-	      <property name="fill">True</property>
+	      <property name="shrink">True</property>
+	      <property name="resize">True</property>
 	    </packing>
 	  </child>
 	</widget>

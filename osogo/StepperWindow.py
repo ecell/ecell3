@@ -34,18 +34,13 @@
 
 from OsogoUtil import *
 
-#from Window import *
 from OsogoWindow import *
 import gobject
-#from gtk import *
-#from Numeric import *
 
 from os import *
 
 from ecell.ecssupport import *
-
-#from ecell.DataFileManager import *
-#from ecell.ECDDataFile import *
+import ConfirmWindow
 
 # Constant value of this class
 PROPERTY_INDEX = 0
@@ -288,6 +283,13 @@ class StepperWindow(OsogoWindow):
 		if self.isShown == gtk.FALSE:
 			return None
 
+		self.theSelectedRowOfPropertyList = self.thePropertyList.get_selection().get_selected()[1]
+		if self.theSelectedRowOfPropertyList == None:
+			aMessage = 'Select a property.'
+			aDialog = ConfirmWindow.ConfirmWindow(0,aMessage,'Error!')
+			self['statusbar'].push(1,'property is not selected.')
+			return None
+
 		self['statusbar'].pop(1)
 
 		# ---------------------------------------------------------------------------
@@ -449,18 +451,7 @@ class StepperWindow(OsogoWindow):
 
 		self[self.__class__.__name__].show_all()
 
-		# ----------------------------------------------------
-		# select first item.
-		# ----------------------------------------------------
-		if self.isShown == gtk.TRUE:
-			if self.theStepperIDListWidget.get_selection().get_selected() == None:
-				if len(self.theStepperIDList) >= 1:
-					self.theStepperIDListWidget.select_item( 0 ) 
-					self.selectStepperID(None)
-			
-
 	# end of update
-
 
 	# ---------------------------------------------------------------
 	# Closes this window
