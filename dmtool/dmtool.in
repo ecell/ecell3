@@ -1,0 +1,214 @@
+#!@SHELL@
+#
+# $Id$
+#
+# dmtool --- a program to compile and/or docify dynamic module in 
+#            E-CELL Simulation Environment
+#
+# this program is part of E-CELL Simulation Environment.
+#
+# author:    Kouichi Takahashi <shafi@e-cell.org>
+#
+
+# variables substituted by ./configure script
+
+TEMPLATEDIR="@TEMPLATEDIR@"
+TMPDIR="@TMPDIR@"
+
+CXX="@CXX@"
+MV="@MV@"
+RM="@RM@"
+INCLUDES="@INCLUDES@"
+DMFLAGS="@DMFLAGS@"
+
+# customizable variables. usually no need to edit
+
+RD2CH="rd2ch"
+RD2TEX="rd2tex"
+OUTDIR="./"
+CXXFLAGS="$DMFLAGS $INCLUDES"
+TEXOUT="spec.tex"
+INSUFFIX=".rd"
+SOSUFFIX=".so"
+
+# internal variables. DO NOT EDIT BELOW
+OPTS="vcd::fho:st:T:"
+LONGOPTS=\
+"verbose,compile,docify::,force,help,outdir:,strip,templatedir:,tmpdir:"
+
+unset VERBOSE DO_COMPILE DO_DOCIFY DO_STRIP FORCE CLASS
+DTTMPDIR="$TMPDIR/dmtool.$$"
+
+
+usage() 
+{
+cat << EOT_USAGE
+Compile and/or docify dynamic module.
+
+Usage:
+	`basename $0` <classname> [OPTIONS] files...
+	`basename $0` -h|--help
+
+EOT_USAGE
+}
+
+help()
+{
+usage
+cat << EOT_HELP
+Options:
+	-v or --verbose)	print what this is doing.
+	-c or --compile)	compile dynamic module.
+	-d[filename] or
+	--docify[filename])	make TeX documentation from input files.
+	-f or --force)		proceed even if input is older than output.
+	-o [dir] or
+	 --outdir [dir])	specify output directory.
+	-t or --templatedir)	specify template directory.
+				[default=$TEMPLATEDIR]
+	-T or --tmpdir)     	specify temporary directory.
+				[default=$TMPDIR]
+	-h or --help)		print this message.
+
+This program is part of E-CELL Simulation Environment.
+Written by Kouichi Takahashi <shafi@e-cell.org>
+EOT_HELP
+}
+
+initialize()
+{
+	trap interrupted 2 9 15
+	echo mkdir $DTTMPDIR
+}
+
+cleanup()
+{
+	echo rm -rf $DTTMPDIR
+}
+
+interrupted()
+{
+	trap '' 2 9 15
+	cleanup
+	exit 1
+}
+
+run_command()
+{
+	[ $VERBOSE ] && echo $@
+	echo $@
+}
+
+
+# at least one argument is required
+if [ -z $1 ] ;  then
+	echo $1
+	usage; echo $1
+	exit 1
+fi
+
+if [ "$1" = "-h" -o "$1" = "--help" ] ; then
+	help
+	exit 0
+fi
+
+
+# get dynamic module class
+CLASS=$1
+shift
+
+#
+# parse remaining commandline options
+#
+TEMP=`getopt -o $OPTS --long $LONGOPTS -n "$0" -- "$@"`
+if [ $? != 0 ] ; then echo "getopt error..." >&2 ; exit 1 ; fi
+eval set -- "$TEMP"
+
+while true ; do
+	case "$1" in
+		-v|--verbose) VERBOSE=yes ; shift ;;
+		-c|--compile) DO_COMPILE=yes ; shift ;;
+		-d|--docify) DO_DOCIFY=yes 
+			case "$2" in
+				"") shift 2 ;;
+				*)  TEXOUT="$2" ; shift 2 ;;
+			esac ;;
+		-f|--force)  FORCE=yes ; shift ;;
+		-o|--outdir) OUTDIR=$2 ; shift 2 ;;
+		-s|--strip)  DO_STRIP=yes ; shift ;;
+		-t|--templatedir) TEMPLATEDIR=$2 ; shift ;;
+		-T|--tmpdir)      TMPDIR=$2 ; shift ;;
+		-h|--help) help ; exit 0 ;;
+		--) shift ; break ;;
+		*) echo "Internal error!" ; exit 1 ;;
+	esac
+done
+
+#
+# initialize
+#
+initialize
+
+#
+# drop files which do not end with $INSUFFIX
+#
+for file in $@ ; do
+	if [ `basename $file $INSUFFIX` != `basename $file` ] ; then
+		inputs="$inputs $file"
+	fi
+done
+
+#
+# compile dm files
+#
+if [ $DO_COMPILE  ] ; then
+	for rdfile in $inputs;  do 
+		base=`basename $rdfile $INSUFFIX`
+		sofile=$base$SOSUFFIX
+		cppfile=$base.C
+		[ $VERBOSE ] && echo "$0: compiling $name..." 
+
+		if [ ! $FORCE ] ; then
+			if [ -f $sofile -a $rdfile -nt $sofile ] ; then
+				echo -n "$rdfile is newer than $sofile... "
+				echo "skipping.."
+				break
+			fi
+		fi
+
+		# make source files. (-> .[Ch])
+		run_command "$RD2CH -d $DTTMPDIR -t $TEMPLATEDIR $rdfile"
+		if [ $? ] ; then
+			:
+		else
+			echo "error: conversion of $rdfile (by $RD2CH) failed."
+			cleanup
+			exit 1
+		fi
+
+		# compile
+		run_command $CXX $CXXFLAGS $DTTMPDIR/$cppfile -o $DTTMPDIR/$sofile
+		if [ $? ] ; then
+			# move resulting so to OUTDIR
+			run_command $MV $DTTMPDIR/$sofile $OUTDIR
+		else
+			echo "error: compilation of $rdfile failed."
+			cleanup
+			exit 1
+		fi
+	done
+fi
+
+#
+# make tex file
+#
+if [ $DO_DOCIFY  ] ; then
+	echo $TEXOUT
+	run_command $RD2TEX $inputs -o $OUTDIR/$TEXOUT
+fi
+
+
+cleanup
+exit 0
+
+
