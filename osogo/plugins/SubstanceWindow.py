@@ -24,12 +24,12 @@ class SubstanceWindow(PluginWindow):
                              } )
 
         self.theFullPropertyName = data[0]
-        self.initialize( self.theFullPropertyName)
+        self.initialize( self.theFullPropertyName )
         
     def initialize( self, fpn ):
         
         self.theFullID = convertToFullID( fpn )
-        self.theFPNQuantity = tuple(convertToFullPropertyName( self.theFullID, 'Quantity' ))
+        self.theFPNQuantity = tuple( convertToFullPropertyName( self.theFullID, 'Quantity' ) )
         self.theFPNConcentration = tuple(convertToFullPropertyName( self.theFullID, 'Concentration' ))
         self.theType = str( self.theFullID[TYPE] )
         self.theID   = str( self.theFullID[ID] )
@@ -72,37 +72,38 @@ class SubstanceWindow(PluginWindow):
     def increaseQuantity( self, button_object ):
 
         self.theQuantity *= 2.0
-        self[ "Quantity_entry" ].set_text(str(self.theQuantity))
+        self[ "Quantity_entry" ].set_text( str( self.theQuantity ) )
         self.changeQuantity()
 
     def increaseConcentration( self, button_object ):
 
         self.theConcentration *= 2.0
-        self[ "Concentration_entry" ].set_text(str(self.theConcentration))
+        self[ "Concentration_entry" ].set_text( str( self.theConcentration ) )
         self.changeConcentration()
 
     def decreaseQuantity( self, button_object ):
 
         self.theQuantity *= 0.5
-        self[ "Quantity_entry" ].set_text(str(self.theQuantity))
+        self[ "Quantity_entry" ].set_text( str( self.theQuantity ) )
         self.changeQuantity()
 
     def decreaseConcentration( self, button_object ):
 
         self.theConcentration *= 0.5
-        self[ "Concentration_entry" ].set_text(str(self.theConcentration))
+        self[ "Concentration_entry" ].set_text( str( self.theConcentration ) )
         self.changeConcentration()
 
     def changeQuantity( self ):
         
         value = (self.theQuantity,)
-        self.theSimulator.setProperty(self.theFPNQuantity, value)
-        print self.theSimulator.getProperty(self.theFPNQuantity)
+        self.theSimulator.setProperty( self.theFPNQuantity, value )
+        print self.theSimulator.getProperty( self.theFPNQuantity )
 
     def changeConcentration( self ):
+        
         value = (self.theConcentration,)
-        self.theSimulator.setProperty(self.theFPNConcentration, value)
-        print self.theSimulator.getProperty(self.theFPNConcentration)
+        self.theSimulator.setProperty( self.theFPNConcentration, value )
+        print self.theSimulator.getProperty( self.theFPNConcentration )
 
 def mainLoop():
     # FIXME: should be a custom function
