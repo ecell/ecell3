@@ -45,6 +45,8 @@ class Substance;
 
 //class Eular1;
 
+//using namespace ::;
+
 typedef Integrator* IntegratorPtr;
 typedef IntegratorPtr (*IntegratorAllocator) (Substance&);
 
