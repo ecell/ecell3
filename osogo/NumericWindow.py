@@ -7,27 +7,10 @@ import gnome.ui
 import GDK
 import libglade
 
+from Window import *
 
 
-class Window:
-
-    def __init__( self, gladefile=None, root=None ):
-        self.widgets = libglade.GladeXML( filename=gladefile, root=root )
-
-    def addHandlers( self, handlers ):
-        self.widgets.signal_autoconnect( handlers )
-        
-    def addHandler( self, name, handler, *args ):
-        self.widgets.signal_connect( name, handler, args )
-
-    def getWidget( self, key ):
-        return self.widgets.get_widget( key )
-
-    def __getitem__( self, key ):
-        return self.widgets.get_widget( key )
-
-
-class MainWindow(Window):
+class NumericWindow(Window):
 
     def __init__( self, gladefile ):
 
@@ -49,31 +32,25 @@ class MainWindow(Window):
         aNumber = string.atof( aNumberString )
         print aNumberString
 
-#    def label1_enter_notify_event( self,obj ):
-#        print 'zhaiteng'
-        
-def mainQuit( obj, data ):
-    print obj,data
-    gtk.mainquit()
-
-def mainLoop():
-    # FIXME: should be a custom function
-    gtk.mainloop()
-
-def main():
-    systemPath = '/CELL/CYTOPLASM'
-    ID = 'ATP'
-    FQPI = systemPath + ':' + ID  
-    propertyName = 'quantity'
-    propertyValue = '0.00000'
-    aWindow = MainWindow( 'NumericWindow.glade' )
-    aWindow.addHandler( 'gtk_main_quit', mainQuit )
-    aWindow.setText("spinbutton1", propertyValue)
-    aWindow.setText("label1",ID)  
-    aWindow.setLabel("frame1", propertyName)
-    mainLoop()
 
 if __name__ == "__main__":
+
+    from main import *
+
+    def main():
+        systemPath = '/CELL/CYTOPLASM'
+        ID = 'ATP'
+        FQPI = systemPath + ':' + ID  
+        propertyName = 'quantity'
+        propertyValue = '0.00000'
+        aWindow = NumericWindow( 'NumericWindow.glade' )
+        aWindow.addHandler( 'gtk_main_quit', mainQuit )
+        aWindow.setText("spinbutton1", propertyValue)
+        aWindow.setText("label1",ID)  
+        aWindow.setLabel("frame1", propertyName)
+        mainLoop()
+
+
     main()
 
 

@@ -3,18 +3,18 @@
 
 from Window import *
 from main import *
+from Plugin import *
 
 class MainWindow(Window):
 
     def __init__( self ):
 
+        self.thePluginWindowManager = PluginWindowManager()
+
         self.theHandlerMap = { 'on_exit_activate':   self.exit
                                }
-
         Window.__init__( self )
         self.addHandlers( self.theHandlerMap )
-
-        self.theProgressBar = self.getWidget( "progressbar1" )
 
     def exit( self, obj ):
         mainQuit()
