@@ -13,6 +13,7 @@ import sys
 import os
 import glob
 import getopt
+import string
 
 def usage():
     ext = os.path.basename( sys.argv[0] )
@@ -38,8 +39,8 @@ def help():
         --no-define-cxxflags=[cxxflags]
                                  Override the default compiler options.
         --dmcompile=[path]       Specify dmcompile path.
-        -v or --verbose            Be verbose.
-        -h or --help                 Print this message.
+        -v or --verbose          Be verbose.
+        -h or --help             Print this message.
 
 
 This program is part of E-Cell Simulation Environment Version 3.
@@ -63,9 +64,10 @@ def main():
     STDLIBDIR = '-L\"' + exec_prefix + os.sep + 'lib\"'
     ECELL_INCLUDE = prefix + os.sep + 'include' + os.sep + 'ecell'
     LIBECS_INCLUDE = ECELL_INCLUDE + os.sep + 'libecs'
-    STDINCLUDE = '-I\"' + prefix + os.sep + 'include\"' + ' -I\"' + \
-                 ECELL_INCLUDE + '\" ' + '-I\"' + LIBECS_INCLUDE + '\"'
-    DMCOMPILE = 'dmcompile'
+    STDINCLUDE = [ '\"-I' + prefix + os.sep + 'include\"',
+                   '\"-I' + ECELL_INCLUDE + '\"',
+                   '\"-I' + LIBECS_INCLUDE + '\"' ]
+    DMCOMPILE = os.path.abspath( BINDIR + os.sep + 'dmcompile' )
     SRC = None
 
 
@@ -85,8 +87,10 @@ def main():
     NO_STDLIBDIR = False
     NO_DEFINE_CXXFLAGS = False
     LDFLAGS = ''
-    CXXFLAGS = ''
-    CXXCOMPILEFLAGS = ''
+    CXXFLAGS = []
+    CXXCOMPILEFLAGS = []
+    PYTHON = None
+    cmdList = []
 
     # -------------------------------------
     # check argument
@@ -98,7 +102,7 @@ def main():
             help()
             sys.exit(0)
       
-          # be verbose
+        # be verbose
         if anOption in ( "-v", '--verbose'):
             VERBOSE = True
             
@@ -117,11 +121,12 @@ def main():
         # set no-define-cxxflags
         if anOption == "--no-define-cxxflags":
             NO_DEFINE_CXXFLAGS = True
-            CXXFLAGS = anArg
+            CXXFLAGS = anArg.split()
 
         # set cxxflags
         if anOption == "--cxxflags":
-            CXXCOMPILEFLAGS = CXXFLAGS + ' ' + anArg
+            CXXCOMPILEFLAGS.extend( CXXFLAGS )
+            CXXCOMPILEFLAGS.extend( anArg.split() )
 
         # set cxxflags
         if anOption == "--dmcompile":
@@ -134,13 +139,17 @@ def main():
         sys.exit(1)
 
     if os.name == 'nt':
-        import string
-        PYTHON_WIN_VERSION = string.replace( sys.version[:3], '.', '' )
+        PYTHON_WIN_VERSION = sys.winver.replace( '.', '' )
         ADDFLAGS = ' -Wl,--enable-runtime-pseudo-reloc -lpython' + \
                    PYTHON_WIN_VERSION
     else:
         ADDFLAGS = ''
-	DMCOMPILE = 'python ' + DMCOMPILE
+        cmdList.append( sys.executable )
+
+    cmdList.append( DMCOMPILE )
+
+    if VERBOSE:
+        cmdList.append( '-v' )
 
     # on MS-Windows, command line doesn't expand *.cpp automatically
     FILELIST = []
@@ -153,9 +162,7 @@ def main():
         sys.exit(1)    
 
     if NO_STDINCLUDE:
-        INCLUDE = ""
-    else:
-        INCLUDE = STDINCLUDE
+        STDINCLUDE = []
 
     if not NO_STDLIBDIR:
         LDFLAGS = LDFLAGS + ' ' + STDLIBDIR
@@ -164,23 +171,26 @@ def main():
     os.environ['LDFLAGS'] = LDFLAGS
     
     if NO_DEFINE_CXXFLAGS:
-        os.environ['CXXFLAGS'] = CXXFLAGS
+        os.environ['CXXFLAGS'] = CXXFLAGS.join()
 
     for SRC in FILELIST:
         ext = os.path.basename(SRC)
         CLASSNAME, ext = os.path.splitext(ext)
         CLASSNAMEDEFINE = '-D_ECELL3_DM_CLASSNAME=' + CLASSNAME
-        cmdstr = '\"' + SRC + '\"' + ' ' + INCLUDE + ' \"' + CLASSNAMEDEFINE + \
-                '\" ' + CXXCOMPILEFLAGS
+        argList = []
+        argList.append( '\"' + cmdList[0] + '\"' )
+        argList.extend( cmdList[1:] )
+        argList.extend( [ '\"' + SRC + '\"',
+                          '\"' + CLASSNAMEDEFINE + '\"' ] )
+        argList.extend( STDINCLUDE )
+        argList.extend( CXXCOMPILEFLAGS )
 
         if VERBOSE:
-            cmdstr =  DMCOMPILE + ' -v ' + cmdstr
-            print cmdstr
-        else:
-            cmdstr =  DMCOMPILE + ' ' + cmdstr
-
-        ret = os.system( cmdstr )
-
+            print string.join( argList[0:] )
+            
+        # Need to us os.spawnv because of problems in MS-Windows with os.sytem
+        # when the dmcompile path contains whitespaces even if we force quotes
+        ret = os.spawnv( os.P_WAIT, cmdList[0], argList )
         if not ret == 0:
             sys.exit( 1 )
 
