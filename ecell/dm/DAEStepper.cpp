@@ -769,7 +769,7 @@ namespace libecs
 	  ( theContinuousVariableVector.size() + c - aDiscreteProcessOffset );
 
 	gsl_vector_set( theVelocityVector1, anIndex,
-			theDiscreteActivityBuffer[ c ] );	
+			theDiscreteActivityBuffer[ c - aDiscreteProcessOffset ] );	
       }
 
     for ( IntVector::size_type c( 0 );
