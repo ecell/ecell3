@@ -32,9 +32,8 @@
 #define __DISCRETEEVENTSTEPPER_HPP
 
 #include "libecs.hpp"
-
 #include "Stepper.hpp"
-
+#include "DiscreteEventProcess.hpp"
 
 namespace libecs
 {
@@ -54,26 +53,128 @@ namespace libecs
   LIBECS_DM_CLASS( DiscreteEventStepper, Stepper )
   {
 
+  protected:
+
+
+    DECLARE_CLASS( StepperEvent );
+    DECLARE_TYPE( DynamicPriorityQueue<StepperEvent>, PriorityQueue );
+
+
+    // A pair of (reaction index, time) for inclusion in the priority queue.
+    class StepperEvent
+    {
+    public:
+
+      StepperEvent()
+      {
+	; // do nothing
+      }
+
+      StepperEvent( RealCref aTime, DiscreteEventProcessPtr aProcess )
+	:
+	theTime( aTime ),
+	theProcess( aProcess )
+      {
+	; // do nothing
+      }
+
+      const Real getTime() const
+      {
+	return theTime;
+      }
+
+      DiscreteEventProcessPtr getProcess() const
+      {
+	return theProcess;
+      }
+
+      const bool operator< ( StepperEventCref rhs ) const
+      {
+	return theTime < rhs.theTime;
+      }
+
+      const bool operator!= ( StepperEventCref rhs ) const
+      {
+	return theTime != rhs.theTime || 
+	  theProcess != rhs.theProcess;
+      }
+
+
+    private:
+
+      Real       theTime;
+      DiscreteEventProcessPtr theProcess;
+
+
+    };
+
+
   public:
 
     LIBECS_DM_OBJECT_ABSTRACT( DiscreteEventStepper )
       {
 	INHERIT_PROPERTIES( Stepper );
+
+
+	PROPERTYSLOT_SET_GET( Real, Tolerance );
+
+	PROPERTYSLOT_GET_NO_LOAD_SAVE( Real, TimeScale );
+	PROPERTYSLOT_GET_NO_LOAD_SAVE( String, LastProcess );
+
       }
 
     DiscreteEventStepper();
     virtual ~DiscreteEventStepper() {}
 
-    // virtual void step();
 
-    //    virtual void interrupt( StepperPtr const aCaller )
-    //    {
-    //      ; // do nothing -- ignore interruption
-    //    }
+    virtual void initialize();
 
-    //    static StepperPtr createInstance() { return new DiscreteEventStepper; }
+    virtual void step();
+
+    virtual void interrupt( StepperPtr const aCaller );
+
+
+    SET_METHOD( Real, Tolerance )
+      {
+	theTolerance = value;
+      }
+    
+    GET_METHOD( Real, Tolerance )
+      {
+	return theTolerance;
+      }
+    
+    virtual GET_METHOD( Real, TimeScale )
+      {
+	//return theLastProcess->getTimeScale();
+	return theTimeScale;
+      }
+
+    GET_METHOD( String, LastProcess );
+
+
+    DiscreteEventProcessVectorCref getDiscreteEventProcessVector() const
+      {
+	return theDiscreteEventProcessVector;
+      }
+
+
+  protected:
+
+    DiscreteEventProcessVector theDiscreteEventProcessVector;
+
+    PriorityQueue thePriorityQueue;
+
+
+    Real            theTimeScale;
+
+    Real            theTolerance;
+
+    DiscreteEventProcessPtr    theLastProcess;
 
   };
+
+
 
 
 

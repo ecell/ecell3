@@ -42,6 +42,7 @@ EntityType.cpp\
 System.cpp\
 Entity.cpp\
 Process.cpp\
+DiscreteEventProcess.cpp\
 StepperMaker.cpp\
 SystemMaker.cpp\
 DataPoint.cpp\
@@ -84,6 +85,7 @@ EntityType.hpp\
 System.hpp\
 Entity.hpp\
 Process.hpp\
+DiscreteEventProcess.hpp\
 StepperMaker.hpp\
 SystemMaker.hpp\
 DataPoint.hpp\

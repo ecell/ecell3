@@ -182,7 +182,9 @@ namespace libecs
     safety( 0.9 ),
     theMaxErrorRatio( 1.0 )
   {
-    ; // do nothing
+    // use more narrow range
+    setMinStepInterval( 1e-100 );
+    setMaxStepInterval( 1e+100 );
   }
 
   void AdaptiveDifferentialStepper::initialize()

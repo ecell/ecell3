@@ -7,7 +7,7 @@
 #include <gsl/gsl_rng.h>
 
 #include <libecs/libecs.hpp>
-#include <libecs/Process.hpp>
+#include <libecs/DiscreteEventProcess.hpp>
 #include <libecs/Stepper.hpp>
 #include <libecs/FullID.hpp>
 
@@ -21,7 +21,7 @@ DECLARE_VECTOR( GillespieProcessPtr, GillespieProcessVector );
      GillespieProcess 
 ***************************************************************************/
 
-LIBECS_DM_CLASS( GillespieProcess, Process )
+LIBECS_DM_CLASS( GillespieProcess, DiscreteEventProcess )
 {
   
   typedef const Real (GillespieProcess::* RealMethodPtr)() const;
@@ -30,17 +30,12 @@ LIBECS_DM_CLASS( GillespieProcess, Process )
   
   LIBECS_DM_OBJECT( GillespieProcess, Process )
     {
-      INHERIT_PROPERTIES( Process );
+      INHERIT_PROPERTIES( DiscreteEventProcess );
       
       PROPERTYSLOT_SET_GET( Real, k );
 
       PROPERTYSLOT_GET_NO_LOAD_SAVE( Real, Mu );
       PROPERTYSLOT_GET_NO_LOAD_SAVE( Int,  Order );
-      PROPERTYSLOT_GET_NO_LOAD_SAVE( Real, StepInterval );
-
-      PROPERTYSLOT( Polymorph, EffectList,
-			   NULLPTR,
-			   &GillespieProcess::getEffectListProperty );
     }
 
 
@@ -48,9 +43,7 @@ LIBECS_DM_CLASS( GillespieProcess, Process )
   GillespieProcess() 
     :
     theOrder( 0 ),
-    theStepInterval( 0.0 ),
     k( 0.0 ),
-    Index( -1 ),
     theGetMultiplicityMethodPtr( &GillespieProcess::getZero ),
     theGetMinValueMethodPtr( &GillespieProcess::getZero )
     {
@@ -64,7 +57,6 @@ LIBECS_DM_CLASS( GillespieProcess, Process )
   
 
   SIMPLE_SET_GET_METHOD( Real, k );
-  SIMPLE_SET_GET_METHOD( Int, Index );
 
 
   GET_METHOD( Real, Mu )
@@ -80,21 +72,15 @@ LIBECS_DM_CLASS( GillespieProcess, Process )
     return theOrder;
   }
 
-  GET_METHOD( Real, StepInterval )
+  virtual GET_METHOD( Real, TimeScale )
   {
-    return theStepInterval;
+    return ( this->*theGetMinValueMethodPtr )() * getStepInterval();
   }
-
-  GET_METHOD( Real, MinValue )
-  {
-    return ( this->*theGetMinValueMethodPtr )();
-  }
-
-  const Polymorph getEffectListProperty() const;
-
   
+
+
   // a uniform random number (0...1) must be given as u
-  void updateStepInterval()
+  virtual void updateStepInterval()
   {
     const Real aMu( getMu() );
 
@@ -120,7 +106,7 @@ LIBECS_DM_CLASS( GillespieProcess, Process )
 
   virtual void initialize()
   {
-    Process::initialize();
+    DiscreteEventProcess::initialize();
     declareUnidirectional();
 
     calculateOrder();
@@ -145,19 +131,8 @@ LIBECS_DM_CLASS( GillespieProcess, Process )
       }
   }
 
-  void clearEffectList()
-  {
-    theEffectList.clear();
-  }
-
-  void addEffect( GillespieProcessPtr anIndex );
-
-  const bool checkEffect( GillespieProcessPtr anGillespieProcessPtr ) const;
-
-  GillespieProcessVectorCref getEffectList() const
-  {
-    return theEffectList;
-  }
+  //  virtual const bool 
+  //    checkEffect( GillespieProcessPtr anGillespieProcessPtr ) const;
 
 
 protected:
@@ -226,39 +201,16 @@ protected:
 
 protected:
 
+  Real k;    
+
   GillespieProcessVector theEffectList;
 
   Int theOrder;
-
-  Real theStepInterval;
-
-  Real k;    
-  Int Index;
 
   RealMethodPtr theGetMultiplicityMethodPtr;
   RealMethodPtr theGetMinValueMethodPtr;
 
 };
-
-
-const Polymorph GillespieProcess::getEffectListProperty() const
-{
-  PolymorphVector aVector;
-  aVector.reserve( theEffectList.size() );
-
-  for ( GillespieProcessVectorConstIterator i( theEffectList.begin() );
-	i != theEffectList.end(); ++i ) 
-    {
-      GillespieProcessPtr anGillespieProcess( *i );
-
-      FullIDCref aFullID( anGillespieProcess->getFullID() );
-      const String aFullIDString( aFullID.getString() );
-
-      aVector.push_back( aFullIDString );
-    }
-
-  return aVector;
-}
 
 
 void GillespieProcess::calculateOrder()
@@ -319,53 +271,6 @@ void GillespieProcess::calculateOrder()
 }
 
 
-const bool GillespieProcess::checkEffect( GillespieProcessPtr 
-					  anGillespieProcessPtr ) const
-{
-  VariableReferenceVectorCref 
-    aVariableReferenceVector( anGillespieProcessPtr->
-			      getVariableReferenceVector() );
-    
-  for( VariableReferenceVectorConstIterator 
-	 i( theVariableReferenceVector.begin() );
-       i != theVariableReferenceVector.end() ; ++i )
-    {
-      VariableReferenceCref aVariableReference1(*i );
-	
-      VariableCptr const aVariable1( aVariableReference1.getVariable() );
 
-      for( VariableReferenceVectorConstIterator 
-	     j( aVariableReferenceVector.begin() );
-	   j != aVariableReferenceVector.end(); ++j )
-	{
-	  VariableReferenceCref aVariableReference2( *j );
-	  VariableCptr const aVariable2( aVariableReference2.getVariable() );
-	  const Int aCoefficient2( aVariableReference2.getCoefficient() );
-	    
-	  if( aVariable1 == aVariable2 && aCoefficient2 < 0 )
-	    {
-	      return true;
-	    }
-	}
-    }
-
-  return false;
-}
-
-
-
-
-void GillespieProcess::addEffect( GillespieProcessPtr aProcessPtr )
-{
-  if( std::find( theEffectList.begin(), theEffectList.end(), aProcessPtr ) 
-      == theEffectList.end() )
-    {
-      theEffectList.push_back( aProcessPtr );
-
-      // optimization: sort by memory address
-      std::sort( theEffectList.begin(), theEffectList.end() );
-    }
-
-}
 
 #endif /* __NRPROCESS_HPP */

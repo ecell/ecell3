@@ -64,6 +64,7 @@ namespace libecs
   DECLARE_CLASS( FullPN );
   DECLARE_CLASS( VariableReference );
   DECLARE_CLASS( Process );
+  DECLARE_CLASS( DiscreteEventProcess );
   DECLARE_CLASS( ProcessMaker );
   DECLARE_CLASS( Stepper );
   DECLARE_CLASS( VariableProxy );

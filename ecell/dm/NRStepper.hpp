@@ -60,61 +60,10 @@
 USE_LIBECS;
 
 
+// NRStepper actually IS a DiscreteEventStepper.
+
 LIBECS_DM_CLASS( NRStepper, DiscreteEventStepper )
 {
-
-  DECLARE_CLASS( NREvent );
-  DECLARE_TYPE( DynamicPriorityQueue<NREvent>, NRPriorityQueue );
-
-protected:
-
-  // A pair of (reaction index, time) for inclusion in the priority queue.
-  class NREvent
-  {
-  public:
-
-    NREvent()
-    {
-      ; // do nothing
-    }
-
-    NREvent( RealCref aTime, GillespieProcessPtr aProcess )
-      :
-      theTime( aTime ),
-      theProcess( aProcess )
-    {
-      ; // do nothing
-    }
-
-    const Real getTime() const
-    {
-      return theTime;
-    }
-
-    GillespieProcessPtr getProcess() const
-    {
-      return theProcess;
-    }
-
-    const bool operator< ( NREventCref rhs ) const
-    {
-      return theTime < rhs.theTime;
-    }
-
-    const bool operator!= ( NREventCref rhs ) const
-    {
-      return theTime != rhs.theTime || 
-	theProcess != rhs.theProcess;
-    }
-
-
-  private:
-
-    Real       theTime;
-    GillespieProcessPtr theProcess;
-
-
-  };
 
 public:
 
@@ -122,55 +71,18 @@ public:
     {
       INHERIT_PROPERTIES( DiscreteEventStepper );
 
-      PROPERTYSLOT_SET_GET( Real, Tolerance );
-
-      PROPERTYSLOT_GET_NO_LOAD_SAVE( Real, TimeScale );
     }
 
   NRStepper(void);
 
   virtual ~NRStepper(void);
 
-  virtual void initialize();
+  //virtual void initialize();
 
-  virtual void step();
+  //virtual void step();
+  
+  //virtual void interrupt( StepperPtr const aCaller );
 
-  virtual void interrupt( StepperPtr const aCaller );
-
-
-  SET_METHOD( Real, Tolerance )
-  {
-    theTolerance = value;
-  }
-
-  GET_METHOD( Real, Tolerance )
-  {
-    return theTolerance;
-  }
-
-  virtual GET_METHOD( Real, TimeScale )
-  {
-    //return theLastProcess->getTimeScale();
-    return theTimeScale;
-  }
-
-  GillespieProcessVectorCref getGillespieProcessVector() const
-  {
-    return theGillespieProcessVector;
-  }
-
-
-protected:
-
-  GillespieProcessVector theGillespieProcessVector;
-
-  NRPriorityQueue thePriorityQueue;
-
-  //    GillespieProcessPtr    theLastProcess;
-
-  Real            theTimeScale;
-
-  Real            theTolerance;
 
 };
 
