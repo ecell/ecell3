@@ -77,11 +77,11 @@ anEml.setProperty( 'Variable:/CELL/CYTOPLASM:E', 'Value', [ '1400' ] )
 anEml.createEntity( 'Process', 'MichaelisUniUniProcess', 'Process:/CELL/CYTOPLASM:E', 'process E' )
 
 
-anEml.setProperty( 'Process:/CELL/CYTOPLASM:E', 'Connection', \
+anEml.setProperty( 'Process:/CELL/CYTOPLASM:E', 'VariableReference', \
                    ( 'S0', 'Variable:/CELL/CYTOPLASM:S', '-1' ) )
-anEml.setProperty( 'Process:/CELL/CYTOPLASM:E','Connection', \
+anEml.setProperty( 'Process:/CELL/CYTOPLASM:E','VariableReference', \
                    ( 'P0', 'Variable:/CELL/CYTOPLASM:P', '1') )
-anEml.setProperty( 'Process:/CELL/CYTOPLASM:E','Connection', \
+anEml.setProperty( 'Process:/CELL/CYTOPLASM:E','VariableReference', \
                    ( 'C0', 'Variable:/CELL/CYTOPLASM:E', '0') )
 
 anEml.setProperty( 'Process:/CELL/CYTOPLASM:E','KmS', [ '1' ] )

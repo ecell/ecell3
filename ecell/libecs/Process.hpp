@@ -35,7 +35,7 @@
 
 #include "libecs.hpp"
 #include "Entity.hpp"
-#include "Connection.hpp"
+#include "VariableReference.hpp"
 
 namespace libecs
 {
@@ -47,8 +47,8 @@ namespace libecs
   /** @file */
 
 
-  DECLARE_ASSOCVECTOR( String, Connection, std::less< const String >, 
-		       ConnectionMap  );
+  DECLARE_ASSOCVECTOR( String, VariableReference, std::less< const String >, 
+		       VariableReferenceMap  );
 
   /**
      Process class is used to represent chemical and other phenonema which 
@@ -119,34 +119,34 @@ namespace libecs
       return theActivity;
     }
 
-    void setConnection( PolymorphCref aValue );
+    void setVariableReference( PolymorphCref aValue );
 
-    void setConnectionList( PolymorphCref );
+    void setVariableReferenceList( PolymorphCref );
 
-    const Polymorph getConnectionList() const;
+    const Polymorph getVariableReferenceList() const;
 
-    void registerConnection( StringCref aName, FullIDCref aFullID,
-			   const Int aCoefficient );
+    void registerVariableReference( StringCref aName, FullIDCref aFullID,
+				    const Int aCoefficient );
 
-    void registerConnection( StringCref aName, VariablePtr aVariable, 
-			   const Int aCoefficient );
-
-    /**
-       Get Connection by tag name.
-
-       @param aConnectionName
-       @return a Connection
-       @see Connection
-    */
-
-    Connection getConnection( StringCref aConnectionName );
+    void registerVariableReference( StringCref aName, VariablePtr aVariable, 
+				    const Int aCoefficient );
 
     /**
-       @return a const reference to the connection map
+       Get VariableReference by tag name.
+
+       @param aVariableReferenceName
+       @return a VariableReference
+       @see VariableReference
     */
-    ConnectionMapCref getConnectionMap() const
+
+    VariableReference getVariableReference( StringCref aVariableReferenceName );
+
+    /**
+       @return a const reference to the VariableReferenceMap
+    */
+    VariableReferenceMapCref getVariableReferenceMap() const
     {
-      return theConnectionMap;
+      return theVariableReferenceMap;
     }
 
     void setPriority( IntCref aValue )
@@ -165,7 +165,7 @@ namespace libecs
 
   protected:
 
-    ConnectionMap theConnectionMap;
+    VariableReferenceMap theVariableReferenceMap;
 
   private:
 

@@ -182,17 +182,18 @@ namespace libecs
     // Update theVariableCache
     //
 
-    // get all the variables which are connections of the Processs
+    // get all the variables which are included in the VariableReferenceMap
+    // of the Processs
     theVariableCache.clear();
     // for all the processs
     for( ProcessCache::const_iterator i( theProcessCache.begin());
 	 i != theProcessCache.end() ; ++i )
       {
-	ConnectionMapCref aConnectionMap( (*i)->getConnectionMap() );
+	VariableReferenceMapCref aVariableReferenceMap( (*i)->getVariableReferenceMap() );
 
-	// for all the connections
-	for( ConnectionMapConstIterator j( aConnectionMap.begin() );
-	     j != aConnectionMap.end(); ++j )
+	// for all the VariableReferences
+	for( VariableReferenceMapConstIterator j( aVariableReferenceMap.begin() );
+	     j != aVariableReferenceMap.end(); ++j )
 	  {
 	    VariablePtr aVariablePtr( j->second.getVariable() );
 

@@ -4,18 +4,18 @@ BASECLASS = 'FluxProcess'
 PROPERTIES = [('Real','k1',0.0), ('Real','k2',0.0), ('Real','kd',0.0)]
 
 PROTECTED_AUX = '''
-  Connection S0;
-  Connection C0;
-  Connection C1;
+  VariableReference S0;
+  VariableReference C0;
+  VariableReference C1;
   Real v; // declare member variable
   Int a; // declare member variable
   Real time; // declare member variable
 '''
 
 defineMethod( 'initialize', '''
-  S0 = getConnection( "S0" );
-  C0 = getConnection( "C0" );
-  C1 = getConnection( "C1" );
+  S0 = getVariableReference( "S0" );
+  C0 = getVariableReference( "C0" );
+  C1 = getVariableReference( "C1" );
   v = 0; // initialize member variable
   a = 0; // initialize member variable
   time = 0; // initialize member variable

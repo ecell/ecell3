@@ -28,8 +28,8 @@
 // E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
 
-#ifndef __CONNECTION_HPP
-#define __CONNECTION_HPP
+#ifndef __VARIABLEREFERENCE_HPP
+#define __VARIABLEREFERENCE_HPP
 
 #include "libecs.hpp"
 
@@ -44,12 +44,12 @@ namespace libecs
 
   /** @file */
 
-  class Connection
+  class VariableReference
   {
 
   public:
 
-    Connection()
+    VariableReference()
       :
       theVariable( NULLPTR ),
       theCoefficient( 0 )
@@ -57,7 +57,7 @@ namespace libecs
       ; // do nothing
     }
 
-    Connection( VariablePtr aVariablePtr, const Int aCoefficient ) 
+    VariableReference( VariablePtr aVariablePtr, const Int aCoefficient ) 
       : 
       theVariable( aVariablePtr ), 
       theCoefficient( aCoefficient )
@@ -65,7 +65,7 @@ namespace libecs
       ; // do nothing
     }
 
-    ~Connection() {}
+    ~VariableReference() {}
 
     VariablePtr getVariable() const { return theVariable; }
     const Int getCoefficient() const { return theCoefficient; }
@@ -81,4 +81,6 @@ namespace libecs
 
 } // namespace libecs
 
-#endif /* __CONNECTION_HPP */
+
+#endif /* __VARIABLEREFERENCE_HPP */
+

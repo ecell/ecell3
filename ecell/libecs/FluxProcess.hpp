@@ -3,7 +3,7 @@
 
 #include "libecs/libecs.hpp"
 #include "libecs/Process.hpp"
-#include "libecs/Connection.hpp"
+#include "libecs/VariableReference.hpp"
 #include "libecs/Variable.hpp"
 #include "libecs/Stepper.hpp"
 
@@ -40,16 +40,16 @@ namespace libecs
 
       setActivity( aVelocity );
 
-      // Increase or decrease connections.
+      // Increase or decrease variables.
 
-      for( ConnectionMapIterator s( theConnectionMap.begin() );
-	   s != theConnectionMap.end() ; ++s )
+      for( VariableReferenceMapIterator s( theVariableReferenceMap.begin() );
+	   s != theVariableReferenceMap.end() ; ++s )
 	{
-	  Connection aConnection( s->second );
-	  const Int aCoefficient( aConnection.getCoefficient() );
+	  VariableReference aVariableReference( s->second );
+	  const Int aCoefficient( aVariableReference.getCoefficient() );
 	  if( aCoefficient != 0 )
 	    {
-	      aConnection.getVariable()->
+	      aVariableReference.getVariable()->
 		addVelocity( aVelocity * aCoefficient );
 	    }
 	}

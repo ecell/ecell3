@@ -3,19 +3,19 @@ BASECLASS = 'FluxProcess'
 PROPERTIES = [('Real','m',0.0)]
 
 PROTECTED_AUX = '''
-  Connection C0;
-  Connection P1;
-  Connection P2;
-  Connection P0;
+  VariableReference C0;
+  VariableReference P1;
+  VariableReference P2;
+  VariableReference P0;
   Real prev; // declare member variable
   Real counter; // seconds (when step inverval is 0.001)
 '''
 
 defineMethod( 'initialize', '''
-  C0 = getConnection( "C0" );
-  P1 = getConnection( "P1" );
-  P2 = getConnection( "P2" );
-  P0 = getConnection( "P0" );
+  C0 = getVariableReference( "C0" );
+  P1 = getVariableReference( "P1" );
+  P2 = getVariableReference( "P2" );
+  P0 = getVariableReference( "P0" );
   prev = 0; // initialize member variable
   counter = 0; // for debugging purposes!!!
 ''' )

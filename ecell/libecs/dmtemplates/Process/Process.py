@@ -1,8 +1,8 @@
 import string
 METHOD_LIST={}
 INCLUDE_FILES=[]
-CONNECTION_SLOTS=[]
-ALL_CONNECTION_SLOTS=[]
+VARIABLE_SLOTS=[]
+ALL_VARIABLE_SLOTS=[]
 PUBLIC_AUX = ''
 PROTECTED_AUX = ''
 PRIVATE_AUX= ''
@@ -30,32 +30,32 @@ def createpropertyslots():
 	print '  registerSlot( getPropertySlotMaker()->createPropertySlot( "%s",*this, Type2Type<%s>(),&%s::set%s, &%s::get%s ));'\
               % (i[1],i[0],CLASSNAME,i[1],CLASSNAME,i[1])
 
-def connectionpropertyslotvariabledecls():
-    for i in CONNECTION_SLOTS:
+def variablepropertyslotvariabledecls():
+    for i in VARIABLE_SLOTS:
         print '    PropertySlotPtr %s_%s;' % (i[0],i[1])
-    for i in ALL_CONNECTION_SLOTS:
-        print '    std::vector<PropertySlotPtr> Connection_%s;' % i
+    for i in ALL_VARIABLE_SLOTS:
+        print '    std::vector<PropertySlotPtr> Variable_%s;' % i
 
-def getpropertyslotofconnection():
-    for i in CONNECTION_SLOTS:
-        print '  %s_%s = getPropertySlotOfConnection( "%s", "%s" );' \
+def getpropertyslotofvariable():
+    for i in VARIABLE_SLOTS:
+        print '  %s_%s = getPropertySlotOfVariable( "%s", "%s" );' \
             % (i[0],i[1],i[0],i[1])
 
-def allconnectionslotsinit():
-    if len( ALL_CONNECTION_SLOTS ) == 0:
+def allvariableslotsinit():
+    if len( ALL_VARIABLE_SLOTS ) == 0:
         return
 
-    for i in ALL_CONNECTION_SLOTS:
-        print 'Connection_%s.clear();' % i
+    for i in ALL_VARIABLE_SLOTS:
+        print 'Variable_%s.clear();' % i
 
     print ''
-    print '''  for( ConnectionMapIterator s( theConnectionMap.begin() );
-       s != theConnectionMap.end() ; ++s )
+    print '''  for( VariableReferenceMapIterator s( theVariableReferenceMap.begin() );
+       s != theVariableReferenceMap.end() ; ++s )
     {
       VariablePtr aVariable( s->second.getVariable() );
     '''
-    for i in ALL_CONNECTION_SLOTS:
-        print 'Connection_%s.push_back( aVariable->getPropertySlot( "%s", this ) );' % (i,i)
+    for i in ALL_VARIABLE_SLOTS:
+        print 'VariableReference_%s.push_back( aVariable->getPropertySlot( "%s", this ) );' % (i,i)
     print '}'
 
 #def methodDecls():

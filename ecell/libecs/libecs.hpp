@@ -65,7 +65,7 @@ namespace libecs
   DECLARE_CLASS( FullID );
   DECLARE_CLASS( FullPN );
   DECLARE_CLASS( Integrator );
-  DECLARE_CLASS( Connection );
+  DECLARE_CLASS( VariableReference );
   DECLARE_CLASS( Process );
   DECLARE_CLASS( ProcessMaker );
   DECLARE_CLASS( Stepper );

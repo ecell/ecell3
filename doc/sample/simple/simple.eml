@@ -78,7 +78,7 @@
 
 
 <process class="MichaelisUniUniProcess" id="E" name="E">
-<property name="ConnectionList">
+<property name="VariableReferenceList">
 <value>
 <value number="0">S0</value>
 <value number="1">Variable:/CELL/CYTOPLASM:S</value>

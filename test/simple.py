@@ -37,9 +37,9 @@ aSimulator.createEntity( 'MassActionProcess',
                          'Process:/CELL/CYTOPLASM:R',
                          'a process' )
 
-aSimulator.setProperty( 'Process:/CELL/CYTOPLASM:R:Connection', ( 'S0', 'Variable:/CELL/CYTOPLASM:S',-1 ) )
-aSimulator.setProperty( 'Process:/CELL/CYTOPLASM:R:Connection', ( 'P0', 'Variable:/CELL/CYTOPLASM:P',1) )
-aSimulator.setProperty( 'Process:/CELL/CYTOPLASM:R:Connection', ( 'C0', 'Variable:/CELL/CYTOPLASM:E',0) )
+aSimulator.setProperty( 'Process:/CELL/CYTOPLASM:R:VariableReference', ( 'S0', 'Variable:/CELL/CYTOPLASM:S',-1 ) )
+aSimulator.setProperty( 'Process:/CELL/CYTOPLASM:R:VariableReference', ( 'P0', 'Variable:/CELL/CYTOPLASM:P',1) )
+aSimulator.setProperty( 'Process:/CELL/CYTOPLASM:R:VariableReference', ( 'C0', 'Variable:/CELL/CYTOPLASM:E',0) )
 aSimulator.setProperty( 'Process:/CELL/CYTOPLASM:R:K', (.00001, ) )
 #aSimulator.setProperty( 'Process:/CELL/CYTOPLASM:R:KmS', (.01, ) )
 #aSimulator.setProperty( 'Process:/CELL/CYTOPLASM:R:KcF', (10, ) )

@@ -205,7 +205,7 @@
 
 <!-- for PROCESS -->
 <process class="CyclinsynthesisProcess" id="Cln2syn" name="Cln2 synthesis">
-<property name="ConnectionList">
+<property name="VariableReferenceList">
 <value>
 <value number="0">P0</value>
 <value number="1">Variable:/CELL/CYTOPLASM:Cln2</value>
@@ -233,7 +233,7 @@
 </process>
 
 <process class="DegradeProcess" id="Cln2deg" name="Cln2 degrade">
-<property name="ConnectionList">
+<property name="VariableReferenceList">
 <value>
 <value number="0">S0</value>
 <value number="1">Variable:/CELL/CYTOPLASM:Cln2</value>
@@ -247,7 +247,7 @@
 </process>
 
 <process class="CyclinsynthesisProcess" id="Clb2syn" name="Clb2 synthesis">
-<property name="ConnectionList">
+<property name="VariableReferenceList">
 <value>
 <value number="0">P0</value>
 <value number="1">Variable:/CELL/CYTOPLASM:Clb2t</value>
@@ -275,7 +275,7 @@
 </process>
 
 <process class="DegradeClb2Process" id="Clb2deg" name="Clb2 degrade">
-<property name="ConnectionList">
+<property name="VariableReferenceList">
 <value>
 <value number="0">S0</value>
 <value number="1">Variable:/CELL/CYTOPLASM:Clb2t</value>
@@ -312,7 +312,7 @@
 </process>
 
 <process class="CyclinsynthesisProcess" id="Clb5syn" name="Clb5 synthesis">
-<property name="ConnectionList">
+<property name="VariableReferenceList">
 <value>
 <value number="0">P0</value>
 <value number="1">Variable:/CELL/CYTOPLASM:Clb5t</value>
@@ -340,7 +340,7 @@
 </process>
 
 <process class="DegradeClb5Process" id="Clb5deg" name="Clb5 degrade">
-<property name="ConnectionList">
+<property name="VariableReferenceList">
 <value>
 <value number="0">S0</value>
 <value number="1">Variable:/CELL/CYTOPLASM:Clb5t</value>
@@ -366,7 +366,7 @@
 <property name="Priority">
 <value number="0">-1</value>
 </property>
-<property name="ConnectionList">
+<property name="VariableReferenceList">
 <value>
 <value number="0">P0</value>
 <value number="1">Variable:/CELL/CYTOPLASM:Bck2</value>
@@ -388,7 +388,7 @@
 <property name="Priority">
 <value number="0">-1</value>
 </property>
-<property name="ConnectionList">
+<property name="VariableReferenceList">
 <value>
 <value number="0">P0</value>
 <value number="1">Variable:/CELL/CYTOPLASM:Cln3</value>
@@ -415,7 +415,7 @@
 </process>
 
 <process class="Sic1Process" id="Sic1syn" name="Sic1 synthesis">
-<property name="ConnectionList">
+<property name="VariableReferenceList">
 <value>
 <value number="0">P0</value>
 <value number="1">Variable:/CELL/CYTOPLASM:Sic1t</value>
@@ -438,7 +438,7 @@
 </process>
 
 <process class="DegradeProcess" id="Sic1deg1" name="Sic1 degrade1">
-<property name="ConnectionList">
+<property name="VariableReferenceList">
 <value>
 <value number="0">S0</value>
 <value number="1">Variable:/CELL/CYTOPLASM:Sic1t</value>
@@ -452,7 +452,7 @@
 </process>
 
 <process class="Sic1ComplexDegradeProcess" id="Sic1deg2" name="Sic1 degrade2">
-<property name="ConnectionList">
+<property name="VariableReferenceList">
 <value>
 <value number="0">S0</value>
 <value number="1">Variable:/CELL/CYTOPLASM:Sic1t</value>
@@ -516,7 +516,7 @@
 </process>
 
 <process class="BiUniProcess" id="Clb2Sic1syn" name="Clb2Sic1 synthesis">
-<property name="ConnectionList">
+<property name="VariableReferenceList">
 <value>
 <value number="0">P0</value>
 <value number="1">Variable:/CELL/CYTOPLASM:Clb2Sic1</value>
@@ -540,7 +540,7 @@
 </process>
 
 <process class="DegradeProcess" id="Clb2Sic1deg1" name="Clb2Sic1 degrade1">
-<property name="ConnectionList">
+<property name="VariableReferenceList">
 <value>
 <value number="0">S0</value>
 <value number="1">Variable:/CELL/CYTOPLASM:Clb2Sic1</value>
@@ -554,7 +554,7 @@
 </process>
 
 <process class="DegradeClb2Process" id="Clb2Sic1deg2" name="Clb2Sic1 degrade2">
-<property name="ConnectionList">
+<property name="VariableReferenceList">
 <value>
 <value number="0">S0</value>
 <value number="1">Variable:/CELL/CYTOPLASM:Clb2Sic1</value>
@@ -592,7 +592,7 @@
 
 
 <process class="DegradeProcess" id="Clb2Sic1deg3" name="Clb2Sic1 degrade3">
-<property name="ConnectionList">
+<property name="VariableReferenceList">
 <value>
 <value number="0">S0</value>
 <value number="1">Variable:/CELL/CYTOPLASM:Clb2Sic1</value>
@@ -606,7 +606,7 @@
 </process>
 
 <process class="Sic1ComplexDegradeProcess" id="Clb2Sic1deg4" name="Clb2Sic1 degrade4">
-<property name="ConnectionList">
+<property name="VariableReferenceList">
 <value>
 <value number="0">S0</value>
 <value number="1">Variable:/CELL/CYTOPLASM:Clb2Sic1</value>
@@ -670,7 +670,7 @@
 </process>
 
 <process class="BiUniProcess" id="Clb5Sic1syn" name="Clb5Sic1 synthesis">
-<property name="ConnectionList">
+<property name="VariableReferenceList">
 <value>
 <value number="0">P0</value>
 <value number="1">Variable:/CELL/CYTOPLASM:Clb5Sic1</value>
@@ -695,7 +695,7 @@
 
 
 <process class="DegradeProcess" id="Clb5Sic1deg1" name="Clb5Sic1 degrade1">
-<property name="ConnectionList">
+<property name="VariableReferenceList">
 <value>
 <value number="0">S0</value>
 <value number="1">Variable:/CELL/CYTOPLASM:Clb5Sic1</value>
@@ -710,7 +710,7 @@
 
 
 <process class="DegradeClb5Process" id="Clb5Sic1deg2" name="Clb5Sic1 degrade2">
-<property name="ConnectionList">
+<property name="VariableReferenceList">
 <value>
 <value number="0">S0</value>
 <value number="1">Variable:/CELL/CYTOPLASM:Clb5Sic1</value>
@@ -733,7 +733,7 @@
 </process>
 
 <process class="DegradeProcess" id="Clb5Sic1deg3" name="Clb5Sic1 degrade3">
-<property name="ConnectionList">
+<property name="VariableReferenceList">
 <value>
 <value number="0">S0</value>
 <value number="1">Variable:/CELL/CYTOPLASM:Clb5Sic1</value>
@@ -748,7 +748,7 @@
 
 
 <process class="Sic1ComplexDegradeProcess" id="Clb5Sic1deg4" name="Clb5Sic1 degrade4">
-<property name="ConnectionList">
+<property name="VariableReferenceList">
 <value>
 <value number="0">S0</value>
 <value number="1">Variable:/CELL/CYTOPLASM:Clb5Sic1</value>
@@ -812,7 +812,7 @@
 </process>
 
 <process class="Sic1Process" id="Cdc20tsyn" name="Cdc20t synthesis">
-<property name="ConnectionList">
+<property name="VariableReferenceList">
 <value>
 <value number="0">P0</value>
 <value number="1">Variable:/CELL/CYTOPLASM:Cdc20t</value>
@@ -836,7 +836,7 @@
 
 
 <process class="DegradeProcess" id="Cdc20tdeg" name="Cdc20t degrade">
-<property name="ConnectionList">
+<property name="VariableReferenceList">
 <value>
 <value number="0">S0</value>
 <value number="1">Variable:/CELL/CYTOPLASM:Cdc20t</value>
@@ -850,7 +850,7 @@
 </process>
 
 <process class="Cdc20ActivateProcess" id="Cdc20act" name="Cdc20 activate">
-<property name="ConnectionList">
+<property name="VariableReferenceList">
 <value>
 <value number="0">P0</value>
 <value number="1">Variable:/CELL/CYTOPLASM:Cdc20a</value>
@@ -869,7 +869,7 @@
 </process>
 
 <process class="Cdc20InactivateProcess" id="Cdc20ina" name="Cdc20 inactivate">
-<property name="ConnectionList">
+<property name="VariableReferenceList">
 <value>
 <value number="0">S0</value>
 <value number="1">Variable:/CELL/CYTOPLASM:Cdc20a</value>
@@ -902,7 +902,7 @@
 
 
 <process class="Hct1ActivateProcess" id="Hct1act" name="Hct1 activate">
-<property name="ConnectionList">
+<property name="VariableReferenceList">
 <value>
 <value number="0">P0</value>
 <value number="1">Variable:/CELL/CYTOPLASM:Hct1a</value>
@@ -935,7 +935,7 @@
 
 
 <process class="Hct1InactivateProcess" id="Hct1ina" name="Hct1 inactivate">
-<property name="ConnectionList">
+<property name="VariableReferenceList">
 <value>
 <value number="0">S0</value>
 <value number="1">Variable:/CELL/CYTOPLASM:Hct1a</value>
@@ -989,7 +989,7 @@
 </process>
 
 <process class="MassCalculateProcess" id="masscalc" name="mass calculate">
-<property name="ConnectionList">
+<property name="VariableReferenceList">
 <value>
 <value number="0">P0</value>
 <value number="1">Variable:/CELL/CYTOPLASM:mass</value>
@@ -1009,7 +1009,7 @@
 
 
 <process class="DegradeProcess" id="ORIdeg" name="ORI deg">
-<property name="ConnectionList">
+<property name="VariableReferenceList">
 <value>
 <value number="0">S0</value>
 <value number="1">Variable:/CELL/CYTOPLASM:ORI</value>
@@ -1024,7 +1024,7 @@
 
 
 <process class="BUDProcess" id="BUD" name="BUD">
-<property name="ConnectionList">
+<property name="VariableReferenceList">
 <value>
 <value number="0">P0</value>
 <value number="1">Variable:/CELL/CYTOPLASM:BUD</value>
@@ -1058,7 +1058,7 @@
 
 
 <process class="DegradeProcess" id="BUDdeg" name="BUD deg">
-<property name="ConnectionList">
+<property name="VariableReferenceList">
 <value>
 <value number="0">S0</value>
 <value number="1">Variable:/CELL/CYTOPLASM:BUD</value>
@@ -1072,7 +1072,7 @@
 </process>
 
 <process class="SPNProcess" id="SPN" name="SPN">
-<property name="ConnectionList">
+<property name="VariableReferenceList">
 <value>
 <value number="0">P0</value>
 <value number="1">Variable:/CELL/CYTOPLASM:SPN</value>
@@ -1096,7 +1096,7 @@
 
 
 <process class="DegradeProcess" id="SPNdeg" name="SPN deg">
-<property name="ConnectionList">
+<property name="VariableReferenceList">
 <value>
 <value number="0">S0</value>
 <value number="1">Variable:/CELL/CYTOPLASM:SPN</value>
@@ -1113,7 +1113,7 @@
 <property name="Priority">
 <value number="0">-1</value>
 </property>
-<property name="ConnectionList">
+<property name="VariableReferenceList">
 <value>
 <value number="0">P0</value>
 <value number="1">Variable:/CELL/CYTOPLASM:SBF</value>
@@ -1180,7 +1180,7 @@
 <property name="Priority">
 <value number="0">-1</value>
 </property>
-<property name="ConnectionList">
+<property name="VariableReferenceList">
 <value>
 <value number="0">P0</value>
 <value number="1">Variable:/CELL/CYTOPLASM:MBF</value>
@@ -1247,7 +1247,7 @@
 <value number="0">-1</value>
 </property>
 
-<property name="ConnectionList">
+<property name="VariableReferenceList">
 <value>
 <value number="0">P0</value>
 <value number="1">Variable:/CELL/CYTOPLASM:Mcm1</value>
@@ -1282,7 +1282,7 @@
 <property name="Priority">
 <value number="0">-1</value>
 </property>
-<property name="ConnectionList">
+<property name="VariableReferenceList">
 <value>
 <value number="0">P0</value>
 <value number="1">Variable:/CELL/CYTOPLASM:Swi5</value>
@@ -1326,7 +1326,7 @@
 <property name="Priority">
 <value number="0">-1</value>
 </property>
-<property name="ConnectionList">
+<property name="VariableReferenceList">
 <value>
 <value number="0">C0</value>
 <value number="1">Variable:/CELL/CYTOPLASM:Clb2</value>
@@ -1358,7 +1358,7 @@
 <property name="Priority">
 <value number="0">-1</value>
 </property>
-<property name="ConnectionList">
+<property name="VariableReferenceList">
 <value>
 <value number="0">C0</value>
 <value number="1">Variable:/CELL/CYTOPLASM:Clb2</value>
@@ -1381,7 +1381,7 @@
 <property name="Priority">
 <value number="0">-1</value>
 </property>
-<property name="ConnectionList">
+<property name="VariableReferenceList">
 <value>
 <value number="0">P0</value>
 <value number="1">Variable:/CELL/CYTOPLASM:Clb2</value>
@@ -1404,7 +1404,7 @@
 <property name="Priority">
 <value number="0">-1</value>
 </property>
-<property name="ConnectionList">
+<property name="VariableReferenceList">
 <value>
 <value number="0">P0</value>
 <value number="1">Variable:/CELL/CYTOPLASM:Clb5</value>
@@ -1427,7 +1427,7 @@
 <property name="Priority">
 <value number="0">-1</value>
 </property>
-<property name="ConnectionList">
+<property name="VariableReferenceList">
 <value>
 <value number="0">P0</value>
 <value number="1">Variable:/CELL/CYTOPLASM:Sic1</value>

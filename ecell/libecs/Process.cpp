@@ -31,7 +31,7 @@
 #include <iostream>
 
 #include "Util.hpp"
-#include "Connection.hpp"
+#include "VariableReference.hpp"
 #include "Stepper.hpp"
 #include "FullID.hpp"
 #include "Variable.hpp"
@@ -47,16 +47,16 @@ namespace libecs
   void Process::makeSlots()
   {
     registerSlot( getPropertySlotMaker()->
-		  createPropertySlot( "Connection", *this, 
+		  createPropertySlot( "VariableReference", *this, 
 				      Type2Type<Polymorph>(),
-				      &Process::setConnection,
+				      &Process::setVariableReference,
 				      NULLPTR ) );
 
     registerSlot( getPropertySlotMaker()->
-		  createPropertySlot( "ConnectionList", *this, 
+		  createPropertySlot( "VariableReferenceList", *this, 
 				      Type2Type<Polymorph>(),
-				      &Process::setConnectionList,
-				      &Process::getConnectionList ) );
+				      &Process::setVariableReferenceList,
+				      &Process::getVariableReferenceList ) );
 
     registerSlot( getPropertySlotMaker()->
 		  createPropertySlot( "Activity", *this, 
@@ -71,18 +71,18 @@ namespace libecs
 				      &Process::getPriority ) );
   }
 
-  void Process::setConnection( PolymorphCref aValue )
+  void Process::setVariableReference( PolymorphCref aValue )
   {
     PolymorphVector aVector( aValue.asPolymorphVector() );
     checkSequenceSize( aVector, 3 );
 
-    std::cerr << "Use of Process::setConnection() is deprecated. Use ConnectionList." << std::endl;
+    std::cerr << "Use of Process::setVariableReference() is deprecated. Use VariableReferenceMap." << std::endl;
 
-    registerConnection( aVector[0].asString(), FullID( aVector[1].asString() ), 
+    registerVariableReference( aVector[0].asString(), FullID( aVector[1].asString() ), 
 		      aVector[2].asInt() );
   }
 
-  void Process::setConnectionList( PolymorphCref aValue )
+  void Process::setVariableReferenceList( PolymorphCref aValue )
   {
     const PolymorphVector aVector( aValue.asPolymorphVector() );
     for( PolymorphVectorConstIterator i( aVector.begin() );
@@ -94,36 +94,36 @@ namespace libecs
 	if( anInnerVector.size() < 3 )
 	  {
 	    THROW_EXCEPTION( ValueError, "Process [" + getFullID().getString()
-			     + "]: ill-formed ConnectionList given." );
+			     + "]: ill-formed VariableReferenceMap given." );
 	  }
 
-	const String aConnectionName(  anInnerVector[0].asString() );
+	const String aVariableReferenceName(  anInnerVector[0].asString() );
 	const FullID aFullID(        anInnerVector[1].asString() );
 	const Int    aCoefficient( anInnerVector[2].asInt() );
 
-	registerConnection( aConnectionName, aFullID, aCoefficient );
+	registerVariableReference( aVariableReferenceName, aFullID, aCoefficient );
       }
 
   }
 
-  const Polymorph Process::getConnectionList() const
+  const Polymorph Process::getVariableReferenceList() const
   {
     PolymorphVector aVector;
-    aVector.reserve( theConnectionMap.size() );
+    aVector.reserve( theVariableReferenceMap.size() );
   
-    for( ConnectionMapConstIterator i( theConnectionMap.begin() );
-	 i != theConnectionMap.end() ; ++i )
+    for( VariableReferenceMapConstIterator i( theVariableReferenceMap.begin() );
+	 i != theVariableReferenceMap.end() ; ++i )
       {
 	PolymorphVector anInnerVector;
-	ConnectionCref aConnection( i->second );
+	VariableReferenceCref aVariableReference( i->second );
 
 	// Tagname
 	anInnerVector.push_back( i->first );
 	// FullID
-	anInnerVector.push_back( aConnection.getVariable()->
+	anInnerVector.push_back( aVariableReference.getVariable()->
 				 getFullID().getString() );
 	// Coefficient
-	anInnerVector.push_back( aConnection.getCoefficient() );
+	anInnerVector.push_back( aVariableReference.getCoefficient() );
 
 	aVector.push_back( anInnerVector );
       }
@@ -131,13 +131,13 @@ namespace libecs
     return aVector;
   }
 
-  void Process::registerConnection( StringCref aName, FullIDCref aFullID, 
+  void Process::registerVariableReference( StringCref aName, FullIDCref aFullID, 
 				  const Int aCoefficient )
   {
     SystemPtr aSystem( getModel()->getSystem( aFullID.getSystemPath() ) );
     VariablePtr aVariable( aSystem->getVariable( aFullID.getID() ) );
 
-    registerConnection( aName, aVariable, aCoefficient );
+    registerVariableReference( aName, aVariable, aCoefficient );
   }
 
   Process::Process() 
@@ -154,23 +154,23 @@ namespace libecs
   }
 
 
-  void Process::registerConnection( StringCref aName, VariablePtr aVariable, 
+  void Process::registerVariableReference( StringCref aName, VariablePtr aVariable, 
 				  const Int aCoefficient )
   {
-    Connection aConnection( aVariable, aCoefficient );
-    theConnectionMap.insert( ConnectionMap::value_type( aName, aConnection ) );
+    VariableReference aVariableReference( aVariable, aCoefficient );
+    theVariableReferenceMap.insert( VariableReferenceMap::value_type( aName, aVariableReference ) );
   }
 
 
-  Connection Process::getConnection( StringCref aName )
+  VariableReference Process::getVariableReference( StringCref aName )
   {
-    ConnectionMapConstIterator anIterator( theConnectionMap.find( aName ) );
+    VariableReferenceMapConstIterator anIterator( theVariableReferenceMap.find( aName ) );
 
-    if( anIterator == theConnectionMap.end() )
+    if( anIterator == theVariableReferenceMap.end() )
       {
 	THROW_EXCEPTION( NotFound,
 			 "[" + getFullID().getString() + 
-			 "]: Connection [" + aName + 
+			 "]: VariableReference [" + aName + 
 			 "] not found in this Process." );
       }
 

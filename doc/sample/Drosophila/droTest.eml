@@ -95,7 +95,7 @@
 
 <process class="FM1Process" id="R.toy1" name="Toy procession">
 
-<property name="ConnectionList">
+<property name="VariableReferenceList">
 <value>
 <value number="0">P0</value>
 <value number="1">Variable:/CELL/CYTOPLASM:M</value>
@@ -121,7 +121,7 @@
 
 <process class="FM2Process" id="R.toy2" name="Toy procession">
 
-<property name="ConnectionList">
+<property name="VariableReferenceList">
 <value>
 <value number="0">P0</value>
 <value number="1">Variable:/CELL/CYTOPLASM:M</value>
@@ -144,7 +144,7 @@
 
 <process class="FP01Process" id="R.toy3" name="Toy procession">
 
-<property name="ConnectionList">
+<property name="VariableReferenceList">
 <value>
 <value number="0">P0</value>
 <value number="1">Variable:/CELL/CYTOPLASM:P0</value>
@@ -167,7 +167,7 @@
 
 <process class="FP02Process" id="R.toy4" name="Toy procession">
 
-<property name="ConnectionList">
+<property name="VariableReferenceList">
 <value>
 <value number="0">P0</value>
 <value number="1">Variable:/CELL/CYTOPLASM:P0</value>
@@ -195,7 +195,7 @@
 
 <process class="FP03Process" id="R.toy5" name="Toy procession">
 
-<property name="ConnectionList">
+<property name="VariableReferenceList">
 <value>
 <value number="0">P0</value>
 <value number="1">Variable:/CELL/CYTOPLASM:P0</value>
@@ -224,7 +224,7 @@
 
 <process class="FP11Process" id="R.toy6" name="Toy procession">
 
-<property name="ConnectionList">
+<property name="VariableReferenceList">
 <value>
 <value number="0">P0</value>
 <value number="1">Variable:/CELL/CYTOPLASM:P1</value>
@@ -253,7 +253,7 @@
 
 <process class="FP12Process" id="R.toy7" name="Toy procession">
 
-<property name="ConnectionList">
+<property name="VariableReferenceList">
 <value>
 <value number="0">P0</value>
 <value number="1">Variable:/CELL/CYTOPLASM:P1</value>
@@ -281,7 +281,7 @@
 
 <process class="FP13Process" id="R.toy8" name="Toy procession">
 
-<property name="ConnectionList">
+<property name="VariableReferenceList">
 <value>
 <value number="0">P0</value>
 <value number="1">Variable:/CELL/CYTOPLASM:P1</value>
@@ -310,7 +310,7 @@
 
 <process class="FP14Process" id="R.toy9" name="Toy procession">
 
-<property name="ConnectionList">
+<property name="VariableReferenceList">
 <value>
 <value number="0">P0</value>
 <value number="1">Variable:/CELL/CYTOPLASM:P1</value>
@@ -339,7 +339,7 @@
 
 <process class="FP21Process" id="R.toy10" name="Toy procession">
 
-<property name="ConnectionList">
+<property name="VariableReferenceList">
 <value>
 <value number="0">P0</value>
 <value number="1">Variable:/CELL/CYTOPLASM:P2</value>
@@ -368,7 +368,7 @@
 
 <process class="FP22Process" id="R.toy11" name="Toy procession">
 
-<property name="ConnectionList">
+<property name="VariableReferenceList">
 <value>
 <value number="0">P0</value>
 <value number="1">Variable:/CELL/CYTOPLASM:P2</value>
@@ -397,7 +397,7 @@
 
 <process class="FP23Process" id="R.toy12" name="Toy procession">
 
-<property name="ConnectionList">
+<property name="VariableReferenceList">
 <value>
 <value number="0">P0</value>
 <value number="1">Variable:/CELL/CYTOPLASM:P2</value>
@@ -420,7 +420,7 @@
 
 <process class="FP24Process" id="R.toy13" name="Toy procession">
 
-<property name="ConnectionList">
+<property name="VariableReferenceList">
 <value>
 <value number="0">P0</value>
 <value number="1">Variable:/CELL/CYTOPLASM:P2</value>
@@ -444,7 +444,7 @@
 
 <process class="FP25Process" id="R.toy14" name="Toy procession">
 
-<property name="ConnectionList">
+<property name="VariableReferenceList">
 <value>
 <value number="0">P0</value>
 <value number="1">Variable:/CELL/CYTOPLASM:P2</value>
@@ -473,7 +473,7 @@
 
 <process class="FPn1Process" id="R.toy15" name="Toy procession">
 
-<property name="ConnectionList">
+<property name="VariableReferenceList">
 <value>
 <value number="0">P0</value>
 <value number="1">Variable:/CELL/CYTOPLASM:Pn</value>
@@ -497,7 +497,7 @@
 
 <process class="FPn2Process" id="R.toy16" name="Toy procession">
 
-<property name="ConnectionList">
+<property name="VariableReferenceList">
 <value>
 <value number="0">P0</value>
 <value number="1">Variable:/CELL/CYTOPLASM:Pn</value>

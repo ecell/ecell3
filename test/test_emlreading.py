@@ -89,8 +89,8 @@ anEntityProperty = anEml.getEntityProperty( 'Variable:/CELL/CYTOPLASM:S', 'Value
 print anEntityProperty, '\n'
 
 ## 
-print '## TEST for getEntityProperty (Connection E, Connection)'
-anEntityProperty = anEml.getEntityProperty( 'Process:/CELL/CYTOPLASM:E', 'Connection' )
+print '## TEST for getEntityProperty (VariableReference E, VariableReference)'
+anEntityProperty = anEml.getEntityProperty( 'Process:/CELL/CYTOPLASM:E', 'VariableReference' )
 print anEntityProperty, '\n'
 
 

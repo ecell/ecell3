@@ -4,13 +4,13 @@ BASECLASS = 'FluxProcess'
 PROPERTIES = [('Real','k1',0.0),('Real','k2',0.0)]
 
 PROTECTED_AUX = '''
-  Connection S0;
-  Connection C0;
+  VariableReference S0;
+  VariableReference C0;
 '''
 
 defineMethod( 'initialize', '''
-  S0 = getConnection( "S0" );
-  C0 = getConnection( "C0" );
+  S0 = getVariableReference( "S0" );
+  C0 = getVariableReference( "C0" );
 ''' )
 
 defineMethod( 'process', '''

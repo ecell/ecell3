@@ -78,7 +78,7 @@ Exceptions.hpp\
 Util.hpp\
 CoreLinuxCompatibility.hpp\
 RCPtr.hpp\
-Connection.hpp\
+VariableReference.hpp\
 DynamicPriorityQueue.hpp\
 AssocVector.h
 

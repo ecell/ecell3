@@ -48,7 +48,7 @@ namespace libecs
     void makeSlots();
 
 @{propertyvariabledecls()}
-@{connectionpropertyslotvariabledecls()}
+@{variablepropertyslotvariabledecls()}
 
 @(PROTECTED_AUX)
 
@@ -88,8 +88,8 @@ void @(CLASSNAME)::initialize()
 {
   @(BASECLASS)::initialize();
 
-  @{getpropertyslotofconnection()}
-  @{allconnectionslotsinit()}
+  @{getpropertyslotofvariable()}
+  @{allvariableslotsinit()}
 
   @{methodDefs('initialize')}
 

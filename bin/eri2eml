@@ -155,8 +155,8 @@ Options:
                 anEml.createEntity( anEriLine[1], aSystemFullID )
                 anEml.setEntityProperty( aSystemFullID, 'Name', anEriLine[3:4] )
 
-                # create ConnectionList from Eri data
-                aConnectionList = []
+                # create VariableReferenceList from Eri data
+                aVariableReferenceList = []
                 aSubstrateNumber = 0
                 aProductNumber = 0
                 aCatalystNumber = 0
@@ -170,14 +170,14 @@ Options:
                         aSubstrateNumber = aSubstrateNumber + 1
                         aSubstrateList.append( 'Variable:' + anEriChunkElement[1])
                         aSubstrateList.append( str(-1 * int(anEriChunkElement[2])) )
-                        aConnectionList.append( aSubstrateList )
+                        aVariableReferenceList.append( aSubstrateList )
                     elif ( anEriChunkElement[0] == 'Product' ):
                         aProductList = []
                         aProductList.append( 'P' + str(aProductNumber) )
                         aProductNumber = aProductNumber + 1
                         aProductList.append( 'Variable:' + anEriChunkElement[1])
                         aProductList.append( str(1 * int(anEriChunkElement[2])) )
-                        aConnectionList.append( aProductList )
+                        aVariableReferenceList.append( aProductList )
 
                     elif ( anEriChunkElement[0] == 'Catalyst' ):
                         aCatalystList = []
@@ -185,7 +185,7 @@ Options:
                         aCatalystNumber = aCatalystNumber + 1
                         aCatalystList.append( 'Variable:' + anEriChunkElement[1])
                         aCatalystList.append( '0' )
-                        aConnectionList.append( aCatalystList )
+                        aVariableReferenceList.append( aCatalystList )
 
                     elif ( anEriChunkElement[0] == 'Effector' ):
                         anEffectorList = []
@@ -193,13 +193,13 @@ Options:
                         anEffectorNumber = anEffectorNumber + 1
                         anEffectorList.append( 'Variable:' + anEriChunkElement[1])
                         anEffectorList.append( '0' )
-                        aConnectionList.append( anEffectorList )
+                        aVariableReferenceList.append( anEffectorList )
 
                     else:
                         anEml.setEntityProperty( aSystemFullID, anEriChunkElement[0], anEriChunkElement[1:] )
 
-                # set ConnectionList
-                anEml.setEntityProperty( aSystemFullID, 'ConnectionList', aConnectionList )
+                # set VariableReferenceList
+                anEml.setEntityProperty( aSystemFullID, 'VariableReferenceList', aVariableReferenceList )
     else: 
         pass
 
