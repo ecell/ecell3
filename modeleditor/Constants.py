@@ -22,8 +22,9 @@ LE_OBJECT_CUSTOM = 4
 LE_OBJECT_CONNECTION = 5
 
 # Default Root System Stepper
-DE_DEFAULT_STEPPER_CLASS = 'ODE45Stepper'
+DE_DEFAULT_STEPPER_CLASS = 'ODEStepper'
 DE_DEFAULT_STEPPER_NAME = 'Default_Stepper'
+DE_DEFAULT_PROCESS_CLASS = 'ExpressionFluxProcess'
 
 #CL_PATH='ME_PATH'
 # ModelStore constants

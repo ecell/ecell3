@@ -46,6 +46,7 @@ class CreateEntity(ModelCommand):
                 pass
             newFullID = ':'.join( [ ME_VARIABLE_TYPE, convertSysIDToSysPath( self.__theID ), 'SIZE' ] )
             self.theModel.createEntity( ME_VARIABLE_TYPE, newFullID )
+            self.theModel.setEntityProperty( newFullID + ":Value", 1 )
 
 
         return True

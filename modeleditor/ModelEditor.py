@@ -182,6 +182,7 @@ class ModelEditor:
         self.theModelStore.setEntityProperty( 'System::/:StepperID', DE_DEFAULT_STEPPER_NAME)
         newFullID = ':'.join( [ ME_VARIABLE_TYPE, '/', 'SIZE' ] )
         self.theModelStore.createEntity( ME_VARIABLE_TYPE, newFullID )
+        self.theModelStore.setEntityProperty( newFullID + ':Value', 1 )
     
         self.changesSaved = True
 
@@ -853,7 +854,11 @@ class ModelEditor:
 
 
     def getDefaultProcessClass( self ):
-        return self.theDMInfo.getClassList( ME_PROCESS_TYPE )[0]
+        classList = self.theDMInfo.getClassList( ME_PROCESS_TYPE )
+        if DE_DEFAULT_PROCESS_CLASS in classList:
+            return DE_DEFAULT_PROCESS_CLASS
+        else:
+            return classList[0]
 
 
     def getRecentFileList(self):
