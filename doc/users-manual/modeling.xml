@@ -4,7 +4,7 @@
   <title>Modeling with &ecell;</title> 
 
   <highlights>
-    <para>By reading this chapter, you may get information about:</para>
+    <para>By reading this chapter, you can get information about:</para>
     
     <simplelist>
       <member>How an &ecell;'s simulation model is organized</member>
@@ -14,9 +14,243 @@
 
 
   <sect1>
-    <title>What is E-Cell Model file?</title>
+    <title>Simulation Model of &ecell;</title>
 
-    <para>
+    <sect2>
+      <title>Objects in the Model</title>
+
+      <para>A simulation model of &app; consists of the following types of objects.
+<itemizedlist>
+	  <listitem>
+	    <para>Usually more than one &Entity; object</para>
+	  </listitem>
+	  <listitem>
+	    <para>One or more &Stepper; object(s)</para>
+	  </listitem>
+	</itemizedlist>
+&Entity; objects define the structure of the simulation model and represented phenomena (such
+as chemical reactions) in the model. &Stepper; objects
+implement specific simulation algorithms.
+</para>
+  </sect2>
+
+
+    <sect2>
+      <title>&Entity; objects</title>
+
+      <para>
+The &Entity; class has three subclasses:
+<itemizedlist>
+	  <listitem>
+	    <para>&Variable</para> <para>This class of objects represent state
+	  variables.  A &Variable; object holds a scalar real-number
+	  value.  A set of values of all &Variable; objects in a
+	  simulation model defines the state of the model at a certain
+	  point in time.</para>
+	  </listitem>
+	  <listitem>
+	    <para>&Process</para> <para>This class of objects
+	  represent phenomena in the simulation model that result in
+	  changes in the values of one or more &Variable; objects.
+	  The way of change of the &Variable; values can be either
+	  discrete or continuous.</para>
+	  </listitem>
+	  <listitem>
+	    <para>&System</para> <para>This class of objects define
+	  overall structure of the model.  A &System; object can
+	  contain sets of these three types of &Entity;, &Variable;,
+	  &Process;, and &System; objects.  A &System; can contain
+	  other &System;s, and can form a tree-like structure.  
+	  </para>
+	  </listitem>
+	</itemizedlist>
+</para>
+      <sect3>
+	<title>Root &System;</title>
+	<para>When a simulator instance is newly instantiated, 
+	a subclass object of &System;,
+	a <classname>CompartmentSystem</classname>, is created. This
+	&System; is called the <emphasis>root &System</emphasis>.
+</para>
+      </sect3>
+
+
+    </sect2>
+
+    <sect2>
+      <title>&Stepper; objects</title>
+
+      <para></para>
+    </sect2>
+
+
+
+
+    <sect2>
+      <title>Identifiers</title>
+
+      <para>&app; uses several types of identifier strings to specify
+      an object, such as the &Entity; and &Stepper;, in a simulation
+      model.</para>
+
+      <sect3>
+	<title>&ID; (<emphasis>StepperID</emphasis>)</title>
+
+	<para>Every &Entity; and &Stepper; object has an
+	&ID;.  An &ID; is a character string of
+	arbitrary length starting from an alphabet or '_' with
+	succeeding alphabet, numeric, and '_' characters.  &app treats
+	&ID;s in a case-sensitive way.</para>
+
+	<para>If an &ID; is used to indicate a &Stepper; object, it is
+	called a <emphasis>Stepper ID</emphasis>.  An &ID; points to
+	an &Entity; object is refered to as <emphasis>Entity
+	ID</emphasis>, or just <emphasis>ID</emphasis>.</para>
+
+	<para>(need EBNF here)</para>
+
+	<informalexample>
+	  <para>Examples: _P3, ATP, GlucoseKinase</para>
+	</informalexample>
+
+      </sect3>
+
+      <sect3>
+	<title>&SystemPath;</title>
+
+	<para>The &SystemPath; identifies a &System; from the
+	tree-like hierarchy of &System; objects in a simulation model.
+	It has a form of &ID; strings joined by a character '/'
+	(slash).  As a special case, the &SystemPath; of the root
+	system is '/'. For instance, if there is a &System; 'A', and
+	'A' has a subsystem 'B', a &SystemPath; '/A/B' specifies the
+	&System; object 'B'.  It has three parts: (1) the root system
+	('/'), (2) the &System; 'A' directly under the root system,
+	and (3) the &System; 'B' just under 'A'.</para>
+
+	<para>A &SystemPath can be relative.  That is, it can contain
+	'.' and '..' to specify a current and a super (containing)
+	&System;, respectively.  If a &SystemPath; is relative, it does
+	not point at a &System; object unless a current &System; is
+	given.</para>
+
+	<informalexample>
+	  <para>Examples: /A/B,  ../A, ., /CELL/ER1/../CYTOSOL</para>
+	</informalexample>
+
+      </sect3>
+
+      <sect3>
+	<title>&FullID;</title>
+
+	<para>A &FullID; identifies a unique &Entity; object in a simulation
+	model.  A &FullID; comprises three parts, (1) a
+	<emphasis>Type</emphasis>, (2) a &SystemPath;, and (3) an
+	&ID;, joined by a character ':' (colon).</para>
+
+	<para>Type is one of the following class names:
+<itemizedlist>
+	    <listitem>
+	      <para>&System;</para>
+	    </listitem>
+	    <listitem>
+	      <para>&Process;</para>
+	    </listitem>
+	    <listitem>
+	      <para>&Variable;</para>
+	    </listitem>
+	  </itemizedlist>
+</para>
+
+	<para>For example, the following &FullID; points to a &Process; object
+of which &ID; is 'P', in the &System; 'CELL' directly under the root system.
+<informalexample>
+	    <programlisting>Process:/CELL:P</programlisting>
+	  </informalexample>
+</para>
+
+      </sect3>
+
+      <sect3>
+	<title>&FullPN;</title>
+
+	<para>&FullPN; specifies a unique
+	<emphasis>property</emphasis> (see below) of an &Entity; object in the
+	simulation model.  It has a form of a &FullID; and a name of a
+	property joined by a character ':'.</para>
+
+	<para>The following &FullPN; points to a 'Value' property of the &Variable; object 'Variable:/CELL:S'.
+<informalexample>
+	    <programlisting>Variable:/CELL:S:Value</programlisting>
+	  </informalexample>
+</para>
+      </sect3>
+
+    </sect2>
+
+
+
+    <sect2>
+      <title>Properties of &Entity; and &Stepper; Objects</title>
+
+      <para>&Entity; and &Stepper; objects have
+      <emphasis>properties</emphasis>.  Property is an attribute of a
+      certain object associated with a name, which can be get and set.
+      </para>
+
+      <para>A value of a property has a <emphasis>type</emphasis>,
+      which is one of:
+
+<itemizedlist>
+	  <listitem>
+	    <para>&Real; number</para> 
+	    <para>(ex. 3.33e+10, 1.0)</para>
+	  </listitem>
+	  <listitem>
+	    <para>&Int; number</para>
+	    <para>(ex. 3, 100)</para>
+	  </listitem>
+	  <listitem>
+	    <para>&StringType;</para>
+
+	    <para>&StringType; has two forms: quoted and not quoted.
+	    A quoted &StringType; can contain any
+	    <acronym>ASCII</acronym> characters except the quotation
+	    characters (' or ").  If a &StringType is not quoted, it
+	    can start with an alphabet character or '_', or '/', and
+	    contain alphabets, numbers, '_', '/' and ':'.</para>
+
+	    <para>Multi-line string support is currently under
+	    development.</para>
+
+	    <para>(ex. C10_A, "It can include spaces if double-quoted.", 'single-quote is available too, if you want to use "double-quotes" inside.')</para>
+	  </listitem>
+
+	  <listitem>
+	    <para>List</para> <para>The list can contain &Real;,
+	    &Int;, &StringType values. This list can also contain
+	    other lists, that is, the list can be nested.  A list must
+	    be surrounded by brackets ('[' and ']'), and the elements
+	    must be separated by space characters.  In some cases
+	    outermost brackets are omitted (such as in &EM; files, see below).</para>
+	    <para>(ex. [ A 10 [ 1.0 "a string" 1e+10 ] ] )</para>
+	  </listitem>
+	</itemizedlist>
+</para>
+
+    </sect2>
+
+
+  </sect1>
+
+
+  <sect1>
+    <title>E-Cell Model (&EM;) File Format</title>
+
+    <sect2>
+      <title>What is &EM;?</title>
+
+      <para>
       In &app, the standard file format of model description and
       exchange is XML-based &EML; (E-Cell Model description Language).
       Although &EML; is an ideal means of integrating E-Cell with other
@@ -37,7 +271,10 @@
       ".em".
     </para>
 
-    <para>Although <application>E-Cell Modeling
+    <sect3>
+      <title>Why and when use &EM;?</title>
+
+      <para>Although <application>E-Cell Modeling
     Environment</application> will provide means of more sophisticate,
     scalable and automated model construction on the basis of &EML;,
     learning syntax and semantics of &EM; may help you get the idea of
@@ -46,72 +283,17 @@
     programming language-like syntax, &EM; can be used as a simple and
     intuitive tool to communicate with other &ecell users.</para>
 
+    </sect3>
 
-    </sect1>
+    </sect2>
+
+
+  </sect1>
+
 
 
   <sect1>
-    <title>Basic Concepts</title>
-
-    <sect2>
-      <title>&Entity; Objects for Cell Model Construction</title>
-      <para></para>
-
-    <sect3>
-      <title><emphasis>FullID</emphasis>, <emphasis>FullPN</emphasis>, and <emphasis>SystemPath</emphasis></title>
-
-      <para></para>
-
-    </sect3>
-
-
-    </sect2>
-
-
-    <sect2>
-      <title>&Stepper; Objects for Defining Simulation Procedures</title>
-
-      <para></para>
-    </sect2>
-
-
-    <sect2>
-      <title>Properties of &Entity; and &Stepper; objects</title>
-
-
-      <para><emphasis>property_value</emphasis> can be one of  (this should be a table, not a list)
-
-<itemizedlist>
-	  <listitem>
-	    <para>Real number (ex. 3.33e+10, 1.0)</para>
-	  </listitem>
-	  <listitem>
-	    <para>Int number  (ex. 3, 100)</para>
-	  </listitem>
-	  <listitem>
-	    <para>String (ex. C10:A)</para>
-	  </listitem>
-	  <listitem>
-	    <para>Quoted string (ex. "[EC35.3.33]+30")</para>
-	  </listitem>
-	  <listitem>
-	    <para>List of items consists of above types of elements.  This list
-can be nested. 
-(ex. [ A 10 [ 1 1.0 1e+10 ] ] )
-</para>
-	  </listitem>
-	</itemizedlist>
-
-
-</para>
-
-    </sect2>
-
-</sect1>
-
-
-    <sect1>
-      <title>general structure</title>
+    <title>general structure</title>
     
 
     <para></para>
@@ -122,7 +304,7 @@ can be nested.
       <title></title>
 
 
-    <programlisting>
+      <programlisting>
 Stepper [ClassName] ( ID )
 "docstring"
 { 
@@ -158,7 +340,7 @@ System [ClassName] ( SystemPath )
 } 
 </programlisting>
 
-    <para>where <emphasis>ObjectType</emphasis> is one of:
+      <para>where <emphasis>ObjectType</emphasis> is one of:
 
       <itemizedlist>
 	  <listitem>
@@ -331,7 +513,7 @@ System System ( /CELL/MEMBRANE )
 
     </sect2>
 
-    </sect1>
+  </sect1>
 
 
 

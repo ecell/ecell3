@@ -5,7 +5,7 @@
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN" 
 [
   <!ENTITY legal SYSTEM "legal.xml">
-  <!ENTITY appversion "3.1.94">
+  <!ENTITY appversion "3.1.96">
   <!ENTITY manrevision "0.0">
   <!ENTITY date "Nov 2002">
   <!ENTITY app "<application>E-Cell Simulation Environment</application>">
@@ -55,12 +55,11 @@
   <!ENTITY PropertySlot "<classname>PropertySlot</classname>">
   <!ENTITY PropertyInterface "<classname>PropertyInterface</classname>">
   <!ENTITY System "<classname>System</classname>">
-  <!ENTITY SystemPath "<classname>SystemPath</classname>">
   <!ENTITY Stepper "<classname>Stepper</classname>">
-  <!ENTITY String "<classname>String</classname>">
   <!ENTITY Session "<classname>Session</classname>">
   <!ENTITY SessionManager "<classname>SessionManager</classname>">
   <!ENTITY Simulator "<classname>Simulator</classname>">
+  <!ENTITY String "<classname>String</classname>">
   <!ENTITY Logger "<classname>Logger</classname>">
   <!ENTITY ObjectStub "<classname>ObjectStub</classname>">
   <!ENTITY EntityStub "<classname>EntityStub</classname>">
@@ -78,6 +77,15 @@
   <!ENTITY float "<type>float</type>">
   <!ENTITY int "<type>int</type>">
   <!ENTITY double "<type>double</type>">
+  <!ENTITY Real "<type>Real</type>">
+  <!ENTITY Int "<type>Int</type>">
+  <!ENTITY StringType "<type>String</type>">
+
+  <!ENTITY EntityType "<wordasword>EntityType</wordasword>">
+  <!ENTITY FullID "<wordasword>FullID</wordasword>">
+  <!ENTITY FullPN "<wordasword>FullPN</wordasword>">
+  <!ENTITY ID "<wordasword>ID</wordasword>">
+  <!ENTITY SystemPath "<wordasword>SystemPath</wordasword>">
 
   <!ENTITY ecell3 "<command>ecell3</command>">
   <!ENTITY ecell3-session "<command>ecell3-session</command>">

@@ -45,7 +45,7 @@
 	  &Logger;s may be created in this phase.</para>
 	</listitem>
 	<listitem>
-	  <para>Running simulation.</para>
+	  <para>Running the simulation.</para>
 	  <para>The simulation is run for a certain length of time.</para>
 	</listitem>
 	<listitem>
@@ -469,7 +469,7 @@ else:
 
 
       <sect3>
-	<title>Creating an &ObjectStub; from ID</title>
+	<title>Creating an &ObjectStub; by ID</title>
 
 	<para>To get an &ObjectStub; object,
 	<methodname>createEntityStub</methodname>(),
@@ -722,7 +722,7 @@ the logged data before getting data, use
       </sect3>
 
       <sect3>
-	<title>An Example usage of an &EntityStub;</title>
+	<title>An example usage of an &EntityStub;</title>
 
 	<para>The following example loads an EML file, and prints the
 	value of ATP &Variable; in
