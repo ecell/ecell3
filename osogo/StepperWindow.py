@@ -48,6 +48,8 @@ VALUE_INDEX = 1
 GET_INDEX = 2
 SET_INDEX = 3
 
+MAX_STRING_NUMBER = 20
+
 # ---------------------------------------------------------------
 # StepperWindow -> OsogoWindow
 #  - displays each stepper's property
@@ -148,56 +150,56 @@ class StepperWindow(OsogoWindow):
 	# ---------------------------------------------------------------
 	def selectStepperID( self, *objects ):
 
+		# If Window is closed, do nothing.
 		if self.isShown == gtk.FALSE:
 			return None
 
+		# ------------------------------------------------------------------
+		# Creates selected StepperSub 
+		# ------------------------------------------------------------------
 		iter = self.theStepperIDListWidget.get_selection().get_selected()[1]
-		self.theSelectedStepperIDListItem = self.theStepperIDListWidget.get_model().get_value(iter,0)
-		for aStepperID in self.theStepperIDList:
-			if aStepperID == self.theSelectedStepperIDListItem:
+		# aStepperID is selected stepper id
+		aStepperID = self.theStepperIDListWidget.get_model().get_value(iter,0)
+		# aStepperStub is selected StepperStub of selected stepper
+		aStepperStub = StepperStub( self.theSession.theSimulator, aStepperID )
 
-				PropertyModel=self['property_list'].get_model()
-				PropertyModel.clear()
+		PropertyModel=self['property_list'].get_model()
+		PropertyModel.clear()
 
-				aClassName = self.theSession.theSimulator.getStepperClassName( aStepperID )
-				aList = [ 'ClassName', ]
-				aList.append( str(aClassName) )
-				aList.append( decodeAttribute( TRUE ) )
-				aList.append( decodeAttribute( FALSE ) )
-				iter = PropertyModel.append( )
-				for i in range(0,4):
-			    	    PropertyModel.set_value(iter,i,aList[i])
-						    
+		# aClassName = self.theSession.theSimulator.getStepperClassName( aStepperID )
+		aClassName = aStepperStub.getClassname( )
 
-				for aProperty in self.theSession.theSimulator.getStepperPropertyList( aStepperID ):
+		# ---------------------------------------
+		# Creates list [aList] to display
+		# ---------------------------------------
 
-					if aProperty == 'ClassName':
-						continue            
+		# Sets ClassName row
+		aList = [ 'ClassName', ]
+		aList.append( str(aClassName) )
+		aList.append( decodeAttribute( TRUE ) )
+		aList.append( decodeAttribute( FALSE ) )
+		iter = PropertyModel.append( )
+		for i in range(0,4):
+	    	    PropertyModel.set_value(iter,i,aList[i])
+					    
+		# Sets all propertys other than ClassName
 
-					data =  self.theSession.theSimulator.getStepperProperty( aStepperID, aProperty )
+		#for aProperty in self.theSession.theSimulator.getStepperPropertyList( aStepperID ):
+		for aProperty in aStepperStub.getPropertyList():
 
-					aList = [ aProperty, ]
+			aValue =  aStepperStub.getProperty( aProperty )
 
-					aDataString = str( data )
+			aList = [ aProperty, ]
+			aList.append( shortenString( str(aValue), MAX_STRING_NUMBER) )
 
-					if( len( aDataString ) > 20 ):
-						aDataString = aDataString[:20]\
-							      + '.. (total ' +\
-							      str( len( data ) ) +\
-							      ' items) ..'
+			anAttribute = aStepperStub.getPropertyAttributes( aProperty )
 
-					aList.append( aDataString )
+			aList.append( decodeAttribute(anAttribute[GETABLE]) )
+			aList.append( decodeAttribute(anAttribute[SETTABLE]) )
+			iter = PropertyModel.append( )
+			for i in range(0,4):
+				PropertyModel.set_value(iter,i,aList[i])
 
-					anAttribute = self.theSession.theSimulator.getStepperPropertyAttributes( aStepperID, aProperty )
-
-
-					aList.append( decodeAttribute(anAttribute[GETABLE]) )
-					aList.append( decodeAttribute(anAttribute[SETTABLE]) )
-					iter = PropertyModel.append( )
-					for i in range(0,4):
-						PropertyModel.set_value(iter,i,aList[i])
-
-							
 
 	# ---------------------------------------------------------------
 	# selectProprety
@@ -207,8 +209,16 @@ class StepperWindow(OsogoWindow):
 	# ---------------------------------------------------------------
 	def selectProperty( self, *objects ):
 
+		# If Window is closed, do nothing.
 		if self.isShown == gtk.FALSE:
 			return None
+
+		# ------------------------------------------------------------------
+		# Creates selected StepperSub 
+		# ------------------------------------------------------------------
+		iter = self.theStepperIDListWidget.get_selection().get_selected()[1]
+		aStepperID = self.theStepperIDListWidget.get_model().get_value(iter,0)
+		aStepperStub = StepperStub( self.theSession.theSimulator, aStepperID )
 
 		# ------------------------------------------------------------------
 		# gets the number of selected row that is required in updateProprety
@@ -228,9 +238,20 @@ class StepperWindow(OsogoWindow):
 		# ------------------------------------------------------------------
 		# sets value to value_entry
 		# ------------------------------------------------------------------
-		aValue = self.theSession.theSimulator.getStepperProperty(\
-			self.theSelectedStepperIDListItem,\
-			aPropertyName )
+		aValue = None
+
+		# If selected Property is 'ClassName'
+		if aPropertyName == 'ClassName':
+			aValue = aStepperStub.getClassname()
+
+		# If selected Property is not 'ClassName'
+		else:
+			aValue = aStepperStub.getProperty( aPropertyName )
+	
+
+		#aValue = self.theSession.theSimulator.getStepperProperty(\
+		#	self.theSelectedStepperIDListItem,\
+		#	aPropertyName )
 
 		self['value_entry'].set_text( str( aValue ) )
 
@@ -259,9 +280,20 @@ class StepperWindow(OsogoWindow):
 	# ---------------------------------------------------------------
 	def updateProperty( self, *objects ):
 
+		# If Window is closed, do nothing.
 		if self.isShown == gtk.FALSE:
 			return None
 
+		# ------------------------------------------------------------------
+		# creates selected StepperSub 
+		# ------------------------------------------------------------------
+		iter = self.theStepperIDListWidget.get_selection().get_selected()[1]
+		aStepperID = self.theStepperIDListWidget.get_model().get_value(iter,0)
+		aStepperStub = StepperStub( self.theSession.theSimulator, aStepperID )
+
+		# ------------------------------------------------------------------
+		# gets selected property row
+		# ------------------------------------------------------------------
 		self.theSelectedRowOfPropertyList = self.thePropertyList.get_selection().get_selected()[1]
 		if self.theSelectedRowOfPropertyList == None:
 			aMessage = 'Select a property.'
@@ -285,46 +317,28 @@ class StepperWindow(OsogoWindow):
 		# ------------------------------------
 		# When the property value is scalar
 		# ------------------------------------
-		if aNumber == '':
+		if type(aValue) != list:
 
 			# ---------------------------------------------------------------------------
 			# converts value type
 			# ---------------------------------------------------------------------------
-			anOldValue = self.theSession.theSimulator.getStepperProperty( 
-			                              self.theSelectedStepperIDListItem,
-			                              aPropertyName )
+			anOldValue = aStepperStub.getProperty( aPropertyName )
 
-			try:
-
-				if type(anOldValue) == type(0):
-					aValue = string.atoi( aValue )
-				elif type(anOldValue) == type(0.0):
-					aValue = string.atof( aValue )
-
-			except:
-				aErrorMessage = "Error : the type of inputed value is wrong."
-				self['statusbar'].push(1,aErrorMessage)
-				return None
-
-		
 			# ---------------------------------------------------------------------------
 			# sets new value
 			# ---------------------------------------------------------------------------
 			try:
-				self.theSession.theSimulator.setStepperProperty( self.theSelectedStepperIDListItem,
-			    	                                             aPropertyName,
-			       	                                          aValue )
+				aStepperStub.setProperty( aPropertyName, aValue )
 			except:
 
 				import sys
 				import traceback
-#				self.printMessage(' can\'t load [%s]' %aFileName)
-				aErrorMessage = \
-				  string.join( traceback.format_exception(sys.exc_type,sys.exc_value,sys.exc_traceback), '\n' )
-				self.theSession.message( aErrorMessage )
+				anErrorMessage =  string.join( traceback.format_exception(sys.exc_type,sys.exc_value,sys.exc_traceback), '\n' )
+				self.theSession.message( anErrorMessage )
 
-				aErrorMessage = "Error : refer to the MessageWindow."
-				self['statusbar'].push(1,aErrorMessage)
+				anErrorMessage = "Error : refer to the MessageWindow."
+				aDialog = ConfirmWindow.ConfirmWindow(0,aMessage,"Can't set property!\n" + anErrorMessage)
+				self['statusbar'].push(1,anErrorMessage)
 				return None
 
 		# ------------------------------------
@@ -334,28 +348,10 @@ class StepperWindow(OsogoWindow):
 
 			# ---------------------------------------------------------------------------
 			# converts value type
+			# do not check the type of ecah element.
 			# ---------------------------------------------------------------------------
-			aValueTuple = self.theSession.theSimulator.getStepperProperty( 
-			                             self.theSelectedStepperIDListItem,
-			                             aPropertyName )
-
-			try:
-
-				# Convert value type
-				anOldValue = aValueTuple[0]
-				if type(anOldValue) == type(0):
-					aValue = string.atoi( aValue )
-				elif type(anOldValue) == type(0.0):
-					aValue = string.atof( aValue )
-
-			except:
-				aErrorMessage = "Error : the type of inputed value is wrong."
-				self['statusbar'].push(1,aErrorMessage)
-				return None
-
-
+			anOldValue = aStepperStub.getProperty( aPropertyName )
 			anIndexOfTuple = string.atoi(aNumber)-1
-
 
 			# ---------------------------------------------------------------------------
 			# create tuple to set
@@ -372,20 +368,23 @@ class StepperWindow(OsogoWindow):
 			# sets new value
 			# ---------------------------------------------------------------------------
 			try:
-				self.theSession.theSimulator.setStepperProperty( self.theSelectedStepperIDListItem,
-			   	                                              aPropertyName,
-			   	                                              aNewValue )
+				#self.theSession.theSimulator.setStepperProperty( self.theSelectedStepperIDListItem,
+			   	#                                              aPropertyName,
+			   	#                                              aNewValue )
+				aStepperStub.setProperty( aPropertyName, aNewValue )
+
 			except:
 
 				import sys
 				import traceback
 #				self.printMessage(' can\'t load [%s]' %aFileName)
-				aErrorMessage = \
+				anErrorMessage = \
 				  string.join( traceback.format_exception(sys.exc_type,sys.exc_value,sys.exc_traceback), '\n' )
 				self.theSession.message( aErroeMessage )
 
-				aErrorMessage = "Error : refer to the MessageWindow."
-				self['statusbar'].push(1,aErrorMessage)
+				anErrorMessage = "Error : refer to the MessageWindow."
+				aDialog = ConfirmWindow.ConfirmWindow(0,aMessage,"Can't set property!\n" + anErrorMessage)
+				self['statusbar'].push(1,anErrorMessage)
 				return None
 
 
@@ -437,6 +436,8 @@ class StepperWindow(OsogoWindow):
 	def closeWindow ( self, obj ):
 
 		self[self.__class__.__name__].hide_all()
+		self.isShown = FALSE
+		self.theMainWindow.toggleStepperWindow()
 
 	# end of closeWindow
 

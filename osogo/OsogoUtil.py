@@ -82,4 +82,27 @@ def convertStringToTuple(aString):
 
 	return tuple(aList)
 
+# end of convertStringToTuple
+
+
+# ----------------------------------------------------------------------
+# shortenString
+#
+# aValue : an original string
+# aNumber : the length to cut original string
+#
+# return -> a shorten string
+#
+# ----------------------------------------------------------------------
+def shortenString( aValue, aNumber):
+
+	if len( str(aValue) ) > aNumber:
+		return aValue[:aNumber] + '...'
+	else:
+		return aValue
+		
+# end of shortenString
+
+
+
 
