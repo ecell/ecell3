@@ -16,6 +16,8 @@ Requires: gsl
 Requires: gsl-devel
 Requires: boost
 Requires: boost-devel
+Requires: gnome-python2-canvas >= 2.0.2
+Requires: pygtk2 >= 2.0.0
 
 %description
 E-Cell Simulation Environment (E-Cell SE) is a software package for cellular and biochemical modeling and simulation. E-Cell attempts to provide a framework not only for analyzing metabolism, but also for higher-order cellular phenomena such as gen regulation networks, DNA replication and other occurences in the cell cycle.
