@@ -462,8 +462,7 @@ class Preprocessor:
 		#
 		pseudo.addHook( 'after_include', self.afterIncludeHook )
 		pseudo.addHook( 'after_expand', self.needLineControl )
-		# 'after_evaluate' may not work by a bug in empy2.0?
-		pseudo.addHook( 'before_evaluate', self.needLineControl )
+		pseudo.addHook( 'after_evaluate', self.needLineControl )
 		pseudo.addHook( 'after_execute', self.needLineControl )
 		pseudo.addHook( 'after_substitute', self.needLineControl )
 		pseudo.addHook( 'after_significate', self.needLineControl )
