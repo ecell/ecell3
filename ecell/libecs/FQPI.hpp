@@ -43,7 +43,8 @@ class SystemPath {
 
 public:
 
-  SystemPath( StringCref systempath = "" );
+  SystemPath( StringCref rqsn = "" );
+  SystemPath( SystemPathCref systempath );
   virtual ~SystemPath() {}
 
   StringCref getSystemPathString() const { return theSystemPath; }
@@ -51,21 +52,20 @@ public:
   virtual operator String() const { return getSystemPathString(); }
 
   /**
-    Extract the first system name. Standardize given string.
+    Extract the first system name.
     @return name of the first system
     */
   const String first() const;
 
   /**
-    Extract the last system name. Standardize given string.
+    Extract the last system name.
 
     @return name of the last system in given systempath.
     */
   const String last() const;
 
   /**
-    Remove the first system name. Standardize given string.
-    @return
+    @return SystemPath without the first system name.
     */
   SystemPath next() const;
 
@@ -80,6 +80,10 @@ protected:
   void standardize();
 
   SystemPath() {}
+
+private:
+
+  SystemPathRef operator=( SystemPathCref rhs );
 
 public:
 
@@ -106,7 +110,8 @@ class FQID : public SystemPath
 public:
 
   FQID( StringCref systemname, StringCref id );
-  FQID( StringCref fqen );
+  FQID( StringCref fqid );
+  FQID( FQIDCref fqid );
   virtual ~FQID() {}
 
   const String getFqidString() const;
@@ -116,6 +121,10 @@ public:
 
   static const String IdOf( StringCref fqen );
   static const String SystemPathOf( StringCref fqen );
+
+private:
+
+  FQIDRef operator=( FQIDCref rhs );
 
 private:
 
@@ -139,7 +148,8 @@ public:
   static const String  fqidOf( StringCref fqpi );
 
   FQPI( const PrimitiveType type, FQIDCref fqid );
-  FQPI( StringCref fqpi );
+  FQPI( StringCref fqpistring );
+  FQPI( FQPICref fqpi );
   virtual ~FQPI() {}
   
   const String getFqpiString() const;
@@ -147,6 +157,10 @@ public:
 
   virtual const String getString() const { return getFqpiString(); }
   virtual operator const String() const { return getFqpiString(); }
+
+private:
+
+  FQPIRef operator=( FQPICref rhs );
 
 private:
 

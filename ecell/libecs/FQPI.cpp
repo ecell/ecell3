@@ -41,6 +41,12 @@ SystemPath::SystemPath( StringCref rqsn )
   standardize();
 }
 
+SystemPath::SystemPath( SystemPathCref systempath )
+  :
+  theSystemPath( systempath.getSystemPathString() )
+{
+  standardize();
+}
 
 const String SystemPath::last() const
 {
@@ -158,10 +164,18 @@ FQPI::FQPI( const PrimitiveType type, const FQID& fqid )
 }
 
 //FIXME: ??
-FQPI::FQPI( StringCref fqpi )
+FQPI::FQPI( StringCref fqpistring )
   : 
-  FQID( fqidOf( fqpi ) ),
-  thePrimitiveType( PrimitiveTypeOf( PrimitiveTypeStringOf( fqpi ) ) )
+  FQID( fqidOf( fqpistring ) ),
+  thePrimitiveType( PrimitiveTypeOf( PrimitiveTypeStringOf( fqpistring ) ) )
+{
+  ; // do nothing
+}
+
+FQPI::FQPI( FQPICref fqpi )
+  :
+  FQID( static_cast<FQID>( fqpi ) ),
+  thePrimitiveType( fqpi.getPrimitiveType() )
 {
   ; // do nothing
 }
