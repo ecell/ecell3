@@ -358,6 +358,9 @@ namespace libemc
       }
 
     FullPN aFullPN( aFullPNString );
+
+    clean();
+
     getModel().getLoggerBroker().
       createLogger( aFullPN, aParamList.asPolymorphVector() );
   }
