@@ -1,14 +1,11 @@
 // written by kem
 
 #include "libecs.hpp"
-#include "Process.hpp"
 #include "Util.hpp"
 #include "PropertyInterface.hpp"
 
 #include "System.hpp"
 #include "Stepper.hpp"
-#include "Variable.hpp"
-#include "VariableProxy.hpp"
 
 #include "Process.hpp"
 

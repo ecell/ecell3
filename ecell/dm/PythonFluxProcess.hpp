@@ -63,6 +63,11 @@ public:
     ; // do nothing
   }
 
+  virtual const bool isContinuous() const
+    {
+      return true;
+    }
+
   SET_METHOD( String, Expression )
   {
     theExpression = value;

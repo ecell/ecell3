@@ -1,25 +1,17 @@
 #include "libecs.hpp"
-#include "Process.hpp"
-#include "Util.hpp"
-#include "PropertyInterface.hpp"
 
-#include "System.hpp"
-#include "Stepper.hpp"
-#include "Variable.hpp"
-#include "VariableProxy.hpp"
-
-#include "Process.hpp"
+#include "ContinuousProcess.hpp"
 
 USE_LIBECS;
 
-LIBECS_DM_CLASS( PingPongBiBiProcess, Process )
+LIBECS_DM_CLASS( PingPongBiBiFluxProcess, ContinuousProcess )
 {
 
  public:
 
-  LIBECS_DM_OBJECT( PingPongBiBiProcess, Process )
+  LIBECS_DM_OBJECT( PingPongBiBiFluxProcess, Process )
     {
-      INHERIT_PROPERTIES( Process );
+      INHERIT_PROPERTIES( ContinuousProcess );
 
       PROPERTYSLOT_SET_GET( Real, KcF );
       PROPERTYSLOT_SET_GET( Real, KcR );
@@ -32,8 +24,18 @@ LIBECS_DM_CLASS( PingPongBiBiProcess, Process )
       PROPERTYSLOT_SET_GET( Real, KiP1 );
     }
 
-  // FIXME: initial values
   PingPongBiBiProcess()
+    :
+    KcF( 0.0 ),
+    KcR( 0.0 ),
+    Keq( 1.0 ),
+    KmS0( 1.0 ),
+    KmS1( 1.0 ),
+    KmP0( 1.0 ),
+    KmP1( 1.0 ),
+    KiS0( 1.0 ),
+    KiP1( 1.0 ),
+    KcF_Keq_Inv( 0.0 )
     {
       ; // do nothing
     }
@@ -56,6 +58,8 @@ LIBECS_DM_CLASS( PingPongBiBiProcess, Process )
       P0 = getVariableReference( "P0" );
       P1 = getVariableReference( "P1" );
       C0 = getVariableReference( "C0" );
+
+      KcF_Keq_Inv = KcF / Keq;
     }
 
   virtual void process()
@@ -68,13 +72,12 @@ LIBECS_DM_CLASS( PingPongBiBiProcess, Process )
       Real Denom =
 	+ KcR * KmS1 * S0Concentration 
 	+ KcR * KmS0 * S1Concentration 
-	+ KcF * KmP1 * P0Concentration / Keq
-	+ KcF * KmP0 * P1Concentration / Keq 
+	+ KmP1 * P0Concentration * KcF_Keq_Inv
+	+ KmP0 * P1Concentration * KcF_Keq_Inv
 	+ KcR * S0Concentration * S1Concentration
-	+ KcF * KmP1 * S0Concentration * P0Concentration / (Keq * KiS0) 
-	+ KcF * P0Concentration * P1Concentration / Keq
+	+ KmP1 * S0Concentration * P0Concentration * KcF_Keq_Inv / KiS0 
+	+ P0Concentration * P1Concentration * KcF_Keq_Inv
 	+ KcR * KmS0 * S1Concentration * P1Concentration / KiP1;
-      
       
       Real velocity = KcF * KcR * C0.getValue()
 	* ( S0Concentration * S1Concentration 
@@ -95,6 +98,8 @@ LIBECS_DM_CLASS( PingPongBiBiProcess, Process )
   Real KmP1;
   Real KiS0;
   Real KiP1;
+
+  Real KcF_Keq_Inv;
 
   VariableReference S0;
   VariableReference S1;

@@ -43,8 +43,6 @@
 #include "boost/python.hpp"
 
 #include "libecs.hpp"
-#include "Variable.hpp"
-#include "PropertyInterface.hpp"
 
 #include "FullID.hpp"
 
@@ -55,18 +53,19 @@ USE_LIBECS;
 
 namespace python = boost::python;
 
-//LIBECS_DM_CLASS( PythonProcessBase, Process )
-class PythonProcessBase
+LIBECS_DM_CLASS( PythonProcessBase, Process )
   :
   public Process
 {
 
 public:
 
-  //  LIBECS_DM_OBJECT_ABSTRACT( PythonProcessBase )
-  //    {
-  //      INHERIT_PROPERTIES( Process );
-  //    }
+  LIBECS_DM_OBJECT_ABSTRACT( PythonProcessBase )
+    {
+      INHERIT_PROPERTIES( Process );
+
+      PROPERTYSLOT_SET_GET( Int, IsContinuous );
+    }
 
 
   PythonProcessBase()

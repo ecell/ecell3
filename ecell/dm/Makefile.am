@@ -18,8 +18,7 @@ PYTHON_INCLUDES=@PYTHON_INCLUDES@
 
 DMS = MassActionFluxProcess.cpp\
 CatalyzedMassActionFluxProcess.cpp\
-MichaelisUniUniProcess.cpp\
-MichaelisUniUniReversibleProcess.cpp\
+MichaelisUniUniFluxProcess.cpp\
 RandomBiUniFluxProcess.cpp\
 RandomUniBiFluxProcess.cpp\
 RandomBiBiFluxProcess.cpp\

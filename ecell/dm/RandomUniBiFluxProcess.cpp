@@ -1,25 +1,17 @@
 #include "libecs.hpp"
-#include "Process.hpp"
-#include "Util.hpp"
-#include "PropertyInterface.hpp"
 
-#include "System.hpp"
-#include "Stepper.hpp"
-#include "Variable.hpp"
-#include "VariableProxy.hpp"
-
-#include "Process.hpp"
+#include "ContinuousProcess.hpp"
 
 USE_LIBECS;
 
-LIBECS_DM_CLASS( RandomUniBiProcess, Process )
+LIBECS_DM_CLASS( RandomUniBiFluxProcess, ContinuousProcess )
 {
 
  public:
 
-  LIBECS_DM_OBJECT( RandomUniBiProcess, Process )
+  LIBECS_DM_OBJECT( RandomUniBiFluxProcess, Process )
     {
-      INHERIT_PROPERTIES( Process );
+      INHERIT_PROPERTIES( ContinuousProcess );
       
       PROPERTYSLOT_SET_GET( Real, k1 );
       PROPERTYSLOT_SET_GET( Real, k_1 );
@@ -33,8 +25,18 @@ LIBECS_DM_CLASS( RandomUniBiProcess, Process )
       PROPERTYSLOT_SET_GET( Real, k_5 );
     }
 
-  // FIXME: initial values
-  RandomUniBiProcess()
+  RandomUniBiFluxProcess()
+    :
+    k1( 0.0 ),
+    k_1( 0.0 ),
+    k2( 0.0 ),
+    k_2( 0.0 ),
+    k3( 0.0 ),
+    k_3( 0.0 ),
+    k4( 0.0 ),
+    k_4( 0.0 ),
+    k5( 0.0 ),
+    k_5( 0.0 )
     {
       ; // do nothing
     }
@@ -96,4 +98,4 @@ LIBECS_DM_CLASS( RandomUniBiProcess, Process )
   
 };
 
-LIBECS_DM_INIT( RandomUniBiProcess, Process );
+LIBECS_DM_INIT( RandomUniBiFluxProcess, Process );

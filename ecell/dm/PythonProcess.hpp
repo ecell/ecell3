@@ -52,6 +52,8 @@ public:
     }
 
   PythonProcess()
+    :
+    theIsContinuous( false )
   {
 
     setInitializeMethod( "" );
@@ -66,6 +68,22 @@ public:
   {
     ; // do nothing
   }
+
+  SET_METHOD( Int, IsContinuous )
+  {
+    theIsContinuous = value;
+  }
+
+  virtual const bool isContinuous() const
+  {
+    return theIsContinuous;
+  }
+
+  //  GET_METHOD( Int, IsContinuous )
+  //  {
+  //    return theIsContinuous;
+  //  }
+
 
   SET_METHOD( String, ProcessMethod )
   {
@@ -112,6 +130,7 @@ protected:
   python::object theCompiledProcessMethod;
   python::object theCompiledInitializeMethod;
 
+  bool theIsContinuous;
 };
 
 

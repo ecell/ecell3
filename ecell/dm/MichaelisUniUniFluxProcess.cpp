@@ -1,24 +1,17 @@
 #include "libecs.hpp"
-#include "Process.hpp"
-#include "Util.hpp"
-#include "PropertyInterface.hpp"
-#include "System.hpp"
-#include "Stepper.hpp"
-#include "Variable.hpp"
-#include "VariableProxy.hpp"
 
-#include "Process.hpp"
+#include "ContinuousProcess.hpp"
 
 USE_LIBECS;
 
-LIBECS_DM_CLASS( MichaelisUniUniReversibleProcess, Process )
+LIBECS_DM_CLASS( MichaelisUniUniFluxProcess, ContinuousProcess )
 {
 
  public:
 
-  LIBECS_DM_OBJECT( MichaelisUniUniReversibleProcess, Process )
+  LIBECS_DM_OBJECT( MichaelisUniUniFluxProcess, Process )
     {
-      INHERIT_PROPERTIES( Process );
+      INHERIT_PROPERTIES( ContinuousProcess );
 
       PROPERTYSLOT_SET_GET( Real, KmS );
       PROPERTYSLOT_SET_GET( Real, KmP );
@@ -28,8 +21,13 @@ LIBECS_DM_CLASS( MichaelisUniUniReversibleProcess, Process )
   
 
 
-  // FIXME: property initial values?
-  MichaelisUniUniReversibleProcess()
+  MichaelisUniUniFluxProcess()
+    :
+    KmS( 1.0 ),
+    KmP( 1.0 ),
+    KcF( 0.0 ),
+    KcR( 0.0 ),
+    KmSP( 1.0 )
     {
       // do nothing
     }
@@ -55,15 +53,13 @@ LIBECS_DM_CLASS( MichaelisUniUniReversibleProcess, Process )
       const Real S( S0.getMolarConc() );
       const Real P( P0.getMolarConc() );
 
-      Real velocity( KcF * KmP * S );
-      velocity -= KcR * KmS * P;
-      velocity *= C0.getValue();
-      
-      Real Den( KmS * P );
-      Den += KmP * S;
-      Den += KmSP; 
+      const Real KmP_S( KmP * S );
+      const Real KmS_P( KmS * P );
 
-      velocity /= Den;
+      Real velocity( C0.getValue() * KcF * KmP_S );
+      velocity -= KcR * KmS_P;
+      
+      velocity /= KmS_P + KmP_S + KmSP;
 
       setFlux( velocity );
     }
@@ -84,4 +80,4 @@ LIBECS_DM_CLASS( MichaelisUniUniReversibleProcess, Process )
   
 };
 
-LIBECS_DM_INIT( MichaelisUniUniReversibleProcess, Process );
+LIBECS_DM_INIT( MichaelisUniUniFluxProcess, Process );

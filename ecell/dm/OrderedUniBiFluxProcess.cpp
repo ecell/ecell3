@@ -1,25 +1,17 @@
 #include "libecs.hpp"
-#include "Process.hpp"
-#include "Util.hpp"
-#include "PropertyInterface.hpp"
 
-#include "System.hpp"
-#include "Stepper.hpp"
-#include "Variable.hpp"
-#include "VariableProxy.hpp"
-
-#include "Process.hpp"
+#include "ContinuousProcess.hpp"
 
 USE_LIBECS;
 
-LIBECS_DM_CLASS( OrderedUniBiProcess, Process )
+LIBECS_DM_CLASS( OrderedUniBiFluxProcess, ContinuousProcess )
 {
 
  public:
 
-  LIBECS_DM_OBJECT( OrderedUniBiProcess, Process )
+  LIBECS_DM_OBJECT( OrderedUniBiFluxProcess, Process )
     {
-      INHERIT_PROPERTIES( Process );
+      INHERIT_PROPERTIES( ContinuousProcess );
 
       PROPERTYSLOT_SET_GET( Real, KcF );
       PROPERTYSLOT_SET_GET( Real, KcR );
@@ -31,8 +23,16 @@ LIBECS_DM_CLASS( OrderedUniBiProcess, Process )
     }
   
 
-  // FIXME: initial values
-  OrderedUniBiProcess()
+  OrderedUniBiFluxProcess()
+    :
+    KcF( 0.0 ),
+    KcR( 0.0 ),
+    Keq( 1.0 ),
+    KmS( 1.0 ),
+    KmP0( 1.0 ),
+    KmP1( 1.0 ),
+    KiP( 1.0 ),
+    Keq_Inv( 1.0 )
     {
       ; // do nothing
     }
@@ -52,6 +52,8 @@ LIBECS_DM_CLASS( OrderedUniBiProcess, Process )
       P0 = getVariableReference( "P0" );
       P1 = getVariableReference( "P1" );
       C0 = getVariableReference( "C0" );
+
+      Keq_Inv = 1.0 / Keq;
     }
 
   virtual void process()
@@ -61,12 +63,13 @@ LIBECS_DM_CLASS( OrderedUniBiProcess, Process )
       Real P1Concentration = P1.getMolarConc();
       
       Real Den( KcR * KmS + KcR * S0Concentration 
-		+ KcF * KmP1 * P0Concentration / Keq 
-		+ KcF * KmP0 * P1Concentration / Keq 
+		+ KcF * KmP1 * P0Concentration * Keq_Inv
+		+ KcF * KmP0 * P1Concentration * Keq_Inv
 		+ KcR * S0Concentration * P0Concentration / KiP
-		+ KcR * P0Concentration * P1Concentration / Keq );
+		+ KcR * P0Concentration * P1Concentration * Keq_Inv );
       Real velocity( KcF * KcR * C0.getValue()
-		     * (S0Concentration - P0Concentration * P1Concentration / Keq) / Den );
+		     * (S0Concentration - P0Concentration * 
+			P1Concentration * Keq_Inv) / Den );
       setFlux( velocity );
     }
 
@@ -81,6 +84,8 @@ LIBECS_DM_CLASS( OrderedUniBiProcess, Process )
   Real KmP1;
   Real KiP;
 
+  Real Keq_Inv;
+
   VariableReference S0;
   VariableReference P0;
   VariableReference P1;
@@ -88,4 +93,4 @@ LIBECS_DM_CLASS( OrderedUniBiProcess, Process )
   
 };
 
-LIBECS_DM_INIT( OrderedUniBiProcess, Process );
+LIBECS_DM_INIT( OrderedUniBiFluxProcess, Process );

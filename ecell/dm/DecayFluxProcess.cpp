@@ -4,33 +4,29 @@
 //
 
 #include "libecs.hpp"
-#include "Process.hpp"
 #include "Util.hpp"
-#include "PropertyInterface.hpp"
 
-#include "System.hpp"
-#include "Stepper.hpp"
-#include "Variable.hpp"
-#include "VariableProxy.hpp"
-
-#include "Process.hpp"
+#include "ContinuousProcess.hpp"
 
 
 USE_LIBECS;
 
-LIBECS_DM_CLASS( DecayProcess, Process )
+LIBECS_DM_CLASS( DecayFluxProcess, ContinuousProcess )
 {
 
  public:
 
-  LIBECS_DM_OBJECT( DecayProcess, Process )
+  LIBECS_DM_OBJECT( DecayFluxProcess, Process )
     {
-      INHERIT_PROPERTIES( Process );
+      INHERIT_PROPERTIES( ContinuousProcess );
 
       PROPERTYSLOT_SET_GET( Real, T );
     }  
 
-  DecayProcess()
+  DecayFluxProcess()
+    :
+    T( 1.0 ),
+    k( 0.0 )
     {
       ; // do nothing
     }
@@ -48,25 +44,24 @@ LIBECS_DM_CLASS( DecayProcess, Process )
 			   "Zero or negative half time." );
 	}
       
-      k_na = N_A * log( 2.0 ) / T;
+      k = log( 2.0 ) / T;
       S0 = getVariableReference( "S0" );
     }
 
   virtual void process()
     {
-      Real velocity( k_na );
-      velocity *= getSuperSystem()->getSize();
+      Real velocity( k );
 
-      velocity *= pow( S0.getMolarConc(), - S0.getCoefficient() );
+      velocity *= pow( S0.getValue(), - S0.getCoefficient() );
       setFlux( velocity );
     }
 
  protected:
   
   Real T;
-  Real k_na;
+  Real k;
   VariableReference S0;
   
 };
 
-LIBECS_DM_INIT( DecayProcess, Process );
+LIBECS_DM_INIT( DecayFluxProcess, Process );

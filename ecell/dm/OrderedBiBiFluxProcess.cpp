@@ -1,25 +1,17 @@
 #include "libecs.hpp"
-#include "Process.hpp"
-#include "Util.hpp"
-#include "PropertyInterface.hpp"
 
-#include "System.hpp"
-#include "Stepper.hpp"
-#include "Variable.hpp"
-#include "VariableProxy.hpp"
-
-#include "Process.hpp"
+#include "ContinuousProcess.hpp"
 
 USE_LIBECS;
 
-LIBECS_DM_CLASS( OrderedBiBiProcess, Process )
+LIBECS_DM_CLASS( OrderedBiBiFluxProcess, ContinuousProcess )
 {
 
  public:
 
-  LIBECS_DM_OBJECT( OrderedBiBiProcess, Process )
+  LIBECS_DM_OBJECT( OrderedBiBiFluxProcess, Process )
     {
-      INHERIT_PROPERTIES( Process );
+      INHERIT_PROPERTIES( ContinuousProcess );
 
       PROPERTYSLOT_SET_GET( Real, KcF );
       PROPERTYSLOT_SET_GET( Real, KcR );
@@ -35,8 +27,19 @@ LIBECS_DM_CLASS( OrderedBiBiProcess, Process )
     }
   
 
-  // FIXME: property initial values?
-  OrderedBiBiProcess()
+  OrderedBiBiFluxProcess()
+    :
+    KcF( 0.0 ),
+    KcR( 0.0 ),
+    Keq( 1.0 ),
+    KmS0( 1.0 ),
+    KmS1( 1.0 ),
+    KmP0( 1.0 ),
+    KmP1( 1.0 ),
+    KiS0( 1.0 ),
+    KiS1( 1.0 ),
+    KiP0( 1.0 ),
+    KiP1( 1.0 )
     {
       ; // do nothing
     }
@@ -116,4 +119,4 @@ LIBECS_DM_CLASS( OrderedBiBiProcess, Process )
   
 };
 
-LIBECS_DM_INIT( OrderedBiBiProcess, Process );
+LIBECS_DM_INIT( OrderedBiBiFluxProcess, Process );
