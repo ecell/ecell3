@@ -47,12 +47,6 @@ namespace libecs
   void Process::makeSlots()
   {
     registerSlot( getPropertySlotMaker()->
-		  createPropertySlot( "VariableReference", *this, 
-				      Type2Type<Polymorph>(),
-				      &Process::setVariableReference,
-				      NULLPTR ) );
-
-    registerSlot( getPropertySlotMaker()->
 		  createPropertySlot( "VariableReferenceList", *this, 
 				      Type2Type<Polymorph>(),
 				      &Process::setVariableReferenceList,
@@ -71,17 +65,6 @@ namespace libecs
 				      &Process::getPriority ) );
   }
 
-  void Process::setVariableReference( PolymorphCref aValue )
-  {
-    PolymorphVector aVector( aValue.asPolymorphVector() );
-    checkSequenceSize( aVector, 3 );
-
-    std::cerr << "Use of Process::setVariableReference() is deprecated. Use VariableReferenceMap." << std::endl;
-
-    registerVariableReference( aVector[0].asString(), FullID( aVector[1].asString() ), 
-		      aVector[2].asInt() );
-  }
-
   void Process::setVariableReferenceList( PolymorphCref aValue )
   {
     const PolymorphVector aVector( aValue.asPolymorphVector() );
@@ -91,15 +74,20 @@ namespace libecs
 	const PolymorphVector anInnerVector( (*i).asPolymorphVector() );
 
 	// Require ( tagname, fullid, coefficient ) 3-tuple
-	if( anInnerVector.size() < 3 )
+	if( anInnerVector.size() < 2 )
 	  {
 	    THROW_EXCEPTION( ValueError, "Process [" + getFullID().getString()
-			     + "]: ill-formed VariableReferenceMap given." );
+			     + "]: ill-formed VariableReferenceList given." );
 	  }
 
 	const String aVariableReferenceName(  anInnerVector[0].asString() );
-	const FullID aFullID(        anInnerVector[1].asString() );
-	const Int    aCoefficient( anInnerVector[2].asInt() );
+	const FullID aFullID(                 anInnerVector[1].asString() );
+	Int          aCoefficient( 0 );
+
+	if( anInnerVector.size() >= 3 )
+	  {
+	    aCoefficient = anInnerVector[2].asInt();
+	  }
 
 	registerVariableReference( aVariableReferenceName, aFullID, aCoefficient );
       }
