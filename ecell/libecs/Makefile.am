@@ -56,6 +56,7 @@ UVariable.hpp\
 FullID.hpp\
 Message.hpp\
 PropertySlot.hpp\
+PropertySlotMaker.hpp\
 PropertyInterface.hpp\
 AccumulatorMaker.hpp\
 ReactorMaker.hpp\

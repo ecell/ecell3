@@ -28,10 +28,13 @@
 // E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
 
-#include "Entity.hpp"
 #include "System.hpp"
 #include "FullID.hpp"
 #include "Stepper.hpp"
+#include "PropertySlotMaker.hpp"
+
+#include "Entity.hpp"
+
 
 namespace libecs
 {
@@ -53,30 +56,36 @@ namespace libecs
 
   void Entity::makeSlots()
   {
-    createPropertySlot( "ID", *this, 
-			Type2Type<String>(),
-			&PropertyInterface::nullSetMethod,
-			&Entity::getID );
 
-    createPropertySlot( "FullID", *this, 
-			Type2Type<String>(),
-			&PropertyInterface::nullSetMethod,
-			&Entity::getFullIDString );
+    appendSlot( getPropertySlotMaker()->
+		createPropertySlot( "ID", *this, 
+				    Type2Type<String>(),
+				    NULLPTR,
+				    &Entity::getID ) );
+
+    appendSlot( getPropertySlotMaker()->
+		createPropertySlot( "FullID", *this, 
+				    Type2Type<String>(),
+				    NULLPTR,
+				    &Entity::getFullIDString ) );
     
-    createPropertySlot( "Name", *this, 
-			Type2Type<String>(),
-			&PropertyInterface::nullSetMethod, 
-			&Entity::getName );
+    appendSlot( getPropertySlotMaker()->
+		createPropertySlot( "Name", *this, 
+				    Type2Type<String>(),
+				    NULLPTR,
+				    &Entity::getName ) );
 
-    createPropertySlot( "Activity", *this, 
-			Type2Type<Real>(),
-			&Entity::setActivity,
-			&Entity::getActivity );
+    appendSlot( getPropertySlotMaker()->
+		createPropertySlot( "Activity", *this, 
+				    Type2Type<Real>(),
+				    &Entity::setActivity,
+				    &Entity::getActivity ) );
 
-    createPropertySlot( "ActivityPerSecond", *this,
-			Type2Type<Real>(),
-			&PropertyInterface::nullSetMethod, 
-			&Entity::getActivityPerSecond );
+    appendSlot( getPropertySlotMaker()->
+		createPropertySlot( "ActivityPerSecond", *this,
+				    Type2Type<Real>(),
+				    NULLPTR,
+				    &Entity::getActivityPerSecond ) );
   }
 
   const Real Entity::getActivity() const

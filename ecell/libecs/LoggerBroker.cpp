@@ -31,10 +31,12 @@
 
 #include "libecs.hpp"
 
+#include "Util.hpp"
 #include "Logger.hpp"
 #include "PropertyInterface.hpp"
 #include "FullID.hpp"
 #include "Model.hpp"
+#include "PropertySlot.hpp"
 
 #include "LoggerBroker.hpp"
 

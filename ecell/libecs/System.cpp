@@ -30,7 +30,6 @@
 
 #include <algorithm>
 
-#include "System.hpp"
 #include "Reactor.hpp"
 #include "Model.hpp"
 #include "SubstanceMaker.hpp"
@@ -41,6 +40,10 @@
 #include "FullID.hpp"
 #include "SystemMaker.hpp"
 #include "PropertyInterface.hpp"
+#include "PropertySlotMaker.hpp"
+
+#include "System.hpp"
+
 
 namespace libecs
 {
@@ -50,35 +53,42 @@ namespace libecs
 
   void System::makeSlots()
   {
-    createPropertySlot( "SystemList", *this,
-			Type2Type<UVariableVectorRCPtr>(),
-			&PropertyInterface::nullSetMethod,
-			&System::getSystemList );
 
-    createPropertySlot( "SubstanceList", *this,
-			Type2Type<UVariableVectorRCPtr>(),
-			&PropertyInterface::nullSetMethod,
-			&System::getSubstanceList );
+    appendSlot( getPropertySlotMaker()->
+		createPropertySlot( "SystemList", *this,
+				    Type2Type<UVariableVectorRCPtr>(),
+				    NULLPTR,
+				    &System::getSystemList ) );
 
-    createPropertySlot( "ReactorList", *this,
-			Type2Type<UVariableVectorRCPtr>(),
-			&PropertyInterface::nullSetMethod,
-			&System::getReactorList );
+    appendSlot( getPropertySlotMaker()->
+		createPropertySlot( "SubstanceList", *this,
+				    Type2Type<UVariableVectorRCPtr>(),
+				    NULLPTR,
+				    &System::getSubstanceList ) );
 
-    createPropertySlot( "StepperID", *this,
-			Type2Type<UVariableVectorRCPtr>(),
-			&System::setStepperID,
-			&System::getStepperID );
+    appendSlot( getPropertySlotMaker()->
+		createPropertySlot( "ReactorList", *this,
+				    Type2Type<UVariableVectorRCPtr>(),
+				    NULLPTR,
+				    &System::getReactorList ) );
 
-    createPropertySlot( "Volume", *this,
-			Type2Type<Real>(),
-			&System::setVolume, 
-			&System::getVolume );
+    appendSlot( getPropertySlotMaker()->
+		createPropertySlot( "StepperID", *this,
+				    Type2Type<UVariableVectorRCPtr>(),
+				    &System::setStepperID,
+				    &System::getStepperID ) );
 
-    createPropertySlot( "StepInterval", *this,
-			Type2Type<Real>(),
-			&System::setStepInterval, 
-			&System::getStepInterval );
+    appendSlot( getPropertySlotMaker()->
+		createPropertySlot( "Volume", *this,
+				    Type2Type<Real>(),
+				    &System::setVolume, 
+				    &System::getVolume ) );
+
+    appendSlot( getPropertySlotMaker()->
+		createPropertySlot( "StepInterval", *this,
+				    Type2Type<Real>(),
+				    &System::setStepInterval, 
+				    &System::getStepInterval ) );
   }
 
 

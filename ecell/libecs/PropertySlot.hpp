@@ -36,6 +36,7 @@
 
 #include "libecs.hpp"
 #include "Util.hpp"
+#include "PropertyInterface.hpp"
 
 #include "UVariable.hpp"
 
@@ -267,19 +268,19 @@ namespace libecs
   template <>
   inline const UVariableVectorRCPtr PropertySlot::get()
   {
-    getUVariableVectorRCPtr();
+    return getUVariableVectorRCPtr();
   }
 
   template <>
   inline const String PropertySlot::get()
   {
-    getString();
+    return getString();
   }
 
   template <>
   inline const Real PropertySlot::get()
   {
-    getReal();
+    return getReal();
   }
 
 
@@ -591,12 +592,16 @@ namespace libecs
 
     virtual const bool isSetable() const
     {
-      //      return theSetMethodPtr != NULLPTR;
+      const SetMethodPtr aNullMethodPtr( &PropertyInterface::nullSet );
+      return theSetMethodPtr != aNullMethodPtr;
     }
 
     virtual const bool isGetable() const
     {
-      //      return theGetMethodPtr != NULLPTR;
+      // how tricky! -- does this work with all compilers?
+      const GetMethodPtr aNullMethodPtr( reinterpret_cast<GetMethodPtr>
+					 ( &PropertyInterface::nullGet ) );
+      return theGetMethodPtr != aNullMethodPtr;
     }
 
 
@@ -645,6 +650,8 @@ namespace libecs
     ProxyVector        theProxyVector;
 
   };
+
+
 
 
   /** @} */ //end of libecs_module 

@@ -34,6 +34,7 @@
 #include "FullID.hpp"
 #include "Substance.hpp"
 #include "Model.hpp"
+#include "PropertySlotMaker.hpp"
 
 #include "Reactor.hpp"
 
@@ -43,21 +44,23 @@ namespace libecs
 
   void Reactor::makeSlots()
   {
-    createPropertySlot( "Reactant", *this, 
-			Type2Type<UVariableVectorRCPtr>(),
-			&Reactor::setReactant,
-			NULLPTR );
-			//			&PropertyInterface::nullGetMethod<UVariableVectorRCPtr> );
+    appendSlot( getPropertySlotMaker()->
+		createPropertySlot( "Reactant", *this, 
+				    Type2Type<UVariableVectorRCPtr>(),
+				    &Reactor::setReactant,
+				    NULLPTR ) );
 
-    createPropertySlot( "ReactantList", *this, 
-			Type2Type<UVariableVectorRCPtr>(),
-			&PropertyInterface::nullSetMethod,
-			&Reactor::getReactantList );
+    appendSlot( getPropertySlotMaker()->
+		createPropertySlot( "ReactantList", *this, 
+				    Type2Type<UVariableVectorRCPtr>(),
+				    NULLPTR,
+				    &Reactor::getReactantList ) );
 
-    createPropertySlot( "Activity", *this, 
-			Type2Type<Real>(),
-			&Reactor::setActivity,
-			&Reactor::getActivity );
+    appendSlot( getPropertySlotMaker()->
+		createPropertySlot( "Activity", *this, 
+				    Type2Type<Real>(),
+				    &Reactor::setActivity,
+				    &Reactor::getActivity ) );
   }
 
   void Reactor::setReactant( UVariableVectorRCPtrCref aMessage )

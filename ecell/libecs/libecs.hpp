@@ -81,6 +81,7 @@ namespace libecs
   DECLARE_CLASS( PropertySlot );
   DECLARE_CLASS( ProxyPropertySlot );
   DECLARE_CLASS( PropertyInterface );
+  DECLARE_CLASS( PropertySlotMaker );
   DECLARE_CLASS( UVariable );
   DECLARE_CLASS( LoggerBroker );
   DECLARE_CLASS( Logger );

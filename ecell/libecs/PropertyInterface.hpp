@@ -37,7 +37,6 @@
 
 #include "Defs.hpp"
 #include "Message.hpp"
-#include "PropertySlot.hpp"
 
 
 namespace libecs
@@ -99,16 +98,28 @@ namespace libecs
     virtual StringLiteral getClassName() const { return "PropertyInterface"; }
 
 
-  protected:
 
-    template <typename Type>
-    void nullSetMethod( const Type& )
+    void nullSet( RealCref )
     {
       THROW_EXCEPTION( AttributeError, "Not setable." );
     }
 
-    template <typename Type>
-    const Type nullGetMethod() const
+    void nullSet( IntCref )
+    {
+      THROW_EXCEPTION( AttributeError, "Not setable." );
+    }
+
+    void nullSet( StringCref )
+    {
+      THROW_EXCEPTION( AttributeError, "Not setable." );
+    }
+
+    void nullSet( UVariableVectorRCPtrCref )
+    {
+      THROW_EXCEPTION( AttributeError, "Not setable." );
+    }
+
+    void nullGet() const
     {
       THROW_EXCEPTION( AttributeError, "Not getable." );
     }
@@ -118,77 +129,11 @@ namespace libecs
     const UVariableVectorRCPtr getPropertyList() const;
     const UVariableVectorRCPtr getPropertyAttributes() const;
 
-
-    /**
-
-    createPropertySlot template method provides a standard way 
-    to create a new slot.  It is template so that it can accept methods
-    of class T (the template parameter class).
-
-    */
-
-    template<class T, typename SlotType>
-    void
-    createPropertySlot( StringCref aName,
-			T& anObject,
-			//			const SlotType& anInitialValue,
-			Type2Type<SlotType>,
-			typename ConcretePropertySlot<T,SlotType>
-			::SetMethodPtr aSetMethodPtr,
-			typename ConcretePropertySlot<T,SlotType>
-			::GetMethodPtr aGetMethodPtr )
-    {
-      if( aSetMethodPtr == NULLPTR )
-	{
-	  aSetMethodPtr = &PropertyInterface::nullSetMethod;
-	}
-
-      if( aGetMethodPtr == NULLPTR )
-	{
-	  aGetMethodPtr = &PropertyInterface::nullGetMethod<SlotType>;
-	}
-
-      appendSlot( new ConcretePropertySlot
-		  <T,SlotType>( aName,
-				anObject,
-				aSetMethodPtr,
-				aGetMethodPtr ) );
-				//				anInitialValue ) );
-    }
-
-    /*
-    template<class T>
-    void
-    createPropertySlot( StringCref name,
-			T& object,
-			typename ConcretePropertySlot<T,Real>::
-			SetMethodPtr set,
-			typename ConcretePropertySlot<T,Real>::
-			GetMethodPtr get )
-    {
-      appendSlot( new ConcretePropertySlot<T,Real>( name, 
-						    object, 
-						    set, 
-						    get ) );
-    }
-
-    template<class T>
-    void
-    createPropertySlot( StringCref name,
-			T& object,
-			typename ConcretePropertySlot<T,String>::
-			SetMethodPtr set,
-			typename ConcretePropertySlot<T,String>::
-			GetMethodPtr get )
-    {
-      appendSlot( new ConcretePropertySlot<T,String>( name, 
-						      object, 
-						      set, 
-						      get ) );
-    }
-    */
     void appendSlot( PropertySlotPtr );
     void deleteSlot( StringCref keyword );
+
+    static PropertySlotMakerPtr getPropertySlotMaker();
+
 
   private:
 

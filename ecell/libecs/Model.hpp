@@ -62,38 +62,6 @@ namespace libecs
   DECLARE_TYPE( EventDynamicPriorityQueue, ScheduleQueue );
 
 
-  //FIXME: should be merged with PropertySlot::SlotTypes
-
-  template <class T,typename Ret>
-  class VoidObjectMethod
-  {
-    typedef Ret (T::* Method )( void ) const;
-
-  public:
-
-    VoidObjectMethod( T& anObject, Method aMethod )
-      :
-      theObject( anObject ),
-      theMethod( aMethod )
-    {
-      ; // do nothing
-    }
-
-    const Ret operator()( void ) const 
-    {
-      return ( theObject.*theMethod )();
-    }
-
-  private:
-
-    T&     theObject;
-    Method theMethod;
-
-  };
-
-  typedef VoidObjectMethod< Model, const Real > GetCurrentTimeMethodType;
-
-
   /**
      
 

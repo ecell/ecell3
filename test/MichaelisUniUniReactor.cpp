@@ -4,7 +4,7 @@
 #include "libecs/System.hpp"
 #include "libecs/Substance.hpp"
 #include "libecs/Util.hpp"
-
+#include "libecs/PropertySlotMaker.hpp"
 
 #include "MichaelisUniUniReactor.hpp"
 
@@ -30,16 +30,19 @@ MichaelisUniUniReactor::~MichaelisUniUniReactor()
 
 void MichaelisUniUniReactor::makeSlots()
 {
-  createPropertySlot( "KmS", 
-		      *this,
-		      Type2Type<Real>(),
-		      &MichaelisUniUniReactor::setKmS,
-		      &MichaelisUniUniReactor::getKmS );
-  createPropertySlot( "KcF",
-		      *this,
-		      Type2Type<Real>(),
-		      &MichaelisUniUniReactor::setKcF,
-		      &MichaelisUniUniReactor::getKcF );
+  appendSlot( getPropertySlotMaker()->
+	      createPropertySlot( "KmS", 
+				  *this,
+				  Type2Type<Real>(),
+				  &MichaelisUniUniReactor::setKmS,
+				  &MichaelisUniUniReactor::getKmS ) );
+
+  appendSlot( getPropertySlotMaker()->
+	      createPropertySlot( "KcF",
+				  *this,
+				  Type2Type<Real>(),
+				  &MichaelisUniUniReactor::setKcF,
+				  &MichaelisUniUniReactor::getKcF ) );
 
 }
 

@@ -31,8 +31,9 @@
 // E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
 
-#include "PropertyInterface.hpp"
+#include "PropertySlotMaker.hpp"
 
+#include "PropertyInterface.hpp"
 
 namespace libecs
 {
@@ -40,23 +41,35 @@ namespace libecs
 
   ///////////////////////////// PropertyInterface
 
+  PropertySlotMakerPtr PropertyInterface::getPropertySlotMaker()
+  {
+    static PropertySlotMaker aPropertySlotMaker;
+
+    return &aPropertySlotMaker;
+  }
+
+
   void PropertyInterface::makeSlots()
   {
 
-    createPropertySlot( "ClassName", *this, 
-			Type2Type<String>(),
-    			&PropertyInterface::nullSetMethod,
-    			&PropertyInterface::getClassNameString );
+    appendSlot( getPropertySlotMaker()->
+		createPropertySlot( "ClassName", *this, 
+				    Type2Type<String>(),
+				    NULLPTR,
+				    &PropertyInterface::getClassNameString ) );
 
-    createPropertySlot( "PropertyList",*this,
-			Type2Type<UVariableVectorRCPtr>(),
-    			&PropertyInterface::nullSetMethod,
-			&PropertyInterface::getPropertyList );
+    appendSlot( getPropertySlotMaker()->
+		createPropertySlot( "PropertyList",*this,
+				    Type2Type<UVariableVectorRCPtr>(),
+				    NULLPTR,
+				    &PropertyInterface::getPropertyList ) );
 
-    createPropertySlot( "PropertyAttributes",*this,
-			Type2Type<UVariableVectorRCPtr>(),
-			&PropertyInterface::nullSetMethod,
-			&PropertyInterface::getPropertyAttributes );
+    appendSlot( getPropertySlotMaker()->
+		createPropertySlot( "PropertyAttributes",*this,
+				    Type2Type<UVariableVectorRCPtr>(),
+				    NULLPTR,
+				    &PropertyInterface::getPropertyAttributes 
+				    ) );
 
 
   }

@@ -36,6 +36,7 @@
 #include "Model.hpp"
 #include "Util.hpp"
 #include "FullID.hpp"
+#include "PropertySlot.hpp"
 
 #include "Stepper.hpp"
 

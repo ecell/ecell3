@@ -28,13 +28,15 @@
 // E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
 
-#include "Substance.hpp"
+#include "Util.hpp"
 #include "System.hpp"
 #include "Accumulators.hpp"
 #include "AccumulatorMaker.hpp"
 #include "Model.hpp"
 #include "PrimitiveType.hpp"
-#include "Util.hpp"
+#include "PropertySlotMaker.hpp"
+
+#include "Substance.hpp"
 
 
 namespace libecs
@@ -49,25 +51,29 @@ namespace libecs
 
   void Substance::makeSlots()
   {
-    createPropertySlot( "Quantity",*this,
-			Type2Type<Real>(),
-			&Substance::setQuantity,
-			&Substance::getQuantity );
+    appendSlot( getPropertySlotMaker()->
+		createPropertySlot( "Quantity",*this,
+				    Type2Type<Real>(),
+				    &Substance::setQuantity,
+				    &Substance::getQuantity ) );
 
-    createPropertySlot( "Concentration",*this,
-			Type2Type<Real>(),
-			&PropertyInterface::nullSetMethod,
-			&Substance::getConcentration );
+    appendSlot( getPropertySlotMaker()->
+		createPropertySlot( "Concentration",*this,
+				    Type2Type<Real>(),
+				    NULLPTR,
+				    &Substance::getConcentration ) );
 
-    createPropertySlot( "Velocity",*this,
-			Type2Type<Real>(),
-			&Substance::addVelocity,
-			&Substance::getVelocity );
+    appendSlot( getPropertySlotMaker()->
+		createPropertySlot( "Velocity",*this,
+				    Type2Type<Real>(),
+				    &Substance::addVelocity,
+				    &Substance::getVelocity ) );
 
-    createPropertySlot( "AccumulatorClass",*this,
-			Type2Type<UVariableVectorRCPtr>(),
-			&Substance::setAccumulatorClass,
-			&Substance::getAccumulatorClass );
+    appendSlot( getPropertySlotMaker()->
+		createPropertySlot( "AccumulatorClass",*this,
+				    Type2Type<UVariableVectorRCPtr>(),
+				    &Substance::setAccumulatorClass,
+				    &Substance::getAccumulatorClass ) );
   }
 
   void Substance::setAccumulatorClass( UVariableVectorRCPtrCref aMessage )
