@@ -338,6 +338,8 @@ class Interpret(GenericASTTraversal):
 		anID = node[1][1].attr
 		if path != '':
 			anID = path + ':' + anID
+
+		print aType, anID
 		aFullID = convert2FullID( self.eml , aType, anID)
 		self.eml.createEntity( aClassname, aFullID )
 		
@@ -388,19 +390,16 @@ def convertEm2Eml( anEmFileObject, debug=0 ):
 
 def convert2FullID( anEml, aType, aSystemID ):
 
-        aFullID = anEml.convertSystemID2SystemFullID(aSystemID)
         if aType == 'System':
-		anID = aFullID
+		#FIXME: convertSystemID2SystemFullID() will be deprecated
+		return ecell.eml.convertSystemID2SystemFullID( aSystemID )
 	elif aType == 'Variable':
-		anID = 'Variable:' + aSystemID
-	elif aType == 'Stepper':
-		anID = aSystemID
+		return 'Variable:' + aSystemID
 	elif aType == 'Process':
-		anID = 'Process:' + aSystemID
-	else:
-		raise ValueError, 'Type Error %s %s %s' (aType, aClass, aSystemID)
-	    
-	return anID
+		return 'Process:' + aSystemID
+
+	# error
+	raise ValueError, 'Type Error in conver2FullID() (%s)' % aType
     
 
 
@@ -460,14 +459,14 @@ class Preprocessor:
 		#
 		# set hooks
 		#
-		pseudo.addHook( 'after_include', self.afterIncludeHook )
-		pseudo.addHook( 'before_include', self.beforeIncludeHook )
-		pseudo.addHook( 'after_expand', self.needLineControl )
-		pseudo.addHook( 'after_evaluate', self.needLineControl )
-		pseudo.addHook( 'after_execute', self.needLineControl )
-		pseudo.addHook( 'after_substitute', self.needLineControl )
+		pseudo.addHook( 'after_include',     self.afterIncludeHook )
+		pseudo.addHook( 'before_include',    self.beforeIncludeHook )
+		pseudo.addHook( 'after_expand',      self.needLineControl )
+		pseudo.addHook( 'after_evaluate',    self.needLineControl )
+		pseudo.addHook( 'after_execute',     self.needLineControl )
+		pseudo.addHook( 'after_substitute',  self.needLineControl )
 		pseudo.addHook( 'after_significate', self.needLineControl )
-		pseudo.addHook( 'at_parse', self.atParseHook )
+		pseudo.addHook( 'at_parse',          self.atParseHook )
 
 
 		#
