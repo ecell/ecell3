@@ -185,7 +185,9 @@ class StepperWindow(OsogoWindow):
 
 					if( len( aDataString ) > 20 ):
 						aDataString = aDataString[:20]\
-							      + '...'
+							      + '.. (total ' +\
+							      str( len( data ) ) +\
+							      ' items) ..'
 
 					aList.append( aDataString )
 
@@ -220,20 +222,27 @@ class StepperWindow(OsogoWindow):
 		# ------------------------------------------------------------------
 		# gets value from proprety_list
 		# ------------------------------------------------------------------
-		aValue = self['property_list'].get_model().get_value(\
-			     self.theSelectedRowOfPropertyList, VALUE_INDEX )
+#		aValue = self['property_list'].get_model().get_value(\
+#			     self.theSelectedRowOfPropertyList, VALUE_INDEX )
+
+		aPropertyName = self['property_list'].get_model().get_value(\
+			     self.theSelectedRowOfPropertyList, PROPERTY_INDEX )
 
 		# ------------------------------------------------------------------
 		# sets value to value_entry
 		# ------------------------------------------------------------------
-		self['value_entry'].set_text( aValue )
+		aValue = self.theSession.theSimulator.getStepperProperty(\
+			self.theSelectedStepperIDListItem,\
+			aPropertyName )
+
+		self['value_entry'].set_text( str( aValue ) )
 
 		# ------------------------------------------------------------------
 		# when the selected property is settable, set sensitive value_entry
 		# when not, set unsensitive value_entry
 		# ------------------------------------------------------------------
-		if self['property_list'].get_model().get_value(  self.theSelectedRowOfPropertyList, 
-							SET_INDEX ) == decodeAttribute(TRUE):
+		if self['property_list'].get_model().get_value(  self.theSelectedRowOfPropertyList,\
+								 SET_INDEX ) == decodeAttribute(TRUE):
 			self['value_entry'].set_sensitive( gtk.TRUE )
 			self['update_button'].set_sensitive( gtk.TRUE )
 		else:
