@@ -3,7 +3,7 @@
 <glade-interface>
   <widget class="GtkWindow" id="ToolLauncher">
     <property name="visible">True</property>
-    <property name="title" translatable="yes">E-Cell3 ToolLauncher</property>
+    <property name="title" translatable="yes">E-Cell ToolLauncher</property>
     <property name="type">GTK_WINDOW_TOPLEVEL</property>
     <property name="window_position">GTK_WIN_POS_NONE</property>
     <property name="modal">False</property>

@@ -66,7 +66,8 @@ def main():
     LIBECS_INCLUDE = ECELL_INCLUDE + os.sep + 'libecs'
     STDINCLUDE = [ '\"-I' + prefix + os.sep + 'include\"',
                    '\"-I' + ECELL_INCLUDE + '\"',
-                   '\"-I' + LIBECS_INCLUDE + '\"' ]
+                   '\"-I' + LIBECS_INCLUDE + '\"',
+                   os.environ['PYTHON_INCLUDES'] ]
     DMCOMPILE = os.path.abspath( BINDIR + os.sep + 'dmcompile' )
     SRC = None
 

@@ -374,9 +374,9 @@ class ToolLauncher(ParentWindow):
                                 self['eml_file'].set_text( fileName )
 
 		elif self.theFileSelectorDlg.get_title() == 'Select Cpp File':
-                        fileName = self.theFileSelectorDlg.get_filename()
-                        if os.path.isfile( fileName ):
-                                self['cpp_file'].set_text( fileName )
+                        fileDirName = self.theFileSelectorDlg.get_filename()
+                        if os.path.exists( fileDirName ):
+                                self['cpp_file'].set_text( fileDirName )
 
 		elif self.theFileSelectorDlg.get_title() == 'Select Import Model Zip File':
                         fileName = self.theFileSelectorDlg.get_filename()
