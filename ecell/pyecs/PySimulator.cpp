@@ -296,7 +296,7 @@ bool PySimulator::callPendingEventChecker()
 {
   thePendingEventChecker->apply( Py::Tuple() );
 
-  return false;
+  return true;//thePendingEventChecker->isTrue();
 }
 
 void PySimulator::callEventHandler()
