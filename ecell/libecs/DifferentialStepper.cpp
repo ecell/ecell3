@@ -98,13 +98,22 @@ namespace libecs
   {
     Real const aCurrentTime( getCurrentTime() );
 
-    for( VariableVector::size_type c( theReadWriteVariableOffset );
-	  c != theVariableVector.size(); ++c )
+    VariableVector::size_type c( theReadWriteVariableOffset );
+    for( ; c != theReadOnlyVariableOffset; ++c )
+      {
+      	VariablePtr const aVariable( theVariableVector[ c ] );
+
+	aVariable->interIntegrate( aCurrentTime );
+      }
+
+    // RealOnly Variables must be reset by the values in theValueBuffer
+    // before interIntegrate().
+    for( ; c != theVariableVector.size(); ++c )
       {
 	VariablePtr const aVariable( theVariableVector[ c ] );
 
+	aVariable->loadValue( theValueBuffer[ c ] );
 	aVariable->interIntegrate( aCurrentTime );
-	//	std::cout << aValue << ":" << aDifference << std::endl;
       }
 
   }
