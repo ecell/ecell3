@@ -1,3 +1,5 @@
+<?xml version="1.0" encoding="US-ASCII"?>
+
 <!-- ============= Automating Simulation Sessions with ECS ========== -->
 <chapter id="writing-ecs"> 
   <title>Automating Simulation Sessions with &ecell Session Script</title> 
@@ -127,6 +129,11 @@
     <productname>Python</productname> script with some convenient
     features.</para>
 
+    <para>Three major groups of object classes which are commonly used
+    in ESS are <classname>Session</classname>,
+    <classname>ObjectStub</classname> classes, and
+    <classname>Datafile</classname> classes.</para>
+
     <sect2>
       <title>Using Session methods</title>
 
@@ -156,6 +163,11 @@
     </para>
 
 
+      <para>
+Write something about step(), print(), loadModel(), getCurrentTime() here.
+</para>
+
+
     <example>
       <title>A simple <acronym>ESS</acronym> example.</title>
 
@@ -167,26 +179,49 @@ run( 100 )
 
     </sect2>
 
+    <sect2>
+      <title>Getting Session parameters.</title>
+
+      <para></para>
+
+    </sect2>
+
 
     <sect2>
-      <title>Using Stubs</title>
+      <title>Observing and manipulating simulation models</title>
 
       <sect3>
-	<title>What is Stub?</title>
+	<title>What is <classname>ObjectStub</classname>?</title>
 
-	<para>Stub is a...</para>
+	<para><classname>ObjectStub</classname> is a...</para>
 
 	<para>Explanation of backend/frontend isolation may come here.</para>
+
+	<para>ObjectStub, EntityStub, StepperStub, LoggerStub</para>
 
       </sect3>
 
     </sect2>
 
+    <sect2>
+      <title>Saving and handling data files</title>
+
+      <para></para>
+
+      <sect3>
+	<title>Saving <classname>Logger</classname> data</title>
+
+	<para>Howtos about <classname>ECDDataFile</classname> should
+	come here.</para>
+      </sect3>
+    </sect2>
+
+
   </sect1>
 
 
   <sect1>
-    <title>List of methods commonly used in ESS</title>
+    <title>List of commonly used methods in ESS</title>
 
     <para>This section provides full lists of methods implemented in
       classes in &ecell Python library which are commonly used in ESS.
@@ -218,429 +253,8 @@ run( 100 )
       </itemizedlist>
 
 
-      <table pgwide='1' tocentry='1' frame='bottom' rowsep='0'>
-	<title>Methods and properties of <classname>Session</classname> class</title>
-	
-	<tgroup cols="3">
-	  <colspec colnum='1' colname='c1'/>
-	  <colspec colnum='2' colname='c2'/>
-	  <colspec colnum='3' colname='c3'/>
-	  <thead>
-	    <row>
-	      <entry namest="c1" nameend='c2'>Synopsis</entry>
-	      <entry>Return</entry>
-	    </row>
-	    <row>
-	      <entry namest='c1' nameend='c3' align='left' rowsep='1'>Description</entry>	  </row>
-	  </thead>
-	  
-	  <tbody>
-	    
-	    <!-- ============== Session Methods ==================== -->
-	    <row>
-	      <entry namest='c1' nameend='c3' align='center'rowsep='1'><emphasis>Session methods</emphasis></entry>
-	    </row>
+      &session-class-api
 
-
-
-	    <!-- loadModel -->
-
-	    <row>
-	      <entry namest='c1' nameend='c2' align='left'>
-<synopsis><methodname>loadModel</methodname>( <parameter>file</parameter> )
-</synopsis></entry>
-
-	      <entry>None</entry>
-	    </row>
-
-	    <row>
-	      <entry namest="c1" nameend='c3' rowsep='1'>
-<para>Load an EML file, and create a cell model as described in the file.
-</para>
-
-<para><parameter>file</parameter> can be either a filename or a file object.
-</para>
-
-            </entry>
-	    </row>
-
-	    <!-- loadScript -->
-	    <row>
-	      <entry namest='c1' nameend='c2' align='left'>
-<synopsis><methodname>loadScript</methodname>( <parameter>filename</parameter> )
-</synopsis></entry>
-
-	      <entry>None</entry>
-	    </row>
-
-	    <row>
-	      <entry namest="c1" nameend='c3' rowsep='1'>
-<para>Load a ESS file.  Usually this is not used in ESS.</para>
-
-<para>FIXME: what happens then?  need to check if this can be called
-recursively.
-</para>
-
-<para>FIXME: need to describe about the locals()</para>
-
-            </entry>
-	    </row>
-
-
-
-	    <!-- print -->
-	    <row>
-	      <entry namest='c1' nameend='c2' align='left'>
-<synopsis><methodname>print</methodname>( <parameter>message</parameter> )
-</synopsis></entry>
-
-	      <entry>None</entry>
-	    </row>
-	    <row>
-	      <entry namest="c1" nameend='c3' rowsep='1'>
-<para>Print <parameter>message</parameter>.  By default the message is
-printed to stdout.</para> 
-
-<para>The way the message is handled can be changed by using
-<methodname>setPrintMethod</methodname> method.  For example, GUI
-frontend software may give a new print method to steal the message for
-its message printing widget.</para></entry>
-	    </row>
-
-
-	    <!-- setLogMethod -->
-
-	    <row>
-	      <entry namest='c1' nameend='c2' align='left'>
-<synopsis><methodname>setPrintMethod</methodname>( <parameter>method</parameter> )
-</synopsis></entry>
-
-	      <entry>None</entry>
-	    </row>
-
-	    <row>
-	      <entry namest="c1" nameend='c3' rowsep='1'>
-<para>This method changes what happens when
-<methodname>print</methodname> method is called.  
-</para>
-
-<para><parameter>method</parameter> must be a Python callable object
-which takes just one string parameter.</para>
-
-<para>See also: <methodname>print</methodname></para>
-            </entry>
-	    </row>
-
-	    <!-- ============ Simulation Methods ================== -->
-
-	    <row>
-	      <entry namest='c1' nameend='c3' align='center' rowsep='1'>
-<emphasis>Simulation methods</emphasis></entry>
-	    </row>
-
-	    <!-- getCurrentTime -->
-
-	    <row>
-	      <entry namest='c1' nameend='c2' align='left'>
-<synopsis><methodname>getCurrentTime</methodname>()
-</synopsis></entry>
-
-	      <entry>Simulator's current time as a <type>float</type></entry>
-	    </row>
-
-	    <row>
-	      <entry namest="c1" nameend='c3' rowsep='1'>
-<para>This method returns the current time of the simulator.</para>
-            </entry>
-	    </row>
-
-
-	    <!-- run -->
-	    <row>
-	      <entry namest='c1' nameend='c2' align='left'>
-<synopsis><methodname>run</methodname>( <optional><parameter>sec</parameter></optional> )
-</synopsis>
-            </entry>
-
-	      <entry>None</entry>
-
-	    </row>
-	    <row>
-	      <entry namest="c1" nameend='c3' rowsep='1'>
-	    <para>Run the simulation for <parameter>sec</parameter>
-	    seconds.</para> <para>If <parameter>sec</parameter> is
-	    omitted, this method will not return unless the event
-	    checker object is set by using
-	    <methodname>setEventChecker</methodname> and it returns
-	    true.</para> 
-            <para>See also:
-	    <methodname>setEventChecker</methodname> and
-	    <methodname>setEventHandler</methodname></para></entry>
-	    </row>
-
-	    <!-- setEventChecker -->
-
-	    <row>
-	      <entry namest='c1' nameend='c2' align='left'>
-<synopsis><methodname>setEventChecker</methodname>( <parameter>eventchecker</parameter> )
-</synopsis></entry>
-
-	      <entry>None</entry>
-	    </row>
-
-	    <row>
-	      <entry namest="c1" nameend='c3' rowsep='1'>
-<para>If the <emphasis>event checker</emphasis> and an <emphasis>event
-handler</emphasis> are correctly set, and the
-<methodname>run</methodname> method is called with or without time
-duration, the simulator checks if the <emphasis>event
-checker</emphasis> returns true once in <varname>n</varname>
-simulation steps , where <parameter>n</parameter> is a positive
-integer number set by using
-<methodname>setEventCheckInterval</methodname> (default
-<parameter>n</parameter>= 20 steps).  If it happens, the simulator
-then calls the <emphasis>event handler</emphasis>.  If the
-<emphasis>event handler</emphasis> called
-<methodname>stop</methodname> method of
-<classname>Session</classname>, the simulator stops before the next
-iteration.  This is the only way to quit from simulation loop when
-<methodname>run</methodname> is called without an argument.</para>
-
-<para>This mechanism is used to implement, mainly but not limited to,
-GUI frontend to <classname>Session</classname> efficiently and easily.</para>
-
-<para><parameter>eventchecker</parameter> and <parameter>event
-handler</parameter> must be Python callable objects.
-<parameter>eventchecker</parameter> must return an object which can be
-evaluated as either <constant>true</constant> or
-<constant>false</constant>.</para>
-
-<para>If either of the <emphasis>event checker</emphasis> and the
-<emphasis>event handler</emphasis> is not set, both of them are never
-called.</para></entry>
-	    </row>
-
-
-	    <!-- setEventCheckInterval -->
-
-	    <row>
-	      <entry namest='c1' nameend='c2' align='left'>
-<synopsis><methodname>setEventCheckInterval</methodname>( <parameter>n</parameter> )
-</synopsis></entry>
-
-	      <entry>None</entry>
-	    </row>
-
-	    <row>
-	      <entry namest="c1" nameend='c3' rowsep='1'>
-<para>See <methodname>setEventChecker</methodname>.</para>
-<para>This method is NOT IMPLEMENTED YET.</para>
-</entry>
-	    </row>
-
-	    <!-- setEventHandler -->
-
-	    <row>
-	      <entry namest='c1' nameend='c2' align='left'>
-<synopsis><methodname>setEventHandler</methodname>( <parameter>eventhandler</parameter> )
-</synopsis></entry>
-
-	      <entry>None</entry>
-	    </row>
-
-	    <row>
-	      <entry namest="c1" nameend='c3' rowsep='1'>
-<para>See <methodname>setEventChacker</methodname></para>
-            </entry>
-	    </row>
-
-
-
-	    <!-- step -->
-	    <row>
-	      <entry namest='c1' nameend='c2' align='left'>
-<synopsis><methodname>step</methodname>( <optional><parameter>numsteps</parameter></optional> )
-</synopsis></entry>
-
-	      <entry>None</entry>
-	    </row>
-
-	    <row>
-	      <entry namest="c1" nameend='c3' rowsep='1'>
-<para>Perform a step of simulation.  If the optional integer
-<parameter>numsteps</parameter> parameter is given, the simulator
-steps that number.</para>
-            </entry>
-	    </row>
-
-
-	    <!-- step -->
-	    <row>
-	      <entry namest='c1' nameend='c2' align='left'>
-<synopsis><methodname>stop</methodname>()</synopsis></entry>
-
-	      <entry>None</entry>
-	    </row>
-
-	    <row>
-	      <entry namest="c1" nameend='c3' rowsep='1'>
-<para>Stop the simulation.  Usually this is called from the
-<emphasis>event handler</emphasis>, or other methods called by the
-<emphasis>event handler.</emphasis></para>
-<para>See also: <methodname>setEventChacker</methodname>,
-<methodname>setEventHandler</methodname></para>
-            </entry>
-	    </row>
-
-
-	    <!-- initialize -->
-	    <row>
-	      <entry namest='c1' nameend='c2' align='left'>
-<synopsis><methodname>initialize</methodname>()</synopsis></entry>
-
-	      <entry>None</entry>
-	    </row>
-
-	    <row>
-	      <entry namest="c1" nameend='c3' rowsep='1'>
-<para>Do preparation of simulation.  Usually there is no need to call
-this method because this is automatically called before executing
-<methodname>step</methodname> and <methodname>run</methodname>.</para>
-            </entry>
-	    </row>
-
-	    <!-- ============== Stepper methods ==================== -->
-	    <row>
-	      <entry namest='c1' nameend='c3' align='center'rowsep='1'><emphasis>Stepper methods</emphasis></entry>
-	    </row>
-
-	    <!-- getStepperList -->
-	    <row>
-	      <entry namest='c1' nameend='c2' align='left'>
-<synopsis><methodname>getStepperList</methodname>()</synopsis></entry>
-
-	      <entry>A Python <type>tuple</type> containing a list of
-ID strings.</entry>
-	    </row>
-
-	    <row>
-	      <entry namest="c1" nameend='c3' rowsep='1'>
-<para>This method returns a Python <type>tuple</type> which contains
-ID strings of <classname>Stepper</classname>
-objects existing in the simulator.</para>
-            </entry>
-	    </row>
-
-	    <!-- createStepperStub -->
-	    <row>
-	      <entry namest='c1' nameend='c2' align='left'>
-<synopsis><methodname>createStepperStub</methodname>( <parameter>id</parameter> )</synopsis></entry>
-
-	      <entry>A <classname>StepperStub</classname> object</entry>
-	    </row>
-
-	    <row>
-	      <entry namest="c1" nameend='c3' rowsep='1'>
-<para>This method returns a <classname>StepperStub</classname> object
-bound to this <classname>Session</classname> object and the given
-<parameter>id</parameter>.</para>
-            </entry>
-	    </row>
-
-
-
-	    <!-- ============== Entity methods ==================== -->
-	    <row>
-	      <entry namest='c1' nameend='c3' align='center'rowsep='1'><emphasis>Entity methods</emphasis></entry>
-	    </row>
-
-	    <!-- getEntityList -->
-	    <row>
-	      <entry namest='c1' nameend='c2' align='left'>
-<synopsis><methodname>getEntityList</methodname>( <parameter>entitytype</parameter>, <parameter>systempath</parameter> )</synopsis></entry>
-
-	      <entry>A Python <type>tuple</type> containing a list of
-	      <classname>FullID</classname> strings.</entry>
-	    </row>
-
-	    <row>
-	      <entry namest="c1" nameend='c3' rowsep='1'>
-<para>This method returns a Python <type>tuple</type> which contains
-<classname>FullID</classname> strings of <classname>Entity</classname>
-objects of <parameter>entitytype</parameter> existing in a
-<classname>System</classname> pointed by
-<parameter>systempath</parameter></para>
-
-<para><parameter>entitytype</parameter> must be one of
-<constant>VARIABLE</constant>, <constant>PROCESS</constant>, or
-<constant>SYSTEM</constant> defined in ecell.ECS module.
-<parameter>systempath</parameter> must be a valid
-<emphasis>SystemPath</emphasis> string.</para>
-            </entry>
-	    </row>
-
-	    <!-- createEntityStub -->
-	    <row>
-	      <entry namest='c1' nameend='c2' align='left'>
-<synopsis><methodname>createEntityStub</methodname>( <parameter>fullid</parameter> )</synopsis></entry>
-
-	      <entry>an <classname>EntityStub</classname> object</entry>
-	    </row>
-
-	    <row>
-	      <entry namest="c1" nameend='c3' rowsep='1'>
-<para>This method returns an <classname>EntityStub</classname> object bound to this <classname>Session</classname> object and the given <parameter>fullid</parameter>.</para>
-            </entry>
-	    </row>
-
-
-	    <!-- ============== Logger methods ==================== -->
-	    <row>
-	      <entry namest='c1' nameend='c3' align='center'rowsep='1'><emphasis>Logger methods</emphasis></entry>
-	    </row>
-
-	    <!-- createLoggerList -->
-
-	    <row>
-	      <entry namest='c1' nameend='c2' align='left'>
-<synopsis><methodname>getLoggerList</methodname>()</synopsis></entry>
-
-	      <entry>A Python <type>tuple</type> containing a list of
-<classname>FullPN</classname> strings.</entry>
-	    </row>
-
-	    <row>
-	      <entry namest="c1" nameend='c3' rowsep='1'>
-<para>This method returns a Python <type>tuple</type> which contains
-<classname>FullPN</classname> strings of all the
-<classname>Logger</classname> objects existing in the
-simulator.</para>
-            </entry>
-	    </row>
-
-	    <!-- createLoggerStub -->
-
-	    <row>
-	      <entry namest='c1' nameend='c2' align='left'>
-<synopsis><methodname>createLoggerStub</methodname>( <parameter>id</parameter> )</synopsis></entry>
-
-	      <entry>A <classname>LoggerStub</classname> object</entry>
-	    </row>
-
-	    <row>
-	      <entry namest="c1" nameend='c3' rowsep='1'>
-<para>This method returns a <classname>LoggerStub</classname> object
-bound to this <classname>Session</classname> object and the given
-<parameter>fullpn</parameter>.</para>
-
-<para><parameter>fullpn</parameter> must be a valid
-<classname>FullPN</classname> string.</para>
-            </entry>
-	    </row>
-
-	  </tbody>
-	</tgroup>
-      </table>
 
     </sect2>
 

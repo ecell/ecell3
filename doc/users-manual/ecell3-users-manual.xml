@@ -28,6 +28,10 @@
   <!ENTITY python-basics SYSTEM "python-basics.xml">
   <!ENTITY cpp-basics SYSTEM "cpp-basics.xml">
 
+<!-- API tables -->
+
+  <!ENTITY session-class-api SYSTEM "session-class-api.xml">
+
 ]>
 <!-- 
   This is a GNOME documentation template, designed by the GNOME
