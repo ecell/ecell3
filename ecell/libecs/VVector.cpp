@@ -45,8 +45,8 @@
  *::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
  *	$Id$
  :	$Log$
- :	Revision 1.8  2003/09/27 13:09:38  bgabor
- :	Bug fix.
+ :	Revision 1.9  2003/09/27 13:41:07  bgabor
+ :	Bugfix.
  :
  :	Revision 1.6  2003/09/27 12:39:15  satyanandavel
  :	more compatibility issues in Windows
@@ -193,11 +193,11 @@ void vvectorbase::unlinkfile()
 #ifndef OPEN_WHEN_ACCESS
 	if (0 <= _fdr) {
 		close(_fdr);
-		printf("fdr closed\n");
+//		printf("fdr closed\n");
 	}
 	if (0 <= _fdw) {
 		close(_fdw);
-		printf("fdrw closed\n");
+//		printf("fdrw closed\n");
 	}
 #endif /* OPEN_WHEN_ACCESS */
 	if (_file_name != NULL) {
@@ -240,7 +240,7 @@ void vvectorbase::removeTmpFile()
 
 	if (0 <= *ii) {
 		close(*ii);
-		printf("fdr closed\n");
+//		printf("fdr closed\n");
 	}
 }
 
@@ -248,7 +248,7 @@ void vvectorbase::removeTmpFile()
 
 	if (0 <= *ii) {
 		close(*ii);
-		printf("fdrw closed\n");
+//		printf("fdrw closed\n");
 	}
 }
 #endif /* OPEN_WHEN_ACCESS */	

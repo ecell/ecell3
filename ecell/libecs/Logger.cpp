@@ -293,14 +293,20 @@ namespace libecs
     --log_no;
     avg_interval=thePhysicalLoggers[log_no]->get_avg_interval();
 
+//	printf("iteration log_no %i, avg_interval %f, size %i, range %i\n", log_no, avg_interval,thePhysicalLoggers[log_no]->size(), range);
+
 	}
-    while (((avg_interval>(anInterval/3))||(avg_interval==0.0))&&
+    while (((avg_interval>(anInterval/3))||(avg_interval==0.0)||(thePhysicalLoggers[log_no]->size()<range))&&
 	    (log_no>0));
+
+
     Real theStartTime ( thePhysicalLoggers[log_no]->front().getTime() );
     Real theEndTime ( thePhysicalLoggers[log_no]->back().getTime() );
-	
     Real time_per_step( ( theEndTime - theStartTime ) /
 		    ( thePhysicalLoggers[log_no]->end() - thePhysicalLoggers[log_no]->begin() ) );
+
+//	printf("loggerstartime %f, loggerendtime %f, time_per_step %f\n", theStartTime, theEndTime,time_per_step );	
+
 	theStartTime = aStartTime;
 	theEndTime = anEndTime;
 
@@ -326,7 +332,7 @@ namespace libecs
 						   vectorslice_end,
 						   theStartTime,
 						   time_per_step ) );
-
+//printf("vectorslice start %i, vectorslice start %i\n", vectorslice_start , vectorslice_end );
 
 	// start from vectorslice start to vectorslice end, scan through all datapoints
 	
@@ -353,6 +359,7 @@ namespace libecs
 
 			}
 		while((readDpl.getTime() < targetTime ) && (loggerCounter < vectorslice_end));
+//	printf(" readDpl.getTime() %f, targetTime %f, loggerCounter%i, elementCount%i\n", readDpl.getTime(), targetTime, loggerCounter, elementCount );
 		aDataPointVector->asLong(elementCount) = theAggregator.getData();
 
 
