@@ -448,31 +448,25 @@ class Eml:
         aFullID = createFullIDString( convertFullPNToFullID( aFullPN ) )
         anEntityPropertyNode = self.__getEntityPropertyNode( aFullID, aPropertyName )
 
-        aPropertyValueList = []
-        for aChildNode in anEntityPropertyNode.childNodes:
-
-            if aChildNode.tagName == 'value':
-
-                aPropertyValueList.append( self.__createValueList( aChildNode ) )
-
-
-        return aPropertyValueList
+        return self.__createValueList( anEntityPropertyNode )
                 
 
 
     def __createValueList( self, aValueNode ):
+
         if aValueNode.firstChild.nodeType == minidom.Node.TEXT_NODE:
 
             return aValueNode.firstChild.toxml()
 
         elif aValueNode.firstChild.nodeType == minidom.Node.ELEMENT_NODE:
-            
-            aValueList = []
 
+            aValueList = []
             for aChildNode in aValueNode.childNodes:
-                aValueList.append( self.__createValueList( aChildNode ) )
+                if aChildNode.tagName == 'value':
+                    aValueList.append( self.__createValueList( aChildNode ) )
 
             return aValueList
+
 
     def __getSystemList( self, anEntityType, aSystemPath ):
 
@@ -542,6 +536,8 @@ class Eml:
 
         anEntityInfo = self.asEntityInfo( aFullID )
 
+
+        # what if multiple propety elements with the same name exist?
         for aChildNode in anEntityNode.childNodes:
 
             if aChildNode.tagName == 'property':

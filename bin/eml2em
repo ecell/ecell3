@@ -5,32 +5,47 @@ import string
 import os
 import time
 import getopt
+import types
 
 from ecell.ecssupport import *
 from ecell.eml import *
-from types import *
 
-def expandValueList( aValue ):
+def expandValueList( aValue, aLevel=0 ):
     aType = type( aValue )
 
     # just apply str() to scalar type
-    if aType != TupleType and aType != ListType:
+    if aType != types.TupleType and aType != types.ListType:
         return str( aValue )
 
-    aValue = map( expandValueList, aValue )
+    # recursively apply this method for nested lists
+    aValue = map( expandValueList, aValue, (aLevel+1,) * len( aValue ) )
 
-    aValueString = '[ '
-    for i in aValue:
-        aValueString += str( i )
+    print aValue
+
+    aValueString = ''
+
+    # don't use [] in uppermost level
+    if aLevel != 0:
+        aValueString += '[ '
+
+    
+    # don't print a space before the first item
+    if len( aValue ) > 0:
+        aValueString += str( aValue[0] )
+        
+    for anItem in aValue[1:]:
         aValueString += ' '
+        aValueString += str( anItem )
 
-    aValueString += ']'
+    if aLevel != 0:
+        aValueString += ' ]'
 
     return aValueString
         
 
 
 def createObjectDef( aType, aClass, anArgList, aPropertyList, anOptional='' ):
+
 
     # declaration line
     anArgListString = string.join( anArgList, ',' ) 
@@ -39,9 +54,9 @@ def createObjectDef( aType, aClass, anArgList, aPropertyList, anOptional='' ):
     # properties
     for aProperty in aPropertyList:
         aPropertyName = aProperty[0]
-        aPropertyValueListString = expandValueList( aProperty[1][0] )
+        aPropertyValueListString = expandValueList( aProperty[1] )
 
-        aBuffer += '\t%s %s;\n' % ( aPropertyName, aPropertyValueListString )
+        aBuffer += '\t%s\t%s;\n' % ( aPropertyName, aPropertyValueListString )
 
     # optional field
     if anOptional != '':
