@@ -1,4 +1,5 @@
 libdir=@libdir@
+USE_COMPILER_CONVERSIONS=@USE_COMPILER_CONVERSIONS@
 
 if OS_WIN32
   no_undefined = -no-undefined
@@ -107,7 +108,8 @@ Exceptions.hpp\
 Util.hpp\
 VariableReference.hpp\
 DynamicPriorityQueue.hpp\
-FluxProcess.hpp
+FluxProcess.hpp\
+ObjectMethodProxy.hpp
 
 
 all-local: libecs$(SHLEXT)

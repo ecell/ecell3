@@ -36,9 +36,6 @@
 
 #include <new>
 
-#include "libecs.hpp"
-#include "Process.hpp"
-
 #include <boost/spirit/core.hpp>
 #include <boost/spirit/tree/ast.hpp>
 
@@ -47,6 +44,10 @@
 #else
 #define PARSER_CONTEXT parser_context
 #endif
+
+#include "libecs/libecs.hpp"
+#include "libecs/Process.hpp"
+#include "libecs/ObjectMethodProxy.hpp"
 
 using namespace boost::spirit;
 
@@ -61,65 +62,6 @@ DECLARE_ASSOCVECTOR
 ( String, Real, std::less<const String>, ConstantMap );
 DECLARE_ASSOCVECTOR
 ( String, Real, std::less<const String>, PropertyMap );
-
-template < class T, typename RET, typename ARG1 = void > 
-class ObjectMethodProxy;
-
-template < class T, typename RET >
-class ObjectMethodProxy<T,RET>
-{
-private:
-
-  typedef const RET (* Invoker )( T* );
-
-public:
-
-  inline const RET operator()() const 
-  { 
-    return theInvoker( theObject ); 
-  }
-
-  template < const RET (T::*TMethod)() const >
-  static ObjectMethodProxy create( T* const anObject )
-  {
-#if defined( ENABLE_PMF_CONVERSIONS )
-    return ObjectMethodProxy( Invoker( anObject->*TMethod ), anObject );
-#else  /* defined( ENABLE_PMF_CONVERSIONS ) */
-    return ObjectMethodProxy( invoke<TMethod>, anObject );
-#endif /* defined( ENABLE_PMF_CONVERSIONS ) */
-  }
-
-private:
-
-  ObjectMethodProxy()
-    : 
-    theInvoker( 0 ),
-    theObject( 0 )
-  {
-    ; // do nothing
-  }
-    
-  ObjectMethodProxy( Invoker anInvoker, T* anObject ) 
-    : 
-    theInvoker( anInvoker ),
-    theObject( anObject )
-  {
-    ; // do nothing
-  }
-
-  template < const RET (T::*TMethod)() const >
-  inline static const RET invoke( T* const anObject )
-  {
-    return ( anObject->*TMethod )();
-  }
-
-private:
-    
-  const Invoker   theInvoker;
-  T* const        theObject;
-
-};
-
 
 
 class ExpressionCompiler
@@ -146,8 +88,8 @@ public:
   typedef Real (*RealFunc2)( Real, Real );
 
 
-  typedef ObjectMethodProxy<VariableReference,Real> 
-  VariableReferenceMethodProxy;
+  typedef ObjectMethodProxy<Real> RealObjectMethodProxy;
+  //  VariableReferenceMethodProxy;
 
   typedef void (*InstructionAppender)( CodeRef );
 
@@ -581,7 +523,7 @@ SPECIALIZE_OPCODE2OPERAND( LOAD_REAL,                RealPtr const );
 SPECIALIZE_OPCODE2OPERAND( CALL_FUNC1,               RealFunc1 );
 SPECIALIZE_OPCODE2OPERAND( CALL_FUNC2,               RealFunc2 );
 SPECIALIZE_OPCODE2OPERAND( VARREF_REAL_METHOD, 
-			   VariableReferenceMethodProxy );
+			   RealObjectMethodProxy );
 SPECIALIZE_OPCODE2OPERAND( PROCESS_METHOD,           ProcessMethod );
 SPECIALIZE_OPCODE2OPERAND( SYSTEM_METHOD,            SystemMethod );
 SPECIALIZE_OPCODE2OPERAND( PROCESS_TO_SYSTEM_METHOD, ProcessMethodPtr );
@@ -733,8 +675,8 @@ appendVariableReferenceMethodInstruction( Code& aCode,
 	appendInstruction\
 	  ( aCode, \
 	    Instruction<VARREF_REAL_METHOD>\
-	    ( VariableReferenceMethodProxy::\
-	      create< &VariableReference::METHODNAME >\
+	    ( RealObjectMethodProxy::\
+	      create< VariableReference, &VariableReference::METHODNAME >\
 	      ( aVariableReference ) ) ); // \
 
 
