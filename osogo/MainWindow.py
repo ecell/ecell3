@@ -28,15 +28,30 @@ class MainWindow(Window):
         #### create Message Window ####
         self.theMessageWindow = MessageWindow.MessageWindow()
         self.theMessageWindowWindow = self.theMessageWindow[ 'message_window' ]
-        self.theMessageWindowWindow.hide()
+#        self.theMessageWindowWindow.hide()
 
         self.theTmpSessionRecordFilename = 'TmpSessionRecord.py'
         self.thePreSessionRecordFilename = 'preSessionRecord.py'
 
-        self.theSession = Session.OsogoSession( self.theMessageWindow, self.theTmpSessionRecordFilename )
 
+        self.theSession = Session.OsogoSession( self.theMessageWindow,
+                                                self.theTmpSessionRecordFilename )
         self.theDriver = self.theSession.theDriver
         self.theModelInterpreter = self.theSession.theModelInterpreter
+
+        self.theLoggerWindow = LoggerWindow.LoggerWindow( self.theSession )
+        self.theLoggerWindowWindow = self.theLoggerWindow[ 'logger_window' ]
+#        self.theLoggerWindowWindow.hide()
+
+        self.thePluginManager = PluginManager( self.theSession, self.theLoggerWindow )
+        self.thePluginManager.loadAll()
+
+        self.thePaletteWindow = PaletteWindow.PaletteWindow()
+        self.thePaletteWindow.setPluginList( self.thePluginManager.thePluginMap )
+
+        self.theEntryListWindow = EntryListWindow.EntryListWindow( self )
+        self.theEntryListWindowWindow = self.theEntryListWindow[ 'entry_list_window' ]
+#        self.theEntryListWindowWindow.hide()
 
         self.theUpdateInterval = 100
         self.theStepSize = 1
@@ -52,8 +67,8 @@ class MainWindow(Window):
               'message_window_menu_activate'         : self.toggleMessageWindow ,
               'interface_window_menu_activate'       : self.toggleInterfaceListWindow ,
               'palette_window_menu_activate'         : self.togglePaletteWindow ,
-              'create_new_entry_list_menu_activate'  : self.createNewEntryList ,
-              'create_new_logger_list_menu_activate' : self.createNewLoggerList ,
+              'create_new_entry_list_menu_activate'  : self.toggleEntryList ,
+              'create_new_logger_list_menu_activate' : self.toggleLoggerWindow ,
               'preferences_menu_activate'            : self.openPreferences ,
               'about_menu_activate'                  : self.openAbout ,
               'start_button_clicked'     : self.startSimulation ,
@@ -61,16 +76,14 @@ class MainWindow(Window):
               'step_button_clicked'      : self.stepSimulation ,
               'input_step_size'          : self.setStepSize ,
               'step_sec_toggled'         : self.changeStepType ,
-              'entry_button_clicked'     : self.createNewEntryList ,
-              'logger_button_clicked'    : self.createNewLoggerList ,
+              'entrylist_togglebutton_toggled'     : self.toggleEntryList ,
+              'logger_togglebutton_toggled'    : self.toggleLoggerWindow ,
               'palette_togglebutton_toggled'   : self.togglePaletteWindow ,
               'message_togglebutton_toggled'   : self.toggleMessageWindow ,
               'Interface_togglebutton_toggled' : self.toggleInterfaceListWindow ,
               }
         self.addHandlers( self.theHandlerMap )
 
-        self.thePluginManager = PluginManager( self.theSession )
-        self.thePluginManager.loadAll()
 
         #### create Script File Selection ####
         self.theScriptFileSelection = gtk.GtkFileSelection( 'Select Script File' )
@@ -87,9 +100,6 @@ class MainWindow(Window):
         self.theSaveFileSelection.ok_button.connect('clicked', self.saveCellState)
         self.theSaveFileSelection.cancel_button.connect('clicked', self.closeParentWindow)
         
-        #### create Palette Window ####
-        self.thePaletteWindow = PaletteWindow.PaletteWindow()
-        self.thePaletteWindow.setPluginList( self.thePluginManager.thePluginMap )
 
 
         ### initialize for run method ###
@@ -114,6 +124,7 @@ class MainWindow(Window):
         aGlobalNameMap = { 'aMainWindow' : self }
         execfile(aFileName, aGlobalNameMap)
         self.theModelInterpreter.load( self.theCellModelObject )
+        self.theEntryListWindow.update()
         self.theDriver.initialize()
 
     ###### Load Script ######
@@ -140,19 +151,21 @@ class MainWindow(Window):
         os.rename(self.theTmpSessionRecordFilename, self.thePreSessionRecordFilename)
         
     def startSimulation( self, a ) :
-        self.theRunningFlag = 1
+        self.theSession.theRunningFlag = 1
         self.theSession.printMessage( "Start\n" )
         self.theTimer = gtk.timeout_add(self.theUpdateInterval, self.updateByTimeOut, 0)
+        self.theLoggerWindow.update()
         self.theSession.run()
         self.removeTimeOut()
 
     def stopSimulation( self, a ) :
-        if self.theRunningFlag:
-            self.theRunningFlag = 0
+        if self.theSession.theRunningFlag:
+            self.theSession.theRunningFlag = 0
             self.theSession.stop()
             self.theSession.printMessage( "Stop\n" )
             self.removeTimeOut()
             self.update()
+            self.theLoggerWindow.update()
 
     def stepSimulation( self, a ) : 
         self.theSession.printMessage( "Step\n" )
@@ -164,6 +177,7 @@ class MainWindow(Window):
             self.theSession.step( self.theStepSize )
         self.removeTimeOut()
         self.update()
+        self.theLoggerWindow.update()
 
     def changeStepType ( self, a ):
         self.theStepType = 1 - self.theStepType
@@ -188,14 +202,27 @@ class MainWindow(Window):
         self['time_entry'].set_text( str( self.theCurrentTime ) )
         self.thePluginManager.updateAllPluginWindow()
         
-    def createNewEntryList( self, button_obj ) :
-        aEntryList = EntryListWindow.EntryListWindow( self )
     
-    def createNewLoggerList( self, a ) :
-        aLoggerList = LoggerWindow.LoggerWindow( self )
+    def toggleEntryList( self, button_obj ):
 
-    ###### Message Window ######
+        if button_obj.get_active() :
+            self.theEntryListWindowWindow.show_all()
+            self.theEntryListWindow.update()
+        else :
+            self.theEntryListWindowWindow.hide()
+
+
+    def toggleLoggerWindow( self, button_obj ):
+
+        if button_obj.get_active() :
+            self.theLoggerWindowWindow.show_all()
+            self.theLoggerWindow.update()
+        else :
+            self.theLoggerWindowWindow.hide()
+
+
     def toggleMessageWindow( self, button_obj ) :
+
         if button_obj.get_active() :
             self.theMessageWindowWindow.show_all()
         else :

@@ -14,10 +14,10 @@
 
 <widget>
   <class>GtkWindow</class>
-  <name>EntryListWindow</name>
+  <name>entry_list_window</name>
   <width>750</width>
   <height>400</height>
-  <title>Entry List</title>
+  <title>EntryList</title>
   <type>GTK_WINDOW_TOPLEVEL</type>
   <position>GTK_WIN_POS_NONE</position>
   <modal>False</modal>
@@ -579,6 +579,7 @@ All
 	  <last_modification_time>Wed, 05 Sep 2001 06:35:21 GMT</last_modification_time>
 	</signal>
 	<label>Show</label>
+	<relief>GTK_RELIEF_NORMAL</relief>
 	<child>
 	  <padding>0</padding>
 	  <expand>False</expand>

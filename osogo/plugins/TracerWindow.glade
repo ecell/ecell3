@@ -6,7 +6,7 @@
   <program_name>ecellgui</program_name>
   <directory></directory>
   <source_directory>src</source_directory>
-  <pixmaps_directory>pixmaps</pixmaps_directory>
+  <pixmaps_directory></pixmaps_directory>
   <language>C</language>
   <gnome_support>True</gnome_support>
   <gettext_support>True</gettext_support>
@@ -15,23 +15,27 @@
 <widget>
   <class>GtkWindow</class>
   <name>Tracer</name>
-  <title>Tracer</title>
+  <height>355</height>
+  <title>TracerWindow</title>
   <type>GTK_WINDOW_TOPLEVEL</type>
   <position>GTK_WIN_POS_NONE</position>
   <modal>False</modal>
   <allow_shrink>False</allow_shrink>
-  <allow_grow>True</allow_grow>
+  <allow_grow>False</allow_grow>
   <auto_shrink>False</auto_shrink>
 
   <widget>
     <class>GtkVBox</class>
     <name>vbox19</name>
+    <width>450</width>
+    <height>151</height>
     <homogeneous>False</homogeneous>
     <spacing>0</spacing>
 
     <widget>
       <class>GtkVBox</class>
       <name>vbox20</name>
+      <width>450</width>
       <homogeneous>False</homogeneous>
       <spacing>0</spacing>
       <child>
@@ -42,7 +46,7 @@
 
       <widget>
 	<class>GtkFrame</class>
-	<name>frame7</name>
+	<name>frame9</name>
 	<border_width>2</border_width>
 	<label>Traces</label>
 	<label_xalign>0</label_xalign>
@@ -54,237 +58,183 @@
 	</child>
 
 	<widget>
-	  <class>GtkPacker</class>
-	  <name>packer5</name>
-	  <default_border_width>0</default_border_width>
-	  <default_pad_x>0</default_pad_x>
-	  <default_pad_y>0</default_pad_y>
-	  <default_ipad_x>0</default_ipad_x>
-	  <default_ipad_y>0</default_ipad_y>
+	  <class>GtkToolbar</class>
+	  <name>toolbar1</name>
+	  <orientation>GTK_ORIENTATION_HORIZONTAL</orientation>
+	  <type>GTK_TOOLBAR_ICONS</type>
+	  <space_size>5</space_size>
+	  <space_style>GTK_TOOLBAR_SPACE_EMPTY</space_style>
+	  <relief>GTK_RELIEF_NORMAL</relief>
+	  <tooltips>True</tooltips>
 
 	  <widget>
-	    <class>GtkCheckButton</class>
-	    <name>checkbutton4</name>
-	    <can_focus>True</can_focus>
-	    <label>ATP</label>
-	    <active>True</active>
-	    <draw_indicator>True</draw_indicator>
-	    <child>
-	      <side>GTK_SIDE_LEFT</side>
-	      <anchor>GTK_ANCHOR_NORTH</anchor>
-	      <expand>False</expand>
-	      <xfill>False</xfill>
-	      <yfill>False</yfill>
-	      <use_default>True</use_default>
-	      <border_width>0</border_width>
-	      <xpad>0</xpad>
-	      <ypad>0</ypad>
-	      <xipad>0</xipad>
-	      <yipad>0</yipad>
-	    </child>
+	    <class>GtkToggleButton</class>
+	    <child_name>Toolbar:button</child_name>
+	    <name>button1</name>
+	    <width>21</width>
+	    <height>21</height>
+	    <label>togglebutton1</label>
+	    <icon>red.xpm</icon>
+	    <active>False</active>
 	  </widget>
 
 	  <widget>
-	    <class>GtkCheckButton</class>
-	    <name>checkbutton5</name>
-	    <can_focus>True</can_focus>
-	    <label>ADP</label>
-	    <active>True</active>
-	    <draw_indicator>True</draw_indicator>
-	    <child>
-	      <side>GTK_SIDE_LEFT</side>
-	      <anchor>GTK_ANCHOR_NORTH</anchor>
-	      <expand>False</expand>
-	      <xfill>False</xfill>
-	      <yfill>False</yfill>
-	      <use_default>True</use_default>
-	      <border_width>0</border_width>
-	      <xpad>0</xpad>
-	      <ypad>0</ypad>
-	      <xipad>0</xipad>
-	      <yipad>0</yipad>
-	    </child>
-	  </widget>
-
-	  <widget>
-	    <class>GtkCheckButton</class>
-	    <name>checkbutton7</name>
-	    <can_focus>True</can_focus>
-	    <label>NADH</label>
-	    <active>True</active>
-	    <draw_indicator>True</draw_indicator>
-	    <child>
-	      <side>GTK_SIDE_LEFT</side>
-	      <anchor>GTK_ANCHOR_NORTH</anchor>
-	      <expand>False</expand>
-	      <xfill>False</xfill>
-	      <yfill>False</yfill>
-	      <use_default>True</use_default>
-	      <border_width>0</border_width>
-	      <xpad>0</xpad>
-	      <ypad>0</ypad>
-	      <xipad>0</xipad>
-	      <yipad>0</yipad>
-	    </child>
-	  </widget>
-	</widget>
-      </widget>
-
-      <widget>
-	<class>GtkHBox</class>
-	<name>hbox23</name>
-	<homogeneous>False</homogeneous>
-	<spacing>0</spacing>
-	<child>
-	  <padding>2</padding>
-	  <expand>False</expand>
-	  <fill>True</fill>
-	</child>
-
-	<widget>
-	  <class>GtkLabel</class>
-	  <name>label38</name>
-	  <label>Equation: </label>
-	  <justify>GTK_JUSTIFY_CENTER</justify>
-	  <wrap>False</wrap>
-	  <xalign>0.5</xalign>
-	  <yalign>0.5</yalign>
-	  <xpad>0</xpad>
-	  <ypad>0</ypad>
-	  <child>
-	    <padding>2</padding>
-	    <expand>False</expand>
-	    <fill>False</fill>
-	  </child>
-	</widget>
-
-	<widget>
-	  <class>GtkEntry</class>
-	  <name>entry1</name>
-	  <can_focus>True</can_focus>
-	  <editable>True</editable>
-	  <text_visible>True</text_visible>
-	  <text_max_length>0</text_max_length>
-	  <text></text>
-	  <child>
-	    <padding>2</padding>
-	    <expand>True</expand>
-	    <fill>True</fill>
-	  </child>
-	</widget>
-      </widget>
-    </widget>
-
-    <widget>
-      <class>GtkScrolledWindow</class>
-      <name>scrolledwindow12</name>
-      <hscrollbar_policy>GTK_POLICY_ALWAYS</hscrollbar_policy>
-      <vscrollbar_policy>GTK_POLICY_ALWAYS</vscrollbar_policy>
-      <hupdate_policy>GTK_UPDATE_CONTINUOUS</hupdate_policy>
-      <vupdate_policy>GTK_UPDATE_CONTINUOUS</vupdate_policy>
-      <child>
-	<padding>0</padding>
-	<expand>True</expand>
-	<fill>True</fill>
-      </child>
-
-      <widget>
-	<class>GtkViewport</class>
-	<name>viewport10</name>
-	<shadow_type>GTK_SHADOW_IN</shadow_type>
-
-	<widget>
-	  <class>GtkCurve</class>
-	  <name>curve1</name>
-	  <curve_type>GTK_CURVE_TYPE_SPLINE</curve_type>
-	  <min_x>0</min_x>
-	  <max_x>1</max_x>
-	  <min_y>0</min_y>
-	  <max_y>1</max_y>
-	</widget>
-      </widget>
-    </widget>
-
-    <widget>
-      <class>GtkHBox</class>
-      <name>hbox24</name>
-      <homogeneous>False</homogeneous>
-      <spacing>0</spacing>
-      <child>
-	<padding>0</padding>
-	<expand>False</expand>
-	<fill>True</fill>
-      </child>
-
-      <widget>
-	<class>GtkPacker</class>
-	<name>packer6</name>
-	<default_border_width>0</default_border_width>
-	<default_pad_x>0</default_pad_x>
-	<default_pad_y>0</default_pad_y>
-	<default_ipad_x>0</default_ipad_x>
-	<default_ipad_y>0</default_ipad_y>
-	<child>
-	  <padding>0</padding>
-	  <expand>True</expand>
-	  <fill>True</fill>
-	</child>
-
-	<widget>
-	  <class>GtkRadioButton</class>
-	  <name>radiobutton2</name>
-	  <can_focus>True</can_focus>
-	  <label>quantity</label>
-	  <active>True</active>
-	  <draw_indicator>True</draw_indicator>
-	  <child>
-	    <side>GTK_SIDE_LEFT</side>
-	    <anchor>GTK_ANCHOR_CENTER</anchor>
-	    <expand>False</expand>
-	    <xfill>False</xfill>
-	    <yfill>False</yfill>
-	    <use_default>True</use_default>
-	    <border_width>0</border_width>
+	    <class>GtkLabel</class>
+	    <name>label1</name>
+	    <label></label>
+	    <justify>GTK_JUSTIFY_CENTER</justify>
+	    <wrap>False</wrap>
+	    <xalign>0.5</xalign>
+	    <yalign>0.5</yalign>
 	    <xpad>0</xpad>
 	    <ypad>0</ypad>
-	    <xipad>0</xipad>
-	    <yipad>0</yipad>
-	  </child>
-	</widget>
+	  </widget>
 
-	<widget>
-	  <class>GtkRadioButton</class>
-	  <name>radiobutton3</name>
-	  <can_focus>True</can_focus>
-	  <label>concentration</label>
-	  <active>False</active>
-	  <draw_indicator>True</draw_indicator>
-	  <child>
-	    <side>GTK_SIDE_LEFT</side>
-	    <anchor>GTK_ANCHOR_CENTER</anchor>
-	    <expand>False</expand>
-	    <xfill>False</xfill>
-	    <yfill>False</yfill>
-	    <use_default>True</use_default>
-	    <border_width>0</border_width>
+	  <widget>
+	    <class>GtkToggleButton</class>
+	    <child_name>Toolbar:button</child_name>
+	    <name>button2</name>
+	    <width>21</width>
+	    <height>21</height>
+	    <label>togglebutton2</label>
+	    <icon>blue.xpm</icon>
+	    <active>False</active>
+	  </widget>
+
+	  <widget>
+	    <class>GtkLabel</class>
+	    <name>label2</name>
+	    <label></label>
+	    <justify>GTK_JUSTIFY_CENTER</justify>
+	    <wrap>False</wrap>
+	    <xalign>0.5</xalign>
+	    <yalign>0.5</yalign>
 	    <xpad>0</xpad>
 	    <ypad>0</ypad>
-	    <xipad>0</xipad>
-	    <yipad>0</yipad>
-	  </child>
+	  </widget>
+
+	  <widget>
+	    <class>GtkToggleButton</class>
+	    <child_name>Toolbar:button</child_name>
+	    <name>button3</name>
+	    <width>21</width>
+	    <height>21</height>
+	    <label>togglebutton3</label>
+	    <icon>orange.xpm</icon>
+	    <active>False</active>
+	  </widget>
+
+	  <widget>
+	    <class>GtkLabel</class>
+	    <name>label3</name>
+	    <label></label>
+	    <justify>GTK_JUSTIFY_CENTER</justify>
+	    <wrap>False</wrap>
+	    <xalign>0.5</xalign>
+	    <yalign>0.5</yalign>
+	    <xpad>0</xpad>
+	    <ypad>0</ypad>
+	  </widget>
+
+	  <widget>
+	    <class>GtkToggleButton</class>
+	    <child_name>Toolbar:button</child_name>
+	    <name>button4</name>
+	    <width>21</width>
+	    <height>21</height>
+	    <label>togglebutton4</label>
+	    <icon>green.xpm</icon>
+	    <active>False</active>
+	  </widget>
+
+	  <widget>
+	    <class>GtkLabel</class>
+	    <name>label4</name>
+	    <label></label>
+	    <justify>GTK_JUSTIFY_CENTER</justify>
+	    <wrap>False</wrap>
+	    <xalign>0.5</xalign>
+	    <yalign>0.5</yalign>
+	    <xpad>0</xpad>
+	    <ypad>0</ypad>
+	  </widget>
+
+	  <widget>
+	    <class>GtkToggleButton</class>
+	    <child_name>Toolbar:button</child_name>
+	    <name>button5</name>
+	    <width>21</width>
+	    <height>21</height>
+	    <label>togglebutton5</label>
+	    <icon>purple.xpm</icon>
+	    <active>False</active>
+	  </widget>
+
+	  <widget>
+	    <class>GtkLabel</class>
+	    <name>label5</name>
+	    <label></label>
+	    <justify>GTK_JUSTIFY_CENTER</justify>
+	    <wrap>False</wrap>
+	    <xalign>0.5</xalign>
+	    <yalign>0.5</yalign>
+	    <xpad>0</xpad>
+	    <ypad>0</ypad>
+	  </widget>
+
+	  <widget>
+	    <class>GtkToggleButton</class>
+	    <child_name>Toolbar:button</child_name>
+	    <name>button6</name>
+	    <width>21</width>
+	    <height>21</height>
+	    <label>togglebutton5</label>
+	    <icon>navy.xpm</icon>
+	    <active>False</active>
+	  </widget>
+
+	  <widget>
+	    <class>GtkLabel</class>
+	    <name>label6</name>
+	    <label></label>
+	    <justify>GTK_JUSTIFY_CENTER</justify>
+	    <wrap>False</wrap>
+	    <xalign>0.5</xalign>
+	    <yalign>0.5</yalign>
+	    <xpad>0</xpad>
+	    <ypad>0</ypad>
+	  </widget>
+
+	  <widget>
+	    <class>GtkToggleButton</class>
+	    <child_name>Toolbar:button</child_name>
+	    <name>button7</name>
+	    <width>21</width>
+	    <height>21</height>
+	    <label>togglebutton7</label>
+	    <icon>brown.xpm</icon>
+	    <active>False</active>
+	  </widget>
+
+	  <widget>
+	    <class>GtkLabel</class>
+	    <name>label7</name>
+	    <label></label>
+	    <justify>GTK_JUSTIFY_CENTER</justify>
+	    <wrap>False</wrap>
+	    <xalign>0.5</xalign>
+	    <yalign>0.5</yalign>
+	    <xpad>0</xpad>
+	    <ypad>0</ypad>
+	  </widget>
 	</widget>
       </widget>
 
       <widget>
-	<class>GtkHButtonBox</class>
-	<name>hbuttonbox6</name>
-	<border_width>2</border_width>
-	<layout_style>GTK_BUTTONBOX_END</layout_style>
-	<spacing>30</spacing>
-	<child_min_width>85</child_min_width>
-	<child_min_height>27</child_min_height>
-	<child_ipad_x>7</child_ipad_x>
-	<child_ipad_y>0</child_ipad_y>
+	<class>GtkFixed</class>
+	<name>fixed1</name>
+	<width>444</width>
+	<height>17</height>
 	<child>
 	  <padding>0</padding>
 	  <expand>True</expand>
@@ -293,11 +243,62 @@
 
 	<widget>
 	  <class>GtkButton</class>
-	  <name>button89</name>
-	  <can_default>True</can_default>
+	  <name>button9</name>
+	  <x>409</x>
+	  <y>6</y>
+	  <width>23</width>
+	  <height>13</height>
 	  <can_focus>True</can_focus>
-	  <stock_button>GNOME_STOCK_BUTTON_CLOSE</stock_button>
+	  <signal>
+	    <name>clicked</name>
+	    <handler>on_button9_clicked</handler>
+	    <last_modification_time>Tue, 11 Dec 2001 10:19:36 GMT</last_modification_time>
+	  </signal>
+	  <label></label>
+	  <relief>GTK_RELIEF_NORMAL</relief>
 	</widget>
+
+	<widget>
+	  <class>GtkCheckButton</class>
+	  <name>checkbutton1</name>
+	  <border_width>2</border_width>
+	  <x>8</x>
+	  <y>0</y>
+	  <width>58</width>
+	  <height>24</height>
+	  <can_focus>True</can_focus>
+	  <signal>
+	    <name>toggled</name>
+	    <handler>checkbutton1_toggled</handler>
+	    <last_modification_time>Wed, 19 Dec 2001 03:01:18 GMT</last_modification_time>
+	  </signal>
+	  <signal>
+	    <name>clicked</name>
+	    <handler>checkbutton1_clicked</handler>
+	    <last_modification_time>Wed, 19 Dec 2001 07:16:54 GMT</last_modification_time>
+	  </signal>
+	  <label>scale</label>
+	  <active>False</active>
+	  <draw_indicator>True</draw_indicator>
+	</widget>
+      </widget>
+    </widget>
+
+    <widget>
+      <class>GtkFrame</class>
+      <name>frame8</name>
+      <width>450</width>
+      <height>17</height>
+      <label_xalign>0</label_xalign>
+      <shadow_type>GTK_SHADOW_ETCHED_IN</shadow_type>
+      <child>
+	<padding>0</padding>
+	<expand>True</expand>
+	<fill>True</fill>
+      </child>
+
+      <widget>
+	<class>Placeholder</class>
       </widget>
     </widget>
   </widget>

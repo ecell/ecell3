@@ -48,10 +48,14 @@ class OsogoSession( SingleSession ):
         self.theDriver = Driver.OsogoDriver( srfilename )
         self.theModelInterpreter = ModelInterpreter.ModelInterpreter( self.theDriver )
         self.theMessageWindow = aMessageWindow
+        self.theRunningFlag = 0
+
 
     def printMessage( self, aMessageString ):
 
         self.theMessageWindow.printMessage( aMessageString )
+
+
 
 
 class LoopSession( Session ):

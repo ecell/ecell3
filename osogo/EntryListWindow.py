@@ -45,7 +45,9 @@ class EntryListWindow(Window):
 
         aPManager = self.theMainWindow.thePluginManager
         self.thePropertyWindow = aPManager.createInstance( 'PropertyWindow',
-                                                           (),'top_vbox' )
+                                                           [(4, '/', '/', '')],'top_vbox' )
+
+#        self.theSystemTree.select_item( -1 )
 
         aPropertyWindowTopVBox = self.thePropertyWindow['top_vbox']
         self['property_frame'].add( aPropertyWindowTopVBox )
@@ -54,6 +56,8 @@ class EntryListWindow(Window):
         self.update()
 
     def update( self ):
+        self.theSystemTree.clear_items(0, 999)
+        self.theEntryList.clear_items(0, 999)
         aRootSystemFullID = createFullID( 'System:/:/' )
         self.constructTree( self.theSystemTree, aRootSystemFullID )
         self.updateEntryList()

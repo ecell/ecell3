@@ -8,24 +8,23 @@ from ecssupport import *
 
 class LoggerWindow(Window):
 
-    def __init__( self, aMainWindow ):
+    def __init__( self, session ):
 
         Window.__init__( self, 'LoggerWindow.glade' )
         
-        self.theMainWindow = aMainWindow
-        self.theFullPNList = self.theMainWindow.theDriver.getLoggerList()
+        self.theSession = session
         self.theEntryList = self['clist3']
         self.theEntryList.connect( 'select_row', self.selectPropertyName )
         self.theList = []
         self.initialize()
-        self.addHandlers( {'on_button121_clicked':self.saveAllData} )
-        self.addHandlers( {'on_exit_activate' : self.closeWindow} )
+        self.addHandlers( { 'on_button121_clicked' : self.saveAllData, 
+                            'on_exit_activate' : self.closeWindow } )
         self.theSelectedFullPNList = self.theFullPNList
 
 
     def initialize( self ):
 
-        self.setEntryList()
+        self.update()
         
 
     def saveAllData( self, obj ):
@@ -70,23 +69,24 @@ class LoggerWindow(Window):
             self.theSelectedFullPNList = self.theFullPNList
 
 
-    def setEntryList( self ):
-
-        for fpn in self.theFullPNList :
-            theFullPN = createFullPNString( fpn )
-            aLogger = self.theMainWindow.theDriver.getLogger( fpn )
-            start = aLogger.getStartTime()
-            end = aLogger.getEndTime()
-            aList = [ theFullPN, start, end ]
-            aList = map( str, aList )
-            self.theList.append( aList )
-
-        self.update()
-
-
     def update( self ):
 
+        self.theFullPNList = self.theSession.getLoggerList()
+
         self.theEntryList.clear()
+        self.theList = []
+
+        for aFullPNString in self.theFullPNList :
+            aFullPN = createFullPN( aFullPNString )
+            aLogger = self.theSession.getLogger( aFullPN )
+            start = str( aLogger.getStartTime() )
+            if self.theSession.theRunningFlag:
+                end = 'running'
+            else:
+                end = str( aLogger.getEndTime() )
+            aList = [ aFullPNString, start, end ]
+            self.theList.append( aList )
+
         for aValue in self.theList:
             self.theEntryList.append( aValue )
 

@@ -37,13 +37,8 @@ print '----------------- LoggerList -------------------'
 print aDriver.getLoggerList()
 print '------------------------------------'
 
-aSession.run( 100 )
-
-print aDriver.getCurrentTime()
-
-aDriver.printProperty( ( SUBSTANCE, '/CELL/CYTOPLASM', 'S', 'Quantity' ) )
-aDriver.printProperty( ( SUBSTANCE, '/CELL/CYTOPLASM', 'P', 'Quantity' ) )
-aDriver.printProperty( ( SUBSTANCE, '/CELL/CYTOPLASM', 'E', 'Quantity' ) )
+print 'start = ', loggerS.getStartTime()
+print 'end = ', loggerS.getEndTime()
 
 aSession.run( 100 )
 
@@ -53,4 +48,19 @@ aDriver.printProperty( ( SUBSTANCE, '/CELL/CYTOPLASM', 'S', 'Quantity' ) )
 aDriver.printProperty( ( SUBSTANCE, '/CELL/CYTOPLASM', 'P', 'Quantity' ) )
 aDriver.printProperty( ( SUBSTANCE, '/CELL/CYTOPLASM', 'E', 'Quantity' ) )
 
-print loggerS.getData()
+aSession.run( 100 )
+
+print aDriver.getCurrentTime()
+
+aDriver.printProperty( ( SUBSTANCE, '/CELL/CYTOPLASM', 'S', 'Quantity' ) )
+aDriver.printProperty( ( SUBSTANCE, '/CELL/CYTOPLASM', 'P', 'Quantity' ) )
+aDriver.printProperty( ( SUBSTANCE, '/CELL/CYTOPLASM', 'E', 'Quantity' ) )
+
+#print loggerS.getData()
+
+print 'start = ', loggerS.getStartTime()
+print 'end = ', loggerS.getEndTime()
+
+
+
+

@@ -153,7 +153,15 @@ namespace libecs
   
   RealCref Logger::getStartTime( void ) const
   {
-    return (*theDataPointVector.begin())->getTime();
+    if(!theDataPointVector.empty())
+      {
+	return (*theDataPointVector.begin())->getTime();
+      }
+    else
+      {
+	static const Real aZero( 0.0 );
+	return aZero;
+      }
   }
   
   
@@ -161,7 +169,15 @@ namespace libecs
   
   RealCref Logger::getEndTime( void ) const
   {
-    return theDataPointVector.back()->getTime();
+    if(!theDataPointVector.empty())
+      {
+	return theDataPointVector.back()->getTime();
+      }
+    else
+      {
+	static const Real aZero( 0.0 );
+	return aZero;
+      }
   }
   
 

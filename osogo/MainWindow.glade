@@ -150,7 +150,7 @@
 	      </signal>
 	      <label>_Message Window</label>
 	      <active>False</active>
-	      <always_show_toggle>False</always_show_toggle>
+	      <always_show_toggle>True</always_show_toggle>
 	    </widget>
 
 	    <widget>
@@ -163,7 +163,7 @@
 	      </signal>
 	      <label>_Interface Window</label>
 	      <active>False</active>
-	      <always_show_toggle>False</always_show_toggle>
+	      <always_show_toggle>True</always_show_toggle>
 	    </widget>
 
 	    <widget>
@@ -176,7 +176,7 @@
 	      </signal>
 	      <label>_Palette Window</label>
 	      <active>True</active>
-	      <always_show_toggle>False</always_show_toggle>
+	      <always_show_toggle>True</always_show_toggle>
 	    </widget>
 	  </widget>
 	</widget>
@@ -589,31 +589,31 @@
 	      <tooltips>True</tooltips>
 
 	      <widget>
-		<class>GtkButton</class>
+		<class>GtkToggleButton</class>
 		<child_name>Toolbar:button</child_name>
-		<name>entry_button</name>
-		<width>60</width>
+		<name>entry_list</name>
 		<signal>
-		  <name>clicked</name>
-		  <handler>entry_button_clicked</handler>
-		  <last_modification_time>Wed, 15 Aug 2001 07:39:45 GMT</last_modification_time>
+		  <name>toggled</name>
+		  <handler>entrylist_togglebutton_toggled</handler>
+		  <last_modification_time>Wed, 30 Jan 2002 12:50:48 GMT</last_modification_time>
 		</signal>
-		<label>Entry</label>
+		<label>EntryList</label>
 		<icon>icon_entry.xpm</icon>
+		<active>False</active>
 	      </widget>
 
 	      <widget>
-		<class>GtkButton</class>
+		<class>GtkToggleButton</class>
 		<child_name>Toolbar:button</child_name>
-		<name>logger_button</name>
-		<width>60</width>
+		<name>logger_togglebutton</name>
 		<signal>
-		  <name>clicked</name>
-		  <handler>logger_button_clicked</handler>
-		  <last_modification_time>Wed, 15 Aug 2001 07:39:51 GMT</last_modification_time>
+		  <name>toggled</name>
+		  <handler>logger_togglebutton_toggled</handler>
+		  <last_modification_time>Wed, 30 Jan 2002 10:47:42 GMT</last_modification_time>
 		</signal>
 		<label>Logger</label>
 		<icon>icon_logger.xpm</icon>
+		<active>False</active>
 	      </widget>
 
 	      <widget>

@@ -14,8 +14,8 @@ class PropertyWindow(PluginWindow):
         self.openWindow()
         PluginWindow.initialize( self, root )
         self.initialize()
-        
-        if len( self.theFullPNList() ) > 1:
+
+        if len( self.theFullPNList() ) > 1 and root != 'top_vbox':
             i = 1
             preFullID = self.theFullID()
             aClassName = self.__class__.__name__

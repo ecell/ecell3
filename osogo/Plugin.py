@@ -38,11 +38,12 @@ class PluginModule:
 
 class PluginManager:
 
-    def __init__( self, session ):
+    def __init__( self, session, loggerwindow ):
         self.thePluginMap = {}
         self.theInstanceList = []
         self.theSession = session
         self.theDriver = self.theSession.theDriver
+        self.theLoggerWindow = loggerwindow
         
     def createInstance( self, classname, data, root=None, parent=None ):
         try:
@@ -81,6 +82,9 @@ class PluginManager:
 
     def removeInstance( self, instance ):
         self.theInstanceList.remove( instance )
+
+    def updateLoggerWindow( self ):
+        self.theLoggerWindow.update()
 
         
 if __name__ == "__main__":

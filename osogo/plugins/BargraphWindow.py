@@ -21,7 +21,8 @@ class BargraphWindow( PluginWindow ):
             self.initialize()
 
         else:
-            self.theSession.printMessage( "not numerical data\n" )
+            aFullPNString = createFullPNString( self.theFullPN() )
+            self.theSession.printMessage( "%s: not numerical data\n" % aFullPNString )
 
         if len( self.theFullPNList() ) > 1:
             aClassName = self.__class__.__name__

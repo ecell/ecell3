@@ -24,7 +24,6 @@ class PluginWindow(ViewWindow):
         self.theDriver = self.theSession.theDriver
         self.theRawFullPNList = data
 
-
     def initialize( self, root=None ):
 
         aMenuWindow = Window( 'PluginWindowPopupMenu.glade', root='menu' )
