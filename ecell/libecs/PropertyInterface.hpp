@@ -115,8 +115,8 @@ namespace libecs
     const UVariableVectorRCPtr getPropertyList() const;
     const UVariableVectorRCPtr getPropertyAttributes() const;
 
-    void appendSlot( PropertySlotPtr );
-    void deleteSlot( StringCref keyword );
+    void registerSlot( PropertySlotPtr );
+    void removeSlot( StringCref keyword );
 
     static PropertySlotMakerPtr getPropertySlotMaker();
 

@@ -51,29 +51,29 @@ namespace libecs
 
   void Substance::makeSlots()
   {
-    appendSlot( getPropertySlotMaker()->
-		createPropertySlot( "Quantity",*this,
-				    Type2Type<Real>(),
-				    &Substance::setQuantity,
-				    &Substance::getQuantity ) );
+    registerSlot( getPropertySlotMaker()->
+		  createPropertySlot( "Quantity",*this,
+				      Type2Type<Real>(),
+				      &Substance::setQuantity,
+				      &Substance::getQuantity ) );
 
-    appendSlot( getPropertySlotMaker()->
-		createPropertySlot( "Concentration",*this,
-				    Type2Type<Real>(),
-				    NULLPTR,
-				    &Substance::getConcentration ) );
+    registerSlot( getPropertySlotMaker()->
+		  createPropertySlot( "Concentration",*this,
+				      Type2Type<Real>(),
+				      NULLPTR,
+				      &Substance::getConcentration ) );
 
-    appendSlot( getPropertySlotMaker()->
-		createPropertySlot( "Velocity",*this,
-				    Type2Type<Real>(),
-				    &Substance::addVelocity,
-				    &Substance::getVelocity ) );
+    registerSlot( getPropertySlotMaker()->
+		  createPropertySlot( "Velocity",*this,
+				      Type2Type<Real>(),
+				      &Substance::addVelocity,
+				      &Substance::getVelocity ) );
 
-    appendSlot( getPropertySlotMaker()->
-		createPropertySlot( "AccumulatorClass",*this,
-				    Type2Type<UVariableVectorRCPtr>(),
-				    &Substance::setAccumulatorClass,
-				    &Substance::getAccumulatorClass ) );
+    registerSlot( getPropertySlotMaker()->
+		  createPropertySlot( "AccumulatorClass",*this,
+				      Type2Type<UVariableVectorRCPtr>(),
+				      &Substance::setAccumulatorClass,
+				      &Substance::getAccumulatorClass ) );
   }
 
   void Substance::setAccumulatorClass( UVariableVectorRCPtrCref aMessage )

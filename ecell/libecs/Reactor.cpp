@@ -44,23 +44,23 @@ namespace libecs
 
   void Reactor::makeSlots()
   {
-    appendSlot( getPropertySlotMaker()->
-		createPropertySlot( "Reactant", *this, 
-				    Type2Type<UVariableVectorRCPtr>(),
-				    &Reactor::setReactant,
-				    NULLPTR ) );
+    registerSlot( getPropertySlotMaker()->
+		  createPropertySlot( "Reactant", *this, 
+				      Type2Type<UVariableVectorRCPtr>(),
+				      &Reactor::setReactant,
+				      NULLPTR ) );
 
-    appendSlot( getPropertySlotMaker()->
-		createPropertySlot( "ReactantList", *this, 
-				    Type2Type<UVariableVectorRCPtr>(),
-				    NULLPTR,
-				    &Reactor::getReactantList ) );
+    registerSlot( getPropertySlotMaker()->
+		  createPropertySlot( "ReactantList", *this, 
+				      Type2Type<UVariableVectorRCPtr>(),
+				      NULLPTR,
+				      &Reactor::getReactantList ) );
 
-    appendSlot( getPropertySlotMaker()->
-		createPropertySlot( "Activity", *this, 
-				    Type2Type<Real>(),
-				    &Reactor::setActivity,
-				    &Reactor::getActivity ) );
+    registerSlot( getPropertySlotMaker()->
+		  createPropertySlot( "Activity", *this, 
+				      Type2Type<Real>(),
+				      &Reactor::setActivity,
+				      &Reactor::getActivity ) );
   }
 
   void Reactor::setReactant( UVariableVectorRCPtrCref aMessage )

@@ -57,35 +57,35 @@ namespace libecs
   void Entity::makeSlots()
   {
 
-    appendSlot( getPropertySlotMaker()->
-		createPropertySlot( "ID", *this, 
-				    Type2Type<String>(),
-				    NULLPTR,
-				    &Entity::getID ) );
+    registerSlot( getPropertySlotMaker()->
+		  createPropertySlot( "ID", *this, 
+				      Type2Type<String>(),
+				      NULLPTR,
+				      &Entity::getID ) );
 
-    appendSlot( getPropertySlotMaker()->
-		createPropertySlot( "FullID", *this, 
-				    Type2Type<String>(),
-				    NULLPTR,
-				    &Entity::getFullIDString ) );
+    registerSlot( getPropertySlotMaker()->
+		  createPropertySlot( "FullID", *this, 
+				      Type2Type<String>(),
+				      NULLPTR,
+				      &Entity::getFullIDString ) );
     
-    appendSlot( getPropertySlotMaker()->
-		createPropertySlot( "Name", *this, 
-				    Type2Type<String>(),
-				    NULLPTR,
-				    &Entity::getName ) );
+    registerSlot( getPropertySlotMaker()->
+		  createPropertySlot( "Name", *this, 
+				      Type2Type<String>(),
+				      NULLPTR,
+				      &Entity::getName ) );
 
-    appendSlot( getPropertySlotMaker()->
-		createPropertySlot( "Activity", *this, 
-				    Type2Type<Real>(),
-				    &Entity::setActivity,
-				    &Entity::getActivity ) );
+    registerSlot( getPropertySlotMaker()->
+		  createPropertySlot( "Activity", *this, 
+				      Type2Type<Real>(),
+				      &Entity::setActivity,
+				      &Entity::getActivity ) );
 
-    appendSlot( getPropertySlotMaker()->
-		createPropertySlot( "ActivityPerSecond", *this,
-				    Type2Type<Real>(),
-				    NULLPTR,
-				    &Entity::getActivityPerSecond ) );
+    registerSlot( getPropertySlotMaker()->
+		  createPropertySlot( "ActivityPerSecond", *this,
+				      Type2Type<Real>(),
+				      NULLPTR,
+				      &Entity::getActivityPerSecond ) );
   }
 
   const Real Entity::getActivity() const

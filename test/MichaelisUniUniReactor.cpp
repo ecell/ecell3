@@ -30,19 +30,19 @@ MichaelisUniUniReactor::~MichaelisUniUniReactor()
 
 void MichaelisUniUniReactor::makeSlots()
 {
-  appendSlot( getPropertySlotMaker()->
-	      createPropertySlot( "KmS", 
-				  *this,
-				  Type2Type<Real>(),
-				  &MichaelisUniUniReactor::setKmS,
-				  &MichaelisUniUniReactor::getKmS ) );
+  registerSlot( getPropertySlotMaker()->
+		createPropertySlot( "KmS", 
+				    *this,
+				    Type2Type<Real>(),
+				    &MichaelisUniUniReactor::setKmS,
+				    &MichaelisUniUniReactor::getKmS ) );
 
-  appendSlot( getPropertySlotMaker()->
-	      createPropertySlot( "KcF",
-				  *this,
-				  Type2Type<Real>(),
-				  &MichaelisUniUniReactor::setKcF,
-				  &MichaelisUniUniReactor::getKcF ) );
+  registerSlot( getPropertySlotMaker()->
+		createPropertySlot( "KcF",
+				    *this,
+				    Type2Type<Real>(),
+				    &MichaelisUniUniReactor::setKcF,
+				    &MichaelisUniUniReactor::getKcF ) );
 
 }
 

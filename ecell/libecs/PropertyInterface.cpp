@@ -52,25 +52,25 @@ namespace libecs
   void PropertyInterface::makeSlots()
   {
 
-    appendSlot( getPropertySlotMaker()->
-		createPropertySlot( "ClassName", *this, 
-				    Type2Type<String>(),
-				    NULLPTR,
-				    &PropertyInterface::getClassNameString ) );
-
-    appendSlot( getPropertySlotMaker()->
-		createPropertySlot( "PropertyList",*this,
-				    Type2Type<UVariableVectorRCPtr>(),
-				    NULLPTR,
-				    &PropertyInterface::getPropertyList ) );
-
-    appendSlot( getPropertySlotMaker()->
-		createPropertySlot( "PropertyAttributes",*this,
-				    Type2Type<UVariableVectorRCPtr>(),
-				    NULLPTR,
-				    &PropertyInterface::getPropertyAttributes 
-				    ) );
-
+    registerSlot( getPropertySlotMaker()->
+		  createPropertySlot( "ClassName", *this, 
+				      Type2Type<String>(),
+				      NULLPTR,
+				      &PropertyInterface::getClassNameString ) );
+    
+    registerSlot( getPropertySlotMaker()->
+		  createPropertySlot( "PropertyList",*this,
+				      Type2Type<UVariableVectorRCPtr>(),
+				      NULLPTR,
+				      &PropertyInterface::getPropertyList ) );
+    
+    registerSlot( getPropertySlotMaker()->
+		  createPropertySlot( "PropertyAttributes",*this,
+				      Type2Type<UVariableVectorRCPtr>(),
+				      NULLPTR,
+				      &PropertyInterface::getPropertyAttributes 
+				      ) );
+    
 
   }
 
@@ -128,7 +128,7 @@ namespace libecs
       }
   }
 
-  void PropertyInterface::appendSlot( PropertySlotPtr slot )
+  void PropertyInterface::registerSlot( PropertySlotPtr slot )
   {
     String keyword = slot->getName();
     if( thePropertySlotMap.find( keyword ) != thePropertySlotMap.end() )
@@ -141,7 +141,7 @@ namespace libecs
     thePropertySlotMap[ keyword ] = slot;
   }
 
-  void PropertyInterface::deleteSlot( StringCref keyword )
+  void PropertyInterface::removeSlot( StringCref keyword )
   {
     if( thePropertySlotMap.find( keyword ) == thePropertySlotMap.end() )
       {

@@ -54,41 +54,41 @@ namespace libecs
   void System::makeSlots()
   {
 
-    appendSlot( getPropertySlotMaker()->
-		createPropertySlot( "SystemList", *this,
-				    Type2Type<UVariableVectorRCPtr>(),
-				    NULLPTR,
-				    &System::getSystemList ) );
+    registerSlot( getPropertySlotMaker()->
+		  createPropertySlot( "SystemList", *this,
+				      Type2Type<UVariableVectorRCPtr>(),
+				      NULLPTR,
+				      &System::getSystemList ) );
 
-    appendSlot( getPropertySlotMaker()->
-		createPropertySlot( "SubstanceList", *this,
-				    Type2Type<UVariableVectorRCPtr>(),
-				    NULLPTR,
-				    &System::getSubstanceList ) );
+    registerSlot( getPropertySlotMaker()->
+		  createPropertySlot( "SubstanceList", *this,
+				      Type2Type<UVariableVectorRCPtr>(),
+				      NULLPTR,
+				      &System::getSubstanceList ) );
 
-    appendSlot( getPropertySlotMaker()->
-		createPropertySlot( "ReactorList", *this,
-				    Type2Type<UVariableVectorRCPtr>(),
-				    NULLPTR,
-				    &System::getReactorList ) );
+    registerSlot( getPropertySlotMaker()->
+		  createPropertySlot( "ReactorList", *this,
+				      Type2Type<UVariableVectorRCPtr>(),
+				      NULLPTR,
+				      &System::getReactorList ) );
 
-    appendSlot( getPropertySlotMaker()->
-		createPropertySlot( "StepperID", *this,
-				    Type2Type<UVariableVectorRCPtr>(),
-				    &System::setStepperID,
-				    &System::getStepperID ) );
+    registerSlot( getPropertySlotMaker()->
+		  createPropertySlot( "StepperID", *this,
+				      Type2Type<UVariableVectorRCPtr>(),
+				      &System::setStepperID,
+				      &System::getStepperID ) );
 
-    appendSlot( getPropertySlotMaker()->
-		createPropertySlot( "Volume", *this,
-				    Type2Type<Real>(),
-				    &System::setVolume, 
-				    &System::getVolume ) );
+    registerSlot( getPropertySlotMaker()->
+		  createPropertySlot( "Volume", *this,
+				      Type2Type<Real>(),
+				      &System::setVolume, 
+				      &System::getVolume ) );
 
-    appendSlot( getPropertySlotMaker()->
-		createPropertySlot( "StepInterval", *this,
-				    Type2Type<Real>(),
-				    &System::setStepInterval, 
-				    &System::getStepInterval ) );
+    registerSlot( getPropertySlotMaker()->
+		  createPropertySlot( "StepInterval", *this,
+				      Type2Type<Real>(),
+				      &System::setStepInterval, 
+				      &System::getStepInterval ) );
   }
 
 
@@ -275,7 +275,7 @@ namespace libecs
       {
 	THROW_EXCEPTION( NotFound, 
 			 "[" + getFullID().getString() + 
-			"]: Reactor [" + anID + 
+			 "]: Reactor [" + anID + 
 			 "] not found in this System." );
       }
 
@@ -344,7 +344,8 @@ namespace libecs
       {
 	THROW_EXCEPTION( NotFound,
 			 "[" + getFullID().getString() + 
-			"]: System [" + anID + "] not found in this System." );
+			 "]: System [" + anID + 
+			 "] not found in this System." );
       }
     return i->second;
   }
