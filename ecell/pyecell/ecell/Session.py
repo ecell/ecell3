@@ -15,7 +15,7 @@ class Session:
 
     def __init__( self, aSimulator ):
 
-        self.thePrintMethod = self.plainPrintMethod
+        self.thePrintMethod = self.__plainPrintMethod
         self.theSimulator = aSimulator
 
     def run( self , time='' ):
@@ -66,7 +66,7 @@ class Session:
                 # from [Substance:/CELL/CYTOPLASM:E:Quantity]
                 # to   [CYTOPLASM-E-Quantity]
                 # ---------------------------------------------\----
-                aFileName=split(join(split(aFullPNString,':')[1\:],'-'),'/')[-1]
+                aFileName=split(join(split(aFullPNString,':')[1:],'-'),'/')[-1]
                 
                 aECDDataFile = ECDDataFile()
                 aECDDataFile.setFileName(aFileName)
