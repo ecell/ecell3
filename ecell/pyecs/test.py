@@ -2,6 +2,11 @@
 
 import ecs
 
+ENTITY     = 1
+SUBSTANCE  = 2
+REACTOR    = 3
+SYSTEM     = 4
+
 def printProperty( sim, fullpropertyname ):
     value = sim.getProperty( fullpropertyname )
     print fullpropertyname, '\t=\t', value
@@ -20,56 +25,56 @@ def printList( sim, primitivetype, systempath,list ):
 print 'create Simulator instance.'
 s = ecs.Simulator()
 
-s.createEntity( 'System', ( 'System', '/', 'CYTOPLASM' ), 'cytoplasm' )
+s.createEntity( 'System', ( SYSTEM, '/', 'CYTOPLASM' ), 'cytoplasm' )
 
 print 'make substances...'
-s.createEntity( 'Substance', ( 'Substance', '/', 'A' ), 'substance A' )
-s.createEntity( 'Substance', ( 'Substance', '/', 'B' ), 'substance B' )
-s.createEntity( 'Substance', ( 'Substance', '/', 'C' ), 'substance C' )
+s.createEntity( 'Substance', ( SUBSTANCE, '/', 'A' ), 'substance A' )
+s.createEntity( 'Substance', ( SUBSTANCE, '/', 'B' ), 'substance B' )
+s.createEntity( 'Substance', ( SUBSTANCE, '/', 'C' ), 'substance C' )
 
 
 print 'make reactors...'
 try:
     s.createEntity('ConstantActivityReactor',
-                   ( 'Reactor', '/', 'RC1' ),
+                   ( REACTOR, '/', 'RC1' ),
                    'constant reactor' )
 except:
     print 'cannot instantiate ConstantActivityReactor'
     
 print 'set Substance:/:A Quantity = 30'
-s.setProperty( ( 'Substance', '/', 'A', 'Quantity' ), (30,) )
+s.setProperty( ( SUBSTANCE, '/', 'A', 'Quantity' ), (30,) )
 
 print 'initialize()...'
 s.initialize()
 
-printAllProperties( s, ( 'System', '/', 'CYTOPLASM' ) )
+printAllProperties( s, ( SYSTEM, '/', 'CYTOPLASM' ) )
 
 
-substancelist = s.getProperty( ( 'System', '/', '/', 'SubstanceList' ) )
+substancelist = s.getProperty( ( SYSTEM, '/', '/', 'SubstanceList' ) )
 
-printList( s, 'Substance', '/' , substancelist )
+printList( s, SUBSTANCE, '/' , substancelist )
 
 print
 
-printProperty( s, ( 'Substance', '/', 'A', 'Quantity' ) )
+printProperty( s, ( SUBSTANCE, '/', 'A', 'Quantity' ) )
 print 'changing Quantity of Substance:/:A...'
-s.setProperty( ( 'Substance', '/', 'A', 'Quantity' ), (1, ) )
-printProperty( s, ( 'Substance', '/', 'A', 'Quantity' ) )
+s.setProperty( ( SUBSTANCE, '/', 'A', 'Quantity' ), (1, ) )
+printProperty( s, ( SUBSTANCE, '/', 'A', 'Quantity' ) )
 
 try:
-    printAllProperties( s, ( 'Reactor', '/', 'RC1' ) )
+    printAllProperties( s, ( REACTOR, '/', 'RC1' ) )
 except:
     pass
 
 print 'step()...'
-printProperty( s, ( 'System', '/', '/', 'CurrentTime' ) )
+printProperty( s, ( SYSTEM, '/', '/', 'CurrentTime' ) )
 s.step()
 
-printProperty( s, ( 'System', '/', '/', 'CurrentTime' ) )
+printProperty( s, ( SYSTEM, '/', '/', 'CurrentTime' ) )
 s.step()
 
-printProperty( s, ( 'System', '/', '/', 'CurrentTime' ) )
+printProperty( s, ( SYSTEM, '/', '/', 'CurrentTime' ) )
 s.step()
 
-printProperty( s, ( 'System', '/', '/', 'CurrentTime' ) )
+printProperty( s, ( SYSTEM, '/', '/', 'CurrentTime' ) )
 s.step()

@@ -46,7 +46,8 @@ namespace libecs
 
   StringCref PrimitiveTypeStringOf( PrimitiveType type );
 
-  PrimitiveType PrimitiveTypeOf( StringCref typestring );
+  PrimitiveType PrimitiveTypeFromString( StringCref typestring );
+  PrimitiveType PrimitiveTypeFromNumber( Int number );
 
   inline StringCref  PrimitiveTypeStringOfEntity()
   {

@@ -37,7 +37,7 @@
 namespace libecs
 {
 
-  PrimitiveType PrimitiveTypeOf( StringCref typestring )
+  PrimitiveType PrimitiveTypeFromString( StringCref typestring )
   {
     if( typestring == PrimitiveTypeStringOfSubstance() )
       {
@@ -61,6 +61,16 @@ namespace libecs
 				    "can't convert typestring [" + typestring
 				    + "] to PrimitiveType." );
       }
+  }
+
+  PrimitiveType PrimitiveTypeFromNumber( Int number )
+  {
+    if( number > 4 || number <= 0 )
+      {
+	throw InvalidPrimitiveType( __PRETTY_FUNCTION__, 
+				    "Invalid PrimitiveType number" );
+      }
+
   }
 
   StringCref PrimitiveTypeStringOf( PrimitiveType type )

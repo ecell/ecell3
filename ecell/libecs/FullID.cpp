@@ -147,7 +147,7 @@ namespace libecs
 
     String aTypeString( aString.substr( aFieldStart, 
 					     aFieldEnd - aFieldStart ) );
-    thePrimitiveType = PrimitiveTypeOf( aTypeString );
+    thePrimitiveType = PrimitiveTypeFromString( aTypeString );
 
     aFieldStart = aFieldEnd + 1;
     aFieldEnd = aString.find_first_of( DELIMITER, aFieldStart );
