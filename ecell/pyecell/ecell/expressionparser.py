@@ -20,7 +20,7 @@ import types
 import lex
 import yacc
 
-import libsbml
+#import libsbml
 
 
 tokens = (
@@ -317,11 +317,11 @@ def initializePLY():
     lextabname = "expressionlextab"
     yacctabname = "expressionparsetab"
 
-#    lex.lex( lextab=lextabname, optimize=1 )
-    lex.lex()
+    lex.lex( lextab=lextabname, optimize=1 )
+    #lex.lex()
 
-#    return yacc.yacc( optimize=1, tabmodule=yacctabname )
-    return yacc.yacc()
+    yacc.yacc( tabmodule=yacctabname )
+    #return yacc.yacc()
 
 
 
@@ -356,13 +356,17 @@ def getVariableReferenceId( aVariableReference ):
 
 
 
-def convertExpression( anExpression, aVariableReferenceListObject, aReactionPathObject ):
+def convertExpression( anExpression, aVariableReferenceListObject, aReactionPathObject, debug=0 ):
+  
+    global aVariableReferenceList
+    global aReactionPath
+    aVariableReferenceList = aVariableReferenceListObject
+    aReactionPath = aReactionPathObject
+    
+    aLexer = lex.lex( lextab="expressionlextab" )
+    
+    aParser = yacc.yacc( optimize=1, tabmodule="expressionparsetab" )
+    return aParser.parse( anExpression, lexer=aLexer, debug=debug )
 
-     global aVariableReferenceList
-     global aReactionPath
-     aVariableReferenceList = aVariableReferenceListObject
-     aReactionPath = aReactionPathObject
-
-     initializePLY()
-
-     return yacc.parse( anExpression )
+if __name__ == '__main__':
+    initializePLY()
