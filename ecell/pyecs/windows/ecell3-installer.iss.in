@@ -8,7 +8,7 @@
 ;    - #define FullInstall : compile E-Cell setup together with Python and GTK
 ;    - ;#define FullInstall : compile E-Cell setup only
 ; 3. Set the target architecture by commenting and uncommenting the appropriate Arch variable
-;    - #define Arch     'i686'
+;    - #define Arch     'sse2'
 ;    - #define Arch     'i386'
 ; 4. Define the filenames of PythonSetup and GtkSetup if newer versions are used
 ; 5. Under [Setup], set Compression=None during development/test compilation.
@@ -21,7 +21,7 @@
 
 #define FullInstall
 ;#define Arch          'i386'
-#define Arch          'i686'
+#define Arch          'sse2'
 #define Version       '@VERSION@'
 #define PythonVersion '@PYTHON_VERSION@'
 #define GtkVersion    '2.4'
@@ -34,7 +34,7 @@
 #define DlltoolFile   'dlltool.exe'
 
 #ifdef FullInstall
-# define Filename      '-python+gtk'
+# define Filename      '-gtk+python'
 #else
 # define Filename      ''
 #endif
@@ -513,12 +513,12 @@ begin
                 if CheckListBox.Checked[PythonCheck] then begin
                   MsgBox('Python version ' + PYTHON_VERSION + ' or newer was not found on your computer.' #13#10
                          'Please get it from http://www.python.org/ and install it' #13#10
-                         'or use the ecell-' + ECELL_VERSION + '-python+gtk.' + ARCHITECTURE + '.exe installer.', mbInformation, MB_OK);
+                         'or use the ecell-' + ECELL_VERSION + '-gtk+python.' + ARCHITECTURE + '.exe installer.', mbInformation, MB_OK);
                 end;
                 if CheckListBox.Checked[GtkCheck] then begin
                   MsgBox('GTK+ Runtime version ' + GTK_VERSION + ' or newer was not found on your computer.' #13#10
                          'Please get it from http://gladewin32.sourceforge.net/ and install it' #13#10
-                         'or use the ecell-' + ECELL_VERSION + '-python+gtk.' + ARCHITECTURE + '.exe installer.', mbInformation, MB_OK);
+                         'or use the ecell-' + ECELL_VERSION + '-gtk+python.' + ARCHITECTURE + '.exe installer.', mbInformation, MB_OK);
                 end;
               end;
             end;
