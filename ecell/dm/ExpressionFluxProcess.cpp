@@ -60,9 +60,7 @@ LIBECS_DM_CLASS( ExpressionFluxProcess, ExpressionProcessBase )
   
   virtual void process()
     { 
-      theStackMachine.execute( theCompiledCode );
-
-      setFlux( theStackMachine.top() );
+      setFlux( theStackMachine.execute( theCompiledCode ) );
     }
 
 };
