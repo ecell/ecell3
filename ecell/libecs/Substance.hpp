@@ -63,8 +63,6 @@ namespace libecs
     Substance();
     virtual ~Substance();
 
-    static SubstancePtr createInstance() { return new Substance; }
-
     virtual const EntityType getEntityType() const
     {
       return EntityType( EntityType::SUBSTANCE );
@@ -74,10 +72,7 @@ namespace libecs
     /**
        @return the number of molecules.
     */
-    const Real getQuantity() const
-    { 
-      return theQuantity; 
-    }
+    virtual const Real getQuantity() const = 0;
 
     /**
        Fix quantity of this Substance.
@@ -113,26 +108,76 @@ namespace libecs
 
     const Real getConcentration() const
     {
-      return theQuantity * getSuperSystem()->getConcentrationFactor();
+      return getQuantity() * getSuperSystem()->getConcentrationFactor();
     }
 
     /**
        Initializes this substance. 
        Called at startup.
     */
-    void initialize();
+    virtual void initialize();
+
+    /**
+       Returns activity value of a Substance object.
+       The activity is current velocity.
+       @see getActivityPerSecond
+       @return activity value of Substance in Real.
+    */
+
+    virtual const Real getActivity() = 0;
+
+    virtual void setQuantity( RealCref aQuantity ) = 0;
+
+    virtual StringLiteral getClassName() const { return "Substance"; }
+
+  protected:
+
+    void makeSlots();
+
+  protected:
+
+    bool theFixed;
+  };
+
+
+
+  class VariableSubstance 
+    : 
+    public Substance
+  {
+
+  public:
+
+    VariableSubstance();
+    virtual ~VariableSubstance();
+
+    static SubstancePtr createInstance() { return new VariableSubstance; }
+
+    /**
+       @return the number of molecules.
+    */
+    virtual const Real getQuantity() const
+    { 
+      return theQuantity; 
+    }
+
+    /**
+       Initializes this substance. 
+       Called at startup.
+    */
+    virtual void initialize();
 
     /**
        Clear phase.
        Then call clear() of the integrator.
     */
 
-    void clear()
+    virtual void clear()
     { 
       theVelocity = 0.0; 
     }
 
-    void setVelocity( RealCref aVelocity )
+    virtual void setVelocity( RealCref aVelocity )
     {
       theVelocity = aVelocity;
     }
@@ -140,7 +185,7 @@ namespace libecs
     /**
        @return current velocity value in (number of molecules)/(step)
     */
-    const Real getVelocity() const
+    virtual const Real getVelocity() const
     { 
       return theVelocity; 
     }
@@ -148,7 +193,7 @@ namespace libecs
     /**
        @param v velocity in number of molecules to be added.
     */
-    void addVelocity( RealCref aVelocity ) 
+    virtual void addVelocity( RealCref aVelocity ) 
     {
       theVelocity += aVelocity; 
     }
@@ -197,7 +242,7 @@ namespace libecs
     const Real saveQuantity();
 
 
-    virtual StringLiteral getClassName() const { return "Substance"; }
+    virtual StringLiteral getClassName() const { return "VariableSubstance"; }
 
   protected:
 
@@ -208,12 +253,8 @@ namespace libecs
     Real theQuantity;
     Real theVelocity;
 
-    bool theFixed;
   };
 
-
-
-  DECLARE_CLASS( SRMSubstance );
 
   /**
      Substance class is used to represent state variables, such as
@@ -223,7 +264,7 @@ namespace libecs
 
   class SRMSubstance 
     : 
-    public Substance
+    public VariableSubstance
   {
     //FIXME: for Accumulators:: to be deleted
     friend class Accumulator;
@@ -255,15 +296,15 @@ namespace libecs
        Initializes this substance. 
        Called at startup.
     */
-    void initialize();
+    virtual void initialize();
 
     /**
        Clear phase.
        Then call clear() of the integrator.
     */
-    void clear()
+    virtual void clear()
     { 
-      Substance::clear();
+      VariableSubstance::clear();
       theIntegrator->clear();
     }
 
@@ -292,7 +333,7 @@ namespace libecs
        @see setQuantity
     */
 
-    void loadQuantity( RealCref aQuantity );
+    virtual void loadQuantity( RealCref aQuantity );
 
 
     /**
@@ -309,7 +350,7 @@ namespace libecs
     void setAccumulator( AccumulatorPtr anAccumulator );
 
 
-    void makeSlots();
+    virtual void makeSlots();
 
   public:
 

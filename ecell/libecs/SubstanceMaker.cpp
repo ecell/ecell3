@@ -36,7 +36,10 @@ namespace libecs
 
   void SubstanceMaker::makeClassList()
   {
-    NewSubstanceModule( Substance );
+    // temporary workaround
+    addClass( new Module( "Substance", VariableSubstance::createInstance ) );
+
+    NewSubstanceModule( VariableSubstance );
     NewSubstanceModule( SRMSubstance );
   }
 

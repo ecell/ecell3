@@ -42,34 +42,19 @@
 namespace libecs
 {
 
-
   void Substance::makeSlots()
   {
-    registerSlot( getPropertySlotMaker()->
-		  createPropertySlot( "Quantity",*this,
-				      Type2Type<Real>(),
-				      &Substance::setQuantity,
-				      &Substance::getQuantity ) );
-
     registerSlot( getPropertySlotMaker()->
 		  createPropertySlot( "Concentration",*this,
 				      Type2Type<Real>(),
 				      NULLPTR,
 				      &Substance::getConcentration ) );
 
-    registerSlot( getPropertySlotMaker()->
-		  createPropertySlot( "Velocity",*this,
-				      Type2Type<Real>(),
-				      &Substance::addVelocity,
-				      &Substance::getVelocity ) );
-
   }
 
 
   Substance::Substance()
     : 
-    theQuantity( 0 ),  
-    theVelocity( 0 ),
     theFixed( false ) 
   {
     makeSlots();
@@ -87,12 +72,51 @@ namespace libecs
   }
 
 
-  void Substance::loadQuantity( RealCref aQuantity )
+
+  void VariableSubstance::makeSlots()
+  {
+    registerSlot( getPropertySlotMaker()->
+		  createPropertySlot( "Quantity",*this,
+				      Type2Type<Real>(),
+				      &VariableSubstance::setQuantity,
+				      &VariableSubstance::getQuantity ) );
+
+    registerSlot( getPropertySlotMaker()->
+		  createPropertySlot( "Velocity",*this,
+				      Type2Type<Real>(),
+				      &VariableSubstance::addVelocity,
+				      &VariableSubstance::getVelocity ) );
+
+  }
+
+
+
+  VariableSubstance::VariableSubstance()
+    : 
+    theQuantity( 0.0 ),  
+    theVelocity( 0.0 )
+  {
+    makeSlots();
+  } 
+
+  VariableSubstance::~VariableSubstance()
+  {
+    ; // do nothing
+  }
+
+
+  void VariableSubstance::initialize()
+  {
+
+  }
+
+
+  void VariableSubstance::loadQuantity( RealCref aQuantity )
   {
     theQuantity = aQuantity;
   }
 
-  const Real Substance::getActivity()
+  const Real VariableSubstance::getActivity()
   {
     return getVelocity();
   }

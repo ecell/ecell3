@@ -412,7 +412,6 @@ namespace libecs
 
     virtual void clear();
     virtual void differentiate();
-    virtual void turn();
     virtual void integrate();
     //    virtual void ???();
 

@@ -174,15 +174,13 @@ namespace libecs
     // Reactor::differentiate()
     //
     FOR_ALL( ReactorVector, theReactorCache, differentiate );
-  }
 
-  void SRMStepper::turn()
-  {
     //
     // Substance::turn()
     //
-    FOR_ALL( SRMSubstanceCache, theSubstanceCache, turn );
+    FOR_ALL( SRMSubstanceCache, theSubstanceCache, turn );    
   }
+
 
   void SRMStepper::integrate()
   {
