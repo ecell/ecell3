@@ -9,12 +9,12 @@ from gtk import *
 class MessageWindowToolLauncher(MessageWindow):
 
 	# ==========================================================================
-	def __init__( self, theMessageBox ):
+	def __init__( self ):
 
 		"""Constructor 
 		- calls parent class's constructor
 		"""
-		MessageWindow.__init__( self, theMessageBox )
+		MessageWindow.__init__( self )
 
 	# enf of __init__
 

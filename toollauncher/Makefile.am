@@ -6,6 +6,7 @@ SUBDIRS = misc
 toollauncherdir=${pkglibdir}
 toollauncher_PYTHON=\
 ToolLauncher.glade\
+MessageWindow.glade\
 ToolLauncherErrorMessage.glade\
 ToolLauncherOkCancel.glade\
 ToolLauncherPreferences.glade\
