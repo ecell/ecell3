@@ -27,7 +27,6 @@ ProcessMaker.cpp\
 Variable.cpp\
 VariableMaker.cpp\
 Stepper.cpp\
-Steppers.cpp\
 VariableProxy.cpp\
 Model.cpp\
 Scheduler.cpp\
@@ -59,7 +58,6 @@ ProcessMaker.hpp\
 Variable.hpp\
 VariableMaker.hpp\
 Stepper.hpp\
-Steppers.hpp\
 VariableProxy.hpp\
 Model.hpp\
 Scheduler.hpp\
