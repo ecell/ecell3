@@ -1,5 +1,5 @@
-bin_SCRIPTS = dmtool rd2tex rd2ch
+bin_SCRIPTS = dmtool dmgen
 
-SUBDIRS = template
+SUBDIRS = include
 
 
