@@ -3,7 +3,7 @@
 import string
 
 
-# PropertyAttribute masks
+# PropertyAttribute bit masks
 SETABLE = 1 << 0   # == 1
 GETABLE = 1 << 1   # == 2
 
@@ -17,22 +17,28 @@ PROPERTY   = 3
 
 
 def parseFullID( fullid ):
-    if string.count( fullid, ':' ) != 2:
-        raise ValueError( "FullID must have 2 ':'s." )
-    return string.split( fullid, ':' )
+    aList = string.split( fullid, ':' )
+    aLength = len( aList )
+    if aLength != 3:
+        raise ValueError(
+            "FullID must have 2 ':'s. ( %d given ) " % aLength - 1 )
+    return aList
 
 
 def parseFullPropertyName( fullpropertyname ):
-    if string.count( fullpropertyname, ':' ) != 3:
-        raise ValueError( "FullPropertyName must have 3 ':'s." )
-    return string.split( fullpropertyname, ':' )
+    aList = string.split( fullpropertyname, ':' )
+    aLength = len( aList )
+    if aLength != 4:
+        raise ValueError(
+            "FullPropertyName must have 3 ':'s. ( %d given ) " % aLength - 1 )
+    return aList
 
 
 def constructFullID( words ):
     aLength = len( words )
     if aLength != 3:
         raise ValueError(
-            "FullID has 3 parts. ( %d given )" % aLength )
+            "FullID has 3 fields. ( %d given )" % aLength )
     return string.join( words, ':' )
 
 
@@ -40,7 +46,7 @@ def constructFullPropertyName( words ):
     aLength = len( words )
     if aLength != 4:
         raise ValueError(
-            "FullPropertyName has 4 parts. ( %d given )" % aLength )
+            "FullPropertyName has 4 fields. ( %d given )" % aLength )
     return string.join( words, ':' )
 
 
