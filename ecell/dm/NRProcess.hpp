@@ -90,16 +90,13 @@ public:
 	  {
 	    aValue = floor( aValue );
 	  }
-	else // aValue is negative
+	else if( aValue > -1.0 ) // if it is -1.0 < > 0.0 round to zero. 
+	  {                      // this is necessary in hybrid simulation.
+	     aValue = 0.0;
+	  }
+	else // <= -1.0
 	  {
-	    if( aValue > -1.0 ) // round to zero. 
-	      {                 // this is necessary in hybrid simulation.
-		aValue = 0.0;
-	      }
-	    else
-	      {
-		THROW_EXCEPTION( SimulationError, "Variable value <= -1.0" );
-	      }
+	    THROW_EXCEPTION( SimulationError, "Variable value <= -1.0" );
 	  }
 
 
@@ -109,7 +106,7 @@ public:
 	  }
 	else  // aCoefficient == -2
 	  {
-            aMultiplicity *= aValue * aValue;
+            aMultiplicity *= aValue * ( aValue - 1 );
 	  }
 
       }
