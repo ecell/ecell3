@@ -78,7 +78,7 @@ class Window:
 		# ------------------------------------------------
 		if self.theGladeFile == None:
 			self.theGladeFile = GLADEFILE_PATH
-			self.theGladeFile += '/' + self.__class__.__name__ + ".glade"
+			self.theGladeFile += os.sep + self.__class__.__name__ + ".glade"
 		else:
 
 			# ------------------------------------------------
@@ -90,7 +90,7 @@ class Window:
 			# When relative path
 			# ------------------------------------------------
 			else:
-				self.theGladeFile = GLADEFILE_PATH + '/' + self.theGladeFile
+				self.theGladeFile = GLADEFILE_PATH + os.sep + self.theGladeFile
 
 		# ------------------------------------------------
 		# checks and loads glade file
