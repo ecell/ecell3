@@ -14,8 +14,8 @@
 
 <widget>
   <class>GtkWindow</class>
-  <name>Substance Window</name>
-  <title>Substance</title>
+  <name>SubstanceWindow</name>
+  <title>SubstanceWindow</title>
   <type>GTK_WINDOW_TOPLEVEL</type>
   <position>GTK_WIN_POS_NONE</position>
   <modal>False</modal>
