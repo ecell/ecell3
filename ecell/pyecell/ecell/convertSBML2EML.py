@@ -199,14 +199,15 @@ class SBML_Model:
 
     def convertUnit( self, aValueUnit, aValue ):
 
+        newValue = []
         if ( self.Level == 1 ):
             for unitList in self.UnitDefinitionList:
                 if ( unitList[1] == aValueUnit ):
 
                     for anUnit in unitList[2]:
-                        aValue = self.__getNewUnitValue( anUnit, aValue )
+                        aValue = aValue * self.__getNewUnitValue( anUnit )
 
-                    return aValue
+                newValue.append( aValue )
 
         elif ( self.Level == 2 ):
             for unitList in self.UnitDefinitionList:
@@ -214,14 +215,21 @@ class SBML_Model:
 
                     for anUnit in unitList[2]:
 
-                        aValue =  self.__getNewUnitValue( anUnit, aValue )
+                        aValue = aValue * self.__getNewUnitValue( anUnit )
 
-                    return aValue
+                newValue.append( aValue )
+
+        if( newValue == [] ):
+            return aValue
+        else:
+            return newValue[0]
 
 
     # =========================================================
 
-    def __getNewUnitValue( self, anUnit, aValue ):
+    def __getNewUnitValue( self, anUnit ):
+
+        aValue = 1
 
         # Scale
         if ( anUnit[2] != 0 ):
