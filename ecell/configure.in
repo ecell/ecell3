@@ -42,6 +42,8 @@ AC_SUBST(LIBLTDL)
 AC_LIBTOOL_DLOPEN
 AM_PROG_LIBTOOL
 
+AM_PATH_PYTHON(2.0)
+AC_SUBST(PYTHON)
 
 AC_LANG_CPLUSPLUS
 
@@ -125,7 +127,7 @@ if test "$KORANDOM_DIR" = "" ; then
 fi
 AC_SUBST(KORANDOM_DIR)
 
-
+AM_CHECK_PYTHON_HEADERS()
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_LANG_SAVE
@@ -159,6 +161,8 @@ Makefile
 libecs/Makefile 
 libemc/Makefile
 pyecs/Makefile
+pyecs/ecell3,
+chmod +x pyecs/ecell3
 )
 
 

@@ -3,23 +3,18 @@
 ECELLDIR=..
 DMTOOL_INCLUDE=-I@DMTOOL_INCLUDE_DIR@
 INCLTDL=@INCLTDL@
+PYTHON_INCLUDES=@PYTHON_INCLUDES@
 
-#CXXSRCDIR=/usr/etc/CXX/
-#CXXSRCDIR=/home/shafi/wrk/CXX/Src
-#CXXINCLUDE=-I/home/shafi/wrk/CXX
 CXXSRCDIR=../../PyCXX/Src
 CXXINCLUDE=-I../..//PyCXX
-PYTHONINCLUDE=-I/usr/include/python2.1 #-I@PYTHONINCLUDEDIR@
-#PYTHONINCLUDE=-I/usr/include/python1.5
-ECELLINCLUDES=-I${ECELLDIR} ${DMTOOL_INCLUDE} ${INCLTDL} ${PYTHONINCLUDE}
+
+ECELLINCLUDES=-I${ECELLDIR} ${DMTOOL_INCLUDE} ${INCLTDL} ${PYTHON_INCLUDES}
 CXXFLAGS=@CXXFLAGS@ ${CXXINCLUDE} ${ECELLINCLUDES} #-D_REENTRANT
 LIBLTDL=@LIBLTDL@
 
 LIBKORANDOM=../../korandom/libkorandom.la
 
 CFLAGS=${CXXFLAGS}
-
-#CXXOBJS=${CXXSRCDIR}/*.o
 
 CXXSRC=\
 IndirectPythonInterface.cxx\
@@ -33,7 +28,7 @@ $(CXXSRC):
 clean-local:
 	rm -f ${CXXSRC}
 
-noinst_LTLIBRARIES=ecs.la
+pyexec_LTLIBRARIES=ecs.la
 ecs_la_SOURCES=\
 PyUVariable.cpp\
 PyEcs.cpp\
@@ -65,7 +60,6 @@ clean-local:
 
 pyecsdir=${pkgincludedir}/pyecs
 
-EXTRA_DIST= \
-testrun\
-test.py
+bin_SCRIPTS =\
+ecell3
 
