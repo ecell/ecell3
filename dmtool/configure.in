@@ -1,6 +1,6 @@
 AC_REVISION([$Id$])
 dnl
-AC_INIT(dmtool.in)
+AC_INIT(dmgen.in)
 dnl AC_CONFIG_AUX_DIR()
 dnl
 dnl 
