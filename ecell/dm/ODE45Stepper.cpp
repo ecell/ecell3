@@ -94,7 +94,7 @@ namespace libecs
     if ( theInterrupted )
     //    if ( 1 )
       {
-	interIntegrate();
+	//	interIntegrate();
 	process();
 
 	for( UnsignedInt c( 0 ); c < aSize; ++c )
@@ -132,7 +132,7 @@ namespace libecs
 
     // ========= 2 ===========
     setCurrentTime( aCurrentTime + getStepInterval() * 0.2 );
-    interIntegrate();
+    //    interIntegrate();
     process();
 
     for( UnsignedInt c( 0 ); c < aSize; ++c )
@@ -154,7 +154,7 @@ namespace libecs
 
     // ========= 3 ===========
     setCurrentTime( aCurrentTime + getStepInterval() * 0.3 );
-    interIntegrate();
+    //    interIntegrate();
     process();
 
     for( UnsignedInt c( 0 ); c < aSize; ++c )
@@ -176,7 +176,7 @@ namespace libecs
 
     // ========= 4 ===========
     setCurrentTime( aCurrentTime + getStepInterval() * 0.8 );
-    interIntegrate();
+    //    interIntegrate();
     process();
 
     for( UnsignedInt c( 0 ); c < aSize; ++c )
@@ -199,7 +199,7 @@ namespace libecs
 
     // ========= 5 ===========
     setCurrentTime( aCurrentTime + getStepInterval() * ( 8.0 / 9.0 ) );
-    interIntegrate();
+    //    interIntegrate();
     process();
 
     for( UnsignedInt c( 0 ); c < aSize; ++c )
@@ -223,7 +223,7 @@ namespace libecs
 
     // ========= 6 ===========
     setCurrentTime( aCurrentTime + getStepInterval() );
-    interIntegrate();
+    //    interIntegrate();
     process();
 
     for( UnsignedInt c( 0 ); c < aSize; ++c )
@@ -248,7 +248,7 @@ namespace libecs
 
     // ========= 7 ===========
     setCurrentTime( aCurrentTime + getStepInterval() );
-    interIntegrate();
+    //    interIntegrate();
     process();
 
     // evaluate error
