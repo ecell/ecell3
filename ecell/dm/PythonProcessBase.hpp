@@ -104,6 +104,7 @@ public:
   void defaultSetProperty( StringCref aPropertyName,
 			   PolymorphCref aValue )
     {
+      // don't assume subclasses here !!!
       if( getClassName() == "PythonProcess" ||
 	  getClassName() == "PythonFluxProcess" )
 	{
@@ -124,7 +125,7 @@ public:
 protected:
 
   python::dict   theGlobalNamespace;
-  python::dict   theLocalNamespace;
+  //python::dict   theLocalNamespace;
 
 };
 

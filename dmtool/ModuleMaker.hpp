@@ -78,7 +78,7 @@ public:
   static const std::string getSearchPath()
   {
     const char* aSearchPath( lt_dlgetsearchpath() );
-    if( aSearchPath == NULLPTR )
+    if( aSearchPath == 0 )
       {
 	return "";
       }

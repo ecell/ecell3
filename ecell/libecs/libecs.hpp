@@ -75,6 +75,18 @@ namespace libecs
   }
 
 
+  void setDMSearchPath( const String& path );
+  const String getDMSearchPath();
+  const String getLoadedDMList();
+
+  //  DECLARE_CLASS( Polymorph );
+  //  const Polymorph getDMInfoList( const String& aDMName );
+  //  const String getDMInfo( const String& aDMName,
+  //			  const String& aFieldName );
+
+  
+
+
   // Declarations to be exported
 
 

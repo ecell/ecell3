@@ -331,6 +331,22 @@ namespace libecs
       return isDefaultNameString( theName );
     }
 
+    bool operator==( VariableReferenceCref rhs ) const
+    {
+      if( theName        == rhs.theName && 
+	  theVariablePtr == rhs.theVariablePtr &&
+	  theCoefficient == rhs.theCoefficient &&
+	  theIsAccessor  == rhs.theIsAccessor )
+	{
+	  return true;
+	}
+      else
+	{
+	  return false;
+	}
+    }
+
+
     static const bool isEllipsisNameString( StringCref aname );
     static const bool isDefaultNameString( StringCref aname );
 

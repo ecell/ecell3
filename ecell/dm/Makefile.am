@@ -3,6 +3,8 @@ SUFFIXES = .cpp @LTDL_SHLIB_EXT@
 
 SHELL = @SHELL@
 
+LTDL_SHLIB_EXT = @LTDL_SHLIB_EXT@
+
 ECELL3_SCRIPT = ../pyecs/ecell3-python
 ECELL3_DMC = ../../bin/ecell3-dmc
 DM_SO_DIR = ${prefix}/lib/${PACKAGE}/${VERSION}
@@ -109,9 +111,9 @@ SOS = ${DMS:.cpp=@LTDL_SHLIB_EXT@}
 dmsodir = ${DM_SO_DIR}
 dmso_DATA = ${SOS} ${DESCS}
 
-%@LTDL_SHLIB_EXT@ : %.cpp
+%$(LTDL_SHLIB_EXT) : %.cpp
 	${ECELL3_SCRIPT} ${ECELL3_DMC} --verbose --dmcompile=${top_srcdir}/../dmtool --no-stdinclude --no-stdlibdir --ldflags="-L${top_srcdir}/libecs ${BOOST_LIB}" --cxxflags='-I${top_srcdir}/libecs -I${top_srcdir}/.. -I${top_srcdir} ${PYTHON_INCLUDES} ${BOOST_INCLUDE}' $< 
 
 clean-local:
-	${RM} -rf ${dmso_DATA}
+	${RM} -rf ${SOS}
 

@@ -34,68 +34,49 @@ LIBBOOSTPYTHON=$(BOOST_LIB) @BOOST_PYTHON_LIB@
 CFLAGS=${CXXFLAGS}
 
 
-pkgpython_LTLIBRARIES = _ecs.la
+pkgpython_LTLIBRARIES = _ecs.la _emc.la
 
 _ecs_la_SOURCES=\
 PyEcs.cpp
 
 
-noinst_HEADERS=\
-PyEcs.hpp
+pyecsdir=${pkgincludedir}/pyecs
+pyecs_HEADERS=\
+PyEcs.hpp PyEmc.hpp
 
 _ecs_la_LDFLAGS=-module -export-dynamic -avoid-version $(no_undefined)
 
-_ecs_la_LIBADD=$(LIBECS) $(LIBEMC) $(LIBBOOSTPYTHON) $(LIBPYTHON)
+_ecs_la_LIBADD=$(LIBECS) $(LIBBOOSTPYTHON) $(LIBPYTHON)
 
-_ecs_la_DEPENDENCIES=$(LIBECS) $(LIBEMC)
-
-
-all-local: _ecs@LTDL_SHLIB_EXT@
+_ecs_la_DEPENDENCIES=$(LIBECS)
 
 
-_ecs@LTDL_SHLIB_EXT@: _ecs.la 
-	ln -sf .libs/_ecs@LTDL_SHLIB_EXT@ ./_ecs@LTDL_SHLIB_EXT@
+
+_emc_la_SOURCES=\
+PyEmc.cpp
+
+_emc_la_LDFLAGS=$(_ecs_la_LDFLAGS)
+
+_emc_la_LIBADD=$(LIBECS) $(LIBEMC) $(LIBBOOSTPYTHON) $(LIBPYTHON)
+
+_emc_la_DEPENDENCIES=$(LIBECS) $(LIBEMC)
+
+
+ECS_SO=_ecs@LTDL_SHLIB_EXT@
+EMC_SO=_emc@LTDL_SHLIB_EXT@
+
+all-local: $(ECS_SO) $(EMC_SO)
+
+$(ECS_SO): _ecs.la 
+	ln -sf .libs/$(ECS_SO) ./$(ECS_SO)
+
+$(EMC_SO): _emc.la 
+	ln -sf .libs/$(EMC_SO) ./$(EMC_SO)
 
 clean-local:
-	rm -f _ecs@LTDL_SHLIB_EXT@
+	rm -f $(ECS_SO) $(EMC_SO)
+
 
 bin_SCRIPTS =\
 ecell3-python$(ECELL3_PYTHON_EXT)
-
-
-
-# BPLSRC=\
-# numeric.cpp\
-# list.cpp\
-# long.cpp\
-# dict.cpp\
-# tuple.cpp\
-# str.cpp\
-# aix_init_module.cpp\
-# from_python.cpp\
-# registry.cpp\
-# type_id.cpp\
-# enum.cpp\
-# class.cpp\
-# function.cpp\
-# inheritance.cpp\
-# life_support.cpp\
-# pickle_support.cpp\
-# errors.cpp\
-# module.cpp\
-# builtin_converters.cpp\
-# arg_to_python_base.cpp\
-# iterator.cpp\
-# object_protocol.cpp\
-# object_operators.cpp
-
-# $(BPLSRC):
-# 	echo $(BPLV2SRC)
-# 	if [ -f $(BPLSRCDIR)/$@ ]; then\
-# 		cp -f $(BPLSRCDIR)/$@ . ;\
-# 	elif [ -f $(BPLSRCDIR)/converter/$@ ] ; then\
-# 		cp -f $(BPLSRCDIR)/converter/$@ . ;\
-# 	elif [ -f $(BPLSRCDIR)/object/$@ ] ; then\
-# 		cp -f $(BPLSRCDIR)/object/$@ . ;\
-# 	fi
 

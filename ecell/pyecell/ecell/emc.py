@@ -1,6 +1,6 @@
 import ecsinit
 
-# _ecs.so
-from _ecs import Simulator
+# _emc.so
+from _emc import *
 
 

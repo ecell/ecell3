@@ -8,8 +8,9 @@ import time
 
 
 from Numeric import *
-import ecell.emc
 import ecell.ecs
+import ecell.emc
+
 
 from ecell.ecssupport import *
 from ecell.DataFileManager import *
@@ -21,7 +22,7 @@ from ecell.ECDDataFile import *
 
 BANNERSTRING =\
 '''ecell3-session [ E-Cell SE Version %s, on Python Version %d.%d.%d ]
-Copyright (C) 1996-2003 Keio University.
+Copyright (C) 1996-2004 Keio University.
 Send feedback to Kouichi Takahashi <shafi@e-cell.org>'''\
 % ( ecell.ecs.getLibECSVersion(), sys.version_info[0], sys.version_info[1], sys.version_info[2] )
 

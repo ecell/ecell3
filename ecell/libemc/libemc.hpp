@@ -36,8 +36,6 @@
 
 #include "libecs/libecs.hpp"
 
-#include "dmtool/ModuleMaker.hpp"
-
 namespace libemc
 {
 
@@ -53,14 +51,6 @@ namespace libemc
 
   DECLARE_CLASS( Simulator );
   DECLARE_CLASS( SimulatorImplementation );
-
-  void setDMSearchPath( const std::string& path );
-  const std::string getDMSearchPath();
-  const std::string getLoadedDMList();
-
-  const libecs::Polymorph getDMInfoList( const std::string& aDMName );
-  const std::string getDMInfo( const std::string& aDMName,
-			       const std::string& aFieldName );
 
 
 

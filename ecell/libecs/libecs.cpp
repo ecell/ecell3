@@ -28,14 +28,21 @@
 // E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
 
-#include <signal.h>
+#include "dmtool/ModuleMaker.hpp"
 
+#include "libecs.hpp"
 
-#include "libemc.hpp"
-
-namespace libemc
+namespace libecs
 {
 
-  ; // empty
+  void setDMSearchPath( const std::string& path )
+  {
+    ModuleMaker::setSearchPath( path );
+  }
 
-} // namespace libemc
+  const std::string getDMSearchPath()
+  {
+    return ModuleMaker::getSearchPath();
+  }
+
+} // namespace libecs
