@@ -204,6 +204,7 @@ namespace libecs
 
     const Real getActivityPerSecond() const;
 
+    void setStepInterval( const Real aStepInterval );
     const Real getStepInterval() const;
     const Real getStepsPerSecond() const;
 

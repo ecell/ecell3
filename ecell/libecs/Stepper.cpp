@@ -110,22 +110,29 @@ namespace libecs
   void StepperLeader::step()
   {
     EventCref aTopEvent( theScheduleQueue.top() );
-    MasterStepperPtr aMasterStepper( aTopEvent.second );
 
-    // the time must be memorized before the Event is deleted by push()
+    // the time must be memorized before the Event is deleted
     const Real aTopTime( aTopEvent.first );
 
+    MasterStepperPtr aMasterStepper( aTopEvent.second );
+
+    // three-phase progression of the step
+    // 1. sync:  synchronize with proxies of the PropertySlots
     aMasterStepper->sync();
-
+    // 2. step:  do the computation, returning a length of the time progression
     const Real aStepSize( aMasterStepper->step() );
-
+    // 3. push:  re-sync with the proxies, and push new values to Loggers
     aMasterStepper->push();
 
-    //FIXME: change_top() is better than pop 'n' push
+    //FIXME: change_top() is better than pop 'n' push.
+    // If the ScheduleQueue holds pointers of Event, not instances,
+    // it would be more efficient in the current implementation because
+    // the instantiation below can be eliminated, but
+    // if there is the change_top(), benefits would be lesser...
     theScheduleQueue.pop();
-    theScheduleQueue.push( Event( aTopTime + aStepSize,
-				  aMasterStepper ) );
+    theScheduleQueue.push( Event( aTopTime + aStepSize, aMasterStepper ) );
 
+    // update theCurrentTime, which is scheduled time of the Event on the top
     theCurrentTime = ( theScheduleQueue.top() ).first;
   }
 
@@ -200,9 +207,9 @@ namespace libecs
     thePropertySlotVector.push_back( propertyslot );
   }
 
-  void MasterStepper::setStepInterval( RealCref stepsize )
+  void MasterStepper::setStepInterval( RealCref aStepInterval )
   {
-    theStepInterval = stepsize;
+    theStepInterval = aStepInterval;
     calculateStepsPerSecond();
   }
 
@@ -213,13 +220,18 @@ namespace libecs
 
   void MasterStepper::sync()
   {
-
+    FOR_ALL( PropertySlotVector, thePropertySlotVector, sync );
   }
 
-  void MasterStepper::push()
+ void MasterStepper::push()
   {
-
+    for( PropertySlotVectorIterator i( thePropertySlotVector.begin() );
+	 i != thePropertySlotVector.end() ; ++i )
+      {
+	(*i)->push( theOwner->getRootSystem()->getCurrentTime() );
+      }
   }
+
 
   ////////////////////////// MasterStepperWithEntityCache
 
@@ -242,8 +254,8 @@ namespace libecs
     ReactorVector::size_type   
       aReactorCacheSize( aMasterSystem->getReactorMap().size() );
 
-    SlaveStepperVectorCref 
-      aSlaveStepperVector( getSlaveStepperVector() );
+    SlaveStepperVectorCref aSlaveStepperVector( getSlaveStepperVector() );
+
     for( SlaveStepperVectorConstIterator i( aSlaveStepperVector.begin() ); 
 	 i != aSlaveStepperVector.end() ; ++i )
       {
@@ -292,8 +304,8 @@ namespace libecs
     ReactorVector::size_type   
       aReactorCacheSize( aMasterSystem->getReactorMap().size() );
 
-    SlaveStepperVectorCref 
-      aSlaveStepperVector( getSlaveStepperVector() );
+    SlaveStepperVectorCref aSlaveStepperVector( getSlaveStepperVector() );
+
     for( SlaveStepperVectorConstIterator i( aSlaveStepperVector.begin() ); 
 	 i != aSlaveStepperVector.end() ; ++i )
       {
@@ -329,8 +341,6 @@ namespace libecs
 			  std::select2nd<ReactorMap::value_type>() );    
       }
 
-    //      theMaster->push();
-    ;
   }
 
 
@@ -341,11 +351,7 @@ namespace libecs
     :
     theIntegratorAllocator( NULLPTR )
   {
-    for( PropertySlotVectorIterator i( thePropertySlotVector.begin() );
-	 i != thePropertySlotVector.end(); ++i )
-      {
-	(*i)->sync();
-      }
+
   }
 
   void SRMStepper::clear()
@@ -387,9 +393,6 @@ namespace libecs
     //
     FOR_ALL( SubstanceVector, theSubstanceCache, integrate );
 
-
-    //FIXME: should be removed
-    push();
   }
 
 
@@ -416,11 +419,7 @@ namespace libecs
 
   void StepperLeader::push()
   {
-    for( MasterStepperVector::iterator i( theMasterStepperVector.begin() );
-	 i != theMasterStepperVector.end(); ++i )
-      {
-	(*i)->push();
-      }
+    FOR_ALL( MasterStepperVector, theMasterStepperVector, push );
   }
 
   void SRMStepper::distributeIntegrator( IntegratorAllocator allocator )

@@ -31,6 +31,7 @@
 #ifndef ___STEPPER_H___
 #define ___STEPPER_H___
 #include <queue>
+#include <vector>
 #include <map>
 #include <algorithm>
 #include <utility>
@@ -70,7 +71,9 @@ namespace libecs
 
   typedef std::pair<Real,MasterStepperPtr> RealMasterStepperPtrPair;
   DECLARE_TYPE( RealMasterStepperPtrPair, Event );
-  DECLARE_TYPE( std::priority_queue<Event>, ScheduleQueue );
+  typedef std::priority_queue<Event,std::vector<Event>,std::greater<Event> >
+  EventPriorityQueue_less;
+  DECLARE_TYPE( EventPriorityQueue_less, ScheduleQueue );
 
   class StepperLeader
   {
@@ -136,6 +139,7 @@ namespace libecs
 
     virtual void initialize();
 
+    virtual void setStepInterval( RealCref aStepInterval ) = 0;
     virtual RealCref getStepInterval() const = 0;
     virtual RealCref getStepsPerSecond() const = 0;
 
@@ -178,9 +182,15 @@ namespace libecs
     virtual const Real step() = 0;
     virtual void push();
 
-    void setStepInterval( RealCref stepinterval );
-    void calculateStepsPerSecond();
+    /**
 
+       This may be overridden in dynamically scheduled steppers.
+
+     */
+
+    void setStepInterval( RealCref aStepInterval );
+
+    void calculateStepsPerSecond();
 
     virtual RealCref getStepInterval() const
     {
@@ -255,6 +265,12 @@ namespace libecs
     void setMasterStepper( MasterStepperPtr aMasterStepperPtr )
     {
       theMasterStepper = aMasterStepperPtr;
+    }
+
+    void setStepInterval( RealCref aStepInterval )
+    {
+      // Slaves are synchronous to their masters.
+      theMasterStepper->setStepInterval( aStepInterval ); 
     }
 
     virtual RealCref getStepInterval() const

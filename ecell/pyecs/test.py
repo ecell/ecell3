@@ -26,6 +26,10 @@ print 'create Simulator instance.'
 s = ecs.Simulator()
 
 s.createEntity( 'System', ( SYSTEM, '/', 'CYTOPLASM' ), 'cytoplasm' )
+s.setProperty( ( SYSTEM, '/', 'CYTOPLASM', 'StepperClass' ),
+               ('RungeKutta4SRMStepper',) )
+s.setProperty( ( SYSTEM, '/', 'CYTOPLASM', 'StepInterval' ),
+               (0.05,) )
 
 print 'make substances...'
 s.createEntity( 'Substance', ( SUBSTANCE, '/', 'A' ), 'substance A' )
@@ -86,4 +90,12 @@ printProperty( s, ( SYSTEM, '/', '/', 'CurrentTime' ) )
 s.step()
 
 printProperty( s, ( SYSTEM, '/', '/', 'CurrentTime' ) )
-s.step()
+
+for i in xrange( 1000 ):
+    s.step()
+
+printProperty( s, ( SYSTEM, '/', '/', 'CurrentTime' ) )
+
+printProperty( s, ( SYSTEM, '/', '/', 'StepInterval' ) )
+printProperty( s, ( SYSTEM, '/', 'CYTOPLASM', 'StepInterval' ) )
+    

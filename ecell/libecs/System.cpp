@@ -57,14 +57,14 @@ namespace libecs
     createPropertySlot( "ReactorList", *this,
 			NULLPTR, &System::getReactorList );
 
-    createPropertySlot( "Stepper", *this,
+    createPropertySlot( "StepperClass", *this,
 			&System::setStepperClass, &System::getStepperClass );
 
     createPropertySlot( "Volume", *this,
 			&System::setVolume, &System::getVolume );
 
     createPropertySlot( "StepInterval", *this,
-			NULLPTR, &System::getStepInterval );
+			&System::setStepInterval, &System::getStepInterval );
   }
 
 
@@ -194,6 +194,11 @@ namespace libecs
     theStepper->initialize();
 
 
+  }
+
+  void System::setStepInterval( const Real aStepInterval )
+  {
+    theStepper->setStepInterval( aStepInterval );
   }
 
   const Real System::getStepInterval() const
