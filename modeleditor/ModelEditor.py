@@ -40,7 +40,7 @@ from LayoutEml import *
 from GraphicalUtils import *
 
 from Error import *
-
+import time
 RECENTFILELIST_FILENAME = '.modeleditor' + os.sep + '.recentlist'
 RECENTFILELIST_DIRNAME = '.modeleditor'
 RECENTFILELIST_MAXFILES = 10
@@ -758,13 +758,14 @@ class ModelEditor:
 
 
     def doCommandList( self, aCommandList ):
+#        t=[["start", time.time()]]
         
         undoCommandList = []
         aCommandList = self.theMultiplexer.processCommandList( aCommandList )
         for aCommand in aCommandList:
             # execute commands
             aCommand.execute()
-           
+#            t+=[["execute "+aCommand.__class__.__name__, time.time()]]
             ( aType, anID ) = aCommand.getAffectedObject()
             
             self.updateWindows( aType, anID )
@@ -773,7 +774,7 @@ class ModelEditor:
                 pass
             else:
                 self.updateWindows( aType, anID )
-    
+#                t+=[["updatewindows" + Type + " , " + anID, time.time()]]
             # get undocommands
             undoCommand = aCommand.getReverseCommandList()
             
@@ -783,15 +784,23 @@ class ModelEditor:
 
             # reset commands put commands into redoqueue
             aCommand.reset()
-
+#            t+=[["reverse+reset", time.time() ]]
         if undoCommandList != []:
             self.theUndoQueue.push ( undoCommandList )
             self.theRedoQueue.push ( aCommandList )
             self.changesSaved = False
             
         self.theMainWindow.update()
+#        t+=[["Mainwindow update", time.time() ] ]
         self.checkAutoSaveOption()
+#        t+=[["autosave", time.time() ]]
+#        t0=t[0][1]
 
+#        for anitem in t:
+#            print anitem[0], anitem[1]-t0
+#            t0=anitem[1]
+#        print
+            
 
     def autoSave(self, aFileName = 'AutoSaveUntitled'):
         processId = os.getpid()
@@ -817,7 +826,7 @@ class ModelEditor:
         self.theUpdateInterval = self.getAutosavePreferences()[0] *1000
         byOperation = self.getAutosavePreferences()[1]
                
-        if self.theUpdateInterval != 0:
+        if self.theUpdateInterval != 0 and self.theTimer == None:
             self.autoSave(os.path.splitext(os.path.basename(self.theModelFileName))[0])
               
         if byOperation !=0 :        

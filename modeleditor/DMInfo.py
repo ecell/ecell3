@@ -14,6 +14,8 @@ class DMInfo:
     def __init__(self ):
         self.theList={}
         self.theClass=None
+        self.theProcessClassList = None
+        self.theStepperClassList = None
 
     # SECOND DO THIS
     def getClassList( self, aType ):
@@ -21,6 +23,10 @@ class DMInfo:
             return [DM_SYSTEM_CLASS, DM_SYSTEM_CLASS_OLD ]
         if aType == ME_VARIABLE_TYPE:
             return [DM_VARIABLE_CLASS ]
+        if aType == ME_PROCESS_TYPE and self.theProcessClassList != None:
+            return self.theProcessClassList
+        if aType == ME_STEPPER_TYPE and self.theStepperClassList != None:
+            return self.theStepperClassList
 
         aList = []
         # get from current directory for other type of classes
@@ -32,7 +38,10 @@ class DMInfo:
         for aFile in filelist:
             if aFile.endswith( aType + '.desc' ):
                 aList.append( aFile.replace( '.desc' , '') )
-        
+        if aType == ME_PROCESS_TYPE :
+            self.theProcessClassList = aList
+        if aType == ME_STEPPER_TYPE:
+            self.theStepperClassList = aList
         return aList
 
 
