@@ -312,7 +312,7 @@ class Axis:
             if self.theScaleType == SCALE_LINEAR:
                 ticks=0
                 if self.theFrame[1] == self.theFrame[0]:
-                    self.theFrame[1] = self.theFrame[0] + 1
+                    self.theFrame[1] = self.theFrame[0] + abs( self.theFrame[0] ) *.1 + 1 
                 exponent = pow( 10, floor( log10( self.theFrame[1] - self.theFrame[0] ) ) )
                
                 while ticks < self.theMaxTicks / 2:
@@ -1000,7 +1000,7 @@ class Plot:
         self.theOwner.requestDataSlice( aStart, anEnd, ( anEnd - aStart ) / ( self.theXAxis.theLength*2) )
 
     def requestNewData ( self ):
-        self.theOwner.requestNewData( self.getRequiredTimeResolution() )
+        self.theOwner.requestNewData( self.theXAxis.theLength * 2 )
 
 
     def getRequiredTimeResolution( self ):

@@ -51,7 +51,7 @@ class DataGenerator:
 
 
 
-    def requestNewData( self, aDataSeries, requiredResolution ):
+    def requestNewData( self, aDataSeries, dataPointWidth ):
         '''
         update aDataSeries with new data points gotten from source
         '''
@@ -74,8 +74,13 @@ class DataGenerator:
             else:
                 dataList = aDataSeries.getAllData()
                 lastTime = dataList[ len( dataList) -1 ][0]
+                dataRange =  currentTime - lastTime 
+
+                requiredResolution = dataRange / dataPointWidth
+
                 dataList = self.theLoggerAdapter.getData( fullPNString, 
                             lastTime, currentTime,requiredResolution )
+
                 
                 # I havent yet updated the new logger code from CVS, but isn't changed to getDigest?
                 
@@ -117,8 +122,12 @@ class DataGenerator:
                 aStartTime = self.theLoggerAdapter.getStartTime( fullPNString )
                 anEndTime = self.theLoggerAdapter.getEndTime ( fullPNString )
                 requiredResolution = ( anEndTime - aStartTime ) / numberOfElements
+
                 dataList = self.theLoggerAdapter.getData( fullPNString, 
                     aStartTime, anEndTime, requiredResolution )
+
+
+
         else:
             aWindow = aDataSeries.thePlot.theWidget.get_ancestor( gtk.Window)
             if aWindow != None:
@@ -329,6 +338,7 @@ class CachedLogger:
         # use logger
 
 #        return self.theSimulator.getLoggerData(self.theFullPNString, start, end, interval )
+
         a=self.theSimulator.getLoggerData(self.theFullPNString, start, end, interval )
         return a
 
@@ -409,7 +419,9 @@ class LoggerCache:
 
 
     def getData( self, start, end, interval ):
+
         vectorLength = ( end - start ) / interval
+
         if vectorLength > int( vectorLength ):
             vectorLength += 1
         vectorLength = int(vectorLength )
