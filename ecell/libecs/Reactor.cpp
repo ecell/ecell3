@@ -57,27 +57,27 @@ void Reactor::makeSlots()
 
 void Reactor::setSubstrate( MessageCref message )
 {
-  setSubstrate( message.getBody( 0 ), asInt( message.getBody( 1 ) ) );
+  setSubstrate( message.getBody( 0 ), stringTo<Int>( message.getBody( 1 ) ) );
 }
 
 void Reactor::setProduct( MessageCref message )
 {
-  setProduct( message.getBody( 0 ), asInt( message.getBody( 1 ) ) );
+  setProduct( message.getBody( 0 ), stringTo<Int>( message.getBody( 1 ) ) );
 }
 
 void Reactor::setCatalyst( MessageCref message )
 {
-  setCatalyst( message.getBody( 0 ), asInt( message.getBody( 1 ) ) );
+  setCatalyst( message.getBody( 0 ), stringTo<Int>( message.getBody( 1 ) ) );
 }
 
 void Reactor::setEffector( MessageCref message )
 {
-  setEffector( message.getBody( 0 ), asInt( message.getBody( 1 ) ) );
+  setEffector( message.getBody( 0 ), stringTo<Int>( message.getBody( 1 ) ) );
 }
 
 void Reactor::setInitialActivity( MessageCref message )
 {
-  setInitialActivity( asFloat( message.getBody() ) );
+  setInitialActivity( stringTo<Float>( message.getBody() ) );
 }
 
 const Message Reactor::getInitialActivity( StringCref keyword )

@@ -35,13 +35,17 @@
 #include "Defs.hpp"
 #include "korandom/korandom.h"
 
-/////////////// KoRandom random number generator
-
 typedef korandom_d_c  RandomNumberGenerator;
 
-extern RandomNumberGenerator* theRandomNumberGenerator;
+/**
+   Random number generator
+ */
+//FIXME: thread safe?
+extern RandomNumberGenerator* theRandomNumberGenerator; 
 
-/////////////// least common multiple
+/**
+   least common multiple.
+ */
 
 inline int lcm( int a, int b )
 {
@@ -49,34 +53,47 @@ inline int lcm( int a, int b )
     {
       int i;
       for( i = 1; ( a * i ) % b ; ++i ) 
-	;
+	{
+	  ; // do nothing
+	}
       return a * i;
     }
   else
     {
       int i;
       for( i = 1 ; ( b * i ) % a ; ++i ) 
-	;
+	{
+	  ; // do nothing
+	}
       return b * i;
     }
 }
 
-////////////////////// table_lookup
+/**
+   table lookup function.
+ */
 
 int table_lookup( StringCref str, const char** table );
 
-//////////////////////  string -> Float,Int
+/** 
+    universal String -> object converter.
+    Float and Int specializations are defined in Util.cpp.
+    Conversion to the other classes are conducted using 
+    istrstream.
+ */
 
-Float asFloat( StringCref str );
+template<class T> T stringTo( StringCref str );
 
-Int asInt( StringCref str );
-
-//////////////////////  extract just a filename from a path
+/**
+   extract a filename from a path string
+*/
 
 String basenameOf( StringCref str, String::size_type maxlength = 0 );
 
 
-//////////////////////  reversed order compare
+/**
+   reversed order compare
+*/
 
 template <class T>
 class ReverseCmp

@@ -57,6 +57,9 @@ typedef double Float;
 typedef Float Mol;
 #define FLOAT_DIG DBL_DIG
 
+#define ATOF( str ) atof( str )
+#define ATOI( str ) atoi( str )
+
 typedef Int Quantity;
 typedef Float Concentration;
 

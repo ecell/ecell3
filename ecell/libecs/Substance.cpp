@@ -51,7 +51,7 @@ void Substance::makeSlots()
 
 void Substance::setQuantity( MessageCref message )
 {
-  Float aQuantity = asFloat( message.getBody() );
+  Float aQuantity = stringTo<Float>( message.getBody() );
 
   if( theAccumulator )
     {

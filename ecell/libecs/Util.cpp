@@ -36,8 +36,8 @@
 
 RandomNumberGenerator* theRandomNumberGenerator = 
 new RandomNumberGenerator( 
-			  // FIXME: this cast is not good: 
-			  // should be reinterpret_cast or something.
+			  // FIXME: is this cast good?
+			  // should be reinterpret_cast or something?
 			  (Float)(time(NULL)) ,
 			  RANDOM_NUMBER_BUFFER_SIZE);
 
@@ -54,20 +54,23 @@ int table_lookup( StringCref str, const char** table )
   return NOMATCH;
 }
 
-Float asFloat( StringCref str )
+template <class T> 
+T stringTo( StringCref str )
 {
   istrstream ist( str.c_str() );
-  Float f;
-  ist >> f;
-  return f;
+  T aT;
+  ist >> aT;
+  return aT;
 }
 
-Int asInt( StringCref str )
+template<> Float stringTo<Float>( StringCref str )
 {
-  istrstream ist( str.c_str() );
-  Int l;
-  ist >> l;
-  return l;
+  return ATOF( str.c_str() );
+}
+
+template<> Int stringTo<Int>( StringCref str )
+{
+  return ATOI( str.c_str() );
 }
 
 string basenameOf( StringCref str, String::size_type maxlength )

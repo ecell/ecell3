@@ -103,8 +103,11 @@ public:
    */
   const String getBody( int n ) const;
 
-
+  /**
+     return keyword + ' ' + body for debug.
+   */
   const String dump() const { return first + ' ' + second; }
+
 
 };
 
