@@ -62,30 +62,6 @@ namespace libecs
     public Entity
   {
 
-  public:
-
-    /**
-       An predicate object which returns true if given pointer of Reactor 
-       points to a regular Reactor (i.e. not posterior Reactor).
-  
-       ID of Posterior Reactors must start with '!'.
-    */
-    class isRegularReactor : public std::unary_function< ReactorCptr, bool >
-    {
-    public:
-      static bool isRegularName( StringCref anID )
-      {
-	if( anID[0] != '!' )
-	  {
-	    return true;
-	  }
-	return false;
-      }
-      bool operator() ( ReactorCptr aReactorPtr ) const
-      {
-	return isRegularName( aReactorPtr->getID() );
-      }
-    };
 
   public: 
 

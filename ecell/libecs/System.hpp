@@ -60,10 +60,6 @@ namespace libecs
     public Entity
   {
 
-  public: 
-
-    class isRegularReactorItem;
-
   public:
 
     System();
@@ -282,8 +278,6 @@ namespace libecs
 
     StepperPtr theStepper;
 
-    ReactorMapConstIterator theFirstRegularReactorIterator;
-
   private:
 
     Real theVolume;
@@ -298,20 +292,6 @@ namespace libecs
 
     bool         theEntityListChanged;
 
-  };
-
-  /**
-  Equivalent to Reactor::isRegularReactor except that
-  this function object takes a reference to a ReactorMap::value_type.
-  */
-  class System::isRegularReactorItem
-    : public std::unary_function< const ReactorMap::value_type,bool >
-  {
-  public:
-    bool operator()( const ReactorMap::value_type r ) const
-    {
-      return Reactor::isRegularReactor::isRegularName( ( r.second )->getID() );
-    }
   };
 
 

@@ -146,7 +146,6 @@ namespace libecs
     theEntityListChanged( false )
   {
     makeSlots();
-    theFirstRegularReactorIterator = getReactorMap().begin();
 
     updateConcentrationFactor();
   }
@@ -226,12 +225,8 @@ namespace libecs
 	i->second->initialize();
       }
 
-    theFirstRegularReactorIterator = find_if( getReactorMap().begin(),
-					      getReactorMap().end(),
-					      isRegularReactorItem() );
 
     // do not need to call subsystems' initialize()
-
 
     updateConcentrationFactor();
   }

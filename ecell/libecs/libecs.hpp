@@ -67,7 +67,6 @@ namespace libecs
   DECLARE_CLASS( Integrator );
   DECLARE_CLASS( Reactant );
   DECLARE_CLASS( Reactor );
-  DECLARE_CLASS( isRegularReactor );
   DECLARE_CLASS( ReactorMaker );
   DECLARE_CLASS( Stepper );
   DECLARE_CLASS( MasterStepper );
@@ -77,7 +76,6 @@ namespace libecs
   DECLARE_CLASS( Substance );
   DECLARE_CLASS( SubstanceMaker );
   DECLARE_CLASS( System );
-  DECLARE_CLASS( isRegularReactorItem );
   DECLARE_CLASS( SystemMaker );
   DECLARE_CLASS( PropertySlot );
   DECLARE_CLASS( ProxyPropertySlot );
