@@ -49,7 +49,7 @@ NOTE: If you get this package via cvs, use ./autogen.sh instead of
 
   == Compilers ==
 
-  We've tested with gcc-2.95.3, gcc-2.96 and gcc-3.0.3.
+  We've tested with gcc-3.0.2 and gcc-3.0.3.
 
 
   == Note for RedHat 7.2 users ==
@@ -57,11 +57,15 @@ NOTE: If you get this package via cvs, use ./autogen.sh instead of
   If you are using RedHat Linux 7.2, you need some additional packages to 
   successfully build and run E-CELL 3.
 
+  1. gcc3:
+     must be installed.  This is an optional package of RedHat 7.2.
+     If it is installed as gcc3, not gcc, 
+     you should set environment variables(CC=gcc3 CXX=g++3) at configure.
 
-  1. python2: 
+  2. python2: 
      must be installed.  This is an optional package of RedHat 7.2.
 
-  2. Numeric Python for python2:
+  3. Numeric Python for python2:
      note that this should be built for python2, not python.
      You may have to build and install from tarball.
 
@@ -69,7 +73,7 @@ NOTE: If you get this package via cvs, use ./autogen.sh instead of
 
   (below is for osogo GUI)
 
-  3. gnome-python 1.4.2 or better for python2:
+  4. gnome-python 1.4.2 or better for python2:
      note that this is for python2, not python.
      You may have to build and install from source code.
      
@@ -88,7 +92,7 @@ NOTE: If you get this package via cvs, use ./autogen.sh instead of
 
      http://www.daa.com.au/+james/pygtk
 
-  4. GtkExtra and PyGtkExtra:
+  5. GtkExtra and PyGtkExtra:
 
      http://gtkextra.sourceforge.net
      http://python-gtkextra.sourceforge.net
