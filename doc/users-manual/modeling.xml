@@ -15,7 +15,7 @@
 
 
   <sect1>
-    <title>Simulation Model Of &ecell;</title>
+    <title>Objects In The Model</title>
 
     <para>
     &ecell;'s simulation model is fully object-oriented.  That is, the
@@ -23,17 +23,17 @@
     connected each other.  The objects have
     <emphasis>properties</emphasis>, which determine characteristics
     of the objects (such as a reaction rate constant if the object
-    represent a chemical reaction) and the relationships between
-    objects.
+    represent a chemical reaction) and relationships between
+    the objects.
     </para>
 
     <sect2>
-      <title>Objects In The Model</title>
+      <title>Types of the Objects</title>
 
       <para>A simulation model of &app; consists of the following types of objects.
 <itemizedlist>
 	  <listitem>
-	    <para>Usually more than one &Entity; object</para>
+	    <para>Usually more than one &Entity; objects</para>
 	  </listitem>
 	  <listitem>
 	    <para>One or more &Stepper; object(s)</para>
@@ -43,11 +43,9 @@
 as chemical reactions) in the model. &Stepper; objects
 implement specific simulation algorithms.
 </para>
-  </sect2>
 
-
-    <sect2>
-      <title>&Entity; Objects</title>
+    <sect3>
+      <title>Entity objects</title>
 
       <para>
 The &Entity; class has three subclasses:
@@ -76,20 +74,11 @@ The &Entity; class has three subclasses:
 	  </listitem>
 	</itemizedlist>
 </para>
-      <sect3>
-	<title>Root &System;</title>
-	<para>When a simulator instance is newly instantiated, 
-	a subclass object of &System;,
-	a <classname>CompartmentSystem</classname>, is created, and named '/'.
-        This &System; is called the <emphasis>root &System</emphasis>.
-</para>
-      </sect3>
 
+    </sect3>
 
-    </sect2>
-
-    <sect2>
-      <title>&Stepper; Objects</title>
+    <sect3>
+      <title>Stepper objects</title>
 
       <para>A model must have one or more &Stepper; object(s).  Each
       &Process; and &System; object must be connected with a &Stepper;
@@ -99,7 +88,7 @@ The &Entity; class has three subclasses:
 
       <para>&Stepper; is a class which implement a specific simulation
       algorithm.  If the model has more than one &Stepper; objects,
-      the system conducts a multi-algorithm (or multi-stepper)
+      the system conducts a multi-stepper
       simulation.  In addition to the lists of &Process; and &System;
       objects, a &Stepper; has a list of &Variable; objects that can
       be read or written by its &Process; objects.  It also has a time
@@ -112,18 +101,17 @@ The &Entity; class has three subclasses:
       determines the next time step interval.  See the following
       chapters for details of the simulation procedure.</para>
 
-      <para></para>
+    </sect3>
+
     </sect2>
-
-
 
 
     <sect2>
       <title>Object Identifiers</title>
 
       <para>&app; uses several types of identifier strings to specify
-      an object, such as the &Entity; and &Stepper;, in a simulation
-      model.</para>
+      the objects, such as the &Entity; and &Stepper; objects, in a
+      simulation model.</para>
 
       <sect3>
 	<title>ID (&EntityID; and &StepperID;)</title>
@@ -142,45 +130,57 @@ The &Entity; class has three subclasses:
 	<para>(need EBNF here)</para>
 
 	<informalexample>
-	  <para>Examples: _P3, ATP, GlucoKinase</para>
+	  <para>Examples: <literal>_P3</literal>, <literal>ATP</literal>, <literal>GlucoKinase</literal></para>
 	</informalexample>
 
       </sect3>
 
       <sect3>
-	<title>&SystemPath;</title>
+	<title>SystemPath</title>
 
 	<para>The &SystemPath; identifies a &System; from the
 	tree-like hierarchy of &System; objects in a simulation model.
 	It has a form of &EntityID; strings joined by a character '/'
 	(slash).  As a special case, the &SystemPath; of the root
-	system is '/'. For instance, if there is a &System; 'A', and
-	'A' has a subsystem 'B', a &SystemPath; '/A/B' specifies the
-	&System; object 'B'.  It has three parts: (1) the root system
-	('/'), (2) the &System; 'A' directly under the root system,
-	and (3) the &System; 'B' just under 'A'.</para>
+	system is <literal>/</literal>. For instance, if there is a
+	&System; <literal>A</literal>, and <literal>A</literal> has a
+	subsystem <literal>B</literal>, a &SystemPath;
+	<literal>/A/B</literal> specifies the &System; object
+	<literal>B</literal>.  It has three parts: (1) the root system
+	(<literal>/</literal>), (2) the &System; <literal>A</literal>
+	directly under the root system, and (3) the &System;
+	<literal>B</literal> just under <literal>A</literal>.</para>
 
-	<para>A &SystemPath can be relative.  That is, it can contain
-	'.' and '..' to specify a current and a super (containing)
-	&System;, respectively.  If a &SystemPath; is relative, it does
-	not point at a &System; object unless a current &System; is
-	given.</para>
+	<para>A &SystemPath can be relative.  The relative
+	&SystemPath; does not point at a &System; object unless the
+	current &System; is given.  A &SystemPath; is relative if (1)
+	it does not start with the leading <literal>/</literal> (the
+	root system), or (2) it contains '<literal>.</literal>' (the
+	current system) or '<literal>..</literal>' (the super-system).
+	</para>
 
 	<informalexample>
-	  <para>Examples: /A/B,  ../A, ., /CELL/ER1/../CYTOSOL</para>
+	  <para>Examples: <literal>/A/B</literal>,
+	  <literal>../A</literal>, <literal>.</literal>,
+	  <literal>/CELL/ER1/../CYTOSOL</literal></para>
 	</informalexample>
 
       </sect3>
 
       <sect3>
-	<title>&FullID;</title>
+	<title>FullID</title>
 
-	<para>A &FullID; identifies a unique &Entity; object in a simulation
-	model.  A &FullID; comprises three parts, (1) a
-	<emphasis>Type</emphasis>, (2) a &SystemPath;, and (3) an
-	&EntityID;, joined by a character ':' (colon).</para>
+	<para>A &FullID; (FULLy qualified IDentifier) identifies a
+	unique &Entity; object in a simulation model.  A &FullID;
+	comprises three parts, (1) a &EntityType;, (2) a &SystemPath;,
+	and (3) an &EntityID;, joined by a character
+	'<literal>:</literal>' (colon).
 
-	<para>Type is one of the following class names:
+<programlisting><replaceable>EntityType</replaceable>:<replaceable>SystemPath</replaceable>:<replaceable>ID</replaceable></programlisting>
+
+</para>
+
+	<para>The &EntityType; is one of the following class names:
 <itemizedlist>
 	    <listitem>
 	      <para>&System;</para>
@@ -195,8 +195,9 @@ The &Entity; class has three subclasses:
 </para>
 
 	<para>For example, the following &FullID; points to a
-&Process; object of which &EntityID; is 'P', in the &System; 'CELL'
-directly under the root system.
+&Process; object of which &EntityID; is '<literal>P</literal>', in the
+&System; '<literal>CELL</literal>' immediately under the root system
+(<literal>/</literal>).
 <informalexample>
 	    <programlisting>Process:/CELL:P</programlisting>
 	  </informalexample>
@@ -205,14 +206,24 @@ directly under the root system.
       </sect3>
 
       <sect3>
-	<title>&FullPN;</title>
+	<title>FullPN</title>
 
-	<para>&FullPN; specifies a unique
-	<emphasis>property</emphasis> (see below) of an &Entity; object in the
-	simulation model.  It has a form of a &FullID; and a name of a
-	property joined by a character ':'.</para>
+	<para>&FullPN; (FULLy qualified Property Name) specifies a
+	unique <emphasis>property</emphasis> (see the next section) of
+	an &Entity; object in the simulation model.  It has a form of
+	a &FullID; and the name of the property joined by a character
+	'<literal>:</literal>' (colon).
 
-	<para>The following &FullPN; points to a 'Value' property of the &Variable; object 'Variable:/CELL:S'.
+<programlisting><replaceable>FullID</replaceable>:<replaceable>property_name</replaceable></programlisting>
+
+        or,
+
+<programlisting><replaceable>EntityType</replaceable>:<replaceable>SystemPath</replaceable>:<replaceable>ID</replaceable>:<replaceable>property_name</replaceable></programlisting>
+</para>
+
+	<para>The following &FullPN; points to a
+	'<property>Value</property>' property of the &Variable; object
+	<literal>Variable:/CELL:S</literal>.
 <informalexample>
 	    <programlisting>Variable:/CELL:S:Value</programlisting>
 	  </informalexample>
@@ -227,66 +238,83 @@ directly under the root system.
       <title>Object Properties</title>
 
       <para>&Entity; and &Stepper; objects have
-      <emphasis>properties</emphasis>.  Property is an attribute of a
+      <emphasis>properties</emphasis>.  A property is an attribute of a
       certain object associated with a name, which can be get from and
-      set to an object.
+      set to the object.
       </para>
 
-      <para>A value of a property has a <emphasis>type</emphasis>,
-      which is one of the following types.
+      <sect3>
 
-<itemizedlist>
 	<title>Types of object properties</title>
 
-	  <listitem>
-	    <para>&Real; number</para> 
-	    <para>(ex. 3.33e+10, 1.0)</para>
-	  </listitem>
-	  <listitem>
-	    <para>&Int; number</para>
-	    <para>(ex. 3, 100)</para>
-	  </listitem>
-	  <listitem>
-	    <para>&StringType;</para>
 
-	    <para>&StringType; has two forms: quoted and not quoted.
+	<para>A value of a property has a <emphasis>type</emphasis>,
+      which is one of the followings.
+
+<itemizedlist>
+	    <listitem>
+	      <para>&Real; number</para> 
+	      <para>(ex. <literal>3.33e+10</literal>, <literal>1.0</literal>)</para>
+	    </listitem>
+	    <listitem>
+	      <para>&Int; number</para>
+	      <para>(ex. <literal>3</literal>, <literal>100</literal>)</para>
+	    </listitem>
+	    <listitem>
+	      <para>&StringType;</para>
+
+	      <para>&StringType; has two forms: quoted and not quoted.
 	    A quoted &StringType; can contain any
 	    <acronym>ASCII</acronym> characters except the quotation
 	    characters (' or ").  If a &StringType; is not quoted, it
-	    can start with an alphabet character or '_', or '/', and
-	    contain alphabets, numbers, '_', '/' and ':'.</para>
+	    can start with an alphabet character or
+	    <literal>_</literal>, or <literal>/</literal>, and contain
+	    alphabets, numbers, <literal>_</literal>,
+	    <literal>/</literal> and <literal>:</literal>.</para>
 
-	    <para>Multi-line string support is currently under
-	    development.</para>
+	      <para>If the &StringType; is triple-quoted (by
+             <literal>'''</literal>s or <literal>"""</literal>), it
+             can contain new-line characters.  (The current version still has
+             some problems processing this.)</para>
 
-	    <para>(ex. C10_A, "It can include spaces if double-quoted.", 'single-quote is available too, if you want to use "double-quotes" inside.')</para>
-	  </listitem>
+	      <para>(ex. <literal>C10_A</literal>, <literal>"It can
+	      include spaces if double-quoted."</literal>,
+	      <literal>'single-quote is available too, if you want to
+	      use "double-quotes" inside.'</literal>)</para>
+	    </listitem>
 
-	  <listitem>
-	    <para>List</para> <para>The list can contain &Real;,
-	    &Int;, &StringType; values. This list can also contain
-	    other lists, that is, the list can be nested.  A list must
-	    be surrounded by brackets ('[' and ']'), and the elements
-	    must be separated by space characters.  In some cases
-	    outermost brackets are omitted (such as in &EM; files, see below).</para>
-	    <para>(ex. [ A 10 [ 1.0 "a string" 1e+10 ] ] )</para>
-	  </listitem>
-	</itemizedlist>
+	    <listitem>
+	      <para>List</para> 
+
+	      <para>The list can contain &Real;, &Int;, and
+	       &StringType; values. This list can also contain other
+	       lists, that is, the list can be nested.  A list must be
+	       surrounded by brackets (<literal>[</literal> and
+	       <literal>]</literal>), and the elements must be
+	       separated by space characters.  In some cases outermost
+	       brackets are omitted (such as in &EM; files, see
+	       below).</para> 
+
+	      <para>(ex. <literal>[ A 10 [ 1.0 "a string" 1e+10 ]
+	      ]</literal> )</para>
+	    </listitem>
+	  </itemizedlist>
 </para>
+      </sect3>
 
       <sect3>
 	<title>Dynamic type conversion of property values</title>
 
 	<para>The system automatically convert the type of the
-         property value if it is different from what the backend
-         object (such as &Process; and &Variable;) expects to get.
-         That is, the system does not necessary raise an error if the
-         type of the given value differs from the type the backend
-         object accepts.  The system always try to convert a type of
-         the value given in a model file to a requested type by the
-         backend object.  The conversion is done by the backend object,
-         when it gets a property value.  See the
-         following section.</para>
+         property value if it is different from what the objects in
+         the simulator (such as &Process; and &Variable;) expects to
+         get.  That is, the system does not necessary raise an error
+         if the type of the given value differs from the type the
+         backend object accepts.  The system tries to convert the type
+         of the value given in the model file to the requested type by
+         the objects in the simulator.  The conversion is done by the
+         backend object, when it gets a property value.  See also the
+         following sections.</para>
 
 	<para>The conversion is done in the following manner.  
 <itemizedlist>
@@ -299,7 +327,7 @@ directly under the root system.
 
 		  <para>The number is simply converted to a character
 		  string. For example, a number 12.3 is converted to a
-		  &StringType; '12.3'.</para>
+		  &StringType; <literal>'12.3'</literal>.</para>
 		</listitem>
 		<listitem>
 		  <para>To a list</para>
@@ -347,7 +375,7 @@ directly under the root system.
 
 		  <para>It simply takes the first item of the list.
 		  If necessary the taken value is further converted to
-		  other types.</para>
+		  the destined types.</para>
 		</listitem>
 	      </itemizedlist>
 	    </listitem>
@@ -355,11 +383,11 @@ directly under the root system.
 
 
 <note>
-	    <title>Overflow or underflow when converting a property
+	    <title>Overflow and underflow when converting a property
 	    value</title> 
 
 	    <para>When converting from a &Real; number to an &Int;, or
-	    from a &StringType; to a numeric value, overflow or
+	    from a &StringType; to a numeric value, overflow and
 	    underflow can occur during the conversion.  In this case
 	    an exception (TYPE??) is raised when the backend object
 	    attempts the conversion.</para>
@@ -370,9 +398,7 @@ directly under the root system.
 
       </sect3>
 
-
     </sect2>
-
 
   </sect1>
 
@@ -380,8 +406,17 @@ directly under the root system.
   <sect1>
     <title>E-Cell Model (&EM;) File Basics</title>
 
+    <para>Now you know the &ecell;'s simulation model consists of what
+     types of objects, and the objects have their properties.  The
+     next thing to understand is how the simulation model is
+     organized: the structure of the model.  But wait, learn the
+     syntax of the &ecell; model (&EM;) file before proceeding the
+     next section would help you very much to understand the details
+     of the structure of the model, because most of the example codes uses
+     the syntax of &EM;.</para>
+
     <sect2>
-      <title>What Is &EM;?</title>
+      <title>What is &EM;?</title>
 
       <para>
       In &app, the standard file format of model description and
@@ -401,17 +436,14 @@ directly under the root system.
       are almost completely equivalent to each other, and going
       between these two formats is meant to be possible with no loss
       of information (some exceptions are comments and directions to
-      the preprocessor in &EM;).  The file suffix of &EM; files must be
+      the preprocessor in &EM;).  The file suffix of &EM; files is
       ".em".
     </para>
 
-    <sect3>
-      <title>Why and when use &EM;?</title>
+      <sect3>
+	<title>Why and when use &EM;?</title>
 
-	<para>An &EM; file can be viewed as an &EML; generator script.
-         
-
-</para>
+	<para>&EM; files can be viewed as &EML; generator scripts.</para>
 
 	<para>Although <application>E-Cell Modeling
          Environment</application> (which is under development) will
@@ -422,18 +454,19 @@ directly under the root system.
          conduct simulations.  Furthermore, owing to the nature of
          plain programming language-like syntax, &EM; can be used as a
          simple and intuitive tool to communicate with other &ecell
-         users.  In fact, this manual uses &EM; to illustrate how a
+         users.  In fact, this manual uses &EM; to illustrate how the
          model is constructed in &ecell;</para>
 
-    </sect3>
+      </sect3>
 
     </sect2>
 
     <sect2>
-      <title>&EM; At A Glance</title>
+      <title>&EM; at a Glance</title>
 
       <para>Before getting in to the details of &EM; syntax, let's
-      have a look at a tiny example. It's very simple.</para>
+      have a look at a tiny example. It's very simple, but you do not 
+      need to understand everything right now.</para>
 
       <example>
 	<title>A tiny &EM; example</title>
@@ -467,56 +500,64 @@ System CompartmentSystem( / )
                 Name  "A mass action from S to P."
                 k     1.0; 
 
-                VariableReferenceList [ S0 Variable:.:S -1 ] 
-                                      [ P0 Variable:.:P 1 ]  ;
+                VariableReferenceList [ S0 :.:S -1 ] 
+                                      [ P0 :.:P 1 ]  ;
         } 
  
 } 
 </programlisting>
       </example>
 
-      <para>In this example, the model has a &Stepper;, of which class
-      name is <classname>ODE23Stepper</classname>, and has an ID
-      ODE_1.  The model also has a root system ('/'), and the class
-      name is <classname>CompartmentSystem</classname>.  The root
-      sytem, has a StepperID property, and four &Entity; objects,
-      &Variable;s SIZE, S and P, and a &Process; E.  The 'SIZE' is a
-      special name of a &Variable;.  It determines the size of the
-      compartment.  If the compartment is three-dimensional, it means
-      the volume of the compartment in [L] (liter).  That value is
-      used to calculate concentrations of other &Variable;s.  These
-      &Entity; objects have their property values of several different
-      types.  For example, 'StepperID' of the root system is a string
-      without quotes (ODE_1). The initial value given to 'Value'
-      property of the &Variable; S is an integer number 10000.  'Name'
-      of the &Process; E is a quoted string "A mass action from S to
-      P", and 'k' of it is a real number 1.0.  'VariableReferenceList'
-      property of E is a list of two lists, which contain strings
-      (such as 'S0'), and numbers (such as -1).</para>
+      <para>In this example, the model has a &Stepper;
+      <literal>ODE_1</literal> of class
+      <classname>ODE23Stepper</classname>.  The model also has the
+      root system (<literal>/</literal>).  The root sytem has the
+      <property>StepperID</property> property, and four &Entity;
+      objects, &Variable;s <literal>SIZE</literal>,
+      <literal>S</literal> and <literal>P</literal>, and the &Process;
+      <literal>E</literal>.  <literal>SIZE</literal> is the special name
+      of the &Variable;, that determines the size of the compartment.
+      If the compartment is three-dimensional, it means the volume of
+      the compartment in [L] (liter).  That value is used to calculate
+      concentrations of other &Variable;s.  These &Entity; objects
+      have their property values of several different types.  For
+      example, <literal>StepperID</literal> of the root system is the
+      string without quotes (<literal>ODE_1</literal>). The initial
+      value given to <property>Value</property> property of the
+      &Variable; <literal>S</literal> is an integer number
+      <literal>10000</literal>.  <property>Name</property> property of
+      the &Process; <literal>E</literal> is the quoted string
+      <literal>"A mass action from S to P"</literal>, and
+      '<property>k</property>' of it is the real number
+      <literal>1.0</literal>.
+      <property>VariableReferenceList</property> property of
+      <literal>E</literal> is the list of two lists, which contain
+      strings (such as <literal>S0</literal>), and numbers (such as
+      <literal>-1</literal>).</para>
 
     </sect2>
 
 
     <sect2>
-      <title>General Syntax Of &EM;</title>
+      <title>General Syntax of &EM;</title>
 
-      <para>Basically &EM; is (and thus &EML; is) a list of just one
-      type of directive: <emphasis>object instantiation</emphasis>.
+      <para>Basically an &EM; is (and thus an &EML; is) a list of just one
+      type of directives: <emphasis>object instantiation</emphasis>.
       As we have seen, &ecell;'s simulation models have only two types 
       of 'objects'; &Stepper; and &Entity;.   After
       creating an object, property values of the object must be set.
       Therefore the object
-      instantiation has two steps: (1) creating object
+      instantiation has two steps: (1) creating the object
       and (2) setting properties.</para>
 
       <sect3>
-	<title>A general form of an object instantiation statement</title>
+	<title>General form of object instantiation statements</title>
 
-      <para>The following is the general form of definition (instantiation) 
-of an object in the simulation model:
+	<para>The following is the general form of definition
+(instantiation) of an object in &EM;:
 
 <programlisting>
-TYPE CLASSNAME ( ID )
+TYPE CLASSNAME( ID )
 """INFO (<emphasis>optional</emphasis>)"""
 { 
         PROPERTY_NAME_1 PROPERTY_VALUE_1;
@@ -529,84 +570,88 @@ where:
 <itemizedlist>
 	    <listitem>
 	      <para>TYPE</para>
-		<para>The type of the object, which is one of the followings:
+	      <para>The type of the object, which is one of the followings:
       <itemizedlist>
-	  <listitem>
-	    <para>&Stepper;</para>
-	  </listitem>
-	  <listitem>
-	    <para>&Variable;</para>
-	  </listitem>
-	  <listitem>
-	    <para>&Process;</para>
-	  </listitem>
-	  <listitem>
-	    <para>&System;</para>
-	  </listitem>
-	</itemizedlist>
+		  <listitem>
+		    <para>&Stepper;</para>
+		  </listitem>
+		  <listitem>
+		    <para>&Variable;</para>
+		  </listitem>
+		  <listitem>
+		    <para>&Process;</para>
+		  </listitem>
+		  <listitem>
+		    <para>&System;</para>
+		  </listitem>
+		</itemizedlist>
 </para>
-	      </listitem>
+	    </listitem>
 
 	    <listitem>
 	      <para>ID</para>
-		<para>This is a <emphasis>StepperID</emphasis> if the
+	      <para>This is a <emphasis>StepperID</emphasis> if the
 		object type is &Stepper;.  If it is &System;, put a
 		&SystemPath; here.  Fill in an &EntityID; if it is
-		&Variable; or &Process; (Not a &FullID; ; see the following
-		sections).</para>
-	      </listitem>
+		a &Variable; or a &Process;.</para>
+	    </listitem>
 
 	    <listitem>
 	      <para>CLASSNAME</para>
-		<para>A classname of this object.  This class must be
-a subclass of the baseclass defined by <emphasis>TYPE</emphasis>.
-For example, if the <emphasis>TYPE</emphasis> is &Process;,
+
+	      <para>The classname of this object.  This class must be
+a subclass of the baseclass defined by <emphasis>TYPE</emphasis>.  For
+example, if the <emphasis>TYPE</emphasis> is &Process;,
 <emphasis>CLASSNAME</emphasis> must be a subclass of &Process;, such
 as <classname>MassActionFluxProcess</classname>.</para>
 	    </listitem>
 
 	    <listitem>
 	      <para>INFO</para>
-		<para>This field is optional, and is not used in the
-		simulation.  A quoted single-line ("string") or
-		a multi-line string ("""multi-line string""") can be put
-		here.</para>
+
+	      <para>An annotation for this object. This field is
+		optional, and is not used in the simulation.  A quoted
+		single-line ("string") or a multi-line string
+		("""multi-line string""") can be put here.</para>
 	    </listitem>
 
 	    <listitem>
 	      <para>PROPERTY</para>
-		<para>An object definition has zero or more property
-		fields.</para> <para>A property field starts with an
-		unquoted property name string, followed by a property
-		value, and ends with a semi-colon (';').  For example,
-		if the property name is 'Concentration' and the value
-		is 10.0, it may look like:
+
+	      <para>An object definition has zero or more properties.</para> 
+
+	      <para>The property starts with an unquoted property name
+		string, followed by a property value, and ends with a
+		semi-colon (<literal>;</literal>).  For example, if
+		the property name is
+		<property>Concentration</property> and the value is
+		<literal>10.0</literal>, it may look like:
 		<informalexample>
-		    <programlisting>Concentration 10.0;</programlisting></informalexample></para>
+		  <programlisting>Concentration 10.0;</programlisting></informalexample></para>
 
-		<para>&Real;, &Int;, &StringType;, and List are
-		allowed as property value types (See Object Properties
-		above).</para> 
+	      <para>&Real;, &Int;, &StringType;, and List are
+		allowed as property value types (See the Object Properties
+		section above).</para> 
 
-		<para>If the value is a List, outermost
+	      <para>If the value is a List, outermost
 		brackets are omitted.  For example, to put a list
 		<programlisting>[ 10 "string" [ LIST ] ]</programlisting> 
-                into a property slot 'Foo', write a
-		line in a object definition like this:
+                into a property slot <literal>Foo</literal>, write a
+		line in the object definition like this:
 <informalexample>
-		    <programlisting>Foo 10 "string" [ LIST ];</programlisting>
-		  </informalexample>
+		  <programlisting>Foo 10 "string" [ LIST ];</programlisting>
+		</informalexample>
 <note>
-		    <title>Why the outermost brackets can be ommited?</title> 
+		  <title>Why the outermost brackets can be ommited?</title> 
 
-		    <para>All property values are lists, even if it is
+		  <para>All property values are lists, even if it is
 		    a scalar &Real; number.  Remember a number '1.0' is
 		    interconvertible with a length-1 list '[ 1.0 ]'. 
                     Therefore the system can correctly interpret property
                     values without the brackets.
                     </para>
 
-		    <para>In other words, if the property value is
+		  <para>In other words, if the property value is
 		    bracketed, for example, the following property value
 <programlisting>Foo [ 10 [ LIST ] ];</programlisting> 
                     is interpreted by the system as a length-1 List 
@@ -614,7 +659,7 @@ as <classname>MassActionFluxProcess</classname>.</para>
                     of which the first item is a list
 <programlisting>[ 10 [ LIST ] ]</programlisting> 
                     This may or may not be what you intend to have.</para>
-		  </note>
+		</note>
 </para>
 
 	    </listitem>
@@ -626,340 +671,17 @@ as <classname>MassActionFluxProcess</classname>.</para>
 </para>
 
       </sect3>
+    </sect2>
 
-      <sect3>
-	<title>Structure of the model</title>
+    <sect2>
+      <title>Macros and Preprocessing</title>
 
-	<para>Usually a model has one or more &Stepper; and &System;
-	statements.  General structure of &EM; file may look like this:
-<programlisting>
-STEPPER_0
-[ STEPPER_1 ]
-...
-[ STEPPER_n ]
-{
-}
-
-SYSTEM_0 # the root system ( '/' )
-[ SYSTEM_1 ]
-...
-[ SYSTEM_n ]
-</programlisting>
-</para>
-
-	<para>A &System; statement can have zero or more
-	&Variable; and &Process; statements.  Do not put a &System;
-	statement inside &System;.
-
-<programlisting>
-System CompartmentSystem( / )
-{
-
-    Variable Variable( V0 ) {}
-    Variable Variable( V1 ) {}
-    # ...
-    Variable Variable( Vn ) {}
-
-    Process SomeProcess( P0 )  {}
-    Process SomeProcess( P1 )  {}
-    # ...
-    Process OtherProcess( Pm ) {}
-}
-</programlisting>
-</para>
-      </sect3>
-
-      <sect3>
-
-	<title>System tree</title>
-
-	<para>A System statement instantiates an instance of
-         a sub-class of the &System; class.   A model has one or more
-         &System; objects.</para>
-
-	<para>A model must have at least the root sytem (/).
-
-<programlisting>
-System CompartmentSystem( / )
-{
-  ...
-}
-</programlisting>
-
-         The class of the root system is always
-         <classname>CompartmentSystem</classname>, no matter what
-         class you specify.  This is because the simulator creates the
-         root sytem when starts up, before loading a model file. That
-         is, the statement does not actually create a &System; object,
-         but just set property values.  Consequently the class name
-         (in this case, it is also
-         <classname>CompartmentSystem</classname>) is ignored.  This
-         root system statement is always required, even if you have no
-         property to set.
-      </para>
-
-	<para>If the model has more than one &System; objects, it must
-         form a tree which starts from the root system (/).  For
-         example, the following is <emphasis>not</emphasis> a valid &EM;.
-
-<programlisting>
-System CompartmentSystem( / )
-{
-}
-
-System CompartmentSystem( /CELL0/MITOCHONDRION0 )
-{
-}
-</programlisting>
-
-         This is invalid because these two &System; objects,
-         <literal>/</literal> and
-         <literal>/CELL0/MITOCHONDRION0</literal> are not connected to
-         each other, nor form a single tree.  Adding another &System;,
-         /CELL0, makes it valid.
-
-<programlisting>
-System CompartmentSystem( / )
-{
-}
-
-System CompartmentSystem( /CELL0 )
-{
-}
-
-System CompartmentSystem( /CELL0/MITOCHONDRION0 )
-{
-}
-</programlisting>
-
-         Of course a &System; can have an arbitrary number of sub-systems.
-
-<programlisting>
-System CompartmentSystem( / )
-{
-}
-
-System CompartmentSystem( /CELL1 ) {}
-System CompartmentSystem( /CELL2 ) {}
-System CompartmentSystem( /CELL3 ) {}
-# ...
-</programlisting>
-
-</para>
-
-	<note>
-	  <title>Planned support for model composition</title>
-	  <para>In future versions, the system will support a model
-             composed of multiple model files (&EM;s or &EML;s).</para>
-	</note>
-
-      </sect3>
-
-      <sect3>
-	<title>Connecting &Stepper;s with &Entity; objects</title>
-
-	<para>Any &Process; and &Variable; object in the model must be
-         connected with a &Stepper; by specifying
-         <property>StepperID</property> property.  If the
-         <property>StepperID</property> of a &Process; is omitted, it
-         defaults that of its supersystm (the &System; the &Process;
-         belongs to).  <property>StepperID</property> of &System; cannot
-         be omitted.</para>
-
-	<para>In the following example, the root sytem is connected to
-         a &Stepper; <literal>STEPPER0</literal>, and the &Process;
-         <literal>P0</literal> and <literal>P1</literal> belongs to
-         &Stepper;s <literal>STEPPER0</literal> and
-         <literal>STEPPER1</literal>, respectively.
-
-<programlisting>
-System CompartmentSystem( / )
-{
-    StepperID     STEPPER0;
-
-    Process AProcess( P0 )
-    {
-    }
-
-    Process AProcess( P1 )
-    {
-        StepperID     STEPPER1;
-    }
-}
-</programlisting>
-</para>
-
-	<para>Connections between &Stepper;s and &Variable;s are
-	automatically determined by the system, and cannot be
-	specified manually.  See the next section.</para>
-      </sect3>
-
-
-      <sect3>
-	<title>Relating &Variable; objects with a &Process;</title>
-
-	<para>A &Process; object changes values of &Variable;
-         object(s) according to a certain procedure, such as the law
-         of mass action.  What &Variable; objects the &Process; works
-         on cannot be determined when it is programmed, but it must be
-         specified by the modeler when the &Process; takes part in the
-         simulation.  
-         <property>VariableReferenceList</property> property of the
-         &Process; relates some &Variable; objects with the &Process;.</para>
-
-	<para><property>VariableReferenceList</property> is a list of
-         <emphasis>&VariableReference;s</emphasis>.  A
-         &VariableReference;, in turn, is usually a list of the
-         following three or four elements:
-
-<programlisting>[ <replaceable>reference_name</replaceable> <replaceable>FullID</replaceable> <replaceable>coefficient</replaceable> <replaceable>accessor_flag</replaceable> ]</programlisting>
-         The last two fields can be omitted:         
-
-<programlisting>[ <replaceable>reference_name</replaceable> <replaceable>FullID</replaceable> <replaceable>coefficient</replaceable> ]</programlisting>
-
-         or,
-
-<programlisting>[ <replaceable>reference_name</replaceable> <replaceable>FullID</replaceable> ]</programlisting>
-
-         Each field has the following meanings.
-
-<orderedlist>
-	    <listitem>
-	      <para>A reference name</para>
-
-	      <para>This field gives a local name inside the &Process;
-               to this &VariableReference;.  Some &Process; classes
-               use this name to identify particular instances of
-               &VariableReference;.</para>
-
-	      <para>Currently, this reference name must be set for all
-               &VariableReference;s, even if the &Process; does not
-               use it at all.
-               </para>
-
-	      <para>Lexical rule for this field is the same
-               as the &EntityID; ; leading alphabet or '_' with
-               trailing alphabet, '_', and numeric characters.</para>
-	    </listitem>
-
-	    <listitem>
-	      <para>A &FullID;</para>
-
-	      <para>This &FullID; specifies a &Variable; that this
-               &VariableReference; points to.</para>
-
-	      <para>The &SystemPath; of the &FullID; can be relative.
-	       Also, &EntityType; can be omitted.</para>
-
-	    </listitem>
-
-	    <listitem>
-	      <para>A coefficient (<emphasis>optional</emphasis>)</para>
-
-	      <para>An integer value that defines weight of the
-               connection between the &Process; and the &Variable;
-               that this &VariableReference; points to.  
-              </para>
-
-	      <para>If this value is non-zero integer, then this
-               &VariableReference; is said to be a <emphasis>mutator
-               &VariableReference;</emphasis>.  The &Process; can
-               change the value of the &Variable; that this
-               &VariableReference; points to.  If the value is zero,
-               this &VariableReference; is not a mutator, and the &Process;
-               should not change the value of the &Variable;.
-               </para>
-
-              <para>For example, if the &Process; represents a chemical
-               reaction, this value is usually interpreted by the &Process;
-               as a stoichiometric constant.  If the coefficient is -1,
-               the value of the &Variable; is decreased by 1 in a single
-               occurence or the forward reaction.</para>
-
-	      <para>If omitted, <emphasis>this field defaults to
-	      zero</emphasis>.</para>
-	    </listitem>
-
-	    <listitem>
-	      <para>An <emphasis>isAccessor</emphasis> flag (<emphasis>optional</emphasis>)</para>
-
-	      <para>This item is either 1 (true) or 0 (false).  If
-               this <emphasis>isAccessor</emphasis> flag is false, it
-               indicates that the behavior of &Process; is not
-               affected by the &Variable; that this
-               &VariableReference; points to.  That is, the &Process;
-               never reads the value of the &Variable;. The &Process;
-               may or may not change the &Variable; regardless of the value
-               of this field.</para>
-
-              <para><emphasis>The default of is 1 (true).</emphasis>
-               This field is often omitted.  Some &Process; objects
-               automatically sets this information.</para>
-
-	      <note>
-		<title>How isAccessor flag is used in the
-		simulation</title> <para>In multi-stepper simulations,
-		this information sometimes helps the system to run
-		efficiently.  If the system knows, for example, all
-		&Process; objects in a &Stepper; <literal>A</literal>
-		do not change any &Variable; connected to the other
-		&Stepper; <literal>B</literal>, it can give
-		<literal>B</literal> more chance to have larger stepsizes,
-		rather than always checking whether &Stepper;
-		<literal>A</literal> changes the &Variable;s. 
-                This flag is mainly used when there are more than one
-                &Stepper;s.</para>
-	      </note>
-
-	    </listitem>
-	  </orderedlist>
-
-	</para>
-
-	<para>
-	 Consider a reaction &Process; <literal>R</literal> in the
-	 root system, and we want to configure this &Process; to
-	 consumes a &Variable; <literal>S</literal> and produces a
-	 &Variable; <literal>P</literal>, taking <literal>E</literal>
-	 as the enzyme.  This class of &Process; requires to give the
-	 enzyme as a &VariableReference; of name
-	 <literal>ENZYME</literal>.  All the &Variable;s are in the
-	 same root system. In &EM; files,
-	 <property>VariableReferenceList</property> of thie &Process;
-	 may appear like this:
-
-<programlisting>
-System CompartmentSystem( / )
-{
-# ...
-
-    Process SomeReactionProcess( R )
-    {
-        # ...
-
-        VariableReferenceList [ S0     :.:S -1 ]
-                              [ P0     :.:P  1 ]
-                              [ ENZYME :.:E  0 ];
-
-    }
-}
-</programlisting>
-
-</para>
-
-      </sect3>
-
-
-
-      <sect3>
-	<title>Macros and preprocessing</title>
-
-	<para>Before converting to &EML;,
+      <para>Before converting to &EML;,
          <command>ecell3-em2eml</command> command invokes the &empy;
-         preprocessor to preprocess the given &EM; file.
+         program to preprocess the given &EM; file.
         </para>
 
-	<para>By using &empy;, you can embed any &Python;
+      <para>By using &empy;, you can embed any &Python;
 	expressions and statements after '@' in an &EM; file.  Put
 	a &Python; expression inside '@( <replaceable>python expression</replaceable> )', and the
 	macro will be replated with an evaluation of the expression.
@@ -987,7 +709,7 @@ System CompartmentSystem( / )
 <programlisting>Video Games Boost Visual Skills is true.</programlisting>
 </para>
 
-	<para>&empy; can also be used to include other files.  The
+      <para>&empy; can also be used to include other files.  The
 following line is replaced with the content of the file
 <filename>foo.em</filename> immediately before the &EM; file is
 converted to an &EML;: 
@@ -995,58 +717,437 @@ converted to an &EML;:
 <programlisting>@include( 'foo.em' )</programlisting>
 </para>
 
-	<para>Use <option>-E</option> option of
+      <para>Use <option>-E</option> option of
 	<command>ecell3-em2eml</command> command to see what happens
 	in the preprocessing.  With this option, it outputs the result of the
 	preprocessing to standard output and stops without creating an
 	&EML; file.</para>
 
-	<para>It has many more nice features.  See the appendix A
+      <para>It has many more nice features.  See the appendix A
 	for the full description of the &empy; program.</para>
-      </sect3>
+    </sect2>
 
-      <sect3>
-	<title>Comments</title>
+    <sect2>
+      <title>Comments</title>
 
-	<para>The comment character is a sharp '#'.  If a line contains
+      <para>The comment character is a sharp '#'.  If a line contains
          a '#' outside a quoted-string, anything after the character
          is considered a comment, and not processed by the
          <command>ecell3-em2eml</command> command.</para>
 
-	<para>This is processed differently from the &empy; comments
+      <para>This is processed differently from the &empy; comments
          (@#).  This comment character is processed by the &empy; as a
          usual character, and does not have an effect on the
          preprocessor.  That is, the part of the line after '#' is not
          ignored by &empy; preprocessor.   To comment out an &empy; macro, 
          the &empy; comment (@#) must be used.
          </para>
+    </sect2>
+
+  </sect1>
+
+  <sect1>
+    <title>Structure Of The Model</title>
+
+    <sect2>
+      <title>Steppers and Systems</title>
+
+      <para>Usually a model has one or more &Stepper; and &System;
+	statements.  General structure of &EM; file may look like this:
+<programlisting>
+STEPPER_0
+STEPPER_1
+...
+STEPPER_n
+
+
+SYSTEM_0 # the root system ( '/' )
+SYSTEM_1
+...
+SYSTEM_m
+</programlisting>
+</para>
+
+      <para>A &System; statement can have zero or more
+	&Variable; and &Process; statements.  Do not put a &System;
+	statement inside &System;.
+
+<programlisting>
+System CompartmentSystem( / )
+{
+
+    Variable Variable( V0 ) {}
+    Variable Variable( V1 ) {}
+    # ...
+    Variable Variable( Vn ) {}
+
+    Process SomeProcess( P0 )  {}
+    Process SomeProcess( P1 )  {}
+    # ...
+    Process OtherProcess( Pm ) {}
+}
+</programlisting>
+</para>
+
+
+    </sect2>
+
+    <sect2>
+
+      <title>System Tree</title>
+      
+
+      <sect3>
+	<title>The root system</title>
+	
+	<para>The model must have a &System; with a
+	 &SystemPath; <literal>/</literal>.  This &System; is called
+	 the <emphasis>root system</emphasis>.
+
+<programlisting>
+System CompartmentSystem( / )
+{
+    # ...
+}
+</programlisting>
+</para>
+
+	<para>The class of the root system is always
+         <classname>CompartmentSystem</classname>, no matter what
+         class you specify.  This is because the simulator creates the
+         root sytem when starts up, before loading the model
+         file. That is, the statement does not actually create the
+         root system object when loading the &EML; file, but just set
+         its property values.  Consequently the class name specified
+         in the &EML; is ignored.  The model file must always have
+         this root system statement, even if you have no property to
+         set.
+      </para>
+
       </sect3>
+
+      <sect3>
+	<title>Constructing the system tree</title>
+
+	<para>If the model has more than one &System; objects, it must
+         form a tree which starts from the root system (/).  For
+         example, the following is <emphasis>not</emphasis> a valid &EM;.
+
+<programlisting>
+System CompartmentSystem( / )
+{
+}
+
+System CompartmentSystem( /CELL0/MITOCHONDRION0 )
+{
+}
+</programlisting>
+
+         This is invalid because these two &System; objects,
+         <literal>/</literal> and
+         <literal>/CELL0/MITOCHONDRION0</literal> are not connected to
+         each other, nor form a single tree.  Adding another &System;,
+         <literal>/CELL0</literal>, makes it valid.
+
+<programlisting>
+System CompartmentSystem( / )
+{
+}
+
+System CompartmentSystem( /CELL0 )
+{
+}
+
+System CompartmentSystem( /CELL0/MITOCHONDRION0 )
+{
+}
+</programlisting>
+
+         Of course a &System; can have arbitrary number of sub-systems.
+
+<programlisting>
+System CompartmentSystem( / )
+{
+}
+
+System CompartmentSystem( /CELL1 ) {}
+System CompartmentSystem( /CELL2 ) {}
+System CompartmentSystem( /CELL3 ) {}
+# ...
+</programlisting>
+
+</para>
+
+
+	<note>
+	  <title>Planned support for model composition</title>
+
+	  <para>In future versions, the system will support composing
+             a model from multiple model files (&EM;s or &EML;s).
+             This is not the same as the &EM;'s file inclusion by
+             &empy; preprocessor.</para>
+	</note>
+
+      </sect3>
+
+    </sect2>
+
+    <sect2>
+      <title>Connecting Steppers with Entity Objects</title>
+
+      <para>Any &Process; and &Variable; object in the model must be
+         connected with a &Stepper; by setting its
+         <property>StepperID</property> property.  If the
+         <property>StepperID</property> of a &Process; is omitted, it
+         defaults to that of its supersystm (the &System; the &Process;
+         belongs to).  <property>StepperID</property> of &System; cannot
+         be omitted.</para>
+
+      <para>In the following example, the root sytem is connected to
+         the &Stepper; <literal>STEPPER0</literal>, and the &Process;
+         <literal>P0</literal> and <literal>P1</literal> belong to
+         &Stepper;s <literal>STEPPER0</literal> and
+         <literal>STEPPER1</literal>, respectively.
+
+<programlisting>
+Stepper SomeClassOfStepper( STEPPER0 ) {}
+Stepper AnotherClassOfStepper( STEPPER1 ) {}
+
+System CompartmentSystem( / )  # connected to STEPPER0
+{
+    StepperID     STEPPER0;
+
+    Process AProcess( P0 )     # connected to STEPPER0
+    {
+        # No StepperID specified.
+    }
+
+    Process AProcess( P1 )     # connected to STEPPER1
+    {
+        StepperID     STEPPER1;
+    }
+}
+</programlisting>
+</para>
+
+      <para>Connections between &Stepper;s and &Variable;s are
+	automatically determined by the system, and cannot be
+	specified manually.  See the next section.</para>
+
+    </sect2>
+
+    <sect2>
+      <title>Connecting Variable objects and Processes</title>
+
+      <para>A &Process; object changes values of &Variable;
+         object(s) according to a certain procedure, such as the law
+         of mass action.  What &Variable; objects the &Process; works
+         on cannot be determined when it is programmed, but it must be
+         specified by the modeler when the &Process; takes part in the
+         simulation.  
+         <property>VariableReferenceList</property> property of the
+         &Process; relates some &Variable; objects with the &Process;.</para>
+
+      <para><property>VariableReferenceList</property> is a list of
+         <emphasis>&VariableReference;s</emphasis>.  A
+         &VariableReference;, in turn, is usually a list of the
+         following four elements:
+
+<programlisting>[ <replaceable>reference_name</replaceable> <replaceable>FullID</replaceable> <replaceable>coefficient</replaceable> <replaceable>accessor_flag</replaceable> ]</programlisting>
+         The last two fields can be omitted:         
+
+<programlisting>[ <replaceable>reference_name</replaceable> <replaceable>FullID</replaceable> <replaceable>coefficient</replaceable> ]</programlisting>
+
+         or,
+
+<programlisting>[ <replaceable>reference_name</replaceable> <replaceable>FullID</replaceable> ]</programlisting>
+
+          These elements have the following meanings.
+
+<orderedlist>
+	  <listitem>
+	    <para>Reference name</para>
+
+	    <para>This field gives a local name inside the &Process;
+               to this &VariableReference;.  Some &Process; classes
+               use this name to identify particular instances of
+               &VariableReference;.</para>
+
+	    <para>Currently, this reference name must be set for all
+               &VariableReference;s, even if the &Process; does not
+               use it at all.
+               </para>
+
+	    <para>Lexical rule for this field is the same
+               as the &EntityID;; leading alphabet or '_' with
+               trailing alphabet, '_', and numeric characters.</para>
+	  </listitem>
+
+	  <listitem>
+	    <para>&FullID;</para>
+
+	    <para>This &FullID; specifies the &Variable; that this
+               &VariableReference; points to.</para>
+
+	    <para>The &SystemPath; of this &FullID; can be relative.
+	       Also, &EntityType; can be omitted.   That is, writing
+               like this is allowed:
+
+<programlisting>:.:S0</programlisting>
+
+             instead of
+
+<programlisting>Variable:/CELL:S0</programlisting>
+
+             , if the &Process; exists in the &System <literal>/CELL</literal>.
+</para>
+
+	  </listitem>
+
+	  <listitem>
+	    <para>Coefficient (<emphasis>optional</emphasis>)</para>
+
+	    <para>This coefficient is an integer value that defines
+               weight of the connection between the &Process; and the
+               &Variable; that this &VariableReference; points to.
+              </para>
+
+	    <para>If this value is a non-zero integer, then this
+               &VariableReference; is said to be a <emphasis>mutator
+               &VariableReference;</emphasis>, and the &Process; can
+               change the value of the &Variable;.  If the value is zero,
+               this &VariableReference; is not a mutator, and the &Process;
+               should not change the value of the &Variable;.
+               </para>
+
+	    <para>If the &Process; represents a chemical reaction,
+               this value is usually interpreted by the &Process; as a
+               stoichiometric constant.  For example, if the
+               coefficient is -1, the value of the &Variable; is
+               decreased by 1 in a single occurence of the forward
+               reaction.</para>
+
+	    <para>If omitted, <emphasis>this field defaults to
+	      zero</emphasis>.</para>
+	  </listitem>
+
+	  <listitem>
+	    <para><emphasis>isAccessor</emphasis> flag (<emphasis>optional</emphasis>)</para>
+
+	    <para>This item is either 1 (true) or 0 (false).  If
+               this <emphasis>isAccessor</emphasis> flag is false, it
+               indicates that the behavior of &Process; is not
+               affected by the &Variable; that this
+               &VariableReference; points to.  That is, the &Process;
+               never reads the value of the &Variable;. The &Process;
+               may or may not change the &Variable; regardless of the value
+               of this field.</para>
+
+	    <para><emphasis>The default is 1 (true).</emphasis>
+               This field is often omitted.  Some &Process; objects
+               automatically sets this information, if it knows it does
+               not change the &Variable; of this &VariableReference;.</para>
+
+	    <note>
+	      <title>How isAccessor flag is used in the
+		simulation</title> <para>In multi-stepper simulations,
+		this information sometimes helps the system to run
+		efficiently.  If the system knows, for example, all
+		&Process; objects in the &Stepper; <literal>A</literal>
+		do not change any &Variable; connected to the other
+		&Stepper; <literal>B</literal>, it can give
+		<literal>B</literal> more chance to have larger stepsizes,
+		rather than always checking whether &Stepper;
+		<literal>A</literal> changed some of the &Variable; objects. 
+                This flag is mainly used when there are more than one
+                &Stepper;s.</para>
+	    </note>
+
+	  </listitem>
+	</orderedlist>
+
+	</para>
+
+      <para>
+	 Consider a reaction &Process; in the root system
+	 ,<literal>R</literal>, consumes the &Variable;
+	 <literal>S</literal> and produces the &Variable;
+	 <literal>P</literal>, taking <literal>E</literal> as the
+	 enzyme.  This class of &Process; requires to give the enzyme
+	 as a &VariableReference; of name <literal>ENZYME</literal>.
+	 All the &Variable; objects are in the root system. In &EM;
+	 files, <property>VariableReferenceList</property> of this
+	 &Process; may appear like this:
+
+<programlisting>
+System CompartmentSystem( / )
+{
+    # ...
+    Variable Variable( S ) {}
+    Variable Variable( P ) {}
+    Variable Variable( E ) {}
+
+    Process SomeReactionProcess( R )
+    {
+        # ...
+        VariableReferenceList [ S0     :.:S -1 ]
+                              [ P0     :.:P  1 ]
+                              [ ENZYME :.:E  0 ];
+
+    }
+}
+</programlisting>
+
+</para>
 
     </sect2>
 
   </sect1>
 
-  <!--
+
+<!--
   <sect1>
-    <title>Modeling Convensions</title>
+  <title>Modeling Convensions</title>
 
-    <sect2>
-      <title>Units</title>
+  <sect2>
+  <title>Units</title>
 
-      <para><itemizedlist>
+      <para>
+      In &app;, the following units are recommended to be used.
+
+       <itemizedlist>
+
+	  <listitem>
+	    <para>Time</para>
+
+	    <para>s (second)</para>
+	  </listitem>
+
+	  <listitem>
+	    <para>Volume</para>
+	    <para>L (liter)</para>
+	  </listitem>
+
 	  <listitem>
 	    <para>Concentration</para>
-	    <para>M, or Molar concentration.  </para>
+	    <para>M (Molar concentration)</para>
 	  </listitem>
 	</itemizedlist>
 </para>
     </sect2>
 
+    <sect2>
+      <title></title>
+      <para>Anything else?</para>
+    </sect2>
+
   </sect1>
+
   -->
 
+
   <sect1>
-    <title>Modeling Examples</title>
+    <title>Modeling Tutorial</title>
 
     <para>Some basics on usage of ODE Steppers, NRStepper (Gillespie), DiscreteTimeStepper and SlaveStepper should come here.</para>
 
@@ -1105,7 +1206,7 @@ S1            S2
       <sect3>
 	<title>Defining the compartment</title>
 
-      <para>Next, define a compartment, and connect it to the &Stepper;
+	<para>Next, define a compartment, and connect it to the &Stepper;
        <literal>NR1</literal>.   Because this model has only a single
        compartment, we use the root sytem (<literal>/</literal>).
 
@@ -1167,9 +1268,9 @@ S1            S2
 
       <sect3>
 	<title>Putting them together</title>
-      <example>
-	<title>The simplest Gillespie-Gibson model</title>
-	<programlisting>Stepper NRStepper( NR1 )
+	<example>
+	  <title>The simplest Gillespie-Gibson model</title>
+	  <programlisting>Stepper NRStepper( NR1 )
 {
     # no property
 }
@@ -1208,7 +1309,7 @@ System CompartmentSystem( / )
     }
 }
 </programlisting>
-      </example>
+	</example>
       </sect3>
 
     </sect2>
@@ -1287,7 +1388,7 @@ System CompartmentSystem( / )
          The unit of the volume is [L] (liter).  In this example, we set
          it to 1e-18.
         </para>
-      
+	
       </sect3>
 
 

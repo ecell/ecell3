@@ -500,16 +500,15 @@ else:
 
 
       <sect3>
-	<title>Creating and checking existence of a backend object</title>
+	<title>Creating and checking existence of the backend object</title>
 
-	<para>Creating an &ObjectStub; does not
-	necessarily mean a corresponding object in the backend exists, or is
-	created.  In other words, creation of the
-	&ObjectStub; is purely a frontend
-	operation.  After creating an
-	&ObjectStub;, you may want to check if
-	the corresponding backend object exists, and/or to command the
-	backend to create the backend object.</para>
+	<para>Creating an &ObjectStub; does not necessarily mean a
+	corresponding object in the simulator backend exists, or is
+	created.  In other words, creation of the &ObjectStub; is
+	purely a frontend operation.  After creating an &ObjectStub;,
+	you may want to check if the corresponding backend object
+	exists, and/or to command the backend to create the backend
+	object.</para>
 
 	<para>To check if a corresponding object to an
 	&ObjectStub; exists in the simulator, use
@@ -1058,7 +1057,7 @@ Now the data is stored in a matrix variable with the same name as the file witho
 
       <para>Thus basically &ecell3; is just a
 	&Python; interpreter, and frontend
-	components to &ecell SE should run on this command.  To use
+	components of &ecell SE run on this command.  To use
 	the &ecell Python Library from &ecell3;
 	command, use <programlisting>import ecell</programlisting>
 	statement from the prompt:
@@ -1122,7 +1121,7 @@ The '<computeroutput>PYTHON =</computeroutput>' line gives the path of the
 	This runs the command on a debugger software.  If found,
 	<productname>GNU gdb</productname> is used as the
 	debugger. <envar>ECELL_DEBUG</envar> can be used for any
-	commands run on &ecell3;, including
+	commands which run on &ecell3;, including
 	&ecell3-session; and
 	&gecell;.  For example, to run &ecell3-session; in debug mode on the shell prompt:
 <informalexample>
@@ -1156,8 +1155,8 @@ It automatically runs the program with the commandline options with '<parameter>
 </para>
 
       <para><envar>ECELL_DEBUG</envar> runs
-	<productname>gdb</productname>, which is for debugging at the
-	level of lower level C++ code.  See
+	<productname>gdb</productname>, which is operates at the level
+	of C++ code.  For debugging of &Python; layer scripts, see
 	&Python; Library Reference Manual for
 	<productname>Python Debugger</productname>.</para>
     </sect2>

@@ -61,13 +61,14 @@ items.
     </sect2>
 
     <sect2>
-      <title>Compiling Dynamic Modules C++ files</title>
+      <title>Compiling C++ Dynamic Modules</title>
 
-      <para>If may have your own classes defined for the simulation
-(Dynamic Modules, or &DM;) model in form of C++ source code files.
+      <para>If may have your own classes (Dynamic Modules, or &DM;)
+defined for the simulation model in form of C++ source code files.
 Those files must be compiled before using.</para>
 
-      <para>Use <command>ecell3-dmc</command> command as a DM compiler.</para>
+      <para>Use <command>ecell3-dmc</command> command as the DM
+      compiler.</para>
 
       <para><command>ecell3-dmc</command> <option>[options]</option>
 <replaceable>filename.cpp</replaceable> <option>[compiler options]</option></para>
