@@ -1,12 +1,12 @@
 $Id$
 
-    Installation notes for E-CELL Simulation Environment Version 3
+    Installation notes for E-CELL Simulation Environment Version 3 (E-CELL SE 3)
 
                                        Kouichi Takahashi <shafi@e-cell.org>
 
 
 
-== Getting latest version of E-CELL 3 ==
+== Getting the latest version of E-CELL 3 ==
 
 1. Get source code via CVS:
 
@@ -22,10 +22,10 @@ $Id$
 
 2. Get tarball:
 
-   Check the same URL as (1)
+   Check the same URL as 1.
 
 
-Also check the e-cell.org:
+Also check e-cell.org:
 
    http://www.e-cell.org
 
@@ -59,9 +59,9 @@ NOTE: If you get this package via cvs, use ./autogen.sh instead of
 
 
   1. python2: 
-     must be installed.  This is an optional package of the RedHat 7.2.
+     must be installed.  This is an optional package of RedHat 7.2.
 
-  2. Numeric Python for the python2:
+  2. Numeric Python for python2:
      note that this should be built for python2, not python.
      You may have to build and install from tarball.
 
@@ -95,7 +95,7 @@ NOTE: If you get this package via cvs, use ./autogen.sh instead of
 
 
 
-  I recommend http://www.freshmeat.net to find latest URLs for the
+  I recommend http://www.freshmeat.net for finding the latest URLs for the
   packages.
 
 
@@ -111,7 +111,7 @@ NOTE: If you get this package via cvs, use ./autogen.sh instead of
 
       % {PREFIX}/bin/ecell3
 
-   (where {PREFIX} is the prefix specified in the step 1 of the Install. 
+   (where {PREFIX} is the prefix specified in step 1 of 'Install'. 
     The default is /usr/local.)
 
    then import E-CELL module by 'import ecs'.
@@ -136,14 +136,14 @@ NOTE: If you get this package via cvs, use ./autogen.sh instead of
    == 2. Using E-CELL from Osogo GUI ==
 
    If you have python, gnome-python (aka. pygnome) and PyGtkExtra installed,
-   an GUI session monitor, Osogo, is built.
+   a GUI session monitor, Osogo, is built.
 
    To use Osogo, type:
 
    % {PREFIX}/bin/gecell
 
-   Osogo is a python program runs on the ecell3 command explained 
-   in section 2.1.
+   Osogo is a python program which runs on the 'ecell3' command, 
+   explained above
 
 
 == Documentation ==
@@ -156,7 +156,7 @@ NOTE: If you get this package via cvs, use ./autogen.sh instead of
 
       http://www.red-bean.com/cvs2cl
 
-   2. set up cvs for E-CELL 3 project (check the 'Getting' section above)
+   2. set up cvs for E-CELL 3 project (check the 'Getting...' section above)
 
    3. run the cvs2cl.pl
 
@@ -191,7 +191,7 @@ NOTE: If you get this package via cvs, use ./autogen.sh instead of
 
 
 
-(( Below is general instructions with automake. ))
+(( Below are general instructions with automake. ))
 
 
 Basic Installation
@@ -376,3 +376,16 @@ operates.
      script, and exit.
 
 `configure' also accepts some other, not widely useful, options.
+
+
+
+
+
+
+
+
+
+
+
+
+

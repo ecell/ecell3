@@ -1,6 +1,6 @@
 $Id$
 
-      Release notes for E-CELL Simulation Environement Version 3
+      Release notes for E-CELL Simulation Environment Version 3 (E-CELL SE 3)
                                         Kouichi Takahashi <shafi@e-cell.org>
 
 
@@ -16,7 +16,7 @@ E-CELL is a generic software package for cellular modeling and simulation.
 == Files and directories ==
 
 README:    This file
-INSTALL:   Installation instruction
+INSTALL:   Installation instructions
 ChangeLog: Automatically generated cvs log 
 NEWS:      Project log
 COPYING:   License
@@ -25,36 +25,36 @@ AUTHORS:   List of authors
 
 
 ecell/       --> Core portion of E-CELL SE 3, or Hekkoro
-ecell/libecs --> Koyurugi: A class library for cell modeling and simulation
-                           (E-CELL3's core of the core)
-ecell/libemc --> E-CELL Micro Core (EMC): A C++ API of Koyurugi
-ecell/pyecs  --> A python binding of the EMC
+ecell/libecs --> Koyurugi: Class library for cell modeling and simulation
+                           (E-CELL SE 3's innermost core)
+ecell/libemc --> E-CELL Micro Core (EMC): C++ API of Koyurugi
+ecell/pyecs  --> Python binding of EMC
 
-osogo/       --> Osogo GUI session monitor (gecell)
+osogo/       --> GUI session monitor (gecell)
 
-dmtool/      --> A C++ class library for dynamic loading of object classes
+dmtool/      --> C++ class library for dynamic loading of object classes
 
 doc/         --> Documentations 
-                 (including an automatically generated reference manual)
+                 (Includes an automatically generated reference manual)
 
 
 (Below are third-party packages)
 
-PyCXX/       --> A C++ wrapper of Python C API
-korandom/    --> Random number generator package
-libltdl/     --> libtool's dynamic module loader library
+PyCXX/       --> C++ wrapper of Python C API
+korandom/    --> Package for random number generation
+libltdl/     --> Libtool's dynamic module loader library
 
 
 
 
-== About codenames ==
+== About code names ==
 
 
-  Hekkoro  -- is a codename of E-CELL SE Version 3 (libecs, libemc plus pyecs)
-  Koyurugi -- is a codename of libecs class library
-  Osogo    -- is a codename of a GUI Session monitor (gecell)
+  Hekkoro  -- Code name for E-CELL SE Version 3 (libecs, libemc and pyecs)
+  Koyurugi -- Code name for the libecs class library
+  Osogo    -- Code name for the GUI Session monitor (gecell)
 
-  (Serizawa -- was a code name of E-CELL 1)
+  (Serizawa -- Code name for E-CELL 1)
 
 
 
@@ -90,4 +90,35 @@ libltdl/     --> libtool's dynamic module loader library
 // E-CELL Project, Lab. for Bioinformatics, 
 // Institute for Advanced Biosciences, Keio University.
 //
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
