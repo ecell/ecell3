@@ -2,7 +2,7 @@
 
 from ecell.ECDDataFile import *
 
-print "onerun.ess --------------------------------> start "
+print "runsession.py --------------------------------> start "
 
 # ---------------------------------------------------------
 # load the model
@@ -116,7 +116,13 @@ aDifference /= aGivenS.getSize()[1]
 
 print "aDifference = %s " %aDifference
 
+# ---------------------------------------------------------
+# write evaluation value (float) to 'result.dat'
+# ga.py reads this file.
+# ---------------------------------------------------------
 open('result.dat','w').write(str(aDifference))
+
+# optional procedures
 
 # ---------------------------------------------------------
 # write setting file for gnuplot
@@ -135,7 +141,7 @@ aContents += "pause -1"
 open('gnuplot.dat','w').write(aContents)
 
 
-print "onerun.ess --------------------------------> end "
+print "runsession.py --------------------------------> end "
 
 
 
