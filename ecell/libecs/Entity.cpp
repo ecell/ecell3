@@ -36,7 +36,7 @@
 
 Entity::Entity()
   : 
-  theSuperSystem( NULL ),
+  theSuperSystem( NULLPTR ),
   theId( "" ),
   theName( "" ) 
 {
@@ -51,12 +51,12 @@ Entity::~Entity()
 
 void Entity::makeSlots()
 {
-  MessageSlot( "ClassName", Entity, *this, NULL, &Entity::getClassName );
-  MessageSlot( "Id", Entity, *this, NULL, &Entity::getId );
-  MessageSlot( "SystemPath", Entity, *this, NULL, &Entity::getSystemPath );
-  MessageSlot( "Name", Entity, *this, NULL, &Entity::getName );
-  MessageSlot( "Activity", Entity, *this, NULL, &Entity::getActivity );
-  MessageSlot( "ActivityPerSecond", Entity, *this, NULL, 
+  MessageSlot( "ClassName", Entity, *this, NULLPTR, &Entity::getClassName );
+  MessageSlot( "Id", Entity, *this, NULLPTR, &Entity::getId );
+  MessageSlot( "SystemPath", Entity, *this, NULLPTR, &Entity::getSystemPath );
+  MessageSlot( "Name", Entity, *this, NULLPTR, &Entity::getName );
+  MessageSlot( "Activity", Entity, *this, NULLPTR, &Entity::getActivity );
+  MessageSlot( "ActivityPerSecond", Entity, *this, NULLPTR, 
 	       &Entity::getActivityPerSecond );
 }
 

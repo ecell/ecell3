@@ -40,13 +40,32 @@ class Accumulator
 
 public:
 
-  Accumulator() : theSubstance( NULL ) {}
-  virtual ~Accumulator() {}
+  Accumulator() 
+    : 
+    theSubstance( NULLPTR ) 
+  {
+    ; // do nothing
+  }
 
-  void setOwner( SubstancePtr substance ) { theSubstance = substance; }
+  virtual ~Accumulator() 
+  {
+    ; // do nothing
+  }
 
-  virtual Float save() { return getQuantity(); }
-  virtual void update() {}
+  void setOwner( SubstancePtr substance ) 
+  { 
+    theSubstance = substance; 
+  }
+
+  virtual Float save() 
+  { 
+    return getQuantity(); 
+  }
+
+  virtual void update() 
+  {
+    ; // do nothing
+  }
 
   virtual void doit() = 0;
 
@@ -55,9 +74,14 @@ public:
 protected:
 
   Float& getQuantity() 
-  { return const_cast<Float&>( theSubstance->theQuantity ); }
+  { 
+    return const_cast<Float&>( theSubstance->theQuantity ); 
+  }
+
   Float& getVelocity() 
-  { return const_cast<Float&>( theSubstance->theVelocity ); }
+  { 
+    return const_cast<Float&>( theSubstance->theVelocity ); 
+  }
 
 protected:
 
@@ -70,7 +94,11 @@ class SimpleAccumulator : public Accumulator
 
 public:
 
-  SimpleAccumulator() {}
+  SimpleAccumulator() 
+  {
+    ; // do nothing
+  }
+
   static AccumulatorPtr instance() { return new SimpleAccumulator; }
 
   virtual void doit();
@@ -84,7 +112,11 @@ class RoundDownAccumulator : public Accumulator
 
 public:
 
-  RoundDownAccumulator() {}
+  RoundDownAccumulator() 
+  {
+    ; // do nothing
+  }
+
   static AccumulatorPtr instance() { return new RoundDownAccumulator; }
 
   virtual void update();
@@ -100,7 +132,11 @@ class RoundOffAccumulator : public Accumulator
 
 public:
 
-  RoundOffAccumulator() {}
+  RoundOffAccumulator() 
+  {
+    ; // do nothing
+  }
+
   static AccumulatorPtr instance() { return new RoundOffAccumulator; }
 
   virtual void update();
@@ -116,7 +152,13 @@ class ReserveAccumulator : public Accumulator
 
 public:
 
-  ReserveAccumulator() : theFraction( 0 ) {}
+  ReserveAccumulator() 
+    : 
+    theFraction( 0 ) 
+  {
+    ; // do nothing
+  }
+
   static AccumulatorPtr instance() { return new ReserveAccumulator; }
 
   virtual Float save();
@@ -136,7 +178,11 @@ class MonteCarloAccumulator : public Accumulator
 
 public:
 
-  MonteCarloAccumulator() {}
+  MonteCarloAccumulator() 
+  {
+    ; // do nothing
+  }
+
   static AccumulatorPtr instance() { return new MonteCarloAccumulator; }
 
   virtual void update();

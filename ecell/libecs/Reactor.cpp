@@ -43,13 +43,13 @@ void Reactor::makeSlots()
 {
   //FIXME: get methods
   MessageSlot( "AppendSubstrate",Reactor,*this,&Reactor::setAppendSubstrate,
-	       NULL );
+	       NULLPTR );
   MessageSlot( "AppendProduct",Reactor,*this,&Reactor::setAppendProduct,
-	       NULL );
+	       NULLPTR );
   MessageSlot( "AppendCatalyst",Reactor,*this,&Reactor::setAppendCatalyst,
-	       NULL );
+	       NULLPTR );
   MessageSlot( "AppendEffector",Reactor,*this,&Reactor::setAppendEffector,
-	       NULL );
+	       NULLPTR );
 
   MessageSlot( "SubstrateList",Reactor,*this,&Reactor::setSubstrateList,
 	       &Reactor::getSubstrateList);

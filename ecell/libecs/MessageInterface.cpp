@@ -34,7 +34,7 @@
 
 void MessageInterface::makeSlots()
 {
-  MessageSlot( "PropertyList",MessageInterface,*this,NULL,
+  MessageSlot( "PropertyList",MessageInterface,*this,NULLPTR,
 	       &MessageInterface::getPropertyList);
 
 }

@@ -37,7 +37,7 @@
 
 ////////////////////////// Stepper
 
-Stepper::Stepper() : theOwner( NULL )
+Stepper::Stepper() : theOwner( NULLPTR )
 {
 
 }
@@ -64,7 +64,7 @@ void Stepper::initialize()
 MasterStepper::MasterStepper() 
   :
   thePace( 1 ),
-  theAllocator( NULL )
+  theAllocator( NULLPTR )
 {
 
 }
@@ -84,7 +84,9 @@ void MasterStepper::initialize()
 
   for( SlaveStepperListIterator i = theSlavesList.begin() ; 
        i != theSlavesList.end() ; ++i )
-    (*i)->initialize();
+    {
+      (*i)->initialize();
+    }
 }
 
 void MasterStepper::distributeIntegrator(IntegratorAllocator allocator)
@@ -92,7 +94,9 @@ void MasterStepper::distributeIntegrator(IntegratorAllocator allocator)
   Stepper::distributeIntegrator( &allocator );
   for( SlaveStepperListIterator i = theSlavesList.begin() ; 
        i != theSlavesList.end() ; ++i )
-    (*i)->distributeIntegrator( &allocator );
+    {
+      (*i)->distributeIntegrator( &allocator );
+    }
 }
 
 
@@ -184,7 +188,9 @@ void StepperLeader::clear()
 
   for( MasterStepperMap::iterator i = theStepperList.begin();
        i != theStepperList.end() ; ++i )
-    i->second->clear();
+    {
+      i->second->clear();
+    }
 }
 
 void StepperLeader::react()

@@ -46,11 +46,11 @@ template SystemList;
 void System::makeSlots()
 {
   MessageSlot( "SystemList", System, *this,
-	       NULL, &System::getSystemList );
+	       NULLPTR, &System::getSystemList );
   MessageSlot( "SubstanceList", System, *this,
-	       NULL, &System::getSubstanceList );
+	       NULLPTR, &System::getSubstanceList );
   MessageSlot( "ReactorList", System, *this,
-	       NULL, &System::getReactorList );
+	       NULLPTR, &System::getReactorList );
 
   MessageSlot( "StepperClass", System, *this,
 	       &System::setStepperClass, &System::getStepperClass );
@@ -134,10 +134,10 @@ const Message System::getVolumeIndex( StringCref keyword )
 
 System::System()
   :
-  theVolumeIndexName( NULL ),
-  theVolumeIndex( NULL ),
-  theStepper( NULL ),
-  theRootSystem( NULL )
+  theVolumeIndexName( NULLPTR ),
+  theVolumeIndex( NULLPTR ),
+  theStepper( NULLPTR ),
+  theRootSystem( NULLPTR )
 {
   makeSlots();
   theFirstRegularReactorIterator = getFirstReactorIterator();
@@ -200,7 +200,7 @@ void System::initialize()
     }
 
   delete theVolumeIndexName;
-  theVolumeIndexName = NULL;
+  theVolumeIndexName = NULLPTR;
 
   //
   // Substance::initialize()

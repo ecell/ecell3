@@ -38,12 +38,12 @@ RandomNumberGenerator* theRandomNumberGenerator =
 new RandomNumberGenerator( 
 			  // FIXME: is this cast good?
 			  // should be reinterpret_cast or something?
-			  (Float)(time(NULL)) ,
+			  static_cast<Float>( time( NULLPTR ) ) ,
 			  RANDOM_NUMBER_BUFFER_SIZE);
 
 int table_lookup( StringCref str, const char** table )
 {
-  for( int i = 0 ; table[i] != NULL ; ++i )
+  for( int i = 0 ; table[i] != NULLPTR ; ++i )
     {
       if( str == String( table[ i ] ) )
 	{
@@ -57,19 +57,19 @@ int table_lookup( StringCref str, const char** table )
 template<> const Float stringTo<Float>( StringCref str )
 {
   // FIXME: error check, throw exception
-  return strtod( str.c_str(), NULL );
+  return strtod( str.c_str(), NULLPTR );
 }
 
 template<> const Int stringTo<Int>( StringCref str )
 {
   // FIXME: error check, throw exception
-  return strtol( str.c_str(), NULL, 10 );
+  return strtol( str.c_str(), NULLPTR, 10 );
 }
 
 template<> const UnsignedInt stringTo<UnsignedInt>( StringCref str )
 {
   // FIXME: error check, throw exception
-  return strtoul( str.c_str(), NULL, 10 );
+  return strtoul( str.c_str(), NULLPTR, 10 );
 }
 
 template<> const String toString<Float>( const Float& f )

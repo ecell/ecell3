@@ -95,8 +95,8 @@ const Message Substance::getAccumulatorClass( StringCref keyword )
 
 Substance::Substance()
   : 
-  theAccumulator( NULL ),
-  theIntegrator( NULL ),
+  theAccumulator( NULLPTR ),
+  theIntegrator( NULLPTR ),
   theQuantity( 0 ),  
   theFraction( 0 ),
   theVelocity( 0 ),
@@ -131,7 +131,7 @@ void Substance::setAccumulator( StringCref classname )
     {
       //FIXME:     *theMessageWindow << "[" << fqpi() << "]:\n" << e.message();
       // warn if theAccumulator is already set
-      if( theAccumulator != NULL )   
+      if( theAccumulator != NULLPTR )   
        {
 	 //FIXME: *theMessageWindow << "[" << fqpi() << 
 	 //FIXME: "]: falling back to :" << theAccumulator->className() 
@@ -142,8 +142,10 @@ void Substance::setAccumulator( StringCref classname )
 
 void Substance::setAccumulator( AccumulatorPtr accumulator )
 {
-  if( theAccumulator )
-    delete theAccumulator;
+  if( theAccumulator != NULLPTR )
+    {
+      delete theAccumulator;
+    }
   theAccumulator = accumulator;
   theAccumulator->setOwner( this );
   theAccumulator->update();
@@ -157,8 +159,10 @@ const String Substance::getFqpi() const
 
 void Substance::initialize()
 {
-  if( theAccumulator == NULL )
-    setAccumulator( USER_DEFAULT_ACCUMULATOR_NAME );
+  if( theAccumulator == NULLPTR )
+    {
+      setAccumulator( USER_DEFAULT_ACCUMULATOR_NAME );
+    }
 
   // if the user default is invalid fall back to the system default.
   if( !theAccumulator )  
@@ -197,7 +201,7 @@ bool Substance::haveConcentration() const
 {
   bool aBool(true);
 
-  if( getSuperSystem()->getVolumeIndex() == NULL ) 
+  if( getSuperSystem()->getVolumeIndex() == NULLPTR ) 
     {
       aBool = false;
     }
