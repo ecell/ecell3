@@ -315,8 +315,6 @@ class EntityListWindow(OsogoWindow):
             rootWidget= 'top_frame',\
             parent= self ) 
 
-        self.thePropertyWindow.setStatusBar( self['statusbar'] )
-
         aPropertyWindowTopVBox = self.thePropertyWindow['top_frame']
         self['property_area'].add( aPropertyWindowTopVBox )
         self.thePropertyWindow.setParent( self )
