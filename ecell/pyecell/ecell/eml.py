@@ -329,49 +329,308 @@ class Model:
 class EmlParser:
     """This class parses EML file to PreModel Object."""
 
-    def __init__( self, aFileObject ):
+
+    def __init__( self, *aFileObjectList ):
         """read EML file and make Document Object"""
 
 
-        self.__theFileObject = aFileObject
+        self.__theDocumentList = []
+        for aTargetFileObject in( aFileObjectList ):
 
-        aFileList   = aFileObject.readlines()
-        aStringData = string.join( string.join( aFileList, '' ).split( '\n' ), '' )
-        self.__theDocument = minidom.parseString( aStringData )
+            try:
+                aFileName = aTargetFileObject.name
+            except AttributeError:                      ## with StringData
+                aFileName = 'StringData'                ## error will occur!! why!?
 
-        
+
+            aFileList   = aTargetFileObject.readlines()
+            aStringData = string.join( string.join( aFileList, '' ).split( '\n' ), '' )
+
+            aDocument = minidom.parseString( aStringData )
+
+            self.__theDocumentList.append( ( aDocument, aFileName ) )
+
+
+
 
     def parse( self ):
-        """parse the DOM to the PreModel Object
-        - aPreModel
-            * aPropertyPreModelElement -> [aFullPn,aValueList]
-            * anEntityPreModelElement  -> [anId,anEntityClass,aName]
-        """
+
+
+        self.__thePedigree     = {}
+        self.__thePropertyList = []
+        self.__theSystemList   = []
+        self.__theStepperList  = []
+
+        for aTargetDocument in( self.__theDocumentList ):
+
+            ### get path information ###
+            self.getSystemPropertyList( aTargetDocument[0].documentElement )
+
+            ### add Origin to each elements ###
+            anOrigin = aTargetDocument[1]
+            self.markOrigin( aTargetDocument[0].documentElement, anOrigin )
+            
+            ### connect DOM tree (Property) ###
+            #@#I haven't allowed for metadata yet! @020421
+            self.getPropertyList( aTargetDocument[0].documentElement )
+
+            ### connect DOM tree (System) ###
+            #@#I haven't allowed for metadata yet! @020421
+            self.getSystemList( aTargetDocument[0].documentElement )
+
+            ### connect DOM tree (Stepper) ###
+            self.getStepperList( aTargetDocument[0].documentElement )
+
+
+        aDomList = { 'property': self.__thePropertyList, \
+                     'system'  : self.__theSystemList,   \
+                     'stepper' : self.__theStepperList   \
+                   }
+
+
+        aRootString = '<eml><model></model></eml>'
+        self.__theDocument = minidom.parseString( aRootString )
+
+        for aTargetType in( 'property', 'system', 'stepper' ):
+            for aTargetElement in( aDomList[ aTargetType ] ):
+                self.__theDocument.documentElement.appendChild( aTargetElement )
+
+
+        ###                                                 ###
+        ### if PreModel is aborted, please change following ###
+        ###                                                 ###
+
 
         aStepperPreModel        = self.getStepperPreModel()
         aStepperSystemPreModel  = self.getStepperSystemPreModel()
         aPropertyPreModel       = self.getPropertyPreModel()
         anEntityPreModel        = self.getEntityPreModel()
 
+	anStepperSystemPreModel = self.convertStepperSystemPath( aStepperSystemPreModel )
+        anEntityPreModel        = self.convertEntityPath( anEntityPreModel )
+	
 
-        aPreModel = { 'stepper': aStepperPreModel, \
+        aPreModel = { 'stepper'       : aStepperPreModel,       \
                       'stepper_system': aStepperSystemPreModel, \
-                      'property': aPropertyPreModel, \
-                      'entity': anEntityPreModel }
-
-
-
-        ## Temporary Path Convert for 3.0.0, refactor!!
-        aPathConverter = ConvertPath( self.__theDocument )
-        aPathConverter.createPathList( 'None' )
-        
-        for aTargetEntity in( aPreModel['entity'] ):
-            aTargetEntity[1] = aPathConverter.change( aTargetEntity[1] )
-        for aTargetStepperSystem in( aPreModel['stepper_system'] ):
-            aTargetStepperSystem[0] = aPathConverter.change( aTargetStepperSystem[0] )
-        ##-----------------------------------------------------------------------------
+                      'property'      : aPropertyPreModel,      \
+                      'entity'        : anEntityPreModel        \
+                    }
 
         return aPreModel
+
+
+
+
+
+    def showPreModel( self, aPreModel ):
+        for aTargetType in( 'stepper', 'stepper_system', 'property', 'entity' ):
+            print aTargetType,':'
+            for aTarget in( aPreModel[ aTargetType ] ):
+                print aTarget
+            print '\n'
+                        
+
+
+
+##### methods for methods #####
+        
+    def markOrigin( self, aTargetNode, anOrigin ):
+        """for parse method, this works recursively"""
+
+        if len( aTargetNode.childNodes ) > 0:
+            for aChild in( aTargetNode.childNodes ):
+                try:
+                    aChild.setAttribute( 'origin', anOrigin )
+                except AttributeError:
+                    pass
+                self.markOrigin( aChild, anOrigin )
+
+
+
+    def removeOrigin( self, aTargetNode ):
+        """this works recursively"""
+        pass
+
+
+
+
+    def getSystemPropertyList( self, aTargetNode ):
+        """for parse method, this works recursively"""
+
+        if len( aTargetNode.childNodes ) > 0:
+            for aChild in( aTargetNode.childNodes ):
+                try:
+                    if aChild.tagName == 'property' and \
+                       aChild.getAttribute( 'fullid' ).split( ':' )[0] == 'System':
+
+                        aFullId = aChild.getAttribute( 'fullid' ).split( ':' )
+                        aRelativePath = aFullId[2]
+                        
+                        if not ( aFullId[2] == '/' or aFullId[1] == '/' ):
+                            anAbsolutePath = aFullId[1] + '/' + aFullId[2]
+                        else:
+                            anAbsolutePath = aFullId[1] + aFullId[2]
+
+
+                        ## system-subsystem overwrite
+                        anAbsolutePathList = self.__thePedigree.values()
+                        for aCheckingAbsolutePath in( anAbsolutePathList ):
+                            if anAbsolutePath == aCheckingAbsolutePath:
+                                self.__thePedigree.remove\
+                                                  ( self.__thePedigree[ aCheckingAbsolutePath ] )
+                                
+                        self.__thePedigree[ aRelativePath ] = anAbsolutePath
+
+                        
+                except AttributeError:
+                    pass
+                self.getSystemPropertyList( aChild )
+
+
+
+
+    def getPropertyList( self, aTargetNode ):
+        """for parse method, this works recursively"""
+
+        if len( aTargetNode.childNodes ) > 0:
+            for aTargetChild in( aTargetNode.childNodes ):
+                try:
+                    if aTargetChild.tagName == 'property':
+
+                        aTargetFullid = aTargetChild.getAttribute( 'fullid' )
+                        aTargetName   = aTargetChild.getAttribute( 'name' )
+
+
+                        ## remove old element for Property list overwrite
+                        for aCheckingProperty in( self.__thePropertyList ):
+
+                            aCheckingFullid = aCheckingProperty.getAttribute( 'fullid' )
+                            aCheckingName   = aCheckingProperty.getAttribute( 'name' )
+
+                            if \
+                               aCheckingProperty.getAttribute( 'name' ) == 'Reactant' and \
+                               self.compareProperty( aCheckingProperty, aTargetChild ) == 1:
+
+                                ## cannot specify aReactantProperty with fullid and name
+                                ## specify with all value data and attributes
+
+                                self.__thePropertyList.remove( aCheckingProperty )
+
+                            elif \
+                               not aCheckingProperty.getAttribute( 'name' ) == 'Reactant' and \
+                               aTargetFullid == aCheckingFullid and \
+                               aTargetName   == aCheckingName:
+
+                                self.__thePropertyList.remove( aCheckingProperty )
+
+
+                        self.__thePropertyList.append( aTargetChild )
+
+                except AttributeError:
+                    pass
+                self.getPropertyList( aTargetChild )
+
+
+
+
+    def getSystemList( self, aTargetNode ):
+        """for parse method, this works recursively"""
+        
+        for aTargetChild in( aTargetNode.childNodes ):
+            try:
+                if aTargetChild.tagName == 'system':
+                    aTargetId      = aTargetChild.getAttribute( 'id' )
+                    aTargetStepper = aTargetChild.getAttribute( 'stepper' )
+
+                    ## remove old element for System list overwrite
+                    for aCheckingSystem in( self.__theSystemList ):
+                        aCheckingId      = aCheckingSystem.getAttribute( 'id' )
+                        aCheckingStepper = aCheckingSystem.getAttribute( 'stepper' )
+
+                        #if self.compareSystem( aCheckingSystem, aTargetChild ) == 1:
+                        if aTargetId      == aCheckingId and \
+                           aTargetStepper == aCheckingStepper:
+                            self.__theSystemList.remove( aCheckingSystem )
+                            
+                    self.__theSystemList.append( aTargetChild )
+
+            except AttributeError:
+                pass
+
+            self.getSystemList( aTargetChild )
+
+
+
+    def getStepperList( self, aTargetNode ):
+        """for parse method, this works recursively"""
+        
+        for aTargetChild in( aTargetNode.childNodes ):
+            try:
+                if aTargetChild.tagName == 'stepperlist':
+                    aTargetId      = aTargetChild.getAttribute( 'id' )
+                    aTargetStepper = aTargetChild.getAttribute( 'stepper' )
+
+                    ## remove old element for System list overwrite
+                    for aCheckingStepper in( self.__theStepperList ):
+                        anId     = aCheckingStepper.getAttribute( 'id' )
+                        aStepper = aCheckingStepper.getAttribute( 'stepper' )
+
+                        if aTargetId      == anId and \
+                           aTargetStepper == aStepper:
+                            self.__theStepperList.remove( aCheckingStepper )
+
+                    self.__theStepperList.append( aTargetChild )
+
+            except AttributeError:
+                pass
+
+            self.getStepperList( aTargetChild )
+
+
+
+
+    def compareProperty( self, anElementA, anElementB ):
+
+        def setOrigin( aTargetElement, anOrigin ):
+            aTargetElement.setAttribute( 'origin', anOrigin )
+            if len( aTargetElement.childNodes ) > 0:
+                for aTargetChild in( aTargetElement.childNodes ):
+                    aTargetChild.setAttribute( 'origin', anOrigin )
+
+        def removeOrigin( aTargetElement ):
+            setOrigin( aTargetElement, '' )
+
+
+        anOriginA = anElementA.getAttribute( 'origin' )
+        anOriginB = anElementB.getAttribute( 'origin' )
+
+        removeOrigin( anElementA )
+        removeOrigin( anElementB )
+
+        aCompareResult =  self.compareDomElement( anElementA, anElementB )
+
+        setOrigin( anElementA, anOriginA )
+        setOrigin( anElementB, anOriginB )
+
+        return aCompareResult
+
+    
+### very dangerous because this don't allow for metadata without any option   ###
+### I recommend not to use this comparint (suzuki@020421)                     ###
+
+
+    def compareDomElement( self, anElementA, anElementB ):
+        aStringA = anElementA.toxml()
+        aStringB = anElementB.toxml()
+
+        #print aStringA  ##
+        #print aStringB  ##DebugMessage
+
+        if aStringA == aStringB:
+            return 1
+        else:
+            return 0
+
 
 
 
@@ -404,6 +663,7 @@ class EmlParser:
 
         return aStepperSystemPreModel
         ## [ systemFullPn, stepperId ]
+
 
 
 
@@ -491,88 +751,35 @@ class EmlParser:
 
 
 
-#---------------------------------------------------------"""
-class ConvertPath:
-    """convert relative path to absolute path"""
+    def convertEntityPath( self, anEntityPreModel ):
 
-    def __init__( self, aDocumentObject ):
-        """initialize self.__thePedigreeList"""
+        for aTargetEntity in( anEntityPreModel ):
+            aRelativePath  = aTargetEntity[1]
+            try:
+                anAbsolutePath = self.__thePedigree[ aRelativePath ]
+            except KeyError:
+                anAbsolutePath = 'AbsolutePathError'
 
-        self.__theDocument = aDocumentObject
-        self.__thePedigreeList = []
-        
-
-    def change( self, anId ):
-        """turn relative path to absolute path"""
-
-
-        if anId == '/':
-            aPath = '/'
-            return aPath
-
-        else:
-            for aPedigree in( self.__thePedigreeList ):
-                i = 0
-                for anElement in( aPedigree ):
-                    i = i + 1
-                    if anElement == anId:
-                        aPathList = aPedigree[0:i]
-                        aPath     = string.join( aPathList, '/' )
-                        aPath     = str( '/' + aPath )
-
-                        return aPath
-
-
-
-    def createPathList( self, aChildName ):
-        """create absolute path list"""
-
-        if aChildName == 'None':
-            self.__thePedigree = []
-
-        self.createFillitationList()
-        
-        for aFillitation in( self.__theFillitationList ):
-
-
-            if aFillitation[1] == aChildName:
-                self.__thePedigree.append( aFillitation[1] )
-                
-                if not aFillitation[0] == '/':
-                    self.createPathList( aFillitation[0] )
-                    
-                else:
-                    del self.__thePedigree[0]
-                    self.__thePedigree.reverse()
-                    self.__thePedigreeList.append( self.__thePedigree )
-                    
-                    self.__thePedigree = [] ## initialization
-                    
-
-
-    def createFillitationList( self ):
-        self.__theFillitationList = []
-
-        for aSystem in( self.__theDocument.getElementsByTagName( 'system' ) ):
-
-            aParentPath = aSystem.getAttribute( 'id' )
+            aTargetEntity[1] = str( anAbsolutePath )
             
-            if len( aSystem.getElementsByTagName( 'subsystem' ) ) > 0:
-                for aChild in ( aSystem.childNodes ):
-                    if aChild.tagName == 'subsystem':
-                        aChildPath  = aChild.getAttribute( 'id' )
-                        self.__theFillitationList.append( [ aParentPath, aChildPath ] )
-
-            else:
-                aChildPath  = 'None'
-                self.__theFillitationList.append( [ aParentPath, aChildPath ] )
+        return anEntityPreModel
 
 
 
-                    
-    def returnList( self ):
-        """return all absolute path lists"""
-        return self.__thePedigreeList
+
+    def convertStepperSystemPath( self, aStepperSystemPreModel ):
+
+        for aTargetSS in( aStepperSystemPreModel ):
+            aRelativePath  = aTargetSS[0]
+            try:
+                anAbsolutePath = self.__thePedigree[ aRelativePath ]
+            except KeyError:
+                anAbsolutePath = 'AbsolutePathError'
+
+            aTargetSS[0] = str( anAbsolutePath )
+            
+        return aStepperSystemPreModel
+
 
 
 
