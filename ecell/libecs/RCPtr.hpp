@@ -31,6 +31,8 @@
 #ifndef __RCPTR_HPP
 #define __RCPTR_HPP
 
+#include "Defs.hpp"
+
 namespace libecs
 {
 
@@ -43,8 +45,6 @@ namespace libecs
 #define DECLARE_RCPTR( type )\
 DECLARE_TYPE( RCPtr<type>, type ## RCPtr )
 
-
-#include "Defs.hpp"
 
   /**
      A simple reference counted pointer class.
@@ -180,18 +180,9 @@ DECLARE_TYPE( RCPtr<type>, type ## RCPtr )
 
     const bool isNonNull() const
     {
-      if( theObject != NULLPTR )
-	{
-	  return true;
-	}
-      else
-	{
-	  return false;
-	}
-
-      assert( 0 );
-      // NEVER_GET_HERE
+      return theObject != NULLPTR;
     }
+
     void incrementReferenceCount() const
     {
       ++(*theCount);
