@@ -23,7 +23,7 @@ OrderedBiBiFluxProcess.cpp\
 OrderedBiUniFluxProcess.cpp\
 OrderedUniBiFluxProcess.cpp\
 SSystemProcess.cpp\
-NRProcess.cpp\
+GillespieProcess.cpp\
 NRStepper.cpp\
 FixedODE1Stepper.cpp\
 FixedRungeKutta4Stepper.cpp\

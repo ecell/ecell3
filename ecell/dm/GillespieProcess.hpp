@@ -1,5 +1,5 @@
-#ifndef __NRPROCESS_HPP
-#define __NRPROCESS_HPP
+#ifndef __GILLESPIEPROCESS_HPP
+#define __GILLESPIEPROCESS_HPP
 
 #include <limits>
 #include <vector>
@@ -11,42 +11,42 @@
 
 USE_LIBECS;
 
-DECLARE_CLASS( NRProcess );
-DECLARE_VECTOR( NRProcessPtr, NRProcessVector );
+DECLARE_CLASS( GillespieProcess );
+DECLARE_VECTOR( GillespieProcessPtr, GillespieProcessVector );
 
 
 /***************************************************************************
-     NRProcess 
+     GillespieProcess 
 ***************************************************************************/
-class NRProcess 
+class GillespieProcess 
   : 
   public Process
 {
 
-  LIBECS_DM_OBJECT( Process, NRProcess );
+  LIBECS_DM_OBJECT( Process, GillespieProcess );
 
 public:
 
 
-  NRProcess() 
+  GillespieProcess() 
     :
     theOrder( 0 ),
     theStepInterval( 0.0 ),
     k( 0.0 ),
     Index( -1 )
   {
-    CREATE_PROPERTYSLOT_SET_GET( Real, k,            NRProcess );
-    CREATE_PROPERTYSLOT_GET    ( Real, Mu,           NRProcess );
-    CREATE_PROPERTYSLOT_GET    ( Real, StepInterval, NRProcess );
-    CREATE_PROPERTYSLOT_GET    ( Int,  Order,        NRProcess );
+    CREATE_PROPERTYSLOT_SET_GET( Real, k,            GillespieProcess );
+    CREATE_PROPERTYSLOT_GET    ( Real, Mu,           GillespieProcess );
+    CREATE_PROPERTYSLOT_GET    ( Real, StepInterval, GillespieProcess );
+    CREATE_PROPERTYSLOT_GET    ( Int,  Order,        GillespieProcess );
       
     CREATE_PROPERTYSLOT( Polymorph, EffectList,
 			 NULLPTR,
-			 &NRProcess::getEffectListProperty );
+			 &GillespieProcess::getEffectListProperty );
   }
 
 
-  virtual ~NRProcess()
+  virtual ~GillespieProcess()
   {
     ; // do nothing
   }
@@ -70,20 +70,16 @@ public:
     return theOrder;
   }
 
-  static const Real roundValue( RealCref aValue )
+  inline static const Real roundValue( RealCref aValue )
   {
-    if( aValue >= 0.0 )
-      {
-	return floor( aValue );
-      }
-    else if( aValue > -1.0 ) // if it is -1.0 < > 0.0 round to zero. 
-      {                      // this is necessary in hybrid simulation.
-	return 0.0;
-      }
-    else // <= -1.0
+    const Real aRoundedValue( trunc( aValue ) );
+
+    if( aRoundedValue < 0.0 )
       {
 	THROW_EXCEPTION( SimulationError, "Variable value <= -1.0" );
       }
+
+    return aRoundedValue;
   }
 
 
@@ -111,7 +107,6 @@ public:
   }
 
 
-  GET_METHOD( Real, Volume );
   GET_METHOD( Real, u );
 
   GET_METHOD( Real, StepInterval )
@@ -158,7 +153,7 @@ public:
 
 	if( getOrder() == 2 )
 	  {
-	    theStepInterval *= getSuperSystem()->getVolume() * N_A;
+	    theStepInterval *= getSuperSystem()->getVolumeN_A();
 	  }
       }
     else // aMu == 0.0 (or aMu < 0.0 but this won't happen)
@@ -208,11 +203,11 @@ public:
     theEffectList.clear();
   }
 
-  void addEffect( NRProcessPtr anIndex );
+  void addEffect( GillespieProcessPtr anIndex );
 
-  const bool checkEffect( NRProcessPtr anNRProcessPtr ) const;
+  const bool checkEffect( GillespieProcessPtr anGillespieProcessPtr ) const;
 
-  NRProcessVectorCref getEffectList() const
+  GillespieProcessVectorCref getEffectList() const
   {
     return theEffectList;
   }
@@ -220,7 +215,7 @@ public:
 
 protected:
 
-  NRProcessVector theEffectList;
+  GillespieProcessVector theEffectList;
 
   Int theOrder;
 
@@ -232,17 +227,17 @@ protected:
 };
 
 
-const Polymorph NRProcess::getEffectListProperty() const
+const Polymorph GillespieProcess::getEffectListProperty() const
 {
   PolymorphVector aVector;
   aVector.reserve( theEffectList.size() );
 
-  for ( NRProcessVectorConstIterator i( theEffectList.begin() );
+  for ( GillespieProcessVectorConstIterator i( theEffectList.begin() );
 	i != theEffectList.end(); ++i ) 
     {
-      NRProcessPtr anNRProcess( *i );
+      GillespieProcessPtr anGillespieProcess( *i );
 
-      FullIDCref aFullID( anNRProcess->getFullID() );
+      FullIDCref aFullID( anGillespieProcess->getFullID() );
       const String aFullIDString( aFullID.getString() );
 
       aVector.push_back( aFullIDString );
@@ -252,7 +247,7 @@ const Polymorph NRProcess::getEffectListProperty() const
 }
 
 
-void NRProcess::calculateOrder()
+void GillespieProcess::calculateOrder()
 {
   theOrder = 0;
     
@@ -285,10 +280,10 @@ void NRProcess::calculateOrder()
 }
 
 
-const bool NRProcess::checkEffect( NRProcessPtr anNRProcessPtr ) const
+const bool GillespieProcess::checkEffect( GillespieProcessPtr anGillespieProcessPtr ) const
 {
   VariableReferenceVectorCref 
-    aVariableReferenceVector( anNRProcessPtr->getVariableReferenceVector() );
+    aVariableReferenceVector( anGillespieProcessPtr->getVariableReferenceVector() );
     
   for( VariableReferenceVectorConstIterator 
 	 i( theVariableReferenceVector.begin() );
@@ -319,7 +314,7 @@ const bool NRProcess::checkEffect( NRProcessPtr anNRProcessPtr ) const
 
 
 
-void NRProcess::addEffect( NRProcessPtr aProcessPtr )
+void GillespieProcess::addEffect( GillespieProcessPtr aProcessPtr )
 {
   if( std::find( theEffectList.begin(), theEffectList.end(), aProcessPtr ) 
       == theEffectList.end() )

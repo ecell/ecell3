@@ -59,7 +59,7 @@
 #include "libecs/DynamicPriorityQueue.hpp"
 #include "libecs/DiscreteEventStepper.hpp"
 
-#include "NRProcess.hpp"
+#include "GillespieProcess.hpp"
 
 USE_LIBECS;
 
@@ -88,7 +88,7 @@ protected:
       ; // do nothing
     }
 
-    NREvent( RealCref aTime, NRProcessPtr aProcess )
+    NREvent( RealCref aTime, GillespieProcessPtr aProcess )
       :
       theTime( aTime ),
       theProcess( aProcess )
@@ -101,7 +101,7 @@ protected:
       return theTime;
     }
 
-    NRProcessPtr getProcess() const
+    GillespieProcessPtr getProcess() const
     {
       return theProcess;
     }
@@ -121,7 +121,7 @@ protected:
   private:
 
     Real       theTime;
-    NRProcessPtr theProcess;
+    GillespieProcessPtr theProcess;
 
 
   };
@@ -160,25 +160,25 @@ public:
     return theRng;
   }
     
-  void updateNRProcess( NRProcessPtr aNRProcessPtr ) const
+  void updateGillespieProcess( GillespieProcessPtr aGillespieProcessPtr ) const
   {
-    aNRProcessPtr->updateStepInterval( gsl_rng_uniform_pos( theRng ) );
+    aGillespieProcessPtr->updateStepInterval( gsl_rng_uniform_pos( theRng ) );
   }
 
 
-  NRProcessVectorCref getNRProcessVector() const
+  GillespieProcessVectorCref getGillespieProcessVector() const
   {
-    return theNRProcessVector;
+    return theGillespieProcessVector;
   }
 
 
 protected:
 
-  NRProcessVector theNRProcessVector;
+  GillespieProcessVector theGillespieProcessVector;
 
   NRPriorityQueue thePriorityQueue;
 
-  //    NRProcessPtr    theLastProcess;
+  //    GillespieProcessPtr    theLastProcess;
 
   Real            theTimeScale;
 

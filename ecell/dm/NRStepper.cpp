@@ -74,20 +74,20 @@ void NRStepper::initialize()
 {
   DiscreteEventStepper::initialize();
 
-  // dynamic_cast theProcessVector of this Stepper to NRProcess, and store
-  // it in theNRProcessVector.
-  theNRProcessVector.clear();
+  // dynamic_cast theProcessVector of this Stepper to GillespieProcess, and store
+  // it in theGillespieProcessVector.
+  theGillespieProcessVector.clear();
   try
     {
       std::transform( theProcessVector.begin(), theProcessVector.end(),
-		      std::back_inserter( theNRProcessVector ),
-		      libecs::DynamicCaster<NRProcessPtr,ProcessPtr>() );
+		      std::back_inserter( theGillespieProcessVector ),
+		      libecs::DynamicCaster<GillespieProcessPtr,ProcessPtr>() );
     }
   catch( const libecs::TypeError& )
     {
       THROW_EXCEPTION( InitializationFailed,
 		       String( getClassName() ) + 
-		       ": Only NRProcesses are allowed to exist "
+		       ": Only GillespieProcesses are allowed to exist "
 		       "in this Stepper." );
     }
 
@@ -100,22 +100,22 @@ void NRStepper::initialize()
   // (3) construct the priority queue (scheduler)
   thePriorityQueue.clear();
   const Real aCurrentTime( getCurrentTime() );
-  for( NRProcessVector::const_iterator i( theNRProcessVector.begin() );
-       i != theNRProcessVector.end(); ++i )
+  for( GillespieProcessVector::const_iterator i( theGillespieProcessVector.begin() );
+       i != theGillespieProcessVector.end(); ++i )
     {      
-      NRProcessPtr anNRProcessPtr( *i );
+      GillespieProcessPtr anGillespieProcessPtr( *i );
 	
       // check Process dependencies
-      anNRProcessPtr->clearEffectList();
+      anGillespieProcessPtr->clearEffectList();
       // here assume aCoefficient != 0
-      for( NRProcessVector::const_iterator j( theNRProcessVector.begin() );
-	   j != theNRProcessVector.end(); ++j )
+      for( GillespieProcessVector::const_iterator j( theGillespieProcessVector.begin() );
+	   j != theGillespieProcessVector.end(); ++j )
 	{
-	  NRProcessPtr const anNRProcess2Ptr( *j );
+	  GillespieProcessPtr const anGillespieProcess2Ptr( *j );
 	  
-	  if( anNRProcessPtr->checkEffect( anNRProcess2Ptr ) )
+	  if( anGillespieProcessPtr->checkEffect( anGillespieProcess2Ptr ) )
 	    {
-	      anNRProcessPtr->addEffect( anNRProcess2Ptr );
+	      anGillespieProcessPtr->addEffect( anGillespieProcess2Ptr );
 	    }
 	}
 
@@ -123,14 +123,14 @@ void NRStepper::initialize()
       // here we assume size() is the index of the newly pushed element
       const Int anIndex( thePriorityQueue.size() );
 
-      anNRProcessPtr->setIndex( anIndex );
-      updateNRProcess( anNRProcessPtr );
-      thePriorityQueue.push( NREvent( anNRProcessPtr->getStepInterval()
+      anGillespieProcessPtr->setIndex( anIndex );
+      updateGillespieProcess( anGillespieProcessPtr );
+      thePriorityQueue.push( NREvent( anGillespieProcessPtr->getStepInterval()
       				      + aCurrentTime,
-      				      anNRProcessPtr ) );
+      				      anGillespieProcessPtr ) );
     }
 
-  // here all the NRProcesses are updated, then set new
+  // here all the GillespieProcesses are updated, then set new
   // step interval and reschedule this stepper.
   // That means, this Stepper doesn't necessary steps immediately
   // after initialize()
@@ -150,7 +150,7 @@ void NRStepper::step()
 {
   NREventCref anEvent( thePriorityQueue.top() );
 
-  NRProcessPtr const aMuProcess( anEvent.getProcess() );
+  GillespieProcessPtr const aMuProcess( anEvent.getProcess() );
   aMuProcess->process();
 
   // it assumes all coefficients are one or minus one
@@ -160,12 +160,12 @@ void NRStepper::step()
 
   const Real aCurrentTime( getCurrentTime() );
   // Update relevant mus
-  NRProcessVectorCref anEffectList( aMuProcess->getEffectList() );
-  for ( NRProcessVectorConstIterator i( anEffectList.begin() );
+  GillespieProcessVectorCref anEffectList( aMuProcess->getEffectList() );
+  for ( GillespieProcessVectorConstIterator i( anEffectList.begin() );
 	i!= anEffectList.end(); ++i ) 
     {
-      NRProcessPtr const anAffectedProcess( *i );
-      updateNRProcess( anAffectedProcess );
+      GillespieProcessPtr const anAffectedProcess( *i );
+      updateGillespieProcess( anAffectedProcess );
       const Real aStepInterval( anAffectedProcess->getStepInterval() );
       // aTime is time in the priority queue
 
@@ -184,19 +184,19 @@ void NRStepper::step()
 
 void NRStepper::interrupt( StepperPtr const aCaller )
 {
-  // update step intervals of NRProcesses
+  // update step intervals of GillespieProcesses
   const Real aCurrentTime( aCaller->getCurrentTime() );
-  for( NRProcessVector::const_iterator i( theNRProcessVector.begin() );
-       i != theNRProcessVector.end(); ++i )
+  for( GillespieProcessVector::const_iterator i( theGillespieProcessVector.begin() );
+       i != theGillespieProcessVector.end(); ++i )
     {      
-      NRProcessPtr const anNRProcessPtr( *i );
+      GillespieProcessPtr const anGillespieProcessPtr( *i );
 	
-      updateNRProcess( anNRProcessPtr );
-      const Real aStepInterval( anNRProcessPtr->getStepInterval() );
+      updateGillespieProcess( anGillespieProcessPtr );
+      const Real aStepInterval( anGillespieProcessPtr->getStepInterval() );
 
-      thePriorityQueue.changeOneKey( anNRProcessPtr->getIndex(),
+      thePriorityQueue.changeOneKey( anGillespieProcessPtr->getIndex(),
 				     NREvent( aStepInterval + aCurrentTime,
-					      anNRProcessPtr ) );
+					      anGillespieProcessPtr ) );
     }
 
   NREventCref aTopEvent( thePriorityQueue.top() );
