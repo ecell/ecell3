@@ -342,21 +342,21 @@ class LayoutBufferPaster:
             newID = anID
         # paste connection buffer
         # create new connection
-        aVarobj = aLayout.getObject( newVariableID )
+        #aVarobj = aLayout.getObject( newVariableID )
         aLayout.createConnectionObject( newID, newProcessID, newVariableID,  processRing, variableRing, None, aVarrefName )
         return newID
 
-        conObject = aLayout.getObject( newID )
+#        conObject = aLayout.getObject( newID )
         # set properties
-        propertyList = conBuffer.getPropertyList()
-        for aProperty in propertyList:
+#        propertyList = conBuffer.getPropertyList()
+#        for aProperty in propertyList:
             # endpoints should not be overwritten here
-            if aProperty not in (CO_ENDPOINT1, CO_ENDPOINT2, CO_PROCESS_ATTACHED, CO_VARIABLE_ATTACHED):
+#            if aProperty not in (CO_ENDPOINT1, CO_ENDPOINT2, CO_PROCESS_ATTACHED, CO_VARIABLE_ATTACHED):
 
-                aValue = conBuffer.getProperty( aProperty )
-                conObject.setProperty( aProperty, aValue )
+#                aValue = conBuffer.getProperty( aProperty )
+#                conObject.setProperty( aProperty, aValue )
 
 #           aProcessObj.getProperty(PR_CONNECTIONLIST).append(newID)
                         
 
-        return newID
+#        return newID
