@@ -248,7 +248,7 @@ namespace libecs
   public:
 
     AdaptiveDifferentialStepper();
-    virtual ~AdaptiveDifferentialStepper() {}
+    virtual ~AdaptiveDifferentialStepper();
 
     /**
        Adaptive stepsize control.

@@ -224,6 +224,12 @@ namespace libecs
     setMaxStepInterval( 1e+100 );
   }
 
+  AdaptiveDifferentialStepper::~AdaptiveDifferentialStepper()
+  {
+    ; // do nothing
+  }
+
+
   void AdaptiveDifferentialStepper::initialize()
   {
     DifferentialStepper::initialize();
