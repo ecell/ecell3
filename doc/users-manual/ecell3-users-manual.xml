@@ -31,6 +31,7 @@
 <!-- API tables -->
 
   <!ENTITY session-class-api SYSTEM "session-class-api.xml">
+  <!ENTITY objectstubs-api SYSTEM "objectstubs-api.xml">
 
 ]>
 <!-- 

@@ -321,9 +321,8 @@ message( 'stopped at %f seconds.' % getCurrentTime() )
       variables.</para>
 
       <note>
-	<para>Currently there is no way to list only the Session
-      parameters because these are given just as global
-      variables.</para>
+	<para>Currently there is no way to distinguish the Session
+      parameters from other global variables from within ESS.</para>
       </note>
 
       <para></para>
@@ -435,6 +434,32 @@ message( 'Stopped at %s.' % getCurrentTime() )
 
     </sect2>
 
+    <sect2>
+      <title><classname>ObjectStub</classname> classes</title>
+
+
+      <para>There are three subclasses of <classname>ObjectStub</classname>
+</para>
+      <itemizedlist>
+	<listitem>
+	  <para><classname>EntityStub</classname></para>
+	</listitem>
+	<listitem>
+	  <para><classname>StepperStub</classname></para>
+	</listitem>
+	<listitem>
+	  <para><classname>LoggerStub</classname></para>
+	</listitem>
+      </itemizedlist>
+
+      <para>Some methods are common to the subclasses.</para>
+
+
+
+
+      &objectstubs-api
+
+    </sect2>
 
 
   </sect1>
