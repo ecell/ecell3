@@ -88,7 +88,6 @@ def createSystemPathFromFullID( aSystemFullID ):
     else:
         aNewSystemPath = aSystemFullID[SYSTEMPATH] + '/' + aSystemFullID[ID]
 
-
     return aNewSystemPath
 
 
