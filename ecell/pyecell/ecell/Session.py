@@ -110,7 +110,7 @@ class Session:
     def getStepperList():
         return self.theSimulator.getStepperList()
 
-    def getStepperStub( self, id ):
+    def createStepperStub( self, id ):
         return StepperStub( self.theSimulator, id )
 
 
@@ -121,7 +121,7 @@ class Session:
     def getEntityList( self, entityType, systemPath ):
         return self.theSimulator.getEntityList( entityType, systemPath )
 
-    def getEntityStub( self, fullid ):
+    def createEntityStub( self, fullid ):
         return EntityStub( self.theSimulator, fullid )
 
 
@@ -132,7 +132,7 @@ class Session:
     def getLoggerList( self ):
         return self.theSimulator.getLoggerList()
         
-    def getLoggerStub( self, fullpn ):
+    def createLoggerStub( self, fullpn ):
         return LoggerStub( self.theSimulator, fullpn )
 
     def saveLoggerData( self, aFullPNString='', aStartTime=-1, aEndTime=-1, aInterval=-1, aSaveDirectory='./Data'):

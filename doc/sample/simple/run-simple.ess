@@ -3,9 +3,9 @@
 loadModel( 'simple.eml' )
 
 # create stubs
-S_Logger = getLoggerStub( 'Variable:/CELL/CYTOPLASM:S:Value' )
+S_Logger = createLoggerStub( 'Variable:/CELL/CYTOPLASM:S:Value' )
 S_Logger.create()
-S = getEntityStub( 'Variable:/CELL/CYTOPLASM:S' )
+S = createEntityStub( 'Variable:/CELL/CYTOPLASM:S' )
 
 
 # print some values
