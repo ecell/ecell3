@@ -316,17 +316,6 @@ namespace libecs
 	      continue;
 	    }
 
-	  case ExpressionCompiler::POW:
-	    {
-	      Real aStackTopValue( aStackPtr->theReal );
-	      --aStackPtr;
-
-	      aStackPtr->theReal = pow( aStackPtr->theReal, aStackTopValue );
-
-	      INCREMENT_PC( POW );
-	      continue;
-	    }
-
 	  case ExpressionCompiler::CALL_FUNC1:
 	    {
               DECODE_INSTRUCTION( CALL_FUNC1 );
@@ -408,9 +397,9 @@ namespace libecs
 
 	  }
 
-      bypass_real:
-
 #if defined( ENABLE_STACKOPS_FOLDING )
+
+      bypass_real:
 
 	switch( FETCH_OPCODE() )
 	  {
@@ -446,26 +435,16 @@ namespace libecs
 	      break;
 	    }
 
-	  case ExpressionCompiler::POW:
+	  case ExpressionCompiler::CALL_FUNC2:
 	    {
-	      aStackPtr->theReal = pow( aStackPtr->theReal, bypass );
+              DECODE_INSTRUCTION( CALL_FUNC2 );
 
-	      INCREMENT_PC( POW );
+	      aStackPtr->theReal
+		= ( anInstruction->getOperand() )( aStackPtr->theReal, 
+						   bypass );
+
+	      INCREMENT_PC( CALL_FUNC2 );
 	      break;
-	    }
-
-	  case ExpressionCompiler::NEG:
-	    {
-	      ++aStackPtr;
-	      aStackPtr->theReal = - bypass;
-
-	      INCREMENT_PC( NEG );
-	      break;
-	    }
-
-	  case ExpressionCompiler::RET:
-	    {
-	      return bypass;
 	    }
 
 	  default:
@@ -477,12 +456,18 @@ namespace libecs
 	      aStackPtr->theReal = bypass;
 	      break;
 	    }
-
 	  }
+
+	continue;
+
 #else /* defined( ENABLE_STACKOPS_FOLDING ) */
+
+      bypass_real:
 
 	++aStackPtr;
 	aStackPtr->theReal = bypass;
+
+	continue;
 
 #endif /* defined( ENABLE_STACKOPS_FOLDING ) */
 

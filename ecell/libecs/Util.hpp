@@ -298,7 +298,7 @@ namespace libecs
 
 
   template <typename T>
-  Real Not( T n )
+  Real real_not( T n )
   {
     if( n == 0 )
       {
@@ -311,7 +311,7 @@ namespace libecs
   }
 
   template <typename T>
-  Real eq( T n1, T n2 )
+  Real real_eq( T n1, T n2 )
   {
     if( n1 == n2 )
       {
@@ -324,7 +324,7 @@ namespace libecs
   }
 
   template <typename T>
-  Real neq( T n1, T n2 )
+  Real real_neq( T n1, T n2 )
   {
     if( n1 == n2 )
       {
@@ -337,7 +337,7 @@ namespace libecs
   }
 
   template <typename T>
-  Real gt( T n1, T n2 )
+  Real real_gt( T n1, T n2 )
   {
     if( n1 > n2 )
       {
@@ -350,7 +350,7 @@ namespace libecs
   }
 
   template <typename T>
-  Real lt( T n1, T n2 )
+  Real real_lt( T n1, T n2 )
   {
     if( n1 < n2 )
       {
@@ -363,7 +363,7 @@ namespace libecs
   }
 
   template <typename T>
-  Real geq( T n1, T n2 )
+  Real real_geq( T n1, T n2 )
   {
     if( n1 >= n2 )
       {
@@ -376,7 +376,7 @@ namespace libecs
   }
 
   template <typename T>
-  Real leq( T n1, T n2 )
+  Real real_leq( T n1, T n2 )
   {
     if( n1 <= n2 )
       {
@@ -389,7 +389,7 @@ namespace libecs
   }
 
   template <typename T>
-  Real And( T n1, T n2 )
+  Real real_and( T n1, T n2 )
   {
     if( ( n1 != 0 ) && ( n2 != 0 ) )
       {
@@ -402,7 +402,7 @@ namespace libecs
   }
 
   template <typename T>
-  Real Or( T n1, T n2 )
+  Real real_or( T n1, T n2 )
   {
     if( ( n1 != 0 ) || ( n2 != 0 ) )
       {
@@ -415,7 +415,7 @@ namespace libecs
   }
 
   template <typename T>
-  Real Xor( T n1, T n2 )
+  Real real_xor( T n1, T n2 )
   {
     if( ( n1 != 0 ) && !( n2 != 0 ) )
       {

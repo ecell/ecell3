@@ -160,15 +160,13 @@ namespace libecs
 	, SUB    // no arg
 	, MUL    // no arg
 	, DIV    // no arg
-	, POW    // no arg
-	, NEG    // no arg
-	, RET   // no arg
+	, CALL_FUNC2 // RealFunc2
 	// Those instructions above are candidates of stack operations folding
 	// in the stack machine, and grouped here to optimize the switch(). 
 
+	, NEG    // no arg
 	//, CALL_FUNC0 // RealFunc0
 	, CALL_FUNC1 // RealFunc1
-	, CALL_FUNC2 // RealFunc2
 	, LOAD_REAL  // Real*
 	, PUSH_REAL   // Real
 	, VARREF_REAL_METHOD //VariableReferencePtr, VariableReferenceMethodPtr
@@ -181,6 +179,7 @@ namespace libecs
 	, VARREF_TO_SYSTEM_METHOD  // VariableReferenceSystemMethodPtr
 	, PROCESS_TO_SYSTEM_METHOD // ProcessMethodPtr
 	, SYSTEM_TO_REAL_METHOD // SystemMethodPtr
+	, RET   // no arg
 	, NOP
 
 	, END=NOP
@@ -610,7 +609,7 @@ namespace libecs
   DEFINE_OPCODE2INSTRUCTION( SUB );
   DEFINE_OPCODE2INSTRUCTION( MUL );
   DEFINE_OPCODE2INSTRUCTION( DIV );
-  DEFINE_OPCODE2INSTRUCTION( POW );
+  //  DEFINE_OPCODE2INSTRUCTION( POW );
   DEFINE_OPCODE2INSTRUCTION( LOAD_REAL );
   //DEFINE_OPCODE2INSTRUCTION( CALL_FUNC0 );
   DEFINE_OPCODE2INSTRUCTION( CALL_FUNC1 );
@@ -700,20 +699,20 @@ namespace libecs
     theFunctionMap1["sec"]   = sec;
     theFunctionMap1["csc"]   = csc;
     theFunctionMap1["cot"]   = cot;
-    theFunctionMap1["not"]   = Not;
+    theFunctionMap1["not"]   = libecs::real_not;
 
 
     // set FunctionMap2
     theFunctionMap2["pow"]   = pow;
-    theFunctionMap2["and"]   = And;
-    theFunctionMap2["or"]    = Or;
-    theFunctionMap2["xor"]   = Xor;
-    theFunctionMap2["eq"]    = eq;
-    theFunctionMap2["neq"]   = neq;
-    theFunctionMap2["gt"]    = gt;
-    theFunctionMap2["lt"]    = lt;
-    theFunctionMap2["geq"]   = geq;
-    theFunctionMap2["leq"]   = leq;
+    theFunctionMap2["and"]   = libecs::real_and;
+    theFunctionMap2["or"]    = libecs::real_or;
+    theFunctionMap2["xor"]   = libecs::real_xor;
+    theFunctionMap2["eq"]    = libecs::real_eq;
+    theFunctionMap2["neq"]   = libecs::real_neq;
+    theFunctionMap2["gt"]    = libecs::real_gt;
+    theFunctionMap2["lt"]    = libecs::real_lt;
+    theFunctionMap2["geq"]   = libecs::real_geq;
+    theFunctionMap2["leq"]   = libecs::real_leq;
 
 
     // set SystemMethodMap
@@ -758,6 +757,7 @@ namespace libecs
       {
 	APPEND_VARREF_METHOD( getTotalVelocity );
       }
+    /*
     else if( aMethodName == "Coefficient" )
       {
 	VariableReferenceIntegerMethod aVariableReferenceIntegerMethod;
@@ -770,7 +770,7 @@ namespace libecs
 			   Instruction<VARREF_INTEGER_METHOD>
 			   ( aVariableReferenceIntegerMethod ) );	      
       } 
-	  
+    */  
 	  /**else if( str_child2 == "Fixed" ){
 	     aCode.push_back(
 	     new VARREF_REAL_METHOD( aVariableReference,
@@ -1297,7 +1297,9 @@ namespace libecs
 	    
 	      if( *aTreeIterator->value.begin() == '^' )
 		{
-		  appendInstruction( aCode, Instruction<POW>() );
+		  RealFunc2 aPowFunc( theFunctionMap2.find( "pow" )->second );
+		  appendInstruction( aCode, 
+				     Instruction<CALL_FUNC2>( aPowFunc ) );
 		}
 
 	      else
