@@ -32,14 +32,7 @@ rm -f conftest
 dnl
 dnl compatibility for libtool 1.5.x
 if test -n "$shrext"; then 
-  case ${host_os} in
-    *cygwin* | *mingw* | *win32*)
-    LTDL_SHLIB_EXT=".dll"
-    ;;
-  *)
-    LTDL_SHLIB_EXT=$shrext
-    ;;
-  esac    
+  LTDL_SHLIB_EXT=$shrext
   AC_SUBST(LTDL_SHLIB_EXT)
 dnl compatibility for libtool 1.4.x
 else

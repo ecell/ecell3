@@ -2,6 +2,9 @@ libdir=@libdir@
 
 if OS_WIN32
   no_undefined = -no-undefined
+  SHLEXT = .dll.a
+else
+  SHLEXT = @LTDL_SHLIB_EXT@:
 endif
 
 SUBDIRS =
@@ -105,7 +108,7 @@ DynamicPriorityQueue.hpp\
 FluxProcess.hpp
 
 
-all-local: libecs@LTDL_SHLIB_EXT@
+all-local: libecs$(SHLEXT)
 
-libecs@LTDL_SHLIB_EXT@: libecs.la
-	ln -sf .libs/libecs@LTDL_SHLIB_EXT@ ./libecs@LTDL_SHLIB_EXT@
+libecs$(SHLEXT): libecs.la
+	ln -sf .libs/libecs$(SHLEXT) ./libecs$(SHLEXT)
