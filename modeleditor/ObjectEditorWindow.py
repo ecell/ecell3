@@ -80,6 +80,10 @@ class ObjectEditorWindow :
 
 		# Sets title
 		self.win.set_title("ObjectEditor")
+		iconPixbuf = None
+		iconPixbuf = gtk.gdk.pixbuf_new_from_file(os.environ['MEPATH'] \
+				+ os.sep + 'glade' + os.sep + "modeleditor.png")
+		self.win.set_icon(iconPixbuf)
 
 		self.theComponent=None
 		self.theShapeProperty=None
@@ -146,7 +150,7 @@ class ObjectEditorWindow :
 		elif  aPropertyName == OB_DIMENSION_Y  :
 			objHeight = self.theObject.getProperty(OB_DIMENSION_Y)
 			deltaHeight = objHeight-aPropertyValue
-			maxShiftPos= self.theObject.getMaxShiftPos(self.theObject,DIRECTION_DOWN)
+			maxShiftPos= self.theObject.getMaxShiftPos(DIRECTION_DOWN)
 			maxShiftNeg= self.theObject.getMaxShiftNeg(DIRECTION_DOWN) 
 			if deltaHeight>0:
 				if  maxShiftNeg > deltaHeight:
@@ -166,7 +170,7 @@ class ObjectEditorWindow :
 		 	objWidth = self.theObject.getProperty(OB_DIMENSION_X)
 
 			deltaWidth = objWidth-aPropertyValue
-			maxShiftPos= self.theObject.getMaxShiftPos(self.theObject,DIRECTION_RIGHT)
+			maxShiftPos= self.theObject.getMaxShiftPos(DIRECTION_RIGHT)
 			maxShiftNeg= self.theObject.getMaxShiftNeg(DIRECTION_RIGHT) 
 			if deltaWidth>0:
 				if  maxShiftNeg > deltaWidth:

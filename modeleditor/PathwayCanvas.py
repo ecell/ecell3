@@ -32,7 +32,8 @@ class PathwayCanvas( Canvas ):
 		self.beyondcanvas=False
 		self.zoomratio=0
 		self.theRTMap={}
-		
+		self.lastposx=0
+		self.lastposy=0
 
 	def setCursor( self, aCursorType ):
 		aCursor = self.theCursorList[ aCursorType ]
@@ -56,23 +57,35 @@ class PathwayCanvas( Canvas ):
 	
 	def setSize( self, scrollRegion ):
 		self.theCanvas.set_scroll_region( scrollRegion[0], scrollRegion[1], scrollRegion[2], scrollRegion[3] )
+		
 
 	def getSize(self):
 		return self.theCanvas.get_size()
+
+	def setLastCursorPos(self,x,y):
+		self.lastposx=x
+		self.lastposy=y
+
+	def getLastCursorPos(self):
+		return self.lastposx,self.lastposy
 	
 	def scrollTo(self, dx, dy, argum=None):
 		if argum==None:
 			x,y=self.theCanvas.get_scroll_offsets()
-			self.theCanvas.scroll_to( x+dx, y+dy)
+			self.theCanvas.scroll_to(int(x+dx) , int(y+dy))
+			self.setLastCursorPos(x+dx,y+dy)
 		else:
-			self.theCanvas.scroll_to( dx, dy)
+			self.theCanvas.scroll_to( int(dx), int(dy))
+			
 
 
 	def setZoomRatio( self, ppu):
+		lastx,lasty=self.theCanvas.get_scroll_offsets()
 		self.theCanvas.set_pixels_per_unit( ppu )
 		self.zoomratio=ppu
-		for aLabel, aText in self.theRTMap.iteritems():
-			aText.set_property('size')
+		for aResizeableText, aText in self.theRTMap.iteritems():
+			aResizeableText.set_property('size')
+		self.scrollTo(lastx,lasty,'attach')
 			
 
 	def getZoomRatio( self):
@@ -82,18 +95,23 @@ class PathwayCanvas( Canvas ):
 	#--------------------------------
 	#	ResizeableText methods
 	#--------------------------------
-	def registerText(self,aResizeableText,aLabel):
-		self.theRTMap[aLabel]=aResizeableText
+	def registerText(self,aResizeableText,aText):
+		self.theRTMap[aResizeableText]=aText
 	
-	def setLabelText(self,oldLabel,newLabel):
-		if self.theRTMap.has_key(oldLabel):
-			self.theRTMap[newLabel]=self.theRTMap[oldLabel]
-			del self.theRTMap[oldLabel]
+	#def setLabelText(self,oldLabel,newLabel):
+	#	if self.theRTMap.has_key(oldLabel):
+	#		self.theRTMap[newLabel]=self.theRTMap[oldLabel]
+	#		del self.theRTMap[oldLabel]
+	def setLabelText(self,aResizeableText,newText):
+		if self.theRTMap.has_key(aResizeableText):
+			self.theRTMap[aResizeableText]=newText
 	
-	def deregisterText(self,aLabel):
-		if self.theRTMap.has_key(aLabel):
-			del self.theRTMap[aLabel]
-
+	#def deregisterText(self,aLabel):
+	#	if self.theRTMap.has_key(aLabel):
+	#		del self.theRTMap[aLabel]
+	def deregisterText(self,aResizeableText):
+		if self.theRTMap.has_key(aResizeableText):
+			del self.theRTMap[aResizeableText]
 
 
 	def addHandlers( self):

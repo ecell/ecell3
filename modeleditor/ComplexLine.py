@@ -13,6 +13,7 @@ class ComplexLine:
 		self.lastmousex = 0
 		self.lastmousey = 0
 		self.buttonpressed = False
+		self.firstdrag=False
 
 
 
@@ -22,32 +23,37 @@ class ComplexLine:
 		self.parentObject.getProperty( OB_SHAPEDESCRIPTORLIST ).reCalculate()
 		self.__sortByZOrder( self.shapeDescriptorList )
 		self.isSelected = False
-		
-		for aDescriptor in self.shapeDescriptorList:
+		for aKey in self.shapeDescriptorList.keys():
+			aDescriptor = self.shapeDescriptorList[aKey]
 			if aDescriptor[SD_TYPE] == CV_TEXT:
 				self.createText( aDescriptor )
 			elif aDescriptor[SD_TYPE] == CV_LINE:
 				self.createLine( aDescriptor )
+			elif aDescriptor[SD_TYPE] == CV_BPATH:
+				self.createBpath( aDescriptor )
 		self.isSelected = False
-
+	
 
 	def repaint ( self ):
 		self.parentObject.getProperty( OB_SHAPEDESCRIPTORLIST ).reCalculate()
 		self.shapeDescriptorList = self.parentObject.getProperty( OB_SHAPEDESCRIPTORLIST ).getDescriptorList()
 		self.__sortByZOrder( self.shapeDescriptorList )
-		for aDescriptor in self.shapeDescriptorList:
+		for aKey in self.shapeDescriptorList.keys():
+			aDescriptor = self.shapeDescriptorList[aKey]
 			if aDescriptor[SD_TYPE] == CV_TEXT:
 				self.redrawText( aDescriptor )
 			elif aDescriptor[SD_TYPE] == CV_LINE:
 				self.redrawLine( aDescriptor )
+			elif aDescriptor[SD_TYPE] == CV_BPATH:
+				self.redrawBpath( aDescriptor )
+		
 
 	def reName( self ):
 		self.shapeDescriptorList = self.parentObject.getProperty( OB_SHAPEDESCRIPTORLIST ).getDescriptorList()
 		self.parentObject.getProperty( OB_SHAPEDESCRIPTORLIST ).renameLabel( self.parentObject.getProperty( CO_NAME ) )
-		for aDescriptor in self.shapeDescriptorList:
-			if aDescriptor[SD_NAME] == "textbox":
-				self.renameText( aDescriptor )
-
+		aDescriptor = self.shapeDescriptorList["textbox"]
+		self.renameText( aDescriptor )
+		
 
 	def delete( self ):
 		for aShapeName in self.shapeMap.keys():
@@ -72,17 +78,34 @@ class ComplexLine:
 		if self.isSelected:
 			for i in range(0,3):
 				anRGB[i] = 32768 + anRGB[i]
-		for aDescriptor in self.shapeDescriptorList:
+		
+		for aKey in self.shapeDescriptorList.keys():
+			aDescriptor = self.shapeDescriptorList[aKey]
 			if aDescriptor[ SD_COLOR ] == SD_FILL:
 				aColor = self.graphUtils.getGdkColorByRGB( anRGB )
 				if aDescriptor[SD_TYPE] == CV_LINE:
 					self.changeLineColor( aDescriptor[ SD_NAME ] , aColor )
 
+	
+	def createBpath(self, aDescriptor):
+		aSpecific= aDescriptor[SD_SPECIFIC]
+		# get pathdef
+		pathdef= aSpecific[BPATH_PATHDEF]
+		pd=gnome.canvas.path_def_new(pathdef)
 
+		aGdkColor = self.getGdkColor( aDescriptor )
+		bpath=self.theRoot.add(gnome.canvas.CanvasBpath, width_units=3, 
+outline_color_gdk = aGdkColor )
+		bpath.set_bpath(pd)
+	
+		self.addHandlers( bpath, aDescriptor[ SD_NAME ] )
+		self.shapeMap[ aDescriptor[ SD_NAME ] ] = bpath
+		
 	def createLine( self, aDescriptor ):
 		lineSpec = aDescriptor[SD_SPECIFIC]
 		
 		( X1, X2, Y1, Y2 ) = [lineSpec[0], lineSpec[2], lineSpec[1], lineSpec[3] ]
+		
 		aGdkColor = self.getGdkColor( aDescriptor )
 		firstArrow = lineSpec[4]
 		secondArrow = lineSpec[5]
@@ -104,10 +127,6 @@ class ComplexLine:
 		textSpec = aDescriptor[SD_SPECIFIC]
 		(X1, Y1) = ( textSpec[TEXT_ABSX], textSpec[TEXT_ABSY] )
 		aGdkColor = self.getGdkColor( aDescriptor )
-		"""
-		aText = self.theRoot.add( gnome.canvas.CanvasText,x=X1,y=Y1, fill_color_gdk = aGdkColor, text = textSpec[TEXT_TEXT], anchor = gtk.ANCHOR_NW )
-		self.addHandlers( aText, aDescriptor[ SD_NAME ] )
-		"""
 		aText = ResizeableText( self.theRoot, self.theCanvas, X1, Y1, aGdkColor, textSpec[TEXT_TEXT], gtk.ANCHOR_NW )
 		self.addHandlers( aText, aDescriptor[ SD_NAME ] )
 		self.shapeMap[ aDescriptor[ SD_NAME ] ] = aText
@@ -126,6 +145,12 @@ class ComplexLine:
 		aShape.set_property('first_arrowhead', hasFirstArrow )
 		aShape.set_property('last_arrowhead', hasLastArrow )
 
+	def redrawBpath( self, aDescriptor ):
+		aShape = self.shapeMap[ aDescriptor[ SD_NAME ] ]
+		pathdef = aDescriptor[ SD_SPECIFIC ][BPATH_PATHDEF]
+		pd=gnome.canvas.path_def_new(pathdef)
+		aShape.set_bpath(pd)
+		
 
 	def redrawText( self, aDescriptor ):
 		aShape = self.shapeMap[ aDescriptor[ SD_NAME ] ]
@@ -158,9 +183,10 @@ class ComplexLine:
 
 
 	def __sortByZOrder ( self, desclist ):
+		keys = desclist.keys()
 		fn = lambda x, y: ( x[SD_Z] < y[SD_Z] ) - ( y[SD_Z] < x[SD_Z] )
 
-		desclist.sort(fn)
+		keys.sort(fn)
 
 
 	def leftClick( self, shapeName, x, y ):
@@ -175,14 +201,23 @@ class ComplexLine:
 		self.parentObject.doSelect()
 		self.parentObject.showMenu( anEvent)
 
+	def getFirstDrag(self):
+		return self.firstdrag
+	
+	def setFirstDrag(self,aValue):
+		self.firstdrag=aValue
 
 	def mouseDrag( self, shapeName, deltax, deltay, origx, origy ):
 		# decide whether resize or move or draw arrow
 		if self.getShapeDescriptor(shapeName)[SD_FUNCTION] == SD_MOVINGLINE:
 			print "movingline dragged"
 		elif self.getShapeDescriptor(shapeName)[SD_FUNCTION] == SD_ARROWHEAD:
-			print "arrowhead dragged"
+			if not self.firstdrag:
+				self.firstdrag=True
+			self.parentObject.arrowheadDragged( shapeName,deltax, deltay, origx, origy)
 
+	
+		
 	def checkConnection( self ):
 		self.parentObject.checkConnection()
 
@@ -201,7 +236,7 @@ class ComplexLine:
 
 	def releaseButton( self, shapeName, x, y ):
 		self.changeCursor( shapeName, x, y, False )
-
+		self.parentObject.mouseReleased( shapeName,x, y)
 
 	def mouseEntered( self, shapeName, x, y ):
 		self.changeCursor( shapeName, x, y )
@@ -231,8 +266,10 @@ class ComplexLine:
 			if event.button == 1:
 				self.buttonpressed = False
 				self.releaseButton(shapeName, event.x, event.y )
+				
 
 		elif event.type == gtk.gdk.MOTION_NOTIFY:
+			self.buttonpressed=(event.state&gtk.gdk.BUTTON1_MASK)>0
 			if not self.buttonpressed:
 				return
 			oldx = self.lastmousex

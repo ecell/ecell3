@@ -2,7 +2,7 @@
 <!DOCTYPE glade-interface SYSTEM "http://glade.gnome.org/glade-2.0.dtd">
 
 <glade-interface>
-<requires lib="gnome"/>
+
 
 <widget class="GtkWindow" id="ListComponent">
   <property name="visible">True</property>
@@ -12,6 +12,7 @@
   <property name="modal">False</property>
   <property name="resizable">True</property>
   <property name="destroy_with_parent">False</property>
+  <property name="icon">modeleditor.png</property>
 
   <child>
     <widget class="GtkVBox" id="attachment_box">

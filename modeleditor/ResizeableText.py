@@ -11,6 +11,7 @@ class ResizeableText:
 		self.anchor=anchor
 		self.fill=fillColor
 		self.ppu=0
+		#self.parentID=parentID
 	
 		self.theCanvasText=self.theRoot.add( gnome.canvas.CanvasText, x=self.x, y=self.y, fill_color_gdk = self.fill, text = self.theText, anchor = self.anchor )
 
@@ -27,12 +28,12 @@ class ResizeableText:
 		self.theCanvasText.set_property('font-desc', pgfd )
 
 	def renameText(self, newText):
-		self.thePathwayCanvas.setLabelText(self.theText,newText)
+		self.thePathwayCanvas.setLabelText(self,newText)
 		self.theText=newText
 
 	def destroy(self):
 		#deregister at pathway canvas
-		self.thePathwayCanvas.deregisterText(self.theText)
+		self.thePathwayCanvas.deregisterText(self)
 		self.theCanvasText.destroy()
 
 	def w2i(self,x,y):

@@ -43,6 +43,11 @@ class ConnectionObjectEditorWindow:
 
 		# Sets title
 		self.win.set_title('ConnectionObjectEditor')
+		iconPixbuf = None
+		import os
+		iconPixbuf = gtk.gdk.pixbuf_new_from_file(os.environ['MEPATH'] \
+				+ os.sep + 'glade' + os.sep + "modeleditor.png")
+		self.win.set_icon(iconPixbuf)
 		
 		
 		self.getTheObject(aLayoutName, anObjectId)
@@ -69,7 +74,6 @@ class ConnectionObjectEditorWindow:
 		self.theObjectId = anObjectId
 		self.theObject = self.theLayout.getObject(self.theObjectId)
 		
-
 	def modifyConnObjectProperty(self,aPropertyName, aPropertyValue):
 		aCommand = None
 		if  aPropertyName == OB_FILL_COLOR :
@@ -85,8 +89,10 @@ class ConnectionObjectEditorWindow:
 
 
 	def update(self, aType = None, aFullID = None):
-
+	
 		self.theComponent.update()
+		
+		
 		
 
 	# ==========================================================================

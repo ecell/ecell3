@@ -20,7 +20,10 @@ class Layout:
 		self.theName = aName
 		self.theObjectMap = {}
 		self.thePropertyMap = {}
+		
 		default_scrollregion = [ -1000, -1000, 1000, 1000 ]
+		self.orgScrollRegion = default_scrollregion
+
 		self.thePropertyMap[ OB_DIMENSION_X ] = default_scrollregion[2] - default_scrollregion[0]
 		self.thePropertyMap[ OB_DIMENSION_Y ] = default_scrollregion[3] - default_scrollregion[1]
 
@@ -35,8 +38,7 @@ class Layout:
 		anObjectID = self.getUniqueObjectID( ME_SYSTEM_TYPE )
 		self.createObject( anObjectID, ME_SYSTEM_TYPE, ME_ROOTID, default_scrollregion[0], default_scrollregion[1], None )
 		self.thePropertyMap[ LO_ROOT_SYSTEM ] = anObjectID
-
-
+		
 	def update( self, aType = None, anID = None ):
 		# i am not sure this is necessary
 		pass
@@ -44,8 +46,14 @@ class Layout:
 	def isShown( self ):
 		return self.theCanvas != None
 
+	def getName(self):
+		return self.theName
+
+	def getLayoutManager(self):
+		return self.theLayoutManager
 
 	def attachToCanvas( self, aCanvas ):
+		
 		self.theCanvas = aCanvas
 		self.thePathwayEditor = self.theCanvas.getParentWindow()
 		self.theCanvas.setLayout( self )
@@ -56,12 +64,10 @@ class Layout:
 		ppu = self.getProperty( LO_ZOOM_RATIO )
 		self.theCanvas.setZoomRatio( ppu )
 		self.theCanvas.scrollTo( scrollRegion[0], scrollRegion[1],'attach')
-
 		# set canvas for objects and show objects
 
 
 		self.__showObject( self.thePropertyMap[ LO_ROOT_SYSTEM ] )
-
 		# then get all the connections, setcanvas, show
 
 		for objectID in self.getObjectList(OB_TYPE_CONNECTION):
@@ -70,11 +76,9 @@ class Layout:
 			anObject.show()
 		
 	def __showObject( self, anObjectID ):
-		
 		anObject = self.theObjectMap[ anObjectID ]
 		anObject.setCanvas( self.theCanvas )
 		anObject.show()
-		
 		if anObject.getProperty( OB_TYPE ) == OB_TYPE_SYSTEM:
 			objectList = anObject.getObjectList()
 			
@@ -113,6 +117,7 @@ class Layout:
 	def createObject( self, objectID, objectType, aFullID=None, x=None, y=None, parentSystem = None  ):
 		# object must be within a system except for textboxes 
 		# parentSystem object cannot be None, just for root
+		
 		if x == None and y == None:
 			(x,y) = parentSystem.getEmptyPosition()
 
@@ -143,7 +148,9 @@ class Layout:
 			raise Exception("Object type %s does not exists"%objectType)
 		
 		self.theObjectMap[ objectID ] = newObject
+		
 		if self.theCanvas!=None:
+			
 			newObject.setCanvas( self.theCanvas )
 			newObject.show()
 
@@ -183,10 +190,18 @@ class Layout:
 			return self.thePropertyMap[aPropertyName]
 		else:
 			raise Exception("Unknown property %s for layout %s"%(self.theName, aPropertyName ) )
-	
-	
+
+###################################################################
 	def setProperty( self, aPropertyName, aValue ):
 		self.thePropertyMap[aPropertyName] = aValue
+		if aPropertyName==LO_SCROLL_REGION:
+			scrollRegion=self.getProperty(LO_SCROLL_REGION)
+			self.thePropertyMap[ OB_DIMENSION_X ]=scrollRegion[2]-scrollRegion[0]
+			self.thePropertyMap[ OB_DIMENSION_Y ]=scrollRegion[3]-scrollRegion[1]
+			if self.theCanvas!=None:
+				self.theCanvas.setSize( scrollRegion )
+			
+
 
 	def getAbsoluteInsidePosition( self ):
 		return ( 0, 0 )
@@ -225,10 +240,11 @@ class Layout:
 			newObject.show()
 
 
-	def redirectConnectionObject( self, anObjectID, newProcessObjectID, newVariableObjectID = None, processRing = None, variableRing = None ):
+	def redirectConnectionObject( self, anObjectID, newProcessObjectID, newVariableObjectID = None, processRing = None, variableRing = None, varrefName =None ):
 		# if processobjectid or variableobjectid is None -> no change on their part
 		# if process or variableID is the same as connection objectid, means that it should be left unattached
-		pass
+		conObject = self.getObject( anObjectID )
+		conObject.redirectConnbyComm(newProcessObjectID,newVariableObjectID,processRing,variableRing,varrefName)
 
 
 	#################################################

@@ -79,6 +79,11 @@ class FullIDBrowserWindow:
 		# Sets title
 		
 		self.theComponent = ViewComponent( self.win.vbox, 'attachment_box', 'FullIDChooser.glade' )
+		iconPixbuf = None
+		import os
+		iconPixbuf = gtk.gdk.pixbuf_new_from_file(os.environ['MEPATH'] \
+				+ os.sep + 'glade' + os.sep + "modeleditor.png")
+		self.win.set_icon(iconPixbuf)
                
 		# create systree, processlist, propertylist
 		self.theSystemTree = SystemTree( self, self.theComponent['SystemTreeFrame'] )

@@ -39,6 +39,7 @@ import string
 from Constants import *
 from LayoutCommand import *
 
+
 class MainWindow( ListWindow ):
 
 
@@ -75,9 +76,6 @@ class MainWindow( ListWindow ):
 			'exit_menu_activate' : self.__quit_menu_clicked,\
 			'on_undo_activate' : self.__undo_activated,\
 			'on_redo_activate' : self.__redo_activated,\
-			'on_cut_activate' : self.__cut_activated,\
-			'on_copy_activate' : self.__copy_activated,\
-			'on_paste_activate' : self.__paste_activated,\
 			'stepper_window_activate' : self.__stepper_window_activated,\
 			'entity_window_activate' : self.__entity_window_activated,\
 			'on_pathway_editor_activate' : self.__pathway_editor_activated,\
@@ -88,9 +86,6 @@ class MainWindow( ListWindow ):
 			'on_quit_button_clicked' : self.__quit_menu_clicked,\
 			'on_undo_button_clicked' :  self.__undo_activated,\
 			'on_redo_button_clicked' : self.__redo_activated,\
-			'on_cut_button_clicked' :  self.__cut_activated,\
-			'on_copy_button_clicked' : self.__copy_activated,\
-			'on_paste_button_clicked' : self.__paste_activated,\
 			'on_StepperButton_clicked' : self.__stepper_window_activated,\
 			'on_EntityButton_clicked' : self.__entity_window_activated,\
 			'on_PathwayButton_clicked' : self.__pathway_editor_activated,\
@@ -251,31 +246,31 @@ class MainWindow( ListWindow ):
 			
 
 		# update copy, cut, paste buttons, menus
-		adcpFlags = self.theModelEditor.getADCPFlags()
+#		adcpFlags = self.theModelEditor.getADCPFlags()
 
-		if adcpFlags[ME_COPY_FLAG]:
-			copyFlag = gtk.TRUE
-		else:
-			copyFlag = gtk.FALSE
+#		if adcpFlags[ME_COPY_FLAG]:
+#			copyFlag = gtk.TRUE
+#		else:
+#			copyFlag = gtk.FALSE
 
-		self['copy1'].set_sensitive( copyFlag )
-		self['button4'].set_sensitive( copyFlag )
+#		self['copy1'].set_sensitive( copyFlag )
+#		self['button4'].set_sensitive( copyFlag )
 
-		if adcpFlags[ME_COPY_FLAG] and adcpFlags[ME_DELETE_FLAG]:
-			cutFlag = gtk.TRUE
-		else:
-			cutFlag = gtk.FALSE
+#		if adcpFlags[ME_COPY_FLAG] and adcpFlags[ME_DELETE_FLAG]:
+#			cutFlag = gtk.TRUE
+#		else:
+#			cutFlag = gtk.FALSE
 
-		self['cut1'].set_sensitive( cutFlag )
-		self['button3'].set_sensitive( cutFlag )
+#		self['cut1'].set_sensitive( cutFlag )
+#		self['button3'].set_sensitive( cutFlag )
 
-		if adcpFlags[ME_PASTE_FLAG]:
-			pasteFlag = gtk.TRUE
-		else:
-			pasteFlag = gtk.FALSE
+#		if adcpFlags[ME_PASTE_FLAG]:
+#			pasteFlag = gtk.TRUE
+#		else:
+#			pasteFlag = gtk.FALSE
 
-		self['paste1'].set_sensitive( pasteFlag )
-		self['button5'].set_sensitive( pasteFlag )
+#		self['paste1'].set_sensitive( pasteFlag )
+#		self['button5'].set_sensitive( pasteFlag )
 
 
 
@@ -283,7 +278,8 @@ class MainWindow( ListWindow ):
 
 	def showAbout ( self ):
 		# show about information
-		self.theModelEditor.printMessage("Sorry, not implemented !", ME_ERROR )
+		self.theModelEditor.createAboutModelEditor()
+		#self.theModelEditor.printMessage("Sorry, not implemented !", ME_ERROR )
 
 
 	
@@ -300,6 +296,9 @@ class MainWindow( ListWindow ):
 
 		# set init path for dialog
 		aDialog.set_filename( defaultName )
+		iconPixbuf = gtk.gdk.pixbuf_new_from_file(os.environ['MEPATH'] + os.sep + "glade" + os.sep + "modeleditor.png")
+		aDialog.set_icon(iconPixbuf)
+		aDialog.set_title("Select a file name")
 		aDialog.show_fileop_buttons( )
 
 		# make dialog modal
@@ -373,20 +372,6 @@ class MainWindow( ListWindow ):
 
 		self.theModelEditor.redoCommandList()
 
-
-	def __cut_activated( self, *args ):
-		
-		self.theModelEditor.cut()
-
-
-	def __copy_activated( self, *args ):
-
-		self.theModelEditor.copy()
-
-
-	def __paste_activated( self, *args ):
-
-		self.theModelEditor.paste()
 
 
 	def __stepper_window_activated( self, *args ):

@@ -130,6 +130,7 @@ class ListWindow(Window):
 			Window.openWindow(self)
 
 			# connects 'delete_event' and self.delete() method.
+			
 			self[self.__class__.__name__].show_all()
 			self[self.__class__.__name__].connect('delete_event',self.deleted)
 

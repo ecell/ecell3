@@ -44,4 +44,6 @@ class CommandQueue:
 	def isNext( self ):
 		return self.__thePointer < len( self.__theCommandQueue)
 
+	
+
 

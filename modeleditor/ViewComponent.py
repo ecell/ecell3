@@ -48,6 +48,7 @@ class ViewComponent:
 				self.widgets = gtk.glade.XML( self.theGladeFile, root=anAttachment )
 		else:
 			raise IOError( "can't read %s." %self.theGladeFile )
+		
 		self.theRoot = self[anAttachment]		
 		pointOfAttach.add( self.theRoot )
 		

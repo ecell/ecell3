@@ -10,6 +10,7 @@ AM_CHECK_PYMOD(pygtk,,,[AC_MSG_ERROR(could not find pygtk module)])
 AM_CHECK_PYMOD(gtk,,,[AC_MSG_ERROR(could not find gtk module)])
 AM_CHECK_PYMOD(gtk.gdk,,,[AC_MSG_ERROR(could not find gtk.gdk module. perhaps pygtk2 is not installed)])
 AM_CHECK_PYMOD(gtk.glade,,,[AC_MSG_ERROR(could not find gtk.glade module. perhaps pygtk2-libglade is not installed)])
+AC_PROG_CC
 
 dnl check for pygtk>=2.0.0
 prog="
@@ -35,7 +36,7 @@ AM_CHECK_PYMOD(Numeric,,,[AC_MSG_ERROR(could not find Numeric module)])
 
 ECELL_MAJOR_VERSION=3
 ECELL_MINOR_VERSION=1
-ECELL_MICRO_VERSION=101
+ECELL_MICRO_VERSION=100
 
 VERSION=$ECELL_MAJOR_VERSION.$ECELL_MINOR_VERSION.$ECELL_MICRO_VERSION
 ECELL_VERSION_STRING=$VERSION
@@ -45,8 +46,6 @@ ecell_dm_path="${prefix}/lib/ecell/${VERSION}"
 AC_SUBST(ecell_dm_path)
 AC_OUTPUT(
 Makefile
-Config.py
-glade/Makefile
-ecell3-model-editor,
+glade/Makefile,
 chmod +x ecell3-model-editor
 )

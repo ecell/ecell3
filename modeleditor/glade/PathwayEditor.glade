@@ -2,19 +2,18 @@
 <!DOCTYPE glade-interface SYSTEM "http://glade.gnome.org/glade-2.0.dtd">
 
 <glade-interface>
-<requires lib="canvas"/>
 
 <widget class="GtkWindow" id="PathwayEditor">
-  <property name="width_request">850</property>
-  <property name="height_request">650</property>
   <property name="visible">True</property>
   <property name="title" translatable="yes">PathwayEditor</property>
   <property name="type">GTK_WINDOW_TOPLEVEL</property>
   <property name="window_position">GTK_WIN_POS_NONE</property>
   <property name="modal">False</property>
+  <property name="default_width">850</property>
+  <property name="default_height">650</property>
   <property name="resizable">True</property>
   <property name="destroy_with_parent">False</property>
-  <property name="icon">pathway.png</property>
+  <property name="icon">icon_pathway.png</property>
 
   <child>
     <widget class="GtkVBox" id="vbox1">
@@ -399,7 +398,7 @@
 				      <child>
 					<widget class="GtkImage" id="image7">
 					  <property name="visible">True</property>
-					  <property name="pixbuf">selector.png</property>
+					  <property name="pixbuf">icon_selector.png</property>
 					  <property name="xalign">0.5</property>
 					  <property name="yalign">0.5</property>
 					  <property name="xpad">0</property>
@@ -440,7 +439,7 @@
 				      <child>
 					<widget class="GtkImage" id="image4">
 					  <property name="visible">True</property>
-					  <property name="pixbuf">variable.png</property>
+					  <property name="pixbuf">icon_variable.png</property>
 					  <property name="xalign">0.5</property>
 					  <property name="yalign">0.5</property>
 					  <property name="xpad">0</property>
@@ -481,7 +480,7 @@
 				      <child>
 					<widget class="GtkImage" id="image5">
 					  <property name="visible">True</property>
-					  <property name="pixbuf">process.png</property>
+					  <property name="pixbuf">icon_process.png</property>
 					  <property name="xalign">0.5</property>
 					  <property name="yalign">0.5</property>
 					  <property name="xpad">0</property>
@@ -522,7 +521,7 @@
 				      <child>
 					<widget class="GtkImage" id="image10">
 					  <property name="visible">True</property>
-					  <property name="pixbuf">system.png</property>
+					  <property name="pixbuf">icon_system.png</property>
 					  <property name="xalign">0.5</property>
 					  <property name="yalign">0.5</property>
 					  <property name="xpad">0</property>
@@ -563,7 +562,7 @@
 				      <child>
 					<widget class="GtkImage" id="image12">
 					  <property name="visible">True</property>
-					  <property name="pixbuf">custom.png</property>
+					  <property name="pixbuf">icon_custom.png</property>
 					  <property name="xalign">0.5</property>
 					  <property name="yalign">0.5</property>
 					  <property name="xpad">0</property>
@@ -604,7 +603,7 @@
 				      <child>
 					<widget class="GtkImage" id="image8">
 					  <property name="visible">True</property>
-					  <property name="pixbuf">textbox.png</property>
+					  <property name="pixbuf">icon_textbox.png</property>
 					  <property name="xalign">0.5</property>
 					  <property name="yalign">0.5</property>
 					  <property name="xpad">0</property>
@@ -752,18 +751,7 @@
 		  <property name="label_yalign">0.5</property>
 		  <property name="shadow_type">GTK_SHADOW_ETCHED_IN</property>
 
-		  <child>
-		    <widget class="GnomeCanvas" id="preview_canvas">
-		      <property name="visible">True</property>
-		      <property name="can_focus">True</property>
-		      <property name="anti_aliased">False</property>
-		      <property name="scroll_x1">0</property>
-		      <property name="scroll_y1">0</property>
-		      <property name="scroll_x2">100</property>
-		      <property name="scroll_y2">100</property>
-		      <property name="pixels_per_unit">1</property>
-		    </widget>
-		  </child>
+
 
 		  <child>
 		    <widget class="GtkLabel" id="label17">
@@ -809,18 +797,6 @@
 	  <property name="shadow_type">GTK_SHADOW_NONE</property>
 	  <property name="window_placement">GTK_CORNER_TOP_LEFT</property>
 
-	  <child>
-	    <widget class="GnomeCanvas" id="pathway_canvas">
-	      <property name="visible">True</property>
-	      <property name="can_focus">True</property>
-	      <property name="anti_aliased">False</property>
-	      <property name="scroll_x1">0</property>
-	      <property name="scroll_y1">0</property>
-	      <property name="scroll_x2">100</property>
-	      <property name="scroll_y2">100</property>
-	      <property name="pixels_per_unit">1</property>
-	    </widget>
-	  </child>
 	</widget>
 	<packing>
 	  <property name="padding">0</property>

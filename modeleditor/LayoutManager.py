@@ -22,7 +22,7 @@ class LayoutManager:
 			raise Exception("Layout %s already exists!"%aLayoutName )
 		newLayout = Layout ( self, aLayoutName )
 		self.theLayoutMap[ aLayoutName ] = newLayout
-
+		
 
 	def deleteLayout( self, aLayoutName ):
 		aLayout = self.theLayoutMap[ aLayoutName ]
@@ -84,7 +84,15 @@ class LayoutManager:
 			self.theLayoutMap[ newLayoutName ] = aLayout
 			self.theLayoutMap.__delitem__( oldLayoutName )
 			return True
-		
+
+	def setLayoutProperty( self, aLayoutName, aPropertyName, aPropertyValue ):
+		aLayout = self.theLayoutMap[ aLayoutName ]
+		if self.doesLayoutExist( aLayoutName ):
+			#raise Exception("%s layout already exists!"%newLayoutName )
+			return False
+		else:
+			aLayout.setProperty( aPropertyName, aPropertyValue )
+			return True
 	
 	def createObjectIterator( self ):
 		return ObjectIterator( self)

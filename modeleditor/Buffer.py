@@ -29,8 +29,9 @@ class Buffer:
 	
 	def asText( self ):
 
-		return "sorry not implemneted"
+		return "sorry not implemented"
 
+	
 
 class StepperListBuffer (Buffer):
 

@@ -5,7 +5,7 @@ class PackingStrategy:
 
 	def __init__( self, aLayout ):
 		self.theLayout = aLayout
-
+		
 
 	def autoMoveObject( self, systemFullID, objectID ):
 		# return cmdlist: delete or move + resize command
@@ -66,12 +66,10 @@ class PackingStrategy:
 
 
 	def autoConnect( self, processObjectID, variableObjectID,varrefName ):
-		# return cmdlist
-		cmdList = []
 		
 		aProObject = self.theLayout.getObject( processObjectID )
 		aVarObject = self.theLayout.getObject( variableObjectID )
-
+		
 		# get dimensions of object and x, y pos
 		aProObjectWidth = aProObject.getProperty( OB_DIMENSION_X )
 		aProObjectHeigth = aProObject.getProperty( OB_DIMENSION_Y )
@@ -87,45 +85,15 @@ class PackingStrategy:
 		aVarObjectXCenter = aVarObjectX1 +aVarObjectWidth/2
 		aVarObjectYCenter = aVarObjectY1 +aVarObjectHeigth/2
 
-		if aVarObjectXCenter >= aProObjectXCenter and aVarObjectYCenter <= aProObjectYCenter:
-			if aVarObjectYCenter >=aProObjectY1:
-				processRing =RING_RIGHT
-				variableRing =RING_LEFT
-			if aVarObjectYCenter <= aProObjectY1:
-				processRing =RING_TOP
-				variableRing =RING_BOTTOM
-		if aVarObjectXCenter >= aProObjectXCenter and aVarObjectYCenter >= aProObjectYCenter:
-			if aVarObjectYCenter <= aProObjectY2:
-				processRing =RING_RIGHT
-				variableRing =RING_LEFT
-			if aVarObjectYCenter >=aProObjectY2:
-				processRing =RING_BOTTOM
-				variableRing =RING_TOP
-		if aVarObjectXCenter <= aProObjectXCenter and aVarObjectYCenter >= aProObjectYCenter:
-			if aVarObjectYCenter >= aProObjectY2:
-				processRing =RING_BOTTOM
-				variableRing =RING_TOP
-			if aVarObjectYCenter <=aProObjectY2:
-				processRing =RING_LEFT
-				variableRing =RING_RIGHT
-		if aVarObjectXCenter <= aProObjectXCenter and aVarObjectYCenter<= aProObjectYCenter:
-			if aVarObjectYCenter >= aProObjectY1:
-				processRing =RING_LEFT
-				variableRing =RING_RIGHT
-			if aVarObjectYCenter <= aProObjectY1:
-				processRing =RING_TOP
-				variableRing =RING_BOTTOM
+		#assign process ring n var ring
+		QArray = [[RING_BOTTOM,RING_TOP],[RING_LEFT,RING_RIGHT],[RING_LEFT,RING_RIGHT],[RING_TOP,RING_BOTTOM],[RING_BOTTOM,RING_TOP],[RING_RIGHT,RING_LEFT],[RING_RIGHT,RING_LEFT],[RING_TOP,RING_BOTTOM]]
 
-
-
-		newID = self.theLayout.getUniqueObjectID( OB_TYPE_CONNECTION )
-		cmdList.append(CreateConnection( self.theLayout, newID,  processObjectID, variableObjectID, processRing, variableRing, PROCESS_TO_VARIABLE, varrefName ))
-		return cmdList
+		codeQ = (aVarObjectXCenter>aProObjectXCenter)*4 + (aVarObjectYCenter<aProObjectYCenter)*2 + (aVarObjectYCenter<aProObjectYCenter)
+		processRing,variableRing = QArray[codeQ]
+		
+		return (processRing,variableRing)
 		
 		
-		
-		
-
 
 	def autoShowObject( self, aFullID ):
 		# return cmd or comes up with error message!

@@ -37,6 +37,7 @@ import os.path
 import string
 from Constants import *
 from PathwayCanvas import *
+import gnome.canvas
 
 class PathwayEditor( ListWindow ):
 
@@ -64,10 +65,12 @@ class PathwayEditor( ListWindow ):
 		ListWindow.openWindow( self )
 
 		# add signal handlers
-
-		self.thePathwayCanvas = PathwayCanvas( self, self['pathway_canvas'] )
+		canv=gnome.canvas.Canvas()
+		canv.show_all()
+		self['scrolledwindow1'].add(canv)
+		self.thePathwayCanvas = PathwayCanvas( self, canv )
 		self.theLayout.attachToCanvas( self.thePathwayCanvas )
-
+		
 		self.addHandlers({ 
 				'on_zoom_in_button_clicked' : self.__zoom_in,\
 				'on_zoom_out_button_clicked' : self.__zoom_out,\

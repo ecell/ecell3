@@ -331,7 +331,7 @@ class PasteEntityList(ModelCommand):
 		deleteList = createFullIDList( self.__theType, convertSysPathToSysID( self.__theSysPath), deleteNameList )
 		# create a paste and a delete reverse command
 		deleteCommand = DeleteEntityList( self.theReceiver, deleteList )
-		pasteCommand = PasteEntityList( self.theReceiver, pasteBuffer )
+		pasteCommand = PasteEntityList( self.theReceiver, pasteBuffer, self.__theSysPath )
 		self.theReverseCommandList = [ deleteCommand, pasteCommand ]
 		return True
 

@@ -1,4 +1,3 @@
-
 from ComplexShape import *
 from Constants import *
 from LayoutCommand import *
@@ -6,6 +5,8 @@ import gtk
 from EntityCommand import *
 from Utils import *
 from PackingStrategy import *
+import Numeric as n
+from LayoutBufferFactory import *
 
 
 
@@ -35,12 +36,20 @@ class EditorObject:
 		self.parentSystem.registerObject( self )
 		#self.theSD = None
 		self.isSelected = False
+
 		self.existobjectFullIDList=[]
 		
 		self.thexorg=0
 		self.theyorg=0
 		self.lastx=0
 		self.lasty=0
+		self.rn=None
+		self.totalLabelWidth=0
+		self.labelLimit=0
+		
+		self.maxShiftMap={DIRECTION_LEFT:[0], DIRECTION_RIGHT:[2],DIRECTION_UP:[1],DIRECTION_DOWN:[3], 
+                                  DIRECTION_BOTTOM_RIGHT:[2,3],DIRECTION_BOTTOM_LEFT:[0,3],DIRECTION_TOP_RIGHT:[2,1], 	
+                                  DIRECTION_TOP_LEFT:[0,1]}
 
 		
 	def destroy(self):
@@ -55,12 +64,17 @@ class EditorObject:
 		if not self.isSelected:
 			self.theLayout.selectRequest( self.theID )
 
+	
+
 	def selected( self ):
 		if not self.isSelected:
 			self.isSelected = True
 			self.theShape.selected()
 			self.theShape.outlineColorChanged()
-
+			
+	
+	
+				
 
 	def unselected( self ):
 		if self.isSelected:
@@ -70,6 +84,8 @@ class EditorObject:
 
 
 	def outlineDragged( self, deltax, deltay, x, y ):
+		if self.parentSystem.__class__.__name__ == 'Layout':
+			return
 		# in most of the cases object are not resizeable, only system is resizeable and it will override this
 		self.objectDragged( )
 		pass
@@ -118,13 +134,10 @@ class EditorObject:
 	def getID( self ):
 		return self.theID
 
-		
-
 	def setProperty( self, aPropertyName, aPropertyValue):
 		self.thePropertyMap[aPropertyName] = aPropertyValue
-		
 		if  self.theCanvas !=None:
-			if aPropertyName == OB_FULLID:
+			if aPropertyName == OB_LABEL:
 				self.labelChanged(aPropertyValue)
 			elif aPropertyName == OB_TEXT_COLOR :
 				self.theShape.outlineColorChanged()
@@ -134,9 +147,9 @@ class EditorObject:
 				self.theShape.fillColorChanged()
 
 	def labelChanged( self,aPropertyValue ):
-		newLabel = aPropertyValue.split(':')[2]
-		self.theShape.labelChanged(newLabel) 
-		
+		pass
+		#newLabel = aPropertyValue.split(':')[2]
+		#self.theShape.labelChanged(newLabel) 
 
 	def getLayout( self ):
 		return self.theLayout
@@ -163,19 +176,58 @@ class EditorObject:
 		self.thePropertyMap[ OB_POS_Y ] += deltay
 		self.theShape.move( deltax, deltay )
 
+
 	def parentMoved( self, deltax, deltay ):
 		# no change in relative postions
-
+		
 		self.theShape.move( deltax, deltay )
 
 	def adjustCanvas(self,dx,dy):
 		if self.theCanvas.getBeyondCanvas():
 			self.parentSystem.theCanvas.setCursor(CU_MOVE)
 			self.parentSystem.theCanvas.scrollTo(dx,dy)
-	
+			#self.parentSystem.theCanvas.setLastCursorPos(dx,dy)
+
+	def getDirectionShift(self,dx,dy):
+		if dx>0 and dy==0:
+			return DIRECTION_RIGHT
+		if dx<0 and dy==0:
+			return DIRECTION_LEFT
+		if dy>0 and dx==0:
+			return DIRECTION_DOWN
+		if dy<0 and dx==0:
+			return DIRECTION_UP
+		if dx>0 and dy>0:
+			return DIRECTION_BOTTOM_RIGHT
+		if dx<0 and dy>0:
+			return DIRECTION_BOTTOM_LEFT
+		if dx>0 and dy<0:
+			return DIRECTION_TOP_RIGHT
+		if dx<0 and dy<0:
+			return DIRECTION_TOP_LEFT
+
+	def adjustLayoutCanvas(self,dup,ddown,dleft,dright):
+		scrollx=self.theLayout.getProperty(LO_SCROLL_REGION)[0]
+		scrolly=self.theLayout.getProperty(LO_SCROLL_REGION)[1]
+		scrollx2=self.theLayout.getProperty(LO_SCROLL_REGION)[2]
+		scrolly2=self.theLayout.getProperty(LO_SCROLL_REGION)[3]
+		dleft=-dleft
+		dup=-dup
+		scrollx+=dleft
+		scrolly+=dup
+		scrollx2+=dright
+		scrolly2+=ddown
+		self.theLayout.setProperty(LO_SCROLL_REGION,[scrollx,scrolly,scrollx2,scrolly2])
+		self.theLayout.setProperty(OB_DIMENSION_X,scrollx2 - scrollx)
+		self.theLayout.setProperty(OB_DIMENSION_Y,scrolly2 - scrolly)
+		self.theLayout.getCanvas().setSize(self.theLayout.getProperty(LO_SCROLL_REGION))
+		self.theLayout.getCanvas().scrollTo(dleft+dright,ddown+dup)	
+
 	###################################################################################################
 	def objectDragged( self, deltax, deltay ):
+		cmdList=[]
 		theParent=self.parentSystem
+		childs=len(theParent.getObjectList())
 		#  parent system boundaries should be watched here!!!
 		#get new positions:
 		# currently move out of system is not supported!!!
@@ -184,17 +236,76 @@ class EditorObject:
 			return
 		
 		if self.theShape.getFirstDrag() and not self.theShape.getDragBefore() :
+			self.rn=self.createRnOut()
 			# store org position first
 			self.thexorg= self.getProperty( OB_POS_X )
 			self.theyorg= self.getProperty( OB_POS_Y )
+			# for parent
+			theParent.thex1org=theParent.thePropertyMap[OB_POS_X]
+			theParent.they1org=theParent.thePropertyMap[OB_POS_Y]
+			theParent.thex2org=theParent.thex1org+theParent.thePropertyMap[OB_DIMENSION_X]
+			theParent.they2org=theParent.they1org+theParent.thePropertyMap[OB_DIMENSION_Y]
+			# for siblings
+			if childs>1:
+				for sib in theParent.getObjectList():
+					asib=theParent.getObject(sib)
+					if asib.getProperty(OB_FULLID)!=self.getProperty(OB_FULLID):
+						asib.thexorg=asib.getProperty(OB_POS_X)
+						asib.theyorg=asib.getProperty(OB_POS_Y)
+			#for Layout
+			self.theLayout.orgScrollRegion = self.theLayout.getProperty(LO_SCROLL_REGION)
 			self.theShape.setFirstDrag(False)
 			self.theShape.setDragBefore(True)
+			
 
 		if self.theShape.getIsButtonPressed(): 
 			newx = self.getProperty( OB_POS_X ) + deltax
 			newy = self.getProperty( OB_POS_Y ) + deltay
 
-		elif not self.theShape.getIsButtonPressed():
+			if newx==0 and newy == 0:
+				return
+			# get self's newx2,newy2
+			newx2=newx+self.getProperty(OB_DIMENSION_X)
+			newy2=newy+self.getProperty(OB_DIMENSION_Y)
+			rpar=self.createRparent()
+			if not self.isWithinParent(newx,newy,newx2,newy2,rpar):
+				dir=self.getDirectionShift(deltax,deltay)
+				UDLR=theParent.getUDLRmatrix(deltax,deltay,dir)
+				deltaup=UDLR[theParent.UDLRMap['U']]
+				deltadown=UDLR[theParent.UDLRMap['D']]
+				deltaright=UDLR[theParent.UDLRMap['R']]
+				deltaleft=UDLR[theParent.UDLRMap['L']]
+				delta=theParent.getDelta(UDLR)
+				
+				if  theParent.parentSystem.__class__.__name__ == 'Layout':
+					self.adjustLayoutCanvas(   deltaup, deltadown, deltaleft, deltaright )
+					theParent.resize(   deltaup, deltadown, deltaleft, deltaright )
+				else:
+					if dir in [DIRECTION_RIGHT,DIRECTION_UP,DIRECTION_DOWN,DIRECTION_LEFT]:
+						maxShift=theParent.getMaxShiftPos(dir)
+						if maxShift>0:
+							if maxShift>delta:				
+								theParent.resize(   deltaup, deltadown, deltaleft, deltaright )
+								self.adjustCanvas(deltax,deltay)
+							else:
+								return
+					else:
+						maxShiftx,maxShifty=theParent.getMaxShiftPos(dir)
+						if maxShiftx>0 and maxShifty>0:
+							if maxShiftx>delta and maxShifty>delta:			
+								theParent.resize(   deltaup, deltadown, deltaleft, deltaright )
+								self.adjustCanvas(deltax,deltay)
+							else:
+								return
+				
+			elif self.isWithinParent(newx,newy,newx2,newy2,rpar):
+				if self.isOverlap(newx,newy,newx2,newy2,self.rn):	
+					return						
+				else:			
+					self.move(deltax,deltay)
+					self.adjustCanvas(deltax,deltay)
+		else:
+			#for self
 			self.lastx=self.thePropertyMap[ OB_POS_X ]
 			self.lasty=self.thePropertyMap[ OB_POS_Y ]
 			newx=self.lastx
@@ -202,40 +313,58 @@ class EditorObject:
 			self.move(-(self.getProperty( OB_POS_X )-self.thexorg) ,-(self.getProperty( OB_POS_Y )-self.theyorg))
 			self.thePropertyMap[ OB_POS_X ] =self.thexorg
 			self.thePropertyMap[ OB_POS_Y ] =self.theyorg
+
+			#create command for self
+			aCommand1 = MoveObject( self.theLayout, self.theID, newx, newy, None )
+			cmdList.append(aCommand1)
+
+			#siblings
+			if childs>0:
+				for sib in theParent.getObjectList():
+					asib=theParent.getObject(sib)
+					if asib.getProperty(OB_FULLID)!=self.getProperty(OB_FULLID):
+						asib.lastx=asib.thePropertyMap[ OB_POS_X ]
+						asib.lasty=asib.thePropertyMap[ OB_POS_Y ]
+						newxsib=asib.lastx
+						newysib=asib.lasty
+						asib.move(-(asib.getProperty( OB_POS_X )-asib.thexorg) ,-(asib.getProperty( OB_POS_Y )-asib.theyorg))
+						asib.thePropertyMap[ OB_POS_X ] =asib.thexorg
+						asib.thePropertyMap[ OB_POS_Y ] =asib.theyorg
+						#create command for siblings
+						aCommand= MoveObject( asib.theLayout, asib.theID, newxsib, newysib, None )
+						cmdList.append(aCommand)
+
+
+			#parent
+			theParent.thedleftorg=theParent.thePropertyMap[OB_POS_X]-theParent.thex1org
+			theParent.thedrightorg=theParent.thePropertyMap[OB_POS_X]+theParent.thePropertyMap[OB_DIMENSION_X]-theParent.thex2org
+			theParent.theduporg=theParent.thePropertyMap[OB_POS_Y]-theParent.they1org
+			theParent.theddownorg=theParent.thePropertyMap[OB_POS_Y]+theParent.thePropertyMap[OB_DIMENSION_Y]-theParent.they2org
+			theParent.resize( theParent.theduporg, -theParent.theddownorg, theParent.thedleftorg, -theParent.thedrightorg)
 			
-		if newx==0 and newy == 0:
-			return
+			#create command for parent
+			aCommand2 = ResizeObject( theParent.theLayout, theParent.theID, -theParent.theduporg, theParent.theddownorg, -theParent.thedleftorg, theParent.thedrightorg )
+			cmdList.append(aCommand2)
+			
+
+			# Layout
+			newScrollRegion=self.theLayout.getProperty(LO_SCROLL_REGION)
+			self.theLayout.setProperty(LO_SCROLL_REGION,self.theLayout.orgScrollRegion)
+			self.theLayout.setProperty(OB_DIMENSION_X,self.theLayout.orgScrollRegion[2]-self.theLayout.orgScrollRegion[0])
+			self.theLayout.setProperty(OB_DIMENSION_Y,self.theLayout.orgScrollRegion[3]-self.theLayout.orgScrollRegion[1])
+			self.theLayout.getCanvas().setSize(self.theLayout.orgScrollRegion)
+			#create command for Layout
+			aCommand3 = ChangeLayoutProperty(self.theLayout, LO_SCROLL_REGION,newScrollRegion) 
+			cmdList.append(aCommand3)
+			self.theLayout.passCommand( cmdList)
+			lastposx,lastposy=self.theLayout.getCanvas().getLastCursorPos()
+			if self.theLayout.orgScrollRegion!=newScrollRegion:
+				self.theLayout.getCanvas().scrollTo(lastposx,lastposy,'attach')
+			
+
+	def canPaste(self):
+		return False
 		
-		# get self's newx2,newy2
-		newx2=newx+self.getProperty(OB_DIMENSION_X)
-		newy2=newy+self.getProperty(OB_DIMENSION_Y)
-		
-		if theParent.isWithinParent(newx,newy,self.getProperty(OB_TYPE),self):
-			for aKey in theParent.getObjectList():
-				aParChild=self.parentSystem.theLayout.getObject(aKey)
-				if aParChild.getProperty(OB_FULLID)!=self.getProperty(OB_FULLID):	
-					childX1=aParChild.getProperty(OB_POS_X)
-					childX2=childX1+aParChild.getProperty(OB_DIMENSION_X)
-					childY1=aParChild.getProperty(OB_POS_Y)
-					childY2=childY1+aParChild.getProperty(OB_DIMENSION_Y)
-						
-					# check for overlapping
-					if self.getProperty(OB_TYPE)==OB_TYPE_SYSTEM:
-						if theParent.isOverlap(newx,newy,newx2,newy2,childX1,childY1,childX2,childY2):	
-							return
-					else:
-						if theParent.isOverlapSystem(newx,newy,self.getProperty(OB_TYPE),self):
-							return	
-			if self.theShape.getIsButtonPressed():
-				self.move(deltax,deltay)
-			elif not self.theShape.getIsButtonPressed():
-				aCommand = MoveObject( self.theLayout, self.theID, newx, newy, None )
-				self.theLayout.passCommand( [ aCommand ] )
-			self.adjustCanvas(deltax,deltay)
-		else:
-			return
-		
-	
 
 	def showMenu( self, anEvent, x=None,y=None ):
 		self.newObjectPosX =x
@@ -259,7 +388,11 @@ class EditorObject:
 					
 					if not self.getModelEditor().canRedo():
 						menuItem.set_sensitive(gtk.FALSE)
-					
+
+				if aMenuName =='paste':
+					if self.getModelEditor().getCopyBuffer() == None or not self.canPaste():
+						menuItem.set_sensitive(gtk.FALSE)
+
 				if aMenuName =='show system' or aMenuName =='show process' or aMenuName =='show variable':
 					(aSubMenu,NoOfSubMenuItem)=self.getSubMenu(aMenuName)
 					if NoOfSubMenuItem ==0:
@@ -273,6 +406,15 @@ class EditorObject:
 					else:
 						menuItem.set_submenu(aSubMenu )
 
+				if aMenuName == 'extend label':
+					maxShift=self.getMaxShiftPos(DIRECTION_RIGHT)
+					aLabel=self.getProperty(OB_LABEL)
+					if aLabel.endswith('...') and  maxShift>15:	
+						menuItem.set_sensitive(gtk.TRUE)
+					else:
+						menuItem.set_sensitive(gtk.FALSE)
+						
+
 				aMenu.add(menuItem)
 				
 
@@ -284,25 +426,39 @@ class EditorObject:
 		aMenu.popup(None, None, None, anEvent.button, anEvent.time)
 			
 
+
 	def getMenuItems( self, aSubMenu = None ):
-		menuDict1 = {};menuDict2 = {};menuDict3 = {};menuDict4 = {}
+
+
+		menuDict1 = {};menuDict2 = {};menuDict3 = {};menuDict4 = {}; menuDict5={}
+		menuDict6 = {}
+
 		menuDictList = []
 		menuDict1['undo']=self.__undo
 		menuDict1['redo']=self.__redo
+		menuDict2['cut']=self.__cut
+		menuDict2['copy']=self.__copy
+		menuDict2['paste']=self.__paste
 		menuDictList +=[menuDict1]
+		menuDictList +=[menuDict2]
 		if self.getProperty(OB_TYPE) == OB_TYPE_SYSTEM:
-			menuDict2['show system'] = self.__test 
-			menuDict2['show process'] = self.__test 
-			menuDict2['show variable'] = self.__test 
-			menuDictList +=[menuDict2]
+			menuDict5['show system'] = self.__test 
+			menuDict5['show process'] = self.__test 
+			menuDict5['show variable'] = self.__test 
+			menuDictList +=[menuDict5]
 		if self.parentSystem.__class__.__name__ != 'Layout' or self.getProperty(OB_TYPE) == OB_TYPE_CONNECTION:
-			menuDict3 [ 'delete from layout'] = self.__userDeleteObject 
+			menuDict6 [ 'delete from layout'] = self.__userDeleteObject 
 			if self.getProperty( OB_HASFULLID ) or self.getProperty(OB_TYPE) == OB_TYPE_CONNECTION:
-				menuDict3['delete_from_model'] = self.__userDeleteEntity 
-			menuDictList +=[menuDict3]
+				menuDict6['delete_from_model'] = self.__userDeleteEntity 
+			menuDictList +=[menuDict6]
 		if self.getProperty(OB_TYPE) == OB_TYPE_PROCESS or self.getProperty(OB_TYPE) == OB_TYPE_VARIABLE:
 			menuDict4 [ 'show connection'] = self.__test
 			menuDictList +=[menuDict4]
+		if self.getProperty(OB_TYPE) != OB_TYPE_CONNECTION:
+			menuDict3['extend label']=self.__extend_label
+			menuDictList +=[menuDict3]
+		
+		
 	
 		
 		return menuDictList
@@ -362,8 +518,8 @@ class EditorObject:
 			#convert the relative path of var full id into the absolute
 			aVarReffList1 =[]		
 			for aVarReff in aVarReffList:
-				varFullID = getAbsoluteReference(aProcessFullID, aVarReff[1])
-				aVarReffList1 +=[[varFullID,aVarReff[0]]]
+				varFullID = getAbsoluteReference(aProcessFullID, aVarReff[ME_VARREF_FULLID])
+				aVarReffList1 +=[[aVarReff[ME_VARREF_NAME], varFullID]]
 
 			#get list of connection return the connId
 			connectionList = self.getProperty(PR_CONNECTIONLIST)
@@ -381,15 +537,17 @@ class EditorObject:
 				aVarReffList2+=[varreffName]
 			
 			#check if there is missing variable
+			ExistVarRefNameList = []
 			if len(aVarReffList1)!=len(aVarReffList2) :
 				for i in range (len(aVarReffList1)):
-					aVar = aVarReffList1[i][0] 
-					aVarReff = aVarReffList1[i][1] 
+					aVar = aVarReffList1[i][ME_VARREF_FULLID] 
+					aVarReff = aVarReffList1[i][ME_VARREF_NAME] 
 					if not aVarReff in aVarReffList2:
 						for j in range (len(existObjectFullIDList)): 
-							if aVar ==existObjectFullIDList[j][0]:
+							if aVar ==existObjectFullIDList[j][0] and  aVarReff not in ExistVarRefNameList :
 								menuItem = gtk.MenuItem( aVar+': '+aVarReff )
-								menuItem.set_name( aVar+','+aVarReffList1[i][1] + ',' +existObjectFullIDList[j][1] )
+								menuItem.set_name( aVar+','+aVarReff + ',' +existObjectFullIDList[j][1] )
+								ExistVarRefNameList +=[aVarReff]
 								menuItem.connect( 'activate', self.__userCreateConnection )
 								NoOfSubMenuItem+=1
 								aSubMenu.add(menuItem)
@@ -411,13 +569,15 @@ class EditorObject:
 				aProcessList2+=[proFullID]
 
 			#check if there is missing process
+			existProList =[]
 			if len(aProcessList)!=len(aProcessList2) :
 				for aPro in aProcessList :
 					if not aPro in aProcessList2:
 						for j in range (len(existObjectFullIDList)): 
-							if aPro ==existObjectFullIDList[j][0]:
+							if aPro ==existObjectFullIDList[j][0] and not aPro in existProList:
 								menuItem = gtk.MenuItem( aPro )
 								menuItem.set_name( aPro+','+existObjectFullIDList[j][1] )
+								existProList += [aPro]
 								menuItem.connect( 'activate', self.__userCreateConnection )
 								NoOfSubMenuItem+=1
 								aSubMenu.add(menuItem)
@@ -449,7 +609,10 @@ class EditorObject:
 		
 	def ringDragged( self, shapeName, deltax, deltay ):
 		pass
+
 		
+	def pasteObject(self):
+		pass
 	
 	def getParent( self ):
 		return self.parentSystem
@@ -466,23 +629,10 @@ class EditorObject:
 		pass
 
 	def __userDeleteObject( self, *args ):
-		self.theMenu.destroy()
-		
-		
-#		if self.getProperty( OB_TYPE )==OB_TYPE_PROCESS : 
-#			connectionList = self.getProperty(PR_CONNECTIONLIST)
-#			for conn in connectionList:
-#				aCommand= DeleteObject( self.theLayout,conn )
-#				self.theLayout.passCommand( [ aCommand ] )
-#
-#		if self.getProperty( OB_TYPE )==OB_TYPE_VARIABLE:
-#			connectionList = self.getProperty(VR_CONNECTIONLIST)
-#			for conn in connectionList:
-#				aCommand= DeleteObject( self.theLayout,conn )
-#				self.theLayout.passCommand( [ aCommand ] )
-				
+		self.theMenu.destroy()				
 		aCommand = DeleteObject( self.theLayout, self.theID )
 		self.theLayout.passCommand( [ aCommand ] )
+
 		
 		
 	def __userDeleteEntity ( self, *args ):
@@ -502,14 +652,16 @@ class EditorObject:
 			aProcessFullID = aProcessObject.getProperty( OB_FULLID )
 			fullPN = aProcessFullID+':' +MS_PROCESS_VARREFLIST
 			aVarReffList = copyValue( aModelEditor.theModelStore.getEntityProperty( fullPN ) )
-			for i in range (len(aVarReffList)): 
-				if varreffName == aVarReffList[i][0]:
-					del aVarReffList[i]
+
+			for aVarref in aVarReffList:
+				if aVarref[ME_VARREF_NAME] == varreffName :
+					del aVarref
 					break
 			aCommand = ChangeEntityProperty( aModelEditor, fullPN, aVarReffList )
 
 			self.theLayout.passCommand( [ aCommand ] )
-		
+			
+			
 
 	def __undo(self, *args ):
 		self.getModelEditor().undoCommandList()
@@ -518,7 +670,30 @@ class EditorObject:
 	def __redo(self, *args ):
 		self.getModelEditor().redoCommandList()
 		
+	def __cut(self,*args):
+		
+		if self.parentSystem.__class__.__name__ != 'Layout':
+			aLayoutManager = self.getModelEditor().theLayoutManager
+			self.LayoutBufferFactory =  LayoutBufferFactory(self.getModelEditor(), aLayoutManager)
+			self.aLayoutBuffer = self.LayoutBufferFactory.createObjectBuffer(self.theLayout.theName, self.theID)
+			self.getModelEditor().setCopyBuffer( self.aLayoutBuffer )
+		
+			aCommand = DeleteObject( self.theLayout, self.theID )
+			self.theLayout.passCommand( [ aCommand ] )
 
+		
+	def __copy(self,*args):
+		
+		if self.parentSystem.__class__.__name__ != 'Layout':
+			aLayoutManager = self.getModelEditor().theLayoutManager
+			self.LayoutBufferFactory =  LayoutBufferFactory(self.getModelEditor(), aLayoutManager)
+			self.aLayoutBuffer = self.LayoutBufferFactory.createObjectBuffer(self.theLayout.theName, self.theID)
+			self.getModelEditor().setCopyBuffer(self.aLayoutBuffer )
+		
+	def __paste(self,*args):
+		self.pasteObject()
+
+	
 	def __userCreateConnection(self,*args):
 		if self.getProperty(OB_TYPE)==OB_TYPE_PROCESS:
 			if len(args) == 0:
@@ -527,9 +702,11 @@ class EditorObject:
 				variableID = args[0].get_name()
 			varrefName = variableID.split(',')[1]
 			variableID = variableID.split(',')[2]
-		
-			aCommandList = self.thePackingStrategy.autoConnect( self.theID, variableID,varrefName )
-			self.theLayout.passCommand(  aCommandList  )
+			newID = self.theLayout.getUniqueObjectID( OB_TYPE_CONNECTION )
+			(processRing, variableRing) = self.thePackingStrategy.autoConnect(self.theID, variableID,varrefName )
+			aCommand = CreateConnection( self.theLayout, newID,  self.theID,variableID, processRing, variableRing, PROCESS_TO_VARIABLE, varrefName )
+			
+			self.theLayout.passCommand([aCommand])
 		
 			
 
@@ -547,12 +724,14 @@ class EditorObject:
 			aVarReffList = aModelEditor.theModelStore.getEntityProperty(aProcessFullID+':' +MS_PROCESS_VARREFLIST)
 			varReffNameList = []
 			for i in range (len(aVarReffList)):
-				varFullID= getAbsoluteReference(aProcessFullID, aVarReffList[i][1])
+				varFullID= getAbsoluteReference(aProcessFullID, aVarReffList[i][ME_VARREF_FULLID])
 				if aVariableFullID ==varFullID:
-					varReffNameList+=[aVarReffList[i][0]]
+					varReffNameList+=[aVarReffList[i][ME_VARREF_NAME]]
 			for avarRefName in varReffNameList:
-				aCommandList = self.thePackingStrategy.autoConnect( processID, self.theID, avarRefName )
-				self.theLayout.passCommand(  aCommandList  )	
+				newID = self.theLayout.getUniqueObjectID( OB_TYPE_CONNECTION )
+				(processRing, variableRing) = self.thePackingStrategy.autoConnect( processID, self.theID, avarRefName )
+				aCommand = CreateConnection( self.theLayout, newID,  processID,self.theID, processRing, variableRing, PROCESS_TO_VARIABLE, avarRefName )
+				self.theLayout.passCommand(  [aCommand]  )	
 		       
 		
 
@@ -587,27 +766,63 @@ class EditorObject:
                 
 
 		if aCommand != None:
-
+			px2=self.getProperty(OB_DIMENSION_X)
+			py2=self.getProperty(OB_DIMENSION_Y)
+			rpar=n.array([0,0,px2,py2])
 			if objectType == OB_TYPE_SYSTEM:
+				rn=self.createRnAddSystem()
+				x2=x+SYS_MINWIDTH
+				y2=y+SYS_MINHEIGHT
+				availspace=self.getAvailSpace(x,y,x2,y2,rn)
+				self.availSpace=availspace
 				# check boundaries
-				maxAvailWidth,maxAvailHeight=self.getMaxDimensions(x,y)
-				if ((maxAvailWidth>=SYS_MINWIDTH and maxAvailHeight>=SYS_MINHEIGHT) and self.isWithinParent(x,y,OB_TYPE_SYSTEM,None)):
+				if (not self.isOverlap(x,y,x2,y2,rn) and self.isWithinParent(x,y,x2,y2,rpar)):
 					self.theLayout.passCommand( [aCommand] )
 					
 			if objectType == OB_TYPE_PROCESS:
-				# check boundaries
-				if (not self.isOverlapSystem(x,y,OB_TYPE_PROCESS,None) and self.isWithinParent(x,y,OB_TYPE_PROCESS,None)):
+				x2=x+PRO_MINWIDTH
+				y2=y+PRO_MINHEIGHT
+				rn=self.createRnAddOthers()
+				if (not self.isOverlap(x,y,x2,y2,rn) and self.isWithinParent(x,y,x2,y2,rpar)):
 					self.theLayout.passCommand( [aCommand] )
-					
 
 			if objectType == OB_TYPE_VARIABLE:
+				x2=x+VAR_MINWIDTH
+				y2=y+VAR_MINHEIGHT
 				# check boundaries
-				if (not self.isOverlapSystem(x,y,OB_TYPE_VARIABLE,None) and self.isWithinParent(x,y,OB_TYPE_VARIABLE,None)):
+				rn=self.createRnAddOthers()
+				if (not self.isOverlap(x,y,x2,y2,rn) and self.isWithinParent(x,y,x2,y2,rpar)):
 					self.theLayout.passCommand( [aCommand] )
 					
-		
 			else:
 				pass
+
+
+	def __extend_label(self,*args):
+		aLabel=self.getProperty(OB_LABEL)
+		oldLen=len(aLabel)
+		aFullID=self.getProperty(OB_FULLID)
+		idLen=len(aFullID)
+		aType=self.getProperty(OB_TYPE)
+		if aType!=OB_TYPE_SYSTEM :
+			aFullID=aFullID.split(':')[2]
+		maxShift=self.getMaxShiftPos(DIRECTION_RIGHT)
+		newLabel=aFullID[0:oldLen]
+		self.calcLabelParam(newLabel)
+		totalWidth,limit=self.getLabelParam()
+		while totalWidth<limit and oldLen<=len(aFullID):
+			oldLen+=1
+			newLabel=aFullID[0:oldLen]
+			self.calcLabelParam(newLabel)
+			totalWidth,limit=self.getLabelParam()
+		if newLabel!=aFullID:
+			newLabel=newLabel[0:len(newLabel)-3]+'...'
+		newDimx=self.estLabelWidth(newLabel)
+		oldDimx=self.getProperty(OB_DIMENSION_X)
+		deltaWidth=newDimx-oldDimx
+		resizeCommand = ResizeObject(self.getLayout(),self.getID(), 0, 0, 0, deltaWidth)			
+		relabelCommand = SetObjectProperty( self.getLayout(), self.getID(), OB_LABEL, newLabel )
+		self.getLayout().passCommand( [resizeCommand,relabelCommand] )	
 
 
 	
@@ -623,599 +838,45 @@ class EditorObject:
 			objectFullID = object.getProperty(OB_FULLID)
 			self.existobjectFullIDList += [objectFullID]
 	
+
+	def createRnOut(self):
+		no=len(self.parentSystem.getObjectList())
+		rn=None
+		if no>1:
+			for sib in self.parentSystem.getObjectList():
+				asib=self.parentSystem.getObject(sib)
+				if (asib.getProperty(OB_FULLID)!=self.getProperty(OB_FULLID)) and (asib.getProperty(OB_TYPE)==OB_TYPE_SYSTEM):
+					asibx1=asib.getProperty(OB_POS_X)
+					asiby1=asib.getProperty(OB_POS_Y)
+					asibx2=asibx1+asib.getProperty(OB_DIMENSION_X)
+					asiby2=asiby1+asib.getProperty(OB_DIMENSION_Y)
+					rsib=n.array([asibx1,asiby1,asibx2,asiby2])
+					rsib=n.reshape(rsib,(4,1))
+					if rn==None:
+						rn=rsib
+					else:
+						rn=n.concatenate((rn,rsib),1)
+		return rn
+
 	
 
-	###########################################################################################
-	###########################################################################################
-
-	#######################################
-	#  a system is being resized inwardly #
-	#######################################
-	def getMaxShiftNeg(self,direction):
-		olw=self.getProperty(OB_OUTLINE_WIDTH)
-		maxAvailShiftNeg=0
-		x1List=[]
-		y1List=[]
-		x2List=[]
-		y2List=[]
-		if self.getProperty(OB_TYPE)=='System':
-			sysX1=0
-			sysY1=0
-			sysX2=sysX1+self.getProperty(OB_DIMENSION_X)
-			sysY2=sysY1+self.getProperty(OB_DIMENSION_Y)
-			textWidth=self.getProperty(OB_SHAPEDESCRIPTORLIST).getRequiredWidth()		
-			# check if it has any child
-			if len(self.getObjectList())>0:
-				for aKey in self.getObjectList():
-					aChildObj=self.theLayout.getObject(aKey)
-					childX1=aChildObj.getProperty(OB_POS_X)
-					childX2=childX1+aChildObj.getProperty(OB_DIMENSION_X)
-					childY1=aChildObj.getProperty(OB_POS_Y)
-					childY2=childY1+aChildObj.getProperty(OB_DIMENSION_Y)+olw*8
-					x1List.append(childX1)
-					y1List.append(childY1)
-					x2List.append(childX2)
-					y2List.append(childY2)
-					x1List.sort()
-					y1List.sort()
-					x2List.sort()
-					y2List.sort()
-				# bottom or top
-				if direction == DIRECTION_DOWN or direction==DIRECTION_UP:
-					maxAvailShiftNeg=(sysY2-(y2List[len(y2List)-1]))
-				# right or left
-				elif direction == DIRECTION_RIGHT or direction==DIRECTION_LEFT:
-					# check against ID
-					if textWidth>x2List[len(x2List)-1]:
-						maxAvailShiftNeg=(sysX2-textWidth)		
-					else:
-						maxAvailShiftNeg=(sysX2-x2List[len(x2List)-1])
-			else:
-				# no child
-				# bottom or top
-				if direction == DIRECTION_DOWN or direction==DIRECTION_UP:
-					maxAvailShiftNeg=(sysY2-sysY1)-olw*10
-				# right or left
-				elif direction == DIRECTION_RIGHT or direction==DIRECTION_LEFT:
-					maxAvailShiftNeg=sysX2-textWidth
-		return maxAvailShiftNeg
-
-
 	
-	#########################################
-	#  a system is being resized outwardly  #
-	#########################################
-	def getMaxShiftPos(self,sysObj,direction):
-		maxAvailShiftPos=0
-		objList=[]
-		sysX1=sysObj.getProperty(OB_POS_X)
-		sysY1=sysObj.getProperty(OB_POS_Y)
-		sysX2=sysX1+sysObj.getProperty(OB_DIMENSION_X)
-		sysY2=sysY1+sysObj.getProperty(OB_DIMENSION_Y)
-		tempSysX1=sysX1
-		tempSysX2=sysX2
-		tempSysY2=sysY2
-		tempSysY1=sysY1
-		xList=[]
-		yList=[]
-		olw=self.getProperty(OB_OUTLINE_WIDTH)
-		if self.parentSystem.getProperty(OB_TYPE)=='System':
-			# check if parent has any child
-			if len(self.parentSystem.getObjectList())>1:
-				for aKey in self.parentSystem.getObjectList():
-					aParChild=self.parentSystem.theLayout.getObject(aKey)
-					if aParChild.getProperty(OB_FULLID)!=self.getProperty(OB_FULLID):	
-						childX1=aParChild.getProperty(OB_POS_X)
-						childX2=childX1+aParChild.getProperty(OB_DIMENSION_X)
-						childY1=aParChild.getProperty(OB_POS_Y)
-						childY2=childY1+aParChild.getProperty(OB_DIMENSION_Y)				
-						# bottom
-						if direction == DIRECTION_DOWN:
-							if childY1>=sysY2 :
-								if childX1<sysX1 and childX2>sysX1:
-									objList.append(aParChild)
-								elif childX1>sysX1 and childX2<sysX2:
-									objList.append(aParChild)
-								elif childX1<sysX2 and sysX2<childX2:
-									objList.append(aParChild)
-
-
-						# right
-						elif direction == DIRECTION_RIGHT: 
-							if childX1>=sysX2 :
-								if childY1<sysY1 and childY2>sysY1:
-									objList.append(aParChild)
-								elif childY1>sysY1 and childY2<sysY2:
-									objList.append(aParChild)
-								elif childY1<sysY2 and sysY2<childY2:
-									objList.append(aParChild)
-							
-						# left
-						elif direction==DIRECTION_LEFT:
-							if childX2<=sysX1 :
-								if sysY1>childY1 and childY2>sysY1:
-									objList.append(aParChild)
-								elif sysY1<childY1 and childY2<sysY2:
-									objList.append(aParChild)
-								elif childY1<sysY2 and sysY2<childY2:
-									objList.append(aParChild)
-									
-						# top
-						elif direction==DIRECTION_UP:
-							if childY2<=sysY1 :
-								if childX1<=sysX1 and childX2<sysX2:
-									objList.append(aParChild)
-								elif childX1>sysX1 and childX2<sysX2:
-									objList.append(aParChild)
-								elif childX1>sysX1 and sysX2<childX2:
-									objList.append(aParChild)
-									
-									
-				#bottom
-				if direction == DIRECTION_DOWN:
-					if len(objList)>0:
-						for i in range (len(objList)):
-							yList.append(objList[i].getProperty(OB_POS_Y))
-						yList.sort()
-						y=yList[0]
-					else:
-							y=self.parentSystem.getProperty(SY_INSIDE_DIMENSION_Y)
-					maxAvailShiftPos=y-sysY2-olw
-				# right				
-				elif direction==DIRECTION_RIGHT:
-					if len(objList)>0:
-						for i in range (len(objList)):
-							xList.append(objList[i].getProperty(OB_POS_X))
-						xList.sort()
-						x=xList[0]
-					else:
-						x=self.parentSystem.getProperty(SY_INSIDE_DIMENSION_X)
-					maxAvailShiftPos=x-sysX2-olw
-						
-				# left
-				elif direction==DIRECTION_LEFT:	
-					if len(objList)>0:
-						for i in range (len(objList)):
-							xList.append(objList[i].getProperty(OB_POS_X)+objList[i].getProperty(OB_DIMENSION_X))
-						xList.sort()
-						x=xList[len(xList)-1]
-					else:	
-						x=olw
-					maxAvailShiftPos=sysX1-x-olw
-
-				# top
-				elif direction==DIRECTION_UP:
-					if len(objList)>0:
-						for i in range (len(objList)):
-							yList.append(objList[i].getProperty(OB_POS_Y)+objList[i].getProperty(OB_DIMENSION_Y))
-						yList.sort()
-						y=yList[len(yList)-1]
-					else:	
-
-						y=olw
-					maxAvailShiftPos=sysY1-y-olw
-					
-			else:
-				#parent has no child
-				# bottom
-				if direction == DIRECTION_DOWN:
-					while (tempSysY2<self.parentSystem.getProperty(SY_INSIDE_DIMENSION_Y)):
-						tempSysY2=tempSysY2+1
-						if (tempSysY2>=self.parentSystem.getProperty(SY_INSIDE_DIMENSION_Y)):
-							maxAvailShiftPos=self.parentSystem.getProperty(SY_INSIDE_DIMENSION_Y)-sysY2-olw
-							break
-							
-				# right
-				elif direction == DIRECTION_RIGHT: 
-					while (tempSysX2<self.parentSystem.getProperty(SY_INSIDE_DIMENSION_X)):
-						tempSysX2=tempSysX2+1
-						if (tempSysX2>=self.parentSystem.getProperty(SY_INSIDE_DIMENSION_X)):
-							maxAvailShiftPos=self.parentSystem.getProperty(SY_INSIDE_DIMENSION_X)-sysX2-olw
-							break
-
-				# left
-				elif direction==DIRECTION_LEFT:
-					while (tempSysX1>4):
-						tempSysX1=tempSysX1-1
-						if tempSysX1<=4:
-							maxAvailShiftPos=sysX1-tempSysX1-olw
-							break
-
-				# top
-				elif direction==DIRECTION_UP:
-					while (tempSysY1>4):
-						tempSysY1=tempSysY1-1
-						if tempSysY1<=4:
-							maxAvailShiftPos=sysY1-tempSysY1-olw
-							break
-			return maxAvailShiftPos
-
-		
-	
-	def getMaxDiagShiftPos(self,direction):
-		dir=direction
-		maxpos=[]
-		objList=[]
-		xmax=0
-		ymax=0
-		sysX1=self.getProperty(OB_POS_X)
-		sysY1=self.getProperty(OB_POS_Y)
-		sysX2=sysX1+self.getProperty(OB_DIMENSION_X)
-		sysY2=sysY1+self.getProperty(OB_DIMENSION_Y)
-		tempSysX1=sysX1
-		tempSysX2=sysX2
-		tempSysY2=sysY2
-		tempSysY1=sysY1
-		childX1=0
-		childX2=0
-		childY1=0
-		childY2=0
-		olw=self.getProperty(OB_OUTLINE_WIDTH)
-		if self.parentSystem.getProperty(OB_TYPE)=='System':
-			# check if parent has any child
-			if len(self.parentSystem.getObjectList())>1:
-				for aKey in self.parentSystem.getObjectList():
-					aParChild=self.parentSystem.theLayout.getObject(aKey)
-					if aParChild.getProperty(OB_FULLID)!=self.getProperty(OB_FULLID):	
-						childX1=aParChild.getProperty(OB_POS_X)
-						childX2=childX1+aParChild.getProperty(OB_DIMENSION_X)
-						childY1=aParChild.getProperty(OB_POS_Y)
-						childY2=childY1+aParChild.getProperty(OB_DIMENSION_Y)
-			
-						if dir==DIRECTION_BOTTOM_RIGHT:
-							if childY1>sysY2 :
-								if childX1<sysX1 and childX2>sysX1:
-									objList.append(aParChild)
-								elif childX1>sysX1 and childX2<sysX2:
-									objList.append(aParChild)
-								elif childX1<sysX2 and sysX2<childX2:
-									objList.append(aParChild)
-								elif childX1>sysX2:
- 									objList.append(aParChild)
-							elif childX1>sysX2 :
-								if childY1<sysY1 and childY2>sysY1:
-									objList.append(aParChild)
-								elif childY1>sysY1 and childY2<sysY2:
-									objList.append(aParChild)
-								elif childY1<sysY2 and sysY2<childY2:
-									objList.append(aParChild)
-						elif dir==DIRECTION_BOTTOM_LEFT:
-							if childY1>sysY2 :
-								if childX1<sysX1 and childX2>sysX1:
-									objList.append(aParChild)
-								elif childX1>sysX1 and childX2<sysX2:
-									objList.append(aParChild)
-								elif childX1<sysX2 and sysX2<childX2:
-									objList.append(aParChild)
-								elif childX1<sysX1:
-									objList.append(aParChild)
-							elif childX2<sysX1 :
-								if sysY1>childY1 and childY2>sysY1:
-									objList.append(aParChild)
-								elif sysY1<childY1 and childY2<sysY2:
-									objList.append(aParChild)
-								elif childY1<sysY2 and sysY2<childY2:
-									objList.append(aParChild)
-						elif dir==DIRECTION_TOP_RIGHT:
-							if childY2<=sysY1 :
-								if childX1<sysX1 and childX2<sysX2:
-									objList.append(aParChild)
-								elif childX1>sysX1 and childX2<sysX2:
-									objList.append(aParChild)
-								elif childX1>sysX1 and sysX2<childX2:
-									objList.append(aParChild)
-								elif childX1>sysX2:
-									objList.append(aParChild)
-							elif childX1>=sysX2 :
-								if childY1<sysY1 and childY2>sysY1:
-									objList.append(aParChild)
-								elif childY1>sysY1 and childY2<sysY2:
-									objList.append(aParChild)
-								elif childY1<sysY2 and sysY2<childY2:
-									objList.append(aParChild)
-						elif dir==DIRECTION_TOP_LEFT:
-							if childX2<=sysX1 :
-								if sysY1>childY1 and childY2>sysY1:
-									objList.append(aParChild)
-								elif sysY1<childY1 and childY2<sysY2:
-									objList.append(aParChild)
-								elif childY1<sysY2 and sysY2<childY2:
-									objList.append(aParChild)
-							if childY2<=sysY1 :
-								if childX1<=sysX1 and childX2<sysX2:
-									objList.append(aParChild)
-								elif childX1>sysX1 and childX2<sysX2:
-									objList.append(aParChild)
-								elif childX1>sysX1 and sysX2<childX2:
-									objList.append(aParChild)
-								elif childX2<sysX2:
-									objList.append(aParChild)
-									
-
-			if dir==DIRECTION_BOTTOM_RIGHT:
-				if len(objList)>0:
-					for o in objList:
-						childX1=o.getProperty(OB_POS_X)
-						childY1=o.getProperty(OB_POS_Y)	
-						childX2=childX1+o.getProperty(OB_DIMENSION_X)	
-						childY2=childY1+o.getProperty(OB_DIMENSION_Y)
-						while not self.isOverlap(sysX1,sysY1,tempSysX2,tempSysY2,childX1,childY1,childX2,childY2):
-							tempSysX2+=1
-							tempSysY2+=1
-						maxpos.append(min(tempSysX2-sysX2,tempSysY2-sysY2))
-						tempSysX2=sysX2
-						tempSysY2=sysY2
-						
-				else:
-					while (tempSysY2<self.parentSystem.getProperty(SY_INSIDE_DIMENSION_Y)):
-						tempSysY2+=1
-						if (tempSysY2>=self.parentSystem.getProperty(SY_INSIDE_DIMENSION_Y)):
-							ymax=self.parentSystem.getProperty(SY_INSIDE_DIMENSION_Y)-sysY2-olw
-							break
-					while (tempSysX2<self.parentSystem.getProperty(SY_INSIDE_DIMENSION_X)):
-						tempSysX2+=1
-						if (tempSysX2>=self.parentSystem.getProperty(SY_INSIDE_DIMENSION_X)):
-							xmax=self.parentSystem.getProperty(SY_INSIDE_DIMENSION_X)-sysX2-olw
-							break
-					maxpos.append(min(xmax,ymax))
-
-			elif dir==DIRECTION_BOTTOM_LEFT:
-				if len(objList)>0:
-					for o in objList:
-						childX1=o.getProperty(OB_POS_X)
-						childY1=o.getProperty(OB_POS_Y)	
-						childX2=childX1+o.getProperty(OB_DIMENSION_X)	
-						childY2=childY1+o.getProperty(OB_DIMENSION_Y)
-						while not self.isOverlap(childX1,childY1,childX2,childY2,tempSysX1,sysY1,sysX2,tempSysY2):
-							tempSysX1-=1
-							tempSysY2+=1
-						maxpos.append(min(sysX1-tempSysX1,tempSysY2-sysY2))
-						tempSysX1=sysX1
-						tempSysY2=sysY2
-				else:
-					while (tempSysX1>4):
-						tempSysX1=tempSysX1-1
-						if tempSysX1<=4:
-							xmax=sysX1-tempSysX1-olw
-							break
-					while (tempSysY2<self.parentSystem.getProperty(SY_INSIDE_DIMENSION_Y)):
-						tempSysY2+=1
-						if (tempSysY2>=self.parentSystem.getProperty(SY_INSIDE_DIMENSION_Y)):
-							ymax=self.parentSystem.getProperty(SY_INSIDE_DIMENSION_Y)-sysY2-olw
-							break
-					maxpos.append(min(xmax,ymax))
-
-			elif dir==DIRECTION_TOP_RIGHT:
-				if len(objList)>0:
-					for o in objList:
-						childX1=o.getProperty(OB_POS_X)
-						childY1=o.getProperty(OB_POS_Y)	
-						childX2=childX1+o.getProperty(OB_DIMENSION_X)	
-						childY2=childY1+o.getProperty(OB_DIMENSION_Y)
-                                              
-						while not self.isOverlap(childX1,childY1,childX2,childY2,sysX1,tempSysY1,tempSysX2,sysY2):
-							tempSysX2+=1
-							tempSysY1-=1
-						maxpos.append(min(tempSysX2-sysX2,sysY1-tempSysY1))
-						tempSysX2=sysX2
-						tempSysY1=sysY1
-					
-				else:
-					while (tempSysY2<self.parentSystem.getProperty(SY_INSIDE_DIMENSION_Y)):
-						tempSysY2+=1
-						if (tempSysY2>=self.parentSystem.getProperty(SY_INSIDE_DIMENSION_Y)):
-							ymax=self.parentSystem.getProperty(SY_INSIDE_DIMENSION_Y)-sysY2-olw
-							break
-					while (tempSysX2<self.parentSystem.getProperty(SY_INSIDE_DIMENSION_X)):
-						tempSysX2+=1
-						if (tempSysX2>=self.parentSystem.getProperty(SY_INSIDE_DIMENSION_X)):
-							xmax=self.parentSystem.getProperty(SY_INSIDE_DIMENSION_X)-sysX2-olw
-					maxpos.append(min(xmax,ymax))
-
-			elif dir==DIRECTION_TOP_LEFT:
-				if len(objList)>0:
-					for o in objList:
-						childX1=o.getProperty(OB_POS_X)
-						childY1=o.getProperty(OB_POS_Y)	
-						childX2=childX1+o.getProperty(OB_DIMENSION_X)	
-						childY2=childY1+o.getProperty(OB_DIMENSION_Y)
-						while not self.isOverlap(childX1,childY1,childX2,childY2,tempSysX1,tempSysY1,sysX2,sysY2):
-							tempSysX1-=1
-							tempSysY1-=1
-						maxpos.append(min(sysY1-tempSysY1,sysX1-tempSysX1))
-						tempSysX1=sysX1
-						tempSysY1=sysY1
-				else:
-					while (tempSysX1>4):
-						tempSysX1=tempSysX1-1
-						if tempSysX1<=4:
-							xmax=(sysX1-tempSysX1-olw)
-							break
-					while (tempSysY2<self.parentSystem.getProperty(SY_INSIDE_DIMENSION_Y)):
-						tempSysY2+=1
-						if (tempSysY2>=self.parentSystem.getProperty(SY_INSIDE_DIMENSION_Y)):
-							ymax=(self.parentSystem.getProperty(SY_INSIDE_DIMENSION_Y)-sysY2-olw)
-							break
-					maxpos.append(min(xmax,ymax))
-		
-		maxpos.sort()	
-		return maxpos[0]
-
-	def getMaxDiagShiftNeg(self,direction):
-		dir=direction
-		xmaxneg=0
-		ymaxneg=0
-		x1List=[]
-		y1List=[]
-		x2List=[]
-		y2List=[]
-		olw=self.getProperty(OB_OUTLINE_WIDTH)
-		if self.getProperty(OB_TYPE)=='System':
-			sysX1=0
-			sysY1=0
-			sysX2=sysX1+self.getProperty(OB_DIMENSION_X)
-			sysY2=sysY1+self.getProperty(OB_DIMENSION_Y)
-			textWidth=self.getProperty(OB_SHAPEDESCRIPTORLIST).getRequiredWidth()		
-			# check if it has any child
-			if len(self.getObjectList())>0:
-				for aKey in self.getObjectList():
-					aChildObj=self.theLayout.getObject(aKey)
-					childX1=aChildObj.getProperty(OB_POS_X)
-					childX2=childX1+aChildObj.getProperty(OB_DIMENSION_X)
-					childY1=aChildObj.getProperty(OB_POS_Y)
-					childY2=childY1+aChildObj.getProperty(OB_DIMENSION_Y)+olw*8
-					x1List.append(childX1)
-					y1List.append(childY1)
-					x2List.append(childX2)
-					y2List.append(childY2)
-				x1List.sort()
-				y1List.sort()
-				x2List.sort()
-				y2List.sort()
-			
-			if dir==DIRECTION_BOTTOM_RIGHT or dir == DIRECTION_BOTTOM_LEFT:
-				if len(y2List)>0:	
-					ymaxneg=(sysY2-(y2List[len(y2List)-1]))	
-				else:
-					ymaxneg=(sysY2-sysY1)-olw*10	
-				if len(x2List)>0:
-					if textWidth>x2List[len(x2List)-1]:
-						xmaxneg=(sysX2-textWidth)		
-					else:
-						xmaxneg=sysX2-x2List[len(x2List)-1]
-				else:
-					xmaxneg=sysX2-textWidth
-			
-			elif dir==DIRECTION_TOP_RIGHT or dir == DIRECTION_TOP_LEFT:
-				if len(y1List)>0:	
-					ymaxneg=(sysY2-(y2List[len(y2List)-1]))	
-				else:
-					ymaxneg=(sysY2-sysY1)-olw*10	
-				if len(x2List)>0:
-					if textWidth>x2List[len(x2List)-1]:
-						xmaxneg=(sysX2-textWidth)		
-					else:
-						xmaxneg=sysX2-x2List[len(x2List)-1]
-				else:
-					xmaxneg=sysX2-textWidth
-			
-		return -xmaxneg,-ymaxneg
-
-	def isOverlap(self,x1,y1,x2,y2,childX1,childY1,childX2,childY2):
-		olw = self.getProperty( OB_OUTLINE_WIDTH )
-		isOverlap=True
-		objX1=x1
-		objY1=y1
-		objX2=x2
-		objY2=y2
-#
-
-		if objY1>=childY2:
-			isOverlap=False
-		elif objY2<=childY1:
-			isOverlap=False
-		elif  objY1<=childY1 or objY1<=childY2:
-			if objX2<childX1:
-				isOverlap=False
-			elif objX1>childX2:
-				isOverlap=False
-			else:
-				isOverlap=True
-#		
-		return isOverlap
-
-	def getMaxDimensions(self,x,y):
-		objX1=x
-		objY1=y
-		objX2=x+SYS_MINWIDTH
-		objY2=y+SYS_MINHEIGHT
-		maxAvailWidth=SYS_MINWIDTH
-		maxAvailHeight=SYS_MINHEIGHT
-		if len(self.getObjectList())>0:
-			for aKey in self.getObjectList(): 
-				aChildObj=self.theLayout.getObject(aKey)
-				childX1=aChildObj.getProperty(OB_POS_X)
-				childY1=aChildObj.getProperty(OB_POS_Y)
-				childX2=childX1+aChildObj.getProperty(OB_DIMENSION_X)
-				childY2=childY1+aChildObj.getProperty(OB_DIMENSION_Y)
-				if self.isOverlap(objX1,objY1,objX2,objY2,childX1,childY1,childX2,childY2):
-					maxAvailWidth=childX1-objX1-10				
-					maxAvailHeight=childY1-objY1-10
-					break
-		return (maxAvailWidth,maxAvailHeight)
-		
-	def isWithinParent(self,x,y,type,child=None):
-		olw = self.getProperty( OB_OUTLINE_WIDTH )
-		parX1=0
-		parY1=0
-		parX2= parX1+self.getProperty(OB_DIMENSION_X)
-		parY2= parY1+self.getProperty(OB_DIMENSION_Y)
-		childX1=x
-		childY1=y
-		childX2=0
-		childY2=0
-		if type==OB_TYPE_SYSTEM:
-			childX2=childX1+SYS_MINWIDTH
-			childY2=childY1+SYS_MINHEIGHT
-		elif type==OB_TYPE_VARIABLE:
-			childX2=x+VAR_MINWIDTH
-			childY2=y+VAR_MINHEIGHT
-		elif type==OB_TYPE_PROCESS:
-			childX2=x+PRO_MINWIDTH
-			childY2=y+PRO_MINHEIGHT
-		elif type==OB_TYPE_TEXT:
-			childX2=x+TEXT_MINWIDTH
-			childY2=y+TEXT_MINHEIGHT
-		if not child == None:
-			if childX2<x+child.getProperty(OB_DIMENSION_X):
-				childX2=x+child.getProperty(OB_DIMENSION_X)
-			if childY2<y+child.getProperty(OB_DIMENSION_Y):
-				childY2=y+child.getProperty(OB_DIMENSION_Y)
-		childY2+=olw*8 #height of the parent label
-		if ((parX1<childX1 and parY1<childY1) and (parX2>childX2 and parY2>childY2)):
-			return True
+	def isOverlap(self,x1,y1,x2,y2,rn):
+		r1 = n.array([x1,y1,x2,y2])
+		r1=n.reshape(r1,(4,1))
+		if rn!=None:
+			return self.getGraphUtils().calcOverlap(r1,rn)
 		else:
 			return False
-
-	def isOverlapSystem(self,x,y,type,anobj=None):
-		isOverlapSystem=True
-		objX1=x
-		objY1=y	
-		if type==OB_TYPE_VARIABLE:
-			objX2=x+VAR_MINWIDTH
-			objY2=y+VAR_MINHEIGHT
-		elif type==OB_TYPE_PROCESS:
-			objX2=x+PRO_MINWIDTH
-			objY2=y+PRO_MINHEIGHT
-		elif type==OB_TYPE_TEXT:
-			objX2=x+TEXT_MINWIDTH
-			objY2=y+TEXT_MINHEIGHT
-		if not anobj == None:
-			if objX2<x+anobj.getProperty(OB_DIMENSION_X):
-				objX2=x+anobj.getProperty(OB_DIMENSION_X)
-			if objY2<y+anobj.getProperty(OB_DIMENSION_Y):
-				objY2=y+anobj.getProperty(OB_DIMENSION_Y)
-		if len(self.getObjectList())>0:
-			for aKey in self.getObjectList(): 
-				aChildObj=self.theLayout.getObject(aKey)
-				if aChildObj.getProperty(OB_TYPE)=='System':
-					childX1=aChildObj.getProperty(OB_POS_X)
-					childY1=aChildObj.getProperty(OB_POS_Y)
-					childX2=childX1+aChildObj.getProperty(OB_DIMENSION_X)
-					childY2=childY1+aChildObj.getProperty(OB_DIMENSION_Y)
-					if self.isOverlap(objX1,objY1,objX2,objY2,childX1,childY1,childX2,childY2):
-						isOverlapSystem=True
-						break
-					else:
-						isOverlapSystem=False
-				else:
-					isOverlapSystem=False
-		else:
-			isOverlapSystem=False
-		return isOverlapSystem
 	
-
-	
+		
+	def isWithinParent(self,u1,v1,u2,v2,rpar):
+		rpar=n.reshape(rpar,(4,1))
+		olw = self.getProperty( OB_OUTLINE_WIDTH )
+		#v2+=olw*8 #height of the parent label
+		r2 = n.array([u1,v1,u2,v2])
+		r2=n.reshape(r2,(4,1))
+		return self.getGraphUtils().calcWithin(rpar,r2)
 
 	def getGraphUtils( self ):
 		return self.theLayout.graphUtils()
@@ -1224,5 +885,67 @@ class EditorObject:
 	def buttonReleased( self ):
 		pass
 
+	def createRparent(self):
+		olw=self.thePropertyMap[ OB_OUTLINE_WIDTH ]
+		if self.parentSystem.__class__.__name__ == 'Layout':
+			x1=0
+			y1=0
+			x2= x1+self.parentSystem.getProperty(OB_DIMENSION_X)
+			y2= y1+self.parentSystem.getProperty(OB_DIMENSION_Y)
+		else:
+			x1=0
+			#y1=self.parentSystem.getProperty(OB_DIMENSION_Y)-self.parentSystem.getProperty
+#(SY_INSIDE_DIMENSION_Y)
+			y1=0
+			x2= x1+self.parentSystem.getProperty(SY_INSIDE_DIMENSION_X)
+			y2= y1+self.parentSystem.getProperty(SY_INSIDE_DIMENSION_Y)
+		r1=n.array([x1,y1,x2,y2])
+		return r1  
+	
+	def estLabelWidth(self,newLabel):
+		pass
 
 	
+
+	def setLabelParam(self,totalWidth,limit):
+		self.totalLabelWidth=totalWidth
+		self.totalLimit=limit
+
+	def getLabelParam(self):
+		return self.totalLabelWidth,self.totalLimit
+
+	def calcLabelParam(self,label):
+		estWidth=self.estLabelWidth(label)
+		newx2=estWidth
+		#check overlap and within parent
+		x=self.getProperty(OB_POS_X)
+		x2=self.getProperty(OB_DIMENSION_X)
+		totalWidth=x+newx2
+		maxShift=self.getMaxShiftPos(DIRECTION_RIGHT)
+		limit=x+x2+maxShift
+		self.setLabelParam(totalWidth,limit)
+
+
+	def truncateLabel(self,aLabel,lblWidth,dimx):
+		truncatedLabel=self.getGraphUtils().truncateLabel(aLabel,lblWidth,dimx,self.getProperty(OB_MINLABEL))
+		return truncatedLabel
+
+	def getMaxShiftPos(self,direction):
+		dir=direction
+		olw=self.getProperty(OB_OUTLINE_WIDTH)
+		x1=self.getProperty(OB_POS_X)
+		y1=self.getProperty(OB_POS_Y)
+		x2=x1+self.getProperty(OB_DIMENSION_X)
+		y2=y1+self.getProperty(OB_DIMENSION_Y)
+		r1=n.array([x1,y1,x2,y2])
+		rn=self.createRnOut()
+		rpar=self.createRparent()
+		matrix = self.getGraphUtils().calcMaxShiftPos(r1,rn,dir,rpar)
+		mshift=matrix-r1
+		if len(self.maxShiftMap[dir])>1:
+			posx,posy=self.maxShiftMap[dir][0],self.maxShiftMap[dir][1]
+			return abs( mshift[posx] ),abs( mshift[posy] )
+		else:
+			pos=self.maxShiftMap[dir][0]
+			return abs( mshift[pos] )
+

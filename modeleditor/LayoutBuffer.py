@@ -1,7 +1,7 @@
 from Buffer import *
 
 
-class ObjectBuffer:
+class ObjectBuffer(Buffer):
 
 	def __init__( self, anID ):
 		self.theID = anID

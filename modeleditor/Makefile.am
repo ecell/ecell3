@@ -4,6 +4,7 @@ SUBDIRS = glade
 
 modeleditordir=${pkglibdir}
 modeleditor_PYTHON=\
+AboutModelEditor.py\
 Buffer.py\
 BufferFactory.py\
 Command.py\
@@ -31,6 +32,7 @@ LayoutManager.py\
 LayoutManagerWindow.py\
 LayoutXML.py\
 LinePropertyEditor.py\
+LineDescriptor.py\
 ListWindow.py\
 MainWindow.py\
 ModelEditor.py\
@@ -77,5 +79,20 @@ ComplexShape.py
 
 EXTRA_DIST=${modeleditor_PYTHON}
 
-bin_SCRIPTS =\
+# Windows py2exe setup options, ignore for Unix based systems
+PY2EXE_SETUP = ../ecell/pyecs/windows/py2exeSetup
+WIN_ICON = modeleditor.ico
+PATH_VARIABLES = ../ecell/pyecs/windows/pathVariables
+
+BINS =\
 ecell3-model-editor
+
+EXE = ${BINS:=$(EXEEXT)}
+bin_SCRIPTS = ${EXE}
+
+%.exe : %
+	python $(PY2EXE_SETUP) --source=$< --icon=$(WIN_ICON) --merge=$(PATH_VARIABLES) --gui py2exe
+
+clean-local:
+	${RM} -rf build *.exe *.zip *.dll *.pyd
+

@@ -229,8 +229,8 @@ class EntityEditor(ViewComponent):
 		newTuple[2] = newName
 		newID = ':'.join( newTuple )
 		sysPath = self.theDisplayedEntity.split(':')[1]
-		existEntityList = self.theModelEditor.getModel().getEntityList(newTuple[0],sysPath)	
-
+		existEntityList = self.theModelEditor.getModel().getEntityList(newTuple[0],sysPath)
+		
 		if not newName in existEntityList:
 			aCommand = RenameEntity( self.theModelEditor, self.theDisplayedEntity, newID )
 			if aCommand.isExecutable:

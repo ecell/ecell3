@@ -135,7 +135,7 @@ ME_ENTITY_EDITOR = 'ME_ENTITY_EDITOR'
 ME_CONNNECTION_OBJ_EDITOR = 'ME_CONNNECTION_OBJ_EDITOR'
 
 # undo
-MAX_REDOABLE_COMMAND = 20
+MAX_REDOABLE_COMMAND = 100
 
 # ADCP flags
 ME_ADD_FLAG = 0
@@ -193,6 +193,8 @@ OB_MIN_HEIGTH = 40
 OB_POS_X = 'x'   #omitted
 OB_POS_Y = 'y'   #omitted
 OB_FULLID = 'FullID'  #rename action
+OB_LABEL = 'Label'
+OB_MINLABEL='Min Label Length'
 OB_STEPPERID = 'StepperID' #omitted
 OB_TYPE = 'Type' #omitted
 OB_DIMENSION_X = 'DimensionX' #omitted in Editor Object, resize action in SystemObject
@@ -273,6 +275,7 @@ SHAPE_TYPE_TEXTBOX = "TextBox"
 SHAPE_TYPE_CUSTOM = "Custom"
 SHAPE_TYPE_STRAIGHT_LINE = "Straight"
 SHAPE_TYPE_CORNERED_LINE = "Cornered"
+SHAPE_TYPE_CURVED_LINE = "Curved"
 
 # layout properties
 LO_SCROLL_REGION = "ScrollRegion" # list of int
@@ -298,6 +301,10 @@ RECT_ABSX1 = 4
 RECT_ABSY1 = 5
 RECT_ABSX2 = 6
 RECT_ABSY2 = 7
+#for rect. line, ellipse specific
+SPEC_POINTS=0
+SPEC_WIDTH_RATIO = 1
+SPEC_LABEL = 1
 
 LINE_POINTS = 0 # [ x1abs, x1rel, y1abs, y1rel,... ] for connection lines it x1, y1, x2, y2
 LINE_WIDTH = 1
@@ -307,6 +314,9 @@ TEXT_RELX = 1
 TEXT_RELY = 2
 TEXT_ABSX = 3
 TEXT_ABSY = 4
+
+BPATH_PATHDEF=0
+BPATH_WIDTH = 1
 
 # parameters for SD_FUNCTION and SD_COLOR
 SD_OUTLINE = 0
@@ -324,18 +334,22 @@ CV_RECT = "CanvasRect"
 CV_ELL = "CanvasEllipse"
 CV_TEXT = "CanvasText"
 CV_LINE = "CanvasLine"
+CV_BPATH = "CanvasBPath"
 
 # parameters for minimum SYSTEM_TYPE dimensions
 SYS_MINWIDTH=230
 SYS_MINHEIGHT=200
+SYS_MINLABEL=29
 
 # parameters for minimum VARIABLE_TYPE dimensions
-VAR_MINWIDTH=119
+VAR_MINWIDTH=125
 VAR_MINHEIGHT=30
+VAR_MINLABEL=12
 
 # parameters for minimum PROCESS_TYPE dimensions
-PRO_MINWIDTH=92
+PRO_MINWIDTH=89
 PRO_MINHEIGHT=30
+PRO_MINLABEL=11
 
 # parameters for minimum TEXT_TYPE dimensions
 TEXT_MINWIDTH=205

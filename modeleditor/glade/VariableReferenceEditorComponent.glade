@@ -12,6 +12,7 @@
   <property name="modal">False</property>
   <property name="resizable">True</property>
   <property name="destroy_with_parent">False</property>
+  <property name="icon">icon_variable.png</property>
 
   <child>
     <widget class="GtkVBox" id="attachment_box">
@@ -336,7 +337,39 @@
 			      </child>
 
 			      <child>
-				<placeholder/>
+				<widget class="GtkHBox" id="hbox23">
+				  <property name="visible">True</property>
+				  <property name="homogeneous">False</property>
+				  <property name="spacing">0</property>
+
+				  <child>
+				    <placeholder/>
+				  </child>
+
+				  <child>
+				    <widget class="GtkCheckButton" id="varAbs">
+				      <property name="visible">True</property>
+				      <property name="can_focus">True</property>
+				      <property name="label" translatable="yes">variable absolute path</property>
+				      <property name="use_underline">True</property>
+				      <property name="relief">GTK_RELIEF_NORMAL</property>
+				      <property name="active">False</property>
+				      <property name="inconsistent">False</property>
+				      <property name="draw_indicator">True</property>
+				      <signal name="toggled" handler="on_varAbs_toggled" last_modification_time="Mon, 05 Apr 2004 05:18:06 GMT"/>
+				    </widget>
+				    <packing>
+				      <property name="padding">50</property>
+				      <property name="expand">False</property>
+				      <property name="fill">False</property>
+				    </packing>
+				  </child>
+				</widget>
+				<packing>
+				  <property name="padding">0</property>
+				  <property name="expand">True</property>
+				  <property name="fill">True</property>
+				</packing>
 			      </child>
 			    </widget>
 			    <packing>

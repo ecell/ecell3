@@ -184,9 +184,11 @@ class LayoutManagerWindow( ListWindow ):
 			
 
 	def __copy_layout( self, *args ):
-		self.theModelEditor.printMessage("Sorry, not implemented !", ME_ERROR )
+		if self.theLayoutManager.doesLayoutExist(self.theSelectedLayout):
+			aCommand = CloneLayout( self.theLayoutManager, self.theSelectedLayout)
+			self.theModelEditor.doCommandList( [ aCommand ] )
 
-
+		
 	def __show_layout( self, *args ):
 		if self.theLayoutManager.doesLayoutExist(self.theSelectedLayout):
 			self.theLayoutManager.showLayout(self.theSelectedLayout)

@@ -3,9 +3,28 @@ from Utils import *
 from Command import *
 
 class LayoutCommand( Command ):
+	def __init__(self, aReceiver, *args):
+		"""
+		convert Layout receiver to LayoutName
+		"""
+		if aReceiver.__class__.__name__ == "Layout":
+			self.theLayoutName = aReceiver.getName()
+			self.theLayoutManager = aReceiver.getLayoutManager()
+		else:
+			self.theLayoutName = None
+		Command.__init__( self, aReceiver, *args )
+	
+
+	def execute(self):
+		"""
+		must convert  LayoutName into receiver
+		"""
+		if self.theLayoutName != None:
+			self.theReceiver = self.theLayoutManager.getLayout( self.theLayoutName )
+		return Command.execute( self )
 
 
-	def __checkArgs( self ):
+	def checkArgs( self ):
 		if type (self.theReceiver) == type(self):
 			if self.theReceiver.__class__.__name__ == self.RECEIVER:
 				return True
@@ -34,6 +53,7 @@ class CreateLayout(LayoutCommand):
 
 	
 	def do( self ):
+		
 		self.theReceiver.createLayout( self.theName)
 		if self.isShow:
 			self.theReceiver.showLayout(self.theName)
@@ -147,6 +167,7 @@ class CloneLayout(LayoutCommand):
 
 	def do(self):
 		layoutBuffer = self.theReceiver.theLayoutBufferFactory.createLayoutBuffer( self.theTemplate )
+		layoutBuffer.setUndoFlag( True )
 		newName = "copyOf" + self.theTemplate
 		newName = self.theReceiver.getUniqueLayoutName( newName )
 		self.theReceiver.theLayoutBufferPaster.pasteLayoutBuffer( layoutBuffer, newName )
@@ -229,16 +250,18 @@ class CreateObject(LayoutCommand):
 		self.theFullID = self.theArgs[ self.FULLID ]
 		self.x = self.theArgs[ self.X ]
 		self.y = self.theArgs[ self.Y ]
-		self.theParent = self.theArgs[ self.PARENT ]
+		self.theParentID = self.theArgs[ self.PARENT ].getID()
 		return True
 
 
 	def do(self):
-		self.theReceiver.createObject(self.objectID, self.theType, self.theFullID, self.x, self.y, self.theParent )
+		theParent = self.theReceiver.getObject( self.theParentID )
+		self.theReceiver.createObject(self.objectID, self.theType, self.theFullID, self.x, self.y, theParent )
 		return True
 
 
 	def createReverseCommand( self ):
+		
 		self.theReverseCommandList = [ DeleteObject( self.theReceiver, self.objectID ) ]
 
 
@@ -262,8 +285,13 @@ class DeleteObject(LayoutCommand):
 
 	def do(self):
 		objectBuffer = self.theReceiver.theLayoutBufferFactory.createObjectBuffer( self.theReceiver.getName(), self.objectID )
-
-		self.theReverseCommandList = [ UndeleteObject( self.theReceiver, objectBuffer, None, None, None ) ]
+		anObject = self.theReceiver.getObject(self.objectID)
+		aParent = anObject.getParent()
+		if aParent.__class__.__name__ != 'Layout':
+			aParentID = anObject.getParent().getID()
+		else:
+			aParentID ='System0'
+		self.theReverseCommandList = [ UndeleteObject( self.theReceiver, objectBuffer, None, None, aParentID ) ]
 		
 		self.theReceiver.deleteObject(self.objectID)
 		return True
@@ -276,6 +304,37 @@ class DeleteObject(LayoutCommand):
 	def getAffected( self ):
 		return (self.RECEIVER, self.theReceiver )
 
+
+class ChangeLayoutProperty(LayoutCommand):
+	"""
+	args:
+	"""
+	RECEIVER = 'Layout'
+	ARGS_NO=2
+	PROPERTYNAME=0
+	PROPERTYVALUE=1
+	
+	def checkArgs( self ):
+		if not LayoutCommand.checkArgs(self):
+			return False
+		self.propertyName= self.theArgs[ self.PROPERTYNAME ]
+		self.propertyValue= self.theArgs[ self.PROPERTYVALUE ]
+		self.oldPropertyValue=self.theReceiver.getProperty(self.propertyName)
+		return True
+
+	def do( self ):
+		self.theReceiver.setProperty(self.propertyName,self.propertyValue)
+		return True
+
+	def createReverseCommand( self ):
+		self.theReverseCommandList=None
+		if self.oldPropertyValue != None:
+			revcom = ChangeLayoutProperty( self.theReceiver,  self.propertyName, self.oldPropertyValue )
+			self.theReverseCommandList = [ revcom ]
+
+
+	def getAffected( self ):
+		return (self.RECEIVER, self.theReceiver )
 
 	
 
@@ -356,7 +415,7 @@ class PasteObject(LayoutCommand):
 	BUFFER = 0
 	X = 1 # if None, get it from buffer
 	Y = 2 # if None get it from buffer
-	PARENT = 3 # cannot be None
+	PARENTID = 3 # cannot be None
 
 
 	def checkArgs( self ):
@@ -364,17 +423,25 @@ class PasteObject(LayoutCommand):
 		self.theBuffer = self.theArgs[ self.BUFFER ]
 		self.x = self.theArgs[ self.X ]
 		self.y = self.theArgs[ self.Y ]
-		self.theParent = self.theArgs[ self.PARENT ]
+		self.theParentID = self.theArgs[ self.PARENTID ]
 		return True
 
 
 	def do(self):
-		self.theReceiver.theLayoutBufferPaster.pasteObjectBuffer( self.theReceiver.getName(), self.theBuffer, self.x, self.y, self.theParent )
+		theParent = self.theReceiver.getObject( self.theParentID )
+		self.theReceiver.theLayoutBufferPaster.pasteObjectBuffer( self.theReceiver, self.theBuffer, self.x, self.y, self.theParentID )
 		return True
 
 
 	def createReverseCommand( self ):
-		self.theReverseCommandList = [ DeleteObject( self.theReceiver, self.theBuffer.getID() ) ]
+		
+		aType = self.theBuffer.getProperty( OB_TYPE )
+		
+		if self.theBuffer.getUndoFlag():
+			newID = self.theBuffer.getID()
+		else:
+			newID = self.theReceiver.getUniqueObjectID( aType )
+		self.theReverseCommandList = [ DeleteObject( self.theReceiver,newID ) ]
 
 
 	def getAffected( self ):
@@ -390,7 +457,7 @@ class UndeleteObject(LayoutCommand):
 	BUFFER = 0
 	X = 1 # if None, get it from buffer
 	Y = 2 # if None get it from buffer
-	PARENT = 3 # cannot be None
+	PARENTID = 3 # cannot be None
 
 
 	def checkArgs( self ):
@@ -398,13 +465,13 @@ class UndeleteObject(LayoutCommand):
 		self.theBuffer = self.theArgs[ self.BUFFER ]
 		self.x = self.theArgs[ self.X ]
 		self.y = self.theArgs[ self.Y ]
-		self.theParent = self.theArgs[ self.PARENT ]
+		self.theParentID = self.theArgs[ self.PARENTID ]
 		self.theBuffer.setUndoFlag ( True )
 		return True
 
 
 	def do(self):
-		self.theReceiver.theLayoutBufferPaster.pasteObjectBuffer( self.theReceiver.getName(), self.theBuffer, self.x, self.y, self.theParent )
+		self.theReceiver.theLayoutBufferPaster.pasteObjectBuffer( self.theReceiver, self.theBuffer, self.x, self.y, self.theParentID )
 		return True
 
 
@@ -439,6 +506,7 @@ class MoveObject(LayoutCommand):
 
 
 	def do(self):
+		a = self.theReceiver.getObject( self.objectID )
 		self.theReceiver.moveObject( self.objectID, self.newx, self.newy, self.newParent )
 		return True
 
@@ -539,16 +607,17 @@ class CreateConnection(LayoutCommand):
 class RedirectConnection(LayoutCommand):
 	"""
 	args: anObjectID, newProcessObjectID, newVariableObjectID = None, newRing = None 
+	   # arguments are None. means they dont change
 	"""
 	RECEIVER = 'Layout'
 	ARGS_NO = 6
 	OBJECTID = 0
 	NEWPROCESSOBJECTID = 1
-	NEWVARIABLEOBJECTID = 2 
+	NEWVARIABLEOBJECTID = 2 # it is either a valid objectID or a pair of values [x,y] indicating the new endpoint
 	NEWPROCESSRING = 3
 	NEWVARIABLERING = 4
 	NEWVARREFNAME = 5 # can be none
-	
+
 	def checkArgs( self ):
 		# no argument check - suppose call is right
 		self.objectID = self.theArgs[ self.OBJECTID ]
@@ -558,10 +627,10 @@ class RedirectConnection(LayoutCommand):
 		self.newVariableRing = self.theArgs[ self.NEWVARIABLERING ]
 		self.newVarrefName = self.theArgs[ self.NEWVARREFNAME ]
 		return True
-
+		
 
 	def do(self):
-		self.theReceiver.redirectConnectionObject( self.objectID, self.newProcessObjectID, self.newVariableObjectID, self.newProcessRing, self.newVariableRing )
+		self.theReceiver.redirectConnectionObject( self.objectID, self.newProcessObjectID, self.newVariableObjectID, self.newProcessRing, self.newVariableRing,self.newVarrefName )
 		return True
 
 
@@ -571,18 +640,22 @@ class RedirectConnection(LayoutCommand):
 			oldProcessObjectID = None
 			oldProcessRing = None
 		else:
-			oldProcessObjectID = theObject.getProperty( CO_PROCESS_ATTACHED ).getProperty( OB_FULLID )
+			oldProcessObjectID = theObject.getProperty( CO_PROCESS_ATTACHED )
 			oldProcessRing = theObject.getProperty( CO_PROCESS_RING )
+			
 
 		if self.newVariableObjectID == None:
 			oldVariableObjectID = None
 			oldVariableRing = None
 		else:
+			
 			oldVariableObjectID = theObject.getProperty( CO_VARIABLE_ATTACHED )
+			if oldVariableObjectID == None:
+				oldVariableObjectID = theObject.getProperty( CO_ENDPOINT2 )
 			oldVariableRing = theObject.getProperty( CO_VARIABLE_RING )
 
 
-		self.theReverseCommandList = [ RedirectConnectionObject( self.theReceiver, self.objectID, oldProcessObjectID, oldVariableObjectID, oldProcessRing, oldVariableRing ) ]
+		self.theReverseCommandList = [ RedirectConnection( self.theReceiver, self.objectID, oldProcessObjectID, oldVariableObjectID, oldProcessRing, oldVariableRing, self.newVarrefName) ]
 
 
 	def getAffected( self ):

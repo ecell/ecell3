@@ -1,6 +1,6 @@
 from EditorObject import *
 from Constants import *
-from ShapeDescriptor import *
+from LineDescriptor import *
 from LayoutCommand import *
 from Utils import *
 from ComplexLine import *
@@ -62,20 +62,26 @@ class ConnectionObject( EditorObject ):
 			self.thePropertyMap[ CO_VARIABLE_ATTACHED ] = aVariableID
 			aVariableObj = self.theLayout.getObject( aVariableID )
 			(x, y) = aVariableObj.getRingPosition( aVariableRing )
-			self.thePropertyMap[ CO_ENDPOINT2 ] = [x, y]
+
+			ringsize =  aVariableObj.theSD.getRingSize()/2
+			self.thePropertyMap[ CO_ENDPOINT2 ] = [x + ringsize, y+ringsize]
 			self.thePropertyMap[ CO_ATTACHMENT2TYPE ] = OB_NOTHING
 			self.thePropertyMap[ CO_DIRECTION2 ] = self.__getRingDirection( aVariableRing)
                         self.thePropertyMap[ CO_ATTACHMENT2TYPE ] = OB_TYPE_VARIABLE
 			aVariableObj.registerConnection( objectID )
 		self.__defineArrowDirection()
 
-
+		
 		aLineSD = StraightLineSD(self, self.getGraphUtils() )
 
 		self.theSD = aLineSD
 		self.thePropertyMap[ OB_SHAPEDESCRIPTORLIST ] = aLineSD
-		self.theConnectionArrowTypeList=['Straight','Cornered']
+		self.theConnectionArrowTypeList=['Straight','Cornered', 'Curved']
 		self.theConnectionLineTypeList=['Normal', 'Bold', 'Dashed' ,'Dotted']
+		self.hasBeenDragBefore = False
+		#Attribute needed for redirectCon
+		self.EndPoint2 =self.thePropertyMap[ CO_ENDPOINT2 ]
+		self.processRing = self.thePropertyMap[ CO_PROCESS_RING ]		
 
 	def __defineArrowDirection( self ):
 		self.thePropertyMap[ CO_HASARROW1 ] = gtk.FALSE
@@ -85,6 +91,99 @@ class ConnectionObject( EditorObject ):
 			self.thePropertyMap[ CO_HASARROW1 ] = gtk.TRUE
 		elif self.thePropertyMap[ CO_COEF ] >0:
 			self.thePropertyMap[ CO_HASARROW2 ] = gtk.TRUE
+
+	def arrowheadDragged(self,shapeName, deltax, deltay, absx, absy):
+		(offsetx, offsety ) = self.getAbsolutePosition()
+		x = absx- offsetx
+		y = absy - offsety
+
+		if self.theShape.getFirstDrag():
+			self.redirectConnection(shapeName,x,y)
+			self.theShape.setFirstDrag(False)
+			self.hasBeenDragBefore = True
+			
+
+	def redirectConnection(self,shapeName,x,y):
+		if shapeName == ARROWHEAD1:
+			self.thePropertyMap[ CO_ENDPOINT1 ] = [x, y]
+		elif shapeName == ARROWHEAD2:
+			self.thePropertyMap[ CO_ENDPOINT2 ] = [x, y]
+		self.theShape.repaint()
+
+	def mouseReleased(self,shapeName, x, y):
+		if self.theShape.getFirstDrag():
+			self.arrowheadDragged(0, 0, x, y)
+		
+		if self.hasBeenDragBefore :
+			if shapeName == ARROWHEAD2:
+				( varID, varRing ) = self.theLayout.checkConnection(x, y, ME_VARIABLE_TYPE )
+				
+				if varID == None:
+					varID = ( x, y)
+					varRing = None
+				self.thePropertyMap[ CO_ENDPOINT2 ]  = self.EndPoint2
+				aCommand = RedirectConnection( self.theLayout, self.theID, None, varID,None,varRing,None)
+				self.theLayout.passCommand( [aCommand] )
+				self.hasBeenDragBefore = False
+
+			elif shapeName == ARROWHEAD1:
+				( proID, processRing ) = self.theLayout.checkConnection(x, y, ME_PROCESS_TYPE )
+				if proID ==None or proID != self.thePropertyMap[ CO_PROCESS_ATTACHED ]:
+					proID = self.thePropertyMap[ CO_PROCESS_ATTACHED ]
+					processRing = self.thePropertyMap[ CO_PROCESS_RING ]
+					aProcessObj = self.theLayout.getObject( proID )
+					(x, y) = aProcessObj.getRingPosition( processRing )
+					rsize = aProcessObj.getRingSize()
+					self.thePropertyMap[ CO_ENDPOINT1 ] = [ x +rsize/2, y+rsize/2 ]
+					self.theShape.repaint()
+					return 
+				else:
+					self.processRing =  processRing
+					aCommand = RedirectConnection( self.theLayout, self.theID, proID,None,processRing,None,None)
+					self.theLayout.passCommand( [aCommand] )
+					self.hasBeenDragBefore = False
+					
+
+
+	def redirectConnbyComm(self, aProID,aNewVarID,aProcessRing,aVariableRing,varrefName):
+		# arguments are None. means they dont change
+		# if newVarId is like [x,y] then i should be detached
+		
+		if aNewVarID != None:
+			# means it changed
+			oldVarID = self.thePropertyMap[ CO_VARIABLE_ATTACHED ]
+			if type(aNewVarID) in (type( [] ),type([] )) :
+				self.thePropertyMap[ CO_ENDPOINT2 ] = aNewVarID
+				self.thePropertyMap[ CO_VARIABLE_ATTACHED ] = None
+				self.thePropertyMap[ CO_ATTACHMENT2TYPE ] = OB_NOTHING
+				self.thePropertyMap[ CO_DIRECTION2 ] = self.__getRingDirection( RING_BOTTOM)
+			else:
+				self.thePropertyMap[ CO_VARIABLE_ATTACHED ] = aNewVarID
+				aVariableObj = self.theLayout.getObject( aNewVarID)
+				(x, y) = aVariableObj.getRingPosition( aVariableRing )
+
+				rsize =  aVariableObj.theSD.getRingSize()/2
+				self.thePropertyMap[ CO_ENDPOINT2 ] = [x + rsize, y+rsize]
+				self.thePropertyMap[ CO_DIRECTION2 ] = self.__getRingDirection( aVariableRing)
+				self.thePropertyMap[ CO_VARIABLE_RING ] = aVariableRing
+				self.thePropertyMap[ CO_ATTACHMENT2TYPE ] = OB_TYPE_VARIABLE
+				aVariableObj.registerConnection(self.theID)
+				
+			if oldVarID != None:
+				self.theLayout.getObject( oldVarID ).unRegisterConnection( self.theID )
+
+			self.theShape.repaint()	
+			self.EndPoint2 = self.thePropertyMap[ CO_ENDPOINT2 ]		
+		if aProID != None:
+			
+			if aProcessRing !=None:
+				aProcessObj = self.theLayout.getObject( aProID)
+				(x, y) = aProcessObj.getRingPosition( aProcessRing )
+				rsize = aProcessObj.getRingSize()
+				self.thePropertyMap[ CO_ENDPOINT1 ] = [ x +rsize/2, y+rsize/2 ]
+				self.thePropertyMap[ CO_DIRECTION1 ] = self.__getRingDirection( aProcessRing )
+			self.theShape.repaint()	
+			self.thePropertyMap[  CO_PROCESS_RING ] = self.processRing
 
 
 	def parentMoved( self, parentID, deltax, deltay ):
@@ -154,7 +253,8 @@ class ConnectionObject( EditorObject ):
 			aLineSD = StraightLineSD(self, self.getGraphUtils() )
 		elif aShapeType == SHAPE_TYPE_CORNERED_LINE:
 			aLineSD = corneredLineSD(self, self.getGraphUtils() )
-
+		elif aShapeType == SHAPE_TYPE_CURVED_LINE:
+			aLineSD = curvedLineSD(self, self.getGraphUtils() )
 		self.theSD = aLineSD
 		self.thePropertyMap[ OB_SHAPEDESCRIPTORLIST ] = aLineSD
 

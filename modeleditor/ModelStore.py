@@ -456,7 +456,6 @@ class ModelStore:
 				return
 
 			aVariable = self.__getEntity( aVariableFullID )
-
 			if aProcessID not in aVariable[MS_ENTITY_PROPERTYLIST][MS_VARIABLE_PROCESSLIST][MS_PROPERTY_VALUE]:
 				aVariable[MS_ENTITY_PROPERTYLIST][MS_VARIABLE_PROCESSLIST][MS_PROPERTY_VALUE].append( aProcessID )
 

@@ -124,7 +124,6 @@ class ModelCommand( Command ):
 	def checkArgs( self ):
 
 		if not Command.checkArgs(self):
-
 			return False
 
 		if type( self.theReceiver) == type(self):

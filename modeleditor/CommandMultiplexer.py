@@ -2,6 +2,8 @@ from Constants import *
 from LayoutCommand import *
 from EntityCommand import *
 from Utils import *
+from PackingStrategy import *
+import string
 
 
 class CommandMultiplexer:
@@ -9,7 +11,7 @@ class CommandMultiplexer:
 	def __init__( self, aModelEditor, aLayoutManager ):
 		self.theLayoutManager = aLayoutManager
 		self.theModelEditor = aModelEditor
-
+		
 
 	def processCommandList( self, aCommandList ):
 		returnCmdList = []
@@ -37,17 +39,49 @@ class CommandMultiplexer:
 			oldFullID = aCmd.theArgs[ aCmd.OLDID ]
 			newFullID = aCmd.theArgs[ aCmd.NEWID ]
 			anIterator.filterByFullID( oldFullID )
+		
 			aType = getFullIDType( newFullID )
 			while True:
 				anObject = anIterator.getNextObject()
 				if anObject == None:
 					break
-				renameCommand = SetObjectProperty( anObject.getLayout(), anObject.getID(), OB_FULLID, newFullID )
+
+				# estimate new textwidth that is available
+				newLabel=newFullID
+				if aType != ME_SYSTEM_TYPE:
+					newLabel=newFullID.split(':')[2]
+				anObject.calcLabelParam(newLabel)
+				totalWidth,limit=anObject.getLabelParam()
+				
+				if totalWidth>limit:
+					newLabel=anObject.truncateLabel(newLabel,totalWidth,limit)
+				newDimx=anObject.estLabelWidth(newLabel)
+				oldDimx=anObject.getProperty(OB_DIMENSION_X)
+				deltaWidth=newDimx-oldDimx
+				#no resize necessary for system if newDimx is smaller
+				if aType == ME_SYSTEM_TYPE:
+					noChild=len(anObject.getObjectList())
+					if noChild>0:
+						largestDim=anObject.getLargestChildPosX()
+						if largestDim>newDimx:
+							deltaWidth=largestDim-oldDimx
+					if deltaWidth<0:
+						deltaWidth=0
+
+				resizeCommand = ResizeObject(anObject.getLayout(),anObject.getID(),0, 0, 0, deltaWidth )
+				renameCommand = SetObjectProperty( anObject.getLayout(), anObject.getID(), OB_FULLID, newFullID )		
+				relabelCommand = SetObjectProperty( anObject.getLayout(), anObject.getID(), OB_LABEL, newLabel )
+				
+				returnCmdList.append( relabelCommand )
+				returnCmdList.append( resizeCommand )			
 				returnCmdList.append( renameCommand )
 				if aType == ME_SYSTEM_TYPE:
 					returnCmdList.extend( self.__changeFullID( anObject, newFullID ) )
-					#check broken connections!
-					returnCmdList.extend( self.__checkBrokenConnections( oldFullID, newFullID ) )
+					
+			if aType == ME_SYSTEM_TYPE:
+				#check broken connections!
+				returnCmdList.extend( self.__checkBrokenConnections( oldFullID, newFullID ) )				
+				
 
 		elif cmdType == "CutEntityList":
 			fullIDList = aCmd.theArgs[ aCmd.IDLIST ]
@@ -133,6 +167,7 @@ class CommandMultiplexer:
 			theLayout = aCmd.theReceiver
 			theObject = theLayout.getObject ( chgdID )
 			objectType = theObject.getProperty( OB_TYPE )
+			
 			if chgdProperty in GLOBALPROPERTYSET:
 				if objectType == OB_TYPE_CONNECTION:
 					aProcessID = theObject.getProperty( CO_PROCESS_ATTACHED )
@@ -220,8 +255,11 @@ class CommandMultiplexer:
 #			returnCmdList.extend( self.__deleteObjectByID( anObject ) )
 		elif cmdType == "PasteObject":
 			# construct real fullid
-			aBuffer = aCmd.theBuffer
-			aParent = aCmd.theParent
+			aLayout = aCmd.theReceiver
+			aBuffer = aCmd.theArgs[aCmd.BUFFER]
+			aParentID =aCmd.theArgs[aCmd.PARENTID]
+			
+			aParent = aLayout.getObject(aParentID)
 			objectType = aBuffer.getProperty ( OB_TYPE )
 			if objectType in [ OB_TYPE_PROCESS, OB_TYPE_VARIABLE, OB_TYPE_SYSTEM]:
 				objectFullID = aBuffer.getProperty( OB_FULLID )
@@ -236,7 +274,7 @@ class CommandMultiplexer:
 				# else create new fullid
 				if not self.theModelEditor.getModel().isEntityExist( newFullID ):
 					entityBuffer = aBuffer.getEntityBuffer()
-					pasteCmd = PasteEntity( self.theModelEditor, entityBuffer, parentSysPath )
+					pasteCmd = PasteEntityList( self.theModelEditor, entityBuffer, parentSysPath )
 					returnCmdList.insert( len( returnCmdList) - 1, pasteCmd )
 
 		elif cmdType == "CreateConnection":
@@ -280,42 +318,53 @@ class CommandMultiplexer:
 			
 		elif cmdType == "RedirectConnection":
 			# get changed and new endpoint
+			
 			cmdObjectID = aCmd.theArgs[ aCmd.OBJECTID ]
 			cmdNewProcessObjectID = aCmd.theArgs[aCmd.NEWPROCESSOBJECTID ]
 			cmdNewVariableObjectID = aCmd.theArgs[aCmd.NEWVARIABLEOBJECTID ]
+			cmdNewVarrefName = aCmd.theArgs[aCmd.NEWVARREFNAME ]
 			connectionObject = aCmd.theReceiver.getObject( cmdObjectID )
 			aVarrefName = connectionObject.getProperty( CO_NAME )
-			oldProcessFullID = connectionObject.getProperty( CO_PROCESS_ATTACHED )
-			if type( oldProcessFullID ) != type( [] ):
-				oldProcessObject = aCmd.theReceiver.getObject( oldProcessFullID )
+			oldProcessID = connectionObject.getProperty( CO_PROCESS_ATTACHED )
+			oldProcessObject = aCmd.theReceiver.getObject( oldProcessID )
+			oldProcessFullID = oldProcessObject.getProperty( OB_FULLID )
+		 	
+			
+			
+			oldVariableID = connectionObject.getProperty( CO_VARIABLE_ATTACHED )
+			if type( oldVariableID ) not in (type( [] ), type([] ), type(None)):
+				oldVariableObject = aCmd.theReceiver.getObject( oldVariableID )
 			else:
-				oldProcessObject = oldProcessFullID
-			oldVariableFullID = connectionObject.getProperty( CO_VARIABLE_ATTACHED )
-			if type( oldVariableFullID ) != type( [] ):
-				oldVariableObject = aCmd.theReceiver.getObject( oldVariableFullID )
-			else:
-				oldVariableObject = oldVariableFullID
-			newVarrefName = aCmd.theArgs[ aCmd.NEWVARREFNAME ]
+				oldVariableObject = oldVariableID			
+			
+			newVarrefName = cmdNewVarrefName
 			if newVarrefName == None:
 				newVarrefName = aVarrefName
-			theCoef = connectionObject.getProperty( CO_COEF )
-			isRelative = connectionObject.getProperty( CO_ISRELATIVE )
-
+			
 			oldVarrefFullPN = createFullPN ( oldProcessFullID, MS_PROCESS_VARREFLIST )
 			aVarrefList = copyValue( self.theModelEditor.getModel().getEntityProperty( oldVarrefFullPN ) )
 			for aVarref in aVarrefList:
 				if aVarref[ MS_VARREF_NAME ] == aVarrefName:
 					foundVarref = aVarref
 					break
-
+			# get coef and isrelative flag from Varref
+			#theCoef = connectionObject.getProperty( CO_COEF )
+			isRelative = foundVarref[ME_VARREF_COEF]
+			
 			# if processID is changed, it can only be changes in the rings so no changes are necessary
+			
 			if cmdNewProcessObjectID != None:
 				pass
 
 			# if varrefID is changed, handle four cases
-			elif cmdNewVariableObjectID != None:
-				doDetachment = type( oldVariableObject) == type( [] )
-				doAttachment = type( cmdNewVariableObjectID) == type([])
+			entityCmd = None
+			if cmdNewVariableObjectID != None:
+				if type( cmdNewVariableObjectID) == type([]):
+					aVariableObject = cmdNewVariableObjectID
+				
+				doDetachment = type( oldVariableObject) != type( [] )
+				doAttachment = type( cmdNewVariableObjectID) != type([])
+				
 				#no detachment, no attachment - do nothing
 				if not doDetachment and not doAttachment:
 					entityCmd = None
@@ -323,34 +372,100 @@ class CommandMultiplexer:
 
 				# just detachment,  first change entity property, then detach other layouts
 				elif doDetachment and not doAttachment:
-					foundVarref[ MS_VARREF_FULLID ] = ""
+					foundVarref[ MS_VARREF_FULLID ] = ":.:___NOTHING"
 					objCommands = []
+					
+					entityCmd = ChangeEntityProperty( self.theModelEditor, oldVarrefFullPN, aVarrefList )
 					objectIter = self.theLayoutManager.createObjectIterator()
-					objectIter.filterByFullID(aProcessFullID )
+					objectIter.filterByFullID(oldProcessFullID )
+					anOldLayoutName = aCmd.theReceiver.theName
 					while True:
 						anObject = objectIter.getNextObject()
+						
 						if anObject == None:
 							break
+						aLayout = anObject.getLayout()
 						connectionList = anObject.getProperty( PR_CONNECTIONLIST )	
-						for conObject in connectionList:
-							if conObject.getProperty( CO_NAME ) == aVarrefName and conObject.getID() != cmdObjectID:
-								attachmentPoints = copyValue(conObject.getProperty( CO_ENDPOINT2 ) )
-								attachmentPoints[0] += 20
-								attachmentPoints[1] += 20
-								redirCommand = RedirectConnection( conObject.getLayout(), conObject.getID(), None, attachmentPoints, None, None, None )
-								objCommands.append( redirCommand )
+						for conObjectID in connectionList:
+							conObject = aLayout.getObject( conObjectID )
+							if conObject.getProperty( CO_NAME ) == aVarrefName:
+								if (conObject.getLayout().theName== anOldLayoutName and conObject.getID() != cmdObjectID) or conObject.getLayout().theName!= anOldLayoutName:
+								
+									attachmentPoints = copyValue(conObject.getProperty( CO_ENDPOINT2 ) )
+									attachmentPoints[0] += 20
+									attachmentPoints[1] += 20
+									redirCommand = RedirectConnection( conObject.getLayout(), conObject.getID(), None, attachmentPoints, None, None, None )
+									objCommands.append( redirCommand )
 					
 
 				# just attachment, first change entity varref, then attach other layouts
 				elif doAttachment:
+					#new varref fullid is absolute path
 					#FIXME do Attachments with autoconnect
 					objCommands = []
-					aVariableObject = aCmd.theReceiver.getObject( cmdNewVariableFullID )
-					foundVarref[ MS_VARREF_FULLID ] = aVariableObject.getProperty( OB_FULLID )
+					aVariableObject = aCmd.theReceiver.getObject( cmdNewVariableObjectID )
+			                newVariableFullID = aVariableObject.getProperty( OB_FULLID )
+					foundVarref[ MS_VARREF_FULLID ] = getRelativeReference (oldProcessFullID, aVariableObject.getProperty( OB_FULLID ))
+					
 					entityCmd = ChangeEntityProperty( self.theModelEditor, oldVarrefFullPN, aVarrefList )
+					
+					objectIterPro = self.theLayoutManager.createObjectIterator()
+					objectIterPro.filterByFullID(oldProcessFullID )
+					anOldLayoutName = aCmd.theReceiver.theName
+					
+					while True:
+						# quit cycle (break) if next process object is None
+						# check that this is not the original process
+						# if it is, continue
+						# search for variableobjects in the same layout where the process is
+
+						aProObject = objectIterPro.getNextObject()
+						if aProObject == None:
+							break
+						
+						aLayout = aProObject.getLayout()
+						aProObjectID = aProObject.getID()
+						
+						if aLayout.getName() == anOldLayoutName and aProObjectID ==oldProcessID:
+							continue
+						
+						varList = aLayout.getObjectList(OB_TYPE_VARIABLE)
+						for aVarID in varList:
+							aVarObj =  aLayout.getObject(aVarID)
+							aVarFullID = aVarObj.getProperty(OB_FULLID)
+							if aVarFullID != newVariableFullID:
+								continue
+							
+							connectionList = aProObject.getProperty( PR_CONNECTIONLIST )
+								
+							for aConID in connectionList:
+								conObject = aLayout.getObject( aConID )
+								currVarIDAttached = conObject.getProperty(CO_VARIABLE_ATTACHED)
+								if type( currVarIDAttached ) not in (type( [] ), type([] ), type(None)):
+									currVarObj = aLayout.getObject(currVarIDAttached)
+									currVarFullID = currVarObj.getProperty(OB_FULLID)
+								
+									print 'conID',conObject.getProperty(CO_VARIABLE_ATTACHED)
+								else:
+									currVarFullID = None
+								
+								if conObject.getProperty( CO_NAME ) == aVarrefName and currVarFullID != newVariableFullID:
+									
+									thePackingStrategy = conObject.getLayout().thePackingStrategy
+							
+									(processRing, variableRing) = thePackingStrategy.autoConnect(aProObjectID, aVarID ,cmdNewVarrefName )
+									redirCommand = RedirectConnection( conObject.getLayout(), conObject.getID(), None, aVarID, processRing, variableRing, None )
+									objCommands.append( redirCommand )
+									
+							break
+
+						
+						
 				if entityCmd != None:
+						
 					returnCmdList.insert( len(returnCmdList)-1, entityCmd )
 				returnCmdList.extend( objCommands )
+				
 
 				
 
@@ -359,14 +474,16 @@ class CommandMultiplexer:
 				foundVarref[ MS_VARREF_NAME ] = cmdNewVarrefName
 				objCommands = []
 				objectIter = self.theLayoutManager.createObjectIterator()
-				objectIter.filterByFullID(aProcessFullID )
+				objectIter.filterByFullID(oldProcessFullID )
 				while True:
 					anObject = objectIter.getNextObject()
 					if anObject == None:
 						break
 					connectionList = anObject.getProperty( PR_CONNECTIONLIST )	
-					for conObject in connectionList:
-						if conObject.getProperty( CO_NAME ) == aVarrefName and conObject.getID() != cmdObjectID:
+					
+					for aConID in connectionList:
+						conObject = aCmd.theReceiver.getObject( aConID )
+						if conObject.getProperty( CO_NAME ) == aVarrefName and conObject.getID() == cmdObjectID:
 							redirCommand = RedirectConnection( conObject.getLayout(), conObject.getID(), None, None, None, None, cmdNewVarrefName )
 							objCommands.append( redirCommand )
 				entityCmd = ChangeEntityProperty( self.theModelEditor, oldVarrefFullPN, aVarrefList )
@@ -447,7 +564,7 @@ class CommandMultiplexer:
 				if aNewVarref[ ME_VARREF_NAME ] == anOldVarref [ ME_VARREF_NAME ]:
 					foundInNew = True
 				elif aNewVarref[ ME_VARREF_COEF ] == anOldVarref[ ME_VARREF_COEF ]:
-					if aNewVarref[ ME_VARREF_COEF ] == anOldVarref[ ME_VARREF_COEF ] and aNewVarref[ ME_VARREF_NAME ] not in oldVarrefNames:
+					if aNewVarref[ ME_VARREF_FULLID ] == anOldVarref[ ME_VARREF_FULLID ] and aNewVarref[ ME_VARREF_NAME ] not in oldVarrefNames:
 						changedTo = aNewVarref[ ME_VARREF_NAME ]
 			if not foundInNew:
 				if changedTo != None:
@@ -469,6 +586,7 @@ class CommandMultiplexer:
 				# process redirections
 				oldVariable = getAbsoluteReference( aProcessFullID, anOldVarref[ ME_VARREF_FULLID ] )
 				newVariable = getAbsoluteReference( aProcessFullID, aNewVarref[ ME_VARREF_FULLID ] )
+				
 				cmdList.extend( self.__redirectVarref( aProcessFullID, anOldVarref [ ME_VARREF_NAME ], oldVariable, newVariable ) )
 			if anOldVarref[ ME_VARREF_COEF ] != aNewVarref[ ME_VARREF_COEF ]:
 				# process coef changes
@@ -489,7 +607,7 @@ class CommandMultiplexer:
 			aLayout = anObject.getLayout()
 			for conID in connectionList:
 				conObject = aLayout.getObject( conID )
-				if conObject.getProperty( CO_NAME ) == aVarrefName and conObject.getID()!= doNotTouch:
+				if conObject.getProperty( CO_NAME ) == aVarrefName and conObject.getLayout().theName!= doNotTouch:
 					deleteCommand = DeleteObject( aLayout, conObject.getID() )
 					cmdList.append( deleteCommand )
 		return cmdList
@@ -501,16 +619,29 @@ class CommandMultiplexer:
 		objectIter.filterByFullID( aProcessFullID )
 		while True:
 			anObject = objectIter.getNextObject()
+			
 			if anObject == None:
 				break
+			aProObjectID = anObject.getID()
 			connectionList = anObject.getProperty( PR_CONNECTIONLIST )
 			aLayout = anObject.getLayout()	
 			for conID in connectionList:
 				conObject = aLayout.getObject( conID )
 				if conObject.getProperty( CO_NAME ) == aVarrefName:
-					deleteCommand = DeleteObject( conObject.getLayout(), conObject.getID() )
-					cmdList.append( deleteCommand )
-
+					if newVariable ==None:
+						newVariableID = conObject.getProperty( CO_ENDPOINT2)
+						newVariableID[0]+=20
+						newVariableID[1]+=20
+						proRing = None
+						varRing = None
+					else:
+						newVariableID = conObject.getProperty( CO_VARIABLE_ATTACHED)
+						proRing = conObject.getProperty( CO_PROCESS_RING)
+						varRing = conObject.getProperty( CO_VARIABLE_RING)
+					
+					redirCommand = RedirectConnection( conObject.getLayout(), conObject.getID(), aProObjectID, newVariableID, proRing, varRing, aVarrefName )
+					cmdList.append( redirCommand )
+						
 		return cmdList
 
 
@@ -549,24 +680,99 @@ class CommandMultiplexer:
 					cmdList.append( renameCommand )
 
 		return cmdList
-		
+#|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||\\
 	def __changeFullID( self, aSystemObject, newFullID ):
 		returnCmdList = []
 		newPath = convertSysIDToSysPath( newFullID )
 		aLayout = aSystemObject.getLayout()
 		for anID in aSystemObject.getObjectList():
 			anObject = aLayout.getObject( anID )
+			aType = getFullIDType( newFullID )
 			if not anObject.getProperty( OB_HASFULLID ):
 				continue
 			aFullID = anObject.getProperty( OB_FULLID )
 			( aType, aPath, aName ) = aFullID.split(':')
 			aFullID = ':'.join( [aType, newPath, aName ] )
+			
+			#Label
+			newLabel=aFullID
+			if aType != ME_SYSTEM_TYPE:
+				newLabel=newLabel.split(':')[2]
+			anObject.calcLabelParam(newLabel)
+			totalWidth,limit=anObject.getLabelParam()
+			if totalWidth>limit:
+				newLabel=anObject.truncateLabel(newLabel,totalWidth,limit)		
+			newDimx=anObject.estLabelWidth(newLabel)
+			oldDimx=anObject.getProperty(OB_DIMENSION_X)
+			deltaWidth=newDimx-oldDimx
+			#no resize necessary for system child if newDimx is smaller
+			if aType==ME_SYSTEM_TYPE:
+				noChild=len(anObject.getObjectList())
+				if noChild>0:
+					largestDim=anObject.getLargestChildPosX()
+					if largestDim>newDimx:
+						deltaWidth=largestDim-oldDimx
+				if deltaWidth<0:
+					deltaWidth=0
+			resizeCommand = ResizeObject(aLayout, anID,0, 0, 0, deltaWidth )
 			renameCommand = SetObjectProperty( aLayout, anID, OB_FULLID, aFullID )
+			relabelCommand = SetObjectProperty( aLayout, anID,OB_LABEL, newLabel)
+			returnCmdList.append( resizeCommand )
 			returnCmdList.append( renameCommand )
+			returnCmdList.append( relabelCommand )
 			if aType == ME_SYSTEM_TYPE:
+
 				returnCmdList.extend( self.__changeFullID( anObject, aFullID  ) )
 		return returnCmdList
 
-	def __checkBrokenConnections(self, oldFullID, newFullID ):
-		# should find whether
-		return []
+	def __checkBrokenConnections(self,oldFullID, newFullID ):
+		returnCmdList =[]
+		
+		oldName = oldFullID.split(':')[2]
+		# should find whether there are broken connections when renaming system and copying, cutting entities.
+		sysPath = convertSysIDToSysPath( oldFullID)
+		variableNameList = self.theModelEditor.getModel().getEntityList( ME_VARIABLE_TYPE, sysPath )
+		variableList = createFullIDList( ME_VARIABLE_TYPE, oldFullID, variableNameList )
+		
+		for aVariableFullID in variableList:
+			# create the variablefullId after system renamed
+			aFullPN = createFullPN ( aVariableFullID, MS_VARIABLE_PROCESSLIST)
+			aProcessList = copyValue( self.theModelEditor.getModel().getEntityProperty( aFullPN ) )
+			(t, variablePath, variableName) = aVariableFullID.split(':')
+			for aProcessFullID in aProcessList:
+				aProFullPN = createFullPN ( aProcessFullID, MS_PROCESS_VARREFLIST )
+				aVarrefList = copyValue( self.theModelEditor.getModel().getEntityProperty( aProFullPN) )
+				for aVarref in aVarrefList:
+					aFullID = aVarref[ME_VARREF_FULLID ]
+					refValid = True
+					if not isAbsoluteReference( aFullID ):
+						try:
+							absFullID = getAbsoluteReference( aProcessFullID, aFullID )
+						except:
+							refValid = False
+					else:
+						absFullID = aFullID
+					if absFullID.split(':')[1] == variablePath and absFullID.split(':')[2] == variableName:
+						varrefPath = aFullID.split(':')[1]
+						if varrefPath.endswith( oldName ):
+							returnCmdList.extend( self.__redirectVarref(  aProcessFullID,aVarref [ ME_VARREF_NAME ],aVarref[ME_VARREF_FULLID], None  ))
+							
+		#check for child systems
+		systemNameList = self.theModelEditor.getModel().getEntityList( ME_SYSTEM_TYPE, sysPath )
+		systemList = createFullIDList( ME_SYSTEM_TYPE, oldFullID, systemNameList )	
+		if systemList != []:
+			for anOldSystemFullID in systemList:
+				aNewFullIDList = newFullID.split(':')
+				if aNewFullIDList[1] == '/':
+					anewName = ''.join(aNewFullIDList[1:])
+				else:
+					anewName = '/'.join(aNewFullIDList[1:])
+				aNewSystemFullID = anOldSystemFullID.split(':')
+				aNewSystemFullID[1]=anewName	
+				aNewSystemFullID = string.join(aNewSystemFullID,':')	
+				returnCmdList.extend( self.__checkBrokenConnections(anOldSystemFullID, aNewSystemFullID ) )
+					
+		return returnCmdList
+		
+
+		

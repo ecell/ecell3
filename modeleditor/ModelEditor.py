@@ -21,6 +21,8 @@ from DMInfo import *
 from PopupMenu import *
 from PathwayEditor import *
 from LayoutManager import *
+from AboutModelEditor import *
+
 
 from CommandMultiplexer import *
 from ObjectEditorWindow import *
@@ -30,8 +32,8 @@ from GraphicalUtils import *
 
 from Error import *
 
-RECENTFILELIST_FILENAME = '~/.modeleditor/.recentlist'
-RECENTFILELIST_DIRNAME = '~/.modeleditor'
+RECENTFILELIST_FILENAME = '.modeleditor' + os.sep + '.recentlist'
+RECENTFILELIST_DIRNAME = '.modeleditor'
 RECENTFILELIST_MAXFILES = 10
 
 
@@ -66,10 +68,12 @@ class ModelEditor:
 		self.theLayoutManagerWindow=None 
 		self.theObjectEditorWindow = None
 		self.theConnObjectEditorWindow = None
+		self.theAboutModelEditorWindow = None
 		self.theFullIDBrowser = None
 		self.thePopupMenu = PopupMenu( self )
 		self.theMainWindow = MainWindow( self )
 		self.changesSaved = True
+		self.openAboutModelEditor = False
 		# create untitled model
 		self.__createModel()
 
@@ -566,9 +570,7 @@ class ModelEditor:
 		self.theRedoQueue.moveback()
 		cmdList = aCommandList[:]
 		cmdList.reverse()
-
 		for aCommand in cmdList:
-
 			# execute commands
 			aCommand.execute()
 			( aType, anID ) = aCommand.getAffectedObject()
@@ -667,6 +669,15 @@ class ModelEditor:
 		self.theConnObjectEditorWindow=aConnObjectEditor
 		self.openConnObjectEditorWindow=isOpen
 
+
+	def createAboutModelEditor(self):
+		if not self.openAboutModelEditor:
+			AboutModelEditor(self)
+
+	def toggleAboutModelEditor(self,isOpen,anAboutModelEditorWindow):
+		self.theAboutModelEditorWindow = anAboutModelEditorWindow
+		self.openAboutModelEditor=isOpen
+			
 		
 	def copy(self ):
 		self.theLastComponent.copy()
@@ -709,6 +720,7 @@ class ModelEditor:
 				aType = None
 			else:
 				aType = self.copyBuffer.getType()
+				
 			return self.theLastComponent.getADCPFlags( aType )
 
 	def setFullIDBrowser( self, aBrowser):
@@ -856,6 +868,19 @@ class ModelEditor:
 		# save to file whole list
 		self.__saveRecentFileList()
 
+		
+	def __getHomeDir ( self ):
+		"""
+		in: nothing
+		returns the Home directory of user
+		workaround for a bug in Python os.path.expanduser in Windows
+		"""
+		
+		aHomeDir = os.path.expanduser( '~' )
+		if aHomeDir not in ( '~', '%USERPROFILE%' ):
+			return aHomeDir
+		if os.name == 'nt' and aHomeDir == '%USERPROFILE%':
+			return os.environ['USERPROFILE']
 
 
 	def __saveRecentFileList ( self ):
@@ -864,12 +889,12 @@ class ModelEditor:
 		returns nothing
 		"""
 		# creates recentfiledir if does not exist
-		aDirName = os.path.expanduser( RECENTFILELIST_DIRNAME )
+		aDirName = self.__getHomeDir() + os.sep + RECENTFILELIST_DIRNAME
 		if not os.path.isdir( aDirName ):
 			os.mkdir( aDirName )
 
 		# creates file 
-		aFileName = os.path.expanduser( RECENTFILELIST_FILENAME )
+		aFileName = self.__getHomeDir() + os.sep + RECENTFILELIST_FILENAME
 		aFileObject = open( aFileName, 'w' )
 
 		for aLine in self.__theRecentFileList:
