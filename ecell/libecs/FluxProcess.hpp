@@ -32,58 +32,30 @@ namespace libecs
     void initialize()
     {
       Process::initialize();
-
     }
 
     void setFlux( RealCref velocity )
     {
       Real aVelocity( velocity );
 
-      // The aVelocityPerStep is limited by amounts of substrates and products.
-      /*
+      setActivity( aVelocity );
+
+      // Increase or decrease connections.
+
       for( ConnectionMapIterator s( theConnectionMap.begin() );
 	   s != theConnectionMap.end() ; ++s )
 	{
 	  Connection aConnection( s->second );
-	  Int aCoefficient( aConnection.getCoefficient() );
-	  
+	  const Int aCoefficient( aConnection.getCoefficient() );
 	  if( aCoefficient != 0 )
 	    {
-	      Real aVelocityPerStep = velocity * aConnection.getVariable()->
-		getStepper()->getStepInterval();
-
-	      Real aLimit( aConnection.getVariable()->getValue() 
-			   / aCoefficient );
-	      if( ( aLimit > 0 && aVelocityPerStep > aLimit ) ||
-		  ( aLimit < 0 && aVelocityPerStep < aLimit ) )
-	      {
-		aVelocityPerStep = aLimit;
-	      }
+	      aConnection.getVariable()->
+		addVelocity( aVelocity * aCoefficient );
 	    }
 	}
-      */
-
-    // IMPORTANT!!!: 
-    // Activity must be given as 
-    // [number of molecule that this process yields / deltaT]
-    setActivity( aVelocity );
-
-    // Increase or decrease connections.
-
-    for( ConnectionMapIterator s( theConnectionMap.begin() );
-	 s != theConnectionMap.end() ; ++s )
-      {
-	Connection aConnection( s->second );
-	const Int aCoefficient( aConnection.getCoefficient() );
-	if( aCoefficient != 0 )
-	  {
-	    aConnection.getVariable()->
-	      addVelocity( aVelocity * aCoefficient );
-	  }
-      }
-
+      
     }
-
+    
   };
 
 }

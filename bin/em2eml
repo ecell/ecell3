@@ -55,10 +55,10 @@ class EmScanner( GenericScanner , object ):
 	def __init__( self ):
 		GenericScanner.__init__( self )
 
-	def tokenize( self, input, filename='???' ):
+	def tokenize( self, input ):
 		self.rv = []
 		self.lineno = 1
-		self.filename = filename
+		self.filename = '???'
 #		GenericScanner.tokenize( self, input )
                 super (EmScanner, self).tokenize( input )
 		return self.rv
@@ -88,7 +88,7 @@ class EmScanner( GenericScanner , object ):
 		self.rv.append( self.createToken( 'quotedstring', s ) )
 		
 	def t_control( self, s ):
-		r' \% [^\n]* '
+		r' \%line [^\n]*\n '
 		seq = s.split()
 		self.lineno = int( seq[1] )
 		self.filename = str( seq[2] )
@@ -353,12 +353,13 @@ class Interpret(GenericASTTraversal):
 		pass
 
 			
-def convertEm2Eml( anEmFileObject , aFileName= '???', debug=0 ):
+def convertEm2Eml( anEmFileObject, debug=0 ):
+
 	anEml = ecell.eml.Eml()
 
 	# Scanning
 	aScanner = EmScanner()
-	aTokenList = aScanner.tokenize( anEmFileObject.read(), aFileName )
+	aTokenList = aScanner.tokenize( anEmFileObject.read() )
 	if debug != 0:print aTokenList
 
 	# Parsing 
@@ -389,7 +390,59 @@ def convert2FullID( anEml, aType, aSystemID ):
 	    
 	return anID
     
-    
+
+
+#
+# preprocessing methods
+#
+
+import StringIO
+
+import ecell.em
+em = ecell.em ; del ecell.em
+
+def lineControl( file, line ):
+	return '%%line %d %s\n' % ( line, file )
+
+def beforeHook( interpreter, keywords ):
+	interpreter.write( lineControl( keywords['name'], 1 ) )
+
+def afterHook( interpreter, keywords ):
+	( file, line ) = interpreter.context().identify()
+	interpreter.write( lineControl( file, line ) )
+
+
+def preprocess( file, filename ):
+
+	Output = StringIO.StringIO()
+
+	interpreter = em.Interpreter( output = Output )
+
+        interpreter.pseudo.flatten()
+
+	interpreter.pseudo.addHook( 'before_include', beforeHook )
+	interpreter.pseudo.addHook( 'after_include', afterHook )
+
+	interpreter.write( lineControl( filename, 1 ) )
+
+	#
+	# FIXME: need more hooks here for multiline string expansions
+	#
+
+
+	# start processing
+	if file is not None:
+		interpreter.wrap( interpreter.file, (file, filename), 0, 1 )
+
+	interpreter.flush()
+
+	OutputString = Output.getvalue()
+
+	interpreter.shutdown()
+
+	return OutputString
+
+
 def usage():
 	aProgramName = os.path.basename( sys.argv[0] )
 	print '''
@@ -407,8 +460,6 @@ Options:
 	
 if __name__ == '__main__':
 
-	import ecell.em
-	em = ecell.em ; del ecell.em
 
 
 	try:
@@ -463,19 +514,18 @@ if __name__ == '__main__':
 	if anEmlFileName == '-':
 		anEmlFile = sys.stdout
 
-	aTempFileName = tempfile.mktemp()
-	em.invoke( ( "-o", aTempFileName, anEmFileName ) )
+	aTempFile = StringIO.StringIO( preprocess( anEmFile, anEmFileName ) )
 
-	aTempFile = open( aTempFileName, 'r' )
-	
+	aTempFile.seek( 0 )
+
 	if preprocessing_only != 0:
-		print string.join( aTempFile.readlines(), '' )
+		anEmlFile.write( aTempFile.read() )
+		aTempFile.close()
+		anEmlFile.close()
 		sys.exit(0)
 
-	anEmlObject = convertEm2Eml(aTempFile, anEmFileName, debug)
-
+	anEmlObject = convertEm2Eml(aTempFile, debug)
 	aTempFile.close()
-	os.unlink( aTempFileName )
 
 	aString = anEmlObject.asString()
 	

@@ -131,10 +131,7 @@ def createSystemList( anEml, aSystemPath='' ):
         aFullID = ( SYSTEM, '', '/' )
     else:
         aLastSlash = string.rindex( aSystemPath, '/' )
-        if aLastSlash == 0:
-            aPath = aSystemPath[:aLastSlash+1]
-        else:
-            aPath = aSystemPath[:aLastSlash]
+        aPath = aSystemPath[:aLastSlash+1]
         anID = aSystemPath[aLastSlash+1:]
         aFullID = ( SYSTEM, aPath, anID )
 
@@ -142,7 +139,8 @@ def createSystemList( anEml, aSystemPath='' ):
     aBuffer += '\n'
 
     for aSystem in anEml.getEntityList( 'System', aSystemPath ):
-        aBuffer += createSystemList( anEml, aSystem )
+        aSubSystemPath = joinSystemPath( aSystemPath, aSystem )
+        aBuffer += createSystemList( anEml, aSubSystemPath )
 
     return aBuffer
 
@@ -232,12 +230,12 @@ Options:
 
 ''' % ( anEmlFileName, time.asctime( time.localtime() ) )
 
-    try:
-        aBuffer += createStepperList( anEml )
-        aBuffer += createSystemList( anEml )
-    except:
-        sys.stderr.write( 'Error: ' + str( sys.exc_type ) + '\n' )
-        sys.exit( 1 )
+#    try:
+    aBuffer += createStepperList( anEml )
+    aBuffer += createSystemList( anEml )
+#    except:
+#        sys.stderr.write( 'Error: ' + str( sys.exc_type ) + '\n' )
+#        sys.exit( 1 )
 
 
     anEmFile.write( aBuffer )
