@@ -303,7 +303,7 @@ namespace libecs
       const Real aPutativeVelocity( calculateTotalVelocity() * aStepInterval );
       const Real aPutativeQuantity( getQuantity() + aPutativeVelocity );
 
-      if( aPutativeQuantity > 0 )
+      if( aPutativeQuantity >= 0 )
 	{
 	  return true;
 	}
