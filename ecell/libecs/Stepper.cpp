@@ -49,8 +49,17 @@ namespace libecs
 
   ////////////////////////// Stepper
 
-  
-  void Stepper::makeSlots()
+  Stepper::Stepper() 
+    :
+    theReadWriteVariableOffset( 0 ),
+    theReadOnlyVariableOffset( 0 ),
+    theModel( NULLPTR ),
+    theSchedulerIndex( -1 ),
+    theCurrentTime( 0.0 ),
+    theStepInterval( 0.001 ),
+    theOriginalStepInterval( 0.001 ),
+    theMinInterval( std::numeric_limits<Real>::min() * 10 ),
+    theMaxInterval( std::numeric_limits<Real>::max() * .1 )
   {
 
     DEFINE_PROPERTYSLOT( "CurrentTime", Real,
@@ -96,22 +105,6 @@ namespace libecs
     DEFINE_PROPERTYSLOT( "DependentStepperList", Polymorph,
 			 NULLPTR,
 			 &Stepper::getDependentStepperList );
-
-  }
-
-  Stepper::Stepper() 
-    :
-    theReadWriteVariableOffset( 0 ),
-    theReadOnlyVariableOffset( 0 ),
-    theModel( NULLPTR ),
-    theSchedulerIndex( -1 ),
-    theCurrentTime( 0.0 ),
-    theStepInterval( 0.001 ),
-    theOriginalStepInterval( 0.001 ),
-    theMinInterval( std::numeric_limits<Real>::min() * 10 ),
-    theMaxInterval( std::numeric_limits<Real>::max() * .1 )
-  {
-    makeSlots();
   }
 
   void Stepper::initialize()
@@ -649,11 +642,6 @@ namespace libecs
     theTolerantStepInterval( 0.001 ),
     theNextStepInterval( 0.001 )
   {
-    makeSlots();
-  }
-
-  void DifferentialStepper::makeSlots()
-  {
     DEFINE_PROPERTYSLOT( "StepInterval", Real, 
 			 &DifferentialStepper::initializeStepInterval,
 			 &DifferentialStepper::getStepInterval );
@@ -778,7 +766,16 @@ namespace libecs
 
   ////////////////////////// AdaptiveDifferentialStepper
 
-  void AdaptiveDifferentialStepper::makeSlots()
+  AdaptiveDifferentialStepper::AdaptiveDifferentialStepper()
+    :
+    theTolerance( 1.0e-6 ),
+    theAbsoluteToleranceFactor( 1.0 ),
+    theStateToleranceFactor( 1.0 ),
+    theDerivativeToleranceFactor( 1.0 ),
+    theAbsoluteEpsilon( 0.1 ),
+    theRelativeEpsilon( 0.1 ),
+    safety( 0.9 ),
+    theMaxErrorRatio( 1.0 )
   {
     DEFINE_PROPERTYSLOT( "Tolerance", Real,
 			 &AdaptiveDifferentialStepper::setTolerance,
@@ -811,20 +808,6 @@ namespace libecs
     DEFINE_PROPERTYSLOT( "Order", Int, 
 			 NULLPTR,
 			 &AdaptiveDifferentialStepper::getOrder );
-  }
-
-  AdaptiveDifferentialStepper::AdaptiveDifferentialStepper()
-    :
-    theTolerance( 1.0e-6 ),
-    theAbsoluteToleranceFactor( 1.0 ),
-    theStateToleranceFactor( 1.0 ),
-    theDerivativeToleranceFactor( 1.0 ),
-    theAbsoluteEpsilon( 0.1 ),
-    theRelativeEpsilon( 0.1 ),
-    safety( 0.9 ),
-    theMaxErrorRatio( 1.0 )
-  {
-    makeSlots();
   }
 
   void AdaptiveDifferentialStepper::initialize()

@@ -200,6 +200,7 @@ T* ModuleMakerBase<T,DMAllocator>::make( const string& classname )
     {
       throw DMException( "Can't instantiate [" + classname + "]." );
     }
+
   ++theNumberOfInstances;
 
   return anInstance;

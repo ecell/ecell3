@@ -62,17 +62,11 @@ namespace libecs
     public Entity
   {
 
+    DM_BASECLASS( Variable );
+
+    LIBECS_DM_OBJECT( Variable, Variable );
+
   public:
-
-    /** 
-	A function type that returns a pointer to Variable.
-
-	Every subclass must have this type of a function which returns
-	an instance for the VariableMaker.
-    */
-
-    typedef VariablePtr (* AllocatorFuncPtr )();
-
 
     Variable();
     virtual ~Variable();
@@ -243,12 +237,12 @@ namespace libecs
 
 
     // wrappers to expose is/setFixed as PropertySlots 
-    void setFixed( IntCref aValue )
+    SET_METHOD( Int, Fixed )
     { 
-      theFixed = static_cast<bool>( aValue );
+      theFixed = static_cast<bool>( value );
     }
 
-    const Int getFixed() const
+    GET_METHOD( Int, Fixed )
     { 
       return theFixed;
     }
@@ -260,7 +254,7 @@ namespace libecs
        @return Concentration in M (mol/L).
     */
 
-    const Real getConcentration() const
+    GET_METHOD( Real, Concentration )
     {
       return getValue() / ( getSuperSystem()->getVolume() * N_A );
     }
@@ -268,13 +262,8 @@ namespace libecs
     void registerProxy( VariableProxyPtr const anVariableProxy );
     //    void removeProxy( VariableProxyPtr const anVariableProxy );
 
-    static VariablePtr createInstance() { return new Variable; }
-
-    virtual StringLiteral getClassName() const { return "Variable"; }
 
   protected:
-
-    void makeSlots();
 
     void clearVariableProxyVector();
 
@@ -305,6 +294,8 @@ namespace libecs
   {
 
   public:
+
+    LIBECS_DM_OBJECT( Variable, Variable );
 
 
     PositiveVariable()
@@ -340,10 +331,6 @@ namespace libecs
 	  return false;
 	}
     }
-
-    static VariablePtr createInstance() { return new PositiveVariable; }
-      
-    virtual StringLiteral getClassName() const { return "PositiveVariable"; }
 
   };
 

@@ -44,27 +44,6 @@
 namespace libecs
 {
 
-  void Process::makeSlots()
-  {
-    DEFINE_PROPERTYSLOT( "VariableReferenceList", Polymorph,
-			 &Process::setVariableReferenceList,
-			 &Process::getVariableReferenceList );
-
-    DEFINE_PROPERTYSLOT( "Activity",  Real,
-			 &Process::setActivity,
-			 &Process::getActivity );
-
-    DEFINE_PROPERTYSLOT( "Priority",  Int,
-			 &Process::setPriority,
-			 &Process::getPriority );
-
-    DEFINE_PROPERTYSLOT( "StepperID", String,
-			 &Process::setStepperID,
-			 &Process::getStepperID );
-
-  }
-
-
   void Process::setVariableReferenceList( PolymorphCref aValue )
   {
     const PolymorphVector aVector( aValue.asPolymorphVector() );
@@ -112,7 +91,21 @@ namespace libecs
     thePriority( 0 ),
     theStepper( NULLPTR )
   {
-    makeSlots();
+    DEFINE_PROPERTYSLOT( "VariableReferenceList", Polymorph,
+			 &Process::setVariableReferenceList,
+			 &Process::getVariableReferenceList );
+
+    DEFINE_PROPERTYSLOT( "Activity",  Real,
+			 &Process::setActivity,
+			 &Process::getActivity );
+
+    DEFINE_PROPERTYSLOT( "Priority",  Int,
+			 &Process::setPriority,
+			 &Process::getPriority );
+
+    DEFINE_PROPERTYSLOT( "StepperID", String,
+			 &Process::setStepperID,
+			 &Process::getStepperID );
   }
 
   Process::~Process()

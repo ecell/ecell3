@@ -75,28 +75,20 @@ namespace libecs
 
   public:
 
+    DM_BASECLASS( Stepper );
+
+
     //    typedef std::pair<StepperPtr,Real> StepIntervalConstraint;
     //    DECLARE_VECTOR( StepIntervalConstraint, StepIntervalConstraintVector );
 
     //    DECLARE_ASSOCVECTOR( StepperPtr, Real, std::less<StepperPtr>,
     //			 StepIntervalConstraintMap );
 
-    /** 
-	A function type that returns a pointer to Stepper.
-
-	Every subclass must have this type of a function which returns
-	an instance for the StepperMaker.
-    */
-
-    typedef StepperPtr (* AllocatorFuncPtr )();
-
     Stepper(); 
     virtual ~Stepper() 
     {
       ; // do nothing
     }
-
-    void makeSlots();
 
     /**
 
@@ -409,7 +401,7 @@ namespace libecs
       return getCurrentTime() < rhs.getCurrentTime();
     }
 
-    virtual StringLiteral getClassName() const  { return "Stepper"; }
+    //    virtual StringLiteral getClassName() const  { return "Stepper"; }
 
 
   protected:
@@ -514,7 +506,7 @@ namespace libecs
 
 
   public:
-
+    
     class VariableProxy
       :
       public libecs::VariableProxy
@@ -584,8 +576,6 @@ namespace libecs
       setNextStepInterval( aStepInterval );
     }
 
-    void makeSlots();
-
     virtual void initialize();
 
     virtual void reset();
@@ -603,10 +593,6 @@ namespace libecs
       return new DifferentialStepper::VariableProxy( *this, aVariable );
     }
 
-    virtual StringLiteral getClassName() const 
-    { 
-      return "DifferentialStepper";
-    }
 
   protected:
 
@@ -763,16 +749,10 @@ namespace libecs
 
     virtual const Int getOrder() const { return 1; }
 
-    void makeSlots();
-
     virtual void initialize();
     void step();
     virtual bool calculate() = 0;
 
-    virtual StringLiteral getClassName() const 
-    { 
-      return "AdaptiveDifferentialStepper";
-    }
 
     RealVectorCref getK1() const
     {
@@ -828,11 +808,6 @@ namespace libecs
 
     //    static StepperPtr createInstance() { return new DiscreteEventStepper; }
 
-    virtual StringLiteral getClassName() const 
-    { 
-      return "DiscreteEventStepper";
-    }
-
   };
 
 
@@ -854,6 +829,9 @@ namespace libecs
 
   public:
 
+    LIBECS_DM_OBJECT( Stepper, DiscreteTimeStepper );
+
+
     DiscreteTimeStepper();
     virtual ~DiscreteTimeStepper() {}
 
@@ -863,13 +841,6 @@ namespace libecs
     virtual void interrupt( StepperPtr const aCaller )
     {
       ; // do nothing -- ignore interruption
-    }
-
-    static StepperPtr createInstance() { return new DiscreteTimeStepper; }
-
-    virtual StringLiteral getClassName() const 
-    { 
-      return "DiscreteTimeStepper";
     }
 
 
@@ -891,7 +862,11 @@ namespace libecs
     :
     public Stepper
   {
+
   public:
+
+    LIBECS_DM_OBJECT( Stepper, SlaveStepper );
+
 
     SlaveStepper();
     ~SlaveStepper() {}
@@ -920,14 +895,6 @@ namespace libecs
     {
       ; // do nothing
     }
-
-    static StepperPtr createInstance() { return new SlaveStepper; }
-
-    virtual StringLiteral getClassName() const 
-    { 
-      return "SlaveStepper";
-    }
-
 
   };
 

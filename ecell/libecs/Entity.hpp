@@ -197,17 +197,6 @@ namespace libecs
       theSuperSystem = supersystem; 
     }
 
-
-
-    /// @internal
-
-    virtual StringLiteral getClassName() const { return "Entity"; }
-
-
-  protected:
-
-    void makeSlots();
-
   private:
 
     // hide them
@@ -217,6 +206,13 @@ namespace libecs
   private:
 
     SystemPtr theSuperSystem;
+
+
+    /// @internal
+
+    virtual StringLiteral getClassName() const { return "Entity"; }
+
+
     String    theID;
     String    theName;
   };

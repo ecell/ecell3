@@ -47,40 +47,6 @@ namespace libecs
 
   /////////////////////// System
 
-  void System::makeSlots()
-  {
-
-    registerSlot( "SystemList",  
-		  getPropertySlotMaker()->
-		  createPropertySlot( *this, Type2Type<Polymorph>(),
-				      NULLPTR,
-				      &System::getSystemList ) );
-
-    registerSlot( "VariableList",  
-		  getPropertySlotMaker()->
-		  createPropertySlot( *this, Type2Type<Polymorph>(),
-				      NULLPTR,
-				      &System::getVariableList ) );
-
-    registerSlot( "ProcessList", 
-		  getPropertySlotMaker()->
-		  createPropertySlot( *this, Type2Type<Polymorph>(),
-				      NULLPTR,
-				      &System::getProcessList ) );
-
-    registerSlot( "StepperID", 
-		  getPropertySlotMaker()->
-		  createPropertySlot( *this, Type2Type<String>(),
-				      &System::setStepperID,
-				      &System::getStepperID ) );
-
-    registerSlot( "Volume",  
-		  getPropertySlotMaker()->
-		  createPropertySlot( *this, Type2Type<Real>(),
-				      &System::setVolume, 
-				      &System::getVolume ) );
-  }
-
 
   // Property slots
 
@@ -133,7 +99,26 @@ namespace libecs
     theModel( NULLPTR ),
     theEntityListChanged( false )
   {
-    makeSlots();
+
+    DEFINE_PROPERTYSLOT( "SystemList", Polymorph,
+			 NULLPTR,
+			 &System::getSystemList );
+
+    DEFINE_PROPERTYSLOT( "VariableList", Polymorph,
+			 NULLPTR,
+			 &System::getVariableList );
+
+    DEFINE_PROPERTYSLOT( "ProcessList", Polymorph,
+			 NULLPTR,
+			 &System::getProcessList );
+
+    DEFINE_PROPERTYSLOT( "StepperID", String,
+			 &System::setStepperID,
+			 &System::getStepperID );
+
+    DEFINE_PROPERTYSLOT( "Volume", Real,
+			 &System::setVolume, 
+			 &System::getVolume );
   }
 
   System::~System()
@@ -255,9 +240,12 @@ namespace libecs
       }
   }
 
+
   VirtualSystem::VirtualSystem()
   {
-    makeSlots();
+    DEFINE_PROPERTYSLOT( "ProcessList", Polymorph,
+			 NULLPTR,
+			 &System::getProcessList );
   }
 
   VirtualSystem::~VirtualSystem()
@@ -268,15 +256,6 @@ namespace libecs
 	delete i->second;
       }
 
-  }
-
-  void VirtualSystem::makeSlots()
-  {
-    registerSlot( "ProcessList",  
-		  getPropertySlotMaker()->
-		  createPropertySlot( *this, Type2Type<Polymorph>(),
-				      NULLPTR,
-				      &System::getProcessList ) );
   }
 
 
@@ -326,7 +305,9 @@ namespace libecs
 
   LogicalSystem::LogicalSystem()
   {
-    makeSlots();
+    DEFINE_PROPERTYSLOT( "VariableList", Polymorph,
+			 NULLPTR,
+			 &System::getVariableList );
   }
 
   LogicalSystem::~LogicalSystem()
@@ -338,16 +319,6 @@ namespace libecs
       }
   }
 
-
-  void LogicalSystem::makeSlots()
-  {
-    registerSlot( "VariableList",  
-		  getPropertySlotMaker()->
-		  createPropertySlot( *this, Type2Type<Polymorph>(),
-				      NULLPTR,
-				      &System::getVariableList ) );
-
-  }
 
   void LogicalSystem::initialize()
   {
@@ -388,21 +359,14 @@ namespace libecs
     :
     theVolume( 1.0 )
   {
-    makeSlots();
+    DEFINE_PROPERTYSLOT( "Volume",  Real,
+			 &System::setVolume, 
+			 &System::getVolume );
   }
 
   CompartmentSystem::~CompartmentSystem()
   {
     ; // do nothing
-  }
-
-  void CompartmentSystem::makeSlots()
-  {
-    registerSlot( "Volume",  
-		  getPropertySlotMaker()->
-		  createPropertySlot( *this, Type2Type<Real>(),
-				      &System::setVolume, 
-				      &System::getVolume ) );
   }
 
   void CompartmentSystem::initialize()

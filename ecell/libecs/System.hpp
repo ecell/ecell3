@@ -62,14 +62,7 @@ namespace libecs
 
   public:
 
-    /** 
-	A function type that returns a pointer to System.
-
-	Every subclass must have this type of a function which returns
-	an instance for the SystemMaker.
-    */
-
-    typedef SystemPtr (* AllocatorFuncPtr )();
+    DM_BASECLASS( System );
 
 
     System();
@@ -236,18 +229,11 @@ namespace libecs
     void notifyChangeOfEntityList();
 
 
-    virtual StringLiteral getClassName() const { return "System"; }
-    //    static SystemPtr createInstance() { return new System; }
-
   public: // property slots
 
     const Polymorph getSystemList() const;
     const Polymorph getVariableList() const;
     const Polymorph getProcessList() const;
-
-  protected:
-
-    virtual void makeSlots();
 
   protected:
 
@@ -270,6 +256,9 @@ namespace libecs
   {
 
   public:
+
+    LIBECS_DM_OBJECT( System, VirtualSystem );
+
 
     VirtualSystem();
     virtual ~VirtualSystem();
@@ -312,13 +301,6 @@ namespace libecs
       return theProcessMap;
     }
 
-    virtual StringLiteral getClassName() const { return "VirtualSystem"; }
-    static SystemPtr createInstance() { return new VirtualSystem; }
-
-  protected:
-
-    virtual void makeSlots();
-
   private:
 
     ProcessMap   theProcessMap;
@@ -333,6 +315,8 @@ namespace libecs
 
   public:
 
+    LIBECS_DM_OBJECT( System, LogicalSystem );
+
     LogicalSystem();
     virtual ~LogicalSystem();
 
@@ -344,13 +328,6 @@ namespace libecs
     }
 
     virtual void registerVariable( VariablePtr aVariable );
-
-    virtual StringLiteral getClassName() const { return "LogicalSystem"; }
-    static SystemPtr createInstance() { return new LogicalSystem; }
-
-  protected:
-
-    virtual void makeSlots();
 
   private:
 
@@ -366,6 +343,8 @@ namespace libecs
   {
 
   public:
+
+    LIBECS_DM_OBJECT( System, CompartmentSystem );
 
     CompartmentSystem();
     virtual ~CompartmentSystem();
@@ -390,13 +369,7 @@ namespace libecs
       theVolume = aVolume;
     }
 
-    virtual StringLiteral getClassName() const { return "CompartmentSystem"; }
-    static SystemPtr createInstance() { return new CompartmentSystem; }
  
- protected:
-
-    virtual void makeSlots();
-
   private:
 
     Real theVolume;

@@ -33,10 +33,10 @@
 
 #include <map>
 
+#include "dmtool/DMObject.hpp"
+
 #include "libecs.hpp"
-
 #include "Defs.hpp"
-
 #include "Exceptions.hpp"
 
 namespace libecs
@@ -121,27 +121,6 @@ namespace libecs
     }
 
 
-    /**
-       Create and register PropertySlots of this object.
-
-       This method should be defined in subclasses, if it has new
-       PropertySlots defined.  
-
-       This method must be called from the constructor only once.
-    */
-
-    void makeSlots();
-
-    /*
-    void connectLogger( LoggerPtr aLoggerPtr );
-    void disconnectLogger( LoggerPtr aLoggerPtr );
-
-    const bool isLogged()
-    {
-      return ! theLoggerVector.empty();
-    }
-    */
-
     // to be deprecated
     //    const Polymorph getPropertyListWithAttributes() const;
 
@@ -194,6 +173,40 @@ namespace libecs
     //    LoggerVector theLoggerVector;
 
   };
+
+
+#define GET_METHOD( TYPE, NAME )\
+const TYPE get ## NAME() const
+
+#define SET_METHOD( TYPE, NAME )\
+void set ## NAME( TYPE ## Cref value )
+
+
+#define SIMPLE_GET_METHOD( TYPE, NAME )\
+GET_METHOD( TYPE, NAME )\
+{\
+  return NAME;\
+}
+
+#define SIMPLE_SET_METHOD( TYPE, NAME )\
+SET_METHOD( TYPE, NAME )\
+{\
+  NAME = value;\
+}
+
+#define SIMPLE_SET_GET_METHOD( TYPE, NAME )\
+SIMPLE_SET_METHOD( TYPE, NAME )\
+SIMPLE_GET_METHOD( TYPE, NAME )
+
+#define ECELL_DM_OBJECT\
+ StringLiteral getClassname() { return XSTR( _ECELL_CLASSNAME ); }\
+ static _ECELL_TYPE* createInstance() { return new _ECELL_CLASSNAME ; }
+
+
+#define LIBECS_DM_OBJECT( TYPE, CLASSNAME )\
+public:\
+ StringLiteral getClassname() { return XSTR( CLASSNAME ); }\
+DM_OBJECT( TYPE, CLASSNAME )
 
 
 #define DEFINE_PROPERTYSLOT( NAME, TYPE, SETMETHOD, GETMETHOD )\

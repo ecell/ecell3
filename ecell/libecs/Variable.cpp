@@ -41,7 +41,13 @@
 namespace libecs
 {
 
-  void Variable::makeSlots()
+  Variable::Variable()
+    : 
+    theValue( 0.0 ),  
+    theVelocity( 0.0 ),
+    theTotalVelocity( 0.0 ),
+    theLastTime( 0.0 ),
+    theFixed( false )
   {
     DEFINE_PROPERTYSLOT( "Value", Real,
 			 &Variable::setValue,
@@ -62,19 +68,8 @@ namespace libecs
     DEFINE_PROPERTYSLOT( "Concentration", Real,
 			 NULLPTR,
 			 &Variable::getConcentration );
-  }
-
-
-  Variable::Variable()
-    : 
-    theValue( 0.0 ),  
-    theVelocity( 0.0 ),
-    theTotalVelocity( 0.0 ),
-    theLastTime( 0.0 ),
-    theFixed( false )
-  {
-    makeSlots();
   } 
+
 
   Variable::~Variable()
   {

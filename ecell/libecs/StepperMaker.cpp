@@ -48,7 +48,6 @@ namespace libecs
   {
     NewStepperModule( FixedEuler1Stepper );
     NewStepperModule( FixedRungeKutta4Stepper );
-    NewStepperModule( Fehlberg21Stepper );
     NewStepperModule( Fehlberg23Stepper );
     NewStepperModule( CashKarp45Stepper );
     NewStepperModule( DormandPrince547MStepper );

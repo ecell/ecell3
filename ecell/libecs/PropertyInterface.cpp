@@ -48,29 +48,6 @@ namespace libecs
     return &aPropertySlotMaker;
   }
 
-
-  void PropertyInterface::makeSlots()
-  {
-
-    // deprecated
-    /*
-    registerSlot( "ClassName", getPropertySlotMaker()->
-		  createPropertySlot( *this, 
-				      Type2Type<String>(),
-				      NULLPTR,
-				      &PropertyInterface::
-				      getClassNameString ) );
-
-    registerSlot( "PropertyList", getPropertySlotMaker()->
-		  createPropertySlot( *this,
-				      Type2Type<Polymorph>(),
-				      NULLPTR,
-				      &PropertyInterface::getPropertyListWithAttributes ) );
-    */
-
-  }
-
-
   const Polymorph PropertyInterface::getPropertyList() const
   {
     PolymorphVector aVector;
@@ -104,7 +81,7 @@ namespace libecs
 
   PropertyInterface::PropertyInterface()
   {
-    makeSlots();
+    ; // do nothing
   }
 
   PropertyInterface::~PropertyInterface()

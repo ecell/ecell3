@@ -46,18 +46,13 @@ namespace libecs
 
   public:
     
+    LIBECS_DM_OBJECT( Stepper, FixedEuler1Stepper );
+
     FixedEuler1Stepper();
     virtual ~FixedEuler1Stepper() {}
 
     virtual void step();
 
-
-    static StepperPtr createInstance() { return new FixedEuler1Stepper; }
-
-    virtual StringLiteral getClassName() const
-    {
-      return "FixedEuler1Stepper";
-    }
 
   };
 
@@ -70,46 +65,13 @@ namespace libecs
 
   public:
 
+    LIBECS_DM_OBJECT( Stepper, FixedRungeKutta4Stepper );
+
     FixedRungeKutta4Stepper();
     virtual ~FixedRungeKutta4Stepper() {}
-    static StepperPtr createInstance() { return new FixedRungeKutta4Stepper; }
 
     virtual void step();
 
-
-    virtual StringLiteral getClassName() const
-    {
-      return "FixedRungeKutta4Stepper";
-    }
-
-
-  protected:
-  };
-
-
-  DECLARE_CLASS( Fehlberg21Stepper );
-
-  class Fehlberg21Stepper
-    :
-    public AdaptiveDifferentialStepper
-  {
-
-  public:
-
-    Fehlberg21Stepper();
-    virtual ~Fehlberg21Stepper() {}
-
-    static StepperPtr createInstance() { return new Fehlberg21Stepper; }
-
-    virtual void initialize();
-    virtual bool calculate();
-
-    virtual const Int getOrder() const { return 2; }
-
-    virtual StringLiteral getClassName() const { return "Fehlberg21Stepper"; }
-
-
-  protected:
   };
 
 
@@ -122,17 +84,15 @@ namespace libecs
 
   public:
 
+    LIBECS_DM_OBJECT( Stepper, Fehlberg23Stepper );
+
     Fehlberg23Stepper();
     virtual ~Fehlberg23Stepper() {}
-
-    static StepperPtr createInstance() { return new Fehlberg23Stepper; }
 
     virtual void initialize();
     virtual bool calculate();
 
     virtual const Int getOrder() const { return 2; }
-
-    virtual StringLiteral getClassName() const { return "Fehlberg23Stepper"; }
 
   protected:
 
@@ -147,18 +107,16 @@ namespace libecs
 
   public:
 
+    LIBECS_DM_OBJECT( Stepper, CashKarp45Stepper );
+
+
     CashKarp45Stepper();
     virtual ~CashKarp45Stepper() {}
-
-    static StepperPtr createInstance() { return new CashKarp45Stepper; }
 
     virtual void initialize();
     virtual bool calculate();
 
     virtual const Int getOrder() const { return 4; }
-
-    virtual StringLiteral getClassName() const { return "CashKarp45Stepper"; }
-
 
   protected:
 
@@ -180,6 +138,11 @@ namespace libecs
     : 
     public AdaptiveDifferentialStepper
   {
+
+  public:
+
+    LIBECS_DM_OBJECT( Stepper, DormandPrince547MStepper );
+
 
     class VariableProxy
       :
@@ -261,19 +224,12 @@ namespace libecs
     DormandPrince547MStepper();
     virtual ~DormandPrince547MStepper() {}
 
-    static StepperPtr createInstance() { return new DormandPrince547MStepper; }
-
     virtual void initialize();
     virtual bool calculate();
 
     virtual void interrupt( StepperPtr const aCaller );
 
     virtual const Int getOrder() const { return 5; }
-
-    virtual StringLiteral getClassName() const
-    { 
-      return "DormandPrince547MStepper";
-    }
 
     virtual VariableProxyPtr createVariableProxy( VariablePtr aVariable )
     {

@@ -65,6 +65,10 @@ namespace libecs
 
   public: 
 
+    DM_BASECLASS( Process );
+
+
+  public:
 
     class PriorityCompare
     {
@@ -101,15 +105,6 @@ namespace libecs
 
 
     };
-
-    /** 
-	A function type that returns a pointer to Process.  
-
-	Every Process class must have this type of a function which returns
-	an instance for the ProcessMaker.
-    */
-
-    typedef ProcessPtr (* AllocatorFuncPtr )();
 
 
   public:
@@ -344,8 +339,6 @@ namespace libecs
   protected:
 
     VariableReferenceVectorIterator findVariableReference( StringCref aName );
-
-    void makeSlots();
 
   protected:
 

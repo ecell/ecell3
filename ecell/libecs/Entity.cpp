@@ -44,22 +44,15 @@ namespace libecs
     theID( "" ),
     theName( "" ) 
   {
-    makeSlots();
+    DEFINE_PROPERTYSLOT( "FullID", String, NULLPTR, &Entity::getFullIDString );
+    
+    DEFINE_PROPERTYSLOT( "Name", String, &Entity::setName, &Entity::getName );
   }
 
 
   Entity::~Entity()
   {
     ; // do nothing
-  }
-
-  void Entity::makeSlots()
-  {
-    //    DEFINE_PROPERTYSLOT( "ID", String, NULLPTR, &Entity::getID );
-
-    DEFINE_PROPERTYSLOT( "FullID", String, NULLPTR, &Entity::getFullIDString );
-    
-    DEFINE_PROPERTYSLOT( "Name", String, &Entity::setName, &Entity::getName );
   }
 
   const FullID Entity::getFullID() const
