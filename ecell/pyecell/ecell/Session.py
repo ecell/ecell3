@@ -48,8 +48,9 @@ class Session:
     def loadModel( self, aModel ):
         self.__thePreModel = aModel
 
-        self.loadEntity()
         self.loadStepper()
+        self.loadEntity()
+        self.loadSystemStepper()
         self.loadProperty()
 
         
@@ -80,6 +81,8 @@ class Session:
             self.theSimulator.createStepper( aClass, anId )
 
 
+
+    def loadSystemStepper( self ):
         
         for aTargetStepperSystem in( self.__thePreModel[ 'stepper_system' ] ):
 
