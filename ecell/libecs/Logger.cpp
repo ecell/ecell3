@@ -57,6 +57,7 @@ Logger<T, V>::Logger( LoggerCref logger )
   :
   theDataPointVector( logger.getDataPointVector() ),
   theDataFuncCptr( logger.getDataFuncCptr() )
+  theMinimumInterval( logger.getMinInterval() ) 
 {
   ; // do nothing
 }
@@ -168,7 +169,42 @@ template <class T, class V>
 void Logger<T, V>::appendData(const containee_type& dp )
 {
   theDataPointVector.push( dp );
+  T aCurrentInterval = getCurrentInterval();
+  if(theMinimumInterval < aCurrentInterval )
+    {
+      theMinimumInterval = aCurrentInterval; 
+    }
 }
+
+
+//
+
+template < class T, class V >
+const T& Logger<T, V>::getStartTime( void ) const
+{
+  return theDataPointVector.at( 0 )->getTime();
+}
+
+
+//
+
+template < class T, class V >
+const T& Logger<T, V>::getEndTime( void ) const
+{
+  return theDataPointVector.back()->getTime();
+}
+
+//
+
+template < class T, class V >
+const T& Logger<T, V>::getCurrentInterval( void ) const
+{
+  Int aVectorSize = theDataPointVector.size();
+  return
+    theDataPointVector.back()->getTime()
+    - theDataPointVector.at( aVectorSize - 2 )->getTime();
+}
+
 
 
 
@@ -218,7 +254,8 @@ main()
   //  printf("%p %p\n",&(lg.getDataPointVector()),&(lg_clone.getDataPointVector()));
 
   lg.getData(0.0,5.0,0.5);
-
+  printf("%f\n",lg.getStartTime());
+  printf("%f\n",lg.getEndTime());
 }
 
 #endif /* LOGGER_TEST */

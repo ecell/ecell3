@@ -141,29 +141,52 @@ public:
 			       const T& interval ) const;
 
 
+  /**
+
+   */
+
   void update( void );
   
+  /**
+
+   */
   //FIXME temp
   void update( containee_type& dp )
   {
     appendData(dp);
   }
 
+  /**
+
+   */
+
   void push( const containee_type& x )
   {
     theDataPointVector.push( x );
   }
+
+  /**
+
+   */
 
   void push( const T& t, const V& v )
   {
     theDataPointVector.push( t, v );
   }
 
+  /**
+
+   */
+
   const_iterator binary_search( const_iterator begin, const_iterator end,
 				const T& t ) const
   {
     return theDataPointVector.binary_search( begin, end, t );
   }
+
+  /**
+
+   */
 
   const_iterator binary_search( size_type begin, size_type end, 
 				const T& t ) const
@@ -172,6 +195,33 @@ public:
   }
 
 
+  /**
+
+   */
+
+  const T& getStartTime( void ) const;
+
+  /**
+
+   */
+
+  const T& getEndTime( void ) const;
+
+
+  /**
+
+   */
+
+  const T& getMinInterval( void ) const
+  {
+    return theMinimumInterval;
+  }
+
+  /**
+
+   */
+
+  const T& getCurrentInterval( void ) const;
 
 protected:
   
@@ -226,9 +276,11 @@ private:
 
   DataPointVector theDataPointVector;
   DataFuncCptr    theDataFuncCptr;
+  T               theMinimumInterval;
 
 
 };
 
 
 #endif /* __LOGGER_HPP */
+
