@@ -4,7 +4,6 @@
 SUBDIRS = libltdl korandom dmtool ecell osogo
 
 EXTRA_DIST = autogen.sh\
-PyCXX\
 doc\
 test
 
