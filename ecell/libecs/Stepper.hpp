@@ -44,6 +44,7 @@ namespace libecs
 
   DECLARE_CLASS( Euler1Stepper );
   DECLARE_CLASS( RungeKutta4Stepper );
+  DECLARE_CLASS( PropertySlotVectorImplementation );
 
 
   typedef IntegratorPtr ( *IntegratorAllocator_ )( SubstanceRef );
@@ -132,6 +133,30 @@ namespace libecs
 
 
 
+  // Implementation Class
+  class PropertySlotVectorImplementation
+  {
+  public:
+
+    void appendPropertySlot( PropertySlotPtr aPropertySlot )
+    {
+      thePropertySlotVector.push_back( aPropertySlot );
+    }
+
+    void pushall()
+    {
+      for(PropertySlotVector::iterator i( thePropertySlotVector.begin() );
+	  i != thePropertySlotVector.end(); ++i )
+	{
+	  (*i)->push();
+	}
+    }
+
+  private:
+    PropertySlotVector thePropertySlotVector;
+
+  };
+
   class Stepper
   {
 
@@ -142,6 +167,16 @@ namespace libecs
 
     void setOwner( SystemPtr owner ) { theOwner = owner; }
     SystemPtr getOwner() const { return theOwner; }
+
+    void setPropertySlotVector( PropertySlotVectorImplementationPtr aVector )
+    {
+      thePropertySlotVector = aVector;
+    }
+    
+    PropertySlotVectorImplementationPtr getPropertySlotVector() const 
+    {
+      return thePropertySlotVector;
+    }
 
     virtual void initialize();
 
@@ -163,6 +198,7 @@ namespace libecs
   protected:
 
     SystemPtr theOwner;
+    PropertySlotVectorImplementationPtr thePropertySlotVector;
 
   };
 
@@ -255,11 +291,7 @@ namespace libecs
 
     void push()
     {
-      for(PropertySlotVector::iterator i( thePropertySlotVector.begin() );
-	  i != thePropertySlotVector.end(); ++i )
-	{
-	  (*i)->push();
-	}
+      thePropertySlotVector->pushall();
     }
 
     virtual void initialize()
@@ -291,7 +323,6 @@ namespace libecs
   private:
 
     MasterStepperPtr theMaster;
-    PropertySlotVector  thePropertySlotVector;
 
   };
 

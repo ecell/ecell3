@@ -199,6 +199,7 @@ namespace libecs
 
   void MasterStepper::push()
   {
+    thePropertySlotVector->pushall();
     for( StepperVectorIterator i( theSlaveStepperVector.begin() );
 	 i != theSlaveStepperVector.end() ; ++i )
       {
