@@ -3,7 +3,7 @@ AUTOMAKE_OPTIONS = foreign
 SUBDIRS = plugins
 
 osogodir=${pkglibdir}
-osogo_DATA=\
+osogo_PYTHON=\
 ConfirmWindow.py\
 EntityListWindow.glade\
 EntityListWindow.py\
@@ -48,7 +48,7 @@ icon_step.xpm\
 icon_stop.xpm\
 icon_up.xpm
 
-EXTRA_DIST=${osogo_DATA}
+EXTRA_DIST=${osogo_PYTHON}
 
 bin_SCRIPTS =\
 gecell

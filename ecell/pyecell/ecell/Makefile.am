@@ -2,7 +2,7 @@ AUTOMAKE_OPTIONS = foreign
 
 
 pyecelldir=${pythondir}/ecell
-pyecell_DATA=\
+pyecell_PYTHON=\
 __init__.py\
 EntityStub.py\
 LoggerStub.py\
@@ -26,5 +26,5 @@ em.py\
 spark.py
 
 
-EXTRA_DIST=${pyecell_DATA}
+EXTRA_DIST=${pyecell_PYTHON}
 
