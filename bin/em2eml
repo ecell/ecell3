@@ -324,8 +324,8 @@ class Interpret(GenericASTTraversal):
 			for j in aValueNodeList:
 				aValueList.append( j )
 			print aPropertyName, aValueList
-			# self.eml.setStepperProperty( anID, aPropertyName,
-			# aValueList )
+			self.eml.setStepperProperty( anID, aPropertyName,\
+						     aValueList )
 			
 		
 		

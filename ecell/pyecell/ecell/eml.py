@@ -19,6 +19,7 @@ __Todo__ = '\
 from xml.dom import minidom
 
 import string
+import types
 
 from types import *
 
@@ -175,7 +176,13 @@ class Eml:
         return aStepperNodeList
 
 
+    def setStepperProperty( self, aStepperID, aPropertyName, aValue ):
 
+        aPropertyElement = self.createPropertyNode( aPropertyName, aValue )
+        aStepperNode = self.__getStepperNode( aStepperID )
+
+        aStepperNode.appendChild( aPropertyElement )
+        
 
     def __getStepperNode( self, aStepperID ):
         """private"""
@@ -733,30 +740,24 @@ class Eml:
 
     def createValueNode( self, aValue ):
 
-        if isinstance( aValue, StringType ):
+        if type( aValue ) is types.TupleType or \
+               type( aValue ) is types.ListType:    # vector value
+
+            aValueNode = self.createElement( 'value' )
+
+            for anItem in aValue:
+                aChildValueData = self.createValueNode( anItem )
+                aValueNode.appendChild( aChildValueData )
+
+            return aValueNode
+
+        else:        # scaler value
+ 
             aValueNode = self.createElement( 'value' )
             aValueData = self.__theDocument.createTextNode( aValue )
             aValueNode.appendChild( aValueData )
 
             return aValueNode
-
-
-        elif aValue: ## NOW 2-dimension only
-            
-            aValueList = aValue
-
-            aValueNode = self.createElement( 'value' )
-
-            for aValue in aValueList:
-                aChildValueNode = self.createElement( 'value' )
-                aChildValueData = self.__theDocument.createTextNode( aValue )
-                aChildValueNode.appendChild( aChildValueData )
-                
-                aValueNode.appendChild( aChildValueNode )
-
-            return aValueNode
-
-
 
 
 
