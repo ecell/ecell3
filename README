@@ -29,6 +29,7 @@ ecell/libecs --> Koyurugi: Class library for cell modeling and simulation
                            (E-CELL SE 3's innermost core)
 ecell/libemc --> E-CELL Micro Core (EMC): C++ API of Koyurugi
 ecell/pyecs  --> Python binding of EMC
+ecell/pyecell--> Python E-CELL library
 
 osogo/       --> GUI session monitor (gecell)
 
@@ -90,35 +91,4 @@ libltdl/     --> Libtool's dynamic module loader library
 // E-CELL Project, Lab. for Bioinformatics, 
 // Institute for Advanced Biosciences, Keio University.
 //
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
