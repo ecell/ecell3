@@ -261,7 +261,7 @@ class OsogoPluginWindow(PluginWindow):
 				if aProperty[1] == TRUE:
 					self.theSession.theSimulator.setProperty( createFullPNString( aFullPN ), aValue )
 					self.thePluginManager.updateAllPluginWindow()
-					self.thePluginManager.updateFandamentalWindows()
+					self.thePluginManager.updateFundamentalWindows()
 					return None
 				else:
 					aFullPNString = createFullPNString( aFullPN )
@@ -370,7 +370,7 @@ class OsogoPluginWindow(PluginWindow):
 	def createLogger( self, *objects ):
 
 		self.theSession.getLogger( createFullPNString(self.theFullPN()) )
-		self.thePluginManager.updateFandamentalWindows()
+		self.thePluginManager.updateFundamentalWindows()
 
 	# end of createLogger
 
@@ -396,7 +396,7 @@ class OsogoPluginWindow(PluginWindow):
 
 		self.update()
 		self.thePluginManager.updateAllPluginWindow()
-		self.thePluginManager.updateFandamentalWindows()
+		self.thePluginManager.updateFundamentalWindows()
 
 	# end of changeFullPN
 
