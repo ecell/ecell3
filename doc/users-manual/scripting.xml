@@ -25,11 +25,11 @@
   <sect1>
     <title>Session Scripting</title>
 
-    <para>An &ecell Session Script (ESS) is a
+    <para>An &ecell Session Script (&ESS;) is a
 &Python; script which is loaded by a &ecell; &Session; object.  A
 &Session; instance represents a single run of a simulation.</para>
 
-    <para>An ESS is used to automate a single run of a simulation session.
+    <para>An &ESS; is used to automate a single run of a simulation session.
   A simple simulation run typically involves the following five stages:
 <orderedlist>
 	<listitem>
@@ -65,7 +65,7 @@
       </orderedlist>
 </para>
 
-    <para>An ESS file usually has an extension '<filename>.py</filename>'.</para>
+    <para>An &ESS; file usually has an extension '<filename>.py</filename>'.</para>
 
   </sect1>
 
@@ -330,7 +330,7 @@ Both ways, <option>-D</option> and <option>--parameters</option>, can be mixed.
       <sect3>
 	<title>Printing messages</title>
 
-	<para>You may want to print some messages in your ESS.
+	<para>You may want to print some messages in your &ESS;.
         Use <methodname>message</methodname>( <parameter>message</parameter> )
 	method, where <parameter>message</parameter> argument is a
 	string to be outputed.</para>
@@ -370,7 +370,7 @@ message( 'stopped at %f seconds.' % getCurrentTime() )
     <sect2>
       <title>Getting Session Parameters.</title>
 
-      <para>Session parameters are given to an ESS as global variables.
+      <para>Session parameters are given to an &ESS; as global variables.
       Therefore usage of the session parameters is very simple.  For
       example, if you can assume a session parameter
       <varname>MODELFILE</varname> is given, just use it as a
@@ -380,11 +380,11 @@ message( 'stopped at %f seconds.' % getCurrentTime() )
 	</informalexample>
       </para>
 
-      <para>To check what parameters are given to ESS, use
+      <para>To check what parameters are given to &ESS;, use
       <methodname>dir</methodname>() or
       <methodname>globals</methodname>() built-in functions.  Session
       parameters are listed as well as other available methods and
-      variables.   To check if a certain ESS parameter or a global variable is given, write an if statement like this:
+      variables.   To check if a certain &ESS; parameter or a global variable is given, write an if statement like this:
 <informalexample>
 	  <programlisting>if 'MODELFILE' in globals():
     # MODELFILE is given
@@ -397,7 +397,7 @@ else:
 
       <note>
 	<para>Currently there is no way to distinguish the Session
-      parameters from other global variables from within ESS.</para>
+      parameters from other global variables from &ESS;.</para>
       </note>
 
 

@@ -16,7 +16,7 @@ Stepper DiscreteTimeStepper( DT_1 )
 }
 
 
-Stepper SlaveStepper( SLAVE_1 )
+Stepper PassiveStepper( PASSIVE_1 )
 {
 	# no property
 }
@@ -1057,14 +1057,14 @@ System System( /CELL/CYTOPLASM )
 	Process PKCactivePProcess( PKC_PKCactive )
 	{
 		Name	PKC_PKC_active;
-		StepperID SLAVE_1;	
+		StepperID PASSIVE_1;	
 		VariableReferenceList	[ S0 Variable:.:Ca_DAG_PKC] [ S1 Variable:.:DAG_AA_PKC] [ S2 Variable:.:AA_PKC] [ S3 Variable:.:Ca_AA_PKC] [ P0 Variable:.:PKCactive 1 ];
 	}
 	
 	Process MAPPProcess( MAPact )
 	{
 		Name	MAPact;
-		StepperID SLAVE_1;	
+		StepperID PASSIVE_1;	
 		VariableReferenceList	[ S0 Variable:.:MAPK_P] [ S1 Variable:.:MAPK_PP] [ P0 Variable:.:MAPKactive 1 ];
 	}
 	

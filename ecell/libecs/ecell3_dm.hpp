@@ -33,6 +33,9 @@
 
 #include "PropertySlotMaker.hpp"
 
+
+#warning "ecell3_dm.hpp will be deprecated."
+
 /**
    @file
 

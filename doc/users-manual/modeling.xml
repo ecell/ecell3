@@ -91,12 +91,28 @@ The &Entity; class has three subclasses:
     <sect2>
       <title>&Stepper; objects</title>
 
-      <para>A model must have one or more &Stepper; object(s).  </para>
+      <para>A model must have one or more &Stepper; object(s).  Each
+      &Process; and &System; object must be connected with a &Stepper;
+      object in the same model.  In other words, &Stepper; objects in
+      the model have non-overlapping sets of &Process; and &System;
+      objects.</para>
 
-      <para>Each &Process; and &System; object must be connected with
-      a &Stepper; object in the same model.  In other words, &Stepper;
-      objects in the model have non-overlapping sets of &Process; and
-      &System; objects.</para>
+      <para>&Stepper; is a class which implement a specific simulation
+      algorithm.  If the model has more than one &Stepper; objects,
+      the system conducts a multi-algorithm (or multi-stepper)
+      simulation.  In addition to the lists of &Process; and &System;
+      objects, a &Stepper; has a list of &Variable; objects that can
+      be read or written by its &Process; objects.  It also has a time
+      step interval as a positive real-number.  The system schedules
+      &Stepper; objects according to the step intervals, and updates
+      the current time. When called by the system, a &Stepper; object
+      updates values of related &Variable; objects, calls zero, one or
+      more &Process; objects connected with the &Stepper; in an order
+      determined by its implementation of the algorithm, and
+      determines the next time step interval.  See the following
+      chapters for details of the simulation procedure.</para>
+
+      <para></para>
     </sect2>
 
 
@@ -455,7 +471,7 @@ System CompartmentSystem( / )
       &Entity; objects, &Variable;s S and P, and a &Process; E.  These
       &Entity; objects have their property values of several different
       types.  For example, 'StepperID' of the root system is a string
-      without quotes (ODE_1). The initial value to 'Value' property of
+      without quotes (ODE_1). The initial value given to 'Value' property of
       the &Variable; S is an integer number 10000.  'Name' of the
       &Process; E is a quoted string "A mass action from S to P", and
       'k' of it is a real number 1.0.  'VariableReferenceList'
@@ -602,6 +618,92 @@ as <classname>MassActionFluxProcess</classname>.</para>
 	has one or more &Stepper; and &System; statements.  A &System;
         statement can have zero or more &Variable; and &Process; statements.
         There cannot be a &System; statement inside &System;.</para>
+
+	<para>A model must at least have a root sytem (/).
+
+<programlisting>
+System CompartmentSystem( / )
+{
+  ...
+}
+</programlisting>
+
+         The class of the root system is always
+         <classname>CompartmentSystem</classname>, no matter what
+         class you specify.  This is because the simulator creates the
+         root sytem when starts up, before loading a model file. That
+         is, the statement does not actually create a &System; object,
+         but just set property values.  Consequently the class name
+         (in this case, it is also
+         <classname>CompartmentSystem</classname>) is ignored.  This
+         root system statement is always required, even if you have no
+         property to set.
+      </para>
+
+	<para>If the model has more than one &System; objects, it must
+         form a tree which starts from the root system (/).  For
+         example, the following is <emphasis>not</emphasis> a valid &EM;.
+
+<programlisting>
+System CompartmentSystem( / )
+{
+}
+
+System CompartmentSystem( /LIVER/CELL1 )
+{
+}
+</programlisting>
+
+         This is invalid because these two &System; objects are not
+         connected each other, nor form a single tree.
+         Adding another &System;, /LIVER, makes it valid.
+
+<programlisting>
+System CompartmentSystem( / )
+{
+}
+
+System CompartmentSystem( /LIVER )
+{
+}
+
+System CompartmentSystem( /LIVER/CELL1 )
+{
+}
+</programlisting>
+
+         Of course a &System; can have an arbitrary number of sub-systems.
+
+<programlisting>
+System CompartmentSystem( / )
+{
+}
+
+System CompartmentSystem( /LIVER )
+{
+}
+
+System CompartmentSystem( /LIVER/CELL1 )
+{
+}
+
+System CompartmentSystem( /LIVER/CELL2 )
+{
+}
+
+System CompartmentSystem( /LIVER/CELL3 )
+{
+}
+</programlisting>
+
+</para>
+
+	<note>
+	  <title>Planned support for model composition</title>
+	  <para>In future versions, the system will support a model
+             composed of multiple model files (&EM;s or &EML;s).</para>
+	</note>
+
       </sect3>
 
       <sect3>
@@ -612,11 +714,11 @@ as <classname>MassActionFluxProcess</classname>.</para>
         processed by &empy; preprocessor.</para>
 
 	<para>By using &empy;, effectively you can embed any &Python;
-	expressions and statements after '@' inside an &EM; file.  Put
-	a &Python; expression inside '@( python expression )', and the
+	expressions and statements after '@' in an &EM; file.  Put
+	a &Python; expression inside '@( <replaceable>python expression</replaceable> )', and the
 	macro will be replated with an evaluation of the expression.
 	If the expression is very simple, '()' can be ommited. Use '@{
-	pytyon statements }' to embed &Python; statements.  For
+	<replaceable>pytyon statements</replaceable> }' to embed &Python; statements.  For
 	example, the following code:
 
 <programlisting>@(AA='10')

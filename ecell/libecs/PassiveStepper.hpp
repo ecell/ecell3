@@ -28,8 +28,8 @@
 // E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
 
-#ifndef __SLAVESTEPPER_HPP
-#define __SLAVESTEPPER_HPP
+#ifndef __PASSIVESTEPPER_HPP
+#define __PASSIVESTEPPER_HPP
 
 #include "libecs.hpp"
 
@@ -47,7 +47,7 @@ namespace libecs
 
 
   /**
-     SlaveStepper steps only when triggered by incoming interruptions from
+     PassiveStepper steps only when triggered by incoming interruptions from
      other Steppers.
 
      This Stepper never dispatch interruptions to other Steppers.
@@ -57,18 +57,18 @@ namespace libecs
 
   */
 
-  class SlaveStepper
+  class PassiveStepper
     :
     public Stepper
   {
 
   public:
 
-    LIBECS_DM_OBJECT( Stepper, SlaveStepper );
+    LIBECS_DM_OBJECT( Stepper, PassiveStepper );
 
 
-    SlaveStepper();
-    ~SlaveStepper() {}
+    PassiveStepper();
+    ~PassiveStepper() {}
     
     virtual void initialize();
 
@@ -102,7 +102,7 @@ namespace libecs
 
 } // namespace libecs
 
-#endif /* __SLAVESTEPPER_HPP */
+#endif /* __PASSIVESTEPPER_HPP */
 
 
 

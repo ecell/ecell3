@@ -30,7 +30,7 @@ Stepper.cpp\
 DifferentialStepper.cpp\
 DiscreteTimeStepper.cpp\
 DiscreteEventStepper.cpp\
-SlaveStepper.cpp\
+PassiveStepper.cpp\
 VariableProxy.cpp\
 Model.cpp\
 Scheduler.cpp\
@@ -66,7 +66,7 @@ Stepper.hpp\
 DifferentialStepper.hpp\
 DiscreteTimeStepper.hpp\
 DiscreteEventStepper.hpp\
-SlaveStepper.hpp\
+PassiveStepper.hpp\
 VariableProxy.hpp\
 Model.hpp\
 Scheduler.hpp\

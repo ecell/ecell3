@@ -30,14 +30,14 @@
 
 #include "Model.hpp"
 
-#include "SlaveStepper.hpp"
+#include "PassiveStepper.hpp"
 
 
 namespace libecs
 {
 
 
-  SlaveStepper::SlaveStepper()
+  PassiveStepper::PassiveStepper()
   {
     // gcc3 doesn't currently support numeric_limits::infinity.
     // using max() instead.
@@ -46,7 +46,7 @@ namespace libecs
     setStepInterval( anInfinity );
   }
 
-  void SlaveStepper::initialize()
+  void PassiveStepper::initialize()
   {
     Stepper::initialize();
 
