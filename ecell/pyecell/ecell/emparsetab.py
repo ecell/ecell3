@@ -4,9 +4,9 @@
 
 _lr_method = 'SLR'
 
-_lr_signature = '\xda\xf3.-\x00\x1d\xc1\x10\xe2\x1e\xff\x03(\x00y\xef'
+_lr_signature = '(\xf8\x11\xa3\xdaY\x18o o\xaahK\xdbUA'
 
-_lr_action_items = {'LBRACE':([30,50,46,32,8,13,51,1,49,12,19,],[-15,-10,-8,-14,14,-13,-11,9,-9,-12,31,]),'RPAREN':([39,],[46,]),'name':([9,38,16,36,20,42,4,24,31,34,23,3,45,48,33,27,18,15,22,44,26,35,17,14,37,21,40,43,47,25,29,],[23,-25,11,-27,11,23,11,39,23,-26,34,11,-29,-28,34,-18,-21,23,-22,-19,23,34,-24,23,-30,-23,-16,34,-7,-17,-20,]),'SEMI':([35,36,37,45,48,38,34,],[44,-27,-30,-29,-28,-25,-26,]),'Process':([14,31,9,18,22,15,17,44,21,29,47,],[-31,-31,16,-21,-22,16,-24,-19,-23,-20,-7,]),'Stepper':([5,10,2,6,7,41,0,28,],[-2,-1,3,-3,-4,-5,3,-6,]),'System':([5,10,2,6,7,41,0,28,],[-2,-1,4,-3,-4,-5,4,-6,]),'number':([45,48,33,23,34,38,43,35,36,37,],[-29,-28,36,36,-26,-25,36,36,-27,-30,]),'LBRACKET':([48,45,23,37,34,38,43,35,33,36,],[-28,-29,33,-30,-26,-25,33,33,33,-27,]),'LPAREN':([11,],[24,]),'quotedstrings':([46,],[50,]),'Variable':([31,9,14,21,17,29,47,22,44,15,18,],[-31,20,-31,-23,-24,-20,-7,-22,-19,20,-21,]),'RBRACKET':([36,38,43,34,45,37,48,],[-27,-25,48,-26,-29,-30,-28,]),'quotedstring':([43,48,35,34,38,46,45,33,37,23,36,],[38,-28,38,-26,-25,51,-29,38,-30,38,-27,]),'$':([7,28,10,2,5,41,6,],[-4,-6,-1,0,-2,-5,-3,]),'RBRACE':([42,47,9,40,44,27,31,26,21,18,15,22,14,25,29,17,],[47,-7,-31,-16,-19,-18,-31,41,-23,-21,28,-22,-31,-17,-20,-24,]),}
+_lr_action_items = {'LBRACE':([51,14,53,10,43,1,41,15,55,54,27,],[-10,-14,-11,22,-16,11,-17,-15,-13,-12,42,]),'number':([35,19,46,33,20,21,6,31,16,44,17,18,],[-31,-29,-30,19,-32,-27,19,19,19,19,-28,19,]),'$':([7,48,9,2,8,34,12,39,5,],[-5,-6,-4,0,-3,-9,-1,-7,-2,]),'SEMI':([21,19,20,46,35,17,18,44,],[-27,-29,-32,-30,-31,-28,34,50,]),'Process':([52,30,22,40,29,42,23,11,26,50,25,],[-8,-24,-33,-22,-25,-33,24,24,-23,-21,-26,]),'Stepper':([5,39,12,2,48,7,8,0,34,9,],[-2,-7,-1,3,-6,-5,-3,3,-9,-4,]),'System':([2,7,48,8,0,34,9,5,39,12,],[4,-5,-6,-3,4,-9,-4,-2,-7,-1,]),'name':([9,16,42,49,24,34,31,23,0,3,7,48,33,36,18,11,44,26,35,17,2,21,50,25,38,20,4,46,28,37,12,19,52,30,22,40,8,6,32,39,5,47,29,],[-4,17,31,31,13,-9,17,31,6,13,-5,-6,17,-19,17,31,17,-23,-31,-28,6,-27,-21,-26,-20,-32,13,-30,13,31,-1,-29,-8,-24,31,-22,-3,17,45,-7,-2,-18,-25,]),'LBRACKET':([16,35,17,19,44,33,18,6,20,46,31,21,],[16,-31,-28,-29,16,16,16,16,-32,-30,16,-27,]),'LPAREN':([13,],[32,]),'quotedstrings':([51,],[54,]),'Variable':([52,29,22,30,40,23,42,25,50,11,26,],[-8,-25,-33,-24,-22,28,-33,-26,-21,28,-23,]),'RPAREN':([45,],[51,]),'RBRACKET':([21,20,19,17,35,33,46,],[-27,-32,-29,-28,-31,46,-30,]),'quotedstring':([44,51,6,18,17,35,33,31,16,21,46,20,19,],[21,55,21,21,-28,-31,21,21,21,-27,-30,-32,-29,]),'RBRACE':([42,49,26,36,11,50,25,23,38,37,40,30,22,47,29,52,],[-33,52,-23,-19,-33,-21,-26,39,-20,48,-22,-24,-33,-18,-25,-8,]),}
 
 _lr_action = { }
 for _k, _v in _lr_action_items.items():
@@ -14,7 +14,7 @@ for _k, _v in _lr_action_items.items():
        _lr_action[(_x,_k)] = _y
 del _lr_action_items
 
-_lr_goto_items = {'info':([46,],[49,]),'system_object_decl':([2,0,],[1,1,]),'entity_other_stmt':([15,9,],[17,17,]),'property_entity_list':([9,],[15,]),'object_decl':([4,3,16,20,],[13,12,30,32,]),'stmts':([0,],[2,]),'propertylist':([31,14,],[42,26,]),'value':([35,23,43,33,],[45,37,45,37,]),'property_entity':([15,9,],[29,18,]),'stmt':([2,0,],[10,5,]),'valuelist':([33,23,],[43,35,]),'entity_other_object_decl':([15,9,],[19,19,]),'stepper_stmt':([0,2,],[6,6,]),'stepper_object_decl':([2,0,],[8,8,]),'property':([14,15,9,31,42,26,],[25,21,21,25,40,40,]),'empty':([14,31,9,],[27,27,22,]),'system_stmt':([2,0,],[7,7,]),}
+_lr_goto_items = {'info':([51,],[53,]),'system_object_decl':([2,0,],[1,1,]),'entity_other_stmt':([11,23,],[25,25,]),'property_entity_list':([11,],[23,]),'object_decl':([4,24,28,3,],[15,41,43,14,]),'stmts':([0,],[2,]),'propertylist':([42,22,],[49,37,]),'value':([18,44,6,31,16,33,],[35,35,20,20,20,35,]),'ecs':([2,0,],[7,7,]),'stmt':([2,0,],[12,5,]),'valuelist':([31,6,16,],[44,18,33,]),'entity_other_object_decl':([11,23,],[27,27,]),'stepper_stmt':([0,2,],[8,8,]),'property_entity':([23,11,],[40,26,]),'stepper_object_decl':([2,0,],[10,10,]),'property':([11,22,49,37,42,23,],[29,36,47,47,36,29,]),'empty':([22,11,42,],[38,30,38,]),'system_stmt':([2,0,],[9,9,]),}
 
 _lr_goto = { }
 for _k, _v in _lr_goto_items.items():
@@ -23,35 +23,37 @@ for _k, _v in _lr_goto_items.items():
 del _lr_goto_items
 _lr_productions = [
   ("S'",1,None,None,None),
-  ('stmts',2,'p_stmts','./emparser.py',175),
-  ('stmts',1,'p_stmts','./emparser.py',176),
-  ('stmt',1,'p_stmt','./emparser.py',183),
-  ('stmt',1,'p_stmt','./emparser.py',184),
-  ('stepper_stmt',4,'p_stepper_stmt','./emparser.py',190),
-  ('system_stmt',4,'p_system_stmt','./emparser.py',196),
-  ('entity_other_stmt',4,'p_entity_other_stmt','./emparser.py',202),
-  ('object_decl',4,'p_object_decl','./emparser.py',210),
-  ('object_decl',5,'p_object_decl','./emparser.py',211),
-  ('info',1,'p_info','./emparser.py',220),
+  ('stmts',2,'p_stmts','./emparser.py',158),
+  ('stmts',1,'p_stmts','./emparser.py',159),
+  ('stmt',1,'p_stmt','./emparser.py',166),
+  ('stmt',1,'p_stmt','./emparser.py',167),
+  ('stmt',1,'p_stmt','./emparser.py',168),
+  ('stepper_stmt',4,'p_stepper_stmt','./emparser.py',174),
+  ('system_stmt',4,'p_system_stmt','./emparser.py',180),
+  ('entity_other_stmt',4,'p_entity_other_stmt','./emparser.py',186),
+  ('ecs',3,'p_ecs','./emparser.py',193),
+  ('object_decl',4,'p_object_decl','./emparser.py',211),
+  ('object_decl',5,'p_object_decl','./emparser.py',212),
   ('info',1,'p_info','./emparser.py',221),
-  ('stepper_object_decl',2,'p_stepper_object_decl','./emparser.py',227),
-  ('system_object_decl',2,'p_system_object_decl','./emparser.py',240),
-  ('entity_other_object_decl',2,'p_entity_other_object_decl','./emparser.py',254),
+  ('info',1,'p_info','./emparser.py',222),
+  ('stepper_object_decl',2,'p_stepper_object_decl','./emparser.py',228),
+  ('system_object_decl',2,'p_system_object_decl','./emparser.py',241),
   ('entity_other_object_decl',2,'p_entity_other_object_decl','./emparser.py',255),
-  ('propertylist',2,'p_propertylist','./emparser.py',271),
-  ('propertylist',1,'p_propertylist','./emparser.py',272),
+  ('entity_other_object_decl',2,'p_entity_other_object_decl','./emparser.py',256),
+  ('propertylist',2,'p_propertylist','./emparser.py',272),
   ('propertylist',1,'p_propertylist','./emparser.py',273),
-  ('property',3,'p_property','./emparser.py',279),
-  ('property_entity_list',2,'p_property_entity_list','./emparser.py',295),
-  ('property_entity_list',1,'p_property_entity_list','./emparser.py',296),
+  ('propertylist',1,'p_propertylist','./emparser.py',274),
+  ('property',3,'p_property','./emparser.py',280),
+  ('property_entity_list',2,'p_property_entity_list','./emparser.py',296),
   ('property_entity_list',1,'p_property_entity_list','./emparser.py',297),
-  ('property_entity',1,'p_property_entity','./emparser.py',304),
+  ('property_entity_list',1,'p_property_entity_list','./emparser.py',298),
   ('property_entity',1,'p_property_entity','./emparser.py',305),
-  ('value',1,'p_value','./emparser.py',313),
+  ('property_entity',1,'p_property_entity','./emparser.py',306),
   ('value',1,'p_value','./emparser.py',314),
   ('value',1,'p_value','./emparser.py',315),
-  ('value',3,'p_value','./emparser.py',316),
-  ('valuelist',2,'p_valuelist','./emparser.py',325),
-  ('valuelist',1,'p_valuelist','./emparser.py',326),
-  ('empty',0,'p_empty','./emparser.py',345),
+  ('value',1,'p_value','./emparser.py',316),
+  ('value',3,'p_value','./emparser.py',317),
+  ('valuelist',2,'p_valuelist','./emparser.py',326),
+  ('valuelist',1,'p_valuelist','./emparser.py',327),
+  ('empty',0,'p_empty','./emparser.py',333),
 ]
