@@ -166,8 +166,8 @@ precedence = (
 
 def p_stmts(t):
 	'''
-        stmts : stmt stmts
-
+        stmts : stmts stmt
+	      | stmt
         '''
 	t[0] = createList( 'stmts', t)
 
@@ -244,13 +244,12 @@ def p_entity_other_object_decl (t):
 # property
 
 def p_propertylist(t):
-    '''
-    propertylist : property propertylist
-                 | property
-                 | empty
-    '''
-
-    t[0] = createList( 'propertylist', t )
+	'''
+	propertylist : propertylist property
+	             | property
+                     | empty
+        '''
+	t[0] = createList( 'propertylist', t )
 
 def p_property(t):
 	'''
@@ -269,7 +268,7 @@ def p_property(t):
 
 def p_property_entity_list(t):
 	'''
-        property_entity_list : property_entity property_entity_list
+        property_entity_list : property_entity_list property_entity
                              | property_entity
                              | empty
         '''
@@ -296,7 +295,7 @@ def p_value(t):
         
 def p_valuelist(t):
         '''
-        valuelist : value valuelist
+        valuelist : valuelist value
                   | value
         '''
 	t[0] =  createList( 'valuelist', t )
@@ -309,7 +308,7 @@ def p_matrix(t):
 	
 def p_matrixlist(t):
         '''
-        matrixlist : matrix matrixlist
+        matrixlist : matrixlist matrix
                    | matrix
         '''
 	t[0] =  createList( 'matrixlist', t )
@@ -321,7 +320,7 @@ def p_empty(t):
 	t[0] = None
 
 def p_error(t):
-	print "Syntax error at line %d in %s. (near '%s')" % ( t.lineno, t.value )
+	print "Syntax error at line %d in %s. " % ( t.lineno, t.value )
 	yacc.errok()
 	
 # Constract List
