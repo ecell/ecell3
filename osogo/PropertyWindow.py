@@ -28,61 +28,63 @@ class Window:
 
 class MainWindow(Window):
 
+
     def __init__( self, gladefile ):
 
         self.theHandlerMap = {
             }
         
         Window.__init__( self, gladefile )
-
+        
         self.addHandlers( self.theHandlerMap)
-         
+        
         self.thePropertyClist = self.getWidget( "clist1" )
-        self.thePropertyListA = self.getWidget( "list7" )
+        self.thePropertyListA = self.getWidget( "entry2" )
         self.thePropertyListB = self.getWidget( "list8" )
         self.thePropertyListC = self.getWidget( "list9" )
+
+
         
         #    def setName( self ):
         #        MainWindow.thePropertyEntity.set_text('EntytyName')
         #    setName( self )
-
-
-    FQPPList = ['MichaMen','/CELL/CYTOPLASM','MichaelisMentenReactor']
+        
 
               
     def update( self ):
         aPropertyList = list( tmpget( 'PropertyList' ) )
-#        aFQPP = list( FQPP )
+        #        aFQPP = list( FQPP )
         
         # remove keyword
         aPropertyList = aPropertyList[1:] 
         # remove PropertyList itself
         aPropertyList.remove( 'PropertyList' )
-
+        
         self.thePropertyClist.clear()
-#        self.thePropertyListA.clear()
-#        self.thePropertyListB.clear()
-#        self.thePropertyListC.clear()
+        #        self.thePropertyListA.clear()
+        #        self.thePropertyListB.clear()
+        #        self.thePropertyListC.clear()
 
-#        for y in FQPPList:
-#            FQPPList = map( toString, FQPPList)
-#            print FQPPList
-            
-#        print FQPPList[0]
-
-         self.thePropertyListA.append( FQPPList[0] )
-#        self.thePropertyListB.append( FQPPdic[1] )
-#        self.thePropertyListC.append( FQPPdic[2] )
-
+        
+        #        print FQPPList[0]
+        asan = getFQPP()
+        self.thePropertyListA.set_text(asan[0])
+        #print asan[1]
+        #        self.thePropertyListA.append( asan[0] )
+        #        self.thePropertyListB.append( FQPPdic[1] )
+        #        self.thePropertyListC.append( FQPPdic[2] )
+        
         for x in aPropertyList:
             aValueList = tmpget( x )
             #            aName = aValueList[0]
             #            aValueList = aValueList[1:]
             aValueList = map( toString, aValueList )
-
+            
             self.thePropertyClist.append( aValueList )
-#            print aValueList
 
+            
+            #            print aValueList
+            
 
 def toString( object ):
     return str( object )
@@ -102,8 +104,11 @@ def main():
     mainLoop()
     
 testdic={ 'PropertyList': ('PropertyList', 'A','B','C'),
-          'A': ('aaa', ) ,'B': (1.04E-3, ) ,'C': (41, ) }
+          'A': ('aaa', ) ,'B': (1.04E-3, ) ,'C': (41, )} 
+FQPPList = ['MichaMen','/CELL/CYTOPLASM','MichaelisMentenReactor']
 
+def getFQPP():
+    return FQPPList
 def tmpget( name ):
     aList = list(testdic[name])
     aList.insert( 0, name )
@@ -112,3 +117,5 @@ def tmpget( name ):
 if __name__ == "__main__":
 
     main()
+
+
