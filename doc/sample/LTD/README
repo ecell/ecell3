@@ -55,13 +55,7 @@ LTD.em:     Model file(em file) for this model
 
    Run ecell3-dmc for each .cpp file.
 
-   % ecell3-dmc ...cpp
-
-   Or, to do this job at once,
-
-   (at bash prompt,)
-   % for i in *.cpp ; do ecell3-dmc $i ; done
-   
+   % ecell3-dmc *.cpp
 
 3. Run gecell, File->loadModel and load the LTD.eml file.
 

@@ -1036,8 +1036,12 @@ System CompartmentSystem( /CELL/CYTOPLASM )
 	{
 		Name	add;
 		StepperID DT_1;	
-		add	0.000000012;
-		VariableReferenceList	[ S0 Variable:.:NO] [ P0 Variable:.:NO 1 ];
+
+		Impulse	0.000000012;
+		Interval 1;
+		Duration 300.0;
+
+		VariableReferenceList	[ P0 Variable:.:NO 1 ];
 	}
 
 
@@ -1045,30 +1049,49 @@ System CompartmentSystem( /CELL/CYTOPLASM )
 	{
 		Name	addCa;
 		StepperID DT_1;	
-		add	0.00000055;
-		VariableReferenceList	[ S0 Variable:.:Ca] [ P0 Variable:.:Ca 1 ];
+
+		Impulse	0.00000055;
+		Interval 1;
+		Duration 300.0;
+
+		VariableReferenceList	[ P0 Variable:.:Ca 1 ];
 	}
 
 	Process MakesignalPProcess( ADDGlu )
 	{
 		Name	addGlu;
 		StepperID DT_1;	
-		add	0.0000012;
-		VariableReferenceList	[ S0 Variable:.:Glu] [ P0 Variable:.:Glu 1 ];
+
+		Impulse	0.0000012;
+		Interval 1;
+		Duration 300.0;
+	
+		VariableReferenceList	[ P0 Variable:.:Glu 1 ];
 	}
 	
-	Process PKCactivePProcess( PKC_PKCactive )
+	Process PythonProcess( PKC_PKCactive )
 	{
 		Name	PKC_PKC_active;
-		StepperID PASSIVE_1;	
-		VariableReferenceList	[ S0 Variable:.:Ca_DAG_PKC] [ S1 Variable:.:DAG_AA_PKC] [ S2 Variable:.:AA_PKC] [ S3 Variable:.:Ca_AA_PKC] [ P0 Variable:.:PKCactive 1 ];
+		StepperID PASSIVE_1;
+
+		ProcessMethod "P0.Value = R0.Value + R1.Value + R2.Value + R3.Value";	
+		VariableReferenceList	[ R0 Variable:.:Ca_DAG_PKC 0 ] 
+					[ R1 Variable:.:DAG_AA_PKC 0 ] 
+					[ R2 Variable:.:AA_PKC 0 ] 
+					[ R3 Variable:.:Ca_AA_PKC 0 ] 
+					[ P0 Variable:.:PKCactive 1 ];
 	}
 	
-	Process MAPPProcess( MAPact )
+	Process PythonProcess( MAPact )
 	{
 		Name	MAPact;
 		StepperID PASSIVE_1;	
-		VariableReferenceList	[ S0 Variable:.:MAPK_P] [ S1 Variable:.:MAPK_PP] [ P0 Variable:.:MAPKactive 1 ];
+
+		ProcessMethod "P0.Value = R0.Value + R1.Value";
+
+		VariableReferenceList	[ R0 Variable:.:MAPK_P 0 ] 
+					[ R1 Variable:.:MAPK_PP 0 ]
+					[ P0 Variable:.:MAPKactive 1 ];
 	}
 	
 	

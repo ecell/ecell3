@@ -24,51 +24,69 @@ ECELL3_DM_CLASS
  public:
   
   ECELL3_DM_CLASSNAME()
+    :
+    Impulse( 0.0 ),
+    Interval( 1.0 ),
+    Duration( 0.0 ),
+    DecayFactor( 10.0 )
     {
-      ECELL3_CREATE_PROPERTYSLOT_SET_GET( Real, add );
+      ECELL3_CREATE_PROPERTYSLOT_SET_GET( Real, Impulse );
+      ECELL3_CREATE_PROPERTYSLOT_SET_GET( Real, Interval );
+      ECELL3_CREATE_PROPERTYSLOT_SET_GET( Real, Duration );
+      ECELL3_CREATE_PROPERTYSLOT_SET_GET( Real, DecayFactor );
     }
   
-  SIMPLE_SET_GET_METHOD( Real, add );
+  SIMPLE_SET_GET_METHOD( Real, Impulse );
+  SIMPLE_SET_GET_METHOD( Real, Interval );
+  SIMPLE_SET_GET_METHOD( Real, Duration );
+  SIMPLE_SET_GET_METHOD( Real, DecayFactor );
   
   void initialize()
     {
       Process::initialize();
       P0 = getVariableReference( "P0" );
-      i = 0;
-      k = 0;
     }
 
   void process()
   {
-    Real p0( P0.getValue() );
-    
-    i += 1;
-    
-    if( k < 30000)
+    if( theLastTime < 0.0 )
       {
-	Int ii( i % 10 );
-	if( ii == 0 )
-	  {
-	    p0 = add * getSuperSystem()->getSizeN_A();
-	    k = k + 1;
-	  }
-	else
-	  {
-	    p0 = add * getSuperSystem()->getSizeN_A() / (2 * ii);
-	  }
+	return;
       }
-    else
+
+    Real aCurrentTime( getStepper()->getCurrentTime() );
+
+    Real aNextTime( theLastTime + Interval );
+    
+    if( aNextTime >= Duration )
       {
-	p0 = 0.00000000000000000001 * getSuperSystem()->getSizeN_A();
+	theLastTime = -1;
+
+	P0.setValue( 1e-20 * getSuperSystem()->getSizeN_A() );
+	return;
       }					
-    P0.setValue(p0);
+
+
+    Real aTimeDifference( aCurrentTime - theLastTime );
+    Real aDecay( aTimeDifference * DecayFactor / Interval );
+    
+    P0.setValue( Impulse * getSuperSystem()->getSizeN_A() 
+		 / ( aDecay + 1 ) );
+    
+    if( aTimeDifference >= Interval )
+      {
+	theLastTime += Interval;
+      }
   }
   
  protected:
 
-  Real add;
-  Int i;
-  Int k;
+  Real theLastTime;
+
+  Real Impulse;
+  Real Interval;
+  Real Duration;
+  Real DecayFactor;
   
   VariableReference P0;  
   
