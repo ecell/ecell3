@@ -45,10 +45,11 @@ namespace libemc
   LocalSimulatorImplementation::LocalSimulatorImplementation()
     :
     theRootSystem( *new RootSystem ),
-    theLoggerBroker( *new LoggerBroker( theRootSystem ) )
+    theLoggerBroker( *new LoggerBroker( theRootSystem ) ),
+    thePendingEventChecker( defaultPendingEventChecker ),
+    theEventHandler( NULL )
   {
-    thePendingEventChecker = PendingEventChecker;
-    theEventHandler = NULL;
+    ; // do nothing
   }
 
   LocalSimulatorImplementation::~LocalSimulatorImplementation()
@@ -56,7 +57,6 @@ namespace libemc
     delete &theRootSystem;
     delete &theLoggerBroker;
   }
-
 
   void LocalSimulatorImplementation::createEntity( StringCref    classname, 
 						   PrimitiveType type,
@@ -78,7 +78,7 @@ namespace libemc
     EntityPtr anEntityPtr( getRootSystem().getEntity( FullID( type, 
 							      systempath, 
 							      id ) ) );
-    // this new must not cause memory leak since Message will get it as RCPtr
+    // this new does not cause memory leak since Message will get it as a RCPtr
     anEntityPtr->set( Message( property, new UConstantVector( data ) ) );
   }
 
@@ -139,20 +139,29 @@ namespace libemc
     theRunningFlag = false;
   }
 
-  void LocalSimulatorImplementation::setPendingEventChecker( PendingEventCheckerFuncPtr aPendingEventChecker )
+  void LocalSimulatorImplementation::
+  setPendingEventChecker( PendingEventCheckerFuncPtr aPendingEventChecker )
   {
     thePendingEventChecker = aPendingEventChecker;
   }
 
-  void LocalSimulatorImplementation::setEventHandler( EventHandlerFuncPtr anEventHandler )
+  void LocalSimulatorImplementation::
+  setEventHandler( EventHandlerFuncPtr anEventHandler )
   {
     theEventHandler = anEventHandler;
   }
 
-  bool LocalSimulatorImplementation::PendingEventChecker()
+  void LocalSimulatorImplementation::clearPendingEventChecker()
+  {
+    thePendingEventChecker = defaultPendingEventChecker;
+  }
+
+  bool LocalSimulatorImplementation::defaultPendingEventChecker()
   {
     return false;
   }
+
+
 
 } // namespace libemc,
 

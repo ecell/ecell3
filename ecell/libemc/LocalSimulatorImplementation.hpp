@@ -50,14 +50,19 @@ namespace libemc
     LocalSimulatorImplementation();
     virtual ~LocalSimulatorImplementation();
 
-    libecs::RootSystemRef   getRootSystem() { return theRootSystem; }
-    libecs::LoggerBrokerRef getLoggerBroker() { return theLoggerBroker; }
+    libecs::RootSystemRef   getRootSystem() 
+    { 
+      return theRootSystem; 
+    }
 
+    libecs::LoggerBrokerRef getLoggerBroker()
+    { 
+      return theLoggerBroker; 
+    }
 
     virtual void createEntity( libecs::StringCref    classname, 
 			       libecs::PrimitiveType type,
 			       libecs::StringCref    systempath,
-
 			       libecs::StringCref    id,
 			       libecs::StringCref    name );
 
@@ -86,12 +91,19 @@ namespace libemc
 
     virtual void stop();
 
-    virtual void setPendingEventChecker( PendingEventCheckerFuncPtr aPendingEventChecker );
+    virtual void setPendingEventChecker( PendingEventCheckerFuncPtr
+					 aPendingEventChecker );
+
+    void clearPendingEventChecker();
 
     virtual void setEventHandler( EventHandlerFuncPtr anEventHandler );
 
   private:
-    static bool PendingEventChecker();
+
+    static bool defaultPendingEventChecker();
+
+  private:
+
     libecs::RootSystemRef      theRootSystem;
     libecs::LoggerBrokerRef    theLoggerBroker;
     bool                       theRunningFlag;
