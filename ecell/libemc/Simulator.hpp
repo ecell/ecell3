@@ -29,19 +29,16 @@
 //
 
 
-#ifndef ___SIMULATOR_H___
-#define ___SIMULATOR_H___
+#ifndef __SIMULATOR_HPP
+#define __SIMULATOR_HPP
 
-#include "libecs.hpp"
-#include "Message.hpp"
+#include "libecs/libecs.hpp"
+#include "libecs/Message.hpp"
 
 #include "SimulatorImplementation.hpp"
 
 namespace libemc
 {
-
-
-  using namespace libecs;
 
   class Simulator
   {
@@ -51,22 +48,22 @@ namespace libemc
     Simulator();
     virtual ~Simulator() {}
 
-    void createEntity( StringCref classname, 
-		       FQPICref fqpi,
-		       StringCref name )
+    void createEntity( libecs::StringCref classname, 
+		       libecs::FQPICref   fqpi,
+		       libecs::StringCref name )
     {
       theSimulatorImplementation->createEntity( classname, fqpi, name );
     }
 
-    void setProperty( FQPICref fqpi, 
-		      MessageCref message )
+    void setProperty( libecs::FQPICref    fqpi, 
+		      libecs::MessageCref message )
     {
       theSimulatorImplementation->setProperty( fqpi, message );
     }
 
 
-    const Message getProperty( FQPICref fqpi, 
-			       StringCref propertyName )
+    const libecs::Message getProperty( libecs::FQPICref   fqpi, 
+				       libecs::StringCref propertyName )
     {
       return theSimulatorImplementation->getProperty( fqpi, propertyName ); 
     }
@@ -90,7 +87,7 @@ namespace libemc
 
 } // namespace libemc
 
-#endif   /* ___SIMULATOR_H___ */
+#endif   /* __SIMULATOR_HPP */
 
 
 

@@ -31,11 +31,14 @@
 
 #include <string>
 
-#include "libecs.hpp"
-#include "FQPI.hpp"
-#include "Message.hpp"
+#include "libecs/libecs.hpp"
+#include "libecs/FQPI.hpp"
+#include "libecs/Message.hpp"
 
 #include "PySimulator.hpp"
+
+using namespace libemc;
+using namespace libecs;
 
 #define ECS_TRY try {
 

@@ -29,16 +29,14 @@
 //
 
 
-#ifndef ___SIMULATORMAKER_H___
-#define ___SIMULATORMAKER_H___
-#include "Simulator.h"
-#include "ModuleMaker.h"
+#ifndef __SIMULATORMAKER_HPP
+#define __SIMULATORMAKER_HPP
+#include "Simulator.hpp"
+//FIXME: should be dmtool/ModuleMaker.hpp
+#include "ModuleMaker.hpp"
 
 namespace libemc
 {
-
-  using namespace libecs;
-
 
   class SimulatorMaker : public SharedModuleMaker<Simulator>
   {
@@ -49,8 +47,8 @@ namespace libemc
   public:
 
     SimulatorMaker();
-    Simulator* make(const string& classname) throw(CantInstantiate);
-    void install(const string& systementry);
+    Simulator* make( libecs::StringCref classname );
+    void install( libecs::StringCref systementry );
 
     virtual const char* const className() const {return "SimulatorMaker";}
   };
@@ -59,5 +57,5 @@ namespace libemc
 
 } // namespace libemc
 
-#endif /* ___SIMULATORMAKER_H___ */
+#endif /* __SIMULATORMAKER_HPP */
 

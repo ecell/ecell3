@@ -30,10 +30,9 @@
 
 #include <iostream>
 
-#include "Simulator.hpp"
+#include "emc/Simulator.hpp"
 
 #include "PySimulator.hpp"
-
 #include "PyEcs.hpp"
 
 //-----------------//

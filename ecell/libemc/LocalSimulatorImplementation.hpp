@@ -29,10 +29,10 @@
 //
 
 
-#ifndef ___LOCAL_SIMULATOR_IMPLEMENTATION_H___
-#define ___LOCAL_SIMULATOR_IMPLEMENTATION_H___
+#ifndef __LOCALSIMULATORIMPLEMENTATION_HPP
+#define __LOCALSIMULATORIMPLEMENTATION_HPP
 
-#include "libecs.hpp"
+#include "libecs/libecs.hpp"
 
 #include "SimulatorImplementation.hpp"
 
@@ -49,16 +49,17 @@ namespace libemc
     LocalSimulatorImplementation();
     virtual ~LocalSimulatorImplementation();
 
-    RootSystemRef getRootSystem() { return theRootSystem; }
+    libecs::RootSystemRef getRootSystem() { return theRootSystem; }
 
-    void createEntity( StringCref classname, 
-		       FQPICref fqpi, 
-		       StringCref name );
+    void createEntity( libecs::StringCref classname, 
+		       libecs::FQPICref fqpi, 
+		       libecs::StringCref name );
 
-    void setProperty( FQPICref fqpi, 
-		      MessageCref message );
+    void setProperty( libecs::FQPICref fqpi, 
+		      libecs::MessageCref message );
 
-    const Message getProperty( FQPICref fqpi, StringCref propertyName );
+    const libecs::Message getProperty( libecs::FQPICref fqpi,
+				       libecs::StringCref propertyName );
 
     void step();
 
@@ -66,12 +67,12 @@ namespace libemc
 
   private:
 
-    RootSystemRef     theRootSystem;
+    libecs::RootSystemRef     theRootSystem;
 
-  };   //end of class LocalSimulatorImplementation
+  };  
 
 
 } // namespace libemc
 
 
-#endif   /* ___LOCAL_SIMULATOR_IMPLEMENTATION_H___ */
+#endif   /* __LOCALSIMULATORIMPLEMENTATION_HPP */

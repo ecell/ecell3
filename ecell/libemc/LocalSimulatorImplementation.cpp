@@ -29,18 +29,21 @@
 //
 
 
-#include "Message.hpp"
-#include "FQPI.hpp"
-#include "RootSystem.hpp"
-#include "SubstanceMaker.hpp"
-#include "ReactorMaker.hpp"
-#include "SystemMaker.hpp"
-#include "Stepper.hpp"
+#include "libecs/libecs.hpp"
+#include "libecs/Message.hpp"
+#include "libecs/FQPI.hpp"
+#include "libecs/RootSystem.hpp"
+#include "libecs/SubstanceMaker.hpp"
+#include "libecs/ReactorMaker.hpp"
+#include "libecs/SystemMaker.hpp"
+#include "libecs/Stepper.hpp"
 
 #include "LocalSimulatorImplementation.hpp"
 
 namespace libemc
 {
+
+  using namespace libecs;
 
   LocalSimulatorImplementation::LocalSimulatorImplementation()
     :

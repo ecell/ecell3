@@ -29,15 +29,13 @@
 //
 
 
-#ifndef ___SIMULATOR_IMPLEMENTATION_H___
-#define ___SIMULATOR_IMPLEMENTATION_H___
+#ifndef __SIMULATORIMPLEMENTATION_HPP
+#define __SIMULATORIMPLEMENTATION_HPP
 
-#include "libecs.hpp"
+#include "libecs/libecs.hpp"
 
 namespace libemc
 {
-
-  using namespace libecs;
 
   /**
      Pure virtual base class (interface definition) of simulator
@@ -52,17 +50,19 @@ namespace libemc
     SimulatorImplementation() {}
     virtual ~SimulatorImplementation() {}
 
-    virtual RootSystemRef getRootSystem() = 0;
+    virtual libecs::RootSystemRef getRootSystem() = 0;
 
-    virtual void createEntity( StringCref classname, 
-			       FQPICref fqpi, 
-			       StringCref name ) = 0;
+    virtual void createEntity( libecs::StringCref classname, 
+			       libecs::FQPICref   fqpi, 
+			       libecs::StringCref name ) = 0;
 
-    virtual void setProperty( FQPICref fqpi, 
-			      MessageCref message ) = 0;
+    virtual void setProperty( libecs::FQPICref    fqpi, 
+			      libecs::MessageCref message ) = 0;
 
-    virtual const Message getProperty( FQPICref fqpi, 
-				       StringCref propertyName ) = 0;
+    virtual const libecs::Message 
+    getProperty( libecs::FQPICref   fqpi, 
+		 libecs::StringCref propertyName ) = 0;
+
     virtual void step() = 0;
 
     virtual void initialize() = 0;

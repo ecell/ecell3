@@ -32,14 +32,13 @@
 #if !defined( __EMC_LOGGER_HPP )
 #define __EMC_LOGGER_HPP
 
-#include "libecs.hpp"
+#include "libecs/libecs.hpp"
+#include "libecs/Logger.hpp"
 #include "LoggerImplementation.hpp"
 #include "LocalLoggerImplementation.hpp"
 
 namespace libemc
 {
-
-  using namespace libecs;
 
   class EmcLogger
   {
@@ -54,19 +53,19 @@ namespace libemc
     EmcLogger( MessageSlotObject );
     virtual ~EmcLogger( ) { }
 
-    Logger::DataPointVectorCref
+    libecs::Logger::DataPointVectorCref
     getData( void ) const
     {
       return theLoggerImplementation->getData();
     }
 
-    Logger::DataPointVectorCref
+    libecs::Logger::DataPointVectorCref
     getData( libecs::RealCref start, libecs::RealCref end ) const
     {
       return theLoggerImplementation->getData( start, end );
     }
 
-    Logger::DataPointVectorCref
+    libecs::Logger::DataPointVectorCref
     getData( libecs::RealCref start, libecs::RealCref end, libecs::RealCref interval ) const
     {
       return theLoggerImplementation->getData( start, end, interval );
@@ -74,7 +73,8 @@ namespace libemc
 
     void setMessageCallback( MessageSlotObject aMessageCallback )
     {
-      theLoggerImplementation = new LocalLoggerImplementation( aMessageCallback );
+      theLoggerImplementation = 
+	new LocalLoggerImplementation( aMessageCallback );
     }
 
     void update( void )
@@ -82,13 +82,14 @@ namespace libemc
       theLoggerImplementation->update();
     }
 
-    void update( Logger::containee_type& datapoint )
+    void update( libecs::Logger::containee_type& datapoint )
     {
       theLoggerImplementation->update( datapoint );
     }
  
 
   private:
+
     LoggerImplementation* theLoggerImplementation;
 
   };

@@ -29,13 +29,11 @@
 //
 
 
-#ifndef ___PY_SIMULATOR_H___
-#define ___PY_SIMULATOR_H___
+#ifndef __PYSIMULATOR_HPP
+#define __PYSIMULATOR_HPP
 
-#include "Simulator.hpp"
+#include "emc/Simulator.hpp"
 #include "CXX/Extensions.hxx"
-
-using namespace libemc;
 
 using Py::Object;
 using Py::Tuple;
@@ -44,7 +42,7 @@ using Py::PythonExtension;
 class PySimulator 
   :
   public PythonExtension< PySimulator >,
-  public Simulator
+  public libemc::Simulator
 {
 public:
   
@@ -61,7 +59,7 @@ public:
 
 };
 
-#endif   /* ___PY_SIMULATOR_H___ */
+#endif   /* __PYSIMULATOR_HPP */
 
 
 

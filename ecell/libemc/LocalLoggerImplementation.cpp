@@ -28,14 +28,17 @@
 // E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
 
+#include "libecs/MessageInterface.hpp"
 
 #include "LocalLoggerImplementation.hpp"
-#include "MessageInterface.hpp"
 
 namespace libemc
 {
 
-  LocalLoggerImplementation::LocalLoggerImplementation( MessageSlotObject aMessageCallbackCptr )
+  using namespace libecs;
+
+  LocalLoggerImplementation::
+  LocalLoggerImplementation( MessageSlotObject aMessageCallbackCptr )
     :
     theLogger( Logger( aMessageCallbackCptr ) ) 
   {
