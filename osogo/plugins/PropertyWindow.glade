@@ -272,7 +272,6 @@
       <widget>
 	<class>GtkScrolledWindow</class>
 	<name>scrolledwindow1</name>
-	<height>257</height>
 	<hscrollbar_policy>GTK_POLICY_ALWAYS</hscrollbar_policy>
 	<vscrollbar_policy>GTK_POLICY_ALWAYS</vscrollbar_policy>
 	<hupdate_policy>GTK_UPDATE_CONTINUOUS</hupdate_policy>
@@ -287,13 +286,8 @@
 	  <class>GtkCList</class>
 	  <name>clist1</name>
 	  <can_focus>True</can_focus>
-	  <signal>
-	    <name>select_row</name>
-	    <handler>input_row_pressed</handler>
-	    <last_modification_time>Tue, 14 Aug 2001 08:24:36 GMT</last_modification_time>
-	  </signal>
-	  <columns>3</columns>
-	  <column_widths>102,17,36</column_widths>
+	  <columns>4</columns>
+	  <column_widths>126,15,241,80</column_widths>
 	  <selection_mode>GTK_SELECTION_SINGLE</selection_mode>
 	  <show_titles>True</show_titles>
 	  <shadow_type>GTK_SHADOW_IN</shadow_type>
@@ -301,7 +295,7 @@
 	  <widget>
 	    <class>GtkLabel</class>
 	    <child_name>CList:title</child_name>
-	    <name>label22</name>
+	    <name>label41</name>
 	    <label>Property</label>
 	    <justify>GTK_JUSTIFY_CENTER</justify>
 	    <wrap>False</wrap>
@@ -314,7 +308,7 @@
 	  <widget>
 	    <class>GtkLabel</class>
 	    <child_name>CList:title</child_name>
-	    <name>label23</name>
+	    <name>label42</name>
 	    <label>n</label>
 	    <justify>GTK_JUSTIFY_CENTER</justify>
 	    <wrap>False</wrap>
@@ -327,8 +321,21 @@
 	  <widget>
 	    <class>GtkLabel</class>
 	    <child_name>CList:title</child_name>
-	    <name>label24</name>
+	    <name>label43</name>
 	    <label>Value</label>
+	    <justify>GTK_JUSTIFY_CENTER</justify>
+	    <wrap>False</wrap>
+	    <xalign>0.5</xalign>
+	    <yalign>0.5</yalign>
+	    <xpad>0</xpad>
+	    <ypad>0</ypad>
+	  </widget>
+
+	  <widget>
+	    <class>GtkLabel</class>
+	    <child_name>CList:title</child_name>
+	    <name>label44</name>
+	    <label>Attribute</label>
 	    <justify>GTK_JUSTIFY_CENTER</justify>
 	    <wrap>False</wrap>
 	    <xalign>0.5</xalign>
