@@ -6,7 +6,6 @@
 import string
 
 
-'''
 def createFullID( fullidstring ):
 
     aFullID = string.split( fullidstring, ':' )
@@ -85,7 +84,6 @@ def createSystemPathFromFullID( aSystemFullID ):
         aNewSystemPath = aSystemFullID[SYSTEMPATH] + '/' +\
                          aSystemFullID[ID]
     return aNewSystemPath
-'''
 
 
 
