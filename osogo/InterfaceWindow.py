@@ -56,7 +56,10 @@ class InterfaceWindow( OsogoWindow ):
 	# -------------------------------------------------------------
 	def update( self ):
 	
-		aModel = self.theInterfaceListWidget.get_model()
+		try:
+			aModel = self.theInterfaceListWidget.get_model()
+		except:
+			return None
 
 		#		if self.theExist != 0:
 		if aModel != None:
@@ -82,8 +85,8 @@ class InterfaceWindow( OsogoWindow ):
 
 
 	# -------------------------------------------------------------
-	# update
-	#    - update CList
+	# editTitle
+	#    - edit title of plugin window
 	#
 	# return -> None
 	# This method is throwable exception

@@ -154,7 +154,7 @@ class MainWindow(OsogoWindow):
 		# creates InterfaceWindow
 		# -------------------------------------
 		self.theInterfaceWindow = InterfaceWindow.InterfaceWindow( self )
-		self.theInterfaceWindow.openWindow()
+		#self.theInterfaceWindow.openWindow()
 
 		# -------------------------------------
 		# creates PluginManager
