@@ -206,7 +206,7 @@ namespace libecs
 
   }
 
-  VariableReference Process::getVariableReference( StringCref 
+  VariableReferenceCref Process::getVariableReference( StringCref 
 						   aVariableReferenceName )
   {
     VariableReferenceVectorConstIterator 
