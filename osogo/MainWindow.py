@@ -27,6 +27,8 @@ class MainWindow(Window):
 
         self.theUpdateInterval = 100
         self.theStepSize = 1
+        self.theStepType = 0
+        # 0: sec   1: step
 
         Window.__init__( self )
 
@@ -47,6 +49,7 @@ class MainWindow(Window):
               'stop_button_clicked'      : self.stopSimulation ,
               'step_button_clicked'      : self.stepSimulation ,
               'input_step_size'          : self.setStepSize ,
+              'step_sec_toggled'         : self.changeStepType ,
               'entry_button_clicked'     : self.createNewEntryList ,
               'logger_button_clicked'    : self.createNewLoggerList ,
               'palette_togglebutton_toggled'   : self.togglePaletteWindow ,
@@ -125,33 +128,39 @@ class MainWindow(Window):
         self.printMessage( "Start\n" )
         self.theTimer = gtk.timeout_add(self.theUpdateInterval, self.updateByTimeOut, 0)
         self.theSimulator.run()
-        self.update()
 
     def stopSimulation( self, a ) :
         self.printMessage( "Stop\n" )
         self.theSimulator.stop()
         self.update()
-        gtk.timeout_remove(self.theTimer)
 
     def stepSimulation( self, a ) : 
         self.printMessage( "Step\n" )
+        self['step_combo_entry'].set_text( str( self.theStepSize ) )
         self.theTimer = gtk.timeout_add( self.theUpdateInterval, self.updateByTimeOut, 0 )
-        self.theSimulator.run( self.theStepSize )
+        if self.theStepType == 0:
+            self.theSimulator.run( self.theStepSize )
+        else:
+            for i in range( int ( self.theStepSize ) ):
+                self.theSimulator.step()
         self.update()
-        gtk.timeout_remove( self.theTimer )
+
+    def changeStepType ( self, a ):
+        self.theStepType = 1 - self.theStepType
 
     def setStepSize( self, obj ):
-        self.theStepSize =  string.atoi( obj.get_text() )
-        self.printMessage( 'Step Size -> ' )
-        self.printMessage( str(self.theStepSize) )
-        self.printMessage( '\n' )
+        aNumberString = obj.get_text()
+        if len( aNumberString ):
+            self.theStepSize = string.atof( aNumberString )
+        else:
+            self.theStepSize = 1
 
     def updateByTimeOut( self, a ):
-        gtk.timeout_remove( self.theTimer )
         self.update()
         self.theTimer = gtk.timeout_add( self.theUpdateInterval, self.updateByTimeOut, 0 )
 
     def update( self ):
+        gtk.timeout_remove( self.theTimer )
         aTime = self.theSimulator.getProperty( ( SYSTEM, '/', '/', 'CurrentTime') ) 
         self.theCurrentTime = aTime[0]
         self['time_entry'].set_text( str( self.theCurrentTime ) )
