@@ -513,9 +513,9 @@ class MainWindow(OsogoWindow):
 				# does nothing
 				return None
 
-			# when ok is pressed, overwrites it.
-			# deletes FileSelection
-			self.__deleteFileSelection()
+		# when ok is pressed, overwrites it.
+		# deletes FileSelection
+		self.__deleteFileSelection()
 
 		try:
 
