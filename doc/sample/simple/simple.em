@@ -8,7 +8,7 @@ Stepper FixedODE1Stepper( DE1 )
 	# no property
 }
 
-System CompartmentSystem( / )
+System System( / )
 {
 	StepperID	DE1;
 	ariable Variable;

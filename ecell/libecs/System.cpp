@@ -44,8 +44,6 @@ namespace libecs
 {
 
   LIBECS_DM_INIT_STATIC( System, System );
-  LIBECS_DM_INIT_STATIC( VirtualSystem, System );
-  LIBECS_DM_INIT_STATIC( CompartmentSystem, System );
 
   /////////////////////// System
 
@@ -109,6 +107,21 @@ namespace libecs
   {
     getStepper()->removeSystem( this );
     
+    // delete Processes first.
+    for( ProcessMapIterator i( theProcessMap.begin() );
+	 i != theProcessMap.end() ; ++i )
+      {
+	delete i->second;
+      }
+
+    // then Variables.
+    for( VariableMapIterator i( theVariableMap.begin() );
+	 i != theVariableMap.end() ; ++i )
+      {
+	delete i->second;
+      }
+
+    // delete sub-systems.
     for( SystemMapIterator i( theSystemMap.begin() );
 	 i != theSystemMap.end() ; ++i )
       {
@@ -163,15 +176,33 @@ namespace libecs
   {
     // do not need to call subsystems' initialize() -- the Model does this
 
+    //
+    // Variable::initialize()
+    //
+    for( VariableMapConstIterator i( getVariableMap().begin() );
+	 i != getVariableMap().end() ; ++i )
+      {
+	i->second->initialize();
+      }
+
+    //
+    // Process::initialize()
+    //
+    for( ProcessMapConstIterator i( getProcessMap().begin() );
+	 i != getProcessMap().end() ; ++i )
+      {
+	ProcessPtr aProcessPtr( i->second );
+
+	if( aProcessPtr->getStepper() == NULLPTR )
+	  {
+	    aProcessPtr->setStepper( getStepper() );
+	  }
+
+	aProcessPtr->initialize();
+      }
+
     setSizeVariable();
   }
-
-  void System::registerProcess( ProcessPtr aProcess )
-  {
-    getSuperSystem()->registerProcess( aProcess );
-  }
-
-
 
   ProcessPtr System::getProcess( StringCref anID ) const
   {
@@ -188,10 +219,6 @@ namespace libecs
     return i->second;
   }
 
-  void System::registerVariable( VariablePtr aVariable )
-  {
-    getSuperSystem()->registerVariable( aVariable );
-  }
 
   VariablePtr System::getVariable( StringCref anID ) const
   {
@@ -302,46 +329,7 @@ namespace libecs
   }
 
 
-  VirtualSystem::VirtualSystem()
-  {
-    // ; do nothing
-  }
-
-  VirtualSystem::~VirtualSystem()
-  {
-    for( ProcessMapIterator i( theProcessMap.begin() );
-	 i != theProcessMap.end() ; ++i )
-      {
-	delete i->second;
-      }
-
-  }
-
-
-  void VirtualSystem::initialize()
-  {
-    System::initialize();
-
-    //
-    // Process::initialize()
-    //
-    for( ProcessMapConstIterator i( getProcessMap().begin() );
-	 i != getProcessMap().end() ; ++i )
-      {
-	ProcessPtr aProcessPtr( i->second );
-
-	if( aProcessPtr->getStepper() == NULLPTR )
-	  {
-	    aProcessPtr->setStepper( getStepper() );
-	  }
-
-	aProcessPtr->initialize();
-      }
-
-  }
-
-
-  void VirtualSystem::registerProcess( ProcessPtr aProcess )
+  void System::registerProcess( ProcessPtr aProcess )
   {
     const String anID( aProcess->getID() );
 
@@ -361,36 +349,7 @@ namespace libecs
   }
 
 
-  CompartmentSystem::CompartmentSystem()
-  {
-    ; // do nothing
-  }
-
-  CompartmentSystem::~CompartmentSystem()
-  {
-    for( VariableMapIterator i( theVariableMap.begin() );
-	 i != theVariableMap.end() ; ++i )
-      {
-	delete i->second;
-      }
-  }
-
-  void CompartmentSystem::initialize()
-  {
-    VirtualSystem::initialize();
-
-    //
-    // Variable::initialize()
-    //
-    for( VariableMapConstIterator i( getVariableMap().begin() );
-	 i != getVariableMap().end() ; ++i )
-      {
-	i->second->initialize();
-      }
-
-  }
-
-  void CompartmentSystem::registerVariable( VariablePtr aVariable )
+  void System::registerVariable( VariablePtr aVariable )
   {
     const String anID( aVariable->getID() );
 

@@ -44,10 +44,11 @@ namespace libecs
   {
 
     //temporary workaround
-    //    addClass( new Module( "System", CompartmentSystem::createInstance ) );
+    addClass( new Module( "CompartmentSystem", System::createInstance ) );
 
-    NewSystemModule( VirtualSystem );
-    NewSystemModule( CompartmentSystem );
+    NewSystemModule( System );
+    //    NewSystemModule( VirtualSystem );
+    //    NewSystemModule( CompartmentSystem );
   }
 
 } // namespace libecs

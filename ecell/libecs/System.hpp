@@ -62,7 +62,7 @@ namespace libecs
 
     LIBECS_DM_BASECLASS( System );
 
-    LIBECS_DM_OBJECT_ABSTRACT( System )
+    LIBECS_DM_OBJECT( System, System )
     {
       INHERIT_PROPERTIES( Entity );
       
@@ -131,9 +131,15 @@ namespace libecs
       DEFAULT_SPECIALIZATION_INHIBITED();
     }
 
-    virtual VariableMapCref  getVariableMap() const = 0;
+    VariableMapCref getVariableMap() const
+    {
+      return theVariableMap;
+    }
 
-    virtual ProcessMapCref   getProcessMap() const = 0;
+    ProcessMapCref  getProcessMap() const
+    {
+      return theProcessMap;
+    }
 
     SystemMapCref    getSystemMap() const
     {
@@ -205,7 +211,7 @@ namespace libecs
        it if there is an error.
     */
 
-    virtual void registerProcess( ProcessPtr aProcess );
+    void registerProcess( ProcessPtr aProcess );
   
 
     /**
@@ -215,7 +221,7 @@ namespace libecs
        it if there is an error.
     */
 
-    virtual void registerVariable( VariablePtr aVariable );
+    void registerVariable( VariablePtr aVariable );
   
 
     /**
@@ -225,7 +231,7 @@ namespace libecs
        it if there is an error.
     */
 
-    virtual void registerSystem( SystemPtr aSystem );
+    void registerSystem( SystemPtr aSystem );
 
     /**
        Check if this is a root System.
@@ -281,16 +287,18 @@ namespace libecs
 
     ModelPtr     theModel;
 
-    VariablePtr  theSizeVariable;
-
+    VariableMap  theVariableMap;
+    ProcessMap   theProcessMap;
     SystemMap    theSystemMap;
+
+    VariablePtr  theSizeVariable;
 
     bool         theEntityListChanged;
 
   };
 
 
-
+  /*
 
   LIBECS_DM_CLASS( VirtualSystem, System )
   {
@@ -357,7 +365,7 @@ namespace libecs
 
   };
 
-
+  */
 
 
   template <>

@@ -22,25 +22,25 @@ Stepper PassiveStepper( PASSIVE_1 )
 }
 
 
-System CompartmentSystem( / )
+System System( / )
 {
 	StepperID	DE_1;
 	Name	"The culture medium";
 }
 
-System CompartmentSystem( /CELL )
+System System( /CELL )
 {
 	StepperID	DE_1;
 	Name	"The cell";
 }
 
-System CompartmentSystem( /CELL/MEMBRANE )
+System System( /CELL/MEMBRANE )
 {
 	StepperID	DE_1;
 	Name	"The menbrane";
 }
 
-System CompartmentSystem( /CELL/CYTOPLASM )
+System System( /CELL/CYTOPLASM )
 {
 	StepperID	DE_1;
 	Name	"The cytoplasm";
