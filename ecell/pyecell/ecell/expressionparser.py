@@ -209,6 +209,7 @@ def p_expression_variablereference(t):
             # In case of [Parameter], it must be without change.
             # --------------------------------------------------------------
             
+            # VariableReference attribute is Value
             if ( t[3] == 'Value' ):
 
                 aFastColon = string.index( aVariableReference[1], ':' )
@@ -218,29 +219,72 @@ def p_expression_variablereference(t):
 
                 if ( aSystemPath == '/SBMLParameter' ):
 
-                    aVariableID.append( getVariableReferenceId( aVariableReference[1] ) )
+                    aVariableID.append( getVariableReferenceId
+                                        ( aVariableReference[1] ) )
 
                 elif ( aSystemPath == '.' and
                        aReactionPath == '/SBMLParameter' ):
 
-                    aVariableID.append( getVariableReferenceId( aVariableReference[1] ) )
+                    aVariableID.append( getVariableReferenceId
+                                        ( aVariableReference[1] ) )
 
                 else:
-                    aVariableID.append( getVariableReferenceId( aVariableReference[1] ) )
+                    aVariableID.append( getVariableReferenceId
+                                        ( aVariableReference[1] ) )
+
                     if ( aSystemPath == '.' ):
 
                         aLastSlash = string.rindex( aReactionPath, '/' )
-                        aVariableID[0] = '(' + aVariableID[0]+ '/'+ aReactionPath[aLastSlash+1:] + '/' + 'N_A)'
+
+                        if( aVariableReference[1][aLastColon+1:] == 'SIZE' ):
+
+                            if ( aReactionPath == '/' ):
+
+                                aVariableID[0] = 'default'
+
+                            else:
+                                aVariableID[0] = aReactionPath[aLastSlash+1:]
+
+                        else:
+                            if ( aReactionPath == '/' ):
+                                
+                                aVariableID[0] = '(' + aVariableID[0]+ '/default/N_A)'
+
+                            else:
+                                aVariableID[0] = '(' + aVariableID[0]+ '/'+ aReactionPath[aLastSlash+1:] + '/N_A)'
+
 
                     else:
                         aLastSlash = string.rindex( aSystemPath, '/' )
-                        aVariableID[0] = '(' + aVariableID[0] + '/'+ aSystemPath[aLastSlash+1:] + '/' + 'N_A)'
+                        
+                        if( aVariableReference[1][aLastColon+1:] == 'SIZE' ):
 
+                            if ( aSystemPath == '/' ):
+
+                                aVariableID[0] = 'default'
+
+                            else:
+                                aVariableID[0] = aSystemPath[aLastSlash+1:]
+                            
+                        else:
+                            if ( aSystemPath == '/' ):
+
+                                aVariableID[0] = '(' + aVariableID[0] + '/default/N_A)'
+
+                            else:
+                                
+                                aVariableID[0] = '(' + aVariableID[0] + '/'+ aSystemPath[aLastSlash+1:] + '/N_A)'
+
+
+            # VariableReference attribute is NumberConc 
             elif ( t[3] == 'NumberConc' ):
                 
                 aVariableID.append( getVariableReferenceId( aVariableReference[1] ) )
                 aVariableID[0] = '(' + aVariableID[0] + '/N_A)'
 
+
+
+            # VariableReference attribute is MolarConc
             elif ( t[3] == 'MolarConc' ):
 
                 aVariableID.append( getVariableReferenceId( aVariableReference[1] ) )
@@ -272,11 +316,11 @@ def initializePLY():
     lextabname = "expressionlextab"
     yacctabname = "expressionparsetab"
 
-    lex.lex( lextab=lextabname, optimize=1 )
-#    lex.lex()
+#    lex.lex( lextab=lextabname, optimize=1 )
+    lex.lex()
 
-    return yacc.yacc( optimize=1, tabmodule=yacctabname )
-#    return yacc.yacc()
+#    return yacc.yacc( optimize=1, tabmodule=yacctabname )
+    return yacc.yacc()
 
 
 
@@ -286,18 +330,28 @@ def initializePLY():
 
 def getVariableReferenceId( aVariableReference ):
 
-    aFastColon = string.index( aVariableReference, ':' )
+    aFirstColon = string.index( aVariableReference, ':' )
     aLastColon = string.rindex( aVariableReference, ':' )
 
     # set Species Id to Reactant object
-    if ( aVariableReference[aFastColon+1:aLastColon] == '.' ):
+    if ( aVariableReference[aFirstColon+1:aLastColon] == '.' ):
 
-        aSpeciesReferencePath = string.replace( aReactionPath[1:], '/', '_S_' )
+        # if this VariableReference is in default compartment
+        if ( aReactionPath[1:] == '' ):
+
+            return aVariableReference[aLastColon+1:]
+
+        else:
+            aSpeciesReferencePath = string.replace( aReactionPath[1:], '/', '__' )
+
+    elif ( aVariableReference[aFirstColon+1:aLastColon] == '/' ):
+
+        return aVariableReference[aLastColon+1:]
         
     else:
-        aSpeciesReferencePath = string.replace( aVariableReference[aFastColon+2:aLastColon], '/', '_S_' )
+        aSpeciesReferencePath = string.replace( aVariableReference[aFirstColon+2:aLastColon], '/', '__' )
 
-    return  aSpeciesReferencePath + '_' + aVariableReference[aLastColon+1:]
+    return  aSpeciesReferencePath + '__' + aVariableReference[aLastColon+1:]
 
 
 
@@ -308,6 +362,6 @@ def convertExpression( anExpression, aVariableReferenceListObject, aReactionPath
      aVariableReferenceList = aVariableReferenceListObject
      aReactionPath = aReactionPathObject
 
-     aYacc = initializePLY()
+     initializePLY()
 
-     return aYacc.parse( anExpression )
+     return yacc.parse( anExpression )
