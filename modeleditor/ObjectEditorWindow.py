@@ -47,25 +47,24 @@ from Constants import *
 from EntityEditor import *
 from VariableReferenceEditorComponent import *
 from Constants import *
+from LayoutManager import *
+from Layout import *
 
 
 class ObjectEditorWindow :
 
-	def __init__( self, aParentWindow, aDisplayedWindowName ):
+	def __init__( self, aModelEditor, aLayoutName, anObjectId ):
 		"""
 		sets up a modal dialogwindow displaying 
 		either both the EntityEditor and the ShapeProperty
                 or the ConnectionObjectEditorWindow
 
 		""" 
-		self.theModelEditor = aParentWindow	
-		self.theDispWindowName=aDisplayedWindowName
+		self.theModelEditor = aModelEditor	
+		self.theObject = anObjectId
 		
-		# Sets the return number
-		self.__value = None
-
 		# Create the Dialog
-		self.win = gtk.Dialog('Object Editor Window', None, gtk.DIALOG_MODAL)
+		self.win = gtk.Dialog('Object Editor Window', None)
 		self.win.connect("destroy",self.destroy)
 
 		# Sets size and position
@@ -76,11 +75,21 @@ class ObjectEditorWindow :
 
 		# Sets title
 		self.win.set_title("ObjectEditor")
+		
 
-		if self.theDispWindowName == ME_ENTITY_EDITOR:
-			self.theComponent = EntityEditor( self, self.win.vbox,None )
+		self.theLayout =self.theModelEditor.theLayoutManager.getLayout(aLayoutName)
+		
+		self.theObject = self.theLayout.getObject(anObjectId)
+
+		if self.theObject.getProperty(OB_HASFULLID):
 			
-                        #Add the ShapePropertyComponent
+		
+	                self.theComponent = EntityEditor( self, self.win.vbox,OB_TYPE_VARIABLE)
+			FullId = self.theObject.getProperty(OB_FULLID)
+		
+			self.theComponent.setDisplayedEntity (FullId)
+			
+                	#Add the ShapePropertyComponent
 	   		aNoteBook=ViewComponent.getWidget(self.theComponent,'editor_notebook')
 			aShapeFrame=gtk.Frame()
 			aShapeFrame.show()
@@ -90,19 +99,32 @@ class ObjectEditorWindow :
 		
 			self.theComponent.theShapeProperty = ShapePropertyComponent( self.theComponent.theParentWindow, aShapeFrame )
 			self.theComponent.update()
-
-
-		elif self.theDispWindowName == ME_CONNNECTION_OBJ_EDITOR:
-			self.theComponent =  VariableReferenceEditorComponent( self, self.win.vbox )
+			
 		
-               
-              
+              	else:
+			self.theShapeProperty=ShapePropertyComponent( self, self.win.vbox )
+
+
+
 		self.win.show_all()
-		gtk.mainloop()
+		self.theModelEditor.toggleObjectEditorWindow(True,self)
 
 
-     
-      
+
+
+
+
+		
+	# ==========================================================================
+	def displayObjectEditorWindow(self,aLayoutName, anObjectId):
+		self.theLayout =self.theModelEditor.theLayoutManager.getLayout(aLayoutName)
+		self.theObject = self.theLayout.getObject(anObjectId)
+		if self.theObject.getProperty(OB_HASFULLID):
+			FullId = self.theObject.getProperty(OB_FULLID)
+		        self.theComponent.setDisplayedEntity(FullId)
+			
+
+
 	# ==========================================================================
 	def return_result( self ):
 		"""Returns result
@@ -115,9 +137,15 @@ class ObjectEditorWindow :
 	def destroy( self, *arg ):
 		"""destroy dialog
 		"""
+		
+		self.win.destroy()
+		
+	        self.theModelEditor.toggleObjectEditorWindow(False,None)
+		
+		
 
-		self.win.hide()
-		gtk.mainquit()
+		
+	
 
 
 

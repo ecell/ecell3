@@ -384,7 +384,7 @@
 				  <property name="tooltip" translatable="yes">Variable</property>
 				  <property name="can_focus">True</property>
 				  <property name="relief">GTK_RELIEF_NORMAL</property>
-				  <property name="active">False</property>
+				  <property name="active">True</property>
 				  <property name="inconsistent">False</property>
 				  <signal name="toggled" handler="on_selector_button_toggled" last_modification_time="Fri, 14 Nov 2003 09:07:25 GMT"/>
 
@@ -397,7 +397,7 @@
 				      <child>
 					<widget class="GtkImage" id="image7">
 					  <property name="visible">True</property>
-					  <property name="pixbuf">selector.xpm</property>
+					  <property name="pixbuf">selector.png</property>
 					  <property name="xalign">0.5</property>
 					  <property name="yalign">0.5</property>
 					  <property name="xpad">0</property>
@@ -438,7 +438,7 @@
 				      <child>
 					<widget class="GtkImage" id="image4">
 					  <property name="visible">True</property>
-					  <property name="pixbuf">variable.xpm</property>
+					  <property name="pixbuf">variable.png</property>
 					  <property name="xalign">0.5</property>
 					  <property name="yalign">0.5</property>
 					  <property name="xpad">0</property>
@@ -478,7 +478,7 @@
 				      <child>
 					<widget class="GtkImage" id="image5">
 					  <property name="visible">True</property>
-					  <property name="pixbuf">process.xpm</property>
+					  <property name="pixbuf">process.png</property>
 					  <property name="xalign">0.5</property>
 					  <property name="yalign">0.5</property>
 					  <property name="xpad">0</property>
@@ -519,7 +519,7 @@
 				      <child>
 					<widget class="GtkImage" id="image10">
 					  <property name="visible">True</property>
-					  <property name="pixbuf">system.xpm</property>
+					  <property name="pixbuf">system.png</property>
 					  <property name="xalign">0.5</property>
 					  <property name="yalign">0.5</property>
 					  <property name="xpad">0</property>
@@ -560,7 +560,7 @@
 				      <child>
 					<widget class="GtkImage" id="image12">
 					  <property name="visible">True</property>
-					  <property name="pixbuf">custom.xpm</property>
+					  <property name="pixbuf">custom.png</property>
 					  <property name="xalign">0.5</property>
 					  <property name="yalign">0.5</property>
 					  <property name="xpad">0</property>
@@ -601,7 +601,7 @@
 				      <child>
 					<widget class="GtkImage" id="image8">
 					  <property name="visible">True</property>
-					  <property name="pixbuf">textbox.xpm</property>
+					  <property name="pixbuf">textbox.png</property>
 					  <property name="xalign">0.5</property>
 					  <property name="yalign">0.5</property>
 					  <property name="xpad">0</property>

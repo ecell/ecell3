@@ -1,5 +1,6 @@
 from ComplexShape import *
 from Constants import *
+from LayoutCommand import *
 
 class EditorObject:
 
@@ -21,6 +22,8 @@ class EditorObject:
 		# default outline
 		self.thePropertyMap [ OB_OUTLINE_WIDTH ] = 1
 		self.parentSystem.registerObject( self )
+		self.theSD = None
+		self.isSelected = False
 
 
 
@@ -32,16 +35,61 @@ class EditorObject:
 		pass
 
 	def doSelect( self ):
-		print "object selected"
-		pass
+		if not self.isSelected:
+			self.theLayout.selectRequest( self.theID )
+
+	def selected( self ):
+		if not self.isSelected:
+			self.isSelected = True
+			self.theShape.selected()
+			self.theShape.outlineColorChanged()
+
+
+	def unselected( self ):
+		if self.isSelected:
+			self.isSelected = False
+			self.theShape.unselected()
+			self.theShape.outlineColorChanged()
+
+
 
 	def showMenu( self ):
 		print "object rightclicked"
 		pass
 	
+	def outlineDragged( self, deltax, deltay, x, y ):
+		# in most of the cases object are not resizeable, only system is resizeable and it will override this
+		self.objectDragged( )
+		pass
+
+	def objectDragged( self, deltax, deltay ):
+		#  parent system boundaries should be watched here!!!
+		#get new positions:
+		# currently move out of system is not supported!!!
+		if self.parentSystem.__class__.__name__ == 'Layout':
+			#rootsystem cannot be moved!!!
+			return
+
+		newx = self.getProperty( OB_POS_X ) + deltax
+		newy = self.getProperty( OB_POS_Y ) + deltay
+		if (newy + self.getProperty( OB_DIMENSION_Y ) > self.parentSystem.getProperty( SY_INSIDE_DIMENSION_Y )) and deltay> 0:
+			newy = self.getProperty( OB_POS_Y )
+		if ( newx + self.getProperty( OB_DIMENSION_X ) > self.parentSystem.getProperty( SY_INSIDE_DIMENSION_X  ) ) and deltax > 0:
+			newx = self.getProperty( OB_POS_X )
+		if newx <0 and deltax< 0:
+			newx = self.getProperty( OB_POS_X )
+		if newy <0 and deltay< 0:
+			newy = self.getProperty( OB_POS_Y )
+		
+
+		if newx==0 and newy == 0:
+			return
+		aCommand = MoveObject( self.theLayout, self.theID, newx, newy, None )
+		self.theLayout.passCommand( [ aCommand ] )
+
 
 	def popupEditor( self ):
-		print "object doubleclicked"
+
 		self.theLayout.popupObjectEditor( self.theID )		
 
 
@@ -102,7 +150,7 @@ class EditorObject:
 		return self.theID
 		
 	def getLayout( self ):
-		pass
+		return self.theLayout
 
 
 	def getParent( self ):
@@ -114,3 +162,7 @@ class EditorObject:
 	def getModelEditor( self ):
 		return self.theLayout.theLayoutManager.theModelEditor
 
+	def move( self, deltax, deltay ):
+		self.thePropertyMap[ OB_POS_X ] += deltax
+		self.thePropertyMap[ OB_POS_Y ] += deltay
+		self.theShape.move( deltax, deltay )

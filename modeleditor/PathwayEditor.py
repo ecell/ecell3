@@ -53,10 +53,6 @@ class PathwayEditor( ListWindow ):
 		self.theLayout = aLayout
 		self.theModelEditor = theModelEditor
 
-		# Sets the return PaletteButton value
-		self.__CurrPaletteButton = None
-		self.__OldPaletteButton = None
-
 		
 
 
@@ -100,9 +96,12 @@ class PathwayEditor( ListWindow ):
 		custom = ListWindow.getWidget(self,'custom_button')
 		text = ListWindow.getWidget(self,'text_button')
 
-
+			
 		self.thePaletteButtonDict={PE_SELECTOR: selector, PE_VARIABLE : variable ,PE_PROCESS: process, PE_SYSTEM : system, PE_CUSTOM : custom, PE_TEXT:text}
 
+		# Sets the return PaletteButton value
+		self.__CurrPaletteButton = PE_SELECTOR
+		self.__OldPaletteButton = None
 		
 
 	def update( self, arg1 = None, arg2 = None):
@@ -112,8 +111,10 @@ class PathwayEditor( ListWindow ):
 
 
 	def deleted( self, *args ):
+		
 		# detach canvas from layout
 		self.thePathwayCanvas.getLayout().detachFromCanvas()
+		self.theModelEditor.thePathwayEditorList.remove(self)
 		ListWindow.deleted( self, args )
 		
 	def getPathwayCanvas( self ):	
@@ -155,7 +156,8 @@ class PathwayEditor( ListWindow ):
 		pass
 
 	def __rename_layout( self, *args ):
-		pass
+		self.theModelEditor.theLayoutManager.renameLayout(self.theLayout.getName(),self['layout_name_entry'].get_text())
+		self.theModelEditor.updateWindows()
 
 	def __palette_toggled( self, *args ):
 		self.__OldPaletteButton = self.__CurrPaletteButton

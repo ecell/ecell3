@@ -17,14 +17,12 @@ from LayoutManagerWindow import *
 from MainWindow import *
 from StepperWindow import *
 from EntityListWindow import *
-#from PathwayEditor import *
 from DMInfo import *
 from PopupMenu import *
 from PathwayEditor import *
 from LayoutManager import *
 from ecell.eml import *
 from CommandMultiplexer import *
-
 from ObjectEditorWindow import *
 
 
@@ -62,7 +60,7 @@ class ModelEditor:
 		self.theEntityListWindowList = []
 		self.thePathwayEditorList = []
 		self.theLayoutManagerWindow=None 
-		
+		self.theObjectEditorWindow = None
 		self.theFullIDBrowser = None
 		self.thePopupMenu = PopupMenu( self )
 		self.theMainWindow = MainWindow( self )
@@ -70,6 +68,7 @@ class ModelEditor:
 		self.theMultiplexer = CommandMultiplexer( self, self.theLayoutManager )
 		self.changesSaved = True
 		self.openLayoutWindow = False
+		self.openObjectEditorWindow = False
 		# create untitled model
 		self.__createModel()
 		self.theLastComponent = None
@@ -436,6 +435,7 @@ class ModelEditor:
 
 
 	def createPathwayEditor( self, aLayout ):
+		
 		newWindow = PathwayEditor( self, aLayout )
 		newWindow.openWindow()
 		self.thePathwayEditorList.append( newWindow )
@@ -459,7 +459,19 @@ class ModelEditor:
 			
 			self.theLayoutManagerWindow.present()
 
+	def createObjectEditorWindow(self, aLayoutName, anObjectID ):
+		if not self.openObjectEditorWindow:
+			ObjectEditorWindow(self, aLayoutName, anObjectID)
+		else:
+			self.theObjectEditorWindow.displayObjectEditorWindow( aLayoutName, anObjectID)
+		
+	def toggleObjectEditorWindow(self,isOpen,anObjectEditor):
+		self.theObjectEditorWindow=anObjectEditor
+		self.openObjectEditorWindow=isOpen
 
+	def deleteObjectEditorWindow( self ):
+		self.theObjectEditorWindow = None
+		
 	def copy(self ):
 		self.theLastComponent.copy()
 
@@ -508,7 +520,7 @@ class ModelEditor:
 
 
 	def updateWindows( self, aType = None, anID = None ):
-		print 'Model Editor updateWindow'
+		
 		# aType None means nothing to be updated
 		for aStepperWindow in self.theStepperWindowList:
 			# anID None means all for steppers
@@ -565,7 +577,7 @@ class ModelEditor:
 		in: nothing
 		out nothingfrom EntityListWindow import *
 		"""
-
+		
 		self.__closeModel()
 		# create new model
 		self.theModelStore = ModelStore()

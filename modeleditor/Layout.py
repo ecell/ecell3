@@ -5,6 +5,7 @@ from PackingStrategy import *
 from SystemObject import *
 import gnome.canvas 
 
+
 class Layout:
 
 	def __init__( self, aLayoutManager, aName ):
@@ -16,14 +17,19 @@ class Layout:
 		self.theObjectMap = {}
 		self.thePropertyMap = {}
 		default_scrollregion = [ -1000, -1000, 1000, 1000 ]
+		self.thePropertyMap[ OB_DIMENSION_X ] = default_scrollregion[2] - default_scrollregion[0]
+		self.thePropertyMap[ OB_DIMENSION_Y ] = default_scrollregion[3] - default_scrollregion[1]
+
 		default_zoomratio = 1
 		self.thePropertyMap[ LO_SCROLL_REGION ] = default_scrollregion
 		self.thePropertyMap[ LO_ZOOM_RATIO ] = default_zoomratio
 		self.theCanvas = None
 		self.thePathwayEditor = None
+		self.theSelectedObjectID = None
 
 		# allways add root dir object
 		anObjectID = self.getUniqueObjectID( ME_SYSTEM_TYPE )
+		
 		self.createObject( anObjectID, ME_SYSTEM_TYPE, ME_ROOTID, default_scrollregion[0], default_scrollregion[1], None )
 
 
@@ -68,7 +74,7 @@ class Layout:
 
 	def rename( self, newName ):
 		self.theName = newName
-		self.theCanvas.getParentWindow.update()
+		self.thePathwayEditor.update()
 		
 		
 	#########################################
@@ -120,7 +126,7 @@ class Layout:
 		if aPropertyName in self.thePropertyMap.keys():
 			return self.thePropertyMap[aPropertyName]
 		else:
-			raise Exception("Unknown property %s for layout %s"%(self.theName, self.thePropertyName ) )
+			raise Exception("Unknown property %s for layout %s"%(self.theName, aPropertyName ) )
 	
 	
 	def setProperty( self, aPropertyName, aValue ):
@@ -131,8 +137,11 @@ class Layout:
 
 	def moveObject(self, anObjectID, newX, newY, newParent ):
 		# if newParent is None, means same system
-		pass
-
+		# currently doesnt accept reparentation!!!
+		anObject = self.getObject( anObjectID )
+		deltax = newX - anObject.getProperty( OB_POS_X ) 
+		deltay = newY - anObject.getProperty( OB_POS_Y )
+		anObject.move( deltax, deltay )
 
 	def getObject( self, anObjectID ):
 		# returns the object including connectionobject
@@ -143,7 +152,8 @@ class Layout:
 
 	def resizeObject( self, anObjectID, deltaTop, deltaBottom, deltaLeft, deltaRight ):
 		# inward movement negative, outward positive
-		pass
+		anObject = self.getObject( anObjectID )
+		anObject.resize( deltaTop, deltaBottom, deltaLeft, deltaRight )
 
 
 	def createConnectionObject( self, anObjectID, aProcessObjectID = None, aVariableObjectID=None,  processRing=None, variableRing=None, direction = PROCESS_TO_VARIABLE, aVarrefName = None ):
@@ -207,14 +217,20 @@ class Layout:
 
 
 	def popupObjectEditor( self, anObjectID ):
-		pass
+		
+		self.theLayoutManager.theModelEditor.createObjectEditorWindow(self.theName, anObjectID)
 
 	def getPaletteButton( self ):
-		LE_OBJECT_SYSTEM = 0
-		return LE_OBJECT_SYSTEM
+		return self.thePathwayEditor.getPaletteButton()
 
 	def passCommand( self, aCommandList):
 		self.theLayoutManager.theModelEditor.doCommandList( aCommandList)
 
 	def registerObject( self, anObject ):
 		self.theRootObject = anObject
+
+	def selectRequest( self, objectID ):
+		if self.theSelectedObjectID != None:
+			self.getObject( self.theSelectedObjectID ).unselected()
+		self.theSelectedObjectID = objectID
+		self.getObject( self.theSelectedObjectID ).selected()

@@ -17,6 +17,9 @@ class LayoutManager:
 
 	def createLayout( self, aLayoutName ):
 		# create and show
+		print ''
+		print 'LayoutManager createLayout'
+		print aLayoutName
 		if aLayoutName in self.theLayoutMap.keys():
 			raise Exception("Layout %s already exists!"%aLayoutName )
 		newLayout = Layout ( self, aLayoutName )
@@ -25,9 +28,11 @@ class LayoutManager:
 
 
 	def deleteLayout( self, aLayoutName ):
+		print 'Layout Manager deleteLayout'
 		aLayout = self.theLayoutMap[ aLayoutName ]
 		editorWindow = aLayout.getCanvas().getParentWindow()
 		aLayout.detachFromCanvas()
+		del self.theLayoutMap[aLayoutName]
 		editorWindow.close()
 
 
@@ -52,13 +57,16 @@ class LayoutManager:
 
 	def update( self, aType = None, anID = None ):
 		# i am not sure this is necessary!!!
-		pass
+		self.theModelEditor.updateWindows()
 
 
 	def getUniqueLayoutName( self, tryThisName = None ):
 		if tryThisName == None:
 			tryThisName = 'Layout'
 		nameList = self.theLayoutMap.keys()
+		print ''
+		print nameList
+		print 'LayoutManager getUniqueLayoutName'
 		counter = 0
 		layoutName = tryThisName
 		while layoutName in nameList:

@@ -49,8 +49,7 @@ class ShapePropertyComponent(ViewComponent):
 	#######################
 
 	def __init__( self, aParentWindow, pointOfAttach ):
-		self.theParentWindow = aParentWindow
-		self.theModelEditor = self.theParentWindow.theModelEditor
+		self.theModelEditor = aParentWindow.theModelEditor
 		
 		ViewComponent.__init__( self, pointOfAttach, 'attachment_frame', 'ShapePropertyComponent.glade' )
 

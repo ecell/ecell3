@@ -33,14 +33,29 @@ def rect_event( *args ):
 		item.move(deltax,deltay)
 		
 	elif event.type == gtk.gdk._2BUTTON_PRESS:
-		print "doubleclick", event.button
-		myobj.c_size += 0.5
-		pangosize = 1024 * myobj.c_size
-		myobj.pgfd.set_size( pangosize )
-		canv.set_pixels_per_unit(myobj.c_size)
-		print myobj.pgfd.get_size()
-		print myobj.pgfd.to_string()
-		myobj.text.set_property('font-desc', myobj.pgfd )
+		gdkc = item.get_property("fill_color_gdk")
+
+		newgdkc = gdkc.copy()
+		newgdkc.red= gdkc.red+10000
+		newgdkc.green= gdkc.green+20000
+		newgdkc.blue= gdkc.blue+40000
+		
+		item.set_property("fill_color_gdk", newgdkc)
+		x2 = item.get_property("x2" )
+		y2 = item.get_property("y2")
+		x2+=3
+		y2+=5
+		item.set_property("x2", x2)
+		item.set_property("y2", y2)
+
+
+#		myobj.c_size += 0.5
+#		pangosize = 1024 * myobj.c_size
+#		myobj.pgfd.set_size( pangosize )
+#		canv.set_pixels_per_unit(myobj.c_size)
+#		print myobj.pgfd.get_size()
+#		print myobj.pgfd.to_string()
+#		myobj.text.set_property('font-desc', myobj.pgfd )
 
 def setup_canvas( myobj ):
 	canv.set_scroll_region(0,0,200,200)
