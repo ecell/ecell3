@@ -36,6 +36,8 @@
 //#include <utility>
 //#include <iostream>
 
+#include <gsl/gsl_rng.h>
+
 #include "libecs.hpp"
 
 #include "Util.hpp"
@@ -121,10 +123,7 @@ namespace libecs
     //			 StepIntervalConstraintMap );
 
     Stepper(); 
-    virtual ~Stepper() 
-    {
-      ; // do nothing
-    }
+    virtual ~Stepper();
 
 
     /**
@@ -257,6 +256,10 @@ namespace libecs
     GET_METHOD( Polymorph, ProcessList );
     GET_METHOD( Polymorph, SystemList );
     GET_METHOD( Polymorph, DependentStepperList );
+
+    SET_METHOD( String, RngSeed );
+
+    GET_METHOD( String, RngType );
 
 
     /**
@@ -466,6 +469,10 @@ m
       return new VariableProxy( aVariablePtr );
     }
 
+    const gsl_rng* getRng() const
+    {
+      return theRng;
+    }
 
     bool operator<( StepperCref rhs )
     {
@@ -559,6 +566,9 @@ m
     Real                theMaxStepInterval;
 
     String              theID;
+
+
+    gsl_rng*   theRng;
 
   };
 

@@ -49,16 +49,10 @@ DM_INIT( Stepper, NRStepper );
 NRStepper::NRStepper()
   :
   theTimeScale( 0.0 ),
-  theTolerance( 0.0 ),
-  theRng( gsl_rng_alloc( gsl_rng_mt19937 ) )
+  theTolerance( 0.0 )
 {
   // unset the default MinStepInterval.  
   setMinStepInterval( std::numeric_limits<Real>::min() );
-
-  // set a seed.   
-  // This can cause a problem in simultaneous multiple runs, because
-  // time() can return the same value within 1 sec.
-  gsl_rng_set( theRng, static_cast<unsigned long int>( time( NULL ) ) );
 
   CREATE_PROPERTYSLOT_GET    ( Real, TimeScale, NRStepper );
   CREATE_PROPERTYSLOT_SET_GET( Real, Tolerance, NRStepper );
@@ -66,7 +60,7 @@ NRStepper::NRStepper()
 	    
 NRStepper::~NRStepper()
 {
-  gsl_rng_free( theRng );
+  ; // do nothing
 }
 
 

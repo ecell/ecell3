@@ -4,6 +4,8 @@
 #include <limits>
 #include <vector>
 
+#include <gsl/gsl_rng.h>
+
 #include <libecs/libecs.hpp>
 #include <libecs/Process.hpp>
 #include <libecs/PropertySlotMaker.hpp>
@@ -87,12 +89,13 @@ public:
 
   
   // a uniform random number (0...1) must be given as u
-  void updateStepInterval( const Real u )
+  void updateStepInterval()
   {
     const Real aMu( getMu() );
 
     if( aMu > 0.0 )
       {
+	const Real u( gsl_rng_uniform_pos( getStepper()->getRng() ) );
 	theStepInterval = - log( u ) / aMu;
 
 	if( getOrder() == 2 )

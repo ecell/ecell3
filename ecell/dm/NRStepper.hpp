@@ -54,8 +54,6 @@
 //#include <vector>
 #include <algorithm>
 
-#include <gsl/gsl_rng.h>
-
 #include "libecs/DynamicPriorityQueue.hpp"
 #include "libecs/DiscreteEventStepper.hpp"
 
@@ -155,14 +153,10 @@ public:
     return theTimeScale;
   }
 
-  const gsl_rng* getRng() const
-  {
-    return theRng;
-  }
     
   void updateGillespieProcess( GillespieProcessPtr aGillespieProcessPtr ) const
   {
-    aGillespieProcessPtr->updateStepInterval( gsl_rng_uniform_pos( theRng ) );
+    aGillespieProcessPtr->updateStepInterval();
   }
 
 
@@ -183,9 +177,6 @@ protected:
   Real            theTimeScale;
 
   Real            theTolerance;
-
-  gsl_rng* const theRng;
-
 
 };
 

@@ -75,6 +75,19 @@ namespace libecs
     CREATE_PROPERTYSLOT_GET    ( Polymorph, ProcessList,          Stepper );
     CREATE_PROPERTYSLOT_GET    ( Polymorph, SystemList,           Stepper );
     CREATE_PROPERTYSLOT_GET    ( Polymorph, DependentStepperList, Stepper );
+    CREATE_PROPERTYSLOT_SET    ( String,    RngSeed,              Stepper );
+
+    // setting rng type:  not yet supported
+    //CREATE_PROPERTYSLOT_SET_GET( Polymorph, Rng,              Stepper );
+
+    gsl_rng_env_setup();
+
+    theRng = gsl_rng_alloc( gsl_rng_default );
+  }
+
+  Stepper::~Stepper()
+  {
+    gsl_rng_free( theRng );
   }
 
   void Stepper::initialize()
@@ -603,6 +616,27 @@ namespace libecs
     ; // do nothing
   }
 
+
+  SET_METHOD_DEF( String, RngSeed, Stepper )
+  {
+    UnsignedInt aSeed( 0 );
+    
+    if( value == "DEFAULT" )
+      {
+	aSeed = static_cast<UnsignedInt>( time( NULLPTR ) );
+      }
+    else
+      {
+	aSeed = stringTo<UnsignedInt>( value );
+      }
+
+    gsl_rng_set( getRng(), aSeed );
+  }
+
+  GET_METHOD_DEF( String, RngType, Stepper )
+  {
+    return gsl_rng_name( getRng() );
+  }
 
 
 } // namespace libecs
