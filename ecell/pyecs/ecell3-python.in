@@ -8,10 +8,11 @@ prefix=@prefix@
 exec_prefix=${prefix}
 pythondir=@pythondir@
 
+export ECELL3_PREFIX=${prefix}
 export OSOGOPATH=${exec_prefix}/lib/osogo
 export LD_LIBRARY_PATH="${exec_prefix}/lib:${LD_LIBRARY_PATH}"
 export PYTHONPATH="$pythondir:${PYTHONPATH}"
-
+export PYTHON_INCLUDES="@PYTHON_INCLUDES@"
 export LTDL_LIBRARY_PATH="${ECELL3_DM_PATH}:${prefix}/lib/ecell/${VERSION}:${LTDL_LIBRARY_PATH}"
 
 
@@ -101,14 +102,14 @@ if [ $ECELL_PROFILE ] ; then
 fi
 
 if [ ! $ECELL_DEBUG ] ; then
-    exec $PYTHON $*
+    exec $PYTHON "$@"
 else
     TMPFILE=`mktemp -q /tmp/$BASENAME.XXXXXX`
     if [ $? -ne 0 ]; then
 	echo "$BASENAME: Can't create temp file, exiting..."
 	exit 1
     fi
-    echo "run $*" > $TMPFILE
+    echo "run "$@"" > $TMPFILE
     echo $DEBUGGER --command=$TMPFILE $PYTHON
     $DEBUGGER --command=$TMPFILE $PYTHON
     rm -f $TMPFILE

@@ -1,126 +1,101 @@
-#!/bin/sh
+#!/usr/bin/env ecell3-python
 
+import sys
+import os
+import glob
+import string
+import getopt
 
-prefix=@prefix@
-exec_prefix=@exec_prefix@
-libdir=@libdir@
-
-
-CXX=@CXX@
+prefix=os.environ['ECELL3_PREFIX']
+exec_prefix=prefix
+libdir=exec_prefix + os.sep + 'lib'
+CXX='@CXX@'
 ORIG_CXXFLAGS="@CXXFLAGS@"
-LDADD=-lstdc++
-SHLEXT=@LTDL_SHLIB_EXT@  
-BASENAME=@BASENAME@
-CXXSUFFIX=".cpp"
+LDADD='-lstdc++'
+SHLEXT='@LTDL_SHLIB_EXT@'
+CXXSUFFIX='.cpp'
+CXXFLAGS = os.environ.get('CXXFLAGS','')
+VERBOSE = False
 
-VERBOSE=1
-
-unset CXXFLAGS
-
-
-exit_if_failed()
-{
-    $@
-    exitcode=$?
-    if [ $exitcode -ne 0 ] ; then
-	exit $exitcode
-    fi
-}
-
-
-run_command()
-{
-	if [ $TEST_MODE ] ; then
-		echo $@
-	else
-		[ $VERBOSE ] && echo $@
-		$@
-	fi
-return $?
-}
-
-cleanup()
-{
-	run_command rm -f $OBJ
-}
-
-move()
-{
-	run_command mv -f .libs/$SOBJ .
-}
-
-compile()
-{
-	run_command $CXX $CXXCOMPILEFLAGS -fPIC -c $SRC
-}
-
-link()
-{
-	run_command $CXX -shared $OBJ -o $SOBJ $LDFLAGS
-}
-
-
-help()
-{
-cat << EOT_USAGE
-Compile dynamic module.
+def help():
+    ext = os.path.basename( sys.argv[0] )
+    aProgramName, ext = os.path.splitext( ext )
+    print '''
+%s -- Compile dynamic modules for E-Cell Simulation Environment Version 3
 
 Usage:
-	`$BASENAME $0` <source.cpp> [compile options]
-	`$BASENAME $0` -h|--help
+       %s [-v|--verbose] <source.cpp> [compile options]
+       %s [-h|--help]
+    '''% ( aProgramName, aProgramName, aProgramName )
 
-EOT_USAGE
+def msg( outstr ):
+    print "E-Cell3 dmcompile: " + outstr
 
-}
+def execute( cmdstr ):
+    if VERBOSE:
+	print cmdstr
+    return os.system( cmdstr )
 
+def compile( CXX, CXXCOMPILEFLAGS, SRC ):
+    return execute( CXX + ' ' + CXXCOMPILEFLAGS + ' -fPIC -c ' + SRC )
 
-######################################################
+def link( CXX, OBJ, SOBJ, LDFLAGS ):
+    return execute( CXX + ' -shared ' + OBJ + ' -o ' + SOBJ + ' ' + LDFLAGS )
 
+def cleanup( OBJ ):
+    if os.path.isfile( OBJ ):
+	os.remove( OBJ )
+    
+def main():
+    opts , args = getopt.getopt( sys.argv[1:], "hv", ["help", "verbose"])   
+    global VERBOSE
+    
+    for anOption, anArg in opts:
 
-## check commandline
+	# print help message
+        if anOption in ( "-h", '--help' ):
+            help()
+            sys.exit(0)
+      
+  	# be verbose
+        if anOption in ( "-v", '--verbose'):
+	    VERBOSE = True 
 
-# at least one argument is required
-if [ -z $1 ] ;  then
-	help
-	exit 1
-fi
+    # check if source file is given
+    if len( args ) < 1:
+	help()
+	msg( "Error: source file was not given." )
+	sys.exit(1)
 
-if [ "$1" = "-h" -o "$1" = "--help" ] ; then
-	help
-	exit 0
-fi
+    # check if source file is valid
+    if len( glob.glob ( args[0] ) ) < 1:
+	msg( "Error: source file "+ args[0] + " was not found." )
+	sys.exit(1)
+		
+    SRC = args[0]
+    ext = os.path.basename(SRC)
+    CLASSNAME, ext = os.path.splitext(ext)
+    OBJ = CLASSNAME + '.o'
+    SOBJ = CLASSNAME + SHLEXT
+    LDFLAGS =  os.environ.get('LDFLAGS','')
+    LDFLAGS = '-Wl,-rpath=' + libdir + ',-soname=' + SOBJ + ' ' + LDFLAGS 
+    if CXXFLAGS != '':
+	CXXCOMPILEFLAGS = CXXFLAGS + ' ' + string.join( args[1:] )
+    else:
+	CXXCOMPILEFLAGS = ORIG_CXXFLAGS + ' ' + string.join( args[1:] )
 
-## set names and variables
+    if compile( CXX, CXXCOMPILEFLAGS, "\""+SRC+"\"" ) or not os.path.isfile( OBJ ):
+	msg( "Error: The compiler failed to create " + OBJ )
+	sys.exit(1)
+	
+    if link( CXX, OBJ, SOBJ, LDFLAGS ) or not os.path.isfile( SOBJ ):
+	msg( "Error: The compiler failed to create " + SOBJ )
+	sys.exit(1)
+    
+    msg( 'generated ' + SOBJ )
+    cleanup( OBJ )
 
-SRC=$1 ; shift
-CLASSNAME=`$BASENAME $SRC $CXXSUFFIX`
-OBJ=$CLASSNAME.o
-SOBJ=$CLASSNAME$SHLEXT
+if __name__ == '__main__':
+	main()
+	
 
-
-LDFLAGS="-Wl,-rpath=$libdir,-soname=$SOBJ $LDFLAGS"
-
-if [ $CXXFLAGS ]; then
-    CXXCOMPILEFLAGS="$CXXFLAGS $*"
-else
-    CXXCOMPILEFLAGS="$ORIG_CXXFLAGS $*"
-fi
-
-
-## main routine
-
-exit_if_failed compile
-
-if [ ! -f $OBJ ] ; then
-    echo "Error: $OBJ not created by the compiler."
-    exit 1
-fi
-
-exit_if_failed link
-
-if [ ! -f $SOBJ ] ; then
-    echo "Error: $SOBJ not created by the compiler."
-    exit 1
-fi
-
-cleanup

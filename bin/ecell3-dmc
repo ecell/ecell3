@@ -63,7 +63,8 @@ def main():
     ECELL_INCLUDE = prefix + os.sep + 'include' + os.sep + 'ecell'
     LIBECS_INCLUDE = ECELL_INCLUDE + os.sep + 'libecs'
     STDINCLUDE = '-I' + prefix + os.sep + 'include' + ' -I' + ECELL_INCLUDE + \
-    		' ' + '-I' + LIBECS_INCLUDE + ' -I.'
+    		' ' + '-I' + LIBECS_INCLUDE + ' -I.' + ' ' + \
+		os.environ['PYTHON_INCLUDES']
     DMCOMPILE = '\"'+BINDIR + os.sep + 'dmcompile\"'
     SRC = None
 

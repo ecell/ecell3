@@ -13,7 +13,7 @@ import ecell.Session
 def usage():
     aProgramName = os.path.basename( sys.argv[0] )
     print '''
-%s -- invoke ecell3 python intract mode or run ess file
+%s -- invoke ecell3 python interactive mode or run ess file
 
 Usage:
 
@@ -33,7 +33,7 @@ Options:
        -DNAME=VALUE                       :  Set session parameter
        --parameters="[python dictionary]" :  Set session parameters
         
-       eaxmple: 
+       example: 
 
        ecell3-session -DNAME1=VALUE1 -DNAME2=VALUE2
        ecell3-session --parameters="{NAME1:VALUE1,NAME2:VALUE2}"
@@ -72,9 +72,13 @@ def main():
     for i in range(len(sys.argv)-1):
         i = i + 1
         if not (sys.argv[i])[0] == "-":
-            if os.path.isfile( sys.argv[i] ):
-            	if (sys.argv[i-1]) != "-e" and (sys.argv[i-1]) != "-f" :
-	            anEssFile = sys.argv[i]		
+	    if os.path.isfile( sys.argv[i] ):
+	        if (sys.argv[i-1]) != "-e" and (sys.argv[i-1]) != "-f" :
+		    anEssFile = sys.argv[i]
+	    else:
+	        print "File Name Error: "+ sys.argv[1] + " does not exist."
+                sys.exit(1)
+	
 
     # -------------------------------------
     # gets options

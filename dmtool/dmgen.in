@@ -1,99 +1,133 @@
-#!/bin/sh
+#!/usr/bin/env ecell3-python
 #
-# dmgen --- a program to docify dynamic module in 
+# dmgen --  a program to docify dynamic module in 
 #           E-CELL Simulation Environment Version 3
 #
-# author:  Tomoya Kitayama <tomo@e-cell.org>
-#
+# authors:  Tomoya Kitayama <tomo@e-cell.org>
+#           Satya Arjunan <satya@ttck.keio.ac.jp>
 
-PACKAGE=@PACKAGE@
-VERSION=@VERSION@
+import os
+import sys
+import getopt
+import string
 
-prefix=@prefix@
-exec_prefix=@prefix@
+PACKAGE='@PACKAGE@'
+VERSION='@VERSION@'
+
+prefix=os.environ['ECELL3_PREFIX']
+exec_prefix=prefix
 pythondir=@pythondir@
-
-BINDIR="${exec_prefix}/bin"
-EMPYBIN="${pythondir}/ecell/em.py"
-
+EMPYBIN=pythondir + os.sep + 'ecell' + os.sep + 'em.py'
 EMPYOPTIONS="--flatten --raw-error"
 
-PYSUFFIX=".py"
-EMSUFFIX=".em"
-OUTSUFFIX=".cpp"
+OUTSUFFIX='.cpp'
+VERBOSE = False
 
-unset VERBOSE HAVE_TEMPLATE HAVE_PY
-
-help() 
-{
-cat << EOT_HELP
+def help():
+    ext = os.path.basename( sys.argv[0] )
+    aProgramName, ext = os.path.splitext( ext )
+    print '''
+%s -- Docify dynamic modules for E-Cell Simulation Environment Version 3
 
 Usage:
-	`basename $0` <classname> [OPTIONS] files...
-	`basename $0` -h|--help
+       %s <classname> [options] files
+       %s [-h|--help]
+
 Options:
-	-d|--dmfilename)    Specify dmfile
-	-t|--template)      Specify template (.em) file
-        -p|--py)            Specify python script file
-	-h|--help)          Print this massage
-EOT_HELP
-}
+       -d|--dmfilename file     Specify dmfile (.dm) 
+       -t|--template file       Specify template (.em) 
+       -p|--py file             Specify python script file (.py)
+       -v|--verbose		Be verbose
+       -h|--help		Print this message
+    '''% ( aProgramName, aProgramName, aProgramName )
+    
+def msg( outstr ):
+    print "E-Cell3 dmgen: " + outstr
+    
+def execute( cmdstr ):
+    if VERBOSE:
+	print cmdstr
+    return os.system( cmdstr )
 
-#at least one argument is required
+def normpath( path ):
+    path = string.replace(path, '\\', '/')
+    return path
+    
 
-if [ -z $1 ] ;then 
-    $1
-    help;
-    echo $1
-    exit 1
-fi
+def main():
+    # -------------------------------------
+    # get options and arguments
+    # -------------------------------------
+    try:
+	opts , args = getopt.getopt( sys.argv[2:] , "hvd:t:p:", ["help", \
+		"verbose", "dmfilename ", "template ", "py "])
+    except:
+	help()
+	sys.exit(1)
 
-# print help message
- 
-if [ "$1" = "-h" -o "$1" = "--help" ] ; then
-    help
-    exit 0
-fi
+    global VERBOSE
+    HAVE_TEMPLATE = False
+    HAVE_PY = False
+    dmFile = ''
+    emFile = ''
+    pyFile = ''
+    
+    # -------------------------------------
+    # check argument
+    # -------------------------------------
+    
+    for anOption, anArg in opts:
 
-# get dynamic module class
-CLASS=$1
-shift
+	# print help message
+	if anOption in ( "-h", '--help' ):
+	    help()
+	    sys.exit(0)
+	    
+	# be verbose
+	if anOption in ( "-v", '--verbose'):
+	    VERBOSE = True            
+	    
+	if anOption in ( "-d", '--dmfilename'):
+	    dmFile = anArg
+	    
+	if anOption in ( "-t", '--template' ):
+	    HAVE_TEMPLATE = True
+	    emFile = anArg   
+	    
+	if anOption in ( "-p", '--py'):
+	    HAVE_PY = True
+	    pyFile = anArg
+	    
+    # check if input file is given
+    if not sys.argv[1]:
+	help()
+	msg( "Error: not enough arguments" )
+	sys.exit(1)
+	
+    if not HAVE_TEMPLATE:
+	help()
+	msg( "Error: Template file was not specified" )
+	sys.exit(1)
 
-while [ -n "$(echo $1 | grep '-')" ]; do
-    case "$1" in
-	-d|--dmfile) DMFILE=$2 ; shift 2 ;;
-	-t|--template) HAVE_TEMPLATE=yes ; EMFILE=$2 ; shift 2 ;;
-	-p|--py) HAVE_PY=yes ; PYFILE=$2 ; shift 2 ;;
-	-v|--verbose) VERBOSE=yes ; shift ;;
-	-h|--help) help ; exit 0 ;;
-	*) echo "Invalid Option! " ; help ; exit 1 ;;
-    esac
-done
+    if not HAVE_PY:
+	help()
+	msg( "Error: PY file was not specified" )
+	sys.exit(1)
 
-# em command
-
-base=`basename $DMFILE .dm`
-outfile=$base$OUTSUFFIX
-
-if [ $HAVE_TEMPLATE ] ; then 
-    EMFILE="${EMFILE}"
-else
-    echo 'don't specify template dir'
-fi
-
-if [ $HAVE_EMPY ] ; then 
-    PYFILE="${PYFILE}"
-else
-    echo 'don't specify PY file'
-fi
-
-command="python $EMPYBIN $EMPYOPTIONS -F $PYFILE -F $DMFILE -o $outfile $EMFILE"
-
-if [ $VERBOSE ] ; then
-    echo $command
-fi
-
-$command
-
-exit $?
+    basedmFile = os.path.basename(dmFile)
+    name, ext = os.path.splitext(basedmFile)
+    outFile = name + OUTSUFFIX
+    pyFile = normpath(pyFile)
+    dmFile = normpath(dmFile)
+    
+    cmdstr = 'python ' + EMPYBIN + ' ' + EMPYOPTIONS + ' -F ' + pyFile + \
+	    ' -F ' + dmFile + ' -o ' + outFile + ' ' + emFile
+    if execute( cmdstr ):
+	msg ( "Error: failed to create " + outFile )
+	sys.exit(1)
+    
+    msg( 'generated ' + outFile )
+    
+if __name__ == '__main__':
+    main()
 
