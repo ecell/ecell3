@@ -856,6 +856,8 @@ on an object, the last is taken.</para>
         for <parameter>PROPERTY_BASECLASS</parameter>.
 </para>
 
+
+	<!--   Really?   Need verification.
 	<note>
 	  <title>Virtual functions and properties</title>
 
@@ -864,6 +866,8 @@ on an object, the last is taken.</para>
            property after <function>INHERIT_PROPERTIES</function>
            macro in a subclass.</para>
 	</note>
+	-->
+
       </sect3>
 
 

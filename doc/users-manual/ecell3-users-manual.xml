@@ -84,8 +84,10 @@
   <!ENTITY EntityType "<wordasword>EntityType</wordasword>">
   <!ENTITY FullID "<wordasword>FullID</wordasword>">
   <!ENTITY FullPN "<wordasword>FullPN</wordasword>">
-  <!ENTITY ID "<wordasword>ID</wordasword>">
+  <!ENTITY EntityID "<wordasword>Entity ID</wordasword>">
+  <!ENTITY StepperID "<wordasword>Stepper ID</wordasword>">
   <!ENTITY SystemPath "<wordasword>SystemPath</wordasword>">
+  <!ENTITY VariableReference "<wordasword>VariableReference</wordasword>">
 
   <!ENTITY ecell3 "<command>ecell3</command>">
   <!ENTITY ecell3-session "<command>ecell3-session</command>">
