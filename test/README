@@ -9,7 +9,7 @@ A simple and incomplete test for ecell3.
 
 2. build Reactor dynamic module plugin
 
-   % emtool reactor -c MichaelisUniUniReactor.cpp 
+   % emtool -a MichaelisUniUniReactor.dm
    % ls *.so
    MichaelisUniUniReactor.so
 
@@ -18,24 +18,10 @@ A simple and incomplete test for ecell3.
    The following command invokes ecell3, create Session instance, 
    load simple.eml and run 1000 seconds.
 
-   % ecell3 testeml.py
+   % ecell3 testeml.py simple.eml
 
-   An example of output is as following; 
+   This will show a part of logger data.
    Check Substance:/CELL/CYTOPLASM:S:Quantity is consumed.
-
-   create a simulation session instance
-   load Model
-   Current time =  0.0
-   Substance:/CELL/CYTOPLASM:S:Quantity    =       (1000000.0,)
-   Substance:/CELL/CYTOPLASM:P:Quantity    =       (0.0,)
-   Substance:/CELL/CYTOPLASM:E:Quantity    =       (1000.0,)
-   Current time =  1000.00099998
-   Reactor:/CELL/CYTOPLASM:E:ActivityPerSecond     =       (0.0,)
-   Substance:/CELL/CYTOPLASM:S:Quantity    =       (0.0,)
-   Substance:/CELL/CYTOPLASM:S:Concentration       =       (0.0,)
-   Substance:/CELL/CYTOPLASM:S:Activity    =       (0.0,)
-   Substance:/CELL/CYTOPLASM:S:Velocity    =       (-0.0,)
-   Substance:/CELL/CYTOPLASM:P:Quantity    =       (1000000.0,)
 
 
 4. Run gecell (osogo)

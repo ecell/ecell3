@@ -33,84 +33,57 @@ namespace libecs
     {
       Reactor::initialize();
 
-      if( theReactantQuantitySlotVector.size() == 0 )
-	{
-	  for( ReactantMapIterator s( theReactantMap.begin() );
-	       s != theReactantMap.end() ; ++s )
-	    {
-	      SubstancePtr aSubstance( s->second.getSubstance() );
-	      
-	      theReactantQuantitySlotVector.push_back( aSubstance->
-						       getPropertySlot( "Quantity", this ) );
-	      theReactantVelocitySlotVector.push_back( aSubstance->
-						       getPropertySlot( "Velocity", this ) );
-	      
-	    }
-	}
-
     }
 
-    void process( const Real velocity )
+    void process( RealCref velocity )
     {
-      Real aVelocityPerStep( velocity );
-      aVelocityPerStep *= getSuperSystem()->getStepper()->getStepInterval();
+      Real aVelocity( velocity );
 
       // The aVelocityPerStep is limited by amounts of substrates and products.
-#if 0
-      if( aVelocityPerStep >= 0 )  // If the reaction occurs forward,
+      /*
+      for( ReactantMapIterator s( theReactantMap.begin() );
+	   s != theReactantMap.end() ; ++s )
 	{
-	  for( ReactantMapIterator s( theReactantMap.begin() );
-	       s != theReactantMap.end() ; ++s)
+	  Reactant aReactant( s->second );
+	  Int aStoichiometry( aReactant.getStoichiometry() );
+	  
+	  if( aStoichiometry != 0 )
 	    {
-	      Real aLimit( (*s)->getSubstance().getQuantity()
-			   * (*s)->getStoichiometry() );
-	      if( aVelocityPerStep > aLimit )
-		{
-		  aVelocityPerStep = aLimit;
-		}
+	      Real aVelocityPerStep = velocity * aReactant.getSubstance()->
+		getStepper()->getStepInterval();
+
+	      Real aLimit( aReactant.getSubstance()->getQuantity() 
+			   / aStoichiometry );
+	      if( ( aLimit > 0 && aVelocityPerStep > aLimit ) ||
+		  ( aLimit < 0 && aVelocityPerStep < aLimit ) )
+	      {
+		aVelocityPerStep = aLimit;
+	      }
 	    }
 	}
-      else  // Or if the reaction occurs reversely
-	{
-	  for( ReactantVectorIterator p( theProductList.begin() );
-	       p != theProductList.end() ; ++p)
-	    {
-	      Real aLimit( - (*p)->getSubstance().getQuantity()
-			   * (*p)->getStoichiometry() );
-	      if( aVelocityPerStep < aLimit )
-		{
-		  aVelocityPerStep = aLimit;
-		}
-	    }          
-	}
-#endif
+      */
+
     // IMPORTANT!!!: 
     // Activity must be given as 
     // [number of molecule that this reactor yields / deltaT]
-    // *BUT* this is *RECALCULATED* as [number of molecule / s]
-    // in Reactor::activity().
-    setActivity( aVelocityPerStep );
+    setActivity( aVelocity );
 
     // Increase or decrease reactants.
 
-    PropertySlotVectorIterator i( theReactantVelocitySlotVector.begin() );
     for( ReactantMapIterator s( theReactantMap.begin() );
 	 s != theReactantMap.end() ; ++s )
       {
-	const Int aStoichiometry( (*s).second.getStoichiometry() );
+	Reactant aReactant( s->second );
+	const Int aStoichiometry( aReactant.getStoichiometry() );
 	if( aStoichiometry != 0 )
 	  {
-	    (*i)->setReal( aVelocityPerStep * aStoichiometry );
+	    aReactant.getSubstance()->
+	      addVelocity( aVelocity * aStoichiometry );
 	  }
- 	++i;
       }
 
     }
 
-  protected:
-
-    PropertySlotVector theReactantQuantitySlotVector;
-    PropertySlotVector theReactantVelocitySlotVector;
   };
 
 }

@@ -80,22 +80,22 @@
 
 
 <reactor class="MichaelisUniUniReactor" id="E" name="E">
-<property name="Reactant">
+<property name="ReactantList">
+<value>
 <value number="0">S0</value>
 <value number="1">Substance:/CELL/CYTOPLASM:S</value>
 <value number="2">-1</value>
-</property>
-
-<property name="Reactant">
+</value>
+<value>
 <value number="0">P0</value>
 <value number="1">Substance:/CELL/CYTOPLASM:P</value>
 <value number="2">1</value>
-</property>
-
-<property name="Reactant">
+</value>
+<value>
 <value number="0">C0</value>
 <value number="1">Substance:/CELL/CYTOPLASM:E</value>
 <value number="2">0</value>
+</value>
 </property>
 
 <property name="KmS">
@@ -107,6 +107,8 @@
 </property>
 
 </reactor>
+
+
 </system>
 
 

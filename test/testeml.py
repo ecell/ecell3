@@ -23,19 +23,13 @@ aFile.close()
 print 'init'
 aSimulator.initialize()
 
-aLogger1 = aSimulator.getLogger( 'Substance:/CELL/CYTOPLASM2:S:Quantity'  )
+aLogger1 = LoggerStub( aSimulator, 'Substance:/CELL/CYTOPLASM:S:Quantity'  )
+aLogger1.create()
 
-
-
-
-#printAllProperties( aSimulator, 'System::/' )
-#printAllProperties( aSimulator, 'System:/:CELL' )
-#printAllProperties( aSimulator, 'System:/CELL:CYTOPLASM' )
-#printAllProperties( aSimulator, 'Reactor:/CELL/CYTOPLASM:E' )
-
+aSubstanceS = EntityStub( aSimulator, 'Substance:/CELL/CYTOPLASM:S' )
 
 print 'Current time = ', aSimulator.getCurrentTime()
-printProperty( aSimulator, 'Substance:/CELL/CYTOPLASM:S:Quantity' )
+print aSubstanceS.theFullIDString, ':Quantity =', aSubstanceS.getProperty( 'Quantity' )
 printProperty( aSimulator, 'Substance:/CELL/CYTOPLASM:P:Quantity' )
 printProperty( aSimulator, 'Substance:/CELL/CYTOPLASM:E:Quantity' )
 
@@ -43,11 +37,10 @@ printProperty( aSimulator, 'Substance:/CELL/CYTOPLASM:E:Quantity' )
 aSimulator.run( 1000 )
 
 print 'Current time = ', aSimulator.getCurrentTime()
-printProperty( aSimulator, 'Reactor:/CELL/CYTOPLASM:E:ActivityPerSecond' )
-printProperty( aSimulator, 'Substance:/CELL/CYTOPLASM:S:Quantity' )
-printProperty( aSimulator, 'Substance:/CELL/CYTOPLASM:S:Concentration' )
-printProperty( aSimulator, 'Substance:/CELL/CYTOPLASM:S:Activity' )
-printProperty( aSimulator, 'Substance:/CELL/CYTOPLASM:S:Velocity' )
+print aSubstanceS.theFullIDString, ':'
+print '\tQuantity =', aSubstanceS.getProperty( 'Quantity' )
+print '\tConcentration =', aSubstanceS.getProperty( 'Concentration' )
+print '\tTotalVelocity =', aSubstanceS.getProperty( 'TotalVelocity' )
 printProperty( aSimulator, 'Substance:/CELL/CYTOPLASM:P:Quantity' )
 
 

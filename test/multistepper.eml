@@ -10,8 +10,8 @@
 
 
 <stepperlist>
-<stepper class="Euler1SRMStepper" id="SRM_01"/>
-<stepper class="Euler1SRMStepper" id="SRM_02"/>
+<stepper class="Euler1Stepper" id="SRM_01"/>
+<stepper class="Euler1Stepper" id="SRM_02"/>
 </stepperlist>
 
 
@@ -55,46 +55,50 @@
 </property>
 
 <property name="Volume">
-<value number="0">1e-10</value>
+<value number="0">1e-18</value>
 </property>
 
 
-<substance class="SRMSubstance" id="S" name="substance S">
+<substance class="Substance" id="S" name="substance S">
 <property name="Quantity">
 <value number="0">1000000</value>
 </property>
 </substance>
 
-<substance class="SRMSubstance" id="P" name="substance P">
+<substance class="Substance" id="P" name="substance P">
 <property name="Quantity">
 <value number="0">0</value>
 </property>
 </substance>
 
-<substance class="SRMSubstance" id="E" name="substance E">
+
+<substance class="Substance" id="E" name="substance E">
 <property name="Quantity">
 <value number="0">1000</value>
 </property>
 </substance>
 
 <reactor class="MichaelisUniUniReactor" id="E" name="E">
-<property name="Reactant">
+<property name="ReactantList">
+<value>
 <value number="0">S0</value>
 <value number="1">Substance:/CELL/CYTOPLASM:S</value>
 <value number="2">-1</value>
-</property>
+</value>
 
-<property name="Reactant">
+<value>
 <value number="0">P0</value>
 <value number="1">Substance:/CELL/CYTOPLASM:P</value>
 <value number="2">1</value>
-</property>
+</value>
 
-<property name="Reactant">
+<value>
 <value number="0">C0</value>
 <value number="1">Substance:/CELL/CYTOPLASM:E</value>
 <value number="2">0</value>
+</value>
 </property>
+
 
 <property name="KmS">
 <value number="0">1</value>
@@ -117,7 +121,7 @@
 <system class="System" id="/CELL/CYTOPLASM2" name="Cytoplasm 2">
 
 <property name="StepperID">
-<value>SRM_02</value>
+<value>SRM_01</value>
 </property>
 
 <property name="Volume">
@@ -125,19 +129,19 @@
 </property>
 
 
-<substance class="SRMSubstance" id="S" name="substance S">
+<substance class="Substance" id="S" name="substance S">
 <property name="Quantity">
 <value number="0">1000000</value>
 </property>
 </substance>
 
-<substance class="SRMSubstance" id="P" name="substance P">
+<substance class="Substance" id="P" name="substance P">
 <property name="Quantity">
 <value number="0">0</value>
 </property>
 </substance>
 
-<substance class="SRMSubstance" id="E" name="substance E">
+<substance class="Substance" id="E" name="substance E">
 <property name="Quantity">
 <value number="0">1000</value>
 </property>
@@ -150,16 +154,18 @@
 <value number="2">-1</value>
 </property>
 
-<property name="Reactant">
+<property name="ReactantList">
+<value>
 <value number="0">P0</value>
 <value number="1">Substance:/CELL/CYTOPLASM2:P</value>
 <value number="2">1</value>
-</property>
+</value>
 
-<property name="Reactant">
+<value>
 <value number="0">C0</value>
 <value number="1">Substance:/CELL/CYTOPLASM2:E</value>
 <value number="2">0</value>
+</value>
 </property>
 
 <property name="KmS">
