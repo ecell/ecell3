@@ -75,7 +75,7 @@ namespace libecs
       case SYSTEM:
 	break;
       }
-    PropertyMapIterator pmitr( aMessageInterfacePtr->getMessageCallback( property_name ) );
+    PropertyMapIterator pmitr( aMessageInterfacePtr->getMessageSlot( property_name ) );
     LoggerPtr aNewLoggerPtr = new Logger( pmitr->second );
   }
   

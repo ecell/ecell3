@@ -38,7 +38,7 @@ StlDataPointVector.cpp\
 Logger.cpp\
 LoggerBroker.cpp
 
-libecsdir=${pkginclude}/libecs
+libecsdir=${pkgincludedir}/libecs
 libecs_HEADERS=\
 libecs.hpp\
 Defs.hpp\

@@ -77,7 +77,6 @@ namespace libecs
   DECLARE_CLASS( SystemMaker );
   DECLARE_CLASS( Message );
   DECLARE_CLASS( AbstractMessageSlot );
-  DECLARE_CLASS( MessageSlot );
   DECLARE_CLASS( MessageInterface );
   DECLARE_CLASS( UniversalVariable );
   DECLARE_CLASS( LoggerBroker );

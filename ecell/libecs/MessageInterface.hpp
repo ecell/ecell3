@@ -77,7 +77,7 @@ namespace libecs
   */
 
 
-  template <class T>
+  template<class T>
   class MessageSlot : public AbstractMessageSlot
   {
 
@@ -93,8 +93,8 @@ namespace libecs
       : 
       theObject( object ), 
       theSetMethod( setmethod ), 
-      theGetMethod( getmethod ),
-      theLogger( 0 )
+      theGetMethod( getmethod )
+      //      theLogger( 0 )
     {
       ; // do nothing
     }
@@ -118,18 +118,19 @@ namespace libecs
 	}
       return ( ( theObject.*theGetMethod )( keyword ));
     }
-
+    /*
     virtual void setLogger( LoggerRef logger )
     {
       theLogger = &logger;
     }
+    */
 
   private:
 
     T& theObject;
     const SetMessageFunc theSetMethod;
     const GetMessageFunc theGetMethod;
-    LoggerPtr theLogger;
+    //    LoggerPtr theLogger;
   };
 
   /**

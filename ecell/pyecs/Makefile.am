@@ -48,7 +48,7 @@ clean-local:
 	rm -f ecs.so
 	rm -f $(CXXSRC)
 
-pyecsdir=${pkginclude}/pyecs
+pyecsdir=${pkgincludedir}/pyecs
 pyecs_HEADERS=\
 PyEcs.hpp\
 PySimulator.hpp
