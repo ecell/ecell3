@@ -152,7 +152,11 @@ namespace libecs
 
     void setID( StringCref anID ) 
     { 
+<<<<<<< Entity.hpp
+      theID = anID; 
+=======
       theID = anID;
+>>>>>>> 1.35
     }
 
     /**
