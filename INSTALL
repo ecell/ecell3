@@ -12,22 +12,17 @@ $Id$
 
    Official development site of E-Cell 3 is:
 
-   http://bioinformatics.org/project/?group_id=46
+    http://www.e-cell.org/software
 
-   You can get the latest CVS version anonymously by:
+   You can get the latest CVS version anonymously.  See this page
+   for CVS instructions:
 
-     % cvs -d:pserver:anonymous@bioinformatics.org:/cvsroot login
-     % cvs -d:pserver:anonymous@bioinformatics.org:/cvsroot checkout ecell3
+    http://sf.net/cvs/?group_id=72485
 
 
 2. Get tarball:
 
    Check the same URL as 1.
-
-
-Also check e-cell.org:
-
-   http://www.e-cell.org
 
 
 
@@ -60,39 +55,43 @@ NOTE: If you get this package via cvs, use ./autogen.sh instead of
   If you are using RedHat Linux 9, you need some additional packages to 
   successfully build and run E-Cell 3.
 
-  1. Numeric Python for python2:
-     note that this should be built for python2, not python.
-     You may have to build and install from tarball.
+  1. Numeric Python for python2.  (Version 22.0 or later)
+       http://numpy.sf.net
 
-     http://numpy.sourceforge.net
+     Get RPM files, or build it from tarball.
 
 
-  2. GNU Scientific Library:
+  2. GNU Scientific Library.  (Version 1.1 or later)
+       http://sources.redhat.com/gsl
 
      This is provided as optional packages of RedHat 9.
-     Find gsl-*.rpm and gsl-devel*.rpm files in the distribution and
-     use rpm command to install them.
+     Find gsl-*.rpm and gsl-devel*.rpm files in the distribution 
+     or the redhat ftp mirror.
      
 
-  3. Boost C++ Libraries
-
-     You need to have boost C++ Libraries version 1.29.0 or later.
-
-     Go http://www.boost.org
-     You may have to extract Boost tarball at the same directory of 
-     E-Cell3 source code and should rename the package name to boost.
-
-     % gzip -dc boost_all.tar.gz | tar xvf -
-     % mv boost_1_29_0 boost
+  3. Boost C++ Libraries.  (Version 1.29 or later)
+       http://www.boost.org
 
 
-  I recommend http://www.freshmeat.net for finding the latest URLs for the
-  packages.
+
+  RPM packages of Numeric Python and Boost can be found here:
+
+       http://ecell.sf.net/packages/rpm/
 
 
   == Build ecell3 without GUI ==
 
   Use --disable-gtk configure option.
+
+
+  == Boost library installed under non-standard directories ==
+
+  Use --with-boost-include-dir= configure option to specify
+  non-standard include directory for boost.
+
+  Use --with-boost-lib-dir= configure option to specify
+  non-standard lib directory for boost.
+
 
 
 
@@ -123,7 +122,7 @@ NOTE: If you get this package via cvs, use ./autogen.sh instead of
 
    == 2. Using E-Cell from Osogo GUI ==
 
-   If you have python, and gnome-python  installed,
+   If you have python, and pygtk2 installed,
    a GUI session monitor, Osogo, is built.
 
    To use Osogo, type:
@@ -187,9 +186,6 @@ NOTE: If you get this package via cvs, use ./autogen.sh instead of
  
 
 
-
-
-(( Below are general instructions with automake. ))
 
 
 Basic Installation

@@ -27,13 +27,28 @@ dnl
 dnl
 AC_CONFIG_SUBDIRS( libltdl ecell bin dmtool )
 dnl
-AC_ARG_ENABLE(gtk,,[
-ECELL_SUBDIR="libltdl ecell bin dmtool "],[
-ECELL_SUBDIR="libltdl ecell bin dmtool osogo "
-AC_CONFIG_SUBDIRS(osogo)]
+AC_ARG_ENABLE(gtk,
+  AC_HELP_STRING([--disable-gtk],
+               [build ecell without gtk.]),
+  [ECELL_SUBDIR="libltdl ecell bin dmtool "],
+  [ECELL_SUBDIR="libltdl ecell bin dmtool osogo "
+  AC_CONFIG_SUBDIRS(osogo)]
 )
 dnl
 AC_SUBST(ECELL_SUBDIR)
+dnl
+dnl
+dnl
+dnl
+dnl
+dnl
+AC_ARG_WITH( boost-include,
+  AC_HELP_STRING([--with-boost-include-dir=],
+               [specify a non-standard include directory for boost library.]) )
+AC_ARG_WITH( boost-lib-dir,
+  AC_HELP_STRING([--with-boost-lib-dir=],
+               [specify a non-standard library directory for boost library.]) )
+dnl
 dnl
 AM_CONFIG_HEADER([ecell3_config.h])
 dnl

@@ -135,16 +135,18 @@ dnl
 dnl boost package
 dnl
 dnl
-AC_ARG_WITH( boost-include,
-  AC_HELP_STRING([--with-boost-include=],
-               [specify a special include directory for boost library.]),
-  [$BOOST_INCLUDE=-I$withval],
+AC_ARG_WITH( boost-include-dir,,
+  [$BOOST_INCLUDE="-I$withval"],
   [$BOOST_INCLUDE=])
 AC_SUBST(BOOST_INCLUDE)
+AC_ARG_WITH( boost-lib-dir,,
+  [$BOOST_LIB="-L$withval"],
+  [$BOOST_LIB=])
+AC_SUBST(BOOST_LIB)
 
 dnl if test "$BOOST_DIR" = "" ; then
 dnl        AC_MSG_CHECKING( for boost dir )
-dnl        ac_cv_boost_dir="no"
+dnl        ac_cv_boost_dir="no"	
 dnl        for ac_dir in $EXT_GUESS ; do
 dnl                if test -d $ac_dir/boost ; then
 dnl                        ac_cv_boost_dir=`(cd $ac_dir/boost ; pwd)`
