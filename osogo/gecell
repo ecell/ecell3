@@ -9,4 +9,7 @@ PYTHONPATH = os.environ['PYTHONPATH']
 os.environ['PYTHONPATH'] = OSOGOPATH + os.pathsep + PYTHONPATH
 os.environ['LANG'] = 'C'
 
-os.popen('python' + ' ' + '\"' + OSOGOPATH + '\"' + os.sep + 'opengui.py' + ' \"' + string.join( sys.argv[1:], '\" \"' ) + '\"')
+if os.name == 'nt':
+    os.popen('python' + ' ' + '\"' + OSOGOPATH + '\"' + os.sep + 'opengui.py' + ' \"' + string.join( sys.argv[1:], '\" \"' ) + '\"')
+else:
+    os.system('python' + ' ' + '\"' + OSOGOPATH + '\"' + os.sep + 'opengui.py' + ' \"' + string.join( sys.argv[1:], '\" \"' ) + '\"')
