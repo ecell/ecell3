@@ -35,6 +35,7 @@ make
 
 make strip 
 make prefix="$RPM_BUILD_ROOT/usr" install
+chmod 666 $RPM_BUILD_ROOT/usr/lib/toollauncher/launcher.ini
 make prefix="$RPM_BUILD_ROOT/usr" doc-install
 
 %clean
