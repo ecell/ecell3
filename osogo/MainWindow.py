@@ -88,10 +88,6 @@ DESCRIPTION = 'Osogo is a simulation session monitoring module for E-CELL SE Ver
 # ---------------------------------------------------------------
 class MainWindow(OsogoWindow):
 
-	ModelFileExtension = 'eml'
-	ScriptFileExtension = 'py'
-	CellStateFileExtension = 'cs'
-
 	# ---------------------------------------------------------------
 	# Constructor
 	#   - creates MessageWindow 
@@ -191,10 +187,11 @@ class MainWindow(OsogoWindow):
 		self['MainWindow'].connect('expose-event',self.expose)
 
 		self.theHandlerMap = \
-		  { 'load_rule_menu_activate'                  : self.openModelFileSelection ,
-			'load_script_menu_activate'            : self.openScriptFileSelection ,
-			'save_cell_state_menu_activate'        : self.saveCellStateToTheFile ,
-			'save_cell_state_as_menu_activate'     : self.openSaveCellStateFileSelection ,
+		  { 
+		# menu
+		    'load_rule_menu_activate'              : self.openLoadModelFileSelection ,
+			'load_script_menu_activate'            : self.openLoadScriptFileSelection ,
+			'save_model_menu_activate'             : self.openSaveModelFileSelection ,
 			'exit_menu_activate'                   : self.exit ,
 			'message_window_menu_activate'         : self.toggleMessageWindowByMenu ,
 			'interface_window_menu_activate'       : self.toggleInterfaceWindowByMenu ,
@@ -204,6 +201,7 @@ class MainWindow(OsogoWindow):
 			'stepper_window_menu_activate'         : self.toggleStepperWindowByMenu ,
 			'preferences_menu_activate'            : self.openPreferences ,
 			'about_menu_activate'                  : self.openAbout ,
+		# button
 			'start_button_clicked'                 : self.startSimulation ,
 			'stop_button_clicked'                  : self.stopSimulation ,
 			'step_button_clicked'                  : self.stepSimulation ,
@@ -219,15 +217,6 @@ class MainWindow(OsogoWindow):
 			'destroy'                              : self.exitCompulsorily,
 		}
 		self.addHandlers( self.theHandlerMap )
-
-
-		# -------------------------------------
-		# create Save Cell State File Selection 
-		# -------------------------------------
-		self.theSaveFileSelection = gtk.FileSelection( 'Select Model File for Saving' )
-		self.theSaveFileSelection.ok_button.connect('clicked', self.saveCellState)
-		self.theSaveFileSelection.cancel_button.connect('clicked', self.closeParentWindow)
-		self.theSaveFileSelection.complete( '*.' + self.CellStateFileExtension )
 
 		# -------------------------------------
 		# initialize for run method 
@@ -288,6 +277,7 @@ class MainWindow(OsogoWindow):
 		self['palette_togglebutton'].set_sensitive(0)
 		self['palette_window_menu'].set_sensitive(0)
 		self['create_new_entity_list_menu'].set_sensitive(0)
+		self['save_model_menu'].set_sensitive(0)
 
 		self.setUnSensitiveMenu()
 
@@ -355,34 +345,34 @@ class MainWindow(OsogoWindow):
 
 
 	# ---------------------------------------------------------------
-	# openModelFileSelection
+	# openLoadModelFileSelection
 	#
 	# anObject: a reference to widget
 	#
 	# return -> None
 	# This method is throwable exception.
 	# ---------------------------------------------------------------
-	def openModelFileSelection( self, anObject ) :
+	def openLoadModelFileSelection( self, anObject ) :
 
 		self.theModelFileSelection = gtk.FileSelection( 'Select Model File' )
-		#self.theModelFileSelection.set_modal(gtk.TRUE)
-		self.theModelFileSelection.ok_button.connect('clicked', self.loadModel)
+		self.theModelFileSelection.ok_button.connect('clicked', self.__loadModel)
 		self.theModelFileSelection.cancel_button.connect('clicked', self.closeParentWindow)
-		self.theModelFileSelection.complete( '*.' + self.ModelFileExtension )
+		self.theModelFileSelection.complete( '*.' + MODEL_FILE_EXTENSION )
 		self.theModelFileSelection.show_all()
 
-	# end of openModelFileSelection
+	# end of openLoadModelFileSelection
+
 
 
 	# ---------------------------------------------------------------
-	# loadModel
+	# __loadModel
 	#
 	# button_obj: reference to button
 	#
 	# return -> None
 	# This method is throwable exception.
 	# ---------------------------------------------------------------
-	def loadModel( self, button_obj ) :
+	def __loadModel( self, button_obj ) :
 
 		try:
 			aFileName = self.theModelFileSelection.get_filename()
@@ -398,7 +388,7 @@ class MainWindow(OsogoWindow):
 			self.theModelFileSelection.hide()
 			self.read_ini(aFileName)
 			self.theSession.message( 'loading rule file %s\n' % aFileName)
-			aModelFile = open( aFileName )
+			aModelFile = open( aFileName, 'r' )
 			self.theSession.loadModel( aModelFile )
 			aModelFile.close()
 			self.theSession.theSimulator.initialize()
@@ -422,29 +412,30 @@ class MainWindow(OsogoWindow):
 			self['create_new_entity_list_menu'].set_sensitive(1)
 			self['load_rule_menu'].set_sensitive(0)
 			self['load_script_menu'].set_sensitive(0)
+			self['save_model_menu'].set_sensitive(1)
 			#self.setUnSensitiveMenu()
 
 	# end of loadModel
 
 
 	# ---------------------------------------------------------------
-	# openScriptFileSelection
+	# openLoadScriptFileSelection
 	#
 	# anObject:  dammy object
 	#
 	# return -> None
 	# This method is throwable exception.
 	# ---------------------------------------------------------------
-	def openScriptFileSelection( self, anObject ) :
+	def openLoadScriptFileSelection( self, anObject ) :
 
-		self.theScriptFileSelection = gtk.FileSelection( 'Select Script File' )
+		self.theLoadScriptFileSelection = gtk.FileSelection( 'Select Script File' )
 		#self.theScriptFileSelection.set_modal(gtk.TRUE)
-		self.theScriptFileSelection.ok_button.connect('clicked', self.loadScript)
-		self.theScriptFileSelection.cancel_button.connect('clicked', self.closeParentWindow)
-		self.theScriptFileSelection.complete( '*.' + self.ScriptFileExtension )
-		self.theScriptFileSelection.show_all()
+		self.theLoadScriptFileSelection.ok_button.connect('clicked', self.loadScript)
+		self.theLoadScriptFileSelection.cancel_button.connect('clicked', self.closeParentWindow)
+		self.theLoadScriptFileSelection.complete( '*.' + SCRIPT_FILE_EXTENSION )
+		self.theLoadScriptFileSelection.show_all()
         
-	# end of openScriptFileSelection
+	# end of openLoadScriptFileSelection
 
 
 	# ---------------------------------------------------------------
@@ -457,8 +448,8 @@ class MainWindow(OsogoWindow):
 	# ---------------------------------------------------------------
 	def loadScript( self, anObject ):
 
-		aFileName = self.theScriptFileSelection.get_filename()
-		self.theScriptFileSelection.hide()
+		aFileName = self.theLoadScriptFileSelection.get_filename()
+		self.theLoadScriptFileSelection.hide()
 
 		if not os.access( aFileName, os.R_OK ):
 			self.printMessage('Error: loadScript: can\'t load [%s]' % aFileName)
@@ -490,43 +481,72 @@ class MainWindow(OsogoWindow):
 			self['create_new_entity_list_menu'].set_sensitive(1)
 			self['load_rule_menu'].set_sensitive(0)
 			self['load_script_menu'].set_sensitive(0)
+			self['save_model_menu'].set_sensitive(1)
 			self.setUnSensitiveMenu()
 
 	# end of loadScript
 
 
 	# ---------------------------------------------------------------
-	# openSaveCellStateFileSelection
+	# openSaveModelFileSelection
 	#
-	# anObject:  dammy object
-	#
-	# return -> None
-	# This method is throwable exception.
-	# ---------------------------------------------------------------
-	def openSaveCellStateFileSelection( self, anObject ) :
-
-		#self.theSaveFileSelection.show_all()
-		aMessage = ' Sorry ! Not implemented... [%s]\n' %'08/Jul/2002'
-		self.printMessage(aMessage)
-		aDialog = ConfirmWindow(0,aMessage,'Sorry!')
-		return None
-
-	# end of openSaveCellStateFileSelection
-
-
-	# ---------------------------------------------------------------
-	# saveCellState ( NOT IMPLEMENTED ON 27/Jul/2002)
-	#
-	# anObject:  dammy object
+	# anObject: a reference to widget
 	#
 	# return -> None
 	# This method is throwable exception.
 	# ---------------------------------------------------------------
-	def saveCellState ( self, anObject ) :
+	def openSaveModelFileSelection( self, anObject ) :
 
-		pass
+		self.theSaveModelFileSelection = gtk.FileSelection( 'Select Model File' )
+		self.theSaveModelFileSelection.ok_button.connect('clicked', self.__saveModel)
+		self.theSaveModelFileSelection.cancel_button.connect('clicked', self.closeParentWindow)
+		self.theSaveModelFileSelection.complete( '*.' + MODEL_FILE_EXTENSION )
+		self.theSaveModelFileSelection.show_all()
 
-	# end of saveCellState
+	# end of openSaveModelFileSelection
+
+
+	# ---------------------------------------------------------------
+	# __saveModel
+	#
+	# button_obj: reference to button
+	#
+	# return -> None
+	# This method is throwable exception.
+	# ---------------------------------------------------------------
+	def __saveModel( self, button_obj ) :
+
+		try:
+			aFileName = self.theSaveModelFileSelection.get_filename()
+
+			if os.path.isfile( aFileName ):
+				aMessage = ' Would you like overwrite? \n[%s]' %aFileName
+				self.printMessage(aMessage)
+				aDialog = ConfirmWindow(OKCANCEL_MODE,aMessage,'Overwrite?')
+				if aDialog == -1:
+					return None
+			else:
+				pass
+
+			self.theSaveModelFileSelection.hide()
+			self.theSession.message( 'save model file %s\n' % aFileName)
+
+			aModelFile = open( aFileName, 'w')
+			self.theSession.saveModel( aModelFile )
+			aModelFile.close()
+			self.update()
+			self.updateFundamentalWindows()
+
+		except:
+			self.printMessage(' can\'t save [%s]' %aFileName)
+			aErrorMessage = string.join( traceback.format_exception(sys.exc_type,sys.exc_value,sys.exc_traceback), '\n' )
+			self.printMessage("-----------")
+			self.printMessage(aErrorMessage)
+			self.printMessage("-----------")
+			#self.setUnSensitiveMenu()
+
+	# end of loadModel
+
 
 	# ---------------------------------------------------------------
 	# exit
