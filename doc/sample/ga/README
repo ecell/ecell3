@@ -26,7 +26,7 @@ README                      This file
 Data/						Training time-course
 ga.py                       EMS file of GA
 runsession.py               ESS file that is used by GA
-setting.txt:                Setting file for ga.esm
+setting.txt:                Setting file for ga.py
 simple.em                   Model file (EM file) 
 
 
@@ -37,7 +37,7 @@ simple.em                   Model file (EM file)
    Refer to the following chapter for details.
 
 
-3. Run ga.esm file.
+3. Run ga.py file.
 
      [%] ecell3-session-manager ga.py
      GA on E-Cell3 ........ start
@@ -56,10 +56,10 @@ simple.em                   Model file (EM file)
 
 
 
-   ga.esm tries to 'setting.txt' in current working directory.
+   ga.py tries to 'setting.txt' in current working directory.
    If you'd like to use other setting file, do as below.
 
-   % ecell3-session-manager ga.esm -DSETTING=otherfile
+   % ecell3-session-manager ga.py -DSETTING=otherfile
 
 
 4. See results.
@@ -82,7 +82,7 @@ simple.em                   Model file (EM file)
 
 === Detail of Setting File ===
 
-   The properties of ga.esm is written in setting.txt.
+   The properties of ga.py is written in setting.txt.
    In the file, the format of items follows, 
 
    KEY = VALUE
@@ -112,7 +112,7 @@ simple.em                   Model file (EM file)
 
 === Detail of ESS File ===
 
-   ga.esm requires ESS file to run E-Cell3 and evaluate
+   ga.py requires ESS file to run E-Cell3 and evaluate
    the given parameters. In this sample, runsession.py is
    already prepared.
    In this file, the following procedure should be
@@ -124,7 +124,7 @@ simple.em                   Model file (EM file)
    4. evaluate the result.
    5. written evaluated value to file.
 
-   When this script is executed by ga.esm, the following
+   When this script is executed by ga.py, the following
    items are replaced.
 
    EML KEY     -> EML FILES
@@ -133,7 +133,47 @@ simple.em                   Model file (EM file)
 
    And the evaluated value must be written as float value
    in result.dat file. After this script is executed, 
-   ga.esm tries to read result.dat file.
+   ga.py tries to read result.dat file.
+
+=== Resume ===
+
+   To restart GA with pre-existing data, you should prepare
+   the following file.
+
+   PARAMETER1 = VALUE1
+   PARAMETER2 = VALUE2
+   ...
+
+   (example)
+   _KmS_   = 12.0
+   _KcF_   = 8.2
+
+   And you specify file name for "RESUME FILE" parameter in
+   setting file.
+
+   (example in setting.txt)
+   RESUME FILE = resume.txt
+
+   
+   Finally, execute the following command.
+
+     [%] ecell3-session-manager ga.py
+     GA on E-Cell3 ........ start
+     Reading resume file ... resume.txt
+      [_KmS_] <--- [12.0]
+      [_KcF_] <--- [8.2]
+     (10/10) .....[1]        0.235249363621
+     (10/10) .....[2]        0.161928244491
+     (10/10) .....[3]        0.161928244491
+     (10/10) .....[4]        0.122347093743
+     reached max generation
+     ----------------------------------------
+     |   Result                             |
+     ----------------------------------------
+     (Evaluated Value)       = 0.122347093743
+     _KmS_   = 12.0990347731
+     _KcF_   = 4.37625454902
+     job id = [34]
 
 
 === Debugging ===

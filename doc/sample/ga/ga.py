@@ -26,6 +26,7 @@ SET_UP_NG_RETURN = 1
 # ------------------------
 SETTINGFILE_EXIT = 101
 SCRIPTFILE_EXIT = 102
+RESUMEFILE_EXIT = 103
 
 # ------------------------
 # Messages
@@ -55,7 +56,6 @@ class RCGA:
 		self.theCurrentGeneration = 0
 		self.theIndividualList = []
 		self.theErFileList = None
-		#self.theEcellSessionManager = None
 		self.theEliteIndividual = None
 		self.theParameterMap = None
 		self.theMutationRatio = None
@@ -115,6 +115,22 @@ class RCGA:
 		for anIndividual in self.theIndividualList:
 			anIndividual.constructRandomly()
 
+		# ----------------------------------------------------------
+		# resume 
+		# ----------------------------------------------------------
+
+		# when resume file is specified, read resume file
+		if self.theSetting['RESUME FILE'] != None:
+
+			sys.stdout.write( "Reading resume file ... %s\n" \
+			                   %self.theSetting['RESUME FILE'] )
+
+			# read resume data
+			aGenoType = self.readResumeFile( self.theSetting['RESUME FILE'] )
+
+			# set resume data to first individual
+			self.theIndividualList[0].setGenoType(aGenoType)
+
 
 		# ----------------------------------------------------------
 		# write gnuplot file
@@ -139,6 +155,72 @@ class RCGA:
 
 
 	# ------------------------------------------------------------------
+	def readResumeFile( self, aFile ):
+		'''read resume file
+		Return resume data (dict)
+        key is parameter symbol
+        value is parameter value
+		'''
+
+		aGenoType = {}
+		aSearch = re.compile('^(\S)+\s+=\s+(\S+)')
+
+		aCounter = 0
+
+		for aLine in open(aFile,'r').readlines():
+
+			# delete comment after #
+			anIndex = find( aLine, '#' ) 
+			if anIndex != -1:
+				aLine = aLine[:anIndex]
+
+
+			# get parameter symbol and value
+			aResult = aSearch.match(aLine)
+			if aResult != None:
+				aParam, anEqual, aValue = split( aResult.group() )
+				aValue = atof( aValue )
+				aMessage = " [%s] <--- [%s]\n" %(aParam,aValue)
+				sys.stdout.write(aMessage)
+				sys.stdout.flush()
+
+			aCounter += 1
+			aGenoType[aParam] = aValue
+
+		if aCounter != len(aGenoType):
+			aMessage = "%s : same parameter is found in resume input file.\n" %(ERROR)
+			sys.stdout.write(aMessage)
+			sys.stdout.flush()
+			sys.exit(RESUMEFILE_EXIT)
+
+
+		# validate resume file.
+		aParameterMap = {}
+		copy.deepcopy( Individual.theParameterMap, aParameterMap )
+
+		aKeyDict = copy.deepcopy( Individual.theParameterMap )
+
+		for aType in aGenoType.keys():
+			try:
+				del aKeyDict[aType]
+			except KeyError:
+				aMessage = "%s : %s no such parameter resume input file.\n" %(ERROR, aType)
+				sys.stdout.write(aMessage)
+				sys.stdout.flush()
+				sys.exit(RESUMEFILE_EXIT)
+		
+
+		if len(aKeyDict)!=0:
+			aMessage = "%s : %s must be set in resume input file.\n" \
+			            %(ERROR, str(aKeyDict.keys()))
+			sys.stdout.write(aMessage)
+			sys.stdout.flush()
+			sys.exit(RESUMEFILE_EXIT)
+
+		return aGenoType
+
+
+	# ------------------------------------------------------------------
 	def run( self ):
 		'''run a main loop of estimation
 		Return : None
@@ -153,10 +235,11 @@ class RCGA:
 			# clear all jobs
 			clearJob(jobid=-1)
 
-			print "[%s]\t%s" %(self.theCurrentGeneration, \
-			                   self.theEliteIndividual.getEvaluatedValue())
 
-			#if atoi(self.theSetting['MAX GENERATION']) <= self.theCurrentGeneration:
+			print "[%s]\t%s" %(self.theCurrentGeneration, \
+			       self.theEliteIndividual.getEvaluatedValue())
+
+			#if atoi(self.theSetiting['MAX GENERATION']) <= self.theCurrentGeneration:
 			if self.theSetting['MAX GENERATION'] <= self.theCurrentGeneration:
 				print "reached max generation"
 				break
@@ -214,11 +297,17 @@ class RCGA:
 				anExtraFiles = [ self.theSetting['EXTRA DIRS'][anIndex],
 				                 self.theSetting['EML FILES'][anIndex] ]
 
+				#if self.theCurrentGeneration == 1:
+				#	if self.theSetting['RESUME FILE'] != None:
+
+				#sys.exit(0)
+
 				anArgument = {}
 
 				for aKey in anIndividual.getGenoType().keys():
 					anArgument[aKey] = anIndividual.getGenoType()[aKey]
 
+				#print anArgument
 
 				anArgument[self.theSetting['EML KEY']] = self.theSetting['EML FILES'][anIndex]
 				anArgument[self.theSetting['DIR KEY']] = self.theSetting['EXTRA DIRS'][anIndex]
@@ -319,6 +408,7 @@ class RCGA:
 		Return None
 		'''
 
+
 		# --------------------------------------------------------------
 		# [1] Find the inidividual who has best evaluated value as elite
 		# --------------------------------------------------------------
@@ -389,7 +479,6 @@ class RCGA:
 					                  os.sep,
 					                  aDir)
 					shutil.rmtree(aDir)
-				# hoge
 
 				# ---------------------
 				# copy the directories related to elite individual
@@ -434,6 +523,8 @@ class RCGA:
 		else:
 			open( self.theSetting['ELITE FILE'], 'a').write(aContents)
 
+		#sys.stdout.write(aContents)
+		#sys.stdout.flush()
 
 		#self.theEcellSessionManager.saveEliteDirectory(anIndexOfElite)
 
@@ -1041,15 +1132,16 @@ class Setting(ConfigParser):
 		# check argument
 		# -----------------------------------------------
 		if aSettingFile == None:
-			aMessage = "%s: setting file must be specified" %FATAL_ERROR 
+			aMessage = "%s: setting file must be specified\n" %FATAL_ERROR 
 			sys.stderr.write(aMessage)
+			sys.stderr.flush()
 			sys.exit(SETTINGFILE_EXIT)
 
 		# -----------------------------------------------
 		# check the accessibility of setting file
 		# -----------------------------------------------
 		if os.access(aSettingFile,os.R_OK) == False:
-			aMessage = "Error: can't read %s" %aSettingFile
+			aMessage = "Error: can't read %s\n" %aSettingFile
 			sys.stderr.write(aMessage)
 			sys.exit(SETTINGFILE_EXIT)
 
@@ -1135,6 +1227,9 @@ class Setting(ConfigParser):
 		# parameters
 		aResult += self.__isList('PARAMETERS')
 		aResult += self.__checkParameterFormat()
+
+		# ess file name
+		aResult += self.__isReadableFileOrNone('RESUME FILE')
 
 		# ==========================================================
 		# [Temporaty directory]
@@ -1463,6 +1558,26 @@ class Setting(ConfigParser):
 					aNGNumber += 1
 
 		return aNGNumber
+
+
+	# ----------------------------------------------------------
+	def __isReadableFileOrNone(self,aKey):
+
+		#print "----or-not---"
+		#print self.__get(aKey) 
+
+		# ------------------------------------------
+		# check the existance
+		# ------------------------------------------
+		if aKey == None or self.__get(aKey) == None or \
+		   self.__get(aKey) == "" or self.__get(aKey) == "None":
+
+			self[aKey] = None
+			return SET_UP_OK_RETURN
+
+		else:
+			return self.__isReadableFile(aKey)
+
 
 	# ----------------------------------------------------------
 	def __isReadableFile(self,aKey):
