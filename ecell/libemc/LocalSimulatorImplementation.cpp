@@ -151,11 +151,9 @@ namespace libemc
 	while( (*thePendingEventChecker)() )
         {
 	  (*theEventHandler)();
-	  
+
 	  if( !theRunningFlag )
-	    {
-	      break;
-	    }
+	    break;
 	}
 
       }	while( theRunningFlag );
