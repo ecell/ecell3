@@ -114,9 +114,8 @@ namespace libecs
 
   Process::Process() 
     :
-    theFirstZeroVariableReferenceIterator( theVariableReferenceVector.end() ),
-    theFirstPositiveVariableReferenceIterator
-    ( theVariableReferenceVector.end() ),
+    theZeroVariableReferenceIterator( theVariableReferenceVector.end() ),
+    thePositiveVariableReferenceIterator( theVariableReferenceVector.end() ),
     theActivity( 0.0 ),
     thePriority( 0 ),
     theStepper( NULLPTR )
@@ -251,8 +250,8 @@ namespace libecs
 				    VariableReference::CoefficientCompare()
 				    ) );
 
-    theFirstZeroVariableReferenceIterator     = aZeroRange.first;
-    theFirstPositiveVariableReferenceIterator = aZeroRange.second;
+    theZeroVariableReferenceIterator     = aZeroRange.first;
+    thePositiveVariableReferenceIterator = aZeroRange.second;
   }
 
 
@@ -278,7 +277,7 @@ namespace libecs
 
   void Process::declareUnidirectional()
   {
-    std::for_each( theFirstPositiveVariableReferenceIterator,
+    std::for_each( thePositiveVariableReferenceIterator,
 		   theVariableReferenceVector.end(),
 		   std::bind2nd
 		   ( std::mem_fun_ref

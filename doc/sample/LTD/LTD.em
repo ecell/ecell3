@@ -3,9 +3,8 @@
 # from file: LTD.eml, date: Mon Oct 14 19:51:27 2002
 #
 
-#Stepper Euler1Stepper( DE_1 )
-#Stepper Midpoint2Stepper( DE_1 )
-Stepper CashKarp4Stepper( DE_1 )
+Stepper Fehlberg23Stepper( DE_1 )
+#Stepper DormandPrince547MStepper( DE_1 )
 #Stepper FixedRungeKutta4Stepper( DE_1 )
 {
 	# no property
@@ -572,16 +571,16 @@ System System( /CELL/CYTOPLASM )
 		VariableReferenceList	[ S0 Variable:/CELL/CYTOPLASM:NO -1 ] [ P0 Variable:/CELL/CYTOPLASM:N 1 ];
 	}
 	
-	Process MassActionProcess( GC.NO_NO_GC )
+	Process MassActionProcess( GC__NO_NO_GC )
 	{
-		Name	GC.NO_NO_GC;
+		Name	GC__NO_NO_GC;
 		k	3000000;
 		VariableReferenceList	[ S0 Variable:/CELL/CYTOPLASM:GC -1 ] [ S1 Variable:/CELL/CYTOPLASM:NO -1 ] [ P0 Variable:/CELL/CYTOPLASM:NO_GC 1 ];
 	}
 	
-	Process MassActionProcess( NO_GC_GC.NO )
+	Process MassActionProcess( NO_GC_GC__NO )
 	{
-		Name	NO_GC_GC.NO;
+		Name	NO_GC_GC__NO;
 		k	0.75;
 		VariableReferenceList	[ S0 Variable:/CELL/CYTOPLASM:NO_GC -1 ] [ P0 Variable:/CELL/CYTOPLASM:GC 1 ] [ P1 Variable:/CELL/CYTOPLASM:NO 1 ];
 	}
@@ -602,16 +601,16 @@ System System( /CELL/CYTOPLASM )
 		VariableReferenceList	[ S0 Variable:/CELL/CYTOPLASM:CGMP -1 ] [ P0 Variable:/CELL/CYTOPLASM:GMP5 1 ] [ C0 Variable:/CELL/CYTOPLASM:PDE];
 	}
 	
-	Process MassActionProcess( CGMP.PKG_cGMP_PKG )
+	Process MassActionProcess( CGMP__PKG_cGMP_PKG )
 	{
-		Name	CGMP.PKG_cGMP_PKG;
+		Name	CGMP__PKG_cGMP_PKG;
 		k	100000;
 		VariableReferenceList	[ S0 Variable:/CELL/CYTOPLASM:CGMP -1 ] [ S1 Variable:/CELL/CYTOPLASM:PKG -1 ] [ P0 Variable:/CELL/CYTOPLASM:cGMP_PKG 1 ];
 	}
 	
-	Process MassActionProcess( cGMP_PKG_CGMP.PKG )
+	Process MassActionProcess( cGMP_PKG_CGMP__PKG )
 	{
-		Name	cGMP_PKG_CGMP.PKG;
+		Name	cGMP_PKG_CGMP__PKG;
 		k	0.005;
 		VariableReferenceList	[ S0 Variable:/CELL/CYTOPLASM:cGMP_PKG -1 ] [ P0 Variable:/CELL/CYTOPLASM:CGMP 1 ] [ P1 Variable:/CELL/CYTOPLASM:PKG 1 ];
 	}
@@ -631,9 +630,9 @@ System System( /CELL/CYTOPLASM )
 		VariableReferenceList	[ S0 Variable:/CELL/CYTOPLASM:G_Sub_P -1 ] [ P0 Variable:/CELL/CYTOPLASM:G_Sub 1 ];
 	}
 	
-	Process MassActionProcess( G_Sub_P.PP2A_PP2A_G_Sub_P )
+	Process MassActionProcess( G_Sub_P__PP2A_PP2A_G_Sub_P )
 	{
-		Name	G_Sub_P.PP2A_PP2A_G_Sub_P;
+		Name	G_Sub_P__PP2A_PP2A_G_Sub_P;
 		k	10000;
 		VariableReferenceList	[ S0 Variable:/CELL/CYTOPLASM:G_Sub_P -1 ] [ S1 Variable:/CELL/CYTOPLASM:PP2A -1 ] [ P0 Variable:/CELL/CYTOPLASM:PP2A_G_Sub_P 1 ];
 	}

@@ -19,7 +19,7 @@ defineMethod( 'process',
 
   for( VariableReferenceVectorConstIterator 
 	s( theVariableReferenceVector.begin() );
-       s != theFirstZeroVariableReferenceIterator; ++s )
+       s != theZeroVariableReferenceIterator; ++s )
     {
       VariableReference aVariableReference( *s );
       Int aCoefficient( aVariableReference.getCoefficient() );

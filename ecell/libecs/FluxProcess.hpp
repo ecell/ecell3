@@ -43,12 +43,12 @@ namespace libecs
 
       // Increase or decrease variables, skipping zero coefficients.
       std::for_each( theVariableReferenceVector.begin(),
-		     theFirstZeroVariableReferenceIterator,
+		     theZeroVariableReferenceIterator,
 		     std::bind2nd
 		     ( std::mem_fun_ref
 		       ( &VariableReference::addFlux ), aVelocity ) );
 
-      std::for_each( theFirstPositiveVariableReferenceIterator,
+      std::for_each( thePositiveVariableReferenceIterator,
 		     theVariableReferenceVector.end(),
 		     std::bind2nd
 		     ( std::mem_fun_ref

@@ -218,6 +218,20 @@ namespace libecs
       return theVariableReferenceVector;
     }
 
+    VariableReferenceVector::size_type getZeroVariableReferenceOffset() const
+    {
+      return theZeroVariableReferenceIterator - 
+	getVariableReferenceVector().begin();
+    }
+
+    VariableReferenceVector::size_type 
+    getPositiveVariableReferenceOffset() const
+    {
+      return thePositiveVariableReferenceIterator - 
+	getVariableReferenceVector().begin();
+    }
+
+
     /**
        Set a priority value of this Process.
 
@@ -299,12 +313,12 @@ namespace libecs
 
       // Increase or decrease variables, skipping zero coefficients.
       std::for_each( theVariableReferenceVector.begin(),
-		     theFirstZeroVariableReferenceIterator,
+		     theZeroVariableReferenceIterator,
 		     std::bind2nd
 		     ( std::mem_fun_ref
 		       ( &VariableReference::addValue ), aValue ) );
 
-      std::for_each( theFirstPositiveVariableReferenceIterator,
+      std::for_each( thePositiveVariableReferenceIterator,
 		     theVariableReferenceVector.end(),
 		     std::bind2nd
 		     ( std::mem_fun_ref
@@ -337,8 +351,8 @@ namespace libecs
 
     VariableReferenceVector theVariableReferenceVector;
 
-    VariableReferenceVectorIterator theFirstZeroVariableReferenceIterator;
-    VariableReferenceVectorIterator theFirstPositiveVariableReferenceIterator;
+    VariableReferenceVectorIterator theZeroVariableReferenceIterator;
+    VariableReferenceVectorIterator thePositiveVariableReferenceIterator;
 
   private:
 
