@@ -220,12 +220,8 @@ class LayoutBufferPaster:
             newID = aLayout.getUniqueObjectID( aType )
 
         translationList[oldID] = newID
-        if aType == "System":
-            print "paste object", aFullID, theParent
         aLayout.createObject( newID, aType, aFullID, x, y, theParent  )
         anObject = aLayout.getObject( newID )
-        if aType == "System":
-            print "created object", anObject, anObject.getParent()
 
         propertyList = aBuffer.getPropertyList()
         for aProperty in propertyList:

@@ -1,10 +1,13 @@
 AUTOMAKE_OPTIONS = foreign
 
-SUBDIRS = glade
+SUBDIRS = glade doc
+
 
 modeleditordir=${pkglibdir}
 modeleditor_PYTHON=\
+preferences.ini\
 AboutModelEditor.py\
+AutosaveWindow.py\
 Buffer.py\
 BufferFactory.py\
 Command.py\

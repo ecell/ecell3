@@ -30,7 +30,8 @@ ecell_dm_path="${prefix}/lib/ecell/${VERSION}"
 AC_SUBST(ecell_dm_path)
 AC_OUTPUT(
 Makefile
-ecell3-model-editor
-glade/Makefile,
+glade/Makefile
+doc/Makefile
+ecell3-model-editor,
 chmod +x ecell3-model-editor
 )

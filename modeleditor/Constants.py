@@ -3,6 +3,7 @@ from ConfirmWindow import *
 
 # Layout constants
 
+
 # object types:
 LE_OBJECT_SYSTEM = 0
 LE_OBJECT_PROCESS = 1
@@ -11,7 +12,9 @@ LE_OBJECT_TEXTBOX = 3
 LE_OBJECT_CUSTOM = 4
 LE_OBJECT_CONNECTION = 5
 
-
+# Default Root System Stepper
+DE_DEFAULT_STEPPER_CLASS = 'ODE45Stepper'
+DE_DEFAULT_STEPPER_NAME = 'Default Stepper'
 
 # ModelStore constants
 
@@ -31,6 +34,9 @@ MS_PROPERTY_COLOR = 3
 #MS_SETTABLE_FLAG = 0
 #MS_GETTABLE_FLAG = 1
 
+AVOGADRO = 6.0221367e+23
+
+
 
 MS_SETTABLE_FLAG = 0
 MS_GETTABLE_FLAG = 1
@@ -43,6 +49,10 @@ MS_VARREF_NAME = 0
 MS_VARREF_FULLID = 1
 MS_VARREF_COEF = 2
 
+MS_VARIABLE_VALUE = "Value"
+MS_VARIABLE_NUMCONC = "NumberConc"
+MS_VARIABLE_MOLARCONC = "MolarConc"
+MS_SIZE = "SIZE"
 
 MS_SYSTEM_STEPPERID = 'StepperID'
 MS_PROCESS_STEPPERID = 'StepperID'

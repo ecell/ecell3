@@ -1,4 +1,4 @@
-
+from Constants import *
 
 def copyValue ( aValue ):
     """
@@ -185,3 +185,13 @@ def getUniqueVarrefName ( aVarrefList, aVarrefName = None ):
     while incVarrefName in nameList:
         incVarrefName = aVarrefName + zfill( str( counter ) )
     return incVarrefName
+    
+def createFullIDFromVarref( aProcessFullID, aVarref ):
+    #aVarref: containing all 3 components
+    aVarrefFullID = aVarref[ MS_VARREF_FULLID ]
+    aVarrefFullID = getAbsoluteReference( aProcessFullID,  aVarrefFullID )
+    aVarrefTuple = aVarrefFullID.split( ':' )
+    aVarrefTuple[0] = 'Variable'
+    return ':'.join( aVarrefTuple )
+
+

@@ -42,14 +42,14 @@ import gnome.canvas
 class PathwayEditor( ListWindow ):
 
 
-    def __init__( self, theModelEditor, aLayout ):
+    def __init__( self, theModelEditor, aLayout, aRoot=None ):
         """
         in: ModelEditor theModelEditor
         returns nothing
         """
 
         # init superclass
-        ListWindow.__init__( self, theModelEditor )
+        ListWindow.__init__( self, theModelEditor ,aRoot)
         self.theLayout = aLayout
         self.theModelEditor = theModelEditor
         self.zoom=0.25
@@ -120,6 +120,7 @@ class PathwayEditor( ListWindow ):
         if not self.exists():
             return
         self['layout_name_entry'].set_text( self.theLayout.getName() )
+        
 
 
     def deleted( self, *args ):
@@ -129,7 +130,8 @@ class PathwayEditor( ListWindow ):
         ListWindow.deleted( self, args )
         if self.theModelEditor.theObjectEditorWindow!=None:
             self.theModelEditor.theObjectEditorWindow.destroy(self) 
-        
+
+       
     def getPathwayCanvas( self ):   
         return self.thePathwayCanvas
 

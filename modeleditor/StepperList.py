@@ -52,16 +52,13 @@ class StepperList(ViewComponent):
 
     def __init__( self, aParentWindow, pointOfAttach ):
         self.theParentWindow = aParentWindow
-
         # call superclass
         ViewComponent.__init__( self,  pointOfAttach,\
          'attachment_box', 'ListComponent.glade' )
-
         # set up liststore
         self.theListStore=gtk.ListStore( gobject.TYPE_STRING, gobject.TYPE_BOOLEAN )
         self['theTreeView'].set_model(self.theListStore)
         renderer = gtk.CellRendererText()
-
 
         renderer.connect('edited', self.__cellEdited)
         column=gtk.TreeViewColumn( 'System Tree',
@@ -74,7 +71,7 @@ class StepperList(ViewComponent):
         self.theListSelection.set_mode( gtk.SELECTION_MULTIPLE )
         self['theTreeView'].set_headers_visible( gtk.FALSE )
         self.theModelEditor = self.theParentWindow.theModelEditor
-
+       
         # set up variables
         self.userSelect = True
         self.noActivate = False
@@ -261,7 +258,7 @@ class StepperList(ViewComponent):
         if args[1].button == 3:
             self.theModelEditor.createPopupMenu( self, args[1] )
             return gtk.TRUE
-
+        
 
     def __cursor_changed( self, *args ):
         # when row is selected in list
@@ -272,19 +269,19 @@ class StepperList(ViewComponent):
         self.theParentWindow.setLastActiveComponent( self )
         self.selectByUser()
 
-
+        
 
     def __add_clicked( self, *args ):
         self.add_new()
-
+        
 
     def __delete_clicked( self, *args ):
         self.delete()
-
+        
 
     def __unselectRows( self ):
-         self.theListSelection.unselect_all()
-
+        self.theListSelection.unselect_all()
+         
         
     def __buildList( self ):
         """
@@ -297,7 +294,7 @@ class StepperList(ViewComponent):
 
         self.__addRows( anIDList )
         self.noActivate = False
-
+        
     
     def __addRows( self, aNameList ):
         """
@@ -307,7 +304,7 @@ class StepperList(ViewComponent):
             anIter = self.theListStore.append(  )
             self.theListStore.set_value ( anIter, 0 , aName )
             self.theListStore.set_value ( anIter, 1 , gtk.TRUE )
-
+        
 
 
 
@@ -322,7 +319,7 @@ class StepperList(ViewComponent):
             if aNameList.__contains__( aName ):
                 self.theListStore.remove( anIter )
             anIter = self.theListStore.iter_next( anIter )
-
+        
 
     def __getSelection( self ):
         """
@@ -335,7 +332,7 @@ class StepperList(ViewComponent):
             aNameList.append ( self.theListStore.get_value( anIter, 0 ) )
         return aNameList    
 
-
+        
 
     def __selectRows( self, aNameList, forEdit = gtk.FALSE, doSelect = False ):
         """
@@ -367,7 +364,7 @@ class StepperList(ViewComponent):
                 if aNameList.__contains__( aName ):
                     self.theListSelection.select_iter( anIter )
                 anIter = self.theListStore.iter_next(anIter)
-
+        
 
     def __getIter( self, aName ):
         """
@@ -384,7 +381,7 @@ class StepperList(ViewComponent):
         self.theListSelection.selected_foreach( self.__foreachCallBack )
         return self.__thePathList
 
-
+        
     def __foreachCallBack( self, *args ):
         """
         args[0] TreModel
@@ -394,7 +391,7 @@ class StepperList(ViewComponent):
 
         self.__thePathList.append( args[1] )
 
-
+        
     def __cellEdited( self, *args ):
         """
         args[0]: cellrenderer
@@ -406,4 +403,4 @@ class StepperList(ViewComponent):
         aPath = args[1]
         anIter = self.theListStore.get_iter_from_string( aPath )
         self.rename ( newName, anIter )
-
+        

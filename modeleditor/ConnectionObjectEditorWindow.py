@@ -66,9 +66,11 @@ class ConnectionObjectEditorWindow:
     #########################################
 
     def setDisplayConnObjectEditorWindow(self,aLayoutName, anObjectId):
+        self.win.present()
         self.getTheObject( aLayoutName, anObjectId)
         self.theComponent.setDisplayedVarRef(self.theLayout,self.theObject)
         self.update()
+        
     def getTheObject(self,aLayoutName, anObjectId):
         self.theLayout =self.theModelEditor.theLayoutManager.getLayout(aLayoutName)
         self.theObjectId = anObjectId
@@ -89,7 +91,7 @@ class ConnectionObjectEditorWindow:
 
 
     def update(self, aType = None, aFullID = None):
-    
+
         self.theComponent.update()
         
         

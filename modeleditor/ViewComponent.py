@@ -49,7 +49,9 @@ class ViewComponent:
         else:
             raise IOError( "can't read %s." %self.theGladeFile )
         
-        self.theRoot = self[anAttachment]       
+        self.theRoot = self[anAttachment]  
+        #print pointOfAttach
+        #print self.theRoot
         pointOfAttach.add( self.theRoot )
         
 

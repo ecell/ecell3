@@ -45,7 +45,7 @@ from Utils import *
 class EntityListWindow(ListWindow):
 
 
-    def __init__( self, aModelEditor ):
+    def __init__( self, aModelEditor,aRoot=None ):
         """
         in: ModelEditor theModelEditor
         returns nothing
@@ -53,7 +53,7 @@ class EntityListWindow(ListWindow):
         self.theModelEditor = aModelEditor
 
         # init superclass
-        ListWindow.__init__( self, self.theModelEditor )
+        ListWindow.__init__( self, self.theModelEditor ,aRoot)
         
 
 
@@ -191,7 +191,7 @@ class EntityListWindow(ListWindow):
 
             self.theEntityEditorList.setDisplayedEntity ( selectedID )
 
-        elif aFullID == selectedID or aFullID == None:
+        elif aFullID == selectedID or aFullID == None or aFullID[-4:] == "SIZE":
 
             self.theEntityEditorList.update()
 

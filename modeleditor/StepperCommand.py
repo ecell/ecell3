@@ -302,12 +302,12 @@ class ChangeStepperClass(ModelCommand):
         # set system properties
         systemList = coreBuffer.getProperty( ME_STEPPER_SYSTEMLIST )
         for aSystem in systemList:
-            self.theModel.setEntityProperty( aSystem, ME_STEPPERID, [ self.__theID ] )
+            self.theModel.setEntityProperty( aSystem +':'+ ME_STEPPERID, [ self.__theID ] )
         
         # set process properties
         processList = coreBuffer.getProperty( ME_STEPPER_PROCESSLIST )
         for aProcess in processList:
-            self.theModel.setEntityProperty( aProcess, ME_STEPPERID, [ self.__theID ] )
+            self.theModel.setEntityProperty( aProcess+':'+ ME_STEPPERID, [ self.__theID ] )
 
         return True
         

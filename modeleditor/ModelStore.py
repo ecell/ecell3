@@ -3,7 +3,7 @@ import string
 from DMInfo import *
 from Constants import *
 from Utils import *
-
+from ModelEditor import *
 from Error import *
 
 
@@ -13,7 +13,7 @@ class ModelStore:
     
     def __init__( self ):
         """make ModelStore"""
-
+        #self.theModelEditor = self.theParentWindow.theModelEditor
         self.__theModel = [] 
         self.__theStepper = {}
         self.__theEntity = {}
@@ -269,7 +269,7 @@ class ModelStore:
         aPropertyList = {}
         aPropertyNames = self.__theDM.getClassInfo( aClass, DM_PROPERTYLIST )
         for aPropertyName in aPropertyNames:
-            if aClass == DM_SYSTEM_CLASS and ( aPropertyName ==MS_STEPPER_PROCESSLIST or aPropertyName == MS_STEPPER_SYSTEMLIST ):
+            if aClass == DM_SYSTEM_CLASS and ( aPropertyName == MS_STEPPER_PROCESSLIST or aPropertyName == MS_STEPPER_SYSTEMLIST ):
                 aDefaultValue = []
                 aType = DM_PROPERTY_NESTEDLIST
                 aFlags = ( False, False, False, False, False )
@@ -295,7 +295,7 @@ class ModelStore:
     def __getEntityProperty( self, anEntity, aPropertyName ):
         # check if Entity exists
         if anEntity not in self.__theEntity.keys():
-            raise Exception("Stepper %s does not exist!"%anEntity )
+            raise Exception("Entity %s does not exist!"%anEntity )
         if aPropertyName not in self.getEntityPropertyList( anEntity ):
             raise Exception("Property %s of entity %s does not exist!"%(aPropertyName,anEntity))
         return self.__theEntity[anEntity][MS_ENTITY_PROPERTYLIST][aPropertyName]
@@ -320,14 +320,30 @@ class ModelStore:
             raise Exception( "Parent system of %s doesnot exist!"%aFullID )
 
         aPropertyList = self.__createPropertyList( aClass )
-
+        
         self.__theEntity[aFullID] = [ aClass, aPropertyList, aParentSystem, [],  [], [], 'A System' ]
+
+        aFullPN = createFullPN( getParentSystemOfFullID(aFullID), 'StepperID')
+        
+
         if anEntityType == ME_SYSTEM_TYPE:
-            #aParentSystem[MS_ENTITY_CHILD_SYSTEMLIST].append( self.__theEntity[aFullID] )
             pass
+#            aStepperIdValue = self.getEntityProperty(aFullPN)
+#            if not aStepperIdValue == '': #None here
+#                aFullPN = createFullPN( aFullID, 'StepperID')
+#                self.setEntityProperty( aFullPN, [aStepperIdValue])
+#            else:
+#                pass
+                
         elif anEntityType == ME_PROCESS_TYPE:
             pass
-            #aParentSystem[MS_ENTITY_CHILD_PROCESSLIST].append( self.__theEntity[aFullID] )
+#            aStepperIdValue = self.getEntityProperty(aFullPN)
+#            if not aStepperIdValue == None:
+#                aFullPN = createFullPN( aFullID, 'StepperID')
+#                self.setEntityProperty( aFullPN, [aStepperIdValue])
+#            else:
+#                pass
+                #MY PIECE
         else:
             #aParentSystem[MS_ENTITY_CHILD_VARIABLELIST].append( self.__theEntity[aFullID] )
             # find process referencing this variable
@@ -538,16 +554,18 @@ class ModelStore:
             #watch for stepperID
             if aPropertyName == MS_SYSTEM_STEPPERID:
                 self.__deregisterEntityFromStepper( aFullID )
+            
         elif anEntityType == ME_PROCESS_TYPE:
             if aPropertyName == MS_PROCESS_STEPPERID:
                 self.__deregisterEntityFromStepper( aFullID )
             elif aPropertyName == MS_PROCESS_VARREFLIST:
                 oldValue = aProperty[MS_PROPERTY_VALUE]
                 self.__deregisterProcessFromVariable( aFullID, oldValue )
-
+                self.__registerProcessToVariable( aFullID, convertValue )
+                
         # set property
         aProperty[MS_PROPERTY_VALUE] = copyValue( convertValue )
-        
+
         # reregistering
         if anEntityType == ME_SYSTEM_TYPE:
             #watch for stepperID
@@ -557,7 +575,46 @@ class ModelStore:
             if aPropertyName == MS_PROCESS_STEPPERID:
                 self.__registerEntityToStepper( aFullID, convertValue )
             elif aPropertyName == MS_PROCESS_VARREFLIST:
-                self.__registerProcessToVariable( aFullID, convertValue )
+                self.__adjustVarrefList( aProperty[MS_PROPERTY_VALUE] )
+        elif anEntityType == ME_VARIABLE_TYPE:
+            anEntityName = aFullID.split(':')[2]
+            anEntityPath = aFullID.split(':')[1]
+            if anEntityName == MS_SIZE:
+                if aPropertyName == MS_VARIABLE_MOLARCONC:
+                # watch for molarconc and numconc
+                    aProperty[MS_PROPERTY_VALUE] = 1 / AVOGADRO
+                elif aPropertyName == MS_VARIABLE_NUMCONC:
+                    aProperty[MS_PROPERTY_VALUE] = 1.0
+                elif aPropertyName == MS_VARIABLE_VALUE:
+                # watch for value - recalculate all child variables not recursively
+#        self.__theEntity[aFullID] = [ aClass, aPropertyList, aParentSystem, [],  [], [], 'A System' ]
+
+                    for aSearchFullID in self.__theEntity.keys():
+                        if aSearchFullID.split(':')[1] != anEntityPath:
+                            continue
+                        if aSearchFullID.split(':')[0] != ME_VARIABLE_TYPE:
+                            continue
+                        aVariable = self.__theEntity[aSearchFullID]
+                        self.__recalculateConcentrations( aVariable, convertValue )
+                    
+            else:
+                if aPropertyName == MS_VARIABLE_MOLARCONC:
+                    aVariable = self.__getEntity( aFullID )
+                    aSystemSize = self.__getSystemSize( aFullID )
+                    aValueRef = self.__getEntityProperty( aFullID, MS_VARIABLE_VALUE )
+                    aValueRef[MS_PROPERTY_VALUE] = AVOGADRO * aSystemSize * float(convertValue)
+                    
+                    self.__recalculateConcentrations( aVariable, aSystemSize )
+                elif aPropertyName == MS_VARIABLE_NUMCONC:
+                    aVariable = self.__getEntity( aFullID )
+                    aSystemSize = self.__getSystemSize( aFullID )
+                    aValueRef = self.__getEntityProperty( aFullID, MS_VARIABLE_VALUE )
+                    aValueRef[MS_PROPERTY_VALUE] =  aSystemSize * float(convertValue)
+                    self.__recalculateConcentrations( aVariable, aSystemSize )
+                elif aPropertyName == MS_VARIABLE_VALUE:
+                    aVariable = self.__getEntity( aFullID )
+                    aSystemSize = self.__getSystemSize( aFullID )
+                    self.__recalculateConcentrations( aVariable, aSystemSize )
 
         
         # modify changeableFlag
@@ -565,8 +622,33 @@ class ModelStore:
         newFlag=(self.changeChangeableFlag(aProperty))
         aProperty[MS_PROPERTY_FLAGS]=newFlag
 
-    
+    def __recalculateConcentrations(self,  aVariable, systemSize ):
+        aValue = float( aVariable[MS_ENTITY_PROPERTYLIST][MS_VARIABLE_VALUE][MS_PROPERTY_VALUE] )
+        if systemSize != 0.0:
+            newMolarConc = aValue / ( AVOGADRO * systemSize )
+        else:
+            newMolarConc = 0.0
+        aVariable[MS_ENTITY_PROPERTYLIST][MS_VARIABLE_MOLARCONC][MS_PROPERTY_VALUE] = newMolarConc
+        if systemSize != 0.0:
+            newNumberConc = aValue / systemSize
+        else:
+            newNumberConc = 0.0
+        aVariable[MS_ENTITY_PROPERTYLIST][MS_VARIABLE_NUMCONC][MS_PROPERTY_VALUE] = newNumberConc
         
+        
+    def __getSystemSize( self, aFullID ):
+        aTuple = aFullID.split(':')
+        aTuple[2] = MS_SIZE
+        SizeFullID = ':'.join( aTuple )
+        if SizeFullID not in self.__theEntity.keys():
+            return 0.0
+        SizeFullPN = createFullPN( SizeFullID, MS_VARIABLE_VALUE ) 
+        return float( self.getEntityProperty( SizeFullPN ) )
+    
+    def __adjustVarrefList( self, aVarrefList ):
+        for aVarref in aVarrefList:
+            if len( aVarref ) <3:
+                aVarref.append( 0 )
 
 
     def changeChangeableFlag( self, aProperty ):

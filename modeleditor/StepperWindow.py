@@ -45,14 +45,15 @@ from Constants import *
 class StepperWindow(ListWindow):
 
 
-    def __init__( self, aModelEditor ):
+    def __init__( self, aModelEditor,aRoot=None ):
         """
         in: ModelEditor theModelEditor
         returns nothing
         """
         self.theModelEditor = aModelEditor
+        self.aRoot=aRoot
         # init superclass
-        ListWindow.__init__( self, self.theModelEditor )
+        ListWindow.__init__( self, self.theModelEditor,self.aRoot )
 
 
 

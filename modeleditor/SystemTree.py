@@ -257,8 +257,9 @@ class SystemTree(ViewComponent):
         self.theSelection = [ newID ]
         self.__unselectRows()
         self.theModelEditor.doCommandList ( [ aCommand ] )
-        
+        ############################## Add cheCk here ###############################3
         # open for edit
+
         anIter = self.__getIter ( self.theSelection[0] )
         self.noActivate = True
         self.__selectRow( anIter, gtk.TRUE )

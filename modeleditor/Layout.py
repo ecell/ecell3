@@ -52,6 +52,9 @@ class Layout:
     def getLayoutManager(self):
         return self.theLayoutManager
 
+    def getPathwayEditor(self):
+        return self.thePathwayEditor 
+
     def attachToCanvas( self, aCanvas ):
         
         self.theCanvas = aCanvas

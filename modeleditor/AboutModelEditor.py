@@ -21,6 +21,7 @@ class  AboutModelEditor:
         the AboutModelEditor window
              
         """ 
+       
         self.theModelEditor = aModelEditor  
         
         # Create the Dialog
@@ -42,7 +43,7 @@ class  AboutModelEditor:
 
         # Sets title
         self.win.set_title('About Model Editor')
-        
+        #print "self.win.vbox", self.win.vbox
         
         ViewComponent( self.win.vbox, 'attachment_box', 'AboutModelEditor.glade' )
         aPixbuf16 = gtk.gdk.pixbuf_new_from_file( os.environ['MEPATH'] +

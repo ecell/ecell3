@@ -13,14 +13,19 @@ class ListWindow(Window):
     """
 
     # ========================================================================
-    def __init__( self, aModelEditor , aGladeFile=None ):
+    def __init__( self, aModelEditor , aRoot=None,aGladeFile=None):
         """constructor
         aModelEditor  -- a reference to ModelEditor (ModelEditor)
         aGladeFile   -- a glade file name (str)
         """
+        if aRoot == None:
+            self.isStandalone = True
+        else:
+            self.isStandalone = False
+
 
         # calls superclass's constructor
-        Window.__init__( self, aGladeFile, aRoot=None )
+        Window.__init__( self, aGladeFile, aRoot )
 
         # saves a reference to Session
         self.theModelEditor = aModelEditor
@@ -52,7 +57,14 @@ class ListWindow(Window):
         # calla present() method of Window widget of this window.
         if self.exists():
 
-            self[self.__class__.__name__].present()
+
+          #self[self.__class__.__name__].present()
+
+            if self.isStandalone:
+                self[self.__class__.__name__].present()
+            else:
+                self.theModelEditor.theMainWindow.presentTab( self )
+
 
     # ========================================================================
     def iconify( self ):
@@ -65,8 +77,9 @@ class ListWindow(Window):
         # When glade file is not loaded yet or already deleted, does nothing
         # calls iconify() method of Window widget of this window.
         if self.exists():
+            if self.isStandalone:
 
-            self[self.__class__.__name__].iconify()
+                self[self.__class__.__name__].iconify()
 
     # ========================================================================
     def move( self, xpos, ypos ):
@@ -79,8 +92,9 @@ class ListWindow(Window):
         # When glade file is not loaded yet or already deleted, does nothing
         # calls move(x,y) method of Window widget of this window.
         if self.exists():
+            if self.isStandalone:
 
-            self[self.__class__.__name__].move( xpos, ypos)
+                self[self.__class__.__name__].move( xpos, ypos)
 
     # ========================================================================
     def resize( self, width, heigth ):
@@ -93,8 +107,9 @@ class ListWindow(Window):
         # When glade file is not loaded yet or already deleted, does nothing
         # calls resize(width,heigth) method of Window widget of this window.
         if self.exists():
+            if self.isStandalone:
 
-            self[self.__class__.__name__].resize( width, heigth)
+                self[self.__class__.__name__].resize( width, heigth)
 
     # ========================================================================
     def deleted( self, *arg ):
@@ -131,8 +146,8 @@ class ListWindow(Window):
 
             # connects 'delete_event' and self.delete() method.
             
-            self[self.__class__.__name__].show_all()
-            self[self.__class__.__name__].connect('delete_event',self.deleted)
+           # self[self.__class__.__name__].show_all()
+           # self[self.__class__.__name__].connect('delete_event',self.deleted)
 
 
 
@@ -151,7 +166,13 @@ class ListWindow(Window):
             if self.theModelEditor.getLastUsedComponent() != None:
                 if self.theModelEditor.getLastUsedComponent().getParentWindow() == self:
                     self.theModelEditor.setLastUsedComponent( None )
-            self[self.__class__.__name__].destroy()
+
+            if self.isStandalone:
+
+                self[self.__class__.__name__].destroy()
+            else:
+                self.theModelEditor.theMainWindow.detachTab ( self )
+                
             self.__theExist = False
             self.widgets = None
             

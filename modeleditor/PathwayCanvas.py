@@ -9,11 +9,11 @@ class PathwayCanvas( Canvas ):
         self.theCanvas = aCanvas
         self.theCanvasRoot = self.theCanvas.root()
         aStyle = aCanvas.get_style().copy()
-        aGdkWindow = aCanvas.window
-        aColorMap = aGdkWindow.get_colormap()
-        whiteColor = aColorMap.alloc_color("white")
-        aStyle.bg[0] = whiteColor
-        aCanvas.set_style( aStyle )
+        #aGdkWindow = aCanvas.window
+        #aColorMap = aGdkWindow.get_colormap()
+        #whiteColor = aColorMap.alloc_color("white")
+        #aStyle.bg[0] = whiteColor
+        #aCanvas.set_style( aStyle )
         self.theCursorList = [ \
                     gtk.gdk.Cursor( gtk.gdk.TOP_LEFT_ARROW ),
                     gtk.gdk.Cursor( gtk.gdk.FLEUR ),

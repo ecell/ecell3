@@ -40,7 +40,6 @@ class LayoutManager:
             return
         # create new pathwayeditor
         anEditorWindow = self.theModelEditor.createPathwayEditor( aLayout )
-        
 
 
 

@@ -224,6 +224,7 @@ class ObjectEditorWindow :
     # ==========================================================================
 
     def setDisplayObjectEditorWindow(self,aLayoutName, anObjectId):
+        self.win.present()
         self.getTheObject( aLayoutName, anObjectId)
         if self.theObject.getProperty(OB_HASFULLID):
             self.theLastFullID = self.theObject.getProperty(OB_FULLID)
@@ -259,7 +260,6 @@ class ObjectEditorWindow :
     # ==========================================================================
     
     def update(self, aType = None, aFullID = None):
-
         if self.theObject !=None:
             anObjectID = self.theObject.getID()
             existObjectList = self.theLayout.getObjectList()
@@ -301,8 +301,10 @@ class ObjectEditorWindow :
         self.theShapeProperty.setDisplayedShapeProperty(self.theObject)
 
     def selectEntity(self,anEntityList):
+
         if type(anEntityList) == type(""):
             return
+        self.win.present()
         self.theLastObject = anEntityList[0]
         if self.theObject.getProperty(OB_HASFULLID):
             self.theLastFullID = self.theObject.getProperty(OB_FULLID)

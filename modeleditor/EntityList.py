@@ -39,7 +39,7 @@ import gobject
 
 import os
 import os.path
-
+from ModelStore import *
 from ModelEditor import *
 from ViewComponent import *
 from Constants import *
@@ -74,6 +74,7 @@ class EntityList(ViewComponent):
         self.theListSelection.set_mode( gtk.SELECTION_MULTIPLE )
         self['theTreeView'].set_headers_visible( gtk.FALSE )
         self.theModelEditor = self.theParentWindow.theModelEditor
+        self.theModelStore = ModelStore()
 
         # set up variables
         self.userSelect = True
@@ -269,7 +270,10 @@ class EntityList(ViewComponent):
         self.theSelection = [ newID ]
         self.__unselectRows()
         self.theModelEditor.doCommandList ( [ aCommand ] )
-    
+
+        ############################ Add cheCk here ###################################
+           
+
         # open for edit
         self.noActivate = True
         self.__selectRows( [ newName ], gtk.TRUE )

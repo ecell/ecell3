@@ -1,19 +1,26 @@
+import gtk
+import gobject
 from Constants import *
 from Utils import *
 from DMInfo import *
 from Command import *
+from StepperChooser import *
+from ModelEditor import *
 
 class CreateEntity(ModelCommand):
     """
     arg1: ID
+    arg2: ClassName eg. CompartmentSystem
     """
     ARGS_NO = 2
     FULLID = 0
     CLASSNAME = 1
     
+    
     def checkArgs( self ):
         if not ModelCommand.checkArgs(self):
             return False
+        
         self.__theID = self.theArgs[ self.FULLID ]
         self.__theClassName = self.theArgs[ self.CLASSNAME ]
         # CHECK IN DM WHETHER CLASSNAME EXISTS!!!
@@ -25,6 +32,20 @@ class CreateEntity(ModelCommand):
     def do( self ):
 
         self.theModel.createEntity( self.__theClassName, self.__theID )
+        anEntityType = self.__theID.split( ':' )[0]
+        if anEntityType == ME_SYSTEM_TYPE:
+            aParentFullID = convertSysPathToSysID(  self.__theID.split( ':' )[1]  )
+            parentStepperFullPN = createFullPN( aParentFullID , MS_SYSTEM_STEPPERID )
+            aStepperIdValue = self.theModel.getEntityProperty(parentStepperFullPN)
+            if aStepperIdValue != '': 
+                aFullPN = createFullPN( self.__theID, MS_SYSTEM_STEPPERID )
+                self.theModel.setEntityProperty( aFullPN, [aStepperIdValue])
+            else:
+                pass
+            newFullID = ':'.join( [ ME_VARIABLE_TYPE, convertSysIDToSysPath( self.__theID ), 'SIZE' ] )
+            self.theModel.createEntity( ME_VARIABLE_TYPE, newFullID )
+
+
         return True
 
 
@@ -107,6 +128,7 @@ class RenameEntity(ModelCommand):
         # newID shouldn't exist
         if not ModelCommand.checkArgs(self):
             return False
+        
         self.__theOldID = self.theArgs[ self.OLDID ]
         self.__theNewID = self.theArgs[ self.NEWID ]
         
@@ -488,6 +510,7 @@ class CreateEntityProperty(ModelCommand):
     def checkArgs( self ):
         if not ModelCommand.checkArgs(self):
             return False
+        
         self.__theFullPN = self.theArgs[ self.FULLPN ]
         # check if full id exists
         if not self.theModel.isEntityExist( getFullID( self.__theFullPN ) ):

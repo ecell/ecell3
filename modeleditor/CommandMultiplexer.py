@@ -32,6 +32,8 @@ class CommandMultiplexer:
             returnCmdList = []
             for aFullID in fullIDList:
                 returnCmdList.extend( self.__deleteObjectsByFullID( aFullID) )
+            for aFullID in fullIDList:
+                returnCmdList.extend( self.__deleteReferringVarrefs( aFullID ) )
             returnCmdList.append( aCmd )
 
 
@@ -445,7 +447,7 @@ class CommandMultiplexer:
                                     currVarObj = aLayout.getObject(currVarIDAttached)
                                     currVarFullID = currVarObj.getProperty(OB_FULLID)
                                 
-                                    print 'conID',conObject.getProperty(CO_VARIABLE_ATTACHED)
+
                                 else:
                                     currVarFullID = None
                                 
@@ -493,6 +495,26 @@ class CommandMultiplexer:
             aCommand.doNotMultiplex()
             aCommand.doNotMultiplexReverse()
         return returnCmdList
+
+    def __deleteReferringVarrefs( self, aFullID ):
+
+        cmdList = []
+        if getFullIDType( aFullID ) != ME_VARIABLE_TYPE:
+            return cmdList
+        aModel = self.theModelEditor.theModelStore
+        aProcessList = aModel.getEntityProperty( createFullPN ( aFullID , MS_VARIABLE_PROCESSLIST ) )
+
+        for aProcess in aProcessList:
+            aVarrefFullPN = createFullPN ( aProcess, MS_PROCESS_VARREFLIST )
+            aVarrefList = aModel.getEntityProperty( aVarrefFullPN )
+            for aVarref in aVarrefList:
+                aVariableFullID = createFullIDFromVarref( aProcess, aVarref )
+                if aVariableFullID == aFullID:
+                    aVarrefList.remove( aVarref )
+            aCommand = ChangeEntityProperty( self.theModelEditor, aVarrefFullPN, aVarrefList )
+            cmdList.append( aCommand )
+        return cmdList
+                    
 
 
     def __deleteObjectsByFullID( self, aFullID ):
