@@ -29,21 +29,28 @@ os.environ['LTDL_LIBRARY_PATH']=\
 os.environ['VVECTORTMPDIR']=\
 	os.environ['TMP']
 
-# PYTHONDIR contains E-Cell, pygtk and Numeric python modules
+# PYTHONDIR contains E-Cell python modules
 # PYTHONDIR is used by dmgen
 os.environ['PYTHONDIR']=\
 	os.path.join( prefix, 'lib', 'python' + sys.winver, 'site-packages' )
 
-# Include E-Cell python module location in Python module search path
+# Include E-Cell, pygtk, and Numeric python module locations in
+# Python module search path
 os.environ['PYTHONPATH']=\
-	os.environ['PYTHONDIR']
+	os.pathsep.join([
+		os.environ['PYTHONDIR'],
+		os.path.join( os.environ['PYTHONDIR'], 'Numeric'),
+		os.path.join( os.environ['PYTHONDIR'], 'gtk-2.0')
+	])
 	
 # BOOST_LIBRARIES is used by ecell3-dmc		
 os.environ['BOOST_LIBRARIES']=\
-	'-L\"' + os.path.join( prefix, 'lib' ) + '\" -lboost_python'
+	'\"-L' + os.path.join( prefix, 'lib' ) + '\" -lboost_python'
+
+
+import _winreg
 
 # Get installed Python prefix from Windows registry
-import _winreg
 try:
 	key = _winreg.OpenKey( _winreg.HKEY_LOCAL_MACHINE, \
 		r'Software\Python\PythonCore\%s' % (sys.winver) )
@@ -54,22 +61,41 @@ except:
 python_prefix = os.path.abspath( _winreg.QueryValue( key, 'InstallPath' ) )
 _winreg.CloseKey( key )
 
+# Get installed GTK prefix from Windows registry
+try:
+	key = _winreg.OpenKey( _winreg.HKEY_LOCAL_MACHINE, r'Software\GTK\2.0' )
+except:
+	print "Could not find GTK in registry"
+	sys.exit(1)
+
+gtk_prefix = os.path.abspath( _winreg.QueryValueEx( key, 'Path' )[0] )
+_winreg.CloseKey( key )
+
+
+# PYTHON_INCLUDES is used by ecell3-dmc, needed by PythonFluxProcess.hpp
+os.environ['PYTHON_INCLUDES']=\
+	'\"-I' + os.path.join( python_prefix, 'include' ) + '\"'
+
+
 os.environ['PATH']=\
 	os.pathsep.join([
 		os.path.join( prefix, 'bin' ),
 		os.path.join( prefix, 'lib' ),
 		python_prefix,
+		os.path.join( gtk_prefix, 'bin' ),
+		os.path.join( gtk_prefix, 'lib' ),
 		os.environ['PATH']
 	])
 
 # Set sys.path to point to all locations of Python modules
+# sys.path is critical for any compiled .exe which never envokes Python
 sys.path = [
 	python_prefix,
 	os.environ['PYTHONDIR'],
-	os.path.join( python_prefix, 'lib', 'site-packages' ),
-	os.path.join( python_prefix, 'lib', 'site-packages', 'Numeric'),
-	os.path.join( python_prefix, 'lib', 'site-packages', 'gtk-2.0'),
+	os.path.join( os.environ['PYTHONDIR'], 'Numeric'),
+	os.path.join( os.environ['PYTHONDIR'], 'gtk-2.0'),
 	os.environ['OSOGOPATH'],
+	os.path.join( python_prefix, 'lib', 'site-packages' ),
 	os.path.join( python_prefix, 'DLLs' ),
 	os.path.join( python_prefix, 'lib' ),
 	os.path.join( python_prefix, 'lib', 'plat-win'),

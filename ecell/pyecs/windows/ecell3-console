@@ -11,8 +11,9 @@ pathSaved = os.environ['PATH']
 # Forced quotes for paths containing whitespaces
 prefix = os.path.split(sys.prefix)[0]
 
-# Get installed Python prefix from Windows registry
 import _winreg
+
+# Get installed Python prefix from Windows registry
 try:
 	key = _winreg.OpenKey( _winreg.HKEY_LOCAL_MACHINE, \
 		r'Software\Python\PythonCore\%s' % (sys.winver) )
@@ -23,14 +24,26 @@ except:
 python_prefix = os.path.abspath( _winreg.QueryValue( key, 'InstallPath' ) )
 _winreg.CloseKey( key )
 
+# Get installed GTK prefix from Windows registry
+try:
+	key = _winreg.OpenKey( _winreg.HKEY_LOCAL_MACHINE, r'Software\GTK\2.0' )
+except:
+	print "Could not find GTK in registry"
+	sys.exit(1)
+
+gtk_prefix = os.path.abspath( _winreg.QueryValueEx( key, 'Path' )[0] )
+_winreg.CloseKey( key )
+
 os.environ['PATH']=\
 	os.pathsep.join([
 		os.path.join( prefix, 'bin' ),
 		os.path.join( prefix, 'lib' ),
 		python_prefix,
+		os.path.join( gtk_prefix, 'bin' ),
+		os.path.join( gtk_prefix, 'lib' ),
 		os.environ['PATH']
 	])
 os.chdir( prefix )
-os.popen('start "E-Cell3 Console"' )
+os.popen('start "E-Cell Console"' )
 os.environ['PATH'] = pathSaved
 

@@ -95,7 +95,9 @@ fi
 
 AM_PATH_PYTHON(2.2)
 AC_SUBST(PYTHON)
+PYTHON_VERSION=${am_cv_python_version}
 PYTHON_WIN_VERSION=${am_cv_python_version/'.'}
+AC_SUBST(PYTHON_VERSION)
 AC_SUBST(PYTHON_WIN_VERSION)
 
 AC_LANG([C++])
@@ -251,7 +253,7 @@ AC_CONFIG_FILES([Makefile
 		 libemc/Makefile
 		 pyecs/Makefile
 		 pyecs/windows/Makefile
-		 pyecs/windows/ecell3-inno.iss
+		 pyecs/windows/ecell3-installer.iss
 		 pyecs/windows/pathVariables
 		 pyecell/Makefile
 		 pyecell/ecell/Makefile

@@ -1,0 +1,550 @@
+; Inno Setup script to create E-Cell Simulation Environment Version 3 Installer
+; Author: Satya Arjunan <satya@sfc.keio.ac.jp>
+; Requires Inno Setup QuickStart Pack 4.2.2 (comes with ISTool script editor and Inno Setup Preprocessor)
+
+; Compilation Instructions:
+; 1. Open this file in Inno Setup Compiler
+; 2. Define what type of installer should be compiled:
+;    - #define FullInstall : compile E-Cell setup together with Python and GTK
+;    - ;#define FullInstall : compile E-Cell setup only
+; 3. Define the filenames of PythonSetup and GtkSetup if newer versions are used
+; 4. Under [Setup], set Compression=None during development/test compilation.
+;    Set Compression=lzma/ultra for releases.
+; 5. Compile the script
+; 6. The compiled installer will appear in the root directory of the script file
+
+
+#define FullInstall
+#define Version       '@VERSION@'
+#define PythonVersion '@PYTHON_VERSION@'
+#define GtkVersion    '@GTK_VERSION@'
+#define PythonSetup   'Python-2.3.3.exe'
+#define GtkSetup      'gtk-win32-aio-2.4-rc6.exe'
+#define Pythondll     'python@PYTHON_WIN_VERSION@.dll'
+#define Libpython     'libpython@PYTHON_WIN_VERSION@.a'
+#define LicenseFile   'COPYING'
+#define PexportsFile  'pexports.exe'
+#define DlltoolFile   'dlltool.exe'
+
+#ifdef FullInstall
+# define Filename      '-python+gtk'
+#else
+# define Filename      ''
+#endif
+
+[Setup]
+AppName=E-Cell Simulation Environment
+AppVerName=E-Cell Simulation Environment version {#Version}
+AppPublisher=Keio University
+AppPublisherURL=http://www.e-cell.org
+AppSupportURL=http://sourceforge.net/forum/forum.php?forum_id=247258
+AppUpdatesURL=http://sourceforge.net/project/showfiles.php?group_id=72485
+DefaultDirName={pf}\E-Cell 3
+DefaultGroupName=E-Cell 3
+SetupIconFile=ecell3-installer.ico
+UninstallDisplayIcon={app}\bin\gecell.exe
+UninstallDisplayName=E-Cell Simulation Environment {#Version}
+ChangesAssociations=yes
+OutputBaseFilename=ecell-{#Version}{#Filename}-setup
+OutputDir=.
+Compression=none
+;Compression=lzma/ultra
+WizardSmallImageFile=installer_header.bmp
+WizardImageFile=installer_intro.bmp
+WizardImageStretch=no
+BackColor=clBlue
+BackColor2=clBlack
+BackColorDirection=lefttoright
+WizardImageBackColor=clWhite
+WizardSmallImageBackColor=clWhite
+
+[Tasks]
+Name: desktopicon; Description: Create &desktop icons; GroupDescription: Additional icons:
+Name: quicklaunchicon; Description: Create &Quick Launch icons; GroupDescription: Additional icons:; Flags: unchecked
+
+
+[Files]
+;E-Cell libraries
+Source: bin\*.*; DestDir: {app}\bin; Flags: recursesubdirs ignoreversion
+Source: include\*.*; DestDir: {app}\include; Flags: recursesubdirs ignoreversion
+Source: lib\*.*; DestDir: {app}\lib; Flags: recursesubdirs ignoreversion
+Source: share\*.*; DestDir: {app}\share; Flags: recursesubdirs ignoreversion
+
+;Runtime libraries used by E-Cell
+Source: ..\runtime\1.mingw\*.*; DestDir: {app}; Flags: recursesubdirs ignoreversion
+Source: ..\runtime\2.mingw-runtime\*.*; DestDir: {app}; Flags: recursesubdirs ignoreversion
+Source: ..\runtime\3.gcc-core\*.*; DestDir: {app}; Flags: recursesubdirs ignoreversion
+Source: ..\runtime\4.gcc-g++\*.*; DestDir: {app}; Flags: recursesubdirs ignoreversion
+Source: ..\runtime\5.binutils\*.*; DestDir: {app}; Flags: recursesubdirs ignoreversion
+Source: ..\runtime\6.boost\*.*; DestDir: {app}; Flags: recursesubdirs ignoreversion
+Source: ..\runtime\7.gsl\*.*; DestDir: {app}; Flags: recursesubdirs ignoreversion
+Source: ..\runtime\8.libart_lgpl\*.*; DestDir: {app}; Flags: recursesubdirs ignoreversion
+Source: ..\runtime\9.libgnomecanvas\*.*; DestDir: {app}; Flags: recursesubdirs ignoreversion
+Source: ..\runtime\10.msys-cp.find.grep.ls.mkdir.mv.rm\*.*; DestDir: {app}; Flags: recursesubdirs ignoreversion
+Source: ..\runtime\11.ecell3-samples\*.*; DestDir: {app}; Flags: recursesubdirs ignoreversion
+
+;Python modules used by E-Cell
+Source: ..\pythonModules\1.pygtk\*.*; DestDir: {app}; Flags: recursesubdirs ignoreversion
+Source: ..\pythonModules\2.Numeric\*.*; DestDir: {app}; Flags: recursesubdirs ignoreversion
+Source: ..\pythonModules\3.gnome-python\*.*; DestDir: {app}; Flags: recursesubdirs ignoreversion
+
+;Gtk libraries
+Source: ..\gtk\wimp\gtkrc; DestDir: {code:GetGtkDir}\share\themes\Default\gtk-2.0; Flags: ignoreversion; Components: themes\wimp
+Source: ..\gtk\wimp\libwimp.dll; DestDir: {code:GetGtkDir}\lib\gtk-2.0\{#GtkVersion}.0\engines; Flags: ignoreversion; Components: themes\wimp
+Source: ..\gtk\prettyOk\gtkrc; DestDir: {code:GetGtkDir}\share\themes\Default\gtk-2.0; Flags: ignoreversion; Components: themes\prettyOK
+Source: ..\gtk\prettyOK\libcleanice.dll; DestDir: {code:GetGtkDir}\lib\gtk-2.0\{#GtkVersion}.0\engines; Flags: ignoreversion; Components: themes\prettyOK
+Source: ..\gtk\lighthouse\gtkrc; DestDir: {code:GetGtkDir}\share\themes\Default\gtk-2.0; Flags: ignoreversion; Components: themes\lighthouse
+Source: ..\gtk\lighthouse\liblighthouseblue.dll; DestDir: {code:GetGtkDir}\lib\gtk-2.0\{#GtkVersion}.0\engines; Flags: ignoreversion; Components: themes\lighthouse
+
+
+;Files not installed on host
+#ifdef FullInstall
+  Source: ..\dontCopy\{#PythonSetup}; Flags: dontcopy
+  Source: ..\dontCopy\{#GtkSetup}; Flags: dontcopy
+#endif
+Source: ..\dontCopy\{#PexportsFile}; Flags: dontcopy
+Source: share\doc\ecell-{#Version}\{#LicenseFile}; Flags: dontcopy
+
+
+[Icons]
+;Main E-Cell icons in Start Menu
+Name: {group}\E-Cell Session Monitor; Filename: {app}\bin\gecell.exe; WorkingDir: {app}
+Name: {group}\E-Cell Toollauncher; Filename: {app}\bin\toollauncher.exe; WorkingDir: {app}\share
+Name: {group}\E-Cell Model Editor; Filename: {app}\bin\ecell3-model-editor.exe; WorkingDir: {app}
+Name: {group}\E-Cell Console; Filename: {app}\bin\ecell3-console.exe; WorkingDir: {app}; IconFilename: {app}\bin\ecell3-console.exe
+
+;E-Cell sample icons in Start Menu
+Name: {group}\Samples\Simple; Filename: {app}\bin\gecell.exe; Parameters: -f share\doc\sample\simple\simple.eml; WorkingDir: {app}
+Name: {group}\Samples\BranchG; Filename: {app}\bin\gecell.exe; Parameters: -f share\doc\sample\branchG\branchG.eml; WorkingDir: {app}
+Name: {group}\Samples\CoupledOscillator; Filename: {app}\bin\gecell.exe; Parameters: -f share\doc\sample\CoupledOscillator\cascade.eml; WorkingDir: {app}
+Name: {group}\Samples\Drosophila; Filename: {app}\bin\gecell.exe; Parameters: -f share\doc\sample\Drosophila\Drosophila.eml; WorkingDir: {app}
+Name: {group}\Samples\Drosophila-cpp; Filename: {app}\bin\gecell.exe; Parameters: -f share\doc\sample\Drosophila-cpp\Drosophila.eml; WorkingDir: {app}
+Name: {group}\Samples\Heatshock; Filename: {app}\bin\gecell.exe; Parameters: -f share\doc\sample\Heatshock\heatshock.eml; WorkingDir: {app}
+Name: {group}\Samples\LTD; Filename: {app}\bin\gecell.exe; Parameters: -f share\doc\sample\LTD\LTD.eml; WorkingDir: {app}
+Name: {group}\Samples\Pendulum; Filename: {app}\bin\gecell.exe; Parameters: -f share\doc\sample\Pendulum\Pendulum.eml; WorkingDir: {app}
+Name: {group}\Samples\SSystem; Filename: {app}\bin\gecell.exe; Parameters: -f share\doc\sample\SSystem\SSystem.eml; WorkingDir: {app}
+Name: {group}\Samples\Toy_Hybrid; Filename: {app}\bin\gecell.exe; Parameters: -f share\doc\sample\Toy_Hybrid\Toy_Hybrid.eml; WorkingDir: {app}
+
+;E-Cell documentation icons in Start Menu
+Name: {group}\E-Cell3 Documentation\API Reference Manual; Filename: {app}\share\doc\refman\refman.pdf; WorkingDir: {app}\share\doc\refman
+Name: {group}\E-Cell3 Documentation\API Reference Manual (html); Filename: {app}\share\doc\refman\html\main.html; WorkingDir: {app}\share\doc\refman\html
+Name: {group}\E-Cell3 Documentation\User's Manual; Filename: {app}\share\doc\users-manual\ecell3-users-manual.pdf; WorkingDir: {app}\share\doc\users-manual
+Name: {group}\E-Cell3 Documentation\User's Manual (html); Filename: {app}\share\doc\users-manual\ecell3-users-manual\book1.html; WorkingDir: {app}\share\doc\users-manual\ecell3-users-manual
+
+;Main E-Cell shortcuts in Desktop
+Name: {userdesktop}\E-Cell Session Monitor; Filename: {app}\bin\gecell.exe; WorkingDir: {app}; Tasks: desktopicon
+Name: {userdesktop}\E-Cell Toollauncher; Filename: {app}\bin\toollauncher.exe; WorkingDir: {app}; Tasks: desktopicon
+Name: {userdesktop}\E-Cell Model Editor; Filename: {app}\bin\ecell3-model-editor.exe; WorkingDir: {app}; Tasks: desktopicon
+Name: {userdesktop}\E-Cell Console; Filename: {app}\bin\ecell3-console.exe; WorkingDir: {app}; IconFilename: {app}\bin\ecell3-console.exe; Tasks: desktopicon
+
+;Main E-Cell shortcuts in Quick Launch
+Name: {userappdata}\Microsoft\Internet Explorer\Quick Launch\E-Cell Session Monitor; Filename: {app}\bin\gecell.exe; WorkingDir: {app}; Tasks: quicklaunchicon; MinVersion: 4,4
+Name: {userappdata}\Microsoft\Internet Explorer\Quick Launch\E-Cell Toollauncher; Filename: {app}\bin\toollauncher.exe; WorkingDir: {app}; Tasks: quicklaunchicon; MinVersion: 4,4
+Name: {userappdata}\Microsoft\Internet Explorer\Quick Launch\E-Cell Model Editor; Filename: {app}\bin\ecell3-model-editor.exe; WorkingDir: {app}; Tasks: quicklaunchicon; MinVersion: 4,4
+Name: {userappdata}\Microsoft\Internet Explorer\Quick Launch\E-Cell Console; Filename: {app}\bin\ecell3-console.exe; WorkingDir: {app}; IconFilename: {app}\bin\ecell3-console.exe; Tasks: quicklaunchicon; MinVersion: 4,4
+
+
+[Messages]
+FinishedLabel=Please wait for a few moments while setup finalizes E-Cell {#Version} installation on your computer.
+
+
+[LangOptions]
+TitleFontName=Verdana
+TitleFontSize=26
+DialogFontName=Tahoma
+
+
+[Components]
+Name: file; Description: E-Cell File Associations; Types: full compact
+Name: file\eml; Description: .eml; Types: full compact
+Name: file\eml\gecell; Description: gecell; Types: full compact; Flags: exclusive
+Name: file\eml\model_editor; Description: ecell3-model-editor; Flags: exclusive
+Name: file\eml\eml2em; Description: ecell3-eml2em; Flags: exclusive
+Name: file\em; Description: .em; Types: full compact
+Name: file\em\em2eml; Description: ecell3-em2eml; Types: full compact; Flags: exclusive
+Name: file\ess; Description: .ess; Types: full compact
+Name: file\ess\session; Description: ecell3-session; Types: full compact; Flags: exclusive
+Name: file\esm; Description: .esm
+Name: file\esm\session_manager; Description: ecell3-session-manager
+Name: file\cpp; Description: .cpp; Types: full compact
+Name: file\cpp\dmc; Description: ecell3-dmc; Types: full compact; Flags: exclusive
+Name: themes; Description: GTK+ Themes; Types: full compact
+Name: themes\wimp; Description: GTK-Wimp Theme; Types: full compact; Flags: exclusive
+Name: themes\prettyOK; Description: PrettyOK Theme; Flags: exclusive
+Name: themes\lighthouse; Description: Lighthouse Blue Theme; Flags: exclusive
+
+
+[Registry]
+;Registry entry for ECELL3_PREFIX
+;Root: HKLM; Subkey: "Software\E-Cell3"; Flags: deletekey uninsdeletekey
+;Root: HKLM; Subkey: "Software\E-Cell3\Settings"; ValueType: string; ValueName: "ECELL3_PREFIX"; ValueData: "{app}"
+
+;File association for *.eml
+Root: HKCR; Subkey: .eml; ValueType: string; ValueName: ; ValueData: EcellModelDescriptor; Flags: createvalueifdoesntexist uninsdeletevalue; Components: file\eml
+;.eml" is the extension we're associating. "EcellModelDescriptor" is the internal name for the file type as stored in the registry.
+;Make sure you use a unique name for this so you don't inadvertently overwrite another application's registry key.
+Root: HKCR; Subkey: EcellModelDescriptor; ValueType: string; ValueName: ; ValueData: E-Cell Model Descriptor File; Flags: createvalueifdoesntexist uninsdeletekey; Components: file\eml
+;"E-Cell Model Descriptor" above is the name for the file type as shown in Explorer.
+Root: HKCR; Subkey: EcellModelDescriptor\DefaultIcon; ValueType: string; ValueName: ; ValueData: {app}\bin\gecell.exe,0; Components: file\eml\gecell
+;"DefaultIcon" is the registry key that specifies the filename containing the icon to associate with the file type.
+;",0" tells Explorer to use the first icon from gecell.exe. (",1" would mean the second icon.)
+Root: HKCR; Subkey: EcellModelDescriptor\shell\open\command; ValueType: string; ValueName: ; ValueData: """{app}\bin\gecell.exe"" -f ""%1"""; Components: file\eml\gecell
+;"shell\open\command" is the registry key that specifies the program to execute when a file of the type is double-clicked in Explorer.
+;The surrounding quotes are in the command line so it handles long filenames correctly.
+
+;File association for *.eml with ecell3-model-editor
+Root: HKCR; Subkey: EcellModelDescriptor\DefaultIcon; ValueType: string; ValueName: ; ValueData: {app}\bin\ecell3-model-editor.exe,0; Components: file\eml\model_editor
+Root: HKCR; Subkey: EcellModelDescriptor\shell\open\command; ValueType: string; ValueName: ; ValueData: """{app}\bin\ecell3-model-editor.exe"" -f ""%1"""; Components: file\eml\model_editor
+;File association for *.eml with ecell3-eml2em
+Root: HKCR; Subkey: EcellModelDescriptor\DefaultIcon; ValueType: string; ValueName: ; ValueData: {app}\bin\ecell3-eml2em.exe,0; Components: file\eml\eml2em
+Root: HKCR; Subkey: EcellModelDescriptor\shell\open\command; ValueType: string; ValueName: ; ValueData: """{app}\bin\ecell3-eml2em.exe"" -f ""%1"""; Components: file\eml\eml2em
+
+;File association for *.em
+Root: HKCR; Subkey: .em; ValueType: string; ValueName: ; ValueData: EcellModelFile; Flags: createvalueifdoesntexist uninsdeletevalue; Components: file\em
+Root: HKCR; Subkey: EcellModelFile; ValueType: string; ValueName: ; ValueData: E-Cell Model File; Flags: createvalueifdoesntexist uninsdeletekey; Components: file\em
+;File association for *.em with ecell3-em2eml
+Root: HKCR; Subkey: EcellModelFile\DefaultIcon; ValueType: string; ValueName: ; ValueData: {app}\bin\ecell3-em2eml.exe,0; Components: file\em\em2eml
+Root: HKCR; Subkey: EcellModelFile\shell\open\command; ValueType: string; ValueName: ; ValueData: """{app}\bin\ecell3-em2eml.exe"" ""%1"""; Components: file\em\em2eml
+
+;File association for *.ess
+Root: HKCR; Subkey: .ess; ValueType: string; ValueName: ; ValueData: EcellSessionScript; Flags: createvalueifdoesntexist uninsdeletevalue; Components: file\ess
+Root: HKCR; Subkey: EcellSessionScript; ValueType: string; ValueName: ; ValueData: E-Cell Session Script File; Flags: createvalueifdoesntexist uninsdeletekey; Components: file\ess
+;File association for *.ess with ecell3-session
+Root: HKCR; Subkey: EcellSessionScript\DefaultIcon; ValueType: string; ValueName: ; ValueData: {app}\bin\ecell3-session.exe,0; Components: file\ess\session
+Root: HKCR; Subkey: EcellSessionScript\shell\open\command; ValueType: string; ValueName: ; ValueData: """{app}\bin\ecell3-session.exe"" -e ""%1"""; Components: file\ess\session
+
+;File association for *.esm
+Root: HKCR; Subkey: .esm; ValueType: string; ValueName: ; ValueData: EcellSessionManager; Flags: createvalueifdoesntexist uninsdeletevalue; Components: file\esm
+Root: HKCR; Subkey: EcellSessionManager; ValueType: string; ValueName: ; ValueData: E-Cell Session Manager Script; Flags: createvalueifdoesntexist uninsdeletekey; Components: file\esm
+;File association for *.esm with ecell3-session-manager
+Root: HKCR; Subkey: EcellSessionManager\DefaultIcon; ValueType: string; ValueName: ; ValueData: {app}\bin\ecell3-session-manager.exe,0; Components: file\esm\session_manager
+Root: HKCR; Subkey: EcellSessionManager\shell\open\command; ValueType: string; ValueName: ; ValueData: """{app}\bin\ecell3-session-manager.exe"" -e ""%1"""; Components: file\esm\session_manager
+
+;File association for *.cpp
+Root: HKCR; Subkey: .cpp; ValueType: string; ValueName: ; ValueData: EcellDMSource; Flags: createvalueifdoesntexist uninsdeletevalue; Components: file\cpp
+Root: HKCR; Subkey: EcellDMSource; ValueType: string; ValueName: ; ValueData: E-Cell DM Source File; Flags: createvalueifdoesntexist uninsdeletekey; Components: file\cpp
+;File association for *.cpp with ecell3-dmc
+Root: HKCR; Subkey: EcellDMSource\DefaultIcon; ValueType: string; ValueName: ; ValueData: {app}\bin\ecell3-dmc.exe,0; Components: file\cpp\dmc
+Root: HKCR; Subkey: EcellDMSource\shell\open\command; ValueType: string; ValueName: ; ValueData: """{app}\bin\ecell3-dmc.exe"" ""%1"""; Components: file\cpp\dmc
+
+
+[UninstallDelete]
+Type: filesandordirs; Name: {app}\lib
+
+
+[Code]
+const
+  ECELL_VERSION  =  '{#Version}';
+  LICENSE_FILE   =  '{#LicenseFile}';
+  PYTHON_VERSION =  '{#PythonVersion}';
+  GTK_VERSION    =  '{#GtkVersion}';
+  PYTHON_SETUP   =  '{#PythonSetup}';
+  GTK_SETUP      =  '{#GtkSetup}';
+  PEXPORTS_FILE  =  '{#PexportsFile}';
+  DLLTOOL_FILE   =  '{#DlltoolFile}';
+  PYTHONDLL_FILE =  '{#Pythondll}';
+  LIBPYTHON_FILE =  '{#Libpython}';
+
+var
+  URLLabel      : TNewStaticText;
+  GtkDir        : String;
+  PythonDir     : String;
+  isFullInstall : Boolean;
+
+
+{ Convert python[].dll to libpython[].a and store it in ecell_prefix/lib at the end of installation }
+procedure CurPageChanged(CurPage: Integer);
+var
+  pexports  : String;
+  dlltool   : String;
+  pythondll : String;
+  pythondef : String;
+  libdir    : String;
+  cmd       : String;
+  Dummy     : Integer;
+begin
+  case CurPage of
+    wpFinished:
+      begin
+        ExtractTemporaryFile(PEXPORTS_FILE);
+        pexports := GetShortName( ExpandConstant('{tmp}') + '\' + PEXPORTS_FILE );
+        dlltool := ExpandConstant('{app}') + '\bin\' + DLLTOOL_FILE;
+        pythondll := GetShortName( ExpandConstant('{sys}') + '\' + PYTHONDLL_FILE );
+        libdir := ExpandConstant('{app}') + '\lib\';
+        pythondef := libdir + '\python.def';
+        cmd := ExpandConstant('{cmd}')
+        InstExec(cmd, '/C ' + pexports + ' ' + pythondll + ' > python.def', libdir, True, False, SW_HIDE, Dummy);
+        InstExec(dlltool, '--dllname  ' + pythondll + ' --def python.def ' + '--output-lib ' + LIBPYTHON_FILE, libdir, True, False, SW_SHOWNORMAL, Dummy);
+        if FileExists(pythondef) then
+          DeleteFile(pythondef);
+      end;
+  end;
+end;
+
+
+procedure URLLabelOnClick(Sender: TObject);
+var
+  Dummy: Integer;
+begin
+  URLLabel.Font.Color := clBlack;
+  InstShellExec('http://www.e-cell.org/', '', '', SW_SHOWNORMAL, Dummy);
+end;
+
+procedure InitializeWizard();
+var
+  CancelButton: TButton;
+begin
+  CancelButton := WizardForm.CancelButton;
+  URLLabel := TNewStaticText.Create(WizardForm);
+  URLLabel.Top := CancelButton.Top + CancelButton.Height - URLLabel.Height - 2;
+  URLLabel.Left := WizardForm.ClientWidth - CancelButton.Left - CancelButton.Width;
+  URLLabel.Caption := 'e - c e l l . o r g';
+  URLLabel.Font.Name := 'Verdana';
+  URLLabel.Font.Size := 7;
+  URLLabel.Font.Color := clGray;
+  URLLabel.Cursor := crHand;
+  URLLabel.OnClick := @URLLabelOnClick;
+  URLLabel.Parent := WizardForm;
+#ifdef FullInstall
+  isFullInstall := True
+#else
+  isFullInstall := False
+#endif
+end;
+
+function isPythonExists(): Boolean;
+var
+  InsVersion: TArrayOfString;
+  MinVersion: String;
+  i         : Integer;
+
+begin
+  MinVersion := PYTHON_VERSION
+  Result := False;
+  { Check if Python has been installed, if it meets a minimum version, and if python.exe exists }
+  if RegGetSubkeyNames(HKLM, 'Software\Python\PythonCore', InsVersion) then begin
+    for i := 0 to (GetArrayLength(InsVersion)-1) do begin
+      if ( StrToInt(StrGet(InsVersion[i],1)) > StrToInt(StrGet(MinVersion,1)) ) or (
+         ( StrToInt(StrGet(InsVersion[i],1)) = StrToInt(StrGet(MinVersion,1)) ) and ( StrToInt(StrGet(InsVersion[i],3)) >= StrToInt(StrGet(MinVersion,3)) ) ) then begin
+        RegQueryStringValue(HKLM, 'Software\Python\PythonCore\' + InsVersion[i] + '\InstallPath', '', PythonDir)
+        Result := FileExists(PythonDir + '\python.exe');
+      end;
+    end;
+  end;
+end;
+
+function isGtkExists(): Boolean;
+var
+  InsVersion: String;
+  MinVersion: String;
+begin
+  MinVersion := GTK_VERSION
+  Result := False;
+  { Check if GTK has been installed, if it meets a minimum version, and if libglib-2.0-0.dll exists }
+  if RegQueryStringValue(HKLM, 'Software\GTK\2.0', 'Version', InsVersion) then begin
+    if ( StrToInt(StrGet(InsVersion,1)) > StrToInt(StrGet(MinVersion,1)) ) or (
+     ( StrToInt(StrGet(InsVersion,1)) = StrToInt(StrGet(MinVersion,1)) ) and ( StrToInt(StrGet(InsVersion,3)) >= StrToInt(StrGet(MinVersion,3)) ) ) then begin
+      RegQueryStringValue(HKLM, 'Software\GTK\2.0', 'Path', GtkDir)
+      Result := FileExists(GtkDir + '\bin\libglib-2.0-0.dll');
+    end;
+  end;
+end;
+
+
+function GetGtkDir(S: String): String;
+begin
+  Result := GtkDir;
+end;
+
+
+function ScriptDlgPages(CurPage: Integer; BackClicked: Boolean): Boolean;
+var
+  CurSubPage    : Integer;
+  Next          : Boolean;
+  NextOK        : Boolean;
+  LicenseLabel  : TLabel;
+  LicenseDesc   : TLabel;
+  EcellLicense  : String;
+  FileName      : String;
+  LicenseMemo   : TRichEditViewer;
+  CompLabel     : TLabel;
+  CheckListBox  : TNewCheckListBox;
+  PythonExists  : Boolean;
+  GTKExists     : Boolean;
+  PythonRequired: String;
+  GtkRequired   : String;
+  PythonCheck   : Integer;
+  GtkCheck      : Integer;
+  Dummy         : Integer;
+begin
+  if (not BackClicked and (CurPage = wpWelcome)) or (BackClicked and (CurPage = wpSelectDir)) then begin
+
+    if not BackClicked then
+      CurSubPage := 0
+    else
+      CurSubPage := 1;
+    ScriptDlgPageOpen();
+    ScriptDlgPageSetCaption('Custom wizard page controls');
+    ScriptDlgPageSetSubCaption2('');
+
+    while (CurSubPage >= 0) and (CurSubPage <= 1) and not Terminated do begin
+      case CurSubPage of
+        0:
+          begin
+            ScriptDlgPageSetCaption('E-Cell License Information');
+            ScriptDlgPageSetSubCaption1('Please review the license terms of E-Cell Simulation Environment.');
+            ScriptDlgPageClearCustom();
+            WizardForm.NextButton.Caption := 'Next >';
+
+            LicenseLabel := TLabel.Create(WizardForm.ScriptDlgPanel);
+            LicenseLabel.Caption := 'Scroll down to see the rest of the license information.';
+            LicenseLabel.AutoSize := True;
+            LicenseLabel.Parent := WizardForm.ScriptDlgPanel;
+
+            LicenseDesc := TLabel.Create(WizardForm.ScriptDlgPanel);
+            LicenseDesc.Caption := 'E-Cell ' + ECELL_VERSION + ' is released under the GPL license. The license is provided here for information purposes only. Click Next to continue.';
+            LicenseDesc.Top := WizardForm.ScriptDlgPanel.Height - LicenseDesc.Height - 25;
+            LicenseDesc.Width := WizardForm.ScriptDlgPanel.Width
+            LicenseDesc.AutoSize := True;
+            LicenseDesc.WordWrap := True;
+            LicenseDesc.Parent := WizardForm.ScriptDlgPanel;
+
+            ExtractTemporaryFile(LICENSE_FILE)
+            FileName := ExpandConstant('{tmp}') + '\' + LICENSE_FILE;
+
+
+            LicenseMemo := TRichEditViewer.Create(WizardForm.ScriptDlgPanel);
+            LicenseMemo.Top := LicenseLabel.Top + LicenseLabel.Height + 10;
+            LicenseMemo.ScrollBars := ssVertical;
+            LicenseMemo.Width := WizardForm.ScriptDlgPanel.Width;
+            LicenseMemo.Height := LicenseDesc.Top - LicenseMemo.Top - 10;
+            LicenseMemo.ReadOnly := True;
+            LicenseMemo.Parent := WizardForm.ScriptDlgPanel;
+            { LicenseMemo.Font.Name := 'Courier New' }
+            { LicenseMemo.Font.Size := 7 }
+            LoadStringFromFile(FileName, EcellLicense)
+            LicenseMemo.UseRichEdit := True;
+            LicenseMemo.RTFText := EcellLicense;
+
+            Next := ScriptDlgPageProcessCustom();
+            NextOk := Next;
+          end;
+        1:
+          begin
+            ScriptDlgPageSetCaption('E-Cell Required Libraries');
+            ScriptDlgPageSetSubCaption1('Install E-Cell Simulation Environment required packages before continuing.');
+            ScriptDlgPageClearCustom();
+
+
+            PythonExists := isPythonExists();
+            GtkExists := isGtkExists();
+            if PythonExists then
+              PythonRequired := ' (found an installed copy at ' + PythonDir + ')'
+            else
+              PythonRequired := ' (no installed copy found)';
+
+            if GtkExists then
+              GtkRequired := ' (found an installed copy at ' + GtkDir + ')'
+            else
+              GtkRequired := ' (no installed copy found)';
+
+
+            CompLabel := TLabel.Create(WizardForm.ScriptDlgPanel);
+
+            if isFullInstall then begin
+              if PythonExists and GtkExists then begin
+                CompLabel.Caption := 'Please click Next to proceed. All required packages have been installed.';
+                WizardForm.NextButton.Caption := 'Next >';
+              end else begin
+                CompLabel.Caption := 'Before proceeding, the following checked package(s) need to be installed. Click Run Setup to continue.';
+                WizardForm.NextButton.Caption := 'Run Setup';
+              end;
+            end else begin
+              if PythonExists and GtkExists then
+                CompLabel.Caption := 'Please click Next to proceed. All required packages found.'
+              else if not PythonExists and not GtkExists then
+                CompLabel.Caption := 'Before setup can proceed, you need to install the Python and GTK Runtime libraries since they were not found on your computer.'
+              else if not PythonExists then
+                CompLabel.Caption := 'Before setup can proceed, you need to install the Python libraries since it was not found on your computer.'
+              else
+                CompLabel.Caption := 'Before setup can proceed, you need to install the GTK Runtime libraries since it was not found on your computer.';
+            end;
+
+            CompLabel.Width := WizardForm.ScriptDlgPanel.Width
+            CompLabel.AutoSize := True;
+            CompLabel.WordWrap := True;
+            CompLabel.Parent := WizardForm.ScriptDlgPanel;
+
+            CheckListBox := TNewCheckListBox.Create(WizardForm.ScriptDlgPanel);
+            CheckListBox.Flat := True;
+            CheckListBox.Top := CompLabel.Top + CompLabel.Height + 10;
+            CheckListBox.Width := WizardForm.ScriptDlgPanel.Width;
+            CheckListBox.ExtendedSelect := True;
+            CheckListBox.Parent := WizardForm.ScriptDlgPanel;
+
+            PythonCheck := CheckListBox.AddCheckBox('Python version ' + PYTHON_VERSION + PythonRequired, '', 0, not PythonExists, False, True, nil);
+            GtkCheck := CheckListBox.AddCheckBox('GTK version ' + GTK_VERSION + GtkRequired, '', 0, not GtkExists, False, True, nil);
+
+            Next := ScriptDlgPageProcessCustom();
+
+            if Next then begin
+              if isFullInstall then begin
+                NextOK := (not CheckListBox.Checked[PythonCheck]) and (not CheckListBox.Checked[GtkCheck]);
+                if CheckListBox.Checked[PythonCheck] then begin
+                  MsgBox('Python installation setup will start now since Python-' + PYTHON_VERSION + ' was not found on your computer.' #13#10
+                         'Please wait for a few moments while the setup file is extracted.', mbInformation, MB_OK);
+                  ExtractTemporaryFile(PYTHON_SETUP)
+                  FileName := ExpandConstant('{tmp}') + '\' + PYTHON_SETUP;
+                  InstExec(FileName, '', '', True, False, SW_SHOWNORMAL, Dummy);
+                end;
+                if CheckListBox.Checked[GtkCheck] then begin
+                  MsgBox('GTK installation setup will start now since GTK-' + GTK_VERSION + ' was not found on your computer.' #13#10
+                         'Please wait for a few moments while the setup file is extracted.' #13#10
+                         'During the GTK setup, you only need to install GTK+ ' + GTK_VERSION + ' Runtime (uncheck the Glade and Devel packages).', mbInformation, MB_OK);
+                  ExtractTemporaryFile(GTK_SETUP)
+                  FileName := ExpandConstant('{tmp}') + '\' + GTK_SETUP;
+                  InstExec(FileName, '', '', True, False, SW_SHOWNORMAL, Dummy);
+                end;
+              end else begin
+                NextOK := (not CheckListBox.Checked[PythonCheck]) and (not CheckListBox.Checked[GtkCheck]);
+                if CheckListBox.Checked[PythonCheck] then begin
+                  MsgBox('Python version ' + PYTHON_VERSION + ' or newer was not found on your computer.' #13#10
+                         'Please get it from http://www.python.org/ and install it' #13#10
+                         'or use the ecell-' + ECELL_VERSION + '-python+gtk-setup.exe installer.', mbInformation, MB_OK);
+                end;
+                if CheckListBox.Checked[GtkCheck] then begin
+                  MsgBox('GTK+ Runtime version ' + GTK_VERSION + ' or newer was not found on your computer.' #13#10
+                         'Please install it from http://gladewin32.sourceforge.net/ and install it' #13#10
+                         'or use the ecell-' + ECELL_VERSION + '-python+gtk-setup.exe installer.', mbInformation, MB_OK);
+                end;
+              end;
+            end;
+          end;
+
+      end;
+      if Next then begin
+        { Go to the next page, but only if Python and GTK has been installed, i.e. NextOK is True }
+        if NextOK then
+          CurSubPage := CurSubPage + 1
+      end else
+        CurSubPage := CurSubPage - 1;
+    end;
+    if not BackClicked then
+      Result := Next
+    else
+      Result := not Next;
+    ScriptDlgPageClose(not Result);
+  end else
+    Result := True;
+end;
+
+function NextButtonClick(CurPage: Integer): Boolean;
+begin
+  Result := ScriptDlgPages(CurPage, False);
+end;
+
+function BackButtonClick(CurPage: Integer): Boolean;
+begin
+  Result := ScriptDlgPages(CurPage, True);
+end;
+
