@@ -297,12 +297,7 @@ class RCGA:
 					                 %(getJobDirectory(aJobID),
 					                   os.sep,
 					                   getStderrFileName()))
-					sys.stderr.write("If you set \'TMP REMOVABLE\' is True, change it to False and try again for debugging.\n")
-					sys.stderr.write("If not, see %s%s%s for details.\n" \
-					                  %(getJobDirectory(aJobID),
-					                   os.sep,
-					                   getSessionProxy(aJobID).getStderrFileName() ))
-
+					sys.stderr.write("If you set \'TMP REMOVABLE\' is True, change it to False and try again.\n")
 					sys.stderr.flush()
 					
 					sys.exit(SCRIPTFILE_EXIT)
@@ -1485,7 +1480,8 @@ class Setting(ConfigParser):
 			sys.stderr.write(aMessage)
 			return SET_UP_NG_RETURN 
 
-		aFile = os.path.abspath( self.__get(aKey) )
+		#aFile = os.path.abspath( self.__get(aKey) )
+		aFile = self.__get(aKey) 
 
 		# -----------------------------------------------
 		# checks the existance of aFile
@@ -1527,6 +1523,7 @@ class Setting(ConfigParser):
 			return SET_UP_NG_RETURN 
 
 		aFile = os.path.abspath( self.__get(aKey) )
+		#aFile = self.__get(aKey) 
 
 		# checks dir
 		# to do
@@ -1738,7 +1735,7 @@ class Setting(ConfigParser):
 
 		for anIndex in xrange(0,len(aDirList)):
 
-			aDirList[anIndex] = os.path.abspath(aDirList[anIndex])
+			#aDirList[anIndex] = os.path.abspath(aDirList[anIndex])
 
 			# -----------------------------------------------
 			# checks the existance of directory
@@ -1830,7 +1827,8 @@ class Setting(ConfigParser):
 			sys.stderr.write(aMessage)
 			return SET_UP_NG_RETURN 
 	
-		aDir = os.path.abspath( self.__get(aKey) )
+		#aDir = os.path.abspath( self.__get(aKey) )
+		aDir = self.__get(aKey) 
 
 		# -----------------------------------------------
 		# checks type
@@ -1853,8 +1851,6 @@ class Setting(ConfigParser):
 
 		aDir = os.path.abspath(aDir)
 		aParentDir = os.path.dirname(aDir)
-
-		#print aParentDir
 
 		# -----------------------------------------------
 		# checks the read permission of aParentDir
