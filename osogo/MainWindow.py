@@ -177,10 +177,6 @@ class MainWindow(Window):
             if aButton.get_active() :
                 aPluginName = plugin_name
 
-        # aScriptLine = 'from ' + aPluginName + ' import *'
-        # print '>>> ' + aScriptLine
-        # exec( aScriptLine )
-
         aSubstanceIDList = [ 'A', 'B', 'C' ]
 
         for id in aSubstanceIDList :
@@ -188,15 +184,15 @@ class MainWindow(Window):
             if aButton.get_active() :
                 aSelectedID = id
 
-        aFullPN = 'Substance:/:' + aSelectedID + ':Quantity'
+        aFullPN = ['Substance', '/', aSelectedID, 'Quantity']
         aFullPNList = [ aFullPN, ]
 
         self.thePluginManager.createInstance( aPluginName, self.theSimulator, aFullPNList)
           
-#          aScriptLine = "aPluginWindow = " + aPluginName +\
-#                        "( self.theSimulator, 'Substance:/:" + aSelectedID + "' )"
-#          print '>>> ' + aScriptLine
-#          exec( aScriptLine )
+    ###########################
+    #### For Test Mode end ####
+    ###########################
+
 
 if __name__ == "__main__":
 
