@@ -49,22 +49,18 @@ public:
     if( Py::_Float_Check( *aPyObject ) )
       {
 	theData = new libecs::UConstantRealData( Py::Float( aPyObject ) );
-	theType = REAL;
       }
     else if( Py::_Int_Check( *aPyObject ) )
       {
 	theData = new libecs::UConstantIntData( Py::Int( aPyObject ) );
-	theType = INT;
       }
     else if( Py::_Long_Check( *aPyObject ) )
       {
 	theData = new libecs::UConstantRealData( Py::Float( aPyObject ) );
-	theType = REAL;
       }
     else // assume everything else as a string
       {
 	theData = new libecs::UConstantStringData( aPyObject.as_string() );
-	theType = STRING;
       }
   }
 
