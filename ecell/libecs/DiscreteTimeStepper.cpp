@@ -47,7 +47,7 @@ namespace libecs
   {
     Stepper::initialize();
 
-    if( getDiscreteProcessOffset() != 0 )
+    if( getDiscreteProcessOffset() != 0 && ! getProcessVector().empty() )
       {
 	THROW_EXCEPTION( InitializationFailed,
 			 getClassNameString() 
