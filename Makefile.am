@@ -1,5 +1,5 @@
 
-AUTOMAKE_OPTIONS = foreign
+#AUTOMAKE_OPTIONS = foreign
 
 SUBDIRS = libltdl korandom dmtool ecell osogo
 

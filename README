@@ -47,12 +47,12 @@ libltdl/     --> libtool's dynamic module loader library
 
 
 
-== Code names ==
+== About codenames ==
 
 
-  Hekkoro  -- is a code name of E-CELL SE Version 3 (libecs, libemc & pyecs)
-  Koyurugi -- is a code name of libecs class library
-  Osogo    -- is a code name of a GUI Session monitor (gecell)
+  Hekkoro  -- is a codename of E-CELL SE Version 3 (libecs, libemc plus pyecs)
+  Koyurugi -- is a codename of libecs class library
+  Osogo    -- is a codename of a GUI Session monitor (gecell)
 
   (Serizawa -- was a code name of E-CELL 1)
 

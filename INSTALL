@@ -41,6 +41,65 @@ NOTE: If you get this package via cvs, use ./autogen.sh instead of
       ./configure.
 
 
+
+  == Operating Systems ==
+
+  We've tested with RedHat Linux 7.2 on i386 platform.
+
+
+  == Compilers ==
+
+  We've tested with gcc-2.95.3, gcc-2.96 and gcc-3.0.3.
+
+
+  == Note for RedHat 7.2 users ==
+
+  If you are using RedHat Linux 7.2, you need some additional packages to 
+  successfully build and run E-CELL 3.
+
+
+  1. python2: 
+     must be installed.  This is an optional package of the RedHat 7.2.
+
+  2. Numeric Python for the python2:
+     note that this should be built for python2, not python.
+     You may have to build and install from tarball.
+
+     http://numpy.sourceforge.net
+
+  (below is for osogo GUI)
+
+  3. gnome-python 1.4.2 or better for python2:
+     note that this is for python2, not python.
+     You may have to build and install from source code.
+     
+     (We have experienced crashing problems with version 1.4.1)
+
+     The configure script of gnome-python doesn't find /usr/bin/python2.
+     A workaround is:
+
+     1. % rm /usr/bin/python    
+        (this should be safe because it's a hard link)
+     2. % ln /usr/bin/python2 /usr/bin/python
+     3. In gnome-python directory,
+        % ./configure ; make ; make install 
+     4. % rm /usr/bin/python ; ln /usr/bin/python1.5 /usr/bin/python
+
+
+     http://www.daa.com.au/+james/pygtk
+
+  4. GtkExtra and PyGtkExtra:
+
+     http://gtkextra.sourceforge.net
+     http://python-gtkextra.sourceforge.net
+
+
+
+  I recommend http://www.freshmeat.net to find latest URLs for the
+  packages.
+
+
+
 == Usage ==
 
 
