@@ -83,6 +83,17 @@ static void PyEcsSignalHandler( int aSignal )
 }
 
 
+static PyObject* getLibECSVersionInfo()
+{
+  PyObject* aPyTuple( PyTuple_New( 3 ) );
+    
+  PyTuple_SetItem( aPyTuple, 0, PyInt_FromLong( libecs::getMajorVersion() ) );
+  PyTuple_SetItem( aPyTuple, 1, PyInt_FromLong( libecs::getMinorVersion() ) );
+  PyTuple_SetItem( aPyTuple, 2, PyInt_FromLong( libecs::getMicroVersion() ) );
+  
+  return aPyTuple;
+}
+
 BOOST_PYTHON_MODULE( _ecs )
 {
   using namespace boost::python;
@@ -94,6 +105,9 @@ BOOST_PYTHON_MODULE( _ecs )
   signal( SIGFPE,  PyEcsSignalHandler );
   signal( SIGINT,  PyEcsSignalHandler );
 
+
+  def( "getLibECSVersionInfo", &getLibECSVersionInfo );
+  def( "getLibECSVersion",     &libecs::getVersion );
 
   def( "setDMSearchPath", &libemc::setDMSearchPath );
   def( "getDMSearchPath", &libemc::getDMSearchPath );

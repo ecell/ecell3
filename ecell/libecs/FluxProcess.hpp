@@ -30,7 +30,7 @@ namespace libecs
       ; // do nothing
     }
 
-    StringLiteral getClassName() const { return "FluxProcess"; }
+    virtual StringLiteral getClassName() const { return "FluxProcess"; }
     
     virtual void initialize()
     {

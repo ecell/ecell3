@@ -17,10 +17,10 @@ import ecell.ECDDataFile
 #from ecell.ECS import *
 
 BANNERSTRING =\
-'''ecell3-session [ for E-Cell SE Version 3, on Python Version %d.%d.%d ]
-Copyright (C) 1996-2002 Keio University.
+'''ecell3-session [ E-Cell SE Version %s, on Python Version %d.%d.%d ]
+Copyright (C) 1996-2003 Keio University.
 Written by Kouichi Takahashi <shafi@e-cell.org>'''\
-% ( sys.version_info[0], sys.version_info[1], sys.version_info[2] )
+% ( ecell.ecs.getLibECSVersion(), sys.version_info[0], sys.version_info[1], sys.version_info[2] )
 
 
 class Session:
@@ -55,7 +55,7 @@ class Session:
         anInterpreter = code.InteractiveConsole( aContext )
 
         self._prompt = self._session_prompt( self )
-        anInterpreter.runsource( 'import sys; sys.ps1=theSession._prompt' )
+        anInterpreter.runsource( 'import sys; sys.ps1=theSession._prompt; del sys' )
 
         anInterpreter.interact( BANNERSTRING )
 
@@ -400,8 +400,11 @@ class Session:
         
         # flatten class methods and object properties so that
         # 'self.' isn't needed for each method calls in the script
+        aKeyList = list ( self.__dict__.keys() +\
+                          self.__class__.__dict__.keys() )
+
         aDict = {}
-        for aKey in self.__dict__.keys() + self.__class__.__dict__.keys():
+        for aKey in aKeyList:
             aDict[ aKey ] = getattr( self, aKey )
 
         aContext.update( aDict )

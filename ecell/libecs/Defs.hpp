@@ -29,8 +29,9 @@
 //
 
 
-#ifndef ___DEFS_H___
-#define ___DEFS_H___
+#ifndef __DEFS_HPP
+#define __DEFS_HPP
+
 #include <stdint.h>
 #include <float.h>
 #include <string>
@@ -69,7 +70,33 @@ namespace libecs
 
   // system constants
 
-  // system constants -- nothing here yet
+  const int MAJOR_VERSION( ECELL_MAJOR_VERSION );
+  const int MINOR_VERSION( ECELL_MINOR_VERSION );
+  const int MICRO_VERSION( ECELL_MICRO_VERSION );
+
+  const char* const VERSION_STRING( ECELL_VERSION_STRING );
+
+
+  inline const int getMajorVersion()
+  {
+    return MAJOR_VERSION;
+  }
+
+  inline const int getMinorVersion()
+  {
+    return MINOR_VERSION;
+  }
+
+  inline const int getMicroVersion()
+  {
+    return MICRO_VERSION;
+  }
+
+  inline const std::string getVersion()
+  {
+    return VERSION_STRING;
+  }
+
 
 
   // CoreLinux++ compatibility
@@ -162,7 +189,7 @@ namespace libecs
 } // namespace libecs
 
 
-#endif /* ___DEFS_H___ */
+#endif /* __DEFS_HPP */
 
 
 /*
