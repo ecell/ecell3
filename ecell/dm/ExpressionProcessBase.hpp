@@ -241,8 +241,6 @@ const Real ExpressionProcessBase::VirtualMachine::execute( CodeCref aCode )
 #define INCREMENT_PC( OPCODE )\
     aPC += sizeof( ExpressionCompiler::\
                    Opcode2Instruction<ExpressionCompiler::OPCODE>::type );\
-    LIBECS_PREFETCH( aPC, 0, 1 );
- //
 
   //    std::cout << #OPCODE << std::endl;
 
