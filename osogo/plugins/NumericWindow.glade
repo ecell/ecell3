@@ -16,7 +16,7 @@
   <class>GtkWindow</class>
   <name>NumericWindow</name>
   <can_focus>True</can_focus>
-  <title>window1</title>
+  <title>NumericWindow</title>
   <type>GTK_WINDOW_TOPLEVEL</type>
   <position>GTK_WIN_POS_NONE</position>
   <modal>False</modal>

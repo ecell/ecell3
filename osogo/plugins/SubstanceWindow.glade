@@ -60,6 +60,7 @@
       <widget>
 	<class>GtkFrame</class>
 	<name>frame44</name>
+	<height>37</height>
 	<label>Quantity</label>
 	<label_xalign>0</label_xalign>
 	<shadow_type>GTK_SHADOW_ETCHED_IN</shadow_type>
@@ -72,6 +73,7 @@
 	<widget>
 	  <class>GtkHBox</class>
 	  <name>hbox75</name>
+	  <height>25</height>
 	  <homogeneous>False</homogeneous>
 	  <spacing>0</spacing>
 
@@ -98,6 +100,7 @@
 	  <widget>
 	    <class>GtkVBox</class>
 	    <name>vbox62</name>
+	    <height>25</height>
 	    <homogeneous>False</homogeneous>
 	    <spacing>0</spacing>
 	    <child>
@@ -125,15 +128,15 @@
 		<class>GtkButton</class>
 		<child_name>Toolbar:button</child_name>
 		<name>button1</name>
-		<width>28</width>
-		<height>22</height>
+		<width>16</width>
+		<height>14</height>
 		<signal>
 		  <name>clicked</name>
 		  <handler>qty_increase_pressed</handler>
 		  <last_modification_time>Tue, 11 Sep 2001 07:23:31 GMT</last_modification_time>
 		</signal>
 		<label></label>
-		<icon>icon_up.xpm</icon>
+		<icon>icon_up_small.xpm</icon>
 	      </widget>
 	    </widget>
 
@@ -156,15 +159,15 @@
 		<class>GtkButton</class>
 		<child_name>Toolbar:button</child_name>
 		<name>button2</name>
-		<width>28</width>
-		<height>22</height>
+		<width>16</width>
+		<height>14</height>
 		<signal>
 		  <name>clicked</name>
 		  <handler>qty_decrease_pressed</handler>
 		  <last_modification_time>Tue, 11 Sep 2001 07:24:06 GMT</last_modification_time>
 		</signal>
 		<label></label>
-		<icon>icon_down.xpm</icon>
+		<icon>icon_down_small.xpm</icon>
 	      </widget>
 	    </widget>
 	  </widget>
@@ -174,6 +177,7 @@
       <widget>
 	<class>GtkFrame</class>
 	<name>frame45</name>
+	<height>54</height>
 	<label>Concentration</label>
 	<label_xalign>0</label_xalign>
 	<shadow_type>GTK_SHADOW_ETCHED_IN</shadow_type>
@@ -186,6 +190,7 @@
 	<widget>
 	  <class>GtkHBox</class>
 	  <name>hbox76</name>
+	  <height>25</height>
 	  <homogeneous>False</homogeneous>
 	  <spacing>0</spacing>
 
@@ -212,6 +217,7 @@
 	  <widget>
 	    <class>GtkVBox</class>
 	    <name>vbox63</name>
+	    <height>25</height>
 	    <homogeneous>False</homogeneous>
 	    <spacing>0</spacing>
 	    <child>
@@ -239,15 +245,15 @@
 		<class>GtkButton</class>
 		<child_name>Toolbar:button</child_name>
 		<name>button3</name>
-		<width>28</width>
-		<height>22</height>
+		<width>16</width>
+		<height>14</height>
 		<signal>
 		  <name>clicked</name>
 		  <handler>concentration_increase_pressed</handler>
 		  <last_modification_time>Tue, 11 Sep 2001 07:24:34 GMT</last_modification_time>
 		</signal>
 		<label></label>
-		<icon>icon_up.xpm</icon>
+		<icon>icon_up_small.xpm</icon>
 	      </widget>
 	    </widget>
 
@@ -270,15 +276,15 @@
 		<class>GtkButton</class>
 		<child_name>Toolbar:button</child_name>
 		<name>button4</name>
-		<width>28</width>
-		<height>22</height>
+		<width>16</width>
+		<height>14</height>
 		<signal>
 		  <name>clicked</name>
 		  <handler>concentration_decrease_pressed</handler>
 		  <last_modification_time>Tue, 11 Sep 2001 07:24:55 GMT</last_modification_time>
 		</signal>
 		<label></label>
-		<icon>icon_down.xpm</icon>
+		<icon>icon_down_small.xpm</icon>
 	      </widget>
 	    </widget>
 	  </widget>
