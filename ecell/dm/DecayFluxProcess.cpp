@@ -42,28 +42,29 @@ LIBECS_DM_CLASS( DecayProcess, Process )
     {
       Process::initialize();
 
-      if(T <= 0)
+      if( T <= 0.0 )
 	{
-	  THROW_EXCEPTION( ValueError, "Error:in DecayProcess::initialze().0 or negative half time. set to 1." );
+	  THROW_EXCEPTION( InitializationFailed, 
+			   "Zero or negative half time." );
 	}
       
-      k = log(2)/T;
+      k_na = N_A * log( 2.0 ) / T;
       S0 = getVariableReference( "S0" );
     }
 
   virtual void process()
     {
-      Real velocity( k * N_A );
+      Real velocity( k_na );
       velocity *= getSuperSystem()->getSize();
 
-      velocity *= pow(S0.getMolarConc(),S0.getCoefficient()*-1);
+      velocity *= pow( S0.getMolarConc(), - S0.getCoefficient() );
       setFlux( velocity );
     }
 
  protected:
   
   Real T;
-  Real k;
+  Real k_na;
   VariableReference S0;
   
 };
