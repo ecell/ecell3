@@ -14,8 +14,6 @@
   <property name="modal">False</property>
   <property name="resizable">True</property>
   <property name="destroy_with_parent">False</property>
-  <signal name="delete_event" handler="on_LoggerWindow_delete_event" last_modification_time="Wed, 12 Mar 2003 03:27:30 GMT"/>
-  <signal name="destroy_event" handler="on_LoggerWindow_destroy_event" last_modification_time="Wed, 12 Mar 2003 03:27:37 GMT"/>
 
   <child>
     <widget class="GtkVBox" id="vbox9">
@@ -442,12 +440,12 @@
 					  <property name="visible">True</property>
 					  <property name="can_focus">True</property>
 					  <property name="climb_rate">1</property>
-					  <property name="digits">3</property>
+					  <property name="digits">1</property>
 					  <property name="numeric">True</property>
 					  <property name="update_policy">GTK_UPDATE_IF_VALID</property>
 					  <property name="snap_to_ticks">False</property>
 					  <property name="wrap">False</property>
-					  <property name="adjustment">3 0 100 1 10 10</property>
+					  <property name="adjustment">3 0 100000 1 10 10</property>
 					</widget>
 					<packing>
 					  <property name="padding">0</property>
@@ -567,7 +565,7 @@
 					      <property name="update_policy">GTK_UPDATE_IF_VALID</property>
 					      <property name="snap_to_ticks">False</property>
 					      <property name="wrap">False</property>
-					      <property name="adjustment">0 0 1e+07 1 10 10</property>
+					      <property name="adjustment">0 0 1e+16 1 10 10</property>
 					    </widget>
 					    <packing>
 					      <property name="padding">0</property>
@@ -607,7 +605,7 @@
 					      <property name="update_policy">GTK_UPDATE_IF_VALID</property>
 					      <property name="snap_to_ticks">False</property>
 					      <property name="wrap">False</property>
-					      <property name="adjustment">1000 0 1e+07 1 10 10</property>
+					      <property name="adjustment">1e+06 0 1e+16 1 10 10</property>
 					    </widget>
 					    <packing>
 					      <property name="padding">0</property>

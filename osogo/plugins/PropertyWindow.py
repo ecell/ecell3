@@ -31,20 +31,23 @@ class PropertyWindow(OsogoPluginWindow):
 		# calls superclass's constructor
 		OsogoPluginWindow.__init__( self, aDirName, aData, aPluginManager, aRoot )
 		self.theStatusBarWidget = None
-		self.openWindow()
-		
-		# registers myself to PluginManager
-		self.thePluginManager.appendInstance( self ) 
 
+	# end of __init__
+
+	def openWindow( self ):
+		#self.openWindow()
+		OsogoPluginWindow.openWindow(self)
 		# sets handlers
 		self.addHandlers( { \
-		                    # property tree
-		                    'cursor_changed'                        : self.__selectProperty,
-		                    'on_property_clist_button_press_event'  : self.__popupMenu,
-		                    # button
-		                    'on_update_button_pressed'              : self.__updateValue,
-		                    'window_exit'	                        : self.exit } )
+		      # property tree
+		      'cursor_changed'                        : self.__selectProperty,
+		      'on_property_clist_button_press_event'  : self.__popupMenu,
+		      # button
+		      'on_update_button_clicked'              : self.__updateValue })
+		      #'window_exit'	                        : self.exit } )
         
+		#self['property_clist'].connect('button_press_event',self.__popupMenu)
+
 		# initializes buffer
 		self.thePreFullID = None
 		self.thePrePropertyMap = {}
@@ -81,7 +84,8 @@ class PropertyWindow(OsogoPluginWindow):
 			self.thePreFullID = self.theFullID()
 			aClassName = self.__class__.__name__
 
-	# end of __init__
+		# registers myself to PluginManager
+		self.thePluginManager.appendInstance( self ) 
 
 
 	# ---------------------------------------------------------------
@@ -543,6 +547,12 @@ class PropertyWindowPopupMenu( gtk.Menu ):
 		self.thePluginManager = aPluginManager
 		self.theMenuItem = {}
 
+        # ------------------------------------------
+        # initializes the size of menu
+        # ------------------------------------------
+		aMaxStringLength = 0
+		aMenuSize = 0
+
 		# ------------------------------------------
 		# adds plugin window
 		# ------------------------------------------
@@ -551,9 +561,18 @@ class PropertyWindowPopupMenu( gtk.Menu ):
 			self.theMenuItem[aPluginMap].connect('activate', self.theParent.createNewPluginWindow )
 			self.theMenuItem[aPluginMap].set_name(aPluginMap)
 			self.append( self.theMenuItem[aPluginMap] )
+			if aMaxStringLength < len(aPluginMap):
+				aMaxStringLength = len(aPluginMap)
+			aMenuSize += 1
 
+		self.theWidth = (aMaxStringLength+1)*8
+		#self.theHeight = (aMenuSize+1)*21 + 3
+		self.theHeight = (aMenuSize+1)*21 + 3
+		#self.set_usize( self.theWidth, self.theHeight )
+
+		self.set_size_request( self.theWidth, self.theHeight )
 		#self.append( gtk.MenuItem() )
-
+		#self.set_size_request( 150, 450 )
 
 	# end of __init__
 

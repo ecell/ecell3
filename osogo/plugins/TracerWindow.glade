@@ -5,6 +5,7 @@
 
 <widget class="GtkWindow" id="TracerWindow">
   <property name="visible">True</property>
+  <property name="tooltip" translatable="yes">TracerWindow</property>
   <property name="events">GDK_KEY_PRESS_MASK</property>
   <property name="title" translatable="yes">TracerWindow</property>
   <property name="type">GTK_WINDOW_TOPLEVEL</property>
@@ -12,8 +13,6 @@
   <property name="modal">False</property>
   <property name="resizable">True</property>
   <property name="destroy_with_parent">False</property>
-  <signal name="destroy" handler="window_exit"/>
-  <signal name="button_press_event" handler="button_press_event"/>
 
   <child>
     <widget class="GtkVBox" id="vbox19">
@@ -38,7 +37,6 @@
 	      <property name="has_frame">True</property>
 	      <property name="invisible_char" translatable="yes">*</property>
 	      <property name="activates_default">False</property>
-	      <signal name="focus_out_event" handler="on_entry1_focus_out_event"/>
 	    </widget>
 	    <packing>
 	      <property name="x">16</property>
@@ -81,6 +79,22 @@
 	  </child>
 
 	  <child>
+	    <widget class="GtkButton" id="button13">
+	      <property name="width_request">0</property>
+	      <property name="height_request">0</property>
+	      <property name="visible">True</property>
+	      <property name="can_focus">True</property>
+	      <property name="label" translatable="yes">Log All</property>
+	      <property name="use_underline">True</property>
+	      <property name="relief">GTK_RELIEF_NORMAL</property>
+	    </widget>
+	    <packing>
+	      <property name="x">416</property>
+	      <property name="y">8</property>
+	    </packing>
+	  </child>
+
+	  <child>
 	    <widget class="GtkButton" id="button12">
 	      <property name="width_request">0</property>
 	      <property name="height_request">0</property>
@@ -106,7 +120,7 @@
 	      <property name="label" translatable="yes">Remove Trace</property>
 	      <property name="use_underline">True</property>
 	      <property name="relief">GTK_RELIEF_NORMAL</property>
-	      <signal name="clicked" handler="on_button9_clicked"/>
+	      <signal name="clicked" handler="on_button9_clicked" last_modification_time="Tue, 25 Mar 2003 04:09:07 GMT"/>
 	    </widget>
 	    <packing>
 	      <property name="x">216</property>
@@ -125,27 +139,9 @@
 	      <property name="relief">GTK_RELIEF_NORMAL</property>
 	      <property name="active">False</property>
 	      <property name="inconsistent">False</property>
-	      <signal name="toggled" handler="on_togglebutton3_toggled"/>
 	    </widget>
 	    <packing>
 	      <property name="x">320</property>
-	      <property name="y">8</property>
-	    </packing>
-	  </child>
-
-	  <child>
-	    <widget class="GtkButton" id="button13">
-	      <property name="width_request">0</property>
-	      <property name="height_request">0</property>
-	      <property name="visible">True</property>
-	      <property name="can_focus">True</property>
-	      <property name="label" translatable="yes">Log All</property>
-	      <property name="use_underline">True</property>
-	      <property name="relief">GTK_RELIEF_NORMAL</property>
-	      <signal name="clicked" handler="on_button13_clicked"/>
-	    </widget>
-	    <packing>
-	      <property name="x">416</property>
 	      <property name="y">8</property>
 	    </packing>
 	  </child>

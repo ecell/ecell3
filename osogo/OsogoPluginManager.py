@@ -139,6 +139,7 @@ class OsogoPluginManager(PluginManager):
 			else:
 
 				anInstance = aPlugin.createInstance( data, self, root, parent )
+				anInstance.openWindow()
 
 				try:
 					if root !='top_vbox':              

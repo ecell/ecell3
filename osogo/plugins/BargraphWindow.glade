@@ -12,8 +12,6 @@
   <property name="modal">False</property>
   <property name="resizable">False</property>
   <property name="destroy_with_parent">False</property>
-  <signal name="destroy" handler="window_exit"/>
-  <signal name="button_press_event" handler="button_press_event"/>
 
   <child>
     <widget class="GtkHandleBox" id="handlebox1">

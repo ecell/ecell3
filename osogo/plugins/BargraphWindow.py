@@ -18,8 +18,11 @@ class BargraphWindow( OsogoPluginWindow ):
 		#initiates window
 		OsogoPluginWindow.__init__(self, dirname, data, pluginmanager,\
 		    				root)
+		self.theSession=pluginmanager.theSession
 
-		self.openWindow()
+	def openWindow( self ):
+		OsogoPluginWindow.openWindow(self)
+		#self.openWindow()
 		#this should be removed:
 		root=self.getWidget('BargraphWindow')
 		#gets HandleBox
@@ -49,7 +52,6 @@ class BargraphWindow( OsogoPluginWindow ):
 		    gc.set_foreground(\
 			self.ColorMap.alloc_color(self.colored_ranges[i][1]))
 		    self.colored_ranges[i][2]=gc
-		self.theSession=pluginmanager.theSession
 		#lastvalue zero
 		self.lastvalue=0
 		self.lastscale=0
@@ -66,7 +68,8 @@ class BargraphWindow( OsogoPluginWindow ):
 
 		self.drawingarea.queue_draw_area(0,0,BAR_WIDTH, BAR_HEIGTH)			
 		#calls update
-		pluginmanager.appendInstance(self)
+		#pluginmanager.appendInstance(self)
+		self.thePluginManager.appendInstance(self)
 		self.ccFullPN=convertFullIDToFullPN(self.theFullID(),
 		'Value')
 		nameFullPN=str(self.ccFullPN[SYSTEMPATH])+':'+\

@@ -18,13 +18,23 @@ class TracerWindow( PlotterPluginWindow ):
 		#initiates Plotterpluginwindow
 		PlotterPluginWindow.__init__(self, dirname, data, pluginmanager,\
 					    'TracerPlot',root)
+		#-------
+
+	def openWindow(self):
+		#OsogoPluginWindow.openWindow(self)
+		PlotterPluginWindow.openWindow(self)
 		#sets stripinterval, disable history buttons
 		self['entry1'].set_text(str(self.thePlotInstance.getstripinterval()))
 		self['entry1'].connect('activate',self.entry1_activated)
 		#sets additional button handlers(toggle strip/history, zoom), 
-		self.addHandlers({'on_entry1_focus_out_event' :  self.stripinterval_changes , 
-		'on_button13_clicked'    :self.createlogger_pressed,  
-		'on_togglebutton3_toggled' :self.togglestrip })
+		#self.addHandlers( {
+		                #'on_entry1_focus_out_event' :  self.stripinterval_changes , 
+		                #'on_button13_clicked'       :  self.createlogger_pressed,  
+		                #'on_togglebutton3_toggled'  :  self.togglestrip
+		#                 })
+		self['button13'].connect('clicked',self.createlogger_pressed)
+		self['togglebutton3'].connect('toggled',self.togglestrip)
+		self['entry1'].connect('focus_out_event',self.stripinterval_changes)
 		self.theLoggerMap={}
 		self.lastTime=self.theSession.theSimulator.getCurrentTime()
 

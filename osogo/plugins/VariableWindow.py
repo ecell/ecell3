@@ -98,16 +98,22 @@ class VariableWindow( OsogoPluginWindow ):
 		# --------------------------------------------------------------------
 		# registers this instance to plugin manager
 		self.thePluginManager.appendInstance( self )    
+
+	def openWindow(self):
+
+		OsogoPluginWindow.openWindow(self)
+
 		# calls openWindow of superclass
-		self.openWindow()
+		#self.openWindow()
 
 		# adds handers
 		self.addHandlers( { \
 		                    'button_toggled': self.changeFixFlag,
 							'on_value_spinbutton_changed' : self.changeValue,
 							'input_value': self.changeValue,
+		                    })
 							#'input_concentration': self.inputConcentration,
-							'window_exit' : self.exit } )
+							#'window_exit' : self.exit } )
 
 		# sets FULLID to label 
 		self["id_label"].set_text( self.theFullIDString )

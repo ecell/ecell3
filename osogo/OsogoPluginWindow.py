@@ -94,6 +94,11 @@ class OsogoPluginWindow(PluginWindow):
 
 	# end of __init__
 
+	def openWindow( self ):
+		Window.openWindow( self )
+		if self.theRoot == None:
+			self[self.__class__.__name__].connect('destroy',self.exit)
+
 	def setRawFullPNList( self, aRawFullPNList ):
 		self.theRawFullPNList = aRawFullPNList
 

@@ -27,18 +27,22 @@ class DigitalWindow( OsogoPluginWindow ):
         
 		#if type() self.theFullPN() 
 
+	# end of __init__
+
+	def openWindow(self):
+		OsogoPluginWindow.openWindow(self)
+		self[self.__class__.__name__].show_all()
+
 		aFullPNString = createFullPNString( self.theFullPN() )
 		aValue = self.theSession.theSimulator.getEntityProperty( aFullPNString )
-
 		if operator.isNumberType( aValue ):
-			self.openWindow()
 			self.thePluginManager.appendInstance( self )
 
 			self.addHandlers( { 
 			            'on_value_frame_changed' :self.inputValue,
 		  	            'on_increase_button_clicked' :self.increaseValue,
 		  	            'on_decrease_button_clicked' :self.decreaseValue,
-			            'on_DigitalWindow_delete_event'    :self.exit } )
+			            } )
 
 			aString = str( self.theFullPN()[ID] )
 			aString += ':\n' + str( self.theFullPN()[PROPERTY] )
@@ -51,9 +55,6 @@ class DigitalWindow( OsogoPluginWindow ):
 			self.thePluginManager.printMessage( aMessage )
 			#aDialog = ConfirmWindow(0,aMessage,'Error!')
 			aDialog = ConfirmWindow.ConfirmWindow(0,aMessage,'Error!')
-
-	# end of __init__
-
 
 	# ------------------------------------------------------
 	# changeFullPN
@@ -181,7 +182,8 @@ if __name__ == "__main__":
 
     def main():
         aDigitalWindow = DigitalWindow( 'plugins', simulator(), [fpn,] )
-        aDigitalWindow.addHandler( 'gtk_main_quit', mainQuit )
+        #aDigitalWindow.addHandler( 'gtk_main_quit', mainQuit )
+        aDigitalWindow.addHandler( { 'gtk_main_quit' : mainQuit } )
         aDigitalWindow.update()
 
         mainLoop()

@@ -21,9 +21,16 @@ class PlotterPluginWindow( OsogoPluginWindow ):
 	#
 	def __init__( self, dirname, data, pluginmanager, plot_type, root=None ):
 		#PluginWindow.__init__( self, dirname, data, pluginmanager, root )
-		self.thePluginManager=pluginmanager
 		OsogoPluginWindow.__init__( self, dirname, data, pluginmanager, root )
-		self.openWindow()
+		self.thePluginManager=pluginmanager
+		self.thePlotType = plot_type
+		#get session
+		self.theSession = pluginmanager.theSession
+	
+	def openWindow(self):
+		OsogoPluginWindow.openWindow(self)
+
+		#self.openWindow()
 		aWindowWidget = self.getWidget( 'frame8' )
 		self.displayedFullPNStringList=[]
 		
@@ -49,24 +56,27 @@ class PlotterPluginWindow( OsogoPluginWindow ):
 		self.ListSelection.set_mode(gtk.SELECTION_MULTIPLE)
 		self.theWindow=self.getWidget(self.__class__.__name__)
 		#init plotter instance
-		if plot_type=='TracerPlot':
+		#if plot_type=='TracerPlot':
+		if self.thePlotType=='TracerPlot':
 		    self.thePlotInstance=TracerPlot(self, 'linear',self.theWindow)
 		#attach plotterwidget to window
 		self.PlotWidget= self.thePlotInstance.getWidget() 
 		aWindowWidget.add( self.PlotWidget )
 
+		aWindowWidget.show_all()
+
+		self.thePluginManager.appendInstance( self )                    
+
 		#add handlers to buttons
 		self.addHandlers({\
 		    'on_button9_clicked' : self.remove_trace,\
 		    'on_button12_clicked'  : self.change_scale})
-		aWindowWidget.show_all()
 		self['button12'].set_label('Log10 Scale')
 
-		self.thePluginManager.appendInstance( self )                    
 		#init clist
 	 			
-		#get session
-		self.theSession = pluginmanager.theSession
+		##get session
+		#self.theSession = pluginmanager.theSession
 		#addtrace to plot
 		self.addtrace_to_plot(self.theFullPNList())
 		self.refresh_loggers()
