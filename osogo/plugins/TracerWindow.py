@@ -20,6 +20,7 @@ class TracerWindow( PlotterPluginWindow ):
 					    'TracerPlot',root)
 		#sets stripinterval, disable history buttons
 		self['entry1'].set_text(str(self.thePlotInstance.getstripinterval()))
+		self['entry1'].connect('activate',self.entry1_activated)
 		#sets additional button handlers(toggle strip/history, zoom), 
 		self.addHandlers({'on_entry1_focus_out_event' :  self.stripinterval_changes , 
 		'on_button13_clicked'    :self.createlogger_pressed,  
@@ -127,6 +128,17 @@ class TracerWindow( PlotterPluginWindow ):
 			    pass_flag=1    		
 		if pass_flag==0: 
 		    PlotterPluginWindow.addtrace_to_plot(self,aFullPNList)    
+	
+	#----------------------------------------------
+	#this signal handler is called when ENTER is pushed on entry1
+	#-------------------------------------------------
+	
+	def entry1_activated(self,obj):
+	    self.stripinterval_changes(obj,None)
+	
+	#--------------------------------------------------------
+	#this signal handler is called when TAB is presses on entry1
+	#---------------------------------------------------------
 		
 	def stripinterval_changes(self, obj, event): #this is an event handler again
 		#get new value

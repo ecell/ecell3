@@ -428,6 +428,7 @@ class TracerPlot(Plot):
 	    self.stripinterval=1000
 	    self.zerovalue=1e-50 #very small amount to substitute 0 in log scale calculations
 	    # stripinterval/pixel
+	    self.requires_scale=gtk.TRUE
 	     
 	    #initialize data buffers
 	    self.data_stack={} #key:FullPNString, value: DataBuffer[[x0,y0],[x1,y1],[x2,y2]]}	
@@ -516,6 +517,8 @@ class TracerPlot(Plot):
 	    elif self.zoomlevel==0 and not self.zoomkeypressed:
 	    #if history:
 	    #for each trace:
+		if self.requires_scale:
+		    self.addtrace([])
 		newdata_stack={}
 		for fpn in self.data_list:
 		    xmax=0
@@ -634,6 +637,7 @@ class TracerPlot(Plot):
 		#if mode is history and zoom level 0, set xframes
 		self.xframe[0]=None
 		self.xframe[1]=None
+		self.requires_scale=gtk.TRUE
 		for fpn in self.data_list:
 		    if self.xframe[0]==None: self.xframe[0]=self.loggerstartendmap[fpn][0]
 		    if self.xframe[1]==None: self.xframe[1]=self.loggerstartendmap[fpn][1]
@@ -644,7 +648,10 @@ class TracerPlot(Plot):
 			self.xframe[1]=self.loggerstartendmap[fpn][1]
 			
 		xframe=self.xframe[1]-self.xframe[0]
-		if xframe==0: xframe=self.stripinterval
+		if xframe==0: 
+		    xframe=self.stripinterval
+		else:
+		    self.requires_scale=gtk.FALSE
 		self.xframe[1]=self.xframe[0]+xframe/self.xframe_when_rescaling
 		self.reframex()
 		#get all data
@@ -710,7 +717,8 @@ class TracerPlot(Plot):
 	    for fpn in FullPNStringList:
 		self.data_list.remove(fpn)
 		self.data_stack[fpn]=None
-		self.trace_onoff.remove(fpn)
+		if self.trace_onoff.has_key(fpn):
+		    self.trace_onoff.__delitem__(fpn)
 	    self.reframey()
 	    self.drawall()	    
 	
