@@ -93,8 +93,6 @@ class EmScanner( GenericScanner , object ):
 		self.lineno = int( seq[1] )
 		self.filename = str( seq[2] )
 
-		print seq
-
 	def t_comment( self, s ):
 		r' \# [^\n]* '
 		pass
@@ -433,9 +431,6 @@ if __name__ == '__main__':
 		if anOption in ( "-D", '--debug' ):
 			debug = 1
 			
-		if anOption in ( "-f", '--force' ):
-			aForceFlag = 1
-
 		if anOption in ( "-o", '--outfile'):
 		        anEmlFileName = anArg
 
@@ -467,12 +462,6 @@ if __name__ == '__main__':
 
 	if anEmlFileName == '-':
 		anEmlFile = sys.stdout
-	else:
-		if os.path.isfile( anEmlFileName ) and aForceFlag == 0:
-			sys.stderr.write( "Output file %s exists. Use -f to overwrite.\n"
-					  % anEmlFileName )
-			sys.exit( 1 )
-
 
 	aTempFileName = tempfile.mktemp()
 	em.invoke( ( "-o", aTempFileName, anEmFileName ) )
@@ -480,7 +469,7 @@ if __name__ == '__main__':
 	aTempFile = open( aTempFileName, 'r' )
 	
 	if preprocessing_only != 0:
-		print string.join( aTempFile.readlines() )
+		print string.join( aTempFile.readlines(), '' )
 		sys.exit(0)
 
 	anEmlObject = convertEm2Eml(aTempFile, anEmFileName, debug)
@@ -497,7 +486,3 @@ if __name__ == '__main__':
 		anEmlFile.write(aString)
 		anEmlFile.close()
 		
-
-		
-
-	
