@@ -2,49 +2,58 @@
 
 from Interface import *
 from ecssupport import *
-
-#TARGET_STRING = 0
-#TARGET_ROOTWIN = 1
-
-#target = [ ('STRING', 0, TARGET_STRING),
-#           ('text/plain', 0, TARGET_STRING),
-#           ('application/x-rootwin-drop', 0, TARGET_ROOTWIN) ]
+import ecs
 
 class NumericWindow( Interface ):
 
-    def __init__( self, fpn ):
+    def __init__( self, fpn, sim ):
+        self.sim = sim
         self.theGladeFileName = 'NumericWindow.glade'
         Interface.__init__( self, self.theGladeFileName, fpn )
-        self.addHandler('input', self.inputValue)
+        self.addHandler('input_value', self.inputValue)
+        self.addHandler('increase_value', self.increaseValue)
+        self.addHandler('decrease_value', self.decreaseValue)
         self.initInterface( fpn )
- #       self["fqpp_label"].drag_dest_set( gtk.DEST_DEFAULT_ALL, target, GDK.ACTION_COPY)
-#        self["fqpp_label"].drag_source_set( GDK.BUTTON1_MASK, target, GDK.ACTION_COPY|GDK.ACTION_MOVE )
 
     def initInterface( self, fpn ):
-        fpnobj = FullPropertyName(fpn)
-        self["fqpp_label"].set_text(fpnobj['ID'])
-        self["spinbutton"].set_text('1.00000')
+        self.fpnobj = FullPropertyName(fpn)
+        self["id_label"].set_text(self.fpnobj['ID'])
+        value = self.sim.getProperty( self.fpnobj['FullID'], self.fpnobj['PropertyName'])
+        self.theCurValue = value[0]
+        self["value_frame"].set_text(str(self.theCurValue))
 
     def inputValue( self, obj, n ):
+
         aNumberString =  obj.get_text()
-        aNumber = string.atof( aNumberString )
-        print aNumberString
+        self.theCurValue = string.atof( aNumberString )
+        value = (self.theCurValue,)
+        self.sim.setProperty( self.fpnobj['fullID'], self.fpnobj['PropertyName'], value )
+        print self.sim.getProperty( self.fpnobj['FullID'], self.fpnobj['PropertyName'])
+
+    def increaseValue( self, value, n ):
+        self.theCurValue = self.theCurValue * 2
+        self["value_frame"].set_text(str(self.theCurValue))
+
+    def decreaseValue( self, obj, n ):
+        self.theCurValue = self.theCurValue / 2
+        self["value_frame"].set_text(str(self.theCurValue))
+
 
 ### test code
 
 def mainLoop():
 
-    aFPN1 = 'Substance:/CELL/CYTOPLASM:ATP:Quantity'
-    aWindow1 = NumericWindow( aFPN1 )
-    aFPN2 = 'Substance:/CELL/CYTOPLASM:ADP:Quantity'
-    aWindow2 = NumericWindow( aFPN2 )
+    s = ecs.Simulator()
 
-#    aWindow2 = NumericWindow( 'Substance:/CELL/CYTOPLASM:ATP' )
-#    aWindow3 = NumericWindow( 'Reactor:/CELL/CYTOPLASM:ATPase-0' )
-#    aWindow4 = NumericWindow( 'System:/CELL:CYTOPLASM' )
-#    aWindow5 = NumericWindow( 'Substance:/CELL/CYTOPLASM:ATP|Quantity,Substance:/CELL/CYTOPLASM:ADP|Quantity' )
-#    aWindow6 = NumericWindow( 'Substance:/CELL/CYTOPLASM:ATP|Quantity,Substance:/CELL/CYTOPLASM:ATPase' )
-    
+    s.createEntity('Substance','Substance:/:ATP','ATP')
+    s.setProperty( 'Substance:/:ATP', 'Quantity', (30,) )
+    s.initialize()
+
+    aFPN1 = 'Substance:/:ATP:Quantity'
+    aWindow1 = NumericWindow( aFPN1 , s)
+#    aFPN2 = 'Substance:/:ADP:Quantity'
+#    aWindow2 = NumericWindow( aFPN1 , s)
+
     gtk.mainloop()
 
 def main():
@@ -52,18 +61,6 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
