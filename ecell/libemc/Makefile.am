@@ -7,7 +7,7 @@ INCLTDL=@INCLTDL@
 libdir=@libdir@
 
 INCLUDES = -I..  ${DMTOOL_INCLUDE} ${INCLTDL}
-noinst_LTLIBRARIES = libemc.la
+lib_LTLIBRARIES = libemc.la
 
 CXXFLAGS= @CXXFLAGS@ #-D_REENTRANT
 
