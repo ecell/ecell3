@@ -9,6 +9,7 @@ from ecssupport import *
 
 import ecs
 
+import MessageWindow
 import PaletteWindow
 import EntryListWindow
 
@@ -41,7 +42,7 @@ class MainWindow(Window):
               'entry_button_clicked'     : self.createNewEntryList ,
               'logger_button_clicked'    : self.createNewLoggerList ,
               'palette_togglebutton_toggled'   : self.togglePaletteWindow ,
-              'Message_togglebutton_toggled'   : self.toggleMessageWindow ,
+              'message_togglebutton_toggled'   : self.toggleMessageWindow ,
               'Interface_togglebutton_toggled' : self.toggleInterfaceListWindow ,
               }
         self.addHandlers( self.theHandlerMap )
@@ -66,6 +67,9 @@ class MainWindow(Window):
         #### create Palette Window ####
         self.thePaletteWindow = PaletteWindow.PaletteWindow()
 
+        #### create Message Window ####
+        self.theMessageWindow = MessageWindow.MessageWindow()
+        self.theMessageWindowWindow = self.theMessageWindow[ 'message_window' ]
 
     ###### window operation ####
     def closeParentWindow( self, button_obj):
@@ -103,13 +107,24 @@ class MainWindow(Window):
         mainQuit()
 
     def startSimulation( self, a ) : pass
-    def stopSimulation( self, a ) : pass
+    def stopSimulation( self, a ) :
+        self.printMessage( 'this function STOP is not supported.\n' )
     def stepSimulation( self, a ) : pass
 
     def createNewEntryList( self, button_obj ) :
         aEntryList = EntryListWindow.EntryListWindow( self )
     
     def createNewLoggerList( self, a ) : pass
+
+    ###### Message Window ######
+    def toggleMessageWindow( self, button_obj ) :
+        if button_obj.get_active() :
+            self.theMessageWindowWindow.show_all()
+        else :
+            self.theMessageWindowWindow.hide()
+
+    def printMessage( self, aMessageString ):
+        self.theMessageWindow.printMessage( aMessageString )
 
     ###### Toggle Palette Window ######
     def togglePaletteWindow( self, button_obj ) :
@@ -121,7 +136,6 @@ class MainWindow(Window):
     def toggleInterfaceListWindow( self, a ) : pass
 
     #### these method is not supported in summer GUI project
-    def toggleMessageWindow( self, a ) : pass
     def loadCellState( self ) : pass
     def saveCellStateToTheFile( self ) : pass
     def openPreferences( self ) : pass
