@@ -29,54 +29,85 @@ class Window:
 
 class MainWindow(Window):
 
-
     def __init__( self, gladefile ):
 
+        self.thePositiveFlag = 1
+        self.theAutoChangeFlag = 1
+
+        self.theActualValue = 0
+        self.theBarLength = 0
+        self.theMultiplier = 0
+
         self.theHandlerMap = {
-                              'input1': self.input,
-                              'input2': self.input,
-                              'button_press_event': self.button_press_event
+                              'level_spinbutton_activate': self.updateBySpinbutton,
+                              'level_spinbutton_changed': self.updateBySpinbutton,
+                              'auto_button_toggled': self.updateByAutoButton
                               }
 
         Window.__init__( self, gladefile )
         self.addHandlers( self.theHandlerMap )
 
+    def updateByAuto( self, value ):
+        self.theAutoChangeFlag = 1
+        self.update( value )
 
-    def button_press_event (self,name,obj):
-        print 'MAX automatically changed'
+    def updateBySpinbutton( self, spinbutton_obj ):
+        if self.theAutoChangeFlag :
+            pass
+        else :
+            self['auto_button'].set_active( 0 )
+        self.update( self.theActualValue )
 
-        
-    def setText( self, name , text ):
-        obj = self.getWidget(name)
-        obj.set_text(text)
-
-    def setValue2( self, name ,value ):
-        obj = self.getWidget( name )
-        log = (int)(Numeric.log10(value))
-        obj.set_value(log)
-        self.keisan(value,log)
-
-    def keisan(self,value,log):
-        value = (int)(value / (float)(10**(log -1)))
-        self.theProgressBar = self.getWidget( "progressbar1" )
-        self.theProgressBar.set_value(value)
-        
-    def setLabel(self,name,text):
-        obj = self.getWidget(name)
-        obj.set_label(text)
-
-    def getPercentage(self,name,value):
-        obj = self.getWidget(name)
-        obj.set_value(value)
-        
-    def input( self,obj ):
-        aNumberString =  obj.get_text()
+        aNumberString =  spinbutton_obj.get_text()
         aNumber = string.atof( aNumberString )
-        self.theSpinButton = self.getWidget( "spinbutton1" )
-        self.theSpinButton.set_value( aNumber )
-        value = propertyValue1
-        self.keisan(value,aNumber)
+        self['level_spinbutton'].set_value(aNumber)
+        # value = propertyValue1
 
+        self.theAutoChangeFlag = 0
+
+    def updateByAutoButton(self, autobutton):
+        self.update( self.theActualValue)
+
+    def calculateBarLength( self, value ):
+        if value < 0 :
+            value = - value
+            aPositiveFlag = -1
+        else :
+            aPositiveFlag = 1
+
+        if self['auto_button'].get_active() :
+            aMultiplier = (int)(Numeric.log10(value))
+        else :
+            aMultiplier = self['level_spinbutton'].get_value()
+
+#        aBarLength = (value / (float)(10**(aMultiplier)))
+        aBarLength = (Numeric.log10(value)-aMultiplier+1)*10/3
+
+        return  aBarLength, aMultiplier, aPositiveFlag
+        
+    def update( self, value ):
+        self.theActualValue = value
+        self.theBarLength , self.theMultiplier , self.thePositiveFlag \
+                          = self.calculateBarLength( value )
+
+#        aIndicator = self.theBarLength * self.thePositiveFlag
+        aIndicator = (value / (float)(10**(self.theMultiplier))) \
+                     * self.thePositiveFlag
+        
+        self['progressbar'].set_value(int(self.theBarLength))
+        self['progressbar'].set_format_string(str(aIndicator))
+        self['level_spinbutton'].set_value(self.theMultiplier)
+        
+    ### for test
+    def changeValueFromEntryWindow( self, obj, a):
+        
+        aValueString = obj.get_text()
+        aValue = string.atof( aValueString )
+        print aValue
+        self.changeValue( aValue )
+
+    def changeValue( self, value ):
+        self.updateByAuto( value )
 
 def mainQuit( obj, data ):
     print obj,data
@@ -88,33 +119,27 @@ def mainLoop():
 
 def main():
     systemPath = '/CELL/CYTOPLASM'
-#    ID = 'ATPase: Activity'
+    #    ID = 'ATPase: Activity'
     ID = 'ATPase'
     FQPI = systemPath + ':' + ID  
+    
     aWindow = MainWindow( 'ProgressbarWindow.glade' )
+
     aWindow.addHandler( 'gtk_main_quit', mainQuit )
-    aWindow.setText("label1",ID)
-    aWindow.setValue2("spinbutton1",propertyValue1)
-#    aWindow.setLabel("frame1", propertyName)
+    aWindow.addHandler( 'on_entry1_activate', aWindow.changeValueFromEntryWindow)
+
+    aWindow['property_id_label'].set_text(ID)
+
+    aWindow.update(propertyValue1)
+
+    # aWindow.setAuto("auto_button")
+    #    aWindow.setLabel("frame1", propertyName)
+    
     mainLoop()
 
 if __name__ == "__main__":
-    propertyValue1 = 750.0000
+    
+    propertyValue1 = -750.0000
     main()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
