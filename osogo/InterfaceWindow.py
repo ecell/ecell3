@@ -59,7 +59,8 @@ class InterfaceWindow( OsogoWindow ):
 		aModel = self.theInterfaceListWidget.get_model()
 
 		#		if self.theExist != 0:
-		aModel.clear()
+		if aModel != None:
+			aModel.clear()
 
 		# gets
 		anInstanceList = self.theMainWindow.thePluginManager.theInstanceList
