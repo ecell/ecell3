@@ -1,21 +1,23 @@
 #!/usr/bin/env python
 
-
 from Window import *
 from main import *
 from Plugin import *
+import PaletteWindow
 
 class MainWindow(Window):
 
     def __init__( self ):
 
-        self.thePluginWindowManager = PluginWindowManager()
+        # self.thePluginWindowManager = PluginWindowManager()
+
+        Window.__init__( self )
 
         self.theHandlerMap = \
             { 'load_rule_menu_activate'              : self.loadRule ,
+              'load_script_menu_activate'            : self.loadScript ,
               'load_cell_state_menu_activate'        : self.loadCellState ,
               'save_cell_state__menu_activate'       : self.saveCellState ,
-              'execute_script_menu_activate'         : self.executeScriptMenu ,
               'exit_menu_activate'                   : self.exit ,
               'message_window_menu_activate'         : self.toggleMessageWindow ,
               'interface_window_menu_activate'       : self.toggleInterfaceListWindow ,
@@ -29,15 +31,36 @@ class MainWindow(Window):
               'step_button_clicked'      : self.stepSimulation ,
               'entry_button_clicked'     : self.createNewEntryList ,
               'logger_button_clicked'    : self.createNewLoggerList ,
-              'palette_button_clicked'   : self.togglePaletteWindow ,
-              'Message_button_clicked'   : self.toggleMessageWindow ,
-              'Interface_button_clicked' : self.toggleInterfaceListWindow ,
+              'palette_togglebutton_toggled'   : self.togglePaletteWindow ,
+              'Message_togglebutton_toggled'   : self.toggleMessageWindow ,
+              'Interface_togglebutton_toggled' : self.toggleInterfaceListWindow ,
               }
-        Window.__init__( self )
         self.addHandlers( self.theHandlerMap )
 
+        #### create Script File Selection ####
+        self.theScriptFileSelection = gtk.GtkFileSelection( 'Select Script File' )
+        self.theScriptFileSelection.ok_button.connect('clicked', self.executeScript)
+        self.theScriptFileSelection.cancel_button.connect('clicked', self.cancelLoadingScript)
+
+        self.thePaletteWindow = PaletteWindow.PaletteWindow()
+
+    ###### Load Rule ######
     def loadRule( self ) : pass
 
+    ###### Load Script ######
+    def loadScript( self, obj ) :
+        self.theScriptFileSelection.show_all()
+
+    def executeScript( self, button_obj ):
+        aFileName = self.theScriptFileSelection.get_filename()
+        self.theScriptFileSelection.hide()
+        print aFileName
+        execfile(aFileName)
+        
+    def cancelLoadingScript( self, button_obj):
+        self.theScriptFileSelection.hide()
+
+    ###### Exit ######
     def exit( self, obj ):
         mainQuit()
 
@@ -48,17 +71,22 @@ class MainWindow(Window):
     def createNewEntryList( self, a ) : pass
     def createNewLoggerList( self, a ) : pass
 
-    def togglePaletteWindow( self, a ) : pass
+    ###### Toggle Palette Window ######
+    def togglePaletteWindow( self, button_obj ) :
+        if button_obj.get_active() :
+            self.thePaletteWindow.show_all()
+        else :
+            self.thePaletteWindow.hide()
+        
     def toggleMessageWindow( self, a ) : pass
     def toggleInterfaceListWindow( self, a ) : pass
 
-    # these method is not supported in summer GUI project
+    #### these method is not supported in summer GUI project
     def loadCellState( self ) : pass
     def saveCellState( self ) : pass
-    def executeScriptMenu( self ) : pass
     def openPreferences( self ) : pass
     def openAbout( self ) : pass
-
+    #### these method is not supported in summer GUI project
 
 if __name__ == "__main__":
 

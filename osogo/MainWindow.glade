@@ -70,6 +70,19 @@
 
 	    <widget>
 	      <class>GtkPixmapMenuItem</class>
+	      <name>load_script_menu</name>
+	      <signal>
+		<name>activate</name>
+		<handler>load_script_menu_activate</handler>
+		<last_modification_time>Thu, 16 Aug 2001 05:32:49 GMT</last_modification_time>
+	      </signal>
+	      <label>Load Scrip_t ...</label>
+	      <right_justify>False</right_justify>
+	      <stock_icon>GNOME_STOCK_MENU_EXEC</stock_icon>
+	    </widget>
+
+	    <widget>
+	      <class>GtkPixmapMenuItem</class>
 	      <name>load_cell_state_menu</name>
 	      <signal>
 		<name>activate</name>
@@ -92,19 +105,6 @@
 	      <label>_Save Cell State ...</label>
 	      <right_justify>False</right_justify>
 	      <stock_icon>GNOME_STOCK_MENU_SAVE</stock_icon>
-	    </widget>
-
-	    <widget>
-	      <class>GtkPixmapMenuItem</class>
-	      <name>execute_script_menu</name>
-	      <signal>
-		<name>activate</name>
-		<handler>execute_script_menu_activate</handler>
-		<last_modification_time>Wed, 15 Aug 2001 09:04:40 GMT</last_modification_time>
-	      </signal>
-	      <label>_Execute Script ...</label>
-	      <right_justify>False</right_justify>
-	      <stock_icon>GNOME_STOCK_MENU_EXEC</stock_icon>
 	    </widget>
 
 	    <widget>
@@ -150,8 +150,8 @@
 		<last_modification_time>Wed, 15 Aug 2001 09:06:12 GMT</last_modification_time>
 	      </signal>
 	      <label>_Message Window</label>
-	      <active>True</active>
-	      <always_show_toggle>True</always_show_toggle>
+	      <active>False</active>
+	      <always_show_toggle>False</always_show_toggle>
 	    </widget>
 
 	    <widget>
@@ -164,7 +164,7 @@
 	      </signal>
 	      <label>_Interface Window</label>
 	      <active>False</active>
-	      <always_show_toggle>True</always_show_toggle>
+	      <always_show_toggle>False</always_show_toggle>
 	    </widget>
 
 	    <widget>
@@ -176,8 +176,8 @@
 		<last_modification_time>Wed, 15 Aug 2001 09:06:59 GMT</last_modification_time>
 	      </signal>
 	      <label>_Palette Window</label>
-	      <active>False</active>
-	      <always_show_toggle>True</always_show_toggle>
+	      <active>True</active>
+	      <always_show_toggle>False</always_show_toggle>
 	    </widget>
 	  </widget>
 	</widget>
