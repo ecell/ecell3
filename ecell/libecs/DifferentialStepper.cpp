@@ -161,7 +161,9 @@ namespace libecs
 	setNextStepInterval( 0.001 );
       }
       
-    loadStepInterval( aCallerCurrentTime - aCurrentTime );
+    const Real aNewStepInterval( aCallerCurrentTime - aCurrentTime );
+
+    loadStepInterval( aNewStepInterval );
 
     getModel()->reschedule( this );
   }

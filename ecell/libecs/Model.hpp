@@ -2,7 +2,7 @@
 //
 //        This file is part of E-Cell Simulation Environment package
 //
-//                Copyright (C) 1996-2002 Keio University
+//                Copyright (C) 2000-2004 Keio University
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
@@ -239,6 +239,11 @@ namespace libecs
     }
 
 
+    SystemStepperPtr getSystemStepper() const
+    {
+      return theSystemStepperPtr;
+    }
+
     /**
        Get the LoggerBroker.
 
@@ -286,22 +291,20 @@ namespace libecs
 
   private:
 
-    SystemPtr           theRootSystemPtr;
-    SystemStepperPtr    theSystemStepperPtr;
-
-
-    StepperMap          theStepperMap;
-
     Scheduler           theScheduler;
 
     LoggerBrokerRef     theLoggerBroker;
 
+    SystemPtr           theRootSystemPtr;
+ 
+    SystemStepperPtr    theSystemStepperPtr;
+
+    StepperMap          theStepperMap;
 
     StepperMakerRef     theStepperMaker;
     SystemMakerRef      theSystemMaker;
     VariableMakerRef    theVariableMaker;
     ProcessMakerRef     theProcessMaker;
-
 
   };
 

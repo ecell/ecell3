@@ -292,7 +292,7 @@ namespace libecs
 
     virtual void step() = 0;
 
-    void integrate( RealParam aTime );
+    virtual void integrate( RealParam aTime );
 
     /**
        Let the Loggers log data.
@@ -380,9 +380,11 @@ namespace libecs
 
        The priority is an Int value which is used to determine the
        order of step when more than one Stepper is scheduled at the
-       same point in time (such as starting up: t=0).
+       same point in time (such as starting up: t=0).   
 
-       @param aValue the priority value as an Int.
+       Larger value means higher priority, and called first.
+
+       @param value the priority value as an Int.
        @see Scheduler
     */
 
@@ -494,7 +496,7 @@ namespace libecs
       getVariableIndex( VariableCptr const aVariable );
 
 
-    virtual void dispatchInterruptions();
+    void dispatchInterruptions();
 
     virtual void interrupt( StepperPtr const aCaller );
 

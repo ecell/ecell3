@@ -85,7 +85,7 @@ namespace libecs
   
 
 
-  // Declarations to be exported
+  // Forward declarations.
 
 
   // string STL containers.

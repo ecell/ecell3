@@ -41,6 +41,7 @@ DifferentialStepper.cpp\
 DiscreteTimeStepper.cpp\
 DiscreteEventStepper.cpp\
 PassiveStepper.cpp\
+SystemStepper.cpp\
 Interpolant.cpp\
 Model.cpp\
 Scheduler.cpp\
@@ -84,6 +85,7 @@ DifferentialStepper.hpp\
 DiscreteTimeStepper.hpp\
 DiscreteEventStepper.hpp\
 PassiveStepper.hpp\
+SystemStepper.hpp\
 Interpolant.hpp\
 Model.hpp\
 Scheduler.hpp\

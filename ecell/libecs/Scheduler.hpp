@@ -33,7 +33,7 @@
 
 #include "libecs.hpp"
 #include "DynamicPriorityQueue.hpp"
-
+#include "Stepper.hpp"
 
 namespace libecs
 {
@@ -87,9 +87,8 @@ namespace libecs
 	}
       else // if theTime == rhs.theTime,
 	{  // then higher priority comes first 
-	  return false;
-	  /*
-	  if( theStepperPtr->getPriority() > rhs.getStepper()->getPriority() )
+	  //	  return false;
+	  if( theStepperPtr->getPriority() < rhs.getStepper()->getPriority() )
 	    {
 	      return true;
 	    }
@@ -97,24 +96,13 @@ namespace libecs
 	    {
 	      return false;
 	    }
-	  */
 	}
     }
 
     const bool operator!= ( SchedulerEventCref rhs ) const
     {
-      if( theTime != rhs.theTime || theStepperPtr != rhs.theStepperPtr )
-	{
-	  return true;
-	}
-      else
-	{
-	  return false;
-	}
-      // theTime == rhs.theTime
-      /*
-      else if( theStepperPtr->getPriority() == 
-	       rhs.theStepperPtr->getPriority() )
+      if( theTime == rhs.theTime && 
+	  theStepperPtr == rhs.theStepperPtr )
 	{
 	  return false;
 	}
@@ -122,7 +110,6 @@ namespace libecs
 	{
 	  return true;
 	}
-      */
     }
 
 

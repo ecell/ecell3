@@ -2,7 +2,7 @@
 //
 //        This file is part of E-Cell Simulation Environment package
 //
-//                Copyright (C) 1996-2002 Keio University
+//                Copyright (C) 2000-2004 Keio University
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
@@ -35,6 +35,7 @@
 #include "SystemMaker.hpp"
 #include "LoggerBroker.hpp"
 #include "Stepper.hpp"
+#include "SystemStepper.hpp"
 
 #include "Model.hpp"
 
@@ -46,19 +47,28 @@ namespace libecs
 
   Model::Model()
     : 
-    theRootSystemPtr( NULL ),
     theLoggerBroker(     *new LoggerBroker( *this ) ),
+    theRootSystemPtr(    NULL ),
+    theSystemStepperPtr(  new SystemStepper ),
     theStepperMaker(     *new StepperMaker          ),
     theSystemMaker(      *new SystemMaker           ),
-    theVariableMaker(   *new VariableMaker        ),
+    theVariableMaker(    *new VariableMaker        ),
     theProcessMaker(     *new ProcessMaker          )
   {
+    // initialize theRootSystem
     theRootSystemPtr = getSystemMaker().make( "CompartmentSystem" );
     theRootSystemPtr->setModel( this );
     theRootSystemPtr->setID( "/" );
     theRootSystemPtr->setName( "The Root System" );
     // super system of the root system is itself.
     theRootSystemPtr->setSuperSystem( theRootSystemPtr );
+
+   
+    // initialize theSystemStepper
+    theSystemStepperPtr->setModel( this );
+    theSystemStepperPtr->setID( "___SYSTEM" );
+    // don't insert this to the stepper map.
+    theScheduler.registerStepper( theSystemStepperPtr );
   }
 
   Model::~Model()
@@ -68,6 +78,7 @@ namespace libecs
     delete &theVariableMaker;
     delete &theSystemMaker;
     delete &theStepperMaker;
+    delete theSystemStepperPtr;
     delete &theLoggerBroker;
   }
 
@@ -88,8 +99,8 @@ namespace libecs
 
     SystemPtr aContainerSystemPtr( getSystem( aFullID.getSystemPath() ) );
 
-    ProcessPtr   aProcessPtr  ( NULLPTR );
-    SystemPtr    aSystemPtr   ( NULLPTR );
+    ProcessPtr   aProcessPtr( NULLPTR );
+    SystemPtr    aSystemPtr ( NULLPTR );
     VariablePtr aVariablePtr( NULLPTR );
 
     switch( aFullID.getEntityType() )
@@ -273,16 +284,22 @@ namespace libecs
     //     - construct stepper dependency graph and
     //     - fill theIntegratedVariableVector.
 
+    /*
     const Real aCurrentTime( getCurrentTime() );
     for( StepperMapConstIterator i( theStepperMap.begin() );
     	 i != theStepperMap.end(); ++i )
       {
     	(*i).second->integrate( aCurrentTime );
       }
+    */
+    
     FOR_ALL_SECOND( StepperMap, theStepperMap, initializeProcesses );
     FOR_ALL_SECOND( StepperMap, theStepperMap, initialize );
     FOR_ALL_SECOND( StepperMap, theStepperMap, updateDependentStepperVector );
-    FOR_ALL_SECOND( StepperMap, theStepperMap, updateIntegratedVariableVector );
+    FOR_ALL_SECOND( StepperMap, theStepperMap, 
+		    updateIntegratedVariableVector );
+
+    theSystemStepperPtr->initialize();
 
   }
 

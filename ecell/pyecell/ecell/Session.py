@@ -109,9 +109,6 @@ class Session:
         # saves ModelName 
         self.theModelName = aModelName
 
-        # initializes Simulator
-        self.theSimulator.initialize()
-
     # end of loadModel
         
 
@@ -199,9 +196,9 @@ class Session:
     def setEventHandler( self, event ):
         self.theSimulator.setEventHandler( event )
 
-    # no need to initialize explicitly in current version
-    def initialize( self ):
-        self.theSimulator.initialize()
+    # no need to initialize explicitly in the current version
+    # def initialize( self ):
+    #     self.theSimulator.initialize()
 
 
     #

@@ -28,11 +28,7 @@
 // E-Cell Project, Institute for Advanced Biosciences, Keio University.
 //
 
-#include <iostream>
-#include <algorithm>
-
 #include "libecs/libecs.hpp"
-#include "libecs/Model.hpp"
 #include "libecs/Stepper.hpp"
 #include "libecs/System.hpp"
 #include "libecs/Process.hpp"
@@ -42,6 +38,7 @@
 #include "libecs/ProcessMaker.hpp"
 #include "libecs/SystemMaker.hpp"
 #include "libecs/VariableMaker.hpp"
+#include "libecs/SystemStepper.hpp"
 
 #include "LocalSimulatorImplementation.hpp"
 
@@ -54,9 +51,8 @@ namespace libemc
   LocalSimulatorImplementation::LocalSimulatorImplementation()
     :
     theRunningFlag( false ),
-    theUserInterferenceFlag( true ),
+    theDirtyFlag( true ),
     theEventCheckInterval( 20 ),
-    theModel( *new Model ),
     theEventChecker(),
     theEventHandler()
   {
@@ -84,7 +80,7 @@ namespace libemc
 			 "Cannot create a Stepper while running." );
       }
 
-    theUserInterferenceFlag = true;
+    setDirty();
     getModel().createStepper( aClassname, anId );
   }
 
@@ -93,7 +89,7 @@ namespace libemc
     THROW_EXCEPTION( libecs::NotImplemented,
 		     "deleteStepper() method is not supported yet." );
 
-    // theUserInterferenceFlag = true;
+    setDirty();
   }
 
   const libecs::Polymorph LocalSimulatorImplementation::getStepperList() const
@@ -138,7 +134,7 @@ namespace libemc
   {
     StepperPtr aStepperPtr( getModel().getStepper( aStepperID ) );
     
-    theUserInterferenceFlag = true;
+    setDirty();
     aStepperPtr->setProperty( aPropertyName, aValue );
   }
 
@@ -158,7 +154,7 @@ namespace libemc
   {
     StepperPtr aStepperPtr( getModel().getStepper( aStepperID ) );
     
-    theUserInterferenceFlag = true;
+    setDirty();
     aStepperPtr->loadProperty( aPropertyName, aValue );
   }
 
@@ -189,7 +185,7 @@ namespace libemc
 			 "Cannot create an Entity while running." );
       }
 
-    theUserInterferenceFlag = true;
+    setDirty();
     getModel().createEntity( aClassname, FullID( aFullIDString ) );
   }
 
@@ -198,7 +194,7 @@ namespace libemc
     THROW_EXCEPTION( libecs::NotImplemented,
 		     "deleteEntity() method is not supported yet." );
 
-    // theUserInterferenceFlag = true;
+    setDirty();
   }
 
   const libecs::Polymorph LocalSimulatorImplementation::
@@ -266,7 +262,7 @@ namespace libemc
     FullPN aFullPN( aFullPNString );
     EntityPtr anEntityPtr( getModel().getEntity( aFullPN.getFullID() ) );
 
-    theUserInterferenceFlag = true;
+    setDirty();
     anEntityPtr->setProperty( aFullPN.getPropertyName(), aValue );
   }
 
@@ -286,7 +282,7 @@ namespace libemc
     FullPN aFullPN( aFullPNString );
     EntityPtr anEntityPtr( getModel().getEntity( aFullPN.getFullID() ) );
 
-    theUserInterferenceFlag = true;
+    setDirty();
     anEntityPtr->loadProperty( aFullPN.getPropertyName(), aValue );
   }
 
@@ -425,7 +421,7 @@ namespace libemc
   setLoggerPolicy( libecs::StringCref aFullPNString, 
 		   libecs::Polymorph aParamList )
   {
-    if ( aParamList.getType() != libecs::Polymorph::POLYMORPH_VECTOR )
+    if( aParamList.getType() != libecs::Polymorph::POLYMORPH_VECTOR )
       {
 	THROW_EXCEPTION( libecs::Exception,
 			 "2nd parameter of logger policy must be a list.");
@@ -457,49 +453,6 @@ namespace libemc
     return aVector;
   }
 
-
-  void LocalSimulatorImplementation::step( const libecs::Integer aNumSteps )
-  {
-    if( aNumSteps <= 0 )
-      {
-	THROW_EXCEPTION( libecs::Exception,
-			 "step( n ): n must be 1 or greater. (" +
-			 libecs::stringCast( aNumSteps ) + " given.)" );
-      }
-
-    getModel().initialize();  
-
-    theRunningFlag = true;
-
-    libecs::Integer aCounter( aNumSteps );
-    do
-      {
-	getModel().step();
-	
-	--aCounter;
-	
-	if( aCounter == 0 )
-	  {
-	    theRunningFlag = false;
-	    break;
-	  }
-
-	if( aCounter % theEventCheckInterval == 0 )
-	  {
-	    while( (*theEventChecker)() )
-	      {
-		(*theEventHandler)();
-	      }
-	    if( ! theRunningFlag )
-	      {
-		break;
-	      }
-	  }
-      }	while( 1 );
-
-    getModel().flushLoggers();
-  }
-
   void LocalSimulatorImplementation::initialize()
   {
     getModel().initialize();
@@ -510,6 +463,44 @@ namespace libemc
     return getModel().getCurrentTime();
   }
 
+
+
+  void LocalSimulatorImplementation::step( const libecs::Integer aNumSteps )
+  {
+    if( aNumSteps <= 0 )
+      {
+	THROW_EXCEPTION( libecs::Exception,
+			 "step( n ): n must be 1 or greater. (" +
+			 libecs::stringCast( aNumSteps ) + " given.)" );
+      }
+
+    start();
+
+    libecs::Integer aCounter( aNumSteps );
+    do
+      {
+	getModel().step();
+	
+	--aCounter;
+	
+	if( aCounter == 0 )
+	  {
+	    stop();
+	    break;
+	  }
+
+	if( aCounter % theEventCheckInterval == 0 )
+	  {
+	    handleEvent();
+
+	    if( ! theRunningFlag )
+	      {
+		break;
+	      }
+	  }
+      }	while( 1 );
+
+  }
 
   void LocalSimulatorImplementation::run()
   {
@@ -522,9 +513,7 @@ namespace libemc
 			 "set before run without duration." ) ;
       }
 
-    getModel().initialize();
-
-    theRunningFlag = true;
+    start();
 
     do
       {
@@ -532,15 +521,10 @@ namespace libemc
 	  {
 	    getModel().step();
 	  }
-
-	while( (*theEventChecker)() )
-	  {
-	    (*theEventHandler)();
-	  }
+	
+	handleEvent();
 
       }	while( theRunningFlag );
-
-    getModel().flushLoggers();
   }
 
   void LocalSimulatorImplementation::run( const libecs::Real aDuration )
@@ -552,61 +536,65 @@ namespace libemc
 			 libecs::stringCast( aDuration ) + " given.)" );
       }
 
-    getModel().initialize();
+    start();
 
-    if( theEventChecker != NULLPTR && theEventHandler != NULLPTR )
+    const libecs::Real aStopTime( getModel().getCurrentTime() + aDuration );
+
+    // setup SystemStepper to step at aStopTime
+    StepperPtr aSystemStepper( getModel().getSystemStepper() );
+    aSystemStepper->setCurrentTime( aStopTime );
+    aSystemStepper->setStepInterval( 0.0 );
+    getModel().reschedule( aSystemStepper );
+
+
+    if( typeid( *theEventChecker ) != 
+	typeid( DefaultEventChecker ) && 
+	theEventHandler.get() != NULLPTR )
       {
-	runWithEvent( aDuration );
+	runWithEvent();
       }
     else
       {
-	runWithoutEvent( aDuration );
+	runWithoutEvent();
       }
 
-    getModel().flushLoggers();
   }
 
-  void LocalSimulatorImplementation::
-  runWithEvent( libecs::RealParam aDuration )
+  void LocalSimulatorImplementation::runWithEvent()
   {
-    theRunningFlag = true;
-
-    const libecs::Real aStopTime( getModel().getCurrentTime() + aDuration );
+    StepperCptr const aSystemStepper( getModel().getSystemStepper() );
 
     do
       {
 	for( unsigned int i( theEventCheckInterval ); i != 0; --i )
 	  {
-	    if( getModel().getCurrentTime() > aStopTime )
+	    if( getModel().getNextEvent().getStepper() == aSystemStepper )
 	      {
-		theRunningFlag = false;
-		return;  // the exit
+		getModel().step();
+		stop();
+		return;
 	      }
 	    
 	    getModel().step();
 	  }
 
-	while( (*theEventChecker)() )
-	  {
-	    (*theEventHandler)();
-	  }
+	handleEvent();
 
       }	while( theRunningFlag );
 
+    return;  // the exit
   }
 
-  void LocalSimulatorImplementation::
-  runWithoutEvent( libecs::RealParam aDuration )
+  void LocalSimulatorImplementation::runWithoutEvent()
   {
-    theRunningFlag = true;
-
-    const libecs::Real aStopTime( getModel().getCurrentTime() + aDuration );
+    StepperCptr const aSystemStepper( getModel().getSystemStepper() );
 
     do
       {
-	if( getModel().getCurrentTime() > aStopTime )
+	if( getModel().getNextEvent().getStepper() == aSystemStepper )
 	  {
-	    theRunningFlag = false;
+	    getModel().step();
+	    stop();
 	    return;  // the only exit
 	  }
 
@@ -619,12 +607,14 @@ namespace libemc
   void LocalSimulatorImplementation::stop()
   {
     theRunningFlag = false;
+
+    getModel().flushLoggers();
   }
 
   void LocalSimulatorImplementation::
-  setEventChecker( EventCheckerSharedPtrCref aEventChecker )
+  setEventChecker( EventCheckerSharedPtrCref anEventChecker )
   {
-    theEventChecker = aEventChecker;
+    theEventChecker = anEventChecker;
   }
 
   void LocalSimulatorImplementation::
@@ -644,7 +634,7 @@ namespace libemc
 
     
     // ugly hack...
-    // ModuleMaker should be reconstructed to make this cleanly.
+    // ModuleMaker should be reconstructed to make this clean.
 
     ProcessMakerRef aProcessMaker( getModel().getProcessMaker() );
     for( libecs::ProcessMaker::ModuleMap::const_iterator

@@ -505,7 +505,8 @@ namespace libecs
     return aVector;
   }
   
-  const VariableVector::size_type Stepper::getVariableIndex( VariableCptr const aVariable )
+  const VariableVector::size_type 
+  Stepper::getVariableIndex( VariableCptr const aVariable )
   {
     VariableVectorConstIterator
       anIterator( std::find( theVariableVector.begin(), 

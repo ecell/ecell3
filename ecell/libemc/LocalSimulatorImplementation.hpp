@@ -33,9 +33,11 @@
 #define __LOCALSIMULATORIMPLEMENTATION_HPP
 
 #include "libecs/libecs.hpp"
+#include "libecs/Model.hpp"
 
 #include "libemc.hpp"
 #include "SimulatorImplementation.hpp"
+
 
 namespace libemc
 {
@@ -179,7 +181,7 @@ namespace libemc
 
     void clearEventChecker();
 
-    virtual void setEventChecker( EventCheckerSharedPtrCref aEventChecker );
+    virtual void setEventChecker( EventCheckerSharedPtrCref anEventChecker );
 
     virtual void setEventHandler( EventHandlerSharedPtrCref anEventHandler );
 
@@ -200,19 +202,58 @@ namespace libemc
     libecs::LoggerPtr getLogger( libecs::StringCref aFullPNString ) const;
 
 
-  private:
+    void setDirty()
+    {
+      theDirtyFlag = true;
+    }
 
-    void runWithEvent( libecs::RealParam aDuration );
-    void runWithoutEvent( libecs::RealParam aDuration );
+    const bool isDirty() const
+    {
+      return theDirtyFlag;
+    }
+
+    inline void handleEvent()
+    {
+      if( (*theEventChecker)() )
+	{
+	  do
+	    {
+	      (*theEventHandler)();
+	    }	while( (*theEventChecker)() );
+	  
+	  clean();
+	}
+    }
+
+    void clean()
+    {
+      if( isDirty() )
+	{
+	  initialize();
+	  // interruptAll();
+	  
+	  theDirtyFlag = false;
+	}
+    }
+
+    void start()
+    {
+      clean();
+      theRunningFlag = true;
+    }
+
+    void runWithEvent();
+    void runWithoutEvent();
 
   private:
 
     bool                       theRunningFlag;
-    bool                       theUserInterferenceFlag;
+
+    bool                       theDirtyFlag;
 
     libecs::Integer            theEventCheckInterval;
 
-    libecs::ModelRef           theModel;
+    libecs::Model              theModel;
 
     EventCheckerSharedPtr      theEventChecker;
     EventHandlerSharedPtr      theEventHandler;

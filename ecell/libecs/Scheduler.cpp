@@ -71,20 +71,20 @@ namespace libecs
     StepperPtr const aStepperPtr( aTopEvent.getStepper() );
 
     setCurrentTime( aCurrentTime );
- 
+
     aStepperPtr->integrate( aCurrentTime );
     aStepperPtr->step();
-    aStepperPtr->dispatchInterruptions();
-    aStepperPtr->log();
-
 
     // Use higher precision for this procedure:
     const Time aStepInterval( aStepperPtr->getStepInterval() );
     const Time aScheduledTime( aCurrentTime + aStepInterval );
 
-    // If the stepinterval is too small to proceed time,
-    // throw an exception.   
-    // Obviously time needs more precision. Possibly MP or 128-bit float.
+    // schedule a new event
+    theScheduleQueue.changeTopKey( SchedulerEvent( aScheduledTime, 
+						   aStepperPtr ) );
+    aStepperPtr->dispatchInterruptions();
+    aStepperPtr->log();
+
 
     /*
     if( aCurrentTime == aScheduledTime && aStepInterval > 0.0 )
@@ -95,9 +95,6 @@ namespace libecs
       }
     */
 
-    // schedule a new event
-    theScheduleQueue.changeTopKey( SchedulerEvent( aScheduledTime, 
-						   aStepperPtr ) );
    }
 
 

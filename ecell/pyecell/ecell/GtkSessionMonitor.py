@@ -595,11 +595,10 @@ class GtkSessionMonitor(Session):
 		try:
 			self.theRunningFlag = True
 			self.theTimer = gtk.timeout_add(self.theUpdateInterval, self.__updateByTimeOut, FALSE)
-			# this can fail if the simulator is not ready
 
 			aCurrentTime = self.getCurrentTime()
 			self.message("%15s"%aCurrentTime + ":Start\n" )
-			self.theSimulator.initialize()
+
 			Session.run( self, time )
 			self.theRunningFlag = False
 			self.__removeTimeOut()
@@ -648,8 +647,6 @@ class GtkSessionMonitor(Session):
 
 		try:
 			self.theRunningFlag = True
-			# this can fail if the simulator is not ready
-			self.theSimulator.initialize()
 
 			self.message( "Step\n" )
 			self.theTimer = gtk.timeout_add( self.theUpdateInterval, self.__updateByTimeOut, 0 )
@@ -687,8 +684,8 @@ class GtkSessionMonitor(Session):
 		Session.setEventHandler( self, event )
 
 	#-------------------------------------------------------------------
-	def initialize( self ):
-		Session.initialize()
+	#	def initialize( self ):
+	#		Session.initialize()
 
 	#-------------------------------------------------------------------
 	def getStepperList( self ):
