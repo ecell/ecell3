@@ -282,7 +282,7 @@ class MainWindow(OsogoWindow):
 	def openRuleFileSelection( self, anObject ) :
 
 		self.theRuleFileSelection = gtk.GtkFileSelection( 'Select Rule File' )
-		self.theRuleFileSelection.set_modal(gtk.TRUE)
+		#self.theRuleFileSelection.set_modal(gtk.TRUE)
 		self.theRuleFileSelection.ok_button.connect('clicked', self.loadRule)
 		self.theRuleFileSelection.cancel_button.connect('clicked', self.closeParentWindow)
 		self.theRuleFileSelection.complete( '*.' + self.RuleFileExtension )
@@ -354,7 +354,7 @@ class MainWindow(OsogoWindow):
 	def openScriptFileSelection( self, anObject ) :
 
 		self.theScriptFileSelection = gtk.GtkFileSelection( 'Select Script File' )
-		self.theScriptFileSelection.set_modal(gtk.TRUE)
+		#self.theScriptFileSelection.set_modal(gtk.TRUE)
 		self.theScriptFileSelection.ok_button.connect('clicked', self.loadScript)
 		self.theScriptFileSelection.cancel_button.connect('clicked', self.closeParentWindow)
 		self.theScriptFileSelection.complete( '*.' + self.ScriptFileExtension )
