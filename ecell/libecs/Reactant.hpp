@@ -49,6 +49,14 @@ namespace libecs
 
   public:
 
+    Reactant()
+      :
+      theSubstance( NULLPTR ),
+      theStoichiometry( 0 )
+    {
+      ; // do nothing
+    }
+
     Reactant( SubstancePtr aSubstancePtr, const Int aStoichiometry ) 
       : 
       theSubstance( aSubstancePtr ), 
