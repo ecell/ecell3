@@ -1,6 +1,9 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 
 from spark import *
+import sys
+import string
+import eml
 
 class Token:
 	def __init__(self, type, attr=None, lineno='???'):
@@ -24,6 +27,14 @@ class AST:
                 self.right = right
                 if left: self._kids.append(left)
                 if right: self._kids.append(right)
+#                if left:
+#			self._kids.append(left)
+#			print "left=\t", left, left.attr
+#                if right:
+#			self._kids.append(right)
+#			print "right=\t", right, right.attr
+#		# test kids	
+#		print self, self.attr , self._kids
 
         def __getitem__(self, i):
                 return self._kids[i]
@@ -42,7 +53,7 @@ class ErScanner( GenericScanner ):
 		return self.rv
 
 	def t_keywords( self, s ):
-		r' Reactor | Reactant | Substance | Stepper | System '
+		r' Reactor | Reactant | Substance | Stepper | System | root | SStepper'
 		self.rv.append( Token( type=s, attr=s ) )
 
 	def t_symbols( self, s ):
@@ -74,36 +85,73 @@ class ErScanner( GenericScanner ):
 
 
 class ErParser( GenericParser ):
-	def __init__( self, start='start' ):
+	def __init__( self, start='stmt' ):
 		GenericParser.__init__( self, start )
-
-	def p_start( self, args ):
-		'''
-		start ::= stmt
-		start ::= start stmt
-		'''
-		return AST( type=args[0] )
-	
-#	def p_stmt( self, args ):
+		
+#	def p_start( self, args ):
 #		'''
-#		stmt ::= entity_stmt
-#		'''
-#                '''
-#		stmt ::= stepper_stmt
+#		start ::= stmt
 #		'''
 #		return AST( type=args[0] )
+#                '''
+#		start = start stepper_stmt
+#		'''
+#		print "start.."
+#		return AST( type=args[0] , right=args[1])
+	
+	def p_stmt( self, args ):
+                '''
+		stmt ::= root stepper_stmt system_stmt
+		'''
+		return AST( type=args[0] , right=args[1], left=args[2] )
+	
+#	def p_stepper_stmt ( self, args ):
+#		'''
+#		stepper_stmt ::= stepper stepper_stmt
+#		stepper_stmt ::=
+#		'''
+#		if (len(args) == 1):
+#			return AST( type=args[0] , right=args[0] )
+#		elif (len(args) == 2):
+#			return AST( type=args[0] , right=args[1] )
+	
 	def p_stepper_stmt ( self, args ):
 		'''
-		stmt ::= Stepper name ( name ) { }
+		stepper_stmt ::= Stepper class { }
 		'''
+		return AST( type=args[0] , right=args[1] )
+	
+	def p_class (self, args ):
+		' class ::= classname ( somename ) '
+		return AST( type=args[0] , right=args[2])
+	
+	def p_classname (self, args ):
+		' classname ::= name '
 		return AST( type=args[0] )
 	
+	def p_somename ( self, args ):
+		' somename ::= name '
+		return AST( type=args[0] )
+
 	def p_system_stmt ( self, args ):
 		'''
-		stmt ::= System System ( name , quotedstring ) { Stepper name ; property substancelist reactor }
-		stmt ::= System System ( name , quotedstring ) { Stepper name ; property }
+		system_stmt ::= System System ( name , quotedstring ) { property }
 		'''
-		return AST( type=args[0] )
+		return AST ( type=args[1] , right=args[8] )
+	
+#	def p_system_stmt ( self, args ):
+#		'''
+#		system_stmt ::= System System ( name , quotedstring ) { Stepper name ; property }
+#		system_stmt ::= System System ( name , quotedstring ) { Stepper name ; property substancelist reactor }
+#		'''
+		
+#		(aClass, aFullID) = (args[1].attr, 'System::'+args[3].attr )
+#		(aPropertyName, aValueList) = (args[8].attr, [args[9].attr])
+#		anEml.createEntity( aClass, aFullID )
+#		anEml.setEntityProperty( aFullID, aPropertyName, aValueList)
+#
+#		return AST( type=args[0] )
+	
 	def p_reactor ( self, args ):
 		'''
 		reactor ::= Reactor name ( name , quotedstring ) { reactantlist propertylist }
@@ -146,10 +194,15 @@ class ErParser( GenericParser ):
 		propertylist ::= propertylist property
 		propertylist ::=
 		'''
-
+		return AST ( type=args[0] )
 	
 	def p_property( self, args ):
-		' property ::= name valuelist ; '
+		' property ::=  valuelist ; '
+		print args[0], args[1], args[2]
+		return AST( type=args[0] )
+	
+	def P_propertyname( self, args ):
+		' propertyname ::= name '
 		return AST( type=args[0] )
 	
 	def p_valuelist( self, args ):
@@ -171,33 +224,63 @@ class ErParser( GenericParser ):
 class Interpret(GenericASTTraversal):
 	def __init__( self, ast ):
 		GenericASTTraversal.__init__( self, ast )
-		self.postorder()
-		print ast.value
 
-	def n_number( self, node):
-		node.value = node.attr
+		# for eml output
+		print "eml initialing..(For AST)"
+                self.anEml = eml.Eml( open('minimum.eml') )
+
+		# asttraversal process
+		self.postorder()
+		print "AST.value=\t" , ast.value # FOR DEBUG
+		string = self.anEml.asString()
+		print string
 
         def n_name( self, node):
 		node.value = node.attr
 
 	def n_Stepper( self, node ):
+		print "node..", node.attr, node[0].attr
+		(aClass, anID) = (node[0].attr, node[0][0].attr)
+		self.anEml.createStepper (aClass, anID)
+		node.value = node.attr
+		
+	def n_System( self, node ):
+		print node.attr, node[0].attr
 		node.value = node.attr
 
-	def n_System( self, node):
-		node.value = node.attr
+        def default(self, node):
+#		left = node.left.value
+		right = node.right.value
 
-#	def default( self, node):
-#		node.value = node.type
+		print "children check.."
+		print  right
+		node.value = 'root'
+
+#		if node.type == '+':
+#			node.value = left + right
+#		else:
+#			node.value = left * right
 		
 
 if __name__ == '__main__':
-	import sys
+	
 	aFilename = sys.argv[1]
 	aFile = open( aFilename )
 	aScanner = ErScanner()
 	aTokenList = aScanner.tokenize( aFile.read() )
 	print aTokenList
 	aParser = ErParser()
+	
+	print "eml initialing.."
+	anEmlFilename = 'minimum.eml'
+        anEml = eml.Eml( open( anEmlFilename ) )
+		
 	anAst = aParser.parse( aTokenList )
-	aInterpreter = Interpret( anAst )
+
+	string = anEml.asString()
+	print string
+	
 	print anAst
+	aInterpreter = Interpret( anAst )
+
+
