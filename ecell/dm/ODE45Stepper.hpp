@@ -80,30 +80,26 @@ class ODE45Stepper
       const Real theta( anInterval * aStepIntervalInv );
 
       const Real theta_0_5( theta - 0.5 );
-      const Real theta_1_0( theta - 1.0 );
 
       return anInterval * ( k1 + ( theta + theta ) * 
 			    ( theta_0_5 * k3__k1
-			      + theta_1_0 * 
+			      + ( theta - 1.0 ) * 
 			      ( k1__k2_2 - theta_0_5 * k1__4k2_4k3__k4 ) ) );
     }
    
     virtual const Real getDifference( RealCref aTime, RealCref anInterval )
     {
-      register const Real k1( theStepper.getK1()[ theIndex ] );
+      const Real k1( theStepper.getK1()[ theIndex ] );
       const Real k2( theStepper.getMidVelocityBuffer()[ theIndex ] );
       const Real k3( theStepper.getVelocityBuffer()[ theIndex ] );
       const Real k4( theStepper.getK7()[ theIndex ] );
 
-      register const Real 
+      const Real 
 	aStepIntervalInv( 1.0 / theStepper.getOriginalStepInterval() );
 
-      register const Real k3__k1( k3 - k1 );
-      const Real k1__k2( k1 - k2 );
-      register const Real k1__k2_2( k1__k2 + k1__k2 );
-      const Real k3__k2( k3 - k2 );
-      const Real k3__k2_2( k3__k2 + k3__k2 );
-      register const Real k1__4k2_4k3__k4( ( k1 + k3__k2_2 + k3__k2_2 - k4 ) );
+      const Real k1__4k2_4k3__k4( ( k1 + ( k3 - k2 ) * 4.0 - k4 ) );
+      const Real k1__k2_2( ( k1 - k2 ) * 2.0 );
+      const Real k3__k1( k3 - k1 );
 
       const Real aTimeInterval( aTime - theStepper.getCurrentTime() );
 
