@@ -13,12 +13,40 @@ class OtherProcessSD( ShapeDescriptor):
         ShapeDescriptor.__init__( self, parentObject, graphUtils, aLabel  )
         
         self.thePointMatrix = nu.array([
-                                [[1,0,0,0,0],[1,0,0,0,0]], [[1,1,0,0,0],[1,1,0,0,0]],
-                                [[1,0,0,2,0 ], [1,0,0,2,0 ]], 
-                                [[1,0,5,-1,.5 ], [1,0,0,-1,0 ]], [[1,0,5,1,.5 ], [1,0,0,1,0]],
-                                [[1,0,5,-1,0.5 ], [1,1,0,-1,0]], [[1,0,5,1,0.5 ], [1,1,0,1,0 ]],
-                                [[1,0,0,-1,0 ], [1,0,5,-1,0.5 ]], [[1,0,0,1,0 ], [1,0,5,1,0.5 ]],
-                                [[1,0,10,-1,1 ], [1,0,5,-1,0.5 ]], [[1,0,10,1,1 ], [1,0,5,1,0.5 ]]])
+                                #frame
+                                [[1,0,0,0,0],[1,0,0,0,0]], 
+                                [[1,1,0,0,0],[1,1,0,0,0]],
+                                #text
+                                [[1,0,10,2,0 ], [1,-0.35,0,2,0 ]], 
+                                # THIS ONE > [[1,0.1,0,0,0],[1,0.1,0,0,0]],
+                                #ring top
+                                [[1,0.5,0,-1,0 ],[1,0,0,-1,0 ]],
+                                [[1,0.5,0,1,0 ],[1,0,0,1,0 ]], 
+                                #ring bottom
+                                [[1,0.5,0,-1,0 ],[1,1,0,-1,0 ]],
+                                [[1,0.5,0,1,0 ],[1,1,0,1,0 ]], 
+                                #ring left
+                                [[1,0,0,-1,0 ],[1,0.5,0,-1,0 ]],
+                                [[1,0,0,1,0 ],[1,0.5,0,1,0 ]], 
+                                #ring right
+                                [[1,1,0,-1,0 ],[1,0.5,0,-1,0 ]],
+                                [[1,1,0,1,0 ],[1,0.5,0,1,0 ]] ])
+        '''
+                                #text
+                                [[1,-1.5,0,2,0 ], [1,1,0,2,0 ]],
+                                #Ring Top 
+                                [[1,-1.65,5,-1,.5 ], [1,-.03,0,-1,0 ]], 
+                                [[1,-1.65,5,1,.5 ], [1,-.03,0,1,0]],
+                                #Ring Bottom
+                                [[1,-1.65,5,-1,0.5 ], [1,1,0,-1,0]], 
+                                [[1,-1.65,5,1,0.5 ], [1,1,0,1,0 ]],
+                                #Ring Left
+                                [[1,0,0,-1,0 ], [1,-.4,5,-1,0.5 ]], 
+                                [[1,0,0,1,0 ], [1,-.4,5,1,0.5 ]],
+                                #Ring Right
+                                [[1,-3.3,10,-1,1 ], [1,-.4,5,-1,0.5 ]], 
+                                [[1,-3.3,10,1,1 ], [1,-.4,5,1,0.5 ]]])
+        '''
         self.theCodeMap = {\
                     'frame' : [0,1],
                     'text' : [2],
@@ -39,11 +67,11 @@ class OtherProcessSD( ShapeDescriptor):
 
     def estLabelWidth(self, aLabel):
         (tx_height, tx_width) = self.theGraphUtils.getTextDimensions( aLabel )
-        return tx_width + self.olw*3
+        return tx_width + self.olw*3 + 20
 
     def getRequiredWidth( self ):
         self.calculateParams()
-        return self.tx_width + self.olw*3
+        return self.tx_width + self.olw*3 + 20
 
 
     def getRequiredHeight( self ):

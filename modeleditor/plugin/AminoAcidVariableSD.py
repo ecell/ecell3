@@ -1,27 +1,43 @@
 from Constants import *
+import Numeric as nu
 from gnome.canvas import *
 from ShapeDescriptor import *
-import Numeric as nu
 
 SHAPE_PLUGIN_TYPE='Variable' #Shape Plugin Constants
-SHAPE_PLUGIN_NAME='RNA'
-#OS_SHOW_LABEL=1
+SHAPE_PLUGIN_NAME='AminoAcid'
+OS_SHOW_LABEL=1
 
 def estLabelDims(graphUtils, aLabel):
     #(tx_height, tx_width) = graphUtils.getTextDimensions( aLabel )
-    return 30, 30
+    return 40, 40 
 
-class RNAVariableSD( ShapeDescriptor):
+class AminoAcidVariableSD( ShapeDescriptor):
 
     def __init__( self, parentObject, graphUtils, aLabel ):
         ShapeDescriptor.__init__( self, parentObject, graphUtils, aLabel  )
         #[[ self.absx], [self.width], [1], [self.olw],[self.tx_width] ]
 
+        '''
+        #frame
+        [[1,0.01,0,0,0],[1,0.98,0,0,0]], #MOVETO
+        [[1,0.50,0,0,0],[1,0.50,0,0,0 ]], #LINETO
+        [[1,0.50,0,0,0],[1,0.02,0,0,0 ]], #LINETO
+        [[1,0.50,0,0,0],[1,0.50,0,0,0 ]], #LINETO
+        [[1,0.98,0,0,0],[1,0.98,0,0,0 ]], #LINETO
+        [[1,0.50,0,0,0],[1,0.50,0,0,0 ]], #LINETO
+        [[1,0.01,0,0,0],[1,0.98,0,0,0 ]], #LINETO
+        #text COOH        
+        [[1,0.5,0,0,0],[1,0.6,0,0,0]],
+        #text NH2       
+        [[1,1,0,0,0],[1,0.6,0,0,0]],
+        #text > [[1,0.1,0,0,0],[1,1.1,0,0,0]]       
+        '''        
+        
         self.thePointMatrix = nu.array([ \
         #frame
         [[1,0,0,0,0],[1,0,0,0,0]],
         #text
-        [[1,0,30/2,0,-0.5],[1,1,5,0,0]],
+        [[1,0,40/2,0,-0.5],[1,1,5,0,0]],
         #[[1,0.2,-5,0,0],[1,1,5,0,0]],
         #ring top
         [[1,0.5,0,-1,0 ],[1,-0.1,0,-1,0 ]],
@@ -36,9 +52,13 @@ class RNAVariableSD( ShapeDescriptor):
         [[1,1.1,0,-1,0 ],[1,0.5,0,-1,0 ]],
         [[1,1.1,0,1,0 ],[1,0.5,0,1,0 ]] ])     
         
-        self.theCodeMap = {\
-                    #frame' : [[MOVETO_OPEN, 0], [CURVETO,1,2,3]],
+        '''
+        'frame' : [[MOVETO_OPEN, 0], [LINETO,1], [LINETO,2],[LINETO,3],[LINETO,4,],[LINETO,5],[LINETO,6]],
+        'freetext' : [7],
+        'freetext' : [8],
+        '''
 
+        self.theCodeMap = {\
                     'image' : [0],
                     'text' : [1],
                     RING_TOP : [2,3],
@@ -46,20 +66,16 @@ class RNAVariableSD( ShapeDescriptor):
                     RING_LEFT : [6,7],
                     RING_RIGHT : [8,9] 
                     }
+
         '''
-        self.theCodeMap = {\
-                    'frame' : [[MOVETO_OPEN, 0], [CURVETO,1,2,3],[CURVETO,4,5,6]],
-                    'text' : [7],
-                    RING_TOP : [8,9],
-                    RING_BOTTOM : [10,11],
-                    RING_LEFT : [12,13],
-                    RING_RIGHT : [14,15] 
-                    }
+        'frame' : ['frame', CV_BPATH, SD_FILL, SD_FILL, 7, [ [], 1 ] ],\
+        'freetext' : ['freetext', CV_TEXT, SD_FILL, SD_TEXT, 5, [ [], 'COOH' ] ],\
+        'freetext' : ['freetext', CV_TEXT, SD_FILL, SD_TEXT, 5, [ [], 'NH2' ] ],\
         '''
+
         self.theDescriptorList = {\
         #NAME, TYPE, FUNCTION, COLOR, Z, SPECIFIC, PROPERTIES 
-        #'frame' : ['frame', CV_IMG, SD_FILL, SD_FILL, 7, [ [], 1 ] ],
-        'image' : ["image",CV_IMG, SD_FILL, SD_FILL, 3, [ [], "RNA.png" ] ],\
+        'image' : ['image',CV_IMG, SD_FILL, SD_FILL, 3, [ [], "Amino.png" ] ],\
         'text' : ['text', CV_TEXT, SD_FILL, SD_TEXT, 5, [ [], aLabel ] ],\
         RING_TOP : [RING_TOP, CV_RECT, SD_RING, SD_OUTLINE, 5, [[],0 ] ],\
         RING_BOTTOM : [RING_BOTTOM, CV_RECT, SD_RING, SD_OUTLINE, 5, [[],0 ] ],\
@@ -69,20 +85,21 @@ class RNAVariableSD( ShapeDescriptor):
 
     def estLabelWidth(self, aLabel):
         #(tx_height, tx_width) = self.theGraphUtils.getTextDimensions( aLabel )
-        #return tx_width / 0.8
-        return 30
+        #return tx_width / 0.8 + 40
+        return 40
 
     def getRequiredWidth( self ):
         #self.calculateParams()
-        #return self.tx_width /0.8
-        return 30
+        #return self.tx_width /0.8 + 40
+        return 40
 
     def getRequiredHeight( self ):
         #self.calculateParams()
-        return 30
+        return 40
 
     def getRingSize( self ):
-        return self.olw*2
+        return self.olw*2   
 
-    
+
+
 
