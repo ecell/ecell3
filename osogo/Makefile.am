@@ -49,7 +49,8 @@ icon_message.png\
 icon_start.png\
 icon_step.png\
 icon_stepper.png\
-icon_stop.png
+icon_stop.png\
+gecell.ico
 
 
 bin_SCRIPTS =\
