@@ -83,6 +83,9 @@ namespace libecs
     virtual void setReal( RealCref real ) = 0;
     virtual const Real getReal() const = 0;
 
+    virtual void setInt( IntCref real ) = 0;
+    virtual const Int getInt() const = 0;
+
     virtual void setString( StringCref string ) = 0;
     virtual const String getString() const = 0;
 
@@ -144,6 +147,12 @@ namespace libecs
   }
 
   template <>
+  inline void PropertySlot::set( IntCref aValue )
+  {
+    setInt( aValue );
+  }
+
+  template <>
   inline void PropertySlot::set( StringCref aValue )
   {
     setString( aValue );
@@ -165,6 +174,13 @@ namespace libecs
   inline const Real PropertySlot::get() const
   {
     return getReal();
+  }
+
+
+  template <>
+  inline const Int PropertySlot::get() const
+  {
+    return getInt();
   }
 
 
@@ -228,6 +244,16 @@ namespace libecs
     virtual const Real getReal() const
     {
       return getImpl<Real>();
+    }
+
+    virtual void setInt( IntCref aValue )
+    {
+      setImpl( aValue );
+    }
+
+    virtual const Int getInt() const
+    {
+      return getImpl<Int>();
     }
 
     virtual void setString( StringCref aValue )
