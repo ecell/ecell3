@@ -494,10 +494,8 @@ class Session:
                 # check get attribute 
                 if anAttributeList[3] != 0:
                                     
-                    print aProperty
                     aValue = self.theSimulator.saveStepperProperty( aStepper,
                                                                     aProperty )
-                    print 'done'
                     #if aValue == '':
                     #    pass
                     
