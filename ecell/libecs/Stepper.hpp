@@ -42,7 +42,6 @@
 #include "Polymorph.hpp"
 #include "VariableProxy.hpp"
 #include "PropertyInterface.hpp"
-//#include "System.hpp"
 
 
 
@@ -89,6 +88,139 @@ namespace libecs
     {
       ; // do nothing
     }
+
+
+    /**
+       Get the current time of this Stepper.
+
+       The current time is defined as a next scheduled point in time
+       of this Stepper.
+
+       @return the current time in Real.
+    */
+
+    GET_METHOD( Real, CurrentTime )
+    {
+      return theCurrentTime;
+    }
+
+    SET_METHOD( Real, CurrentTime )
+    {
+      theCurrentTime = value;
+    }
+
+    /**
+       This may be overridden in dynamically scheduled steppers.
+
+    */
+
+    virtual SET_METHOD( Real, StepInterval )
+    {
+      Real aNewStepInterval( value );
+
+      if( aNewStepInterval > getMaxInterval() )
+	{
+	  aNewStepInterval = getMaxInterval();
+	}
+      else if ( aNewStepInterval < getMinInterval() )
+	{
+	  aNewStepInterval = getMinInterval();
+	}
+
+      loadStepInterval( aNewStepInterval );
+    }
+
+
+    /**
+       Get the step interval of this Stepper.
+
+       The step interval is a length of time that this Stepper proceeded
+       in the last step.
+       
+       @return the step interval of this Stepper
+    */
+
+
+    GET_METHOD( Real, StepInterval )
+    {
+      return theStepInterval;
+    }
+
+    virtual GET_METHOD( Real, TimeScale )
+    {
+      return getStepInterval();
+    }
+
+    /**
+       theOriginalStepInterval for getDifference(),
+       must need to be independent of interruption, theStepInterval.
+    */
+
+    SET_METHOD( Real, OriginalStepInterval )
+    {
+      theOriginalStepInterval = value;
+    }
+
+    GET_METHOD( Real, OriginalStepInterval )
+    {
+      return theOriginalStepInterval;
+    }
+
+    SET_METHOD( String, ID )
+    {
+      theID = value;
+    }
+
+    GET_METHOD( String, ID )
+    {
+      return theID;
+    }
+
+
+    SET_METHOD( Real, MinInterval )
+    {
+      theMinInterval = value;
+    }
+
+    GET_METHOD( Real, MinInterval )
+    {
+      return theMinInterval;
+    }
+
+    SET_METHOD( Real, MaxInterval )
+    {
+      theMaxInterval = value;
+    }
+
+    GET_METHOD( Real, MaxInterval )
+    {
+      Real aMaxInterval( theMaxInterval );
+
+      /*
+      for( StepIntervalConstraintMapConstIterator 
+	     i( theStepIntervalConstraintMap.begin() ); 
+	   i != theStepIntervalConstraintMap.end() ; ++i )
+	{
+	  const StepperPtr aStepperPtr( (*i).first );
+	  Real aConstraint( aStepperPtr->getStepInterval() * (*i).second );
+
+	  if( aMaxInterval > aConstraint )
+	    {
+	      aMaxInterval = aConstraint;
+	    }
+	}
+      */
+
+      return aMaxInterval;
+    }
+
+
+    GET_METHOD( Polymorph, WriteVariableList );
+    GET_METHOD( Polymorph, ReadVariableList );
+    GET_METHOD( Polymorph, ProcessList );
+    GET_METHOD( Polymorph, SystemList );
+    GET_METHOD( Polymorph, DependentStepperList );
+
 
     /**
 
@@ -162,96 +294,16 @@ namespace libecs
 
     void removeProcess( ProcessPtr aProcessPtr );
 
-    /**
-       Get the current time of this Stepper.
-
-       The current time is defined as a next scheduled point in time
-       of this Stepper.
-
-       @return the current time in Real.
-    */
-
-    const Real getCurrentTime() const
-    {
-      return theCurrentTime;
-    }
-
-    void setCurrentTime( RealCref aTime )
-    {
-      theCurrentTime = aTime;
-    }
-
-    /**
-       This may be overridden in dynamically scheduled steppers.
-
-    */
-
-    virtual void setStepInterval( RealCref aStepInterval )
-    {
-      Real aNewStepInterval( aStepInterval );
-
-      if( aNewStepInterval > getMaxInterval() )
-	{
-	  aNewStepInterval = getMaxInterval();
-	}
-      else if ( aNewStepInterval < getMinInterval() )
-	{
-	  aNewStepInterval = getMinInterval();
-	}
-
-      loadStepInterval( aNewStepInterval );
-    }
 
     void loadStepInterval( RealCref aStepInterval )
     {
       theStepInterval = aStepInterval;
     }
 
-    /**
-       Get the step interval of this Stepper.
-
-       The step interval is a length of time that this Stepper proceeded
-       in the last step.
-       
-       @return the step interval of this Stepper
-    */
-
-    const Real getStepInterval() const
-    {
-      return theStepInterval;
-    }
-
-    virtual const Real getTimeScale() const
-    {
-      return getStepInterval();
-    }
-
-    /**
-       theOriginalStepInterval for getDifference(),
-       must need to be independent of interruption, theStepInterval.
-    */
-
-    void setOriginalStepInterval( RealCref aValue )
-    {
-      theOriginalStepInterval = aValue;
-    }
-
-    const Real getOriginalStepInterval() const
-    {
-      return theOriginalStepInterval;
-    }
 
     void registerLoggedPropertySlot( PropertySlotPtr );
 
-    const String getID() const
-    {
-      return theID;
-    }
 
-    void setID( StringCref anID )
-    {
-      theID = anID;
-    }
 
     ModelPtr getModel() const
     {
@@ -279,42 +331,6 @@ namespace libecs
     }
 
 
-    void setMinInterval( RealCref aValue )
-    {
-      theMinInterval = aValue;
-    }
-
-    const Real getMinInterval() const
-    {
-      return theMinInterval;
-    }
-
-    void setMaxInterval( RealCref aValue )
-    {
-      theMaxInterval = aValue;
-    }
-
-    const Real getMaxInterval() const
-    {
-      Real aMaxInterval( theMaxInterval );
-
-      /*
-      for( StepIntervalConstraintMapConstIterator 
-	     i( theStepIntervalConstraintMap.begin() ); 
-	   i != theStepIntervalConstraintMap.end() ; ++i )
-	{
-	  const StepperPtr aStepperPtr( (*i).first );
-	  Real aConstraint( aStepperPtr->getStepInterval() * (*i).second );
-
-	  if( aMaxInterval > aConstraint )
-	    {
-	      aMaxInterval = aConstraint;
-	    }
-	}
-      */
-
-      return aMaxInterval;
-    }
   
     //    void setStepIntervalConstraint( PolymorphCref aValue );
 
@@ -365,13 +381,6 @@ namespace libecs
     virtual void dispatchInterruptions();
     virtual void interrupt( StepperPtr const aCaller );
 
-
-    const Polymorph getWriteVariableList()    const;
-    const Polymorph getReadVariableList()     const;
-    const Polymorph getProcessList()          const;
-    const Polymorph getSystemList()           const;
-    const Polymorph getDependentStepperList() const;
-
     /**
 
 	Definition of the Stepper dependency:
@@ -379,7 +388,7 @@ namespace libecs
 	if:
 	- A and B share at least one Variable, AND
 	- A reads AND B writes on (changes) the same Variable.
-
+m
 	See VariableReference class about the definitions of
 	Variable 'read' and 'write'.
 
@@ -548,24 +557,24 @@ namespace libecs
 
     */
 
-    virtual void setStepInterval( RealCref aStepInterval )
+    virtual SET_METHOD( Real, StepInterval )
     {
-      theTolerantStepInterval = aStepInterval;
+      theTolerantStepInterval = value;
 
-      Stepper::setStepInterval( aStepInterval );
+      Stepper::setStepInterval( value );
     }
 
-    void setNextStepInterval( RealCref aStepInterval )
-    {
-      theNextStepInterval = aStepInterval;
-    }
-
-    const Real getTolerantStepInterval() const
+    GET_METHOD( Real, TolerantStepInterval )
     {
       return theTolerantStepInterval;
     }
 
-    const Real getNextStepInterval() const
+    SET_METHOD( Real, NextStepInterval )
+    {
+      theNextStepInterval = value;
+    }
+
+    GET_METHOD( Real, NextStepInterval )
     {
       return theNextStepInterval;
     }
@@ -673,52 +682,53 @@ namespace libecs
        These methods are for handling the standerd error control objects.
     */
 
-    void setTolerance( RealCref aValue )
+    SET_METHOD( Real, Tolerance )
     {
-      theTolerance = aValue;
+      theTolerance = value;
     }
 
-    const Real getTolerance() const
+    GET_METHOD( Real, Tolerance )
     {
       return theTolerance;
     }
 
-    const Real getAbsoluteToleranceFactor() const
+    SET_METHOD( Real, AbsoluteToleranceFactor )
+    {
+      theAbsoluteToleranceFactor = value;
+    }
+
+    GET_METHOD( Real, AbsoluteToleranceFactor )
     {
       return theAbsoluteToleranceFactor;
     }
 
-    void setAbsoluteToleranceFactor( RealCref aValue )
+    SET_METHOD( Real, StateToleranceFactor )
     {
-      theAbsoluteToleranceFactor = aValue;
+      theStateToleranceFactor = value;
     }
 
-    void setStateToleranceFactor( RealCref aValue )
-    {
-      theStateToleranceFactor = aValue;
-    }
-
-    const Real getStateToleranceFactor() const
+    GET_METHOD( Real, StateToleranceFactor )
     {
       return theStateToleranceFactor;
     }
 
-    void setDerivativeToleranceFactor( RealCref aValue )
+
+    SET_METHOD( Real, DerivativeToleranceFactor )
     {
-      theDerivativeToleranceFactor = aValue;
+      theDerivativeToleranceFactor = value;
     }
 
-    const Real getDerivativeToleranceFactor() const
+    GET_METHOD( Real, DerivativeToleranceFactor )
     {
       return theDerivativeToleranceFactor;
     }
 
-    void setMaxErrorRatio( RealCref aValue )
+    SET_METHOD( Real, MaxErrorRatio )
     {
-      theMaxErrorRatio = aValue;
+      theMaxErrorRatio = value;
     }
 
-    const Real getMaxErrorRatio() const
+    GET_METHOD( Real, MaxErrorRatio )
     {
       return theMaxErrorRatio;
     }
@@ -727,27 +737,31 @@ namespace libecs
        check difference in one step
     */
 
-    void setAbsoluteEpsilon( RealCref aValue )
+    SET_METHOD( Real, AbsoluteEpsilon )
     {
-      theAbsoluteEpsilon = aValue;
+      theAbsoluteEpsilon = value;
     }
 
-    const Real getAbsoluteEpsilon() const
+    GET_METHOD( Real, AbsoluteEpsilon )
     {
       return theAbsoluteEpsilon;
     }
 
-    void setRelativeEpsilon( RealCref aValue )
+    SET_METHOD( Real, RelativeEpsilon )
     {
-      theRelativeEpsilon = aValue;
+      theRelativeEpsilon = value;
     }
 
-    const Real getRelativeEpsilon() const
+    GET_METHOD( Real, RelativeEpsilon )
     {
       return theRelativeEpsilon;
     }
 
-    virtual const Int getOrder() const { return 1; }
+
+    virtual GET_METHOD( Int, Order )
+    { 
+      return 1; 
+    }
 
     virtual void initialize();
     virtual void step();
@@ -885,10 +899,10 @@ namespace libecs
       step();
     }
 
-    virtual void setStepInterval( RealCref aStepInterval )
+    virtual SET_METHOD( Real, StepInterval )
     {
       // skip range check
-      loadStepInterval( aStepInterval );
+      loadStepInterval( value );
     }
 
     virtual void dispatchInterruptions()

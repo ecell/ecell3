@@ -61,50 +61,16 @@ namespace libecs
     theMinInterval( std::numeric_limits<Real>::min() * 10 ),
     theMaxInterval( std::numeric_limits<Real>::max() * .1 )
   {
-
-    DEFINE_PROPERTYSLOT( "CurrentTime", Real,
-			 NULLPTR,
-			 &Stepper::getCurrentTime );
-
-    DEFINE_PROPERTYSLOT( "StepInterval", Real,
-			 &Stepper::setStepInterval,
-			 &Stepper::getStepInterval );
-
-    DEFINE_PROPERTYSLOT( "OriginalStepInterval", Real,
-			 &Stepper::setOriginalStepInterval,
-			 &Stepper::getOriginalStepInterval );
-
-    DEFINE_PROPERTYSLOT( "MaxInterval", Real,
-			 &Stepper::setMaxInterval,
-			 &Stepper::getMaxInterval );
-
-    DEFINE_PROPERTYSLOT( "MinInterval", Real,
-			 &Stepper::setMinInterval,
-			 &Stepper::getMinInterval );
-
-    //    DEFINE_PROPERTYSLOT( "StepIntervalConstraint", Polymorph,
-    //			 &Stepper::setStepIntervalConstraint,
-    //			 &Stepper::getStepIntervalConstraint );
-
-    DEFINE_PROPERTYSLOT( "ReadVariableList", Polymorph,
-			 NULLPTR,
-			 &Stepper::getReadVariableList );
-
-    DEFINE_PROPERTYSLOT( "WriteVariableList", Polymorph,
-			 NULLPTR,
-			 &Stepper::getWriteVariableList );
-
-    DEFINE_PROPERTYSLOT( "ProcessList", Polymorph,
-			 NULLPTR,
-			 &Stepper::getProcessList );
-
-    DEFINE_PROPERTYSLOT( "SystemList", Polymorph,
-			 NULLPTR,
-			 &Stepper::getSystemList );
-
-    DEFINE_PROPERTYSLOT( "DependentStepperList", Polymorph,
-			 NULLPTR,
-			 &Stepper::getDependentStepperList );
+    CREATE_PROPERTYSLOT_GET    ( Real,      CurrentTime,          Stepper );
+    CREATE_PROPERTYSLOT_SET_GET( Real,      StepInterval,         Stepper );
+    CREATE_PROPERTYSLOT_SET_GET( Real,      OriginalStepInterval, Stepper );
+    CREATE_PROPERTYSLOT_SET_GET( Real,      MaxInterval,          Stepper );
+    CREATE_PROPERTYSLOT_SET_GET( Real,      MinInterval,          Stepper );
+    CREATE_PROPERTYSLOT_GET    ( Polymorph, ReadVariableList,     Stepper );
+    CREATE_PROPERTYSLOT_GET    ( Polymorph, WriteVariableList,    Stepper );
+    CREATE_PROPERTYSLOT_GET    ( Polymorph, ProcessList,          Stepper );
+    CREATE_PROPERTYSLOT_GET    ( Polymorph, SystemList,           Stepper );
+    CREATE_PROPERTYSLOT_GET    ( Polymorph, DependentStepperList, Stepper );
   }
 
   void Stepper::initialize()
@@ -642,13 +608,11 @@ namespace libecs
     theTolerantStepInterval( 0.001 ),
     theNextStepInterval( 0.001 )
   {
-    DEFINE_PROPERTYSLOT( "StepInterval", Real, 
+    CREATE_PROPERTYSLOT( Real, StepInterval, 
 			 &DifferentialStepper::initializeStepInterval,
 			 &DifferentialStepper::getStepInterval );
 
-    DEFINE_PROPERTYSLOT( "NextStepInterval", Real, 
-			 NULLPTR,
-			 &DifferentialStepper::getNextStepInterval );
+    CREATE_PROPERTYSLOT_GET( Real, NextStepInterval, DifferentialStepper );
   }
 
   void DifferentialStepper::initialize()
@@ -777,37 +741,22 @@ namespace libecs
     safety( 0.9 ),
     theMaxErrorRatio( 1.0 )
   {
-    DEFINE_PROPERTYSLOT( "Tolerance", Real,
-			 &AdaptiveDifferentialStepper::setTolerance,
-			 &AdaptiveDifferentialStepper::getTolerance );
+    CREATE_PROPERTYSLOT_SET_GET( Real, Tolerance, 
+				 AdaptiveDifferentialStepper );
+    CREATE_PROPERTYSLOT_SET_GET( Real, AbsoluteToleranceFactor, 
+				 AdaptiveDifferentialStepper );
+    CREATE_PROPERTYSLOT_SET_GET( Real, StateToleranceFactor, 
+				 AdaptiveDifferentialStepper );
+    CREATE_PROPERTYSLOT_SET_GET( Real, DerivativeToleranceFactor, 
+				 AdaptiveDifferentialStepper );
+    CREATE_PROPERTYSLOT_SET_GET( Real, AbsoluteEpsilon, 
+				 AdaptiveDifferentialStepper );
+    CREATE_PROPERTYSLOT_SET_GET( Real, RelativeEpsilon, 
+				 AdaptiveDifferentialStepper );
+    CREATE_PROPERTYSLOT_GET    ( Real, MaxErrorRatio, 
+				 AdaptiveDifferentialStepper );
+    CREATE_PROPERTYSLOT_GET    ( Int,  Order, AdaptiveDifferentialStepper );
 
-    DEFINE_PROPERTYSLOT( "AbsoluteToleranceFactor", Real,
-			 &AdaptiveDifferentialStepper::setAbsoluteToleranceFactor,
-			 &AdaptiveDifferentialStepper::getAbsoluteToleranceFactor );
- 
-    DEFINE_PROPERTYSLOT( "StateToleranceFactor", Real,
-			 &AdaptiveDifferentialStepper::setStateToleranceFactor,
-			 &AdaptiveDifferentialStepper::getStateToleranceFactor );
-
-    DEFINE_PROPERTYSLOT( "DerivativeToleranceFactor", Real,
-			 &AdaptiveDifferentialStepper::setDerivativeToleranceFactor,
-			 &AdaptiveDifferentialStepper::getDerivativeToleranceFactor );
-
-    DEFINE_PROPERTYSLOT( "MaxErrorRatio", Real,
-			 NULLPTR,
-			 &AdaptiveDifferentialStepper::getMaxErrorRatio );
-
-    DEFINE_PROPERTYSLOT( "AbsoluteEpsilon", Real,
-			 &AdaptiveDifferentialStepper::setAbsoluteEpsilon,
-			 &AdaptiveDifferentialStepper::getAbsoluteEpsilon );
-
-    DEFINE_PROPERTYSLOT( "RelativeEpsilon", Real,
-			 &AdaptiveDifferentialStepper::setRelativeEpsilon,
-			 &AdaptiveDifferentialStepper::getRelativeEpsilon );
-
-    DEFINE_PROPERTYSLOT( "Order", Int, 
-			 NULLPTR,
-			 &AdaptiveDifferentialStepper::getOrder );
   }
 
   void AdaptiveDifferentialStepper::initialize()

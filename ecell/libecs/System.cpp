@@ -99,26 +99,11 @@ namespace libecs
     theModel( NULLPTR ),
     theEntityListChanged( false )
   {
-
-    DEFINE_PROPERTYSLOT( "SystemList", Polymorph,
-			 NULLPTR,
-			 &System::getSystemList );
-
-    DEFINE_PROPERTYSLOT( "VariableList", Polymorph,
-			 NULLPTR,
-			 &System::getVariableList );
-
-    DEFINE_PROPERTYSLOT( "ProcessList", Polymorph,
-			 NULLPTR,
-			 &System::getProcessList );
-
-    DEFINE_PROPERTYSLOT( "StepperID", String,
-			 &System::setStepperID,
-			 &System::getStepperID );
-
-    DEFINE_PROPERTYSLOT( "Volume", Real,
-			 &System::setVolume, 
-			 &System::getVolume );
+    CREATE_PROPERTYSLOT_GET    ( Polymorph, SystemList,   System );
+    CREATE_PROPERTYSLOT_GET    ( Polymorph, VariableList, System );
+    CREATE_PROPERTYSLOT_GET    ( Polymorph, ProcessList,  System );
+    CREATE_PROPERTYSLOT_SET_GET( String,    StepperID,    System );
+    CREATE_PROPERTYSLOT_SET_GET( Real,      Volume,       System );
   }
 
   System::~System()
@@ -243,9 +228,7 @@ namespace libecs
 
   VirtualSystem::VirtualSystem()
   {
-    DEFINE_PROPERTYSLOT( "ProcessList", Polymorph,
-			 NULLPTR,
-			 &System::getProcessList );
+    CREATE_PROPERTYSLOT_GET( Polymorph, ProcessList, VirtualSystem );
   }
 
   VirtualSystem::~VirtualSystem()
@@ -305,9 +288,7 @@ namespace libecs
 
   LogicalSystem::LogicalSystem()
   {
-    DEFINE_PROPERTYSLOT( "VariableList", Polymorph,
-			 NULLPTR,
-			 &System::getVariableList );
+    CREATE_PROPERTYSLOT_GET( Polymorph, VariableList, LogicalSystem );
   }
 
   LogicalSystem::~LogicalSystem()
@@ -359,9 +340,7 @@ namespace libecs
     :
     theVolume( 1.0 )
   {
-    DEFINE_PROPERTYSLOT( "Volume",  Real,
-			 &System::setVolume, 
-			 &System::getVolume );
+    CREATE_PROPERTYSLOT_SET_GET( Real, Volume, System );
   }
 
   CompartmentSystem::~CompartmentSystem()

@@ -91,21 +91,10 @@ namespace libecs
     thePriority( 0 ),
     theStepper( NULLPTR )
   {
-    DEFINE_PROPERTYSLOT( "VariableReferenceList", Polymorph,
-			 &Process::setVariableReferenceList,
-			 &Process::getVariableReferenceList );
-
-    DEFINE_PROPERTYSLOT( "Activity",  Real,
-			 &Process::setActivity,
-			 &Process::getActivity );
-
-    DEFINE_PROPERTYSLOT( "Priority",  Int,
-			 &Process::setPriority,
-			 &Process::getPriority );
-
-    DEFINE_PROPERTYSLOT( "StepperID", String,
-			 &Process::setStepperID,
-			 &Process::getStepperID );
+    CREATE_PROPERTYSLOT_SET_GET( Polymorph, VariableReferenceList, Process ); 
+    CREATE_PROPERTYSLOT_SET_GET( Real,      Activity,              Process ); 
+    CREATE_PROPERTYSLOT_SET_GET( Int,       Priority,              Process ); 
+    CREATE_PROPERTYSLOT_SET_GET( String,    StepperID,             Process ); 
   }
 
   Process::~Process()
@@ -114,14 +103,14 @@ namespace libecs
   }
 
 
-  void Process::setStepperID( StringCref anID )
+  SET_METHOD_DEF( String, StepperID, Process )
   {
-    StepperPtr aStepperPtr( getModel()->getStepper( anID ) );
+    StepperPtr aStepperPtr( getModel()->getStepper( value ) );
 
     setStepper( aStepperPtr );
   }
 
-  const String Process::getStepperID() const
+  GET_METHOD_DEF( String, StepperID, Process )
   {
     return getStepper()->getID();
   }

@@ -14,6 +14,7 @@ exec_prefix=@prefix@
 pythondir=@pythondir@
 
 BINDIR="${exec_prefix}/bin"
+STD_INCLUDE="${prefix}/include"
 ECELL_INCLUDE="${prefix}/include/ecell"
 LIBECS_INCLUDE="${ECELL_INCLUDE}/libecs"
 
@@ -198,7 +199,7 @@ fi
 
 if [ $DO_COMPILE  ] ; then 
 	
-    command_string="$DMCOMPILE $base.cpp -I $CURRENTDIR -I $ECELL_INCLUDE -I $LIBECS_INCLUDE -I . -I .."     
+    command_string="$DMCOMPILE $base.cpp -I $CURRENTDIR -I $ECELL_INCLUDE -I $LIBECS_INCLUDE -I $STD_INCLUDE -I . -I .."     
 
     if [ $HAVE_INCLUDE ] ; then 
 	command_string="$command_string -I $includedir"

@@ -167,12 +167,22 @@ namespace libecs
        @see getFixed()
     */
 
-    void setValue( RealCref aValue )
+    SET_METHOD( Real, Value )
     { 
       if( ! isFixed() ) 
 	{
-	  loadValue( aValue ); 
+	  loadValue( value ); 
 	}
+    }
+
+    GET_METHOD( Real, Value )
+    { 
+      return theValue;
+    }
+
+    void addValue( RealCref aValue )
+    {
+      setValue( getValue() + aValue );
     }
 
     void loadValue( RealCref aValue )
@@ -180,33 +190,34 @@ namespace libecs
       theValue = aValue;
     }
 
-    const Real getValue() const
-    { 
-      return theValue;
-    }
-
     const Real saveValue() const
     {
       return getValue();
     }
 
-
-
-    void setVelocity( RealCref aVelocity )
+    SET_METHOD( Real, theVelocity )
     {
-      theVelocity = aVelocity;
+      theVelocity = value;
     }
+
+
+    // provide interface for value passing. (mainly for STL)
+    void setVelocity( const Real value )
+    {
+      theVelocity = value;
+    }
+
 
     /**
        @return current velocity value in (number of molecules)/(step)
     */
 
-    const Real getVelocity() const
+    GET_METHOD( Real, Velocity )
     { 
       return theVelocity; 
     }
 
-    const Real getTotalVelocity() const
+    GET_METHOD( Real, TotalVelocity )
     {
       return theTotalVelocity;
     }
@@ -220,6 +231,12 @@ namespace libecs
       theVelocity += aVelocity; 
     }
 
+
+    /**
+
+    A wrapper to set Fixed property by a bool value.
+
+    */
 
     void setFixed( const bool aValue )
     {

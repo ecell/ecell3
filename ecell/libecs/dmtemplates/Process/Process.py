@@ -27,8 +27,8 @@ def propertyvariableinit():
 
 def createpropertyslots():
     for i in PROPERTIES:
-	print '  DEFINE_PROPERTYSLOT( "%s", %s, &%s::set%s, &%s::get%s );'\
-              % (i[1],i[0],CLASSNAME,i[1],CLASSNAME,i[1])
+	print '  DEFINE_PROPERTYSLOT( %s, %s, &%s::set%s, &%s::get%s );'\
+              % (i[0],i[1],CLASSNAME,i[1],CLASSNAME,i[1])
 
 def variablepropertyslotvariabledecls():
     for i in VARIABLE_SLOTS:

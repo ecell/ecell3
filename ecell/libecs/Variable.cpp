@@ -49,25 +49,15 @@ namespace libecs
     theLastTime( 0.0 ),
     theFixed( false )
   {
-    DEFINE_PROPERTYSLOT( "Value", Real,
-			 &Variable::setValue,
-			 &Variable::getValue );
-
-    DEFINE_PROPERTYSLOT( "Velocity", Real,
+    // Use addVelocity as a set method.
+    CREATE_PROPERTYSLOT( Real, Velocity, 
 			 &Variable::addVelocity,
 			 &Variable::getVelocity );
+    CREATE_PROPERTYSLOT_SET_GET( Real, Value,         Variable );
+    CREATE_PROPERTYSLOT_GET    ( Real, TotalVelocity, Variable );
+    CREATE_PROPERTYSLOT_GET    ( Real, Concentration, Variable );
+    CREATE_PROPERTYSLOT_SET_GET( Int,  Fixed,         Variable );
 
-    DEFINE_PROPERTYSLOT( "TotalVelocity", Real,
-			 NULLPTR,
-			 &Variable::getTotalVelocity );
-
-    DEFINE_PROPERTYSLOT( "Fixed", Int,
-			 &Variable::setFixed,
-			 &Variable::getFixed );
-
-    DEFINE_PROPERTYSLOT( "Concentration", Real,
-			 NULLPTR,
-			 &Variable::getConcentration );
   } 
 
 

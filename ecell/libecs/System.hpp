@@ -95,7 +95,7 @@ namespace libecs
        @param anID Stepper ID.
     */
 
-    void setStepperID( StringCref anID );
+    SET_METHOD( String, StepperID );
 
 
     /**
@@ -104,7 +104,7 @@ namespace libecs
        @return an ID of the Stepper as a String.
     */
 
-    const String getStepperID() const;
+    GET_METHOD( String, StepperID );
 
     /**
        Get the volume of this System in [L] (liter).
@@ -112,7 +112,7 @@ namespace libecs
        @return Volume of this System.
     */
 
-    virtual const Real getVolume() const = 0;
+    virtual GET_METHOD( Real, Volume ) = 0;
 
     /**
        Set a new volume of this System in [L] (liter).
@@ -122,7 +122,7 @@ namespace libecs
        @param aVolume the new volume value.
      */
 
-    virtual void setVolume( RealCref aVolume ) = 0;
+    virtual SET_METHOD( Real, Volume ) = 0;
 
     template <class C>
     const std::map<const String,C*,std::less<const String> >& getMap() const
@@ -130,7 +130,7 @@ namespace libecs
       DEFAULT_SPECIALIZATION_INHIBITED();
     }
 
-    virtual VariableMapCref getVariableMap() const = 0;
+    virtual VariableMapCref  getVariableMap() const = 0;
 
     virtual ProcessMapCref   getProcessMap() const = 0;
 
@@ -263,20 +263,16 @@ namespace libecs
     VirtualSystem();
     virtual ~VirtualSystem();
 
-    virtual void initialize();
-
     /**
        Get the volume of this System in [L] (liter).
 
        @return Volume of this System.
     */
 
-    virtual const Real getVolume() const
+    virtual GET_METHOD( Real, Volume )
     {
       return getSuperSystem()->getVolume();
     }
-
-    virtual void registerProcess( ProcessPtr aProcess );
 
     /**
        Set a new volume of this System in [L] (liter).
@@ -286,10 +282,14 @@ namespace libecs
        @param aVolume the new volume value.
      */
 
-    virtual void setVolume( RealCref aVolume )
+    virtual SET_METHOD( Real, Volume )
     {
-      getSuperSystem()->setVolume( aVolume );
+      getSuperSystem()->setVolume( value );
     }
+
+    virtual void initialize();
+
+    virtual void registerProcess( ProcessPtr aProcess );
 
     virtual VariableMapCref getVariableMap() const
     {
@@ -349,9 +349,7 @@ namespace libecs
     CompartmentSystem();
     virtual ~CompartmentSystem();
 
-    virtual void initialize();
-
-    virtual const Real getVolume() const
+    virtual GET_METHOD( Real, Volume )
     {
       return theVolume;
     }
@@ -364,11 +362,12 @@ namespace libecs
        @param aVolume the new volume value.
      */
 
-    virtual void setVolume( RealCref aVolume )
+    virtual SET_METHOD( Real, Volume )
     {
-      theVolume = aVolume;
+      theVolume = value;
     }
 
+    virtual void initialize();
  
   private:
 

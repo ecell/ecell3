@@ -121,8 +121,6 @@ namespace libecs
     }
 
 
-    // to be deprecated
-    //    const Polymorph getPropertyListWithAttributes() const;
 
     const Polymorph getPropertyList() const;
 
@@ -181,18 +179,24 @@ const TYPE get ## NAME() const
 #define SET_METHOD( TYPE, NAME )\
 void set ## NAME( TYPE ## Cref value )
 
+#define GET_METHOD_DEF( TYPE, NAME, CLASS )\
+const TYPE CLASS::get ## NAME() const
+
+#define SET_METHOD_DEF( TYPE, NAME, CLASS )\
+void CLASS::set ## NAME( TYPE ## Cref value )
+
 
 #define SIMPLE_GET_METHOD( TYPE, NAME )\
 GET_METHOD( TYPE, NAME )\
 {\
   return NAME;\
-}
+} //
 
 #define SIMPLE_SET_METHOD( TYPE, NAME )\
 SET_METHOD( TYPE, NAME )\
 {\
   NAME = value;\
-}
+} //
 
 #define SIMPLE_SET_GET_METHOD( TYPE, NAME )\
 SIMPLE_SET_METHOD( TYPE, NAME )\
@@ -208,14 +212,32 @@ public:\
  StringLiteral getClassname() { return XSTR( CLASSNAME ); }\
 DM_OBJECT( TYPE, CLASSNAME )
 
+#define DEFINE_PROPERTYSLOT( TYPE, NAME, SETMETHOD, GETMETHOD )\
+CREATE_PROPERTYSLOT( TYPE, NAME, SETMETHOD, GETMETHOD )\
 
-#define DEFINE_PROPERTYSLOT( NAME, TYPE, SETMETHOD, GETMETHOD )\
-    registerSlot( NAME,\
+#define CREATE_PROPERTYSLOT( TYPE, NAME, SETMETHOD, GETMETHOD )\
+    registerSlot( # NAME,\
 		  getPropertySlotMaker()->\
 		  createPropertySlot( *this, Type2Type<TYPE>(),\
 				      SETMETHOD,\
 				      GETMETHOD\
-				      ) );
+				      ) )
+
+#define CREATE_PROPERTYSLOT_SET_GET( TYPE, NAME, CLASS )\
+CREATE_PROPERTYSLOT( TYPE, NAME,\
+                     & CLASS::set ## NAME,\
+                     & CLASS::get ## NAME )
+
+#define CREATE_PROPERTYSLOT_SET( TYPE, NAME, CLASS )\
+CREATE_PROPERTYSLOT( TYPE, NAME,\
+                     & CLASS::set ## NAME,\
+                     NULLPTR )
+
+
+#define CREATE_PROPERTYSLOT_GET( TYPE, NAME, CLASS )\
+CREATE_PROPERTYSLOT( TYPE, NAME,\
+                     NULLPTR,\
+                     & CLASS::get ## NAME )
 
 
 

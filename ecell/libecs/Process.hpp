@@ -137,9 +137,9 @@ namespace libecs
        @see getActivity()
     */
 
-    void setActivity( RealCref anActivity ) 
+    SET_METHOD( Real, Activity )
     { 
-      theActivity = anActivity; 
+      theActivity = value; 
     }
 
     /**
@@ -149,10 +149,56 @@ namespace libecs
        @return the activity value of this Process.
     */
 
-    const Real getActivity() const
+    GET_METHOD( Real, Activity )
     {
       return theActivity;
     }
+
+    SET_METHOD( Polymorph, VariableReferenceList );
+    GET_METHOD( Polymorph, VariableReferenceList );
+
+
+
+    /**
+       Set a priority value of this Process.
+
+       The priority is an Int value which is used to determine the
+       order of call to Process::process() method in Stepper.
+
+       @param aValue the priority value as an Int.
+       @see Stepper
+    */
+
+    SET_METHOD( Int, Priority )
+    {
+      thePriority = value;
+    }
+
+    /**
+       @see setPriority()
+    */
+
+    GET_METHOD( Int, Priority )
+    {
+      return thePriority;
+    }
+
+    /**
+       Register the Stepper of this Process by an ID.
+
+       @param anID Stepper ID.
+    */
+
+    SET_METHOD( String, StepperID );
+
+    /**
+       Get an ID of the Stepper of this Process.
+
+       @return StepperID as a String.
+    */
+
+    GET_METHOD( String, StepperID );
+
 
 
     /**
@@ -170,10 +216,6 @@ namespace libecs
     */
 
     void setVariableReference( PolymorphVectorCref aValue );
-
-    void setVariableReferenceList( PolymorphCref );
-
-    const Polymorph getVariableReferenceList() const;
 
     void removeVariableReference( StringCref aName );
 
@@ -227,46 +269,6 @@ namespace libecs
     }
 
 
-    /**
-       Set a priority value of this Process.
-
-       The priority is an Int value which is used to determine the
-       order of call to Process::process() method in Stepper.
-
-       @param aValue the priority value as an Int.
-       @see Stepper
-    */
-
-    void setPriority( IntCref aValue )
-    {
-      thePriority = aValue;
-    }
-
-    /**
-       @see setPriority()
-    */
-
-    const Int getPriority() const
-    {
-      return thePriority;
-    }
-
-    /**
-       Register the Stepper of this Process by an ID.
-
-       @param anID Stepper ID.
-    */
-
-    void setStepperID( StringCref anID );
-
-
-    /**
-       Get an ID of the Stepper of this Process.
-
-       @return StepperID as a String.
-    */
-
-    const String getStepperID() const;
 
 
     void setStepper( StepperPtr const aStepper );

@@ -208,7 +208,7 @@ namespace libecs
 
     void addValue( const Real aValue ) const
     {
-      setValue( ( aValue * theCoefficient ) + getValue() );
+      addValue( aValue );
     }
 
     const Real getConcentration() const

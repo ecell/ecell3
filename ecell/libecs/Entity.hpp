@@ -128,9 +128,9 @@ namespace libecs
        @param anID an id of this Entry.
     */
 
-    void setID( StringCref anID ) 
-    { 
-      theID = anID; 
+    SET_METHOD( String, ID )
+    {
+      theID = value;
     }
 
     /**
@@ -139,9 +139,9 @@ namespace libecs
        @return an id of this Entity.
     */
 
-    const String getID() const
-    { 
-      return theID; 
+    GET_METHOD( String, ID )
+    {
+      return theID;
     }
 
     /**
@@ -150,9 +150,9 @@ namespace libecs
        @param aName a name of this Entity.
     */
 
-    void setName( StringCref aName ) 
+    SET_METHOD( String, Name )
     { 
-      theName = aName;
+      theName = value;
     }
 
     /**
@@ -161,7 +161,7 @@ namespace libecs
        @return a name of this Entity.
     */
 
-    const String getName() const 
+    GET_METHOD( String, Name )
     { 
       return theName; 
     }

@@ -44,9 +44,9 @@ namespace libecs
     theID( "" ),
     theName( "" ) 
   {
-    DEFINE_PROPERTYSLOT( "FullID", String, NULLPTR, &Entity::getFullIDString );
-    
-    DEFINE_PROPERTYSLOT( "Name", String, &Entity::setName, &Entity::getName );
+    CREATE_PROPERTYSLOT_SET_GET( String, Name,   Entity );
+    CREATE_PROPERTYSLOT        ( String, FullID, 
+				 NULLPTR, &Entity::getFullIDString );
   }
 
 
