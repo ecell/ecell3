@@ -28,8 +28,8 @@
 // E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
 
-#ifndef __FEHLBERG23_HPP
-#define __FEHLBERG23_HPP
+#ifndef __ODE23_HPP
+#define __ODE23_HPP
 
 
 // #include <iostream>
@@ -40,20 +40,20 @@ USE_LIBECS;
 
 // DECLARE_VECTOR( Real, RealVector );
 
-// DECLARE_CLASS( Fehlberg23Stepper );
+// DECLARE_CLASS( ODE23Stepper );
 
-class Fehlberg23Stepper 
+class ODE23Stepper 
   : 
   public AdaptiveDifferentialStepper
 {
 
-  LIBECS_DM_OBJECT( Stepper, Fehlberg23Stepper );
+  LIBECS_DM_OBJECT( Stepper, ODE23Stepper );
 
 public:
 
-  Fehlberg23Stepper( void );
+  ODE23Stepper( void );
   
-  virtual ~Fehlberg23Stepper( void );
+  virtual ~ODE23Stepper( void );
 
   virtual void initialize();
   virtual bool calculate();
@@ -65,4 +65,4 @@ protected:
   //  RealVector theK1;
 };
 
-#endif /* __FEHLBERG23_HPP */
+#endif /* __ODE23_HPP */

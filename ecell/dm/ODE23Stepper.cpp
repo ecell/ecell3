@@ -30,24 +30,24 @@
 
 #include "Variable.hpp"
 
-#include "Fehlberg23Stepper.hpp"
+#include "ODE23Stepper.hpp"
 
-DM_INIT( Stepper, Fehlberg23Stepper );
+DM_INIT( Stepper, ODE23Stepper );
 
 namespace libecs
 {
 
-  Fehlberg23Stepper::Fehlberg23Stepper()
+  ODE23Stepper::ODE23Stepper()
   {
     ; // do nothing
   }
 	    
-  Fehlberg23Stepper::~Fehlberg23Stepper()
+  ODE23Stepper::~ODE23Stepper()
   {
     ; // do nothing
   }
 
-  void Fehlberg23Stepper::initialize()
+  void ODE23Stepper::initialize()
   {
     AdaptiveDifferentialStepper::initialize();
 
@@ -57,7 +57,7 @@ namespace libecs
     theK1.resize( aSize );
   }
 
-  bool Fehlberg23Stepper::calculate()
+  bool ODE23Stepper::calculate()
   {
     const UnsignedInt aSize( getReadOnlyVariableOffset() );
 

@@ -28,8 +28,8 @@
 // E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
 
-#ifndef __FIXEDEULER1_HPP
-#define __FIXEDEULER1_HPP
+#ifndef __FIXEDODE1_HPP
+#define __FIXEDODE1_HPP
 
 
 // #include <iostream>
@@ -42,18 +42,18 @@ USE_LIBECS;
 
 // DECLARE_CLASS( FixedEuler1Stepper );
 
-class FixedEuler1Stepper 
+class FixedODE1Stepper 
   : 
   public DifferentialStepper
 {
 
-  LIBECS_DM_OBJECT( Stepper, FixedEuler1Stepper );
+  LIBECS_DM_OBJECT( Stepper, FixedODE1Stepper );
 
 public:
 
-  FixedEuler1Stepper( void );
+  FixedODE1Stepper( void );
   
-  virtual ~FixedEuler1Stepper( void );
+  virtual ~FixedODE1Stepper( void );
 
   virtual void step();
 
@@ -61,4 +61,4 @@ protected:
 
 };
 
-#endif /* __FIXEDEULER1_HPP */
+#endif /* __FIXEDODE1_HPP */

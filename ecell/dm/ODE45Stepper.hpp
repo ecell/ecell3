@@ -41,14 +41,14 @@ USE_LIBECS;
 
 // DECLARE_VECTOR( Real, RealVector );
 
-DECLARE_CLASS( DormandPrince547MStepper );
+DECLARE_CLASS( ODE45Stepper );
 
-class DormandPrince547MStepper 
+class ODE45Stepper 
   : 
   public AdaptiveDifferentialStepper
 {
 
-  LIBECS_DM_OBJECT( Stepper, DormandPrince547MStepper );
+  LIBECS_DM_OBJECT( Stepper, ODE45Stepper );
 
   class VariableProxy
     :
@@ -56,7 +56,7 @@ class DormandPrince547MStepper
   {
   public:
 
-    VariableProxy( DormandPrince547MStepperRef aStepper, 
+    VariableProxy( ODE45StepperRef aStepper, 
 		   VariablePtr const aVariablePtr )
       :
       libecs::VariableProxy( aVariablePtr ),
@@ -98,14 +98,14 @@ class DormandPrince547MStepper
 
   protected:
 
-    DormandPrince547MStepperRef theStepper;
+    ODE45StepperRef theStepper;
     UnsignedInt                 theIndex;
   };
 
 public:
 
-  DormandPrince547MStepper();
-  virtual ~DormandPrince547MStepper();
+  ODE45Stepper();
+  virtual ~ODE45Stepper();
 
   virtual void initialize();
   virtual void step();
@@ -118,7 +118,7 @@ public:
   virtual VariableProxyPtr createVariableProxy( VariablePtr aVariable )
   {
     return new 
-      DormandPrince547MStepper::VariableProxy( *this, aVariable );
+      ODE45Stepper::VariableProxy( *this, aVariable );
   }
 
   RealVectorCref getMidVelocityBuffer() const

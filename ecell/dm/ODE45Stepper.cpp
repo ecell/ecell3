@@ -30,26 +30,26 @@
 
 #include "Variable.hpp"
 
-#include "DormandPrince547MStepper.hpp"
+#include "ODE45Stepper.hpp"
 
-DM_INIT( Stepper, DormandPrince547MStepper );
+DM_INIT( Stepper, ODE45Stepper );
 
 namespace libecs
 {
 
-  DormandPrince547MStepper::DormandPrince547MStepper()
+  ODE45Stepper::ODE45Stepper()
     :
     theInterrupted( true )
   {
     ; // do nothing
   }
 	    
-  DormandPrince547MStepper::~DormandPrince547MStepper()
+  ODE45Stepper::~ODE45Stepper()
   {
     ; // do nothing
   }
 
-  void DormandPrince547MStepper::initialize()
+  void ODE45Stepper::initialize()
   {
     AdaptiveDifferentialStepper::initialize();
 
@@ -68,7 +68,7 @@ namespace libecs
     theInterrupted = true;
   }
 
-  void DormandPrince547MStepper::step()
+  void ODE45Stepper::step()
   {
     AdaptiveDifferentialStepper::step();
 
@@ -78,7 +78,7 @@ namespace libecs
       }
   }
 
-  bool DormandPrince547MStepper::calculate()
+  bool ODE45Stepper::calculate()
   {
     const UnsignedInt aSize( getReadOnlyVariableOffset() );
 
@@ -327,7 +327,7 @@ namespace libecs
     return true;
   }
 
-  void DormandPrince547MStepper::interrupt( StepperPtr aCaller )
+  void ODE45Stepper::interrupt( StepperPtr aCaller )
   {
     theInterrupted = true;
     AdaptiveDifferentialStepper::interrupt( aCaller );

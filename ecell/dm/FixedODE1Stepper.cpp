@@ -30,24 +30,24 @@
 
 #include "Variable.hpp"
 
-#include "FixedEuler1Stepper.hpp"
+#include "FixedODE1Stepper.hpp"
 
-DM_INIT( Stepper, FixedEuler1Stepper );
+DM_INIT( Stepper, FixedODE1Stepper );
 
 namespace libecs
 {
 
-  FixedEuler1Stepper::FixedEuler1Stepper()
+  FixedODE1Stepper::FixedODE1Stepper()
   {
     ; // do nothing
   }
 	    
-  FixedEuler1Stepper::~FixedEuler1Stepper()
+  FixedODE1Stepper::~FixedODE1Stepper()
   {
     ; // do nothing
   }
 
-  void FixedEuler1Stepper::step()
+  void FixedODE1Stepper::step()
   {
     const UnsignedInt aSize( getReadOnlyVariableOffset() );
 
