@@ -135,7 +135,7 @@ def main():
 		elif not os.path.isfile(anEmlFileName):
 			pass
 		else:
-			sys.stderr.write( "Exist same output file name. For overwrite this , use -f or --force option.\n" )
+			sys.stderr.write( "The output file already exists. To overwrite, use -f or --force.\n" )
 			sys.exit( 1 )
 			
 		anEmlFile = open(anEmlFileName, 'w')
