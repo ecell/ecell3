@@ -159,16 +159,25 @@ namespace libecs
       return theCurrentTime;
     }
 
-    void registerEvent( EventCref anEvent )
+    void setCurrentTime( RealCref aTime )
     {
-      theScheduleQueue.push( anEvent );
+      theCurrentTime = aTime;
     }
+
+    void registerStepper( StepperPtr aStepper );
+
+  protected:
 
     /**
        This method clears the ScheduleQueue.
     */
 
     void reset();
+
+    void registerEvent( EventCref anEvent )
+    {
+      theScheduleQueue.push( anEvent );
+    }
 
   private:
 

@@ -58,6 +58,13 @@ namespace libecs
   }
 
  
+  void Scheduler::registerStepper( StepperPtr aStepper )
+  {
+    // need check if this is a slave stepper
+
+    registerEvent( Event( getCurrentTime(), aStepper ) );
+  }
+
   void Scheduler::reset()
   {
     //FIXME: slow! :  no theScheduleQueue.clear() ?
@@ -74,15 +81,20 @@ namespace libecs
   {
     EventCref aTopEvent( theScheduleQueue.top() );
     const StepperPtr aStepperPtr( aTopEvent.getStepper() );
+    setCurrentTime( aTopEvent.getTime() );
  
+    aStepperPtr->setCurrentTime( getCurrentTime() );
+    //    aStepperPtr->proceedTime();
+
     aStepperPtr->step();
-    aStepperPtr->log();
+
+    const Real aStepInterval( aStepperPtr->getStepInterval() );
+    const Real aScheduledTime( getCurrentTime() + aStepInterval );
 
     // schedule a new event
-    theScheduleQueue.changeTopKey( Event( aStepperPtr->getCurrentTime(),
-					  aStepperPtr ) );
+    theScheduleQueue.changeTopKey( Event( aScheduledTime, aStepperPtr ) );
  
-    theCurrentTime = ( theScheduleQueue.top() ).getTime();
+    //    theCurrentTime = ( theScheduleQueue.top() ).getTime();
   }
 
 

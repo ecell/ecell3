@@ -44,8 +44,8 @@ namespace libecs
 
   void StepperMaker::makeClassList()
   {
-    NewStepperModule(Euler1SRMStepper);
-    NewStepperModule(RungeKutta4SRMStepper);
+    NewStepperModule( Euler1Stepper );
+    NewStepperModule( RungeKutta4Stepper );
   }
 
 

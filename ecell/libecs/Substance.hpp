@@ -31,7 +31,7 @@
 #ifndef ___SUBSTANCE_H___
 #define ___SUBSTANCE_H___
 
-#include <iostream>
+//#include <iostream>
 #include "libecs.hpp"
 #include "EntityType.hpp"
 #include "Integrators.hpp"
@@ -59,6 +59,8 @@ namespace libecs
     : 
     public Entity
   {
+
+    DECLARE_VECTOR( RealCptr, RealPtrVector);
 
   public:
 
@@ -100,12 +102,28 @@ namespace libecs
 	integrate phase
     */
 
-    virtual void integrate()
+    virtual void integrate( RealCref aTime )
     {
       if( isFixed() == false )
 	{
-	  theQuantity += theVelocity;
+	  updateQuantity( aTime );
 	}
+    }
+
+    void updateQuantity( RealCref aTime )
+    {
+      const Real aDeltaT( aTime - theLastTime );
+
+      Real aVelocitySum( 0.0 ); // no initialization
+      RealPtrVectorConstIterator i( theVelocityVector.begin() ); 
+      while( i != theVelocityVector.end() )
+	{
+	  aVelocitySum += **i;
+	  ++i;
+	}
+
+      loadQuantity( getQuantity() + aVelocitySum * aDeltaT );
+      theLastTime = aTime;
     }
 
 
@@ -196,6 +214,7 @@ namespace libecs
       return getQuantity() / ( getSuperSystem()->getVolume() * N_A );
     }
 
+    void registerStepper( StepperPtr aStepper );
 
     static SubstancePtr createInstance() { return new Substance; }
 
@@ -209,6 +228,13 @@ namespace libecs
 
     Real theQuantity;
     Real theVelocity;
+
+
+    Real theLastTime;
+
+    StepperVector theStepperVector;
+    // this is a list of indices of Steppers' SubstanceCache of this Substance.
+    RealPtrVector theVelocityVector;
 
     bool theFixed;
 
@@ -256,7 +282,8 @@ namespace libecs
        integrate phase.
        Perform integration by a result calculated by integrator.
     */
-    virtual void integrate();
+
+    virtual void integrate( RealCref aTime );
 
     /**
        Set a quantity with no check. (i.e. isFixed() is ignored.)

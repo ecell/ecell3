@@ -91,7 +91,11 @@ namespace libecs
   // containers
 
   DECLARE_VECTOR( Polymorph, PolymorphVector );
-
+  DECLARE_VECTOR( SubstancePtr, SubstanceVector );
+  DECLARE_VECTOR( ReactorPtr,   ReactorVector );
+  DECLARE_VECTOR( SystemPtr,    SystemVector );
+  DECLARE_VECTOR( StepperPtr, StepperVector );
+  DECLARE_VECTOR( PropertySlotPtr, PropertySlotVector );
 
   // exceptions
 

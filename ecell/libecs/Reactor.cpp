@@ -63,21 +63,10 @@ namespace libecs
 				      &Reactor::getActivity ) );
 
     registerSlot( getPropertySlotMaker()->
-		  createPropertySlot( "ActivityPerSecond", *this,
-				      Type2Type<Real>(),
-				      NULLPTR,
-				      &Reactor::getActivityPerSecond ) );
-
-    registerSlot( getPropertySlotMaker()->
 		  createPropertySlot( "Priority", *this, 
 				      Type2Type<Int>(),
 				      &Reactor::setPriority,
 				      &Reactor::getPriority ) );
-  }
-
-  const Real Reactor::getActivityPerSecond() const
-  {
-    return getActivity() * getStepper()->getStepsPerSecond();
   }
 
   void Reactor::setReactant( PolymorphCref aValue )

@@ -31,15 +31,11 @@
 #ifndef ___STEPPER_H___
 #define ___STEPPER_H___
 
-#define GSL_RANGE_CHECK_OFF
-
 #include <vector>
 #include <map>
 #include <algorithm>
 #include <utility>
 #include <valarray>
-
-#include <gsl/gsl_vector.h>
 
 #include "libecs.hpp"
 
@@ -48,13 +44,6 @@
 #include "PropertyInterface.hpp"
 #include "System.hpp"
 
-// to be removed
-#include "SRMReactor.hpp"
-#include "RuleSRMReactor.hpp"
-#include "Integrators.hpp"
-
-
-#include "Substance.hpp"
 
 namespace libecs
 {
@@ -69,15 +58,6 @@ namespace libecs
 
   DECLARE_CLASS( Euler1Stepper );
   DECLARE_CLASS( RungeKutta4Stepper );
-
-  DECLARE_VECTOR( SubstancePtr, SubstanceVector );
-  DECLARE_VECTOR( ReactorPtr,   ReactorVector );
-  DECLARE_VECTOR( SystemPtr,    SystemVector );
-  
-  DECLARE_VECTOR( StepperPtr, StepperVector );
-
-  DECLARE_VECTOR( PropertySlotPtr, PropertySlotVector );
-
 
   /**
      Stepper class defines and governs computation unit in a model.
@@ -95,6 +75,10 @@ namespace libecs
 
     //    typedef std::pair<StepperPtr,Real> StepIntervalConstraint;
     //    DECLARE_VECTOR( StepIntervalConstraint, StepIntervalConstraintVector );
+
+    DECLARE_TYPE( SubstanceVector, SubstanceCache );
+    DECLARE_TYPE( ReactorVector, ReactorCache );
+
     DECLARE_ASSOCVECTOR( StepperPtr, Real, std::less<StepperPtr>,
 			 StepIntervalConstraintMap );
 
@@ -137,10 +121,10 @@ namespace libecs
     their step().
     */
 
-    virtual void step()
-    {
-      theCurrentTime += getStepInterval();
-    }
+    virtual void step() = 0;
+
+
+    void integrate();
 
     /**
        Update loggers.
@@ -148,7 +132,11 @@ namespace libecs
     */
 
     void log();
+    void slave();
+    void clear();
+    void react();
 
+    void updateVelocityBuffer();
     
     /**
 
@@ -181,13 +169,18 @@ namespace libecs
       return theCurrentTime;
     }
 
+
     /**
 
     This may be overridden in dynamically scheduled steppers.
 
     */
 
-    void setStepInterval( RealCref aStepInterval );
+    void setStepInterval( RealCref aStepInterval )
+    {
+      theStepInterval = aStepInterval;
+    }
+
 
 
     /**
@@ -203,44 +196,6 @@ namespace libecs
     {
       return theStepInterval;
     }
-
-    /**
-       Get the number of steps per a second.
-
-       'StepsPerSecond' is defined as 1.0 / getStepInterval().
-
-       If you need to get a reciprocal of the step interval,
-       use of this is more efficient than just getStepInterval(), because
-       it is pre-calculated when the setStepInterval() is called.
-
-
-       @return the number of steps per a second. (== 1.0 / getStepInterval )
-    */
-
-    const Real getStepsPerSecond() const
-    {
-      return theStepsPerSecond;
-    }
-
-    //@{
-
-    bool isEntityListChanged() const
-    {
-      return theEntityListChanged;
-    }
-
-    void setEntityListChanged()
-    {
-      theEntityListChanged = true;
-    }
-
-    void clearEntityListChanged()
-    {
-      theEntityListChanged = false;
-    }
-
-    //@}
-
 
     void registerLoggedPropertySlot( PropertySlotPtr );
 
@@ -271,7 +226,31 @@ namespace libecs
     }
 
 
+    /**
+       Set slave stepper by a stepper ID string.
 
+       If an empty string is given, this method unsets the slave stepper.
+    */
+
+    void setSlaveStepperID( StringCref aStepperID );
+
+    /**
+       Get an ID string of the slave stepper.
+
+       @return an ID string of the slave stepper.
+    */
+
+    const String getSlaveStepperID() const;
+
+    void setSlaveStepper( StepperPtr aStepperPtr )
+    {
+      theSlaveStepper = aStepperPtr;
+    }
+
+    StepperPtr getSlaveStepper() const
+    {
+      return theSlaveStepper;
+    }
 
 
     void setUserMinInterval( RealCref aValue )
@@ -324,18 +303,21 @@ namespace libecs
       theCurrentTime = aTime;
     }
 
-    virtual StringLiteral getClassName() const  { return "Stepper"; }
+    const UnsignedInt getSubstanceCacheIndex( SubstancePtr aSubstance );
 
+    RealCptr getVelocityBufferElementPtr( UnsignedInt anIndex )
+    {
+      return &theVelocityBuffer[ anIndex ];
+    }
+
+    const Polymorph getSubstanceCache() const;
+    const Polymorph getReactorCache() const;
+
+
+    virtual StringLiteral getClassName() const  { return "Stepper"; }
 
     const Polymorph getSystemList() const;
 
-
-  protected:
-
-    void calculateStepsPerSecond()
-    {
-      theStepsPerSecond = 1.0 / getStepInterval();
-    }
 
   protected:
 
@@ -344,6 +326,14 @@ namespace libecs
     PropertySlotVector  theLoggedPropertySlotVector;
 
     StepIntervalConstraintMap theStepIntervalConstraintMap;
+
+
+    SubstanceCache        theSubstanceCache;
+    ReactorCache          theReactorCache;
+
+    RealValarray theQuantityBuffer;
+    RealValarray theVelocityBuffer;
+
 
   private:
 
@@ -359,98 +349,49 @@ namespace libecs
 
     String              theID;
 
-    bool                theEntityListChanged;
+    StepperPtr          theSlaveStepper;
 
   };
 
 
+  class Euler1Stepper
+    :
+    public Stepper
+  {
+
+  public:
+
+    Euler1Stepper();
+    virtual ~Euler1Stepper() {}
+
+    virtual void step();
+
+    static StepperPtr createInstance() { return new Euler1Stepper; }
+
+    virtual StringLiteral getClassName() const  { return "Euler1Stepper"; }
+ 
+  };
 
 
-  DECLARE_CLASS( SRMReactor );
-
-  class SRMStepper 
+  class RungeKutta4Stepper
     : 
     public Stepper
   {
-  public:
-
-
-    DECLARE_TYPE( SubstanceVector, SubstanceCache );
-    DECLARE_TYPE( ReactorVector, ReactorCache );
-
-    SRMStepper();
-    virtual ~SRMStepper() {}
-
-    virtual void makeSlots();
-
-    virtual void step();
-
-
-    void clear();
-    void react();
-    void integrate();
-    void rule();
-
-    virtual void initialize();
-
-
-    const Polymorph getSubstanceCache() const;
-    const Polymorph getReactorCache() const;
-    const Polymorph getRuleReactorCache() const;
-
-
-    virtual StringLiteral getClassName() const  { return "SRMStepper"; }
- 
-
-  protected:
-
-    SubstanceCache        theSubstanceCache;
-    ReactorCache          theReactorCache;
-    ReactorCache          theRuleReactorCache;
-
-  };
-
-
-  class Euler1SRMStepper
-    :
-    public SRMStepper
-  {
 
   public:
 
-    Euler1SRMStepper();
-    virtual ~Euler1SRMStepper() {}
+    RungeKutta4Stepper();
+    virtual ~RungeKutta4Stepper() {}
 
-    static StepperPtr createInstance() { return new Euler1SRMStepper; }
+    static StepperPtr createInstance() { return new RungeKutta4Stepper; }
 
-    virtual StringLiteral getClassName() const  { return "Euler1SRMStepper"; }
- 
-  };
-
-
-  class RungeKutta4SRMStepper
-    : 
-    public SRMStepper
-  {
-
-  public:
-
-    RungeKutta4SRMStepper();
-    virtual ~RungeKutta4SRMStepper() {}
-
-    static StepperPtr createInstance() { return new RungeKutta4SRMStepper; }
-
-    virtual void initialize();
     virtual void step();
 
     virtual StringLiteral getClassName() const 
-    { return "RungeKutta4SRMStepper"; }
+    { return "RungeKutta4Stepper"; }
 
 
   protected:
-
-    RealValarray theQuantityBuffer;
-    RealValarray theK;
 
   };
 

@@ -75,6 +75,7 @@ namespace libecs
     : 
     theQuantity( 0.0 ),  
     theVelocity( 0.0 ),
+    theLastTime( 0 ),
     theFixed( false )
   {
     makeSlots();
@@ -89,6 +90,17 @@ namespace libecs
   void Substance::initialize()
   {
 
+    theVelocityVector.clear();
+    for( StepperVectorConstIterator i( theStepperVector.begin() );
+	 i != theStepperVector.end(); ++i )
+      {
+	StepperPtr aStepperPtr( *i );
+	const UnsignedInt anIndex( aStepperPtr->
+				   getSubstanceCacheIndex( this ) );
+	theVelocityVector.push_back( aStepperPtr->
+				     getVelocityBufferElementPtr( anIndex ) );
+      }
+
   }
 
   void Substance::setFixed( IntCref aValue )
@@ -102,7 +114,15 @@ namespace libecs
     return theFixed;
   }
 
+  void Substance::registerStepper( StepperPtr aStepper )
+  {
+    if( std::find( theStepperVector.begin(), theStepperVector.end(),
+		   aStepper )  == theStepperVector.end() )
+      {
+	theStepperVector.push_back( aStepper );
+      }
 
+  }
 
 
     const String SRMSubstance::SYSTEM_DEFAULT_ACCUMULATOR_NAME = "ReserveAccumulator";
@@ -130,7 +150,6 @@ namespace libecs
   {
     return theAccumulator->getClassName();
   }
-
 
   void SRMSubstance::setAccumulatorClass( StringCref anAccumulatorClassname )
   {
@@ -179,11 +198,11 @@ namespace libecs
   }
 
 
-  void SRMSubstance::integrate()
+  void SRMSubstance::integrate( RealCref aTime )
   { 
     if( isFixed() == false ) 
       {
-	Substance::integrate();
+	updateQuantity( aTime );
 
 	theAccumulator->accumulate();
   

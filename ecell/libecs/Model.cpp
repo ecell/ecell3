@@ -235,7 +235,7 @@ namespace libecs
 
     theStepperMap.insert( std::make_pair( anID, aStepper ) );
 
-    theScheduler.registerEvent( Event( getCurrentTime(), aStepper ) );
+    theScheduler.registerStepper( aStepper );
   }
 
 

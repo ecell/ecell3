@@ -32,19 +32,12 @@
 #include <algorithm>
 #include <limits>
 
-#include <gsl/gsl_vector.h>
-#include <gsl/gsl_blas.h>
-
-
 #include "Util.hpp"
 #include "Substance.hpp"
 #include "Reactor.hpp"
 #include "Model.hpp"
 #include "FullID.hpp"
 #include "PropertySlotMaker.hpp"
-
-// to be removed (for SRM)
-#include "Integrators.hpp"
 
 #include "Stepper.hpp"
 
@@ -84,12 +77,6 @@ namespace libecs
 				      &Stepper::getStepInterval ) );
 
     registerSlot( getPropertySlotMaker()->
-		  createPropertySlot( "StepsPerSecond", *this,
-				      Type2Type<Real>(),
-				      NULLPTR,
-				      &Stepper::getStepsPerSecond ) );
-
-    registerSlot( getPropertySlotMaker()->
 		  createPropertySlot( "UserMaxInterval", *this,
 				      Type2Type<Real>(),
 				      &Stepper::setUserMaxInterval,
@@ -119,6 +106,23 @@ namespace libecs
 				      &Stepper::setStepIntervalConstraint,
 				      &Stepper::getStepIntervalConstraint ) );
 
+    registerSlot( getPropertySlotMaker()->
+		  createPropertySlot( "SlaveStepper", *this,
+				      Type2Type<String>(),
+				      &Stepper::setSlaveStepperID,
+				      &Stepper::getSlaveStepperID ) );
+
+    registerSlot( getPropertySlotMaker()->
+		  createPropertySlot( "SubstanceCache", *this,
+				      Type2Type<Polymorph>(),
+				      NULLPTR,
+				      &Stepper::getSubstanceCache ) );
+
+    registerSlot( getPropertySlotMaker()->
+		  createPropertySlot( "ReactorCache", *this,
+				      Type2Type<Polymorph>(),
+				      NULLPTR,
+				      &Stepper::getReactorCache ) );
 
   }
 
@@ -129,15 +133,82 @@ namespace libecs
     theStepInterval( 0.001 ),
     theUserMinInterval( 0.0 ),
     theUserMaxInterval( std::numeric_limits<Real>::max() ),
-    theEntityListChanged( true )
+    theSlaveStepper( NULLPTR )
   {
     makeSlots();
-    calculateStepsPerSecond();
   }
 
   void Stepper::initialize()
   {
     FOR_ALL( SystemVector, theSystemVector, initialize );
+
+    Int aSize( theSubstanceCache.size() );
+
+    theQuantityBuffer.resize( aSize );
+    theVelocityBuffer.resize( aSize );
+
+
+    //    if( isEntityListChanged() )
+    //      {
+
+    //
+    // update theReactorCache
+    //
+    theReactorCache.clear();
+    for( SystemVectorConstIterator i( theSystemVector.begin() );
+	 i != theSystemVector.end() ; ++i )
+	{
+	  const SystemCptr aSystem( *i );
+
+	  for( ReactorMapConstIterator 
+		 j( aSystem->getReactorMap().begin() );
+	       j != aSystem->getReactorMap().end(); j++ )
+	    {
+	      ReactorPtr aReactorPtr( (*j).second );
+
+	      theReactorCache.push_back( aReactorPtr );
+
+	      aReactorPtr->initialize();
+	    }
+	}
+
+    // sort by Reactor priority
+    std::sort( theReactorCache.begin(), theReactorCache.end(),
+	       Reactor::PriorityCompare() );
+
+
+    //
+    // Update theSubstanceCache
+    //
+
+    // get all the substances which are reactants of the Reactors
+    theSubstanceCache.clear();
+    // for all the reactors
+    for( ReactorCache::const_iterator i( theReactorCache.begin());
+	 i != theReactorCache.end() ; ++i )
+      {
+	ReactantMapCref aReactantMap( (*i)->getReactantMap() );
+
+	// for all the reactants
+	for( ReactantMapConstIterator j( aReactantMap.begin() );
+	     j != aReactantMap.end(); ++j )
+	  {
+	    SubstancePtr aSubstancePtr( j->second.getSubstance() );
+
+	    // prevent duplication
+	    if( std::find( theSubstanceCache.begin(), theSubstanceCache.end(),
+			   aSubstancePtr ) == theSubstanceCache.end() )
+	      {
+		theSubstanceCache.push_back( aSubstancePtr );
+		aSubstancePtr->registerStepper( this );
+		aSubstancePtr->initialize();
+	      }
+	  }
+      }
+
+    //    clearEntityListChanged();
+    //      }
+    
   }
 
 
@@ -191,10 +262,29 @@ namespace libecs
     theLoggedPropertySlotVector.push_back( aPropertySlotPtr );
   }
 
-  void Stepper::setStepInterval( RealCref aStepInterval )
+  void Stepper::setSlaveStepperID( StringCref aStepperID )
   {
-    theStepInterval = aStepInterval;
-    calculateStepsPerSecond();
+    if( aStepperID == "" )
+      {
+	setSlaveStepper( NULLPTR );
+      }
+    else
+      {
+	setSlaveStepper( getModel()->getStepper( aStepperID ) );
+      }
+  }
+
+  const String Stepper::getSlaveStepperID() const
+  {
+    StepperPtr aStepperPtr( getSlaveStepper() );
+    if( aStepperPtr == NULLPTR )
+      {
+	return String();
+      }
+    else
+      {
+	return aStepperPtr->getID();
+      }
   }
 
   void Stepper::setStepIntervalConstraint( PolymorphCref aValue )
@@ -267,37 +357,8 @@ namespace libecs
   }
 
 
-  ////////////////////////// SRMStepper
 
-  SRMStepper::SRMStepper()
-  {
-    makeSlots();
-  }
-
-  
-  void SRMStepper::makeSlots()
-  {
-    registerSlot( getPropertySlotMaker()->
-		  createPropertySlot( "SubstanceCache", *this,
-				      Type2Type<Polymorph>(),
-				      NULLPTR,
-				      &SRMStepper::getSubstanceCache ) );
-
-    registerSlot( getPropertySlotMaker()->
-		  createPropertySlot( "ReactorCache", *this,
-				      Type2Type<Polymorph>(),
-				      NULLPTR,
-				      &SRMStepper::getReactorCache ) );
-
-    registerSlot( getPropertySlotMaker()->
-		  createPropertySlot( "RuleReactorCache", *this,
-				      Type2Type<Polymorph>(),
-				      NULLPTR,
-				      &SRMStepper::getRuleReactorCache ) );
-  }
-
-
-  const Polymorph SRMStepper::getSubstanceCache() const
+  const Polymorph Stepper::getSubstanceCache() const
   {
     PolymorphVector aVector;
     aVector.reserve( theSubstanceCache.size() );
@@ -311,7 +372,7 @@ namespace libecs
     return aVector;
   }
   
-  const Polymorph SRMStepper::getReactorCache() const
+  const Polymorph Stepper::getReactorCache() const
   {
     PolymorphVector aVector;
     aVector.reserve( theReactorCache.size() );
@@ -325,105 +386,35 @@ namespace libecs
     return aVector;
   }
   
-  const Polymorph SRMStepper::getRuleReactorCache() const
+
+  const UnsignedInt Stepper::getSubstanceCacheIndex( SubstancePtr aSubstance )
   {
-    PolymorphVector aVector;
-    aVector.reserve( theReactorCache.size() );
-    
-    for( ReactorCache::const_iterator i( theRuleReactorCache.begin() );
-	 i != theRuleReactorCache.end() ; ++i )
-      {
-	aVector.push_back( (*i)->getID() );
-      }
-    
-    return aVector;
-  }
-  
+    SubstanceCache::const_iterator 
+      anIterator( std::find( theSubstanceCache.begin(), 
+			     theSubstanceCache.end(), aSubstance ) );
 
-  void SRMStepper::initialize()
-  {
-    Stepper::initialize();
-
-    //    if( isEntityListChanged() )
-    //      {
-
-    //
-    // update theReactorCache
-    //
-    theReactorCache.clear();
-    for( SystemVectorConstIterator i( theSystemVector.begin() );
-	 i != theSystemVector.end() ; ++i )
-	{
-	  const SystemCptr aSystem( *i );
-
-	  for( ReactorMapConstIterator 
-		 j( aSystem->getReactorMap().begin() );
-	       j != aSystem->getReactorMap().end(); j++ )
-	    {
-	      ReactorPtr aReactorPtr( (*j).second );
-
-	      theReactorCache.push_back( aReactorPtr );
-	    }
-	}
-
-    // sort by Reactor priority
-    std::sort( theReactorCache.begin(), theReactorCache.end(),
-	       Reactor::PriorityCompare() );
-
-
-    //
-    // Update theSubstanceCache
-    //
-
-    // get all the substances which are reactants of the Reactors
-    theSubstanceCache.clear();
-    // for all the reactors
-    for( ReactorCache::const_iterator i( theReactorCache.begin());
-	 i != theReactorCache.end() ; ++i )
-      {
-	ReactantMapCref aReactantMap( (*i)->getReactantMap() );
-
-	// for all the reactants
-	for( ReactantMapConstIterator j( aReactantMap.begin() );
-	     j != aReactantMap.end(); ++j )
-	  {
-	    SubstancePtr aSubstancePtr( j->second.getSubstance() );
-
-	    // prevent duplication
-	    if( std::find( theSubstanceCache.begin(), theSubstanceCache.end(),
-			   aSubstancePtr ) == theSubstanceCache.end() )
-	      {
-		theSubstanceCache.push_back( aSubstancePtr );
-	      }
-	  }
-      }
-
-
-    //
-    // Update theRuleReactorCache
-    //
-
-    // move RuleReactors from theReactorCache to theRuleReactorCache
-    theRuleReactorCache.clear();
-    std::remove_copy_if( theReactorCache.begin(), theReactorCache.end(),
-			 std::back_inserter( theRuleReactorCache ), 
-			 not1( RuleSRMReactor::IsRuleReactor() ) );
-    std::remove_if( theReactorCache.begin(), theReactorCache.end(),
-		    RuleSRMReactor::IsRuleReactor() );
-
-    
-    //    clearEntityListChanged();
-    //      }
-    
+    return anIterator - theSubstanceCache.begin();
   }
 
-
-  inline void SRMStepper::clear()
+  inline void Stepper::clear()
   {
     //
     // Substance::clear()
     //
-    FOR_ALL( SubstanceCache, theSubstanceCache, clear );
+    const UnsignedInt aSize( theSubstanceCache.size() );
+    for( UnsignedInt c( 0 ); c < aSize; ++c )
+      {
+	SubstancePtr const aSubstance( theSubstanceCache[ c ] );
+
+	// save original quantity values
+	theQuantityBuffer[ c ] = aSubstance->saveQuantity();
+
+	// clear phase is here!
+	aSubstance->clear();
+      }
+
+
+    //    FOR_ALL( SubstanceCache, theSubstanceCache, clear );
       
     //
     // Reactor::clear() ?
@@ -436,7 +427,7 @@ namespace libecs
     //FOR_ALL( ,, clear );
   }
 
-  inline void SRMStepper::react()
+  inline void Stepper::react()
   {
     //
     // Reactor::react()
@@ -445,77 +436,88 @@ namespace libecs
 
   }
 
-  inline void SRMStepper::integrate()
+  inline void Stepper::integrate()
   {
     //
     // Substance::integrate()
     //
-    FOR_ALL( SubstanceCache, theSubstanceCache, integrate );
-  }
-
-  inline void SRMStepper::rule()
-  {
-    //
-    // Reactor::react() of RuleReactors
-    //
-    FOR_ALL( ReactorCache, theRuleReactorCache, react );
-  }
-
-
-  void SRMStepper::step()
-  {
-    clear();
-    react();
-    integrate();
-    rule();
-    
-    Stepper::step();
-  }
-
-
-  ////////////////////////// Euler1SRMStepper
-
-  Euler1SRMStepper::Euler1SRMStepper()
-  {
-    ; // do nothing
-  }
-
-  ////////////////////////// RungeKutta4SRMStepper
-
-  RungeKutta4SRMStepper::RungeKutta4SRMStepper()
-  {
-    ; // do nothing
-  }
-
-  void RungeKutta4SRMStepper::initialize()
-  {
-    SRMStepper::initialize();
-
-    Int aSize( theSubstanceCache.size() );
-
-    theQuantityBuffer.resize( aSize );
-    theK.resize( aSize );
-  }
-  
-
-  void RungeKutta4SRMStepper::step()
-  {
     const UnsignedInt aSize( theSubstanceCache.size() );
 
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
 	SubstancePtr const aSubstance( theSubstanceCache[ c ] );
 
-	// save original quantity values
-	theQuantityBuffer[ c ] = aSubstance->saveQuantity();
-
-	// clear phase is here!
-	aSubstance->clear();
+	aSubstance->integrate( getCurrentTime() );
       }
+  }
+
+  inline void Stepper::slave()
+  {
+    // call slave
+    StepperPtr aSlaveStepperPtr( getSlaveStepper() );
+    if( aSlaveStepperPtr != NULLPTR )
+      {
+	aSlaveStepperPtr->step();
+	aSlaveStepperPtr->setCurrentTime( getCurrentTime() );
+      }
+  }
+
+
+  inline void Stepper::updateVelocityBuffer()
+  {
+    const UnsignedInt aSize( theSubstanceCache.size() );
+    for( UnsignedInt c( 0 ); c < aSize; ++c )
+      {
+	SubstancePtr const aSubstance( theSubstanceCache[ c ] );
+
+	theVelocityBuffer[ c ] = aSubstance->getVelocity();
+      }
+  }
+
+
+
+  ////////////////////////// Euler1Stepper
+
+  Euler1Stepper::Euler1Stepper()
+  {
+    ; // do nothing
+  }
+
+  void Euler1Stepper::step()
+  {
+    integrate();
+    slave();
+    log();
+    clear();
+    react();
+
+    updateVelocityBuffer();
+  }
+
+
+  ////////////////////////// RungeKutta4Stepper
+
+  RungeKutta4Stepper::RungeKutta4Stepper()
+  {
+    ; // do nothing
+  }
+
+  void RungeKutta4Stepper::step()
+  {
+    // integrate phase first
+    integrate();
+
+    slave();
+
+    log();
+
+    // clear
+    clear();
 
     // ========= 1 ===========
     react();
 
+    const UnsignedInt aSize( theSubstanceCache.size() );
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
 	SubstancePtr const aSubstance( theSubstanceCache[ c ] );
@@ -524,9 +526,10 @@ namespace libecs
 	Real aVelocity( aSubstance->getVelocity() );
 
 	// restore k1 / 2 + x
-	aSubstance->loadQuantity( aVelocity * .5 + theQuantityBuffer[ c ] );
+	aSubstance->loadQuantity( aVelocity * .5 * getStepInterval()
+				  + theQuantityBuffer[ c ] );
 
-	theK[ c ] = aVelocity;
+	theVelocityBuffer[ c ] = aVelocity;
 
 	// clear velocity
 	aSubstance->setVelocity( 0 );
@@ -535,15 +538,15 @@ namespace libecs
     // ========= 2 ===========
     react();
 
-
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
 	SubstancePtr const aSubstance( theSubstanceCache[ c ] );
 	const Real aVelocity( aSubstance->getVelocity() );
-	theK[ c ] += aVelocity + aVelocity;
+	theVelocityBuffer[ c ] += aVelocity + aVelocity;
 
 	// restore k2 / 2 + x
-	aSubstance->loadQuantity( aVelocity * .5 + theQuantityBuffer[ c ] );
+	aSubstance->loadQuantity( aVelocity * .5 * getStepInterval()
+				  + theQuantityBuffer[ c ] );
 
 
 	// clear velocity
@@ -553,16 +556,15 @@ namespace libecs
 
     // ========= 3 ===========
     react();
-
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
 	SubstancePtr const aSubstance( theSubstanceCache[ c ] );
 	const Real aVelocity( aSubstance->getVelocity() );
-	theK[ c ] += aVelocity + aVelocity;
+	theVelocityBuffer[ c ] += aVelocity + aVelocity;
 
 	// restore k3 + x
-	aSubstance->loadQuantity( aVelocity + theQuantityBuffer[ c ] );
-
+	aSubstance->loadQuantity( aVelocity * getStepInterval()
+				  + theQuantityBuffer[ c ] );
 
 	// clear velocity
 	aSubstance->setVelocity( 0 );
@@ -583,15 +585,14 @@ namespace libecs
 
 	//// x(n+1) = x(n) + 1/6 * (k1 + k4 + 2 * (k2 + k3)) + O(h^5)
 
-	aSubstance->setVelocity( ( theK[ c ] + aVelocity ) * ( 1.0 / 6.0 ) );
-
-	// integrate phase here!!
-	aSubstance->integrate();
+	theVelocityBuffer[ c ] += aVelocity;
+	theVelocityBuffer[ c ] *= ( 1.0 / 6.0 );
+	aSubstance->setVelocity( theVelocityBuffer[ c ] );
       }
     
-    rule();
-    
-    Stepper::step();
+    // don't call updateVelocityBuffer() -- it is already updated by
+    // the algorithm.
+
   }
 
 

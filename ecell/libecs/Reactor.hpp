@@ -119,19 +119,6 @@ namespace libecs
       return theActivity;
     }
 
-    /**
-       Returns activity value (per second).
-
-       Default action of this method is to return getActivity() / step
-       interval, but this action can be changed in subclasses.
-
-       @return activity of this Entity per second
-    */
-
-    const Real getActivityPerSecond() const;
-
-
-
     void setReactant( PolymorphCref aValue );
 
     const Polymorph getReactantList() const;

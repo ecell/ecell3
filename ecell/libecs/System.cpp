@@ -159,12 +159,6 @@ namespace libecs
 
   void System::initialize()
   {
-    if( theStepper == NULLPTR )
-      {
-	THROW_EXCEPTION( InitializationFailed,
-			 getFullID().getString() + ": Stepper not set." );
-      }
-
     // do not need to call subsystems' initialize() -- Stepper does this
 
   }

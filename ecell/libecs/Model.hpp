@@ -83,7 +83,7 @@ namespace libecs
        @see Scheduler
     */
 
-    inline void step()
+    void step()
     {
       theScheduler.step();
     }
@@ -95,7 +95,7 @@ namespace libecs
        @return time elasped since start of the simulation.
     */
 
-    inline const Real getCurrentTime() const
+    const Real getCurrentTime() const
     {
       return theScheduler.getCurrentTime();
     }
