@@ -168,7 +168,10 @@ namespace libecs
 
   Process::~Process()
   {
-    getStepper()->removeProcess( this );
+    if( getStepper() != NULLPTR )
+      {
+	getStepper()->removeProcess( this );
+      }
   }
 
 

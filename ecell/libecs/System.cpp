@@ -115,7 +115,10 @@ namespace libecs
 
   System::~System()
   {
-    getStepper()->removeSystem( this );
+    if( getStepper() != NULLPTR )
+      {
+	getStepper()->removeSystem( this );
+      }
     
     // delete Processes first.
     for( ProcessMapIterator i( theProcessMap.begin() );
