@@ -73,11 +73,13 @@ namespace libecs
     aStepperPtr->setCurrentTime( getCurrentTime() );
     aStepperPtr->integrate();
     aStepperPtr->step();
-    aStepperPtr->dispatchInterruptions();
     aStepperPtr->log();
 
+    aStepperPtr->dispatchInterruptions();
+
+
     const Real aStepInterval( aStepperPtr->getStepInterval() );
-    const Real aScheduledTime( getCurrentTime() + aStepInterval );
+    const Real aScheduledTime( aStepperPtr->getCurrentTime() + aStepInterval );
 
     // schedule a new event
     theScheduleQueue.changeTopKey( Event( aScheduledTime, aStepperPtr ) );
@@ -89,9 +91,9 @@ namespace libecs
     const Real aScheduledTime( aStepperPtr->getCurrentTime() + 
 			       aStepperPtr->getStepInterval() );
 
-    DEBUG_EXCEPTION( aScheduledTime >= getCurrentTime(),
-		     SimulationError,
-		     "Attempt to go past." );
+    //    DEBUG_EXCEPTION( aScheduledTime >= getCurrentTime(),
+    //		     SimulationError,
+    //		     "Attempt to go past." );
 
     theScheduleQueue.changeOneKey( aStepperPtr->getSchedulerIndex(),
 				   Event( aScheduledTime, aStepperPtr ) );
