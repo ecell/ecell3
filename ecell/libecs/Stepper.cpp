@@ -499,8 +499,9 @@ namespace libecs
 				    aVariable, 
 				    VariableProxy::VariablePtrCompare() ) );
 
-    DEBUG_EXCEPTION( (*anIterator)->getVariable() == aVariable , NotFound, 
-		     "This should not occur.  Must be a bug." );
+    // This may be called before push_back() function.
+//     DEBUG_EXCEPTION( (*anIterator)->getVariable() == aVariable , NotFound, 
+// 		     "This should not occur.  Must be a bug." );
 
     return anIterator - theVariableProxyVector.begin();
   }
