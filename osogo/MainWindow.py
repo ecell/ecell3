@@ -70,6 +70,7 @@ class MainWindow(Window):
         #### create Message Window ####
         self.theMessageWindow = MessageWindow.MessageWindow()
         self.theMessageWindowWindow = self.theMessageWindow[ 'message_window' ]
+        self.theMessageWindowWindow.hide()
 
     ###### window operation ####
     def closeParentWindow( self, button_obj):
