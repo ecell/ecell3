@@ -23,7 +23,6 @@ LIBECS_DM_CLASS( QuasiDynamicFluxProcess, Process )
     }
 
   QuasiDynamicFluxProcess()
-    :
     {
       ; // do nothing
     }
