@@ -13,10 +13,9 @@ prefix=@prefix@
 exec_prefix=@prefix@
 pythondir=@pythondir@
 
-SHAREDIR="${prefix}/share/ecell/@VERSION@/template"
 BINDIR="${exec_prefix}/bin"
 ECELL_INCLUDE="${prefix}/include/ecell"
-#EMTOOL_INCLUDE="${prefix}/share/ecell/@VERSION@/templates/Reactor"
+
 CXX="c++"
 MV="/bin/mv"
 RM="/bin/rm"
@@ -29,7 +28,7 @@ SOSUFFIX=".so"
 CPPSUFFIX=".cpp"
 HPPSUFFIX=".hpp"
 
-unset DO_COMPILE DO_GENERATE DO_COMPILE FORCE
+unset DO_COMPILE DO_GENERATE DO_COMPILE
 
 TMPDIR="/tmp"
 ETTMPDIR="$TMPDIR/emtool.$$"
@@ -56,8 +55,10 @@ Options:
 	-a or --all)	        All dynamic module compile.
 	-g or --generate)       Generate dm to cpp/hpp source file.
 	-c or --compile)        Compile cpp to so file.
-#	-f or --force)          Disable modification time checks.
-	-h or --help)		Print this message.
+        -t or --template)       Specify dmgen template class
+	-i or --include)        Specify dmcompile include file
+        -m or --munch)          Specify munch file
+        -h or --help)		Print this message.
 
 This program is part of E-CELL Simulation Environment Version 3.
 Written by Tomoya Kitayama <tomo@e-cell.org>
@@ -113,14 +114,16 @@ shift
 
 TEMPLATEDIR="${prefix}/share/ecell/@VERSION@/template/$CLASS"
 
-while true ; do
+while [ -n "$(echo $1 | grep '-')" ]; do
     case "$1" in
 	-a|--all) DO_ALL=yes ; shift ; break ;;
 	-g|--generate) DO_GENERATE=yes ; shift ; break ;;
 	-c|--compile) DO_COMPILE=yes ; shift ; break ;;
-#	-f|--force) FORCE=yes ; shift ; break ;;
+	-t|--template) DO_TEMPLATE=yes ; templatefile=$2 ; shift 2 ;;
+	-i|--include) DO_INCLUDE=yes ; includefile=$2 ; shift 2;;
+	-m|--munch) DO_MUNCH=yes ; MUNCHFILE=$2 ; shift 2 ;;
 	-h|--help) help ; exit 0 ;;
-	*) echo "Internal error! " ; help ; exit 1 ;;
+	*) echo "Invarid Option! " ; help ; exit 1 ;;
     esac
 done
 
@@ -142,18 +145,38 @@ if [ $DO_ALL ] ; then
     sofile=$base$SOSUFFIX
     
     if [ -f $sofile -a $sofile -nt $inputfile ] ; then
-	echo -n "$sofile is newer than &inputfile." 
+	echo -n "$sofile is newer than $inputfile " 
 	echo "skipping."
 	cleanup
 	exit 0
     fi
-
+    
     run_command "cp $inputfile $ETTMPDIR"
     run_command "pushd $ETTMPDIR"
-    run_command "$DMGEN $base.dm -t $TEMPLATEDIR"
-    run_command "popd"
-    run_command "$DMCOMPILE $ETTMPDIR/$base.cpp -I $ECELL_INCLUDE -I $EMTOOL_INCLUDE -I. -I.." 
+    
+    if [ $DO_TEMPLATE ] ; then 
+	if [ $DO_MUNCH ] ; then 
+	    run_command "$DMGEN $CLASS -d $inputfile -t $templatefile -m $munchfile"
+	else
+	    run_command "$DMGEN $CLASS -d $inputfile -t $templatefile"
+        fi
+    else
+	if [ $DO_MUNCH ] ; then 
+	    run_command "$DMGEN $CLASS -d $inputfile -m $munchfile"
+	else
+	    run_command "$DMGEN $CLASS -d $inputfile"
+        fi
+    fi    
 
+    run_command "popd"
+
+    if [ $DO_INCLUDE ] ; then 
+	run_command "$DMCOMPILE $base.cpp -I $includefile -I $ECELL_INCLUDE -I $EMTOOL_INCLUDE -I . -I .." 
+    else
+	run_command "$DMCOMPILE $base.cpp -I $ECELL_INCLUDE -I $EMTOOL_INCLUDE -I . -I .." 
+    fi
+
+    echo "generate $base.so"
 fi
 
 #
@@ -166,14 +189,28 @@ if [ $DO_GENERATE ] ; then
     cppfile=$base$CPPSUFFIX
 
     if [ -f $cppfile -a $cppfile -nt $inputfile ] ; then
-	echo -n "$cppfile is newer than $inputfile." 
+	echo -n "$cppfile is newer than $inputfile " 
 	echo "skipping."
 	cleanup
 	exit 0
     fi
 
-    run_command "$DMGEN $base.dm -t $TEMPLATEDIR"
-    
+    if [ $DO_TEMPLATE ] ; then 
+	if [ $DO_MUNCH ] ; then 
+	    run_command "$DMGEN $CLASS -d $inputfile -t $templatefile -m $munchfile"
+	else
+	    run_command "$DMGEN $CLASS -d $inputfile -t $templatefile"
+	fi
+
+    else
+	if [ $DO_MUNCH ] ; then 
+	    run_command "$DMGEN $CLASS -d $inputfile -m $munchfile"
+	else
+	    run_command "$DMGEN $CLASS -d $inputfile"
+	fi
+    fi
+
+    echo "generate $base.cpp"
 fi
 
 #
@@ -185,16 +222,20 @@ if [ $DO_COMPILE  ] ; then
     base=`basename $inputfile .cpp`	     			
     sofile=$base$SOSUFFIX
 
-#    if test -f $sofile && test $sofile -nt $inputfile ; then
-#	echo "$sofile is newer than $inputfile..." 
-#	echo "skipping..."
-#	cleanup
-#	exit 0
-#    fi
+    if [ -f $sofile -a $sofile -nt $ ] ; then
+	echo "$sofile is newer than $inputfile..." 
+	echo "skipping..."
+	cleanup
+	exit 0
+    fi
 
-    touch $base.so
-    run_command "$DMCOMPILE $base.cpp -I $ECELL_INCLUDE -I $EMTOOL_INCLUDE -I . -I .." 
+    if [ $DO_INCLUDE ] ; then 
+	run_command "$DMCOMPILE $base.cpp -I $includefile -I $ECELL_INCLUDE -I $EMTOOL_INCLUDE -I . -I .." 
+    else
+	run_command "$DMCOMPILE $base.cpp -I $ECELL_INCLUDE -I $EMTOOL_INCLUDE -I . -I .." 
+    fi
 
+    echo "generate $base.so"
 fi
 
 #
@@ -204,3 +245,4 @@ fi
 cleanup
 
 exit 0
+
