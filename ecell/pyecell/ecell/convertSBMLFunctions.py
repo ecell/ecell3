@@ -576,7 +576,7 @@ class SBML_Rule( SBML_Model ):
 
     # =========================================================
 
-    def getVariableMolarConc( self, aName ):
+    def setMolarConcName( self, aName ):
 
         for aVariableReference in self.VariableReferenceList:
             if aVariableReference[1].split(':')[2] == aName:
@@ -586,10 +586,20 @@ class SBML_Rule( SBML_Model ):
 
     # =========================================================
 
-    def getVariableValue( self, aName ):
+    def setValueName( self, aName ):
 
         for aVariableReference in self.VariableReferenceList:
             if aVariableReference[1].split(':')[2] == aName:
+
+                return aVariableReference[0] + '.Value'
+
+
+    # =========================================================
+
+    def setSizeName( self, aName ):
+
+        for aVariableReference in self.VariableReferenceList:
+            if aVariableReference[1].split(':')[2] == 'SIZE':
 
                 return aVariableReference[0] + '.Value'
 
@@ -650,6 +660,14 @@ class SBML_Rule( SBML_Model ):
             if ( ( self.Model.Level == 1 and aCompartment[1] == aName ) or
                  ( self.Model.Level == 2 and aCompartment[0] == aName ) ):
                 
+                print self.VariableReferenceList
+                for aVariableReference in self.VariableReferenceList:
+                    if ( aVariableReference[1].split(':')[1] ==\
+                       self.Model.getPath( aName ) ) and\
+                    ( aVariableReference[1].split(':')[2] == 'SIZE' ):
+
+                        return
+
                 aCompartmentList = []
                 aCompartmentList.append( aName )
                 
@@ -681,32 +699,35 @@ class SBML_Rule( SBML_Model ):
             else:
                 aName = anASTNode.getName()
                 newName = []
-
                 aType = self.getVariableType( aName )
 
                 # Species
                 if ( aType == libsbml.SBML_SPECIES ):
 
                     self.setSpeciesToVariableReference( aName )
-                    newName.append( self.getVariableMolarConc( aName ) )
-                    anASTNode.setName( newName[0] )      
-                    return anASTNode
+                    newName.append( self.setMolarConcName( aName ) )
+                    if( newName[0] != '' ):
+                        anASTNode.setName( newName[0] )      
+                        return anASTNode
 
                 # Parameter
                 if ( aType == libsbml.SBML_PARAMETER ):
                     
                     self.setParameterToVariableReference( aName )
-                    newName.append( self.getVariableValue( aName ) )
-                    anASTNode.setName( newName[0] )                    
-                    return anASTNode
+                    newName.append( self.setValueName( aName ) )
+                    if( newName[0] != '' ):
+                        anASTNode.setName( newName[0] )                    
+                        return anASTNode
 
                 # Compartment
                 if ( aType == libsbml.SBML_COMPARTMENT ):
                     
                     self.setCompartmentToVariableReference( aName )
-                    newName.append( self.getVariableValue( aName ) )
-                    anASTNode.setName( newName[0] )                    
-                    return anASTNode
+                    newName.append( self.setSizeName( aName ) )
+#                    print newName
+                    if( newName[0] != '' ):
+                        anASTNode.setName( newName[0] )                    
+                        return anASTNode
 
         return anASTNode
 

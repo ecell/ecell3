@@ -346,15 +346,16 @@ def convertSBML2EML( aSBMLString ):
         # --------------------------
         
         # convert SBML format formula to E-Cell format formula
-        anExpression =\
-        [ str( theReaction.convertKineticLawFormula( aReaction[2][0] ) ) ]
+        if( aReaction[2][0] != '' ):
+            anExpression =\
+            [ str( theReaction.convertKineticLawFormula( aReaction[2][0] ) ) ]
 
 
 
-        # set Expression Property for ExpressionFluxProcess
-        anEml.setEntityProperty( aSystemFullID,
-                                 'Expression',
-                                 anExpression )
+            # set Expression Property for ExpressionFluxProcess
+            anEml.setEntityProperty( aSystemFullID,
+                                     'Expression',
+                                     anExpression )
 
         # setVariableReferenceList
         anEml.setEntityProperty( aSystemFullID,
