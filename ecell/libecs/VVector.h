@@ -45,9 +45,13 @@
  *::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
  *	$Id$
  :	$Log$
- :	Revision 1.6  2003/07/20 06:06:06  bgabor
- :	Added support for large files.
+ :	Revision 1.7  2003/08/08 13:13:09  satyanandavel
+ :	Added support for MinGW to define type of ssize_t
  :
+ :	Revision 1.6  2003/07/20 06:06:06  bgabor
+ :	
+ :	Added support for large files.
+ :	
  :	Revision 1.5  2003/04/02 11:42:18  shafi
  :	my_open_to_read( off_t )
  :	
@@ -93,7 +97,7 @@
 #endif	/* compiler dependent part */
 
 
-#ifdef __BORLANDC__
+#if defined(__BORLANDC__) || defined(__WINDOWS__) || defined(__MINGW32__)
 typedef int ssize_t;
 #endif /* __BORLANDC__ */
 const unsigned int VVECTOR_READ_CACHE_SIZE = 2048;
