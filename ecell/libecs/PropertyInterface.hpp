@@ -56,6 +56,10 @@ namespace libecs
   /**
      Common base class for classes with PropertySlots.
 
+     Properties is a group of methods which can be accessed via (1)
+     PropertySlots and (2) set/getProperty() methods, in addition to
+     normal C++ method calls.
+
      @note  Subclasses of PropertyInterface MUST call their own makeSlots()
      to create their property slots in their constructors.
      (virtual functions don't work in constructors)
@@ -109,9 +113,9 @@ namespace libecs
        @return a borrowed pointer to the PropertySlot with the name.
     */
 
-    virtual PropertySlotPtr getPropertySlot( StringCref aPropertyName )
+    virtual PropertySlotPtr getPropertySlot( StringCref aPropertyName ) const
     {
-      return thePropertySlotMap[ aPropertyName ];
+      return getPropertySlotMap().find( aPropertyName )->second;
     }
 
 
@@ -127,20 +131,9 @@ namespace libecs
     void makeSlots();
 
 
-    /** \name Properties
-
-    Properties is a group of methods which can be accessed via (1)
-    PropertySlots and (2) set/getProperty() methods, in addition to
-    normal C++ method calls.
-
-    */
-    //@{
-
     const Polymorph getPropertyList() const;
-    const Polymorph getPropertyAttributes() const;
 
-    //@}
-
+    const Polymorph getPropertyAttributes( StringCref aPropertyName ) const;
 
 
     /// @internal 

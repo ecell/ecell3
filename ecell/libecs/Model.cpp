@@ -84,8 +84,7 @@ namespace libecs
 
 
   void Model::createEntity( StringCref aClassname,
-			    FullIDCref aFullID,
-			    StringCref aName )
+			    FullIDCref aFullID )
   {
     if( aFullID.getSystemPath().empty() )
       {
@@ -103,21 +102,18 @@ namespace libecs
       case EntityType::SUBSTANCE:
 	aSubstancePtr = getSubstanceMaker().make( aClassname );
 	aSubstancePtr->setID( aFullID.getID() );
-	aSubstancePtr->setName( aName );
 	aSubstancePtr->setModel( this );
 	aContainerSystemPtr->registerSubstance( aSubstancePtr );
 	break;
       case EntityType::REACTOR:
 	aReactorPtr = getReactorMaker().make( aClassname );
 	aReactorPtr->setID( aFullID.getID() );
-	aReactorPtr->setName( aName );
 	aReactorPtr->setModel( this );
 	aContainerSystemPtr->registerReactor( aReactorPtr );
 	break;
       case EntityType::SYSTEM:
 	aSystemPtr = getSystemMaker().make( aClassname );
 	aSystemPtr->setID( aFullID.getID() );
-	aSystemPtr->setName( aName );
 	aSystemPtr->setModel( this );
 	aContainerSystemPtr->registerSystem( aSystemPtr );
 	break;

@@ -111,8 +111,7 @@ namespace libecs
     */
 
     void createEntity( StringCref aClassname,
-		       FullIDCref aFullID,
-		       StringCref aName );
+		       FullIDCref aFullID );
 
 
     /**

@@ -96,6 +96,25 @@ namespace libecs
     return aVector;
   }
 
+  const Polymorph PropertyInterface::
+  getPropertyAttributes( StringCref aPropertyName ) const  
+  {
+    PropertySlotPtr aPropertySlotPtr( getPropertySlot( aPropertyName ) );
+
+    PolymorphVector aVector;
+
+    // is setable?
+    aVector.push_back( static_cast<Int>
+		       ( aPropertySlotPtr->isSetable() ) );
+
+    // is getable?
+    aVector.push_back( static_cast<Int>
+		       ( aPropertySlotPtr->isGetable() ) );
+
+    return aVector;
+  }
+
+
   PropertyInterface::PropertyInterface()
   {
     makeSlots();

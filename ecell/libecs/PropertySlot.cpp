@@ -40,6 +40,7 @@
 namespace libecs
 {
 
+
   void PropertySlot::connectLogger( LoggerPtr logger )
   {
     if( isLogged() )

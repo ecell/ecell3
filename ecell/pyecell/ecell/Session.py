@@ -203,8 +203,8 @@ class Session:
         for anEntity in anEntityList:
 
             self.theSimulator.createEntity( anEntity[ 'Type' ], \
-                                            anEntity[ 'FullId' ], \
-                                            anEntity[ 'Name' ] )
+                                            anEntity[ 'FullId' ] )
+                                            #                                            anEntity[ 'Name' ] )
 
             ## Debug for Output -----------------------------------------------------------
             #script = "self.theSimulator.createEntity( '" + anEntity[ 'Type' ] + "', '" + \

@@ -57,8 +57,15 @@ namespace libemc
 
      Unlike libecs::Model class, this API does involve only standard
      C++ types/classes, and doesn't depend on libecs classes.  An only
-     exception is Polymorph class, which is used in setting and getting 
-     property values of objects in the model.
+     exception is Polymorph class.
+
+     The public API methods are classified into these three groups:
+
+     - Simulator methods
+     - Entity methods
+     - Stepper methods
+     - Logger methods
+
      
      @see libecs
      @see Model
@@ -88,6 +95,16 @@ namespace libemc
     }
 
     /**
+       Delete a Stepper.  This method is not supported.
+
+    */
+
+    void deleteStepper( libecs::StringCref anID )
+    {
+      theSimulatorImplementation->deleteStepper( anID );
+    }
+
+    /**
        List Steppers in the model.
 
        @returh a list of Steppers.
@@ -96,6 +113,37 @@ namespace libemc
     const libecs::Polymorph getStepperList() const
     {
       return theSimulatorImplementation->getStepperList();
+    }
+
+    /**
+       List names of properties of a Stepper.
+    
+       @return a list of properties of a Stepper.
+    */
+
+    const libecs::Polymorph 
+    getStepperPropertyList( libecs::StringCref aStepperID ) const
+    {
+      return theSimulatorImplementation->getStepperPropertyList( aStepperID );
+    }
+
+
+    /**
+       Get attributes of a property of a Stepper.
+
+       The attributes are returned as a form of boolean 2-tuple 
+       ( setable, getable ).  ( 1, 0 ) means that the property is setable but
+       not getable,,, and so on.
+
+       @return Stepper property attributes.
+    */
+
+    const libecs::Polymorph 
+    getStepperPropertyAttributes( libecs::StringCref aStepperID, 
+				  libecs::StringCref aPropertyName ) const
+    {
+      return theSimulatorImplementation->
+	getStepperPropertyAttributes( aStepperID, aPropertyName );
     }
 
   
@@ -133,20 +181,58 @@ namespace libemc
     }
 
     /**
+       Get class name of a Stepper.
+
+       @param aStepperID the Stepper ID.
+
+       @return the class name.
+    */
+
+    const libecs::String
+    getStepperClassName( libecs::StringCref aStepperID ) const
+    {
+      return theSimulatorImplementation->getStepperClassName( aStepperID );
+    }
+
+    /**
        Create a new Entity in the model.
 
        @param aClassname a classname of the Entity to create.
-       @param aFullIDString FullID of the Entity as a String.
+       @param aFullIDString FullID of the Entity.
        @param aName      a name of the Entity.
     */
 
     void createEntity( libecs::StringCref           aClassname, 
-		       libecs::StringCref           aFullIDString,
-		       libecs::StringCref           aName )
+		       libecs::StringCref           aFullIDString )
     {
       theSimulatorImplementation->createEntity( aClassname,
-						aFullIDString,
-						aName );
+						aFullIDString );
+    }
+
+    /**
+       Delete an Entity. This method is not supported yet.
+
+    */
+
+    void deleteEntity( libecs::StringCref aFullIDString )
+    {
+      theSimulatorImplementation->deleteEntity( aFullIDString );
+    }
+
+    /**
+       Get a list of Entities in a System.
+
+       @param anEntityTypeNumber a EntityType to list.
+       @param aSystemPathString a SystemPath of the System.
+       @return the list of IDs of Entities.
+    */
+
+    const libecs::Polymorph 
+    getEntityList( libecs::Int anEntityTypeNumber,
+		   libecs::StringCref aSystemPathString ) const
+    {
+      return theSimulatorImplementation->getEntityList( anEntityTypeNumber,
+							aSystemPathString );
     }
 
 
@@ -165,7 +251,7 @@ namespace libemc
     /**
        Set a property value of an Entity.
 
-       @param aFullPNString a FullPN of the Property to set as a String.
+       @param aFullPNString a FullPN of the Property to set.
        @param aValue        the value to be set.
     */
 
@@ -179,7 +265,7 @@ namespace libemc
     /**
        Get a value of a property from an Entity.
 
-       @param aFullPNString a FullPN of the property as a String.
+       @param aFullPNString a FullPN of the property.
        @return the property value.
     */
 
@@ -187,6 +273,36 @@ namespace libemc
     getEntityProperty( libecs::StringCref aFullPNString ) const
     {
       return theSimulatorImplementation->getEntityProperty( aFullPNString );
+    }
+
+    /**
+       Get attributes of a property of an Entity.
+
+       The attributes are returned as a form of boolean 2-tuple 
+       ( setable, getable ).  ( 1, 0 ) means that the property is setable but
+       not getable,,, and so on.
+
+       @return Entity property attributes.
+    */
+
+    const libecs::Polymorph
+    getEntityPropertyAttributes( libecs::StringCref aFullPNString ) const
+    {
+      return theSimulatorImplementation->
+	getEntityPropertyAttributes( aFullPNString );
+    }
+
+    /**
+       Get class name of an Entity.
+
+       @param aFullIDString a FullID of the Entity.
+       @return the class name.
+    */
+
+    const libecs::String
+    getEntityClassName( libecs::StringCref aFullIDString ) const
+    {
+      return theSimulatorImplementation->getEntityClassName( aFullIDString );
     }
 
     /**

@@ -100,7 +100,16 @@ namespace libemc
     virtual void createStepper( libecs::StringCref         aClassname,
 				libecs::StringCref         anId ) = 0;
 
+    virtual void deleteStepper( libecs::StringCref anID ) = 0;
+
     virtual const libecs::Polymorph getStepperList() const = 0;
+
+    virtual const libecs::Polymorph 
+    getStepperPropertyList( libecs::StringCref aStepperID ) const = 0;
+
+    virtual const libecs::Polymorph 
+    getStepperPropertyAttributes( libecs::StringCref aStepperID, 
+				  libecs::StringCref aPropertyName ) const = 0;
 
     virtual void setStepperProperty( libecs::StringCref    aStepperID,
 				     libecs::StringCref    aPropertyName,
@@ -110,9 +119,17 @@ namespace libemc
     getStepperProperty( libecs::StringCref aStepperID,
 			libecs::StringCref aPropertyName ) const = 0;
 
+    virtual const libecs::String
+    getStepperClassName( libecs::StringCref aStepperID ) const = 0;
+
     virtual void createEntity( libecs::StringCref   aClassname, 
-			       libecs::StringCref   aFullIDString,
-			       libecs::StringCref   aName ) = 0;
+			       libecs::StringCref   aFullIDString ) = 0;
+
+    virtual void deleteEntity( libecs::StringCref aFullIDString ) = 0;
+
+    virtual const libecs::Polymorph 
+    getEntityList( libecs::Int anEntityTypeNumber,
+		   libecs::StringCref aSystemPathString ) const = 0;
 
     virtual const bool 
     isEntityExist( libecs::StringCref  aFullIDString ) const = 0;
@@ -123,6 +140,11 @@ namespace libemc
     virtual const libecs::Polymorph
     getEntityProperty( libecs::StringCref aFullPNString ) const = 0;
 
+    virtual const libecs::Polymorph
+    getEntityPropertyAttributes( libecs::StringCref aFullPNString ) const = 0;
+
+    virtual const libecs::String
+    getEntityClassName( libecs::StringCref aFullIDString ) const = 0;
 
     virtual void createLogger( libecs::StringCref aFullPNString ) = 0;
 

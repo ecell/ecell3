@@ -73,7 +73,7 @@ namespace libecs
     registerSlot( getPropertySlotMaker()->
 		  createPropertySlot( "Name", *this, 
 				      Type2Type<String>(),
-				      NULLPTR,
+				      &Entity::setName,
 				      &Entity::getName ) );
 
   }

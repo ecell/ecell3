@@ -28,6 +28,8 @@
 // E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
 
+#include <iostream>
+
 #include <algorithm>
 
 #include "libecs/libecs.hpp"
@@ -69,6 +71,11 @@ namespace libemc
     getModel().createStepper( aClassname, anId );
   }
 
+  void LocalSimulatorImplementation::deleteStepper( libecs::StringCref anID )
+  {
+    std::cerr << "deleteStepper() method is not supported yet." << std::endl;
+  }
+
   const libecs::Polymorph LocalSimulatorImplementation::getStepperList() const
   {
     StepperMapCref aStepperMap( getModel().getStepperMap() );
@@ -85,6 +92,25 @@ namespace libemc
     return aPolymorphVector;
   }
 
+
+  const libecs::Polymorph LocalSimulatorImplementation::
+  getStepperPropertyList( StringCref aStepperID ) const
+  {
+    StepperPtr aStepperPtr( getModel().getStepper( aStepperID ) );
+    
+    return aStepperPtr->getPropertyList();
+  }
+  
+  const libecs::Polymorph LocalSimulatorImplementation::
+  getStepperPropertyAttributes( libecs::StringCref aStepperID, 
+				libecs::StringCref aPropertyName ) const
+  {
+    StepperPtr aStepperPtr( getModel().getStepper( aStepperID ) );
+
+    return aStepperPtr->getPropertyAttributes( aPropertyName );
+  }
+  
+
   void LocalSimulatorImplementation::
   setStepperProperty( libecs::StringCref          aStepperID,
 		      libecs::StringCref          aPropertyName,
@@ -95,8 +121,7 @@ namespace libemc
     aStepperPtr->setProperty( aPropertyName, aValue );
   }
 
-  const libecs::Polymorph
-  LocalSimulatorImplementation::
+  const libecs::Polymorph LocalSimulatorImplementation::
   getStepperProperty( libecs::StringCref aStepperID,
 		      libecs::StringCref aPropertyName ) const
   {
@@ -105,13 +130,47 @@ namespace libemc
     return aStepperPtr->getProperty( aPropertyName );
   }
 
+  const libecs::String LocalSimulatorImplementation::
+  getStepperClassName( libecs::StringCref aStepperID ) const
+  {
+    StepperCptr aStepperPtr( getModel().getStepper( aStepperID ) );
+
+    return aStepperPtr->getClassNameString();
+  }
+
 
   void LocalSimulatorImplementation::createEntity( StringCref aClassname,
-						   StringCref aFullIDString,
-						   StringCref aName )
+						   StringCref aFullIDString )
   {
-    getModel().createEntity( aClassname, FullID( aFullIDString ), aName );
+    getModel().createEntity( aClassname, FullID( aFullIDString ) );
   }
+
+  void LocalSimulatorImplementation::deleteEntity( StringCref aFullIDString )
+  {
+    std::cerr << "deleteEntity() method is not supported yet." << std::endl;
+  }
+
+  const libecs::Polymorph LocalSimulatorImplementation::
+  getEntityList( libecs::Int anEntityTypeNumber,
+		 libecs::StringCref aSystemPathString ) const
+  {
+    const libecs::EntityType anEntityType( anEntityTypeNumber );
+    const libecs::SystemPath aSystemPath( aSystemPathString );
+    const libecs::SystemPtr aSystemPtr( getModel().getSystem( aSystemPath ) );
+
+    switch( anEntityType )
+      {
+      case libecs::EntityType::SUBSTANCE:
+	return aSystemPtr->getSubstanceList();
+      case libecs::EntityType::REACTOR:
+	return aSystemPtr->getReactorList();
+      case libecs::EntityType::SYSTEM:
+	return aSystemPtr->getSystemList();
+      }
+
+    NEVER_GET_HERE;
+  }
+
 
   const bool LocalSimulatorImplementation::
   isEntityExist( libecs::StringCref aFullIDString ) const
@@ -147,6 +206,25 @@ namespace libemc
 
     return anEntityPtr->getProperty( aFullPN.getPropertyName() );
   }
+
+  const libecs::Polymorph LocalSimulatorImplementation::
+  getEntityPropertyAttributes( libecs::StringCref aFullPNString ) const
+  {
+    FullPN aFullPN( aFullPNString );
+    EntityCptr anEntityPtr( getModel().getEntity( aFullPN.getFullID() ) );
+
+    return anEntityPtr->getPropertyAttributes( aFullPN.getPropertyName() );
+  }
+
+  const libecs::String LocalSimulatorImplementation::
+  getEntityClassName( libecs::StringCref aFullIDString ) const
+  {
+    FullID aFullID( aFullIDString );
+    EntityCptr anEntityPtr( getModel().getEntity( aFullID ) );
+
+    return anEntityPtr->getClassNameString();
+  }
+
 
   void LocalSimulatorImplementation::
   createLogger( libecs::StringCref aFullPNString )
