@@ -22,8 +22,7 @@ ODE23Stepper.cpp\
 CashKarp45Stepper.cpp\
 ODE45Stepper.cpp
 
-EXTRA_DIST = ${DM 
-     S}
+EXTRA_DIST = ${DMS}
 dmdir = ${DM_SRC_DIR}
 dm_DATA = ${DMS}
 
