@@ -490,6 +490,16 @@ namespace libecs
       return theDerivativeToleranceFactor;
     }
 
+    void setMaxErrorRatio( RealCref aValue )
+    {
+      theMaxErrorRatio = aValue;
+    }
+
+    const Real getMaxErrorRatio() const
+    {
+      return theMaxErrorRatio;
+    }
+
     /**
        Override setStepInterval() for theTolerantStepInterval.
 

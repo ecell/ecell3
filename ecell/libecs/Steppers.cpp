@@ -60,7 +60,8 @@ namespace libecs
 
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
-	VariablePtr const aVariable( theVariableProxyVector[ c ]->getVariable() );
+	VariablePtr const aVariable( theVariableProxyVector[ c ]->
+				     getVariable() );
 
 	theVelocityBuffer[ c ] = aVariable->getVelocity();
 
@@ -107,7 +108,8 @@ namespace libecs
     const UnsignedInt aSize( theVariableProxyVector.size() );
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
-	VariablePtr const aVariable( theVariableProxyVector[ c ]->getVariable() );
+	VariablePtr const aVariable( theVariableProxyVector[ c ]->
+				     getVariable() );
 
 	// get k1
 	Real aVelocity( aVariable->getVelocity() );
@@ -127,7 +129,9 @@ namespace libecs
 
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
-	VariablePtr const aVariable( theVariableProxyVector[ c ]->getVariable() );
+	VariablePtr const aVariable( theVariableProxyVector[ c ]->
+				     getVariable() );
+
 	const Real aVelocity( aVariable->getVelocity() );
 	theVelocityBuffer[ c ] += aVelocity + aVelocity;
 
@@ -144,7 +148,9 @@ namespace libecs
     processNormal();
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
-	VariablePtr const aVariable( theVariableProxyVector[ c ]->getVariable() );
+	VariablePtr const aVariable( theVariableProxyVector[ c ]->
+				     getVariable() );
+
 	const Real aVelocity( aVariable->getVelocity() );
 	theVelocityBuffer[ c ] += aVelocity + aVelocity;
 
@@ -162,7 +168,9 @@ namespace libecs
     // restore theValueBuffer
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
-	VariablePtr const aVariable( theVariableProxyVector[ c ]->getVariable() );
+	VariablePtr const aVariable( theVariableProxyVector[ c ]->
+				     getVariable() );
+
 	const Real aVelocity( aVariable->getVelocity() );
 
 	// restore x (original value)
@@ -201,7 +209,41 @@ namespace libecs
 
     while( !calculate() )
       {
-	; // do nothing
+	// shrink it if the error exceeds 110%
+	//		    setStepInterval( getStepInterval() 
+	//				     * pow(maxError, -1.0)
+	//				     *  safety );
+		
+	setStepInterval( getStepInterval() * 0.5 );
+		
+	//		    std::cerr << "s " << getCurrentTime() 
+	//			      << ' ' << getStepInterval() 
+	//			      << std::endl;
+      }
+    
+    const Real maxError( getMaxErrorRatio() );
+
+    if( maxError < 0.5 )
+      {
+	// grow it if error is 50% less than desired
+	//	    Real aNewStepInterval( getStepInterval() * 2.0 );
+	
+	Real aNewStepInterval( getStepInterval() 
+			       * pow(maxError, -0.5) * safety );
+	
+	if( aNewStepInterval >= getUserMaxInterval() )
+	  {
+	    aNewStepInterval = getStepInterval();
+	  }
+	
+	//	    	    std::cerr << "g " << getCurrentTime() << ' ' 
+	//	    		      << aStepInterval << std::endl;
+	
+	setNextStepInterval( aNewStepInterval );
+      }
+    else
+      {
+	setNextStepInterval( getStepInterval() );
       }
   }
 
@@ -220,7 +262,8 @@ namespace libecs
 
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
-	VariablePtr const aVariable( theVariableProxyVector[ c ]->getVariable() );
+	VariablePtr const aVariable( theVariableProxyVector[ c ]->
+				     getVariable() );
 	
 	const Real aVelocity( aVariable->getVelocity() );
 
@@ -242,7 +285,8 @@ namespace libecs
     // restore theValueBuffer
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
-	VariablePtr const aVariable( theVariableProxyVector[ c ]->getVariable() );
+	VariablePtr const aVariable( theVariableProxyVector[ c ]->
+				     getVariable() );
 
 	// get k2 = f(x+h/2, y+k1*h/2)
 	const Real aVelocity( aVariable->getVelocity() );
@@ -269,19 +313,8 @@ namespace libecs
 	    
 	    if( maxError > 1.1 )
 	      {
-		// shrink it if the error exceeds 110%
-		//		    setStepInterval( getStepInterval() 
-		//				     * pow(maxError, -1.0)
-		//				     *  safety );
-		
-		setStepInterval( getStepInterval() * 0.5 );
-		
-		//		    std::cerr << "s " << getCurrentTime() 
-		//			      << ' ' << getStepInterval() 
-		//			      << std::endl;
-		
+		//		setMaxErrorRatio( maxError );
 		reset();
-
 		return 0;
 	      }
 	  }
@@ -292,30 +325,8 @@ namespace libecs
 	/// x(n+1) = x(n) + k2 * aStepInterval + O(h^3)
 	aVariable->setVelocity( theVelocityBuffer[ c ] );
       }
-    
-    if( maxError < 0.5 )
-      {
-	// grow it if error is 50% less than desired
-	//	    Real aNewStepInterval( getStepInterval() * 2.0 );
-	
-	Real aNewStepInterval( getStepInterval() 
-			       * pow(maxError, -0.5) * safety );
-	
-	if( aNewStepInterval >= getUserMaxInterval() )
-	  {
-	    aNewStepInterval = getStepInterval();
-	  }
-	
-	//	    	    std::cerr << "g " << getCurrentTime() << ' ' 
-	//	    		      << aStepInterval << std::endl;
-	
-	setNextStepInterval( aNewStepInterval );
-      }
-    else
-      {
-	setNextStepInterval( getStepInterval() );
-      }
 
+    setMaxErrorRatio( maxError );
     return 1;
   }
 
@@ -350,7 +361,40 @@ namespace libecs
 
     while( !calculate() )
       {
-	; // do nothing
+	// shrink it if the error exceeds 110%
+	//		    setStepInterval( getStepInterval() 
+	//				     * pow(maxError, -0.5) 
+	//				     * safety );
+
+	setStepInterval( getStepInterval() * 0.5 );
+
+	//		    std::cerr << "s " << getCurrentTime() 
+	//			      << ' ' << getStepInterval()
+	//			      << std::endl;
+      }
+
+    const Real maxError( getMaxErrorRatio() );
+
+    // grow it if error is 50% less than desired
+    if ( maxError < 0.5 )
+      {
+	Real aNewStepInterval( getStepInterval()
+			       * pow(maxError , -0.5)
+			       * safety );
+	//  	    Real aNewStepInterval( getStepInterval() * 2.0 );
+
+	if( aNewStepInterval >= getUserMaxInterval() )
+	  {
+	    aNewStepInterval = getStepInterval();
+	  }
+
+	//	    std::cerr << "g " << getCurrentTime() << ' ' 
+	//		      << getStepInterval() << std::endl;
+	setNextStepInterval( aNewStepInterval );
+      }
+    else 
+      {
+	setNextStepInterval( getStepInterval() );
       }
   }
 
@@ -368,7 +412,8 @@ namespace libecs
 
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
-	VariablePtr const aVariable( theVariableProxyVector[ c ]->getVariable() );
+	VariablePtr const aVariable( theVariableProxyVector[ c ]->
+				     getVariable() );
 	    
 	// get k1
 	const Real aVelocity( aVariable->getVelocity() );
@@ -387,7 +432,8 @@ namespace libecs
 
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
-	VariablePtr const aVariable( theVariableProxyVector[ c ]->getVariable() );
+	VariablePtr const aVariable( theVariableProxyVector[ c ]->
+				     getVariable() );
 	    
 	// get k2
 	const Real aVelocity( aVariable->getVelocity() );
@@ -414,7 +460,8 @@ namespace libecs
     // restore theValueBuffer
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
-	VariablePtr const aVariable( theVariableProxyVector[ c ]->getVariable() );
+	VariablePtr const aVariable( theVariableProxyVector[ c ]->
+				     getVariable() );
 	
 	const Real aVelocity( aVariable->getVelocity() );
 	
@@ -440,19 +487,8 @@ namespace libecs
 	    
 	    if( maxError > 1.1 )
 	      {
-		// shrink it if the error exceeds 110%
-		//		    setStepInterval( getStepInterval() 
-		//				     * pow(maxError, -0.5) 
-		//				     * safety );
-
-		setStepInterval( getStepInterval() * 0.5 );
-
-		//		    std::cerr << "s " << getCurrentTime() 
-		//			      << ' ' << getStepInterval()
-		//			      << std::endl;
-
-		reset();
-		
+		//		setMaxErrorRatio( maxError );
+		reset();		
 		return 0;
 	      }
 	  }
@@ -463,29 +499,8 @@ namespace libecs
 	//// x(n+1) = x(n) + k2 * aStepInterval + O(h^3)
 	aVariable->setVelocity( theVelocityBuffer[ c ] );
       }
-
-    // grow it if error is 50% less than desired
-    if ( maxError < 0.5 )
-      {
-	Real aNewStepInterval( getStepInterval()
-			       * pow(maxError , -0.5)
-			       * safety );
-	//  	    Real aNewStepInterval( getStepInterval() * 2.0 );
-
-	if( aNewStepInterval >= getUserMaxInterval() )
-	  {
-	    aNewStepInterval = getStepInterval();
-	  }
-
-	//	    std::cerr << "g " << getCurrentTime() << ' ' 
-	//		      << getStepInterval() << std::endl;
-	setNextStepInterval( aNewStepInterval );
-      }
-    else 
-      {
-	setNextStepInterval( getStepInterval() );
-      }
     
+    setMaxErrorRatio( maxError );
     return 1;
   }
 
@@ -527,7 +542,31 @@ namespace libecs
 
     while( !calculate() )
       {
-	; // do nothing
+	// shrink it if the error exceeds 110%
+	//		    setStepInterval( getStepInterval() 
+	//				     * pow(maxError, -0.20)
+	//				     *  safety );
+	setStepInterval( getStepInterval() * 0.5 );
+      }
+
+    const Real maxError( getMaxErrorRatio() );
+
+    // grow it if error is 50% less than desired
+    if (maxError <= 0.5)
+      {
+	Real aNewStepInterval( getStepInterval() 
+			       * pow(maxError , -0.25) * safety );
+	    
+	if( aNewStepInterval >= getUserMaxInterval() )
+	  {
+	    aNewStepInterval = getStepInterval();
+	  }
+	    	    
+	setNextStepInterval( aNewStepInterval );
+      }
+    else 
+      {
+	setNextStepInterval( getStepInterval() );
       }
   }
 
@@ -545,7 +584,8 @@ namespace libecs
 
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
-	VariablePtr const aVariable( theVariableProxyVector[ c ]->getVariable() );
+	VariablePtr const aVariable( theVariableProxyVector[ c ]->
+				     getVariable() );
 	    
 	// get k1
 	theK1[ c ] = aVariable->getVelocity();
@@ -569,7 +609,8 @@ namespace libecs
 
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
-	VariablePtr const aVariable( theVariableProxyVector[ c ]->getVariable() );
+	VariablePtr const aVariable( theVariableProxyVector[ c ]->
+				     getVariable() );
 	
 	theK2[ c ] = aVariable->getVelocity();
 	    
@@ -593,7 +634,8 @@ namespace libecs
 	
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
-	VariablePtr const aVariable( theVariableProxyVector[ c ]->getVariable() );
+	VariablePtr const aVariable( theVariableProxyVector[ c ]->
+				     getVariable() );
 	
 	theK3[ c ] = aVariable->getVelocity();
 	
@@ -618,7 +660,8 @@ namespace libecs
     
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
-	VariablePtr const aVariable( theVariableProxyVector[ c ]->getVariable() );
+	VariablePtr const aVariable( theVariableProxyVector[ c ]->
+				     getVariable() );
 	
 	theK4[ c ] = aVariable->getVelocity();
 	
@@ -644,7 +687,8 @@ namespace libecs
 	
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
-	VariablePtr const aVariable( theVariableProxyVector[ c ]->getVariable() );
+	VariablePtr const aVariable( theVariableProxyVector[ c ]->
+				     getVariable() );
 	
 	theK5[ c ] = aVariable->getVelocity();
 	    
@@ -678,7 +722,8 @@ namespace libecs
     // restore theValueBuffer
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
-	VariablePtr const aVariable( theVariableProxyVector[ c ]->getVariable() );
+	VariablePtr const aVariable( theVariableProxyVector[ c ]->
+				     getVariable() );
 	
 	theK6[ c ] = aVariable->getVelocity();
 
@@ -703,14 +748,8 @@ namespace libecs
 	    
 	    if( maxError > 1.1 )
 	      {
-		// shrink it if the error exceeds 110%
-		//		    setStepInterval( getStepInterval() 
-		//				     * pow(maxError, -0.20)
-		//				     *  safety );
-		setStepInterval( getStepInterval() * 0.5 );
-
+		//		setMaxErrorRatio( maxError );
 		reset();
-
 		return 0;
 	      }
 	  }
@@ -722,24 +761,7 @@ namespace libecs
 	aVariable->setVelocity( theVelocityBuffer[ c ] );
       }
 
-    // grow it if error is 50% less than desired
-    if (maxError <= 0.5)
-      {
-	Real aNewStepInterval( getStepInterval() 
-			       * pow(maxError , -0.25) * safety );
-	    
-	if( aNewStepInterval >= getUserMaxInterval() )
-	  {
-	    aNewStepInterval = getStepInterval();
-	  }
-	    	    
-	setNextStepInterval( aNewStepInterval );
-      }
-    else 
-      {
-	setNextStepInterval( getStepInterval() );
-      }
-
+    setMaxErrorRatio( maxError );
     return 1;
   }
 
@@ -780,7 +802,41 @@ namespace libecs
 
     while( !calculate() )
       {
-	; // do nothing
+	// shrink it if the error exceeds 110%
+	//		    setStepInterval( getStepInterval() 
+	//				     * pow(maxError, -0.2)
+	//				     *  safety );
+		
+	setStepInterval( getStepInterval() * 0.5 );
+		
+	//		    std::cerr << "s " << getCurrentTime() 
+	//			      << ' ' << getStepInterval() 
+	//			      << std::endl;
+      }
+
+    const Real maxError( getMaxErrorRatio() );
+    
+    if( maxError < 0.5 )
+      {
+	// grow it if error is 50% less than desired
+	//	    Real aNewStepInterval( getStepInterval() * 2.0 );
+	
+	Real aNewStepInterval( getStepInterval() 
+			       * pow(maxError, -0.2) * safety );
+	
+	if( aNewStepInterval >= getUserMaxInterval() )
+	  {
+	    aNewStepInterval = getStepInterval();
+	  }
+	
+	//	    	    std::cerr << "g " << getCurrentTime() << ' ' 
+	//	    		      << aStepInterval << std::endl;
+	
+	setNextStepInterval( aNewStepInterval );
+      }
+    else
+      {
+	setNextStepInterval( getStepInterval() );
       }
   }
 
@@ -799,7 +855,8 @@ namespace libecs
 
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
-	VariablePtr const aVariable( theVariableProxyVector[ c ]->getVariable() );
+	VariablePtr const aVariable( theVariableProxyVector[ c ]->
+				     getVariable() );
 	
 	// get k1
 	theK1[ c ] = aVariable->getVelocity();
@@ -821,7 +878,8 @@ namespace libecs
 
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
-	VariablePtr const aVariable( theVariableProxyVector[ c ]->getVariable() );
+	VariablePtr const aVariable( theVariableProxyVector[ c ]->
+				     getVariable() );
 	
 	// get k2
 	theK2[ c ] = aVariable->getVelocity();
@@ -846,7 +904,8 @@ namespace libecs
 
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
-	VariablePtr const aVariable( theVariableProxyVector[ c ]->getVariable() );
+	VariablePtr const aVariable( theVariableProxyVector[ c ]->
+				     getVariable() );
 	
 	// get k3
 	theK3[ c ] = aVariable->getVelocity();
@@ -872,7 +931,8 @@ namespace libecs
 
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
-	VariablePtr const aVariable( theVariableProxyVector[ c ]->getVariable() );
+	VariablePtr const aVariable( theVariableProxyVector[ c ]->
+				     getVariable() );
 	
 	// get k4
 	theK4[ c ] = aVariable->getVelocity();
@@ -898,7 +958,8 @@ namespace libecs
 
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
-	VariablePtr const aVariable( theVariableProxyVector[ c ]->getVariable() );
+	VariablePtr const aVariable( theVariableProxyVector[ c ]->
+				     getVariable() );
 	
 	// get k5
 	theK5[ c ] = aVariable->getVelocity();
@@ -925,7 +986,8 @@ namespace libecs
 
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
-	VariablePtr const aVariable( theVariableProxyVector[ c ]->getVariable() );
+	VariablePtr const aVariable( theVariableProxyVector[ c ]->
+				     getVariable() );
 	
 	// get k6
 	theK6[ c ] = aVariable->getVelocity();
@@ -956,7 +1018,8 @@ namespace libecs
     // restore theValueBuffer
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
-	VariablePtr const aVariable( theVariableProxyVector[ c ]->getVariable() );
+	VariablePtr const aVariable( theVariableProxyVector[ c ]->
+				     getVariable() );
 
 	// get k7
 	theK7[ c ] = aVariable->getVelocity();
@@ -980,19 +1043,8 @@ namespace libecs
 	    
 	    if( maxError > 1.1 )
 	      {
-		// shrink it if the error exceeds 110%
-		//		    setStepInterval( getStepInterval() 
-		//				     * pow(maxError, -0.2)
-		//				     *  safety );
-		
-		setStepInterval( getStepInterval() * 0.5 );
-		
-		//		    std::cerr << "s " << getCurrentTime() 
-		//			      << ' ' << getStepInterval() 
-		//			      << std::endl;
-		
+		//		setMaxErrorRatio( maxError );
 		reset();
-
 		return 0;
 	      }
 	  }
@@ -1003,30 +1055,8 @@ namespace libecs
 	/// O(h^6)
 	aVariable->setVelocity( theVelocityBuffer[ c ] );
       }
-    
-    if( maxError < 0.5 )
-      {
-	// grow it if error is 50% less than desired
-	//	    Real aNewStepInterval( getStepInterval() * 2.0 );
-	
-	Real aNewStepInterval( getStepInterval() 
-			       * pow(maxError, -0.2) * safety );
-	
-	if( aNewStepInterval >= getUserMaxInterval() )
-	  {
-	    aNewStepInterval = getStepInterval();
-	  }
-	
-	//	    	    std::cerr << "g " << getCurrentTime() << ' ' 
-	//	    		      << aStepInterval << std::endl;
-	
-	setNextStepInterval( aNewStepInterval );
-      }
-    else
-      {
-	setNextStepInterval( getStepInterval() );
-      }
 
+    setMaxErrorRatio( maxError );
     return 1;
   }
 

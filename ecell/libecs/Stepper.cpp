@@ -585,6 +585,7 @@ namespace libecs
     theStateToleranceFactor( 1.0 ),
     theDerivativeToleranceFactor( 1.0 ),
     safety( 0.9 ),
+    theMaxErrorRatio( 1.0 ),
     theTolerantStepInterval( 0.001 ),
     theNextStepInterval( 0.001 )
   {
@@ -626,6 +627,13 @@ namespace libecs
 				      Type2Type<Real>(),
 				      &DifferentialStepper::setDerivativeToleranceFactor,
 				      &DifferentialStepper::getDerivativeToleranceFactor
+				      ) );
+
+    registerSlot( getPropertySlotMaker()->
+		  createPropertySlot( "MaxErrorRatio", *this,
+				      Type2Type<Real>(),
+				      NULLPTR,
+				      &DifferentialStepper::getMaxErrorRatio
 				      ) ); 
   }
 
