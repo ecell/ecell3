@@ -62,7 +62,6 @@ DECLARE_ASSOCVECTOR
 DECLARE_ASSOCVECTOR
 ( String, Real, std::less<const String>, PropertyMap );
 
-
 template < class T, typename RET, typename ARG1 = void > 
 class ObjectMethodProxy;
 
@@ -786,6 +785,9 @@ appendVariableReferenceMethodInstruction( Code& aCode,
 	  "ExpressionCompiler: VariableReference attribute [" +
 	  aMethodName + "] not found." ); 
     }
+
+
+#undef APPEND_VARREF_METHOD
 
 }
 

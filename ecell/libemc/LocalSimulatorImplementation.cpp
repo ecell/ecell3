@@ -421,7 +421,7 @@ namespace libemc
     getLogger( aFullPNString )->setLoggerPolicy( aParamList );
   }
 
-  const libecs::PolymorphCref LocalSimulatorImplementation::
+  const libecs::Polymorph LocalSimulatorImplementation::
   getLoggerPolicy( libecs::StringCref aFullPNString ) const
   {
 

@@ -10,6 +10,8 @@
 
 USE_LIBECS;
 
+DECLARE_VECTOR( Real, RealVector );
+
 LIBECS_DM_CLASS( SSystemProcess, ESSYNSProcess )
 {
 

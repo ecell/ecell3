@@ -156,7 +156,7 @@ namespace libemc
     setLoggerPolicy( libecs::StringCref aFullPNString, 
 			      libecs::Polymorph aParamList ) ;
 
-    virtual const libecs::PolymorphCref 
+    virtual const libecs::Polymorph
     getLoggerPolicy( libecs::StringCref aFullPNString ) const;
 
 
