@@ -71,8 +71,10 @@ namespace libecs
 	// Tagname
 	anInnerVector.push_back( aVariableReference.getName() );
 	// FullID
-	anInnerVector.push_back( aVariableReference.getVariable()->
-				 getFullID().getString() );
+
+	FullID aFullID( aVariableReference.getVariable()->getFullID() );
+	aFullID.setEntityType( EntityType::NONE );
+	anInnerVector.push_back( aFullID.getString() );
 	// Coefficient
 	anInnerVector.push_back( aVariableReference.getCoefficient() );
 	// isAccessor

@@ -37,6 +37,12 @@
 namespace libecs
 {
 
+  StringCref EntityType::EntityTypeStringOfNone()
+  {
+    const static String aString;
+    return aString;
+  }
+
   StringCref EntityType::EntityTypeStringOfEntity()
   {
     const static String aString( "Entity" );
@@ -110,6 +116,8 @@ namespace libecs
   {
     switch( theType )
       {
+      case NONE:
+	return EntityTypeStringOfNone();
       case VARIABLE:
 	return EntityTypeStringOfVariable();
       case PROCESS:

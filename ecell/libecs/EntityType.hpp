@@ -132,6 +132,8 @@ namespace libecs
     }
 
 
+    static StringCref  EntityTypeStringOfNone();
+
     static StringCref  EntityTypeStringOfEntity();
 
     static StringCref  EntityTypeStringOfProcess();
