@@ -70,11 +70,18 @@ AC_CHECK_LIB(c, open, LIBC="-lc")
 AC_SUBST(LIBC)
 dnl
 
-AC_CHECK_LIB(dl, dlopen, LIBDL="-ldl")
-if test "$LIBDL" = ""; then
-AC_MSG_ERROR([The libdl could not be found.])
-fi
-AC_SUBST(LIBDL)
+dnl disable checking dlopen for windows
+case ${host_os} in
+  *cygwin* | *mingw* | *win32*)
+    ;;
+  *)
+    AC_CHECK_LIB(dl, dlopen, LIBDL="-ldl")
+    if test "$LIBDL" = ""; then
+      AC_MSG_ERROR([The libdl could not be found.])
+    fi
+    AC_SUBST(LIBDL) 
+    ;;
+esac
 
 AC_CHECK_LIB(gslcblas,main)
 AC_CHECK_LIB(gsl,main)
