@@ -47,7 +47,7 @@ dmsodir = ${DM_SO_DIR}
 dmso_DATA = ${SOS}
 
 %.so : %.cpp
-	${SHELL} ${ECELL3_DMC} -v --dmcompile=${top_srcdir}/../dmtool --no-stdinclude --no-stdlibdir --ldflags=-L${top_srcdir}/libecs $< -I${top_srcdir}/libecs -I${top_srcdir}/.. -I${top_srcdir}
+	${SHELL} ${ECELL3_DMC} -v --dmcompile=${top_srcdir}/../dmtool --no-stdinclude --no-stdlibdir --ldflags=-L${top_srcdir}/libecs --cxxflags='-I${top_srcdir}/libecs -I${top_srcdir}/.. -I${top_srcdir}' $< 
 
 clean-local:
 	${RM} -rf ${dmso_DATA}
