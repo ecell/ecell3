@@ -42,6 +42,7 @@ from gtk import *
 from ecell.ECS import *
 import string
 import sys
+import traceback
 from ecell.ecssupport import *
 
 #from PluginWindow import *
@@ -325,7 +326,17 @@ class OsogoPluginWindow(PluginWindow):
 	# ---------------------------------------------------------------
 	def createLogger( self, *objects ):
 
-		self.theSession.createLogger( createFullPNString(self.theFullPN()) )
+		try:
+			# creates loggerstub and call its create method.
+			self.theSession.createLoggerStub( createFullPNString(self.theFullPN()) ).create()
+
+		except:
+
+			# When to create log is failed, display error message on MessageWindow.
+			anErrorMessage = traceback.format_exception(sys.exc_type,sys.exc_value,sys.exc_traceback)
+			self.thePluginManager.printMessage( anErrorMessage )
+
+		# updates fandamental windows.
 		self.thePluginManager.updateFundamentalWindows()
 
 	# end of createLogger
