@@ -85,7 +85,7 @@ exit_if_failed make doc-pdf
 exit_if_failed make doc-html-archive
 
 
-exit_if_failed cp -a doc/refman $TARGET
+exit_if_failed cp -a doc/refman $TARGETDIR
 #exit_if_failed cp -a doc/??? $TARGET
 
 cleanup
