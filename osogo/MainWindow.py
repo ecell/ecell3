@@ -25,6 +25,8 @@ class MainWindow(Window):
 
         self.theSimulator = ecs.Simulator()
 
+        self.theUpdateInterval = 100
+
         Window.__init__( self )
 
         self.theHandlerMap = \
@@ -119,24 +121,30 @@ class MainWindow(Window):
 
     def startSimulation( self, a ) :
         self.printMessage( "start\n" )
+        self.theTimer = timeout_add(self.theUpdateInterval, self.updateByTimeOut, 0)
         self.theSimulator.run()
-        self.update()
+        self.update(0)
 
     def stopSimulation( self, a ) :
-        self.printMessage( 'this function STOP is not supported.\n' )
+        self.printMessage( "stop\n" )
         self.theSimulator.stop()
-        self.update()
+        self.update(0)
+        timeout_remove(self.theTimer)
 
     def stepSimulation( self, a ) : 
-        self.printMessage( "step " )
-#        self.printMessage( str( self.theCurrentTime ) )
-        self.printMessage( "\n" )
-        self.update()
+        self.printMessage( "step\n" )
+        self.update(0)
 
-    def update( self ):
+    def updateByTimeOut( self, a ):
+        timeout_remove(self.theTimer)
+        self.update(0)
+        self.theTimer = timeout_add(self.theUpdateInterval, self.updateByTimeOut, 0)
+
+    def update( self , a):
         aTime = self.theSimulator.getProperty( ( SYSTEM, '/', '/', 'CurrentTime') ) 
         self.theCurrentTime = aTime[0]
         self['time_entry'].set_text( str( self.theCurrentTime ) )
+        self.thePluginManager.updateAllPluginWindow()
         
     def createNewEntryList( self, button_obj ) :
         aEntryList = EntryListWindow.EntryListWindow( self )
