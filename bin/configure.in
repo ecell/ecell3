@@ -1,5 +1,6 @@
 dnl Process this file with autoconf to produce a configure script.
 AC_INIT(ecell3-em2eml)
+AC_CANONICAL_SYSTEM
 AM_INIT_AUTOMAKE(bin, 0.0)
 AM_CONFIG_HEADER([config.h])
 
@@ -9,7 +10,16 @@ dnl AC_PROG_CC
 dnl Checks for libraries.
 AC_PROG_CXX
 
-dnl Checks for header files.
+case ${host_os} in
+  *cygwin* | *mingw* | *win32*)
+    PYTHON_LIBS="-lpython22 -lboost_python"
+    ;;
+  *)
+    PYTHON_LIBS=
+    ;;
+esac
+AC_SUBST(PYTHON_LIBS) 
+
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 

@@ -9,11 +9,7 @@ libdir=@libdir@
 CXX=@CXX@
 ORIG_CXXFLAGS="@CXXFLAGS@"
 LDADD=-lstdc++
-if OS_WIN32
-    SHLEXT=.dll
-else
-    SHLEXT=@LTDL_SHLIB_EXT@  
-endif
+SHLEXT=@LTDL_SHLIB_EXT@  
 BASENAME=@BASENAME@
 CXXSUFFIX=".cpp"
 

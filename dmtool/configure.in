@@ -45,9 +45,17 @@ libltdl_cv_shlibext=`cat conftest`
 rm -f conftest
 ])
 if test -n "$libltdl_cv_shlibext"; then
-  LTDL_SHLIB_EXT=$libltdl_cv_shlibext
+  case ${host_os} in
+    *cygwin* | *mingw* | *win32*)
+    LTDL_SHLIB_EXT=".dll"
+    ;;
+  *)
+    LTDL_SHLIB_EXT=$libltdl_cv_shlibext
+    ;;
+  esac    
   AC_SUBST(LTDL_SHLIB_EXT)
 fi
+
 dnl
 dnl
 dnl
