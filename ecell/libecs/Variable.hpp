@@ -80,9 +80,14 @@ namespace libecs
 				   NOMETHOD,
 				   &Variable::getVelocity );
 
-	PROPERTYSLOT_NO_LOAD_SAVE( Real, MolarConc,
-				   &Variable::setMolarConc,
-				   &Variable::getMolarConc );
+	PROPERTYSLOT_LOAD_SAVE( Real, MolarConc,
+				&Variable::setMolarConc,
+				&Variable::getMolarConc,
+				&Variable::loadMolarConc,
+				NOMETHOD );
+	//	PROPERTYSLOT_NO_LOAD_SAVE( Real, MolarConc,
+	//				   &Variable::setMolarConc,
+	//				   &Variable::getMolarConc );
 
 	PROPERTYSLOT_NO_LOAD_SAVE( Real, NumberConc,
 				   &Variable::setNumberConc,
@@ -292,6 +297,22 @@ namespace libecs
     }
 
     /**
+       Load the molar concentration of this Variable.
+
+       This method uses loadNumberConc() instead of setNumberConc().
+
+       @see setNumberConc()
+    */
+
+    LOAD_METHOD( Real, MolarConc )
+    {
+      loadNumberConc( value * N_A );
+    }
+
+
+
+
+    /**
        Returns the number concentration of this Variable.
 
        Unlike getMolarConc, this method just returns value / size.
@@ -323,6 +344,25 @@ namespace libecs
       // impossible to inline this.
     }
 
+
+    /**
+       Load the number concentration of this Variable.
+
+       This method can be called before the SIZE Variable of 
+       the supersystem of this Variable is configured in
+       Model::initialize().
+
+       Thus this method gets the value of the SIZE Variable
+       without relying on the System::getSizeVariable() method
+       of the supersystem.
+
+       @see loadMolarConc()
+       @see System::getSizeVariable()
+       @see System::configureSizeVariable()
+       @see System::findSizeVariable()
+    */
+
+    LOAD_METHOD( Real, NumberConc );
 
     void registerProxy( InterpolantPtr const anInterpolant );
     //    void removeProxy( InterpolantPtr const anInterpolant );

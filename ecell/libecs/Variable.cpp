@@ -66,6 +66,22 @@ namespace libecs
     clearInterpolantVector();
   }
 
+
+  LOAD_METHOD_DEF( Real, NumberConc, Variable )
+  {
+    // Find the SIZE Variable by own.
+    // Here, it assumes that System::findSizeVariable() of the supersystem 
+    // of this Variable works correctly even at this stage of the model
+    // loading.  In other words, properties of Entities of the model should be
+    // loaded in the order from the root (/) to leaves, AND Value property
+    // of the found SIZE Variable is already set.
+    VariableCptr const aSizeVariable( getSuperSystem()->findSizeVariable() );
+    
+    setValue( value * aSizeVariable->getValue() );
+  }
+
+
+
   void Variable::clearInterpolantVector()
   {
     for( InterpolantVectorIterator i( theInterpolantVector.begin() );

@@ -244,7 +244,7 @@ namespace libecs
 
 	THROW_EXCEPTION( AlreadyExist, 
 			 "[" + getFullID().getString() + 
-			 "]: System [" + anID + "] already exist." );
+			 "]: System [" + anID + "] already exists." );
       }
 
     theSystemMap[ anID ] = aSystem;
@@ -338,7 +338,7 @@ namespace libecs
 
 	THROW_EXCEPTION( AlreadyExist, 
 			 "[" + getFullID().getString() + 
-			 "]: Process [" + anID + "] already exist." );
+			 "]: Process [" + anID + "] already exists." );
       }
 
     theProcessMap[ anID ] = aProcess;
@@ -358,7 +358,7 @@ namespace libecs
 
 	THROW_EXCEPTION( AlreadyExist, 
 			 "[" + getFullID().getString() + 
-			 "]: Variable [" + anID + "] already exist." );
+			 "]: Variable [" + anID + "] already exists." );
       }
 
     theVariableMap[ anID ] = aVariable;
