@@ -1,10 +1,21 @@
-## -----------------------------------------------------
-##
-##
-##   create simple EML file with emllib
-##
-##
-## -----------------------------------------------------
+
+# -----------------------------------------------------
+#
+#
+#   create simple EML file with emllib
+#
+#
+# -----------------------------------------------------
+#
+# [usage]
+#
+#  % /path/to/ecell3 createSimpleEml.py
+#
+#  A new file 'output.eml' is made.
+#
+#  (to make indentations, use nmaker program)
+#
+# -----------------------------------------------------
 
 __author__ = 'Ryosuke Suzuki'
 __email__  = 'suzuki@e-cell.org'
