@@ -649,7 +649,7 @@ class DataSeries:
                 upLimit = self.thePlot.thePlotAreaBox[1] + 1
                 downLimit = self.thePlot.thePlotAreaBox[3] - 1
                 leftLimit = self.thePlot.thePlotAreaBox[0] + 1
-                rightLimit = self.thePlot.thePlotAreaBox[2] + 1
+                rightLimit = self.thePlot.thePlotAreaBox[2] - 1
                 #either current or last point out of frame, do interpolation
                     
                 #interpolation section begins - only in case lastpoint or current point is off limits
