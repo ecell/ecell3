@@ -15,26 +15,42 @@
 
 
 <!-- ROOT -->
-<system class="System" stepper="SRM_01" id="/" name="Environment">
+<system class="System" id="/" name="Environment">
+
+<property name="StepperID">
+<value>SRM_01</value>
+</property>
+
 <property name="Volume">
 <value number="0">0.000000000000001</value>
 </property>
+
 </system>
 
 
 
 <!-- CELL -->
-<system class="System" stepper="SRM_01" id="/CELL" name="Cell">
+<system class="System" id="/CELL" name="Cell">
+
+<property name="StepperID">
+<value>SRM_01</value>
+</property>
+
 <property name="Volume">
 <value number="0">unknown</value>
 </property>
+
 </system>
 
 
 
 
 <!-- CYTOPLASM -->
-<system class="System" stepper="SRM_01" id="/CELL/CYTOPLASM" name="Cytoplasm">
+<system class="System" id="/CELL/CYTOPLASM" name="Cytoplasm">
+
+<property name="StepperID">
+<value>SRM_01</value>
+</property>
 
 <property name="Volume">
 <value number="0">1e-18</value>
