@@ -993,8 +993,8 @@ class Plot:
             self.thePlotArea[2]+self.thePlotArea[0],\
             self.thePlotArea[3]+self.thePlotArea[1]]
         fontHeight = self.theAscent + self.theDescent
-        self.theCoordinateArea = [self.theOrigo[0] + 50, 5, self.thePlotWidth - 20, fontHeight ]
-
+        self.persistentCoordArea = [200, 5, self.thePlotWidth / 2 - 100, fontHeight ]
+        self.temporaryCoordArea = [ 100 + self.thePlotWidth / 2 , 5, self.thePlotWidth / 2 -100, fontHeight ]
         self.historyArea = [ 5, self.thePlotHeight - fontHeight, self.theFont.string_width( MODE_HISTORY ), fontHeight ]
         self.theXAxis.recalculateSize()
         self.theYAxis.recalculateSize()
@@ -1152,20 +1152,23 @@ class Plot:
         pass
 
     def showPersistentCoordinates( self, x, y ):
-        pass
+        self.displayCoordinates( x, y, self.persistentCoordArea )
 
-    def displayCoordinates( self, x, y ):
+    def showTempCoordinates( self, x, y ):
+        self.displayCoordinates( x, y, self.temporaryCoordArea )
+
+
+    def displayCoordinates( self, x, y, aBox ):
         # displays coordinates at the top of chart
         aCoords = self.convertPlotCoordinates( x, y )
-        if aCoords == None:
-            pass
-        pass
+        # delete coord area
+        self.drawBox( BACKGROUND_COLOR, aBox[0], aBox[1], aBox[2], aBox[3] )
+        # write new coordinates
+        if aCoords != None:
+            text = num_to_sci( aCoords[0] ) + "  x  " + num_to_sci( aCoords[1] )
+            self.drawText( PEN_COLOR, aBox[0], aBox[1], text )
             
-
-    def deleteCoordinates( self ):
-        # greys coordinates
-        pass
-
+  
 
     def convertPlotCoordinates( self, x, y ):
         # retunrs [xcoord, ycoord] or None if outside
@@ -1179,11 +1182,11 @@ class Plot:
             return None
         return realCoords
 
-            
+
     def motion(self,obj,event):
         x=event.x
         y=event.y
-        self.displayCoordinates( x, y )
+        self.showTempCoordinates( x, y )
         #if keypressed undo previous  one
         if self.theZoomKeyPressed:
             self.drawxorbox(self.realx0,self.realy0,self.realx1,self.realy1)
