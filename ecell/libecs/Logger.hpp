@@ -88,7 +88,7 @@ namespace libecs
 
      */
 
-    const DataPointVector getData( void ) const;
+    DataPointVectorCref getData( void ) const;
 
     /**
 
@@ -175,13 +175,21 @@ namespace libecs
 
      */
 
-    const_iterator binary_search( const_iterator begin,
-				  const_iterator end,
-				  RealCref t ) const
+    const_iterator lower_bound( const_iterator begin,
+				const_iterator end,
+				RealCref t ) const
     {
-      return theDataPointVector.binary_search( begin, end, t );
+      return theDataPointVector.lower_bound( begin, end, t );
     }
     
+    const_iterator upper_bound( const_iterator begin,
+				const_iterator end,
+				RealCref t ) const
+    {
+      return theDataPointVector.upper_bound( begin, end, t );
+    }
+    
+
 
   private:
 

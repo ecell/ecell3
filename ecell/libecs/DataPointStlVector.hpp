@@ -64,6 +64,14 @@ namespace libecs
       ; // do nothing
     }
 
+    DataPointStlVector( const_iterator start, const_iterator end )
+      :
+      theContainer( start, end )
+    {
+      ; // do nothing
+    }
+
+
     DataPointStlVector( DataPointStlVectorCref vector )
       :
       theContainer( vector.getContainer() )
@@ -158,9 +166,20 @@ namespace libecs
       theContainer.push_back( Containee( t, v ) );
     }
 
-    const_iterator binary_search( const_iterator first,
-				  const_iterator last,
-				  RealCref) const;
+    static const_iterator lower_bound( const_iterator first,
+				       const_iterator last,
+				       RealCref aTime ) 
+    {
+      return std::lower_bound( first, last, aTime );
+    }
+
+    static const_iterator upper_bound( const_iterator first,
+				       const_iterator last,
+				       RealCref aTime ) 
+    {
+      return std::upper_bound( first, last, aTime );
+    }
+
 
   private:
     Container theContainer;

@@ -104,7 +104,18 @@ namespace libecs
 
 
     // FIXME
-    bool operator<( DataPointCref second )
+    bool operator<( RealCref second ) const
+    {
+      if( getTime() < second )
+	{
+	  return true;
+	}
+      return false;
+    }
+
+
+    // FIXME
+    bool operator<( DataPointCref second ) const
     {
       if( getTime() < second.getTime() )
 	{
@@ -182,6 +193,17 @@ namespace libecs
     
   };
   
+  inline bool operator< ( RealCref aTime, DataPointCref aDataPoint )
+  {
+
+    if( aTime < aDataPoint.getTime() )
+      {
+	return true;
+      }
+    return false;
+
+  }
+
   
 
 } // namespace libecs

@@ -64,20 +64,6 @@ namespace libecs
   //
 
 
-  DataPointStlVector::const_iterator 
-  DataPointStlVector::
-  binary_search(const_iterator first,
-		const_iterator last,
-		RealCref aTime) const
-  {
-    /*
-    Containee aContainee( aTime, aTime );
-    const_iterator itr = lower_bound( first, last, &aContainee );
-    return itr;
-    */
-  }
-
-
 } // namespace libecs
 
 

@@ -48,6 +48,11 @@ except:
     
 print 'set Substance:/:A Quantity = 30'
 s.setProperty( ( SUBSTANCE, '/', 'A', 'Quantity' ), (30,) )
+l = s.getLogger( ( SUBSTANCE, '/', 'A', 'Quantity') )
+#print l
+
+
+print dir(l)
 
 print 'initialize()...'
 s.initialize()
@@ -91,7 +96,7 @@ s.step()
 
 printProperty( s, ( SYSTEM, '/', '/', 'CurrentTime' ) )
 
-for i in xrange( 1000 ):
+for i in xrange( 10000 ):
     s.step()
 
 printProperty( s, ( SYSTEM, '/', '/', 'CurrentTime' ) )
@@ -99,3 +104,15 @@ printProperty( s, ( SYSTEM, '/', '/', 'CurrentTime' ) )
 printProperty( s, ( SYSTEM, '/', '/', 'StepInterval' ) )
 printProperty( s, ( SYSTEM, '/', 'CYTOPLASM', 'StepInterval' ) )
     
+print 'logger getData...'
+d = l.getData()
+print len( d )
+
+d = l.getData( 2, 8 )
+print len( d )
+
+d = l.getData( 0, 5,0.005 )
+print len( d )
+
+
+

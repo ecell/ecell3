@@ -28,6 +28,8 @@
 // E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
 
+#include <iostream>
+
 #include "PropertyInterface.hpp"
 
 /*
@@ -57,9 +59,9 @@ namespace libecs
   } 
   
   
-  const Logger::DataPointVector Logger::getData( void ) const
+  Logger::DataPointVectorCref Logger::getData( void ) const
   {
-    return DataPointVector(theDataPointVector);
+    return theDataPointVector;
   }
   
   //
@@ -67,30 +69,21 @@ namespace libecs
   const Logger::DataPointVector Logger::getData( RealCref aStartTime,
 						 RealCref anEndTime ) const
   {
-    /*
-    const_iterator itr_1( theDataPointVector.begin() );
-    const_iterator itr_2( theDataPointVector.end() );
+    const const_iterator aHeadItr( theDataPointVector.begin() );
+    const const_iterator aTailItr( theDataPointVector.end() );
     
-    
-    const_iterator 
-      aStartIterator( theDataPointVector.binary_search( itr_1,
-							itr_2,
-							aStartTime ) );
-    const_iterator 
-      anEndIterator( theDataPointVector.binary_search( itr_1,
-						       itr_2,
-						       anEndTime ) );
-    DataPointVector aNewDataPointVector;
-    while( aStartIterator != anEndIterator )
-      {
-	//  std::cerr << UVariable((*aStartIterator)->getTime()).asString() 
-	//		  << std::endl;
-	aNewDataPointVector.push( **aStartIterator );
-	++aStartIterator;
-      }
-    
+    const const_iterator 
+      aStartIterator( theDataPointVector.lower_bound( aHeadItr,
+						      aTailItr,
+						      aStartTime ) );
+    const const_iterator 
+      anEndIterator( theDataPointVector.upper_bound( aStartIterator,
+						     aTailItr,
+						     anEndTime ) );
+
+    DataPointVector aNewDataPointVector( aStartIterator, anEndIterator );
+
     return aNewDataPointVector;
-    */
   }
   
   
@@ -101,33 +94,42 @@ namespace libecs
 						 RealCref anEndTime,
 						 RealCref anInterval ) const
   {
-    /*
-    const_iterator aFirstIterator( binary_search( theDataPointVector.begin(),
-						  theDataPointVector.end(),
-						  aStartTime ) );
-
-    const_iterator aLastIterator( binary_search( aFirstIterator,
-						 theDataPointVector.end(),
-						 anEndTime ) );
-
+    const const_iterator aHeadIterator( theDataPointVector.begin() );
+    const const_iterator aTailIterator( theDataPointVector.end() );
     
-    Real aTime( aStartTime );
-    Real aLastTime( (*aLastIterator)->getTime() );
+    const_iterator 
+      aStartIterator( theDataPointVector.lower_bound( aHeadIterator,
+						      aTailIterator,
+						      aStartTime ) );
+    const_iterator 
+      anEndIterator( theDataPointVector.upper_bound( aStartIterator,
+						     aTailIterator,
+						     anEndTime ) );    
+
+    if( anEndIterator == aTailIterator )
+      {
+	--anEndIterator;
+      }
+    
+    Real aTime( aStartIterator->getTime() );
+    const Real aLastTime( anEndIterator->getTime() );
 
     DataPointVector aDataPointVector;
-    while( aTime <  aLastTime ) // FIXME
+    aDataPointVector.push( *aStartIterator );
+
+    while( aTime <  aLastTime )
       {
 	const_iterator 
-	  anIterator( theDataPointVector.binary_search( aFirstIterator,
-							aLastIterator,
-							aTime + anInterval ) );
-	aDataPointVector.push( **anIterator );
-	aTime = (*anIterator)->getTime();
-	aFirstIterator = anIterator;
+	  anIterator( theDataPointVector.lower_bound( aStartIterator,
+						      anEndIterator,
+						      aTime + anInterval ) );
+	DataPointCref anDataPoint( *anIterator );
+	aDataPointVector.push( anDataPoint );
+	aTime = anDataPoint.getTime();
+	aStartIterator = anIterator;
       }
     
     return aDataPointVector;
-    */
   }
   
   
