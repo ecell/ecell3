@@ -49,6 +49,8 @@ class MainWindow(Window):
 
         self.thePluginManager = PluginManager()
 
+        self.theCurrentTime = 0
+
         #### create Script File Selection ####
         self.theScriptFileSelection = gtk.GtkFileSelection( 'Select Script File' )
         self.theScriptFileSelection.ok_button.connect('clicked', self.loadScript)
@@ -107,10 +109,16 @@ class MainWindow(Window):
     def exit( self, obj ):
         mainQuit()
 
-    def startSimulation( self, a ) : pass
+    def startSimulation( self, a ) :
+        self.printMessage( "start\n" )
+
     def stopSimulation( self, a ) :
         self.printMessage( 'this function STOP is not supported.\n' )
-    def stepSimulation( self, a ) : pass
+
+    def stepSimulation( self, a ) : 
+        self.theCurrentTime += 1.0
+        self.printMessage( "step " )
+        self.printMessage( str( self.theCurrentTime ) )
 
     def createNewEntryList( self, button_obj ) :
         aEntryList = EntryListWindow.EntryListWindow( self )
@@ -133,6 +141,7 @@ class MainWindow(Window):
         self.printMessage( fullpnstring )
         self.printMessage( ' = ' )
         self.printMessage( str(value[0]) )
+        self.theMessageWindow.printMessage( "\n" )
     
     def printAllProperties( self, fullid ):
         properties = self.theSimulator.getProperty( fullid +  ('PropertyList',) )

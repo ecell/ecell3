@@ -7,6 +7,7 @@ class MessageWindow(Window):
 
     def __init__( self ):
         Window.__init__( self, 'MessageWindow.glade' )
+        self.printMessage('')
 
     def printMessage( self, aMessageString ):
         self["message_text_box"].insert_text( aMessageString )
