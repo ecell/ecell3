@@ -1,0 +1,91 @@
+@{cpplineno()}
+
+#include "libecs/libecs.hpp"
+#include "@(BASECLASS).hpp"
+
+namespace libecs
+{
+
+  class @(CLASSNAME)
+    :  
+    public @(BASECLASS)
+  {
+  
+  public:
+
+    @(CLASSNAME)();
+    ~@(CLASSNAME)();
+
+@{propertymethods()}
+
+@{methodDecls()}
+
+    virtual void initialize();
+
+    static ReactorPtr createInstance() 
+    { 
+      return new @(CLASSNAME);
+    }
+   
+    StringLiteral getClassName() const { return "@(CLASSNAME)"; }
+
+
+  protected:
+    
+    void makeSlots();
+            
+@{propertyvariabledecls()}
+
+@{reactantpropertyslotvariabledecls()}
+
+  };
+
+
+}
+
+
+#include <iostream>
+
+#include "libecs/System.hpp"
+#include "libecs/Substance.hpp"
+#include "libecs/Util.hpp"
+
+
+//#include "MichaelisUniUniReactor.hpp"
+
+
+using namespace libecs;
+
+extern "C"
+{
+  ReactorAllocatorFunc CreateObject =
+  &@(CLASSNAME)::createInstance;
+}  
+
+@(CLASSNAME)::@(CLASSNAME)()
+{
+  makeSlots();
+@{propertyvariableinit()}
+}
+
+@(CLASSNAME)::~@(CLASSNAME)()
+{
+}
+
+void @(CLASSNAME)::makeSlots()
+{
+@{createpropertyslots()}
+}
+
+
+void @(CLASSNAME)::initialize()
+{
+  @(BASECLASS)::initialize();
+
+@{getpropertyslotofreactant()}
+
+
+}
+
+
+@{methodDefs('differentiate')}
