@@ -159,6 +159,21 @@ namespace libecs
       return theActivity;
     }
 
+
+    /**
+       Create a new VariableReference.
+
+       This method gets a Polymorph which contains
+       ( name, [ fullid, [ [ coefficient ] , accessor_flag ] ] ).
+
+       If only the name is given, the VariableReference with the name
+       is removed from this Process.
+
+       Default values of coefficient and accessor_flag are 0 and true (1).
+       
+       @param aValue a PolymorphVector specifying a VariableReference.
+    */
+
     void setVariableReference( PolymorphVectorCref aValue );
 
     void setVariableReferenceList( PolymorphCref );
@@ -167,14 +182,25 @@ namespace libecs
 
     void removeVariableReference( StringCref aName );
 
-    void registerVariableReference( StringCref aName, FullIDCref aFullID,
-				    const Int aCoefficient );
-
-    void registerVariableReference( StringCref aName, VariablePtr aVariable, 
-				    const Int aCoefficient );
 
     /**
-       Get VariableReference by tag name.
+       Register a new VariableReference to theVariableReferenceVector.
+
+       VariableReferences are sorted by coefficients, preserving the relative
+       order by the names.
+
+       @param aName name of the VariableReference. 
+       @param aVariable a Pointer to the Variable.
+       @param aCoefficient an Int value of the coefficient.
+    */
+
+    void registerVariableReference( StringCref aName, 
+				    VariablePtr aVariable, 
+				    const Int aCoefficient, 
+				    const bool isAccessor = true );
+
+    /**
+       Get VariableReference by a tag name.
 
        @param aVariableReferenceName
        @return a VariableReference
@@ -182,8 +208,6 @@ namespace libecs
     */
 
     VariableReference getVariableReference( StringCref aVariableReferenceName );
-
-    VariableReferenceVectorIterator findVariableReference( StringCref aName );
 
     /**
        @return a const reference to the VariableReferenceVector
@@ -194,10 +218,24 @@ namespace libecs
       return theVariableReferenceVector;
     }
 
+    /**
+       Set a priority value of this Process.
+
+       The priority is an Int value which is used to determine the
+       order of call to Process::process() method in Stepper.
+
+       @param aValue the priority value as an Int.
+       @see Stepper
+    */
+
     void setPriority( IntCref aValue )
     {
       thePriority = aValue;
     }
+
+    /**
+       @see setPriority()
+    */
 
     const Int getPriority() const
     {
@@ -241,7 +279,57 @@ namespace libecs
       return getSuperSystem()->getModel();
     }
 
+
+    /**
+       Add a value to each of VariableReferences.
+
+       For each VariableReference, the new value is: 
+       old_value + ( aValue * theCoeffiencnt ).
+
+       VariableReferences with zero coefficients are skipped for optimization.
+
+       This is a convenient method for use in subclasses.
+
+       @param aValue aReal value to be added.
+    */
+
+    void addValue( const Real aValue )
+    {
+      setActivity( aValue );
+
+      // Increase or decrease variables, skipping zero coefficients.
+      std::for_each( theVariableReferenceVector.begin(),
+		     theFirstZeroVariableReferenceIterator,
+		     std::bind2nd
+		     ( std::mem_fun_ref
+		       ( &VariableReference::addValue ), aValue ) );
+
+      std::for_each( theFirstPositiveVariableReferenceIterator,
+		     theVariableReferenceVector.end(),
+		     std::bind2nd
+		     ( std::mem_fun_ref
+		       ( &VariableReference::addValue ), aValue ) );
+    }
+
+    /**
+       Unset all the products' isAccessor() bit.
+
+       As a result these becomes write-only VariableReferences.
+
+       This method is typically called in initialize() of subclasses.
+
+       This method should be called before getVariableReference().
+
+       This is a convenient method.
+
+    */
+
+    void declareUnidirectional();
+
+
   protected:
+
+    VariableReferenceVectorIterator findVariableReference( StringCref aName );
 
     void makeSlots();
 

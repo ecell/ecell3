@@ -55,25 +55,6 @@ namespace libecs
 		       ( &VariableReference::addFlux ), aVelocity ) );
     }
 
-    /**
-       Unset all the products' isAccessor() bit.
-
-       As a result these becomes write-only VariableReferences.
-
-       This method is typically called in initialize() of subclasses.
-
-       This method should be called before getVariableReference().
-
-    */
-
-    void declareUnidirectional()
-    {
-      std::for_each( theFirstPositiveVariableReferenceIterator,
-		     theVariableReferenceVector.end(),
-		     std::bind2nd
-		     ( std::mem_fun_ref
-		       ( &VariableReference::setIsAccessor ), false ) );
-    }
 
 
   };

@@ -176,50 +176,54 @@ namespace libecs
 
     UnsignedInt aVectorSize( aValue.size() );
     
-    // Require ( tagname, fullid [ , coefficient ] ) 2,3-tuple
-    if( aVectorSize < 2 )
+    // Require at least a VariableReference name.
+    if( aVectorSize == 0 )
       {
 	THROW_EXCEPTION( ValueError, "Process [" + getFullID().getString()
 			 + "]: ill-formed VariableReference given." );
       }
 
     const String aVariableReferenceName(  aValue[0].asString() );
-    const String aFullIDString( aValue[1].asString() );
-    if( ! aFullIDString.empty() )
-      {
-	const FullID aFullID( aValue[1].asString() );
-	Int          aCoefficient( 0 );
-	
-	if( aVectorSize >= 3 )
-	  {
-	    aCoefficient = aValue[2].asInt();
-	  }
-	
-	registerVariableReference( aVariableReferenceName, aFullID, 
-				   aCoefficient );
-      }
-    else // if the FullID is empty, remove the VariableReference
+
+    // If it contains only the VariableReference name,
+    // remove the VariableReference from this process
+    if( aVectorSize == 1 )
       {
 	removeVariableReference( aVariableReferenceName );
       }
-  }
 
 
-
-  void Process::registerVariableReference( StringCref aName, 
-					   FullIDCref aFullID, 
-					   const Int aCoefficient )
-  {
+    const String aFullIDString( aValue[1].asString() );
+    const FullID aFullID( aValue[1].asString() );
+    Int          aCoefficient( 0 );
+    
     SystemPtr aSystem( getModel()->getSystem( aFullID.getSystemPath() ) );
     VariablePtr aVariable( aSystem->getVariable( aFullID.getID() ) );
-
-    registerVariableReference( aName, aVariable, aCoefficient );
+    
+    if( aVectorSize >= 3 )
+      {
+	aCoefficient = aValue[2].asInt();
+      }
+    
+    if( aVectorSize >= 4 )
+      {
+	const bool anIsAccessorFlag( static_cast<bool>( aValue[3].asInt() ) );
+	registerVariableReference( aVariableReferenceName, aVariable,
+				   aCoefficient, anIsAccessorFlag );
+      }
+    else
+      {
+	registerVariableReference( aVariableReferenceName, aVariable, 
+				   aCoefficient );
+      }
+    
   }
 
 
   void Process::registerVariableReference( StringCref aName, 
 					   VariablePtr aVariable, 
-					   const Int aCoefficient )
+					   const Int aCoefficient,
+					   const bool isAccessor )
   {
     VariableReference aVariableReference( aName, aVariable, aCoefficient );
     theVariableReferenceVector.push_back( aVariableReference );
@@ -239,8 +243,8 @@ namespace libecs
 
     // find the first VariableReference whose coefficient is 0,
     // and the first VariableReference whose coefficient is positive.
-    std::pair<VariableReferenceVectorIterator,
-      VariableReferenceVectorIterator> 
+    std::pair
+      <VariableReferenceVectorIterator, VariableReferenceVectorIterator> 
       aZeroRange( std::equal_range( theVariableReferenceVector.begin(), 
 				    theVariableReferenceVector.end(), 
 				    0, 
@@ -272,6 +276,14 @@ namespace libecs
 		     "] not found in this Process." );
   }
 
+  void Process::declareUnidirectional()
+  {
+    std::for_each( theFirstPositiveVariableReferenceIterator,
+		   theVariableReferenceVector.end(),
+		   std::bind2nd
+		   ( std::mem_fun_ref
+		     ( &VariableReference::setIsAccessor ), false ) );
+  }
 
   void Process::initialize()
   {

@@ -197,6 +197,20 @@ namespace libecs
       theVariablePtr->setValue( aValue );
     }
 
+    /**
+       Add a value to the variable according to the coefficient.
+       
+       Set a new value to the variable.  
+       The new value is: old_value + ( aValue * theCoeffiencnt ).
+
+       @param aValue a Real value to be added.
+    */
+
+    void addValue( const Real aValue )
+    {
+      setValue( ( aValue * theCoefficient ) + getValue() );
+    }
+
     const Real getConcentration() const
     {
       return theVariablePtr->getConcentration();
