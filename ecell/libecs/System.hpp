@@ -67,8 +67,10 @@ namespace libecs
       INHERIT_PROPERTIES( Entity );
       
       //    PROPERTYSLOT_SET_GET( Real,      Dimension );
-      PROPERTYSLOT_GET    ( Real,      Size );
       PROPERTYSLOT_SET_GET( String,    StepperID );
+      
+      PROPERTYSLOT_GET_NO_LOAD_SAVE( Real,      Size );
+
     }
 
     System();
