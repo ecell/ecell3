@@ -178,6 +178,9 @@ namespace libecs
 
     // reset the stepper current time
     setCurrentTime( aCurrentTime );
+
+    // set the error limit interval
+    setOriginalStepInterval( getStepInterval() );
   }
 
 
@@ -271,8 +274,14 @@ namespace libecs
     if( maxError > 1.1 )
       {
 	reset();
+	setOriginalStepInterval( 0.0 );
+
 	return false;
       }
+
+
+    // set the error guaranteed interval
+    setOriginalStepInterval( getStepInterval() );
 
     return true;
   }
@@ -400,8 +409,13 @@ namespace libecs
     if ( maxError > 1.1 )
       {
 	reset();
+	setOriginalStepInterval( 0.0 );
+
 	return false;
       }
+
+    // set the error limit interval
+    setOriginalStepInterval( getStepInterval() );
 
     return true;
   }
@@ -623,8 +637,13 @@ namespace libecs
     if( maxError > 1.1 )
       {
 	reset();
+	setOriginalStepInterval( 0.0 );
+
 	return false;
       }
+
+    // set the error limit interval
+    setOriginalStepInterval( getStepInterval() );
 
     return true;
   }
@@ -923,6 +942,7 @@ namespace libecs
 	// reset the stepper current time
 	setCurrentTime( aCurrentTime );
 	reset();
+	setOriginalStepInterval( 0.0 );
 
 	return false;
       }
@@ -948,6 +968,9 @@ namespace libecs
       }
 
     setCurrentTime( aCurrentTime );
+
+    // set the error limit interval
+    setOriginalStepInterval( getStepInterval() );
 
     return true;
   }

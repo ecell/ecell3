@@ -203,7 +203,7 @@ namespace libecs
 
       const Real interpolate( RealCref anInterval )
       {
-	const Real theta( anInterval / theStepper.getStepInterval() );
+	const Real theta( anInterval / theStepper.getOriginalStepInterval() );
 
 	const Real k1 = theStepper.getK1()[ theIndex ];
 	const Real k2 = theStepper.getMidVelocityBuffer()[ theIndex ];

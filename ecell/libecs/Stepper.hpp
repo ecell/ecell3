@@ -234,6 +234,21 @@ namespace libecs
       return getStepInterval();
     }
 
+    /**
+       theOriginalStepInterval for getDifference(),
+       must need to be independent of interruption, theStepInterval.
+    */
+
+    void setOriginalStepInterval( RealCref aValue )
+    {
+      theOriginalStepInterval = aValue;
+    }
+
+    const Real getOriginalStepInterval() const
+    {
+      return theOriginalStepInterval;
+    }
+
     void registerLoggedPropertySlot( PropertySlotPtr );
 
     const String getID() const
@@ -474,6 +489,7 @@ namespace libecs
     Real                theCurrentTime;
 
     Real                theStepInterval;
+    Real                theOriginalStepInterval;
 
     Real                theMinInterval;
     Real                theMaxInterval;
@@ -640,10 +656,13 @@ namespace libecs
 
       virtual const Real getDifference( RealCref aTime, RealCref anInterval )
       {
+	const Real anOriginalStepInterval
+	  ( theStepper.getOriginalStepInterval() );
+
 	const Real aTimeInterval( aTime - theStepper.getCurrentTime() );
 
 	const Real theta( ( aTimeInterval + aTimeInterval - anInterval )
-			   / theStepper.getStepInterval() );
+			  / anOriginalStepInterval );
 
 	const Real k1 = theStepper.getK1()[ theIndex ];
 	const Real k2 = theStepper.getVelocityBuffer()[ theIndex ];

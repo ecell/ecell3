@@ -61,6 +61,10 @@ namespace libecs
 			 &Stepper::setStepInterval,
 			 &Stepper::getStepInterval );
 
+    DEFINE_PROPERTYSLOT( "OriginalStepInterval", Real,
+			 &Stepper::setOriginalStepInterval,
+			 &Stepper::getOriginalStepInterval );
+
     DEFINE_PROPERTYSLOT( "MaxInterval", Real,
 			 &Stepper::setMaxInterval,
 			 &Stepper::getMaxInterval );
@@ -103,6 +107,7 @@ namespace libecs
     theSchedulerIndex( -1 ),
     theCurrentTime( 0.0 ),
     theStepInterval( 0.001 ),
+    theOriginalStepInterval( 0.001 ),
     theMinInterval( std::numeric_limits<Real>::min() * 10 ),
     theMaxInterval( std::numeric_limits<Real>::max() * .1 )
   {
@@ -857,10 +862,19 @@ namespace libecs
 	    {
 	      setStepInterval( getMinInterval() );
 
-	      // this must return false
+	      // this must return false,
+	      // so theOriginalStepInterval does NOT LIMIT the error.
 	      calculate();
+	      setOriginalStepInterval( getMinInterval() );
 	      break;
 	    }
+      }
+
+    if ( getOriginalStepInterval() < getMinInterval() )
+      {
+	THROW_EXCEPTION( SimulationError,
+			 "The error-limit step interval of Stepper [" + 
+			 getID() + "] is too small." );
       }
 
     const Real anAdaptedStepInterval( getStepInterval() );
