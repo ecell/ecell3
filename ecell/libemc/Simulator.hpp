@@ -560,19 +560,6 @@ namespace libemc
     }
 
     /**
-       Initialize the simulator.
-
-       This method is automatically called before step() and run().
-       Usually no need to call this explicitly.
-    */
-
-    void initialize()
-    {
-      theSimulatorImplementation->initialize();
-    }
-
-
-    /**
        Get current time of the simulator.
 
        @return current time of the simulator

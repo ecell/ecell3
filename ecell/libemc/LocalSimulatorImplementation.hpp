@@ -174,8 +174,6 @@ namespace libemc
 
     virtual void step( const libecs::Integer aNumSteps );
 
-    virtual void initialize();
-
     virtual const libecs::Real getCurrentTime() const;
 
     virtual void run();
@@ -204,6 +202,8 @@ namespace libemc
       return theModel; 
     }
 
+    void initialize() const;
+
     libecs::LoggerPtr getLogger( libecs::StringCref aFullPNString ) const;
 
 
@@ -230,7 +230,7 @@ namespace libemc
 	}
     }
 
-    void clean()
+    void clean() const
     {
       if( isDirty() )
 	{
@@ -254,7 +254,7 @@ namespace libemc
 
     bool                       theRunningFlag;
 
-    bool                       theDirtyFlag;
+    mutable bool               theDirtyFlag;
 
     libecs::Integer            theEventCheckInterval;
 

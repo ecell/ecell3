@@ -168,8 +168,6 @@ BOOST_PYTHON_MODULE( _emc )
     
     .def( "setEventChecker",             &Simulator::setEventChecker )
     .def( "setEventHandler",             &Simulator::setEventHandler )
-    // usually no need to call this explicitly
-    .def( "initialize",                  &Simulator::initialize )
 
     //    .def( "getLoadedDMList",             &Simulator::getLoadedDMList )
     ;  

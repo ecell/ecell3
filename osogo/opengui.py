@@ -136,7 +136,6 @@ def main():
 		else:
 
 			# initialize & update windows
-			aSession.theSimulator.initialize()
 			aMainWindow = aSession.openWindow('MainWindow')
 			aSession.updateWindows()
 

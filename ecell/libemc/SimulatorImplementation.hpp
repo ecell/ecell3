@@ -179,8 +179,6 @@ namespace libemc
 
     virtual void step( const libecs::Integer aNumSteps ) = 0;
 
-    virtual void initialize() = 0;
-
     virtual const libecs::Real getCurrentTime() const = 0;
 
     virtual void run() = 0;

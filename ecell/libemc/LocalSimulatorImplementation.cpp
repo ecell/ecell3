@@ -144,6 +144,8 @@ namespace libemc
   {
     StepperCptr aStepperPtr( getModel().getStepper( aStepperID ) );
 
+    clean();
+
     return aStepperPtr->getProperty( aPropertyName );
   }
 
@@ -164,6 +166,8 @@ namespace libemc
   {
     StepperCptr aStepperPtr( getModel().getStepper( aStepperID ) );
 
+    clean();
+
     return aStepperPtr->saveProperty( aPropertyName );
   }
 
@@ -176,11 +180,11 @@ namespace libemc
   }
 
 
-  const libecs::PolymorphMap LocalSimulatorImplementation::getClassInfo(
-		  				StringCref aClasstype,
-						StringCref aClassname )
+  const libecs::PolymorphMap 
+  LocalSimulatorImplementation::getClassInfo( StringCref aClasstype,
+					      StringCref aClassname )
   {
-	return getModel().getClassInfo( aClasstype, aClassname );
+    return getModel().getClassInfo( aClasstype, aClassname );
   }
   
   void LocalSimulatorImplementation::createEntity( StringCref aClassname,
@@ -280,6 +284,8 @@ namespace libemc
     FullPN aFullPN( aFullPNString );
     EntityCptr anEntityPtr( getModel().getEntity( aFullPN.getFullID() ) );
 	
+    clean();
+
     return anEntityPtr->getProperty( aFullPN.getPropertyName() );
   }
 
@@ -298,6 +304,8 @@ namespace libemc
   {
     FullPN aFullPN( aFullPNString );
     EntityCptr anEntityPtr( getModel().getEntity( aFullPN.getFullID() ) );
+
+    clean();
 
     return anEntityPtr->saveProperty( aFullPN.getPropertyName() );
   }
@@ -325,10 +333,10 @@ namespace libemc
   createLogger( libecs::StringCref aFullPNString )
   {
     libecs::PolymorphVector aVector;
-    aVector.push_back(Integer(1));
-    aVector.push_back(Real(0.0));
-    aVector.push_back(Integer(0));
-    aVector.push_back(Integer(0));
+    aVector.push_back( Integer( 1 ) );
+    aVector.push_back( Real( 0.0 )  );
+    aVector.push_back( Integer( 0 ) );
+    aVector.push_back( Integer( 0 ) );
     createLogger( aFullPNString, libecs::Polymorph(aVector) );
   }
 
@@ -460,9 +468,12 @@ namespace libemc
     return aVector;
   }
 
-  void LocalSimulatorImplementation::initialize()
+  void LocalSimulatorImplementation::initialize() const
   {
-    getModel().initialize();
+    // calling the model's initialize(), which is non-const,
+    // is semantically a const operation at the simulator level.
+    const_cast<LocalSimulatorImplementation*>( this )->
+      getModel().initialize();
   }
 
   const libecs::Real LocalSimulatorImplementation::getCurrentTime() const
