@@ -112,7 +112,7 @@ template<class T, class DMAllocator = SimpleAllocator( T )>
 class StaticModuleMaker : public ModuleMaker
 {
 
-protected:
+public:
 
   typedef DynamicModuleBase<T,DMAllocator> Module;
   typedef std::map<const std::string, Module*> ModuleMap;
@@ -140,6 +140,11 @@ public:
 
   void addClass( Module* dm );
 
+  const ModuleMap& getModuleMap() const
+  {
+    return theModuleMap;
+  }
+
 protected:
 
   /*!
@@ -150,6 +155,7 @@ protected:
   */
 
   virtual DMAllocator getAllocator( const std::string& classname ); 
+
 
 protected:
 

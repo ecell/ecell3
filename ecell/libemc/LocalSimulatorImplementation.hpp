@@ -158,6 +158,7 @@ namespace libemc
 
     virtual void setEventHandler( EventHandlerRCPtrCref anEventHandler );
 
+    virtual const libecs::Polymorph getDMInfo();
 
   protected:
 

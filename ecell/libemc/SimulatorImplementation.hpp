@@ -207,6 +207,8 @@ namespace libemc
 
     virtual void setEventHandler( EventHandlerRCPtrCref anEventHandler ) = 0;
 
+    virtual const libecs::Polymorph getDMInfo() = 0;
+
   };   //end of class Simulator
 
   /** @} */ //end of libemc_module 

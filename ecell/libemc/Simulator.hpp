@@ -557,6 +557,11 @@ namespace libemc
        theSimulatorImplementation->setEventHandler( anEventHandler );
     }
 
+    const libecs::Polymorph getDMInfo()
+    {
+      return theSimulatorImplementation->getDMInfo();
+    }
+
   //@}
 
   private:

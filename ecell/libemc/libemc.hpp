@@ -56,6 +56,7 @@ namespace libemc
 
   void setDMSearchPath( const std::string& path );
   const std::string getDMSearchPath();
+  const std::string getDMInfo();
 
 
   /** @} */ //end of libemc_module 

@@ -97,7 +97,7 @@ public:
 
   virtual const std::string getFileName() const
   {
-    return getModuleName();
+    return "";
   }
 
   const DMAllocator& getAllocator() const

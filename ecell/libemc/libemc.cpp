@@ -41,11 +41,9 @@ namespace libemc
     ModuleMaker::setSearchPath( path );
   }
 
-
   const std::string getDMSearchPath()
   {
     return ModuleMaker::getSearchPath();
   }
-
 
 } // namespace libemc

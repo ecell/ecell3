@@ -178,6 +178,8 @@ BOOST_PYTHON_MODULE( _ecs )
     .def( "setEventHandler",             &Simulator::setEventHandler )
     // usually no need to call this explicitly
     .def( "initialize",                  &Simulator::initialize )
+
+    .def( "getDMInfo",                   &Simulator::getDMInfo )
     
     ;  
 

@@ -37,6 +37,10 @@
 #include "libecs/Process.hpp"
 #include "libecs/Variable.hpp"
 #include "libecs/LoggerBroker.hpp"
+#include "libecs/StepperMaker.hpp"
+#include "libecs/ProcessMaker.hpp"
+#include "libecs/SystemMaker.hpp"
+#include "libecs/VariableMaker.hpp"
 
 #include "LocalSimulatorImplementation.hpp"
 
@@ -537,6 +541,74 @@ namespace libemc
   {
     setEventChecker( EventCheckerRCPtr( new DefaultEventChecker() ) );
   }
+
+  const libecs::Polymorph LocalSimulatorImplementation::getDMInfo()
+  {
+    libecs::PolymorphVector aVector;
+
+    
+    // ugly hack...
+    // ModuleMaker should be reconstructed to make this cleanly.
+
+    ProcessMakerRef aProcessMaker( getModel().getProcessMaker() );
+    for( libecs::ProcessMaker::ModuleMap::const_iterator
+	   i( aProcessMaker.getModuleMap().begin() ); 
+	 i != aProcessMaker.getModuleMap().end(); ++i )
+      {
+	libecs::PolymorphVector anInnerVector;
+
+	anInnerVector.push_back( Polymorph( "Process" ) );
+	anInnerVector.push_back( Polymorph( i->first ) );
+	anInnerVector.push_back( Polymorph( i->second->getFileName() ) );
+
+	aVector.push_back( anInnerVector );
+      }
+
+    StepperMakerRef aStepperMaker( getModel().getStepperMaker() );
+    for( libecs::StepperMaker::ModuleMap::const_iterator
+	   i( aStepperMaker.getModuleMap().begin() ); 
+	 i != aStepperMaker.getModuleMap().end(); ++i )
+      {
+	libecs::PolymorphVector anInnerVector;
+
+	anInnerVector.push_back( Polymorph( "Stepper" ) );
+	anInnerVector.push_back( Polymorph( i->first ) );
+	anInnerVector.push_back( Polymorph( i->second->getFileName() ) );
+
+	aVector.push_back( anInnerVector );
+      }
+
+    SystemMakerRef aSystemMaker( getModel().getSystemMaker() );
+    for( libecs::SystemMaker::ModuleMap::const_iterator
+	   i( aSystemMaker.getModuleMap().begin() ); 
+	 i != aSystemMaker.getModuleMap().end(); ++i )
+      {
+	libecs::PolymorphVector anInnerVector;
+
+	anInnerVector.push_back( Polymorph( "System" ) );
+	anInnerVector.push_back( Polymorph( i->first ) );
+	anInnerVector.push_back( Polymorph( i->second->getFileName() ) );
+
+	aVector.push_back( anInnerVector );
+      }
+
+    VariableMakerRef aVariableMaker( getModel().getVariableMaker() );
+    for( libecs::VariableMaker::ModuleMap::const_iterator
+	   i( aVariableMaker.getModuleMap().begin() ); 
+	 i != aVariableMaker.getModuleMap().end(); ++i )
+      {
+	libecs::PolymorphVector anInnerVector;
+
+	anInnerVector.push_back( Polymorph( "Variable" ) );
+	anInnerVector.push_back( Polymorph( i->first ) );
+	anInnerVector.push_back( Polymorph( i->second->getFileName() ) );
+
+	aVector.push_back( anInnerVector );
+      }
+
+    return aVector;
+  }
+
 
 } // namespace libemc,
 
