@@ -619,12 +619,15 @@ class MEMainWindow( ListWindow ):
             self['stop_button'].set_sensitive(gtk.TRUE)
             self['start_button'].set_sensitive(gtk.FALSE)
             self['step_button'].set_sensitive(gtk.FALSE)
-            self['entry5'].set_text(str(self.theRuntimeObject.getSimulationTime())[:10])       
+
         else:
             self['stop_button'].set_sensitive(gtk.FALSE)
             self['start_button'].set_sensitive(gtk.TRUE)
             self['step_button'].set_sensitive(gtk.TRUE)
-
+        if self.theModelEditor.getMode() == ME_RUN_MODE:
+            self['entry5'].set_text(str(self.theRuntimeObject.getSimulationTime())[:10])
+        else:
+            self['entry5'].set_text("---")
 
     def __step_activated(self, *args): 
         text = self['entry4'].get_text()        

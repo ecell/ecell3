@@ -209,7 +209,7 @@ gtk.main()\n\
 
     def message( self, text):
         if type(text) == type(""): 
-            if text.find("\n") == -1:
+            if (text.find("Start") or text.find("Stop") ) and text.strip().find("\n") == -1 :
                 self.theModelEditor.printMessage( text, ME_STATUSBAR )
                 return          
         self.theModelEditor.printMessage( text )
@@ -286,6 +286,7 @@ gtk.main()\n\
     def step( self, aNum ): 
         if self.__canRun():
             self.theSession.step( aNum )
+            self.updateWindows()
         
         
     #====================================================================================              
