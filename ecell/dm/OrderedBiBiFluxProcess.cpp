@@ -63,28 +63,28 @@ ECELL3_DM_CLASS
 
   virtual void process()
     {
-      Real S1Concentration = S0.getVariable()->getConcentration();
-      Real S2Concentration = S1.getVariable()->getConcentration();
-      Real P1Concentration = P0.getVariable()->getConcentration();
-      Real P2Concentration = P1.getVariable()->getConcentration();
+      Real S0Concentration = S0.getVariable()->getConcentration();
+      Real S1Concentration = S1.getVariable()->getConcentration();
+      Real P0Concentration = P0.getVariable()->getConcentration();
+      Real P1Concentration = P1.getVariable()->getConcentration();
       
       Real Denom( KcR * KiS1 * KmS2
-		  + KcR * KmS2 * S1Concentration + KcR * KmS1 
-		  * S2Concentration + KcF * KmP2 * P1Concentration / Keq
-		  + KcF * KmP1 * P2Concentration / Keq + KcR 
-		  * S1Concentration * S2Concentration
-		  + KcF * KmP2 * S1Concentration * P1Concentration 
-		  / (Keq * KiS1) + KcF * P1Concentration 
-		  * P2Concentration / Keq
-		  + KcR * KmS1 * S2Concentration * P2Concentration 
-		  / KiP2 + KcR * S1Concentration * S2Concentration 
-		  * P1Concentration /KiP1
-		  + KcF * S2Concentration * P1Concentration 
-		  * P2Concentration / (KiS2 * Keq) );
+		  + KcR * KmS2 * S0Concentration + KcR * KmS1 
+		  * S1Concentration + KcF * KmP2 * P0Concentration / Keq
+		  + KcF * KmP1 * P1Concentration / Keq + KcR 
+		  * S0Concentration * S1Concentration
+		  + KcF * KmP2 * S0Concentration * P0Concentration 
+		  / (Keq * KiS1) + KcF * P0Concentration 
+		  * P1Concentration / Keq
+		  + KcR * KmS1 * S1Concentration * P1Concentration 
+		  / KiP2 + KcR * S0Concentration * S1Concentration 
+		  * P0Concentration /KiP1
+		  + KcF * S1Concentration * P0Concentration 
+		  * P1Concentration / (KiS2 * Keq) );
       
       Real velocity( KcF * KcR * C0.getVariable()->getValue()
-		     * ( S1Concentration * S2Concentration 
-			 - P1Concentration * P2Concentration / Keq ) 
+		     * ( S0Concentration * S1Concentration 
+			 - P0Concentration * P1Concentration / Keq ) 
 		     / Denom );
       
       setFlux( velocity );
