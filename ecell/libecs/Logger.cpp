@@ -97,6 +97,12 @@ namespace libecs
 					RealCref anEndTime,
 					RealCref anInterval ) const
   {
+    if( anInterval < 0.0 )
+      {
+	THROW_EXCEPTION( ValueError, 
+			 "Logger::getData(): interval must not be negative." );
+      }
+
     if (thePhysicalLogger.empty())
 	{
 	return anEmptyVector();
