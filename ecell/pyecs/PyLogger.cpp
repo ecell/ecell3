@@ -31,26 +31,6 @@
 
 #include "PyLogger.hpp"
 
-void PyDataPoint::init_type()
-{
-  behaviors().name("DataPoint");
-  behaviors().doc("DataPoint Python class");
-
-  add_varargs_method( "getTime", &PyDataPoint::getTime );
-  add_varargs_method( "getValue", &PyDataPoint::getValue );
-}
-
-Object PyDataPoint::getTime( const Tuple& args )
-{
-  return Py::Float( EmcDataPoint::getTime() );
-}
-  
-Object PyDataPoint::getValue( const Tuple& args )
-{
-  return Py::Float( EmcDataPoint::getValue().asReal() );
-}
-  
-
 void PyLogger::init_type()
 {
   behaviors().name("Logger");
@@ -62,42 +42,34 @@ void PyLogger::init_type()
 Object PyLogger::getData( const Py::Tuple& args )
 {
   args.verify_length( 0, 3 );
-  Py::List aPyList;
   libecs::Logger::DataPointVectorCptr aDataPointVector( NULLPTR );
   switch( args.length() )
     {
     case 0:
       aDataPointVector = &EmcLogger::getData();
-      for(int i = 0; i < aDataPointVector->size(); i++ )
-	{
-	  aPyList.
-	    append( asObject( new PyDataPoint( *(*aDataPointVector)[i] )
-			      )
-		    );
-	}
       break;
     case 2:
-      aDataPointVector = &EmcLogger::getData();
-      for(int i = 0; i < aDataPointVector->size(); i++ )
-	{
-	  aPyList.
-	    append( asObject( new PyDataPoint( *(*aDataPointVector)[i] )
-			      )
-		    );
-	}
+      aDataPointVector = &EmcLogger::getData( double( static_cast<Py::Float>(args[0]) ),
+					      double( static_cast<Py::Float>(args[1]) )
+					      );
       break;
     case 3:
-      aDataPointVector = &EmcLogger::getData();
-      for(int i = 0; i < aDataPointVector->size(); i++ )
-	{
-	  aPyList.
-	    append( asObject( new PyDataPoint( *(*aDataPointVector)[i] )
-			      )
-		    );
-	}
+      aDataPointVector = &EmcLogger::getData( double( static_cast<Py::Float>(args[0]) ),
+					      double( static_cast<Py::Float>(args[1]) ),
+					      double( static_cast<Py::Float>(args[2]) )
+					      );
       break;
     }
 
-  return Py::Tuple( aPyList );
+  Py::Tuple* aPyTupleReturned = new Py::Tuple( aDataPointVector->size() );
+  for(int i = 0; i < aDataPointVector->size(); i++ )
+    {
+      Py::Tuple aPyTuple( 2 );
+      aPyTuple[0] = Py::Float( (*aDataPointVector)[i]->getTime() );
+      aPyTuple[1] = Py::Float( (*aDataPointVector)[i]->getValue().asReal() );
+      (*aPyTupleReturned)[i] = aPyTuple;
+    }
+  
+  return *aPyTupleReturned;
 }
 

@@ -30,10 +30,16 @@
 
 #include <iostream>
 
+#include "libecs/libecs.hpp"
 #include "emc/Simulator.hpp"
+#include "emc/EmcLogger.hpp"
 
 #include "PySimulator.hpp"
+#include "PyLogger.hpp"
 #include "PyEcs.hpp"
+
+using namespace libemc;
+using namespace libecs;
 
 //-----------------//
 // PyEcs class     //
@@ -46,9 +52,13 @@ PyEcs::PyEcs()
   Py::ExtensionModule<PyEcs>( "ecs" )
 {
   PySimulator::init_type();
+  PyLogger::init_type();
   add_varargs_method( "Simulator", 
 		      &PyEcs::createSimulator, 
 		      "Simulator( type = \"Local\" )" );
+  //  add_varargs_method( "Logger", 
+  //		      &PyEcs::createLogger, 
+  //		      "Logger( type = \"Local\" )" );
     
   initialize();
 }
@@ -57,6 +67,12 @@ Object PyEcs::createSimulator( const Tuple& args )
 {
   PySimulator* aPySimulator = new PySimulator();
   return asObject( aPySimulator );
+}
+
+Object PyEcs::createLogger( const Py::Tuple& args )
+{
+  PyLogger* aPyLogger = new PyLogger();
+  return asObject( aPyLogger );
 }
 
 void initecs()

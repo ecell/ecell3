@@ -36,6 +36,7 @@
 #include "libecs/Message.hpp"
 
 #include "PySimulator.hpp"
+#include "PyLogger.hpp"
 
 using namespace libemc;
 using namespace libecs;
@@ -186,6 +187,7 @@ Object PySimulator::initialize( const Py::Tuple& )
 }
 
 
+
 Object PySimulator::getLogger( const Py::Tuple& args )
 {
   ECS_TRY;
@@ -196,13 +198,30 @@ Object PySimulator::getLogger( const Py::Tuple& args )
 
   const Logger* aLogger = Simulator::getLogger( aId, aPropertyName );
 
-  PyLogger pl;
-  pl.setLogger( aLogger );
+  PyLogger* aPyLogger = new PyLogger( aLogger );
 
-  return asObject(&pl);
+  return asObject( aPyLogger );
 
   ECS_CATCH;
 }
+
+Object PySimulator::setLogger( const Py::Tuple& args )
+{
+  ECS_TRY;
+  args.verify_length( 3 );
+  
+  const String aId( static_cast<Py::String>( args[0] ) );
+  const String aPropertyName( static_cast<Py::String>( args[1] ) );
+  //  const Logger* aLogger = Simulator::getLogger( aId, aPropertyName );
+
+  //  PyLogger* aPyLogger = new PyLogger( aLogger );
+
+  //  return asObject( aPyLogger );
+  return Object();
+
+  ECS_CATCH;
+}
+
 
 
 

@@ -44,6 +44,7 @@ public:
   ~PyEcs(){};
  
   Py::Object createSimulator( const Py::Tuple& args );
+  Py::Object createLogger( const Py::Tuple& args );
 
 private:
 
