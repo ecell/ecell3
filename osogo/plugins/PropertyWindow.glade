@@ -402,7 +402,7 @@
 	    <handler>show_button_clicked</handler>
 	    <last_modification_time>Wed, 12 Sep 2001 01:51:19 GMT</last_modification_time>
 	  </signal>
-	  <label>button1</label>
+	  <label>Show</label>
 	</widget>
       </widget>
     </widget>
