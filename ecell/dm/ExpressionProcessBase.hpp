@@ -445,32 +445,34 @@ namespace libecs
 			    | root_node_d[ lexeme_d[ str_p("log")] ]
 			    | root_node_d[ lexeme_d[ str_p("floor")] ]
 			    | root_node_d[ lexeme_d[ str_p("ceil")] ]
-			    | root_node_d[ lexeme_d[ str_p("fact")] ]
+			    | root_node_d[ lexeme_d[ str_p("sin")] ]
+			    | root_node_d[ lexeme_d[ str_p("cos")] ]
+			    | root_node_d[ lexeme_d[ str_p("tan")] ]
+			    | root_node_d[ lexeme_d[ str_p("sinh")] ]
+			    | root_node_d[ lexeme_d[ str_p("cosh")] ]
+			    | root_node_d[ lexeme_d[ str_p("tanh")] ]
+			    | root_node_d[ lexeme_d[ str_p("asin")] ]
+			    | root_node_d[ lexeme_d[ str_p("acos")] ]
+			    | root_node_d[ lexeme_d[ str_p("atan")] ]
+#ifndef __MINGW32__
+         		    | root_node_d[ lexeme_d[ str_p("fact")] ]
 			    | root_node_d[ lexeme_d[ str_p("asinh")] ]
 			    | root_node_d[ lexeme_d[ str_p("acosh")] ]
 			    | root_node_d[ lexeme_d[ str_p("atanh")] ]
 			    | root_node_d[ lexeme_d[ str_p("asech")] ]
 			    | root_node_d[ lexeme_d[ str_p("acsch")] ]
 			    | root_node_d[ lexeme_d[ str_p("acoth")] ]
-			    | root_node_d[ lexeme_d[ str_p("sinh")] ]
-			    | root_node_d[ lexeme_d[ str_p("cosh")] ]
-			    | root_node_d[ lexeme_d[ str_p("tanh")] ]
 			    | root_node_d[ lexeme_d[ str_p("sech")] ]
 			    | root_node_d[ lexeme_d[ str_p("csch")] ]
 			    | root_node_d[ lexeme_d[ str_p("coth")] ]
-			    | root_node_d[ lexeme_d[ str_p("asin")] ]
-			    | root_node_d[ lexeme_d[ str_p("acos")] ]
-			    | root_node_d[ lexeme_d[ str_p("atan")] ]
 			    | root_node_d[ lexeme_d[ str_p("asec")] ]
 			    | root_node_d[ lexeme_d[ str_p("acsc")] ]
 			    | root_node_d[ lexeme_d[ str_p("acot")] ]
-			    | root_node_d[ lexeme_d[ str_p("sin")] ]
-			    | root_node_d[ lexeme_d[ str_p("cos")] ]
-			    | root_node_d[ lexeme_d[ str_p("tan")] ]
 			    | root_node_d[ lexeme_d[ str_p("sec")] ]
 			    | root_node_d[ lexeme_d[ str_p("csc")] ]
-			    | root_node_d[ lexeme_d[ str_p("abs")] ]
-			    | root_node_d[ lexeme_d[ str_p("cot")] ] ) >> argument;
+			    | root_node_d[ lexeme_d[ str_p("cot")] ]
+#endif  			    
+			    ) >> argument;
 	
 	  group       =   inner_node_d[ ch_p('(') >> expression >> ch_p(')')];
 	
@@ -598,6 +600,16 @@ namespace libecs
     theFunctionMap["log"] = log;
     theFunctionMap["floor"] = floor;
     theFunctionMap["ceil"] = ceil;
+    theFunctionMap["sin"] = sin;
+    theFunctionMap["cos"] = cos;
+    theFunctionMap["tan"] = tan;
+    theFunctionMap["sinh"] = sinh;
+    theFunctionMap["cosh"] = cosh;
+    theFunctionMap["tanh"] = tanh;
+    theFunctionMap["asin"] = asin;
+    theFunctionMap["acos"] = acos;
+    theFunctionMap["atan"] = atan;
+#ifndef __MINGW32__
     theFunctionMap["fact"] = fact;
     theFunctionMap["asinh"] = asinh;
     theFunctionMap["acosh"] = acosh;
@@ -605,26 +617,16 @@ namespace libecs
     theFunctionMap["asech"] = asech;
     theFunctionMap["acsch"] = acsch;
     theFunctionMap["acoth"] = acoth;
-    theFunctionMap["sinh"] = sinh;
-    theFunctionMap["cosh"] = cosh;
-    theFunctionMap["tanh"] = tanh;
     theFunctionMap["sech"] = sech;
     theFunctionMap["csch"] = csch;
     theFunctionMap["coth"] = coth;
-#ifndef __MINGW32__
-    theFunctionMap["asin"] = asin;
-    theFunctionMap["acos"] = acos;
-    theFunctionMap["atan"] = atan;
-#endif
     theFunctionMap["asec"] = asec;
     theFunctionMap["acsc"] = acsc;
     theFunctionMap["acot"] = acot;
-    theFunctionMap["sin"] = sin;
-    theFunctionMap["cos"] = cos;
-    theFunctionMap["tan"] = tan;
     theFunctionMap["sec"] = sec;
     theFunctionMap["csc"] = csc;
     theFunctionMap["cot"] = cot;
+#endif    
   }
 
 
