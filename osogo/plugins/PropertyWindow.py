@@ -6,9 +6,9 @@ from VariableReferenceEditor import *
 from FullPNQueue import *
 
 # column index of clist
-PROPERTY_COL  = 0
-GETABLE_COL   = 1
-SETTABLE_COL  = 2
+GETABLE_COL   = 0
+SETTABLE_COL  = 1
+PROPERTY_COL  = 2
 VALUE_COL     = 3
 
 import gobject
@@ -67,24 +67,15 @@ class PropertyWindow(OsogoPluginWindow):
        
         # initializes ListStore
         self.theListStore=gtk.ListStore(
-                                        PROPERTY_COL_TYPE,
                                         GETABLE_COL_TYPE,
                                         SETTABLE_COL_TYPE,
+                                        PROPERTY_COL_TYPE,
                                         VALUE_COL_TYPE )
 
         self['theTreeView'].set_model(self.theListStore)
         
-        renderer=gtk.CellRendererText()
-        column=gtk.TreeViewColumn( "Property", renderer, text=PROPERTY_COL)
-        column.set_visible( True )
-        column.set_resizable( True )
-        column.set_reorderable( True )
-        column.set_sort_column_id( PROPERTY_COL )
-        self['theTreeView'].append_column(column)
-
-
         renderer=gtk.CellRendererToggle()
-        column=gtk.TreeViewColumn( "Read", renderer, active = GETABLE_COL )
+        column=gtk.TreeViewColumn( "R", renderer, active = GETABLE_COL )
         column.set_visible( True )
         column.set_resizable( True )
         column.set_sort_column_id( GETABLE_COL )
@@ -92,11 +83,19 @@ class PropertyWindow(OsogoPluginWindow):
         self['theTreeView'].append_column(column)
 
         renderer=gtk.CellRendererToggle()
-        column=gtk.TreeViewColumn( "Write", renderer, active = SETTABLE_COL )
+        column=gtk.TreeViewColumn( "W", renderer, active = SETTABLE_COL )
         column.set_visible( True )
         column.set_reorderable( True )
         column.set_sort_column_id( SETTABLE_COL )
         column.set_resizable( True )
+        self['theTreeView'].append_column(column)
+
+        renderer=gtk.CellRendererText()
+        column=gtk.TreeViewColumn( "Property", renderer, text=PROPERTY_COL)
+        column.set_visible( True )
+        column.set_resizable( True )
+        column.set_reorderable( True )
+        column.set_sort_column_id( PROPERTY_COL )
         self['theTreeView'].append_column(column)
 
         renderer = gtk.CellRendererText()
@@ -117,6 +116,15 @@ class PropertyWindow(OsogoPluginWindow):
         self.theVarrefTabNumber  = -1
         self.theNoteBook = self['notebookProperty']
         self.theVarrefEditor = None
+
+        self['entrySystemSubsystems'].set_property( 'xalign', 0.5 )
+        self['entrySystemProcesses'].set_property( 'xalign', 0.5 )
+        self['entrySystemVariables'].set_property( 'xalign', 0.5 )
+
+        self['entryProcessVarRefTotal'].set_property( 'xalign', 0.5 )
+        self['entryProcessVarRefPositive'].set_property( 'xalign', 0.5 )
+        self['entryProcessVarRefZero'].set_property( 'xalign', 0.5 )
+        self['entryProcessVarRefNegative'].set_property( 'xalign', 0.5 )
 
         if self.theRawFullPNList == ():
             return
@@ -312,9 +320,6 @@ class PropertyWindow(OsogoPluginWindow):
 
             self['entryName'].set_text( str(
                                  self.thePrePropertyMap[ 'Name' ][0] )  )
-        
-
-
 
         # save current full id to previous full id.
         self.preFullID = self.theFullID()
@@ -322,7 +327,6 @@ class PropertyWindow(OsogoPluginWindow):
         # updates status bar
         if self['statusbar'] != None:
             self['statusbar'].push(1,'')
-
 
 
                 
@@ -350,9 +354,9 @@ class PropertyWindow(OsogoPluginWindow):
 
 
                 self.theList.append( [
-                                      aPropertyName,
                                       anAttribute[GETABLE],
                                       anAttribute[SETTABLE],
+                                      aPropertyName,
                                       aValue ] )
 
         self.theListStore.clear()
@@ -379,70 +383,51 @@ class PropertyWindow(OsogoPluginWindow):
             elif aVariableReference[2] < 0:
                 aNegativeCoeff = aNegativeCoeff + 1
 
-        self['labelSummaryFrame'].set_text( 'Variable References' )
-        self['label2.1'].set_text( 'Total' )
-        self['entry2.1'].set_text( str( len( aVariableReferenceList ) ) )
-        self['label2.2'].set_text( 'Positive')
-        self['entry2.2'].set_text( str( aPositiveCoeff ) )
-        self['label2.3'].set_text( 'Zero')
-        self['entry2.3'].set_text( str( aZeroCoeff ) )
-        
-        self['label2.4'].show()
-        self['label2.4'].set_text( 'Negative' )
-        self['entry2.4'].show()
-        self['entry2.4'].set_text( str( aNegativeCoeff ) )
-
         aStepperID = str( self.thePrePropertyMap[ 'StepperID' ][0] )
         anActivity = str( self.thePrePropertyMap[ 'Activity' ][0] )
         isContinuous = bool( self.thePrePropertyMap[ 'IsContinuous'][0] )
         aPriority = str( self.thePrePropertyMap[ 'Priority'][0] )
 
-        self['label1.1'].set_text( 'StepperID')
-        self['entry1.1'].set_text( aStepperID )
-        self['label1.2'].set_text( 'Activity')
-        self['entry1.2'].set_text( anActivity )
+        self['entryProcessVarRefTotal'].set_text(
+                                         str( len( aVariableReferenceList ) ) )
+        self['entryProcessVarRefPositive'].set_text( str( aPositiveCoeff ) )
+        self['entryProcessVarRefZero'].set_text( str( aZeroCoeff ) )
+        self['entryProcessVarRefNegative'].set_text( str( aNegativeCoeff ) )
+        self['entryProcessStepper'].set_text( aStepperID )
+        self['entryProcessActivity'].set_text( anActivity )
+        self['entryProcessIsContinuous'].set_text( str( isContinuous ) )
+        self['entryProcessPriority'].set_text( aPriority )
 
-        self['label1.3'].show()
-        self['label1.3'].set_text( 'IsContinuous')
-        self['entry1.3'].show()
-        self['entry1.3'].set_text( str( isContinuous ) )
+        self['systemFrame'].hide()
+        self['processFrame'].show()
+        self['variableFrame'].hide()
 
-        self['label1.4'].show()
-        self['label1.4'].set_text( 'Priority')
-        self['entry1.4'].show()
-        self['entry1.4'].set_text( aPriority )
+
+        
 
     def __updateVariable( self ):
         self.__updatePropertyList()
         aMolarConc = str( self.thePrePropertyMap[ 'MolarConc' ][0] )
         aValue = str( self.thePrePropertyMap[ 'Value' ][0] )
         aNumberConc = str( self.thePrePropertyMap[ 'NumberConc' ][0] )
-        isFixed = bool( self.thePrePropertyMap[ 'Fixed'][0] )
         aVelocity = str( self.thePrePropertyMap[ 'Velocity' ][0] )
         aTotalVelocity = str( self.thePrePropertyMap[ 'TotalVelocity' ][0] )
+        if self.thePrePropertyMap[ 'Fixed'][0]  == 1:
+            aFixed = '(Fixed)'
+        else:
+            aFixed = '(Not Fixed)'
         
-        self['labelSummaryFrame'].set_text( 'Variable Quantities' )
-        self['label2.1'].set_text( 'MolarConc' )
-        self['entry2.1'].set_text( aMolarConc )
-        self['label2.2'].set_text( 'Value')
-        self['entry2.2'].set_text( aValue )
-        self['label2.3'].set_text( 'NumberConc')
-        self['entry2.3'].set_text( aNumberConc )
+        self['entryVariableValue'].set_text( aValue )
+        self['entryVariableMolar'].set_text( aMolarConc )
+        self['entryVariableNumber'].set_text( aNumberConc )
+        self['labelVariableQuantities'].set_markup( '<b>Quantities '
+                                                   + aFixed + '</b>' )
+        self['entryVariableVelocity'].set_text( aVelocity )
+        self['entryVariableTotalVelocity'].set_text( aTotalVelocity )
 
-        self['label2.4'].show()
-        self['label2.4'].set_text( 'Fixed')
-        self['entry2.4'].show()
-        self['entry2.4'].set_text( str( isFixed ) )
-
-        self['label1.1'].set_text( 'Velocity')
-        self['entry1.1'].set_text( aVelocity )
-        self['label1.2'].set_text( 'Total Velocity')
-        self['entry1.2'].set_text( aTotalVelocity )
-
-        self['label1.3'].hide()
-        self['entry1.3'].hide()
-        self['label1.4'].hide()
-        self['entry1.4'].hide()
+        self['systemFrame'].hide()
+        self['processFrame'].hide()
+        self['variableFrame'].show()
 
     def __updateSystem( self ):
         self.__updatePropertyList()
@@ -453,27 +438,15 @@ class PropertyWindow(OsogoPluginWindow):
         aStepperID = str( self.thePrePropertyMap[ 'StepperID' ][0] )
         aSize = str( self.thePrePropertyMap[ 'Size' ][0] )
 
-        self['labelSummaryFrame'].set_text( 'System Statistics' )
-        self['label2.1'].set_text( 'Subsystems' ) 
-        self['entry2.1'].set_text( str( len( aSystemList ) ) )
-        self['label2.2'].set_text( 'Processes')
-        self['entry2.2'].set_text( str( len( aProcessList ) ) )
-        self['label2.3'].set_text( 'Variables' )
-        self['entry2.3'].set_text( str( len( aVariableList ) ) )
-        
-        self['label2.4'].hide()
-        self['entry2.4'].hide()
-
-        self['label1.1'].set_text( 'StepperID')
-        self['entry1.1'].set_text( aStepperID )
-        self['label1.2'].set_text( 'Size')
-        self['entry1.2'].set_text( aSize )
-
-        self['label1.3'].hide()
-        self['entry1.3'].hide()
-        self['label1.4'].hide()
-        self['entry1.4'].hide()
-
+        self['entrySystemSubsystems'].set_text( str( len( aSystemList ) ) )
+        self['entrySystemProcesses'].set_text( str( len( aProcessList ) ) )
+        self['entrySystemVariables'].set_text( str( len( aVariableList ) ) )
+        self['entrySystemStepper'].set_text( aStepperID )
+        self['entrySystemSize'].set_text( aSize )
+       
+        self['systemFrame'].show()
+        self['processFrame'].hide()
+        self['variableFrame'].hide()
 
     def updateViewAllProperties( self, *anObject ):
         self.__setDiscardList()
