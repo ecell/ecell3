@@ -14,7 +14,9 @@ PropertyWindow.xpm\
 SubstanceWindow.glade\
 SubstanceWindow.py\
 SubstanceWindow.xpm\
+TracerWindow.py\
 TracerWindow.glade\
+TracerWindow.xpm\
 InputWindow.glade\
 icon_down.xpm\
 icon_down_small.xpm\
