@@ -88,7 +88,8 @@ BOOST_PYTHON_MODULE( _ecs )
   to_python_converter< Polymorph, Polymorph_to_python >();
   to_python_converter< DataPointVectorSharedPtr, 
     DataPointVectorSharedPtr_to_python >();
-
+  to_python_converter< PolymorphMap, PolymorphMap_to_python>();
+  
   register_Polymorph_from_python();
 
   register_exception_translator<Exception>     ( &translateException );

@@ -176,6 +176,13 @@ namespace libemc
   }
 
 
+  const libecs::PolymorphMap LocalSimulatorImplementation::getClassInfo(
+		  				StringCref aClasstype,
+						StringCref aClassname )
+  {
+	return getModel().getClassInfo( aClasstype, aClassname );
+  }
+  
   void LocalSimulatorImplementation::createEntity( StringCref aClassname,
 						   StringCref aFullIDString )
   {

@@ -94,6 +94,12 @@ namespace libemc
     virtual const libecs::String
     getStepperClassName( libecs::StringCref aStepperID ) const = 0;
 
+
+    virtual const libecs::PolymorphMap
+	    	  getClassInfo( libecs::StringCref aClasstype,
+		    		libecs::StringCref aClassname ) = 0;
+
+    
     virtual void createEntity( libecs::StringCref   aClassname, 
 			       libecs::StringCref   aFullIDString ) = 0;
 

@@ -97,7 +97,7 @@ BOOST_PYTHON_MODULE( _emc )
   // Simulator class
   class_<Simulator>( "Simulator" )
     .def( init<>() )
-
+    .def( "getClassInfo", 		  &Simulator::getClassInfo )
     // Stepper-related methods
     .def( "createStepper",                &Simulator::createStepper )
     .def( "deleteStepper",                &Simulator::deleteStepper )

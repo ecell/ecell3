@@ -94,7 +94,7 @@ namespace libecs
   }
 
 
-  PolymorphMapCref Model::getClassInfo( StringCref aClassType, StringCref aClassname )
+  PolymorphMap Model::getClassInfo( StringCref aClassType, StringCref aClassname )
   {
 	const void* (*InfoPtrFunc)();
     

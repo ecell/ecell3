@@ -45,6 +45,7 @@
 
 namespace python = boost::python;
 
+
 class Polymorph_to_python
 {
 public:
@@ -197,5 +198,24 @@ public:
     
 };
 
+class PolymorphMap_to_python
+{
+public:
+static PyObject* convert(const libecs::PolymorphMap& aPolymorphMapCref )
+{
+	//Polymorph_to_python aPolymorphConverter;
+	PyObject * aPyDict(PyDict_New());
+	libecs::PolymorphMap aPolymorphMap( aPolymorphMapCref );
+	for (libecs::PolymorphMap::iterator i=aPolymorphMap.begin();
+			i!=aPolymorphMap.end();++i)
+	{
+	PyDict_SetItem( aPyDict, PyString_FromString( i->first.c_str() ),
+			Polymorph_to_python::convert( i->second ) );
+			
+	}
+	return aPyDict;
+}
+
+};
 
 #endif // __PYECS_HPP

@@ -239,8 +239,14 @@ namespace libemc
 
     //@}
 
+    const libecs::PolymorphMap getClassInfo( libecs::StringCref aClasstype,
+		    			   libecs::StringCref aClassname ) const
+    {
+	    return theSimulatorImplementation->getClassInfo( aClasstype, aClassname );
+    }
 
 
+    
     /**
        @name Entity methods.
     */

@@ -153,7 +153,7 @@ namespace libecs
        @param aClassType
     */
 
-    PolymorphMapCref getClassInfo( StringCref aClassType, StringCref aClassname );
+    PolymorphMap getClassInfo( StringCref aClassType, StringCref aClassname );
 
     /**
        Creates a new Entity object and register it in an appropriate System
