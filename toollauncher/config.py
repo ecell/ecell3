@@ -1,4 +1,5 @@
-LAUNCHER_PATH = '.'
+import os
 
+LAUNCHER_PATH = os.environ['TLPATH']
 GLADEFILE_PATH = LAUNCHER_PATH
 

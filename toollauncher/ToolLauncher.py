@@ -12,7 +12,7 @@ from ParentWindow import *
 
 from ToolLauncherPreferences import *
 from ToolLauncherErrorMessage import *
-from ToolLauncherVersion import *
+from AboutToolLauncher import *
 from ZipManager import *
 from OutputMessage import *
 
@@ -56,7 +56,7 @@ class ToolLauncher(ParentWindow):
 
 	def initPref( self ):
 		self.thePref = {}
-		self.thePrefFile = os.environ['ecell3_prefix']+'/lib' + os.sep+"toollauncher"+os.sep+'launcher.ini'
+		self.thePrefFile = os.environ['ECELL3_PREFIX'] + os.sep + 'lib' + os.sep + "toollauncher" + os.sep + 'launcher.ini'
 		if not os.path.isfile( self.thePrefFile ):
 			aFile = open( self.thePrefFile, 'w' )
 			aFile.write( '[DEFAULT]' )
@@ -64,7 +64,7 @@ class ToolLauncher(ParentWindow):
 
 		self.theConfig=ConfigParser.ConfigParser()
 		self.theConfig.read( self.thePrefFile )
-		self.thePref['ecell3_path'] = os.environ['ecell3_prefix']
+		self.thePref['ecell3_path'] = os.environ['ECELL3_PREFIX']
 		self.thePref['window_open'] = 0
 		if self.theConfig.has_option( 'DEFAULT', 'auto_load_pref' ) and \
 			self.theConfig.get( 'DEFAULT', 'auto_load_pref') == '1':
@@ -81,11 +81,15 @@ class ToolLauncher(ParentWindow):
 			self.thePref['save_eml'] = '1'
 			self.thePref['translate_em'] = '0'
 			self.thePref['auto_load_pref'] = '1'
-			self.thePref['editor_path'] = ""
-			self.thePref['model_home'] = ""
-			self.thePref['model_path'] = ""
-			self.thePref['programs_path'] = ""
+			if os.name == 'nt':
+				self.thePref['editor_path'] = os.environ['ProgramFiles'] + '\Windows NT\Accessories\wordpad.exe'
+			else:
+				self.thePref['editor_path'] = 'gedit'
+			self.thePref['model_home'] = os.environ['ECELL3_PREFIX'] + os.sep + 'share' + os.sep + 'doc' + os.sep + os.environ['VERSION'] + os.sep + 'sample'
+			self.thePref['model_path'] = os.environ['ECELL3_PREFIX'] + os.sep + 'share' + os.sep + 'doc' + os.sep + os.environ['VERSION'] + os.sep + 'sample' + os.sep + 'LTD'
+			self.thePref['programs_path'] = os.environ['ECELL3_PREFIX'] + os.sep + 'bin'
 
+		
 	def openWindow( self 
  ):
 		"""override parent class' method
@@ -98,7 +102,7 @@ class ToolLauncher(ParentWindow):
 			'exit_menu_activate'                    : self.__deleted ,
 			'refresh_menu_activate'                 : self.refreshMessage ,
 			'output_menu_activate'                  : self.selectFile ,
-			'version_menu_activate'                 : self.openVersion ,
+			'about_menu_activate'                 : self.createAboutToolLauncher ,
 
 			# buttons
 			'on_execute_button_clicked'             : self.executeTab ,
@@ -121,6 +125,11 @@ class ToolLauncher(ParentWindow):
 		self.MessageWindow_attached=True
 
 		self.addHandlers( self.theHandlerMap )
+
+		# initializes AboutDialog reference
+		self.theAboutToolLauncher = None
+		self.openAboutToolLauncher = False 
+
 		self.update()
 		self.checkPref()
 
@@ -184,18 +193,26 @@ class ToolLauncher(ParentWindow):
 
 
 	# ==========================================================================
-	def openVersion( self, *arg ):
-		"""display the Version Window
-		arg[0]   ---  self['version_menu']
+	def createAboutToolLauncher( self, *arg ):
+		if not self.openAboutToolLauncher:
+			AboutToolLauncher(self)
+
+	def toggleAboutToolLauncher( self, isOpen, anAboutToolLauncher ):
+		self.theAboutToolLauncher = anAboutToolLauncher
+		self.openAboutToolLauncher=isOpen
+		
+	def openAbout( self, *arg ):
+		"""display the About Window
+		arg[0]   ---  self['about_menu']
 		Return None
 		"""
 		if +len( arg ) < 1:
 			return None
 
-		self.theVerWindow = ToolLauncherVersion( self )
+		self.theVerWindow = AboutToolLauncher( self )
 		self.theVerWindow.openWindow()
 
-	# end of openVersion
+	# end of openAbout
 
 
 	# ==========================================================================

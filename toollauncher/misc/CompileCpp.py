@@ -90,7 +90,8 @@ class CompileCpp:
 		else:
 			os.chdir( self.theToolLauncher.thePref['model_path'] )
 
-		os.system( cmd+" 2> /tmp/error.log > /tmp/cpp.log" )
+		TMPDIR = os.path.dirname( os.tempnam() )
+		os.system( cmd+" 2> " + TMPDIR + os.sep + "error.log > " + TMPDIR + os.sep + "cpp.log" )
 		errorMsg = self.checkLog( )
 
 		if errorMsg != "":
@@ -112,11 +113,12 @@ class CompileCpp:
 	# ==========================================================================
 	def checkLog( self ):
 
-		logdata = self.readSystemOut( "/tmp/cpp.log" )
+		TMPDIR = os.path.dirname( os.tempnam() )
+		logdata = self.readSystemOut( TMPDIR + os.sep + "cpp.log" )
 		errorMsg = re.search( 'Error', logdata )
 
 		self.printMessage( logdata, "")
-		logdata = self.readSystemOut( "/tmp/error.log" )
+		logdata = self.readSystemOut( TMPDIR + os.sep + "error.log" )
 		self.printMessage( logdata, "")
 
 		if errorMsg == None:

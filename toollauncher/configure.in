@@ -15,8 +15,6 @@ AM_CHECK_PYMOD(gtk.glade,,,[AC_MSG_ERROR(could not find gtk.glade module. perhap
 dnl
 AC_OUTPUT(
 Makefile
-misc/Makefile
-launcher.ini
-toollauncher,
+misc/Makefile,
 chmod +x toollauncher
 )

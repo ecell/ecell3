@@ -1,0 +1,12 @@
+#!/usr/bin/env ecell3-python
+
+import os
+import sys
+import string
+
+TL_MISC_PATH = os.environ['TLPATH'] + os.sep + 'misc'
+PYTHONPATH = os.environ['PYTHONPATH']
+os.environ['PYTHONPATH'] = os.environ['TLPATH'] + os.pathsep + TL_MISC_PATH + os.pathsep + PYTHONPATH
+
+os.system('python ' + os.environ['TLPATH'] + os.sep + 'ToolLauncher.py ' + string.join(sys.argv[1:]))
+

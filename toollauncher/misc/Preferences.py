@@ -5,12 +5,19 @@
 
 import os
 
-EDITOR_PATH = "gedit"
-PROGRAMS_PATH = "/usr/bin"
+if os.name == 'nt':
+	EDITOR_PATH = os.environ['ProgramFiles'] + \
+			'\Windows NT\Accessories\wordpad.exe'
+else:
+	EDITOR_PATH = 'gedit'
+PROGRAMS_PATH = os.environ['ECELL3_PREFIX'] + os.sep + 'bin'
 SAVE_EM = "1"
 SAVE_EML = "1"
-MODEL_PATH = ""
-MODEL_HOME = "/share/doc/ecell-3.1.100/sample"
+MODEL_PATH = os.environ['ECELL3_PREFIX'] + os.sep + 'share' + os.sep + 'doc' + \
+		os.sep + os.environ['VERSION'] + os.sep + 'sample' + os.sep + \
+		'LTD'
+MODEL_HOME = os.environ['ECELL3_PREFIX'] + os.sep + 'share' + os.sep + 'doc' + \
+		os.sep + os.environ['VERSION'] + os.sep + 'sample'
 AUTO_LOAD_PREF = "1"
 TRANSLATE_EM = "0"
 
