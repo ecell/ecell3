@@ -37,7 +37,7 @@
 #include "Model.hpp"
 #include "Util.hpp"
 #include "FullID.hpp"
-#include "PropertySlot.hpp"
+#include "PropertySlotMaker.hpp"
 
 #include "Stepper.hpp"
 
@@ -47,6 +47,55 @@ namespace libecs
 
 
   ////////////////////////// Stepper
+
+  
+  void Stepper::makeSlots()
+  {
+
+    registerSlot( getPropertySlotMaker()->
+		  createPropertySlot( "ID", *this,
+				      Type2Type<String>(),
+				      NULLPTR,
+				      &Stepper::getID ) );
+
+    registerSlot( getPropertySlotMaker()->
+		  createPropertySlot( "SystemList", *this,
+				      Type2Type<UVariableVectorRCPtr>(),
+				      NULLPTR,
+				      &Stepper::getSystemList ) );
+
+    registerSlot( getPropertySlotMaker()->
+		  createPropertySlot( "CurrentTime", *this,
+				      Type2Type<Real>(),
+				      NULLPTR,
+				      &Stepper::getCurrentTime ) );
+
+    registerSlot( getPropertySlotMaker()->
+		  createPropertySlot( "StepInterval", *this,
+				      Type2Type<Real>(),
+				      &Stepper::setStepInterval,
+				      &Stepper::getStepInterval ) );
+
+    registerSlot( getPropertySlotMaker()->
+		  createPropertySlot( "StepsPerSecond", *this,
+				      Type2Type<Real>(),
+				      NULLPTR,
+				      &Stepper::getStepsPerSecond ) );
+
+    registerSlot( getPropertySlotMaker()->
+		  createPropertySlot( "MaxInterval", *this,
+				      Type2Type<Real>(),
+				      &Stepper::setMaxInterval,
+				      &Stepper::getMaxInterval ) );
+
+    registerSlot( getPropertySlotMaker()->
+		  createPropertySlot( "MinInterval", *this,
+				      Type2Type<Real>(),
+				      &Stepper::setMinInterval,
+				      &Stepper::getMinInterval ) );
+
+
+  }
 
   Stepper::Stepper() 
     :
@@ -62,6 +111,25 @@ namespace libecs
   void Stepper::initialize()
   {
     FOR_ALL( SystemVector, theSystemVector, initialize );
+  }
+
+
+  const UVariableVectorRCPtr Stepper::getSystemList() const
+  {
+    UVariableVectorRCPtr aVectorPtr( new UVariableVector );
+    aVectorPtr->reserve( theSystemVector.size() );
+
+    for( SystemVectorConstIterator i = getSystemVector().begin() ;
+	 i != getSystemVector().end() ; ++i )
+      {
+	SystemCptr aSystemPtr( *i );
+	FullIDCref aFullID( aSystemPtr->getFullID() );
+	const String aFullIDString( aFullID.getString() );
+
+	aVectorPtr->push_back( aFullIDString );
+      }
+
+    return aVectorPtr;
   }
 
 
@@ -125,28 +193,6 @@ namespace libecs
     // update loggers
     FOR_ALL( PropertySlotVector, theLoggedPropertySlotVector, updateLogger );
   }
-
-
-  void Stepper::setParameterList( UVariableVectorCref aParameterList )
-  {
-    const UVariableVector::size_type aSize( aParameterList.size() );
-
-    if( aSize >= 1 )
-      {
-	setStepInterval( aParameterList[0].asReal() );
-    
-	if( aSize >= 2 )
-	  {
-	    setMinInterval( aParameterList[1].asReal() );
-	    
-	    if( aSize >= 3 )
-	      {
-		setMaxInterval( aParameterList[2].asReal() );
-	      }
-	  }
-      }
-  }
-
 
 
   ////////////////////////// SRMStepper

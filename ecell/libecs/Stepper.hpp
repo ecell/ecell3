@@ -40,6 +40,7 @@
 
 #include "Util.hpp"
 #include "UVariable.hpp"
+#include "PropertyInterface.hpp"
 #include "System.hpp"
 
 
@@ -80,6 +81,8 @@ namespace libecs
   */
 
   class Stepper
+    :
+    public PropertyInterface
   {
 
   public:
@@ -89,6 +92,8 @@ namespace libecs
     {
       ; // do nothing
     }
+
+    virtual void makeSlots();
 
     /**
 
@@ -129,15 +134,6 @@ namespace libecs
     virtual void compute() = 0;
 
 
-
-    /**
-
-    @param aParameterList
-    */
-
-    virtual void setParameterList( UVariableVectorCref aParameterList );
-
-
     /**
 
 
@@ -164,7 +160,7 @@ namespace libecs
        @return the current time in Real.
     */
 
-    RealCref getCurrentTime() const
+    const Real getCurrentTime() const
     {
       return theCurrentTime;
     }
@@ -187,7 +183,7 @@ namespace libecs
        @return the step interval of this Stepper
     */
 
-    RealCref getStepInterval() const
+    const Real getStepInterval() const
     {
       return theStepInterval;
     }
@@ -205,7 +201,7 @@ namespace libecs
        @return the number of steps per a second. (== 1.0 / getStepInterval )
     */
 
-    RealCref getStepsPerSecond() const
+    const Real getStepsPerSecond() const
     {
       return theStepsPerSecond;
     }
@@ -237,7 +233,7 @@ namespace libecs
     void registerLoggedPropertySlot( PropertySlotPtr );
 
 
-    StringCref getID() const
+    const String getID() const
     {
       return theID;
     }
@@ -252,7 +248,7 @@ namespace libecs
       theMinInterval = aValue;
     }
 
-    RealCref getMinInterval() const
+    const Real getMinInterval() const
     {
       return theMinInterval;
     }
@@ -262,7 +258,7 @@ namespace libecs
       theMaxInterval = aValue;
     }
 
-    RealCref getMaxInterval() const
+    const Real getMaxInterval() const
     {
       return theMaxInterval;
     }
@@ -285,6 +281,10 @@ namespace libecs
     }
 
     virtual StringLiteral getClassName() const  { return "Stepper"; }
+
+
+    const UVariableVectorRCPtr getSystemList() const;
+
 
   protected:
 

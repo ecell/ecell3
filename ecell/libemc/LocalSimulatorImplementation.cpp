@@ -61,10 +61,9 @@ namespace libemc
 
   void LocalSimulatorImplementation::
   createStepper( libecs::StringCref          aClassname, 
-		 libecs::StringCref          anId,
-		 libecs::UVariableVectorCref aData )
+		 libecs::StringCref          anId )
   {
-    getModel().createStepper( aClassname, anId, aData );
+    getModel().createStepper( aClassname, anId );
   }
 
   void LocalSimulatorImplementation::createEntity( StringCref aClassname,

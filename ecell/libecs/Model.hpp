@@ -165,14 +165,9 @@ namespace libecs
 
        @param anID        a Stepper ID string of the Stepper to create.  
 
-       @param aParameters a UVariableVector of parameters to give to
-       the created Stepper.
     */
 
-    void createStepper( StringCref aClassname, 
-			StringCref anID,
-			UVariableVectorCref aParameterList );
-
+    void createStepper( StringCref aClassname, StringCref anID );
 
 
     /**

@@ -77,10 +77,9 @@ namespace libemc
     */
 
     void createStepper( libecs::StringCref          aClassname,
-			libecs::StringCref          anId,
-			libecs::UVariableVectorCref aData )
+			libecs::StringCref          anId )
     {
-      theSimulatorImplementation->createStepper( aClassname, anId, aData );
+      theSimulatorImplementation->createStepper( aClassname, anId );
     }
 
 

@@ -99,8 +99,7 @@ namespace libemc
 
 
     virtual void createStepper( libecs::StringCref          aClassname,
-				libecs::StringCref          anId,
-				libecs::UVariableVectorCref aData ) = 0;
+				libecs::StringCref          anId ) = 0;
 
     virtual void createEntity( libecs::StringCref           aClassname, 
 			       libecs::StringCref           aFullIDString,

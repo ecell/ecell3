@@ -56,8 +56,7 @@ namespace libemc
     virtual ~LocalSimulatorImplementation();
 
     virtual void createStepper( libecs::StringCref          aClassname,
-				libecs::StringCref          anId,
-				libecs::UVariableVectorCref aData );
+				libecs::StringCref          anId );
 
     virtual void createEntity( libecs::StringCref           aClassname, 
 			       libecs::StringCref           aFullIDString,

@@ -224,13 +224,10 @@ namespace libecs
   }
 
 
-  void Model::createStepper( StringCref aClassName,
-			     StringCref anID,
-			     UVariableVectorCref aParameterList )
+  void Model::createStepper( StringCref aClassName, StringCref anID )
   {
     StepperPtr aStepper( getStepperMaker().make( aClassName ) );
     aStepper->setID( anID );
-    aStepper->setParameterList( aParameterList );
 
     theStepperMap.insert( std::make_pair( anID, aStepper ) );
     theScheduleQueue.push( Event( getCurrentTime(), aStepper ) );
