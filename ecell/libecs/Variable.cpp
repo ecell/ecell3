@@ -99,6 +99,21 @@ namespace libecs
 
   ///////////////////////// PositiveVariable
 
+  SET_METHOD_DEF( Real, Value, PositiveVariable )
+  {
+    if( value >= 0 )
+      {
+	Variable::setValue( value );
+      }
+    else
+      {
+	THROW_EXCEPTION( RangeError, "PositiveVariable [" + 
+			 getFullID().getString() + 
+			 "]: attempt to set a negative value." );
+      }
+  }
+
+
   void PositiveVariable::integrate( const Real aTime )
   {
     Variable::integrate( aTime );
@@ -113,7 +128,7 @@ namespace libecs
       {
 	if( aValue > - anEpsilon )
 	  {
-	    setValue( 0.0 );
+	    loadValue( 0.0 );
 	  }
 	else
 	  {

@@ -52,7 +52,7 @@ namespace libecs
 
 
   /**
-     Variable class is used to represent state variables, such as
+     Variable class represents state variables in the simulation model, such as
      amounts of molecular species in a compartment.
 
   */
@@ -66,7 +66,6 @@ namespace libecs
 
   public:
 
-    // this should be put in public.
     DM_BASECLASS( Variable );
 
     Variable();
@@ -81,6 +80,7 @@ namespace libecs
     /**
        Initializes this variable. 
     */
+
     virtual void initialize();
 
 
@@ -94,7 +94,7 @@ namespace libecs
     }
 
     /** 
-	integrate phase
+	Integrate.
     */
 
     virtual void integrate( const Real aTime )
@@ -161,12 +161,12 @@ namespace libecs
     }
 
     /**
-       This simply set the value of this Variable if getFixed() is false.
+       This simply sets the value of this Variable if getFixed() is false.
 
        @see getFixed()
     */
 
-    SET_METHOD( Real, Value )
+    virtual SET_METHOD( Real, Value )
     { 
       if( ! isFixed() ) 
 	{
@@ -174,9 +174,9 @@ namespace libecs
 	}
     }
 
-    GET_METHOD( Real, Value )
+    virtual GET_METHOD( Real, Value )
     { 
-      return theValue;
+      return saveValue();
     }
 
     void addValue( RealCref aValue )
@@ -191,7 +191,7 @@ namespace libecs
 
     const Real saveValue() const
     {
-      return getValue();
+      return theValue;
     }
 
     SET_METHOD( Real, theVelocity )
@@ -222,7 +222,7 @@ namespace libecs
     }
 
     /**
-       @param v velocity in number of molecules to be added.
+       @param aVelocity velocity in number of molecules to be added.
     */
 
     void addVelocity( RealCref aVelocity ) 
@@ -324,9 +324,13 @@ namespace libecs
       // do nothing
     }
 
+    virtual SET_METHOD( Real, Value );
+
 
     /** 
-	integrate phase
+	Integrate.
+
+	In this class, the range (non-negative) is checked.
     */
 
     virtual void integrate( const Real aTime );

@@ -239,7 +239,7 @@ namespace libemc
     /**
        Get a list of Entities in a System.
 
-       @param anEntityTypeNumber a EntityType to list.
+       @param anEntityTypeString an EntityType as a string
        @param aSystemPathString a SystemPath of the System.
        @return the list of IDs of Entities.
     */
