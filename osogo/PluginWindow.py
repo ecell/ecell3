@@ -2,7 +2,7 @@ import os
 
 from config import *
 from ViewWindow import *
-
+from gtk import *
 
 class PluginWindow(ViewWindow):
     '''
@@ -23,21 +23,26 @@ class PluginWindow(ViewWindow):
         self.theSession = self.thePluginManager.theSession 
         self.theDriver = self.theSession.theDriver
         self.theRawFullPNList = data
-
+        self.theTitle = pluginmanager.theInterfaceWindow.theTitle
+        	
     def initialize( self, root=None ):
 
         aMenuWindow = Window( 'PluginWindowPopupMenu.glade', root='menu' )
         self.thePopupMenu = aMenuWindow['menu']
+
         if root != None:
             self.theClassName = root
             self[self.theClassName].connect( 'button_press_event', self.popupMenu )
-
             aMenuWindow.addHandlers( { 'copy_fullpnlist'  : self.copyFullPNList,
                                        'paste_fullpnlist' : self.pasteFullPNList,
                                        'add_fullpnlist'   : self.addFullPNList
                                        } )
+#        else root !='top_vbox':
+        else:
+            self.getWidget( self.theClassName )['title'] = self.theTitle
 
-
+            
+            
     def popupMenu( self, widget, aEvent ):
 
         if aEvent.button == 3:

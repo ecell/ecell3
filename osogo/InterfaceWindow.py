@@ -25,6 +25,7 @@ class InterfaceWindow( Window ):
 	self.thePluginWindowsDict = {}
 	self.theCount = 0
         self.theSelectedRow = -1
+        self.theTitle = ""
 
     def addNewRecord( self , classname , data ):
         

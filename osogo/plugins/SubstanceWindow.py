@@ -14,7 +14,6 @@ class SubstanceWindow( PluginWindow ):
 
         self.openWindow()
         self.thePluginManager.appendInstance( self )    
-	self.theTitle = pluginmanager.theInterfaceWindow.theTitle           
         PluginWindow.initialize( self, root )
         self.initialize()
 
@@ -35,7 +34,6 @@ class SubstanceWindow( PluginWindow ):
         # 0 : not fixed  1: fixed
         self.theFixFlag = 0
         
-	self.getWidget('SubstanceWindow')['title'] = self.theTitle
         self['toolbar1'].set_style( GTK.TOOLBAR_ICONS )
         self['toolbar1'].set_button_relief( GTK.RELIEF_HALF )
         self['toolbar2'].set_style( GTK.TOOLBAR_ICONS )

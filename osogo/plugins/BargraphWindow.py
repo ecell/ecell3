@@ -18,7 +18,6 @@ class BargraphWindow( PluginWindow ):
 
             self.openWindow()
             self.thePluginManager.appendInstance( self )   
-	    self.theTitle = pluginmanager.theInterfaceWindow.theTitle              
             PluginWindow.initialize( self, root )
             self.initialize()
 
@@ -33,7 +32,6 @@ class BargraphWindow( PluginWindow ):
 
     def initialize( self ):
     
-	self.getWidget('BargraphWindow')['title'] = self.theTitle
         self['toolbar5'].set_style( GTK.TOOLBAR_ICONS )
         self['toolbar6'].set_style( GTK.TOOLBAR_ICONS )
         self['toolbar5'].set_button_relief( GTK.RELIEF_HALF )

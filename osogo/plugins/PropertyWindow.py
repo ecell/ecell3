@@ -13,11 +13,7 @@ class PropertyWindow(PluginWindow):
 
         self.openWindow()
         self.thePluginManager.appendInstance( self ) 
-	
-	if root !='top_vbox':
-		self.theTitle = pluginmanager.theInterfaceWindow.theTitle 
-		self.getWidget('PropertyWindow')['title'] = self.theTitle      
-        
+              
 	PluginWindow.initialize( self, root )
         self.initialize()
 
