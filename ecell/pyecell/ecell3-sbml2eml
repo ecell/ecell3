@@ -1,6 +1,16 @@
 #!/usr/bin/env ecell3-python
 
-# Sbml to Eml converter
+"""
+This program for converting SBML to EML.
+This program is part of E-Cell Simulation Environment Version 3.
+"""
+
+__program__ = 'ecell3-sbml2eml'
+__version__ = '1 and 2'
+__author__ = 'Tatsuya Ishida'
+__copyright__ = 'Copyright (C) 2002-2003 Keio University'
+__license__ = 'GPL'
+
 
 import sys
 import string
@@ -12,6 +22,7 @@ import types
 
 from ecell.eml import *
 from ecell.convertSBML2EML import *
+import libsbml
 
 
 if __name__ == '__main__':
@@ -84,14 +95,18 @@ Options:
 
     # ----------------    sbml2eml main    ------------------  
 
-    aSBMLdocument = readSBML( aSbmlFileName )
-    aSBMLmodel = SBMLDocument_getModel( aSBMLdocument )
+    theSBMLReader = libsbml.SBMLReader()
 
-    theModel = SBML_Model( aSBMLdocument, aSBMLmodel )
+    aSBMLDocument = theSBMLReader.readSBML( aSbmlFileName )
+    aSBMLModel = aSBMLDocument.getModel()
+
+    theModel = SBML_Model( aSBMLDocument, aSBMLModel )
     theCompartment = SBML_Compartment( theModel )
     theParameter = SBML_Parameter( theModel )
     theSpecies = SBML_Species( theModel )
+    theRule = SBML_Rule( theModel )
     theReaction = SBML_Reaction( theModel )
+#    theEvent = SBML_Event( theModel )
 
     print 'File:',aSbmlFileName,'( Level,',theModel.Level,' version,',theModel.Version,' )'
 
@@ -101,11 +116,11 @@ Options:
     #  Set Stepper
     # ------------------------------
 
-    anEml.createStepper( 'FixedODE1Stepper', 'DE' )
+    anEml.createStepper( 'ODE45Stepper', 'DE' )
 
 
     # ------------------------------
-    #  Set System
+    #  Set Compartment ( System )
     # ------------------------------
 
     # setFullID
@@ -160,9 +175,9 @@ Options:
         elif( theModel.Level == 2 ):
             aSizeValue = theModel.CompartmentSize[ aCompartment[0] ]
 
-        # convertToECELLUnit
-        if ( aCompartment[5] != [] ):
-            aSizeValue = theCompartment.convertCompartmentUnit( aSizeValue, aCompartment[5] )
+        # convert to ECELL Unit
+        if ( aCompartment[5] != '' ):
+            aSizeValue = theCompartment.convertCompartmentUnit( theModel, aSizeValue, aCompartment[5] )
 
         aTmpList = [ str( aSizeValue ) ]
         anEml.setEntityProperty( aSizeFullID, 'Value', aTmpList[0:1] )
@@ -175,7 +190,7 @@ Options:
            
            
     # ------------------------------
-    #  Set GlobalParameter
+    #  Set GlobalParameter ( Variable )
     # ------------------------------
     
     for aParameter in theModel.ParameterList:
@@ -200,7 +215,7 @@ Options:
 
 
     # ------------------------------
-    #  Set Variable
+    #  Set Species ( Variable )
     # ------------------------------
 
     for aSpecies in theModel.SpeciesList:
@@ -232,7 +247,30 @@ Options:
                 anEml.setEntityProperty( aSystemFullID, 'Fixed', aTmpList[0:1] )
 
     # ------------------------------
-    #  Set Process
+    #  Set Rule ( Process )
+    # ------------------------------
+
+    for aRule in theModel.RuleList:
+
+        theRule.initialize()
+
+        # setFullID
+        aSystemFullID = theRule.getRuleID()
+
+        convertedFormula = [ str( theRule.convertRuleFormula( aRule ) ) ]
+
+        #   if Algebraic Rule        
+        #anEml.createEntity( 'ExpressionAlgebraicProcess', aSystemFullID )
+
+        #   if Assignment Rule
+        #anEml.createEntity( 'ExpressionAssignmentProcess', aSystemFullID )
+        
+        #   if Rate Rule
+        #anEml.createEntity( 'ExpressionFluxProcess', aSystemFullID )
+
+
+    # ------------------------------
+    #  Set Reaction ( Process )
     # ------------------------------
 
     for aReaction in theModel.ReactionList:
@@ -245,59 +283,62 @@ Options:
 
         # setName
         if ( theModel.Level == 2 ):
-            if( aReaction[1] != [] ):
+            if( aReaction[1] != '' ):
                 anEml.setEntityProperty( aSystemFullID, 'Name', aReaction[1:2] )
-
-        # create VariableReferenceList from Sbml data
-        aVariableReferenceList = []
-        aSubstrateNumber = 0
-        aProductNumber = 0
-        aModifierNumber = 0
-        anEffectorNumber =0
-
 
         # setSubstrate
         for aSubstrate in aReaction[5]:
             aSubstrateList = []
-            aSubstrateList.append( 'S' + str( aSubstrateNumber ) )
-            aSubstrateNumber = aSubstrateNumber + 1
-            aSubstrateID = theReaction.getSpeciesReferenceID( aSubstrate[0] )
+            aSubstrateList.append( 'S' + str( theReaction.SubstrateNumber ) )
+            theReaction.SubstrateNumber = theReaction.SubstrateNumber + 1
+            aSubstrateID = theModel.getSpeciesReferenceID( aSubstrate[0] )
+            if ( aSubstrateID == None ):
+                raise NameError,"Species "+aSubstrate[0]+" not found"
+                sys.exit(1)
             aSubstrateList.append( 'Variable:' + aSubstrateID )
             if ( aSubstrate[2] != 1 ):
                 print "Stoichiometry Error : E-Cell System can't set a floating Stoichiometry"
                 sys.exit(1)
-            aSubstrateList.append( str( -1 * int( aSubstrate[1] ) ) )
-            aVariableReferenceList.append( aSubstrateList )
+            aSubstrateList.append( str( -1 * theReaction.getStoichiometry(
+                aSubstrate[0], aSubstrate[1] ) ) )
+            theReaction.VariableReferenceList.append( aSubstrateList )
 
         # setProduct
         for aProduct in aReaction[6]:
             aProductList = []
-            aProductList.append( 'P' + str(aProductNumber) )
-            aProductNumber = aProductNumber + 1
-            aProductID = theReaction.getSpeciesReferenceID( aProduct[0] )
+            aProductList.append( 'P' + str(theReaction.ProductNumber) )
+            theReaction.ProductNumber = theReaction.ProductNumber + 1
+            aProductID = theModel.getSpeciesReferenceID( aProduct[0] )
+            if ( aProductID == None ):
+                raise NameError,"Species "+aProduct[0]+" not found"
+                sys.exit(1)
             aProductList.append( 'Variable:' + aProductID )
             if ( aProduct[2] != 1 ):
                 print "Stoichiometry Error : E-Cell System can't set a floating Stoichiometry"
                 sys.exit(1)
-            aProductList.append( str(1 * int( aProduct[1] ) ) )
-            aVariableReferenceList.append( aProductList )
+            aProductList.append( str( 1 * theReaction.getStoichiometry(
+                aProduct[0],  aProduct[1] ) ) )
+            theReaction.VariableReferenceList.append( aProductList )
 
         # setCatalyst
         for aModifier in aReaction[7]:
             aModifierList = []
-            aModifierList.append( 'C' + str( aModifierNumber ) )
-            aModifierNumber = aModifierNumber + 1
-            aModifierID = theReaction.getSpeciesReferenceID( aModifier )
+            aModifierList.append( 'C' + str( theReaction.ModifierNumber ) )
+            theReaction.ModifierNumber = theReaction.ModifierNumber + 1
+            aModifierID = theModel.getSpeciesReferenceID( aModifier )
+            if ( aModifierID == None ):
+                raise NameError,"Species "+aModifier[0]+" not found"
+                sys.exit(1)
             aModifierList.append( 'Variable:' + aModifierID )
             aModifierList.append( '0' )
-            aVariableReferenceList.append( aModifierList )
+            theReaction.VariableReferenceList.append( aModifierList )
 
 
         # setProperty
-        if( aReaction[2] != [] ):
-            if( aReaction[2][4] != [] ):
+        if( aReaction[2] != '' ):
+            if( aReaction[2][4] != '' ):
                 for aParameter in aReaction[2][4]:
-                    if ( aParameter[2] != [] ): 
+                    if ( aParameter[2] != '' ): 
                         aTmpList = [ str( aParameter[2] ) ]
                         if ( theModel.Level == 1 ):
                             anEml.setEntityProperty( aSystemFullID, aParameter[1], aTmpList[0:1] )
@@ -311,13 +352,17 @@ Options:
                           
 
         # set "Expression" Property
-        aConvertedKineticLaw = [ str( theReaction.convertKineticLaw( aReaction[2][0], aVariableReferenceList ) ) ]
+        aConvertedKineticLaw = [ str( theReaction.convertKineticLaw( aReaction[2][0] ) ) ]
 
-        anEml.setEntityProperty( aSystemFullID, 'Expression', aConvertedKineticLaw )
-
+        # set Expression Property for ExpressionFluxProcess
+        anEml.setEntityProperty( aSystemFullID,
+                                 'Expression',
+                                 aConvertedKineticLaw )
 
         # setVariableReferenceList
-        anEml.setEntityProperty( aSystemFullID, 'VariableReferenceList', aVariableReferenceList )
+        anEml.setEntityProperty( aSystemFullID,
+                                 'VariableReferenceList',
+                                 theReaction.VariableReferenceList )
 
 
     # saveEmlFile
