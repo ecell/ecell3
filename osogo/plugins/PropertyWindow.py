@@ -1,191 +1,167 @@
 #!/usr/bin/env python
 
+
 import string
 
-import gtk
-import gnome.ui
-import GDK
-import libglade
-import propertyname
+from Plugin import *
+from ecssupport import *
 
-
-
-class Window:
-
-    def __init__( self, gladefile=None, root=None ):
-        self.widgets = libglade.GladeXML( filename=gladefile, root=root )
-
-    def addHandlers( self, handlers ):
-        self.widgets.signal_autoconnect( handlers )
-        
-    def addHandler( self, name, handler, *args ):
-        self.widgets.signal_connect( name, handler, args )
-
-    def getWidget( self, key ):
-        return self.widgets.get_widget( key )
-
-    def __getitem__( self, key ):
-        return self.widgets.get_widget( key )
-
-class MainWindow(Window):
+class PropertyWindow(PluginWindow):
 
     
-    def __init__( self, gladefile ):
+    def __init__( self, dirname, sim, data ):
         
-        self.theHandlerMap = {'input_row_pressed':self.select_property,
-                              'show_button_pressed':self.showing}
+        PluginWindow.__init__( self, dirname, sim, data )
         
-        Window.__init__( self, gladefile )
-        
-        self.addHandlers( self.theHandlerMap)
+        self.addHandlers( { 'input_row_pressed'   : self.select_property,
+                            'show_button_pressed' : self.show } )
         
         self.thePropertyClist = self.getWidget( "clist1" )
-        self.theTypeEntry = self.getWidget( "entry_TYPE" )
-        self.theIDEntry = self.getWidget( "entry_ID" )
-        self.thePathEntry = self.getWidget( "entry_PATH" )
-        self.theNameEntry = self.getWidget( "entry_NAME" )
+        self.theTypeEntry     = self.getWidget( "entry_TYPE" )
+        self.theIDEntry       = self.getWidget( "entry_ID" )
+        self.thePathEntry     = self.getWidget( "entry_PATH" )
+        self.theClassNameEntry     = self.getWidget( "entry_NAME" )
         
+        self.initialize()
+
         
+    def initialize( self ):
+
+        self.theSelected = ''
         
+        self.theFullID = convertToFullID( self.theFPNs[0] )
+        self.theType = str( self.theFullID[TYPE] )
+        self.theID   = str( self.theFullID[ID] )
+        self.thePath = str( self.theFullID[SYSTEMPATH] )
+        aFullPropertyName = convertToFullPropertyName( self.theFullID,
+                                                       'ClassName' )
+        aList = self.theSimulator.getProperty( aFullPropertyName )
+        self.theClassName  = aList[0]
+        self.theTypeEntry.set_text( self.theType  )
+        self.theIDEntry.set_text  ( self.theID )
+        self.thePathEntry.set_text( self.thePath )
+        self.theClassNameEntry.set_text( self.theClassName )
+
+        self.update()
         
-        
-    def update( self, aMainValueList, namePropertyList ):
+
+    def update( self ):
+
+        self.updatePropertyList()
         self.thePropertyClist.clear()
-        
-        self.aType = toString( FQPPList.getType() )
-        self.aID = toString( FQPPList.getID() )
-        self.aPath = toString( FQPPList.getSystemPath() )
-
-        self.theTypeEntry.set_text( self.aType  )
-        self.theIDEntry.set_text( self.aID )
-        self.thePathEntry.set_text( self.aPath )
-        self.theNameEntry.set_text( namePropertyList )
-
-        for a in aMainValueList:
-            self.thePropertyClist.append( a )
-
-        return self.aType, self.aID, self.aPath 
+        for aValue in self.theList:
+            self.thePropertyClist.append( aValue )
 
         
-    def makeValueList( self ):
-        self.MainValueList = []
-        
+    def updatePropertyList( self ):
 
-        aPropertyList = list( getKeyandList( 'PropertyList' ) )
-        self.bPropertyList = testdic['Name'][0] 
+        self.theList = []
+
+        aFullPropertyName = convertToFullPropertyName( self.theFullID,
+                                                       'PropertyList' )
+        aPropertyList =\
+        list( self.theSimulator.getProperty( aFullPropertyName ) )
+
         
-        
-        # remove keyword
-        aPropertyList = aPropertyList[1:] 
-        # remove PropertyList itself
+        # remove PropertyList and ClassName
         aPropertyList.remove( 'PropertyList' )
-        aPropertyList.remove( 'Name' )
+        aPropertyList.remove( 'ClassName' )
 
-        
-        
-        for x in aPropertyList:
-            aValueList = getKeyandList( x )
-            aValueList = aValueList[1:]
-            num_list = len( aValueList )
-            r=1
-            if  num_list > 1 :
-                for y in aValueList :
-                    
-                    aSubstanceList = [ x,r,y ]
-                    aSubstanceList = map( toString, aSubstanceList )
-                    self.MainValueList.append( aSubstanceList ) 
-                    r=r+1
-                
+        for aProperty in aPropertyList:
+
+            aFullPropertyName = convertToFullPropertyName( self.theFullID,
+                                                           aProperty )
+            aValueList = self.theSimulator.getProperty( aFullPropertyName ) 
+
+            aLength = len( aValueList )
+            if  aLength > 1 :
+                aNumber = 1
+                for aValue in aValueList :
+                    aList = [ aProperty, aNumber, aValue ]
+                    aList = map( str, aList )
+                    self.theList.append( aList ) 
+                    aNumber += 1
             else:
-                for y in aValueList :
-                    aParameterList = [ x,'',y ]
-                    aParameterList = map( toString, aParameterList )
-                    self.MainValueList.append( aParameterList)
-        return self.MainValueList, self.bPropertyList
+                for aValue in aValueList :
+                    aList = [ aProperty, '', aValue ]
+                    aList = map( str, aList )
+                    self.theList.append( aList)
 
-    def select_property(self,a,b,c,d):
-        value = find_substance( self.MainValueList[b][2] )
-        if value == -1 :
-            #            full=propertyname.getFullID()
-            aProperty = self.aType + ' ' + self.aID + ' ' + self.aPath
-            self.aProperty = aProperty +  ' ' +self.MainValueList[b][0]
-            #aProperty = full + full
-            return self.aProperty
-        else:
-            self.aProperty = self.MainValueList[b][2]
-            return self.aProperty
-    def showing(self,a):
-            print self.aProperty 
+    def select_property(self, obj, data1, data2, data3):
 
-def find_substance( aValue ) :                     
+        aSelectedItem = self.theList[data1]
+        aFullPropertyName = None
 
-    Sub_Sys_Rea = ['Substance','System','Reactor']
-    aValue = toString( aValue )
-    
-    for x in Sub_Sys_Rea :
-        result = string.find( aValue,x )
-        if not result == -1 :
-            break
+        print aSelectedItem
+        try:
+            aFullPropertyName = parseFullPropertyName( aSelectedItem[2] )
+        except ValueError:
+            pass
 
-    if result == -1:
-        return result
-    elif not result == -1:
-        return result
-    
-def toString( object ):
-    return str( object )
-    
-def mainQuit( obj, data ):
-    print obj,data
-    gtk.mainquit()
+        if not aFullPropertyName:
+            try:
+                aFullID = parseFullID( aSelectedItem[2] )
+                aFullPropertyName = convertToFullPropertyName( aFullID )
+            except ValueError:
+                pass
+            
+        if not aFullPropertyName:
+            aFullPropertyName = [ self.theType, self.thePath,
+                          self.theID, aSelectedItem[0] ]
 
-def mainLoop():
-    # FIXME: should be a custom function
-    gtk.mainloop()
+        self.theSelected = aFullPropertyName
 
-def main():
-    aMainWindow = MainWindow( 'PropertyWindow.glade' )
-    aMainWindow.addHandler( 'gtk_main_quit', mainQuit )
-    aMainWindow.makeValueList()
-    aMainWindow.update( aMainWindow.MainValueList, aMainWindow.bPropertyList )
-    mainLoop()
+    def show( self, obj ):
 
-#this data should be written in an other file.
-#the beginning of data area
-    
-testdic={'PropertyList': ('PropertyList', 'Name', 'A','B','C','Substrate','Product'),
-          'Name': ('MichaelisMentenReactor', ),
-          'A': ('aaa', ) ,
-          'B': (1.04E-3, ) ,
-          'C': (41, ),
-          'Substrate': ('Substance:/CELL/CYTOPLASM/ ATP',
-                        'Substance:/CELL/CYTOPLASM/ ADP',
-                        'Substance:/CELL/CYTOPLASM/ AMP',
-                        ),
-
-          'Product': ('Substance:/CELL/CYTOPLASM/ GLU',
-                      'Substance:/CELL/CYTOPLASM/ LAC',
-                       'Substance:/CELL/CYTOPLASM/ PYR',
-                      )
-          } 
-
-#FQPPList = ['MichaMen','/CELL/CYTOPLASM','MichaelisMentenReactor']
-FQPPList = propertyname.FullPropertyName('Reactor:/CELL/CYTOPLASM:MichaMen:PropertyName')
+        print self.theSelected
 
 
-
-#the ending of data area
-
-
-#def getFQPP():
-#    return FQPPList
-
-def getKeyandList( key ):
-    aList = list(testdic[key])
-    aList.insert( 0, key )
-    return tuple( aList )
 
 if __name__ == "__main__":
+
+
+    class simulator:
+
+        dic={'PropertyList':
+             ('PropertyList', 'ClassName', 'A','B','C','Substrate','Product'),
+             'ClassName': ('MichaelisMentenReactor', ),
+             'A': ('aaa', ) ,
+             'B': (1.04E-3, ) ,
+             'C': (41, ),
+             'Substrate': ('Substance:/CELL/CYTOPLASM:ATP',
+                           'Substance:/CELL/CYTOPLASM:ADP',
+                           'Substance:/CELL/CYTOPLASM:AMP',
+                           ),
+             'Product': ('Substance:/CELL/CYTOPLASM:GLU',
+                         'Substance:/CELL/CYTOPLASM:LAC',
+                         'Substance:/CELL/CYTOPLASM:PYR',
+                         )
+             } 
+
+        def getProperty( self, fpn ):
+            return simulator.dic[fpn[PROPERTY]]
+    
+    fpn = parseFullPropertyName('Reactor:/CELL/CYTOPLASM:MichaMen:PropertyName')
+
+
+
+    def mainQuit( obj, data ):
+        print obj,data
+        gtk.mainquit()
+        
+    def mainLoop():
+        # FIXME: should be a custom function
+
+        gtk.mainloop()
+
+    def main():
+        aPropertyWindow = PropertyWindow( 'plugins', simulator(), [fpn,] )
+        aPropertyWindow.addHandler( 'gtk_main_quit', mainQuit )
+        aPropertyWindow.update()
+
+        mainLoop()
+
+    
 
     main()
 
