@@ -190,6 +190,7 @@ pyecs/Makefile
 pyecs/ecell3
 pyecell/Makefile
 pyecell/ecell/Makefile
+dm/Makefile
 ])
 AC_CONFIG_COMMANDS([default],[[chmod +x pyecs/ecell3 libecs/emtool
 ]],[[]])
