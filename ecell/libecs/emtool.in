@@ -183,7 +183,7 @@ if [ $DO_COMPILE  ] ; then
     base=`basename $inputfile .cpp`	     			
     sofile=$base$SOSUFFIX
 
-    if [ -f $sofile -a $sofile -nt $ ] ; then
+    if test -f $sofile && test $sofile -nt $inputfile ; then
 	echo "$sofile is newer than $inputfile..." 
 	echo "skipping..."
 	cleanup
