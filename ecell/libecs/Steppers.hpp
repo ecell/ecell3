@@ -32,15 +32,46 @@
 #define __STEPPERS_HPP
 
 #include "Stepper.hpp"
-
+#include "Interpolator.hpp"
 
 namespace libecs
 {
+
+  DECLARE_CLASS( FixedEuler1Stepper );
 
   class FixedEuler1Stepper
     :
     public DifferentialStepper
   {
+  protected:
+
+    class Interpolator
+      :
+      public libecs::Interpolator
+    {
+    public:
+      Interpolator( FixedEuler1StepperRef aStepper, UnsignedInt anIndex )
+	:
+	theStepper( aStepper ),
+	theIndex( anIndex )
+      {
+	; // do nothing
+      }
+
+      virtual const Real getVelocity( RealCref aTime )
+      {
+	return theStepper.getVelocityBuffer()[ theIndex ] 
+	  * ( aTime - theStepper.getCurrentTime() );
+      }
+      
+    protected:
+
+      FixedEuler1StepperRef theStepper;
+      UnsignedInt           theIndex;
+
+    };
+
+
   public:
     
     FixedEuler1Stepper();
@@ -50,10 +81,17 @@ namespace libecs
     
     virtual void step();
 
-    virtual const Real getContinuousVelocity( RealCref aTime, 
-					     UnsignedInt anIndex )
+
+    virtual InterpolatorPtr createInterpolator( UnsignedInt anIndex )
     {
-      return 0;
+      return new Interpolator( *this, anIndex );
+    }
+
+
+    virtual const Real getContinuousVelocity( RealCref aTime, 
+					      UnsignedInt anIndex )
+    {
+      return 0.0;
     }
 
     virtual StringLiteral getClassName() const { return "FixedEuler1Stepper"; }

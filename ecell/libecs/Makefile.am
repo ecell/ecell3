@@ -59,6 +59,7 @@ Variable.hpp\
 VariableMaker.hpp\
 Stepper.hpp\
 Steppers.hpp\
+Interpolator.hpp\
 Model.hpp\
 Scheduler.hpp\
 EntityType.hpp\

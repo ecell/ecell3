@@ -34,12 +34,13 @@
 #include <vector>
 #include <algorithm>
 #include <utility>
-//#include <valarray>
+
 
 #include "libecs.hpp"
 
 #include "Util.hpp"
 #include "Polymorph.hpp"
+#include "Interpolator.hpp"
 #include "PropertyInterface.hpp"
 #include "System.hpp"
 
@@ -201,7 +202,7 @@ namespace libecs
     }
 
     virtual const Real getContinuousVelocity( RealCref aTime, 
-					     UnsignedInt anIndex ) = 0;
+					      UnsignedInt anIndex ) = 0;
 
     void registerLoggedPropertySlot( PropertySlotPtr );
 
@@ -289,8 +290,19 @@ namespace libecs
       return theDependentStepperVector;
     }
 
+    RealVectorCref getValueBuffer() const
+    {
+      return theValueBuffer;
+    }
 
-    const UnsignedInt findInWriteVariableVector( VariablePtr aVariable );
+    RealVectorCref getVelocityBuffer() const
+    {
+      return theVelocityBuffer;
+    }
+
+
+
+    const UnsignedInt getWriteVariableIndex( VariableCptr const aVariable );
 
     RealCptr getVelocityBufferElementPtr( UnsignedInt anIndex )
     {
@@ -336,6 +348,13 @@ namespace libecs
     const Polymorph getProcessList()          const;
     const Polymorph getSystemList()           const;
     const Polymorph getDependentStepperList() const;
+
+
+    virtual InterpolatorPtr createInterpolator( VariablePtr aVariablePtr )
+    {
+      return new Interpolator();
+    }
+
 
     bool operator<( StepperCref rhs )
     {

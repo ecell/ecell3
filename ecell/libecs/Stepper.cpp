@@ -146,8 +146,6 @@ namespace libecs
 
   void Stepper::initialize()
   {
-    FOR_ALL( SystemVector, theSystemVector, initialize );
-
     //    if( isEntityListChanged() )
     //      {
 
@@ -166,7 +164,7 @@ namespace libecs
     //    clearEntityListChanged();
     //      }
 
-    Int aSize( theWriteVariableVector.size() );
+    const Int aSize( theWriteVariableVector.size() );
 
     theValueBuffer.resize( aSize );
     theVelocityBuffer.resize( aSize );
@@ -183,13 +181,11 @@ namespace libecs
 
 	  for( ProcessMapConstIterator 
 		 j( aSystem->getProcessMap().begin() );
-	       j != aSystem->getProcessMap().end(); j++ )
+	       j != aSystem->getProcessMap().end(); ++j )
 	    {
 	      ProcessPtr aProcessPtr( (*j).second );
 
 	      theProcessVector.push_back( aProcessPtr );
-
-	      aProcessPtr->initialize();
 	    }
 	}
 
@@ -239,12 +235,7 @@ namespace libecs
 			       theWriteVariableVector.end(),
 			       aVariablePtr ) == theWriteVariableVector.end() )
 		  {
-		    
 		    theWriteVariableVector.push_back( aVariablePtr );
-		    
-		    aVariablePtr->registerStepper( this );
-		    // FIXME: this this needed?
-		    aVariablePtr->initialize();
 		  }
 	      }
 
@@ -266,6 +257,14 @@ namespace libecs
     std::sort( theReadVariableVector.begin(), theReadVariableVector.end() );
     std::sort( theWriteVariableVector.begin(), theWriteVariableVector.end() );
 
+		    
+    for( VariableVectorConstIterator i( theWriteVariableVector.begin() );
+	 i != theWriteVariableVector.end(); ++i )
+      {
+	VariablePtr aVariablePtr( *i );
+	aVariablePtr->registerStepper( this );
+      }
+
   }
 
   void Stepper::updateDependentStepperVector()
@@ -279,6 +278,7 @@ namespace libecs
       {
 	StepperPtr aStepperPtr( i->second );
 
+	// exclude this
 	if( aStepperPtr == this )
 	  {
 	    continue;
@@ -486,11 +486,16 @@ namespace libecs
     return aVector;
   }
   
-  const UnsignedInt Stepper::findInWriteVariableVector( VariablePtr aVariable )
+  const UnsignedInt 
+  Stepper::getWriteVariableIndex( VariableCptr const aVariable )
   {
     VariableVectorConstIterator
-      anIterator( std::find( theWriteVariableVector.begin(), 
-			     theWriteVariableVector.end(), aVariable ) );
+      anIterator( std::lower_bound( theWriteVariableVector.begin(), 
+				    theWriteVariableVector.end(), 
+				    aVariable ) );
+
+    DEBUG_EXCEPTION( *anIterator == aVariable , NotFound, 
+		     "This should not occur.  Must be a bug." );
 
     return anIterator - theWriteVariableVector.begin();
   }
@@ -528,10 +533,8 @@ namespace libecs
 
   void Stepper::process()
   {
-    //
-    // Process::process()
-    //
-    FOR_ALL( ProcessVector, theProcessVector, process );
+    std::for_each( theProcessVector.begin(), theProcessVector.end(),
+		   std::mem_fun( &Process::process ) );
   }
 
   void Stepper::processNegative()
@@ -543,7 +546,7 @@ namespace libecs
   void Stepper::processNormal()
   {
     std::for_each( theFirstNormalProcess, theProcessVector.end(),
-		   std::mem_fun( &Process::process ) );
+    		   std::mem_fun( &Process::process ) );
   }
 
   void Stepper::integrate()

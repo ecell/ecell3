@@ -28,8 +28,10 @@
 // E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
 
-#ifndef ___VARIABLE_H___
-#define ___VARIABLE_H___
+#ifndef __VARIABLE_HPP
+#define __VARIABLE_HPP
+
+#include <utility>
 
 #include "libecs.hpp"
 #include "EntityType.hpp"
@@ -59,6 +61,9 @@ namespace libecs
   {
 
     DECLARE_VECTOR( RealCptr, RealPtrVector);
+
+    DECLARE_VECTOR( InterpolatorPtr, InterpolatorVector );
+
 
   public:
 
@@ -244,7 +249,7 @@ namespace libecs
       return getValue() / ( getSuperSystem()->getVolume() * N_A );
     }
 
-    void registerStepper( StepperPtr aStepper );
+    void registerStepper( StepperPtr aStepperPtr );
 
     static VariablePtr createInstance() { return new Variable; }
 
@@ -419,7 +424,8 @@ namespace libecs
 
 } // namespace libecs
 
-#endif /* ___VARIABLE_H___ */
+
+#endif /* __VARIABLE_HPP */
 
 /*
   Do not modify

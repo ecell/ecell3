@@ -99,18 +99,8 @@ namespace libecs
 
   void Variable::initialize()
   {
-
     theVelocityVector.clear();
-    for( StepperVectorConstIterator i( theStepperVector.begin() );
-	 i != theStepperVector.end(); ++i )
-      {
-	StepperPtr aStepperPtr( *i );
-	const UnsignedInt anIndex( aStepperPtr->
-				   findInWriteVariableVector( this ) );
-	theVelocityVector.push_back( aStepperPtr->
-				     getVelocityBufferElementPtr( anIndex ) );
-      }
-
+    theStepperVector.clear();
   }
 
   void Variable::setFixed( IntCref aValue )
@@ -124,14 +114,23 @@ namespace libecs
     return theFixed;
   }
 
-  void Variable::registerStepper( StepperPtr aStepper )
+  void Variable::registerStepper( StepperPtr aStepperPtr )
   {
-    if( std::find( theStepperVector.begin(), theStepperVector.end(),
-		   aStepper )  == theStepperVector.end() )
+    // prevent duplication
+    if( std::find( theStepperVector.begin(), 
+		   theStepperVector.end(),
+		   aStepperPtr )  != theStepperVector.end() )
       {
-	theStepperVector.push_back( aStepper );
+	return;
       }
 
+
+    theStepperVector.push_back( aStepperPtr );
+
+    const UnsignedInt anIndex( aStepperPtr->
+			       getWriteVariableIndex( this ) );
+    theVelocityVector.push_back( aStepperPtr->
+				 getVelocityBufferElementPtr( anIndex ) );
   }
 
 

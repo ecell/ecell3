@@ -57,19 +57,16 @@ namespace libecs
   // classes
 
   DECLARE_CLASS( System );
-  //  DECLARE_CLASS( AccumulatorMaker );
-  //  DECLARE_CLASS( Accumulator );
   DECLARE_CLASS( Entity );
   DECLARE_CLASS( EntityType );
   DECLARE_CLASS( SystemPath );
   DECLARE_CLASS( FullID );
   DECLARE_CLASS( FullPN );
-  DECLARE_CLASS( Integrator );
   DECLARE_CLASS( VariableReference );
   DECLARE_CLASS( Process );
   DECLARE_CLASS( ProcessMaker );
   DECLARE_CLASS( Stepper );
-  DECLARE_CLASS( MasterStepper );
+  DECLARE_CLASS( Interpolator );
   DECLARE_CLASS( Model );
   DECLARE_CLASS( Scheduler );
   DECLARE_CLASS( Event );
@@ -86,6 +83,11 @@ namespace libecs
   DECLARE_CLASS( Logger );
   DECLARE_CLASS( DataPoint );
   DECLARE_CLASS( DataPointVector );
+
+
+  //  DECLARE_CLASS( AccumulatorMaker );
+  //  DECLARE_CLASS( Accumulator );
+  //  DECLARE_CLASS( Integrator );
 
 
   // containers

@@ -159,7 +159,7 @@ namespace libecs
 
   void System::initialize()
   {
-    // do not need to call subsystems' initialize() -- Stepper does this
+    // do not need to call subsystems' initialize() -- caller does this
 
   }
 

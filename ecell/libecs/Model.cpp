@@ -234,7 +234,7 @@ namespace libecs
   }
 
 
-  void Model::checkStepper( SystemCptr aSystem)
+  void Model::checkStepper( SystemCptr const aSystem ) const
   {
     if( aSystem->getStepper() == NULLPTR )
       {
@@ -251,12 +251,29 @@ namespace libecs
       }
   }
 
+
+  void Model::initializeSystems( SystemPtr const aSystem )
+  {
+    aSystem->initialize();
+
+    for( SystemMapConstIterator i( aSystem->getSystemMap().begin() );
+	 i != aSystem->getSystemMap().end() ; ++i )
+      {
+	// initialize recursively
+	initializeSystems( i->second );
+      }
+  }
+
   void Model::initialize()
   {
+    initializeSystems( getRootSystem() );
+
     checkStepper( getRootSystem() );
 
+    // initialization of Stepper needs two stages:
+    // (1) initialize
+    // (2) construct stepper dependency graph
     FOR_ALL_SECOND( StepperMap, theStepperMap, initialize );
-
     FOR_ALL_SECOND( StepperMap, theStepperMap, updateDependentStepperVector );
 
   }

@@ -73,6 +73,16 @@ namespace libecs
 
        This method must be called before running the model, and when
        structure of the model is changed.
+
+       Procedure of the initialization is as follows:
+
+       1. Initialize Systems recursively starting from theRootSystem.
+       ( System::initialize() )
+       1. Check if all the Systems have a Stepper.
+       1. Initialize Steppers. ( Stepper::initialize() )
+       1. Construct Stepper interdependency graph 
+       ( Stepper::updateDependentStepperVector() )
+
     */
 
     void initialize();
@@ -110,8 +120,7 @@ namespace libecs
        @param aName
     */
 
-    void createEntity( StringCref aClassname,
-		       FullIDCref aFullID );
+    void createEntity( StringCref aClassname, FullIDCref aFullID );
 
 
     /**
@@ -216,7 +225,7 @@ namespace libecs
 
     /// @internal
 
-    VariableMakerRef   getVariableMaker()   { return theVariableMaker; }
+    VariableMakerRef    getVariableMaker()    { return theVariableMaker; }
 
     /// @internal
 
@@ -241,8 +250,9 @@ namespace libecs
        @throw InitializationFailed if the check failed.
     */
 
-    void checkStepper( SystemCptr aSystem );
+    void checkStepper( SystemCptr const aSystem ) const;
 
+    static void initializeSystems( SystemPtr const aSystem );
 
   private:
 
