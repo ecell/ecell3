@@ -5,7 +5,7 @@
 <modelname>simple</modelname>
 <author>Ryosuke Suzuki</author>
 <created>2002/04/15</created>
-<lastsaved>2002/07/19</lastsaved>
+<lastsaved>2002/07/24</lastsaved>
 </info>
 
 
@@ -15,7 +15,7 @@
 
 
 <!-- ROOT -->
-<system class="" stepper="SRM_01" id="/" name="Environment">
+<system class="System" stepper="SRM_01" id="/" name="Environment">
 <property name="Volume">
 <value number="0">0.000000000000001</value>
 </property>
@@ -24,7 +24,7 @@
 
 
 <!-- CELL -->
-<system class="" stepper="SRM_01" id="/CELL" name="Cell">
+<system class="System" stepper="SRM_01" id="/CELL" name="Cell">
 <property name="Volume">
 <value number="0">unknown</value>
 </property>
@@ -34,7 +34,7 @@
 
 
 <!-- CYTOPLASM -->
-<system class="" stepper="SRM_01" id="/CELL/CYTOPLASM" name="Cytoplasm">
+<system class="System" stepper="SRM_01" id="/CELL/CYTOPLASM" name="Cytoplasm">
 
 <property name="Volume">
 <value number="0">1e-18</value>
