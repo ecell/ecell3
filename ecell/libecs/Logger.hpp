@@ -40,7 +40,7 @@
  */
 
 #include "DataPoint.hpp"
-#include "MessageInterface.hpp"
+//#include "MessageInterface.hpp"
 #include "UniversalVariable.hpp"
 
 //#if defined(STLDATAPOINTVECTOR)
@@ -52,8 +52,7 @@ namespace libecs
 
   class DataPoint;
   class Logger;
-
-
+  class ProxyMessageSlot;
 
   /**
    
@@ -61,26 +60,15 @@ namespace libecs
 
   class Logger
   {
-
-
-
-
   public:
 
-    //#if defined(STLDATAPOINTVECTOR)
     DECLARE_TYPE( StlDataPointVector, DataPointVector );
-    //#endif /* END OF STLDATAPOINTVECTOR */
-
-#if defined(VVECTOR)
-    DECLARE_TYPE( VVector, DataPointVector );
-#endif /* END OF VVECTOR */ 
 
     typedef DataPointVector::Containee containee_type;
     typedef DataPointVector::const_iterator const_iterator;
     typedef DataPointVector::iterator iterator;
     typedef DataPointVector::size_type size_type;
 
-  typedef AbstractMessageSlot::ProxyMessageSlot ProxyMessageSlot;
 
   
   public:
@@ -95,7 +83,7 @@ namespace libecs
        Constructor
     */
   
-    Logger( const ProxyMessageSlot& );
+    //    Logger( const ProxyMessageSlot& );
   
     /**
        Copy constructor
@@ -131,24 +119,6 @@ namespace libecs
 				 RealCref interval ) const;
 
 
-    /**
-
-     */
-
-    /*    void update( void ); */
-  
-    /**
-
-     */
-    //FIXME temp
-
-    /*
-    void update( containee_type& dp )
-    {
-      appendData(dp);
-    }
-    */
-
 
     /**
 
@@ -183,17 +153,26 @@ namespace libecs
 
 
 
+    /**
+
+     */
+
+    void appendData( const containee_type& );
+
+    void appendData( RealCref t, UniversalVariableCref v );
+
+
   protected:
 
     /**
 
-     */
 
     const ProxyMessageSlot& getMessageSlot( void ) const
     {
       return theMessageSlot;
     }
   
+     */
   
     /**
 
@@ -216,15 +195,6 @@ namespace libecs
       return theDataPointVector.binary_search( begin, end, t );
     }
     
-
-
-    /**
-
-     */
-
-    void appendData( const containee_type& );
-
-    void appendData( RealCref t, UniversalVariableCref v );
 
   private:
 
@@ -249,7 +219,7 @@ namespace libecs
     /// Data members
 
     DataPointVector             theDataPointVector;
-    const ProxyMessageSlot      theMessageSlot;
+    //    const ProxyMessageSlot      theMessageSlot;
     Real                        theMinimumInterval;
     Real                        theCurrentInterval;
 

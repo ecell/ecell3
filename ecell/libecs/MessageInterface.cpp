@@ -27,6 +27,9 @@
 // written by Kouichi Takahashi <shafi@e-cell.org> at
 // E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
+// modified by Masayuki Okayama <smash@e-cell.org> at
+// E-CELL Project, Lab. for Bioinformatics, Keio University.
+//
 
 #include "MessageInterface.hpp"
 

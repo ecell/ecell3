@@ -33,10 +33,12 @@
 
 #include <map>
 
-#include "libecs.hpp"
 
+#include "libecs.hpp"
+#include "Logger.hpp"
 #include "Message.hpp"
 #include "RCPtr.hpp"
+
 
 namespace libecs
 {
@@ -45,6 +47,9 @@ namespace libecs
 
   DECLARE_MAP( const String, AbstractMessageSlotPtr, 
 	       less<const String>, PropertyMap );
+
+  class Logger;
+  class ProxyMessageSlot;
 
 
   /**
@@ -68,72 +73,92 @@ namespace libecs
     virtual const Message operator()( StringCref keyword ) 
     { return get(keyword); }
 
-    class ProxyMessageSlot
-    {
-      DECLARE_TYPE( RCPtr<AbstractMessageSlotPtr>, RCMessageSlotPtr );
-      
-    public:
-      
-      ProxyMessageSlot( AbstractMessageSlotPtr aMessageSlot )
-	:
-	theMessageSlot( aMessageSlot ),
-	theLogger( NULLPTR )
-      {
-	;
-      }
-
-      
-      ProxyMessageSlot( RCMessageSlotPtr aRCMessageSlotPtr )
-	:
-	theMessageSlot( aRCMessageSlotPtr ),
-	theLogger( NULLPTR )
-      {
-	;
-      }
-
-      ProxyMessageSlot( ProxyMessageSlot& rhs )
-	:
-	theMessageSlot( rhs.theMessageSlot ),
-	theLogger( NULLPTR )
-      {
-	;
-      }
-
-      ProxyMessageSlot( const ProxyMessageSlot& rhs )
-	:
-	theMessageSlot( rhs.theMessageSlot ),
-	theLogger( NULLPTR )
-      {
-	;
-      }
-
-
-      void setLogger( LoggerPtr aLogger )
-      {
-	theLogger = aLogger;
-      }
-      
-
-      
-    private:
-      
-      ProxyMessageSlot( void );
-      
-    private:    
-      RCMessageSlotPtr theMessageSlot;
-      LoggerPtr        theLogger;
-
-    
-    
-    };
-
     virtual ProxyMessageSlot* getProxy( void ) = 0;
-
-
-
 
   };
 
+
+  class ProxyMessageSlot
+  {
+    DECLARE_TYPE( RCPtr<AbstractMessageSlotPtr>, RCMessageSlotPtr );
+    
+  public:
+      
+    ProxyMessageSlot( AbstractMessageSlotPtr aMessageSlot )
+      :
+      theMessageSlot( aMessageSlot ),
+      theLogger( NULLPTR )
+    {
+      ;
+    }
+
+      
+    ProxyMessageSlot( RCMessageSlotPtr aRCMessageSlotPtr )
+      :
+      theMessageSlot( aRCMessageSlotPtr ),
+      theLogger( NULLPTR )
+    {
+      ;
+    }
+
+
+    // copy constructor
+    
+    ProxyMessageSlot( ProxyMessageSlot& rhs )
+      :
+      theMessageSlot( rhs.theMessageSlot ),
+      theLogger( rhs.theLogger )
+    {
+      ;
+    }
+
+    // copy constructor 
+
+    ProxyMessageSlot( const ProxyMessageSlot& rhs )
+      :
+      theMessageSlot( rhs.theMessageSlot ),
+      theLogger( rhs.theLogger )
+    {
+      ;
+    }
+
+
+    void setLogger( LoggerPtr aLogger )
+    {
+      theLogger = aLogger;
+    }
+    
+    
+    void update( UniversalVariableCref v )
+    {
+      const Real temp(0.0);
+      theLogger->appendData( temp, v );
+    }
+
+
+    bool operator!=( const ProxyMessageSlot& rhs ) const
+    {
+      if( *rhs.theMessageSlot != *this->theMessageSlot )
+	{
+	  return true;
+	}
+      return false;
+    }
+
+      
+  private:
+      
+    ProxyMessageSlot( void );
+      
+  private:    
+    RCMessageSlotPtr theMessageSlot;
+    LoggerPtr        theLogger;
+    
+    
+    
+  };
+
+  
 
 
 
@@ -173,7 +198,7 @@ namespace libecs
     }
   
 
-    virtual void set( MessageCref message ) 
+    virtual void set( MessageCref message )
     {
       if( theSetMethod == NULLPTR )
 	{
@@ -181,6 +206,12 @@ namespace libecs
 	  return;
 	}
       ( theObject.*theSetMethod )( message );
+      
+      if( theProxy != NULL )
+	{
+	  Message m = get("nothing");
+	  //	  theProxy.update( m.getBody() );
+	} 
     }
 
     virtual const Message get( StringCref keyword ) 

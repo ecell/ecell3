@@ -46,30 +46,30 @@ namespace libecs
   Logger::Logger( void )
     :
     theMinimumInterval( 0.0 ),
-    theCurrentInterval( 0.0 ),
-    theMessageSlot( NULLPTR )
+    theCurrentInterval( 0.0 )
   {
     ;
   } 
 
   // Constructor
 
-
+  /*
   Logger::Logger( const ProxyMessageSlot& aMessageSlot )
     :
-    theMessageSlot( aMessageSlot ),
+    //    theMessageSlot( aMessageSlot ),
     theMinimumInterval( 0.0 ),
     theCurrentInterval( 0.0 )
   {
     ; // do nothing
   } 
+  */
   
   // Copy Constructor
   
   Logger::Logger( LoggerCref logger )
     :
     theDataPointVector( logger.getDataPointVector() ),
-    theMessageSlot( logger.getMessageSlot() ),
+    //    theMessageSlot( logger.getMessageSlot() ),
     theMinimumInterval( logger.getMinInterval() ),
     theCurrentInterval( logger.getCurrentInterval() )
   {
@@ -162,15 +162,6 @@ namespace libecs
     return *aDataPointVectorPtr;
   }
   
-  
-  //
-  // FIXME
-  /*
-  void Logger::update( void )
-  {
-    appendData( containee_type( (*theDataFuncCptr)(), (*theDataFuncCptr)() ) );
-  }
-  */
   
   //
   

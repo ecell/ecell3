@@ -66,27 +66,25 @@ namespace libecs
     String aSystemPathString( aFQPI.getSystemPathString() );
     SystemPtr aSystemPtr = theRootSystem->getSystem( aSystemPathString );
 
-    //    MessageInterfacePtr aMessageInterfacePtr = NULLPTR;
     PropertyMapIterator pmitr( NULLPTR );
 
     switch( aFQPI.getPrimitiveType() )
       {
       case SUBSTANCE:
-	//	aMessageInterfacePtr = aSystemPtr->getSubstance( aFQPI.getIdString() );
 	pmitr = aSystemPtr->getSubstance( aFQPI.getIdString() )->getMessageSlot( property_name );
     	break;
       case REACTOR:
-	//	aMessageInterfacePtr = aSystemPtr->getReactor( aFQPI.getIdString() );
 	pmitr = aSystemPtr->getReactor( aFQPI.getIdString() )->getMessageSlot( property_name );
 	break;
       case SYSTEM:
+	pmitr = aSystemPtr->getSystem( aFQPI.getIdString() )->getMessageSlot( property_name );
 	break;
       }
-    //    PropertyMapIterator pmitr( aMessageInterfacePtr->getMessageSlot( property_name ) );
 
+    LoggerPtr lptr = new Logger();
+    pmitr->second->getProxy()->setLogger( lptr );
     const PairOfStrings p( fqpnstring, property_name );
-    //    theLoggerMap[ p ] = new Logger( *pmitr->second->getProxy() );
-    theLoggerMap.insert(PairInLoggerMap( p, new Logger( *pmitr->second->getProxy() ) ) );
+    theLoggerMap.insert(PairInLoggerMap( p, lptr ) );
   }
   
 
