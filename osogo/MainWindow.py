@@ -260,6 +260,16 @@ class MainWindow(OsogoWindow):
                 self.theToolbarVisible = False
 
 
+
+                # ------------------------
+                # set color in time entry
+                # ------------------------
+
+                self['time_entry'].modify_base( gtk.STATE_NORMAL,
+                                                gtk.gdk.Color(61000,61000,61000,0) )
+
+
+
 	def __expose( self, *arg ):
 		"""expose
 		Return None
