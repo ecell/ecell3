@@ -23,7 +23,7 @@ class Session:
     def __init__( self, aSimulator ):
         'constructor'
 
-        self.thePrintMethod = self.__plainPrintMethod
+        self.theMessageMethod = self.__plainMessageMethod
         self.theSimulator = aSimulator
 
 
@@ -69,19 +69,19 @@ class Session:
     def saveModel( self ):
         pass
 
-    def setPrintMethod( self, aMethod ):
-        self.thePrintMethod = aMethod
+    def setMessageMethod( self, aMethod ):
+        self.theMessageMethod = aMethod
 
     def message( self, message ):
-        self.thePrintMethod( message )
+        self.theMessageMethod( message )
 
     def setLogMethod( self, aMethod ):
-        print 'setLogMethod() is deprecated. use setPrintMethod instead.'
-        self.thePrintMethod = aMethod
+        print 'setLogMethod() is deprecated. use setMessageMethod instead.'
+        self.theMessageMethod = aMethod
 
     def log( self, message ):
         print 'log() is deprecated. use message() instead'
-        self.thePrintMethod( message )
+        self.theMessageMethod( message )
 
 
 
@@ -236,7 +236,7 @@ class Session:
     # private methods
     #
 
-    def __plainPrintMethod( self, aMessage ):
+    def __plainMessageMethod( self, aMessage ):
         print aMessage
 
 

@@ -9,24 +9,24 @@ S = createEntityStub( 'Variable:/CELL/CYTOPLASM:S' )
 
 
 # print some values
-log( 't= \t%s' % getCurrentTime() )
-log( 'S:Value= \t%s' % S.getProperty( 'Value' ) )
-log( 'S:Concentration= \t%s' % S.getProperty( 'Concentration' ) )
+message( 't= \t%s' % getCurrentTime() )
+message( 'S:Value= \t%s' % S.getProperty( 'Value' ) )
+message( 'S:Concentration= \t%s' % S.getProperty( 'Concentration' ) )
 
 # run
 duration = 1000
-log( '\n' )
-log( 'run %s sec.\n' % duration )
+message( '\n' )
+message( 'run %s sec.\n' % duration )
 run( duration )
 
 
 # print results
-log( 't= \t%s' % getCurrentTime() )
-log( 'S:Value= \t%s' % S.getProperty( 'Value' ) )
-log( 'S:Concentration= \t%s' % S.getProperty( 'Concentration' ) )
+message( 't= \t%s' % getCurrentTime() )
+message( 'S:Value= \t%s' % S.getProperty( 'Value' ) )
+message( 'S:Concentration= \t%s' % S.getProperty( 'Concentration' ) )
 
-log( '\n' )
+message( '\n' )
 
 # print some logger data
-log( 'Last ten log points of %s:' % S_Logger.getName() )
-log( S_Logger.getData()[-10:] )
+message( 'Last ten log points of %s:' % S_Logger.getName() )
+message( S_Logger.getData()[-10:] )
