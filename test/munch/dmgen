@@ -1,0 +1,81 @@
+#!/bin/bash
+#
+# dmgen --- 
+#
+# author:  Tomoya Kitayama <tomo@e-cell.org>
+#
+
+#PACKAGE=@PACKAGE@
+#VERSION=@VERSION@
+
+prefix=/home/tomo/wrk/munch
+exec_prefix=@prefix@
+
+SHAREDIR="${prefix}/share/ecell/@VERSION@/template"
+BINDIR="${exec_prefix}/bin"
+ECELL_INCLUDE="${prefix}/include/ecell"
+MUNCHBIN="/home/tomo/wrk/munch/munch.py"
+TMPLDIR="/home/tomo/wrk/munch/dmtemplates/reactor"
+MUNCHDIR="/home/tomo/wrk/munch/dmtemplates/reactor"
+
+MV="/bin/mv"
+RM="/bin/rm"
+
+MUNCHSUFFIX=".mu"
+TMPLSUFFIX=".tmpl"
+
+OUTPREFIX="."
+OUTDIR="."
+
+help() 
+{
+cat << EOT_HELP
+
+Usage:
+	`basename $0` <classname> [OPTIONS] files...
+	`basename $0` -h|--help
+Options:
+	-d|--dmfilename)    Specify dmfile
+	-t|--templateclass) Specify templateclass
+	-h|--help)          Print this massage
+EOT_HELP
+}
+
+#at least one argument is required
+
+if [ -z $1 ] ;then 
+    $1
+    help;
+    echo $1
+    exit 1
+fi
+
+# print help message
+ 
+if [ "$1" = "-h" -o "$1" = "--help" ] ; then
+    help
+    exit 0
+fi
+
+# get dynamic module class
+TMPLCLASS=$1
+CLASS=$1
+shift
+
+while [ -n "$(echo $1 | grep '-')" ]; do
+    case "$1" in
+	-d|--dmfile) DMFILE=$2 ; shift 2 ;;
+	-t|--tmplclass) TMPLCLASS=$2 ; shift 2 ;;
+	-h|--help) help ; exit 0 ;;
+	*) echo "Invalid Option! " ; help ; exit 1 ;;
+    esac
+done
+
+# munch command
+
+MUNCHFILE="${MUNCHDIR}/${CLASS}${MUNCHSUFFIX}"
+TMPLFILE="${TMPLDIR}/${TMPLCLASS}${TMPLSUFFIX}"
+
+$MUNCHBIN $MUNCHFILE $DMFILE $TMPLFILE
+
+exit 0

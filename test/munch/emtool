@@ -1,0 +1,204 @@
+#!/bin/sh
+#
+#emtool --- a program to compile and/or docify dynamic module in 
+#           E-CELL Simulation Environment Version 3
+#
+# author:  Tomoya Kitayama <tomo@e-cell.org>
+#
+
+PACKAGE=ecell
+VERSION=3.0.0
+
+prefix=/home/tomo/wrk/test
+exec_prefix=/home/tomo/wrk/test
+pythondir=${prefix}/lib/python2.2/site-packages
+
+SHAREDIR="${prefix}/share/ecell/3.0.0/template"
+BINDIR="${exec_prefix}/bin"
+ECELL_INCLUDE="${prefix}/include/ecell"
+#EMTOOL_INCLUDE="${prefix}/share/ecell/3.0.0/templates/Reactor"
+CXX="c++"
+MV="/bin/mv"
+RM="/bin/rm"
+
+DMGEN="${exec_prefix}/bin/dmgen"
+DMCOMPILE="${exec_prefix}/bin/dmcompile"
+INSUFFIX=".dm"
+SOSUFFIX=".so"
+
+CPPSUFFIX=".cpp"
+HPPSUFFIX=".hpp"
+
+unset DO_COMPILE DO_GENERATE DO_COMPILE
+
+TMPDIR="/tmp"
+ETTMPDIR="$TMPDIR/emtool.$$"
+
+usage() 
+{
+cat << EOT_USAGE
+
+Compile and/or dynamic module in
+E-CELL Simulation Environment Versin 3.
+
+Usage:
+	`basename $0` <classname> [OPTIONS] files...
+	`basename $0` -h|--help
+EOT_USAGE
+}
+
+help()
+{
+usage
+cat << EOT_HELP
+
+Options:
+	-a or --all)	        All dynamic module compile.
+	-g or --generate)       Generate dm to cpp/hpp source file.
+	-c or --compile)        Compile cpp to so file.
+	-h or --help)		Print this message.
+
+This program is part of E-CELL Simulation Environment Version 3.
+Written by Tomoya Kitayama <tomo@e-cell.org>
+EOT_HELP
+}
+
+initialize()
+{
+	trap interrupted 2 9 15
+	run_command mkdir $ETTMPDIR
+}
+
+cleanup()
+{
+	run_command $RM -rf $ETTMPDIR
+}
+
+interrupted()
+{
+	echo "interrupted..."
+	trap '' 2 9 15
+	cleanup
+	exit 1
+}
+
+run_command()
+{
+	echo $@
+	$@
+	return $?
+}
+
+#at least one argument is required
+
+if [ -z $1 ] ;then 
+    $1
+    help;
+    echo $1
+    exit 1
+fi
+
+# print help message
+ 
+if [ "$1" = "-h" -o "$1" = "--help" ] ; then
+    help
+    exit 0
+fi
+
+# get dynamic module class
+
+CLASS=$1
+shift
+
+TEMPLATEDIR="${prefix}/share/ecell/3.0.0/template/$CLASS"
+
+while true ; do
+    case "$1" in
+	-a|--all) DO_ALL=yes ; shift ; break ;;
+	-g|--generate) DO_GENERATE=yes ; shift ; break ;;
+	-c|--compile) DO_COMPILE=yes ; shift ; break ;;
+	-h|--help) help ; exit 0 ;;
+	*) echo "Internal error! " ; help ; exit 1 ;;
+    esac
+done
+
+#
+#initialize & get filename
+#
+
+initialize
+
+inputfile=$1
+
+#
+#All dynamic module compile.
+#
+
+if [ $DO_ALL ] ; then 
+    
+    base=`basename $inputfile .dm`
+    sofile=$base$SOSUFFIX
+    
+    if [ -f $sofile -a $sofile -nt $inputfile ] ; then
+	echo -n "$sofile is newer than &inputfile." 
+	echo "skipping."
+	cleanup
+	exit 0
+    fi
+    
+    run_command "cp $inputfile $ETTMPDIR"
+    run_command "pushd $ETTMPDIR"
+    echo "$DMGEN &CLASS -d $inputfile > $base.cpp"
+    run_command "$DMGEN &CLASS -d $inputfile > $base.cpp"
+    run_command "popd"
+    run_command "$DMCOMPILE $base.cpp -I $ECELL_INCLUDE -I $EMTOOL_INCLUDE -I. -I.." 
+
+fi
+
+#
+#Generate dm to cpp/hpp source file.
+#
+
+if [ $DO_GENERATE ] ; then 
+    
+    base=`basename $inputfile .dm`
+    cppfile=$base$CPPSUFFIX
+
+    if [ -f $cppfile -a $cppfile -nt $inputfile ] ; then
+	echo -n "$cppfile is newer than $inputfile." 
+	echo "skipping."
+	cleanup
+	exit 0
+    fi
+
+    run_command "$DMGEN &CLASS -d $inputfile"
+    
+fi
+
+#
+#Compile cpp to so file.
+#
+
+if [ $DO_COMPILE  ] ; then 
+	
+    base=`basename $inputfile .cpp`	     			
+    sofile=$base$SOSUFFIX
+
+    if [ -f $sofile -a $sofile -nt $ ] ; then
+	echo "$sofile is newer than $inputfile..." 
+	echo "skipping..."
+	cleanup
+	exit 0
+    fi
+
+    run_command "$DMCOMPILE $base.cpp -I $ECELL_INCLUDE -I $EMTOOL_INCLUDE -I . -I .." 
+
+fi
+
+#
+#cleanup & exit
+#
+
+cleanup
+
+exit 0
