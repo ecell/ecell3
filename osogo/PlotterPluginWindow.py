@@ -25,10 +25,16 @@ class PlotterPluginWindow( OsogoPluginWindow ):
 		self.displayedFullPNStringList=[]
 		
 		self.ListWindow=self.getWidget('clist1')
-		self.ListStore=gtk.ListStore(gobject.TYPE_OBJECT,gobject.TYPE_STRING)
+		self.ListStore=gtk.ListStore(gobject.TYPE_BOOLEAN,gobject.TYPE_OBJECT,gobject.TYPE_STRING)
 		self.ListWindow.set_model(self.ListStore)
-		column1=gtk.TreeViewColumn('color',gtk.CellRendererPixbuf(),pixbuf=0)
-		column2=gtk.TreeViewColumn('trace',gtk.CellRendererText(),text=1)
+		renderer=gtk.CellRendererToggle()
+		renderer.connect('toggled',self.toggle_pressed,self.ListStore)
+		
+		column1=gtk.TreeViewColumn('color',gtk.CellRendererPixbuf(),pixbuf=1)
+		column2=gtk.TreeViewColumn('trace',gtk.CellRendererText(),text=2)
+		column3=gtk.TreeViewColumn('lg',renderer,active=0)
+		column3.set_clickable(gtk.TRUE)
+		self.ListWindow.append_column(column3)
 		self.ListWindow.append_column(column1)
 		self.ListWindow.append_column(column2)
 		self.ListSelection=self.ListWindow.get_selection()
@@ -49,12 +55,36 @@ class PlotterPluginWindow( OsogoPluginWindow ):
 
 		self.thePluginManager.appendInstance( self )                    
 		#init clist
-				
+	 			
 		#get session
 		self.theSession = pluginmanager.theSession
 		#addtrace to plot
 		self.addtrace_to_plot(self.theFullPNList())
+		self.refresh_loggers()
 
+	def refresh_loggers(self):
+	    #refreshes loggerlist
+	    iter=self.ListStore.get_iter_first()
+	    while iter!=None:
+		text=self.ListStore.get_value(iter,2)
+		if self.haslogger(text):
+		    fixed=gtk.TRUE
+		else:
+		    fixed=gtk.FALSE
+		self.ListStore.set(iter,0,fixed)
+		iter=self.ListStore.iter_next(iter)
+		
+	    
+	    
+	def toggle_pressed(self,cell,path,model):
+	    iter=model.get_iter((int (path),))
+	    fixed=model.get_value(iter,0)
+	    text=self.ListStore.get_value(iter,2)
+	    
+	    if fixed==gtk.FALSE:
+		self.create_logger([text])
+		self.refresh_loggers()	
+	
 	def addtrace_to_plot(self,aFullPNList): #make possible to add multiple
 	    pass_list=[]
 	    for aFullPN in aFullPNList: 
@@ -108,7 +138,7 @@ class PlotterPluginWindow( OsogoPluginWindow ):
 	    #se;ection list, [0]=text, [1], iter
 	    
 	def selection_function(self,model,path,iter):
-		text=self.ListStore.get_value(iter,1)
+		text=self.ListStore.get_value(iter,2)
 		self.selection_list.append([text,iter])
 	    
 	def addtrace(self, aFullPN): #called from outside
@@ -131,8 +161,8 @@ class PlotterPluginWindow( OsogoPluginWindow ):
 	def add_trace_to_list(self,added_list):
 	    for added_item in added_list:
 		iter=self.ListStore.append()
-		self.ListStore.set_value(iter,0,added_item[1]) #set pixbuf
-		self.ListStore.set_value(iter,1,added_item[0]) #set pixbuf
+		self.ListStore.set_value(iter,1,added_item[1]) #set pixbuf
+		self.ListStore.set_value(iter,2,added_item[0]) #set pixbuf
 	    
 	def remove_trace_from_list(self,aFullPNString):
 		print "remove_trace_from_list"
