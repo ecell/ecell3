@@ -1,0 +1,35 @@
+%Id: README,v 1.0 2002/10/18 17:34 yoyo Exp %
+
+
+
+=== About ===
+
+
+
+=== Files and directories ===
+
+README:      This file
+droTest.em:  Model file(em file) for this model
+droTest.eml: Model file(eml file) for this model
+*.dm:        Process files(dm files) for this model
+
+
+
+=== A how-to for running models on E-Cell 3 ===
+
+1) Compile all Process files(dm files) included in the model, by using emtool.
+   The emtool program generates a Shared Object file(so file)
+   from each corresponding Process file.
+
+   % emtool -a MichaelisUniUniProcess.dm
+
+2) Execute gecell, the gui for E-Cell3.
+
+   % gecell
+
+3) Load Model file(eml file)
+
+   3.1) Click 'File' in Main Window
+   3.2) Click 'Load Model' in pulldown menu
+   3.3) Select Model file to load(e.g. simple.eml)
+   3.4) Click 'Start' in Main Window to start simulation
