@@ -1,145 +1,117 @@
-import os
-
-from config import *
-from ViewWindow import *
-from gtk import *
-from ecell.ECS import *
-
-class PluginWindow(ViewWindow):
-    '''
-    self.theRawFullPNList : [ FullPN1, FullID2, FullPN3, , , ]
-    theFullPNList()       : [ FullPN1, FullPN2, FullPN3, , , ]
-    theFullIDList()       : [ FullID1, FullID2, FullID3, , , ]
-    theFullPN()           : FullPN1
-    theFullID()           : FullID1
-    '''
-
-    def __init__( self, dirname, data, pluginmanager, root=None ):
-
-        self.theClassName = self.__class__.__name__
-        aGladeFileName = os.path.join( dirname , self.theClassName + ".glade" )
-        ViewWindow.__init__( self, aGladeFileName, root )
-
-        self.thePluginManager = pluginmanager
-        self.theSession = self.thePluginManager.theSession 
-        self.theRawFullPNList = data
-        self.theTitle = pluginmanager.theInterfaceWindow.theTitle
-        	
-    def initialize( self, root=None ):
-
-        aMenuWindow = Window( 'PluginWindowPopupMenu.glade', root='menu' )
-        self.thePopupMenu = aMenuWindow['menu']
-
-        if root != None:
-            self.theClassName = root
-            self[self.theClassName].connect( 'button_press_event', self.popupMenu )
-            aMenuWindow.addHandlers( { 'copy_fullpnlist'  : self.copyFullPNList,
-                                       'paste_fullpnlist' : self.pasteFullPNList,
-                                       'add_fullpnlist'   : self.addFullPNList
-                                       } )
-#        else root !='top_vbox':
-        else:
-            self.getWidget( self.theClassName )['title'] = self.theTitle
-
-            
-            
-    def popupMenu( self, widget, aEvent ):
-
-        if aEvent.button == 3:
-            self.thePopupMenu.popup( None, None, None, 1, 0 )
+#!/usr/bin/env python
 
 
-    def theFullPNList( self ):
-
-        return map( self.supplementFullPN, self.theRawFullPNList )
-
-
-    def theFullIDList( self ):
-
-        return map( convertFullPNToFullID, self.theRawFullPNList )
-
-
-    def theFullPN( self ):
-
-        return self.supplementFullPN( self.theRawFullPNList[0] )
-
-
-    def theFullID( self ):
-
-        return convertFullPNToFullID( self.theFullPN() )
-
-
-    def supplementFullPN( self, aFullPN ):
-
-        if aFullPN[PROPERTY] != '' :
-            return aFullPN
-        else :
-            if aFullPN[TYPE] == SUBSTANCE :
-                aPropertyName = 'Quantity'
-            elif aFullPN[TYPE] == REACTOR :
-                aPropertyName = 'Activity'
-            elif aFullPN[TYPE] == SYSTEM :
-                aPropertyName = 'Activity'
-            aNewFullPN = convertFullIDToFullPN( convertFullPNToFullID(aFullPN),
-                                                aPropertyName )
-            return aNewFullPN
-
-
-    def theAttributeMap( self ):
-
-        aMap = {}
-        for aFullPN in self.theRawFullPNList:
-            aFullID = convertFullPNToFullID( aFullPN )
-            aPropertyName = aFullPN[PROPERTY]
-            aPropertyListFullPN = convertFullIDToFullPN( aFullID, 'PropertyList' )
-            aPropertyList = self.theSession.theSimulator.getProperty( createFullPNString( aPropertyListFullPN ) )
-            aAttributeListFullPN = convertFullIDToFullPN( aFullID, 'PropertyAttributes')
-            aAttributeList = self.theSession.theSimulator.getProperty( createFullPNString( aAttributeListFullPN ) )
-            num = 0
-            for aProperty in aPropertyList:
-                aPropertyFullPN = convertFullIDToFullPN( aFullID, aProperty )
-                aMap[ aPropertyFullPN ] = aAttributeList[ num ]
-                num += 1
-        return aMap
-
-        
-    def getAttribute( self, aFullPN ):
-
-        aMap = self.theAttributeMap()
-        if aMap.has_key( aFullPN ):
-            return aMap[ aFullPN ]
-        else:
-            return 99
+#::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+#
+#        This file is part of E-CELL Session Monitor package
+#
+#                Copyright (C) 1996-2002 Keio University
+#
+#::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+#
+#
+# E-CELL is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public
+# License as published by the Free Software Foundation; either
+# version 2 of the License, or (at your option) any later version.
+#
+# E-CELL is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+# See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public
+# License along with E-CELL -- see the file COPYING.
+# If not, write to the Free Software Foundation, Inc.,
+# 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+#
+#END_HEADER
+#
+#'Design: Kenta Hashimoto <kem@e-cell.org>',
+#'Design and application Framework: Kouichi Takahashi <shafi@e-cell.org>',
+#'Programming: Yuki Fujita',
+#             'Yoshiya Matsubara',
+#             'Yuusuke Saito'
+#
+# modified by Masahiro Sugimoto <sugi@bioinformatics.org> at
+# E-CELL Project, Lab. for Bioinformatics, Keio University.
+#
 
 
-    def getValue( self, fullpn ):
+from Window import *
 
-        aValueList = self.theSession.theSimulator.getProperty( createFullPNString( fullpn ) )
-        return aValueList[0]
+import string
+import sys
+from ecell.ecssupport import *
 
-
-    def setValue( self, fullpn, value ):
-
-        if self.getAttribute( fullpn ) == 3:
-            aValue = value
-            self.theSession.theSimulator.setProperty( createFullPNString( fullpn ), aValue )
-            self.thePluginManager.updateAllPluginWindow()
-        else:
-            aFullPNString = createFullPNString( fullpn )
-            self.theSession.printMessage('%s is not settable\n' % aFullPNString )
-
-    def exit( self, obj ):
-
-	self.thePluginManager.theInterfaceWindow.removeRecord( self )
-	self.thePluginManager.removeInstance( self )
-        self.thePluginManager.theInterfaceWindow.theSelectedRow = -1
-
-    def editTitle( self, aTitle ):
-
-        self.theTitle = aTitle
-        self.getWidget( self.theClassName )[ 'title' ] = self.theTitle
+# ---------------------------------------------------------------
+# PluginWindow --> Window
+#   - has some plugin functions
+# ---------------------------------------------------------------
+class PluginWindow( Window ):
 
 
+	# ---------------------------------------------------------------
+	# Constructor
+	#   - sets glade file
+	#   - sets root property
+	#   - call openwindow method of this class
+	#  
+	# In the constructor sub class, you have to call openWindow().
+	#
+	# aModuleName : module name
+	# aModulePath : module path
+	# return -> None
+	# This method is throwable exception.
+	# ---------------------------------------------------------------
+	#def __init__( self, aDirname, aData, aPluginManager, aRoot=None ):
+	def __init__( self, aDirname, aPluginManager, aRoot=None ):
+
+		self.theRoot = aRoot
+		self.theClassName = self.__class__.__name__
+		aGladeFileName = os.path.join( aDirname , self.theClassName + ".glade" )
+
+		self.theGladeFile = aGladeFileName
+		self.thePluginManager = aPluginManager
+
+	# end of __init__
+
+	# ---------------------------------------------------------------
+	# initialize (abstract method )
+	#   - Sub class must override this method.
+	# ---------------------------------------------------------------
+	def initialize( self ):
+
+		pass
+
+	# end of initialize
+
+	# ---------------------------------------------------------------
+	# update (abstract method )
+	#   - Sub class must override this method.
+	# ---------------------------------------------------------------
+	def update( self ):
+
+		pass
+
+	# end of update
+
+	# ---------------------------------------------------------------
+	# exit 
+	#   - remove this window from PluginManager
+	#
+	# *objects : dammy elements of argument
+	# return -> None
+	# This method is throwable exception.
+	# ---------------------------------------------------------------
+	def exit( self, *objects ):
+
+		self.thePluginManager.theInterfaceWindow.removeRecord( self )
+		self.thePluginManager.removeInstance( self )
+		#self.thePluginManager.theInterfaceWindow.theSelectedRow = -1
+	
+	# end of exit
 
 
+# end of PluginWindow
 
