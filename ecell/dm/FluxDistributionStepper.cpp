@@ -27,6 +27,9 @@
 // written by Kouichi Takahashi <shafi@e-cell.org> at
 // E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
+// written by Tomoya Kitayama <tomo@e-cell.org> at
+// E-CELL Project, Lab. for Bioinformatics, Keio University.
+//
 
 #include "Model.hpp"
 #include "Variable.hpp"
