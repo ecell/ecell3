@@ -15,7 +15,7 @@ DependentStepperList, NESTED_LIST , [], 0100
 DerivativeToleranceFactor, FLOAT, 1.0, 1111
 MaxErrorRatio, FLOAT, 1.0, 0100
 MaxStepInterval, FLOAT, 1e+100, 1111
-MinStepInterval,1e-100,1111
+MinStepInterval,FLOAT, 1e-100,1111
 NextStepInterval, FLOAT, 0.001, 0100
 Order, INTEGER, 4, 0100
 OriginalStepInterval, FLOAT, 0.001, 1100
