@@ -2,16 +2,24 @@
 
 import string
 
+### for test
+import sys
+sys.path.append('.')
+### for test
+
 from PluginWindow import *
 from ecssupport import *
+import Plugin
 
 import Numeric
 
+
 class ProgressbarWindow(PluginWindow):
     
-    def __init__( self, dirname, sim, data ):
+    def __init__( self, dirname, sim, data, pluginmanager ):
 
-        PluginWindow.__init__( self, dirname, sim, data )
+        PluginWindow.__init__( self, dirname, sim, data, pluginmanager )
+        self.pull = 0
         self.thePositiveFlag = 1
         self.theAutoChangeFlag = 1
         self.theActualValue = 0
@@ -19,13 +27,16 @@ class ProgressbarWindow(PluginWindow):
         self.theMultiplier = 0
         
         self.addHandlers( { \
-            'level_spinbutton_activate': self.updateBySpinbutton,
-            'level_spinbutton_changed': self.updateBySpinbutton,
+            'on_add_button_clicked' : self.updateByAddbutton,
+            'on_subtract_button_clicked' : self.updateBySubtractbutton,
+            'multiplier_entry_activate' : self.updateByTextentry,
             'auto_button_toggled': self.updateByAutoButton ,
-#            'on_entry1_activate': self.changeValueFromEntryWindow
             })
-        # self['property_id_label'].set_text(self.theID)
+
         self.theIDEntry = self.getWidget( "property_id_label" )
+        self.theMultiplier1Entry = self.getWidget("multiplier1_label")
+        self.theMultiplier2Entry = self.getWidget("multiplier2_label")
+        self.theMultiplier3Entry = self.getWidget("multiplier3_label")
         self.theFPN = data[0]
         self.initialize()
         
@@ -42,9 +53,9 @@ class ProgressbarWindow(PluginWindow):
         
     def update( self ):
         self.theIDEntry.set_text  ( self.theID )
+        
         aValue = self.theSimulator.getProperty( self.theFPN )
         value = aValue[0]
-#        value = 124143.807
         self.theActualValue = value
         self.theBarLength , self.theMultiplier , self.thePositiveFlag \
                           = self.calculateBarLength( value )
@@ -52,27 +63,59 @@ class ProgressbarWindow(PluginWindow):
         # aIndicator = self.theBarLength * self.thePositiveFlag
         aIndicator = (value / (float)(10**(self.theMultiplier))) \
                      * self.thePositiveFlag
+
+        print self.theMultiplier
         
         self['progressbar'].set_value(int(self.theBarLength))
-        self['progressbar'].set_format_string(str(aIndicator))
-        self['level_spinbutton'].set_value(self.theMultiplier)
+        self['progressbar'].set_format_string(str(value))
+
+        self.theMultiplier1Entry.set_text(str(int(self.theMultiplier-1)))
+        self.theMultiplier2Entry.set_text(str(int(self.theMultiplier)))
+        self.theMultiplier3Entry.set_text(str(int(self.theMultiplier+1)))
+        self['multiplier_entry'].set_text(str(int(self.theMultiplier+2)))
 
     def updateByAuto( self, value ):
         self.theAutoChangeFlag = 1
         self.update()
 
-    def updateBySpinbutton( self, spinbutton_obj ):
+    def updateByAddbutton( self , obj ):
+        self['auto_button'].set_active( 0 )
+        aNumberString =  self['multiplier_entry'].get_text()
+        aNumber = string.atof( aNumberString )
+        aNumber = aNumber + 1
+        self.pull = aNumber
+
+        self.theAutoChangeFlag = 0
+        self.update()
+
+    def updateBySubtractbutton( self,obj ):
+#        if self.theAutoChangeFlag :
+#            pass
+#        else :
+        self['auto_button'].set_active( 0 )
+
+        aNumberString =  self['multiplier_entry'].get_text()
+        aNumber = string.atof( aNumberString )
+        aNumber = aNumber - 1
+        self.pull = aNumber
+
+        self.theAutoChangeFlag = 0
+        self.update()
+
+    def updateByTextentry(self, obj):
+
         if self.theAutoChangeFlag :
             pass
         else :
             self['auto_button'].set_active( 0 )
-        self.update()
 
-        aNumberString =  spinbutton_obj.get_text()
+        aNumberString = obj.get_text()
+
         aNumber = string.atof( aNumberString )
-        self['level_spinbutton'].set_value(aNumber)
+        self.pull = aNumber
 
         self.theAutoChangeFlag = 0
+        self.update()
 
     def updateByAutoButton(self, autobutton):
         self.update()
@@ -84,13 +127,18 @@ class ProgressbarWindow(PluginWindow):
         else :
             aPositiveFlag = 1
 
-        if self['auto_button'].get_active() :
-            aMultiplier = (int)(Numeric.log10(value))
-        else :
-            aMultiplier = self['level_spinbutton'].get_value()
+        if value == 0 :
+            aMultiplier = 0
+            aBarLength = 0
 
-        # aBarLength = (value / (float)(10**(aMultiplier)))
-        aBarLength = (Numeric.log10(value)-aMultiplier+1)*10/3
+        else :
+            if self['auto_button'].get_active() :
+                aMultiplier = (int)(Numeric.log10(value))
+                self.pull = aMultiplier+2
+            else :
+                aMultiplier = self.pull-2
+
+            aBarLength = (Numeric.log10(value)+1-aMultiplier)*10/3
 
         return  aBarLength, aMultiplier, aPositiveFlag
                 
@@ -132,11 +180,13 @@ if __name__ == "__main__":
         gtk.mainloop()
 
     def main():
-        aProgressbarWindow = ProgressbarWindow( 'plugins', simulator(), [fpn,] )
+        aPluginManager = Plugin.PluginManager()
+        aProgressbarWindow = ProgressbarWindow( 'plugins', simulator(), [fpn,], aPluginManager )
         aProgressbarWindow.addHandler( 'gtk_main_quit', mainQuit )
         
         mainLoop()
 
 
     # propertyValue1 = -750.0000
+
     main()
