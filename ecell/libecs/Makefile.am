@@ -4,7 +4,7 @@ if OS_WIN32
   no_undefined = -no-undefined
   SHLEXT = .dll.a
 else
-  SHLEXT = @LTDL_SHLIB_EXT@:
+  SHLEXT = @LTDL_SHLIB_EXT@
 endif
 
 SUBDIRS =
