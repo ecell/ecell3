@@ -5,6 +5,7 @@ from main import *
 from Plugin import *
 
 import gtk
+import GTK
 from ecssupport import *
 
 import ecs
@@ -87,7 +88,8 @@ class MainWindow(Window):
         self.theSimulator.setPendingEventChecker( gtk.events_pending )
         #self.theSimulator.setPendingEventChecker( false )
         self.theSimulator.setEventHandler( gtk.mainiteration  )
-        
+
+        self['ecell_logo_toolbar'].set_style( GTK.TOOLBAR_ICONS )
 
     ###### window operation ####
     def closeParentWindow( self, button_obj):
