@@ -116,11 +116,7 @@ namespace libecs
 
 #define PROPERTYSLOT( TYPE, NAME, SETMETHOD, GETMETHOD )\
   PropertyInterface<TT>::registerSlot( # NAME,\
-	                              PropertyInterface<TT>::\
-                                      createPropertySlot( Type2Type<TYPE>(),\
-			                                  SETMETHOD,\
-  				                          GETMETHOD ) )
-
+         new ConcretePropertySlot<TT,TYPE>( SETMETHOD, GETMETHOD ) );
 
 #define PROPERTYSLOT_SET_GET( TYPE, NAME )\
   PROPERTYSLOT( TYPE, NAME,\
@@ -303,6 +299,22 @@ namespace libecs
 
   };
 
+
+#define NULLSET_SPECIALIZATION( TYPE )\
+  template <> void PropertiedClass::nullSet<TYPE>( const TYPE& )
+
+  NULLSET_SPECIALIZATION( Real );
+  NULLSET_SPECIALIZATION( Int );
+  NULLSET_SPECIALIZATION( String );
+  NULLSET_SPECIALIZATION( Polymorph );
+
+#define NULLGET_SPECIALIZATION( TYPE )\
+  template <> const TYPE PropertiedClass::nullGet<TYPE>() const
+
+  NULLGET_SPECIALIZATION( Real );
+  NULLGET_SPECIALIZATION( Int );
+  NULLGET_SPECIALIZATION( String );
+  NULLGET_SPECIALIZATION( Polymorph );
 
 
   /*@}*/

@@ -78,6 +78,25 @@ namespace libecs
       }
   }
 
+  void throwSequenceSizeError( const Int aSize, 
+			       const Int aMin, const Int aMax )
+  {
+    THROW_EXCEPTION( RangeError,
+		     "Size of the sequence must be within [ " 
+		     + toString( aMin ) + ", " + toString( aMax )
+		     + " ] ( " + toString( aSize ) + " given)." );
+  }
+
+  void throwSequenceSizeError( const Int aSize, const Int aMin )
+  {
+    THROW_EXCEPTION( RangeError,
+		     "Size of the sequence must be at least " 
+		     + toString( aMin ) + 
+		     + " ( " + toString( aSize ) + " given)." );
+  }
+
+
+
 
 } // namespace libecs
 

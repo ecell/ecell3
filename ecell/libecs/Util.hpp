@@ -133,12 +133,10 @@ namespace libecs
     const typename Sequence::size_type aSize( aSequence.size() );
     if( aSize < aMin || aSize > aMax )
       {
-	THROW_EXCEPTION( RangeError,
-			 "Size of the sequence must be within [ " 
-			 + toString( aMin ) + ", " + toString( aMax )
-			 + " ] ( " + toString( aSize ) + " given)." );
+	throwSequenceSizeError( aSize, aMin, aMax );
       }
   }
+
 
   /**
      Check if aSequence's size() is at least aMin.
@@ -154,13 +152,17 @@ namespace libecs
     const typename Sequence::size_type aSize( aSequence.size() );
     if( aSize < aMin )
       {
-	THROW_EXCEPTION( RangeError,
-			 "Size of the sequence must be at least " 
-			 + toString( aMin ) + 
-			 + " ( " + toString( aSize ) + " given)." );
+	throwSequenceSizeError( aSize, aMin );
       }
   }
 
+
+  ///@internal
+  void throwSequenceSizeError( const Int aSize, 
+			       const Int aMin, const Int aMax );
+
+  ///@internal
+  void throwSequenceSizeError( const Int aSize, const Int aMin );
 
 
   /**

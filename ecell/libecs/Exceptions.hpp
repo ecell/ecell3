@@ -79,17 +79,9 @@ if( ! ( EXPRESSION ) )\
       ; // do nothing
     }
 
-    virtual ~Exception() throw() {}
+    virtual ~Exception() throw();
 
-    virtual const String message() const 
-    {
-#ifdef DEBUG
-      return theMethod + ":\n" + 
-	String( getClassName() ) + ": " + theMessage + "\n";
-#else
-      return String( getClassName() ) + ": " + theMessage + "\n";
-#endif /* DEBUG */
-    }
+    virtual const String message() const;
 
     virtual const char* what() const throw() { return message().c_str(); }
     virtual const char* const getClassName() const  { return "Exception"; }

@@ -54,10 +54,6 @@ namespace libecs
 
   /** @file */
   
-  // probably better to replace by AssocVector.
-  //  DECLARE_MAP( const String, PropertySlotPtr, 
-  //	       std::less<const String>, PropertySlotMap );
-
   class PropertyInterfaceBase
   {
   public:
@@ -129,33 +125,6 @@ namespace libecs
     }
 
 
-    template<typename SlotType>
-    static PropertySlotPtr
-    createPropertySlot( Type2Type<SlotType>,
-			typename ConcretePropertySlot<T,SlotType>::SetMethodPtr
-			aSetMethodPtr,
-			typename ConcretePropertySlot<T,SlotType>::GetMethodPtr
-			aGetMethodPtr )
-    {
-      if( aSetMethodPtr == NULLPTR )
-	{
-	  aSetMethodPtr = &PropertiedClass::nullSet;
-	}
-      
-      if( aGetMethodPtr == NULLPTR )
-	{
-	  aGetMethodPtr = &PropertiedClass::nullGet<SlotType>;
-	}
-      
-
-      PropertySlotPtr
-	aPropertySlotPtr( new ConcretePropertySlot<T,SlotType>
-			  ( aSetMethodPtr,
-			    aGetMethodPtr ) );
-
-      return aPropertySlotPtr;
-    }
-
     PropertySlotProxyPtr createPropertySlotProxy( T& anObject,
 						  StringCref aPropertyName )
     {
@@ -183,7 +152,7 @@ namespace libecs
     */
 
     void setProperty( T& anObject, StringCref aPropertyName, 
-			PolymorphCref aValue )
+		      PolymorphCref aValue )
     {
       PropertySlotMapConstIterator 
 	aPropertySlotMapIterator( thePropertySlotMap.find( aPropertyName ) );
@@ -243,7 +212,7 @@ namespace libecs
     const Polymorph getPropertyList() const
     {
       PolymorphVector aVector;
-      aVector.reserve( thePropertySlotMap.size() );
+      // aVector.reserve( thePropertySlotMap.size() );
       
       for( PropertySlotMapConstIterator i( thePropertySlotMap.begin() ); 
 	   i != thePropertySlotMap.end() ; ++i )
@@ -255,13 +224,6 @@ namespace libecs
     }
 
     
-    /// @internal 
-
-    //FIXME: can be a protected member?
-
-    //    virtual PropertySlotMapCref getPropertySlotMap() const = 0;
-
-
     static void 
     registerSlot( StringCref aName, PropertySlotPtr aPropertySlotPtr )
     {

@@ -22,6 +22,7 @@ Util.cpp\
 Polymorph.cpp\
 FullID.cpp\
 PropertySlot.cpp\
+PropertySlotProxy.cpp\
 PropertyInterface.cpp\
 PropertiedClass.cpp\
 ProcessMaker.cpp\
@@ -47,7 +48,8 @@ VVector.cpp\
 osif.cpp\
 Logger.cpp\
 PhysicalLogger.cpp\
-LoggerBroker.cpp
+LoggerBroker.cpp\
+Exceptions.cpp
 
 
 libecsdir=${pkgincludedir}/libecs

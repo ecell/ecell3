@@ -36,6 +36,13 @@
 
 namespace libecs
 {
+
+  StringCref EntityType::EntityTypeStringOfEntity()
+  {
+    const static String aString( "Entity" );
+    return aString;
+  }
+
   StringCref EntityType::EntityTypeStringOfProcess()
   {
     const static String aString( "Process" );

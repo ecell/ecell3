@@ -112,6 +112,29 @@ namespace libecs
   }
 
 
+#define NULLSET_SPECIALIZATION_DEF( TYPE )\
+  template <> void PropertiedClass::nullSet<TYPE>( const TYPE& )\
+  {\
+    throwNotSetable();\
+  } //
+
+  NULLSET_SPECIALIZATION_DEF( Real );
+  NULLSET_SPECIALIZATION_DEF( Int );
+  NULLSET_SPECIALIZATION_DEF( String );
+  NULLSET_SPECIALIZATION_DEF( Polymorph );
+
+#define NULLGET_SPECIALIZATION_DEF( TYPE )\
+  template <> const TYPE PropertiedClass::nullGet<TYPE>() const\
+  {\
+    throwNotGetable();\
+  } //
+
+  NULLGET_SPECIALIZATION_DEF( Real );
+  NULLGET_SPECIALIZATION_DEF( Int );
+  NULLGET_SPECIALIZATION_DEF( String );
+  NULLGET_SPECIALIZATION_DEF( Polymorph );
+
+
 } // namespace libecs
 
 

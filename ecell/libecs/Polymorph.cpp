@@ -52,6 +52,11 @@ namespace libecs
     return PolymorphVector(); 
   }
 
+  const String PolymorphNoneData::asString() const
+  { 
+    static String aNoneString;
+    return aNoneString;
+  }
 
   const Polymorph::Type Polymorph::getType() const
   {

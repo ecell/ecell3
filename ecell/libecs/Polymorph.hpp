@@ -189,11 +189,7 @@ namespace libecs
 
     virtual ~PolymorphNoneData();
 
-    virtual const String asString() const 
-    { 
-      static String aNoneString;
-      return aNoneString;
-    }
+    virtual const String asString() const;
     virtual const Real   asReal() const   { return 0.0; }
     virtual const Int    asInt() const    { return 0; }
     virtual const PolymorphVector asPolymorphVector() const;

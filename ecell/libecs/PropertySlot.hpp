@@ -172,8 +172,8 @@ namespace libecs
     ConcretePropertySlot( const SetMethodPtr aSetMethodPtr,
 			  const GetMethodPtr aGetMethodPtr )
       :
-      theSetMethodPtr( aSetMethodPtr ),
-      theGetMethodPtr( aGetMethodPtr )
+      theSetMethodPtr( SetMethod( aSetMethodPtr ) ),
+      theGetMethodPtr( GetMethod( aGetMethodPtr ) )
     {
       ; // do nothing
     }
@@ -249,12 +249,41 @@ namespace libecs
       return convertTo<Type>( callGetMethod( anObject ) );
     }
 
+
+    static SetMethodPtr SetMethod( SetMethodPtr aSetMethodPtr )
+    {
+      if( aSetMethodPtr == NULLPTR )
+	{
+	  return &PropertiedClass::nullSet;
+	}
+      else
+	{
+	  return aSetMethodPtr;
+	}
+    }
+
+    static GetMethodPtr GetMethod( GetMethodPtr aGetMethodPtr )
+    {
+      if( aGetMethodPtr == NULLPTR )
+	{
+	  return &PropertiedClass::nullGet<SlotType>;
+	}
+      else
+	{
+	  return aGetMethodPtr;
+	}
+    }
+
+
   protected:
 
     const SetMethodPtr theSetMethodPtr;
     const GetMethodPtr theGetMethodPtr;
 
   };
+
+
+
 
 
   /*@}*/

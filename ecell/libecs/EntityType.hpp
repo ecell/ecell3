@@ -130,11 +130,7 @@ namespace libecs
     }
 
 
-    inline static StringCref  EntityTypeStringOfEntity()
-    {
-      const static String aString( "Entity" );
-      return aString;
-    }
+    static StringCref  EntityTypeStringOfEntity();
 
     static StringCref  EntityTypeStringOfProcess();
     

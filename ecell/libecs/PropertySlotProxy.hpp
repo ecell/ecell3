@@ -64,11 +64,7 @@ namespace libecs
       ; // do nothing
     }
     
-    virtual ~PropertySlotProxy()
-    {
-      ; // do nothing
-    }
-
+    virtual ~PropertySlotProxy();
 
     virtual void setPolymorph( PolymorphCref ) = 0;
     virtual const Polymorph getPolymorph() const = 0;
@@ -101,6 +97,57 @@ namespace libecs
   protected:
 
   };
+
+
+
+  template <>
+  inline void PropertySlotProxy::set( PolymorphCref aValue )
+  {
+    setPolymorph( aValue );
+  }
+
+  template <>
+  inline void PropertySlotProxy::set( RealCref aValue )
+  {
+    setReal( aValue );
+  }
+
+  template <>
+  inline void PropertySlotProxy::set( IntCref aValue )
+  {
+    setInt( aValue );
+  }
+
+  template <>
+  inline void PropertySlotProxy::set( StringCref aValue )
+  {
+    setString( aValue );
+  }
+
+  template <>
+  inline const Polymorph PropertySlotProxy::get() const
+  {
+    return getPolymorph();
+  }
+
+  template <>
+  inline const String PropertySlotProxy::get() const
+  {
+    return getString();
+  }
+
+  template <>
+  inline const Real PropertySlotProxy::get() const
+  {
+    return getReal();
+  }
+
+
+  template <>
+  inline const Int PropertySlotProxy::get() const
+  {
+    return getInt();
+  }
 
 
 
