@@ -24,6 +24,7 @@ ProcessList,NESTED_LIST,[],0100
 ReadVariableList,NESTED_LIST,[],0100
 RelativeEpsilon,FLOAT,0.1,1111
 RngSeed,INTEGER,1,1010
+SpectralRadius,FLOAT,0.0,0100
 StateToleranceFactor,FLOAT,1.0,1111
 StepInterval,FLOAT,0.01,1111
 SystemList,NESTED_LIST,[],0100

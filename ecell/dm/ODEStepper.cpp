@@ -64,7 +64,8 @@ ODEStepper::ODEStepper()
   thePreviousStepInterval( 0.001 ),
   theJacobianRecalculateTheta( 0.001 ),
   rtoler( 1e-10 ),
-  atoler( 1e-10 )
+  atoler( 1e-10 ),
+  theSpectralRadius( 0.0 )
 {
   const Real pow913( pow( 9.0, 1.0 / 3.0 ) );
   
@@ -180,6 +181,8 @@ void ODEStepper::calculateJacobian()
       
       aVariable->loadValue( aValue );
     }
+
+  setSpectralRadius( calculateJacobianNorm() );
 }
 
 void ODEStepper::setJacobianMatrix()
@@ -229,6 +232,7 @@ void ODEStepper::decompJacobianMatrix()
 
 Real ODEStepper::calculateJacobianNorm()
 {
+  /**
   Real anEuclideanNorm( 0.0 );
 
   for ( RealVector::size_type i( 0 ); i < theSystemSize; i++ )
@@ -239,6 +243,37 @@ Real ODEStepper::calculateJacobianNorm()
       }
 
   return sqrt( anEuclideanNorm );
+  */
+
+  RealVector theEigenVector( theSystemSize, sqrt( 1.0 / theSystemSize ) ), theTempVector( theSystemSize );
+
+  Real sum, norm;
+
+  for ( Integer count( 0 ); count < 3; count++ )
+    {
+      norm = 0.0;
+      for ( RealVector::size_type i( 0 ); i < theSystemSize; i++ )
+	{
+	  sum = 0.0;
+	  for ( RealVector::size_type j( 0 ); j < theSystemSize; j++ )
+	    {
+	      const Real aPartialDerivative( theJacobian[ i ][ j ] );
+	      sum += aPartialDerivative * theEigenVector[ j ];
+	    }
+	  theTempVector[ i ] = sum;
+	 
+	  norm += theTempVector[ i ] * theTempVector[ i ];
+	}
+      
+      norm = sqrt( norm );
+
+      for ( RealVector::size_type i( 0 ); i < theSystemSize; i++ )
+	{
+	  theEigenVector[ i ] = theTempVector[ i ] / norm;
+	}
+    }
+
+  return norm;
 }
 
 void ODEStepper::calculateRhs()
@@ -646,7 +681,7 @@ void ODEStepper::step()
 
       setJacobianMatrix();
     }
-  
+
   const Real aStepInterval( getStepInterval() );
   
   // theW will already be transformed to Z-form

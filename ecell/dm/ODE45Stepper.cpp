@@ -38,7 +38,7 @@ LIBECS_DM_INIT( ODE45Stepper, Stepper );
 ODE45Stepper::ODE45Stepper()
   :
   theInterrupted( true ),
-  theStiffness( 1.0 )
+  theSpectralRadius( 0.0 )
 {
   ; // do nothing
 }
@@ -89,6 +89,7 @@ bool ODE45Stepper::calculate()
   const Real a_dydt( getDerivativeToleranceFactor() );
 
   const Real aCurrentTime( getCurrentTime() );
+  const Real aStepInterval( getStepInterval() );
 
   // ========= 1 ===========
 
@@ -106,7 +107,7 @@ bool ODE45Stepper::calculate()
 	  theK1[ c ] = aVariable->getVelocity();
 	    
 	  aVariable->loadValue( theK1[ c ] * ( 1.0 / 5.0 )
-				* getStepInterval()
+				* aStepInterval
 				+ theValueBuffer[ c ] );
 
 	  // clear velocity
@@ -123,7 +124,7 @@ bool ODE45Stepper::calculate()
 	  theK1[ c ] = theK7[ c ];
 
 	  aVariable->loadValue( theK1[ c ] * ( 1.0 / 5.0 )
-				* getStepInterval()
+				* aStepInterval
 				+ theValueBuffer[ c ] );
 
 	  // clear velocity
@@ -132,7 +133,7 @@ bool ODE45Stepper::calculate()
     }
 
   // ========= 2 ===========
-  setCurrentTime( aCurrentTime + getStepInterval() * 0.2 );
+  setCurrentTime( aCurrentTime + aStepInterval * 0.2 );
   interIntegrate();
   fireProcesses();
 
@@ -145,7 +146,7 @@ bool ODE45Stepper::calculate()
 
       aVariable->loadValue( ( theK1[ c ] * ( 3.0 / 40.0 ) 
 			      + theK2[ c ] * ( 9.0 / 40.0 ) )
-			    * getStepInterval()
+			    * aStepInterval
 			    + theValueBuffer[ c ] );
 
       // clear velocity
@@ -154,7 +155,7 @@ bool ODE45Stepper::calculate()
 
 
   // ========= 3 ===========
-  setCurrentTime( aCurrentTime + getStepInterval() * 0.3 );
+  setCurrentTime( aCurrentTime + aStepInterval * 0.3 );
   interIntegrate();
   fireProcesses();
 
@@ -168,7 +169,7 @@ bool ODE45Stepper::calculate()
       aVariable->loadValue( ( theK1[ c ] * ( 44.0 / 45.0 ) 
 			      - theK2[ c ] * ( 56.0 / 15.0 )
 			      + theK3[ c ] * ( 32.0 / 9.0 ) )
-			    * getStepInterval()
+			    * aStepInterval
 			    + theValueBuffer[ c ] );
 
       // clear velocity
@@ -176,7 +177,7 @@ bool ODE45Stepper::calculate()
     }
 
   // ========= 4 ===========
-  setCurrentTime( aCurrentTime + getStepInterval() * 0.8 );
+  setCurrentTime( aCurrentTime + aStepInterval * 0.8 );
   interIntegrate();
   fireProcesses();
 
@@ -191,7 +192,7 @@ bool ODE45Stepper::calculate()
 			      - theK2[ c ] * ( 25360.0 / 2187.0 )
 			      + theK3[ c ] * ( 64448.0 / 6561.0 )
 			      - theK4[ c ] * ( 212.0 / 729.0 ) )
-			    * getStepInterval()
+			    * aStepInterval
 			    + theValueBuffer[ c ] );
 
       // clear velocity
@@ -199,7 +200,7 @@ bool ODE45Stepper::calculate()
     }
 
   // ========= 5 ===========
-  setCurrentTime( aCurrentTime + getStepInterval() * ( 8.0 / 9.0 ) );
+  setCurrentTime( aCurrentTime + aStepInterval * ( 8.0 / 9.0 ) );
   interIntegrate();
   fireProcesses();
 
@@ -218,7 +219,7 @@ bool ODE45Stepper::calculate()
 	+ theK4[ c ] * ( 49.0 / 176.0 )
 	- theK5[ c ] * ( 5103.0 / 18656.0 );
  
-      aVariable->loadValue( theMidVelocityBuffer[ c ] * getStepInterval()
+      aVariable->loadValue( theMidVelocityBuffer[ c ] * aStepInterval
 			    + theValueBuffer[ c ] );
 
       // clear velocity
@@ -229,9 +230,9 @@ bool ODE45Stepper::calculate()
 
   // estimate stiffness
   Real aDenominator( 0.0 );
-  Real aLipschitzConstant( 0.0 );
+  Real aSpectralRadius( 0.0 );
 
-  setCurrentTime( aCurrentTime + getStepInterval() );
+  setCurrentTime( aCurrentTime + aStepInterval );
   interIntegrate();
   fireProcesses();
 
@@ -254,7 +255,7 @@ bool ODE45Stepper::calculate()
 	+= ( theVelocityBuffer[ c ] - theMidVelocityBuffer[ c ] )
 	* ( theVelocityBuffer[ c ] - theMidVelocityBuffer[ c ] );
 
-      aVariable->loadValue( theVelocityBuffer[ c ] * getStepInterval()
+      aVariable->loadValue( theVelocityBuffer[ c ] * aStepInterval
 			    + theValueBuffer[ c ] );
 
       // clear velocity
@@ -262,7 +263,7 @@ bool ODE45Stepper::calculate()
     }
 
   // ========= 7 ===========
-  setCurrentTime( aCurrentTime + getStepInterval() );
+  setCurrentTime( aCurrentTime + aStepInterval );
   interIntegrate();
   fireProcesses();
 
@@ -291,7 +292,7 @@ bool ODE45Stepper::calculate()
       // 				     + theK6[ c ] * ( 44.0 / 1575.0 )
       // 				     + theK7[ c ] * ( -1.0 / 60.0 ) );
 
-      aLipschitzConstant 
+      aSpectralRadius 
 	+= ( theK7[ c ] - theK6[ c ] ) * ( theK7[ c ] - theK6[ c ] );
 
       // calculate velocity for Xn+.5
@@ -318,12 +319,8 @@ bool ODE45Stepper::calculate()
       aVariable->setVelocity( theVelocityBuffer[ c ] );
     }
 
-  aLipschitzConstant /= aDenominator;
-  aLipschitzConstant  = sqrt( aLipschitzConstant );
-  setStiffness( aLipschitzConstant / 3.3 );
-
-  //    std::cout << getCurrentTime() << "\t"
-  //	      << getStiffness() << std::endl;
+  aSpectralRadius /= aDenominator;
+  aSpectralRadius  = sqrt( aSpectralRadius );
 
   resetAll(); // reset all value
 
@@ -340,6 +337,8 @@ bool ODE45Stepper::calculate()
 
   // set the error limit interval
   theInterrupted = false;
+
+  setSpectralRadius( aSpectralRadius / aStepInterval );
 
   return true;
 }

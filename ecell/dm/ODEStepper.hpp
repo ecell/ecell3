@@ -118,6 +118,8 @@ public:
 		    &ODEStepper::initializeAbsoluteToleranceFactor,
 		    &AdaptiveDifferentialStepper::getAbsoluteToleranceFactor );
       
+
+      PROPERTYSLOT_GET_NO_LOAD_SAVE( Real, SpectralRadius );
       PROPERTYSLOT_SET_GET( Real, JacobianRecalculateTheta );
     }
 
@@ -145,6 +147,16 @@ public:
     {
       return theJacobianRecalculateTheta;
     }
+
+  GET_METHOD( Real, SpectralRadius )
+  {
+    return theSpectralRadius;
+  }
+
+  SET_METHOD( Real, SpectralRadius )
+  {
+    theSpectralRadius = value;
+  }
 
   virtual void initialize();
   bool calculate();
@@ -217,6 +229,7 @@ protected:
 
   bool    theJacobianCalculateFlag;
   Real    theJacobianRecalculateTheta;
+  Real    theSpectralRadius;
 
 };
 

@@ -149,7 +149,7 @@ public:
     {
       INHERIT_PROPERTIES( AdaptiveDifferentialStepper );
 
-      PROPERTYSLOT_GET_NO_LOAD_SAVE( Real, Stiffness );
+      PROPERTYSLOT_GET_NO_LOAD_SAVE( Real, SpectralRadius );
     }
 
   ODE45Stepper();
@@ -179,14 +179,14 @@ public:
     return theK7;
   }
 
-  GET_METHOD( Real, Stiffness )
+  GET_METHOD( Real, SpectralRadius )
   {
-    return theStiffness;
+    return theSpectralRadius;
   }
 
-  SET_METHOD( Real, Stiffness )
+  SET_METHOD( Real, SpectralRadius )
   {
-    theStiffness = value;
+    theSpectralRadius = value;
   }
 
 protected:
@@ -203,7 +203,7 @@ protected:
 
   bool theInterrupted;
 
-  Real       theStiffness;
+  Real       theSpectralRadius;
 
 };
 
