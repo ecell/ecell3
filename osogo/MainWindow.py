@@ -5,10 +5,13 @@ from main import *
 from Plugin import *
 
 from gtk import *
+from ecssupport import *
 
 import ecs
 
 import PaletteWindow
+
+import string
 
 class MainWindow(Window):
 
@@ -80,15 +83,15 @@ class MainWindow(Window):
         aToolbar = GtkToolbar( ORIENTATION_VERTICAL, TOOLBAR_TEXT )
         aVBox.add( aToolbar )
         
-        aFirstButton = GtkRadioButton( label = 'A' )
+        aFirstButton = GtkRadioButton( label = 'ATP' )
         aToolbar.append_widget( aFirstButton, '', '' )
-        self.theTestModeWindow.set_data( 'A', aFirstButton )
-        aButton = GtkRadioButton( aFirstButton, label = 'B' )
+        self.theTestModeWindow.set_data( 'ATP', aFirstButton )
+        aButton = GtkRadioButton( aFirstButton, label = 'ADP' )
         aToolbar.append_widget( aButton, '', '' )
-        self.theTestModeWindow.set_data( 'B', aButton )
-        aButton = GtkRadioButton( aFirstButton, label = 'C' )
+        self.theTestModeWindow.set_data( 'ADP', aButton )
+        aButton = GtkRadioButton( aFirstButton, label = 'AMP' )
         aToolbar.append_widget( aButton, '', '' )
-        self.theTestModeWindow.set_data( 'C', aButton )
+        self.theTestModeWindow.set_data( 'AMP', aButton )
 
     ###### window operation ####
     def closeParentWindow( self, button_obj):
@@ -151,20 +154,24 @@ class MainWindow(Window):
     def goTestMode( self, button_obj ) :
 
         print 'go test mode ...'
-        self.theSimulator = ecs.Simulator()
+#          self.theSimulator = ecs.Simulator()
 
-        self.theSimulator.createEntity('Substance','Substance:/:A','substance A')
-        self.theSimulator.createEntity('Substance','Substance:/:B','substance B')
-        self.theSimulator.createEntity('Substance','Substance:/:C','substance C')
+#          self.theSimulator.createEntity('Substance','Substance:/:A','substance A')
+#          self.theSimulator.createEntity('Substance','Substance:/:B','substance B')
+#          self.theSimulator.createEntity('Substance','Substance:/:C','substance C')
 
-        self.theSimulator.setProperty( 'Substance:/:A', 'Quantity', (15,) )
-        self.theSimulator.setProperty( 'Substance:/:B', 'Quantity', (30,) )
-        self.theSimulator.setProperty( 'Substance:/:C', 'Quantity', (40,) )
+#          self.theSimulator.setProperty( 'Substance:/:A', 'Quantity', (15,) )
+#          self.theSimulator.setProperty( 'Substance:/:B', 'Quantity', (30,) )
+#          self.theSimulator.setProperty( 'Substance:/:C', 'Quantity', (40,) )
 
-        print 'initialize()...'
-        self.theSimulator.initialize()
+#          print 'initialize()...'
+#          self.theSimulator.initialize()
 
-        print 'now the simulator has three substances:A, B, C in a root system'
+        self.theSimulator = simulator()
+
+        print 
+        print 'now the simulator has created'
+        print 
 
         self.theTestModeWindow.show_all()
 
@@ -177,22 +184,199 @@ class MainWindow(Window):
             if aButton.get_active() :
                 aPluginName = plugin_name
 
-        aSubstanceIDList = [ 'A', 'B', 'C' ]
+        aSubstanceIDList = [ 'ATP', 'ADP', 'AMP' ]
 
         for id in aSubstanceIDList :
             aButton = self.theTestModeWindow.get_data( id )
             if aButton.get_active() :
                 aSelectedID = id
 
-        aFullPN = ['Substance', '/', aSelectedID, 'Quantity']
-        aFullPNList = [ aFullPN, ]
+        aFullPN = ('Substance', '/CELL/CYTOPLASM', aSelectedID, 'Quantity')
+        aFullPNList = ( aFullPN, )
 
         self.thePluginManager.createInstance( aPluginName, self.theSimulator, aFullPNList)
           
-    ###########################
-    #### For Test Mode end ####
-    ###########################
 
+
+###########################################
+#### Simuator Object For Test Mode end ####
+###########################################
+
+class simulator :
+
+    def __init__(self) :
+        self.theATP={
+            'PropertyList': ( 'PropertyList', 'Activity', 'Quantity', 'Concentration' ),
+            'Activity' : (100, ),
+            'Quantity' : (15, ),
+            'Concentration' : (0.0017, )
+            }
+    
+        self.theADP={
+            'PropertyList': ( 'PropertyList', 'Activity', 'Quantity', 'Concentration' ),
+            'Activity' : (120, ),
+            'Quantity' : (30, ),
+            'Concentration' : (0.0318318, )
+            }
+    
+        self.theAMP={
+            'PropertyList': ( 'PropertyList', 'Activity', 'Quantity', 'Concentration' ),
+            'Activity' : (777, ),
+            'Quantity' : (40, ),
+            'Concentration' : (0.0037, )
+            }
+
+        self.theAaa={
+            'PropertyList': ( 'PropertyList', 'Activity', 'Quantity', 'Concentration' ),
+            'Activity' : (100, ),
+            'Quantity' : (45, ),
+            'Concentration' : (0.03103, )
+            }
+
+        self.theBbb={
+            'PropertyList': ( 'PropertyList', 'Activity', 'Quantity', 'Concentration' ),
+            'Activity' : (38976, ),
+            'Quantity' : (18394, ),
+            'Concentration' : (0.001083, )
+            }
+
+        self.theCcc={
+            'PropertyList': ( 'PropertyList', 'Activity', 'Quantity', 'Concentration' ),
+            'Activity' : (938, ),
+            'Quantity' : (896, ),
+            'Concentration' : (0.082136, )
+            }
+
+        self.theDdd={
+            'PropertyList': ( 'PropertyList', 'Activity', 'Quantity', 'Concentration' ),
+            'Activity' : (765938, ),
+            'Quantity' : (89696, ),
+            'Concentration' : (0.0782136, )
+            }
+
+        self.theEee={
+            'PropertyList': ( 'PropertyList', 'Activity', 'Quantity', 'Concentration' ),
+            'Activity' : (9978638, ),
+            'Quantity' : (89876, ),
+            'Concentration' : (0.09682136, )
+            }
+
+        self.theAAA={
+            'PropertyList': ( 'PropertyList', 'Activity', 'Km', 'Vmax', 'Substrate', 'Product', 'ClassName' ),
+            'Activity': ( 123, ),
+            'Km' : ( 1.233, ),
+            'Vmax' : ( 349, ),
+            'Substrate': ('Substance:/CELL/CYTOPLASM:ATP',
+                          'Substance:/CELL/CYTOPLASM:ADP', ),
+            'Product': ('Substance:/CELL/CYTOPLASM:AMP', ),
+            'ClassName' : 'MichaelisMentenReactor'
+            }
+
+        self.theBBB={
+            'PropertyList': ( 'PropertyList', 'Activity', 'Km', 'Vmax', 'Substrate', 'Product', 'ClassName' ),
+            'Activity': ( 123, ),
+            'Km' : ( 1.233, ),
+            'Vmax' : ( 349, ),
+            'Substrate': ('Substance:/ENVIRONMENT:Ccc',),
+            'Product': ('Substance:/ENVIRONMENT:Ddd', 'Substance:/ENVIRONMENT:Eee' ),
+            'ClassName' : 'MichaosUniUniReactor'
+            }
+
+        self.theCytoplasm={
+            'PropertyList': ( 'PropertyList', 'SystemList', 'SubstanceList', 'ReactorList', 'ClassName', 'Activity' ),
+            'SystemList' : ( ) ,
+            'SubstanceList' : ( 'ATP', 'ADP', 'AMP'),
+            'ReactorList' : ( 'AAA', ),
+            'ClassName': ( 'System', ),
+            'ATP' : self.theATP,
+            'ADP' : self.theADP, 
+            'AMP' : self.theAMP,
+            'AAA' : self.theAAA
+            }
+
+        self.theCell={
+            'PropertyList': ( 'PropertyList', 'SystemList', 'SubstanceList', 'ReactorList', 'ClassName', 'Activity' ),
+            'SystemList' : ( 'CYTOPLASM', ),
+            'SubstanceList' : ( 'Aaa', 'Bbb' ),
+            'ReactorList' : ( ),
+            'ClassName': ( 'System', ),
+            'CYTOPLASM' : self.theCytoplasm,
+            'Aaa' : self.theAaa,
+            'Bbb' : self.theBbb,
+            }
+        
+        self.theEnvironment={
+            'PropertyList': ( 'PropertyList', 'SystemList', 'SubstanceList', 'ReactorList', 'ClassName', 'Activity' ),
+            'SystemList' : ( ) ,
+            'SubstanceList' : ( 'Ccc', 'Ddd', 'Eee'),
+            'ReactorList' : ( 'BBB', ),
+            'ClassName': ( 'System', ),
+            'Ccc' : self.theCcc,
+            'Ddd' : self.theDdd,
+            'Eee' : self.theEee
+            }
+
+        self.theRootSystem= {
+            'PropertyList': ( 'PropertyList', 'SystemList', 'SubstanceList', 'ReactorList', 'ClassName', 'Activity' ),
+            'SystemList' : ( 'CELL', 'ENVIRONMENT' ),
+            'SubstanceList' : ( ),
+            'ReactorList' : ( ),
+            'ClassName': ( 'System', ),
+            'Activity': ( 1234, ),
+            'CELL' : self.theCell,
+            'ENVIRONMENT' : self.theEnvironment
+            }
+
+    def getProperty( self, fpn ):
+        aSystemList = string.split(fpn[SYSTEMPATH] , '/')
+        aLength = len( aSystemList )
+        if aLength == 1 :
+            aSystem = self.theRootSystem
+        else :
+            aSystem = self.theRootSystem
+            for x in aSystemList[1:] :
+                aSystem = aSystem[ x ]
+            
+        if fpn[TYPE] == 'Substance' :
+            aSubstance = aSystem[fpn[ID]]
+            return aSubstance[fpn[PROPERTY]]
+
+        elif fpn[TYPE] == 'Reactor' :
+            aReactor = aSystem[fpn[ID]]
+            return aReactor[fpn[PROPERTY]]
+
+        elif fpn[TYPE] == 'System' :
+            return aSystem[fpn[PROPERTY]]
+    
+    def setProperty( self, fpn, arg_list ):
+        aSystemList = string.split(fpn[SYSTEMPATH] , '/')
+        aLength = len( aSystemList )
+        if aLength == 1 :
+            aSystem = self.theRootSystem
+        else :
+            aSystem = self.theRootSystem
+            for x in aSystemList[1:] :
+                aSystem = aSystem[ x ]
+            
+        if fpn[TYPE] == 'Substance' :
+            aSubstance = aSystem[fpn[ID]]
+            aSubstance[fpn[PROPERTY]] = arg_list
+            print arg_list ,
+            print ' is set to ' ,
+            print fpn[PROPERTY]
+
+        elif fpn[TYPE] == 'Reactor' :
+            aReactor = aSystem[fpn[ID]]
+            aReactor[fpn[PROPERTY]] = arg_list
+            print arg_list ,
+            print ' is set to ' ,
+            print fpn[PROPERTY]
+
+        elif fpn[TYPE] == 'System' :
+            aSystem[fpn[PROPERTY]] = arg_list
+            print arg_list ,
+            print ' is set to ' ,
+            print fpn[PROPERTY]
 
 if __name__ == "__main__":
 
