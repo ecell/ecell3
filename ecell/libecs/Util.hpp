@@ -295,6 +295,138 @@ namespace libecs
      and are used in it. asinh, acosh and atanh are not available in 
      MS Windows (MinGW).
   */
+
+
+  template <typename T>
+  Real Not( T n )
+  {
+    if( n == 0 )
+      {
+	return 1.0;
+      }
+    else
+      {
+	return 0.0;
+      }
+  }
+
+  template <typename T>
+  Real eq( T n1, T n2 )
+  {
+    if( n1 == n2 )
+      {
+	return 1.0;
+      }
+    else
+      {
+	return 0.0;
+      }
+  }
+
+  template <typename T>
+  Real neq( T n1, T n2 )
+  {
+    if( n1 == n2 )
+      {
+	return 0.0;
+      }
+    else
+      {
+	return 1.0;
+      }
+  }
+
+  template <typename T>
+  Real gt( T n1, T n2 )
+  {
+    if( n1 > n2 )
+      {
+	return 1.0;
+      }
+    else
+      {
+	return 0.0;
+      }
+  }
+
+  template <typename T>
+  Real lt( T n1, T n2 )
+  {
+    if( n1 < n2 )
+      {
+	return 1.0;
+      }
+    else
+      {
+	return 0.0;
+      }
+  }
+
+  template <typename T>
+  Real geq( T n1, T n2 )
+  {
+    if( n1 >= n2 )
+      {
+	return 1.0;
+      }
+    else
+      {
+	return 0.0;
+      }
+  }
+
+  template <typename T>
+  Real leq( T n1, T n2 )
+  {
+    if( n1 <= n2 )
+      {
+	return 1.0;
+      }
+    else
+      {
+	return 0.0;
+      }
+  }
+
+  template <typename T>
+  Real And( T n1, T n2 )
+  {
+    if( ( n1 != 0 ) && ( n2 != 0 ) )
+      {
+	return 1.0;
+      }
+    else
+      {
+	return 0.0;
+      }
+  }
+
+  template <typename T>
+  Real Or( T n1, T n2 )
+  {
+    if( ( n1 != 0 ) || ( n2 != 0 ) )
+      {
+	return 1.0;
+      }
+    else
+      {
+	return 0.0;
+      }
+  }
+
+  template <typename T>
+  Real Xor( T n1, T n2 )
+  {
+    if( ( n1 != 0 ) && !( n2 != 0 ) )
+      {
+	return 1.0;
+      }
+    else
+      {
+	return 0.0;
+      }
+  }
+
   template <typename T>
   T asinh( T n )
   {
