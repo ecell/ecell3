@@ -1,4 +1,4 @@
-#!/usr/bin/env ecell3-python
+#!/usr/bin/env @prefix@/ecell3-python
 #
 # ecell3-dmc  - a program to compile and/or docify dynamic module in 
 #               E-Cell Simulation Environment Version 3

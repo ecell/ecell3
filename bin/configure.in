@@ -1,5 +1,5 @@
 dnl Process this file with autoconf to produce a configure script.
-AC_INIT(ecell3-em2eml)
+AC_INIT(ecell3-em2eml.in)
 AC_CANONICAL_SYSTEM
 AM_INIT_AUTOMAKE(bin, 0.0)
 AM_CONFIG_HEADER([config.h])
@@ -15,5 +15,10 @@ dnl Checks for typedefs, structures, and compiler characteristics.
 dnl Checks for library functions.
 
 AC_OUTPUT(Makefile
-,chmod +x rd2dm eri2eml ecell3-dmc ecell3-em2eml ecell3-eml2em)
+          ecell3-dmc
+          ecell3-eml2em
+          ecell3-em2eml
+          eri2eml
+          rd2dm,
+          chmod +x rd2dm eri2eml ecell3-dmc ecell3-em2eml ecell3-eml2em)
 
