@@ -75,6 +75,7 @@ class GtkSessionMonitor(Session):
     		self.theConfigDB.read(OSOGO_PATH+os.sep+'osogo.ini')
 
 		self.theUpdateInterval = 150
+		self.stuckRequests = 0
 		self.theStepSizeOrSec = 1.0
 		self.theRunningFlag = 0
 
@@ -322,6 +323,12 @@ class GtkSessionMonitor(Session):
 		"""
 		if not gtk.events_pending():
 			self.updateWindows()
+			if self.stuckRequests > 0:
+				self.stuckRequests -= 1
+		else:
+			self.stuckRequests +=1
+			if self.stuckRequests >20:
+				self.theUpdateInterval *= 2		
 		self.theTimer = gtk.timeout_add( self.theUpdateInterval, self.__updateByTimeOut, 0 )
 
 
