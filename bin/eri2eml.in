@@ -217,7 +217,7 @@ Options:
                         anEffectorList.append( 'E' + str(anEffectorNumber) )
                         anEffectorNumber = anEffectorNumber + 1
                         anEffectorID = replaceProhibitLetter( anEriChunkElement[1] )
-                        anEffectorList.append( 'Variable:' + anEffector )
+                        anEffectorList.append( 'Variable:' + anEffectorID )
                         anEffectorList.append( '0' )
                         aVariableReferenceList.append( anEffectorList )
 
