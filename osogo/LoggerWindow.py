@@ -324,108 +324,17 @@ class LoggerWindow(OsogoWindow):
 		# -------------------------------------------------
 		# [3] Execute saving.
 		# -------------------------------------------------
-		#aLoggerFactory = LoggerFactory()
-
-		# creates instance datafilemanager
-		aDataFileManager = DataFileManager()
-
-		# sets root directory to datafilemanager
-		aDataFileManager.setRootDirectory(aSaveDirectory)
-
-		aFileIndex=0
-
-		try: #(1)
-
-			# gets all list of selected property name
-			for aFullPNString in self.theSelectedPropertyName(): #(2)
-
-				# -------------------------------------------------
-				# from [Variable:/CELL/CYTOPLASM:E:Value]
-				# to   [Variable_CELL_CYTOPLASM_E_Value]
-				# -------------------------------------------------
-
-				aRootIndex=find(aFullPNString,':/')
-				aFileName=aFullPNString[:aRootIndex]+aFullPNString[aRootIndex+1:]
-				aFileName=replace(aFileName,':','_')
-				aFileName=replace(aFileName,'/','_')
-
-				aECDDataFile = ECDDataFile()
-				aECDDataFile.setFileName(aFileName)
-
-				# -------------------------------------------------
-				# Gets logger
-				# -------------------------------------------------
-#                               need check if the logger exists
-				aLoggerStub = self.theSession.createLoggerStub( aFullPNString )
-				if not aLoggerStub.isExist():
-					aErrorMessage='\nLogger doesn\'t exist.!\n'
-					aWarningWindow = ConfirmWindow(0,aErrorMessage)
-					return None
-                                aLoggerStartTime= aLoggerStub.getStartTime()
-				aLoggerEndTime= aLoggerStub.getEndTime()
-				if aStartTime == -1 or anEndTime == -1:
-					# gets start time and end time from logger
-					aStartTime = aLoggerStartTime
-					anEndTime = aLoggerEndTime
-				else:
-					# checks the value
-					if not ( aLoggerStartTime < aStartTime < aLoggerEndTime ):
-						aStartTime = aLoggerStartTime
-					if not ( aLoggerStartTime < anEndTime < aLoggerEndTime ):
-						anEndTime = aLoggerEndTime
-
-				# -------------------------------------------------
-				# gets the matrix data from logger.
-				# -------------------------------------------------
-				if anInterval == -1:
-					# gets data with specifing interval 
-					aMatrixData = aLoggerStub.getData( aStartTime, anEndTime )
-				else:
-					# gets data without specifing interval 
-					aMatrixData = aLoggerStub.getData( aStartTime, anEndTime, anInterval )
-
-
-				# sets data name 
-				aECDDataFile.setDataName(aFullPNString)
-
-				# sets matrix data
-				aECDDataFile.setData(aMatrixData)
-
-				# -------------------------------------------------
-				# adds data file to data file manager
-				# -------------------------------------------------
-				aDataFileManager.getFileMap()[`aFileIndex`] = aECDDataFile
-
-				aFileIndex = aFileIndex + 1
-
-			# for(2)
-
-			aDataFileManager.saveAll()
-
-		except: #try(1)
-
-			# -------------------------------------------------
-			# displays error message and exit this method.
-			# -------------------------------------------------
-
-			import sys
-			print __name__,
-			print sys.exc_traceback
-			aErrorMessage= "Error : could not save [%s] " %aFullPNString
-			self["statusbar"].push(1,aErrorMessage)
+		try:
+			self.theSession.saveLoggerData( self.theSelectedPropertyName(), aSaveDirectory, aStartTime, anEndTime, anInterval )
+		except:
+			anErrorMessage= "Error : could not save "
+			self["statusbar"].push(1,anErrorMessage)
 			return None
+		
+		aSuccessMessage= " All files you selected are saved. " 
+		self["statusbar"].push(1,aSuccessMessage)
 
-		else: # try(1)
-			# -------------------------------------------------
-			# displays error message and exit this method.
-			# -------------------------------------------------
-
-			aSuccessMessage= " All files you selected are saved. " 
-			self["statusbar"].push(1,aSuccessMessage)
-
-		# end of try(1)
-
-	# end of saveData
+		# end of saveData
 
 
 	# ---------------------------------------------------------------
