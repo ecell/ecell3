@@ -45,7 +45,7 @@
 namespace libecs
 {
 
-  LoggerPtr LoggerBroker::getLogger( FullPropertyNameCref fpn )
+  LoggerPtr LoggerBroker::getLogger( FullPNCref fpn )
   {
     LoggerMapIterator aLoggerMapIterator( theLoggerMap.find( fpn ) );
     if( aLoggerMapIterator != theLoggerMap.end() )
@@ -60,7 +60,7 @@ namespace libecs
       }
   }
 
-  void LoggerBroker::appendLogger( FullPropertyNameCref fpn )
+  void LoggerBroker::appendLogger( FullPNCref fpn )
   {
     EntityPtr anEntityPtr = theRootSystem->getEntity( fpn.getFullID() );
 

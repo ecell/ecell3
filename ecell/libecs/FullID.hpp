@@ -231,12 +231,12 @@ namespace libecs
 
   };
 
-  class FullPropertyName
+  class FullPN
   {
 
   public:
 
-    FullPropertyName( const PrimitiveType type, 
+    FullPN( const PrimitiveType type, 
 		      SystemPathCref systempath,
 		      StringCref id,
 		      StringCref propertyname )
@@ -247,7 +247,7 @@ namespace libecs
       ; // do nothing
     }
 
-    FullPropertyName( FullIDCref fullid, StringCref propertyname )
+    FullPN( FullIDCref fullid, StringCref propertyname )
       :
       theFullID( fullid ),
       thePropertyName( propertyname )
@@ -255,11 +255,11 @@ namespace libecs
       ; // do nothing
     }
 
-    //    FullPropertyName( FullPropertyNameCref fullpropertyname );
+    //    FullPN( FullPNCref fullpropertyname );
 
-    FullPropertyName( StringCref fullpropertynamestring );
+    FullPN( StringCref fullpropertynamestring );
 
-    ~FullPropertyName() {}
+    ~FullPN() {}
 
 
 
@@ -313,7 +313,7 @@ namespace libecs
 
     bool isValid() const;
 
-    bool operator<( FullPropertyNameCref rhs ) const
+    bool operator<( FullPNCref rhs ) const
     {
       if( getFullID() != rhs.getFullID() )
 	{
@@ -323,7 +323,7 @@ namespace libecs
       return getPropertyName() < rhs.getPropertyName();
     }
 
-    bool operator==( FullPropertyNameCref rhs ) const
+    bool operator==( FullPNCref rhs ) const
     {
       if( getFullID() != rhs.getFullID() )
 	{

@@ -51,14 +51,14 @@ namespace libecs
       ; // do nothing
     }
     
-    LoggerPtr getLogger( FullPropertyNameCref fpn );
+    LoggerPtr getLogger( FullPNCref fpn );
 
-    DECLARE_MAP( const FullPropertyName, 
-		 LoggerPtr, std::less<const FullPropertyName>, LoggerMap );
+    DECLARE_MAP( const FullPN, 
+		 LoggerPtr, std::less<const FullPN>, LoggerMap );
 
   protected:
     
-    void appendLogger( FullPropertyNameCref );
+    void appendLogger( FullPNCref );
     
     
   private:

@@ -53,7 +53,7 @@ namespace libecs
   DECLARE_CLASS( PrimitiveType );
   DECLARE_CLASS( SystemPath );
   DECLARE_CLASS( FullID );
-  DECLARE_CLASS( FullPropertyName );
+  DECLARE_CLASS( FullPN );
   DECLARE_CLASS( Integrator );
   DECLARE_CLASS( Reactant );
   DECLARE_CLASS( Reactor );

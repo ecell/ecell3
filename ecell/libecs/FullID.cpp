@@ -169,7 +169,7 @@ namespace libecs
 
     aFieldStart = aFieldEnd + 1;
 
-    // drop trailing string after extra ':'(if this is  FullPropertyName),
+    // drop trailing string after extra ':'(if this is  FullPN),
     // or go to the end
     aFieldEnd = aString.find_first_of( DELIMITER, aFieldStart );
 
@@ -191,10 +191,10 @@ namespace libecs
   }
 
 
-  ///////////////// FullPropertyName
+  ///////////////// FullPN
 
 
-  FullPropertyName::FullPropertyName( StringCref fullpropertynamestring )
+  FullPN::FullPN( StringCref fullpropertynamestring )
     :
     theFullID( fullpropertynamestring )
   {
@@ -208,7 +208,7 @@ namespace libecs
 	if( aPosition == String::npos ) 
 	  {
 	    throw BadID( __PRETTY_FUNCTION__, 
-			 "Not enough fields in FullPropertyName string [" +
+			 "Not enough fields in FullPN string [" +
 			 fullpropertynamestring + "]." );
 	  }
 	++aPosition;
@@ -218,12 +218,12 @@ namespace libecs
     eraseWhiteSpaces( thePropertyName );
   }
 
-  const String FullPropertyName::getString() const
+  const String FullPN::getString() const
   {
     return theFullID.getString() + FullID::DELIMITER + thePropertyName;
   }
 
-  bool FullPropertyName::isValid() const
+  bool FullPN::isValid() const
   {
     return theFullID.isValid() & ! thePropertyName.empty();
   }
@@ -285,22 +285,22 @@ main()
 
       cout << "\n::::::::::" << endl;
 
-      FullPropertyName 
-	aFullPropertyName( "       \t  \n  Substance:/A/B:S:PNAME   \t   \n" );
-      cout << aFullPropertyName.getString() << endl;
-      cout << aFullPropertyName.getPrimitiveType() << endl;
-      cout << aFullPropertyName.getSystemPath().getString() << endl;
-      cout << aFullPropertyName.getID() << endl;
-      cout << aFullPropertyName.getPropertyName() << endl;
-      cout << aFullPropertyName.isValid() << endl;
+      FullPN 
+	aFullPN( "       \t  \n  Substance:/A/B:S:PNAME   \t   \n" );
+      cout << aFullPN.getString() << endl;
+      cout << aFullPN.getPrimitiveType() << endl;
+      cout << aFullPN.getSystemPath().getString() << endl;
+      cout << aFullPN.getID() << endl;
+      cout << aFullPN.getPropertyName() << endl;
+      cout << aFullPN.isValid() << endl;
 
-      FullPropertyName aFullPropertyName2( aFullPropertyName );
-      cout << aFullPropertyName2.getString() << endl;
+      FullPN aFullPN2( aFullPN );
+      cout << aFullPN2.getString() << endl;
 
-      FullPropertyName aFullPropertyName3( "Reactor:/:R:P" );
-      cout << aFullPropertyName3.getString() << endl;
-      aFullPropertyName3 = aFullPropertyName2;
-      cout << aFullPropertyName3.getString() << endl;
+      FullPN aFullPN3( "Reactor:/:R:P" );
+      cout << aFullPN3.getString() << endl;
+      aFullPN3 = aFullPN2;
+      cout << aFullPN3.getString() << endl;
 
     }
   catch ( ExceptionCref e )
