@@ -132,6 +132,7 @@ namespace libecs
 	const RealMatrixCref aTaylorSeries( theStepper.getTaylorSeries() );
 	const Real aTimeInterval( aTime - theStepper.getCurrentTime() );
 	const Real aStepInterval( theStepper.getTolerableStepInterval() );
+	
 
 	const Real i1( interpolate( aTaylorSeries, 
 	                            aTimeInterval, 
@@ -167,7 +168,8 @@ namespace libecs
 
 
 	// check if second and higher order calculations are necessary.
-	const RealMatrix::size_type aTaylorSize( aTaylorSeries.size() );
+	//	const RealMatrix::size_type aTaylorSize( aTaylorSeries.size() );
+	const RealMatrix::size_type aTaylorSize( theStepper.getStage() );
 	if( aTaylorSize >= 2)
 	  {
 	    const Real 
