@@ -9,14 +9,17 @@ class ViewWindow(Window):
 
     theClipBoard = ''
 
-    def __init__(self, gladefile, fqpps):
+    def __init__(self, gladefile, sim, fpns):
         Window.__init__( self, gladefile )
-        self.theFQPPs = fqpps
+
+        self.theSimulator = sim
+        
+        self.theFPNs = fpns
         self.addHandlers(
-            { 'copy_fqpps':            self.copyFQPPs,
-              'paste_fqpps':           self.pasteFQPPs,
-              'add_fqpps':             self.addFQPPs,
-              'print_fqpps_to_stdout': self.printFQPPs,
+            { 'copy_fqpps':            self.copyFPNs,
+              'paste_fqpps':           self.pasteFPNs,
+              'add_fqpps':             self.addFPNs,
+              'print_fqpps_to_stdout': self.printFPNs,
               'drag_data_received':    self.printTest,
               'drag_motion':           self.printTest,
               'drag_leave':            self.printTest,
@@ -25,25 +28,31 @@ class ViewWindow(Window):
               'drag_data_delete':      self.printTest }
             )
 
+    def update( self ):
+        pass
+
+    def initialize( self ):
+        pass
+
     def printTest( self, obj, data ):
         print obj, data
 
-    def copyFQPPs(self, a, b):
-        ViewWindow.theClipBoard = self.theFQPPs
+    def copyFPNs(self, a, b):
+        ViewWindow.theClipBoard = self.theFPNs
         print 'copy'
 
-    def pasteFQPPs(self, a, b):
-        self.theFQPPs = ViewWindow.theClipBoard
-        self.initViewWindow(self.theFQPPs)
-        print 'paste' + ' : ' + self.theFQPPs
+    def pasteFPNs(self, a, b):
+        self.theFPNs = ViewWindow.theClipBoard
+        initialize()
+        print 'paste' + ' : ' + self.theFPNs
 
     # overwrite in subclass if needed
-    def addFQPPs(self, a, b):
-        self.theFQPPs = self.theFQPPs + ',' + ViewWindow.theClipBoard
-        print 'add' + ' : ' + self.theFQPPs
+    def addFPNs(self, a, b):
+        self.theFPNs = self.theFPNs + ',' + ViewWindow.theClipBoard
+        print 'add' + ' : ' + self.theFPNs
 
-    def printFQPPs(self, a, b):
-        print self.theFQPPs
+    def printFPNs(self, a, b):
+        print self.theFPNs
     
         
 

@@ -9,10 +9,10 @@ from ViewWindow import *
 
 class PluginWindow(ViewWindow):
 
-    def __init__( self, dirname, data ):
+    def __init__( self, dirname, sim, data ):
         aGladeFileName = os.path.join( dirname ,
                                        self.__class__.__name__ + ".glade" )
-        ViewWindow.__init__( self, aGladeFileName, data )
+        ViewWindow.__init__( self, aGladeFileName, sim, data )
 
 
 
@@ -38,9 +38,9 @@ class PluginModule:
                 aFp.close()
 
 
-    def createInstance( self, data ):
+    def createInstance( self, sim, data, parent=None ):
         aConstructor = self.theModule.__dict__[self.theName]
-        anArgumentTuple = tuple( self.theDirectoryName ) + data
+        anArgumentTuple = tuple( self.theDirectoryName ) + sim + data
         apply( aConstructor, anArgumentTuple )
 
 
@@ -51,14 +51,14 @@ class PluginManager:
         self.thePluginMap = {}
         self.theInstanceList = []
 
-    def createInstance( self, name, parent=None ):
+    def createInstance( self, name, sim, data, parent=None ):
         try:
             aPlugin = self.thePluginMap[ name ]
         except KeyError:
             aPlugin = PluginModule( name )
             self.thePluginMap[ name ] = aPlugin
 
-        anInstance = aPlugin.createInstance()
+        anInstance = aPlugin.createInstance( sim, data, parent )
         self.appendInstance( anInstance )
 
         return anInstance
