@@ -66,6 +66,13 @@ Configurations:
 	LD_LIBRARY_PATH = $LD_LIBRARY_PATH
 	prefix          = $prefix
         pythondir       = $pythondir
+	ECELL3_DM_PATH  = $ECELL3_DM_PATH
+
+        If the environment variable ECELL3_DM_PATH is set to a colon (:)
+        separated directory path, it loads dynamic modules from there.
+
+        ex.
+	  ECELL3_DM_PATH=/home/user/dm:/home/user/dm_other ecell3
 
 EOT_USAGE
 }
