@@ -15,8 +15,14 @@ class Token:
 		return cmp(self.type, o)
 
         def __repr__(self):
-                return str(self.type)
+                return str(self.type) + ':' + str(self.attr)
 	
+	def __getitem__(self,i):
+		raise IndexError
+
+	def __len__(self):
+		return 0
+
 	def info(self):
 		return "File " + repr(self.filename) + ", line " + repr(self.lineno)
 	def error(self):
@@ -24,21 +30,19 @@ class Token:
 		raise SystemExit, 1
 
 class AST:
-        def __init__(self, type, left=None, right=None , property=None):
-                self.type = type.type
-                self.attr = type.attr
-		self.property = property
-                self._kids = []
-                self.left = left
-                self.right = right
-                if left: self._kids.append(left)
-                if right: self._kids.append(right)
+	def __init__(self, type, kids=[]):
+		self.type = type.type
+		self.attr = type.attr
+		self._kids = kids
+		
+	def __getitem__(self, i):
+		return self._kids[i]
 
-        def __getitem__(self, i):
-                return self._kids[i]
+	def __len__(self):
+		return len(self._kids)
 
 	def __repr__(self):
-                return str(self.type)
+                return str(self.type) + ':' + str(self._kids)
 
 class EmScanner( GenericScanner , object ):
 	
@@ -93,161 +97,179 @@ class EmScanner( GenericScanner , object ):
 
 
 class EmParser( GenericParser ):
-	def __init__( self, start='start' ):
+	def __init__( self, AST, start='start' ):
+
 		GenericParser.__init__( self, start )
 
 	def p_start( self, args ):
 		'''
 		start ::= stmts
 		'''
-		return args[0]
+		return AST( Token( 'start' ), args )
 	
 	def p_stmts_1( self, args ):
 		'''
 		stmts ::= stmt stmts
 		'''
-		return AST ( type=args[1] ,left=args[0], right=args[2] )
+		return AST( Token( 'stmts' ), ( args[0], args[1][0] ) )
 
 	def p_stmts_2( self, args ):
 		'''
 		stmts ::= stmt
 		'''
-		return args[0]
+		return AST( Token( 'stmts' ), args )
 	
 	def p_stmt( self, args ):
 		'''
 		stmt ::= stepper_stmt
-		stmt ::= entity_system_stmt
-		stmt ::= entity_other_stmt
+		stmt ::= system_stmt
 		'''
-		return AST( type=args[0] , right=args[1] )
-
-	def p_entity_tpye( self, args ):
-		'''
-		entity_type ::= class
-		'''
-		return args[0]
+		return AST( Token( 'stmt' ), args )
 	
+	# statements
+
+
+	# object statements
+
 	def p_stepper_stmt ( self, args ):
 		'''
-		stepper_stmt ::= stepper name ( id ) { propertylist } 
+		stepper_stmt ::= Stepper object_decl stepper_def
 		'''
-		return AST( type=args[1] , left=args[0], right=args[2] )
+		return AST( args[0], args )
 
-	def p_entity_system_stmt ( self, args ):
+	def p_system_stmt ( self, args ):
                 '''
-		entity_system_stmt ::= entitytype entity_decl entity_system_def
+		system_stmt ::= System object_decl system_def
 		'''
-		return AST( type=args[1] , left=args[0], right=args[2] )
+		return AST ( args[0], args )
 
 	def p_entity_other_stmt ( self, args ):
                 '''
-		entity_other_stmt ::= entitytype entity_decl entity_other_def
+		entity_other_stmt ::= Substance object_decl entity_other_def
+		entity_other_stmt ::= Reactor object_decl entity_other_def
 		'''
-		return AST( type=args[1] , left=args[0], right=args[2] )
+		return AST ( args[0], ( args[1], args[2] ) )
 
-	def p_entity_decl( self, args ):
-		'''
-		entity_decl ::= name ( id )
-		'''
-		return AST( type=args[0] , left=args[0], right=args[2] )
+	# object declarations
 
-	def p_entity_system_def( self, args ):
+	def p_object_decl( self, args ):
 		'''
-		entity_decl ::= { property_entity_list }
+		object_decl ::= name ( name )
 		'''
-		return AST( type=args[0] , left=args[0], right=args[2] )
+		return AST ( Token( 'object_decl' ), ( args[0], args[2] ) )
+
+	# object definitions
+
+	def p_stepper_def( self, args ):
+		'''
+		stepper_def ::= { propertylist }
+		'''
+		return AST ( Token( 'stepper_def' ), ( args[1], ) )
+
+	def p_system_def( self, args ):
+		'''
+		system_def ::= { property_entity_list }
+		'''
+		return AST ( Token( 'system_def' ), ( args[1], ) )
 
 	def p_entity_other_def( self, args ):
 		'''
-		entity_decl ::= { propertylist }
+		entity_other_def ::= { propertylist }
 		'''
-		return AST( type=args[0] , left=args[0], right=args[2] )
+		return AST ( Token( 'entity_other_def' ), ( args[1], ) )
 
-
-	def p_entitytype ( self, args ):
-		'''
-		entitytype ::= System
-		entitytype ::= Substance
-		entitytype ::= Reactor
-		'''
-		return AST ( type=args[0] )
-		
-	def p_stepper ( self, args ):
-		'''
-		stepper ::= Stepper
-		'''
-		return AST ( type=args[0] )
-
-	def p_class ( self, args ):
-		'''
-		class ::= entitytype
-		class ::= stepper
-		'''
-		return AST ( type=args[0] )
-
-	def p_id ( self , args ):
-		' id ::= name '
-		return AST ( type=args[0] )
-
-	def p_systemid( self, args ):
-		' systemid ::= name '
-		return AST ( type=args[0] )
-
-	def p_info( self, args ):
-		' info ::= quotedstring '
-		return AST ( type=args[0])
-	
-	def p_entitylist_1( self, args ):
-		'''
-		entitylist ::= entity class entitylist
-		'''
-		return AST ( type=args[1] , left=args[0], right=args[2] )
-	
-	def p_entitylist_2( self, args):
-		'''
-		entitylist ::= entity
-		'''
-		return args[0]
+	# property
 
 	def p_propertylist( self, args ):
 		'''
 		propertylist ::= property propertylist
+		'''
+		return AST ( Token('propertylist'), ( args[0], args[1][0] ) )
+
+	def p_propertylist_single( self, args ):
+		'''
+		propertylist ::= property
+		'''
+		return AST ( Token('propertylist'), args )
+
+	def p_propertylist_empty( self, args ):
+		'''
 		propertylist ::=
 		'''
-		return AST( type=args[1], left=args[0] , right=args[2] )
+		return AST ( Token('propertylist') )
 
-	def p_property_1( self, args ):
+	def p_property( self, args ):
 		'''
-		property ::= propertyname valuelist ;
+		property ::= name valuelist ;
 		'''
-		return AST( type=args[0] , right=args[1] )
+		return AST( Token('token'), args[:1] )
 
-	def p_property_3( self, args ):
+
+
+	# property or entity ( for System statement )
+
+	def p_property_entity_list( self, args ):
 		'''
-		property ::= property ;
+		property_entity_list ::= property_entity property_entity_list
 		'''
-		return AST ( type=args[1] , left=args[0] , right=args[0] )
-	
-	def p_valuelist_1( self, args ):
+		return AST( Token( 'property_entity_list' ), ( args[0], args[1][0] ) )
+
+	def p_property_entity_single( self, args ):
+		'''
+		property_entity_list ::= property_entity
+		'''
+		return AST( Token( 'property_entity_list' ), args )
+
+	def p_property_entity_list_empty( self, args ):
+		'''
+		property_entity_list ::=
+		'''
+		return AST( Token( 'property_entity_list' ) )
+
+	def p_property_entity( self, args ):
+		'''
+		property_entity ::= property
+		property_entity ::= entity_other_stmt
+		'''
+		return AST( Token( 'property_entity' ), args )
+
+
+	# value
+
+	def p_valuelist( self, args ):
 		'''
 		valuelist ::= value valuelist
 		'''
-		return AST( type=args[0] , right=args[2] )
+		return AST( Token( 'valuelist' ), ( args[0], args[1][0] ) )
 
-	def p_valuelist_2( self, args ):
+	def p_valuelist_single( self, args ):
 		'''
 		valuelist ::= value
 		'''
-		return args[0]
-	
+		return AST( Token( 'valuelist' ), args )
+
 	def p_value( self, args ):
 		'''
-		value ::= number
-		value ::= quotedstring
-		value ::= name
+		value ::= scalervalue
+		value ::= vectorvalue
 		'''
-		return AST( type=args[0] )
+		return AST( Token( 'value' ), args )
+
+	def p_scalervalue( self, args ):
+		'''
+		scalervalue ::= number
+		scalervalue ::= quotedstring
+		scalervalue ::= name
+		'''
+		return AST( Token( 'scalervalue' ), args )
+
+	def p_vectorvalue( self, args ):
+		'''
+		vectorvalue ::= [ valuelist ]
+		'''
+		return AST( Token( 'vectorvalue' ), ( args[1], ) )
+
+
 
 class Interpret(GenericASTTraversal):
 	def __init__( self, ast ):
@@ -255,94 +277,39 @@ class Interpret(GenericASTTraversal):
 		
 		# eml stack
 		self.queue = []
-		
 		self.postorder()
+
 		ast.value = self.queue
-		#print ast.value
+#		print ast.value
 
-	def n_number( self, node):
+	def n_stepper_stmt( self, node ):
 		node.value = node.attr
-
-        def n_name( self, node):
-		node.value = node.attr
-
-	def n_quotedstring(self, node):
-		node.value = node.attr
-		
-	def n_Stepper( self, node ):
-		node.value = node.attr
-		if node.right != None and node.right.type != 'name':
-			aList = [node.value] + node.right.value
+		if node[1] != None and node[1].type != 'name':
+			aList = [node.value] + node[1].value
 			self.queue.append(aList)
 
-	def n_System( self, node):
-		node.value = node.attr
-		if node.right != None:
-			aList = [node.value] + node.right.value
+		if node[1] != None:
+			aList = [node.value] + node[1].value
 			self.queue.append(aList)
 
 	def n_Reactor( self, node):
 		node.value = node.attr
-		if node.right != None:
-			aList = [node.value] + node.right.value
+		if node[1] != None:
+			aList = [node.value] + node[1].value
 			self.queue.append(aList)
 		
 	def n_Substance( self, node):
 		node.value = node.attr
-		if node.right != None:
-			aList = [node.value] + node.right.value
+		if node[1] != None:
+			aList = [node.value] + node[1].value
 			self.queue.append(aList)
 		
 	def default( self, node):
-#               left  = node.left.value
-#		right = node.right.value
+		pass
 
-		if node.type == '(':
-			aClass = node.left.value
-			if node.left.type == 'name' and node.right.type == 'name':
-				anID = node.right.value
-			else:
-				aSystemID = node.right.left.value
-                                anID = aSystemID			
-			node.value = [aClass, anID, node.right.value]
-
-		elif ( node.type == '{' ):
-                        aSystemID = node.left.value
-			aPropertyList = []
-			nodekid = node.right
-			while nodekid.type == ';':
-				aPropertyList.append(nodekid.value)
-				nodekid = nodekid.right
-			node.value = aPropertyList
-			
-		elif ( node.type == ',' ):
-			aList = []
-			nodekid = node.left
-			while hasattr(nodekid, 'right'):
-				aList.append(nodekid.value)
-				nodekid = nodekid.right
-                        node.value = tuple(aList)
-				
-		elif ( node.type == ';' ):
-			aValueList = []
-			nodepro = node.left.right
-			while hasattr(nodepro, 'value'):
-				aValueList.append(nodepro.value)
-				nodepro = nodepro.right
-			aPropertyName = node.left.value
-			node.value = (aPropertyName, aValueList)
-		
-		else:
-			print "Syntax error..%s %s" % (node.type, node.attr)
-			node.value = node.attr
 			
 def convertEm2Eml( anEmFileObject , mode='' ):
-	# template EmlFile generate
-	tempFilename = tempfile.mktemp()
-	tempFile = open(tempFilename, 'w')
-	tempFile.write('<?xml version="1.0" ?><eml><stepperlist/></eml>')
-	tempFile.close()
-	anEml = ecell.eml.Eml( open(tempFilename) )
+	anEml = ecell.eml.Eml()
 
 	# Scanning
 	aScanner = EmScanner()
@@ -350,7 +317,7 @@ def convertEm2Eml( anEmFileObject , mode='' ):
 	if mode == 'debug':print aTokenList
 
 	# Parsing 
-	aParser = EmParser()
+	aParser = EmParser( AST )
 	anAst = aParser.parse( aTokenList )
 	if mode == 'debug':print 'AST:', anAst
 
@@ -380,8 +347,6 @@ def convertEm2Eml( anEmFileObject , mode='' ):
 
 	aString = anEml.asString()
 	    
-	os.unlink(tempFilename)
-
 	return anEml
 
 def convert2FullID( anEml, aType, aSystemID ):

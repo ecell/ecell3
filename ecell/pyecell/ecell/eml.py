@@ -28,12 +28,16 @@ from ecssupport import *
 class Eml:
 
     
-    def __init__( self, aFileObject ):
+    def __init__( self, aFileObject=None ):
         """read EML file and make domtree"""
 
-        #aFileObject = open( aFile )
-        aFileList   = aFileObject.readlines()
-        aStringData = string.join( string.join( aFileList, '' ).split( '\n' ), '' )
+        if aFileObject is None:
+            aStringData = '<?xml version="1.0" ?><eml><stepperlist/></eml>'
+        else:
+            aFileObject.readlines()
+            aStringData = string.join( string.join( aFileObject.readlines(), '' ).split( '\n' ), '' )
+
+
         self.__theDocument = minidom.parseString( aStringData )
 
 
