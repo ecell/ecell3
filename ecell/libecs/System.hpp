@@ -62,7 +62,7 @@ namespace libecs
 
     virtual const PrimitiveType getPrimitiveType() const
     {
-      return PrimitiveType( PrimitiveType::REACTOR );
+      return PrimitiveType( PrimitiveType::SYSTEM );
     }
 
     virtual void initialize();
