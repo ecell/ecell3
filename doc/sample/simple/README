@@ -1,0 +1,38 @@
+%Id: README,v 1.0 2002/10/16 21:49 yoyo Exp %
+
+
+
+=== About ===
+
+This is a sample model with.
+It is intended to introduce the .
+
+
+
+=== Files and directories ===
+
+README:                    This file
+simple.em:                 Model file(em file) for this model
+simple.eml:                Model file(eml file) for this model
+MichaelisUniUniProcess.dm: Process file(dm file) for this model
+
+
+
+=== A how-to for running models on E-Cell 3 ===
+
+1) Compile all Process files(dm files) included in the model, by using emtool.
+   The emtool program generates a Shared Object file(so file)
+   from each corresponding Process file.
+
+   % emtool -a .MichaelisUniUniProcess.dm
+
+2) Execute gecell, the gui for E-Cell3.
+
+   % gecell
+
+3) Load Model file(eml file)
+
+   3.1) Click 'File' in Main Window
+   3.2) Click 'Load Model' in pulldown menu
+   3.3) Select Model file to load
+   3.4) Click 'Start' in Main Window to start simulation
