@@ -21,8 +21,8 @@ ecell3_usage()
 cat << EOT_USAGE
 $BASENAME ( Package: $PACKAGE, Version: $VERSION )
 
-Invoke python interpreter ready to import E-CELL module.
-('import ecs' to load the module.)
+Invoke python interpreter made ready to import E-CELL module.
+('import ecell.ecs' to load the module.)
 
 Usage:
 

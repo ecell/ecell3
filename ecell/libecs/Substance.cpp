@@ -49,13 +49,23 @@ namespace libecs
 
   void Substance::makeSlots()
   {
-    createPropertySlot( "Quantity",*this,&Substance::setQuantity,
+    createPropertySlot( "Quantity",*this,
+			Type2Type<Real>(),
+			&Substance::setQuantity,
 			&Substance::getQuantity );
-    createPropertySlot( "Concentration",*this,NULLPTR,
+
+    createPropertySlot( "Concentration",*this,
+			Type2Type<Real>(),
+			&PropertyInterface::nullSetMethod,
 			&Substance::getConcentration );
-    createPropertySlot( "Velocity",*this,&Substance::addVelocity,
+
+    createPropertySlot( "Velocity",*this,
+			Type2Type<Real>(),
+			&Substance::addVelocity,
 			&Substance::getVelocity );
+
     createPropertySlot( "AccumulatorClass",*this,
+			Type2Type<UVariableVectorRCPtr>(),
 			&Substance::setAccumulatorClass,
 			&Substance::getAccumulatorClass );
   }

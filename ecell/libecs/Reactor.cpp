@@ -43,16 +43,19 @@ namespace libecs
 
   void Reactor::makeSlots()
   {
-    //FIXME: get methods
     createPropertySlot( "Reactant", *this, 
+			Type2Type<UVariableVectorRCPtr>(),
 			&Reactor::setReactant,
 			NULLPTR );
+			//			&PropertyInterface::nullGetMethod<UVariableVectorRCPtr> );
 
     createPropertySlot( "ReactantList", *this, 
-			NULLPTR,
-			&Reactor::getReactantList);
+			Type2Type<UVariableVectorRCPtr>(),
+			&PropertyInterface::nullSetMethod,
+			&Reactor::getReactantList );
 
     createPropertySlot( "Activity", *this, 
+			Type2Type<Real>(),
 			&Reactor::setActivity,
 			&Reactor::getActivity );
   }
@@ -98,12 +101,7 @@ namespace libecs
 
   Reactor::~Reactor()
   {
-    // delete all Reactants
-    //    for( ReactantMapConstIterator i( theReactantMap.begin() );
-    //	 i != theReactantMap.end() ; ++i )
-    //      {
-    //	delete i->second;
-    //      }
+    ; // do nothing
   }
 
 

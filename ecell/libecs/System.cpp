@@ -51,20 +51,34 @@ namespace libecs
   void System::makeSlots()
   {
     createPropertySlot( "SystemList", *this,
-			NULLPTR, &System::getSystemList );
+			Type2Type<UVariableVectorRCPtr>(),
+			&PropertyInterface::nullSetMethod,
+			&System::getSystemList );
+
     createPropertySlot( "SubstanceList", *this,
-			NULLPTR, &System::getSubstanceList );
+			Type2Type<UVariableVectorRCPtr>(),
+			&PropertyInterface::nullSetMethod,
+			&System::getSubstanceList );
+
     createPropertySlot( "ReactorList", *this,
-			NULLPTR, &System::getReactorList );
+			Type2Type<UVariableVectorRCPtr>(),
+			&PropertyInterface::nullSetMethod,
+			&System::getReactorList );
 
     createPropertySlot( "StepperID", *this,
-			&System::setStepperID, &System::getStepperID );
+			Type2Type<UVariableVectorRCPtr>(),
+			&System::setStepperID,
+			&System::getStepperID );
 
     createPropertySlot( "Volume", *this,
-			&System::setVolume, &System::getVolume );
+			Type2Type<Real>(),
+			&System::setVolume, 
+			&System::getVolume );
 
     createPropertySlot( "StepInterval", *this,
-			&System::setStepInterval, &System::getStepInterval );
+			Type2Type<Real>(),
+			&System::setStepInterval, 
+			&System::getStepInterval );
   }
 
 

@@ -97,8 +97,12 @@ namespace libecs
     for( ReactantMapIterator s( theReactantMap.begin() );
 	 s != theReactantMap.end() ; ++s )
       {
-	(*i)->setReal( aVelocityPerStep * (*s).second.getStoichiometry() );
-	++i;
+	const Int aStoichiometry( (*s).second.getStoichiometry() );
+	if( aStoichiometry != 0 )
+	  {
+	    (*i)->setReal( aVelocityPerStep * aStoichiometry );
+	  }
+ 	++i;
       }
 
     }

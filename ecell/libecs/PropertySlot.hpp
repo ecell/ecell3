@@ -501,23 +501,9 @@ namespace libecs
       PropertySlot( aName ),
       theObject( anObject ),
       theSetMethodPtr( aSetMethodPtr ),
-      theGetMethodPtr( aGetMethodPtr ),
-      theCallSetMethodPtr( &ConcretePropertySlot::callNullSetMethod ),
-      theCallGetMethodPtr( &ConcretePropertySlot::callNullGetMethod )
+      theGetMethodPtr( aGetMethodPtr )
     {
-      // set theCallSetMethod Ptr and theCallGetMethodPtr.
-      // if method pointers given in the constructor parameters are
-      // null, these are not set, leaving them point to callNull[SG]etMethod.
-
-      if( isSetable() )
-	{
-	  theCallSetMethodPtr = &ConcretePropertySlot::callSetMethodPtr;
-	}
-
-      if( isGetable() )
-	{
-	  theCallGetMethodPtr = &ConcretePropertySlot::callGetMethodPtr;
-	}
+      ; // do nothing
     }
 
     virtual ~ConcretePropertySlot()
@@ -605,12 +591,12 @@ namespace libecs
 
     virtual const bool isSetable() const
     {
-      return theSetMethodPtr != NULLPTR;
+      //      return theSetMethodPtr != NULLPTR;
     }
 
     virtual const bool isGetable() const
     {
-      return theGetMethodPtr != NULLPTR;
+      //      return theGetMethodPtr != NULLPTR;
     }
 
 
@@ -627,14 +613,14 @@ namespace libecs
 
   protected:
 
-    void callSetMethod( SetType aValue )
+    inline void callSetMethod( SetType aValue )    
     {
-      ( this->*theCallSetMethodPtr )( aValue );
+      ( theObject.*theSetMethodPtr )( aValue );
     }
 
-    GetType callGetMethod() const
+    inline GetType callGetMethod() const
     {
-      return ( this->*theCallGetMethodPtr )();
+      return ( ( theObject.*theGetMethodPtr )() );
     }
 
 
@@ -652,35 +638,9 @@ namespace libecs
 
   private:
 
-    void callSetMethodPtr( SetType aValue )    
-    {
-      ( theObject.*theSetMethodPtr )( aValue );
-    }
-
-    GetType callGetMethodPtr() const
-    {
-      return ( ( theObject.*theGetMethodPtr )() );
-    }
-
-    void callNullSetMethod( SetType )    
-    {
-      THROW_EXCEPTION( AttributeError, "Not setable." );
-    }
-
-    GetType callNullGetMethod() const
-    {
-      THROW_EXCEPTION( AttributeError, "Not getable." );
-    }
-
-
-  private:
-
     T& theObject;
     const SetMethodPtr theSetMethodPtr;
     const GetMethodPtr theGetMethodPtr;
-
-    CallSetMethodPtr theCallSetMethodPtr;
-    CallGetMethodPtr theCallGetMethodPtr;
 
     ProxyVector        theProxyVector;
 

@@ -43,12 +43,21 @@ namespace libecs
   void PropertyInterface::makeSlots()
   {
 
-    createPropertySlot( "ClassName", *this, NULLPTR, 
+    createPropertySlot( "ClassName", *this, 
+			Type2Type<String>(),
+    			&PropertyInterface::nullSetMethod,
     			&PropertyInterface::getClassNameString );
-    createPropertySlot( "PropertyList",*this,NULLPTR,
+
+    createPropertySlot( "PropertyList",*this,
+			Type2Type<UVariableVectorRCPtr>(),
+    			&PropertyInterface::nullSetMethod,
 			&PropertyInterface::getPropertyList );
-    createPropertySlot( "PropertyAttributes",*this,NULLPTR,
-			&PropertyInterface::getPropertyAttributes);
+
+    createPropertySlot( "PropertyAttributes",*this,
+			Type2Type<UVariableVectorRCPtr>(),
+			&PropertyInterface::nullSetMethod,
+			&PropertyInterface::getPropertyAttributes );
+
 
   }
 

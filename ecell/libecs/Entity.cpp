@@ -53,14 +53,29 @@ namespace libecs
 
   void Entity::makeSlots()
   {
-    createPropertySlot( "ID", *this, NULLPTR, &Entity::getID );
-    createPropertySlot( "FullID", *this, NULLPTR, &Entity::getFullIDString );
+    createPropertySlot( "ID", *this, 
+			Type2Type<String>(),
+			&PropertyInterface::nullSetMethod,
+			&Entity::getID );
+
+    createPropertySlot( "FullID", *this, 
+			Type2Type<String>(),
+			&PropertyInterface::nullSetMethod,
+			&Entity::getFullIDString );
     
-    createPropertySlot( "Name", *this, NULLPTR, &Entity::getName );
+    createPropertySlot( "Name", *this, 
+			Type2Type<String>(),
+			&PropertyInterface::nullSetMethod, 
+			&Entity::getName );
+
     createPropertySlot( "Activity", *this, 
+			Type2Type<Real>(),
 			&Entity::setActivity,
 			&Entity::getActivity );
-    createPropertySlot( "ActivityPerSecond", *this, NULLPTR, 
+
+    createPropertySlot( "ActivityPerSecond", *this,
+			Type2Type<Real>(),
+			&PropertyInterface::nullSetMethod, 
 			&Entity::getActivityPerSecond );
   }
 

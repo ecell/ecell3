@@ -32,10 +32,12 @@ void MichaelisUniUniReactor::makeSlots()
 {
   createPropertySlot( "KmS", 
 		      *this,
+		      Type2Type<Real>(),
 		      &MichaelisUniUniReactor::setKmS,
 		      &MichaelisUniUniReactor::getKmS );
   createPropertySlot( "KcF",
 		      *this,
+		      Type2Type<Real>(),
 		      &MichaelisUniUniReactor::setKcF,
 		      &MichaelisUniUniReactor::getKcF );
 

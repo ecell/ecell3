@@ -128,6 +128,14 @@ namespace libecs
       return theConcentration;
     }
 
+    /**
+       Update theConcentration by theQuantity.
+
+       This method calculates the concentration with System's
+       calculateConcentration() method.
+
+    */
+
     void updateConcentration()
     {
       theConcentration = 
@@ -197,19 +205,23 @@ namespace libecs
 
     /**
        Set a quantity with no check. (i.e. isFixed() is ignored.)
+
+       Use setQuantity() for usual purposes.
+
        This updates the accumulator immediately.
-       (e.g. loading cell state.) Use setQuantity() for usual purposes.
 
        @see setQuantity
     */
+
     void loadQuantity( RealCref aQuantity );
 
     /**
-       This simply set the quantity of this Substance with check of isFixed().
+       This simply set the quantity of this Substance if isFixed() is false.
        This updates the accumulator immediately.
 
        @see isFixed
     */
+
     void setQuantity( RealCref aQuantity )
     { 
       if( !isFixed() ) 
@@ -222,6 +234,7 @@ namespace libecs
     /**
        Get a quantity via save() method of the Accumulator.
     */
+
     const Real saveQuantity();
 
 
@@ -230,6 +243,7 @@ namespace libecs
     /**
        set a class name string of user default accumulator
     */
+
     static void setUserDefaultAccumulatorName( StringCref name ) 
     { 
       USER_DEFAULT_ACCUMULATOR_NAME = name; 
@@ -238,6 +252,7 @@ namespace libecs
     /**
        a class name string of user default accumulator
     */
+
     static StringCref userDefaultAccumulatorName() 
     { 
       return USER_DEFAULT_ACCUMULATOR_NAME; 

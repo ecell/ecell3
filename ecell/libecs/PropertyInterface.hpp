@@ -35,6 +35,7 @@
 
 #include "libecs.hpp"
 
+#include "Defs.hpp"
 #include "Message.hpp"
 #include "PropertySlot.hpp"
 
@@ -97,6 +98,21 @@ namespace libecs
 
     virtual StringLiteral getClassName() const { return "PropertyInterface"; }
 
+
+  protected:
+
+    template <typename Type>
+    void nullSetMethod( const Type& )
+    {
+      THROW_EXCEPTION( AttributeError, "Not setable." );
+    }
+
+    template <typename Type>
+    const Type nullGetMethod() const
+    {
+      THROW_EXCEPTION( AttributeError, "Not getable." );
+    }
+
   public: // message slots
 
     const UVariableVectorRCPtr getPropertyList() const;
@@ -111,19 +127,36 @@ namespace libecs
 
     */
 
-    template<class T>
+    template<class T, typename SlotType>
     void
-    createPropertySlot( StringCref name,
-			T& object,
-			typename ConcretePropertySlot<T,UVariableVectorRCPtr>::SetMethodPtr set,
-			typename ConcretePropertySlot<T,UVariableVectorRCPtr>::GetMethodPtr get )
+    createPropertySlot( StringCref aName,
+			T& anObject,
+			//			const SlotType& anInitialValue,
+			Type2Type<SlotType>,
+			typename ConcretePropertySlot<T,SlotType>
+			::SetMethodPtr aSetMethodPtr,
+			typename ConcretePropertySlot<T,SlotType>
+			::GetMethodPtr aGetMethodPtr )
     {
-      appendSlot( new ConcretePropertySlot<T,UVariableVectorRCPtr>( name, 
-								object, 
-								set, 
-								get ) );
+      if( aSetMethodPtr == NULLPTR )
+	{
+	  aSetMethodPtr = &PropertyInterface::nullSetMethod;
+	}
+
+      if( aGetMethodPtr == NULLPTR )
+	{
+	  aGetMethodPtr = &PropertyInterface::nullGetMethod<SlotType>;
+	}
+
+      appendSlot( new ConcretePropertySlot
+		  <T,SlotType>( aName,
+				anObject,
+				aSetMethodPtr,
+				aGetMethodPtr ) );
+				//				anInitialValue ) );
     }
 
+    /*
     template<class T>
     void
     createPropertySlot( StringCref name,
@@ -153,7 +186,7 @@ namespace libecs
 						      set, 
 						      get ) );
     }
-
+    */
     void appendSlot( PropertySlotPtr );
     void deleteSlot( StringCref keyword );
 
