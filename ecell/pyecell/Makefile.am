@@ -13,6 +13,8 @@ ecell3-session-manager\
 gecell3-session\
 ecell3-sbml2eml
 
+EXTRA_DIST = ${BINS}
+
 EXE = ${BINS:=$(EXEEXT)}
 bin_SCRIPTS = ${EXE}
 

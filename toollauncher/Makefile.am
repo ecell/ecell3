@@ -22,7 +22,7 @@ toollauncher.png\
 toollauncher32.png\
 toollauncher_large.png
 
-EXTRA_DIST=${toollauncher_PYTHON}
+EXTRA_DIST=${toollauncher_PYTHON} ${BINS}
 
 # Windows py2exe setup options, ignore for Unix based systems
 PY2EXE_SETUP = ../ecell/pyecs/windows/py2exeSetup

@@ -12,6 +12,8 @@ BINS =\
 dmgen\
 dmcompile
 
+EXTRA_DIST = ${BINS}
+
 EXE = ${BINS:=$(EXEEXT)}
 bin_SCRIPTS = ${EXE}
 

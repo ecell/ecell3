@@ -77,7 +77,7 @@ ConnectionObjectEditorWindow.py\
 ComplexShape.py
 
 
-EXTRA_DIST=${modeleditor_PYTHON}
+EXTRA_DIST=${modeleditor_PYTHON} ${BINS}
 
 # Windows py2exe setup options, ignore for Unix based systems
 PY2EXE_SETUP = ../ecell/pyecs/windows/py2exeSetup
