@@ -51,7 +51,6 @@ import string
 import sys
 import traceback
 import os
-import webbrowser
 
 
 #
@@ -222,9 +221,8 @@ class MainWindow(OsogoWindow):
 		# creates EntityListWindow 
 		# -------------------------------------
 
-                self.theEntityListWindow = self.theSession.createEntityListWindow( 'top_frame' )
+                self.theEntityListWindow = self.theSession.createEntityListWindow( 'top_frame', self['statusbar'] )
                 self['entitylistarea'].add( self.theEntityListWindow['top_frame'] )
-
 
 
 	def __expose( self, *arg ):
@@ -848,7 +846,7 @@ class MainWindow(OsogoWindow):
 		self.theMessageWindow.printMessage( aMessage )
 
 	def __createEntityListWindow( self, *arg ):
-		self.theSession.createEntityListWindow( )
+		anEntityListWindow = self.theSession.createEntityListWindow()
 
 	def deleted( self, *arg ):
 		""" When 'delete_event' signal is chatcked( for example, [X] button is clicked ),

@@ -42,7 +42,7 @@ class EntityListWindow(OsogoWindow):
     PROCESS_COLUMN_LIST = [ 'ID', 'Activity', 'Classname', 'Path' ]
 
 
-    def __init__( self, session, rootWidget ):
+    def __init__( self, session, rootWidget, aStatusbar ):
         '''Constructor
         session   --   a reference to GtkSessionMonitor
         '''
@@ -55,6 +55,9 @@ class EntityListWindow(OsogoWindow):
 
         self.searchString = ''
 
+        # set status bar
+        self.theStatusbar = aStatusbar
+
         # fix me
         if( self.theSession != None ):
             self.thePluginManager = session.thePluginManager
@@ -65,7 +68,6 @@ class EntityListWindow(OsogoWindow):
 
         # call superclass's openWindow
         OsogoWindow.openWindow( self )
-
 
         # add handers
         self.addHandlers( { 
@@ -314,6 +316,9 @@ class EntityListWindow(OsogoWindow):
             [(SYSTEM, '', '/', '')],\
             rootWidget= 'top_frame',\
             parent= self ) 
+
+        if ( self.theStatusbar != None ):
+            self.thePropertyWindow.setStatusBar( self.theStatusbar )
 
         aPropertyWindowTopVBox = self.thePropertyWindow['top_frame']
         self['property_area'].add( aPropertyWindowTopVBox )
@@ -831,7 +836,7 @@ class EntityListWindow(OsogoWindow):
         Returns None
         """
 
-#        self.thePropertyWindow.clearStatusBar()
+        self.thePropertyWindow.clearStatusBar()
 
         if len(obj) == 0:
             return None
@@ -871,7 +876,7 @@ class EntityListWindow(OsogoWindow):
         """
 
         # clear status bar
-#        self.thePropertyWindow.clearStatusBar()
+        self.thePropertyWindow.clearStatusBar()
 
         if len(obj) == 0:
             return None
@@ -1010,7 +1015,7 @@ class EntityListWindow(OsogoWindow):
         """add plugin window to board
         """
 
-#        self.thePropertyWindow.clearStatusBar()
+        self.thePropertyWindow.clearStatusBar()
 
         if len(arg) == 0:
             return None
@@ -1050,7 +1055,7 @@ class EntityListWindow(OsogoWindow):
         """
 
         # clear status bar
-#        self.thePropertyWindow.clearStatusBar()
+        self.thePropertyWindow.clearStatusBar()
 
         # gets selected RawFullPNList
         aSelectedRawFullPNList = self.__getSelectedRawFullPNList()
@@ -1076,8 +1081,6 @@ class EntityListWindow(OsogoWindow):
             aMessage = 'Loggers were created.'
         self.thePropertyWindow.showMessageOnStatusBar(aMessage)
         #self.checkCreateLoggerButton()
-
-
 
     def searchEntity( self ):
         """search Entities
