@@ -473,8 +473,7 @@ class EntityListWindow(OsogoWindow):
             # When PopupMenu was displayed last time without PluginWindows'
             # menus, the buffer (self.thePopupSubMenu) is None.
             if self.thePopupSubMenu != None:
-                pass
-#				self['EntityPopupMenu'].remove( self.thePopupSubMenu )
+                self['EntityPopupMenu'].remove( self.thePopupSubMenu )
 
             if len(self.thePluginManager.theInstanceList)!=0:
 
@@ -500,17 +499,17 @@ class EntityListWindow(OsogoWindow):
                     aMenuItem.set_submenu( aSubMenu )
 
                     # appends parent MenuItem to PopupMenu
-#					self['EntityPopupMenu'].append( aMenuItem )
+                    self['EntityPopupMenu'].append( aMenuItem )
 
                     # saves this submenu set to buffer (self.thePopupSubMenu)
                     self.thePopupSubMenu = aMenuItem
 
 
             # displays all items on PopupMenu
-            #			self['EntityPopupMenu'].show_all() 
+            self['EntityPopupMenu'].show_all() 
 
             # displays popup menu
-            #			self['EntityPopupMenu'].popup(None,None,None,anEvent.button,anEvent.time)
+            self['EntityPopupMenu'].popup(None,None,None,anEvent.button,anEvent.time)
 
 
     def reset( self ):
