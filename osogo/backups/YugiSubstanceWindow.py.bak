@@ -2,11 +2,15 @@
 
 import string
 import ecs
-import re
+
 import gtk
 import gnome.ui
 import GDK
 import libglade
+
+calledSubstance = 'Substance:/:B'
+volume = 1.0E-15
+N_A = 6.0E+23
 
 #
 # from "test.py"
@@ -98,17 +102,19 @@ class SubstanceWindow(Window):
     def __init__( self, gladefile ):
 
         self.theHandlerMap = { 'fixbutton_toggled' : self.fixbutton_toggled,
-                               'quantity_changed': self.quantity_changed
+                               'quantity_changed': self.quantity_changed,
+                               'conc_changed': self.conc_changed
                                }
         
         Window.__init__( self, gladefile )
         
-#        init_quantity = s.getProperty('Substance:/:C', 'Quantity')
-#        id = s.getProperty('Substance:/:C', 'ID') 
+        init_quantity = s.getProperty(calledSubstance, 'Quantity')
+        init_conc = init_quantity[0] / N_A / volume
+        id = s.getProperty(calledSubstance, 'Id')
 
-        self['name_label'].set_text("cAMP")
-#        self['quantity_spin'].set_value( init_quantity )
-#        self['conc_spin'].set_value( init_conc )
+        self['name_label'].set_text(str(id[0]))
+        self['quantity_spin'].set_value( init_quantity[0] )
+        self['conc_spin'].set_value( init_conc )
 
         self.addHandlers( self.theHandlerMap )
         self.fixed = 0
@@ -124,11 +130,25 @@ class SubstanceWindow(Window):
             
     def quantity_changed( self,obj ):
         aNumberString = obj.get_text()
-        aNumber = string.atof( aNumberString )
+        quantity = string.atof( aNumberString )
+        conc = quantity / N_A / volume
 
-        obj.set_value( aNumber )
-        s.setProperty( 'Substance:/:A', 'Quantity', (aNumber,) )
-        printProperty( s, 'Substance:/:A', 'Quantity' )
+        s.setProperty( calledSubstance, 'Quantity', (quantity,) )
+        printProperty( s, calledSubstance, 'Quantity' )
+
+        self['quantity_spin'].set_value( quantity )
+        self['conc_spin'].set_value( conc )
+
+    def conc_changed( self,obj ):
+        aNumberString = obj.get_text()
+        conc = string.atof( aNumberString )
+        quantity = conc * N_A * volume
+
+        s.setProperty( calledSubstance, 'Quantity', (quantity,) )
+        printProperty( s, calledSubstance, 'Quantity' )
+
+        self['quantity_spin'].set_value( quantity )
+        self['conc_spin'].set_value( conc )
 
     def setLabel(self,name,text):
         obj = self.getWidget(name)
@@ -149,3 +169,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
