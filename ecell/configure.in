@@ -3,14 +3,14 @@ AC_REVISION([$Id$])dnl
 dnl Process this file with autoconf to produce a configure script.
 
 
-VERSION=\"3.0\"
+VERSION=\"3.0.0\"
 PACKAGE=\"ecell\"
 
 AC_SUBST(VERSION)
 AC_SUBST(PACKAGE)
 
 AC_INIT(libecs/Entity.hpp)
-AM_INIT_AUTOMAKE(ecell,3.0)
+AM_INIT_AUTOMAKE(ecell,3.0.0)
 
 AM_SANITY_CHECK
 
@@ -158,15 +158,13 @@ AM_CONFIG_HEADER(config.h)
 
 AC_OUTPUT(
 Makefile 
-libecs/Makefile 
+libecs/Makefile
+libecs/emtool
+libecs/dmtemplates/Makefile
+libecs/dmtemplates/reactor/Makefile
 libemc/Makefile
 pyecs/Makefile
 pyecs/ecell3,
 chmod +x pyecs/ecell3
 )
-
-
-
-
-
 
