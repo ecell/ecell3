@@ -438,7 +438,11 @@ Stepper ODE23Stepper( ODE_1 )
 System CompartmentSystem( / ) 
 { 
         StepperID       ODE_1;
-        Volume          1e-18; 
+
+        Variable Variable( SIZE )
+        {
+                Value   1e-18; 
+        }
  
         Variable Variable( S ) 
         { 
@@ -463,15 +467,19 @@ System CompartmentSystem( / )
 </programlisting>
       </example>
 
-      <para>In this example, the model has a &Stepper;, of which
-      class name is <classname>ODE23Stepper</classname>, and has an ID
+      <para>In this example, the model has a &Stepper;, of which class
+      name is <classname>ODE23Stepper</classname>, and has an ID
       ODE_1.  The model also has a root system ('/'), and the class
       name is <classname>CompartmentSystem</classname>.  The root
-      sytem, has two properties, StepperID and Volume, and three
-      &Entity; objects, &Variable;s S and P, and a &Process; E.  These
-      &Entity; objects have their property values of several different
-      types.  For example, 'StepperID' of the root system is a string
-      without quotes (ODE_1). The initial value given to 'Value' property of
+      sytem, has a StepperID property, and four &Entity; objects,
+      &Variable;s SIZE, S and P, and a &Process; E.  The 'SIZE' is a
+      special name of a &Variable;.  It determines the size of the
+      compartment.  If the compartment is three-dimensional, it means
+      the volume in [L] (liter).  That value is used to calculate
+      concentrations of other &Variables;.  These &Entity; objects
+      have their property values of several different types.  For
+      example, 'StepperID' of the root system is a string without
+      quotes (ODE_1). The initial value given to 'Value' property of
       the &Variable; S is an integer number 10000.  'Name' of the
       &Process; E is a quoted string "A mass action from S to P", and
       'k' of it is a real number 1.0.  'VariableReferenceList'
