@@ -36,11 +36,7 @@ if test "$DIE" -eq 1; then
         exit 1
 fi
 
-if (cvs2cl.pl --version) < /dev/null > /dev/null 2>&1 ; then
-    echo "cvs2cl.pl found. running it."
-    cvs2cl.pl
-else
-    echo "cvs2cl.pl not found. touching ChangeLog."
+if [ ! -f ChangeLog ] ; then
     touch ChangeLog
 fi
 
