@@ -17,8 +17,8 @@ PluginWindow.py\
 RecordingSimulator.py\
 util.py\
 Window.py\
-eml.py
-
+eml.py\
+munch.py
 
 
 EXTRA_DIST=${pyecell_DATA}
