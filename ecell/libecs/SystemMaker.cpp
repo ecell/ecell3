@@ -56,9 +56,10 @@ System* SystemMaker::make(const string& classname) throw(CantInstantiate)
   System* instance = allocator(classname)();
 
   if(instance == NULL)
-    throw CantInstantiate(__PRETTY_FUNCTION__,
-			  className() + string(": failed to instantiate a ")
-			  + classname + ".");
+    throw CantInstantiate();
+  //__PRETTY_FUNCTION__,
+  //className() + string(": failed to instantiate a ")
+  //			  + classname + ".");
   ++_numInstance;
   return instance;
 }

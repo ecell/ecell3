@@ -38,7 +38,7 @@
 #define ___REACTORMAKER_H___
 #include <stl.h>
 #include "Reactor.h"
-#include "util/SharedModuleMaker.h"
+#include "SharedModuleMaker.h"
 
 class ReactorMaker : public SharedModuleMaker<Reactor>
 {

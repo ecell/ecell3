@@ -39,7 +39,7 @@
 #include <stl.h>
 #include "System.h"
 #include "StepperMaker.h"
-#include "util/ModuleMaker.h"
+#include "ModuleMaker.h"
 
 
 class SystemMaker : public MultiClassModuleMaker<System>

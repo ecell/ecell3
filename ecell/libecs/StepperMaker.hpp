@@ -38,7 +38,7 @@
 #define ___STEPPERMAKER_H___
 #include <stl.h>
 #include "Stepper.h"
-#include "util/ModuleMaker.h"
+#include "ModuleMaker.h"
 
 class StepperMaker : public MultiClassModuleMaker<Stepper>
 {

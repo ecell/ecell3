@@ -55,9 +55,11 @@ throw(CantInstantiate)
   Accumulator* instance = allocator(classname)();
 
   if(instance == NULL)
-    throw CantInstantiate(__PRETTY_FUNCTION__,
+    throw CantInstantiate() ;
+
+      /*__PRETTY_FUNCTION__,
 			  className() + string(": failed to instantiate a ")
-			  + classname + ".");
+			  + classname + ".");*/
   ++_numInstance;
   return instance;
 }

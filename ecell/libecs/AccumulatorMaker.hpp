@@ -38,7 +38,7 @@
 #define ___ACCUMULATORMAKER_H___
 #include <stl.h>
 #include "Accumulators.h"
-#include "util/ModuleMaker.h"
+#include "ModuleMaker.h"
 
 class AccumulatorMaker : public MultiClassModuleMaker<Accumulator>
 {

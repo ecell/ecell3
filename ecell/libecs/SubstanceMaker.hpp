@@ -36,7 +36,7 @@
 
 #ifndef ___SUBSTANCEMAKER_H___
 #define ___SUBSTANCEMAKER_H___
-#include "util/ModuleMaker.h"
+#include "ModuleMaker.h"
 
 #include "Substance.h"
 
