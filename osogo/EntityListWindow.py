@@ -359,8 +359,10 @@ class PopupMenu( gtk.Menu ):
 		# caliculates size of menu and sets it to itself
 		# ------------------------------------------
 		self.theWidth = (aMaxStringLength+1)*8
-		self.theHeight = (aMenuSize+1)*21 + 3
-		self.set_usize( self.theWidth, self.theHeight )
+		#self.theHeight = (aMenuSize+1)*21 + 3
+		self.theHeight = (aMenuSize+1)*24 + 3
+		#self.set_usize( self.theWidth, self.theHeight )
+		self.set_size_request( self.theWidth, self.theHeight )
 
 	# end of __init__
 

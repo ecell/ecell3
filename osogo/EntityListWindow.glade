@@ -11,7 +11,6 @@
   <property name="modal">False</property>
   <property name="resizable">True</property>
   <property name="destroy_with_parent">False</property>
-  <signal name="destroy" handler="destroy"/>
 
   <child>
     <widget class="GtkVBox" id="vbox58">
@@ -57,7 +56,7 @@
 			  <property name="reorderable">False</property>
 			  <property name="enable_search">True</property>
 			  <signal name="button_press_event" handler="system_tree_button_press_event" last_modification_time="Sat, 07 Dec 2002 13:48:22 GMT"/>
-			  <signal name="cursor_changed" handler="system_tree_cursor_changed" last_modification_time="Mon, 21 Oct 2002 20:13:28 GMT"/>
+			  <signal name="cursor_changed" handler="system_tree_cursor_changed" last_modification_time="Sat, 01 Mar 2003 10:23:31 GMT"/>
 			</widget>
 		      </child>
 		    </widget>
@@ -137,7 +136,6 @@
 			  <property name="visible">True</property>
 			  <property name="can_focus">True</property>
 			  <property name="history">0</property>
-			  <signal name="changed" handler="type_optionmenu_changed" last_modification_time="Mon, 21 Oct 2002 20:11:27 GMT"/>
 
 			  <child>
 			    <widget class="GtkMenu" id="menu1">
@@ -147,7 +145,9 @@
 				  <property name="visible">True</property>
 				  <property name="label" translatable="yes">Variable</property>
 				  <property name="use_underline">True</property>
+<!--
 				  <signal name="activate" handler="on_variable1_activate" last_modification_time="Sun, 20 Oct 2002 13:11:07 GMT"/>
+-->
 				</widget>
 			      </child>
 
@@ -156,7 +156,9 @@
 				  <property name="visible">True</property>
 				  <property name="label" translatable="yes">Process</property>
 				  <property name="use_underline">True</property>
+<!--
 				  <signal name="activate" handler="on_process1_activate" last_modification_time="Sun, 20 Oct 2002 13:11:07 GMT"/>
+-->
 				</widget>
 			      </child>
 
@@ -165,7 +167,9 @@
 				  <property name="visible">True</property>
 				  <property name="label" translatable="yes">All</property>
 				  <property name="use_underline">True</property>
+<!--
 				  <signal name="activate" handler="on_all1_activate" last_modification_time="Sun, 20 Oct 2002 13:11:07 GMT"/>
+-->
 				</widget>
 			      </child>
 			    </widget>
@@ -207,9 +211,8 @@
 			      <property name="rules_hint">False</property>
 			      <property name="reorderable">False</property>
 			      <property name="enable_search">True</property>
-			      <signal name="selection_changed" handler="entity_list_selection_changed"/>
 			      <signal name="button_press_event" handler="entity_list_button_press_event" last_modification_time="Sat, 07 Dec 2002 14:45:33 GMT"/>
-			      <signal name="cursor_changed" handler="entity_list_cursor_changed" last_modification_time="Mon, 21 Oct 2002 20:46:32 GMT"/>
+			      <signal name="cursor_changed" handler="entity_list_cursor_changed" last_modification_time="Sat, 01 Mar 2003 10:23:56 GMT"/>
 			    </widget>
 			  </child>
 			</widget>

@@ -31,8 +31,8 @@ class PropertyWindow(OsogoPluginWindow):
 
 		OsogoPluginWindow.__init__( self, aDirName, aData, aPluginManager, aRoot )
 		self.openWindow()
-		print self.getWidget("PropertyWindow")
-		print self.widgets
+		#print self.getWidget("PropertyWindow")
+		#print self.widgets
 		
 		self.thePluginManager.appendInstance( self ) 
 
