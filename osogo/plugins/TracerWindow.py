@@ -105,6 +105,7 @@ class TracerWindow( OsogoPluginWindow ):
 		self.ListWindow.connect("button-press-event",self.button_pressed_on_list)
 		self['button12'].set_label('Log10 Scale')
 
+
 		#addtrace to plot
 		self.addtrace_to_plot(self.theFullPNList())
 		self.refresh_loggers()
@@ -120,6 +121,11 @@ class TracerWindow( OsogoPluginWindow ):
 			self.minimize()
 		else:
 			self['TracerWindow'].connect('expose-event',self.__resize)
+
+		if self.theSession.getParameter('show_history'):
+			self['togglebutton3'].set_active(gtk.TRUE)
+			#self.showHistory()
+			
 
 
 
@@ -247,6 +253,10 @@ class TracerWindow( OsogoPluginWindow ):
 		#checks that newpn has logger if mode is history
 		#calls superclass
 		pass_flag=0
+		if self.theSession.getParameter('log_all_traces'):
+		    for aFullPN in aFullPNList:
+			aFullPNString= createFullPNString( aFullPN)
+			self.create_logger([aFullPNString])
 
 		if self.thePlotInstance.getstripmode()=='history':
 		    for aFullPN in aFullPNList:
@@ -256,6 +266,7 @@ class TracerWindow( OsogoPluginWindow ):
 			    pass_flag=1    		
 		if pass_flag==1: 
 			return -1
+
 
 	    	pass_list=[]
 	    	for aFullPN in aFullPNList: 
@@ -416,7 +427,7 @@ class TracerWindow( OsogoPluginWindow ):
 			returns None
 		"""
 		if self.thePlotInstance.getstripmode() != 'history':
-			self.__togglestrip( self['button12'] )
+			self.__togglestrip( self['togglebutton3'] )
 			
 
 	# ========================================================================
@@ -426,7 +437,7 @@ class TracerWindow( OsogoPluginWindow ):
 			spanning an interval set by StripInterval
 		"""
 		if self.thePlotInstance.getstripmode() == 'history':
-			self.__togglestrip( self['button12'] )
+			self.__togglestrip( self['togglebutton3'] )
 
 	# ========================================================================
 	def logAll(self):
