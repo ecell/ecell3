@@ -116,7 +116,7 @@ def main():
 			pass
 		else:
 			aMessage = " Error ! [%s] No such file. \n" %anEmlFile
-			aSession.message( Message )
+			aSession.message( aMessage )
 			sys.exit(1)
 
 		# print message 
