@@ -44,8 +44,12 @@
 #include "System.hpp"
 
 // to be removed
+#include "SRMReactor.hpp"
+#include "RuleSRMReactor.hpp"
 #include "Integrators.hpp"
 
+
+#include "Substance.hpp"
 
 namespace libecs
 {
@@ -107,10 +111,11 @@ namespace libecs
 	  const SystemCptr aSystem( *i );
 
 	  typedef std::map<const String,BasePtr> BaseMap;
-	  
-	  for( typename BaseMap::const_iterator 
+	  typedef typename BaseMap::const_iterator BaseMapConstIterator; 
+
+	  for( BaseMapConstIterator 
 		 j( aSystem->System::getMap<Base>().begin() );
-	       j != aSystem->System::getMap<Base>().end(); ++j )
+	       j != aSystem->System::getMap<Base>().end(); j++ )
 	    {
 	      BasePtr aBasePtr( (*j).second );
 
@@ -120,7 +125,6 @@ namespace libecs
 		  push_back( aDerivedPtr );
 		}
 	    }
-
 	}
 
     }
@@ -434,6 +438,8 @@ namespace libecs
     SRMStepper();
     virtual ~SRMStepper() {}
 
+    virtual void makeSlots();
+
     virtual void step();
 
 
@@ -443,6 +449,60 @@ namespace libecs
     void rule();
 
     virtual void initialize();
+
+
+    const PolymorphVectorRCPtr getSubstanceCache() const
+    {
+      PolymorphVectorRCPtr aVectorPtr( new PolymorphVector );
+      
+      for( SubstanceCache::const_iterator i( theSubstanceCache.begin() );
+	   i != theSubstanceCache.end() ; ++i )
+	{
+	  aVectorPtr->push_back( (*i)->getID() );
+	}
+
+      return aVectorPtr;
+    }
+
+    const PolymorphVectorRCPtr getSRMSubstanceCache() const
+    {
+      PolymorphVectorRCPtr aVectorPtr( new PolymorphVector );
+      
+      for( SRMSubstanceCache::const_iterator i( theSRMSubstanceCache.begin() );
+	   i != theSRMSubstanceCache.end() ; ++i )
+	{
+	  aVectorPtr->push_back( (*i)->getID() );
+	}
+
+      return aVectorPtr;
+    }
+
+    const PolymorphVectorRCPtr getReactorCache() const
+    {
+      PolymorphVectorRCPtr aVectorPtr( new PolymorphVector );
+      
+      for( ReactorCache::const_iterator i( theReactorCache.begin() );
+	   i != theReactorCache.end() ; ++i )
+	{
+	  aVectorPtr->push_back( (*i)->getID() );
+	}
+
+      return aVectorPtr;
+    }
+
+    const PolymorphVectorRCPtr getRuleReactorCache() const
+    {
+      PolymorphVectorRCPtr aVectorPtr( new PolymorphVector );
+      
+      for( ReactorCache::const_iterator i( theRuleReactorCache.begin() );
+	   i != theRuleReactorCache.end() ; ++i )
+	{
+	  aVectorPtr->push_back( (*i)->getID() );
+	}
+
+      return aVectorPtr;
+    }
+
 
     virtual StringLiteral getClassName() const  { return "SRMStepper"; }
  

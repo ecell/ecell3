@@ -130,7 +130,7 @@ namespace libecs
     virtual void setVolume( RealCref aVolume ) = 0;
 
     template <class C>
-    const std::map<const String,C*> getMap() const
+    const std::map<const String,C*,std::less<const String> >& getMap() const
     {
       DEFAULT_SPECIALIZATION_INHIBITED();
     }
@@ -387,19 +387,19 @@ namespace libecs
 
 
   template <>
-  inline const std::map<const String,SubstancePtr> System::getMap() const
+  inline SubstanceMapCref System::getMap() const
   {
     return getSubstanceMap();
   }
 
   template <>
-  inline const std::map<const String,ReactorPtr>   System::getMap() const
+  inline ReactorMapCref   System::getMap() const
   {
     return getReactorMap();
   }
 
   template <>
-  inline const std::map<const String,SystemPtr>    System::getMap() const
+  inline SystemMapCref    System::getMap() const
   {
     return getSystemMap();
   }

@@ -133,7 +133,7 @@ namespace libecs
        This method must be called from the constructor only once.
     */
 
-    virtual void makeSlots();
+    void makeSlots();
 
 
     /** \name Properties

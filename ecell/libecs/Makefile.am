@@ -71,6 +71,8 @@ EntityType.hpp\
 System.hpp\
 Entity.hpp\
 Reactor.hpp\
+SRMReactor.hpp\
+RuleSRMReactor.hpp\
 StepperMaker.hpp\
 SystemMaker.hpp\
 DataPoint.hpp\

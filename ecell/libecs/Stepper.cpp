@@ -159,9 +159,9 @@ namespace libecs
   void Stepper::registerSystem( SystemPtr aSystem )
   { 
     if( std::find( theSystemVector.begin(), theSystemVector.end(), aSystem ) 
-	== theSystemVector.end() )
+   	== theSystemVector.end() )
       {
-	theSystemVector.push_back( aSystem );
+   	theSystemVector.push_back( aSystem );
       }
   }
 
@@ -282,9 +282,36 @@ namespace libecs
     :
     theIntegratorAllocator( NULLPTR )
   {
-    ; // do nothing
+    makeSlots();
   }
 
+  
+  void SRMStepper::makeSlots()
+  {
+    registerSlot( getPropertySlotMaker()->
+		  createPropertySlot( "SubstanceCache", *this,
+				      Type2Type<PolymorphVectorRCPtr>(),
+				      NULLPTR,
+				      &SRMStepper::getSubstanceCache ) );
+
+    registerSlot( getPropertySlotMaker()->
+		  createPropertySlot( "SRMSubstanceCache", *this,
+				      Type2Type<PolymorphVectorRCPtr>(),
+				      NULLPTR,
+				      &SRMStepper::getSRMSubstanceCache ) );
+
+    registerSlot( getPropertySlotMaker()->
+		  createPropertySlot( "ReactorCache", *this,
+				      Type2Type<PolymorphVectorRCPtr>(),
+				      NULLPTR,
+				      &SRMStepper::getReactorCache ) );
+
+    registerSlot( getPropertySlotMaker()->
+		  createPropertySlot( "RuleReactorCache", *this,
+				      Type2Type<PolymorphVectorRCPtr>(),
+				      NULLPTR,
+				      &SRMStepper::getRuleReactorCache ) );
+  }
 
 
   void SRMStepper::initialize()
@@ -301,10 +328,15 @@ namespace libecs
     std::sort( theReactorCache.begin(), theReactorCache.end(),
 	       SRMReactor::PriorityCompare() );
 
+    // move RuleReactors from theReactorCache to theRuleReactorCache
     theRuleReactorCache.clear();
+    //FIXME: can be faster
     std::remove_copy_if( theReactorCache.begin(), theReactorCache.end(),
-			 theRuleReactorCache.begin(), 
-			 std::not1( RuleSRMReactor::IsRuleReactor() ) );
+			 std::back_inserter( theRuleReactorCache ), 
+			 not1( RuleSRMReactor::IsRuleReactor() ) );
+    std::remove_if( theReactorCache.begin(), theReactorCache.end(),
+		    RuleSRMReactor::IsRuleReactor() );
+
 
     distributeIntegrator( theIntegratorAllocator );
 

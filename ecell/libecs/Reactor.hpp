@@ -31,10 +31,7 @@
 #ifndef ___REACTOR_H___
 #define ___REACTOR_H___
 
-// #include <climits>
-
 #include "AssocVector.h"
-
 
 #include "libecs.hpp"
 #include "Entity.hpp"
@@ -175,98 +172,6 @@ namespace libecs
   };
 
 
-
-  DECLARE_CLASS( SRMReactor );
-  DECLARE_CLASS( RuleSRMReactor );
-
-  class SRMReactor
-    :
-    public Reactor
-  {
-
-  public:
-
-    class PriorityCompare
-    {
-    public:
-      bool operator()( SRMReactorPtr aLhs, SRMReactorPtr aRhs ) const
-      {
-	return ( aLhs->getPriority() < aRhs->getPriority() );
-      }
-    };
-
-    SRMReactor();
-    virtual ~SRMReactor();
-
-    virtual void initialize();
-
-    virtual void react()
-    {
-      ; // do nothing
-    }
-
-    void setPriority( RealCref aValue )
-    {
-      thePriority = static_cast<Int>( aValue );
-    }
-
-    const Real getPriority() const
-    {
-      return static_cast<Real>( thePriority );
-    }
-
-
-  protected:
-
-    void makeSlots();
-
-  private:
-
-    Int         thePriority;
-
-  };
-
-
-
-  class RuleSRMReactor
-    :
-    public SRMReactor
-  {
-
-  public:
-
-    class IsRuleReactor
-      : 
-      public std::unary_function<SRMReactorPtr,bool>
-    {
-    public:
-      result_type operator()( const argument_type aReactorPtr ) const
-      {
-	if( dynamic_cast<RuleSRMReactorPtr> ( aReactorPtr ) != NULLPTR ) 
-	  {
-	    return true;
-	  }
-	else
-	  {
-	    return false;
-	  }
-      }
-    };
-
-
-
-    RuleSRMReactor()
-    {
-      ; // do nothing
-    }
-
-    virtual ~RuleSRMReactor()
-    {
-      ; // do nothing
-    }
-
-
-  };
 
 
 

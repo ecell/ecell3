@@ -155,34 +155,6 @@ namespace libecs
       getSubstance()->getPropertySlot( aPropertyName, this );
   }
 
-
-  void SRMReactor::makeSlots()
-  {
-    registerSlot( getPropertySlotMaker()->
-		  createPropertySlot( "Priority", *this, 
-				      Type2Type<Real>(), // Int?
-				      &SRMReactor::setPriority,
-				      &SRMReactor::getPriority ) );
-  }
-
-  SRMReactor::SRMReactor() 
-    :
-    thePriority( 0 )
-  {
-    makeSlots();  
-  } 
-
-  SRMReactor::~SRMReactor()
-  {
-    ; // do nothing
-  }
-
-  void SRMReactor::initialize()
-  {
-    Reactor::initialize();
-  }
-
-
 } // namespace libecs
 
 
