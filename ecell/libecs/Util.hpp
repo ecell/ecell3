@@ -246,7 +246,7 @@ namespace libecs
      These functions are prepared for ExpressionFluxProcess
      and used in it.
   */
-
+  /*
   Real sec( Real n )
   {
     return 1 / cos( n );
@@ -315,7 +315,7 @@ namespace libecs
     
     return sum;
   }
-
+  */
   const Polymorph convertStringMapToPolymorph( StringMapCref aMap );
 
 
