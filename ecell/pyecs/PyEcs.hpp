@@ -264,37 +264,6 @@ from_python( PyObject* aPyObjectPtr,
 }
 
 
-//
-// StringVector  
-//
-
-// to_python only -- is this really needed? (sha)
-
-PyObject* to_python( libecs::StringVectorCref aVector )
-{
-  libecs::StringVector::size_type aSize( aVector.size() );
-  
-  tuple aPyTuple( aSize );
-  
-  for( std::size_t i( 0 ) ; i < aSize ; ++i )
-    {
-      aPyTuple.set_item( i, BOOST_PYTHON_CONVERSION::to_python( aVector[i] ) );
-    }
-
-  return to_python( aPyTuple.get() );
-}
-
-PyObject* to_python( libecs::StringVectorCptr aVectorCptr )
-{
-  return to_python( *aVectorCptr );
-}
-
-PyObject* to_python( libecs::StringVectorRCPtr aVectorRCPtr )
-{
-  return to_python( *aVectorRCPtr );
-}
-
-
 BOOST_PYTHON_END_CONVERSION_NAMESPACE
 
 

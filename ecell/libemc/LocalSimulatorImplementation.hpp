@@ -58,6 +58,7 @@ namespace libemc
     virtual void createStepper( libecs::StringCref         aClassname,
 				libecs::StringCref         anId );
 
+    virtual const libecs::Polymorph getStepperList();
 
     virtual void setStepperProperty( libecs::StringCref    aStepperID,
 				     libecs::StringCref    aPropertyName,
@@ -86,7 +87,7 @@ namespace libemc
 
     virtual const libecs::Real getCurrentTime();
 
-    virtual libecs::StringVectorRCPtr getLoggerList();
+    virtual const libecs::Polymorph getLoggerList();
 
     virtual void run();
 

@@ -65,6 +65,22 @@ namespace libemc
     getModel().createStepper( aClassname, anId );
   }
 
+  const libecs::Polymorph LocalSimulatorImplementation::getStepperList()
+  {
+    StepperMapCref aStepperMap( getModel().getStepperMap() );
+
+    PolymorphVector aPolymorphVector; 
+    aPolymorphVector.reserve( aStepperMap.size() );
+    
+    for( StepperMapConstIterator i( aStepperMap.begin() );
+	 i != aStepperMap.end(); ++i )
+      {
+	aPolymorphVector.push_back( String( (*i).first ) );
+      }
+
+    return aPolymorphVector;
+  }
+
   void LocalSimulatorImplementation::
   setStepperProperty( libecs::StringCref          aStepperID,
 		      libecs::StringCref          aPropertyName,
@@ -138,11 +154,10 @@ namespace libemc
     return EmcLogger( aLoggerPtr );
   }
 
-  StringVectorRCPtr LocalSimulatorImplementation::getLoggerList()
+  const Polymorph LocalSimulatorImplementation::getLoggerList()
   {
-    StringVectorRCPtr aLoggerListPtr( new StringVector );
-    aLoggerListPtr->
-      reserve( getModel().getLoggerBroker().getLoggerMap().size() );
+    PolymorphVector aLoggerList;
+    aLoggerList.reserve( getModel().getLoggerBroker().getLoggerMap().size() );
 
     LoggerBroker::LoggerMapCref 
       aLoggerMap( getModel().getLoggerBroker().getLoggerMap() );
@@ -150,11 +165,11 @@ namespace libemc
     for( LoggerBroker::LoggerMapConstIterator i( aLoggerMap.begin() );
 	 i != aLoggerMap.end(); ++i )
       {
-	FullPNCref aFullPN( i->first );
-	aLoggerListPtr->push_back( aFullPN.getString() );
+	FullPNCref aFullPN( (*i).first );
+	aLoggerList.push_back( aFullPN.getString() );
       }
 
-    return aLoggerListPtr;
+    return aLoggerList;
   }
 
 

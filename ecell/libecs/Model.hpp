@@ -159,6 +159,20 @@ namespace libecs
 
 
     /**
+       Get the StepperMap of this Model.
+
+       @return the const reference of the StepperMap.
+    */
+
+    StepperMapCref getStepperMap() const
+    {
+      return theStepperMap;
+    }
+
+
+
+
+    /**
        Flush the data in all Loggers immediately.
 
        Usually Loggers record data with logging intervals.  This method

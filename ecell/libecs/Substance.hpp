@@ -31,10 +31,8 @@
 #ifndef ___SUBSTANCE_H___
 #define ___SUBSTANCE_H___
 
-//#include <iostream>
 #include "libecs.hpp"
 #include "EntityType.hpp"
-#include "Integrators.hpp"
 #include "Entity.hpp"
 #include "System.hpp"
 
@@ -122,7 +120,9 @@ namespace libecs
 	  ++i;
 	}
 
-      loadQuantity( getQuantity() + aVelocitySum * aDeltaT );
+      theTotalVelocity = aVelocitySum * aDeltaT;
+      loadQuantity( getQuantity() + theTotalVelocity );
+
       theLastTime = aTime;
     }
 
@@ -170,6 +170,11 @@ namespace libecs
     const Real getVelocity() const
     { 
       return theVelocity; 
+    }
+
+    const Real getTotalVelocity() const
+    {
+      return theTotalVelocity;
     }
 
     /**
@@ -229,6 +234,7 @@ namespace libecs
     Real theQuantity;
     Real theVelocity;
 
+    Real theTotalVelocity;
 
     Real theLastTime;
 

@@ -57,6 +57,12 @@ namespace libecs
 				      &Substance::getVelocity ) );
 
     registerSlot( getPropertySlotMaker()->
+		  createPropertySlot( "TotalVelocity",*this,
+				      Type2Type<Real>(),
+				      NULLPTR,
+				      &Substance::getTotalVelocity ) );
+
+    registerSlot( getPropertySlotMaker()->
 		  createPropertySlot( "Fixed",*this,
 				      Type2Type<Int>(),
 				      &Substance::setFixed,

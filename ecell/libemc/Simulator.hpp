@@ -81,7 +81,18 @@ namespace libemc
       theSimulatorImplementation->createStepper( aClassname, anId );
     }
 
+    /**
+       List Steppers in the model.
 
+       @returh a list of Steppers.
+    */
+
+    const libecs::Polymorph getStepperList()
+    {
+      return theSimulatorImplementation->getStepperList();
+    }
+
+  
     /**
        Set a property value of an Stepper.
 
@@ -215,7 +226,7 @@ namespace libemc
        to a StringVector
     */
 
-    libecs::StringVectorRCPtr getLoggerList()
+    const libecs::Polymorph getLoggerList()
     {
       return theSimulatorImplementation->getLoggerList();
     }
