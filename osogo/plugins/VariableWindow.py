@@ -54,21 +54,21 @@ class VariableWindow( OsogoPluginWindow ):
 			aMessage = "Error: %s does not have \"Value\" property" %self.theFullIDString
 			self.thePluginManager.printMessage( aMessage )
 			aDialog = ConfirmWindow(OK_MODE, aMessage, 'Error!')
-			return None
+			raise TypeError( aMessage )
 
 		# If this entity does not have 'Concentration', does not create instance 
 		if aConcentrationFlag == FALSE:
 			aMessage = "Error: %s does not have \"Concentration\" property" %self.theFullIDString
 			self.thePluginManager.printMessage( aMessage )
 			aDialog = ConfirmWindow(OK_MODE, aMessage, 'Error!')
-			return None
+			raise TypeError( aMessage )
 
 		# If this entity does not have 'Fixed', does not create instance 
 		if aFixedFlag == FALSE:
 			aMessage = "Error: %s does not have \"Fixed\" property" %self.theFullIDString
 			self.thePluginManager.printMessage( aMessage )
 			aDialog = ConfirmWindow(OK_MODE, aMessage, 'Error!')
-			return None
+			raise TypeError( aMessage )
 
 
 		# --------------------------------------------------------------------
@@ -82,7 +82,7 @@ class VariableWindow( OsogoPluginWindow ):
 			aMessage = "Error: \"Value\" property is not number" 
 			self.thePluginManager.printMessage( aMessage )
 			aDialog = ConfirmWindow(OK_MODE, aMessage, 'Error!')
-			return None
+			raise TypeError( aMessage )
 
 		# If Concentration is not Number
 		if operator.isNumberType( self.theStub.getProperty('Concentration') ):
@@ -91,7 +91,7 @@ class VariableWindow( OsogoPluginWindow ):
 			aMessage = "Error: \"Concentration\" property is not number" 
 			self.thePluginManager.printMessage( aMessage )
 			aDialog = ConfirmWindow(OK_MODE, aMessage, 'Error!')
-			return None
+			raise TypeError( aMessage )
 
 		# --------------------------------------------------------------------
 		#  [3] Creates this instance

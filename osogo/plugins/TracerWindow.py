@@ -18,7 +18,7 @@ class TracerWindow( PlotterPluginWindow ):
 		#initiates Plotterpluginwindow
 		PlotterPluginWindow.__init__(self, dirname, data, pluginmanager,\
 					    'TracerPlot',root)
-		#-------
+		TracerWindow.theViewType = MULTIPLE
 
 	def openWindow(self):
 		#OsogoPluginWindow.openWindow(self)
@@ -142,6 +142,31 @@ class TracerWindow( PlotterPluginWindow ):
 #		print "start getting loggerendtime"		
 		return lend 
 		
+
+	def appendRawFullPNList( self, aRawFullPNList ):
+		"""overwrites superclass method
+		aRawFullPNList  -- a RawFullPNList to append (RawFullPNList) 
+		Returns None
+		"""
+
+		# calls superclass's method
+		OsogoPluginWindow.appendRawFullPNList( self, aRawFullPNList )
+		# creates FullPNList to plot
+		aFullPNList = map( self.supplementFullPN, aRawFullPNList )
+
+		for aFullPN in aFullPNList:
+			aFullPNString = createFullPNString( aFullPN )
+			aValue = self.theSession.theSimulator.getEntityProperty( aFullPNString )
+			if operator.isNumberType( aValue ) == FALSE:
+				aMessage = "Error: (%s) is not numerical data" %aFullPNString
+				self.thePluginManager.printMessage( aMessage )
+				aDialog = ConfirmWindow.ConfirmWindow(0,aMessage,'Error!')
+				raise TypeError( aMessage )
+
+		# appends FullPNList as plot data
+		self.addtrace_to_plot( aFullPNList )
+
+
 	def addtrace_to_plot(self,aFullPNList):
 		#checks that newpn has logger if mode is history
 		#calls superclass

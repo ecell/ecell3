@@ -20,6 +20,16 @@ class BargraphWindow( OsogoPluginWindow ):
 		    				root)
 		self.theSession=pluginmanager.theSession
 
+		#aFullPNString = createFullPNString( self.theFullPN() )
+		#aValue = self.theSession.theSimulator.getEntityProperty( aFullPNString )
+		#if operator.isNumberType( aValue ) == FALSE:
+		#	aMessage = "Error: (%s) is not numerical data" %aFullPNString
+		#	self.thePluginManager.printMessage( aMessage )
+		#	aDialog = ConfirmWindow.ConfirmWindow(0,aMessage,'Error!')
+		#	raise TypeError( aMessage )
+
+
+
 	def openWindow( self ):
 		OsogoPluginWindow.openWindow(self)
 		#self.openWindow()

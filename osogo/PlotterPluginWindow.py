@@ -11,6 +11,8 @@ from OsogoPluginWindow import *
 import gobject
 from ecell.ecssupport import *
 from Plot import *
+import ConfirmWindow
+
 COL_LOG=2
 COL_PIX=1
 COL_ON=0
@@ -20,12 +22,21 @@ class PlotterPluginWindow( OsogoPluginWindow ):
 	#initiates plotter sends data for processing to superclass
 	#
 	def __init__( self, dirname, data, pluginmanager, plot_type, root=None ):
+		PlotterPluginWindow.theViewType = MULTIPLE
 		#PluginWindow.__init__( self, dirname, data, pluginmanager, root )
 		OsogoPluginWindow.__init__( self, dirname, data, pluginmanager, root )
 		self.thePluginManager=pluginmanager
 		self.thePlotType = plot_type
 		#get session
 		self.theSession = pluginmanager.theSession
+
+		aFullPNString = createFullPNString( self.theFullPN() )
+		aValue = self.theSession.theSimulator.getEntityProperty( aFullPNString )
+		if operator.isNumberType( aValue ) == FALSE:
+			aMessage = "Error: (%s) is not numerical data" %aFullPNString
+			self.thePluginManager.printMessage( aMessage )
+			aDialog = ConfirmWindow.ConfirmWindow(0,aMessage,'Error!')
+			raise TypeError( aMessage )
 	
 	def openWindow(self):
 		OsogoPluginWindow.openWindow(self)
@@ -81,6 +92,13 @@ class PlotterPluginWindow( OsogoPluginWindow ):
 		self.addtrace_to_plot(self.theFullPNList())
 		self.refresh_loggers()
 
+	#def addFullPNList( self, aFullPNList ):
+		#print "######################1"
+		#print self.theFullPNList()
+		#print "######################2"
+		#print aFullPNList
+		#print "######################3"
+
 	def refresh_loggers(self):
 	    #refreshes loggerlist
 	    iter=self.ListStore.get_iter_first()
@@ -112,6 +130,7 @@ class PlotterPluginWindow( OsogoPluginWindow ):
 		self.refresh_loggers()	
 	
 	def addtrace_to_plot(self,aFullPNList): #make possible to add multiple
+
 	    pass_list=[]
 	    for aFullPN in aFullPNList: 
 		aFullPNString = createFullPNString( aFullPN )

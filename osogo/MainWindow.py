@@ -234,6 +234,8 @@ class MainWindow(OsogoWindow):
 		self[self.__class__.__name__].hide_all()
 		self[self.__class__.__name__].show_all()
 
+		self.theFirstTime = TRUE
+
 	# end of __init__
 
 	def expose(self,obj,obj2):
@@ -394,6 +396,7 @@ class MainWindow(OsogoWindow):
 			self.theSession.theSimulator.initialize()
 			self.update()
 			self.updateFundamentalWindows()
+
 
 		except:
 			self.printMessage(' can\'t load [%s]' %aFileName)
@@ -821,6 +824,7 @@ class MainWindow(OsogoWindow):
 		self['time_entry'].set_text( str( self.theCurrentTime ) )
 		self.thePluginManager.updateAllPluginWindow()
         
+
 	# end of update
 
     
@@ -1427,6 +1431,10 @@ class MainWindow(OsogoWindow):
 			self['load_rule_menu'].set_sensitive(FALSE)
 			self['load_script_menu'].set_sensitive(FALSE)
 			self['save_model_menu'].set_sensitive(TRUE)
+
+		if self.theStepperChecker == 1 and self.theFirstTime == TRUE:
+			self.theFirstTime = FALSE
+			self.clickEntityListWindow( self, self['entitylist'] )
 
 	# end of updateFundamentalWindow
 

@@ -25,7 +25,13 @@ class DigitalWindow( OsogoPluginWindow ):
 		# call constructor of superclass
 		OsogoPluginWindow.__init__( self, aDirName, aData, aPluginManager, aRoot )
         
-		#if type() self.theFullPN() 
+		aFullPNString = createFullPNString( self.theFullPN() )
+		aValue = self.theSession.theSimulator.getEntityProperty( aFullPNString )
+		if operator.isNumberType( aValue ) == FALSE:
+			aMessage = "Error: (%s) is not numerical data" %aFullPNString
+			self.thePluginManager.printMessage( aMessage )
+			aDialog = ConfirmWindow.ConfirmWindow(0,aMessage,'Error!')
+			raise TypeError( aMessage )
 
 	# end of __init__
 
@@ -35,7 +41,8 @@ class DigitalWindow( OsogoPluginWindow ):
 
 		aFullPNString = createFullPNString( self.theFullPN() )
 		aValue = self.theSession.theSimulator.getEntityProperty( aFullPNString )
-		if operator.isNumberType( aValue ):
+		#if operator.isNumberType( aValue ):
+		if TRUE:
 			self.thePluginManager.appendInstance( self )
 
 			self.addHandlers( { 
@@ -50,11 +57,7 @@ class DigitalWindow( OsogoPluginWindow ):
 			self.update()
 			# ----------------------------------------------------------------
 
-		else:
-			aMessage = "Error: (%s) is not numerical data" %aFullPNString
-			self.thePluginManager.printMessage( aMessage )
-			#aDialog = ConfirmWindow(0,aMessage,'Error!')
-			aDialog = ConfirmWindow.ConfirmWindow(0,aMessage,'Error!')
+		#else:
 
 	# ------------------------------------------------------
 	# changeFullPN

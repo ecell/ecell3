@@ -74,6 +74,9 @@ class PropertyWindow(OsogoPluginWindow):
 		# creates popu menu
 		self.thePopupMenu =  PropertyWindowPopupMenu( self.thePluginManager, self )
 
+		# initializes statusbar
+		self.theStatusBarWidget = self['statusbar']
+
 		if self.theRawFullPNList == ():
 			return
 
@@ -88,18 +91,40 @@ class PropertyWindow(OsogoPluginWindow):
 		self.thePluginManager.appendInstance( self ) 
 
 
-	# ---------------------------------------------------------------
-	# This method is used by EntityListWindow
-	# Sets statusbar of EntityListWindows to this instance
-	#
-	# aStatusBarWidget  : a status bar widget
-	# return -> None
-	# ---------------------------------------------------------------
+	# =====================================================================
 	def setStatusBar( self, aStatusBarWidget ):
+		"""sets a status bar to this window. 
+		This method is used when this window is displayed on other window.
+		aStatusBarWidget  --  a status bar (gtk.StatusBar)
+		Returns None
+		[Note]:The type of aStatusBarWidget is wrong, throws exception.
+		"""
+
+		if type(aStatusBarWidget) != gtk.Statusbar:
+			raise TypeError("%s must be gtk.StatusBar.")
 
 		self.theStatusBarWidget = aStatusBarWidget
 
-	# end of setStatusBar
+
+	# =====================================================================
+	def clearStatusBar( self ):
+		"""clear messaeg of statusbar
+		"""
+
+		self.theStatusBarWidget.push(1,'')
+
+
+	# =====================================================================
+	def showMessageOnStatusBar( self, aMessage ):
+		"""show messaegs on statusbar
+		aMessage   --  a message to be displayed on statusbar (str)
+		[Note]:message on statusbar should be 1 line. If the line aMessage is
+		       more than 2 lines, connects them as one line.
+		"""
+
+		aMessage = string.join( string.split(aMessage,'\n'), ', ' )
+
+		self.theStatusBarWidget.push(1,aMessage)
 
 
 	# ---------------------------------------------------------------
@@ -411,7 +436,7 @@ class PropertyWindow(OsogoPluginWindow):
 			self.theSession.message("---------------------------")
 
 			# creates and display error message dialog.
-			anErrorMessage = "An error happened!\nSee MessageWindow."
+			anErrorMessage = "An error happened! See MessageWindow."
 			anErrorTitle = "An error happened!"
 			if self['statusbar'] != None:
 				self['statusbar'].push(1,anErrorMessage)

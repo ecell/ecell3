@@ -51,56 +51,78 @@ from OsogoUtil import *
 from ConfirmWindow import *
 
 class OsogoPluginWindow(PluginWindow):
+	"""OsogoPluginWindow
+	This class has the following attribute and methods.
 
-	'''
 	self.theRawFullPNList : [ FullPN1, FullID2, FullPN3, , , ]
 	theFullPNList()       : [ FullPN1, FullPN2, FullPN3, , , ]
 	theFullIDList()       : [ FullID1, FullID2, FullID3, , , ]
 	theFullPN()           : FullPN1
 	theFullID()           : FullID1
-	'''
+	[Note]:When the Property of FullPN is wrong, the constructor of subclass
+	       should throw TypeError. PluginManager will catch this Error,
+	       display error message and create nothing.	
+	"""
 
-	# ---------------------------------------------------------------
-	# Constructor
-	#   - initializes theFullListClipBoard
-	#   - sets the session reference
-	#   - sets the RowFullPNList
-	#   - sets the title from InterfaceWindow
-	#
-	# aDirname       : directory name includes plugin module 
-	# aData          : RawFullPNList
-	# aPluginManager : PluginManager
-	# aRoot          : root property
-	# return -> None
-	# This method throws exceptions.
-	# ---------------------------------------------------------------
-	def __init__( self, dirname, aData, pluginmanager, aRoot=None ):
+	# If the window displays multiple FullPN/FullID, theViewType is MULTIPLE
+	theViewType = SINGLE  # default
 
-		self.theFullPNListClipBoard = []
+	# ========================================================================
+	def __init__( self, aDirName, aData, aPluginManager, aRoot=None ):
+		"""Constructor
+		aDirName        --  a directory name including plugin module
+		                    (str:absolute path/relative path)
+		aData           --  a RawFullPNList (RawFullPNList)
+		aPluginManager  --  a reference to PluginManager (PluginManager)
+		aRoot           --  a root property (str)
+		"""
+
+		#self.theFullPNListClipBoard = []
 		self.theSelectedFullPNIndex = 0
 
-		PluginWindow.__init__( self, dirname, pluginmanager, aRoot )
-		#PluginWindow.openWindow( self )
+		# calls superclass's constructor
+		PluginWindow.__init__( self, aDirName, aPluginManager, aRoot )
 
 		self.theSession = self.thePluginManager.theMainWindow.theSession 
 		self.theRawFullPNList = aData
 
+		# sets default title
 		self.theTitle = self.__class__.__name__
 
-		#if aRoot == None:
-			#self.thePopupMenu = OsogoMenu( pluginmanager, self )
-			#self.getWidget( self.theClassName ).connect( 'button_press_event', self.popupMenu )
-			#self.getWidget( self.theClassName )['title'] = self.theTitle
 
-	# end of __init__
-
+	# ========================================================================
 	def openWindow( self ):
+		"""overwrites superclass's method
+		Returns None
+		[Note]:When this is top window, appends 'destroy' signal handler.
+		"""
+
+		# calls superclass's method
 		Window.openWindow( self )
+
+		# When this is top window, appends 'destroy' signal handler.
 		if self.theRoot == None:
 			self[self.__class__.__name__].connect('destroy',self.exit)
 
+
+	# ========================================================================
 	def setRawFullPNList( self, aRawFullPNList ):
+		"""sets RawFullPNList
+		aRawFullPNList  --  a RawFullPNList to be set (RawFullPNList)
+		Returns None
+		"""
+
 		self.theRawFullPNList = aRawFullPNList
+
+
+	# ========================================================================
+	def appendRawFullPNList( self, aRawFullPNList ):
+		"""appneds RawFullPNList
+		aRawFullPNList  --  a RawFullPNList to be appned (RawFullPNList)
+		Returns None
+		"""
+
+		self.theRawFullPNList += aRawFullPNList 
 
 	# ---------------------------------------------------------------
 	# getRawFullPNList
@@ -186,7 +208,7 @@ class OsogoPluginWindow(PluginWindow):
 			elif aFullPN[TYPE] == PROCESS :
 				aPropertyName = 'Activity'
 			elif aFullPN[TYPE] == SYSTEM :
-				aPropertyName = 'Activity'
+				aPropertyName = 'Volume'
 			aNewFullPN = convertFullIDToFullPN( convertFullPNToFullID(aFullPN), aPropertyName )
 			return aNewFullPN
 
@@ -265,9 +287,9 @@ class OsogoPluginWindow(PluginWindow):
 	# return -> None
 	# This method throws exceptions.
 	# ---------------------------------------------------------------
-	def copyFullPNList(self, *objects ):
+	#def copyFullPNList(self, *objects ):
 
-		self.theFullPNListClipBoard = self.theRawFullPNList
+	#	self.theFullPNListClipBoard = self.theRawFullPNList
 
 	# end of copyFullPNList
 	
@@ -281,10 +303,10 @@ class OsogoPluginWindow(PluginWindow):
 	# return -> None
 	# This method throws exceptions.
 	# ---------------------------------------------------------------
-	def pasteFullPNList(self, *objects ):
+	#def pasteFullPNList(self, *objects ):
 
-		self.theRawFullPNList = self.theFullPNListClipBoard
-		self.initialize()
+	#	self.theRawFullPNList = self.theFullPNListClipBoard
+	#	self.initialize()
 
 	# end of pasteFullPNList
 
@@ -298,9 +320,9 @@ class OsogoPluginWindow(PluginWindow):
 	# return -> None
 	# This method throws exceptions.
 	# ---------------------------------------------------------------
-	def addFullPNList(self, *objects ):
+	#def addFullPNList(self, *objects ):
 
-		self.theRawFullPNList.extend( self.theFullPNListClipBoard )
+	#	self.theRawFullPNList.extend( self.theFullPNListClipBoard )
 
 	# end of addFullPNList
 

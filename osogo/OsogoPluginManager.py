@@ -105,61 +105,57 @@ class OsogoPluginManager(PluginManager):
 	# ---------------------------------------------------------------
 	def createInstance( self, aClassname, data, root=None, parent=None ):
 	
-		#try:
+		if self.thePluginMap.has_key( aClassname ):
+			pass
+		else:
+			self.loadModule( aClassname )
 
-			if self.thePluginMap.has_key( aClassname ):
-				pass
+		aPlugin = self.thePluginMap[ aClassname ]
+
+		# -------------------------------------------------------
+		# If plugin window does not exist on EntryList,
+		# then creates new title and sets it to plugin window.
+		# -------------------------------------------------------
+		aTitle = ""
+		if root !='top_vbox':                # if(1)
+
+			aTitle = aClassname[:-6]
+
+			if self.thePluginWindowNumber.has_key( aClassname ):
+				self.thePluginWindowNumber[ aClassname ] += 1
 			else:
-				self.loadModule( aClassname )
+				self.thePluginWindowNumber[ aClassname ] = 1
 
-			aPlugin = self.thePluginMap[ aClassname ]
-
-			# -------------------------------------------------------
-			# If plugin window does not exist on EntryList,
-			# then creates new title and sets it to plugin window.
-			# -------------------------------------------------------
-			aTitle = ""
-			if root !='top_vbox':                # if(1)
-
-				aTitle = aClassname[:-6]
-
-				if self.thePluginWindowNumber.has_key( aClassname ):
-					self.thePluginWindowNumber[ aClassname ] += 1
-				else:
-					self.thePluginWindowNumber[ aClassname ] = 1
-
-				aTitle = "%s%d" %(aTitle,self.thePluginWindowNumber[ aClassname ])
+			aTitle = "%s%d" %(aTitle,self.thePluginWindowNumber[ aClassname ])
 
 			# if(1)
 
-			# Nothing is selected.
-			if len(data) == 0:
-				self.printMessage("Nothing is selected.")
+		# Nothing is selected.
+		if len(data) == 0:
+			self.printMessage("Nothing is selected.")
 
-			else:
+		else:
 
+			try:
 				anInstance = aPlugin.createInstance( data, self, root, parent )
-				anInstance.openWindow()
+			except TypeError:
+				return None
 
-				try:
-					if root !='top_vbox':              
-						anInstance.editTitle( aTitle )
-						self.thePluginTitleDict[ anInstance ] = aTitle
-						self.theInstanceList.append( anInstance )
+			anInstance.openWindow()
 
-					# initializes session
-					self.theMainWindow.theSession.theSimulator.initialize()
-					self.updateFundamentalWindows()
-				except:
-					pass
+			try:
+				if root !='top_vbox':              
+					anInstance.editTitle( aTitle )
+					self.thePluginTitleDict[ anInstance ] = aTitle
+					self.theInstanceList.append( anInstance )
 
-				return anInstance
+				# initializes session
+				self.theMainWindow.theSession.theSimulator.initialize()
+				self.updateFundamentalWindows()
+			except:
+				pass
 
-
-		#except:
-		#	aMessage = " Some error happens, can't create plugin window."
-		#	self.printMessage(aMessage)
-
+			return anInstance
 
 	# end of createInstance
 
