@@ -62,4 +62,11 @@ SystemMaker.hpp\
 DataPoint.hpp\
 StlDataPointVector.hpp\
 Logger.hpp\
-LoggerBroker.hpp
+LoggerBroker.hpp\
+Exceptions.hpp\
+Util.hpp\
+CoreLinuxCompatibility.hpp\
+RCPtr.hpp\
+Reactant.hpp\
+StringList.hpp
+

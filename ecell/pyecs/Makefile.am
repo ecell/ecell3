@@ -64,3 +64,8 @@ clean-local:
 	rm -f $(CXXSRC)
 
 pyecsdir=${pkgincludedir}/pyecs
+
+EXTRA_DIST= \
+testrun\
+test.py
+

@@ -34,4 +34,5 @@ SimulatorMaker.hpp\
 EmcDataPoint.hpp\
 EmcLogger.hpp\
 LocalLoggerImplementation.hpp\
-LoggerImplementation.hpp
+LoggerImplementation.hpp\
+libemc.hpp

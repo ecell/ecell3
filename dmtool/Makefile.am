@@ -11,3 +11,4 @@ bin_SCRIPTS = dmtool dmgen dmcompile dmlibtool
 dmlibtool: $(DMLTMAIN)
 	$(LTCONFIG) --disable-static --enable-win32-dll -o $@ $(DMLTMAIN)
 
+EXTRA_DIST = $(bin_SCRIPTS)
