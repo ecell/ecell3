@@ -63,17 +63,17 @@ namespace libecs
 
 
   /**
-     
+     Model class represents the simulation model.
 
-     This also work as a global scheduler with a heap-tree based
+     Model has a list of Steppers and a pointer to the root system.
+
+     This also works as a global scheduler with a heap-tree based
      priority queue.
 
-     Model has two containers; theStepperMap and theScheduleQueue.
-
+     In addition to theStepperMap, this class has theScheduleQueue.
      theStepperMap stores all the Steppers in the model.  theScheduleQueue
      is basically a priority queue used for scheduling, of which containee
      is synchronized with the StepperMap by resetScheduleQueue() method.  
-
 
   */
 
@@ -86,69 +86,154 @@ namespace libecs
     ~Model();
 
     /**
-       Get a stepper by ID.
+       Initialize the whole model.
+
+       This method must be called before running the model, and when
+       structure of the model is changed.
     */
-
-    StepperPtr getStepper( StringCref anID );
-
-    /**
-       Create a stepper with an ID and a classname.
-
-    */
-
-    void createStepper( StringCref aClassName, 
-			StringCref anID,
-			UVariableVectorCref aMessage );
 
     void initialize();
 
-    void flushLogger();
+    /**
+       Conducts a step of the simulation.
+
+       This method picks a Stepper on the top of theScheduleQueue,
+       calls sync(), step(), and push() of the Stepper, and
+       reschedules it on the queue.
+
+    */
+
+    void step();
+
+
+    /**
+       Returns the current time.
+
+       \return time elasped since start of the simulation.
+    */
 
     const Real getCurrentTime() const
     {
       return theCurrentTime;
     }
 
-    SystemPtr getRootSystem() const
-    {
-      return theRootSystemPtr;
-    }
-
-    void step();
-
 
     /**
-       This method finds a System object pointed by the @a SystemPath.  
+       Creates a new Entity object and register it in an appropriate System
+       in  the Model.
 
-       @return An pointer to a System object that is pointed by @a SystemPath
+       \param aClassname
+       \param aFullID
+       \param aName
     */
-
-    SystemPtr getSystem( SystemPathCref aSystemPath );
-
-    /**
-       This method finds an Entity object pointed by the @a FullID.
-
-       @return An pointer to an Entity object that is pointed by @a FullID
-    */
-
-    EntityPtr getEntity( FullIDCref aFullID );
-
 
     void createEntity( StringCref aClassname,
 		       FullIDCref aFullID,
 		       StringCref aName );
 
 
+    /**
+       This method finds an Entity object pointed by the FullID.
+
+       \param aFullID a FullID of the requested Entity.
+       \return A borrowed pointer to an Entity specified by the FullID.
+    */
+
+    EntityPtr getEntity( FullIDCref aFullID );
+
+    /**
+       This method finds a System object pointed by the SystemPath.  
+
+
+       \param aSystemPath a SystemPath of the requested System.
+       \return A borrowed pointer to a System.
+    */
+
+
+    SystemPtr getSystem( SystemPathCref aSystemPath );
+
+
+    /**
+       Create a stepper with an ID and a classname. 
+
+       \param aClassname  a classname of the Stepper to create.  
+
+       \param anID        a Stepper ID string of the Stepper to create.  
+
+       \param aParameters a UVariableVector of parameters to give to
+       the created Stepper.
+    */
+
+    void createStepper( StringCref aClassname, 
+			StringCref anID,
+			UVariableVectorCref aParameterList );
+
+
+
+    /**
+       Get a stepper by an ID.
+
+       \param anID a Stepper ID string of the Stepper to get.
+       \return a borrowed pointer to the Stepper.
+    */
+
+    StepperPtr getStepper( StringCref anID );
+
+
+    /**
+       Flush to the data in Loggers immediately.
+
+       Usually Loggers record data with logging intervals.  This method
+       orders every Logger to write the data immediately ignoring the
+       logging interval.
+
+    */
+
+    void flushLogger();
+
+
+    /**
+       Get the RootSystem.
+
+       \return a borrowed pointer to the RootSystem.
+    */
+
+    SystemPtr getRootSystem() const
+    {
+      return theRootSystemPtr;
+    }
+
+
+    /**
+       Get the LoggerBroker.
+
+       \return a borrowed pointer to the LoggerBroker.
+    */
+
     LoggerBrokerRef getLoggerBroker()
     { 
       return theLoggerBroker; 
     }
 
+
+    /// \internal
+
     StepperMakerRef     getStepperMaker()     { return theStepperMaker; }
 
+    /// \internal
+
     ReactorMakerRef     getReactorMaker()     { return theReactorMaker; }
+
+    /// \internal
+
     SubstanceMakerRef   getSubstanceMaker()   { return theSubstanceMaker; }
+
+    /// \internal
+
     SystemMakerRef      getSystemMaker()      { return theSystemMaker; }
+
+    /// \internal
+
     AccumulatorMakerRef getAccumulatorMaker() { return theAccumulatorMaker; }
 
 
@@ -157,7 +242,22 @@ namespace libecs
 
   private:
 
+    /**
+       This method checks recursively if all systems have Steppers
+       connected.
+
+       \param aSystem a root node to start recursive search.
+       
+       \throw InitializationFailed if the check failed.
+    */
+
     void checkStepper( SystemCptr aSystem );
+
+
+    /**
+       This method clears the ScheduleQueue and reconstruct the queue
+       from the StepperMap.
+    */
 
     void resetScheduleQueue();
 

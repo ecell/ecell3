@@ -65,12 +65,12 @@ namespace libecs
   }
 
 
-  void Stepper::connectSystem( SystemPtr aSystem )
+  void Stepper::registerSystem( SystemPtr aSystem )
   { 
     theSystemVector.push_back( aSystem );
   }
 
-  void Stepper::disconnectSystem( SystemPtr aSystem )
+  void Stepper::removeSystem( SystemPtr aSystem )
   { 
     SystemVectorIterator i( find( theSystemVector.begin(), 
 				  theSystemVector.end(),

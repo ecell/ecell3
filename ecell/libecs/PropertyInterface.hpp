@@ -53,14 +53,14 @@ namespace libecs
   /**
      Common base class for classes which receive Messages.
 
-     NOTE:  Subclasses of PropertyInterface MUST call their own makeSlots()
+     \note  Subclasses of PropertyInterface MUST call their own makeSlots()
      to create their property slots in their constructors.
      (virtual functions don't work in constructors)
 
-     FIXME: class-static slots?
+     \todo class-static slots?
 
-     @see Message
-     @see PropertySlot
+     \see Message
+     \see PropertySlot
   */
 
   class PropertyInterface
@@ -78,25 +78,85 @@ namespace libecs
     PropertyInterface();
     virtual ~PropertyInterface();
 
-    void setMessage( MessageCref );
-    const Message getMessage( StringCref ) const;
 
-    PropertySlotMapCref getPropertySlotMap() const 
-    {
-      return thePropertySlotMap;
-    }
+    /**
+       Send a message to this object via a PropertySlot.
+
+       \param aMessage a Message object
+       \throw NoSlot 
+    */
+
+    void setMessage( MessageCref aMessage );
+
+    /**
+       Get a message from this object via a PropertySlot.
+
+       \param aPropertyName a name of the PropertySlot.
+       \return the Message from this object.
+       \throw NoSlot
+    */
+
+    const Message getMessage( StringCref aPropertyName ) const;
+
+
+    /**
+       Get a PropertySlot by name.
+
+       \param aPropertyName the name of the PropertySlot.
+
+       \return a borrowed pointer to the PropertySlot with the name.
+    */
 
     virtual PropertySlotPtr getPropertySlot( StringCref aPropertyName )
     {
       return thePropertySlotMap[ aPropertyName ];
     }
 
+
+    /**
+       Create and register PropertySlots of this object.
+
+       This method should be defined in subclasses, if it has new
+       PropertySlots defined.  
+
+       This method must be called from the constructor only once.
+    */
+
     virtual void makeSlots();
+
+
+    /** \name Properties
+
+    Properties is a group of methods which can be accessed via (1)
+    PropertySlots and (2) set/getMessage() methods, in addition to
+    normal C++ method calls.
+
+    */
+    //@{
+
+    const UVariableVectorRCPtr getPropertyList() const;
+    const UVariableVectorRCPtr getPropertyAttributes() const;
+
+    //@}
+
+
+
+
+    /// \internal 
+
+    //FIXME: can be protected?
+
+    PropertySlotMapCref getPropertySlotMap() const 
+    {
+      return thePropertySlotMap;
+    }
 
     const String getClassNameString() const { return getClassName(); }
 
     virtual StringLiteral getClassName() const { return "PropertyInterface"; }
 
+
+    /// \internal
 
     template <typename Type>
     void nullSet( const Type& )
@@ -104,22 +164,20 @@ namespace libecs
       THROW_EXCEPTION( AttributeError, "Not setable." );
     }
 
+    /// \internal
+
     template <typename Type>
     const Type nullGet() const
     {
       THROW_EXCEPTION( AttributeError, "Not getable." );
     }
 
-  public: // message slots
-
-    const UVariableVectorRCPtr getPropertyList() const;
-    const UVariableVectorRCPtr getPropertyAttributes() const;
-
-    void registerSlot( PropertySlotPtr );
-    void removeSlot( StringCref keyword );
+  protected:
 
     static PropertySlotMakerPtr getPropertySlotMaker();
 
+    void registerSlot( PropertySlotPtr );
+    void removeSlot( StringCref keyword );
 
   private:
 

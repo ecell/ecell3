@@ -80,8 +80,10 @@ namespace libecs
     Stepper(); 
     virtual ~Stepper() {}
 
-    void connectSystem( SystemPtr aSystem );
-    void disconnectSystem( SystemPtr aSystem );
+    virtual void setParameterList( UVariableVectorCref aParameterList );
+
+    void registerSystem( SystemPtr aSystem );
+    void removeSystem( SystemPtr aSystem );
 
 
     RealCref getCurrentTime() const
@@ -185,9 +187,6 @@ namespace libecs
     {
       return theMaxInterval;
     }
-
-
-    virtual void setParameters( UVariableVectorCref aParameterList );
 
     bool operator<( StepperCref rhs )
     {

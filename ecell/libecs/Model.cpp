@@ -226,11 +226,11 @@ namespace libecs
 
   void Model::createStepper( StringCref aClassName,
 			     StringCref anID,
-			     UVariableVectorCref data )
+			     UVariableVectorCref aParameterList )
   {
     StepperPtr aStepper( getStepperMaker().make( aClassName ) );
     aStepper->setName( anID );
-    aStepper->setParameters( data );
+    aStepper->setParameterList( aParameterList );
 
     theStepperMap.insert( std::make_pair( anID, aStepper ) );
     theScheduleQueue.push( Event( getCurrentTime(), aStepper ) );

@@ -169,7 +169,7 @@ namespace libecs
 
   System::~System()
   {
-    getStepper()->disconnectSystem( this );
+    getStepper()->removeSystem( this );
     
     for( ReactorMapIterator i( theReactorMap.begin() );
 	 i != theReactorMap.end() ; ++i )
@@ -193,7 +193,7 @@ namespace libecs
   void System::setStepperID( StringCref anID )
   {
     theStepper = getModel()->getStepper( anID );
-    theStepper->connectSystem( this );
+    theStepper->registerSystem( this );
   }
 
   void System::setStepInterval( RealCref aStepInterval )
