@@ -169,9 +169,8 @@ def t_name(t):
 	return t
 
 def t_quotedstring(t):
-	r' "(^"|.)*" '
-	t.value = Token( 'quotedstring', t.value[1:-1] )
-
+	r' "(^"|.)*" | \'(^\'|.)*\' '
+	t.value = Token( 'quotedstring', t.value )
 	return t
 
 def t_control(t):
@@ -235,8 +234,6 @@ def p_stepper_stmt(t):
 	'''
 	stepper_stmt : Stepper object_decl LBRACE propertylist RBRACE
 	'''
-	print t.slice
-
 	t[0] = createAst( 'stepper_stmt', t )
     
 def p_system_stmt(t):
@@ -450,12 +447,13 @@ def convertEm2Eml( anEmFileObject, debug=0 ):
 	# Build the lexer ( one-time-only )
 	# default create parser.out and parsetab.py
 	lex.lex(optimize=1)
-	
-	# Give the lexer some input for test
-        #lex.input(anEmFileObject.read())
 
         # Tokenizen test..
-        #while 1:
+        #while debug == 1:
+			
+            # Give the lexer some input for test
+        #    lex.input(anEmFileObject.read())
+
         #    tok = lex.token()
         #    if not tok: break      # No more input
         #    print tok
