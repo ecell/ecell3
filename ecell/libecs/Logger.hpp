@@ -43,9 +43,9 @@
 #include "MessageInterface.hpp"
 #include "UniversalVariable.hpp"
 
-#if defined(STLDATAPOINTVECTOR)
+//#if defined(STLDATAPOINTVECTOR)
 #include "StlDataPointVector.hpp"
-#endif /* END OF STLDATAPOINTVECTOR */
+//#endif /* END OF STLDATAPOINTVECTOR */
 
 namespace libecs
 {
@@ -71,9 +71,9 @@ namespace libecs
 
   public:
 
-#if defined(STLDATAPOINTVECTOR)
+    //#if defined(STLDATAPOINTVECTOR)
     DECLARE_TYPE( StlDataPointVector, DataPointVector );
-#endif /* END OF STLDATAPOINTVECTOR */
+    //#endif /* END OF STLDATAPOINTVECTOR */
 
 #if defined(VVECTOR)
     DECLARE_TYPE( VVector, DataPointVector );

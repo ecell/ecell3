@@ -32,7 +32,11 @@ System.cpp\
 Entity.cpp\
 Reactor.cpp\
 StepperMaker.cpp\
-SystemMaker.cpp
+SystemMaker.cpp\
+DataPoint.cpp\
+StlDataPointVector.cpp\
+Logger.cpp\
+LoggerBroker.cpp
 
 libecsdir=${pkginclude}/libecs
 libecs_HEADERS=\
@@ -56,4 +60,8 @@ System.hpp\
 Entity.hpp\
 Reactor.hpp\
 StepperMaker.hpp\
-SystemMaker.hpp
+SystemMaker.hpp\
+DataPoint.hpp\
+StlDataPointVector.hpp\
+Logger.hpp\
+LoggerBroker.hpp
