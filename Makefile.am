@@ -65,6 +65,14 @@ strip:
 	strip ecell/libemc/.libs/libemc.so
 	strip ecell/pyecs/.libs/_ecs.so
 
+exe-clean:
+	make -C bin clean-local
+	make -C dmtool clean-local
+	make -C ecell/pyecell clean-local
+	make -C ecell/pyecs/windows clean-local
+	make -C modeleditor clean-local
+	make -C osogo clean-local
+	make -C toollauncher clean-local
 
 ${DOXYGEN_OUTFILE}:
 	doxygen ecell3.doxy
