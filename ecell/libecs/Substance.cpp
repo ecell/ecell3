@@ -195,7 +195,7 @@ bool Substance::haveConcentration() const
       aBool = false;
     }
 
-  return true;
+  return aBool;
 }
 
 void Substance::transit()
