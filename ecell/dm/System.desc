@@ -1,8 +1,7 @@
 # general description of the class
-DESCRIPTION=This system parses and executes algebraic expressions fed to its Expression property
-
+DESCRIPTION=System
 # whether class allows new properties (other then the hardcoded ones) created by modeleditor
-ACCEPTNEWPROPERTY=True
+ACCEPTNEWPROPERTY=False
 
 # propertyname, type, defaultvalue, flags 
 # flags are: (gettable, settable, loadable, saveable) 1 means True, 0 means false
@@ -10,5 +9,5 @@ ACCEPTNEWPROPERTY=True
 PROPERTYLIST
 StepperID, STRING,"" , 1111
 Name, STRING,"", 1111
-Size, FLOAT, 0, 1011
+Size, FLOAT, 0.0, 0100
 END

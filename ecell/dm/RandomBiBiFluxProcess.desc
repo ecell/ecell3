@@ -1,18 +1,30 @@
 # general description of the class
-DESCRIPTION = "This process parses and executes algebraic expressions fed to its Expression property"
+DESCRIPTION=RandomBiBiFluxProcess
 
 # whether class allows new properties (other then the hardcoded ones) created by modeleditor
-ACCEPTNEWPROPERTY = "False"
+ACCEPTNEWPROPERTY=True
 
 PROPERTYLIST
-# propertyname, type, defaultvalue, flags 
-# flags are: (gettable, settable, loadable, saveable) 1 means True, 0 means false
-# type can be: NESTED_LIST, STRING, MULTILINE, INTEGER, FLOAT
-
-"Priority", "INTEGER", "0", "1111"
-"Name", "STRING", "", "1111"
-"VariableReferenceList", "NESTED_LIST", "[]", "1111"
-"Activity", "INTEGER", "0", "1111"
-"IsContinuous", "INTEGER", "0", "1111"
-"Expression", "STRING", "", "1111"
-"StepperID", "STRING", "", "1111"
+Activity,FLOAT,0.0,1100
+IsContinuous,INTEGER,1,0100
+Name,STRING,"",1111
+Priority,INTEGER,0,1111
+StepperID,STRING,"",1111
+VariableReferenceList,NESTED_LIST,[],1111
+k1 ,FLOAT,0.0,1111
+k2,FLOAT,0.0,1111
+k3,FLOAT,0.0,1111
+k4,FLOAT,0.0,1111
+k5,FLOAT,0.0,1111
+k6,FLOAT,0.0,1111
+k7,FLOAT,0.0,1111
+k8,FLOAT,0.0,1111
+k_1,FLOAT,0.0,1111
+k_2,FLOAT,0.0,1111
+k_3,FLOAT,0.0,1111
+k_4,FLOAT,0.0,1111
+k_5,FLOAT,0.0,1111
+k_6,FLOAT,0.0,1111
+k_7,FLOAT,0.0,1111
+k_8,FLOAT,0.0,1111
+END

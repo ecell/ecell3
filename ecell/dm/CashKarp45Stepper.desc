@@ -1,23 +1,32 @@
 # general description of the class
-DESCRIPTION=This CashKarp45Stepper 
+DESCRIPTION=CashKarp45Stepper 
 
 # whether class allows new properties (other then the hardcoded ones) created by modeleditor
-ACCEPTNEWPROPERTY=True
+ACCEPTNEWPROPERTY=False
 
 # propertyname, type, defaultvalue, flags 
 # flags are: (gettable, settable, loadable, saveable) 1 means True, 0 means false
 # type can be: NESTED_LIST, STRING, MULTILINE, INTEGER, FLOAT
 PROPERTYLIST
-CurrentTime, FLOAT, 0.0, 1011
-DependentStepperList, NESTED_LIST, [], 1011
-MaxStepInterval, FLOAT, 1.79769313486e+308, 1111
-MinStepInterval, FLOAT, 2.22507385851e-308, 1111
-NextStepInterval, FLOAT, 0.001, 1011
-OriginalStepInterval, FLOAT, 0.001, 1111
+AbsoluteEpsilon, FLOAT, 0.1, 1111
+AbsoluteToleranceFactor,FLOAT, 1.0, 1111
+CurrentTime, FLOAT, 0.0, 0100
+DependentStepperList, NESTED_LIST , [], 0100
+DerivativeToleranceFactor, FLOAT, 1.0, 1111
+MaxErrorRatio, FLOAT, 1.0, 0100
+MaxStepInterval, FLOAT, 1e+100, 1111
+MinStepInterval:1e-100:(1, 1, 1, 1)
+NextStepInterval, FLOAT, 0.001, 0100
+Order, INTEGER, 4, 0100
+OriginalStepInterval, FLOAT, 0.001, 1100
 Priority, INTEGER, 0, 1111
-ProcessList,NESTED_LIST,[],1011
-ReadVariableList,NESTED_LIST,[],1011
+ProcessList, NESTED_LIST, [], 0100
+ReadVariableList, NESTED_LIST, [], 0100
+RelativeEpsilon, FLOAT, 0.1, 1111
+RngSeed, STRING, "", 1111
+StateToleranceFactor, FLOAT, 1.0, 1111
 StepInterval, FLOAT, 0.001, 1111
-SystemVariableList,NESTED_LIST,[],1011
-WriteVariableList,NESTED_LIST,[],1011
+SystemList, NESTED_LIST, [], 0100
+Tolerance, FLOAT, 1e-06, 1111
+WriteVariableList, NESTED_LIST, [], 0100
 END
