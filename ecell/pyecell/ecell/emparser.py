@@ -439,14 +439,20 @@ class Interpret(GenericASTTraversal):
 	def default( self, node ):
 		pass
 
+def initializePLY():
+	lextabname = "emlextab"
+	yacctabname = "emparsetab"
+
+	lex.lex(optimize=1, lextab=lextabname)
+	yacc.yacc(tabmodule=yacctabname)
+
 def convertEm2Eml( anEmFileObject, debug=0 ):
 
 	# initialize eml object
 	anEml = ecell.eml.Eml()
 	
-	# Build the lexer ( one-time-only )
-	# default create parser.out and parsetab.py
-	lex.lex(optimize=1)
+	# Build the lexer
+	lex.lex(optimize=1, lextab="emlextab")
 
         # Tokenizen test..
         #while debug == 1:
@@ -454,14 +460,12 @@ def convertEm2Eml( anEmFileObject, debug=0 ):
             # Give the lexer some input for test
         #    lex.input(anEmFileObject.read())
 
-        #    tok = lex.token()
+        #    tok = lex.token( anEmFileObject.read() )
         #    if not tok: break      # No more input
         #    print tok
 
 	# Parsing
-	# optimize=1 not generate parser.out parsetab.py and fast parsing  
-	#aParser = yacc.yacc(optimize=1)
-	aParser = yacc.yacc()
+	aParser = yacc.yacc(optimize=1, tabmodule="emparsetab")
 	anAst = aParser.parse( anEmFileObject.read() , debug=debug)
 
 	import pprint
