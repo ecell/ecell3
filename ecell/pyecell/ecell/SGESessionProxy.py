@@ -56,9 +56,8 @@ class SGESessionProxy(SessionProxy):
 		self.__theSGEJobID = None
 
 		# initialize script name
-		# for example, script.tcsh if $SHELL is '/bin/tcsh'
-		self.__theTmpScriptFileName = "script." + os.path.basename( os.getenv('SHELL') )
-
+		# if current shell is '/bin/tcsh', set 'script.tcsh' 
+		self.__theTmpScriptFileName = "script." + os.path.basename( getCurrentShell() )
 
 
 	def getSGEJobID(self):
@@ -128,46 +127,31 @@ class SGESessionProxy(SessionProxy):
 
 			# create script context
 			aScriptContext = "#!%s\nuname -a\n%s\nexit $?" \
-				                  %(os.getenv('SHELL'),
+				                  %(getCurrentShell(),
 				                    anArgument)
 
 			# write script file
 			open( self.__theTmpScriptFileName, 'w' ).write( aScriptContext )
 
 
-			# ----------------------------------------------------------------------
-			# When the DM_PATH is specified, insert the environment variable DM_PATH
-			# is added a context as below.
-			#
-			# qsub -v ECELL3_DM_PATH=xxx,yyy
-			#
-			# ----------------------------------------------------------------------
-			if self.getDM_PATH() != "": # if(2)
+			# -----------------------------------
+			# create a value of option -v of qsub
+			# -----------------------------------
+			aHyphenVOption = getEnvString()
 
-				aContext = "%s -v ECELL3_DM_PATH=%s -cwd -S %s -o %s -e %s %s" \
-				            %(QSUB,
-							 self.getDM_PATH(),
-				             os.getenv('SHELL'),
-				             self.getStdoutFileName(),
-				             self.getStderrFileName(),
-				             self.__theTmpScriptFileName)
-				
-			
-			# ----------------------------------------------------------------------
-			# When the DM_PATH is not specified, do not use -v option of qsub.
-			# ----------------------------------------------------------------------
-			else:
-
-				aContext = "%s -cwd -S %s -o %s -e %s %s" \
-				            %(QSUB,
-				             os.getenv('SHELL'),
-				             self.getStdoutFileName(),
-				             self.getStderrFileName(),
-				             self.__theTmpScriptFileName)
-
-			# end of if(2)
+			# when ECELL3_DM_PATH is set, append it to the -v option 
+			if self.getDM_PATH() != "": 
+				aHyphenVOption += ",ECELL3_DM_PATH=%s" %self.getDM_PATH()
 
 
+			# create a context
+			aContext = "%s -v %s -cwd -S %s -o %s -e %s %s" \
+			            %(QSUB,
+			             aHyphenVOption,
+			             getCurrentShell(),
+			             self.getStdoutFileName(),
+			             self.getStderrFileName(),
+			             self.__theTmpScriptFileName)
 
 
 		# --------------------------------------------------------------------------
@@ -178,13 +162,14 @@ class SGESessionProxy(SessionProxy):
 			# convert argument into string
 			anArgument = str(self.getArgument())
 
-			# creates context
-			aContext = "%s -cwd -S %s -o %s -e %s %s %s" %(QSUB,
-		                                            self.getInterpreter(),
-					                                self.getStdoutFileName(),
-					                                self.getStderrFileName(),
-		                                            self.getScriptFileName(),
-		                                            anArgument)
+			# create a context
+			aContext = "%s -v %s -cwd -S %s -o %s -e %s %s %s" %(QSUB,
+			            getEnvString(),
+			            self.getInterpreter(),
+			            self.getStdoutFileName(),
+			            self.getStderrFileName(),
+			            self.getScriptFileName(),
+			            anArgument)
 
 		# end of if(1)
 

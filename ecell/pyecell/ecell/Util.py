@@ -62,7 +62,6 @@ DEFAULT_TMP_DIRECTORY = 'tmp'
 DEFAULT_ENVIRONMENT = 'Local'
 
 
-
 # job status
 QUEUED 		= 0
 RUN			= 1
@@ -96,5 +95,28 @@ def createScriptContext( anInstance, parameters ):
 
 		return aContext
 
+def getCurrentShell():
+	'''return the current shell
+	Note: os.env('SHELL') returns not current shell but login shell.
+	'''
+
+	aShellName = string.split( os.popen('ps -p %s'%os.getppid()).readlines()[1] )[3]
+	aCurrentShell = os.popen('which %s' %aShellName).read()[:-1]
+
+	return aCurrentShell
+
+
+def getEnvString():
+	'''return the env string as below
+	VARIABLE1=VALUE1,VARIABLE2=VALUE2,VARIABLE3=VALUE3, ...
+	'''
+
+	aString = "ECELL3_PREFIX=%s" %os.getenv('ECELL3_PREFIX')
+	aString += ",LTDL_LIBRARY_PATH=%s" %os.getenv('LTDL_LIBRARY_PATH')
+	aString += ",LD_LIBRARY_PATH=%s" %os.getenv('LD_LIBRARY_PATH')
+	aString += ",PYTHONPATH=%s" %os.getenv('PYTHONPATH')
+	aString += ",PATH=%s" %os.getenv('PATH')
+
+	return aString
 
 
