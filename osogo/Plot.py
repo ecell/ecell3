@@ -26,7 +26,7 @@ DP_MIN = 4
 class Plot:
 
 
-	def __init__( self, owner, scale_type, root, width, heigth ):
+	def __init__( self, owner, scale_type, root, width, height ):
 	# ------------------------------------------------------
 	    self.scale_type=scale_type
 	    self.ColorFullPNMap={"pen":"black", "background":"grey"} # key is FullPN, value color
@@ -56,13 +56,13 @@ class Plot:
 	    self.pixmapmap={} #key is color, value pixmap
 	    self.FullPNMap={} #key: FullPNString, values [FullPN,shortname]
 	    self.plotwidth=width
-	    self.plotheigth=heigth
+	    self.plotheight=height
 
 	    self.xframe=[]
 	    self.yframe=[]
 	    #creates widget
 	    self.theWidget=gtk.DrawingArea()
-	    self.theWidget.set_size_request(self.plotwidth,self.plotheigth)
+	    self.theWidget.set_size_request(self.plotwidth,self.plotheight)
 	    #add buttonmasks to widget
 	    self.theWidget.set_events(gtk.gdk.EXPOSURE_MASK|gtk.gdk.BUTTON_PRESS_MASK|
 					gtk.gdk.LEAVE_NOTIFY_MASK|gtk.gdk.POINTER_MOTION_MASK|
@@ -81,8 +81,8 @@ class Plot:
 	    self.font=gtk.gdk.font_from_description(self.st.font_desc)
 	    self.ascent=self.font.ascent
 	    self.descent=self.font.descent
-	    self.pm=gtk.gdk.Pixmap(root.window,self.plotwidth,self.plotheigth,-1)
-	    self.pm2=gtk.gdk.Pixmap(root.window,self.plotwidth,self.plotheigth,-1)
+	    self.pm=gtk.gdk.Pixmap(root.window,self.plotwidth,self.plotheight,-1)
+	    self.pm2=gtk.gdk.Pixmap(root.window,self.plotwidth,self.plotheight,-1)
 	    newpm=gtk.gdk.Pixmap(root.window,10,10,-1)
 	    newgc=root.window.new_gc()
 	    for acolor in self.ColorList:
@@ -134,9 +134,9 @@ class Plot:
 
 
 	def recalculate_size(self):
-	    self.max_yticks_no=int(self.plotheigth/150)*5
+	    self.max_yticks_no=int(self.plotheight/150)*5
 	    self.max_xticks_no=int(self.plotwidth/100)
-	    self.origo=[70,self.plotheigth-30]
+	    self.origo=[70,self.plotheight-30]
 	    self.plotarea=[self.origo[0],30,\
 	    	self.plotwidth-60-self.origo[0],\
 	    	self.origo[1]-30]
@@ -232,7 +232,7 @@ class Plot:
 			self.plotarea[3]+1)
 
 	def clearplot(self):
-	    self.drawbox("background",0,0,self.plotwidth,self.plotheigth)
+	    self.drawbox("background",0,0,self.plotwidth,self.plotheight)
 	    
 	def clearxlabelarea(self):
 	    self.drawbox("background",self.xlabelsarea[0],self.xlabelsarea[1],
@@ -258,32 +258,33 @@ class Plot:
 	    
 	def drawpoint_on_plot(self, aFullPNString,x,y):
 	    #uses raw plot coordinates!
-	    self.pm.draw_point(self.GCFullPNMap[aFullPNString],x,y)
-	    self.theWidget.queue_draw_area(x,y,1,1)
+	    self.pm.draw_point(self.GCFullPNMap[aFullPNString],int(x),int(y))
+	    self.theWidget.queue_draw_area(int(x),int(y),1,1)
     	
 	    
 	def drawline(self, aFullPNString,x0,y0,x1,y1):
 	    #uses raw plot coordinates!	    
-	    self.pm.draw_line(self.GCFullPNMap[aFullPNString],x0,y0,x1,y1)
-	    self.theWidget.queue_draw_area(min(x0,x1),min(y0,y1),abs(x1-x0)+1,\
-	    abs(y1-y0)+1)
+	    self.pm.draw_line(self.GCFullPNMap[aFullPNString],int(x0),int(y0),\
+                int(x1),int(y1))
+	    self.theWidget.queue_draw_area(int(min(x0,x1)),int(min(y0,y1)),\
+                int(abs(x1-x0)+1),int(abs(y1-y0)+1))
 	    return [x1,y1]
 
-	def drawbox(self, aFullPNString,x0,y0,width,heigth):
+	def drawbox(self, aFullPNString,x0,y0,width,height):
 	    #uses raw plot coordinates!
-	    self.pm.draw_rectangle(self.GCFullPNMap[aFullPNString],gtk.TRUE,x0,y0,width,heigth)
-	    self.theWidget.queue_draw_area(x0,y0,width,heigth)
+	    self.pm.draw_rectangle(self.GCFullPNMap[aFullPNString],gtk.TRUE,x0,y0,width,height)
+	    self.theWidget.queue_draw_area(x0,y0,width,height)
 
 	def drawxorbox(self,x0,y0,x1,y1):
 	    newgc=self.pm.new_gc()
 	    newgc.set_function(gtk.gdk.INVERT)
-	    self.pm.draw_rectangle(newgc,gtk.TRUE,x0,y0,x1-x0,y1-y0)
-	    self.theWidget.queue_draw_area(x0,y0,x1,y1)
+	    self.pm.draw_rectangle(newgc,gtk.TRUE,int(x0),int(y0),int(x1-x0),int(y1-y0))
+	    self.theWidget.queue_draw_area(int(x0),int(y0),int(x1),int(y1))
 
 	def drawtext(self,aFullPNString,x0,y0,text):
 		t=str(text)
-		self.pm.draw_text(self.font,self.GCFullPNMap[aFullPNString],x0,y0+self.ascent,t)
-		self.theWidget.queue_draw_area(x0,y0,self.font.string_width(t),self.ascent+self.descent)
+		self.pm.draw_text(self.font,self.GCFullPNMap[aFullPNString],int(x0),int(y0+self.ascent),t)
+		self.theWidget.queue_draw_area(int(x0),int(y0),self.font.string_width(t),self.ascent+self.descent)
 
 	def shiftplot(self,realshift):
 	    #save plotarea
@@ -455,17 +456,17 @@ class Plot:
 
 	def reframey2(self):
 	    if self.scale_type=='linear':
-		self.pixelheigth=float(self.yframe[1]-self.yframe[0])/self.plotarea[3]
+		self.pixelheight=float(self.yframe[1]-self.yframe[0])/self.plotarea[3]
 	    else:
-		self.pixelheigth=float(log10(self.yframe[1])-log10(self.yframe[0]))/self.plotarea[3]
+		self.pixelheight=float(log10(self.yframe[1])-log10(self.yframe[0]))/self.plotarea[3]
 	    #reprint_ylabels
 	    self.reprint_ylabels()
 
 	def converty_to_plot(self,y):
 	    if self.scale_type=='linear':
-		return self.origo[1]-round((y-self.yframe[0])/float(self.pixelheigth))
+		return self.origo[1]-round((y-self.yframe[0])/float(self.pixelheight))
 	    else:
-		return self.origo[1]-round((log10(max(y,self.zerovalue))-log10(self.yframe[0]))/self.pixelheigth)
+		return self.origo[1]-round((log10(max(y,self.zerovalue))-log10(self.yframe[0]))/self.pixelheight)
 
 
 	def change_scale(self):
@@ -488,7 +489,7 @@ class Plot:
 	    self.clearylabelarea()
 	    tick=1
 	    if self.scale_type=='linear':
-		for tick in range(self.yticks_no+1):
+		for tick in range(int(self.yticks_no+1)):
 		    tickvalue=self.ygrid[0]+tick*self.yticks_step
 		    self.printylabel(tick,tickvalue)
 	    else:
@@ -510,9 +511,9 @@ class Plot:
 	    
 	def convertplot_to_y(self,ploty):
 	    if self.scale_type=='linear':
-		return (self.origo[1]-ploty)*self.pixelheigth+self.yframe[0]
+		return (self.origo[1]-ploty)*self.pixelheight+self.yframe[0]
 	    else:
-		return pow(10,(((self.origo[1]-ploty)*self.pixelheigth)+log10(self.yframe[0])))
+		return pow(10,(((self.origo[1]-ploty)*self.pixelheight)+log10(self.yframe[0])))
 
 
 	def addpoints(self, points):
@@ -938,7 +939,7 @@ class Plot:
 	def reprint_xlabels(self):
 	    #clears xlabel area
 	    self.clearxlabelarea()
-	    for tick in range(self.xticks_no+1):
+	    for tick in range(int(self.xticks_no+1)):
 		tickvalue=self.xgrid[0]+tick*self.xticks_step
 		self.printxlabel(tickvalue)
 
@@ -1291,15 +1292,15 @@ class Plot:
 
 	def resize( self, args):
 		new_width = args[0]
-		new_heigth = args[1]
-		if new_width==self.plotwidth and new_heigth==self.plotheigth: 
+		new_height = args[1]
+		if new_width==self.plotwidth and new_height==self.plotheight: 
 			return
 		self.plotwidth=new_width
-		self.plotheigth=new_heigth
-		self.pm=gtk.gdk.Pixmap(self.theRoot.window,self.plotwidth,self.plotheigth,-1)
+		self.plotheight=new_height
+		self.pm=gtk.gdk.Pixmap(self.theRoot.window,self.plotwidth,self.plotheight,-1)
 		aSizeAlloc= self.theWidget.get_allocation()
 		aSizeAlloc[2]=self.plotwidth
-		aSizeAlloc[3]=self.plotheigth
+		aSizeAlloc[3]=self.plotheight
 		self.theWidget.size_allocate(aSizeAlloc)
 		self.recalculate_size()
 		self.clearplot()
