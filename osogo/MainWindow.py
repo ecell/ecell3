@@ -356,7 +356,7 @@ class MainWindow(OsogoWindow):
 			pass
 		else:
 			aMessage = ' Error ! No such file. \n[%s]' %aFileName
-			self.__printMessage(aMessage)
+			self.theSession.message(aMessage)
 			aDialog = ConfirmWindow(OK_MODE,aMessage,'Error!')
 			self.theFileSelection.present()
 			return None
@@ -377,9 +377,10 @@ class MainWindow(OsogoWindow):
 		except:
 
 			# expants message window, when it is folded.
-			if self['message_togglebutton'].get_active() == FALSE:
-				self['message_togglebutton'].set_active(TRUE)
-				self.__toggleMessageWindow( self['message_togglebutton'] ) 
+			if self.exists():
+				if self['message_togglebutton'].get_active() == FALSE:
+					self['message_togglebutton'].set_active(TRUE)
+					self.__toggleMessageWindow( self['message_togglebutton'] ) 
 
 			# displays confirm window
 			aMessage = 'Can\'t load [%s]\nSee MessageWindow for details.' %aFileName
@@ -387,10 +388,10 @@ class MainWindow(OsogoWindow):
 
 			# displays message on MessageWindow
 			aMessage = 'Can\'t load [%s]' %aFileName
-			self.__printMessage(aMessage)
+			self.theSession.message(aMessage)
 			anErrorMessage = string.join( traceback.format_exception(sys.exc_type,sys.exc_value, \
 					sys.	exc_traceback), '\n' )
-			self.__printMessage(anErrorMessage)
+			self.theSession.message(anErrorMessage)
 
 
 		self.update()
@@ -439,9 +440,9 @@ class MainWindow(OsogoWindow):
 			aDialog = ConfirmWindow(OK_MODE,aMessage,'Error!')
 
 			# displays error message of MessageWindow
-			self.__printMessage('Can\'t save [%s]' %aFileName)
+			self.theSession.message('Can\'t save [%s]' %aFileName)
 			anErrorMessage = string.join( traceback.format_exception(sys.exc_type,sys.exc_value,sys.exc_traceback), '\n' )
-			self.__printMessage(anErrorMessage)
+			self.theSession.message(anErrorMessage)
 
 		# updates
 		self.update()
@@ -485,6 +486,7 @@ class MainWindow(OsogoWindow):
 	# ==========================================================================
 	def close( self ):
 		""" restores message method and closes window """
+
 		self.theSession.restoreMessageMethod()
 		OsogoWindow.close( self )
 
@@ -547,11 +549,14 @@ class MainWindow(OsogoWindow):
 	def setStepType( self, aState ):
 		""" sets Step Type radiobutton state 
 			values for aState
-			gtk.TRUE : seconds
-			gtk.FALSE : step			
+			True : seconds
+			False : step			
 			"""
-		if aState == gtk.TRUE or aState == gtk.FALSE:
-			self['sec_radiobutton'].set_active( aState )
+		if aState == True :
+			self['sec_radiobutton'].set_active( gtk.TRUE )
+		if aState == False:
+			self['sec_radiobutton'].set_active( gtk.FALSE )
+
 
 	# ==========================================================================
 	def getStepSize( self ):

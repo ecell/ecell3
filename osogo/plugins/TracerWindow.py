@@ -318,8 +318,10 @@ class TracerWindow( OsogoPluginWindow ):
 	
 	
 	def maximize(self):
-		self['vbox1'].add(self['scrolledwindow1'])
-		self['vbox2'].add(self['fixed1'])
+		if self['vbox1'] != self['scrolledwindow1'].get_parent():
+			self['vbox1'].add(self['scrolledwindow1'])
+		if self['vbox2'] != self['fixed1'].get_parent():
+			self['vbox2'].add(self['fixed1'])
 		alloc_rect2=self['fixed1'].size_request()
 		alloc_rect3=self['vbox1'].size_request()
 		aHeigth= _LARGE_PLOTHEIGTH + alloc_rect2[1] + alloc_rect3[1] +4
@@ -346,14 +348,15 @@ class TracerWindow( OsogoPluginWindow ):
 			self.desired_plot_size = [_LARGE_PLOTWIDTH, _LARGE_PLOTHEIGTH]
 			plot_size_alloc = self.__get_frame8_space()
 		self.desired_window_size = [plot_size_alloc[0] + 4, plot_size_alloc[1] + 4]
-		self['vbox1'].remove(self['scrolledwindow1'])
-		self['vbox2'].remove(self['fixed1'])
+		if self['vbox1']==self['scrolledwindow1'].get_parent():
+			self['vbox1'].remove(self['scrolledwindow1'])
+		if self['vbox2']==self['fixed1'].get_parent():
+			self['vbox2'].remove(self['fixed1'])
 		self['top_frame'].set_size_request(self.desired_plot_size[0]+4,
 			self.desired_plot_size[1]+4)
 		self.thePlotInstance.resize( plot_size_alloc )
 		self.getParent().shrink_to_fit()
 		self.thePlotInstance.printTraceLabels()
-
 
 	def __get_frame8_space (self):
 		aSizeAlloc=self['frame8'].get_allocation()
@@ -377,18 +380,18 @@ class TracerWindow( OsogoPluginWindow ):
 	# ========================================================================
 	def setStripInterval( self, anInterval ):
 		""" sets striptinterval of graph to anInterval """
-		self['entry1'].set_text( anInterval )
+		self['entry1'].set_text( str(anInterval) )
 		self.stripinterval_changes(None, None )
 	
 	# ========================================================================
 	def setScale ( self, aScale ):
 		""" sets scale of y axis
 			aScale -
-			gtk.TRUE: scale is linear
-			gtk.FALSE: scale is log10
+			True: scale is linear
+			False: scale is log10
 		"""
-		if (self.PlotInstance.scale_type != 'linear' and aScale ) or \
-			(self.PlotInstance.scale_type == linear and not aScale ):
+		if (self.thePlotInstance.scale_type != 'linear' and aScale ) or \
+			(self.thePlotInstance.scale_type == 'linear' and not aScale ):
 			self.change_scale()
 
 	# ========================================================================
@@ -400,7 +403,7 @@ class TracerWindow( OsogoPluginWindow ):
 			returns None
 		"""
 		if self.thePlotInstance.getstripmode() != 'history':
-			self.__togglestrip(self, self['button12'] )
+			self.__togglestrip( self['button12'] )
 			
 
 	# ========================================================================
@@ -410,7 +413,7 @@ class TracerWindow( OsogoPluginWindow ):
 			spanning an interval set by StripInterval
 		"""
 		if self.thePlotInstance.getstripmode() == 'history':
-			self.__togglestrip(self, self['button12'] )
+			self.__togglestrip( self['button12'] )
 
 	# ========================================================================
 	def logAll(self):
@@ -437,10 +440,11 @@ class TracerWindow( OsogoPluginWindow ):
 		while True:
 			if anIter == None:
 				return None
-			aTitle = self.ListStore.get_value(anIter, TITLE )
+			aTitle = self.ListStore.get_value(anIter, COL_TXT )
+
 			if aTitle == aFullPNString:
-				aPath = self.ListStore.get_path ( anIter )
-				self.trace_toggled(self,None, aPath, self.ListStore)
+				onoff=self.thePlotInstance.toggle_trace( aTitle )
+				self.ListStore.set_value(anIter,COL_ON,onoff)
 				break
 			anIter=self.ListStore.iter_next( anIter )
 
@@ -450,14 +454,16 @@ class TracerWindow( OsogoPluginWindow ):
 		""" magnifies a rectangular area of  Plotarea
 			bordered by x0,x1,y0,y1
 		"""
-		self.thePlotInstance.zoomin( [x0, x1], [y0, y1])
+		if x1<0 or x1<=x0 or y1<=y0:
+			self.thePluginManager.theSession.message("bad arguments")
+		self.thePlotInstance.zoomin( [x0, x1], [y1, y0])
 
 	# ========================================================================
 	def zoomOut(self, aNum = 1):
 		""" zooms out aNum level of zoom ins 
 		"""
 		for i in range(0, aNum):
-			self.thePlotInstance()
+			self.thePlotInstance.zoomout()
 
 	# ========================================================================
 	def smallSize( self ):
@@ -518,7 +524,7 @@ class TracerWindow( OsogoPluginWindow ):
 	#---------------------------------------------------------
 		
 	def trace_toggled(self,cell, path, model):
-	    iter=model.get_iter((int (path),))
+	    iter=model.get_iter((int(path),))
 	    text=self.ListStore.get_value(iter,COL_TXT)
 	    onoff=self.thePlotInstance.toggle_trace(text)
 	    self.ListStore.set_value(iter,COL_ON,onoff)

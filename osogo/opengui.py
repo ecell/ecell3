@@ -22,6 +22,30 @@ try:
 except KeyboardInterrupt:
 	sys.exit(1)
 
+def loadScript( aTupple ):
+	aSession = aTupple[0]
+	anEssFile = aTupple[1]
+
+	#loads script after mainloop has been called
+	try:
+		# load ane execute script file
+		aSession.loadScript( anEssFile )
+	except:
+		aSession.message(' can\'t load [%s]' %anEssFile)
+		anErrorMessage = string.join( traceback.format_exception(sys.exc_type,sys.exc_value,sys.exc_traceback), '\n' )
+		aSession.message("-----------")
+		aSession.message(anErrorMessage)
+		aSession.message("-----------")
+	#else:
+		# initialize & update windows
+		#aSession.openWindow('MainWindow
+		#aSession.updateWindow()
+
+
+
+
+
+
 # -----------------------------------------------------------------
 # main
 #   - checks arguments
@@ -69,7 +93,7 @@ def main():
 	# -------------------------------------
 	# prohibits to use -e and -f options 
 	# -------------------------------------
-	if anEmlFile != None and anEssFile !=None:
+	if anEmlFile != None and anEssFile != None:
 		usage()
 		sys.exit(0)
 
@@ -109,6 +133,7 @@ def main():
 
 			# initialize & update windows
 			aSession.theSimulator.initialize()
+			aMainWindow = aSession.openWindow('MainWindow')
 			aSession.updateWindows()
 
 	# executes script file (.ess)
@@ -123,29 +148,15 @@ def main():
 			sys.exit(1)
 
 		# print message on MainWindow
-		aSession.message("%s is loaded and executed.\n" %anEssFile )
+		aSession.message("%s is being loaded and executed.\n" %anEssFile )
+		gtk.timeout_add( 1, loadScript, [aSession, anEssFile] )
 
-		# load script
-		try:
-			# load ane execute script file
-			aSession.loadScript( anEssFile )
-		except:
-			aSession.message(' can\'t load [%s]' %anEssFile)
-			anErrorMessage = string.join( traceback.format_exception(sys.exc_type,sys.exc_value,sys.exc_traceback), '\n' )
-			aSession.message("-----------")
-			aSession.message(anErrorMessage)
-			aSession.message("-----------")
-		else:
-
-			# initialize & update windows
-			aSession.read_ini( anEssFile )
-			aSession.updateWindow()
-
+	else:
+		aMainWindow = aSession.openWindow('MainWindow')
 
 	# -------------------------------------
 	# calls gtk.mainloop()
 	# -------------------------------------
-	aMainWindow = aSession.openWindow('MainWindow')
 
 	aSession.GUI_interact()
 

@@ -332,7 +332,7 @@ class LoggerWindow(OsogoWindow):
 			return None
 		
 		aSuccessMessage= " All files you selected are saved. " 
-		self["statusbar"].push(1,aSuccessMessage)
+		self["statusbar"].push( 1 , aSuccessMessage )
 
 		# end of saveData
 
@@ -426,6 +426,7 @@ class LoggerWindow(OsogoWindow):
 		#	self.theSession.getLoggerList().remove( aSelectedFullPNString )
 		#print "deleteIetm -- e "
 		pass
+
 	# ==============================================================================
 	def saveDataFile( self, aFullPN, aDirectory = None, anInterval = None, aStartTime = None, anEndTime = None, fileType = 'ecd' ):
 		""" saves FullPN logger data with given parameters
@@ -435,15 +436,17 @@ class LoggerWindow(OsogoWindow):
 		"""
 		#find FullPM in list
 		aFullPNString = createFullPNString ( aFullPN )
+		print "parameter %s" %aFullPNString
+		anIter = self.theEntryList.get_model().get_iter_first()
 		while True:
-			anIter = theEntryList.get_model().get_iter_first()
 			if anIter == None:
 				return None
-			aTitle = theEntryList.get_model().get_value(anIter, 0 )
+			aTitle = self.theEntryList.get_model().get_value(anIter, 0 )
 			if aTitle == aFullPNString:
-				aPath = theEntryList.get_model().get_path ( anIter )
-				theEntryList.set_cursor( aPath )
+				aPath = self.theEntryList.get_model().get_path ( anIter )
+				self.theEntryList.set_cursor( aPath, None, gtk.FALSE )
 				break
+			anIter = self.theEntryList.get_model().iter_next( anIter )
 		if aDirectory != None:
 			self.setDirectory( aDirectory )
 		

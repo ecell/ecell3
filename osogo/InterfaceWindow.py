@@ -69,7 +69,7 @@ class InterfaceWindow( OsogoWindow ):
 		                    'ShowButton_clicked'       : self.showWindow,
 		                    'SaveButton_clicked'       : self.editTitle,
 		                    'DeleteButton_clicked'     : self.deleteWindow } )
-
+		self.update()
 
 	# ==========================================================================
 	def update( self ):

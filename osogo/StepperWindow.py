@@ -141,15 +141,16 @@ class StepperWindow(OsogoWindow):
 		""" selects StepperID on screen and displays its property list 
 			if StepperID exists returns True, else returns False
 		"""
+		anIter=self['stepper_id_list'].get_model().get_iter_first()
 		while True:
-			anIter=self['stepper_id_list'].get_model().get_iter_first()
 			if anIter == None:
 				return False
 			aTitle = self['stepper_id_list'].get_model().get_value(anIter, 0 )
 			if aTitle == aStepperID:
 				aPath = self['stepper_id_list'].get_model().get_path ( anIter )
-				self['stepper_id_list'].set_cursor( aPath )
+				self['stepper_id_list'].set_cursor( aPath, None, gtk.FALSE )
 				break
+			anIter=self['stepper_id_list'].get_model().iter_next(anIter)
 		self.__selectStepperID(  None )
 		return False
 
@@ -243,15 +244,18 @@ class StepperWindow(OsogoWindow):
 		""" selects PropertyName on screen  
 			if PropertyName exists returns True, else returns False
 		"""
+		anIter=self['property_list'].get_model().get_iter_first()
+
 		while True:
-			anIter=self['property_list'].get_model().get_iter_first()
 			if anIter == None:
 				return False
 			aTitle = self['property_list'].get_model().get_value(anIter, PROPERTY_INDEX )
 			if aTitle == aPropertyName:
 				aPath = self['property_list'].get_model().get_path ( anIter )
-				self['property_list'].set_cursor( aPath )
+				self['property_list'].set_cursor( aPath, None, gtk.FALSE )
 				break
+			anIter=self['property_list'].get_model().iter_next(anIter)
+
 		self.__selectProperty(  None )
 		return False
 
@@ -314,7 +318,7 @@ class StepperWindow(OsogoWindow):
 	def updateProperty(self, aValue):
 		""" overwrites selected Property on screen  
 		"""
-		if self['value_entry'].get_sensitive():
+		if self['value_entry'].get_editable():
 			self['value_entry'].set_text ( str( aValue ) )
 			self.__updateProperty(None)
 

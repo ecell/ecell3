@@ -463,20 +463,15 @@ class EntityListWindow(OsogoWindow):
 	# ========================================================================
 	# create list of Entity tree
 	def listEntity( self, aEntityTypeString, aSystemFullID ):
-
 		aSystemPath = createSystemPathFromFullID( aSystemFullID )
-
 		aEntityList = self.theSession.getEntityList( aEntityTypeString, aSystemPath )
-
 		if aEntityTypeString == 'Variable':
 			aEntityType = VARIABLE
 		elif aEntityTypeString == 'Process':
 			aEntityType = PROCESS
-
 		for anEntityID in aEntityList:
 			iter = self.theEntityListStore.append()
 			self.theEntityListStore.set_value(iter,0,anEntityID)
-
 			aEntityFullPN = ( aEntityType, aSystemPath, anEntityID, '' )
 			self.theEntityListStore.set_data( anEntityID, aEntityFullPN )
 

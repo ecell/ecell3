@@ -120,10 +120,11 @@ class BoardWindow(OsogoWindow):
 
 	def addPluginWindows( self, aPluginWindowType, aRawFullPNList ):
 		if aPluginWindowType == 'TracerWindow':
-			self.attachPluginWindow( aPluginWindowType, aRawFullPNList )
+			aButton=self.attachPluginWindow( aPluginWindowType, aRawFullPNList )
 		else:
 			for aRawFullPN in aRawFullPNList:
-				self.attachPluginWindow( aPluginWindowType, [ aRawFullPN ] )
+				aButton=self.attachPluginWindow( aPluginWindowType, [ aRawFullPN ] )
+		return aButton
 
 	def attachPluginWindow( self, aPluginWindowType, aRawFullPNList ):
 
@@ -143,6 +144,7 @@ class BoardWindow(OsogoWindow):
 		self.__appendPluginFrame( aPluginFrame, r, c )
 		aPluginFrame.show_all()
 		self.updatePositions()
+		return aButton
 
 	def deletePluginWindow( self, *arg ):
 		if self.theSelectedPluginFrame != None:
@@ -352,10 +354,14 @@ class BoardWindow(OsogoWindow):
 	def setPackDirectionForward( self, aDirection ):
 		""" sets direction of packing PluginWindows  
 			aDirection:
-			gtk.TRUE : Forward
-			gtk.FALSE : Down
+			True : Forward
+			False : Down
 		"""
-		self['forward_radiobutton'].set_active( aDirection )
+		if aDirection:
+			self['forward_radiobutton'].set_active( gtk.TRUE )
+		if not aDirection:
+			self['forward_radiobutton'].set_active( gtk.FALSE )
+
 		self.changeAlignment( None )				
 	
 	# ========================================================================
