@@ -91,7 +91,7 @@ ecs_la_LDFLAGS=-module -export-dynamic -avoid-version
 
 ecs_la_LIBADD= $(LIBEMC) $(LIBECS) -lstdc++ $(LIBLTDL)
 
-all-local: _ecs.so
+all-local: ecs.so
 
 #FIXME: should be removed after ecs.la is renamed to _ecs.la
 #FIXME: messy
