@@ -49,35 +49,46 @@ class EntityStub( PropertyInterfaceStub ):
 	# Constructor
 	#
 	# aSimulator    : a reference to a Simulator 
-	# aClassname    : a classname of the Entity to create.
 	# aFullIDString : a FullID of the Entity as a String.
-	# aName         : a name of the Entity.
 	#
 	# return -> None
 	# This method can throw exceptions.
 	# ---------------------------------------------------------------
-	def __init__( self, aSimulator, aClassname, aFullIDString, aName ):
+	def __init__( self, aSimulator, aFullIDString ):
 	
 		PropertyInterfaceStub.__init__( self, aSimulator )
-
-		self.theClassname = aClassname
 		self.theFullIDString = aFullIDString
-		self.theName = aName
 
 	# end of __init__
 
 
 	# ---------------------------------------------------------------
-	# setClassname
+	# create
 	#
 	# return -> None
 	# This method can throw exceptions.
 	# ---------------------------------------------------------------
-	def setClassname( self, aClassname ):
 
-		self.theClassname = aClassname
+	def create( self, aClassname ):
 
-	# end of setClassname
+		self.theSimulator.createEntity( aClassname,
+		                                self.theFullIDString, 
+		                                self.theName )
+
+	# end of createEntity
+
+	# ---------------------------------------------------------------
+	# delete
+	#
+	# return -> None
+	# This method can throw exceptions.
+	# ---------------------------------------------------------------
+
+	def delete( self, aClassname ):
+
+		self.theSimulator.deleteEntity( self.theFullIDString ) 
+
+	# end of createEntity
 
 
 	# ---------------------------------------------------------------
@@ -88,38 +99,25 @@ class EntityStub( PropertyInterfaceStub ):
 	# ---------------------------------------------------------------
 	def getClassname( self ):
 
-		return self.theClassname 
+		return self.theSimulator.\
+		       getEntityClassName( self.theFullIDString )
 
 	# end of setClassname
 
 
 	# ---------------------------------------------------------------
-	# setFullIDString
+	# getPropertyList
 	#
-	# return -> None
-	# This method can throw exceptions.
-	# ---------------------------------------------------------------
-	def setFullIDString( self, aFullIDString ):
-
-		self.theClassname = aClassname
-
-	# end of setClassname
-
-
-	# ---------------------------------------------------------------
-	# createEntity
-	#
-	# return -> None
+	# return -> a list of property names
 	# This method can throw exceptions.
 	# ---------------------------------------------------------------
 
-	def createEntity( self ):
+	def getPropertyList( self ):
 
-		self.theSimulator.createEntity( self.theClassname, 
-		                                self.theFullIDString, 
-		                                self.theName )
+		return self.theSimulator.\
+		       getEntityPropertyList( self.theFullIDString )
 
-	# end of createEntity
+	# end of isExist
 
 
 	# ---------------------------------------------------------------
@@ -138,16 +136,17 @@ class EntityStub( PropertyInterfaceStub ):
 	# ---------------------------------------------------------------
 	# setProperty
 	#
-	# anAttribute : the attribute to set
-	# aValue      : the value to set
+	# aPropertyName : name of the property to set
+	# aValue        : the value to set
 	#
 	# return -> None
 	# This method can throw exceptions.
 	# ---------------------------------------------------------------
-	def setProperty( self, anAttribute, aValue ):
-	
-		self.theSimulator.setProperty( self.theFullIDString + ':' + anAttribute,
-		                               aValue )
+	def setProperty( self, aPropertyName, aValue ):
+
+		aFullPN = self.theFullIDString + ':' + aPropertyName	
+
+		self.theSimulator.setProperty( aFullPN, aValue )
 
 	# end of setProperty
 
@@ -155,16 +154,13 @@ class EntityStub( PropertyInterfaceStub ):
 	# ---------------------------------------------------------------
 	# __setitem__ ( = setProperty )
 	#
-	# anAttribute : the attribute to set
-	# aValue      : the value to set
+	# see setProperty().
 	#
-	# return -> None
 	# This method can throw exceptions.
 	# ---------------------------------------------------------------
-	def __setitem__( self, anAttribute, aValue ):
+	def __setitem__( self, aPropertyName, aValue ):
 	
-		self.theSimulator.setProperty( self.theFullIDString + ':' + anAttribute,
-		                               aValue )
+		self.setProperty( aPropertyName, aValue )
 
 	# end of setProperty
 
@@ -172,14 +168,15 @@ class EntityStub( PropertyInterfaceStub ):
 	# ---------------------------------------------------------------
 	# getProperty
 	#
-	# anAttribute : an attribute 
+	# aPropertyName : name of the property to get
 	#
 	# return -> the property value
 	# This method can throw exceptions.
 	# ---------------------------------------------------------------
-	def getProperty( self, anAttribute ):
-	
-		return self.theSimulator.getProperty( self.theFullIDString + ':' + anAttribute )
+	def getProperty( self, aPropertyName ):
+
+		aFullPN = self.theFullIDString + ':' + aPropertyName
+		return self.theSimulator.getEntityProperty( aFullPN )
 
 	# end of getProperty
 
@@ -187,17 +184,32 @@ class EntityStub( PropertyInterfaceStub ):
 	# ---------------------------------------------------------------
 	# __getitem__ ( = getProperty )
 	#
-	# anAttribute : an attribute 
+	# see getProperty().
 	#
-	# return -> the property value
 	# This method can throw exceptions.
 	# ---------------------------------------------------------------
-	def __getitem__( self, anAttribute ):
+	def __getitem__( self, aPropertyName ):
 	
-		return self.theSimulator.getProperty( self.theFullIDString + ':' + anAttribute )
+		return self.getProperty( aPropertyName )
 
 	# end of getProperty
 
+
+	# ---------------------------------------------------------------
+	# getPropertyAttributes
+	#
+	# aPropertyName : name of the property to get
+	#
+	# return -> boolean 2-tuple ( setable, getable )
+	# This method can throw exceptions.
+	# ---------------------------------------------------------------
+	def getPropertyAttributes( self, aPropertyName ):
+	
+		aFullPN = self.theFullIDString + ':' + aPropertyName
+		return self.theSimulator.getEntityPropertyAttributes( aFullPN )
+
+
+	# end of getProperty
 
 # end of EntityStub
 

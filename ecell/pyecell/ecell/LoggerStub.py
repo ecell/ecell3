@@ -40,6 +40,8 @@ from PropertyInterfaceStub import *
 #   - provides an object-oriented appearance to the ecs.Simulator's Logger API
 #   - does not check validation of each argument.
 # ---------------------------------------------------------------
+
+# FIXME: Logger isn't a PropertyInterface
 class LoggerStub( PropertyInterfaceStub ):
 
 
@@ -57,7 +59,6 @@ class LoggerStub( PropertyInterfaceStub ):
 		PropertyInterfaceStub.__init__( self, aSimulator )
 		
 		self.theFullPNString = aFullPNString
-		self.theLogger = None
 
 	# end of __init__
 
@@ -72,7 +73,20 @@ class LoggerStub( PropertyInterfaceStub ):
 
 	def create( self ):
 
-		self.theLogger = self.theSimulator.createLogger( self.theFullPNString )
+		self.theSimulator.createLogger( self.theFullPNString )
+
+	# end of createLogger
+
+	# ---------------------------------------------------------------
+	# deleteLogger
+	#
+	# return -> None
+	# This method can throw exceptions.
+	# ---------------------------------------------------------------
+
+	def delete( self ):
+
+		self.theSimulator.deleteLogger( self.theFullPNString )
 
 	# end of createLogger
 
@@ -88,13 +102,10 @@ class LoggerStub( PropertyInterfaceStub ):
 
 		# When the FullPN of this instance exists in 
 		# the FullPN list, returns TRUE
-		for aFullPNString in self.theSimulator.getLoggerList():
-			if self.theFullPNString == aFullPNString:
-				return TRUE
-
-		# When the FullPN of this instance does not exist in 
-		# the FullPN list, returns FALSE
-		return FALSE
+		if self.theFullPNString in self.theSimulator.getLoggerList():
+			return TRUE
+		else:
+			return FALSE
 
 	# end of isExist
 

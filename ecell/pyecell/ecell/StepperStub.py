@@ -47,17 +47,15 @@ class StepperStub( PropertyInterfaceStub ):
 	# Constructor
 	#
 	# aSimulator : a reference to a Simulator
-	# aClassname : a classname of the Stepper
 	# anID       : an ID of the Stepper
 	#
 	# return -> None
 	# This method can throw exceptions.
 	# ---------------------------------------------------------------
-	def __init__( self, aSimulator, aClassname, anID ):
+	def __init__( self, aSimulator, anID ):
 
 		PropertyInterfaceStub.__init__( self, aSimulator )
 
-		self.theClassname = aClassname
 		self.theID = anID
 
 	# end of __init__
@@ -65,18 +63,30 @@ class StepperStub( PropertyInterfaceStub ):
 
 
 	# ---------------------------------------------------------------
-	# createStepper
+	# create
 	#
 	# return -> None
 	# This method can throw exceptions.
 	# ---------------------------------------------------------------
 
-	def createStepper( self ):
+	def create( self, aClassname ):
 
-		self.theLogger = self.theSimulator.createStepper( self.theClassname,
-		                                                  self.theID )
+		self.theSimulator.createStepper( aClassname, self.theID )
 
-	# end of getEntity
+	# end of create
+
+	# ---------------------------------------------------------------
+	# delete
+	#
+	# return -> None
+	# This method can throw exceptions.
+	# ---------------------------------------------------------------
+
+	def delete( self ):
+
+		self.theSimulator.deleteStepper( self.theID )
+
+	# end of delete
 
 
 	# ---------------------------------------------------------------
@@ -88,12 +98,38 @@ class StepperStub( PropertyInterfaceStub ):
 
 	def isExist( self ):
 
-		for anID in self.theSimulator.getStepperList():
-			if anID == self.theID:
-				return TRUE
-		return FALSE
+		if self.theID in self.theSimulator.getStepperList():
+			return TRUE
+		else:
+			return FALSE
 
 	# end of isExist
+
+
+	# ---------------------------------------------------------------
+	# getClassname
+	#
+	# return -> None
+	# This method can throw exceptions.
+	# ---------------------------------------------------------------
+	def getClassname( self ):
+
+		return self.theSimulator.getStepperClassName( self.theID )
+
+	# end of setClassname
+
+	# ---------------------------------------------------------------
+	# getPropertyList
+	#
+	# return -> a list of property names
+	# This method can throw exceptions.
+	# ---------------------------------------------------------------
+
+	def getPropertyList( self ):
+
+		return self.theSimulator.getStepperPropertyList( self.theID )
+
+	# end of getPropertyList
 
 
 	# ---------------------------------------------------------------
@@ -127,9 +163,7 @@ class StepperStub( PropertyInterfaceStub ):
 
 	def __setitem__( self, aPropertyName, aValue ):
 
-		return self.theSimulator.setStepperProperty( self.theID, 
-		                                             aPropertyName, 
-		                                             aValue )
+		return self.setProperty( aPropertyName, aValue )
 
 	# end of setProperty
 
@@ -162,11 +196,26 @@ class StepperStub( PropertyInterfaceStub ):
 
 	def __getitem__( self, aPropertyName ):
 
-		return self.theSimulator.getStepperProperty( self.theID, 
-		                                             aPropertyName )
+		return self.getProperty( aPropertyName )
 
 	# end of getProperty
 
+
+	# ---------------------------------------------------------------
+	# getPropertyAttributes
+	#
+	# aPropertyName : name of the property to get
+	#
+	# return -> boolean 2-tuple ( setable, getable )
+	# This method can throw exceptions.
+	# ---------------------------------------------------------------
+	def getPropertyAttributes( self, aPropertyName ):
+	
+		return self.theSimulator.\
+		       getStepperPropertyAttributes( self.theID )
+
+
+	# end of getProperty
 
 
 # end of LoggerStub
