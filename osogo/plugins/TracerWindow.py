@@ -81,11 +81,13 @@ class TracerWindow( OsogoPluginWindow ):
 		self.theWindow=self.getWidget(self.__class__.__name__)
 		#determine plotsize
 		if self.isStandAlone():
-			self.thePlotHeigth = _LARGE_PLOTHEIGTH
-			self.thePlotWidth = _LARGE_PLOTWIDTH
+			self.desired_plot_size = [ _LARGE_PLOTWIDTH, _LARGE_PLOTHEIGTH] 
+			
 		else:
-			self.thePlotHeigth = _SMALL_PLOTHEIGTH
-			self.thePlotWidth = _SMALL_PLOTWIDTH
+			self.desired_plot_size = [ _SMALL_PLOTWIDTH, _SMALL_PLOTHEIGTH] 
+
+		self.thePlotHeigth = self.desired_plot_size[1]
+		self.thePlotWidth = self.desired_plot_size[0]
 		#init plotter instance
 		self.thePlotInstance=Plot(self, 'linear', self.getParent(), self.thePlotWidth, self.thePlotHeigth )
 		#attach plotterwidget to window
@@ -117,6 +119,8 @@ class TracerWindow( OsogoPluginWindow ):
 		if not self.isStandAlone():
 			self.minimize()
 		else:
+#			alloc_rect=self['top_frame'].get_allocation()
+#			self['top_frame'].set_size_request(alloc_rect[2], alloc_rect[3])
 			self['TracerWindow'].connect('expose-event',self.resize)
 
 
@@ -313,44 +317,61 @@ class TracerWindow( OsogoPluginWindow ):
 		pass
 
 	def shrink_to_fit(self):
-		alloc_rect=self['top_frame'].size_request()
-		self.no_expose=True
-		aSizeAlloc=self['frame8'].get_allocation()
-		self['TracerWindow'].resize(alloc_rect[0],alloc_rect[1])
-		aSizeAlloc=self['frame8'].get_allocation()
-		self.no_expose=False
+#		alloc_rect=self['top_frame'].get_allocation()
+		self['TracerWindow'].resize(self.desired_window_size[0],
+				self.desired_window_size[1])
+
 	
 	
 	def maximize(self):
 		self['vbox1'].add(self['scrolledwindow1'])
 		self['vbox2'].add(self['fixed1'])
-		if not self.isStandAlone():
-			self.thePlotInstance.resize(_LARGE_PLOTWIDTH, _LARGE_PLOTHEIGTH)
-			alloc_rect=[0,0,_LARGE_PLOTWIDTH, _LARGE_PLOTHEIGTH]
-		else:
-			alloc_rect=self['frame8'].get_allocation()
-			alloc_rect[2]=max(alloc_rect[2],_LARGE_PLOTWIDTH)
-			alloc_rect[3]=max(alloc_rect[3],_LARGE_PLOTHEIGTH)
 		alloc_rect2=self['fixed1'].size_request()
 		alloc_rect3=self['vbox1'].size_request()
-		height=alloc_rect[3]+alloc_rect2[1]+alloc_rect3[1]
-		width=max(alloc_rect[2],alloc_rect2[0],alloc_rect3[0])
-		self['top_frame'].set_size_request(width,height)
+		aHeigth= _LARGE_PLOTHEIGTH + alloc_rect2[1] + alloc_rect3[1] +4
+		aWidth = max(_LARGE_PLOTWIDTH + 4, alloc_rect2[0], alloc_rect3[0]) 
+		self.desired_plot_size= [_LARGE_PLOTWIDTH, _LARGE_PLOTHEIGTH]
+		top_frame_size = [ aWidth, aHeigth ]
+		if not self.isStandAlone():
+			plot_size_alloc=[ _LARGE_PLOTWIDTH, _LARGE_PLOTHEIGTH]
+		else:
+			plot_size_alloc = self.get_frame8_space()
+			self.desired_window_size= [ max( plot_size_alloc[0], alloc_rect2[0], alloc_rect3[0]),\
+				plot_size_alloc[1] + alloc_rect2[1] + alloc_rect3[1]]
+		self['top_frame'].set_size_request(top_frame_size[0],top_frame_size[1])
+		self.thePlotInstance.resize(plot_size_alloc)
 		self.getParent().shrink_to_fit()
 
 
 	def minimize(self):
 		self.thePlotInstance.minimize()
 		if not self.isStandAlone() or self.min_button_clicked:
-			self.thePlotInstance.resize(_SMALL_PLOTWIDTH, _SMALL_PLOTHEIGTH)
-			alloc_rect=[0,0,_SMALL_PLOTWIDTH, _SMALL_PLOTHEIGTH]
+			self.desired_plot_size = [_SMALL_PLOTWIDTH, _SMALL_PLOTHEIGTH]
+			plot_size_alloc = self.desired_plot_size[:]
 		else:
-			alloc_rect=self.thePlotInstance.getWidget().get_allocation()	
+			self.desired_plot_size = [_LARGE_PLOTWIDTH, _LARGE_PLOTHEIGTH]
+			plot_size_alloc = self.get_frame8_space()
+		self.desired_window_size = [plot_size_alloc[0] + 4, plot_size_alloc[1] + 4]
 		self['vbox1'].remove(self['scrolledwindow1'])
 		self['vbox2'].remove(self['fixed1'])
-		self['top_frame'].set_size_request(alloc_rect[2]+4,
-			alloc_rect[3]+4)
+		self['top_frame'].set_size_request(self.desired_plot_size[0]+4,
+			self.desired_plot_size[1]+4)
+		self.thePlotInstance.resize( plot_size_alloc )
 		self.getParent().shrink_to_fit()
+		self.thePlotInstance.printTraceLabels()
+
+
+	def get_frame8_space (self):
+		aSizeAlloc=self['frame8'].get_allocation()
+		return_width = aSizeAlloc[2] - 4
+		return_heigth = aSizeAlloc[3] - 4
+		if return_width < self.desired_plot_size[0]:
+			return_width = self.desired_plot_size[0]
+		if return_heigth < self.desired_plot_size[1]:
+			return_heigth = self.desired_plot_size[1]
+		return [ return_width, return_heigth ]
+
+			
 
 
 		
@@ -498,8 +519,6 @@ class TracerWindow( OsogoPluginWindow ):
 	def resize(self, window, event):
 #		if self.no_expose:
 #			return gtk.FALSE
-		aSizeAlloc=self['frame8'].get_allocation()
-		if aSizeAlloc[2]>_SMALL_PLOTWIDTH and aSizeAlloc[3]>_SMALL_PLOTHEIGTH:
-			self.thePlotInstance.resize( aSizeAlloc[2]-4, aSizeAlloc[3]-4 )
+		self.thePlotInstance.resize( self.get_frame8_space() )
 		return gtk.FALSE
 

@@ -236,6 +236,7 @@ class Plot:
 			self.plotarea[1],self.plotarea[2]-realshift,
 			self.plotarea[3]+1)
 	    self.theWidget.queue_draw()
+	    self.printTraceLabels()
 
 	def printxlabel(self, num):
 	    text=self.num_to_sci(num)
@@ -385,7 +386,7 @@ class Plot:
 			    self.yticks_no=self.max_yticks_no
 			    self.yticks_step=pow(10,ceil(diff/self.max_yticks_no))
 		    else:
-			self.theOwner.theSession.printMessage("negative value in range, falling back to linear scale")		
+			self.theOwner.theSession.message("negative value in range, falling back to linear scale")		
 			self.change_scale()
 			return
 	    self.reframey2()
@@ -855,9 +856,34 @@ class Plot:
 	    self.clearxlabelarea()
 	    for tick in range(self.xticks_no+1):
 		tickvalue=self.xgrid[0]+tick*self.xticks_step
-
 		self.printxlabel(tickvalue)
 			    
+	def printTraceLabels(self):
+
+	    if self.size_status!='minimized':
+		return
+	    _textshift=10
+	    for fpn in self.data_list:
+		if not self.trace_onoff[fpn]:
+			break
+		theSum=0
+		for dp in self.data_stack[fpn]:
+			theSum += dp[1]
+		if len(self.data_stack[fpn]) != 0:
+			theAvg = theSum / len(self.data_stack[fpn])
+			theAvgPos = self.converty_to_plot(theAvg)
+		else:
+			theAvgPos = _textshift + self.plotaread[1]
+			
+		if theAvgPos < self.plotaread[1] or theAvgPos > self.plotaread[3]:
+			break
+		_bias = 10
+		if theAvgPos - self.plotaread[1] > self.plotaread[3] - theAvgPos:
+			_bias = -15
+		self.drawtext( fpn, self.plotaread[0] + _textshift, theAvgPos + _bias, \
+			self.FullPNMap[fpn][1] )
+		_textshift += 20		
+
 	def drawall(self):
 	    #clears plotarea
 	    self.clearplotarea()
@@ -865,6 +891,8 @@ class Plot:
 	    for fpn in self.data_list:
 		if self.trace_onoff[fpn]:
 		    self.drawtrace(fpn)
+	    self. printTraceLabels()
+
 
 	
 	def drawtrace(self, aFullPNString):
@@ -1000,12 +1028,10 @@ class Plot:
 		if self.xframe[0]==self.xframe[1]: self.xframe[1]=self.xframe[0]+100
 		exponent=pow(10,floor(log10(self.xframe[1]-self.xframe[0])))
 		while ticks < self.max_xticks_no/2:
-			
 			mantissa1=floor(self.xframe[1]/exponent)
 			mantissa0=ceil(self.xframe[0]/exponent)
 			ticks=mantissa1-mantissa0
 			if ticks<self.max_xticks_no/2: exponent=exponent/2
-
 		if ticks > self.max_xticks_no:
 			mantissa0=ceil(mantissa0/2)*2
 			mantissa1=floor(mantissa1/2)*2
@@ -1051,7 +1077,9 @@ class Plot:
 		self.size_status='maximized'
 		self.theOwner.maximize()
 
-	def resize(self, new_width, new_heigth):
+	def resize( self, args):
+		new_width = args[0]
+		new_heigth = args[1]
 		if new_width==self.plotwidth and new_heigth==self.plotheigth: 
 			return
 		self.plotwidth=new_width
