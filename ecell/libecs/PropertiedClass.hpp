@@ -31,8 +31,9 @@
 #ifndef __PROPERTIEDCLASS_HPP
 #define __PROPERTIEDCLASS_HPP
 
+#include "dmtool/DMObject.hpp"
+
 #include "libecs.hpp"
-#include "Defs.hpp"
 
 namespace libecs
 {
@@ -45,8 +46,10 @@ namespace libecs
   DECLARE_CLASS( CLASSNAME );\
   class CLASSNAME\
    :\
-  public BASE,\
-  private PropertyInterface<CLASSNAME>
+  public BASE 
+
+//,\
+//  private PropertyInterface<CLASSNAME>
 
 
 #define LIBECS_DM_OBJECT_ABSTRACT( CLASSNAME )\
@@ -74,37 +77,42 @@ namespace libecs
 #define LIBECS_DM_INIT_STATIC( CLASSNAME, DMTYPE )\
   libecs::PropertyInterface<CLASSNAME>::PropertySlotMap\
     libecs::PropertyInterface<CLASSNAME>::thePropertySlotMap;\
-  static PropertyInitializer<CLASSNAME> a ## CLASSNAME ## PropertyInitializer
+  libecs::PropertyInterface<CLASSNAME>\
+    CLASSNAME::thePropertyInterface
+
+//  static PropertyInitializer<CLASSNAME> a ## CLASSNAME ## PropertyInitializer
 
   ///@internal
 #define LIBECS_DM_OBJECT_DEF( CLASSNAME )\
-  typedef CLASSNAME _LIBECS_CLASS_
+  typedef CLASSNAME _LIBECS_CLASS_;\
+  virtual StringLiteral getClassName() const { return XSTR( CLASSNAME ); } //
 
   ///@internal
 #define LIBECS_DM_EXPOSE_PROPERTYINTERFACE( CLASSNAME )\
+private:\
+ static PropertyInterface<CLASSNAME> thePropertyInterface;\
+public:\
  virtual PropertySlotBasePtr getPropertySlot( StringCref aPropertyName ) const\
  {\
-  return PropertyInterface<CLASSNAME>::getPropertySlot( aPropertyName );\
+  return thePropertyInterface.getPropertySlot( aPropertyName );\
  }\
  virtual void setProperty( StringCref aPropertyName, PolymorphCref aValue )\
  {\
-  PropertyInterface<CLASSNAME>::setProperty( *this, aPropertyName, aValue );\
+  thePropertyInterface.setProperty( *this, aPropertyName, aValue );\
  }\
  virtual const Polymorph getProperty( StringCref aPropertyName ) const\
  {\
-  return PropertyInterface<CLASSNAME>::getProperty( *this, aPropertyName );\
+  return thePropertyInterface.getProperty( *this, aPropertyName );\
  }\
  virtual const Polymorph getPropertyList() const\
  {\
-  return PropertyInterface<CLASSNAME>::getPropertyList();\
+  return thePropertyInterface.getPropertyList();\
  }\
  virtual PropertySlotProxyPtr\
  createPropertySlotProxy( StringCref aPropertyName )\
  {\
-  PropertyInterface<CLASSNAME>::createPropertySlotProxy( *this,\
-                                                         aPropertyName );\
- }\
- virtual StringLiteral getClassName() const { return XSTR( CLASSNAME ); } //
+  thePropertyInterface.createPropertySlotProxy( *this, aPropertyName );\
+ } //
 
 
   //
@@ -114,8 +122,14 @@ namespace libecs
 #define INHERIT_PROPERTIES( BASECLASS )\
     BASECLASS::initializeProperties( Type2Type<TT>() )
 
+  /*
 #define PROPERTYSLOT( TYPE, NAME, SETMETHOD, GETMETHOD )\
-  PropertyInterface<TT>::registerSlot( # NAME,\
+  PropertyInterface<TT>::registerPropertySlot( # NAME,\
+         new ConcretePropertySlot<TT,TYPE>( SETMETHOD, GETMETHOD ) );
+  */
+
+#define PROPERTYSLOT( TYPE, NAME, SETMETHOD, GETMETHOD )\
+  PropertyInterface<TT>::registerPropertySlot( # NAME,\
          new ConcretePropertySlot<TT,TYPE>( SETMETHOD, GETMETHOD ) );
 
 #define PROPERTYSLOT_SET_GET( TYPE, NAME )\
@@ -174,20 +188,6 @@ namespace libecs
 #define SIMPLE_SET_GET_METHOD( TYPE, NAME )\
   SIMPLE_SET_METHOD( TYPE, NAME )\
   SIMPLE_GET_METHOD( TYPE, NAME )
-
-
-
-
-  template <class C>
-  class PropertyInitializer
-  {
-  public:
-    PropertyInitializer() 
-    {
-      C::initializeProperties( Type2Type<C>() );
-    }
-
-  };
 
 
   /** @addtogroup property The Inter-object Communication.
@@ -265,12 +265,6 @@ namespace libecs
 
 
   protected:
-
-    //    virtual void 
-    //    registerSlot( StringCref aName, PropertySlotPtr aPropertySlotPtr ) = 0;
-
-    // virtual void removeSlot( StringCref aName ) = 0;
-
 
     /// @internal
 

@@ -33,6 +33,7 @@
 
 #include "libecs.hpp"
 #include "EntityType.hpp"
+#include "PropertiedClass.hpp"
 #include "PropertyInterface.hpp"
 
 

@@ -35,13 +35,10 @@
 
 #include "AssocVector.h"
 
-#include "dmtool/DMObject.hpp"
-
 #include "libecs.hpp"
-#include "Defs.hpp"
-#include "Exceptions.hpp"
 #include "PropertySlot.hpp"
 #include "PropertySlotProxy.hpp"
+#include "PropertiedClass.hpp"
 
 namespace libecs
 {
@@ -53,26 +50,26 @@ namespace libecs
   */
 
   /** @file */
-  
+
   class PropertyInterfaceBase
   {
   public:
-
-    PropertyInterfaceBase()
-    {
-      ; // do nothing
-    }
 
     ~PropertyInterfaceBase()
     {
       ; // do nothing
     }
 
+    static void throwNoSlot( StringCref aClassName, StringCref aPropertyName );
 
-    void throwNoSlot( StringCref aClassName, StringCref aPropertyName ) const;
+  protected:
+
+    PropertyInterfaceBase()
+    {
+      ; // do nothing
+    }
 
   };
-
 
 
   template
@@ -83,6 +80,7 @@ namespace libecs
     :
     public PropertyInterfaceBase
   {
+
   public:
 
     typedef PropertySlot<T> PropertySlot_;
@@ -91,30 +89,34 @@ namespace libecs
     DECLARE_ASSOCVECTOR_TEMPLATE( String, PropertySlot*,
 				  std::less<const String>, PropertySlotMap );
 
-    PropertySlotMapCref getPropertySlotMap() const
-    {
-      return thePropertySlotMap;
-    }
-
     PropertyInterface()
     {
-      ; // do nothing
+      T::initializeProperties( Type2Type<T>() );
     }
 
     ~PropertyInterface()
     {
-      for( PropertySlotMapIterator i( thePropertySlotMap.begin() ); 
-	   i != thePropertySlotMap.end() ; ++i )
+      // This object is never deleted.
+      /*
+	for( PropertySlotMapIterator i( thePropertySlotMap.begin() ); 
+	i != thePropertySlotMap.end() ; ++i )
 	{
-	  delete i->second;
+	delete i->second;
 	}
+      */
     }
 
+    /**
+       Get a PropertySlot by name.
 
-    PropertySlotPtr getPropertySlot( StringCref aPropertyName ) const
+       @param aPropertyName the name of the PropertySlot.
+
+       @return a borrowed pointer to the PropertySlot with that name.
+    */
+
+    static PropertySlotPtr getPropertySlot( StringCref aPropertyName )
     {
-      PropertySlotMapConstIterator 
-	i( thePropertySlotMap.find( aPropertyName ) );
+      PropertySlotMapConstIterator i( findPropertySlot( aPropertyName ) );
 
       if( i == thePropertySlotMap.end() )
 	{
@@ -124,9 +126,9 @@ namespace libecs
       return i->second;
     }
 
-
-    PropertySlotProxyPtr createPropertySlotProxy( T& anObject,
-						  StringCref aPropertyName )
+    static PropertySlotProxyPtr 
+    createPropertySlotProxy( T& anObject,
+			     StringCref aPropertyName )
     {
       try
 	{
@@ -146,16 +148,16 @@ namespace libecs
        This method checks if the property slot exists, and throws
        NoSlot exception if not.
 
-       @param aPropertyName a name of the property.
-       @param aValue the value to set as a PolymorphVector.
+       @param aPropertyName the name of the property.
+       @param aValue the value to set as a Polymorph.
        @throw NoSlot 
     */
 
-    void setProperty( T& anObject, StringCref aPropertyName, 
-		      PolymorphCref aValue )
+    static void setProperty( T& anObject, StringCref aPropertyName, 
+			     PolymorphCref aValue )
     {
       PropertySlotMapConstIterator 
-	aPropertySlotMapIterator( thePropertySlotMap.find( aPropertyName ) );
+	aPropertySlotMapIterator( findPropertySlot( aPropertyName ) );
       
       if( aPropertySlotMapIterator != thePropertySlotMap.end() )
 	{
@@ -174,16 +176,16 @@ namespace libecs
        This method checks if the property slot exists, and throws
        NoSlot exception if not.
 
-       @param aPropertyName a name of the property.
-       @return the value as a PolymorphVector.
+       @param aPropertyName the name of the property.
+       @return the value as a Polymorph.
        @throw NoSlot
     */
 
-    const Polymorph getProperty( const T& anObject,
-				 StringCref aPropertyName ) const
+    static const Polymorph getProperty( const T& anObject,
+					StringCref aPropertyName )
     {
       PropertySlotMapConstIterator 
-	aPropertySlotMapIterator( thePropertySlotMap.find( aPropertyName ) );
+	aPropertySlotMapIterator( findPropertySlot( aPropertyName ) );
       
       if( aPropertySlotMapIterator != thePropertySlotMap.end() )
 	{
@@ -196,20 +198,19 @@ namespace libecs
     }
 
 
-    /**
-       Get a PropertySlot by name.
+    static void loadProperty( T& anObject, StringCref aPropertyName, 
+			      PolymorphCref aValue )
+    {
+      getPropertySlot( aPropertyName )->loadPolymorph( anObject, aValue );
+    }
+    
+    static const Polymorph saveProperty( const T& anObject,
+					 StringCref aPropertyName )
+    {
+      return getPropertySlot( aPropertyName )->savePolymorph( anObject );
+    }
 
-       @param aPropertyName the name of the PropertySlot.
-
-       @return a borrowed pointer to the PropertySlot with the name.
-    */
-
-    //    PropertySlotBasePtr getPropertySlot( StringCref aPropertyName ) const
-    //    {
-    //      return getPropertySlotMap().find( aPropertyName )->second;
-    //    }
-
-    const Polymorph getPropertyList() const
+    static const Polymorph getPropertyList()
     {
       PolymorphVector aVector;
       // aVector.reserve( thePropertySlotMap.size() );
@@ -225,9 +226,9 @@ namespace libecs
 
     
     static void 
-    registerSlot( StringCref aName, PropertySlotPtr aPropertySlotPtr )
+    registerPropertySlot( StringCref aName, PropertySlotPtr aPropertySlotPtr )
     {
-      if( thePropertySlotMap.find( aName ) != thePropertySlotMap.end() )
+      if( findPropertySlot( aName ) != thePropertySlotMap.end() )
 	{
 	  // it already exists. take the latter one.
 	  delete thePropertySlotMap[ aName ];
@@ -239,7 +240,7 @@ namespace libecs
 
 
     /*
-    static void removeSlot( StringCref aName );
+    static void removePropertySlot( StringCref aName );
     {
       if( thePropertySlotMap.find( aName ) == thePropertySlotMap.end() )
 	{
@@ -253,6 +254,19 @@ namespace libecs
     }
     */
 
+    static PropertySlotMapCref getPropertySlotMap()
+    {
+      return thePropertySlotMap;
+    }
+
+
+  private:
+
+    static PropertySlotMapConstIterator 
+    findPropertySlot( StringCref aPropertyName )
+    {
+      return thePropertySlotMap.find( aPropertyName );
+    }
 
   private:
 

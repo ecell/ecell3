@@ -71,7 +71,6 @@ namespace libecs
       PROPERTYSLOT_SET_GET( String,    StepperID );
     }
 
-
     System();
     virtual ~System();
 

@@ -39,7 +39,7 @@ namespace libecs
 {
 
   void PropertyInterfaceBase::throwNoSlot( StringCref aClassName, 
-					   StringCref aPropertyName ) const
+					   StringCref aPropertyName )
   {
     THROW_EXCEPTION( NoSlot,
 		     aClassName + 

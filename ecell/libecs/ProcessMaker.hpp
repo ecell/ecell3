@@ -30,6 +30,7 @@
 
 #ifndef ___PROCESSMAKER_H___
 #define ___PROCESSMAKER_H___
+
 #include "Process.hpp"
 #include "dmtool/ModuleMaker.hpp"
 
