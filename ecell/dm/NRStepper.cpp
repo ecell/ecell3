@@ -164,7 +164,7 @@ void NRStepper::step()
 void NRStepper::interrupt( StepperPtr const aCaller )
 {
   // update step intervals of NRProcesses
-  const Real aCurrentTime( getCurrentTime() );
+  const Real aCurrentTime( aCaller->getCurrentTime() );
   for( NRProcessVector::const_iterator i( theNRProcessVector.begin() );
        i != theNRProcessVector.end(); ++i )
     {      
