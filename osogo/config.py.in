@@ -1,6 +1,6 @@
 import os
 
-OSOGO_PATH = os.environ['OSOGO_PATH']
+OSOGO_PATH = os.environ['OSOGOPATH']
 
 # where to place .glade files for main (non-plugin) windows
 GLADEFILE_PATH = OSOGO_PATH
