@@ -45,9 +45,12 @@
  *::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
  *	$Id$
  :	$Log$
+ :	Revision 1.8  2003/09/22 04:28:44  bgabor
+ :	Fixed a serious undefined reference to my_open_to_read bug in VVector.
+ :
  :	Revision 1.7  2003/08/08 13:13:09  satyanandavel
  :	Added support for MinGW to define type of ssize_t
- :
+ :	
  :	Revision 1.6  2003/07/20 06:06:06  bgabor
  :	
  :	Added support for large files.
@@ -85,10 +88,11 @@
 //END_RCS_HEADER
  *::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
  */
-#include "ecell/config.h"
-//#define _FILE_OFFSET_BITS 64 //for test purposes only
+
+
 #ifndef __VVECOTOR_H__
 #define	__VVECOTOR_H__
+#include "ecell/config.h"
 #include <sys/types.h>
 #if	defined(__GNUC__)
 #include <vector>
@@ -100,6 +104,25 @@
 #if defined(__BORLANDC__) || defined(__WINDOWS__) || defined(__MINGW32__)
 typedef int ssize_t;
 #endif /* __BORLANDC__ */
+
+
+#include <string.h>
+#include <memory.h>
+#include <stdio.h>
+#include <assert.h>
+#include <errno.h>
+#if 	defined(__BORLANDC__)
+#include <io.h>
+#elif	defined(__linux__)
+#include <unistd.h>
+#include <sys/io.h>
+#else
+#include <unistd.h>
+
+#endif
+
+
+
 const unsigned int VVECTOR_READ_CACHE_SIZE = 2048;
 const unsigned int VVECTOR_WRITE_CACHE_SIZE = 2048;
 const unsigned int VVECTOR_READ_CACHE_INDEX_SIZE = 2;
@@ -186,20 +209,6 @@ public:
 //////////////////////////////////////////////////////////////////////
 //      implemetation
 //////////////////////////////////////////////////////////////////////
-#include <string.h>
-#include <memory.h>
-#include <stdio.h>
-#include <assert.h>
-#include <errno.h>
-#if 	defined(__BORLANDC__)
-#include <io.h>
-#elif	defined(__linux__)
-#include <unistd.h>
-#include <sys/io.h>
-#else
-#include <unistd.h>
-
-#endif
 
 
 template<class T> vvector<T>::vvector()
@@ -283,7 +292,7 @@ template<class T>  T const & vvector<T>::operator [] (size_type i)
     num_to_read = VVECTOR_READ_CACHE_SIZE;
   }
 
-  my_open_to_read(static_cast<off_t>(i2) * sizeof(T));
+  my_open_to_read(static_cast<off_t>((i2) * sizeof(T)));
   num_red = read(_fdr, _cacheRV, num_to_read * sizeof(T));
 
   if (num_red < 0) {
@@ -328,7 +337,7 @@ template<class T>  T const & vvector<T>::at(size_type i)
     return _cacheWV[i-_cacheWI[0]];
   }
   
-  my_open_to_read(static_cast<off_t>(i) * sizeof(T));
+  my_open_to_read(static_cast<off_t>((i) * sizeof(T)));
   size_type num_to_read = _size - i;
   if (VVECTOR_READ_CACHE_SIZE < num_to_read) {
     num_to_read = VVECTOR_READ_CACHE_SIZE;

@@ -45,9 +45,13 @@
  *::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
  *	$Id$
  :	$Log$
- :	Revision 1.4  2003/07/20 06:05:35  bgabor
- :	added support for large files
+ :	Revision 1.5  2003/09/22 04:28:43  bgabor
+ :	Fixed a serious undefined reference to my_open_to_read bug in VVector.
  :
+ :	Revision 1.4  2003/07/20 06:05:35  bgabor
+ :	
+ :	added support for large files
+ :	
  :	Revision 1.3  2003/03/18 09:06:36  shafi
  :	logger performance improvement by gabor
  :	
@@ -87,6 +91,7 @@
 //END_RCS_HEADER
  *::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
  */
+#include "VVector.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -95,7 +100,6 @@
 #include <errno.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include "VVector.h"
 #include "osif.h"
 
 
