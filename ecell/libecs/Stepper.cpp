@@ -229,13 +229,9 @@ namespace libecs
     FOR_ALL( PropertySlotVector, thePropertySlotVector, sync );
   }
 
- void MasterStepper::push()
+  void MasterStepper::push()
   {
-    for( PropertySlotVectorIterator i( thePropertySlotVector.begin() );
-	 i != thePropertySlotVector.end() ; ++i )
-      {
-	(*i)->push( theOwner->getRootSystem()->getCurrentTime() );
-      }
+    FOR_ALL( PropertySlotVector, thePropertySlotVector, push );
   }
 
 

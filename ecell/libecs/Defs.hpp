@@ -95,8 +95,6 @@ namespace libecs
   //! Avogadro number. 
   const Real N_A( 6.0221367e+23 );
 
-  const int NOMATCH( -1 );
-
 
   // MACROS
 

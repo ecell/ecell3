@@ -31,13 +31,48 @@
 #ifndef ___ROOTSYSTEM_H___
 #define ___ROOTSYSTEM_H___
 
+#include "Util.hpp"
 #include "Stepper.hpp"
 #include "System.hpp"
+
 
 namespace libecs
 {
 
-  class RootSystem : public System
+
+  //FIXME: should be merged with PropertySlot::SlotTypes
+
+  template <class T,class Ret>
+  class VoidObjectMethod
+  {
+    typedef Ret (T::* Method )( void ) const;
+
+  public:
+    VoidObjectMethod( T& anObject, Method aMethod )
+      :
+      theObject( anObject ),
+      theMethod( aMethod )
+    {
+      ; // do nothing
+    }
+
+    const Ret operator()( void ) const 
+    {
+      return ( theObject.*theMethod )();
+    }
+
+  private:
+
+    T&     theObject;
+    Method theMethod;
+
+  };
+
+  typedef VoidObjectMethod<RootSystem,const Real> GetCurrentTimeMethodType;
+
+  class RootSystem 
+    : 
+    public System
   {
 
   public:
@@ -66,9 +101,6 @@ namespace libecs
 
     virtual StringLiteral getClassName() const { return "RootSystem"; }
 
-  private:
-
-    void install();
 
   private:
 

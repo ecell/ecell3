@@ -42,6 +42,14 @@
 namespace libecs
 {
 
+  LoggerBroker::LoggerBroker( RootSystemRef aRootSystem )
+    :
+    theRootSystem( aRootSystem ),
+    theGetCurrentTimeMethod( theRootSystem, &RootSystem::getCurrentTime )
+  {
+    ; // do nothing
+  }
+
   LoggerBroker::~LoggerBroker()
   {
     for( LoggerMapIterator i( theLoggerMap.begin() );
@@ -83,7 +91,8 @@ namespace libecs
     //    aPropertyMapIterator->second->getProxy()->setLogger( aLoggerPtr );
 
     //    appendLogger( aLoggerPtr );
-    theLoggerMap[fpn] = new Logger( *aPropertyMapIterator->second );
+    theLoggerMap[fpn] = new Logger( theGetCurrentTimeMethod,
+				    *aPropertyMapIterator->second );
     aPropertyMapIterator->second->setLogger(theLoggerMap[fpn]);
 
     anEntityPtr->getSuperSystem()

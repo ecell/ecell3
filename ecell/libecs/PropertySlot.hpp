@@ -48,6 +48,7 @@ namespace libecs
      @see PropertyInterface
      @see Message
   */
+
   class PropertySlot
   {
 
@@ -83,6 +84,11 @@ namespace libecs
       return theName;
     }
 
+    const bool isLogged()
+    {
+      return theLogger != NULLPTR;
+    }
+
     void setLogger( LoggerPtr logger )
     {
       theLogger = logger;
@@ -93,13 +99,21 @@ namespace libecs
       return theLogger;
     }
 
-    void push( RealCref aTime )
+    void clearLogger()
     {
-      updateLogger( aTime );
+      theLogger = NULLPTR;
+    }
+
+    void push()
+    {
+      if( isLogged() )
+	{
+	  updateLogger();
+	}
       //      updateProxy();
     }
 
-    void updateLogger( const Real aTime );
+    void updateLogger();
 
   protected:
 

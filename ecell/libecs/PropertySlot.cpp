@@ -39,9 +39,9 @@
 namespace libecs
 {
 
-  void PropertySlot::updateLogger( const Real aCurrentTime )
+  void PropertySlot::updateLogger()
   {
-    theLogger->appendData( aCurrentTime, getReal() );
+    theLogger->appendData( getReal() );
   }
 
   

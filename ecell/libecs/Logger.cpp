@@ -45,9 +45,11 @@ namespace libecs
 
   // Constructor
 
-  Logger::Logger( PropertySlotCref aPropertySlot )
+  Logger::Logger( GetCurrentTimeMethodType aGetCurrentTime,
+		  PropertySlotRef aPropertySlot )
     :
     thePropertySlot( aPropertySlot ),
+    theGetCurrentTimeMethod( aGetCurrentTime ),
     theMinimumInterval( 0.0 ),
     theCurrentInterval( 0.0 )
   {
@@ -125,8 +127,9 @@ namespace libecs
   }
   
   
-  void Logger::appendData( RealCref aTime, RealCref aValue )
+  void Logger::appendData( RealCref aValue )
   {
+    const Real aTime( (theGetCurrentTimeMethod)() );
     if( !theDataPointVector.empty() )
       {
 	theCurrentInterval = aTime - theDataPointVector.back()->getTime();

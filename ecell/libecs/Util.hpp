@@ -32,6 +32,7 @@
 #define ___UTIL_H___
 #include <stdlib.h>
 #include <sstream>
+#include <functional>
 
 #include "Defs.hpp"
 #include "korandom/korandom.h"
@@ -149,9 +150,7 @@ namespace libecs
        i != (SEQ) .end() ; ++i )\
     { (*i)-> METHOD (); }
 
-
-
-
+ 
 
 } // namespace libecs
 

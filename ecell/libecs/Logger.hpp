@@ -34,6 +34,8 @@
 
 #include "libecs.hpp"
 
+#include "RootSystem.hpp"
+
 
 /*
 
@@ -69,14 +71,16 @@ namespace libecs
 
     */
   
-    explicit Logger( PropertySlotCref aPropertySlot );
+    explicit Logger( GetCurrentTimeMethodType aGetCurrentTime,
+		     PropertySlotRef aPropertySlot );
 
   
     /// Destructor
 
     ~Logger( void )
     {
-      ; // do nothing
+      // self purge
+      thePropertySlot.clearLogger();
     }
 
 
@@ -91,15 +95,15 @@ namespace libecs
      */
 
     const DataPointVector getData( RealCref start,
-				 RealCref end ) const;
+				   RealCref end ) const;
 
     /**
 
      */
 
     const DataPointVector getData( RealCref first,
-				 RealCref last, 
-				 RealCref interval ) const;
+				   RealCref last, 
+				   RealCref interval ) const;
 
 
 
@@ -142,7 +146,7 @@ namespace libecs
 
      */
 
-    void appendData( RealCref t, RealCref v );
+    void appendData( RealCref v );
 
 
     /**
@@ -200,12 +204,11 @@ namespace libecs
 
     /// Data members
 
-    PropertySlotCref            thePropertySlot;
-    
-
-    Real                        theMinimumInterval;
-    Real                        theCurrentInterval;
-    DataPointVector             theDataPointVector;
+    PropertySlotRef      thePropertySlot;
+    const GetCurrentTimeMethodType& theGetCurrentTimeMethod; 
+    Real                 theMinimumInterval;
+    Real                 theCurrentInterval;
+    DataPointVector      theDataPointVector;
 
   };
 

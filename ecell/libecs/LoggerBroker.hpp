@@ -49,12 +49,8 @@ namespace libecs
     DECLARE_MAP( const FullPN, 
 		 LoggerPtr, std::less<const FullPN>, LoggerMap );
 
-    LoggerBroker( RootSystemRef aRootSystem )
-      :
-      theRootSystem( aRootSystem )
-    {
-      ; // do nothing
-    }
+    LoggerBroker( RootSystemRef aRootSystem );
+
     
     ~LoggerBroker();
 
@@ -81,6 +77,8 @@ namespace libecs
 
     LoggerMap     theLoggerMap;
     RootSystemRef theRootSystem;
+
+    GetCurrentTimeMethodType theGetCurrentTimeMethod;
     
   };
   
