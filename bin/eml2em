@@ -70,6 +70,7 @@ def createObjectDef( aType, aClass, anArgList, aPropertyList, anOptional='' ):
             aPropertyValueListString = expandValueList( aProperty[1] )
             aBuffer += '\t%s\t%s;\n' % ( aPropertyName,
                                          aPropertyValueListString )
+#            print aPropertyName
     else:
         aBuffer += '\t# no property\n'
     
@@ -130,7 +131,7 @@ def createEntity( anEml, aFullID, anOptional='' ):
                             anOptional )
     
 
-def createSystemList( anEml, aSystemPath='' ):
+def createSystemList( anEml, aSystemPath='/' ):
     aBuffer = ''
 
     anOptional = ''
