@@ -1,54 +1,31 @@
-
+#!/usr/bin/env python2
 
 import sys
 import os
 import imp
 
 from config import *
+from ViewWindow import *
 
-class PluginWindowManager:
+class PluginWindow(ViewWindow):
 
-    def __init__( self ):
-        self.theModuleMap = {}
-        self.theWindowList = []
+    def __init__( self, dirname, data ):
+        aGladeFileName = os.path.join( dirname ,
+                                       self.__class__.__name__ + ".glade" )
+        ViewWindow.__init__( self, aGladeFileName, data )
 
-    def createWindow( self, name, parent=None ):
-        try:
-            aModule = self.theModuleMap[ name ]
-        except KeyError:
-            aModule = PluginWindowModule( name )
-            self.theModuleMap[ name ] = aModule
 
-        aWindow = aModule.createWindow()
-        self.appendWindow( aWindow )
 
-        return aWindow
-
-    def appendWindow( self, aWindow ):
-        self.theWindowList.append( aWindow )
-
-    def removeWindow( self, aWindow ):
-        self.theWindowList.remove( aWindow )
-
-    def getWindowList( self ):
-        return self.theWindowList
-
-        
-
-class PluginWindowModule:
+class PluginModule:
 
     def __init__( self, name, path=PLUGIN_PATH ):
 
         self.theName = name
 
-        # check if it's already loaded
-        try:
-            return sys.modules[name]
-        except KeyError:
-            pass
-
         aFp, aPath, self.theDescription\
              = imp.find_module( self.theName, PLUGIN_PATH )
+
+        self.theDirectoryName = os.path.dirname( aPath )
         
         try:
             self.theModule = imp.load_module( self.theName,
@@ -60,12 +37,38 @@ class PluginWindowModule:
             if aFp:
                 aFp.close()
 
-        self.theGladefileName, dotpy = os.path.splitext( aPath )
-        self.theGladefileName += '.glade'
 
-        #FIXME: check if there is createWindow() in this module
+    def createInstance( self, data ):
+        aConstructor = self.theModule.__dict__[self.theName]
+        anArgumentTuple = tuple( self.theDirectoryName ) + data
+        apply( aConstructor, anArgumentTuple )
 
 
-    def createWindow( self, parent = None ):
-        self.theModule.__dict__[self.theName]( self.theGladefileName )
 
+class PluginManager:
+
+    def __init__( self ):
+        self.thePluginMap = {}
+        self.theInstanceList = []
+
+    def createInstance( self, name, parent=None ):
+        try:
+            aPlugin = self.thePluginMap[ name ]
+        except KeyError:
+            aPlugin = PluginModule( name )
+            self.thePluginMap[ name ] = aPlugin
+
+        anInstance = aPlugin.createInstance()
+        self.appendInstance( anInstance )
+
+        return anInstance
+
+    def appendInstance( self, instance ):
+        self.theInstanceList.append( instance )
+
+    def removeInstance( self, instance ):
+        self.theInstanceList.remove( instance )
+
+        
+if __name__ == "__main__":
+    pass

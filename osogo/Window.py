@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 
 from config import *
 
@@ -15,18 +15,16 @@ class Window:
 
     def __init__( self, gladefile=None, root=None ):
 
-        # load (CLASSNAME).glade by default
+        # load GLADEFILE_PATH/CLASSNAME.glade by default
         if gladefile == None:
-            gladefile = self.__class__.__name__ + ".glade"
-
-
-        gladefile = GLADEFILE_PATH + "/" + gladefile
+            gladefile = GLADEFILE_PATH
+            gladefile += '/' + self.__class__.__name__ + ".glade"
 
         if os.access( gladefile, os.R_OK ):
             self.widgets = libglade.GladeXML( filename=gladefile, root=root )
         else:
             print "Window: can't read %s." % gladefile
-            #FIXME: exception?
+            raise IOError()
 
     def addHandlers( self, handlers ):
         self.widgets.signal_autoconnect( handlers )

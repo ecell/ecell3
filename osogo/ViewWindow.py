@@ -10,7 +10,7 @@ class ViewWindow(Window):
     theClipBoard = ''
 
     def __init__(self, gladefile, fqpps):
-        Window.__init__(self, gladefile)
+        Window.__init__( self, gladefile )
         self.theFQPPs = fqpps
         self.addHandlers(
             { 'copy_fqpps':            self.copyFQPPs,
@@ -24,6 +24,9 @@ class ViewWindow(Window):
               'drag_data_get':         self.printTest,
               'drag_data_delete':      self.printTest }
             )
+
+    def printTest( self, obj, data ):
+        print obj, data
 
     def copyFQPPs(self, a, b):
         ViewWindow.theClipBoard = self.theFQPPs
