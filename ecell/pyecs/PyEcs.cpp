@@ -68,21 +68,37 @@ BOOST_PYTHON_MODULE_INIT(_ecs)
 
   aSimulatorClass.def( python::constructor<>() );
 
-  // Entity-related methods
-  aSimulatorClass.def( &libemc::Simulator::createEntity,   "createEntity" );
-  aSimulatorClass.def( &libemc::Simulator::isEntityExist,  "isEntityExist" );
-  aSimulatorClass.def( &libemc::Simulator::setEntityProperty,
-		       "setEntityProperty" );
-  aSimulatorClass.def( &libemc::Simulator::getEntityProperty, 
-		       "getEntityProperty" );
-
   // Stepper-related methods
   aSimulatorClass.def( &libemc::Simulator::createStepper,   "createStepper" );
+  aSimulatorClass.def( &libemc::Simulator::deleteStepper,   "deleteStepper" );
   aSimulatorClass.def( &libemc::Simulator::getStepperList,  "getStepperList" );
+  aSimulatorClass.def( &libemc::Simulator::getStepperPropertyList, 
+		       "getStepperPropertyList" );
+  aSimulatorClass.def( &libemc::Simulator::getStepperPropertyAttributes,
+		       "getStepperPropertyAttributes" );
   aSimulatorClass.def( &libemc::Simulator::setStepperProperty, 
 		       "setStepperProperty" );
   aSimulatorClass.def( &libemc::Simulator::getStepperProperty,
 		       "getStepperProperty" );
+  aSimulatorClass.def( &libemc::Simulator::getStepperClassName,
+		       "getStepperClassName" );
+
+
+  // Entity-related methods
+  aSimulatorClass.def( &libemc::Simulator::createEntity,   "createEntity" );
+  aSimulatorClass.def( &libemc::Simulator::deleteEntity,   "deleteEntity" );
+  aSimulatorClass.def( &libemc::Simulator::getEntityList,  "getEntityList" );
+  aSimulatorClass.def( &libemc::Simulator::isEntityExist,  "isEntityExist" );
+  aSimulatorClass.def( &libemc::Simulator::getEntityPropertyList,
+		       "getEntityPropertyList" );
+  aSimulatorClass.def( &libemc::Simulator::setEntityProperty,
+		       "setEntityProperty" );
+  aSimulatorClass.def( &libemc::Simulator::getEntityProperty, 
+		       "getEntityProperty" );
+  aSimulatorClass.def( &libemc::Simulator::getEntityPropertyAttributes, 
+		       "getEntityPropertyAttributes" );
+  aSimulatorClass.def( &libemc::Simulator::getEntityClassName,
+		       "getEntityClassName" );
 
 
   // Logger-related methods

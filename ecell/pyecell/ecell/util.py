@@ -8,10 +8,9 @@ def printProperty( s, fullpn ):
 
 def printAllProperties( s, fullid ):
 
-    plistfullpn = fullid + ':' + 'PropertyList'
-    properties = s.getEntityProperty( plistfullpn )
+    properties = s.getEntityPropertyList( fullid )
     for property in properties:
-        fullpn = fullid + ':' + property[0]
+        fullpn = fullid + ':' + property
         try:
             printProperty( s, fullpn )
         except:
@@ -24,9 +23,9 @@ def printStepperProperty( s, id, propertyname ):
 
 def printAllStepperProperties( s, id ):
 
-    properties = s.getStepperProperty( id, 'PropertyList' )
+    properties = s.getStepperPropertyList( id )
     for property in properties:
         try:
-            printStepperProperty( s, id, property[0] )
+            printStepperProperty( s, id, property )
         except:
             print "failed to print %s:%s" % ( id, property )

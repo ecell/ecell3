@@ -131,6 +131,9 @@ namespace libemc
     getEntityList( libecs::Int anEntityTypeNumber,
 		   libecs::StringCref aSystemPathString ) const = 0;
 
+    virtual const libecs::Polymorph 
+    getEntityPropertyList( libecs::StringCref aFullIDString ) const = 0;
+
     virtual const bool 
     isEntityExist( libecs::StringCref  aFullIDString ) const = 0;
 

@@ -172,6 +172,16 @@ namespace libemc
   }
 
 
+  const libecs::Polymorph LocalSimulatorImplementation::
+  getEntityPropertyList( libecs::StringCref aFullIDString ) const
+  {
+    FullID aFullID( aFullIDString );
+    EntityCptr anEntityPtr( getModel().getEntity( aFullID ) );
+
+    return anEntityPtr->getPropertyList();
+  }
+
+
   const bool LocalSimulatorImplementation::
   isEntityExist( libecs::StringCref aFullIDString ) const
   {

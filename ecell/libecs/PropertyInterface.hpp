@@ -131,6 +131,9 @@ namespace libecs
     void makeSlots();
 
 
+    // to be deprecated
+    const Polymorph getPropertyListWithAttributes() const;
+
     const Polymorph getPropertyList() const;
 
     const Polymorph getPropertyAttributes( StringCref aPropertyName ) const;

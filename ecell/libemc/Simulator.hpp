@@ -254,6 +254,19 @@ namespace libemc
 
 
     /**
+       List names of properties of an Entity. 
+    
+       @return a list of properties of an Entity.
+    */
+
+    const libecs::Polymorph 
+    getEntityPropertyList( libecs::StringCref aFullIDString ) const
+    {
+      return theSimulatorImplementation->
+	getEntityPropertyList( aFullIDString );
+    }
+
+    /**
        Check if an Entity object specified by a FullID exists in the model.
 
        @param aFullIDString a FullID string to be checked.
