@@ -179,7 +179,6 @@ class EntityListWindow(OsogoWindow):
 			aEntityFullPN = ( aEntityType, aSystemPath, anEntityID, '' )
 
 			self.theEntityListStore.set_data( anEntityID, aEntityFullPN )
-			print self.theEntityListStore.get_value(iter,0)
 
 	def selectEntity( self, aEntityList ):
 		self.theSelectedFullPNList = []
