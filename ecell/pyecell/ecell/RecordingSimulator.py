@@ -1,6 +1,6 @@
 
 
-import ecell.ecs
+import ecell.emc
 
 
 #FIXME: incomplete

@@ -2,7 +2,7 @@
 //
 //        This file is part of E-CELL Simulation Environment package
 //
-//                Copyright (C) 1996-2002 Keio University
+//                Copyright (C) 2003 Keio University
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
@@ -24,67 +24,67 @@
 // 
 //END_HEADER
 //
-// written by Kouichi Takahashi <shafi@e-cell.org> at
+// authors:
+// Kouichi Takahashi <shafi@e-cell.org>
+// Nayuta Iwata
+//
 // E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
 
-#include "System.hpp"
-#include "FullID.hpp"
-#include "PropertySlotMaker.hpp"
+#ifndef __PYTHONFLUXPROCESS_HPP
+#define __PYTHONFLUXPROCESS_HPP
 
-#include "Entity.hpp"
+#include "PythonProcessBase.hpp"
 
+USE_LIBECS;
 
-namespace libecs
+class PythonFluxProcess
+  :
+  public PythonProcessBase
 {
 
-  Entity::Entity()
-    : 
-    theSuperSystem( NULLPTR ),
-    theID( "" ),
-    theName( "" ) 
+public:
+
+  DM_OBJECT( Process, PythonFluxProcess );
+  
+  PythonFluxProcess()
   {
-    CREATE_PROPERTYSLOT_SET_GET( String, Name,   Entity );
-    CREATE_PROPERTYSLOT        ( String, FullID, 
-				 NULLPTR, &Entity::getFullIDString );
+    CREATE_PROPERTYSLOT_SET_GET( String, Expression, PythonFluxProcess );
+
+    //FIXME: additional properties:
+    // Unidirectional   -> call declareUnidirectional() in initialize()
+    //                     if this is set
   }
 
-
-  Entity::~Entity()
+  virtual ~PythonFluxProcess()
   {
     ; // do nothing
   }
 
-  const FullID Entity::getFullID() const
+  SET_METHOD( String, Expression )
   {
-    return FullID( getEntityType(), getSystemPath(), getID() );
+    theExpression = value;
+
+    theCompiledExpression = compilePythonCode( theExpression,
+					       getFullID().getString() +
+					       ":Expression",
+					       Py_eval_input );
   }
 
-  const String Entity::getFullIDString() const
+  GET_METHOD( String, Expression )
   {
-    return getFullID().getString();
+    return theExpression;
   }
 
-  const SystemPath Entity::getSystemPath() const
-  {
-    SystemPtr aSystemPtr( getSuperSystem() );
+  virtual void process();
 
-    if( aSystemPtr == NULLPTR )
-      {
-	return SystemPath();
-      }
+protected:
 
-    SystemPath aSystemPath( aSystemPtr->getSystemPath() );
-    aSystemPath.push_back( aSystemPtr->getID() );
-    return aSystemPath;
-  }
+  String    theExpression;
 
-} // namespace libecs
+  python::object theCompiledExpression;
 
-/*
-  Do not modify
-  $Author$
-  $Revision$
-  $Date$
-  $Locker$
-*/
+};
+
+
+#endif /* __PYTHONFLUXPROCESS_HPP */

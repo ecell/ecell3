@@ -43,6 +43,7 @@
 #include "libecs/Polymorph.hpp"
 #include "libecs/DataPointVector.hpp"
 
+#include "libemc/libemc.hpp"
 
 namespace python = boost::python;
 

@@ -1,10 +1,21 @@
 
 
+
+/// an allocator function template
+
+template< class Base, class Derived >
+Base* ObjectAllocator()
+{
+  return new Derived;
+}
+
+
+
 #define DM_INIT( TYPE, CLASSNAME )\
   extern "C"\
   {\
     TYPE::AllocatorFuncPtr CreateObject =\
-    &CLASSNAME::createInstance;\
+    &ObjectAllocator<TYPE,CLASSNAME>;\
   } // 
 
 

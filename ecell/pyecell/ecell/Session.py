@@ -8,6 +8,7 @@ import time
 
 
 from Numeric import *
+import ecell.emc
 import ecell.ecs
 
 from ecell.ecssupport import *
@@ -29,11 +30,15 @@ class Session:
     'Session class'
 
 
-    def __init__( self, aSimulator ):
+    def __init__( self, aSimulator=None ):
         'constructor'
 
         self.theMessageMethod = self.__plainMessageMethod
-        self.theSimulator = aSimulator
+
+        if aSimulator is None:
+            self.theSimulator = ecell.emc.Simulator()
+        else:
+            self.theSimulator = aSimulator
 
         self.theModelName = ''
 

@@ -48,48 +48,6 @@ namespace libemc
   /** @file */
 
 
-  DECLARE_RCPTR( EventChecker );
-  DECLARE_RCPTR( EventHandler );
-
-
-
-  class EventHandler
-    :
-    public std::unary_function<void,void> 
-  {
-  public:
-    EventHandler() {}
-    virtual ~EventHandler() {}
-
-    virtual void operator()( void ) const = 0;
-  };
-
-  class EventChecker
-    :
-    public std::unary_function<bool,void>
-  {
-  public:
-    EventChecker() {}
-    virtual ~EventChecker() {}
-
-    virtual bool operator()( void ) const = 0;
-  };
-
-  class DefaultEventChecker
-    :
-    public EventChecker
-  {
-  public:
-    DefaultEventChecker() {}
-    //    virtual ~DefaultEventChecker() {}
-
-    virtual bool operator()( void ) const
-    {
-      return false;
-    }
-  };
-
-
   /**
      Pure virtual base class (interface definition) of simulator
      implementation.

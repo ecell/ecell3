@@ -17,6 +17,8 @@ DataFile.py\
 ECDDataFile.py\
 ECS.py\
 ecs.py\
+ecsinit.py\
+emc.py\
 Session.py\
 ecssupport.py\
 FullID.py\

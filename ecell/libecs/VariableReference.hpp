@@ -259,6 +259,11 @@ namespace libecs
       theVariablePtr->addVelocity( aVelocity * theCoefficient );
     }
 
+    SystemPtr getSuperSystem() const
+    {
+      return theVariablePtr->getSuperSystem();
+    }
+
 
   private:
 

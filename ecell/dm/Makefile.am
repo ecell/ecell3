@@ -6,6 +6,9 @@ ECELL3_DMC = ../../bin/ecell3-dmc
 DM_SO_DIR = ${prefix}/lib/${PACKAGE}/${VERSION}
 DM_SRC_DIR =  ${prefix}/share/${PACKAGE}/${VERSION}/DM
 
+BOOST_DIR=@BOOST_DIR@
+PYTHON_INCLUDES=@PYTHON_INCLUDES@
+
 DMS = MassActionProcess.cpp\
 CatalyzedMassActionFluxProcess.cpp\
 MichaelisUniUniProcess.cpp\
@@ -26,7 +29,9 @@ FixedODE1Stepper.cpp\
 FixedRungeKutta4Stepper.cpp\
 ODE23Stepper.cpp\
 CashKarp45Stepper.cpp\
-ODE45Stepper.cpp
+ODE45Stepper.cpp\
+PythonFluxProcess.cpp\
+PythonProcess.cpp
 
 DMH = CashKarp45Stepper.hpp\
 FixedODE1Stepper.hpp\
@@ -47,7 +52,7 @@ dmsodir = ${DM_SO_DIR}
 dmso_DATA = ${SOS}
 
 %.so : %.cpp
-	${SHELL} ${ECELL3_DMC} -v --dmcompile=${top_srcdir}/../dmtool --no-stdinclude --no-stdlibdir --ldflags=-L${top_srcdir}/libecs --cxxflags='-I${top_srcdir}/libecs -I${top_srcdir}/.. -I${top_srcdir}' $< 
+	${SHELL} ${ECELL3_DMC} -v --dmcompile=${top_srcdir}/../dmtool --no-stdinclude --no-stdlibdir --ldflags=-L${top_srcdir}/libecs --cxxflags='-I${top_srcdir}/libecs -I${top_srcdir}/.. -I${top_srcdir} ${PYTHON_INCLUDES} -I${BOOST_DIR}' $< 
 
 clean-local:
 	${RM} -rf ${dmso_DATA}

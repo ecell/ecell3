@@ -34,6 +34,9 @@
 #include "libemc/Simulator.hpp"
 #include "libecs/Exceptions.hpp"
 
+#include "libecs/FluxProcess.hpp"
+#include "libecs/VariableReference.hpp"
+
 #include "PyEcs.hpp"
 
 using namespace libemc;
@@ -105,6 +108,19 @@ BOOST_PYTHON_MODULE( _ecs )
   signal( SIGFPE,  PyEcsSignalHandler );
   signal( SIGINT,  PyEcsSignalHandler );
 
+  to_python_converter< Polymorph, Polymorph_to_python >();
+  to_python_converter< DataPointVectorRCPtr, 
+    DataPointVectorRCPtr_to_python >();
+
+  register_Polymorph_from_python();
+  register_EventCheckerRCPtr_from_python();
+  register_EventHandlerRCPtr_from_python();
+
+  register_exception_translator<Exception>     ( &translateException );
+  register_exception_translator<std::exception>( &translateException );
+
+
+  // ecs module
 
   def( "getLibECSVersionInfo", &getLibECSVersionInfo );
   def( "getLibECSVersion",     &libecs::getVersion );
@@ -112,6 +128,76 @@ BOOST_PYTHON_MODULE( _ecs )
   def( "setDMSearchPath", &libemc::setDMSearchPath );
   def( "getDMSearchPath", &libemc::getDMSearchPath );
 
+  class_<VariableReference>( "VariableReference", no_init )
+
+    // properties
+    .add_property( "Coefficient",
+		   &VariableReference::getCoefficient )   // read-only
+    .add_property( "Concentration", 
+		   &VariableReference::getConcentration ) // read-only
+    .add_property( "Fixed",
+    		   &VariableReference::getVelocity )      // read-only
+    .add_property( "IsAccessor",
+    		   &VariableReference::isAccessor )       // read-only
+    .add_property( "TotalVelocity",
+		   &VariableReference::getTotalVelocity )
+    .add_property( "Value", 
+		   &VariableReference::getValue, 
+		   &VariableReference::setValue )
+    .add_property( "Velocity",
+		   &VariableReference::getVelocity )
+
+    // methods
+    .def( "addFlux",     &VariableReference::addFlux )
+    .def( "addValue",    &VariableReference::addValue )
+    .def( "addVelocity", &VariableReference::addVelocity )
+    .def( "getSuperSystem",  // this should be a property, but not supported
+	  &VariableReference::getSuperSystem,
+	  python::return_value_policy<python::reference_existing_object>() )
+    ;
+
+  class_<FluxProcess, bases<>, FluxProcess, boost::noncopyable>
+    ( "Process", no_init )
+
+    // properties
+    .add_property( "Activity",
+		   &Process::getActivity,
+		   &Process::setActivity )
+    .add_property( "Priority",
+		   &Process::getPriority )
+    .add_property( "StepperID",
+		   &Process::getStepperID )
+
+    // methods
+    .def( "addValue",    &Process::addValue )
+    .def( "getSuperSystem",   // this should be a property, but not supported
+	  &Process::getSuperSystem,
+	  python::return_value_policy<python::reference_existing_object>() )
+    .def( "setFlux",     &FluxProcess::setFlux )
+    ;
+
+
+  class_<System, bases<>, System, boost::noncopyable>
+    ( "System", no_init )
+
+    // properties
+    .add_property( "Volume",
+		   &System::getVolume,
+		   &System::setVolume )
+    .add_property( "StepperID",
+		   &System::getStepperID )
+    // methods
+    .def( "getSuperSystem",   // this should be a property, but not supported
+	  &System::getSuperSystem,
+	  python::return_value_policy<python::reference_existing_object>() )
+    ;
+
+
+
+
+
+
+  // emc module
 
   // PySimulator class
   class_<Simulator>( "Simulator" )
@@ -183,19 +269,6 @@ BOOST_PYTHON_MODULE( _ecs )
     
     ;  
 
-
-
-
-  to_python_converter< Polymorph, Polymorph_to_python >();
-  to_python_converter< DataPointVectorRCPtr, 
-    DataPointVectorRCPtr_to_python >();
-
-  register_Polymorph_from_python();
-  register_EventCheckerRCPtr_from_python();
-  register_EventHandlerRCPtr_from_python();
-
-  register_exception_translator<Exception>     ( &translateException );
-  register_exception_translator<std::exception>( &translateException );
 
 }
 

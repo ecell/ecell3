@@ -59,6 +59,49 @@ namespace libemc
   const std::string getDMInfo();
 
 
+
+  DECLARE_RCPTR( EventChecker );
+  DECLARE_RCPTR( EventHandler );
+
+  class EventHandler
+    :
+    public std::unary_function<void,void> 
+  {
+  public:
+    EventHandler() {}
+    virtual ~EventHandler() {}
+
+    virtual void operator()( void ) const = 0;
+  };
+
+  class EventChecker
+    :
+    public std::unary_function<bool,void>
+  {
+  public:
+    EventChecker() {}
+    virtual ~EventChecker() {}
+
+    virtual bool operator()( void ) const = 0;
+  };
+
+  class DefaultEventChecker
+    :
+    public EventChecker
+  {
+  public:
+    DefaultEventChecker() {}
+    //    virtual ~DefaultEventChecker() {}
+
+    virtual bool operator()( void ) const
+    {
+      return false;
+    }
+  };
+
+
+
+
   /** @} */ //end of libemc_module 
 
 } // namespace libemc

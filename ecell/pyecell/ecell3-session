@@ -5,7 +5,7 @@ import string
 import getopt
 import os
 
-import ecell.ecs
+import ecell.emc
 import ecell.Session
 
 #FIXME: commandline processing needed
@@ -149,7 +149,7 @@ def main():
                 aParameters[aKeyString] = anEvaluatedArg[aKeyString]
                 
             
-    aSimulator = ecell.ecs.Simulator()
+    aSimulator = ecell.emc.Simulator()
     aSession = ecell.Session( aSimulator )
 
     if anEmlFile:

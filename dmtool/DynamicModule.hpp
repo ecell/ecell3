@@ -174,14 +174,6 @@ addClass( new DynamicModule< BASE, DERIVED >( #DERIVED ) )
 #define NewDynamicModuleWithAllocator( BASE, DERIVED, ALLOC )\
 addClass( new DynamicModule< BASE, DERIVED, ALLOC >( #DERIVED ) )
 
-/// an allocator function template
-
-template< class Base, class Derived >
-Base* CreateObject()
-{
-  return new Derived;
-}
-
 
 //////////////////////////// begin implementation
 

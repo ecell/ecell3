@@ -57,7 +57,6 @@ import traceback
 #
 #import pyecell module
 #
-import ecell.ecs
 import ecell.Session
 from ecell.ecssupport import *
 from ecell.ECS import *
@@ -131,7 +130,7 @@ class MainWindow(OsogoWindow):
 		# -------------------------------------
 		# creates Session
 		# -------------------------------------
-		self.theSession = ecell.Session( ecell.ecs.Simulator() )
+		self.theSession = ecell.Session()
 		self.theSession.theMainWindow = self
 		self.theSession.setMessageMethod( self.theMessageWindow.printMessage )
 
