@@ -76,11 +76,10 @@ class Session:
 
         self.__loadStepper( anEml )
 
-        # load root system properties
-        aPropertyList = anEml.getEntityPropertyList( 'System::/' )
-        self.__loadEntityPropertyList( anEml, 'System::/', aPropertyList )
-
         self.__loadEntity( anEml )
+
+        self.__loadProperty( anEml )
+
 
         self.theModelName = aModelName
 
@@ -296,7 +295,44 @@ class Session:
             self.__loadEntity( anEml, aSubSystemPath )
 
 
-    def __loadEntityList( self, anEml, anEntityTypeString, aSystemPath, anIDList ):
+    def __loadProperty( self, anEml, aSystemPath='' ):
+        # the default of aSystemPath is empty because
+        # unlike __loadEntity() this starts with the root system
+
+        aVariableList  = anEml.getEntityList( 'Variable',  aSystemPath )
+        aProcessList   = anEml.getEntityList( 'Process',   aSystemPath )
+        aSubSystemList = anEml.getEntityList( 'System',    aSystemPath )
+
+        print aSubSystemList
+
+        self.__loadPropertyList( anEml, 'Variable',\
+                                 aSystemPath, aVariableList )
+        self.__loadPropertyList( anEml, 'Process',  aSystemPath, aProcessList )
+        self.__loadPropertyList( anEml, 'System',\
+                                 aSystemPath, aSubSystemList )
+
+        for aSystem in aSubSystemList:
+            aSubSystemPath = joinSystemPath( aSystemPath, aSystem )
+            self.__loadProperty( anEml, aSubSystemPath )
+
+    def __loadPropertyList( self, anEml, anEntityTypeString,\
+                            aSystemPath, anIDList ):
+
+        for anID in anIDList:
+
+            aFullID = anEntityTypeString + ':' + aSystemPath + ':' + anID
+
+            aPropertyList = anEml.getEntityPropertyList( aFullID )
+
+            for aProperty in aPropertyList:
+                aFullPN = aFullID + ':' + aProperty
+                aValue = anEml.getEntityProperty( aFullPN )
+                self.theSimulator.setEntityProperty( aFullPN, aValue )
+
+        
+
+    def __loadEntityList( self, anEml, anEntityTypeString,\
+                          aSystemPath, anIDList ):
         
         for anID in anIDList:
 
@@ -304,17 +340,7 @@ class Session:
             aClassName = anEml.getEntityClass( aFullID )
             self.theSimulator.createEntity( str( aClassName ), aFullID )
 
-            aPropertyList = anEml.getEntityPropertyList( aFullID )
 
-            self.__loadEntityPropertyList( anEml, aFullID, aPropertyList )
-
-
-    def __loadEntityPropertyList( self, anEml, aFullID, aPropertyList ):
-
-        for aProperty in aPropertyList:
-            aFullPN = aFullID + ':' + aProperty
-            aValue = anEml.getEntityProperty( aFullPN )
-            self.theSimulator.setEntityProperty( aFullPN, aValue )
 
     def __createScriptContext( self, parameters ):
 

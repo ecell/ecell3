@@ -419,8 +419,7 @@ class Eml:
                 if aSystemNode.nodeName == 'system' and \
                      aSystemNode.getAttribute( 'id' ) == '/':
                     return [ '/', ]
-                else:
-                    return []
+            return []
 
 
         aSystemList = []
