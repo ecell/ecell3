@@ -22,11 +22,11 @@ emc.py\
 Session.py\
 ecssupport.py\
 FullID.py\
-Plugin.py\
-PluginWindow.py\
 RecordingSimulator.py\
-util.py\
 Window.py\
+PluginWindow.py\
+Plugin.py\
+util.py\
 eml.py\
 em.py\
 spark.py\
@@ -35,7 +35,10 @@ emparser.py\
 lex.py\
 yacc.py\
 emlextab.py\
-emparsetab.py
+emparsetab.py\
+GtkSessionMonitor.py\
+gui_config.py
+
 
 INCLUDES=-I. -I.. ${PYTHON_INCLUDES}
 

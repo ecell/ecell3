@@ -42,7 +42,6 @@ class Session:
 
         self.theModelName = ''
 
-
     #
     # Session methods
     #
@@ -118,7 +117,7 @@ class Session:
         anEml = eml.Eml()
 
         # creates root entity
-        anEml.createEntity( 'CompartmentSystem', 'System::/' )
+        anEml.createEntity('CompartmentSystem', 'System::/')
         
         # calls save methods
         self.__saveEntity( anEml )
@@ -364,6 +363,9 @@ class Session:
 
 	# end of saveData
 
+    def plainMessageMethod( self, aMessage ):
+	self.__plainMessageMethod( aMessage )
+
     #
     # private methods
     #
@@ -458,7 +460,6 @@ class Session:
         # 'self.' isn't needed for each method calls in the script
         aKeyList = list ( self.__dict__.keys() +\
                           self.__class__.__dict__.keys() )
-
         aDict = {}
         for aKey in aKeyList:
             aDict[ aKey ] = getattr( self, aKey )

@@ -95,6 +95,9 @@ class PluginWindow( Window ):
 
 		self.thePluginManager.removeInstance( self )
 	
+	def close( self ):
+		""" closes pluginwindow """
+		self.exit( None )	
 
 #	def getParent( self ):
 #		if self.theRoot == None:
