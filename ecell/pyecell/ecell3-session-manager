@@ -9,6 +9,7 @@ import ecell.emc
 import ecell.Session
 import ecell.SessionManager
 
+DEFAULT_ENVIRONMENT = 'Local'
 
 def usage():
     aProgramName = os.path.basename( sys.argv[0] )
@@ -17,13 +18,15 @@ def usage():
 
 Usage:
 
-       %s [-e] [-e emlfile]          : Load script (.esm) file 
+       %s [-e] [-e esmfile]          : Load script (.esm) file 
        %s                            : Invoke ecell3-session-manager intract mode
        %s [-h]                       : Print this message
        
 Options:
 
        -e or --exec=[.esm file]           :  load script (.esm) file
+       -c or --concurrency=[int]          :  Set concurrency
+       -E or --environment=[environment]  :  Set environment
        
        
        -DNAME=VALUE                       :  Set session parameter
@@ -57,9 +60,11 @@ def main():
 	# -------------------------------------
 	anEsmFile = None
 	aParameters = {}
+	aConcurrency = None
+	anEnvironment = DEFAULT_ENVIRONMENT 
 
 	# -------------------------------------
-	# when ecell3-session [ essfile ] check file exist
+	# when ecell3-session [ esmfile ] check file exist
 	# and set anESSfile 
 	# -------------------------------------
 
@@ -74,8 +79,8 @@ def main():
 	# gets options
 	# -------------------------------------
 	try:
-		opts , args = getopt.getopt( sys.argv[1:] , 'he:f:D:',
-		              ["parameters=","help", "exec=", "file="])
+		opts , args = getopt.getopt( sys.argv[1:] , 'he:f:D:c:E:',
+		              ["parameters=","help", "exec=", "file=","concurrency=","environment="])
 	except:
 		usage()
 		sys.exit(1)
@@ -89,25 +94,24 @@ def main():
 		# ------------------------------
 		# prints help message
 		# ------------------------------
-		if anOption in ( "-h", '--help' ):
+		if anOption in ( '-h', '--help' ):
 			usage()
 			sys.exit(0)
             
 		# ------------------------------
-		# executes script file (.ess)
+		# executes script file (.esm)
 		# ------------------------------
-		if anOption in ( "-e", '--exec'):
+		if anOption in ( '-e', '--exec'):
 			if not anArg:
-				print "Warning: not specify ess file"
+				print "Error: not specify esm file"
 				usage()
-				sys.exit(0)
+				sys.exit(2)
 			anEsmFile = anArg
-            
 
 		# ------------------------------
 		# set session-manager parameters            
 		# ------------------------------
-		if anOption == "-D":
+		if anOption == '-D':
 			aSplitArgList = string.split(anArg,'=')
 
 			if not aSplitArgList[1]:
@@ -122,7 +126,7 @@ def main():
 		# ------------------------------
 		# set session-manager parameters            
 		# ------------------------------
-		if anOption == "--parameters":
+		if anOption == '--parameters':
 			try:
 				anEvaluatedArg = eval(anArg)
 
@@ -133,21 +137,63 @@ def main():
 					print aLine 
 				print 'Error : %s is not evaluate.' %anArg
 				print '%s is not python dictionary and do not use space in variable.' %anArg
-				sys.exit(0)
+				sys.exit(2)
 
 			# check anEvaluatedArg type
 			if not type(anEvaluatedArg) == dict:
 				print 'Error : %s is not python dictionary.' %aParameters
-				sys.exit(0)
+				sys.exit(2)
 
 			# add parameters to aParameters 
 			for aKeyString in anEvaluatedArg.keys():
 				aParameters[aKeyString] = anEvaluatedArg[aKeyString]
-                
+
+
+		# ------------------------------
+		# set concurrency
+		# ------------------------------
+		if anOption in ( '-c', '--concurrency' ):
+
+			# ----------------------------
+			# check the existance of value
+			# ----------------------------
+			if not anArg:
+				print "Error: not specify concurrency"
+				usage()
+				sys.exit(2)
+
+			# ----------------------------
+			# convert str to int
+			# ----------------------------
+			try:
+				aConcurrency = string.atoi(anArg)
+			except ValueError:
+				print "Error: invalid parameter --concurrency=int"
+				usage()
+				sys.exit(2)
+
+
+		# ------------------------------
+		# set environment
+		# ------------------------------
+		if anOption in ( '-E', '--environment', ):
+
+			# ----------------------------
+			# check the existance of value
+			# ----------------------------
+			if not anArg:
+				print "Error: not specify environment"
+				usage()
+				sys.exit(2)
+
+			anEnvironment = anArg
+
     
 	aModulePath= ecell.__path__
 
-	aSessionManager = ecell.SessionManager.SessionManager( aModulePath )
+	aSessionManager = ecell.SessionManager.SessionManager( aModulePath, \
+	                                                       aConcurrency, \
+	                                                       anEnvironment )
 
 	if anEsmFile:
 		aSessionManager.loadScript( anEsmFile, aParameters  )
