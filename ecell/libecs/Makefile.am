@@ -1,5 +1,9 @@
 libdir=@libdir@
 
+if OS_WIN32
+  no_undefined = -no-undefined
+endif
+
 SUBDIRS =
 
 GSL_LIBADD = -lgsl -lgslcblas
@@ -15,7 +19,7 @@ lib_LTLIBRARIES = libecs.la
 
 CXXFLAGS= @CXXFLAGS@ # -D_REENTRANT
 
-libecs_la_LDFLAGS= -version-info 2:0:0 #-rpath ${libdir}
+libecs_la_LDFLAGS= -version-info 2:0:0 $(no_undefined) #-rpath ${libdir}
 libecs_la_LIBADD=  -lstdc++ ${LIBLTDL} ${GSL_LIBADD}
 libecs_la_SOURCES=\
 Util.cpp\
@@ -99,7 +103,7 @@ DynamicPriorityQueue.hpp\
 FluxProcess.hpp
 
 
-all-local: libecs.so
+all-local: libecs@LTDL_SHLIB_EXT@
 
-libecs.so: libecs.la
-	ln -sf .libs/libecs.so ./libecs.so
+libecs@LTDL_SHLIB_EXT@: libecs.la
+	ln -sf .libs/libecs@LTDL_SHLIB_EXT@ ./libecs@LTDL_SHLIB_EXT@

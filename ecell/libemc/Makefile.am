@@ -1,5 +1,9 @@
 libdir=@libdir@
 
+if OS_WIN32
+  no_undefined = -no-undefined
+endif
+
 ECELLDIR=..
 
 DMTOOL_INCLUDE=-I@DMTOOL_INCLUDE_DIR@
@@ -14,7 +18,7 @@ lib_LTLIBRARIES = libemc.la
 
 CXXFLAGS= @CXXFLAGS@ #-D_REENTRANT
 
-libemc_la_LDFLAGS= -version-info 2:0:0
+libemc_la_LDFLAGS= -version-info 2:0:0 $(no_undefined)
 
 libemc_la_LIBADD=$(LIBECS) -lstdc++ 
 libemc_la_DEPENDENCIES=$(LIBECS)

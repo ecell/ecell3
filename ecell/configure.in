@@ -54,6 +54,33 @@ AC_SUBST(LIBLTDL)
 AC_LIBTOOL_DLOPEN
 AC_PROG_LIBTOOL
 
+
+rm -f conftest
+./libtool --config > conftest
+. ./conftest
+rm -f conftest
+dnl
+AC_CACHE_CHECK([which extension is used for shared libraries],
+  libltdl_cv_shlibext, [dnl
+(
+  last=
+  for spec in $library_names_spec; do
+    last="$spec"
+  done
+changequote(, )
+  echo "$last" | sed 's/\[.*\]//;s/^[^.]*//;s/\$.*$//;s/\.$//' > conftest
+changequote([, ])
+)
+libltdl_cv_shlibext=`cat conftest`
+rm -f conftest
+])
+if test -n "$libltdl_cv_shlibext"; then
+  LTDL_SHLIB_EXT=$libltdl_cv_shlibext
+  AC_SUBST(LTDL_SHLIB_EXT)
+fi
+
+
+
 AM_PATH_PYTHON(2.2)
 AC_SUBST(PYTHON)
 
@@ -73,6 +100,7 @@ dnl
 dnl disable checking dlopen for windows
 case ${host_os} in
   *cygwin* | *mingw* | *win32*)
+    os_win32=yes
     ;;
   *)
     AC_CHECK_LIB(dl, dlopen, LIBDL="-ldl")
@@ -80,8 +108,10 @@ case ${host_os} in
       AC_MSG_ERROR([The libdl could not be found.])
     fi
     AC_SUBST(LIBDL) 
+    os_win32=no
     ;;
 esac
+AM_CONDITIONAL(OS_WIN32, test "$os_win32" = "yes")
 
 AC_CHECK_LIB(gslcblas,main)
 AC_CHECK_LIB(gsl,main)
