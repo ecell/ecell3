@@ -94,6 +94,8 @@ namespace libecs
     // clear
     clear();
 
+    const Real aCurrentTime( getCurrentTime() );
+
     // ========= 1 ===========
     process();
 
@@ -116,6 +118,7 @@ namespace libecs
       }
 
     // ========= 2 ===========
+    setCurrentTime( aCurrentTime + getStepInterval()*0.5 );
     process();
 
     for( UnsignedInt c( 0 ); c < aSize; ++c )
@@ -135,6 +138,7 @@ namespace libecs
       }
 
     // ========= 3 ===========
+    //    setCurrentTime( aCurrentTime + getStepInterval()*0.5 );
     process();
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
@@ -152,6 +156,7 @@ namespace libecs
       }
 
     // ========= 4 ===========
+    setCurrentTime( aCurrentTime + getStepInterval() );
     process();
 
     // restore theValueBuffer
@@ -170,8 +175,10 @@ namespace libecs
 	theVelocityBuffer[ c ] *= ( 1.0 / 6.0 );
 	aVariable->setVelocity( theVelocityBuffer[ c ] );
       }
-  }
 
+    // reset the stepper current time
+    setCurrentTime( aCurrentTime );
+  }
 
   ////////////////////////// Fehlberg21Stepper
 
@@ -236,6 +243,8 @@ namespace libecs
     const Real a_y( getStateToleranceFactor() );
     const Real a_dydt( getDerivativeToleranceFactor() );
 
+    const Real aCurrentTime( getCurrentTime() );
+
     // ========= 1 ===========
     process();
 
@@ -256,6 +265,7 @@ namespace libecs
       }
 
     // ========= 2 ===========
+    setCurrentTime( aCurrentTime + getCurrentTime()*0.5 );
     process();
 
     Real maxError( 0.0 );
@@ -289,6 +299,10 @@ namespace libecs
 	    if( maxError > 1.1 )
 	      {
 		//		setMaxErrorRatio( maxError );
+
+		// reset the stepper current time
+		setCurrentTime( aCurrentTime );
+
 		reset();
 		return false;
 	      }
@@ -302,6 +316,10 @@ namespace libecs
       }
 
     setMaxErrorRatio( maxError );
+
+    // reset the stepper current time
+    setCurrentTime( aCurrentTime );
+
     return true;
   }
 
@@ -345,45 +363,35 @@ namespace libecs
 	//		  << std::endl;
       }
 
-    /**
-       this does not work
+    const Real theAbsoluteEpsilon( 0.1 );
+    const Real theRelativeEpsilon( 0.1 );
 
     const Real anAdaptedStepInterval( getStepInterval() );
-    Real aValue( 0.0 );
-    Real aVelocity( 0.0 );
-
     const UnsignedInt aSize( getReadOnlyVariableOffset() );
+
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
 	VariablePtr const aVariable( theVariableVector[ c ] );
 
-	aValue = fabs( aVariable->getValue() );
-	aVelocity = theVelocityBuffer[ c ];
+	Real const aTolerance( ( fabs( aVariable->getValue() ) 
+				 + theAbsoluteEpsilon ) * theRelativeEpsilon );
+	Real const aVelocity( fabs( theVelocityBuffer[ c ] ) );
 
-	if ( aVelocity > 0 )
+	if ( aTolerance < aVelocity * getStepInterval() )
 	  {
-	    aValue += 0.1 ;
-	  }
-	else
-	  {
-	    aValue += std::numeric_limits<Real>::min() * 100.0;
-	    aVelocity = aVelocity * ( -1.0 );
-	  }
-
-	if ( aVelocity * getStepInterval() > aValue * 0.1  )
-	  {
-	    setStepInterval( aValue / ( 10.0 * aVelocity ) );
+	    setStepInterval( aTolerance / aVelocity );
 	  }
       }
 
     if ( anAdaptedStepInterval > getStepInterval() )
       {
+	reset();		
+
 	if ( !calculate() )
 	  {
 	    // do nothing
 	  }
       }
-    */
 
     const Real maxError( getMaxErrorRatio() );
 
@@ -413,6 +421,8 @@ namespace libecs
     const Real a_y( getStateToleranceFactor() );
     const Real a_dydt( getDerivativeToleranceFactor() );
 
+    const Real aCurrentTime( getCurrentTime() );
+
     // ========= 1 ===========
     process();
 
@@ -433,6 +443,7 @@ namespace libecs
       }
 
     // ========= 2 ===========
+    setCurrentTime( aCurrentTime + getCurrentTime() );
     process();
 
     for( UnsignedInt c( 0 ); c < aSize; ++c )
@@ -457,6 +468,7 @@ namespace libecs
       }
 	
     // ========= 3 ===========
+    setCurrentTime( aCurrentTime + getCurrentTime()*0.5 );
     process();
 	
     Real maxError( 0.0 );
@@ -483,7 +495,7 @@ namespace libecs
 
 	const Real anError( fabs( ( theVelocityBuffer[ c ] 
 				    - anErrorEstimate ) / aTolerance ) );
-	    
+
 	if( anError > maxError )
 	  {
 	    maxError = anError;
@@ -491,6 +503,10 @@ namespace libecs
 	    if( maxError > 1.1 )
 	      {
 		//		setMaxErrorRatio( maxError );
+
+		// reset the stepper current time
+		setCurrentTime( aCurrentTime );
+
 		reset();		
 		return false;
 	      }
@@ -504,6 +520,10 @@ namespace libecs
       }
     
     setMaxErrorRatio( maxError );
+
+    // reset the stepper current time
+    setCurrentTime( aCurrentTime );
+
     return true;
   }
 
@@ -573,6 +593,8 @@ namespace libecs
     const Real a_y( getStateToleranceFactor() );
     const Real a_dydt( getDerivativeToleranceFactor() );
 
+    const Real aCurrentTime( getCurrentTime() );
+
     // ========= 1 ===========
     process();
 
@@ -597,6 +619,7 @@ namespace libecs
       }
 
     // ========= 2 ===========
+    setCurrentTime( aCurrentTime + getCurrentTime()*0.2 );
     process();
 
     for( UnsignedInt c( 0 ); c < aSize; ++c )
@@ -621,6 +644,7 @@ namespace libecs
       }
 	
     // ========= 3 ===========
+    setCurrentTime( aCurrentTime + getCurrentTime()*0.3 );
     process();
 	
     for( UnsignedInt c( 0 ); c < aSize; ++c )
@@ -646,6 +670,7 @@ namespace libecs
       }
     
     // ========= 4 ===========
+    setCurrentTime( aCurrentTime + getCurrentTime()*0.6 );
     process();
     
     for( UnsignedInt c( 0 ); c < aSize; ++c )
@@ -672,6 +697,7 @@ namespace libecs
       }
 		
     // ========= 5 ===========
+    setCurrentTime( aCurrentTime + getCurrentTime() );
     process();
 	
     for( UnsignedInt c( 0 ); c < aSize; ++c )
@@ -703,6 +729,7 @@ namespace libecs
       }
 
     // ========= 6 ===========
+    setCurrentTime( aCurrentTime + getCurrentTime() * ( 7.0 / 8.0 ) );
     process();
 	
     Real maxError( 0.0 );
@@ -736,6 +763,10 @@ namespace libecs
 	    if( maxError > 1.1 )
 	      {
 		//		setMaxErrorRatio( maxError );
+
+		// reset the stepper current time
+		setCurrentTime( aCurrentTime );
+
 		reset();
 		return false;
 	      }
@@ -749,6 +780,10 @@ namespace libecs
       }
 
     setMaxErrorRatio( maxError );
+
+    // reset the stepper current time
+    setCurrentTime( aCurrentTime );
+
     return true;
   }
 
@@ -829,6 +864,8 @@ namespace libecs
     const Real a_y( getStateToleranceFactor() );
     const Real a_dydt( getDerivativeToleranceFactor() );
 
+    const Real aCurrentTime( getCurrentTime() );
+
     // ========= 1 ===========
     process();
 
@@ -854,6 +891,7 @@ namespace libecs
       }
 
     // ========= 2 ===========
+    setCurrentTime( aCurrentTime + getCurrentTime() * 0.2 );
     process();
 
     for( UnsignedInt c( 0 ); c < aSize; ++c )
@@ -881,6 +919,7 @@ namespace libecs
 
 
     // ========= 3 ===========
+    setCurrentTime( aCurrentTime + getCurrentTime() * 0.3 );
     process();
 
     for( UnsignedInt c( 0 ); c < aSize; ++c )
@@ -909,6 +948,7 @@ namespace libecs
 
 
     // ========= 4 ===========
+    setCurrentTime( aCurrentTime + getCurrentTime() * 0.8 );
     process();
 
     for( UnsignedInt c( 0 ); c < aSize; ++c )
@@ -937,6 +977,7 @@ namespace libecs
       }
 
     // ========= 5 ===========
+    setCurrentTime( aCurrentTime + getCurrentTime() * ( 8.0 / 9.0 ) );
     process();
 
     for( UnsignedInt c( 0 ); c < aSize; ++c )
@@ -966,6 +1007,7 @@ namespace libecs
       }
 
     // ========= 6 ===========
+    setCurrentTime( aCurrentTime + getCurrentTime() );
     process();
 
     for( UnsignedInt c( 0 ); c < aSize; ++c )
@@ -996,6 +1038,7 @@ namespace libecs
       }
 
     // ========= 7 ===========
+    setCurrentTime( aCurrentTime + getCurrentTime() );
     process();
 
     Real maxError( 0.0 );
@@ -1028,6 +1071,10 @@ namespace libecs
 	    if( maxError > 1.1 )
 	      {
 		//		setMaxErrorRatio( maxError );
+
+		// reset the stepper current time
+		setCurrentTime( aCurrentTime );
+
 		reset();
 		return false;
 	      }
@@ -1041,6 +1088,10 @@ namespace libecs
       }
 
     setMaxErrorRatio( maxError );
+
+    // reset the stepper current time
+    setCurrentTime( aCurrentTime );
+
     return true;
   }
 
