@@ -14,7 +14,7 @@
 
 <widget>
   <class>GtkWindow</class>
-  <name>window</name>
+  <name>PropertyWindow</name>
   <width>520</width>
   <height>410</height>
   <title>PropertyWindow</title>
