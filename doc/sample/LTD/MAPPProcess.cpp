@@ -8,7 +8,6 @@
 #include "Variable.hpp"
 #include "VariableProxy.hpp"
 
-#include "FluxProcess.hpp"
 #include "ecell3_dm.hpp"
 
 #define ECELL3_DM_TYPE Process
@@ -17,7 +16,7 @@ USE_LIBECS;
 
 ECELL3_DM_CLASS
   :  
-  public FluxProcess
+  public Process
 {
   
   ECELL3_DM_OBJECT;
@@ -34,7 +33,7 @@ ECELL3_DM_CLASS
   
   virtual void initialize()
     {
-      FluxProcess::initialize();
+      Process::initialize();
       S0 = getVariableReference( "S0" );
       S1 = getVariableReference( "S1" );
       P0 = getVariableReference( "P0" );
