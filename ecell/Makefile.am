@@ -1,4 +1,4 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-SUBDIRS = util libecs
+SUBDIRS = util libecs emc

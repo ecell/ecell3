@@ -146,8 +146,9 @@ AM_CONFIG_HEADER(config.h)
 
 AC_OUTPUT(
 Makefile 
-libecs/Makefile 
 util/Makefile
+libecs/Makefile 
+emc/Makefile
 )
 
 
