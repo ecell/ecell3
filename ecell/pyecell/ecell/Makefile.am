@@ -41,7 +41,15 @@ yacc.py\
 emlextab.py\
 emparsetab.py\
 GtkSessionMonitor.py\
-gui_config.py
+gui_config.py\
+SessionManager.py\
+SessionProxy.py\
+SystemProxy.py\
+LocalSessionProxy.py\
+LocalSystemProxy.py\
+SGESessionProxy.py\
+SGESystemProxy.py\
+Util.py
 
 
 INCLUDES=-I. -I.. ${PYTHON_INCLUDES}
