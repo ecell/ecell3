@@ -36,15 +36,17 @@ const Real TauLeapStepper::getTau( )
 {
   const Real anA0( getTotalPropensity() );      
   
-  for( TauLeapProcessVector::size_type i( 0 ); i < theTauLeapProcessVector.size(); ++i )
+  TauLeapProcessVector::size_type aTauLeapProcessVectorSize( theTauLeapProcessVector.size() );
+  for( TauLeapProcessVector::size_type i( 0 ); i < aTauLeapProcessVectorSize; ++i )
     {
-      for( TauLeapProcessVector::size_type j( 0 ); j < theTauLeapProcessVector.size(); ++j )
+      for( TauLeapProcessVector::size_type j( 0 ); j < aTauLeapProcessVectorSize; ++j )
 	{
 	  Real aFF( 0 );
 	  VariableReferenceVector aVariableReferenceVector( theTauLeapProcessVector[j]->getVariableReferenceVector() );
 	  
+	  VariableReferenceVector::size_type aVariableReferenceVectorSize( aVariableReferenceVector.size() );
 	  for( VariableReferenceVector::size_type k( 0 ); 
-	       k < aVariableReferenceVector.size(); ++k )
+	       k < aVariableReferenceVectorSize; ++k )
 	    {
 	      VariableReferenceRef aVariableReferenceRef( aVariableReferenceVector[k] );
 	      aFF += theTauLeapProcessVector[i]->getPD( aVariableReferenceRef.getVariable() ) * aVariableReferenceRef.getCoefficient();
@@ -56,7 +58,8 @@ const Real TauLeapStepper::getTau( )
       Real aMean( 0 );
       Real aVariance( 0 );
       
-      for( RealVector::size_type j( 0 ); j < theFFVector.size(); ++j )
+      RealVector::size_type aFFVectorSize( theFFVector.size() );
+      for( RealVector::size_type j( 0 ); j < aFFVectorSize; ++j )
 	{
 	  aMean += theFFVector[j] * theTauLeapProcessVector[j]->getPropensity();
 	  aVariance += pow( theFFVector[j], 2 ) * theTauLeapProcessVector[j]->getPropensity();

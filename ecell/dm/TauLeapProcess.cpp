@@ -62,16 +62,13 @@ void TauLeapProcess::calculateOrder()
   
   if( getOrder() == 0 )   // no substrate
     {
-      theGetPropensityMethodPtr       = &TauLeapProcess::getZero;
-      theGetPDMethodPtr       = &TauLeapProcess::getZero;
+      theGetPropensityMethodPtr = &TauLeapProcess::getZero;
+      theGetPDMethodPtr = &TauLeapProcess::getZero;
     }
   else if( getOrder() == 1 )   // one substrate, first order.
     {
-      theGetPropensityMethodPtr = 
-	&TauLeapProcess::getPropensity_FirstOrder;
-      theGetPDMethodPtr = 
-	&TauLeapProcess::getPD_FirstOrder;
-      
+      theGetPropensityMethodPtr = &TauLeapProcess::getPropensity_FirstOrder;
+      theGetPDMethodPtr = &TauLeapProcess::getPD_FirstOrder;
     }
   else if( getOrder() == 2 )
     {
@@ -93,7 +90,7 @@ void TauLeapProcess::calculateOrder()
   else
     {
       //FIXME: generic functions should come here.
-      theGetPropensityMethodPtr       = &TauLeapProcess::getZero;
-      theGetPDMethodPtr           = &TauLeapProcess::getZero;
+      theGetPropensityMethodPtr = &TauLeapProcess::getZero;
+      theGetPDMethodPtr = &TauLeapProcess::getZero;
     }
 }

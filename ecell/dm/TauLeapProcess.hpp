@@ -94,8 +94,7 @@ LIBECS_DM_CLASS( TauLeapProcess, ContinuousProcess )
   virtual void initialize()
     {
       ContinuousProcess::initialize();
-      // declareUnidirectional();
-      
+
       calculateOrder();
       
       if( ! ( getOrder() == 1 || getOrder() == 2 ) )
@@ -170,7 +169,6 @@ LIBECS_DM_CLASS( TauLeapProcess, ContinuousProcess )
       if( aMultiplicity > 0.0 )
 	{
 	  return ( k * aMultiplicity ) / ( getSuperSystem()->getSizeVariable()->getValue() * N_A );
-	    
 	}
       else
 	{
@@ -180,7 +178,6 @@ LIBECS_DM_CLASS( TauLeapProcess, ContinuousProcess )
 
   const Real getPD_SecondOrder_TwoSubstrates( VariablePtr value ) const
     {
-
       if( theVariableReferenceVector[0].getVariable() == value )
 	{
 	  return ( k * theVariableReferenceVector[1].getValue() ) / ( getSuperSystem()->getSizeVariable()->getValue() * N_A );

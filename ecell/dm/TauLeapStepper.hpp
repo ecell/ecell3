@@ -86,8 +86,8 @@ public:
       theMeanVector.clear();
       theVarianceVector.clear();
       theFFVector.resize( theProcessVector.size() );
-      theMeanVector.resize(theProcessVector.size() );
-      theVarianceVector.resize(theProcessVector.size() );
+      theMeanVector.resize( theProcessVector.size() );
+      theVarianceVector.resize( theProcessVector.size() );
 
     }
 
@@ -113,8 +113,9 @@ public:
   const Real getTotalPropensity( )
     {
       Real anA0( 0.0 );
+      TauLeapProcessVector::size_type aTauLeapProcessVectorSize( theTauLeapProcessVector.size() );
       for( TauLeapProcessVector::size_type i( 0 );
-	   i < theTauLeapProcessVector.size(); ++i )
+	   i < aTauLeapProcessVectorSize; ++i )
 	{
 	  anA0 += theTauLeapProcessVector[ i ]->getPropensity();
 	}
