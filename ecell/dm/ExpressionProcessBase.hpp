@@ -73,7 +73,10 @@ namespace libecs
 
     typedef const Real 
       (libecs::VariableReference::* VariableReferenceMethodPtr)() const;
-    typedef SystemPtr (libecs::Process::* System_Func)() const;
+    typedef SystemPtr 
+      (libecs::Process::* Process_System_Func)() const;
+    typedef SystemPtr 
+      (libecs::VariableReference::* VariableReference_System_Func)() const;
     typedef const Real (libecs::System::* System_Attribute)() const;
 
 
@@ -96,13 +99,13 @@ namespace libecs
 	:
 	theValue( aValue )
       { 
-	; // do nothing
+	// ; do nothing
       }
       virtual ~PUSH() {}
     
       virtual void initialize()
       {
-	; //do nothing
+	// ; do nothing
       }
 
       virtual void execute( StackMachine& aStackMachine );
@@ -121,7 +124,7 @@ namespace libecs
     
       virtual void initialize()
       {
-	; //do nothing
+	// ; do nothing
       }
 
       virtual void execute( StackMachine& aStackMachine );    
@@ -137,7 +140,7 @@ namespace libecs
     
       virtual void initialize()
       {
-	; //do nothing
+	// ; do nothing
       }
 
       virtual void execute( StackMachine& aStackMachine );    
@@ -153,7 +156,7 @@ namespace libecs
     
       virtual void initialize()
       {
-	//do nothing
+	// ; do nothing
       }
 
       virtual void execute( StackMachine& aStackMachine );    
@@ -169,7 +172,7 @@ namespace libecs
     
       virtual void initialize()
       {
-	; //do nothing
+	// ; do nothing
       }
 
       virtual void execute( StackMachine& aStackMachine );    
@@ -185,7 +188,7 @@ namespace libecs
     
       virtual void initialize()
       {
-	; //do nothing
+	// ; do nothing
       }
 
       virtual void execute( StackMachine& aStackMachine );
@@ -201,7 +204,7 @@ namespace libecs
     
       virtual void initialize()
       {
-	; //do nothing
+	// ; do nothing
       }
 
       virtual void execute( StackMachine& aStackMachine );    
@@ -217,14 +220,14 @@ namespace libecs
 	:
 	theFuncPtr( aFuncPtr )
       {
-	; // do nothing
+	// ; do nothing
       }
 
       virtual ~CALL_FUNC1() {}
     
       virtual void initialize()
       {
-	; //do nothing
+	// ; do nothing
       }
 
       virtual void execute( StackMachine& aStackMachine );
@@ -243,14 +246,14 @@ namespace libecs
 	:
 	theFuncPtr( aFuncPtr )
       {
-	; // do nothing
+        // ; do nothing
       }
 
       virtual ~CALL_FUNC2() {}
     
       virtual void initialize()
       {
-	; //do nothing
+	// ; do nothing
       }
 
       virtual void execute( StackMachine& aStackMachine );
@@ -297,13 +300,13 @@ namespace libecs
 	theVariableReference( tmpVariableReference ),
 	theFuncPtr( aFuncPtr )
       {
-	; // do nothing
+	// ; do nothing
       }
       virtual ~VARREF_FUNC() {}
     
       virtual void initialize()
       {
-	; //do nothing
+	// ; do nothing
       }
 
       virtual void execute( StackMachine& aStackMachine );
@@ -315,34 +318,66 @@ namespace libecs
     
 
 
-    class SYSTEM_FUNC
+    class PROCESS_SYSTEM_FUNC
       :
   public Instruction
     {
     public:
-      SYSTEM_FUNC() {}
-      SYSTEM_FUNC( ProcessPtr aProcessPtr,
-		   System_Func aFuncPtr,
+      PROCESS_SYSTEM_FUNC() {}
+      PROCESS_SYSTEM_FUNC( ProcessPtr aProcessPtr,
+		   Process_System_Func aFuncPtr,
 		   System_Attribute aAttributePtr )
 	:
 	theProcessPtr( aProcessPtr ), 
 	theFuncPtr( aFuncPtr ),
 	theAttributePtr( aAttributePtr )
       {
-	; // do nothing
+	// ; do nothing
       }
-      virtual ~SYSTEM_FUNC() {}
+      virtual ~PROCESS_SYSTEM_FUNC() {}
     
       virtual void initialize()
       {
-	; //do nothing
+	// ; do nothing
       }
 
       virtual void execute( StackMachine& aStackMachine );
     
     private:
       ProcessPtr theProcessPtr;
-      System_Func theFuncPtr;
+      Process_System_Func theFuncPtr;
+      System_Attribute theAttributePtr;
+    };
+
+
+    class VARIABLE_SYSTEM_FUNC
+      :
+  public Instruction
+    {
+    public:
+      VARIABLE_SYSTEM_FUNC() {}
+      VARIABLE_SYSTEM_FUNC( VariableReference aVariableReference,
+			    VariableReference_System_Func aFuncPtr,
+			    System_Attribute aAttributePtr )
+	:
+	theVariableReference( aVariableReference ), 
+	theFuncPtr( aFuncPtr ),
+	theAttributePtr( aAttributePtr )
+      {
+	// ; do nothing
+      }
+      virtual ~VARIABLE_SYSTEM_FUNC() {}
+    
+      virtual void initialize()
+      {
+	// ; do nothing
+      }
+
+      virtual void execute( StackMachine& aStackMachine );
+    
+    private:
+      VariableReference theVariableReference;
+      VariableReference_System_Func theFuncPtr;
       System_Attribute theAttributePtr;
     };
 
@@ -354,7 +389,7 @@ namespace libecs
     public: 
       Code()
       {
-	; // do nothing;
+	// ; do nothing;
       }
       
       ~Code() {}
@@ -394,7 +429,7 @@ namespace libecs
     
       StackMachine()
       {
-	; // do nothing
+	// ; do nothing
       }
     
       ~StackMachine() {}
@@ -508,7 +543,7 @@ namespace libecs
 	else
 	  {
 	    THROW_EXCEPTION( UnexpectedError, 
-			     "Parse error in the expression." );
+			     "Parse error in the expression. Expression : " + anExpression );
 	  }
 	
 	return aCode;
@@ -564,21 +599,19 @@ namespace libecs
 	  integer     =   leafNode( +digit_p );
 	  floating    =   leafNode( +digit_p >> ch_p('.') >> +digit_p );
 
-	  exponent    =   ( integer | floating ) >>
+	  exponent    =   ( floating | integer ) >>
 	    rootNode( ch_p('e') | ch_p('E') ) >>
-	    ( factor | 
-	      discard_first_node_d[ ch_p('+') >> factor ] );
+	    ( ch_p('-') >> integer | 
+	      discard_node_d[ ch_p('+') ] >> integer |
+	      integer );
 
 	  negative    =	  rootNode( ch_p('-') ) >> factor; 
 
 	  identifier  =   leafNode( alpha_p >> *( alnum_p | ch_p('_') ) );
 
-	  variable    =   identifier >>
-	    rootNode( ch_p('.') ) >>
-	    identifier;
+	  variable    =   identifier >> rootNode( ch_p('.') ) >> identifier;
 	
- 	  system_func = identifier >>
-	    rootNode( ch_p('.') ) >>
+ 	  system_func = identifier >> rootNode( ch_p('.') ) >>
 	    +( leafNode( +( alpha_p | ch_p('_') ) ) >>
 	       discard_node_d[ ch_p('(') ] >>
 	       discard_node_d[ ch_p(')') ] >>
@@ -636,16 +669,13 @@ namespace libecs
 
 	  group       =   inner_node_d[ ch_p('(') >> expression >> ch_p(')')];
 	
-	  constant    = 
-	    exponent |
-	    floating |
-	    integer;
+	  constant    =   exponent | floating | integer;
 
 	  factor      =   call_func
 	    |   system_func
 	    |   variable 
-	    |   group
 	    |   constant
+	    |   group
 	    |   identifier
 	    |   negative;
 	
@@ -661,7 +691,7 @@ namespace libecs
 	}
       
 	rule<ScannerT, parser_context, parser_tag<VARIABLE> >     variable;
-	rule<ScannerT, parser_context, parser_tag<CALL_FUNC1> >    call_func;
+	rule<ScannerT, parser_context, parser_tag<CALL_FUNC1> >   call_func;
 	rule<ScannerT, parser_context, parser_tag<EXPRESSION> >   expression;
 	rule<ScannerT, parser_context, parser_tag<TERM> >         term;
 	rule<ScannerT, parser_context, parser_tag<FACTOR> >       factor;
@@ -697,12 +727,12 @@ namespace libecs
 
     ExpressionProcessBase()
       {
-	;// do nothing
+	// ; do nothing
       }
 
     virtual ~ExpressionProcessBase()
       {
-	;  // do nothing
+	// ; do nothing
       }
 
     SET_METHOD( String, Expression )
@@ -908,13 +938,30 @@ namespace libecs
 	  {
 	    str_child2 += *container_iterator;
 	  }
-	
+
 	n1 = stringTo<Real>( str_child1.c_str() );
-	n2 = stringTo<Real>( str_child2.c_str() );
-	
+
 	++theStackSize;
-	theCode.push_back( new PUSH( n1 * pow(10, n2) ) );
 	
+	if( str_child2 != "-")
+	  {
+	    n2 = stringTo<Real>( str_child2.c_str() );
+	
+	    theCode.push_back( new PUSH( n1 * pow(10, n2) ) );
+	  }
+	else
+	  {
+	    for( container_iterator = ( i->children.begin()+2 )->value.begin();
+		 container_iterator != ( i->children.begin()+2 )->value.end();
+		 ++container_iterator )
+	      {
+		str_child3 += *container_iterator;
+	      }
+
+	    n2 = stringTo<Real>( str_child3.c_str() );
+	    theCode.push_back( new PUSH( n1 * pow(10, -n2) ) );
+	  }
+
 	return; 
 	
     
@@ -1029,7 +1076,6 @@ namespace libecs
 	    str_child2 += *container_iterator;
 	  }
 	
-	assert( str_child1 == "self" );
 	assert( *i->value.begin() == '.' );
 	
 	if( str_child2 == "getSuperSystem" )
@@ -1043,17 +1089,49 @@ namespace libecs
 
 	    if( str_child3 == "Size" )
 	      {
-		theCode.push_back
-		  ( new SYSTEM_FUNC( theProcessPtr,
-				     &libecs::Process::getSuperSystem,
-				     &libecs::System::getSize ) );
+		if( str_child1 == "self" )
+		  {
+		    theCode.push_back
+		      ( new PROCESS_SYSTEM_FUNC
+			( theProcessPtr,
+			  &libecs::Process::getSuperSystem,
+			  &libecs::System::getSize ) );
+		  }
+		else
+		  {
+		    aVariableReference = 
+		      theProcessPtr->libecs::Process::
+		      getVariableReference( str_child1 );
+		    
+		    theCode.push_back
+		      ( new VARIABLE_SYSTEM_FUNC
+			( aVariableReference,
+			  &libecs::VariableReference::getSuperSystem,
+			  &libecs::System::getSize ) );
+		  }
 	      }
 	    else if( str_child3 == "SizeN_A" )
 	      {
-		theCode.push_back
-		  ( new SYSTEM_FUNC( theProcessPtr,
-				     &libecs::Process::getSuperSystem,
-				     &libecs::System::getSizeN_A ) );
+		if( str_child1 == "self" )
+		  {
+		    theCode.push_back
+		      ( new PROCESS_SYSTEM_FUNC
+			( theProcessPtr,
+			  &libecs::Process::getSuperSystem,
+			  &libecs::System::getSizeN_A ) );
+		  }
+		else
+		  {
+		    aVariableReference = 
+		      theProcessPtr->libecs::Process::
+		      getVariableReference( str_child1 );
+		    
+		    theCode.push_back
+		      ( new VARIABLE_SYSTEM_FUNC
+			( aVariableReference,
+			  &libecs::VariableReference::getSuperSystem,
+			  &libecs::System::getSizeN_A ) );
+		  }
 	      }
 	    else
 	      {
@@ -1493,13 +1571,23 @@ namespace libecs
   }
 
   void
-  ExpressionProcessBase::SYSTEM_FUNC::
+  ExpressionProcessBase::PROCESS_SYSTEM_FUNC::
   execute( StackMachine& aStackMachine )
   {
     aStackMachine.getStackPtr()++;
     
     *aStackMachine.getStackPtr()
       = ( ( theProcessPtr->*theFuncPtr )()->*theAttributePtr)();
+  }
+
+  void
+  ExpressionProcessBase::VARIABLE_SYSTEM_FUNC::
+  execute( StackMachine& aStackMachine )
+  {
+    aStackMachine.getStackPtr()++;
+    
+    *aStackMachine.getStackPtr()
+      = ( ( theVariableReference.*theFuncPtr )()->*theAttributePtr)();
   }
   
   LIBECS_DM_INIT_STATIC( ExpressionProcessBase, ExpressionFluxProcess );
