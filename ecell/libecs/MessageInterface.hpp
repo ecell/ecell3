@@ -43,6 +43,7 @@
   @see Message
   @see MessageCallback
 */
+
 class MessageInterface
 {
 public:  
@@ -58,7 +59,8 @@ public:
 
   void set( MessageCref ) throw( NoSlot );
   const Message get( StringCref ) throw( NoSlot );
-  StringList slotList();
+
+  //  StringList slotListString();
 
   virtual void makeSlots() = 0;
 

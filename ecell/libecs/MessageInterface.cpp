@@ -127,7 +127,8 @@ const Message MessageInterface::get( StringCref keyword ) throw( NoSlot )
     }
 }
 
-StringList MessageInterface::slotList()
+#if 0 
+StringList MessageInterface::slotListString()
 {
   StringList sl;
 
@@ -138,6 +139,7 @@ StringList MessageInterface::slotList()
 
   return sl;
 }
+#endif
 
 /*
   Do not modify
