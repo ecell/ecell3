@@ -239,7 +239,7 @@ namespace libecs
        @return activity of this Entity per second
     */
 
-    virtual const Real getActivityPerSecond() const;
+    const Real getActivityPerSecond() const;
 
     //@}
 

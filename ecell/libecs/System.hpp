@@ -221,9 +221,6 @@ namespace libecs
       return ( getSuperSystem() == this );
     }
 
-
-    const Real getActivityPerSecond() const;
-
     virtual const SystemPath getSystemPath() const;
 
     void notifyChangeOfEntityList();

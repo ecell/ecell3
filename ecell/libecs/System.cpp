@@ -244,12 +244,6 @@ namespace libecs
     return i->second;
   }
 
-
-  const Real System::getActivityPerSecond() const
-  {
-    return getActivity() * getStepper()->getStepsPerSecond();
-  }
-
   void System::notifyChangeOfEntityList()
   {
     //    getStepper()->getMasterStepper()->setEntityListChanged();
