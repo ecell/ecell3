@@ -34,11 +34,13 @@
 #include "libemc/EmcLogger.hpp"
 #include "CXX/Extensions.hxx"
 
-using namespace libemc;
-
 using Py::Object;
 using Py::Tuple;
 using Py::PythonExtension;
+
+using libemc::EmcLogger;
+
+
 
 class PyLogger
   :

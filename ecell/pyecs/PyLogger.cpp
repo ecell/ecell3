@@ -31,6 +31,9 @@
 
 #include "PyLogger.hpp"
 
+using libecs::Real;
+
+
 void PyLogger::init_type()
 {
   behaviors().name("Logger");
@@ -45,22 +48,32 @@ Object PyLogger::getData( const Py::Tuple& args )
   libecs::Logger::DataPointVectorCptr aDataPointVector( NULLPTR );
   switch( args.length() )
     {
+
     case 0:
       aDataPointVector = &EmcLogger::getData();
       break;
+
     case 2:
-      aDataPointVector = &EmcLogger::getData( double( static_cast<Py::Float>(args[0]) ),
-					      double( static_cast<Py::Float>(args[1]) )
-					      );
+      aDataPointVector 
+	= &EmcLogger::getData( Real( static_cast<Py::Float>( args[0] ) ),
+			       Real( static_cast<Py::Float>( args[1] ) )
+			       );
       break;
+
     case 3:
-      aDataPointVector = &EmcLogger::getData( double( static_cast<Py::Float>(args[0]) ),
-					      double( static_cast<Py::Float>(args[1]) ),
-					      double( static_cast<Py::Float>(args[2]) )
-					      );
+      aDataPointVector 
+	= &EmcLogger::getData( Real( static_cast<Py::Float>( args[0] ) ),
+			       Real( static_cast<Py::Float>( args[1] ) ),
+			       Real( static_cast<Py::Float>( args[2] ) )
+			       );
       break;
+
+    default:
+      throw Py::IndexError ( "Unexpected number of arguments." );
     }
 
+
+  // FIXME: should return Numeric::array
   Py::Tuple* aPyTupleReturned = new Py::Tuple( aDataPointVector->size() );
   for(int i = 0; i < aDataPointVector->size(); i++ )
     {
