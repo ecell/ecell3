@@ -222,53 +222,6 @@ class OsogoPluginWindow(PluginWindow):
 
 
 	# ---------------------------------------------------------------
-	# theAttributeMap
-	#   - return an attribute map
-	#
-	# return -> attribute map 
-	# This method is throwable exception.
-	# ---------------------------------------------------------------
-	def theAttributeMap( self ):
-
-		aMap = {}
-		for aFullPN in self.theRawFullPNList:
-			aFullID = convertFullPNToFullID( aFullPN )
-			aPropertyName = aFullPN[PROPERTY]
-			aPropertyListFullPN = convertFullIDToFullPN( aFullID, 'PropertyList' )
-			aPropertyList = self.theSession.theSimulator.getProperty( createFullPNString( aPropertyListFullPN ) )
-			aAttributeListFullPN = convertFullIDToFullPN( aFullID, 'PropertyAttributes')
-			aAttributeList = self.theSession.theSimulator.getProperty( createFullPNString( aAttributeListFullPN ) )
-			num = 0
-			for aProperty in aPropertyList:
-				aPropertyFullPN = convertFullIDToFullPN( aFullID, aProperty )
-				aMap[ aPropertyFullPN ] = aAttributeList[ num ]
-				num += 1
-		return aMap
-
-	# end of theAttributeMap
-
-        
-	# ---------------------------------------------------------------
-	# getAttribute
-	#   - return an attribute 
-	#     If there is no attribute on my attribute map, then return 99
-	#
-	# aFullPN : FullPN
-	# return -> attribute map 
-	# This method is throwable exception.
-	# ---------------------------------------------------------------
-	def getAttribute( self, aFullPN ):
-
-		aMap = self.theAttributeMap()
-		if aMap.has_key( aFullPN ):
-			return aMap[ aFullPN ]
-		else:
-			return 99
-
-	# end of getAttribute
-
-
-	# ---------------------------------------------------------------
 	# getValue from the session.simulator
 	#   - return a value
 	#
@@ -295,24 +248,29 @@ class OsogoPluginWindow(PluginWindow):
 	# return -> None
 	# This method is throwable exception.
 	# ---------------------------------------------------------------
-	#def setValue( self, aFfullPN, aValue ):
 	def setValue( self, aFullPN, aValue ):
 
-		if self.getAttribute( aFullPN ) == 3:
+		aFullID = convertFullPNToFullID( aFullPN )
+		aFullPNwithProperty = convertFullIDToFullPN( aFullID, 'PropertyList' )
+		aFullPNwithPropertyString = createFullPNString( aFullPNwithProperty )
+		aPropertyList = self.theSession.theSimulator.getProperty( aFullPNwithPropertyString )
 
-			aValueList = aValue
+		for aProperty in aPropertyList:
+			# if proprety matches and settable flag is true
+			if aProperty[0] == aFullPN[-1] :
+				if aProperty[1] == TRUE:
+					self.theSession.theSimulator.setProperty( createFullPNString( aFullPN ), aValue )
+					self.thePluginManager.updateAllPluginWindow()
+					self.thePluginManager.updateBasicWindows()
+					return None
+				else:
+					aFullPNString = createFullPNString( aFullPN )
+					self.theSession.printMessage('%s is not settable\n' % aFullPNString )
+					return None
 
-			if type(aValue) != type((0,)):
-				aValueList  = (aValueList,)
+		aFullPNString = createFullPNString( aFullPN )
+		self.theSession.printMessage('proprety of %s is wrong\n' %aFullPNString )
 
-			aValueList = (aValue,)
-
-			# the 2nd argument of theSimulator.setPropety must be tuple
-			self.theSession.theSimulator.setProperty( createFullPNString( aFullPN ), aValueList )
-			self.thePluginManager.updateAllPluginWindow()
-		else:
-			aFullPNString = createFullPNString( aFullPN )
-			self.theSession.printMessage('%s is not settable\n' % aFullPNString )
 
 	# end of setValue
 

@@ -43,22 +43,35 @@ class PropertyWindow(OsogoPluginWindow):
 			else:
 				self.addPopupMenu(0,1,1)
        
+	# ---------------------------------------------------------------
+	# setFullPNList
+	#  - this method is called from EntryList Window, when users select 
+	#    some entries.
+	#  - display all properties of selected entity.
+	#
+	# return -> None
+	# This method is throwable exception.
+	# ---------------------------------------------------------------
 	def setFullPNList( self ):
 
 		self.theSelected = ''
         
 		aNameFullPN = convertFullIDToFullPN( self.theFullID() ,'Name' )
+
 		aNameList = list( self.theSession.theSimulator.getProperty( createFullPNString( aNameFullPN ) ) )
         
+
 		aClassName = aNameList[0]
 		self.theType =ENTITYTYPE_STRING_LIST[ self.theFullID()[TYPE] ]
 		self.theID   = str( self.theFullID()[ID] )
 		self.thePath = str( self.theFullID()[SYSTEMPATH] )
 		aClassNameFullPN = convertFullIDToFullPN( self.theFullID(),
 		                                          'ClassName' )
-		aList = self.theSession.theSimulator.getProperty( createFullPNString( aClassNameFullPN ) )
 
-		self.theTypeEntry.set_text( self.theType  )
+		aClassName = self.theSession.theSimulator.getProperty( createFullPNString( aClassNameFullPN ) )
+
+
+		self.theTypeEntry.set_text( self.theType + ' : ' + aClassName )
 		self.theIDEntry.set_text  ( self.theID )
 		self.thePathEntry.set_text( self.thePath )
 		self.theClassNameEntry.set_text( aClassName )
@@ -81,12 +94,14 @@ class PropertyWindow(OsogoPluginWindow):
 				self.thePropertyClist.append( aValue )
 
 
+	
 	def updatePropertyList( self ):
 
 		self.theList = []
 
 		aPropertyListFullPN = convertFullIDToFullPN( self.theFullID(),
 		                                             'PropertyList' )
+
 		self.prevFullID = convertFullPNToFullID( aPropertyListFullPN )        
 		aPropertyList = self.theSession.theSimulator.getProperty( createFullPNString( aPropertyListFullPN ) )
 
@@ -106,7 +121,11 @@ class PropertyWindow(OsogoPluginWindow):
 				continue
 
 			if (aProperty == 'ClassName'):
-				pass
+
+				aFullPN = convertFullIDToFullPN( self.theFullID(), aProperty )
+				aValueList = self.theSession.theSimulator.getProperty( createFullPNString( aFullPN ) )
+
+
 			elif (aProperty == 'PropertyList'):
 				pass
 			elif (aProperty == 'PropertyAttributes'):
@@ -120,41 +139,31 @@ class PropertyWindow(OsogoPluginWindow):
 			else :
                 
 				aFullPN = convertFullIDToFullPN( self.theFullID(), aProperty )
-				aAttribute = self.getAttribute( aFullPN )
-
-				#aAttributeData = self.decodeAttribute( aAttribute )
-				#get = aAttributeData[0]
-				#set = aAttributeData[1]
 
 				set = self.decodeAttribute( aSet )
 				get = self.decodeAttribute( aGet )
                 
-				if aAttribute != 1: # for (3)
+				aFullPNString =  createFullPNString( aFullPN ) 
 
-					#aValueList = self.theSession.theSimulator.getProperty( createFullPNString( aFullPN ) )
-					aFullPNString =  createFullPNString( aFullPN ) 
+				aValueList = self.theSession.theSimulator.getProperty( createFullPNString( aFullPN ) )
 
-					aValueList = self.theSession.theSimulator.getProperty( createFullPNString( aFullPN ) )
+				aDisplayedFlag = 0
+				if type(aValueList) == type(()):
+					if len(aValueList)  > 1 :
+						aNumber = 1
+						for aValue in aValueList :
+							if type(aValue) == type(()):
+								aValue = aValue[0]
+							aList = [ aProperty, aNumber, aValue , get, set ]
+							aList = map( str, aList )
+							self.theList.append( aList ) 
+							aNumber += 1
+						aDisplayedFlag = 1
 
-					aDisplayedFlag = 0
-					if type(aValueList) == type(()):
-						if len(aValueList)  > 1 :
-							aNumber = 1
-							for aValue in aValueList :
-								if type(aValue) == type(()):
-									aValue = aValue[0]
-								aList = [ aProperty, aNumber, aValue , get, set ]
-								aList = map( str, aList )
-								self.theList.append( aList ) 
-								aNumber += 1
-							aDisplayedFlag = 1
-
-					if aDisplayedFlag == 0:
-						aList = [ aProperty, '', aValueList , get, set]
-						aList = map( str, aList )
-						self.theList.append( aList )
-
-				# end of if (3)
+				if aDisplayedFlag == 0:
+					aList = [ aProperty, '', aValueList , get, set]
+					aList = map( str, aList )
+					self.theList.append( aList )
 
 			# end of if (2)
 
@@ -242,8 +251,6 @@ if __name__ == "__main__":
         mainLoop()
 
     main()
-
-
 
 
 
