@@ -79,10 +79,6 @@ namespace libecs
 						       itr_2,
 						       anEndTime ) );
     DataPointVector aNewDataPointVector;
-    if(aStartIterator == anEndIterator)
-      {
-	cerr << "come" << endl;
-      }
     while( aStartIterator != anEndIterator )
       {
 	cerr << UVariable((*aStartIterator)->getTime()).asString() << endl;

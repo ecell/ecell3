@@ -35,7 +35,8 @@
 #include <iostream>
 #include <map>
 #include <string>
-#include <ltdl.h>
+//#include <ltdl.h>
+#include <dlfcn.h>
 #include "DynamicModule.hpp"
 
 
@@ -261,21 +262,25 @@ SharedModuleMaker<T,DMAllocator>::SharedModuleMaker()
   :
   theSearchPathString( "." )
 {
-  int result = lt_dlinit();
-  if( result != 0 )
+  /*
+    int result = lt_dlinit();
+    if( result != 0 )
     {
-      cerr << "warning: lt_dlinit() failed." << endl;
+    cerr << "warning: lt_dlinit() failed." << endl;
     }
+  */
 }
 
 template<class T,class DMAllocator>
 SharedModuleMaker<T,DMAllocator>::~SharedModuleMaker()
 {
-  int result = lt_dlexit();
-  if( result != 0 )
+  /*
+    int result = lt_dlexit();
+    if( result != 0 )
     {
-      cerr << "warning: lt_dlexit() failed." << endl;
+    cerr << "warning: lt_dlexit() failed." << endl;
     }
+  */
 }
 
 template<class T,class DMAllocator>

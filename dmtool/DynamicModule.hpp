@@ -36,7 +36,8 @@
 #include <exception>
 
 #include <string>
-#include <ltdl.h>
+//#include <ltdl.h>
+#include <dlfcn.h>
 
 
 /// doc needed
@@ -156,7 +157,7 @@ public:
 
 private:
 
-  lt_dlhandle theHandle;
+  void *theHandle;
 
 };
 
@@ -214,7 +215,7 @@ SharedDynamicModule( const std::string& classname,
   theHandle( NULL )
 {
   std::string filename( directory + '/' + classname );
-  theHandle = lt_dlopenext( filename.c_str() );
+  theHandle = dlopen( filename.c_str(), RTLD_NOW );
 
   if( theHandle == NULL ) 
     {
@@ -223,19 +224,19 @@ SharedDynamicModule( const std::string& classname,
       //       .so if there is *not* .la (as of libtool-1.4.2)....
       //       May be this can be eliminated and simplified in the future...
       filename += ".so";
-      theHandle = lt_dlopen( filename.c_str() );
+      theHandle = dlopen( filename.c_str(), RTLD_NOW );
 
       if( theHandle == NULL ) 
 	{
-	  throw DMException( lt_dlerror() );
+	  throw DMException( dlerror() );
 	}
     }
 
-  theAllocator = *((DMAllocator*)( lt_dlsym( theHandle, "CreateObject" ) ));
+  theAllocator = *((DMAllocator*)( dlsym( theHandle, "CreateObject" ) ));
 
   if( theAllocator == NULL )
     {
-      throw DMException( lt_dlerror() );  
+      throw DMException( dlerror() );  
     }
 }
 
@@ -244,18 +245,18 @@ SharedDynamicModule<Base,DMAllocator>::~SharedDynamicModule()
 {
   if( theHandle != NULL )
     {
-      lt_dlclose( theHandle );
+      dlclose( theHandle );
     }
 }
 
 template < class Base, class DMAllocator >
 const std::string& SharedDynamicModule<Base,DMAllocator>::getFileName() const
 {
-  lt_dlinfo* aDlInfo = lt_dlgetinfo( theHandle );
+  dlinfo* aDlInfo = dlgetinfo( theHandle );
 
   if( aDlInfo == NULL )
     {
-      throw DMException( "lt_dlgetinfo failed" );
+      throw DMException( "dlgetinfo failed" );
     }
 
   return string( aDlInfo->filename );

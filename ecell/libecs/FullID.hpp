@@ -47,7 +47,7 @@ namespace libecs
 
   public:
 
-    SystemPath( StringCref systempathstring = "" )
+    explicit SystemPath( StringCref systempathstring = "" )
     {
       parse( systempathstring );
     }
@@ -121,7 +121,18 @@ namespace libecs
       ; // do nothing
     }
 
-    explicit FullID( StringCref fullidstring )
+    explicit FullID( const PrimitiveType type,
+		     StringCref systempathstring,
+		     StringCref id )
+      :
+      thePrimitiveType( type ),
+      theSystemPath( systempathstring ),
+      theID( id )
+    {
+      ; // do nothing
+    }
+
+    FullID( StringCref fullidstring )
     {
       parse( fullidstring );
     }

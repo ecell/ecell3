@@ -49,12 +49,13 @@ namespace libecs
 
     String aString( systempathstring );
     eraseWhiteSpaces( aString );
-
+    
     String::size_type aFieldStart( 0 );
     
-     // absolute path ( start with '/' )
+    // absolute path ( start with '/' )
     if( aString[0] == DELIMITER )
        {
+	 //insert(end(), String( 1, DELIMITER ) );
 	 push_back( String( 1, DELIMITER ) );
 
 	 if( aString.size() == 1 )
@@ -67,6 +68,8 @@ namespace libecs
 
     String::size_type aFieldEnd( aString.find_first_of( DELIMITER, 
 							aFieldStart ) );
+    //    insert(end(), aString.substr( aFieldStart, 
+    //			       aFieldEnd - aFieldStart ) );
     push_back( aString.substr( aFieldStart, 
 			       aFieldEnd - aFieldStart ) );
 
@@ -74,9 +77,9 @@ namespace libecs
       {
 	aFieldStart = aFieldEnd + 1;
 	aFieldEnd = aString.find_first_of( DELIMITER, aFieldStart );
-
-	push_back( aString.substr( aFieldStart, 
-				   aFieldEnd - aFieldStart ) );
+	
+	insert(end(), aString.substr( aFieldStart, 
+				      aFieldEnd - aFieldStart ) );
       }
 
   }
@@ -141,7 +144,7 @@ namespace libecs
     // ignore leading white spaces
     String::size_type aFieldStart( 0 );
     String::size_type aFieldEnd( aString.find_first_of( DELIMITER,
-							     aFieldStart ) );
+							aFieldStart ) );
     if( aFieldEnd == String::npos )
       {
 	throw BadID( __PRETTY_FUNCTION__,
@@ -149,9 +152,9 @@ namespace libecs
       }
 
     String aTypeString( aString.substr( aFieldStart, 
-					     aFieldEnd - aFieldStart ) );
+					aFieldEnd - aFieldStart ) );
     thePrimitiveType = PrimitiveType( aTypeString );
-
+    
     aFieldStart = aFieldEnd + 1;
     aFieldEnd = aString.find_first_of( DELIMITER, aFieldStart );
     if( aFieldEnd == String::npos )
@@ -163,8 +166,8 @@ namespace libecs
 
     theSystemPath = 
       SystemPath( aString.substr( aFieldStart, 
-				       aFieldEnd - aFieldStart ) );
-
+				  aFieldEnd - aFieldStart ) );
+    
     aFieldStart = aFieldEnd + 1;
 
     // drop trailing string after extra ':'(if this is  FullPN),
