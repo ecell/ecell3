@@ -47,6 +47,7 @@ StepperList.py\
 StepperWindow.py\
 SystemObject.py\
 SystemTree.py\
+TextObject.py\
 Utils.py\
 VariableObject.py\
 VariableReferenceEditor.py\

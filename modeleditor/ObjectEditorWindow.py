@@ -49,6 +49,7 @@ from VariableReferenceEditorComponent import *
 from Constants import *
 from LayoutManager import *
 from Layout import *
+from EditorObject import *
 
 
 class ObjectEditorWindow :
@@ -61,7 +62,6 @@ class ObjectEditorWindow :
 
 		""" 
 		self.theModelEditor = aModelEditor	
-		self.theObject = anObjectId
 		
 		# Create the Dialog
 		self.win = gtk.Dialog('Object Editor Window', None)
@@ -76,11 +76,9 @@ class ObjectEditorWindow :
 		# Sets title
 		self.win.set_title("ObjectEditor")
 		
-
-		self.theLayout =self.theModelEditor.theLayoutManager.getLayout(aLayoutName)
+		self.getTheObjectProperty(aLayoutName, anObjectId)
 		
-		self.theObject = self.theLayout.getObject(anObjectId)
-
+		
 		if self.theObject.getProperty(OB_HASFULLID):
 			
 		
@@ -98,6 +96,7 @@ class ObjectEditorWindow :
 			aNoteBook.append_page(aShapeFrame,aShapeLabel)
 		
 			self.theComponent.theShapeProperty = ShapePropertyComponent( self.theComponent.theParentWindow, aShapeFrame )
+			self.theComponent.theShapeProperty.setDisplayedShapeProperty(self.theObject,FullId,self.theObjShapeType, self.theObjWidth, self.theObjHeight)
 			self.theComponent.update()
 			
 		
@@ -112,16 +111,25 @@ class ObjectEditorWindow :
 
 
 
-
-
+	# ==========================================================================
+	def getTheObjectProperty(self,aLayoutName, anObjectId):
+		self.theLayout =self.theModelEditor.theLayoutManager.getLayout(aLayoutName)
+		self.theObject = self.theLayout.getObject(anObjectId)
+		self.theObjWidth = self.theObject.theShape.width
+		self.theObjHeight = self.theObject.theShape.height 
+		self.theObjShapeType = self.theObject.getProperty(OB_SHAPE_TYPE)
+		
 		
 	# ==========================================================================
 	def displayObjectEditorWindow(self,aLayoutName, anObjectId):
-		self.theLayout =self.theModelEditor.theLayoutManager.getLayout(aLayoutName)
-		self.theObject = self.theLayout.getObject(anObjectId)
+		self.getTheObjectProperty(aLayoutName, anObjectId)
 		if self.theObject.getProperty(OB_HASFULLID):
 			FullId = self.theObject.getProperty(OB_FULLID)
 		        self.theComponent.setDisplayedEntity(FullId)
+			self.theComponent.theShapeProperty.setDisplayedShapeProperty(self.theObject,FullId,self.theObjShapeType, self.theObjWidth, self.theObjHeight)
+		else:
+			self.theShapeProperty=ShapePropertyComponent( self, self.win.vbox )
+			
 			
 
 

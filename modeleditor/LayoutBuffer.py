@@ -46,7 +46,7 @@ class ObjectListBuffer:
 
 
 	def addObjectBuffer( self, objectBuffer ):
-		self.theObjectList[ objectID ] = objectBuffer
+		self.theObjectList[ objectBuffer.getID() ] = objectBuffer
 
 
 

@@ -82,6 +82,7 @@ def setup_canvas( myobj ):
 	line = rt.add(gnome.canvas.CanvasLine,points=[20,30,80,90], first_arrowhead = gtk.TRUE, last_arrowhead = gtk.TRUE,width_units=2, fill_color="blue", arrow_shape_a=10, arrow_shape_b=10, arrow_shape_c=20, spline_steps = 5 )
 	rect = rt.add(gnome.canvas.CanvasRect, x1=40, y1=40, x2=80, y2=80, outline_color="brown", fill_color = "red")
 	myobj.text = rt.add( gnome.canvas.CanvasText, x=30, y=30, text="anyad!", fill_color="red", scale = 4, scale_set= True )
+	path = rt.add( gnome.canvas.C
 	myobj.pgfd = myobj.text.get_property("font-desc").copy()
 	#rect.move(100,100)0,200)
 

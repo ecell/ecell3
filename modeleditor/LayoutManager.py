@@ -27,10 +27,12 @@ class LayoutManager:
 
 	def deleteLayout( self, aLayoutName ):
 		aLayout = self.theLayoutMap[ aLayoutName ]
-		editorWindow = aLayout.getCanvas().getParentWindow()
+		aCanvas=aLayout.getCanvas()
 		aLayout.detachFromCanvas()
 		del self.theLayoutMap[aLayoutName]
-		editorWindow.close()
+		if aCanvas!=None:
+			editorWindow = aCanvas.getParentWindow()
+			editorWindow.close()
 
 
 	def showLayout( self, aLayoutName ):
@@ -85,10 +87,13 @@ class LayoutManager:
 	def renameLayout( self, oldLayoutName, newLayoutName ):
 		aLayout = self.theLayoutMap[ oldLayoutName ]
 		if self.doesLayoutExist( newLayoutName ):
-			raise Exception("%s layout already exists!"%newLayoutName )
-		aLayout.rename( newLayoutName )
-		self.theLayoutMap[ newLayoutName ] = aLayout
-		self.theLayoutMap.__delitem__( oldLayoutName )
+			#raise Exception("%s layout already exists!"%newLayoutName )
+			return False
+		else:
+			aLayout.rename( newLayoutName )
+			self.theLayoutMap[ newLayoutName ] = aLayout
+			self.theLayoutMap.__delitem__( oldLayoutName )
+			return True
 		
 	
 	def createObjectIterator( self ):

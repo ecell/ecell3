@@ -187,4 +187,7 @@ class LayoutManagerWindow( ListWindow ):
 		newName=args[2]
 		aPath=args[1]
 		anIter=self.theListStore.get_iter_from_string(aPath)
-		self.rename(newName,anIter)
+		if len(newName)>0:
+			self.rename(newName,anIter)
+		else:
+			self.update()

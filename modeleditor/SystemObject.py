@@ -48,6 +48,13 @@ class SystemObject(EditorObject):
 		self.thePropertyMap[ SY_INSIDE_DIMENSION_X  ] = aSystemSD.getInsideWidth()
 		self.thePropertyMap[ SY_INSIDE_DIMENSION_Y  ] = aSystemSD.getInsideHeight()
 
+		self.theSystemShapeList=['Rectangle']
+
+	def destroy( self ):
+		for anObjectID in self.theObjectMap.keys()[:]:
+			self.theLayout.deleteObject( anObjectID )
+		EditorObject.destroy( self )
+
 
 	def registerObject( self, anObject ):
 		self.theObjectMap[anObject.getID()] = anObject
@@ -93,11 +100,24 @@ class SystemObject(EditorObject):
 			objectID = self.theLayout.getUniqueObjectID( OB_TYPE_SYSTEM )
 			aCommand = CreateObject( self.theLayout, objectID, OB_TYPE_SYSTEM, aFullID, x, y, self )
 		elif buttonPressed == PE_PROCESS:
-			print "process button pressed"
+			# create command
+			aName = self.getModelEditor().getUniqueEntityName ( ME_PROCESS_TYPE, aSysPath )
+			aFullID = ':'.join( [ME_PROCESS_TYPE, aSysPath, aName] )
+			objectID = self.theLayout.getUniqueObjectID( OB_TYPE_PROCESS )
+			aCommand = CreateObject( self.theLayout, objectID, OB_TYPE_PROCESS, aFullID, x, y, self )
+			
 		elif buttonPressed == PE_VARIABLE:
-			print "variable button pressed"
+			aName = self.getModelEditor().getUniqueEntityName ( ME_VARIABLE_TYPE, aSysPath )
+			aFullID = ':'.join( [ME_VARIABLE_TYPE, aSysPath, aName] )
+			objectID = self.theLayout.getUniqueObjectID( OB_TYPE_VARIABLE)
+			aCommand = CreateObject( self.theLayout, objectID, OB_TYPE_VARIABLE, aFullID, x, y, self )
 		elif buttonPressed == PE_TEXT:
 			print "text button pressed"
+			aName = self.getModelEditor().getUniqueEntityName (ME_SYSTEM_TYPE, aSysPath )
+			aFullID = ':'.join( [ME_SYSTEM_TYPE, aSysPath, aName])
+			objectID = self.theLayout.getUniqueObjectID( OB_TYPE_TEXT )
+			aCommand = CreateObject( self.theLayout, objectID, OB_TYPE_TEXT, aFullID, x, y, self)
+
 		elif buttonPressed == PE_SELECTOR:
 			self.doSelect()
 		elif buttonPressed == PE_CUSTOM:
@@ -195,3 +215,7 @@ class SystemObject(EditorObject):
 
 			aCommand = ResizeObject( self.theLayout, self.theID, deltaup, deltadown, deltaleft, deltaright )
 			self.theLayout.passCommand( [aCommand] )
+
+
+	def getAvailableSystemShape(self):
+			return self.theSystemShapeList

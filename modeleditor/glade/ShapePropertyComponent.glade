@@ -130,14 +130,6 @@
 		<widget class="GtkList" id="list_combo">
 		  <property name="visible">True</property>
 		  <property name="selection_mode">GTK_SELECTION_BROWSE</property>
-
-		  <child>
-		    <widget class="GtkListItem" id="listitem130">
-		      <property name="visible">True</property>
-		      <property name="can_focus">True</property>
-		      <property name="label" translatable="yes">Select</property>
-		    </widget>
-		  </child>
 		</widget>
 	      </child>
 	    </widget>

@@ -3,6 +3,9 @@ from LayoutManager import *
 from ModelStore import *
 from PackingStrategy import *
 from SystemObject import *
+from ProcessObject import *
+from VariableObject import *
+from TextObject import *
 import gnome.canvas 
 
 
@@ -89,20 +92,30 @@ class Layout:
 			(x,y) = parentSystem.getEmptyPosition()
 
 		if objectType == OB_TYPE_PROCESS:
-			pass
+			
+			if parentSystem == None:
+				parentSystem = self
+			
+			newObject = ProcessObject( self, objectID, aFullID, x, y, parentSystem )
 		elif objectType == OB_TYPE_VARIABLE:
-			pass
+			if parentSystem == None:
+				parentSystem = self
+			newObject = VariableObject( self, objectID, aFullID, x, y, parentSystem )
 		elif objectType == OB_TYPE_SYSTEM:
 			if parentSystem == None:
 				parentSystem = self
 			newObject = SystemObject( self, objectID, aFullID, x, y, parentSystem )
 
 		elif objectType == OB_TYPE_TEXT:
-			pass
+			if parentSystem == None:
+				parentSystem = self
+			newObject = TextObject( self, objectID, aFullID, x, y, parentSystem )
+
 		elif objectType == OB_TYPE_CONNECTION:
 			pass
 		else:
 			raise Exception("Object type %s does not exists"%objectType)
+		
 		self.theObjectMap[ objectID ] = newObject
 		if self.theCanvas!=None:
 			newObject.setCanvas( self.theCanvas )

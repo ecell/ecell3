@@ -30,7 +30,6 @@
 # E-CELL Project, Lab. for Bioinformatics, Keio University.
 #
 import gtk
-
 import ModelEditor
 from ListWindow import *
 import os
@@ -90,6 +89,7 @@ class PathwayEditor( ListWindow ):
 		#get Palette Button Widgets
 		
 		selector = ListWindow.getWidget(self,'selector_button')
+		selector.set_active(gtk.TRUE)
 		variable = ListWindow.getWidget(self,'variable_button')
 		process = ListWindow.getWidget(self,'process_button')
 		system = ListWindow.getWidget(self,'system_button')
@@ -97,12 +97,16 @@ class PathwayEditor( ListWindow ):
 		text = ListWindow.getWidget(self,'text_button')
 
 			
-		self.thePaletteButtonDict={PE_SELECTOR: selector, PE_VARIABLE : variable ,PE_PROCESS: process, PE_SYSTEM : system, PE_CUSTOM : custom, PE_TEXT:text}
-
-		# Sets the return PaletteButton value
-		self.__CurrPaletteButton = PE_SELECTOR
-		self.__OldPaletteButton = None
-
+	
+		
+		self.theButtonDict={ 'selector':PE_SELECTOR,  'variable':PE_VARIABLE  , 'process':PE_PROCESS, 'system':PE_SYSTEM ,  'custom':PE_CUSTOM , 'text':PE_TEXT}
+		self.thePaletteButtonDict={'selector': selector, 'variable' : variable , 'process': process,  'system' : system, 'custom' : custom, 'text':text}
+		self.theButtonKeys=self.thePaletteButtonDict.keys().sort()
+  
+  		# Sets the return PaletteButton value
+		self.__CurrPaletteButton = 'selector'
+		self.__PrevPaletteButton = None
+		self.isFirst=True
 
 
 	def update( self, arg1 = None, arg2 = None):
@@ -112,27 +116,26 @@ class PathwayEditor( ListWindow ):
 
 
 	def deleted( self, *args ):
-		
 		# detach canvas from layout
 		self.thePathwayCanvas.getLayout().detachFromCanvas()
 		self.theModelEditor.thePathwayEditorList.remove(self)
 		ListWindow.deleted( self, args )
+		if self.theModelEditor.theObjectEditorWindow!=None:
+			self.theModelEditor.theObjectEditorWindow.destroy(self)	
 		
 	def getPathwayCanvas( self ):	
 		return self.thePathwayCanvas
 
 	def getPaletteButton(self):
-		return self.__CurrPaletteButton
+		return self.theButtonDict[self.__CurrPaletteButton]
 		 	
-	def unToggled(self):
-		if self.__OldPaletteButton !=None:
-			self.thePaletteButtonDict[self.__OldPaletteButton].set_active(gtk.FALSE)
 
-		keys=self.thePaletteButtonDict.keys()
-		keys.sort()
-		for aKey in keys:
-			if  self.thePaletteButtonDict[aKey].get_active():
-				self.__CurrPaletteButton = aKey
+	def toggle(self,aName,aStat):
+		if aStat:
+			self.thePaletteButtonDict[aName].set_active(gtk.TRUE)
+		else:
+			self.thePaletteButtonDict[aName].set_active(gtk.FALSE)
+		
 		
 	def getLayout( self ):
 		return self.theLayout
@@ -157,13 +160,37 @@ class PathwayEditor( ListWindow ):
 		pass
 
 	def __rename_layout( self, *args ):
-		self.theModelEditor.theLayoutManager.renameLayout(self.theLayout.getName(),self['layout_name_entry'].get_text())
-		self.theModelEditor.updateWindows()
+		if len(self['layout_name_entry'].get_text())>0:
+			if self.theModelEditor.theLayoutManager.renameLayout(self.theLayout.getName(),self['layout_name_entry'].get_text()):
+				self.theModelEditor.updateWindows()
+			else:
+				self['layout_name_entry'].set_text(self.theLayout.getName())
+		else:
+			self['layout_name_entry'].set_text(self.theLayout.getName())
 
 	def __palette_toggled( self, *args ):
-		self.__OldPaletteButton = self.__CurrPaletteButton
-		self.unToggled()
+		aButtonName=args[0].get_name().split('_')[0]
+		if self.isFirst:
+			if aButtonName!=self.__CurrPaletteButton:
+				self.isFirst=False
+				self.toggle(aButtonName,True)	
+				self.toggle(self.__CurrPaletteButton,False)	
+				self.__CurrPaletteButton=aButtonName
+				
+			elif aButtonName==self.__CurrPaletteButton:
+				self.isFirst=False
+				if self.__CurrPaletteButton=='selector':
+					self.toggle(self.__CurrPaletteButton,True)
+				else:	
+					self.toggle(self.__CurrPaletteButton,False)
+					self.toggle('selector',True)	
+					self.__CurrPaletteButton='selector'
+			
+		else:
+			self.isFirst=True
 
+	
+			
 	def __search( self, *args ):
 		pass
 

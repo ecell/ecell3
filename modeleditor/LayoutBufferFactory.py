@@ -143,7 +143,7 @@ class LayoutBufferPaster:
 		aLayout = self.theLayoutManager.getLayout( aLayoutName )
 		for anObjectID in objectList:
 			aBuffer = listBuffer.getObjectBuffer( anObjectID )
-			self.pasteObjectBuffer( aLayout, aBuffer, None, None, aParent, translationList = None)
+			self.pasteObjectBuffer( aLayoutName, aBuffer, None, None, aParent, translationList = None)
 		
 		
 	

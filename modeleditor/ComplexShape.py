@@ -105,12 +105,15 @@ class ComplexShape:
 		X2 = relativeX2 + offsetx 
 		Y1 = relativeY1 + offsety
 		Y2 = relativeY2 + offsety 
+		
 		return ( X1, X2, Y1, Y2 )
-
+	
+	
 	def createRectangle( self, aDescriptor ):
 		( X1, X2, Y1, Y2 ) = self.calculateRectCorners( aDescriptor )
 		aGdkColor = self.getGdkColor( aDescriptor )
-
+		if aDescriptor[SD_NAME] == 'ring1':
+			pass
 		aRect = self.theRoot.add( gnome.canvas.CanvasRect, x1=X1, y1=Y1, x2=X2, y2=Y2, outline_color_gdk = aGdkColor, fill_color_gdk = aGdkColor )
 		self.addHandlers( aRect, aDescriptor[ SD_NAME ] )
 		self.shapeMap[ aDescriptor[ SD_NAME ] ] = aRect
@@ -133,10 +136,25 @@ class ComplexShape:
 
 
 	def createEllipse( self, aDescriptor ):
-		pass
+		( X1, X2, Y1, Y2 ) = self.calculateEllipseCorners( aDescriptor )
+		aGdkColor = self.getGdkColor( aDescriptor )
+
+		anEllipse = self.theRoot.add( gnome.canvas.CanvasEllipse, x1=X1, y1=Y1, x2=X2, y2=Y2, outline_color_gdk = aGdkColor, fill_color_gdk = aGdkColor )
+		self.addHandlers( anEllipse, aDescriptor[ SD_NAME ] )
+		self.shapeMap[ aDescriptor[ SD_NAME ] ] = anEllipse
 
 	def calculateEllipseCorners( self, aDescriptor ):
-		pass
+		rectSpec = aDescriptor[ SD_SPECIFIC ]
+		relativeX1 = rectSpec[ RECT_RELX1 ] * self.width + rectSpec[ RECT_ABSX1 ]
+		relativeY1 = rectSpec[ RECT_RELY1 ] * self.height + rectSpec[ RECT_ABSY1 ]
+		relativeX2 = rectSpec[ RECT_RELX2 ] * self.width + rectSpec[ RECT_ABSX2 ]
+		relativeY2 = rectSpec[ RECT_RELY2 ] * self.height + rectSpec[ RECT_ABSY2 ]
+		(offsetx, offsety ) = self.parentObject.getAbsolutePosition()
+		X1 = relativeX1 + offsetx
+		X2 = relativeX2 + offsetx 
+		Y1 = relativeY1 + offsety
+		Y2 = relativeY2 + offsety
+		return ( X1, X2, Y1, Y2 )
 
 	def resizeEllipse( self, aDescriptor ):
 		( X1, X2, Y1, Y2 ) = self.calculateEllipseCorners( aDescriptor )
@@ -194,7 +212,6 @@ class ComplexShape:
 		textSpec = aDescriptor[SD_SPECIFIC]
 		relativeX1 = textSpec[TEXT_ABSX] + textSpec[TEXT_RELX] * self.width
 		relativeY1 = textSpec[TEXT_ABSY] + textSpec[TEXT_RELY] * self.height
-
 		(offsetx, offsety ) = self.parentObject.getAbsolutePosition()
 		X1 = relativeX1 + offsetx
 		Y1 = relativeY1 + offsety
@@ -311,7 +328,12 @@ class ComplexShape:
 		if self.getShapeDescriptor(shapeName)[SD_FUNCTION] == SD_OUTLINE:
 
 			self.parentObject.outlineDragged( deltax, deltay, origx, origy )
+		elif self.getShapeDescriptor(shapeName)[SD_FUNCTION] == SD_RING:
+			print self.getShapeDescriptor(shapeName)[SD_NAME], 'mouse drag'
+			print 'deltax, deltay:', deltax, deltay
+			#self.parentObject.objectDragged( deltax, deltay )
 		else:
+			
 			self.parentObject.objectDragged( deltax, deltay )
 
 

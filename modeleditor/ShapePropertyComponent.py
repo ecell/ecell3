@@ -40,6 +40,7 @@ import os.path
 from ModelEditor import *
 from ViewComponent import *
 from whrandom import randint
+from SystemObject import *
 
 
 class ShapePropertyComponent(ViewComponent):
@@ -55,12 +56,14 @@ class ShapePropertyComponent(ViewComponent):
 
 		# the variables
 		self.theShapeDic={'Label':None,'Height':None,'Width':0,'Type':0,'Fill Color':None,'Outline Color':None,}
-		self.theShapeList=['Circle','Ellipse','Rectangle','Rounded Rectangle','Polygon']
+		self.theShapeList=[]
 		self.theColor=None
 		self.theColorDialog=None
 		self.theDrawingArea=None
 		self.theColorList=['red', 'yellow', 'green', 'brown', 'blue', 'magenta',
                  'darkgreen', 'bisque1']
+		self.theCombo=ViewComponent.getWidget(self,'shape_combo')
+		self.theObject=None
 
 		# the handlers dictionary
 		self.addHandlers({ 
@@ -75,12 +78,6 @@ class ShapePropertyComponent(ViewComponent):
 			'on_OutlineButton_clicked' : self.__ColorOutSelection_displayed
 			})
 		
-		# populate list item of combobox
-		self.theCombo=ViewComponent.getWidget(self,'shape_combo')
-		for i in range(len(self.theShapeList)):
-			aListItem=gtk.ListItem(self.theShapeList[i])
-			self.theCombo.list.append_items([aListItem])
-			aListItem.show()
 			
 
 	#########################################
@@ -124,6 +121,10 @@ class ShapePropertyComponent(ViewComponent):
 			aDa.modify_bg(gtk.STATE_NORMAL,aColor)
 			aDialog.destroy()
 			self.setHexadecimal(aColor,'Fill Color')
+			
+		else:
+			aDialog.destroy()
+			
 
 	def __ColorOutSelection_displayed( self,*args):
 		aDialog,aColorSel=self.setColorDialog()
@@ -134,6 +135,9 @@ class ShapePropertyComponent(ViewComponent):
 			aDa.modify_bg(gtk.STATE_NORMAL,aColor)
 			aDialog.destroy()
 			self.setHexadecimal(aColor,'Outline Color')
+			
+		else:
+			aDialog.destroy()
 
 	def __ShapeProperty_displayed(self,*args):
 		keys=self.theShapeDic.keys()
@@ -147,6 +151,47 @@ class ShapePropertyComponent(ViewComponent):
 	#########################################
 	#    Private methods		        #
 	#########################################
+
+
+	def setDisplayedShapeProperty(self,anObject, selectedID, shapeType, width, height):
+		self.theObjectID = selectedID 
+		self.theObject=anObject
+		self.shapeType = self.getShapeType(shapeType)
+		self.shapeWidth = width
+		self.shapeHeight = height
+		self.populateComboBox()
+		self.updateShapeProperty()
+
+	def updateShapeProperty(self):
+		if self.theObjectID !=None:
+			nameText = self.theObjectID.split(':')[2]
+		else:
+			nameText = ''
+		ViewComponent.getWidget(self,'combo_entry').set_text(self.shapeType)
+		ViewComponent.getWidget(self,'ent_width').set_text( str(self.shapeWidth) )
+		ViewComponent.getWidget(self,'ent_height').set_text( str(self.shapeHeight ))
+		ViewComponent.getWidget(self,'ent_label').set_text( nameText )
+		
+	def getShapeType(self, shapeType):
+		if shapeType ==OB_TYPE_PROCESS:
+			shapeType = 'Rectangle'
+			self.theShapeList = self.theObject.getAvailableProcessShape()
+		if shapeType ==OB_TYPE_VARIABLE:
+			shapeType = 'Rounded Rectangle'
+			self.theShapeList = self.theObject.getAvailableVariableShape()
+		if shapeType ==OB_TYPE_SYSTEM:
+			shapeType ='Rectangle'
+			self.theShapeList = self.theObject.getAvailableSystemShape()
+		if shapeType ==OB_TYPE_TEXT:
+			pass
+		if shapeType ==OB_TYPE_CONNECTION:
+			pass
+		return shapeType
+	
+	def populateComboBox(self):
+		# populate list item of combobox
+		self.theCombo.set_popdown_strings(self.theShapeList)
+		
 
 	def setColorDialog( self, *args ):
 		aColor=gtk.gdk.color_parse(self.theColorList[randint (0, 3)])
