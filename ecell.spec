@@ -10,13 +10,13 @@ Copyright: E-Cell Project
 Packager: Kazuto Maruoka
 BuildRoot: %{_tmppath}/%{name}-root
 
-Reauires: Numeric
-Reauires: gsl
-Reauires: gsl-devel
-Reauires: boost-python
-Reauires: boost-python-devel
-Reauires: boost
-Reauires: boost-devel
+Requires: Numeric
+Requires: gsl
+Requires: gsl-devel
+Requires: boost-python
+Requires: boost-python-devel
+Requires: boost
+Requires: boost-devel
 
 %description
 E-Cell Simulation Environment (E-Cell SE) is a software package for cellular and biochemical modeling and simulation. E-Cell attempts to provide a framework not only for analyzing metabolism, but also for higher-order cellular phenomena such as gen regulation networks, DNA replication and other occurences in the cell cycle.
