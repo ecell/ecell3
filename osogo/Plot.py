@@ -28,16 +28,30 @@ class Plot:
 	    self.ColorList=["pink","cyan","yellow","navy",
 			    "brown","white","purple","black",
 			    "green", "orange","blue","red"]
+	    self.mes_dict = \
+		[['System', 'Size' , '??'],
+		['Variable', 'MolarConc', 'mol/l' ],
+		['Variable', 'NumberConc', '1/l' ],
+		['Variable', 'TotalVelocity', '??' ],
+		['Variable', 'Value', 'no. of molecules'],
+		['Variable', 'Velocity', '??' ],
+		['Process', 'Activity', '??'  ]]
+
+	    self.xmes=''
+	    self.ymes=''
+
 	    self.data_list=[] #list of displayed fullpnstrings
 	    self.trace_onoff={}
 	    self.available_colors=[]
 	    for acolor in self.ColorList:
 		self.available_colors.append(acolor)
+	    self.GUI_Button_Shown = False
+
 	    self.pixmapmap={} #key is color, value pixmap
 	    self.FullPNMap={} #key: FullPNString, values [FullPN,shortname]
 	    self.plotwidth=width
 	    self.plotheigth=heigth
-	    self.recalculate_size()
+
 	    self.xframe=[]
 	    self.yframe=[]
 	    #creates widget
@@ -47,10 +61,7 @@ class Plot:
 	    self.theWidget.set_events(gtk.gdk.EXPOSURE_MASK|gtk.gdk.BUTTON_PRESS_MASK|
 					gtk.gdk.LEAVE_NOTIFY_MASK|gtk.gdk.POINTER_MOTION_MASK|
 					gtk.gdk.BUTTON_RELEASE_MASK)
-	    self.theWidget.connect('expose-event',self.expose)
-	    self.theWidget.connect('button-press-event',self.press)
-	    self.theWidget.connect('motion-notify-event',self.motion)
-	    self.theWidget.connect('button-release-event',self.release)
+	
 	    root = root[root.__class__.__name__]
 	    self.theRoot=root
 	    self.theColorMap=self.theWidget.get_colormap()
@@ -74,7 +85,7 @@ class Plot:
 		pb=gtk.gdk.Pixbuf(gtk.gdk.COLORSPACE_RGB,gtk.TRUE,8,10,10)
 		newpb=pb.get_from_drawable(newpm,self.theColorMap,0,0,0,0,10,10)
 		self.pixmapmap[acolor]=newpb
-	    
+	    self.recalculate_size()	    
 	    self.zoomlevel=0
 	    self.zoombuffer=[]
 	    self.zoomkeypressed=False
@@ -107,16 +118,20 @@ class Plot:
 	    self.reframey()
 	    self.reframex()
 	    self.drawall()
-
+	    self.definemeasures()
+	    self.theWidget.connect('expose-event',self.expose)
+	    self.theWidget.connect('button-press-event',self.press)
+	    self.theWidget.connect('motion-notify-event',self.motion)
+	    self.theWidget.connect('button-release-event',self.release)
 
 
 	def recalculate_size(self):
 	    self.max_yticks_no=int(self.plotheigth/150)*5
 	    self.max_xticks_no=int(self.plotwidth/100)
 	    self.origo=[70,self.plotheigth-30]
-	    self.plotarea=[self.origo[0],20,\
-	    	self.plotwidth-40-self.origo[0],\
-	    	self.origo[1]-20]
+	    self.plotarea=[self.origo[0],30,\
+	    	self.plotwidth-60-self.origo[0],\
+	    	self.origo[1]-30]
 	    self.plotaread=[self.plotarea[0],self.plotarea[1],\
 	    	self.plotarea[2]+self.plotarea[0],\
 	    	self.plotarea[3]+self.plotarea[1]]
@@ -129,12 +144,49 @@ class Plot:
 	    self.xaxis_y=self.origo[1]+1
 	    self.xaxislength=self.plotarea[2]+1
 	    self.yaxislength=self.plotarea[3]+1
-	
+	    self.gui_button_area = [self.plotwidth-20, 0, 20, 20 ]
+	    self.xmes_ltop=[self.plotaread[2]+10,self.origo[1]-10]
+
+	    self.ymes_ltop=[self.origo[0]-50, 0]
+
+
+	def show_gui_button( self ):
+		self.GUI_Button_Shown = True
+
+		self.draw_gui_button()
+
+
+	def hide_gui_button( self ):
+		self.GUI_Button_Shown = False
+		self.draw_gui_button()
+
+
+	def draw_gui_button (self ):
+		if self.GUI_Button_Shown:
+			rct=self.gui_button_area
+			self.drawline("pen", rct[0], rct[1], rct[0]+rct[2],rct[1] )
+			self.drawline("pen", rct[0], rct[3]+rct[1], rct[0]+rct[2],rct[3]+rct[1] )
+			self.drawline("pen", rct[0], rct[1], rct[0], rct[3]+rct[1] )
+			self.drawline("pen", rct[2]+rct[0], rct[1], rct[0]+rct[2], rct[3]+rct[1] )
+
+			self.drawline("pen", rct[0]+4, rct[1]+4, rct[0]+16,rct[1]+4 )
+			self.drawline("pen", rct[0]+4, rct[1]+5, rct[0]+16,rct[1]+5 )
+			self.drawline("pen", rct[0]+4, rct[1]+6, rct[0]+16,rct[1]+6 )
+			self.drawline("pen", rct[0]+4, rct[1]+4, rct[0]+4,rct[1]+16 )
+			self.drawline("pen", rct[0]+16, rct[1]+4, rct[0]+16,rct[1]+16 )
+			self.drawline("pen", rct[0]+4, rct[1]+16, rct[0]+16,rct[1]+16 )
+
+
+		else:
+			self.drawbox("background", self.gui_button_area[0], self.gui_button_area[1], \
+				self.gui_button_area[2], self.gui_button_area[3]+1 )
 
 
 	def expose(self, obj, event):
 	    obj.window.draw_drawable(self.pm.new_gc(),self.pm,event.area[0],event.area[1],
 					event.area[0],event.area[1],event.area[2],event.area[3])
+
+
 	def allocate_color(self, aFullPNString):		
 	    #checks whether there's room for new traces
 	    if len(self.available_colors)>0 and \
@@ -392,6 +444,7 @@ class Plot:
 	    self.reframey2()
 	    return 0
 
+
 	def reframey2(self):
 	    if self.scale_type=='linear':
 		self.pixelheigth=float(self.yframe[1]-self.yframe[0])/self.plotarea[3]
@@ -406,6 +459,7 @@ class Plot:
 	    else:
 		return self.origo[1]-round((log10(max(y,self.zerovalue))-log10(self.yframe[0]))/self.pixelheigth)
 
+
 	def change_scale(self):
     	    #change variable
 	    if self.scale_type=='linear': 
@@ -414,11 +468,13 @@ class Plot:
 		self.scale_type='linear'
 	    self.reframey()
 	    self.drawall()
+	    self.definemeasures()
 	    if self.scale_type=='linear':
 		self.theOwner.set_scale_button( 'Log10 Scale')
 	    else:
 		self.theOwner.set_scale_button('Linear Scale')
-	    	    
+
+
 	def reprint_ylabels(self):
 	    #clears ylabel area
 	    self.clearylabelarea()
@@ -442,12 +498,14 @@ class Plot:
 	    
 	def convertplot_to_x(self,plotx):
 	    return (plotx-self.origo[0])*self.pixelwidth+self.xframe[0]
+
 	    
 	def convertplot_to_y(self,ploty):
 	    if self.scale_type=='linear':
 		return (self.origo[1]-ploty)*self.pixelheigth+self.yframe[0]
 	    else:
 		return pow(10,(((self.origo[1]-ploty)*self.pixelheigth)+log10(self.yframe[0])))
+
 
 	def addpoints(self, points):
 	    #must be zoom level 0
@@ -484,7 +542,7 @@ class Plot:
 		if redraw_flag:
 		#if >yframe[1],<yframe[0], reframey, drawall
 		    self.reframey()
-		    self.drawall()		
+		    self.drawall()
 		elif shift_flag:
 		#if >xframe[1],  shiftframe, remove bufferhead 
 		    #,adjust lastx, lasty,
@@ -535,6 +593,7 @@ class Plot:
 	    #begin drawing
 		#drawpoint
 
+
 	def setmode_strip(self,pointmap):
 	    #delete buffers
 	    #reframe buffers end-interval/end
@@ -565,6 +624,7 @@ class Plot:
 	    #drawall
 	    #zoomlevel=0
 	    #mode=strip
+
 	    
 	def setmode_history(self):
 	    #reframe buufers start/end
@@ -576,6 +636,7 @@ class Plot:
 	    #reframey
 	    self.strip_mode='history'
 	    self.addtrace([])
+
 
 	def getShortName(self, aFullPN ):
 		IdString = str( aFullPN[ID] )
@@ -657,7 +718,9 @@ class Plot:
 	    #reframey
 	    #drawall
 	    self.drawall()
+	    self.definemeasures()
 	    return return_list
+
 
 	def getminmax(self):
 	    self.minmax=[0,1,0,100,10000000000]
@@ -680,6 +743,7 @@ class Plot:
 	    	    if datapoint[1]>0:
 			if self.minmax[4]>datapoint[1]: self.minmax[4]=datapoint[1]
 
+
 	def refresh_loggerstartendmap(self):
 	    self.loggerstartendmap={}
 	    for fpn in self.data_list:
@@ -688,6 +752,7 @@ class Plot:
 		    end=self.theOwner.getloggerend(fpn)
 		    self.loggerstartendmap[fpn]=[start,end]
 		else: self.loggerstartendmap[fpn]=[None,None]
+
 	
 	def getxframe_from_logger(self,fpn): #refreshes the whole displayed interval 
 	    newdatabuffer=[]
@@ -697,6 +762,7 @@ class Plot:
 		newdatabuffer=self.theOwner.recache(fpn,data_from,
 			    data_to, self.pixelwidth/2)
 	    return newdatabuffer
+
 	
 	def remove_trace(self, FullPNStringList):
 	    #call superclass
@@ -709,7 +775,9 @@ class Plot:
 		if self.trace_onoff.has_key(fpn):
 		    self.trace_onoff.__delitem__(fpn)
 	    self.reframey()
-	    self.drawall()	    
+	    self.drawall()
+	    self.definemeasures()
+
 	
 	def press(self,obj, event):
 	    x=event.x
@@ -723,6 +791,12 @@ class Plot:
 				self.maximize()
 			else:
 				self.minimize_action()
+		elif self.GUI_Button_Shown: 
+			print x,y
+			if x > self.gui_button_area[0] and x< (self.gui_button_area[0]+self.gui_button_area[2]) and\
+				y > self.gui_button_area[1] and y<(self.gui_button_area[3]+self.gui_button_area[1]):
+				self.maximize()
+
 		self.button_timestamp=tstamp			
 		if self.strip_mode=='history':
 		#check that mode is history 
@@ -745,9 +819,9 @@ class Plot:
 		if self.zoomlevel>0:
 		    self.zoomout()
 	    	#call zoomout
+
 	    	
 	def motion(self,obj,event):
-	    
 	    #if keypressed undo previous  one
 	    if self.zoomkeypressed:
 		self.drawxorbox(self.realx0,self.realy0,self.realx1,self.realy1)
@@ -771,9 +845,9 @@ class Plot:
 		    self.realy1=max(self.y0,self.y1)
 		    #draw new rectangle
 	    	    self.drawxorbox(self.realx0,self.realy0,self.realx1,self.realy1)
-		    
+
+
 	def release(self,obj,event):
-	
 	    #check that button 1 is released and previously keypressed was set
 	    if self.zoomkeypressed and event.button==1:
 		#draw old inverz rectangle
@@ -789,6 +863,7 @@ class Plot:
 		    self.zoomin(newxframe,newyframe)
 		self.zoomkeypressed=False
 	    
+
 	def zoomin(self, newxframe, newyframe):
 	    #increase zoomlevel
 	    self.zoomlevel+=1
@@ -801,6 +876,7 @@ class Plot:
 	    self.yframe[1]=newyframe[0]
 	    self.addtrace([])
 	    
+
 	def zoomout(self):
 	    #if zoomlevel 0 do nothing
 	    if self.zoomlevel==1:
@@ -816,11 +892,12 @@ class Plot:
 		self.yframe[1]=newframes[1][1]
 		self.addtrace([])
 		
-	
-	    
+
+
 	def getstripinterval(self):
 	    return self.stripinterval
 	
+
 	def setstripinterval(self,newinterval):
 	    #calulates new xframes, if there are more data in buffer
 	    self.stripinterval=newinterval
@@ -847,9 +924,11 @@ class Plot:
 		self.drawall()
 	    #reframey 
 	    #redrawall
-	    
+
+
 	def getstripmode(self):
 	    return self.strip_mode
+
 
 	def reprint_xlabels(self):
 	    #clears xlabel area
@@ -857,7 +936,8 @@ class Plot:
 	    for tick in range(self.xticks_no+1):
 		tickvalue=self.xgrid[0]+tick*self.xticks_step
 		self.printxlabel(tickvalue)
-			    
+
+
 	def printTraceLabels(self):
 	    if self.size_status!='minimized':
 		return
@@ -898,6 +978,7 @@ class Plot:
 			self.FullPNMap[fpn][1] )
 		_textshift += 20		
 
+
 	def drawall(self):
 	    #clears plotarea
 	    self.clearplotarea()
@@ -907,7 +988,6 @@ class Plot:
 		    self.drawtrace(fpn)
 
 	    self. printTraceLabels()
-
 
 	
 	def drawtrace(self, aFullPNString):
@@ -919,10 +999,12 @@ class Plot:
 		self.drawpoint(aFullPNString, datapoint)
 	    fpn = aFullPNString
 
+
 	def withinframes(self,point):
 	    return point[0]<self.plotaread[2] and point[0]>self.plotaread[0] and\
 		   point[1]<=self.plotaread[3] and point[1]>=self.plotaread[1]
-	
+
+
 	def drawpoint(self, aFullPNString, datapoint):
 	    #get datapoint x y values
 	    #convert to plot coordinates
@@ -1067,6 +1149,7 @@ class Plot:
 		    self.trace_onoff[fpn]=gtk.TRUE
 		self.reframey()
 		self.drawall()
+		self.definemeasures()
 		return self.trace_onoff[fpn]
 	    else:
 		return gtk.FALSE
@@ -1117,4 +1200,59 @@ class Plot:
 		self.reframey()
 		self.reframex()
 		self.drawall()
+		self.draw_gui_button()
+		self.drawmeasures()
 
+	def drawmeasures( self ):
+		# delete x area
+		self.drawbox("background", self.xmes_ltop[0], self.xmes_ltop[1], 100, 20)
+
+		# drawtext xmes
+		self.drawtext("pen", self.xmes_ltop[0], self.xmes_ltop[1], self.xmes )
+
+		# delete y area
+		self.drawbox("background", self.ymes_ltop[0], self.ymes_ltop[1], 200, 20)
+
+		# drawtext ymes
+		self.drawtext("pen", self.ymes_ltop[0], self.ymes_ltop[1], self.ymes )		
+
+
+	def definemeasures ( self ):
+		# xmes is sec
+		self.xmes='sec'
+
+		# get all displayed fullpns
+		# for all fpn
+		mes_list ={}
+		for fpn in self.data_list:
+		    if self.trace_onoff[fpn]:
+			# get type and propertyname
+			anArray= fpn.split(':')
+			aType = anArray[0]
+			aProperty = anArray[3]
+
+			# define values from measure list
+			aMeasure='??'
+			for aMeasureItem in self.mes_dict:
+				if aMeasureItem[0]==aType and aMeasureItem[1]==aProperty:
+					aMeasure= aMeasureItem[2]
+					break
+
+			# add it to measure list
+			mes_list[aMeasure]=1
+		# consolidate measure list
+		mes_keys = mes_list.keys()
+		if len(mes_keys)>1:
+
+			# if there are diferent measures it is 'mixed measures'
+			self.ymes ='mixed measures'
+
+		elif len(mes_keys) ==1:
+			self.ymes = mes_keys[0]
+		else:
+			self.ymes=''
+
+		# add scale information
+		self.ymes = self.ymes + "    " + self.scale_type + " scale"
+		self.drawmeasures()
+		

@@ -315,6 +315,7 @@ class TracerWindow( OsogoPluginWindow ):
 		self['TracerWindow'].resize(self.desired_window_size[0],
 				self.desired_window_size[1])
 
+
 	
 	
 	def maximize(self):
@@ -322,6 +323,7 @@ class TracerWindow( OsogoPluginWindow ):
 			self['vbox1'].add(self['scrolledwindow1'])
 		if self['vbox2'] != self['fixed1'].get_parent():
 			self['vbox2'].add(self['fixed1'])
+		self.thePlotInstance.hide_gui_button()
 		alloc_rect2=self['fixed1'].size_request()
 		alloc_rect3=self['vbox1'].size_request()
 		aHeigth= _LARGE_PLOTHEIGTH + alloc_rect2[1] + alloc_rect3[1] +4
@@ -355,8 +357,10 @@ class TracerWindow( OsogoPluginWindow ):
 		self['top_frame'].set_size_request(self.desired_plot_size[0]+4,
 			self.desired_plot_size[1]+4)
 		self.thePlotInstance.resize( plot_size_alloc )
+		self.thePlotInstance.show_gui_button()
 		self.getParent().shrink_to_fit()
 		self.thePlotInstance.printTraceLabels()
+
 
 	def __get_frame8_space (self):
 		aSizeAlloc=self['frame8'].get_allocation()
