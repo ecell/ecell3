@@ -52,7 +52,8 @@ public:
       }
     else if( Py::_Int_Check( *aPyObject ) )
       {
-	theData = new libecs::UVariableIntData( Py::Int( aPyObject ) );
+	theData = new libecs::
+	  UVariableIntData( static_cast<libecs::Int>( Py::Int( aPyObject ) ) );
       }
     else if( Py::_Long_Check( *aPyObject ) )
       {
