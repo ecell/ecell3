@@ -90,11 +90,13 @@ class PluginModule:
 	# return -> the result of apply function
 	# This method is throwable exception.
 	# ---------------------------------------------------------------
-	def createInstance( self, data, pluginManager, rootWidget=None ):
+	def createInstance( self, data, pluginManager, rootWidget=None, parent = None ):
 
 		aConstructor = self.theModule.__dict__[self.theName]
 		anArgumentTuple = ( self.theDirectoryName,  data, pluginManager, rootWidget )
-		return apply( aConstructor, anArgumentTuple )
+		instance = apply( aConstructor, anArgumentTuple )
+		instance.theParent = parent
+		return instance
 	
 	# end of createInstance
 

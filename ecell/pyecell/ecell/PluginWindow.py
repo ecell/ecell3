@@ -99,7 +99,11 @@ class PluginWindow( Window ):
 		""" closes pluginwindow """
 		self.exit( None )	
 
-#	def getParent( self ):
+	def getParent( self ):
+	   if self.theParent == None:
+	       return self
+	   return self.theParent
+	   
 #		if self.theRoot == None:
 			#return self[self.__class__.__name__]
 		#else:
