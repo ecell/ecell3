@@ -46,7 +46,7 @@ namespace libemc
   
   /** @file */
 
-  DECLARE_CLASS( PendingEventChecker );
+  DECLARE_CLASS( EventChecker );
   DECLARE_CLASS( EventHandler );
 
   DECLARE_CLASS( Simulator );

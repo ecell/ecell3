@@ -82,8 +82,8 @@ class Session:
     def getCurrentTime( self ):
         return self.theSimulator.getCurrentTime()
 
-    def setPendingEventChecker( self, event ):
-        self.theSimulator.setPendingEventChecker( event )
+    def setEventChecker( self, event ):
+        self.theSimulator.setEventChecker( event )
 
     def setEventHandler( self, event ):
         self.theSimulator.setEventHandler( event )

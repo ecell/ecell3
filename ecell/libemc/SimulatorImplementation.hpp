@@ -56,24 +56,24 @@ namespace libemc
     virtual void operator()( void ) const = 0;
   };
 
-  class PendingEventChecker
+  class EventChecker
     :
     public std::unary_function<bool,void>
   {
   public:
-    PendingEventChecker() {}
-    virtual ~PendingEventChecker() {}
+    EventChecker() {}
+    virtual ~EventChecker() {}
 
     virtual bool operator()( void ) const = 0;
   };
 
-  class DefaultPendingEventChecker
+  class DefaultEventChecker
     :
-    public PendingEventChecker
+    public EventChecker
   {
   public:
-    DefaultPendingEventChecker() {}
-    //    virtual ~DefaultPendingEventChecker() {}
+    DefaultEventChecker() {}
+    //    virtual ~DefaultEventChecker() {}
 
     virtual bool operator()( void ) const
     {
@@ -194,8 +194,8 @@ namespace libemc
 
     virtual void stop() = 0;
 
-    virtual void setPendingEventChecker( PendingEventCheckerPtr 
-					 aPendingEventChecker ) = 0;
+    virtual void setEventChecker( EventCheckerPtr 
+					 aEventChecker ) = 0;
 
     virtual void setEventHandler( EventHandlerPtr anEventHandler ) = 0;
 

@@ -215,7 +215,7 @@ class MainWindow(OsogoWindow):
 		# -------------------------------------
 		# initialize for run method 
 		# -------------------------------------
-		self.theSession.theSimulator.setPendingEventChecker( gtk.events_pending )
+		self.theSession.theSimulator.setEventChecker( gtk.events_pending )
 		self.theSession.theSimulator.setEventHandler( gtk.mainiteration  )
 		self['ecell_logo_toolbar'].set_style( GTK.TOOLBAR_ICONS )
 		self.setInitialWidgetStatus()

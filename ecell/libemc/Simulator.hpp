@@ -477,10 +477,10 @@ namespace libemc
     /**
        Run the simulation.
 
-       @note Both the PendingEventChecker and the EventHandler must be set 
+       @note Both the EventChecker and the EventHandler must be set 
        before calling this method.
 
-       @see setPendingEventChecker
+       @see setEventChecker
        @see setEventHandler
     */
 
@@ -514,7 +514,7 @@ namespace libemc
     /**
        Set a pending event checker.
 
-       The event checker must be a subclass of PendingEventChecker class.
+       The event checker must be a subclass of EventChecker class.
 
        This is usually used to set to form a mainloop of GUI toolkit.
        If you are using gtk, the event checker would call gtk_events_pending()
@@ -525,15 +525,15 @@ namespace libemc
        steps.  If it returns true, the EventHandler given by setEventHandler()
        method is called.
 
-       @param aPendingEventChecker a function object of the event checker
-       @see PendingEventChecker
+       @param aEventChecker a function object of the event checker
+       @see EventChecker
        @see setEventHandler
     */
 
-    void setPendingEventChecker( PendingEventCheckerPtr aPendingEventChecker )
+    void setEventChecker( EventCheckerPtr aEventChecker )
     {
        theSimulatorImplementation->
-	 setPendingEventChecker( aPendingEventChecker );
+	 setEventChecker( aEventChecker );
      }
 
     /**
@@ -545,7 +545,7 @@ namespace libemc
 
        @param anEventHandler a function object of the event handler
        @see EventHandler
-       @see setPendingEventChecker
+       @see setEventChecker
     */
 
     void setEventHandler( EventHandlerPtr anEventHandler )

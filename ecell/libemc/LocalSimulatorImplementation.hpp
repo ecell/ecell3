@@ -150,10 +150,10 @@ namespace libemc
 
     virtual void stop();
 
-    virtual void setPendingEventChecker( PendingEventCheckerPtr
-					 aPendingEventChecker );
+    virtual void setEventChecker( EventCheckerPtr
+					 aEventChecker );
 
-    void clearPendingEventChecker();
+    void clearEventChecker();
 
     virtual void setEventHandler( EventHandlerPtr anEventHandler );
 
@@ -182,7 +182,7 @@ namespace libemc
     libecs::ModelRef           theModel;
 
     bool                       theRunningFlag;
-    PendingEventCheckerPtr     thePendingEventChecker;
+    EventCheckerPtr            theEventChecker;
     EventHandlerPtr            theEventHandler;
 
   };  

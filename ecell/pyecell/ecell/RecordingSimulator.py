@@ -63,9 +63,9 @@ class RecordingSimulator( ecell.ecs.Simulator ):
         return self.theSimulator.getLogger( fullpn )
         self.record( 'aSimulator.setLogger( %s )' % fullpn )
 
-    def setPendingEventChecker( self, event ):
+    def setEventChecker( self, event ):
 
-        self.theSimulator.setPendingEventChecker( event )
+        self.theSimulator.setEventChecker( event )
         
     def setEventHandler( self, event ):
 

@@ -140,8 +140,8 @@ BOOST_PYTHON_MODULE_INIT(_ecs)
   aSimulatorClass.def( ( void( libemc::Simulator::* )( libecs::Real ) )
 		       &libemc::Simulator::run,            "run" );
 
-  aSimulatorClass.def( &libemc::Simulator::setPendingEventChecker,
-		       "setPendingEventChecker" );
+  aSimulatorClass.def( &libemc::Simulator::setEventChecker,
+		       "setEventChecker" );
   aSimulatorClass.def( &libemc::Simulator::setEventHandler, 
 		       "setEventHandler" );
 

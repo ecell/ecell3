@@ -44,21 +44,21 @@ protected:
 };
 
 
-class PythonPendingEventChecker
+class PythonEventChecker
   : 
   public PythonCallable,
-  public libemc::PendingEventChecker
+  public libemc::EventChecker
 {
 public:
 
-  PythonPendingEventChecker( PyObject* aPyObjectPtr )
+  PythonEventChecker( PyObject* aPyObjectPtr )
     :
     PythonCallable( aPyObjectPtr )
   {
     ; // do nothing
   }
     
-  virtual ~PythonPendingEventChecker() {}
+  virtual ~PythonEventChecker() {}
 
   virtual bool operator()( void ) const
   {
@@ -244,16 +244,16 @@ PyObject* to_python( libecs::DataPointVectorRCPtr aVectorRCPtr )
 
 
 //
-// libemc::PendingEventChecker and libemc::EventHandler
+// libemc::EventChecker and libemc::EventHandler
 //
 
 // NOTE: these functions return pointers to newly allocated objects
 
-libemc::PendingEventCheckerPtr 
+libemc::EventCheckerPtr 
 from_python( PyObject* aPyObjectPtr, 
-	     type<libemc::PendingEventCheckerPtr> )
+	     type<libemc::EventCheckerPtr> )
 {
-  return new PythonPendingEventChecker( aPyObjectPtr );
+  return new PythonEventChecker( aPyObjectPtr );
 }
 
 libemc::EventHandlerPtr

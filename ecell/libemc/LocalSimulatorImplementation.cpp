@@ -47,10 +47,10 @@ namespace libemc
     :
     theModel( *new Model ),
     theRunningFlag( false ),
-    thePendingEventChecker( NULLPTR ),
+    theEventChecker( NULLPTR ),
     theEventHandler( NULLPTR )
   {
-    clearPendingEventChecker();
+    clearEventChecker();
   }
 
   LocalSimulatorImplementation::~LocalSimulatorImplementation()
@@ -342,7 +342,7 @@ namespace libemc
   {
     getModel().initialize();
 
-    if( ! ( thePendingEventChecker != NULLPTR && theEventHandler != NULLPTR ) )
+    if( ! ( theEventChecker != NULLPTR && theEventHandler != NULLPTR ) )
       {
 	THROW_EXCEPTION( libecs::Exception,
 			 "Both EventChecker and EventHandler must be "
@@ -361,7 +361,7 @@ namespace libemc
 	    --i;
 	  } while( i != 0 );
 
-	while( (*thePendingEventChecker)() )
+	while( (*theEventChecker)() )
 	  {
 	    (*theEventHandler)();
 	  }
@@ -375,7 +375,7 @@ namespace libemc
   {
     getModel().initialize();
 
-    if( thePendingEventChecker != NULLPTR && theEventHandler != NULLPTR )
+    if( theEventChecker != NULLPTR && theEventHandler != NULLPTR )
       {
 	runWithEvent( aDuration );
       }
@@ -410,7 +410,7 @@ namespace libemc
 	  } while( i != 0 );
 
 
-	while( (*thePendingEventChecker)() )
+	while( (*theEventChecker)() )
 	  {
 	    (*theEventHandler)();
 	  }
@@ -445,10 +445,10 @@ namespace libemc
   }
 
   void LocalSimulatorImplementation::
-  setPendingEventChecker( PendingEventCheckerPtr aPendingEventChecker )
+  setEventChecker( EventCheckerPtr aEventChecker )
   {
-    delete thePendingEventChecker;
-    thePendingEventChecker = aPendingEventChecker;
+    delete theEventChecker;
+    theEventChecker = aEventChecker;
   }
 
   void LocalSimulatorImplementation::
@@ -458,9 +458,9 @@ namespace libemc
     theEventHandler = anEventHandler;
   }
 
-  void LocalSimulatorImplementation::clearPendingEventChecker()
+  void LocalSimulatorImplementation::clearEventChecker()
   {
-    setPendingEventChecker( new DefaultPendingEventChecker() );
+    setEventChecker( new DefaultEventChecker() );
   }
 
 
