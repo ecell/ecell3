@@ -1,5 +1,16 @@
 from ConfirmWindow import *
 
+# Layout constants
+
+# object types:
+LE_OBJECT_SYSTEM = 0
+LE_OBJECT_PROCESS = 1
+LE_OBJECT_VARIABLE = 2
+LE_OBJECT_TEXTBOX = 3
+LE_OBJECT_CUSTOM = 4
+LE_OBJECT_CONNECTION = 5
+
+
 
 # ModelStore constants
 
