@@ -1,168 +1,209 @@
 <?xml version="1.0" standalone="no"?> <!--*- mode: xml -*-->
-<!DOCTYPE glade-interface SYSTEM "http://glade.gnome.org/glade-2.0.dtd" >
+<!DOCTYPE glade-interface SYSTEM "http://glade.gnome.org/glade-2.0.dtd">
 
 <glade-interface>
-  <widget class="GtkWindow" id="VariableWindow">
-    <property name="events">GDK_BUTTON_PRESS_MASK | GDK_KEY_PRESS_MASK</property>
-    <property name="title" translatable="yes">VariableWindow</property>
-    <property name="type">GTK_WINDOW_TOPLEVEL</property>
-    <property name="modal">no</property>
-    <property name="allow_shrink">no</property>
-    <property name="allow_grow">yes</property>
-    <property name="window-position">GTK_WIN_POS_NONE</property>
-    <property name="visible">yes</property>
 
-    <signal name="destroy" handler="window_exit" />
-    <signal name="button_press_event" handler="button_press_event" />
+<widget class="GtkWindow" id="VariableWindow">
+  <property name="visible">True</property>
+  <property name="events">GDK_BUTTON_PRESS_MASK | GDK_KEY_PRESS_MASK</property>
+  <property name="title" translatable="yes">VariableWindow</property>
+  <property name="type">GTK_WINDOW_TOPLEVEL</property>
+  <property name="window_position">GTK_WIN_POS_NONE</property>
+  <property name="modal">False</property>
+  <property name="resizable">True</property>
+  <property name="destroy_with_parent">False</property>
+  <signal name="destroy" handler="window_exit"/>
+  <signal name="button_press_event" handler="button_press_event"/>
 
-    <child>
-      <widget class="GtkVBox" id="vbox61">
-        <property name="homogeneous">no</property>
-        <property name="spacing">0</property>
-        <property name="visible">yes</property>
+  <child>
+    <widget class="GtkVBox" id="vbox61">
+      <property name="visible">True</property>
+      <property name="homogeneous">False</property>
+      <property name="spacing">0</property>
 
-        <child>
-          <widget class="GtkLabel" id="id_label">
-            <property name="label" translatable="yes">/CELL/CYTOPLASM:ATP</property>
-            <property name="justify">GTK_JUSTIFY_LEFT</property>
-            <property name="wrap">no</property>
-            <property name="xalign">0.5</property>
-            <property name="yalign">0.5</property>
-            <property name="xpad">0</property>
-            <property name="ypad">0</property>
-            <property name="visible">yes</property>
-          </widget>
-          <packing>
-            <property name="padding">0</property>
-            <property name="expand">no</property>
-            <property name="fill">no</property>
-          </packing>
-        </child>
+      <child>
+	<widget class="GtkLabel" id="id_label">
+	  <property name="visible">True</property>
+	  <property name="label" translatable="yes">/CELL/CYTOPLASM:ATP</property>
+	  <property name="use_underline">False</property>
+	  <property name="use_markup">False</property>
+	  <property name="justify">GTK_JUSTIFY_LEFT</property>
+	  <property name="wrap">False</property>
+	  <property name="selectable">False</property>
+	  <property name="xalign">0.5</property>
+	  <property name="yalign">0.5</property>
+	  <property name="xpad">0</property>
+	  <property name="ypad">0</property>
+	</widget>
+	<packing>
+	  <property name="padding">0</property>
+	  <property name="expand">False</property>
+	  <property name="fill">False</property>
+	</packing>
+      </child>
 
-        <child>
-          <widget class="GtkHBox" id="hbox74">
-            <property name="homogeneous">no</property>
-            <property name="spacing">0</property>
-            <property name="visible">yes</property>
+      <child>
+	<widget class="GtkHBox" id="hbox74">
+	  <property name="visible">True</property>
+	  <property name="homogeneous">False</property>
+	  <property name="spacing">0</property>
 
-            <child>
-              <widget class="GtkFrame" id="frame44">
-                <property name="label" translatable="yes">Value</property>
-                <property name="label_xalign">0</property>
-                <property name="height-request">37</property>
-                <property name="shadow">GTK_SHADOW_ETCHED_IN</property>
-                <property name="visible">yes</property>
+	  <child>
+	    <widget class="GtkFrame" id="frame44">
+	      <property name="visible">True</property>
+	      <property name="label_xalign">0</property>
+	      <property name="label_yalign">0.5</property>
+	      <property name="shadow_type">GTK_SHADOW_ETCHED_IN</property>
 
-                <child>
-                  <widget class="GtkHBox" id="hbox75">
-                    <property name="homogeneous">no</property>
-                    <property name="spacing">0</property>
-                    <property name="height-request">25</property>
-                    <property name="visible">yes</property>
+	      <child>
+		<widget class="GtkHBox" id="hbox75">
+		  <property name="visible">True</property>
+		  <property name="homogeneous">False</property>
+		  <property name="spacing">0</property>
 
-                    <child>
-                      <widget class="GtkSpinButton" id="value_spinbutton">
-                        <property name="can_focus">yes</property>
-                        <property name="events">GDK_BUTTON_PRESS_MASK | GDK_KEY_PRESS_MASK</property>
-                        <property name="climb_rate">1</property>
-                        <property name="digits">0</property>
-                        <property name="numeric">no</property>
-                        <property name="update_policy">GTK_UPDATE_ALWAYS</property>
-                        <property name="wrap">no</property>
-                        <property name="width-request">178</property>
-                        <property name="snap_to_ticks">no</property>
-                        <property name="visible">yes</property>
-                        <property name="adjustment">0 0 100000000 1 10 10</property>
+		  <child>
+		    <widget class="GtkSpinButton" id="value_spinbutton">
+		      <property name="width_request">169</property>
+		      <property name="visible">True</property>
+		      <property name="can_focus">True</property>
+		      <property name="events">GDK_BUTTON_PRESS_MASK | GDK_KEY_PRESS_MASK</property>
+		      <property name="climb_rate">1</property>
+		      <property name="digits">0</property>
+		      <property name="numeric">False</property>
+		      <property name="update_policy">GTK_UPDATE_ALWAYS</property>
+		      <property name="snap_to_ticks">False</property>
+		      <property name="wrap">False</property>
+		      <property name="adjustment">0 -1e-16 1e+16 1 10 10</property>
+		      <signal name="copy_clipboard" handler="on_value_spinbutton_copy_clipboard"/>
+		      <signal name="cut_clipboard" handler="on_value_spinbutton_cut_clipboard"/>
+		      <signal name="paste_clipboard" handler="on_value_spinbutton_paste_clipboard"/>
+		      <signal name="changed" handler="on_value_spinbutton_changed"/>
+		    </widget>
+		    <packing>
+		      <property name="padding">0</property>
+		      <property name="expand">True</property>
+		      <property name="fill">True</property>
+		    </packing>
+		  </child>
+		</widget>
+	      </child>
 
-                        <signal name="copy_clipboard" handler="on_value_spinbutton_copy_clipboard" />
-                        <signal name="cut_clipboard" handler="on_value_spinbutton_cut_clipboard" />
-                        <signal name="paste_clipboard" handler="on_value_spinbutton_paste_clipboard" />
-                        <signal name="changed" handler="on_value_spinbutton_changed" />
-                      </widget>
-                      <packing>
-                        <property name="padding">0</property>
-                        <property name="expand">yes</property>
-                        <property name="fill">yes</property>
-                      </packing>
-                    </child>
-                  </widget>
-                </child>
-              </widget>
-              <packing>
-                <property name="padding">0</property>
-                <property name="expand">no</property>
-                <property name="fill">no</property>
-              </packing>
-            </child>
+	      <child>
+		<widget class="GtkLabel" id="label1">
+		  <property name="visible">True</property>
+		  <property name="label" translatable="yes">Value</property>
+		  <property name="use_underline">False</property>
+		  <property name="use_markup">False</property>
+		  <property name="justify">GTK_JUSTIFY_LEFT</property>
+		  <property name="wrap">False</property>
+		  <property name="selectable">False</property>
+		  <property name="xalign">0.5</property>
+		  <property name="yalign">0.5</property>
+		  <property name="xpad">0</property>
+		  <property name="ypad">0</property>
+		</widget>
+		<packing>
+		  <property name="type">label_item</property>
+		</packing>
+	      </child>
+	    </widget>
+	    <packing>
+	      <property name="padding">0</property>
+	      <property name="expand">False</property>
+	      <property name="fill">False</property>
+	    </packing>
+	  </child>
 
-            <child>
-              <widget class="GtkFrame" id="frame45">
-                <property name="label" translatable="yes">Concentration</property>
-                <property name="label_xalign">0</property>
-                <property name="height-request">54</property>
-                <property name="shadow">GTK_SHADOW_ETCHED_IN</property>
-                <property name="visible">yes</property>
+	  <child>
+	    <widget class="GtkFrame" id="frame45">
+	      <property name="visible">True</property>
+	      <property name="label_xalign">0</property>
+	      <property name="label_yalign">0.5</property>
+	      <property name="shadow_type">GTK_SHADOW_ETCHED_IN</property>
 
-                <child>
-                  <widget class="GtkHBox" id="hbox76">
-                    <property name="homogeneous">no</property>
-                    <property name="spacing">0</property>
-                    <property name="height-request">25</property>
-                    <property name="visible">yes</property>
+	      <child>
+		<widget class="GtkHBox" id="hbox76">
+		  <property name="visible">True</property>
+		  <property name="homogeneous">False</property>
+		  <property name="spacing">0</property>
 
-                    <child>
-                      <widget class="GtkEntry" id="concentration_entry">
-                        <property name="can_focus">yes</property>
-                        <property name="editable">no</property>
-                        <property name="text" translatable="yes"></property>
-                        <property name="max-length">0</property>
-                        <property name="visibility">yes</property>
-                        <property name="visible">yes</property>
+		  <child>
+		    <widget class="GtkEntry" id="concentration_entry">
+		      <property name="visible">True</property>
+		      <property name="can_focus">True</property>
+		      <property name="editable">False</property>
+		      <property name="visibility">True</property>
+		      <property name="max_length">0</property>
+		      <property name="text" translatable="yes"></property>
+		      <property name="has_frame">True</property>
+		      <property name="invisible_char" translatable="yes">*</property>
+		      <property name="activates_default">False</property>
+		      <signal name="activate" handler="input_concentration"/>
+		    </widget>
+		    <packing>
+		      <property name="padding">0</property>
+		      <property name="expand">True</property>
+		      <property name="fill">True</property>
+		    </packing>
+		  </child>
+		</widget>
+	      </child>
 
-                        <signal name="activate" handler="input_concentration" />
-                      </widget>
-                      <packing>
-                        <property name="padding">0</property>
-                        <property name="expand">yes</property>
-                        <property name="fill">yes</property>
-                      </packing>
-                    </child>
-                  </widget>
-                </child>
-              </widget>
-              <packing>
-                <property name="padding">0</property>
-                <property name="expand">no</property>
-                <property name="fill">no</property>
-              </packing>
-            </child>
+	      <child>
+		<widget class="GtkLabel" id="label2">
+		  <property name="visible">True</property>
+		  <property name="label" translatable="yes">Concentration</property>
+		  <property name="use_underline">False</property>
+		  <property name="use_markup">False</property>
+		  <property name="justify">GTK_JUSTIFY_LEFT</property>
+		  <property name="wrap">False</property>
+		  <property name="selectable">False</property>
+		  <property name="xalign">0.5</property>
+		  <property name="yalign">0.5</property>
+		  <property name="xpad">0</property>
+		  <property name="ypad">0</property>
+		</widget>
+		<packing>
+		  <property name="type">label_item</property>
+		</packing>
+	      </child>
+	    </widget>
+	    <packing>
+	      <property name="padding">0</property>
+	      <property name="expand">False</property>
+	      <property name="fill">False</property>
+	    </packing>
+	  </child>
 
-            <child>
-              <widget class="GtkCheckButton" id="checkbutton32">
-                <property name="border_width">2</property>
-                <property name="can_focus">yes</property>
-                <property name="label" translatable="yes">Value
+	  <child>
+	    <widget class="GtkCheckButton" id="checkbox">
+	      <property name="border_width">2</property>
+	      <property name="visible">True</property>
+	      <property name="can_focus">True</property>
+	      <property name="label" translatable="yes">Value
 Fixed</property>
-                <property name="active">no</property>
-                <property name="draw_indicator">yes</property>
-                <property name="visible">yes</property>
+	      <property name="use_underline">True</property>
+	      <property name="relief">GTK_RELIEF_NORMAL</property>
+	      <property name="active">False</property>
+	      <property name="inconsistent">False</property>
+	      <property name="draw_indicator">True</property>
+	      <signal name="toggled" handler="button_toggled"/>
+	    </widget>
+	    <packing>
+	      <property name="padding">0</property>
+	      <property name="expand">False</property>
+	      <property name="fill">False</property>
+	    </packing>
+	  </child>
+	</widget>
+	<packing>
+	  <property name="padding">0</property>
+	  <property name="expand">False</property>
+	  <property name="fill">False</property>
+	</packing>
+      </child>
+    </widget>
+  </child>
+</widget>
 
-                <signal name="toggled" handler="button_toggled" />
-              </widget>
-              <packing>
-                <property name="padding">0</property>
-                <property name="expand">no</property>
-                <property name="fill">no</property>
-              </packing>
-            </child>
-          </widget>
-          <packing>
-            <property name="padding">0</property>
-            <property name="expand">no</property>
-            <property name="fill">no</property>
-          </packing>
-        </child>
-      </widget>
-    </child>
-  </widget>
 </glade-interface>

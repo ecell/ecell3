@@ -1,149 +1,190 @@
 #!/usr/bin/env python
 
 import string
+import operator
 
 from OsogoPluginWindow import *
 from ecell.ecssupport import *
 
 class VariableWindow( OsogoPluginWindow ):
 
-	def __init__( self, dirname,  data, pluginmanager, root=None ):
+	# ------------------------------------------------------
+	# Constructor
+	#  [1] Checks this entity have Value, Concentration, 
+	#      Fixed Property. 
+	#  [2] Checks type of Value and Concentration
+	#  [3] Only when this entity has all of them, 
+	#      creates this window.
+	#
+	# aDirName(str)   : directory name that includes glade file
+	# aData           : RawFullPN
+	# aPluginManager  : the reference to pluginmanager
+	# return -> None
+	# ------------------------------------------------------
+	def __init__( self, aDirName, aData, aPluginManager, aRoot=None ):
         
-		OsogoPluginWindow.__init__( self, dirname, data, pluginmanager, root )
+		# calls constructor of superclass
+		OsogoPluginWindow.__init__( self, aDirName, aData, aPluginManager, aRoot )
 
+		# creates EntityStub
+		self.theSession = aPluginManager.theSession
+		self.theFullIDString = createFullIDString( self.theFullID() )
+		self.theStub = self.theSession.createEntityStub( self.theFullIDString )
+
+		# flags 
+		aValueFlag = FALSE
+		aConcentrationFlag = FALSE
+		aFixedFlag = FALSE
+
+		# --------------------------------------------------------------------
+		# [1] Checks this entity have Value, Concentration, Fixed property.
+		# --------------------------------------------------------------------
+		
+		for aProperty in self.theStub.getPropertyList(): # for(1)
+			if aProperty == 'Value':
+				aValueFlag = TRUE
+			elif aProperty == 'Concentration':
+				aConcentrationFlag = TRUE
+			elif aProperty == 'Fixed':
+				aFixedFlag = TRUE
+		# end of for(1)
+
+		# If this entity does not have 'Value', does not create instance 
+		if aValueFlag == FALSE:
+			aMessage = "Error: %s does not have \"Value\" property" %self.theFullIDString
+			self.thePluginManager.printMessage( aMessage )
+			aDialog = ConfirmWindow(OK_MODE, aMessage, 'Error!')
+			return None
+
+		# If this entity does not have 'Concentration', does not create instance 
+		if aConcentrationFlag == FALSE:
+			aMessage = "Error: %s does not have \"Concentration\" property" %self.theFullIDString
+			self.thePluginManager.printMessage( aMessage )
+			aDialog = ConfirmWindow(OK_MODE, aMessage, 'Error!')
+			return None
+
+		# If this entity does not have 'Fixed', does not create instance 
+		if aFixedFlag == FALSE:
+			aMessage = "Error: %s does not have \"Fixed\" property" %self.theFullIDString
+			self.thePluginManager.printMessage( aMessage )
+			aDialog = ConfirmWindow(OK_MODE, aMessage, 'Error!')
+			return None
+
+
+		# --------------------------------------------------------------------
+		#  [2] Checks Value and Concentration is Number
+		# --------------------------------------------------------------------
+
+		# If Value is not Number
+		if operator.isNumberType( self.theStub.getProperty('Value') ):
+			pass
+		else:
+			aMessage = "Error: \"Value\" property is not number" 
+			self.thePluginManager.printMessage( aMessage )
+			aDialog = ConfirmWindow(OK_MODE, aMessage, 'Error!')
+			return None
+
+		# If Concentration is not Number
+		if operator.isNumberType( self.theStub.getProperty('Concentration') ):
+			pass
+		else:
+			aMessage = "Error: \"Concentration\" property is not number" 
+			self.thePluginManager.printMessage( aMessage )
+			aDialog = ConfirmWindow(OK_MODE, aMessage, 'Error!')
+			return None
+
+		# --------------------------------------------------------------------
+		#  [3] Creates this instance
+		# --------------------------------------------------------------------
+		# registers this instance to plugin manager
 		self.thePluginManager.appendInstance( self )    
+		# calls openWindow of superclass
 		self.openWindow()
-		#self.initialize()
-		# ------------------------------------------------------------
-		# 0 : not fixed  1: fixed
-		self.theFixFlag = 0
-        
-		self.addHandlers( {'button_toggled': self.fix_mode,
-#		                   'qty_increase_pressed': self.increaseValue, 
-#		                   'qty_decrease_pressed': self.decreaseValue,
-				   'on_value_spinbutton_changed' : self.changeValue,
-#		                   'concentration_increase_pressed': self.increaseConcentration,
-#		                   'concentration_decrease_pressed': self.decreaseConcentration,
-		                   'input_value': self.changeValue,
-		                   'input_concentration': self.inputConcentration,
-		                   'window_exit' : self.exit } )
 
-		self.theSession = pluginmanager.theSession
+		# adds handers
+		self.addHandlers( { \
+		                    'button_toggled': self.changeFixFlag,
+							'on_value_spinbutton_changed' : self.changeValue,
+							'input_value': self.changeValue,
+							#'input_concentration': self.inputConcentration,
+							'window_exit' : self.exit } )
 
-		aFullIDString = createFullIDString( self.theFullID() )
-
-		self.theStub = self.theSession.createEntityStub( aFullIDString )
-		self["id_label"].set_text( self.theStub.getName() )
-
+		# sets FULLID to label 
+		self["id_label"].set_text( self.theFullIDString )
 		self.update()
-		# ------------------------------------------------------------
+
+	# end of __init__
 
 
+	# ------------------------------------------------------
+	# update
+	#  - update all widget
+	#
+	# return -> None
+	# ------------------------------------------------------
 	def update( self ):
 
-		self.theValue = self.theStub.getProperty( 'Value' )
-		self.theConcValue = self.theStub.getProperty( 'Concentration' )
-		self.theIsFixed = self.theStub.getProperty( 'Fixed' )
+		self['checkbox'].set_active( self.theStub.getProperty('Fixed') )
+		self['value_spinbutton'].set_text( str(self.theStub.getProperty('Value')) )
+		self['concentration_entry'].set_text( str(self.theStub.getProperty('Concentration')) )
 
-		self['value_spinbutton'].set_text( str( self.theValue ) )
-		self['concentration_entry'].set_text( str( self.theConcValue ) )
+	# end of update
 
-	def fix_mode( self, a ) :
-		self.theFixFlag = not self.theFixFlag
-		self.theStub.setProperty( 'Fixed', self.theFixFlag )
 
-		self.thePluginManager.updateAllPluginWindow()
+	# ------------------------------------------------------
+	# changeFixFlag
+	#  - change fix flag
+	#
+	# *obj             : dammy objects
+	# return -> None
+	# ------------------------------------------------------
+	def changeFixFlag( self, *obj ):
 
+		self.theStub.setProperty( 'Fixed', self['checkbox'].get_active() )
+		self.thePluginManager.updateAllWindows()    
+
+	# end of changeFixFlag
+
+
+	# ------------------------------------------------------
+	# changeValue
+	#  - get text form GtkEntryField
+	#  - convert text to float
+	#  - set the float value to session
+	#
+	# *obj             : dammy objects
+	# return -> None
+	# ------------------------------------------------------
 	def changeValue( self, obj ):
 
-		aText = obj.get_text()
+		# gets text
+		aText = string.strip( obj.get_text() )
 
-		string.strip(aText)
-
+		# if nothing is written in GtkEntryField, do nothing.
 		if aText == '':
 			return None
+
+		# if something is written, convert it.
+		try:
+			aNumber = getFloatFromString( aText )
+		except:
+			ConfirmWindow(OK_MODE,"Value must be float.","Error!")
+			return None
+
+		# if aNumber is None may be
+		if aNumber == None:
+			pass
 		else:
-			self.theValue = string.atof( aText )
-			self.theStub.setProperty( 'Value', self.theValue )
+			self.theStub.setProperty( 'Value', aNumber )
+			self.thePluginManager.updateAllWindows()    
 
-			self.thePluginManager.updateAllPluginWindow()
-
-
-	def inputConcentration( self, obj ):
-        
-		self.theConcValue = string.atof( obj.get_text() )
-		self.theStub.setProperty( 'Concentration', self.theConcValue )
-
-		self.thePluginManager.updateAllPluginWindow()
-
-	def increaseValue( self, button_object ):
-
-		if self.theStub.getProperty( 'Value' ):
-			self.theValue *= 2.0
-		else:
-			self.theValue = 1.0
-
-		self.theStub.setProperty( 'Value', self.theValue )
-
-		self.thePluginManager.updateAllPluginWindow()
-
-	def decreaseValue( self, button_object ):
-
-		self.theValue *= 0.5
-		self.setProperty( 'Value', self.theValue )
-
-		self.thePluginManager.updateAllPluginWindow()
+	# end of changeValue
 
 
-	def increaseConcentration( self, button_object ):
-
-		self.theConcValue *= 2.0
-		self.setProperty( 'Concentration', self.theConcValue )
-
-		self.thePluginManager.updateAllPluginWindow()
-
-	def decreaseConcentration( self, button_object ):
-
-		self.theConcValue *= 0.5
-		self.setProperty( 'Concentration', self.theConcValue )
-
-		self.thePluginManager.updateAllPluginWindow()
-    
+	# ----------
+	# for debug
+	# ----------
 	def mainLoop():
 		# FIXME: should be a custom function
 		gtk.mainloop()
-
-if __name__ == "__main__":
-
-    class simulator:        
-        dic={('Variable','/CELL/CYTOPLASM','ATP','Value') : (1950,),
-             ('Variable','/CELL/CYTOPLASM','ATP','Concentration') : (0.353,),}
-        def getEntityProperty( self, fpn ):
-            return simulator.dic[fpn]
-        
-        def setEntityProperty( self, fpn, value ):
-            simulator.dic[fpn] = value
-            
-            
-    fpn = ('Variable','/CELL/CYTOPLASM','ATP','')
-
-
-    def mainQuit( obj, data ):
-        gtk.mainquit()
-         
-    def mainLoop():
-        # FIXME: should be a custom function
-        
-        gtk.mainloop()
-
-    def main():
-        aVariableWindow = VariableWindow( 'plugins', simulator(), [fpn,])
-        aVariableWindow.addHandler( 'gtk_main_quit' , mainQuit )
-        aVariableWindow.update()
-
-        mainLoop()
-
-    main()
-    
-
 

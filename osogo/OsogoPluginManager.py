@@ -412,6 +412,9 @@ class OsogoPluginManager(PluginManager):
 
 	# end of printMessage
 
+	def updateAllWindows( self ):
+		self.updateAllPluginWindow()
+		self.theMainWindow.updateFundamentalWindows()
 
 
 if __name__ == "__main__":
