@@ -33,7 +33,6 @@
 #define __SIMULATORIMPLEMENTATION_HPP
 
 #include "libecs/libecs.hpp"
-#include "libecs/RCPtr.hpp"
 
 #include "libemc.hpp"
 
@@ -134,15 +133,15 @@ namespace libemc
 
     virtual const libecs::Polymorph getLoggerList() const = 0;
 
-    virtual const libecs::DataPointVectorRCPtr 
+    virtual const libecs::DataPointVectorSharedPtr 
     getLoggerData( libecs::StringCref aFullPNString ) const = 0;
 
-    virtual const libecs::DataPointVectorRCPtr
+    virtual const libecs::DataPointVectorSharedPtr
     getLoggerData( libecs::StringCref aFullPNString, 
 		   libecs::RealCref aStartTime, 
 		   libecs::RealCref anEndTime ) const = 0;
 
-    virtual const libecs::DataPointVectorRCPtr
+    virtual const libecs::DataPointVectorSharedPtr
     getLoggerData( libecs::StringCref aFullPNString,
 		   libecs::RealCref aStartTime, libecs::RealCref anEndTime, 
 		   libecs::RealCref interval ) const = 0;
@@ -184,9 +183,9 @@ namespace libemc
 
     virtual void stop() = 0;
 
-    virtual void setEventChecker( EventCheckerRCPtrCref aEventChecker ) = 0;
+    virtual void setEventChecker( EventCheckerSharedPtrCref aEventChecker ) = 0;
 
-    virtual void setEventHandler( EventHandlerRCPtrCref anEventHandler ) = 0;
+    virtual void setEventHandler( EventHandlerSharedPtrCref anEventHandler ) = 0;
 
     virtual const libecs::Polymorph getDMInfo() = 0;
 

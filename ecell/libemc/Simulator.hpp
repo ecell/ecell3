@@ -460,13 +460,13 @@ namespace libemc
       return theSimulatorImplementation->getLoggerList();
     }
 
-    const libecs::DataPointVectorRCPtr 
+    const libecs::DataPointVectorSharedPtr 
     getLoggerData( libecs::StringCref aFullPNString ) const
     {
       return theSimulatorImplementation->getLoggerData( aFullPNString );
     }
 
-    const libecs::DataPointVectorRCPtr
+    const libecs::DataPointVectorSharedPtr
     getLoggerData( libecs::StringCref aFullPNString, 
 		   libecs::RealCref aStartTime, 
 		   libecs::RealCref anEndTime ) const 
@@ -475,7 +475,7 @@ namespace libemc
 	getLoggerData( aFullPNString, aStartTime, anEndTime );
     }
 
-    const libecs::DataPointVectorRCPtr
+    const libecs::DataPointVectorSharedPtr
     getLoggerData( libecs::StringCref aFullPNString,
 		   libecs::RealCref aStartTime, libecs::RealCref anEndTime,
 		   libecs::RealCref anInterval ) const
@@ -633,7 +633,7 @@ namespace libemc
        @see setEventHandler
     */
 
-    void setEventChecker( EventCheckerRCPtr aEventChecker )
+    void setEventChecker( EventCheckerSharedPtr aEventChecker )
     {
        theSimulatorImplementation->setEventChecker( aEventChecker );
     }
@@ -650,7 +650,7 @@ namespace libemc
        @see setEventChecker
     */
 
-    void setEventHandler( EventHandlerRCPtrCref anEventHandler )
+    void setEventHandler( EventHandlerSharedPtrCref anEventHandler )
     {
        theSimulatorImplementation->setEventHandler( anEventHandler );
     }

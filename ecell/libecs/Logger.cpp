@@ -115,7 +115,7 @@ namespace libecs
 
 
 
-  DataPointVectorRCPtr Logger::getData( void ) const
+  DataPointVectorSharedPtr Logger::getData( void ) const
   {
     if (thePhysicalLoggers[0]->empty())
 	{
@@ -128,7 +128,7 @@ namespace libecs
 
   //
 
-  DataPointVectorRCPtr Logger::getData( RealParam aStartTime,
+  DataPointVectorSharedPtr Logger::getData( RealParam aStartTime,
 					RealParam anEndTime ) const
   {
     if (thePhysicalLoggers[0]->empty())
@@ -151,10 +151,10 @@ namespace libecs
 
   //
 
-  DataPointVectorRCPtr Logger::anEmptyVector(void) const
+  DataPointVectorSharedPtr Logger::anEmptyVector(void) const
   
   {
-  DataPointVectorRCPtr aDataPointVector( new DataPointVector (0,2) );
+  DataPointVectorSharedPtr aDataPointVector( new DataPointVector (0,2) );
   return aDataPointVector;
   }
   
@@ -301,7 +301,7 @@ namespace libecs
 
 
 
-  DataPointVectorRCPtr Logger::getData( RealParam aStartTime,
+  DataPointVectorSharedPtr Logger::getData( RealParam aStartTime,
 					RealParam anEndTime,
 					RealParam anInterval ) const
   {
@@ -406,7 +406,7 @@ namespace libecs
 		}
 
 
-    return DataPointVectorRCPtr( aDataPointVector );
+    return DataPointVectorSharedPtr( aDataPointVector );
   }
 
 

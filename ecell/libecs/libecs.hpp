@@ -33,7 +33,6 @@
 #include <map>
 
 #include "Defs.hpp"
-#include "RCPtr.hpp"
 
 
 namespace libecs
@@ -96,8 +95,8 @@ namespace libecs
   DECLARE_MAP( const String, String, std::less<const String>,
 	       StringMap );
 
-  DECLARE_RCPTR( StringList );
-  DECLARE_RCPTR( StringVector );
+  DECLARE_SHAREDPTR( StringList );
+  DECLARE_SHAREDPTR( StringVector );
 
 
   // classes
@@ -162,10 +161,10 @@ namespace libecs
 
 
 
-  // reference counted pointer types
+  // other reference counted pointer types
 
-  DECLARE_RCPTR( PolymorphVector );
-  DECLARE_RCPTR( DataPointVector );
+  DECLARE_SHAREDPTR( PolymorphVector );
+  DECLARE_SHAREDPTR( DataPointVector );
   
   /** @} */ 
 

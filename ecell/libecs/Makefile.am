@@ -105,7 +105,6 @@ LoggerAdapter.hpp\
 LoggerBroker.hpp\
 Exceptions.hpp\
 Util.hpp\
-RCPtr.hpp\
 VariableReference.hpp\
 DynamicPriorityQueue.hpp\
 FluxProcess.hpp

@@ -89,8 +89,8 @@ BOOST_PYTHON_MODULE( _emc )
   signal( SIGFPE,  PyEcsSignalHandler );
   signal( SIGINT,  PyEcsSignalHandler );
 
-  register_EventCheckerRCPtr_from_python();
-  register_EventHandlerRCPtr_from_python();
+  register_EventCheckerSharedPtr_from_python();
+  register_EventHandlerSharedPtr_from_python();
 
 
 
@@ -136,14 +136,14 @@ BOOST_PYTHON_MODULE( _emc )
 	  ( void ( Simulator::* )( StringCref, Polymorph ) )
       &Simulator::createLogger )  
     .def( "getLoggerData", 
-	  ( const DataPointVectorRCPtr ( Simulator::* )( StringCref ) const )
+	  ( const DataPointVectorSharedPtr ( Simulator::* )( StringCref ) const )
 	  &Simulator::getLoggerData )
     .def( "getLoggerData", 
-	  ( const DataPointVectorRCPtr 
+	  ( const DataPointVectorSharedPtr 
 	    ( Simulator::* )( StringCref, RealCref, RealCref ) const ) 
 	  &Simulator::getLoggerData )
     .def( "getLoggerData",
-	  ( const DataPointVectorRCPtr
+	  ( const DataPointVectorSharedPtr
 	    ( Simulator::* )( StringCref, RealCref, 
 			      RealCref, RealCref ) const ) 
 	  &Simulator::getLoggerData )

@@ -110,7 +110,7 @@ namespace libecs
 
     void getItem( const iterator&, DataPointPtr ) const;
     
-    DataPointVectorRCPtr getVector( const iterator& start,
+    DataPointVectorSharedPtr getVector( const iterator& start,
 				    const iterator& end ) const;
 
     size_type size() const;

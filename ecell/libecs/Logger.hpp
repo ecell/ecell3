@@ -64,7 +64,7 @@ namespace libecs
   public:
 
     typedef DataPointVectorIterator const_iterator;
-	typedef PhysicalLogger::iterator phys_iterator;
+    typedef PhysicalLogger::iterator phys_iterator;
 
 
   public:
@@ -99,7 +99,7 @@ namespace libecs
 
     */
 
-    DataPointVectorRCPtr getData( void ) const;
+    DataPointVectorSharedPtr getData( void ) const;
 
     /**
 
@@ -111,14 +111,14 @@ namespace libecs
        - no 2 theTime values are the same 
     */
 
-    DataPointVectorRCPtr getData( RealParam aStartTine,
+    DataPointVectorSharedPtr getData( RealParam aStartTine,
 				  RealParam anEndTime ) const;
 
     /**
     
     */
 
-    DataPointVectorRCPtr getData( RealParam aStartTime,
+    DataPointVectorSharedPtr getData( RealParam aStartTime,
 				  RealParam anEndTime, 
 				  RealParam anInterval ) const;
     
@@ -192,7 +192,7 @@ namespace libecs
 
   private:
     
-    DataPointVectorRCPtr anEmptyVector(void) const;
+    DataPointVectorSharedPtr anEmptyVector(void) const;
 
     // no copy constructor
   

@@ -54,8 +54,8 @@ namespace libemc
 
 
 
-  DECLARE_RCPTR( EventChecker );
-  DECLARE_RCPTR( EventHandler );
+  DECLARE_SHAREDPTR( EventChecker );
+  DECLARE_SHAREDPTR( EventHandler );
 
   class EventHandler
     :

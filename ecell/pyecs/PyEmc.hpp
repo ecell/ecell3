@@ -130,15 +130,15 @@ public:
 };
 
 
-class register_EventCheckerRCPtr_from_python
+class register_EventCheckerSharedPtr_from_python
 {
 public:
 
-  register_EventCheckerRCPtr_from_python()
+  register_EventCheckerSharedPtr_from_python()
   {
     python::converter::
       registry::insert( &convertible, &construct,
-			python::type_id<libemc::EventCheckerRCPtr>() );
+			python::type_id<libemc::EventCheckerSharedPtr>() );
   }
 
   static void* convertible( PyObject* aPyObjectPtr )
@@ -162,7 +162,7 @@ public:
 		     data )->storage.bytes );
 
     new (storage) 
-      libemc::EventCheckerRCPtr( new PythonEventChecker( aPyObjectPtr ) );
+      libemc::EventCheckerSharedPtr( new PythonEventChecker( aPyObjectPtr ) );
 
     data->convertible = storage;
   }
@@ -171,15 +171,15 @@ public:
 
 
 
-class register_EventHandlerRCPtr_from_python
+class register_EventHandlerSharedPtr_from_python
 {
 public:
 
-  register_EventHandlerRCPtr_from_python()
+  register_EventHandlerSharedPtr_from_python()
   {
     python::converter::
       registry::insert( &convertible, &construct,
-			python::type_id<libemc::EventHandlerRCPtr>() );
+			python::type_id<libemc::EventHandlerSharedPtr>() );
   }
 
   static void* convertible( PyObject* aPyObjectPtr )
@@ -203,7 +203,7 @@ public:
 		     data )->storage.bytes );
 
     new (storage) 
-      libemc::EventHandlerRCPtr( new PythonEventHandler( aPyObjectPtr ) );
+      libemc::EventHandlerSharedPtr( new PythonEventHandler( aPyObjectPtr ) );
 
     data->convertible = storage;
   }

@@ -86,16 +86,16 @@ public:
 };
 
 
-class DataPointVectorRCPtr_to_python
+class DataPointVectorSharedPtr_to_python
 {
 public:
 
   static PyObject* 
-  convert( const libecs::DataPointVectorRCPtr& aVectorRCPtr )
+  convert( const libecs::DataPointVectorSharedPtr& aVectorSharedPtr )
   {
     // here starts an ugly C hack :-/
 
-    libecs::DataPointVectorCref aVector( *aVectorRCPtr );
+    libecs::DataPointVectorCref aVector( *aVectorSharedPtr );
 
     int aDimensions[2] = { aVector.getSize(),
 			   aVector.getElementSize() / sizeof( double ) };

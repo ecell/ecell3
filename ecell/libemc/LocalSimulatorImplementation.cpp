@@ -56,8 +56,8 @@ namespace libemc
     theModel( *new Model ),
     theRunningFlag( false ),
     theEventCheckInterval( 20 ),
-    theEventChecker( NULLPTR ),
-    theEventHandler( NULLPTR )
+    theEventChecker(),
+    theEventHandler()
   {
     clearEventChecker();
   }
@@ -355,13 +355,13 @@ namespace libemc
   }
 
 
-  const libecs::DataPointVectorRCPtr LocalSimulatorImplementation::
+  const libecs::DataPointVectorSharedPtr LocalSimulatorImplementation::
   getLoggerData( libecs::StringCref aFullPNString ) const
   {
     return getLogger( aFullPNString )->getData();
   }
 
-  const libecs::DataPointVectorRCPtr LocalSimulatorImplementation::
+  const libecs::DataPointVectorSharedPtr LocalSimulatorImplementation::
   getLoggerData( libecs::StringCref aFullPNString, 
 		 libecs::RealCref aStartTime, 
 		 libecs::RealCref anEndTime ) const
@@ -370,7 +370,7 @@ namespace libemc
   }
 
 
-  const libecs::DataPointVectorRCPtr LocalSimulatorImplementation::
+  const libecs::DataPointVectorSharedPtr LocalSimulatorImplementation::
   getLoggerData( libecs::StringCref aFullPNString, 
 		 libecs::RealCref aStartTime, 
 		 libecs::RealCref anEndTime,
@@ -605,20 +605,20 @@ namespace libemc
   }
 
   void LocalSimulatorImplementation::
-  setEventChecker( EventCheckerRCPtrCref aEventChecker )
+  setEventChecker( EventCheckerSharedPtrCref aEventChecker )
   {
     theEventChecker = aEventChecker;
   }
 
   void LocalSimulatorImplementation::
-  setEventHandler( EventHandlerRCPtrCref anEventHandler )
+  setEventHandler( EventHandlerSharedPtrCref anEventHandler )
   {
     theEventHandler = anEventHandler;
   }
 
   void LocalSimulatorImplementation::clearEventChecker()
   {
-    setEventChecker( EventCheckerRCPtr( new DefaultEventChecker() ) );
+    setEventChecker( EventCheckerSharedPtr( new DefaultEventChecker() ) );
   }
 
   const libecs::Polymorph LocalSimulatorImplementation::getDMInfo()

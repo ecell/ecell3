@@ -111,10 +111,12 @@ namespace libecs
     : 
     public PolymorphValue
   {
-  
+
+    typedef typename libecs::Param<T>::type TParam;
+
   public:
 
-    ConcretePolymorphValue( typename Param<T>::type  aValue ) 
+    ConcretePolymorphValue( TParam aValue ) 
       :
       theValue( aValue )
     {

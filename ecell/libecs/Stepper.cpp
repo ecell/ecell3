@@ -328,8 +328,8 @@ namespace libecs
 	  ( aTargetVector.begin() +
 	    aStepperPtr->getReadOnlyVariableOffset() );
 
-	// For efficiency, binary_search should be done for possibly longer
-	// vector, and linear iteration for possibly shorter vector.
+	// For efficiency, binary_search should be done for supposedly longer
+	// vector, and linear iteration for supposedly shorter vector.
 	//
 
 	// if one Variable in this::readlist appears in the target::write list

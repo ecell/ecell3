@@ -127,14 +127,14 @@ namespace libemc
 
     virtual const libecs::Polymorph getLoggerList() const;
 
-    virtual const libecs::DataPointVectorRCPtr 
+    virtual const libecs::DataPointVectorSharedPtr 
     getLoggerData( libecs::StringCref aFullPNString ) const;
 
-    virtual const libecs::DataPointVectorRCPtr
+    virtual const libecs::DataPointVectorSharedPtr
     getLoggerData( libecs::StringCref aFullPNString, 
 		   libecs::RealCref start, libecs::RealCref end ) const;
 
-    virtual const libecs::DataPointVectorRCPtr
+    virtual const libecs::DataPointVectorSharedPtr
     getLoggerData( libecs::StringCref aFullPNString,
 		   libecs::RealCref start, libecs::RealCref end, 
 		   libecs::RealCref interval ) const;
@@ -179,9 +179,9 @@ namespace libemc
 
     void clearEventChecker();
 
-    virtual void setEventChecker( EventCheckerRCPtrCref aEventChecker );
+    virtual void setEventChecker( EventCheckerSharedPtrCref aEventChecker );
 
-    virtual void setEventHandler( EventHandlerRCPtrCref anEventHandler );
+    virtual void setEventHandler( EventHandlerSharedPtrCref anEventHandler );
 
     virtual const libecs::Polymorph getDMInfo();
 
@@ -212,8 +212,8 @@ namespace libemc
     bool                       theRunningFlag;
     libecs::Integer                theEventCheckInterval;
 
-    EventCheckerRCPtr          theEventChecker;
-    EventHandlerRCPtr          theEventHandler;
+    EventCheckerSharedPtr          theEventChecker;
+    EventHandlerSharedPtr          theEventHandler;
 
   };  
 

@@ -39,6 +39,7 @@
 #include <vector>
 
 #include <boost/call_traits.hpp>
+#include <boost/smart_ptr.hpp>
 
 #include "ecell/config.h"
 
@@ -108,6 +109,14 @@ typedef const mytype & mytype ## Cref;
    typedef const tag * tag ## Cptr;    \
    typedef tag &       tag ## Ref;     \
    typedef const tag & tag ## Cref;
+
+#define DECLARE_SHAREDPTR( type )\
+  typedef boost::shared_ptr<type> type ## SharedPtr;\
+  typedef type ## SharedPtr *       type ## SharedPtr ## Ptr;     \
+  typedef const type ## SharedPtr * type ## SharedPtr ## Cptr;    \
+  typedef type ## SharedPtr &       type ## SharedPtr ## Ref;     \
+  typedef const type ## SharedPtr & type ## SharedPtr ## Cref;
+
 
 
   // *******************************************
@@ -327,7 +336,6 @@ typedef const mytype & mytype ## Cref;
       typedef typename name::reverse_iterator name ## Riterator;            \
       typedef typename name::reverse_iterator& name ## RiteratorRef;        \
       typedef typename name::reverse_iterator* name ## RiteratorPtr
-
 
 
   // Types

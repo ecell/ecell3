@@ -285,7 +285,7 @@ namespace libecs
   }
 
 
-  DataPointVectorRCPtr 
+  DataPointVectorSharedPtr 
   PhysicalLogger::getVector( PhysicalLoggerIteratorCref start,
 			     PhysicalLoggerIteratorCref end ) const
   {
@@ -326,7 +326,7 @@ namespace libecs
 	  while ( counter <= end );
       }
 
-    return DataPointVectorRCPtr( aVector );
+    return DataPointVectorSharedPtr( aVector );
   }
     
 
