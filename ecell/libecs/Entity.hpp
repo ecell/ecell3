@@ -206,7 +206,7 @@ namespace libecs
 
   protected:
 
-    virtual void makeSlots();
+    void makeSlots();
 
   private:
 
