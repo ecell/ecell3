@@ -1,16 +1,28 @@
   <!-- ================ Writing em ================================ -->
 
   <chapter id="write-em"> 
-    <title>Writing a Model File in E-Cell Model format</title> 
+  <title>Writing a Model File in E-Cell Model format</title> 
 
 
-    <sect1>
-      <title>General rules</title>
+  <sect1>
+    <title>What is E-Cell Model file?</title>
 
-      <para>
-	  The file suffix must be ".em". It is an abbreviation of
-	  "E-Cell Model"
-	  </para>
+    <para>
+      In &app, the standard file format of model description and
+      exchange is XML-based EML (E-Cell Model description Language).
+      Although EML is an ideal means of integrating E-Cell with other
+      software components such as GUI model editors and databases, it
+      is very tedious for human users who want to write and edit their
+      models directly by text editors.  E-Cell Model (EM) is a file
+      format with programming language-like syntax and a powerful
+      embedded <application>empy</application> preprocessor, which is
+      designed to be productive and intuitive especially when handled
+      by the text editors.  Semantics of EM and EML files are almost
+      completely equivalent to each other, and going between these two
+      formats is meant to be possible with no loss of information
+      (some exceptions are comments and directions to the preprocessor in EM).
+      The file suffix of EM files must be ".em".
+    </para>
 
     </sect1>
 
@@ -18,12 +30,37 @@
       <title>general structure</title>
 
       <programlisting>
-ObjectType [ClassName] ( ID )
+Stepper [ClassName] ( ID )
 { 
         property_name1 property_value1 ;
         property_name2 property_value2 ;
         ...
         property_namen property_valuen ;
+} 
+
+System [ClassName] ( SystemPath )
+{ 
+        property_name1 property_value1 ;
+        property_name2 property_value2 ;
+        ...
+        property_namen property_valuen ;
+
+        Variable [ClassName] ( ID )
+        { 
+                property_name1 property_value1 ;
+                property_name2 property_value2 ;
+                ...
+                property_namen property_valuen ;
+        } 
+
+        Process [ClassName] ( ID )
+        { 
+                property_name1 property_value1 ;
+                property_name2 property_value2 ;
+                ...
+                property_namen property_valuen ;
+        } 
+
 } 
 </programlisting>
 
