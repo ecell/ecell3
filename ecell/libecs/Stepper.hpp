@@ -370,24 +370,24 @@ namespace libecs
        These methods are for handling the standerd error control objects.
     */
 
-    const Real getRelativeTorelance() const
+    const Real getRelativeTolerance() const
     {
-      return theRelativeTorelance;
+      return theRelativeTolerance;
     }
 
-    void setRelativeTorelance( RealCref aValue )
+    void setRelativeTolerance( RealCref aValue )
     {
-      theRelativeTorelance = aValue;
+      theRelativeTolerance = aValue;
     }
 
-    void setTorelance( RealCref aValue )
+    void setTolerance( RealCref aValue )
     {
-      theTorelance = aValue;
+      theTolerance = aValue;
     }
 
-    const Real getTorelance() const
+    const Real getTolerance() const
     {
-      return theTorelance;
+      return theTolerance;
     }
 
     void setStateScalingFactor( RealCref aValue )
@@ -460,8 +460,8 @@ namespace libecs
 
   private:
 
-    Real theRelativeTorelance;
-    Real theTorelance;
+    Real theRelativeTolerance;
+    Real theTolerance;
     Real theStateScalingFactor;
     Real theDerivativeScalingFactor;
 

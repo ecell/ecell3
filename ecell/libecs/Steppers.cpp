@@ -220,8 +220,8 @@ namespace libecs
     const UnsignedInt aSize( theWriteVariableVector.size() );
 
     // don't expect too much from euler
-    const Real eps_abs( getTorelance() );
-    const Real eps_rel( getRelativeTorelance() * eps_abs );
+    const Real eps_abs( getTolerance() );
+    const Real eps_rel( getRelativeTolerance() * eps_abs );
     const Real a_y( getStateScalingFactor() );
     const Real a_dydt( getDerivativeScalingFactor() );
 
@@ -373,8 +373,8 @@ namespace libecs
   {
     const UnsignedInt aSize( theWriteVariableVector.size() );
 
-    const Real eps_abs( getTorelance() );
-    const Real eps_rel( getRelativeTorelance() * eps_abs );
+    const Real eps_abs( getTolerance() );
+    const Real eps_rel( getRelativeTolerance() * eps_abs );
     const Real a_y( getStateScalingFactor() );
     const Real a_dydt( getDerivativeScalingFactor() );
 
@@ -555,8 +555,8 @@ namespace libecs
   {
     const UnsignedInt aSize( theWriteVariableVector.size() );
 
-    const Real eps_abs( getTorelance() );
-    const Real eps_rel( getRelativeTorelance() * eps_abs );
+    const Real eps_abs( getTolerance() );
+    const Real eps_rel( getRelativeTolerance() * eps_abs );
     const Real a_y( getStateScalingFactor() );
     const Real a_dydt( getDerivativeScalingFactor() );
 
