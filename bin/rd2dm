@@ -6,19 +6,29 @@
 
 
 #TO-DOS, in order of importance, as of 09/30/02
-#-Make this program put its executable under --prefix=/.../bin/
+#-Reactor -> Process
+#-Substance -> Variable
+#-Reactant -> Connection -> VariableReference
+#-Quantity -> Value
+#-Stoichiometry -> coefficient
+#-react -> process
+#-FluxProcess::process( Real ) -> setFlux( Real )
+
 #-Make this program comment out "#" in 'react'
 #-Make this program allow multi-line 'DESCRIPTION' values
 #-Make this program allow multi-line 'BRIEF_DESCRIPTION' values
 #-Make this program support *.rd syntax (will be supported by shell?)
 
 import sys
+import string
+import time
 
 ##########open files
 
 anInputfilename = sys.argv[1] # assign the name of the rd file to anInputfilename
 anInputfile = open( anInputfilename, 'r' )
-anOutputfilename = anInputfilename[:-2] + 'dm'
+
+anOutputfilename = anInputfilename[:-10] + 'Process.dm'
 anOutputfile = open( anOutputfilename, 'w' )
 
 aText = anInputfile.read() # assign aText with the contents of the rd file
@@ -27,7 +37,7 @@ if len( sys.argv ) != 2: # Error if there are too many arguments(rd2dm.py, input
 	print "ArgumentError: Too many arguments (% rd2dm.py inputfile)"
 	sys.exit( 0 )
 
-import string
+
 aTextList = string.split( aText,'\n' ) # Split aText into lines and assign each line into an element of aTextList
 
 TRUE = 1 # TRUE flag for @REACT_FUNC:
@@ -258,10 +268,10 @@ anEditedTextDictionary['REACT'] = aTextDictionary['REACT_FUNC']
 ##########begin editing
 
 ###CLASSNAME
-# do nothing
+anEditedTextDictionary['CLASSNAME'] = string.replace(anEditedTextDictionary['CLASSNAME'],'Reactor','Process') # Replace Float with Real
 
 ###BASECLASS
-# do nothing
+anEditedTextDictionary['BASECLASS'] = string.replace(anEditedTextDictionary['BASECLASS'],'Reactor','Process') # Replace Float with Real
 
 ###AUTHOR
 # do nothing
@@ -307,38 +317,38 @@ aNumberOfEffector = string.count(anEditedTextDictionary['REACT'], 'effector(')
 
 aProtectedAuxIndex = 0
 while aProtectedAuxIndex < aNumberOfSubstrate:
-	anEditedTextDictionary['PROTECTED_AUX'] = anEditedTextDictionary['PROTECTED_AUX'] + '\n' + '  ' + 'Reactant S' + str(aProtectedAuxIndex) + ';'
+	anEditedTextDictionary['PROTECTED_AUX'] = anEditedTextDictionary['PROTECTED_AUX'] + '\n' + '  ' + 'Connection S' + str(aProtectedAuxIndex) + ';'
 	aProtectedAuxIndex = aProtectedAuxIndex + 1
 aProtectedAuxIndex = 0
 while aProtectedAuxIndex < aNumberOfProduct:
-	anEditedTextDictionary['PROTECTED_AUX'] = anEditedTextDictionary['PROTECTED_AUX'] + '\n' + '  ' + 'Reactant P' + str(aProtectedAuxIndex) + ';'
+	anEditedTextDictionary['PROTECTED_AUX'] = anEditedTextDictionary['PROTECTED_AUX'] + '\n' + '  ' + 'Connection P' + str(aProtectedAuxIndex) + ';'
 	aProtectedAuxIndex = aProtectedAuxIndex + 1
 aProtectedAuxIndex = 0
 while aProtectedAuxIndex < aNumberOfCatalyst:
-	anEditedTextDictionary['PROTECTED_AUX'] = anEditedTextDictionary['PROTECTED_AUX'] + '\n' + '  ' + 'Reactant C' + str(aProtectedAuxIndex) + ';'
+	anEditedTextDictionary['PROTECTED_AUX'] = anEditedTextDictionary['PROTECTED_AUX'] + '\n' + '  ' + 'Connection C' + str(aProtectedAuxIndex) + ';'
 	aProtectedAuxIndex = aProtectedAuxIndex + 1
 aProtectedAuxIndex = 0
 while aProtectedAuxIndex < aNumberOfEffector:
-	anEditedTextDictionary['PROTECTED_AUX'] = anEditedTextDictionary['PROTECTED_AUX'] + '\n' + '  ' + 'Reactant E' + str(aProtectedAuxIndex) + ';'	
+	anEditedTextDictionary['PROTECTED_AUX'] = anEditedTextDictionary['PROTECTED_AUX'] + '\n' + '  ' + 'Connection E' + str(aProtectedAuxIndex) + ';'	
 	aProtectedAuxIndex = aProtectedAuxIndex + 1
 
 ###INITIALIZE
 
 anInitializeIndex = 0
 while anInitializeIndex < aNumberOfSubstrate:
-	anEditedTextDictionary['INITIALIZE'] = anEditedTextDictionary['INITIALIZE'] + '  S' + str(anInitializeIndex) + ' = getReactant( "S' + str(anInitializeIndex) + '" );\n'
+	anEditedTextDictionary['INITIALIZE'] = anEditedTextDictionary['INITIALIZE'] + '  S' + str(anInitializeIndex) + ' = getConnection( "S' + str(anInitializeIndex) + '" );\n'
 	anInitializeIndex = anInitializeIndex + 1
 anInitializeIndex = 0
 while anInitializeIndex < aNumberOfProduct:
-	anEditedTextDictionary['INITIALIZE'] = anEditedTextDictionary['INITIALIZE'] + '  P' + str(anInitializeIndex) + ' = getReactant( "P' + str(anInitializeIndex) + '" );\n'
+	anEditedTextDictionary['INITIALIZE'] = anEditedTextDictionary['INITIALIZE'] + '  P' + str(anInitializeIndex) + ' = getConnection( "P' + str(anInitializeIndex) + '" );\n'
 	anInitializeIndex = anInitializeIndex + 1
 anInitializeIndex = 0
 while anInitializeIndex < aNumberOfCatalyst:
-	anEditedTextDictionary['INITIALIZE'] = anEditedTextDictionary['INITIALIZE'] + '  C' + str(anInitializeIndex) + ' = getReactant( "C' + str(anInitializeIndex) + '" );\n'
+	anEditedTextDictionary['INITIALIZE'] = anEditedTextDictionary['INITIALIZE'] + '  C' + str(anInitializeIndex) + ' = getConnection( "C' + str(anInitializeIndex) + '" );\n'
 	anInitializeIndex = anInitializeIndex + 1
 anInitializeIndex = 0
 while anInitializeIndex < aNumberOfEffector:
-	anEditedTextDictionary['INITIALIZE'] = anEditedTextDictionary['INITIALIZE'] + '  E' + str(anInitializeIndex) + ' = getReactant( "E' + str(anInitializeIndex) + '" );\n'
+	anEditedTextDictionary['INITIALIZE'] = anEditedTextDictionary['INITIALIZE'] + '  E' + str(anInitializeIndex) + ' = getConnection( "E' + str(anInitializeIndex) + '" );\n'
 	anInitializeIndex = anInitializeIndex + 1
 	
 ###REACT
@@ -349,28 +359,28 @@ anEditedTextDictionary['REACT'] = string.replace(anEditedTextDictionary['REACT']
 anEditedTextDictionary['REACT'] = string.replace(anEditedTextDictionary['REACT'],'catalyst(','C') # Replace catalyst with C
 anEditedTextDictionary['REACT'] = string.replace(anEditedTextDictionary['REACT'],'effector(','E') # Replace effector with E
 
-anEditedTextDictionary['REACT'] = string.replace(anEditedTextDictionary['REACT'], ')->quantity()','.getSubstance()->getQuantity()')
-anEditedTextDictionary['REACT'] = string.replace(anEditedTextDictionary['REACT'], ') -> quantity()','.getSubstance()->getQuantity()')
-anEditedTextDictionary['REACT'] = string.replace(anEditedTextDictionary['REACT'], ')->setQuantity','.getSubstance()->setQuantity')
-anEditedTextDictionary['REACT'] = string.replace(anEditedTextDictionary['REACT'], ') -> setQuantity','.getSubstance()->setQuantity')
-anEditedTextDictionary['REACT'] = string.replace(anEditedTextDictionary['REACT'], ')->concentration()','.getSubstance()->getConcentration()')
-anEditedTextDictionary['REACT'] = string.replace(anEditedTextDictionary['REACT'], ') -> concentration()','.getSubstance()->getConcentration()')
+anEditedTextDictionary['REACT'] = string.replace(anEditedTextDictionary['REACT'], ')->quantity()','.getVariable()->getValue()')
+anEditedTextDictionary['REACT'] = string.replace(anEditedTextDictionary['REACT'], ') -> quantity()','.getVariable()->getValue()')
+anEditedTextDictionary['REACT'] = string.replace(anEditedTextDictionary['REACT'], ')->setQuantity','.getVariable()->setValue')
+anEditedTextDictionary['REACT'] = string.replace(anEditedTextDictionary['REACT'], ') -> setQuantity','.getVariable()->setValue')
+anEditedTextDictionary['REACT'] = string.replace(anEditedTextDictionary['REACT'], ')->concentration()','.getVariable()->getConcentration()')
+anEditedTextDictionary['REACT'] = string.replace(anEditedTextDictionary['REACT'], ') -> concentration()','.getVariable()->getConcentration()')
 
 anEditedTextDictionary['REACT'] = string.replace(anEditedTextDictionary['REACT'], 'supersystem()','getSuperSystem()')
 anEditedTextDictionary['REACT'] = string.replace(anEditedTextDictionary['REACT'], 'volume()','getVolume()')
 anEditedTextDictionary['REACT'] = string.replace(anEditedTextDictionary['REACT'], 'stepper()','getStepper()')
 anEditedTextDictionary['REACT'] = string.replace(anEditedTextDictionary['REACT'], 'deltaT()','getStepInterval()')
-anEditedTextDictionary['REACT'] = string.replace(anEditedTextDictionary['REACT'], 'coefficient()','getStoichiometry()') # will probably change in the future
+anEditedTextDictionary['REACT'] = string.replace(anEditedTextDictionary['REACT'], 'coefficient()','getCoefficient()') # will probably change in the future
 
 anEditedTextDictionary['REACT'] = string.replace(anEditedTextDictionary['REACT'], 'cout', 'std::cout')
-#anEditedTextDictionary['REACT'] = string.replace(anEditedTextDictionary['REACT'], '', '')
+anEditedTextDictionary['REACT'] = string.replace(anEditedTextDictionary['REACT'], 'process', 'setFlux')
 #anEditedTextDictionary['REACT'] = string.replace(anEditedTextDictionary['REACT'], '//','#')
 #anEditedTextDictionary['REACT'] = string.replace(anEditedTextDictionary['REACT'], 'num(Substrate)','') # don't edit 'num(Substrate)'
 
 ##########end editing
 ##########begin writing
 
-#anOutputfile.write("# This has been created using the 'rd2dm' module. \n# Please remove this comment after checking for errors.\n\n")
+anOutputfile.write("# This has been created using the 'rd2dm' program\n" + "# From: " + anInputfilename + ", Time: " + time.asctime( time.localtime() ) + "\n\n")
 
 classname = "CLASSNAME = " + "'" + str(anEditedTextDictionary['CLASSNAME'] + "'")
 anOutputfile.write(classname + '\n\n')
@@ -408,8 +418,8 @@ anOutputfile.write(protected_aux + "\n'''\n\n")
 initialize = "defineMethod( 'initialize', '''\n" + str(anEditedTextDictionary['INITIALIZE'])
 anOutputfile.write(initialize + "''' )\n\n")
 
-react = "defineMethod( 'react', '''" + str(anEditedTextDictionary['REACT'])
-anOutputfile.write(react + "\n''' )\n\n")
+process = "defineMethod( 'process', '''" + str(anEditedTextDictionary['REACT'])
+anOutputfile.write(process + "\n''' )\n\n")
 
 #print "CONVERTED:", anInputfile, "\nTO:", anOutputfile
 
