@@ -27,16 +27,6 @@ dnl
 dnl
 AC_CONFIG_SUBDIRS( libltdl ecell bin dmtool )
 dnl
-dnl AC_ARG_ENABLE(gtk,
-dnl   AC_HELP_STRING([--disable-gtk],
-dnl                [build ecell without gtk.]),
-dnl   [ECELL_SUBDIR="libltdl bin dmtool ecell"],
-dnl   [ECELL_SUBDIR="libltdl bin dmtool ecell osogo modeleditor toollauncher"
-dnl   AC_CONFIG_SUBDIRS(osogo)
-dnl   AC_CONFIG_SUBDIRS(modeleditor)
-dnl   AC_CONFIG_SUBDIRS(toollauncher)]
-dnl )
-dnl
 dnl
 AC_ARG_WITH(gtk,
   AC_HELP_STRING([--without-gtk],
@@ -60,12 +50,15 @@ dnl
 dnl
 dnl
 dnl
-dnl
-dnl
-AC_ARG_WITH( boost-root,
+AC_ARG_WITH( boost-root-dir,
   AC_HELP_STRING([--with-boost-root-dir=],
                [specify a non-standard root installation directory for boost library.]) )
 dnl
+dnl
+AC_ARG_ENABLE( compiler-extensions,
+	       AC_HELP_STRING([--disable-compiler-extensions],
+	       [Don't exploit the compiler's special language syntax and optimizations that are not part of the standard (such as ISO C++).] ) )
+dnl	       
 dnl
 AM_CONFIG_HEADER([ecell3_config.h])
 dnl

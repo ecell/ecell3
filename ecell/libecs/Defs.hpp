@@ -62,10 +62,23 @@
 #error "either math or cmath header is needed."
 #endif /* HAVE_CMATH */
 
+
+// 
+// If USE_COMPILER_EXTENSIONS is defined, the compiler's special
+// language syntax and optimizations that are not part of the standard
+// (such as ISO C++) are exploited.
+//
+#if defined( USE_COMPILER_EXTENSIONS )
+#  if defined( __GNUC__ )
+#    define USE_PMF_CONVERSIONS
+#  endif /* defined( __GNUC__ ) */
+#endif /* defined( USE_COMPILER_EXTENSIONS ) */
+
+
 namespace libecs
 {
 
-  // Some macros those origins from CoreLinux++
+  // Some macros those origins are libCoreLinux++
 
   /**
      IGNORE_RETURN is an indicator that the return

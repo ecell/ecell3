@@ -13,12 +13,14 @@ export MEPATH=${exec_prefix}/lib/modeleditor
 export TLPATH=${exec_prefix}/lib/toollauncher
 export PYTHONDIR=@pythondir@
 export LD_LIBRARY_PATH="${exec_prefix}/lib:${LD_LIBRARY_PATH}"
-export PYTHONPATH="$PYTHONDIR:${PYTHONPATH}"
-export PYTHONPATH="$PYTHONDIR/ecell/SessionManager:${PYTHONPATH}"
+export PYTHONPATH="$PYTHONDIR/ecell/SessionManager:$PYTHONDIR:${PYTHONPATH}"
 export PYTHON_INCLUDES="@PYTHON_INCLUDES@"
 export BOOST_LIBRARIES="@BOOST_LIB@ @BOOST_PYTHON_LIB@"
 export LTDL_LIBRARY_PATH=".:${ECELL3_DM_PATH}:${prefix}/lib/ecell/${VERSION}:${LTDL_LIBRARY_PATH}"
 export VERSION=${VERSION}
+export CXXFLAGS="@CXXFLAGS@"
+export CXX="@CXX@"
+export LDFLAGS="@LDFLAGS@"
 
 
 PYTHON=@PYTHON@
@@ -74,6 +76,10 @@ Configurations:
 	prefix          = $prefix
         pythondir       = $PYTHONDIR
 	ECELL3_DM_PATH  = $ECELL3_DM_PATH
+
+        CXX             = $CXX
+        CXXFLAGS        = $CXXFLAGS
+        LDFLAGS         = $LDFLAGS
 
         If the environment variable ECELL3_DM_PATH is set to a colon (:)
         separated directory path, it loads dynamic modules from there.

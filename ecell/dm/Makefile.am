@@ -5,6 +5,8 @@ SHELL = @SHELL@
 
 LTDL_SHLIB_EXT = @LTDL_SHLIB_EXT@
 
+CXXFLAGS = @CXXFLAGS@
+
 if OS_WIN32
   ECELL3_DMC = ../../bin/ecell3-dmc.exe
 else
@@ -120,7 +122,7 @@ dmsodir = ${DM_SO_DIR}
 dmso_DATA = ${SOS} ${DESCS}
 
 %$(LTDL_SHLIB_EXT) : %.cpp
-	${ECELL3_DMC} --verbose --dmcompile="../../dmtool" --no-stdinclude --no-stdlibdir --ldflags="-L${top_srcdir}/libecs ${BOOST_LIB}" --cxxflags='-I${top_srcdir}/libecs -I${top_srcdir}/.. -I${top_srcdir} ${PYTHON_INCLUDES} ${BOOST_INCLUDE}' $< 
+	${ECELL3_DMC} --verbose --dmcompile="../../dmtool" --no-stdinclude --no-stdlibdir --ldflags="-L${top_srcdir}/libecs ${BOOST_LIB}" --cxxflags='${CXXFLAGS} -I${top_srcdir}/libecs -I${top_srcdir}/.. -I${top_srcdir} ${PYTHON_INCLUDES} ${BOOST_INCLUDE}' $< 
 
 clean-local:
 	${RM} -rf ${SOS}
