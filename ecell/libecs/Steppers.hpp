@@ -54,7 +54,10 @@ namespace libecs
 
     static StepperPtr createInstance() { return new FixedEuler1Stepper; }
 
-    virtual StringLiteral getClassName() const { return "FixedEuler1Stepper"; }
+    virtual StringLiteral getClassName() const
+    {
+      return "FixedEuler1Stepper";
+    }
 
   };
 
@@ -73,7 +76,10 @@ namespace libecs
     virtual void step();
 
 
-    virtual StringLiteral getClassName() const { return "FixedRungeKutta4Stepper"; }
+    virtual StringLiteral getClassName() const
+    {
+      return "FixedRungeKutta4Stepper";
+    }
 
 
   protected:
@@ -105,10 +111,50 @@ namespace libecs
   };
 
 
+  DECLARE_CLASS( Midpoint2Stepper );
+
   class Midpoint2Stepper
     : 
     public DifferentialStepper
   {
+
+  public:
+
+    class VariableProxy
+      :
+      public libecs::VariableProxy
+    {
+    public:
+
+      VariableProxy( Midpoint2StepperRef aStepper, 
+		    VariablePtr const aVariablePtr )
+	:
+	libecs::VariableProxy( aVariablePtr ),
+	theStepper( aStepper ),
+	theIndex( theStepper.getVariableProxyIndex( aVariablePtr ) )
+      {
+	; // do nothing
+      }
+
+      virtual const Real getVelocity( RealCref aTime )
+      {
+	const Real theta( ( aTime - theStepper.getCurrentTime() )
+			  / theStepper.getStepInterval() );
+
+	const Real k1 = theStepper.getK1()[ theIndex ];
+	const Real k2 = theStepper.getVelocityBuffer()[ theIndex ];
+
+	return ( k1 + ( k2 - k1 ) * theta )
+	  * ( aTime - theStepper.getCurrentTime() );
+      }
+
+
+    protected:
+
+      Midpoint2StepperRef theStepper;
+      UnsignedInt         theIndex;
+    };
+
 
   public:
 
@@ -123,6 +169,16 @@ namespace libecs
     bool calculate();
 
     virtual StringLiteral getClassName() const { return "Midpoint2Stepper"; }
+
+    virtual VariableProxyPtr createVariableProxy( VariablePtr aVariable )
+    {
+      return new VariableProxy( *this, aVariable );
+    }
+
+    RealVectorCref getK1() const
+    {
+      return theK1;
+    }
 
 
   protected:
@@ -164,10 +220,50 @@ namespace libecs
 
   };
 
+
+  DECLARE_CLASS( DormandPrince547MStepper );
+
   class DormandPrince547MStepper
     : 
     public DifferentialStepper
   {
+
+    class VariableProxy
+      :
+      public libecs::VariableProxy
+    {
+    public:
+
+      VariableProxy( DormandPrince547MStepperRef aStepper, 
+		    VariablePtr const aVariablePtr )
+	:
+	libecs::VariableProxy( aVariablePtr ),
+	theStepper( aStepper ),
+	theIndex( theStepper.getVariableProxyIndex( aVariablePtr ) )
+      {
+	; // do nothing
+      }
+
+      virtual const Real getVelocity( RealCref aTime )
+      {
+	const Real theta( ( aTime - theStepper.getCurrentTime() )
+			  / theStepper.getStepInterval() );
+
+	const Real k1 = theStepper.getK1()[ theIndex ];
+	const Real k2 = theStepper.getVelocityBuffer()[ theIndex ];
+	const Real k3 = theStepper.getMidVelocityBuffer()[ theIndex ];
+
+	return ( k1 + ( ( -3*k1 - k2 + 8*k3 ) 
+			+ ( 2*k1 + 2*k2 - 8*k3 ) * theta ) * theta )
+	  * ( aTime - theStepper.getCurrentTime() );
+      }
+
+
+    protected:
+
+      DormandPrince547MStepperRef theStepper;
+      UnsignedInt                 theIndex;
+    };
 
   public:
 
@@ -186,6 +282,21 @@ namespace libecs
       return "DormandPrince547MStepper";
     }
 
+    virtual VariableProxyPtr createVariableProxy( VariablePtr aVariable )
+    {
+      return new VariableProxy( *this, aVariable );
+    }
+
+    RealVectorCref getK1() const
+    {
+      return theK1;
+    }
+
+    RealVectorCref getMidVelocityBuffer() const
+    {
+      return theMidVelocityBuffer;
+    }
+
 
   protected:
 
@@ -197,6 +308,7 @@ namespace libecs
     RealVector theK6;
     RealVector theK7;
 
+    RealVector theMidVelocityBuffer;
     RealVector theErrorEstimate;
 
   };
