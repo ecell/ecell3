@@ -291,6 +291,7 @@ namespace libecs
 	  theInterval            = anInterval;
 	  theLastNonzeroInterval = anInterval;
 	  theLastNonzeroValue    = aDataPoint.getAvg();
+
 	}
       else
 	{
@@ -313,6 +314,7 @@ namespace libecs
 	  theLastNonzeroValue=aDataPoint.getAvg();
 	  theDataPoint.setValue( aDataPoint.getValue() );
 	  theDataPoint.setTime( getTime() + anInterval );
+
 	  theInterval += anInterval;
 	}
     }

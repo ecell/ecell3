@@ -104,8 +104,9 @@ namespace libecs
     DataPoint back() const
     {
       // danger!!  undefined behavior with vvector if size() == 0 - sha
-      DEBUG_EXCEPTION( size() > 0, AssertionFailed, "" );
-      return theVector[ size() - 1 ];
+//      DEBUG_EXCEPTION( size() > 0, AssertionFailed, "" );
+//	not anymore - gabor
+      return theVector[ end() ];
     }
 
     iterator begin() const
@@ -116,8 +117,15 @@ namespace libecs
     iterator end() const
     {
       // is this ok? - sha
-      
-       return size() - 1;
+      //no, but I fixed it - gabor
+       if ( size() > 0 )
+        {
+    	    return size() - 1;
+	}
+       else
+        {
+	    return 0;
+	}
     }
 
 

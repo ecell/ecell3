@@ -36,6 +36,9 @@ class Plot:
 	    self.plotwidth=480
 	    self.plotheigth=350
 	    self.plotarea=[70,20,370,300]
+	    self.plotaread=[self.plotarea[0],self.plotarea[1],\
+		self.plotarea[2]+self.plotarea[0],\
+		self.plotarea[3]+self.plotarea[1]]
 	    self.ylabelsarea=[0,0,69,325]
 	    self.xlabelsarea=[30,325,450,25]
 	    self.xticksarea=[70,322,410,3]
@@ -169,8 +172,11 @@ class Plot:
 	    
 	def drawline(self, aFullPNString,x0,y0,x1,y1):
 	    #uses raw plot coordinates!
+	    
 	    self.pm.draw_line(self.GCFullPNMap[aFullPNString],x0,y0,x1,y1)
-	    self.theWidget.queue_draw_area(min(x0,x1),min(y0,y1),abs(x1-x0)+1,abs(y1-y0)+1)
+	    self.theWidget.queue_draw_area(min(x0,x1),min(y0,y1),abs(x1-x0)+1,\
+	    abs(y1-y0)+1)
+	    return [x1,y1]
 	    
 	def drawbox(self, aFullPNString,x0,y0,width,heigth):
 	    #uses raw plot coordinates!
@@ -289,6 +295,7 @@ class Plot:
 			self.zerovalue=miny
 		    else:
 			miny=self.minmax[0]
+			self.zerovalue=miny
 		    self.yframe[1]=pow(10,ceil(log10(self.minmax[1])))
 		    self.yframe[0]=pow(10,floor(log10(miny)))	    
 		    diff=int(log10(self.yframe[1]/self.yframe[0]))
@@ -301,6 +308,7 @@ class Plot:
 			self.yticks_step=pow(10,ceil(diff/5))
 		self.ygrid[0]=self.yframe[0]
 		self.ygrid[1]=self.yframe[1]
+
 	    else:
 		if self.scale_type=='linear':
 		    ticks=0
@@ -475,7 +483,7 @@ class TracerPlot(Plot):
 
 		    for fpn in self.data_list:
 			try:
-			    while self.data_stack[fpn][0][0]<self.xframe[0]:
+			    while self.data_stack[fpn][1][0]<self.xframe[0]:
 				del self.data_stack[fpn][0]
 			except IndexError:
 			    pass #it's quite normal, that there is no data in frame, because simualtor is too fast
@@ -862,40 +870,133 @@ class TracerPlot(Plot):
 	    self.lastx[aFullPNString]=None	
 	    self.lasty[aFullPNString]=None
 	    for datapoint in databuffer:
-		if datapoint[0]>=self.xframe[0]:
+	#	if datapoint[0]>=self.xframe[0]:
 		    self.drawpoint(aFullPNString, datapoint)
+
+	def withinframes(self,point):
+	    return point[0]<self.plotaread[2] and point[0]>self.plotaread[0] and\
+		   point[1]<self.plotaread[3] and point[1]>self.plotaread[1]
 	
 	def drawpoint(self, aFullPNString, datapoint):
 	    #get datapoint x y values
 	    #convert to plot coordinates
-	    if datapoint[0]<self.xframe[1] and datapoint[0]>self.xframe[0] and\
-		   datapoint[1]<self.yframe[1] and datapoint[1]>self.yframe[0]:
-		    x=self.convertx_to_plot(datapoint[0])
-		    y=self.converty_to_plot(datapoint[1])
-		    #getlastpoint, calculate change to the last
-		    lastx=self.lastx[aFullPNString]
-		    lasty=self.lasty[aFullPNString]
-		    if lastx!=None:
-			    dx=abs(lastx-x)
-			    dy=abs(lasty-y)
+
+	    x=self.convertx_to_plot(datapoint[0])
+	    y=self.converty_to_plot(datapoint[1])
+	    cur_point_within_frame=self.withinframes([x,y])
+	    #getlastpoint, calculate change to the last
+	    lastx=self.lastx[aFullPNString]
+	    lasty=self.lasty[aFullPNString]
+	    self.lastx[aFullPNString]=x
+	    self.lasty[aFullPNString]=y
+
+
+	    last_point_within_frame=self.withinframes([lastx,lasty])
+	    if lastx!=None:
+		dx=abs(lastx-x)
+		dy=abs(lasty-y)
+	    else:
+		dx=0
+		dy=0
+	    if dx<2 and dy<2:
+		#draw just a point
+		if cur_point_within_frame:
+		    self.drawpoint_on_plot(aFullPNString,x,y)
+
+	    else:
+		#draw line    
+
+		if (not cur_point_within_frame) and (not last_point_within_frame):
+		    #if neither points are in frame do not draw line
+		    pass
+		else:
+		    #draw line
+		    x0=lastx
+		    y0=lasty
+		    x1=x
+		    y1=y
+
+#		    print "before"
+#		    print "x0",x0,"y0",y0,"x1",x1,"y1",y1
+
+		    if cur_point_within_frame and last_point_within_frame:
+		    #if both points are in frame no interpolation needed
+			pass
 		    else:
-			    dx=0
-			    dy=0
-		    if dx<2 and dy<2:
-			    self.drawpoint_on_plot(aFullPNString,x,y)
-		    else:
-			    self.drawline(aFullPNString,lastx,lasty,x,y)
-		    
+			#either current or last point out of frame, do interpolation
+			
+#interpolation section begins - only in case lastpoint or current point is off limits
+			#there are 2 boundary cases x0=x1 and y0=y1
+			if x0==x1:
+			    #adjust y if necessary
+			    if y0<self.plotaread[1] and y1>self.plotaread[1]:
+				y0=self.plotaread[1]
+			    if y0>self.plotaread[3] and y1<self.plotaread[3]:
+				y0=self.plotaread[3]
+
+			    if y1<self.plotaread[1] and y0>self.plotaread[1]:
+				y1=self.plotaread[1]
+			    if y1>self.plotaread[3] and y0<self.plotaread[3]:
+				y1=self.plotaread[3]
+	    
+			elif y0==y1:
+			    #adjust x values if necessary
+			    if x0<self.plotaread[0] and x1>self.plotaread[0]:
+				x0=self.plotaread[0]
+			    if x0>self.plotaread[2] and x1<self.plotaread[2]:
+				x0=self.plotaread[2]
+
+			    if x1<self.plotaread[0] and x0>self.plotaread[0]:
+				x1=self.plotaread[0]
+			    if x1>self.plotaread[2] and x0<self.plotaread[2]:
+				x1=self.plotaread[2]
+	    
+			else:
+
+    			    #create coordinate equations
+			    mx=float(y1-y0)/float(x1-x0)
+			    my=1/mx
+			    xi=x0
+			    yi=y0
+			    #check whether either point is out of plot area
+	    
+			    #if x0 is out then interpolate x=leftside, create new x0, y0
+			    if x0<self.plotaread[0]:
+				x0=self.plotaread[0]
+				y0=yi+round((x0-xi)*mx)
+			    #if y0 is still out, interpolate y=upper and lower side, 
+			    #whichever x0 is smaller, create new x0
+			    if y0<self.plotaread[1] or y0>self.plotaread[3]:
+				#upper side
+				y0=self.plotaread[1]
+				x0=xi+round((y0-yi)*my)
+				#lower side
+				y02=self.plotaread[3]
+				x02=xi+round((y02-yi)*my)
+				if x02<x0:
+				    x0=x02
+				    y0=y02
+			    #repeat it with x1 and y1, but compare to left side
+			    if x1>self.plotaread[2]:
+				x1=self.plotaread[2]
+				y1=yi+round((x1-xi)*mx)
+			    #if y0 is still out, interpolate y=upper and lower side, 
+			    #whichever x0 is smaller, create new x0
+			    if y1<self.plotaread[1] or y1>self.plotaread[3]:
+				#upper side
+				y1=self.plotaread[1]
+				x1=xi+round((y1-yi)*my)
+				#lower side
+				y12=self.plotaread[3]
+				x12=xi+round((y12-yi)*my)
+				if x12>x1:
+				    x1=x12
+				    y1=y12
+#interpolation section ends
+		    self.drawline(aFullPNString,x0,y0,x1,y1)
 		    #if change is 1 pixel in x or y direction drawpoint
 		    #else drawline
 		    #setlast
-		    self.lastx[aFullPNString]=x
-		    self.lasty[aFullPNString]=y
-	    else:
-		    self.lastx[aFullPNString]=None
-		    self.lasty[aFullPNString]=None
-
-
 	    
 	    
 	def reframex(self):

@@ -31,7 +31,6 @@
 
 
 #include "Logger.hpp"
- 
 
 namespace libecs
 {
@@ -92,7 +91,7 @@ namespace libecs
 	theEndTime = anEndTime;
       }
   
-    Real theMaxSize ( thePhysicalLogger.size() );  
+    PhysicalLoggerIterator theMaxSize ( thePhysicalLogger.end() );  
     DataPointVectorIterator 
       range( static_cast<DataPointVectorIterator>
 	     ( ( theEndTime - theStartTime ) / anInterval ) + 1 );
@@ -102,7 +101,8 @@ namespace libecs
       top( thePhysicalLogger.upper_bound( thePhysicalLogger.begin(),
 					  thePhysicalLogger.end(),
 					  theEndTime ) );
-
+    
+    
     PhysicalLoggerIterator 
       current_item( thePhysicalLogger.lower_bound( thePhysicalLogger.begin(),
 						   top,
@@ -112,11 +112,89 @@ namespace libecs
     Real rtarget( theStartTime );
     DataPointVectorPtr aDataPointVector( new DataPointVector( range ) );
     DataPoint aDataPoint;
+    DataPoint nextDataPoint;
     Real interval( 0.0 );
-    Real dptime( aDataPoint.getTime() );
     DataInterval aDataInterval;
-    thePhysicalLogger.getItem( current_item, &aDataPoint );
+    
     PhysicalLoggerIterator it;
+
+    thePhysicalLogger.getItem( current_item, &aDataPoint );
+    if (current_item<theMaxSize)
+	{
+	    ++current_item;
+	    thePhysicalLogger.getItem( current_item,&nextDataPoint);
+	}
+    else
+	{
+	nextDataPoint=aDataPoint;
+	nextDataPoint.setTime (rtarget);
+	}
+    Real dptime( aDataPoint.getTime() );
+    Real nextdptime ( nextDataPoint.getTime() );
+
+    aDataInterval.beginNewInterval();
+    do
+	{
+	    if ( nextdptime >= rtarget )
+		{		
+		    interval = rtarget - rcounter;
+		    aDataPoint=nextDataPoint;
+		    aDataPoint.setTime( rtarget );
+		    aDataInterval.aggregatePoint(aDataPoint, interval);
+    		    ( *aDataPointVector )[counter] = aDataInterval.getFinalDataPoint();
+		    rtarget += anInterval;
+		    ++counter;
+		    aDataInterval.beginNewInterval();
+		    rcounter+=interval;
+		    if (rcounter==nextdptime)
+			{
+			    aDataPoint=nextDataPoint;
+
+			    if (current_item<theMaxSize)
+    				{
+				    ++current_item;
+				    thePhysicalLogger.getItem( current_item,
+								&nextDataPoint);
+				}
+			    else
+				{
+				    nextDataPoint=aDataPoint;
+				    nextDataPoint.setTime (rtarget);
+				}
+
+			    nextdptime=nextDataPoint.getTime();
+
+			}
+		}
+	    else //nextdptime<rtarget(aggregate and get new data)
+		{
+
+		    interval = nextdptime - rcounter;
+		    rcounter = nextdptime;
+		    aDataInterval.aggregatePoint ( nextDataPoint, interval );
+
+
+		    aDataPoint=nextDataPoint;
+
+		    if ( current_item < theMaxSize )
+    			{
+			    ++current_item;
+			    thePhysicalLogger.getItem( current_item, 
+							&nextDataPoint);
+			}
+		    else
+			{
+			    nextDataPoint=aDataPoint;
+			    nextDataPoint.setTime (rtarget);
+			}
+
+		    nextdptime = nextDataPoint.getTime();
+		}
+    
+	}
+    while ( counter < range );
+    
+/*    
     while( counter < range )
       {
 	aDataInterval.beginNewInterval();
@@ -151,8 +229,8 @@ namespace libecs
 	    rtarget = theEndTime;	
 	}
 	++counter;
-	
-      }
+*/	
+      
 
     return DataPointVectorRCPtr( aDataPointVector );
   }
