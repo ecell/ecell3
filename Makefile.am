@@ -19,6 +19,8 @@ DOXYGEN_OUTFILE=${DOXYGEN_DIR}/html/index.html
 
 doc: ${DOXYGEN_OUTFILE}
 
+doc-all: doc-ps doc-pdf doc-html-archive
+
 doc-ps: doc
 	make -C ${DOXYGEN_DIR}/latex ps
 	cp ${DOXYGEN_DIR}/latex/refman.ps ${DOXYGEN_DIR}
