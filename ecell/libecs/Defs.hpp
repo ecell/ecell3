@@ -31,7 +31,7 @@
 
 #ifndef ___DEFS_H___
 #define ___DEFS_H___
-#include <sys/types.h>
+#include <stdint.h>
 #include <float.h>
 #include <stl.h>
 #include "config.h"
@@ -39,27 +39,18 @@
 // system constants
 
 const int RANDOM_NUMBER_BUFFER_SIZE(65535);
-//FIXME: const char* const REACTOR_SO_DIR= DM_SO_DIR "/reactor"; 
+
+
+// Numeric types
 
 // FIXME: use numeric_limits
-#if SIZEOF_LONG_LONG > 0
-typedef long long Int;
-const int INT_SIZE=SIZEOF_LONG_LONG;
-#else
 typedef int64_t Int;
-const int INT_SIZE=SIZEOF_LONG;
-#endif
-
-//#define QUANTITY_MAX LONG_LONG_MAX
-//#define QUANTITY_MIN LONG_LONG_MIN
+typedef uint64_t Uint;
+const int INT_SIZE=sizeof(int64_t);
 
 typedef double Float;
 typedef Float Mol;
 #define FLOAT_DIG DBL_DIG
-
-#define ATOF( str ) atof( str )
-#define ATOI( str ) atoi( str )
-
 typedef Int Quantity;
 typedef Float Concentration;
 
@@ -73,6 +64,11 @@ const char LINE_SEPARATOR = '\n';
 
 
 const int NOMATCH = -1;
+
+#define ATOF( str ) atof( str )
+#define ATOI( str ) atoi( str )
+
+
 
 
 // CoreLinux++ compatibility
@@ -92,13 +88,17 @@ typedef const mytype & mytype ## Cref;
    typedef tag &       tag ## Ref;     \
    typedef const tag & tag ## Cref;
 
+#define NULLPTR 0
+
+
+// String and StringPair
+
 #include <string>
 
 DECLARE_TYPE( string, String );
 typedef pair<String,String> StringPair_;
 DECLARE_TYPE( StringPair_, StringPair );
 
-#define NULLPTR 0
 
 #endif /* ___DEFS_H___ */
 

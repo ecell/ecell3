@@ -31,6 +31,8 @@
 #include <string.h>
 #include <strstream>
 #include <time.h>
+
+#include "Exceptions.hpp"
 #include "Util.hpp"
 
 
@@ -51,7 +53,7 @@ int table_lookup( StringCref str, const char** table )
 	}
     }
 
-  return NOMATCH;
+  throw NotFound( __PRETTY_FUNCTION__ );
 }
 
 template <class T> 
@@ -69,6 +71,11 @@ template<> Float stringTo<Float>( StringCref str )
 }
 
 template<> Int stringTo<Int>( StringCref str )
+{
+  return ATOI( str.c_str() );
+}
+
+template<> Uint stringTo<Uint>( StringCref str )
 {
   return ATOI( str.c_str() );
 }
