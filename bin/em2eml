@@ -49,8 +49,7 @@ class Token:
 
 class AST:
 	def __init__(self, type, kids=[]):
-		self.type = type.type
-		self.attr = type.attr
+		self.type = type
 		self._kids = kids
 		
 	def __getitem__(self, i):
@@ -61,6 +60,8 @@ class AST:
 
 	def __repr__(self):
                 return str(self.type) + ':' + str(self._kids)
+
+
 
 class EmScanner( GenericScanner , object ):
 	
@@ -124,7 +125,7 @@ class EmScanner( GenericScanner , object ):
 
 
 class EmParser( GenericParser ):
-	def __init__( self, AST, start='start' ):
+	def __init__( self, AST, start='stmts' ):
 
 		GenericParser.__init__( self, start )
 
@@ -132,7 +133,7 @@ class EmParser( GenericParser ):
 		'''
 		start ::= stmts
 		'''
-		return AST( Token( 'start' ), args )
+		return AST( 'start', args )
 	
 	def p_stmts( self, args ):
 		'''
@@ -140,14 +141,14 @@ class EmParser( GenericParser ):
 		stmts ::= stmt
 		stmts ::=
 		'''
-		return AST( Token( 'stmts' ), args )
+		return AST( 'stmts', args )
 
 	def p_stmt( self, args ):
 		'''
 		stmt ::= stepper_stmt
 		stmt ::= system_stmt
 		'''
-		return AST( Token( 'stmt' ), args )
+		return AST( 'stmt', args )
 	
 	# statements
 
@@ -156,51 +157,30 @@ class EmParser( GenericParser ):
 
 	def p_stepper_stmt ( self, args ):
 		'''
-		stepper_stmt ::= Stepper object_decl stepper_def
+		stepper_stmt ::= Stepper object_decl { propertylist }
 		'''
-		return AST( Token( 'stepper_stmt' ), args )
+		return AST( 'stepper_stmt', args )
 
 	def p_system_stmt ( self, args ):
                 '''
-		system_stmt ::= System object_decl system_def
+		system_stmt ::= System object_decl { property_entity_list }
 		'''
-		return AST( Token( 'system_stmt' ), args )
+		return AST( 'system_stmt', args )
 
 	def p_entity_other_stmt ( self, args ):
                 '''
-		entity_other_stmt ::= Variable object_decl entity_other_def
-		entity_other_stmt ::= Process object_decl entity_other_def
+		entity_other_stmt ::= Variable object_decl { propertylist }
+		entity_other_stmt ::= Process object_decl { propertylist }
 		'''
-		return AST ( Token( 'entity_other_stmt' ), args )
+                return AST ( 'entity_other_stmt', args )
 
 	# object declarations
 
 	def p_object_decl( self, args ):
 		'''
 		object_decl ::= name ( name )
-		object_decl ::= Variable ( name )
 		'''
-		return AST ( Token( 'object_decl' ), ( args[0], args[2] ) )
-
-	# object definitions
-
-	def p_stepper_def( self, args ):
-		'''
-		stepper_def ::= { propertylist }
-		'''
-		return AST ( Token( 'stepper_def' ), ( args[1], ) )
-
-	def p_system_def( self, args ):
-		'''
-		system_def ::= { property_entity_list }
-		'''
-		return AST ( Token( 'system_def' ), ( args[1], ) )
-
-	def p_entity_other_def( self, args ):
-		'''
-		entity_other_def ::= { propertylist }
-		'''
-		return AST ( Token( 'entity_other_def' ), ( args[1], ) )
+		return AST ( 'object_decl', ( args[0], args[2] ) )
 
 	# property
 
@@ -210,13 +190,13 @@ class EmParser( GenericParser ):
 		propertylist ::= property
 		propertylist ::=
 		'''
-		return AST ( Token('propertylist'), args )
+		return AST ( 'propertylist', args )
 
 	def p_property( self, args ):
 		'''
 		property ::= name valuelist ;
 		'''
-		return AST( Token('property'), args[:2] )
+		return AST( 'property', args[:2] )
 
 
 
@@ -228,14 +208,14 @@ class EmParser( GenericParser ):
 		property_entity_list ::= property_entity
 		property_entity_list ::=
 		'''
-		return AST( Token( 'property_entity_list' ), args )
+		return AST( 'property_entity_list', args )
 
 	def p_property_entity( self, args ):
 		'''
 		property_entity ::= property
 		property_entity ::= entity_other_stmt
 		'''
-		return AST( Token( 'property_entity' ), args )
+		return AST( 'property_entity', args )
 
 
 	# value
@@ -245,29 +225,16 @@ class EmParser( GenericParser ):
 		valuelist ::= value valuelist
 		valuelist ::= value
 		'''
-		return AST( Token( 'valuelist' ), args )
+		return AST( 'valuelist', args )
 
 	def p_value( self, args ):
 		'''
-		value ::= scalervalue
-		value ::= vectorvalue
+		value ::= number
+		value ::= quotedstring
+		value ::= name
+		value ::= [ valuelist ]
 		'''
-		return AST( Token( 'value' ), args )
-
-	def p_scalervalue( self, args ):
-		'''
-		scalervalue ::= number
-		scalervalue ::= quotedstring
-		scalervalue ::= name
-		'''
-		return AST( Token( 'scalervalue' ), args )
-
-	def p_vectorvalue( self, args ):
-		'''
-		vectorvalue ::= [ valuelist ]
-		'''
-		return AST( Token( 'vectorvalue' ), ( args[1], ) )
-
+		return AST( 'value', args )
 
 	def error( self, token ):
 		sys.stderr.write( "Syntax error at or near token '%s', line %d of file %s.\n" % ( token.attr, token.lineno, token.filename ) )
@@ -275,33 +242,31 @@ class EmParser( GenericParser ):
 
 
 def flatten_nodetree( node ):
-	aList = []
 
 	if node is None or len( node ) == 0:
-		return aList
+		return []
 
-	aList.append( node[0] )
+        aList = list()
+	while len( node ) >= 1:
+            aList.append( node[0] )
+            if len( node ) == 1:
+                break
+            else:
+                node = node[1]
 
-	while len( node ) > 1:
-		node = node[1]
-		if len( node ) == 0:
-			break
-		else:
-			aList.append( node[0] )
-		
 	return aList
+
+
+def flatten_node( node ):
+    if len( node ) == 1:	
+        return node[0].attr 
+    else:
+        return flatten_propertytree( node[1] )
+
 
 def flatten_propertytree( node ):
-	anNodeList = flatten_nodetree( node )
-	aList = []
 
-	for i in anNodeList:
-		if i[0].type == 'vectorvalue':
-			aList.append( flatten_propertytree( i[0][0] ) )
-		else:
-			aList.append( i[0][0].attr )
-
-	return aList
+    return map( flatten_node, flatten_nodetree( node ) )
 	
 
 
@@ -318,51 +283,59 @@ class Interpret(GenericASTTraversal):
 
 		self.eml.createStepper( aClassname, anID )
 		
-		aPropertyList = []
-		aPropertyNodeList = flatten_nodetree( node[2][0] )
+		aPropertyNodeList = flatten_nodetree( node[3] )
 		for i in aPropertyNodeList:
+
 			aPropertyName = i[0].attr
-
-			aValueNodeList = flatten_propertytree( i[1] )
-
-			aValueList = []
-			for j in aValueNodeList:
-				aValueList.append( j )
+			aValueList = flatten_propertytree( i[1] )
 
 			self.eml.setStepperProperty( anID, aPropertyName,\
 						     aValueList )
 
-	def n_system_stmt( self, node, path='' ):
+	def n_system_stmt( self, node ):
 		aType = node[0].attr
 		aClassname = node[1][0].attr
 		anID = node[1][1].attr
-		if path != '':
-			anID = path + ':' + anID
 
-		aFullID = convert2FullID( self.eml , aType, anID)
+		aFullID = convert2FullID( self.eml , aType, anID )
 		self.eml.createEntity( aClassname, aFullID )
 		
-		aPropertyNodeList = flatten_nodetree( node[2][0] )
+		aPropertyNodeList = flatten_nodetree( node[3] )
 		for i in aPropertyNodeList:
-			if len(i[0]) != 0: 
-				aPropertyName = i[0][0].attr
-			else:
-				aPropertyName = i[0].attr
 
-			if aType == 'System' and\
-			       aPropertyName in ( 'Variable', 'Process' ):
-				self.n_system_stmt(i[0], anID)
+                        node = i[0]
+                        aPropertyName = node[0].attr
+
+			if aPropertyName in ( 'Variable', 'Process' ):
+				self.entity_other( node, anID )
 				continue
 			
-			if len(i[0]) != 0:
-				aValueList = flatten_propertytree( i[0][1] )
-			else:
-				aValueList = flatten_propertytree( i[1] )
+                        aValueList = flatten_propertytree( node[1] )
 
 			self.eml.setEntityProperty( aFullID, aPropertyName,\
 						    aValueList )
 		
-	def default( self, node):
+
+        def entity_other( self, node, path ):
+		aType = node[0].attr
+		aClassname = node[1][0].attr
+		anID = path + ':' + node[1][1].attr
+
+		aFullID = convert2FullID( self.eml , aType, anID )
+		self.eml.createEntity( aClassname, aFullID )
+		
+		aPropertyNodeList = flatten_nodetree( node[3] )
+		for i in aPropertyNodeList:
+
+			aPropertyName = i[0].attr
+			aValueList = flatten_propertytree( i[1] )
+
+			self.eml.setEntityProperty( aFullID, aPropertyName,\
+                                                    aValueList )
+
+            
+
+	def default( self, node ):
 		pass
 
 			
