@@ -3,6 +3,14 @@
   <chapter id="write-em"> 
   <title>Writing a Model File in E-Cell Model format</title> 
 
+  <highlights>
+    <para>By reading this chapter, you may get information about:</para>
+    
+    <simplelist>
+      <member>aaa</member>
+    </simplelist>
+  </highlights>
+
 
   <sect1>
     <title>What is E-Cell Model file?</title>
@@ -17,20 +25,50 @@
       format with programming language-like syntax and a powerful
       embedded <application>empy</application> preprocessor, which is
       designed to be productive and intuitive especially when handled
-      by the text editors.  Semantics of EM and EML files are almost
-      completely equivalent to each other, and going between these two
-      formats is meant to be possible with no loss of information
-      (some exceptions are comments and directions to the preprocessor in EM).
-      The file suffix of EM files must be ".em".
+      by the text editors and other text processing programs such as
+      UNIX's <application>grep</application>,
+      <application>diff</application> and
+      <application>cat</application>.  Semantics of EM and EML files
+      are almost completely equivalent to each other, and going
+      between these two formats is meant to be possible with no loss
+      of information (some exceptions are comments and directions to
+      the preprocessor in EM).  The file suffix of EM files must be
+      ".em".
     </para>
+
+    <para>Although <application>E-Cell Modeling
+    Environment</application> will provide means of more sophisticate,
+    scalable and automated model construction on the basis of EML,
+    learning syntax and semantics of EM may help you get the idea of
+    how object model inside &ecell is organized and how it is driven
+    to conduct simulations.  Furthermore, owing to the nature of plain
+    programming language-like syntax, EM can be used as a simple and
+    intuitive tool to communicate with other &ecell users.</para>
+
 
     </sect1>
 
     <sect1>
       <title>general structure</title>
+    
 
-      <programlisting>
+    <para></para>
+
+    <sect2>
+      <title>FullID and FullPN</title> 
+
+      <para></para>
+
+    </sect2>
+
+
+    <sect2>
+      <title></title>
+
+
+    <programlisting>
 Stepper [ClassName] ( ID )
+"docstring"
 { 
         property_name1 property_value1 ;
         property_name2 property_value2 ;
@@ -64,7 +102,7 @@ System [ClassName] ( SystemPath )
 } 
 </programlisting>
 
-      <para>where <emphasis>ObjectType</emphasis> is one of:
+    <para>where <emphasis>ObjectType</emphasis> is one of:
 
       <itemizedlist>
 	  <listitem>
@@ -259,6 +297,9 @@ System System ( /CELL/MEMBRANE )
 
 </programlisting>
       </example>
+
+    </sect2>
+
     </sect1>
 
 
