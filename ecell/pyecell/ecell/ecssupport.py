@@ -75,16 +75,17 @@ def validateFullPN( fullpn ):
 
 
 def createSystemPathFromFullID( aSystemFullID ):
-    if aSystemFullID[SYSTEMPATH] == '/':
+    # root system?
+    if aSystemFullID[SYSTEMPATH] == '':
         if aSystemFullID[ID] == '/':
             aNewSystemPath = '/'
-        else:
-            aNewSystemPath = '/' + aSystemFullID[ID]
+    elif aSystemFullID[SYSTEMPATH] == '/':
+        aNewSystemPath = aSystemFullID[SYSTEMPATH] + aSystemFullID[ID]
     else:
-        aNewSystemPath = aSystemFullID[SYSTEMPATH] + '/' +\
-                         aSystemFullID[ID]
-    return aNewSystemPath
+        aNewSystemPath = aSystemFullID[SYSTEMPATH] + '/' + aSystemFullID[ID]
 
+
+    return aNewSystemPath
 
 
 if __name__ == "__main__":
@@ -108,7 +109,7 @@ if __name__ == "__main__":
 
     systemfullid1  = createFullID( 'System:/:CELL' )
     systemfullid2  = createFullID( 'System:/CELL:CYTOPLASM' )
-    systemfullid3  = createFullID( 'System:/:/' )
+    systemfullid3  = createFullID( 'System::/' )
     print createSystemPathFromFullID( systemfullid1 )
     print createSystemPathFromFullID( systemfullid2 )
     print createSystemPathFromFullID( systemfullid3 )
