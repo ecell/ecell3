@@ -4,6 +4,7 @@
 from OsogoPluginWindow import *
 from ecell.ecssupport import *
 import operator
+import ConfirmWindow
 
 # ------------------------------------------------------
 # DigitalWindow -> OsogoPluginWindow
@@ -14,15 +15,14 @@ class DigitalWindow( OsogoPluginWindow ):
 	# ------------------------------------------------------
 	# Constructor
 	# 
-	# aDirName:  directory name that includes glade file
-	# data:      RawFullPN
-	# aPluginManager
+	# aDirName(str)   : directory name that includes glade file
+	# data            : RawFullPN
+	# aPluginManager  : the reference to pluginmanager 
 	# return -> None
 	# ------------------------------------------------------
 	def __init__( self, aDirName, aData, aPluginManager, aRoot=None ):
 
-
-		# calla constructor of superclass
+		# call constructor of superclass
 		OsogoPluginWindow.__init__( self, aDirName, aData, aPluginManager, aRoot )
         
 		#if type() self.theFullPN() 
@@ -30,23 +30,15 @@ class DigitalWindow( OsogoPluginWindow ):
 		aFullPNString = createFullPNString( self.theFullPN() )
 		aValue = self.theSession.theSimulator.getEntityProperty( aFullPNString )
 
-
 		if operator.isNumberType( aValue ):
-			#if operator.isNumberType( aValue[0] ):
-
 			self.openWindow()
 			self.thePluginManager.appendInstance( self )
 
-			# ----------------------------------------------------------------
-		#	self['toolbar5'].set_style( GTK.TOOLBAR_ICONS )
-			self['increase_button'].set_relief( gtk.RELIEF_HALF )
-			self['decrease_button'].set_relief( gtk.RELIEF_HALF )
-
-			self.addHandlers( { 'input_value'    :self.inputValue,
-		  	            'increase_value' :self.increaseValue,
-			            'decrease_value' :self.decreaseValue,
-			            'window_exit'    :self.exit,
-			            'test'           :self.test } )
+			self.addHandlers( { 
+			            'on_value_frame_changed' :self.inputValue,
+		  	            'on_increase_button_clicked' :self.increaseValue,
+		  	            'on_decrease_button_clicked' :self.decreaseValue,
+			            'on_DigitalWindow_delete_event'    :self.exit } )
 
 			aString = str( self.theFullPN()[ID] )
 			aString += ':\n' + str( self.theFullPN()[PROPERTY] )
@@ -59,7 +51,15 @@ class DigitalWindow( OsogoPluginWindow ):
 			self.thePluginManager.printMessage( aMessage )
 			aDialog = ConfirmWindow(0,aMessage,'Error!')
 
+	# end of __init__
 
+
+	# ------------------------------------------------------
+	# changeFullPN
+	# 
+	# anObject(any)   : a dammy object
+	# return -> None
+	# ------------------------------------------------------
 	def changeFullPN( self, anObject ):
 
 		OsogoPluginWindow.changeFullPN( self, anObject )
@@ -71,34 +71,87 @@ class DigitalWindow( OsogoPluginWindow ):
 	# end of changeFullPN
 
 
+	# ------------------------------------------------------
+	# update
+	# 
+	# return -> None
+	# ------------------------------------------------------
 	def update( self ):
 
-		#self["value_frame"].set_text( str( self.getValue( self.theFullPN() ) ) )
 		aFullPNString = createFullPNString( self.theFullPN() )
 		aValue = self.theSession.theSimulator.getEntityProperty( aFullPNString )
 		self["value_frame"].set_text( str( aValue ) )
 
+	# end of update
 
+
+	# ------------------------------------------------------
+	# inputValue
+	# 
+	# anObject(any)   : a dammy object
+	# return -> None
+	# ------------------------------------------------------
 	def inputValue( self, obj ):
-		aValue =  string.atof(obj.get_text())
-		self.setValue( self.theFullPN(), aValue )
+
+		# gets text from text field.
+		aText = string.split(self['value_frame'].get_text())
+		if type(aText) == type([]):
+			if len(aText) > 0:
+				aText = aText[0]
+			else:
+				return None
+		else:
+			return None
+
+		# Only when the length of text > 0,
+		# checks type of text and set it.
+		if len(aText)>0:
+			# Only when the value is numeric, 
+			# the value will be set to value_frame.
+			try:
+				aValue = string.atof( aText )
+				self.setValue( self.theFullPN(), aValue )
+			except:
+				ConfirmWindow.ConfirmWindow(0,'Input numerical value.')
+				aValue = self.getValue( self.theFullPN() )
+				self["value_frame"].set_text( str( aValue ) )
+			return None
+		else:
+			return None
+
+	# end of inputValue
 
 
+	# ------------------------------------------------------
+	# increaseValue
+	# 
+	# anObject(any)   : a dammy object
+	# return -> None
+	# ------------------------------------------------------
 	def increaseValue( self, obj ):
 
 		if self.getValue( self.theFullPN() ):
 			self.setValue( self.theFullPN(), self.getValue( self.theFullPN() ) * 2.0 )
 		else:
 			self.setValue( self.theFullPN(), 1.0 )
-        
 
+	# end of increaseValue
+		
+        
+	# ------------------------------------------------------
+	# decreaseValue
+	# 
+	# anObject(any)   : a dammy object
+	# return -> None
+	# ------------------------------------------------------
 	def decreaseValue( self, obj ):
 
 		self.setValue( self.theFullPN(), self.getValue( self.theFullPN() ) * 0.5 )
 
+	# end of decreaseValue
 			
-	def test( self, obj ):
-		print 'you did it'
+# end of DigitalWindow
+
 
 ### test code
 
