@@ -32,22 +32,44 @@
 #define __ECELL3_DM_HPP
 
 
-// these macros assume that TYPE and CLASS macros
+// these macros assume that ECELL3_DM_TYPE and ECELL3_DM_CLASSNAME macros
 // are already defined before use.
 //
-// TYPE and CLASS macros must be defined after including this
-// file.
+// ECELL3_DM_TYPE and ECELL3_DM_CLASSNAME macros must be defined 
+// *after* this file is included.
+//
+// if _ECELL3_DM_TYPE or _ECELL3_DM_CLASSNAME is defined *before*
+// including this file, it is used as a default value of
+// ECELL3_DM_TYPE or ECELL3_DM_CLASSNAME macros.
 
 
 #define ECELL3_DM_OBJECT LIBECS_DM_OBJECT( TYPE, CLASS )
 
 #define ECELL3_DM_INIT DM_INIT( TYPE, CLASS )
 
-#define ECELL3_DM_CLASS class CLASS
+#define ECELL3_DM_CLASS class ECELL3_DM_CLASSNAME
 
 
-#undef TYPE
-#undef CLASS
+#ifdef _ECELL3_DM_CLASSNAME
+#    define ECELL3_DM_CLASSNAME _ECELL3_DM_CLASSNAME
+#    undef  _ECELL3_DM_CLASSNAME
+#endif
+
+#ifdef _ECELL3_DM_TYPE
+#    define ECELL3_DM_TYPE _ECELL3_DM_TYPE
+#    undef  _ECELL3_DM_TYPE
+#endif
+
+
+#define ECELL3_CREATE_PROPERTYSLOT_SET_GET( TYPE, NAME )\
+CREATE_PROPERTYSLOT_SET_GET( TYPE, NAME, ECELL3_DM_CLASSNAME )
+
+#define ECELL3_CREATE_PROPERTYSLOT_SET    ( TYPE, NAME )\
+CREATE_PROPERTYSLOT_SET    ( TYPE, NAME, ECELL3_DM_CLASSNAME )
+
+#define ECELL3_CREATE_PROPERTYSLOT_GET    ( TYPE, NAME )\
+CREATE_PROPERTYSLOT_GET    ( TYPE, NAME, ECELL3_DM_CLASSNAME )
+
 
 
 #endif /* __ECELL3_DM_HPP */
