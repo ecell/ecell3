@@ -194,7 +194,7 @@ namespace libecs
     virtual Real getCurrentTime()
     {
       //FIXME:
-      return 0;
+      return theCurrentTime;
     }
 
   protected:

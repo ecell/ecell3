@@ -68,7 +68,7 @@ namespace libecs
 		const_iterator last,
 		RealCref aTime) const
   {
-    Containee aContainee( aTime, 0.0 );
+    Containee aContainee( aTime, aTime );
     const_iterator itr = lower_bound( first, last, &aContainee );
     return itr;
   }
