@@ -32,6 +32,10 @@
 #define ___ROOTSYSTEM_H___
 #include "System.hpp"
 #include "Primitive.hpp"
+#include "SubstanceMaker.hpp"
+#include "ReactorMaker.hpp"
+#include "SystemMaker.hpp"
+#include "AccumulatorMaker.hpp"
 
 
 class RootSystem : public System
@@ -61,13 +65,13 @@ public:
 
   virtual void initialize();
 
-  StepperLeaderRef    getStepperLeader()    const { return theStepperLeader; }
+  StepperLeaderRef    getStepperLeader()    { return theStepperLeader; }
 
-  ReactorMakerRef     reactorMaker()     const { return theReactorMaker; }
-  SubstanceMakerRef   substanceMaker()   const { return theSubstanceMaker; }
-  SystemMakerRef      systemMaker()      const { return theSystemMaker; }
-  StepperMakerRef     stepperMaker()     const { return theStepperMaker; }
-  AccumulatorMakerRef accumulatorMaker() const { return theAccumulatorMaker; }
+  ReactorMakerRef     getReactorMaker()     { return theReactorMaker; }
+  SubstanceMakerRef   getSubstanceMaker()   { return theSubstanceMaker; }
+  SystemMakerRef      getSystemMaker()      { return theSystemMaker; }
+  StepperMakerRef     getStepperMaker()     { return theStepperMaker; }
+  AccumulatorMakerRef getAccumulatorMaker() { return theAccumulatorMaker; }
 
   virtual const char* const className() const { return "RootSystem"; }
 
@@ -77,13 +81,13 @@ private:
 
 private:
 
-  StepperLeaderRef theStepperLeader;
+  StepperLeader    theStepperLeader;
 
-  ReactorMakerRef theReactorMaker;
-  SubstanceMakerRef theSubstanceMaker;
-  SystemMakerRef theSystemMaker;
-  StepperMakerRef theStepperMaker;
-  AccumulatorMakerRef theAccumulatorMaker;
+  ReactorMaker     theReactorMaker;
+  SubstanceMaker   theSubstanceMaker;
+  SystemMaker      theSystemMaker;
+  StepperMaker     theStepperMaker;
+  AccumulatorMaker theAccumulatorMaker;
 
 };
 

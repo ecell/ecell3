@@ -31,19 +31,8 @@
 #include "RootSystem.hpp"
 #include "Primitive.hpp"
 #include "FQPI.hpp"
-#include "SubstanceMaker.hpp"
-#include "ReactorMaker.hpp"
-#include "SystemMaker.hpp"
-#include "AccumulatorMaker.hpp"
 
 RootSystem::RootSystem() 
-  :
-  theStepperLeader(    *new StepperLeader()    ),
-  theReactorMaker(     *new ReactorMaker()     ),
-  theSubstanceMaker(   *new SubstanceMaker()   ),
-  theSystemMaker(      *new SystemMaker()      ),
-  theStepperMaker(     *new StepperMaker()     ),
-  theAccumulatorMaker( *new AccumulatorMaker() )
 {
   // FIXME: remove this.
 //  _stepper = new Eular1Stepper(this);
@@ -51,12 +40,7 @@ RootSystem::RootSystem()
 
 RootSystem::~RootSystem()
 {
-  delete &theReactorMaker;
-  delete &theSubstanceMaker;
-  delete &theSystemMaker;
-
-  delete &theStepperLeader;
-  delete &theAccumulatorMaker;
+  ; // do nothing
 }
 
 void RootSystem::initialize()
@@ -86,13 +70,6 @@ int RootSystem::check()
 //FIXME      status = false;
 //FIXME    }
   
-//  *theMessageWindow << systemMaker().numInstance()
-//    << " systems.\n";
-//  *theMessageWindow << substanceMaker().numInstance() 
-//    << " substances.\n";
-//  *theMessageWindow << reactorMaker().numInstance()
-//    << " reactors.\n";
-
   return status;
 }
 
@@ -102,7 +79,7 @@ SystemPtr RootSystem::getSystem( SystemPathCref systempath )
   if( systempath.first() != "/" )
     {
       throw MalformedSystemName( __PRETTY_FUNCTION__,
-				 "system path given to this function must" +
+				 "Fully qualified system path must" +
 				 String( "start with '/'. ([" ) + 
 				 systempath.getString() + "].");
     }

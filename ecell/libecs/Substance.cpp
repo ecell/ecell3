@@ -110,7 +110,7 @@ void Substance::setAccumulator( StringCref classname )
 {
   try {
     AccumulatorPtr aAccumulatorPtr;
-    aAccumulatorPtr = theRootSystem->accumulatorMaker().make( classname );
+    aAccumulatorPtr = theRootSystem->getAccumulatorMaker().make( classname );
     setAccumulator(aAccumulatorPtr);
     if( classname != userDefaultAccumulatorName() )
       {

@@ -100,7 +100,7 @@ const Message System::getVolumeIndex( StringCref keyword )
 void System::setStepper( StringCref classname )
 {
   StepperPtr aStepper;
-  aStepper = theRootSystem->stepperMaker().make( classname );
+  aStepper = theRootSystem->getStepperMaker().make( classname );
   aStepper->setOwner( this );
 
   theStepper = aStepper;
