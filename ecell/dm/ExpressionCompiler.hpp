@@ -62,7 +62,8 @@ namespace libecs
   ( String, Real(*)(Real), std::less<const String>, FunctionMap1 );
   DECLARE_ASSOCVECTOR
   ( String, Real(*)(Real,Real), std::less<const String>, FunctionMap2 );
-  DECLARE_ASSOCVECTOR( String, Real, std::less<const String>, ConstantMap );
+  DECLARE_ASSOCVECTOR
+  ( String, Real, std::less<const String>, ConstantMap );
   DECLARE_ASSOCVECTOR
   ( String, Real, std::less<const String>, PropertyMap );
 
@@ -78,6 +79,8 @@ namespace libecs
     typedef Real*           RealPtr;
     typedef libecs::Integer Integer;
     typedef void*           Pointer;
+    typedef const Integer 
+    (libecs::VariableReference::* VariableReferenceIntegerMethodPtr)() const;
     typedef const Real 
     (libecs::VariableReference::* VariableReferenceMethodPtr)() const;
     typedef SystemPtr 
@@ -89,9 +92,19 @@ namespace libecs
     typedef Real (*RealFunc1)( Real );
     typedef Real (*RealFunc2)( Real, Real );
 
-    enum Opcode  // the order of items is optimized. don't change.
-      {   
-	ADD = 0  // no arg
+    DECLARE_ASSOCVECTOR
+    ( String, VariableReferenceMethodPtr, std::less<const String>,
+      VariableReferenceMethodMap );
+    DECLARE_ASSOCVECTOR
+    ( String, SystemMethodPtr, std::less<const String>, SystemMethodMap );
+    DECLARE_ASSOCVECTOR
+    ( String, void (*)( CodeRef ),
+    std::less<const String>, BooleanFunctionMap );
+
+
+    enum Opcode// the order of items is optimized. don't change.
+      {
+        ADD = 0  // no arg
 	, SUB    // no arg
 	, MUL    // no arg
 	, DIV    // no arg
@@ -99,14 +112,13 @@ namespace libecs
 	, NEG    // no arg
 	, RET   // no arg
 	// Those instructions above are candidates of stack operations folding
-	// in the stack machine, and grouped here to optimize the switch().
-
+	// in the stack machine, and grouped here to optimize the switch(). 
 
 	//, CALL_FUNC0 // RealFunc0
 	, CALL_FUNC1 // RealFunc1
 	, CALL_FUNC2 // RealFunc2
 	, LOAD_REAL  // Real*
-	, PUSH_REAL  // Real
+	, PUSH_REAL   // Real
 	, VARREF_METHOD // VariableReferencePtr, VariableReferenceMethodPtr
 	, PUSH_INTEGER // Integer
 	, PUSH_POINTER // Pointer
@@ -122,14 +134,16 @@ namespace libecs
 	, NOT    // no arg
 	, SYSTEM_FUNC  // 
 	, PROCESS_METHOD // ProcessPtr, ProcessMethodPtr
+	, VARREF_INTEGER_METHOD // VariableReferenceIntegerMethodPtr
 	, SYSTEM_METHOD // SystemPtr, SystemMethodPtr
 	, VARREF_TO_SYSTEM_METHOD  // VariableReferenceSystemMethodPtr
 	, PROCESS_TO_SYSTEM_METHOD // ProcessMethodPtr
 	, SYSTEM_TO_REAL_METHOD // SystemMethodPtr
 	, NOP
 	, END=NOP
-	// , CALL_OBJECT???
       };
+
+
 
 
     class NoOperand {}; // Null type.
@@ -248,6 +262,8 @@ namespace libecs
     typedef ObjectMethodOperand<System,Real>  SystemMethod;
     typedef ObjectMethodOperand<VariableReference,const Real>
     VariableReferenceMethod;
+    typedef ObjectMethodOperand<VariableReference,const Integer> 
+    VariableReferenceIntegerMethod;
 
 
 
@@ -313,6 +329,8 @@ namespace libecs
 	  //                                               //
 	  ///////////////////////////////////////////////////
             
+	  //call_func = rootNode( +alpha_p ) >>
+
 	  call_func = (	  rootNode( str_p("eq") )
 			  | rootNode( str_p("neq") )
 			  | rootNode( str_p("gt") )
@@ -356,13 +374,14 @@ namespace libecs
 			  | rootNode( str_p("sec") )
 			  | rootNode( str_p("csc") )
 			  | rootNode( str_p("cot") )
-			  ) >>
+			  ) >>	    
 	    inner_node_d[ ch_p('(') >>  
-			  ( expression >>
+		  ( expression >>
 			    *( discard_node_d[ ch_p(',') ] >>
 			       expression ) ) >> 
 			  ch_p(')') ];
 
+	  
 	  group       =   inner_node_d[ ch_p('(') >> expression >> ch_p(')')];
 	
 	  constant    =   exponent | floating | integer;
@@ -416,16 +435,17 @@ namespace libecs
     
     ExpressionCompiler()
     {
-      if( theConstantMap.empty() == true )
+      if( theConstantMap.empty() == true ||
+	  theFunctionMap1.empty() == true ||
+	  theVariableReferenceMethodMap.empty() == true || 
+	  theSystemMethodMap.empty() == true ||
+	  theBooleanFunctionMap.empty() == true )
 	{
-	  setConstantMap();
-	}
-      if( theFunctionMap1.empty() == true )
-	{
-	  setFunctionMap();
+	  fillMap();
 	}
     }
     
+
     ~ExpressionCompiler()
     {
       ; // do nothing
@@ -436,31 +456,37 @@ namespace libecs
     typedef parse_tree_match_t::tree_iterator TreeIterator;
     //    DECLARE_CLASS( TreeIterator );
     
-    void setProcessPtr( ProcessPtr aProcessPtr )
-    {
-      theProcessPtr = aProcessPtr;
-    }
 
-    const int getStackSize()
+    void setProcessPtr( ProcessCref aProcessPtr )
     {
-      return theStackSize;
+      theProcessPtr = const_cast<ProcessPtr>( &aProcessPtr );
     }
-    
-    void setConstantMap();
-    
-    void setFunctionMap();
 
     void setPropertyMap( PropertyMapPtr aPropertyMapPtr )
     {
-      thePropertyMapPtr = aPropertyMapPtr;
+     thePropertyMapPtr = aPropertyMapPtr;
     }
 
     const Code compileExpression( StringCref anExpression );
     
+    
+
   protected:
 
+    static void appendInstruction_EQ( CodeRef aCode );
+    static void appendInstruction_NEQ( CodeRef aCode );
+    static void appendInstruction_GT( CodeRef aCode );
+    static void appendInstruction_GEQ( CodeRef aCode );
+    static void appendInstruction_LT( CodeRef aCode );
+    static void appendInstruction_LEQ( CodeRef aCode );
+    static void appendInstruction_AND( CodeRef aCode );
+    static void appendInstruction_OR( CodeRef aCode );
+    static void appendInstruction_XOR( CodeRef aCode );
+    static void appendInstruction_NOT( CodeRef aCode );
+
+
     template < class INSTRUCTION >
-    void appendInstruction( Code& aCode, const INSTRUCTION& anInstruction )
+    static void appendInstruction( Code& aCode, const INSTRUCTION& anInstruction )
     {
       Code::size_type aCodeSize( aCode.size() );
       aCode.resize( aCodeSize + sizeof( INSTRUCTION ) );
@@ -469,19 +495,35 @@ namespace libecs
 
   private:
     
+    static void fillMap();
+
     void compileTree( TreeIterator const&  i, CodeRef aCode );  
 
   private:
     
-    int theStackSize;
     ProcessPtr theProcessPtr;
     
-    ConstantMap theConstantMap;
+    PropertyMapPtr thePropertyMapPtr;
+    
+    static ConstantMap theConstantMap;
+    static FunctionMap1 theFunctionMap1;
+    static FunctionMap2 theFunctionMap2;
+    static VariableReferenceMethodMap theVariableReferenceMethodMap;
+    static SystemMethodMap theSystemMethodMap;
+    static BooleanFunctionMap theBooleanFunctionMap;
+
+    /**ConstantMap theConstantMap;
     FunctionMap1 theFunctionMap1;
     FunctionMap2 theFunctionMap2;
+    VariableReferenceMethodMap theVariableReferenceMethodMap;
+    SystemMethodMap theSystemMethodMap;
+    BooleanFunctionMap theBooleanFunctionMap;*/
 
-    PropertyMapPtr thePropertyMapPtr;
-  };
+  }; // ExpressionCompiler
+
+
+
+
 
   template <> 
   class ExpressionCompiler::InstructionBase<ExpressionCompiler::NoOperand>
@@ -500,6 +542,9 @@ namespace libecs
     InstructionBase( Opcode, const NoOperand& );
     
   };
+
+
+
 
 #define SPECIALIZE_OPCODE2OPERAND( OP, OPE )\
   template<> class ExpressionCompiler::Opcode2Operand<ExpressionCompiler::OP>\
@@ -524,6 +569,8 @@ namespace libecs
   SPECIALIZE_OPCODE2OPERAND( SYSTEM_TO_REAL_METHOD, SystemMethodPtr );  
   SPECIALIZE_OPCODE2OPERAND( VARREF_TO_SYSTEM_METHOD,  
 			     VariableReferenceSystemMethodPtr );
+  SPECIALIZE_OPCODE2OPERAND( VARREF_INTEGER_METHOD,
+			     VariableReferenceIntegerMethod );
 
   
 #define DEFINE_OPCODE2INSTRUCTION( CODE )\
@@ -559,6 +606,7 @@ namespace libecs
   //DEFINE_OPCODE2INSTRUCTION( CALL_FUNC0 );
   DEFINE_OPCODE2INSTRUCTION( CALL_FUNC1 );
   DEFINE_OPCODE2INSTRUCTION( CALL_FUNC2 );
+  DEFINE_OPCODE2INSTRUCTION( VARREF_INTEGER_METHOD );
   DEFINE_OPCODE2INSTRUCTION( VARREF_METHOD );
   DEFINE_OPCODE2INSTRUCTION( PROCESS_METHOD );
   DEFINE_OPCODE2INSTRUCTION( SYSTEM_METHOD );
@@ -568,16 +616,10 @@ namespace libecs
   DEFINE_OPCODE2INSTRUCTION( RET );
   DEFINE_OPCODE2INSTRUCTION( NOP );
 
-  void ExpressionCompiler::setConstantMap()
-  {
-    theConstantMap[ "true" ] = 1.0;
-    theConstantMap[ "false" ] = 0.0;
-    theConstantMap[ "pi" ] = M_PI;
-    theConstantMap[ "NaN" ] = std::numeric_limits<Real>::quiet_NaN();
-    theConstantMap[ "INF"] = std::numeric_limits<Real>::infinity();
-    theConstantMap[ "N_A" ] = N_A;
-    theConstantMap[ "exp" ] = M_E;
-  }
+
+
+
+
 
   const ExpressionCompiler::Code 
   ExpressionCompiler::compileExpression( StringCref anExpression )
@@ -585,8 +627,6 @@ namespace libecs
     Code aCode;
     CompileGrammar aGrammer;
 	        
-    theStackSize = 1;
-      
     tree_parse_info<> 
       info( ast_parse( anExpression.c_str(), aGrammer, space_p ) );
 
@@ -594,7 +634,7 @@ namespace libecs
       {
 	compileTree( info.trees.begin(), aCode );
 	  
-	// place RET on the tail.
+	// place RET at the tail.
 	appendInstruction( aCode, Instruction<RET>() );
       }
     else
@@ -608,8 +648,85 @@ namespace libecs
   }
 
 
-  void libecs::ExpressionCompiler::setFunctionMap()
+  void libecs::ExpressionCompiler::appendInstruction_EQ( CodeRef aCode )
   {
+    appendInstruction( aCode, Instruction<EQ>() );
+  }
+  void libecs::ExpressionCompiler::appendInstruction_NEQ( CodeRef aCode )
+  {
+    appendInstruction( aCode, Instruction<NEQ>() );
+  }
+  void libecs::ExpressionCompiler::appendInstruction_GT( CodeRef aCode )
+  {
+    appendInstruction( aCode, Instruction<GT>() );
+  }
+  void libecs::ExpressionCompiler::appendInstruction_GEQ( CodeRef aCode )
+  {
+    appendInstruction( aCode, Instruction<GEQ>() );
+  }
+  void libecs::ExpressionCompiler::appendInstruction_LT( CodeRef aCode )
+  {
+    appendInstruction( aCode, Instruction<LT>() );
+  }
+  void libecs::ExpressionCompiler::appendInstruction_LEQ( CodeRef aCode )
+  {
+    appendInstruction( aCode, Instruction<LEQ>() );
+  }
+  void libecs::ExpressionCompiler::appendInstruction_AND( CodeRef aCode )
+  {
+    appendInstruction( aCode, Instruction<AND>() );
+  }
+  void libecs::ExpressionCompiler::appendInstruction_OR( CodeRef aCode )
+  {
+    appendInstruction( aCode, Instruction<OR>() );
+  }
+  void libecs::ExpressionCompiler::appendInstruction_XOR( CodeRef aCode )
+  {
+    appendInstruction( aCode, Instruction<XOR>() );
+  }
+  void libecs::ExpressionCompiler::appendInstruction_NOT( CodeRef aCode )
+  {
+    appendInstruction( aCode, Instruction<NOT>() );
+  }
+
+
+
+  void libecs::ExpressionCompiler::fillMap()
+  {
+    // set BooleanFunctionMap
+    theBooleanFunctionMap["not"] = 
+      &libecs::ExpressionCompiler::appendInstruction_NOT;
+    theBooleanFunctionMap["eq"] =
+      &libecs::ExpressionCompiler::appendInstruction_EQ;
+    theBooleanFunctionMap["neq"] =
+      &libecs::ExpressionCompiler::appendInstruction_NEQ;
+    theBooleanFunctionMap["gt"] =
+      &libecs::ExpressionCompiler::appendInstruction_GT;
+    theBooleanFunctionMap["lt"] =
+      &libecs::ExpressionCompiler::appendInstruction_LT;
+    theBooleanFunctionMap["geq"] =
+      &libecs::ExpressionCompiler::appendInstruction_GEQ;
+    theBooleanFunctionMap["leq"] =
+      &libecs::ExpressionCompiler::appendInstruction_LEQ;
+    theBooleanFunctionMap["and"] =
+      &libecs::ExpressionCompiler::appendInstruction_AND;
+    theBooleanFunctionMap["or"] =
+      &libecs::ExpressionCompiler::appendInstruction_OR;
+    theBooleanFunctionMap["xor"] =
+      &libecs::ExpressionCompiler::appendInstruction_XOR;
+      
+
+    // set ConstantMap
+    theConstantMap["true"] = 1.0;
+    theConstantMap["false"] = 0.0;
+    theConstantMap["pi"] = M_PI;
+    theConstantMap["NaN"] = std::numeric_limits<Real>::quiet_NaN();
+    theConstantMap["INF"] = std::numeric_limits<Real>::infinity();
+    theConstantMap["N_A"] = N_A;
+    theConstantMap["exp"] = M_E;
+
+
+    // set FunctionMap1
     theFunctionMap1["abs"] = std::fabs;
     theFunctionMap1["sqrt"] = std::sqrt;
     theFunctionMap1["exp"] = std::exp;
@@ -643,8 +760,34 @@ namespace libecs
     theFunctionMap1["csc"] = csc;
     theFunctionMap1["cot"] = cot;
 
+
+    // set FunctionMap2
     theFunctionMap2["pow"] = pow;
+
+
+    // set VariableReferenceMethodMap
+    theVariableReferenceMethodMap["MolarConc"]
+      = &libecs::VariableReference::getMolarConc;
+
+    theVariableReferenceMethodMap["Value"] 
+      = &libecs::VariableReference::getValue;
+
+    theVariableReferenceMethodMap["Velocity"]
+      = &libecs::VariableReference::getVelocity;
+
+    theVariableReferenceMethodMap["NumberConc"]
+      = &libecs::VariableReference::getNumberConc;
+
+    theVariableReferenceMethodMap["TotalVelocity"] 
+      = &libecs::VariableReference::getTotalVelocity;
+
+
+    // set SystemMethodMap
+    theSystemMethodMap["Size"] = &libecs::System::getSize;
+    theSystemMethodMap["SizeN_A"] = &libecs::System::getSizeN_A;
   }
+
+
 
 
 
@@ -685,8 +828,6 @@ namespace libecs
 	  
 	  value = stringCast<Real>( aString );
 	  
-	  ++theStackSize;
-
 	  appendInstruction( aCode, Instruction<PUSH_REAL>( value ) );
 	  
 	  return;
@@ -711,8 +852,6 @@ namespace libecs
 	  
 	  value = stringCast<Real>( aString );
 	  
-	  ++theStackSize;
-
 	  appendInstruction( aCode, Instruction<PUSH_REAL>( value ) );
 
 	  return; 
@@ -746,8 +885,6 @@ namespace libecs
 	  
 	  value1 = stringCast<Real>( aString1 );
 	  
-	  ++theStackSize;
-	  
 	  if( aString2 != "-")
 	    {
 	      value2 = stringCast<Real>( aString2 );
@@ -773,6 +910,8 @@ namespace libecs
 	  return; 
 	}
 
+
+
 	/**
 	   Call_Func Grammar compile
 	*/
@@ -783,6 +922,7 @@ namespace libecs
 	  String aString1, aString2;
 	  FunctionMap1Iterator theFunctionMap1Iterator;
 	  FunctionMap2Iterator theFunctionMap2Iterator;
+	  BooleanFunctionMapIterator theBooleanFunctionMapIterator;
 	    
 
 	  assert( i->children.size() != 0 );
@@ -793,15 +933,20 @@ namespace libecs
 	      aString1 += *CharIterator;
 	    }
 
-	  ++theStackSize;
+
+	  theBooleanFunctionMapIterator = 
+	    theBooleanFunctionMap.find( aString1 );
+
+
 	  if( i->children.size() == 1 )
 	    {
-	      if( aString1 == "not" )
-		{
-		  compileTree( i->children.begin(), aCode );
 
-		  appendInstruction( aCode, Instruction<NOT>() );
+	      if( theBooleanFunctionMapIterator !=
+		  theBooleanFunctionMap.end() )
+		{
+		  (theBooleanFunctionMapIterator->second)( aCode );
 		}
+
 	      else
 		{
 		  theFunctionMap1Iterator = theFunctionMap1.find( aString1 );
@@ -860,42 +1005,13 @@ namespace libecs
 	      compileTree( i->children.begin(), aCode );	  
 	      compileTree( i->children.begin()+1, aCode );
 		
-	      if( aString1 == "eq" )
-		{
-		  appendInstruction( aCode, Instruction<EQ>() );
+	      
+	      if( theBooleanFunctionMapIterator !=
+		  theBooleanFunctionMap.end() )
+		{	
+		  (theBooleanFunctionMapIterator->second)( aCode );
 		}
-	      else if( aString1 == "neq" )
-		{
-		  appendInstruction( aCode, Instruction<NEQ>() );
-		}
-	      else if( aString1 == "gt" )
-		{
-		  appendInstruction( aCode, Instruction<GT>() );
-		}
-	      else if( aString1 == "lt" )
-		{
-		  appendInstruction( aCode, Instruction<LT>() );
-		}
-	      else if( aString1 == "geq" )
-		{
-		  appendInstruction( aCode, Instruction<GEQ>() );
-		}
-	      else if( aString1 == "leq" )
-		{
-		  appendInstruction( aCode, Instruction<LEQ>() );
-		}
-	      else if( aString1 == "and" )
-		{
-		  appendInstruction( aCode, Instruction<AND>() );
-		}
-	      else if( aString1 == "or" )
-		{
-		  appendInstruction( aCode, Instruction<OR>() );
-		}
-	      else if( aString1 == "xor" )
-		{
-		  appendInstruction( aCode, Instruction<XOR>() );
-		}
+
 	      else
 		{
 		  theFunctionMap2Iterator = theFunctionMap2.find( aString1 );
@@ -933,9 +1049,8 @@ namespace libecs
 	{
 	  String aString1, aString2, aString3;
 	  FunctionMap2Iterator theFunctionMap2Iterator;
+	  SystemMethodMapIterator theSystemMethodMapIterator;
 	  
-	  ++theStackSize;
-	
 	  for( CharIterator = i->children.begin()->value.begin();
 	       CharIterator != i->children.begin()->value.end();
 	       ++CharIterator )
@@ -972,19 +1087,18 @@ namespace libecs
 		      aString3 += *CharIterator;
 		    }
 		  
-		  if( aString3 == "Size" )
+
+		  theSystemMethodMapIterator = 
+		    theSystemMethodMap.find( aString3 );
+
+	
+		  if( theSystemMethodMapIterator != theSystemMethodMap.end() )
 		    {
 		      appendInstruction
 			( aCode, Instruction<SYSTEM_TO_REAL_METHOD>
-			  ( &libecs::System::getSize ) );
+			  ( theSystemMethodMap[aString3] ) );
 		    }
 
-		  else if( aString3 == "SizeN_A" )
-		    {
-		      appendInstruction
-			( aCode, Instruction<SYSTEM_TO_REAL_METHOD>
-			  ( &libecs::System::getSizeN_A ) );
-		    }
 		  else
 		    {
 		      THROW_EXCEPTION( NoSlot,
@@ -1011,6 +1125,7 @@ namespace libecs
 		( aCode, Instruction<PUSH_POINTER>
 		  ( const_cast<VariableReference*>( &aVariableReference ) ) );
 	      
+
 	      if( aString2 == "getSuperSystem" )
 		{
 		  appendInstruction
@@ -1024,20 +1139,18 @@ namespace libecs
 		      aString3 += *CharIterator;
 		    }
 		  
-		  
-		  if( aString3 == "Size" )
-		    {
-		      appendInstruction
-			( aCode, Instruction<SYSTEM_TO_REAL_METHOD>
-			  ( &libecs::System::getSize ) );
-		    }
 
-		  else if( aString3 == "SizeN_A" )
+		  theSystemMethodMapIterator = 
+		    theSystemMethodMap.find( aString3 );
+		  
+		  
+		  if( theSystemMethodMapIterator != theSystemMethodMap.end() )
 		    {
 		      appendInstruction
 			( aCode, Instruction<SYSTEM_TO_REAL_METHOD>
-			  ( &libecs::System::getSizeN_A ) );
+			  ( theSystemMethodMap[aString3] ) );
 		    }
+		  
 		  else
 		    {
 		      THROW_EXCEPTION( NoSlot,
@@ -1065,6 +1178,8 @@ namespace libecs
       case CompileGrammar::VARIABLE :
 	{
 	  String aString1, aString2;
+	  VariableReferenceMethodMapIterator
+	    theVariableReferenceMethodMapIterator;
 	  
 	  assert( *i->value.begin() == '.' );
 
@@ -1086,89 +1201,46 @@ namespace libecs
 	    aVariableReference( theProcessPtr->libecs::Process::
 				getVariableReference( aString1 ) );
 	  
-	  ++theStackSize;
 
-	  if( aString2 == "MolarConc" )
+	  theVariableReferenceMethodMapIterator =
+	    theVariableReferenceMethodMap.find( aString2 );
+	
+	  if( theVariableReferenceMethodMapIterator != 
+	      theVariableReferenceMethodMap.end() )
 	    {
 	      VariableReferenceMethod aVariableReferenceMethod;
 
 	      aVariableReferenceMethod.theOperand1 = &aVariableReference;
-	      aVariableReferenceMethod.theOperand2 = 
-		&libecs::VariableReference::getMolarConc;
+	      aVariableReferenceMethod.theOperand2 =
+		theVariableReferenceMethodMap[aString2]; 
 
 	      appendInstruction
 		( aCode, 
 		  Instruction<VARREF_METHOD>( aVariableReferenceMethod ) );
 	    }
 
-	  else if( aString2 == "NumberConc" )
+
+	  else if( aString2 == "Coefficient" )
 	    {
-	      VariableReferenceMethod aVariableReferenceMethod;
+	      VariableReferenceIntegerMethod aVariableReferenceIntegerMethod;
 
-	      aVariableReferenceMethod.theOperand1 = &aVariableReference;
-	      aVariableReferenceMethod.theOperand2 = 
-		&libecs::VariableReference::getNumberConc;
-
-	      appendInstruction
-		( aCode,
-		  Instruction<VARREF_METHOD>( aVariableReferenceMethod ) );
-	    }
-
-	  else if( aString2 == "Value" )
-	    {
-	      VariableReferenceMethod aVariableReferenceMethod;
-
-	      aVariableReferenceMethod.theOperand1 = &aVariableReference;
-	      aVariableReferenceMethod.theOperand2 = 
-		&libecs::VariableReference::getValue;
-
-	      appendInstruction
-		( aCode,
-		  Instruction<VARREF_METHOD>( aVariableReferenceMethod ) );
-	    }
-	  /**else if( str_child2 == "Coefficient" )
-	    {
-	      VariableReferenceMethod aVariableReferenceMethod;
-
-	      aVariableReferenceMethod.theOperand1 = &aVariableReference;
-	      aVariableReferenceMethod.theOperand2 = 
+	      aVariableReferenceIntegerMethod.theOperand1 = 
+		&aVariableReference;
+	      aVariableReferenceIntegerMethod.theOperand2 = 
 		&libecs::VariableReference::getCoefficient;
 	      
 	      appendInstruction
-		( aCode, Instruction<VARREF_METHOD>( aVariableReferenceMethod ) );
-	      
-		}*/ 
-			/**else if( str_child2 == "Fixed" ){
-			aCode.push_back(
-			new VARREF_METHOD( aVariableReference,
-			&libecs::VariableReference::isFixed ) );
-			}*/
+		( aCode, 
+		  Instruction<VARREF_INTEGER_METHOD>
+		  ( aVariableReferenceIntegerMethod ) );	      
+	    } 
+	  
+	  /**else if( str_child2 == "Fixed" ){
+	     aCode.push_back(
+	     new VARREF_METHOD( aVariableReference,
+	     &libecs::VariableReference::isFixed ) );
+	     }*/
 
-	  else if( aString2 == "Velocity" )
-	    {
-	      VariableReferenceMethod aVariableReferenceMethod;
-
-	      aVariableReferenceMethod.theOperand1 = &aVariableReference;
-	      aVariableReferenceMethod.theOperand2 = 
-		&libecs::VariableReference::getVelocity;
-
-	      appendInstruction
-		( aCode,
-		  Instruction<VARREF_METHOD>( aVariableReferenceMethod ) );
-	    }
-
-	  else if( aString2 == "TotalVelocity" )
-	    {
-	      VariableReferenceMethod aVariableReferenceMethod;
-
-	      aVariableReferenceMethod.theOperand1 = &aVariableReference;
-	      aVariableReferenceMethod.theOperand2 = 
-		&libecs::VariableReference::getTotalVelocity;
-
-	      appendInstruction
-		( aCode,
-		  Instruction<VARREF_METHOD>( aVariableReferenceMethod ) );
-	    }
 	  else
 	    {
 	      THROW_EXCEPTION
@@ -1195,8 +1267,6 @@ namespace libecs
     
 	  assert( i->children.size() == 0 );
 	
-	  ++theStackSize;
-
 	  for( CharIterator = i->value.begin();
 	       CharIterator != i->value.end(); ++CharIterator )
 	    {
@@ -1209,7 +1279,8 @@ namespace libecs
 	  if( theConstantMapIterator != theConstantMap.end() )
 	    {
 	      appendInstruction
-		( aCode, Instruction<PUSH_REAL>( theConstantMapIterator->second ) );
+		( aCode,
+		  Instruction<PUSH_REAL>( theConstantMapIterator->second ) );
 	    }
 
 	  else if( thePropertyMapIterator != (*thePropertyMapPtr).end() )
@@ -1254,8 +1325,6 @@ namespace libecs
 	    {
 	      value = stringCast<Real>( aString );
 
-	      ++theStackSize;
-
 	      appendInstruction( aCode, Instruction<PUSH_REAL>( -value ) );
 	    }
 	  else
@@ -1283,11 +1352,12 @@ namespace libecs
 	  assert(i->children.size() == 2);
 
 	  if( ( i->children.begin()->value.id() == CompileGrammar::INTEGER ||
-		i->children.begin()->value.id() == CompileGrammar::FLOATING ) && 
-	      ( ( i->children.begin()+1 )->value.id() == CompileGrammar::INTEGER
-		||
-		( i->children.begin()+1 )->value.id() == CompileGrammar::FLOATING
-		) )
+		i->children.begin()->value.id() == CompileGrammar::FLOATING ) 
+	      && 
+	      ( ( i->children.begin()+1 )->value.id() ==
+		CompileGrammar::INTEGER ||
+		( i->children.begin()+1 )->value.id() ==
+		CompileGrammar::FLOATING ) )
 	    {
 	      for( CharIterator = i->children.begin()->value.begin();
 		   CharIterator != i->children.begin()->value.end();
@@ -1305,8 +1375,6 @@ namespace libecs
 
 	      value1 = stringCast<Real>( aString1 );
 	      value2 = stringCast<Real>( aString2 );	  
-
-	      ++theStackSize;
 
 	      if( *i->value.begin() == '^' )
 		{
@@ -1356,10 +1424,10 @@ namespace libecs
 
 	  if( ( i->children.begin()->value.id() == CompileGrammar::INTEGER ||
 		i->children.begin()->value.id() == CompileGrammar::FLOATING ) && 
-	      ( ( i->children.begin()+1 )->value.id() == CompileGrammar::INTEGER
-		||
-		( i->children.begin()+1 )->value.id() == CompileGrammar::FLOATING
-		) )
+	      ( ( i->children.begin()+1 )->value.id() ==
+		CompileGrammar::INTEGER ||
+		( i->children.begin()+1 )->value.id() ==
+		CompileGrammar::FLOATING ) )
 	    {
 	      for( CharIterator = i->children.begin()->value.begin();
 		   CharIterator != i->children.begin()->value.end();
@@ -1378,7 +1446,6 @@ namespace libecs
 	      value1 = stringCast<Real>( aString1 );
 	      value2 = stringCast<Real>( aString2 );	  
 
-	      ++theStackSize;
 
 	      if (*i->value.begin() == '*')
 		{
@@ -1436,10 +1503,10 @@ namespace libecs
 	
 	  if( ( i->children.begin()->value.id() == CompileGrammar::INTEGER ||
 		i->children.begin()->value.id() == CompileGrammar::FLOATING ) &&
-	      ( ( i->children.begin()+1 )->value.id() == CompileGrammar::INTEGER
-		||
-		( i->children.begin()+1 )->value.id() == CompileGrammar::FLOATING
-		) )
+	      ( ( i->children.begin()+1 )->value.id() ==
+		CompileGrammar::INTEGER ||
+		( i->children.begin()+1 )->value.id() ==
+		CompileGrammar::FLOATING ) )
 	    {
 	      for( CharIterator = i->children.begin()->value.begin();
 		   CharIterator != i->children.begin()->value.end();
@@ -1458,7 +1525,6 @@ namespace libecs
 	      value1 = stringCast<Real>( aString1 );
 	      value2 = stringCast<Real>( aString2 );	  
 
-	      ++theStackSize;
 
 	      if (*i->value.begin() == '+')
 		{
@@ -1504,6 +1570,17 @@ namespace libecs
       }
   }
 
+
+  // this should be moved to .cpp
+  
+  ConstantMap ExpressionCompiler::theConstantMap;
+  FunctionMap1 ExpressionCompiler::theFunctionMap1;
+  FunctionMap2 ExpressionCompiler::theFunctionMap2;
+  ExpressionCompiler::VariableReferenceMethodMap
+  ExpressionCompiler::theVariableReferenceMethodMap;  
+  ExpressionCompiler::SystemMethodMap ExpressionCompiler::theSystemMethodMap;
+  ExpressionCompiler::BooleanFunctionMap 
+  ExpressionCompiler::theBooleanFunctionMap;
 
 } // namespace libecs
 
