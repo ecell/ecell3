@@ -89,7 +89,7 @@ class EntityListWindow(OsogoWindow):
 
 
         self.theLastSelectedWindow = None
-
+        self.thePopupMenu = gtk.Menu()
 
         self.systemTree   = self['system_tree']
         self.processTree  = self['process_tree']
@@ -345,12 +345,12 @@ class EntityListWindow(OsogoWindow):
             aMenuItem.connect('activate', self.createPluginWindow )
             aMenuItem.set_name( aPluginWindowType )
             if aPluginWindowType == self.DEFAULT_PLUGIN:
-                self['EntityPopupMenu'].prepend( aMenuItem )
+                self.thePopupMenu.prepend( aMenuItem )
             else:
-                self['EntityPopupMenu'].append( aMenuItem )
+                self.thePopupMenu.append( aMenuItem )
 
         # appends separator
-        self['EntityPopupMenu'].append( gtk.MenuItem() )
+        self.thePopupMenu.append( gtk.MenuItem() )
 
         # ------------------------------------------
         # menus for Logger
@@ -360,10 +360,10 @@ class EntityListWindow(OsogoWindow):
         aMenuItem = gtk.MenuItem( aLogMenuString )
         aMenuItem.connect('activate', self.createLogger )
         aMenuItem.set_name( aLogMenuString )
-        self['EntityPopupMenu'].append( aMenuItem )
+        self.thePopupMenu.append( aMenuItem )
 
         # appends separator
-        self['EntityPopupMenu'].append( gtk.MenuItem() )
+        self.thePopupMenu.append( gtk.MenuItem() )
 
         # ------------------------------------------
         # menus for Bord
@@ -384,11 +384,11 @@ class EntityListWindow(OsogoWindow):
         aMenuItem = gtk.MenuItem( aMenuString )
         aMenuItem.set_name( aLogMenuString )
         aMenuItem.set_submenu( aSubMenu )
-        self['EntityPopupMenu'].append( aMenuItem )
+        self.thePopupMenu.append( aMenuItem )
         self.theBoardMenu = aMenuItem
 
         # appends separator
-        self['EntityPopupMenu'].append( gtk.MenuItem() )
+        self.thePopupMenu.append( gtk.MenuItem() )
 
         # ------------------------------------------
         # menus for submenu
@@ -482,7 +482,7 @@ class EntityListWindow(OsogoWindow):
             # When PopupMenu was displayed last time without PluginWindows'
             # menus, the buffer (self.thePopupSubMenu) is None.
             if self.thePopupSubMenu != None:
-                self['EntityPopupMenu'].remove( self.thePopupSubMenu )
+                self.thePopupMenu.remove( self.thePopupSubMenu )
 
             if len(self.thePluginManager.theInstanceList)!=0:
 
@@ -508,17 +508,17 @@ class EntityListWindow(OsogoWindow):
                     aMenuItem.set_submenu( aSubMenu )
 
                     # appends parent MenuItem to PopupMenu
-                    self['EntityPopupMenu'].append( aMenuItem )
+                    self.thePopupMenu.append( aMenuItem )
 
                     # saves this submenu set to buffer (self.thePopupSubMenu)
                     self.thePopupSubMenu = aMenuItem
 
 
             # displays all items on PopupMenu
-            self['EntityPopupMenu'].show_all() 
+            self.thePopupMenu.show_all() 
 
             # displays popup menu
-            self['EntityPopupMenu'].popup(None,None,None,anEvent.button,anEvent.time)
+            self.thePopupMenu.popup(None,None,None,anEvent.button,anEvent.time)
 
 
     def reset( self ):
