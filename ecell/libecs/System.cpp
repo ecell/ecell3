@@ -156,8 +156,8 @@ namespace libecs
 
   System::System()
     :
-    theVolume( 1 ),
-    theConcentrationFactor( 0 ),
+    theVolume( 1.0 ),
+    theConcentrationFactor( 0.0 ),
     theStepper( NULLPTR ),
     theEntityListChanged( false )
   {

@@ -30,6 +30,7 @@
 
 #include <functional>
 #include <algorithm>
+#include <limits>
 
 #include "Substance.hpp"
 #include "Integrators.hpp"
@@ -50,7 +51,10 @@ namespace libecs
   Stepper::Stepper() 
     :
     theCurrentTime( 0.0 ),
-    theStepInterval( 0.001 )
+    theStepInterval( 0.001 ),
+    theMinInterval( 0.0 ),
+    theMaxInterval( std::numeric_limits<Real>::max() ),
+    theEntityListChanged( true )
   {
     calculateStepsPerSecond();
   }
@@ -120,6 +124,27 @@ namespace libecs
 
     // update loggers
     FOR_ALL( PropertySlotVector, theLoggedPropertySlotVector, updateLogger );
+  }
+
+
+  void Stepper::setParameters( UVariableVectorCref aParameterList )
+  {
+    const UVariableVector::size_type aSize( aParameterList.size() );
+
+    if( aSize >= 1 )
+      {
+	setStepInterval( aParameterList[0].asReal() );
+    
+	if( aSize >= 2 )
+	  {
+	    setMinInterval( aParameterList[1].asReal() );
+	    
+	    if( aSize >= 3 )
+	      {
+		setMaxInterval( aParameterList[2].asReal() );
+	      }
+	  }
+      }
   }
 
 

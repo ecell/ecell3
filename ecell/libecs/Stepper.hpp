@@ -38,6 +38,8 @@
 
 #include "libecs.hpp"
 
+#include "Util.hpp"
+#include "UVariable.hpp"
 #include "System.hpp"
 
 
@@ -164,6 +166,28 @@ namespace libecs
       theName = aName;
     }
 
+    void setMinInterval( RealCref aValue )
+    {
+      theMinInterval = aValue;
+    }
+
+    RealCref getMinInterval() const
+    {
+      return theMinInterval;
+    }
+
+    void setMaxInterval( RealCref aValue )
+    {
+      theMaxInterval = aValue;
+    }
+
+    RealCref getMaxInterval() const
+    {
+      return theMaxInterval;
+    }
+
+
+    virtual void setParameters( UVariableVectorCref aParameterList );
 
     bool operator<( StepperCref rhs )
     {
@@ -184,6 +208,9 @@ namespace libecs
 
     Real                theStepInterval;
     Real                theStepsPerSecond;
+
+    Real                theMinInterval;
+    Real                theMaxInterval;
 
     SystemVector        theSystemVector;
 

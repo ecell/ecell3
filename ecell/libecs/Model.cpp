@@ -230,6 +230,7 @@ namespace libecs
   {
     StepperPtr aStepper( getStepperMaker().make( aClassName ) );
     aStepper->setName( anID );
+    aStepper->setParameters( data );
 
     theStepperMap.insert( std::make_pair( anID, aStepper ) );
     theScheduleQueue.push( Event( getCurrentTime(), aStepper ) );
