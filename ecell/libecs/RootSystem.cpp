@@ -40,13 +40,13 @@ char const RootSystem_C_rcsid[] = "$Id$";
 #include <string.h>
 #include <stdlib.h>
 #include <assert.h>
-#include "ecell/MessageWindow.h"
-#include "ecell/ECSMainWindow.h"
-#include "InfoDialogManager.h"
-#include "WorkingDialogManager.h"
+//FIXME: #include "ecell/MessageWindow.h"
+//FIXME: #include "ecell/ECSMainWindow.h"
+//FIXME: #include "InfoDialogManager.h"
+//FIXME: #include "WorkingDialogManager.h"
 #include "Koyurugi/RootSystem.h"
 #include "Koyurugi/CellComponents.h"
-#include "util/Datafile.h"
+//FIXME: #include "util/Datafile.h"
 #include "Koyurugi/Primitive.h"
 #include "Koyurugi/SubstanceMaker.h"
 #include "Koyurugi/ReactorMaker.h"
@@ -86,27 +86,27 @@ int RootSystem::check()
 {
   bool status = true;
   
-  *theMessageWindow << "Reactor initialization ";
-  switch(Reactor::globalCondition())
-    {
-    case Reactor::Good:
-      *theMessageWindow 
-        << "succeeded. condition Good.\n";
-      break;
-    case Reactor::InitFail:
-      *theMessageWindow << "condition InitFail.\n";
-    default:
-      *theMessageWindow << "initialization failed. "
-        << "trying to continue... \n";
-      theInfoDialogManager->post("Reactor initialization failed.");
-      status = false;
-    }
+  //FIXME:  *theMessageWindow << "Reactor initialization ";
+//FIXME  switch(Reactor::globalCondition())
+//FIXME    {
+//FIXME    case Reactor::Good:
+//FIXME      *theMessageWindow 
+//FIXME        << "succeeded. condition Good.\n";
+//FIXME      break;
+//FIXME    case Reactor::InitFail:
+//FIXME      *theMessageWindow << "condition InitFail.\n";
+//FIXME    default:
+//FIXME      *theMessageWindow << "initialization failed. "
+//FIXME        << "trying to continue... \n";
+//FIXME      theInfoDialogManager->post("Reactor initialization failed.");
+//FIXME      status = false;
+//FIXME    }
   
 /*
   if(!_Cell)
     {
       *theMessageWindow << "no cell object found. " <<
-	"check your rule file again.\n";
+      "check your rule file again.\n";
       theInfoDialogManager->post("no cell object found.");
       status = false;
     }

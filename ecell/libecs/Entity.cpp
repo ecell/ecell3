@@ -36,7 +36,7 @@ char const Entity_C_rcsid[] = "$Id$";
 
 
 #include "Koyurugi/Entity.h"
-#include "ecell/MessageWindow.h"
+//FIXME: #include "ecell/MessageWindow.h"
 #include "Koyurugi/System.h"
 #include "Koyurugi/FQPN.h"
 #include "Koyurugi/RootSystem.h"
@@ -63,8 +63,8 @@ void Entity::makeSlots()
 
 Float Entity::activity() 
 {
-  *theMessageWindow << "warning: request for activity from " << className() 
-    << " [" << entryname() << "] which have no activity function defined.\n";
+//FIXME:   *theMessageWindow << "warning: request for activity from " << className() 
+//FIXME:     << " [" << entryname() << "] which have no activity function defined.\n";
   return 0;
 }
 
@@ -113,8 +113,8 @@ void Entity::setSupersystem(const string& supersystem)
     }
   catch(MetaSystem::CantFindSystem& e)
     {
-      *theMessageWindow << __PRETTY_FUNCTION__ << ": " 
-	<< e.message() << "\n";
+//FIXME:       *theMessageWindow << __PRETTY_FUNCTION__ << ": " 
+//FIXME: 	<< e.message() << "\n";
       return;
     }
   setSupersystem(s);

@@ -39,7 +39,7 @@ char const Stepper_C_rcsid[] = "$Id$";
 #include <typeinfo>
 #include "Koyurugi/Stepper.h"
 #include "Koyurugi/SystemMaker.h"
-#include "ecell/TimeManager.h"
+//FIXME: #include "ecell/TimeManager.h"
 #include "util/Util.h"
 #include "Koyurugi/Integrators.h"
 #include "Koyurugi/RootSystem.h"
@@ -155,7 +155,7 @@ void StepperLeader::setBaseClock(int clock)
 
 Float StepperLeader::deltaT()
 {
-  return theTimeManager->stepInterval();
+  //FIXME: return theTimeManager->stepInterval();
 }
 
 

@@ -35,7 +35,7 @@ char const Reactor_C_rcsid[] = "$Id$";
 
 
 
-#include "ecell/MessageWindow.h"
+//FIXME: #include "ecell/MessageWindow.h"
 #include "Koyurugi/Reactant.h"
 #include "Koyurugi/RootSystem.h"
 #include "Koyurugi/Stepper.h"
@@ -174,8 +174,8 @@ Reactor::Condition Reactor::condition(Condition condition)
 
 void Reactor::warning(const string& message)
 {
-  *theMessageWindow << className() << " [" << fqen() << "]";
-  *theMessageWindow << ":\n\t" << message << "\n";
+//FIXME:   *theMessageWindow << className() << " [" << fqen() << "]";
+//FIXME:   *theMessageWindow << ":\n\t" << message << "\n";
 }
 
 void Reactor::initialize()

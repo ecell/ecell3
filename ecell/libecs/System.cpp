@@ -38,7 +38,7 @@ char const System_C_rcsid[] = "$Id$";
 #include "Koyurugi/System.h"
 #include "Koyurugi/Reactor.h"
 #include "Koyurugi/CellComponents.h"
-#include "ecell/MessageWindow.h"
+//FIXME: #include "ecell/MessageWindow.h"
 #include "Koyurugi/RootSystem.h"
 #include "Koyurugi/Stepper.h"
 #include "Koyurugi/StepperMaker.h"
@@ -291,19 +291,19 @@ void System::initialize()
 	FQPN fqpn(Primitive::REACTOR,*_volumeIndexName);
 	Primitive p(theRootSystem->getPrimitive(fqpn));
 	_volumeIndex = p.reactor;
-	*theMessageWindow << fqen() << ": volume index is [" 
-	  << _volumeIndex->fqen() << "].\n";
+	//FIXME: *theMessageWindow << fqen() << ": volume index is [" 
+	//FIXME: 	  << _volumeIndex->fqen() << "].\n";
 
       }
     else
       {
-	*theMessageWindow << fqen() << ": no volume index is specified.\n"; 
+	//FIXME: *theMessageWindow << fqen() << ": no volume index is specified.\n"; 
       }
   }
   catch(NotFound)
     {
-      *theMessageWindow << fqen() << ": volume index [" 
-	<< _volumeIndexName->fqenString() << "] not found.\n";
+      //FIXME: *theMessageWindow << fqen() << ": volume index [" 
+	//FIXME: << _volumeIndexName->fqenString() << "] not found.\n";
     }
 
   delete _volumeIndexName;
@@ -326,9 +326,9 @@ bool RSystem::newReactor(Reactor *reactor)
 
   if(containsReactor(reactor->entryname()))
     {
-      *theMessageWindow << "multiple definition of reactor [" 
-	<< reactor->entryname() << "] on [" << entryname() << 
-	  "], later one discarded.\n";
+      //FIXME: *theMessageWindow << "multiple definition of reactor [" 
+	//FIXME: << reactor->entryname() << "] on [" << entryname() << 
+	  //FIXME: "], later one discarded.\n";
       return false;
     }
 
@@ -400,9 +400,9 @@ bool SSystem::newSubstance(Substance* newone)
 {
   if(containsSubstance(newone->entryname()))
     {
-      *theMessageWindow << "multiple definition of substance [" 
-	<< newone->entryname() << "] on [" << entryname() << 
-	  "], name and quantity overwrote.\n";
+//FIXME:       *theMessageWindow << "multiple definition of substance [" 
+//FIXME: 	<< newone->entryname() << "] on [" << entryname() << 
+//FIXME: 	  "], name and quantity overwrote.\n";
       _substanceList[newone->entryname()]->setName(newone->name());
       Message m("Quantity",newone->quantity());
       _substanceList[newone->entryname()]->set(m);
@@ -448,8 +448,8 @@ void SSystem::fixSubstance(const string& entry)
   Substance* s;
   if( (s = getSubstance(entry)) == NULL)
     {
-      *theMessageWindow << "fix request to undefined substance [" 
-	<< entry << "] on [" << entryname() << "]. ignoring.\n";
+//FIXME:       *theMessageWindow << "fix request to undefined substance [" 
+//FIXME: 	<< entry << "] on [" << entryname() << "]. ignoring.\n";
       return; 
     }
   s->fix();
@@ -477,9 +477,9 @@ bool MetaSystem::newSystem(System* system)
 {
   if(containsSystem(system->entryname()))
     {
-      *theMessageWindow << "multiple definition of system [" 
-	<< system->entryname() << "] on [" << entryname() << 
-	  "], later one discarded.\n";
+//FIXME:       *theMessageWindow << "multiple definition of system [" 
+//FIXME: 	<< system->entryname() << "] on [" << entryname() << 
+//FIXME: 	  "], later one discarded.\n";
       delete system;
       return false;
     }

@@ -40,7 +40,7 @@
 // system constants
 
 const int RANDOM_NUMBER_BUFFER_SIZE(65535);
-const char* const REACTOR_SO_DIR= DM_SO_DIR "/reactor"; 
+//FIXME: const char* const REACTOR_SO_DIR= DM_SO_DIR "/reactor"; 
 
 // FIXME: use numeric_limits
 #if defined(sparc) && defined(__SVR4)

@@ -39,9 +39,9 @@
 #include <string>
 #include <map>
 #include <vector>
-#include "ecell/Exceptions.h"
+#include "Koyurugi/Exceptions.h"
 #include "util/StringList.h"
-#include "include/Defs.h"
+#include "Koyurugi/Defs.h"
 
 class AbstractMessageCallback;
 

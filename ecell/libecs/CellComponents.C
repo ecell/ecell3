@@ -37,7 +37,7 @@ char const CellComponents_C_rcsid[] = "$Id$";
 
 #include "assert.h"
 #include "Koyurugi/CellComponents.h"
-#include "ecell/MessageWindow.h"
+//FIXME: #include "ecell/MessageWindow.h"
 #include "Koyurugi/RootSystem.h"
 #include "Koyurugi/SystemMaker.h"
 

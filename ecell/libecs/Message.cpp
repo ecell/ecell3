@@ -38,8 +38,8 @@ char const Message_C_rcsid[] = "$Id$";
 #include <strstream>
 #include <stdio.h>
 #include "util/Message.h"
-#include "ecell/MessageWindow.h"
-#include "include/Defs.h"
+//FIXME: #include "ecell/MessageWindow.h"
+#include "Koyurugi/Defs.h"
 
 ////////////////////// Message
 
@@ -120,6 +120,8 @@ const string Message::body(int n) const
   return second.substr(pos,second.find(FIELD_SEPARATOR)-pos);
 }
 
+//FIXME:
+/*
 ///////////////////////////// MessageInterface
 
 MessageInterface::MessageInterface()
@@ -221,8 +223,7 @@ StringList MessageInterface::slotList()
     sl.insert(sl.end(),i->first);
   return sl;
 }
-
-
+*/
 
 void debugPrint(FILE * pf, const string & str)
 {

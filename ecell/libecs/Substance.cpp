@@ -42,7 +42,7 @@ char const Substance_C_rcsid[] = "$Id$";
 #include "util/Util.h"
 #include "Koyurugi/Accumulators.h"
 #include "Koyurugi/AccumulatorMaker.h"
-#include "ecell/MessageWindow.h"
+//FIXME: #include "ecell/MessageWindow.h"
 
 
 const string Substance::SYSTEM_DEFAULT_ACCUMULATOR_NAME = "ReserveAccumulator";
@@ -104,23 +104,23 @@ Substance::~Substance()
 
 void Substance::setAccumulator(const string& classname)
 {
-  try {
+  //FIXME: try {
     Accumulator* a;
     a = theRootSystem->accumulatorMaker().make(classname);
     setAccumulator(a);
-    if(classname != userDefaultAccumulatorName())
-      *theMessageWindow << "[" << fqpn() 
-	<< "]: accumulator is changed to: " << classname << ".\n";
-  }
-  catch(Exception& e)
-    {
-      *theMessageWindow << "[" << fqpn() << "]:\n" << e.message();
-      if(_accumulator)   // _accumulator is already set
-	{
-	  *theMessageWindow << "[" << fqpn() << 
-	    "]: falling back to :" << _accumulator->className() << ".\n";
-	}
-    }
+    //FIXME: if(classname != userDefaultAccumulatorName())
+    //FIXME:  *theMessageWindow << "[" << fqpn() 
+    //FIXME: << "]: accumulator is changed to: " << classname << ".\n";
+    //FIXME: }
+  //FIXME:  catch(Exception& e)
+  //FIXME:    {
+  //FIXME:      *theMessageWindow << "[" << fqpn() << "]:\n" << e.message();
+  //FIXME:      if(_accumulator)   // _accumulator is already set
+  //FIXME:	{
+  //FIXME:	  *theMessageWindow << "[" << fqpn() << 
+  //FIXME:	    "]: falling back to :" << _accumulator->className() << ".\n";
+  //FIXME:	}
+  //FIXME:    }
 }
 
 void Substance::setAccumulator(Accumulator* a)
@@ -144,9 +144,9 @@ void Substance::initialize()
     setAccumulator(USER_DEFAULT_ACCUMULATOR_NAME);
   if(!_accumulator)  // if the user default is invalid fall back to the
     {                // system default.
-      *theMessageWindow << "Substance: " 
-	<< "falling back to the system default accumulator: " 
-	  << SYSTEM_DEFAULT_ACCUMULATOR_NAME  << ".\n";
+      //FIXME:      *theMessageWindow << "Substance: " 
+      //FIXME:	<< "falling back to the system default accumulator: " 
+      //FIXME:	  << SYSTEM_DEFAULT_ACCUMULATOR_NAME  << ".\n";
       setUserDefaultAccumulatorName(SYSTEM_DEFAULT_ACCUMULATOR_NAME);
       setAccumulator(USER_DEFAULT_ACCUMULATOR_NAME);
     }

@@ -37,7 +37,7 @@ char const ReactorMaker_C_rcsid[] = "$Id$";
 
 #include <stdlib.h>
 #include "Koyurugi/ReactorMaker.h"
-#include "ecell/Serizawa.h"
+//FIXME: #include "ecell/Serizawa.h"
 #include "Koyurugi/RootSystem.h"
 #include "util/Message.h"
 #include "Koyurugi/Defs.h"
@@ -53,16 +53,16 @@ char const ReactorMaker_C_rcsid[] = "$Id$";
 
 ReactorMaker::ReactorMaker()
 {
-  addSearchPath(REACTOR_SO_DIR);
+  //FIXME:  addSearchPath(REACTOR_SO_DIR);
 
   char* env = getenv("REACTOR_PATH");
   if(env)
     addSearchPath(env);
 
-  addSearchPath(Serizawa::REACTOR_PATH);
+  //FIXME: addSearchPath(Serizawa::REACTOR_PATH);
 
-  *theMessageWindow << "ReactorMaker: Reactor path = [" << searchPath()
-		    << "].\n";
+  //FIXME:*theMessageWindow << "ReactorMaker: Reactor path = [" << searchPath()
+  //FIXME:	    << "].\n";
 }
 
 Reactor* ReactorMaker::make(const string& classname) throw(CantInstantiate)
