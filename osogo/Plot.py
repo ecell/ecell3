@@ -113,6 +113,7 @@ class Plot:
 	def press(self,obj, event):
 	    #"this must be overriden"
 	    return True
+
 	def motion(self,obj,event):
 	    #this must be overriden
 	    return True
@@ -123,7 +124,8 @@ class Plot:
 	    
 	def addtrace(self, aFullPNString):		
 	    #checks whether there's room for new traces
-	    if len(self.available_colors)>0:
+	    if len(self.available_colors)>0 and \
+		(not self.data_list.__contains__(aFullPNString)):
 		#allocates a color
 		allocated_color=self.available_colors.pop()
 		self.data_list.append(aFullPNString)
@@ -200,13 +202,12 @@ class Plot:
 #	    self.gc.foreground=self.saved_gc_color
 	    
 	def drawline(self, aFullPNString,x0,y0,x1,y1):
-	    #uses raw plot coordinates!
-	    
+	    #uses raw plot coordinates!	    
 	    self.pm.draw_line(self.GCFullPNMap[aFullPNString],x0,y0,x1,y1)
 	    self.theWidget.queue_draw_area(min(x0,x1),min(y0,y1),abs(x1-x0)+1,\
 	    abs(y1-y0)+1)
 	    return [x1,y1]
-	    
+
 	def drawbox(self, aFullPNString,x0,y0,width,heigth):
 	    #uses raw plot coordinates!
 	    self.pm.draw_rectangle(self.GCFullPNMap[aFullPNString],gtk.TRUE,x0,y0,width,heigth)
@@ -217,7 +218,7 @@ class Plot:
 	    newgc.set_function(gtk.gdk.INVERT)
 	    self.pm.draw_rectangle(newgc,gtk.TRUE,x0,y0,x1-x0,y1-y0)
 	    self.theWidget.queue_draw_area(x0,y0,x1,y1)
-	    
+
 	def drawtext(self,aFullPNString,x0,y0,text):
 		t=str(text)
 		self.pm.draw_text(self.font,self.GCFullPNMap[aFullPNString],x0,y0+self.ascent,t)
@@ -234,7 +235,7 @@ class Plot:
 			self.plotarea[1],self.plotarea[2]-realshift,
 			self.plotarea[3]+1)
 	    self.theWidget.queue_draw()
-	    
+
 	def printxlabel(self, num):
 	    text=self.num_to_sci(num)
 	    x=self.convertx_to_plot(num)
@@ -511,10 +512,12 @@ class TracerPlot(Plot):
 		#addbuffer
 		    xmax=0
 		    self.data_stack[fpn].append(points[fpn])
+
 		    if points[fpn][0]>self.xframe[1]: 
 			shift_flag=True
 			if points[fpn][0]>xmax: xmax=points[fpn][0]
-		    if points[fpn][1]>self.yframe[1] or points[fpn][1]<self.yframe[0]: 
+		    if (points[fpn][1]>self.yframe[1] or points[fpn][1]<self.yframe[0])\
+			and self.trace_onoff[fpn]==gtk.TRUE:
 			redraw_flag=True
 		if shift_flag:
 		    newxframe=max(xmax,self.xframe[1]+self.stripinterval*(1-self.xframe_when_rescaling))
@@ -523,7 +526,6 @@ class TracerPlot(Plot):
 		    self.xframe[1]+=shift
 		    self.xframe[0]+=shift
 		    self.reframex()
-
 		    for fpn in self.data_list:
 			try:
 			    while self.data_stack[fpn][1][0]<self.xframe[0]:
@@ -540,6 +542,7 @@ class TracerPlot(Plot):
 		#if >xframe[1],  shiftframe, remove bufferhead 
 		    #,adjust lastx, lasty,
 		    self.shiftplot(realshift)
+
 		    for fpn in self.data_list:
 			if self.lastx[fpn]!=None:
 			    self.lastx[fpn]-=realshift
@@ -547,7 +550,6 @@ class TracerPlot(Plot):
 		else:
 		    for fpn in self.data_list:
 			self.drawpoint(fpn,points[fpn])
-		    
 		#else drawpoint
 	    elif self.zoomlevel==0 and not self.zoomkeypressed:
 	    #if history:
@@ -570,11 +572,12 @@ class TracerPlot(Plot):
 		    newdata_stack[fpn].extend(newdata)
 	    #check xframe[1], overflow, if yes:addtrace[]
 		#if >yframe[1] or<yframe[0], interrupt, addtrace[]
-		    for dp in newdata:
-			if dp[0]>self.xframe[1]:
-			    redraw_flag=True
-			if dp[1]>self.yframe[1] or dp[1]<self.yframe[0]:
-			    redraw_flag=True
+		    if self.trace_onoff[fpn]==gtk.TRUE:
+			for dp in newdata:
+			    if dp[0]>self.xframe[1]:
+				redraw_flag=True
+			    if dp[1]>self.yframe[1] or dp[1]<self.yframe[0]:
+				redraw_flag=True
 		if redraw_flag:
 		    self.addtrace([])
 		else:
@@ -584,7 +587,7 @@ class TracerPlot(Plot):
 			    self.drawpoint(fpn,dp)
 	    #begin drawing
 		#drawpoint
-	    
+
 	def setmode_strip(self,pointmap):
 	    #delete buffers
 	    #reframe buffers end-interval/end
@@ -636,6 +639,7 @@ class TracerPlot(Plot):
 	    #checks whether there's room for new traces
 	    #allocates a color
 		aFullPNString= add_item[0]
+		
 		pm=Plot.addtrace(self,aFullPNString)
 		if pm!=None:
 		    return_list.append([aFullPNString,pm])
