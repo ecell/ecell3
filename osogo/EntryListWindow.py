@@ -31,9 +31,12 @@ class EntryListWindow(Window):
 
         self.theTypeMenu = self.theTypeOptionMenu.get_menu()
         aTypeMenuItemMap = self.theTypeMenu.children()
-        aTypeMenuItemMap[0].connect( 'activate', self.changeEntityType, 'Substance' )
-        aTypeMenuItemMap[1].connect( 'activate', self.changeEntityType, 'Reactor' )
-        aTypeMenuItemMap[2].connect( 'activate', self.changeEntityType, 'All' )
+        aTypeMenuItemMap[0].connect( 'activate', self.changeEntityType,
+                                     'Substance' )
+        aTypeMenuItemMap[1].connect( 'activate', self.changeEntityType,
+                                     'Reactor' )
+        aTypeMenuItemMap[2].connect( 'activate', self.changeEntityType,
+                                     'All' )
 
         self.theSelectedEntityType = 'Substance'
         self.theSelectedSystemFullID = ''
@@ -59,14 +62,8 @@ class EntryListWindow(Window):
             aLeaf.expand()
 
             for aSystemID in aSystemList:
-                if aSystemFullID[SYSTEMPATH] == '/':
-                    if aSystemFullID[ID] == '/':
-                        aNewSystemPath = '/'
-                    else:
-                        aNewSystemPath = '/' + aSystemFullID[ID]
-                else:
-                    aNewSystemPath = aSystemFullID[SYSTEMPATH] + '/' + aSystemFullID[ID]
-                aNewSystemFullID = ( SYSTEM, aNewSystemPath, aSystemID )
+                aSystemPath = self.createSystemPathFromFullID( aSystemFullID )
+                aNewSystemFullID = ( SYSTEM, aSystemPath, aSystemID )
                 self.constructTree( aTree, aNewSystemFullID )
 
     def changeEntityType( self, menu_item_obj, aEntityType):
@@ -98,14 +95,7 @@ class EntryListWindow(Window):
         for aEntityID in aEntityList:
             aListItem = gtk.GtkListItem( aEntityID )
 
-            if aSystemFullID[SYSTEMPATH] == '/':
-                if aSystemFullID[ID] == '/':
-                    aSystemPath = '/'
-                else:
-                    aSystemPath = '/' + aSystemFullID[ID]
-            else:
-                aSystemPath = aSystemFullID[SYSTEMPATH] + '/' + aSystemFullID[ID]
-
+            aSystemPath = self.createSystemPathFromFullID( aSystemFullID )
             aListItem.connect( 'select', self.selectEntity, aEntityTypeString,
                                aSystemPath, aEntityID )
             self.theEntryList.add( aListItem )
@@ -131,6 +121,17 @@ class EntryListWindow(Window):
         self.theMainWindow.thePluginManager.createInstance( aPluginName,
                    self.theSimulator, self.theSelectedEntityList )
                                                             
+    def createSystemPathFromFullID( self, aSystemFullID ):
+        if aSystemFullID[SYSTEMPATH] == '/':
+            if aSystemFullID[ID] == '/':
+                aNewSystemPath = '/'
+            else:
+                aNewSystemPath = '/' + aSystemFullID[ID]
+        else:
+            aNewSystemPath = aSystemFullID[SYSTEMPATH] + '/' +\
+                             aSystemFullID[ID]
+        return aNewSystemPath
+
 
 def mainQuit( obj, data ):
     gtk.mainquit()
