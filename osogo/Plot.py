@@ -69,8 +69,6 @@ class Plot:
 	    self.theWidget.connect('button-release-event',self.release)
 	    
 	    #aRootWindow=self.getParent()
-	    #print "------------p--------------1"
-	    #print aRootWindow
 	    #root = aRootWindow[aRootWindow.__class__.__name__]
 
 	    root = root[root.__class__.__name__]
@@ -272,7 +270,6 @@ class Plot:
 	    return len(self.ColorList)
 	    
 	def convertx_to_plot(self,x):
-	    #print "this must be overloaded!"
 	    pass
 	    
 	    
@@ -565,7 +562,7 @@ class TracerPlot(Plot):
 			lasttime=self.xframe[0]
 		    else:
 			lasttime=databuffer[len(databuffer)-1][0]
-		    newdata=self.theOwner.recache(fpn,lasttime,points[fpn][0],self.pixelwidth)
+		    newdata=self.theOwner.recache(fpn,lasttime,points[fpn][0],self.pixelwidth/2)
 	    #addbuffer all
 		    databuffer.extend(newdata)
 		    newdata_stack[fpn]=[]
@@ -660,7 +657,6 @@ class TracerPlot(Plot):
 		self.reframex()
 		for fpn in self.data_list:
 		    self.data_stack[fpn]=self.getxframe_from_logger(fpn)
-
 		
 		for add_item in add_list:
 		    fpn=add_item[0]
@@ -668,10 +664,6 @@ class TracerPlot(Plot):
 		    newdatabuffer.append(add_item[1]) #latest value
 		self.reframey()
 
-#		self.minmax()
-#		self.xframe[0]=self.minmax[2]
-#		self.xframe[1]=xframe[0]+self.stripinterval*self.xframe_when_rescaling
-		
 	    elif self.zoomlevel==0:
 		#if mode is history and zoom level 0, set xframes
 		self.xframe[0]=None
@@ -746,7 +738,7 @@ class TracerPlot(Plot):
 	    data_to=min(self.xframe[1],self.loggerstartendmap[fpn][1])
 	    if self.theOwner.haslogger(fpn):
 		newdatabuffer=self.theOwner.recache(fpn,data_from,
-			    data_to, self.pixelwidth)
+			    data_to, self.pixelwidth/2)
 	    return newdatabuffer
 	
 	def remove_trace(self, FullPNStringList):
@@ -947,8 +939,6 @@ class TracerPlot(Plot):
 	    lasty=self.lasty[aFullPNString]
 	    self.lastx[aFullPNString]=x
 	    self.lasty[aFullPNString]=y
-
-
 	    last_point_within_frame=self.withinframes([lastx,lasty])
 	    if lastx!=None:
 		dx=abs(lastx-x)
@@ -960,10 +950,8 @@ class TracerPlot(Plot):
 		#draw just a point
 		if cur_point_within_frame:
 		    self.drawpoint_on_plot(aFullPNString,x,y)
-
 	    else:
 		#draw line    
-
 		if (not cur_point_within_frame) and (not last_point_within_frame):
 		    #if neither points are in frame do not draw line
 		    pass
@@ -974,8 +962,6 @@ class TracerPlot(Plot):
 		    x1=x
 		    y1=y
 
-#		    print "before"
-#		    print "x0",x0,"y0",y0,"x1",x1,"y1",y1
 
 		    if cur_point_within_frame and last_point_within_frame:
 		    #if both points are in frame no interpolation needed
@@ -987,26 +973,26 @@ class TracerPlot(Plot):
 			#there are 2 boundary cases x0=x1 and y0=y1
 			if x0==x1:
 			    #adjust y if necessary
-			    if y0<self.plotaread[1] and y1>self.plotaread[1]:
+			    if y0<self.plotaread[1] and y1>=self.plotaread[1]:
 				y0=self.plotaread[1]
-			    if y0>self.plotaread[3] and y1<self.plotaread[3]:
+			    if y0>self.plotaread[3] and y1<=self.plotaread[3]:
 				y0=self.plotaread[3]
 
-			    if y1<self.plotaread[1] and y0>self.plotaread[1]:
+			    if y1<self.plotaread[1] and y0>=self.plotaread[1]:
 				y1=self.plotaread[1]
-			    if y1>self.plotaread[3] and y0<self.plotaread[3]:
+			    if y1>self.plotaread[3] and y0<=self.plotaread[3]:
 				y1=self.plotaread[3]
 	    
 			elif y0==y1:
 			    #adjust x values if necessary
-			    if x0<self.plotaread[0] and x1>self.plotaread[0]:
+			    if x0<self.plotaread[0] and x1>=self.plotaread[0]:
 				x0=self.plotaread[0]
-			    if x0>self.plotaread[2] and x1<self.plotaread[2]:
+			    if x0>self.plotaread[2] and x1<=self.plotaread[2]:
 				x0=self.plotaread[2]
 
-			    if x1<self.plotaread[0] and x0>self.plotaread[0]:
+			    if x1<self.plotaread[0] and x0>=self.plotaread[0]:
 				x1=self.plotaread[0]
-			    if x1>self.plotaread[2] and x0<self.plotaread[2]:
+			    if x1>self.plotaread[2] and x0<=self.plotaread[2]:
 				x1=self.plotaread[2]
 	    
 			else:
@@ -1052,6 +1038,7 @@ class TracerPlot(Plot):
 				    y1=y12
 #interpolation section ends
 		    self.drawline(aFullPNString,x0,y0,x1,y1)
+		    
 		    #if change is 1 pixel in x or y direction drawpoint
 		    #else drawline
 		    #setlast
