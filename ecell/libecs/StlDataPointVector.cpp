@@ -68,10 +68,10 @@ StlDataPointVector<T,V,Containee,Container>::const_iterator StlDataPointVector<T
 }
 
 
-#if defined(STL_DATAPOINTVECTOR_TEST)
+#if defined(STLDATAPOINTVECTOR_TEST)
 
 #include <iostream>
-#include "datapoint.cpp"
+#include "DataPoint.cpp"
 
 typedef double Float;
 
@@ -99,4 +99,10 @@ int main()
 
 }
 
-#endif /* END OF STL_DATAPOINTVECTOR_TEST */
+#endif /* END OF STLDATAPOINTVECTOR_TEST */
+
+
+
+
+
+
