@@ -5,7 +5,7 @@ from main import *
 from Plugin import *
 
 from gtk import *
-from ecssupport import *
+import ecssupport
 
 import ecs
 
@@ -126,6 +126,25 @@ class MainWindow(Window):
 
     def printMessage( self, aMessageString ):
         self.theMessageWindow.printMessage( aMessageString )
+
+    def printProperty( self, fullpn ):
+        value = self.theSimulator.getProperty( fullpn )
+        fullpnstring = ecssupport.getFullPNString(fullpn)
+        self.printMessage( fullpnstring )
+        self.printMessage( ' = ' )
+        self.printMessage( str(value[0]) )
+    
+    def printAllProperties( self, fullid ):
+        properties = self.theSimulator.getProperty( fullid +  ('PropertyList',) )
+        for property in properties:
+            self.printProperty( fullid + ( property, ) )
+
+    def printList( self, primitivetype, systempath,list ):
+        for i in list:
+            printAllProperties( ( primitivetype, systempath, i ) )
+
+##########################################################################
+
 
     ###### Toggle Palette Window ######
     def togglePaletteWindow( self, button_obj ) :

@@ -112,22 +112,6 @@ def createSystemPathFromFullID( aSystemFullID ):
     return aNewSystemPath
 
 
-##########################################################################
-
-def printProperty( sim, fullpn ):
-    value = sim.getProperty( fullpn )
-    print fullpn, '\t=\t', value
-
-def printAllProperties( sim, fullid ):
-    properties = sim.getProperty( fullid +  ('PropertyList',) )
-    for property in properties:
-        printProperty( sim, fullid + ( property, ) )
-
-def printList( sim, primitivetype, systempath,list ):
-    for i in list:
-        printAllProperties( sim, ( primitivetype, systempath, i ) )
-
-##########################################################################
 
 
 if __name__ == "__main__":
