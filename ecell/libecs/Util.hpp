@@ -246,76 +246,88 @@ namespace libecs
      These functions are prepared for ExpressionFluxProcess
      and used in it.
   */
-  /*
-  Real sec( Real n )
+
+  template <typename T>
+  T sec( T n )
   {
     return 1 / cos( n );
   }
 
-  Real csc( Real n )
+  template <typename T>
+  T csc( T n )
   {
     return 1 / sin( n );
   }
 
-  Real cot( Real n )
+  template <typename T>
+  T cot( T n )
   {
     return 1 / tan( n );
   }
 
-  Real asec( Real n )
+  template <typename T>
+  T asec( T n )
   {
     return 1 / acos( n );
   }
 
-  Real acsc( Real n )
+  template <typename T>
+  T acsc( T n )
   {
     return 1 / asin( n );
   }
 
-  Real acot( Real n )
+  template <typename T>
+  T acot( T n )
   {
     return 1 / atan( n );
   }
 
-  Real sech( Real n )
+  template <typename T>
+  T sech( T n )
   {
     return 1 / cosh( n );
   }
   
-  Real csch( Real n )
+  template <typename T>
+  T csch( T n )
   {
     return 1 / sinh( n );
   }
   
-  Real coth( Real n )
+  template <typename T>
+  T coth( T n )
   {
     return 1 / tanh( n );
   }
   
-  Real asech( Real n )
+  template <typename T>
+  T asech( T n )
   {
     return 1 / acosh( n );
   }
 
-  Real acsch( Real n )
+  template <typename T>
+  T acsch( T n )
   {
     return 1 / asinh( n );
   }
 
-  Real acoth( Real n )
+  template <typename T>
+  T acoth( T n )
   {
     return 1 / atanh( n );
   }
 
-  Real sum = 1;
-  Real fact( Real n )
+  template <typename T>
+  T fact( T n )
   {
-    for( Real num = n; num > 0; num--)
-      sum = sum * num;
-    
-    return sum;
+    if( n <= 1 )
+      return 1;
+    else
+      return n * fact( n-1 );
   }
-  */
+  
   const Polymorph convertStringMapToPolymorph( StringMapCref aMap );
 
 
