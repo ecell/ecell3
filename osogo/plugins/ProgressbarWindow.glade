@@ -228,7 +228,7 @@
 	<class>GtkProgressBar</class>
 	<name>progressbar</name>
 	<width>20</width>
-	<height>0</height>
+	<height>22</height>
 	<value>0</value>
 	<lower>0</lower>
 	<upper>10</upper>
@@ -238,7 +238,7 @@
 	<show_text>True</show_text>
 	<format></format>
 	<text_xalign>0.5</text_xalign>
-	<text_yalign>0.5</text_yalign>
+	<text_yalign>0.41</text_yalign>
 	<child>
 	  <padding>0</padding>
 	  <expand>False</expand>
