@@ -1,8 +1,41 @@
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+//
+//        This file is part of E-CELL Simulation Environment package
+//
+//                Copyright (C) 2000-2001 Keio University
+//
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+//
+//
+// E-CELL is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public
+// License as published by the Free Software Foundation; either
+// version 2 of the License, or (at your option) any later version.
+// 
+// E-CELL is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+// See the GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public
+// License along with E-CELL -- see the file COPYING.
+// If not, write to the Free Software Foundation, Inc.,
+// 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+// 
+//END_HEADER
+//
+// written by Masayuki Okayama <smash@e-cell.org> at
+// E-CELL Project, Lab. for Bioinformatics, Keio University.
+//
+
+
 #if !defined(__DATAPOINT_HPP)
 #define __DATAPOINT_HPP
 
 #include "libecs.hpp"
 
+
+#include "UniversalVariable.hpp"
 
 namespace libecs
 {
@@ -17,150 +50,129 @@ namespace libecs
  */
 
 
-// DECLARE_TYPE( DataPoint<Real,Real>, RealDataPoint );
-
-template <class T, class V>
-class DataPoint
-{
-
-  DECLARE_CLASS( DataPoint );
-
-public:
-
-
-  /**
-     Initializing constructor
-     @param 2 objects which are components of DataPoint
-  */
-
-  DataPoint( const T&, const V& );
-
-
-  /**
-     Copy constructor
-     @param Object constant reference
-   */
-
-  DataPoint( DataPointCref );
-
-
-  /// Destructor
-
-  ~DataPoint( void )
+  class DataPoint
   {
-    ; // do nothing
-  }
+    
+    
+  public:
+    
+    
+    /**
+       Initializing constructor
+       @param 2 objects which are components of DataPoint
+    */
+    
+    DataPoint( RealCref, UniversalVariableCref );
+    
+    DataPoint( RealCref, RealCref );
+
+    
+    /**
+       Copy constructor
+       @param Object constant reference
+    */
+    
+    DataPoint( DataPointCref );
+    
+    
+    /// Destructor
+    
+    ~DataPoint( void )
+    {
+      ; // do nothing
+    }
+    
+    
+    /**
+       Assignments operator
+       @param DataPoint constant reference
+       @return DataPoint reference
+    */
+    
+    /*
+      DataPointRef operator=( DataPointCref );
+    */
 
 
-  /**
-     Assignments operator
-     @param DataPoint constant reference
-     @return DataPoint reference
-  */
-
-  DataPointRef operator=( DataPointCref );
-
-
-  bool operator<( DataPointCref second )
-  {
-    if( getTime() < second.getTime() )
-      {
-	return true;
-      }
-    return false;
-  }
-
-
-  bool operator>(const DataPoint& second)
-  {
-    if( getTime() > second.getTime() )
-      {
-	return true;
-      }
-    return false;
-  }
-
-
-  //
-  // Accessors
-  //
-
-  /**
-     Return the data member, theTime
-     @return T constant reference
-   */
-
-  const T& getTime( void ) const
-  {
-    return theTime;
-  }
-
-
-  /**
-     Return the data member, theValue
-     @return V constant reference
-   */
-
-  const V& getValue( void ) const
-  {
-    return theValue;
-  }
+    // FIXME
+    bool operator<( DataPointCref second )
+    {
+      if( getTime() < second.getTime() )
+	{
+	  return true;
+	}
+      return false;
+    }
+    
+    // FIXME
+    bool operator>(const DataPoint& second)
+    {
+      if( getTime() > second.getTime() )
+	{
+	  return true;
+	}
+      return false;
+    }
+    
+    
+    //
+    // Accessors
+    //
+    
+    /**
+       Return the data member, theTime
+       @return T constant reference
+    */
+    
+    RealCref getTime( void ) const
+    {
+      return theTime;
+    }
+    
+    
+    /**
+       Return the data member, theValue
+       @return V constant reference
+    */
+    
+    UniversalVariableCref getValue( void ) const
+    {
+      return theValue;
+    }
+    
+  private:
+    
+    /// Default constructor prohibited to public use
+    
+    DataPoint( void );
+    
+    /**
+       
+       @param int object
+       @return DataPoint reference
+    */
+    
+    DataPoint& operator[]( int );
+    
+    
+    //
+    // Mutators
+    //
+    
+    //
+    // Private data members follow
+    //
+    
+  private:
+    
+    /// The internal value
+    
+    Real theTime;
+    UniversalVariable theValue;
+    
+  };
   
-private:
-
-  /// Default constructor prohibited to public use
-
-  DataPoint( void );
-
-  /**
-
-     @param int object
-     @return DataPoint reference
-   */
-
-  DataPoint& operator[]( int );
-
-
-  //
-  // Mutators
-  //
-
-  /**
-     Sets the data member, theTime
-     @param T const object
-   */
-
-  void setTime( const T& t )
-  {
-    theTime = t;
-  }
-
-
-  /**
-     Sets the data member, theValue
-     @param V const object
-   */
-
-  void setValue( const V& v )
-  {
-    theValue = v;
-  }
-
-
-  //
-  // Private data members follow
-  //
-
-private:
-
-  /// The internal value
-
-  T theTime;
-  V theValue;
   
-};
-
-
 
 } // namespace libecs
 

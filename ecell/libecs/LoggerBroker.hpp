@@ -37,29 +37,40 @@
 #include "libecs.hpp"
 #include "Logger.hpp"
 
-
 namespace libecs
 {
 
-  typedef string IDString;
-
+  DECLARE_MAP( const String, LoggerPtr, std::less<const String>, LoggerMap );
+  
   class LoggerBroker
   {
   public:
-    LoggerBroker( void )
+    LoggerBroker( RootSystemPtr aRootSystemPtr )
+      :
+      theRootSystem( aRootSystemPtr )
     {
-      ;
+      ; // do nothing
     }
-
-    Logger* getLogger( IDString );
-
+    
+    LoggerPtr getLogger( StringCref, StringCref );
+    //    LoggerPtr getLogger( FQPICref );
+    
+  protected:
+    
+    void appendLogger( StringCref, StringCref );
+    //    void appendLogger( FQPICref );
+    
+    
+    
   private:
-    LoggerBroker( cosnt  LoggerBroker& );
-    LoggerBroker& operator=( const LoggerBroker& );
-    std::map< IDString, Logger* > theLoggerMap;
-
-  }
-
+    LoggerBroker( LoggerBrokerCref );
+    LoggerBrokerRef operator=( const LoggerBroker& );
+    
+    LoggerMap     theLoggerMap;
+    RootSystemPtr theRootSystem;
+    
+  };
+  
 } // namespace libecs
 
 #endif

@@ -40,43 +40,22 @@
  */
 
 #include "DataPoint.hpp"
-
-
-namespace libecs
-{
-
-  template <class T, class V> class DataPoint;
-  template <class T, class V> class Logger;
-
-  typedef double Real;                          // FIXME :temp
-  typedef const Real& (*const DataFuncCptr)( ); // FIXME:temp 
-
-  typedef double Time;      // FIXME : temporary use
-  typedef double ValueType; // FIXME : temporary use 
-
-  typedef const Real& (*const funcptr)();
-
-  DECLARE_CLASS( Object );
-
-  class Object
-  {
-  public:
-    Object(funcptr fp)
-      :
-      fptr(fp)
-    {
-      ;
-    }
-
-    funcptr fptr;
-  };
-
-
-
+#include "MessageInterface.hpp"
+#include "UniversalVariable.hpp"
 
 #if defined(STLDATAPOINTVECTOR)
 #include "StlDataPointVector.hpp"
 #endif /* END OF STLDATAPOINTVECTOR */
+
+namespace libecs
+{
+
+  class DataPoint;
+  class Logger;
+
+  typedef const Real& (*const DataFuncCptr)( ); // FIXME:temp 
+
+  typedef const Real& (*const funcptr)();
 
 
 
@@ -84,25 +63,26 @@ namespace libecs
    
    */
 
-  template <class T, class V>
   class Logger
   {
 
-    DECLARE_CLASS( Logger );
 
-  public:
 #if defined(STLDATAPOINTVECTOR)
-    typedef StlDataPointVector<T,V> DataPointVector;
+    DECLARE_TYPE( StlDataPointVector, DataPointVector );
 #endif /* END OF STLDATAPOINTVECTOR */
 
 #if defined(VVECTOR)
     DECLARE_TYPE( VVector, DataPointVector );
 #endif /* END OF VVECTOR */ 
 
-    typedef typename DataPointVector::containee_type containee_type;
-    typedef typename DataPointVector::const_iterator const_iterator;
-    typedef typename DataPointVector::iterator iterator;
-    typedef typename DataPointVector::size_type size_type;
+
+
+  public:
+
+    typedef DataPointVector::Containee containee_type;
+    typedef DataPointVector::const_iterator const_iterator;
+    typedef DataPointVector::iterator iterator;
+    typedef DataPointVector::size_type size_type;
 
   
   public:
@@ -111,7 +91,7 @@ namespace libecs
        Constructor
     */
   
-    Logger( ObjectPtr );
+    Logger( AbstractMessageCallbackCptr );
   
     /**
        Copy constructor
@@ -129,20 +109,22 @@ namespace libecs
 
      */
 
-    const DataPointVector& getData( void ) const;
+    DataPointVectorCref getData( void ) const;
 
     /**
 
      */
 
-    const DataPointVector& getData( const T& start, const T& end ) const;
+    DataPointVectorCref getData( RealCref start,
+				 RealCref end ) const;
 
     /**
 
      */
 
-    const DataPointVector& getData( const T& first, const T& last, 
-				    const T& interval ) const;
+    DataPointVectorCref getData( RealCref first,
+				 RealCref last, 
+				 RealCref interval ) const;
 
 
     /**
@@ -160,63 +142,25 @@ namespace libecs
       appendData(dp);
     }
 
-    /**
-
-     */
-
-    void push( const containee_type& x )
-    {
-      theDataPointVector.push( x );
-    }
 
     /**
 
      */
 
-    void push( const T& t, const V& v )
-    {
-      theDataPointVector.push( t, v );
-    }
+    RealCref getStartTime( void ) const;
 
     /**
 
      */
 
-    const_iterator binary_search( const_iterator begin, const_iterator end,
-				  const T& t ) const
-    {
-      return theDataPointVector.binary_search( begin, end, t );
-    }
-
-    /**
-
-     */
-
-    const_iterator binary_search( size_type begin, size_type end, 
-				  const T& t ) const
-    {
-      return theDataPointVector.binary_search( begin, end, t);
-    }
+    RealCref getEndTime( void ) const;
 
 
     /**
 
      */
 
-    const T& getStartTime( void ) const;
-
-    /**
-
-     */
-
-    const T& getEndTime( void ) const;
-
-
-    /**
-
-     */
-
-    const T& getMinInterval( void ) const
+    RealCref getMinInterval( void ) const
     {
       return theMinimumInterval;
     }
@@ -225,17 +169,53 @@ namespace libecs
 
      */
 
-    const T& getCurrentInterval( void ) const;
+    RealCref getCurrentInterval( void ) const
+    {
+      return theCurrentInterval;
+    }
 
   protected:
+
+    /**
+
+     */
+
+    AbstractMessageCallbackCptr getMessageCallbackCptr( void ) const
+    {
+      return theMessageCallbackCptr;
+    }
   
   
     /**
 
      */
 
+    DataPointVectorCref getDataPointVector( void ) const
+    {
+      return theDataPointVector;
+    }
+
+
+    /**
+
+     */
+
+    const_iterator binary_search( const_iterator begin,
+				  const_iterator end,
+				  RealCref t ) const
+    {
+      return theDataPointVector.binary_search( begin, end, t );
+    }
+    
+
+
+    /**
+
+     */
+
     void appendData( const containee_type& );
 
+    void appendData( RealCref t, UniversalVariableCref v );
 
   private:
 
@@ -246,24 +226,9 @@ namespace libecs
 
     /// Assignment operator is hidden
   
-    Logger& operator=( const Logger<T,V>& );
+    Logger& operator=( const Logger& );
   
 
-    /**
-
-     */
-    const DataPointVector& getDataPointVector( void ) const
-    {
-      return theDataPointVector;
-    }
-
-    /**
-
-     */
-    const DataFuncCptr& getDataFuncCptr( void ) const
-    {
-      return theDataFuncCptr;
-    }
 
 
   private:
@@ -278,10 +243,10 @@ namespace libecs
 
     /// Data members
 
-    DataPointVector theDataPointVector;
-    DataFuncCptr    theDataFuncCptr;
-    T               theMinimumInterval;
-
+    DataPointVector             theDataPointVector;
+    AbstractMessageCallbackCptr theMessageCallbackCptr;
+    Real                        theMinimumInterval;
+    Real                        theCurrentInterval;
 
   };
 

@@ -44,168 +44,164 @@ namespace libecs
 // Constructor
 
 
-template <class T, class V>
-Logger<T, V>::Logger( ObjectPtr optr )
-  :
-  theDataFuncCptr( optr->fptr )
-{
-  ; // do nothing
-} 
-
-// Copy Constructor
-
-template <class T, class V>
-Logger<T, V>::Logger( LoggerCref logger )
-  :
-  theDataPointVector( logger.getDataPointVector() ),
-  theDataFuncCptr( logger.getDataFuncCptr() )
-  theMinimumInterval( logger.getMinInterval() ) 
-{
-  ; // do nothing
-}
-
-
-// Destructor
-
-template <class T, class V>
-Logger<T,V>::~Logger( void )
-{
-  ; // do nothing
-}
-
-
-//
-
-template < class T, class V >
-const DataPointVector& Logger<T,V>::getData( void ) const
-{
-  const_iterator aItr = theDataPointVector.begin();
-  const_iterator endItr = theDataPointVector.end();
-  DataPointVector* aDataPointVectorPtr( new DataPointVector() );
-
-  while( aItr != endItr )
-    {
-      aDataPointVectorPtr->push( *aItr );
-      aItr++;
-    }
-
-  return *aDataPointVectorPtr;
-
-}
-
-//
-
-template < class T, class V >
-const DataPointVector& Logger<T,V>::getData( const T& start,
-					     const T& end ) const
-{
-  const_iterator itr_1 = theDataPointVector.begin();
-  const_iterator itr_2 = theDataPointVector.end();
-
-
-  const_iterator startItr = theDataPointVector.binary_search( itr_1,
+  Logger::Logger( AbstractMessageCallbackCptr aMessageCallbackPtr )
+    :
+    theMessageCallbackCptr( aMessageCallbackPtr ),
+    theMinimumInterval( 0.0 ),
+    theCurrentInterval( 0.0 )
+  {
+    ; // do nothing
+  } 
+  
+  // Copy Constructor
+  
+  Logger::Logger( LoggerCref logger )
+    :
+    theDataPointVector( logger.getDataPointVector() ),
+    theMessageCallbackCptr( logger.getMessageCallbackCptr() ),
+    theMinimumInterval( logger.getMinInterval() ),
+    theCurrentInterval( logger.getCurrentInterval() )
+  {
+    ; // do nothing
+  }
+  
+  
+  // Destructor
+  
+  Logger::~Logger( void )
+  {
+    ; // do nothing
+  }
+  
+  
+  
+  Logger::DataPointVectorCref Logger::getData( void ) const
+  {
+    const_iterator aItr = theDataPointVector.begin();
+    const_iterator endItr = theDataPointVector.end();
+    DataPointVectorPtr aDataPointVectorPtr( new DataPointVector() );
+    
+    while( aItr != endItr )
+      {
+	aDataPointVectorPtr->push( **aItr );
+	aItr++;
+      }
+    
+    return *aDataPointVectorPtr;
+    
+  }
+  
+  //
+  
+  Logger::DataPointVectorCref Logger::getData( RealCref start,
+					       RealCref end ) const
+  {
+    const_iterator itr_1 = theDataPointVector.begin();
+    const_iterator itr_2 = theDataPointVector.end();
+    
+    
+    const_iterator startItr = theDataPointVector.binary_search( itr_1,
+								itr_2,
+								start );
+    const_iterator endItr = theDataPointVector.binary_search( itr_1,
 							      itr_2,
-							      start );
-  const_iterator endItr = theDataPointVector.binary_search( itr_1,
-							    itr_2,
-							    end );
-  const_iterator i = startItr;
-  DataPointVector* aNewDataPointVectorPtr( new DataPointVector() );
-  while( i != endItr )
-    {
-      aNewDataPointVectorPtr->push( *i );
-      i++;
-    }
-
-  return *aNewDataPointVectorPtr;
-}
-
-
-//
-
-
-template <class T, class V>
-const Logger<T,V>::DataPointVector&
-Logger<T,V>::getData( const T& first,
-		      const T& last,
-		      const T& interval ) const
-{
+							      end );
+    const_iterator i = startItr;
+    DataPointVectorPtr aNewDataPointVectorPtr( new DataPointVector() );
+    while( i != endItr )
+      {
+	aNewDataPointVectorPtr->push( **i );
+	i++;
+      }
+    
+    return *aNewDataPointVectorPtr;
+  }
   
-  DataPointVector* aDataPointVectorPtr( new DataPointVector() );
   
-  const_iterator itr_1 = theDataPointVector.begin();
-  const_iterator itr_2 = theDataPointVector.end();
+  //
   
-  const_iterator firstItr = binary_search( itr_1, itr_2, first );
-  const_iterator lastItr  = binary_search( itr_1, itr_2, last );
-
-  const_iterator i = firstItr;
-  T aTime( first );
-  while( aTime < (*lastItr)->getTime())
-    {
-      const_iterator n = 
-	theDataPointVector.binary_search( i,
-					  lastItr,
-					  aTime + interval );
-      aDataPointVectorPtr->push( **n );
-      aTime = (*n)->getTime();
-      i = n;
-    }
-
-  return *aDataPointVectorPtr;
-}
-
-
-//
-
-template <class T, class V>
-void Logger<T, V>::update( void )
-{
-  appendData( containee_type( (*theDataFuncCptr)(), (*theDataFuncCptr)() ) );
-}
-
-
-//
-
-template <class T, class V>
-void Logger<T, V>::appendData(const containee_type& dp )
-{
-  theDataPointVector.push( dp );
-  T aCurrentInterval = getCurrentInterval();
-  if(theMinimumInterval < aCurrentInterval )
-    {
-      theMinimumInterval = aCurrentInterval; 
-    }
-}
-
-
-//
-
-template < class T, class V >
-const T& Logger<T, V>::getStartTime( void ) const
-{
-  return theDataPointVector.at( 0 )->getTime();
-}
-
-
-//
-
-template < class T, class V >
-const T& Logger<T, V>::getEndTime( void ) const
-{
-  return theDataPointVector.back()->getTime();
-}
-
-//
-
-template < class T, class V >
-const T& Logger<T, V>::getCurrentInterval( void ) const
-{
-  Int aVectorSize = theDataPointVector.size();
-  return
-    theDataPointVector.back()->getTime()
-    - theDataPointVector.at( aVectorSize - 2 )->getTime();
-}
+  
+  Logger::DataPointVectorCref Logger::getData( RealCref first,
+					       RealCref last,
+					       RealCref interval ) const
+  {
+    
+    DataPointVectorPtr aDataPointVectorPtr( new DataPointVector() );
+    
+    const_iterator itr_1 = theDataPointVector.begin();
+    const_iterator itr_2 = theDataPointVector.end();
+    
+    const_iterator firstItr = binary_search( itr_1, itr_2, first );
+    const_iterator lastItr  = binary_search( itr_1, itr_2, last );
+    
+    const_iterator i = firstItr;
+    Real aTime( first );
+    while( aTime < (*lastItr)->getTime() ) // FIXME
+      {
+	const_iterator n = 
+	  theDataPointVector.binary_search( i,
+					    lastItr,
+					    aTime + interval
+					    );
+	aDataPointVectorPtr->push( **n );
+	aTime = (*n)->getTime();
+	i = n;
+      }
+    
+    return *aDataPointVectorPtr;
+  }
+  
+  
+  //
+  // FIXME
+  /*
+  void Logger::update( void )
+  {
+    appendData( containee_type( (*theDataFuncCptr)(), (*theDataFuncCptr)() ) );
+  }
+  */
+  
+  //
+  
+  void Logger::appendData(const containee_type& dp )
+  {
+    theCurrentInterval = dp.getTime() - theDataPointVector.back()->getTime();
+    theDataPointVector.push( dp );
+    if(theMinimumInterval < theCurrentInterval )
+      {
+	theMinimumInterval = theCurrentInterval; 
+      }
+  }
+  
+  
+  //
+  
+  void Logger::appendData( RealCref t, UniversalVariableCref v )
+  {
+    theCurrentInterval = t - theDataPointVector.back()->getTime();
+    theDataPointVector.push( t, v );
+    if(theMinimumInterval < theCurrentInterval )
+      {
+	theMinimumInterval = theCurrentInterval; 
+      }
+  }
+  
+  
+  //
+  
+  RealCref Logger::getStartTime( void ) const
+  {
+    return theDataPointVector[0]->getTime();
+  }
+  
+  
+  //
+  
+  RealCref Logger::getEndTime( void ) const
+  {
+    return theDataPointVector.back()->getTime();
+  }
+  
 
 
 } // namespace libecs

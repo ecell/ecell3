@@ -29,29 +29,55 @@
 //
 
 
+#include "libecs.hpp"
+
 #include "LoggerBroker.hpp"
 #include "Logger.hpp"
-
+#include "PrimitiveType.hpp"
+#include "FQPI.hpp"
+#include "RootSystem.hpp"
+#include "System.hpp"
 
 namespace libecs
 {
 
-  Logger* LoggerBroker::getLogger( IDString id_name )
+  LoggerPtr LoggerBroker::getLogger( StringCref id_name, StringCref property_name )
   {
-    map::iterator position( theLoggerMap.find( id_name ) );
+    LoggerMap::iterator position( theLoggerMap.find( id_name ) );
     if( position != theLoggerMap.end() )
       {
 	return position->second;
       }
     else
       {
-	Object obj;  // FIXME temporary
-	Logger* aNewLoggerPtr = new Logger( obj );
-	theLoggerMap.
-	  insert( pair< IDString, Logger* >( id_name, aNewLoggerPtr ) );
-	return aNewLoggerPtr;
+	appendLogger( id_name, property_name );
+	position = theLoggerMap.find( id_name ); 
+	return position->second;
       }
   }
 
+  void LoggerBroker::appendLogger( StringCref fqpnstring, StringCref property_name )
+  {
+    FQPI aFQPI( fqpnstring );
+    String aSystemPathString( aFQPI.getSystemPathString() );
+    SystemPtr aSystemPtr = theRootSystem->getSystem( aSystemPathString );
+
+    MessageInterfacePtr aMessageInterfacePtr = 0;
+
+    switch( aFQPI.getPrimitiveType() )
+      {
+      case SUBSTANCE:
+	//aMessageInterfacePtr = aSystemPtr->getSubstance( aFQPI.getIdString() );
+    	break;
+      case REACTOR:
+	aMessageInterfacePtr = aSystemPtr->getReactor( aFQPI.getIdString() );
+	break;
+      case SYSTEM:
+	break;
+      }
+    PropertyMapIterator pmitr( aMessageInterfacePtr->getMessageCallback( property_name ) );
+    LoggerPtr aNewLoggerPtr = new Logger( pmitr->second );
+  }
+  
 
 } // namespace libecs

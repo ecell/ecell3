@@ -148,6 +148,11 @@ namespace libecs
     void set( MessageCref );
     const Message get( StringCref );
 
+    PropertyMapIterator getMessageCallback( StringCref property )
+    {
+      return thePropertyMap.find( property );
+    }
+
     virtual void makeSlots();
 
     virtual const char* const className() const { return "MessageInterface"; }

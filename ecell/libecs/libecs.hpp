@@ -82,6 +82,8 @@ namespace libecs
   DECLARE_CLASS( MessageInterface );
   DECLARE_CLASS( UniversalVariable );
   DECLARE_CLASS( LoggerBroker );
+  DECLARE_CLASS( Logger );
+  DECLARE_CLASS( DataPoint );
 
   // exceptions
 

@@ -1,3 +1,34 @@
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+//
+//        This file is part of E-CELL Simulation Environment package
+//
+//                Copyright (C) 2000-2001 Keio University
+//
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+//
+//
+// E-CELL is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public
+// License as published by the Free Software Foundation; either
+// version 2 of the License, or (at your option) any later version.
+// 
+// E-CELL is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+// See the GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public
+// License along with E-CELL -- see the file COPYING.
+// If not, write to the Free Software Foundation, Inc.,
+// 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+// 
+//END_HEADER
+//
+// written by Masayuki Okayama <smash@e-cell.org> at
+// E-CELL Project, Lab. for Bioinformatics, Keio University.
+//
+
+
 /*
 
 
@@ -18,12 +49,10 @@
 namespace libecs
 {
 
-  template <class T, class V> class DataPoint;
-  template <class T, class V, class Containee, class Container> 
+  class DataPoint;
   class StlDataPointVector;
 
-  template <class T, class V, class Containee, class Container>
-  StlDataPointVector<T,V,Containee,Container>::
+  StlDataPointVector::
   StlDataPointVector( const StlDataPointVector& datapointvector )
     :
     theContainer( datapointvector.theContainer )
@@ -35,8 +64,7 @@ namespace libecs
 
   // Destructor
 
-  template <class T, class V, class Containee, class Container>
-  StlDataPointVector<T,V,Containee,Container>::~StlDataPointVector( void )
+  StlDataPointVector::~StlDataPointVector( void )
   {
     for( iterator i( begin() ) ; i < end(); i++ )
       {
@@ -46,14 +74,13 @@ namespace libecs
 
   //
 
-  template <class T, class V, class Containee, class Container>
-  void StlDataPointVector<T,V,Containee,Container>::push(const T& t, const V& val)
+  void StlDataPointVector::push( RealCref t,
+				 UniversalVariableCref val)
   {
     theContainer.push_back( new Containee( t, val ) );
   }
 
-  template <class T, class V, class Containee, class Container>
-  void StlDataPointVector<T,V,Containee,Container>::push(const Containee& x)
+  void StlDataPointVector::push(const Containee& x)
   {
     theContainer.push_back( new Containee( x ) );
   }
@@ -61,13 +88,13 @@ namespace libecs
   //
 
 
-  template <class T, class V, class Containee, class Container>
-  StlDataPointVector<T,V,Containee,Container>::const_iterator 
-  StlDataPointVector<T,V,Containee,Container>::
-  binary_search(const_iterator first, const_iterator last, const T& val) const
+  StlDataPointVector::const_iterator 
+  StlDataPointVector::
+  binary_search(const_iterator first,
+		const_iterator last,
+		RealCref aTime) const
   {
-    V v;
-    DataPoint<T,V> dp(val,v);
+    DataPoint dp( aTime, aTime );
     const_iterator itr = lower_bound( first, last, &dp );
     return itr;
 
