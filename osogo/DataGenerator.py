@@ -2,6 +2,12 @@
 
 from Numeric import *
 
+# aggregate so many points at any one level
+AGGREGATE_POINTS = 200
+
+# read no more than so many points from logger at once
+READ_CACHE = 10000
+
 
 class DataGenerator:
     '''
@@ -16,8 +22,6 @@ class DataGenerator:
         '''
 
         self.__theSession = aSession
-        #self.hasLogger = 1
-        # because having logger is varying from fpn to fpn
         self.lastTime = 0.0
         self.dataProxy = {}
         
@@ -26,26 +30,6 @@ class DataGenerator:
     def hasLogger( self, aFullPNString ):
         return aFullPNString in self.__theSession.theSimulator.getLoggerList()
 
-#    def setSource( self, aSource ):
- #      '''
-#        aSource is either Logger or Core
-#        Tracer and Plotter should take care that if source is Core,
-#        then only requestNewData should be called
-#        '''
-#
-#        if not ( aSource == 'Logger' ):
-#            self.hasLogger = 1
-#
-#        elif ( aSource == 'Core' ):
-#            self.hasLogger = 0
-#
-#        else:
-#            # need some messages?
-#            pass
-#
-    # end of setSource
-
-# Source is varying from fpn to fpn depending whether it has logger, so source is not global
 
 
     def requestNewData( self, aDataSeries, requiredResolution ):
@@ -160,41 +144,83 @@ class DataGenerator:
 
 class CachedLoggerAdapter:
     def __init__ ( self, aSession ):
-        pass
+        self.theSession = aSession
+        self.theCachedLoggerDict = {}
+        
         
     def update( self ):
-        pass
+        for aCachedLogger in self.theCachedLoggerDict.values():
+            aCachedLogger.update()
         
     def getData( fullPNString, start, end, interval ):
-        pass
+        if fullPNString not in self.theCachedLoggerDict.keys():
+            self.theCachedLoggerDict[ fullPNString ] = CachedLogger( self.theSession, fullPNString )
+        self.theCachedLoggerDict[ fullPNString ].getData( start, end, interval )
+            
+            
         
     def getStartTime( fullPNString ):
-        pass
+        if fullPNString not in self.theCachedLoggerDict.keys():
+            self.theCachedLoggerDict[ fullPNString ] = CachedLogger( self.theSession, fullPNString )
+        self.theCachedLoggerDict[ fullPNString ].getStartTime( )
         
     def getEndTime( fullPNString ):
-        pass
+        if fullPNString not in self.theCachedLoggerDict.keys():
+            self.theCachedLoggerDict[ fullPNString ] = CachedLogger( self.theSession, fullPNString )
+        self.theCachedLoggerDict[ fullPNString ].getEndTime( )
         
     def getSize( fullPNString ):
-        pass
+        if fullPNString not in self.theCachedLoggerDict.keys():
+            self.theCachedLoggerDict[ fullPNString ] = CachedLogger( self.theSession, fullPNString )
+        self.theCachedLoggerDict[ fullPNString ].getSize( )
 
     
 
 class CachedLogger:
     def __init__( self, aSession, fullPNString ):
-        pass
+        self.theFullPNString = fullPNString
+        self.theSimulator = aSession.theSimulator
+        if fullPNString not in self.theSimulator.getLoggerList():
+            aSession.createLoggerWithPolicy( fullPNString )
+        self.theLoggerCacheList = []
+        self.cachedTill = 0.0
+        self.update()
 
     def update( self ):
+        # calculate how many points should be read
+        
+        # call 
         pass
         
     def getData( start, end, interval ):
         pass
         
-    def getStartTime( ):
+    def getStartTime( self ):
         pass
         
-    def getEndTime(  ):
+    def getEndTime( self ):
         pass
 
-    def getSize( ):
+    def getSize( self ):
         pass
         
+class LoggerCache:
+    
+    def __init__( self ):
+        self.theCache  = zeros( (0,5) )
+        
+        
+    def addPoints( self, anArray ):
+        pass
+    
+    def getData( self, start, end, interval ):
+        pass
+        
+    def getStartTime( self ):
+        pass
+        
+    def getEndTime( self ):
+        pass
+
+    def getSize( self ):
+        pass

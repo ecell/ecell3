@@ -66,7 +66,6 @@ class EntityListWindow(OsogoWindow):
 
         self.thePluginInstanceSelection = None
         
-        self.theModelWalker = ModelWalker( session.theSimulator )
         
 
     def openWindow( self ):
@@ -1237,10 +1236,15 @@ class EntityListWindow(OsogoWindow):
 
 
     def pushSearchButton( self, *arg ):
-        self.searchEntity()
+        self.filterSelectedSystems()
+
+    def filterSelectedSystems( self ):
+        self.searchString = self['search_entry'].get_text()
+        self.reconstructLists()
+
 
     def keypressOnSearchEntry( self, *arg ):
 
         if( arg[1].keyval == 65293 ):
 
-            self.searchEntity()
+            self.filterSelectedSystems()
