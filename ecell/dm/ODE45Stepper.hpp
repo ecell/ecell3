@@ -130,6 +130,11 @@ LIBECS_DM_CLASS( ODE45Stepper, AdaptiveDifferentialStepper )
 //       return ( i1 - i2 );
 //     }
 
+    virtual const ODE45StepperPtr getStepperPtr()
+    {
+      return &theStepper;
+    }
+
   protected:
 
     ODE45StepperRef theStepper;
