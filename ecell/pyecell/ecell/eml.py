@@ -356,13 +356,13 @@ class EmlParser:
     def getStepperPreModel( self ):
         """for parse"""
         aStepperlistList = self.__theDocument.getElementsByTagName( 'stepperlist' )
-        aStepperPreModel       = []
-
+        aStepperPreModel = []
+        
         for aTargetStepper in( aStepperlistList ):
-            aFullId = aTargetStepper.getAttribute( 'id' )
-            aClass  = aTargetStepper.getAttribute( 'class' )
+            aFullId = str( aTargetStepper.getAttribute( 'id' ) )
+            aClass  = str( aTargetStepper.getAttribute( 'class' ) )
             
-            aStepperPreModel.append( [aClass,aFullId] )
+            aStepperPreModel.append( [ aClass, aFullId ] )
 
         return aStepperPreModel
         ## [ stepperClass, stepperId ]
@@ -375,9 +375,9 @@ class EmlParser:
         aStepperSystemPreModel = []
 
         for aTargetSystem in( aSystemList ):
-            aFullId  = aTargetSystem.getAttribute( 'id' )
-            aStepper = aTargetSystem.getAttribute( 'stepper' )
-            
+            aFullId  = str( aTargetSystem.getAttribute( 'id' ) )
+            aStepper = str( aTargetSystem.getAttribute( 'stepper' ) )
+
             aStepperSystemPreModel.append( [ aFullId, aStepper] )
 
         return aStepperSystemPreModel
@@ -415,9 +415,11 @@ class EmlParser:
                         aValue = aRange
 
                 ## append to valueList
+                aValue = str( aValue ) ## for Unicode
                 aValueList.append( aValue )
 
-            aPropertyPreModel.append( [aFullPn,aValueList] )
+            aFullPn    = str( aFullPn ) ## for Unicode
+            aPropertyPreModel.append( [ aFullPn, aValueList ] )
 
         return aPropertyPreModel
 
@@ -432,9 +434,9 @@ class EmlParser:
     
         for aTargetSystem in( aSystemList ):
 
-            anId     = aTargetSystem.getAttribute( 'id' )
-            aSystemName    = aTargetSystem.getAttribute( 'name' )
-            aStepper = aTargetSystem.getAttribute( 'stepper' )
+            anId        = str( aTargetSystem.getAttribute( 'id' ) )
+            aSystemName = str( aTargetSystem.getAttribute( 'name' ) )
+            aStepper    = str( aTargetSystem.getAttribute( 'stepper' ) )
 
             anEntityPreModel.append( [anId,'system',aSystemName] )
             
@@ -444,10 +446,11 @@ class EmlParser:
                 if aTargetEntity.tagName == 'substance' or \
                    aTargetEntity.tagName == 'reactor':
 
-                    aName         = aTargetEntity.getAttribute( 'name' )
-                    anEntityClass = aTargetEntity.tagName
-                    anEntityPreModel.append( [anId,anEntityClass,aName] )
+                    anEntityClass = str( aTargetEntity.tagName )
+                    aName         = str( aTargetEntity.getAttribute( 'name' ) )
                     
+                    anEntityPreModel.append( [ anId, anEntityClass, aName ] )
+
         return anEntityPreModel
 
 
@@ -458,7 +461,7 @@ class ConvertPath:
 
     def __init__( self, anEmlFile ):
         """initialize self.__thePedigreeList"""
-        self.__theDocument = minidom.parse( anEmlFile )
+        self.__theDocument     = minidom.parse( anEmlFile )
         self.__thePedigreeList = []
         
 
@@ -476,8 +479,8 @@ class ConvertPath:
                     i = i + 1
                     if anElement == anId:
                         aPathList = aPedigree[0:i]
-                        aPath = string.join( aPathList, '/' )
-                        aPath = '/' + aPath
+                        aPath     = string.join( aPathList, '/' )
+                        aPath     = str( '/' + aPath )
                     
                         return aPath
 
