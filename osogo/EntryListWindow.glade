@@ -410,14 +410,9 @@
 	      <class>GtkTree</class>
 	      <name>system_tree</name>
 	      <signal>
-		<name>select_child</name>
-		<handler>select_child</handler>
-		<last_modification_time>Mon, 20 Aug 2001 07:20:28 GMT</last_modification_time>
-	      </signal>
-	      <signal>
 		<name>selection_changed</name>
-		<handler>selection_changed</handler>
-		<last_modification_time>Mon, 20 Aug 2001 07:42:20 GMT</last_modification_time>
+		<handler>system_tree_selection_changed</handler>
+		<last_modification_time>Thu, 06 Sep 2001 07:01:00 GMT</last_modification_time>
 	      </signal>
 	      <selection_mode>GTK_SELECTION_SINGLE</selection_mode>
 	      <view_mode>GTK_TREE_VIEW_LINE</view_mode>
@@ -531,7 +526,12 @@ All
 	      <widget>
 		<class>GtkList</class>
 		<name>entry_list</name>
-		<selection_mode>GTK_SELECTION_SINGLE</selection_mode>
+		<signal>
+		  <name>selection_changed</name>
+		  <handler>entry_list_selection_changed</handler>
+		  <last_modification_time>Thu, 06 Sep 2001 07:30:51 GMT</last_modification_time>
+		</signal>
+		<selection_mode>GTK_SELECTION_EXTENDED</selection_mode>
 	      </widget>
 	    </widget>
 	  </widget>
