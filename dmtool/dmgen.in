@@ -18,7 +18,7 @@ BINDIR="${exec_prefix}/bin"
 EMPYBIN="${pythondir}/ecell/em.py"
 TMPLDIR="${prefix}/share/ecell/@VERSION@/template"
 
-EMPYOPTIONS="--flatten --raw"
+EMPYOPTIONS="--flatten --raw-error"
 
 PYSUFFIX=".py"
 EMSUFFIX=".em"
