@@ -139,7 +139,7 @@ class MainWindow(Window):
     def stepSimulation( self, a ) : pass
 
     def createNewEntryList( self, button_obj ) :
-        aEntryList = EntryListWindow.EntryListWindow( self.theSimulator )
+        aEntryList = EntryListWindow.EntryListWindow( self, self.theSimulator )
     
     def createNewLoggerList( self, a ) : pass
 
@@ -210,7 +210,7 @@ class MainWindow(Window):
           
     def updateInterfaceTest( self, button_obj ):
 
-        self.thePluginManager.update()
+        self.thePluginManager.updateAllPluginWindow()
     
 if __name__ == "__main__":
 
