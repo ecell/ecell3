@@ -15,6 +15,9 @@ class Session:
         else:
             self.theSimulator.run( time )
 
+    def stop( self ):
+        self.theSimulator.stop()
+
     def step( self, num='' ):
         if not num:
             self.theSimulator.step()
