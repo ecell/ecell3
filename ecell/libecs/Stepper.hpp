@@ -196,15 +196,18 @@ namespace libecs
 
     virtual void setStepInterval( RealCref aStepInterval )
     {
-      if( aStepInterval > getMaxInterval()
-	  || aStepInterval < getMinInterval() )
+      Real aNewStepInterval( aStepInterval );
+
+      if( aNewStepInterval > getMaxInterval() )
 	{
-	  // should use other exception?
-	  THROW_EXCEPTION( RangeError, "Stepper StepInterval: out of range. ("
-			   + toString( aStepInterval ) + String( ")\n" ) );
+	  aNewStepInterval = getMaxInterval();
+	}
+      else if ( aNewStepInterval < getMinInterval() )
+	{
+	  aNewStepInterval = getMinInterval();
 	}
 
-      loadStepInterval( aStepInterval );
+      loadStepInterval( aNewStepInterval );
     }
 
     void loadStepInterval( RealCref aStepInterval )
@@ -269,33 +272,43 @@ namespace libecs
     }
 
 
-    void setUserMinInterval( RealCref aValue )
+    void setMinInterval( RealCref aValue )
     {
-      theUserMinInterval = aValue;
-    }
-
-    const Real getUserMinInterval() const
-    {
-      return theUserMinInterval;
-    }
-
-    void setUserMaxInterval( RealCref aValue )
-    {
-      theUserMaxInterval = aValue;
-    }
-
-    const Real getUserMaxInterval() const
-    {
-      return theUserMaxInterval;
+      theMinInterval = aValue;
     }
 
     const Real getMinInterval() const
     {
-      return getUserMinInterval();
+      return theMinInterval;
     }
 
-    const Real getMaxInterval() const;
+    void setMaxInterval( RealCref aValue )
+    {
+      theMaxInterval = aValue;
+    }
 
+    const Real getMaxInterval() const
+    {
+      Real aMaxInterval( theMaxInterval );
+
+      /*
+      for( StepIntervalConstraintMapConstIterator 
+	     i( theStepIntervalConstraintMap.begin() ); 
+	   i != theStepIntervalConstraintMap.end() ; ++i )
+	{
+	  const StepperPtr aStepperPtr( (*i).first );
+	  Real aConstraint( aStepperPtr->getStepInterval() * (*i).second );
+
+	  if( aMaxInterval > aConstraint )
+	    {
+	      aMaxInterval = aConstraint;
+	    }
+	}
+      */
+
+      return aMaxInterval;
+    }
+  
     //    void setStepIntervalConstraint( PolymorphCref aValue );
 
     //    void setStepIntervalConstraint( StepperPtr aStepperPtr, RealCref aFactor );
@@ -462,8 +475,8 @@ namespace libecs
 
     Real                theStepInterval;
 
-    Real                theUserMinInterval;
-    Real                theUserMaxInterval;
+    Real                theMinInterval;
+    Real                theMaxInterval;
 
     String              theID;
 
@@ -587,7 +600,7 @@ namespace libecs
     {
       theTolerantStepInterval = aStepInterval;
 
-      loadStepInterval( aStepInterval );
+      Stepper::setStepInterval( aStepInterval );
     }
 
     void setNextStepInterval( RealCref aStepInterval )

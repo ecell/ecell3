@@ -65,20 +65,12 @@ namespace libecs
 			 &Stepper::setStepInterval,
 			 &Stepper::getStepInterval );
 
-    DEFINE_PROPERTYSLOT( "UserMaxInterval", Real,
-			 &Stepper::setUserMaxInterval,
-			 &Stepper::getUserMaxInterval );
-
-    DEFINE_PROPERTYSLOT( "UserMinInterval", Real,
-			 &Stepper::setUserMinInterval,
-			 &Stepper::getUserMinInterval );
-
     DEFINE_PROPERTYSLOT( "MaxInterval", Real,
-			 NULLPTR,
+			 &Stepper::setMaxInterval,
 			 &Stepper::getMaxInterval );
 
     DEFINE_PROPERTYSLOT( "MinInterval", Real,
-			 NULLPTR,
+			 &Stepper::setMinInterval,
 			 &Stepper::getMinInterval );
 
     //    DEFINE_PROPERTYSLOT( "StepIntervalConstraint", Polymorph,
@@ -115,8 +107,8 @@ namespace libecs
     theSchedulerIndex( -1 ),
     theCurrentTime( 0.0 ),
     theStepInterval( 0.001 ),
-    theUserMinInterval( std::numeric_limits<Real>::min() * 10 ),
-    theUserMaxInterval( std::numeric_limits<Real>::max() * .1 )
+    theMinInterval( std::numeric_limits<Real>::min() * 10 ),
+    theMaxInterval( std::numeric_limits<Real>::max() * .1 )
   {
     makeSlots();
   }
@@ -517,28 +509,6 @@ namespace libecs
   }
   */
 
-  const Real Stepper::getMaxInterval() const
-  {
-    Real aMaxInterval( getUserMaxInterval() );
-
-    /*
-    for( StepIntervalConstraintMapConstIterator 
-	   i( theStepIntervalConstraintMap.begin() ); 
-	      i != theStepIntervalConstraintMap.end() ; ++i )
-      {
-	const StepperPtr aStepperPtr( (*i).first );
-	Real aConstraint( aStepperPtr->getStepInterval() * (*i).second );
-
-	if( aMaxInterval > aConstraint )
-	  {
-	    aMaxInterval = aConstraint;
-	  }
-      }
-    */
-
-    return aMaxInterval;
-  }
-  
   void Stepper::log()
   {
     // update loggers
@@ -771,7 +741,7 @@ namespace libecs
     const Real aCallerTimeScale( aCaller->getTimeScale() );
     const Real aStepInterval   ( getStepInterval() );
 
-    // If the step size of this is less than caller's,
+    // If the step size of this is less than caller's timescale,
     // ignore this interruption.
     if( aCallerTimeScale >= aStepInterval )
       {
@@ -780,34 +750,53 @@ namespace libecs
 
     // if all Variables didn't change its value more than 10%,
     // ignore this interruption.
-    /*  !!! currently this cannot be used
+    /*  !!! currently this is disabled
     if( checkExternalError() )
       {
 	return;
       }
     */
 
-    // Shrink the next step size to that of caller's
-    setNextStepInterval( aCallerTimeScale );
 
+	
     const Real aCurrentTime      ( getCurrentTime() );
-    const Real aNextStep         ( aCurrentTime + aStepInterval );
     const Real aCallerCurrentTime( aCaller->getCurrentTime() );
-    const Real aCallerNextStep   ( aCallerCurrentTime + aCallerTimeScale );
 
-    // If the next step of this occurs *before* the next step of the caller,
-    // just shrink step size of this Stepper.
-    if( aNextStep <= aCallerNextStep )
+    // aCallerTimeScale == 0 implies need for immediate reset
+    if( aCallerTimeScale != 0.0 )
       {
-	return;
+	// Shrink the next step size to that of caller's
+	setNextStepInterval( aCallerTimeScale );
+
+	const Real aNextStep      ( aCurrentTime + aStepInterval );
+	const Real aCallerNextStep( aCallerCurrentTime + aCallerTimeScale );
+
+	// If the next step of this occurs *before* the next step 
+	// of the caller, just shrink step size of this Stepper.
+	if( aNextStep <= aCallerNextStep )
+	  {
+	    //std::cerr << aCurrentTime << " return" << std::endl;
+
+	    return;
+	  }
+
+	//	std::cerr << aCurrentTime << " noreset" << std::endl;
+
+	
+	// If the next step of this will occur *after* the caller,
+	// reschedule this Stepper, as well as shrinking the next step size.
+	//    setStepInterval( aCallerCurrentTime + ( aCallerTimeScale * 0.5 ) 
+	//		     - aCurrentTime );
       }
+    else
+      {
+	// reset step interval to the default
+	//	std::cerr << aCurrentTime << " reset" << std::endl;
 
-    // If the next step of this will occur *after* the caller,
-    // reschedule this Stepper, as well as shrinking the next step size.
-    //    setStepInterval( aCallerCurrentTime + ( aCallerTimeScale * 0.5 ) 
-    //		     - aCurrentTime );
+	setNextStepInterval( 0.001 );
+      }
+      
     setStepInterval( aCallerCurrentTime - aCurrentTime );
-
     getModel()->reschedule( this );
   }
 
