@@ -19,14 +19,14 @@
       <property name="homogeneous">False</property>
       <property name="spacing">0</property>
 
-  <child>
-    <widget class="GtkMenu" id="EntityPopupMenu">
-    </widget>
-  </child>
+      <child>
+        <widget class="GtkMenu" id="EntityPopupMenu">
+        </widget>
+      </child>
 
       <child>
 	<widget class="GtkHPaned" id="hpaned7">
-	  <property name="width_request">305</property>
+	  <property name="width_request">500</property>
 	  <property name="visible">True</property>
 	  <property name="can_focus">True</property>
 
