@@ -92,7 +92,7 @@ namespace libecs
   }
 
 
-  // Message slots
+  // Property slots
 
   const UVariableVectorRCPtr System::getSystemList() const
   {
@@ -137,11 +137,11 @@ namespace libecs
   }
 
 
-  void System::setStepperID( UVariableVectorRCPtrCref aMessage )
+  void System::setStepperID( UVariableVectorRCPtrCref aValue )
   {
-    checkSequenceSize( *aMessage, 1 );
+    checkSequenceSize( *aValue, 1 );
 
-    setStepperID( (*aMessage)[0].asString() );
+    setStepperID( (*aValue)[0].asString() );
   }
 
   const UVariableVectorRCPtr System::getStepperID() const

@@ -54,8 +54,6 @@ namespace libecs
 
 
   Substance::Substance()
-    : 
-    theFixed( false ) 
   {
     makeSlots();
   } 
@@ -73,52 +71,86 @@ namespace libecs
 
 
 
-  void VariableSubstance::makeSlots()
+  void PlainSubstance::makeSlots()
   {
     registerSlot( getPropertySlotMaker()->
 		  createPropertySlot( "Quantity",*this,
 				      Type2Type<Real>(),
-				      &VariableSubstance::setQuantity,
-				      &VariableSubstance::getQuantity ) );
+				      &PlainSubstance::setQuantity,
+				      &PlainSubstance::getQuantity ) );
 
     registerSlot( getPropertySlotMaker()->
 		  createPropertySlot( "Velocity",*this,
 				      Type2Type<Real>(),
-				      &VariableSubstance::addVelocity,
-				      &VariableSubstance::getVelocity ) );
+				      &PlainSubstance::addVelocity,
+				      &PlainSubstance::getVelocity ) );
+
+
+    registerSlot( getPropertySlotMaker()->
+		  createPropertySlot( "Fixed",*this,
+				      Type2Type<Real>(),
+				      &PlainSubstance::setFixed,
+				      &PlainSubstance::getFixed ) );
 
   }
 
 
 
-  VariableSubstance::VariableSubstance()
+  PlainSubstance::PlainSubstance()
     : 
     theQuantity( 0.0 ),  
-    theVelocity( 0.0 )
+    theVelocity( 0.0 ),
+    theFixed( false )
   {
     makeSlots();
   } 
 
-  VariableSubstance::~VariableSubstance()
+  PlainSubstance::~PlainSubstance()
   {
     ; // do nothing
   }
 
 
-  void VariableSubstance::initialize()
+  void PlainSubstance::initialize()
   {
 
   }
 
 
-  void VariableSubstance::loadQuantity( RealCref aQuantity )
+  void PlainSubstance::loadQuantity( RealCref aQuantity )
   {
     theQuantity = aQuantity;
   }
 
-  const Real VariableSubstance::getActivity()
+  const Real PlainSubstance::getActivity()
   {
     return getVelocity();
+  }
+
+
+  void PlainSubstance::setFixed( RealCref aValue )
+  { 
+    if( aValue == 0.0 )
+      {
+	theFixed = false;
+      }
+    else
+      {
+	theFixed = true;
+      }
+  }
+
+
+  const Real PlainSubstance::getFixed() const                         
+  { 
+    if( isFixed() == false )
+      {
+	return 0.0;
+      }
+    else
+      {
+	return 1.0;
+      }
   }
 
 
@@ -209,7 +241,7 @@ namespace libecs
 
   void SRMSubstance::integrate()
   { 
-    if( ! isFixed() ) 
+    if( isFixed() == false ) 
       {
 	theIntegrator->integrate();
 

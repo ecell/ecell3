@@ -74,31 +74,6 @@ namespace libecs
     */
     virtual const Real getQuantity() const = 0;
 
-    /**
-       Fix quantity of this Substance.
-    */
-
-    void setFixed()
-    { 
-      theFixed = true;
-    }
-
-    /**
-       Unfix quantity of this Substance.
-    */
-
-    void clearFixed()
-    { 
-      theFixed = false;
-    }
-
-    /**
-       @return true if the Substance is fixed or false if not.
-    */
-    bool isFixed() const                         
-    { 
-      return theFixed; 
-    }
 
     /**
        Returns the concentration of this Substance.
@@ -134,24 +109,21 @@ namespace libecs
 
     void makeSlots();
 
-  protected:
-
-    bool theFixed;
   };
 
 
 
-  class VariableSubstance 
+  class PlainSubstance 
     : 
     public Substance
   {
 
   public:
 
-    VariableSubstance();
-    virtual ~VariableSubstance();
+    PlainSubstance();
+    virtual ~PlainSubstance();
 
-    static SubstancePtr createInstance() { return new VariableSubstance; }
+    static SubstancePtr createInstance() { return new PlainSubstance; }
 
     /**
        @return the number of molecules.
@@ -220,15 +192,15 @@ namespace libecs
     virtual void loadQuantity( RealCref aQuantity );
 
     /**
-       This simply set the quantity of this Substance if isFixed() is false.
+       This simply set the quantity of this Substance if getFixed() is false.
        This updates the accumulator immediately.
 
-       @see isFixed
+       @see getFixed()
     */
 
     void setQuantity( RealCref aQuantity )
     { 
-      if( !isFixed() ) 
+      if( ! getFixed() ) 
 	{
 	  loadQuantity( aQuantity ); 
 	}
@@ -241,8 +213,28 @@ namespace libecs
 
     const Real saveQuantity();
 
+    void setFixed( const bool aValue )
+    {
+      theFixed = aValue;
+    }
 
-    virtual StringLiteral getClassName() const { return "VariableSubstance"; }
+    /**
+       @return true if the Substance is fixed or false if not.
+    */
+
+    const bool isFixed() const
+    {
+      return theFixed;
+    }
+
+
+
+    // wrappers to expose is/setFixed as PropertySlots
+    void setFixed( RealCref aValue );
+    const Real getFixed() const;
+
+
+    virtual StringLiteral getClassName() const { return "PlainSubstance"; }
 
   protected:
 
@@ -252,6 +244,8 @@ namespace libecs
 
     Real theQuantity;
     Real theVelocity;
+
+    bool theFixed;
 
   };
 
@@ -264,7 +258,7 @@ namespace libecs
 
   class SRMSubstance 
     : 
-    public VariableSubstance
+    public PlainSubstance
   {
     //FIXME: for Accumulators:: to be deleted
     friend class Accumulator;
@@ -304,7 +298,7 @@ namespace libecs
     */
     virtual void clear()
     { 
-      VariableSubstance::clear();
+      PlainSubstance::clear();
       theIntegrator->clear();
     }
 
