@@ -15,6 +15,7 @@
 <widget>
   <class>GtkWindow</class>
   <name>NumericWindow</name>
+  <can_focus>True</can_focus>
   <title>window1</title>
   <type>GTK_WINDOW_TOPLEVEL</type>
   <position>GTK_WIN_POS_NONE</position>
@@ -200,7 +201,6 @@
 	  <widget>
 	    <class>GtkEntry</class>
 	    <name>value_frame</name>
-	    <can_focus>True</can_focus>
 	    <signal>
 	      <name>activate</name>
 	      <handler>input_value</handler>
@@ -217,14 +217,15 @@
 	    <text></text>
 	    <child>
 	      <padding>0</padding>
-	      <expand>True</expand>
-	      <fill>True</fill>
+	      <expand>False</expand>
+	      <fill>False</fill>
 	    </child>
 	  </widget>
 
 	  <widget>
 	    <class>GtkToolbar</class>
-	    <name>toolbar4</name>
+	    <name>toolbar5</name>
+	    <height>44</height>
 	    <orientation>GTK_ORIENTATION_VERTICAL</orientation>
 	    <type>GTK_TOOLBAR_ICONS</type>
 	    <space_size>0</space_size>
@@ -233,8 +234,8 @@
 	    <tooltips>True</tooltips>
 	    <child>
 	      <padding>0</padding>
-	      <expand>False</expand>
-	      <fill>False</fill>
+	      <expand>True</expand>
+	      <fill>True</fill>
 	    </child>
 
 	    <widget>
@@ -246,19 +247,22 @@
 		<handler>increase_value</handler>
 		<last_modification_time>Mon, 10 Sep 2001 06:31:44 GMT</last_modification_time>
 	      </signal>
-	      <label>*2</label>
+	      <label></label>
+	      <icon>icon_up.xpm</icon>
 	    </widget>
 
 	    <widget>
 	      <class>GtkButton</class>
 	      <child_name>Toolbar:button</child_name>
 	      <name>decrease_button</name>
+	      <can_focus>True</can_focus>
 	      <signal>
 		<name>clicked</name>
 		<handler>decrease_value</handler>
 		<last_modification_time>Mon, 10 Sep 2001 06:30:56 GMT</last_modification_time>
 	      </signal>
-	      <label>*0.5</label>
+	      <label></label>
+	      <icon>icon_down.xpm</icon>
 	    </widget>
 	  </widget>
 	</widget>

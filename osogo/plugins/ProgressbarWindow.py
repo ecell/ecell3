@@ -12,6 +12,7 @@ from PluginWindow import *
 from ecssupport import *
 
 import Numeric
+import GTK
 
 
 class ProgressbarWindow(PluginWindow):
@@ -19,6 +20,13 @@ class ProgressbarWindow(PluginWindow):
     def __init__( self, dirname, sim, data, pluginmanager ):
 
         PluginWindow.__init__( self, dirname, sim, data, pluginmanager )
+
+        #test
+        self['toolbar3'].set_style( GTK.TOOLBAR_ICONS )
+        self['toolbar4'].set_style( GTK.TOOLBAR_ICONS )
+        self['toolbar3'].set_button_relief( GTK.RELIEF_HALF )
+        self['toolbar4'].set_button_relief( GTK.RELIEF_HALF )        
+
         self.pull = 0
         self.thePositiveFlag = 1
         self.theAutoChangeFlag = 1
@@ -162,7 +170,7 @@ class ProgressbarWindow(PluginWindow):
         if value == 0:
             aBarLength = 0
         else :
-            aBarLength = (Numeric.log10(value)+1-aMultiplier)*10/3
+            aBarLength = (Numeric.log10(value)+1-aMultiplier)*1000/3
 
         return  aBarLength, aMultiplier, aPositiveFlag
                 

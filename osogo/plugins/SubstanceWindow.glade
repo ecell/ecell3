@@ -115,7 +115,7 @@
 		<handler>qty_increase_pressed</handler>
 		<last_modification_time>Fri, 17 Aug 2001 08:43:14 GMT</last_modification_time>
 	      </signal>
-	      <label>UP</label>
+	      <label>*2</label>
 	      <child>
 		<padding>0</padding>
 		<expand>False</expand>
@@ -132,7 +132,7 @@
 		<handler>qty_decrease_pressed</handler>
 		<last_modification_time>Fri, 17 Aug 2001 08:43:21 GMT</last_modification_time>
 	      </signal>
-	      <label>DOWN</label>
+	      <label>*0.5</label>
 	      <child>
 		<padding>0</padding>
 		<expand>False</expand>
@@ -201,7 +201,7 @@
 		<handler>concentration_increase_pressed</handler>
 		<last_modification_time>Fri, 17 Aug 2001 08:43:28 GMT</last_modification_time>
 	      </signal>
-	      <label>UP</label>
+	      <label>*2</label>
 	      <child>
 		<padding>0</padding>
 		<expand>False</expand>
@@ -218,7 +218,7 @@
 		<handler>concentration_decrease_pressed</handler>
 		<last_modification_time>Fri, 17 Aug 2001 08:43:34 GMT</last_modification_time>
 	      </signal>
-	      <label>DOWN</label>
+	      <label>*0.5</label>
 	      <child>
 		<padding>0</padding>
 		<expand>False</expand>

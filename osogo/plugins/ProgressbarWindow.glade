@@ -19,8 +19,8 @@
   <type>GTK_WINDOW_TOPLEVEL</type>
   <position>GTK_WIN_POS_NONE</position>
   <modal>False</modal>
-  <allow_shrink>True</allow_shrink>
-  <allow_grow>True</allow_grow>
+  <allow_shrink>False</allow_shrink>
+  <allow_grow>False</allow_grow>
   <auto_shrink>False</auto_shrink>
 
   <widget>
@@ -50,6 +50,7 @@
     <widget>
       <class>GtkToolbar</class>
       <name>toolbar3</name>
+      <height>21</height>
       <orientation>GTK_ORIENTATION_HORIZONTAL</orientation>
       <type>GTK_TOOLBAR_BOTH</type>
       <space_size>5</space_size>
@@ -66,7 +67,10 @@
 	<class>GtkButton</class>
 	<child_name>Toolbar:button</child_name>
 	<name>subtract_button</name>
-	<height>40</height>
+	<width>22</width>
+	<height>22</height>
+	<can_focus>True</can_focus>
+	<has_focus>True</has_focus>
 	<signal>
 	  <name>clicked</name>
 	  <handler>on_subtract_button_clicked</handler>
@@ -244,7 +248,7 @@
 	<height>22</height>
 	<value>0</value>
 	<lower>0</lower>
-	<upper>10</upper>
+	<upper>1000</upper>
 	<bar_style>GTK_PROGRESS_CONTINUOUS</bar_style>
 	<orientation>GTK_PROGRESS_LEFT_TO_RIGHT</orientation>
 	<activity_mode>False</activity_mode>
@@ -279,7 +283,10 @@
 	<class>GtkButton</class>
 	<child_name>Toolbar:button</child_name>
 	<name>add_button</name>
-	<height>40</height>
+	<width>22</width>
+	<height>22</height>
+	<can_focus>True</can_focus>
+	<has_focus>True</has_focus>
 	<signal>
 	  <name>clicked</name>
 	  <handler>on_add_button_clicked</handler>
