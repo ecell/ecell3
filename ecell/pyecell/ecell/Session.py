@@ -98,8 +98,8 @@ class Session:
             raise TypeError, " The type of aModel must be EML instance, string(file name) or file object "
 	
 	# change directory to file's home directory
-        if type( aModel ) == type( eml.Eml ) or\
-               type( aModel ) == type( eml.Eml() ):
+        if type( aModel ) != type( eml.Eml ) and\
+               type( aModel ) != type( eml.Eml() ):
             dirname = os.path.dirname( aModel )
             if dirname != "":
                 os.chdir( dirname )
