@@ -326,7 +326,7 @@ class Parser:
                             if hasattr(errtoken,"lineno"): lineno = lookahead.lineno
                             else: lineno = 0
                             if lineno:
-                                print "yacc: Syntax error at line %d, token=%s" % (lineno, errtoken.type)
+                                print "yacc: Syntax error at line %s, token=%s, in %s" % (lineno, errtoken.type, errtoken.lexer.filename)
                             else:
                                 print "yacc: Syntax error, token=%s" % errtoken.type
                         else:
@@ -499,7 +499,7 @@ def initialize_vars():
 
 # -----------------------------------------------------------------------------
 # class Production:
-#
+#p
 # This class stores the raw information about a single production or grammar rule.
 # It has a few required attributes:
 #
