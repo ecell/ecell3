@@ -41,7 +41,7 @@ from config import *
 import os
 
 import gtk
-import gnome.ui
+#import gnome.ui
 import GDK
 import libglade
 

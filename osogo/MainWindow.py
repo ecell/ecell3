@@ -202,6 +202,7 @@ class MainWindow(OsogoWindow):
 			'on_interface_button_clicked'          : self.__displayWindow,
 			'on_board_button_clicked'              : self.__displayWindow,
 			'logo_button_clicked'                  : self.openAbout,
+			'on_scrolledwindow1_expose_event'	: self.expose
 		}
 		self.addHandlers( self.theHandlerMap )
 

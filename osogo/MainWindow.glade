@@ -1205,6 +1205,7 @@
 		      <property name="vscrollbar_policy">GTK_POLICY_ALWAYS</property>
 		      <property name="shadow_type">GTK_SHADOW_IN</property>
 		      <property name="window_placement">GTK_CORNER_TOP_LEFT</property>
+		      <signal name="expose_event" handler="on_scrolledwindow1_expose_event" last_modification_time="Thu, 15 May 2003 08:59:41 GMT"/>
 
 		      <child>
 			<widget class="GtkTextView" id="textview1">
