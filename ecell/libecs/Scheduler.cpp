@@ -70,16 +70,14 @@ namespace libecs
     const StepperPtr aStepperPtr( aTopEvent.getStepper() );
     setCurrentTime( aTopEvent.getTime() );
  
-    aStepperPtr->setCurrentTime( getCurrentTime() );
-    aStepperPtr->integrate();
+    aStepperPtr->integrate( getCurrentTime() );
     aStepperPtr->step();
     aStepperPtr->log();
 
     aStepperPtr->dispatchInterruptions();
 
-
     const Real aStepInterval( aStepperPtr->getStepInterval() );
-    const Real aScheduledTime( aStepperPtr->getCurrentTime() + aStepInterval );
+    const Real aScheduledTime( getCurrentTime() + aStepInterval );
 
     // schedule a new event
     theScheduleQueue.changeTopKey( Event( aScheduledTime, aStepperPtr ) );

@@ -119,7 +119,7 @@ namespace libecs
 
     virtual void step() = 0;
 
-    void integrate();
+    void integrate( const Real aTime );
 
     /**
        Update loggers.

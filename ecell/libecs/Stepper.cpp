@@ -595,14 +595,16 @@ namespace libecs
   }
 
 
-  void Stepper::integrate()
+  void Stepper::integrate( const Real aTime )
   {
     //
     // Variable::integrate()
     //
     std::for_each( theVariableVector.begin(), theVariableVector.end(), 
 		   std::bind2nd( std::mem_fun( &Variable::integrate ),
-				 getCurrentTime() ) );
+				 aTime ) );
+
+    setCurrentTime( aTime );
   }
 
 
