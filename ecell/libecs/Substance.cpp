@@ -49,10 +49,12 @@ namespace libecs
   void Substance::makeSlots()
   {
     makePropertySlot( "Quantity",Substance,*this,&Substance::setQuantity,
-		 &Substance::getQuantity );
+		      &Substance::getQuantity );
+    makePropertySlot( "Concentration",Substance,*this,NULL,
+		      &Substance::getConcentration );
     makePropertySlot( "AccumulatorClass",Substance,*this,
-		 &Substance::setAccumulatorClass,
-		 &Substance::getAccumulatorClass );
+		      &Substance::setAccumulatorClass,
+		      &Substance::getAccumulatorClass );
   }
 
   void Substance::setQuantity( MessageCref message )
@@ -82,6 +84,11 @@ namespace libecs
   const Message Substance::getQuantity( StringCref keyword )
   {
     return Message( keyword, getQuantity() );
+  }
+
+  const Message Substance::getConcentration( StringCref keyword )
+  {
+    return Message( keyword, getConcentration() );
   }
 
   const Message Substance::getAccumulatorClass( StringCref keyword )

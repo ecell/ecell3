@@ -31,6 +31,7 @@
 #ifndef ___SUBSTANCE_H___
 #define ___SUBSTANCE_H___
 #include "libecs.hpp"
+#include "PrimitiveType.hpp"
 #include "Entity.hpp"
 
 
@@ -52,6 +53,7 @@ namespace libecs
     void setQuantity( MessageCref message );
     void setAccumulatorClass( MessageCref message );
     const Message getQuantity( StringCref keyword );
+    const Message getConcentration( StringCref keyword );
     const Message getAccumulatorClass( StringCref keyword );
 
   public:
