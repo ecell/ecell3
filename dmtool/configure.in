@@ -16,7 +16,7 @@ dnl
 AC_PROG_CXX
  
 dnl
-AM_PROG_LIBTOOL
+AC_PROG_LIBTOOL
 dnl
 dnl
 dnl Read the libtool configuration

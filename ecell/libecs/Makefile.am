@@ -2,7 +2,7 @@
 DMTOOL_INCLUDE=-I@DMTOOL_INCLUDE_DIR@
 KORANDOM_DIR=@KORANDOM_DIR@
 KORANDOM_INCLUDE=-I${KORANDOM_DIR}
-KORANDOM_LIBS=${KORANDOM_DIR}/korandom/libkorandom.la
+LIBKORANDOM=${KORANDOM_DIR}/korandom/libkorandom.la
 INCLTDL=@INCLTDL@
 LIBLTDL=@LIBLTDL@
 libdir=@libdir@
@@ -13,7 +13,7 @@ lib_LTLIBRARIES = libecs.la
 CXXFLAGS= @CXXFLAGS@ # -D_REENTRANT
 
 libecs_la_LDFLAGS= #-rpath ${libdir}
-libecs_la_LIBADD= ${LIBLTDL} -L${KORANDOM_DIR}/korandom/.libs -lkorandom -lstdc++
+libecs_la_LIBADD= ${LIBLTDL} -L${KORANDOM_DIR}/korandom/ -lkorandom -lstdc++
 libecs_la_SOURCES=\
 Util.cpp\
 UVariable.cpp\

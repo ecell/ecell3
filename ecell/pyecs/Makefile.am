@@ -3,6 +3,7 @@
 ECELLDIR=..
 DMTOOL_INCLUDE=-I@DMTOOL_INCLUDE_DIR@
 INCLTDL=@INCLTDL@
+LIBLTDL=@LIBLTDL@
 PYTHON_INCLUDES=@PYTHON_INCLUDES@
 
 CXXSRCDIR=../../PyCXX/Src
@@ -10,9 +11,12 @@ CXXINCLUDE=-I../..//PyCXX
 
 ECELLINCLUDES=-I${ECELLDIR} ${DMTOOL_INCLUDE} ${INCLTDL} ${PYTHON_INCLUDES}
 CXXFLAGS=@CXXFLAGS@ ${CXXINCLUDE} ${ECELLINCLUDES} #-D_REENTRANT
-LIBLTDL=@LIBLTDL@
 
-LIBKORANDOM=../../korandom/libkorandom.la
+KORANDOM_DIR=@KORANDOM_DIR@
+LIBKORANDOM=$(KORANDOM_DIR)/korandom/libkorandom.la
+LIBEMC=$(ECELLDIR)/libemc/libemc.la 
+LIBECS=$(ECELLDIR)/libecs/libecs.la
+
 
 CFLAGS=${CXXFLAGS}
 
@@ -44,10 +48,7 @@ PyLogger.hpp
 
 ecs_la_LDFLAGS=-module -export-dynamic -avoid-version -rpath /usr/local/lib
 
-#FIXME: specifing .libs is ugly
-#ecs_la_LIBADD= /usr/local/lib/libstdc++.a.2.10.0 -L$(ECELLDIR)/libemc/.libs/ -lemc -L$(ECELLDIR)/libecs/.libs/ -lecs
-ecs_la_LIBADD= -lstdc++ -L$(ECELLDIR)/libemc/.libs/ -lemc -L$(ECELLDIR)/libecs/.libs/ -lecs
-ecs_la_DEPENDENCIES= $(ECELLDIR)/libemc/libemc.la $(ECELLDIR)/libecs/libecs.la $(LIBKORANDOM) ${LIBLTDL} 
+ecs_la_LIBADD= $(LIBEMC) $(LIBECS) $(LIBKORANDOM) -lstdc++ $(LIBLTDL)
 
 all-local: ecs.so
 
