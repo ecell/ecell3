@@ -55,12 +55,12 @@ LTD.em:     Model file(em file) for this model
 
    Run emtool -a for each .dm file.
 
-   % emtool -a ...dm
+   % ecell3-dmc ...dm
 
    Or, to do this job at once,
 
    (at bash prompt,)
-   % for i in *.dm ; do emtool -a $i ; done
+   % for i in *.dm ; do ecell3-dmc $i ; done
    
 
 3. Run gecell, File->loadModel and load the LTD.eml file.
