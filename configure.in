@@ -42,5 +42,5 @@ dnl Create the top-level Makefile.
 dnl
 AC_CONFIG_FILES([Makefile])
 
-AC_OUTPUT(Makefile ecell3.doxy)
+AC_OUTPUT(ecell3.doxy)
 
