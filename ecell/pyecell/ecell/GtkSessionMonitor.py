@@ -124,12 +124,15 @@ class GtkSessionMonitor(Session):
 		# -------------------------------------
 	
 		self.theMainWindow = aMainWindow
+	# ==========================================================================
+	def synchronize(self):
+		self.updateWindows()
+		while gtk.events_pending():
+			gtk.main_iteration_do()
 
 	# ==========================================================================
 	def GUI_interact(self):			#
 		"hands over controlto the user (gtk.mainloop())"
-		if not self.doesExist('MainWindow'):
-			openWindow('MainWindow')
 
 		gtk.mainloop()
 
@@ -148,18 +151,18 @@ class GtkSessionMonitor(Session):
 
 		# check fundamentalwindows
 		if self.theFundamentalWindows.has_key(aWindowName):
-			return gtk.TRUE
+			return self.theFundamentalWindows[ aWindowName ].exists()
 
 		# check entity list windows
-		if aWindowName == 'EntityListWindow':
+		if aWindowName == 'EntityListWindow' and len( self.theEntityListInstanceMap>0):
 			return gtk.TRUE
 		# check pluginwindow instances
 		
 		aPluginInstanceList = self.thePluginManager.thePluginTitleDict.keys()
 
 		for aPluginInstance in aPluginInstanceList:
-			aWindowName = self.thePluginManager.thePluginTitleDict[aPluginInstance]
-			return gtk.TRUE
+			if aWindowName == self.thePluginManager.thePluginTitleDict[aPluginInstance]:
+				return gtk.TRUE
 		return gtk.FALSE
 
 
@@ -188,7 +191,6 @@ class GtkSessionMonitor(Session):
 		"""
 		aWindowName   ---  Window name (str)
 		Returns FundamentalWindow or EntityListWindow list
-
 		"""
 
 		# check fundamentalwindows
@@ -206,6 +208,7 @@ class GtkSessionMonitor(Session):
 			aWindowName = self.thePluginManager.thePluginTitleDict[aPluginInstance]
 			return aPluginInstance
 		return None
+
 
 	# ==========================================================================
 	def displayWindow( self, aWindowName ):
@@ -229,8 +232,8 @@ class GtkSessionMonitor(Session):
 		else:
 			self.theFundamentalWindows[aWindowName].openWindow()
 			self.theFundamentalWindows[aWindowName].update()
-
 		
+
 	# ==========================================================================
 	def createPluginWindow(self, aType, aFullPNList):
 		""" opens and returns _PluginWindow instance of aType showing aFullPNList 
@@ -239,16 +242,17 @@ class GtkSessionMonitor(Session):
 		if anInstance == None:
 			self.message ( 'Pluginwindow has not been created. %s may not be a valid plugin type' %aType )
 		return anInstance
-		
+
 
 	# ==========================================================================
 	def createPluginOnBoard(self, aType, aFullPNList):	
 		""" creates and adds plugin to pluginwindow and returns plugininstance """
-		aBoardWindow = getWindow('BoardWindow')
+		aBoardWindow = self.getWindow('BoardWindow')
 		if aBoardWindow == None:
 			self.message('Board Window does not exist. Plugin cannot be added.')
 			return None
-		aBoardWindow.addPluginWindows( aType, aFullPNList)
+		return aBoardWindow.addPluginWindows( aType, aFullPNList)
+
 
 	# ==========================================================================
 	def openConfirmWindow(self,  aMessage, aTitle ):
@@ -302,6 +306,7 @@ class GtkSessionMonitor(Session):
 
 		# deletes the reference to the EntityListWindow instance
 		if self.theEntityListInstanceMap.has_key( anEntityListWindow ):
+			anEntityListWindow.close()
 			del self.theEntityListInstanceMap[ anEntityListWindow ]
 	
 	# ==========================================================================
@@ -416,10 +421,11 @@ class GtkSessionMonitor(Session):
 		# first try to set it in osogo section
 		if self.theConfigDB.has_section('osogo'):
 			if self.theConfigDB.has_option('osogo',aParameter):
-				return self.theConfigDB.set('osogo',aParameter, aValue)
+				self.theConfigDB.set('osogo',aParameter, str(aValue))
+		else:
 
-		# gets it from default
-		return self.theConfigDB.set('DEFAULT',aParameter, aValue)
+			# sets it in default
+			self.theConfigDB.set('DEFAULT',aParameter, str(aValue))
 
 
 #------------------------------------------------------------------------
@@ -469,7 +475,7 @@ class GtkSessionMonitor(Session):
 			return
 
 		if time == '' and not self.doesExist('MainWindow'):
-			openWindow('MainWindow')
+			self.openWindow('MainWindow')
 
 		try:
 			self.theRunningFlag = TRUE
