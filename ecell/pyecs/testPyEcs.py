@@ -9,7 +9,7 @@ print 'makePrimitive()...'
 s.makePrimitive('Substance','Substance:/:A','substance A')
 
 print 'sendMessage()...'
-s.sendMessage( 'Substance:/:A', 'Quantity', '30' )
+s.sendMessage( 'Substance:/:A', 'quantity', '30' )
 
 print 'initialize()...'
 s.initialize()
@@ -19,8 +19,20 @@ tuple = s.getMessage( 'Substance:/:A', 'id' )
 print 'got key=%s body=%s' % (tuple[0], tuple[1])
 
 print 'getMessage()...'
-tuple = s.getMessage( 'System:/:CELL', 'id' )
+tuple = s.getMessage( 'Substance:/:A', 'quantity' )
 print 'got key=%s body=%s' % (tuple[0], tuple[1])
+
+print 'sendMessage()...'
+s.sendMessage( 'Substance:/:A', 'quantity', '0' )
+
+
+print 'getMessage()...'
+tuple = s.getMessage( 'Substance:/:A', 'quantity' )
+print 'got key=%s body=%s' % (tuple[0], tuple[1])
+
+#print 'getMessage()...'
+#tuple = s.getMessage( 'System:/:CELL', 'id' )
+#print 'got key=%s body=%s' % (tuple[0], tuple[1])
 
 
 print 'step()...'
