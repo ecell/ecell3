@@ -28,12 +28,14 @@
 // E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
 
-#ifndef ___UTIL_H___
-#define ___UTIL_H___
+#ifndef __UTIL_HPP
+#define __UTIL_HPP
 #include <stdlib.h>
 #include <sstream>
 #include <functional>
 #include <limits>
+
+#include <boost/lexical_cast.hpp>
 
 #include "libecs.hpp"
 #include "Exceptions.hpp"
@@ -63,19 +65,12 @@ namespace libecs
   template <typename T> 
   const T stringTo( StringCref str )
   {
-    std::istringstream ist( str.c_str() );
-    T aT;
-    ist >> aT;
-    return aT;
+    return boost::lexical_cast<T>( str );
   }
 
-  /// A specialization of stringTo for Real
+  /// Specializations of stringTo
   template<> const Real stringTo<Real>( StringCref str );
-
-  /// A specialization of stringTo for Int
   template<> const Integer stringTo<Integer>( StringCref str );
-
-  /// A specialization of stringTo for UnsignedInt
   template<> const UnsignedInteger stringTo<UnsignedInteger>( StringCref str );
 
   /**
@@ -84,19 +79,16 @@ namespace libecs
      is also defined.
   */
 
-  // FIXME: should be a static function object? to reduce initialization cost
-
   template <typename T> inline const String toString( const T& t )
   {
-    std::ostringstream os;
-    os << t;
-    os << std::ends;
-    return os.str();
+    return boost::lexical_cast<String>( t );
   }
 
-  /// A specialization of toString for Real
-  template<> const String toString<Real>( RealCref f );
-
+  /// Specializations, mainly for the sake of binary size.
+  template <> inline const String toString( const Real& t );
+  template <> inline const String toString( const Integer& t );
+  template <> inline const String toString( const UnsignedInteger& t );
+  template <> inline const String toString( const String& t );
 
   /**
      Erase white space characters ( ' ', '\t', and '\n' ) from a string
@@ -336,7 +328,7 @@ namespace libecs
 } // namespace libecs
 
 
-#endif /* ___UTIL_H___ */
+#endif /* __UTIL_HPP */
 
 
 /*

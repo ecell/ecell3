@@ -40,12 +40,7 @@ namespace libecs
   LIBECS_DM_INIT_STATIC( DiscreteEventProcess, Process );
 
 
-  DiscreteEventProcess::~DiscreteEventProcess()
-  {
-    ; // do nothing
-  }
-
-  const Polymorph DiscreteEventProcess::getDependentProcessList() const
+  GET_METHOD_DEF( Polymorph, DependentProcessList, DiscreteEventProcess )
   {
     PolymorphVector aVector;
     aVector.reserve( theDependentProcessVector.size() );
@@ -64,6 +59,13 @@ namespace libecs
     
     return aVector;
   }
+
+
+  DiscreteEventProcess::~DiscreteEventProcess()
+  {
+    ; // do nothing
+  }
+
 
 
   const bool DiscreteEventProcess::

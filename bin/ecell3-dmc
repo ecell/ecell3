@@ -100,7 +100,7 @@ def main():
       
   	# be verbose
         if anOption in ( "-v", '--verbose'):
-	    VERBOSE = True            
+	    VERBOSE = True
             
 	# without stdinclude            
         if anOption == "--no-stdinclude":
@@ -169,11 +169,14 @@ def main():
 	if VERBOSE:
 	    cmdstr = 'python ' + DMCOMPILE + ' -v ' + cmdstr
 	    print cmdstr
-	    os.system( cmdstr )
 	else:
 	    cmdstr = 'python ' + DMCOMPILE + ' ' + cmdstr	
-	    print cmdstr
-	    os.system( cmdstr )
+
+
+	ret = os.system( cmdstr )
+
+	if not ret == 0:
+	    sys.exit( 1 )
 
 if __name__ == '__main__':
 	main()

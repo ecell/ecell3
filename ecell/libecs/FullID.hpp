@@ -28,9 +28,8 @@
 // E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
 
-#ifndef ___FULLID_HPP
-#define ___FULLID_HPP
-#include <string>
+#ifndef __FULLID_HPP
+#define __FULLID_HPP
 
 #include "libecs.hpp"
 #include "EntityType.hpp"

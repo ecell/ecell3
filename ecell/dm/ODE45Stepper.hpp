@@ -79,7 +79,7 @@ LIBECS_DM_CLASS( ODE45Stepper, AdaptiveDifferentialStepper )
 			      ( k1__k2_2 - theta_0_5 * k1__4k2_4k3__k4 ) ) );
     }
    
-    virtual const Real getDifference( RealCref aTime, RealCref anInterval )
+    virtual const Real getDifference( RealParam aTime, RealParam anInterval )
     {
       if ( !theStepper.theStateFlag )
       	{
@@ -110,7 +110,7 @@ LIBECS_DM_CLASS( ODE45Stepper, AdaptiveDifferentialStepper )
     }
 
     /**
-    const Real interpolate( RealCref anInterval )
+    const Real interpolate( const Real anInterval )
     {
       const Real theta( anInterval / theStepper.getTolerableStepInterval() );
       
@@ -126,7 +126,7 @@ LIBECS_DM_CLASS( ODE45Stepper, AdaptiveDifferentialStepper )
  				* 2.0 * (k4 - k1 - 4*k3 + 4*k2) ) );
     }
    
-    virtual const Real getDifference( RealCref aTime, RealCref anInterval )
+    virtual const Real getDifference( const Real aTime, const Real anInterval )
     {
       const Real aTimeInterval( aTime - theStepper.getCurrentTime() );
       
@@ -159,7 +159,7 @@ public:
 
   virtual void interrupt( StepperPtr const aCaller );
 
-  virtual const Integer getOrder() const { return 5; }
+  virtual GET_METHOD( Integer, Order ) { return 5; }
 
   virtual VariableProxyPtr createVariableProxy( VariablePtr aVariable )
   {

@@ -31,14 +31,11 @@
 #ifndef __PROPERTYINTERFACE_HPP
 #define __PROPERTYINTERFACE_HPP
 
-//#include <map>
-
 #include "AssocVector.h"
 
 #include "libecs.hpp"
 #include "PropertySlot.hpp"
 #include "PropertySlotProxy.hpp"
-#include "PropertiedClass.hpp"
 
 namespace libecs
 {

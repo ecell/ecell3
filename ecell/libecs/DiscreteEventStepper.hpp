@@ -33,6 +33,7 @@
 
 #include "libecs.hpp"
 #include "Stepper.hpp"
+#include "DynamicPriorityQueue.hpp"
 #include "DiscreteEventProcess.hpp"
 
 namespace libecs
@@ -70,7 +71,7 @@ namespace libecs
 	; // do nothing
       }
 
-      StepperEvent( RealCref aTime, DiscreteEventProcessPtr aProcess )
+      StepperEvent( RealParam aTime, DiscreteEventProcessPtr aProcess )
 	:
 	theTime( aTime ),
 	theProcess( aProcess )

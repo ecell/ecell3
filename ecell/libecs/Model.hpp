@@ -31,7 +31,8 @@
 #ifndef __MODEL_HPP
 #define __MODEL_HPP
 
-#include <map>
+#include "AssocVector.h"
+
 #include "libecs.hpp"
 
 #include "Scheduler.hpp"
@@ -274,7 +275,7 @@ namespace libecs
 
        @param aSystem a root node to start recursive search.
        
-       @throw InitializationFailed if the check failed.
+       @throw InitializationFailed if the check is failed.
     */
 
     void checkStepper( SystemCptr const aSystem ) const;
@@ -286,6 +287,8 @@ namespace libecs
   private:
 
     SystemPtr           theRootSystemPtr;
+    SystemStepperPtr    theSystemStepperPtr;
+
 
     StepperMap          theStepperMap;
 
@@ -296,7 +299,7 @@ namespace libecs
 
     StepperMakerRef     theStepperMaker;
     SystemMakerRef      theSystemMaker;
-    VariableMakerRef   theVariableMaker;
+    VariableMakerRef    theVariableMaker;
     ProcessMakerRef     theProcessMaker;
 
 

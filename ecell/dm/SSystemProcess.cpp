@@ -48,14 +48,14 @@ LIBECS_DM_CLASS( SSystemProcess, ESSYNSProcess )
     }
 
   SIMPLE_GET_METHOD( Integer, Order );
-  void setOrder( IntegerCref aValue );
+  SET_METHOD( Integer, Order );
   
-  void setSSystemMatrix( PolymorphCref aValue );
+  SET_METHOD( Polymorph, SSystemMatrix );
 
-  const Polymorph getSSystemMatrix() const
-   {
-      return SSystemMatrix;
-    }
+  GET_METHOD( Polymorph, SSystemMatrix )
+  {
+    return SSystemMatrix;
+  }
 
   void fire()
     {
@@ -64,7 +64,7 @@ LIBECS_DM_CLASS( SSystemProcess, ESSYNSProcess )
 
   const std::vector<RealVector>& getESSYNSMatrix();
   
-  Integer getSystemSize()
+  GET_METHOD( Integer, SystemSize )
     {
       return theSystemSize;
     }
@@ -103,9 +103,9 @@ LIBECS_DM_CLASS( SSystemProcess, ESSYNSProcess )
 
 LIBECS_DM_INIT( SSystemProcess, Process );
 
-void SSystemProcess::setOrder( IntegerCref aValue ) 
+SET_METHOD_DEF( Integer, Order, SSystemProcess )
 { 
-  Order = aValue;
+  Order = value;
   
   // init Substance Vector
   theY.resize(theSystemSize+1);
@@ -151,10 +151,10 @@ void SSystemProcess::setOrder( IntegerCref aValue )
 
 }
 
-void SSystemProcess::setSSystemMatrix( PolymorphCref aValue )
+SET_METHOD_DEF( Polymorph, SSystemMatrix, SSystemProcess )
 {
-  SSystemMatrix = aValue;
-  PolymorphVector aValueVector( aValue.asPolymorphVector() );
+  SSystemMatrix = value;
+  PolymorphVector aValueVector( value.asPolymorphVector() );
   theSystemSize = aValueVector.size();
 
   // init Substance Vector

@@ -31,11 +31,10 @@
 #ifndef __PROPERTYSLOT_HPP
 #define __PROPERTYSLOT_HPP
 
-#include <iostream>
 #include <functional>
 
 #include "libecs.hpp"
-#include "Util.hpp"
+//#include "Util.hpp"
 #include "PropertiedClass.hpp"
 #include "convertTo.hpp"
 #include "Polymorph.hpp"
@@ -111,7 +110,7 @@ namespace libecs
 
 
 #define _PROPERTYSLOT_SETMETHOD( TYPE )\
-    virtual void set ## TYPE( T& anObject, TYPE ## Cref aValue ) = 0;
+    virtual void set ## TYPE( T& anObject, Param<TYPE>::type value ) = 0;
 
 #define _PROPERTYSLOT_GETMETHOD( TYPE )\
     virtual const TYPE get ## TYPE( const T& anObject ) const = 0;
@@ -132,7 +131,7 @@ namespace libecs
 #undef _PROPERTYSLOT_GETMETHOD
 
 
-    virtual void loadPolymorph( T& anObject, PolymorphCref aValue )
+    virtual void loadPolymorph( T& anObject, Param<Polymorph>::type aValue )
     {
       setPolymorph( anObject, aValue );
     }
@@ -159,10 +158,10 @@ namespace libecs
 
     DECLARE_TYPE( SlotType_, SlotType );
 
-    typedef SlotTypeCref SetType;
-    typedef const SlotType GetType;
+    typedef typename Param<SlotType>::type  SetType;
+    typedef const SlotType                  GetType;
 
-    typedef void    ( T::* SetMethodPtr )( SlotTypeCref );
+    typedef void    ( T::* SetMethodPtr )( SetType );
     typedef GetType ( T::* GetMethodPtr )() const;
 
     ConcretePropertySlot( const SetMethodPtr aSetMethodPtr,
@@ -191,7 +190,7 @@ namespace libecs
     }
 
 #define _PROPERTYSLOT_SETMETHOD( TYPE )\
-    virtual void set ## TYPE( T& anObject, TYPE ## Cref aValue )\
+    virtual void set ## TYPE( T& anObject, Param<TYPE>::type aValue )\
     {\
       setImpl( anObject, aValue );\
     }
@@ -227,7 +226,7 @@ namespace libecs
 
     inline GetType callGetMethod( const T& anObject ) const
     {
-      return ( ( anObject.*theGetMethodPtr )() );
+      return ( anObject.*theGetMethodPtr )();
     }
 
     template < typename Type >
@@ -245,7 +244,7 @@ namespace libecs
 
     static const bool isSetableMethod( const SetMethodPtr aSetMethodPtr )
     {
-      const SetMethodPtr aNullMethodPtr( &PropertiedClass::nullSet );
+      const SetMethodPtr aNullMethodPtr( &PropertiedClass::nullSet<SlotType> );
       return aSetMethodPtr != aNullMethodPtr;
     }
 
@@ -261,7 +260,7 @@ namespace libecs
     {
       if( aSetMethodPtr == NULLPTR )
 	{
-	  return &PropertiedClass::nullSet;
+	  return &PropertiedClass::nullSet<SlotType>;
 	}
       else
 	{
@@ -339,7 +338,7 @@ namespace libecs
       return isGetableMethod( theSaveMethodPtr );
     }
 
-    virtual void loadPolymorph( T& anObject, PolymorphCref aValue )
+    virtual void loadPolymorph( T& anObject, Param<Polymorph>::type aValue )
     {
       loadImpl( anObject, aValue );
     }
@@ -359,7 +358,7 @@ namespace libecs
 
     inline GetType callSaveMethod( const T& anObject ) const
     {
-      return ( ( anObject.*theSaveMethodPtr )() );
+      return ( anObject.*theSaveMethodPtr )();
     }
 
     inline void loadImpl( T& anObject, PolymorphCref aValue )

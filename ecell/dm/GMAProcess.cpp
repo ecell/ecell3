@@ -40,11 +40,11 @@ LIBECS_DM_CLASS( GMAProcess, ESSYNSProcess )
     }
 
   SIMPLE_GET_METHOD( Integer, Order );
-  void setOrder( IntegerCref aValue );
+  SET_METHOD( Integer, Order );
   
-  void setGMASystemMatrix( PolymorphCref aValue );
+  SET_METHOD( Polymorph, GMASystemMatrix );
 
-  const Polymorph getGMASystemMatrix() const
+  GET_METHOD( Polymorph, GMASystemMatrix )
     {
       return GMASystemMatrix;
     }
@@ -56,7 +56,7 @@ LIBECS_DM_CLASS( GMAProcess, ESSYNSProcess )
 
   const std::vector<RealVector>& getESSYNSMatrix();
 
-  Integer getSystemSize()
+  GET_METHOD( Integer, SystemSize )
   {
     return theSystemSize;
   }
@@ -91,9 +91,9 @@ LIBECS_DM_CLASS( GMAProcess, ESSYNSProcess )
 
 LIBECS_DM_INIT( GMAProcess, Process );
 
-void GMAProcess::setOrder( IntegerCref aValue ) 
+SET_METHOD_DEF( Integer, Order, GMAProcess )
 { 
-  Order = aValue;
+  Order = value;
   
   //init ESSYNS Matrix
   RealVector tmp;

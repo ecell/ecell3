@@ -325,8 +325,8 @@ namespace libecs
     public:
       PROCESS_SYSTEM_FUNC() {}
       PROCESS_SYSTEM_FUNC( ProcessPtr aProcessPtr,
-		   Process_System_Func aFuncPtr,
-		   System_Attribute aAttributePtr )
+			   Process_System_Func aFuncPtr,
+			   System_Attribute aAttributePtr )
 	:
 	theProcessPtr( aProcessPtr ), 
 	theFuncPtr( aFuncPtr ),
@@ -750,7 +750,7 @@ namespace libecs
       }
 
     virtual void defaultSetProperty( StringCref aPropertyName,
-			     PolymorphCref aValue)
+				     PolymorphCref aValue)
       {
 	thePropertyMap[ aPropertyName ] = aValue.asReal();
 	

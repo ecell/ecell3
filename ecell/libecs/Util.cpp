@@ -57,13 +57,24 @@ namespace libecs
     return strtoul( str.c_str(), NULLPTR, 10 );
   }
 
-  template<> const String toString<Real>( RealCref f )
-  { 
-    std::ostringstream os;
-    os.precision( std::numeric_limits<Real>::digits10 );
-    os << f;
-    os << std::ends;
-    return os.str();
+  template <> inline const String toString( const Real& t )
+  {
+    return boost::lexical_cast<String>( t );
+  }
+
+  template <> inline const String toString( const Integer& t )
+  {
+    return boost::lexical_cast<String>( t );
+  }
+
+  template <> inline const String toString( const UnsignedInteger& t )
+  {
+    return boost::lexical_cast<String>( t );
+  }
+
+  template <> inline const String toString( const String& t )
+  {
+    return t;
   }
 
   void eraseWhiteSpaces( StringRef str )

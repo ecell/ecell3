@@ -31,6 +31,7 @@
 #include <algorithm>
 
 #include "FullID.hpp"
+#include "Model.hpp"
 
 #include "DiscreteEventStepper.hpp"
 

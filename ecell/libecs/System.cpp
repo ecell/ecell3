@@ -50,7 +50,7 @@ namespace libecs
 
   // Property slots
 
-  const Polymorph System::getSystemList() const
+  GET_METHOD_DEF( Polymorph, SystemList, System )
   {
     PolymorphVector aVector;
     aVector.reserve( getSystemMap().size() );
@@ -64,7 +64,7 @@ namespace libecs
     return aVector;
   }
 
-  const Polymorph System::getVariableList() const
+  GET_METHOD_DEF( Polymorph, VariableList, System )
   {
     PolymorphVector aVector;
     aVector.reserve( getVariableMap().size() );
@@ -78,7 +78,7 @@ namespace libecs
     return aVector;
   }
 
-  const Polymorph System::getProcessList() const
+  GET_METHOD_DEF( Polymorph, ProcessList, System )
   {
     PolymorphVector aVector;
     aVector.reserve( getProcessMap().size() );
@@ -92,6 +92,16 @@ namespace libecs
     return aVector;
   }
 
+  SET_METHOD_DEF( String, StepperID, System )
+  {
+    theStepper = getModel()->getStepper( value );
+    theStepper->registerSystem( this );
+  }
+
+  GET_METHOD_DEF( String, StepperID, System )
+  {
+    return getStepper()->getID();
+  }
 
   System::System()
     :
@@ -129,16 +139,6 @@ namespace libecs
       }
   }
 
-  void System::setStepperID( StringCref anID )
-  {
-    theStepper = getModel()->getStepper( anID );
-    theStepper->registerSystem( this );
-  }
-
-  const String System::getStepperID() const
-  {
-    return getStepper()->getID();
-  }
 
   VariableCptr const System::findSizeVariable() const
   {

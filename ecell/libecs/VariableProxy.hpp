@@ -88,7 +88,7 @@ namespace libecs
 
     virtual ~VariableProxy();
     
-    virtual const Real getDifference( RealCref aTime, RealCref anInterval )
+    virtual const Real getDifference( RealParam aTime, RealParam anInterval )
     {
       return 0.0;
     }

@@ -57,7 +57,7 @@ namespace libecs
   PhysicalLoggerIterator 
   PhysicalLogger::lower_bound( PhysicalLoggerIteratorCref start,
 			       PhysicalLoggerIteratorCref end,
-			       RealCref time ) const
+			       const Real time ) const
   {
     PhysicalLoggerIterator iterator( ( start + end ) / 2 );
     PhysicalLoggerIterator i_start( start );
@@ -95,7 +95,7 @@ namespace libecs
   PhysicalLoggerIterator 
   PhysicalLogger::upper_bound( PhysicalLoggerIteratorCref start,
 			       PhysicalLoggerIteratorCref end,
-			       RealCref time ) const
+			       const Real time ) const
 
   {
     PhysicalLoggerIterator result( lower_bound( start, end, time ) );
@@ -125,7 +125,7 @@ namespace libecs
   PhysicalLoggerIterator 
   PhysicalLogger::lower_bound_linear_backwards( PhysicalLoggerIteratorCref start,
 			       PhysicalLoggerIteratorCref end,
-			       RealCref time ) const
+			       const Real time ) const
     {
     PhysicalLoggerIterator i_start( start );
     PhysicalLoggerIterator i_end( end );
@@ -148,8 +148,8 @@ namespace libecs
   PhysicalLoggerIterator 
   PhysicalLogger::lower_bound_linear_estimate( PhysicalLoggerIteratorCref start,
 			       PhysicalLoggerIteratorCref end,
-			       RealCref time,
-			       RealCref time_per_step ) const
+			       const Real time,
+			       const Real time_per_step ) const
     {
     //if time_per_step is zero fall back to stepwise linear search
     if ( time_per_step == 0 )
@@ -178,8 +178,8 @@ namespace libecs
   PhysicalLoggerIterator 
   PhysicalLogger::upper_bound_linear_estimate( PhysicalLoggerIteratorCref start,
 			       PhysicalLoggerIteratorCref end,
-			       RealCref time,
-			       RealCref time_per_step ) const
+			       const Real time,
+			       const Real time_per_step ) const
     {
     PhysicalLoggerIterator result( lower_bound_linear_estimate( start, end, 
 							time, time_per_step ) );
@@ -196,7 +196,7 @@ namespace libecs
   PhysicalLoggerIterator 
   PhysicalLogger::lower_bound_linear( PhysicalLoggerIteratorCref start,
 			       PhysicalLoggerIteratorCref end,
-			       RealCref time ) const
+			       const Real time ) const
   {
     PhysicalLoggerIterator i_start( start );
     PhysicalLoggerIterator i_end( end );
@@ -232,7 +232,7 @@ namespace libecs
   PhysicalLoggerIterator 
   PhysicalLogger::upper_bound_linear( PhysicalLoggerIteratorCref start,
 			       PhysicalLoggerIteratorCref end,
-			       RealCref time ) const
+			       const Real time ) const
   {
     PhysicalLoggerIterator result( lower_bound_linear( start, end, time ) );
 

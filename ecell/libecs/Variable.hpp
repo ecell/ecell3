@@ -32,14 +32,12 @@
 #define __VARIABLE_HPP
 
 #include <utility>
-#include <iostream>
 
 #include "libecs.hpp"
-#include "EntityType.hpp"
 #include "Entity.hpp"
 #include "VariableProxy.hpp"
 #include "System.hpp"
-#include "Model.hpp"
+
 
 namespace libecs
 {
@@ -145,7 +143,7 @@ namespace libecs
 	Integrate.
     */
 
-    virtual void integrate( const Real aTime )
+    virtual void integrate( RealParam aTime )
     {
       if( isFixed() == false )
 	{
@@ -153,8 +151,8 @@ namespace libecs
 	}
     }
 
-    const Real calculateVelocitySum( RealCref aCurrentTime, 
-				     RealCref anInterval ) const
+    const Real calculateVelocitySum( RealParam aCurrentTime, 
+				     RealParam anInterval ) const
     {
       Real aVelocitySum( 0.0 );
       FOR_ALL( VariableProxyVector, theVariableProxyVector )
@@ -168,7 +166,7 @@ namespace libecs
     }
 
 
-    void updateValue( RealCref aCurrentTime )
+    void updateValue( RealParam aCurrentTime )
     {
       const Real anInterval( aCurrentTime - theLastTime );
 
@@ -188,7 +186,7 @@ namespace libecs
       theLastTime = aCurrentTime;
     }
 
-    const Real calculateTempVelocitySum( const Real aCurrentTime )
+    const Real calculateTempVelocitySum( RealParam aCurrentTime )
     {
       const Real anInterval( aCurrentTime - theLastTime );
 
@@ -221,7 +219,7 @@ namespace libecs
        this method if it has the range.
     */
 
-    virtual const bool checkRange( RealCref aStepInterval ) const
+    virtual const bool checkRange( RealParam aStepInterval ) const
     {
       // this class has no range limit, thus this check always succeeds
       return true;
@@ -250,12 +248,12 @@ namespace libecs
       return saveValue();
     }
 
-    void addValue( RealCref aValue )
+    void addValue( RealParam aValue )
     {
       setValue( getValue() + aValue );
     }
 
-    void loadValue( RealCref aValue )
+    void loadValue( RealParam aValue )
     {
       theValue = aValue;
     }
@@ -272,7 +270,7 @@ namespace libecs
 
 
     // provide interface for value passing. (mainly for STL)
-    void setVelocity( const Real value )
+    void setVelocity( RealParam value )
     {
       theVelocity = value;
     }
@@ -296,7 +294,7 @@ namespace libecs
        @param aVelocity velocity in number of molecules to be added.
     */
 
-    void addVelocity( RealCref aVelocity ) 
+    void addVelocity( RealParam aVelocity ) 
     {
       theVelocity += aVelocity; 
     }
@@ -457,9 +455,9 @@ namespace libecs
 	In this class, the range (non-negative) is checked.
     */
 
-    virtual void integrate( const Real aTime );
+    virtual void integrate( RealParam aTime );
 
-    virtual const bool checkRange( RealCref anInterval ) const
+    virtual const bool checkRange( RealParam anInterval ) const
     {
       const Real aPutativeValue( getValue() + 
 				 calculateVelocitySum( theLastTime 

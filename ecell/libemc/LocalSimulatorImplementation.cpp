@@ -32,6 +32,7 @@
 #include <algorithm>
 
 #include "libecs/libecs.hpp"
+#include "libecs/Model.hpp"
 #include "libecs/Stepper.hpp"
 #include "libecs/System.hpp"
 #include "libecs/Process.hpp"

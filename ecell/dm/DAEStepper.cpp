@@ -165,7 +165,7 @@ namespace libecs
 
   void DAEStepper::calculateJacobian()
   {
-    UnsignedInt aSize( getReadOnlyVariableOffset() );
+    UnsignedInteger aSize( getReadOnlyVariableOffset() );
     Real aPerturbation;
 
     for ( VariableVector::size_type i( 0 ); i < aSize; ++i )
@@ -230,12 +230,12 @@ namespace libecs
 
     /**
     std::cout << std::endl;
-    for ( UnsignedInt i( 0 ); i < aSize; ++i )
-      for ( UnsignedInt j( 0 ); j < aSize; ++j )
+    for ( UnsignedInteger i( 0 ); i < aSize; ++i )
+      for ( UnsignedInteger j( 0 ); j < aSize; ++j )
 	std::cout << "m(" << i << "," << j << ") = " 
      << gsl_matrix_get( theJacobianMatrix1, i, j ) << std::endl;
-    for ( UnsignedInt i( 0 ); i < aSize*2; ++i )
-      for ( UnsignedInt j( 0 ); j < aSize*2; ++j )
+    for ( UnsignedInteger i( 0 ); i < aSize*2; ++i )
+      for ( UnsignedInteger j( 0 ); j < aSize*2; ++j )
 	std::cout << "m(" << i+aSize << "," << j+aSize << ") = " 
 		  << gsl_matrix_get( theJacobianMatrix2, i, j ) << std::endl;
     */

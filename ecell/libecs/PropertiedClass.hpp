@@ -200,18 +200,44 @@ public:\
   // Macros for property method declaration / definitions.
   //
 
+#define SET_SLOT( TYPE, METHODNAME )\
+  void METHODNAME( libecs::Param<TYPE>::type value )
 
-#define GET_METHOD( TYPE, NAME )\
-  const TYPE get ## NAME() const
+#define GET_SLOT( TYPE, METHODNAME )\
+  const TYPE METHODNAME() const
+
+#define SET_SLOT_DEF( TYPE, METHODNAME, CLASS )\
+  SET_SLOT( TYPE, CLASS::METHODNAME )
+
+#define GET_SLOT_DEF( TYPE, METHODNAME, CLASS )\
+  GET_SLOT( TYPE, CLASS::METHODNAME )
+
 
 #define SET_METHOD( TYPE, NAME )\
-  void set ## NAME( TYPE ## Cref value )
+  SET_SLOT( TYPE, set ## NAME )
 
-#define GET_METHOD_DEF( TYPE, NAME, CLASS )\
-  const TYPE CLASS::get ## NAME() const
+#define GET_METHOD( TYPE, NAME )\
+  GET_SLOT( TYPE, get ## NAME )
+
+#define LOAD_METHOD( TYPE, NAME )\
+  SET_SLOT( TYPE, load ## NAME )
+
+#define SAVE_METHOD( TYPE, NAME )\
+  GET_SLOT( TYPE, save ## NAME )
+
 
 #define SET_METHOD_DEF( TYPE, NAME, CLASS )\
-  void CLASS::set ## NAME( TYPE ## Cref value )
+  SET_SLOT_DEF( TYPE, set ## NAME, CLASS )
+
+#define GET_METHOD_DEF( TYPE, NAME, CLASS )\
+  GET_SLOT_DEF( TYPE, get ## NAME, CLASS )
+
+#define LOAD_METHOD_DEF( TYPE, NAME, CLASS )\
+  SET_SLOT_DEF( TYPE, load ## NAME, CLASS )
+
+#define SAVE_METHOD_DEF( TYPE, NAME, CLASS )\
+  GET_SLOT_DEF( TYPE, save ## NAME, CLASS )
+
 
 
 #define SIMPLE_GET_METHOD( TYPE, NAME )\
@@ -316,7 +342,7 @@ public:\
     /// @internal
 
     template <typename Type>
-    void nullSet( const Type& )
+    void nullSet( typename Param<Type>::type )
     {
       throwNotSetable();
     }
@@ -346,7 +372,7 @@ public:\
   // inline copies of them around.  This reduces sizes of DM .so files a bit.
 
 #define NULLSET_SPECIALIZATION( TYPE )\
-  template <> void PropertiedClass::nullSet<TYPE>( const TYPE& )
+  template <> void PropertiedClass::nullSet<TYPE>( Param<TYPE>::type )
 
   NULLSET_SPECIALIZATION( Real );
   NULLSET_SPECIALIZATION( Integer );

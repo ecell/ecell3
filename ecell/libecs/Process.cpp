@@ -46,9 +46,9 @@ namespace libecs
 
   LIBECS_DM_INIT_STATIC( Process, Process );
 
-  void Process::setVariableReferenceList( PolymorphCref aValue )
+  SET_METHOD_DEF( Polymorph, VariableReferenceList, Process )
   {
-    const PolymorphVector aVector( aValue.asPolymorphVector() );
+    const PolymorphVector aVector( value.asPolymorphVector() );
     for( PolymorphVectorConstIterator i( aVector.begin() );
 	 i != aVector.end(); ++i )
       {
@@ -59,7 +59,7 @@ namespace libecs
 
   }
 
-  const Polymorph Process::getVariableReferenceList() const
+  GET_METHOD_DEF( Polymorph, VariableReferenceList, Process )
   {
     PolymorphVector aVector;
     aVector.reserve( theVariableReferenceVector.size() );
@@ -90,7 +90,7 @@ namespace libecs
     return aVector;
   }
 
-  const Polymorph Process::saveVariableReferenceList() const
+  SAVE_METHOD_DEF( Polymorph, VariableReferenceList, Process )
   {
     PolymorphVector aVector( getVariableReferenceList().asPolymorphVector() );
 
@@ -239,7 +239,7 @@ namespace libecs
 
   void Process::registerVariableReference( StringCref aName, 
 					   VariablePtr aVariable, 
-					   const Integer aCoefficient,
+					   IntegerParam aCoefficient,
 					   const bool isAccessor )
   {
     String aVariableReferenceName( aName );
@@ -335,8 +335,8 @@ namespace libecs
   {
     std::for_each( thePositiveVariableReferenceIterator,
 		   theVariableReferenceVector.end(),
-		   std::bind2nd
-		   ( std::mem_fun_ref
+		   boost::bind2nd
+		   ( boost::mem_fun_ref
 		     ( &VariableReference::setIsAccessor ), false ) );
   }
 

@@ -32,7 +32,6 @@ NRStepper.cpp\
 FixedODE1Stepper.cpp\
 FixedDAE1Stepper.cpp\
 ODE23Stepper.cpp\
-CashKarp45Stepper.cpp\
 ODE45Stepper.cpp\
 DAEStepper.cpp\
 ESSYNSStepper.cpp\
@@ -49,7 +48,6 @@ ExpressionAssignmentProcess.cpp
 
 DMH = \
 ESSYNSProcess.hpp\
-CashKarp45Stepper.hpp\
 PythonFluxProcess.hpp\
 PythonProcess.hpp\
 PythonProcessBase.hpp\
@@ -75,7 +73,7 @@ dmsodir = ${DM_SO_DIR}
 dmso_DATA = ${SOS}
 
 %@LTDL_SHLIB_EXT@ : %.cpp
-	${ECELL3_SCRIPT} ${ECELL3_DMC} --dmcompile=${top_srcdir}/../dmtool --no-stdinclude --no-stdlibdir --ldflags="-L${top_srcdir}/libecs ${BOOST_LIB}" --cxxflags='-I${top_srcdir}/libecs -I${top_srcdir}/.. -I${top_srcdir} ${PYTHON_INCLUDES} ${BOOST_INCLUDE}' $< 
+	${ECELL3_SCRIPT} ${ECELL3_DMC} --verbose --dmcompile=${top_srcdir}/../dmtool --no-stdinclude --no-stdlibdir --ldflags="-L${top_srcdir}/libecs ${BOOST_LIB}" --cxxflags='-I${top_srcdir}/libecs -I${top_srcdir}/.. -I${top_srcdir} ${PYTHON_INCLUDES} ${BOOST_INCLUDE}' $< 
 
 clean-local:
 	${RM} -rf ${dmso_DATA}

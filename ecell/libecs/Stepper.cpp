@@ -359,7 +359,7 @@ namespace libecs
 
   }
 
-  const Polymorph Stepper::getSystemList() const
+  GET_METHOD_DEF( Polymorph, SystemList, Stepper )
   {
     PolymorphVector aVector;
     aVector.reserve( theSystemVector.size() );
@@ -378,7 +378,7 @@ namespace libecs
   }
 
 
-  const Polymorph Stepper::getDependentStepperList() const
+  GET_METHOD_DEF( Polymorph, DependentStepperList, Stepper )
   {
     PolymorphVector aVector;
     aVector.reserve( theDependentStepperVector.size() );
@@ -462,7 +462,7 @@ namespace libecs
       }
   }
 
-  const Polymorph Stepper::getWriteVariableList() const
+  GET_METHOD_DEF( Polymorph, WriteVariableList, Stepper )
   {
     PolymorphVector aVector;
     aVector.reserve( theVariableVector.size() );
@@ -476,7 +476,8 @@ namespace libecs
     return aVector;
   }
 
-  const Polymorph Stepper::getReadVariableList() const
+
+  GET_METHOD_DEF( Polymorph, ReadVariableList, Stepper )
   {
     PolymorphVector aVector;
     aVector.reserve( theVariableVector.size() );
@@ -490,7 +491,7 @@ namespace libecs
     return aVector;
   }
   
-  const Polymorph Stepper::getProcessList() const
+  GET_METHOD_DEF( Polymorph, ProcessList, Stepper )
   {
     PolymorphVector aVector;
     aVector.reserve( theProcessVector.size() );
@@ -551,7 +552,7 @@ namespace libecs
   }
 
 
-  void Stepper::integrate( const Real aTime )
+  void Stepper::integrate( RealParam aTime )
   {
     //
     // Variable::integrate()

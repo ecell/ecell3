@@ -46,6 +46,35 @@ namespace libecs
   
   /** @file */
 
+
+  const int MAJOR_VERSION( ECELL_MAJOR_VERSION );
+  const int MINOR_VERSION( ECELL_MINOR_VERSION );
+  const int MICRO_VERSION( ECELL_MICRO_VERSION );
+
+  const char* const VERSION_STRING( ECELL_VERSION_STRING );
+
+
+  inline const int getMajorVersion()
+  {
+    return MAJOR_VERSION;
+  }
+
+  inline const int getMinorVersion()
+  {
+    return MINOR_VERSION;
+  }
+
+  inline const int getMicroVersion()
+  {
+    return MICRO_VERSION;
+  }
+
+  inline const std::string getVersion()
+  {
+    return VERSION_STRING;
+  }
+
+
   // Declarations to be exported
 
 
@@ -72,6 +101,7 @@ namespace libecs
   DECLARE_CLASS( DiscreteEventProcess );
   DECLARE_CLASS( ProcessMaker );
   DECLARE_CLASS( Stepper );
+  DECLARE_CLASS( SystemStepper );
   DECLARE_CLASS( VariableProxy );
   DECLARE_CLASS( Model );
   DECLARE_CLASS( Scheduler );

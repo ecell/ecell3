@@ -46,7 +46,6 @@ namespace libecs
   @{
   */
 
-
   template< typename ToType, typename FromType >
   inline const ToType convertTo( const FromType& aValue )
   {
@@ -57,7 +56,7 @@ namespace libecs
   const ToType convertTo( const FromType& aValue, Type2Type<ToType> )
   {
     return static_cast<ToType>( aValue );
-    //    DefaultSpecializationInhibited();
+    // DefaultSpecializationProhibited();
   }
 
 

@@ -67,23 +67,23 @@ namespace libecs
     
     virtual ~PropertySlotProxy();
 
-    virtual void setPolymorph( PolymorphCref ) = 0;
-    virtual const Polymorph getPolymorph() const = 0;
+    virtual SET_METHOD( Polymorph, Polymorph ) = 0;
+    virtual GET_METHOD( Polymorph, Polymorph ) = 0;
+
+    virtual SET_METHOD( Real, Real ) = 0;
+    virtual GET_METHOD( Real, Real ) = 0;
+
+    virtual SET_METHOD( Integer, Integer ) = 0;
+    virtual GET_METHOD( Integer, Integer ) = 0;
+
+    virtual SET_METHOD( String, String ) = 0;
+    virtual GET_METHOD( String, String ) = 0;
     
-    virtual void setReal( RealCref real ) = 0;
-    virtual const Real getReal() const = 0;
-
-    virtual void setInteger( IntegerCref real ) = 0;
-    virtual const Integer getInteger() const = 0;
-
-    virtual void setString( StringCref string ) = 0;
-    virtual const String getString() const = 0;
-
     virtual const bool isSetable() const = 0;
     virtual const bool isGetable() const = 0;
 
     template < typename Type >
-    inline void set( const Type& aValue )
+    inline void set( typename Param<Type>::type aValue )
     {
       DefaultSpecializationInhibited();
     }
@@ -102,25 +102,26 @@ namespace libecs
 
 
   template <>
-  inline void PropertySlotProxy::set( PolymorphCref aValue )
+  inline void 
+  PropertySlotProxy::set<Polymorph>( Param<Polymorph>::type aValue )
   {
     setPolymorph( aValue );
   }
 
   template <>
-  inline void PropertySlotProxy::set( RealCref aValue )
+  inline void PropertySlotProxy::set<Real>( Param<Real>::type aValue )
   {
     setReal( aValue );
   }
 
   template <>
-  inline void PropertySlotProxy::set( IntegerCref aValue )
+  inline void PropertySlotProxy::set<Integer>( Param<Integer>::type aValue )
   {
     setInteger( aValue );
   }
 
   template <>
-  inline void PropertySlotProxy::set( StringCref aValue )
+  inline void PropertySlotProxy::set<String>( Param<String>::type aValue )
   {
     setString( aValue );
   }
@@ -182,13 +183,13 @@ namespace libecs
 
 
 #define _PROPERTYSLOT_SETMETHOD( TYPE )\
-    virtual void set ## TYPE( TYPE ## Cref aValue )\
+    virtual SET_METHOD( TYPE, TYPE )\
     {\
-      thePropertySlot.set ## TYPE( theObject, aValue );\
+      thePropertySlot.set ## TYPE( theObject, value );\
     }
 
 #define _PROPERTYSLOT_GETMETHOD( TYPE )\
-    virtual const TYPE get ## TYPE() const\
+    virtual GET_METHOD( TYPE, TYPE )\
     {\
       return thePropertySlot.get ## TYPE( theObject );\
     }

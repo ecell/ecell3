@@ -35,8 +35,6 @@
 #define __LOGGER_HPP
 
 #include "libecs.hpp"
-#include "Model.hpp"
-#include "Polymorph.hpp"
 #include "LoggerAdapter.hpp"
 #include "PhysicalLogger.hpp"
 #include "DataPointVector.hpp"
@@ -84,7 +82,7 @@ namespace libecs
     ~Logger( void );
 
 
-    void log( const Real aTime )
+    void log( RealParam aTime )
     {
       appendData( aTime, theLoggerAdapter->getValue() );
     }
@@ -106,16 +104,16 @@ namespace libecs
        - no 2 theTime values are the same 
     */
 
-    DataPointVectorRCPtr getData( RealCref aStartTine,
-				  RealCref anEndTime ) const;
+    DataPointVectorRCPtr getData( RealParam aStartTine,
+				  RealParam anEndTime ) const;
 
     /**
     
     */
 
-    DataPointVectorRCPtr getData( RealCref aStartTime,
-				  RealCref anEndTime, 
-				  RealCref anInterval ) const;
+    DataPointVectorRCPtr getData( RealParam aStartTime,
+				  RealParam anEndTime, 
+				  RealParam anInterval ) const;
     
 
 
@@ -141,13 +139,13 @@ namespace libecs
 
     */
 
-    void setMinimumInterval( RealCref anInterval );
+    void setMinimumInterval( RealParam anInterval );
 
     /**
 
     */
 
-    RealCref getMinimumInterval( void ) const
+    const Real getMinimumInterval( void ) const
     {
       return theMinimumInterval;
     }
@@ -157,7 +155,7 @@ namespace libecs
 
     */
 
-    void appendData( RealCref aTime, RealCref aValue );
+    void appendData( RealParam aTime, RealParam aValue );
 
 
     /**
@@ -177,7 +175,7 @@ namespace libecs
 
     const_iterator binary_search( const_iterator begin,
 				  const_iterator end,
-				  RealCref t ) 
+				  RealParam t ) 
     {
       return thePhysicalLoggers[0]->lower_bound( thePhysicalLoggers[0]->begin(), 
     					    thePhysicalLoggers[0]->end(), 

@@ -28,9 +28,8 @@
 // E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
 
-#ifndef ___SYSTEM_HPP
-#define ___SYSTEM_HPP
-#include <map>
+#ifndef __SYSTEM_HPP
+#define __SYSTEM_HPP
 
 #include "libecs.hpp"
 
@@ -283,9 +282,9 @@ namespace libecs
 
   public: // property slots
 
-    const Polymorph getSystemList() const;
-    const Polymorph getVariableList() const;
-    const Polymorph getProcessList() const;
+    GET_METHOD( Polymorph, SystemList );
+    GET_METHOD( Polymorph, VariableList );
+    GET_METHOD( Polymorph, ProcessList );
 
   protected:
 

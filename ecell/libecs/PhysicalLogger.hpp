@@ -74,33 +74,33 @@ namespace libecs
 
     iterator lower_bound( const iterator& start,
 			  const iterator& end,
-			  RealCref time ) const;
+			  const Real time ) const;
 
     iterator upper_bound( const iterator& start,
 			  const iterator& end,
-			  RealCref time ) const;
+			  const Real time ) const;
 
     iterator lower_bound_linear( const iterator& start,
 			  const iterator& end,
-			  RealCref time ) const;
+			  const Real time ) const;
 
     iterator upper_bound_linear( const iterator& start,
 			  const iterator& end,
-			  RealCref time ) const;
+			  const Real time ) const;
 
     iterator lower_bound_linear_backwards( const iterator& start,
 			  const iterator& end,
-			  RealCref time ) const;
+			  const Real time ) const;
 
     iterator lower_bound_linear_estimate( const iterator& start,
 			  const iterator& end,
-			  RealCref time,
-			  RealCref time_per_step ) const;
+			  const Real time,
+			  const Real time_per_step ) const;
 
     iterator upper_bound_linear_estimate( const iterator& start,
 			  const iterator& end,
-			  RealCref time,
-			  RealCref time_per_step ) const;
+			  const Real time,
+			  const Real time_per_step ) const;
 
     iterator next_index( const iterator& start) const;
 

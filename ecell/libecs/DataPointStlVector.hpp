@@ -162,26 +162,26 @@ namespace libecs
     }
 
 
-    void push( RealCref t, PolymorphCref v )
+    void push( RealParam t, PolymorphCref v )
     {
       theContainer.push_back( Containee( t, v ) );
     }
 
-    void push( RealCref t, RealCref v )
+    void push( RealParam t, RealParam v )
     {
       theContainer.push_back( Containee( t, v ) );
     }
 
     static const_iterator lower_bound( const_iterator first,
 				       const_iterator last,
-				       RealCref aTime ) 
+				       RealParam aTime ) 
     {
       return std::lower_bound( first, last, aTime );
     }
 
     static const_iterator upper_bound( const_iterator first,
 				       const_iterator last,
-				       RealCref aTime ) 
+				       RealParam aTime ) 
     {
       return std::upper_bound( first, last, aTime );
     }

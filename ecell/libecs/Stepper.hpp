@@ -112,12 +112,12 @@ namespace libecs
 	return compare( aLhs->getPriority(), aRhs->getPriority() );
       }
 
-      bool operator()( StepperPtr aLhs, const Integer aRhs ) const
+      bool operator()( StepperPtr aLhs, IntegerParam aRhs ) const
       {
 	return compare( aLhs->getPriority(), aRhs );
       }
 
-      bool operator()( const Integer aLhs, StepperPtr aRhs ) const
+      bool operator()( IntegerParam aLhs, StepperPtr aRhs ) const
       {
 	return compare( aLhs, aRhs->getPriority() );
       }
@@ -125,7 +125,7 @@ namespace libecs
     private:
 
       // if statement can be faster than returning an expression directly
-      inline static bool compare( const Integer aLhs, const Integer aRhs )
+      inline static bool compare( IntegerParam aLhs, IntegerParam aRhs )
       {
 	if( aLhs > aRhs )
 	  {
@@ -292,7 +292,7 @@ namespace libecs
 
     virtual void step() = 0;
 
-    void integrate( const Real aTime );
+    void integrate( RealParam aTime );
 
     /**
        Update loggers.
@@ -340,7 +340,7 @@ namespace libecs
     void removeProcess( ProcessPtr aProcessPtr );
 
 
-    void loadStepInterval( RealCref aStepInterval )
+    void loadStepInterval( RealParam aStepInterval )
     {
       theStepInterval = aStepInterval;
     }

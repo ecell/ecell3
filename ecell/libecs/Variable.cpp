@@ -109,7 +109,7 @@ namespace libecs
   }
 
 
-  void PositiveVariable::integrate( const Real aTime )
+  void PositiveVariable::integrate( RealParam aTime )
   {
     Variable::integrate( aTime );
 

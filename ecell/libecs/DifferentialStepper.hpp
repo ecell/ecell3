@@ -84,7 +84,8 @@ namespace libecs
 	; // do nothing
       }
 
-      virtual const Real getDifference( RealCref aTime, RealCref anInterval )
+      virtual const Real getDifference( RealParam aTime, 
+					RealParam anInterval )
       {
 	// First order interpolation.  This should be overridden in
 	// higher order DifferentialSteppers.
@@ -124,7 +125,7 @@ namespace libecs
       return theNextStepInterval;
     }
 
-    void initializeStepInterval( RealCref aStepInterval )
+    void initializeStepInterval( RealParam aStepInterval )
     {
       setStepInterval( aStepInterval );
       setOriginalStepInterval( aStepInterval );
@@ -217,7 +218,8 @@ namespace libecs
 	; // do nothing
       }
 
-      virtual const Real getDifference( RealCref aTime, RealCref anInterval )
+      virtual const Real getDifference( RealParam aTime, 
+					RealParam anInterval )
       {
 	const Real aTolerableStepInterval
 	  ( theStepper.getTolerableStepInterval() );

@@ -28,8 +28,8 @@
 // E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
 
-#ifndef __DAE_HPP
-#define __DAE_HPP
+#ifndef __DAESTEPPER_HPP
+#define __DAESTEPPER_HPP
 
 #include "libecs/DifferentialStepper.hpp"
 
@@ -56,38 +56,46 @@ LIBECS_DM_CLASS( DAEStepper, DifferentialStepper )
       ; // do nothing
     }
 
-    virtual const Real getDifference( RealCref aTime, RealCref anInterval )
+    virtual const Real getDifference( RealParam aTime, 
+				      RealParam anInterval )
     {
-      if ( !theStepper.theStateFlag )
-      	{
-      	  return 0.0;
-      	}
+     const Real sq6( 2.4494897427831779 );  // sqrt( 6.0 )      
+     const Real c1( ( 4.0 - sq6 ) / 10.0 - 1.0 );      
+     const Real c2( ( 4.0 + sq6 ) / 10.0 - 1.0 );      
 
-      const VariableVector::size_type
-	aSize( theStepper.getReadOnlyVariableOffset() );
+     if ( !theStepper.theStateFlag )      
+       { 
+         return 0.0;  
+       }  
 
-      const Real cont1( theStepper.getContinuousVector()[ theIndex ] );
-      const Real cont2( theStepper.getContinuousVector()[ theIndex + aSize ] );
-      const Real cont3( theStepper.getContinuousVector()[ theIndex + aSize * 2 ] );
+     const VariableVector::size_type        
+       aSize( theStepper.getReadOnlyVariableOffset() );      
+     RealVectorConstIterator         
+       anIterator( theStepper.getContinuousVector().begin() + theIndex );
 
-      const Real sq6( sqrt( 6.0 ) );
-      const Real c1( ( 4.0 - sq6 ) / 10.0 - 1.0 );
-      const Real c2( ( 4.0 + sq6 ) / 10.0 - 1.0 );
- 
-      const Real aStepInterval( theStepper.getStepInterval() );
-      const Real aTimeInterval( aTime - aStepInterval - theStepper.getCurrentTime() );
+     const Real cont1( *anIterator ); // [ theIndex ]     
+     anIterator += aSize;      
+     const Real cont2( *anIterator ); // [ theIndex + aSize ]
+     anIterator += aSize;     
+     const Real cont3( *anIterator ); // [ theIndex + aSize * 2 ]
 
-      const Real s1( aTimeInterval / aStepInterval );
-      const Real s2( ( aTimeInterval - anInterval ) / aStepInterval );
+     const Real aStepInterval( theStepper.getStepInterval() );
+     const Real aStepIntervalInv( 1.0 / aStepInterval );
+     const Real aTimeInterval( aTime - aStepInterval    
+			       - theStepper.getCurrentTime() ); 
 
-      const Real i1( s1 * ( cont1 + ( s1 - c2 ) * ( cont2 + ( s1 - c1 ) * cont3 ) ) );
-      const Real i2( s2 * ( cont1 + ( s2 - c2 ) * ( cont2 + ( s2 - c1 ) * cont3 ) ) );
+     const Real s1( aTimeInterval * aStepIntervalInv );
+     const Real s2( ( aTimeInterval - anInterval ) * aStepIntervalInv );
 
-      //      std::cout << s1 << " : " << s2 << std::endl;
-      //      std::cout << theStepper.getVelocityBuffer()[ theIndex ]*anInterval << " : " << i2 - i1 << std::endl;
+     const Real 
+       i1( s1 * ( cont1 + ( s1 - c2 ) * ( cont2 + ( s1 - c1 ) * cont3 ) ) );
+     const Real 
+       i2( s2 * ( cont1 + ( s2 - c2 ) * ( cont2 + ( s2 - c1 ) * cont3 ) ) );
 
-      return ( i1 - i2 );
-      //      return theStepper.getVelocityBuffer()[ theIndex ] * anInterval;
+     //      std::cout << s1 << " : " << s2 << std::endl;      
+     //      std::cout << theStepper.getVelocityBuffer()[ theIndex]*anInterval << " : " << i2 - i1 << std::endl;  
+     return ( i1 - i2 );     
+     //      return theStepper.getVelocityBuffer()[ theIndex ] *anInterval;
     }
 
   protected:
@@ -102,7 +110,7 @@ public:
     {
       INHERIT_PROPERTIES( DifferentialStepper );
 
-      PROPERTYSLOT_SET_GET( Int, MaxIterationNumber );
+      PROPERTYSLOT_SET_GET( Integer, MaxIterationNumber );
       PROPERTYSLOT_SET_GET( Real, Uround );
 
       PROPERTYSLOT_SET_GET( Real, AbsoluteTolerance );
@@ -114,12 +122,12 @@ public:
   DAEStepper( void );
   virtual ~DAEStepper( void );
 
-  SET_METHOD( Int, MaxIterationNumber )
+  SET_METHOD( Integer, MaxIterationNumber )
     {
       theMaxIterationNumber = value;
     }
 
-  GET_METHOD( Int, MaxIterationNumber )
+  GET_METHOD( Integer, MaxIterationNumber )
     {
       return theMaxIterationNumber;
     }
@@ -184,8 +192,7 @@ public:
 
   virtual VariableProxyPtr createVariableProxy( VariablePtr aVariable )
   {
-    return new
-      DAEStepper::VariableProxy( *this, aVariable );
+    return new DAEStepper::VariableProxy( *this, aVariable );
   }
 
 protected:
@@ -223,4 +230,4 @@ protected:
 
 };
 
-#endif /* __DAE_HPP */
+#endif /* __DAESTEPPER_HPP */

@@ -31,6 +31,9 @@
 #ifndef __PROCESS_HPP
 #define __PROCESS_HPP
 
+#include <boost/mem_fn.hpp>
+#include <boost/functional.hpp>
+
 #include "AssocVector.h"
 
 #include "libecs.hpp"
@@ -96,12 +99,12 @@ namespace libecs
 	return compare( aLhs->getPriority(), aRhs->getPriority() );
       }
 
-      bool operator()( ProcessPtr aLhs, const Integer aRhs ) const
+      bool operator()( ProcessPtr aLhs, IntegerParam aRhs ) const
       {
 	return compare( aLhs->getPriority(), aRhs );
       }
 
-      bool operator()( const Integer aLhs, ProcessPtr aRhs ) const
+      bool operator()( IntegerParam aLhs, ProcessPtr aRhs ) const
       {
 	return compare( aLhs, aRhs->getPriority() );
       }
@@ -109,7 +112,7 @@ namespace libecs
     private:
 
       // if statement can be faster than returning an expression directly
-      inline static bool compare( const Integer aLhs, const Integer aRhs )
+      inline static bool compare( IntegerParam aLhs, IntegerParam aRhs )
       {
 	if( aLhs > aRhs )
 	  {
@@ -187,7 +190,8 @@ namespace libecs
 
     SET_METHOD( Polymorph, VariableReferenceList );
     GET_METHOD( Polymorph, VariableReferenceList );
-    const Polymorph saveVariableReferenceList() const;
+    SAVE_METHOD( Polymorph, VariableReferenceList );
+
 
 
     /**
@@ -264,7 +268,7 @@ namespace libecs
 
     void registerVariableReference( StringCref aName, 
 				    VariablePtr aVariable, 
-				    const Integer aCoefficient, 
+				    IntegerParam aCoefficient, 
 				    const bool isAccessor = true );
 
     /**
@@ -335,21 +339,21 @@ namespace libecs
        @param aValue aReal value to be added.
     */
 
-    void addValue( const Real aValue )
+    void addValue( RealParam aValue )
     {
       setActivity( aValue );
 
       // Increase or decrease variables, skipping zero coefficients.
       std::for_each( theVariableReferenceVector.begin(),
 		     theZeroVariableReferenceIterator,
-		     std::bind2nd
-		     ( std::mem_fun_ref
+		     boost::bind2nd
+		     ( boost::mem_fun_ref
 		       ( &VariableReference::addValue ), aValue ) );
 
       std::for_each( thePositiveVariableReferenceIterator,
 		     theVariableReferenceVector.end(),
-		     std::bind2nd
-		     ( std::mem_fun_ref
+		     boost::bind2nd
+		     ( boost::mem_fun_ref
 		       ( &VariableReference::addValue ), aValue ) );
     }
 
@@ -364,21 +368,21 @@ namespace libecs
        @param aVelocity a base velocity to be added.
     */
 
-    void setFlux( const Real aVelocity )
+    void setFlux( RealParam aVelocity )
     {
       setActivity( aVelocity );
 
       // Increase or decrease variables, skipping zero coefficients.
       std::for_each( theVariableReferenceVector.begin(),
 		     theZeroVariableReferenceIterator,
-		     std::bind2nd
-		     ( std::mem_fun_ref
+		     boost::bind2nd
+		     ( boost::mem_fun_ref
 		       ( &VariableReference::addFlux ), aVelocity ) );
 
       std::for_each( thePositiveVariableReferenceIterator,
 		     theVariableReferenceVector.end(),
-		     std::bind2nd
-		     ( std::mem_fun_ref
+		     boost::bind2nd
+		     ( boost::mem_fun_ref
 		       ( &VariableReference::addFlux ), aVelocity ) );
     }
 

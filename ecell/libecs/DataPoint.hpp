@@ -69,7 +69,7 @@ namespace libecs
       ; // do nothing
     }
 
-    DataPoint( RealCref aTime, RealCref aValue )
+    DataPoint( RealParam aTime, RealParam aValue )
       :
       theTime ( aTime ),
       theValue( aValue )   
@@ -84,53 +84,53 @@ namespace libecs
       ; // do nothing
     }
 
-    RealCref getTime() const
+    const Real getTime() const
     {
       return theTime;
     }
 
-    RealCref getValue() const
+    const Real getValue() const
     {
       return theValue;
     }
 
-    RealCref getAvg() const
+    const Real getAvg() const
     {
       return theValue;
     }
 
-    RealCref getMin() const
+    const Real getMin() const
     {
       return theValue;
     }
 
-    RealCref getMax() const
+    const Real getMax() const
     {
       return theValue;
     }
 
 
-    void setTime( RealCref aReal )
+    void setTime( RealParam aReal )
     {
       theTime = aReal;
     }
 
-    void setValue( RealCref aReal )
+    void setValue( RealParam aReal )
     {
       theValue = aReal;
     }
 
-    void setAvg( RealCref aReal )
+    void setAvg( RealParam aReal )
     {
       ;
     }
 
-    void setMin( RealCref aReal )
+    void setMin( RealParam aReal )
     {
       ;
     }
 
-    void setMax( RealCref aReal )
+    void setMax( RealParam aReal )
     {
       ;
     }
@@ -175,7 +175,7 @@ namespace libecs
     }
 
 
-    DataPointLong( RealCref aTime, RealCref aValue ) //constructor with 2 args
+    DataPointLong( RealParam aTime, RealParam aValue ) //constructor with 2 args
     
     {
       theTime = aTime ;
@@ -185,8 +185,8 @@ namespace libecs
       theMin = aValue ;
     }
 
-    DataPointLong( RealCref aTime, RealCref aValue, RealCref anAvg,
-		RealCref aMax, RealCref aMin ) //constructor with 5 args
+    DataPointLong( RealParam aTime, RealParam aValue, RealParam anAvg,
+		RealParam aMax, RealParam aMin ) //constructor with 5 args
 
     {
       theTime = aTime ;
@@ -225,53 +225,53 @@ namespace libecs
       ; // do nothing
     }
 
-    RealCref getTime() const
+    const Real getTime() const
     {
       return theTime;
     }
 
-    RealCref getValue() const
+    const Real getValue() const
     {
       return theValue;
     }
 
-    RealCref getAvg() const
+    const Real getAvg() const
     {
       return theAvg;
     }
 
-    RealCref getMin() const
+    const Real getMin() const
     {
       return theMin;
     }
 
-    RealCref getMax() const
+    const Real getMax() const
     {
       return theMax;
     }
 
 
-    void setTime( RealCref aReal )
+    void setTime( RealParam aReal )
     {
       theTime = aReal;
     }
 
-    void setValue( RealCref aReal )
+    void setValue( RealParam aReal )
     {
       theValue = aReal;
     }
 
-    void setAvg( RealCref aReal )
+    void setAvg( RealParam aReal )
     {
       theAvg = aReal;
     }
 
-    void setMin( RealCref aReal )
+    void setMin( RealParam aReal )
     {
       theMin = aReal;
     }
 
-    void setMax( RealCref aReal )
+    void setMax( RealParam aReal )
 
     {
       theMax = aReal;

@@ -64,14 +64,14 @@ namespace libecs
 	return compare( aLhs.getCoefficient(), aRhs.getCoefficient() );
       }
 
-      bool operator()( const Integer aLhs, 
+      bool operator()( IntegerParam aLhs, 
 		       VariableReferenceCref aRhs ) const
       {
 	return compare( aLhs, aRhs.getCoefficient() );
       }
 
       bool operator()( VariableReferenceCref aLhs, 
-		       const Integer aRhs ) const
+		       IntegerParam aRhs ) const
       {
 	return compare( aLhs.getCoefficient(), aRhs );
       }
@@ -180,7 +180,7 @@ namespace libecs
 
     VariableReference( StringCref aName, 
 		       VariablePtr aVariablePtr, 
-		       const Integer aCoefficient,
+		       IntegerParam aCoefficient,
 		       const bool anIsAccessor = true )  
       : 
       theName( aName ),
@@ -215,7 +215,7 @@ namespace libecs
       return theVariablePtr; 
     }
 
-    void setCoefficient( IntegerCref aCoefficient )
+    void setCoefficient( IntegerParam aCoefficient )
     {
       theCoefficient = aCoefficient;
     }
@@ -252,7 +252,7 @@ namespace libecs
       return theVariablePtr->getValue();
     }
 
-    void setValue( const Real aValue ) const
+    void setValue( RealParam aValue ) const
     {
       theVariablePtr->setValue( aValue );
     }
@@ -266,7 +266,7 @@ namespace libecs
        @param aValue a Real value to be added.
     */
 
-    void addValue( const Real aValue ) const
+    void addValue( RealParam aValue ) const
     {
       theVariablePtr->addValue( aValue );
     }
@@ -293,7 +293,7 @@ namespace libecs
     }
 
     // before trying this consider addFlux() below.
-    void addVelocity( const Real aValue ) const
+    void addVelocity( RealParam aValue ) const
     {
       theVariablePtr->addVelocity( aValue );
     }
@@ -309,7 +309,7 @@ namespace libecs
     }
 
 
-    void addFlux( const Real aVelocity ) const
+    void addFlux( RealParam aVelocity ) const
     {
       theVariablePtr->addVelocity( aVelocity * theCoefficient );
     }

@@ -92,8 +92,8 @@ namespace libecs
 
   //
 
-  DataPointVectorRCPtr Logger::getData( RealCref aStartTime,
-					RealCref anEndTime ) const
+  DataPointVectorRCPtr Logger::getData( RealParam aStartTime,
+					RealParam anEndTime ) const
   {
     if (thePhysicalLoggers[0]->empty())
 	{
@@ -124,7 +124,7 @@ namespace libecs
   
   
 
-  void Logger::setMinimumInterval( RealCref anInterval )
+  void Logger::setMinimumInterval( RealParam anInterval )
   {
     if( anInterval < 0 )
       {
@@ -136,7 +136,7 @@ namespace libecs
   }
 
 
-  void Logger::appendData( RealCref aTime, RealCref aValue )
+  void Logger::appendData( RealParam aTime, RealParam aValue )
   {
     const Real aCurrentInterval( aTime - theLastTime );
     DataPoint dp;
@@ -241,9 +241,9 @@ namespace libecs
 
 
 
-  DataPointVectorRCPtr Logger::getData( RealCref aStartTime,
-					RealCref anEndTime,
-					RealCref anInterval ) const
+  DataPointVectorRCPtr Logger::getData( RealParam aStartTime,
+					RealParam anEndTime,
+					RealParam anInterval ) const
   {
     if (thePhysicalLoggers[0]->empty())
 	{

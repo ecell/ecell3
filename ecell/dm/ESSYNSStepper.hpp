@@ -59,7 +59,7 @@ LIBECS_DM_CLASS( ESSYNSStepper, AdaptiveDifferentialStepper )
 	; // do nothing
       }
 
-      virtual const Real getDifference( RealCref aTime, RealCref anInterval )
+      virtual const Real getDifference( const Real aTime, const Real anInterval )
       {
 	// First order interpolation.  This should be overridden in
 	// higher order DifferentialSteppers.
@@ -108,7 +108,7 @@ public:
   virtual void initialize();
   virtual bool calculate();
     
-  virtual Integer const getOrder() const 
+  virtual GET_METHOD( Integer, Order )
     {
       return theTaylorOrder;
     }

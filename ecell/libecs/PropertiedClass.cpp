@@ -119,7 +119,7 @@ namespace libecs
 
 
 #define NULLSET_SPECIALIZATION_DEF( TYPE )\
-  template <> void PropertiedClass::nullSet<TYPE>( const TYPE& )\
+  template <> void PropertiedClass::nullSet<TYPE>( Param<TYPE>::type )\
   {\
     throwNotSetable();\
   } //

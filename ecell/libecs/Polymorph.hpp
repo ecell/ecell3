@@ -122,14 +122,14 @@ namespace libecs
       ; // do nothing
     }
 
-    ConcretePolymorphValue( RealCref aValue ) 
+    ConcretePolymorphValue( RealParam aValue ) 
       :
       theValue( convertTo<T>( aValue ) )
     {
       ; // do nothing
     }
 
-    ConcretePolymorphValue( IntegerCref  aValue )
+    ConcretePolymorphValue( IntegerParam  aValue )
       :
       theValue( convertTo<T>( aValue ) )
     {
@@ -160,7 +160,7 @@ namespace libecs
       return convertTo<String>( theValue ); 
     }
 
-    virtual const Real    asReal()  const 
+    virtual const Real   asReal()  const 
     { 
       return convertTo<Real>( theValue );
     }
@@ -240,14 +240,14 @@ namespace libecs
       ; // do nothing
     }
   
-    Polymorph( RealCref aValue )      
+    Polymorph( RealParam aValue )      
       :
       theValue( new ConcretePolymorphValue<Real>( aValue ) )
     {
       ; // do nothing
     }
 
-    Polymorph( IntegerCref aValue )      
+    Polymorph( IntegerParam aValue )      
       :
       theValue( new ConcretePolymorphValue<Integer>( aValue ) )
     {
@@ -289,7 +289,7 @@ namespace libecs
       return theValue->asString(); 
     }
 
-    const Real  asReal() const
+    const Real   asReal() const
     { 
       return theValue->asReal(); 
     }
@@ -358,7 +358,7 @@ namespace libecs
   }
 
   template <>
-  inline const Real Polymorph::as() const
+  inline const Real   Polymorph::as() const
   {
     return asReal();
   }
@@ -395,40 +395,17 @@ namespace libecs
   // Mainly for PolymorphVector classes
   //
 
-  // to Polymorph object
-
-
-  // identity
-
-  template<>
-  inline const Polymorph convertTo( PolymorphCref aValue, 
-				    Type2Type< Polymorph > )
-  {
-    return aValue;
-  }
-
-  // from Real
-
-  template<>
-  inline const Polymorph convertTo( RealCref aValue, 
-				    Type2Type< Polymorph > )
-  {
-    return Polymorph( aValue );
-  }
-
-
-
   // to PolymorphVector object
 
   // identity
 
-  template<>
-  inline const PolymorphVector 
-  convertTo( PolymorphVectorCref aValue, 
-	     Type2Type< PolymorphVector > )
-  {
-    return aValue;
-  }
+  //  template<>
+  //  inline const PolymorphVector 
+  //  convertTo( PolymorphVectorCref aValue, 
+  //	     Type2Type< PolymorphVector > )
+  //  {
+  //    return aValue;
+  //  }
 
   // from Real
   template<>

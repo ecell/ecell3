@@ -7,6 +7,6 @@ a = createEntityStub( 'Variable:/CELL/CYTOPLASM:P0' )
 #print s.getProperty( 'ReadVariableList' )
 #print s.getProperty( 'SystemList' )
 print a.getProperty( 'Value' )
-run( 10 )
+run( 1000 )
 
 print a.getProperty( 'Value' )

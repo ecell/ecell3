@@ -124,7 +124,7 @@ namespace libecs
 	return theDependentProcessVector;
       }
 
-    const Polymorph getDependentProcessList() const;
+    GET_METHOD( Polymorph, DependentProcessList );
 
 
   protected:

@@ -38,10 +38,10 @@
 #include <list>
 #include <vector>
 
+#include <boost/call_traits.hpp>
+
 #include "ecell/config.h"
 
-#include "CoreLinuxCompatibility.hpp"
-#include "AssocVector.h"
 
 
 
@@ -68,54 +68,231 @@
 namespace libecs
 {
 
-  // system constants
+  // Some macros those origins from CoreLinux++
 
-  const int MAJOR_VERSION( ECELL_MAJOR_VERSION );
-  const int MINOR_VERSION( ECELL_MINOR_VERSION );
-  const int MICRO_VERSION( ECELL_MICRO_VERSION );
+  /**
+     IGNORE_RETURN is an indicator that the return
+     value for a function is ignored.
+     i.e   IGNORE_RETURN getSomething( ... );
+     Eliminates a lint warning.
+  */
 
-  const char* const VERSION_STRING( ECELL_VERSION_STRING );
+#define IGNORE_RETURN (void)
 
+  /**
+     Declare a new type and its pointer,
+     const pointer, reference, and const reference types. For example
+     DECLARE_TYPE( Dword, VeryLongTime );
+     @param mydecl The base type
+     @param mytype The new type
+  */
 
-  inline const int getMajorVersion()
-  {
-    return MAJOR_VERSION;
-  }
+#define DECLARE_TYPE( mydecl, mytype )  \
+typedef mydecl         mytype;         \
+typedef mytype *       mytype ## Ptr;  \
+typedef const mytype * mytype ## Cptr; \
+typedef mytype &       mytype ## Ref;  \
+typedef const mytype & mytype ## Cref;
 
-  inline const int getMinorVersion()
-  {
-    return MINOR_VERSION;
-  }
+  /**
+     Declare class , class pointer , 
+     const pointer, class reference 
+     and const class reference types for classes. For example
+     DECLARE_CLASS( Exception );
+     @param tag The class being declared
+  */
 
-  inline const int getMicroVersion()
-  {
-    return MICRO_VERSION;
-  }
-
-  inline const std::string getVersion()
-  {
-    return VERSION_STRING;
-  }
-
-
-
-  // CoreLinux++ compatibility
-
-  using namespace corelinux;
-
-  // replace CORELINUX from macro names
-
-#define DECLARE_LIST        CORELINUX_LIST
-#define DECLARE_VECTOR      CORELINUX_VECTOR
-#define DECLARE_MAP         CORELINUX_MAP
-#define DECLARE_MULTIMAP    CORELINUX_MULTIMAP  
-#define DECLARE_SET         CORELINUX_SET       
-#define DECLARE_MULTISET    CORELINUX_MULTISET  
-#define DECLARE_QUEUE       CORELINUX_QUEUE     
-#define DECLARE_STACK       CORELINUX_STACK     
+#define DECLARE_CLASS( tag )            \
+   class   tag;                        \
+   typedef tag *       tag ## Ptr;     \
+   typedef const tag * tag ## Cptr;    \
+   typedef tag &       tag ## Ref;     \
+   typedef const tag & tag ## Cref;
 
 
-  
+  // *******************************************
+  // Define the void pointer type.
+  // *******************************************
+   
+  typedef void * VoidPtr;
+
+  // *******************************************
+  // Define the NULLPTR
+  // *******************************************
+
+#define  NULLPTR  0
+   
+  /**
+     STL list template. This macro generates all
+     the type references and pointers for the collection and
+     respective iterators for a list.
+     @param name The name you want to give the collection
+     @param type The type object the collection manages
+  */
+#define DECLARE_LIST( type, name )                            \
+      DECLARE_TYPE(std::list<type>,name);                       \
+      typedef name::iterator name ## Iterator;                  \
+      typedef name::iterator& name ## IteratorRef;              \
+      typedef name::iterator* name ## IteratorPtr;              \
+      typedef name::const_iterator name ## ConstIterator;       \
+      typedef name::const_iterator& name ## ConstIteratorRef;   \
+      typedef name::const_iterator* name ## ConstIteratorPtr;   \
+      typedef name::reverse_iterator name ## Riterator;         \
+      typedef name::reverse_iterator& name ## RiteratorRef;     \
+      typedef name::reverse_iterator* name ## RiteratorPtr
+
+
+  /**
+     STL vector template. This macro generates all
+     the type references and pointers for the collection and
+     respective iterators for a vector.
+     @param name The name you want to give the collection
+     @param type The type for the vector
+  */
+#define DECLARE_VECTOR( type, name )                            \
+   DECLARE_TYPE(std::vector<type>,name);                       \
+   typedef name::iterator name ## Iterator;                    \
+   typedef name::iterator& name ## IteratorRef;                \
+   typedef name::iterator* name ## IteratorPtr;                \
+   typedef name::const_iterator name ## ConstIterator;         \
+   typedef name::const_iterator& name ## ConstIteratorRef;     \
+   typedef name::const_iterator* name ## ConstIteratorPtr;     \
+   typedef name::reverse_iterator name ## Riterator;           \
+   typedef name::reverse_iterator& name ## RiteratorRef;       \
+   typedef name::reverse_iterator* name ## RiteratorPtr
+
+
+  /**
+     STL set template. This macro generates all
+     the type references and pointers for the collection and
+     respective iterators for a set.
+     @param name The name you want to give the collection
+     @param key The object that represents the set key
+     @param comp The comparator functor
+  */
+#define DECLARE_SET(key,comp,name)                                       \
+      typedef set<key, comp > name;                                           \
+      typedef name *       name ## Ptr;                                       \
+      typedef const name * name ## Cptr;                                      \
+      typedef name &       name ## Ref;                                       \
+      typedef const name & name ## Cref;                                      \
+      typedef name::iterator name ## Iterator;                                \
+      typedef name::iterator& name ## IteratorRef;                            \
+      typedef name::iterator* name ## IteratorPtr;                            \
+      typedef name::const_iterator name ## ConstIterator;                     \
+      typedef name::const_iterator& name ## ConstIteratorRef;                 \
+      typedef name::const_iterator* name ## ConstIteratorPtr;                 \
+      typedef name::reverse_iterator name ## Riterator;                       \
+      typedef name::reverse_iterator& name ## RiteratorRef;                   \
+      typedef name::reverse_iterator* name ## RiteratorPtr
+   
+  /**
+     STL multiset template. This macro generates all
+     the type references and pointers for the collection and
+     respective iterators for a multiset.
+     @param name The name you want to give the collection
+     @param key The object that represents the mutliset key
+     @param comp The comparator functor
+  */
+#define DECLARE_MULTISET(key,comp,name)                                  \
+      typedef multiset<key, comp > name;                                      \
+      typedef name *       name ## Ptr;                                       \
+      typedef const name * name ## Cptr;                                      \
+      typedef name &       name ## Ref;                                       \
+      typedef const name & name ## Cref;                                      \
+      typedef name::iterator name ## Iterator;                                \
+      typedef name::iterator& name ## IteratorRef;                            \
+      typedef name::iterator* name ## IteratorPtr;                            \
+      typedef name::const_iterator name ## ConstIterator;                     \
+      typedef name::const_iterator& name ## ConstIteratorRef;                 \
+      typedef name::const_iterator* name ## ConstIteratorPtr;                 \
+      typedef name::reverse_iterator name ## Riterator;                       \
+      typedef name::reverse_iterator& name ## RiteratorRef;                   \
+      typedef name::reverse_iterator* name ## RiteratorPtr
+
+
+  /**
+     STL map template. This macro generates all
+     the type references and pointers for the collection and
+     respective iterators for a map.
+     @param name The name you want to give the collection
+     @param key The object that represents the map key
+     @param value The object that the key is associated to
+     @param comp The comparator functor
+  */
+#define DECLARE_MAP(key,value,comp,name)                             \
+      typedef std::map<key,value,comp > name;                      \
+      typedef name *       name ## Ptr;                            \
+      typedef const name * name ## Cptr;                           \
+      typedef name &       name ## Ref;                            \
+      typedef const name & name ## Cref;                           \
+      typedef name::iterator name ## Iterator;                     \
+      typedef name::iterator& name ## IteratorRef;                 \
+      typedef name::iterator* name ## IteratorPtr;                 \
+      typedef name::const_iterator name ## ConstIterator;          \
+      typedef name::const_iterator& name ## ConstIteratorRef;      \
+      typedef name::const_iterator* name ## ConstIteratorPtr;      \
+      typedef name::reverse_iterator name ## Riterator;            \
+      typedef name::reverse_iterator& name ## RiteratorRef;        \
+      typedef name::reverse_iterator* name ## RiteratorPtr
+   
+  /**
+     STL multimap template. This macro generates all
+     the type references and pointers for the collection and
+     respective iterators for a multimap.
+     @param name The name you want to give the collection
+     @param key The object that represents the map key
+     @param value The object that the key is associated to
+     @param comp The comparator functor
+  */
+
+#define DECLARE_MULTIMAP(key,value,comp,name)                 \
+      typedef std::multimap<key,value,comp > name;                 \
+      typedef name *       name ## Ptr;                            \
+      typedef const name * name ## Cptr;                           \
+      typedef name &       name ## Ref;                            \
+      typedef const name & name ## Cref;                           \
+      typedef name::iterator name ## Iterator;                     \
+      typedef name::iterator& name ## IteratorRef;                 \
+      typedef name::iterator* name ## IteratorPtr;                 \
+      typedef name::const_iterator name ## ConstIterator;          \
+      typedef name::const_iterator& name ## ConstIteratorRef;      \
+      typedef name::const_iterator* name ## ConstIteratorPtr;      \
+      typedef name::reverse_iterator name ## Riterator;            \
+      typedef name::reverse_iterator& name ## RiteratorRef;        \
+      typedef name::reverse_iterator* name ## RiteratorPtr
+
+
+  /**
+     STL queue template. This macro generates all
+     the type references and pointers for the collection and
+     respective iterators for a queue.
+     @param name The name you want to give the collection
+     @param type The type to be queued
+  */
+#define DECLARE_QUEUE( type, name )                          \
+      DECLARE_TYPE(std::deque<type>,name);                     \
+      typedef name::iterator name ## Iterator;                 \
+      typedef name::iterator& name ## IteratorRef;             \
+      typedef name::iterator* name ## IteratorPtr;             \
+      typedef name::const_iterator name ## ConstIterator;      \
+      typedef name::const_iterator& name ## ConstIteratorRef;  \
+      typedef name::const_iterator* name ## ConstIteratorPtr;  \
+      typedef name::reverse_iterator name ## Riterator;        \
+      typedef name::reverse_iterator& name ## RiteratorRef;    \
+      typedef name::reverse_iterator* name ## RiteratorPtr
+
+  /**
+     STL stack template. This macro generates all
+     the type references and pointers for the collection and
+     respective iterators for a stack.
+     @param name The name you want to give the collection
+     @param type The type to be stacked
+  */
+#define DECLARE_STACK( type, name )                                 \
+      DECLARE_TYPE(stack<type>,name)                                   
+
+
   // from Loki
 
   
@@ -152,6 +329,16 @@ namespace libecs
       typedef typename name::reverse_iterator* name ## RiteratorPtr
 
 
+
+  // Types
+
+  template <typename T>
+  class Param
+  {
+  public:
+    typedef typename boost::call_traits<T>::param_type type;
+  };
+
   // String
 
   DECLARE_TYPE( std::string, String );
@@ -162,22 +349,24 @@ namespace libecs
 
   DECLARE_TYPE( long int, Integer );
   DECLARE_TYPE( unsigned long int, UnsignedInteger );
+  typedef Param<Integer>::type IntegerParam;
+  typedef Param<UnsignedInteger>::type UnsignedIntegerParam;
 
-  // these types (Int and UnsignedInt are obsolete, and will be removed.)
-  DECLARE_TYPE( long int, Int );
-  DECLARE_TYPE( unsigned long int, UnsignedInt );
 
   // these can cause problem when used as template parameters
   //  DECLARE_TYPE( int64_t, Integer );
   //  DECLARE_TYPE( uint64_t, UnsignedInteger );
 
+  //  DECLARE_TYPE( double, Real );
   DECLARE_TYPE( double, Real );
+  typedef Param<Real>::type RealParam;
 
 #if defined( HAVE_LONG_DOUBLE )
   DECLARE_TYPE( long double, HighReal );
 #else
   DECLARE_TYPE( double, HighReal );
 #endif /* defined( HAVE_LONG_DOUBLE ) */
+  typedef Param<HighReal>::type HighRealParam;
     
   //  DECLARE_TYPE( HighReal, Time );
   DECLARE_TYPE( Real, Time );
