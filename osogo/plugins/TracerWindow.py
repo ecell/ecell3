@@ -2,7 +2,7 @@
 
 from gtk import *
 from gtkextra import *
-from Window import *
+#from Window import *
 from Numeric import *
 import GDK
 import GTK
@@ -34,10 +34,10 @@ class TracerWindow( OsogoPluginWindow ):
         if IDflag == 1:
             aValue = self.theSession.theSimulator.getProperty( aFullPNString )
             if operator.isNumberType( aValue[0] ):
-                self.openWindow()
+                #self.openWindow()
                 self.thePluginManager.appendInstance( self )                    
                 #PluginWindow.initialize( self, root )
-                OsogoPluginWindow.initialize( self, root )
+                #OsogoPluginWindow.initialize( self, root )
                 self.initialize()
             else:
                 self.theSession.printMessage( "%s: not numerical data\n" % aFullPNString )                    

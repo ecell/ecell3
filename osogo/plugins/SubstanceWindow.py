@@ -13,10 +13,10 @@ class SubstanceWindow( OsogoPluginWindow ):
         #PluginWindow.__init__( self, dirname, data, pluginmanager, root )
         OsogoPluginWindow.__init__( self, dirname, data, pluginmanager, root )
 
-        self.openWindow()
+        #self.openWindow()
         self.thePluginManager.appendInstance( self )    
         #PluginWindow.initialize( self, root )
-        OsogoPluginWindow.initialize( self, root )
+        #OsogoPluginWindow.initialize( self, root )
         self.initialize()
 
         self.theSession = pluginmanager.theSession

@@ -21,10 +21,10 @@ class DigitalWindow( OsogoPluginWindow ):
 
         if operator.isNumberType( aValue[0] ):
 
-            self.openWindow()
+            #self.openWindow()
             self.thePluginManager.appendInstance( self )
             #PluginWindow.initialize( self, root )
-            OsogoPluginWindow.initialize( self, root )
+            #OsogoPluginWindow.initialize( self, root )
             self.initialize()
 
         else:
