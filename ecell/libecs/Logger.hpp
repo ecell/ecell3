@@ -40,7 +40,6 @@
 #include "PhysicalLogger.hpp"
 #include "DataPointVector.hpp"
 
-
 namespace libecs
 {
 
@@ -80,10 +79,7 @@ namespace libecs
   
     /// Destructor
 
-    ~Logger( void )
-    {
-      // self purge
-    }
+    ~Logger( void );
 
 
     /**
@@ -130,7 +126,7 @@ namespace libecs
 
     const Int getSize() const
     {
-      return thePhysicalLogger.size();
+      return thePhysicalLoggers[0].size();
     }
 
     /**
@@ -175,8 +171,8 @@ namespace libecs
 				  const_iterator end,
 				  RealCref t ) 
     {
-      return thePhysicalLogger.lower_bound( thePhysicalLogger.begin(), 
-    					    thePhysicalLogger.end(), 
+      return thePhysicalLoggers[0].lower_bound( thePhysicalLoggers[0].begin(), 
+    					    thePhysicalLoggers[0].end(), 
 					    t );
     }
     
@@ -206,7 +202,7 @@ namespace libecs
 
     PropertySlotRef      thePropertySlot;
 
-    PhysicalLogger	 thePhysicalLogger;
+    PhysicalLogger*	 thePhysicalLoggers;
     DataInterval	 theDataInterval;
     Real                 theLastTime;
 

@@ -27,7 +27,9 @@
 // written by Gabor Bereczki <gabor.bereczki@talk21.com>
 //
 
+#include "config.h" 
 #include "PhysicalLogger.hpp"
+//#include <stdio.h>
 
 namespace libecs
 {
@@ -108,7 +110,77 @@ namespace libecs
     return result;
   }
 
+  PhysicalLoggerIterator 
+  PhysicalLogger::lower_bound_linear_backwards( PhysicalLoggerIteratorCref start,
+			       PhysicalLoggerIteratorCref end,
+			       RealCref time ) const
+    {
+    PhysicalLoggerIterator i_start( start );
+    PhysicalLoggerIterator i_end( end );
+    Real aTime;
 
+    if ( start > end )
+      {
+	i_start=end;
+	i_end=start;
+      }
+    PhysicalLoggerIterator iterator( i_end );
+    
+    while ( (iterator>i_start) && ( theVector [ iterator ].getTime() > time ) )
+	{
+	iterator--;
+	}
+    return iterator;
+    }
+
+  PhysicalLoggerIterator 
+  PhysicalLogger::lower_bound_linear_estimate( PhysicalLoggerIteratorCref start,
+			       PhysicalLoggerIteratorCref end,
+			       RealCref time,
+			       RealCref time_per_step ) const
+    {
+    //if time_per_step is zero fall back to stepwise linear search
+    if ( time_per_step == 0 )
+    {
+    return lower_bound_linear( start, end, time);
+    }
+    Real theStartTime( theVector[start].getTime() );
+    PhysicalLoggerIterator iterator;
+
+    iterator = static_cast<PhysicalLoggerIterator> ( (time - theStartTime ) 
+					/ time_per_step ) + start;
+    if ( iterator > end ) { iterator = end;}
+    if ( theVector [iterator].getTime() < time )
+	{
+	    return lower_bound_linear( iterator, end, time);
+	}
+	
+    if ( theVector [iterator].getTime() > time )
+	{
+	    return lower_bound_linear_backwards( start, iterator, time );
+	}
+    
+    return iterator;
+    }
+
+  PhysicalLoggerIterator 
+  PhysicalLogger::upper_bound_linear_estimate( PhysicalLoggerIteratorCref start,
+			       PhysicalLoggerIteratorCref end,
+			       RealCref time,
+			       RealCref time_per_step ) const
+    {
+    PhysicalLoggerIterator result( lower_bound_linear_estimate( start, end, 
+							time, time_per_step ) );
+
+    if ( ( result < size() - 1 ) && ( theVector [ result ].getTime() != time ) )
+      {
+	++result;
+      }
+
+    return result;
+    
+    }
+    
   PhysicalLoggerIterator 
   PhysicalLogger::lower_bound_linear( PhysicalLoggerIteratorCref start,
 			       PhysicalLoggerIteratorCref end,
@@ -125,6 +197,7 @@ namespace libecs
       }
     PhysicalLoggerIterator iterator( i_start );
     PhysicalLoggerIterator return_value( i_start );
+
 	
     do
       {
@@ -238,8 +311,18 @@ namespace libecs
 
     return DataPointVectorRCPtr( aVector );
   }
+    
+/*  void PhysicalLogger::set_stats( PhysicalLoggerIteratorCref distance,
+				PhysicalLoggerIteratorCref num_of_elements) const
+  {
+    theVector.set_direct_read_stats(distance,num_of_elements);
+  }
 
-
+  void PhysicalLogger::set_default_stats() const
+  {
+    theVector.set_direct_read_stats();
+  }
+*/
 } // namespace libecs
 
 

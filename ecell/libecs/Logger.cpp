@@ -33,8 +33,10 @@
 #include "Logger.hpp"
 #include <cmath>
 #include <assert.h>
+//#include <stdio.h>
+#define _LOGGER_MAX_PHYSICAL_LOGGERS 5
+#define _LOGGER_DIVIDE_STEP 100
 
-#include <stdio.h>
 namespace libecs
 {
 
@@ -45,19 +47,23 @@ namespace libecs
     theMinimumInterval( 0.0 ),
     theLastTime( 0.0 ) // theStepper.getCurrentTime() - theMinimumInterval )
   {
-    ; // do nothing
+    thePhysicalLoggers=new PhysicalLogger[_LOGGER_MAX_PHYSICAL_LOGGERS]; // do nothing
   }
 
-
+  Logger::~Logger()
+  {
+    delete[] thePhysicalLoggers;
+  }
+  
   DataPointVectorRCPtr Logger::getData( void ) const
   {
-    if (thePhysicalLogger.empty())
+    if (thePhysicalLoggers[0].empty())
 	{
-	return anEmptyVector();
+	  return anEmptyVector();
 	}
 
-    return thePhysicalLogger.getVector( thePhysicalLogger.begin(),
-					thePhysicalLogger.end() );
+    return thePhysicalLoggers[0].getVector( thePhysicalLoggers[0].begin(),
+					thePhysicalLoggers[0].end() );
   }
 
   //
@@ -65,21 +71,21 @@ namespace libecs
   DataPointVectorRCPtr Logger::getData( RealCref aStartTime,
 					RealCref anEndTime ) const
   {
-    if (thePhysicalLogger.empty())
+    if (thePhysicalLoggers[0].empty())
 	{
 	return anEmptyVector();
 	}
 
     PhysicalLoggerIterator 
-      top( thePhysicalLogger.upper_bound( thePhysicalLogger.begin(),
-					  thePhysicalLogger.end(), 
+      top( thePhysicalLoggers[0].upper_bound( thePhysicalLoggers[0].begin(),
+					  thePhysicalLoggers[0].end(), 
 					  anEndTime ) );
 
     PhysicalLoggerIterator 
-      bottom( thePhysicalLogger.lower_bound( thePhysicalLogger.begin(),
+      bottom( thePhysicalLoggers[0].lower_bound( thePhysicalLoggers[0].begin(),
 					     top,
 					     aStartTime ) );
-    return thePhysicalLogger.getVector( bottom, top );
+    return thePhysicalLoggers[0].getVector( bottom, top );
   }
 
 
@@ -97,18 +103,26 @@ namespace libecs
 					RealCref anEndTime,
 					RealCref anInterval ) const
   {
-    if( anInterval < 0.0 )
-      {
-	THROW_EXCEPTION( ValueError, 
-			 "Logger::getData(): interval must not be negative." );
-      }
-
-    if (thePhysicalLogger.empty())
+    if (thePhysicalLoggers[0].empty())
 	{
 	return anEmptyVector();
 	}
-    Real theStartTime ( thePhysicalLogger.front().getTime() );
-    Real theEndTime ( thePhysicalLogger.back().getTime() );
+	
+    //choose appropriate physlogger
+    int log_no(_LOGGER_MAX_PHYSICAL_LOGGERS+1);
+    Real avg_interval;
+    do{
+    --log_no;
+    avg_interval=thePhysicalLoggers[log_no].get_avg_interval();
+    }
+    while (((avg_interval>anInterval)||(avg_interval==-1.0))&&
+	    (log_no>0));
+	
+    Real theStartTime ( thePhysicalLoggers[log_no].front().getTime() );
+    Real theEndTime ( thePhysicalLoggers[log_no].back().getTime() );
+    Real time_per_step( ( theEndTime - theStartTime ) /
+		    ( thePhysicalLoggers[log_no].end() - thePhysicalLoggers[log_no].begin() ) );
+
     if ( theStartTime < aStartTime )
       { 
 	theStartTime = aStartTime;
@@ -140,43 +154,50 @@ namespace libecs
 
 //set uo iterators
     PhysicalLoggerIterator 
-      vectorslice_end( thePhysicalLogger.upper_bound( thePhysicalLogger.begin(),
-					  thePhysicalLogger.end(),
-					  theEndTime ) );
+      vectorslice_end( thePhysicalLoggers[log_no].upper_bound_linear_estimate
+    					( thePhysicalLoggers[log_no].begin(),
+					  thePhysicalLoggers[log_no].end(),
+					  theEndTime,
+					  time_per_step ) );
     
     PhysicalLoggerIterator 
-      vectorslice_start( thePhysicalLogger.lower_bound( thePhysicalLogger.begin(),
+      vectorslice_start( thePhysicalLoggers[log_no].lower_bound_linear_estimate
+    						( thePhysicalLoggers[log_no].begin(),
 						   vectorslice_end,
-						   theStartTime ) );
+						   theStartTime,
+						   time_per_step ) );
 //decide on applied method
-    
+    //refine time_per_step
     Real vectorslice_length( 
 		    ( vectorslice_end - vectorslice_start ) );
+    time_per_step = ( ( theEndTime - theStartTime ) / vectorslice_length );
 
     Real linear_step_estimate( vectorslice_length / range );
-    Real logarythmic_step_estimate ( log2( vectorslice_length ) );
     
-//    bool isLinearSearch( (logarythmic_step_estimate > linear_step_estimate) );
-    bool isLinearSearch ( true );
+    //if estimated linear step is 3 or smaller use the simple lianear search
+    if ( linear_step_estimate < 4 )
+	{
+	time_per_step = 0;
+	}    
+
 //initialize iterator indexes    
     PhysicalLoggerIterator
 	lowerbound_index (vectorslice_start);
 	
     PhysicalLoggerIterator
-	upperbound_index ( thePhysicalLogger.next_index( lowerbound_index ) ) ;
+	upperbound_index ( thePhysicalLoggers[log_no].next_index( lowerbound_index ) ) ;
 				
 //initializa DP-s
     DataPoint current_DP;
     DataPoint lower_DP;
     DataPoint upper_DP;
     Real currentTime( theStartTime );
-    thePhysicalLogger.getItem( lowerbound_index, &lower_DP );
-    thePhysicalLogger.getItem( upperbound_index, &upper_DP );
+    thePhysicalLoggers[log_no].getItem( lowerbound_index, &lower_DP );
+    thePhysicalLoggers[log_no].getItem( upperbound_index, &upper_DP );
     Real lowerbound_time( lower_DP.getTime() );
     Real upperbound_time( upper_DP.getTime() );
     Real lowerbound_value( lower_DP.getValue() );
     Real upperbound_value( upper_DP.getValue() );
-    
     
     do 
 	{
@@ -219,23 +240,24 @@ namespace libecs
 	    else //upperbound_time<current_time
 	    //else get new value
 		{
-		lowerbound_index=thePhysicalLogger.lower_bound_search(
+		lowerbound_index=thePhysicalLoggers[log_no].lower_bound_linear_estimate(
 		    upperbound_index, vectorslice_end, currentTime,
-		    isLinearSearch );
-
-		upperbound_index=thePhysicalLogger.next_index( lowerbound_index );
-		thePhysicalLogger.getItem( lowerbound_index, &lower_DP );
-		thePhysicalLogger.getItem( upperbound_index, &upper_DP );
+		    time_per_step );
+		upperbound_index=thePhysicalLoggers[log_no].next_index( lowerbound_index );
+		thePhysicalLoggers[log_no].getItem( lowerbound_index, &lower_DP );
+		thePhysicalLoggers[log_no].getItem( upperbound_index, &upper_DP );
 		lowerbound_time=lower_DP.getTime();
 		upperbound_time=upper_DP.getTime();
 		lowerbound_value=lower_DP.getValue();
 		upperbound_value=upper_DP.getValue();
+		time_per_step=(theEndTime-upperbound_time)/
+		    (vectorslice_end-upperbound_index);
 		}
 	
 	}
     while ( counter < range );
     
-
+//    thePhysicalLogger.set_default_stats();
     return DataPointVectorRCPtr( aDataPointVector );
   }
 
@@ -254,11 +276,21 @@ namespace libecs
   void Logger::appendData( RealCref aTime, RealCref aValue )
   {
     const Real aCurrentInterval( aTime - theLastTime );
-
+    int log_no(0);
+    PhysicalLoggerIterator psize;
     if( theMinimumInterval <= aCurrentInterval )
       {
         theDataInterval.addPoint( aTime, aValue );
-        thePhysicalLogger.push( theDataInterval.getFinalDataPoint() );
+        
+	do{
+	
+	thePhysicalLoggers[log_no].push( theDataInterval.getFinalDataPoint() );
+	psize=thePhysicalLoggers[log_no].size();
+	++log_no;
+	}
+	while ((log_no<=_LOGGER_MAX_PHYSICAL_LOGGERS) &&
+		(((psize%_LOGGER_DIVIDE_STEP)==0)));
+	
 	theLastTime = aTime;
 	theDataInterval.beginNewInterval();
       }
@@ -275,7 +307,7 @@ namespace libecs
     if ( ( theDataInterval.getInterval() != -1.0 ) && 
 	 ( theMinimumInterval > 0 ) )
       {  
-	thePhysicalLogger.push( theDataInterval.getFinalDataPoint() );
+	thePhysicalLoggers[0].push( theDataInterval.getFinalDataPoint() );
 	theDataInterval.beginNewInterval();
       }
   }
@@ -284,7 +316,7 @@ namespace libecs
 
   Real Logger::getStartTime( void ) const
   {
-    return thePhysicalLogger.front().getTime();
+    return thePhysicalLoggers[0].front().getTime();
   }
 
 
@@ -292,7 +324,7 @@ namespace libecs
 
   Real Logger::getEndTime( void ) const
   {
-    return thePhysicalLogger.back().getTime();
+    return thePhysicalLoggers[0].back().getTime();
   }
 
 

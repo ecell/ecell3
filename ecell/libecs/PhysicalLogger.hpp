@@ -31,12 +31,11 @@
 #if !defined(__PHYSICALLOGGER_HPP)
 #define __PHYSICALLOGGER_HPP
 
-#include "libecs.hpp"
-
 #include "Exceptions.hpp"
 #include "VVector.h"
 #include "DataPoint.hpp"
 
+#include "libecs.hpp"
 #include "DataPointVector.hpp"
 
 namespace libecs
@@ -89,6 +88,20 @@ namespace libecs
 			  const iterator& end,
 			  RealCref time ) const;
 
+    iterator lower_bound_linear_backwards( const iterator& start,
+			  const iterator& end,
+			  RealCref time ) const;
+
+    iterator lower_bound_linear_estimate( const iterator& start,
+			  const iterator& end,
+			  RealCref time,
+			  RealCref time_per_step ) const;
+
+    iterator upper_bound_linear_estimate( const iterator& start,
+			  const iterator& end,
+			  RealCref time,
+			  RealCref time_per_step ) const;
+
     iterator lower_bound_search( const iterator& start,
 			  const iterator& end,
 			  RealCref time,
@@ -102,6 +115,10 @@ namespace libecs
     iterator next_index( const iterator& start) const;
 
     void getItem( const iterator&, DataPointPtr ) const;
+    
+//    void set_stats(const iterator& distance,const iterator&) const;
+    
+//    void set_default_stats() const;
 
     DataPointVectorRCPtr getVector( const iterator& start,
 				    const iterator& end ) const;
@@ -158,10 +175,20 @@ namespace libecs
 	}
     }
 
-
+  
+Real get_avg_interval() const
+   {
+   if (size()<2)
+     {
+       return -1.0;
+     }
+   else
+     {
+       return (back().getTime()-front().getTime())/(size()-1);
+     }
+   }
 
   private:
-
     iterator theCurrentPosition;
     DataPoint anEmptyDataPoint;
     // this mutable can be removed if vvector supports const operations

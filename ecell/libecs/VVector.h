@@ -45,8 +45,8 @@
  *::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
  *	$Id$
  :	$Log$
- :	Revision 1.3  2003/02/23 15:17:40  shafi
- :	Logger::getData performance tuning by gabor
+ :	Revision 1.4  2003/03/18 09:06:36  shafi
+ :	logger performance improvement by gabor
  :
  :	Revision 1.2  2003/02/03 15:31:56  shafi
  :	changed vvector cache sizes to 1024
@@ -88,12 +88,13 @@
 #ifdef __BORLANDC__
 typedef int ssize_t;
 #endif /* __BORLANDC__ */
-const unsigned int VVECTOR_READ_CACHE_SIZE = 1024;
+const unsigned int VVECTOR_READ_CACHE_SIZE = 2048;
 const unsigned int VVECTOR_WRITE_CACHE_SIZE = 2048;
 const unsigned int VVECTOR_READ_CACHE_INDEX_SIZE = 2;
 const unsigned int VVECTOR_WRITE_CACHE_INDEX_SIZE = 2;
-
-
+//const unsigned int DR_MIN_SIZE = 200000; //minimum one megs should be read by direct read
+//const unsigned int DR_MIN_DIST = 1; //data points should be at least 2 logical blocks away from each other
+//const double DR_ERROR_INTERVAL = 0.01; //1% range should be read around the estimated data point
 class vvectorbase {
 // types
 public:
@@ -114,14 +115,15 @@ private:
 protected:
   int _myNumber;
   char *_file_name;
-  int _fd;
+  int _fdr,_fdw;
 
 // protected methods
   void initBase(char const * const dirname);
   void my_open_to_append();
   void my_open_to_read(long offset);
   void my_close();
-
+//  ssize_t my_direct_read(void* buffer, size_t num_to_read, off_t position);
+//  long get_logical_block_size();
 // constcuctor, destcuctor
 public:
   vvectorbase();
@@ -153,7 +155,8 @@ private:
   value_type _cacheWV[VVECTOR_WRITE_CACHE_SIZE];
   size_type _cacheWI[VVECTOR_WRITE_CACHE_INDEX_SIZE];
   size_type _cacheWNum;
-
+//  bool direct_read_flag;
+//  size_t direct_read_interval;
 // constructor, destructor
 public:
   vvector();
@@ -167,6 +170,8 @@ public:
   size_type size() const { return _size; };
   void clear();
   static void setDiskFullCB(void(*)());
+//  void set_direct_read_stats(size_type distance,size_type num_of_elements);
+//  void set_direct_read_stats();
 };
 
 
@@ -177,6 +182,7 @@ public:
 #include <memory.h>
 #include <stdio.h>
 #include <assert.h>
+#include <errno.h>
 #if 	defined(__BORLANDC__)
 #include <io.h>
 #elif	defined(__linux__)
@@ -184,6 +190,7 @@ public:
 #include <sys/io.h>
 #else
 #include <unistd.h>
+
 #endif
 
 
@@ -200,6 +207,7 @@ template<class T> vvector<T>::vvector()
   } while (0 <= --counter);
   _cacheWNum = 0;
   _size = 0;
+//  direct_read_flag=false;
 }
 
 
@@ -215,34 +223,37 @@ template<class T> void vvector<T>::push_back(const T & x)
   if (_cacheWNum==0){_cacheWI[0]=_size;}
   _cacheWI[1] = _size;
   if (VVECTOR_WRITE_CACHE_SIZE <= ++_cacheWNum) {
-    my_open_to_append();
-    if (write(_fd, _cacheWV, sizeof(T) * VVECTOR_WRITE_CACHE_SIZE)
+//    my_open_to_append();
+    if (write(_fdw, _cacheWV, sizeof(T) * VVECTOR_WRITE_CACHE_SIZE)
 	!= sizeof(T) * VVECTOR_WRITE_CACHE_SIZE) {
       fprintf(stderr, "write() failed in VVector.\n");
       cbError();
     }
     _cacheWNum = 0;
-    my_close();
+//    my_close();
   }
   _size++;
 }
 
+//template<class T>  void vvector<T>::set_direct_read_stats(size_type distance,
+//				    size_type num_of_elements)
+//    {
+//    printf("distance: %i,num of elements: %i\n",distance,num_of_elements);
+//    direct_read_flag=(((sizeof(T)*num_of_elements*distance)>DR_MIN_SIZE)&&
+//		((sizeof(T)*distance)>get_logical_block_size()*DR_MIN_DIST));
+    
+//    direct_read_interval=static_cast<size_type>(distance*DR_ERROR_INTERVAL);
+//    direct_read_flag=false;    
+//    }
+
+//template<class T>  void vvector<T>::set_direct_read_stats()
+//    {
+//    direct_read_flag=false;
+//    }
 
 template<class T>  T const & vvector<T>::operator [] (size_type i)
 {
   assert(i < _size);
-/*  int counter = VVECTOR_READ_CACHE_SIZE - 1;
-  do {
-    if (_cacheRI[counter] == i) {
-      return _cacheRV[counter];
-    }
-  } while (0 <= --counter);
-  counter = VVECTOR_WRITE_CACHE_SIZE - 1;
-  do {
-    if (_cacheWI[counter] == i) {
-      return _cacheWV[counter];
-    }
-  } while (0 <= --counter);*/
   if (( i >= _cacheRI[0])&&(_cacheRI[1]>=i)){
   //calculate i's position
     return _cacheRV[i-_cacheRI[0]];
@@ -251,27 +262,66 @@ template<class T>  T const & vvector<T>::operator [] (size_type i)
   //calculate i's position
     return _cacheWV[i-_cacheWI[0]];
   }
+  size_type i2=i; //forward sequential read assumed
+ 
+  size_t half_size,read_interval;
+//    if ((direct_read_flag)&&(direct_read_interval<VVECTOR_READ_CACHE_SIZE)){
+//        printf("direct read on\n");
+//	read_interval=direct_read_interval;
+//    }
+//    else{
+//	printf("direct read off\n");
+	read_interval=VVECTOR_READ_CACHE_SIZE;
+//    }
   
-  my_open_to_read(static_cast<off_t>(i * sizeof(T)));
-  size_type num_to_read = _size - i;
+  // detect sequential read
+  if ((i+1)==_cacheRI[0])
+    {
+    if (_cacheRI[0]>=read_interval){
+    i2=_cacheRI[0]-read_interval;}
+    else {i2=0;}
+//    printf("backward sequential  access\n");
+    }
+    else if((_cacheRI[1]+1)!=i){ //not forward sequential, therefore random access
+//    printf("random access\n");
+    half_size=read_interval/2;
+    if (i>half_size){i2=(i-half_size);} else {i2=0;}
+    }
+  ssize_t num_red;
+  size_type num_to_read = _size - i2 ;
   if (VVECTOR_READ_CACHE_SIZE < num_to_read) {
     num_to_read = VVECTOR_READ_CACHE_SIZE;
   }
-  ssize_t num_red = read(_fd, _cacheRV, num_to_read * sizeof(T));
+//if (direct_read_flag){
+//    if (direct_read_interval<num_to_read){num_to_read=direct_read_interval;}
+//    off_t block_end=(((num_to_read+i2)*sizeof(T))/get_logical_block_size())+1;
+//    num_to_read=block_end*get_logical_block_size()/sizeof(T)-i2;
+//  if (VVECTOR_READ_CACHE_SIZE < num_to_read) {
+//    num_to_read = VVECTOR_READ_CACHE_SIZE;
+//  }
+//
+//    num_red=my_direct_read(_cacheRV, num_to_read*sizeof(T),i2*sizeof(T));
+//    }
+//    else
+//    {
+  my_open_to_read(static_cast<off_t>(i2 * sizeof(T)));
+  num_red = read(_fdr, _cacheRV, num_to_read * sizeof(T));
+//  }
   if (num_red < 0) {
     fprintf(stderr, "read() failed in VVector. i=%ld, _size=%ld, n=%ld\n",
-	    (long)i, (long)_size, (long)num_to_read);
+	    (long)i2, (long)_size, (long)num_to_read);
+    fprintf(stderr,"hiba %s\n",strerror(errno));
     cbError();
   }
   num_red /= sizeof(T);
-/*  for (ssize_t tmp_index = 0; tmp_index < num_red; tmp_index++) {
-    _cacheRI[tmp_index] = i + tmp_index;
-  }*/
-  _cacheRI[0]=i;
-  _cacheRI[1]=i+num_red-1;
+ // printf("i, %i, i2, %i, num_red, %i\n",i,i2,num_red);
+  _cacheRI[0]=i2;
+  _cacheRI[1]=i2+num_red-1;
   
-  _buf = _cacheRV[0];
-  my_close();
+
+  _buf = _cacheRV[i-_cacheRI[0]];
+//my_close();
+
   return _buf;
 }
 
@@ -306,7 +356,7 @@ template<class T>  T const & vvector<T>::at(size_type i)
   if (VVECTOR_READ_CACHE_SIZE < num_to_read) {
     num_to_read = VVECTOR_READ_CACHE_SIZE;
   }
-  ssize_t num_red = read(_fd, _cacheRV, num_to_read * sizeof(T));
+  ssize_t num_red = read(_fdr, _cacheRV, num_to_read * sizeof(T));
   if (num_red < 0) {
     fprintf(stderr, "read() failed in VVector. i=%ld, _size=%ld, n=%ld\n",
 	    (long)i, (long)_size, (long)num_to_read);
@@ -320,7 +370,7 @@ template<class T>  T const & vvector<T>::at(size_type i)
   _cacheRI[1]=i+num_red-1;
   
   _buf = _cacheRV[0];
-  my_close();
+//  my_close();
   return _buf;
 }
 

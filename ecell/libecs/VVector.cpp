@@ -45,8 +45,11 @@
  *::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
  *	$Id$
  :	$Log$
- :	Revision 1.2  2003/03/01 02:43:51  shafi
- :	changed envvar name: ECSTMPDIR to VVECTORTMPDIR, changed default vvector dir: /var/tmp to /tmp
+ :	Revision 1.3  2003/03/18 09:06:36  shafi
+ :	logger performance improvement by gabor
+ :
+ :	Revision 1.2 2003/03/01 02:43:51  shafi
+ :	changed envvar name: ECSTMPDIR to VVECTORTMPDIR, changed defult vvector dir: /var/tmp to /tmp
  :
  :	Revision 1.1  2002/04/30 11:21:53  shafi
  :	gabor's vvector logger patch + modifications by shafi
@@ -154,20 +157,26 @@ vvectorbase::vvectorbase()
       cbError();
     }
   }
+//  osif_direct_read_init(_defaultDirectory);
+
 }
 
 
 vvectorbase::~vvectorbase()
 {
 #ifndef OPEN_WHEN_ACCESS
-	if (0 <= _fd) {
-		close(_fd);
+	if (0 <= _fdr) {
+		close(_fdr);
+	}
+	if (0 <= _fdw) {
+		close(_fdw);
 	}
 #endif /* OPEN_WHEN_ACCESS */
 	if (_file_name != NULL) {
 		unlink(_file_name);
 		free(_file_name);
 	}
+//	osif_direct_read_close();
 }
 
 
@@ -220,22 +229,32 @@ void vvectorbase::initBase(char const * const dirname)
   strcat(pathname, filename);
   _file_name = strdup(pathname);
   _tmp_name.push_back(_file_name);
-  _fd = open(_file_name, O_WRONLY | O_CREAT | O_TRUNC | O_BINARY, 0600);
-  if (_fd < 0) {
+  _fdw = open(_file_name, O_WRONLY | O_CREAT | O_TRUNC | O_BINARY, 0600);
+  if (_fdw < 0) {
     fprintf(stderr, "open(\"%s\") failed in VVector.\n", _file_name);
     cbError();
     exit(1);
   }
-  close(_fd);
-  _fd = -1;
+//  close(_fd);
+//    osif_direct_read_init(_file_name);
+
+//   my_open_to_read(0);
+ _fdr = open(_file_name, O_RDONLY | O_BINARY );
+  if (_fdr < 0) {
+    fprintf(stderr, "open(\"%s\") failed in VVector err=%s.\n",
+	    _file_name, strerror(errno));
+    cbError();
+    exit(1);
+  }
+//  _fdw = my_open_to_append();  
 }
 
 
 void vvectorbase::my_open_to_append()
 {
   checkDiskFull(_file_name, 0);
-  _fd = open(_file_name, O_WRONLY | O_APPEND | O_BINARY);
-  if (_fd < 0) {
+  _fdw = open(_file_name, O_WRONLY | O_APPEND | O_BINARY);
+  if (_fdw < 0) {
     fprintf(stderr, "open(\"%s\") failed in VVector err=%s.\n",
 	    _file_name, strerror(errno));
     cbError();
@@ -246,31 +265,43 @@ void vvectorbase::my_open_to_append()
 
 void vvectorbase::my_open_to_read(off_t offset)
 {
-  _fd = open(_file_name, O_RDONLY | O_BINARY);
-  if (_fd < 0) {
+if (_fdr<0) {
+ _fdr = open(_file_name, O_RDONLY | O_BINARY );
+ }
+  if (_fdr < 0) {
     fprintf(stderr, "open(\"%s\") failed in VVector err=%s.\n",
 	    _file_name, strerror(errno));
     cbError();
     exit(1);
   }
-  if (lseek(_fd, offset, SEEK_SET) == static_cast<off_t>(-1)) {
+  if (lseek(_fdr, offset, SEEK_SET) == static_cast<off_t>(-1)) {
     fprintf(stderr, "lseek(\"%s\") failed in VVector err=%s.\n",
 	    _file_name, strerror(errno));
     assert(0);
   }
 }
 
+//ssize_t vvectorbase::my_direct_read(void * buffer, size_t num_to_read, 
+//				off_t position)
+//    {
+//    return osif_direct_read(_file_name,buffer, num_to_read,position);
+//    }
+
+//long vvectorbase::get_logical_block_size(){
+//    return osif_get_logical_block_size();
+//}
 
 void vvectorbase::my_close()
 {
-  assert(0 <= _fd);
-  if (close(_fd) < 0) {
+  assert((0 <= _fdr)&&(0<=_fdw));
+  if ((close(_fdr) < 0)||(close(_fdw) < 0)) {
     fprintf(stderr, "close(\"%s\") failed in VVector err=%s.\n",
 	    _file_name, strerror(errno));
     cbError();
     exit(1);
   }
-  _fd = -1;
+  _fdr = -1;
+  _fdw = -1;
 }
 
 
