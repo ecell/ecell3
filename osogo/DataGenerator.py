@@ -71,7 +71,8 @@ class DataGenerator:
             else:
                 dataList = aDataSeries.getAllData()
                 lastTime = dataList[ len( dataList) -1 ][0]
-                dataList = self.__theSession.theSimulator.getLoggerData( fullPNString, lastTime, currentTime,requiredResolution )
+                dataList = self.__theSession.theSimulator.getLoggerData( fullPNString, 
+                            lastTime, currentTime,requiredResolution )
                 
                 # I havent yet updated the new logger code from CVS, but isn't changed to getDigest?
                 
@@ -97,6 +98,9 @@ class DataGenerator:
 
     # end of requestNewData
 
+    def __checkDataSeries( self, aDataSeries ):
+        pass
+
 
     def requestData( self, aDataSeries, numberOfElements ):
         '''
@@ -115,10 +119,11 @@ class DataGenerator:
                 aStartTime = self.__theSession.theSimulator.getLoggerStartTime( fullPNString )
                 anEndTime = self.__theSession.theSimulator.getLoggerEndTime ( fullPNString )
                 requiredResolution = ( anEndTime - aStartTime ) / numberOfElements
-                dataList = self.__theSession.theSimulator.getLoggerData( fullPNString, aStartTime, anEndTime,   requiredResolution )
+                dataList = self.__theSession.theSimulator.getLoggerData( fullPNString, 
+                    aStartTime, anEndTime,   requiredResolution )
         else:
             pass
-            return
+            #return
             # do interpolation on X axis
 
         aDataSeries.replacePoints( dataList )
@@ -140,11 +145,11 @@ class DataGenerator:
     
                 dataList =  zeros( (0,5 ) )
             else:
-
                 dataList = self.__theSession.theSimulator.getLoggerData( fullPNString, startX, endX, requiredResolution )
+
         else:
             pass
-            return
+            #return
             # do Xaxis interpolation here for phase plotting
 
         aDataSeries.replacePoints( dataList )

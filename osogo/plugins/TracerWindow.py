@@ -229,6 +229,8 @@ class TracerWindow( OsogoPluginWindow ):
         pass_list = []
         for aFullPN in aFullPNList: 
             aFullPNString = createFullPNString( aFullPN )
+            if aFullPNString in self.displayedFullPNStringList:
+                continue
             #gets most recent value
             #check whether there's enough room left
             if len(self.displayedFullPNStringList) < self.thePlotInstance.getMaxTraces():

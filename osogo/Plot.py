@@ -519,6 +519,8 @@ class DataSeries:
     def getNewData( self ):
         return self.theNewData
 
+    
+
     def drawNewPoints( self ):
         self.drawTrace( self.getNewData() )
         self.theOldData = self.getAllData()
@@ -533,7 +535,7 @@ class DataSeries:
         self.theLastYmax = None
         self.theLastY = None
         self.drawTrace( self.getAllData() )
-        self.theOldData = self.getAllData()        
+        self.theOldData = self.getAllData()
         self.theNewData = nu.zeros( ( 0,5 ) )
 
 
@@ -554,19 +556,19 @@ class DataSeries:
             lasty = self.theLastY
             lastymax = self.theLastYmax
             lastymin = self.theLastYmin
-            
+
             self.theLastX = x
             self.theLastY = y
             self.theLastYmax = ymax
             self.theLastYmin = ymin
             if x == lastx and y==lasty and ymax==lastymax and ymin==lastymin:
                 continue
-            
                 #print x, y, ymax, ymin, datapoint[DP_TIME], datapoint[DP_VALUE], datapoint[DP_MAX], datapoint[DP_MIN]
             if self.thePlot.getDisplayMinMax():
                 self.drawMinMax( self.getColor(), x, ymax, ymin )
-                
+
             self.drawPoint( self.getColor(), x, y, lastx, lasty )
+
 
 
     def drawMinMax(self, aColor, x, ymax, ymin):
@@ -888,6 +890,7 @@ class Plot:
             self.theYAxis.reframe()
             self.theYAxis.draw()
             redrawFlag = True
+
         if self.theXAxis.isOutOfFrame( self.theRanges[2], self.theRanges[3] ):
             redrawFlag = True
             if self.theXAxis.getType() == PLOT_TIME_AXIS:
@@ -912,11 +915,13 @@ class Plot:
     def setStripMode(self, aMode):
 
         self.theStripMode = aMode
+        self.requestData( )
         if aMode == MODE_STRIP:
             self.getRanges()
-            self.requestDataSlice( self.theRanges[2] - self.theStripInterval, self.theRanges[2] )
-        else:
-            self.requestData( )
+            self.theOwner.requestDataSlice( self.theRanges[3] - self.theStripInterval,
+                self.theRanges[3] - self.theStripInterval / 2, 
+                self.theStripInterval / self.theXAxis.theLength )
+
         self.theZoomLevel = 0
         self.theZoomBuffer = []
         self.theZoomKeyPressed = False
@@ -993,8 +998,8 @@ class Plot:
 
 
     def getRequiredTimeResolution( self ):
-        return self.theXAxis.thePixelSize / 2
-
+        return ( self.theXAxis.theFrame[1] - self.theXAxis.theFrame[0] ) / self.theXAxis.theLength * 2
+        
     def doConnectPoints( self, aBool ):
         self.doesConnectPoints = aBool
 
@@ -1119,9 +1124,12 @@ class Plot:
 
 
     def shiftPlot( self ):
-        halfPoint = int( self.theStripInterval / 2 ) + self.theXAxis.theFrame[0]   
+        halfPoint =  self.theRanges[3] - int( self.theStripInterval / 2 ) 
+        self.cutSeries( halfPoint )
+
+    def cutSeries( self, aThreshold ):
         for aSeries in self.theSeriesMap.values():
-            aSeries.deletePoints( halfPoint )               
+            aSeries.deletePoints( aThreshold )
 
 
     def getRanges(self):
@@ -1387,15 +1395,17 @@ class Plot:
 
 
     def drawWholePlot(self):
+
         #clears plotarea
         self.clearPlotarea()
         self.drawFrame()
+
         #go trace by trace and redraws plot
         for aSeries in self.theSeriesMap.values():
             if aSeries.isOn():
                 aSeries.drawAllPoints()
-            
         self. printTraceLabels()
+
 
     def drawFrame( self ):
         x0 = self.theOrigo[0]
