@@ -572,9 +572,18 @@ namespace libecs
 
     theMidVelocityBuffer.resize( aSize );
     theErrorEstimate.resize( aSize );
-    theNextK1.resize( aSize );
 
     theInterrupted = true;
+  }
+
+  void DormandPrince547MStepper::step()
+  {
+    AdaptiveDifferentialStepper::step();
+
+    if ( getOriginalStepInterval() > getStepInterval() )
+      {
+	theInterrupted = true;
+      }
   }
 
   bool DormandPrince547MStepper::calculate()
@@ -590,11 +599,8 @@ namespace libecs
 
     // ========= 1 ===========
 
-    // we can't reuse theNextK1 for theK1,
-    // untill developing non-caller interruption
-
-    //    if ( theInterrupted )
-    if ( 1 )
+    if ( theInterrupted )
+    //    if ( 1 )
       {
 	process();
 
@@ -613,9 +619,6 @@ namespace libecs
 	    theVelocityBuffer[ c ] = theK1[ c ] * ( 35.0 / 384.0 );
 	    // k1 * 5179/57600 for ~Yn+1
 	    theErrorEstimate[ c ] = theK1[ c ] * ( 5179.0 / 57600.0 );
-	    // k1 * 5783653/57600000 for Yn+.5
-	    theMidVelocityBuffer[ c ] = theK1[ c ] 
-	      * ( 5783653.0 / 57600000.0 );
 
 	    // clear velocity
 	    aVariable->setVelocity( 0.0 );
@@ -628,8 +631,8 @@ namespace libecs
 	    VariablePtr const aVariable( theVariableVector[ c ] );
 	
 	    // get k1
-	    theK1[ c ] = theNextK1[ c ];
-	    
+	    theK1[ c ] = theK7[ c ];
+
 	    aVariable->loadValue( theK1[ c ] * ( 1.0 / 5.0 )
 				  * getStepInterval()
 				  + theValueBuffer[ c ] );
@@ -638,9 +641,6 @@ namespace libecs
 	    theVelocityBuffer[ c ] = theK1[ c ] * ( 35.0 / 384.0 );
 	    // k1 * 5179/57600 for ~Yn+1
 	    theErrorEstimate[ c ] = theK1[ c ] * ( 5179.0 / 57600.0 );
-	    // k1 * 5783653/57600000 for Yn+.5
-	    theMidVelocityBuffer[ c ] = theK1[ c ] 
-	      * ( 5783653.0 / 57600000.0 );
 
 	    // clear velocity
 	    aVariable->setVelocity( 0.0 );
@@ -667,8 +667,6 @@ namespace libecs
 	//	    theVelocityBuffer[ c ] += theK2[ c ] * 0;
 	// k2 * 0 for ~Yn+1 (do nothing)
 	//	    theErrorEstimate[ c ] += theK2[ c ] * 0;
-	// k2 * 0 for Yn+.5 (do nothing)
-	//	    theMidVelocityBuffer[ c ] += theK2[ c ] * 0;
 
 	// clear velocity
 	aVariable->setVelocity( 0.0 );
@@ -696,13 +694,10 @@ namespace libecs
 	theVelocityBuffer[ c ] += theK3[ c ] * ( 500.0 / 1113.0 );
 	// k3 * 7571/16695 for ~Yn+1
 	theErrorEstimate[ c ] += theK3[ c ] * ( 7571.0 / 16695.0 );
-	// k3 * 466123/1192500 for Yn+.5
-	theMidVelocityBuffer[ c ] += theK3[ c ] * ( 466123.0 / 1192500.0 );
 
 	// clear velocity
 	aVariable->setVelocity( 0.0 );
       }
-
 
     // ========= 4 ===========
     setCurrentTime( aCurrentTime + getStepInterval() * 0.8 );
@@ -726,8 +721,6 @@ namespace libecs
 	theVelocityBuffer[ c ] += theK4[ c ] * ( 125.0 / 192.0 );
 	// k4 * 393/640 for ~Yn+1
 	theErrorEstimate[ c ] += theK4[ c ] * ( 393.0 / 640.0 );
-	// k4 * -41347/1920000 for Yn+.5
-	theMidVelocityBuffer[ c ] += theK4[ c ] * ( -41347.0 / 1920000.0 );
 
 	// clear velocity
 	aVariable->setVelocity( 0.0 );
@@ -756,8 +749,6 @@ namespace libecs
 	theVelocityBuffer[ c ] += theK5[ c ] * ( -2187.0 / 6784.0 );
 	// k5 * -92097/339200 for ~Yn+1
 	theErrorEstimate[ c ] += theK5[ c ] * ( -92097.0 / 339200.0 );
-	// k5 * 16122321/339200000 for Yn+.5
-	theMidVelocityBuffer[ c ] += theK5[ c ] * ( 16122321.0 / 339200000.0 );
 
 	// clear velocity
 	aVariable->setVelocity( 0.0 );
@@ -787,8 +778,6 @@ namespace libecs
 	theVelocityBuffer[ c ] += theK6[ c ] * ( 11.0 / 84.0 );
 	// k6 * 187/2100 for ~Yn+1
 	theErrorEstimate[ c ] += theK6[ c ] * ( 187.0 / 2100.0 );
-	// k6 * -7117/20000 for Yn+.5
-	theMidVelocityBuffer[ c ] += theK6[ c ] * ( -7117.0 / 20000.0 );
 
 	// clear velocity
 	aVariable->setVelocity( 0.0 );
@@ -810,8 +799,14 @@ namespace libecs
 
 	// k7 * 1/40 for ~Yn+1
 	theErrorEstimate[ c ] += theK7[ c ] * ( 1.0 / 40.0 );
-	// k7 * 183/100000 for Yn+.5
-	theMidVelocityBuffer[ c ] += theK7[ c ] * ( 183.0 / 100000.0 );
+
+	// calculate velocity for Xn+.5
+	theMidVelocityBuffer[ c ] = theK1[ c ] * ( 6025192743.0 / 30085553152 )
+	  + theK3[ c ] * ( 51252292925.0 / 65400821598.0 )
+	  + theK4[ c ] * ( -2691868925.0 / 45128329728.0 )
+	  + theK5[ c ] * ( 187940372067.0 / 1594534317056.0 )
+	  + theK6[ c ] * ( -1776094331.0 / 19743644256.0 )
+	  + theK7[ c ] * ( 11237099.0 / 235043384.0 );
 
 	const Real aTolerance( eps_rel * 
 			       ( a_y * fabs( theValueBuffer[ c ] ) 
@@ -826,48 +821,26 @@ namespace libecs
 	    maxError = anError;
 	  }
 	
-	aVariable->loadValue( theValueBuffer[ c ] 
-			      + theVelocityBuffer[ c ]
-			      * getStepInterval() );
+	aVariable->loadValue( theValueBuffer[ c ] );
 	aVariable->setVelocity( 0.0 );
       }
 
     setMaxErrorRatio( maxError );
+    setCurrentTime( aCurrentTime );
 
     if( maxError > 1.1 )
       {
 	// reset the stepper current time
-	setCurrentTime( aCurrentTime );
 	reset();
 	setOriginalStepInterval( 0.0 );
+	theInterrupted = true;
 
 	return false;
       }
 
-    // ========= 8 ===========
-    //    setCurrentTime( aCurrentTime + getStepInterval() );
-    theInterrupted = false;
-    process();
-
-    // restore theValueBuffer
-    for( UnsignedInt c( 0 ); c < aSize; ++c )
-      {
-	VariablePtr const aVariable( theVariableVector[ c ] );
-	
-	// get K1 at next step
-	theNextK1[ c ] = aVariable->getVelocity();
-
-	// restore x (original value)
-	aVariable->loadValue( theValueBuffer[ c ] );
-
-	/// O(h^6)
-	aVariable->setVelocity( theVelocityBuffer[ c ] );
-      }
-
-    setCurrentTime( aCurrentTime );
-
     // set the error limit interval
     setOriginalStepInterval( getStepInterval() );
+    theInterrupted = false;
 
     return true;
   }

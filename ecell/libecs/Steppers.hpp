@@ -171,13 +171,13 @@ namespace libecs
 	const Real k1 = theStepper.getK1()[ theIndex ];
 	const Real k2 = theStepper.getMidVelocityBuffer()[ theIndex ];
 	const Real k3 = theStepper.getVelocityBuffer()[ theIndex ];
-	const Real k4 = theStepper.getNextK1()[ theIndex ];
+	const Real k4 = theStepper.getK7()[ theIndex ];
 
-	return anInterval
-	  * ( k1 + theta * ( ( theta - 0.5 ) * 2 * ( k3 - k1 )
-			     - ( theta - 1 ) * 4 * ( k1 - k2 - k2 )
-			     + ( theta - 0.5 ) * ( theta - 1 )
-			     * 2 * ( k4 - k1 - 4 * k3 + 8 * k2 ) ) );
+	return anInterval * ( k1 + theta
+			      * ( (theta - 0.5) * 2.0 * (k3 - k1)
+				  + (theta - 1.0) * 4.0 * (k1 - k2) 
+				  + (theta - 0.5) * (theta - 1.0) 
+				  * 2.0 * (k4 - k1 - 4*k3 + 4*k2) ) );
       }
 
       virtual const Real getDifference( RealCref aTime, RealCref anInterval )
@@ -189,29 +189,6 @@ namespace libecs
 
 	return ( i1 - i2 );
       }
-
-      /*
-      virtual const Real getDifference( RealCref aTime, RealCref anInterval )
-      {
-	const Real aTimeInterval( aTime - theStepper.getCurrentTime() );
-
-	const Real theta1( aTimeInterval / theStepper.getStepInterval() );
-	const Real theta2( ( aTimeInterval - anInterval )
-			   / theStepper.getStepInterval() );
-
-	const Real theta( theta1 + theta2 );
-
-	const Real k1 = theStepper.getK1()[ theIndex ];
-	const Real k2 = theStepper.getMidVelocityBuffer()[ theIndex ];
-	const Real k3 = theStepper.getVelocityBuffer()[ theIndex ];
-
-	const Real b = (-3) * k1 + 4 * k2 + (-1) * k3;
-	const Real c = (+2) * k1 - 4 * k2 + (+2) * k3;
-
-	return ( ( k1 + theta * ( b + c * theta ) - c * theta1 * theta2 )
-		 * anInterval );
-      }
-      */
 
     protected:
 
@@ -225,6 +202,7 @@ namespace libecs
     virtual ~DormandPrince547MStepper() {}
 
     virtual void initialize();
+    virtual void step();
     virtual bool calculate();
 
     virtual void interrupt( StepperPtr const aCaller );
@@ -242,9 +220,9 @@ namespace libecs
       return theMidVelocityBuffer;
     }
 
-    RealVectorCref getNextK1() const
+    RealVectorCref getK7() const
     {
-      return theNextK1;
+      return theK7;
     }
 
   protected:
@@ -259,7 +237,6 @@ namespace libecs
 
     RealVector theMidVelocityBuffer;
     RealVector theErrorEstimate;
-    RealVector theNextK1;
 
     bool theInterrupted;
   };

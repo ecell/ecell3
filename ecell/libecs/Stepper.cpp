@@ -826,31 +826,31 @@ namespace libecs
       {
 	const Real
 	  anExpectedStepInterval( getStepInterval() 
-				  * pow( getMaxErrorRatio(),
+				  * pow( getMaxErrorRatio(), 
 					 -1.0 / getOrder() ) 
 				  * safety );
 
-	  if ( anExpectedStepInterval > getMinInterval() )
-	    {
-	      // shrink it if the error exceeds 110%
-	      setStepInterval( anExpectedStepInterval );
-	      
-	      //	setStepInterval( getStepInterval() * 0.5 );
+	if ( anExpectedStepInterval > getMinInterval() )
+	  {
+	    // shrink it if the error exceeds 110%
+	    setStepInterval( anExpectedStepInterval );
 
-	      //	std::cerr << "s " << getCurrentTime() 
-	      //		  << ' ' << getStepInterval()
-	      //		  << std::endl;
-	    }
-	  else
-	    {
-	      setStepInterval( getMinInterval() );
+	    //	setStepInterval( getStepInterval() * 0.5 );
 
-	      // this must return false,
-	      // so theOriginalStepInterval does NOT LIMIT the error.
-	      calculate();
-	      setOriginalStepInterval( getMinInterval() );
-	      break;
-	    }
+	    //	std::cerr << "s " << getCurrentTime() 
+	    //		  << ' ' << getStepInterval()
+	    //		  << std::endl;
+	  }
+	else
+	  {
+	    setStepInterval( getMinInterval() );
+	    
+	    // this must return false,
+	    // so theOriginalStepInterval does NOT LIMIT the error.
+	    calculate();
+	    setOriginalStepInterval( getMinInterval() );
+	    break;
+	  }
       }
 
     if ( getOriginalStepInterval() < getMinInterval() )
@@ -868,22 +868,13 @@ namespace libecs
 	VariablePtr const aVariable( theVariableVector[ c ] );
 
 	Real const aTolerance( ( fabs( aVariable->getValue() ) 
-				 + theAbsoluteEpsilon ) * theRelativeEpsilon );
+				 + theAbsoluteEpsilon ) 
+			       * theRelativeEpsilon );
 	Real const aVelocity( fabs( theVelocityBuffer[ c ] ) );
 
 	if ( aTolerance < aVelocity * getStepInterval() )
 	  {
 	    setStepInterval( aTolerance / aVelocity );
-	  }
-      }
-
-    if ( anAdaptedStepInterval > getStepInterval() )
-      {
-	reset();
-
-	if ( !calculate() )
-	  {
-	    ; // this should not be called
 	  }
       }
 

@@ -750,7 +750,7 @@ namespace libecs
     virtual const Int getOrder() const { return 1; }
 
     virtual void initialize();
-    void step();
+    virtual void step();
     virtual bool calculate() = 0;
 
 
