@@ -20,8 +20,6 @@ class MainWindow(Window):
 
         self.theSimulator = ecs.Simulator()
 
-        # self.thePluginWindowManager = PluginWindowManager()
-
         Window.__init__( self )
 
         self.theHandlerMap = \
@@ -68,11 +66,6 @@ class MainWindow(Window):
         #### create Palette Window ####
         self.thePaletteWindow = PaletteWindow.PaletteWindow()
 
-        #### ######## ####
-        #### FOR TEST ####
-        #### ######## ####
-#        self.theSimulator = simulator()
-
 
     ###### window operation ####
     def closeParentWindow( self, button_obj):
@@ -114,7 +107,7 @@ class MainWindow(Window):
     def stepSimulation( self, a ) : pass
 
     def createNewEntryList( self, button_obj ) :
-        aEntryList = EntryListWindow.EntryListWindow( self, self.theSimulator )
+        aEntryList = EntryListWindow.EntryListWindow( self )
     
     def createNewLoggerList( self, a ) : pass
 
