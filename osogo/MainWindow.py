@@ -285,8 +285,8 @@ class simulator :
             'Substrate': ('Substance:/CELL/CYTOPLASM:ATP',
                           'Substance:/CELL/CYTOPLASM:ADP', ),
             'Product': ('Substance:/CELL/CYTOPLASM:AMP', ),
-            'ClassName' : 'MichaelisMentenReactor'
-            'Name' : ('AAA Reactor',),
+            'ClassName' : 'MichaelisMentenReactor',
+            'Name' : ('AAA Reactor',)
             }
 
         self.theBBB={
@@ -296,8 +296,8 @@ class simulator :
             'Vmax' : ( 349, ),
             'Substrate': ('Substance:/ENVIRONMENT:Ccc',),
             'Product': ('Substance:/ENVIRONMENT:Ddd', 'Substance:/ENVIRONMENT:Eee' ),
-            'ClassName' : 'MichaosUniUniReactor'
-            'Name' : ('BBB Reactor',),
+            'ClassName' : 'MichaosUniUniReactor',
+            'Name' : ('BBB Reactor',)
             }
 
         self.theCytoplasm={
