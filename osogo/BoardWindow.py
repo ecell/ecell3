@@ -71,7 +71,7 @@ class BoardWindow(OsogoWindow):
 		self.theCol = -1
 		self.thePluginMap = {}
 		self.theSelectedPluginFrame = None
-
+		self.theMainWindow = aMainWindow
 	# end of the __init__
 
 	def openWindow(self):
@@ -93,7 +93,8 @@ class BoardWindow(OsogoWindow):
 		self.theScrolledWindow = self['scrolledwindow1']
 		self.theViewPort=self['viewport1']
 		self.deleteScroll()
-
+		for anEntityWindow in self.theMainWindow.getWindow('EntityListWindow'):
+			anEntityWindow.checkBoardExists()
 
 	def displayScroll(self):
 		if self.theViewPort.get_child() == None:
@@ -118,13 +119,16 @@ class BoardWindow(OsogoWindow):
 	#	return TRUE
 
 	def addPluginWindows( self, aPluginWindowType, aRawFullPNList ):
-		for aRawFullPN in aRawFullPNList:
-			self.attachPluginWindow( aPluginWindowType, aRawFullPN )
+		if aPluginWindowType == 'TracerWindow':
+			self.attachPluginWindow( aPluginWindowType, aRawFullPNList )
+		else:
+			for aRawFullPN in aRawFullPNList:
+				self.attachPluginWindow( aPluginWindowType, [ aRawFullPN ] )
 
-	def attachPluginWindow( self, aPluginWindowType, aRawFullPN ):
+	def attachPluginWindow( self, aPluginWindowType, aRawFullPNList ):
 
 		aButton = self.thePluginManager.createInstance( \
-		    aPluginWindowType, [aRawFullPN], self )
+		    aPluginWindowType, aRawFullPNList, self )
 
 		aTopFrame = aButton['top_frame']
 

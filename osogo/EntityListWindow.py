@@ -55,6 +55,7 @@ class EntityListWindow(OsogoWindow):
 		                    'on_create_button_clicked'     : self.createPluginWindow,\
 		                    'on_append_button_clicked'     : self.__openPluginInstanceSelectionWindow,\
 		                    'on_logger_button_clicked'     : self.createLogger,\
+				    'on_add_to_board_clicked'	   : self.addToBoard,\
 		                    # plugin selection
 		                    #'on_ok_button_plugin_selection_clicked'     : self.appendData,\
 		                    #'on_cancel_button_plugin_selection_clicked'  : self.__closePluginInstanceSelectionWindow,\
@@ -92,6 +93,18 @@ class EntityListWindow(OsogoWindow):
 		# --------------------------------------------
 		self.theSelectedEntityList = []
 		self.theSelectedPluginInstanceList = []
+		
+		# --------------------------------------------
+		# initializes Add to Board button
+		# --------------------------------------------
+		self.checkBoardExists()
+
+	def checkBoardExists( self ):
+		if self.theMainWindow.getWindow('BoardWindow').exists():
+			self['add_to_board'].set_sensitive(TRUE)
+		else:
+			self['add_to_board'].set_sensitive(FALSE)
+		
 
 	def deleted( self, *arg ):
 
@@ -732,12 +745,35 @@ class EntityListWindow(OsogoWindow):
 		"""add plugin window to board
 		"""
 
-		# checks the length of argument, but this is verbose
-		if len( arg ) < 1:
+		self.thePropertyWindow.clearStatusBar()
+
+		if len(arg) == 0:
 			return None
 
-		self.thePropertyWindow.clearStatusBar()
-		aPluginWindowType = arg[0].get_name()
+		aPluginWindowType = DEFAULT_WINDOW
+		aSetFlag = FALSE
+
+		# When this method is called by popup menu
+		if type( arg[0] ) == gtk.MenuItem:
+			aPluginWindowType = obj[0].get_name()
+
+		# When this method is called by 'CreateWindow' button
+		elif type( arg[0] ) == gtk.Button:
+			aPluginWindowType = self['plugin_optionmenu'].get_children()[0].get()
+
+		else:
+			raise TypeErrir("%s must be gtk.MenuItem or gtk.Button" %str(type(obj[0])))
+
+		aSelectedRawFullPNList = self.__getSelectedRawFullPNList()
+
+		# When no FullPN is selected, displays error message.
+		if aSelectedRawFullPNList  == None or len( aSelectedRawFullPNList ) == 0:
+
+			aMessage = 'No entity is selected.'
+			aDialog = ConfirmWindow(OK_MODE,aMessage,'Error!')
+			self.thePropertyWindow.showMessageOnStatusBar(aMessage)
+			return FALSE
+
 		self.theMainWindow.getWindow('BoardWindow').addPluginWindows( aPluginWindowType, \
 		self.__getSelectedRawFullPNList() )
 

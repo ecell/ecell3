@@ -41,7 +41,7 @@ class TracerWindow( OsogoPluginWindow ):
 		if operator.isNumberType( aValue ) == FALSE:
 			aMessage = "Error: (%s) is not numerical data" %aFullPNString
 			self.thePluginManager.printMessage( aMessage )
-			aDialog = ConfirmWindow.ConfirmWindow(0,aMessage,'Error!')
+			aDialog = ConfirmWindow(0,aMessage,'Error!')
 			raise TypeError( aMessage )
 		self.theViewType = MULTIPLE
 		self.min_button_clicked=False
@@ -217,7 +217,7 @@ class TracerWindow( OsogoPluginWindow ):
 			if operator.isNumberType( aValue ) == FALSE:
 				aMessage = "Error: (%s) is not numerical data" %aFullPNString
 				self.thePluginManager.printMessage( aMessage )
-				aDialog = ConfirmWindow.ConfirmWindow(0,aMessage,'Error!')
+				aDialog = ConfirmWindow(0,aMessage,'Error!')
 				raise TypeError( aMessage )
 
 		# appends FullPNList as plot data
