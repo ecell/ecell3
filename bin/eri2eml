@@ -1,0 +1,81 @@
+#!/usr/bin/env python2
+
+import sys
+import string
+
+from ecell.eml import *
+
+def convertFQEN2SystemID( aFQEN ):
+    aPathToSystem = aFQEN.split( ':' )[0]
+    aSystemSimpleID = aFQEN.split( ':' )[1]
+
+    if ( aPathToSystem == '/' ):
+        aSystemID = '/' +aSystemSimpleID
+    else:
+        asystemID = aPathToSystem + '/' +aSystemSimpleID
+    return aSystemID
+
+if __name__ == '__main__':
+    aFilename = sys.argv[1]
+    aFile = open( aFilename )
+    s = aFile.readlines()
+
+test = []
+for l in s:
+     w = l.split('\t')
+     test.append(w)
+#print test
+
+anEml = Eml()
+
+anEml.createStepper( 'Euler1Stepper', 'SRM_01')
+
+for aEriLine in test:
+    if ( aEriLine[0] == 'SYSTEM' ):
+#        aSystemID = convertFQEN2SystemID( line[2] )
+        aSystemFullID = 'System:' +aEriLine[2]
+        anEml.createEntity( 'System', aSystemFullID )
+        
+    elif ( aEriLine[0] == 'SUBSTANCE' ):
+        aSystemFullID = 'Substance:' +aEriLine[2]
+        aEriChunk = aEriLine[4].split()
+        anEml.createEntity( 'Substance', aSystemFullID )
+        anEml.setEntityProperty( aSystemFullID, aEriChunk[0], aEriChunk[1:] )
+        
+    elif ( aEriLine[0] == 'REACTOR' ):
+        aSystemFullID = 'Reactor:' +aEriLine[2]
+        anEml.createEntity( aEriLine[1], aSystemFullID )
+#        print aEriLine[4:]
+        aSubstrateNumber = 0
+        aProductNumber = 0
+        aCatalystNumber = 0
+        aEffectorNumber =0
+        
+        for aEriChunk in aEriLine[4:]:
+            aEriChunkElement = aEriChunk.split()
+            if ( aEriChunkElement[0] == 'Substrate' ):
+#                aSystemFullID = 'Substance:' +aEriChunkElement[1]
+#                print aSystemFullID
+                aReactantList = []
+                aReactantList.append( 'S' + str(aSubstrateNumber) )
+                aSubstrateNumber = aSubstrateNumber + 1
+                aReactantList.append( 'Substance:' + aEriChunkElement[1])
+                aReactantList.append( -1 * int(aEriChunkElement[2]) )
+                anEml.setEntityProperty( aSystemFullID, 'ReactantList', aEriChunkElement )
+                print aReactantList
+                print aEriChunkElement[0]
+            elif ( aEriChunkElement[0] == 'Product' ):
+                print "test pro"
+            elif ( aEriChunkElement[0] == 'Catalyst' ):
+                print "test cata"
+            else:
+                print "test parameter"
+    else:
+        pass
+
+anEml.save('test1.eml')
+a = anEml.asString()
+
+print a
+
+
