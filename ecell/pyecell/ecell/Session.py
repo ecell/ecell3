@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-
+import string
         
 class Session:
 
@@ -66,7 +66,6 @@ class Session:
 
     def loadStepper( self ):
         """stepper loader"""
-        import string
 
         for aTargetStepper in( self.__thePreModel[ 'stepper' ] ):
             aClass = aTargetStepper[0]
@@ -110,18 +109,35 @@ class Session:
 
     def loadEntity( self ):
         """Entity loader"""
-        
+
         for aTargetEntity in( self.__thePreModel[ 'entity' ] ):
-            aFullId = aTargetEntity[0]
-            aType   = aTargetEntity[1]
-            aName   = aTargetEntity[2]
+            aType = aTargetEntity[0]
+            aPath = aTargetEntity[1]
+            anId  = aTargetEntity[2]
+            aName = aTargetEntity[3]
+
+            if aType == 'System':
+
+                ## need refactoring about PathConvert!!                
+                if aPath == '/':
+                    aPath = ''
+                else:
+                    aPathList = aPath.split( '/' )
+                    aLenPathList = len( aPathList )
+                    aPathList = aPathList[0:aLenPathList-1]
+                    aPath     = string.join( aPathList, '/' )
+                    if aPath == '':
+                        aPath = '/'
+                ## --------------------------------------------------
+
+            aFullId = aType + ':' + aPath + ':' + anId
 
             # self.theDriver.createEntity( aType, aFullId, aName )
-
+            
 
             ## TemporarySample ---------------------------------------
-            aPrintFullId = "Session.theSimulator.createEntity('" + aFullId + "',"
-            aPrintType   = "'" + aType + "',"
+            aPrintFullId = "Session.theSimulator.createEntity('" + aType + "',"
+            aPrintType   = "'" + aFullId + "',"
             aPrintName   = "'" + aName + "')"
             print aPrintFullId, aPrintType, aPrintName ## Temporary
             ## -------------------------------------------------------
