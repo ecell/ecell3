@@ -75,7 +75,7 @@ namespace libecs
 
     virtual void step()
     {
-      fire();
+      fireProcesses();
     }
 
     virtual void interrupt( StepperPtr const aCaller )

@@ -174,7 +174,7 @@ namespace libecs
 
   void System::initialize()
   {
-    // do not need to call subsystems' initialize() -- the Model does this
+    // no need to call subsystems' initialize() -- the Model does this
 
     //
     // Variable::initialize()
@@ -186,8 +186,9 @@ namespace libecs
       }
 
     //
-    // Process::initialize()
-    //
+    // Set Process::theStepper.
+    // Process::initialize() is called in Stepper::initialize()
+    // 
     for( ProcessMapConstIterator i( getProcessMap().begin() );
 	 i != getProcessMap().end() ; ++i )
       {
@@ -197,8 +198,6 @@ namespace libecs
 	  {
 	    aProcessPtr->setStepper( getStepper() );
 	  }
-
-	aProcessPtr->initialize();
       }
 
     configureSizeVariable();

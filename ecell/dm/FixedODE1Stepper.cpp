@@ -51,9 +51,9 @@ namespace libecs
   {
     const UnsignedInt aSize( getReadOnlyVariableOffset() );
 
-    clear();
+    clearVariables();
 
-    fire();
+    fireProcesses();
 
     setStepInterval( getNextStepInterval() );
 

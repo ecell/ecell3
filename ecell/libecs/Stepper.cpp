@@ -75,16 +75,11 @@ namespace libecs
     gsl_rng_free( theRng );
   }
 
+
   void Stepper::initialize()
   {
     //    if( isEntityListChanged() )
     //      {
-
-    //
-    // update theProcessVector
-    //
-    //    updateProcessVector();
-
 
     //
     // Update theVariableVector.  This also calls updateVariableProxyVector.
@@ -110,6 +105,10 @@ namespace libecs
  
   void Stepper::updateProcessVector()
   {
+    // lighter implementation of this method is 
+    // to merge this into registerProcess() and removeProcess() and
+    // find a position to insert/remove each time.
+
     // sort by memory address. this is an optimization.
     std::sort( theProcessVector.begin(), theProcessVector.end() );
 
@@ -515,7 +514,7 @@ namespace libecs
   }
 
 
-  void Stepper::clear()
+  void Stepper::clearVariables()
   {
     const UnsignedInt aSize( theVariableVector.size() );
     for( UnsignedInt c( 0 ); c < aSize; ++c )
@@ -530,7 +529,16 @@ namespace libecs
 
   }
 
-  void Stepper::fire()
+  void Stepper::initializeProcesses()
+  {
+    FOR_ALL( ProcessVector, theProcessVector )
+      {
+	(*i)->initialize();
+      }
+  }
+
+
+  void Stepper::fireProcesses()
   {
     FOR_ALL( ProcessVector, theProcessVector )
       {

@@ -269,11 +269,8 @@ namespace libecs
 
     virtual void initialize();
 
-    /**
+    void initializeProcesses();
 
-    */
-
-    void sync();
 
     /**       
        Each subclass of Stepper defines this.
@@ -292,10 +289,6 @@ namespace libecs
     */
 
     void log();
-    void clear();
-    void fire();
-
-    virtual void reset();
     
     /**
        Register a System to this Stepper.
@@ -543,6 +536,13 @@ namespace libecs
 
 
   protected:
+
+    void clearVariables();
+
+    void fireProcesses();
+
+    virtual void reset();
+
 
     /**
        Update theProcessVector.

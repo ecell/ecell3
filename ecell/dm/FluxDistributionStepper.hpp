@@ -63,8 +63,8 @@ LIBECS_DM_CLASS( FluxDistributionStepper, DifferentialStepper )
   
   virtual void step()
     {
-      clear();
-      fire();
+      clearVariables();
+      fireProcesses();
 
       for( UnsignedInt c( 0 ); c < getReadOnlyVariableOffset(); ++c )
 	{

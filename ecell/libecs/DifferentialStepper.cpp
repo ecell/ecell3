@@ -248,8 +248,7 @@ namespace libecs
   {
     theStateFlag = false;
 
-    // clear
-    clear();
+    clearVariables();
 
     setStepInterval( getNextStepInterval() );
 

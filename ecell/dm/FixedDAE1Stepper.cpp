@@ -416,7 +416,7 @@ namespace libecs
   {
     theStateFlag = false;
 
-    clear();
+    clearVariables();
 
     // Newton iteration
     UnsignedInt anIterator( 0 );

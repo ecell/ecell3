@@ -268,7 +268,7 @@ namespace libecs
     checkStepper( aRootSystem );
 
     // initialization of Stepper needs three stages:
-    // (1) integrate:  update Variables, and also *CurrentTime*
+    // (1) call user-initialization methods of Processes.
     // (2) call initialize()
     // (3) post-initialize() procedures:
     //     - construct stepper dependency graph and
@@ -281,6 +281,7 @@ namespace libecs
     //      {
     //	(*i).second->integrate( aCurrentTime );
     //      }
+    FOR_ALL_SECOND( StepperMap, theStepperMap, initializeProcesses );
     FOR_ALL_SECOND( StepperMap, theStepperMap, initialize );
     FOR_ALL_SECOND( StepperMap, theStepperMap, updateDependentStepperVector );
     FOR_ALL_SECOND( StepperMap, theStepperMap, updateIntegratedVariableVector );
