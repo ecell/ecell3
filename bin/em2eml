@@ -2,7 +2,7 @@
 
 from spark import *
 import sys
-import string
+import string 
 import eml
 
 class Token:
@@ -27,14 +27,6 @@ class AST:
                 self.right = right
                 if left: self._kids.append(left)
                 if right: self._kids.append(right)
-#                if left:
-#			self._kids.append(left)
-#			print "left=\t", left, left.attr
-#                if right:
-#			self._kids.append(right)
-#			print "right=\t", right, right.attr
-#		# test kids	
-#		print self, self.attr , self._kids
 
         def __getitem__(self, i):
                 return self._kids[i]
@@ -53,7 +45,7 @@ class ErScanner( GenericScanner ):
 		return self.rv
 
 	def t_keywords( self, s ):
-		r' Reactor | Reactant | Substance | Stepper | System | root | SStepper'
+		r' Reactor | Reactant | Substance | Stepper | System | root '
 		self.rv.append( Token( type=s, attr=s ) )
 
 	def t_symbols( self, s ):
@@ -85,131 +77,141 @@ class ErScanner( GenericScanner ):
 
 
 class ErParser( GenericParser ):
-	def __init__( self, start='stmt' ):
+	def __init__( self, start='start' ):
 		GenericParser.__init__( self, start )
-		
-#	def p_start( self, args ):
-#		'''
-#		start ::= stmt
-#		'''
-#		return AST( type=args[0] )
-#                '''
-#		start = start stepper_stmt
-#		'''
-#		print "start.."
-#		return AST( type=args[0] , right=args[1])
+
+	def p_start( self, args ):
+		'''
+		start ::= stmts
+		'''
+		return args[0]
+	
+	def p_stmts_1( self, args ):
+		'''
+		stmts ::= stmts entity_type entity
+		'''
+		return AST ( type=args[1] ,left=args[0], right=args[2] )
+
+	def p_stmts_2( self, args ):
+		'''
+		stmts ::= stmt
+		'''
+		return args[0]
 	
 	def p_stmt( self, args ):
-                '''
-		stmt ::= root stepper_stmt system_stmt
 		'''
-		return AST( type=args[0] , right=args[1], left=args[2] )
-	
-#	def p_stepper_stmt ( self, args ):
-#		'''
-#		stepper_stmt ::= stepper stepper_stmt
-#		stepper_stmt ::=
-#		'''
-#		if (len(args) == 1):
-#			return AST( type=args[0] , right=args[0] )
-#		elif (len(args) == 2):
-#			return AST( type=args[0] , right=args[1] )
-	
-	def p_stepper_stmt ( self, args ):
+		stmt ::= entity_type entity
 		'''
-		stepper_stmt ::= Stepper class { }
+		return AST( type=args[0] , right=args[1] )
+
+	def p_entity_tpye_ste( self, args ):
+		'''
+		entity_type ::= Stepper
+		entity_type ::= System
+		entity_type ::= Substance
+		entity_type ::= Reactor
+		'''
+		return AST( type=args[0] )
+	
+	def p_entity_stepper ( self, args ):
+		'''
+		entity ::= class ( id ) { } 
+		'''
+		return AST( type=args[1] , left=args[0], right=args[2] )
+
+	def p_entity_system ( self, args ):
+		'''
+		entity ::= class ( systeminfo
+		'''
+		return AST( type=args[1] , left=args[0], right=args[2] )
+	
+	def p_systeminfo_1( self, args):
+		'''
+		systeminfo ::= systemid , info ) { propertylist }
+		'''
+		return AST( type=args[4], left=args[0] , right=args[5] )
+	
+	def p_class ( self, args ):
+		'''
+		class ::= name
+		class ::= System
+		class ::= Stepper
+		class ::= Substance
+		class ::= Reactor
+		'''
+		return AST ( type=args[0] )
+
+	def p_id ( self , args ):
+		' id ::= name '
+		return AST ( type=args[0] )
+
+	def p_systemid( self, args ):
+		' systemid ::= name '
+		return AST ( type=args[0] )
+
+	def p_info( self, args ):
+		' info ::= quotedstring '
+		return AST ( type=args[0])
+	
+	def p_entitylist_1( self, args ):
+		'''
+		entitylist ::= entity class entitylist
+		'''
+		return AST ( type=args[1] , left=args[0], right=args[2] )
+	
+	def p_entitylist_2( self, args):
+		'''
+		entitylist ::= entity
+		'''
+		return args[0]
+
+	def p_propertylist_1( self, args ):
+		'''
+		propertylist ::= property ; propertylist
+		'''
+		return AST( type=args[1], left=args[0] , right=args[2] )
+
+	def p_propertylist_2( self, args ):
+		'''
+		propertylist ::= property
+		'''
+		return args[0]
+	
+	def p_propertylist_3( self, args ):
+		'''
+		propertylist ::= propertylist entity_type entitylist
+		'''
+		return AST( type=args[1], left=args[0], right=args[2] )
+	
+	def p_property_1( self, args ):
+		'''
+		property ::= propertyname valuelist
 		'''
 		return AST( type=args[0] , right=args[1] )
 	
-	def p_class (self, args ):
-		' class ::= classname ( somename ) '
-		return AST( type=args[0] , right=args[2])
+	def p_property_2( self, args ):
+		'''
+		property ::= property ;
+		'''
+		return AST ( type=args[1] , left=args[0] , right=args[0] )
 	
-	def p_classname (self, args ):
-		' classname ::= name '
+	def p_propertyname( self, args ):
+		'''
+		propertyname ::= name
+		propertyname ::= Stepper
+		propertyname ::= Reactant
+		'''
 		return AST( type=args[0] )
 	
-	def p_somename ( self, args ):
-		' somename ::= name '
-		return AST( type=args[0] )
+	def p_valuelist_1( self, args ):
+		'''
+		valuelist ::= value valuelist
+		'''
+		return AST( type=args[0] , right=args[1] )
 
-	def p_system_stmt ( self, args ):
+	def p_valuelist_2( self, args ):
 		'''
-		system_stmt ::= System System ( name , quotedstring ) { property }
-		'''
-		return AST ( type=args[1] , right=args[8] )
-	
-#	def p_system_stmt ( self, args ):
-#		'''
-#		system_stmt ::= System System ( name , quotedstring ) { Stepper name ; property }
-#		system_stmt ::= System System ( name , quotedstring ) { Stepper name ; property substancelist reactor }
-#		'''
-		
-#		(aClass, aFullID) = (args[1].attr, 'System::'+args[3].attr )
-#		(aPropertyName, aValueList) = (args[8].attr, [args[9].attr])
-#		anEml.createEntity( aClass, aFullID )
-#		anEml.setEntityProperty( aFullID, aPropertyName, aValueList)
-#
-#		return AST( type=args[0] )
-	
-	def p_reactor ( self, args ):
-		'''
-		reactor ::= Reactor name ( name , quotedstring ) { reactantlist propertylist }
-		'''
-		return AST( type=args[0] )
-	
-	def p_reactantlist( self, args ):
-		'''
-		reactantlist ::= reactantlist reactant
-		reactantlist ::=
-		'''
-	def p_reatant( self, args ):
-		'''
-		reactant ::= Reactant name property
-		'''
-		return AST( type=args[0] )
-                
-
-	def p_substancelist( self, args ):
-		'''
-		substancelist ::= substancelist substance
-		substancelist ::=
-		'''
-	
-	def p_substance_stmt ( self, args ):
-		'''
-		substance  ::= Substance Substance ( name , quotedstring ) { property }
-		'''
-		return AST( type=args[0] )
-
-	
-	def p_entity_stmt( self, args ):
-		'''
-		stmt ::= Entity name ( name , quotedstring ) { propertylist }
-		'''
-		return AST( type=args[0] )
-
-	def p_propertylist( self, args ):
-		'''
-		propertylist ::= propertylist property
-		propertylist ::=
-		'''
-		return AST ( type=args[0] )
-	
-	def p_property( self, args ):
-		' property ::=  valuelist ; '
-		print args[0], args[1], args[2]
-		return AST( type=args[0] )
-	
-	def P_propertyname( self, args ):
-		' propertyname ::= name '
-		return AST( type=args[0] )
-	
-	def p_valuelist( self, args ):
-		'''
-		valuelist ::= valuelist value
 		valuelist ::= value
-
 		'''
 		return AST( type=args[0] )
 	
@@ -224,63 +226,100 @@ class ErParser( GenericParser ):
 class Interpret(GenericASTTraversal):
 	def __init__( self, ast ):
 		GenericASTTraversal.__init__( self, ast )
-
-		# for eml output
-		print "eml initialing..(For AST)"
-                self.anEml = eml.Eml( open('minimum.eml') )
-
-		# asttraversal process
 		self.postorder()
-		print "AST.value=\t" , ast.value # FOR DEBUG
-		string = self.anEml.asString()
-		print string
+		#print ast.value
+
+	def n_number( self, node):
+		node.value = node.attr
 
         def n_name( self, node):
 		node.value = node.attr
 
 	def n_Stepper( self, node ):
-		print "node..", node.attr, node[0].attr
-		(aClass, anID) = (node[0].attr, node[0][0].attr)
-		self.anEml.createStepper (aClass, anID)
-		node.value = node.attr
-		
-	def n_System( self, node ):
-		print node.attr, node[0].attr
 		node.value = node.attr
 
-        def default(self, node):
-#		left = node.left.value
-		right = node.right.value
+	def n_System( self, node):
+		node.value = node.attr
 
-		print "children check.."
-		print  right
-		node.value = 'root'
+	def default( self, node):
+#		right = node.right.value
+#		print "(node.type, right)=\t", node.type, right
 
-#		if node.type == '+':
-#			node.value = left + right
-#		else:
-#			node.value = left * right
+		if node.type == '(':
+			aClass = node.left.value
+			if node.left.type == 'name' and node.right.type == 'name':
+				anID = node.right.value
+#				print "createStepper( %s, %s)" % (aClass, anID )
+				anEml.createStepper( aClass, anID )
+			else:
+				aFullID = anEml.convertSystemID2SystemFullID(node.right.left.value)
+				if aClass == 'System':
+					anID = aFullID
+				elif aClass == 'Substance':
+					anID = string.join(string.split(aFullID, 'System'), "Substance")
+				else:
+					anID = string.join(string.split(aFullID, 'System'), "Reactor")
+#				print "createEntity( %s, %s)" % ( aClass, anID )
+#				anEml.createEntity( aClass, anID )
+				anEml.entity.append((aClass, anID))
+				
+				for i in anEml.queue:
+					if aClass == 'Substance':
+						aType = string.join(string.split(i[0], 'System'), "Substance")
+					elif i[1] == 'Reactant':
+						aType = string.join(string.split(i[0], 'System'), "Reactor")
+					else:
+						aType = i[0]
+#					print "\tsetEntityProperty(%s, %s, %s)" % (aType, i[1], i[2:])
+#					anEml.setEntityProperty( aType, i[1], i[2:])
+					anEml.property[aType] = (aType, i[1], i[2:])
+				anEml.queue = []
+
+		if node.type == '{':
+			aFullID = anEml.convertSystemID2SystemFullID(node.left.value)
+			(aPropertyName, aValueList) = ('', [] )
+			nodekid = node.right
+			while nodekid.value == ';':
+				aValueList = []
+				nodepro = nodekid.left.right
+				while hasattr(nodepro, 'value'):
+					aValueList.append(nodepro.value)
+					nodepro = nodepro.right
+				aPropertyName = nodekid.left.value
+				anEml.queue.append((aFullID, aPropertyName, aValueList))
+				
+				nodekid = nodekid.right
+		else:
+			node.value = node.attr
 		
 
 if __name__ == '__main__':
-	
 	aFilename = sys.argv[1]
 	aFile = open( aFilename )
 	aScanner = ErScanner()
 	aTokenList = aScanner.tokenize( aFile.read() )
-	print aTokenList
+#	print aTokenList
 	aParser = ErParser()
-	
-	print "eml initialing.."
-	anEmlFilename = 'minimum.eml'
-        anEml = eml.Eml( open( anEmlFilename ) )
-		
 	anAst = aParser.parse( aTokenList )
 
-	string = anEml.asString()
-	print string
+	aFileObject = open('minimum.eml')
+	anEml = eml.Eml( aFileObject )
+	anEml.entity = []
+	anEml.property = {}
+	anEml.queue = []
 	
-	print anAst
 	aInterpreter = Interpret( anAst )
 
+	anEml.queue = []
 
+	for i in anEml.entity:
+		(aClass, aFullID) = i
+		anEml.createEntity(aClass, aFullID)
+
+	for j in anEml.property.keys():
+		(aFullID, aPropertyName, aValueList) = anEml.property[j]
+		anEml.setEntityProperty(aFullID, aPropertyName, aValueList)
+	
+	string = anEml.asString()
+	print string
+#	print anAst
