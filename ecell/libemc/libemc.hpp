@@ -36,6 +36,8 @@
 
 #include "libecs/libecs.hpp"
 
+#include "dmtool/ModuleMaker.hpp"
+
 namespace libemc
 {
 
@@ -51,6 +53,12 @@ namespace libemc
 
   DECLARE_CLASS( Simulator );
   DECLARE_CLASS( SimulatorImplementation );
+
+
+  void setDMSearchPath( const std::string& path );
+
+  const std::string getDMSearchPath();
+
 
   /** @} */ //end of libemc_module 
 

@@ -17,18 +17,19 @@ AM_INIT_AUTOMAKE($PACKAGE, $VERSION, do-not-define)
 AC_PROG_MAKE_SET
 dnl
 dnl
-AC_LIBLTDL_INSTALLABLE
+dnl AC_LIBLTDL_INSTALLABLE
+AC_LIBLTDL_CONVENIENCE
 AC_SUBST(INCLTDL)
 AC_SUBST(LIBLTDL)
 AC_LIBTOOL_DLOPEN
 AC_PROG_LIBTOOL
 dnl
 dnl
-AC_CONFIG_SUBDIRS( libltdl ecell bin dmtool)
+AC_CONFIG_SUBDIRS( libltdl ecell bin dmtool libltdl)
 dnl
 AC_ARG_ENABLE(gtk,,[
-ECELL_SUBDIR="libltdl ecell bin dmtool"],[
-ECELL_SUBDIR="libltdl ecell bin dmtool osogo"
+ECELL_SUBDIR="libltdl ecell bin dmtool libltdl"],[
+ECELL_SUBDIR="libltdl ecell bin dmtool osogo libltdl"
 AC_CONFIG_SUBDIRS(osogo)]
 )
 dnl

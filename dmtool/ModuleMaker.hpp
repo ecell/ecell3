@@ -35,39 +35,57 @@
 #include <iostream>
 #include <map>
 #include <string>
-//#include <ltdl.h>
-#include <dlfcn.h>
+#include <ltdl.h>
 #include "DynamicModule.hpp"
 
-
-using namespace std;
 
 /// doc needed
 
 #define DynamicModuleEntry( T )\
-addClass( new Module( string( #T ), &T::createInstance ) );
+addClass( new Module( std::string( #T ), &T::createInstance ) );
 
 /**
    A base class for ModuleMakers
  */
 
-template<class T, class DMAllocator = SimpleAllocator(T)>
-class ModuleMakerBase
+class ModuleMaker
 {
 
 public:
 
-  ModuleMakerBase();
-  virtual ~ModuleMakerBase();
+  ModuleMaker() 
+    : 
+    theNumberOfInstances( 0 ) 
+  {
+    ; // do nothing
+  }
 
-  /**
-     Instantiates given class of an object.
- 
-     @param classname name of class to be instantiated.
-     @return pointer to a new instance.
-  */
+  virtual ~ModuleMaker() 
+  {
+    ; // do nothing
+  }
 
-  virtual T* make( const string& classname );
+  static void setSearchPath( const std::string& path )
+  {
+    int error = lt_dlsetsearchpath( path.c_str() );
+    if( error != 0 )
+      {
+	throw DMException( lt_dlerror() );
+      }
+  }
+
+  static const std::string getSearchPath()
+  {
+    const char* aSearchPath( lt_dlgetsearchpath() );
+    if( aSearchPath == NULLPTR )
+      {
+	return "";
+      }
+    else
+      {
+	return aSearchPath;
+      }
+  }
 
   /**
      @return the number of instance this have ever created
@@ -75,14 +93,13 @@ public:
 
   int getNumberOfInstances() const
   {
-    return theNumInstance;
+    return theNumberOfInstances;
   }
 
 protected:
 
   int theNumberOfInstances;
 
-  virtual DMAllocator getAllocator( const string& classname ) = 0;
 };
 
 
@@ -92,19 +109,29 @@ protected:
 */
 
 template<class T, class DMAllocator = SimpleAllocator( T )>
-class StaticModuleMaker : public ModuleMakerBase<T,DMAllocator>
+class StaticModuleMaker : public ModuleMaker
 {
 
 protected:
 
   typedef DynamicModuleBase<T,DMAllocator> Module;
-  typedef map<const string, Module*> ModuleMap;
+  typedef std::map<const std::string, Module*> ModuleMap;
   typedef typename ModuleMap::iterator ModuleMapIterator;
 
 public: 
 
   StaticModuleMaker();
   virtual ~StaticModuleMaker();
+
+  /**
+     Instantiates given class of an object.
+ 
+     @param classname name of class to be instantiated.
+     @return pointer to a new instance.
+  */
+
+  virtual T* make( const std::string& classname );
+
 
   /**
      Add a class to the subclass list.
@@ -122,7 +149,7 @@ protected:
     \return pointer to a new instance.
   */
 
-  virtual DMAllocator getAllocator( const string& classname ); 
+  virtual DMAllocator getAllocator( const std::string& classname ); 
 
 protected:
 
@@ -147,64 +174,18 @@ public:
   SharedModuleMaker();
   virtual ~SharedModuleMaker();
 
-  void setSearchPath( const string& path );
-
-  const string& getSearchPath() const;
-
 protected:
 
-  string theSearchPathString;
 
-  virtual DMAllocator getAllocator( const string& classname );
+  virtual DMAllocator getAllocator( const std::string& classname );
 
-  void loadModule( const string& classname );
+  void loadModule( const std::string& classname );
 
 
 };
 
 
 ///////////////////////////// begin implementation
-
-
-////////////////////// ModuleMakerBase
-
-template<class T, class DMAllocator>
-ModuleMakerBase<T,DMAllocator>::ModuleMakerBase() 
-  : 
-  theNumberOfInstances( 0 ) 
-{
-  ; // do nothing
-}
-
-template<class T, class DMAllocator>
-ModuleMakerBase<T,DMAllocator>::~ModuleMakerBase() 
-{
-  ; // do nothing
-}
-
-template<class T, class DMAllocator>
-T* ModuleMakerBase<T,DMAllocator>::make( const string& classname ) 
-{
-
-  DMAllocator anAllocator( getAllocator( classname ) );
-  if( anAllocator == NULL )
-    {
-      throw DMException( string( "unexpected error in " ) +
-			 __PRETTY_FUNCTION__ );
-    }
-
-  T* anInstance( NULL );
-  anInstance = anAllocator();
-
-  if( anInstance == NULL )
-    {
-      throw DMException( "Can't instantiate [" + classname + "]." );
-    }
-
-  ++theNumberOfInstances;
-
-  return anInstance;
-}
 
 
 
@@ -227,6 +208,31 @@ StaticModuleMaker<T,DMAllocator>::~StaticModuleMaker()
     }
 }
 
+template<class T, class DMAllocator>
+T* StaticModuleMaker<T,DMAllocator>::make( const std::string& classname ) 
+{
+
+  DMAllocator anAllocator( getAllocator( classname ) );
+  if( anAllocator == NULL )
+    {
+      throw DMException( std::string( "unexpected error in " ) +
+			 __PRETTY_FUNCTION__ );
+    }
+
+  T* anInstance( NULL );
+  anInstance = anAllocator();
+
+  if( anInstance == NULL )
+    {
+      throw DMException( "Can't instantiate [" + classname + "]." );
+    }
+
+  ++theNumberOfInstances;
+
+  return anInstance;
+}
+
+
 template<class T,class DMAllocator>
 void StaticModuleMaker<T,DMAllocator>::addClass( Module* dm )
 {
@@ -238,7 +244,7 @@ void StaticModuleMaker<T,DMAllocator>::addClass( Module* dm )
 
 template<class T,class DMAllocator>
 DMAllocator StaticModuleMaker<T,DMAllocator>::
-getAllocator( const string& classname )
+getAllocator( const std::string& classname )
 {
   if( theModuleMap.find( classname ) == theModuleMap.end() )
     {
@@ -253,33 +259,29 @@ getAllocator( const string& classname )
 
 template<class T,class DMAllocator>
 SharedModuleMaker<T,DMAllocator>::SharedModuleMaker()
-  :
-  theSearchPathString( "." )
 {
-  /*
-    int result = lt_dlinit();
-    if( result != 0 )
+  int result = lt_dlinit();
+  if( result != 0 )
     {
-    cerr << "warning: lt_dlinit() failed." << endl;
+      std::cerr << "fatal: lt_dlinit() failed." << std::endl;
+      exit( 1 );
     }
-  */
 }
 
 template<class T,class DMAllocator>
 SharedModuleMaker<T,DMAllocator>::~SharedModuleMaker()
 {
-  /*
-    int result = lt_dlexit();
-    if( result != 0 )
+  int result = lt_dlexit();
+  if( result != 0 )
     {
-    cerr << "warning: lt_dlexit() failed." << endl;
+      std::cerr << "fatal: lt_dlexit() failed." << std::endl;
+      exit( 1 );
     }
-  */
 }
 
 template<class T,class DMAllocator>
 DMAllocator SharedModuleMaker<T,DMAllocator>::
-getAllocator( const string& classname ) 
+getAllocator( const std::string& classname ) 
 {
   DMAllocator anAllocator( NULL );
 
@@ -299,7 +301,7 @@ getAllocator( const string& classname )
   if( anAllocator == NULL )
     {
       // getAllocator() returned NULL! why?
-      throw DMException( string("unexpected error in ") 
+      throw DMException( std::string("unexpected error in ") 
 			 + __PRETTY_FUNCTION__ );
     }
 
@@ -307,7 +309,7 @@ getAllocator( const string& classname )
 }
 
 template<class T,class DMAllocator>
-void SharedModuleMaker<T,DMAllocator>::loadModule( const string& classname )
+void SharedModuleMaker<T,DMAllocator>::loadModule( const std::string& classname )
 {
   // return immediately if already loaded
   if( theModuleMap.find( classname ) != theModuleMap.end() )
@@ -315,52 +317,18 @@ void SharedModuleMaker<T,DMAllocator>::loadModule( const string& classname )
       return;      
     }
     
-  // iterate over the search path
-  string::size_type aTail( 0 );
-  do
+  SharedModule* sm( NULL );
+  try 
     {
-      string::size_type aHead( aTail );
-      aTail = theSearchPathString.find_first_of( ":", aHead );
-      string aDirectory = theSearchPathString.substr( aHead, aTail - aHead );
-
-      if( aDirectory == "" )
-	{
-	  continue;
-	}
-
-      SharedModule* sm( NULL );
-      try 
-	{
-	  sm = new SharedModule( classname, aDirectory );
-	  addClass( sm );
-	  break;
-	}
-      catch ( const DMException& e )
-	{
-	  delete sm;
-
-	  // re-throw if failed for the last item
-	  if( aTail == string::npos )
-	    {
-	      throw DMException( "failed to load [" + classname + 
-				 "]: " + e.what() );
-	    }
-	}
-
-    } while( aTail != string::npos );
-
-}
-
-template<class T,class DMAllocator>
-void SharedModuleMaker<T,DMAllocator>::setSearchPath( const string& path )
-{
-  theSearchPathString = path;
-}
-
-template<class T,class DMAllocator>
-const string& SharedModuleMaker<T,DMAllocator>::getSearchPath() const
-{
-  return theSearchPathString;
+      sm = new SharedModule( classname );
+      addClass( sm );
+    }
+  catch ( const DMException& e )
+    {
+      delete sm;
+      
+      throw;
+    }
 }
 
 #endif /* __MODULEMAKER_HPP */

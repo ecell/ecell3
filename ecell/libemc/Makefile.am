@@ -16,18 +16,18 @@ CXXFLAGS= @CXXFLAGS@ #-D_REENTRANT
 
 libemc_la_LDFLAGS= -version-info 1:0:0
 
-#FIXME: specifing .libs is ugly
 libemc_la_LIBADD= $(LIBECS) -lstdc++ 
 libemc_la_DEPENDENCIES=$(ECELLDIR)/libecs/libecs.la
 libemc_la_SOURCES=\
+libemc.cpp\
 Simulator.cpp\
 SimulatorImplementation.cpp\
 LocalSimulatorImplementation.cpp
 
 libemcdir=${pkgincludedir}/libemc
 libemc_HEADERS=\
+libemc.hpp\
 LocalSimulatorImplementation.hpp\
 Simulator.hpp\
 SimulatorImplementation.hpp\
-SimulatorMaker.hpp\
-libemc.hpp
+SimulatorMaker.hpp

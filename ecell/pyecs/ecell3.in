@@ -11,6 +11,9 @@ pythondir=@pythondir@
 export LD_LIBRARY_PATH="${exec_prefix}/lib:${LD_LIBRARY_PATH}"
 export PYTHONPATH="$pythondir:${PYTHONPATH}"
 
+export LTDL_LIBRARY_PATH="${LTDL_LIBRARY_PATH}:${ECELL3_DM_PATH}"
+
+
 PYTHON=@PYTHON@
 DEBUGGER=gdb
 

@@ -40,7 +40,7 @@
 //
 // if _ECELL3_DM_TYPE or _ECELL3_DM_CLASSNAME is defined *before*
 // including this file, it is used as a default value of
-// ECELL3_DM_TYPE or ECELL3_DM_CLASSNAME macros.
+// ECELL3_DM_TYPE or ECELL3_DM_CLASSNAME macro.
 
 
 #define ECELL3_DM_OBJECT LIBECS_DM_OBJECT( TYPE, CLASS )

@@ -69,7 +69,7 @@ public:
 
   const char* what() const throw()
   { 
-    return theMessage.c_str(); 
+    return ( "DMException: " + theMessage ).c_str();
   }
 
 private:
@@ -95,7 +95,7 @@ public:
     return theModuleName;
   }
 
-  const std::string& getFileName() const
+  virtual const std::string getFileName() const
   {
     return getModuleName();
   }
@@ -149,15 +149,14 @@ class SharedDynamicModule : public DynamicModuleBase< Base >
 
 public:
 
-  SharedDynamicModule( const std::string& classname, 
-		       const std::string& directory );
+  SharedDynamicModule( const std::string& classname ); 
   virtual ~SharedDynamicModule();
 
-  const std::string& getFileName() const;
+  const std::string getFileName() const;
 
 private:
 
-  void *theHandle;
+  lt_dlhandle theHandle;
 
 };
 
@@ -203,19 +202,19 @@ DynamicModule( const std::string& modulename )
   : 
   DynamicModuleBase<Base,DMAllocator>( modulename, &Derived::createInstance )
 {
+  
   ; // do nothing
 }
 
 template < class Base, class DMAllocator >
 SharedDynamicModule< Base, DMAllocator >::
-SharedDynamicModule( const std::string& classname,
-		     const std::string& directory ) 
+SharedDynamicModule( const std::string& classname )
   :
   DynamicModuleBase<Base,DMAllocator>( classname, NULL ), 
   theHandle( NULL )
 {
-  std::string filename( directory + '/' + classname );
-  theHandle = dlopen( filename.c_str(), RTLD_GLOBAL | RTLD_NOW );
+  std::string filename( classname );
+  theHandle = lt_dlopenext( filename.c_str() );
 
   if( theHandle == NULL ) 
     {
@@ -224,19 +223,20 @@ SharedDynamicModule( const std::string& classname,
       //       .so if there is *not* .la (as of libtool-1.4.2)....
       //       May be this can be eliminated and simplified in the future...
       filename += ".so";
-      theHandle = dlopen( filename.c_str(), RTLD_GLOBAL | RTLD_NOW );
+      theHandle = lt_dlopenext( filename.c_str() );
 
       if( theHandle == NULL ) 
 	{
-	  throw DMException( dlerror() );
+	  throw DMException( "Shared object file for [" + classname + 
+			     "] not found." );
 	}
     }
 
-  theAllocator = *((DMAllocator*)( dlsym( theHandle, "CreateObject" ) ));
+  theAllocator = *((DMAllocator*)( lt_dlsym( theHandle, "CreateObject" ) ));
 
   if( theAllocator == NULL )
     {
-      throw DMException( dlerror() );  
+      throw DMException( lt_dlerror() );  
     }
 }
 
@@ -245,21 +245,21 @@ SharedDynamicModule<Base,DMAllocator>::~SharedDynamicModule()
 {
   if( theHandle != NULL )
     {
-      dlclose( theHandle );
+      lt_dlclose( theHandle );
     }
 }
 
 template < class Base, class DMAllocator >
-const std::string& SharedDynamicModule<Base,DMAllocator>::getFileName() const
+const std::string SharedDynamicModule<Base,DMAllocator>::getFileName() const
 {
-  dlinfo* aDlInfo = dlgetinfo( theHandle );
+  const lt_dlinfo* aDlInfo = lt_dlgetinfo( theHandle );
 
   if( aDlInfo == NULL )
     {
-      throw DMException( "dlgetinfo failed" );
+      throw DMException( lt_dlerror() );
     }
 
-  return string( aDlInfo->filename );
+  return std::string( aDlInfo->filename );
 }
 
 #endif /* __DYNAMICMODULE_HPP */

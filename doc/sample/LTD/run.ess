@@ -1,5 +1,8 @@
-loadModel( 'LTD.eml' )
+import ecell.ecs
+#ecell.ecs.setDMSearchPath( '.:/home/shafi/wrk/ecell3/doc/sample/LTD' )
+print ecell.ecs.getDMSearchPath()
 
+loadModel( 'LTD/LTD.eml' )
 
 
 for i in range( 10 ):

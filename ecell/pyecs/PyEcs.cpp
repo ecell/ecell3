@@ -59,6 +59,9 @@ BOOST_PYTHON_MODULE( _ecs )
   // pyecs uses Numeric module
   import_array();
 
+  def( "setDMSearchPath", &libemc::setDMSearchPath );
+  def( "getDMSearchPath", &libemc::getDMSearchPath );
+
 
   // PySimulator class
   class_<Simulator>( "Simulator" )
