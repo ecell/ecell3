@@ -43,7 +43,7 @@ class Eml:
     def asString( self ):
         """return domtree as string"""
 
-        return self.__theDocument.toxml()
+        return self.__theDocument.toprettyxml(indent="", newl="\n")
 
 
 
