@@ -51,29 +51,25 @@ namespace libecs
 
   public:
 
-    Integrator(SubstanceRef);
+    Integrator( SubstanceRef aSubstance );
     virtual ~Integrator() {}
 
     /**
-       how many times to be called during an single integration cycle  
+       how many react->turn steps does needed in a single integration cycle  
     */
+
     virtual int getNumberOfSteps() = 0;
 
     virtual void clear();
-    //  virtual Real velocity(Real v) = 0;
     virtual void turn() {}
     virtual void integrate() = 0;
 
-  protected:
-
-    //    void setQuantity( Real quantity ) { theSubstance.theQuantity = quantity; }
-    //    void setVelocity( Real velocity ) { theSubstance.theVelocity = velocity; }
 
   protected:
 
     SubstanceRef theSubstance;
     int          theStepCounter;
-    Real        theNumberOfMoleculesCache;
+    Real         theOriginalQuantity;
 
   };
 
@@ -82,11 +78,10 @@ namespace libecs
 
   public:
 
-    Euler1Integrator( SubstanceRef ); 
+    Euler1Integrator( SubstanceRef aSubstance ); 
     virtual ~Euler1Integrator() {}
 
     virtual int getNumberOfSteps() { return 1; }
-    //  virtual Real velocity(Real );
     virtual void turn();
     virtual void integrate() {}
   };
@@ -94,18 +89,17 @@ namespace libecs
   class RungeKutta4Integrator : public Integrator
   {
 
-    typedef void (RungeKutta4Integrator::*TurnFunc_)();
-    DECLARE_TYPE(TurnFunc_,TurnFunc);
+    typedef void ( RungeKutta4Integrator::*TurnMethod_ )();
+    DECLARE_TYPE( TurnMethod_, TurnMethod );
 
   public:
 
-    RungeKutta4Integrator( SubstanceRef );
+    RungeKutta4Integrator( SubstanceRef aSubstance );
     virtual ~RungeKutta4Integrator() {}
 
 
     virtual int getNumberOfSteps() { return 4; }
     virtual void clear();
-    //  virtual Real velocity( Real );
     virtual void turn();
     virtual void integrate();
 
@@ -118,11 +112,15 @@ namespace libecs
 
   private:
 
-    static TurnFunc theTurnFuncs[4];
-    TurnFuncPtr theTurnFuncPtr;
+    TurnMethodPtr     theTurnMethodPtr;
+    Real              theK[4];
 
+
+    // turn method table.
+    static TurnMethod theTurnMethods[4];
+
+    // constant number: 1/6;  for internal use
     static const Real theOne6th;
-    Real theK[4];
 
   };
 

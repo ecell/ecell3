@@ -85,7 +85,7 @@ namespace libecs
     theFraction( 0 ),
     theVelocity( 0 ),
     theFixed( false ) ,
-    theConcentration( -1 )
+    theConcentration( 0 )
   {
     makeSlots();
     // FIXME: use AccumulatorMaker
@@ -138,17 +138,15 @@ namespace libecs
 
   void Substance::initialize()
   {
+    // if the accumulator is not set, use user default
     if( theAccumulator == NULLPTR )
       {
 	setAccumulator( USER_DEFAULT_ACCUMULATOR_NAME );
       }
 
     // if the user default is invalid fall back to the system default.
-    if( ! theAccumulator )  
+    if( theAccumulator == NULLPTR )  
       {               
-	//FIXME:      *theMessageWindow << "Substance: " 
-	//FIXME:	<< "falling back to the system default accumulator: " 
-	//FIXME:	  << SYSTEM_DEFAULT_ACCUMULATOR_NAME  << ".\n";
 	setUserDefaultAccumulatorName( SYSTEM_DEFAULT_ACCUMULATOR_NAME );
 	setAccumulator( USER_DEFAULT_ACCUMULATOR_NAME );
       }
@@ -163,6 +161,7 @@ namespace libecs
   {
     mySetQuantity( aQuantity );
     theAccumulator->update();
+    calculateConcentration();
   }
 
   Real Substance::getActivity()
@@ -172,16 +171,13 @@ namespace libecs
 
   void Substance::calculateConcentration() const
   {
+    //FIXME: more efficient if 1 / ( volume * N_A ) is precalculated
     theConcentration = theQuantity / ( getSuperSystem()->getVolume() * N_A ); 
   }
 
 
-  //FIXME: the following methods should be inlined
-
   void Substance::integrate()
   { 
-    theConcentration = -1;
-
     if( ! isFixed() ) 
       {
 	theIntegrator->integrate();

@@ -50,6 +50,7 @@ namespace libecs
 
   class Substance : public Entity
   {
+    //FIXME: don't use friend class :-/
     friend class Integrator;
     friend class Accumulator;
 
@@ -106,14 +107,6 @@ namespace libecs
     }
 
     /**
-       Whether concentration of this substance can be calculated or not.
-       It must have a supersystem which have volume other than zero to
-       calculate concentration.
-       \return true -> if concentration can be obtained. false -> if not.
-    */
-    // bool haveConcentration() const;
-
-    /**
        Returns a concentration if it have.
        Invalid if haveConcentration() is false.
        @return Concentration in M (mol/L).
@@ -121,11 +114,6 @@ namespace libecs
 
     const Real getConcentration() const
     {
-      if ( theConcentration < 0 ) 
-	{
-	  calculateConcentration(); 
-	}
-
       return theConcentration;
     }
 

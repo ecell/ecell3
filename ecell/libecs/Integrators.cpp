@@ -49,14 +49,14 @@ namespace libecs
   void Integrator::clear()
   {
     theStepCounter=0;
-    theNumberOfMoleculesCache = theSubstance.getQuantity();
+    theOriginalQuantity = theSubstance.saveQuantity();
   }
 
   ////////////////////////////// Euler1Integrator
 
-  Euler1Integrator::Euler1Integrator( SubstanceRef substance ) 
+  Euler1Integrator::Euler1Integrator( SubstanceRef aSubstance ) 
     : 
-    Integrator( substance )
+    Integrator( aSubstance )
   {
     ; // do nothing
   }
@@ -69,20 +69,20 @@ namespace libecs
 
   ////////////////////////////// RungeKutta4Integrator
 
-  const Real RungeKutta4Integrator::theOne6th = (Real)1.0 / (Real)6.0;
+  const Real RungeKutta4Integrator::theOne6th( Real( 1.0 ) / Real( 6.0 ) );
 
-  RungeKutta4Integrator::TurnFunc RungeKutta4Integrator::theTurnFuncs[4] =
+  RungeKutta4Integrator::TurnMethod RungeKutta4Integrator::theTurnMethods[4] =
   {
     &RungeKutta4Integrator::turn0,
-      &RungeKutta4Integrator::turn1,
-      &RungeKutta4Integrator::turn2,
-      &RungeKutta4Integrator::turn3
-      };
+    &RungeKutta4Integrator::turn1,
+    &RungeKutta4Integrator::turn2,
+    &RungeKutta4Integrator::turn3
+  };
 
 
-  RungeKutta4Integrator::RungeKutta4Integrator( SubstanceRef substance ) 
+  RungeKutta4Integrator::RungeKutta4Integrator( SubstanceRef aSubstance ) 
     : 
-    Integrator(substance)
+    Integrator( aSubstance )
   {
     ; // do nothing
   }
@@ -90,55 +90,57 @@ namespace libecs
   void RungeKutta4Integrator::clear()
   {
     Integrator::clear();
-    theTurnFuncPtr = &theTurnFuncs[0];
+    theTurnMethodPtr = &theTurnMethods[0];
   }
 
   void RungeKutta4Integrator::turn()
   {
     theK[ theStepCounter ] = theSubstance.getVelocity();
-    ( this->*( *theTurnFuncPtr ) )();
-    ++theTurnFuncPtr;
+    ( this->*( *theTurnMethodPtr ) )();
+    ++theTurnMethodPtr;
     ++theStepCounter;
     theSubstance.setVelocity( 0 );
   }
 
   void RungeKutta4Integrator::turn0()
   {
-    theSubstance.loadQuantity( ( theK[0] * .5 ) + theNumberOfMoleculesCache );
+    theSubstance.loadQuantity( ( theK[0] * .5 ) + theOriginalQuantity );
   }
 
   void RungeKutta4Integrator::turn1()
   {
-    theSubstance.loadQuantity( ( theK[1] * .5 ) + theNumberOfMoleculesCache );
+    theSubstance.loadQuantity( ( theK[1] * .5 ) + theOriginalQuantity );
   }
 
   void RungeKutta4Integrator::turn2()
   {
-    theSubstance.loadQuantity( theK[2] + theNumberOfMoleculesCache );
+    theSubstance.loadQuantity( theK[2] + theOriginalQuantity );
   }
 
   void RungeKutta4Integrator::turn3()
   {
-    theSubstance.loadQuantity( theNumberOfMoleculesCache );
+    theSubstance.loadQuantity( theOriginalQuantity );
   }
 
   void RungeKutta4Integrator::integrate()
   {
     //// x(n+1) = x(n) + 1/6 * (k1 + k4 + 2 * (k2 + k3)) + O(h^5)
 
-    Real* k( &theK[0] );
+    Real aResult( theOne6th );
+    aResult *= theK[0] + theK[1] + theK[1] + theK[2] + theK[2] + theK[3];
 
-    // FIXME: prefetching here makes this faster on alpha?
-
-    //                      k1  + (2 * k2)  + (2 * k3)  + k4
-    Real aResult = *k++;
-    aResult += *k;
-    aResult += *k++;
-    aResult += *k;
-    aResult += *k++;
-    aResult += *k;
-
-    aResult *= theOne6th;
+    // an alternative impl.  which is faster?
+    //    Real* k( &theK[0] );
+    //    Real aResult = *k;
+    //    k++;
+    //    aResult += *k;
+    //    aResult += *k;
+    //    k++;
+    //    aResult += *k;
+    //    aResult += *k;
+    //    k++;
+    //    aResult += *k;
+    //    aResult *= theOne6th;
 
     theSubstance.setVelocity( aResult );
   }
