@@ -63,14 +63,51 @@ FluxDistributionStepper.hpp\
 QuasiDynamicFluxProcess.hpp\
 ODE45Stepper.hpp
 
-EXTRA_DIST = ${DMS} ${DMH}
+DESCS = \
+BisectionRapidEquilibriumProcess.desc\
+CashKarp45Stepper.desc\
+CatalyzedMassActionFluxProcess.desc\
+ConstantFluxProcess.desc\
+DAEStepper.desc\
+DecayFluxProcess.desc\
+ESSYNSStepper.desc\
+ExpressionAlgebraicProcess.desc\
+ExpressionFluxProcess.desc\
+FixedDAE1Stepper.desc\
+FixedODE1Stepper.desc\
+FluxDistributionProcess.desc\
+FluxDistributionStepper.desc\
+GillespieProcess.desc\
+GMAProcess.desc\
+IsoUniUniFluxProcess.desc\
+MassActionFluxProcess.desc\
+MichaelisUniUniFluxProcess.desc\
+NRStepper.desc\
+ODE23Stepper.desc\
+ODE45Stepper.desc\
+OrderedBiBiFluxProcess.desc\
+OrderedBiUniFluxProcess.desc\
+OrderedUniBiFluxProcess.desc\
+PythonFluxProcess.desc\
+PythonProcess.desc\
+QuasiDynamicFluxProcess.desc\
+RandomBiBiFluxProcess.desc\
+RandomBiUniFluxProcess.desc\
+RandomUniBiFluxProcess.desc\
+RapidEquilibriumProcess.desc\
+SSystemProcess.desc\
+System.desc\
+CompartmentSystem.desc\
+Variable.desc
+
+EXTRA_DIST = ${DMS} ${DMH} ${DESCS}
 dmdir = ${DM_SRC_DIR}
 dm_DATA = ${DMS} ${DMH}
 
 SOS = ${DMS:.cpp=@LTDL_SHLIB_EXT@}
 
 dmsodir = ${DM_SO_DIR}
-dmso_DATA = ${SOS}
+dmso_DATA = ${SOS} ${DESCS}
 
 %@LTDL_SHLIB_EXT@ : %.cpp
 	${ECELL3_SCRIPT} ${ECELL3_DMC} --verbose --dmcompile=${top_srcdir}/../dmtool --no-stdinclude --no-stdlibdir --ldflags="-L${top_srcdir}/libecs ${BOOST_LIB}" --cxxflags='-I${top_srcdir}/libecs -I${top_srcdir}/.. -I${top_srcdir} ${PYTHON_INCLUDES} ${BOOST_INCLUDE}' $< 
