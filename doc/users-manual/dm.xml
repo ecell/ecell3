@@ -61,17 +61,15 @@
 
 USE_LIBECS;
 
-class <parameter>CLASSNAME</parameter>
-  :
-  public <parameter>BASECLASS</parameter>
+LIBECS_DM_CLASS( <parameter>CLASSNAME</parameter>, <parameter>BASECLASS</parameter> )
 {
-  LIBECS_DM_OBJECT( <parameter>DMTYPE</parameter>, <parameter>CLASSNAME</parameter> );
+  LIBECS_DM_OBJECT( <parameter>CLASSNAME</parameter>, <parameter>DMTYPE</parameter> );
 public:
   <parameter>CLASSNAME</parameter>() {}// A constructor without an argument
   <parameter>~CLASSNAME</parameter>() {}// A destructor
 };
 
-DM_INIT( <parameter>DMTYPE</parameter>, <parameter>CLASSNAME</parameter> );
+DM_INIT( <parameter>CLASSNAME</parameter>, <parameter>DMTYPE</parameter> );
 </programlisting>
     </example>
 </para>

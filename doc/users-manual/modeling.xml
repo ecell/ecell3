@@ -15,7 +15,7 @@
 
 
   <sect1>
-    <title>Simulation Model of &ecell;</title>
+    <title>Simulation Model Of &ecell;</title>
 
     <para>
     &ecell;'s simulation model is fully object-oriented.  That is, the
@@ -28,7 +28,7 @@
     </para>
 
     <sect2>
-      <title>Objects in the Model</title>
+      <title>Objects In The Model</title>
 
       <para>A simulation model of &app; consists of the following types of objects.
 <itemizedlist>
@@ -47,7 +47,7 @@ implement specific simulation algorithms.
 
 
     <sect2>
-      <title>&Entity; objects</title>
+      <title>&Entity; Objects</title>
 
       <para>
 The &Entity; class has three subclasses:
@@ -80,8 +80,8 @@ The &Entity; class has three subclasses:
 	<title>Root &System;</title>
 	<para>When a simulator instance is newly instantiated, 
 	a subclass object of &System;,
-	a <classname>CompartmentSystem</classname>, is created. This
-	&System; is called the <emphasis>root &System</emphasis>.
+	a <classname>CompartmentSystem</classname>, is created, and named '/'.
+        This &System; is called the <emphasis>root &System</emphasis>.
 </para>
       </sect3>
 
@@ -89,7 +89,7 @@ The &Entity; class has three subclasses:
     </sect2>
 
     <sect2>
-      <title>&Stepper; objects</title>
+      <title>&Stepper; Objects</title>
 
       <para>A model must have one or more &Stepper; object(s).  Each
       &Process; and &System; object must be connected with a &Stepper;
@@ -119,7 +119,7 @@ The &Entity; class has three subclasses:
 
 
     <sect2>
-      <title>Identifiers</title>
+      <title>Object Identifiers</title>
 
       <para>&app; uses several types of identifier strings to specify
       an object, such as the &Entity; and &Stepper;, in a simulation
@@ -380,19 +380,20 @@ of which &ID; is 'P', in the &System; 'CELL' directly under the root system.
     <title>E-Cell Model (&EM;) File Basics</title>
 
     <sect2>
-      <title>What is &EM;?</title>
+      <title>What Is &EM;?</title>
 
       <para>
       In &app, the standard file format of model description and
       exchange is XML-based &EML; (E-Cell Model description Language).
       Although &EML; is an ideal means of integrating E-Cell with other
       software components such as GUI model editors and databases, it
-      is very tedious for human users who want to write and edit their
-      models directly by a text editor.  E-Cell Model (&EM;) is a file
-      format with programming language-like syntax and a powerful
+      is very tedious for human users to write and edit by hand.</para>
+
+      <para>E-Cell Model (&EM;) is a file
+      format with a programming language-like syntax and a powerful
       embedded &empy; preprocessor, which is
       designed to be productive and intuitive especially when handled
-      by the text editors and other text processing programs such as
+      by text editors and other text processing programs such as
       UNIX's <application>grep</application>,
       <application>diff</application> and
       <application>cat</application>.  Semantics of &EM; and &EML; files
@@ -406,23 +407,29 @@ of which &ID; is 'P', in the &System; 'CELL' directly under the root system.
     <sect3>
       <title>Why and when use &EM;?</title>
 
-      <para>Although <application>E-Cell Modeling
-    Environment</application> will provide means of more sophisticated,
-    scalable and intelligent model construction on the basis of &EML;,
-    learning syntax and semantics of &EM; may help you get the idea of
-    how object model inside &ecell is organized and how it is driven
-    to conduct simulations.  Furthermore, owing to the nature of plain
-    programming language-like syntax, &EM; can be used as a simple and
-    intuitive tool to communicate with other &ecell users.  In fact,
-    this manual uses &EM; to illustrate how a model is constructed in
-    &ecell;</para>
+	<para>An &EM; file can be viewed as an &EML; generator script.
+         
+
+</para>
+
+	<para>Although <application>E-Cell Modeling
+         Environment</application> (which is under development) will
+         provide means of more sophisticated, scalable and intelligent
+         model construction on the basis of &EML;, learning syntax and
+         semantics of &EM; may help you to get the idea of how object
+         model inside &ecell is organized and how it is driven to
+         conduct simulations.  Furthermore, owing to the nature of
+         plain programming language-like syntax, &EM; can be used as a
+         simple and intuitive tool to communicate with other &ecell
+         users.  In fact, this manual uses &EM; to illustrate how a
+         model is constructed in &ecell;</para>
 
     </sect3>
 
     </sect2>
 
     <sect2>
-      <title>&EM; At a Glance</title>
+      <title>&EM; At A Glance</title>
 
       <para>Before getting in to the details of &EM; syntax, let's
       have a look at a tiny example. It's very simple.</para>
@@ -490,13 +497,14 @@ System CompartmentSystem( / )
 
 
     <sect2>
-      <title>General Syntax of &EM;</title>
+      <title>General Syntax Of &EM;</title>
 
-      <para>Basically &EM; is (and thus &EML; is) a set of just one
+      <para>Basically &EM; is (and thus &EML; is) a list of just one
       type of directive: <emphasis>object instantiation</emphasis>.
-      And in &ecell;'s simulation model, the 'object' has, as we have
-      seen, only two types, &Stepper; and &Entity;.   In addition, after
-      creating an object, property values must be set.  Therefore the object
+      As we have seen, &ecell;'s simulation models have only two types 
+      of 'objects'; &Stepper; and &Entity;.   After
+      creating an object, property values of the object must be set.
+      Therefore the object
       instantiation has two steps: (1) creating object
       and (2) setting properties.</para>
 
@@ -508,7 +516,7 @@ of an object in the simulation model:
 
 <programlisting>
 TYPE CLASSNAME ( ID )
-'''INFO (<emphasis>optional</emphasis>)'''
+"""INFO (<emphasis>optional</emphasis>)"""
 { 
         PROPERTY_NAME_1 PROPERTY_VALUE_1;
         PROPERTY_NAME_2 PROPERTY_VALUE_2;
@@ -520,7 +528,7 @@ where:
 <itemizedlist>
 	    <listitem>
 	      <para>TYPE</para>
-		<para>An object type, which is one of the followings:
+		<para>The type of the object, which is one of the followings:
       <itemizedlist>
 	  <listitem>
 	    <para>&Stepper;</para>
@@ -550,7 +558,7 @@ where:
 	    <listitem>
 	      <para>CLASSNAME</para>
 		<para>A classname of this object.  This class must be
-a subclass of the baseclass defined by the <emphasis>TYPE</emphasis>.
+a subclass of the baseclass defined by <emphasis>TYPE</emphasis>.
 For example, if the <emphasis>TYPE</emphasis> is &Process;,
 <emphasis>CLASSNAME</emphasis> must be a subclass of &Process;, such
 as <classname>MassActionFluxProcess</classname>.</para>
@@ -558,9 +566,9 @@ as <classname>MassActionFluxProcess</classname>.</para>
 
 	    <listitem>
 	      <para>INFO</para>
-		<para>This field is optional, and is not used for the
+		<para>This field is optional, and is not used in the
 		simulation.  A quoted single-line ("string") or
-		a multi-line string ('''multi-line string''') can be put
+		a multi-line string ("""multi-line string""") can be put
 		here.</para>
 	    </listitem>
 
@@ -625,7 +633,7 @@ as <classname>MassActionFluxProcess</classname>.</para>
 	exist in the toplevel of an &EM; file.  Usually an &EM; file
 	has one or more &Stepper; and &System; statements.  A &System;
         statement can have zero or more &Variable; and &Process; statements.
-        There cannot be a &System; statement inside &System;.</para>
+        Do not put a &System; statement inside &System;.</para>
 
 	<para>A model must at least have a root sytem (/).
 
@@ -663,7 +671,7 @@ System CompartmentSystem( /LIVER/CELL1 )
 </programlisting>
 
          This is invalid because these two &System; objects are not
-         connected each other, nor form a single tree.
+         connected to each other, nor form a single tree.
          Adding another &System;, /LIVER, makes it valid.
 
 <programlisting>
@@ -770,7 +778,7 @@ converted to an &EML;:
       <sect3>
 	<title>Comments</title>
 
-	<para>The comment character is sharp '#'.  If a line contains
+	<para>The comment character is a sharp '#'.  If a line contains
          a '#' outside a quoted-string, anything after the character
          is considered a comment, and not processed by the
          <command>ecell3-em2eml</command> command.</para>
