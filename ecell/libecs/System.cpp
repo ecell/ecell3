@@ -132,7 +132,7 @@ namespace libecs
 
   const Message System::getVolumeIndex( StringCref keyword )
   {
-    if( getVolumeIndex() == NULLPTR )
+    if( ! haveVolumeIndex() )
       {
 	return Message( keyword );
       }
@@ -143,8 +143,15 @@ namespace libecs
 
   const Message System::getVolume( StringCref keyword )
   {
-    return Message( keyword, 
-		    UVariable( getVolume() ) ) ;
+    if( haveVolumeIndex() )
+      {
+	return Message( keyword, 
+			UVariable( getVolume() ) ) ;
+      }
+    else
+      {
+	return Message( keyword );
+      }
   }
 
   const Message System::getDeltaT( StringCref keyword )

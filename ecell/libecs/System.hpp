@@ -135,6 +135,12 @@ namespace libecs
     */
     ReactorPtr getVolumeIndex() const { return theVolumeIndex; }
 
+
+    bool haveVolumeIndex() const 
+    {
+      return getVolumeIndex() != NULLPTR;
+    }
+
     /**
        Volume of a System is calculated by activity() of
        VolumeIndex Reactor of the System.
