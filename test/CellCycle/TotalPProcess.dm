@@ -21,5 +21,11 @@ defineMethod( 'process', '''
   V -= C1.getVariable()->getConcentration();
   
   V *= N_A * getSuperSystem()->getVolume();
+
+  if( V < 0 )
+  {
+    V = 0;
+  }
+
   P0.getVariable()->setValue( V );
 ''' )
