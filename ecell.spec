@@ -26,12 +26,11 @@ CFLAGS="$RPM_OPT_FLAGS" ./configure --prefix=%{_prefix}
 
 %build
 make
-make doc
 
 %install
 #rm -rf $RPM_BUILD_ROOT
 make prefix="$RPM_BUILD_ROOT/usr" install
-make prefix="$RPM_BUILD_ROOT/usr" doc install
+make prefix="$RPM_BUILD_ROOT/usr" doc-install
 
 %clean
 rm -rf $RPM_BUILD_ROOT
