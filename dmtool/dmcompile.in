@@ -7,13 +7,15 @@ libdir=@libdir@
 
 
 CXX=@CXX@
-CXXFLAGS="@CXXFLAGS@"
+ORIG_CXXFLAGS="@CXXFLAGS@"
 LDADD=-lstdc++
 SHLEXT=@LTDL_SHLIB_EXT@
 BASENAME=@BASENAME@
 CXXSUFFIX=".cpp"
 
 VERBOSE=1
+
+unset CXXFLAGS
 
 
 exit_if_failed()
@@ -91,13 +93,18 @@ fi
 ## set names and variables
 
 SRC=$1 ; shift
-CXXCOMPILEFLAGS="$CXXFLAGS $*"
 CLASSNAME=`$BASENAME $SRC $CXXSUFFIX`
 OBJ=$CLASSNAME.o
 SOBJ=$CLASSNAME$SHLEXT
 
 
-LDFLAGS="-Wl,-rpath=$libdir,-soname=$SOBJ"
+LDFLAGS="-Wl,-rpath=$libdir,-soname=$SOBJ $LDFLAGS"
+
+if [ $CXXFLAGS ]; then
+    CXXCOMPILEFLAGS="$CXXFLAGS $*"
+else
+    CXXCOMPILEFLAGS="$ORIG_CXXFLAGS $*"
+fi
 
 
 ## main routine
