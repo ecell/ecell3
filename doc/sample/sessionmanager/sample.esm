@@ -1,0 +1,79 @@
+# example of esm file for SessionManager
+
+import sys
+import shutil
+
+message( "---- sample.esm ------------> start " )
+
+# -----------------------------------------------------
+# [1] set up the properties of SessionManager
+# -----------------------------------------------------
+
+# [1-1] set the environment parameter
+setEnvironment('Local')
+#setEnvironment('SGE')
+message( "current environment = %s " %getEnvironment() )
+message( "current concurrency = %s " %getConcurrency() )
+
+# [1-2] set the temporary directory
+setTmpRootDir('./workingdir')
+message( "current temporary root dir = %s" %getTmpRootDir() )
+message( "current temporary dir = %s" %getTmpDir() )
+
+# [1-3] set the stdout and stderr
+setStdoutFileName('stdout.txt')
+setStderrFileName('stderr.txt')
+
+
+# -----------------------------------------------------
+# [2] retuster jobs
+# -----------------------------------------------------
+# [2-1] set up
+anEssFile = 'onerun.ess'
+anExtraFileList = ['simple.eml']
+
+# [2-2] register 3 sessions
+aJob1 = registerEcellSession(anEssFile,"{'value':100}",anExtraFileList )
+aJob2 = registerEcellSession(anEssFile,"{'value':200}",anExtraFileList )
+aJob3 = registerEcellSession(anEssFile,"{'value':300}",anExtraFileList )
+
+
+# -----------------------------------------------------
+# [3] run
+# -----------------------------------------------------
+
+message( "run --> start" )
+
+run(block=True)
+
+message( "run --> end" )
+
+# -----------------------------------------------------
+# [4] copy files
+# -----------------------------------------------------
+
+message( "copy files --> start" )
+
+# [4-1] copy output file and stdout file of first job 
+shutil.copy("%s/S.ecd"%getJobDirectory(aJob1), "S1.ecd")
+shutil.copy("%s/stdout.txt"%getJobDirectory(aJob1), "stdout1.txt")
+
+# [4-2] copy output file and stdout file of second job 
+shutil.copy("%s/S.ecd"%getJobDirectory(aJob2), "S2.ecd")
+shutil.copy("%s/stdout.txt"%getJobDirectory(aJob2), "stdout2.txt")
+
+# [4-3] copy output file and stdout file of third job 
+shutil.copy("%s/S.ecd"%getJobDirectory(aJob3), "S3.ecd")
+shutil.copy("%s/stdout.txt"%getJobDirectory(aJob3), "stdout3.txt")
+
+message( "copy files --> end" )
+
+message( "---- sample.esm ------------> end " )
+# end of sample.ecs
+
+
+
+
+
+
+

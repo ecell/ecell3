@@ -1,0 +1,52 @@
+# sample of testrun
+
+from ecell.ECDDataFile import *
+
+print "onerun.ess --------------------------------> start "
+# value is set by --parameters="{'value':200}"
+message("value= %s" %value)
+
+# load the model
+loadModel( 'simple.eml' )
+
+# -----------------------------------------------------
+# [1] set parameter
+# -----------------------------------------------------
+
+# create stubs
+S = createEntityStub( 'Variable:/:S' )
+
+S.setProperty( 'Value', value )        
+message("Time= %s" %getCurrentTime())
+message("S:Value= %s" %S.getProperty('Value'))
+
+# creates logger
+S_Logger = createLoggerStub( 'Variable:/:S:Value' )
+S_Logger.create()
+S = createEntityStub( 'Variable:/:S' )
+
+# -----------------------------------------------------
+# [2] run
+# -----------------------------------------------------
+message("run")
+run( 200 )
+
+message("Time= %s" %getCurrentTime())
+message("S:Value= %s" %S.getProperty('Value'))
+
+# -----------------------------------------------------
+# [3] save data
+# -----------------------------------------------------
+message('saving S.ecd...')
+aDataFile = ECDDataFile( S_Logger.getData(0,2000,5) )
+aDataFile.setDataName( S_Logger.getName() )
+aDataFile.setNote( '' )
+aDataFile.save( 'S.ecd' )
+
+print "onerun.ess --------------------------------> end "
+
+# end of testrun.ess
+
+
+
+

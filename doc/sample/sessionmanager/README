@@ -1,0 +1,34 @@
+%Id: README,v 1.0 2003/09/03 19:02 sugi Exp %
+
+
+
+=== About ===
+
+This is a very simple example of E-Cell Session Manager Script (ESM)
+for SessionManager. SessionManager concurrently runs script files,
+including ESS files or other script files(sh,python,etc.).
+
+
+
+=== Files and directories ===
+
+README:                     This file
+onerun.ess:                 ESS file which is loaded by a E-Cell session object.
+sample.esm:                 ESM file which is loaded by multiple E-Cell session
+                            objects.
+simple.em:                  Model file(EM file) for this model
+
+
+=== Running this script ===
+
+1. Convert the .em file to .eml file.
+
+   % ecell3-em2eml simple.em
+   % ls simple.eml
+   simple.eml
+
+
+2. Run ecs file.
+
+   % ecell3-session-manager sample.esm
+
