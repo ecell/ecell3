@@ -120,17 +120,29 @@ class ErParser( GenericParser ):
 		return AST( type=args[1] , left=args[0], right=args[2] )
 
 	def p_entity_system ( self, args ):
-		'''
-		entity ::= class ( systeminfo
+                '''
+		entity ::= class ( systembase
 		'''
 		return AST( type=args[1] , left=args[0], right=args[2] )
-	
+
+	def p_systembase_1 ( self, args ):
+		'''
+		systembase ::= systemidandinfo ) { propertylist }
+		'''
+		return AST( type=args[2], left=args[0], right=args[3] )
+
+	def p_systemidandinfo ( self, args ):
+		'''
+		systemidandinfo ::= systemid , info
+		'''
+		return AST( type=args[1], left=args[0], right=args[2] )
+
 	def p_systeminfo_1( self, args):
 		'''
 		systeminfo ::= systemid , info ) { propertylist }
 		'''
 		return AST( type=args[4], left=args[0] , right=args[5] )
-	
+
 	def p_class ( self, args ):
 		'''
 		class ::= name
@@ -252,31 +264,26 @@ class Interpret(GenericASTTraversal):
 #				print "createStepper( %s, %s)" % (aClass, anID )
 				anEml.createStepper( aClass, anID )
 			else:
-				aFullID = anEml.convertSystemID2SystemFullID(node.right.left.value)
+				aSystemID = node.right.left.value
+				aFullID = anEml.convertSystemID2SystemFullID(aSystemID)
 				if aClass == 'System':
 					anID = aFullID
 				elif aClass == 'Substance':
-					anID = string.join(string.split(aFullID, 'System'), "Substance")
+					anID = 'Substance:' + aSystemID
 				else:
-					anID = string.join(string.split(aFullID, 'System'), "Reactor")
+					anID = 'Reactor:' + aSystemID
 #				print "createEntity( %s, %s)" % ( aClass, anID )
-#				anEml.createEntity( aClass, anID )
 				anEml.entity.append((aClass, anID))
 				
 				for i in anEml.queue:
-					if aClass == 'Substance':
-						aType = string.join(string.split(i[0], 'System'), "Substance")
-					elif i[1] == 'Reactant':
-						aType = string.join(string.split(i[0], 'System'), "Reactor")
-					else:
-						aType = i[0]
-#					print "\tsetEntityProperty(%s, %s, %s)" % (aType, i[1], i[2:])
-#					anEml.setEntityProperty( aType, i[1], i[2:])
-					anEml.property[aType] = (aType, i[1], i[2:])
+					anEml.property.append((anID, i[1], i[2:]))
 				anEml.queue = []
 
 		if node.type == '{':
-			aFullID = anEml.convertSystemID2SystemFullID(node.left.value)
+			aSystemID = node.left.value
+			aFullID = anEml.convertSystemID2SystemFullID(aSystemID)
+			
+			aPropertyList = []
 			(aPropertyName, aValueList) = ('', [] )
 			nodekid = node.right
 			while nodekid.value == ';':
@@ -287,11 +294,25 @@ class Interpret(GenericASTTraversal):
 					nodepro = nodepro.right
 				aPropertyName = nodekid.left.value
 				anEml.queue.append((aFullID, aPropertyName, aValueList))
-				
 				nodekid = nodekid.right
+		
+		if node.type == ',':
+			node.value = node.left.value
 		else:
 			node.value = node.attr
 		
+def sortSystemID( aList ):
+	aSortList  = []
+	aLowList   = []
+	aHightList = []
+	for i in aList:
+		aClass = string.split(i[1], ':')[0]
+		if aClass == 'System':
+			aHightList.append(i)
+		else:
+			aLowList.append(i)
+	aSortList = aHightList + aLowList
+	return aSortList
 
 if __name__ == '__main__':
 	aFilename = sys.argv[1]
@@ -305,19 +326,23 @@ if __name__ == '__main__':
 	aFileObject = open('minimum.eml')
 	anEml = eml.Eml( aFileObject )
 	anEml.entity = []
-	anEml.property = {}
+	anEml.property = []
 	anEml.queue = []
 	
 	aInterpreter = Interpret( anAst )
 
 	anEml.queue = []
 
+	anEml.entity = sortSystemID(anEml.entity)
+
 	for i in anEml.entity:
 		(aClass, aFullID) = i
+#		print "createEntity( %s, %s)" % (aClass, aFullID)
 		anEml.createEntity(aClass, aFullID)
 
-	for j in anEml.property.keys():
-		(aFullID, aPropertyName, aValueList) = anEml.property[j]
+	for j in anEml.property:
+		(aFullID, aPropertyName, aValueList) = j
+#		print "setEntityProperty(%s, %s, %s)" % (aFullID, aPropertyName, aValueList)
 		anEml.setEntityProperty(aFullID, aPropertyName, aValueList)
 	
 	string = anEml.asString()
