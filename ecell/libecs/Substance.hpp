@@ -110,19 +110,19 @@ namespace libecs
     }
 
 
-    virtual void setVelocity( RealCref aVelocity );
+    virtual void setVelocity( RealCref aVelocity ) = 0;
 
     /**
        @return current velocity value in (number of molecules)/(step)
     */
 
-    virtual const Real getVelocity() const;
+    virtual const Real getVelocity() const = 0;
 
     /**
        @param v velocity in number of molecules to be added.
     */
 
-    virtual void addVelocity( RealCref aVelocity );
+    virtual void addVelocity( RealCref aVelocity ) = 0;
 
     /**
        Returns activity value of a Substance object.
