@@ -28,15 +28,6 @@
 // E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
 
-//
-// Reference counted pointer class.
-//
-// Inspired by AutoRelease Library
-// (Reference Counting Garbage Collector for C++).
-// http://www.fukt.hk-r.se/~per/autorelease/
-// written by Per Liden <per@fukt.hk-r.se>
-//
-
 #ifndef __AUTORELEASE_HPP
 #define __AUTORELEASE_HPP
 
@@ -49,6 +40,16 @@ DECLARE_TYPE( RCPtr<type>, type ## RCPtr )
 
 
 #include "Defs.hpp"
+
+/**
+   A simple reference counted pointer class.
+
+   Inspired by, but rewritten version of, the AutoRelease Library
+   (Reference Counting Garbage Collector for C++) taken from
+   http://www.fukt.hk-r.se/~per/autorelease/
+   written by Per Liden <per@fukt.hk-r.se>.
+*/
+
 
 template <class T>
 class RCPtr
@@ -183,9 +184,9 @@ private:
 	return false;
       }
 
+    assert( 0 );
     // NEVER_GET_HERE
   }
-
   void incrementReferenceCount() const
   {
     ++(*theCount);
