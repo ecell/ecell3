@@ -45,7 +45,7 @@ namespace libecs
 
   // Constructor
 
-  Logger::Logger( GetCurrentTimeMethodType aGetCurrentTime,
+  Logger::Logger( const GetCurrentTimeMethodType& aGetCurrentTime,
 		  PropertySlotRef aPropertySlot )
     :
     thePropertySlot( aPropertySlot ),

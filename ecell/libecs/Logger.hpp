@@ -71,7 +71,7 @@ namespace libecs
 
     */
   
-    explicit Logger( GetCurrentTimeMethodType aGetCurrentTime,
+    explicit Logger( const GetCurrentTimeMethodType& aGetCurrentTime,
 		     PropertySlotRef aPropertySlot );
 
   
@@ -205,7 +205,7 @@ namespace libecs
     /// Data members
 
     PropertySlotRef      thePropertySlot;
-    const GetCurrentTimeMethodType theGetCurrentTimeMethod; 
+    const GetCurrentTimeMethodType& theGetCurrentTimeMethod; 
     Real                 theMinimumInterval;
     Real                 theCurrentInterval;
     DataPointVector      theDataPointVector;
