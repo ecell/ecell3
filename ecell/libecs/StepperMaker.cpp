@@ -46,6 +46,9 @@ namespace libecs
   {
     NewStepperModule( Euler1Stepper );
     NewStepperModule( RungeKutta4Stepper );
+    NewStepperModule( AdaptiveStepsizeEuler1Stepper );
+    NewStepperModule( AdaptiveStepsizeMidpoint2Stepper );
+    NewStepperModule( CashKarp4Stepper );
   }
 
 

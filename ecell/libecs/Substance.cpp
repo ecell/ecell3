@@ -144,11 +144,18 @@ namespace libecs
 	updateQuantity( aTime );
       }
     
-    if( getQuantity() < 0 )
+    if( getQuantity() < DBL_EPSILON )
       {
-	THROW_EXCEPTION( RangeError, "PositiveSubstance [" + 
-			 getFullID().getString() + 
-			 "]: negative quantity occured." );
+	if( getQuantity() > -DBL_EPSILON )
+	  {
+	    setQuantity(0);
+	  }
+	else
+	  {
+	    THROW_EXCEPTION( RangeError, "PositiveSubstance [" + 
+			     getFullID().getString() + 
+			     "]: negative quantity occured." );
+	  }
       }
   }
 

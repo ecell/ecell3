@@ -122,7 +122,8 @@ public:\
   DEFINE_EXCEPTION( UnexpectedError,        Exception );
   DEFINE_EXCEPTION( NotFound,               Exception );
   DEFINE_EXCEPTION( CantOpen,               Exception ); 
-//  DEFINE_EXCEPTION( CallbackFailed,         Exception );
+
+//    DEFINE_EXCEPTION( CallbackFailed,         Exception );
   DEFINE_EXCEPTION( AssertionFailed,        Exception );
   DEFINE_EXCEPTION( AlreadyExist,           Exception );
   DEFINE_EXCEPTION( ValueError,             Exception );
@@ -131,7 +132,6 @@ public:\
   DEFINE_EXCEPTION( SimulationError,        Exception );
   DEFINE_EXCEPTION( InitializationFailed,   SimulationError );
   DEFINE_EXCEPTION( RangeError,             SimulationError );
-
 
   // PropertySlot errors
   DEFINE_EXCEPTION( PropertyException,      Exception );

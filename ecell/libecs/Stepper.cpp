@@ -131,6 +131,8 @@ namespace libecs
     theModel( NULLPTR ),
     theCurrentTime( 0.0 ),
     theStepInterval( 0.001 ),
+    theTolerantStepInterval( 0.001 ),
+    theNextStepInterval( 0.001 ),
     theUserMinInterval( 0.0 ),
     theUserMaxInterval( std::numeric_limits<Real>::max() ),
     theSlaveStepper( NULLPTR )
@@ -146,7 +148,6 @@ namespace libecs
 
     theQuantityBuffer.resize( aSize );
     theVelocityBuffer.resize( aSize );
-
 
     //    if( isEntityListChanged() )
     //      {
@@ -462,16 +463,46 @@ namespace libecs
       }
   }
 
-
-  inline void Stepper::updateVelocityBuffer()
+  inline void Stepper::reset()
   {
     const UnsignedInt aSize( theSubstanceCache.size() );
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
 	SubstancePtr const aSubstance( theSubstanceCache[ c ] );
 
-	theVelocityBuffer[ c ] = aSubstance->getVelocity();
+	// restore x (original value)
+	aSubstance->setQuantity( theQuantityBuffer[ c ] );
+
+	// clear velocity
+	theVelocityBuffer[ c ] = 0.0;
+	aSubstance->setVelocity( 0.0 );
       }
+  }
+
+  inline void Stepper::updateVelocityBuffer()
+  {
+    setStepInterval( getNextStepInterval() );
+
+    const UnsignedInt aSize( theSubstanceCache.size() );
+    for( UnsignedInt c( 0 ); c < aSize; ++c )
+      {
+	SubstancePtr const aSubstance( theSubstanceCache[ c ] );
+
+	theVelocityBuffer[ c ] = aSubstance->getVelocity();
+
+	// avoid negative value
+	while( aSubstance->checkRange( getStepInterval() ) == false )
+	  {
+	    // don't use setStepInterval()
+	    loadStepInterval( getStepInterval()*0.5 );
+	  }
+      }
+
+    if( getStepInterval() < getTolerantStepInterval() )
+      {
+  	setNextStepInterval( getStepInterval() * 2.0 );
+      }
+    else setNextStepInterval( getStepInterval() );
   }
 
 
@@ -592,9 +623,526 @@ namespace libecs
     
     // don't call updateVelocityBuffer() -- it is already updated by
     // the algorithm.
-
   }
 
+
+  ////////////////////////// AdaptiveStepsizeEuler1Stepper
+
+  AdaptiveStepsizeEuler1Stepper::AdaptiveStepsizeEuler1Stepper()
+  {
+    ; // do nothing
+  }
+
+  void AdaptiveStepsizeEuler1Stepper::initialize()
+  {
+    Stepper::initialize();
+
+    setUserMaxInterval( 0.001 );
+  }
+
+  void AdaptiveStepsizeEuler1Stepper::step()
+  {
+    Real delta, delta_max;
+    Real aTolerance, anError;
+    Real aStepInterval;
+
+    const Real eps_abs( 1.0e-16 );
+    const Real eps_rel( 1.0e-4 );
+    const Real a_y( 0.0 );
+    const Real a_dydt( 1.0 );
+
+    const Real safety( 0.9 );
+
+    const UnsignedInt aSize( theSubstanceCache.size() );
+
+    integrate();
+    slave();
+    log();
+    clear();
+
+    setStepInterval( getNextStepInterval() );
+
+    while( 1 )
+      {
+
+	// ========= 1 ===========
+	react();
+
+	for( UnsignedInt c( 0 ); c < aSize; ++c )
+	  {
+	    SubstancePtr const aSubstance( theSubstanceCache[ c ] );
+
+	    // get k1
+	    const Real aVelocity( aSubstance->getVelocity() );
+	    theVelocityBuffer[ c ] = aVelocity;
+
+	    aSubstance->loadQuantity( aVelocity * .5 * getStepInterval() 
+				      + theQuantityBuffer[ c ] );
+	    aSubstance->setVelocity( 0 );
+	  }
+
+	// ========= 2 ===========
+	react();
+
+	delta_max = 0.0;
+
+	for( UnsignedInt c( 0 ); c < aSize; ++c )
+	  {
+	    SubstancePtr const aSubstance( theSubstanceCache[ c ] );
+
+	    // get k2 = f(x+h/2, y+k1*h/2)
+	    const Real aVelocity( aSubstance->getVelocity() );
+
+  	    aTolerance = eps_abs 
+	      + eps_rel * ( a_y * fabs(theQuantityBuffer[ c ]) 
+			    + a_dydt * getStepInterval() * fabs(theVelocityBuffer[ c ]) );
+
+	    anError = theVelocityBuffer[ c ] - aVelocity;
+	    delta = fabs(anError / aTolerance);
+
+	    getchar();
+
+	    if( delta > delta_max )
+	      {
+		delta_max = delta;
+		
+		// shrink it if the error exceeds 110%
+		if( delta_max > 1.1 )
+		  {
+               	    setStepInterval( getStepInterval() * 0.5 );
+//      		    setStepInterval( getStepInterval() * pow(delta_max, -1.0) *  safety );
+
+		    reset();
+		    continue;
+		  }
+	      }
+
+	    // restore x and dx/dt (original value)
+	    aSubstance->loadQuantity( theQuantityBuffer[ c ] );
+	    aSubstance->setVelocity( theVelocityBuffer[ c ] );
+	  }
+
+
+	if( delta_max <= 0.5 )
+	  {
+	    // grow it if error is 50% less than desired
+    	    aStepInterval = getStepInterval() * 2.0;
+//    	    aStepInterval = getStepInterval() * pow(delta_max, -0.5) * safety;
+
+	    if( aStepInterval >= getUserMaxInterval() )
+	      {
+		aStepInterval = getUserMaxInterval();
+	      }
+
+	    setNextStepInterval( aStepInterval );
+	  }
+	else
+	  setNextStepInterval( getStepInterval() );
+
+	break;
+      }
+
+    // don't call updateVelocityBuffer() -- it is already updated by
+    // the algorithm.
+  }
+
+
+ ////////////////////////// AdaptiveStepsizeMidpoint2Stepper
+
+  AdaptiveStepsizeMidpoint2Stepper::AdaptiveStepsizeMidpoint2Stepper()
+  {
+    ; // do nothing
+  }
+
+  void AdaptiveStepsizeMidpoint2Stepper::initialize()
+  {
+    Stepper::initialize();
+
+    const UnsignedInt aSize( theSubstanceCache.size() );
+
+    theK1.resize( aSize );
+    theErrorEstimate.resize( aSize );
+  }
+
+  void AdaptiveStepsizeMidpoint2Stepper::step()
+  {
+    Real maxError( 0.0 );
+    Real desiredError, tmpError;
+    Real aStepInterval;
+
+    const UnsignedInt aSize( theSubstanceCache.size() );
+
+    const Real eps_rel( 1.0e-8 );
+    const Real eps_abs( 1.0e-6 );
+    const Real a_y( 0.0 );
+    const Real a_dydt( 0.0 );
+
+    const Real safety( 0.9 );
+
+    // integrate phase first
+    integrate();
+
+    slave();
+
+    log();
+
+    // clear
+    clear();
+
+    setStepInterval( getNextStepInterval() );
+
+    while( 1 )
+      {
+
+	// ========= 1 ===========
+	react();
+
+	for( UnsignedInt c( 0 ); c < aSize; ++c )
+	  {
+	    SubstancePtr const aSubstance( theSubstanceCache[ c ] );
+	    
+	    // get k1
+	    theK1[ c ] = aSubstance->getVelocity();
+
+	    // restore k1/2 + x
+	    aSubstance->loadQuantity( theK1[ c ] * .5  * getStepInterval()
+				      + theQuantityBuffer[ c ] );
+
+	    // k1 * for ~Yn+1
+	    theErrorEstimate[ c ] = theK1[ c ];
+
+	    // clear velocity
+	    aSubstance->setVelocity( 0 );
+	  }
+
+	// ========= 2 ===========
+	react();
+
+	for( UnsignedInt c( 0 ); c < aSize; ++c )
+	  {
+	    SubstancePtr const aSubstance( theSubstanceCache[ c ] );
+	    
+	    // get k2
+	    theVelocityBuffer[ c ] = aSubstance->getVelocity();
+	    
+	    // restore -k1+ k2 * 2 + x
+	    aSubstance->loadQuantity( (-theK1[ c ] + theVelocityBuffer[ c ] * 2.0) * getStepInterval()
+				      + theQuantityBuffer[ c ] );
+	    
+	    // k2 * 4 for ~Yn+1
+  	    theErrorEstimate[ c ] += theVelocityBuffer[ c ] * 4.0;
+
+	    // clear velocity
+	    aSubstance->setVelocity( 0 );
+	  }
+	
+	// ========= 3 ===========
+	react();
+	
+	maxError = 0.0;
+
+	// restore theQuantityBuffer
+	for( UnsignedInt c( 0 ); c < aSize; ++c )
+	  {
+	    SubstancePtr const aSubstance( theSubstanceCache[ c ] );
+
+	    const Real aVelocity( aSubstance->getVelocity() );
+
+	    // k3 for ~Yn+1
+	    theErrorEstimate[ c ] += aVelocity;
+	    theErrorEstimate[ c ] /= 6.0;
+
+//  	    desiredError = eps_rel * ( a_y * fabs(theQuantityBuffer[ c ]) + a_dydt * getStepInterval() * fabs(theVelocityBuffer[ c ]) ) + eps_abs;
+//  	    tmpError = fabs(theVelocityBuffer[ c ] - theErrorEstimate[ c ]) / desiredError;
+	    
+//  	    if( tmpError > maxError )
+//  	      {
+//  		maxError = tmpError;
+		
+//  		if( maxError > 1.1 )
+//  		  {
+//  		    // shrink it if the error exceeds 110%
+//  		    setStepInterval( getStepInterval() * pow(maxError , -0.5) *  safety );
+
+//  		    reset();
+//  		    continue;
+//  		  }
+//  	      }
+
+	    // restore x (original value)
+	    aSubstance->loadQuantity( theQuantityBuffer[ c ] );
+
+	    //// x(n+1) = x(n) + k2 * aStepInterval + O(h^3)
+	    aSubstance->setVelocity( theVelocityBuffer[ c ] );
+	  }
+
+	// grow it if error is 50% less than desired
+//  	if (maxError <= 0.5)
+//  	  {
+//  	    aStepInterval = getStepInterval() * pow(maxError , -1.0/3.0) * safety;
+//  	    if( aStepInterval >= getUserMaxInterval() )
+//  	      {
+//  		aStepInterval = getStepInterval();
+//  	      }
+
+//  	    setNextStepInterval( aStepInterval );
+//  	  }
+//  	else setNextStepInterval( getStepInterval() );
+
+	setNextStepInterval( getStepInterval() );
+
+	break;
+      }
+
+    // don't call updateVelocityBuffer() -- it is already updated by
+    // the algorithm.
+  }
+
+
+  ////////////////////////// CashKarp4Stepper
+
+  CashKarp4Stepper::CashKarp4Stepper()
+  {
+    ; // do nothing
+  }
+
+  void CashKarp4Stepper::initialize()
+  {
+    Stepper::initialize();
+
+    const UnsignedInt aSize( theSubstanceCache.size() );
+
+    theK1.resize( aSize );
+    theK2.resize( aSize );
+    theK3.resize( aSize );
+    theK4.resize( aSize );
+    theK5.resize( aSize );
+    theK6.resize( aSize );
+
+    theErrorEstimate.resize( aSize );
+  }
+  
+  void CashKarp4Stepper::step()
+  {
+    Real maxError( 0.0 );
+    Real desiredError, tmpError;
+    Real aStepInterval;
+
+    const UnsignedInt aSize( theSubstanceCache.size() );
+
+    const Real eps_rel( 1.0e-8 );
+    const Real eps_abs( 1.0e-10 );
+    const Real a_y( 0.0 );
+    const Real a_dydt( 0.0 );
+    const Real safety( 0.9 );
+
+    // integrate phase first
+    integrate();
+
+    slave();
+
+    log();
+
+    // clear
+    clear();
+
+    setStepInterval( getNextStepInterval() );
+
+    while( 1 )
+      {
+
+	// ========= 1 ===========
+	react();
+
+	for( UnsignedInt c( 0 ); c < aSize; ++c )
+	  {
+	    SubstancePtr const aSubstance( theSubstanceCache[ c ] );
+	    
+	    // get k1
+	    theK1[ c ] = aSubstance->getVelocity();
+
+	    // restore k1 / 5 + x
+	    aSubstance->loadQuantity( theK1[ c ] * .2  * getStepInterval()
+				      + theQuantityBuffer[ c ] );
+
+	    // k1 * 37/378 for Yn+1
+	    theVelocityBuffer[ c ] = theK1[ c ] * ( 37.0 / 378.0 );
+	    // k1 * 2825/27648 for ~Yn+1
+	    theErrorEstimate[ c ] = theK1[ c ] * ( 2825.0 / 27648.0 );
+
+	    // clear velocity
+	    aSubstance->setVelocity( 0 );
+	  }
+
+	// ========= 2 ===========
+	react();
+
+	for( UnsignedInt c( 0 ); c < aSize; ++c )
+	  {
+	    SubstancePtr const aSubstance( theSubstanceCache[ c ] );
+	    
+	    theK2[ c ] = aSubstance->getVelocity();
+	    
+	    // restore k1 * 3/40+ k2 * 9/40 + x
+	    aSubstance->loadQuantity( theK1[ c ] * ( 3.0 / 40.0 ) * getStepInterval()
+				      + theK2[ c ] * ( 9.0 / 40.0 ) * getStepInterval()
+				      + theQuantityBuffer[ c ] );
+	    
+	    // k2 * 0 for Yn+1 (do nothing)
+//  	    theVelocityBuffer[ c ] = theK2[ c ] * 0;
+	    // k2 * 0 for ~Yn+1 (do nothing)
+//  	    theErrorEstimate[ c ] = theK2[ c ] * 0;
+	    
+	    
+	    // clear velocity
+	    aSubstance->setVelocity( 0 );
+	  }
+	
+	// ========= 3 ===========
+	react();
+	
+	for( UnsignedInt c( 0 ); c < aSize; ++c )
+	  {
+	    SubstancePtr const aSubstance( theSubstanceCache[ c ] );
+	    
+	    theK3[ c ] = aSubstance->getVelocity();
+	    
+	    // restore k1 * 3/10 - k2 * 9/10 + k3 * 6/5 + x
+	    aSubstance->loadQuantity( theK1[ c ] * ( 3.0 / 10.0 ) * getStepInterval()
+				      - theK2[ c ] * ( 9.0 / 10.0 ) * getStepInterval()
+				      + theK3[ c ] * ( 6.0 / 5.0 ) * getStepInterval()
+				      + theQuantityBuffer[ c ] );
+	    
+	    // k3 * 250/621 for Yn+1
+	    theVelocityBuffer[ c ] += theK3[ c ] * ( 250.0 / 621.0 );
+	    // k3 * 18575/48384 for ~Yn+1
+	    theErrorEstimate[ c ] += theK3[ c ] * ( 18575.0 / 48384.0 );
+	    
+	    
+	    // clear velocity
+	    aSubstance->setVelocity( 0 );
+	  }
+	
+	// ========= 4 ===========
+	react();
+	
+	for( UnsignedInt c( 0 ); c < aSize; ++c )
+	  {
+	    SubstancePtr const aSubstance( theSubstanceCache[ c ] );
+	    
+	    theK4[ c ] = aSubstance->getVelocity();
+	    
+	    // restore k2 * 5/2 - k1 * 11/54 - k3 * 70/27 + k4 * 35/27 + x
+	    aSubstance->loadQuantity( theK2[ c ] * ( 5.0 / 2.0 ) * getStepInterval()
+				      - theK1[ c ] * ( 11.0 / 54.0 ) * getStepInterval()
+				      - theK3[ c ] * ( 70.0 / 27.0 ) * getStepInterval()
+				      + theK4[ c ] * ( 35.0 / 27.0 ) * getStepInterval()
+				      + theQuantityBuffer[ c ] );
+	    
+	    // k4 * 125/594 for Yn+1
+	    theVelocityBuffer[ c ] += theK4[ c ] * ( 125.0 / 594.0 );
+	    // k4 * 13525/55296 for ~Yn+1
+	    theErrorEstimate[ c ] += theK4[ c ] * ( 13525.0 / 55296.0 );
+	    
+	    
+	    // clear velocity
+	    aSubstance->setVelocity( 0 );
+	  }
+	
+	
+	// ========= 5 ===========
+	react();
+	
+	for( UnsignedInt c( 0 ); c < aSize; ++c )
+	  {
+	    SubstancePtr const aSubstance( theSubstanceCache[ c ] );
+	    
+	    theK5[ c ] = aSubstance->getVelocity();
+	    
+	    // restore k1 * 1631/55296 + k2 * 175/512 + k3 * 575/13824 + k4 * 44275/110592 + k5 * 253/4096 + x
+	    aSubstance->loadQuantity( theK1[ c ] * ( 1631.0 / 55296.0 ) * getStepInterval()
+				      + theK2[ c ] * ( 175.0 / 512.0 ) * getStepInterval()
+				      + theK3[ c ] * ( 575.0 / 13824.0 ) * getStepInterval()
+				      + theK4[ c ] * ( 44275.0 / 110592.0 ) * getStepInterval()
+				      + theK5[ c ] * ( 253.0 / 4096.0 ) * getStepInterval()
+				      + theQuantityBuffer[ c ] );
+	    
+	    // k5 * 0 for Yn+1(do nothing)
+//  	    theVelocityBuffer[ c ] += theK5[ c ] * 0;
+	    // k5 * 277/14336 for ~Yn+1
+	    theErrorEstimate[ c ] += theK5[ c ] * ( 277.0 / 14336.0 );
+	    
+	    
+	    // clear velocity
+	    aSubstance->setVelocity( 0 );
+	  }
+		
+	// ========= 6 ===========
+	react();
+	
+	maxError = 0.0;
+
+	// restore theQuantityBuffer
+	for( UnsignedInt c( 0 ); c < aSize; ++c )
+	  {
+	    SubstancePtr const aSubstance( theSubstanceCache[ c ] );
+
+	    theK6[ c ] = aSubstance->getVelocity();
+
+	    // k6 * 512/1771 for Yn+1
+	    theVelocityBuffer[ c ] += theK6[ c ] * ( 512.0 / 1771.0 );
+	    // k6 * 1/4 for ~Yn+1
+	    theErrorEstimate[ c ] += theK6[ c ] * .25;
+
+//  	    desiredError = eps_rel * ( a_y * fabs(theQuantityBuffer[ c ]) + a_dydt * getStepInterval() * fabs(theVelocityBuffer[ c ]) ) + eps_abs;
+//  	    tmpError = fabs(theVelocityBuffer[ c ] - theErrorEstimate[ c ]) / desiredError;
+	    
+//  	    if( tmpError > maxError )
+//  	      {
+//  		maxError = tmpError;
+		
+//  		if( maxError > 1.1 )
+//  		  {
+//  		    // shrink it if the error exceeds 110%
+//  		    setStepInterval( getStepInterval() * pow(maxError , -0.20) *  safety );
+
+//    		    printf("Error: %e\nInterval: %lf\n", theVelocityBuffer[ c ]-theErrorEstimate[ c ], getStepInterval());
+//  		    reset();
+//  		    continue;
+//  		  }
+//  	      }
+
+	    // restore x (original value)
+	    aSubstance->loadQuantity( theQuantityBuffer[ c ] );
+
+	    //// x(n+1) = x(n) + (k1 * 37/378 + k3 * 250/621 + k4 * 125/594 + k6 * 512/1771) + O(h^5)
+	    aSubstance->setVelocity( theVelocityBuffer[ c ] );
+	  }
+
+	// grow it if error is 50% less than desired
+//  	if (maxError <= 0.5)
+//  	  {
+//  	    aStepInterval = getStepInterval() * pow(maxError , -0.25) * safety;
+
+//  	    if( aStepInterval >= getUserMaxInterval() )
+//  	      {
+//  		aStepInterval = getStepInterval();
+//  	      }
+
+//  	    printf("Error: %e\nInterval: %lf\n", maxError, aStepInterval);
+	    
+//  	    setNextStepInterval( aStepInterval );
+//  	  }
+//  	else setNextStepInterval( getStepInterval() );
+	
+	setNextStepInterval( getStepInterval() );
+
+	break;
+      }
+
+    // don't call updateVelocityBuffer() -- it is already updated by
+    // the algorithm.
+  }
 
 
 } // namespace libecs
@@ -607,3 +1155,4 @@ namespace libecs
   $Date$
   $Locker$
 */
+

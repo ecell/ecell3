@@ -58,6 +58,7 @@ namespace libecs
 
   DECLARE_CLASS( Euler1Stepper );
   DECLARE_CLASS( RungeKutta4Stepper );
+  DECLARE_CLASS( AdaptiveStepsizeEuler1Stepper );
 
   /**
      Stepper class defines and governs computation unit in a model.
@@ -117,7 +118,7 @@ namespace libecs
        
     Each subclass of Stepper defines this.
 
-    @note Subclass of Stepper must call this by Stepper::step() from
+    @note Subclass of Stepper must call this by Stepper::calculate() from
     their step().
     */
 
@@ -135,6 +136,8 @@ namespace libecs
     void slave();
     void clear();
     void react();
+
+    void reset();
 
     void updateVelocityBuffer();
     
@@ -178,10 +181,27 @@ namespace libecs
 
     void setStepInterval( RealCref aStepInterval )
     {
+      theTolerantStepInterval = aStepInterval;
+
+      loadStepInterval( aStepInterval );
+    }
+
+    virtual void loadStepInterval( RealCref aStepInterval )
+    {
+      if( aStepInterval > getUserMaxInterval()
+	  || aStepInterval <= getUserMinInterval() )
+	{
+	  // should use other exception?
+	  THROW_EXCEPTION( RangeError, "Stepper StepInterval: out of range." );
+	}
+
       theStepInterval = aStepInterval;
     }
 
-
+    void setNextStepInterval( RealCref aStepInterval )
+    {
+      theNextStepInterval = aStepInterval;
+    }
 
     /**
        Get the step interval of this Stepper.
@@ -195,6 +215,16 @@ namespace libecs
     const Real getStepInterval() const
     {
       return theStepInterval;
+    }
+
+    const Real getTolerantStepInterval() const
+    {
+      return theTolerantStepInterval;
+    }
+
+    const Real getNextStepInterval() const
+    {
+      return theNextStepInterval;
     }
 
     void registerLoggedPropertySlot( PropertySlotPtr );
@@ -327,7 +357,6 @@ namespace libecs
 
     StepIntervalConstraintMap theStepIntervalConstraintMap;
 
-
     SubstanceCache        theSubstanceCache;
     ReactorCache          theReactorCache;
 
@@ -343,6 +372,9 @@ namespace libecs
 
     Real                theStepInterval;
     Real                theStepsPerSecond;
+
+    Real                theTolerantStepInterval;
+    Real                theNextStepInterval;
 
     Real                theUserMinInterval;
     Real                theUserMaxInterval;
@@ -395,7 +427,80 @@ namespace libecs
 
   };
 
+  class AdaptiveStepsizeEuler1Stepper
+    :
+    public Stepper
+  {
 
+  public:
+
+    AdaptiveStepsizeEuler1Stepper();
+    virtual ~AdaptiveStepsizeEuler1Stepper() {}
+
+    static StepperPtr createInstance() { return new AdaptiveStepsizeEuler1Stepper; }
+
+    virtual void initialize();
+    virtual void step();
+
+    virtual StringLiteral getClassName() const { return "AdaptiveStepsizeEuler1Stepper"; }
+
+  protected:
+
+  };
+
+  class AdaptiveStepsizeMidpoint2Stepper
+    : 
+    public Stepper
+  {
+
+  public:
+
+    AdaptiveStepsizeMidpoint2Stepper();
+    virtual ~AdaptiveStepsizeMidpoint2Stepper() {}
+
+    static StepperPtr createInstance() { return new AdaptiveStepsizeMidpoint2Stepper; }
+
+    virtual void initialize();
+    virtual void step();
+
+    virtual StringLiteral getClassName() const 
+    { return "AdaptiveStepsizeMidpoint2Stepper"; }
+
+  protected:
+
+    RealValarray theK1;
+    RealValarray theErrorEstimate;
+  };
+
+  class CashKarp4Stepper
+    : 
+    public Stepper
+  {
+
+  public:
+
+    CashKarp4Stepper();
+    virtual ~CashKarp4Stepper() {}
+
+    static StepperPtr createInstance() { return new CashKarp4Stepper; }
+
+    virtual void initialize();
+    virtual void step();
+
+    virtual StringLiteral getClassName() const 
+    { return "CashKarp4Stepper"; }
+
+  protected:
+
+    RealValarray theK1;
+    RealValarray theK2;
+    RealValarray theK3;
+    RealValarray theK4;
+    RealValarray theK5;
+    RealValarray theK6;
+
+    RealValarray theErrorEstimate;
+  };
 
 } // namespace libecs
 
