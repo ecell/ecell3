@@ -8,45 +8,18 @@ __author__ = 'Kouichi Takahashi <shafi@e-cell.org>, zhaiteng and sugi'
 __copyright__ = 'Copyright (C) 2002-2003 Keio University'
 __license__ = 'GPL'
 
-import gtk
-import MainWindow
-
 import sys
-import os
-import string 
-import getopt
-#import tempfile
-import traceback
 
-# -----------------------------------------------------------------
-# usage
-#  - print usage 
-# return -> None
-# -----------------------------------------------------------------
-def usage():
-	aProgramName = 'gecell'
-	print '''
-%s -- start up E-Cell3 GUI
+try:
+	import os
+	import string 
+	import getopt
+	import traceback
+	import gtk
+	import MainWindow
 
-Usage: %s [-h] ([-e EmlFile]|[-f ModelFile])
-
-Options:
-        -e or --exec=[.ess file]  :  load script (.ess) file
-        -f or --file=[.eml file]  :  load model (.eml) file
-        -h or --help              :  print this message.
-
-	Do not use -e and -f at same time.
-
-Configurations:
-
-	If the environment variable ECELL3_DM_PATH is set to a colon (:) 
-        separated directory path, it loads dynamic modules from there.
-	
-	example: 
-        
-	ECELL3_DM_PATH=/home/user/dm:/home/user/dm_other gecell
-''' % ( aProgramName, aProgramName )
-
+except KeyboardInterrupt:
+	sys.exit(1)
 
 # -----------------------------------------------------------------
 # main
@@ -172,8 +145,39 @@ def main():
 	# -------------------------------------
 	gtk.mainloop()
 
+
+# -----------------------------------------------------------------
+# usage
+#  - print usage 
+# return -> None
+# -----------------------------------------------------------------
+def usage():
+	aProgramName = 'gecell'
+	print '''
+%s -- start up E-Cell3 GUI
+
+Usage: %s [-h] ([-e EmlFile]|[-f ModelFile])
+
+Options:
+        -e or --exec=[.ess file]  :  load script (.ess) file
+        -f or --file=[.eml file]  :  load model (.eml) file
+        -h or --help              :  print this message.
+
+	Do not use -e and -f at same time.
+
+Configurations:
+
+	If the environment variable ECELL3_DM_PATH is set to a colon (:) 
+        separated directory path, it loads dynamic modules from there.
+	
+	example: 
+        
+	ECELL3_DM_PATH=/home/user/dm:/home/user/dm_other gecell
+''' % ( aProgramName, aProgramName )
+
+
 if __name__ == '__main__':
-	main()
-
-
-
+	try:
+		main()
+	except KeyboardInterrupt:
+		sys.exit(1)
