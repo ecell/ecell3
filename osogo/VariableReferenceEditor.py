@@ -3,6 +3,7 @@ from ecell.ecssupport import *
 
 import gobject
 import gtk
+import gtk.gdk
 import operator
 from ConfirmWindow import *
 
@@ -135,21 +136,72 @@ class VariableReferenceEditor:
         
     def __buttonPressed( self, *args ):
         event = args[2]
-        if event.button = gtk.gdk._2BUTTON_PRESS
+        if event.button == gtk.gdk._2BUTTON_PRESS:
             self.__popUpMenu()
             return gtk.TRUE
             
     def __popUpMenu(self ):
+        selectedIter = self.__getSelectedIter()
         aMenu = gtk.Menu()
-        
+        selectedFullID = self.__getSelectedFullID()
+        if selectedFullID == None:
+            isFullIDReal = False
+        else:
+            isFullIDReal = self.__doesExistEntity( selectedFullID )
+            
+        openItem = gtk.MenuItem( "Open" )
+        if isFullIDReal:
+            openItem.connect( "activate", self.__openAction, selectedFullID )
+        else:
+            openItem.set_sensitive( gtk.FALSE )
+        aMenu.append( openItem )
+
+        openNewItem = gtk.MenuItem( "Open in new" )
+        if isFullIDReal:
+            openNewItem.connect( "activate", self.__openNewAction, selectedFullID )
+        else:
+            openNewItem.set_sensitive( gtk.FALSE )
+        aMenu.append( openNewItem )
+        aMenu.append( gtk.SeparatorMenuItem() )
         
         addItem = gtk.MenuItem( "Add" )
         addItem.connect("activate", self.__addAction )
         aMenu.append( addItem )
-        selectedIter = self.__getSelectedIter()
+        
+        deleteItem = gtk.MenuItem( "Delete" )
+
         if selectedIter != None:
-            
+            deleteItem.connect( "activate", self.__deleteAction, anIter )
+        else:
+            deleteItem.set_sensitive( gtk.FALSE )
+        aMenu.append( addItem )
+        aMenu.popup( None, None, None, 1, 0 )
     
+    
+    def __openAction( self, *args ):
+        aFullIDString = args[1]
+        self.theSession.thePluginManager.createInstance( "PropertyWindow", 
+                        [convertFullIDToFullPN( aFullIDString.split(':') )] )
+                        
+    def __openNewAction ( self, *args ):
+        pass
+        
+    def __addAction ( self, *args ):
+        pass
+        
+    def __deleteAction( self, *args ):
+        pass
+                        
+    
+
+
+    def __getSelectedFullID( self ):
+        anIter = self.__getSelectedIter()
+        if anIter == None:
+            return None
+        aVarref = self.theListStore.get_value( anIter, FULLID_COLUMN )
+        return  self.__getAbsoluteReference( aVarref )
+        
     
     def __getSelectedIter( self ):
         anIter = self['theTreeView'].get_selection().get_selected()[1]
