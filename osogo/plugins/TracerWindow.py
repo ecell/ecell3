@@ -38,7 +38,7 @@ class TracerWindow( OsogoPluginWindow ):
         #get session
         self.theSession = self.thePluginManager.theSession
         self.theViewType = MULTIPLE
-        self.isGUIShown = False
+        self.isControlShown = False
         self.theSaveDirectorySelection = gtk.FileSelection( 'Select File' )
         self.theSaveDirectorySelection.ok_button.connect('clicked', self.changeSaveDirectory)
         self.theSaveDirectorySelection.cancel_button.connect('clicked', self.closeParentWindow)
@@ -329,13 +329,13 @@ class TracerWindow( OsogoPluginWindow ):
             self['vpaned1'].add( self['drawingarea1'] )
             self['top_frame'].add( self['vbox2'] )
         
-        self.thePlotInstance.showGUI( gtk.TRUE )
+        self.thePlotInstance.showControl( gtk.TRUE )
 
 
     # ========================================================================
     def minimize(self):
 
-        self.thePlotInstance.showGUI( gtk.FALSE )
+        self.thePlotInstance.showControl( gtk.FALSE )
         if self['top_frame'] == self['vbox2'].get_parent():
             if self.isStandAlone():
                 dividerPos = self['vpaned1'].get_position()
@@ -485,13 +485,13 @@ class TracerWindow( OsogoPluginWindow ):
             self.thePlotInstance.zoomOut()
 
     # ========================================================================
-    def showGUI ( self ):
-        """ shows GUI and sets plot to its normal size """
+    def showControl ( self ):
+        """ shows Control and sets plot to its normal size """
         self.maximize()
 
     # ========================================================================
-    def hideGUI (self ):
-        """doesn't change Plot size, but hides GUI components """
+    def hideControl (self ):
+        """doesn't change Plot size, but hides Control components """
         self.minimize()
 
     # ========================================================================
@@ -763,11 +763,11 @@ class TracerWindow( OsogoPluginWindow ):
     #this signal handler is called when "Minimize" button is pressed
     #--------------------------------------------------------
 
-    def hideGUIAction(self,button_obj):
+    def hideControlAction(self,button_obj):
         self.minimize()
 
 
-# tracer window button removal - Hide GUI, Log All, change scale, show history, only stripinterval stays
+# tracer window button removal - Hide Control, Log All, change scale, show history, only stripinterval stays
 
 # tracer resize
 # boardwindow

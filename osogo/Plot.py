@@ -805,7 +805,7 @@ class Plot:
         self.theZoomKeyPressed = False
         self.theButtonTimeStampp = None
         self.theOwner = owner
-        self.isGUIShown = True
+        self.isControlShown = True
         #initializes variables
         self.theStripInterval = 1000
         self.doesConnectPoints = True
@@ -825,8 +825,8 @@ class Plot:
         self.theWidget.connect('button-release-event',self.release)
 
         
-    def showGUI( self, aState ):
-        self.isGUIShown = aState
+    def showControl( self, aState ):
+        self.isControlShown = aState
         self.printTraceLabels()
 
         
@@ -1166,7 +1166,7 @@ class Plot:
             # if inside plotarea, display 
             tstamp=event.get_time()
             if self.theButtonTimeStampp == tstamp: 
-                if not self.isGUIShown:
+                if not self.isControlShown:
                     self.maximize()
                 else:
                     self.minimize()
@@ -1202,11 +1202,11 @@ class Plot:
             theMenu.append( zoomUt )
             theMenu.append( gtk.SeparatorMenuItem() )
 
-        if self.isGUIShown:
-            guiMenuItem = gtk.MenuItem( "Hide GUI" )
+        if self.isControlShown:
+            guiMenuItem = gtk.MenuItem( "Hide Control" )
             guiMenuItem.connect ( "activate", self.__minimize_action )
         else:
-            guiMenuItem = gtk.MenuItem( "Show GUI" )
+            guiMenuItem = gtk.MenuItem( "Show Control" )
             guiMenuItem.connect ( "activate", self.__maximize_action )
          
         xToggle = gtk.MenuItem ( "Toggle X axis" )
@@ -1384,7 +1384,7 @@ class Plot:
 
     def printTraceLabels(self):
         #FIXME goes to 2ndary layer
-        if self.isGUIShown:
+        if self.isControlShown:
             return
         textShift = self.theAscent + self.theDescent + 5
         seriesCount = self.getSeriesCount()
