@@ -52,6 +52,8 @@ import sys
 import traceback
 import os
 
+
+
 #
 #import pyecell module
 #
@@ -59,6 +61,9 @@ from ecell.GtkSessionMonitor import *
 from ecell.ecssupport import *
 from ecell.ecs_constants import *
 from ConfirmWindow import *
+
+
+
 
 class MainWindow(OsogoWindow):
 	"""MainWindow
@@ -77,6 +82,9 @@ class MainWindow(OsogoWindow):
 		self.theMessageWindow = MessageWindow.MessageWindow()
 		self.theSession.setMessageMethod( self.__printMessage )
 
+                self.theEntityListWindow = EntityListWindow.EntityListWindow( self.theSession )
+
+
 
 	def openWindow( self ):
 
@@ -89,7 +97,7 @@ class MainWindow(OsogoWindow):
 		# creates MessageWindow 
 		# -------------------------------------
 		self.theMessageWindow.openWindow()
-                self['messagearea'].add(self.theMessageWindow['top_frame']                    )
+                self['messagearea'].add(self.theMessageWindow['top_frame'])
                 
 		self.__expose(None,None)
 		messageWindowSize=self.theMessageWindow.getActualSize()
@@ -100,6 +108,14 @@ class MainWindow(OsogoWindow):
                 self['messagehandlebox'].connect('child-detached',\
                                             self.__MessageWindowDetached)
 
+
+
+
+		# -------------------------------------
+		# creates EntityListWindow 
+		# -------------------------------------
+		self.theEntityListWindow.openWindow()
+#                self['entitylistarea'].add(self.theEntityListWindow['top_frame'])
 
 		# -------------------------------------
 		# append signal handlers
@@ -154,6 +170,8 @@ class MainWindow(OsogoWindow):
 
 		# toggles message window menu and button
 		# At first message window is expanded, so the toggle button and menu are active.
+
+
 		self.theMessageWindowVisible = True
 		#self['message_togglebutton'].set_active(TRUE)
 		#self['message_window_menu'].set_active(TRUE)
@@ -209,11 +227,11 @@ class MainWindow(OsogoWindow):
 		self['start_button'].set_sensitive(aDataLoadedStatus)
 		self['stop_button'].set_sensitive(aDataLoadedStatus)
 		self['step_button'].set_sensitive(aDataLoadedStatus)
-		self['entitylist_button'].set_sensitive(aDataLoadedStatus)
-		self['logger_button'].set_sensitive(aDataLoadedStatus)
-		self['stepper_button'].set_sensitive(aDataLoadedStatus)
-		self['interface_button'].set_sensitive(aDataLoadedStatus)
-		self['board_button'].set_sensitive(aDataLoadedStatus)
+#		self['entitylist_button'].set_sensitive(aDataLoadedStatus)
+#		self['logger_button'].set_sensitive(aDataLoadedStatus)
+#		self['stepper_button'].set_sensitive(aDataLoadedStatus)
+#		self['interface_button'].set_sensitive(aDataLoadedStatus)
+#		self['board_button'].set_sensitive(aDataLoadedStatus)
 
 		# file menu
 		self['load_model_menu'].set_sensitive(not aDataLoadedStatus)
@@ -622,7 +640,7 @@ class MainWindow(OsogoWindow):
 		else:
 			flag = gtk.FALSE
 		self['board_window_menu'].set_active( flag )
-		self['board_button'].set_active(flag)
+#		self['board_button'].set_active(flag)
 
 		# Loggerwindow:
 		if self.theSession.doesExist('LoggerWindow' ):
@@ -630,7 +648,7 @@ class MainWindow(OsogoWindow):
 		else:
 			flag = gtk.FALSE
 		self['logger_window_menu'].set_active( flag )
-		self['logger_button'].set_active(flag)
+#		self['logger_button'].set_active(flag)
 			
 		# interface window:
 		if self.theSession.doesExist('InterfaceWindow' ):
@@ -638,7 +656,7 @@ class MainWindow(OsogoWindow):
 		else:
 			flag = gtk.FALSE
 		self['interface_window_menu'].set_active( flag )
-		self['interface_button'].set_active(flag)
+#		self['interface_button'].set_active(flag)
 
 		# stepperwindow:
 		if self.theSession.doesExist('StepperWindow' ):
@@ -646,7 +664,7 @@ class MainWindow(OsogoWindow):
 		else:
 			flag = gtk.FALSE
 		self['stepper_window_menu'].set_active( flag )
-		self['stepper_button'].set_active(flag)
+#		self['stepper_button'].set_active(flag)
 
 
 	
@@ -656,7 +674,7 @@ class MainWindow(OsogoWindow):
 		else:
 			flag = gtk.FALSE
 		self['message_window_menu'].set_active(flag)
-		self['message_togglebutton'].set_active( flag )
+#		self['message_togglebutton'].set_active( flag )
 
 
 		self.__button_update = False
@@ -715,14 +733,15 @@ class MainWindow(OsogoWindow):
 
 
 
-	def hideMessageWindow( self ):
-		self[ 'messagehandlebox' ].hide()
-		self['message_togglebutton'].set_active(gtk.FALSE)
+	def hideMessageWindow( self ):            
+            
+                self[ 'messagehandlebox' ].hide()
+#		self['message_togglebutton'].set_active(gtk.FALSE)
 
 
 	def showMessageWindow( self ):
 		self[ 'messagehandlebox' ].show()
-		self['message_togglebutton'].set_active(gtk.TRUE)
+#		self['message_togglebutton'].set_active(gtk.TRUE)
 
 
         def __toggleMessageWindow( self, *arg ) :
