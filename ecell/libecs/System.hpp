@@ -121,31 +121,21 @@ namespace libecs
     void setStepper( StringCref classname );
 
     /**
-       This method takes a FQID of a Reactor as a VolumeIndex of this System.
-       The FQID will be resolved to ReactorPtr at initialize().
-
-       @param fqen FQID of a VolumeIndex Reactor for this System.
+       @return Volume of this System. Unit is [L].
     */
-    void setVolumeIndex( FullIDCref fullid );
-
-    /**
-       @return a pointer to the VolumeIndex Reactor of this System.
-    */
-    ReactorPtr getVolumeIndex() const { return theVolumeIndex; }
-
-
-    bool haveVolumeIndex() const 
+    virtual RealCref getVolume()
     {
-      return getVolumeIndex() != NULLPTR;
+      return theVolume;
     }
 
     /**
-       Volume of a System is calculated by activity() of
-       VolumeIndex Reactor of the System.
-
-       @return Volume of this System. Unit is [L].
-    */
-    virtual Real getVolume();
+       Set a new volume for this System. 
+       Make the new volume effective from beginning of next time step.
+     */
+    void setVolume( const Real volume )
+    {
+      theVolumeBuffer = volume;
+    }
 
     /**
        Register a Reactor object in this System.
@@ -339,10 +329,9 @@ namespace libecs
   public: // message slots
 
     void setStepper( MessageCref message );
-    void setVolumeIndex( MessageCref message );
+    void setVolume( MessageCref message);
 
     const Message getStepper( StringCref keyword );
-    const Message getVolumeIndex( StringCref keyword );
 
     const Message getSystemList( StringCref keyword );
     const Message getSubstanceList( StringCref keyword );
@@ -355,14 +344,21 @@ namespace libecs
 
     virtual void makeSlots();
 
+    void updateVolume()
+    {
+      theVolume = theVolumeBuffer;
+    }
+
   protected:
 
-    ReactorPtr theVolumeIndex;
     StepperPtr theStepper;
 
     ReactorMapIterator theFirstRegularReactorIterator;
 
   private:
+
+    Real theVolume;
+    Real theVolumeBuffer;
 
     ReactorMap   theReactorMap;
     SubstanceMap theSubstanceMap;

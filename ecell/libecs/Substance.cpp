@@ -88,14 +88,7 @@ namespace libecs
 
   const Message Substance::getConcentration( StringCref keyword )
   {
-    if( haveConcentration() )
-      {
-	return Message( keyword, getConcentration() );
-      }
-    else
-      {
-	return Message( keyword );
-      }
+    return Message( keyword, getConcentration() );
   }
 
   const Message Substance::getAccumulatorClass( StringCref keyword )
@@ -206,17 +199,6 @@ namespace libecs
   void Substance::calculateConcentration()
   {
     theConcentration = theQuantity / ( getSuperSystem()->getVolume() * N_A ); 
-  }
-
-
-  bool Substance::haveConcentration() const
-  {
-    if( getSuperSystem()->getVolumeIndex() == NULLPTR ) 
-      {
-	return false;
-      }
-
-    return true;
   }
 
 

@@ -59,11 +59,9 @@ namespace libecs
 
     makePropertySlot( "Stepper", System, *this,
 		      &System::setStepper, &System::getStepper );
-    makePropertySlot( "VolumeIndex", System, *this,
-		      &System::setVolumeIndex, &System::getVolumeIndex );
 
     makePropertySlot( "Volume", System, *this,
-		      NULLPTR, &System::getVolume );
+		      &System::setVolume, &System::getVolume );
 
     makePropertySlot( "StepInterval", System, *this,
 		      NULLPTR, &System::getStepInterval );
@@ -127,43 +125,19 @@ namespace libecs
 		    UConstant( getStepper()->className() ) );
   }
 
-  void System::setVolumeIndex( const Message& message )
+  void System::setVolume( const Message& message )
   {
-    //FIXME: range check
-    setVolumeIndex( FullID( message[0].asString() ) );
-  }
-
-  const Message System::getVolumeIndex( StringCref keyword )
-  {
-    if( haveVolumeIndex() )
-      {
-	return Message( keyword, 
-			UConstant( getVolumeIndex()->
-				   getFullID().getString() ) );
-      }
-    else
-      {
-	return Message( keyword );
-      }
+    setVolume( message[0].asReal() );
   }
 
   const Message System::getVolume( StringCref keyword )
   {
-    if( haveVolumeIndex() )
-      {
-	return Message( keyword, 
- 			UConstant( getVolume() ) ) ;
-      }
-    else
-      {
-	return Message( keyword );
-      }
+    return Message( keyword, getVolume() );
   }
 
   const Message System::getStepInterval( StringCref keyword )
   {
-    return Message( keyword, 
-		    UConstant( getStepInterval() ) ) ;
+    return Message( keyword, getStepInterval() ) ;
   }
 
 
@@ -171,7 +145,8 @@ namespace libecs
 
   System::System()
     :
-    theVolumeIndex( NULLPTR ),
+    theVolume( 1 ),
+    theVolumeBuffer( 1 ),
     theStepper( NULLPTR ),
     theRootSystem( NULLPTR )
   {
@@ -225,11 +200,6 @@ namespace libecs
     theStepper = aStepper;
   }
 
-  Real System::getVolume() 
-  {
-    return theVolumeIndex->getActivityPerSecond();
-  }
-
   RealCref System::getStepInterval() const
   {
     return theStepper->getStepInterval();
@@ -238,13 +208,6 @@ namespace libecs
   RealCref System::getStepsPerSecond() const
   {
     return theStepper->getStepsPerSecond();
-  }
-
-  void System::setVolumeIndex( FullIDCref volumeindex )
-  {
-    SystemPtr aSystem( theRootSystem->
-		       getSystem( volumeindex.getSystemPath() ) );
-    theVolumeIndex = aSystem->getReactor( volumeindex.getID() );
   }
 
   void System::initialize()
@@ -332,6 +295,8 @@ namespace libecs
       {
 	i->second->transit();
       }
+
+    updateVolume();
   }
 
   void System::postern()

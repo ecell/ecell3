@@ -100,7 +100,7 @@ namespace libecs
        calculate concentration.
        \return true -> if concentration can be obtained. false -> if not.
     */
-    bool haveConcentration() const;
+    // bool haveConcentration() const;
 
     /**
        Returns a concentration if it have.
