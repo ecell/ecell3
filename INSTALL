@@ -114,7 +114,7 @@ NOTE: If you get this package via cvs, use ./autogen.sh instead of
    (where {PREFIX} is the prefix specified in step 1 of 'Install'. 
     The default is /usr/local.)
 
-   then import E-CELL module by 'import ecs'.
+   then import E-CELL module by 'import ecell.ecs'.
 
    Below is an example of using E-CELL from python:
 
@@ -122,10 +122,10 @@ NOTE: If you get this package via cvs, use ./autogen.sh instead of
       Python 2.2 (#1, Dec 23 2001, 09:30:32) 
       [GCC 2.96 20000731 (Red Hat Linux 7.1 2.96-98)] on linux2
       Type "help", "copyright", "credits" or "license" for more information.
-      >>> import ecs
-      >>> dir( ecs )
+      >>> import ecell.ecs
+      >>> dir( ecell.ecs )
       ['Simulator', '__doc__', '__file__', '__name__']
-      >>> s = ecs.Simulator()
+      >>> s = ecell.ecs.Simulator()
       >>> dir( s )
       ['createEntity', 'getLogger', 'getLoggerList', 'getProperty', ... ]
       >>> (Ctrl+d)
@@ -142,8 +142,8 @@ NOTE: If you get this package via cvs, use ./autogen.sh instead of
 
    % {PREFIX}/bin/gecell
 
-   Osogo is a python program which runs on the 'ecell3' command, 
-   explained above
+   Osogo is a python program which runs on the 'ecell3' command, explained 
+   above.
 
 
 == Documentation ==

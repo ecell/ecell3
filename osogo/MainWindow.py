@@ -302,6 +302,5 @@ class MainWindow(Window):
             self.theInterfaceWindowWindow.hide()
 
     #### these method is not supported in summer GUI project
-    def loadCellState( self ) : pass
     def saveCellStateToTheFile( self ) : pass
     #### these method is not supported in summer GUI project
