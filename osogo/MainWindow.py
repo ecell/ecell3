@@ -501,7 +501,8 @@ class MainWindow(OsogoWindow):
 			# this can fail if the simulator is not ready
 			self.theSession.theSimulator.initialize()
 
-			self.theSession.message( "Start\n" )
+			aCurrentTime = self.theSession.getCurrentTime()
+			self.theSession.message("%15s"%aCurrentTime + ":Start\n" )
 			self.theTimer = gtk.timeout_add(self.theUpdateInterval, self.updateByTimeOut, 0)
 			self.theLoggerWindow.update()
 			self.theSession.run()
@@ -531,7 +532,9 @@ class MainWindow(OsogoWindow):
 		try:
 			if self.theRunningFlag:
 				self.theSession.stop()
-				self.theSession.message( "Stop\n" )
+
+				aCurrentTime = self.theSession.getCurrentTime()
+				self.theSession.message( ("%15s"%aCurrentTime + ":Stop\n" ))
 				self.removeTimeOut()
 				self.update()
 				self.updateFundamentalWindows()
