@@ -378,8 +378,6 @@ class LoggerWindow(OsogoWindow):
 			aList = [ aFullPNString, start, end ]
 			self.theList.append( aList )
 
-
-
 		aModel = self.theEntryList.get_model()
 		aModel.clear()
 		for aValue in self.theList:
@@ -428,7 +426,156 @@ class LoggerWindow(OsogoWindow):
 		#	self.theSession.getLoggerList().remove( aSelectedFullPNString )
 		#print "deleteIetm -- e "
 		pass
+	# ==============================================================================
+	def saveDataFile( self, aFullPN, aDirectory = None, anInterval = None, aStartTime = None, anEndTime = None, fileType = 'ecd' ):
+		""" saves FullPN logger data with given parameters
+			if parameters are not given, function defaults to window settings
+			for parameters with a given value it sets appropriate window settings
+			and saves FullPN into Datafile
+		"""
+		#find FullPM in list
+		aFullPNString = createFullPNString ( aFullPN )
+		while True:
+			anIter = theEntryList.get_model().get_iter_first()
+			if anIter == None:
+				return None
+			aTitle = theEntryList.get_model().get_value(anIter, 0 )
+			if aTitle == aFullPNString:
+				aPath = theEntryList.get_model().get_path ( anIter )
+				theEntryList.set_cursor( aPath )
+				break
+		if aDirectory != None:
+			self.setDirectory( aDirectory )
+		
+		if anInterval != None:
+			self.setInterval( anInterval )
+
+		if aStartTime != None:
+			self.setStartTime ( aStartTime )
+
+		if anEndTime != None:
+			self.setEndTime ( anEndTime )
+	
+		if fileType != None:
+			self.setDataFileType ( fileType )
+		
+		self.saveData( None )
 			
+
+
+	# ==============================================================================
+	def setDirectory ( self, aDirectory ):
+		""" sets directory field to aDirectory
+			returns None
+		"""
+		self['directory_entry'].set_text( str( aDirectory ) )
+
+	# ==============================================================================
+	def getDirectory ( self ):
+		""" returns directory choosen by the user """
+		return self['directory_entry'].get_text()
+			
+	# ==============================================================================
+	def setInterval ( self, anInterval ):
+		""" sets Interval field of Loggerwindow to anInterval 
+			also sets interval checkbox True
+		"""
+		self['datainterval_spinbutton'].set_value( anInterval )
+		self['datainterval_checkbox'].set_active( gtk.TRUE )
+		self.updateDataInterval()
+		
+
+	# ==============================================================================
+	def getInterval ( self ):
+		""" returns -1 if Interval checkbox is off
+			rerurns interval set by user if interva check box is on
+		"""
+
+		if self['datainterval_checkbox'].get_active( ):
+			return self['datainterval_spinbutton'].get_value( )
+		else:
+			return -1
+
+	# ==============================================================================
+	def setStartTime ( self, aTime ):
+		""" sets StartTime field of Loggerwindow to anInterval 
+			also sets time checkbox True
+		"""
+		self['start_spinbutton'].set_value( aTime )
+		self['time_checkbox'].set_active( gtk.TRUE )
+		self.updateStartEnd()
+		
+
+	# ==============================================================================
+	def getStartTime ( self ):
+		""" returns -1 if Interval checkbox is off
+			rerurns interval set by user if interva check box is on
+		"""
+
+		if self['time_checkbox'].get_active( ):
+			return self['start_spinbutton'].get_value( )
+		else:
+			return -1
+
+	# ==============================================================================
+	def setEndTime ( self, aTime ):
+		""" sets EndTime field of Loggerwindow to anInterval 
+			also sets time checkbox True
+		"""
+		self['end_spinbutton'].set_value( aTime )
+		self['time_checkbox'].set_active( gtk.TRUE )
+		self.updateStartEnd()
+
+	# ==============================================================================
+	def getEndTime ( self ):
+		""" returns -1 if Interval checkbox is off
+			returns interval set by user if interva check box is on
+		"""
+
+		if self['time_checkbox'].get_active( ):
+			return self['end_spinbutton'].get_value( )
+		else:
+			return -1
+
+	# ==============================================================================
+	def getDataFileType (self ):
+		""" returns Data Type of file choosen by the user
+		"""
+		return self["datatype_combo"].get_text()
+
+	# ==============================================================================
+	def setDataFileType (self, aDataType ):
+		""" sets the Datatype of save file to the window
+			aDataType can only be 'ecd' or 'binary'"""
+		
+		if aDataType == 'ecd' or aDataType == 'binary':
+			self["datatype_combo"].set_text( aDataType )
+
+	# ==============================================================================
+	def setUseDefaultInterval ( self, aBoolean ):
+		""" sets interval checkbox to aBoolean """
+		if aBoolean == gtk.TRUE or aBoolean == gtk.FALSE:
+			self['datainterval_checkbox'].set_active( aBoolean )
+			self.updateDataInterval()
+
+	# ==============================================================================
+	def setUseDefaultTime ( self, aBoolean ):
+		""" sets time checkbox to aBoolean """
+		if aBoolean == gtk.TRUE or aBoolean == gtk.FALSE:
+			self['time_checkbox'].set_active( aBoolean )
+			self.updateStartEnd()
+
+	# ==============================================================================
+	def getUseDefaultInterval ( self ):
+		""" return state of interval checkbox  """
+		return self['datainterval_checkbox'].get_active( )
+
+	# ==============================================================================
+	def getUseDefaultTime ( self ):
+		""" return state of time checkbox  """
+		return self['time_checkbox'].get_active( )
+			
+
 
 # end of LoggerWindow
 

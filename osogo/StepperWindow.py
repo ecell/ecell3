@@ -60,7 +60,6 @@ class StepperWindow(OsogoWindow):
 	- user can change each stepper property
 	"""
 
-	# ---------------------------------------------------------------
 	# ==========================================================================
 	def __init__( self, aSession ): 
 		"""Constructor
@@ -114,9 +113,9 @@ class StepperWindow(OsogoWindow):
 
 		# adds handlers
 		self.addHandlers({ \
-				'on_stepper_id_list_select' : self.selectStepperID,  # StepperID list
-				'on_property_list_select_row' : self.selectProperty, # Property list
-				'on_update_button_clicked' : self.updateProperty,    # update button
+				'on_stepper_id_list_select' : self.__selectStepperID,  # StepperID list
+				'on_property_list_select_row' : self.__selectProperty, # Property list
+				'on_update_button_clicked' : self.__updateProperty,    # update button
 	  			'on_close_button_clicked' : self.deleted,            # close button
 			})
 
@@ -135,11 +134,29 @@ class StepperWindow(OsogoWindow):
 		self[self.__class__.__name__].show_all()
 
 		self['stepper_id_list'].get_selection().select_iter(aFirstIter)
-		self.selectStepperID(None)
-
+		self.__selectStepperID(None)
 
 	# ==========================================================================
-	def selectStepperID( self, *arg ):
+	def selectStepperID( self, aStepperID ):
+		""" selects StepperID on screen and displays its property list 
+			if StepperID exists returns True, else returns False
+		"""
+		while True:
+			anIter=self['stepper_id_list'].get_model().get_iter_first()
+			if anIter == None:
+				return False
+			aTitle = self['stepper_id_list'].get_model().get_value(anIter, 0 )
+			if aTitle == aStepperID:
+				aPath = self['stepper_id_list'].get_model().get_path ( anIter )
+				self['stepper_id_list'].set_cursor( aPath )
+				break
+		self.__selectStepperID(  None )
+		return False
+
+	
+
+	# ==========================================================================
+	def __selectStepperID( self, *arg ):
 		"""selects stepper ID
 		Return None
 		"""
@@ -218,11 +235,29 @@ class StepperWindow(OsogoWindow):
 			self.theSelectedPath[aStepperID] = aPath
 			self['property_list'].get_selection().select_path(aPath)
 
-		self.selectProperty()
+		self.__selectProperty()
 
 
 	# ==========================================================================
-	def selectProperty( self, *arg ):
+	def selectProperty(self, aPropertyName):
+		""" selects PropertyName on screen  
+			if PropertyName exists returns True, else returns False
+		"""
+		while True:
+			anIter=self['property_list'].get_model().get_iter_first()
+			if anIter == None:
+				return False
+			aTitle = self['property_list'].get_model().get_value(anIter, PROPERTY_INDEX )
+			if aTitle == aPropertyName:
+				aPath = self['property_list'].get_model().get_path ( anIter )
+				self['property_list'].set_cursor( aPath )
+				break
+		self.__selectProperty(  None )
+		return False
+
+
+	# ==========================================================================
+	def __selectProperty( self, *arg ):
 		"""when a property is selected, calls this method.
 		updates 
 		Returns None
@@ -275,9 +310,16 @@ class StepperWindow(OsogoWindow):
 			self['value_entry'].set_sensitive( FALSE )
 			self['update_button'].set_sensitive( FALSE )
 
+	# ==========================================================================
+	def updateProperty(self, aValue):
+		""" overwrites selected Property on screen  
+		"""
+		if self['value_entry'].get_sensitive():
+			self['value_entry'].set_text ( str( aValue ) )
+			self.__updateProperty(None)
 
 	# ==========================================================================
-	def updateProperty( self, *arg ):
+	def __updateProperty( self, *arg ):
 		"""updates property
 		Return None
 		"""
@@ -445,7 +487,7 @@ class StepperWindow(OsogoWindow):
 			self['property_list'].get_model().set_value(iter,1,aValue)
 
 		# updates text
-		self.selectProperty()
+		self.__selectProperty()
 
 
 # end of StepperWindow

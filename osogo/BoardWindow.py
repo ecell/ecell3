@@ -348,6 +348,24 @@ class BoardWindow(OsogoWindow):
 			self[self.__class__.__name__].resize( width, heigth)
 			self.updatePositions()
 
+	# ========================================================================
+	def setPackDirectionForward( self, aDirection ):
+		""" sets direction of packing PluginWindows  
+			aDirection:
+			gtk.TRUE : Forward
+			gtk.FALSE : Down
+		"""
+		self['forward_radiobutton'].set_active( aDirection )
+		self.changeAlignment( None )				
+	
+	# ========================================================================
+	def setTableSize( self, aSize ):
+		""" sets row or column size of BoardWindow 
+		   depening on packing strategy
+		"""
+		self['size_spinbutton'].set_text( str(aSize) )
+		self.changeAlignment()
+
 
 	# end of editTitle
 

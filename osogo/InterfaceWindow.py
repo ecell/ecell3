@@ -218,6 +218,23 @@ class InterfaceWindow( OsogoWindow ):
 	# end of deleteWindow
 
 
+	def selectPlugin (self, aPluginTitle ):
+		""" selects Plugin with aPluginTitle title on the list
+			returns True if successful, False if not
+		"""
+
+		#iterate through all rows
+		anIter=self['InterfaceCList'].get_model().get_iter_first()
+		while True:
+			if anIter == None:
+				break
+			aTitle = self['InterfaceCList'].get_model().get_value(anIter, TITLE )
+			if aTitle == aPluginTitle:
+				aPath = self['InterfaceCList'].get_model().get_path ( anIter )
+				self['InterfaceCList'].set_cursor( aPath )
+				break
+			anIter=self['InterfaceCList'].get_model().iter_next( anIter )
+					
 
 if __name__ == "__main__":
 

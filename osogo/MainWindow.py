@@ -635,6 +635,7 @@ class MainWindow(OsogoWindow):
 
 			self.updateButtons()
         
+
 	# ==========================================================================
 	def updateButtons( self ):
 		""" updates Buttons and menus with 

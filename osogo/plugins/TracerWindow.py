@@ -95,7 +95,7 @@ class TracerWindow( OsogoPluginWindow ):
 		aWindowWidget = self.getWidget( 'frame8' )
 		aWindowWidget.add( self.PlotWidget )
 		aWindowWidget.show_all()
-		self.thePluginManager.appendInstance( self )                    
+ 		self.thePluginManager.appendInstance( self )                    
 
 		#add handlers to buttons
 		self.addHandlers({\
@@ -374,7 +374,108 @@ class TracerWindow( OsogoPluginWindow ):
 		self[self.__class__.__name__].resize( width, heigth)
 		self.__resize(None, None)
 
-		
+	# ========================================================================
+	def setStripInterval( self, anInterval ):
+		""" sets striptinterval of graph to anInterval """
+		self['entry1'].set_text( anInterval )
+		self.stripinterval_changes(None, None )
+	
+	# ========================================================================
+	def setScale ( self, aScale ):
+		""" sets scale of y axis
+			aScale -
+			gtk.TRUE: scale is linear
+			gtk.FALSE: scale is log10
+		"""
+		if (self.PlotInstance.scale_type != 'linear' and aScale ) or \
+			(self.PlotInstance.scale_type == linear and not aScale ):
+			self.change_scale()
+
+	# ========================================================================
+	def showHistory (self):
+		""" changes Plot to History mode
+			e.g. draws plot from logger information
+			will fall back to strip mode if not each and every
+			FullPN has a logger
+			returns None
+		"""
+		if self.thePlotInstance.getstripmode() != 'history':
+			self.__togglestrip(self, self['button12'] )
+			
+
+	# ========================================================================
+	def showStrip (self):
+		""" changes Plot to Strip mode
+			e.g. shows the most recent datapaoints
+			spanning an interval set by StripInterval
+		"""
+		if self.thePlotInstance.getstripmode() == 'history':
+			self.__togglestrip(self, self['button12'] )
+
+	# ========================================================================
+	def logAll(self):
+		""" creates logger for all traces on TracerWindow """
+		self.__createlogger_pressed( None )
+
+	# ========================================================================
+	#def setTraceColor(aFullPN, red, green, blue):
+	#TBD
+
+	# ========================================================================
+	def setTraceVisible (self, aFullPNString, aBoolean):
+		""" sets visible trace of identified by FullPNString 
+			aBoolean:
+			gtk.TRUE - Display
+			gtk,FALSE - Don't display trace
+		"""
+		currentState = self.thePlotInstance.isOn( aFullPNString )
+		if currentState == None:
+			return None
+		if currentState == aBoolean:
+			return None
+		anIter=self.ListStore.get_iter_first()
+		while True:
+			if anIter == None:
+				return None
+			aTitle = self.ListStore.get_value(anIter, TITLE )
+			if aTitle == aFullPNString:
+				aPath = self.ListStore.get_path ( anIter )
+				self.trace_toggled(self,None, aPath, self.ListStore)
+				break
+			anIter=self.ListStore.iter_next( anIter )
+
+
+	# ========================================================================
+	def zoomIn (self, x0,x1, y0, y1 ):
+		""" magnifies a rectangular area of  Plotarea
+			bordered by x0,x1,y0,y1
+		"""
+		self.thePlotInstance.zoomin( [x0, x1], [y0, y1])
+
+	# ========================================================================
+	def zoomOut(self, aNum = 1):
+		""" zooms out aNum level of zoom ins 
+		"""
+		for i in range(0, aNum):
+			self.thePlotInstance()
+
+	# ========================================================================
+	def smallSize( self ):
+		""" sets  plot to its smallest size , hides GUI components """
+		self.__minimize_clicked( None )
+
+	# ========================================================================
+	def largeSize ( self ):
+		""" shows GUI and sets plot to its normal size """
+		self.maximize()
+	
+	# ========================================================================
+	def hideGUI (self ):
+		"""doesn't change Plot size, but hides GUI components """
+		self.minimize()
+
+
+
 #----------------------------------------------
 #SIGNAL HANDLERS
 #-------------------------------------------------

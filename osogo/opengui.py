@@ -146,7 +146,7 @@ def main():
 	# calls gtk.mainloop()
 	# -------------------------------------
 	aMainWindow = aSession.openWindow('MainWindow')
-	print "na idajig eljutottunk"
+
 	aSession.GUI_interact()
 
 

@@ -1071,6 +1071,12 @@ class Plot:
 	    else:
 		return gtk.FALSE
 
+	def isOn (self, fpn ):
+		if not self.trace_onoff.has_key( fpn ):
+			return None
+		return self.trace_onoff[fpn]
+
+
 	def change_trace_color(self,fpn):
 	    current_color=self.ColorFullPNMap[fpn]
 	    self.deregister_color(fpn)
