@@ -195,7 +195,7 @@ gsl_matrix* FluxDistributionProcess::generateInverse(gsl_matrix *m_unknown,
   //generate Singular Value Matrix
   
   for(int i=0;i<matrix_size;i++){
-    double singular_value = gsl_vector_get(S,i);
+    Real singular_value = gsl_vector_get(S,i);
     if(singular_value > Epsilon){
       gsl_matrix_set(m_tmp2,i,i,1/singular_value);
     }
@@ -389,7 +389,7 @@ void FluxDistributionProcess::initialize()
 void FluxDistributionProcess::fire()
 {
   ProcessVector::size_type aKnownProcessPtrVectorSize( theKnownProcessPtrVector.size() );
-  for( Integer i( 0 ); i < aKnownProcessPtrVectorSize; ++i )
+  for( ProcessVector::size_type i( 0 ); i < aKnownProcessPtrVectorSize; ++i )
     {
       gsl_vector_set( theKnownVelocityVector, i, theKnownProcessPtrVector[i]->getActivity() );
     }
@@ -398,7 +398,7 @@ void FluxDistributionProcess::fire()
 		  theKnownVelocityVector, 0.0, theSolutionVector );
 
   ProcessVector::size_type anUnknownProcessPtrVectorSize( theUnknownProcessPtrVector.size() );
-  for( Integer i( 0 ); i < anUnknownProcessPtrVectorSize; ++i )
+  for( ProcessVector::size_type i( 0 ); i < anUnknownProcessPtrVectorSize; ++i )
     {
       theUnknownProcessPtrVector[i]->setFlux( gsl_vector_get( theSolutionVector, i ) ) ;
     }
