@@ -107,9 +107,6 @@ namespace libecs
 				  * getStepInterval()
 				  + theValueBuffer[ c ] );
 
-	    // k1 * 35/384 for Yn+1
-	    theVelocityBuffer[ c ] = theK1[ c ] * ( 35.0 / 384.0 );
-
 	    // clear velocity
 	    aVariable->setVelocity( 0.0 );
 	  }
@@ -126,9 +123,6 @@ namespace libecs
 	    aVariable->loadValue( theK1[ c ] * ( 1.0 / 5.0 )
 				  * getStepInterval()
 				  + theValueBuffer[ c ] );
-
-	    // k1 * 35/384 for Yn+1
-	    theVelocityBuffer[ c ] = theK1[ c ] * ( 35.0 / 384.0 );
 
 	    // clear velocity
 	    aVariable->setVelocity( 0.0 );
@@ -150,9 +144,6 @@ namespace libecs
 				+ theK2[ c ] * ( 9.0 / 40.0 ) )
 			      * getStepInterval()
 			      + theValueBuffer[ c ] );
-
-	// k2 * 0 for Yn+1 (do nothing)
-	//	    theVelocityBuffer[ c ] += theK2[ c ] * 0;
 
 	// clear velocity
 	aVariable->setVelocity( 0.0 );
@@ -176,9 +167,6 @@ namespace libecs
 			      * getStepInterval()
 			      + theValueBuffer[ c ] );
 
-	// k3 * 500/1113 for Yn+1
-	theVelocityBuffer[ c ] += theK3[ c ] * ( 500.0 / 1113.0 );
-
 	// clear velocity
 	aVariable->setVelocity( 0.0 );
       }
@@ -200,9 +188,6 @@ namespace libecs
 				- theK4[ c ] * ( 212.0 / 729.0 ) )
 			      * getStepInterval()
 			      + theValueBuffer[ c ] );
-
-	// k4 * 125/192 for Yn+1
-	theVelocityBuffer[ c ] += theK4[ c ] * ( 125.0 / 192.0 );
 
 	// clear velocity
 	aVariable->setVelocity( 0.0 );
@@ -226,9 +211,6 @@ namespace libecs
 				- theK5[ c ] * ( 5103.0 / 18656.0 ) )
 			      * getStepInterval()
 			      + theValueBuffer[ c ] );
-
-	// k5 * -2187/6784 for Yn+1
-	theVelocityBuffer[ c ] += theK5[ c ] * ( -2187.0 / 6784.0 );
 
 	// clear velocity
 	aVariable->setVelocity( 0.0 );
@@ -254,9 +236,6 @@ namespace libecs
 			      * getStepInterval()
 			      + theValueBuffer[ c ] );
 
-	// k6 * 11/84 for Yn+1
-	theVelocityBuffer[ c ] += theK6[ c ] * ( 11.0 / 84.0 );
-
 	// clear velocity
 	aVariable->setVelocity( 0.0 );
       }
@@ -276,12 +255,26 @@ namespace libecs
 	theK7[ c ] = aVariable->getVelocity();
 
 	// calculate error
-	const Real anEstimatedError( theK1[ c ] * ( 71.0 / 57600.0 )
-				     + theK3[ c ] * ( -71.0 / 16695.0 )
-				     + theK4[ c ] * ( 71.0 / 1920.0 )
-				     + theK5[ c ] * ( -17253.0 / 339200.0 )
-				     + theK6[ c ] * ( 22.0 / 525.0 )
-				     + theK7[ c ] * ( -1.0 / 40.0 ) );
+ 	const Real anEstimatedError( theK1[ c ] * ( 71.0 / 57600.0 )
+ 				     + theK3[ c ] * ( -71.0 / 16695.0 )
+ 				     + theK4[ c ] * ( 71.0 / 1920.0 )
+ 				     + theK5[ c ] * ( -17253.0 / 339200.0 )
+ 				     + theK6[ c ] * ( 22.0 / 525.0 )
+ 				     + theK7[ c ] * ( -1.0 / 40.0 ) );
+
+// 	const Real anEstimatedError( theK1[ c ] * ( 71.0 / 86400.0 )
+// 				     + theK3[ c ] * ( -142.0 / 50085.0 )
+// 				     + theK4[ c ] * ( 71.0 / 2880.0 )
+// 				     + theK5[ c ] * ( -5751.0 / 169600.0 )
+// 				     + theK6[ c ] * ( 44.0 / 1575.0 )
+// 				     + theK7[ c ] * ( -1.0 / 60.0 ) );
+
+	theVelocityBuffer[ c ] 
+	  = theK1[ c ] * ( 35.0 / 384.0 )
+	  + theK3[ c ] * ( 500.0 / 1113.0 )
+	  + theK4[ c ] * ( 125.0 / 192.0 )
+	  + theK5[ c ] * ( -2187.0 / 6784.0 )
+	  + theK6[ c ] * ( 11.0 / 84.0 );
 
 	// calculate velocity for Xn+.5
 	theMidVelocityBuffer[ c ] 
