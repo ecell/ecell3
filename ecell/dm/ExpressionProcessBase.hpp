@@ -138,8 +138,6 @@ namespace libecs
 	theCompiledCode = theCompiler.compileExpression( theExpression );
 
 	//	theVirtualMachine.resize( theCompiler.getStackSize() );
-
-	theNeedRecompile = false;
       }
 
     PropertyMapCref getPropertyMap() const
@@ -154,6 +152,7 @@ namespace libecs
 	if( theNeedRecompile )
 	  {
 	    compileExpression();
+	    theNeedRecompile = false;
 	  }
       }
 

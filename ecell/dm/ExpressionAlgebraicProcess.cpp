@@ -59,7 +59,7 @@ LIBECS_DM_CLASS( ExpressionAlgebraicProcess, ExpressionProcessBase )
   
   virtual void fire()
     { 
-      setActivity( theStackMachine.execute( theCompiledCode ) );
+      setActivity( theVirtualMachine.execute( theCompiledCode ) );
     }
 
 };

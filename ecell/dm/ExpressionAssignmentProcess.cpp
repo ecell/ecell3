@@ -89,7 +89,7 @@ LIBECS_DM_CLASS( ExpressionAssignmentProcess, ExpressionProcessBase )
     { 
       theVariableReference.setValue
 	( theVariableReference.getCoefficient() * 
-	  theStackMachine.execute( theCompiledCode ) );
+	  theVirtualMachine.execute( theCompiledCode ) );
     }
 
  private:
