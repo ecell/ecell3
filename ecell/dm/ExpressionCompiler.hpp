@@ -89,6 +89,7 @@ public:
 
 
   typedef ObjectMethodProxy<Real> RealObjectMethodProxy;
+  typedef ObjectMethodProxy<Integer> IntegerObjectMethodProxy;
   //  VariableReferenceMethodProxy;
 
   typedef void (*InstructionAppender)( CodeRef );
@@ -243,8 +244,6 @@ public:
 
   typedef ObjectMethodOperand<Process,Real> ProcessMethod;
   typedef ObjectMethodOperand<System,Real>  SystemMethod;
-  typedef ObjectMethodOperand<VariableReference,const Integer> 
-  VariableReferenceIntegerMethod;
 
 
 private:
@@ -524,14 +523,14 @@ SPECIALIZE_OPCODE2OPERAND( CALL_FUNC1,               RealFunc1 );
 SPECIALIZE_OPCODE2OPERAND( CALL_FUNC2,               RealFunc2 );
 SPECIALIZE_OPCODE2OPERAND( VARREF_REAL_METHOD, 
 			   RealObjectMethodProxy );
+SPECIALIZE_OPCODE2OPERAND( VARREF_INTEGER_METHOD, 
+			   IntegerObjectMethodProxy );
 SPECIALIZE_OPCODE2OPERAND( PROCESS_METHOD,           ProcessMethod );
 SPECIALIZE_OPCODE2OPERAND( SYSTEM_METHOD,            SystemMethod );
 SPECIALIZE_OPCODE2OPERAND( PROCESS_TO_SYSTEM_METHOD, ProcessMethodPtr );
 SPECIALIZE_OPCODE2OPERAND( SYSTEM_TO_REAL_METHOD,    SystemMethodPtr );  
 SPECIALIZE_OPCODE2OPERAND( VARREF_TO_SYSTEM_METHOD,  
 			   VariableReferenceSystemMethodPtr );
-SPECIALIZE_OPCODE2OPERAND( VARREF_INTEGER_METHOD,
-			   VariableReferenceIntegerMethod );
 
   
 #define DEFINE_OPCODE2INSTRUCTION( CODE )\
@@ -671,7 +670,7 @@ appendVariableReferenceMethodInstruction( Code& aCode,
 					  aVariableReference,
 					  StringCref aMethodName )
 {
-#define APPEND_VARREF_METHOD( METHODNAME )\
+#define APPEND_VARREF_REAL_METHOD( METHODNAME )\
 	appendInstruction\
 	  ( aCode, \
 	    Instruction<VARREF_REAL_METHOD>\
@@ -679,41 +678,40 @@ appendVariableReferenceMethodInstruction( Code& aCode,
 	      create< VariableReference, &VariableReference::METHODNAME >\
 	      ( aVariableReference ) ) ); // \
 
+#define APPEND_VARREF_INTEGER_METHOD( METHODNAME )\
+	appendInstruction\
+	  ( aCode, \
+	    Instruction<VARREF_INTEGER_METHOD>\
+	    ( IntegerObjectMethodProxy::\
+	      create< VariableReference, &VariableReference::METHODNAME >\
+	      ( aVariableReference ) ) ); // \
+
 
   if( aMethodName == "MolarConc" )
     {
-      APPEND_VARREF_METHOD( getMolarConc );
+      APPEND_VARREF_REAL_METHOD( getMolarConc );
     }
   else if( aMethodName == "NumberConc" )
     {
-      APPEND_VARREF_METHOD( getNumberConc );
+      APPEND_VARREF_REAL_METHOD( getNumberConc );
     }
   else if( aMethodName == "Value" )
     {
-      APPEND_VARREF_METHOD( getValue );
+      APPEND_VARREF_REAL_METHOD( getValue );
     }
   else if( aMethodName == "Velocity" )
     {
-      APPEND_VARREF_METHOD( getVelocity );
+      APPEND_VARREF_REAL_METHOD( getVelocity );
     }
   else if( aMethodName == "TotalVelocity" )
     {
-      APPEND_VARREF_METHOD( getTotalVelocity );
+      APPEND_VARREF_REAL_METHOD( getTotalVelocity );
     }
-  /*
-    else if( aMethodName == "Coefficient" )
+  else if( aMethodName == "Coefficient" )
     {
-    VariableReferenceIntegerMethod aVariableReferenceIntegerMethod;
-	
-    aVariableReferenceIntegerMethod.theOperand1 = aVariableReference;
-    aVariableReferenceIntegerMethod.theOperand2 = 
-    &libecs::VariableReference::getCoefficient;
-	
-    appendInstruction( aCode, 
-    Instruction<VARREF_INTEGER_METHOD>
-    ( aVariableReferenceIntegerMethod ) );	      
-    } 
-  */  
+      APPEND_VARREF_INTEGER_METHOD( getCoefficient );
+    }
+
   /**else if( str_child2 == "Fixed" ){
      aCode.push_back(
      new VARREF_REAL_METHOD( aVariableReference,
@@ -729,7 +727,8 @@ appendVariableReferenceMethodInstruction( Code& aCode,
     }
 
 
-#undef APPEND_VARREF_METHOD
+#undef APPEND_VARREF_REAL_METHOD
+#undef APPEND_VARREF_INTEGER_METHOD
 
 }
 

@@ -239,6 +239,16 @@ const Real ExpressionProcessBase::VirtualMachine::execute( CodeCref aCode )
 	    goto bypass_real;
 	  }
 
+	case ExpressionCompiler::VARREF_INTEGER_METHOD:
+	  {
+	    DECODE_INSTRUCTION( VARREF_INTEGER_METHOD );
+	      
+	    aStackPtr->theReal = ( anInstruction->getOperand() )();
+
+	    INCREMENT_PC( VARREF_INTEGER_METHOD );
+	    continue;
+	  }
+
 	case ExpressionCompiler::PUSH_INTEGER:
 	  {
 	    DECODE_INSTRUCTION( PUSH_INTEGER );
