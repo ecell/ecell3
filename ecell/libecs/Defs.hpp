@@ -93,14 +93,18 @@
 // These macros does nothing when libecs does not support prefetching
 // on the platform.
 
-#if defined( USE_COMPILER_EXTENSIONS )
-#  if defined( __GNUC__ )
+#if defined( USE_COMPILER_EXTENSIONS ) && defined( __GNUC__ )
 #    define LIBECS_USE_PMF_CONVERSIONS 1
 #    define LIBECS_LIKELY( EXP )       __builtin_expect( ( EXP ), 1 )
 #    define LIBECS_UNLIKELY( EXP )     __builtin_expect( ( EXP ), 0 )
-#    define LIBECS_PREFETCH            __builtin_prefetch
-#  endif /* defined( __GNUC__ ) */
-#endif /* defined( USE_COMPILER_EXTENSIONS ) */
+#    define LIBECS_PREFETCH( ADDR, RW, LOCALITY )\
+            __builtin_prefetch( ( ADDR ), ( RW ), ( LOCALITY ) )
+#else
+// do not define LIBECS_USE_PMF_CONVERSIONS
+#    define LIBECS_LIKELY( EXP )       ( EXP )
+#    define LIBECS_UNLIKELY( EXP )     ( EXP )
+#    define LIBECS_PREFETCH            
+#endif /* defined( USE_COMPILER_EXTENSIONS ) && defined( __GNUC__ ) */
 
 
 namespace libecs
