@@ -2,4 +2,5 @@
 class ShapeDescriptor:
 
 	
-	def get
+	def getDescriptorList( self ):
+		pass
