@@ -110,15 +110,15 @@ class Session:
         # This method can thwor exceptions. 
         
         # creates ana seve an EML instance 
-        self.anEml = eml.Eml()
+        anEml = eml.Eml()
 
         # creates root entity
-        self.anEml.createEntity('System', 'System::/')
+        anEml.createEntity('System', 'System::/')
         
         # calls save methods
-        self.__saveEntity()
-        self.__saveStepper()
-        self.__saveProperty()
+        self.__saveEntity( anEml )
+        self.__saveStepper( anEml )
+        self.__saveProperty( anEml )
 
         # if the type is string
         if type( aModel ) == str:
@@ -130,7 +130,7 @@ class Session:
 -->
 <eml>
 ''' % ( time.asctime( time.localtime() ) , self.getCurrentTime() )
-       	    aString = self.anEml.asString()
+       	    aString = anEml.asString()
             aBuffer = string.join( string.split(aString, '<eml>\n'), aCurrentInfo)
             aFileObject = open( aModel, 'w' )
             aFileObject.write( aBuffer )
@@ -138,7 +138,7 @@ class Session:
 
         # if the type is file object
         elif type( aModel ) == file:
-       	    aString = self.anEml.asString()
+       	    aString = anEml.asString()
             aFileObject = aModel
             aFileObject.write( aString )
             aFileObject.close()
@@ -477,7 +477,7 @@ class Session:
 
         return aContext
 
-    def __saveStepper( self ):
+    def __saveStepper( self , anEml ):
         """stepper loader"""
 
         aStepperList = self.theSimulator.getStepperList()
@@ -485,7 +485,7 @@ class Session:
         for aStepper in aStepperList:
 
             aClassName = self.theSimulator.getStepperClassName( aStepper )
-            self.anEml.createStepper( str( aClassName ),\
+            anEml.createStepper( str( aClassName ),\
                                              str( aStepper ) )
 
             aPropertyList = self.theSimulator.getStepperPropertyList( aStepper )
@@ -508,25 +508,25 @@ class Session:
                     else:
                         aValueList = aValue
 
-                    self.anEml.setStepperProperty( aStepper,\
+                    anEml.setStepperProperty( aStepper,\
                                                       aProperty,\
                                                       aValueList )
     
-    def __saveEntity( self, aSystemPath='/' ):
+    def __saveEntity( self, anEml, aSystemPath='/' ):
 
         aVariableList = self.getEntityList(  2, aSystemPath )
         aProcessList   = self.getEntityList( 3, aSystemPath )
         aSubSystemList = self.getEntityList( 4, aSystemPath )
         
-        self.__saveEntityList( 'System',   aSystemPath, aSubSystemList )
-        self.__saveEntityList( 'Variable', aSystemPath, aVariableList )
-        self.__saveEntityList( 'Process',  aSystemPath, aProcessList )
+        self.__saveEntityList( anEml, 'System',   aSystemPath, aSubSystemList )
+        self.__saveEntityList( anEml, 'Variable', aSystemPath, aVariableList )
+        self.__saveEntityList( anEml, 'Process',  aSystemPath, aProcessList )
 
         for aSystem in aSubSystemList:
             aSubSystemPath = joinSystemPath( aSystemPath, aSystem )
-            self.__saveEntity( aSubSystemPath )
+            self.__saveEntity( anEml, aSubSystemPath )
             
-    def __saveEntityList( self, anEntityTypeString,\
+    def __saveEntityList( self, anEml, anEntityTypeString,\
                           aSystemPath, anIDList ):
 
        for anID in anIDList:
@@ -537,9 +537,9 @@ class Session:
             if aClassName == 'System::/':
                 pass
             else:
-                self.anEml.createEntity( aClassName, aFullID )
+                anEml.createEntity( aClassName, aFullID )
             
-    def __saveProperty( self, aSystemPath='' ):
+    def __saveProperty( self, anEml, aSystemPath='' ):
         # the default of aSystemPath is empty because
         # unlike __loadEntity() this starts with the root system
 
@@ -547,17 +547,18 @@ class Session:
         aProcessList   = self.theSimulator.getEntityList( 3,  aSystemPath )
         aSubSystemList = self.theSimulator.getEntityList( 4,  aSystemPath )
 
-        self.__savePropertyList( 'Variable',\
+        self.__savePropertyList( anEml, 'Variable', \
                                  aSystemPath, aVariableList )
-        self.__savePropertyList( 'Process',  aSystemPath, aProcessList )
-        self.__savePropertyList( 'System',\
+        self.__savePropertyList( anEml, 'Process', \
+                                 aSystemPath, aProcessList )
+        self.__savePropertyList( anEml, 'System', \
                                  aSystemPath, aSubSystemList )
 
         for aSystem in aSubSystemList:
             aSubSystemPath = joinSystemPath( aSystemPath, aSystem )
-            self.__saveProperty( aSubSystemPath )
+            self.__saveProperty( anEml, aSubSystemPath )
 
-    def __savePropertyList( self, anEntityTypeString,\
+    def __savePropertyList( self, anEml, anEntityTypeString,\
                             aSystemPath, anIDList ):
 
         for anID in anIDList:
@@ -587,7 +588,7 @@ class Session:
                         aValueList = self.__convertPropertyValueList( aValue )
                         #aValueList = aValue
                         
-                    self.anEml.setEntityProperty( aFullID, aProperty, aValueList )
+                    anEml.setEntityProperty( aFullID, aProperty, aValueList )
                     
     def __convertPropertyValueList( self, aValueList ):
         
