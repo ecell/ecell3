@@ -45,6 +45,10 @@
    if _ECELL3_DM_TYPE or _ECELL3_DM_CLASSNAME is defined *before*
    including this file, it is used as a default value of
    ECELL3_DM_TYPE or ECELL3_DM_CLASSNAME macro.
+
+   This file can be included only from .cpp source files.  That means,
+   this file cannot be included twice.
+
 */
 
 

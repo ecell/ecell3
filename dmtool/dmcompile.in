@@ -39,8 +39,6 @@ return $?
 
 cleanup()
 {
-#	run_command rm -rf .libs
-#	run_command rm -f $LAOBJ $LOBJ $OBJ
 	run_command rm -f $OBJ
 }
 
@@ -96,8 +94,6 @@ SRC=$1 ; shift
 CXXCOMPILEFLAGS="$CXXFLAGS $*"
 CLASSNAME=`$BASENAME $SRC $CXXSUFFIX`
 OBJ=$CLASSNAME.o
-LOBJ=$CLASSNAME.lo
-LAOBJ=$CLASSNAME.la
 SOBJ=$CLASSNAME$SHLEXT
 
 #FIXME:
@@ -107,6 +103,17 @@ LDFLAGS="-Wl,-rpath $libdir -Wl -L$libdir -lecs"
 ## main routine
 
 exit_if_failed compile
+
+if [ ! -f $OBJ ] ; then
+    echo "Error: $OBJ not created by the compiler."
+    exit 1
+fi
+
 exit_if_failed link
-#move
+
+if [ ! -f $SOBJ ] ; then
+    echo "Error: $SOBJ not created by the compiler."
+    exit 1
+fi
+
 cleanup

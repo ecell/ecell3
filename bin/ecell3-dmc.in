@@ -1,37 +1,34 @@
 #!/bin/sh
 #
 # ecell3-dmc  - a program to compile and/or docify dynamic module in 
-#               E-CELL Simulation Environment Version 3
+#               E-Cell Simulation Environment Version 3
 #
 # author: Tomoya Kitayama <tomo@e-cell.org>
 #
 
-PACKAGE=@PACKAGE@
-VERSION=@VERSION@
+#PACKAGE=@PACKAGE@
+#VERSION=@VERSION@
 
-CXX=@CXX@
 prefix=@prefix@
 exec_prefix=@prefix@
 
 BINDIR="${exec_prefix}/bin"
-STD_INCLUDE="${prefix}/include"
 ECELL_INCLUDE="${prefix}/include/ecell"
 LIBECS_INCLUDE="${ECELL_INCLUDE}/libecs"
 
-unset VERBOSE
+STDINCLUDE="-I${prefix}/include -I${ECELL_INCLUDE} -I${LIBECS_INCLUDE} -I."
 
-#TMPDIR="/tmp"
-#ETTMPDIR="$TMPDIR/ecell3-dmc.$$"
+DMCOMPILE="${BINDIR}/dmcompile"
+
+unset VERBOSE NO_STDINCLUDE
 
 usage() 
 {
 cat << EOT_USAGE
-
-Compile and/or dynamic module in
-E-CELL Simulation Environment Versin 3.
+Compile dynamic modules for E-Cell Simulation Environment Versin 3.
 
 Usage:
-	`basename $0` files... [ compiler options ]
+	`basename $0` [ ecell3-dmc options ] sourcefile [ compiler options ]
 	`basename $0` -h|--help
 EOT_USAGE
 }
@@ -41,11 +38,12 @@ help()
 usage
 cat << EOT_HELP
 
-Options:
+ecell3-dmc options:
+        --no-stdinclude          Don't set standard include file path.
         -v or --verbose   	 Be verbose.
         -h or --help		 Print this message.
 
-This program is part of E-CELL Simulation Environment Version 3.
+This program is part of E-Cell Simulation Environment Version 3.
 Written by Tomoya Kitayama <tomo@e-cell.org>
 EOT_HELP
 }
@@ -53,20 +51,13 @@ EOT_HELP
 initialize()
 {
 	trap interrupted 2 9 15
-	#run_command mkdir $ETTMPDIR
-}
-
-cleanup()
-{
-	run_command rm -rf $ETTMPDIR
 }
 
 interrupted()
 {
-	echo "interrupted..."
-	trap '' 2 9 15
-	cleanup
-	exit 1
+    echo "interrupted..."
+    trap '' 2 9 15
+    exit 1
 }
 
 message()
@@ -75,6 +66,8 @@ message()
 	echo $@
     fi
 }
+
+
 
 run_command()
 {
@@ -103,6 +96,7 @@ fi
 
 while [ -n "$(echo $1 | grep '-')" ]; do
     case "$1" in
+	--no-stdinclude) NO_STDINCLUDE=yes ; shift ;;
 	-v|--verbose) VERBOSE=yes ; shift ;;
 	-h|--help) help ; exit 0 ;;
 	*) echo "Invarid Option! " ; help ; exit 1 ;;
@@ -115,27 +109,44 @@ done
 
 initialize
 
-CURRENTDIR=$(pwd)
-
 SRC=$1 ;shift
+
+if [ -z $SRC ] ; then
+    echo "Error: source file not given."
+    exit 1
+fi
+
+if [ ! -f $SRC ] ; then
+    echo "Error: $SRC not found."
+    exit 1
+fi
+
 
 CLASSNAME=$( echo $SRC | cut -d'.' -f1 ) 
 
-CXXCOMPILEFLAGS="-D_ECELL3_DM_CLASSNAME=$CLASSNAME $*"
+CLASSNAMEDEFINE="-D_ECELL3_DM_CLASSNAME=$CLASSNAME"
+CXXCOMPILEFLAGS="$*"
 
-#copy dmfile to ETTMPDIR
 
-#run_command "cp $SRC $ETTMPDIR" 
-#run_command "pushd $ETTMPDIR"     
+if [ $NO_STDINCLUDE ] ; then
+    INCLUDE=""
+else
+    INCLUDE=${STDINCLUDE}
+fi
+
 
 #
 #Compile
 #
-command_string="dmcompile $SRC -I $CURRENTDIR -I $ECELL_INCLUDE -I $LIBECS_INCLUDE -I $STD_INCLUDE -I . -I .. $CXXCOMPILEFLAGS"
+command_string="$DMCOMPILE $SRC $CXXCOMPILEFLAGS $INCLUDE $CLASSNAMEDEFINE"
 
 run_command $command_string
-unset commnad_string
 
-cleanup
+exitcode=$?
+if [ $exitcode -ne 0 ] ; then
+    echo "Error: dmcompile failed."
+    exit $exitcode
+fi
+
 
 exit 0
