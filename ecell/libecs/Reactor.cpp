@@ -85,12 +85,20 @@ namespace libecs
 
   const Polymorph Reactor::getReactantList() const
   {
-    PolymorphVector aVector( theReactantMap.size() );
+    PolymorphVector aVector;
+    aVector.reserve( theReactantMap.size() );
   
     for( ReactantMapConstIterator i( theReactantMap.begin() );
 	 i != theReactantMap.end() ; ++i )
       {
-	aVector.push_back( i->second.getSubstance()->getFullID().getString() );
+	PolymorphVector anInnerVector;
+	ReactantCref aReactant( i->second );
+
+	anInnerVector.push_back( aReactant.getSubstance()->
+				 getFullID().getString() );
+	anInnerVector.push_back( aReactant.getStoichiometry() );
+
+	aVector.push_back( anInnerVector );
       }
 
     return aVector;
