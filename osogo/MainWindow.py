@@ -104,18 +104,6 @@ class MainWindow(OsogoWindow):
                 self['messagehandlebox'].connect('child-detached',\
                                             self.__MessageWindowDetached)
 
-
-
-
-		# -------------------------------------
-		# creates EntityListWindow 
-		# -------------------------------------
-
-                self.theEntityListWindow = self.theSession.createEntityListWindow()
-                # self.theEntityListWindow = EntityListWindow.EntityListWindow( self.theSession )
-		# self.theEntityListWindow.openWindow()
-                # self['entitylistarea'].add(self.theEntityListWindow['top_frame'])
-
 		# -------------------------------------
 		# append signal handlers
 		# -------------------------------------
@@ -189,7 +177,15 @@ class MainWindow(OsogoWindow):
 		self.theAboutSessionMonitor = None
 		self.openAboutSessionMonitor = False 
 		self.update()
-		
+
+
+
+		# -------------------------------------
+		# creates EntityListWindow 
+		# -------------------------------------
+
+                self.theEntityListWindow = self.theSession.createEntityListWindow()
+
 	def __expose( self, *arg ):
 		"""expose
 		Return None
