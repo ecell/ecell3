@@ -51,14 +51,15 @@ const String SystemPath::last() const
 
 const String SystemPath::first() const
 {
- int    anInt( theSystemPath.find( DELIMITER ) ); 
+ int anInt( theSystemPath.find( DELIMITER ) ); 
+ String aString( "/" );
 
  if( anInt != 0 )
    {
-     return theSystemPath.substr( 0, anInt );
+     aString = theSystemPath.substr( 0, anInt );
    }
 
- return "/";
+ return aString;
 }
 
 SystemPath SystemPath::next() const 
@@ -106,17 +107,18 @@ const String FQID::IdOf( StringCref fqid )
 
   if( aBorder == String::npos )
     {
-      throw BadID(__PRETTY_FUNCTION__,
-		  "no \':\' found in FQID \"" + fqid + "\".");
+      throw BadID( __PRETTY_FUNCTION__,
+		   "no \':\' found in FQID \"" + fqid + "\"." );
     }
 
-  if( fqid.find( ':', aBorder + 1 ) != String::npos )
+  ++aBorder;
+  if( fqid.find( ':', aBorder ) != String::npos )
     {
-      throw BadID(__PRETTY_FUNCTION__,
-		    "too many \':\'s in FQID \"" + fqid + "\".");
+      throw BadID( __PRETTY_FUNCTION__,
+		   "too many \':\'s in FQID \"" + fqid + "\"." );
     }
 
-  return fqid.substr( aBorder + 1, String::npos );
+  return fqid.substr( aBorder, String::npos );
 }
 
 const String FQID::SystemPathOf( StringCref fqid )
@@ -131,17 +133,17 @@ const String FQID::SystemPathOf( StringCref fqid )
 
   if( fqid.find( ':', aBorder + 1 ) != String::npos )
     {
-      throw BadID(__PRETTY_FUNCTION__,
-		    "to many \':\'s in FQID \"" + fqid + "\".");
+      throw BadID( __PRETTY_FUNCTION__,
+		   "to many \':\'s in FQID \"" + fqid + "\"." );
     }
 
   return fqid.substr( 0, aBorder );
 }
 
 
-const String FQID::getFqid() const
+const String FQID::getFqidString() const
 {
-  return ( SystemPath::getString() + ":" + getId() );
+  return ( SystemPath::getString() + ":" + getIdString() );
 }
 
 
@@ -173,16 +175,18 @@ const String FQPI::fqidOf( StringCref fqpi )
       throw BadID( __PRETTY_FUNCTION__,
 		   "no \':\' found in FQPI \"" + fqpi + "\"." );
     }
-  if( fqpi.find( ':', aBorder + 1 ) == String::npos )
+
+  ++aBorder;
+  if( fqpi.find( ':', aBorder ) == String::npos )
     {
       throw BadID( __PRETTY_FUNCTION__,
 		     "no enough \':\'s found in FQPI \"" + fqpi + "\"." );
     }
 
-  return fqpi.substr( aBorder + 1, String::npos );
+  return fqpi.substr( aBorder, String::npos );
 }
 
-const String FQPI::getFqpi() const 
+const String FQPI::getFqpiString() const 
 {
   String aString( PrimitiveTypeStringOf( thePrimitiveType ) + ':' 
 		  + FQID::getString() );
@@ -204,15 +208,15 @@ main()
 
   FQID aFQID( "/A/B:S" );
   cout << aFQID.getString() << endl;
-  cout << aFQID.getSystemPath() << endl;
-  cout << aFQID.getId() << endl;
+  cout << aFQID.getSystemPathString() << endl;
+  cout << aFQID.getIdString() << endl;
 
   FQPI aFQPI( "Substance:/A/B:S" );
   cout << aFQPI.getString() << endl;
-  cout << getPrimitiveTypeString( aFQPI.getType() ) << endl;
-  cout << aFQPI.getSystemPath() << endl;
-  cout << aFQPI.getId() << endl;
-  cout << aFQPI.getFqid() << endl;
+  cout << PrimitiveTypeStringOf( aFQPI.getPrimitiveType() ) << endl;
+  cout << aFQPI.getSystemPathString() << endl;
+  cout << aFQPI.getIdString() << endl;
+  cout << aFQPI.getFqidString() << endl;
 }
 
 

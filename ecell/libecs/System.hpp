@@ -101,49 +101,6 @@ public:
     */
   StepperPtr getStepper() { return theStepper; }
 
-// isn't this redundant?  stl's for_each can be used for this purpose.
-#if 0 
-  /**
-   Find and get a Primitive of given type and ID.
-   The Primitive object must be new'd and deleted by 
-   caller of this method.    
- 
-   @param id Entryname of the Primitive to be obtained.
-   @param primitive Pointer to a primitive whose type field is set
-   to a type of primitive to be obtained. 
- 
-   @return true -> success, false -> failed.
-   */
-  Primitive getPrimitive( const Primitive::Type type, StringCref id )
-    throw( InvalidPrimitiveType, NotFound );
-
-  /**
-    Calls function of type PrimitiveCallback for each Entity of
-    given type.
- 
-   @param type Type of Primitive. 
-   @param cb A pointer to a function to be called for every Primitives.
-   @param clientData void* pointer which is passed to the function.
- 
-   @return true -> success, false -> failed.
-   @sa PrimitiveCallback
-   */
-  void forAllPrimitives( Primitive::Type type, PrimitiveCallback cb,
-			 void* clientData );
-#endif /* 0 */
-
-  /**
-    Returns the number of Entities of given type this system holds.
- 
-   @param type Type of primitive.
- 
-   @return The number of instance of given type.
-   -1 if the type given is invalid.  0 if this is not a System
-   for given type.
-   */
-  int getNumberOfPrimitives( PrimitiveType type );
-
-
   /**
     Instantiate a Stepper object of @a classname using theRootSystem's
     StepperMaker object.  Register the Stepper object as a stepper for 
@@ -289,7 +246,7 @@ public:
   SubstancePtr getSubstance( StringCref id ) throw( NotFound );
 
   /**
-    Add a System object in this MetaSystem
+    Add a System object in this System
     */
   void addSystem( SystemPtr );
 

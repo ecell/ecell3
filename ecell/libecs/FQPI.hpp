@@ -46,10 +46,9 @@ public:
   SystemPath( StringCref systempath = "" );
   virtual ~SystemPath() {}
 
-  StringCref getSystemPath() const { return theSystemPath; }
-  virtual const String getString() const { return getSystemPath(); }
-
-  virtual operator String() const { return getString(); }
+  StringCref getSystemPathString() const { return theSystemPath; }
+  virtual const String getString() const { return getSystemPathString(); }
+  virtual operator String() const { return getSystemPathString(); }
 
   /**
     Extract the first system name. Standardize given string.
@@ -63,6 +62,7 @@ public:
     @return name of the last system in given systempath.
     */
   const String last() const;
+
   /**
     Remove the first system name. Standardize given string.
     @return
@@ -94,11 +94,11 @@ private:
 /**
   FQID(Fully Qualified entity ID)
 
-  The FQID is a identifier (ID) of Entity objects of certain Primitive
-  type.  Given a Primitive type, one can identify unique Entity in a
+  The FQID is a identifier (ID) of Entity objects of certain PrimitiveType.
+  Given a PrimitiveType, one can identify unique Entity in a
   cell model with a SystemPath and an id.  
 
-  @see SystemPath, Primitive 
+  @see SystemPath
 */
 class FQID : public SystemPath
 {
@@ -109,10 +109,10 @@ public:
   FQID( StringCref fqen );
   virtual ~FQID() {}
 
-  const String getFqid() const;
-  virtual const String getString() const { return getFqid(); }
-  StringCref getId() const { return theId; }
-  virtual operator String() const { return getString(); }
+  const String getFqidString() const;
+  virtual const String getString() const { return getFqidString(); }
+  StringCref getIdString() const { return theId; }
+  virtual operator String() const { return getFqidString(); }
 
   static const String IdOf( StringCref fqen );
   static const String SystemPathOf( StringCref fqen );
@@ -142,11 +142,11 @@ public:
   FQPI( StringCref fqpi );
   virtual ~FQPI() {}
   
-  const String getFqpi() const;
+  const String getFqpiString() const;
   const PrimitiveType getPrimitiveType() const { return thePrimitiveType; }
 
-  virtual const String getString() const { return getFqpi(); }
-  virtual operator const String() const { return getString(); }
+  virtual const String getString() const { return getFqpiString(); }
+  virtual operator const String() const { return getFqpiString(); }
 
 private:
 
