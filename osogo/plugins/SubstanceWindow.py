@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import string
-
+import ecs
 import gtk
 import gnome.ui
 import GDK
