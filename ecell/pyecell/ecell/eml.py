@@ -262,7 +262,7 @@ class Eml:
 
         anEntityPropertyElement = self.__createPropertyNode( aPropertyName,\
                                                              aValueList )
-        
+
         aTargetNode = self.__getEntityNode( aFullID )
         aTargetNode.appendChild( anEntityPropertyElement )
 
@@ -402,7 +402,8 @@ class Eml:
 
         if aNodeType == aValueNode.TEXT_NODE:
 
-            return str( aNode.nodeValue )
+            aValue = string.replace( str( aNode.nodeValue ), '#x0A', '\n')
+            return aValue
 
         elif aNodeType == aValueNode.ELEMENT_NODE:
 
@@ -543,12 +544,15 @@ class Eml:
         aValueNode = self.__createElement( 'value' )
 
         if type( aValue ) in ( types.TupleType, types.ListType ):    # vector value
+
             map( aValueNode.appendChild,\
                  map( self.__createValueNode, aValue ) )
 
         else:        # scaler value
- 
-            aValueData = self.__theDocument.createTextNode( aValue )
+
+            aNormalizedValue =  string.replace( aValue, '\n', '#x0A' )
+
+            aValueData = self.__theDocument.createTextNode( aNormalizedValue )
             aValueNode.appendChild( aValueData )
 
 
