@@ -45,9 +45,9 @@ NOTE: If you get this package via cvs, use ./autogen.sh instead of
   == Operating Systems ==
 
   Starting from version 3.1.2, the primary target of ecell3 
-  is RedHat Linux 8.x.
+  is RedHat Linux 9.
 
-  We've tested with RedHat Linux 8.0 on i386 platform.
+  We've tested with RedHat Linux 9 on i386 platform.
 
 
   == Compilers ==
@@ -55,9 +55,9 @@ NOTE: If you get this package via cvs, use ./autogen.sh instead of
   We've tested with gcc-3.2.
 
 
-  == Note for RedHat 8.0 users ==
+  == Note for RedHat 9 users ==
 
-  If you are using RedHat Linux 8.0, you need some additional packages to 
+  If you are using RedHat Linux 9, you need some additional packages to 
   successfully build and run E-Cell 3.
 
   1. Numeric Python for python2:
@@ -69,7 +69,7 @@ NOTE: If you get this package via cvs, use ./autogen.sh instead of
 
   2. GNU Scientific Library:
 
-     This is provided as optional packages of RedHat 8.0.
+     This is provided as optional packages of RedHat 9.
      Find gsl-*.rpm and gsl-devel*.rpm files in the distribution and
      use rpm command to install them.
      
