@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="US-ASCII"?>
 
-<!-- ============= Automating Simulation Sessions with ECS ========== -->
+<!-- ============= Automating Simulation Sessions with ESS ========== -->
 <chapter id="writing-ecs"> 
   <title>Automating Simulation Sessions with &ecell Session Script</title> 
 
@@ -16,7 +16,6 @@
 	<member>How to run &ecell in scripting mode.</member>
 
         <member>How to customize existing frontend software components.</member>
-	<member>How to write a new frontend program to &ecell&.</member>
 
       </simplelist>
 </para>
@@ -50,9 +49,9 @@
 	</listitem>
 	<listitem>
 	  <para>Use SessionManager to automate the invokation of the
-	  simulation sessions, as well as the generation of the <acronym>ESS</acronym>
-	  itself, for simulations involving multiple runs of the
-	  simulator.</para>
+	  simulation sessions, as well as the generation of the
+	  <acronym>ESS</acronym> itself, for simulations involving
+	  multiple runs of the simulator.</para>
 	</listitem>
 
       </itemizedlist>
@@ -224,32 +223,84 @@ Written by Kouichi Takahashi <email>shafi@e-cell.org</email>
 </screen>
 	</informalexample>
 
-	<para><methodname>step</methodname>() conducts a single step of the simulation</para>
+	<para>
+          <methodname>step</methodname>( <parameter>n</parameter> )
+ conducts <parameter>n</parameter> steps of the simulation. The
+ default value of <parameter>n</parameter> is 1.</para>
 
-      <para>
-message(), getCurrentTime() here.
-</para>
+	<note>
+	  <para>In tne above example you may notice that the first
+	  call of <methodname>step</methodname>() doesn't cause the
+	  time to change.  The simulator updates the time at the
+	  beginning of the step, and calculates a tentative step size
+	  after that.  The initial value of the step size is zero.
+	  Thus it needs to call <methodname>step</methodname>() twice
+	  to actually proceed the time.  See chapter 6 for details of
+	  the simulation mechanism.</para>
+	</note>
 
+	<para>To execute the simulation for some seconds, call
+	<methodname>run</methodname> method with a duration in
+	seconds. (e.g. <methodname>run</methodname>(
+	<constant>10</constant> ) for 10 seconds.)</para>
+
+	<note>
+	  <para>The system supports <methodname>run</methodname>
+	  without an argument to run forever, but only if both
+	  <emphasis>event checker</emphasis> and <emphasis>event
+	  handler</emphasis> are set.  If not, it raises an exception.
+	  See <methodname>setEventChecker</methodname>() in the method
+	  list of Session class below.
+
+	  </para>
+	</note>
+
+      </sect3>
+	
+      <sect3>
+	<title>Getting current time</title>
+
+	<para>To get the current time of the simulator,
+	<methodname>getCurrentTime</methodname>() method can be used.</para>
+
+	<informalexample><screen>
+<prompt>simple.eml, t=10.0032>>> </prompt><userinput>getCurrentTime()</userinput>
+<computeroutput>10.003221620379463</computeroutput>
+</screen>
+	</informalexample>
 
       </sect3>
       
       <sect3>
 	<title>Printing messages</title>
 
-	<para>message()</para>
+	<para>You may want to print some messages in your ESS.
+        Use <methodname>message</methodname>( <parameter>message</parameter> )
+	method, where <parameter>parameter</parameter> argument is a
+	string to be outputed.</para>
+
+	<para>By default the message is handled in a way the same as
+         the Python's <methodname>print</methodname> statement; it is
+         printed out to the standard out with a trailing new line.
+         This behavior can be changed by using
+         <methodname>setMessageMethod</methodname>() method.</para>
+
       </sect3>
 
 
       <sect3>
-	<title></title>
+	<title>Example</title>
 
-	<para>
+	<para>Here is a tiny example of using
+	<classname>Session</classname> methods which loads a model,
+	run a hundred seconds, and print a short message.
+
 <example>
 	    <title>A simple <acronym>ESS</acronym> example.</title>
 	    
-	    <programlisting>
-loadModel( 'simple.eml' )
+	    <programlisting linenumbering="numbered">loadModel( 'simple.eml' )
 run( 100 )
+message( 'stopped at %f seconds.' % getCurrentTime() )
 </programlisting>
 	  </example>
         </para>
@@ -263,13 +314,25 @@ run( 100 )
     <sect2>
       <title>Getting Session parameters.</title>
 
+      <para>Session parameters are given to ESS as global variables.
+      To check what parameters are given to ESS, use
+      <methodname>dir</methodname>() built-in function.  Session
+      parameters are listed as well as other available methods and
+      variables.</para>
+
+      <note>
+	<para>Currently there is no way to list only the Session
+      parameters because these are given just as global
+      variables.</para>
+      </note>
+
       <para></para>
 
     </sect2>
 
 
     <sect2>
-      <title>Observing and manipulating simulation models</title>
+      <title>Observing and manipulating the model with <classname>ObjectStub</classname>s</title>
 
       <sect3>
 	<title>What is <classname>ObjectStub</classname>?</title>
@@ -284,7 +347,7 @@ run( 100 )
 
 
       <sect3>
-	<title></title>
+	<title>Example</title>
 
 	<para>The following example loads an EML file, and prints the
 	value of ATP <classname>Variable</classname> in
@@ -294,8 +357,7 @@ run( 100 )
 	<example>
 	  <title>An <acronym>ESS</acronym> to check ATP level every 10 seconds</title>
 	  
-	  <programlisting>
-loadModel( 'simple.eml' )
+	  <programlisting linenumbering="numbered">loadModel( 'simple.eml' )
 
 ATP = createEntityStub( 'Variable:/CELL:ATP' )
 
