@@ -26,8 +26,6 @@ class Window:
                 gladefile = GLADEFILE_PATH + '/' + gladefile
 
         if os.access( os.path.join( GLADEFILE_PATH, gladefile ), os.R_OK ):
-            print gladefile
-            print root
             self.widgets = libglade.GladeXML( filename=gladefile, root=root )
         else:
             raise IOError( "can't read %s." % gladefile )
