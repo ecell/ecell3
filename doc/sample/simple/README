@@ -13,32 +13,22 @@ and one reaction(MichaelisUniUniProcess).
 
 === Files and directories ===
 
-README:                    This file
-simple.em:                 Model file(em file) for this model
-MichaelisUniUniProcess.dm: Process file(dm file) for this model
-
+README:                     This file
+simple.em:                  Model file(em file) for this model
+MichaelisUniUniProcess.cpp: Process file(cpp file) for this model 
+			    this file in standard-Process
 
 
 === Running this model ===
 
 1. (If necessary) Convert the .em file to .eml file.
 
-   % em2eml simple.em
+   % ecell3-em2eml simple.em
    % ls simple.eml
    simple.eml
 
 
-2. Compile .dm files.
-
-   Run emtool -a for each .dm file.
-
-   % ecell3-dmc ...dm
-
-   Or, to do this job at once,
-
-   (at bash prompt,)
-   % for i in *.dm ; do ecell3-dmc $i ; done
-   
+2. Compile .cpp files, but does not need this section.
 
 3. Run the model.
 
