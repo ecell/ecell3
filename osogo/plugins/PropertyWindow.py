@@ -35,7 +35,7 @@ class PropertyWindow(OsogoPluginWindow):
     # This method is throwable exception.
     # ---------------------------------------------------------------
     def __init__( self, aDirName, aData, aPluginManager, rootWidget=None ):
-
+        
         # calls superclass's constructor
         OsogoPluginWindow.__init__( self, aDirName, aData,
                                    aPluginManager, rootWidget=rootWidget )
@@ -64,7 +64,7 @@ class PropertyWindow(OsogoPluginWindow):
                 self.theQueue = FullPNQueue( self['navigator_area'], self.theRawFullPNList )
         else:
             self.theQueue = FullPNQueue( self['navigator_area'], self.theRawFullPNList )
- 
+
         self.theQueue.registerCallback( self.setRawFullPNList )
        
         # initializes ListStore
@@ -255,7 +255,8 @@ class PropertyWindow(OsogoPluginWindow):
     # ---------------------------------------------------------------
     def update( self, fullUpdate = False ):
 
-
+        if self.theSession.theModelWalker == None:
+            return
         # ----------------------------------------------------
         # checks a value is changed or not
         # ----------------------------------------------------

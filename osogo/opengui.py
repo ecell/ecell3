@@ -104,7 +104,7 @@ def main():
 	# creates MainWindow instance
 	# -------------------------------------
 	aSession = ecell.GtkSessionMonitor.GtkSessionMonitor()
-	print "session created"
+
 
 	# -------------------------------------
 	# executes options

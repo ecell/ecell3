@@ -60,9 +60,8 @@ class EntityListWindow(OsogoWindow):
         self.theStatusbar = aStatusbar
 
         # fix me
-        if( self.theSession != None ):
-            self.thePluginManager = session.thePluginManager
-
+        self.thePluginManager = session.thePluginManager
+        self.thePropertyWindow = None
         self.thePluginInstanceSelection = None
 
         
@@ -107,8 +106,24 @@ class EntityListWindow(OsogoWindow):
         # --------------------------------------------
         # initialize components
         # --------------------------------------------
+        self.__initializeSystemTree()
+        self.systemTreeConstructed = False
+        if self.theSession.theModelWalker != None:
+            self.reconstructSystemTree()
+ 
+        self.__initializeProcessTree()
+        self.__initializeVariableTree()
 
-        self.initializeComponents()
+        
+        
+        self.__initializePluginWindowOptionMenu()
+
+        aFullPN = convertFullIDToFullPN( createFullID ( 'System::/' ) )
+        self.theQueue = FullPNQueue( self["navigator_area"] , [ aFullPN ] )
+
+        self.theQueue.registerCallback( self.doSelection )        
+        self.__initializePropertyWindow()
+        self.__initializePopupMenu()
 
         # --------------------------------------------
         # initialize buffer
@@ -120,39 +135,26 @@ class EntityListWindow(OsogoWindow):
         # initialize Add to Board button
         # --------------------------------------------
         self.CloseOrder = False
+        self.updateButtons()
 
 
 
-    def initializeComponents( self, session = None ):
 
-        if ( session != None ):
-            self.theSession = session
-            self.thePluginManager = session.thePluginManager
+
+
+    def updateButtons( self ):
+        if ( self.theSession.theModelWalker != None ):
             self['search_button'].set_sensitive(gtk.TRUE)
             self['view_button'].set_sensitive(gtk.TRUE)
             self['search_entry'].set_sensitive(gtk.TRUE)
             self['plugin_optionmenu'].set_sensitive(gtk.TRUE)
 
-        if ( self.theSession == None ):
+        else:
             self['search_button'].set_sensitive(0)
             self['view_button'].set_sensitive(0)
             self['search_entry'].set_sensitive(0)
             self['plugin_optionmenu'].set_sensitive(0)
-        else:
-            self.__initializeSystemTree()
-            self.reconstructSystemTree()
-            
-            self.__initializeProcessTree()
-            self.__initializeVariableTree()
-            aFullPN = convertFullIDToFullPN( createFullID ( 'System::/' ) )
-            
-            self.theQueue = FullPNQueue( self["navigator_area"] , [ aFullPN ] )
-            self.theQueue.registerCallback( self.doSelection )        
-            
-            self.__initializePluginWindowOptionMenu()        
-            self.__initializePropertyWindow()
-            self.__initializePopupMenu()
-        
+    
 
     def getQueue( self ):
         return self.theQueue
@@ -174,6 +176,7 @@ class EntityListWindow(OsogoWindow):
         if self.theSession != None:
             self.theSession.deleteEntityListWindow( self )
             OsogoWindow.close(self)
+
 
     def deletePluginInstanceSelection( self, *arg ):
         """sets 'delete_event' as 'hide_event'
@@ -299,8 +302,12 @@ class EntityListWindow(OsogoWindow):
         self['plugin_optionmenu'].show_all()
 
 
-    def __initializePropertyWindow( self ):
 
+
+
+    def __initializePropertyWindow( self ):
+        if self.thePropertyWindow != None:
+            return
         self.thePropertyWindow= self.thePluginManager.createInstance(
             'PropertyWindow',\
             [(SYSTEM, '', '/', '')],\
@@ -524,7 +531,11 @@ class EntityListWindow(OsogoWindow):
         updates this window and property window
         Returns None
         """
-
+        if self.theSession.theModelWalker == None:
+            return
+        elif not self.systemTreeConstructed:
+            self.reconstructSystemTree()
+            
         # updates this window
         if not self.exists():
             return
@@ -573,6 +584,7 @@ class EntityListWindow(OsogoWindow):
 
         rootSystemFullID = createFullID( 'System::/' )
         self.constructSystemTree( None, rootSystemFullID )
+        self.systemTreeConstructed = True
 
 
 
@@ -659,16 +671,16 @@ class EntityListWindow(OsogoWindow):
 
 
     def doSelection( self, aFullPNList ):
-
+        if self.theSession.theModelWalker == None:
+            return
         self.doSelectSystem( aFullPNList ) 
         self.doSelectProcess( aFullPNList )
         self.doSelectVariable( aFullPNList )
 
-    
-    def doSelectSystem( self, aFullPNList ):
-        targetFullIDList = []                
-        selectionList = self.getSelectedSystemList()
 
+    def doSelectSystem( self, aFullPNList ):
+
+        targetFullIDList = []
         if aFullPNList[0][TYPE] != SYSTEM:
             targetFullIDList += [ createFullIDFromSystemPath( aFullPN[SYSTEMPATH] )  for aFullPN in aFullPNList ]
         else:
@@ -678,9 +690,6 @@ class EntityListWindow(OsogoWindow):
         # if to slow there should be a check whether this is needed in all cases
         donotHandle = self.donotHandle
         self.donotHandle = True
-        pathList = self.theSysSelection.get_selected_rows()[1]
-#        for aPath in pathList:
-#            self.theSysSelection.unselect_path( aPath )
         self.theSysSelection.unselect_all()
         self.theSysSelection.set_mode( gtk.SELECTION_MULTIPLE )
 
@@ -688,11 +697,13 @@ class EntityListWindow(OsogoWindow):
             #doselection
             targetPath = createSystemPathFromFullID( targetFullID )
             anIter = self.getSysTreeIter( targetPath )
+
             aPath = self.theSysTreeStore.get_path( anIter )
             self.__expandRow( aPath )
             self.theSysSelection.select_iter( anIter )
 
         self.donotHandle = donotHandle
+
         self.reconstructLists()
 
 
@@ -835,9 +846,13 @@ class EntityListWindow(OsogoWindow):
         systemList = []
 
         selection = self.systemTree.get_selection()
-        selectedSystemTreePathList = selection.get_selected_rows()[1]
-
+        selectedSystemTreePathList = selection.get_selected_rows()
+        if selectedSystemTreePathList == None:
+            return []
+        selectedSystemTreePathList = selectedSystemTreePathList[1]
+        
         systemStore = self.systemTree.get_model()
+
 
         for treePath in selectedSystemTreePathList:
 

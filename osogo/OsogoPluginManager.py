@@ -129,7 +129,7 @@ class OsogoPluginManager(PluginManager):
                     self.thePluginTitleDict[ instance ] = title
                     self.theInstanceList.append( instance )
                 # initializes session
-                self.theSession.theSimulator.initialize()
+                #self.theSession.theSimulator.initialize()
                 self.updateFundamentalWindows()
             #except:
             #    pass

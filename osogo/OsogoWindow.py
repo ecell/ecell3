@@ -173,10 +173,10 @@ class OsogoWindow(Window):
 		"""
 
 		# when glade file is not loaded yet or already deleted.
-		if self.__theExist == gtk.FALSE:
+		if self.__theExist == False:
 
 			# sets __theExist flag is TRUE
-			self.__theExist = TRUE
+			self.__theExist = True
 
 			# calls superclass's method 
 			Window.openWindow(self)

@@ -215,7 +215,6 @@ class MainWindow(OsogoWindow):
 	"""
 
 	def __init__( self, aSession ):
-
 	
 		# calls super class's constructor
 		OsogoWindow.__init__( self, self, 'MainWindow.glade' )
@@ -242,9 +241,9 @@ class MainWindow(OsogoWindow):
                 # create datetime instance for Timer
                 self.datetime = datetime.datetime(1970,1,1)
 
+
                 
 	def openWindow( self ):
-
 		# calls superclass's method
 		OsogoWindow.openWindow(self)
 
@@ -375,7 +374,6 @@ class MainWindow(OsogoWindow):
 		self.openAboutSessionMonitor = False 
 
 		self.update()
-
 		# -------------------------------------
 		# creates EntityListWindow 
 		# -------------------------------------
@@ -595,18 +593,17 @@ class MainWindow(OsogoWindow):
 
 			if aFileType == 'Model':
 				self.theSession.loadModel( aFileName )
-
+				self.theSession.theSimulator.initialize()
 			elif aFileType == 'Script':
+
 				self.theSession.loadScript( aFileName )
 
-			self.theSession.theSimulator.initialize()
-                        self.theEntityListWindow.initializeComponents( self.theSession )
+                        self.theEntityListWindow.updateButtons()
 
                         self.update()
                         self.theSession.updateFundamentalWindows()
-
-
-		except:                    
+                        self.theEntityListWindow.theQueue.applyFullPNList()
+		except:
                         # set load command not to be operated 
                         self['load_model_button'].set_sensitive(0)
                         self['load_script_button'].set_sensitive(0)
@@ -625,7 +622,7 @@ class MainWindow(OsogoWindow):
 			# displays message on MessageWindow
 			aMessage = 'Can\'t load [%s]' %aFileName
 			self.theSession.message(aMessage)
-			anErrorMessage = string.join( traceback.format_exception(sys.exc_type,sys.exc_value, \
+			anErrorMessage = string.join( traceback.format_exception(sys.exc_type, sys.exc_value, \
 					sys.exc_traceback), '\n' )
 			self.theSession.message(anErrorMessage)
 
