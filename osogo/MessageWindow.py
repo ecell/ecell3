@@ -76,14 +76,17 @@ class MessageWindow:
 		# -------------------------------------------------------
 		# If messge is list or touple, then print out each line.
 		# -------------------------------------------------------
-		if type(aMessage) == type([]) or type(aMessage) == type(()) :  
+		#if type(aMessage) == type([]) or type(aMessage) == type(()) :  
+		if type(aMessage) == list:  
 			
+			# If first string is not '\n', add it.
 			if len(aMessage)>0:
 				if string.find(aMessage[0],'\n') != 0:
-					aMessage = '\n' + aMessage[0]
+					aMessage[0] = '\n' + aMessage[0]
 
+			# print message list
 			for aLine in aMessage:
-				aString = str( aMessage )
+				aString = str( aLine )
 				self.theMessageBufferList.insert_at_cursor( aString, len(aString) )
 
 
