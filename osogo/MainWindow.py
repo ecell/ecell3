@@ -180,7 +180,9 @@ class MainWindow(Window):
             self.theLoggerWindow.update()
             self.theSession.run()
             self.removeTimeOut()
-
+        else:
+            self.theSession.printMessage( 'WARNING:need load model or script!!\n' )
+            
     def stopSimulation( self, a ) :
         if self.theLoadModelChecker == 1:
             if self.theRunningFlag:
@@ -190,7 +192,9 @@ class MainWindow(Window):
                 self.removeTimeOut()
                 self.update()
                 self.theLoggerWindow.update()
-
+        else:
+            self.theSession.printMessage( 'WARNING:need load model or script!!\n' )
+        
     def stepSimulation( self, a ) : 
         if self.theLoadModelChecker == 1:
             self.theSession.printMessage( "Step\n" )
@@ -203,7 +207,9 @@ class MainWindow(Window):
             self.removeTimeOut()
             self.update()
             self.theLoggerWindow.update()
-
+        else:
+            self.theSession.printMessage( 'WARNING:need load model or script!!\n' )
+            
     def changeStepType ( self, a ):
         self.theStepType = 1 - self.theStepType
 
@@ -234,7 +240,8 @@ class MainWindow(Window):
             self.theEntryListWindow = EntryListWindow.EntryListWindow( self )
             self.theEntryListWindowWindow = self.theEntryListWindow[ 'entry_list_window' ]
             self.theEntryChecker = 1
-        
+        if self.theStepperChecker == 0 and self.theEntryChecker == 0:
+            self.theSession.printMessage( 'WARNING:need load model or script!!\n' )
         if self.theEntryChecker == 1:
             if button_obj.get_active() :
                 self.theEntryListWindowWindow.show_all()
