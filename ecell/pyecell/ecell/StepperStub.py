@@ -32,15 +32,15 @@
 # E-CELL Project, Lab. for Bioinformatics, Keio University.
 #
 
-#from ecell.PropertyInterfaceStub import *
-from PropertyInterfaceStub import *
+#from ecell.ObjectStub import *
+from ObjectStub import *
 
 # ---------------------------------------------------------------
-# StepperStub -> PropertyInterfaceStub
+# StepperStub -> ObjectStub
 #   - provides an object-oriented appearance to the ecs.Simulator's Stepper API
 #   - does not check validation of each argument.
 # ---------------------------------------------------------------
-class StepperStub( PropertyInterfaceStub ):
+class StepperStub( ObjectStub ):
 
 
 	# ---------------------------------------------------------------
@@ -54,13 +54,14 @@ class StepperStub( PropertyInterfaceStub ):
 	# ---------------------------------------------------------------
 	def __init__( self, aSimulator, anID ):
 
-		PropertyInterfaceStub.__init__( self, aSimulator )
+		ObjectStub.__init__( self, aSimulator )
 
 		self.theID = anID
 
 	# end of __init__
 
-
+	def getName( self ):
+		return self.theFullIDString
 
 	# ---------------------------------------------------------------
 	# create

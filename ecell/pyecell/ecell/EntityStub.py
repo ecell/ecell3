@@ -33,16 +33,15 @@
 #
 
 
-#from ecell.PropertyInterfaceStub import *
-from PropertyInterfaceStub import *
+from ObjectStub import *
 
 
 # ---------------------------------------------------------------
-# EntityStub -> PropertyInterfaceStub
+# EntityStub -> ObjectStub
 #   - provides an object-oriented appearance to the ecs.Simulator's Entity API
 #   - does not check validation of each argument.
 # ---------------------------------------------------------------
-class EntityStub( PropertyInterfaceStub ):
+class EntityStub( ObjectStub ):
 
 
 	# ---------------------------------------------------------------
@@ -56,12 +55,15 @@ class EntityStub( PropertyInterfaceStub ):
 	# ---------------------------------------------------------------
 	def __init__( self, aSimulator, aFullIDString ):
 	
-		PropertyInterfaceStub.__init__( self, aSimulator )
+		ObjectStub.__init__( self, aSimulator )
 		self.theFullIDString = aFullIDString
 
 	# end of __init__
 
+	def getName( self ):
+		return self.theFullIDString
 
+	
 	# ---------------------------------------------------------------
 	# create
 	#

@@ -36,11 +36,11 @@
 from ECS import *
 
 # ---------------------------------------------------------------
-# PropertyInterfaceStub
+# ObjectStub
 #   - provides an object-oriented appearance to the ecs.Simulator's API
 #   - does not check validation of each argument.
 # ---------------------------------------------------------------
-class PropertyInterfaceStub:
+class ObjectStub:
 
 
 	# ---------------------------------------------------------------
@@ -58,6 +58,11 @@ class PropertyInterfaceStub:
 	# end of __init__
 
 
+	def getName( self ):
+		
+		import inspect
+		caller = inspect.getouterframes(inspect.currentframe())[0][3]
+		raise NotImplementedError(caller + ' must be implemented in subclass')
 	# ---------------------------------------------------------------
 	# isExist (abstract method)
 	#
@@ -69,7 +74,7 @@ class PropertyInterfaceStub:
 
 		import inspect
 		caller = inspect.getouterframes(inspect.currentframe())[0][3]
-		raise NotImplementedError(caller + 'must be implemented in subclass')
+		raise NotImplementedError(caller + ' must be implemented in subclass')
 
 	# end of isExist
 

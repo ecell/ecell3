@@ -7,7 +7,7 @@ __init__.py\
 EntityStub.py\
 LoggerStub.py\
 StepperStub.py\
-PropertyInterfaceStub.py\
+ObjectStub.py\
 DataFileManager.py\
 DataFile.py\
 ECDDataFile.py\

@@ -32,17 +32,17 @@
 # E-CELL Project, Lab. for Bioinformatics, Keio University.
 #
 
-#from ecell.PropertyInterfaceStub import *
-from PropertyInterfaceStub import *
+#from ecell.ObjectStub import *
+from ObjectStub import *
 
 # ---------------------------------------------------------------
-# LoggerStub -> PropertyInterfaceStub
+# LoggerStub -> ObjectStub
 #   - provides an object-oriented appearance to the ecs.Simulator's Logger API
 #   - does not check validation of each argument.
 # ---------------------------------------------------------------
 
 # FIXME: Logger isn't a PropertyInterface
-class LoggerStub( PropertyInterfaceStub ):
+class LoggerStub( ObjectStub ):
 
 
 	# ---------------------------------------------------------------
@@ -56,12 +56,14 @@ class LoggerStub( PropertyInterfaceStub ):
 	# ---------------------------------------------------------------
 	def __init__( self, aSimulator, aFullPNString ):
 
-		PropertyInterfaceStub.__init__( self, aSimulator )
+		ObjectStub.__init__( self, aSimulator )
 		
 		self.theFullPNString = aFullPNString
 
 	# end of __init__
 
+	def getName( self ):
+		return self.theFullPNString
 
 
 	# ---------------------------------------------------------------

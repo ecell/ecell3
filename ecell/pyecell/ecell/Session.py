@@ -20,7 +20,7 @@ class Session:
 
     def __init__( self, aSimulator ):
 
-        self.thePrintMethod = self.__plainPrintMethod
+        self.theLogMethod = self.__plainLogMethod
         self.theSimulator = aSimulator
 
 
@@ -28,8 +28,20 @@ class Session:
     # Session methods
     #
 
-    def loadScript( self, ecs ):
-        execfile( ecs )
+    def loadScript( self, ecs, locals={} ):
+
+        # theSession == self in the script
+        aGlobals = { 'theSession': self }
+        
+        # flatten class methods and object properties so that
+        # 'self.' isn't needed for each method calls in the script
+        aDict = {}
+        for aKey in self.__dict__.keys() + self.__class__.__dict__.keys():
+            aDict[ aKey ] = getattr( self, aKey )
+        aGlobals.update( aDict )
+
+        execfile( ecs, aGlobals, locals )
+            
 
     def loadModel( self, aFile ):
         if type( aFile ) == str:
@@ -53,11 +65,11 @@ class Session:
     def saveModel( self ):
         pass
 
-    def setPrintMethod( self, aMethod ):
-        self.thePrintMethod = aMethod
+    def setLogMethod( self, aMethod ):
+        self.theLogMethod = aMethod
 
-    def printMessage( self, message ):
-        self.thePrintMethod( message )
+    def log( self, message ):
+        self.theLogMethod( message )
 
 
     #
@@ -98,7 +110,7 @@ class Session:
     def getStepperList():
         return self.theSimulator.getStepperList()
 
-    def createStepperStub( self, id ):
+    def getStepperStub( self, id ):
         return StepperStub( self.theSimulator, id )
 
 
@@ -109,7 +121,7 @@ class Session:
     def getEntityList( self, entityType, systemPath ):
         return self.theSimulator.getEntityList( entityType, systemPath )
 
-    def createEntityStub( self, fullid ):
+    def getEntityStub( self, fullid ):
         return EntityStub( self.theSimulator, fullid )
 
 
@@ -120,7 +132,7 @@ class Session:
     def getLoggerList( self ):
         return self.theSimulator.getLoggerList()
         
-    def createLoggerStub( self, fullpn ):
+    def getLoggerStub( self, fullpn ):
         return LoggerStub( self.theSimulator, fullpn )
 
     def saveLoggerData( self, aFullPNString='', aStartTime=-1, aEndTime=-1, aInterval=-1, aSaveDirectory='./Data'):
@@ -129,7 +141,7 @@ class Session:
             os.mkdir( aSaveDirectory )
         # creates instance datafilemanager
         except:
-            printMessage( "\'" + aSaveDirectory + "\'" + " file exists." )
+            self.log( "\'" + aSaveDirectory + "\'" + " file exists." )
         aDataFileManager = ecell.DataFileManager.DataFileManager()
 
         # sets root directory to datafilemanager
@@ -191,14 +203,14 @@ class Session:
         except:#(1)
             
             import sys
-            ## self.__plainPrintMethod( __name__ )
-            self.__plainPrintMethod( sys.exc_traceback )
+            ## self.log( __name__ )
+            self.log( sys.exc_traceback )
             aErrorMessage= "Error : could not save [%s] " %aFullPNString
-            self.__plainPrintMethod( aErrorMessage )
+            self.log( aErrorMessage )
             return None
 
         aDataFileManager.saveAll()         
-        printMessage( "All files are saved." )
+        self.log( "All files are saved." )
 
 
 
@@ -206,7 +218,7 @@ class Session:
     # private methods
     #
 
-    def __plainPrintMethod( self, aMessage ):
+    def __plainLogMethod( self, aMessage ):
         print aMessage
 
 

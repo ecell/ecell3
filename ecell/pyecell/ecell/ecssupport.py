@@ -2,7 +2,7 @@
 
 # this module is deprecated
 
-#from PropertyInterfaceStub import *
+#from ObjectStub import *
 from EntityStub import *
 from LoggerStub import *
 from StepperStub import *
