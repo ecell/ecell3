@@ -316,12 +316,6 @@ class MainWindow(OsogoWindow):
 		self['entity_list_menu'].set_sensitive(aDataLoadedStatus)
 		self['save_model_menu'].set_sensitive(aDataLoadedStatus)
 
-                # view menu
-		self['entitylist_window_menu'].set_sensitive(aDataLoadedStatus)
-		self['message_window_menu'].set_sensitive(aDataLoadedStatus)
-		self['toolbar_menu'].set_sensitive(aDataLoadedStatus)
-		self['statusbar_menu'].set_sensitive(aDataLoadedStatus)
-                
 
 
 	def __openFileSelection( self, *arg ) :
