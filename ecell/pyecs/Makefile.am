@@ -23,8 +23,6 @@ LIBECS=$(ECELLDIR)/libecs/libecs.la
 
 CFLAGS=${CXXFLAGS}
 
-#FIXME: _ecs.la cannot be used with automake-1.4.
-
 BPLV1SRC=\
 classes.cpp\
 conversions.cpp\
@@ -77,9 +75,9 @@ $(BPLSRC):
 	fi
 
 
-ecellpyexec_LTLIBRARIES = ecs.la
+ecellpyexec_LTLIBRARIES = _ecs.la
 
-ecs_la_SOURCES=\
+_ecs_la_SOURCES=\
 PyEcs.cpp\
 $(BPLSRC)
 
@@ -87,21 +85,21 @@ $(BPLSRC)
 pyecs_HEADERS=\
 PyEcs.hpp
 
-ecs_la_LDFLAGS=-module -export-dynamic -avoid-version
+_ecs_la_LDFLAGS=-module -export-dynamic -avoid-version
 
-ecs_la_LIBADD= $(LIBEMC) $(LIBECS) -lstdc++ $(LIBLTDL)
+_ecs_la_LIBADD= $(LIBEMC) $(LIBECS) -lstdc++ $(LIBLTDL)
 
-all-local: ecs.so
+all-local: _ecs.so
 
 #FIXME: should be removed after ecs.la is renamed to _ecs.la
 #FIXME: messy
-install-exec-local:
-	mv -f $(ecellpyexecdir)/ecs.so $(ecellpyexecdir)/_ecs.so
-	mv -f $(ecellpyexecdir)/ecs.la $(ecellpyexecdir)/_ecs.la
+#install-exec-local:
+#	mv -f $(ecellpyexecdir)/ecs.so $(ecellpyexecdir)/_ecs.so
+#	mv -f $(ecellpyexecdir)/ecs.la $(ecellpyexecdir)/_ecs.la
 
 
-ecs.so: ecs.la 
-	ln -sf .libs/ecs.so ./ecs.so
+_ecs.so: _ecs.la 
+	ln -sf .libs/_ecs.so ./_ecs.so
 
 clean-local:
 	rm -f ecs.so _ecs.so

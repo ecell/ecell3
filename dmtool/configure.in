@@ -51,6 +51,7 @@ fi
 dnl
 dnl
 dnl
+AM_CONFIG_HEADER(config.h)
 dnl
 dnl Create the top-level Makefile.
 dnl

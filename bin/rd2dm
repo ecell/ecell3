@@ -1,4 +1,4 @@
-#!/usr/bin/python2
+#!/usr/bin/env ecell3
 #
 # rd2dm.py --- A program for converting an rd file into a dm file.
 #

@@ -1,11 +1,12 @@
 AC_REVISION([$Id$])
 dnl
-AC_INIT(autogen.sh)
+AC_INIT
+AC_CONFIG_SRCDIR([autogen.sh])
 dnl AC_CONFIG_AUX_DIR()
 dnl
 dnl 
 dnl 
-AC_CANONICAL_SYSTEM
+AC_CANONICAL_TARGET([])
 AM_INIT_AUTOMAKE(ecell,"3.1.2" , do-not-define)
 AC_PROG_MAKE_SET
 dnl
@@ -27,8 +28,12 @@ AC_CONFIG_SUBDIRS(osogo)]
 dnl
 AC_SUBST(ECELL_SUBDIR)
 dnl
+AM_CONFIG_HEADER([config.h])
+dnl
+dnl
 dnl Create the top-level Makefile.
 dnl
-AC_OUTPUT(Makefile)
+AC_CONFIG_FILES([Makefile])
+AC_OUTPUT
 
 

@@ -9,7 +9,8 @@ dnl PACKAGE=\"ecell\"
 dnl AC_SUBST(VERSION)
 dnl AC_SUBST(PACKAGE)
 
-AC_INIT(libecs/Entity.hpp)
+AC_INIT
+AC_CONFIG_SRCDIR([libecs/Entity.hpp])
 AM_INIT_AUTOMAKE(ecell,3.1.2)
 
 AM_SANITY_CHECK
@@ -45,7 +46,7 @@ AC_PROG_LIBTOOL
 AM_PATH_PYTHON(2.2)
 AC_SUBST(PYTHON)
 
-AC_LANG_CPLUSPLUS
+AC_LANG([C++])
 
 dnl Checks for libraries.
 
@@ -63,6 +64,9 @@ if test "$LIBDL" = ""; then
 AC_MSG_ERROR([The libdl could not be found.])
 fi
 AC_SUBST(LIBDL)
+
+AM_CHECK_PYMOD(Numeric,,,[AC_MSG_ERROR([could not find Numeric module])])
+AM_CHECK_PYMOD(xml,,,[AC_MSG_ERROR([could not find xml module])])
 
 dnl Checks for header files.
 
@@ -128,26 +132,25 @@ if test "$BOOST_DIR" = "" ; then
 fi
 AC_SUBST(BOOST_DIR)
 
-AM_CHECK_PYTHON_HEADERS()
+AM_CHECK_PYTHON_HEADERS(,[AC_MSG_ERROR([])])
 
-dnl Checks for typedefs, structures, and compiler characteristics.
-AC_LANG_SAVE
+AC_LANG_PUSH([C])
+
 dnl AC_C_CONST
 dnl AC_C_INLINE
 AC_TYPE_OFF_T
 AC_TYPE_SIZE_T
 AC_TYPE_SIGNAL
-AC_STRUCT_ST_RDEV
 AC_C_LONG_DOUBLE
-AC_LANG_RESTORE
+AC_LANG_POP([])
 
 AC_CHECK_SIZEOF(int)
 AC_CHECK_SIZEOF(long)
 AC_CHECK_SIZEOF(long long)
 
-ICE_CXX_PRETTY_FUNCTION
-ICE_CXX_STD_EXCEPTIONS
-ICE_CXX_TYPEINFO
+dnl ICE_CXX_PRETTY_FUNCTION
+dnl ICE_CXX_STD_EXCEPTIONS
+dnl ICE_CXX_TYPEINFO
 
 dnl Checks for library functions.
 AC_TYPE_SIGNAL
@@ -157,8 +160,7 @@ AC_CHECK_FUNCS(strdup strstr)
 
 AM_CONFIG_HEADER(config.h)
 
-AC_OUTPUT(
-Makefile 
+AC_CONFIG_FILES([Makefile 
 libecs/Makefile
 libecs/emtool
 libecs/dmtemplates/Makefile
@@ -168,7 +170,8 @@ pyecs/Makefile
 pyecs/ecell3
 pyecell/Makefile
 pyecell/ecell/Makefile
-,
-chmod +x pyecs/ecell3 libecs/emtool
-)
+])
+AC_CONFIG_COMMANDS([default],[[chmod +x pyecs/ecell3 libecs/emtool
+]],[[]])
+AC_OUTPUT
 

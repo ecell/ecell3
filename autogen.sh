@@ -5,7 +5,7 @@
 
 DIE=0
 
-PROJECT=E-CELL
+PROJECT="E-Cell"
 
 (autoconf --version) < /dev/null > /dev/null 2>&1 || {
         echo
@@ -33,8 +33,7 @@ if [ ! -f ChangeLog ] ; then
     touch ChangeLog
 fi
 
-libtoolize -c 
-
+libtoolize -c --force
 
 if test -z "$*"; then
         echo "I am going to run ./configure with no arguments - if you wish "
@@ -49,9 +48,9 @@ for dir in . libltdl dmtool ecell osogo bin
 do 
   echo processing $dir
   (cd $dir; \
-  aclocalinclude="$ACLOCAL_FLAGS"; \
-  aclocal $aclocalinclude; \
-  autoheader; automake --add-missing --gnu $am_opt; autoconf)
+  aclocal; \
+  autoheader -f; \
+  automake --add-missing --gnu $am_opt; autoconf) 
 done
 
 ./configure "$@"

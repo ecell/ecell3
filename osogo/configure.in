@@ -1,10 +1,10 @@
 AC_INIT(MainWindow.py)
 AM_INIT_AUTOMAKE(osogo,0.0)
-dnl AM_CONFIG_HEADER(config.h)
+AM_CONFIG_HEADER([config.h])
 AM_SANITY_CHECK
 AC_CANONICAL_HOST
 dnl
-AM_PATH_PYTHON(2.0)
+AM_PATH_PYTHON(2.2)
 dnl
 AM_CHECK_PYMOD(gtk,,,[AC_MSG_ERROR(could not find gtk module)])
 AM_CHECK_PYMOD(gnome,,,[AC_MSG_ERROR(could not find gnome module)])
