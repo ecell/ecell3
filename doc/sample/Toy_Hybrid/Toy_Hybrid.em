@@ -1,60 +1,11 @@
-#
-# * README
-#
-# When you use Hybrid Dynamic/Static Simulation Algorithm in your model,
-# you need FluxDistributionStepper, FluxDistributionProcess, 
-# QuasiDynamicFluxProcess correctly.  
-#
-# 
-# * FluxDistributionStepper
-#
-# When you use FluxDistributionStepper, 
-# FluxDistributionStepper does not need to set Properties.
-# 
-# When Influx Process or efflux Process in Dynamic part write 
-# Variables in Static part, FluxDistributionStepper 
-# call Process in Static part.  
-# FluxDistributionStepper do not have StepInterval, 
-# call step() at interupt by Other Stepper, do not call step() by self.
-# 
-#
-# * FluxDistributionProcess
-#
-# When you use FluxDistributionProcess, 
-# FluxDIstributionProcess need to set follwing Properties.  
-#
-# -StepperID
-# set FluxDistributuinStepper's ID.
-#
-# -UnknownProcessList
-# set a list of Process FullID that QuasiDynamicFluxProcess in Static Part. 
-#
-# -KnownProcessList
-# set a list of Process FullID that Influx Process 
-# or efflux Process in Dynamic part. 
-#
-#
-# * QuasiDynamicFluxProcess
-#
-# When you use QuasiDynamicFluxProcess, 
-# QuasiDynamicFluxProcess need to set follwing Properties.  
-#
-# -StepperID
-# set FluxDistributuinStepper's ID.
-#
-# -VariableReferenceList
-# set VariableReferenceList that show Flux Information in Static part.
-#
-
-
 Stepper FluxDistributionStepper( FD )
 {
-	# nothing
+
 }
 
 Stepper FixedODE1Stepper( DE1 )
 {
-	#StepInterval 	0.001;
+
 }
 
 System System( / )
@@ -165,24 +116,7 @@ System System( /CELL/CYTOPLASM )
                 k     0.01;
         }
 
-#Static : Super & Slave 
-
-        Process FluxDistributionProcess( Super )
-        {
-		StepperID	FD;
-
-                KnownProcessList	
-		:/CELL/CYTOPLASM:E_BC 
-		:/CELL/CYTOPLASM:E_FH 
-		:/CELL/CYTOPLASM:E_GI;
-
-                UnknownProcessList     	
-		:/CELL/CYTOPLASM:E_CD 
-		:/CELL/CYTOPLASM:E_CE 
-		:/CELL/CYTOPLASM:E_DF
-		:/CELL/CYTOPLASM:E_EG;
-
-        }
+#Static :
 
         Process QuasiDynamicFluxProcess( E_CD )
         {
