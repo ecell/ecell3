@@ -1,0 +1,20 @@
+AC_REVISION([$Id$])
+dnl
+AC_INIT(dmtool.in)
+dnl AC_CONFIG_AUX_DIR()
+dnl
+dnl 
+dnl 
+AC_CANONICAL_SYSTEM
+AM_INIT_AUTOMAKE(dmtool,0.0)
+AC_PROG_MAKE_SET
+dnl
+dnl
+dnl
+dnl
+dnl
+dnl Create the top-level Makefile.
+dnl
+AC_OUTPUT(Makefile dmtool dmgen)
+
+
