@@ -82,10 +82,6 @@ class MainWindow(OsogoWindow):
 		self.theMessageWindow = MessageWindow.MessageWindow()
 		self.theSession.setMessageMethod( self.__printMessage )
 
-                self.theEntityListWindow = EntityListWindow.EntityListWindow( self.theSession )
-
-
-
 	def openWindow( self ):
 
 		# calls superclass's method
@@ -114,8 +110,11 @@ class MainWindow(OsogoWindow):
 		# -------------------------------------
 		# creates EntityListWindow 
 		# -------------------------------------
-		self.theEntityListWindow.openWindow()
-#                self['entitylistarea'].add(self.theEntityListWindow['top_frame'])
+
+                self.theEntityListWindow = self.theSession.createEntityListWindow()
+                # self.theEntityListWindow = EntityListWindow.EntityListWindow( self.theSession )
+		# self.theEntityListWindow.openWindow()
+                # self['entitylistarea'].add(self.theEntityListWindow['top_frame'])
 
 		# -------------------------------------
 		# append signal handlers
@@ -374,6 +373,7 @@ class MainWindow(OsogoWindow):
 				self.theSession.loadScript( aFileName )
 
 			self.theSession.theSimulator.initialize()
+                        self.theEntityListWindow.setSession( self.theSession )
 
 		except:
 
