@@ -9,7 +9,9 @@ DM_DIR =  ${prefix}/share/${PACKAGE}/${VERSION}/DM
 DMS = MassActionProcess.cpp\
 MichaelisUniUniProcess.cpp\
 RapidEquilibriumProcess.cpp\
-SSystemProcess.cpp
+SSystemProcess.cpp\
+NRProcess.cpp\
+NRStepper.cpp
 
 EXTRA_DIST = ${DMS}
 dmdir = ${DM_DIR}
@@ -21,7 +23,7 @@ dmsodir = ${DM_SO_DIR}
 dmso_DATA = ${SOS}
 
 %.so : %.cpp
-	${SHELL} ${ECELL3_DMC} --dmcompile=${top_srcdir}/../dmtool --no-stdinclude $< -I${top_srcdir}/libecs -I${top_srcdir}/.. -I${top_srcdir} 
+	${SHELL} ${ECELL3_DMC} -v --dmcompile=${top_srcdir}/../dmtool --no-stdinclude $< -I${top_srcdir}/libecs -I${top_srcdir}/.. -I${top_srcdir} 
 
 clean-local:
 	${RM} -rf ${DM_DATA}

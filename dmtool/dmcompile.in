@@ -96,8 +96,8 @@ CLASSNAME=`$BASENAME $SRC $CXXSUFFIX`
 OBJ=$CLASSNAME.o
 SOBJ=$CLASSNAME$SHLEXT
 
-#FIXME:
-LDFLAGS="-Wl,-rpath $libdir -Wl -L$libdir -lecs"
+
+LDFLAGS="-Wl,-rpath=$libdir,-soname=$SOBJ"
 
 
 ## main routine
