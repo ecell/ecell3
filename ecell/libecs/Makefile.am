@@ -8,6 +8,10 @@ noinst_LIBRARIES = libecs.a
 CXXFLAGS=-D_GNU_SOURCE -D_REENTRANT -D_THREAD_SAFE
 
 libecs_a_SOURCES =\
+Util.cpp\
+StringList.cpp\
+Message.cpp\
+MessageInterface.cpp\
 AccumulatorMaker.cpp\
 FQPI.cpp\
 ReactorMaker.cpp\

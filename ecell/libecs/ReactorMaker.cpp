@@ -30,9 +30,6 @@
 
 #include <stdlib.h>
 #include "ReactorMaker.hpp"
-#include "RootSystem.hpp"
-#include "util/Message.hpp"
-#include "Defs.hpp"
 
 ////////////////////// ReactorMaker
  
@@ -41,9 +38,9 @@ ReactorMaker::ReactorMaker()
 {
   //FIXME:  addSearchPath(REACTOR_SO_DIR);
 
-  char* env = getenv("REACTOR_PATH");
-  if(env)
-    addSearchPath(env);
+  //  char* env = getenv("REACTOR_PATH");
+  //  if(env)
+  //    addSearchPath(env);
 
   //FIXME: addSearchPath(Serizawa::REACTOR_PATH);
 

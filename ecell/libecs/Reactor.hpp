@@ -35,9 +35,7 @@
 
 #include <stl.h>
 #include "libecs.hpp"
-#include "util/Util.hpp"
 #include "Entity.hpp"
-#include "util/Message.hpp"
 
 typedef vector<Reactant*> ReactantList;
 typedef vector<Reactant*>::iterator ReactantListIterator;

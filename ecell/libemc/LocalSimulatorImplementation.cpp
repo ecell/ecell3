@@ -1,5 +1,5 @@
-#include "util/Message.hpp"
-#include "libecs/FQPI.hpp"
+#include "Message.hpp"
+#include "FQPI.hpp"
 
 #include "LocalSimulatorImplementation.hpp"
 

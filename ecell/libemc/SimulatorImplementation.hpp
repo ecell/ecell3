@@ -1,9 +1,9 @@
 #ifndef ___SIMULATOR_IMPLEMENTATION_H___
 #define ___SIMULATOR_IMPLEMENTATION_H___
 
-#include "libecs/libecs.hpp"
-#include "libecs/RootSystem.hpp"
-#include "util/Message.hpp"
+#include "libecs.hpp"
+#include "RootSystem.hpp"
+#include "Message.hpp"
 
 /**
    Pure virtual base class (interface definition) of simulator

@@ -1,7 +1,7 @@
 #ifndef ___LOCAL_SIMULATOR_IMPLEMENTATION_H___
 #define ___LOCAL_SIMULATOR_IMPLEMENTATION_H___
 
-#include "libecs/libecs.hpp"
+#include "libecs.hpp"
 
 #include "SimulatorImplementation.hpp"
 

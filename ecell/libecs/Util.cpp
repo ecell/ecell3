@@ -31,7 +31,7 @@
 #include <string.h>
 #include <strstream>
 #include <time.h>
-#include "util/Util.hpp"
+#include "Util.hpp"
 
 
 RandomNumberGenerator* theRandomNumberGenerator = 

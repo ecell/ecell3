@@ -1,8 +1,8 @@
 #ifndef ___SIMULATOR_H___
 #define ___SIMULATOR_H___
 
-#include "libecs/libecs.hpp"
-#include "util/Message.hpp"
+#include "libecs.hpp"
+#include "Message.hpp"
 
 #include "SimulatorImplementation.hpp"
 

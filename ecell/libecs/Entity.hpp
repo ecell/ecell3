@@ -32,7 +32,7 @@
 #define ___ENTITY_H___
 #include <string>
 #include "libecs.hpp"
-#include "util/MessageInterface.hpp"
+#include "MessageInterface.hpp"
 
 /**
    Entity class is a base class for all components in the cell model.

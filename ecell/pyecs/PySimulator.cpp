@@ -1,6 +1,6 @@
-#include "libecs/libecs.hpp"
-#include "libecs/FQPI.hpp"
-#include "util/Message.hpp"
+#include "libecs.hpp"
+#include "FQPI.hpp"
+#include "Message.hpp"
 
 #include "PySimulator.hpp"
 
