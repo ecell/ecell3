@@ -106,8 +106,8 @@ namespace libecs
 
     void step();
     virtual void clear();
-    virtual void react();
-    virtual void transit();
+    virtual void differentiate();
+    virtual void integrate();
     virtual void compute();
 
     void update();
@@ -149,9 +149,9 @@ namespace libecs
     virtual RealCref getStepsPerSecond() const = 0;
 
     virtual void clear() = 0;
-    virtual void react() = 0;
+    virtual void differentiate() = 0;
     virtual void turn() {}
-    virtual void transit() = 0;
+    virtual void integrate() = 0;
     virtual void compute() = 0;
 
     virtual void distributeIntegrator( IntegratorAllocatorPtr );
@@ -172,8 +172,8 @@ namespace libecs
     MasterStepper();
 
     virtual void clear();
-    virtual void react();
-    virtual void transit();
+    virtual void differentiate();
+    virtual void integrate();
     virtual void compute();
 
     void setStepInterval( RealCref stepinterval );
@@ -223,7 +223,7 @@ namespace libecs
       theOwner->clear();
     }
 
-    virtual void react()
+    virtual void differentiate()
     {
       theOwner->react();
     }
@@ -233,7 +233,7 @@ namespace libecs
       theOwner->turn();
     }
 
-    virtual void transit()
+    virtual void integrate()
     {
       theOwner->transit();
     }
@@ -309,7 +309,7 @@ namespace libecs
 
     virtual int getNumberOfSteps() { return 4; }
 
-    virtual void react();
+    virtual void differentiate();
 
     virtual const char* const className() const 
     { return "RungeKutta4Stepper"; }

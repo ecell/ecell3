@@ -152,7 +152,7 @@ namespace libecs
       }
   }
 
-  void MasterStepper::react()
+  void MasterStepper::differentiate()
   {  
     theOwner->react();
     for( StepperVectorIterator i( theSlaveStepperVector.begin() ); 
@@ -168,7 +168,7 @@ namespace libecs
       }
   }
 
-  void MasterStepper::transit()
+  void MasterStepper::integrate()
   {
     theOwner->transit();
     for( StepperVectorIterator i( theSlaveStepperVector.begin() ); 
@@ -218,8 +218,8 @@ namespace libecs
   void StepperLeader::step()
   {
     clear();
-    react();
-    transit();
+    differentiate();
+    integrate();
     compute();
 
     theCurrentTime += theStepInterval;
@@ -234,7 +234,7 @@ namespace libecs
       }
   }
 
-  void StepperLeader::react()
+  void StepperLeader::differentiate()
   {
     for( StepperVector::iterator i( theMasterStepperVector.begin() );
 	 i != theMasterStepperVector.end(); i++ )
@@ -243,7 +243,7 @@ namespace libecs
       }
   }
 
-  void StepperLeader::transit()
+  void StepperLeader::integrate()
   {
     for( StepperVector::iterator i( theMasterStepperVector.begin() );
 	 i != theMasterStepperVector.end(); ++i )
@@ -297,7 +297,7 @@ namespace libecs
     return new RungeKutta4Integrator( substance );
   }
 
-  void RungeKutta4Stepper::react()
+  void RungeKutta4Stepper::differentiate()
   {
     MasterStepper::react();
     MasterStepper::react();
