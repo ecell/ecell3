@@ -74,6 +74,9 @@ const int INT_SIZE=SIZEOF_LONG;
 #  define MODF modf
 #endif /* HAVE_LONG_DOUBLE */
 
+//double modf(double,double*);
+long double modfl(long double,long double*);
+
 #if defined(sparc) && defined(__SVR4)
 #include <math.h>
 #undef MODF
