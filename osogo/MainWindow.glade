@@ -533,7 +533,6 @@
 					    <widget class="GtkEntry" id="step_combo_entry">
 					      <property name="width_request">69</property>
 					      <property name="visible">True</property>
-					      <property name="sensitive">False</property>
 					      <property name="can_focus">True</property>
 					      <property name="editable">True</property>
 					      <property name="visibility">True</property>
@@ -543,9 +542,6 @@
 					      <property name="invisible_char" translatable="yes">*</property>
 					      <property name="activates_default">False</property>
 					      <signal name="changed" handler="input_step_size"/>
-					      <signal name="copy_clipboard" handler="on_step_combo_entry_copy_clipboard"/>
-					      <signal name="cut_clipboard" handler="on_step_combo_entry_cut_clipboard"/>
-					      <signal name="paste_clipboard" handler="on_step_combo_entry_paste_clipboard"/>
 					    </widget>
 					  </child>
 

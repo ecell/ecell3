@@ -165,7 +165,7 @@ class MainWindow(OsogoWindow):
 		self.theStepperChecker = 0
 
 		self.theUpdateInterval = 150
-		self.theStepSize = 1
+		self.theStepSize = 1.0
 		self.theStepType = 0
 		self.theRunningFlag = 0
 
@@ -204,6 +204,7 @@ class MainWindow(OsogoWindow):
 			'interface_togglebutton_toggled'       : self.toggleInterfaceWindowByButton ,
 			'stepper_togglebutton_toggled'         : self.toggleStepperWindowByButton ,
 			'logo_button_clicked'                  : self.openAbout,
+			'destroy'                              : self.exitCompulsorily,
 		}
 		self.addHandlers( self.theHandlerMap )
 
@@ -230,6 +231,8 @@ class MainWindow(OsogoWindow):
 
 	# end of __init__
 
+	def exitCompulsorily(self, *obj):
+		mainQuit()
 
 	def setUnSensitiveMenu( self ):
 		self['palette_window_menu'].set_sensitive(0)
@@ -605,26 +608,73 @@ class MainWindow(OsogoWindow):
 	# ---------------------------------------------------------------
 	# setStepSize
 	#
-	# anObject:  textfield
+	# anObject:  GtkEntry( step_combo_entry )
 	#
 	# return -> None
-	# This method is throwable exception.
+	# Notice: In this method, 'step size' is not set to the Sesstion.
+	#         Only will be saved the value to self.theStepSize, and
+	#         when Step button is pressed, this saved value is used.
 	# ---------------------------------------------------------------
 	def setStepSize( self, anObject ):
 
+		# If the inputed charactor is not numerical charactors,
+		# displays a confirm window and set 1.0 to the GtkEntry.
 		try:
 
-			aNumberString = anObject.get_text()
+			# gets the inputerd characters from the GtkEntry. 
+			aNumberString = string.strip( anObject.get_text() )
 
-			if len( aNumberString ):
-				self.theStepSize = string.atof( aNumberString )
+			if len( aNumberString ) == 0:
+				# When user delete all character on the GtkEntry,
+				# does nothing and keep previous value.
+				pass
 			else:
-				self.theStepSize = 1
+
+				# considers the case that character 'e' is included.
+
+				# for example, '4e'
+				if string.find(aNumberString, 'e') == len(aNumberString)-1:
+					return None
+
+				# for expample, '3e-' or '5e+'
+				if len(aNumberString) >= 2 and \
+				   ( string.find(aNumberString, 'e-') == len(aNumberString)-2 or \
+				   string.find(aNumberString, 'e+') == len(aNumberString)-2 ):
+					return None
+
+				# for expample, '3e-2'
+				if string.find(aNumberString, 'e-') != -1:
+					anIndexNumber = aNumberString[string.find(aNumberString,'e-')+2:]
+					anIndexNumber = string.atof( anIndexNumber )
+					baseNumber =  aNumberString[:string.find(aNumberString,'e-')]
+					if len(baseNumber) == 0:
+						aNumberString = "1e-%s" %str( int(anIndexNumber) )
+					self.theStepSize = string.atof( aNumberString )
+
+				# for expample, '5e+6'
+				if string.find(aNumberString, 'e+') != -1:
+					anIndexNumber = aNumberString[string.find(aNumberString,'e+')+2:]
+					anIndexNumber = string.atof( anIndexNumber )
+					baseNumber =  aNumberString[:string.find(aNumberString,'e+')]
+					if len(baseNumber) == 0:
+						aNumberString = "1e+%s" %str( int(anIndexNumber) )
+					self.theStepSize = string.atof( aNumberString )
+
+				else:
+					# When user input some character, tries to convert
+					# it to numerical value.
+					# following line is throwable except
+					self.theStepSize = string.atof( aNumberString )
 
 		except:
-			aMessage = "[%s] can't be changed float number." %anObject.get_text()
+			# displays a Confirm Window.
+			aMessage = "\"%s\" is not numerical character." %anObject.get_text()
+			aMessage += "\nInput numerical character" 
 			self.printMessage(aMessage)
 			aDialog = ConfirmWindow(0,aMessage,'Error!')
+
+			# set the previous value to GtkField.
+			anObject.set_text(str(self.theStepSize))
 
 	# end of setStepSize
 
