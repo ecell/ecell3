@@ -158,7 +158,13 @@ class TracerWindow( OsogoPluginWindow ):
         for aSeries in self.thePlotInstance.getDataSeriesList():
             self.theDataGenerator.requestNewData( aSeries, aRequiredResolution )
 
-
+    def allHasLogger( self ):
+        loggerList = self.theSession.theSimulator.getLoggerList()
+        for aSeries in self.thePlotInstance.getDataSeriesList():
+            if aSeries.getFullPNString() not in loggerList:
+                return False
+        return True
+    
     # ========================================================================
     def hasLogger(self, aFullPNString):
         loggerlist=self.theSession.theSimulator.getLoggerList()

@@ -771,7 +771,7 @@ class Plot:
                                     gtk.gdk.BUTTON_RELEASE_MASK)
         if self.theWidget.get_ancestor( gtk.Window) != None:
             self.theWidget.realize()
-    
+
         anAllocation = self.theWidget.get_allocation()
         self.thePlotWidth = max( anAllocation[2], PLOT_MINIMUM_WIDTH )
         self.thePlotHeight = max( anAllocation[3], PLOT_MINIMUM_HEIGHT )
@@ -842,23 +842,16 @@ class Plot:
     def setXAxis( self, aFullPNString ):
         oldFullPN = self.theXAxis.getFullPNString()
         if oldFullPN != TIME_AXIS:
-            self.theSeriesMap[ oldFullPN ].switchOn()
+            #self.theSeriesMap[ oldFullPN ].switchOn()
+            pass
         if aFullPNString == TIME_AXIS:
             self.doesConnectPoints = True
         else:
-            self.theSeriesMap[ aFullPNString ].switchOff()
+            #self.theSeriesMap[ aFullPNString ].switchOff()
             self.doesConnectPoints = False
         self.theXAxis.setFullPNString( aFullPNString )
        # take this out if phase plotting history is supported in datagenerator
-        if aFullPNString != TIME_AXIS:
-            self.setStripMode( MODE_STRIP )
-
-        if self.theZoomLevel == 0:
-            #if mode is history and zoom level 0, set xframes
-            self.requestData( )
-        else: #just get data from loggers
-            self.requestDataSlice( self.theXAxis.theFrame[0], self.theXAxis.theFrame[1] )
-        self.totalRedraw()
+        self.setStripMode( self.theStripMode )
  
 
     def changeScale(self, anOrientation, aScaleType ):
@@ -913,16 +906,26 @@ class Plot:
         for aSeries in self.theSeriesMap.values():
             aSeries.drawNewPoints()
 
+    def resetData( self ):
+        for aSeries in self.getDataSeriesList():
+            aSeries.replacePoints( zeros ( ( 0, 5) ) )
 
     def setStripMode(self, aMode):
 
         self.theStripMode = aMode
-        self.requestData( )
-        if aMode == MODE_STRIP:
-            self.getRanges()
-            self.theOwner.requestDataSlice( self.theRanges[3] - self.theStripInterval,
-                self.theRanges[3] - self.theStripInterval / 2, 
-                self.theStripInterval / self.theXAxis.theLength )
+        if self.getXAxisFullPNString() == TIME_AXIS:
+            self.requestData( )
+            if aMode == MODE_STRIP:
+        
+                self.getRanges()
+                self.theOwner.requestDataSlice( self.theRanges[3] - self.theStripInterval,
+                    self.theRanges[3] - self.theStripInterval / 2, 
+                    self.theStripInterval / self.theXAxis.theLength )
+        else:
+            if aMode == MODE_HISTORY:
+                self.requestData()
+            else:
+                self.resetData()
 
         self.theZoomLevel = 0
         self.theZoomBuffer = []
@@ -1168,7 +1171,7 @@ class Plot:
                 return
 
             self.theButtonTimeStampp=tstamp                 
-            if self.theStripMode==MODE_HISTORY:
+            if self.theStripMode==MODE_HISTORY and self.theXAxis.getFullPNString() == TIME_AXIS:
                 #check that mode is history 
                 self.theZoomKeyPressed=True
                 self.x0 = x
@@ -1209,7 +1212,7 @@ class Plot:
         yToggle = gtk.MenuItem ( "Toggle Y axis" )
         yToggle.connect( "activate", self.__toggleYAxis )
         #take this condition out if phase plotting works for history
-        if self.theXAxis.getFullPNString() == TIME_AXIS:
+        if self.theOwner.allHasLogger():
             if self.theStripMode == MODE_STRIP:
                 toggleStrip = gtk.MenuItem("History mode")
             else:

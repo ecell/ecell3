@@ -1,12 +1,16 @@
 #!/usr/bin/env python
 
 from Numeric import *
+from random import *
+import gtk
+import gtk.gdk
 
 # aggregate so many points at any one level
 AGGREGATE_POINTS = 200
 
 # read no more than so many points from logger at once
 READ_CACHE = 10000
+HISTORY_SAMPLE = 2000
 
 # cache increment
 CACHE_INCREMENT = 10000
@@ -109,17 +113,70 @@ class DataGenerator:
         dataList = zeros( (0,5), LOGGER_TYPECODE )
         fullPNString = aDataSeries.getFullPNString()
         if xAxis == "Time":
-            if not ( self.hasLogger( fullPNString ) ):
-                dataList =  zeros( (0,5 ), LOGGER_TYPECODE )
-            else:
+            if  self.hasLogger( fullPNString ) :
                 aStartTime = self.theLoggerAdapter.getStartTime( fullPNString )
                 anEndTime = self.theLoggerAdapter.getEndTime ( fullPNString )
                 requiredResolution = ( anEndTime - aStartTime ) / numberOfElements
                 dataList = self.theLoggerAdapter.getData( fullPNString, 
                     aStartTime, anEndTime, requiredResolution )
         else:
-            pass
-            #return
+            aWindow = aDataSeries.thePlot.theWidget.get_ancestor( gtk.Window)
+            if aWindow != None:
+                aWindow.window.set_cursor( gtk.gdk.Cursor( gtk.gdk.WATCH ) )
+                while gtk.events_pending():
+                    gtk.main_iteration_do()
+            aRandom = Random()
+
+            if self.hasLogger( fullPNString ) and self.hasLogger( xAxis ):
+                aSimulator = self.__theSession.theSimulator
+                yStartTime = aSimulator.getLoggerStartTime( fullPNString )
+                yWalker = LoggerWalker( aSimulator, fullPNString )
+                xWalker = LoggerWalker( aSimulator, xAxis )
+                xSize = aSimulator.getLoggerSize( xAxis )
+                
+                xstartpoint = xWalker.findPrevious( yStartTime )
+
+                if  xstartpoint != 1:
+                    writeCache = zeros( ( CACHE_INCREMENT, 5 ) )
+                    writeIndex = 0
+                    readIndex = 0
+                    xPoint = xWalker.getNext()
+                    while xPoint != 1:
+                        if aRandom.randint( 0, xSize ) < HISTORY_SAMPLE:
+                            aTime = xPoint[DP_TIME]
+                            yPoint1 = yWalker.findPrevious( aTime )
+                            if yPoint1 == 1:
+                                break
+                            newDataPoint = zeros( ( 5 ) )
+                            newDataPoint[DP_TIME] = xPoint[DP_VALUE]
+                            if yPoint1[DP_TIME] != aTime:
+                                yPoint2 = yWalker.getNext( aTime )
+                                if yPoint2 == 1:
+                                    break
+                                # interpolate
+                                lowerTime = yPoint1[DP_TIME]
+                                lowerValue = yPoint1[DP_VALUE]
+                                upperTime = yPoint2[DP_TIME]
+                                upperValue = yPoint2[DP_VALUE]
+                                newDataPoint[DP_VALUE] = ( ( aTime - lowerTime ) * lowerValue + \
+                                                        ( upperTime - aTime ) * upperValue ) / \
+                                                           ( upperTime - lowerTime )
+
+                            else:
+                                newDataPoint[DP_VALUE] = yPoint1[DP_VALUE]
+                            if writeIndex == len( writeCache):
+                                writeCache = concatenate( ( writeCache, zeros( ( CACHE_INCREMENT, 5 ) ) ) )
+                            writeCache[ writeIndex ] = newDataPoint
+                            writeIndex += 1
+                        xPoint = xWalker.getNext()
+                    dataList = writeCache[:writeIndex] 
+                    dataList [ :, 2 ] = dataList[ :, 1 ]
+                    dataList [ :, 3 ] = dataList[ :, 1 ]
+                    dataList [ :, 4 ] = dataList[ :, 1 ]
+
+            if aWindow != None:
+                aWindow.window.set_cursor( gtk.gdk.Cursor( gtk.gdk.TOP_LEFT_ARROW ) )
+
             # do interpolation on X axis
         aDataSeries.replacePoints( dataList )
 
@@ -396,3 +453,68 @@ class LoggerCache:
         else:
             return 0
 
+
+class LoggerWalker:
+
+    def __init__( self, aSimulator, aFullPN):
+        self.theSimulator = aSimulator
+        self.theFullPN = aFullPN
+        self.theStart = aSimulator.getLoggerStartTime( aFullPN )
+        self.theEnd = aSimulator.getLoggerEndTime( aFullPN )
+        size = aSimulator.getLoggerSize( aFullPN )
+        self.theAvgDistance = ( self.theEnd - self.theStart ) / size
+        self.cachedTill = -1
+        self.theCache = zeros( ( 0,5 ) )
+        self.index = 0
+        self.__readCache()
+
+        
+    def __readCache( self ):
+        if self.cachedTill >= self.theEnd:
+            return False
+
+        if self.cachedTill == -1:
+            readStart = self.theStart
+        else:        
+            readStart = self.cachedTill
+        readEnd = min( self.theAvgDistance * int(READ_CACHE/2), self.theEnd - self.cachedTill ) + readStart
+        newPoints = self.theSimulator.getLoggerData( self.theFullPN, readStart, readEnd )
+        if len( self.theCache) > 0:
+            halfIndex = int(len(self.theCache) /2 )
+            self.index = len( self.theCache ) - halfIndex
+            self.theCache = concatenate( ( self.theCache[ halfIndex: ], newPoints ) )
+        else:
+            self.theCache = newPoints
+            self.index = 0
+        self.cachedTill = readEnd
+
+        return True
+
+        
+    def getNext( self ):
+        if self.index == len( self.theCache ):
+            if not self.__readCache():
+                return 1
+        aDataPoint = self.theCache[ self.index ]
+        self.index += 1
+        return aDataPoint
+            
+            
+    
+    def findPrevious( self, aTime ):
+        #returns -1 aTime too small
+        #returns 1 aTime too big
+        nextIndex = searchsorted( self.theCache[:,DP_TIME], aTime )
+        if nextIndex == len( self.theCache ):
+            if not self.__readCache():
+                return 1
+            return self.findPrevious( aTime )
+
+        if aTime < self.theCache[ nextIndex ][DP_TIME]:
+            if nextIndex > 0:
+                nextIndex -= 1
+            else:
+                # smaller then what logger contains
+                return -1
+        self.index = nextIndex
+        return self.getNext( )
