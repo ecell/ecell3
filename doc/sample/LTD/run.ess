@@ -1,0 +1,9 @@
+loadModel( 'LTD.eml' )
+
+
+for i in range( 10 ):
+	print getCurrentTime()
+	step()
+
+run( 10 )
+print getCurrentTime()
