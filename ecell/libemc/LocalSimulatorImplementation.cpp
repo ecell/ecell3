@@ -507,13 +507,10 @@ namespace libemc
 
     do
       {
-	unsigned int i( 20 );
-	do 
+	for( unsigned int i( 20 ); i != 0; --i )
 	  {
 	    getModel().step();
-
-	    --i;
-	  } while( i != 0 );
+	  }
 
 	while( (*theEventChecker)() )
 	  {
@@ -556,20 +553,16 @@ namespace libemc
 
     do
       {
-	unsigned int i( 20 );
-	do
+	for( unsigned int i( 20 ); i != 0; --i )
 	  {
 	    if( getModel().getCurrentTime() > aStopTime )
 	      {
 		theRunningFlag = false;
-		break;
+		return;  // the exit
 	      }
 	    
 	    getModel().step();
-
-	    --i;
-	  } while( i != 0 );
-
+	  }
 
 	while( (*theEventChecker)() )
 	  {
