@@ -21,7 +21,7 @@ dmsodir = ${DM_SO_DIR}
 dmso_DATA = ${SOS}
 
 %.so : %.cpp
-	${SHELL} ${ECELL3_DMC} $< -I${top_srcdir}/libecs -I${top_srcdir} 
+	${SHELL} ${ECELL3_DMC} $< --no-stdinclude -I${top_srcdir}/libecs -I${top_srcdir}/.. -I${top_srcdir} 
 
 clean-local:
 	${RM} -rf ${DM_DATA}
