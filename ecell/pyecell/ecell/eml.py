@@ -123,13 +123,11 @@ class Eml:
         aValueList = []
 
         aStepperNode = self.__getStepperNode( aStepperID )
-        for aChildNode in aStepperNode.childNodes:
+        for aPropertyNode in aStepperNode.childNodes:
 
-            if aChildNode.nodeName == 'property':
+            if aPropertyNode.nodeName == 'property':
 
-                if aChildNode.getAttribute( 'name' ) == aPropertyName:
-
-                    aPropertyNode = aChildNode
+                if aPropertyNode.getAttribute( 'name' ) == aPropertyName:
 
                     for aChildNode in aPropertyNode.childNodes:
                         if aChildNode.nodeName == 'value':
@@ -164,6 +162,7 @@ class Eml:
 
     def setStepperProperty( self, aStepperID, aPropertyName, aValue ):
 
+        # what if a property with the same name already exist?
         aPropertyElement = self.__createPropertyNode( aPropertyName, aValue )
         aStepperNode = self.__getStepperNode( aStepperID )
 
@@ -191,8 +190,8 @@ class Eml:
 
     def createEntity( self, aClass, aFullID ):
 
-        anEntityType = aFullID.split( ':', 1 )[ 0 ]
-        anEntityElement = self.__createElement( string.lower( anEntityType ) )
+        ( anEntityType, aTargetPath, anID ) = aFullID.split( ':' )
+        anEntityElement = self.__createElement( anEntityType.lower() )
         anEntityElement.setAttribute( 'class', aClass )
 
         if( anEntityType == 'System' ):
@@ -201,14 +200,18 @@ class Eml:
             anEntityElement.setAttribute( 'id', anID )
             self.__theDocument.documentElement.appendChild( anEntityElement )
 
-            #        elif( anEntityType == 'Variable' or anEntityType == 'Process' ):
-        else:
-            (_dummy, aTargetPath, anID ) = aFullID.split( ':' )
+        elif( anEntityType == 'Variable' or anEntityType == 'Process' ):
+
             anEntityElement.setAttribute( 'id', anID )
 
             aTargetSystemNode = self.__getSystemNode( aTargetPath )
 
             aTargetSystemNode.appendChild( anEntityElement )
+
+        else:
+
+            raise "unexpected error."
+
 
         self.__addToCache( aFullID, anEntityElement )
 
@@ -231,7 +234,7 @@ class Eml:
                     if anElement.getAttribute( 'id' ) == aTargetEntity[ 'Path' ]:
 
                         for aChild in anElement.childNodes:
-                            if aChild.nodeName == string.lower( aTargetEntity[ 'Type' ] ) and \
+                            if aChild.nodeName == aTargetEntity[ 'Type' ].lower() and \
                                aChild.getAttribute( 'id' ) == aTargetEntity[ 'ID' ]:
 
                                 anElement.removeChild( aChild )
@@ -240,7 +243,6 @@ class Eml:
 
 
     def isEntityExist( self, aFullID ):
-
 
         try:
             __getEntityNode( aFullID )
@@ -281,7 +283,7 @@ class Eml:
 
         # better if this method creates entity cache on the fly?
 
-        aType = string.lower( anEntityType )
+        aType = anEntityType.lower()
 
         if aType == 'system':
 
@@ -366,7 +368,7 @@ class Eml:
                 self.__addToCache( aSystemFullID, aSystemNode )
 
                 for aChildNode in aSystemNode.childNodes:
-                    aType = string.capwords( aChildNode.nodeName )        
+                    aType = string.capwords( aChildNode.nodeName )
 
                     if  aType == 'Variable' or aType == 'Process':
 
@@ -392,17 +394,14 @@ class Eml:
 
         elif aValueNode.firstChild.nodeType == aValueNode.ELEMENT_NODE:
 
-            aValueList = []
-            for aChildNode in aValueNode.childNodes:
-                if aChildNode.nodeName == 'value':
-                    aValueList.append( self.__createValueList( aChildNode ) )
+            return map( self.__createValueList, aValueNode.childNodes )
 
-            return aValueList
-
+        else:
+            raise "unexpected error."
 
     def __getSubSystemList( self, aSystemPath ):
 
-        aTargetPath = string.split( aSystemPath, '/' )
+        aTargetPath = aSystemPath.split( '/' )
         aTargetPathLength = len( aTargetPath )
 
         # if '' is given, return the root system ('/')
