@@ -7,7 +7,7 @@ dnl
 dnl 
 dnl 
 AC_CANONICAL_TARGET([])
-AM_INIT_AUTOMAKE(ecell,"3.1.5" , do-not-define)
+AM_INIT_AUTOMAKE(ecell,"3.1.6" , do-not-define)
 AC_PROG_MAKE_SET
 dnl
 dnl

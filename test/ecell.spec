@@ -1,6 +1,6 @@
 Summary: E-Cell is a generic software package for cellular modeling and simulation.
 Name: ecell
-Version: 3.1.5
+Version: 3.1.6
 Release: 1
 URL: http://www.e-cell.org
 Source0: %{name}-%{version}.tar.gz
