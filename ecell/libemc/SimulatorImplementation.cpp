@@ -1,26 +1,24 @@
 #include "SimulatorImplementation.hpp"
 
-//RootSystem* theRootSystem = new RootSystem();
+RootSystem* theRootSystem = new RootSystem();
 
 SimulatorImplementation::SimulatorImplementation()
 {
 }
 
-//void SimulatorImplementation::makePrimitive( StringCref classname, FQPNCref fqpn, StringCref name )
-void SimulatorImplementation::makePrimitive()
+void SimulatorImplementation::makePrimitive( StringCref classname, FQPNCref fqpn, StringCref name )
 {
 }
 
-//void SimulatorImplementation::sendMessage( FQPNCref fqpn, MessageCref message )
-void SimulatorImplementation::sendMessage()
+void SimulatorImplementation::sendMessage( FQPNCref fqpn, MessageCref message )
 {
 }
 
-
-//Message SimulatorImplementation::getMessage( FQPNCref fqpn, StringCref propertyName )
-void SimulatorImplementation::getMessage()
+/*
+Message SimulatorImplementation::getMessage( FQPNCref fqpn, StringCref propertyName )
 {
 }
+*/
 
 void SimulatorImplementation::step()
 {

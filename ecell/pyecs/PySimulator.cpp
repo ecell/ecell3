@@ -25,7 +25,7 @@ Py::Object PySimulator::makePrimitive( const Py::Tuple& args )
   const string classname = (string)(Py::String)args[1];
   const string fqen = (string)(Py::String)args[2];
   const string name = (string)(Py::String)args[3];
-  theSimulator->makePrimitive()
+  //  theSimulator->makePrimitive()
 
   return Py::Object();
 }

@@ -5,27 +5,22 @@ Simulator::Simulator()
   theSimulatorImplementation = new SimulatorImplementation();
 }
 
-//void Simulator::makePrimitive( StringCref classname, FQPNCref fqpn, StringCref name )
-void Simulator::makePrimitive()
+void Simulator::makePrimitive( StringCref classname, FQPNCref fqpn, StringCref name )
 {
-  //  theSimulatorImplementation->makePrimitive( classname, fqpn, name );
-  theSimulatorImplementation->makePrimitive();
+  theSimulatorImplementation->makePrimitive( classname, fqpn, name );
 }
 
-//void Simulator::sendMessage( FQPNCref fqpn, Message message )
-void Simulator::sendMessage()
+void Simulator::sendMessage( FQPNCref fqpn, Message message )
 {
-  //  theSimulatorImplementation->sendMessage( fqpn, message );
-  theSimulatorImplementation->sendMessage();
+  theSimulatorImplementation->sendMessage( fqpn, message );
 }
 
-
-//Message Simulator::getMessage( FQPNCref fqpn, StringCref propertyName )
-void Simulator::getMessage()
+/*
+Message Simulator::getMessage( FQPNCref fqpn, StringCref propertyName )
 {
-  //  theSimulatorImplementation->sendMessage( fqpn, message );
-  theSimulatorImplementation->sendMessage();
+  theSimulatorImplementation->sendMessage( fqpn, message );
 }
+*/
 
 void Simulator::step()
 {

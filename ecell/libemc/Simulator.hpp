@@ -13,12 +13,9 @@ public:
   Simulator();
   ~Simulator(){};
 
-  //  void makePrimitive( StringCref classname, FQPNCref fqpn, StringCref name );
-  void makePrimitive();
-  //  void sendMessage( FQPNCref fqpn, Message message );
-  void sendMessage();
+  void makePrimitive( StringCref classname, FQPNCref fqpn, StringCref name );
+  void sendMessage( FQPNCref fqpn, Message message );
   //  Message getMessage( FQPNCref fqpn, StringCref propertyName );
-  void getMessage();
   void step();
 };
 
