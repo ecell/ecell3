@@ -49,7 +49,8 @@ class DigitalWindow( OsogoPluginWindow ):
 		else:
 			aMessage = "Error: (%s) is not numerical data" %aFullPNString
 			self.thePluginManager.printMessage( aMessage )
-			aDialog = ConfirmWindow(0,aMessage,'Error!')
+			#aDialog = ConfirmWindow(0,aMessage,'Error!')
+			aDialog = ConfirmWindow.ConfirmWindow(0,aMessage,'Error!')
 
 	# end of __init__
 
