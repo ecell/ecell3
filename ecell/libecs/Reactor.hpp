@@ -132,44 +132,6 @@ namespace libecs
       Premature= 0x16
     };
 
-    enum LigandType { Substrate, Product, Catalyst, Effector };
-    static const char* LIGAND_STRING_TABLE[];
-
-  private:
-
-    Real theInitialActivity;
-    Real theActivityBuffer;
-    Condition theCondition;
-    static Condition theGlobalCondition;
-
-  protected:
-
-    Real theActivity;
-
-    void makeSlots();
-
-    ReactantVector theSubstrateList; 
-    ReactantVector theProductList;   
-    ReactantVector theEffectorList;
-    ReactantVector theCatalystList;
-
-    /**
-       Set activity variable.  This must be set at every turn and takes
-       [number of molecule that this reactor yields] / [deltaT].
-       However, public activity() method returns it as number of molecule
-       per a second, not per deltaT.
-
-       @param activity [number of molecule that this yields] / [deltaT].
-       @see activity()
-    */
-    void setActivity( RealCref activity ) 
-    { 
-      theActivityBuffer = activity; 
-    }
-
-    Condition condition( Condition );
-    void warning( StringCref );
-
   public:
 
     Reactor();
@@ -187,6 +149,20 @@ namespace libecs
     virtual void transit() { theActivity = theActivityBuffer; }
     Condition status() const { return theCondition; }
     void resetCondition() { theCondition = Good; }
+
+    /**
+       Set activity variable.  This must be set at every turn and takes
+       [number of molecule that this reactor yields] / [deltaT].
+       However, public activity() method returns it as number of molecule
+       per a second, not per deltaT.
+
+       @param activity [number of molecule that this yields] / [deltaT].
+       @see activity()
+    */
+    void setActivity( RealCref activity ) 
+    { 
+      theActivityBuffer = activity; 
+    }
 
     /**
        Returns activity of this reactor in 
@@ -281,6 +257,34 @@ namespace libecs
 #endif /* HAVE_NUMERIC_LIMITS */
 
     static Condition getGlobalCondition() {return theGlobalCondition;}
+
+  protected:
+
+    void makeSlots();
+
+    enum LigandType { Substrate, Product, Catalyst, Effector };
+    static const char* LIGAND_STRING_TABLE[];
+
+    Condition condition( Condition );
+    void warning( StringCref );
+
+  
+  protected:
+
+    Real theActivity;
+
+    ReactantVector theSubstrateList; 
+    ReactantVector theProductList;   
+    ReactantVector theEffectorList;
+    ReactantVector theCatalystList;
+
+  private:
+
+    Real theInitialActivity;
+    Real theActivityBuffer;
+
+    Condition theCondition;
+    static Condition theGlobalCondition;
 
   };
 
