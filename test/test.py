@@ -13,17 +13,17 @@ print 'create a Session'
 aSession = ecell.Session.Session( ecell.ecs.Simulator() )
 aSimulator = aSession.theSimulator
 
-aSimulator.createStepper( 'RungeKutta4SRMStepper', 'RK4_0' )
-aSimulator.createStepper( 'RungeKutta4SRMStepper', 'RK4_1' )
-aSimulator.createStepper( 'Euler1SRMStepper', 'E1_0' )
+aSimulator.createStepper( 'RungeKutta4SRMStepper', 'RK4_0', () )
+aSimulator.createStepper( 'RungeKutta4SRMStepper', 'RK4_1', () )
+aSimulator.createStepper( 'Euler1SRMStepper', 'E1_0', () )
 
 aSimulator.setProperty( 'System::/:StepperID', ('RK4_0',) )
 
 
 
 print 'make substances...'
-aSimulator.createEntity( 'Substance', 'Substance:/:A', 'substance A' )
-aSimulator.createEntity( 'Substance', 'Substance:/:B', 'substance B' )
+aSimulator.createEntity( 'SRMSubstance', 'Substance:/:A', 'substance A' )
+aSimulator.createEntity( 'SRMSubstance', 'Substance:/:B', 'substance B' )
 
 aSimulator.run(10)
 
@@ -36,8 +36,8 @@ aSimulator.createEntity( 'System', 'System:/:CYTOPLASM', 'cytoplasm' )
 aSimulator.setProperty( 'System:/:CYTOPLASM:StepperID', ('RK4_0',) )
 
 
-aSimulator.createEntity( 'Substance', 'Substance:/CYTOPLASM:CA', 's CA' )
-aSimulator.createEntity( 'Substance', 'Substance:/CYTOPLASM:CB', 's CB' )
+aSimulator.createEntity( 'SRMSubstance', 'Substance:/CYTOPLASM:CA', 's CA' )
+aSimulator.createEntity( 'SRMSubstance', 'Substance:/CYTOPLASM:CB', 's CB' )
 
 
 print 'initialize()...'
@@ -123,13 +123,13 @@ a = array(([20,30],
            [280,290],
            [300,310],
            [320,330],
-           [340,350]))  //aALogger.getData()
+           [340,350]))  #aALogger.getData()
 
 sizeOfArrayInArray1 = len(a[0])
 sizeOfArrayInArray2 = len(a[1])
 sizeOfArray = len(a)
 
-List = aSimulator.getLoggerList()
+List = list( aSimulator.getLoggerList() )
 
 for x in List: 
     tmpx = string.replace(x, ':', '-')
@@ -138,7 +138,7 @@ for x in List:
 appendedList = List.append(tmpx)
 print appendedList
     
-data = 'DATA:' + List
+data = 'DATA:' + str( List )
 size = "SIZE: %s %s"%(sizeOfArrayInArray1, sizeOfArray)
 label = "LABEL: time quantity"
 note = "NOTE:\n\n-------------------------"
@@ -146,7 +146,7 @@ note = "NOTE:\n\n-------------------------"
 stringList = [ data , size , label , note ]
 numericList = [sizeOfArrayInArray1 , sizeOfArrayInArray2 ]
 
-output = open('/home/jiji/ecell3/test/test.test','w')
+output = open('test.test','w')
 for x in stringList:
     print x
     output.writelines("%s\n"%x)
@@ -163,6 +163,6 @@ for x in stringList:
     output.writelines("\n///")        
             
             
-if  __name__ == "__main__":
-    
-    setResultFileList("result.ecd")
+#if  __name__ == "__main__":
+#    
+#    setResultFileList("result.ecd")
