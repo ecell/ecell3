@@ -452,7 +452,7 @@ class MainWindow(OsogoWindow):
 				self.theSession.loadScript( aFileName )
 
 			self.theSession.theSimulator.initialize()
-                        self.theEntityListWindow.setSession( self.theSession )
+#                        self.theEntityListWindow.setSession( self.theSession )
 
 
 		except:
@@ -868,14 +868,19 @@ class MainWindow(OsogoWindow):
 
                 # show
 		if arg[0].get_active() == TRUE:
-			self.theMessageWindowVisible = True
-			self.showMessageWindow() 
-                        self.__resizeVertically( self.theMessageWindow.getActualSize()[1] )
+                    self.theMessageWindowVisible = True
+                    self.showMessageWindow() 
+                    self.__resizeVertically( self.theMessageWindow.getActualSize()[1] )
                 # hide
 		else:
-			self.theMessageWindowVisible = False
-			self.hideMessageWindow()                         
-			self.__resizeVertically( self['entitylistarea'].get_allocation()[3] )
+                    self.theMessageWindowVisible = False
+                    self.hideMessageWindow()
+
+                    if self.theEntityListWindowVisible:
+                        self.__resizeVertically( self['entitylistarea'].get_allocation()[3] )
+                    else:
+                        self.__resizeVertically( 0 )
+
 
 		self.updateButtons()
 
@@ -886,11 +891,15 @@ class MainWindow(OsogoWindow):
                 self.theEntityListWindowVisible = True
                 self['entitylistarea'].show()
                 self.__resizeVertically( self['entitylistarea'].get_allocation()[3] )
+                    
             else:
                 self.theEntityListWindowVisible = False
                 self['entitylistarea'].hide()
 
-                self.__resizeVertically( self.theMessageWindow.getActualSize()[1] )
+                if self.theMessageWindowVisible:
+                    self.__resizeVertically( self.theMessageWindow.getActualSize()[1] )
+                else:
+                    self.__resizeVertically( 0 )
 
 
 	def __displayAbout ( self, *args ):
