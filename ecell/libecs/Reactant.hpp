@@ -42,16 +42,18 @@ namespace libecs
 
   public:
 
-    Reactant( SubstanceRef s, const int c ) 
+    Reactant( SubstanceRef s, const Int c ) 
       : 
-      theSubstance( s ), theCoefficient( c ) 
+      theSubstance( s ), 
+      theCoefficient( c ) 
     {
       ; // do nothing
     }
+
     virtual ~Reactant() {}
 
     SubstanceRef getSubstance() const { return theSubstance; }
-    int getCoefficient() const { return theCoefficient; }
+    const Int getCoefficient() const { return theCoefficient; }
 
   private:
 

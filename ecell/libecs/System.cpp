@@ -194,6 +194,8 @@ namespace libecs
 
   void System::initialize()
   {
+    updateVolume();
+
     if( theStepper == NULLPTR )
       {
 	setStepperClass("SlaveStepper");

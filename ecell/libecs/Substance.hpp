@@ -141,7 +141,7 @@ namespace libecs
     /**
        @return current velocity value in (number of molecules)/(step)
     */
-    Real getVelocity() const
+    const Real getVelocity() const
     { 
       return theVelocity; 
     }

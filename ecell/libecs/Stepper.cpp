@@ -169,7 +169,7 @@ namespace libecs
     // FIXME: is this multiple-time-initialization-proof? 
     Stepper::initialize();
 
-    updateSlaveStepperVector( theOwner );
+    updateSlaveStepperVector();
 
     for( SlaveStepperVectorIterator i( theSlaveStepperVector.begin() ); 
 	 i != theSlaveStepperVector.end() ; ++i )
@@ -180,10 +180,15 @@ namespace libecs
   }
 
 
-  void MasterStepper::updateSlaveStepperVector( SystemPtr aStartSystemPtr )
+  void MasterStepper::updateSlaveStepperVector()
   {
     theSlaveStepperVector.clear();
 
+    searchSlaves( theOwner );
+  }
+
+  void MasterStepper::searchSlaves( SystemPtr aStartSystemPtr )
+  {
     for( SystemMapConstIterator s( aStartSystemPtr->getSystemMap().begin() );
 	 s != aStartSystemPtr->getSystemMap().end() ; ++s )
       {
@@ -197,7 +202,7 @@ namespace libecs
 	  {
 	    theSlaveStepperVector.push_back( aSlaveStepperPtr );
 	    aSlaveStepperPtr->setMasterStepper( this );
-	    updateSlaveStepperVector( aSlaveSystemPtr );
+	    searchSlaves( aSlaveSystemPtr );
 	  }
       }
   }
@@ -239,109 +244,52 @@ namespace libecs
   void MasterStepperWithEntityCache::initialize()
   {
     MasterStepper::initialize();
-    updateCacheWithCheck();
+    updateCache();
   }
 
   
   void MasterStepperWithEntityCache::updateCache()
   {
-    SystemPtr aMasterSystem( getOwner() );
-    theSystemCache.resize( getSlaveStepperVector().size() + 1 );
-    SystemVectorIterator aSystemCacheIterator( theSystemCache.begin() );
-    (*aSystemCacheIterator) = aMasterSystem;
+    // clear the caches
+    theSystemCache.clear();
+    theSubstanceCache.clear();
+    theReactorCache.clear();
 
-    SubstanceVector::size_type 
-      aSubstanceCacheSize( aMasterSystem->getSubstanceMap().size() );
-    ReactorVector::size_type   
-      aReactorCacheSize( aMasterSystem->getReactorMap().size() );
+    theSystemCache.reserve( getSlaveStepperVector().size() + 1 );
+    theSystemCache.push_back( getOwner() );
 
-    SlaveStepperVectorCref aSlaveStepperVector( getSlaveStepperVector() );
-
-    for( SlaveStepperVectorConstIterator i( aSlaveStepperVector.begin() ); 
-	 i != aSlaveStepperVector.end() ; ++i )
+    for( SlaveStepperVectorConstIterator i( getSlaveStepperVector().begin() );
+	 i != getSlaveStepperVector().end() ; ++i )
       {
 	SystemPtr aSystem( (*i)->getOwner() );
-	aSubstanceCacheSize += aSystem->getSubstanceMap().size();
-	aReactorCacheSize += aSystem->getReactorMap().size();
-	*(++aSystemCacheIterator) = aSystem;
+	theSystemCache.push_back( aSystem );
+
+	cerr << aSystem->getSubstanceMap().size() << endl;
+	
+	for( SubstanceMapConstIterator i( aSystem->getSubstanceMap().begin() );
+	     i != aSystem->getSubstanceMap().end(); ++i )
+	  {
+	    theSubstanceCache.push_back( (*i).second );
+	  }
+
+	for( ReactorMapConstIterator i( aSystem->getReactorMap().begin() );
+	     i != aSystem->getReactorMap().end(); ++i )
+	  {
+	    theReactorCache.push_back( (*i).second );
+	  }
+
       }
 
-    theSubstanceCache.resize( aSubstanceCacheSize );
-    theReactorCache.resize( aReactorCacheSize );
-
-    SubstanceVectorIterator 
-      aSubstanceVectorIterator( theSubstanceCache.begin() );
-    ReactorVectorIterator aReactorVectorIterator( theReactorCache.begin() );
-
-    for( SystemVectorConstIterator i( theSystemCache.begin() );
-	 i != theSystemCache.end() ; ++i )
-      {
-	aSubstanceVectorIterator =
-	  std::transform( aMasterSystem->getSubstanceMap().begin(), 
-			  aMasterSystem->getSubstanceMap().end(), 
-			  aSubstanceVectorIterator,
-			  std::select2nd<SubstanceMap::value_type>() );    
-
-	aReactorVectorIterator =
-	  std::transform( aMasterSystem->getReactorMap().begin(), 
-			  aMasterSystem->getReactorMap().end(), 
-			  aReactorVectorIterator,
-			  std::select2nd<ReactorMap::value_type>() );    
-      }
-
+    std::cout << theSystemCache.size() << endl;
+    std::cout << theSubstanceCache.size() << endl;
+    std::cout << theReactorCache.size() << endl;
   }
 
 
   //FIXME: incomplete
   void MasterStepperWithEntityCache::updateCacheWithSort()
   {
-    SystemPtr aMasterSystem( getOwner() );
-    theSystemCache.resize( getSlaveStepperVector().size() + 1 );
-    SystemVectorIterator aSystemCacheIterator( theSystemCache.begin() );
-    (*aSystemCacheIterator) = aMasterSystem;
-
-    SubstanceVector::size_type 
-      aSubstanceCacheSize( aMasterSystem->getSubstanceMap().size() );
-    ReactorVector::size_type   
-      aReactorCacheSize( aMasterSystem->getReactorMap().size() );
-
-    SlaveStepperVectorCref aSlaveStepperVector( getSlaveStepperVector() );
-
-    for( SlaveStepperVectorConstIterator i( aSlaveStepperVector.begin() ); 
-	 i != aSlaveStepperVector.end() ; ++i )
-      {
-	SystemPtr aSystem( (*i)->getOwner() );
-	aSubstanceCacheSize += aSystem->getSubstanceMap().size();
-	aReactorCacheSize += aSystem->getReactorMap().size();
-	*(++aSystemCacheIterator) = aSystem;
-      }
-
-    theSubstanceCache.resize( aSubstanceCacheSize );
-    theReactorCache.resize( aReactorCacheSize );
-
-    SubstanceVectorIterator aSubstanceVectorIterator
-      ( theSubstanceCache.begin() );
-
-    ReactorVectorIterator aReactorVectorIterator
-      ( theReactorCache.begin() );
-
-    for( SystemVectorConstIterator i( theSystemCache.begin() );
-	 i != theSystemCache.end() ; ++i )
-      {
-	  
-	aSubstanceVectorIterator =
-	  std::transform( aMasterSystem->getSubstanceMap().begin(), 
-			  aMasterSystem->getSubstanceMap().end(), 
-			  aSubstanceVectorIterator,
-			  std::select2nd<SubstanceMap::value_type>() );    
-
-	aReactorVectorIterator =
-	  std::transform( aMasterSystem->getReactorMap().begin(), 
-			  aMasterSystem->getReactorMap().end(), 
-			  aReactorVectorIterator,
-			  std::select2nd<ReactorMap::value_type>() );    
-      }
-
+    updateCache();
   }
 
 

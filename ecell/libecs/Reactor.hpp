@@ -100,33 +100,6 @@ namespace libecs
     void appendEffector ( FullIDCref fullid, int coefficient );
 
 
-    /**
-       Reactor Condition enum is used by Reactor's self-diagnosis system.
-
-       There are two types of Reactor conditions, local and global.
-       Local Reactor condition accessed by status() method indicates
-       condition of the Reactor.
-       Global Reactor condition can be checked by globalCondition() method
-       and it returns Bad if there is at least one Reactor in the RootSystem
-       whose status is not Good.
-
-       @see status() globalCondition()
-    */
-    enum Condition {
-      /// Condition Good. Everything seems to be Ok. 
-      Good = 0x00,
-      /// Something wrong was occured at the time of initialization.
-      InitFail = 0x01,
-      /// Failed to do something at the time of react phase. 
-      ReactFail = 0x02,
-      /// Something is wrong, but don't know what is it.
-      Bad = 0x04,
-      /// Fatal.  Cannot continue. 
-      Fatal = 0x08,
-      /// Premature. Need initialization to work correctly. */
-      Premature= 0x16
-    };
-
   public:
 
     Reactor();
@@ -140,11 +113,15 @@ namespace libecs
     }
 
     virtual void initialize();
+
     virtual void differentiate() { }
-    virtual void integrate() { theActivity = theActivityBuffer; }
+
+    virtual void integrate() 
+    { 
+      theActivity = theActivityBuffer; 
+    }
+
     virtual void compute() { }
-    Condition status() const { return theCondition; }
-    void resetCondition() { theCondition = Good; }
 
     /**
        Set activity variable.  This must be set at every turn and takes
@@ -242,40 +219,11 @@ namespace libecs
     */
     int getNumberOfEffectors() const { return theEffectorList.size(); }
 
-    virtual int getMinimumNumberOfSubstrates() const { return 0; }
-    virtual int getMinimumNumberOfProducts() const { return 0; }
-    virtual int getMinimumNumberOfCatalysts() const { return 0; }
-    virtual int getMinimumNumberOfEffectors() const { return 0; }
-
-#ifdef HAVE_NUMERIC_LIMITS
-    virtual int getMaximumNumberOfSubstrates() const 
-    { return numeric_limits<int>::max(); }
-    virtual int getMaximumNumberOfProducts() const 
-    { return numeric_limits<int>::max(); }
-    virtual int getMaximumNumberOfCatalysts() const 
-    { return numeric_limits<int>::max(); }
-    virtual int getMaximumNumberOfEffectors() const 
-    { return numeric_limits<int>::max(); }
-#else /* HAVE_NUMERIC_LIMITS */
-    virtual int getMaximumNumberOfSubstrates() const {return INT_MAX;}
-    virtual int getMaximumNumberOfProducts() const {return INT_MAX;}
-    virtual int getMaximumNumberOfCatalysts() const {return INT_MAX;}
-    virtual int getMaximumNumberOfEffectors() const {return INT_MAX;}
-#endif /* HAVE_NUMERIC_LIMITS */
-
-    static Condition getGlobalCondition() {return theGlobalCondition;}
 
   protected:
 
     void makeSlots();
 
-    enum LigandType { Substrate, Product, Catalyst, Effector };
-    static const char* LIGAND_STRING_TABLE[];
-
-    Condition condition( Condition );
-    void warning( StringCref );
-
-  
   protected:
 
     Real theActivity;
@@ -289,9 +237,6 @@ namespace libecs
 
     Real theInitialActivity;
     Real theActivityBuffer;
-
-    Condition theCondition;
-    static Condition theGlobalCondition;
 
   };
 

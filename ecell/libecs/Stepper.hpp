@@ -224,13 +224,17 @@ namespace libecs
       return theSlaveStepperVector;
     }
 
-    void updateSlaveStepperVector( SystemPtr aStartSystemPtr );
+    void updateSlaveStepperVector();
 
     void registerSlaves( SystemPtr );
     void registerPropertySlot( PropertySlotPtr );
 
 
     virtual StringLiteral getClassName() const  { return "MasterStepper"; }
+
+  protected:
+
+    void searchSlaves( SystemPtr aStartSystemPtr );
 
   protected:
 

@@ -227,6 +227,8 @@ namespace libecs
 
     virtual void makeSlots();
 
+
+    //FIXME: should be called every turn
     void updateVolume()
     {
       theVolume = theVolumeBuffer;

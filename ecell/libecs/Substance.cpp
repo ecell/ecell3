@@ -52,6 +52,8 @@ namespace libecs
 			&Substance::getQuantity );
     createPropertySlot( "Concentration",*this,NULLPTR,
 			&Substance::getConcentration );
+    createPropertySlot( "Velocity",*this,NULLPTR,
+			&Substance::getVelocity );
     createPropertySlot( "AccumulatorClass",*this,
 			&Substance::setAccumulatorClass,
 			&Substance::getAccumulatorClass );

@@ -41,8 +41,6 @@
 namespace libecs
 {
 
-  Reactor::Condition Reactor::theGlobalCondition;// = Reactor::Condition::Good;
-
   void Reactor::makeSlots()
   {
     //FIXME: get methods
@@ -216,7 +214,6 @@ namespace libecs
     :
     theInitialActivity( 0 ),
     theActivityBuffer( 0 ),
-    theCondition( Premature ),
     theActivity( 0 )
   {
     makeSlots();
@@ -272,38 +269,10 @@ namespace libecs
     theEffectorList.push_back( aReactantPtr );
   }
 
-  Reactor::Condition Reactor::condition( Condition condition )
-  {
-    theCondition = static_cast<Condition>( theCondition | condition );
-    if( theCondition  != Good )
-      return theGlobalCondition = Bad;
-    return Good;
-  }
-
-  void Reactor::warning( StringCref message )
-  {
-    //FIXME:   *theMessageWindow << className() << " [" << fqen() << "]";
-    //FIXME:   *theMessageWindow << ":\n\t" << message << "\n";
-  }
 
   void Reactor::initialize()
   {
-    if( getNumberOfSubstrates() > getMaximumNumberOfSubstrates() )
-      warning("too many substrates.");
-    else if( getNumberOfSubstrates() < getMinimumNumberOfSubstrates() )
-      warning("too few substrates.");
-    if( getNumberOfProducts() > getMaximumNumberOfProducts() )
-      warning("too many products.");
-    else if( getNumberOfProducts() < getMinimumNumberOfProducts() )
-      warning("too few products.");
-    if( getNumberOfCatalysts() > getMaximumNumberOfCatalysts() )
-      warning("too many catalysts.");
-    else if( getNumberOfCatalysts() < getMinimumNumberOfCatalysts() )
-      warning("too few catalysts.");
-    if( getNumberOfEffectors() > getMaximumNumberOfEffectors() )
-      warning("too many effectors.");
-    else if( getNumberOfEffectors() < getMinimumNumberOfEffectors() )
-      warning("too few effectors.");
+    ; // do nothing
   }
 
 
