@@ -6,8 +6,14 @@ dnl AC_CONFIG_AUX_DIR()
 dnl
 dnl 
 dnl 
+ECELL_MAJOR_VERSION=3
+ECELL_MINOR_VERSION=1
+ECELL_MICRO_VERSION=90
+VERSION=$ECELL_MAJOR_VERSION.$ECELL_MINOR_VERSION.$ECELL_MICRO_VERSION
+PACKAGE=ecell
+dnl
 AC_CANONICAL_TARGET([])
-AM_INIT_AUTOMAKE(ecell,"3.1.6" , do-not-define)
+AM_INIT_AUTOMAKE($PACKAGE, $VERSION, do-not-define)
 AC_PROG_MAKE_SET
 dnl
 dnl
@@ -34,6 +40,6 @@ dnl
 dnl Create the top-level Makefile.
 dnl
 AC_CONFIG_FILES([Makefile])
-AC_OUTPUT
 
+AC_OUTPUT(Makefile ecell3.doxy)
 
