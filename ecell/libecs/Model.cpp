@@ -280,20 +280,19 @@ namespace libecs
     // three-phase progression of the step
     // 1. sync:  synchronize with proxies of the PropertySlots
     aStepper->sync();
-    // 2. step:  do the computation, returning a length of the time progression
-    const Real aStepSize( aStepper->step() );
-
-    // the time must be memorized before the Event is deleted by the pop
-    const Real aTopTime( aTopEvent.first );
-    // schedule a new event
-    theScheduleQueue.changeTopKey( Event( aTopTime + aStepSize, aStepper ) );
-    // update theCurrentTime, which is scheduled time of the Event on the top
-    theCurrentTime = ( theScheduleQueue.top() ).first;
-
+    // 2. step:  do the computation
+    aStepper->step();
     // 3. push:  re-sync with the proxies, and push new values to Loggers
     //           this need to be placed here after the event re-scheduling
     //           so that Loggers get the new time
     aStepper->push();
+
+    // schedule a new event
+    theScheduleQueue.changeTopKey( Event( aStepper->getCurrentTime(),
+					  aStepper ) );
+    // update theCurrentTime, which is scheduled time of the Event on the top
+    theCurrentTime = ( theScheduleQueue.top() ).first;
+
   }
 
 

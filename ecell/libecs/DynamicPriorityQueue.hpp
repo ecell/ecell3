@@ -51,8 +51,8 @@ public:
   typedef std::vector< key_type >    KeyVector;
   typedef std::vector< key_type* >   KeyPtrVector;
 
-  typedef KeyVector::size_type       size_type;
-  typedef KeyVector::difference_type index_type;
+  typedef typename KeyVector::size_type       size_type;
+  typedef typename KeyVector::difference_type index_type;
 
   typedef std::vector< index_type >  IndexVector;
 

@@ -39,9 +39,9 @@ namespace libecs
 {
 
   // Constructor
-  Logger::Logger( ModelCref aModel, PropertySlotRef aPropertySlot )
+  Logger::Logger( StepperCref aStepper, PropertySlotRef aPropertySlot )
     :
-    theModel( aModel ),
+    theStepper( aStepper ),
     thePropertySlot( aPropertySlot ),
     theLastTime( 0.0 ),
     theMinimumInterval( 0.0 ),
@@ -124,7 +124,7 @@ namespace libecs
 
   void Logger::appendData( RealCref aValue )
   {
-    const Real aTime( theModel.getCurrentTime() );
+    const Real aTime( theStepper.getCurrentTime() );
 
     theCurrentInterval = aTime - theLastTime;
 

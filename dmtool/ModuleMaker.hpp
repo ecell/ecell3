@@ -99,7 +99,7 @@ protected:
 
   typedef DynamicModuleBase<T,DMAllocator> Module;
   typedef map<const string, Module*> ModuleMap;
-  typedef ModuleMap::iterator ModuleMapIterator;
+  typedef typename ModuleMap::iterator ModuleMapIterator;
 
 public: 
 
@@ -139,6 +139,8 @@ protected:
 template<class T,class DMAllocator=SimpleAllocator( T )>
 class SharedModuleMaker : public StaticModuleMaker<T,DMAllocator>
 {
+
+  typedef typename StaticModuleMaker<T,DMAllocator>::Module Module;
 
 public:
 

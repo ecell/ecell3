@@ -80,7 +80,7 @@ namespace libecs
 
     PropertySlotMapConstIterator 
       aPropertySlotMapIterator( anEntityPtr->getPropertySlotMap().
-			    find( aPropertyName ) );
+				find( aPropertyName ) );
 
     if( aPropertySlotMapIterator == anEntityPtr->getPropertySlotMap().end() )
       {
@@ -89,7 +89,9 @@ namespace libecs
 
     PropertySlotPtr aPropertySlotPtr( aPropertySlotMapIterator->second );
 
-    LoggerPtr aNewLogger( new Logger( theModel, *(aPropertySlotPtr) ) );
+    //    LoggerPtr aNewLogger( new Logger( theModel, *(aPropertySlotPtr) ) );
+    LoggerPtr aNewLogger( new Logger( *( anEntityPtr->getStepper() ),
+				      *(aPropertySlotPtr) ) );
     theLoggerMap[fpn] = aNewLogger;
     aPropertySlotPtr->connectLogger(theLoggerMap[fpn]);
 

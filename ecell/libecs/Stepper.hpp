@@ -81,6 +81,18 @@ namespace libecs
     void connectSystem( SystemPtr aSystem );
     void disconnectSystem( SystemPtr aSystem );
 
+
+    RealCref getCurrentTime() const
+    {
+      return theCurrentTime;
+    }
+
+    void setCurrentTime( RealCref aTime )
+    {
+      theCurrentTime = aTime;
+    }
+
+
     /**
 
     This may be overridden in dynamically scheduled steppers.
@@ -91,12 +103,12 @@ namespace libecs
 
     void calculateStepsPerSecond();
 
-    virtual RealCref getStepInterval() const
+    RealCref getStepInterval() const
     {
       return theStepInterval;
     }
 
-    virtual RealCref getStepsPerSecond() const
+    RealCref getStepsPerSecond() const
     {
       return theStepsPerSecond;
     }
@@ -127,8 +139,15 @@ namespace libecs
     void registerPropertySlot( PropertySlotPtr );
 
     virtual void sync();
-    virtual const Real step() { }
+    void step() 
+    { 
+      compute();
+      theCurrentTime += getStepInterval();
+    }
     virtual void push();
+
+    // each stepper class defines this
+    virtual void compute() = 0;
 
 
     StringCref getName() const
@@ -141,6 +160,13 @@ namespace libecs
       theName = aName;
     }
 
+
+    bool operator<( StepperCref rhs )
+    {
+      return getCurrentTime() < rhs.getCurrentTime();
+    }
+
+
     virtual StringLiteral getClassName() const  { return "Stepper"; }
 
 
@@ -149,6 +175,8 @@ namespace libecs
     void searchSlaves( SystemPtr aStartSystemPtr );
 
   protected:
+
+    Real                theCurrentTime;
 
     Real                theStepInterval;
     Real                theStepsPerSecond;
@@ -233,14 +261,13 @@ namespace libecs
     SRMStepper();
     virtual ~SRMStepper() {}
 
-    virtual const Real step()
+    virtual void compute()
     {
       clear();
       differentiate();
       integrate();
-      compute();
+      //???();
 
-      return getStepInterval();
     }
 
     virtual void initialize();
@@ -249,7 +276,7 @@ namespace libecs
     virtual void differentiate();
     virtual void turn();
     virtual void integrate();
-    virtual void compute();
+    //    virtual void ???();
 
     virtual StringLiteral getClassName() const  { return "SRMStepper"; }
  

@@ -115,8 +115,8 @@ namespace libecs
     void
     createPropertySlot( StringCref name,
 			T& object,
-			ConcretePropertySlot<T,UVariableVectorRCPtr>::SetMethodPtr set,
-			ConcretePropertySlot<T,UVariableVectorRCPtr>::GetMethodPtr get )
+			typename ConcretePropertySlot<T,UVariableVectorRCPtr>::SetMethodPtr set,
+			typename ConcretePropertySlot<T,UVariableVectorRCPtr>::GetMethodPtr get )
     {
       appendSlot( new ConcretePropertySlot<T,UVariableVectorRCPtr>( name, 
 								object, 
@@ -128,8 +128,10 @@ namespace libecs
     void
     createPropertySlot( StringCref name,
 			T& object,
-			ConcretePropertySlot<T,Real>::SetMethodPtr set,
-			ConcretePropertySlot<T,Real>::GetMethodPtr get )
+			typename ConcretePropertySlot<T,Real>::
+			SetMethodPtr set,
+			typename ConcretePropertySlot<T,Real>::
+			GetMethodPtr get )
     {
       appendSlot( new ConcretePropertySlot<T,Real>( name, 
 						    object, 
@@ -141,8 +143,10 @@ namespace libecs
     void
     createPropertySlot( StringCref name,
 			T& object,
-			ConcretePropertySlot<T,String>::SetMethodPtr set,
-			ConcretePropertySlot<T,String>::GetMethodPtr get )
+			typename ConcretePropertySlot<T,String>::
+			SetMethodPtr set,
+			typename ConcretePropertySlot<T,String>::
+			GetMethodPtr get )
     {
       appendSlot( new ConcretePropertySlot<T,String>( name, 
 						      object, 

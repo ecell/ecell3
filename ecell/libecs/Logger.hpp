@@ -68,7 +68,8 @@ namespace libecs
 
     */
   
-    explicit Logger( ModelCref aModel, PropertySlotRef aPropertySlot );
+    //    explicit Logger( ModelCref aModel, PropertySlotRef aPropertySlot );
+    explicit Logger( StepperCref aStepper, PropertySlotRef aPropertySlot );
 
   
     /// Destructor
@@ -200,7 +201,8 @@ namespace libecs
 
     /// Data members
 
-    ModelCref            theModel;
+    //    ModelCref            theModel;
+    StepperCref          theStepper;
     PropertySlotRef      thePropertySlot;
 
     DataPointVectorRCPtr theDataPointVector;

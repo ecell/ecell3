@@ -51,15 +51,16 @@ namespace libecs
     convertTo( aValue, Type2Type< ToType >() );
   }
 
-
   template< typename FromType, typename ToType >
   ToType convertTo( const FromType& aValue, Type2Type<ToType> )
   {
-    DefaultSpecializationInhibited();
+    //    DefaultSpecializationInhibited();
+#warning "unexpected default specialization of convertTo()"
+    return ToType( aValue );
   }
 
-  // to UVariableVectorRCPtr
 
+  // to UVariableVectorRCPtr
 
   // identity
 
@@ -290,8 +291,8 @@ namespace libecs
 
     DECLARE_TYPE( SlotType_, SlotType );
 
-    typedef const SlotType, GetType;
-    typedef SlotTypeCref, SetType;
+    typedef const SlotType GetType;
+    typedef SlotTypeCref SetType;
 
     typedef GetType ( T::* GetMethodPtr )() const;
     typedef void ( T::* SetMethodPtr )( SlotTypeCref );
@@ -396,13 +397,19 @@ namespace libecs
 
   public:
 
+    typedef typename UpdatePolicy< T, SlotType_ >::SetType SetType;
+    typedef typename UpdatePolicy< T, SlotType_ >::GetType GetType;
+    typedef typename UpdatePolicy< T, SlotType_ >::SetMethodPtr SetMethodPtr;
+    typedef typename UpdatePolicy< T, SlotType_ >::GetMethodPtr GetMethodPtr;
+
+
     UpdateImmediately( T& anObject,
 		       const SetMethodPtr aSetMethodPtr,
 		       const GetMethodPtr aGetMethodPtr )
       : 
       UpdatePolicy< T, SlotType_ >( anObject, 
-					aSetMethodPtr,
-					aGetMethodPtr )
+				    aSetMethodPtr,
+				    aGetMethodPtr )
     {
       ; // do nothing
     }
@@ -440,6 +447,12 @@ namespace libecs
   {
 
   public:
+
+    typedef typename UpdatePolicy< T, SlotType_ >::SetType SetType;
+    typedef typename UpdatePolicy< T, SlotType_ >::GetType GetType;
+    typedef typename UpdatePolicy< T, SlotType_ >::SetMethodPtr SetMethodPtr;
+    typedef typename UpdatePolicy< T, SlotType_ >::GetMethodPtr GetMethodPtr;
+
 
     UpdateAtSync( T& anObject,
 		  const SetMethodPtr aSetMethodPtr,
@@ -568,10 +581,10 @@ namespace libecs
   protected:
 
     template < typename TYPE >
-    void setImpl( TYPE aValue )
+    inline void setImpl( TYPE aValue )
     {
       UpdatePolicy::set( convertTo( aValue, Type2Type< SetType >() ) );
-      //      UpdatePolicy::set( convertTo< SetType >( aValue ) );
+      //      UpdatePolicy::set( convertTo< TYPE, SetType >( aValue ) );
     }
 
     template < typename TYPE >

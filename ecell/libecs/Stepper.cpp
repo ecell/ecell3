@@ -47,6 +47,7 @@ namespace libecs
 
   Stepper::Stepper() 
     :
+    theCurrentTime( 0.0 ),
     theStepInterval( 0.001 )
   {
     calculateStepsPerSecond();
@@ -201,7 +202,8 @@ namespace libecs
   }
 
 
-  void SRMStepper::compute()
+#if 0
+  void SRMStepper::???()
   {
     //
     // Reactor::compute()
@@ -215,6 +217,8 @@ namespace libecs
     //    FOR_ALL( ReactorVector, theReactorCache, integrate );
 
   }
+
+#endif /* 0 */
 
   void SRMStepper::initialize()
   {
