@@ -76,27 +76,6 @@ namespace libecs
 				      NULLPTR,
 				      &Entity::getName ) );
 
-    registerSlot( getPropertySlotMaker()->
-		  createPropertySlot( "Activity", *this, 
-				      Type2Type<Real>(),
-				      &Entity::setActivity,
-				      &Entity::getActivity ) );
-
-    registerSlot( getPropertySlotMaker()->
-		  createPropertySlot( "ActivityPerSecond", *this,
-				      Type2Type<Real>(),
-				      NULLPTR,
-				      &Entity::getActivityPerSecond ) );
-  }
-
-  const Real Entity::getActivity() const
-  {
-    return 0.0;
-  }
-
-  const Real Entity::getActivityPerSecond() const
-  {
-    return getActivity() * getStepper()->getStepsPerSecond();
   }
 
   const FullID Entity::getFullID() const

@@ -28,6 +28,7 @@
 // E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
 
+#include <iostream>
 #include <functional>
 #include <algorithm>
 #include <limits>
@@ -166,7 +167,7 @@ namespace libecs
     SystemVectorIterator i( find( theSystemVector.begin(), 
 				  theSystemVector.end(),
 				  aSystem ) );
-
+    
     if( i == theSystemVector.end() )
       {
 	THROW_EXCEPTION( NotFound,
@@ -281,80 +282,101 @@ namespace libecs
     ; // do nothing
   }
 
-  void SRMStepper::clear()
-  {
-    //
-    // Substance::clear()
-    //
-    FOR_ALL( SRMSubstanceCache, theSubstanceCache, clear );
-
-    //
-    // Reactor::clear() ?
-    //
-    //FOR_ALL( ,, clear );
-
-    //
-    // System::clear() ?
-    //
-    //FOR_ALL( ,, clear );
-  }
-
-
-
-  void SRMStepper::react()
-  {
-    //
-    // Reactor::react()
-    //
-    FOR_ALL( ReactorVector, theReactorCache, react );
-
-    //
-    // Substance::turn()
-    //
-    FOR_ALL( SRMSubstanceCache, theSubstanceCache, turn );    
-  }
-
-
-  void SRMStepper::integrate()
-  {
-    //
-    // Reactor::integrate()
-    //
-    FOR_ALL( ReactorVector, theReactorCache, integrate );
-
-    //
-    // Substance::integrate()
-    //
-    FOR_ALL( SRMSubstanceCache, theSubstanceCache, integrate );
-
-    //
-    // System::integrate()
-    //
-    FOR_ALL( SystemVector, theSystemVector, integrate );
-
-  }
 
 
   void SRMStepper::initialize()
   {
     Stepper::initialize();
 
-    if( isEntityListChanged() )
-      {
-	theSubstanceCache.update( theSystemVector );
-	theReactorCache.update( theSystemVector );
+    //    if( isEntityListChanged() )
+    //      {
 
-	clearEntityListChanged();
-      }
+    theSubstanceCache.update( theSystemVector );
+    theSRMSubstanceCache.update( theSystemVector );
+    
+    theReactorCache.update( theSystemVector );
+    std::sort( theReactorCache.begin(), theReactorCache.end(),
+	       SRMReactor::PriorityCompare() );
+
+    theRuleReactorCache.clear();
+    std::remove_copy_if( theReactorCache.begin(), theReactorCache.end(),
+			 theRuleReactorCache.begin(), 
+			 std::not1( SRMReactor::IsRuleReactor() ) );
 
     distributeIntegrator( theIntegratorAllocator );
+
+    //    clearEntityListChanged();
+    //      }
+
   }
+
+
+  inline void SRMStepper::clear()
+  {
+    //
+    // Substance::clear()
+    //
+    FOR_ALL( SubstanceCache, theSubstanceCache, clear );
+      
+    //
+    // Reactor::clear() ?
+    //
+    //FOR_ALL( ,, clear );
+      
+    //
+    // System::clear() ?
+    //
+    //FOR_ALL( ,, clear );
+  }
+
+  inline void SRMStepper::react()
+  {
+    //
+    // Reactor::react()
+    //
+    FOR_ALL( ReactorCache, theReactorCache, react );
+
+    //
+    // Substance::turn()
+    //
+    FOR_ALL( SRMSubstanceCache, theSRMSubstanceCache, turn );    
+  }
+
+  inline void SRMStepper::integrate()
+  {
+    //
+    // Substance::integrate()
+    //
+    FOR_ALL( SubstanceCache, theSubstanceCache, integrate );
+  }
+
+  inline void SRMStepper::rule()
+  {
+    //
+    // Reactor::react() of RuleReactors
+    //
+    FOR_ALL( ReactorCache, theRuleReactorCache, react );
+  }
+
+
+  void SRMStepper::step()
+  {
+    clear();
+    react();
+    integrate();
+    rule();
+    
+    Stepper::step();
+  }
+
+
+
 
   void SRMStepper::distributeIntegrator( Integrator::AllocatorFuncPtr
 					 anAllocator )
   {
-    for( SRMSubstanceCache::const_iterator s( theSubstanceCache.begin() );
-	 s != theSubstanceCache.end() ; ++s )
+    for( SRMSubstanceCache::const_iterator s( theSRMSubstanceCache.begin() );
+	 s != theSRMSubstanceCache.end() ; ++s )
       {
 	(* anAllocator )(**s);
       }
@@ -387,13 +409,21 @@ namespace libecs
     return new RungeKutta4Integrator( aSubstance );
   }
 
-  void RungeKutta4SRMStepper::react()
+
+  void RungeKutta4SRMStepper::step()
   {
-    SRMStepper::react();
-    SRMStepper::react();
-    SRMStepper::react();
-    SRMStepper::react();
+    clear();
+    
+    react();
+    react();
+    react();
+    react();
+    
+    integrate();
+    
+    Stepper::step();
   }
+
 
 } // namespace libecs
 

@@ -42,6 +42,8 @@
 #include "Polymorph.hpp"
 #include "PropertyInterface.hpp"
 #include "System.hpp"
+
+// to be removed
 #include "Integrators.hpp"
 
 
@@ -416,7 +418,7 @@ namespace libecs
 
 
 
-  DECLARE_CLASS( SRMSubstance );
+  DECLARE_CLASS( SRMReactor );
 
   class SRMStepper 
     : 
@@ -424,26 +426,23 @@ namespace libecs
   {
   public:
 
+    typedef EntityCache<Substance> SubstanceCache;
     typedef EntityCache<Substance,SRMSubstance> SRMSubstanceCache;
-    typedef EntityCache<Reactor> ReactorCache;
+    typedef EntityCache<Reactor,SRMReactor> ReactorCache;
+    //    typedef EntityCache<Reactor,Reactor> ReactorCache;
 
     SRMStepper();
     virtual ~SRMStepper() {}
 
-    virtual void step()
-    {
-      clear();
-      react();
-      integrate();
+    virtual void step();
 
-      Stepper::step();
-    }
+
+    void clear();
+    void react();
+    void integrate();
+    void rule();
 
     virtual void initialize();
-
-    virtual void clear();
-    virtual void react();
-    virtual void integrate();
 
     virtual StringLiteral getClassName() const  { return "SRMStepper"; }
  
@@ -452,14 +451,17 @@ namespace libecs
 
     Integrator::AllocatorFuncPtr theIntegratorAllocator;
 
-    SRMSubstanceCache theSubstanceCache;
-    ReactorCache      theReactorCache;
+    SubstanceCache        theSubstanceCache;
+    SRMSubstanceCache     theSRMSubstanceCache;
+    ReactorCache          theReactorCache;
+    ReactorCache          theRuleReactorCache;
 
   private:
 
     virtual void distributeIntegrator( Integrator::AllocatorFuncPtr );
 
   };
+
 
   class Euler1SRMStepper
     :
@@ -494,7 +496,7 @@ namespace libecs
 
     static StepperPtr createInstance() { return new RungeKutta4SRMStepper; }
 
-    virtual void react();
+    virtual void step();
 
     virtual StringLiteral getClassName() const 
     { return "RungeKutta4SRMStepper"; }

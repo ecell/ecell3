@@ -215,7 +215,7 @@ SharedDynamicModule( const std::string& classname,
   theHandle( NULL )
 {
   std::string filename( directory + '/' + classname );
-  theHandle = dlopen( filename.c_str(), RTLD_NOW );
+  theHandle = dlopen( filename.c_str(), RTLD_GLOBAL | RTLD_NOW );
 
   if( theHandle == NULL ) 
     {
@@ -224,7 +224,7 @@ SharedDynamicModule( const std::string& classname,
       //       .so if there is *not* .la (as of libtool-1.4.2)....
       //       May be this can be eliminated and simplified in the future...
       filename += ".so";
-      theHandle = dlopen( filename.c_str(), RTLD_NOW );
+      theHandle = dlopen( filename.c_str(), RTLD_GLOBAL | RTLD_NOW );
 
       if( theHandle == NULL ) 
 	{

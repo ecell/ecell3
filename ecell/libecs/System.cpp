@@ -384,8 +384,7 @@ namespace libecs
 
   CompartmentSystem::CompartmentSystem()
     :
-    theVolume( 1.0 ),
-    theVolumeBuffer( theVolume )
+    theVolume( 1.0 )
   {
     makeSlots();
   }

@@ -33,10 +33,12 @@
 
 // #include <climits>
 
-#include <vector>
+#include "AssocVector.h"
+
 
 #include "libecs.hpp"
 #include "Entity.hpp"
+#include "Reactant.hpp"
 
 namespace libecs
 {
@@ -86,15 +88,10 @@ namespace libecs
     }
 
     virtual void initialize();
-
+    
     virtual void react() = 0;
-
-    virtual void integrate() 
-    { 
-      updateActivity();
-    }
-
-
+    
+    
     /**
        Set activity variable.  This must be set at every turn and takes
        [number of molecule that this reactor yields] / [deltaT].
@@ -105,20 +102,27 @@ namespace libecs
        @see getActivity(), getActivityPerSecond()
     */
 
-    virtual void setActivity( RealCref anActivity ) 
+    void setActivity( RealCref anActivity ) 
     { 
-      theActivityBuffer = anActivity; 
+      theActivity = anActivity; 
     }
 
-    virtual const Real getActivity() const
+    const Real getActivity() const
     {
       return theActivity;
     }
 
-    void updateActivity()
-    {
-      theActivity = theActivityBuffer;
-    }
+    /**
+       Returns activity value (per second).
+
+       Default action of this method is to return getActivity() / step
+       interval, but this action can be changed in subclasses.
+
+       @return activity of this Entity per second
+    */
+
+    const Real getActivityPerSecond() const;
+
 
 
     void setReactant( PolymorphVectorRCPtrCref aValue );
@@ -145,11 +149,14 @@ namespace libecs
     /**
        @return the number of substrates.
     */
-    const Int getNumberOfReactants() const;
+    const Int getNumberOfReactants() const
+    {
+      return theReactantMap.size();
+    }
 
   protected:
 
-    // convenience inline methods for use in subclasses
+    // convenience methods for use in subclasses
 
     PropertySlotPtr getPropertySlotOfReactant( StringCref aReactantName,
 					       StringCref aPropertyName );
@@ -160,11 +167,78 @@ namespace libecs
 
     ReactantMap theReactantMap;
 
+
   private:
 
     Real        theActivity;
 
-    Real        theActivityBuffer;
+  };
+
+
+
+  DECLARE_CLASS( SRMReactor );
+
+  class SRMReactor
+    :
+    public Reactor
+  {
+
+  public:
+
+    class IsRuleReactor
+      : 
+      public std::unary_function<SRMReactorPtr,bool>
+    {
+    public:
+      result_type operator()( const argument_type aReactorPtr ) const
+      {
+	return aReactorPtr->isRuleReactor();
+      }
+    };
+
+    class PriorityCompare
+    {
+    public:
+      bool operator()( SRMReactorPtr aLhs, SRMReactorPtr aRhs ) const
+      {
+	return ( aLhs->getPriority() < aRhs->getPriority() );
+      }
+    };
+
+    SRMReactor();
+    virtual ~SRMReactor();
+
+    virtual const bool isRuleReactor() const
+    {
+      return false; 
+    }
+
+
+    virtual void initialize();
+
+    virtual void react()
+    {
+      ; // do nothing
+    }
+
+    void setPriority( RealCref aValue )
+    {
+      thePriority = static_cast<Int>( aValue );
+    }
+
+    const Real getPriority() const
+    {
+      return static_cast<Real>( thePriority );
+    }
+
+
+  protected:
+
+    void makeSlots();
+
+  private:
+
+    Int         thePriority;
 
   };
 

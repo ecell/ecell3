@@ -82,9 +82,6 @@ namespace libecs
 
     virtual void initialize();
 
-    virtual void integrate() = 0;
-
-
     /**
        Get a pointer to a Stepper object that this System belongs.
 
@@ -131,12 +128,6 @@ namespace libecs
      */
 
     virtual void setVolume( RealCref aVolume ) = 0;
-
-    virtual void updateVolume()
-    {
-      ; // do nothing
-    }
-
 
     template <class C>
     const std::map<const String,C*> getMap() const
@@ -263,12 +254,6 @@ namespace libecs
 
     virtual void initialize();
 
-    virtual void integrate()
-    {
-      updateVolume();
-    }
-
-
     /**
        Get the volume of this System in [L] (liter).
 
@@ -278,11 +263,6 @@ namespace libecs
     virtual const Real getVolume() const
     {
       return getSuperSystem()->getVolume();
-    }
-
-    virtual void updateVolume()
-    {
-      getSuperSystem()->updateVolume();
     }
 
     virtual void registerReactor( ReactorPtr aReactor );
@@ -370,11 +350,6 @@ namespace libecs
 
     virtual void initialize();
 
-    virtual void integrate()
-    {
-      updateVolume();
-    }
-
     virtual const Real getVolume() const
     {
       return theVolume;
@@ -390,12 +365,7 @@ namespace libecs
 
     virtual void setVolume( RealCref aVolume )
     {
-      theVolumeBuffer = aVolume;
-    }
-
-    virtual void updateVolume()
-    {
-      theVolume = theVolumeBuffer;
+      theVolume = aVolume;
     }
 
     virtual StringLiteral getClassName() const { return "CompartmentSystem"; }

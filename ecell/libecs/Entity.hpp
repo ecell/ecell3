@@ -199,47 +199,6 @@ namespace libecs
 
     const String getFullIDString() const;
 
-    /**
-       Returns an activity value (per step interval) of this Entity.
-
-       Override this in subclasses.  If there is no overriding method,
-       this method returns zero.
-
-       FIXME: should be abstract
-
-       @return activity value per step interval of this Entity
-       @see getActivityPerSecond()
-    */
-
-    virtual const Real getActivity() const;
-
-    /**
-       Set an activity value (per step interval) of this Entity.
-
-       Override this in subclasses.  If there is no overriding method,
-       this method does nothing.
-
-       FIXME: should be abstract
-
-       @param anActivity activity of this Entity
-       @see   getActivity(), getActivityPerSecond()
-    */
-
-    virtual void setActivity( RealCref anActivity ) 
-    {
-      ; // do nothing
-    }
-
-    /**
-       Returns activity value (per second).
-
-       Default action of this method is to return getActivity() / step
-       interval, but this action can be changed in subclasses.
-
-       @return activity of this Entity per second
-    */
-
-    const Real getActivityPerSecond() const;
 
     //@}
 

@@ -91,10 +91,20 @@ namespace libecs
        Clear phase.
     */
 
-    //    virtual void clear() = 0;
+    virtual void clear() 
+    {
+      ; // do nothing
+    }
 
-    //    virtual void integrate() = 0;
+    virtual void turn()
+    {
+      ; // do nothing
+    }
 
+    virtual void integrate()
+    {
+      ; // do nothing
+    }
 
     /**
        @return the quantity of this substance.
@@ -330,6 +340,7 @@ namespace libecs
 
     void setIntegrator( IntegratorPtr anIntegrator ) 
     { 
+      delete theIntegrator;
       theIntegrator = anIntegrator; 
     }
 
@@ -352,7 +363,6 @@ namespace libecs
 
     /**
        This is called one or several times in react phase.
-       Time of call is determined by the type of the integrator.
     */
     void turn()
     {

@@ -61,6 +61,17 @@ namespace libecs
 				      Type2Type<Real>(),
 				      &Reactor::setActivity,
 				      &Reactor::getActivity ) );
+
+    registerSlot( getPropertySlotMaker()->
+		  createPropertySlot( "ActivityPerSecond", *this,
+				      Type2Type<Real>(),
+				      NULLPTR,
+				      &Reactor::getActivityPerSecond ) );
+  }
+
+  const Real Reactor::getActivityPerSecond() const
+  {
+    return getActivity() * getStepper()->getStepsPerSecond();
   }
 
   void Reactor::setReactant( PolymorphVectorRCPtrCref aValue )
@@ -97,9 +108,7 @@ namespace libecs
 
   Reactor::Reactor() 
     :
-    theActivity( 0.0 ),
-    theActivityBuffer( theActivity )
-
+    theActivity( 0.0 )
   {
     makeSlots();
   }
@@ -133,11 +142,6 @@ namespace libecs
     return ( *anIterator ).second;
   }
 
-  const Int Reactor::getNumberOfReactants() const
-  {
-    return theReactantMap.size();
-  }
-
   void Reactor::initialize()
   {
     ; // do nothing
@@ -152,6 +156,31 @@ namespace libecs
   }
 
 
+  void SRMReactor::makeSlots()
+  {
+    registerSlot( getPropertySlotMaker()->
+		  createPropertySlot( "Priority", *this, 
+				      Type2Type<Real>(), // Int?
+				      &SRMReactor::setPriority,
+				      &SRMReactor::getPriority ) );
+  }
+
+  SRMReactor::SRMReactor() 
+    :
+    thePriority( 0 )
+  {
+    makeSlots();  
+  } 
+
+  SRMReactor::~SRMReactor()
+  {
+    ; // do nothing
+  }
+
+  void SRMReactor::initialize()
+  {
+    Reactor::initialize();
+  }
 
 
 } // namespace libecs
