@@ -44,11 +44,6 @@ namespace libecs
   DECLARE_CLASS( System );
   DECLARE_CLASS( AccumulatorMaker );
   DECLARE_CLASS( Accumulator );
-  DECLARE_CLASS( Environment );
-  DECLARE_CLASS( Monolithic );
-  DECLARE_CLASS( Cytoplasm );
-  DECLARE_CLASS( Membrane );
-  DECLARE_CLASS( Cell );
   DECLARE_CLASS( Entity );
   DECLARE_CLASS( PrimitiveType );
   DECLARE_CLASS( SystemPath );
@@ -100,11 +95,6 @@ namespace libecs
 
 
 } // namespace libecs
-
-
-// this is here to avoid inter-dependency problem
-#include "PrimitiveType.hpp"
-
 
 #endif // __LIBECS_HPP
 

@@ -34,6 +34,7 @@
 
 #include "libecs/libecs.hpp"
 #include "libecs/Message.hpp"
+#include "libecs/PrimitiveType.hpp"
 
 #include "SimulatorImplementation.hpp"
 

@@ -42,8 +42,6 @@
 namespace libecs
 {
 
-  DECLARE_CLASS( AbstractPropertySlot );
-
   DECLARE_MAP( const String, AbstractPropertySlotPtr, 
 	       less<const String>, PropertyMap );
 

@@ -31,6 +31,7 @@
 #ifndef ___ENTITY_H___
 #define ___ENTITY_H___
 #include "libecs.hpp"
+#include "PrimitiveType.hpp"
 #include "PropertyInterface.hpp"
 
 
