@@ -181,41 +181,35 @@ namespace libecs
   const Real ExpressionProcessBase::VirtualMachine::execute( CodeCref aCode )
   {
 
-#define FETCH_INSTRUCTION()\
-    anInstructionHead = \
-      ( reinterpret_cast<const ExpressionCompiler::InstructionHead*>( aPC ) );
+#define FETCH_OPCODE()\
+    reinterpret_cast<const ExpressionCompiler::InstructionHead* const>( aPC )\
+      ->getOpcode() 
 
 #define DECODE_INSTRUCTION( OPCODE )\
     typedef ExpressionCompiler::\
       Opcode2Instruction<ExpressionCompiler::OPCODE>::type CurrentInstruction;\
-    const CurrentInstruction* const\
-       anInstruction( reinterpret_cast< const CurrentInstruction* >\
-      ( anInstructionHead ) );
+    const CurrentInstruction* const anInstruction\
+      ( reinterpret_cast<const CurrentInstruction* const>( aPC ) )
 
 
 #define INCREMENT_PC( OPCODE )\
     aPC += sizeof( ExpressionCompiler::\
-                   Opcode2Instruction<ExpressionCompiler::OPCODE>::type );
+                   Opcode2Instruction<ExpressionCompiler::OPCODE>::type ); //
 
     //    std::cout << #OPCODE << std::endl;
 
-    StackElement    aStack[100];
+    StackElement aStack[100];
+    aStack[0].theReal = 0.0;
     StackElementPtr aStackPtr( aStack );
-    aStackPtr->theReal = 0.0;
 
-    const char* aPC( &aCode[0] );
-
-    const ExpressionCompiler::InstructionHead* anInstructionHead;
-    FETCH_INSTRUCTION();
+    const unsigned char* aPC( &aCode[0] );
 
     while( 1 )
       {
-	const ExpressionCompiler::Opcode 
-	  anOpcode( anInstructionHead->getOpcode() );
 
 	Real bypass;
 
-	switch ( anOpcode )
+	switch ( FETCH_OPCODE() )
 	  {
 
 	  case ExpressionCompiler::PUSH_REAL:
@@ -223,6 +217,7 @@ namespace libecs
               DECODE_INSTRUCTION( PUSH_REAL );
 
 	      bypass = anInstruction->getOperand();
+
 	      INCREMENT_PC( PUSH_REAL );
 	      goto bypass_real;
 	    }
@@ -232,21 +227,18 @@ namespace libecs
 	      DECODE_INSTRUCTION( LOAD_REAL );
 	      
 	      bypass = *( anInstruction->getOperand() );
+
 	      INCREMENT_PC( LOAD_REAL );
 	      goto bypass_real;
 	    }
 
-	  case ExpressionCompiler::VARREF_METHOD:
+	  case ExpressionCompiler::VARREF_REAL_METHOD:
 	    {
-	      DECODE_INSTRUCTION( VARREF_METHOD );
+	      DECODE_INSTRUCTION( VARREF_REAL_METHOD );
 	      
-	      const ExpressionCompiler::VariableReferenceMethod&
-		aVariableReferenceMethod( anInstruction->getOperand() );
+	      bypass = ( anInstruction->getOperand() )();
 
-	      bypass = 
-		( ( *( aVariableReferenceMethod.theOperand1 ) ).*( aVariableReferenceMethod.theOperand2 ) )();
-
-	      INCREMENT_PC( VARREF_METHOD );
+	      INCREMENT_PC( VARREF_REAL_METHOD );
 	      goto bypass_real;
 	    }
 
@@ -258,7 +250,7 @@ namespace libecs
 	      aStackPtr->theInteger = anInstruction->getOperand();
 
 	      INCREMENT_PC( PUSH_INTEGER );
-	      goto next;
+	      continue;
 	    }
 
 	  case ExpressionCompiler::PUSH_POINTER:
@@ -269,7 +261,7 @@ namespace libecs
 	      aStackPtr->thePointer = anInstruction->getOperand();
 	      
 	      INCREMENT_PC( PUSH_POINTER );
-	      goto next;
+	      continue;
 	    }
 
 	  case ExpressionCompiler::NEG:
@@ -277,7 +269,7 @@ namespace libecs
 	      aStackPtr->theReal = - aStackPtr->theReal;
 
 	      INCREMENT_PC( NEG );
-	      goto next;
+	      continue;
 	    }
 
 	  case ExpressionCompiler::ADD:
@@ -288,7 +280,7 @@ namespace libecs
 	      aStackPtr->theReal += aStackTopValue;
 
 	      INCREMENT_PC( ADD );
-	      goto next;
+	      continue;
 	    }
 
 	  case ExpressionCompiler::SUB:
@@ -299,9 +291,8 @@ namespace libecs
 	      aStackPtr->theReal -= aStackTopValue;
 
 	      INCREMENT_PC( SUB );
-	      goto next;
+	      continue;
 	    }
-
 
 	  case ExpressionCompiler::MUL:
 	    {
@@ -311,18 +302,18 @@ namespace libecs
 	      aStackPtr->theReal *= aStackTopValue;
 
 	      INCREMENT_PC( MUL );
-	      goto next;
+	      continue;
 	    }
 
 	  case ExpressionCompiler::DIV:
 	    {
 	      Real aStackTopValue( aStackPtr->theReal );
-	      --aStackPtr;
-	      
+	      --aStackPtr;	      
+
 	      aStackPtr->theReal /= aStackTopValue;
 
 	      INCREMENT_PC( DIV );
-	      goto next;
+	      continue;
 	    }
 
 	  case ExpressionCompiler::POW:
@@ -333,7 +324,7 @@ namespace libecs
 	      aStackPtr->theReal = pow( aStackPtr->theReal, aStackTopValue );
 
 	      INCREMENT_PC( POW );
-	      goto next;
+	      continue;
 	    }
 
 	  case ExpressionCompiler::EQ:
@@ -352,7 +343,7 @@ namespace libecs
 
 
 	      INCREMENT_PC( EQ );
-	      goto next;
+	      continue;
 	    }
 
 	  case ExpressionCompiler::NEQ:
@@ -364,7 +355,7 @@ namespace libecs
 		Real( aStackPtr->theReal != aStackTopValue );
 
 	      INCREMENT_PC( NEQ );
-	      goto next;
+	      continue;
 	    }
 
 	  case ExpressionCompiler::GT:
@@ -375,7 +366,7 @@ namespace libecs
 	      aStackPtr->theReal = Real( aStackPtr->theReal > aStackTopValue );
 
 	      INCREMENT_PC( GT );
-	      goto next;
+	      continue;
 	    }
 
 	  case ExpressionCompiler::GEQ:
@@ -387,7 +378,7 @@ namespace libecs
 		Real( aStackPtr->theReal >= aStackTopValue );
 
 	      INCREMENT_PC( GEQ );
-	      goto next;
+	      continue;
 	    }
 
 	  case ExpressionCompiler::LT:
@@ -398,7 +389,7 @@ namespace libecs
 	      aStackPtr->theReal = Real( aStackPtr->theReal < aStackTopValue );
 
 	      INCREMENT_PC( LT );
-	      goto next;
+	      continue;
 	    }
 
 	  case ExpressionCompiler::LEQ:
@@ -410,7 +401,7 @@ namespace libecs
 		Real( aStackPtr->theReal <= aStackTopValue );
 
 	      INCREMENT_PC( LEQ );
-	      goto next;
+	      continue;
 	    }
 
 	  case ExpressionCompiler::AND:
@@ -422,7 +413,7 @@ namespace libecs
 		Real( aStackTopValue && aStackPtr->theReal );
 
 	      INCREMENT_PC( AND );
-	      goto next;
+	      continue;
 	    }
 
 	  case ExpressionCompiler::OR:
@@ -434,7 +425,7 @@ namespace libecs
 		Real( aStackTopValue || aStackPtr->theReal );
 
 	      INCREMENT_PC( OR );
-	      goto next;
+	      continue;
 	    }
 
 	  case ExpressionCompiler::XOR:
@@ -446,7 +437,7 @@ namespace libecs
 		Real( aStackPtr->theReal && !( aStackTopValue ) );
 
 	      INCREMENT_PC( XOR );
-	      goto next;
+	      continue;
 	    }
 
 	  case ExpressionCompiler::NOT:
@@ -454,7 +445,7 @@ namespace libecs
 	      aStackPtr->theReal = !( aStackPtr->theReal );
 
 	      INCREMENT_PC( NOT );
-	      goto next;
+	      continue;
 	    }
 
 	  case ExpressionCompiler::CALL_FUNC1:
@@ -465,7 +456,7 @@ namespace libecs
 		= ( anInstruction->getOperand() )( aStackPtr->theReal );
 	      
 	      INCREMENT_PC( CALL_FUNC1 );
-	      goto next;
+	      continue;
 	    }
 
 	  case ExpressionCompiler::CALL_FUNC2:
@@ -476,67 +467,73 @@ namespace libecs
 	      --aStackPtr;
 
 	      aStackPtr->theReal
-		= ( anInstruction->getOperand() )( aStackPtr->theReal, aStackTopValue );
-
+		= ( anInstruction->getOperand() )( aStackPtr->theReal, 
+						   aStackTopValue );
 
 	      INCREMENT_PC( CALL_FUNC2 );
-	      goto next;
+	      continue;
 	    }
-	  
 
 	  case ExpressionCompiler::PROCESS_TO_SYSTEM_METHOD:
 	    {
 	      DECODE_INSTRUCTION( PROCESS_TO_SYSTEM_METHOD );
 
-	      reinterpret_cast<System*>( aStackPtr->thePointer ) =
-		( *( reinterpret_cast<Process*>( aStackPtr->thePointer ) ).*( anInstruction->getOperand() ) )();
+	      ProcessPtr const aProcessPtr( static_cast<ProcessPtr>
+					    ( aStackPtr->thePointer ) );
+
+	      aStackPtr->thePointer =
+		( aProcessPtr->*( anInstruction->getOperand() ) )();
 
 	      INCREMENT_PC( PROCESS_TO_SYSTEM_METHOD );
-	      goto next;
+	      continue;
 	    }
 
 	  case ExpressionCompiler::VARREF_TO_SYSTEM_METHOD:
 	    {
 	      DECODE_INSTRUCTION( VARREF_TO_SYSTEM_METHOD );
 
-	      reinterpret_cast<System*>( aStackPtr->thePointer ) =
-		( *( reinterpret_cast<VariableReference*>
-		     ( aStackPtr->thePointer ) ).*( anInstruction->getOperand() ) )();
+	      VariableReferencePtr const 
+		aVariableReferencePtr( static_cast<VariableReferencePtr>
+				       ( aStackPtr->thePointer ) );
+
+	      aStackPtr->thePointer =
+		( aVariableReferencePtr->*( anInstruction->getOperand() ) )();
 
 	      INCREMENT_PC( VARREF_TO_SYSTEM_METHOD );
-	      goto next;
+	      continue;
 	    }
 
 	  case ExpressionCompiler::SYSTEM_TO_REAL_METHOD:
 	    {
 	      DECODE_INSTRUCTION( SYSTEM_TO_REAL_METHOD );
 
+	      SystemPtr const aSystemPtr( static_cast<SystemPtr>
+					  ( aStackPtr->thePointer ) );
+
 	      aStackPtr->theReal =
-		( *( reinterpret_cast<System*>( aStackPtr->thePointer ) ).*( anInstruction->getOperand() ) )();
+		( aSystemPtr->*( anInstruction->getOperand() ) )();
 
 	      INCREMENT_PC( SYSTEM_TO_REAL_METHOD );
-	      goto next;
+	      continue;
 	    }
 
 	  case ExpressionCompiler::RET:
 	    {
-              //DECODE_INSTRUCTION( RET );
-	      //INCREMENT_PC( RET );
-
 	      return aStackPtr->theReal;
 	    }
 
 	  default:
-	    THROW_EXCEPTION( UnexpectedError, "Invalid instruction." );
+	    {
+	      THROW_EXCEPTION( UnexpectedError, "Invalid instruction." );
+	    }
+
 	  }
 
       bypass_real:
 
 #if defined( ENABLE_STACKOPS_FOLDING )
 
-	FETCH_INSTRUCTION();
-
-	switch( anInstructionHead->getOpcode() )
+	switch( FETCH_OPCODE() )
 	  {
 	  case ExpressionCompiler::ADD:
 	    {
@@ -594,16 +591,12 @@ namespace libecs
 
 	  default:
 	    {
-	      if( anInstructionHead->getOpcode() <= ExpressionCompiler::END )
-		{
-		  ++aStackPtr;
-		  aStackPtr->theReal = bypass;
-		  continue;
-		}
-	      else
-		{
-		  THROW_EXCEPTION( UnexpectedError, "Invalid instruction." );
-		}
+	      // no need to do invalid instruction check here because
+	      // it will be done in the next cycle.
+
+	      ++aStackPtr;
+	      aStackPtr->theReal = bypass;
+	      break;
 	    }
 
 	  }
@@ -613,10 +606,6 @@ namespace libecs
 	aStackPtr->theReal = bypass;
 
 #endif /* defined( ENABLE_STACKOPS_FOLDING ) */
-
-      next:
-	
-	FETCH_INSTRUCTION();
 
       }
 
