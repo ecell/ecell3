@@ -76,6 +76,43 @@ namespace libecs
 
     DM_BASECLASS( Stepper );
 
+    class PriorityCompare
+    {
+    public:
+      bool operator()( StepperPtr aLhs, StepperPtr aRhs ) const
+      {
+	return compare( aLhs->getPriority(), aRhs->getPriority() );
+      }
+
+      bool operator()( StepperPtr aLhs, const Int aRhs ) const
+      {
+	return compare( aLhs->getPriority(), aRhs );
+      }
+
+      bool operator()( const Int aLhs, StepperPtr aRhs ) const
+      {
+	return compare( aLhs, aRhs->getPriority() );
+      }
+
+    private:
+
+      // if statement can be faster than returning an expression directly
+      inline static bool compare( const Int aLhs, const Int aRhs )
+      {
+	if( aLhs < aRhs )
+	  {
+	    return true;
+	  }
+	else
+	  {
+	    return false;
+	  }
+      }
+
+
+    };
+
+
 
     //    typedef std::pair<StepperPtr,Real> StepIntervalConstraint;
     //    DECLARE_VECTOR( StepIntervalConstraint, StepIntervalConstraintVector );
@@ -331,6 +368,31 @@ namespace libecs
     }
 
 
+    /**
+       Set a priority value of this Stepper.
+
+       The priority is an Int value which is used to determine the
+       order of step when more than one Stepper is scheduled at the
+       same point in time (such as starting up: t=0).
+
+       @param aValue the priority value as an Int.
+       @see Scheduler
+    */
+
+    SET_METHOD( Int, Priority )
+    {
+      thePriority = value;
+    }
+
+    /**
+       @see setPriority()
+    */
+
+    GET_METHOD( Int, Priority )
+    {
+      return thePriority;
+    }
+
   
     //    void setStepIntervalConstraint( PolymorphCref aValue );
 
@@ -486,6 +548,7 @@ m
     
     // the index on the scheduler
     Int                 theSchedulerIndex;
+    Int                 thePriority;
 
     Real                theCurrentTime;
 
