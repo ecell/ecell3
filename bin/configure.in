@@ -16,5 +16,5 @@ dnl Checks for typedefs, structures, and compiler characteristics.
 dnl Checks for library functions.
 
 AC_OUTPUT(Makefile ecell3-dmc
-,chmod +x em2eml eml2em rd2dm eri2eml ecell3-dmc ecell3-em2eml)
+,chmod +x em2eml eml2em rd2dm eri2eml ecell3-dmc ecell3-em2eml ecell3-eml2em)
 
