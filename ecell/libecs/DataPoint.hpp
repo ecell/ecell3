@@ -76,7 +76,7 @@ namespace libecs
        @param Object constant reference
     */
     
-    explicit DataPoint( DataPointCref );
+    DataPoint( DataPointCref );
     
     
     /**
@@ -84,7 +84,7 @@ namespace libecs
        @param Object constant reference
     */
     
-    explicit DataPoint( DataPointRef );
+    DataPoint( DataPointRef );
     
     
     /// Destructor
@@ -101,9 +101,6 @@ namespace libecs
        @return DataPoint reference
     */
     
-    /*
-      DataPointRef operator=( DataPointCref );
-    */
 
 
     // FIXME
@@ -166,6 +163,7 @@ namespace libecs
     
     DataPoint& operator[]( int );
     
+    //    DataPointRef operator=( DataPointCref );
     
     //
     // Mutators

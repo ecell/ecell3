@@ -49,8 +49,6 @@ namespace libemc
 
   public:
 
-    LocalLoggerImplementation( void );
-
     LocalLoggerImplementation( LoggerCptr );
 
     virtual ~LocalLoggerImplementation( );
@@ -76,6 +74,11 @@ namespace libemc
     {
       return theLogger.getEndTime();
     }
+
+
+  private:
+
+    LocalLoggerImplementation( void );
 
   private:
 

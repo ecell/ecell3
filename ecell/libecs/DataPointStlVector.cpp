@@ -53,10 +53,12 @@ namespace libecs
 
   DataPointStlVector::~DataPointStlVector( void )
   {
+    /*
     for( iterator i( theContainer.begin() ) ; i < theContainer.end(); i++ )
       {
 	delete *i;
       }
+    */
   }
 
   //
@@ -68,9 +70,11 @@ namespace libecs
 		const_iterator last,
 		RealCref aTime) const
   {
+    /*
     Containee aContainee( aTime, aTime );
     const_iterator itr = lower_bound( first, last, &aContainee );
     return itr;
+    */
   }
 
 

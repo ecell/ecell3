@@ -65,8 +65,9 @@ namespace libecs
   //
   
   const Logger::DataPointVector Logger::getData( RealCref aStartTime,
-					       RealCref anEndTime ) const
+						 RealCref anEndTime ) const
   {
+    /*
     const_iterator itr_1( theDataPointVector.begin() );
     const_iterator itr_2( theDataPointVector.end() );
     
@@ -89,6 +90,7 @@ namespace libecs
       }
     
     return aNewDataPointVector;
+    */
   }
   
   
@@ -99,6 +101,7 @@ namespace libecs
 						 RealCref anEndTime,
 						 RealCref anInterval ) const
   {
+    /*
     const_iterator aFirstIterator( binary_search( theDataPointVector.begin(),
 						  theDataPointVector.end(),
 						  aStartTime ) );
@@ -124,6 +127,7 @@ namespace libecs
       }
     
     return aDataPointVector;
+    */
   }
   
   
@@ -132,7 +136,7 @@ namespace libecs
     const Real aTime( (theGetCurrentTimeMethod)() );
     if( !theDataPointVector.empty() )
       {
-	theCurrentInterval = aTime - theDataPointVector.back()->getTime();
+    	theCurrentInterval = aTime - theDataPointVector.back().getTime();
       }
     theDataPointVector.push( aTime, aValue );
     if(theMinimumInterval < theCurrentInterval )
@@ -155,7 +159,7 @@ namespace libecs
   {
     if(!theDataPointVector.empty())
       {
-	return (*theDataPointVector.begin())->getTime();
+	return theDataPointVector.front().getTime();
       }
     else
       {
@@ -171,7 +175,7 @@ namespace libecs
   {
     if(!theDataPointVector.empty())
       {
-	return theDataPointVector.back()->getTime();
+	return theDataPointVector.back().getTime();
       }
     else
       {

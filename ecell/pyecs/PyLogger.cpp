@@ -116,8 +116,8 @@ Object PyLogger::convertVector( libecs::Logger::DataPointVectorCref aVector )
       ++anItr)
     {
       Py::Tuple aPyTuple( 2 );
-      aPyTuple[0] = Py::Float( (*anItr)->getTime() );
-      aPyTuple[1] = Py::Float( (*anItr)->getValue() );
+      aPyTuple[0] = Py::Float( (*anItr).getTime() );
+      aPyTuple[1] = Py::Float( (*anItr).getValue() );
       aReturnedPyTuple[i] = aPyTuple;
       ++i;
     }

@@ -46,7 +46,7 @@ namespace libecs
    */
   DECLARE_CLASS(DataPointStlVector);
   DECLARE_TYPE(DataPoint,Containee);
-  DECLARE_VECTOR(ContaineePtr,Container);
+  DECLARE_VECTOR(Containee,Container);
 
   class DataPointStlVector
   {
@@ -106,6 +106,11 @@ namespace libecs
       return theContainer.end();
     }
 
+    const_reference front() const
+    {
+      return theContainer.front();
+    }
+
     const_reference back() const
     {
       return theContainer.back();
@@ -126,24 +131,31 @@ namespace libecs
       return theContainer.back();
     }
 
+
+    void push( ContaineeRef aRef )
+    {
+      theContainer.push_back( aRef );
+    }
+
     void push( ContaineeCref aCref )
     {
-      theContainer.push_back( new Containee( aCref ) );
+      theContainer.push_back( aCref );
     }
 
     void push( ContaineePtr aPtr )
     {
-      theContainer.push_back( new Containee( *aPtr ) );
+      theContainer.push_back( *aPtr );
     }
+
 
     void push( RealCref t, UVariableCref v )
     {
-      theContainer.push_back( new Containee( t, v ) );
+      theContainer.push_back( Containee( t, v ) );
     }
 
     void push( RealCref t, RealCref v )
     {
-      theContainer.push_back( new Containee( t, v ) );
+      theContainer.push_back( Containee( t, v ) );
     }
 
     const_iterator binary_search( const_iterator first,
