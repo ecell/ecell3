@@ -9,18 +9,12 @@ class PySimulator
   public Py::PythonExtension< PySimulator >,
   public Simulator
 {
-
-  Simulator* theSimulator;
-
 public:
   
   PySimulator();
   ~PySimulator(){};
 
   static void init_type();
-
-  PySimulator* getPySimulatorPtr() { return this; }
-  Simulator* getSimulatorPtr() { return theSimulator; }
 
   Py::Object makePrimitive( const Py::Tuple& args );
   Py::Object sendMessage( const Py::Tuple& args );

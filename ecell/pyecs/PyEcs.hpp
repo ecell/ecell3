@@ -15,7 +15,7 @@ public:
  
   static void init_type();
   
-  Py::Object makeSimulator( const Py::Tuple& args );
+  Py::Object createSimulator( const Py::Tuple& args );
 
 private:
 

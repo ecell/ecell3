@@ -2,7 +2,7 @@
 
 Simulator::Simulator()
 {
-  theSimulatorImplementation = new SimulatorImplementation();
+  theSimulatorImplementation = new LocalSimulatorImplementation();
 }
 
 void Simulator::makePrimitive( StringCref classname, FQPNCref fqpn, StringCref name )

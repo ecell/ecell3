@@ -6,15 +6,12 @@ PySimulator::PySimulator()
   add_varargs_method( "sendMessage", &PySimulator::sendMessage );
   add_varargs_method( "getMessage", &PySimulator::getMessage );
   add_varargs_method( "step", &PySimulator::step );
-
-  theSimulator = new Simulator();
 }
 
 Py::Object PySimulator::step( const Py::Tuple& args )
 {
   cout<<"this is PySimulator::step module."<<endl;
-  theSimulator->step();
-
+  //  Simulator::step()
   return Py::Object();
 }
 

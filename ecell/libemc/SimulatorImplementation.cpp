@@ -1,7 +1,5 @@
 #include "SimulatorImplementation.hpp"
 
-RootSystem* theRootSystem = new RootSystem();
-
 SimulatorImplementation::SimulatorImplementation()
 {
 }

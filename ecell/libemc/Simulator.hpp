@@ -1,12 +1,12 @@
 #ifndef ___SIMULATOR_H___
 #define ___SIMULATOR_H___
 
-#include "SimulatorImplementation.hpp"
+#include "LocalSimulatorImplementation.hpp"
 
 class Simulator
 {
 
-  SimulatorImplementation* theSimulatorImplementation;
+  LocalSimulatorImplementation* theSimulatorImplementation;
 
 public:
 

@@ -4,8 +4,11 @@
 #include "libecs/libecs.hpp"
 #include "libecs/RootSystem.hpp"
 #include "util/Message.hpp"
+#include "LocalSimulatorImplementation.hpp"
 
 class SimulatorImplementation
+  :
+  public LocalSimulatorImplementation
 {
 
 public:
@@ -14,14 +17,19 @@ public:
   ~SimulatorImplementation() {};
   RootSystem* getRootSystemPtr() { return theRootSystem; }
 
-  void makePrimitive( StringCref classname, FQPNCref fqpn, StringCref name );
-  void sendMessage( FQPNCref fqpn, MessageCref message );
-  //  Message getMessage( FQPNCref fqpn, StringCref propertyName );
-  void step();
+  virtual void makePrimitive( StringCref classname, FQPNCref fqpn, StringCref name ) = 0;
+  virtual void sendMessage( FQPNCref fqpn, MessageCref message ) = 0;
+  //  virtual Message getMessage( FQPNCref fqpn, StringCref propertyName ) = 0;
+  virtual void step() = 0;
 
 private:
 
   RootSystem* theRootSystem;
+  SubstanceMaker* theSubstanceMaker;
+  ReactorMaker* theReactorMaker;
+  SystemMaker* SystemtheMaker;
+  Stepper* theStepper;
+  Accumulator* theAccumulator;
 
 };   //end of class Simulator
 
