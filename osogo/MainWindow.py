@@ -165,7 +165,7 @@ class LogoAnimation:
 
             if ( self.__currentImage == self.END_ROTATION ):
 
-                if( self.extraCount == 12 ):
+                if( self.extraCount == 5 ):
                     self.__currentImage = self.START_ROTATION
                     self.extraCount = 0
                 else:
@@ -700,8 +700,6 @@ class MainWindow(OsogoWindow):
 				if running_flag:
 					self.theSession.run()
 				return gtk.TRUE		
-
-
 		
 		self.close()
 		self.theSession.QuitGUI()
@@ -710,12 +708,12 @@ class MainWindow(OsogoWindow):
 
 	def close( self ):
 		""" restores message method and closes window """
-
 		self.theSession.restoreMessageMethod()
 
                 if len( self.theSession.theModelName ) > 0:
                     self.theEntityListWindow.update()                    
 
+                self.theEntityListWindow.close()
 		OsogoWindow.close( self )
 
 
@@ -749,12 +747,11 @@ class MainWindow(OsogoWindow):
 		arg[0]  ---  simulation button (gtk.Button)
 		Returns None
 		"""
-
+                
                 if ( self.SimulationButton.getCurrentState() == 'stop' ):
 
                     self.setStartState()
                     self.theSession.run()
-
 
                 elif ( self.SimulationButton.getCurrentState() == 'run' ):
 
