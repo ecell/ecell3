@@ -52,7 +52,7 @@ class MainWindow(Window):
         #    setName( self )
         
         
-
+        
     def update( self ):
         aPropertyList = list( tmpget( 'PropertyList' ) )
         bPropertyList = testdic['Name'][0]
@@ -62,7 +62,7 @@ class MainWindow(Window):
         aPropertyList = aPropertyList[1:] 
         # remove PropertyList itself
         aPropertyList.remove( 'PropertyList' )
-
+        
         aPropertyList.remove( 'Name' )
         
         self.thePropertyClist.clear()
@@ -79,21 +79,39 @@ class MainWindow(Window):
         self.theIDEntry.set_text(toString(FQPPList.getID()))
         self.thePathEntry.set_text(toString(FQPPList.getSystemPath()))
         self.theNameEntry.set_text(bPropertyList)
-        
-        
-        
+
+        m=1
         for x in aPropertyList:
-            if x=='Substrate' or x=='Product' :
-                aValueList=tmpget(x)
+            
+            r=1
+            #            if x=='Substrate' or x=='Product' :
+            aValueList=tmpget(x)
+            aValueList=aValueList[1:]
+            num_list=len(aValueList)
+            if  num_list > 1 :
                 for y in aValueList :
-                    aValueList = map( toString, aValueList )
-                    dValueList=[x,y]
+                    dValueList=[x,r,y]
+                    dValueList = map( toString, dValueList )
                     self.thePropertyClist.append( dValueList ) 
+                    r=r+1
+                    #position =self.thePropertyClist.get_row_data(m)
+                    theDataSet = self.thePropertyClist.get_row_data(5)
+                    print theDataSet
+                    #           else:
+                    #              aValueList = tmpget( x )
+                    #             aValueList = map( toString, aValueList )
+                    #            self.thePropertyClist.append( aValueList )
+                    m=m+1
             else:
-                aValueList = tmpget( x )
-                aValueList = map( toString, aValueList )
-                self.thePropertyClist.append( aValueList )
-                
+                for y in aValueList :
+                    dValueList=[x,'',y]
+                    dValueList = map( toString, dValueList )
+                    self.thePropertyClist.append( dValueList ) 
+                    #position =self.thePropertyClist.get_row_data(m)
+                    #print position
+#                    theDataSet = self.thePropertyClist.get_row_data(5)
+ #                   print theDataSet
+                    m=m+1
         #for x in aPropertyList:
             #print x
             #aValueList = list( tmpget( x ) )
