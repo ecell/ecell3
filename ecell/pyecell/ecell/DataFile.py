@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env ecell3
 
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #
@@ -31,7 +31,7 @@
 # E-CELL Project, Lab. for Bioinformatics, Keio University.
 #
 
-from string import *
+import string
 
 # ------------------------------------------------------------------
 # DataFile (This is abstract class)
@@ -50,23 +50,6 @@ class DataFile:
 		self.theFileName = ''
 
 	# end of __init__
-
-
-	# ------------------------------------------------------------------
-	# setData (abstract method)
-	#
-	# aData(object) : data object
-	#
-	# If this method doesn't be implemented in sub class, 
-	# then throws NotImplementedError
-	# ------------------------------------------------------------------
-	#def setData(self, aData):
-
-	#	import inspect
-	#	caller = inspect.getouterframes(inspect.currentframe())[0][3]
-	#	raise NotImplementedError(caller + 'must be implemented in subclass')
-
-	# end of setData
 
 
 	# ------------------------------------------------------------------
@@ -102,20 +85,6 @@ class DataFile:
 
 
 	# ------------------------------------------------------------------
-	# theData
-	#
-	# return -> the data(string list)
-	# ------------------------------------------------------------------
-	#def theData(self):
-
-	#	import inspect
-	#	caller = inspect.getouterframes(inspect.currentframe())[0][3]
-	#	raise NotImplementedError(caller + 'must be implemented in subclass')
-
-	# end of theData
-
-
-	# ------------------------------------------------------------------
 	# save ( abstract )
 	#
 	# If this method doesn't be implemented in sub class, 
@@ -131,22 +100,6 @@ class DataFile:
 
 
 	# ------------------------------------------------------------------
-	# saveWithFileName
-	#
-	# aFileName(string)  : a file name 
-	#
-	# return -> None
-	# This method is throwable exception.
-	# ------------------------------------------------------------------
-	def saveWithFileName(self, aFileName):
-	
-		self.setFileName(aFileName)
-		self.save()
-
-	# end of saveWithFileName
-
-
-	# ------------------------------------------------------------------
 	# load
 	#
 	# If this method doesn't be implemented in sub class, 
@@ -159,22 +112,6 @@ class DataFile:
 		raise NotImplementedError(caller + 'must be implemented in subclass')
 
 	# end of load
-
-
-	# ------------------------------------------------------------------
-	# loadWithFileName
-	#
-	# aFileName(string)  : a file name 
-	#
-	# return -> None
-	# This method is throwable exception.
-	# ------------------------------------------------------------------
-	def loadWithFileName(self, aFileName):
-
-		self.setFileName(aFileName)
-		self.load()
-
-	# end of loadWithFileName
 
 
 # end of DataFile

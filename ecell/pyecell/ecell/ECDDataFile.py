@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env ecell3
 
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #
@@ -30,8 +30,12 @@
 # E-CELL Project, Lab. for Bioinformatics, Keio University.
 #
 
-from string import *
+import string
 from DataFile import *
+import Numeric
+
+# extension
+ECD_EXTENSION='ecd'
 
 # ------------------------------------------------------------------
 # ECDDataFile -> DataFile
@@ -39,25 +43,155 @@ from DataFile import *
 # ------------------------------------------------------------------
 class ECDDataFile( DataFile ):
 
-	# extension
-	theECDExtension='ecd'
 
 	# ------------------------------------------------------------------
 	# Constructor
 	#
 	# return -> None
 	# ------------------------------------------------------------------
-	def __init__(self):
+	def __init__(self, data=None, filename=None):
 
 		DataFile.__init__(self)
 		self.theDataName=''
 		self.theSizeOfColumn=0
 		self.theSizeOfLine=0
-		self.theLabel=''
+		self.theLabel= ( 't', 'value', 'avg', 'min', 'max' )
 		self.theNote=''
-		self.theMatrixData = [[]]
+
+		if data is None:
+			self.setData( Numeric.array([[]]) )
+		else:
+			self.setData( data )
+
+		if filename is not None:
+			self.setFileName( filename )
 
 	# end of __init__
+
+
+	# ------------------------------------------------------------------
+	# save ( override the method of DataFile class )
+	#
+	# return -> None
+	# This method is throwable exception.
+	# ------------------------------------------------------------------
+	def save( self, aFileName = None ):
+
+		if aFileName is not None:
+			self.setFileName( aFileName )
+
+		# open the file
+		aOutputFile = open(self.theFileName,'w')
+
+		# writes header
+		aOutputFile.write(self.getHeaderString())
+
+		#FIXME: vefy inefficient. should use numpyio module here
+		
+		def array_print( array ):
+			aOutputFile.write( string.lstrip( Numeric.array2string( array,10000,15,1 )[1:-1] + '\n' ) )
+		map( array_print, self.theData )
+
+		aOutputFile.close()
+
+	# end of save
+
+
+	# ------------------------------------------------------------------
+	# load ( override the method of DataFile class )
+	#
+	# return -> None
+	# This method is throwable exception.
+	# ------------------------------------------------------------------
+	def load( self, aFileName = None ):
+
+		if aFileName is not None:
+			self.setFileName( aFileName )
+
+		def readOneLineData( aInputFile, aKey ):
+			aBuff = aInputFile.readline() 
+			if aBuff.find( aKey ) != 0:
+				raise "Error: %s is not ECD format. '%s' line can't be found." %aKey
+			return string.strip(aBuff[len(aKey):]) 
+
+
+		if( len(self.theFileName) == 0):
+			raise "Error: empty filename."
+
+		# open the file
+		aInputFile = open(self.theFileName,'r')
+
+		# read header
+
+		#FIXME: do not depend on the order of header elements
+
+		# --------------------------------------------------------
+		# [1] read DATA: 
+		# --------------------------------------------------------
+		self.setDataName( readOneLineData(aInputFile,'#DATA:') )
+
+		# --------------------------------------------------------
+		# [2] read SIZE:
+		# --------------------------------------------------------
+		# ignore SIZE:
+		readOneLineData(aInputFile,'#SIZE:')
+
+		# --------------------------------------------------------
+		# [3] read LABEL:
+		# --------------------------------------------------------
+		self.setLabel( readOneLineData(aInputFile,'#LABEL:') )
+
+		# --------------------------------------------------------
+		# [4] read NOTE:
+		# --------------------------------------------------------
+		self.setNote( readOneLineData(aInputFile,'#NOTE:') )
+
+		# --------------------------------------------------------
+		# [5] read some lines before matrix data
+		# --------------------------------------------------------
+
+		# read matrix
+		while(1):   # while 1
+			aBuff = aInputFile.readline()
+
+			# if EOF is found, breaks this loop.
+			if aBuff == '':
+				break	
+
+			# if separator is found, breaks this loop.
+			if aBuff.find( '#----------------------' ) == 0:
+				break
+
+		# end of while 1
+
+		# ----------------------------------------------------------
+		# [6] reads matrix data
+		# ----------------------------------------------------------
+
+		#FIXME: very inefficient. use numpyio.
+		
+		aMatrixList = []
+		for aBuff in aInputFile.xreadlines():
+			aDataListOfOneLine = aBuff.strip().split()
+			aMatrixList.append( Numeric.array( map( float, aDataListOfOneLine ) ) )
+
+ 		#close the file 
+		aInputFile.close()
+
+		# checks matrix size
+		self.theSizeOfLine = len(aMatrixList)
+		if self.theSizeOfLine >= 1:
+			self.theSizeOfColumn = len(aMatrixList[0])
+		else:
+			self.theSizeOfColumn = 0
+
+		self.theData = Numeric.array(aMatrixList,Numeric.Float)
+
+
+
+	# end of load
+
+
 
 
 	# ------------------------------------------------------------------
@@ -69,13 +203,11 @@ class ECDDataFile( DataFile ):
 	# ------------------------------------------------------------------
 	def setFileName( self, aFileName ):
 
-		#print ECDDataFile.theECDExtension
-
-		if find(aFileName,ECDDataFile.theECDExtension) == \
-			len(aFileName)-len(ECDDataFile.theECDExtension) :
+		if aFileName.find( ECD_EXTENSION ) == \
+			len( aFileName ) - len( ECD_EXTENSION ) :
 			DataFile.setFileName( self, aFileName )
 		else:
-			DataFile.setFileName( self, aFileName + '.' + ECDDataFile.theECDExtension )
+			DataFile.setFileName( self, aFileName + '.' + ECD_EXTENSION )
 
 	# end of setFileName
 
@@ -113,7 +245,7 @@ class ECDDataFile( DataFile ):
 	# ------------------------------------------------------------------
 	def setLabel( self, aLabel ):
 		
-		self.theLabel = aLabel
+		self.theLabel = string.split( aLabel )
 
 	# end of setLabel
 
@@ -204,7 +336,6 @@ class ECDDataFile( DataFile ):
 	# ------------------------------------------------------------------
 	# getSizeOfLine
 	#
-	# return -> the value of NOTE
 	# ------------------------------------------------------------------
 	def getSizeOfLine( self ):
 
@@ -242,28 +373,31 @@ class ECDDataFile( DataFile ):
 
 
 	# ------------------------------------------------------------------
-	# setMatrixData
-	#   - checks only aMatrixData type
+	# setData
+	#   - checks only aData type
 	#   - does not check each element type.
 	#
-	# aMatrixData(tuple of tuple) : a matrix data
+	# aData(tuple of tuple) : a matrix data
 	#
 	# return -> None
 	# This method is throwable exception.
 	# ------------------------------------------------------------------
-	def setMatrixData( self, aMatrixData ):
+	def setData( self, aData ):
 
-		#if type(aMatrixData) != type(()):
-		#	raise "Error : aMatrixData must be tuple of tuple."
+		#if type(aData) != type(()):
+		#	raise "Error : aData must be tuple of tuple."
 
-		#if len(aMatrixData) > 0 :
-		#	if type(aMatrixData[0]) != type(()):
-		#		raise "Error : aMatrixData must be tuple of tuple."
+		#if len(aData) > 0 :
+		#	if type(aData[0]) != type(()):
+		#		raise "Error : aData must be tuple of tuple."
 
-		self.theMatrixData = aMatrixData
-		self.setSize( len(aMatrixData[0]) ,len(aMatrixData) )
+		self.theData = aData
+		self.setSize( len( aData[0] ), len( aData ) )
 
-	# end of getMatrixData
+	# end of getData
+
+	def getData( self ):
+		return self.theData
 
 
 	# ------------------------------------------------------------------
@@ -274,12 +408,12 @@ class ECDDataFile( DataFile ):
 	def getHeaderList( self ):
 
 		aHeaderList = []		
-		aHeaderList.append( '# DATA: %s' %self.theDataName )
-		aHeaderList.append( '# SIZE: %d %d' %(self.theSizeOfColumn,self.theSizeOfLine) )
-		aHeaderList.append( '# LABEL: %s' %self.theLabel )
-		aHeaderList.append( '# NOTE: %s' %self.theNote )
-		aHeaderList.append( '# ' )
-		aHeaderList.append( '# ----------------------' )
+		aHeaderList.append( '#DATA: %s' %self.theDataName )
+		aHeaderList.append( '#SIZE: %d %d' %(self.theSizeOfColumn,self.theSizeOfLine) )
+		aHeaderList.append( '#LABEL: %s' % string.join( self.theLabel, '\t' ) )
+		aHeaderList.append( '#NOTE: %s' %self.theNote )
+		aHeaderList.append( '#' )
+		aHeaderList.append( '#----------------------' )
 
 		return aHeaderList
 
@@ -303,145 +437,6 @@ class ECDDataFile( DataFile ):
 	# end of getHeaderString
 
 
-	# ------------------------------------------------------------------
-	# save ( override the method of DataFile class )
-	#
-	# return -> None
-	# This method is throwable exception.
-	# ------------------------------------------------------------------
-	def save( self, aFileName = None ):
-
-		if aFileName is not None:
-			self.saveWithFileName( aFileName )
-			return
-
-		# open the file
-		aOutputFile = open(self.theFileName,'w')
-
-		# writes header
-		aOutputFile.write(self.getHeaderString())
-
-		# writes matrix
-		if(self.theSizeOfColumn>=1):
-			theSizeOfColumnMinusOne = self.theSizeOfColumn - 1
-			for i in xrange(len(self.theMatrixData)):
-				j=0
-				while j < theSizeOfColumnMinusOne:
-					aOutputFile.write("%s\t" %self.theMatrixData[i][j])
-					j=j+1
-				aOutputFile.write("%s\n" %self.theMatrixData[i][theSizeOfColumnMinusOne])
-
- 		#close the file 
-		aOutputFile.close()
-
-	# end of save
-
-
-	# ------------------------------------------------------------------
-	# load ( override the method of DataFile class )
-	#
-	# return -> None
-	# This method is throwable exception.
-	# ------------------------------------------------------------------
-	def load( self ):
-
-		def readOneLineData( aInputFile, aKey ):
-			aBuff = aInputFile.readline() 
-			if find(aBuff,aKey) != 0:
-				raise "Error: %s is not ECD format. '%s' line can't be found." %aKey
-			return strip(aBuff[len(aKey):]) 
-
-
-		if( len(self.theFileName) == 0):
-			raise "Error: the length of filename is 0"
-
-		# open the file
-		aInputFile = open(self.theFileName,'r')
-
-		# read header
-
-		# ----------------------------------------------------------------------
-		# [1] reads DATA: 
-		# ----------------------------------------------------------------------
-		self.setDataName( readOneLineData(aInputFile,'DATA:') )
-
-		# ----------------------------------------------------------------------
-		# [2] reads SIZE:
-		# ----------------------------------------------------------------------
-		aSizeList = split(readOneLineData(aInputFile,'SIZE:'),' ')
-		if len(aSizeList) != 2:
-			raise "Error: %s is not ECD format. 'SIZE:' line needs 2 elements." %self.theFileName
-		try:
-			self.setSize(atoi(aSizeList[0]),atoi(aSizeList[1]))
-		except:
-			raise "Error: %s is not ECD format. elements of 'SIZE:' must be integer." %self.theFileName
-
-		# ----------------------------------------------------------------------
-		# [3] reads LABEL:
-		# ----------------------------------------------------------------------
-		self.setLabel( readOneLineData(aInputFile,'LABEL:') )
-
-		# ----------------------------------------------------------------------
-		# [4] reads NOTE:
-		# ----------------------------------------------------------------------
-		self.setNote( readOneLineData(aInputFile,'NOTE:') )
-
-		# ----------------------------------------------------------------------
-		# [5] reads some lines before matrix data
-		# ----------------------------------------------------------------------
-
-		# read matrix
-		while(1):   # while 1
-			aBuff = aInputFile.readline()
-
-			# if EOF is found, breaks this loop.
-			if aBuff == '':
-				break	
-
-			# if separator is found, breaks this loop.
-			if find(aBuff,'----------------------' ) == 0:
-				break
-
-		# end of while 1
-
-		# ----------------------------------------------------------------------
-		# [6] reads matrix data
-		# ----------------------------------------------------------------------
-
-		aMatrixList = []
-
-		for aBuff in aInputFile.readlines():
-			aDataListOfOneLine = split( strip(aBuff),'\t')
-			aDataList = []
-			for anElement in aDataListOfOneLine:
-				try:
-					aDataList.append( atoi(anElement) )
-				except:
-					try:
-						aDataList.append( atof(anElement) )
-					except:
-						raise "Error: %s is not ECD format. Non-fload data are included." %self.theFileName
-			aMatrixList.append( tuple(aDataList) )
-
-		# checks matrix size
-		aSizeOfLine = len(aMatrixList)
-		aSizeOfColumn = 0
-		if aSizeOfLine >= 1 :
-			aSizeOfColumn = len(aMatrixList[0])
-
-		if aSizeOfLine != self.getSizeOfLine():
-			print "Warnig : %s, the line size (=%s) in 'SIZE:' line does not match that of matrix (=%s), so %s is applied to the line size of matrix" %(self.theFileName,self.getSizeOfLine(),aSizeOfLine,aSizeOfLine)
-
-		if aSizeOfColumn != self.getSizeOfColumn():
-			print "Warnig : %s, the column size (=%s) in 'SIZE:' line does not match that of matrix (=%s), so %s is applied to the column size of matrix" %(self.theFileName,self.getSizeOfColumn(),aSizeOfColumn,aSizeOfColumn)
-
-		self.setMatrixData( tuple(aMatrixList) )
-
- 		#close the file 
-		aInputFile.close()
-
-	# end of load
-
 
 # end of ECDDataFile
 
@@ -456,16 +451,15 @@ if __name__ == "__main__":
 
 		aMat = ((3,4),(10,20),(2000,111))
 
-		a.setMatrixData( aMat )
-		a.setFileName('hoge')
-		#a.save()
-
+		a.setData( aMat )
+		
+		a.save('hoge')
+		del a
+		
 		b = ECDDataFile()
-		b.setFileName('hoge')
-		b.load()
-		b.setFileName('hoge1')
+		b.load('hoge')
 		print b.getHeaderString()
-		b.save()
+		b.save('hoge1')
 
 	main()
 
