@@ -1,3 +1,5 @@
+#include <string>
+
 #include "libecs.hpp"
 #include "FQPI.hpp"
 #include "Message.hpp"
@@ -11,6 +13,11 @@
   catch( ::ExceptionCref e )\
     {\
       throw Py::Exception( e.message() );\
+    }\
+  catch( const ::exception& e)\
+    {\
+      throw Py::SystemError( std::string("E-CELL internal error: ")\
+			     + e.what() );\
     }\
   catch( ... ) \
     {\
@@ -28,16 +35,16 @@ void PySimulator::init_type()
   behaviors().doc("E-CELL Python class");
 
   add_varargs_method( "makePrimitive", &PySimulator::makePrimitive );
-  add_varargs_method( "sendMessage", &PySimulator::sendMessage );
-  add_varargs_method( "getMessage", &PySimulator::getMessage );
-  add_varargs_method( "step", &PySimulator::step );
+  add_varargs_method( "sendMessage",   &PySimulator::sendMessage );
+  add_varargs_method( "getMessage",    &PySimulator::getMessage );
+  add_varargs_method( "step",          &PySimulator::step );
+  add_varargs_method( "initialize",    &PySimulator::initialize );
 }
 
 Object PySimulator::step( const Tuple& args )
 {
   ECS_TRY;
 
-  cout<<"this is PySimulator::step module."<<endl;
   // Simulator::step();
   return Object();
 
@@ -91,6 +98,18 @@ Object PySimulator::getMessage( const Tuple& args )
   aTuple[1] = static_cast<Py::String>( aMessage.getBody() );
 
   return aTuple;
+
+  ECS_CATCH;
+}
+
+
+Object PySimulator::initialize( const Tuple& )
+{
+  ECS_TRY;
+
+  Simulator::initialize();
+
+  return Object();
 
   ECS_CATCH;
 }

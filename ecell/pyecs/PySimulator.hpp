@@ -22,6 +22,7 @@ public:
   Object sendMessage( const Tuple& args );
   Object getMessage( const Tuple& args );
   Object step( const Tuple& args );
+  Object initialize( const Tuple& args );
 
 };
 
