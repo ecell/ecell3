@@ -121,12 +121,11 @@ LIBECS_DM_CLASS( ExpressionProcessBase, Process )
       return theExpression;
     }
 
+
   void defaultSetProperty( StringCref aPropertyName,
 			   PolymorphCref aValue )
     {
       thePropertyMap[ aPropertyName ] = aValue.asReal();
-      
-      thePropertyVector.push_back( aPropertyName );
     } 
 
   const Polymorph defaultGetProperty( StringCref aPropertyName ) const
@@ -146,6 +145,37 @@ LIBECS_DM_CLASS( ExpressionProcessBase, Process )
       }
   }
 
+  const Polymorph defaultGetPropertyList() const
+    {
+      PolymorphVector aVector;
+
+      for( PropertyMapConstIterator
+	     aPropertyMapIterator( thePropertyMap.begin() );
+	   aPropertyMapIterator != thePropertyMap.end();
+	   ++aPropertyMapIterator )
+	{
+	  aVector.push_back( aPropertyMapIterator->first );
+	}
+
+      return aVector;
+    }
+  
+  const Polymorph 
+    defaultGetPropertyAttributes( StringCref aPropertyName ) const
+    {
+      PolymorphVector aVector;
+      
+      Integer aPropertyFlag( 1 );
+      
+      aVector.push_back( aPropertyFlag ); // isSetable
+      aVector.push_back( aPropertyFlag ); // isGetable
+      aVector.push_back( aPropertyFlag ); // isLoadable
+      aVector.push_back( aPropertyFlag ); // isSavable
+      
+      return aVector;
+    }
+
+
   void compileExpression()
     {
       ExpressionCompiler theCompiler( this, &( getPropertyMap() ) );
@@ -161,27 +191,6 @@ LIBECS_DM_CLASS( ExpressionProcessBase, Process )
       return thePropertyMap;
     }
   
-  const Polymorph defaultGetPropertyList() const
-    {
-      return thePropertyVector;
-    }
-  
-  const Polymorph 
-    defaultGetPropertyAttributes( StringCref aPropertyName ) const
-    {
-      PolymorphVector aVector;
-      
-      Integer aValue( 1 );
-      
-      aVector.push_back( aValue );
-      aVector.push_back( aValue );
-      aVector.push_back( aValue );
-      aVector.push_back( aValue );
-      
-      return aVector;
-    }
-
-
   virtual void initialize()
     {
       Process::initialize();
@@ -211,8 +220,6 @@ LIBECS_DM_CLASS( ExpressionProcessBase, Process )
   bool theRecompileFlag;
 
   PropertyMap thePropertyMap;
-
-  PolymorphVector thePropertyVector;
 };
 
 

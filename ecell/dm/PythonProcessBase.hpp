@@ -56,6 +56,9 @@ namespace python = boost::python;
 LIBECS_DM_CLASS( PythonProcessBase, Process )
 {
 
+DECLARE_ASSOCVECTOR
+  ( String, Polymorph, std::less<const String>, PropertyMap );
+
 public:
 
   LIBECS_DM_OBJECT_ABSTRACT( PythonProcessBase )
@@ -107,6 +110,54 @@ public:
     {
       theLocalNamespace[ aPropertyName ] =
 	python::object( python::handle<>( PyFloat_FromDouble( aValue ) ) );
+
+      thePropertyMap[ aPropertyName ] = aValue;
+    }
+
+  const Polymorph defaultGetProperty( StringCref aPropertyName ) const
+    {
+      PropertyMapConstIterator
+	aPropertyMapIterator( thePropertyMap.find( aPropertyName ) );
+
+      if( aPropertyMapIterator != thePropertyMap.end() )
+	{
+	  return aPropertyMapIterator->second;
+	}
+      else
+	{
+	  THROW_EXCEPTION( NoSlot, getClassNameString() + " : Property [" +
+			   aPropertyName + "] is not defined" );
+	}
+    }
+
+  const Polymorph defaultGetPropertyList() const
+    {
+      PolymorphVector aVector;
+
+      for( PropertyMapConstIterator 
+	     aPropertyMapIterator( thePropertyMap.begin() );
+	   aPropertyMapIterator != thePropertyMap.end();
+	   ++aPropertyMapIterator )
+	{
+	  aVector.push_back( aPropertyMapIterator->first );
+	}      
+
+      return aVector;
+    }
+
+  const Polymorph
+    defaultGetPropertyAttributes( StringCref aPropertyName ) const
+    {
+      PolymorphVector aVector;
+
+      Integer aPropertyFlag( 1 );
+
+      aVector.push_back( aPropertyFlag ); //isSetable
+      aVector.push_back( aPropertyFlag ); //isGetable
+      aVector.push_back( aPropertyFlag ); //isLoadable
+      aVector.push_back( aPropertyFlag ); //isSavable
+
+      Integer aValue();
     }
 
   virtual void initialize();
@@ -116,6 +167,7 @@ protected:
   python::dict   theGlobalNamespace;
   python::dict   theLocalNamespace;
 
+  PropertyMap    thePropertyMap;
 };
 
 
