@@ -35,6 +35,7 @@
 
 
 from OsogoWindow import *
+from AboutSessionMonitor import *
 
 from main import *
 
@@ -49,6 +50,7 @@ import MessageWindow
 import string
 import sys
 import traceback
+import os
 
 #
 #import pyecell module
@@ -57,22 +59,6 @@ from ecell.GtkSessionMonitor import *
 from ecell.ecssupport import *
 from ecell.ecs_constants import *
 from ConfirmWindow import *
-
-NAME        = 'gecell (Osogo)'
-VERSION     = ''
-COPYRIGHT   = '(C) 2001-2002 Keio University'
-AUTHORLIST  =  [
-    'Design: Kenta Hashimoto <kem@e-cell.org>',
-    'Design and application Framework: Kouichi Takahashi <shafi@e-cell.org>',
-    'Programming: Yuki Fujita',
-    'Yoshiya Matsubara',
-    'Yuusuke Saito',
-    'Masahiro Sugimoto <sugi@e-cell.org>',
-    'Gabor Bereczki <gabor.bereczki@talk21.com>'
-    ]
-    
-DESCRIPTION = 'Osogo is a simulation session monitoring module for E-CELL SE Version 3'
-
 
 class MainWindow(OsogoWindow):
 	"""MainWindow
@@ -140,7 +126,7 @@ class MainWindow(OsogoWindow):
 			'stepper_window_menu_activate'         : self.__displayWindow ,
 			'board_window_menu_activate'           : self.__displayWindow ,
 			#'preferences_menu_activate'            : self.openPreferences ,
-			'about_menu_activate'                  : self.openAbout ,
+			'about_menu_activate'                  : self.__displayAbout ,
 
 			# toolbars
 			'start_button_clicked'                 : self.__startSimulation ,
@@ -155,14 +141,13 @@ class MainWindow(OsogoWindow):
 			'on_stepper_button_toggled'            : self.__displayWindow,
 			'on_interface_button_toggled'          : self.__displayWindow,
 			'on_board_button_toggled'              : self.__displayWindow,
-			'logo_button_clicked'                  : self.openAbout,
+			'logo_button_clicked'                  : self.__displayAbout,
 			'on_scrolledwindow1_expose_event'	: self.__expose
 		}
 		self.addHandlers( self.theHandlerMap )
 
 
 
-		self['ecell_logo_toolbar'].set_style( gtk.TOOLBAR_ICONS )
 		self.__setMenuAndButtonsStatus( FALSE )
 		#self.theSession.updateFundamentalWindows()
 
@@ -184,7 +169,8 @@ class MainWindow(OsogoWindow):
 		self.theFileSelection = None
 
 		# initializes AboutDialog reference
-		self.theAboutDialog = None
+		self.theAboutSessionMonitor = None
+		self.openAboutSessionMonitor = False 
 		self.update()
 		
 	# ==========================================================================
@@ -202,24 +188,22 @@ class MainWindow(OsogoWindow):
 		
 
 	# ==========================================================================
-	def __resizeVertically( self, msg_heigth ): #gets messagebox heigth
+	def __resizeVertically( self, msg_height ): #gets messagebox height
 		"""__resizeVertically
 		Return None
 		"""
 
-		# gets fix components heigth
-		menu_heigth=self['handlebox22'].get_child_requisition()[1]
-		toolbar_heigth=max(self['handlebox19'].get_child_requisition()[1],\
-		self['vbox73'].get_child_requisition()[1],\
-		self['logo_button'].get_child_requisition()[1])
-		statusbar_heigth=self['statusbar'].get_child_requisition()[1]
+		# gets fix components height
+		menu_height=self['handlebox22'].get_child_requisition()[1]
+		toolbar_height=self['handlebox19'].get_child_requisition()[1]
+		statusbar_height=self['statusbar'].get_child_requisition()[1]
 
 		# gets window_width
 		window_width=self['MainWindow'].get_size()[0]
 
 		# resizes
-		window_heigth=menu_heigth+toolbar_heigth+statusbar_heigth+msg_heigth
-		self['MainWindow'].resize(window_width,window_heigth)
+		window_height=menu_height+toolbar_height+statusbar_height+msg_height
+		self['MainWindow'].resize(window_width,window_height)
 	
 
 	# ==========================================================================
@@ -303,6 +287,8 @@ class MainWindow(OsogoWindow):
 			self.theFileSelection = gtk.FileSelection()
 			self.theFileSelection.connect('delete_event', self.__deleteFileSelection )
 			self.theFileSelection.cancel_button.connect('clicked', self.__deleteFileSelection)
+			iconPixbuf = gtk.gdk.pixbuf_new_from_file(os.environ['OSOGOPATH'] + os.sep + "icon_ecelllogo.png")
+			self.theFileSelection.set_icon(iconPixbuf)
 
 			# when 'Load Model' is selected
 			if aType == 'Load' and aTarget == 'Model':
@@ -814,40 +800,18 @@ class MainWindow(OsogoWindow):
 	        
 
 	# ==========================================================================
-	def openAbout( self, button_obj ):
-		"""display the About window
-		arg[0]   ---  self['about_menu']
-		Return None
-		"""
+	def __displayAbout ( self, *args ):
+		# show about information
+		self.createAboutSessionMonitor()
+		
+	def createAboutSessionMonitor(self):
+		if not self.openAboutSessionMonitor:
+			AboutSessionMonitor(self)
 
-		# when AboutDialog is not created yet
-		if self.theAboutDialog == None:
-			if GNOME_INSTALLED=='yes':
-			    self.theAboutDialog = gnome.ui.About( NAME, VERSION, COPYRIGHT, \
-		                                          DESCRIPTION, AUTHORLIST)
-			else:
-			    self.theAboutDialog = OsogoAboutWindow( NAME, VERSION, COPYRIGHT, \
-		                                          DESCRIPTION, AUTHORLIST)
-			self.theAboutDialog.set_title( 'about osogo' )
-			self.theAboutDialog.show_all()
-			self.theAboutDialog.connect('destroy', self.__deleteAboutDialog )
+	def toggleAboutSessionMonitor(self,isOpen,anAboutSessionMonitor):
+		self.theAboutSessionMonitor = anAboutSessionMonitor
+		self.openAboutSessionMonitor=isOpen
 
-		# when AboutDialog is already created 
-		else:
-
-			# moves it to the top of desktop
-			self.theAboutDialog.present()
-
-	# ==========================================================================
-	def __deleteAboutDialog( self, *arg ):
-		"""deletes AboutDialog
-		Return None
-		"""
-
-		# deletes the reference to AboutDialog
-		if self.theAboutDialog != None:
-			self.theAboutDialog.destroy()
-			self.theAboutDialog = None
 
 
 	# ==========================================================================
@@ -889,41 +853,4 @@ class MainWindow(OsogoWindow):
 
 # end of MainWindow
 
-# osogo about dialof class
 
-class OsogoAboutWindow(gtk.Dialog):
-	    """ popup window to display info about e-cell when gnome support is not
-	    present
-	    """
-	    def __init__(self, _name, _version, _copyright, _description,
-			    _authorlist):
-		    #init dialog
-		    gtk.Dialog.__init__(self)
-		    
-		    #add button and connect destroy signal
-		    OK_Button=gtk.Button("OK")
-		    OK_Button.connect("clicked",self.clicked)
-		    self.add_action_widget(OK_Button,1)
-		    #add name description, copyright, version as labels
-		    self.vbox.add(gtk.Label(_name))
-		    self.vbox.add(gtk.Label(_version))
-		    self.vbox.add(gtk.Label(_copyright))
-		    self.vbox.add(gtk.Label(_description))
-		    #add authorlist as a scrolled window
-		    
-		    Auth_Vbox=gtk.VBox()
-		    Auth_Vbox.add(gtk.Label("AUTHORS:"))
-		    for _author in _authorlist:
-			Auth_Vbox.add(gtk.Label(_author))
-		    Auth_List=gtk.ScrolledWindow()
-		    Auth_List.set_size_request(200,200)
-		    Auth_List.add_with_viewport(Auth_Vbox)
-		    self.vbox.add(Auth_List)
-		    
-	    def destroy(self):
-		gtk.Dialog.destroy(self)
-
-	    def clicked(self,button_obj):
-		self.destroy()
-		
-# end of osogo about dialof class

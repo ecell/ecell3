@@ -14,7 +14,12 @@
   <property name="default_height">350</property>
   <property name="resizable">True</property>
   <property name="destroy_with_parent">True</property>
-  <property name="icon">icon_ecelllogo.xpm</property>
+  <property name="icon">icon_ecelllogo.png</property>
+  <property name="decorated">True</property>
+  <property name="skip_taskbar_hint">False</property>
+  <property name="skip_pager_hint">False</property>
+  <property name="type_hint">GDK_WINDOW_TYPE_HINT_NORMAL</property>
+  <property name="gravity">GDK_GRAVITY_NORTH_WEST</property>
 
   <child>
     <widget class="GtkVBox" id="vbox3">
@@ -333,6 +338,7 @@
 		  <property name="label" translatable="yes">  update  </property>
 		  <property name="use_underline">True</property>
 		  <property name="relief">GTK_RELIEF_NORMAL</property>
+		  <property name="focus_on_click">True</property>
 		  <signal name="clicked" handler="on_update_button_clicked" last_modification_time="Tue, 25 Mar 2003 04:31:54 GMT"/>
 		</widget>
 		<packing>

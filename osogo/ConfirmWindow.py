@@ -70,6 +70,14 @@ class ConfirmWindow(gtk.Dialog):
 		self.win.set_border_width(2)
 		self.win.set_default_size(300,75)
 		self.win.set_position(gtk.WIN_POS_MOUSE)
+		
+		iconPixbuf = None
+		try:
+			import os
+			iconPixbuf = gtk.gdk.pixbuf_new_from_file(os.environ['OSOGOPATH'] + os.sep + "icon_ecelllogo.png")
+		except:
+			pass
+		self.win.set_icon(iconPixbuf)
 		self.win.show()
 
 		# Sets title
