@@ -34,19 +34,14 @@
 #include "Entity.hpp"
 
 
-// exceptions
-
-class IntegrationErr {};
-class LTZ : public IntegrationErr {};
-
 /**
   Substance class is used to represent molecular species.
 */
+
 class Substance : public Entity
 {
-friend class Stepper;
-friend class Integrator;
-friend class Accumulator;
+  friend class Integrator;
+  friend class Accumulator;
 
 public: // message slots
 
@@ -60,25 +55,34 @@ public:
   Substance();
   virtual ~Substance();
 
-  static SubstancePtr instance() {return new Substance;}
+  static SubstancePtr instance() { return new Substance; }
 
   const String getFqpi() const;
 
   /**
     @return the number of molecules.
    */
-  Float getQuantity() const                    { return theQuantity; }
+  Float getQuantity() const                    
+  { 
+    return theQuantity; 
+  }
 
   /**
     Fixes or unfixes this Substance.
     @param f Boolean value. true -> fix, false -> unfix.
    */
-  void fix( bool f )                           { theFixed = f; }
+  void fix( bool f )                           
+  { 
+    theFixed = f; 
+  }
 
   /**
     @return true if the Substance is fixed or false if not.
    */
-  bool isFixed() const                         { return theFixed; }
+  bool isFixed() const                         
+  { 
+    return theFixed; 
+  }
 
   /**
     Whether concentration of this substance can be calculated or not.
@@ -99,6 +103,7 @@ public:
       {
 	calculateConcentration(); 
       }
+
     return theConcentration;
   }
 
@@ -130,12 +135,17 @@ public:
     @return current velocity value in (number of molecules)/(step)
    */
   Float getVelocity() const
-    { return theVelocity; }
+    { 
+      return theVelocity; 
+    }
 
   /**
     @param v velocity in number of molecules to be added.
    */
-  void addVelocity( Float velocity ) { theVelocity += velocity; }
+  void addVelocity( Float velocity ) 
+  {
+    theVelocity += velocity; 
+  }
 
   /**
     Returns activity value of a Substance object.
@@ -161,7 +171,12 @@ public:
     @see isFixed
     */
   void setQuantity(Float q)    
-    { if( !isFixed() ) loadQuantity( q ); }
+  { 
+    if( !isFixed() ) 
+      {
+	loadQuantity( q ); 
+      }
+  }
 
 
   /**
@@ -176,27 +191,37 @@ public:
      set a class name string of user default accumulator
   */
   static void setUserDefaultAccumulatorName( StringCref name ) 
-    { USER_DEFAULT_ACCUMULATOR_NAME = name; }
+    { 
+      USER_DEFAULT_ACCUMULATOR_NAME = name; 
+    }
 
   /**
      a class name string of user default accumulator
   */
   static StringCref userDefaultAccumulatorName() 
-    { return USER_DEFAULT_ACCUMULATOR_NAME; }
+    { 
+      return USER_DEFAULT_ACCUMULATOR_NAME; 
+    }
 
 protected:
 
   void setAccumulator( StringCref classname );
   void setAccumulator( AccumulatorPtr accumulator );
   void setIntegrator( IntegratorPtr integrator ) 
-  { theIntegrator = integrator; }
+  { 
+    theIntegrator = integrator; 
+  }
 
   void makeSlots();
 
 private:
 
   void calculateConcentration();
-  void mySetQuantity( Float q ) { theQuantity = q; theConcentration = -1; }
+  void mySetQuantity( Float q ) 
+  { 
+    theQuantity = q; 
+    theConcentration = -1; 
+  }
 
 public:
 

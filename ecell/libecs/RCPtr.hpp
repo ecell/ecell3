@@ -32,7 +32,8 @@
 #define __AUTORELEASE_HPP
 
 /**
-   Use this macro if you want to use SomeClassRCPtr, not RCPtr<SomeClass>.
+   Use this macro if you want to use 
+   SomeClassRCPtr instead of RCPtr<SomeClass>.
 */
 
 #define DECLARE_RCPTR( type )\

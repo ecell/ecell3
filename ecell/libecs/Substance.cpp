@@ -45,7 +45,7 @@ String Substance::USER_DEFAULT_ACCUMULATOR_NAME
 void Substance::makeSlots()
 {
   MessageSlot( "Quantity",Substance,*this,&Substance::setQuantity,
-	      &Substance::getQuantity );
+	       &Substance::getQuantity );
   MessageSlot( "AccumulatorClass",Substance,*this,
 	       &Substance::setAccumulatorClass,
 	       &Substance::getAccumulatorClass );
@@ -119,9 +119,9 @@ void Substance::setAccumulator( StringCref classname )
     aAccumulatorPtr = getSuperSystem()->getRootSystem()->
       getAccumulatorMaker().make( classname );
     setAccumulator(aAccumulatorPtr);
+
     if( classname != userDefaultAccumulatorName() )
       {
-	cerr << __PRETTY_FUNCTION__ << endl;
 	//FIXME:    *theMessageWindow << "[" << fqpi() 
 	//FIXME: << "]: accumulator is changed to: " << classname << ".\n";
       }
@@ -145,6 +145,7 @@ void Substance::setAccumulator( AccumulatorPtr accumulator )
     {
       delete theAccumulator;
     }
+
   theAccumulator = accumulator;
   theAccumulator->setOwner( this );
   theAccumulator->update();
@@ -169,8 +170,8 @@ void Substance::initialize()
       //FIXME:      *theMessageWindow << "Substance: " 
       //FIXME:	<< "falling back to the system default accumulator: " 
       //FIXME:	  << SYSTEM_DEFAULT_ACCUMULATOR_NAME  << ".\n";
-      setUserDefaultAccumulatorName(SYSTEM_DEFAULT_ACCUMULATOR_NAME);
-      setAccumulator(USER_DEFAULT_ACCUMULATOR_NAME);
+      setUserDefaultAccumulatorName( SYSTEM_DEFAULT_ACCUMULATOR_NAME );
+      setAccumulator( USER_DEFAULT_ACCUMULATOR_NAME );
     }
 }
 
@@ -198,32 +199,33 @@ void Substance::calculateConcentration()
 
 bool Substance::haveConcentration() const
 {
-  bool aBool(true);
-
   if( getSuperSystem()->getVolumeIndex() == NULLPTR ) 
     {
-      aBool = false;
+      return false;
     }
 
-  return aBool;
+  return true;
 }
+
+
+//FIXME: the following methods should be inlined
 
 void Substance::transit()
 { 
   theConcentration = -1;
 
-  if( theFixed ) 
-    return;
+  if( ! theFixed ) 
+    {
+      theIntegrator->transit();
 
-  theIntegrator->transit();
-
-  theAccumulator->doit();
+      theAccumulator->doit();
   
-   if( theQuantity < 0 ) 
-     {
-       theQuantity = 0;
-//       throw LTZ();
-     }
+      if( theQuantity < 0 ) 
+	{
+	  theQuantity = 0;
+	  //FIXME:       throw LTZ();
+	}
+    }
 }
 
 void Substance::clear()
