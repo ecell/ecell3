@@ -38,12 +38,12 @@
 from gui_config import *
 import sys
 
-sys.path.append(GUI_OSOGO_PATH)
+sys.path.insert(0, GUI_OSOGO_PATH)
 import MainWindow  
 from ecell.Session import *
 from ecell.ModelWalker import *
 import gtk
-
+sys.path.insert(0, GUI_OSOGO_PATH)
 import EntityListWindow
 import LoggerWindow
 import InterfaceWindow 
@@ -75,7 +75,7 @@ class GtkSessionMonitor(Session):
 			self.theModelWalker = None
 		else:
 			self.theModelWalker = ModelWalker( aSimulator )
-
+		self.updateCallbackList = []
 		# -------------------------------------
 		# reads defaults from osogo.ini 
 		# -------------------------------------
@@ -183,7 +183,7 @@ class GtkSessionMonitor(Session):
 
 
 	# ==========================================================================
-	def openWindow( self, aWindowName ): 
+	def openWindow( self, aWindowName, rootWidget = None, rootWindow = None ): 
 		"""opens up window and returns aWindowname instance
 		aWindowName   ---  Window name (str)
 		Returns FundamentalWindow or EntityListWindow list
@@ -193,7 +193,10 @@ class GtkSessionMonitor(Session):
 			return None
 		# When the WindowName does not match, create nothing.
 		if self.theFundamentalWindows.has_key( aWindowName ) == TRUE:
-			self.theFundamentalWindows[ aWindowName ].openWindow()
+			if rootWidget == None:
+				self.theFundamentalWindows[ aWindowName ].openWindow()
+			else:
+				self.theFundamentalWindows[ aWindowName ].openWindow(rootWidget, rootWindow)
 			self.theMainWindow.updateButtons()
 			return self.theFundamentalWindows[ aWindowName ]
 		elif aWindowName == 'EntityListWindow':
@@ -336,6 +339,10 @@ class GtkSessionMonitor(Session):
 			
 		return anEntityListWindow
 
+	# ==========================================================================
+	def registerUpdateCallback( self, aFunction ):
+		self.updateCallbackList.append( aFunction )        
+
 
 	# ==========================================================================
 	def deleteEntityListWindow( self, anEntityListWindow ):
@@ -392,7 +399,8 @@ class GtkSessionMonitor(Session):
 		self.updateFundamentalWindows()
 		# updates all plugin windows
 		self.thePluginManager.updateAllPluginWindow()
-
+		for aFunction in self.updateCallbackList:
+			apply( aFunction )
  	
 
 	# ==========================================================================

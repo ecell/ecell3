@@ -35,7 +35,7 @@ class Eml:
         if aFileObject is None:
             aStringData = '<?xml version="1.0" ?><eml></eml>'
         else:
-            aStringData = string.join( string.join( aFileObject.readlines(), '' ).split( '\n' ), '' )
+            aStringData = string.join(  map( string.strip, aFileObject.readlines()), '' )
 
 
         # minidom.parseString() is much faster than minidom.parse().. why?
