@@ -197,7 +197,7 @@ Both ways, <option>-D</option> and <option>--parameters</option>, can be mixed.
     </sect2>
 
     <sect2>
-      <title>Advanced topics</title>
+      <title>Advanced Topics</title>
 
       <sect3>
 	<title>How <command>ecell3-session</command> runs</title>
@@ -517,7 +517,7 @@ It automatically runs the program with the commandline options with '<parameter>
 
 
       <sect3>
-	<title>An Example of using <classname>Session</classname> methods</title>
+	<title>An example of using <classname>Session</classname> methods</title>
 
 	<para>Here is a tiny example of using
 	<classname>Session</classname> methods which loads a model,
@@ -540,7 +540,7 @@ message( 'stopped at %f seconds.' % getCurrentTime() )
     </sect2>
 
     <sect2>
-      <title>Getting Session parameters.</title>
+      <title>Getting Session Parameters.</title>
 
       <para>Session parameters are given to an ESS as global variables.
       Therefore usage of the session parameters is very simple.  For
@@ -577,7 +577,7 @@ else:
 
 
     <sect2>
-      <title>Observing and manipulating the model with <classname>ObjectStub</classname>s</title>
+      <title>Observing and Manipulating the Model with <classname>ObjectStub</classname>s</title>
 
       <sect3>
 	<title>What is <classname>ObjectStub</classname>?</title>
@@ -612,7 +612,7 @@ else:
 
 
       <sect3>
-	<title>Why <classname>ObjectStub</classname>s are needed</title>
+	<title>Why <classname>ObjectStub</classname> is needed</title>
 
 
 	<para><classname>ObjectStub</classname> classes are actually
@@ -672,7 +672,7 @@ else:
 
 
       <sect3>
-	<title>Creating and Checking Existence of a Backend Object</title>
+	<title>Creating and checking existence of a backend object</title>
 
 	<para>Creating an <classname>ObjectStub</classname> doesn't
 	necessarily mean a corresponding object in the backend exists, or is
@@ -707,7 +707,7 @@ else:
       </sect3>
 
       <sect3>
-	<title>Getting the Name and a Class Name of an <classname>ObjectStub</classname></title>
+	<title>Getting the name and a class name of an <classname>ObjectStub</classname></title>
 
 	<para>To get the name (or an ID) of an
 	<classname>ObjectStub</classname>, use
@@ -725,7 +725,7 @@ else:
 
 
       <sect3>
-	<title>Setting and Getting Properties</title>
+	<title>Setting and getting properties</title>
 
 	<para>As described in the previous chapters,
 	<classname>Entity</classname> and
@@ -919,7 +919,7 @@ message( 'Stopped at %s.' % getCurrentTime() )
     </sect2>
 
     <sect2>
-      <title>Handling data files</title>
+      <title>Handling Data Files</title>
 
       <sect3>
 	<title>About <acronym>ECD</acronym> file</title>
@@ -1053,7 +1053,7 @@ Now the data is stored in a matrix variable with the same name as the file witho
     </sect2>
 
     <sect2>
-      <title>Other methods</title>
+      <title>Other Methods</title>
       <sect3>
 	<title>Getting version numbers</title>
 
@@ -1144,7 +1144,7 @@ Now the data is stored in a matrix variable with the same name as the file witho
 
 
     <sect2>
-      <title>Method list of <classname>Session</classname> class</title>
+      <title>Method List of <classname>Session</classname> Class</title>
 
       <para>Methods of <classname>Session</classname> class has
       the following five groups.</para>
@@ -1174,7 +1174,7 @@ Now the data is stored in a matrix variable with the same name as the file witho
     </sect2>
 
     <sect2>
-      <title>Method list of <classname>ObjectStub</classname> classes</title>
+      <title>Method List of <classname>ObjectStub</classname> Classes</title>
 
 
       <para>There are three subclasses of <classname>ObjectStub</classname>
@@ -1201,7 +1201,7 @@ Now the data is stored in a matrix variable with the same name as the file witho
     </sect2>
 
     <sect2>
-      <title>Method list of <classname>ECDDataFile</classname> class</title>
+      <title>Method List of <classname>ECDDataFile</classname> Class</title>
       <para><classname>ECDDataFile</classname> class has the following set of methods.</para>
 
       &ecddatafile-api
