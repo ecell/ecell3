@@ -74,7 +74,7 @@ class PropertyEditor:
         cancel_button.connect("clicked",self.cancelButtonClicked)   
 
         self.win.show_all()
-        gtk.mainloop()
+        gtk.main()
 
 
 
@@ -113,7 +113,7 @@ class PropertyEditor:
         """
 
         self.win.hide()
-        gtk.mainquit()
+        gtk.main_quit()
 
 
 

@@ -326,7 +326,8 @@ class PasteEntityList(ModelCommand):
         modelEntityList = self.theModel.getEntityList(  self.__theType, self.__theSysPath )
         pasteBuffer = self.theBufferFactory.createEntityListBuffer( self.__theType )
         deleteNameList = []
-        entityList = self.theBufferFactory.sortSystemIDs( entityList )
+        if self.__theType == ME_SYSTEM_TYPE:
+            entityList = self.theBufferFactory.sortSystemIDs( entityList )
         for anEntity in entityList:
 
             if anEntity in modelEntityList:

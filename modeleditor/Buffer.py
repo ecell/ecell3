@@ -106,7 +106,7 @@ class StepperListBuffer (Buffer):
         raise Exception("Stepper %s does not exists in Buffer"%aStepperID )
 
 
-    def createStepperProperty( self, aStepperID, aPropertyName, aValueList ):
+    def createStepperProperty( self, aStepperID, aPropertyName, aValueList, chgdFlag = 0 ):
         """
         in: string aStepperID, aPropertyName
         returns None
@@ -115,13 +115,13 @@ class StepperListBuffer (Buffer):
         for aStepper in self.__theStepperList:
             if aStepper['Name'] == aStepperID:
                 # calls method from PropertyListBuffer
-                aStepper['PropertyList'].createProperty( aPropertyName, aValueList )
+                aStepper['PropertyList'].createProperty( aPropertyName, aValueList, chgdFlag )
                 return
 
         raise Exception("Stepper %s does not exists in Buffer"%aStepperID )
 
 
-    def setStepperProperty( self, aStepperID, aPropertyName, aValueList ):
+    def setStepperProperty( self, aStepperID, aPropertyName, aValueList, chgdFlag = 1 ):
         """
         in: string aStepperID, aPropertyName
             anyvalue aValue
@@ -131,7 +131,7 @@ class StepperListBuffer (Buffer):
             if aStepper['Name'] == aStepperID:
 
                 # calls method from PropertyListBuffer
-                aStepper['PropertyList'].setProperty( aPropertyName, aValueList )
+                aStepper['PropertyList'].setProperty( aPropertyName, aValueList, chgdFlag )
                 return
         raise Exception("Stepper %s does not exists in Buffer"%aStepperID )
 
@@ -211,21 +211,21 @@ class EntityListBuffer(Buffer):
         return anEntity['PropertyList'].getPropertyList()
 
 
-    def createEntityProperty( self, anID, aPropertyName, aValueList ):
+    def createEntityProperty( self, anID, aPropertyName, aValueList, chgdFlag = 0 ):
         """
         Create an EntityProperty
         """
         anEntity = self.getEntity( anID )
         if anEntity == None:
             raise Exception("%s does not exists in Buffer"%anID )
-        anEntity['PropertyList'].createProperty(aPropertyName, aValueList)
+        anEntity['PropertyList'].createProperty(aPropertyName, aValueList, chgdFlag)
 
 
-    def setEntityProperty( self, anID, aPropertyName, aValueList ):
+    def setEntityProperty( self, anID, aPropertyName, aValueList, chgdFlag = 1 ):
         anEntity = self.getEntity( anID )
         if anEntity == None:
             raise Exception("%s does not exists in Buffer"%anID )
-        anEntity['PropertyList'].setProperty( aPropertyName, aValueList )
+        anEntity['PropertyList'].setProperty( aPropertyName, aValueList, chgdFlag  )
 
 
     def getEntityProperty( self, anID, aPropertyName ):
@@ -570,18 +570,19 @@ class PropertyListBuffer( Buffer ):
         
 
 
-    def createProperty( self, aPropertyName, aValueList ):
+    def createProperty( self, aPropertyName, aValueList, changedFlag = 0 ):
         if self.__getProperty( aPropertyName ) != None:
             raise Exception("%s property already exists in Buffer"%aPropertyName )
-        newProperty = { 'Name':aPropertyName, 'ValueList': copyValue( aValueList) }
+        newProperty = { 'Name':aPropertyName, 'ValueList': copyValue( aValueList), ME_CHANGED_FLAG : changedFlag }
         self.thePropertyList.append( newProperty )
 
 
-    def setProperty( self, aPropertyName, aValueList ):
+    def setProperty( self, aPropertyName, aValueList, changedFlag = 1 ):
         aProperty = self.__getProperty( aPropertyName )
         if aProperty == None:
             raise Exception("%s property does not exist in Buffer"%aPropertyName )
         aProperty['ValueList'] = copyValue( aValueList )
+        aProperty[ME_CHANGED_FLAG] = changedFlag
 
     def getProperty( self, aPropertyName ):
         aProperty = self.__getProperty( aPropertyName )
@@ -589,6 +590,12 @@ class PropertyListBuffer( Buffer ):
             raise Exception("%s property does not exist in Buffer"%aPropertyName )
         return copyValue( aProperty['ValueList'] )
     
+    def getChangedFlag( self, aPropertyName ):
+        aProperty = self.__getProperty( aPropertyName )
+        if aProperty == None:
+            raise Exception("%s property does not exist in Buffer"%aPropertyName )
+        return  aProperty[ME_CHANGED_FLAG] 
+            
 
     def __getProperty( self, aPropertyName ):
         for aProperty in self.thePropertyList:

@@ -85,7 +85,6 @@ class EntityList(ViewComponent):
         self.theListSelection.set_mode( gtk.SELECTION_MULTIPLE )
         self['theTreeView'].set_headers_visible( gtk.FALSE )
         self.theModelEditor = self.theParentWindow.theModelEditor
-        self.theModelStore = ModelStore()
         
         # set up variables
         self.userSelect = True

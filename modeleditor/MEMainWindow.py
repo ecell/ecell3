@@ -81,7 +81,7 @@ class MEMainWindow( ListWindow ):
 
         # superclass openwindow
         ListWindow.openWindow( self )
-
+        self['ObjectWindow'].remove_page(0 )
         # add signal handlers
         
         self.addHandlers({ 
@@ -301,15 +301,14 @@ class MEMainWindow( ListWindow ):
                 if string.find(aMessage[0],'\n') != 0:
                     aMessage[0] = '\n' + aMessage[0]
 
-
             for aLine in aMessage:
                 aString = str( aLine )
-                self.theMessageBuffer.insert( aString, len(aString), iter )
+                
         else: 
             aString = str( aMessage )
             if string.find(aString,'\n') != 0:
                 aString = '\n' + aString
-            self.theMessageBuffer.insert(  iter, aString , len(aString) )
+        self.theMessageBuffer.insert(  iter, aString , len(aString) )
 
         # scrolls textwindow to end of buffer
         self['textview1'].scroll_to_mark(self.endMark,0)
@@ -501,11 +500,12 @@ class MEMainWindow( ListWindow ):
     #############################
     def __design_mode_clicked( self, *args ):
         self.theRuntimeObject.checkState( ME_RUN_MODE )
+        self.theModelEditor.updateWindows()
     
     
     def __run_mode_clicked( self, *args ):
         self.theRuntimeObject.checkState( ME_DESIGN_MODE )
-
+        self.theModelEditor.updateWindows()
 
 
     def __gtk_button2_clicked(self,*arg):

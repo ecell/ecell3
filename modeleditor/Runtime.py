@@ -61,14 +61,14 @@ def mainfunction():\n\
     gtk.timeout_remove(list[0])\n\
     fd.write(chr(10)+'loaded'+chr(10));fd.flush()\n\
     try:\n\
-        self.theSimulator.initialize()\n\
+        #self.theSimulator.initialize()\n\
         step(3)\n\
     except:\n\
         pass\n\
     fd.write('finished'+chr(10));fd.close()\n\
-    gtk.mainquit()\n\
+    gtk.main_quit()\n\
 gtk.timeout_add( 10, mainfunction )\n\
-gtk.mainloop()\n\
+gtk.main()\n\
 "
         fd=open( testPyFile,'w' )
         fd.write( testFile )
@@ -170,7 +170,7 @@ gtk.mainloop()\n\
             
         try:
             self.theSession.loadModel( fileName )                 
-            self.theSession.theSimulator.initialize()
+            #self.theSession.theSimulator.initialize()
         except:
             self.message(' Error while trying to parse model into simulator \n')
             anErrorMessage = string.join( traceback.format_exception(sys.exc_type,sys.exc_value,sys.exc_traceback), '\n' )

@@ -102,7 +102,7 @@ class FullIDBrowserWindow:
         
         
         self.win.show_all()
-        gtk.mainloop()
+        gtk.main()
 
 
     # ==========================================================================
@@ -192,7 +192,7 @@ class FullIDBrowserWindow:
         self.theModelEditor.setFullIDBrowser( None )
 
         self.win.hide()
-        gtk.mainquit()
+        gtk.main_quit()
 
     # ==========================================================================
     def setLastActiveComponent( self, aComponent ):

@@ -91,7 +91,7 @@ class ModelEditor:
         # set up load and save dir
         self.loadDirName = os.getcwd()
         self.saveDirName = os.getcwd()
-
+        print "Reading dynamic modules, please wait..."
         self.theDMInfo = DMInfo()
 
         # create variables
@@ -130,7 +130,7 @@ class ModelEditor:
 
         self.openAutosaveWindow = False
         self.theAutosaveWindow = None
-        self.theModelStore = ModelStore()
+        self.theModelStore = ModelStore( self.theDMInfo)
 
         self.theLayoutManager = LayoutManager( self )
         self.theMultiplexer = CommandMultiplexer( self, self.theLayoutManager )
@@ -161,7 +161,7 @@ class ModelEditor:
     def quitApplication( self ):
         if not self.__closeModel():
             return False
-        gtk.mainquit()
+        gtk.main_quit()
         return True
    
     
@@ -235,11 +235,11 @@ class ModelEditor:
     
     def convertEmToEml(self, emFileName):
         
-        tmpFileBaseName = os.path.basename(aFileName)
+        tmpFileBaseName = os.path.basename(emFileName)
         tmpFileName, tmpExt = os.path.splitext( tmpFileBaseName )
         tmpFileName = str(self.__getTmpDir()) + os.sep + tmpFileName + '.eml'
-        os.system( 'ecell3-em2eml -o ' + tmpFileName +' '+ aFileName )
-        return tmpaFileName
+        os.system( 'ecell3-em2eml -o ' + tmpFileName +' '+ emFileName )
+        return tmpFileName
 
     
     def convertEmlToEm(self, emlFileName, emFileName ):
@@ -1193,7 +1193,7 @@ class ModelEditor:
         if not self.__closeModel():
             return False
         # create new model
-        self.theModelStore = ModelStore()
+        self.theModelStore = ModelStore( self.theDMInfo )
 
         self.theLayoutManager = LayoutManager( self )
         self.theMultiplexer = CommandMultiplexer( self, self.theLayoutManager )
@@ -1477,7 +1477,7 @@ class ModelEditor:
                 anAttributeList = self.theModelStore.getStepperPropertyAttributes( aStepper, aProperty)
 
                 # check get attribute 
-                if anAttributeList[ME_SAVEABLE_FLAG]:
+                if anAttributeList[ME_SAVEABLE_FLAG] and anAttributeList[ME_CHANGED_FLAG]:
                                     
                     aValue = self.theModelStore.saveStepperProperty( aStepper, aProperty )
                     if aValue == '' or aValue == []:
@@ -1554,7 +1554,7 @@ class ModelEditor:
                 anAttributeList = self.theModelStore.getEntityPropertyAttributes(aFullPN)
 
                 # check savable
-                if anAttributeList[ME_SAVEABLE_FLAG]:
+                if anAttributeList[ME_SAVEABLE_FLAG] and anAttributeList[ME_CHANGED_FLAG]:
                     
                     aValue = self.theModelStore.saveEntityProperty(aFullPN)
 

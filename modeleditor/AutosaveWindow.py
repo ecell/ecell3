@@ -99,7 +99,7 @@ class AutosaveWindow:
             self.__setAutosaveDuration ( aDuration )
             self.ViewComponentObject.addHandlers({ "on_duration_toggled" : self.__buttonChosen,                "on_operations_toggled" : self.__buttonChosen,
 "on_turn_off_toggled" : self.__buttonChosen })
-            gtk.mainloop()
+            gtk.main()
         
             
         def __setAutosaveDuration ( self, aDuration ):
@@ -127,7 +127,7 @@ class AutosaveWindow:
             """
         
             self.win.hide()
-            gtk.mainquit()
+            gtk.main_quit()
 
         def __saveAutosaveDuration ( self ):
               

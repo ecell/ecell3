@@ -1,6 +1,5 @@
 
 import string
-from DMInfo import *
 from Constants import *
 from Utils import *
 from ModelEditor import *
@@ -11,14 +10,14 @@ class ModelStore:
 
 
     
-    def __init__( self ):
+    def __init__( self, aDMInfo ):
         """make ModelStore"""
         #self.theModelEditor = self.theParentWindow.theModelEditor
         self.__theModel = [] 
         self.__theStepper = {}
         self.__thefilelist= {}
         self.__theEntity = {}
-        self.__theDM = DMInfo()
+        self.__theDM = aDMInfo
         self.__theEntity[MS_SYSTEM_ROOT] = [ DM_SYSTEM_CLASS, None, None, [],  [], [], 'RootSystem' ]
         self.__theEntity[MS_SYSTEM_ROOT][MS_ENTITY_PROPERTYLIST] = self.__createPropertyList( DM_SYSTEM_CLASS )
         
@@ -31,10 +30,6 @@ class ModelStore:
         """create a stepper"""
         if anID in self.__theStepper.keys():
             raise Exception("Stepper %s already exists!"%anID)
-        if aClass not in self.__theDM.getClassList( ME_STEPPER_TYPE ):
-            #raise Exception("Unknown class name %s!"%aClass)
-            raise ClassNotExistError(aClass)
-
         aPropertyList = self.__createPropertyList( aClass )
 
         self.__theStepper[anID] = [ aClass, aPropertyList, "%s class"%aClass ]
@@ -42,7 +37,7 @@ class ModelStore:
         # find referring processes systems
         for anEntityID in self.__theEntity.keys():
             anEntityType = getFullIDType( anEntityID )
-            if  anEntityType not in [ ME_PROCESS_TYPE, ME_SYSTEM_TYPE ]:
+            if anEntityType not in [ ME_PROCESS_TYPE, ME_SYSTEM_TYPE ]:
                 continue
             aStepperID = self.__getEntityProperty( anEntityID, ME_STEPPERID )[MS_PROPERTY_VALUE]
             if aStepperID == anID:
@@ -89,7 +84,7 @@ class ModelStore:
 
 
 
-    def createStepperProperty( self, aStepperID, aPropertyName, aValue, aType = DM_PROPERTY_STRING, anAttribute = (1,1,1,1,1) ):
+    def createStepperProperty( self, aStepperID, aPropertyName, aValue, aType = DM_PROPERTY_STRING, anAttribute = [1,1,1,1,1,1] ):
         """create a Stepper property"""
 
         # check if Stepper exists
@@ -124,7 +119,7 @@ class ModelStore:
 
     
 
-    def loadStepperProperty( self, aStepperID, aPropertyName, aValue, aType = DM_PROPERTY_STRING, anAttribute = (1,1,1,1,1) ):
+    def loadStepperProperty( self, aStepperID, aPropertyName, aValue, aType = DM_PROPERTY_STRING, anAttribute = [1,1,1,1,1,1] ):
         if aStepperID not in self.__theStepper.keys():
             raise Exception("Stepper %s does not exist!"%aStepperID )
         if aPropertyName not in self.getStepperPropertyList( aStepperID ):
@@ -134,7 +129,14 @@ class ModelStore:
 
 
     def saveStepperProperty( self, aStepperID, aPropertyName ):
-        return self.getStepperProperty( aStepperID, aPropertyName )
+
+        aProperty = self.__getStepperProperty( aStepperID, aPropertyName )
+
+        # check settable flag settable 
+        if aProperty[MS_PROPERTY_FLAGS][MS_SAVEABLE_FLAG]:
+            return aProperty[MS_PROPERTY_VALUE]
+        else:
+            raise Exception("Property %s not gettable"%aPropertyName )
 
 ################################################
     def setStepperProperty( self, aStepperID, aPropertyName, aValue ):
@@ -142,13 +144,14 @@ class ModelStore:
         aProperty = self.__getStepperProperty( aStepperID, aPropertyName )
             
         # check settable flag settable 
-        if aProperty[MS_PROPERTY_FLAGS][MS_SETTABLE_FLAG] or aProperty[MS_PROPERTY_FLAGS][MS_SAVEABLE_FLAG]:
+        if aProperty[MS_PROPERTY_FLAGS][MS_SETTABLE_FLAG] :#or aProperty[MS_PROPERTY_FLAGS][MS_SAVEABLE_FLAG]:
             aType = aProperty[MS_PROPERTY_TYPE]
             convertValue = DMTypeCheck( aValue, aType )
             if convertValue != None:
                 aProperty[MS_PROPERTY_VALUE] = copyValue( convertValue )
             else:
                 raise Exception("Invalid value for Property %s of stepper %s!"%(aPropertyName, aStepperID) )
+            aProperty[MS_PROPERTY_FLAGS][MS_CHANGED_FLAG] = 1
         else:
             raise Exception("Property %s of stepper %s is not settable!"%(aPropertyName, aStepperID) )
 
@@ -263,11 +266,12 @@ class ModelStore:
         aPropertyList = {}
         aPropertyNames = self.__theDM.getClassInfo( aClass, DM_PROPERTYLIST )
         for aPropertyName in aPropertyNames:
-            if aClass == DM_SYSTEM_CLASS and ( aPropertyName == MS_STEPPER_PROCESSLIST or aPropertyName == MS_STEPPER_SYSTEMLIST ):
-                aDefaultValue = []
-                aType = DM_PROPERTY_NESTEDLIST
-                aFlags = ( False, False, False, False, False )
-            else:
+#            if aClass == DM_SYSTEM_CLASS and ( aPropertyName == MS_STEPPER_PROCESSLIST or aPropertyName == MS_STEPPER_SYSTEMLIST ):
+#                aDefaultValue = []
+#                aType = DM_PROPERTY_NESTEDLIST
+#                aFlags = ( False, False, False, False, False )
+#            else:
+            if True:
                 aDefaultValue = self.__theDM.getClassPropertyInfo( aClass, aPropertyName, DM_PROPERTY_DEFAULTVALUE )
                 aType = self.__theDM.getClassPropertyInfo( aClass, aPropertyName, DM_PROPERTY_TYPE )
                 settable = self.__theDM.getClassPropertyInfo( aClass, aPropertyName, DM_PROPERTY_SETTABLE_FLAG )
@@ -275,12 +279,10 @@ class ModelStore:
                 deleteable = self.__theDM.getClassPropertyInfo( aClass, aPropertyName, DM_PROPERTY_DELETEABLE_FLAG )
                 loadable = self.__theDM.getClassPropertyInfo( aClass, aPropertyName, DM_PROPERTY_LOADABLE_FLAG )
                 saveable = self.__theDM.getClassPropertyInfo( aClass, aPropertyName, DM_PROPERTY_SAVEABLE_FLAG )
-                changeable=False
-                aFlags = (  settable,gettable, loadable, saveable, deleteable,changeable)
+                changed = 0
+                aFlags = [ settable,gettable, loadable, saveable, deleteable,changed ]
             aPropertyList[aPropertyName] = [ aDefaultValue, aFlags, aType]
 
-        if aClass == DM_VARIABLE_CLASS:
-            aPropertyList[MS_VARIABLE_PROCESSLIST] = [ [], (False, True, False, False, False, False), DM_PROPERTY_NESTEDLIST ]
         
         return aPropertyList 
 
@@ -302,20 +304,21 @@ class ModelStore:
 
         anEntityType = self.__getEntityType( aFullID )
 
-        if aClass not in self.__theDM.getClassList( anEntityType ):
+#        if aClass not in self.__theDM.getClassList( anEntityType ):
             #self.__theNotExistClass.append(aClass)
             #raise Exception("There is no .desc file for %s!"%aClass)
-            raise ClassNotExistError(aClass)
+#            raise ClassNotExistError(aClass)
             
 
         aParentFullID = convertSysPathToSysID( self.__getEntityPath( aFullID ) )
         aParentSystem = self.__getEntity( aParentFullID )
         if aParentSystem == None:
             raise Exception( "Parent system of %s doesnot exist!"%aFullID )
+        anEntityType = self.__getEntityType( aFullID )
 
         aPropertyList = self.__createPropertyList( aClass )
         
-        self.__theEntity[aFullID] = [ aClass, aPropertyList, aParentSystem, [],  [], [], 'A System' ]
+        self.__theEntity[aFullID] = [ aClass, aPropertyList, aParentSystem, [],  [], [], 'User info not available' ]
 
         aFullPN = createFullPN( getParentSystemOfFullID(aFullID), 'StepperID')
        
@@ -494,7 +497,7 @@ class ModelStore:
 
 
 
-    def createEntityProperty( self, aFullID, aPropertyName, aValueList, aType = DM_PROPERTY_STRING, anAttribute = (1,1,1,1,1,0) ):
+    def createEntityProperty( self, aFullID, aPropertyName, aValueList, aType = DM_PROPERTY_STRING, anAttribute = [1,1,1,1,1,1] ):
         """create an entity property"""
     
         anEntity = self.__getEntity( aFullID )
@@ -611,12 +614,11 @@ class ModelStore:
                     aVariable = self.__getEntity( aFullID )
                     aSystemSize = self.__getSystemSize( aFullID )
                     self.__recalculateConcentrations( aVariable, aSystemSize )
-
         
-        # modify changeableFlag
-        oldFlag=aProperty[MS_PROPERTY_FLAGS]
-        newFlag=(self.changeChangeableFlag(aProperty))
-        aProperty[MS_PROPERTY_FLAGS]=newFlag
+        # modify changeedFlag
+
+        aProperty[MS_PROPERTY_FLAGS][MS_CHANGED_FLAG] = 1
+
 
     def __recalculateConcentrations(self,  aVariable, systemSize ):
         aValue = float( aVariable[MS_ENTITY_PROPERTYLIST][MS_VARIABLE_VALUE][MS_PROPERTY_VALUE] )
@@ -647,20 +649,20 @@ class ModelStore:
                 aVarref.append( 0 )
 
 
-    def changeChangeableFlag( self, aProperty ):
-        anOldProperty=aProperty
-        aPropertyFlag= anOldProperty[MS_PROPERTY_FLAGS]
-        #conver to tuple
-        settable = aPropertyFlag[MS_SETTABLE_FLAG]
-        gettable = aPropertyFlag[MS_GETTABLE_FLAG]
-        deleteable =aPropertyFlag[MS_DELETEABLE_FLAG]
-        loadable = aPropertyFlag[MS_LOADABLE_FLAG]
-        saveable = aPropertyFlag[MS_SAVEABLE_FLAG]
-        changeable=True
-        aNewPropertyFlag=(gettable,settable,loadable,saveable,deleteable,changeable)
-        return aNewPropertyFlag
+#    def changeChangeableFlag( self, aProperty ):
+#        anOldProperty=aProperty
+#        aPropertyFlag= anOldProperty[MS_PROPERTY_FLAGS]
+#        #conver to tuple
+#        settable = aPropertyFlag[MS_SETTABLE_FLAG]
+#        gettable = aPropertyFlag[MS_GETTABLE_FLAG]
+#        deleteable =aPropertyFlag[MS_DELETEABLE_FLAG]
+#        loadable = aPropertyFlag[MS_LOADABLE_FLAG]
+#        saveable = aPropertyFlag[MS_SAVEABLE_FLAG]
+#        changeable=True
+#        aNewPropertyFlag=(gettable,settable,loadable,saveable,deleteable,changeable)
+#        return aNewPropertyFlag
 
-    def loadEntityProperty( self, aFullPN, aValue, aType = DM_PROPERTY_STRING, anAttribute = (1,1,1,1,1) ):
+    def loadEntityProperty( self, aFullPN, aValue, aType = DM_PROPERTY_STRING, anAttribute = [1,1,1,1,1,1] ):
         aFullID = self.__getFullID( aFullPN )
         aPropertyName = self.__getPropertyName( aFullPN )
         if aFullID not in self.__theEntity.keys():
@@ -752,3 +754,11 @@ class ModelStore:
         return aProperty[MS_PROPERTY_TYPE]
 
 
+    # this is illegal for Model API, but needed for revokable operations
+    def setChangedFlag( self, aType, anID, aPropertyName, chgdFlag ):
+        if aType == ME_STEPPER_TYPE:
+            aProperty = self.__getStepperProperty( anID, aPropertyName )
+        else:
+            aProperty = self.__getEntityProperty( anID, aPropertyName )
+        aProperty[MS_PROPERTY_FLAGS][ME_CHANGED_FLAG] = chgdFlag
+            

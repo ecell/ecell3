@@ -40,6 +40,19 @@ class BufferFactory:
                 self.addToSystemListBuffer( aBuffer, anID )
         return aBuffer
 
+    def __fillEntityPropertyBuffer( self, aBuffer, aFullID, anID ):
+        propertyList = self.theModel.getEntityPropertyList( aFullID )
+        propBuffer = aBuffer.getPropertyBuffer( anID )
+        for aProperty in propertyList:
+
+            aFullPN = createFullPN( aFullID, aProperty )
+
+            # get System property values from model
+            self.addToEntityPropertyListBuffer( propBuffer, aFullPN )
+
+
+    def __copyEntityPropertyBuffer( self, toBuffer, fromBuffer, anID  ):
+        self.incrementEntityPropertyBuffer( toBuffer.getPropertyBuffer( anID ), fromBuffer.getPropertyBuffer( anID ) )
 
     def addToSystemListBuffer( self, aBuffer, aFullID ):
 
@@ -52,20 +65,8 @@ class BufferFactory:
         # create System in buffer
         aBuffer.createEntity( aClass, aFullID )
 
-        # get System propertylist from model
-        propertyList = self.theModel.getEntityPropertyList( aFullID )
-    
-        for aProperty in propertyList:
-
-            aFullPN = createFullPN( aFullID, aProperty )
-
-            # get System property values from model
-            if self.theModel.getEntityPropertyAttributes( aFullPN)[MS_GETTABLE_FLAG]:
-                aValueList = self.theModel.getEntityProperty( aFullPN )
-
-                # create System properties in model
-                aBuffer.createEntityProperty( aFullID, aProperty, aValueList )
-
+        self.__fillEntityPropertyBuffer( aBuffer, aFullID, aFullID )
+        
         aType = aFullID.split(':')[0]
         if aType != ME_SYSTEM_TYPE:
             return
@@ -101,19 +102,8 @@ class BufferFactory:
         # create System in buffer
         toBuffer.createEntity( aClass, aFullID )
 
-        # get System propertylist from model
-        propertyList = fromBuffer.getEntityPropertyList( aFullID )
-
-        for aProperty in propertyList:
-
-            aFullPN = createFullPN( aFullID, aProperty )
-
-            # get System property values from model
-
-            aValueList = fromBuffer.getEntityProperty(aFullID, aProperty)
-            # create System properties in model
-            toBuffer.createEntityProperty( aFullID, aProperty, aValueList )
-
+        self.__copyEntityPropertyBuffer( toBuffer, fromBuffer, aFullID )
+            
         aType = aFullID.split(':')[0]
         if aType != ME_SYSTEM_TYPE:
             return
@@ -144,18 +134,13 @@ class BufferFactory:
 
         # create stepper in buffer
         aBuffer.createStepper( aClass, anID )
-
+        propBuffer = aBuffer.getPropertyBuffer( anID )
         # get stepper propertylist from model
         propertyList = self.theModel.getStepperPropertyList( anID )
     
         for aProperty in propertyList:
 
-            # get stepper property values from model
-            if self.theModel.getStepperPropertyAttributes( anID, aProperty)[MS_GETTABLE_FLAG]:
-                aValueList = self.theModel.getStepperProperty( anID, aProperty )
-                # create stepper properties in model
-                aBuffer.createStepperProperty( anID, aProperty, aValueList )
-
+            self.addToStepperPropertyListBuffer( propBuffer, anID, aProperty )
 
 
     def incrementStepperBuffer( self, toBuffer, fromBuffer ):
@@ -172,16 +157,7 @@ class BufferFactory:
             toBuffer.createStepper( aClass, anID )
 
             # get stepper propertylist from frombuffer
-            propertyList = fromBuffer.getStepperPropertyList( anID )
-
-            for aProperty in propertyList:
-        
-                # get stepper property values from frombuffer
-                aValueList = fromBuffer.getStepperProperty( anID, aProperty )
-
-                # create stepper properties in tobuffer
-                toBuffer.createStepperProperty( anID, aProperty, aValueList )
-
+            self.incrementStepperPropertyBuffer( toBuffer.getPropertyBuffer( anID ), fromBuffer.getPropertyBuffer( anID ) )
 
 
     def createProcessListBuffer( self, aFullIDList = None ):
@@ -201,19 +177,7 @@ class BufferFactory:
         aBuffer.createEntity( aClass, anID )
 
         # get process propertylist from model
-        propertyList = self.theModel.getEntityPropertyList( aFullID )
-    
-        for aProperty in propertyList:
-
-            aFullPN = createFullPN( aFullID, aProperty )
-
-            # get process property values from model
-            if self.theModel.getEntityPropertyAttributes( aFullPN )[MS_GETTABLE_FLAG]:
-                aValueList = self.theModel.getEntityProperty( aFullPN )
-
-                # create stepper properties in model
-                aBuffer.createEntityProperty( anID, aProperty, aValueList )
-
+        self.__fillEntityPropertyBuffer( aBuffer, aFullID, anID )
 
 
     def incrementProcessBuffer( self, toBuffer, fromBuffer ):
@@ -230,16 +194,7 @@ class BufferFactory:
             toBuffer.createEntity( aClass, anID )
 
             # get entity propertylist from frombuffer
-            propertyList = fromBuffer.getEntityPropertyList( anID )
-
-            for aProperty in propertyList:
-
-                # get entity property values from frombuffer
-                aValueList = fromBuffer.getEntityPropertyList( anID)
-
-                # create entity properties in tobuffer
-                toBuffer.createEntityProperty( anID, aProperty, aValueList )
-
+            self.__copyEntityPropertyBuffer( toBuffer, fromBuffer, anID )
 
 
     def createVariableListBuffer( self, aFullIDList = None ):
@@ -260,18 +215,7 @@ class BufferFactory:
         aBuffer.createEntity( aClass, anID )
 
         # get process propertylist from model
-        propertyList = self.theModel.getEntityPropertyList( aFullID )
-    
-        for aProperty in propertyList:
-
-            aFullPN = createFullPN( aFullID, aProperty )
-
-            # get process property values from model
-            if self.theModel.getEntityPropertyAttributes( aFullPN )[MS_GETTABLE_FLAG]:
-                aValueList = self.theModel.getEntityProperty( aFullPN )
-
-                # create stepper properties in model
-                aBuffer.createEntityProperty( anID, aProperty, aValueList )
+        self.__fillEntityPropertyBuffer( aBuffer, aFullID, anID ) 
 
 
 
@@ -289,15 +233,7 @@ class BufferFactory:
             toBuffer.createEntity( aClass, anID )
 
             # get entity propertylist from frombuffer
-            propertyList = fromBuffer.getEntityPropertyList( anID )
-
-            for aProperty in propertyList:
-
-                # get entity property values from frombuffer
-                aValueList = fromBuffer.getEntityPropertyList(anID)
-
-                # create entity properties in tobuffer
-                toBuffer.createEntityProperty( anID, aProperty, aValueList )
+            self.__copyEntityPropertyBuffer( toBuffer, fromBuffer, anID )
 
 
 
@@ -341,17 +277,23 @@ class BufferFactory:
 
 
     def addToEntityPropertyListBuffer( self, aBuffer, aFullPN ):
-        if self.theModel.getEntityPropertyAttributes( aFullPN )[MS_GETTABLE_FLAG]:
+        attributes = self.theModel.getEntityPropertyAttributes( aFullPN )
+        if attributes[MS_GETTABLE_FLAG]:
             aValueList = self.theModel.getEntityProperty( aFullPN )
+            if len(attributes) > 4:
+                changedFlag = attributes[ME_CHANGED_FLAG]
+            else:
+                changedFlag = attributes[ME_SAVEABLE_FLAG]
             aPropertyName = aFullPN.split(':')[3]
-            aBuffer.createProperty( aPropertyName, aValueList )
+            aBuffer.createProperty( aPropertyName, aValueList, changedFlag )
 
 
     def incrementEntityPropertyBuffer( self, toBuffer, fromBuffer ):
         aPropertyList = fromBuffer.getPropertyList()
         for aPropertyName in aPropertyList:
             aValueList = fromBuffer.getProperty( aPropertyName )
-            toBuffer.createProperty( aPropertyName, aValueList )
+            chgFlag = fromBuffer.getChangedFlag( aPropertyName )
+            toBuffer.createProperty( aPropertyName, aValueList, chgFlag )
 
 
     def createStepperPropertyListBuffer ( self, aStepperID = None, aPropertyNameList = None ):
@@ -363,16 +305,22 @@ class BufferFactory:
 
 
     def addToStepperPropertyListBuffer( self, aBuffer, aStepperID, aPropertyName ):
-        if self.theModel.getStepperPropertyAttributes( aStepperID, aPropertyName)[MS_GETTABLE_FLAG]:
+        attributes = self.theModel.getStepperPropertyAttributes( aStepperID, aPropertyName)
+        if attributes[MS_GETTABLE_FLAG]:
             aValueList = self.theModel.getStepperProperty( aStepperID, aPropertyName )
-            aBuffer.createProperty( aPropertyName, aValueList )
+            if len(attributes) >4:
+                chgdFlag = attributes[ME_CHANGED_FLAG]
+            else:
+                chgdFlag = attributes[ME_SAVEABLE_FLAG]
+            aBuffer.createProperty( aPropertyName, aValueList, chgdFlag )
 
 
     def incrementStepperPropertyBuffer( self, toBuffer, fromBuffer ):
-        aPropertyList = fromBuffer.getPropertyList
+        aPropertyList = fromBuffer.getPropertyList()
         for aPropertyName in aPropertyList:
             aValueList = fromBuffer.getProperty( aPropertyName )
-            toBuffer.createProperty( aPropertyName, aValueList )
+            chgdFlag = fromBuffer.getChangedFlag( aPropertyName )
+            toBuffer.createProperty( aPropertyName, aValueList, chgdFlag )
 
 
 
@@ -495,18 +443,21 @@ class BufferPaster:
 
         for aPropertyName in aBufferPropertyList:
             aValueList = aBuffer.getProperty( aPropertyName )
+            chgdFlag = aBuffer.getChangedFlag( aPropertyName )
             if aPropertyName in aModelPropertyList:
                 if self.theModel.getStepperPropertyAttributes(anID, aPropertyName)[MS_SETTABLE_FLAG]:
                     aType = self.theModel.getStepperPropertyType( anID, aPropertyName )
                     convertedValue = DMTypeCheck( aValueList, aType )
                     if convertedValue != None:
-                        self.theModel.setStepperProperty( anID, aPropertyName, convertedValue )
+                        self.theModel.setStepperProperty( anID, aPropertyName, convertedValue)
+                        self.theModel.setChangedFlag ( ME_STEPPER_TYPE, anID, aPropertyName, chgdFlag )
             elif forceCreate:
                 aType = DM_PROPERTY_STRING
                 convertedValue = DMTypeCheck(  aValueList, aType )
                 if convertedValue != None:
                     try:
-                        self.theModel.createStepperProperty( anID, aPropertyName, aValueList )
+                        self.theModel.createStepperProperty( anID, aPropertyName, aValueList)
+                        self.theModel.setChangedFlag ( ME_STEPPER_TYPE, anID, aPropertyName, chgdFlag )
                     except Exception:
                         pass
 
@@ -520,6 +471,7 @@ class BufferPaster:
         aModelPropertyList = self.theModel.getEntityPropertyList( aFullID)
         for aPropertyName in aBufferPropertyList:
             aValueList = aBuffer.getProperty( aPropertyName )
+            chgdFlag = aBuffer.getChangedFlag( aPropertyName )
             if aPropertyName in aModelPropertyList:
                 aFullPN = createFullPN( aFullID, aPropertyName )
                 if self.theModel.getEntityPropertyAttributes( aFullPN )[MS_SETTABLE_FLAG]:
@@ -527,9 +479,11 @@ class BufferPaster:
                     convertedValue = DMTypeCheck( aValueList, aType )
                     if convertedValue != None:
                         self.theModel.setEntityProperty( aFullPN, convertedValue)
+                        self.theModel.setChangedFlag( aType, aFullID, aPropertyName, chgdFlag )
             elif forceCreate:
                 aType = DM_PROPERTY_STRING
                 convertedValue = DMTypeCheck(  aValueList, aType )
                 if convertedValue != None:
+                    #exception handling here
                     self.theModel.createEntityProperty( aFullID, aPropertyName, aValueList )
-
+                    self.theModel.setChangedFlag( aType, aFullID, aPropertyName, chgdFlag )

@@ -108,7 +108,7 @@ class ConfirmWindow(gtk.Dialog):
             self.addButton( "  Yes  ", YES_PRESSED, True )
             self.addButton( "  No  ", NO_PRESSED, False )
 
-        gtk.mainloop()
+        gtk.main()
 
 
     # ==========================================================================
@@ -146,7 +146,7 @@ class ConfirmWindow(gtk.Dialog):
         """destroy dialog
         """
         self.win.hide()
-        gtk.mainquit()
+        gtk.main_quit()
 
 
 # ----------------------------------------------------

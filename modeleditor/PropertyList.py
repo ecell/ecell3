@@ -47,6 +47,11 @@ from Constants import *
 from EntityCommand import *
 from StepperCommand import *
 
+PROP_SAVED = "grey0"
+PROP_CAN_BE_SAVED = "grey35"
+PROP_WILL_NOT_SAVED = "grey70"
+CHGD_PROP_IND_TYPE = gobject.TYPE_STRING
+
 class PropertyList( ViewComponent ):
 
     #######################
@@ -64,13 +69,13 @@ class PropertyList( ViewComponent ):
                     gobject.TYPE_BOOLEAN, gobject.TYPE_BOOLEAN, \
                     gobject.TYPE_BOOLEAN, gobject.TYPE_BOOLEAN,\
                     gobject.TYPE_BOOLEAN, gobject.TYPE_BOOLEAN,\
-                     gobject.TYPE_STRING,gobject.TYPE_STRING)
-
+                     gobject.TYPE_STRING,CHGD_PROP_IND_TYPE)
+        self.theListStore.set_sort_column_id(9, gtk.SORT_ASCENDING)
         self['theTreeView'].set_model(self.theListStore)
         self.noActivate = False
         renderer = gtk.CellRendererText()
         renderer.connect('edited', self.__nameEdited)
-        column = gtk.TreeViewColumn( 'Name', renderer, text = 0, editable = 4)
+        column = gtk.TreeViewColumn( 'Name', renderer, text = 0, editable = 4, foreground = 9)
         column.set_visible( gtk.TRUE )
         column.set_resizable( gtk.TRUE )
         self['theTreeView'].append_column(column)
@@ -78,7 +83,7 @@ class PropertyList( ViewComponent ):
 
         renderer = gtk.CellRendererText()
         renderer.connect('edited', self.__valueEdited)
-        column = gtk.TreeViewColumn( 'Value', renderer, text = 1, editable = 5)
+        column = gtk.TreeViewColumn( 'Value', renderer, text = 1, editable = 5, foreground = 9)
         column.set_visible( gtk.TRUE )
         column.set_resizable( gtk.TRUE )
         self['theTreeView'].append_column(column)
@@ -111,7 +116,7 @@ class PropertyList( ViewComponent ):
 
         # add variable type column
         renderer = gtk.CellRendererText()
-        column = gtk.TreeViewColumn( 'Type', renderer, text = 8, editable = 5)
+        column = gtk.TreeViewColumn( 'Type', renderer, text = 8, editable = 5, foreground = 9)
         column.set_visible( gtk.TRUE )
         column.set_resizable( gtk.TRUE )
         self['theTreeView'].append_column(column)
@@ -189,22 +194,29 @@ class PropertyList( ViewComponent ):
     def getPropertyType ( self, aName ):
         #FIXME!
         # this whole method should be rewritten using DMINFO!
-        if self.theModelEditor.getMode() == ME_RUN_MODE:
-            return DM_PROPERTY_STRING
+        #if self.theModelEditor.getMode() == ME_RUN_MODE:
+        #    return DM_PROPERTY_STRING
         if self.theType == 'Stepper':
-            return self.theModelEditor.getModel().getStepperPropertyType( self.theDisplayedEntity, aName )
+            aClass = self.theModelEditor.getModel().getStepperClassName( self.theDisplayedEntity )
+#            return self.theModelEditor.getModel().getStepperPropertyType( self.theDisplayedEntity, aName )
         elif self.theType == 'Entity':
-            fpn = self.theDisplayedEntity + ':' + aName
-            return self.theModelEditor.getModel().getEntityPropertyType( fpn )
+#            fpn = self.theDisplayedEntity + ':' + aName
+            aClass = self.theModelEditor.getModel().getEntityClassName( self.theDisplayedEntity )
+#            return self.theModelEditor.getModel().getEntityPropertyType( fpn )
         else:
             return None
+        return self.theModelEditor.theDMInfo.getClassPropertyInfo ( aClass, aName, DM_PROPERTY_TYPE )
 
-    def getPropertyChangeable ( self, aName ):
+    def getPropertyChanged ( self, aName ):
+        # if it is running all properties may change
+        if self.theModelEditor.getMode() == ME_RUN_MODE:
+            return 1
+
         if self.theType == 'Stepper':
-            return self.theModelEditor.getModel().getStepperPropertyAttributes( self.theDisplayedEntity, aName )[ME_CHANGEABLE_FLAG]
+            return self.theModelEditor.getModel().getStepperPropertyAttributes( self.theDisplayedEntity, aName )[ME_CHANGED_FLAG]
         elif self.theType == 'Entity':
             fpn = self.theDisplayedEntity + ':' + aName
-            return self.theModelEditor.getModel().getEntityPropertyAttributes( fpn )[ME_CHANGEABLE_FLAG]
+            return self.theModelEditor.getModel().getEntityPropertyAttributes( fpn )[ME_CHANGED_FLAG]
         else:
             return None
 
@@ -639,14 +651,16 @@ self.theDisplayedEntity, self.theSelection )
                 aValue.append( self.getPropertyLoadable( anID ) )
                 aValue.append( self.getPropertySaveable( anID ) )
                 aValue.append( self.getPropertyType( anID ))
+
+                if self.getPropertyChanged( anID ) and self.getPropertySaveable( anID ):
+                    aValue.append( PROP_SAVED )
+                elif self.getPropertySaveable( anID ):
+                    aValue.append( PROP_CAN_BE_SAVED )
+                else:
+                    aValue.append( PROP_WILL_NOT_SAVED )
+
             else:
-                aValue += [ "N/A", False, False, False, False, False, False, "N/A" ]
-            '''
-            if self.getPropertyChangeable( anID )==0:
-                aValue.append( 'black' )
-            else:
-                aValue.append( 'black' )
-            '''
+                aValue += [ "N/A", False, False, False, False, False, False, "N/A", PROP_WILL_NOT_SAVED ]
             aValueList.append( aValue )
         
         
@@ -671,7 +685,7 @@ self.theDisplayedEntity, self.theSelection )
             self.theListStore.set_value ( anIter, 6 , aValue[6] )
             self.theListStore.set_value ( anIter, 7 , aValue[7] )
             self.theListStore.set_value ( anIter, 8 , aValue[8] )
-            #self.theListStore.set_value( anIter, 9 , aValue[9] )
+            self.theListStore.set_value( anIter, 9 , aValue[9] )
 
     def __deleteRows( self, aNameList ):
         """

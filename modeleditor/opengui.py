@@ -25,5 +25,5 @@ if len( sys.argv)>1:
     
 
 g=ModelEditor.ModelEditor(aFileName)
-gtk.mainloop()
+gtk.main()
 
