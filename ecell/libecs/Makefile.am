@@ -57,6 +57,7 @@ VVector.cpp\
 osif.cpp\
 Logger.cpp\
 PhysicalLogger.cpp\
+VariableReference.cpp\
 LoggerBroker.cpp\
 Exceptions.cpp
 

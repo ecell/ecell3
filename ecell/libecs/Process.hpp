@@ -69,7 +69,12 @@ namespace libecs
       {
 	INHERIT_PROPERTIES( Entity );
 
-	PROPERTYSLOT_SET_GET( Polymorph, VariableReferenceList );
+	PROPERTYSLOT_LOAD_SAVE( Polymorph, VariableReferenceList,
+				&Process::setVariableReferenceList,
+				&Process::getVariableReferenceList,
+				&Process::setVariableReferenceList,
+				&Process::saveVariableReferenceList );
+
 	PROPERTYSLOT_SET_GET( Integer,       Priority );
 	PROPERTYSLOT_SET_GET( String,    StepperID );
 
@@ -182,7 +187,7 @@ namespace libecs
 
     SET_METHOD( Polymorph, VariableReferenceList );
     GET_METHOD( Polymorph, VariableReferenceList );
-
+    const Polymorph saveVariableReferenceList() const;
 
 
     /**
@@ -398,6 +403,15 @@ namespace libecs
   protected:
 
     VariableReferenceVectorIterator findVariableReference( StringCref aName );
+
+    void updateVariableReferenceVector();
+
+    //    static const Polymorph 
+    //      convertVariableReferenceToPolymorph( VariableReferenceCref 
+    //					   aVariableReference );
+
+    //    static const VariableReference 
+    //      convertPolymorphToVariableReference( PolymorphCref aPolymorph );
 
   protected:
 

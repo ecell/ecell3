@@ -248,7 +248,7 @@ namespace libecs
     {
       PropertySlotMapConstIterator 
 	aPropertySlotMapIterator( findPropertySlot( aPropertyName ) );
-      
+
       if( aPropertySlotMapIterator != thePropertySlotMap.end() )
 	{
 	  PropertySlotPtr aPropertySlotPtr( aPropertySlotMapIterator->second );

@@ -28,10 +28,13 @@
 // E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
 
+#include <boost/format.hpp>
+
 #include "Util.hpp"
 #include "VariableReference.hpp"
 #include "Stepper.hpp"
 #include "FullID.hpp"
+#include "Exceptions.hpp"
 #include "Variable.hpp"
 #include "Model.hpp"
 
@@ -61,7 +64,8 @@ namespace libecs
     PolymorphVector aVector;
     aVector.reserve( theVariableReferenceVector.size() );
   
-    for( VariableReferenceVectorConstIterator i( theVariableReferenceVector.begin() );
+    for( VariableReferenceVectorConstIterator 
+	   i( theVariableReferenceVector.begin() );
 	 i != theVariableReferenceVector.end() ; ++i )
       {
 	PolymorphVector anInnerVector;
@@ -81,6 +85,26 @@ namespace libecs
 	  push_back( static_cast<Integer>( aVariableReference.isAccessor() ) );
 
 	aVector.push_back( anInnerVector );
+      }
+
+    return aVector;
+  }
+
+  const Polymorph Process::saveVariableReferenceList() const
+  {
+    PolymorphVector aVector( getVariableReferenceList().asPolymorphVector() );
+
+    // convert back all variable reference ellipses to the default '_'.
+    for( PolymorphVectorIterator i( aVector.begin() ); 
+	 i != aVector.end(); ++i )
+      {
+	PolymorphVector anInnerVector( (*i).asPolymorphVector() );
+	if( VariableReference::
+	    isEllipsisNameString( anInnerVector[0].asString() ) )
+	  {
+	    anInnerVector[0] = Polymorph( VariableReference::DEFAULT_NAME );
+	    (*i) = anInnerVector;  // copy back
+	  }
       }
 
     return aVector;
@@ -135,9 +159,24 @@ namespace libecs
 
   }
 
-  VariableReference Process::getVariableReference( StringCref aName )
+  VariableReference Process::getVariableReference( StringCref 
+						   aVariableReferenceName )
   {
-    return *( findVariableReference( aName ) );
+    VariableReferenceVectorConstIterator 
+      anIterator( findVariableReference( aVariableReferenceName ) );
+
+    if( anIterator != theVariableReferenceVector.end() )
+      {
+	return *anIterator;
+      }
+    else
+      {
+	THROW_EXCEPTION( NotFound,
+			 "[" + getFullID().getString() + 
+			 "]: VariableReference [" + aVariableReferenceName + 
+			 "] not found in this Process." );
+      }
+
   }
 
   void Process::removeVariableReference( StringCref aName )
@@ -157,7 +196,7 @@ namespace libecs
 			 + "]: ill-formed VariableReference given." );
       }
 
-    const String aVariableReferenceName(  aValue[0].asString() );
+    const String aVariableReferenceName( aValue[0].asString() );
 
     // If it contains only the VariableReference name,
     // remove the VariableReference from this process
@@ -203,21 +242,61 @@ namespace libecs
 					   const Integer aCoefficient,
 					   const bool isAccessor )
   {
-    VariableReference aVariableReference( aName, aVariable, aCoefficient );
+    String aVariableReferenceName( aName );
+
+    if( VariableReference::isDefaultNameString( aVariableReferenceName ) )
+      {
+	try
+	  {
+	    Integer anEllipsisNumber( 0 );
+	    if( ! theVariableReferenceVector.empty() )
+	      {
+		VariableReferenceVectorConstIterator 
+		  aLastEllipsisIterator
+		  ( std::max_element( theVariableReferenceVector.begin(), 
+				      theVariableReferenceVector.end(), 
+				      VariableReference::NameLess() ) );
+		
+		VariableReferenceCref aLastEllipsis( *aLastEllipsisIterator );
+		
+		anEllipsisNumber = aLastEllipsis.getEllipsisNumber();
+		++anEllipsisNumber;
+	      }
+	    
+	    aVariableReferenceName = VariableReference::ELLIPSIS_PREFIX + 
+	      ( boost::format( "%03d" ) % anEllipsisNumber ).str();
+	  }
+	catch( const ValueError& )
+	  {
+	    ; // pass
+	  }
+      }
+
+    if( findVariableReference( aVariableReferenceName ) != 
+	theVariableReferenceVector.end() )
+      {
+	THROW_EXCEPTION( AlreadyExist,
+			 "[" + getFullID().getString() + 
+			 "]: VariableReference [" + aVariableReferenceName + 
+			 "] already exists in this Process." );
+
+      }
+
+    VariableReference aVariableReference( aVariableReferenceName, 
+					  aVariable, aCoefficient );
     theVariableReferenceVector.push_back( aVariableReference );
 
 
     //FIXME: can the following be moved to initialize()?
+    updateVariableReferenceVector();
+  }
 
+  void Process::updateVariableReferenceVector()
+  {
     // first sort by reference name
     std::sort( theVariableReferenceVector.begin(), 
 	       theVariableReferenceVector.end(), 
-	       VariableReference::NameCompare() );
-
-    // then sort by coefficient, preserving the relative order by the names
-    std::stable_sort( theVariableReferenceVector.begin(), 
-		      theVariableReferenceVector.end(), 
-		      VariableReference::CoefficientCompare() );
+	       VariableReference::Less() );
 
     // find the first VariableReference whose coefficient is 0,
     // and the first VariableReference whose coefficient is positive.
@@ -226,7 +305,7 @@ namespace libecs
       aZeroRange( std::equal_range( theVariableReferenceVector.begin(), 
 				    theVariableReferenceVector.end(), 
 				    0, 
-				    VariableReference::CoefficientCompare()
+				    VariableReference::CoefficientLess()
 				    ) );
 
     theZeroVariableReferenceIterator     = aZeroRange.first;
@@ -234,24 +313,22 @@ namespace libecs
   }
 
 
+
   VariableReferenceVectorIterator 
-  Process::findVariableReference( StringCref aName )
+  Process::findVariableReference( StringCref aVariableReferenceName )
   {
     // well this is a linear search.. but this won't be used during simulation.
     for( VariableReferenceVectorIterator 
 	   i( theVariableReferenceVector.begin() );
 	 i != theVariableReferenceVector.end(); ++i )
       {
-	if( (*i).getName() == aName )
+	if( (*i).getName() == aVariableReferenceName )
 	  {
 	    return i;
 	  }
       }
 
-    THROW_EXCEPTION( NotFound,
-		     "[" + getFullID().getString() + 
-		     "]: VariableReference [" + aName + 
-		     "] not found in this Process." );
+    return theVariableReferenceVector.end();
   }
 
   void Process::declareUnidirectional()

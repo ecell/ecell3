@@ -49,11 +49,11 @@ namespace libecs
 
   public:
 
-    class CoefficientCompare
+    class CoefficientLess
     {
     public:
 
-      CoefficientCompare()
+      CoefficientLess()
       {
 	; // do nothing
       }
@@ -83,11 +83,11 @@ namespace libecs
 
     };
 
-    class NameCompare
+    class NameLess
     {
     public:
 
-      NameCompare()
+      NameLess()
       {
 	; // do nothing
       }
@@ -113,9 +113,59 @@ namespace libecs
 
     private:
 
-      static const std::less<String> compare;
+      static const bool compare( StringCref aLhs, StringCref aRhs )
+      {
+	const bool anIsLhsEllipsis( VariableReference::
+				    isEllipsisNameString( aLhs ) );
+	const bool anIsRhsEllipsis( VariableReference::
+				    isEllipsisNameString( aRhs ) );
+
+	// both are ellipses, or both are normal names.
+	if( anIsLhsEllipsis == anIsLhsEllipsis )
+	  {
+	    return stringcompare( aLhs, aRhs );
+	  }
+	else // always sort ellipses last
+	  {
+	    return anIsRhsEllipsis;
+	  }
+      }
+
+      static const std::less<String> stringcompare;
+    };
+
+
+    // compare coefficients first, and if equal, compare names.
+    class Less
+    {
+    public:
+
+      Less()
+      {
+	; // do nothing
+      }
+
+      bool operator()( VariableReferenceCref aLhs, 
+		       VariableReferenceCref aRhs ) const
+      {
+	static CoefficientLess aCoefficientLess;
+	if( aCoefficientLess( aLhs, aRhs ) )
+	  {
+	    return true;
+	  }
+	else if( aCoefficientLess( aRhs, aLhs ) )
+	  {
+	    return false;
+	  } 
+	else // lhs.coeff == rhs.coeff
+	  {
+	    static NameLess aNameLess;
+	    return aNameLess( aLhs, aRhs );
+	  }
+      }
 
     };
+
 
   public:
 
@@ -269,6 +319,26 @@ namespace libecs
       return theVariablePtr->getSuperSystem();
     }
 
+    const bool isEllipsisName() const
+    {
+      return isEllipsisNameString( theName );
+    }
+
+    const Integer getEllipsisNumber() const;
+
+    const bool isDefaultName() const
+    {
+      return isDefaultNameString( theName );
+    }
+
+    static const bool isEllipsisNameString( StringCref aname );
+    static const bool isDefaultNameString( StringCref aname );
+
+
+  public:
+
+    static const String ELLIPSIS_PREFIX;
+    static const String DEFAULT_NAME;
 
   private:
 
