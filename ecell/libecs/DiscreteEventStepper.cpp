@@ -195,8 +195,12 @@ namespace libecs
 
   void DiscreteEventStepper::interrupt( StepperPtr const aCaller )
   {
+    // update current time, because the procedure below
+    // is effectively a stepping.
+    const Real aNewCurrentTime( aCaller->getCurrentTime() );
+    setCurrentTime( aNewCurrentTime );
+
     // update step intervals of all the DiscreteEventProcesses.
-    const Real aCallerCurrentTime( aCaller->getCurrentTime() );
     for( DiscreteEventProcessVector::const_iterator 
 	   i( theDiscreteEventProcessVector.begin() );
 	 i != theDiscreteEventProcessVector.end(); ++i )
@@ -209,15 +213,14 @@ namespace libecs
 
 	thePriorityQueue.
 	  changeOneKey( anDiscreteEventProcessPtr->getIndex(),
-			StepperEvent( aStepInterval + aCallerCurrentTime,
+			StepperEvent( aStepInterval + aNewCurrentTime,
 				      anDiscreteEventProcessPtr ) );
       }
 
     StepperEventCref aTopEvent( thePriorityQueue.top() );
     const Real aNewTime( aTopEvent.getTime() );
 
-    // reschedule this Stepper to aNewStepInterval past current time of
-    // the interruption caller.
+    // reschedule this Stepper
     loadStepInterval( aNewTime - getCurrentTime() );
 
     getModel()->reschedule( this );
