@@ -1,0 +1,7 @@
+@echo off
+set pathsaved=%PATH%
+set prefix=%cd%
+set ECELL3_PREFIX=%prefix%
+set PATH=%prefix%;%prefix%\bin;%prefix%\python@PYTHON_WIN_VERSION@;%prefix%\lib;%PATH%
+start "E-Cell3 Console"
+set PATH=%pathsaved%

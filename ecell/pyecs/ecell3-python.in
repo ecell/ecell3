@@ -11,6 +11,7 @@ pythondir=@pythondir@
 export ECELL3_PREFIX=${prefix}
 export OSOGOPATH=${exec_prefix}/lib/osogo
 export MEPATH=${exec_prefix}/lib/modeleditor
+export TLPATH=${exec_prefix}/lib/toollauncher
 export LD_LIBRARY_PATH="${exec_prefix}/lib:${LD_LIBRARY_PATH}"
 export PYTHONPATH="$pythondir:${PYTHONPATH}"
 export PYTHON_INCLUDES="@PYTHON_INCLUDES@ @BOOST_INCLUDE@"

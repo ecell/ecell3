@@ -11,9 +11,15 @@ pkgpythondir=@pkgpythondir@
 if OS_WIN32
   no_undefined = -no-undefined
   LIBPYTHON = -lpython@PYTHON_WIN_VERSION@
-  ECELL3_PYTHON_EXT = .bat
+  winrootdir = ${prefix}
+  winroot_SCRIPTS=\
+  windows/ecell3-python.bat\
+  windows/ecell3-console.bat\
+  windows/ecell3-inno.iss\
+  windows/ecell3-console.ico
 else
-  ECELL3_PYTHON_EXT =
+  bin_SCRIPTS =\
+  ecell3-python
 endif
 
 BOOST_INCLUDE=@BOOST_INCLUDE@
@@ -76,7 +82,4 @@ $(EMC_SO): _emc.la
 clean-local:
 	rm -f $(ECS_SO) $(EMC_SO)
 
-
-bin_SCRIPTS =\
-ecell3-python$(ECELL3_PYTHON_EXT)
 

@@ -115,6 +115,7 @@ dnl disable checking dlopen for windows
 case ${host_os} in
   *cygwin* | *mingw* | *win32*)
     os_win32=yes
+    pythondir=$PREFIX/python$PYTHON_WIN_VERSION/lib/site-packages
     ;;
   *)
     AC_CHECK_LIB(dl, dlopen, LIBDL="-ldl")
@@ -248,7 +249,9 @@ AC_CONFIG_FILES([pyecs/ecell3-python], [chmod +x pyecs/ecell3-python])
 AC_CONFIG_FILES([Makefile
 		 libecs/Makefile
 		 libemc/Makefile
-		 pyecs/ecell3-python.bat
+		 pyecs/windows/ecell3-python.bat
+		 pyecs/windows/ecell3-console.bat
+		 pyecs/windows/ecell3-inno.iss
 		 pyecs/Makefile
 		 pyecell/Makefile
 		 pyecell/ecell/Makefile

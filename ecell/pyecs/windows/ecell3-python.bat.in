@@ -4,10 +4,11 @@ set VERSION=@VERSION@
 if "x%prefix%"=="x" set paths=%PATH%
 if "x%prefix%"=="x" set prefix=%cd%
 if "x%pathsaved%"=="x" set PATH=%prefix%;%prefix%\bin;%prefix%\Python@PYTHON_WIN_VERSION@;%prefix%\lib;%PATH%
-
 set ECELL3_PREFIX=%prefix%
 set exec_prefix=%ECELL3_PREFIX%
 set OSOGOPATH=%exec_prefix%\lib\osogo
+set MEPATH=%exec_prefix%\lib\modeleditor
+set TLPATH=%exec_prefix%\lib\toollauncher
 set VVECTORTMPDIR=%TMP%
 set pythondir=%prefix%\Python@PYTHON_WIN_VERSION@\lib\site-packages
 if "x%LD_LIBRARY_PATH%"=="x" set LD_LIBRARY_PATH=%exec_prefix%\lib;%exec_prefix%\lib\osogo;%LD_LIBRARY_PATH%
