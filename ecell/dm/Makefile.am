@@ -9,6 +9,8 @@ DM_SRC_DIR =  ${prefix}/share/${PACKAGE}/${VERSION}/DM
 DMS = MassActionProcess.cpp\
 MichaelisUniUniProcess.cpp\
 RapidEquilibriumProcess.cpp\
+MichaelisUniUniReversibleProcess.cpp\
+CatalyzedMassActionFluxProcess.cpp\
 SSystemProcess.cpp\
 NRProcess.cpp\
 NRStepper.cpp\
