@@ -59,7 +59,7 @@ Options:
         -t or --template file       Specify a dmgen template file.
         -T or --type type           Specify a template type.
 	-i or --include directory   Specify a dmcompile include file.
-        -m or --munch file          Specify munch file.
+        -m or --em file          Specify em file.
         -v or --verbose   	    Be verbose.
         -h or --help		    Print this message.
 
@@ -123,7 +123,7 @@ fi
 # get dynamic module class
 
 #default class is reactor
-TYPE='reactor'
+TYPE='Reactor'
 
 TEMPLATEDIR="${prefix}/share/ecell/@VERSION@/template/$TYPE"
 
@@ -135,7 +135,7 @@ while [ -n "$(echo $1 | grep '-')" ]; do
 	-c|--compile) DO_COMPILE=yes ; shift ;;
 	-t|--template) HAVE_TEMPLATE=yes ; templatefile=$2 ; shift 2 ;;
 	-i|--include) HAVE_INCLUDE=yes ; includedir=$2 ; shift 2 ;;
-	-m|--munch) HAVE_MUNCH=yes ; MUNCHFILE=$2 ; shift 2 ;;
+	-m|--em) HAVE_EMPY=yes ; EMPYFILE=$2 ; shift 2 ;;
 	-v|--verbose) VERBOSE=yes ; shift ;;
 	-h|--help) help ; exit 0 ;;
 	*) echo "Invarid Option! " ; help ; exit 1 ;;
@@ -181,8 +181,8 @@ if [ $DO_GENERATE ] ; then
 	command_string="$command_string -t $templatefile"
     fi
 
-    if [ $HAVE_MUNCH ] ; then 
-	command_string="$command_string -m $munchfile"
+    if [ $HAVE_EMPY ] ; then 
+	command_string="$command_string -m $emfile"
     fi
 
     if run_command $command_string ; then

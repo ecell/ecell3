@@ -184,7 +184,7 @@ Makefile
 libecs/Makefile
 libecs/emtool
 libecs/dmtemplates/Makefile
-libecs/dmtemplates/reactor/Makefile
+libecs/dmtemplates/Reactor/Makefile
 libemc/Makefile
 pyecs/Makefile
 pyecs/ecell3

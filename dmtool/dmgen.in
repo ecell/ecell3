@@ -15,12 +15,16 @@ pythondir=@pythondir@
 
 SHAREDIR="${prefix}/share/ecell/@VERSION@/template"
 BINDIR="${exec_prefix}/bin"
-MUNCHBIN="${pythondir}/ecell/munch.py"
+EMPYBIN="${pythondir}/ecell/em.py"
 TMPLDIR="${prefix}/share/ecell/@VERSION@/template"
 
-MUNCHSUFFIX=".mu"
-TMPLSUFFIX=".tmpl"
+EMPYOPTIONS="--flatten"
 
+PYSUFFIX=".py"
+EMSUFFIX=".em"
+OUTSUFFIX=".cpp"
+
+unset VERBOSE HAVE_TEMPLATE HAVE_PY
 
 help() 
 {
@@ -31,8 +35,8 @@ Usage:
 	`basename $0` -h|--help
 Options:
 	-d|--dmfilename)    Specify dmfile
-	-t|--template)      Specify template file
-        -m|--munch)         Specify munch file
+	-t|--template)      Specify template (.em) file
+        -p|--py)            Specify python script file
 	-h|--help)          Print this massage
 EOT_HELP
 }
@@ -60,30 +64,40 @@ shift
 while [ -n "$(echo $1 | grep '-')" ]; do
     case "$1" in
 	-d|--dmfile) DMFILE=$2 ; shift 2 ;;
-	-t|--template) DO_TEMPLATE=yes ; TEMPLATEFILE=$2 ; shift 2 ;;
-	-m|--munch) DO_MUNCH=yes ; MUNCHFILE=$2 ; shift 2 ;;
+	-t|--template) HAVE_TEMPLATE=yes ; EMFILE=$2 ; shift 2 ;;
+	-p|--py) HAVE_PY=yes ; PYFILE=$2 ; shift 2 ;;
+	-v|--verbose) VERBOSE=yes ; shift ;;
 	-h|--help) help ; exit 0 ;;
 	*) echo "Invalid Option! " ; help ; exit 1 ;;
     esac
 done
 
-# munch command
+# em command
 
 base=`basename $DMFILE .dm`
+outfile=$base$OUTSUFFIX
 
-if [ $DO_TEMPLATE ] ; then 
-    TMPLFILE="${TEMPLATEFILE}"
+if [ $HAVE_TEMPLATE ] ; then 
+    EMFILE="${EMFILE}"
 else
-    TMPLFILE="${TMPLDIR}/${CLASS}/${CLASS}${TMPLSUFFIX}"
+    EMFILE="${TMPLDIR}/${CLASS}/${CLASS}${EMSUFFIX}"
 fi
 
-if [ $DO_MUNCH ] ; then 
-    MUNCHFILE="${MUNCHFILE}"
+if [ $HAVE_EMPY ] ; then 
+    PYFILE="${PYFILE}"
 else
-    MUNCHFILE="${TMPLDIR}/${CLASS}/${CLASS}${MUNCHSUFFIX}"
+    PYFILE="${TMPLDIR}/${CLASS}/${CLASS}${PYSUFFIX}"
 fi
 
-python $MUNCHBIN $MUNCHFILE $DMFILE $TMPLFILE > $base.cpp
+
+
+command="python $EMPYBIN $EMPYOPTIONS -F $PYFILE -F $DMFILE -o $outfile $EMFILE"
+
+if [ $VERBOSE ] ; then
+    echo $command
+fi
+
+$command
 
 exit $?
 

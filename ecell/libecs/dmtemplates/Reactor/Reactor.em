@@ -3,13 +3,17 @@
 
 #include <iostream>
 
-#include "libecs/libecs.hpp"
-#include "libecs/System.hpp"
-#include "libecs/Substance.hpp"
-#include "libecs/Util.hpp"
-#include "libecs/PropertySlotMaker.hpp"
+#include "libecs.hpp"
+#include "System.hpp"
+#include "Stepper.hpp"
+#include "Substance.hpp"
+#include "Reactor.hpp"
+#include "Util.hpp"
+#include "PropertySlotMaker.hpp"
 
 #include "@(BASECLASS).hpp"
+
+@{fileincludes()}
 
 namespace libecs
 {
@@ -25,6 +29,8 @@ namespace libecs
     ~@(CLASSNAME)();
 
 @{propertymethods()}
+
+@(PUBLIC_AUX)
     
     virtual void react();
     virtual void initialize();
@@ -44,6 +50,12 @@ namespace libecs
 @{propertyvariabledecls()}
 @{reactantpropertyslotvariabledecls()}
 
+@(PROTECTED_AUX)
+
+  private:
+
+@(PRIVATE_AUX)
+
   };
 
 }
@@ -59,7 +71,7 @@ extern "C"
 @(CLASSNAME)::@(CLASSNAME)()
 {
   makeSlots();
-@{propertyvariableinit()}
+  @{propertyvariableinit()}
 }
 
 @(CLASSNAME)::~@(CLASSNAME)()
@@ -68,7 +80,7 @@ extern "C"
 
 void @(CLASSNAME)::makeSlots()
 {
-@{createpropertyslots()}
+  @{createpropertyslots()}
 }
 
 
@@ -76,9 +88,16 @@ void @(CLASSNAME)::initialize()
 {
   @(BASECLASS)::initialize();
 
-@{getpropertyslotofreactant()}
+  @{getpropertyslotofreactant()}
+  @{allreactantslotsinit()}
+
+  @{methodDefs('initialize')}
 
 }
 
+void @(CLASSNAME)::react()
+{
 @{methodDefs('react')}
+}
+
 #endif
