@@ -30,7 +30,6 @@
 ## E-CELL Project, Institute for Advanced Biosciences, Keio University
 ##
 
-
 ## standard module ##
 
 import sys
@@ -38,7 +37,6 @@ import re
 import string
 import os
 import glob
-
 
 class DmFile:
       
@@ -83,10 +81,8 @@ class DmFile:
                   
                   if key == self.prekey:                  
                         self.keynum[key] = self.keynum[key] + 1
-                        #print key
                   else:
                         self.keynum[key] = 0
-                        #print key
                         self.property[key] = {}
                   
                   # get it!
@@ -111,6 +107,7 @@ class DmTemplate:
             self.dmfile = dmfile
 
       def write( self, dmfile, mastertemplate, outfile ):
+
             try:
                   fp = open( outfile, 'w' )
             except:
@@ -123,13 +120,16 @@ class DmTemplate:
             fp.close()
 
       def generate( self, keyname , no = 0):
+
             buffer = ''
             template_file = self.templatedir + '/' + keyname
+
             try:
                   tp = open( template_file, 'r' )
             except:
                   print "template " + template_file + ": not found."
                   sys.exit( 1 )
+
             while 1:
                   line = tp.readline()
                   
@@ -137,10 +137,9 @@ class DmTemplate:
                         break
 
                   if DmTemplate.regex1.search( line ):
-                        line = self.sub( line , no)                                                
+                        line = self.sub( line , no)  
                         buffer = buffer + line
                         continue
-
                   match = DmTemplate.regex2.search( line )
                   if match:
                         name = match.group( 1 )
@@ -151,14 +150,14 @@ class DmTemplate:
                         buffer = buffer + line
                         continue
                         
-                  match = DmTemplate.regex3.search( line )
-                  if match:
-                                                
+
+                  if DmTemplate.regex3.search( line ):
                         line = self.sub( line ,no )
                         buffer = buffer + line                        
                         continue
                   
                   buffer = buffer + line
+
             return buffer
 
       def sub( self, line ,no = 0):
@@ -173,10 +172,11 @@ class DmTemplate:
                         if not self.dmfile.dic.has_key( key ):
                               print "Keyword " + key + " not found."
                               sys.exit( 1 )
-                        line = string.replace( line , '#(@'+key+')', self.dmfile.dic[key])
+                        line = string.replace(line ,'#(@'+key+')',
+                                              self.dmfile.dic[key])
                         flg = 1
             
-                  match = DmTemplate.regex2.search( line )
+                  match = DmTemplate.regex2.search( line )      
                   if match:
                         line = ''
                         flg = 1
@@ -190,8 +190,8 @@ class DmTemplate:
                               sys.exit( 1 )			
 			
 			if subkey[1] == 'c':
-                              
-			      subname = string.strip(self.dmfile.property[subkey[0]][no][1] )
+			      subname = string.strip(
+                                    self.dmfile.property[subkey[0]][no][1] )
 		              subname = self.checkParameterType( subname )
 			else:
 			      subname = string.strip(self.dmfile.property[subkey[0]][no][string.atoi(subkey[1])] )
@@ -205,25 +205,28 @@ class DmTemplate:
 
             return buffer
 	             
-
       def checkParameterType( self, type):      
 	
 	    if type == 'Int':
 		  type = '0'
 		  
 	    elif type == 'Float':
+                  type = '0.0'
+
+	    elif type == 'Real':
      	          type = '0.0'
-	    
+                        
 	    elif type == 'String':	
 	          type = ' /'/' '
+
 	    else:
-		print type+' is not defined.'
+		print "type"+' is not defined.'
 
 	    return type
 
 if __name__ == "__main__":
       
-      import getopt
+      #import getopt
       
       def printHelp():
             print sys.argv[0], \
@@ -232,31 +235,36 @@ if __name__ == "__main__":
 
       outprefix = ''
       outdir = '.'
-      templatedir = './templates/reactor'
+      templatedir = '/usr/share/dm/templates/reactor'
 
       masterprefix = 'reactor'
 
-      try:
-            opts, pargs = getopt.getopt( sys.argv[1:],\
-                                         'ho:t:d:' )
-      except getopt.GetoptError, e:
-            print e
-            sys.exit( 1 )
+      #try:
+            #opts, pargs = getopt.getopt( sys.argv[1:],'ho:t:d:' )
+      #except getopt.GetoptError, e:
+            #print e
+            #sys.exit( 1 )
 
-      for opt, arg in opts:
-            if opt == '-h':
-                  printHelp()
-                  sys.exit( 0 )
-            elif opt == '-d':
-                  outdir = arg
-            elif opt == '-o':
-                  outprefix = arg                  
-            elif opt == '-t':
-                  templatedir = arg
-            else:
-                  print "invalid option:", opt
-                  sys.exit( 1 )
-      
+      #print opts
+      #for opt, arg in opts:
+            #if opt == '-h':
+                  #printHelp()
+                  #sys.exit( 0 )
+            #elif opt == '-d':
+                  #outdir = arg
+            #elif opt == '-o':
+                  #outprefix = arg                  
+            #elif opt == '-t':
+                  #templatedir = arg
+                  #print arg
+            #else:
+                  #print "invalid option:", opt
+                  #sys.exit( 1 )
+      if sys.argv[2] = '-t':
+            templatedir = sys.argv[3]
+      else:
+            print "Usage :dmgen [dmfilename] -t [templatedir]"
+            sys.exit(0)
       infilename = pargs[0]
       
       if infilename == '':
