@@ -14,6 +14,7 @@ libecs_la_LDFLAGS= -rpath ${libdir}
 libecs_la_LIBADD= ${LIBLTDL} -lstdc++
 libecs_la_SOURCES=\
 Util.cpp\
+UniversalVariable.cpp\
 StringList.cpp\
 Message.cpp\
 MessageInterface.cpp\
