@@ -202,10 +202,7 @@ namespace libecs
     }
     virtual const Real   asReal() const   { return 0.0; }
     virtual const Int    asInt() const    { return 0; }
-    virtual const PolymorphVector asPolymorphVector() const 
-    { 
-      return PolymorphVector(); 
-    }
+    virtual const PolymorphVector asPolymorphVector() const;
   
     virtual PolymorphDataPtr createClone() const
     {

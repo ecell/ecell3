@@ -38,6 +38,12 @@
 namespace libecs
 {
 
+  const PolymorphVector PolymorphNoneData::asPolymorphVector() const
+  { 
+    return PolymorphVector(); 
+  }
+
+
   const Polymorph::Type Polymorph::getType() const
   {
     if( typeid( *theData) == typeid( ConcretePolymorphData<Real> ) )
