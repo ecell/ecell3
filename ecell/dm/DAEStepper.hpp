@@ -94,10 +94,8 @@ LIBECS_DM_CLASS( DAEStepper, DifferentialStepper )
      const Real 
        i2( s2 * ( cont1 + ( s2 - c2 ) * ( cont2 + ( s2 - c1 ) * cont3 ) ) );
 
-     //      std::cout << s1 << " : " << s2 << std::endl;      
-     //      std::cout << theStepper.getVelocityBuffer()[ theIndex]*anInterval << " : " << i2 - i1 << std::endl;  
      return ( i1 - i2 );     
-     //      return theStepper.getVelocityBuffer()[ theIndex ] *anInterval;
+     //      return theStepper.getVelocityBuffer()[ theIndex ] * anInterval;
     }
 
   protected:
@@ -186,12 +184,12 @@ public:
 
   void setJacobianMatrix();
   void decompJacobianMatrix();
-  void calculateVelocityVector();
+  void calculateRhs();
   Real solve();
 
   RealVectorCref getContinuousVector()
     {
-      return theW;
+      return cont;
     }
 
   virtual InterpolantPtr createInterpolant( VariablePtr aVariable )
@@ -221,7 +219,7 @@ protected:
   gsl_vector_complex*        theVelocityVector2;
   gsl_vector_complex*        theSolutionVector2;
 
-  RealVector         theW;
+  RealVector         theW, cont;
 
   UnsignedInteger     theMaxIterationNumber;
   Real                theStoppingCriterion;

@@ -58,8 +58,8 @@ namespace libecs
     theMaxIterationNumber( 7 ),
     eta( 1.0 ),
     Uround( 1e-16 ),
-    theAbsoluteTolerance( 1e-10 ),
-    theRelativeTolerance( 1e-10 ),
+    theAbsoluteTolerance( 1e-6 ),
+    theRelativeTolerance( 1e-6 ),
     theStoppingCriterion( 0.0 ),
     theFirstStepFlag( true ),
     theRejectedStepFlag( false ),
@@ -146,6 +146,7 @@ namespace libecs
 	theSolutionVector1 = gsl_vector_calloc( aSize );
 
 	theW.resize( aSize * 3 );
+	cont.resize( aSize * 3 );
 
 	if ( theJacobianMatrix2 )
 	  gsl_matrix_complex_free( theJacobianMatrix2 );
@@ -163,13 +164,6 @@ namespace libecs
 	  gsl_vector_complex_free( theSolutionVector2 );
 	theSolutionVector2 = gsl_vector_complex_calloc( aSize );
       }
-
-    /**
-    for ( VariableVector::size_type c( 0 ); c < 3*aSize; ++c )
-      theW[ c ] = 0.0;
-
-    thePreviousStepInterval( getStepInterval() );
-    */
   }
 
   void DAEStepper::checkDependency()
@@ -232,7 +226,6 @@ namespace libecs
   {
     UnsignedInteger aSize( getReadOnlyVariableOffset() );
     Real aPerturbation;
-    //    aPerturbation = 1e-9 * getStepInterval();
 
     for ( VariableVector::size_type i( 0 ); i < aSize; ++i )
       {
@@ -248,9 +241,6 @@ namespace libecs
 	    theJacobian[ j ][ i ]
 	      = ( theVariableVector[ j ]->getVelocity()
 		  - theVelocityBuffer[ j ] ) / aPerturbation;
-
-	    //	    std::cout << "J(" << j << "," << i << ") = " 
-	    //		      << aPartialDerivative << std::endl;
 
 	    theVariableVector[ j ]->clearVelocity();
 	  }
@@ -351,21 +341,6 @@ namespace libecs
 				gsl_complex_add( comp1, comp2 ) );	
       }
 
-    /**
-    std::cout << std::endl;
-    for ( UnsignedInteger i( 0 ); i < aSize; ++i )
-      for ( UnsignedInteger j( 0 ); j < aSize; ++j )
-	std::cout << "m1(" << i << "," << j << ") = " 
-     << gsl_matrix_get( theJacobianMatrix1, i, j ) << std::endl;
-    for ( UnsignedInteger i( 0 ); i < aSize; ++i )
-      for ( UnsignedInteger j( 0 ); j < aSize; ++j )
-	std::cout << "m2(" << i << "," << j << ") = " 
-		  << gsl_matrix_complex_get( theJacobianMatrix2, i, j ).dat[0]
-		  << ", "
-		  << gsl_matrix_complex_get( theJacobianMatrix2, i, j ).dat[1]
-		  << std::endl;
-    */
-
     decompJacobianMatrix();
   }
 
@@ -377,7 +352,7 @@ namespace libecs
     gsl_linalg_complex_LU_decomp( theJacobianMatrix2, thePermutation2, &aSignNum );
   }
 
-  void DAEStepper::calculateVelocityVector()
+  void DAEStepper::calculateRhs()
   {
     const Real aCurrentTime( getCurrentTime() );
     const Real aStepInterval( getStepInterval() );
@@ -538,17 +513,8 @@ namespace libecs
 	GSL_SET_COMPLEX( &comp, aTIF[ c + aSize ] - theW[ anIndex + aSize ] * alphah + theW[ anIndex + aSize*2 ] * betah, aTIF[ c + aSize*2 ] - theW[ anIndex + aSize ] * betah - theW[ anIndex + aSize*2 ] * alphah );
 	gsl_vector_complex_set( theVelocityVector2, c, comp );
 
-	// aVariable->loadValue( theValueBuffer[ c ] );
 	aVariable->clearVelocity();
       }
-
-    /**
-    for ( int c( 0 ); c < aSize; c++ )
-	std::cout << "tifvector[ " << c << " ] = " << gsl_vector_get( theVelocityVector1, c ) << std::endl;
-
-    for ( RealVector::size_type c( 0 ); c < aTIF.size(); c++ )
-	std::cout << "TIF[ " << c << " ] = " << aTIF[ c ] << std::endl;
-    */
 
     setCurrentTime( aCurrentTime );
   }
@@ -563,7 +529,7 @@ namespace libecs
 				 theVelocityVector2, theSolutionVector2 );
 
     Real aNorm( 0.0 );
-    Real aDeltaW( 0.0 );
+    Real deltaW( 0.0 );
     gsl_complex comp;
 
     for ( VariableVector::size_type c( 0 ); c < aSize; ++c )
@@ -572,19 +538,19 @@ namespace libecs
 
 	aTolerance2 = aTolerance2 * aTolerance2;
 
-	aDeltaW = gsl_vector_get( theSolutionVector1, c );
-	theW[ c ] += aDeltaW;
-	aNorm += aDeltaW * aDeltaW / aTolerance2;
+	deltaW = gsl_vector_get( theSolutionVector1, c );
+	theW[ c ] += deltaW;
+	aNorm += deltaW * deltaW / aTolerance2;
 
 	comp = gsl_vector_complex_get( theSolutionVector2, c );
 
-	aDeltaW = GSL_REAL( comp );
-	theW[ c + aSize ] += aDeltaW;
-	aNorm += aDeltaW * aDeltaW / aTolerance2;
+	deltaW = GSL_REAL( comp );
+	theW[ c + aSize ] += deltaW;
+	aNorm += deltaW * deltaW / aTolerance2;
 
-	aDeltaW = GSL_IMAG( comp );
-	theW[ c + aSize*2 ] += aDeltaW;
-	aNorm += aDeltaW * aDeltaW / aTolerance2;
+	deltaW = GSL_IMAG( comp );
+	theW[ c + aSize*2 ] += deltaW;
+	aNorm += deltaW * deltaW / aTolerance2;
       }
 
     return sqrt( aNorm / ( 3 * aSize ) );
@@ -605,9 +571,9 @@ namespace libecs
     const Real c2q( c3q * c2 );
     for ( VariableVector::size_type c( 0 ); c < aSize; ++c )
       {
-	const Real z1( c1q * ( theW[ c ] + ( c1q - c2 ) * ( theW[ c + aSize ] + ( c1q - c1 ) * theW[ c + aSize*2 ] ) ) );
-	const Real z2( c2q * ( theW[ c ] + ( c2q - c2 ) * ( theW[ c + aSize ] + ( c2q - c1 ) * theW[ c + aSize*2 ] ) ) );
-	const Real z3( c3q * ( theW[ c ] + ( c3q - c2 ) * ( theW[ c + aSize ] + ( c3q - c1 ) * theW[ c + aSize*2 ] ) ) );
+	const Real z1( c1q * ( cont[ c ] + ( c1q - c2 ) * ( cont[ c + aSize ] + ( c1q - c1 ) * cont[ c + aSize*2 ] ) ) );
+	const Real z2( c2q * ( cont[ c ] + ( c2q - c2 ) * ( cont[ c + aSize ] + ( c2q - c1 ) * cont[ c + aSize*2 ] ) ) );
+	const Real z3( c3q * ( cont[ c ] + ( c3q - c2 ) * ( cont[ c + aSize ] + ( c3q - c1 ) * cont[ c + aSize*2 ] ) ) );
 
 	theW[ c ] = 4.3255798900631553510 * z1
 	  + 0.33919925181580986954 * z2 + 0.54177053993587487119 * z3;
@@ -623,7 +589,7 @@ namespace libecs
 
     while ( anIterator < getMaxIterationNumber() )
       {
-	calculateVelocityVector();
+	calculateRhs();
 
 	const Real aPreviousNorm( std::max( aNorm, Uround ) );
 	aNorm = solve();
@@ -649,6 +615,11 @@ namespace libecs
 		    return false;
 		  }
 	      }
+	    else
+	      {
+		setStepInterval( aStepInterval * 0.5 );
+		return false;
+	      }
 	  }
 	
 	if ( eta * aNorm <= theStoppingCriterion )
@@ -659,6 +630,7 @@ namespace libecs
 	anIterator++;
       }
 
+    // theW is transformed to Z-form
     for ( VariableVector::size_type c( 0 ); c < aSize; ++c )
       {
 	const Real w1( theW[ c ] );
@@ -672,14 +644,6 @@ namespace libecs
 	  + w2 * 0.20412935229379993199
 	  + w3 * 0.38294211275726193779;
 	theW[ c + aSize*2 ] = w1 * 0.96604818261509293619 + w2;
-
-	/**
-	   std::cout << "Z(" << c << ") = " << theW[ c ] << std::endl;
-	   std::cout << "Z(" << c+aSize << ") = "
-	   << theW[ c+aSize ] << std::endl;
-	   std::cout << "Z(" << c+aSize*2 << ") = "
-	   << theW[ c+aSize*2 ] << std::endl;
-	*/
       }
 
     const Real anError( estimateLocalError() );
@@ -720,8 +684,6 @@ namespace libecs
 	else
 	  theJacobianCalculateFlag = true;
 
-	//	std::cout << getCurrentTime() << "\t" << theta << std::endl;
-	
 	if ( aStepIntervalRate >= 1.0 && aStepIntervalRate <= 1.2 )
 	  {
 	    setNextStepInterval( aStepInterval );
@@ -761,7 +723,7 @@ namespace libecs
     const Real hee2( ( -13.0 + 7.0 * sqrt( 6.0 ) ) / ( 3.0 * aStepInterval ) );
     const Real hee3( -1.0 / ( 3.0 * aStepInterval ) );
 
-    // theW must already be transformed to Z-form
+    // theW will already be transformed to Z-form
     for ( ProcessVector::size_type c( aDiscreteProcessOffset );
 	  c < theProcessVector.size(); c++ )
       {
@@ -794,8 +756,7 @@ namespace libecs
 	Real aDifference( gsl_vector_get( theSolutionVector1, c ) );
 
 	// for the case ( anError >= 1.0 )
-	theVariableVector[ c ]->loadValue( theValueBuffer[ c ]
-					   + aDifference );
+	theVariableVector[ c ]->loadValue( theValueBuffer[ c ] + aDifference );
 
 	aDifference /= aTolerance;
 	anError += aDifference * aDifference;
@@ -868,10 +829,6 @@ namespace libecs
 
     theRejectedStepFlag = false;
 
-    /**
-       set initial activities
-       to theDiscreteActivityBuffer and theVelocityBuffer
-    */
     fireProcesses();
 
     const ProcessVector::size_type
@@ -913,9 +870,9 @@ namespace libecs
 	setJacobianMatrix();
       }
 
-    // resetAll();
-
     const Real aStepInterval( getStepInterval() );
+
+    // theW will already be transformed to Z-form
 
     for ( VariableVector::size_type c( 0 ); c < aSize; ++c )
       {
@@ -931,21 +888,18 @@ namespace libecs
 
     for ( VariableVector::size_type c( 0 ); c < aSize; c++ )
       {
-	//	std::cout << "z : " << theW[ c ] << " : "<< theW[ c+aSize ] << " : " << theW[ c+2*aSize ] << std::endl;
-
-	const Real z2( theW[ c + aSize ] );
 	const Real z1( theW[ c ] );
+	const Real z2( theW[ c + aSize ] );
+	const Real z3( theW[ c + aSize*2 ] );
 
-	theW[ c ] = ( z2 - theW[ c + aSize*2 ] ) / ( c2 - 1.0 );
+	cont[ c ] = ( z2 - z3 ) / ( c2 - 1.0 );
 
 	const Real ak( ( z1 - z2 ) / ( c1 - c2 ) );
 	Real acont3 = z1 / c1;
 	acont3 = ( ak - acont3 ) / c2;
 
-	theW[ c+aSize ] = ( ak - theW[ c ] ) / ( c1 - 1.0 );
-	theW[ c+aSize*2 ] = theW[ c+aSize ] - acont3;
-
-	//	std::cout << theW[c] << " : "<< theW[c+aSize] << " : " << theW[c+2*aSize] << std::endl;
+	cont[ c+aSize ] = ( ak - cont[ c ] ) / ( c1 - 1.0 );
+	cont[ c+aSize*2 ] = cont[ c+aSize ] - acont3;
       }
 
     theStateFlag = true;
