@@ -29,6 +29,7 @@ class Plot:
 			    "purple","navy","brown","black",
 			    "white", "yellow","cyan","pink"]
 	    self.data_list=[] #list of displayed fullpnstrings
+	    self.trace_onoff={}
 	    self.available_colors=[]
 	    for acolor in self.ColorList:
 		self.available_colors.append(acolor)
@@ -118,6 +119,7 @@ class Plot:
 		newgc.set_foreground(self.theColorMap.alloc_color(allocated_color))
 		self.GCFullPNMap[aFullPNString]=newgc
 		self.data_list.append(aFullPNString)
+		self.trace_onoff[aFullPNString]=gtk.TRUE
 		return self.pixmapmap[allocated_color]
 	    else:
 		return None
@@ -292,10 +294,10 @@ class Plot:
 			self.change_scale()
 		    if self.minmax[0]==0:
 			miny=self.minmax[4]/10
-			self.zerovalue=miny
 		    else:
 			miny=self.minmax[0]
-			self.zerovalue=miny
+			
+		    self.zerovalue=pow(10,floor(log10(miny)))
 		    self.yframe[1]=pow(10,ceil(log10(self.minmax[1])))
 		    self.yframe[0]=pow(10,floor(log10(miny)))	    
 		    diff=int(log10(self.yframe[1]/self.yframe[0]))
@@ -662,7 +664,8 @@ class TracerPlot(Plot):
 	    #search
 	    a=[]
 	    for fpn in self.data_list:
-		a.extend(self.data_stack[fpn])
+		if self.trace_onoff[fpn]:
+		    a.extend(self.data_stack[fpn])
 	    #init values
 	    if len(a)>0:
 		self.minmax[0]=a[0][1] #minimum value of all
@@ -702,6 +705,7 @@ class TracerPlot(Plot):
 	    for fpn in FullPNStringList:
 		self.data_list.remove(fpn)
 		self.data_stack[fpn]=None
+		self.trace_onoff.remove(fpn)
 	    self.reframey()
 	    self.drawall()	    
 	
@@ -862,7 +866,8 @@ class TracerPlot(Plot):
 	    self.clearplotarea()
 	    #go trace by trace and redraws plot
 	    for fpn in self.data_list:
-		self.drawtrace(fpn)
+		if self.trace_onoff[fpn]:
+		    self.drawtrace(fpn)
 	
 	def drawtrace(self, aFullPNString):
 	    #get databuffer, for each point draw
@@ -880,7 +885,8 @@ class TracerPlot(Plot):
 	def drawpoint(self, aFullPNString, datapoint):
 	    #get datapoint x y values
 	    #convert to plot coordinates
-
+	    if self.trace_onoff[aFullPNString]==gtk.FALSE:
+		return 0
 	    x=self.convertx_to_plot(datapoint[0])
 	    y=self.converty_to_plot(datapoint[1])
 	    cur_point_within_frame=self.withinframes([x,y])
@@ -1021,3 +1027,15 @@ class TracerPlot(Plot):
 		self.pixelwidth=float(self.xframe[1]-self.xframe[0])/self.plotarea[2]
 		self.reprint_xlabels()
 
+	def toggle_trace(self,fpn):
+	    if self.trace_onoff.has_key(fpn):
+		if self.trace_onoff[fpn]==gtk.TRUE:
+		    self.trace_onoff[fpn]=gtk.FALSE
+		else:
+		    self.trace_onoff[fpn]=gtk.TRUE
+		self.reframey()
+		self.drawall()
+		return self.trace_onoff[fpn]
+	    else:
+		return gtk.FALSE
+		

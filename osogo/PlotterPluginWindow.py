@@ -11,7 +11,10 @@ from OsogoPluginWindow import *
 import gobject
 from ecell.ecssupport import *
 from Plot import *
-
+COL_LOG=0
+COL_PIX=1
+COL_ON=2
+COL_TXT=3
 class PlotterPluginWindow( OsogoPluginWindow ):
 	#
 	#initiates plotter sends data for processing to superclass
@@ -25,18 +28,23 @@ class PlotterPluginWindow( OsogoPluginWindow ):
 		self.displayedFullPNStringList=[]
 		
 		self.ListWindow=self.getWidget('clist1')
-		self.ListStore=gtk.ListStore(gobject.TYPE_BOOLEAN,gobject.TYPE_OBJECT,gobject.TYPE_STRING)
+		self.ListStore=gtk.ListStore(gobject.TYPE_BOOLEAN,\
+		    gobject.TYPE_OBJECT, gobject.TYPE_BOOLEAN,\
+		    gobject.TYPE_STRING)
 		self.ListWindow.set_model(self.ListStore)
 		renderer=gtk.CellRendererToggle()
 		renderer.connect('toggled',self.toggle_pressed,self.ListStore)
-		
-		column1=gtk.TreeViewColumn('color',gtk.CellRendererPixbuf(),pixbuf=1)
-		column2=gtk.TreeViewColumn('trace',gtk.CellRendererText(),text=2)
-		column3=gtk.TreeViewColumn('lg',renderer,active=0)
-		column3.set_clickable(gtk.TRUE)
+		renderer2=gtk.CellRendererPixbuf()
+		renderer4=gtk.CellRendererToggle()
+		renderer4.connect('toggled',self.trace_toggled,self.ListStore)
+		column1=gtk.TreeViewColumn('color',renderer2,pixbuf=COL_PIX)
+		column4=gtk.TreeViewColumn('on',renderer4,active=COL_ON)
+		column3=gtk.TreeViewColumn('lg',renderer,active=COL_LOG)
+		column2=gtk.TreeViewColumn('trace',gtk.CellRendererText(),text=COL_TXT)
 		self.ListWindow.append_column(column3)
 		self.ListWindow.append_column(column1)
 		self.ListWindow.append_column(column2)
+		self.ListWindow.append_column(column4)
 		self.ListSelection=self.ListWindow.get_selection()
 		self.ListSelection.set_mode(gtk.SELECTION_MULTIPLE)
 		self.theWindow=self.getWidget(self.__class__.__name__)
@@ -66,20 +74,27 @@ class PlotterPluginWindow( OsogoPluginWindow ):
 	    #refreshes loggerlist
 	    iter=self.ListStore.get_iter_first()
 	    while iter!=None:
-		text=self.ListStore.get_value(iter,2)
+		text=self.ListStore.get_value(iter,COL_TXT)
 		if self.haslogger(text):
 		    fixed=gtk.TRUE
 		else:
 		    fixed=gtk.FALSE
-		self.ListStore.set(iter,0,fixed)
+		self.ListStore.set(iter,COL_LOG,fixed)
 		iter=self.ListStore.iter_next(iter)
 		
-	    
+	def trace_toggled(self,cell, path, model):
+#	    iter=model.get_iter((int (path),))
+#	    text=self.ListStore.get_value(iter,2)
+	    iter=model.get_iter((int (path),))
+#	    onoff=model.get_value(iter,COL_ON)
+	    text=self.ListStore.get_value(iter,COL_TXT)
+	    onoff=self.thePlotInstance.toggle_trace(text)
+	    self.ListStore.set_value(iter,COL_ON,onoff)
 	    
 	def toggle_pressed(self,cell,path,model):
 	    iter=model.get_iter((int (path),))
-	    fixed=model.get_value(iter,0)
-	    text=self.ListStore.get_value(iter,2)
+	    fixed=model.get_value(iter,COL_LOG)
+	    text=self.ListStore.get_value(iter,COL_TXT)
 	    
 	    if fixed==gtk.FALSE:
 		self.create_logger([text])
@@ -138,7 +153,7 @@ class PlotterPluginWindow( OsogoPluginWindow ):
 	    #se;ection list, [0]=text, [1], iter
 	    
 	def selection_function(self,model,path,iter):
-		text=self.ListStore.get_value(iter,2)
+		text=self.ListStore.get_value(iter,COL_TXT)
 		self.selection_list.append([text,iter])
 	    
 	def addtrace(self, aFullPN): #called from outside
@@ -161,8 +176,9 @@ class PlotterPluginWindow( OsogoPluginWindow ):
 	def add_trace_to_list(self,added_list):
 	    for added_item in added_list:
 		iter=self.ListStore.append()
-		self.ListStore.set_value(iter,1,added_item[1]) #set pixbuf
-		self.ListStore.set_value(iter,2,added_item[0]) #set pixbuf
+		self.ListStore.set_value(iter,COL_PIX,added_item[1]) #set pixbuf
+		self.ListStore.set_value(iter,COL_TXT,added_item[0]) #set text
+		self.ListStore.set_value(iter,COL_ON,gtk.TRUE) #trace is on by default
 	    
 	def remove_trace_from_list(self,aFullPNString):
 		print "remove_trace_from_list"

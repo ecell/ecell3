@@ -98,7 +98,11 @@ namespace libecs
 
     DataPoint front() const
     {
-      return theVector[ 0 ];
+      if ( empty ( ) )
+        {
+    	    return anEmptyDataPoint;
+	}
+	return theVector[ 0 ];
     }
 
     DataPoint back() const
@@ -106,6 +110,11 @@ namespace libecs
       // danger!!  undefined behavior with vvector if size() == 0 - sha
 //      DEBUG_EXCEPTION( size() > 0, AssertionFailed, "" );
 //	not anymore - gabor
+      if ( empty ( ) )
+        {
+    	    return anEmptyDataPoint;
+	}
+
       return theVector[ end() ];
     }
 
@@ -133,7 +142,7 @@ namespace libecs
   private:
 
     iterator theCurrentPosition;
-
+    DataPoint anEmptyDataPoint;
 
     // this mutable can be removed if vvector supports const operations
     mutable Vector theVector;

@@ -26,6 +26,15 @@ message( 'S:Concentration= \t%s' % S.getProperty( 'Concentration' ) )
 
 message( '\n' )
 
-# print some logger data
-message( 'Last ten log points of %s:' % S_Logger.getName() )
-message( S_Logger.getData()[-10:] )
+from ecell.ECDDataFile import *
+
+message('saving S.ecd..')
+aDataFile = ECDDataFile( S_Logger.getData(0,2000,.5) )
+aDataFile.setDataName( S_Logger.getName() )
+aDataFile.setNote( '' )
+aDataFile.save( 'S.ecd' )
+
+#message('loading')
+#aNewFile = ECDDataFile()
+#aNewFile.load( 'S.ecd' )
+#print aNewFile.getData()[:10]

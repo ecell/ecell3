@@ -77,6 +77,7 @@ class TracerWindow( PlotterPluginWindow ):
 			self.theSession.theSimulator.createLogger(fpn)
 			self.theSession.theSimulator.setLoggerMinimumInterval(fpn,LoggerMinimumInterval)
 			self.theSession.message("Logger created for "+fpn)
+		self.thePluginManager.theMainWindow.theLoggerWindow.update()
 			
 	def recache(self, aFullPNString, value_from, value_to, interval):
 		#it is called from the plotinstance

@@ -36,7 +36,8 @@ namespace libecs
 
   PhysicalLogger::PhysicalLogger() 
     : 
-    theVector()
+    theVector(),
+    anEmptyDataPoint()
   {
     ; // do nothing
   }

@@ -73,11 +73,22 @@ namespace libecs
 
   //
 
-
+  DataPointVectorRCPtr Logger::anEmptyVector(void) const
+  
+  {
+  DataPointVectorRCPtr aDataPointVector( new DataPointVector (0) );
+  return aDataPointVector;
+  }
+  
+  
   DataPointVectorRCPtr Logger::getData( RealCref aStartTime,
 					RealCref anEndTime,
 					RealCref anInterval ) const
   {
+    if (thePhysicalLogger.empty())
+	{
+	return anEmptyVector();
+	}
     Real theStartTime ( thePhysicalLogger.front().getTime() );
     Real theEndTime ( thePhysicalLogger.back().getTime() );
     if ( theStartTime < aStartTime )

@@ -182,6 +182,8 @@ namespace libecs
     
 
   private:
+    
+    DataPointVectorRCPtr anEmptyVector(void) const;
 
     // no copy constructor
   
