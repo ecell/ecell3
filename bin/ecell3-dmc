@@ -1,0 +1,180 @@
+#!/usr/bin/env ecell3-python
+#
+# ecell3-dmc  - a program to compile and/or docify dynamic module in 
+#               E-Cell Simulation Environment Version 3
+#
+# authors: Tomoya Kitayama <tomo@e-cell.org>
+#          Satya Arjunan <satya@ttck.keio.ac.jp>
+
+#PACKAGE=bin
+#VERSION=0.0
+
+import sys
+import os
+import glob
+import getopt
+
+def usage():
+    ext = os.path.basename( sys.argv[0] )
+    aProgramName, ext = os.path.splitext( ext )
+    print '''
+%s -- Compile dynamic modules for E-Cell Simulation Environment Version 3.
+
+Usage:
+       %s [options] [sourcefile(s)]
+       %s [-h] or [--help]
+    '''% ( aProgramName, aProgramName, aProgramName )
+
+def help():
+    usage()
+    ext = os.path.basename( sys.argv[0] )
+    aProgramName, ext = os.path.splitext( ext )
+    print '''
+%s options:
+        --no-stdinclude          Don't set standard include file path.
+        --no-stdlibdir           Don't set standard library directory path.
+        --ldflags=[ldflags]      Specify options to the linker.
+        --cxxflags=[cxxflags]    Add compiler options.
+        --no-define-cxxflags=[cxxflags]
+                                 Override the default compiler options.
+        --dmcompile=[path]       Specify dmcompile path.
+        -v or --verbose   	 Be verbose.
+        -h or --help		 Print this message.
+
+
+This program is part of E-Cell Simulation Environment Version 3.
+Written by:
+    Tomoya Kitayama <tomo@e-cell.org>
+    Satya Arjunan <satya@ttck.keio.ac.jp>
+    '''% ( aProgramName )
+
+def msg( outstr ):
+    print "E-Cell3 ecell3-dmc: " + outstr
+
+def main():
+
+    # -------------------------------------
+    # initialize file names
+    # -------------------------------------
+    prefix = os.environ['ECELL3_PREFIX']
+    exec_prefix = prefix
+    BINDIR = exec_prefix + os.sep + 'bin'
+    STDLIBDIR = '-L' + exec_prefix + os.sep + 'lib'
+    ECELL_INCLUDE = prefix + os.sep + 'include' + os.sep + 'ecell'
+    LIBECS_INCLUDE = ECELL_INCLUDE + os.sep + 'libecs'
+    STDINCLUDE = '-I' + prefix + os.sep + 'include' + ' -I' + ECELL_INCLUDE + \
+    		' ' + '-I' + LIBECS_INCLUDE + ' -I.'
+    DMCOMPILE = '\"'+BINDIR + os.sep + 'dmcompile\"'
+    SRC = None
+
+
+    # -------------------------------------
+    # get options and arguments
+    # -------------------------------------
+    try:
+	opts , args = getopt.getopt( sys.argv[1:], "hv",
+		["help", "verbose", "no-stdinclude","no-stdlibdir", "ldflags=",
+		 "cxxflags=", "no-define-cxxflags=", "dmcompile="])
+    except:
+        help()
+        sys.exit(1)
+	
+    VERBOSE = False
+    NO_STDINCLUDE = False
+    NO_STDLIBDIR = False
+    NO_DEFINE_CXXFLAGS = False
+    LDFLAGS = ''
+    CXXFLAGS = ''
+    CXXCOMPILEFLAGS = ''
+
+    # -------------------------------------
+    # check argument
+    # -------------------------------------
+    for anOption, anArg in opts:
+
+        # print help message
+        if anOption in ( "-h", '--help' ):
+            help()
+            sys.exit(0)
+      
+  	# be verbose
+        if anOption in ( "-v", '--verbose'):
+	    VERBOSE = True            
+            
+	# without stdinclude            
+        if anOption == "--no-stdinclude":
+	    NO_STDINCLUDE = True
+
+	# without stdlibdir            
+        if anOption == "--no-stdlibdir":
+	    NO_STDLIBDIR = True
+
+	# set ldflags
+        if anOption == "--ldflags":
+            LDFLAGS = LDFLAGS + ' ' + anArg
+
+	# set no-define-cxxflags
+        if anOption == "--no-define-cxxflags":
+            NO_DEFINE_CXXFLAGS = True
+	    CXXFLAGS = anArg
+
+	# set cxxflags
+        if anOption == "--cxxflags":
+	    CXXCOMPILEFLAGS = CXXFLAGS + ' ' + anArg
+
+	# set cxxflags
+        if anOption == "--dmcompile":
+	    DMCOMPILE = anArg + os.sep + 'dmcompile'
+
+    # check if source file is given
+    if len( args ) < 1:
+	help()
+	msg( "Error: source file was not given." )
+	sys.exit(1)
+
+    if os.name == 'nt':
+	ADDFLAGS = ' -Wl,--enable-runtime-pseudo-reloc -lpython22'
+	FILELIST = glob.glob( args[0] )
+    else:
+	ADDFLAGS = ''
+	FILELIST = args
+	
+    # check if source file is valid
+    if len( FILELIST ) < 1:
+	msg( "Error: source file "+ args[0] + " was not found." )
+	sys.exit(1)    
+
+    if NO_STDINCLUDE:
+	INCLUDE = ""
+    else:
+	INCLUDE = STDINCLUDE
+
+    if not NO_STDLIBDIR:
+	LDFLAGS = LDFLAGS + ' ' + STDLIBDIR
+	
+    LDFLAGS = LDFLAGS + ADDFLAGS + ' -lecs -lgsl -lboost_python'
+    os.environ['LDFLAGS'] = LDFLAGS
+    
+    if NO_DEFINE_CXXFLAGS:
+	os.environ['CXXFLAGS'] = CXXFLAGS
+
+    for SRC in FILELIST:
+	ext = os.path.basename(SRC)
+	CLASSNAME, ext = os.path.splitext(ext)
+	CLASSNAMEDEFINE = '-D_ECELL3_DM_CLASSNAME=' + CLASSNAME
+	cmdstr = '\"'+SRC + '\" \"' + INCLUDE + '\" \"' + CLASSNAMEDEFINE + \
+	         '\" \"' + CXXCOMPILEFLAGS+'\"'
+
+	if VERBOSE:
+	    cmdstr = 'python ' + DMCOMPILE + ' -v ' + cmdstr
+	    print cmdstr
+	    os.system( cmdstr )
+	else:
+	    cmdstr = 'python ' + DMCOMPILE + ' ' + cmdstr	
+	    print cmdstr
+	    os.system( cmdstr )
+
+if __name__ == '__main__':
+	main()
+
+

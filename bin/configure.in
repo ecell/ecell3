@@ -10,24 +10,10 @@ dnl AC_PROG_CC
 dnl Checks for libraries.
 AC_PROG_CXX
 
-case ${host_os} in
-  *cygwin* | *mingw* | *win32*)
-    PYTHON_LIBS="-lpython22 -lboost_python"
-    LD_FLAGS="-Wl,--enable-runtime-pseudo-reloc"
-    ;;
-  *)
-    PYTHON_LIBS=
-    LD_FLAGS=
-    ;;
-esac
-AC_SUBST(PYTHON_LIBS) 
-AC_SUBST(LD_FLAGS) 
-
-
 dnl Checks for typedefs, structures, and compiler characteristics.
 
 dnl Checks for library functions.
 
-AC_OUTPUT(Makefile ecell3-dmc
+AC_OUTPUT(Makefile
 ,chmod +x rd2dm eri2eml ecell3-dmc ecell3-em2eml ecell3-eml2em)
 
