@@ -16,7 +16,7 @@ lib_LTLIBRARIES = libecs.la
 CXXFLAGS= @CXXFLAGS@ # -D_REENTRANT
 
 libecs_la_LDFLAGS= -version-info 2:0:0 #-rpath ${libdir}
-libecs_la_LIBADD= ${LIBLTDL} ${GSL_LIBADD}
+libecs_la_LIBADD=  -lstdc++ ${LIBLTDL} ${GSL_LIBADD}
 libecs_la_SOURCES=\
 Singleton.cpp\
 SmallObj.cpp\

@@ -270,7 +270,9 @@ namespace libecs
     // initialization of Stepper needs three stages:
     // (1) integrate:  update Variables, and also *CurrentTime*
     // (2) call initialize()
-    // (3) construct stepper dependency graph
+    // (3) post-initialize() procedures:
+    //     - construct stepper dependency graph and
+    //     - fill theIntegratedVariableVector.
 
     // want select2nd<>...
     const Real aCurrentTime( getCurrentTime() );
@@ -281,6 +283,7 @@ namespace libecs
       }
     FOR_ALL_SECOND( StepperMap, theStepperMap, initialize );
     FOR_ALL_SECOND( StepperMap, theStepperMap, updateDependentStepperVector );
+    FOR_ALL_SECOND( StepperMap, theStepperMap, updateIntegratedVariableVector );
 
   }
 

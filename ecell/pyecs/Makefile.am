@@ -82,7 +82,7 @@ PyEcs.hpp
 
 _ecs_la_LDFLAGS=-module -export-dynamic -avoid-version
 
-_ecs_la_LIBADD=$(LIBECS) $(LIBEMC) -lstdc++ $(LIBLTDL)
+_ecs_la_LIBADD=$(LIBECS) $(LIBEMC)
 
 _ecs_la_DEPENDENCIES=$(LIBECS) $(LIBEMC)
 

@@ -123,7 +123,6 @@ namespace libecs
 
   void Stepper::updateVariableVector()
   {
-
     DECLARE_MAP( VariablePtr, VariableReference, std::less<VariablePtr>,
 		 PtrVariableReferenceMap );
 
@@ -205,16 +204,38 @@ namespace libecs
     theReadOnlyVariableOffset = aReadOnlyVariableReferenceIterator 
       - aVariableReferenceVector.begin();
 
-    // For each part of the vector, sort by memory address. 
-    // This is an optimization.
     VariableVectorIterator aReadWriteVariableIterator = 
       theVariableVector.begin() + theReadWriteVariableOffset;
     VariableVectorIterator aReadOnlyVariableIterator = 
       theVariableVector.begin() + theReadOnlyVariableOffset;
 
+    // For each part of the vector, sort by memory address. 
+    // This is an optimization.
     std::sort( theVariableVector.begin(),  aReadWriteVariableIterator );
     std::sort( aReadWriteVariableIterator, aReadOnlyVariableIterator );
     std::sort( aReadOnlyVariableIterator,  theVariableVector.end() );
+  }
+
+
+  void Stepper::updateIntegratedVariableVector()
+  {
+    theIntegratedVariableVector.clear();
+
+    // want copy_if()...
+    for( VariableVectorConstIterator i( theVariableVector.begin() );
+	 i != theVariableVector.end(); ++i )
+      {
+	VariablePtr aVariablePtr( *i );
+
+	if( aVariablePtr->isIntegrationNeeded() )
+	  {
+	    theIntegratedVariableVector.push_back( aVariablePtr );
+	  }
+      }
+
+    // optimization: sort by memory address.
+    std::sort( theIntegratedVariableVector.begin(), 
+	       theIntegratedVariableVector.end() );
   }
 
 
@@ -572,11 +593,13 @@ namespace libecs
     //
     // Variable::integrate()
     //
-    FOR_ALL( VariableVector, theVariableVector )
+    //    FOR_ALL( VariableVector, theVariableVector )
+    FOR_ALL( VariableVector, theIntegratedVariableVector )
       {
 	(*i)->integrate( aTime );
       }
 
+    // this must be after Variable::integrate()
     setCurrentTime( aTime );
   }
 

@@ -154,13 +154,6 @@ public:
     return theTimeScale;
   }
 
-    
-  void updateGillespieProcess( GillespieProcessPtr aGillespieProcessPtr ) const
-  {
-    aGillespieProcessPtr->updateStepInterval();
-  }
-
-
   GillespieProcessVectorCref getGillespieProcessVector() const
   {
     return theGillespieProcessVector;

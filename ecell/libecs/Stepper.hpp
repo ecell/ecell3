@@ -469,16 +469,16 @@ namespace libecs
 
 
     virtual void dispatchInterruptions();
+
     virtual void interrupt( StepperPtr const aCaller );
 
     /**
-
 	Definition of the Stepper dependency:
 	Stepper A depends on Stepper B 
 	if:
 	- A and B share at least one Variable, AND
 	- A reads AND B writes on (changes) the same Variable.
-m
+
 	See VariableReference class about the definitions of
 	Variable 'read' and 'write'.
 
@@ -487,6 +487,19 @@ m
     */
 
     void updateDependentStepperVector();
+
+    /** 
+	This method updates theIntegratedVariableVector.
+
+	theIntegratedVariableVector holds the Variables those
+	isIntegrationNeeded() method return true.   
+    
+	This method must be called after initialize().
+
+	@internal
+     */
+
+    void updateIntegratedVariableVector();
 
 
     virtual VariableProxyPtr createVariableProxy( VariablePtr aVariablePtr )
@@ -518,17 +531,19 @@ m
 
 
     /**
-       Update theVariableVector and theVariableProxyVector.
+       Update theVariableVector.
 
        This method makes the following data structure:
     
        In theVariableVector, Variables are sorted in this order:
      
        | Write-Only | Read-Write.. | Read-Only.. |
-    
+
     */
 
     void updateVariableVector();
+
+
 
     /**
        Create VariableProxy objects and distribute the objects to 
@@ -558,12 +573,13 @@ m
 
     SystemVector        theSystemVector;
 
-    //    PropertySlotVector  theLoggedPropertySlotVector;
     LoggerVector  theLoggerVector;
 
-    VariableVector         theVariableVector;
+    VariableVector            theVariableVector;
     VariableVector::size_type theReadWriteVariableOffset;
     VariableVector::size_type theReadOnlyVariableOffset;
+
+    VariableVector            theIntegratedVariableVector;
 
     ProcessVector         theProcessVector;
 

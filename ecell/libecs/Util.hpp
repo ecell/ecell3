@@ -166,25 +166,38 @@ namespace libecs
 
 
   /**
+     Form a 'for' loop over a STL sequence.
 
+     Use this like:
+
+     FOR_ALL( std::vector<int>, anIntVector )
+     {
+       int anInt( *i ); // the iterator is 'i'.
+       ...
+     }
+
+     @arg SEQCLASS the classname of the STL sequence. 
+     @arg SEQ the STL sequence.
   */
 
 #define FOR_ALL( SEQCLASS, SEQ )\
-  SEQCLASS ::const_iterator end( (SEQ) .end() );\
   for( SEQCLASS ::const_iterator i( (SEQ) .begin() ) ;\
-      i != end ; ++i )
+      i != (SEQ) .end() ; ++i )
 
 
 
   /**
      For each 'second' member of element in a sequence, call a given method.
+
+     @arg SEQCLASS the classname of the STL sequence. 
+     @arg SEQ the STL sequence.
+     @arg METHOD the name of the method.
      
-     \sa FOR_ALL
+     @see FOR_ALL
   */
 
 #define FOR_ALL_SECOND( SEQCLASS, SEQ, METHOD )\
-  for( SEQCLASS ## ConstIterator i( (SEQ) .begin() ) ;\
-       i != (SEQ) .end() ; ++i )\
+  FOR_ALL( SEQCLASS, SEQ )\
     { (*i).second-> METHOD (); }
 
 

@@ -71,8 +71,6 @@ namespace libecs
     //      ; // do nothing -- ignore interruption
     //    }
 
-    virtual void dispatchInterruptions();
-
     //    static StepperPtr createInstance() { return new DiscreteEventStepper; }
 
   };

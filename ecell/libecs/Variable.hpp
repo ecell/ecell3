@@ -68,7 +68,15 @@ namespace libecs
       {
 	INHERIT_PROPERTIES( Entity );
 	
-	PROPERTYSLOT_SET_GET( Real, Value );
+	PROPERTYSLOT_LOAD_SAVE( Real, Value,
+				&Variable::setValue,
+				&Variable::getValue,
+				&Variable::loadValue,
+				&Variable::saveValue );
+
+	//	PROPERTYSLOT_SET_GET( Real, MinLimit );
+	//	PROPERTYSLOT_SET_GET( Real, MaxLimit );
+
 	PROPERTYSLOT_SET_GET( Int,  Fixed );
 
 	PROPERTYSLOT_GET_NO_LOAD_SAVE( Real, TotalVelocity );
@@ -81,6 +89,17 @@ namespace libecs
 	// Concentration can be saved, but cannot be loaded.
 	PROPERTYSLOT_GET_NO_LOAD_SAVE( Real, Concentration );
       }
+
+    class IsIntegrationNeeded
+    {
+    public:
+      bool operator()( VariablePtr aVariablePtr ) const
+      {
+	return aVariablePtr->isIntegrationNeeded();
+      }
+
+    };
+
 
     Variable();
     virtual ~Variable();
@@ -105,6 +124,12 @@ namespace libecs
     void clearVelocity()
     { 
       theVelocity = 0.0; 
+    }
+
+
+    virtual const bool isIntegrationNeeded() const
+    {
+      return ! theVariableProxyVector.empty();
     }
 
     /** 
@@ -148,7 +173,7 @@ namespace libecs
 
       // Give it in per second.
       theTotalVelocity = aVelocitySum / anInterval;
-
+      
       loadValue( getValue() + aVelocitySum );
 
       theLastTime = aCurrentTime;
@@ -170,7 +195,7 @@ namespace libecs
 
     virtual const bool checkRange( RealCref aStepInterval ) const
     {
-      // this class has no range limit, thus this check always success
+      // this class has no range limit, thus this check always succeeds
       return true;
     }
 
@@ -188,7 +213,11 @@ namespace libecs
 	}
     }
 
-    virtual GET_METHOD( Real, Value )
+
+    // Currently this is non-virtual, but will be changed to a 
+    // virtual function, perhaps in version 3.3.
+    // virtual
+    GET_METHOD( Real, Value )
     { 
       return saveValue();
     }
@@ -307,11 +336,10 @@ namespace libecs
 
     Real theLastTime;
 
-    VariableProxyVector theVariableProxyVector;
+    //    Real theMinLimit;
+    //    Real theMaxLimit;
 
-    //    StepperVector theStepperVector;
-    // this is a list of indices of Steppers' VariableCache of this Variable.
-    //    RealPtrVector theVelocityVector;
+    VariableProxyVector theVariableProxyVector;
 
     bool theFixed;
   };

@@ -44,12 +44,6 @@ namespace libecs
     ; // do nothing
   }
 
-  void DiscreteEventStepper::dispatchInterruptions()
-  {
-    Stepper::dispatchInterruptions();
-  }
-
-
 
 } // namespace libecs
 

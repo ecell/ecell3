@@ -116,7 +116,7 @@ void NRStepper::initialize()
       const Int anIndex( thePriorityQueue.size() );
 
       anGillespieProcessPtr->setIndex( anIndex );
-      updateGillespieProcess( anGillespieProcessPtr );
+      anGillespieProcessPtr->updateStepInterval();
       thePriorityQueue.push( NREvent( anGillespieProcessPtr->getStepInterval()
       				      + aCurrentTime,
       				      anGillespieProcessPtr ) );
@@ -145,10 +145,13 @@ void NRStepper::step()
   GillespieProcessPtr const aMuProcess( anEvent.getProcess() );
   aMuProcess->process();
 
-  // it assumes all coefficients are one or minus one
-  // Process::initialize() should check this
+  // Calculate timescale.
+  // It assumes all coefficients are one or minus one
+  // Process::initialize() should check this.
+  // Some benchmark show this doesn't affect performance.
   theTimeScale = 
-    aMuProcess->getMinValue() * aMuProcess->getStepInterval() * theTolerance;
+    aMuProcess->getMinValue() * aMuProcess->getStepInterval() 
+    * theTolerance;
 
   const Real aCurrentTime( getCurrentTime() );
   // Update relevant mus
@@ -157,7 +160,7 @@ void NRStepper::step()
 	i!= anEffectList.end(); ++i ) 
     {
       GillespieProcessPtr const anAffectedProcess( *i );
-      updateGillespieProcess( anAffectedProcess );
+      anAffectedProcess->updateStepInterval();
       const Real aStepInterval( anAffectedProcess->getStepInterval() );
       // aTime is time in the priority queue
 
@@ -183,7 +186,7 @@ void NRStepper::interrupt( StepperPtr const aCaller )
     {      
       GillespieProcessPtr const anGillespieProcessPtr( *i );
 	
-      updateGillespieProcess( anGillespieProcessPtr );
+      anGillespieProcessPtr->updateStepInterval();
       const Real aStepInterval( anGillespieProcessPtr->getStepInterval() );
 
       thePriorityQueue.changeOneKey( anGillespieProcessPtr->getIndex(),

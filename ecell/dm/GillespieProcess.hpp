@@ -215,14 +215,7 @@ protected:
     const Real aFirstValue( theVariableReferenceVector[0].getValue() );
     const Real aSecondValue( theVariableReferenceVector[1].getValue() );
 
-    if( aFirstValue < aSecondValue )
-      {
-	return aFirstValue;
-      }
-    else
-      {
-	return aSecondValue;
-      }
+    return fmin( aFirstValue, aSecondValue );
   }
 
   const Real getMinValue_SecondOrder_OneSubstrate() const
