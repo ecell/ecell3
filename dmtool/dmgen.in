@@ -16,7 +16,7 @@ VERSION='@VERSION@'
 
 prefix=os.environ['ECELL3_PREFIX']
 exec_prefix=prefix
-pythondir=@pythondir@
+pythondir=os.environ['PYTHONDIR']
 EMPYBIN=pythondir + os.sep + 'ecell' + os.sep + 'em.py'
 EMPYOPTIONS="--flatten --raw-error"
 
@@ -130,4 +130,5 @@ def main():
     
 if __name__ == '__main__':
     main()
+
 

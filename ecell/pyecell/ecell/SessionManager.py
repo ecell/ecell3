@@ -898,7 +898,10 @@ class SessionManager:
 
 		aContext = self.__createScriptContext( parameters )
         
-		import readline # to provide convenient commandline editing :)
+		try:
+			import readline # to provide convenient commandline editing :)
+		except:
+			pass
 		import code
 		anInterpreter = code.InteractiveConsole( aContext )
 
