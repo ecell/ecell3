@@ -77,8 +77,10 @@ class BargraphWindow(PluginWindow):
         self.update()
         
     def update( self ):
-        self.theIDEntry.set_text  ( self.theID )
-        
+        aString = str( self.theFullPN()[ID] )
+        aString += ':\n' + str( self.theFullPN()[PROPERTY] )        
+        self.theIDEntry.set_text  ( aString )
+
         aValue = self.theSimulator.getProperty( self.theFullPN() )
         value = aValue[0]
         self.theActualValue = value
