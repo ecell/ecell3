@@ -11,7 +11,7 @@
   <property name="resizable">True</property>
   <property name="destroy_with_parent">True</property>
   <property name="default_height">80</property>
-  <property name="icon">toollauncher.png</property>
+  <property name="icon">toollauncher.ico</property>
 
   <child>
     <widget class="GtkVBox" id="vbox3">

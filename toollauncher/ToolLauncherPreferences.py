@@ -30,7 +30,7 @@ class ToolLauncherPreferences( ParentWindow ):
 		self.thePathSelectorDlg.ok_button.connect('clicked', self.updatePathSelection)
 		self.thePathSelectorDlg.cancel_button.connect('clicked', self.hidePathSelectorDlg)
 		self.thePathSelectorDlg.connect('delete_event', self.__deleteFileSelection)
-		iconPixbuf = gtk.gdk.pixbuf_new_from_file(os.environ['TLPATH'] + os.sep + "toollauncher.png")
+		iconPixbuf = gtk.gdk.pixbuf_new_from_file(os.environ['TLPATH'] + os.sep + "toollauncher.ico")
 		self.thePathSelectorDlg.set_icon(iconPixbuf)
 		self.defaultPref = Preferences( self.theToolLauncher )
 
@@ -108,7 +108,7 @@ class ToolLauncherPreferences( ParentWindow ):
 			self.thePathSelectorDlg.ok_button.connect('clicked', self.updatePathSelection)
 			self.thePathSelectorDlg.cancel_button.connect('clicked', self.hidePathSelectorDlg)
 			self.thePathSelectorDlg.connect('delete_event', self.__deleteFileSelection)
-			iconPixbuf = gtk.gdk.pixbuf_new_from_file(os.environ['TLPATH'] + os.sep + "toollauncher.png")
+			iconPixbuf = gtk.gdk.pixbuf_new_from_file(os.environ['TLPATH'] + os.sep + "toollauncher.ico")
 			self.thePathSelectorDlg.set_icon(iconPixbuf)
 
 

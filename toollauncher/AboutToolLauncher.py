@@ -47,7 +47,7 @@ class  AboutToolLauncher:
 		self.win.set_title('About ToolLauncher')
 		iconPixbuf = None
 		try:
-			iconPixbuf = gtk.gdk.pixbuf_new_from_file(os.environ['TLPATH'] + os.sep + "toollauncher.png")
+			iconPixbuf = gtk.gdk.pixbuf_new_from_file(os.environ['TLPATH'] + os.sep + "toollauncher.ico")
 		except:
 			pass
 		self.win.set_icon(iconPixbuf)

@@ -11,7 +11,7 @@
     <property name="destroy_with_parent">False</property>
     <property name="default_width">500</property>
     <property name="default_height">378</property>
-    <property name="icon">toollauncher.png</property>
+    <property name="icon">toollauncher.ico</property>
     <child>
       <widget class="GtkVBox" id="vbox9">
         <property name="visible">True</property>
