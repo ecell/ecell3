@@ -6,9 +6,9 @@
 A system for processing Python as markup embedded in text.
 """
 
-__program__ = 'em'
-__version__ = '1.3'
-__url__ = 'http://www.alcyone.com/pyos/em/'
+__program__ = 'empy'
+__version__ = '1.5'
+__url__ = 'http://www.alcyone.com/pyos/empy/'
 __author__ = 'Erik Max Francis <max@alcyone.com>'
 __copyright__ = 'Copyright (C) 2002 Erik Max Francis'
 __license__ = 'GPL'
@@ -17,6 +17,7 @@ __license__ = 'GPL'
 import getopt
 import string
 import cStringIO
+import re
 import sys
 import types
 
@@ -26,14 +27,13 @@ del cStringIO
 
 FAILURE_CODE = 1
 DEFAULT_PREFIX = '@'
-INTERNAL_MODULE_NAME = 'em'
-SECONDARY_CHARS = "#%({[<` \t\v\n"
+INTERNAL_MODULE_NAME = 'empy'
 SIGNIFICATOR_RE_STRING = r"@%(\S)+\s*(.*)$"
 
 
 class EmpyError(Exception):
     
-    """The base class for all em errors."""
+    """The base class for all empy errors."""
 
     pass
 
@@ -91,6 +91,43 @@ class MetaError(Exception):
                                 (string.join(backtrace, ', ')))
 
 
+class Stack:
+    
+    """A simple stack that behave as a sequence (with 0 being the top
+    of the stack, not the bottom)."""
+
+    def __init__(self, seq=None):
+        if seq is None:
+            seq = []
+        self.data = seq
+
+    def top(self):
+        """Access the top element on the stack."""
+        try:
+            return self.data[-1]
+        except IndexError:
+            raise StackUnderflowError, "stack is empty for top"
+        
+    def pop(self):
+        """Pop the top element off the stack and return it."""
+        try:
+            return self.data.pop()
+        except IndexError:
+            raise StackUnderflowError, "stack is empty for pop"
+        
+    def push(self, object):
+        """Push an element onto the top of the stack."""
+        self.data.append(object)
+
+    def clone(self):
+        """Create a duplicate of this stack."""
+        return self.__class__(self.data[:])
+
+    def __nonzero__(self): return len(self.data) != 0
+    def __len__(self): return len(self.data)
+    def __getitem__(self, index): return self.data[-(index + 1)]
+
+
 class AbstractFile:
     
     """An abstracted file that, when buffered, will totally buffer the
@@ -140,7 +177,7 @@ class AbstractFile:
         self.done = 1
 
 
-class ProxyFile:
+class Stream:
     
     """A wrapper around an (output) file object which supports
     diversions and filtering."""
@@ -175,8 +212,8 @@ class ProxyFile:
             self.done = 1
 
     def install(self, filter=None):
-        """Install a new filter.  Handle all the special types of filters
-        here."""
+        """Install a new filter; None means no filter.  Handle all the
+        special shortcuts for filters here."""
         if filter is None or filter == [] or filter == ():
             # Shortcuts for "no filter."
             self.filter = self.file
@@ -276,6 +313,44 @@ class ProxyFile:
         self.currentDiversion = None
 
 
+class ProxyFile:
+
+    """The proxy file object that is intended to take the place of
+    sys.stdout.  The proxy can manage a stack of file objects it is
+    writing to, and an underlying raw file object."""
+
+    def __init__(self, rawFile):
+        self.stack = Stack()
+        self.raw = rawFile
+        self.current = rawFile
+
+    def push(self, file):
+        self.stack.push(file)
+        self.current = file
+
+    def pop(self):
+        result = self.stack.pop()
+        if self.stack:
+            self.current = self.stack[-1]
+        else:
+            self.current = self.raw
+        return result
+
+    def write(self, data):
+        self.current.write(data)
+
+    def writelines(self, lines):
+        self.current.writelines(lines)
+
+    def flush(self):
+        self.current.flush()
+
+    def close(self):
+        if self.current is not None:
+            self.current.close()
+            self.current = None
+
+
 class Filter:
 
     """An abstract filter."""
@@ -320,7 +395,6 @@ class NullFilter(Filter):
 
     def write(self, data): pass
 
-
 class FunctionFilter(Filter):
 
     """A filter that works simply by pumping its input through a
@@ -348,22 +422,185 @@ class StringFilter(Filter):
         self.sink.write(string.translate(data, self.table))
 
 
+class Scanner:
+
+    """A scanner has the ability to look ahead through a string for
+    special characters, respecting Python quotes."""
+    
+    def __init__(self, data=None):
+        self.data = None
+        self.set(data)
+
+    def set(self, data):
+        """Start the scanner digesting a new batch of data."""
+        self.data = data
+
+    def read(self, i, count=1):
+        """Read count chars starting from i."""
+        if len(self.data) < i + count:
+            raise TransientParseError, "need more data to read"
+        else:
+            return self.data[i:i + count]
+
+    def check(self, i, archetype=None):
+        """Scan for the next single or triple quote, with the specified
+        archetype (if the archetype is present, only trigger on those types
+        of quotes.  Return the found quote or None."""
+        quote = None
+        if self.data[i] in '\'\"':
+            quote = self.data[i]
+            if len(self.data) - i < 3:
+                for j in range(i, len(self.data)):
+                    if self.data[i] == quote:
+                        return quote
+                else:
+                    raise TransientParseError, "need to scan for rest of quote"
+            if self.data[i + 1] == self.data[i + 2] == quote:
+                quote = quote * 3
+        if quote is not None:
+            if archetype is None:
+                return quote
+            else:
+                if archetype == quote:
+                    return quote
+                elif len(archetype) < len(quote) and archetype[0] == quote[0]:
+                    return archetype
+                else:
+                    return None
+        else:
+            return None
+
+    def next(self, target, i=0, j=None, mandatory=0):
+        """Scan from i to j for the next occurrence of one of the characters
+        in the target string; optionally, make the scan mandatory."""
+        if mandatory:
+            assert j is not None
+        quote = None
+        if j is None:
+            j = len(self.data)
+        while i < j:
+            newQuote = self.check(i, quote)
+            if newQuote:
+                if newQuote == quote:
+                    quote = None
+                else:
+                    quote = newQuote
+                i = i + len(newQuote)
+            else:
+                c = self.data[i]
+                if quote:
+                    if c == '\\':
+                        i = i + 1
+                else:
+                    if c in target:
+                        return i
+                i = i + 1
+        else:
+            if mandatory:
+                raise ParseError, "expecting %s, not found" % target
+            else:
+                raise TransientParseError, "expecting ending character"
+
+    def complex(self, enter, exit, i=0, j=None):
+        """Scan from i for an ending sequence, respecting entries and
+        exits."""
+        quote = None
+        depth = 0
+        if j is None:
+            j = len(self.data)
+        while i < j:
+            newQuote = self.check(i, quote)
+            if newQuote:
+                if newQuote == quote:
+                    quote = None
+                else:
+                    quote = newQuote
+                i = i + len(newQuote)
+            else:
+                c = self.data[i]
+                if quote:
+                    if c == '\\':
+                        i = i + 1
+                else:
+                    if c == enter:
+                        depth = depth + 1
+                    elif c == exit:
+                        depth = depth - 1
+                        if depth < 0:
+                            return i
+                i = i + 1
+        else:
+            raise TransientParseError, "expecting end of complex expression"
+
+    def word(self, i=0):
+        """Scan from i for a simple word."""
+        self.dataLen = len(self.data)
+        while i < self.dataLen:
+            if not self.data[i] in Parser.IDENTIFIER_REST:
+                return i
+            i = i + 1
+        else:
+            raise TransientParseError, "expecting end of word"
+
+    def phrase(self, i=0):
+        """Scan from i for a phrase (e.g., 'word', 'f(a, b, c)', 'a[i]', or
+        combinations like 'x[i](a)'."""
+        # Find the word.
+        i = self.word(i)
+        while i < len(self.data) and self.data[i] in '([':
+            enter = self.data[i]
+            exit = Parser.ENDING_CHARS[enter]
+            i = self.complex(enter, exit, i + 1) + 1
+        return i
+    
+    def simple(self, i=0):
+        """Scan from i for a simple expression, which consists of one 
+        more phrases separated by dots."""
+        i = self.phrase(i)
+        self.dataLen = len(self.data)
+        while i < self.dataLen and self.data[i] == '.':
+            i = self.phrase(i)
+        # Make sure we don't end with a trailing dot.
+        while i > 0 and self.data[i - 1] == '.':
+            i = i - 1
+        return i
+
+    def keyword(self, word, i=0, j=None, mandatory=0):
+        prefix = word[0] # keywords start with a prefix
+        if mandatory:
+            assert j is not None
+        k = -1
+        while 1:
+            k = string.find(self.data, word, k + 1, j)
+            if k < 0:
+                if mandatory:
+                    raise ParseError, "missing keyword %s" % word
+                else:
+                    raise TransientParseError, "missing keyword %s" % word
+            if k == 0 or (k > 0 and self.data[k - 1] != prefix):
+                return k
+
+
 class Parser:
     
     """The core parser which also manages the output file."""
     
+    SECONDARY_CHARS = "#%([{)]}`: \t\v\n\\"
     IDENTIFIER_FIRST = '_abcdefghijklmnopqrstuvwxyz' + \
                        'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
     IDENTIFIER_REST = '0123456789' + IDENTIFIER_FIRST + '.'
+    ENDING_CHARS = {'(': ')', '[': ']', '{': '}'}
 
-    def __init__(self, interpreter, proxy, globals, \
-                 locals=None):
+    IF_RE = re.compile(r"^if\s+(.*)$")
+    WHILE_RE = re.compile(r"^while\s+(.*)$")
+    FOR_RE = re.compile(r"^for\s+(\S+)\s+in\s+(.*)$")
+    ELSE_SEPARATOR = '@else:'
+
+    def __init__(self, interpreter):
         self.interpreter = interpreter
-        self.proxy = proxy
         self.buffer = ''
-        self.globals = globals
-        self.locals = locals
         self.first = 1 # have we not yet started?
+        self.scanner = Scanner()
 
     def process(self, data):
         """Process data in the form of a 3-triple:  the data preceding the
@@ -378,119 +615,13 @@ class Parser:
             start, end = string.split(data, self.interpreter.prefix, 1)
             if not end:
                 raise ParseError, "illegal trailing token"
-            elif end[0] in self.interpreter.prefix + SECONDARY_CHARS:
+            elif end[0] in self.interpreter.prefix + Parser.SECONDARY_CHARS:
                 code, end = end[0], end[1:]
                 return start, self.interpreter.prefix + code, end
             elif end[0] in Parser.IDENTIFIER_FIRST:
                 return start, self.interpreter.prefix, end
             else:
                 raise ParseError, "unrecognized token sequence"
-
-    def scanNext(self, data, target, i=0, j=None):
-        """Scan from i to j for the next occurrence of one of the characters
-        in the target string, respecting string literals."""
-        quote = None
-        if j is None:
-            j = len(data)
-        while i < j:
-            c = data[i]
-            if c == "'" or c == '"':
-                if not quote:
-                    quote = c
-                elif quote == c:
-                    quote = None
-            elif quote:
-                if c == '\\':
-                    i = i + 1
-            elif not quote:
-                if c in target:
-                    return i
-            i = i + 1
-        else:
-            raise TransientParseError, "expecting ending character"
-
-    def scanNextMandatory(self, data, target, i, j):
-        """Scan from i to j for the next occurrence of one of the characters
-        in the target string, respecting string literals.  If the character
-        is not present, it is a parse error."""
-        quote = None
-        while i < j:
-            c = data[i]
-            if c == "'" or c == '"':
-                if not quote:
-                    quote = c
-                elif quote == c:
-                    quote = None
-            elif quote:
-                if c == '\\':
-                    i = i + 1
-            elif not quote:
-                if c in target:
-                    return i
-            i = i + 1
-        else:
-            raise ParseError, "expecting %s, not found" % target
-
-    def scanComplex(self, data, enter, exit, i=0, j=None):
-        """Scan from i for an ending sequence, respecting entries and exits,
-        respecting string literals."""
-        quote = None
-        depth = 0
-        if j is None:
-            j = len(data)
-        while i < j:
-            c = data[i]
-            if c == "'" or c == '"':
-                if not quote:
-                    quote = c
-                elif quote == c:
-                    quote = None
-            elif quote:
-                if c == '\\':
-                    i = i + 1
-            elif not quote:
-                if c == enter:
-                    depth = depth + 1
-                elif c == exit:
-                    depth = depth - 1
-                    if depth < 0:
-                        return i
-            i = i + 1
-        else:
-            raise TransientParseError, "expecting end of complex expression"
-
-    def scanWord(self, data, i=0):
-        """Scan from i for a simple word."""
-        dataLen = len(data)
-        while i < dataLen:
-            if not data[i] in Parser.IDENTIFIER_REST:
-                return i
-            i = i + 1
-        else:
-            raise TransientParseError, "expecting end of word"
-
-    def scanPhrase(self, data, i=0):
-        """Scan from i for a phrase (e.g., 'word', 'f(a, b, c)', 'a[i]', or
-        combinations like 'x[i](a)'."""
-        # Find the word.
-        i = self.scanWord(data, i)
-        while i < len(data) and data[i] in '([':
-            enter = data[i]
-            exit = {'(': ')', '[': ']',}[enter]
-            i = self.scanComplex(data, enter, exit, i + 1) + 1
-        return i
-    
-    def scanSimple(self, data, i=0):
-        """Scan from i for a simple expression, which consists of one 
-        more phrases separated by dots."""
-        i = self.scanPhrase(data, i)
-        dataLen = len(data)
-        while i < dataLen and data[i] == '.':
-            i = self.scanPhrase(data, i)
-        # Make sure we don't end with a trailing dot.
-        while i > 0 and data[i - 1] == '.':
-            i = i - 1
-        return i
 
     def feed(self, data):
         """Feed the parser more data."""
@@ -511,24 +642,90 @@ class Parser:
         self.first = 0
         if self.buffer:
             start, token, self.buffer = self.process(self.buffer)
-            self.proxy.write(start)
+            self.interpreter.stream.write(start)
             if token is None:
                 # No remaining tokens, just pass through.
-                self.proxy.write(self.buffer)
+                self.interpreter.stream.write(self.buffer)
                 self.buffer = ''
                 return 0
             elif token in (prefix + ' ', prefix + '\t', \
                            prefix + '\v', prefix + '\n'):
                 # Whitespace/line continuation.
                 pass
+            elif token in (prefix + ')', prefix + ']', prefix + '}'):
+                self.interpreter.stream.write(token[-1])
+            elif token == prefix + '\\':
+                try:
+                    self.scanner.set(self.buffer)
+                    code = self.scanner.read(0)
+                    i = 1
+                    result = None
+                    if code in '()[]{}\'\"\\': # literals
+                        result = code
+                    elif code == '0': # NUL
+                        result = '\x00'
+                    elif code == 'a': # BEL
+                        result = '\x07'
+                    elif code == 'b': # BS
+                        result = '\x08'
+                    elif code == 'd': # decimal code
+                        decimalCode = self.scanner.read(i, 3)
+                        i = i + 3
+                        result = chr(string.atoi(decimalCode, 10))
+                    elif code == 'e': # ESC
+                        result = '\x1b'
+                    elif code == 'f': # FF
+                        result = '\x0c'
+                    elif code == 'h': # DEL
+                        result = '\x7f'
+                    elif code == 'n': # LF (newline)
+                        result = '\x0a'
+                    elif code == 'o': # octal code
+                        octalCode = self.scanner.read(i, 3)
+                        i = i + 3
+                        result = chr(string.atoi(octalCode, 8))
+                    elif code == 'r': # CR
+                        result = '\x0d'
+                    elif code == 's': # SP
+                        result = ' '
+                    elif code == 't': # HT
+                        result = '\x09'
+                    elif code == 'u': # unicode
+                        raise NotImplementedError, "no Unicode support"
+                    elif code == 'v': # VT
+                        result = '\x0b'
+                    elif code == 'x': # hexadecimal code
+                        hexCode = self.scanner.read(i, 2)
+                        i = i + 2
+                        result = chr(string.atoi(hexCode, 16))
+                    elif code == 'z': # EOT
+                        result = '\x04'
+                    elif code == '^': # control character
+                        controlCode = string.upper(self.scanner.read(i))
+                        i = i + 1
+                        if controlCode >= '@' and controlCode <= '`':
+                            result = chr(ord(controlCode) - 0x40)
+                        else:
+                            raise ParseError, "invalid escape control code"
+                    else:
+                        raise ParseError, "unrecognized escape code"
+                    assert result is not None
+                    self.interpreter.stream.write(result)
+                    self.buffer = self.buffer[i:]
+                except ValueError:
+                    raise ParseError, "invalid numeric escape code"
+                except TransientParseError:
+                    self.buffer = token + self.buffer
+                    raise
             elif token == prefix:
                 # "Simple expression" expansion.
                 try:
-                    i = self.scanSimple(self.buffer)
+                    self.scanner.set(self.buffer)
+                    i = self.scanner.simple()
                     code, self.buffer = self.buffer[:i], self.buffer[i:]
                     result = self.evaluate(code)
                     if result is not None:
-                        self.proxy.write(str(result))
+                        self.interpreter.stream.write(str(result))
                 except TransientParseError:
                     self.buffer = token + self.buffer
                     raise
@@ -558,80 +755,94 @@ class Parser:
                     self.buffer = token + self.buffer
                     raise TransientParseError, "significator expecting newline"
             elif token == prefix + '(':
-                # Expression evaluation.
+                # Uber-expression evaluation.
+                self.scanner.set(self.buffer)
                 try:
-                    i = self.scanComplex(self.buffer, '(', ')', 0)
-                    code, self.buffer = self.buffer[:i], self.buffer[i + 1:]
-                    result = self.evaluate(code)
+                    z = self.scanner.complex('(', ')', 0)
+                    try:
+                        q = self.scanner.next('$', 0, z, 1)
+                    except ParseError:
+                        q = z
+                    try:
+                        i = self.scanner.next('?', 0, q, 1)
+                        try:
+                            j = self.scanner.next(':', i, q, 1)
+                        except ParseError:
+                            j = q
+                    except ParseError:
+                        i = j = q
+                    testCode = self.buffer[:i]
+                    thenCode = self.buffer[i + 1:j]
+                    elseCode = self.buffer[j + 1:q]
+                    catchCode = self.buffer[q + 1:z]
+                    self.buffer = self.buffer[z + 1:]
+                    try:
+                        result = self.evaluate(testCode)
+                        if thenCode:
+                            if result:
+                                result = self.evaluate(thenCode)
+                            else:
+                                if elseCode:
+                                    result = self.evaluate(elseCode)
+                                else:
+                                    result = None
+                    except SyntaxError:
+                        # Don't catch syntax errors; let them through.
+                        raise
+                    except:
+                        if catchCode:
+                            result = self.evaluate(catchCode)
+                        else:
+                            raise
                     if result is not None:
-                        self.proxy.write(str(result))
+                        self.interpreter.stream.write(str(result))
                 except TransientParseError:
                     self.buffer = token + self.buffer
                     raise
             elif token == prefix + '`':
                 # Repr evalulation.
+                self.scanner.set(self.buffer)
                 try:
-                    i = self.scanNext(self.buffer, '`', 0)
+                    i = self.scanner.next('`', 0)
                     code, self.buffer = self.buffer[:i], self.buffer[i + 1:]
-                    self.proxy.write(repr(self.evaluate(code)))
+                    self.interpreter.stream.write(repr(self.evaluate(code)))
+                except TransientParseError:
+                    self.buffer = token + self.buffer
+                    raise
+            elif token == prefix + ':':
+                # In-place expression substitution.
+                self.scanner.set(self.buffer)
+                try:
+                    i = self.scanner.next(':', 0)
+                    j = self.scanner.next(':', i + 1)
+                    code = self.buffer[:i]
+                    self.buffer = self.buffer[j + 1:]
+                    self.interpreter.stream.write("@:%s:" % code)
+                    try:
+                        result = self.evaluate(code)
+                        if result is not None:
+                            self.interpreter.stream.write(str(result))
+                    finally:
+                        self.interpreter.stream.write(":")
                 except TransientParseError:
                     self.buffer = token + self.buffer
                     raise
             elif token == prefix + '[':
-                # Conditional evaluation.
+                # Conditional and repeated substitution.
+                self.scanner.set(self.buffer)
                 try:
-                    k = self.scanComplex(self.buffer, '[', ']', 0)
-                    i = self.scanNextMandatory(self.buffer, '?', 0, k)
-                    try:
-                        j = self.scanNextMandatory(self.buffer, ':', i, k)
-                    except ParseError:
-                        j = k
-                    testCode = self.buffer[:i]
-                    thenCode = self.buffer[i + 1:j]
-                    elseCode = self.buffer[j + 1:k]
-                    self.buffer = self.buffer[k + 1:]
-                    result = self.evaluate(testCode)
-                    if result:
-                        expansion = self.evaluate(thenCode)
-                    else:
-                        if elseCode:
-                            expansion = self.evaluate(elseCode)
-                        else:
-                            expansion = None
-                    if expansion is not None:
-                        self.proxy.write(str(expansion))
-                except TransientParseError:
-                    self.buffer = token + self.buffer
-                    raise
-            elif token == prefix + '<':
-                # Protected evaluation.
-                try:
-                    j = self.scanComplex(self.buffer, '<', '>', 0)
-                    try:
-                        i = self.scanNextMandatory(self.buffer, ':', 0, j)
-                    except ParseError:
-                        i = j
-                    tryCode = self.buffer[:i]
-                    catchCode = self.buffer[i + 1:j]
-                    self.buffer = self.buffer[j + 1:]
-                    try:
-                        expansion = self.evaluate(tryCode)
-                    except SyntaxError:
-                        raise # let syntax errors through
-                    except:
-                        if catchCode:
-                            expansion = self.evaluate(catchCode)
-                        else:
-                            expansion = None
-                    if expansion is not None:
-                        self.proxy.write(str(expansion))
+                    i = self.scanner.complex('[', ']', 0)
+                    expansion, self.buffer = \
+                        self.buffer[:i], self.buffer[i + 1:]
+                    self.substitute(expansion)
                 except TransientParseError:
                     self.buffer = token + self.buffer
                     raise
             elif token == prefix + '{':
                 # Statement evaluation.
+                self.scanner.set(self.buffer)
                 try:
-                    i = self.scanComplex(self.buffer, '{', '}', 0)
+                    i = self.scanner.complex('{', '}', 0)
                     code, self.buffer = self.buffer[:i], self.buffer[i + 1:]
                     self.execute(code)
                 except TransientParseError:
@@ -643,7 +854,7 @@ class Parser:
                 # secondary characters.  This will prevent literal prefixes
                 # from appearing in markup, but at least everything else
                 # will function as expected!
-                self.proxy.write(prefix)
+                self.interpreter.stream.write(prefix)
             else:
                 raise ParseError, "unknown token: %s" % token
             return 1
@@ -651,6 +862,7 @@ class Parser:
             return 0
 
     def parse(self):
+        """Empty out the buffer."""
         while self.buffer:
             self.once()
 
@@ -658,33 +870,105 @@ class Parser:
         """Declare that this parsing session is over and that any unparsed
         data should be considered an error."""
         if self.buffer:
-            if self.buffer[-1] != '\n':
-                # The data is not well-formed text; add a newline.
-                self.buffer = self.buffer + '\n'
-            # A TransientParseError thrown here is a real parse error.
-            self.parse()
-            self.buffer = ''
+            try:
+                self.parse()
+            except TransientParseError:
+                if self.buffer and self.buffer[-1] != '\n':
+                    # The data is not well-formed, so add a @ and a newline,
+                    # ensuring that any transient parsing problem will be
+                    # resolved but without affecting parsing.
+                    self.buffer = self.buffer + '@\n'
+                # A TransientParseError thrown here is a real parse error.
+                self.parse()
+                self.buffer = ''
 
-    def evaluate(self, expression):
+    def substitute(self, substitution):
+        """Do a command substitution."""
+        self.scanner.set(substitution)
+        z = len(substitution)
+        i = self.scanner.next(':', 0, z, 1)
+        command = string.strip(substitution[:i])
+        rest = substitution[i + 1:]
+        match = Parser.IF_RE.search(command)
+        if match is not None:
+            # if P : ... [@else: ...]
+            testCode, = match.groups()
+            try:
+                self.scanner.set(rest)
+                k = self.scanner.keyword(Parser.ELSE_SEPARATOR,
+                                         0, len(rest), 1)
+                thenExpansion = rest[:k]
+                elseExpansion = rest[k + len(Parser.ELSE_SEPARATOR):]
+            except ParseError:
+                thenExpansion = rest
+                elseExpansion = ''
+            if self.evaluate(testCode):
+                result = self.interpreter.expand(thenExpansion)
+                self.interpreter.stream.write(str(result))
+            else:
+                if elseExpansion:
+                    result = self.interpreter.expand(elseExpansion)
+                    self.interpreter.stream.write(str(result))
+            return
+        match = Parser.WHILE_RE.search(command)
+        if match is not None:
+            # while P : ...
+            testCode, = match.groups()
+            expansion = rest
+            while 1:
+                if not self.evaluate(testCode):
+                    break
+                result = self.interpreter.expand(expansion)
+                self.interpreter.stream.write(str(result))
+            return
+        match = Parser.FOR_RE.search(command)
+        if match is not None:
+            # for X in S : ...
+            iterator, sequenceCode = match.groups()
+            sequence = self.evaluate(sequenceCode)
+            expansion = rest
+            for element in sequence:
+                self.interpreter.globals[iterator] = element
+                result = self.interpreter.expand(expansion)
+                self.interpreter.stream.write(str(result))
+            return
+        # If we get here, we didn't find anything
+        raise ParseError, "unknown substitution type"
+
+    def evaluate(self, expression, locals=None):
         """Evaluate an expression."""
-        if self.locals:
-            return eval(expression, self.globals, self.locals)
-        else:
-            return eval(expression, self.globals)
+        if locals is None:
+            context = self.interpreter.contexts.top()
+            locals = context.locals
+        sys.stdout.push(self.interpreter.stream)
+        try:
+            if locals is not None:
+                return eval(expression, self.interpreter.globals, locals)
+            else:
+                return eval(expression, self.interpreter.globals)
+        finally:
+            sys.stdout.pop()
 
-    def execute(self, statements):
+    def execute(self, statements, locals=None):
         """Execute a statement."""
-        if string.find(statements, '\n') < 0:
-            statements = string.strip(statements)
-        if self.locals:
-            exec statements in self.globals, self.locals
-        else:
-            exec statements in self.globals
+        if locals is None:
+            context = self.interpreter.contexts.top()
+            locals = context.locals
+        sys.stdout.push(self.interpreter.stream)
+        try:
+            if string.find(statements, '\n') < 0:
+                statements = string.strip(statements)
+            if locals is not None:
+                exec statements in self.interpreter.globals, locals
+            else:
+                exec statements in self.interpreter.globals
+        finally:
+            sys.stdout.pop()
 
     def significate(self, key, value):
         """Declare a significator."""
         name = '__%s__' % key
-        self.globals[name] = value
+        self.interpreter.globals[name] = value
 
     def __nonzero__(self): return len(self.buffer) != 0
 
@@ -694,50 +978,18 @@ class Context:
     """An interpreter context, which encapsulates a name, an input
     file object, and a parser object."""
 
-    def __init__(self, name, input, parser, line=0):
+    def __init__(self, name, input, parser, locals=None, line=0):
         self.name = name
         self.input = input
         self.parser = parser
+        self.locals = locals
         self.line = line
         self.exhausted = 1
 
 
-class Stack:
-    
-    """A simple stack that behave as a sequence (with 0 being the top
-    of the stack, not the bottom)."""
-
-    def __init__(self, seq=None):
-        if seq is None:
-            seq = []
-        self.data = seq
-
-    def top(self):
-        try:
-            return self.data[-1]
-        except IndexError:
-            raise StackUnderflowError, "stack is empty for top"
-        
-    def pop(self):
-        try:
-            return self.data.pop()
-        except IndexError:
-            raise StackUnderflowError, "stack is empty for pop"
-        
-    def push(self, object): self.data.append(object)
-
-    def clone(self):
-        """Create a duplicate of this stack."""
-        return self.__class__(self.data[:])
-
-    def __nonzero__(self): return len(self.data) != 0
-    def __len__(self): return len(self.data)
-    def __getitem__(self, index): return self.data[-(index + 1)]
-
-
 class PseudoModule:
     
-    """A pseudomodule for the builtin em routines."""
+    """A pseudomodule for the builtin empy routines."""
 
     __name__ = INTERNAL_MODULE_NAME
 
@@ -764,6 +1016,16 @@ class PseudoModule:
         context = self.interpreter.contexts.top()
         return context.name, context.line
 
+    def setName(self, name):
+        """Set the name of the topmost context."""
+        context = self.interpreter.contexts.top()
+        context.name = name
+        
+    def setLine(self, line):
+        """Set the name of the topmost context."""
+        context = self.interpreter.contexts.top()
+        context.line = line
+
     # Source manipulation.
 
     def include(self, fileOrFilename, locals=None):
@@ -781,41 +1043,39 @@ class PseudoModule:
 
     def expand(self, data, locals=None):
         """Do an explicit expansion pass on a string."""
-        file = StringIO.StringIO(data)
-        self.interpreter.new('<expand>', file, locals)
+        return self.interpreter.expand(data, locals)
 
     def quote(self, data):
         """Quote the given string so that if it were expanded it would
         evaluate to the original."""
-        result = ''
-        quote = None
-        for c in data:
-            if c == "'" or c == '"':
-                if not quote:
-                    quote = c
-                elif quote == c:
-                    quote = None
-            if c == self.interpreter.prefix and not quote:
-                result = result + c * 2
-            else:
-                result = result + c
-        return result
+        scanner = Scanner(data)
+        result = []
+        i = 0
+        try:
+            j = scanner.next('@', i)
+            result.append(data[i:j])
+            result.append('@@')
+            i = j + 1
+        except TransientParseError:
+            pass
+        result.append(data[i:])
+        return string.join(result, '')
 
     # Pseudomodule manipulation.
 
-    def flatten(self):
+    def flatten(self, keys=None):
         """Flatten the contents of the pseudo-module into the globals
         namespace."""
+        if keys is None:
+            keys = self.__dict__.keys() + self.__class__.__dict__.keys()
         dict = {}
-        dict.update(self.__dict__)
-        # The pseudomodule is really a class instance, so we need to
-        # fumble through the parent class' __dict__ as well, but to
-        # get proper bound methods, we need to call getattr on self.
-        for attribute in self.__class__.__dict__.keys():
-            dict[attribute] = getattr(self, attribute)
+        for key in keys:
+            # The pseudomodule is really a class instance, so we need to
+            # fumble use getattr instead of simply fumbling through the
+            # instance's __dict__.
+            dict[key] = getattr(self, key)
         # Stomp everything into the globals namespace.
-        for key, value in dict.items():
-            self.interpreter.globals[key] = value
+        self.interpreter.globals.update(dict)
 
     # Prefix.
 
@@ -831,43 +1091,43 @@ class PseudoModule:
 
     def stopDiverting(self):
         """Stop any diverting."""
-        self.interpreter.proxy.revert()
+        self.interpreter.stream.revert()
 
     def startDiversion(self, diversion):
         """Start diverting to the given diversion name."""
-        self.interpreter.proxy.divert(diversion)
+        self.interpreter.stream.divert(diversion)
 
     def playDiversion(self, diversion):
         """Play the given diversion and then purge it."""
-        self.interpreter.proxy.undivert(diversion, 1)
+        self.interpreter.stream.undivert(diversion, 1)
 
     def replayDiversion(self, diversion):
         """Replay the diversion without purging it."""
-        self.interpreter.proxy.undivert(diversion, 0)
+        self.interpreter.stream.undivert(diversion, 0)
 
     def purgeDiversion(self, diversion):
         """Eliminate the given diversion."""
-        self.interpreter.proxy.purge(diversion)
+        self.interpreter.stream.purge(diversion)
 
     def playAllDiversions(self):
         """Play all existing diversions and then purge them."""
-        self.interpreter.proxy.undivertAll(1)
+        self.interpreter.stream.undivertAll(1)
 
     def replayAllDiversions(self):
         """Replay all existing diversions without purging them."""
-        self.interpreter.proxy.undivertAll(0)
+        self.interpreter.stream.undivertAll(0)
 
     def purgeAllDiversions(self):
         """Purge all existing diversions."""
-        self.interpreter.proxy.purgeAll()
+        self.interpreter.stream.purgeAll()
 
     def getCurrentDiversion(self):
         """Get the name of the current diversion."""
-        return self.interpreter.proxy.currentDiversion
+        return self.interpreter.stream.currentDiversion
 
     def getAllDiversions(self):
         """Get the names of all existing diversions."""
-        diversions = self.interpreter.proxy.diversions.keys()
+        diversions = self.interpreter.stream.diversions.keys()
         diversions.sort()
         return diversions
     
@@ -875,23 +1135,23 @@ class PseudoModule:
 
     def resetFilter(self):
         """Reset the filter so that it does no filtering."""
-        self.interpreter.proxy.install(None)
+        self.interpreter.stream.install(None)
 
     def nullFilter(self):
         """Install a filter that will consume all text."""
-        self.interpreter.proxy.install(0)
+        self.interpreter.stream.install(0)
 
     def getFilter(self):
         """Get the current filter."""
-        filter = self.interpreter.proxy.filter
-        if filter is self.interpreter.proxy.file:
+        filter = self.interpreter.stream.filter
+        if filter is self.interpreter.stream.file:
             return None
         else:
             return filter
 
     def setFilter(self, filter):
         """Set the filter."""
-        self.interpreter.proxy.install(filter)
+        self.interpreter.stream.install(filter)
 
 
 class Interpreter:
@@ -901,11 +1161,12 @@ class Interpreter:
 
     def __init__(self, output=None, globals=None, \
                  prefix=DEFAULT_PREFIX, flatten=0):
-        # Set up the proxy first, since .pseudo needs it.
+        # Set up the stream first, since the pseudomodule needs it.
         if output is None:
-            output = sys.stdout
+            output = sys.__stdout__
         self.output = output
-        self.proxy = ProxyFile(output)
+        self.stream = Stream(output)
+        # Set up the globals.
         if globals is None:
             pseudo = PseudoModule(self)
             globals = {pseudo.__name__: pseudo}
@@ -914,18 +1175,34 @@ class Interpreter:
         self.contexts = Stack()
         if flatten:
             pseudo.flatten()
-        # Override sys.stdout with the proxy file object.  This could
-        # potentially be done better.
-        sys.stdout = self.proxy
+        # Finally, install a proxy stdout if one hasn't been already.
+        self.installProxy()
 
     def __del__(self):
         self.finish()
 
+    def installProxy(self):
+        """Install a proxy if necessary."""
+        if sys.stdout is sys.__stdout__:
+            sys.stdout = ProxyFile(sys.__stdout__)
+
     def new(self, name, input, locals=None):
         """Create a new interpreter context (a new file object to process)."""
-        parser = Parser(self, self.proxy, self.globals, locals)
-        context = Context(name, input, parser)
+        parser = Parser(self)
+        context = Context(name, input, parser, locals)
         self.contexts.push(context)
+
+    def expand(self, data, locals=None):
+        """Do an explicit expansion pack in a subordinate interpreter."""
+        input = StringIO.StringIO(data)
+        output = StringIO.StringIO()
+        subordinate = Interpreter(output, self.globals, self.prefix)
+        subordinate.new('<expand>', input, locals)
+        subordinate.go()
+        subordinate.stream.flush()
+        expansion = output.getvalue()
+        subordinate.finish()
+        return expansion
 
     def step(self):
         """Read one line of the current input interactively (attempt
@@ -997,11 +1274,11 @@ class Interpreter:
                     sys.exit(FAILURE_CODE)
 
     def finish(self):
-        """Declare this interpreting session over; close the proxy file
+        """Declare this interpreting session over; close the stream file
         object."""
-        if self.proxy is not None:
-            self.proxy.close()
-            self.proxy = None
+        if self.stream is not None:
+            self.stream.close()
+            self.stream = None
 
     def meta(self, exc=None):
         """Construct a MetaError for the interpreter's current state."""
@@ -1036,33 +1313,60 @@ Valid options:
   -r --raw --raw-errors        Show raw Python errors
   -o --output=<filename>       Specify file for output as write
   -a --append=<filename>       Specify file for output as append
-  -P --preprocess=<filename>   Interpret em file before main processing
+  -P --preprocess=<filename>   Interpret empy file before main processing
   -I --import=<modules>        Import Python modules before processing
   -E --execute=<statement>     Execute Python statement before processing
   -F --execute-file=<filename> Execute Python file before processing
   -B --buffered-output         Fully buffer output (even open) with -o or -a
 
 The following expansions are supported (where @ is the prefix):
-  @# comment nl                Comment; remove everything up to newline
-  @ whitespace                 Remove following whitespace; line continuation
+  @# ... NL                    Comment; remove everything up to newline
+  @ WHITESPACE                 Remove following whitespace; line continuation
+  @\\ ESCAPE_CODE               A C-style escape sequence
   @@                           Literal @; @ is escaped (duplicated prefix)
-  @( expression )              Evaluate expression and substitute with str
-  @ simple_expression          Evaluate simple expression and substitute;
+  @( EXPRESSION )              Evaluate expression and substitute with str
+  @( TEST ? THEN )             If test is true, evaluate then
+  @( TEST ? THEN : ELSE )      If test is true, evaluate then, otherwise else
+  @( TRY $ CATCH )             Expand try expression, or catch if it raises
+  @ SIMPLE_EXPRESSION          Evaluate simple expression and substitute;
                                e.g., @x, @x.y, @f(a, b), @l[i], etc.
-  @` expression `              Evaluate expression and substitute with repr
-  @[ if ? then : else ]        Conditional expression evaluation
-  @< try : catch >             Protected expression evaluation
-  @{ statements }              Statements are executed for side effects
-  @%% key whitespace value nl   Significator form of __key__ = value
+  @` EXPRESSION `              Evaluate expression and substitute with repr
+  @: EXPRESSION : DUMMY :      Evaluates to @:...:expansion:
+  @[ if E : CODE ]             Expand then code if expression is true
+  @[ if E : CODE @else: CODE ] Expand then code if expression is true, or else
+  @[ while E : CODE ]          Repeatedly expand code while expression is true
+  @[ for X in S : CODE ]       Expand code for each element in sequence
+  @{ STATEMENTS }              Statements are executed for side effects
+  @%% KEY WHITESPACE VALUE NL   Significator form of __KEY__ = VALUE
+
+Valid escape sequences are:
+  @\\0                          NUL, null
+  @\\a                          BEL, bell
+  @\\b                          BS, backspace
+  @\\dDDD                       three-digital decimal code DDD
+  @\\e                          ESC, escape
+  @\\f                          FF, form feed
+  @\\h                          DEL, delete
+  @\\n                          LF, linefeed, newline
+  @\\oOOO                       three-digit octal code OOO
+  @\\r                          CR, carriage return
+  @\\s                          SP, space
+  @\\t                          HT, horizontal tab
+  @\\v                          VT, vertical tab
+  @\\xHH                        two-digit hexadecimal code HH
+  @\\z                          EOT, end of transmission
+  @\\^X                         control character ^X
 
 The %s pseudomodule contains the following attributes:
-  VERSION                      String representing em version
+  VERSION                      String representing empy version
   SIGNIFICATOR_RE_STRING       Regular expression string matching significators
   interpreter                  Currently-executing interpreter instance
   identify()                   Identify top context as name, line
+  setName(name)                Set the name of the current context
+  setLine(line)                Set the line number of the current context
   Filter                       The base class for custom filters
   include(file, [locals])      Include filename or file-like object
-  expand(string, [locals])     Explicitly expand string and return expansion
+  expand(string, [locals])     Explicitly expand string
   quote(string)                Quote prefixes in provided string
   flatten()                    Flatten module contents into globals namespace
   getPrefix()                  Get current prefix
@@ -1089,7 +1393,7 @@ comment.
 """ % (sys.argv[0], INTERNAL_MODULE_NAME))
 
 def invoke(args):
-    """Run a standalone instance of an em interpeter."""
+    """Run a standalone instance of an empy interpeter."""
     # Initialize the options.
     Output = None
     Globals = None
