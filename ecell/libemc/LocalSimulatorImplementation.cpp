@@ -443,6 +443,13 @@ namespace libemc
 
   void LocalSimulatorImplementation::run( const libecs::Real aDuration )
   {
+    if( aDuration <= 0.0 )
+      {
+	THROW_EXCEPTION( libecs::Exception,
+			 "run( l ): l must be > 0.0. (" + 
+			 libecs::toString( aDuration ) + " given.)" );
+      }
+
     getModel().initialize();
 
     if( theEventChecker != NULLPTR && theEventHandler != NULLPTR )
