@@ -209,7 +209,7 @@ Object PySimulator::getLogger( const Py::Tuple& args )
 
   const String        aFullID    ( static_cast<Py::String>( args[0] ) );
 
-  LoggerPtr aLogger( Simulator::getLogger( aFullID ) );
+  libecs::LoggerPtr aLogger( Simulator::getLogger( aFullID ) );
 
   PyLogger* aPyLogger( new PyLogger( aLogger ) );
 

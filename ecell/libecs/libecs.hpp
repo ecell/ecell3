@@ -85,6 +85,8 @@ namespace libecs
   DECLARE_CLASS( LoggerBroker );
   DECLARE_CLASS( Logger );
   DECLARE_CLASS( DataPoint );
+  DECLARE_CLASS( DataPointVector );
+  DECLARE_CLASS( PhysicalLogger );
 
   // containers
 
@@ -110,7 +112,8 @@ namespace libecs
   // reference counted pointer types
 
   DECLARE_RCPTR( UVariableVector );
-
+  DECLARE_RCPTR( DataPointVector );
+  
   /** @} */ //end of libecs_module 
 
 } // namespace libecs

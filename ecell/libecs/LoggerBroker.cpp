@@ -44,8 +44,7 @@ namespace libecs
 
   LoggerBroker::LoggerBroker( ModelRef aModel )
     :
-    theModel( aModel ),
-    theGetCurrentTimeMethod( theModel, &Model::getCurrentTime )
+    theModel( aModel )
   {
     ; // do nothing
   }
@@ -91,8 +90,8 @@ namespace libecs
     //    aPropertyMapIterator->second->getProxy()->setLogger( aLoggerPtr );
 
     //    appendLogger( aLoggerPtr );
-    theLoggerMap[fpn] = new Logger( theGetCurrentTimeMethod,
-				    aPropertySlotMapIterator->second );
+    theLoggerMap[fpn] = new Logger( theModel,
+				    *(aPropertySlotMapIterator->second) );
     aPropertySlotMapIterator->second->connectLogger(theLoggerMap[fpn]);
 
     anEntityPtr->getSuperSystem()

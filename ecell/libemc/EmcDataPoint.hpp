@@ -2,7 +2,7 @@
 //
 //        This file is part of E-CELL Simulation Environment package
 //
-//                Copyright (C) 1996-2002 Keio University
+//                Copyright (C) 1996-2000 Keio University
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
@@ -42,11 +42,6 @@
 namespace libemc
 {
 
-  /** @defgroup libemc_module The Libemc Module 
-   * This is the libemc module 
-   * @{ 
-   */ 
-  
   using namespace libecs;
 
   class EmcDataPoint
@@ -95,7 +90,6 @@ namespace libemc
     const DataPoint* theDataPoint;
   };
 
-  /** @} */ //end of libemc_module 
 }
 
 

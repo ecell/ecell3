@@ -2,7 +2,7 @@
 //
 //        This file is part of E-CELL Simulation Environment package
 //
-//                Copyright (C) 2000-2002 Keio University
+//                Copyright (C) 2000-2001 Keio University
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
@@ -27,6 +27,7 @@
 // written by Masayuki Okayama <smash@e-cell.org> at
 // E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
+// modified by Gabor Bereczki <gabor.bereczki@talk21.com> (14/04/2002)
 
 #include "libecs/PropertyInterface.hpp"
 

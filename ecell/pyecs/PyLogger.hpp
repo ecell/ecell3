@@ -2,7 +2,7 @@
 //
 //        This file is part of E-CELL Simulation Environment package
 //
-//                Copyright (C) 1996-2002 Keio University
+//                Copyright (C) 1996-2001 Keio University
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
@@ -27,19 +27,13 @@
 // written by Masayuki Okayama <smash@e-cell.org> at
 // E-CELL Project, Institute for Advanced Biosciences, Keio University.
 //
+// modified by Gabor Bereczki <gabor.bereczki@talk21.com> (14/04/2002)
 
 #if !defined( __PY_LOGGER_HPP )
 #define __PY_LOGGER_HPP
 
 #include "libemc/EmcLogger.hpp"
 #include "CXX/Extensions.hxx"
-
-/** @defgroup pyecs_module The Pyecs Module 
- * This is the pyecs module 
- * @{ 
- */ 
-
-
 using Py::Object;
 using Py::Tuple;
 using Py::PythonExtension;
@@ -61,12 +55,12 @@ public:
     ; // do nothing
   }
 
-  PyLogger( const libecs::Logger* lptr )
+  PyLogger( libecs::Logger* lptr )
   {
     EmcLogger::setLogger( lptr );
   }
 
-  void setLogger( const libecs::Logger* lptr )
+  void setLogger( libecs::Logger* lptr )
   {
     EmcLogger::setLogger( lptr );
   }
@@ -81,13 +75,13 @@ public:
   Object getData( const Tuple& args );
   Object getStartTime( const Tuple& args );
   Object getEndTime( const Tuple& args );
-
+  Object appendData( const Tuple& args );
+  
 private:
 
-  Object convertVector( libecs::Logger::DataPointVectorCref );
+  Object convertVector( libecs::DataPointVectorRCPtr );
 
 };
 
-/** @} */ //end of pyecs_module 
 
 #endif

@@ -37,8 +37,11 @@ Reactor.cpp\
 StepperMaker.cpp\
 SystemMaker.cpp\
 DataPoint.cpp\
-DataPointStlVector.cpp\
+DataPointVector.cpp\
+VVector.cpp\
+osif.cpp\
 Logger.cpp\
+PhysicalLogger.cpp\
 LoggerBroker.cpp
 
 libecsdir=${pkgincludedir}/libecs
@@ -65,7 +68,10 @@ Reactor.hpp\
 StepperMaker.hpp\
 SystemMaker.hpp\
 DataPoint.hpp\
-DataPointStlVector.hpp\
+DataPointVector.hpp\
+VVector.h\
+osif.h\
+PhysicalLogger.hpp\
 Logger.hpp\
 LoggerBroker.hpp\
 Exceptions.hpp\

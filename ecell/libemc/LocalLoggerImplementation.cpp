@@ -2,7 +2,7 @@
 //
 //        This file is part of E-CELL Simulation Environment package
 //
-//                Copyright (C) 1996-2002 Keio University
+//                Copyright (C) 1996-2000 Keio University
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
@@ -27,11 +27,11 @@
 // written by Masayuki Okayama <smash@e-cell.org> at
 // E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
+// modified by Gabor Bereczki <gabor.bereczki@talk21.com> (14/04/2002)
 
 #include "libecs/PropertyInterface.hpp"
 
 #include "LocalLoggerImplementation.hpp"
-
 namespace libemc
 {
 
@@ -46,7 +46,7 @@ namespace libemc
   //  }
 
   LocalLoggerImplementation::
-  LocalLoggerImplementation( LoggerCptr lptr )
+  LocalLoggerImplementation( LoggerPtr lptr )
     :
     theLogger( *lptr ) 
   {
@@ -59,24 +59,23 @@ namespace libemc
     ;
   }
 
-  const libecs::Logger::DataPointVector
+  const libecs::DataPointVectorRCPtr
   LocalLoggerImplementation::getData( libecs::RealCref start,
 				      libecs::RealCref end,
-				      libecs::RealCref interval ) const
+				      libecs::RealCref interval ) 
   {
     return theLogger.getData( start, end, interval );
   }
 
-  const libecs::Logger::DataPointVector
+  const libecs::DataPointVectorRCPtr
   LocalLoggerImplementation::getData( libecs::RealCref start,
-				      libecs::RealCref end ) const
-				      
+				      libecs::RealCref end ) 				      
   {
     return theLogger.getData( start, end );
   }
 
-  const libecs::Logger::DataPointVector
-  LocalLoggerImplementation::getData( void ) const
+  const libecs::DataPointVectorRCPtr
+  LocalLoggerImplementation::getData( void ) 
 				      
   {
     return theLogger.getData();

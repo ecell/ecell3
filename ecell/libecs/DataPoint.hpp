@@ -2,7 +2,7 @@
 //
 //        This file is part of E-CELL Simulation Environment package
 //
-//                Copyright (C) 2000-2002 Keio University
+//                Copyright (C) 2001-2002 Keio University
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
@@ -11,22 +11,21 @@
 // modify it under the terms of the GNU General Public
 // License as published by the Free Software Foundation; either
 // version 2 of the License, or (at your option) any later version.
-// 
+//
 // E-CELL is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 // See the GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public
 // License along with E-CELL -- see the file COPYING.
 // If not, write to the Free Software Foundation, Inc.,
 // 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-// 
+//
 //END_HEADER
-//
-// written by Masayuki Okayama <smash@e-cell.org> at
-// E-CELL Project, Lab. for Bioinformatics, Keio University.
-//
+// 
+// written by Gabor Bereczki <gabor.bereczki@talk21.com>
+// 25/03/2002
 
 
 #if !defined(__DATAPOINT_HPP)
@@ -45,168 +44,82 @@ namespace libecs
    * @{ 
    */ 
   
-/*
-
- */
-
-/**
-
- */
-
 
   class DataPoint
   {
-    
-    
+
   public:
-    
-    
-    /**
-       Initializing constructor
-       @param 2 objects which are components of DataPoint
-    */
-    
-    explicit DataPoint( RealCref, UVariableCref );
-    
-    explicit DataPoint( UVariableCref, UVariableCref );
-    
-    explicit DataPoint( UVariableCref, RealCref );
 
-    explicit DataPoint( RealCref, RealCref );
-
-    
-    /**
-       Copy constructor
-       @param Object constant reference
-    */
-    
-    DataPoint( DataPointCref );
-    
-    
-    /**
-       Copy constructor
-       @param Object constant reference
-    */
-    
-    DataPoint( DataPointRef );
-    
-    
-    /// Destructor
-    
-    ~DataPoint( void )
+    DataPoint( RealCref aTime = 0.0, RealCref aValue = 0.0 )
+      :
+      theTime( aTime ),
+      theValue( aValue )
     {
       ; // do nothing
     }
-    
-    
-    /**
-       Assignments operator
-       @param DataPoint constant reference
-       @return DataPoint reference
-    */
-    
 
-
-    // FIXME
-    bool operator<( RealCref second ) const
+    DataPoint( DataPointCref aDataPoint )
     {
-      if( getTime() < second )
-	{
-	  return true;
-	}
-      return false;
+      theTime  = aDataPoint.getTime();
+      theValue = aDataPoint.getValue();
+    }
+
+    DataPoint( DataPointRef aDataPoint )
+    {
+      theTime  = aDataPoint.getTime();
+      theValue = aDataPoint.getValue();
     }
 
 
-    // FIXME
-    bool operator<( DataPointCref second ) const
+    ~DataPoint()
     {
-      if( getTime() < second.getTime() )
-	{
-	  return true;
-	}
-      return false;
+      ; // do nothing
     }
-    
-    // FIXME
-    bool operator>(DataPointCref second)
-    {
-      if( getTime() > second.getTime() )
-	{
-	  return true;
-	}
-      return false;
-    }
-    
-    
-    //
-    // Accessors
-    //
-    
-    /**
-       Return the data member, theTime
-       @return T constant reference
-    */
-    
-    RealCref getTime( void ) const
+
+    RealCref getTime() const
     {
       return theTime;
     }
-    
-    
-    /**
-       Return the data member, theValue
-       @return V constant reference
-    */
-    
-    RealCref getValue( void ) const
+
+    RealCref getValue() const
     {
       return theValue;
     }
-    
+
+    void SetValue( RealCref aValue )
+    {
+      theValue = aValue;
+    }
+
+    void SetTime( RealCref aTime )
+    {
+      theTime = aTime;
+    }
+
+    DataPointRef operator=( DataPointCref aDataPoint)
+    {
+      SetTime(  aDataPoint.getTime() );
+      SetValue( aDataPoint.getValue() );
+
+      return *this;
+    }
+
+    DataPointRef operator=( DataPointRef aDataPoint )
+    {
+      SetTime(  aDataPoint.getTime() );
+      SetValue( aDataPoint.getValue() );
+
+      return *this;
+    }
+
+
   private:
-    
-    /// Default constructor prohibited to public use
-    
-    DataPoint( void );
-    
-    /**
-       
-       @param int object
-       @return DataPoint reference
-    */
-    
-    DataPoint& operator[]( int );
-    
-    //    DataPointRef operator=( DataPointCref );
-    
-    //
-    // Mutators
-    //
-    
-    //
-    // Private data members follow
-    //
-    
-  private:
-    
-    /// The internal value
-    
+
     Real theTime;
     Real theValue;
-    
+
   };
-  
-  inline bool operator< ( RealCref aTime, DataPointCref aDataPoint )
-  {
 
-    if( aTime < aDataPoint.getTime() )
-      {
-	return true;
-      }
-    return false;
-
-  }
 
   /** @} */ //end of libecs_module 
 

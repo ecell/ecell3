@@ -2,7 +2,7 @@
 //
 //        This file is part of E-CELL Simulation Environment package
 //
-//                Copyright (C) 2000-2002 Keio University
+//                Copyright (C) 2000-2001 Keio University
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
@@ -11,134 +11,129 @@
 // modify it under the terms of the GNU General Public
 // License as published by the Free Software Foundation; either
 // version 2 of the License, or (at your option) any later version.
-// 
+//
 // E-CELL is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 // See the GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public
 // License along with E-CELL -- see the file COPYING.
 // If not, write to the Free Software Foundation, Inc.,
 // 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-// 
+//
 //END_HEADER
 //
 // written by Masayuki Okayama <smash@e-cell.org> at
 // E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
+// modified by Gabor Bereczki <gabor.bereczki@talk21.com>
+// 14/04/2002
 
-#include <iostream>
 
-#include "PropertyInterface.hpp"
-
-/*
-
- */
-
-#if !defined(__LOGGER_HPP)
 #include "Logger.hpp"
-#endif
 
-
+ 
 
 namespace libecs
 {
 
   // Constructor
-
-  Logger::Logger( const GetCurrentTimeMethodType& aGetCurrentTime,
-		  PropertySlotPtr aPropertySlot )
+  Logger::Logger( ModelCref aModel, PropertySlotRef aPropertySlot )
     :
+    theModel( aModel ),
     thePropertySlot( aPropertySlot ),
-    theGetCurrentTimeMethod( aGetCurrentTime ),
     theMinimumInterval( 0.0 ),
     theCurrentInterval( 0.0 )
   {
     ; // do nothing
-  } 
-  
-  
-  Logger::DataPointVectorCref Logger::getData( void ) const
+  }
+
+
+  DataPointVectorRCPtr Logger::getData( void ) 
   {
+    theDataPointVector 
+      = thePhysicalLogger.getVector( thePhysicalLogger.begin(),
+				     thePhysicalLogger.end() );
+    
     return theDataPointVector;
   }
-  
+
   //
-  
-  const Logger::DataPointVector Logger::getData( RealCref aStartTime,
-						 RealCref anEndTime ) const
+
+  DataPointVectorRCPtr Logger::getData( RealCref aStartTime,
+					RealCref anEndTime ) 
   {
-    const const_iterator aHeadItr( theDataPointVector.begin() );
-    const const_iterator aTailItr( theDataPointVector.end() );
-    
-    const const_iterator 
-      aStartIterator( theDataPointVector.lower_bound( aHeadItr,
-						      aTailItr,
-						      aStartTime ) );
-    const const_iterator 
-      anEndIterator( theDataPointVector.upper_bound( aStartIterator,
-						     aTailItr,
-						     anEndTime ) );
+    PhysicalLoggerIterator 
+      top( thePhysicalLogger.upper_bound( thePhysicalLogger.begin(),
+					  thePhysicalLogger.end(), 
+					  anEndTime ) );
 
-    DataPointVector aNewDataPointVector( aStartIterator, anEndIterator );
+    PhysicalLoggerIterator 
+      bottom( thePhysicalLogger.lower_bound( thePhysicalLogger.begin(),
+					     top,
+					     aStartTime ) );
 
-    return aNewDataPointVector;
+    theDataPointVector = thePhysicalLogger.getVector( bottom, top );
+
+    return theDataPointVector;
   }
-  
-  
+
+
   //
-  
-  
-  const Logger::DataPointVector Logger::getData( RealCref aStartTime,
-						 RealCref anEndTime,
-						 RealCref anInterval ) const
+
+
+  DataPointVectorRCPtr Logger::getData( RealCref aStartTime,
+					RealCref anEndTime,
+					RealCref anInterval ) 
   {
-    const const_iterator aHeadIterator( theDataPointVector.begin() );
-    const const_iterator aTailIterator( theDataPointVector.end() - 1 );
-    
-    const_iterator 
-      aStartIterator( theDataPointVector.lower_bound( aHeadIterator,
-						      aTailIterator,
-						      aStartTime ) );
-    const_iterator 
-      anEndIterator( theDataPointVector.upper_bound( aStartIterator,
-						     aTailIterator,
-						     anEndTime ) );    
+    DataPointVectorIterator 
+      range( static_cast<DataPointVectorIterator>
+	     ( ( anEndTime - aStartTime ) / anInterval ) + 1 );
+    DataPointVectorIterator counter( 0 );
 
-    Real aTime( aStartIterator->getTime() );
-    const Real aLastTime( anEndIterator->getTime() );
+    PhysicalLoggerIterator 
+      top( thePhysicalLogger.upper_bound( thePhysicalLogger.begin(),
+					  thePhysicalLogger.end(),
+					  anEndTime ) );
 
-    DataPointVector aDataPointVector;
-    aDataPointVector.push( *aStartIterator );
+    PhysicalLoggerIterator 
+      bottom( thePhysicalLogger.lower_bound( thePhysicalLogger.begin(),
+					     top,
+					     aStartTime ) );
 
-    while( aTime <  aLastTime )
+    Real rcounter( aStartTime );
+    DataPointVectorPtr aDataPointVector( new DataPointVector( range ) );
+    DataPoint aDataPoint;
+    PhysicalLoggerIterator it;
+    while( counter < range )
       {
-	const_iterator 
-	  anIterator( theDataPointVector.lower_bound( aStartIterator,
-						      anEndIterator,
-						      aTime + anInterval ) );
-	DataPointCref anDataPoint( *anIterator );
-	aDataPointVector.push( anDataPoint );
-	aTime = anDataPoint.getTime();
-	aStartIterator = anIterator;
+	it = thePhysicalLogger.lower_bound( bottom, top , rcounter );
+	thePhysicalLogger.getItem( it, &aDataPoint );
+	( *aDataPointVector )[ counter ] = aDataPoint;
+	++counter;
+	rcounter += anInterval;
       }
-    
-    return aDataPointVector;
+
+    theDataPointVector = aDataPointVector;
+
+    return theDataPointVector;
   }
-  
-  
+
+
   void Logger::appendData( RealCref aValue )
   {
-    const Real aTime( (theGetCurrentTimeMethod)() );
-    if( !theDataPointVector.empty() )
+    const Real aTime( theModel.getCurrentTime() );
+
+    if( !thePhysicalLogger.empty() )
       {
-    	theCurrentInterval = aTime - theDataPointVector.back().getTime();
+    	theCurrentInterval = aTime - thePhysicalLogger.back().getTime();
       }
-    theDataPointVector.push( aTime, aValue );
-    if(theMinimumInterval < theCurrentInterval )
+
+    thePhysicalLogger.push( aTime, aValue );
+    if( theMinimumInterval < theCurrentInterval )
       {
-	theMinimumInterval = theCurrentInterval; 
+	theMinimumInterval = theCurrentInterval;
       }
   }
 
@@ -146,17 +141,17 @@ namespace libecs
 
   StringCref Logger::getName() const
   {
-    return thePropertySlot->getName();
+    return thePropertySlot.getName();
   }
 
-  
+
   //
-  
-  RealCref Logger::getStartTime( void ) const
+
+  Real Logger::getStartTime( void ) 
   {
-    if( ! theDataPointVector.empty() )
+    if( !thePhysicalLogger.empty() )
       {
-	return theDataPointVector.front().getTime();
+	return thePhysicalLogger.front().getTime();
       }
     else
       {
@@ -164,15 +159,15 @@ namespace libecs
 	return aZero;
       }
   }
-  
-  
+
+
   //
-  
-  RealCref Logger::getEndTime( void ) const
+
+  Real Logger::getEndTime( void ) 
   {
-    if( ! theDataPointVector.empty() )
+    if( !thePhysicalLogger.empty() )
       {
-	return theDataPointVector.back().getTime();
+	return thePhysicalLogger.back().getTime();
       }
     else
       {
@@ -180,7 +175,7 @@ namespace libecs
 	return aZero;
       }
   }
-  
+
 
 
 } // namespace libecs
@@ -198,7 +193,7 @@ using namespace libecs;
 
 const Real& func(void)
 {
-  const Real* fp = new Real(3.14); 
+  const Real* fp = new Real(3.14);
   return *fp;
 }
 
@@ -208,11 +203,11 @@ main()
 
   Logger<Real,Real> lg = Logger<Real,Real>(op);
   /*
-  lg.update(d1);
-  lg.update(d2);
-  lg.update(d3);
-  lg.update(d4);
-  lg.update(d5);
+    lg.update(d1);
+    lg.update(d2);
+    lg.update(d3);
+    lg.update(d4);
+    lg.update(d5);
   */
 
 

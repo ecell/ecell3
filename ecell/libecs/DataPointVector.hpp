@@ -2,7 +2,7 @@
 //
 //        This file is part of E-CELL Simulation Environment package
 //
-//                Copyright (C) 2000-2002 Keio University
+//                Copyright (C) 2002-2002 Keio University
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
@@ -11,32 +11,30 @@
 // modify it under the terms of the GNU General Public
 // License as published by the Free Software Foundation; either
 // version 2 of the License, or (at your option) any later version.
-// 
+//
 // E-CELL is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 // See the GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public
 // License along with E-CELL -- see the file COPYING.
 // If not, write to the Free Software Foundation, Inc.,
 // 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-// 
+//
 //END_HEADER
 //
-// written by Masayuki Okayama <smash@e-cell.org> at
-// E-CELL Project, Lab. for Bioinformatics, Keio University.
+// written by Gabor Bereczki <gabor.bereczki@talk21.com>
 //
 
 
-#if !defined(__LOGGER_BROKER_HPP)
-#define __LOGGER_BROKER_HPP
+#if !defined( __DATAPOINTVECTOR_HPP )
+#define __DATAPOINTVECTOR_HPP
 
-#include <map>
+#include "DataPoint.hpp"
+#include "Defs.hpp"
+#include <sys/types.h>
 
-#include "libecs.hpp"
-#include "FullID.hpp"
-#include "Logger.hpp"
 
 namespace libecs
 {
@@ -45,56 +43,57 @@ namespace libecs
    * This is the libecs module 
    * @{ 
    */ 
-  
-  class LoggerBroker
+
+
+  DECLARE_TYPE( size_t, DataPointVectorIterator );
+
+  class DataPointVector
   {
 
   public:
 
-    DECLARE_MAP( const FullPN, 
-		 LoggerPtr, std::less<const FullPN>, LoggerMap );
+    DataPointVector( DataPointVectorIterator );
 
-    LoggerBroker( ModelRef aModel );
-
-    
-    ~LoggerBroker();
-
-
-    LoggerPtr getLogger( FullPNCref fpn );
-
-    LoggerMapCref getLoggerMap() const
+    ~DataPointVector()
     {
-      return theLoggerMap;
+      delete[] theRawArray;
     }
 
-    ModelRef getModel() const
+    DataPointRef operator[]( DataPointVectorIterator aPosition );
+
+    DataPointCref operator[]( DataPointVectorIterator aPosition ) const;
+
+    DataPointVectorIterator getSize();
+
+    size_t getElementSize() const;
+	
+    DataPointVectorIterator begin()
     {
-      return theModel;
+      return 0;
     }
-
-  protected:
-    
-    LoggerPtr createLogger( FullPNCref fpn );
-    //    void appendLogger( LoggerPtr );
-    
-  private:
-
-    // prevent copy
-    LoggerBroker( LoggerBrokerCref );
-    LoggerBrokerRef operator=( const LoggerBroker& );
+	
+    DataPointVectorIterator end()
+    {
+      return getSize();
+    }
+	
+    void* getRawArray();
 
   private:
 
-    LoggerMap     theLoggerMap;
-    ModelRef      theModel;
+    DataPointVectorIterator theSize;
+    
+    const size_t theElementSize;
+
+    DataPoint* theRawArray;
+
+
 
   };
 
-  /** @} */ //end of libecs_module
-  
+  /** @} */ //end of libecs_module 
+
 } // namespace libecs
 
-#endif
 
-
-
+#endif /* __DATAPOINTVECTOR_HPP */

@@ -2,7 +2,7 @@
 //
 //        This file is part of E-CELL Simulation Environment package
 //
-//                Copyright (C) 2000-2002 Keio University
+//                Copyright (C) 2000-2001 Keio University
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
@@ -27,7 +27,7 @@
 // written by Masayuki Okayama <smash@e-cell.org> at
 // E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
-
+// modified by Gabor Bereczki <gabor.bereczki@talk21.com> (14/04/2002)
 
 #if !defined( __EMC_LOGGER_HPP )
 #define __EMC_LOGGER_HPP
@@ -40,11 +40,6 @@
 namespace libemc
 {
 
-  /** @defgroup libecs_module The Libecs Module 
-   * This is the libecs module 
-   * @{ 
-   */ 
-  
   class EmcLogger
   {
 
@@ -59,47 +54,53 @@ namespace libemc
 
     virtual ~EmcLogger( ) { }
 
-    const libecs::Logger::DataPointVector
-    getData( void ) const
+    const libecs::DataPointVectorRCPtr
+    getData( void ) 
     {
       return theLoggerImplementation->getData();
     }
 
-    const libecs::Logger::DataPointVector
-    getData( libecs::RealCref start, libecs::RealCref end ) const
+    const libecs::DataPointVectorRCPtr
+    getData( libecs::RealCref start, libecs::RealCref end ) 
     {
       return theLoggerImplementation->getData( start, end );
     }
 
-    const libecs::Logger::DataPointVector
-    getData( libecs::RealCref start, libecs::RealCref end, libecs::RealCref interval ) const
+    const libecs::DataPointVectorRCPtr
+    getData( libecs::RealCref start, libecs::RealCref end, libecs::RealCref interval ) 
     {
       return theLoggerImplementation->getData( start, end, interval );
     }
 
-    void setLogger( LoggerCptr lptr )
+    void setLogger( LoggerPtr lptr )
     {
       delete theLoggerImplementation;
       theLoggerImplementation = new LocalLoggerImplementation( lptr );
     }
 
-    libecs::RealCref getStartTime() const
+    libecs::RealCref getStartTime() 
     {
-      return theLoggerImplementation->getStartTime();
+      theStartTime = theLoggerImplementation->getStartTime();
+      return theStartTime;
     }
 
-    libecs::RealCref getEndTime() const
+    libecs::RealCref getEndTime() 
     {
-      return theLoggerImplementation->getEndTime();
+      theEndTime = theLoggerImplementation->getEndTime();
+      return theEndTime;
+    }
+
+    void appendData(libecs::RealCref aValue){
+    theLoggerImplementation->appendData(aValue);
     }
 
   private:
 
     LoggerImplementation* theLoggerImplementation;
-
+    libecs::Real theStartTime;
+    libecs::Real theEndTime;
   };
 
-  /** @} */ //end of libecs_module 
 
 } // namespace libemc
 

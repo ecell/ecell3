@@ -2,7 +2,7 @@
 //
 //        This file is part of E-CELL Simulation Environment package
 //
-//                Copyright (C) 1996-2002 Keio University
+//                Copyright (C) 1996-2001 Keio University
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
@@ -27,7 +27,7 @@
 // written by Masayuki Okayama <smash@e-cell.org> at
 // E-CELL Project, Institute for Advanced Biosciences, Keio University.
 //
-
+// modified by Gabor Bereczki <gabor.bereczki@talk21.com>
 
 #include "PyLogger.hpp"
 #include "PyEcs.hpp"
@@ -43,6 +43,7 @@ void PyLogger::init_type()
   add_varargs_method( "getData", &PyLogger::getData );
   add_varargs_method( "getStartTime", &PyLogger::getStartTime );
   add_varargs_method( "getEndTime", &PyLogger::getEndTime );
+  add_varargs_method("appendData",&PyLogger::appendData );
 }
 
 Object PyLogger::getData( const Py::Tuple& args )
@@ -105,19 +106,29 @@ Object PyLogger::getEndTime( const Py::Tuple& args )
   //ECS_CATCH;
 }
 
-Object PyLogger::convertVector( libecs::Logger::DataPointVectorCref aVector )
+Object PyLogger::appendData(const Py::Tuple& args)
+{
+  //ECS_TRY
+args.verify_length( 1 );
+EmcLogger::appendData(Real(static_cast<Py::Float> ( args[0] ) ) );
+return Py::Object();
+
+  //ECS_CATCH
+}
+
+Object PyLogger::convertVector( libecs::DataPointVectorRCPtr aVector )
 {
   //ECS_TRY;
   // FIXME: should return Numeric::array
-  Py::Tuple aReturnedPyTuple( aVector.size() );
+  Py::Tuple aReturnedPyTuple( aVector->getSize() );
   int i(0);
-  for(libecs::Logger::const_iterator anItr(aVector.begin());
-      anItr < aVector.end();
+  for(libecs::Logger::const_iterator anItr(aVector->begin());
+      anItr < aVector->end();
       ++anItr)
     {
       Py::Tuple aPyTuple( 2 );
-      aPyTuple[0] = Py::Float( (*anItr).getTime() );
-      aPyTuple[1] = Py::Float( (*anItr).getValue() );
+      aPyTuple[0] = Py::Float( (*aVector)[anItr].getTime() );
+      aPyTuple[1] = Py::Float( (*aVector)[anItr].getValue() );
       aReturnedPyTuple[i] = aPyTuple;
       ++i;
     }

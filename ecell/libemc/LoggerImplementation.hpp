@@ -2,7 +2,7 @@
 //
 //        This file is part of E-CELL Simulation Environment package
 //
-//                Copyright (C) 1996-2002 Keio University
+//                Copyright (C) 1996-2000 Keio University
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
@@ -27,7 +27,8 @@
 // written by Masayuki Okayama <smash@e-cell.org> at
 // E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
-
+// modified by Gabor Bereczki <gabor.bereczki@talk21.com>
+// 14/04/2002
 
 #ifndef ___LOGGER_IMPLEMENTATION_H___
 #define ___LOGGER_IMPLEMENTATION_H___
@@ -37,12 +38,6 @@
 
 namespace libemc
 {
-
-  /** @defgroup libemc_module The Libemc Module 
-   * This is the libemc module 
-   * @{ 
-   */ 
-  
 
   /**
      Pure virtual base class (interface definition) of logger
@@ -54,27 +49,28 @@ namespace libemc
 
   public:
 
-    LoggerImplementation() {}
-    virtual ~LoggerImplementation() {}
+    LoggerImplementation(){} 
+    virtual ~LoggerImplementation(){} 
 
-    virtual const libecs::Logger::DataPointVector
-    getData( void ) const = 0;
+    virtual const libecs::DataPointVectorRCPtr
+    getData( void ) = 0;
 
-    virtual const libecs::Logger::DataPointVector
+    virtual const libecs::DataPointVectorRCPtr
     getData( libecs::RealCref start,
-	     libecs::RealCref end ) const = 0;
+	     libecs::RealCref end ) = 0;
 
-    virtual const libecs::Logger::DataPointVector
+    virtual const libecs::DataPointVectorRCPtr
     getData( libecs::RealCref start,
 	     libecs::RealCref end,
-	     libecs::RealCref interval ) const = 0;
+	     libecs::RealCref interval ) = 0;
 
-    virtual libecs::RealCref getStartTime() const = 0;
-    virtual libecs::RealCref getEndTime() const = 0;
+    virtual const libecs::Real getStartTime() = 0;
+    virtual const libecs::Real getEndTime() = 0;
+    virtual const void appendData(libecs::RealCref aValue) = 0;
+//    virtual const libecs::Real getSize() = 0;
 
   };
 
-  /** @} */ //end of libemc_module 
 
 } // namespace libecs
 

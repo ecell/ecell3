@@ -2,7 +2,7 @@
 //
 //        This file is part of E-CELL Simulation Environment package
 //
-//                Copyright (C) 2000-2002 Keio University
+//                Copyright (C) 2000-2001 Keio University
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
@@ -27,47 +27,38 @@
 // written by Masayuki Okayama <smash@e-cell.org> at
 // E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
+// modified by Gabor Bereczki <gabor.bereczki@talk21.com>
+
 
 
 #if !defined(__LOGGER_HPP)
 #define __LOGGER_HPP
 
 #include "libecs.hpp"
-
-#include "DataPoint.hpp"
-#include "UVariable.hpp"
 #include "Model.hpp"
-
-#include "DataPointStlVector.hpp"
-
-
-
-/*
-
- */
-
+#include "UVariable.hpp"
+#include "PhysicalLogger.hpp"
+#include "DataPointVector.hpp"
 
 namespace libecs
 {
+
 
   /** @defgroup libecs_module The Libecs Module 
    * This is the libecs module 
    * @{ 
    */ 
-  
+
+
   /**
    
-   */
+  */
 
   class Logger
   {
   public:
 
-    DECLARE_TYPE( DataPointStlVector, DataPointVector );
-
-    typedef Containee containee_type;
-    typedef DataPointVector::const_iterator const_iterator;
-    typedef DataPointVector::iterator iterator;
+    typedef DataPointVectorIterator const_iterator;
 
 
   public:
@@ -77,8 +68,7 @@ namespace libecs
 
     */
   
-    explicit Logger( const GetCurrentTimeMethodType& aGetCurrentTime,
-		     PropertySlotPtr aPropertySlot );
+    explicit Logger( ModelCref aModel, PropertySlotRef aPropertySlot );
 
   
     /// Destructor
@@ -86,51 +76,53 @@ namespace libecs
     ~Logger( void )
     {
       // self purge
-      thePropertySlot->disconnectLogger();
     }
 
 
     /**
 
-     */
+    */
 
-    DataPointVectorCref getData( void ) const;
-
-    /**
-
-     */
-
-    const DataPointVector getData( RealCref start,
-				   RealCref end ) const;
+    DataPointVectorRCPtr getData( void ) ;
 
     /**
+       It is assumed for both following  getData methods that the Time values
+       returned by GetCurrentTime method are monotonously increasing, therefore
+       a, a newer theTime is always greater than previous
+       b, no 2 theTime values are the same 
+    */
 
-     */
+    DataPointVectorRCPtr getData( RealCref aStartTine,
+				  RealCref anEndTime ) ;
 
-    const DataPointVector getData( RealCref first,
-				   RealCref last, 
-				   RealCref interval ) const;
+    /**
+    
+    */
 
+    DataPointVectorRCPtr getData( RealCref aStartTime,
+				  RealCref anEndTime, 
+				  RealCref anInterval ) ;
+    
 
 
     StringCref getName() const;
 
     /**
 
-     */
+    */
 
-    RealCref getStartTime( void ) const;
-
-    /**
-
-     */
-
-    RealCref getEndTime( void ) const;
-
+    Real getStartTime( void ) ;
 
     /**
 
-     */
+    */
+
+    Real getEndTime( void ) ;
+
+
+    /**
+
+    */
 
     RealCref getMinInterval( void ) const
     {
@@ -139,7 +131,7 @@ namespace libecs
 
     /**
 
-     */
+    */
 
     RealCref getCurrentInterval( void ) const
     {
@@ -150,19 +142,15 @@ namespace libecs
 
     /**
 
-     */
+    */
 
     void appendData( RealCref v );
 
 
     /**
 
-     */
+    */
 
-    DataPointVectorCref getDataPointVector( void ) const
-    {
-      return theDataPointVector;
-    }
 
 
   protected:
@@ -172,30 +160,24 @@ namespace libecs
 
     PropertySlotCref getPropertySlot( void ) const
     {
-      return thePropertySlotProxy;
+    return thePropertySlotProxy;
     }
     */
   
   
     /**
 
-     */
+    */
 
-    const_iterator lower_bound( const_iterator begin,
-				const_iterator end,
-				RealCref t ) const
+    const_iterator binary_search( const_iterator begin,
+				  const_iterator end,
+				  RealCref t ) 
     {
-      return theDataPointVector.lower_bound( begin, end, t );
+      return thePhysicalLogger.lower_bound( thePhysicalLogger.begin(), 
+    					    thePhysicalLogger.end(), 
+					    t );
     }
     
-    const_iterator upper_bound( const_iterator begin,
-				const_iterator end,
-				RealCref t ) const
-    {
-      return theDataPointVector.upper_bound( begin, end, t );
-    }
-    
-
 
   private:
 
@@ -218,13 +200,17 @@ namespace libecs
 
     /// Data members
 
-    PropertySlotPtr      thePropertySlot;
-    const GetCurrentTimeMethodType& theGetCurrentTimeMethod; 
+    ModelCref            theModel;
+    PropertySlotRef      thePropertySlot;
+
+    DataPointVectorRCPtr theDataPointVector;
+    PhysicalLogger	 thePhysicalLogger;
+
     Real                 theMinimumInterval;
     Real                 theCurrentInterval;
-    DataPointVector      theDataPointVector;
 
   };
+
 
   /** @} */ //end of libecs_module 
 

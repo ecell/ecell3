@@ -2,7 +2,7 @@
 //
 //        This file is part of E-CELL Simulation Environment package
 //
-//                Copyright (C) 1996-2002 Keio University
+//                Copyright (C) 1996-2000 Keio University
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
@@ -27,7 +27,8 @@
 // written by Masayuki Okayama <smash@e-cell.org> at
 // E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
-
+// modified by Gabor Bereczki <gabor.bereczki@talk21.com>
+// 26-03-2002
 
 #if !defined( __LOCAL_LOGGER_IMPLEMENTATION_HPP )
 #define       __LOCAL_LOGGER_IMPLEMENTATION_HPP
@@ -40,12 +41,7 @@
 namespace libemc
 {
 
-  /** @defgroup libemc_module The Libemc Module 
-   * This is the libemc module 
-   * @{ 
-   */ 
-  
-  typedef libecs::LoggerCptr LoggerCptr;
+  typedef libecs::LoggerPtr LoggerPtr;
 
   class LocalLoggerImplementation
     :
@@ -54,32 +50,36 @@ namespace libemc
 
   public:
 
-    LocalLoggerImplementation( LoggerCptr );
+    LocalLoggerImplementation( LoggerPtr );
 
     virtual ~LocalLoggerImplementation( );
 
-    const libecs::Logger::DataPointVector
-    getData( void ) const;
+    const libecs::DataPointVectorRCPtr
+    getData( void ) ;
 
-    const libecs::Logger::DataPointVector
+    const libecs::DataPointVectorRCPtr
     getData( libecs::RealCref start,
-	     libecs::RealCref end ) const;
+	     libecs::RealCref end ) ;
 
-    const libecs::Logger::DataPointVector
+    const libecs::DataPointVectorRCPtr
     getData( libecs::RealCref start,
 	     libecs::RealCref end,
-	     libecs::RealCref interval ) const;
+	     libecs::RealCref interval ) ;
 
-    libecs::RealCref getStartTime() const
+    const libecs::Real getStartTime() 
     {
       return theLogger.getStartTime();
     }
 
-    libecs::RealCref getEndTime() const
+    const libecs::Real getEndTime() 
     {
       return theLogger.getEndTime();
     }
 
+    const void appendData(libecs::RealCref aValue)
+    {
+        theLogger.appendData(aValue);
+    }
 
   private:
 
@@ -87,11 +87,10 @@ namespace libemc
 
   private:
 
-    libecs::LoggerCref theLogger;
+    libecs::LoggerRef theLogger;
     
   };
 
-  /** @} */ //end of libemc_module 
 
 } // namespace libemc
 
