@@ -302,7 +302,7 @@ class GtkSessionMonitor(Session):
 		return aLogPolicyWindow.return_result()
 		
 	# ==========================================================================
-	def createEntityListWindow( self ):
+	def createEntityListWindow( self, rootWidget = 'EntityListWindow' ):
 		"""creates and returns an EntityListWindow
 		"""
 		anEntityListWindow = None
@@ -310,16 +310,23 @@ class GtkSessionMonitor(Session):
 		# when Model is already loaded.
 		if len(self.theModelName) > 0:
 			# creates new EntityListWindow instance
-			anEntityListWindow = EntityListWindow.EntityListWindow( self )
-		else:
-			anEntityListWindow = EntityListWindow.EntityListWindow( None )
+			anEntityListWindow = EntityListWindow.EntityListWindow( self, rootWidget )
+			anEntityListWindow.openWindow()
 			
-		anEntityListWindow.openWindow()
-		# saves the instance into map
-		self.theEntityListInstanceMap[ anEntityListWindow ] = None
-		# updates all fundamental windows
-		self.updateFundamentalWindows()
+			# saves the instance into map
+			self.theEntityListInstanceMap[ anEntityListWindow ] = None
+			
+			# updates all fundamental windows
+			self.updateFundamentalWindows()
 
+		else:
+			anEntityListWindow = EntityListWindow.EntityListWindow( None, rootWidget )
+			anEntityListWindow.openWindow()
+			
+			# saves the instance into map
+			self.theEntityListInstanceMap[ anEntityListWindow ] = None
+			
+			
 		return anEntityListWindow
 
 
