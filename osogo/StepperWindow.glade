@@ -13,6 +13,7 @@
   <property name="default_height">504</property>
   <property name="resizable">True</property>
   <property name="destroy_with_parent">False</property>
+  <property name="icon">icon_ecelllogo.xpm</property>
 
   <child>
     <widget class="GtkVBox" id="vbox1">

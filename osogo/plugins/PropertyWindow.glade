@@ -10,10 +10,11 @@
   <property name="type">GTK_WINDOW_TOPLEVEL</property>
   <property name="window_position">GTK_WIN_POS_NONE</property>
   <property name="modal">False</property>
-  <property name="default_width">156</property>
-  <property name="default_height">159</property>
+  <property name="default_width">280</property>
+  <property name="default_height">350</property>
   <property name="resizable">True</property>
   <property name="destroy_with_parent">True</property>
+  <property name="icon">icon_ecelllogo.xpm</property>
 
   <child>
     <widget class="GtkVBox" id="vbox3">

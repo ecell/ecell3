@@ -11,6 +11,7 @@
   <property name="modal">False</property>
   <property name="resizable">True</property>
   <property name="destroy_with_parent">False</property>
+  <property name="icon">icon_ecelllogo.xpm</property>
 
   <child>
     <widget class="GtkFixed" id="fixed1">

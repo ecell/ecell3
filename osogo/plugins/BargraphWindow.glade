@@ -12,6 +12,7 @@
   <property name="modal">False</property>
   <property name="resizable">False</property>
   <property name="destroy_with_parent">False</property>
+  <property name="icon">icon_ecelllogo.xpm</property>
 
   <child>
     <widget class="GtkHandleBox" id="handlebox1">

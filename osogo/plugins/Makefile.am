@@ -20,6 +20,7 @@ TracerWindow.xpm\
 InputWindow.glade\
 icon_down.xpm\
 icon_down_small.xpm\
+icon_ecelllogo.xpm\
 icon_left_small.xpm\
 icon_right_small.xpm\
 icon_up.xpm\
