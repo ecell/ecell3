@@ -107,8 +107,15 @@ namespace libecs
     /**
        @return FullID of this Entity.
     */
-    // FIXME:
+
     const FullID getFullID() const;
+
+    virtual const PrimitiveType getPrimitiveType() const
+    {
+      return PrimitiveType( PrimitiveType::ENTITY );
+    }
+
+    virtual const SystemPath getSystemPath() const;
 
     /**
        Returns activity value (per delta-T) of this Entity.
@@ -134,7 +141,8 @@ namespace libecs
 
 
     const Message getClassName( StringCref keyword );
-    const Message getId( StringCref keyword );
+    const Message getID( StringCref keyword );
+    const Message getFullID( StringCref keyword );
     const Message getName( StringCref keyword );
     const Message getActivity( StringCref keyword );
     const Message getActivityPerSecond( StringCref keyword );

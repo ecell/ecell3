@@ -155,12 +155,6 @@ namespace libecs
     theAccumulator->update();
   }
 
-  //  const String Substance::getFullID() const
-  //  {
-    //FIXME:
-  //  }
-
-
   void Substance::initialize()
   {
     if( theAccumulator == NULLPTR )

@@ -122,10 +122,6 @@ namespace libecs
     }
 
     FullID( StringCref fullidstring )
-      :
-      thePrimitiveType( ENTITY ),
-      theSystemPath(),
-      theID()
     {
       parse( fullidstring );
     }

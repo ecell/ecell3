@@ -147,7 +147,7 @@ namespace libecs
 
     String aTypeString( aString.substr( aFieldStart, 
 					     aFieldEnd - aFieldStart ) );
-    thePrimitiveType = PrimitiveTypeFromString( aTypeString );
+    thePrimitiveType = PrimitiveType( aTypeString );
 
     aFieldStart = aFieldEnd + 1;
     aFieldEnd = aString.find_first_of( DELIMITER, aFieldStart );
@@ -173,7 +173,7 @@ namespace libecs
 
   const String FullID::getString() const
   {
-    return PrimitiveTypeStringOf( thePrimitiveType ) + FullID::DELIMITER 
+    return thePrimitiveType.getString() + FullID::DELIMITER 
       + theSystemPath.getString() + FullID::DELIMITER + theID;
   }
 

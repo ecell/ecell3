@@ -62,6 +62,11 @@ namespace libecs
 
     const String getFullID() const;
 
+    virtual const PrimitiveType getPrimitiveType() const
+    {
+      return PrimitiveType( PrimitiveType::REACTOR );
+    }
+
     virtual void initialize();
 
     virtual void clear();

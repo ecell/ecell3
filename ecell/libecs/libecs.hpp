@@ -50,6 +50,7 @@ namespace libecs
   DECLARE_CLASS( Membrane );
   DECLARE_CLASS( Cell );
   DECLARE_CLASS( Entity );
+  DECLARE_CLASS( PrimitiveType );
   DECLARE_CLASS( SystemPath );
   DECLARE_CLASS( FullID );
   DECLARE_CLASS( FullPropertyName );

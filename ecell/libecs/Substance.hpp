@@ -61,7 +61,11 @@ namespace libecs
 
     static SubstancePtr instance() { return new Substance; }
 
-    const String getFqpi() const;
+    virtual const PrimitiveType getPrimitiveType() const
+    {
+      return PrimitiveType( PrimitiveType::SUBSTANCE );
+    }
+
 
     /**
        @return the number of molecules.

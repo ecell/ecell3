@@ -417,13 +417,13 @@ namespace libecs
 
     switch( fullid.getPrimitiveType() )
       {
-      case SUBSTANCE:
+      case PrimitiveType::SUBSTANCE:
 	anEntityPtr = aSystem->getSubstance( fullid.getID() );
 	break;
-      case REACTOR:
+      case PrimitiveType::REACTOR:
 	anEntityPtr = aSystem->getReactor( fullid.getID() );
 	break;
-      case SYSTEM:
+      case PrimitiveType::SYSTEM:
 	anEntityPtr = aSystem->getSystem( fullid.getID() );
 	break;
       default:
@@ -447,19 +447,19 @@ namespace libecs
 
     switch( fullid.getPrimitiveType() )
       {
-      case SUBSTANCE:
+      case PrimitiveType::SUBSTANCE:
 	aSubstancePtr = getRootSystem()->getSubstanceMaker().make( classname );
 	aSubstancePtr->setID( fullid.getID() );
 	aSubstancePtr->setName( name );
 	aSystem->registerSubstance( aSubstancePtr );
 	break;
-      case REACTOR:
+      case PrimitiveType::REACTOR:
 	aReactorPtr = getRootSystem()->getReactorMaker().make( classname );
 	aReactorPtr->setID( fullid.getID() );
 	aReactorPtr->setName( name );
 	aSystem->registerReactor( aReactorPtr );
 	break;
-      case SYSTEM:
+      case PrimitiveType::SYSTEM:
 	aSystemPtr = getRootSystem()->getSystemMaker().make( classname );
 	aSystemPtr->setID( fullid.getID() );
 	aSystemPtr->setName( name );

@@ -54,11 +54,13 @@ namespace libecs
   void Entity::makeSlots()
   {
     makeMessageSlot( "ClassName", Entity, *this, NULLPTR, &Entity::getClassName );
-    makeMessageSlot( "Id", Entity, *this, NULLPTR, &Entity::getId );
+    makeMessageSlot( "ID", Entity, *this, NULLPTR, &Entity::getID );
+    makeMessageSlot( "FullID", Entity, *this, NULLPTR, &Entity::getFullID );
+    
     makeMessageSlot( "Name", Entity, *this, NULLPTR, &Entity::getName );
     makeMessageSlot( "Activity", Entity, *this, NULLPTR, &Entity::getActivity );
     makeMessageSlot( "ActivityPerSecond", Entity, *this, NULLPTR, 
-		 &Entity::getActivityPerSecond );
+		     &Entity::getActivityPerSecond );
   }
 
   const Message Entity::getClassName( StringCref keyword )
@@ -66,9 +68,21 @@ namespace libecs
     return Message( keyword, UVariable( getClassName() ) );
   }
 
-  const Message Entity::getId( StringCref keyword )
+  const Message Entity::getID( StringCref keyword )
   {
     return Message( keyword, UVariable( getID() ) );
+  }
+
+  const Message Entity::getFullID( StringCref keyword )
+  {
+    FullID aFullID = getFullID();
+    UVariableVector aVector( 3 );
+
+    aVector[0] = static_cast<Int>( aFullID.getPrimitiveType().getType() );
+    aVector[1] = aFullID.getSystemPath().getString();
+    aVector[2] = aFullID.getID();
+
+    return Message( keyword, aVector );
   }
 
   const Message Entity::getName( StringCref keyword )
@@ -96,10 +110,18 @@ namespace libecs
     return ( getActivity()  / getSuperSystem()->getStepper()->getDeltaT() );
   }
 
-  //  const FullID Entity::getFullID() const
-  //  {
-  //    return FullID( ENTITY, getSystemPath(), getID() );
-  //  }
+  const FullID Entity::getFullID() const
+  {
+    return FullID( getPrimitiveType(), getSystemPath(), getID() );
+  }
+
+  const SystemPath Entity::getSystemPath() const
+  {
+    SystemPtr aSystemPtr( getSuperSystem() );
+    SystemPath aSystemPath( aSystemPtr->getSystemPath() );
+    aSystemPath.push_back( aSystemPtr->getID() );
+    return aSystemPath;
+  }
 
 
 } // namespace libecs

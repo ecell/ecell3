@@ -254,11 +254,6 @@ namespace libecs
   }
 
 
-  const FullID Reactor::getFullID() const
-  {
-    //    return PrimitiveTypeStringOf( *this ) + ":" + getFullID();
-  }
-
   void Reactor::appendSubstrate( SubstanceRef substrate, int coefficient )
   {
     ReactantPtr reactant = new Reactant( substrate, coefficient );

@@ -37,23 +37,23 @@
 namespace libecs
 {
 
-  PrimitiveType PrimitiveTypeFromString( StringCref typestring )
+  PrimitiveType::PrimitiveType( StringCref typestring )
   {
     if( typestring == PrimitiveTypeStringOfSubstance() )
       {
-	return SUBSTANCE;
+	theType = SUBSTANCE;
       }
     else if( typestring == PrimitiveTypeStringOfReactor() )
       {
-	return REACTOR;
+	theType = REACTOR;
       }
     else if( typestring == PrimitiveTypeStringOfSystem() )
       {
-	return SYSTEM;
+	theType = SYSTEM;
       }
     else if( typestring == PrimitiveTypeStringOfEntity() )
       {
-	return ENTITY;
+	theType = ENTITY;
       }
     else
       {
@@ -63,19 +63,20 @@ namespace libecs
       }
   }
 
-  PrimitiveType PrimitiveTypeFromNumber( Int number )
+  PrimitiveType::PrimitiveType( const Int number )
+    :
+    theType( static_cast<const Type>( number ) )
   {
     if( number > 4 || number <= 0 )
       {
 	throw InvalidPrimitiveType( __PRETTY_FUNCTION__, 
 				    "Invalid PrimitiveType number" );
       }
-
   }
 
-  StringCref PrimitiveTypeStringOf( PrimitiveType type )
+  StringCref PrimitiveType::getString() const
   {
-    switch( type )
+    switch( theType )
       {
       case SUBSTANCE:
 	return PrimitiveTypeStringOfSubstance();

@@ -47,8 +47,8 @@ namespace libecs
 
     void makeSlots();
 
-    int check();
 
+    virtual const SystemPath getSystemPath() const;
     virtual SystemPtr getSystem( StringCref id );
 
     virtual void initialize();

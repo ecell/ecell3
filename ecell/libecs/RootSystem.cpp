@@ -90,13 +90,12 @@ namespace libecs
     getStepperLeader().update();
   }
 
-  int RootSystem::check()
+
+  const SystemPath RootSystem::getSystemPath() const
   {
-    bool status = true;
-  
-  
-    return status;
+    return SystemPath();
   }
+    
 
   SystemPtr RootSystem::getSystem( StringCref id )
   {

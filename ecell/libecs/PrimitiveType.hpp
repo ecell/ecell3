@@ -36,62 +36,116 @@
 namespace libecs
 {
 
-  enum PrimitiveType
+  class PrimitiveType
+  {
+
+  public:
+    
+    enum Type
+      {
+	ENTITY    = 1,
+	SUBSTANCE = 2,
+	REACTOR   = 3,
+	SYSTEM    = 4
+      };
+
+    PrimitiveType( StringCref typestring );
+
+    PrimitiveType( const Int number );
+
+    PrimitiveType( const Type type )
+      :
+      theType( type )
     {
-      ENTITY    = 1,
-      SUBSTANCE = 2,
-      REACTOR   = 3,
-      SYSTEM    = 4
-    };
+      ; // do nothing
+    }
 
-  StringCref PrimitiveTypeStringOf( PrimitiveType type );
+    PrimitiveType( PrimitiveTypeCref primitivetype )
+      :
+      theType( primitivetype.getType() )
+    {
+      ; // do nothing
+    }
 
-  PrimitiveType PrimitiveTypeFromString( StringCref typestring );
-  PrimitiveType PrimitiveTypeFromNumber( Int number );
+    PrimitiveType()
+      :
+      theType( ENTITY )
+    {
+    }
 
-  inline StringCref  PrimitiveTypeStringOfEntity()
-  {
-    const static String aString( "Entity" );
-    return aString;
-  }
+      
+    StringCref getString() const;
 
-  inline StringCref  PrimitiveTypeStringOfReactor()
-  {
-    const static String aString( "Reactor" );
-    return aString;
-  }
+    operator StringCref() const
+    {
+      return getString();
+    }
 
-  inline StringCref  PrimitiveTypeStringOfSubstance()
-  {
-    const static String aString( "Substance" );
-    return aString;
-  }
+    const Type& getType() const
+    {
+      return theType;
+    }
 
-  inline StringCref  PrimitiveTypeStringOfSystem()
-  { 
-    const static String aString( "System" );
-    return aString;
-  }
+    operator const Type&() const
+    {
+      return getType();
+    }
 
-  inline StringCref  PrimitiveTypeStringOf( EntityCref )
-  {
-    return PrimitiveTypeStringOfEntity();
-  }
-  
-  inline StringCref  PrimitiveTypeStringOf( ReactorCref ) 
-  {
-    return PrimitiveTypeStringOfReactor();
-  }
-  
-  inline StringCref  PrimitiveTypeStringOf( SubstanceCref )
-  {
-    return PrimitiveTypeStringOfSubstance();
-  }
-  
-  inline StringCref  PrimitiveTypeStringOf( SystemCref )
-  {
-    return PrimitiveTypeStringOfSystem();
-  }
+    //    operator const Int&() const
+    //    {
+    //      return static_cast<const Int&>( getType() ); 
+    //    }
+
+    bool operator<( PrimitiveTypeCref rhs ) const
+    {
+      return theType < rhs.getType();
+    }
+
+    bool operator<( const Type rhs ) const
+    {
+      return theType < rhs;
+    }
+
+    bool operator==( PrimitiveTypeCref rhs ) const
+    {
+      return theType == rhs.getType();
+    }
+
+    bool operator==( const Type rhs ) const
+    {
+      return theType == rhs;
+    }
+
+
+    inline static StringCref  PrimitiveTypeStringOfEntity()
+    {
+      const static String aString( "Entity" );
+      return aString;
+    }
+
+    inline static StringCref  PrimitiveTypeStringOfReactor()
+    {
+      const static String aString( "Reactor" );
+      return aString;
+    }
+    
+    inline static StringCref  PrimitiveTypeStringOfSubstance()
+    {
+      const static String aString( "Substance" );
+      return aString;
+    }
+    
+    inline static StringCref  PrimitiveTypeStringOfSystem()
+    { 
+      const static String aString( "System" );
+      return aString;
+    }
+
+  private:
+
+    Type theType;
+
+  };
 
 } // namespace libecs
 

@@ -173,6 +173,11 @@ namespace libecs
 
     const FullID getFullID() const;
 
+    virtual const PrimitiveType getPrimitiveType() const
+    {
+      return PrimitiveType( PrimitiveType::REACTOR );
+    }
+
     virtual void initialize();
     virtual void react() = 0;
     virtual void transit() { theActivity = theActivityBuffer; }

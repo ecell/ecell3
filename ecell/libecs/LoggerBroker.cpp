@@ -62,31 +62,12 @@ namespace libecs
 
   void LoggerBroker::appendLogger( FullPropertyNameCref fpn )
   {
-    SystemPtr aSystemPtr = theRootSystem->getSystem( fpn.getSystemPath() );
+    EntityPtr anEntityPtr = theRootSystem->getEntity( fpn.getFullID() );
 
-    PropertyMapIterator aPropertyMapIterator( NULLPTR );
-
-    String anID( fpn.getID() );
     String aPropertyName( fpn.getPropertyName() );
 
-    switch( fpn.getPrimitiveType() )
-      {
-      case SUBSTANCE:
-	aPropertyMapIterator = aSystemPtr->getSubstance( anID )->
-	  getMessageSlot( aPropertyName );
-    	break;
-      case REACTOR:
-	aPropertyMapIterator = aSystemPtr->getReactor( anID )->
-	  getMessageSlot( aPropertyName );
-	break;
-      case SYSTEM:
-	aPropertyMapIterator = aSystemPtr->getSystem( anID )->
-	  getMessageSlot( aPropertyName );
-	break;
-      default:
-	throw BadID( __PRETTY_FUNCTION__,
-		     "Bad primitive type" );
-      }
+    PropertyMapIterator 
+      aPropertyMapIterator( anEntityPtr->getMessageSlot( aPropertyName ) );
 
     LoggerPtr aLoggerPtr = new Logger();
     aPropertyMapIterator->second->getProxy()->setLogger( aLoggerPtr );
