@@ -64,7 +64,7 @@ class ProgressbarWindow(PluginWindow):
         aIndicator = (value / (float)(10**(self.theMultiplier))) \
                      * self.thePositiveFlag
 
-        print self.theMultiplier
+#        print self.theMultiplier
         
         self['progressbar'].set_value(int(self.theBarLength))
         self['progressbar'].set_format_string(str(value))
