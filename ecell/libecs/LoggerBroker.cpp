@@ -72,24 +72,38 @@ namespace libecs
     String aPropertyName( fpn.getPropertyName() );
 
     PropertyMapConstIterator 
-      aPropertyMapIterator( anEntityPtr->getPropertySlot( aPropertyName ) );
+      aPropertyMapIterator( anEntityPtr->getPropertySlotMap().
+			    find( aPropertyName ) );
+    if( aPropertyMapIterator == anEntityPtr->getPropertySlotMap().end() )
+      {
+	throw NotFound( "not found" );
+      }
 
     LoggerPtr aLoggerPtr( new Logger( *aPropertyMapIterator->second ) );
     //    aPropertyMapIterator->second->getProxy()->setLogger( aLoggerPtr );
 
-    appendLogger( aLoggerPtr );
+    //    appendLogger( aLoggerPtr );
+    theLoggerMap[fpn] = aLoggerPtr;
 
 
+    /*
+      
     anEntityPtr->getSuperSystem()
       ->getStepper()->registerPropertySlot( aPropertyMapIterator->second );
+
+    */
+
+
 
     return aLoggerPtr;
   }
 
+  /*
   void LoggerBroker::appendLogger( LoggerPtr logger )
   {
     theLoggerMap[logger->getName()] = logger;
   }
+  */
   
 
 } // namespace libecs

@@ -71,25 +71,25 @@ namespace libecs
   void Reactor::setAppendSubstrate( UVariableVectorCref uvector )
   {
     //FIXME: range check
-    appendSubstrate( uvector[0].asString(), uvector[1].asInt() );
+    appendSubstrate( FullID(uvector[0].asString() ), uvector[1].asInt() );
   }
 
   void Reactor::setAppendProduct( UVariableVectorCref uvector )
   {
     //FIXME: range check
-    appendProduct( uvector[0].asString(), uvector[1].asInt() );
+    appendProduct( FullID( uvector[0].asString() ), uvector[1].asInt() );
   }
 
   void Reactor::setAppendCatalyst( UVariableVectorCref uvector )
   {
     //FIXME: range check
-    appendCatalyst( uvector[0].asString(), uvector[1].asInt() );
+    appendCatalyst( FullID( uvector[0].asString() ), uvector[1].asInt() );
   }
 
   void Reactor::setAppendEffector( UVariableVectorCref uvector )
   {
     //FIXME: range check
-    appendEffector( uvector[0].asString(), uvector[1].asInt() );
+    appendEffector( FullID( uvector[0].asString() ), uvector[1].asInt() );
   }
 
   void Reactor::setSubstrateList( UVariableVectorCref uvector )

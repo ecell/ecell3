@@ -182,6 +182,14 @@ namespace libecs
 	theMinimumInterval = theCurrentInterval; 
       }
   }
+
+  //
+
+  StringCref Logger::getName() const
+    {
+      return thePropertySlot.getName();
+    }
+
   
   //
   

@@ -63,6 +63,7 @@ void PySimulator::init_type()
   add_varargs_method( "step",                  &PySimulator::step );
   add_varargs_method( "initialize",            &PySimulator::initialize );
   add_varargs_method( "getLogger",             &PySimulator::getLogger );
+  add_varargs_method( "getLoggerList",             &PySimulator::getLoggerList );
   add_varargs_method( "run",                   &PySimulator::run );
   add_varargs_method( "stop",                  &PySimulator::stop );
   add_varargs_method( "setPendingEventChecker",  

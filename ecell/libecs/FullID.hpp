@@ -121,7 +121,7 @@ namespace libecs
       ; // do nothing
     }
 
-    FullID( StringCref fullidstring )
+    explicit FullID( StringCref fullidstring )
     {
       parse( fullidstring );
     }
@@ -242,9 +242,9 @@ namespace libecs
   public:
 
     FullPN( const PrimitiveType type, 
-		      SystemPathCref systempath,
-		      StringCref id,
-		      StringCref propertyname )
+	    SystemPathCref systempath,
+	    StringCref id,
+	    StringCref propertyname )
       :
       theFullID( type, systempath, id ),
       thePropertyName( propertyname )
@@ -260,7 +260,13 @@ namespace libecs
       ; // do nothing
     }
 
-    //    FullPN( FullPNCref fullpropertyname );
+    FullPN( FullPNCref fullpn )
+      :
+      theFullID( fullpn.getFullID() ),
+      thePropertyName( fullpn.getPropertyName() )
+    {
+      ; // do nothing
+    }
 
     FullPN( StringCref fullpropertynamestring );
 

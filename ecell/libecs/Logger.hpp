@@ -107,10 +107,7 @@ namespace libecs
 
 
 
-    StringCref getName() const
-    {
-      return theName;
-    }
+    StringCref getName() const;
 
     /**
 
@@ -210,11 +207,10 @@ namespace libecs
 
     /// Data members
 
-    PropertySlotCref    thePropertySlot;
+    PropertySlotCref            thePropertySlot;
     DataPointVector             theDataPointVector;
     Real                        theMinimumInterval;
     Real                        theCurrentInterval;
-    String                      theName;
 
   };
 

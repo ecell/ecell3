@@ -76,9 +76,9 @@ namespace libecs
     void setMessage( MessageCref );
     const Message getMessage( StringCref ) const;
 
-    PropertyMapConstIterator getPropertySlot( StringCref property ) const
+    PropertyMapCref getPropertySlotMap() const 
     {
-      return thePropertyMap.find( property );
+      return thePropertyMap;
     }
 
     virtual void makeSlots();
