@@ -74,6 +74,7 @@ public:
 
     python::handle<> aHandle( python::borrowed( PyImport_GetModuleDict() ) );
     python::dict aModuleList( aHandle );
+
     if( ! aModuleList.has_key( python::str( "ecell.ecs" ) ) )
       {
 	THROW_EXCEPTION( UnexpectedError, getClassNameString() + 
@@ -104,20 +105,8 @@ public:
   void defaultSetProperty( StringCref aPropertyName,
 			   PolymorphCref aValue )
     {
-      // don't assume subclasses here !!!
-      if( getClassName() == "PythonProcess" ||
-	  getClassName() == "PythonFluxProcess" )
-	{
-	  theGlobalNamespace[ aPropertyName ] =
-	    python::object( python::handle<>( PyFloat_FromDouble( aValue ) ) );
-	}
-      else
-	{
-	  THROW_EXCEPTION( NoSlot,
-			   getClassName() +
-			   String( ": No PropertySlot found by name[" )
-			   + aPropertyName + "]. Set property failed." );
-	}
+      theLocalNamespace[ aPropertyName ] =
+	python::object( python::handle<>( PyFloat_FromDouble( aValue ) ) );
     }
 
   virtual void initialize();
@@ -134,7 +123,7 @@ void PythonProcessBase::initialize()
 {
   Process::initialize();
   
-  //  theGlobalNamespace.clear();
+  theGlobalNamespace.clear();
 
   for( VariableReferenceVectorConstIterator 
 	 i( getVariableReferenceVector().begin() );
@@ -156,12 +145,18 @@ void PythonProcessBase::initialize()
 
   python::handle<> 
     aMainModule( python::borrowed( PyImport_AddModule( "__main__" ) ) );
+  python::handle<> 
+    aMathModule( python::borrowed( PyImport_AddModule( "math" ) ) );
 
   python::handle<> 
     aMainNamespace( python::borrowed
 		    ( PyModule_GetDict( aMainModule.get() ) ) );
+  python::handle<> 
+    aMathNamespace( python::borrowed
+  		    ( PyModule_GetDict( aMathModule.get() ) ) );
 
   theGlobalNamespace.update( aMainNamespace );
+  theGlobalNamespace.update( aMathNamespace );
 
 }
 
