@@ -72,7 +72,7 @@ namespace libecs
   }
 
 
-  void Model::flushLogger()
+  void Model::flushLoggers()
   {
     theLoggerBroker.flush();
   }

@@ -224,7 +224,7 @@ namespace libecs
 
     */
 
-    void flushLogger();
+    void flushLoggers();
 
 
     /**

@@ -478,7 +478,7 @@ namespace libemc
 	  }
       }	while( 1 );
 
-    getModel().flushLogger();
+    getModel().flushLoggers();
   }
 
   void LocalSimulatorImplementation::initialize()
@@ -522,7 +522,7 @@ namespace libemc
 
       }	while( theRunningFlag );
 
-    getModel().flushLogger();
+    getModel().flushLoggers();
   }
 
   void LocalSimulatorImplementation::run( const libecs::Real aDuration )
@@ -545,7 +545,7 @@ namespace libemc
 	runWithoutEvent( aDuration );
       }
 
-    getModel().flushLogger();
+    getModel().flushLoggers();
   }
 
   void LocalSimulatorImplementation::runWithEvent( libecs::Real aDuration )
