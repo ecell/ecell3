@@ -65,6 +65,8 @@ namespace libecs
       theSuperSystem = supersystem; 
     }
 
+    virtual RootSystemPtr getRootSystem() const;
+
     SystemPtr getSuperSystem() const 
     {
       return theSuperSystem;

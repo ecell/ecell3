@@ -118,8 +118,8 @@ namespace libecs
   {
     try {
       AccumulatorPtr aAccumulatorPtr;
-      aAccumulatorPtr = getSuperSystem()->getRootSystem()->
-	getAccumulatorMaker().make( classname );
+      aAccumulatorPtr = 
+	getRootSystem()->getAccumulatorMaker().make( classname );
       setAccumulator(aAccumulatorPtr);
 
       if( classname != userDefaultAccumulatorName() )

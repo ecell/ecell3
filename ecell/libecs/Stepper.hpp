@@ -405,7 +405,7 @@ namespace libecs
  
   protected:
 
-    static IntegratorPtr newEuler1( SubstanceRef substance );
+    static IntegratorPtr newIntegrator( SubstanceRef substance );
 
   };
 
@@ -429,7 +429,7 @@ namespace libecs
 
   private:
 
-    static IntegratorPtr newRungeKutta4( SubstanceRef substance );
+    static IntegratorPtr newIntegrator( SubstanceRef substance );
 
   };
 

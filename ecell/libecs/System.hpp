@@ -91,7 +91,7 @@ namespace libecs
 
        @return the pointer to the RootSystem.
     */
-    RootSystemPtr getRootSystem() const { return theRootSystem; }
+    virtual RootSystemPtr getRootSystem() const { return theRootSystem; }
 
     /**
        Set supersystem of this System.

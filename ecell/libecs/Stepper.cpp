@@ -111,9 +111,6 @@ namespace libecs
   {
     EventCref aTopEvent( theScheduleQueue.top() );
 
-    // the time must be memorized before the Event is deleted
-    const Real aTopTime( aTopEvent.first );
-
     MasterStepperPtr aMasterStepper( aTopEvent.second );
 
     // three-phase progression of the step
@@ -123,6 +120,10 @@ namespace libecs
     const Real aStepSize( aMasterStepper->step() );
     // 3. push:  re-sync with the proxies, and push new values to Loggers
     aMasterStepper->push();
+
+
+    // the time must be memorized before the Event is deleted by the pop
+    const Real aTopTime( aTopEvent.first );
 
     //FIXME: change_top() is better than pop 'n' push.
     // If the ScheduleQueue holds pointers of Event, not instances,
@@ -438,10 +439,10 @@ namespace libecs
   Euler1SRMStepper::Euler1SRMStepper()
   {
     theIntegratorAllocator =
-      IntegratorAllocator( &Euler1SRMStepper::newEuler1 );
+      IntegratorAllocator( &Euler1SRMStepper::newIntegrator );
   }
 
-  IntegratorPtr Euler1SRMStepper::newEuler1( SubstanceRef substance )
+  IntegratorPtr Euler1SRMStepper::newIntegrator( SubstanceRef substance )
   {
     return new Euler1Integrator( substance );
   }
@@ -451,10 +452,10 @@ namespace libecs
   RungeKutta4SRMStepper::RungeKutta4SRMStepper()
   {
     theIntegratorAllocator = 
-      IntegratorAllocator( &RungeKutta4SRMStepper::newRungeKutta4 ); 
+      IntegratorAllocator( &RungeKutta4SRMStepper::newIntegrator ); 
   }
 
-  IntegratorPtr RungeKutta4SRMStepper::newRungeKutta4( SubstanceRef substance )
+  IntegratorPtr RungeKutta4SRMStepper::newIntegrator( SubstanceRef substance )
   {
     return new RungeKutta4Integrator( substance );
   }
