@@ -89,8 +89,7 @@ namespace libecs
 
     LoggerPtr getLogger( FullPNCref aFullPN ) const;
 
-    LoggerPtr createLogger( FullPNCref aFullPN );
-
+    LoggerPtr createLogger( FullPNCref aFullPN, PolymorphVectorCref aParamList );
 
     /**
        Flush the data in all the Loggers immediately.

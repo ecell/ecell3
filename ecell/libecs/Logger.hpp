@@ -81,6 +81,12 @@ namespace libecs
 
     ~Logger( void );
 
+	void setLoggerPolicy( PolymorphCref aParamList );
+
+	PolymorphCref getLoggerPolicy( void ){
+
+	return loggingPolicy;
+	}
 
     void log( RealParam aTime )
     {
@@ -215,9 +221,11 @@ namespace libecs
 
     DataPointAggregator* theDataAggregators;
     Real                 theLastTime;
-
+	const_iterator       theStepCounter;
+	Integer              theLogPolicy; //0-no minimum interval, 1 by step 2 by time
     Real                 theMinimumInterval;
-
+	Integer sizeArray[_LOGGER_MAX_PHYSICAL_LOGGERS];
+	Polymorph 			 loggingPolicy;
   };
 
 

@@ -72,6 +72,8 @@ namespace libecs
 
     void push( DataPointLongCref  );
 
+	void setEndPolicy( Integer );
+
     iterator lower_bound( const iterator& start,
 			  const iterator& end,
 			  const Real time ) const;

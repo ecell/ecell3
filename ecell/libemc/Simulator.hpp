@@ -40,6 +40,8 @@
 #include "libemc.hpp"
 #include "SimulatorImplementation.hpp"
 
+
+#include <stdio.h>
 namespace libemc
 {
   
@@ -423,9 +425,29 @@ namespace libemc
 
     void createLogger( libecs::StringCref aFullPNString ) 
     {
+		
       return theSimulatorImplementation->createLogger( aFullPNString );
     }
 
+    /**
+       Create a Logger with parameters.
+		First parameter - minimum log interval dimension 0 - none, 1 - by step, 2 - by time
+		Second parameter - behaviour when run out of disk - 0 - throw exception, 1 - overwrite data
+		Third parameter - minimum log interval
+
+       If the Logger already exists, this method does nothing.
+
+       @param aFullPNString a FullPN of the PropertySlot which the Logger is
+       observing, as a String 
+
+       @return a borrowed pointer to the Logger
+    */
+
+    void createLogger( libecs::StringCref aFullPNString, libecs::Polymorph aParamList ) 
+    {
+	
+      return theSimulatorImplementation->createLogger( aFullPNString, aParamList );
+    }
 
     /**
        List Loggers in the simulator.
@@ -487,6 +509,18 @@ namespace libemc
     {
       return theSimulatorImplementation->
 	getLoggerMinimumInterval( aFullPNString );
+    }
+
+    void setLoggerPolicy( libecs::StringCref aFullPNString, 
+				   libecs::Polymorph aParamList )
+    {
+      return theSimulatorImplementation->setLoggerPolicy( aFullPNString, aParamList );
+    }
+
+    libecs::Polymorph
+    getLoggerPolicy( libecs::StringCref aFullPNString ) const
+    {
+      return theSimulatorImplementation->getLoggerPolicy( aFullPNString );
     }
 
     const libecs::Integer getLoggerSize( libecs::StringCref aFullPNString ) const

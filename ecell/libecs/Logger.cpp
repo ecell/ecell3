@@ -37,7 +37,7 @@
 
 #include "PropertySlotProxy.hpp"
 
-
+#include "Polymorph.hpp"
 #include "Logger.hpp"
 
 namespace libecs
@@ -51,18 +51,22 @@ namespace libecs
 
 
   // Constructor
-  Logger::Logger( LoggerAdapterPtr aLoggerAdapter )
+  Logger::Logger( LoggerAdapterPtr aLoggerAdapter)
     :
     theLoggerAdapter( aLoggerAdapter ),
     theMinimumInterval( 0.0 ),
-    theLastTime( 0.0 ) // theStepper.getCurrentTime() - theMinimumInterval )
+    theLastTime( 0.0 ) ,
+	theStepCounter( 0 ), 
+	theLogPolicy(0)
   {
 	// init physicallogers, the first 2 element, the others five element ones
 	thePhysicalLoggers[0] = new PhysicalLogger(2);
+	sizeArray[0]=0;
 	theDataAggregators = new DataPointAggregator[_LOGGER_MAX_PHYSICAL_LOGGERS];
 	for (int i=1;i<_LOGGER_MAX_PHYSICAL_LOGGERS;i++)
 	{
 	   thePhysicalLoggers[i] = new PhysicalLogger(5);
+		sizeArray[i]=0;
 	}
   }
 
@@ -78,6 +82,24 @@ namespace libecs
     delete theLoggerAdapter;
   }
   
+  void Logger::setLoggerPolicy( PolymorphCref aParamList )
+  {
+	if (aParamList.asPolymorphVector().size()!=3){
+		THROW_EXCEPTION( libecs::Exception, "Logger policy array should be 3 element long.\n" );
+}
+	loggingPolicy = aParamList;
+	theLogPolicy = loggingPolicy.asPolymorphVector()[0];
+	theMinimumInterval = loggingPolicy.asPolymorphVector()[2];
+
+	for (int i=0;i<_LOGGER_MAX_PHYSICAL_LOGGERS;i++)
+	{
+	    thePhysicalLoggers[i]->setEndPolicy( loggingPolicy.asPolymorphVector()[1]);
+	}
+	
+  }
+
+
+
 
   DataPointVectorRCPtr Logger::getData( void ) const
   {
@@ -141,13 +163,26 @@ namespace libecs
     const Real aCurrentInterval( aTime - theLastTime );
     DataPoint dp;
     DataPointLong dpl;
-
+	bool logcondition;
     dp.setTime( aTime);
     dp.setValue( aValue);
 
     theDataAggregators[0].aggregate( dp ); 
+	switch(theLogPolicy){
+	case 1:
+		theStepCounter++;
+		logcondition = ( theStepCounter >= static_cast<const_iterator>(theMinimumInterval) );
+	break;
+	case 2:
+		logcondition = ( theMinimumInterval <= aCurrentInterval );
+	break;
+	default:
+		logcondition=true;
+	break;
 
-    if( theMinimumInterval <= aCurrentInterval )
+	}
+
+    if (logcondition )
       {
 
 		//getdata
@@ -155,6 +190,7 @@ namespace libecs
 
 		//store
 		thePhysicalLoggers[0]->push( dpl );
+		sizeArray[0]++;
 
 		//aggregate highlevel
 		aggregate( dpl, 1);
@@ -164,6 +200,7 @@ namespace libecs
 		theDataAggregators[0].beginNextPoint();
 
 		theLastTime = aTime;
+		theStepCounter = 0;
 
 	}
 
@@ -179,14 +216,13 @@ namespace libecs
 
 	if (log_no == _LOGGER_MAX_PHYSICAL_LOGGERS) { return;}
 
-	PhysicalLoggerIterator psize = thePhysicalLoggers[log_no - 1]->size();
 
 	//aggregate
 	
 	theDataAggregators[log_no].aggregate( dpl );
 
 	// if psize is turning point
-	if ((psize%_LOGGER_DIVIDE_STEP)==1)
+	if (sizeArray[log_no-1]==_LOGGER_DIVIDE_STEP)
 	{
 
 		//getdata
@@ -194,13 +230,14 @@ namespace libecs
 
 		//store
 		thePhysicalLoggers[log_no]->push( dpl_aggd );
-
+		sizeArray[log_no]++;
 
 		//aggregate highlevel
 		aggregate( dpl_aggd, log_no + 1 );
 
 		//beginnextpoint
 		theDataAggregators[log_no].beginNextPoint();
+		sizeArray[log_no-1]=0;
 
 
 	}
@@ -226,7 +263,9 @@ namespace libecs
 
   Real Logger::getStartTime( void ) const
   {
-    return thePhysicalLoggers[0]->front().getTime();
+    Real retval(thePhysicalLoggers[0]->front().getTime());
+
+	return retval;
   }
 
 

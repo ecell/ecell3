@@ -78,7 +78,8 @@ namespace libecs
     return aLoggerMapIterator->second;
   }
 
-  LoggerPtr LoggerBroker::createLogger( FullPNCref aFullPN ) 
+
+  LoggerPtr LoggerBroker::createLogger( FullPNCref aFullPN,   PolymorphVectorCref aParamList ) 
   {
     if( theLoggerMap.find( aFullPN ) != theLoggerMap.end() )
       {
@@ -98,10 +99,12 @@ namespace libecs
       ( new PropertySlotProxyLoggerAdapter( aPropertySlotProxy ) );
 
 
-    LoggerPtr aNewLogger( new Logger( aLoggerAdapter ) );
+    LoggerPtr aNewLogger( new Logger( aLoggerAdapter) );
 
     anEntityPtr->registerLogger( aNewLogger );
     theLoggerMap[aFullPN] = aNewLogger;
+	// set logger policy
+	aNewLogger->setLoggerPolicy( aParamList );
 
     // it should have at least one datapoint to work correctly.
     aNewLogger->log( getModel().getCurrentTime() );

@@ -40,6 +40,7 @@
 
 #include "PyEmc.hpp"
 
+
 using namespace libecs;
 using namespace libemc;
 
@@ -128,7 +129,12 @@ BOOST_PYTHON_MODULE( _emc )
 
     // Logger-related methods
     .def( "getLoggerList",                &Simulator::getLoggerList )  
-    .def( "createLogger",                 &Simulator::createLogger )  
+    .def( "createLogger",                 
+	  ( void ( Simulator::* )( StringCref ) )
+      &Simulator::createLogger )  
+    .def( "createLogger",                 
+	  ( void ( Simulator::* )( StringCref, Polymorph ) )
+      &Simulator::createLogger )  
     .def( "getLoggerData", 
 	  ( const DataPointVectorRCPtr ( Simulator::* )( StringCref ) const )
 	  &Simulator::getLoggerData )
@@ -145,6 +151,8 @@ BOOST_PYTHON_MODULE( _emc )
     .def( "getLoggerEndTime",            &Simulator::getLoggerEndTime )    
     .def( "getLoggerMinimumInterval",    &Simulator::getLoggerMinimumInterval )
     .def( "setLoggerMinimumInterval",    &Simulator::setLoggerMinimumInterval )
+    .def( "getLoggerPolicy",    		&Simulator::getLoggerPolicy )
+    .def( "setLoggerPolicy",   	&Simulator::setLoggerPolicy )
     .def( "getLoggerSize",               &Simulator::getLoggerSize )
 
 

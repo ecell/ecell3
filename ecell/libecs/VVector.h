@@ -45,9 +45,21 @@
  *::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
  *	$Id$
  :	$Log$
+ :	Revision 1.14  2004/05/29 11:54:51  bgabor
+ :	Introducing logger policy .
+ :	User cen set and get the policy for a certain logger either when the logger is creater or anytime later.
+ :	logger policy is a 3 element list of numbers.
+ :	first element:	0-log all
+ :			1-log every xth step
+ :			2-log at the passing of x secs
+ :	second element:	policy at the end
+ :			0-throw exception when disk space is used up
+ :			1-start overwriting earliest data
+ :	third element:	x parameter for minimum step or time interval for first element
+ :
  :	Revision 1.13  2004/03/14 19:19:54  satyanandavel
  :	minor fix
- :
+ :	
  :	Revision 1.12  2004/03/14 19:11:57  satyanandavel
  :	sys/io.h is not available in IBM p650
  :	
@@ -135,6 +147,7 @@ typedef int ssize_t;
 #include <unistd.h>
 #endif 
 
+#include "Exceptions.hpp"
 
 
 const unsigned int VVECTOR_READ_CACHE_SIZE = 2048;
@@ -205,6 +218,12 @@ private:
   value_type _cacheWV[VVECTOR_WRITE_CACHE_SIZE];
   size_type _cacheWI[VVECTOR_WRITE_CACHE_INDEX_SIZE];
   size_type _cacheWNum;
+  bool size_fixed;
+  int end_policy;
+  size_type start_offset;
+
+
+libecs::Real LastTime, diff, lastRead;
 
 // constructor, destructor
 public:
@@ -219,8 +238,7 @@ public:
   size_type size() const { return _size; };
   void clear();
   static void setDiskFullCB(void(*)());
-//  void set_direct_read_stats(size_type distance,size_type num_of_elements);
-//  void set_direct_read_stats();
+  void setEndPolicy( int );
 };
 
 
@@ -231,6 +249,9 @@ public:
 
 template<class T> vvector<T>::vvector()
 {
+ size_fixed = false;
+  end_policy = 0;
+  start_offset = 0;
   initBase(NULL);
   int counter = VVECTOR_READ_CACHE_INDEX_SIZE;
   do {
@@ -242,7 +263,6 @@ template<class T> vvector<T>::vvector()
   } while (0 <= --counter);
   _cacheWNum = 0;
   _size = 0;
-//  direct_read_flag=false;
 }
 
 
@@ -251,100 +271,83 @@ template<class T> vvector<T>::~vvector()
   // do nothing
 }
 
+template<class T> void vvector<T>::setEndPolicy( int anEndPolicy)
+{
+end_policy=anEndPolicy;
+}
+
 
 template<class T> void vvector<T>::push_back(const T & x)
 {
-  _cacheWV[_cacheWNum] = x;
-  if (_cacheWNum==0){_cacheWI[0]=_size;}
-  _cacheWI[1] = _size;
-  if (VVECTOR_WRITE_CACHE_SIZE <= ++_cacheWNum) {
+ssize_t red_bytes; 
+if(VVECTOR_WRITE_CACHE_SIZE <= _cacheWNum){ 
+	      THROW_EXCEPTION( libecs::Exception,  "Write() failed in VVector. \n");
+}
 
-    if (write(_fdw, _cacheWV, sizeof(T) * VVECTOR_WRITE_CACHE_SIZE)
-	!= sizeof(T) * VVECTOR_WRITE_CACHE_SIZE) {
-      fprintf(stderr, "write() failed in VVector.%ld\n", _size);
-      cbError();
+  _cacheWV[_cacheWNum] = x;
+  	if (_cacheWNum==0){_cacheWI[0]=_size;}
+  	_cacheWI[1] = _size;
+  if (size_fixed){
+	_cacheWI[0]--;
+	}
+  if (VVECTOR_WRITE_CACHE_SIZE <= ++_cacheWNum) {
+	// first try to append
+	if (!size_fixed){
+    	if ((red_bytes=write(_fdw, _cacheWV, sizeof(T) * VVECTOR_WRITE_CACHE_SIZE))
+		!= sizeof(T) * VVECTOR_WRITE_CACHE_SIZE) 
+		{
+
+			if (end_policy == 0)
+				{
+				if (_size>0)
+					{
+	    		  	THROW_EXCEPTION( libecs::Exception,  "Write() failed in VVector. Possibly disk full.\n");
+					}
+				else{
+		    		  THROW_EXCEPTION( libecs::Exception,  "Write() failed in VVector. Possibly IO or permission error.\n");
+					}
+				}
+			else 
+			{
+				size_fixed=true;
+				_size-=VVECTOR_WRITE_CACHE_SIZE-1;
+
+			}
+		}// if of write statment
+	} //if of append condition
+
+	if (size_fixed){
+	//try to seek start offset
+
+	  if (lseek(_fdw, static_cast<off_t>((start_offset) * sizeof(T)), SEEK_SET) == static_cast<off_t>(-1)) {
+		THROW_EXCEPTION( libecs::Exception, "Write() failed in VVector. Seek error.\n");
+		}
+	  if (write(_fdw, _cacheWV, sizeof(T) * VVECTOR_WRITE_CACHE_SIZE)
+		!= sizeof(T) * VVECTOR_WRITE_CACHE_SIZE) {
+	      THROW_EXCEPTION( libecs::Exception,  "Write() failed in VVector. Possibly IO error.\n");
+		}
+	start_offset+=VVECTOR_WRITE_CACHE_SIZE;
+	if (start_offset >= _size){ start_offset = 0;}
+
+
     }
     _cacheWNum = 0;
-//    my_close();
+
   }
-  _size++;
+	if (!size_fixed){  _size++; }
 }
 
 
 template<class T>  T const & vvector<T>::operator [] (size_type i)
 {
-  assert(i < _size);
-  if (( i >= _cacheRI[0])&&(_cacheRI[1]>=i)){
-  //calculate i's position
-    return _cacheRV[i-_cacheRI[0]];
-  }
-  if ((i>=_cacheWI[0])&&(_cacheWI[1]>=i)){
-  //calculate i's position
-    return _cacheWV[i-_cacheWI[0]];
-  }
-  size_type i2=i; //forward sequential read assumed
- 
-  size_t half_size,read_interval;
-  read_interval=VVECTOR_READ_CACHE_SIZE;
-  
-  // detect sequential read
-  if ((i+1)==_cacheRI[0])
-    {
-       if (_cacheRI[0]>=read_interval)
-          {
-            i2=_cacheRI[0]-read_interval;
-          }
-       else 
-          {
-            i2=0; 
-          }
-    }
-    else if((_cacheRI[1]+1)!=i){ //not forward sequential, therefore random access
-    half_size=read_interval/2;
-    if (i>half_size){i2=(i-half_size);} else {i2=0;}
-    }
-
-  ssize_t num_red;
-  size_type num_to_read = _size - i2 ;
-  if (VVECTOR_READ_CACHE_SIZE < num_to_read) {
-    num_to_read = VVECTOR_READ_CACHE_SIZE;
-  }
-
-  my_open_to_read(static_cast<off_t>((i2) * sizeof(T)));
-  num_red = read(_fdr, _cacheRV, num_to_read * sizeof(T));
-
-  if (num_red < 0) {
-    fprintf(stderr, "read() failed in VVector. i=%ld, _size=%ld, n=%ld\n",
-	    (long)i2, (long)_size, (long)num_to_read);
-    cbError();
-  }
-  num_red /= sizeof(T);
-
-  _cacheRI[0]=i2;
-  _cacheRI[1]=i2+num_red-1;
-  
-
-  _buf = _cacheRV[i-_cacheRI[0]];
-
-  return _buf;
+return at(i);
 }
 
 
 template<class T>  T const & vvector<T>::at(size_type i)
 {
-  assert(i < _size);
-/*  int counter = VVECTOR_READ_CACHE_SIZE - 1;
-  do {
-    if (_cacheRI[counter] == i) {
-      return _cacheRV[counter];
-    }
-  } while (0 <= --counter);
-  counter = VVECTOR_WRITE_CACHE_SIZE - 1;
-  do {
-    if (_cacheWI[counter] == i) {
-      return _cacheWV[counter];
-    }
-  } while (0 <= --counter);*/
+//  assert(i < _size);
+/*
   //check whether i is in range of _cacheRI[0],_cacheRI[1]
   if ((i>=_cacheRI[0])&&(_cacheRI[1]>=i)){
   //calculate i's position
@@ -367,14 +370,74 @@ template<class T>  T const & vvector<T>::at(size_type i)
     cbError();
   }
   num_red /= sizeof(T);
-/*  for (ssize_t tmp_index = 0; tmp_index < num_red; tmp_index++) {
-    _cacheRI[tmp_index] = i + tmp_index;
-  }*/
   _cacheRI[0]=i;
   _cacheRI[1]=i+num_red-1;
   
   _buf = _cacheRV[0];
 //  my_close();
+  return _buf;
+*/
+  assert(i < _size);
+// read cache only makes sense when not fixed size
+if (!size_fixed){
+  if (( i >= _cacheRI[0])&&(_cacheRI[1]>=i)){
+  //calculate i's position
+    return _cacheRV[i-_cacheRI[0]];
+  }
+  }
+
+  if ((i>=_cacheWI[0])&&(_cacheWI[1]>=i)){
+  //calculate i's position
+
+    return _cacheWV[i-_cacheWI[0]];
+  }
+  size_type i2=i; //forward sequential read assumed
+  size_type log_read_start, phys_read_start;
+   size_t half_size,read_interval;
+  read_interval=VVECTOR_READ_CACHE_SIZE;
+  
+  // detect sequential read ( only in case of not fixed read )
+if (!size_fixed){
+  if ((i+1)==_cacheRI[0])
+    {
+       if (_cacheRI[0]>=read_interval)
+          {
+            i2=_cacheRI[0]-read_interval;
+          }
+       else 
+          {
+            i2=0; 
+          }
+    }
+    else if((_cacheRI[1]+1)!=i){ //not forward sequential, therefore random access
+    half_size=read_interval/2;
+    if (i>half_size){i2=(i-half_size);} else {i2=0;}
+    }
+}
+  ssize_t num_red;
+  size_type num_to_read = _size - i2 ;
+  if (VVECTOR_READ_CACHE_SIZE < num_to_read) {
+    num_to_read = VVECTOR_READ_CACHE_SIZE;
+  }
+log_read_start=i2;
+  if (size_fixed){
+    phys_read_start=(i2+start_offset+_cacheWNum);
+	if (phys_read_start>=_size){ phys_read_start-=_size;}
+  }
+	else{
+	phys_read_start=i2;
+}
+  my_open_to_read(static_cast<off_t>((phys_read_start) * sizeof(T)));
+  num_red = read(_fdr, _cacheRV, num_to_read * sizeof(T));
+  if (num_red < 0) {
+    THROW_EXCEPTION( libecs::Exception, "read() failed in VVector.\n");
+
+  }
+  num_red /= sizeof(T);
+  _cacheRI[0]=log_read_start;
+  _cacheRI[1]=log_read_start+num_red-1;
+
+  _buf = _cacheRV[i-log_read_start];
   return _buf;
 }
 

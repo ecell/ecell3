@@ -45,13 +45,25 @@ namespace libecs
 
     if (PointSize==2)
 	{
-		theVectorLong.clear ( );
+		theVector.clear ( );
 	} 
      else
 	{
-		theVector.clear ( );
+		theVectorLong.clear ( );
 	}
   }
+
+	void PhysicalLogger::setEndPolicy( Integer anEndPolicy)
+	{
+
+    if (PointSize==2)
+	{
+		theVector.setEndPolicy ( anEndPolicy );
+	} 
+     else
+	{
+		theVectorLong.setEndPolicy ( anEndPolicy );
+	}	}
 
 
   PhysicalLoggerIterator 

@@ -45,6 +45,7 @@
 
 #include "LocalSimulatorImplementation.hpp"
 
+
 namespace libemc
 {
 
@@ -307,14 +308,28 @@ namespace libemc
   void LocalSimulatorImplementation::
   createLogger( libecs::StringCref aFullPNString )
   {
+   libecs::PolymorphVector aVector;
+   aVector.push_back(Integer(0));
+   aVector.push_back(Integer(0));
+   aVector.push_back(Integer(0));
+	createLogger( aFullPNString, libecs::Polymorph(aVector) );
+  }
+
+
+  void LocalSimulatorImplementation::
+  createLogger( libecs::StringCref aFullPNString , libecs::Polymorph aParamList )
+  {
     if( theRunningFlag )
       {
 	THROW_EXCEPTION( libecs::Exception, 
 			 "Cannot create a Logger while running." );
       }
-
+	if ( aParamList.getType() != libecs::Polymorph::POLYMORPH_VECTOR ){
+	THROW_EXCEPTION( libecs::Exception,
+			"2nd argument of createLogger must be list of numbers!");
+		}
     FullPN aFullPN( aFullPNString );
-    getModel().getLoggerBroker().createLogger( aFullPN );
+    getModel().getLoggerBroker().createLogger( aFullPN, aParamList.asPolymorphVector() );
   }
 
   const Polymorph LocalSimulatorImplementation::getLoggerList() const
@@ -386,6 +401,27 @@ namespace libemc
     return getLogger( aFullPNString )->getMinimumInterval();
   }
 
+
+
+
+  void LocalSimulatorImplementation::
+  setLoggerPolicy( libecs::StringCref aFullPNString, 
+			    libecs::Polymorph aParamList )
+  {
+	if ( aParamList.getType() != libecs::Polymorph::POLYMORPH_VECTOR ){
+	THROW_EXCEPTION( libecs::Exception,
+			"2nd argument of setLoggerPolicy must be list of numbers!");
+		}
+
+    getLogger( aFullPNString )->setLoggerPolicy( aParamList );
+  }
+
+  const libecs::PolymorphCref LocalSimulatorImplementation::
+  getLoggerPolicy( libecs::StringCref aFullPNString ) const
+  {
+
+    return getLogger( aFullPNString )->getLoggerPolicy();
+  }
 
   const libecs::Integer LocalSimulatorImplementation::
   getLoggerSize( libecs::StringCref aFullPNString ) const

@@ -45,9 +45,21 @@
  *::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
  *	$Id$
  :	$Log$
+ :	Revision 1.11  2004/05/29 11:54:51  bgabor
+ :	Introducing logger policy .
+ :	User cen set and get the policy for a certain logger either when the logger is creater or anytime later.
+ :	logger policy is a 3 element list of numbers.
+ :	first element:	0-log all
+ :			1-log every xth step
+ :			2-log at the passing of x secs
+ :	second element:	policy at the end
+ :			0-throw exception when disk space is used up
+ :			1-start overwriting earliest data
+ :	third element:	x parameter for minimum step or time interval for first element
+ :
  :	Revision 1.10  2004/01/21 06:26:30  shafi
  :	a fix from gabor, remove tmp files when exitting abnormally
- :
+ :	
  :	Revision 1.9  2003/09/27 13:41:07  bgabor
  :	Bugfix.
  :
@@ -137,7 +149,7 @@ long vvectorbase::_margin = 10 * 1024; // by K bytes
 
 static void checkDiskFull(char const * const path, int mustCheck)
 {
-  const long diskFreeMargin = 10L * 1024L; // K bytes
+  const long diskFreeMargin =  1024L; // K bytes
   // const int checkInterval = 1024;
   const int checkInterval = 10;
   static int skipCounter = 0;
@@ -167,7 +179,7 @@ vvectorbase::vvectorbase()
 #ifdef	_Windows
       _defaultDirectory = strdup("c:\\temp");
 #else
-      _defaultDirectory = strdup("/tmp");
+      _defaultDirectory = strdup("/bmp");
 #endif	/* _Windows */
       _directoryPriority = 4;
     }
@@ -283,8 +295,11 @@ void vvectorbase::initBase(char const * const dirname)
   }
 #endif
   if (osif_is_dir(pathname) == 0) {
+THROW_EXCEPTION( libecs::Exception, "Directory doesn't exist.\n" );
+/*
     printf("Directory \"%s\" does not exist.\n", pathname);
     exit(1);
+*/
   }
   checkDiskFull(pathname, 1);
   sprintf(filename, "vvector-%ld-%04d",
@@ -297,16 +312,22 @@ void vvectorbase::initBase(char const * const dirname)
 _file_desc_write.push_back(_fdr);
 _file_desc_write.push_back(_fdw);
   if (_fdw < 0) {
+THROW_EXCEPTION( libecs::Exception, "Opening file failed.\n" );
+/*
     fprintf(stderr, "open(\"%s\") failed in VVector.\n", _file_name);
     cbError();
     exit(1);
+*/
   }
 
   if (_fdr < 0) {
+THROW_EXCEPTION( libecs::Exception, "Opening file failed.\n" );
+/*
     fprintf(stderr, "open(\"%s\") failed in VVector err=%s.\n",
 	    _file_name, strerror(errno));
     cbError();
     exit(1);
+*/
   }
 
 }
@@ -317,10 +338,13 @@ void vvectorbase::my_open_to_append()
   checkDiskFull(_file_name, 0);
   _fdw = open(_file_name, O_WRONLY | O_APPEND | O_BINARY |O_LARGEFILE);
   if (_fdw < 0) {
+THROW_EXCEPTION( libecs::Exception, "Opening file failed.\n" );
+/*
     fprintf(stderr, "open(\"%s\") failed in VVector err=%s.\n",
 	    _file_name, strerror(errno));
     cbError();
     exit(1);
+*/
   }
 }
 
@@ -331,15 +355,19 @@ if (_fdr<0) {
  _fdr = open(_file_name, O_RDONLY | O_BINARY|O_LARGEFILE );
  }
   if (_fdr < 0) {
+THROW_EXCEPTION( libecs::Exception, "Opening file failed.\n" );
+/*
     fprintf(stderr, "open(\"%s\") failed in VVector err=%s.\n",
 	    _file_name, strerror(errno));
     cbError();
     exit(1);
+*/
   }
   if (lseek(_fdr, offset, SEEK_SET) == static_cast<off_t>(-1)) {
-    fprintf(stderr, "lseek(\"%s\") failed in VVector err=%s.\n",
+THROW_EXCEPTION( libecs::Exception, "lseek in file failed.\n" );
+/*    fprintf(stderr, "lseek(\"%s\") failed in VVector err=%s.\n",
 	    _file_name, strerror(errno));
-    assert(0);
+    assert(0);*/
   }
 }
 
@@ -347,10 +375,13 @@ void vvectorbase::my_close()
 {
   assert((0 <= _fdr)&&(0<=_fdw));
   if ((close(_fdr) < 0)||(close(_fdw) < 0)) {
+THROW_EXCEPTION( libecs::Exception, "Close of file failed.\n" );
+/*
     fprintf(stderr, "close(\"%s\") failed in VVector err=%s.\n",
 	    _file_name, strerror(errno));
     cbError();
     exit(1);
+*/
   }
   _fdr = -1;
   _fdw = -1;
@@ -365,9 +396,12 @@ void vvectorbase::my_close()
 	if (_cb_full != NULL) {
 		(*_cb_full)();
 	} else {
+	THROW_EXCEPTION( libecs::Exception, "Disk full, vvector cannot be created.\n");
+/*
 		fprintf(stderr,
 		  "vvector disk full --- return key to continue.\n");
 		getchar();
+*/
 	}
 }
 
@@ -377,8 +411,11 @@ void vvectorbase::my_close()
 	if (_cb_full != NULL) {
 		(*_cb_full)();
 	} else {
-		fprintf(stderr, "error in vvector.\n");
+	THROW_EXCEPTION( libecs::Exception, "Error in vectrobase.\n");
+
+/*		fprintf(stderr, "error in vvector.\n");
 		exit(1);
+*/
 	}
 }
 

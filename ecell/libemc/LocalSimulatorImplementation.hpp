@@ -123,6 +123,8 @@ namespace libemc
 
     virtual void createLogger( libecs::StringCref aFullPNString );
 
+    virtual void createLogger( libecs::StringCref aFullPNString, libecs::Polymorph aParamList  );
+
     virtual const libecs::Polymorph getLoggerList() const;
 
     virtual const libecs::DataPointVectorRCPtr 
@@ -148,6 +150,15 @@ namespace libemc
 
     virtual const libecs::Real 
     getLoggerMinimumInterval( libecs::StringCref aFullPNString ) const;
+
+
+    virtual void 
+    setLoggerPolicy( libecs::StringCref aFullPNString, 
+			      libecs::Polymorph aParamList ) ;
+
+    virtual const libecs::PolymorphCref 
+    getLoggerPolicy( libecs::StringCref aFullPNString ) const;
+
 
     virtual const libecs::Integer 
     getLoggerSize( libecs::StringCref aFullPNString ) const;
