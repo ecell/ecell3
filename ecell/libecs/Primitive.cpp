@@ -38,15 +38,19 @@ const String Primitive::PrimitiveTypeString( Type type )
     {
     case ENTITY:
       aString = String( "Entity" );
+      break;
     case SUBSTANCE:
       aString = String( "Substance" );
+      break;
     case REACTOR:
       aString = String( "Reactor" );
+      break;
     case SYSTEM:
       aString = String( "System" );
+      break;
     default:
-      // FIXME: throw an exception
-      aString = String( "InvalidType" );
+      throw InvalidPrimitiveType( __PRETTY_FUNCTION__, 
+				  "can't create PrimitiveTypeString." );
     }
 
   return aString;
@@ -74,8 +78,9 @@ Primitive::Type Primitive::PrimitiveType( StringCref typestring )
     }
   else
     {
-      // FIXME: throw an exception
-      aType = NONE;
+      throw InvalidPrimitiveType( __PRETTY_FUNCTION__, 
+				  "can't convert typestring [" + typestring
+				  + "] to PrimitiveType." );
     }
 
   return aType;
