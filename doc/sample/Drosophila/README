@@ -16,7 +16,7 @@ Proc R Soc Lond B Biol Sci, Vol.261:319-324, Sep 1995.
 
 README:      This file
 droTest.em:  Model file(em file) for this model
-*.dm:        Process files(dm files) for this model
+*.cpp:        Process files(dm files) for this model
 
 
 
