@@ -331,10 +331,19 @@ class Eml:
         anEntityPropertyNode = self.__getEntityPropertyNode( aFullID, aPropertyName )
 
         return self.__createValueList( anEntityPropertyNode )
-                
 
+    def setEntityInfo( self, aFullID, InfoStrings ):
 
+        anEntityInfoElement = self.__createInfoNode( InfoStrings )
+        aTargetNode = self.__getEntityNode( aFullID )
+        aTargetNode.appendChild( anEntityInfoElement )
 
+    def getEntityInfo( self, aFullID ):
+
+        anEntityInfoNode = self.__getEntityInfoNode( aFullID )
+
+        return self.__createValueList( anEntityInfoNode )
+    
 
     ##-------------------------------------------
     ## Cache manipulations
@@ -497,6 +506,15 @@ class Eml:
 
 
 
+    def __getEntityInfoNode( self, aFullID ):
+
+        anEntityNode = self.__getEntityNode( aFullID )
+
+        for aChildNode in anEntityNode.childNodes:
+
+            if aChildNode.nodeName == 'info':
+                
+                return aChildNode
 
 
 
@@ -535,6 +553,15 @@ class Eml:
 
 
         return aValueNode
+
+    def __createInfoNode ( self, InfoStrings ):
+
+        anInfoElement = self.__createElement( 'info' )
+        anInfoData = self.__theDocument.createTextNode( InfoStrings )
+        anInfoElement.appendChild( anInfoData )
+
+        return anInfoElement
+    
 
 
 def convertSystemFullID2SystemID( aSystemFullID ):
