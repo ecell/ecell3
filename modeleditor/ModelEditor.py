@@ -269,10 +269,7 @@ class ModelEditor:
             
             self.printMessage( "Error loading file %s"%aFileName, ME_ERROR )
             
-            if str(sys.exc_type)=="Error.ClassNotExistError":
-                anErrorMessage= string.join( sys.exc_value )
-            else:
-                anErrorMessage = string.join( traceback.format_exception(sys.exc_type,sys.exc_value, \
+            anErrorMessage = string.join( traceback.format_exception(sys.exc_type,sys.exc_value, \
                     sys.exc_traceback), '\n' )
             
             self.printMessage( anErrorMessage, ME_PLAINMESSAGE )
@@ -336,6 +333,7 @@ class ModelEditor:
         self.__savedModelName = self.theModelName
         self.__savedModelHasName = self.modelHasName
         self.__savedChangesSaved = self.changesSaved
+        self.__cwd = os.getcwd()
 
         return
         
@@ -350,6 +348,7 @@ class ModelEditor:
         self.modelHasName = self.__savedModelHasName 
         self.changesSaved = self.__savedChangesSaved 
         self.__clearModelStoreAndLayoutSave()
+        self.__changeWorkingDir( self.__cwd )
         self.updateWindows()
         return
 
@@ -358,7 +357,12 @@ class ModelEditor:
         del self.__savedModelStore
         return
 
-
+    def __changeWorkingDir( self, aDirName ):
+        if aDirName == "":
+            return
+        os.chdir( aDirName )
+        self.theDMInfo.setWorkingDir( aDirName )
+        
     def loadModel ( self, aFileName ):
         """
         in: nothing
@@ -381,11 +385,10 @@ class ModelEditor:
 
         self.theMainWindow.displayHourglass()
 
+        aDirName = os.path.split( aFileName)[0]
 
-
-        if self.loadDirName != '':
-            os.chdir(self.loadDirName )
-
+        self.__changeWorkingDir( aDirName )
+    
         anExt = os.path.splitext(aFileName)[1].lower()
         
         if anExt == '.em':
@@ -429,9 +432,10 @@ class ModelEditor:
         self.printMessage("Model %s loaded successfully."%aFileName )
         self.updateWindows()
        
-        #self.theMainWindow['combo1'].set_popdown_strings(self.theLayoutManager.getLayoutNameList())
+
         self.__createPathwayWindow( False )
         self.theMainWindow.resetCursor()
+        self.loadDirName = os.getcwd()
         return True
         
         
@@ -461,7 +465,7 @@ class ModelEditor:
 
         # check if it is dir
         if os.path.isdir( aFileName ):
-            self.saveDirName = aFileName.rstrip('/')
+            self.saveDirName = aFileName.rstrip(os.sep)
             return
 
         self.theMainWindow.displayHourglass()
@@ -512,6 +516,7 @@ class ModelEditor:
         self.theModelName = os.path.split( aFileName )[1]
         self.modelHasName = True
         self.changesSaved = True
+	self.__changeWorkingDir( self.saveDirName )
         self.updateWindows()
         
         self.theMainWindow.resetCursor()

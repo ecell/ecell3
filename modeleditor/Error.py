@@ -9,7 +9,7 @@ class ClassNotExistError(Error):
     """
 
     def __init__(self,aClass): 
-            self.args = "No .desc file for %s"%aClass
+            self.args = "Class %s not found."%aClass
 
     #def __str__(self):
     #   return repr(self.message)

@@ -20,6 +20,13 @@ def getFullIDType( aFullID ):
     return aList[0]
 
 
+def getClassTypeFromName( aClassName ):
+    for aType in [ ME_SYSTEM_TYPE, ME_VARIABLE_TYPE, ME_PROCESS_TYPE, ME_STEPPER_TYPE]:
+        if aClassName.endswith( aType):
+            return aType
+    return None
+
+
 def getParentSystemOfFullID( aFullID ):
     return convertSysPathToSysID( aFullID.split(':')[1] )
 

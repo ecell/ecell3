@@ -115,6 +115,8 @@ class EditorObject:
         graphUtils =  self.theLayout.graphUtils()
         theLabel = self.getProperty( OB_LABEL )
         aShapeType = self.getProperty( OB_TYPE )
+        if aShapeName == aShapeType:
+            aShapeName = "Default"
         return self.ShapePluginManager.createShapePlugin(aShapeType,aShapeName,self, graphUtils, theLabel)
         
 
@@ -152,6 +154,7 @@ class EditorObject:
         elif aPropertyName in ( OB_DIMENSION_X, OB_DIMENSION_Y ):
             self.theSD.reCalculate()
         elif aPropertyName == OB_SHAPE_TYPE :
+        
             anSD = self.getShapeDescriptor( aPropertyValue )
             self.setShapeDescriptor( anSD )
 

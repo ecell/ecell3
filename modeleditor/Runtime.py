@@ -170,6 +170,7 @@ gtk.mainloop()\n\
             
         try:
             self.theSession.loadModel( fileName )                 
+            self.theSession.theSimulator.initialize()
         except:
             self.message(' Error while trying to parse model into simulator \n')
             anErrorMessage = string.join( traceback.format_exception(sys.exc_type,sys.exc_value,sys.exc_traceback), '\n' )
@@ -177,7 +178,7 @@ gtk.mainloop()\n\
             self.theModelEditor.theMainWindow.resetCursor()
             dialog = ConfirmWindow(0,"Sorry, error in parsing model, see message window for details." )
             return False
-        self.theSession.theSimulator.initialize()
+
         self.theMode = ME_RUN_MODE
         if self.theModelEditor.theResultsWindow != None:
             self.theModelEditor.theResultsWindow.openBoardWindow(self.theSession)

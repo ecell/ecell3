@@ -72,10 +72,20 @@ class StepperEditor(ViewComponent):
 
         # initate Editors
         self.thePropertyList = PropertyList( self.theParentWindow, self['PropertyListFrame'] )
-            
-        self['vbox4'].remove( self['hbox3'] ) 
-        #self['hbox3'] = None
+        aNoteBook=ViewComponent.getWidget(self,'editor_notebook')
 
+        self['ids'].remove( self['hbox3'] ) 
+        #self['hbox3'] = None
+        aNoteBook.set_tab_pos( gtk.POS_TOP )
+        classDesc = self['class_desc']
+        infoDesc = self['info_desc']
+        vertical = self['vertical_holder']
+        horizontal = self['horizontal_holder']
+        horizontal.remove( classDesc)
+        horizontal.remove( infoDesc )
+        vertical.pack_end( classDesc)
+        vertical.pack_end( infoDesc )
+        vertical.show_all()         
         # make sensitive change class button for process
         self['class_combo'].set_sensitive( gtk.TRUE )
 

@@ -193,9 +193,6 @@ class ModelStore:
         """
         return self.__getStepperProperty( aStepperID, aPropertyName )[MS_PROPERTY_TYPE]
 
-    def getStepperPropertyColor( self, aStepperID, aPropertyName ):
-        return self.__getStepperProperty( aStepperID, aPropertyName )[MS_PROPERTY_COLOR]
-
 
     def setStepperInfo( self, aStepperID, anInfoStrings ):
         # check if Stepper exists

@@ -1,6 +1,6 @@
 
 
-import ecell._ecs
+import ecell._emc
 from Config import *
 import os
 import os.path
@@ -9,358 +9,201 @@ from Utils import *
 import sys
 import string
 
+MASTERLIST_TYPE = 0
+MASTERLIST_BUILTIN = 1
+MASTERLIST_INFOLIST = 2
+MASTERLIST_PROPERTYLIST = 3
+
+DM_TRANSLATIONLIST={ "Real":DM_PROPERTY_FLOAT,
+                        "Integer":DM_PROPERTY_INTEGER,
+                        "String":DM_PROPERTY_STRING,
+                        "Polymorph":DM_PROPERTY_NESTEDLIST}
+
+
+DM_DEFAULTVALUES = { DM_PROPERTY_FLOAT : 0.0,
+                        DM_PROPERTY_INTEGER: 0,
+                        DM_PROPERTY_STRING:"",
+                        DM_PROPERTY_NESTEDLIST: [] }
+
+INFO_TYPE = 0
+INFO_GETTABLE = 2
+INFO_SETTABLE = 1
+INFO_LOADABLE = 4
+INFO_SAVEABLE = 3
+
+
 class DMInfo:
     # FIRST INITIATE HARDCODED CLASSES SUCH AS VARIABLE, SYSTEM, COMPARTMENT SYSTMEM FROM HERE
     def __init__(self ):
+        self.theSimulator = ecell._emc.Simulator()
         self.theList={}
         self.theClass=None
         self.theProcessClassList = None
         self.theStepperClassList = None
         self.theEditorClassList = None
-        self.loadDirName = os.getcwd()
+        
+
+        if os.uname()[0] in ["Linux", "Unix"]:
+            self.theExtension = ".so"
+        else:
+            self.theExtension = ".dll"
+            
+        self.theMasterList={} #key: class name, value: list [type, builtin, descriptor]
+
+        # load built in classes
+        self.builtinPath = DM_PATH
+        self.__loadBuiltins()
+        self.setWorkingDir( os.getcwd() )
        
+
+    def setWorkingDir(self, aPath):
+        # changes working dir, parses working dir so and dlls
+        self.workingPath = aPath
+        self.refresh()
+
+        
+    def refresh( self ):
+        # loads all so and dll files from DMPATH and curdir
+        self.__loadBuiltins()
+        self.__scanCurrentPath()
+        
+        
+    def __deleteClasses( self, builtin ):
+        # deletes classes with given conditions
+        for className in self.theMasterList.keys()[:]:
+            masterList = self.theMasterList[ className ]
+            if  builtin == masterList[MASTERLIST_BUILTIN] :
+                self.theMasterList.__delitem__( className )
+                
+        
+        
+    def __loadBuiltins( self ):
+        # system, variable
+
+        self.loadModule( ME_SYSTEM_TYPE, DM_SYSTEM_CLASS, True )
+        self.loadModule( ME_SYSTEM_TYPE, DM_SYSTEM_CLASS_OLD, True )
+        self.loadModule( ME_VARIABLE_TYPE, DM_VARIABLE_CLASS,True )
+        self.__deleteClasses( False )
+        self.__scanDMPath()
+        
+        
+    def __scanDMPath( self ):
+        # scans DMPATH for module files and parses them
+        # finds .so files
+
+        self.__scanPath( self.builtinPath )
+
+        
+    def __scanCurrentPath( self ):
+        # scans current path for module files and parses them
+        # finds .so files
+        self.__scanPath( self.workingPath )
+
+
+    def __scanPath( self, aPath ):
+        # look for biinaries in Path
+        builtin = aPath == self.builtinPath
+        fileNames = []
+        for aFileName in os.listdir(aPath):
+            baseName, extname = os.path.splitext( aFileName )
+            if extname == self.theExtension:
+                aType = getClassTypeFromName( baseName )
+                self.loadModule( aType, baseName, builtin )
+
+   
+
+    def loadModule( self, aType, aName, builtin = False ):
+        # loads module and fills out masterlist
+        #returns False if unsuccessful
+        if aType == ME_SYSTEM_TYPE and aName == DM_SYSTEM_CLASS_OLD:
+            anInfo = self.theSimulator.getClassInfo( aType, DM_SYSTEM_CLASS )
+        else:
+            anInfo = self.theSimulator.getClassInfo( aType, aName )
+        propertyList = {}
+        for anInfoName in anInfo.keys()[:]:
+            if anInfoName.startswith("Property__"):
+                propertyList[ anInfoName.replace("Property__","")] = anInfo[ anInfoName ]
+                anInfo.__delitem__( anInfoName )
+        if DM_DESCRIPTION not in anInfo.keys():
+            anInfo[DM_DESCRIPTION] = aName
+        if DM_ACCEPTNEWPROPERTY not in anInfo.keys():
+            anInfo[DM_ACCEPTNEWPROPERTY] = True
+        self.theMasterList[ aName ] = [ aType, builtin, anInfo, propertyList ]
+        
+
+    def __getClassInfo( self, aClassName ):
+        if aClassName in self.theMasterList.keys():
+            return self.theMasterList[ aClassName ][MASTERLIST_INFOLIST]
+        raise Exception( "%s class doesnt exist\n",aClassName)
 
     # SECOND DO THIS
     def getClassList( self, aType ):
-        if aType == ME_SYSTEM_TYPE:
-            return [DM_SYSTEM_CLASS, DM_SYSTEM_CLASS_OLD ]
-        if aType == ME_VARIABLE_TYPE:
-            return [DM_VARIABLE_CLASS ]
-        if aType == ME_PROCESS_TYPE and self.theProcessClassList != None:
-            return self.theProcessClassList
-        if aType == ME_STEPPER_TYPE and self.theStepperClassList != None:
-            return self.theStepperClassList
-
-        aList = []
-        # get from current directory for other type of classes
-        curdir = '.'
-        filelist = os.listdir( curdir )
-        # get from module directory
-        filelist.extend( os.listdir( DM_PATH ) )
-
-        for aFile in filelist:
-            if aFile.endswith( aType + '.desc' ):
-                aList.append( aFile.replace( '.desc' , '') )
-        if aType == ME_PROCESS_TYPE :
-            self.theProcessClassList = aList
-        if aType == ME_STEPPER_TYPE:
-            self.theStepperClassList = aList
-        return aList
+        classNames = []
+        for aClassName in self.theMasterList.keys():
+            if self.theMasterList[ aClassName ][MASTERLIST_TYPE] == aType:
+                classNames.append( aClassName )
+        return classNames
 
 
     #THIRD
     def getClassInfoList( self, aClass ):
-        aFullID = self.__getFullID( aClass )
-        if aFullID == None:
-            return []
-        return [DM_DESCRIPTION, DM_PROPERTYLIST, DM_ACCEPTNEWPROPERTY]
+        if not self.theMasterList.has_key(aClass):
+            raise Exception( "%s class doesnt exist\n", aClass)
+        infoList = self.theMasterList[aClass][MASTERLIST_INFOLIST].keys()
+        return infoList
 
 
 
     #FIVE
     def getClassInfo( self, aClass, anInfo ):
         # verify dictionary
-        aKey=aClass
-        if aClass==DM_SYSTEM_CLASS or aClass==DM_SYSTEM_CLASS_OLD:
-            aKey='System'
-        if not self.theList.has_key(aKey):
-            self.__readFromFile(aClass)
-        
-        aFullID = self.__getFullID( aClass )
-        if aFullID ==None:
+
+        if not self.theMasterList.has_key(aClass):
+            raise Exception( "%s class doesnt exist\n", aClass)
+        anInfoList = self.theMasterList[aClass][MASTERLIST_INFOLIST]
+        if anInfo not in anInfoList.keys():
             raise Exception("%s class doesnt have %s info"%(aClass, anInfo) )
-        
         # read from dictionary
-        aClassInfo=self.theList[aClass]
-        for aKey in aClassInfo:
-            if aKey==anInfo:
-                if anInfo == DM_PROPERTYLIST:
-                    return self.__getPropertyNameList(aClassInfo[aKey],'name')
-                else:
-                    return aClassInfo[aKey]
+        return anInfoList[anInfo]
 
 
-    def getClassPropertyInfo( self, aClass, aProperty, anInfo ):
-        aFullID = self.__getFullID( aClass )
-        self.theClass=aClass
-        if aFullID ==None:
-            raise Exception("%s class doesnt have %s info"%(aClass, anInfo) )
-        
+
+
+    def getClassPropertyInfo( self, aClass, aPropertyName, anInfo ):
+
+        if not self.theMasterList.has_key(aClass):
+            raise Exception( "%s class doesnt exist\n", aClass)
+        propertyList = self.theMasterList[aClass][MASTERLIST_PROPERTYLIST]
+        if aPropertyName not in propertyList.keys():
+            raise Exception("%s class doesnt have %s property"%(aClass, aPropertyName) )
+       
         if anInfo == DM_PROPERTY_DEFAULTVALUE:
-            aType = self.getClassPropertyInfo( aClass, aProperty, DM_PROPERTY_TYPE )
-            if aType == DM_PROPERTY_STRING:
-                return ''
-            elif aType == DM_PROPERTY_NESTEDLIST:
-                return []
-            else:
-                return self.__getPropertyInfo(aProperty,anInfo)
+            aType = self.__getPropertyType( aClass, aPropertyName)
+            return copyValue(DM_DEFAULTVALUES[ aType ])
 
         elif anInfo == DM_PROPERTY_SETTABLE_FLAG:
-            flagAttr=self.__getPropertyInfo(aProperty,anInfo)
-            return eval(flagAttr[ME_SETTABLE_FLAG])
+            return self.theMasterList[aClass][MASTERLIST_PROPERTYLIST][aPropertyName][INFO_SETTABLE]
+
 
         elif anInfo == DM_PROPERTY_GETTABLE_FLAG:
-            flagAttr=self.__getPropertyInfo(aProperty,anInfo)
-            return eval(flagAttr[ME_GETTABLE_FLAG])
+            return self.theMasterList[aClass][MASTERLIST_PROPERTYLIST][aPropertyName][INFO_GETTABLE]
 
         elif anInfo == DM_PROPERTY_LOADABLE_FLAG:
-            flagAttr=self.__getPropertyInfo(aProperty,anInfo)
-            return eval(flagAttr[ME_LOADABLE_FLAG])
+            return self.theMasterList[aClass][MASTERLIST_PROPERTYLIST][aPropertyName][INFO_LOADABLE]
 
         elif anInfo == DM_PROPERTY_SAVEABLE_FLAG:
-            flagAttr=self.__getPropertyInfo(aProperty,anInfo)
-            return eval(flagAttr[ME_SAVEABLE_FLAG])
+            return self.theMasterList[aClass][MASTERLIST_PROPERTYLIST][aPropertyName][INFO_SAVEABLE]
 
         elif anInfo == DM_PROPERTY_DELETEABLE_FLAG:
             return False
 
         elif anInfo == DM_PROPERTY_TYPE:
-            return self.__getPropertyInfo(aProperty,anInfo)
-
-    def setModelDirectory(self):
-        #to do
-        curdir='/usr/local/lib/ecell/3.1.102'
-       # for dirname in sys.path:
-        #    acandidate = os.path.join(dirname, aPath)
-        #    if matchFunc (acandidate):
-        #        return acandidate
-        #raise Error("Can't find file %s" %aPath)
+            return self.__getPropertyType(aClass,aPropertyName )
 
 
-    def loadModule(self, directPathName=None):
-        #to do
-        self.setModelDirectory()
-        if os.path.isdir(directPathName):
-            self.loadDirName = directPathName.rstrip('/')
-            return
-        if not os.path.isfile( directPathName ):
-            self.printMessage("%s file cannot be found!"%aFileName, ME_ERROR )
-            return
-
-        self.theMainWindow.displayHourglass()
-
-        self.loadDirName = os.path.split( directPathName )[0]
-
-        if self.loadDirName != '':
-            os.chdir(self.loadDirName )
-        
-        aFileBaseName = os.path.basename(directPathName)
-        anExt = os.path.splitext(aFileBaseName)[1]
-
-        #try to load as .eml
-        if anExt == '.so':
-            if not self.loadEmlAndLeml(directPathName):
-                self.theMainWindow.resetCursor()
-                self.__createModel()
-                return
-            
-        # log to recent list
-        self.__addToRecentFileList( directPathName )
-        
-        self.theModuleFileName = directPathName
-
-        self.theModuleName = os.path.split( directPathName )[1]
-        self.moduleHasName = True
-        self.changesSaved = True
-        self.printMessage("Module %s loaded successfully."%directPathName )
-        self.updateWindows()
-
-
-    def printMessage( self, aMessageText, aType = ME_PLAINMESSAGE ):
-        """
-        Types:
-        confirmation
-        plain message
-        alert
-        """
-        if aType == ME_PLAINMESSAGE:
-            if self.theMainWindow.exists():
-                self.theMainWindow.displayMessage( aMessageText )
-            else:
-                print aMessage 
-        elif aType == ME_OKCANCEL:
-            msgWin = ConfirmWindow( OKCANCEL_MODE, aMessageText, 'Message')
-            return msgWin.return_result()
-        elif aType == ME_YESNO:
-            msgWin = ConfirmWindow( OKCANCEL_MODE, aMessageText, 'Message')
-            return msgWin.return_result()
-        elif aType == ME_WARNING:
-            msgWin = ConfirmWindow( OK_MODE, aMessageText, 'Warning!')
-        elif aType == ME_ERROR:
-            msgWin = ConfirmWindow( OK_MODE, aMessageText, 'ERROR!') 
-    #-------------------------------------------------------------------------------------
-    #
-    #-------------------------------------------------------------------------------------
-
-    def __getFullID( self, aClass):
-        # get type
-        if aClass.endswith('System'):
-            aType = ME_SYSTEM_TYPE
-        elif aClass.endswith(DM_VARIABLE_CLASS):
-            aType = ME_VARIABLE_TYPE
-        elif aClass.endswith('Process'):
-            aType = ME_PROCESS_TYPE
-        elif aClass.endswith('Stepper'):
-            aType = ME_STEPPER_TYPE
-        else:
-            return None
-
-        if aClass not in self.getClassList(aType):
-            raise Exception("Unknown class: %s"%aClass)
-
-        aFullID = aType + ':/:' + aClass
-        return aFullID
-
-    
-    def __getPropertyInfo(self,aProperty,anInfo):
-        aProplist=self.theList[self.theClass][DM_PROPERTYLIST]
-        aName=None
-        end=0
-        start=0
-        until=0
-        aType=None
-        aDefault=None
-        aFlag=[]
-        aFlagstr=None
-        for target in aProplist:
-            end=target.find(',')
-            if end!=-1:
-                aName=(target[0:end]).strip()
-                if aName==aProperty:
-                    if anInfo==DM_PROPERTY_TYPE:
-                        start=end+1
-                        until=  target.find(',',start)
-                        if until!=-1:
-                            aType=(target[start:until]).strip()
-                            break
-                    elif anInfo==DM_PROPERTY_DEFAULTVALUE:
-                        start=end+1
-                        until=  target.find(',',start)
-                        start=until+1
-                        until=target.find(',',start)
-                        if until!=-1:
-                            aDefault=(target[start:until]).strip()
-                            break
-                    else:
-                        start=target.rfind(',')
-                        until=len(target)
-                        aFlagstr=(target[start+1:until]).strip()
-                        
-                            
-        if anInfo==DM_PROPERTY_TYPE:
-            return aType
-        elif anInfo==DM_PROPERTY_DEFAULTVALUE:
-            return aDefault
-        else:
-            for i in range(len(aFlagstr)):
-                aFlag.append(aFlagstr[i])
-            return aFlag
-
-    def __getPropertyNameList(self,aList,anAttr):
-        attrList=[]
-        start=0
-        end=0
-        aName=None
-        if anAttr=='name':
-            for target in aList:
-                end=target.find(',')
-                if end!=-1:
-                    aName=(target[0:end]).strip()
-                    attrList.append(aName)
-        return attrList 
-    
-    def __checkFileFormat(self,content):
-        isDesc=False
-        isAccept=False
-        isProp=False
-        isPropEnd=False
-        for line in content:
-            if line.startswith(DM_DESCRIPTION + '='):
-                isDesc=True
-            if line.startswith(DM_ACCEPTNEWPROPERTY+ '='):
-                isAccept=True
-            if line.startswith(DM_PROPERTYLIST):
-                isProp=True
-            if line.startswith('END'):
-                isPropEnd=True  
-        if not isDesc:
-            return False
-        if not isAccept:
-            return False
-        if not isProp:
-            return False
-        if not isPropEnd:
-            return False
-        return True
-
-    def __readFromFile(self,aClass):
-        noExclude=0
-        aProplist=[]
-        aDescription=None
-        acceptNew=False
-        isAdd=False
-
-        curdir = '.'
-        filelist = os.listdir( curdir )
-        aFileName=''
-        
-
-        # set file name 
-        if aClass.endswith('System'):
-            aFileName=DM_PATH +'/' + aClass[-6:]+'.desc'
-        else:   
-            targetfile=aClass+'.desc'
-            for filename in filelist:
-                if filename==targetfile:
-                    aFileName=os.path.join(curdir,filename)
-                    break
-            if aFileName=='':
-                aFileName=DM_PATH +'/' + targetfile
-
-
-        
-        aFileDesc=open(aFileName,'r')
-        content = aFileDesc.readlines()
-        
-        #check file format
-        if not self.__checkFileFormat(content):
-            raise Exception ("Please check the format of file %s.!"%aFileName)
-
-        for record in content:
-            if record.startswith(DM_DESCRIPTION):
-                noExclude=len(DM_DESCRIPTION)+1
-                aDescription=(record[noExclude:]).strip()
-
-            elif record.startswith(DM_ACCEPTNEWPROPERTY):
-                noExclude=len(DM_ACCEPTNEWPROPERTY)+1
-                aValue=(record[noExclude:]).strip()
-                if aValue=='True':
-                    acceptNew=True
-                else:
-                    acceptNew=False
-
-            elif record.startswith(DM_PROPERTYLIST):
-                isAdd=True
-            if isAdd:
-                aProplist.append(record)    
-        aFileDesc.close()
-        
-        # remove '\n' from Property
-        del aProplist[0]
-        del aProplist[len(aProplist)-1]
-        aTemplist=[]
-        for aProp in aProplist:
-            if aProp.endswith('\n'):
-                aTemplist.append(aProp[:-1])
-        aTemplist.sort()
-        aProplist=aTemplist
-
-        # addToDictionary
-        aDict=dict([(DM_DESCRIPTION,aDescription),(DM_ACCEPTNEWPROPERTY,acceptNew),(DM_PROPERTYLIST,aProplist)])
-        (aDict.keys()).sort()
-        self.theList[aClass]=aDict
-        (self.theList.keys()).sort()
-
+    def __getPropertyType( self, aClass, aPropertyName ):
+        aType = self.theMasterList[aClass][MASTERLIST_PROPERTYLIST][aPropertyName][INFO_TYPE]
+        return DM_TRANSLATIONLIST[aType]
 
 
 def DMTypeCheck( aValue, aType ):
