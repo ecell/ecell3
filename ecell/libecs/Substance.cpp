@@ -28,15 +28,13 @@
 // E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
 
-#include "Substance.h"
-#include "Integrators.h"
-#include "System.h"
-#include "RootSystem.h"
-#include "util/Util.h"
-#include "Accumulators.h"
-#include "AccumulatorMaker.h"
-//FIXME: #include "ecell/MessageWindow.h"
-
+#include "Substance.hpp"
+#include "Integrators.hpp"
+#include "System.hpp"
+#include "RootSystem.hpp"
+#include "util/Util.hpp"
+#include "Accumulators.hpp"
+#include "AccumulatorMaker.hpp"
 
 const String Substance::SYSTEM_DEFAULT_ACCUMULATOR_NAME = "ReserveAccumulator";
 

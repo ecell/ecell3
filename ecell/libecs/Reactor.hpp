@@ -34,10 +34,10 @@
 #include <climits>
 
 #include <stl.h>
-#include "Koyurugi.h"
-#include "util/Util.h"
-#include "Entity.h"
-#include "util/Message.h"
+#include "libecs.hpp"
+#include "util/Util.hpp"
+#include "Entity.hpp"
+#include "util/Message.hpp"
 
 typedef vector<Reactant*> ReactantList;
 typedef vector<Reactant*>::iterator ReactantListIterator;

@@ -32,7 +32,7 @@
 #ifndef ___ACCUMULATOR_H___
 #define ___ACCUMULATOR_H___
 
-#include "Substance.h"
+#include "Substance.hpp"
 
 
 class Accumulator

@@ -30,8 +30,8 @@
 
 
 #include <cmath>
-#include "Accumulators.h"
-#include "AccumulatorMaker.h"
+#include "Accumulators.hpp"
+#include "AccumulatorMaker.hpp"
 
 void AccumulatorMaker::makeClassList()
 {

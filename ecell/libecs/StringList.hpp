@@ -32,7 +32,7 @@
 #define __STRINGLIST_H___
 #include <stl.h>
 #include <string>
-#include "Defs.h"
+#include "Defs.hpp"
 
 class StringList : public vector< String >
 {

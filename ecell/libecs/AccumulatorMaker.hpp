@@ -31,8 +31,8 @@
 #ifndef ___ACCUMULATORMAKER_H___
 #define ___ACCUMULATORMAKER_H___
 #include <stl.h>
-#include "Accumulators.h"
-#include "ModuleMaker.h"
+#include "Accumulators.hpp"
+#include "ModuleMaker.hpp"
 
 class AccumulatorMaker : public StaticModuleMaker< Accumulator >
 {

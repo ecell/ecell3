@@ -28,15 +28,11 @@
 // E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
 
-
-
-
 #include <stdlib.h>
-#include "ReactorMaker.h"
-//FIXME: #include "ecell/Serizawa.h"
-#include "RootSystem.h"
-#include "util/Message.h"
-#include "Defs.h"
+#include "ReactorMaker.hpp"
+#include "RootSystem.hpp"
+#include "util/Message.hpp"
+#include "Defs.hpp"
 
 ////////////////////// ReactorMaker
  

@@ -28,7 +28,7 @@
 // E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
 
-#include "SubstanceMaker.h"
+#include "SubstanceMaker.hpp"
 
 void SubstanceMaker::makeClassList()
 {

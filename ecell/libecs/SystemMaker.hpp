@@ -28,16 +28,12 @@
 // E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
 
-
-
-
-
 #ifndef ___SYSTEMMAKER_H___
 #define ___SYSTEMMAKER_H___
 #include <stl.h>
-#include "System.h"
-#include "StepperMaker.h"
-#include "ModuleMaker.h"
+#include "System.hpp"
+#include "StepperMaker.hpp"
+#include "ModuleMaker.hpp"
 
 
 class SystemMaker : public StaticModuleMaker<System>

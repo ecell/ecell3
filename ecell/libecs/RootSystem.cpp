@@ -28,13 +28,13 @@
 // E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
 
-#include "RootSystem.h"
-#include "Primitive.h"
-#include "FQPN.h"
-#include "SubstanceMaker.h"
-#include "ReactorMaker.h"
-#include "SystemMaker.h"
-#include "AccumulatorMaker.h"
+#include "RootSystem.hpp"
+#include "Primitive.hpp"
+#include "FQPN.hpp"
+#include "SubstanceMaker.hpp"
+#include "ReactorMaker.hpp"
+#include "SystemMaker.hpp"
+#include "AccumulatorMaker.hpp"
 
 RootSystem::RootSystem() 
   :

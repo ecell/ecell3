@@ -31,8 +31,8 @@
 #ifndef ___ENTITY_H___
 #define ___ENTITY_H___
 #include <string>
-#include "util/Message.h"
-#include "Koyurugi.h"
+#include "libecs.hpp"
+#include "util/Message.hpp"
 
 /**
    Entity class is a base class for all components in the cell model.

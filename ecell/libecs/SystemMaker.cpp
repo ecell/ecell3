@@ -28,11 +28,8 @@
 // E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
 
-
-
-
-#include "SystemMaker.h"
-#include "RootSystem.h"
+#include "SystemMaker.hpp"
+#include "RootSystem.hpp"
 
 
 ////////////////////// SystemMaker

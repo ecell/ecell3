@@ -32,8 +32,8 @@
 #define ___EXCEPTIONS_H___
 #include "config.h"
 #include <typeinfo>
-#include "include/Defs.h"
-#include "util/Util.h"
+#include "include/Defs.hpp"
+#include "util/Util.hpp"
 
 DECLARE_CLASS( Exception );
 DECLARE_CLASS( UnexpectedError );

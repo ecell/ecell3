@@ -33,9 +33,9 @@
 #include <string>
 #include <map>
 #include <vector>
-#include "Exceptions.h"
-#include "StringList.h"
-#include "Defs.h"
+#include "Exceptions.hpp"
+#include "StringList.hpp"
+#include "Defs.hpp"
 
 DECLARE_CLASS( Message )
 DECLARE_CLASS( AbstractMessageSlot )

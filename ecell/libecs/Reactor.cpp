@@ -28,12 +28,11 @@
 // E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
 
-#include "Reactant.h"
-#include "RootSystem.h"
-#include "Stepper.h"
-#include "FQPN.h"
-
-#include "Reactor.h"
+#include "Reactant.hpp"
+#include "RootSystem.hpp"
+#include "Stepper.hpp"
+#include "FQPN.hpp"
+#include "Reactor.hpp"
 
 Reactor::Condition Reactor::theGlobalCondition;// = Reactor::Condition::Good;
 const char* Reactor::LIGAND_STRING_TABLE[] = 

@@ -28,7 +28,7 @@
 // E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
 
-#include "StepperMaker.h"
+#include "StepperMaker.hpp"
 
 ////////////////////// StepperMaker
  

@@ -9,7 +9,7 @@ PACKAGE=\"ecell\"
 AC_SUBST(VERSION)
 AC_SUBST(PACKAGE)
 
-AC_INIT(Koyurugi/Entity.h)
+AC_INIT(libecs/Entity.hpp)
 AM_INIT_AUTOMAKE(ecell,3.0)
 
 AM_SANITY_CHECK
@@ -151,7 +151,7 @@ AM_CONFIG_HEADER(config.h)
 
 AC_OUTPUT(
 Makefile 
-Koyurugi/Makefile 
+libecs/Makefile 
 util/Makefile
 )
 

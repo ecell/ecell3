@@ -31,7 +31,7 @@
 #ifndef ___PRIMITIVE_H___
 #define ___PRIMITIVE_H___
 #include <string>
-#include "Koyurugi.h"
+#include "libecs.hpp"
 
 class Primitive
 {

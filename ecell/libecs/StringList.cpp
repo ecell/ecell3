@@ -28,8 +28,7 @@
 // E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
 
-#include "StringList.h"
-
+#include "StringList.hpp"
 
 StringList::StringList( StringCref str, StringCref delim,
 			StringCref spacer )

@@ -31,8 +31,8 @@
 #ifndef ___REACTORMAKER_H___
 #define ___REACTORMAKER_H___
 #include <stl.h>
-#include "Reactor.h"
-#include "ModuleMaker.h"
+#include "Reactor.hpp"
+#include "ModuleMaker.hpp"
 
 class ReactorMaker : public SharedModuleMaker<Reactor>
 {

@@ -30,7 +30,7 @@
 
 #ifndef __KOYURUGI_H
 #define __KOYURUGI_H
-#include "Defs.h"
+#include "Defs.hpp"
 
 DECLARE_CLASS( System );
 DECLARE_CLASS( AccumulatorMaker );

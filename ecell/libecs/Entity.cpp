@@ -28,15 +28,11 @@
 // E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
 
-
-
-
-#include "Entity.h"
-//FIXME: #include "ecell/MessageWindow.h"
-#include "System.h"
-#include "FQPN.h"
-#include "RootSystem.h"
-#include "Stepper.h"
+#include "Entity.hpp"
+#include "System.hpp"
+#include "FQPN.hpp"
+#include "RootSystem.hpp"
+#include "Stepper.hpp"
 
 
 Entity::Entity()

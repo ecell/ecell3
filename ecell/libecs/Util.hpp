@@ -32,7 +32,7 @@
 #define ___UTIL_H___
 #include <string>
 #include <typeinfo>
-#include "Defs.h"
+#include "Defs.hpp"
 #include "korandom/korandom.h"
 
 /////////////// KoRandom random number generator

@@ -33,10 +33,10 @@
 #include <stl.h>
 #include <string>
 
-#include "Entity.h"
-#include "Primitive.h"
-#include "Exceptions.h"
-#include "Koyurugi.h"
+#include "Entity.hpp"
+#include "Primitive.hpp"
+#include "Exceptions.hpp"
+#include "libecs.hpp"
 
 // Tree data structures used for entry lists
 typedef map<const String,SubstancePtr> SubstanceList;
@@ -389,7 +389,7 @@ private:
 
 };
 
-#include "Reactor.h"
+#include "Reactor.hpp"
 /**
   Equivalent to Reactor::isRegularReactor except that
   this function object takes a reference to a ReactorList::value_type.

@@ -30,8 +30,8 @@
 
 #ifndef ___ROOTSYSTEM_H___
 #define ___ROOTSYSTEM_H___
-#include "System.h"
-#include "Primitive.h"
+#include "System.hpp"
+#include "Primitive.hpp"
 
 
 class RootSystem : public System

@@ -30,8 +30,8 @@
 
 #include <strstream>
 #include <stdio.h>
-#include "Message.h"
-#include "StringList.h"
+#include "Message.hpp"
+#include "StringList.hpp"
 
 ////////////////////// Message
 

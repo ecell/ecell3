@@ -30,8 +30,8 @@
 
 #ifndef __REACTANT_H___
 #define __REACTANT_H___
-#include "Substance.h"
-#include "Koyurugi.h"
+#include "Substance.hpp"
+#include "libecs.hpp"
 
 class Reactant
 {

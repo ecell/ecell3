@@ -32,8 +32,8 @@
 #define ___FQPN_H___
 #include <string>
 
-#include "Exceptions.h"
-#include "Primitive.h"
+#include "Exceptions.hpp"
+#include "Primitive.hpp"
 
 /** 
   SystemPath 

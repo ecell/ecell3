@@ -31,7 +31,7 @@
 
 #ifndef ___INTEGRATORS_H___
 #define ___INTEGRATORS_H___
-#include "Substance.h"
+#include "Substance.hpp"
 
 class Integrator
 {

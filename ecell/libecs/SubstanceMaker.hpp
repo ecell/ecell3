@@ -30,8 +30,8 @@
 
 #ifndef ___SUBSTANCEMAKER_H___
 #define ___SUBSTANCEMAKER_H___
-#include "ModuleMaker.h"
-#include "Substance.h"
+#include "ModuleMaker.hpp"
+#include "Substance.hpp"
 
 class SubstanceMaker : public StaticModuleMaker< Substance >
 {

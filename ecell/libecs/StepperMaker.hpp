@@ -28,15 +28,11 @@
 // E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
 
-
-
-
-
 #ifndef ___STEPPERMAKER_H___
 #define ___STEPPERMAKER_H___
 #include <stl.h>
-#include "Stepper.h"
-#include "ModuleMaker.h"
+#include "Stepper.hpp"
+#include "ModuleMaker.hpp"
 
 class StepperMaker : public StaticModuleMaker<Stepper>
 {

@@ -28,7 +28,7 @@
 // E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
 
-#include "Primitive.h"
+#include "Primitive.hpp"
 
 const String Primitive::PrimitiveTypeString( Type type )
 {

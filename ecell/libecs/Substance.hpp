@@ -33,9 +33,8 @@
 #include <cmath>
 #include <errno.h>
 #include <iostream.h>
-#include "Koyurugi.h"
-//#include "ecell/MessageWindow.h"
-#include "Entity.h"
+#include "libecs.hpp"
+#include "Entity.hpp"
 
 
 // exceptions

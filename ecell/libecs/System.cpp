@@ -30,13 +30,13 @@
 
 #include <memory>
 
-#include "System.h"
-#include "Reactor.h"
-#include "RootSystem.h"
-#include "Substance.h"
-#include "Stepper.h"
-#include "StepperMaker.h"
-#include "FQPN.h"
+#include "System.hpp"
+#include "Reactor.hpp"
+#include "RootSystem.hpp"
+#include "Substance.hpp"
+#include "Stepper.hpp"
+#include "StepperMaker.hpp"
+#include "FQPN.hpp"
 
 // instantiate primitive lists.
 template SubstanceList;

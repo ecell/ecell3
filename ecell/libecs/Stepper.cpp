@@ -28,17 +28,12 @@
 // E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
 
-
-
-
 #include <exception>
-#include "Stepper.h"
-#include "SystemMaker.h"
-//FIXME: #include "ecell/TimeManager.h"
-#include "util/Util.h"
-#include "Integrators.h"
-#include "RootSystem.h"
-
+#include "Stepper.hpp"
+#include "SystemMaker.hpp"
+#include "util/Util.hpp"
+#include "Integrators.hpp"
+#include "RootSystem.hpp"
 
 
 void StepperMaker::makeClassList()
