@@ -3,9 +3,9 @@
 # from file: LTD.eml, date: Mon Oct 14 19:51:27 2002
 #
 
-#Stepper Fehlberg23Stepper( DE_1 )
-Stepper DormandPrince547MStepper( DE_1 )
 #Stepper FixedRungeKutta4Stepper( DE_1 )
+#Stepper ODE23Stepper( DE_1 )
+Stepper ODE45Stepper( DE_1 )
 {
 	# no property
 }

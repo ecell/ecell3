@@ -2,8 +2,8 @@
 # A very simple model with one michaelis-uni-uni reaction.
 #
 
-#Stepper Fehlberg23Stepper( DE1 )
-Stepper FixedEuler1Stepper( DE1 )
+#Stepper ODE23Stepper( DE1 )
+Stepper FixedODE1Stepper( DE1 )
 {
 	# no property
 }

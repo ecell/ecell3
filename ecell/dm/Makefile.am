@@ -14,11 +14,11 @@ CatalyzedMassActionFluxProcess.cpp\
 SSystemProcess.cpp\
 NRProcess.cpp\
 NRStepper.cpp\
-FixedEuler1Stepper.cpp\
+FixedODE1Stepper.cpp\
 FixedRungeKutta4Stepper.cpp\
-Fehlberg23Stepper.cpp\
+ODE23Stepper.cpp\
 CashKarp45Stepper.cpp\
-DormandPrince547MStepper.cpp
+ODE45Stepper.cpp
 
 EXTRA_DIST = ${DMS}
 dmdir = ${DM_SRC_DIR}
