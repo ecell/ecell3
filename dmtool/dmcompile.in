@@ -1,12 +1,16 @@
 #!/bin/sh
 
 
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+
+
 CXX=@CXX@
 CXXFLAGS="@CXXFLAGS@"
 LDADD=-lstdc++
 SHLEXT=@LTDL_SHLIB_EXT@
 BASENAME=@BASENAME@
-
 CXXSUFFIX=".cpp"
 
 VERBOSE=1
@@ -50,7 +54,7 @@ compile()
 
 link()
 {
-	run_command $CXX -shared $OBJ -o $SOBJ -lecs
+	run_command $CXX -shared $OBJ -o $SOBJ $LDFLAGS
 }
 
 
@@ -93,6 +97,9 @@ OBJ=$CLASSNAME.o
 LOBJ=$CLASSNAME.lo
 LAOBJ=$CLASSNAME.la
 SOBJ=$CLASSNAME$SHLEXT
+
+#FIXME:
+LDFLAGS="-Wl,-rpath $libdir -L$libdir -lecs"
 
 
 ## main routine
