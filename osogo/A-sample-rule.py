@@ -34,7 +34,8 @@ aMainWindow.theCellModelObject = (
 ( SET, ( REACTOR, '/CELL/CYTOPLASM', 'R', 'AppendProduct' ), ('Substance:/CELL/CYTOPLASM:P',1) ), 
 ( SET, ( REACTOR, '/CELL/CYTOPLASM', 'R', 'AppendCatalyst' ), ('Substance:/CELL/CYTOPLASM:E',1) ), 
 ( SET, ( REACTOR, '/CELL/CYTOPLASM', 'R', 'KmS' ), (.01,) ), 
-( SET, ( REACTOR, '/CELL/CYTOPLASM', 'R', 'KcF' ), (1,) ), 
+( SET, ( REACTOR, '/CELL/CYTOPLASM', 'R', 'KcF' ), (1,) ),
+( SET, ( SYSTEM, '/', '/', 'StepInterval' ), (0.01,) )
 
 )
 
