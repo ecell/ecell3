@@ -35,7 +35,6 @@
 #include "VariableMaker.hpp"
 #include "ProcessMaker.hpp"
 #include "SystemMaker.hpp"
-//#include "AccumulatorMaker.hpp"
 #include "LoggerBroker.hpp"
 #include "Stepper.hpp"
 
@@ -55,7 +54,6 @@ namespace libecs
     theSystemMaker(      *new SystemMaker           ),
     theVariableMaker(   *new VariableMaker        ),
     theProcessMaker(     *new ProcessMaker          )
-    //    ,theAccumulatorMaker( *new AccumulatorMaker      )
   {
     theRootSystemPtr = getSystemMaker().make( "System" );
     theRootSystemPtr->setModel( this );
@@ -68,7 +66,6 @@ namespace libecs
   Model::~Model()
   {
     delete theRootSystemPtr;
-    //    delete &theAccumulatorMaker;
     delete &theProcessMaker;
     delete &theVariableMaker;
     delete &theSystemMaker;

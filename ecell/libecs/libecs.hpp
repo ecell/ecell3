@@ -85,11 +85,6 @@ namespace libecs
   DECLARE_CLASS( DataPointVector );
 
 
-  //  DECLARE_CLASS( AccumulatorMaker );
-  //  DECLARE_CLASS( Accumulator );
-  //  DECLARE_CLASS( Integrator );
-
-
   // containers
 
   DECLARE_VECTOR( Polymorph, PolymorphVector );

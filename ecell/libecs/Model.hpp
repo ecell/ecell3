@@ -294,7 +294,6 @@ namespace libecs
     SystemMakerRef      theSystemMaker;
     VariableMakerRef   theVariableMaker;
     ProcessMakerRef     theProcessMaker;
-    //    AccumulatorMakerRef theAccumulatorMaker;
 
 
   };

@@ -35,10 +35,6 @@
 #include "EntityType.hpp"
 #include "PropertySlotMaker.hpp"
 
-//#include "Accumulators.hpp"
-//#include "AccumulatorMaker.hpp"
-
-
 #include "Variable.hpp"
 
 
@@ -142,111 +138,6 @@ namespace libecs
 	  }
       }
   }
-
-
-
-#if 0
-
-  const String SRMVariable::SYSTEM_DEFAULT_ACCUMULATOR_NAME = "ReserveAccumulator";
-
-  //  const String SRMVariable::SYSTEM_DEFAULT_ACCUMULATOR_NAME = "SimpleAccumulator";
-
-
-  SRMVariable::SRMVariable()
-    : 
-    theAccumulator( NULLPTR ),
-    theFraction( 0 )
-  {
-    makeSlots();
-    // FIXME: use AccumulatorMaker
-    setAccumulator( new ReserveAccumulator );
-  } 
-
-  SRMVariable::~SRMVariable()
-  {
-    delete theAccumulator;
-  }
-
-
-  const String SRMVariable::getAccumulatorClass() const
-  {
-    return theAccumulator->getClassName();
-  }
-
-  void SRMVariable::setAccumulatorClass( StringCref anAccumulatorClassname )
-  {
-    AccumulatorPtr aAccumulatorPtr( getModel()->getAccumulatorMaker()
-				    .make( anAccumulatorClassname ) );
-    setAccumulator( aAccumulatorPtr );
-  }
-
-  void SRMVariable::setAccumulator( AccumulatorPtr anAccumulator )
-  {
-    if( theAccumulator != NULLPTR )
-      {
-	delete theAccumulator;
-      }
-
-    theAccumulator = anAccumulator;
-    theAccumulator->setOwner( this );
-    //    theAccumulator->update();
-  }
-
-
-
-  void SRMVariable::initialize()
-  {
-    // if the accumulator is not set, use user default
-    if( theAccumulator == NULLPTR )
-      {
-	setAccumulatorClass( SYSTEM_DEFAULT_ACCUMULATOR_NAME );
-      }
-
-    theAccumulator->update();
-  }
-
-
-  const Real SRMVariable::saveValue()
-  {
-    return theAccumulator->save();
-  }
-
-
-
-  void SRMVariable::loadValue( RealCref aValue )
-  {
-    Variable::loadValue( aValue );
-    theAccumulator->update();
-  }
-
-
-  void SRMVariable::integrate( RealCref aTime )
-  { 
-    if( isFixed() == false ) 
-      {
-	updateValue( aTime );
-
-	theAccumulator->accumulate();
-  
-	if( theValue < 0.0 ) 
-	  {
-	    theValue = 0.0;
-	    //FIXME:       throw LTZ();
-	  }
-      }
-  }
-
-  void SRMVariable::makeSlots()
-  {
-    registerSlot( getPropertySlotMaker()->
-		  createPropertySlot( "AccumulatorClass", *this,
-				      Type2Type<String>(),
-				      &SRMVariable::setAccumulatorClass,
-				      &SRMVariable::getAccumulatorClass ) );
-
-  }
-
-#endif // 0
 
 
 } // namespace libecs

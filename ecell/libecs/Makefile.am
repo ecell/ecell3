@@ -67,8 +67,6 @@ EntityType.hpp\
 System.hpp\
 Entity.hpp\
 Process.hpp\
-SRMProcess.hpp\
-RuleSRMProcess.hpp\
 StepperMaker.hpp\
 SystemMaker.hpp\
 DataPoint.hpp\
