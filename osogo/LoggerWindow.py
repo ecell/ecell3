@@ -65,7 +65,6 @@ class LoggerWindow(OsogoWindow):
 		self.theDefaultSaveDirectory='Data'
 		self.thePopupMenu = PopupMenu( self )
 		self.theList = []
-		self.theSimulator = self.theSession.theSimulator
 
 		# ---------------------------------------------------------------
 		# Creates save file selection
@@ -149,9 +148,6 @@ class LoggerWindow(OsogoWindow):
 	# return -> None
 	# ---------------------------------------------------------------
 	def resetAllValues( self, obj=None ):
-
-		# data_type
-		pass
 
 		# save_directory
 		self['directory_entry'].set_text(self.theDefaultSaveDirectory)
@@ -237,7 +233,7 @@ class LoggerWindow(OsogoWindow):
 	# ---------------------------------------------------------------
 	def saveData( self, obj ):
 
-		self.aGeneralSaveErrorMessage="couldn't save files."
+		aGeneralSaveErrorMessage="couldn't save files."
 
 		# -------------------------------------------------
 		# [0] clean up statusbar
@@ -358,7 +354,7 @@ class LoggerWindow(OsogoWindow):
 				# Gets logger
 				# -------------------------------------------------
 #                               need check if the logger exists
-				aLoggerStub = LoggerStub( self.theSimulator, aFullPNString )
+				aLoggerStub = self.theSession.createLoggerStub( aFullPNString )
 				if not aLoggerStub.isExist():
 					aErrorMessage='\nLogger doesn\'t exist.!\n'
 					aWarningWindow = ConfirmWindow(0,aErrorMessage)
@@ -383,10 +379,10 @@ class LoggerWindow(OsogoWindow):
 				# -------------------------------------------------
 				if anInterval == -1:
 					# gets data with specifing interval 
-					aMatrixData = aLoggerStub.getDataWithStartEnd( aStartTime, anEndTime )
+					aMatrixData = aLoggerStub.getData( aStartTime, anEndTime )
 				else:
 					# gets data without specifing interval 
-					aMatrixData = aLoggerStub.getDataWithStartEndInterval( aStartTime, anEndTime, anInterval )
+					aMatrixData = aLoggerStub.getData( aStartTime, anEndTime, anInterval )
 
 
 				# sets data name 
@@ -444,7 +440,7 @@ class LoggerWindow(OsogoWindow):
 		
 	def selection_function(self,tree,path,iter):
 			aPropertyName = self["loggerWindow_clist"].get_model().get_value(iter,0)
-			aSelectedPropertyNameList.append(aPropertyName)
+			self.aSelectedPropertyNameList.append(aPropertyName)
 
 	# end of theSelectedPropertyName
 
@@ -470,13 +466,13 @@ class LoggerWindow(OsogoWindow):
 
 		#		if self.isShown == gtk.TRUE:
 		#			self.theEntryList.clear()
-		return True
+#		return True
 		self.theFullPNList = self.theSession.getLoggerList()
 		self.theList = []
 
 		for aFullPNString in self.theFullPNList :
 
-			aLoggerStub = LoggerStub( self.theSession.theSimulator, aFullPNString )
+			aLoggerStub = self.theSession.createLoggerStub( aFullPNString )
 			start = str( aLoggerStub.getStartTime() )
 			if self.theMainWindow.theRunningFlag:
 				end = 'running'

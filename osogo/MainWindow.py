@@ -138,7 +138,7 @@ class MainWindow(OsogoWindow):
 		# creates LoggerWindow
 		# -------------------------------------
 		self.theLoggerWindow = LoggerWindow.LoggerWindow( self.theSession , self )
-#		self.theLoggerWindow.openWindow()
+		self.theLoggerWindow.openWindow()
 
 		# -------------------------------------
 		# creates InterfaceWindow
