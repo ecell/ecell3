@@ -6,10 +6,11 @@ from ViewWindow import *
 
 class PluginWindow(ViewWindow):
     '''
-    theFullPNList()
-    theFullIDList()
-    theFullPN()
-    theFullID()
+    self.theRawFullPNList : [ FullPN1, FullID2, FullPN3, , , ]
+    theFullPNList()       : [ FullPN1, FullPN2, FullPN3, , , ]
+    theFullIDList()       : [ FullID1, FullID2, FullID3, , , ]
+    theFullPN()           : FullPN1
+    theFullID()           : FullID1
     '''
 
     def __init__( self, dirname, sim, data, pluginmanager ):
