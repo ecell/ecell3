@@ -12,6 +12,11 @@ import libglade
 class Window:
 
     def __init__( self, gladefile=None, root=None ):
+
+        # load (CLASSNAME).glade by default
+        if gladefile == None:
+            gladefile = self.__class__.__name__ + ".glade"
+
         self.widgets = libglade.GladeXML( filename=gladefile, root=root )
 
     def addHandlers( self, handlers ):
