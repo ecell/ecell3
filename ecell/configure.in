@@ -166,12 +166,12 @@ dnl boost package
 dnl
 dnl
 AC_ARG_WITH( boost-include-dir,,
-  [$BOOST_INCLUDE="-I$withval"],
-  [$BOOST_INCLUDE=])
+  [BOOST_INCLUDE="-I$withval"],
+  [BOOST_INCLUDE=])
 AC_SUBST(BOOST_INCLUDE)
 AC_ARG_WITH( boost-lib-dir,,
-  [$BOOST_LIB="-L$withval"],
-  [$BOOST_LIB=])
+  [BOOST_LIB="-L$withval"],
+  [BOOST_LIB=])
 AC_SUBST(BOOST_LIB)
 
 dnl if test "$BOOST_DIR" = "" ; then
