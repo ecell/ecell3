@@ -25,9 +25,10 @@ class EntryListWindow(Window):
                             'entry_list_selection_changed' : self.selectEntity
                             } )
 
-        self.theSimulator = aMainWindow.theSimulator
         self.theMainWindow = aMainWindow
+        self.theSimulator = aMainWindow.theSimulator
         self.thePaletteWindow = aMainWindow.thePaletteWindow
+
         self.theSystemTree = self.getWidget( 'system_tree' )
         self.theEntryList = self.getWidget( 'entry_list' )
         self.theTypeOptionMenu = self.getWidget( 'type_optionmenu' )
@@ -120,11 +121,7 @@ class EntryListWindow(Window):
         
     def openNewPluginWindow( self, button_obj ) :
         
-        aPluginList = self.thePaletteWindow.get_data( 'plugin_list' )
-        for plugin_name in aPluginList :
-            aButton = self.thePaletteWindow.get_data( plugin_name )
-            if aButton.get_active() :
-                aPluginName = plugin_name
+        aPluginName = self.thePaletteWindow.getSelectedPluginName()
 
         print self.theSelectedFullPNList
         self.theMainWindow.thePluginManager.createInstance( aPluginName,

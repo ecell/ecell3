@@ -36,6 +36,14 @@ class PaletteWindow(GtkWindow):
                     self.set_data( aModuleName, aButton )
 
         self.set_data( 'plugin_list' , aPluginNameList )
+
+    def getSelectedPluginName( self ):
+        aPluginList = self.get_data( 'plugin_list' )
+        for aPluginName in aPluginList :
+            aButton = self.get_data( aPluginName )
+            if aButton.get_active() :
+                aSelectedPluginName = aPluginName
+        return aSelectedPluginName
         
 def mainLoop():
     aPaletteWindow = PaletteWindow()
