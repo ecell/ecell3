@@ -693,22 +693,22 @@ namespace libecs
 	       |  (rootNode( ch_p('-') ) >> term) );
 	}
       
-	rule<ScannerT, parser_context, parser_tag<VARIABLE> >     variable;
-	rule<ScannerT, parser_context, parser_tag<CALL_FUNC1> >   call_func;
-	rule<ScannerT, parser_context, parser_tag<EXPRESSION> >   expression;
-	rule<ScannerT, parser_context, parser_tag<TERM> >         term;
-	rule<ScannerT, parser_context, parser_tag<POWER> >        power;
-	rule<ScannerT, parser_context, parser_tag<FACTOR> >       factor;
-	rule<ScannerT, parser_context, parser_tag<FLOATING> >     floating;
-	rule<ScannerT, parser_context, parser_tag<EXPONENT> >     exponent;
-	rule<ScannerT, parser_context, parser_tag<INTEGER> >      integer;
-	rule<ScannerT, parser_context, parser_tag<NEGATIVE> >     negative;
-	rule<ScannerT, parser_context, parser_tag<GROUP> >        group;
-	rule<ScannerT, parser_context, parser_tag<IDENTIFIER> >   identifier;
-	rule<ScannerT, parser_context, parser_tag<CONSTANT> >     constant;
-	rule<ScannerT, parser_context, parser_tag<SYSTEM_FUNC> >  system_func;
+	rule<ScannerT, parser_context<>, parser_tag<VARIABLE> >     variable;
+	rule<ScannerT, parser_context<>, parser_tag<CALL_FUNC1> >   call_func;
+	rule<ScannerT, parser_context<>, parser_tag<EXPRESSION> >   expression;
+	rule<ScannerT, parser_context<>, parser_tag<TERM> >         term;
+	rule<ScannerT, parser_context<>, parser_tag<POWER> >        power;
+	rule<ScannerT, parser_context<>, parser_tag<FACTOR> >       factor;
+	rule<ScannerT, parser_context<>, parser_tag<FLOATING> >     floating;
+	rule<ScannerT, parser_context<>, parser_tag<EXPONENT> >     exponent;
+	rule<ScannerT, parser_context<>, parser_tag<INTEGER> >      integer;
+	rule<ScannerT, parser_context<>, parser_tag<NEGATIVE> >     negative;
+	rule<ScannerT, parser_context<>, parser_tag<GROUP> >        group;
+	rule<ScannerT, parser_context<>, parser_tag<IDENTIFIER> >   identifier;
+	rule<ScannerT, parser_context<>, parser_tag<CONSTANT> >     constant;
+	rule<ScannerT, parser_context<>, parser_tag<SYSTEM_FUNC> >  system_func;
 
-	rule<ScannerT, parser_context, parser_tag<EXPRESSION> > const&
+	rule<ScannerT, parser_context<>, parser_tag<EXPRESSION> > const&
 	start() const { return expression; }
       };
 
