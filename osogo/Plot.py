@@ -175,12 +175,11 @@ class Axis:
             relativeCoord = aCoord - self.theParent.theOrigo[0]
         else:
             relativeCoord = self.theParent.theOrigo[1] - aCoord
-                
         if self.theScaleType == SCALE_LINEAR:
             aNumber = float( relativeCoord ) * self.thePixelSize + self.theFrame[0]
         else:
             aNumber = pow(10, float ( relativeCoord ) * self.thePixelSize ) * self.theFrame[0]
-            
+        return aNumber            
 
 
     def reprintLabels(self):
@@ -593,8 +592,8 @@ class DataSeries:
         if y0 > downLimit:
             y0 = downLimit
 
-        if y1 < uplimit:
-            y1 = uplimit
+        if y1 < upLimit:
+            y1 = upLimit
         if y1 > downLimit:
             y1 = downLimit
         return [ y0, y1 ]
@@ -813,12 +812,13 @@ class Plot:
         return self.theXAxis.getFullPNString()
 
     def setXAxis( self, aFullPNString ):
-        if aFullPNString == TIME_AXIS:
-            oldFullPN = self.theXAxis.getFullPNString()
+        oldFullPN = self.theXAxis.getFullPNString()
+        if oldFullPN != TIME_AXIS:
             self.theSeriesMap[ oldFullPN ].switchOn()
+        if aFullPNString == TIME_AXIS:
             self.doesConnectPoints = True
         else:
-            self.theSeriesMap[ oldFullPN ].switchOff()
+            self.theSeriesMap[ aFullPNString ].switchOff()
             self.doesConnectPoints = False
         self.theXAxis.setFullPNString( aFullPNString )
         self.requestData()
@@ -931,7 +931,7 @@ class Plot:
         #call superclass
         #redraw
         for fpn in FullPNStringList:
-            self.releaseColor ( aSeriesMap[ fpn ].getColor() )
+            self.releaseColor ( self.theSeriesMap[ fpn ].getColor() )
             self.theSeriesMap.__delitem__( fpn )
         self.totalRedraw()
 
@@ -1171,10 +1171,11 @@ class Plot:
         # retunrs [xcoord, ycoord] or None if outside
         realCoords = [0,0]
         realCoords[0] = self.theXAxis.convertCoordToNumber( x )
-        if realCoords[0] < self.theXAxis.theFrame[0] or realCoords[0] > self.theXAxis.thFrame[1]:
+
+        if realCoords[0] < self.theXAxis.theFrame[0] or realCoords[0] > self.theXAxis.theFrame[1]:
             return None
         realCoords[1] = self.theYAxis.convertCoordToNumber ( y )
-        if realCoords[1] < self.theYAxis.theFrame[0] or realCoords[1] > self.theYAxis.thFrame[1]:
+        if realCoords[1] < self.theYAxis.theFrame[0] or realCoords[1] > self.theYAxis.theFrame[1]:
             return None
         return realCoords
 
@@ -1211,11 +1212,13 @@ class Plot:
         if self.theZoomKeyPressed and event.button==1:
             #draw old inverz rectangle
             self.drawxorbox(self.realx0,self.realy0,self.realx1,self.realy1)
+
             #call zoomIn    
             self.theZoomKeyPressed=False            
-            if self.realx0<self.realx1 and self.realy0<self.realy1:
+            if self.realx0 < self.realx1 and self.realy0 < self.realy1:
                 coords0 = self.convertPlotCoordinates( self.realx0, self.realy0 )
                 coords1 = self.convertPlotCoordinates( self.realx1, self.realy1 )
+
                 if coords0 != None and coords1 != None:
                     newxframe = [ coords0[0], coords1[0] ]
                     newyframe = [ coords0[1], coords1[1] ]
@@ -1226,20 +1229,22 @@ class Plot:
     def zoomIn(self, newxframe, newyframe):
         #increase zoomlevel
         self.theZoomLevel+=1
+        
         #add new frames to zoombuffer
-        self.theZoomBuffer.append([[self.xframe[0],self.xframe[1]],
-                                [self.theFrame[0],self.theFrame[1]]])
+        self.theZoomBuffer.append([self.theXAxis.theFrame[:],
+                                self.theYAxis.theFrame[:]])
         self.theXAxis.theFrame[0] = newxframe[0]
         self.theXAxis.theFrame[1] = newxframe[1]
         self.theYAxis.theFrame[0] = newyframe[1]
         self.theYAxis.theFrame[1] = newyframe[0]
-        self.requestData( newxframe[0], newxframe[1] ) 
+        self.requestDataSlice( newxframe[0], newxframe[1] ) 
         self.totalRedraw()
         
 
     def zoomOut(self):
         #if zoomlevel 0 do nothing
         if self.theZoomLevel == 1:
+            self.theZoomLevel -= 1
             self.theZoomBuffer = []
             self.requestData()
         #if zoomlevel 1 delete zoombuffer call setmode(MODE_HISTORY)
@@ -1247,11 +1252,9 @@ class Plot:
             self.theZoomLevel -= 1
             newframes = []
             newframes=self.theZoomBuffer.pop()
-            self.theXAxis.theFrame[0] = newframes[0][0]
-            self.theXAxis.theFrame[1] = newframes[0][1]
-            self.theYAxis.theFrame[0]=newframes[1][0]
-            self.theYAxis.theFrame[1]=newframes[1][1]
-            self.requestData( self.theXAxis.theFrame[0],  self.theXAxis.theFrame[1] )
+            self.theXAxis.theFrame = newframes[0]
+            self.theYAxis.theFrame = newframes[1]
+            self.requestDataSlice( self.theXAxis.theFrame[0],  self.theXAxis.theFrame[1] )
         self.totalRedraw()
             
 

@@ -103,16 +103,13 @@ class OsogoPluginManager(PluginManager):
                 self.thePluginWindowNumber[ classname ] += 1
             else:
                 self.thePluginWindowNumber[ classname ] = 1
-
             title = "%s%d" %(title,self.thePluginWindowNumber[ classname ])
-
 
         # Nothing is selected.
         if len(data) == 0:
             self.printMessage("Nothing is selected.")
 
         else:
-
             try:
                 instance = plugin.createInstance( data, self, rootWidget )
             except TypeError:

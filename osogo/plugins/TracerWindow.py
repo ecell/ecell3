@@ -132,7 +132,7 @@ class TracerWindow( OsogoPluginWindow ):
    
            
     def createLogger( self, fpnlist ):
-        if not self.theSession.isRunning():
+        if self.theSession.isRunning():
             return
         logPolicy = self.theSession.getLogPolicyParameters()
         for fpn in fpnlist:
@@ -279,17 +279,19 @@ class TracerWindow( OsogoPluginWindow ):
 
     # ========================================================================
     def addTraceToList( self, added_list ):
-        self.noHandle = True
+
         xAxis = self.thePlotInstance.getXAxisFullPNString()
         for fpn in added_list:
             iter=self.theListStore.append()
+            self.noHandle = True
             aSeries = self.thePlotInstance.getDataSeries( fpn )
             self.theListStore.set_value( iter, COL_PIX, aSeries.getPixBuf() ) #set pixbuf
             self.theListStore.set_value( iter, COL_TXT, fpn ) #set text
             self.theListStore.set_value( iter, COL_ON, aSeries.isOn() ) #trace is on by default
             self.theListStore.set_value( iter, COL_X, fpn == xAxis ) #set text
+            self.noHandle = False
         self.refreshLoggers()
-        self.noHandle = False
+
 
 
     # ========================================================================
@@ -345,20 +347,23 @@ class TracerWindow( OsogoPluginWindow ):
         if theFullPN != "Time":
             if theFullPN not in self.thePlotInstance.getDataSeriesNames():
                 return
+
         self.thePlotInstance.setXAxis( theFullPN )
         #switch off trace
+        anIter=self.theListStore.get_iter_first(  )
         while True:
             if anIter == None:
                 return None
             aTitle = self.theListStore.get_value(anIter, COL_TXT )
 
 
-            if aTitle == aFullPNString:
-                self.noHandle = True
-                self.theListStore.set_value( iter, COL_ON, aSeries.isOn() )
-                self.theListStore.set_value( iter, COL_X, theFullPN == aTitle )
-                self.noHandle = False
-                break
+#            if aTitle == theFullPN:
+            self.noHandle = True
+            aSeries = self.thePlotInstance.getDataSeries( aTitle )
+            self.theListStore.set_value( anIter, COL_ON, aSeries.isOn() )
+            self.theListStore.set_value( anIter, COL_X, theFullPN == aTitle )
+            self.noHandle = False
+
             anIter=self.theListStore.iter_next( anIter )
         
             
@@ -521,9 +526,10 @@ class TracerWindow( OsogoPluginWindow ):
         text = self.theListStore.get_value( iter, COL_TXT )
         aSeries = self.thePlotInstance.getDataSeries( text )
         if aSeries.isOn( ):
-            aSeries.switchOn()
-        else:
             aSeries.switchOff()
+        else:
+            aSeries.switchOn()
+        self.thePlotInstance.totalRedraw()
         self.noHandle = True
         self.theListStore.set_value( iter, COL_ON, aSeries.isOn() )
         self.noHandle = False
@@ -535,14 +541,13 @@ class TracerWindow( OsogoPluginWindow ):
     def loggerTickBoxChecked(self, cell, path, model):
         if self.noHandle:
             return
-        if not self.checkRun():
-            return
-
         iter = model.get_iter( ( int ( path ), ) )
         fixed = model.get_value( iter, COL_LOG )
         text = self.theListStore.get_value( iter, COL_TXT )
-        
-        if fixed==gtk.FALSE:
+      
+        if fixed == gtk.FALSE:
+            if self.checkRun():
+                return
             self.createLogger( [text] )
             self.refreshLoggers()  
     
