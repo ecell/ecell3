@@ -7,7 +7,7 @@
   <!ENTITY legal SYSTEM "legal.xml">
   <!ENTITY appversion "3.1.99">
   <!ENTITY manrevision "0.0">
-  <!ENTITY date "Nov 2002">
+  <!ENTITY date "Oct 2003">
   <!ENTITY app "<application>E-Cell Simulation Environment</application>">
   <!ENTITY ecell "<productname>E-Cell</productname>">
   <!-- Information about the entities
@@ -22,6 +22,7 @@
   <!ENTITY intro SYSTEM "intro.xml">
   <!ENTITY running SYSTEM "running.xml">
   <!ENTITY modeling SYSTEM "modeling.xml">
+  <!ENTITY modelingtutorial SYSTEM "modelingtutorial.xml">
   <!ENTITY dm SYSTEM "dm.xml">
   <!ENTITY scripting SYSTEM "scripting.xml">
   <!ENTITY stddmlib SYSTEM "stddmlib.xml">
@@ -202,6 +203,7 @@
   &intro;
   &running;
   &modeling;
+  &modelingtutorial;
   &scripting;
   &dm;
   &stddmlib;
