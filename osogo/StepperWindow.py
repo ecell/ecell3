@@ -111,17 +111,20 @@ class StepperWindow(OsogoWindow):
 		self.addHandlers({ \
 
 				# StepperID list
-				'on_stepper_id_list_select'   : self.selectStepperID, 
+				'on_stepper_id_list_select'
+				: self.selectStepperID, 
 
 				# Property list
-				'on_property_list_select_row' : self.selectProperty, 
+				'on_property_list_select_row'
+				: self.selectProperty, 
 
 				# update button
-				'on_update_button_clicked'    : self.updateProperty, 
+				'on_update_button_clicked'
+				: self.updateProperty, 
 
 				# close button
-	  			'on_close_button_clicked'     : self.closeWindow,
-
+	  			'on_close_button_clicked'
+				: self.closeWindow,
 			})
 
 
