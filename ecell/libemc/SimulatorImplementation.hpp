@@ -195,7 +195,7 @@ namespace libemc
     virtual void stop() = 0;
 
     virtual void setEventChecker( EventCheckerPtr 
-					 aEventChecker ) = 0;
+				  aEventChecker ) = 0;
 
     virtual void setEventHandler( EventHandlerPtr anEventHandler ) = 0;
 

@@ -32,7 +32,6 @@ class Session:
         execfile( ecs )
 
     def loadModel( self, aFile ):
-        print type( aFile )
         if type( aFile ) == str:
             aFileObject = open( aFile )
         else:
@@ -47,6 +46,9 @@ class Session:
         self.__loadEntityPropertyList( 'System::/', aPropertyList )
 
         self.__loadEntity()
+
+        self.theSimulator.initialize()
+
         
     def saveModel( self ):
         pass

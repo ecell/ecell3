@@ -138,9 +138,9 @@ namespace libemc
     virtual const libecs::Int 
     getLoggerSize( libecs::StringCref aFullPNString ) const;
 
-    void step();
+    virtual void step();
 
-    void initialize();
+    virtual void initialize();
 
     virtual const libecs::Real getCurrentTime() const;
 
@@ -150,10 +150,9 @@ namespace libemc
 
     virtual void stop();
 
-    virtual void setEventChecker( EventCheckerPtr
-					 aEventChecker );
-
     void clearEventChecker();
+
+    virtual void setEventChecker( EventCheckerPtr aEventChecker );
 
     virtual void setEventHandler( EventHandlerPtr anEventHandler );
 
