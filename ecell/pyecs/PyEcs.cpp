@@ -177,8 +177,8 @@ BOOST_PYTHON_MODULE( _ecs )
 
 
 
-  class_<VariableReferenceVector, bases<>, VariableReferenceVector>
-    ( "VariableReferenceVector" )
+  class_<VariableReferenceVector>( "VariableReferenceVector" )
+    //, bases<>, VariableReferenceVector>
 
     .def( vector_indexing_suite<VariableReferenceVector>() )
     ;

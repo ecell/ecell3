@@ -35,8 +35,12 @@
 #include <functional>
 #include <limits>
 
+// for boost-1.32.0 or later.
+#include <boost/numeric/conversion/cast.hpp>
+// use this instead for boost-1.31 or 1.30.
+// #include <boost/cast.hpp>
+
 #include <boost/lexical_cast.hpp>
-#include <boost/cast.hpp>
 #include <boost/static_assert.hpp>
 #include <boost/type_traits.hpp>
 
