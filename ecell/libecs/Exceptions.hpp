@@ -43,62 +43,46 @@ public:
     : theMethod( method ), theMessage( message ) {}
   virtual ~Exception() {}
 
-  virtual const char* what() const 
-    { return "E-Cell Core System Standard Exception"; }
-
   virtual const String message() const 
     {
 #ifdef DEBUG
       return theMethod + ":\n" + 
-	String( getClassName() ) + ": " + what() + ": \n\t"
-	+ theMessage + "\n";
+	String( getClassName() ) + ": " + theMessage + "\n";
 #else
-      return String( getClassName() ) + ": " + what() + ": \n\t"
-	+ theMessage + "\n";
+      return String( getClassName() ) + ": " + theMessage + "\n";
 #endif /* DEBUG */
     }
 
+  virtual const char* what() const { return theMessage.c_str(); }
   virtual const char* const getClassName() const  {return "Exception";}
 
 protected:
 
-  const String theMethod;
   const String theMessage;
+  const String theMethod;
 };
 
-#define DEFINE_EXCEPTION( CLASSNAME, BASECLASS, WHAT )\
+#define DEFINE_EXCEPTION( CLASSNAME, BASECLASS )\
 class CLASSNAME : public BASECLASS\
 {\
 public:\
   CLASSNAME( StringCref method, StringCref message = "" )\
     :  BASECLASS( method, message ) {}\
   virtual ~CLASSNAME() {}\
-  const char* what() const { return WHAT; }\
   virtual const char* const getClassName() const\
     { return #CLASSNAME ; }\
 };\
 
-DEFINE_EXCEPTION( UnexpectedError,       Exception, 
-		  "Unexpected error" );
-DEFINE_EXCEPTION( NotFound,              Exception,
-		  "Not found" );
-DEFINE_EXCEPTION( CantOpen,              Exception, 
-		  "Can't open file" );
-DEFINE_EXCEPTION( BadID,                 Exception, 
-		  "Bad ID" );
-DEFINE_EXCEPTION( MessageException,      Exception, 
-		  "Message Exception" );
-DEFINE_EXCEPTION( CallbackFailed,        Exception,
-		  "Callback has Failed" );
-DEFINE_EXCEPTION( BadMessage,            MessageException, 
-		  "Bad Message" );
-DEFINE_EXCEPTION( NoMethod,              MessageException, 
-		  "No method registered for the slot" );
-DEFINE_EXCEPTION( NoSlot,                MessageException, 
-		  "No slot found for the message" );
-DEFINE_EXCEPTION( InvalidPrimitiveType,  Exception,
-		  "Invalid PrimitiveType" );
-
+DEFINE_EXCEPTION( UnexpectedError,       Exception);
+DEFINE_EXCEPTION( NotFound,              Exception);
+DEFINE_EXCEPTION( CantOpen,              Exception); 
+DEFINE_EXCEPTION( BadID,                 Exception); 
+DEFINE_EXCEPTION( MessageException,      Exception);
+DEFINE_EXCEPTION( CallbackFailed,        Exception);
+DEFINE_EXCEPTION( BadMessage,            MessageException); 
+DEFINE_EXCEPTION( NoMethod,              MessageException);
+DEFINE_EXCEPTION( NoSlot,                MessageException);
+DEFINE_EXCEPTION( InvalidPrimitiveType,  Exception);
 
 #endif /* ___EXCEPTIONS_H___ */
 
