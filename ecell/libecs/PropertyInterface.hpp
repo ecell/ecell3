@@ -115,16 +115,15 @@ namespace libecs
        @return a borrowed pointer to the PropertySlot with the name.
     */
 
-    virtual PropertySlotPtr getPropertySlot( StringCref aPropertyName ) const
+    PropertySlotPtr getPropertySlot( StringCref aPropertyName ) const
     {
       return getPropertySlotMap().find( aPropertyName )->second;
     }
 
+    virtual const Polymorph getPropertyList() const;
 
-
-    const Polymorph getPropertyList() const;
-
-    const Polymorph getPropertyAttributes( StringCref aPropertyName ) const;
+    virtual const Polymorph 
+    getPropertyAttributes( StringCref aPropertyName ) const;
 
 
     /// @internal 
@@ -163,6 +162,13 @@ namespace libecs
 
     void registerSlot( StringCref aName, PropertySlotPtr aPropertySlotPtr );
     void removeSlot( StringCref aName );
+
+
+    virtual void defaultSetProperty( StringCref aPropertyName, 
+				     PolymorphCref aValue );
+
+    virtual const Polymorph 
+    defaultGetProperty( StringCref aPorpertyName ) const;
 
   private:
 

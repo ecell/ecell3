@@ -125,15 +125,14 @@ namespace libecs
     PropertySlotMapConstIterator 
       aPropertySlotMapIterator( thePropertySlotMap.find( aPropertyName ) );
 
-    if( aPropertySlotMapIterator == thePropertySlotMap.end() )
+    if( aPropertySlotMapIterator != thePropertySlotMap.end() )
       {
-	THROW_EXCEPTION( NoSlot,
-			 getClassName() + 
-			 String(": No property slot found with name [")
-			 + aPropertyName + "].  Set property failed." );
+	aPropertySlotMapIterator->second->setPolymorph( aValue );
       }
-
-    aPropertySlotMapIterator->second->setPolymorph( aValue );
+    else
+      {
+	defaultSetProperty( aPropertyName, aValue );
+      }
   }
 
   const Polymorph
@@ -142,16 +141,35 @@ namespace libecs
     PropertySlotMapConstIterator 
       aPropertySlotMapIterator( thePropertySlotMap.find( aPropertyName ) );
 
-    if( aPropertySlotMapIterator == thePropertySlotMap.end() )
+    if( aPropertySlotMapIterator != thePropertySlotMap.end() )
       {
-	THROW_EXCEPTION( NoSlot, 
-			 getClassName() + 
-			 String(": No property slot found with name [")
-			 + aPropertyName + "].  Get property failed." );
+	return aPropertySlotMapIterator->second->getPolymorph();
       }
-
-    return aPropertySlotMapIterator->second->getPolymorph();
+    else
+      {
+	return defaultGetProperty( aPropertyName );
+      }
   }
+
+
+  void PropertyInterface::defaultSetProperty( StringCref aPropertyName, 
+					      PolymorphCref aValue )
+  {
+    THROW_EXCEPTION( NoSlot,
+		     getClassName() + 
+		     String( ": No property slot found by name [" )
+		     + aPropertyName + "].  Set property failed." );
+  }
+
+  const Polymorph 
+  PropertyInterface::defaultGetProperty( StringCref aPropertyName ) const
+  {
+    THROW_EXCEPTION( NoSlot, 
+		     getClassName() + 
+		     String( ": No property slot found by name [" )
+		     + aPropertyName + "].  Get property failed." );
+  }
+
 
   /*
   void PropertyInterface::connectLogger( LoggerPtr aLoggerPtr )
