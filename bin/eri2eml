@@ -130,7 +130,7 @@ Options:
 
     anEml = Eml()
 
-    anEml.createStepper( 'Euler1Stepper', 'SRM_01')
+    anEml.createStepper( 'FixedODE1Stepper', 'SRM_01')
 
     aSystemFullID='System::/'
     anEml.createEntity( 'System', aSystemFullID )
@@ -162,13 +162,16 @@ Options:
             aSystemFullID = 'Process:' +aSystemID
             if ( anEriLine[1] == 'ConstantParameterReactor' ): # set Volume of the System.
                 aSystemID = anEriLine[2].split(':')[0]
-                if ( aSystemID == '/ENVIRONMENT'):
-                    aSystemFullID = 'System::/'    # /ENVIRONMENT set as the RootSystem
-                else:
-                    aSystemFullID = convertSystemID2SystemFullID( aSystemID )
+#                if ( aSystemID == '/ENVIRONMENT'):
+#                    aSystemFullID = 'System::/'    # /ENVIRONMENT set as the RootSystem
+#                else:
+#                    aSystemFullID = convertSystemID2SystemFullID( aSystemID )
+
+                aVariableFullID = 'Variable:' + aSystemID + ':SIZE' # Volume is set as Variable(SIZE)
+                anEml.createEntity( 'Variable', aVariableFullID )
+                
                 anEriChunk = anEriLine[4].split()
-#                print anEriChunk[1:]
-                anEml.setEntityProperty( aSystemFullID, 'Volume', anEriChunk[1:] )
+                anEml.setEntityProperty( aVariableFullID, 'Value', anEriChunk[1:] )
                 
             else:                                              # set other parameters
                 anEml.createEntity( anEriLine[1], aSystemFullID )
@@ -187,14 +190,16 @@ Options:
                         aSubstrateList = []
                         aSubstrateList.append( 'S' + str(aSubstrateNumber) )
                         aSubstrateNumber = aSubstrateNumber + 1
-                        aSubstrateList.append( 'Variable:' + anEriChunkElement[1])
+                        aSubstrateID = replaceProhibitLetter( anEriChunkElement[1] )
+                        aSubstrateList.append( 'Variable:' + aSubstrateID )
                         aSubstrateList.append( str(-1 * int(anEriChunkElement[2])) )
                         aVariableReferenceList.append( aSubstrateList )
                     elif ( anEriChunkElement[0] == 'Product' ):
                         aProductList = []
                         aProductList.append( 'P' + str(aProductNumber) )
                         aProductNumber = aProductNumber + 1
-                        aProductList.append( 'Variable:' + anEriChunkElement[1])
+                        aProductID = replaceProhibitLetter( anEriChunkElement[1] )
+                        aProductList.append( 'Variable:' + aProductID )
                         aProductList.append( str(1 * int(anEriChunkElement[2])) )
                         aVariableReferenceList.append( aProductList )
 
@@ -202,7 +207,8 @@ Options:
                         aCatalystList = []
                         aCatalystList.append( 'C' + str(aCatalystNumber) )
                         aCatalystNumber = aCatalystNumber + 1
-                        aCatalystList.append( 'Variable:' + anEriChunkElement[1])
+                        aCatalystID =replaceProhibitLetter( anEriChunkElement[1] ) 
+                        aCatalystList.append( 'Variable:' + aCatalystID )
                         aCatalystList.append( '0' )
                         aVariableReferenceList.append( aCatalystList )
 
@@ -210,12 +216,14 @@ Options:
                         anEffectorList = []
                         anEffectorList.append( 'E' + str(anEffectorNumber) )
                         anEffectorNumber = anEffectorNumber + 1
-                        anEffectorList.append( 'Variable:' + anEriChunkElement[1])
+                        anEffectorID = replaceProhibitLetter( anEriChunkElement[1] )
+                        anEffectorList.append( 'Variable:' + anEffector )
                         anEffectorList.append( '0' )
                         aVariableReferenceList.append( anEffectorList )
 
                     else:
-                        anEml.setEntityProperty( aSystemFullID, anEriChunkElement[0], anEriChunkElement[1:] )
+                        aPropertyID = replaceProhibitLetter( anEriChunkElement[0] )
+                        anEml.setEntityProperty( aSystemFullID, aPropertyID, anEriChunkElement[1:] )
 
                 # set VariableReferenceList
                 anEml.setEntityProperty( aSystemFullID, 'VariableReferenceList', aVariableReferenceList )
