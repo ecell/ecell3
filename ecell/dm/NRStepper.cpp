@@ -188,12 +188,11 @@ void NRStepper::interrupt( StepperPtr const aCaller )
     }
 
   NREventCref aTopEvent( thePriorityQueue.top() );
-  const Real aCallerCurrentTime( aCaller->getCurrentTime() );
   const Real aNewTime( aTopEvent.getTime() );
 
   // reschedule this Stepper to aNewStepInterval past current time of
   // the interruption caller.
-  setStepInterval( aNewTime - aCallerCurrentTime );
+  setStepInterval( aNewTime - getCurrentTime() );
   getModel()->reschedule( this );
 }
 
