@@ -514,10 +514,10 @@ namespace libecs
 	      goto next;
 	    }
 
-	  case ExpressionCompiler::HALT:
+	  case ExpressionCompiler::RET:
 	    {
-              //DECODE_INSTRUCTION( HALT );
-	      //INCREMENT_PC( HALT );
+              //DECODE_INSTRUCTION( RET );
+	      //INCREMENT_PC( RET );
 
 	      return aStackPtr->theReal;
 	    }
@@ -583,7 +583,7 @@ namespace libecs
 	      break;
 	    }
 
-	  case ExpressionCompiler::HALT:
+	  case ExpressionCompiler::RET:
 	    {
 	      return bypass;
 	    }

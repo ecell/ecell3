@@ -97,7 +97,7 @@ namespace libecs
 	, DIV    // no arg
 	, POW    // no arg
 	, NEG    // no arg
-	, HALT   // no arg
+	, RET   // no arg
 	// Those instructions above are candidates of stack operations folding
 	// in the stack machine, and grouped here to optimize the switch().
 
@@ -565,7 +565,7 @@ namespace libecs
   DEFINE_OPCODE2INSTRUCTION( VARREF_TO_SYSTEM_METHOD );
   DEFINE_OPCODE2INSTRUCTION( PROCESS_TO_SYSTEM_METHOD );
   DEFINE_OPCODE2INSTRUCTION( SYSTEM_TO_REAL_METHOD );
-  DEFINE_OPCODE2INSTRUCTION( HALT );
+  DEFINE_OPCODE2INSTRUCTION( RET );
   DEFINE_OPCODE2INSTRUCTION( NOP );
 
   void ExpressionCompiler::setConstantMap()
@@ -594,8 +594,8 @@ namespace libecs
       {
 	compileTree( info.trees.begin(), aCode );
 	  
-	// place HALT at the tail.
-	appendInstruction( aCode, Instruction<HALT>() );
+	// place RET on the tail.
+	appendInstruction( aCode, Instruction<RET>() );
       }
     else
       {
