@@ -1,4 +1,4 @@
-from libsbml import *
+import libsbml
 
 #---Other functions are using this 'sub'funtion in this file.---
 def sub( fun , indata ):
@@ -79,10 +79,10 @@ def getEvent( aSBMLmodel ):
             aName_Ev = anEvent.getName()
             
             anASTNode_Ev_Tr = anEvent.getTrigger()
-            aString_Ev_Tr = sub( formulaToString , anASTNode_Ev_Tr )
+            aString_Ev_Tr = sub( libsbml.formulaToString , anASTNode_Ev_Tr )
             
             anASTNode_Ev_De = anEvent.getDelay()
-            aString_Ev_De = sub( formulaToString , anASTNode_Ev_Tr )
+            aString_Ev_De = sub( libsbml.formulaToString , anASTNode_Ev_Tr )
             
             aTimeUnit_Ev = anEvent.getTimeUnits()
             
@@ -97,7 +97,7 @@ def getEvent( aSBMLmodel ):
                     aVariable_Ev_As = anEventAssignment.getVariable()
                     
                     anASTNode_Ev_As = anEventAssignment.getMath()
-                    aString_Ev_As = sub( formulaToString , anASTNode_Ev_As )
+                    aString_Ev_As = sub( libsbml.formulaToString , anASTNode_Ev_As )
                     
                     ListOfEventAssignment.append( aVariable_Ev_As )
                     ListOfEventAssignment.append( aString_Ev_As )
@@ -130,13 +130,14 @@ def getFunctionDefinition( aSBMLmodel ):
             aName_FD = aFunctionDefinition.getName()
 
             anASTNode_FD = aFunctionDefinition.getMath()
-            aString_FD = sub( formulaToString , anASTNode_FD )
+            aString_FD = sub( libsbml.formulaToString , anASTNode_FD )
 
             ListOfFunctionDefinition.append( anId_FD )
             ListOfFunctionDefinition.append( aName_FD )
             ListOfFunctionDefinition.append( aString_FD )
 
             LIST.append( ListOfFunctionDefinition )
+
     return LIST
 
 
@@ -156,7 +157,7 @@ def getParameter( aSBMLmodel ):
             if aParameter.isSetValue():
                 aValue_Pa = aParameter.getValue()
             else:
-                "Unknown"
+                'Unknown'
                 
             anUnit_Pa = aParameter.getUnits()
             aConstant_Pa = aParameter.getConstant()
@@ -197,7 +198,7 @@ def getReaction( aSBMLmodel, aSBMLDocument ):
                     aMath.append( '' )
                 else:
                     anASTNode_KL = aKineticLaw.getMath()
-                    aMath.append( formulaToString( anASTNode_KL ) )
+                    aMath.append( libsbml.formulaToString( anASTNode_KL ) )
 
                 aString_KL = aMath
                     
@@ -227,11 +228,14 @@ def getReaction( aSBMLmodel, aSBMLDocument ):
                 else:
                     ListOfParameters = []
 
+                anExpressionAnnotation = aKineticLaw.getAnnotation()
+
                 ListOfKineticLaw.append( aFormula_KL )
                 ListOfKineticLaw.append( aString_KL )
                 ListOfKineticLaw.append( aTimeUnit_KL )
                 ListOfKineticLaw.append( aSubstanceUnit_KL )
                 ListOfKineticLaw.append( ListOfParameters )
+                ListOfKineticLaw.append( anExpressionAnnotation )
 
 #---------------------------------------------------------
 
@@ -253,7 +257,7 @@ def getReaction( aSBMLmodel, aSBMLDocument ):
 
                     if aSpeciesReference.isSetStoichiometryMath():
                         anASTNode_R = aSpeciesReference.getStoichiometryMath()
-                        aString_R = sub( formulaToString , anASTNode_R )
+                        aString_R = sub( libsbml.formulaToString , anASTNode_R )
                     else:
                         aString_R = []
 
@@ -289,7 +293,7 @@ def getReaction( aSBMLmodel, aSBMLDocument ):
 
                     if aSpeciesReference.isSetStoichiometryMath():
                         anASTNode_P = aSpeciesReference.getStoichiometryMath()
-                        aString_P = sub( formulaToString , anASTNode_P )
+                        aString_P = sub( libsbml.formulaToString , anASTNode_P )
                     else:
                         aString_P = []
 
@@ -335,16 +339,46 @@ def getReaction( aSBMLmodel, aSBMLDocument ):
 
 
 def getRule( aSBMLmodel ):
-    " [[ Formula ]] "
+    " [[ RuleType, Formula, Variable ]] "
     LIST = []
     if aSBMLmodel.getRule(0):
         NumRule = aSBMLmodel.getNumRules()
         for Num in range( NumRule ):
+            ListOfRules = []
             aRule = aSBMLmodel.getRule( Num )
-            #'Model_getAssignmentRule() was not found   
-            aFormula = aRule.getFormula()
 
-            LIST.append( aFormula )
+            aRuleType = aRule.getTypeCode()
+            aFormula = aRule.getFormula()
+             
+            if ( aRuleType == libsbml.SBML_ALGEBRAIC_RULE ):
+
+                aVariable = ''
+
+            elif ( aRuleType == libsbml.SBML_ASSIGNMENT_RULE or
+                   aRuleType == libsbml.SBML_RATE_RULE ):
+                
+                aVariable = aRule.getVariable()
+
+            elif ( aRuleType == libsbml.SBML_SPECIES_CONCENTRATION_RULE ):
+
+                aVariable = aRule.getSpecies()
+
+            elif( aRuleType == libsbml.SBML_COMPARTMENT_VOLUME_RULE ):
+                    
+                aVariable = aRule.getCompartment()
+
+            elif( aRuleType == libsbml.SBML_PARAMETER_RULE ):
+
+                aVariable = aRule.getName()
+                
+            else:
+                raise TypeError, " The type of Rule must be Algebraic, Assignment or Rate Rule"
+
+            ListOfRules.append( aRuleType )
+            ListOfRules.append( aFormula )
+            ListOfRules.append( aVariable )
+
+            LIST.append( ListOfRules )
 
     return LIST
 
@@ -421,7 +455,7 @@ def getUnitDefinition( aSBMLmodel ):
 
                     anUnitKind = anUnit.getKind()
 
-                    aKind = UnitKind_toString( anUnitKind )
+                    aKind = libsbml.UnitKind_toString( anUnitKind )
                     anExponent = anUnit.getExponent()
                     aScale = anUnit.getScale()
                     aMultiplier = anUnit.getMultiplier()
@@ -434,7 +468,7 @@ def getUnitDefinition( aSBMLmodel ):
                     ListOfUnit.append( anOffset )
 
                     ListOfUnits.append( ListOfUnit )
-                
+
             ListOfUnitDefinition.append( anId )
             ListOfUnitDefinition.append( aName )
             ListOfUnitDefinition.append( ListOfUnits )
@@ -445,27 +479,3 @@ def getUnitDefinition( aSBMLmodel ):
     return LIST
 
 
-#if __name__ == '__main__':
-#    import sys
-
-#    filename=sys.argv[1]
-#    aSBMLdocument = readSBML( filename )
-#    aSBMLmodel = SBMLDocument_getModel( aSBMLdocument )
-
-#    aCompartment = getCompartment( aSBMLmodel )
-#    anEvent = getEvent( aSBMLmodel )
-#    aFunctionDefinition = getFunctionDefinition( aSBMLmodel )
-#    aParameter = getParameter( aSBMLmodel )
-#    aReaction = getReaction( aSBMLmodel )
-#    aRule = getRule( aSBMLmodel )
-#    aSpecies = getSpecies( aSBMLmodel )
-#    aUnitDefinition = getUnitDefinition( aSBMLmodel )
-
-#    print aCompartment,'\n\n',\
-#          anEvent,'\n\n',\
-#          aFunctionDefinition,'\n\n',\
-#          aParameter,'\n\n' , \
-#          aReaction,'\n\n',\
-#          aRule,'\n\n',\
-#          aSpecies,'\n\n',\
-#          aUnitDefinition,'\n\n'

@@ -219,14 +219,14 @@ def p_expression_variablereference(t):
 
                 if ( aSystemPath == '/SBMLParameter' ):
 
-                    aVariableID.append( getVariableReferenceId
-                                        ( aVariableReference[1] ) )
+                    aVariableID.append(
+                        ( aVariableReference[1][aLastColon+1:] ) )
 
                 elif ( aSystemPath == '.' and
                        aReactionPath == '/SBMLParameter' ):
 
-                    aVariableID.append( getVariableReferenceId
-                                        ( aVariableReference[1] ) )
+                    aVariableID.append( 
+                        ( aVariableReference[1][aLastColon+1:] ) )
 
                 else:
                     aVariableID.append( getVariableReferenceId
@@ -248,10 +248,11 @@ def p_expression_variablereference(t):
                         else:
                             if ( aReactionPath == '/' ):
                                 
-                                aVariableID[0] = '(' + aVariableID[0]+ '/default/N_A)'
+                                aVariableID[0] =\
+                                '(' + aVariableID[0]+ '*default*N_A)'
 
                             else:
-                                aVariableID[0] = '(' + aVariableID[0]+ '/'+ aReactionPath[aLastSlash+1:] + '/N_A)'
+                                aVariableID[0] = '(' + aVariableID[0]+ '*'+ aReactionPath[aLastSlash+1:] + '*N_A)'
 
 
                     else:
@@ -269,11 +270,11 @@ def p_expression_variablereference(t):
                         else:
                             if ( aSystemPath == '/' ):
 
-                                aVariableID[0] = '(' + aVariableID[0] + '/default/N_A)'
+                                aVariableID[0] = '(' + aVariableID[0] + '*default*N_A)'
 
                             else:
                                 
-                                aVariableID[0] = '(' + aVariableID[0] + '/'+ aSystemPath[aLastSlash+1:] + '/N_A)'
+                                aVariableID[0] = '(' + aVariableID[0] + '*'+ aSystemPath[aLastSlash+1:] + '*N_A)'
 
 
             # VariableReference attribute is NumberConc 

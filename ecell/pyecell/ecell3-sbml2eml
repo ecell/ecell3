@@ -8,7 +8,7 @@ This program is part of E-Cell Simulation Environment Version 3.
 __program__ = 'ecell3-sbml2eml'
 __version__ = '1 and 2'
 __author__ = 'Tatsuya Ishida'
-__copyright__ = 'Copyright (C) 2002-2003 Keio University'
+__copyright__ = 'Copyright (C) 2002-2004 Keio University'
 __license__ = 'GPL'
 
 
@@ -76,7 +76,6 @@ Options:
 
     aSbmlFileName = args[0]
 
-
     aSbmlFile = open( aSbmlFileName )
     aSbmlData = aSbmlFile.readlines()
     aSbmlFile.close()
@@ -108,7 +107,8 @@ Options:
     theReaction = SBML_Reaction( theModel )
 #    theEvent = SBML_Event( theModel )
 
-    print 'File:',aSbmlFileName,'( Level,',theModel.Level,' version,',theModel.Version,' )'
+    print 'File:',aSbmlFileName,'( Level,',theModel.Level,\
+    ' version,',theModel.Version,' )'
 
     anEml = Eml()
 
@@ -129,13 +129,12 @@ Options:
     anEml.setEntityProperty( aSystemFullID, 'StepperID', ['DE'] )
     anEml.setEntityProperty( aSystemFullID, 'Name', ['Root System'] )
 
-    # setGlobalParameterSystem
-    aSystemFullID='System:/:SBMLParameter'
-    anEml.createEntity( 'System', aSystemFullID )
-    anEml.setEntityProperty( aSystemFullID, 'StepperID', ['DE'] )
-    anEml.setEntityProperty( aSystemFullID, 'Name', ['Global Parameter'] )
+
 
     for aCompartment in ( theModel.CompartmentList ):
+
+        # initialize
+        theCompartment.initialize( aCompartment )
 
         # getPath
         if ( theModel.Level == 1 ):
@@ -154,8 +153,10 @@ Options:
 
         # setName( default = [] )
         if ( theModel.Level == 2 ):
-            if ( aCompartment[1] != [] ):
-                anEml.setEntityProperty( aSystemFullID, 'Name', aCompartment[1:2] )
+            if ( aCompartment[1] != '' ):
+                anEml.setEntityProperty( aSystemFullID,
+                                         'Name',
+                                         aCompartment[1:2] )
 
         # setDimensions( default = 3 )
         aDimensionsFullID = 'Variable:' + aPath + ':Dimensions'
@@ -167,17 +168,13 @@ Options:
         # setSIZE
         aSizeFullID = 'Variable:' + aPath + ':SIZE'
         anEml.createEntity( 'Variable', aSizeFullID )
-        
-        theCompartment.setCompartmentSize_Unit( aCompartment )
-        
-        if( theModel.Level == 1 ):
-            aSizeValue = theModel.CompartmentSize[ aCompartment[1] ]
-        elif( theModel.Level == 2 ):
-            aSizeValue = theModel.CompartmentSize[ aCompartment[0] ]
+
+        aSizeValue = theCompartment.getCompartmentSize( aCompartment )
+        aSizeUnit = theCompartment.getCompartmentUnit( aCompartment )
 
         # convert to ECELL Unit
-        if ( aCompartment[5] != '' ):
-            aSizeValue = theCompartment.convertCompartmentUnit( theModel, aSizeValue, aCompartment[5] )
+        if ( aSizeUnit != '' ):
+            aSizeValue = theModel.convertUnit( aSizeUnit, aSizeValue )
 
         aTmpList = [ str( aSizeValue ) ]
         anEml.setEntityProperty( aSizeFullID, 'Value', aTmpList[0:1] )
@@ -192,7 +189,16 @@ Options:
     # ------------------------------
     #  Set GlobalParameter ( Variable )
     # ------------------------------
+
+    if ( theModel.ParameterList != [] ):
     
+        # setGlobalParameterSystem
+        aSystemFullID='System:/:SBMLParameter'
+        anEml.createEntity( 'System', aSystemFullID )
+        anEml.setEntityProperty( aSystemFullID, 'StepperID', ['DE'] )
+        anEml.setEntityProperty( aSystemFullID, 'Name', ['Global Parameter'] )
+
+
     for aParameter in theModel.ParameterList:
 
         # setFullID
@@ -200,11 +206,11 @@ Options:
         anEml.createEntity( 'Variable', aSystemFullID )
             
         # setName
-        if ( aParameter[1] != [] ):
-            anEml.setEntityProperty( aSystemFullID, 'Name', aParameter[1:2] )		    
+        if ( aParameter[1] != '' ):
+            anEml.setEntityProperty( aSystemFullID, 'Name', aParameter[1:2] )
 
         # setValue
-        aTmpList = [ str( aParameter[2] ) ]
+        aTmpList = [ str( theParameter.getParameterValue( aParameter ) ) ]
         anEml.setEntityProperty( aSystemFullID, 'Value', aTmpList[0:1] )
 
 
@@ -220,53 +226,120 @@ Options:
 
     for aSpecies in theModel.SpeciesList:
         
-        # setFullID
+        ### setFullID ###
+        
         aSystemFullID = theSpecies.getSpeciesID( aSpecies )
         anEml.createEntity( 'Variable', aSystemFullID )
 
-        # setName
+
+        ### setName ###
+        
 	if( theModel.Level == 2 ):
-            if ( aSpecies[1] != [] ):		
+
+            if ( aSpecies[1] != '' ):
                 anEml.setEntityProperty( aSystemFullID, 'Name', aSpecies[1:2] )
 
 
-        # setValue
+        ### setValue ###
+        
         aTmpList = [ str( theSpecies.getSpeciesValue( aSpecies ) ) ]
         anEml.setEntityProperty( aSystemFullID, 'Value', aTmpList[0:1] )
 
 
-        # setFixed
-        if ( theModel.Level == 1 ):
-            if ( aSpecies[9] == 1 ):
-                aTmpList = [ str( aSpecies[9] ) ]
-                anEml.setEntityProperty( aSystemFullID, 'Fixed', aTmpList[0:1] )
+        ### setFixed ###
 
-        elif ( theModel.Level == 2 ):
-            if ( aSpecies[11] == 1 ):
-                aTmpList = [ str( aSpecies[11] ) ]
-                anEml.setEntityProperty( aSystemFullID, 'Fixed', aTmpList[0:1] )
+        aConstant = theSpecies.getConstant( aSpecies )
+        anEml.setEntityProperty( aSystemFullID,
+                                 'Fixed',
+                                 [ str( aConstant ) ] )
+
 
     # ------------------------------
     #  Set Rule ( Process )
     # ------------------------------
 
+    if ( theModel.RuleList != [] ):
+
+        ### make Rule System ###
+        
+        aSystemFullID='System:/:SBMLRule'
+        anEml.createEntity( 'System', aSystemFullID )
+        anEml.setEntityProperty( aSystemFullID,
+                                 'Name',
+                                 ['System for SBML Rule'] )
+
+        anEml.setEntityProperty( aSystemFullID, 'StepperID', ['DE'] )
+
+        
     for aRule in theModel.RuleList:
 
         theRule.initialize()
 
-        # setFullID
+        ### setFullID ###        
         aSystemFullID = theRule.getRuleID()
 
-        convertedFormula = [ str( theRule.convertRuleFormula( aRule ) ) ]
 
-        #   if Algebraic Rule        
-        #anEml.createEntity( 'ExpressionAlgebraicProcess', aSystemFullID )
+        ### Algebraic Rule ###
+        if ( aRule[0] == libsbml.SBML_ALGEBRAIC_RULE ):
 
-        #   if Assignment Rule
-        #anEml.createEntity( 'ExpressionAssignmentProcess', aSystemFullID )
+            anEml.createEntity( 'ExpressionAlgebraicProcess', aSystemFullID )
+
+
+        ### Assignment Rule ###
+        elif ( aRule[0] == libsbml.SBML_ASSIGNMENT_RULE or
+               aRule[0] == libsbml.SBML_SPECIES_CONCENTRATION_RULE or
+               aRule[0] == libsbml.SBML_COMPARTMENT_VOLUME_RULE or
+               aRule[0] == libsbml.SBML_PARAMETER_RULE ):
+
+            anEml.createEntity( 'ExpressionAssignmentProcess', aSystemFullID )
+
+            aVariableType = theRule.getVariableType( aRule[2] )
+
+            if ( aVariableType == libsbml.SBML_SPECIES ):
+                theRule.setSpeciesToVariableReference( aRule[2], '1' )
+            elif ( aVariableType == libsbml.SBML_PARAMETER ):
+                theRule.setParameterToVariableReference( aRule[2], '1' )
+            elif ( aVariableType == libsbml.SBML_COMPARTMENT ):
+                theRule.setCompartmentToVariableReference( aRule[2], '1' )
+            else:
+                raise TypeError,\
+            "Variable type must be Species, Parameter, or Compartment"
+
+        ### Rate Rule ###
+        elif ( aRule[0] == libsbml.SBML_RATE_RULE ):
+
+            anEml.createEntity( 'ExpressionFluxProcess', aSystemFullID )
+
+            aVariableType = theRule.getVariableType( aRule[2] )
+
+            if ( aVariableType == libsbml.SBML_SPECIES ):
+                theRule.setSpeciesToVariableReference( aRule[2], '1' )
+            elif ( aVariableType == libsbml.SBML_PARAMETER ):
+                theRule.setParameterToVariableReference( aRule[2], '1' )
+            elif ( aVariableType == libsbml.SBML_COMPARTMENT ):
+                theRule.setCompartmentToVariableReference( aRule[2], '1' )
+            else:
+                raise TypeError,\
+            "Variable type must be Species, Parameter, or Compartment"
+
+
+        else:
+            raise TypeError,\
+        " The type of Rule must be Algebraic, Assignment or Rate Rule"
+
+        # convert SBML formula  to E-Cell formula
+        convertedFormula = [ str( theRule.convertRuleFormula( aRule[1] ) ) ]
+
+        # set Expression Property
+        anEml.setEntityProperty( aSystemFullID,
+                                 'Expression',
+                                 convertedFormula )
         
-        #   if Rate Rule
-        #anEml.createEntity( 'ExpressionFluxProcess', aSystemFullID )
+        # setVariableReferenceList
+        anEml.setEntityProperty( aSystemFullID,
+                                 'VariableReferenceList',
+                                 theRule.VariableReferenceList )
+
 
 
     # ------------------------------
@@ -299,6 +372,7 @@ Options:
             if ( aSubstrate[2] != 1 ):
                 print "Stoichiometry Error : E-Cell System can't set a floating Stoichiometry"
                 sys.exit(1)
+ 
             aSubstrateList.append( str( -1 * theReaction.getStoichiometry(
                 aSubstrate[0], aSubstrate[1] ) ) )
             theReaction.VariableReferenceList.append( aSubstrateList )
@@ -318,6 +392,7 @@ Options:
                 sys.exit(1)
             aProductList.append( str( 1 * theReaction.getStoichiometry(
                 aProduct[0],  aProduct[1] ) ) )
+
             theReaction.VariableReferenceList.append( aProductList )
 
         # setCatalyst
@@ -341,23 +416,31 @@ Options:
                     if ( aParameter[2] != '' ): 
                         aTmpList = [ str( aParameter[2] ) ]
                         if ( theModel.Level == 1 ):
-                            anEml.setEntityProperty( aSystemFullID, aParameter[1], aTmpList[0:1] )
+                            anEml.setEntityProperty\
+                            ( aSystemFullID, aParameter[1], aTmpList[0:1] )
                         elif ( theModel.Level == 2 ):
-                            anEml.setEntityProperty( aSystemFullID, aParameter[0], aTmpList[0:1] )
+                            anEml.setEntityProperty\
+                            ( aSystemFullID, aParameter[0], aTmpList[0:1] )
                             
         else:
             print "Undefined error : Reaction object must set KineticLaw"
             sys.exit(1)
 
                           
-
+        # --------------------------
         # set "Expression" Property
-        aConvertedKineticLaw = [ str( theReaction.convertKineticLaw( aReaction[2][0] ) ) ]
+        # --------------------------
+        
+        # convert SBML format formula to E-Cell format formula
+        anExpression =\
+        [ str( theReaction.convertKineticLawFormula( aReaction[2][0] ) ) ]
+
+
 
         # set Expression Property for ExpressionFluxProcess
         anEml.setEntityProperty( aSystemFullID,
                                  'Expression',
-                                 aConvertedKineticLaw )
+                                 anExpression )
 
         # setVariableReferenceList
         anEml.setEntityProperty( aSystemFullID,

@@ -69,12 +69,20 @@ def getVariableReferenceId( aVariableReference, aFullPath ):
 #  set Expression Annotation for ecell3
 # --------------------------------------
 
-def setExpressionAnnotation( aKineticLaw, anExpression ):
+#def setExpressionAnnotation( aKineticLaw, anExpression ):
 
-    anExpressionAnnotation = '''<annotation xmlns:ecell="http://www.sbml.org/2001/ecell"><ecell:Expression>'''
-    anExpressionAnnotationEnd = "</ecell:Expression></annotation>"
+#   anExpressionAnnotation =\
+#    '''<annotation xmlns:ecell="http://www.sbml.org/2001/ecell">
+#              <ecell:Expression>
+#              '''
+
+#    anExpressionAnnotationEnd =\
+#    '''
+#              </ecell:Expression>
+#          </annotation>'''
     
-    aKineticLaw.setAnnotation( anExpressionAnnotation + anExpression + anExpressionAnnotationEnd )
+#    aKineticLaw.setAnnotation\
+#    ( anExpressionAnnotation + anExpression + anExpressionAnnotationEnd )
 
 
 # ------------------------------------------------------------
@@ -124,10 +132,11 @@ def createEntity( anEml, aSBMLModel, aFullID, anOptional='' ):
                         aParameter.setName
                         ( anEml.getEntityProperty( aFullPN ) )
 
-                        
+
                 # set Parameter Value
                 elif ( aPropertyName == "Value" ):
-                    aParameter.setValue( anEml.getEntityProperty( aFullPN ) )
+
+                    aParameter.setValue( float( anEml.getEntityProperty( aFullPN )[0] ) )
 
                 # set Constant 
                 elif ( aPropertyName == "Fixed" ):
@@ -217,10 +226,11 @@ def createEntity( anEml, aSBMLModel, aFullID, anOptional='' ):
             aProcessClass = anEml.getEntityClass( aFullIDString )
             aVariableReferenceList =\
             anEml.getEntityProperty( aFullIDString + ':VariableReferenceList' )
-            anExpression = convertExpression(anEml.getEntityProperty( aFullIDString + ':Expression' )[0],
-                                             aVariableReferenceList,
-                                             aFullID[1] )
-
+            anExpression =\
+            convertExpression(
+                anEml.getEntityProperty( aFullIDString + ':Expression' )[0],
+                aVariableReferenceList,
+                aFullID[1] )
 
 
             if( aProcessClass == 'ExpressionAlgebraicProcess' ):
@@ -303,6 +313,7 @@ def createEntity( anEml, aSBMLModel, aFullID, anOptional='' ):
             if( aSBMLLevel == '2' ):
                 aReaction.setId( aFullID[2] )
 
+
             for aPropertyName in aPropertyNameList:
                 
                 aFullPN = aFullIDString + ':' + aPropertyName
@@ -321,33 +332,58 @@ def createEntity( anEml, aSBMLModel, aFullID, anOptional='' ):
 
                 # set Expression property ( KineticLaw Formula )
                 elif ( aPropertyName == "Expression"):
+
                 
                     # convert Expression of the ECELL format to
                     # SBML kineticLaw formula
-
                     anExpression = anEml.getEntityProperty( aFullPN )[0]
-                    aVariableReference = anEml.getEntityProperty( aFullIDString + ':VariableReferenceList' )
+                    aVariableReferenceList = anEml.getEntityProperty( aFullIDString + ':VariableReferenceList' )
 
-                    setExpressionAnnotation( aKineticLaw, anExpression )
-#                    setVariableReferenceAnnotation( aKineticLaw,
- #                                                   aVariableReference )
+#                    setExpressionAnnotation( aKineticLaw, anExpression )
 
 
                     anExpression = convertExpression( anExpression,
-                                                      aVariableReference,
+                                                      aVariableReferenceList,
                                                       aFullID[1] )
 
 
-                    if( aFullID[1] == '/' ):
+                    # get Current System Id
+                    for aVariableReference in aVariableReferenceList:
+
+                        if( len( aVariableReference ) == 3 ):
+
+                            if( int( aVariableReference[2] ) != 0 ):
+ 
+                                aFirstColon =\
+                                string.index( aVariableReference[1], ':' )
+                                aLastColon =\
+                                string.rindex( aVariableReference[1], ':' )
+
+                                if( aVariableReference[1][aFirstColon+1:aLastColon] == '.' ):
+
+                                    aLastSlash =\
+                                    string.rindex( aFullID[1], '/' )
+
+                                    CompartmentOfReaction=\
+                                    aFullID[1][aLastSlash+1:]
+
+
+                                else: 
+                                    aLastSlash =\
+                                    string.rindex( aVariableReference[1], '/' )
+
+                                    CompartmentOfReaction=\
+                                    aVariableReference[1][aLastSlash+1:aLastColon]
+                            
+
+                    if( CompartmentOfReaction == '' ):
                         
                         anExpression = '(' + anExpression + ')/default/N_A'
 
                     else:
                         
-                        aLastSlash = string.rindex( aFullID[1], '/' )
-                        aCompartmentID = aFullID[1][aLastSlash+1:]
-                    
-                        anExpression = '(' + anExpression + ')/' + aCompartmentID + '/N_A'
+                        anExpression =\
+                        '(' + anExpression + ')/' + CompartmentOfReaction + '/N_A'
 
 
                     # set KineticLaw Formula
@@ -501,11 +537,11 @@ def createEntity( anEml, aSBMLModel, aFullID, anOptional='' ):
 
     elif ( aFullID[TYPE] == SYSTEM ):
 
-        # create Compartment object
-        aCompartment = aSBMLModel.createCompartment()
+        if ( aFullID[2] != 'SBMLParameter' and aFullID[2] != 'SBMLRule' ):
 
-        if ( aFullID[2] != 'SBMLParameter' ):
-
+            # create Compartment object
+            aCompartment = aSBMLModel.createCompartment()
+        
             # set ID ROOT System and Other System
             if ( aFullID[2] == '' ):
 
@@ -514,7 +550,6 @@ def createEntity( anEml, aSBMLModel, aFullID, anOptional='' ):
                 elif( aSBMLLevel == '2' ):
                     aCompartment.setId( "default" )
             else:
-
                 if( aSBMLLevel == '1' ):
                     aCompartment.setName( aFullID[2] )
                 elif( aSBMLLevel == '2' ):
