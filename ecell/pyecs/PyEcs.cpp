@@ -147,9 +147,10 @@ BOOST_PYTHON_MODULE( _ecs )
     .def( "getSuperSystem",   // this can be a property, but not supported
 	  &Process::getSuperSystem,
 	  python::return_value_policy<python::reference_existing_object>() )
-    .def( "getVariableReference",       // this should can a property
-	  &Process::getVariableReference )
-    .def( "getVariableReferenceVector",       // this should can a property
+    .def( "getVariableReference",       // this should be a property
+	  &Process::getVariableReference,
+	  python::return_internal_reference<>() )
+    .def( "getVariableReferenceVector",       // this should be a property
 	  &Process::getVariableReferenceVector,
 	  python::return_value_policy<python::reference_existing_object>() )
     .def( "getZeroVariableReferenceOffset",     

@@ -1,55 +1,53 @@
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
-//        This file is part of E-Cell Simulation Environment package
+//        This file is part of E-CELL Simulation Environment package
 //
 //                Copyright (C) 2003 Keio University
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
 //
-// E-Cell is free software; you can redistribute it and/or
+// E-CELL is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
 // License as published by the Free Software Foundation; either
 // version 2 of the License, or (at your option) any later version.
 // 
-// E-Cell is distributed in the hope that it will be useful,
+// E-CELL is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 // See the GNU General Public License for more details.
 // 
 // You should have received a copy of the GNU General Public
-// License along with E-Cell -- see the file COPYING.
+// License along with E-CELL -- see the file COPYING.
 // If not, write to the Free Software Foundation, Inc.,
 // 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 // 
 //END_HEADER
 //
 // authors:
+//   Kouichi Takahashi
 //   Tatsuya Ishida
 //
-// E-Cell Project, Institute for Advanced Biosciences, Keio University.
+// E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
 
 #ifndef __EXPRESSIONPROCESSBASE_HPP
 #define __EXPRESSIONPROCESSBASE_HPP
 
+#define EXPRESSION_PROCESS_USE_JIT 0
+
 
 #include <cassert>
 #include <limits>
 
-#include "boost/spirit/core.hpp"
-#include "boost/spirit/tree/ast.hpp"
-#include "boost/shared_ptr.hpp"
+#include "ExpressionCompiler.hpp"
 
-#include "Process.hpp"
+//#if defined( EXPRESSIONPROCESS_USE_JIT )
+//#include "JITExpressionProcessBase"
+//#else /* defined( EXPRESSIONPROCESS_USE_JIT ) */
+//#include "SVMExpressionProcessBase"
+//#endif /* defined( EXPRESSIONPROCESS_USE_JIT ) */
 
-#if SPIRIT_VERSION >= 0x1800
-#define PARSER_CONTEXT parser_context<>
-#else
-#define PARSER_CONTEXT parser_context
-#endif
-
-using namespace boost::spirit;
 
 USE_LIBECS;
 
@@ -62,535 +60,29 @@ namespace libecs
   protected:
 
     class StackMachine;
-    class Compiler;
 
-    DECLARE_CLASS( Instruction );
-    DECLARE_CLASS( Code );
-    DECLARE_VECTOR( int, IntVector );
-    DECLARE_VECTOR( Real, RealVector );
-    DECLARE_VECTOR( InstructionPtr, InstructionVector );
+    DECLARE_TYPE( ExpressionCompiler::Code, Code ); 
 
-    DECLARE_ASSOCVECTOR( String, Real, std::less<const String>, ConstantMap);
-    DECLARE_ASSOCVECTOR( String, Real, std::less<const String>, PropertyMap);
-    DECLARE_ASSOCVECTOR
-      ( String, Real(*)(Real), std::less<const String>, FunctionMap1);
-    DECLARE_ASSOCVECTOR
-      ( String, Real(*)(Real,Real), std::less<const String>, FunctionMap2);
-
-    typedef const Real 
-      (libecs::VariableReference::* VariableReferenceMethodPtr)() const;
-    typedef SystemPtr 
-      (libecs::Process::* Process_System_Func)() const;
-    typedef SystemPtr 
-      (libecs::VariableReference::* VariableReference_System_Func)() const;
-    typedef const Real (libecs::System::* System_Attribute)() const;
-
-
-    class Instruction
-    {
-    public:
-      Instruction() {}
-      virtual ~Instruction() {}
-      
-      virtual void initialize() = 0;
-      virtual void execute( StackMachine& aStackMachine ) = 0;
-    };
-
-    class PUSH
-      :
-  public Instruction
-    {
-    public:
-      PUSH( Real aValue ) 
-	:
-	theValue( aValue )
-      { 
-	// ; do nothing
-      }
-      virtual ~PUSH() {}
-    
-      virtual void initialize()
-      {
-	// ; do nothing
-      }
-
-      virtual void execute( StackMachine& aStackMachine );
-
-    private:
-      Real theValue;
-    };
-  
-    class NEG
-      :
-  public Instruction
-    {
-    public:
-      NEG() {}
-      virtual ~NEG() {}
-    
-      virtual void initialize()
-      {
-	// ; do nothing
-      }
-
-      virtual void execute( StackMachine& aStackMachine );    
-    };
-  
-    class ADD
-      :
-  public Instruction
-    {
-    public:
-      ADD() {}
-      virtual ~ADD() {}
-    
-      virtual void initialize()
-      {
-	// ; do nothing
-      }
-
-      virtual void execute( StackMachine& aStackMachine );    
-    };
-  
-    class SUB
-      :
-  public Instruction
-    {
-    public:
-      SUB() {}
-      virtual ~SUB() {}
-    
-      virtual void initialize()
-      {
-	// ; do nothing
-      }
-
-      virtual void execute( StackMachine& aStackMachine );    
-    };
-  
-    class MUL
-      :
-  public Instruction
-    {
-    public:
-      MUL() {}
-      virtual ~MUL() {}
-    
-      virtual void initialize()
-      {
-	// ; do nothing
-      }
-
-      virtual void execute( StackMachine& aStackMachine );    
-    };
-  
-    class DIV
-      :
-  public Instruction
-    {
-    public:
-      DIV() {}
-      virtual ~DIV() {}
-    
-      virtual void initialize()
-      {
-	// ; do nothing
-      }
-
-      virtual void execute( StackMachine& aStackMachine );
-    };
-  
-    class POW
-      :
-  public Instruction
-    {
-    public:
-      POW() {}
-      virtual ~POW() {}
-    
-      virtual void initialize()
-      {
-	// ; do nothing
-      }
-
-      virtual void execute( StackMachine& aStackMachine );    
-    };
-
-    class EQ
-      :
-  public Instruction
-    {
-    public:
-      EQ() {}
-      virtual ~EQ() {}
-    
-      virtual void initialize()
-      {
-	// ; do nothing
-      }
-
-      virtual void execute( StackMachine& aStackMachine );    
-    };
-
-    class NEQ
-      :
-  public Instruction
-    {
-    public:
-      NEQ() {}
-      virtual ~NEQ() {}
-    
-      virtual void initialize()
-      {
-	// ; do nothing
-      }
-
-      virtual void execute( StackMachine& aStackMachine );    
-    };
-
-    class GT
-      :
-  public Instruction
-    {
-    public:
-      GT() {}
-      virtual ~GT() {}
-    
-      virtual void initialize()
-      {
-	// ; do nothing
-      }
-
-      virtual void execute( StackMachine& aStackMachine );    
-    };
-
-    class LT
-      :
-  public Instruction
-    {
-    public:
-      LT() {}
-      virtual ~LT() {}
-    
-      virtual void initialize()
-      {
-	// ; do nothing
-      }
-
-      virtual void execute( StackMachine& aStackMachine );    
-    };
-
-    class GEQ
-      :
-  public Instruction
-    {
-    public:
-      GEQ() {}
-      virtual ~GEQ() {}
-    
-      virtual void initialize()
-      {
-	// ; do nothing
-      }
-
-      virtual void execute( StackMachine& aStackMachine );    
-    };
-
-    class LEQ
-      :
-  public Instruction
-    {
-    public:
-      LEQ() {}
-      virtual ~LEQ() {}
-    
-      virtual void initialize()
-      {
-	// ; do nothing
-      }
-
-      virtual void execute( StackMachine& aStackMachine );    
-    };
-
-    class AND
-      :
-  public Instruction
-    {
-    public:
-      AND() {}
-      virtual ~AND() {}
-    
-      virtual void initialize()
-      {
-	// ; do nothing
-      }
-
-      virtual void execute( StackMachine& aStackMachine );    
-    };
-
-    class OR
-      :
-  public Instruction
-    {
-    public:
-      OR() {}
-      virtual ~OR() {}
-    
-      virtual void initialize()
-      {
-	// ; do nothing
-      }
-
-      virtual void execute( StackMachine& aStackMachine );    
-    };
-
-    class XOR
-      :
-  public Instruction
-    {
-    public:
-      XOR() {}
-      virtual ~XOR() {}
-    
-      virtual void initialize()
-      {
-	// ; do nothing
-      }
-
-      virtual void execute( StackMachine& aStackMachine );    
-    };
-
-    class NOT
-      :
-  public Instruction
-    {
-    public:
-      NOT() {}
-      virtual ~NOT() {}
-    
-      virtual void initialize()
-      {
-	// ; do nothing
-      }
-
-      virtual void execute( StackMachine& aStackMachine );    
-    };  
-    
-    class CALL_FUNC1
-      :
-  public Instruction
-    {
-    public:
-      CALL_FUNC1( Real (*aFuncPtr)(Real) )
-	:
-	theFuncPtr( aFuncPtr )
-      {
-	// ; do nothing
-      }
-
-      virtual ~CALL_FUNC1() {}
-    
-      virtual void initialize()
-      {
-	// ; do nothing
-      }
-
-      virtual void execute( StackMachine& aStackMachine );
-
-    private:
-      Real (*theFuncPtr)(Real);
-    };
-
-
-    class CALL_FUNC2
-      :
-  public Instruction
-    {
-    public:
-      CALL_FUNC2( Real (*aFuncPtr)(Real, Real) )
-	:
-	theFuncPtr( aFuncPtr )
-      {
-        // ; do nothing
-      }
-
-      virtual ~CALL_FUNC2() {}
-    
-      virtual void initialize()
-      {
-	// ; do nothing
-      }
-
-      virtual void execute( StackMachine& aStackMachine );
-
-    private:
-      Real (*theFuncPtr)(Real,Real);
-    };
-
-
-
-    class CALL_PROPERTY
-      :
-  public Instruction
-    {
-    public:
-      CALL_PROPERTY( PropertyMap &aPropertyMap, String aName )
-      {
-	thePropertyMapIterator = ( aPropertyMap ).find( aName ) ;
-      }
-      virtual ~CALL_PROPERTY() {}
-    
-      virtual void initialize()
-      {
-	theValue = thePropertyMapIterator->second;
-      }
-
-      virtual void execute( StackMachine& aStackMachine );
-
-    private:
-      Real theValue;
-      PropertyMapIterator thePropertyMapIterator;
-    };
-
-
-    class VARREF_FUNC
-      :
-  public Instruction
-    {
-    public:
-      VARREF_FUNC() {}
-      VARREF_FUNC( VariableReference tmpVariableReference,
-		   VariableReferenceMethodPtr aFuncPtr )
-	:
-	theVariableReference( tmpVariableReference ),
-	theFuncPtr( aFuncPtr )
-      {
-	// ; do nothing
-      }
-      virtual ~VARREF_FUNC() {}
-    
-      virtual void initialize()
-      {
-	// ; do nothing
-      }
-
-      virtual void execute( StackMachine& aStackMachine );
-    
-    private:
-      VariableReference theVariableReference;
-      VariableReferenceMethodPtr theFuncPtr;
-    };
-    
-
-
-    class PROCESS_SYSTEM_FUNC
-      :
-  public Instruction
-    {
-    public:
-      PROCESS_SYSTEM_FUNC() {}
-      PROCESS_SYSTEM_FUNC( ProcessPtr aProcessPtr,
-		   Process_System_Func aFuncPtr,
-		   System_Attribute aAttributePtr )
-	:
-	theProcessPtr( aProcessPtr ), 
-	theFuncPtr( aFuncPtr ),
-	theAttributePtr( aAttributePtr )
-      {
-	// ; do nothing
-      }
-      virtual ~PROCESS_SYSTEM_FUNC() {}
-    
-      virtual void initialize()
-      {
-	// ; do nothing
-      }
-
-      virtual void execute( StackMachine& aStackMachine );
-    
-    private:
-      ProcessPtr theProcessPtr;
-      Process_System_Func theFuncPtr;
-      System_Attribute theAttributePtr;
-    };
-
-
-    class VARIABLE_SYSTEM_FUNC
-      :
-  public Instruction
-    {
-    public:
-      VARIABLE_SYSTEM_FUNC() {}
-      VARIABLE_SYSTEM_FUNC( VariableReference aVariableReference,
-			    VariableReference_System_Func aFuncPtr,
-			    System_Attribute aAttributePtr )
-	:
-	theVariableReference( aVariableReference ), 
-	theFuncPtr( aFuncPtr ),
-	theAttributePtr( aAttributePtr )
-      {
-	// ; do nothing
-      }
-
-      virtual ~VARIABLE_SYSTEM_FUNC() {}
-    
-      virtual void initialize()
-      {
-	// ; do nothing
-      }
-
-      virtual void execute( StackMachine& aStackMachine );
-    
-    private:
-      VariableReference theVariableReference;
-      VariableReference_System_Func theFuncPtr;
-      System_Attribute theAttributePtr;
-    };
-
-        
-    class Code
-      : 
-  private InstructionVector
-    {
-    public: 
-      Code()
-      {
-	// ; do nothing;
-      }
-      
-      ~Code() {}
-
-      iterator begin() { return InstructionVector::begin(); }
-      const_iterator begin() const { return InstructionVector::begin(); }
-      iterator end() { return InstructionVector::end(); }
-      const_iterator end() const { return InstructionVector::end(); }
-
-      bool empty() const { return InstructionVector::empty(); }
-      size_type size() const { return InstructionVector::size(); }
-      size_type max_size() { return InstructionVector::max_size(); }
-
-      void clear()
-      {
-	for( InstructionVectorConstIterator 
-	       i( InstructionVector::begin() );
-	     i != InstructionVector::end(); ++i )
-	  {
-	    delete *i;
-	  }
-
-	InstructionVector::clear();
-      }
-
-      void push_back( InstructionPtr anInstruction )
-      {
-	InstructionVector::push_back( anInstruction );
-      }
-    };
-    
+    typedef void* Pointer;
 
 
     class StackMachine
     {
+      //      typedef boost::variant< Real, 
+      //			      Pointer,
+      //			      Integer > StackElement_;
+
+      union StackElement_
+      {
+	Real theReal;
+	Pointer thePointer;
+	Integer theInteger;
+      };
+
+      //      StringSharedPtr > Operand;
+      DECLARE_TYPE( StackElement_, StackElement );
+      DECLARE_VECTOR( StackElement, Stack );
+
     public:
     
       StackMachine()
@@ -600,7 +92,7 @@ namespace libecs
     
       ~StackMachine() {}
     
-      void resize( RealVector::size_type aSize )
+      void resize( Stack::size_type aSize )
       {
 	theStack.resize( aSize );
       }
@@ -608,293 +100,20 @@ namespace libecs
       void reset()
       {
 	theStackPtr = &theStack[0];
-	theStack[0] = 0.0;
+        theStack[0].theReal = 0.0;
       }
-    
-      RealPtr& getStackPtr()
-      {
-	return theStackPtr;
-      }
-    
-      const Real execute( CodeCref aCode )
-      {
-	reset();
- 	for( InstructionVectorConstIterator i( aCode.begin() );
-	     i != aCode.end(); ++i )
-	  {
-	    (*i)->execute( *this );
-	  }
 
-	return *theStackPtr;
-      }
+      const Real execute( CodeCref aCode );
     
     protected:
     
-      RealVector theStack;
+      // Stack -> std::vector<variant<>...>
+      Stack           theStack;
     
-      RealPtr theStackPtr;
+      StackElementPtr theStackPtr;
     };
   
   
-  
-    class Compiler
-    {
-
-    private:
-
-    class CompileGrammar 
-      : 
-  public grammar<CompileGrammar>
-    {
-    public:
-      enum GrammarType
-	{
-	  GROUP = 1,
-	  INTEGER,
-	  FLOATING,
-	  NEGATIVE,
-	  EXPONENT,
-	  FACTOR,
-	  POWER,
-	  TERM,
-	  EXPRESSION,
-	  VARIABLE,
-	  CALL_FUNC,
-	  SYSTEM_FUNC,
-	  IDENTIFIER,
-	  CONSTANT,
-	};
-
-      template <typename ScannerT>
-      struct definition
-      {
-#define leafNode( str ) leaf_node_d[lexeme_d[str]]
-#define rootNode( str ) root_node_d[lexeme_d[str]]
-
-	definition( CompileGrammar const& /*self*/ )
-	{
-	  integer     =   leafNode( +digit_p );
-	  floating    =   leafNode( +digit_p >> ch_p('.') >> +digit_p );
-
-	  exponent    =   ( floating | integer ) >>
-	    rootNode( ch_p('e') | ch_p('E') ) >>
-	    ( ch_p('-') >> integer | 
-	      discard_node_d[ ch_p('+') ] >> integer |
-	      integer );
-
-	  negative    =	  rootNode( ch_p('-') ) >> factor; 
-
-	  identifier  =   leafNode( alpha_p >> *( alnum_p | ch_p('_') ) );
-
-	  variable    =   identifier >> rootNode( ch_p('.') ) >> identifier;
-	
- 	  system_func = identifier >> rootNode( ch_p('.') ) >>
-	    +( leafNode( +( alpha_p | ch_p('_') ) ) >>
-	       discard_node_d[ ch_p('(') ] >>
-	       discard_node_d[ ch_p(')') ] >>
-	       discard_node_d[ ch_p('.') ] ) >>
-	    identifier;
-
-	  ///////////////////////////////////////////////////
-	  //                                               //
-	  //      This syntax is made such dirty syntax    //
-	  //      by the bug of Spirit                     //
-          //                                               //
-	  ///////////////////////////////////////////////////
-            
-	  call_func = (	  rootNode( str_p("eq") )
-			  | rootNode( str_p("neq") )
-			  | rootNode( str_p("gt") )
-			  | rootNode( str_p("lt") )
-			  | rootNode( str_p("geq") )
-			  | rootNode( str_p("leq") )
-			  | rootNode( str_p("and") )
-			  | rootNode( str_p("or") )
-			  | rootNode( str_p("xor") )
-			  | rootNode( str_p("not") )
-			  | rootNode( str_p("abs") )
-			  | rootNode( str_p("sqrt") )
-			  | rootNode( str_p("pow") )
-			  | rootNode( str_p("exp") )
-			  | rootNode( str_p("log10") )
-			  | rootNode( str_p("log") )
-			  | rootNode( str_p("floor") )
-			  | rootNode( str_p("ceil") )
-			  | rootNode( str_p("sin") )
-			  | rootNode( str_p("cos") )
-			  | rootNode( str_p("tan") )
-			  | rootNode( str_p("sinh") )
-			  | rootNode( str_p("cosh") )
-			  | rootNode( str_p("tanh") )
-			  | rootNode( str_p("asin") )
-			  | rootNode( str_p("acos") )
-			  | rootNode( str_p("atan") )
-			  | rootNode( str_p("fact") )
-			  | rootNode( str_p("asinh") )
-			  | rootNode( str_p("acosh") )
-			  | rootNode( str_p("atanh") )
-			  | rootNode( str_p("asech") )
-			  | rootNode( str_p("acsch") )
-			  | rootNode( str_p("acoth") )
-			  | rootNode( str_p("sech") )
-			  | rootNode( str_p("csch") )
-			  | rootNode( str_p("coth") )
-			  | rootNode( str_p("asec") )
-			  | rootNode( str_p("acsc") )
-			  | rootNode( str_p("acot") )
-			  | rootNode( str_p("sec") )
-			  | rootNode( str_p("csc") )
-			  | rootNode( str_p("cot") )
-			  ) >>
-	    inner_node_d[ ch_p('(') >>  
-			  ( expression >>
-			    *( discard_node_d[ ch_p(',') ] >>
-			       expression ) ) >> 
-			  ch_p(')') ];
-
-	  group       =   inner_node_d[ ch_p('(') >> expression >> ch_p(')')];
-	
-	  constant    =   exponent | floating | integer;
-
-	  factor      =   call_func
-	    |   system_func
-	    |   variable 
-	    |   constant
-	    |   group
-	    |   identifier
-	    |   negative;
-	
-	  power = factor >> *( rootNode( ch_p('^') ) >> factor );
-
-	  term        =  power >>
-	    *( ( rootNode( ch_p('*') ) >> power )
-	       |  ( rootNode( ch_p('/') ) >> power )
-	       |  ( rootNode( ch_p('^') ) >> power ) );
-	
-
-	  expression  =  term >>
-	    *( (rootNode( ch_p('+') ) >> term)
-	       |  (rootNode( ch_p('-') ) >> term) );
-	}
-      
-	rule<ScannerT, PARSER_CONTEXT, parser_tag<VARIABLE> >     variable;
-	rule<ScannerT, PARSER_CONTEXT, parser_tag<CALL_FUNC> >   call_func;
-	rule<ScannerT, PARSER_CONTEXT, parser_tag<EXPRESSION> >   expression;
-	rule<ScannerT, PARSER_CONTEXT, parser_tag<TERM> >         term;
-	rule<ScannerT, PARSER_CONTEXT, parser_tag<POWER> >        power;
-	rule<ScannerT, PARSER_CONTEXT, parser_tag<FACTOR> >       factor;
-	rule<ScannerT, PARSER_CONTEXT, parser_tag<FLOATING> >     floating;
-	rule<ScannerT, PARSER_CONTEXT, parser_tag<EXPONENT> >     exponent;
-	rule<ScannerT, PARSER_CONTEXT, parser_tag<INTEGER> >      integer;
-	rule<ScannerT, PARSER_CONTEXT, parser_tag<NEGATIVE> >     negative;
-	rule<ScannerT, PARSER_CONTEXT, parser_tag<GROUP> >        group;
-	rule<ScannerT, PARSER_CONTEXT, parser_tag<IDENTIFIER> >   identifier;
-	rule<ScannerT, PARSER_CONTEXT, parser_tag<CONSTANT> >     constant;
-	rule<ScannerT, PARSER_CONTEXT, parser_tag<SYSTEM_FUNC> >  system_func;
-
-	rule<ScannerT, PARSER_CONTEXT, parser_tag<EXPRESSION> > const&
-	start() const { return expression; }
-      };
-
-#undef leafNode
-#undef rootNode
- 
-    };
-
-
-    public:
-    
-      Compiler()
-      {
-	if( theConstantMap.empty() == true )
-	  {
-	    fillConstantMap();
-	  }
-	if( theFunctionMap1.empty() == true )
-	  {
-	    fillFunctionMap();
-	  }
-      }
-    
-      ~Compiler()
-      {
-	;
-      }
-    
-      typedef char const*         iterator_t;
-      typedef tree_match<iterator_t> parse_tree_match_t;
-      typedef parse_tree_match_t::tree_iterator TreeIterator;
-      //    DECLARE_CLASS( TreeIterator );
-
-      void setProcessPtr( ProcessPtr aProcessPtr )
-      {
-	theProcessPtr = aProcessPtr;
-      }
-
-      void setExpressionProcessBasePtr( ExpressionProcessBasePtr 
-					aExpressionProcessBasePtr )
-      {
-	theExpressionProcessBasePtr = aExpressionProcessBasePtr;
-      }
-
-      const int getStackSize()
-      {
-	return theStackSize;
-      }
-      
-      void fillConstantMap()
-      {
-	theConstantMap[ "true" ] = 1.0;
-	theConstantMap[ "false" ] = 0.0;
-	theConstantMap[ "pi" ] = M_PI;
-	theConstantMap[ "NaN" ] = std::numeric_limits<Real>::quiet_NaN();
-	theConstantMap[ "INF"] = std::numeric_limits<Real>::infinity();
-	theConstantMap[ "N_A" ] = N_A;
-	theConstantMap[ "exp" ] = M_E;
-      }
-    
-      void fillFunctionMap();
-
-      const Code compileExpression( StringCref anExpression )
-      {
-	Code aCode;
-	CompileGrammar aGrammer;
-	
-	theStackSize = 1;
-
-	tree_parse_info<> 
-	  info( ast_parse( anExpression.c_str(), aGrammer, space_p ) );
-
-	if( info.full )
-	  {
-	    compileTree( info.trees.begin(), aCode );
-	  }
-	else
-	  {
-	    THROW_EXCEPTION( UnexpectedError, 
-			     "Parse error in the expression. Expression : " + anExpression );
-	  }
-	
-	return aCode;
-      }
-      
-    private:
-      
-      void compileTree( TreeIterator const&  i, CodeRef aCode );  
-
-    private:
-
-      int theStackSize;
-      ProcessPtr theProcessPtr;
-      ExpressionProcessBasePtr theExpressionProcessBasePtr;
-
-      ConstantMap theConstantMap;
-      FunctionMap1 theFunctionMap1;
-      FunctionMap2 theFunctionMap2;
-    };
-
-   
-
 
 
   public:
@@ -928,38 +147,29 @@ namespace libecs
       }
 
     virtual void defaultSetProperty( StringCref aPropertyName,
-			     PolymorphCref aValue)
+				     PolymorphCref aValue)
       {
-	thePropertyMap[ aPropertyName ] = aValue.asReal();
-	
-	for( InstructionVectorConstIterator i( theCompiledCode.begin() );
-	     i != theCompiledCode.end(); ++i )
-	  {
-	    (*i)->initialize();
-	  }
+	thePropertyMap[ aPropertyName ] = aValue;
       } 
-    
+
+    /**virtual const Polymorph getExtraPropertyList()
+      {
+	return thePropertyMap;
+	}*/
 
     virtual void initialize()
       {
-	Compiler theCompiler;
+	ExpressionCompiler theCompiler;
 
 	Process::initialize();
 
 	theCompiler.setProcessPtr( static_cast<Process*>( this ) );
-	theCompiler.setExpressionProcessBasePtr( this );
+	theCompiler.setPropertyMap( thePropertyMap );
 
 	theCompiledCode.clear();
 	theCompiledCode = theCompiler.compileExpression( theExpression );
 
 	theStackMachine.resize( theCompiler.getStackSize() );
-
-	for( InstructionVectorConstIterator i( theCompiledCode.begin() );
-	     i != theCompiledCode.end(); ++i )
-	  {
-	    (*i)->initialize();
-	  }
-
       }
 
   protected:
@@ -972,956 +182,360 @@ namespace libecs
     PropertyMap thePropertyMap;
   };
 
+
   
-  
-  void libecs::ExpressionProcessBase::Compiler::fillFunctionMap()
+  const Real ExpressionProcessBase::StackMachine::
+  execute( CodeCref aCode )
   {
-    theFunctionMap1["abs"] = std::fabs;
-    theFunctionMap1["sqrt"] = std::sqrt;
-    theFunctionMap1["exp"] = std::exp;
-    theFunctionMap1["log10"] = std::log10;
-    theFunctionMap1["log"] = std::log;
-    theFunctionMap1["floor"] = std::floor;
-    theFunctionMap1["ceil"] = std::ceil;
-    theFunctionMap1["sin"] = std::sin;
-    theFunctionMap1["cos"] = std::cos;
-    theFunctionMap1["tan"] = std::tan;
-    theFunctionMap1["sinh"] = std::sinh;
-    theFunctionMap1["cosh"] = std::cosh;
-    theFunctionMap1["tanh"] = std::tanh;
-    theFunctionMap1["asin"] = std::asin;
-    theFunctionMap1["acos"] = std::acos;
-    theFunctionMap1["atan"] = std::atan;
-    theFunctionMap1["fact"] = fact;
-    theFunctionMap1["asinh"] = asinh;
-    theFunctionMap1["acosh"] = acosh;
-    theFunctionMap1["atanh"] = atanh;
-    theFunctionMap1["asech"] = asech;
-    theFunctionMap1["acsch"] = acsch;
-    theFunctionMap1["acoth"] = acoth;
-    theFunctionMap1["sech"] = sech;
-    theFunctionMap1["csch"] = csch;
-    theFunctionMap1["coth"] = coth;
-    theFunctionMap1["asec"] = asec;
-    theFunctionMap1["acsc"] = acsc;
-    theFunctionMap1["acot"] = acot;
-    theFunctionMap1["sec"] = sec;
-    theFunctionMap1["csc"] = csc;
-    theFunctionMap1["cot"] = cot;
+    //using libecs::ExpressionCompiler;
 
-    theFunctionMap2["pow"] = pow;
-  }
+    const char* aPC( &aCode[0] );
+
+    reset();
 
 
-  /**
-     This function is Compiler subclass member function.
-     This member function evaluates AST tree and makes binary codes.
-  */
-  
-  void
-  libecs::ExpressionProcessBase::Compiler::compileTree
-  ( TreeIterator const& i, CodeRef theCode )
-  {
-    /**
-           std::cout << "In compileExpression. i->value = " <<
-       String(i->value.begin(), i->value.end()) <<
-       " i->children.size() = " << i->children.size() << std::endl; 
-    */
+    //#define DECLARE_CURRENTINSTRUCTION( OPCODE )
 
-    Real n,n1,n2;
-    String str, str_child1, str_child2, str_child3;
-    VariableReference aVariableReference;
+#define FETCH_INSTRUCTION( PC )\
+    const ExpressionCompiler::InstructionHead* anInstructionHead\
+      ( reinterpret_cast<const ExpressionCompiler::InstructionHead*>( PC ) );
 
-    ConstantMapIterator theConstantMapIterator;
-    PropertyMapIterator thePropertyMapIterator;
-    FunctionMap1Iterator theFunctionMap1Iterator;
-    FunctionMap2Iterator theFunctionMap2Iterator;
-	    
-    std::vector<char>::iterator container_iterator;
+//    const INSTRUCTION* anInstruction( (INSTRUCTION*) PC );
+
+#define DECODE_INSTRUCTION( OPCODE )\
+    typedef ExpressionCompiler::\
+      Opcode2Instruction<ExpressionCompiler::OPCODE>::type CurrentInstruction;\
+    const size_t SizeOfCurrentInstruction( sizeof( CurrentInstruction ) );\
+    const CurrentInstruction*\
+       anInstruction( reinterpret_cast< const CurrentInstruction* >\
+      ( anInstructionHead ) );
+
+#define INCREMENT_PC( PC )\
+    PC += SizeOfCurrentInstruction;
 
 
-    switch ( i->value.id().to_long() )
+    while( 1 )
       {
-	/**
-	   Floating Grammar compile
-	*/
+	// decode opcode
+	//	const ExpressionCompiler::Opcode* 
+	//anOpcode( (ExpressionCompiler::Opcode*)aPC );
+	FETCH_INSTRUCTION( aPC );
 
-      case CompileGrammar::FLOATING :
-	
-	assert(i->children.size() == 0);
-	
-	for( container_iterator = i->value.begin();
-	     container_iterator != i->value.end(); ++container_iterator )
+	const ExpressionCompiler::Opcode 
+	  anOpcode( anInstructionHead->getOpcode() );
+
+	std::cout << "--------------------------------" << std::endl;
+	std::cout << "OPCode " << anOpcode << std::endl;
+
+	switch ( anOpcode )
 	  {
-	    str += *container_iterator;
-	  }
-	
-	n = stringCast<Real>( str );
-    
-	++theStackSize;
-	theCode.push_back( new PUSH( n ) );
+	  case ExpressionCompiler::PUSH:
+	    {
+              DECODE_INSTRUCTION( PUSH );
 
-	return;
-      
-    
+	      ++theStackPtr;
+	      theStackPtr->theReal = anInstruction->getOperand();
+	      
+	      std::cerr << "PUSH " << (Real)theStackPtr->theReal << std::endl;
+	      
+	      INCREMENT_PC( aPC );
 
-	/**
-	   Integer Grammar compile
-	*/
+	      std::cerr << "PUSH CurrentInstruction Size : " << sizeof(CurrentInstruction) << std::endl;
 
-      case CompileGrammar::INTEGER :
-
-	assert(i->children.size() == 0);
-
-	for( container_iterator = i->value.begin();
-	     container_iterator != i->value.end(); ++container_iterator )
-	  {	  
-	    str += *container_iterator;
-	  }
-
-	n = stringCast<Real>( str );
-	
-	++theStackSize;
-	theCode.push_back( new PUSH( n ) );
-	  
-	return; 
-	
-	
-	/**
-	   Grammar compile
-	*/
-
-      case CompileGrammar::EXPONENT:
-
-	assert( *i->value.begin() == 'E' || *i->value.begin() == 'e' );
-	
-	for( container_iterator = i->children.begin()->value.begin();
-	     container_iterator != i->children.begin()->value.end();
-	     ++container_iterator )
-	  {
-	    str_child1 += *container_iterator;
-	  }
-
-	for( container_iterator = ( i->children.begin()+1 )->value.begin();
-	     container_iterator != ( i->children.begin()+1 )->value.end();
-	     ++container_iterator )
-	  {
-	    str_child2 += *container_iterator;
-	  }
-
-	n1 = stringCast<Real>( str_child1 );
-
-	++theStackSize;
-	
-	if( str_child2 != "-")
-	  {
-	    n2 = stringCast<Real>( str_child2 );
-	
-	    theCode.push_back( new PUSH( n1 * pow(10, n2) ) );
-	  }
-	else
-	  {
-	    for( container_iterator = ( i->children.begin()+2 )->value.begin();
-		 container_iterator != ( i->children.begin()+2 )->value.end();
-		 ++container_iterator )
-	      {
-		str_child3 += *container_iterator;
-	      }
-
-	    n2 = stringCast<Real>( str_child3 );
-	    theCode.push_back( new PUSH( n1 * pow(10, -n2) ) );
-	  }
-
-	return; 
-	
-    
-
-	/**
-	   Call_Func Grammar compile
-	*/
-
-      case CompileGrammar::CALL_FUNC :
-
-	assert( i->children.size() != 0 );
-	
-	for( container_iterator = i->value.begin();
-	     container_iterator != i->value.end(); ++container_iterator )
-	  {
-	    str += *container_iterator;
-	  }
-
-	++theStackSize;
-	if( i->children.size() == 1 )
-	  {
-	    if( str == "not" )
-	      {
-		compileTree( i->children.begin(), theCode );
-
-		theCode.push_back( new NOT() );
-	      }
-	    else
-	      {
-		theFunctionMap1Iterator = theFunctionMap1.find( str );
-		
-		if( i->children.begin()->value.id() ==
-		    CompileGrammar::INTEGER ||
-		    i->children.begin()->value.id() ==
-		    CompileGrammar::FLOATING  )
-		  {
-		    for( container_iterator =
-			   i->children.begin()->value.begin();
-			 container_iterator !=
-			   i->children.begin()->value.end();
-			 ++container_iterator )
-		      {
-			str_child1 += *container_iterator;
-		      }
-		    
-		    n = stringCast<Real>( str_child1 );
-		
-		    if( theFunctionMap1Iterator != theFunctionMap1.end() )
-		      {
-			theCode.push_back
-			  ( new PUSH( ( *theFunctionMap1Iterator->second )( n ) ) );
-		      }
-		    else
-		      {
-			THROW_EXCEPTION( NoSlot, 
-					 str +
-					 String( " : No such function." ) );
-		      }
-		  }
-		else
-		  {
-		    compileTree( i->children.begin(), theCode );	  
-		    
-		    if( theFunctionMap1Iterator != theFunctionMap1.end() )
-		      {
-			theCode.push_back
-			  ( new 
-			    CALL_FUNC1( theFunctionMap1Iterator->second ) );
-		      }
-		    else
-		      {
-			THROW_EXCEPTION( NoSlot, 
-					 str +
-					 String( " : No such function." ) );
-		      }
-		  }
-	      }
-	  }
-	else if( i->children.size() == 2 )
-	  {
-	    compileTree( i->children.begin(), theCode );	  
-	    compileTree( i->children.begin()+1, theCode );
-		
-	    if( str == "eq" )
-	      {
-		theCode.push_back( new EQ() );
-	      }
-	    else if( str == "neq" )
-	      {
-		theCode.push_back( new NEQ() );
-	      }
-	    else if( str == "gt" )
-	      {
-		theCode.push_back( new GT() );
-	      }
-	    else if( str == "lt" )
-	      {
-		theCode.push_back( new LT() );
-	      }
-	    else if( str == "geq" )
-	      {
-		theCode.push_back( new GEQ() );
-	      }
-	    else if( str == "leq" )
-	      {
-		theCode.push_back( new LEQ() );
-	      }
-	    else if( str == "and" )
-	      {
-		theCode.push_back( new AND() );
-	      }
-	    else if( str == "or" )
-	      {
-		theCode.push_back( new OR() );
-	      }
-	    else if( str == "xor" )
-	      {
-		theCode.push_back( new XOR() );
-	      }
-	    else
-	      {
-		theFunctionMap2Iterator = theFunctionMap2.find( str );
-		
-		if( theFunctionMap2Iterator != theFunctionMap2.end() )
-		  {
-		    theCode.push_back
-		      ( new CALL_FUNC2( theFunctionMap2Iterator->second ) );
-		  }
-		else
-		  {
-		    THROW_EXCEPTION( NoSlot, 
-				     str + String( " : No such function." ) );
-		  }
-	      }
-	  }
-	else
-	  {
-	  THROW_EXCEPTION( NoSlot,
-			   str + 
-			   String(" : No such function.") );
-	  }
-
-	return;
-	
-	
-
-	/**
-	   System_Func Grammar compile
-	*/
-
-      case CompileGrammar::SYSTEM_FUNC :
-
-	++theStackSize;
-	
-	for( container_iterator = i->children.begin()->value.begin();
-	     container_iterator != i->children.begin()->value.end();
-	     ++container_iterator )
-	  {
-	    str_child1 += *container_iterator;
-	  }
-
-	for( container_iterator = ( i->children.begin()+1 )->value.begin();
-	     container_iterator != ( i->children.begin()+1 )->value.end();
-	     ++container_iterator )
-	  {
-	    str_child2 += *container_iterator;
-	  }
-	
-	assert( *i->value.begin() == '.' );
-	
-	if( str_child2 == "getSuperSystem" )
-	  {
-	    for( container_iterator = ( i->children.begin()+2 )->value.begin();
-		 container_iterator != ( i->children.begin()+2 )->value.end();
-		 ++container_iterator )
-	      {
-		str_child3 += *container_iterator;
-	      }
-
-	    if( str_child3 == "Size" )
-	      {
-		if( str_child1 == "self" )
-		  {
-		    theCode.push_back
-		      ( new PROCESS_SYSTEM_FUNC
-			( theProcessPtr,
-			  &libecs::Process::getSuperSystem,
-			  &libecs::System::getSize ) );
-		  }
-		else
-		  {
-		    aVariableReference = 
-		      theProcessPtr->libecs::Process::
-		      getVariableReference( str_child1 );
-		    
-		    theCode.push_back
-		      ( new VARIABLE_SYSTEM_FUNC
-			( aVariableReference,
-			  &libecs::VariableReference::getSuperSystem,
-			  &libecs::System::getSize ) );
-		  }
-	      }
-	    else if( str_child3 == "SizeN_A" )
-	      {
-		if( str_child1 == "self" )
-		  {
-		    theCode.push_back
-		      ( new PROCESS_SYSTEM_FUNC
-			( theProcessPtr,
-			  &libecs::Process::getSuperSystem,
-			  &libecs::System::getSizeN_A ) );
-		  }
-		else
-		  {
-		    aVariableReference = 
-		      theProcessPtr->libecs::Process::
-		      getVariableReference( str_child1 );
-		    
-		    theCode.push_back
-		      ( new VARIABLE_SYSTEM_FUNC
-			( aVariableReference,
-			  &libecs::VariableReference::getSuperSystem,
-			  &libecs::System::getSizeN_A ) );
-		  }
-	      }
-	    else
-	      {
-		THROW_EXCEPTION( NoSlot,
-				 str_child3 + 
-				 String
-				 (" : No such System attribute.") );
-	      }
-	  }
-	else
-	  {
-	    THROW_EXCEPTION( NoSlot,
-			     str_child2 + 
-			     String
-			     ( " : No such Process attribute." ) );
-	  }
-	return;
-	
-
-	/**
-	   Variable Grammar compile
-	*/
-
-      case CompileGrammar::VARIABLE :
-
-	assert( *i->value.begin() == '.' );
-
-	for( container_iterator = i->children.begin()->value.begin();
-	     container_iterator != i->children.begin()->value.end();
-	     ++container_iterator )
-	  {
-	    str_child1 += *container_iterator;
-	  }
-
-	for( container_iterator = ( i->children.begin()+1 )->value.begin();
-	     container_iterator != ( i->children.begin()+1 )->value.end();
-	     ++container_iterator )
-	  {
-	    str_child2 += *container_iterator;
-	  }
-      	
-	aVariableReference = 
-	  theProcessPtr->libecs::Process::getVariableReference( str_child1 );
-	
-	++theStackSize;
-
-	if( str_child2 == "MolarConc" )
-	  {
-	    theCode.push_back
-	      ( new VARREF_FUNC( aVariableReference,
-				 &libecs::VariableReference::getMolarConc ) );
-	  }
-	else if( str_child2 == "NumberConc" )
-	  {
-	    theCode.push_back
-	      ( new VARREF_FUNC( aVariableReference,
-				 &libecs::VariableReference::getNumberConc ) );
-	  }
-	else if( str_child2 == "Value" )
-	  {
-	    theCode.push_back
-	      ( new VARREF_FUNC( aVariableReference,
-				 &libecs::VariableReference::getValue ) );
-	  }
-	/**       	else if( str_child2 == "Coefficient" ){
-			theCode.push_back(
-			new VARREF_FUNC( aVariableReference,
-			&libecs::VariableReference::getCoefficient ) );
-			} 
-			else if( str_child2 == "Fixed" ){
-			theCode.push_back(
-			new VARREF_FUNC( aVariableReference,
-			&libecs::VariableReference::isFixed ) );
-			}*/
-	else if( str_child2 == "Velocity" )
-	  {
-	    theCode.push_back
-	      ( new VARREF_FUNC( aVariableReference,
-				 &libecs::VariableReference::getVelocity ) );
-	  }
-	else if( str_child2 == "TotalVelocity" )
-	  {
-	    theCode.push_back
-	      ( new VARREF_FUNC( aVariableReference,
-				 &libecs::VariableReference::getTotalVelocity 
-				 ) );
-	  }
-	else
-	  {
-	    THROW_EXCEPTION
-	      ( NoSlot,
-		str_child2 + 
-		String
-		( " : No such VariableReference attribute." ) ); 
-	  }
-	return;
-	
-
-
-	/**
-	   Identifier Grammar compile
-	*/
-
-      case CompileGrammar::IDENTIFIER :
-
-	assert( i->children.size() == 0 );
-	
-	++theStackSize;
-
-	for( container_iterator = i->value.begin();
-	     container_iterator != i->value.end(); ++container_iterator )
-	  {
-	    str += *container_iterator;
-	  }
-
-	theConstantMapIterator = theConstantMap.find( str );
-	thePropertyMapIterator = 
-	  ( theExpressionProcessBasePtr->thePropertyMap).find( str );
-	
-	if( theConstantMapIterator != theConstantMap.end() )
-	  {
-	    theCode.push_back( new PUSH( theConstantMapIterator->second ) );
-	  }
-	else if( thePropertyMapIterator !=
-		 ( (theExpressionProcessBasePtr->thePropertyMap).end() ) )
-	  {
-	    theCode.push_back
-	      ( new CALL_PROPERTY
-		( theExpressionProcessBasePtr->thePropertyMap, str ) );
-	    //theCode.push_back( InstructPtr 
-	    //( new CALL_PROPERTY( thePropertyMapIterator->second ) ) );
-	  }
-	else
-	  {
-	    THROW_EXCEPTION( NoSlot,
-			     str + String( " : No such Property slot." ) );
-	  }
-	
-	return;
-      
-
-
-	/**
-	   Negative Grammar compile 
-	*/
-    
-      case CompileGrammar::NEGATIVE :
-
-	assert( *i->value.begin() == '-' );
-
-	for( container_iterator = i->children.begin()->value.begin();
-	     container_iterator != i->children.begin()->value.end();
-	     ++container_iterator )
-	  {
-	    str_child1 += *container_iterator;
-	  }
-
-	if( i->children.begin()->value.id() == CompileGrammar::INTEGER ||
-	    i->children.begin()->value.id() == CompileGrammar::FLOATING  )
-	  {
-	    n = stringCast<Real>( str_child1 );
-
-	    ++theStackSize;
-	    theCode.push_back( new PUSH( -n ) ); 
-	  }
-	else
-	  {
-	    compileTree(i->children.begin(), theCode );
-	    theCode.push_back( new NEG() );
-	  }
-	return;
-      
-
-    
-	/**
-	   Power Grammar compile
-	*/
-
-      case CompileGrammar::POWER :
-
-	assert(i->children.size() == 2);
-
-	if( ( i->children.begin()->value.id() == CompileGrammar::INTEGER ||
-	      i->children.begin()->value.id() == CompileGrammar::FLOATING ) && 
-	    ( ( i->children.begin()+1 )->value.id() == CompileGrammar::INTEGER
-	      ||
-	      ( i->children.begin()+1 )->value.id() == CompileGrammar::FLOATING
-	      ) )
-	  {
-	    for( container_iterator = i->children.begin()->value.begin();
-		 container_iterator != i->children.begin()->value.end();
-		 ++container_iterator )
-	      {
-		str_child1 += *container_iterator;
-	      }
-
-	    for( container_iterator = ( i->children.begin()+1 )->value.begin();
-		 container_iterator != ( i->children.begin()+1 )->value.end();
-		 ++container_iterator )
-	      {
-		str_child2 += *container_iterator;
-	      }
-
-	    n1 = stringCast<Real>( str_child1 );
-	    n2 = stringCast<Real>( str_child2 );	  
-
-	    ++theStackSize;
-
-	    if( *i->value.begin() == '^' )
-	      {
-		theCode.push_back( new PUSH( pow( n1, n2 ) ) ); 
-	      }
-	    else
-	      THROW_EXCEPTION( NoSlot, String( " unexpected error " ) );
-
-	    return;
-	  }
-	else
-	  {
-	    compileTree( i->children.begin(), theCode );
-	    compileTree( i->children.begin()+1, theCode );
+	      break;
+	    }
 	    
-	    if( *i->value.begin() == '^' )
-	      {
-		theCode.push_back( new POW() );
-	      }
-	    else
-	      THROW_EXCEPTION( NoSlot, String( " unexpected error " ) );
+	  case ExpressionCompiler::NEG:
+	    {
+              DECODE_INSTRUCTION( NEG );
 
-	    return;
+	      theStackPtr->theReal = - theStackPtr->theReal;
+
+	      INCREMENT_PC( aPC );
+	      break;
+	    }
+
+	  case ExpressionCompiler::ADD:
+	    {
+	      std::cout << "ADD" << std::endl;
+
+              DECODE_INSTRUCTION( ADD );
+	      
+	      Real* aStackTop1( &theStackPtr->theReal );
+	      --theStackPtr;
+	      Real* aStackTop2( &theStackPtr->theReal );
+	      
+	      *aStackTop2 = *aStackTop1 + *aStackTop2;
+
+	      INCREMENT_PC( aPC );
+
+	      std::cout << "ADD Current InstructionSize : " << sizeof( CurrentInstruction ) << std::endl;
+	      break;
+	    }
+
+	  case ExpressionCompiler::SUB:
+	    {
+	      std::cout << "SUB" << std::endl;
+
+              DECODE_INSTRUCTION( SUB );
+
+	      Real* aStackTop1( &theStackPtr->theReal );
+	      --theStackPtr;
+	      Real* aStackTop2( &theStackPtr->theReal );
+	      
+	      *aStackTop2 = *aStackTop1 - *aStackTop2;
+
+	      INCREMENT_PC( aPC );
+	      break;
+	    }
+
+	  case ExpressionCompiler::MUL:
+	    {
+	      std::cout << "MUL" << std::endl;
+
+              DECODE_INSTRUCTION( MUL );
+
+	      Real* aStackTop1( &theStackPtr->theReal );
+	      --theStackPtr;
+	      Real* aStackTop2( &theStackPtr->theReal );
+
+	      std::cout << "StackTop1 : " << *aStackTop1<< std::endl;
+	      std::cout << "StackTop2 : " << *aStackTop2<< std::endl;
+	      
+	      *aStackTop2 = *aStackTop1 * *aStackTop2;
+
+	      std::cout << "MUL Result : " << *aStackTop2 << std::endl;
+
+
+	      INCREMENT_PC( aPC );
+	      break;
+	    }
+
+	  case ExpressionCompiler::DIV:
+	    {
+	      std::cout << "DIV" << std::endl;
+
+              DECODE_INSTRUCTION( DIV );
+
+	      Real* aStackTop1( &theStackPtr->theReal );
+	      --theStackPtr;
+	      Real* aStackTop2( &theStackPtr->theReal );
+	      
+	      *aStackTop2 = *aStackTop1 / *aStackTop2;
+
+
+	      INCREMENT_PC( aPC );
+	      break;
+	    }
+
+	  case ExpressionCompiler::POW:
+	    {
+              DECODE_INSTRUCTION( POW );
+
+	      Real* aStackTop1( &theStackPtr->theReal );
+	      --theStackPtr;
+	      Real* aStackTop2( &theStackPtr->theReal );
+	      
+	      *aStackTop2 = pow( *aStackTop1, *aStackTop2 );
+
+
+	      INCREMENT_PC( aPC );
+	      break;
+	    }
+
+	  case ExpressionCompiler::EQ:
+	    {
+              DECODE_INSTRUCTION( EQ );
+
+	      Real* aStackTop1( &theStackPtr->theReal );
+	      --theStackPtr;
+	      Real* aStackTop2( &theStackPtr->theReal );
+	      
+	      *aStackTop2 = Real( *aStackTop1 == *aStackTop2 );
+
+
+	      INCREMENT_PC( aPC );
+	      break;
+	    }
+
+	  case ExpressionCompiler::NEQ:
+	    {
+              DECODE_INSTRUCTION( NEQ );
+
+	      Real* aStackTop1( &theStackPtr->theReal );
+	      --theStackPtr;
+	      Real* aStackTop2( &theStackPtr->theReal );
+	      
+	      *aStackTop2 = Real( *aStackTop1 != *aStackTop2 );
+
+
+	      INCREMENT_PC( aPC );
+	      break;
+	    }
+
+	  case ExpressionCompiler::GT:
+	    {
+              DECODE_INSTRUCTION( GT );
+
+	      Real* aStackTop1( &theStackPtr->theReal );
+	      --theStackPtr;
+	      Real* aStackTop2( &theStackPtr->theReal );
+	      
+	      *aStackTop2 = Real( *aStackTop1 > *aStackTop2 );
+
+
+	      INCREMENT_PC( aPC );
+	      break;
+	    }
+
+	  case ExpressionCompiler::GEQ:
+	    {
+              DECODE_INSTRUCTION( GEQ );
+
+	      Real* aStackTop1( &theStackPtr->theReal );
+	      --theStackPtr;
+	      Real* aStackTop2( &theStackPtr->theReal );
+	      
+	      *aStackTop2 = Real( *aStackTop1 >= *aStackTop2 );
+
+
+	      INCREMENT_PC( aPC );
+	      break;
+	    }
+
+	  case ExpressionCompiler::LT:
+	    {
+              DECODE_INSTRUCTION( LT );
+
+	      Real* aStackTop1( &theStackPtr->theReal );
+	      --theStackPtr;
+	      Real* aStackTop2( &theStackPtr->theReal );
+	      
+	      *aStackTop2 = Real( *aStackTop1 < *aStackTop2 );
+
+
+	      INCREMENT_PC( aPC );
+	      break;
+	    }
+
+	  case ExpressionCompiler::LEQ:
+	    {
+              DECODE_INSTRUCTION( LEQ );
+
+	      Real* aStackTop1( &theStackPtr->theReal );
+	      --theStackPtr;
+	      Real* aStackTop2( &theStackPtr->theReal );
+	      
+	      *aStackTop2 = Real( *aStackTop1 <= *aStackTop2 );
+
+
+	      INCREMENT_PC( aPC );
+	      break;
+	    }
+
+	  case ExpressionCompiler::AND:
+	    {
+              DECODE_INSTRUCTION( AND );
+
+	      Real* aStackTop1( &theStackPtr->theReal );
+	      --theStackPtr;
+	      Real* aStackTop2( &theStackPtr->theReal );
+	      
+	      *aStackTop2 = Real( *aStackTop1 && *aStackTop2 );
+
+
+	      INCREMENT_PC( aPC );
+	      break;
+	    }
+
+	  case ExpressionCompiler::OR:
+	    {
+              DECODE_INSTRUCTION( OR );
+
+	      Real* aStackTop1( &theStackPtr->theReal );
+	      --theStackPtr;
+	      Real* aStackTop2( &theStackPtr->theReal );
+	      
+	      *aStackTop2 = Real( *aStackTop1 || *aStackTop2 );
+
+
+	      INCREMENT_PC( aPC );
+	      break;
+	    }
+
+	  case ExpressionCompiler::XOR:
+	    {
+              DECODE_INSTRUCTION( XOR );
+
+	      Real* aStackTop1( &theStackPtr->theReal );
+	      --theStackPtr;
+	      Real* aStackTop2( &theStackPtr->theReal );
+	      
+	      *aStackTop2 = Real( *aStackTop1 && !( *aStackTop2 ) );
+
+
+	      INCREMENT_PC( aPC );
+	      break;
+	    }
+
+	  case ExpressionCompiler::NOT:
+	    {
+              DECODE_INSTRUCTION( NOT );
+
+	      theStackPtr->theReal = !( theStackPtr->theReal );
+
+	      INCREMENT_PC( aPC );
+	      break;
+	    }
+
+	  case ExpressionCompiler::CALL_FUNC1:
+	    {
+	      std::cout << "CALL_FUNC1" << std::endl;
+
+              DECODE_INSTRUCTION( CALL_FUNC1 );
+
+	      theStackPtr->theReal
+		= ( anInstruction->getOperand() )( theStackPtr->theReal );
+	      
+	      INCREMENT_PC( aPC );
+	      break;
+	    }
+
+
+
+	    /**case ExpressionCompiler::CALL_FUNC2:
+	  case ExpressionCompiler::GET_PROPERTY:
+	  case ExpressionCompiler::VARREF_METHOD:
+	  case ExpressionCompiler::PROCESS_METHOD:
+	  case ExpressionCompiler::PROCESS_METHOD:
+	  case ExpressionCompiler::SYSTEM_METHOD:*/
+
+
+
+	  case ExpressionCompiler::HALT:
+	    {
+              DECODE_INSTRUCTION( HALT );
+
+	      std::cout << "HALTSize : " << sizeof( CurrentInstruction ) << std::endl;
+	      return theStackPtr->theReal;
+	    }
+
+	  default:
+	    THROW_EXCEPTION( UnexpectedError, "Invalid instruction." );
 	  }
-
-	return;
-      
-
-	/**
-	   Term Grammar compile
-	*/
-
-      case CompileGrammar::TERM :
-
-	assert(i->children.size() == 2);
-
-	if( ( i->children.begin()->value.id() == CompileGrammar::INTEGER ||
-	      i->children.begin()->value.id() == CompileGrammar::FLOATING ) && 
-	    ( ( i->children.begin()+1 )->value.id() == CompileGrammar::INTEGER
-	      ||
-	      ( i->children.begin()+1 )->value.id() == CompileGrammar::FLOATING
-	      ) )
-	  {
-	    for( container_iterator = i->children.begin()->value.begin();
-		 container_iterator != i->children.begin()->value.end();
-		 ++container_iterator )
-	      {
-		str_child1 += *container_iterator;
-	      }
-
-	    for( container_iterator = ( i->children.begin()+1 )->value.begin();
-		 container_iterator != ( i->children.begin()+1 )->value.end();
-		 ++container_iterator )
-	      {
-		str_child2 += *container_iterator;
-	      }
-
-	    n1 = stringCast<Real>( str_child1 );
-	    n2 = stringCast<Real>( str_child2 );	  
-
-	    ++theStackSize;
-
-	    if (*i->value.begin() == '*')
-	      {
-		theCode.push_back( new PUSH( n1 * n2 ) );
-	      }	
-	    else if (*i->value.begin() == '/')
-	      {
-		theCode.push_back( new PUSH( n1 / n2 ) ); 
-	      }
-	    else
-	      THROW_EXCEPTION( NoSlot, String( "Fatal: Unexpected error." ) );
-
-	    return;
-	  }
-	else
-	  {
-	    compileTree( i->children.begin(), theCode );
-	    compileTree( i->children.begin()+1, theCode );
-	    
-	    if (*i->value.begin() == '*')
-	      {
-		theCode.push_back( new MUL() );
-	      }
-	    
-	    else if (*i->value.begin() == '/')
-	      {
-		theCode.push_back( new DIV() );
-	      }
-	    else
-	      THROW_EXCEPTION( NoSlot, String( "Fatal: Unexpected error." ) );
-
-	    return;
-	  }
-
-	return;
-      
-
-    
-	/**
-	   Expression Grammar compile
-	*/
-
-      case CompileGrammar::EXPRESSION :
-
-	assert(i->children.size() == 2);
-	
-	if( ( i->children.begin()->value.id() == CompileGrammar::INTEGER ||
-	      i->children.begin()->value.id() == CompileGrammar::FLOATING ) &&
-	    ( ( i->children.begin()+1 )->value.id() == CompileGrammar::INTEGER
-	      ||
-	      ( i->children.begin()+1 )->value.id() == CompileGrammar::FLOATING
-	      ) )
-	  {
-	    for( container_iterator = i->children.begin()->value.begin();
-		 container_iterator != i->children.begin()->value.end();
-		 ++container_iterator )
-	      {
-		str_child1 += *container_iterator;
-	      }
-
-	    for( container_iterator = ( i->children.begin()+1 )->value.begin();
-		 container_iterator != ( i->children.begin()+1 )->value.end();
-		 ++container_iterator )
-	      {
-		str_child2 += *container_iterator;
-	      }
-
-	    n1 = stringCast<Real>( str_child1 );
-	    n2 = stringCast<Real>( str_child2 );	  
-
-	    ++theStackSize;
-
-	    if (*i->value.begin() == '+')
-	      {
-		theCode.push_back( new PUSH( n1 + n2 ) );
-	      }	
-	    else if (*i->value.begin() == '-')
-	      {
-		theCode.push_back( new PUSH( n1 - n2 ) );
-	      }
-	    else
-	      THROW_EXCEPTION( NoSlot, String( "Fatal: Unexpected error." ) );
-	  }
-	else
-	  {
-	    compileTree( i->children.begin(), theCode );
-	    compileTree( i->children.begin()+1, theCode );
-		
-	    if (*i->value.begin() == '+')
-	      {
-		theCode.push_back( new ADD() );
-	      }
-	    else if (*i->value.begin() == '-')
-	      {
-		theCode.push_back( new SUB() );
-	      }
-	    else
-	      THROW_EXCEPTION( NoSlot, String( "Fatal: Unexpected error." ) );
-	  }
-
-	return;
-	
-
-      default :
-	THROW_EXCEPTION( NoSlot, String( "Fatal: Unexpected error." ) );
-	
-	return;
       }
+
+#undef DECODE_INSTRUCTION
+#undef FETCH_INSTRUCTION
+#undef INCREMENT_PC
+
   }
 
-  /**
-     Member function of the Instruction subclasses are defined here.
-     This member function execute on the binary codes.
-  */
+
   
-  void
-  ExpressionProcessBase::PUSH::
-  execute( StackMachine& aStackMachine )
-  {
-    aStackMachine.getStackPtr()++;
-
-    *aStackMachine.getStackPtr() = theValue;
-  }
   
-  void
-  ExpressionProcessBase::NEG::
-  execute( StackMachine& aStackMachine )
-  {
-    *( aStackMachine.getStackPtr() ) = - *( aStackMachine.getStackPtr() );
-  }
   
-  void
-  ExpressionProcessBase::ADD::
-  execute( StackMachine& aStackMachine )
-  {
-    const Real aValue( *aStackMachine.getStackPtr() );
-
-    --aStackMachine.getStackPtr();
-    *aStackMachine.getStackPtr() += aValue;
-  }
-  
-  void
-  ExpressionProcessBase::SUB::
-  execute( StackMachine& aStackMachine )
-  {
-    const Real aValue( *aStackMachine.getStackPtr() );
-
-    --aStackMachine.getStackPtr();
-    *aStackMachine.getStackPtr() -= aValue;
-  }
-  
-  void
-  ExpressionProcessBase::MUL::
-  execute( StackMachine& aStackMachine )
-  {
-    const Real aValue( *aStackMachine.getStackPtr() );
-
-    --aStackMachine.getStackPtr();
-    *aStackMachine.getStackPtr() *= aValue;
-  }
-  
-  void
-  ExpressionProcessBase::DIV::
-  execute( StackMachine& aStackMachine )
-  {
-    const Real aValue( *aStackMachine.getStackPtr() );
-
-    --aStackMachine.getStackPtr();
-    *aStackMachine.getStackPtr() /= aValue;
-  }
-  
-  void 
-  ExpressionProcessBase::POW::
-  execute( StackMachine& aStackMachine )
-  {
-    const Real aValue( *aStackMachine.getStackPtr() );
-
-    --aStackMachine.getStackPtr();
-
-    *aStackMachine.getStackPtr()
-      = pow( *aStackMachine.getStackPtr(), aValue );
-  }
-
-  void 
-  ExpressionProcessBase::EQ::
-  execute( StackMachine& aStackMachine )
-  {
-    const Real aValue( *aStackMachine.getStackPtr() );
-
-    --aStackMachine.getStackPtr();
-
-    *aStackMachine.getStackPtr()
-      = Real( *aStackMachine.getStackPtr() == aValue );
-  }
-
-  void 
-  ExpressionProcessBase::NEQ::
-  execute( StackMachine& aStackMachine )
-  {
-    const Real aValue( *aStackMachine.getStackPtr() );
-
-    --aStackMachine.getStackPtr();
-
-    *aStackMachine.getStackPtr()
-      = Real( *aStackMachine.getStackPtr() != aValue );
-  }
-
-  void 
-  ExpressionProcessBase::GT::
-  execute( StackMachine& aStackMachine )
-  {
-    const Real aValue( *aStackMachine.getStackPtr() );
-
-    --aStackMachine.getStackPtr();
-
-    *aStackMachine.getStackPtr()
-      = Real( *aStackMachine.getStackPtr() > aValue );
-  }
-
-  void 
-  ExpressionProcessBase::GEQ::
-  execute( StackMachine& aStackMachine )
-  {
-    const Real aValue( *aStackMachine.getStackPtr() );
-
-    --aStackMachine.getStackPtr();
-
-    *aStackMachine.getStackPtr()
-      = Real( *aStackMachine.getStackPtr() >= aValue );
-  }
-
-  void 
-  ExpressionProcessBase::LT::
-  execute( StackMachine& aStackMachine )
-  {
-    const Real aValue( *aStackMachine.getStackPtr() );
-
-    --aStackMachine.getStackPtr();
-
-    *aStackMachine.getStackPtr()
-      = Real( *aStackMachine.getStackPtr() < aValue );
-  }
-
-  void 
-  ExpressionProcessBase::LEQ::
-  execute( StackMachine& aStackMachine )
-  {
-    const Real aValue( *aStackMachine.getStackPtr() );
-
-    --aStackMachine.getStackPtr();
-
-    *aStackMachine.getStackPtr()
-      = Real( *aStackMachine.getStackPtr() <= aValue );
-  }
-
-  void 
-  ExpressionProcessBase::AND::
-  execute( StackMachine& aStackMachine )
-  {
-    const Real aValue( *aStackMachine.getStackPtr() );
-
-    --aStackMachine.getStackPtr();
-
-    *aStackMachine.getStackPtr()
-      = Real( *aStackMachine.getStackPtr() && aValue );
-  }
-
-  void 
-  ExpressionProcessBase::OR::
-  execute( StackMachine& aStackMachine )
-  {
-    const Real aValue( *aStackMachine.getStackPtr() );
-
-    --aStackMachine.getStackPtr();
-
-    *aStackMachine.getStackPtr()
-      = Real( *aStackMachine.getStackPtr() || aValue );
-  }
-
-  void 
-  ExpressionProcessBase::XOR::
-  execute( StackMachine& aStackMachine )
-  {
-    const Real aValue( *aStackMachine.getStackPtr() );
-
-    --aStackMachine.getStackPtr();
-
-    *aStackMachine.getStackPtr()
-      = Real( *aStackMachine.getStackPtr() && !( aValue ) );
-  }
-
-  void 
-  ExpressionProcessBase::NOT::
-  execute( StackMachine& aStackMachine )
-  {
-    *aStackMachine.getStackPtr() = Real( !( *aStackMachine.getStackPtr() ) );
-  }
-  
+/**
   void
   ExpressionProcessBase::CALL_FUNC1::
   execute( StackMachine& aStackMachine )
@@ -1942,7 +556,7 @@ namespace libecs
   }
 
   void
-  ExpressionProcessBase::CALL_PROPERTY::
+  ExpressionProcessBase::GET_PROPERTY::
   execute( StackMachine& aStackMachine )
   {
     aStackMachine.getStackPtr()++;
@@ -1976,10 +590,10 @@ namespace libecs
     
     *aStackMachine.getStackPtr()
       = ( ( theVariableReference.*theFuncPtr )()->*theAttributePtr)();
-  }
-  
+      }*/
+
   LIBECS_DM_INIT_STATIC( ExpressionProcessBase, Process );
-  
+
 } // namespace libecs
 
 
