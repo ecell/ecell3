@@ -46,7 +46,8 @@ class MessageWindow( Window ):
 
 	def __init__( self ):
 
-		Window.__init__( self, rootWidget='top_frame' )
+		Window.__init__( self, gladeFile='MessageWindow.glade',
+                         rootWidget='top_frame' )
 		#		OsogoWindow.openWindow( self )
 		self.isShown = False
 		self.messageBuffer = gtk.TextBuffer(None)
