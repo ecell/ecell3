@@ -48,6 +48,8 @@ RootSystem::RootSystem()
   theStepperMaker( *new StepperMaker ),
   theAccumulatorMaker( *new AccumulatorMaker )
 {
+  setId( "/" );
+  setName( "The RootSystem" );
   setRootSystem( this );
   setSuperSystem( this );
 }
@@ -98,8 +100,7 @@ SystemPtr RootSystem::getSystem( SystemPathCref systempath )
   if( systempath.first() != "/" )
     {
       throw BadID( __PRETTY_FUNCTION__,
-		   "Fully qualified system path must" +
-		   String( "start with '/'. ([" ) + 
+		   "Fully qualified system path must start with '/'. ([" + 
 		   systempath.getString() + "].");
     }
    
