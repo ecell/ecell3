@@ -24,8 +24,8 @@ SERIZAWADIR="@PREFIX@/src"
 # customizable variables. usually no need to edit
 
 TMPDIR="/tmp"
-RD2CH="$BINDIR/rd2ch"
-RD2TEX="$BINDIR/rd2tex"
+RD2CH="rd2ch"
+RD2TEX="rd2tex"
 OUTDIR="./"
 CXXFLAGS="$DMFLAGS -I$SERIZAWADIR"
 TEXOUT="spec.tex"
@@ -33,9 +33,9 @@ INSUFFIX=".rd"
 SOSUFFIX=".so"
 
 # internal variables. DO NOT EDIT BELOW
-OPTS="vcdfho:st:T:I:"
+OPTS="vcdfho:st:T:I:B:"
 LONGOPTS=\
-"verbose,compile,docify=:,force,help,outdir=:,strip,templatedir:,tmpdir=:,includedir=:,test"
+"verbose,compile,docify=:,force,help,outdir=:,strip,templatedir:,tmpdir=:,includedir=:,bindir=:test"
 
 unset VERBOSE DO_COMPILE DO_DOCIFY DO_STRIP FORCE CLASS TEST_MODE
 INCLUDES=""
@@ -70,6 +70,7 @@ Options:
 				[default=$TMPDIR]
 	--test)			Do nothing. Just print what will happen.
 	-I or --includedir=)	Specify include directory for compiler.
+	-B or --bindir=)	Specify directory of dynamic module tools.
 	-v or --verbose)	Be verbose.
 	-h or --help)		Print this message.
 
@@ -152,6 +153,7 @@ while true ; do
 		-T|--tmpdir)      TMPDIR=$2 ; shift 2 ;;
 		--test)		TEST_MODE=yes ; shift ;;
 		-I|--includedir)  INCLUDES="$INCLUDES -I$2" ; shift 2 ;;
+		-B|--bindir) BINDIR=$2 ; shift 2 ;;
 		-h|--help) help ; exit 0 ;;
 		--) shift ; break ;;
 		*) echo "Internal error!"; exit 1 ;;
@@ -172,8 +174,17 @@ fi
 #
 initialize
 
+RD2CH="$BINDIR/$RD2CH"
+if [ ! -x $RD2CH ] ; then
+	echo "can't execute $RD2CH."
+	exit 1
+fi
 
-
+RD2TEX="$BINDIR/$RD2TEX"
+if [ ! -x $RD2TEX ] ; then
+	echo "can't execute $RD2TEX."
+	exit 1
+fi
 
 #
 # drop files which do not end with $INSUFFIX
@@ -231,7 +242,6 @@ fi
 #
 
 if [ $DO_DOCIFY  ] ; then
-	echo $TEXOUT
 	run_command $RD2TEX $inputs -o $OUTDIR/$TEXOUT
 fi
 
