@@ -35,16 +35,11 @@ namespace libecs
       if( aSetMethodPtr == NULLPTR )
 	{
 	  aSetMethodPtr = &PropertyInterface::nullSet;
-
 	}
       
-      // How trickey.. some compiler may not handle this correctly.
-      // One way to avoid this, obviously, is don't use null get method
       if( aGetMethodPtr == NULLPTR )
 	{
-	  aGetMethodPtr = 
-	    reinterpret_cast<typename ConcretePropertySlot<T,SlotType>::
-	    GetMethodPtr>( &PropertyInterface::nullGet );
+	  aGetMethodPtr = &PropertyInterface::nullGet<SlotType>;
 	}
       
       return new ConcretePropertySlot<T,SlotType>( aName,

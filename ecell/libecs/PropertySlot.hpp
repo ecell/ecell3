@@ -158,7 +158,6 @@ namespace libecs
      Base class for PropertySlot classes.
 
      @see PropertyInterface
-     @see Message
   */
 
   class PropertySlot
@@ -598,9 +597,8 @@ namespace libecs
 
     virtual const bool isGetable() const
     {
-      // how tricky! -- does this work with all compilers?
-      const GetMethodPtr aNullMethodPtr( reinterpret_cast<GetMethodPtr>
-					 ( &PropertyInterface::nullGet ) );
+      const GetMethodPtr
+	aNullMethodPtr( &PropertyInterface::nullGet<SlotType> );
       return theGetMethodPtr != aNullMethodPtr;
     }
 

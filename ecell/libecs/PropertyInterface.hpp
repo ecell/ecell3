@@ -98,28 +98,14 @@ namespace libecs
     virtual StringLiteral getClassName() const { return "PropertyInterface"; }
 
 
-
-    void nullSet( RealCref )
+    template <typename Type>
+    void nullSet( const Type& )
     {
       THROW_EXCEPTION( AttributeError, "Not setable." );
     }
 
-    void nullSet( IntCref )
-    {
-      THROW_EXCEPTION( AttributeError, "Not setable." );
-    }
-
-    void nullSet( StringCref )
-    {
-      THROW_EXCEPTION( AttributeError, "Not setable." );
-    }
-
-    void nullSet( UVariableVectorRCPtrCref )
-    {
-      THROW_EXCEPTION( AttributeError, "Not setable." );
-    }
-
-    void nullGet() const
+    template <typename Type>
+    const Type nullGet() const
     {
       THROW_EXCEPTION( AttributeError, "Not getable." );
     }
