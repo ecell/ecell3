@@ -93,6 +93,8 @@
   <!ENTITY ecell3-eml2em "<command>ecell3-eml2em</command>">
   <!ENTITY gecell "<command>gecell</command>">
 
+  <!ENTITY empy "<productname>empy</productname>">
+
 ]>
 <!-- 
   This is a GNOME documentation template, designed by the GNOME

@@ -23,7 +23,7 @@
   </highlights>
 
   <sect1>
-    <title>What is &ecell; Session Script?</title>
+    <title>Session Scripting</title>
 
     <para>An &ecell Session Script (ESS) is a
 &Python; script which is loaded by a &ecell; &Session; object.  A
@@ -185,7 +185,6 @@ Both ways, <option>-D</option> and <option>--parameters</option>, can be mixed.
 
     </sect2>
 
-
     <sect2>
       <title>Using SessionManager</title>
 
@@ -208,7 +207,7 @@ Both ways, <option>-D</option> and <option>--parameters</option>, can be mixed.
       <sect3>
 	<title>General rules</title>
 
-      <para>In &ESS;, an instance of
+	<para>In &ESS;, an instance of
     &Session; is given, and any methods defined
     in the class can be used as if it is defined in the global namespace.
     </para>
@@ -217,23 +216,23 @@ Both ways, <option>-D</option> and <option>--parameters</option>, can be mixed.
     <methodname>run</methodname> method of the
     &Session; object.
     <informalexample> 
-	  <programlisting>self.run( 10 )</programlisting>
-	</informalexample> 
+	    <programlisting>self.run( 10 )</programlisting>
+	  </informalexample> 
     where <methodname>self.</methodname> points to the current
     &Session; object given by the
     system. Alternatively, you can use <varname>theSession</varname> 
     in place of the <varname>self</varname>.
     <informalexample> 
-	  <programlisting>theSession.run( 10 )</programlisting>
-	</informalexample> 
+	    <programlisting>theSession.run( 10 )</programlisting>
+	  </informalexample> 
     </para>
 
-    <para>Unlike usual &Python; script, you
+	<para>Unlike usual &Python; script, you
     can omit the object on which the method is called if the method is for
     the current &Session;.
     <informalexample>
-	<programlisting>run( 10 )</programlisting>
-    </informalexample>
+	    <programlisting>run( 10 )</programlisting>
+	  </informalexample>
     </para>
 
       </sect3>
@@ -242,20 +241,20 @@ Both ways, <option>-D</option> and <option>--parameters</option>, can be mixed.
       <sect3>
 	<title>Loading a model</title>
 
-      <para>Let's try this in the interactive mode of the
+	<para>Let's try this in the interactive mode of the
       &ecell3-session; command.  On the prompt of the
       command, load an &EML; file by using
       <methodname>loadModel</methodname>() method.
 
       <informalexample>
-	  <screen><prompt>ecell3-session>>> </prompt><userinput>loadModel( 'simple.eml' )</userinput></screen>
-	</informalexample>
+	    <screen><prompt>ecell3-session>>> </prompt><userinput>loadModel( 'simple.eml' )</userinput></screen>
+	  </informalexample>
     
     Then the prompt changes from <prompt>ecell3-session>>> </prompt>
     to <prompt><replaceable>model_name</replaceable>,
     t=<replaceable>current time</replaceable>>>> </prompt>
     <informalexample><screen><prompt>simple.eml, t=0>>> </prompt></screen>
-	</informalexample>
+	  </informalexample>
     </para>
       </sect3>
 
@@ -313,7 +312,7 @@ Both ways, <option>-D</option> and <option>--parameters</option>, can be mixed.
 	
 
       </sect3>
-	
+      
       <sect3>
 	<title>Getting current time</title>
 
@@ -448,17 +447,17 @@ else:
 	thin wrappers over the
 	<classname>ecell.ecs.Simulator</classname> class of the E-Cell
 	Python Library, which provides object-oriented appearance to
-	the flat API of the class.  Although
+	the flat procedure-oriented API of the class.  Although
 	&Simulator; object can be accessed
 	directly via <varname>theSimulator</varname> property of
 	&Session; class, use of
 	&ObjectStub; is encouraged.</para>
 
 	<para>This backend / frontend isolation is needed because
-        lifetimes of backend objects are not the same as frontend
-        object, nor are their state transitions necessarily
+        lifetimes of backend objects are not the same as that of frontend
+        objects, nor are their state transitions necessarily
         synchronous.  If the frontend directly manipulates the
-        internal objects of the simulator, consistence of the lifetime
+        internal objects of the simulator, consistency of the lifetime
         and the state of the objects can easily be violated, which
         must not happen, without some complicated and tricky software
         mechanism.</para>
@@ -529,7 +528,7 @@ else:
 	<para>To create the backend object, just call
 	<methodname>create</methodname>() method.
 <informalexample>
-<programlisting>aStepperStub.create()<lineannotation># Stepper 'STEPPER_01' is created here</lineannotation>
+	    <programlisting>aStepperStub.create()<lineannotation># Stepper 'STEPPER_01' is created here</lineannotation>
 </programlisting>
 	  </informalexample></para>
 
@@ -583,11 +582,11 @@ or equivalently,
 	<methodname>setProperty</methodname>() method or mutate an
 	object attribute with a	property name and the new value:
 <informalexample>
-<programlisting>aStub.getProperty( 'Activity', aNewValue )</programlisting> 
+	    <programlisting>aStub.getProperty( 'Activity', aNewValue )</programlisting> 
 	  </informalexample>
 or equivalently, 
 <informalexample>
-<programlisting>aStub[ 'Activity' ] = aNewValue</programlisting>
+	    <programlisting>aStub[ 'Activity' ] = aNewValue</programlisting>
 	  </informalexample>
 </para>
 
@@ -755,22 +754,24 @@ message( 'Stopped at %s.' % getCurrentTime() )
 
     </sect2>
 
+  </sect1>
+
+  <sect1>
+    <title>Handling Data Files</title>
+
     <sect2>
-      <title>Handling Data Files</title>
+      <title>About &ECD; file</title>
 
-      <sect3>
-	<title>About &ECD; file</title>
-
-	<para>&ecell SE uses &ECD; (E-Cell Data) file
+      <para>&ecell SE uses &ECD; (E-Cell Data) file
 format to store simulation results. &ECD; is a plain
 text file, and easily handled by user-written and third-party data
 processing and plotting software such as
 <productname>gnuplot</productname>.</para>
 
-	<para>An &ECD; file can store a matrix of
+      <para>An &ECD; file can store a matrix of
 	floating-point numbers.</para>
 
-	<para><classname>ecell.ECDDataFile</classname> class can be
+      <para><classname>ecell.ECDDataFile</classname> class can be
 used to save and load &ECD; files.  A
 <classname>ECDDataFile</classname> object takes and returns a rank-2
 &array; of &NumericPython;.  A
@@ -779,12 +780,24 @@ used to save and load &ECD; files.  A
 Numeric.shape( ARRAY ) )</methodname> returns
 '<constant>2</constant>'.</para>
 
-      </sect3>
+    </sect2>
 
-      <sect3>
-	<title>Saving and loading data</title>
-	
-	<para>To save data to an &ECD; file, say,
+    <sect2>
+      <title>Importing <classname>ECDDataFile</classname> class</title>
+
+      <para>To import the <classname>ECDDataFile</classname> class,
+      import the whole <classname>ecell</classname> module,
+<programlisting>import ecell</programlisting>
+      or import <classname>ecell.ECDDataFile</classname> module selectively.
+<programlisting>import ecell.ECDDataFile</programlisting>
+</para>
+
+    </sect2>
+
+    <sect2>
+      <title>Saving and loading data</title>
+      
+      <para>To save data to an &ECD; file, say,
 	<filename>datafile.ecd</filename>, instantiate an
 	<classname>ECDDataFile</classname> object and use
 	<methodname>save</methodname>() method.
@@ -793,58 +806,58 @@ Numeric.shape( ARRAY ) )</methodname> returns
 aDataFile = ecell.ECDDataFile( DATA )
 aDataFile.save( 'datafile.ecd' )
 </programlisting>
-	  </informalexample>
+	</informalexample>
           here <varname>DATA</varname> is a rank-2 &array;
           of &NumericPython; or an
           equivalent object.  The data can also be set by using
           <methodname>setData</methodname>() method after the
           instantiation.  If the data is already set, it is replaced.
 <informalexample>
-	    <programlisting>aDataFile.setData( DATA )</programlisting>
-	  </informalexample>
+	  <programlisting>aDataFile.setData( DATA )</programlisting>
+	</informalexample>
 
 
  </para>
 
-	<para>Loading the &ECD; file is also straightforward.
+      <para>Loading the &ECD; file is also straightforward.
 <informalexample>
-	    <programlisting>aDataFile = ecell.ECDDataFile()
+	  <programlisting>aDataFile = ecell.ECDDataFile()
 aDataFile.load( 'datafile.ecd' )
 DATA = aDataFile.getData()</programlisting>
-	  </informalexample>
+	</informalexample>
 The <methodname>getData</methodname>() method extracts the data from the <classname>ECDDataFile</classname> object as an &array;.
 </para>
 
-      </sect3>
+    </sect2>
 
-      <sect3>
-	<title>&ECD; header information</title>
-	<para>In addition to the data itself, an &ECD; file can hold some information in its header.
+    <sect2>
+      <title>&ECD; header information</title>
+      <para>In addition to the data itself, an &ECD; file can hold some information in its header.
 <itemizedlist>
-	    <listitem>
-	      <para>Data name</para>
-	      <para>The name of data.  Setting a <emphasis>FullPN</emphasis> may be a good idea.  Use <methodname>setDataName</methodname>( <parameter>name</parameter> ) and <methodname>getDataName</methodname>() methods to set and get this field.</para>
-	    </listitem>
-	    <listitem>
-	      <para>Label</para> <para>This field is used to name axes
+	  <listitem>
+	    <para>Data name</para>
+	    <para>The name of data.  Setting a <emphasis>FullPN</emphasis> may be a good idea.  Use <methodname>setDataName</methodname>( <parameter>name</parameter> ) and <methodname>getDataName</methodname>() methods to set and get this field.</para>
+	  </listitem>
+	  <listitem>
+	    <para>Label</para> <para>This field is used to name axes
 	      of the data. Use <methodname>setLabel</methodname>(
 	      <parameter>labels</parameter> ) and
 	      <methodname>getLabel</methodname>() methods.  These
 	      methods takes and returns a
 	      &Python; &tuple;,
 	      and stored in the file as a space-separated list. The default value of this field is: <constant>( 't', 'value', 'avg', 'min', 'max' )</constant>.</para>
-	    </listitem>
-	    <listitem>
-	      <para>Note</para> <para>This is a free-format field.
+	  </listitem>
+	  <listitem>
+	    <para>Note</para> <para>This is a free-format field.
 	      This can be a multi-line or a single-line string.  Use
 	      <methodname>setNote</methodname>(
 	      <parameter>note</parameter> ) and
 	      <methodname>getNote</methodname>().</para>
-	    </listitem>
-	  </itemizedlist>
+	  </listitem>
+	</itemizedlist>
 </para>
 
-	<para>The header information is stored in the file like this.
+      <para>The header information is stored in the file like this.
 <programlisting>
 #DATA:
 #SIZE: 5 1010
@@ -861,68 +874,91 @@ show size of the data.  This field is ignored in loading.  The header
 ends with <constant>'#----...'</constant>.
 </para>
 
-      </sect3>
+    </sect2>
 
-      <sect3>
-	<title>Using &ECD; outside &ecell SE</title>
+    <sect2>
+      <title>Using &ECD; outside &ecell SE</title>
 
-	<para>For most cases &NumericPython;
+      <para>For most cases &NumericPython;
 	will offer any necessary functionality for scientific data
 	processing.  However, using some external software can enhance
 	the usability.</para>
 
-	<para>&ECD; files can be used as input to any
+      <para>&ECD; files can be used as input to any
 	software which supports white space-separated text format, and
 	treats lines with heading sharps (#) as comments.</para>
 
-	<para><productname>GNU gnuplot</productname> is a scientific
+      <para><productname>GNU gnuplot</productname> is a scientific
 	presentation-quality plotting software with a sophisticated
 	interactive command system.  To plot an &ECD;
 	file from <productname>gnuplot</productname>, just use
 	<command>plot</command> command. For example, this draws a
 	time-value 2D-graph:
 <informalexample>
-	    <screen><prompt>gnuplot> </prompt><userinput>plot 'datafile.ecd' with lines</userinput>
+	  <screen><prompt>gnuplot> </prompt><userinput>plot 'datafile.ecd' with lines</userinput>
 </screen>
-	  </informalexample>
+	</informalexample>
 	    Use <command>using</command> modifier to specify which column to use for the plotting. The following example makes a time-average 2D-plot.
 <informalexample>
-	    <screen><prompt>gnuplot> </prompt><userinput>plot 'datafile.ecd' using 1:3 with lines</userinput>
+	  <screen><prompt>gnuplot> </prompt><userinput>plot 'datafile.ecd' using 1:3 with lines</userinput>
 </screen>
-	  </informalexample>
+	</informalexample>
 </para>
-	<para>Another OpenSource software useful for data processing is GNU <productname>Octave</productname>.  Loading an &ECD; from <productname>Octave</productname> is also simplest.
+      <para>Another OpenSource software useful for data processing is GNU <productname>Octave</productname>.  Loading an &ECD; from <productname>Octave</productname> is also simplest.
 <informalexample>
-	    <screen><prompt>octave:1></prompt> <userinput>load datafile.ecd</userinput></screen>
-	  </informalexample>
+	  <screen><prompt>octave:1></prompt> <userinput>load datafile.ecd</userinput></screen>
+	</informalexample>
 Now the data is stored in a matrix variable with the same name as the file without the extension (<varname>datafile</varname>).
 <informalexample>
-	    <screen><prompt>octave:2> </prompt><userinput>mean(datafile)</userinput>
+	  <screen><prompt>octave:2> </prompt><userinput>mean(datafile)</userinput>
 <computeroutput>ans =
  
    5.0663  51.7158  51.7158  51.2396  52.2386</computeroutput>
 </screen>
-	  </informalexample>
+	</informalexample>
 </para>
-
-      </sect3>
-
-      <sect3>
-	<title>Binary format</title>
-
-	<para>Currently loading and saving of the binary file format
-	is not supported.</para>
-      </sect3>
-
 
     </sect2>
 
     <sect2>
-      <title>Other Methods</title>
-      <sect3>
-	<title>Getting version numbers</title>
+      <title>Binary format</title>
 
-	<para><methodname>getLibECSVersion</methodname>() method of
+      <para>Currently loading and saving of the binary file format is
+	not supported.  However, <productname>Numeric
+	Python</productname> has an efficient, platform-dependent way
+	of exporting and importing &array; data.  See the
+	<productname>Numeric Python</productname> manual.</para>
+    </sect2>
+
+  </sect1>
+
+
+  <sect1>
+    <title>Manipulating Model Files</title>
+
+    <para>This section describes how to create, modify, and read &EML; files
+     with the EML module of the &ecell; &Python; library.</para>
+
+    <sect2>
+      <title>Importing &EML; module</title>
+
+      <para>To import the &EML; module, just import
+      <classname>ecell</classname> module.
+<programlisting>import ecell</programlisting>
+      And <classname>ecell.Eml</classname> class is made available.
+</para>
+    </sect2>
+
+
+  </sect1>
+
+
+  <sect1>
+    <title>Other Methods</title>
+    <sect2>
+      <title>Getting version numbers</title>
+
+      <para><methodname>getLibECSVersion</methodname>() method of
 	<classname>ecell.ecs</classname> module gives the version of
 	the C++ backend library
 	(libecs) as a string. <methodname>getLibECSVersionInfo</methodname>()
@@ -933,21 +969,21 @@ Now the data is stored in a matrix variable with the same name as the file witho
 	<parameter>MINOR_VERSION</parameter>,
 	<parameter>MICRO_VERSION</parameter> )</para>
 
-	<informalexample>
-	  <screen><prompt>ecell3-session>>> </prompt><userinput>import ecell</userinput>
+      <informalexample>
+	<screen><prompt>ecell3-session>>> </prompt><userinput>import ecell</userinput>
 <prompt>ecell3-session>>> </prompt><userinput>ecell.ecs.getLibECSVersion()</userinput>
 <computeroutput>'3.2.0'</computeroutput>
 <prompt>ecell3-session>>> </prompt><userinput>ecell.ecs.getLibECSVersionInfo()</userinput>
 <computeroutput>(3, 2, 0)</computeroutput>
 </screen>
-	</informalexample>
+      </informalexample>
 
-      </sect3>
+    </sect2>
 
-      <sect3>
-	<title>&DM; loading-related methods</title>
+    <sect2>
+      <title>&DM; loading-related methods</title>
 
-	<para>The search path of &DM; files can be
+      <para>The search path of &DM; files can be
 	specified and retrieved by using
 	<methodname>setDMSearchPath</methodname>() and
 	<methodname>getDMSearchPath</methodname>() methods.  These
@@ -957,15 +993,15 @@ Now the data is stored in a matrix variable with the same name as the file witho
 	variable. See the previous section for more about
 	&DM;search path.</para>
 
-	<informalexample>
-	  <screen><prompt>ecell3-session>>> </prompt><userinput>import ecell</userinput>
+      <informalexample>
+	<screen><prompt>ecell3-session>>> </prompt><userinput>import ecell</userinput>
 <prompt>ecell3-session>>> </prompt><userinput>ecell.ecs.setDMSearchPath( '~/dm:~/test/dm' )</userinput>
 <prompt>ecell3-session>>> </prompt><userinput>ecell.ecs.getDMSearchPath()</userinput>
 <computeroutput>'~/dm:~/test/dm'</computeroutput>
 </screen>
-	</informalexample>
+      </informalexample>
 
-	<para>A list of built-in and already loaded
+      <para>A list of built-in and already loaded
 	&DM; classes can be gotten with
 	<methodname>getDMInfo</methodname>() method of
 	<classname>ecell.ecs.Simulator</classname> class.  The
@@ -983,21 +1019,19 @@ Now the data is stored in a matrix variable with the same name as the file witho
 	which the &DM; is loaded.  PATH is an empty
 	string (<constant>''</constant>) if it is a built-in class.</para>
 
-	<informalexample>
-	  <screen>
+      <informalexample>
+	<screen>
 <prompt>ecell3-session>>> </prompt><userinput>theSimulator.getDMInfo()</userinput>
 <computeroutput>(('Process', 'GillespieProcess', '/usr/lib/ecell/3.2/GillespieProcess.so'), 
 ('Stepper', 'DiscreteTimeStepper', ''), 
 ('Stepper', 'NRStepper', '/usr/lib/ecell/3.2/NRStepper.so'), ... )</computeroutput>
 </screen>
-	</informalexample>
+      </informalexample>
 
 
-      </sect3>
     </sect2>
-
-
   </sect1>
+
 
   <sect1>
     <title>Advanced Topics</title>
@@ -1177,7 +1211,7 @@ It automatically runs the program with the commandline options with '<parameter>
 
 
     <sect2>
-      <title>Method List of &Session; Class</title>
+      <title>&Session; Class API</title>
 
       <para>Methods of &Session; class has
       the following five groups.</para>
@@ -1207,7 +1241,7 @@ It automatically runs the program with the commandline options with '<parameter>
     </sect2>
 
     <sect2>
-      <title>Method List of &ObjectStub; Classes</title>
+      <title>&ObjectStub; Classes API</title>
 
 
       <para>There are three subclasses of &ObjectStub;
@@ -1234,7 +1268,7 @@ It automatically runs the program with the commandline options with '<parameter>
     </sect2>
 
     <sect2>
-      <title>Method List of <classname>ECDDataFile</classname> Class</title>
+      <title><classname>ECDDataFile</classname> Class API</title>
       <para><classname>ECDDataFile</classname> class has the following set of methods.</para>
 
       &ecddatafile-api

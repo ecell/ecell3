@@ -17,7 +17,7 @@ items.
 
     <simplelist>
       <member>What types of files are needed to run the simulator.</member>
-      <member>How to prepare the files to run the simulator.</member>
+      <member>How to prepare the files needed to run the simulator.</member>
       <member>How to run the simulation with &app;.</member>
     </simplelist>
 
@@ -26,10 +26,10 @@ items.
   <sect1 id="prepare-simulation"> 
     <title>Preparing Simulation</title> 
     
-    <para> To start the simulation, you need at least these types of files:
+    <para> To start the simulation, you need to have these types of files:
       <itemizedlist>
 	<listitem>
-	  <para>A model file in EML format</para>
+	  <para>A model file in EML format.</para>
 	</listitem>
 	<listitem>
 	  <para>
@@ -39,19 +39,21 @@ items.
               by default.
              </para>
 	</listitem>
+	<listitem>
+	  <para>
+              (optionally) a script file (&ecell; Session Script, or
+              &ESS;) to automate the simulation session.
+             </para>
+	</listitem>
       </itemizedlist>
 
-    </para>
-    <para>
-      If you have them in different formats other than EML and .so, 
-      you have to convert your files (such as EM and DM) by procedures
-      explained in this section.
     </para>
 
     <sect2>
       <title>Converting EM to EML</title>
-      <para>
-        To convert EM (.em) files to EML (.eml) files, type the
+
+      <para>Simulation models for &ecell; is often written in &EM; format.
+        To convert &EM; (.em) files to &EML; (.eml) files, type the
         following command.
       </para>
       <para><command>ecell3-em2eml</command> <replaceable>filename.em</replaceable></para>
@@ -59,11 +61,11 @@ items.
     </sect2>
 
     <sect2>
-      <title>Compiling DM to make .so</title>
+      <title>Compiling Dynamic Modules C++ files</title>
 
-      <para>If you have your own DM classes which are not part of the
-standard DM library distributed with the package, you have to make
-source files compiled before use.</para>
+      <para>If may have your own classes defined for the simulation
+(Dynamic Modules, or &DM;) model in form of C++ source code files.
+Those files must be compiled before using.</para>
 
       <para>Use <command>ecell3-dmc</command> command as a DM compiler.</para>
 
@@ -76,9 +78,9 @@ source files compiled before use.</para>
 
       <para>The arguments after the file name are passed to a backend
       compiler (such as g++) as-is.  The backend compiler used is the
-      same as the one used to build the system itself.</para>
+      same as that used to build the system itself.</para>
 
-      <para>To observe what the command actually does inside, enable
+      <para>To inspect what the command actually does inside, enable
       verbose mode by specifying <option>-v</option> option.</para>
 
       <para>To get a full list of available
@@ -111,7 +113,7 @@ ecell3-dmc options:
   </sect1>
 
   <sect1 id="ecell3-start">
-    <title>To Start &app;</title>
+    <title>Starting &app;</title>
     <para>You can start <application>&app;</application> either in 
     scripting mode and GUI mode.
     </para> 
@@ -125,7 +127,7 @@ ecell3-dmc options:
       <screen><command>gecell</command> &</screen>
 
       <para>This will invoke an instance of the simulator with
-      <application>Osogo Session Manager</application> as a GUI
+      <application>Osogo Session Manager</application> attached as a GUI
       frontend.</para>
 
     </sect2>
@@ -136,15 +138,12 @@ ecell3-dmc options:
 
 	  <para>To start <application>&app;</application> in scripting
                 mode, type the following command, then press
-                <keycap>Return</keycap>:</para> 
+                <keycap>Return</keycap>:
 
-      <screen>
-                <command>ecell3-session</command> <optional><parameter><replaceable>filename.ess</replaceable></parameter></optional>
+      <screen><command>ecell3-session</command> <optional><parameter><replaceable>filename.ess</replaceable></parameter></optional></screen>
 
-</screen>
-
-      <para>where <replaceable>filename.ess</replaceable> is the name of
-                the Python script file you want to execute.
+      where <replaceable>filename.ess</replaceable> is the name of the
+                Python script file you want to execute.
     		</para>
 	  <para>If <replaceable>filename.ess</replaceable> is omitted,
 	  the interpreter starts up in interactive mode.</para>
@@ -157,11 +156,39 @@ ecell3-dmc options:
   </sect1>
 
   <sect1>
-    <title>Other commands</title>
+    <title>Other Commands</title>
 
-    <para>ecell3-eml2em, ecell3-dmc, eri2eml (unsupported), rd2dm (unsupported)
+    
+    <sect2>
+      <title>Getting An &EM File From &EML;</title>
+
+      <para>Use <command>ecell3-eml2em</command> command to convert an
+      &EML; file to an &EM; file.
+</para>
+
+      <screen>ecell3-eml2em -- convert eml to em
+         
+Usage:
+        ecell3-eml2em [-h] [-f] [-o outfile] infile
+ 
+         
+Options:
+        -h or --help    :  Print this message.
+        -f or --force   :  Force overwrite even if outfile already exists.
+        -o or --outfile=:  Specify output file name.  '-' means stdout.
+</screen>
+
+
+    </sect2>
+
+    <sect2>
+      <title>&ecell 1 Compatibility</title>
+
+    <para>eri2eml (unsupported), rd2dm (unsupported)
 
       </para>
+
+    </sect2>
 
   </sect1>
 

@@ -48,13 +48,13 @@
 
 
 
-    <para>Here is a minimum template of a &DM; file, with which you
+    <para>Here is a boilarplate template of a &DM; file, with which you
     should feel familiar if you have a C++ experience. Replace
     <parameter>DMTYPE</parameter>, <parameter>CLASSNAME</parameter>, and
     <parameter>BASECLASS</parameter> according to your case.
 
     <example>
-      <title>CLASSNAME.cpp; a minimum &DM; source code template.</title>
+      <title>CLASSNAME.cpp; a boilarplate &DM; template.</title>
     <programlisting linenumbering="numbered">
 #include &lt;libecs/libecs.hpp>
 #include &lt;libecs/<parameter>BASECLASS</parameter>.hpp>
@@ -215,12 +215,12 @@ DM_INIT( <parameter>DMTYPE</parameter>, <parameter>CLASSNAME</parameter> );
 	    <listitem>
 	      <para><type>Int</type></para>
 
-	      <para>A signed integer number.   This is 64-bit <type>long int</type> on Linux/IA32/gcc.</para>
+	      <para>A signed integer number.   This is a 64-bit <type>long int</type> on Linux/IA32/gcc.</para>
 	    </listitem>
 	    <listitem>
 	      <para><type>UnsignedInt</type></para>
 
-	      <para>An unsigned integer number. This is 64-bit <type>unsigned long int</type> on Linux/IA32/gcc. </para>
+	      <para>An unsigned integer number. This is a 64-bit <type>unsigned long int</type> on Linux/IA32/gcc. </para>
 	    </listitem>
 	    <listitem>
 	      <para>&String;</para>
@@ -234,7 +234,7 @@ DM_INIT( <parameter>DMTYPE</parameter>, <parameter>CLASSNAME</parameter> );
 
 	      <para>&Polymorph; is a sort of
               universal type (actually a class) which can *become* and
-              *made from* any of <type>Real</type>, <type>Int</type>,
+              *be made from* any of <type>Real</type>, <type>Int</type>,
               <type>String</type>, and <type>PolymorphVector</type>,
               which is a mixed list of these three types of
               objects. See the next section for details.</para>

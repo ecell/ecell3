@@ -7,9 +7,9 @@
     <para>By reading this chapter, you can get information about:</para>
     
     <simplelist>
-      <member>How an &ecell;'s simulation model is organized</member>
-      <member>How to create the simulation model</member>
-      <member>How to write a model file in &EM; format</member>
+      <member>How an &ecell;'s simulation model is organized.</member>
+      <member>How to create a simulation model.</member>
+      <member>How to write a model file in &EM; format.</member>
     </simplelist>
   </highlights>
 
@@ -126,7 +126,7 @@ The &Entity; class has three subclasses:
 	<para>(need EBNF here)</para>
 
 	<informalexample>
-	  <para>Examples: _P3, ATP, GlucoseKinase</para>
+	  <para>Examples: _P3, ATP, GlucoKinase</para>
 	</informalexample>
 
       </sect3>
@@ -207,7 +207,7 @@ of which &ID; is 'P', in the &System; 'CELL' directly under the root system.
 
 
     <sect2>
-      <title>Properties of &Entity; and &Stepper; Objects</title>
+      <title>Object Properties</title>
 
       <para>&Entity; and &Stepper; objects have
       <emphasis>properties</emphasis>.  Property is an attribute of a
@@ -216,9 +216,11 @@ of which &ID; is 'P', in the &System; 'CELL' directly under the root system.
       </para>
 
       <para>A value of a property has a <emphasis>type</emphasis>,
-      which is one of:
+      which is one of the following types.
 
 <itemizedlist>
+	<title>Types of object properties</title>
+
 	  <listitem>
 	    <para>&Real; number</para> 
 	    <para>(ex. 3.33e+10, 1.0)</para>
@@ -233,7 +235,7 @@ of which &ID; is 'P', in the &System; 'CELL' directly under the root system.
 	    <para>&StringType; has two forms: quoted and not quoted.
 	    A quoted &StringType; can contain any
 	    <acronym>ASCII</acronym> characters except the quotation
-	    characters (' or ").  If a &StringType is not quoted, it
+	    characters (' or ").  If a &StringType; is not quoted, it
 	    can start with an alphabet character or '_', or '/', and
 	    contain alphabets, numbers, '_', '/' and ':'.</para>
 
@@ -245,7 +247,7 @@ of which &ID; is 'P', in the &System; 'CELL' directly under the root system.
 
 	  <listitem>
 	    <para>List</para> <para>The list can contain &Real;,
-	    &Int;, &StringType values. This list can also contain
+	    &Int;, &StringType; values. This list can also contain
 	    other lists, that is, the list can be nested.  A list must
 	    be surrounded by brackets ('[' and ']'), and the elements
 	    must be separated by space characters.  In some cases
@@ -255,6 +257,103 @@ of which &ID; is 'P', in the &System; 'CELL' directly under the root system.
 	</itemizedlist>
 </para>
 
+      <sect3>
+	<title>Dynamic type conversion of property values</title>
+
+	<para>The system automatically convert the type of the
+         property value if it is different from what the backend
+         object (such as &Process; and &Variable;) expects to get.
+         That is, the system does not necessary raise an error if the
+         type of the given value differs from the type the backend
+         object accepts.  The system always try to convert a type of
+         the value given in a model file to a requested type by the
+         backend object.  The conversion is done by the backend object,
+         when it gets a property value.  See the
+         following section.</para>
+
+	<para>The conversion is done in the following manner.  
+<itemizedlist>
+	    <title>How property value type conversion is conducted</title>
+	    <listitem>
+	      <para>From a numeric value (&Real; or &Int;)</para>
+	      <itemizedlist>
+		<listitem>
+		  <para>To a &StringType;</para> 
+
+		  <para>The number is simply converted to a character
+		  string. For example, a number 12.3 is converted to a
+		  &StringType; '12.3'.</para>
+		</listitem>
+		<listitem>
+		  <para>To a list</para>
+
+		  <para>A numeric value can be converted to a length-1
+		  list which has that number as the first item.  For
+		  example, 12.3 is equivalent to '[ 12.3 ]'.</para>
+		</listitem>
+	      </itemizedlist>
+	    </listitem>
+	    <listitem>
+	      <para>From a &StringType;</para>
+	      <itemizedlist>
+		<listitem>
+		  <para>To a numeric value (&Real; or &Int;)</para> 
+		  
+		  <para>The initial portion of the &StringType; is
+                  converted to a numeric value.  The number can be
+                  represented either in a decimal form or a
+                  hexadecimal form.  Leading white space characters
+                  are ignored.  'INF' and 'NAN' (case-insensitive) are
+                  converted to an infinity and a NaN (not-a-number),
+                  respectively.  If the initial portion of the
+                  &StringType; cannot be converted to a numeric value,
+                  it is interpreted as a zero (0.0 or 0).  This
+                  conversion procedure is equivalent to C functions
+                  <function>strtol</function> and
+                  <function>strtod</function>, according to the
+                  destined type.</para>
+		</listitem>
+		<listitem>
+		  <para>To a list</para>
+
+		  <para>A &StringType; can be converted to a length-1
+		  list which has that &StringType; as the first item.  For
+		  example, 'string' is equivalent to '[ 'string' ]'.</para>
+		</listitem>
+	      </itemizedlist>
+	    </listitem>
+	    <listitem>
+	      <para>From a list</para>
+	      <itemizedlist>
+		<listitem>
+		  <para>To a numeric or a &StringType value</para> 
+
+		  <para>It simply takes the first item of the list.
+		  If necessary the taken value is further converted to
+		  other types.</para>
+		</listitem>
+	      </itemizedlist>
+	    </listitem>
+	  </itemizedlist>
+
+
+<note>
+	    <title>Overflow or underflow when converting a property
+	    value</title> 
+
+	    <para>When converting from a &Real; number to an &Int;, or
+	    from a &StringType; to a numeric value, overflow or
+	    underflow can occur during the conversion.  In this case
+	    an exception (TYPE??) is raised when the backend object
+	    attempts the conversion.</para>
+	  </note>
+
+</para>
+
+
+      </sect3>
+
+
     </sect2>
 
 
@@ -262,7 +361,7 @@ of which &ID; is 'P', in the &System; 'CELL' directly under the root system.
 
 
   <sect1>
-    <title>E-Cell Model (&EM;) File Format</title>
+    <title>E-Cell Model (&EM;) File Basics</title>
 
     <sect2>
       <title>What is &EM;?</title>
@@ -275,7 +374,7 @@ of which &ID; is 'P', in the &System; 'CELL' directly under the root system.
       is very tedious for human users who want to write and edit their
       models directly by a text editor.  E-Cell Model (&EM;) is a file
       format with programming language-like syntax and a powerful
-      embedded <application>empy</application> preprocessor, which is
+      embedded &empy; preprocessor, which is
       designed to be productive and intuitive especially when handled
       by the text editors and other text processing programs such as
       UNIX's <application>grep</application>,
@@ -292,8 +391,8 @@ of which &ID; is 'P', in the &System; 'CELL' directly under the root system.
       <title>Why and when use &EM;?</title>
 
       <para>Although <application>E-Cell Modeling
-    Environment</application> will provide means of more sophisticate,
-    scalable and automated model construction on the basis of &EML;,
+    Environment</application> will provide means of more sophisticated,
+    scalable and intelligent model construction on the basis of &EML;,
     learning syntax and semantics of &EM; may help you get the idea of
     how object model inside &ecell is organized and how it is driven
     to conduct simulations.  Furthermore, owing to the nature of plain
@@ -306,267 +405,288 @@ of which &ID; is 'P', in the &System; 'CELL' directly under the root system.
 
     </sect2>
 
-
     <sect2>
-      <title>General Syntax</title>
+      <title>&EM; At a Glance</title>
 
-      <para>Basically &EM; is (and thus &EML; is) a set of just one
-      type of directive: <emphasis>object instantiation</emphasis>.
-      And in &ecell;'s simulation model, the 'object' has, as we have
-      seen, only two types, &Stepper; and &Entity;.   In addition, after
-      creating an object, properties must be set.  Therefore the object
-      instantiation has two steps: (1) creating object
-      and (2) setting properties.</para>
-
-      <para>The following is the general form of definition of an object:
-
-<programlisting>
-TYPE CLASSNAME ( ID )
-[ DOCSTRING ]
-{ 
-        property_name_1 property_value_1;
-        property_name_2 property_value_2;
-        ...
-        property_name_n property_value_n;
-} 
-</programlisting>
-
-
-</para>
-
-      
-    </sect2>
-
-
-
-  </sect1>
-
-
-
-  <sect1>
-    <title>general structure</title>
-    
-
-    <para></para>
-
-
-
-    <sect2>
-      <title></title>
-
-
-      <programlisting>
-Stepper [ClassName] ( ID )
-"docstring"
-{ 
-        property_name1 property_value1 ;
-        property_name2 property_value2 ;
-        ...
-        property_namen property_valuen ;
-} 
-
-System [ClassName] ( SystemPath )
-{ 
-        property_name1 property_value1 ;
-        property_name2 property_value2 ;
-        ...
-        property_namen property_valuen ;
-
-        Variable [ClassName] ( ID )
-        { 
-                property_name1 property_value1 ;
-                property_name2 property_value2 ;
-                ...
-                property_namen property_valuen ;
-        } 
-
-        Process [ClassName] ( ID )
-        { 
-                property_name1 property_value1 ;
-                property_name2 property_value2 ;
-                ...
-                property_namen property_valuen ;
-        } 
-
-} 
-</programlisting>
-
-      <para>where <emphasis>ObjectType</emphasis> is one of:
-
-      <itemizedlist>
-	  <listitem>
-	    <para>&Stepper;</para>
-	  </listitem>
-
-	  <listitem>
-	    <para>&Variable;</para>
-	  </listitem>
-
-	  <listitem>
-	    <para>&Process;</para>
-	  </listitem>
-
-	  <listitem>
-	    <para>&System;</para>
-	  </listitem>
-	</itemizedlist>
-
-
-    </para>
-      
-      <para><emphasis>ID</emphasis> is
-      &SystemPath; for &System; definitions, and ID
-      string for other <emphasis>ObjectType</emphasis>s</para>
-
-
-
+      <para>Before getting in to the details of &EM; syntax, let's
+      have a look at a tiny example. It's very simple.</para>
 
       <example>
-	<title>simple 'Toy Pathway' model</title>
-
-	<programlisting>
-
-Stepper Euler1Stepper( SRM_01 ) 
+	<title>A tiny &EM; example</title>
+	<programlisting linenumbering="numbered">
+Stepper ODE23Stepper( ODE_1 ) 
 { 
         # no property 
 } 
  
-System System( / ) 
+System CompartmentSystem( / ) 
 { 
-        StepperID       SRM_01; 
-        Volume  0.000000000000001; 
-} 
- 
-System System( /CELL ) 
-{ 
-        StepperID       SRM_01; 
-        Volume  1e-18;
-} 
- 
-System System( /CELL/CYTOPLASM ) 
-{ 
-        StepperID       SRM_01; 
-        Volume  1e-18; 
+        StepperID       ODE_1;
+        Volume          1e-18; 
  
         Variable Variable( S ) 
         { 
-                Value   1000000; 
+                Value   10000; 
         } 
  
         Variable Variable( P ) 
         { 
                 Value   0; 
         } 
- 
-        Variable Variable( E ) 
-        { 
-                Value   1000; 
-        } 
- 
-        Process MichaelisUniUniProcess( E ) 
-        { 
-                VariableReferenceList   [ S0 Variable:/CELL/CYTOPLASM:S -1 ]  
-                                        [ P0 Variable:/CELL/CYTOPLASM:P 1 ]  
-                                        [ C0 Variable:/CELL/CYTOPLASM:E 0 ]; 
-                KmS     1; 
-                KcF     10; 
-        } 
- 
-} 
- 
-#target /CELL/CYTOPLASM; 
- 
-#/MT0  -> /MT0 
-#MT0   -> /CELL/CYTOPLASM/MT0 
-#Reatant S0 .:S -1; 
-#Reatant S0 ../CYTOPLASM1:S -1; 
- 
-	</programlisting> 
-      </example> 
 
-      <example>
-	<title>Another example</title>
+        Process MassActionFluxProcess( E ) 
+        { 
+                Name  "A mass action from S to P."
+                k     1.0; 
 
-
-	<programlisting>
-
-Stepper Euler1Stepper ( SRM_01 ) 
-{ 
-# no property 
-} 
- 
-System CompartmentSystem ( / ) 
-{ 
-        Name "ENVIRONMENT"; 
-        Stepper SRM_01; 
-        Volume  1.0E-15; 
-} 
- 
-System CompartmentSystem ( /CELL )  
-{ 
-        Name "CELL"; 
-        Stepper SRM_01; 
-        Volume  unknown; 
-} 
- 
-System CompartmentSystem ( /CELL/CYTOPLASM ) 
-{ 
-        Name "CYTOPLASM"; 
-        Stepper SRM_01; 
-        Volume  1.0E-18; 
- 
-        Substance Substance ( S ) 
-        { 
-                Name "S"; 
-                Quantity 1000000; 
-        } 
- 
-        Substance Substance ( P ) 
-        { 
-                Name "P"; 
-                Quantity 0; 
-        } 
- 
-        Substance Substance ( E ) 
-        { 
-                Name "E"; 
-                Quantity 1000; 
-        } 
- 
- 
-#/MT0  -> /MT0 
-#MT0   -> /CELL/CYTOPLASM/MT0 
-#Reatant S0 .:S -1; 
-#Reatant S0 ../CYTOPLASM1:S -1; 
- 
-        Reactor MichaelisUniUniReactor ( R ) 
-        { 
-                Name "R"; 
-                VariableReferenceList [S0 S -1] 
-                                      [P0 P 1] 
-                                      [E0 ./E 0]; 
- 
-                KmS 1; 
-                KcF 10; 
+                VariableReferenceList [ S0 Variable:.:S -1 ] 
+                                      [ P0 Variable:.:P 1 ]  ;
         } 
  
 } 
- 
-System System ( /CELL/MEMBRANE ) 
-{ 
-        Name "MEMBRANE"; 
-        Stepper SRM_01; 
-        Volume  unknown; 
-} 
-
 </programlisting>
       </example>
 
+      <para>In this example, the model has a &Stepper;, of which
+      class name is <classname>ODE23Stepper</classname>, and has an ID
+      ODE_1.  The model also has a root system ('/'), and the class
+      name is <classname>CompartmentSystem</classname>.  The root
+      sytem, has two properties, StepperID and Volume, and three
+      &Entity; objects, &Variable;s S and P, and a &Process; E.  These
+      &Entity; objects have their property values of several different
+      types.  For example, 'StepperID' of the root system is a string
+      without quotes (ODE_1). The initial value to 'Value' property of
+      the &Variable; S is an integer number 10000.  'Name' of the
+      &Process; E is a quoted string "A mass action from S to P", and
+      'k' of it is a real number 1.0.  'VariableReferenceList'
+      property of E is a list of two lists, which contain strings
+      (such as 'S0'), and numbers (such as -1).</para>
+
     </sect2>
+
+
+    <sect2>
+      <title>General Syntax of &EM;</title>
+
+      <para>Basically &EM; is (and thus &EML; is) a set of just one
+      type of directive: <emphasis>object instantiation</emphasis>.
+      And in &ecell;'s simulation model, the 'object' has, as we have
+      seen, only two types, &Stepper; and &Entity;.   In addition, after
+      creating an object, property values must be set.  Therefore the object
+      instantiation has two steps: (1) creating object
+      and (2) setting properties.</para>
+
+      <sect3>
+	<title>A general form of an object instantiation</title>
+
+      <para>The following is the general form of definition (instantiation) 
+of an object in the simulation model:
+
+<programlisting>
+TYPE CLASSNAME ( ID )
+'''INFO (<emphasis>optional</emphasis>)'''
+{ 
+        PROPERTY_NAME_1 PROPERTY_VALUE_1;
+        PROPERTY_NAME_2 PROPERTY_VALUE_2;
+        ...
+        PROPERTY_NAME_n PROPERTY_VALUE_n;
+} 
+</programlisting>
+where:
+<itemizedlist>
+	    <listitem>
+	      <para>TYPE</para>
+		<para>An object type, which is one of the followings:
+      <itemizedlist>
+	  <listitem>
+	    <para>&Stepper;</para>
+	  </listitem>
+	  <listitem>
+	    <para>&Variable;</para>
+	  </listitem>
+	  <listitem>
+	    <para>&Process;</para>
+	  </listitem>
+	  <listitem>
+	    <para>&System;</para>
+	  </listitem>
+	</itemizedlist>
+</para>
+	      </listitem>
+
+	    <listitem>
+	      <para>ID</para>
+		<para>This is a <emphasis>StepperID</emphasis> if the
+		object type is &Stepper;.  If it is &System;, put a
+		&SystemPath; here.  Fill in an &ID; if it is
+		&Variable; or &Process; (Not a &FullID; ; see the following
+		sections).</para>
+	      </listitem>
+
+	    <listitem>
+	      <para>CLASSNAME</para>
+		<para>A classname of this object.  This class must be
+a subclass of the baseclass defined by the <emphasis>TYPE</emphasis>.
+For example, if the <emphasis>TYPE</emphasis> is &Process;,
+<emphasis>CLASSNAME</emphasis> must be a subclass of &Process;, such
+as <classname>MassActionFluxProcess</classname>.</para>
+	    </listitem>
+
+	    <listitem>
+	      <para>INFO</para>
+		<para>This field is optional, and is not used for the
+		simulation.  A quoted single-line ("string") or
+		a multi-line string ('''multi-line string''') can be put
+		here.</para>
+	    </listitem>
+
+	    <listitem>
+	      <para>PROPERTY</para>
+		<para>An object definition has zero or more property
+		fields.</para> <para>A property field starts with an
+		unquoted property name string, followed by a property
+		value, and ends with a semi-colon (';').  For example,
+		if the property name is 'Concentration' and the value
+		is 10.0, it may look like:
+		<informalexample>
+		    <programlisting>Concentration 10.0;</programlisting></informalexample></para>
+
+		<para>&Real;, &Int;, &StringType;, and List are
+		allowed as property value types (See Object Properties
+		above).</para> 
+
+		<para>If the value is a List, outermost
+		brackets are omitted.  For example, to put a list
+		<programlisting>[ 10 "string" [ LIST ] ]</programlisting> 
+                into a property slot 'Foo', write a
+		line in a object definition like this:
+<informalexample>
+		    <programlisting>Foo 10 "string" [ LIST ];</programlisting>
+		  </informalexample>
+<note>
+		    <title>Why the outermost brackets can be ommited?</title> 
+
+		    <para>All property values are lists, even if it is
+		    a scalar &Real; number.  Remember a number '1.0' is
+		    interconvertible with a length-1 list '[ 1.0 ]'. 
+                    Therefore the system can correctly interpret property
+                    values without the brackets.
+                    </para>
+
+		    <para>In other words, if the property value is
+		    bracketed, for example, the following property value
+<programlisting>Foo [ 10 [ LIST ] ];</programlisting> 
+                    is interpreted by the system as a length-1 List 
+<programlisting>[ [ 10 [ LIST ] ] ]</programlisting> 
+                    of which the first item is a list
+<programlisting>[ 10 [ LIST ] ]</programlisting> 
+                    This may or may not be what you intend to have.</para>
+		  </note>
+</para>
+
+	    </listitem>
+
+	  </itemizedlist>
+
+
+
+</para>
+
+      </sect3>
+
+      <sect3>
+	<title>Structure of an &EM; file</title>
+
+	<para>Any number of &Stepper; and &System; statements can
+	exist in the toplevel of an &EM; file.  Usually an &EM; file
+	has one or more &Stepper; and &System; statements.  A &System;
+        statement can have zero or more &Variable; and &Process; statements.
+        There cannot be a &System; statement inside &System;.</para>
+      </sect3>
+
+      <sect3>
+	<title>Macros and preprocessing</title>
+
+	<para>Before converting to an &EML; file by
+	<command>ecell3-em2eml</command> command, an &EM; file is
+        processed by &empy; preprocessor.</para>
+
+	<para>By using &empy;, effectively you can embed any &Python;
+	expressions and statements after '@' inside an &EM; file.  Put
+	a &Python; expression inside '@( python expression )', and the
+	macro will be replated with an evaluation of the expression.
+	If the expression is very simple, '()' can be ommited. Use '@{
+	pytyon statements }' to embed &Python; statements.  For
+	example, the following code:
+
+<programlisting>@(AA='10')
+@AA</programlisting> is expanded to:
+	<programlisting>10</programlisting>
+
+        Of course the statement can be multi-line.  This code 
+
+<programlisting>
+@{
+  def f( str ):
+      return str + ' is true.'
+}
+
+@f( 'Video Games Boost Visual Skills' )
+</programlisting>
+
+        is expanded to
+
+<programlisting>Video Games Boost Visual Skills is true.</programlisting>
+</para>
+
+	<para>&empy; can also be used to include other files.  The
+following line is replaced with the content of the file
+<filename>foo.em</filename> immediately before the &EM; file is
+converted to an &EML;: 
+
+<programlisting>@include( 'foo.em' )</programlisting>
+</para>
+
+	<para>Use <option>-E</option> option of
+	<command>ecell3-em2eml</command> command to see what happens
+	in the preprocessing.  With this option, it outputs the result of the
+	preprocessing to standard output and stops without creating an
+	&EML; file.</para>
+
+	<para>It has many more nice features.  See the appendix A
+	for the full description of the &empy; program.</para>
+      </sect3>
+
+      <sect3>
+	<title>Comments</title>
+
+	<para>The comment character is sharp '#'.  If a line contains
+         a '#' outside a quoted-string, anything after the character
+         is considered a comment, and not processed by the
+         <command>ecell3-em2eml</command> command.</para>
+
+	<para>This is processed differently from the &empy; comments
+         (@#).  This comment character is processed by the &empy; as a
+         usual character, and does not have an effect on the
+         preprocessor.  That is, the part of the line after '#' is not
+         ignored by &empy; preprocessor.   To comment out an &empy; macro, 
+         the &empy; comment (@#) must be used.
+         </para>
+      </sect3>
+
+    </sect2>
+
+
 
   </sect1>
 
 
+  <sect1>
+    <title>Modeling Examples</title>
+
+    <para>Some basics on usage of ODE Steppers, NRStepper (Gillespie), DiscreteTimeStepper and SlaveStepper should come here.</para>
+
+  </sect1>
 
 
   </chapter>
