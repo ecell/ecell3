@@ -536,6 +536,96 @@ namespace libecs
     virtual ~DifferentialStepper() {}
 
     /**
+       Override setStepInterval() for theTolerantStepInterval.
+
+    */
+
+    virtual void setStepInterval( RealCref aStepInterval )
+    {
+      theTolerantStepInterval = aStepInterval;
+
+      Stepper::setStepInterval( aStepInterval );
+    }
+
+    void setNextStepInterval( RealCref aStepInterval )
+    {
+      theNextStepInterval = aStepInterval;
+    }
+
+    const Real getTolerantStepInterval() const
+    {
+      return theTolerantStepInterval;
+    }
+
+    const Real getNextStepInterval() const
+    {
+      return theNextStepInterval;
+    }
+
+    void initializeStepInterval( RealCref aStepInterval )
+    {
+      setStepInterval( aStepInterval );
+      setNextStepInterval( aStepInterval );
+    }
+
+    void makeSlots();
+
+    virtual void initialize();
+
+    virtual void reset();
+
+    virtual void interrupt( StepperPtr const aCaller );
+
+
+    RealVectorCref getVelocityBuffer() const
+    {
+      return theVelocityBuffer;
+    }
+
+    virtual VariableProxyPtr createVariableProxy( VariablePtr aVariable )
+    {
+      return new DifferentialStepper::VariableProxy( *this, aVariable );
+    }
+
+    virtual StringLiteral getClassName() const 
+    { 
+      return "DifferentialStepper";
+    }
+
+  protected:
+
+    const bool isExternalErrorTolerable() const;
+
+  protected:
+
+    RealVector theVelocityBuffer;
+
+  private:
+
+    Real theTolerantStepInterval;
+    Real theNextStepInterval;
+
+  };
+
+
+  /**
+     ADAPTIVE STEPSIZE DIFFERENTIAL EQUATION SOLVER
+
+
+  */
+
+  DECLARE_CLASS( AdaptiveDifferentialStepper );
+
+  class AdaptiveDifferentialStepper
+    :
+    public DifferentialStepper
+  {
+  public:
+
+    AdaptiveDifferentialStepper();
+    virtual ~AdaptiveDifferentialStepper() {}
+
+    /**
        Adaptive stepsize control.
 
        These methods are for handling the standerd error control objects.
@@ -591,73 +681,22 @@ namespace libecs
       return theMaxErrorRatio;
     }
 
-    /**
-       Override setStepInterval() for theTolerantStepInterval.
-
-    */
-
-    virtual void setStepInterval( RealCref aStepInterval )
-    {
-      theTolerantStepInterval = aStepInterval;
-
-      Stepper::setStepInterval( aStepInterval );
-    }
-
-    void setNextStepInterval( RealCref aStepInterval )
-    {
-      theNextStepInterval = aStepInterval;
-    }
-
-    const Real getTolerantStepInterval() const
-    {
-      return theTolerantStepInterval;
-    }
-
-    const Real getNextStepInterval() const
-    {
-      return theNextStepInterval;
-    }
-
-    void initializeStepInterval( RealCref aStepInterval )
-    {
-      setStepInterval( aStepInterval );
-      setNextStepInterval( aStepInterval );
-    }
+    virtual const Int getOrder() const { return 1; }
 
     void makeSlots();
 
     virtual void initialize();
-
-    virtual void reset();
-
-    virtual void interrupt( StepperPtr const aCaller );
-
-
-    RealVectorCref getVelocityBuffer() const
-    {
-      return theVelocityBuffer;
-    }
-
-
-    virtual VariableProxyPtr createVariableProxy( VariablePtr aVariable )
-    {
-      return new DifferentialStepper::VariableProxy( *this, aVariable );
-    }
+    void step();
+    virtual bool calculate() = 0;
 
     virtual StringLiteral getClassName() const 
     { 
-      return "DifferentialStepper";
+      return "AdaptiveDifferentialStepper";
     }
-
-  protected:
-
-    const bool isExternalErrorTolerable() const;
 
   protected:
 
     Real safety;
-
-    RealVector theVelocityBuffer;
 
   private:
 
@@ -666,10 +705,8 @@ namespace libecs
     Real theStateToleranceFactor;
     Real theDerivativeToleranceFactor;
 
-    Real theTolerantStepInterval;
-    Real theNextStepInterval;
-
     Real theMaxErrorRatio;
+
   };
 
 

@@ -61,6 +61,7 @@ namespace libecs
 
   };
 
+  DECLARE_CLASS( FixedRungeKutta4Stepper );
 
   class FixedRungeKutta4Stepper
     : 
@@ -86,9 +87,11 @@ namespace libecs
   };
 
 
+  DECLARE_CLASS( Fehlberg21Stepper );
+
   class Fehlberg21Stepper
     :
-    public DifferentialStepper
+    public AdaptiveDifferentialStepper
   {
 
   public:
@@ -99,10 +102,9 @@ namespace libecs
     static StepperPtr createInstance() { return new Fehlberg21Stepper; }
 
     virtual void initialize();
-    virtual void step();
+    virtual bool calculate();
 
-    bool calculate();
-
+    virtual const Int getOrder() const { return 2; }
 
     virtual StringLiteral getClassName() const { return "Fehlberg21Stepper"; }
 
@@ -115,7 +117,7 @@ namespace libecs
 
   class Fehlberg23Stepper
     : 
-    public DifferentialStepper
+    public AdaptiveDifferentialStepper
   {
 
   public:
@@ -164,9 +166,9 @@ namespace libecs
     static StepperPtr createInstance() { return new Fehlberg23Stepper; }
 
     virtual void initialize();
-    virtual void step();
+    virtual bool calculate();
 
-    bool calculate();
+    virtual const Int getOrder() const { return 2; }
 
     virtual StringLiteral getClassName() const { return "Fehlberg23Stepper"; }
 
@@ -189,7 +191,7 @@ namespace libecs
 
   class CashKarp45Stepper
     : 
-    public DifferentialStepper
+    public AdaptiveDifferentialStepper
   {
 
   public:
@@ -200,9 +202,9 @@ namespace libecs
     static StepperPtr createInstance() { return new CashKarp45Stepper; }
 
     virtual void initialize();
-    virtual void step();
- 
-    bool calculate();
+    virtual bool calculate();
+
+    virtual const Int getOrder() const { return 4; }
 
     virtual StringLiteral getClassName() const { return "CashKarp45Stepper"; }
 
@@ -225,7 +227,7 @@ namespace libecs
 
   class DormandPrince547MStepper
     : 
-    public DifferentialStepper
+    public AdaptiveDifferentialStepper
   {
 
     class VariableProxy
@@ -275,9 +277,9 @@ namespace libecs
     static StepperPtr createInstance() { return new DormandPrince547MStepper; }
 
     virtual void initialize();
-    virtual void step();
- 
-    bool calculate();
+    virtual bool calculate();
+
+    virtual const Int getOrder() const { return 5; }
 
     virtual StringLiteral getClassName() const
     { 

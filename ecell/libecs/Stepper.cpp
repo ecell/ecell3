@@ -643,12 +643,6 @@ namespace libecs
 
   DifferentialStepper::DifferentialStepper()
     :
-    theTolerance( 1.0e-6 ),
-    theAbsoluteToleranceFactor( 1.0 ),
-    theStateToleranceFactor( 1.0 ),
-    theDerivativeToleranceFactor( 1.0 ),
-    safety( 0.9 ),
-    theMaxErrorRatio( 1.0 ),
     theTolerantStepInterval( 0.001 ),
     theNextStepInterval( 0.001 )
   {
@@ -664,26 +658,6 @@ namespace libecs
     DEFINE_PROPERTYSLOT( "NextStepInterval", Real, 
 			 NULLPTR,
 			 &DifferentialStepper::getNextStepInterval );
-
-    DEFINE_PROPERTYSLOT( "Tolerance", Real,
-			 &DifferentialStepper::setTolerance,
-			 &DifferentialStepper::getTolerance );
-
-    DEFINE_PROPERTYSLOT( "AbsoluteToleranceFactor", Real,
-			 &DifferentialStepper::setAbsoluteToleranceFactor,
-			 &DifferentialStepper::getAbsoluteToleranceFactor );
- 
-    DEFINE_PROPERTYSLOT( "StateToleranceFactor", Real,
-			 &DifferentialStepper::setStateToleranceFactor,
-			 &DifferentialStepper::getStateToleranceFactor );
-
-    DEFINE_PROPERTYSLOT( "DerivativeToleranceFactor", Real,
-			 &DifferentialStepper::setDerivativeToleranceFactor,
-			 &DifferentialStepper::getDerivativeToleranceFactor );
-
-    DEFINE_PROPERTYSLOT( "MaxErrorRatio", Real,
-			 NULLPTR,
-			 &DifferentialStepper::getMaxErrorRatio );
   }
 
   void DifferentialStepper::initialize()
@@ -800,6 +774,122 @@ namespace libecs
     getModel()->reschedule( this );
   }
 
+
+  ////////////////////////// AdaptiveDifferentialStepper
+
+  void AdaptiveDifferentialStepper::makeSlots()
+  {
+    DEFINE_PROPERTYSLOT( "Tolerance", Real,
+			 &AdaptiveDifferentialStepper::setTolerance,
+			 &AdaptiveDifferentialStepper::getTolerance );
+
+    DEFINE_PROPERTYSLOT( "AbsoluteToleranceFactor", Real,
+			 &AdaptiveDifferentialStepper::setAbsoluteToleranceFactor,
+			 &AdaptiveDifferentialStepper::getAbsoluteToleranceFactor );
+ 
+    DEFINE_PROPERTYSLOT( "StateToleranceFactor", Real,
+			 &AdaptiveDifferentialStepper::setStateToleranceFactor,
+			 &AdaptiveDifferentialStepper::getStateToleranceFactor );
+
+    DEFINE_PROPERTYSLOT( "DerivativeToleranceFactor", Real,
+			 &AdaptiveDifferentialStepper::setDerivativeToleranceFactor,
+			 &AdaptiveDifferentialStepper::getDerivativeToleranceFactor );
+
+    DEFINE_PROPERTYSLOT( "MaxErrorRatio", Real,
+			 NULLPTR,
+			 &AdaptiveDifferentialStepper::getMaxErrorRatio );
+
+    DEFINE_PROPERTYSLOT( "Order", Int, 
+			 NULLPTR,
+			 &AdaptiveDifferentialStepper::getOrder );
+  }
+
+  AdaptiveDifferentialStepper::AdaptiveDifferentialStepper()
+    :
+    theTolerance( 1.0e-6 ),
+    theAbsoluteToleranceFactor( 1.0 ),
+    theStateToleranceFactor( 1.0 ),
+    theDerivativeToleranceFactor( 1.0 ),
+    safety( 0.9 ),
+    theMaxErrorRatio( 1.0 )
+  {
+    makeSlots();
+  }
+
+  void AdaptiveDifferentialStepper::initialize()
+  {
+    DifferentialStepper::initialize();
+  }
+
+  void AdaptiveDifferentialStepper::step()
+  {
+    // clear
+    clear();
+
+    setStepInterval( getNextStepInterval() );
+
+    while( !calculate() )
+      {
+	// shrink it if the error exceeds 110%
+	//		    setStepInterval( getStepInterval() 
+	//				     * pow(maxError, -0.5) 
+	//				     * safety );
+
+	setStepInterval( getStepInterval() * 0.5 );
+
+	//	std::cerr << "s " << getCurrentTime() 
+	//		  << ' ' << getStepInterval()
+	//		  << std::endl;
+      }
+
+    const Real theAbsoluteEpsilon( 0.1 );
+    const Real theRelativeEpsilon( 0.1 );
+
+    const Real anAdaptedStepInterval( getStepInterval() );
+    const UnsignedInt aSize( getReadOnlyVariableOffset() );
+
+    for( UnsignedInt c( 0 ); c < aSize; ++c )
+      {
+	VariablePtr const aVariable( theVariableVector[ c ] );
+
+	Real const aTolerance( ( fabs( aVariable->getValue() ) 
+				 + theAbsoluteEpsilon ) * theRelativeEpsilon );
+	Real const aVelocity( fabs( theVelocityBuffer[ c ] ) );
+
+	if ( aTolerance < aVelocity * getStepInterval() )
+	  {
+	    setStepInterval( aTolerance / aVelocity );
+	  }
+      }
+
+    if ( anAdaptedStepInterval > getStepInterval() )
+      {
+	reset();		
+
+	if ( !calculate() )
+	  {
+	    // do nothing
+	  }
+      }
+
+    const Real maxError( getMaxErrorRatio() );
+
+    // grow it if error is 50% less than desired
+    if ( maxError < 0.5 )
+      {
+	Real aNewStepInterval( getStepInterval() 
+			       * pow(maxError , -1.0 / getOrder()) * safety );
+	//	Real aNewStepInterval( getStepInterval() * 2.0 );
+
+	//	std::cerr << "g " << getCurrentTime() << ' ' 
+	//		  << getStepInterval() << std::endl;
+	setNextStepInterval( aNewStepInterval );
+      }
+    else 
+      {
+	setNextStepInterval( getStepInterval() );
+      }
+  }
 
   //////////////////// DiscreteEventStepper
 

@@ -180,58 +180,17 @@ namespace libecs
     setCurrentTime( aCurrentTime );
   }
 
-  ////////////////////////// Fehlberg21Stepper
 
+  ////////////////////////// Fehlberg21Stepper
 
   Fehlberg21Stepper::Fehlberg21Stepper()
   {
-    ; // do nothing
+    // do nothing
   }
 
   void Fehlberg21Stepper::initialize()
   {
-    DifferentialStepper::initialize();
-  }
-
-  void Fehlberg21Stepper::step()
-  {
-    clear();
-
-    setStepInterval( getNextStepInterval() );
-
-    while( !calculate() )
-      {
-	// shrink it if the error exceeds 110%
-	//		    setStepInterval( getStepInterval() 
-	//				     * pow(maxError, -1.0)
-	//				     *  safety );
-		
-	setStepInterval( getStepInterval() * 0.5 );
-		
-	//		    std::cerr << "s " << getCurrentTime() 
-	//			      << ' ' << getStepInterval() 
-	//			      << std::endl;
-      }
-
-    const Real maxError( getMaxErrorRatio() );
-
-    if( maxError < 0.5 )
-      {
-	// grow it if error is 50% less than desired
-	//	    Real aNewStepInterval( getStepInterval() * 2.0 );
-	
-	Real aNewStepInterval( getStepInterval() 
-			       * pow(maxError, -0.5) * safety );
-	
-	//	    	    std::cerr << "g " << getCurrentTime() << ' ' 
-	//	    		      << aStepInterval << std::endl;
-	
-	setNextStepInterval( aNewStepInterval );
-      }
-    else
-      {
-	setNextStepInterval( getStepInterval() );
-      }
+    AdaptiveDifferentialStepper::initialize();
   }
 
   bool Fehlberg21Stepper::calculate()
@@ -334,82 +293,12 @@ namespace libecs
 
   void Fehlberg23Stepper::initialize()
   {
-    DifferentialStepper::initialize();
+    AdaptiveDifferentialStepper::initialize();
 
     // the number of write variables
     const UnsignedInt aSize( getReadOnlyVariableOffset() );
 
     theK1.resize( aSize );
-  }
-
-  void Fehlberg23Stepper::step()
-  {
-    // clear
-    clear();
-
-    setStepInterval( getNextStepInterval() );
-
-    while( !calculate() )
-      {
-	// shrink it if the error exceeds 110%
-	//		    setStepInterval( getStepInterval() 
-	//				     * pow(maxError, -0.5) 
-	//				     * safety );
-
-	setStepInterval( getStepInterval() * 0.5 );
-
-	//	std::cerr << "s " << getCurrentTime() 
-	//		  << ' ' << getStepInterval()
-	//		  << std::endl;
-      }
-
-    const Real theAbsoluteEpsilon( 0.1 );
-    const Real theRelativeEpsilon( 0.1 );
-
-    const Real anAdaptedStepInterval( getStepInterval() );
-    const UnsignedInt aSize( getReadOnlyVariableOffset() );
-
-    for( UnsignedInt c( 0 ); c < aSize; ++c )
-      {
-	VariablePtr const aVariable( theVariableVector[ c ] );
-
-	Real const aTolerance( ( fabs( aVariable->getValue() ) 
-				 + theAbsoluteEpsilon ) * theRelativeEpsilon );
-	Real const aVelocity( fabs( theVelocityBuffer[ c ] ) );
-
-	if ( aTolerance < aVelocity * getStepInterval() )
-	  {
-	    setStepInterval( aTolerance / aVelocity );
-	  }
-      }
-
-    if ( anAdaptedStepInterval > getStepInterval() )
-      {
-	reset();		
-
-	if ( !calculate() )
-	  {
-	    // do nothing
-	  }
-      }
-
-    const Real maxError( getMaxErrorRatio() );
-
-    // grow it if error is 50% less than desired
-    if ( maxError < 0.5 )
-      {
-	Real aNewStepInterval( getStepInterval() * pow(maxError , -0.5)
-			       * safety );
-	//	Real aNewStepInterval( getStepInterval() * 2.0 );
-
-	//	std::cerr << "g " << getCurrentTime() << ' ' 
-	//		  << getStepInterval() << std::endl;
-	setNextStepInterval( aNewStepInterval );
-      }
-    else 
-      {
-	setNextStepInterval( getStepInterval() );
-      }
   }
 
   bool Fehlberg23Stepper::calculate()
@@ -538,7 +427,7 @@ namespace libecs
 
   void CashKarp45Stepper::initialize()
   {
-    DifferentialStepper::initialize();
+    AdaptiveDifferentialStepper::initialize();
 
     const UnsignedInt aSize( getReadOnlyVariableOffset() );
 
@@ -550,38 +439,6 @@ namespace libecs
     theK6.resize( aSize );
 
     theErrorEstimate.resize( aSize );
-  }
-  
-  void CashKarp45Stepper::step()
-  {
-    // clear
-    clear();
-
-    setStepInterval( getNextStepInterval() );
-
-    while( !calculate() )
-      {
-	// shrink it if the error exceeds 110%
-	//		    setStepInterval( getStepInterval() 
-	//				     * pow(maxError, -0.20)
-	//				     *  safety );
-	setStepInterval( getStepInterval() * 0.5 );
-      }
-
-    const Real maxError( getMaxErrorRatio() );
-
-    // grow it if error is 50% less than desired
-    if( maxError <= 0.5 )
-      {
-	Real aNewStepInterval( getStepInterval() 
-			       * pow(maxError , -0.25) * safety );
-	    	    
-	setNextStepInterval( aNewStepInterval );
-      }
-    else 
-      {
-	setNextStepInterval( getStepInterval() );
-      }
   }
 
   bool CashKarp45Stepper::calculate()
@@ -798,7 +655,7 @@ namespace libecs
 
   void DormandPrince547MStepper::initialize()
   {
-    DifferentialStepper::initialize();
+    AdaptiveDifferentialStepper::initialize();
 
     const UnsignedInt aSize( getReadOnlyVariableOffset() );
 
@@ -812,47 +669,6 @@ namespace libecs
 
     theMidVelocityBuffer.resize( aSize );
     theErrorEstimate.resize( aSize );
-  }
-
-  void DormandPrince547MStepper::step()
-  {
-    clear();
-
-    setStepInterval( getNextStepInterval() );
-
-    while( !calculate() )
-      {
-	// shrink it if the error exceeds 110%
-	//		    setStepInterval( getStepInterval() 
-	//				     * pow(maxError, -0.2)
-	//				     *  safety );
-		
-	setStepInterval( getStepInterval() * 0.5 );
-		
-	//		    std::cerr << "s " << getCurrentTime() 
-	//			      << ' ' << getStepInterval() 
-	//			      << std::endl;
-      }
-
-    const Real maxError( getMaxErrorRatio() );
-    
-    if( maxError < 0.5 )
-      {
-	// grow it if error is 50% less than desired
-	//	    Real aNewStepInterval( getStepInterval() * 2.0 );
-
-	Real aNewStepInterval( getStepInterval() 
-			       * pow(maxError, -0.2) * safety );
-	
-	//	    	    std::cerr << "g " << getCurrentTime() << ' ' 
-	//	    		      << aStepInterval << std::endl;
-	
-	setNextStepInterval( aNewStepInterval );
-      }
-    else
-      {
-	setNextStepInterval( getStepInterval() );
-      }
   }
 
   bool DormandPrince547MStepper::calculate()
