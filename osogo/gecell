@@ -1,3 +1,11 @@
 #!/bin/sh
 
-PYTHONPATH=/home/ecell/ecell3/ecell/pyecs/:plugins/ LD_PRELOAD="/home/ecell/ecell3/ecell/libemc/.libs/libemc.so /home/ecell/ecell3/ecell/libecs/.libs/libecs.so /home/ecell/ecell3/korandom/.libs/libkorandom.so" /usr/bin/python2 MainWindow.py $*
+
+
+export PYTHONPATH=/home/ecell/ecell3/ecell/pyecs/:plugins/
+
+export LD_PRELOAD="/home/ecell/ecell3/ecell/libemc/.libs/libemc.so\
+ /home/ecell/ecell3/ecell/libecs/.libs/libecs.so\
+ /home/ecell/ecell3/korandom/.libs/libkorandom.so"
+
+exec /usr/bin/python2 MainWindow.py $*
