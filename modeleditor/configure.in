@@ -11,7 +11,6 @@ AM_CHECK_PYMOD(gtk,,,[AC_MSG_ERROR(could not find gtk module)])
 AM_CHECK_PYMOD(gtk.gdk,,,[AC_MSG_ERROR(could not find gtk.gdk module. perhaps pygtk2 is not installed)])
 AM_CHECK_PYMOD(gtk.glade,,,[AC_MSG_ERROR(could not find gtk.glade module. perhaps pygtk2-libglade is not installed)])
 AC_PROG_CC
-
 dnl check for pygtk>=2.0.0
 prog="
 import sys,gtk
@@ -30,6 +29,7 @@ fi
 
 
 AM_CHECK_PYMOD(gnome.canvas,,,[AC_MSG_ERROR(could not find gnome.canvas module. )])
+AM_CHECK_GNOME_CANVAS(,[AC_MSG_ERROR(could not find gnome-pyhon2-canvas >=2.0.2)])
 AM_CHECK_PYMOD(xml.dom.minidom,,,[AC_MSG_ERROR(could not find xml.dom.minidom module. )])
 AM_CHECK_PYMOD(gnome.ui,,[AC_SUBST([GNOME_INSTALLED],yes)],[AC_SUBST([GNOME_INSTALLED],no)])
 AM_CHECK_PYMOD(Numeric,,,[AC_MSG_ERROR(could not find Numeric module)])

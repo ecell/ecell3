@@ -292,6 +292,7 @@ class ModelEditor:
                                                 aPropValue=True
 					anObject.setProperty(aProp,aPropValue)
 
+
 		
 
 	def __loadObject( self, aLayout, anObjectID,  aLayoutEml, parentSys ):
@@ -396,6 +397,7 @@ class ModelEditor:
 			if aProperty in ( PR_CONNECTIONLIST, VR_CONNECTIONLIST ):
 				continue
 			aValue = anObject.getProperty( aProperty)
+
 			aLayoutEml.setObjectProperty( aLayoutName, anObjectID, aProperty, aValue )
 
 		# save subobjects

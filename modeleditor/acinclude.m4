@@ -65,3 +65,39 @@ $1],dnl
 $2])
 CPPFLAGS="$save_CPPFLAGS"
 ])
+
+
+
+## this one is to check the correct version of gnome-python
+dnl AM_CHECK_GNOME_CANVAS()
+dnl Check if gnome canvas >= 2.0.2 is installed
+AC_DEFUN(AM_CHECK_GNOME_CANVAS,
+[AC_REQUIRE([AM_PATH_PYTHON])
+
+AC_MSG_CHECKING(for correct version of gnome canvas)
+AC_CACHE_VAL(py_gnome_canvas, [
+prog="
+import sys
+try:
+	import gnome.canvas
+	a=gnome.canvas.path_def_new( [[(gnome.canvas.MOVETO_OPEN,1,1),(gnome.canvas.LINETO,3,4),(gnome.canvas.LINETO,1,10)]])
+except:
+        sys.exit(1)
+sys.exit(0)"
+
+if $PYTHON -c "$prog" 1>&AC_FD_CC 2>&AC_FD_CC
+  then
+    eval "py_gnome_canvas=yes"
+  else
+    eval "py_gnome_canvas=no"
+  fi
+])
+py_val=`eval "echo \`echo $py_gnome_canvas\`"`
+if test "x$py_val" != xno; then
+  AC_MSG_RESULT(yes)
+  ifelse([$1], [],, [$1])
+else
+  AC_MSG_RESULT(no)
+  ifelse([$2], [],, [$2])
+fi
+])
