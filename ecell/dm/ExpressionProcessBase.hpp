@@ -60,7 +60,7 @@ namespace libecs
   {
 
   protected:
-    
+
     class StackMachine;
     class Compiler;
 
@@ -215,7 +215,166 @@ namespace libecs
 
       virtual void execute( StackMachine& aStackMachine );    
     };
-  
+
+    class EQ
+      :
+  public Instruction
+    {
+    public:
+      EQ() {}
+      virtual ~EQ() {}
+    
+      virtual void initialize()
+      {
+	// ; do nothing
+      }
+
+      virtual void execute( StackMachine& aStackMachine );    
+    };
+
+    class NEQ
+      :
+  public Instruction
+    {
+    public:
+      NEQ() {}
+      virtual ~NEQ() {}
+    
+      virtual void initialize()
+      {
+	// ; do nothing
+      }
+
+      virtual void execute( StackMachine& aStackMachine );    
+    };
+
+    class GT
+      :
+  public Instruction
+    {
+    public:
+      GT() {}
+      virtual ~GT() {}
+    
+      virtual void initialize()
+      {
+	// ; do nothing
+      }
+
+      virtual void execute( StackMachine& aStackMachine );    
+    };
+
+    class LT
+      :
+  public Instruction
+    {
+    public:
+      LT() {}
+      virtual ~LT() {}
+    
+      virtual void initialize()
+      {
+	// ; do nothing
+      }
+
+      virtual void execute( StackMachine& aStackMachine );    
+    };
+
+    class GEQ
+      :
+  public Instruction
+    {
+    public:
+      GEQ() {}
+      virtual ~GEQ() {}
+    
+      virtual void initialize()
+      {
+	// ; do nothing
+      }
+
+      virtual void execute( StackMachine& aStackMachine );    
+    };
+
+    class LEQ
+      :
+  public Instruction
+    {
+    public:
+      LEQ() {}
+      virtual ~LEQ() {}
+    
+      virtual void initialize()
+      {
+	// ; do nothing
+      }
+
+      virtual void execute( StackMachine& aStackMachine );    
+    };
+
+    class AND
+      :
+  public Instruction
+    {
+    public:
+      AND() {}
+      virtual ~AND() {}
+    
+      virtual void initialize()
+      {
+	// ; do nothing
+      }
+
+      virtual void execute( StackMachine& aStackMachine );    
+    };
+
+    class OR
+      :
+  public Instruction
+    {
+    public:
+      OR() {}
+      virtual ~OR() {}
+    
+      virtual void initialize()
+      {
+	// ; do nothing
+      }
+
+      virtual void execute( StackMachine& aStackMachine );    
+    };
+
+    class XOR
+      :
+  public Instruction
+    {
+    public:
+      XOR() {}
+      virtual ~XOR() {}
+    
+      virtual void initialize()
+      {
+	// ; do nothing
+      }
+
+      virtual void execute( StackMachine& aStackMachine );    
+    };
+
+    class NOT
+      :
+  public Instruction
+    {
+    public:
+      NOT() {}
+      virtual ~NOT() {}
+    
+      virtual void initialize()
+      {
+	// ; do nothing
+      }
+
+      virtual void execute( StackMachine& aStackMachine );    
+    };  
     
     class CALL_FUNC1
       :
@@ -331,8 +490,8 @@ namespace libecs
     public:
       PROCESS_SYSTEM_FUNC() {}
       PROCESS_SYSTEM_FUNC( ProcessPtr aProcessPtr,
-			   Process_System_Func aFuncPtr,
-			   System_Attribute aAttributePtr )
+		   Process_System_Func aFuncPtr,
+		   System_Attribute aAttributePtr )
 	:
 	theProcessPtr( aProcessPtr ), 
 	theFuncPtr( aFuncPtr ),
@@ -589,7 +748,7 @@ namespace libecs
 	  TERM,
 	  EXPRESSION,
 	  VARIABLE,
-	  CALL_FUNC1,
+	  CALL_FUNC,
 	  SYSTEM_FUNC,
 	  IDENTIFIER,
 	  CONSTANT,
@@ -632,7 +791,17 @@ namespace libecs
           //                                               //
 	  ///////////////////////////////////////////////////
             
-	  call_func = (   rootNode( str_p("abs") )
+	  call_func = (	  rootNode( str_p("eq") )
+			  | rootNode( str_p("neq") )
+			  | rootNode( str_p("gt") )
+			  | rootNode( str_p("lt") )
+			  | rootNode( str_p("geq") )
+			  | rootNode( str_p("leq") )
+			  | rootNode( str_p("and") )
+			  | rootNode( str_p("or") )
+			  | rootNode( str_p("xor") )
+			  | rootNode( str_p("not") )
+			  | rootNode( str_p("abs") )
 			  | rootNode( str_p("sqrt") )
 			  | rootNode( str_p("pow") )
 			  | rootNode( str_p("exp") )
@@ -649,7 +818,6 @@ namespace libecs
 			  | rootNode( str_p("asin") )
 			  | rootNode( str_p("acos") )
 			  | rootNode( str_p("atan") )
-#ifndef __MINGW32__
 			  | rootNode( str_p("fact") )
 			  | rootNode( str_p("asinh") )
 			  | rootNode( str_p("acosh") )
@@ -666,7 +834,6 @@ namespace libecs
 			  | rootNode( str_p("sec") )
 			  | rootNode( str_p("csc") )
 			  | rootNode( str_p("cot") )
-#endif  			    
 			  ) >>
 	    inner_node_d[ ch_p('(') >>  
 			  ( expression >>
@@ -700,7 +867,7 @@ namespace libecs
 	}
       
 	rule<ScannerT, PARSER_CONTEXT, parser_tag<VARIABLE> >     variable;
-	rule<ScannerT, PARSER_CONTEXT, parser_tag<CALL_FUNC1> >   call_func;
+	rule<ScannerT, PARSER_CONTEXT, parser_tag<CALL_FUNC> >   call_func;
 	rule<ScannerT, PARSER_CONTEXT, parser_tag<EXPRESSION> >   expression;
 	rule<ScannerT, PARSER_CONTEXT, parser_tag<TERM> >         term;
 	rule<ScannerT, PARSER_CONTEXT, parser_tag<POWER> >        power;
@@ -756,7 +923,7 @@ namespace libecs
       }
 
     virtual void defaultSetProperty( StringCref aPropertyName,
-				     PolymorphCref aValue)
+			     PolymorphCref aValue)
       {
 	thePropertyMap[ aPropertyName ] = aValue.asReal();
 	
@@ -804,23 +971,22 @@ namespace libecs
   
   void libecs::ExpressionProcessBase::Compiler::fillFunctionMap()
   {
-    theFunctionMap1["abs"] = fabs;
-    theFunctionMap1["sqrt"] = sqrt;
-    theFunctionMap1["exp"] = exp;
-    theFunctionMap1["log10"] = log10;
-    theFunctionMap1["log"] = log;
-    theFunctionMap1["floor"] = floor;
-    theFunctionMap1["ceil"] = ceil;
-    theFunctionMap1["sin"] = sin;
-    theFunctionMap1["cos"] = cos;
-    theFunctionMap1["tan"] = tan;
-    theFunctionMap1["sinh"] = sinh;
-    theFunctionMap1["cosh"] = cosh;
-    theFunctionMap1["tanh"] = tanh;
-    theFunctionMap1["asin"] = asin;
-    theFunctionMap1["acos"] = acos;
-    theFunctionMap1["atan"] = atan;
-#ifndef __MINGW32__
+    theFunctionMap1["abs"] = std::fabs;
+    theFunctionMap1["sqrt"] = std::sqrt;
+    theFunctionMap1["exp"] = std::exp;
+    theFunctionMap1["log10"] = std::log10;
+    theFunctionMap1["log"] = std::log;
+    theFunctionMap1["floor"] = std::floor;
+    theFunctionMap1["ceil"] = std::ceil;
+    theFunctionMap1["sin"] = std::sin;
+    theFunctionMap1["cos"] = std::cos;
+    theFunctionMap1["tan"] = std::tan;
+    theFunctionMap1["sinh"] = std::sinh;
+    theFunctionMap1["cosh"] = std::cosh;
+    theFunctionMap1["tanh"] = std::tanh;
+    theFunctionMap1["asin"] = std::asin;
+    theFunctionMap1["acos"] = std::acos;
+    theFunctionMap1["atan"] = std::atan;
     theFunctionMap1["fact"] = fact;
     theFunctionMap1["asinh"] = asinh;
     theFunctionMap1["acosh"] = acosh;
@@ -837,7 +1003,6 @@ namespace libecs
     theFunctionMap1["sec"] = sec;
     theFunctionMap1["csc"] = csc;
     theFunctionMap1["cot"] = cot;
-#endif   
 
     theFunctionMap2["pow"] = pow;
   }
@@ -970,7 +1135,7 @@ namespace libecs
 	   Call_Func Grammar compile
 	*/
 
-      case CompileGrammar::CALL_FUNC1 :
+      case CompileGrammar::CALL_FUNC :
 
 	assert( i->children.size() != 0 );
 	
@@ -983,64 +1148,118 @@ namespace libecs
 	++theStackSize;
 	if( i->children.size() == 1 )
 	  {
-	    theFunctionMap1Iterator = theFunctionMap1.find( str );
-
-	    if( i->children.begin()->value.id() == CompileGrammar::INTEGER ||
-		i->children.begin()->value.id() == CompileGrammar::FLOATING  )
+	    if( str == "not" )
 	      {
-		for( container_iterator = i->children.begin()->value.begin();
-		     container_iterator != i->children.begin()->value.end();
-		     ++container_iterator )
-		  {
-		    str_child1 += *container_iterator;
-		  }
+		compileTree( i->children.begin(), theCode );
 
-		n = stringCast<Real>( str_child1 );
-		
-		if( theFunctionMap1Iterator != theFunctionMap1.end() )
-		  {
-		    theCode.push_back
-		      ( new PUSH( ( *theFunctionMap1Iterator->second )( n ) ) );
-		  }
-		else
-		  {
-		    THROW_EXCEPTION( NoSlot, 
-				     str + String( " : No such function." ) );
-		  }
+		theCode.push_back( new NOT() );
 	      }
 	    else
 	      {
-		compileTree( i->children.begin(), theCode );	  
+		theFunctionMap1Iterator = theFunctionMap1.find( str );
 		
-		if( theFunctionMap1Iterator != theFunctionMap1.end() )
+		if( i->children.begin()->value.id() ==
+		    CompileGrammar::INTEGER ||
+		    i->children.begin()->value.id() ==
+		    CompileGrammar::FLOATING  )
 		  {
-		    theCode.push_back
-		      ( new CALL_FUNC1( theFunctionMap1Iterator->second ) );
+		    for( container_iterator =
+			   i->children.begin()->value.begin();
+			 container_iterator !=
+			   i->children.begin()->value.end();
+			 ++container_iterator )
+		      {
+			str_child1 += *container_iterator;
+		      }
+		    
+		    n = stringCast<Real>( str_child1 );
+		
+		    if( theFunctionMap1Iterator != theFunctionMap1.end() )
+		      {
+			theCode.push_back
+			  ( new PUSH( ( *theFunctionMap1Iterator->second )( n ) ) );
+		      }
+		    else
+		      {
+			THROW_EXCEPTION( NoSlot, 
+					 str +
+					 String( " : No such function." ) );
+		      }
 		  }
 		else
 		  {
-		    THROW_EXCEPTION( NoSlot, 
-				     str + String( " : No such function." ) );
+		    compileTree( i->children.begin(), theCode );	  
+		    
+		    if( theFunctionMap1Iterator != theFunctionMap1.end() )
+		      {
+			theCode.push_back
+			  ( new 
+			    CALL_FUNC1( theFunctionMap1Iterator->second ) );
+		      }
+		    else
+		      {
+			THROW_EXCEPTION( NoSlot, 
+					 str +
+					 String( " : No such function." ) );
+		      }
 		  }
 	      }
 	  }
-	
-	else if( i->children.size() >= 2 )
+	else if( i->children.size() == 2 )
 	  {
 	    compileTree( i->children.begin(), theCode );	  
 	    compileTree( i->children.begin()+1, theCode );
 		
-	    theFunctionMap2Iterator = theFunctionMap2.find( str );
-
-	    if( theFunctionMap2Iterator != theFunctionMap2.end() )
+	    if( str == "eq" )
 	      {
-		theCode.push_back
-		  ( new CALL_FUNC2( theFunctionMap2Iterator->second ) );
+		theCode.push_back( new EQ() );
+	      }
+	    else if( str == "neq" )
+	      {
+		theCode.push_back( new NEQ() );
+	      }
+	    else if( str == "gt" )
+	      {
+		theCode.push_back( new GT() );
+	      }
+	    else if( str == "lt" )
+	      {
+		theCode.push_back( new LT() );
+	      }
+	    else if( str == "geq" )
+	      {
+		theCode.push_back( new GEQ() );
+	      }
+	    else if( str == "leq" )
+	      {
+		theCode.push_back( new LEQ() );
+	      }
+	    else if( str == "and" )
+	      {
+		theCode.push_back( new AND() );
+	      }
+	    else if( str == "or" )
+	      {
+		theCode.push_back( new OR() );
+	      }
+	    else if( str == "xor" )
+	      {
+		theCode.push_back( new XOR() );
 	      }
 	    else
 	      {
-		THROW_EXCEPTION( NoSlot, 
-				 str + String( " : No such function." ) );
+		theFunctionMap2Iterator = theFunctionMap2.find( str );
+		
+		if( theFunctionMap2Iterator != theFunctionMap2.end() )
+		  {
+		    theCode.push_back
+		      ( new CALL_FUNC2( theFunctionMap2Iterator->second ) );
+		  }
+		else
+		  {
+		    THROW_EXCEPTION( NoSlot, 
+				     str + String( " : No such function." ) );
+		  }
 	      }
 	  }
 	else
@@ -1289,11 +1508,11 @@ namespace libecs
 	    str_child1 += *container_iterator;
 	  }
 
-	n = stringCast<Real>( str_child1 );
-
 	if( i->children.begin()->value.id() == CompileGrammar::INTEGER ||
 	    i->children.begin()->value.id() == CompileGrammar::FLOATING  )
 	  {
+	    n = stringCast<Real>( str_child1 );
+
 	    ++theStackSize;
 	    theCode.push_back( new PUSH( -n ) ); 
 	  }
@@ -1581,6 +1800,121 @@ namespace libecs
 
     *aStackMachine.getStackPtr()
       = pow( *aStackMachine.getStackPtr(), aValue );
+  }
+
+  void 
+  ExpressionProcessBase::EQ::
+  execute( StackMachine& aStackMachine )
+  {
+    const Real aValue( *aStackMachine.getStackPtr() );
+
+    --aStackMachine.getStackPtr();
+
+    *aStackMachine.getStackPtr()
+      = Real( *aStackMachine.getStackPtr() == aValue );
+  }
+
+  void 
+  ExpressionProcessBase::NEQ::
+  execute( StackMachine& aStackMachine )
+  {
+    const Real aValue( *aStackMachine.getStackPtr() );
+
+    --aStackMachine.getStackPtr();
+
+    *aStackMachine.getStackPtr()
+      = Real( *aStackMachine.getStackPtr() != aValue );
+  }
+
+  void 
+  ExpressionProcessBase::GT::
+  execute( StackMachine& aStackMachine )
+  {
+    const Real aValue( *aStackMachine.getStackPtr() );
+
+    --aStackMachine.getStackPtr();
+
+    *aStackMachine.getStackPtr()
+      = Real( *aStackMachine.getStackPtr() > aValue );
+  }
+
+  void 
+  ExpressionProcessBase::GEQ::
+  execute( StackMachine& aStackMachine )
+  {
+    const Real aValue( *aStackMachine.getStackPtr() );
+
+    --aStackMachine.getStackPtr();
+
+    *aStackMachine.getStackPtr()
+      = Real( *aStackMachine.getStackPtr() >= aValue );
+  }
+
+  void 
+  ExpressionProcessBase::LT::
+  execute( StackMachine& aStackMachine )
+  {
+    const Real aValue( *aStackMachine.getStackPtr() );
+
+    --aStackMachine.getStackPtr();
+
+    *aStackMachine.getStackPtr()
+      = Real( *aStackMachine.getStackPtr() < aValue );
+  }
+
+  void 
+  ExpressionProcessBase::LEQ::
+  execute( StackMachine& aStackMachine )
+  {
+    const Real aValue( *aStackMachine.getStackPtr() );
+
+    --aStackMachine.getStackPtr();
+
+    *aStackMachine.getStackPtr()
+      = Real( *aStackMachine.getStackPtr() <= aValue );
+  }
+
+  void 
+  ExpressionProcessBase::AND::
+  execute( StackMachine& aStackMachine )
+  {
+    const Real aValue( *aStackMachine.getStackPtr() );
+
+    --aStackMachine.getStackPtr();
+
+    *aStackMachine.getStackPtr()
+      = Real( *aStackMachine.getStackPtr() && aValue );
+  }
+
+  void 
+  ExpressionProcessBase::OR::
+  execute( StackMachine& aStackMachine )
+  {
+    const Real aValue( *aStackMachine.getStackPtr() );
+
+    --aStackMachine.getStackPtr();
+
+    *aStackMachine.getStackPtr()
+      = Real( *aStackMachine.getStackPtr() || aValue );
+  }
+
+  void 
+  ExpressionProcessBase::XOR::
+  execute( StackMachine& aStackMachine )
+  {
+    const Real aValue( *aStackMachine.getStackPtr() );
+
+    --aStackMachine.getStackPtr();
+
+    *aStackMachine.getStackPtr()
+      = Real( *aStackMachine.getStackPtr() && !( aValue ) );
+  }
+
+  void 
+  ExpressionProcessBase::NOT::
+  execute( StackMachine& aStackMachine )
+  {
+    *aStackMachine.getStackPtr() = Real( !( *aStackMachine.getStackPtr() ) );
   }
   
   void
