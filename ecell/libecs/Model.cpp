@@ -55,7 +55,7 @@ namespace libecs
     theVariableMaker(   *new VariableMaker        ),
     theProcessMaker(     *new ProcessMaker          )
   {
-    theRootSystemPtr = getSystemMaker().make( "System" );
+    theRootSystemPtr = getSystemMaker().make( "CompartmentSystem" );
     theRootSystemPtr->setModel( this );
     theRootSystemPtr->setID( "/" );
     theRootSystemPtr->setName( "The Root System" );
@@ -240,11 +240,32 @@ namespace libecs
       }
   }
 
+  void Model::checkSizeVariable( SystemCptr const aSystem )
+  {
+    FullID aRootSizeFullID( "Variable:/:SIZE" );
+
+    try
+      {
+	IGNORE_RETURN getEntity( aRootSizeFullID );
+      }
+    catch( NotFoundCref )
+      {
+	createEntity( "Variable", aRootSizeFullID );
+	EntityPtr aRootSizeVariable( getEntity( aRootSizeFullID ) );
+
+	aRootSizeVariable->setProperty( "Value", Polymorph( 1.0 ) );
+      }
+  }
+
   void Model::initialize()
   {
-    initializeSystems( getRootSystem() );
+    SystemPtr aRootSystem( getRootSystem() );
 
-    checkStepper( getRootSystem() );
+    checkSizeVariable( aRootSystem );
+
+    initializeSystems( aRootSystem );
+
+    checkStepper( aRootSystem );
 
     // initialization of Stepper needs three stages:
     // (1) integrate:  update Variables, and also *CurrentTime*

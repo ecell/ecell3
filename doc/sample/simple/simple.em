@@ -8,10 +8,14 @@ Stepper FixedODE1Stepper( DE1 )
 	# no property
 }
 
-System System( / )
+System CompartmentSystem( / )
 {
 	StepperID	DE1;
-	Volume	1e-18;
+
+	Variable Variable( SIZE )
+	{
+		Value	1e-18;
+	}
 
 	Variable Variable( S )
 	{

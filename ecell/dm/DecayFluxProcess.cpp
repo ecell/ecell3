@@ -52,7 +52,7 @@ ECELL3_DM_CLASS
   virtual void process()
     {
       Real velocity( k * N_A );
-      velocity *= getSuperSystem()->getVolume();
+      velocity *= getSuperSystem()->getSize();
 
       velocity *= pow(S0.getConcentration(),S0.getCoefficient()*-1);
       setFlux( velocity );

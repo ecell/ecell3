@@ -272,7 +272,7 @@ namespace libecs
 
     GET_METHOD( Real, Concentration )
     {
-      return getValue() / ( getSuperSystem()->getVolume() * N_A );
+      return getValue() / ( getSuperSystem()->getSizeN_A() );
     }
 
     void registerProxy( VariableProxyPtr const anVariableProxy );

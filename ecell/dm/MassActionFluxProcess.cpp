@@ -35,7 +35,7 @@ ECELL3_DM_CLASS
   {
     
     Real velocity( k * N_A );
-    velocity *= getSuperSystem()->getVolume();
+    velocity *= getSuperSystem()->getSize();
 
     for( VariableReferenceVectorConstIterator 
 	   s( theVariableReferenceVector.begin() );

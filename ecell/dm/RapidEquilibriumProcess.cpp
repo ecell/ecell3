@@ -82,7 +82,7 @@ void ECELL3_DM_CLASSNAME::process()
   {
     for(Int j( 0 ); j < -(*i).getCoefficient(); j++ )
     {
-      Keq_qua *= getSuperSystem()->getVolume();
+      Keq_qua *= getSuperSystem()->getSize();
     }
   }
 
@@ -93,7 +93,7 @@ void ECELL3_DM_CLASSNAME::process()
   {
     for(Int j( 0 ); j < (*i).getCoefficient(); j++ )
     {
-      Keq_qua *= getSuperSystem()->getVolume();
+      Keq_qua *= getSuperSystem()->getSize();
     }
   }  
 

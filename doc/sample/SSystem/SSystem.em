@@ -9,7 +9,6 @@ System System( / )
 {
 	StepperID	DT_01;
 	Name	"The culture medium";
-	Volume	1E-015;
 }
 
 System System( /CELL )
@@ -22,7 +21,11 @@ System System( /CELL/CYTOPLASM )
 {
 	StepperID	DT_01;
 	Name	"The cytoplasm";
-	Volume	1E-018;
+
+	Variable Variable( SIZE )
+	{
+		Value	1E-018;
+	}
 
 	Variable Variable( A )
 	{

@@ -217,7 +217,7 @@ namespace libemc
   {
     try
       {
-	getModel().getEntity( FullID( aFullIDString ) );
+	IGNORE_RETURN getModel().getEntity( FullID( aFullIDString ) );
       }
     catch( const libecs::NotFound& )
       {

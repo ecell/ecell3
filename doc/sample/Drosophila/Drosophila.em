@@ -10,28 +10,29 @@ Stepper ODE45Stepper( DE )
 	# no property
 }
 
-System System( / )
+System CompartmentSystem( / )
 {
 	StepperID	DE;
-	Volume	0.000000000000001;
+	Variable Variable( SIZE ) { Value 0.000000000000001; }
 }
 
-System System( / )
+System CompartmentSystem( / )
 {
 	StepperID	DE;
-	Volume	0.000000000000001;
+
 }
 
-System System( /CELL )
+System CompartmentSystem( /CELL )
 {
 	StepperID	DE;
-	Volume	unknown;
+
 }
 
-System System( /CELL/CYTOPLASM )
+System CompartmentSystem( /CELL/CYTOPLASM )
 {
 	StepperID	DE;
-	Volume	1e-18;
+
+	Variable Variable( SIZE ) { Value 1e-18; }
 
 	Variable Variable( M )
 	{

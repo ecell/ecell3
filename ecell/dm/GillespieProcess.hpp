@@ -100,7 +100,7 @@ public:
 
 	if( getOrder() == 2 )
 	  {
-	    theStepInterval *= getSuperSystem()->getVolumeN_A();
+	    theStepInterval *= getSuperSystem()->getSizeN_A();
 	  }
       }
     else // aMu == 0.0 (or aMu < 0.0 but this won't happen)

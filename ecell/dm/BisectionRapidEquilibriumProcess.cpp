@@ -105,8 +105,8 @@ ECELL3_DM_CLASS
 	    {
 	      aDimention -= (*anIter).getCoefficient();
 	    }
-	  Real aVolume = getSuperSystem()->getVolume();
-	  KeqConc = Keq * pow( ( N_A * aVolume ) , aDimention );
+	  Real aSize = getSuperSystem()->getSize();
+	  KeqConc = Keq * pow( ( N_A * aSize ) , aDimention );
 	}
       else
 	{
@@ -271,12 +271,12 @@ ECELL3_DM_CLASS
 
   Real convertUnitToQty( Real aConcentration )
     {
-      return  aConcentration * N_A * getSuperSystem()->getVolume();
+      return  aConcentration * N_A * getSuperSystem()->getSize();
     }
   
   Real convertUnitToConcentration( Real aQty )
     {
-      return  aQty / ( N_A * getSuperSystem()->getVolume() );
+      return  aQty / ( N_A * getSuperSystem()->getSize() );
     }
   
 };

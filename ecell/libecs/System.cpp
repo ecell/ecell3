@@ -96,14 +96,15 @@ namespace libecs
   System::System()
     :
     theStepper( NULLPTR ),
+    theSizeVariable( NULLPTR ),
     theModel( NULLPTR ),
     theEntityListChanged( false )
   {
     //    CREATE_PROPERTYSLOT_GET    ( Polymorph, SystemList,   System );
     //    CREATE_PROPERTYSLOT_GET    ( Polymorph, VariableList, System );
     //    CREATE_PROPERTYSLOT_GET    ( Polymorph, ProcessList,  System );
-    CREATE_PROPERTYSLOT_SET_GET( Real,      Dimension,       System );
-    CREATE_PROPERTYSLOT_SET_GET( Real,      Volume,       System );
+    //    CREATE_PROPERTYSLOT_SET_GET( Real,      Dimension,       System );
+    CREATE_PROPERTYSLOT_GET    ( Real,      Size,         System );
     CREATE_PROPERTYSLOT_SET_GET( String,    StepperID,    System );
   }
 
@@ -129,10 +130,43 @@ namespace libecs
     return getStepper()->getID();
   }
 
+  GET_METHOD_DEF( Real, Size, System )
+  {
+    return theSizeVariable->getValue();
+  }
+
+  VariablePtr System::getSizeVariable() const
+  {
+    try
+      {
+	return getVariable( "SIZE" );
+      }
+    catch( NotFoundCref )
+      {
+	SystemCptr const aSuperSystem( getSuperSystem() );
+
+	// Prevent infinite looping.  But this shouldn't happen.
+	if( aSuperSystem == this )
+	  {
+	    THROW_EXCEPTION( UnexpectedError, 
+			     "While trying get a SIZE variable,"
+			     " supersystem == this.  Probably a bug." );
+	  }
+
+	return aSuperSystem->getSizeVariable();
+      }
+  }
+
+  void System::setSizeVariable()
+  {
+    theSizeVariable = getSizeVariable();
+  }
+
   void System::initialize()
   {
-    // do not need to call subsystems' initialize() -- caller does this
+    // do not need to call subsystems' initialize() -- the Model does this
 
+    setSizeVariable();
   }
 
   void System::registerProcess( ProcessPtr aProcess )
@@ -142,7 +176,7 @@ namespace libecs
 
 
 
-  ProcessPtr System::getProcess( StringCref anID ) 
+  ProcessPtr System::getProcess( StringCref anID ) const
   {
     ProcessMapConstIterator i( getProcessMap().find( anID ) );
 
@@ -162,7 +196,7 @@ namespace libecs
     getSuperSystem()->registerVariable( aVariable );
   }
 
-  VariablePtr System::getVariable( StringCref anID ) 
+  VariablePtr System::getVariable( StringCref anID ) const
   {
     VariableMapConstIterator i( getVariableMap().find( anID ) );
     if( i == getVariableMap().end() )
@@ -196,11 +230,11 @@ namespace libecs
     notifyChangeOfEntityList();
   }
 
-  SystemPtr System::getSystem( SystemPathCref aSystemPath ) 
+  SystemPtr System::getSystem( SystemPathCref aSystemPath ) const
   {
     if( aSystemPath.empty() )
       {
-	return this;
+	return const_cast<SystemPtr>( this );
       }
     
     if( aSystemPath.isAbsolute() )
@@ -217,7 +251,7 @@ namespace libecs
   }
     
 
-  SystemPtr System::getSystem( StringCref anID ) 
+  SystemPtr System::getSystem( StringCref anID ) const
   {
     if( anID[0] == '.' )
       {
@@ -225,7 +259,7 @@ namespace libecs
 
 	if( anIDSize == 1 ) // == "."
 	  {
-	    return this;
+	    return const_cast<SystemPtr>( this );
 	  }
 	else if( anID[1] == '.' && anIDSize == 2 ) // == ".."
 	  {
@@ -273,8 +307,7 @@ namespace libecs
 
   VirtualSystem::VirtualSystem()
   {
-    CREATE_PROPERTYSLOT_GET( Real, Dimension, VirtualSystem );
-    CREATE_PROPERTYSLOT_GET( Real, Volume, VirtualSystem );
+    // ; do nothing
   }
 
   VirtualSystem::~VirtualSystem()
@@ -331,13 +364,12 @@ namespace libecs
   }
 
 
-
-  LogicalSystem::LogicalSystem()
+  CompartmentSystem::CompartmentSystem()
   {
-    //    CREATE_PROPERTYSLOT_GET( Polymorph, VariableList, LogicalSystem );
+    ; // do nothing
   }
 
-  LogicalSystem::~LogicalSystem()
+  CompartmentSystem::~CompartmentSystem()
   {
     for( VariableMapIterator i( theVariableMap.begin() );
 	 i != theVariableMap.end() ; ++i )
@@ -346,8 +378,7 @@ namespace libecs
       }
   }
 
-
-  void LogicalSystem::initialize()
+  void CompartmentSystem::initialize()
   {
     VirtualSystem::initialize();
 
@@ -362,7 +393,7 @@ namespace libecs
 
   }
 
-  void LogicalSystem::registerVariable( VariablePtr aVariable )
+  void CompartmentSystem::registerVariable( VariablePtr aVariable )
   {
     const String anID( aVariable->getID() );
 
@@ -381,25 +412,6 @@ namespace libecs
     notifyChangeOfEntityList();
   }
 
-
-  CompartmentSystem::CompartmentSystem()
-    :
-    theVolume( 1.0 ),
-    theDimension( 3.0 )
-  {
-    CREATE_PROPERTYSLOT_SET_GET( Real, Dimension, System );
-    CREATE_PROPERTYSLOT_SET_GET( Real, Volume, System );
-  }
-
-  CompartmentSystem::~CompartmentSystem()
-  {
-    ; // do nothing
-  }
-
-  void CompartmentSystem::initialize()
-  {
-    LogicalSystem::initialize();
-  }
 
 
 } // namespace libecs

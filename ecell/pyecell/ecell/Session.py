@@ -118,7 +118,7 @@ class Session:
         anEml = eml.Eml()
 
         # creates root entity
-        anEml.createEntity('System', 'System::/')
+        anEml.createEntity( 'CompartmentSystem', 'System::/' )
         
         # calls save methods
         self.__saveEntity( anEml )

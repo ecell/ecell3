@@ -107,42 +107,17 @@ namespace libecs
     GET_METHOD( String, StepperID );
 
     /**
-       Get the volume of this System in [L] (liter).
+       Get the size of this System in [L] (liter).
 
-       @return Volume of this System.
+       @return Size of this System.
     */
 
-    virtual GET_METHOD( Real, Volume ) = 0;
+    GET_METHOD( Real, Size );
 
-    GET_METHOD( Real, VolumeN_A )
+    GET_METHOD( Real, SizeN_A )
     {
-      return getVolume() * N_A;
+      return getSize() * N_A;
     }
-
-    /**
-       Set a new spatial dimension of this System.
-
-     */
-
-    virtual SET_METHOD( Real, Dimension ) = 0;
-
-    /**
-       Get the spatial dimension of this System.
-
-    */
-
-    virtual GET_METHOD( Real, Dimension ) = 0;
-
-    /**
-       Set a new volume of this System in [L] (liter).
-
-       The volume is updated at the beginning of the next step.
-
-       @param aVolume the new volume value.
-     */
-
-    virtual SET_METHOD( Real, Volume ) = 0;
-
 
     template <class C>
     const std::map<const String,C*,std::less<const String> >& getMap() const
@@ -168,7 +143,7 @@ namespace libecs
        @return a borrowed pointer to a Process object in this System named @a id.
     */
 
-    ProcessPtr getProcess( StringCref anID ) ;
+    ProcessPtr getProcess( StringCref anID ) const;
 
 
     /**
@@ -179,7 +154,7 @@ namespace libecs
        @return a borrowed pointer to a Variable object in this System named @a id.
     */
 
-    VariablePtr getVariable( StringCref aSystemPath );
+    VariablePtr getVariable( StringCref anID ) const;
 
     /**
        Find a System pointed by the given SystemPath relative to
@@ -196,7 +171,7 @@ namespace libecs
        @return a borrowed pointer to a System object pointed by aSystemPath.
     */
 
-    SystemPtr getSystem( SystemPathCref anID );
+    SystemPtr getSystem( SystemPathCref anID ) const;
 
 
     /**
@@ -214,7 +189,7 @@ namespace libecs
        whose ID is anID.
     */
 
-    SystemPtr getSystem( StringCref id );
+    SystemPtr getSystem( StringCref id ) const;
 
 
     /**
@@ -283,6 +258,8 @@ namespace libecs
 
     void notifyChangeOfEntityList();
 
+    VariablePtr getSizeVariable() const;
+    void setSizeVariable();
 
   public: // property slots
 
@@ -296,7 +273,9 @@ namespace libecs
 
   private:
 
-    ModelPtr  theModel;
+    ModelPtr     theModel;
+
+    VariablePtr  theSizeVariable;
 
     SystemMap    theSystemMap;
 
@@ -317,41 +296,6 @@ namespace libecs
 
     VirtualSystem();
     virtual ~VirtualSystem();
-
-    /**
-       Get the volume of this System in [L] (liter).
-
-       @return Volume of this System.
-    */
-
-    virtual GET_METHOD( Real, Volume )
-    {
-      return getSuperSystem()->getVolume();
-    }
-
-    /**
-       Set a new volume of this System in [L] (liter).
-
-       The volume is updated at the beginning of the next step.
-
-       @param aVolume the new volume value.
-     */
-
-    virtual SET_METHOD( Real, Volume )
-    {
-      getSuperSystem()->setVolume( value );
-    }
-
-
-    virtual GET_METHOD( Real, Dimension )
-    {
-      return getSuperSystem()->getDimension();
-    }
-
-    virtual SET_METHOD( Real, Dimension )
-    {
-      getSuperSystem()->setDimension( value );
-    }
 
     virtual void initialize();
 
@@ -374,19 +318,21 @@ namespace libecs
   };
 
 
-  class LogicalSystem 
+
+  class CompartmentSystem 
     : 
     public VirtualSystem
   {
 
   public:
 
-    LIBECS_DM_OBJECT( System, LogicalSystem );
+    LIBECS_DM_OBJECT( System, CompartmentSystem );
 
-    LogicalSystem();
-    virtual ~LogicalSystem();
+    CompartmentSystem();
+    virtual ~CompartmentSystem();
 
     virtual void initialize();
+
 
     virtual VariableMapCref getVariableMap() const
     {
@@ -398,58 +344,6 @@ namespace libecs
   private:
 
     VariableMap theVariableMap;
-
-  };
-
-
-
-  class CompartmentSystem 
-    : 
-    public LogicalSystem
-  {
-
-  public:
-
-    LIBECS_DM_OBJECT( System, CompartmentSystem );
-
-    CompartmentSystem();
-    virtual ~CompartmentSystem();
-
-    virtual GET_METHOD( Real, Volume )
-    {
-      return theVolume;
-    }
-
-    /**
-       Set a new volume of this System in [L] (liter).
-
-       The volume is updated at the beginning of the next step.
-
-       @param aVolume the new volume value.
-     */
-
-    virtual SET_METHOD( Real, Volume )
-    {
-      theVolume = value;
-    }
-
-
-    virtual GET_METHOD( Real, Dimension )
-    {
-      return theDimension;
-    }
-
-    virtual SET_METHOD( Real, Dimension )
-    {
-      theDimension = value;
-    }
-
-    virtual void initialize();
- 
-  private:
-
-    Real theVolume;
-    Real theDimension;
 
   };
 

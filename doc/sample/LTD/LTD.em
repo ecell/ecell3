@@ -22,30 +22,33 @@ Stepper PassiveStepper( PASSIVE_1 )
 }
 
 
-System System( / )
+System CompartmentSystem( / )
 {
 	StepperID	DE_1;
 	Name	"The culture medium";
 }
 
-System System( /CELL )
+System CompartmentSystem( /CELL )
 {
 	StepperID	DE_1;
 	Name	"The cell";
 }
 
-System System( /CELL/MEMBRANE )
+System CompartmentSystem( /CELL/MEMBRANE )
 {
 	StepperID	DE_1;
-	Volume	0.000000000001;
 	Name	"The menbrane";
 }
 
-System System( /CELL/CYTOPLASM )
+System CompartmentSystem( /CELL/CYTOPLASM )
 {
 	StepperID	DE_1;
 	Name	"The cytoplasm";
-	Volume	0.000000000001;
+
+	Variable Variable( SIZE )
+	{
+		Value	0.000000000001;
+	}
 
 	Variable Variable( Ca_DAG_PKC )
 	{
@@ -413,7 +416,7 @@ System System( /CELL/CYTOPLASM )
 		Name	MAPKactive;
 	}
 	
-	Process MassActionProcess( Ca_DAG_PKC_N )
+	Process MassActionFluxProcess( Ca_DAG_PKC_N )
 	{
 		Name	Ca_DAG_PKC_N;
 		k	0.004;
@@ -421,21 +424,21 @@ System System( /CELL/CYTOPLASM )
 	 [ P0 Variable:.:N 1 ];
 	}
 	
-	Process MassActionProcess( DAG_AA_PKC_N )
+	Process MassActionFluxProcess( DAG_AA_PKC_N )
 	{
 		Name	DAG_AA_PKC_N;
 		k	0.004;
 		VariableReferenceList	[ S0 Variable:.:DAG_AA_PKC -1 ] [ P0 Variable:.:N 1 ];
 	}
 	
-	Process MassActionProcess( AA_PKC_N )
+	Process MassActionFluxProcess( AA_PKC_N )
 	{
 		Name	AA_PKC_N;
 		k	0.004;
 		VariableReferenceList	[ S0 Variable:.:AA_PKC -1 ] [ P0 Variable:.:N 1 ];
 	}
 	
-	Process MassActionProcess( Ca_AA_PKC_N )
+	Process MassActionFluxProcess( Ca_AA_PKC_N )
 	{
 		Name	Ca_AA_PKC_N;
 		k	0.004;
@@ -514,21 +517,21 @@ System System( /CELL/CYTOPLASM )
 		VariableReferenceList	[ S0 Variable:.:Raf -1 ] [ P0 Variable:.:Raf_P 1 ] [ C0 Variable:.:Ca_AA_PKC];
 	}
 	
-	Process MassActionProcess( CRHR_CRHR_CRF )
+	Process MassActionFluxProcess( CRHR_CRHR_CRF )
 	{
 		Name	CRHR_CRHR_CRF;
 		k	100000;
 		VariableReferenceList	[ S0 Variable:.:CRHR -1 ] [ S1 Variable:.:CRF -1 ] [ P0 Variable:.:CRHR_CRF 1 ];
 	}
 	
-	Process MassActionProcess( CRHR_CRF_CRHR )
+	Process MassActionFluxProcess( CRHR_CRF_CRHR )
 	{
 		Name	CRHR_CRF_CRHR;
 		k	0.00001;
 		VariableReferenceList	[ S0 Variable:.:CRHR_CRF -1 ] [ P0 Variable:.:CRHR 1 ] [ P1 Variable:.:CRF 1 ];
 	}
 	
-	Process MassActionProcess( DeCRF )
+	Process MassActionFluxProcess( DeCRF )
 	{
 		Name	DeCRF;
 		k	0.02;
@@ -551,35 +554,35 @@ System System( /CELL/CYTOPLASM )
 		VariableReferenceList	[ S0 Variable:.:Raf -1 ] [ P0 Variable:.:Raf_P 1 ] [ C0 Variable:.:Lyn_activate];
 	}
 	
-	Process MassActionProcess( DeLyn_activate )
+	Process MassActionFluxProcess( DeLyn_activate )
 	{
 		Name	DeLyn_activate;
 		k	0.001;
 		VariableReferenceList	[ S0 Variable:.:Lyn_activate -1 ] [ P0 Variable:.:N 1 ];
 	}
 	
-	Process MassActionProcess( AA_APC )
+	Process MassActionFluxProcess( AA_APC )
 	{
 		Name	AA_APC;
 		k	0.001;
 		VariableReferenceList	[ S0 Variable:.:AA -1 ] [ P0 Variable:.:APC 1 ];
 	}
 	
-	Process MassActionProcess( NO_N )
+	Process MassActionFluxProcess( NO_N )
 	{
 		Name	NO_N;
 		k	0.636;
 		VariableReferenceList	[ S0 Variable:.:NO -1 ] [ P0 Variable:.:N 1 ];
 	}
 	
-	Process MassActionProcess( GC__NO_NO_GC )
+	Process MassActionFluxProcess( GC__NO_NO_GC )
 	{
 		Name	GC__NO_NO_GC;
 		k	3000000;
 		VariableReferenceList	[ S0 Variable:.:GC -1 ] [ S1 Variable:.:NO -1 ] [ P0 Variable:.:NO_GC 1 ];
 	}
 	
-	Process MassActionProcess( NO_GC_GC__NO )
+	Process MassActionFluxProcess( NO_GC_GC__NO )
 	{
 		Name	NO_GC_GC__NO;
 		k	0.75;
@@ -602,14 +605,14 @@ System System( /CELL/CYTOPLASM )
 		VariableReferenceList	[ S0 Variable:.:CGMP -1 ] [ P0 Variable:.:GMP5 1 ] [ C0 Variable:.:PDE];
 	}
 	
-	Process MassActionProcess( CGMP__PKG_cGMP_PKG )
+	Process MassActionFluxProcess( CGMP__PKG_cGMP_PKG )
 	{
 		Name	CGMP__PKG_cGMP_PKG;
 		k	100000;
 		VariableReferenceList	[ S0 Variable:.:CGMP -1 ] [ S1 Variable:.:PKG -1 ] [ P0 Variable:.:cGMP_PKG 1 ];
 	}
 	
-	Process MassActionProcess( cGMP_PKG_CGMP__PKG )
+	Process MassActionFluxProcess( cGMP_PKG_CGMP__PKG )
 	{
 		Name	cGMP_PKG_CGMP__PKG;
 		k	0.005;
@@ -624,21 +627,21 @@ System System( /CELL/CYTOPLASM )
 		VariableReferenceList	[ S0 Variable:.:G_Sub -1 ] [ P0 Variable:.:G_Sub_P 1 ] [ C0 Variable:.:cGMP_PKG];
 	}
 	
-	Process MassActionProcess( G_Sub_P_G_Sub )
+	Process MassActionFluxProcess( G_Sub_P_G_Sub )
 	{
 		Name	G_Sub_P_G_Sub;
 		k	0.0001;
 		VariableReferenceList	[ S0 Variable:.:G_Sub_P -1 ] [ P0 Variable:.:G_Sub 1 ];
 	}
 	
-	Process MassActionProcess( G_Sub_P__PP2A_PP2A_G_Sub_P )
+	Process MassActionFluxProcess( G_Sub_P__PP2A_PP2A_G_Sub_P )
 	{
 		Name	G_Sub_P__PP2A_PP2A_G_Sub_P;
 		k	10000;
 		VariableReferenceList	[ S0 Variable:.:G_Sub_P -1 ] [ S1 Variable:.:PP2A -1 ] [ P0 Variable:.:PP2A_G_Sub_P 1 ];
 	}
 	
-	Process MassActionProcess( PP2A_G_Sub_P )
+	Process MassActionFluxProcess( PP2A_G_Sub_P )
 	{
 		Name	PP2A_G_Sub_P;
 		k	0.0027;
@@ -718,14 +721,14 @@ System System( /CELL/CYTOPLASM )
 		VariableReferenceList	[ S0 Variable:.:MAPK_PP -1 ] [ P0 Variable:.:MAPK_P 1 ] [ C0 Variable:.:MKP1];
 	}
 	
-	Process MassActionProcess( PLA2_Ca_PLA2 )
+	Process MassActionFluxProcess( PLA2_Ca_PLA2 )
 	{
 		Name	PLA2_Ca_PLA2;
 		k	10;
 		VariableReferenceList	[ S0 Variable:.:PLA2 -1 ] [ S1 Variable:.:Ca -1 ] [ P0 Variable:.:Ca_PLA2 1 ];
 	}
 	
-	Process MassActionProcess( Ca_PLA2_PLA2 )
+	Process MassActionFluxProcess( Ca_PLA2_PLA2 )
 	{
 		Name	Ca_PLA2_PLA2;
 		k	0.000001;
@@ -740,14 +743,14 @@ System System( /CELL/CYTOPLASM )
 		VariableReferenceList	[ S0 Variable:.:APC -1 ] [ P0 Variable:.:AA 1 ] [ C0 Variable:.:Ca_PLA2];
 	}
 	
-	Process MassActionProcess( Ca_PLA2_DAG_Ca_PLA2 )
+	Process MassActionFluxProcess( Ca_PLA2_DAG_Ca_PLA2 )
 	{
 		Name	Ca_PLA2_DAG_Ca_PLA2;
 		k	100;
 		VariableReferenceList	[ S0 Variable:.:Ca_PLA2 -1 ] [ S1 Variable:.:DAG -1 ] [ P0 Variable:.:DAG_Ca_PLA2 1 ];
 	}
 	
-	Process MassActionProcess( DAG_Ca_PLA2_Ca_PLA2 )
+	Process MassActionFluxProcess( DAG_Ca_PLA2_Ca_PLA2 )
 	{
 		Name	DAG_Ca_PLA2_Ca_PLA2;
 		k	0.0002;
@@ -762,14 +765,14 @@ System System( /CELL/CYTOPLASM )
 		VariableReferenceList	[ S0 Variable:.:APC -1 ] [ P0 Variable:.:AA 1 ] [ C0 Variable:.:DAG_Ca_PLA2];
 	}
 	
-	Process MassActionProcess( PLA2_PIP2_PLA2 )
+	Process MassActionFluxProcess( PLA2_PIP2_PLA2 )
 	{
 		Name	PLA2_PIP2_PLA2;
 		k	1.0;
 		VariableReferenceList	[ S0 Variable:.:PLA2 -1 ] [ S1 Variable:.:PIP2 -1 ] [ P0 Variable:.:PIP2_PLA2 1 ];
 	}
 	
-	Process MassActionProcess( PIP2_PLA2_PLA2 )
+	Process MassActionFluxProcess( PIP2_PLA2_PLA2 )
 	{
 		Name	PIP2_PLA2_PLA2;
 		k	0.0004;
@@ -784,14 +787,14 @@ System System( /CELL/CYTOPLASM )
 		VariableReferenceList	[ S0 Variable:.:APC -1 ] [ P0 Variable:.:AA 1 ] [ C0 Variable:.:PIP2_PLA2];
 	}
 	
-	Process MassActionProcess( PIP2_PLA2_Ca_PIP2_PLA2 )
+	Process MassActionFluxProcess( PIP2_PLA2_Ca_PIP2_PLA2 )
 	{
 		Name	PIP2_PLA2_Ca_PIP2_PLA2;
 		k	12000;
 		VariableReferenceList	[ S0 Variable:.:PIP2_PLA2 -1 ] [ S1 Variable:.:Ca -1 ] [ P0 Variable:.:Ca_PIP2_PLA2 1 ];
 	}
 	
-	Process MassActionProcess( Ca_PIP2_PLA2_PIP2_PLA2 )
+	Process MassActionFluxProcess( Ca_PIP2_PLA2_PIP2_PLA2 )
 	{
 		Name	Ca_PIP2_PLA2_PIP2_PLA2;
 		k	0.012;
@@ -822,7 +825,7 @@ System System( /CELL/CYTOPLASM )
 		VariableReferenceList	[ S0 Variable:.:APC -1 ] [ P0 Variable:.:AA 1 ] [ C0 Variable:.:PLA2_P];
 	}
 	
-	Process MassActionProcess( PLA2_P_PLA2 )
+	Process MassActionFluxProcess( PLA2_P_PLA2 )
 	{
 		Name	PLA2_P_PLA2;
 		k	0.17;
@@ -830,133 +833,133 @@ System System( /CELL/CYTOPLASM )
 	}
 	
 	
-	Process MassActionProcess( PKC_Ca_PKC )
+	Process MassActionFluxProcess( PKC_Ca_PKC )
 	{
 		Name	PKC_Ca_PKC;
 		k	100000;
 		VariableReferenceList	[ S0 Variable:.:PKC -1 ] [ S1 Variable:.:Ca -1 ] [ P0 Variable:.:Ca_PKC 1 ];
 	}
 	
-	Process MassActionProcess( Ca_PKC_PKC )
+	Process MassActionFluxProcess( Ca_PKC_PKC )
 	{
 		Name	Ca_PKC_PKC;
 		k	1;
 		VariableReferenceList	[ S0 Variable:.:Ca_PKC -1 ] [ P0 Variable:.:PKC 1 ] [ P1 Variable:.:Ca 1 ];
 	}
 	
-	Process MassActionProcess( Ca_PKC_Ca_DAG_PKC )
+	Process MassActionFluxProcess( Ca_PKC_Ca_DAG_PKC )
 	{
 		Name	Ca_PKC_Ca_DAG_PKC;
 		k	100000;
 		VariableReferenceList	[ S0 Variable:.:Ca_PKC -1 ] [ S1 Variable:.:DAG -1 ] [ P0 Variable:.:Ca_DAG_PKC 1 ];
 	}
 	
-	Process MassActionProcess( Ca_DAG_PKC_Ca_PKC )
+	Process MassActionFluxProcess( Ca_DAG_PKC_Ca_PKC )
 	{
 		Name	Ca_DAG_PKC_Ca_PKC;
 		k	0.05;
 		VariableReferenceList	[ S0 Variable:.:Ca_DAG_PKC -1 ] [ P0 Variable:.:Ca_PKC 1 ] [ P1 Variable:.:DAG 1 ];
 	}
 	
-	Process MassActionProcess( PKC_DAG_PKC )
+	Process MassActionFluxProcess( PKC_DAG_PKC )
 	{
 		Name	PKC_DAG_PKC;
 		k	500;
 		VariableReferenceList	[ S0 Variable:.:PKC -1 ] [ S1 Variable:.:DAG -1 ] [ P0 Variable:.:DAG_PKC 1 ];
 	}
 	
-	Process MassActionProcess( DAG_PKC_PKC )
+	Process MassActionFluxProcess( DAG_PKC_PKC )
 	{
 		Name	DAG_PKC_PKC;
 		k	0.00025;
 		VariableReferenceList	[ S0 Variable:.:DAG_PKC -1 ] [ P0 Variable:.:PKC 1 ] [ P1 Variable:.:DAG 1 ];
 	}
 	
-	Process MassActionProcess( DAG_PKC_DAG_AA_PKC )
+	Process MassActionFluxProcess( DAG_PKC_DAG_AA_PKC )
 	{
 		Name	DAG_PKC_DAG_AA_PKC;
 		k	10;
 		VariableReferenceList	[ S0 Variable:.:DAG_PKC -1 ] [ S1 Variable:.:AA -1 ] [ P0 Variable:.:DAG_AA_PKC 1 ];
 	}
 	
-	Process MassActionProcess( DAG_AA_PKC_DAG_PKC )
+	Process MassActionFluxProcess( DAG_AA_PKC_DAG_PKC )
 	{
 		Name	DAG_AA_PKC_DAG_PKC;
 		k	0.0005;
 		VariableReferenceList	[ S0 Variable:.:DAG_AA_PKC -1 ] [ P0 Variable:.:DAG_PKC 1 ] [ P1 Variable:.:AA 1 ];
 	}
 	
-	Process MassActionProcess( PKC_AA_PKC )
+	Process MassActionFluxProcess( PKC_AA_PKC )
 	{
 		Name	PKC_AA_PKC;
 		k	100;
 		VariableReferenceList	[ S0 Variable:.:PKC -1 ] [ S1 Variable:.:AA -1 ] [ P0 Variable:.:AA_PKC 1 ];
 	}
 	
-	Process MassActionProcess( AA_PKC_PKC )
+	Process MassActionFluxProcess( AA_PKC_PKC )
 	{
 		Name	AA_PKC_PKC;
 		k	0.005;
 		VariableReferenceList	[ S0 Variable:.:AA_PKC -1 ] [ P0 Variable:.:PKC 1 ] [ P1 Variable:.:AA 1 ];
 	}
 	
-	Process MassActionProcess( Ca_PKC_Ca_AA_PKC )
+	Process MassActionFluxProcess( Ca_PKC_Ca_AA_PKC )
 	{
 		Name	Ca_PKC_Ca_AA_PKC;
 		k	1500;
 		VariableReferenceList	[ S0 Variable:.:Ca_PKC -1 ] [ S1 Variable:.:AA -1 ] [ P0 Variable:.:Ca_AA_PKC 1 ];
 	}
 	
-	Process MassActionProcess( Ca_AA_PKC_Ca_PKC )
+	Process MassActionFluxProcess( Ca_AA_PKC_Ca_PKC )
 	{
 		Name	Ca_AA_PKC_Ca_PKC;
 		k	0.075;
 		VariableReferenceList	[ S0 Variable:.:Ca_AA_PKC -1 ] [ P0 Variable:.:AA 1 ] [ P1 Variable:.:Ca_PKC 1 ];
 	}
 	
-	Process MassActionProcess( mGluR_Gq_Glu_mGluR_Gq )
+	Process MassActionFluxProcess( mGluR_Gq_Glu_mGluR_Gq )
 	{
 		Name	mGluR_Gq_Glu_mGluR_Gq;
 		k	10000;
 		VariableReferenceList	[ S0 Variable:.:mGluR_Gq -1 ] [ S1 Variable:.:Glu -1 ] [ P0 Variable:.:Glu_mGluR_Gq 1 ];
 	}
 	
-	Process MassActionProcess( Glu_mGluR_Gq_mGluR_Gq )
+	Process MassActionFluxProcess( Glu_mGluR_Gq_mGluR_Gq )
 	{
 		Name	Glu_mGluR_Gq_mGluR_Gq;
 		k	0.00006;
 		VariableReferenceList	[ S0 Variable:.:Glu_mGluR_Gq -1 ] [ P0 Variable:.:mGluR_Gq 1 ] [ P1 Variable:.:Glu 1 ];
 	}
 	
-	Process MassActionProcess( Glu_mGluR_Gq_GTP_Gbc_Glu )
+	Process MassActionFluxProcess( Glu_mGluR_Gq_GTP_Gbc_Glu )
 	{
 		Name	Glu_mGluR_Gq_GTP_Gbc_Glu;
 		k	0.1;
 		VariableReferenceList	[ S0 Variable:.:Glu_mGluR_Gq -1 ] [ P0 Variable:.:GTP_Ga 1 ] [ P1 Variable:.:Gbc 1 ] [ P2 Variable:.:Glu_mGluR 1 ];
 	}
 	
-	Process MassActionProcess( GTP_Gbc_Glu_Glu_mGluR_Gq )
+	Process MassActionFluxProcess( GTP_Gbc_Glu_Glu_mGluR_Gq )
 	{
 		Name	GTP_Gbc_Glu_Glu_mGluR_Gq;
 		k	0.0000000001;
 		VariableReferenceList	[ S0 Variable:.:GTP_Ga -1 ] [ S1 Variable:.:Gbc -1 ] [ S2 Variable:.:Glu_mGluR -1 ] [ P0 Variable:.:Glu_mGluR_Gq 1 ];
 	}
 	
-	Process MassActionProcess( GTP_Ga_GDP_Ga )
+	Process MassActionFluxProcess( GTP_Ga_GDP_Ga )
 	{
 		Name	GTP_Ga_GDP_Ga;
 		k	0.1;
 		VariableReferenceList	[ S0 Variable:.:GTP_Ga -1 ] [ P0 Variable:.:GDP_Ga 1 ];
 	}
 	
-	Process MassActionProcess( GTP_Ga_GTP_Ga_PLC )
+	Process MassActionFluxProcess( GTP_Ga_GTP_Ga_PLC )
 	{
 		Name	GTP_Ga_GTP_Ga_PLC;
 		k	1000;
 		VariableReferenceList	[ S0 Variable:.:GTP_Ga -1 ] [ S1 Variable:.:PLC -1 ] [ P0 Variable:.:GTP_Ga_PLC 1 ];
 	}
 	
-	Process MassActionProcess( GTP_Ga_PLC_GTP_Ga )
+	Process MassActionFluxProcess( GTP_Ga_PLC_GTP_Ga )
 	{
 		Name	GTP_Ga_PLC_GTP_Ga;
 		k	0.0000397;
@@ -979,49 +982,49 @@ System System( /CELL/CYTOPLASM )
 		VariableReferenceList	[ S0 Variable:.:PIP2 -1 ] [ P0 Variable:.:DAG 1 ] [ C0 Variable:.:GTP_Ga_PLC];
 	}
 	
-	Process MassActionProcess( DeIP3 )
+	Process MassActionFluxProcess( DeIP3 )
 	{
 		Name	DeIP3;
 		k	10;
 		VariableReferenceList	[ S0 Variable:.:IP3 -1 ] [ P0 Variable:.:N 1 ];
 	}
 	
-	Process MassActionProcess( GDP_Ga_Gabc )
+	Process MassActionFluxProcess( GDP_Ga_Gabc )
 	{
 		Name	GDP_Ga_Gabc;
 		k	500;
 		VariableReferenceList	[ S0 Variable:.:GDP_Ga -1 ] [ S1 Variable:.:Gbc -1 ] [ P0 Variable:.:Gabc 1 ];
 	}
 	
-	Process MassActionProcess( Gabc_GDP_Ga )
+	Process MassActionFluxProcess( Gabc_GDP_Ga )
 	{
 		Name	Gabc_GDP_Ga;
 		k	0.0000005;
 		VariableReferenceList	[ S0 Variable:.:Gabc -1 ] [ P0 Variable:.:GDP_Ga 1 ] [ P1 Variable:.:Gbc 1 ];
 	}
 	
-	Process MassActionProcess( Glu_mGluR_mGluR_Glu )
+	Process MassActionFluxProcess( Glu_mGluR_mGluR_Glu )
 	{
 		Name	Glu_mGluR_mGluR_Glu;
 		k	0.1;
 		VariableReferenceList	[ S0 Variable:.:Glu_mGluR -1 ] [ P0 Variable:.:MgluR 1 ] [ P1 Variable:.:Glu 1 ];
 	}
 	
-	Process MassActionProcess( DeGlu )
+	Process MassActionFluxProcess( DeGlu )
 	{
 		Name	DeGlu;
 		k	0.001;
 		VariableReferenceList	[ S0 Variable:.:Glu -1 ] [ P0 Variable:.:N 1 ];
 	}
 	
-	Process MassActionProcess( MgluR_mGluR_Gq )
+	Process MassActionFluxProcess( MgluR_mGluR_Gq )
 	{
 		Name	MgluR_mGluR_Gq;
 		k	1000;
 		VariableReferenceList	[ S0 Variable:.:MgluR -1 ] [ S1 Variable:.:Gabc -1 ] [ P0 Variable:.:mGluR_Gq 1 ];
 	}
 	
-	Process MassActionProcess( mGluR_Gq_MgluR )
+	Process MassActionFluxProcess( mGluR_Gq_MgluR )
 	{
 		Name	mGluR_Gq_MgluR;
 		k	0.00167;

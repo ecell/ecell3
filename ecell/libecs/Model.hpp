@@ -277,6 +277,8 @@ namespace libecs
 
     void checkStepper( SystemCptr const aSystem ) const;
 
+    void checkSizeVariable( SystemCptr const aSystem );
+
     static void initializeSystems( SystemPtr const aSystem );
 
   private:
