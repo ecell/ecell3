@@ -59,9 +59,9 @@ public:
   // FIXME temporary
   virtual void update( FloatLogger::containee_type& datapoint ) = 0;  
 
-  virtual void push( const FloatLogger::containee_type& x ) = 0;
+  //  virtual void push( const FloatLogger::containee_type& x ) = 0;
 
-  virtual void push( const Float& t, const Float& v ) = 0;
+  //  virtual void push( const Float& t, const Float& v ) = 0;
 
 
 }

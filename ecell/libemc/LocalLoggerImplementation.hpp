@@ -54,9 +54,9 @@ public:
 
   void update( FloatLogger::containee_type& datapoint );
 
-  void push( const FloatLogger::containee_type& x );
+  //  void push( const FloatLogger::containee_type& x );
 
-  void push( const Float& t, const Float& v ); 
+  //  void push( const Float& t, const Float& v ); 
 
 private:
 

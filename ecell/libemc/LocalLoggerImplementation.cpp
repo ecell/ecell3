@@ -56,6 +56,8 @@ LocalLoggerImplementation::update( FloatLogger::containee_type& datapoint )
   theFloatLogger.update( datapoint );
 }
 
+
+/*
 void LocalLoggerImplementation::push( const FloatLogger::containee_type& x )
 {
   theFloatLogger.push( x );
@@ -65,3 +67,4 @@ void LocalLoggerImplementation::push( const Float& t, const Float& v )
 {
   theFloatLogger.push( t, v );
 } 
+*/
