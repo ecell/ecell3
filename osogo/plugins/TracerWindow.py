@@ -19,6 +19,8 @@ class TracerWindow( PluginWindow ):
 
 	PluginWindow.__init__( self, dirname, data, pluginmanager, root )
 
+        
+
         self.openWindow()
         PluginWindow.initialize( self, root )
         self.initialize()
@@ -29,6 +31,7 @@ class TracerWindow( PluginWindow ):
         self.xaxis = None
         self.yaxis = None
         self.arg = 0
+        self.step_size = 0
         self.theLoggerList = []
         self.theDataList = []
 
@@ -121,87 +124,96 @@ class TracerWindow( PluginWindow ):
         n = 1
         for fpn in self.theFullPNList():
             ID = fpn[2]
-#            print fpn
             self.theLoggerList.append(self.theSession.getLogger(fpn))
             label = "label%d"%(n)
             self[label].set_text(ID)
             n += 1
         while n <= 7:
             self['button%i'%n].set_mode(TRUE)
-            n +=1
+            n += 1
 
         self.thePluginManager.updateLoggerWindow()
         
 
     def getColor( self, num ):
 
-        aColorList = ["red", "light blue", "light yellow", "white",
-                      "grey", "blue", "orange", "black",
-                      "brown", "purple", "green", "navy"]
+        aColorList = ["red", "blue", "orange", "green",
+                      "purple", "navy", "brown", "black",
+                      "white", "light_blue", "light_yellow", "black"]
 
         return self.theColorMap.alloc( aColorList[num] )
     
 
     def updateLoggerDataList(self):
-
         self.LoggerDataList =[]
         for aLogger in self.theLoggerList:
-            self.LoggerDataList.append( aLogger.getData() ) 
+            self.LoggerDataList.append( aLogger.getData() )
+            
+        if self.LoggerDataList[0] != ():
+            self.datanumber = array(self.LoggerDataList[0]).shape[0]
+            self.step_size = int(self.datanumber/500)
         num = 0
         self.entry = {}
         while num < len(self.theLoggerList):
-#            print num, '====>', self.LoggerDataList[num]
-            self.entry['X%s' % str(num+1)] = self.LoggerDataList[num]
+            if self.LoggerDataList[num] == ():
+                pass
+            else:
+                self.LoggerDataList[num] = array( self.LoggerDataList[num])
+                self.entry['X%s' % str(num+1)] = self.LoggerDataList[num][:,1][::self.step_size]
             num += 1
 
 
     def update(self):
+        if self.arg % 10 == 0:
+            stateList = []
+            if self['togglebutton2'] == None:
+                stateList = [0,0,0,0,0,0,0]
+            else:
+                for togglebuttonnum in [2,3,4,5,6,7,8]:
+                    togglebutton = 'togglebutton%i'%togglebuttonnum
+                    stateList.append(self[togglebutton].get_active())
+            self.updateLoggerDataList()
 
-        stateList = []
-        if self['togglebutton2'] == None:
-            stateList = [0,0,0,0,0,0,0]
-        else:
-            for togglebuttonnum in [2,3,4,5,6,7,8]:
-                togglebutton = 'togglebutton%i'%togglebuttonnum
-                stateList.append(self[togglebutton].get_active())
 
-        self.updateLoggerDataList()
-
-        if self.xaxis == None:
-            x = self.LoggerDataList[0]
-        elif self.xaxis == 'time':
-            x = self.LoggerDataList[0]
-        else:
-            x = eval(self.xaxis,self.entry)
-
-        yList = []
-            
-        if self.yaxis == None:
-            num = 0
-            for LoggerData in self.LoggerDataList:
-                if stateList[num] == 1:
-                    self.theDataList[num].set_points( None, None )
+            if self.LoggerDataList[0] == ():
+                pass
+            else:
+                if self.xaxis == None:
+                    x = array(self.LoggerDataList)[0][:,0][::self.step_size]
+                elif self.xaxis == 'time':
+                    x = array(self.LoggerDataList)[0][:,0][::self.step_size]
                 else:
-                    self.theDataList[num].set_points( x, LoggerData )
-                num += 1
+                    x = eval(self.xaxis,self.entry)
 
-        else:
-            num = 0
-            for yaxis in self.yaxis:
-                if stateList[num] == 1:
-                    self.theDataList[num].set_points(None,None)
-                elif yaxis == '':
-                    self.theDataList[num].set_points(None,None)
-                else :
-                    self.theDataList[num].set_points(x,eval(yaxis,self.entry))
-                num += 1
+            yList = []
             
-        self.plot.autoscale()
+            if self.yaxis == None:
+                num = 0
+                for LoggerData in self.LoggerDataList:
+                    if LoggerData == ():
+                        pass
+                    else:
+                        if stateList[num] == 1:
+                            self.theDataList[num].set_points( None, None )
+                        else:
+                            self.theDataList[num].set_points( x, array(LoggerData)[:,1][::self.step_size] )
+                    num += 1
 
-        if self.arg%10 == 0:
+            else:
+                num = 0
+                for yaxis in self.yaxis:
+                    if stateList[num] == 1:
+                        self.theDataList[num].set_points(None,None)
+                    elif yaxis == '':
+                        self.theDataList[num].set_points(None,None)
+                    else :
+                        self.theDataList[num].set_points(x,eval(yaxis,self.entry))
+                    num += 1
+            
+            self.plot.autoscale()
             self.canvas.paint()
             self.canvas.refresh()
-        
+            
         self.arg += 1
         return TRUE
 
@@ -209,7 +221,6 @@ class TracerWindow( PluginWindow ):
     def changexaxis(self, obj):
 
         self.xaxis = obj.get_text()
-        print self.xaxis
         
         
     def changeyaxis(self, obj):
