@@ -126,7 +126,7 @@ class LoggerWindow(OsogoWindow):
 		 		#'on_exit_activate' : self.closeWindow,
 
 				# popup
-				'button_press_event'  : self.popupMenu		})
+				'button_press_event'  : self.popupMenu})
 
 
 	# end of openWindow
@@ -443,7 +443,6 @@ class LoggerWindow(OsogoWindow):
 		"""
 		#find FullPM in list
 		aFullPNString = createFullPNString ( aFullPN )
-		print "parameter %s" %aFullPNString
 		anIter = self.theEntryList.get_model().get_iter_first()
 		while True:
 			if anIter == None:

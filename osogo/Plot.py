@@ -122,12 +122,13 @@ class Axis:
     def recalculateSize( self ):
         if self.theOrientation == PLOT_HORIZONTAL_AXIS:
             self.theLength = self.theParent.thePlotArea[2]
-            self.theBoundingBox =  [ 0, self.theParent.theOrigo[1] + 5, self.theParent.thePlotWidth, 25 ]
+            self.theBoundingBox =  [ 0, self.theParent.theOrigo[1] + 1, self.theParent.thePlotWidth, 
+                                    10 + self.theParent.theAscent + self.theParent.theDescent ]
             self.theMaxTicks = int( self.theParent.thePlotWidth / 100 )
-            self.theMeasureLabelPosition = [ self.theParent.thePlotAreaBox[2] + 10, self.theParent.theOrigo[1] - 10 ]
+            self.theMeasureLabelPosition = [ self.theParent.thePlotAreaBox[2] + 10, self.theParent.theOrigo[1] - 30 ]
         else:
             self.theLength = self.theParent.thePlotArea[3]
-            self.theBoundingBox = [ 0, 0, self.theParent.theOrigo[0] - 1, self.theParent.theOrigo[1] + 5 ]
+            self.theBoundingBox = [ 0, 0, self.theParent.theOrigo[0], self.theParent.theOrigo[1] + 5 ]
             self.theMaxTicks = int( self.theParent.thePlotHeight / 150 ) * 5
             self.theMeasureLabelPosition = [ self.theParent.theOrigo[0] - 50, 0 ]
 
@@ -159,7 +160,7 @@ class Axis:
             
     def convertNumToCoord( self, aNumber ):
         if self.theScaleType == SCALE_LINEAR:
-            relativeCoord = round( aNumber - self.theFrame[0] ) / float( self.thePixelSize )
+            relativeCoord = round( ( aNumber - self.theFrame[0] ) / float( self.thePixelSize ) )
         else:
             relativeCoord = round( (log10( aNumber ) - log10( self.theFrame[0] ) ) / self.thePixelSize )
 
@@ -409,13 +410,23 @@ class Axis:
             self.theMeasureLabel = "mixed traces"
 
         # add scale information
-        self.theMeasureLabel +=  "    " + self.theScaleType + " scale"
+        scaleLabel = self.theScaleType + " scale"
+        if self.theOrientation == PLOT_VERTICAL_AXIS:
+            self.theMeasureLabel += "  " + scaleLabel
+
      # delete x area
-        self.theParent.drawBox(BACKGROUND_COLOR, self.theMeasureLabelPosition[0], self.theMeasureLabelPosition[1], 100, 20)
+        self.theParent.drawBox(BACKGROUND_COLOR, self.theMeasureLabelPosition[0], self.theMeasureLabelPosition[1], 140, 20)
 
         # drawText xmes
         self.theParent.drawText(PEN_COLOR, self.theMeasureLabelPosition[0], self.theMeasureLabelPosition[1],
                     self.theMeasureLabel )
+        if self.theOrientation == PLOT_HORIZONTAL_AXIS:
+            textHeight = self.theParent.theAscent + self.theParent.theDescent + 5
+            self.theParent.drawBox(BACKGROUND_COLOR, self.theMeasureLabelPosition[0], 
+                self.theMeasureLabelPosition[1] + textHeight, 100, 20)
+            self.theParent.drawText(PEN_COLOR, self.theMeasureLabelPosition[0], 
+                self.theMeasureLabelPosition[1] + textHeight , scaleLabel )
+        
             
 
 
@@ -524,8 +535,8 @@ class DataSeries:
         self.drawTrace( self.getAllData() )
         self.theOldData = self.getAllData()        
         self.theNewData = nu.zeros( ( 0,5 ) )
-        
-        
+
+
     def drawTrace( self, aPoints ):
         for aDataPoint in aPoints:
             #convert to plot coordinates
@@ -537,6 +548,7 @@ class DataSeries:
             y=self.thePlot.theYAxis.convertNumToCoord( aDataPoint[ DP_VALUE ] )
             ymax=self.thePlot.theYAxis.convertNumToCoord( aDataPoint[ DP_MAX ] )
             ymin=self.thePlot.theYAxis.convertNumToCoord( aDataPoint[ DP_MIN ] )
+
             #getlastpoint, calculate change to the last
             lastx = self.theLastX
             lasty = self.theLastY
@@ -573,6 +585,7 @@ class DataSeries:
 
         # draw line
         self.thePlot.drawLine( aColor, x, ymin, x, ymax)
+
 
 
     def withinframes( self, point ):
@@ -618,6 +631,7 @@ class DataSeries:
             #draw just a point
             if cur_point_within_frame:
                 self.thePlot.drawpoint_on_plot( self.getColor() ,x, y )
+
         else:
             #draw line
             x0 = lastx
@@ -637,7 +651,10 @@ class DataSeries:
                 #interpolation section begins - only in case lastpoint or current point is off limits
                 
                 #there are 2 boundary cases x0=x1 and y0=y1
-                if x0 == x1:
+                if x0 == x1: 
+
+                    if x0 < leftLimit or x0 > rightLimit:
+                        return
                     #adjust y if necessary
                     result = self.__adjustLimits( y0, y1, upLimit, downLimit )
                     if result == None:
@@ -645,7 +662,10 @@ class DataSeries:
                     else:
                         y0, y1 = result
 
-                elif y0 == y1:
+                elif y0 == y1: 
+
+                    if y0 < downLimit or y0 > upLimit:
+                        return
                     result = self.__adjustLimits( x0, x1, leftLimit, rightLimit )
                     if result == None:
                         return
@@ -664,6 +684,8 @@ class DataSeries:
                         
                     #if x0 is out then interpolate x=leftside, create new x0, y0
                     if x0 < leftLimit:
+                        if x1 < leftLimit:
+                            return
                         x0 = leftLimit
                         y0 = yi + round( ( x0 - xi ) * mx )
                     #if y0 is still out, interpolate y=upper and lower side, 
@@ -682,6 +704,8 @@ class DataSeries:
 
                     #repeat it with x1 and y1, but compare to left side
                     if x1 > rightLimit:
+                        if x0 > rightLimit:
+                            return
                         x1 = rightLimit
                         y1 = yi + round( ( x1 - xi ) * mx )
                     #if y0 is still out, interpolate y=upper and lower side, 
@@ -736,10 +760,7 @@ class Plot:
 
         #creates widget
         self.theWidget = aDrawingArea
-        anAllocation = self.theWidget.get_allocation()
-        self.thePlotWidth = anAllocation[2]
-        self.thePlotHeight = anAllocation[3]
-
+        
         self.theWidget.unrealize()   
         #add buttonmasks to widget
         self.theWidget.set_events(gtk.gdk.EXPOSURE_MASK|gtk.gdk.BUTTON_PRESS_MASK|
@@ -747,6 +768,9 @@ class Plot:
                                     gtk.gdk.BUTTON_RELEASE_MASK)
         self.theWidget.realize()
     
+        anAllocation = self.theWidget.get_allocation()
+        self.thePlotWidth = anAllocation[2]
+        self.thePlotHeight = anAllocation[3]
 
         self.theColorMap=self.theWidget.get_colormap()
         self.theGCColorMap[ PEN_COLOR ] = self.getGC( PEN_COLOR )
@@ -821,7 +845,14 @@ class Plot:
             self.theSeriesMap[ aFullPNString ].switchOff()
             self.doesConnectPoints = False
         self.theXAxis.setFullPNString( aFullPNString )
-        self.requestData()
+
+        if self.theZoomLevel == 0:
+            #if mode is history and zoom level 0, set xframes
+            self.requestData( )
+
+        else: #just get data from loggers
+            self.requestData( )
+            #self.requestDataSlice( self.theXAxis.theFrame[0], self.theXAxis.theFrame[1] )
         self.totalRedraw()
 
 
@@ -915,13 +946,13 @@ class Plot:
         #if mode is strip
         if self.theStripMode == MODE_STRIP:
             self.requestData( ) 
-            
+
         elif self.theZoomLevel == 0:
             #if mode is history and zoom level 0, set xframes
             self.requestData( )
-            
+
         else: #just get data from loggers
-            self.requestDataSlices( self.theXAxis.theFrame[0], self.theXAxis.theFrame[1] )
+            self.requestDataSlice( self.theXAxis.theFrame[0], self.theXAxis.theFrame[1] )
         self.totalRedraw( )
         return return_list
 
@@ -1002,13 +1033,14 @@ class Plot:
 
 
     def expose(self, obj, event):
-        obj.window.draw_drawable(self.thePixmapBuffer.new_gc(),self.thePixmapBuffer,event.area[0],event.area[1],
-                                    event.area[0],event.area[1],event.area[2],event.area[3])
+
+        obj.window.draw_drawable( self.thePixmapBuffer.new_gc(), self.thePixmapBuffer, event.area[0], event.area[1],
+                                    event.area[0], event.area[1], event.area[2], event.area[3] )
         # check for resize
         anAllocation = self.theWidget.get_allocation()
         self.resize( anAllocation[2], anAllocation[3] )
-        
-        
+
+
 
     def allocateColor( self ):             
         #checks whether there's room for new traces
@@ -1024,7 +1056,8 @@ class Plot:
         if aColor in self.theAvailableColors:
             self.theAvailableColors.remove( aColor )
 
-    
+
+
     def releaseColor(self, aColor ):
         #remove from colorlist
         for aSeries in self.theSeriesMap.values():
@@ -1144,30 +1177,35 @@ class Plot:
 
     def showMenu( self ):
         theMenu = gtk.Menu()
+        if self.theZoomLevel > 0:
+            zoomUt = gtk.MenuItem( "Zoom out" )
+            zoomUt.connect ("activate", self.__zoomOut )
+            theMenu.append( zoomUt )
+            theMenu.append( gtk.SeparatorMenuItem() )
+
         if self.isGUIShown:
             guiMenuItem = gtk.MenuItem( "Hide GUI" )
             guiMenuItem.connect ( "activate", self.__minimize_action )
         else:
             guiMenuItem = gtk.MenuItem( "Show GUI" )
             guiMenuItem.connect ( "activate", self.__maximize_action )
-            
-        xToggle = gtk.MenuItem ( "toggle X axis" )
+         
+        xToggle = gtk.MenuItem ( "Toggle X axis" )
         xToggle.connect( "activate", self.__toggleXAxis )
-        yToggle = gtk.MenuItem ( "toggle Y axis" )
+        yToggle = gtk.MenuItem ( "Toggle Y axis" )
         yToggle.connect( "activate", self.__toggleYAxis )
+
         if self.theStripMode == MODE_STRIP:
-            toggleStrip = gtk.MenuItem("history mode")
+            toggleStrip = gtk.MenuItem("History mode")
         else:
-            toggleStrip = gtk.MenuItem( "strip mode" )
+            toggleStrip = gtk.MenuItem( "Strip mode" )
         toggleStrip.connect( "activate", self.__toggleStripMode )
         theMenu.append( toggleStrip )
+        theMenu.append( gtk.SeparatorMenuItem() )   
         theMenu.append( xToggle )
         theMenu.append( yToggle )
+        theMenu.append( gtk.SeparatorMenuItem() )
         theMenu.append( guiMenuItem )
-        if self.theZoomLevel > 0:
-            zoomUt = gtk.MenuItem( "zoom out" )
-            zoomUt.connect ("activate", self.__zoomOut )
-            theMenu.append( zoomUt )
         theMenu.show_all()
         theMenu.popup( None, None, None, 1, 0 )
 
@@ -1330,6 +1368,8 @@ class Plot:
             return
         textShift = self.theAscent + self.theDescent + 5
         seriesCount = self.getSeriesCount()
+        if seriesCount == 0:
+            return
         textShift = min( textShift, int( self.thePlotArea[3]/seriesCount ) )
         y = self.thePlotAreaBox[1] + 5
         x = self.thePlotAreaBox[0] + 5

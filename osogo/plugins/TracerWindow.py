@@ -9,10 +9,11 @@ import operator
 from Plot import *
 from ecell.ecssupport import *
 #LoggerMinimumInterval=1
-import ConfirmWindow
+
 from OsogoPluginWindow import *
 from ConfirmWindow import *
 import os
+import os.path
 
 COL_LOG = 2
 COL_PIX = 1
@@ -38,11 +39,13 @@ class TracerWindow( OsogoPluginWindow ):
         self.theSession = self.thePluginManager.theSession
         self.theViewType = MULTIPLE
         self.isGUIShown = False
+        self.theSaveDirectorySelection = gtk.FileSelection( 'Select File' )
+        self.theSaveDirectorySelection.ok_button.connect('clicked', self.changeSaveDirectory)
+        self.theSaveDirectorySelection.cancel_button.connect('clicked', self.closeParentWindow)
 
 
     def openWindow(self):
         OsogoPluginWindow.openWindow(self)
-
 
         #self.openWindow()
         self.theListWindow = self['clist1']
@@ -51,7 +54,7 @@ class TracerWindow( OsogoPluginWindow ):
             gobject.TYPE_BOOLEAN,
             gobject.TYPE_STRING )
         self.theListWindow.set_model( self.theListStore )
-        
+
         onoffRenderer = gtk.CellRendererToggle()
         onoffRenderer.connect( 'toggled', self.onoffTogglePressed, self.theListStore )
         loggerRenderer = gtk.CellRendererToggle()
@@ -59,47 +62,47 @@ class TracerWindow( OsogoPluginWindow ):
         pixbufRenderer = gtk.CellRendererPixbuf()
         xaxisRenderer = gtk.CellRendererToggle()
         xaxisRenderer.connect( 'toggled', self.xaxisToggled, self.theListStore )
-        
+
         pixBufColumn = gtk.TreeViewColumn( 'color', pixbufRenderer, pixbuf = COL_PIX )
         fullpnColumn = gtk.TreeViewColumn( 'trace', gtk.CellRendererText(), text = COL_TXT )
         loggerColumn = gtk.TreeViewColumn( 'lg', loggerRenderer, active=COL_LOG )
         onoffColumn = gtk.TreeViewColumn( 'on', onoffRenderer, active = COL_ON )
         xaxisColumn = gtk.TreeViewColumn ( 'x', xaxisRenderer, active = COL_X )
-        
+
         pixBufColumn.set_resizable( gtk.TRUE )
         fullpnColumn.set_resizable( gtk.TRUE )
         loggerColumn.set_resizable( gtk.TRUE )
         onoffColumn.set_resizable( gtk.TRUE )
         xaxisColumn.set_resizable( gtk.TRUE )
-        
+
         self.theListWindow.append_column( onoffColumn )
         self.theListWindow.append_column( pixBufColumn )
         self.theListWindow.append_column( loggerColumn )
         self.theListWindow.append_column( xaxisColumn )
         self.theListWindow.append_column( fullpnColumn )
-        
+
         self.theScrolledWindow = self['scrolledwindow1']
         self.theFixed = self['fixed1']
-        
+
         self.theListSelection = self.theListWindow.get_selection()
         self.theListSelection.set_mode( gtk.SELECTION_MULTIPLE )
         self.theWindow = self.getWidget( self.__class__.__name__ )
-                               
+
         #determine plotsize
         self.thePlotWidget = self['drawingarea1']
+
         #init plotter instance
         self.thePlotInstance = Plot( self, self.getParent(), self.thePlotWidget )
         #attach plotterwidget to window
+
         aWindowWidget = self.getWidget( 'frame8' )
         self.noHandle = False
+
         aWindowWidget.show_all()
 
         #add handlers to buttons
-        self.addHandlers({\
-            'on_button9_clicked' : self.removeTraceAction, \
-            'on_minimize_clicked'  : self.hideGUIAction } )
+
         self.theListWindow.connect( "button-press-event", self.buttonPressedOnList)
-        self['button12'].set_label( 'Log10 Scale' )
 
         self.setIconList(
         os.environ['OSOGOPATH'] + os.sep + "ecell.png",
@@ -108,29 +111,24 @@ class TracerWindow( OsogoPluginWindow ):
         #addtrace to plot
         self.addTraceToPlot( self.theFullPNList() )
 
-
         #sets stripinterval, disable history buttons
         self['entry1'].set_text( str(self.thePlotInstance.getStripInterval()) )
         self['entry1'].connect( 'activate', self.stripIntervalChangedEnter )
         self['entry1'].connect( 'focus_out_event', self.stripIntervalChanged )
-        self['button13'].connect( 'clicked', self.logAllAction )
-        self['togglebutton3'].connect( 'toggled', self.toggleStripAction )
-         
+
         if not self.isStandAlone():
             self.minimize()
 
-        if self.theSession.getParameter( 'show_history' ):
-            self['togglebutton3'].set_active( gtk.TRUE )
- 
+
         self.thePluginManager.appendInstance( self )
         self.showHistory()               
-            
+
 
     def update(self):
         self.thePlotInstance.update()
         # later update value shown
-   
-           
+
+
     def createLogger( self, fpnlist ):
         if self.theSession.isRunning():
             return
@@ -143,21 +141,20 @@ class TracerWindow( OsogoPluginWindow ):
                     self.theSession.message( 'Error while creating logger\n logger for ' + fpn + ' not created\n' )
                 else:
                     self.theSession.message( "Logger created for " + fpn )
-        self.checkHistoryButton()
+        #self.checkHistoryButton()
         self.thePluginManager.updateFundamentalWindows()
 
 
     def requestData( self, numberOfElements ):
-        for aSeries in self.thePlotInstance.getDataSeriesList():      
+        for aSeries in self.thePlotInstance.getDataSeriesList():
             self.theDataGenerator.requestData( aSeries, numberOfElements )
 
     def requestDataSlice( self, aStart, anEnd, aRequiredResolution ):
-        for aSeries in self.thePlotInstance.getDataSeriesList():      
+        for aSeries in self.thePlotInstance.getDataSeriesList(): 
             self.theDataGenerator.requestDataSlice( aSeries, aStart, anEnd, aRequiredResolution )
 
     def requestNewData( self, aRequiredResolution ):
-
-        for aSeries in self.thePlotInstance.getDataSeriesList():      
+        for aSeries in self.thePlotInstance.getDataSeriesList():
             self.theDataGenerator.requestNewData( aSeries, aRequiredResolution )
 
 
@@ -167,16 +164,16 @@ class TracerWindow( OsogoPluginWindow ):
         return aFullPNString in loggerlist
 
     # ========================================================================
-    def checkHistoryButton(self):
-        history_button = self['togglebutton3']
-        if len( self.displayedFullPNStringList ) == 0:
-            history_button.set_sensitive( gtk.FALSE )
-            return None 
-        for fpn in self.displayedFullPNStringList:
-            if not self.hasLogger(fpn):
-                history_button.set_sensitive(gtk.FALSE)
-                return None 
-        history_button.set_sensitive(gtk.TRUE)      
+#    def checkHistoryButton(self):
+#        history_button = self['togglebutton3']
+#        if len( self.displayedFullPNStringList ) == 0:
+#            history_button.set_sensitive( gtk.FALSE )
+#            return None 
+#        for fpn in self.displayedFullPNStringList:
+#            if not self.hasLogger(fpn):
+#                history_button.set_sensitive(gtk.FALSE)
+#                return None 
+#        history_button.set_sensitive(gtk.TRUE)
 
 
     # ========================================================================
@@ -194,8 +191,7 @@ class TracerWindow( OsogoPluginWindow ):
         # appends FullPNList as plot data
         self.addTraceToPlot( aFullPNList )
 
-            
-        
+
     # ========================================================================
     def refreshLoggers(self):
         #refreshes loggerlist
@@ -225,8 +221,8 @@ class TracerWindow( OsogoPluginWindow ):
                 aFullPNString= createFullPNString( aFullPN)
                 if not self.hasLogger(aFullPNString):
                     self.theSession.message(aFullPNString+" doesn't have associated logger.")
-                    pass_flag = 1         
-            if pass_flag==1: 
+                    pass_flag = 1
+            if pass_flag==1:
                 return -1
 
 
@@ -246,8 +242,8 @@ class TracerWindow( OsogoPluginWindow ):
 
         added_list = self.thePlotInstance.addTrace( pass_list )
         self.addTraceToList( added_list )
-        self.checkHistoryButton()
-        self.checkRemoveButton()      
+        #self.checkHistoryButton()
+        #self.checkRemoveButton()
         
     # ========================================================================
     def getLatestData( self, fpn ):
@@ -256,12 +252,12 @@ class TracerWindow( OsogoPluginWindow ):
         return nu.array( [time,value, value, value, value] )
         
     # ========================================================================
-    def checkRemoveButton( self ):
-        remove_button = self['button9']
-        if len( self.displayedFullPNStringList ) > 1:
-            remove_button.set_sensitive( gtk.TRUE )
-        else:
-            remove_button.set_sensitive( gtk.FALSE )
+#    def checkRemoveButton( self ):
+#        remove_button = self['button9']
+#        if len( self.displayedFullPNStringList ) > 1:
+#            remove_button.set_sensitive( gtk.TRUE )
+#        else:
+#            remove_button.set_sensitive( gtk.FALSE )
 
 
     # ========================================================================
@@ -315,21 +311,42 @@ class TracerWindow( OsogoPluginWindow ):
     
     # ========================================================================
     def maximize(self):
-        if self['vbox1'] != self['scrolledwindow1'].get_parent():
-            self['vbox1'].add( self['scrolledwindow1'] )
-        if self['vbox2'] != self['fixed1'].get_parent():
-            self['vbox2'].add( self['fixed1'] )
+        if self['top_frame'] != self['vbox2'].get_parent():
+            if self.isStandAlone():
+                self.__adjustWindowHeight(  - self.shiftWindow )
+            self['top_frame'].remove( self['drawingarea1'] )
+            self['vpaned1'].add( self['drawingarea1'] )
+            self['top_frame'].add( self['vbox2'] )
+        
         self.thePlotInstance.showGUI( gtk.TRUE )
 
 
     # ========================================================================
     def minimize(self):
-        self.thePlotInstance.showGUI( gtk.FALSE )
-        if self['vbox1']==self['scrolledwindow1'].get_parent():
-            self['vbox1'].remove(self['scrolledwindow1'])
-        if self['vbox2']==self['fixed1'].get_parent():
-            self['vbox2'].remove(self['fixed1'])
 
+        self.thePlotInstance.showGUI( gtk.FALSE )
+        if self['top_frame'] == self['vbox2'].get_parent():
+            if self.isStandAlone():
+                dividerPos = self['vpaned1'].get_position()
+                panedHeight = self['vpaned1'].get_allocation()[3]
+                self.shiftWindow = panedHeight - dividerPos
+
+            self['top_frame'].remove( self['vbox2'] )
+            self['vpaned1'].remove( self['drawingarea1'] )
+            self['top_frame'].add( self['drawingarea1'] )
+            if self.isStandAlone():
+                self.__adjustWindowHeight(  self.shiftWindow )
+                
+    def __adjustWindowHeight ( self, deltaHeight ):
+        aWindow = self.getParent()['TracerWindow']
+        windowAlloc = aWindow.get_allocation()
+        windowHeight = windowAlloc[3]
+        windowWidth = windowAlloc[2]
+        aWindow.resize( windowWidth , windowHeight - deltaHeight )
+        
+    
+    
+    
    # ========================================================================
     def setScale( self, theOrientation, theScaleType ):
         """
@@ -461,7 +478,7 @@ class TracerWindow( OsogoPluginWindow ):
     def showGUI ( self ):
         """ shows GUI and sets plot to its normal size """
         self.maximize()
-    
+
     # ========================================================================
     def hideGUI (self ):
         """doesn't change Plot size, but hides GUI components """
@@ -483,18 +500,18 @@ class TracerWindow( OsogoPluginWindow ):
 #-------------------------------------------------
 
 
-    
+
     #----------------------------------------------
     #this signal handler is called when ENTER is pushed on entry1
     #-------------------------------------------------
-    
+
     def stripIntervalChangedEnter( self, obj ):
         self.stripIntervalChanged( obj, None )
-    
+
     #--------------------------------------------------------
     #this signal handler is called when TAB is presses on entry1
     #---------------------------------------------------------
-        
+
     def stripIntervalChanged(self, obj, event): #this is an event handler again
         #get new value
         #call plotterinstance
@@ -512,13 +529,110 @@ class TracerWindow( OsogoPluginWindow ):
     #---------------------------------------------------------
 
     def buttonPressedOnList(self, aWidget, anEvent):
-        if anEvent.button==3:
-            self.changeTraceColor()
+        if anEvent.button == 3:
+        # user menu: remove trace, log all, save data,edit policy, hide ui, change color
+            selectedList = self.getSelected()
+            allHasLogger = True
+            for aSelection in selectedList:
+                if not self.hasLogger( aSelection[0] ):
+                    allHasLogger = False
+                    break
+
+            theMenu = gtk.Menu()
+            listCount = len( self.displayedFullPNStringList )
+            if len( selectedList ) > 0 and listCount - len(selectedList )  > 0:
+                removeItem = gtk.MenuItem( "Remove" )
+                removeItem.connect( "activate", self.removeTraceAction )
+                theMenu.append( removeItem )
+                theMenu.append( gtk.SeparatorMenuItem() )
+
+            if allHasLogger and listCount> 0:
+                logItem = gtk.MenuItem( "Save data" )
+                logItem.connect( "activate", self.__saveData, selectedList )
+                theMenu.append( logItem )
+                editPolicy = gtk.MenuItem( "Edit policy" )
+                editPolicy.connect( "activate", self.__editPolicy, selectedList )
+                theMenu.append( editPolicy )
+                theMenu.append( gtk.SeparatorMenuItem() )
+                
+            if len( selectedList ) == 1:
+                toggleColorItem = gtk.MenuItem( "Toggle color" )
+                toggleColorItem.connect("activate", self.__toggleColor, selectedList )
+                theMenu.append( toggleColorItem )
+            theMenu.show_all()
+            theMenu.popup( None, None, None, 1, 0 )
+
+
+    def __editPolicy( self, *args ):
+        fpnList = args[1]
+        if len( fpnList ) == 1:
+            # get loggerpolicy
+            aLoggerStub = self.theSession.createLoggerStub( fpnList[0][0] )
+            aLogPolicy = aLoggerStub.getLoggerPolicy()
+        else:
+            aLogPolicy = [ 1, 0, 0, 0 ]
+        newLogPolicy = self.theSession.openLogPolicyWindow( aLogPolicy, "Set log policy for selected loggers" )
+        if newLogPolicy == None:
+            return
+        for anItem in fpnList:
+            aFullPN = anItem[0]
+            aLoggerStub = self.theSession.createLoggerStub( aFullPN )
+            aLoggerStub.setLoggerPolicy( newLogPolicy )
+
+
+    def __toggleColor( self, *args ):
+        self.changeTraceColor()
+
+
+    def __saveData( self, *args ):
+        self.theSaveDirectorySelection.show_all()
+
+
+    def changeSaveDirectory( self, obj ):
+        aSaveDirectory = self.theSaveDirectorySelection.get_filename()
+        self.theSaveDirectorySelection.hide()
+        selectedFullPNList = []
+        for anItem in self.getSelected():
+            selectedFullPNList.append( anItem[0] )
+        # If same directory exists.
+        if os.path.isdir(aSaveDirectory):
+            aConfirmMessage = "%s directory already exist.\n Would you like to override it?"%aSaveDirectory
+            confirmWindow = ConfirmWindow(1,aConfirmMessage)
+
+            if confirmWindow.return_result() == 0:
+                pass
+            else:
+                return None
+
+        # If same directory dose not exists.
+        else:
+            try:
+                os.mkdir(aSaveDirectory)
+            except:
+                aErrorMessage='couldn\'t create %s!\n'%aSaveDirectory
+                aWarningWindow = ConfirmWindow(0,aErrorMessage)
+                return None
+
+
+        try:
+            self.theSession.saveLoggerData( selectedFullPNList, aSaveDirectory, -1, -1, -1 )
+        except:
+            anErrorMessage = "Error : could not save "
+            aWarningWindow = ConfirmWindow(0,anErrorMessage)
+            return None
+        
+        
+
+
+    def closeParentWindow( self, obj ):
+        aParentWindow = self.theSaveDirectorySelection.cancel_button.get_parent_window()
+        aParentWindow.hide()
+
 
     #--------------------------------------------------------
     #this signal handler is called when an on-off checkbox is pressed over of the fullpnlist
     #---------------------------------------------------------
-        
+
     def onoffTogglePressed(self,cell, path, model):
         if self.noHandle:
             return
@@ -533,7 +647,7 @@ class TracerWindow( OsogoPluginWindow ):
         self.noHandle = True
         self.theListStore.set_value( iter, COL_ON, aSeries.isOn() )
         self.noHandle = False
-        
+
     #--------------------------------------------------------
     #this signal handler is called when create logger checkbox is pressed over the fullpnlist
     #---------------------------------------------------------
@@ -544,16 +658,16 @@ class TracerWindow( OsogoPluginWindow ):
         iter = model.get_iter( ( int ( path ), ) )
         fixed = model.get_value( iter, COL_LOG )
         text = self.theListStore.get_value( iter, COL_TXT )
-      
+
         if fixed == gtk.FALSE:
             if self.checkRun():
                 return
             self.createLogger( [text] )
-            self.refreshLoggers()  
-    
+            self.refreshLoggers()
+
     #--------------------------------------------------------
     #this signal handler is called when xaxis is toggled
-    #---------------------------------------------------------
+    #--------------------------------------------------------
 
     def xaxisToggled(self, cell, path, model):
         if self.noHandle:
@@ -566,14 +680,14 @@ class TracerWindow( OsogoPluginWindow ):
             self.setXAxis( text )
         else:
             self.setXAxis( "Time" )
-            
-            
-            
+
+
+
     #--------------------------------------------------------
     #this signal handler is called when "Remove Trace" button is pressed
     #---------------------------------------------------------
 
-    def removeTraceAction(self, obj = None):
+    def removeTraceAction(self, *args ):
         #identify selected FullPNs
         fpnlist=[]      
         selected_list=self.getSelected()
@@ -595,8 +709,8 @@ class TracerWindow( OsogoPluginWindow ):
         
         self.thePlotInstance.removeTrace( fpnlist )
         #delete selected from list
-        self.checkHistoryButton()
-        self.checkRemoveButton()
+        #self.checkHistoryButton()
+        #self.checkRemoveButton()
 
     #--------------------------------------------------------
     #this signal handler is called when "Log All" button is pressed
@@ -639,7 +753,6 @@ class TracerWindow( OsogoPluginWindow ):
 
 
 # tracer window button removal - Hide GUI, Log All, change scale, show history, only stripinterval stays
-# user menu: remove trace, log all, save data, hide ui
-# tracer menus: hide gui, log all, save data
+
 # tracer resize
 # boardwindow
