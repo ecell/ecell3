@@ -16,7 +16,6 @@ dnl
 AC_OUTPUT(
 Makefile
 plugins/Makefile
-config.py
-gecell,
+config.py,
 chmod +x gecell
 )
