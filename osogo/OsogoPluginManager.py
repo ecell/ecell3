@@ -45,284 +45,297 @@ import glob
 from ecell.ecs_constants import *
 from config import *
 from ecell.Plugin import *
-
+from DataGenerator import *
 
 class OsogoPluginManager(PluginManager):
-	"""PluginManager specified for Osogo
-	"""
+    """PluginManager specified for Osogo
+    """
 
-	# ========================================================================
-	def __init__( self, aSession ):
-		"""Constructor
-		aSession   ---  the instance of Session (Session)
-		"""
+    # ========================================================================
+    def __init__( self, aSession ):
+        """Constructor
+        aSession   ---  the instance of Session (Session)
+        """
 
-		PluginManager.__init__(self)
+        PluginManager.__init__(self)
 
-		self.theSession = aSession
+        self.theSession = aSession
+        self.theDataGenerator = DataGenerator( self.theSession )
 
+        self.thePluginTitleDict = {}     # key is instance , value is title
+        self.thePluginWindowNumber = {}
+        self.thePropertyWindowOnEntityListWindows = {}  # key is instance, value is None
 
-		self.thePluginTitleDict = {}     # key is instance , value is title
-		self.thePluginWindowNumber = {}
-		self.thePropertyWindowOnEntityListWindows = {}  # key is instance, value is None
-
-	# end of __init__
+    # end of __init__
         
-
-	# ========================================================================
-	def createInstance( self, classname, data, rootWidget=None, parent=None ):
-		"""creates new Plugin Instance
-		classname  --- a class name of PluginWindow (str)
-		data       --- a RawFullPN (RawFullPN)
-		rootWidget --- a root widget (str or None) 
-		parent     --- a parentWindow (Window)    # NOT gtk.Window
-		Returns a PluginWindow instance (PluginWindow)
-		"""
-		if self.thePluginMap.has_key( classname ):
-			pass
-		else:
-			self.loadModule( classname )
-
-		aPlugin = self.thePluginMap[ classname ]
-
-		# -------------------------------------------------------
-		# If plugin window does not exist on EntryList,
-		# then creates new title and sets it to plugin window.
-		# -------------------------------------------------------
-		aTitle = ""
-
-		if rootWidget != None:
-			pass
-		else:
-			aTitle = classname[:-6]
-
-			if self.thePluginWindowNumber.has_key( classname ):
-				self.thePluginWindowNumber[ classname ] += 1
-			else:
-				self.thePluginWindowNumber[ classname ] = 1
-
-			aTitle = "%s%d" %(aTitle,self.thePluginWindowNumber[ classname ])
+    # ========================================================================
+    def getDataGenerator( self ):
+        return self.theDataGenerator 
 
 
-		# Nothing is selected.
-		if len(data) == 0:
-			self.printMessage("Nothing is selected.")
+    # ========================================================================
+    def createInstance( self, aClassname, data, root=None, parent=None ):
+        """creates new Plugin Instance
+        aClassName  --- a class name of PluginWindow (str)
+        aData       --- a RawFullPN (RawFullPN)
+        aRoot       --- a root widget (str) 
+        aParent     --- ParentWindow (Window)          # NOT gtk.Window
+        Returns a PluginWindow instance (PluginWindow)
+        """
+        if self.thePluginMap.has_key( aClassname ):
+            pass
+        else:
+            self.loadModule( aClassname )
 
-		else:
+        aPlugin = self.thePluginMap[ aClassname ]
 
-			try:
-				anInstance = aPlugin.createInstance( data, self, rootWidget )
-			except TypeError:
-				anErrorMessage = string.join( traceback.format_exception(sys.exc_type,sys.exc_value, \
-					sys.exc_traceback), '\n' )
-				self.theSession.message(anErrorMessage)
-				return None
-
-			anInstance.openWindow()
-
-			#try:
-			if TRUE:
-				if rootWidget != None:
-					self.thePropertyWindowOnEntityListWindows[ anInstance ] = None
-				else:
-					anInstance.editTitle( aTitle )
-					self.thePluginTitleDict[ anInstance ] = aTitle
-					self.theInstanceList.append( anInstance )
-				# initializes session
-				self.theSession.theSimulator.initialize()
-				self.updateFundamentalWindows()
-			#except:
-			#	pass
-
-			return anInstance
-
-	# end of createInstance
-
-	# ========================================================================
-	def loadModule( self, aClassname ):
-		"""loads plugin window
-		aClassname   ---   a class name of PluginWindow
-		"""
-
-		PluginManager.loadModule(self,aClassname)
-
-	# ========================================================================
-	def loadAll( self ):
-		"""loads all plugin windows' files
-		Returns None
-		"""
-
-		for aPath in PLUGIN_PATH:
-			aFileList = glob.glob( os.path.join( aPath, '*.glade' ) )
-			for aFile in aFileList:
-				aModulePath = os.path.splitext( aFile )[0]
-				if( os.path.isfile( aModulePath + '.py' ) ):
-					aModuleName = os.path.basename( aModulePath )
-					self.loadModule( aModuleName )
+        # -------------------------------------------------------
+        # If plugin window does not exist on EntryList,
+        # then creates new title and sets it to plugin window.
+        # -------------------------------------------------------
+        aTitle = ""
+        #if root !='top_vbox':                # if(1)
+        #if root !='EntityListWindow':                # if(1)
 
 
-	# ========================================================================
-	def updateAllPluginWindow( self ):
-		"""updates all plugin windows
-		Returns None
-		"""
+        #if root == None:                # if(1)
+        #if parent == None:                # if(1)
+        if root != None and root.__class__.__name__ == 'EntityListWindow':
+            pass
+        else:
+            aTitle = aClassname[:-6]
 
-		# updates all plugin windows
-		PluginManager.updateAllPluginWindow(self)
+            if self.thePluginWindowNumber.has_key( aClassname ):
+                self.thePluginWindowNumber[ aClassname ] += 1
+            else:
+                self.thePluginWindowNumber[ aClassname ] = 1
 
-		# updates PropertyWindow on EntityListWindow
-		if self.thePropertyWindowOnEntityListWindows != None:
-			for aPropertyWindowOnEntityListWindow in self.thePropertyWindowOnEntityListWindows.keys():
-				aPropertyWindowOnEntityListWindow.update()
+            aTitle = "%s%d" %(aTitle,self.thePluginWindowNumber[ aClassname ])
 
-
-	# ---------------------------------------------------------------
-	# appendInstance  (overrides PluginManager)
-	#   - appends an instance to instance list
-	#   - If catchs exception from the method of super class,
-	#     then print message to MessageWindow.
-	#
-	# anInstance     : an instance
-	# return -> None
-	# ---------------------------------------------------------------
-	# ========================================================================
-	def appendInstance( self, anInstance ):
-
-		pass
-
-	# end of appendInstance
+            # if(1)
 
 
-	# ========================================================================
-	def removeInstance( self, anInstance ):
-		"""override superclass's method
-		anInstance   --- a PluginWindow instance 
-		Returns None
-		"""
+        # Nothing is selected.
+        if len(data) == 0:
+            self.printMessage("Nothing is selected.")
 
-		# calls superclass's method
-		PluginManager.removeInstance(self, anInstance)
+        else:
 
-		# deletes it from the instance map
-		if self.thePluginTitleDict.has_key( anInstance ):
-			del self.thePluginTitleDict[ anInstance ] 
-		else:
-			pass
+            try:
+                anInstance = aPlugin.createInstance( data, self, root )
+            except TypeError:
+                anErrorMessage = string.join( traceback.format_exception(sys.exc_type,sys.exc_value, \
+                    sys.exc_traceback), '\n' )
+                self.theSession.message(anErrorMessage)
+                return None
 
-		# The following process is verbose
-		# when the instance is not deleted, destroy it.
-		if anInstance != None:
-			if anInstance[anInstance.__class__.__name__] != None:
-				anInstance[anInstance.__class__.__name__].destroy()
+            anInstance.openWindow()
 
-		# updaets fundamental windows
-		self.theSession.updateFundamentalWindows()
+            #try:
+            if TRUE:
+                if root != None and root.__class__.__name__ == 'EntityListWindow':
+                    self.thePropertyWindowOnEntityListWindows[ anInstance ] = None
+                else:
+                    anInstance.editTitle( aTitle )
+                    self.thePluginTitleDict[ anInstance ] = aTitle
+                    self.theInstanceList.append( anInstance )
+                # initializes session
+                self.theSession.theSimulator.initialize()
+                self.updateFundamentalWindows()
+            #except:
+            #    pass
 
+            return anInstance
 
-	# ========================================================================
-	def removeInstanceByTitle( self, aTitle ):
-		"""removes PluginWindow instance by title
-		aTitle   --- a PluginWindow's title (str)
-		Returns None
-		"""
-		
-		# converts the title to str type
-		aTitle = str(aTitle)
+    # end of createInstance
 
-		# removes the instance
-		for anInstance in self.theInstanceList:
-			if aTitle == self.thePluginTitleDict[ anInstance ]:
-				self.removeInstance( anInstance )
-				break
+    # ========================================================================
+    def loadModule( self, aClassname ):
+        """loads plugin window
+        aClassname   ---   a class name of PluginWindow
+        """
 
-	# ========================================================================
-	def editModuleTitle( self, aPluginInstance, aTitle ):
-		"""overwrites superclass's method
-		edits PluginWindow's title
-		aPluginInstance   --- the PluginWindow to change title (PluginWindow)
-		aTitle            --- a new PluginWindow's title (str)
-		Returns None
-		"""
+        PluginManager.loadModule(self,aClassname)
 
-		self.thePluginTitleDict[aPluginInstance] = aTitle
-		PluginManager.editModuleTitle( self, aPluginInstance, aTitle)
+    # ========================================================================
+    def loadAll( self ):
+        """loads all plugin windows' files
+        Returns None
+        """
 
-	# ========================================================================
-	def editInstanceTitle( self, anOldTitle, aNewTitle ):
-		"""edits PluginWindow's title
-		anOldTitle   --- current PluginWindow's title (str)
-		anNewTitle   --- a new PluginWindow's title (str)
-		Returns None
-		"""
-
-		# converts the title to str type
-		anOldTitle = str(anOldTitle)
-		aNewTitle = str(aNewTitle)
-
-		# edits the instance's title
-		for anInstance in self.theInstanceList:
-			#print self.thePluginTitleDict[ anInstance ]
-			if anOldTitle == self.thePluginTitleDict[ anInstance ]:
-				self.editModuleTitle( anInstance, aNewTitle )
-				break
+        for aPath in PLUGIN_PATH:
+            aFileList = glob.glob( os.path.join( aPath, '*.glade' ) )
+            for aFile in aFileList:
+                aModulePath = os.path.splitext( aFile )[0]
+                if( os.path.isfile( aModulePath + '.py' ) ):
+                    aModuleName = os.path.basename( aModulePath )
+                    self.loadModule( aModuleName )
 
 
-	# ========================================================================
-	def showPlugin( self, aPluginInstance ):
-		"""overwrites superclass's method
-		aPluginInstance   ---  a PluginWindow instance 
-		Returns None
-		"""
+    # ========================================================================
+    def updateAllPluginWindow( self ):
+        """updates all plugin windows
+        Returns None
+        """
 
-		try:
-			PluginManager.showPlugin(self, aPluginInstance)
+        # updates all plugin windows
+        PluginManager.updateAllPluginWindow(self)
 
-		# When the specified instance exists on BoardWindow.
-		except AttributeError:
-			self.theSession.getWindow('BoardWindow').present()
-
-
-	# ========================================================================
-	def deleteModule( self, *arg ):
-		"""overwrites superclass's method
-		aPluginInstance   ---  a PluginWindow instance 
-		Returns None
-		"""
-
-		self.theSession.updateFundamentalWindows()
+        # updates PropertyWindow on EntityListWindow
+        if self.thePropertyWindowOnEntityListWindows != None:
+            for aPropertyWindowOnEntityListWindow in self.thePropertyWindowOnEntityListWindows.keys():
+                aPropertyWindowOnEntityListWindow.update()
 
 
-	# ========================================================================
-	def updateFundamentalWindows( self ):
-		"""updates fundamental windows
-		Returns None
-		"""
+    # ---------------------------------------------------------------
+    # appendInstance  (overrides PluginManager)
+    #   - appends an instance to instance list
+    #   - If catchs exception from the method of super class,
+    #     then print message to MessageWindow.
+    #
+    # anInstance     : an instance
+    # return -> None
+    # ---------------------------------------------------------------
+    # ========================================================================
+    def appendInstance( self, anInstance ):
 
-		try:
-			self.theSession.updateFundamentalWindows()
+        pass
 
-		except:
-			pass
-
-
-	# ========================================================================
-	def printMessage( self, aMessage ):
-		"""prints message on MessageWindow
-		Returns None
-		"""
-
-		self.theSession.message(aMessage)
+    # end of appendInstance
 
 
-	# ========================================================================
-	def updateAllWindows( self ):
-		"""updates all windows
-		Returns None
-		"""
+    # ========================================================================
+    def removeInstance( self, anInstance ):
+        """override superclass's method
+        anInstance   --- a PluginWindow instance 
+        Returns None
+        """
 
-		self.updateAllPluginWindow()
+        # calls superclass's method
+        PluginManager.removeInstance(self, anInstance)
 
-		self.theSession.updateFundamentalWindows()
+        # deletes it from the instance map
+        
+        if self.thePluginTitleDict.has_key( anInstance ):
+            del self.thePluginTitleDict[ anInstance ] 
+        else:
+            pass
+
+        # The following process is verbose
+        # when the instance is not deleted, destroy it.
+        if anInstance != None:
+            if anInstance[anInstance.__class__.__name__] != None:
+                anInstance[anInstance.__class__.__name__].destroy()
+
+        # updaets fundamental windows
+        self.theSession.updateFundamentalWindows()
+
+
+    # ========================================================================
+    def removeInstanceByTitle( self, aTitle ):
+        """removes PluginWindow instance by title
+        aTitle   --- a PluginWindow's title (str)
+        Returns None
+        """
+        
+        # converts the title to str type
+        aTitle = str(aTitle)
+
+        # removes the instance
+        for anInstance in self.theInstanceList:
+            if aTitle == self.thePluginTitleDict[ anInstance ]:
+                self.removeInstance( anInstance )
+                break
+
+    # ========================================================================
+    def editModuleTitle( self, aPluginInstance, aTitle ):
+        """overwrites superclass's method
+        edits PluginWindow's title
+        aPluginInstance   --- the PluginWindow to change title (PluginWindow)
+        aTitle            --- a new PluginWindow's title (str)
+        Returns None
+        """
+
+        self.thePluginTitleDict[aPluginInstance] = aTitle
+        PluginManager.editModuleTitle( self, aPluginInstance, aTitle)
+
+    # ========================================================================
+    def editInstanceTitle( self, anOldTitle, aNewTitle ):
+        """edits PluginWindow's title
+        anOldTitle   --- current PluginWindow's title (str)
+        anNewTitle   --- a new PluginWindow's title (str)
+        Returns None
+        """
+
+        # converts the title to str type
+        anOldTitle = str(anOldTitle)
+        aNewTitle = str(aNewTitle)
+
+        # edits the instance's title
+        for anInstance in self.theInstanceList:
+            #print self.thePluginTitleDict[ anInstance ]
+            if anOldTitle == self.thePluginTitleDict[ anInstance ]:
+                self.editModuleTitle( anInstance, aNewTitle )
+                break
+
+
+    # ========================================================================
+    def showPlugin( self, aPluginInstance ):
+        """overwrites superclass's method
+        aPluginInstance   ---  a PluginWindow instance 
+        Returns None
+        """
+
+        try:
+            PluginManager.showPlugin(self, aPluginInstance)
+
+        # When the specified instance exists on BoardWindow.
+        except AttributeError:
+            self.theSession.getWindow('BoardWindow').present()
+
+
+    # ========================================================================
+    def deleteModule( self, *arg ):
+        """overwrites superclass's method
+        aPluginInstance   ---  a PluginWindow instance 
+        Returns None
+        """
+
+        self.theSession.updateFundamentalWindows()
+
+
+    # ========================================================================
+    def updateFundamentalWindows( self ):
+        """updates fundamental windows
+        Returns None
+        """
+
+        try:
+            self.theSession.updateFundamentalWindows()
+
+        except:
+            pass
+
+
+    # ========================================================================
+    def printMessage( self, aMessage ):
+        """prints message on MessageWindow
+        Returns None
+        """
+
+        self.theSession.message(aMessage)
+
+
+    # ========================================================================
+    def updateAllWindows( self ):
+        """updates all windows
+        Returns None
+        """
+
+        self.updateAllPluginWindow()
+
+        self.theSession.updateFundamentalWindows()
+
 
 
 	# ========================================================================
@@ -331,8 +344,8 @@ class OsogoPluginManager(PluginManager):
 		Returns None
 		"""
 
-		if self.thePropertyWindowOnEntityListWindows.has_key(aPropertyWindowOnEntityListWindow):
-			del self.thePropertyWindowOnEntityListWindows[aPropertyWindowOnEntityListWindow]
+        if self.thePropertyWindowOnEntityListWindows.has_key(aPropertyWindowOnEntityListWindow):
+            del self.thePropertyWindowOnEntityListWindows[aPropertyWindowOnEntityListWindow]
 
 if __name__ == "__main__":
     pass

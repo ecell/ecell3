@@ -60,6 +60,7 @@ class OsogoWindow(Window):
 		"""
 
 		# calls superclass's constructor
+
 		Window.__init__( self, gladeFile, rootWidget=rootWidget )
 
 		# saves a reference to Session

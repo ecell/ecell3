@@ -8,6 +8,7 @@ osogo.ini\
 BoardWindow.py\
 BoardWindow.glade\
 ConfirmWindow.py\
+DataGenerator.py\
 EntityListWindow.glade\
 EntityListWindow.py\
 InterfaceWindow.py\
