@@ -227,25 +227,31 @@ class Session:
     def createLoggerStub( self, fullpn ):
         return LoggerStub( self.theSimulator, fullpn )
 
-    def saveLoggerData( self, aFullPNString='', aStartTime=-1, anEndTime=-1, anInterval=-1, aSaveDirectory='./Data'):
+    def saveLoggerData( self, fullpn=0, aSaveDirectory='./Data', aStartTime=-1, anEndTime=-1, anInterval=-1 ):
+        
+        # -------------------------------------------------
+        # Check type.
+        # -------------------------------------------------
+        
+        aLoggerNameList = []
 
+        if type( fullpn ) == str:
+            aLoggerNameList.append( aFullPNString )
+        elif not fullpn :
+            aLoggerNameList = self.getLoggerList()
+        elif type( fullpn ) == list: 
+            aLoggerNameList = fullpn
+        elif type( fullpn ) == tuple: 
+            aLoggerNameList = fullpn
+        else:
+            self.mesage( fullpn +" is not suitable type.\nuse string or list or tuple" )
+            sys.exit(0)
+            
         # -------------------------------------------------
         # Execute saving.
         # -------------------------------------------------
-
-        try:
+        if not os.path.isdir( aSaveDirectory ):
             os.mkdir( aSaveDirectory )
-
-        # creates instance datafilemanager
-        except:
-            self.message( "\'" + aSaveDirectory + "\'" + " file exists." )
-
-        aLoggerNameList = []
-
-        if aFullPNString=='':
-            aLoggerNameList = self.getLoggerList()
-        else:
-            aLoggerNameList.append( aFullPNString )         
 
         # creates instance datafilemanager
         aDataFileManager = DataFileManager()
