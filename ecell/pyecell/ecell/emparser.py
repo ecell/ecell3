@@ -19,6 +19,7 @@ import getopt
 import tempfile
 
 import ecell.eml
+from ecell.ecssupport import *
 
 import lex
 import yacc
@@ -164,6 +165,7 @@ def p_stmt(t):
 	'''
         stmt : stepper_stmt
              | system_stmt
+	     | ecs
         '''
 	t[0] = t[1]
     
@@ -184,6 +186,23 @@ def p_entity_other_stmt (t):
 	entity_other_stmt : entity_other_object_decl LBRACE propertylist RBRACE
         '''
 	t[0] = t[1], t[3]
+
+# ecs support
+def p_ecs(t):
+	'''
+	ecs : name valuelist SEMI
+	'''
+	aFullPN = createFullPN( t[1] )
+	aPropertyName = aFullPN[3]
+        aFullID = createFullIDString( convertFullPNToFullID( aFullPN ) )
+
+	# for update property
+	if anEml.getEntityProperty( t[1] ):
+		anEml.deleteEntityProperty( aFullID, aPropertyName )
+		
+	anEml.setEntityProperty(aFullID, aPropertyName, t[2])
+
+	t[0] = t[1], t[2]
 
 # object declarations
 
@@ -268,7 +287,7 @@ def p_property(t):
 	else:
 		anEml.setEntityProperty(t.id, t[1], t[2])
 		
-		#t[0] = t[1], t[2]
+	#t[0] = t[1], t[2]
 
 # property or entity ( for System statement )
 
@@ -308,19 +327,6 @@ def p_valuelist(t):
                   | value
         '''
 	t[0] =  createListleft( t )
-	
-#def p_matrix(t):
-#	'''
-#	matrix : LBRACKET valuelist RBRACKET
-#        '''
-#	t[0] = t[2]
-	
-#def p_matrixlist(t):
-#        '''
-#        matrixlist : matrixlist matrix
-#                   | matrix
-#        '''
-#	t[0] =  createListleft( t )
 	
 def p_empty(t):
 	'''
@@ -366,8 +372,14 @@ def initializePLY():
 def convertEm2Eml( anEmFileObject, debug=0 ):
 
 	# initialize eml object
-	global anEml
 	anEml = ecell.eml.Eml()
+	patchEm2Eml( anEml, anEmFileObject, debug=debug)
+
+def patchEm2Eml( anEmlObject, anEmFileObject, debug=0 ):
+
+	# initialize eml object
+	global anEml
+	anEml = anEmlObject
 	
 	# Build the lexer
 	aLexer = lex.lex(lextab="emlextab")
@@ -395,7 +407,6 @@ def convertEm2Eml( anEmFileObject, debug=0 ):
 		sys.exit(0)
 	
 	return anEml
-
 
 #
 # preprocessing methods
