@@ -55,7 +55,6 @@ class PluginManager:
             self.theDriver.record( 'aPluginManager.createInstance( \'%s\', %s )' % (classname, data) )
 
         anInstance = aPlugin.createInstance( data, self, root, parent )
-        self.appendInstance( anInstance )
         self.theDriver.initialize()
         return anInstance
 
