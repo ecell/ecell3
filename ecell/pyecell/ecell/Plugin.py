@@ -108,8 +108,6 @@ class PluginModule:
 # ---------------------------------------------------------------
 class PluginManager:
 
-
-	#def __init__( self, session, loggerwindow, interfacewindow ):
 	# ---------------------------------------------------------------
 	# Constructor
 	#  - initializes pluginmap and instancelist
@@ -119,9 +117,6 @@ class PluginManager:
 
 		self.thePluginMap = {}
 		self.theInstanceList = []
-		#self.theSession = session
-		#self.theLoggerWindow = loggerwindow
-		#self.theInterfaceWindow = interfacewindow
 
 	# end of __init__
         
@@ -225,7 +220,10 @@ class PluginManager:
 	# ---------------------------------------------------------------
 	def removeInstance( self, anInstance ):
         
-		self.theInstanceList.remove( anInstance )
+		try:
+			self.theInstanceList.remove( anInstance )
+		except:
+			pass
 
 	# end of removeInstance
 
@@ -240,11 +238,10 @@ class PluginManager:
 	# return -> None 
 	# This method is throwable exception. (IndexError)
 	# ---------------------------------------------------------------
-	def showPlugin( self, anIndex, *Objects ):
+	def showPlugin( self, aPluginInstance ):
 
-		anInstance = self.theInstanceList[ anIndex + 1 ]
-		anInstance.getWidget( anInstance.__class__.__name__ ).hide()	
-		anInstance.getWidget( anInstance.__class__.__name__ ).show_all()
+		aPluginInstance[ aPluginInstance.__class__.__name__ ].hide()	
+		aPluginInstance[ aPluginInstance.__class__.__name__ ].show_all()
 
 	# end of showPlugin
 
@@ -253,14 +250,15 @@ class PluginManager:
 	# editModuleTitle
 	#   - edits module title
 	#
-	# anIndex    : index of instance
-	# aTitle     : title of instance
+	# aPluginInstance    : instance that will be removed
+	# aTitle              : title of instance
+	#
 	# return -> None 
 	# This method is throwable exception. (IndexError)
 	# ---------------------------------------------------------------
-	def editModuleTitile( self, anIndex, aTitle ):
+	def editModuleTitle( self, aPluginInstance, aTitle ):
         
-		self.theInstanceList[ anIndex + 1 ].editTitle( aTitle )
+		aPluginInstance.editTitle( aTitle )
 	
 	# end of getModule
 
@@ -270,13 +268,13 @@ class PluginManager:
 	#   - deletes a module
 	#
 	# anIndex     : index of instance
+	# aPluginInstance    : instance that will be removed
 	# *Object     : dammy elements of argument
 	# return -> None 
 	# This method is throwable exception. (IndexError)
 	# ---------------------------------------------------------------
 	def deleteModule( self, anIndex, *Objects ):
 
-		#anInstance = self.theInstanceList[ num + 1 ]
 		anInstance = self.theInstanceList[ anIndex + 1 ]
 		anInstance.getWidget( anInstance.__class__.__name__ ).destroy()
 

@@ -144,6 +144,7 @@ class Window:
 	# ---------------------------------------------------------------
 	def getWidget( self, aKey ):
 
+		#print " Window.getWidget"
 		return self.widgets.get_widget( aKey )
 
 	# end of getWidget
@@ -179,6 +180,9 @@ class Window:
 		self.getWidget( self.theClassName )[ 'title' ] = self.theTitle
 
 	# end of editTitle
+
+	def getTitle( self ):
+		return self.getWidget( self.theClassName )[ 'title' ] 
 
 
 # end of Window

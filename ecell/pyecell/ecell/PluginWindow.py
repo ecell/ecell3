@@ -59,12 +59,13 @@ class PluginWindow( Window ):
 	#  
 	# In the constructor sub class, you have to call openWindow().
 	#
-	# aModuleName : module name
-	# aModulePath : module path
+	# aDirName       : directory name
+	# aPluginManager : reference to plugin manager
+	# aRoot          : root property
+	#
 	# return -> None
 	# This method is throwable exception.
 	# ---------------------------------------------------------------
-	#def __init__( self, aDirname, aData, aPluginManager, aRoot=None ):
 	def __init__( self, aDirname, aPluginManager, aRoot=None ):
 
 		self.theRoot = aRoot
@@ -76,15 +77,24 @@ class PluginWindow( Window ):
 
 	# end of __init__
 
-	# ---------------------------------------------------------------
-	# initialize (abstract method )
-	#   - Sub class must override this method.
-	# ---------------------------------------------------------------
-	def initialize( self ):
 
-		pass
+	# ---------------------------------------------------------------
+	# openWindow
+	#   - call openwindow method of super class
+	#  
+	#
+	# aDirName       : directory name
+	# aPluginManager : reference to plugin manager
+	# aRoot          : root property
+	#
+	# return -> None
+	# This method is throwable exception.
+	# ---------------------------------------------------------------
+	def openWindow( self ):
+		Window.openWindow( self )
+		self.addHandlers( {'window_exit' : self.exit,} )
 
-	# end of initialize
+	# end of openWindow
 
 	# ---------------------------------------------------------------
 	# update (abstract method )
@@ -92,7 +102,9 @@ class PluginWindow( Window ):
 	# ---------------------------------------------------------------
 	def update( self ):
 
-		pass
+		import inspect
+		caller = inspect.getouterframes(inspect.currentframe())[0][3]
+		raise NotImplementedError(caller + 'must be implemented in subclass')
 
 	# end of update
 
@@ -106,9 +118,7 @@ class PluginWindow( Window ):
 	# ---------------------------------------------------------------
 	def exit( self, *objects ):
 
-		self.thePluginManager.theInterfaceWindow.removeRecord( self )
 		self.thePluginManager.removeInstance( self )
-		#self.thePluginManager.theInterfaceWindow.theSelectedRow = -1
 	
 	# end of exit
 
