@@ -246,7 +246,7 @@ namespace libecs
 	theK6[ c ] = aVariable->getVelocity();
 
 	aVariable->loadValue( ( theK1[ c ] * ( 35.0 / 384.0 ) 
-				+ theK2[ c ] * 0.0
+				// + theK2[ c ] * 0.0
 				+ theK3[ c ] * ( 500.0 / 1113.0 )
 				+ theK4[ c ] * ( 125.0 / 192.0 )
 				- theK5[ c ] * ( 2187.0 / 6784.0 )
@@ -304,7 +304,7 @@ namespace libecs
 	  }
 	
 	aVariable->loadValue( theValueBuffer[ c ] );
-	aVariable->setVelocity( 0.0 );
+	//	aVariable->setVelocity( 0.0 );
       }
 
     setMaxErrorRatio( maxError );

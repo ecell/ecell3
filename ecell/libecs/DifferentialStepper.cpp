@@ -257,10 +257,11 @@ namespace libecs
       {
 	VariablePtr const aVariable( theVariableVector[ c ] );
 
-	Real const aTolerance( ( fabs( aVariable->getValue() ) 
-				 + theAbsoluteEpsilon ) 
-			       * theRelativeEpsilon );
-	Real const aVelocity( fabs( theVelocityBuffer[ c ] ) );
+	const Real aTolerance( fabs( aVariable->getValue() ) 
+			       * theRelativeEpsilon
+			       + theAbsoluteEpsilon );
+
+	const Real aVelocity( fabs( theVelocityBuffer[ c ] ) );
 
 	if ( aTolerance < aVelocity * getStepInterval() )
 	  {
