@@ -398,12 +398,11 @@ def usage():
 	print '''
 %s -- convert em to eml
 
-Usage: %s [-h] [-f] [-o outfile] infile
+Usage: %s [-h] [-E] [-o outfile] infile
        default automatic rename mode (*.em -> *.eml) 
 
 Options:
         -h or --help    :  Print this message.
-        -f or --force   :  Force overwrite even if outfile already exists.
         -o or --outfile=:  Specify output file name.  '-' means stdout.
         -E or --execute=:  Preprocessing only. implies -.
 ''' % ( aProgramName, aProgramName )
