@@ -70,6 +70,54 @@ Logger<T,V>::~Logger( void )
   ; // do nothing
 }
 
+
+//
+
+template < class T, class V >
+const DataPointVector& Logger<T,V>::getData( void ) const
+{
+  const_iterator aItr = theDataPointVector.begin();
+  const_iterator endItr = theDataPointVector.end();
+  DataPointVector* aDataPointVectorPtr( new DataPointVector() );
+
+  while( aItr != endItr )
+    {
+      aDataPointVectorPtr->push( *aItr );
+      aItr++;
+    }
+
+  return *aDataPointVectorPtr;
+
+}
+
+//
+
+template < class T, class V >
+const DataPointVector& Logger<T,V>::getData( const T& start,
+					     const T& end ) const
+{
+  const_iterator itr_1 = theDataPointVector.begin();
+  const_iterator itr_2 = theDataPointVector.end();
+
+
+  const_iterator startItr = theDataPointVector.binary_search( itr_1,
+							      itr_2,
+							      start );
+  const_iterator endItr = theDataPointVector.binary_search( itr_1,
+							    itr_2,
+							    end );
+  const_iterator i = startItr;
+  DataPointVector* aNewDataPointVectorPtr( new DataPointVector() );
+  while( i != endItr )
+    {
+      aNewDataPointVectorPtr->push( *i );
+      i++;
+    }
+
+  return *aNewDataPointVectorPtr;
+}
+
+
 //
 
 

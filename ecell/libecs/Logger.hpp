@@ -125,6 +125,18 @@ public:
 
    */
 
+  const DataPointVector& getData( void ) const;
+
+  /**
+
+   */
+
+  const DataPointVector& getData( const T& start, const T& end ) const;
+
+  /**
+
+   */
+
   const DataPointVector& getData( const T& first, const T& last, 
 			       const T& interval ) const;
 
