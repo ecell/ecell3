@@ -477,38 +477,28 @@ class Eml:
 
     def __getSystemList( self, anEntityType, aSystemPath ):
 
+
+        aSystemList = []
         aSystemNodeList = self.__theDocument.getElementsByTagName( 'system' )
-        aSystemPathList = {}
+
+        if aSystemPath == '':
+            aSystemPath = '/'
+
+        aSystemPathLength = len( aSystemPath )
 
         for aSystemNode in aSystemNodeList:
-            
-            #print aSystemNode ## DebugMessage
 
             aSystemID = str( aSystemNode.getAttribute( 'id' ) )
 
-            aSystemPathList[ aSystemID ] = [ 'Root' ]
-
-            aSystemPathElementList = aSystemID.split( '/' )
-            for aSystemPathElement in aSystemPathElementList:
-                if aSystemPathElement:
-
-                     aSystemPathList[ aSystemID ].append( str( aSystemPathElement ) )
-            
-
-        aSystemList = []
-        
-        for aSystemID in aSystemPathList.keys():
-
-            aTargetLength = len( aSystemPathList[ aSystemPath ] )
-
-            if aSystemPathList[ aSystemPath ] == aSystemPathList[ aSystemID ][ 0:aTargetLength ] and \
-               len( aSystemPathList[ aSystemPath ] ) + 1 == len( aSystemPathList[ aSystemID ] ):
-
-                aSystemList.append( aSystemPathList[ aSystemID ][aTargetLength] )
-                
+            if len( aSystemID ) > len( aSystemPath ) and\
+                   string.find( aSystemID, aSystemPath ) == 0:
+                aRelativePath = aSystemID[aSystemPathLength:]
+                if aRelativePath[0] == '/':
+                    aRelativePath = aRelativePath[1:]
+                if string.find( aRelativePath, '/' ) == -1:
+                    aSystemList.append( aSystemID )
 
         return aSystemList
-
 
 
     def __getEntityNode( self, aFullID ):
