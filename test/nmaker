@@ -1,0 +1,50 @@
+#!/usr/bin/perl -w
+
+# Date[0203112]
+# ------------------------------------------------------------
+# 
+#  
+#            EML formatter
+# 
+#
+#                            suzuki@e-cell.org
+# 
+#------------------------------------------------------------
+
+
+$TargetFile = $ARGV[0];
+if( !$TargetFile ){
+    print "\n".'Please select input file.'."\n\n";
+    exit;
+}
+
+open( IN, "$TargetFile" );
+while(<IN>){
+    s/(<eml>)/$1\n\n/g;
+
+    s/(<\/system>)/$1\n/g;
+    s/(<stepperlist>)/$1\n/g;
+    s/(<stepper class.*?>)/$1\n/g;
+    s/(<\/value>)/$1\n/g;
+    s/(<\/stepper>)/$1\n/g;
+    s/(<\/stepperlist>)/$1\n\n/g;
+
+    s/(<system .*?>)/$1\n/g;
+    s/(<\/system>)/$1\n/g;
+
+    s/(<property .*?>)/$1\n/g;
+    s/(<\/property>)/$1\n/g;
+
+    s/(<substance .*?>)/$1\n/g;
+    s/(<\/substance>)/$1\n\n/g;
+
+    s/(<reactor .*?>)/$1\n/g;
+    s/(<\/reactor>)/$1\n\n/g;
+
+    s/(<\/property>)/$1\n/g;
+
+    print "$_";
+}
+close(IN);
+
+
