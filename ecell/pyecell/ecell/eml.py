@@ -39,6 +39,8 @@ class Eml:
 
         self.__theDocument = minidom.parseString( aStringData )
 
+        self.__clearCache()
+
 
     def asString( self ):
         """return domtree as string"""
@@ -63,10 +65,9 @@ class Eml:
 
     def createStepper( self, aClass, anID ):
         """create a stepper"""
-        aStepperElement = self.createElement( 'stepper' )
+        aStepperElement = self.__createElement( 'stepper' )
         aStepperElement.setAttribute( 'class', aClass )
         aStepperElement.setAttribute( 'id', anID )
-
         
         self.__theDocument.documentElement.childNodes.append( aStepperElement )
 
@@ -77,7 +78,7 @@ class Eml:
         """delete a stepper"""
 
         for anElement in self.__theDocument.firstChild.childNodes:
-            if anElement.tagName == 'stepper' and \
+            if anElement.nodeName == 'stepper' and \
                    anElement.getAttribute( 'id' )    == anID:
 
                 anElement.removeChild( aChildElement )
@@ -108,7 +109,7 @@ class Eml:
 
         for aChildNode in aStepperNodeList.childNodes:
 
-            if aChildNode.tagName == 'property':
+            if aChildNode.nodeName == 'property':
 
                 aPropertyNode = aChildNode
                 aPropertyName = aPropertyNode.getAttribute( 'name' )
@@ -126,16 +127,16 @@ class Eml:
         aStepperNode = self.__getStepperNode( aStepperID )
         for aChildNode in aStepperNode.childNodes:
 
-            if aChildNode.tagName == 'property':
+            if aChildNode.nodeName == 'property':
 
                 if aChildNode.getAttribute( 'name' ) == aPropertyName:
 
                     aPropertyNode = aChildNode
 
                     for aChildNode in aPropertyNode.childNodes:
-                        if aChildNode.tagName == 'value':
+                        if aChildNode.nodeName == 'value':
 
-                            aValue = aChildNode.firstChild.toxml()
+                            aValue = str( aChildNode.firstChild.nodeValue )
                             aValueList.append( aValue )
     
         return aValueList
@@ -156,7 +157,7 @@ class Eml:
         aStepperNodeList = []
 
         for aTargetNode in self.__theDocument.documentElement.childNodes:
-            if aTargetNode.tagName == 'stepper':
+            if aTargetNode.nodeName == 'stepper':
                 aStepperNode = aTargetNode
                 aStepperNodeList.append( aStepperNode )
 
@@ -165,7 +166,7 @@ class Eml:
 
     def setStepperProperty( self, aStepperID, aPropertyName, aValue ):
 
-        aPropertyElement = self.createPropertyNode( aPropertyName, aValue )
+        aPropertyElement = self.__createPropertyNode( aPropertyName, aValue )
         aStepperNode = self.__getStepperNode( aStepperID )
 
         aStepperNode.appendChild( aPropertyElement )
@@ -193,7 +194,7 @@ class Eml:
     def createEntity( self, aClass, aFullID ):
 
         anEntityType = self.asEntityInfo( aFullID )[ 'Type' ]
-        anEntityElement = self.createElement( string.lower( anEntityType ) )
+        anEntityElement = self.__createElement( string.lower( anEntityType ) )
         anEntityElement.setAttribute( 'class', aClass )
 
         if( anEntityType == 'System' ):
@@ -210,21 +211,22 @@ class Eml:
             aTargetFullPath = aFullID.split( ':' )[1]
             for aTargetNode in self.__theDocument.documentElement.childNodes:
 
-                if aTargetNode.tagName == 'system':
+                if aTargetNode.nodeName == 'system':
                     aTargetSystem = aTargetNode
 
-                    aSystemFullPath = self.asSystemPath( aTargetSystem )
+                    aSystemFullPath = self.__asSystemPath( aTargetSystem )
                
                     if aTargetFullPath == aSystemFullPath:
                         aTargetSystem.appendChild( anEntityElement )
 
+        self.__addToCache( aFullID, anEntityElement )
 
 
 
     def deleteEntity( self, aFullID ):
         """delete an entity"""
 
-        aTargetEntity = self.asEntityInfo( aFullID )
+        aTargetEntity = asEntityInfo( aFullID )
 
         if aTargetEntity[ 'Type' ] == 'System':
             for anElement in self.__theDocument.firstChild.childNodes:
@@ -234,46 +236,27 @@ class Eml:
 
         else:
             for anElement in self.__theDocument.firstChild.childNodes:
-                if anElement.tagName == 'system':
-                    if self.asSystemPath( anElement ) == aTargetEntity[ 'Path' ]:
+                if anElement.nodeName == 'system':
+                    if self.__asSystemPath( anElement ) == aTargetEntity[ 'Path' ]:
 
                         for aChild in anElement.childNodes:
-                            if aChild.tagName == string.lower( aTargetEntity[ 'Type' ] ) and \
+                            if aChild.nodeName == string.lower( aTargetEntity[ 'Type' ] ) and \
                                aChild.getAttribute( 'id' ) == aTargetEntity[ 'ID' ]:
 
                                 anElement.removeChild( aChild )
-                        
+
+        self.__removeFromCache( aFullID )
 
 
     def isEntityExist( self, aFullID ):
 
-        aTargetEntity = self.asEntityInfo( aFullID )
 
-        anExistence = 0
-
-        aSystemList = self.__theDocument.getElementsByTagName( 'system' )
-        for aSystem in aSystemList:
-
-            ## for System
-            if aTargetEntity[ 'Type' ] == 'System':
-                aSystemPath = aSystem.getAttribute( 'id' ).split( ':' )[1]
-                if aSystemPath == aTargetEntity[ 'Path' ]:
-                    anExistence = 1
-
-            ## for Variable or Process
-            else:
-                aSystemPath = self.asSystemPath( aSystem )
-
-                if aSystemPath == aTargetEntity[ 'Path' ]:
-                    for anElement in aSystem.childNodes:
-
-                        if anElement.tagName == string.lower( aTargetEntity[ 'Type' ] ) and \
-                           anElement.getAttribute( 'id' ) == aTargetEntity[ 'ID' ]:
-
-                            anExistence = 1
-                            
-        return anExistence
-
+        try:
+            __getEntityNode( aFullID )
+        except:
+            return 0
+        else:
+            return 1
 
 
     def getEntityClass( self, aFullID ):
@@ -282,119 +265,34 @@ class Eml:
         return anEntityNode.getAttribute( 'class' )
         
         
-
-
-    ##---------------------------------------------
-    ## Methods for Property
-    ##---------------------------------------------
-
     def setEntityProperty( self, aFullID, aPropertyName, aValueList ):
 
-        anEntityID   = self.asEntityInfo( aFullID )[ 'ID' ]
-        anEntityType = self.asEntityInfo( aFullID )[ 'Type' ]
-        anEntityPath = self.asEntityInfo( aFullID )[ 'Path' ]
-
-        anEntityPropertyElement = self.createPropertyNode( aPropertyName, aValueList )
+        anEntityPropertyElement = self.__createPropertyNode( aPropertyName,\
+                                                             aValueList )
         
-        for aTargetNode in self.__theDocument.firstChild.childNodes:
-            if aTargetNode.tagName == 'system':
+        aTargetNode = self.__getEntityNode( aFullID )
+        aTargetNode.appendChild( anEntityPropertyElement )
 
-                aTargetSystem       = aTargetNode
-                aTargetSystemID     = aTargetSystem.getAttribute( 'id' )
-                aTargetSystemFullID = self.convertSystemID2SystemFullID( aTargetSystemID )
-
-
-                if anEntityType == 'System':
-
-                    aTargetSystem = aTargetNode
-                    aTargetSystemID     = aTargetSystem.getAttribute( 'id' )
-                    aTargetSystemFullID = self.convertSystemID2SystemFullID( aTargetSystemID )
-
-                    if aTargetSystemFullID == aFullID:
-                        aTargetSystem.appendChild( anEntityPropertyElement )
-
-
-                elif aTargetSystemID == anEntityPath:
-                    for aTargetChildNode in aTargetSystem.childNodes:
-
-                        if string.capwords( aTargetChildNode.tagName ) == anEntityType:
-
-                            if aTargetChildNode.getAttribute( 'id' ) == anEntityID:
-
-                                aTargetChildNode.appendChild( anEntityPropertyElement )
-                    
-
-                    
 
 
     def deleteEntityProperty( self, aFullID, aPropertyName ):
 
-        ## aPropertyElement = self.createPropertyNode( aName, aValueList )
+        aTargetNode = self.__getEntityNode( aFullID )
 
-        anEntityID   = self.asEntityInfo( aFullID )[ 'ID' ]
-        anEntityType = self.asEntityInfo( aFullID )[ 'Type' ]
-        anEntityPath = self.asEntityInfo( aFullID )[ 'Path' ]
+        for aChild in aTargetNode.childNodes:
+            if aChild.nodeName == 'property' and\
+                   aChild.getAttribute( 'name' ) == aPropertyName:
 
-        for aTargetNode in self.__theDocument.firstChild.childNodes:
-            if aTargetNode.tagName == 'system':
-
-                aTargetSystem       = aTargetNode
-                aTargetSystemID     = aTargetSystem.getAttribute( 'id' )
-                aTargetSystemFullID = self.convertSystemID2SystemFullID( aTargetSystemID )
-
-                if anEntityType == 'System':
-
-                    aTargetSystem = aTargetNode
-                    aTargetSystemID     = aTargetSystem.getAttribute( 'id' )
-                    aTargetSystemFullID = self.convertSystemID2SystemFullID( aTargetSystemID )
-
-                    if aTargetSystemFullID == aFullID:
-
-                        for aTargetChild in aTargetSystem.childNodes:
-                            if aTargetChild.tagName == 'property':
-
-                                aPropertyNode = aTargetChild
-                                if aPropertyNode.getAttribute( 'name' ) == aPropertyName:
-
-                                    aPropertyNodeToDelete = aPropertyNode
-
-                        aTargetSystem.removeChild( aPropertyNode )
-
-
-
-                elif aTargetSystemID == anEntityPath:
-
-                    for aTargetChildNode in aTargetSystem.childNodes:
-
-                        if string.capwords( aTargetChildNode.tagName ) == anEntityType:
-
-                            if aTargetChildNode.getAttribute( 'id' ) == anEntityID:
-
-                                aTargetEntityNode = aTargetChildNode
-                                for aTargetChild in aTargetEntityNode.childNodes:
-                                    
-                                    if aTargetChild.tagName == 'property':
-                                        
-                                        aPropertyNode = aTargetChild
-
-                                        if aPropertyNode.getAttribute( 'name' ) == aPropertyName:
-
-                                            aPropertyNodeToDelete = aPropertyNode
-                                aTargetEntityNode.removeChild( aPropertyNodeToDelete )
-                               
-                    
-
-
-
-
-    ##---------------------------------------------
-    ## Methods for Read
-    ##---------------------------------------------
+                aTargetSystem.removeChild( aPropertyNode )
 
 
     def getEntityList( self, anEntityType, aSystemPath ):
 
-        if anEntityType == 'System':
+        # better if this method creates entity cache on the fly?
+
+        aType = string.lower( anEntityType )
+
+        if aType == 'system':
 
             anEntityList = self.__getSystemList( aSystemPath )
 
@@ -409,14 +307,12 @@ class Eml:
                     
                     for aChildNode in aSystemNode.childNodes:
                         
-                        if string.capwords( aChildNode.tagName ) == anEntityType:
+                        if aChildNode.nodeName == aType:
                             
                             anEntityList.append( str( aChildNode.getAttribute( 'id' ) ) )
 
+
         return anEntityList
-
-
-
 
 
 
@@ -427,13 +323,11 @@ class Eml:
 
         for aChildNode in anEntityNode.childNodes:
 
-            if aChildNode.tagName == 'property':
+            if aChildNode.nodeName == 'property':
 
                 anEntityPropertyList.append( str( aChildNode.getAttribute( 'name' ) ) )
 
         return anEntityPropertyList
-
-
 
 
 
@@ -449,17 +343,45 @@ class Eml:
                 
 
 
+
+
+    ##-------------------------------------------
+    ## Cache manipulations
+    ##-------------------------------------------
+
+    def __findInCache( self, aFullID ):
+
+        return self.__entityNodeCache[ aFullID ]
+
+    def __addToCache( self, aFullID, aNode ):
+
+        self.__entityNodeCache[ aFullID ] = aNode
+
+    def __removeFromCache( self, aFullID ):
+
+        del self.__entityNodeCache[ aFullID ]
+
+    def __clearCache( self ):
+
+        self.__entityNodeCache = {}
+
+
+
+    ##-------------------------------------------
+    ## Utils
+    ##-------------------------------------------
+
     def __createValueList( self, aValueNode ):
 
         if aValueNode.firstChild.nodeType == minidom.Node.TEXT_NODE:
 
-            return str( aValueNode.firstChild.toxml() )
+            return str( aValueNode.firstChild.nodeValue )
 
         elif aValueNode.firstChild.nodeType == minidom.Node.ELEMENT_NODE:
 
             aValueList = []
             for aChildNode in aValueNode.childNodes:
-                if aChildNode.tagName == 'value':
+                if aChildNode.nodeName == 'value':
                     aValueList.append( self.__createValueList( aChildNode ) )
 
             return aValueList
@@ -494,6 +416,12 @@ class Eml:
 
     def __getEntityNode( self, aFullID ):
         
+        # first look up the cache
+        try:
+            return self.__findInCache( aFullID )
+        except:
+            pass
+
         aSystemNodeList = self.__theDocument.getElementsByTagName( 'system' )
         anEntityInfo = self.asEntityInfo( aFullID )
         
@@ -507,6 +435,7 @@ class Eml:
             for aSystemNode in aSystemNodeList:
                 
                 if aSystemNode.getAttribute( 'id' ) == aSystemPath:
+                    self.__addToCache( aFullID, aSystemNode )
                     return aSystemNode
 
         else:
@@ -516,9 +445,10 @@ class Eml:
 
                     for aChildNode in aSystemNode.childNodes:
                         
-                        if string.capwords( aChildNode.tagName ) == aType and\
+                        if string.capwords( aChildNode.nodeName ) == aType and\
                                aChildNode.getAttribute( 'id' ) == anID:
 
+                            self.__addToCache( aFullID, aChildNode )
                             return aChildNode
 
 
@@ -538,7 +468,7 @@ class Eml:
         # what if multiple propety elements with the same name exist?
         for aChildNode in anEntityNode.childNodes:
 
-            if aChildNode.tagName == 'property':
+            if aChildNode.nodeName == 'property':
 
                 aPropertyNode = aChildNode
                 if aPropertyNode.getAttribute( 'name' ) == aPropertyName:
@@ -550,172 +480,22 @@ class Eml:
 
 
 
-    def getPropertyList( self ):
-        """OLD METHOD"""
-
-        aSystemPropertyList  = self.getSystemPropertyList()
-        aVariableOrProcessPropertyList = self.getVariableOrProcessPropertyList()
-
-        aPropertyList = aSystemPropertyList + aVariableOrProcessPropertyList
-
-        return aPropertyList        
-
-
-
-
-
-
-
-
-
-        
-    # Method for Method
-    #------------------------------------------------------------------------------------
-    def getSystemPropertyList( self ):
-        aPropertyList = []
-        for aSystemElement in self.__theDocument.getElementsByTagName( 'system' ):
-
-            aSystemPath = self.asSystemPath( aSystemElement )
-
-            for aChildElement in aSystemElement.childNodes:
-
-                ## Property for System
-                if aChildElement.tagName == 'property':
-                    aPropertyElement = aChildElement
-                    aProperty = {}
-
-                    aPropertyName = aPropertyElement.getAttribute( 'name' )
-                    aProperty[ 'FullPn' ] = str( 'System:' + self.asPathToSystem( aSystemElement.getAttribute( 'id' ) ) + ':' + aPropertyName )
-
-                    aValueTextList = []
-                    for aValueCandidate in aPropertyElement.childNodes:
-                        if aValueCandidate.tagName == 'value':
-                            aValueText = str( aValueCandidate.firstChild.toxml() )
-                            aValueTextList.append( aValueText )
-
-                    aProperty[ 'ValueList' ] =  aValueTextList
-                    aPropertyList.append( aProperty )
-                    
-        return aPropertyList
-
-
-    def getVariableOrProcessPropertyList( self ):
-        aPropertyList = []
-        for aSystemElement in self.__theDocument.getElementsByTagName( 'system' ):
-
-            aSystemPath = self.asSystemPath( aSystemElement )
-            for aChildElement in aSystemElement.childNodes:
-                
-                ## Property for Variable or Process
-                if aChildElement.tagName == 'variable' or \
-                   aChildElement.tagName == 'process':
-
-                    anEntityType = string.capwords( aChildElement.tagName )
-                    aVariableElement = aChildElement
-
-
-                    for aPropertyElement in aVariableElement.childNodes:
-                        if aPropertyElement.tagName == 'property':
-
-                            aProperty = {}
-
-                            aPropertyName = aPropertyElement.getAttribute( 'name' )
-                            aProperty[ 'FullPn' ] = str( anEntityType + ':' + aSystemPath + ':' + \
-                                                         aChildElement.getAttribute( 'id' ) + ':' + \
-                                                         aPropertyName )
-
-                            aProperty[ 'ValueList' ] = []
-                            for aValueCandidate in aPropertyElement.childNodes:
-                                if aValueCandidate.tagName == 'value':
-                                    aValueText = str( aValueCandidate.firstChild.toxml() )
-                                    aProperty[ 'ValueList' ].append( aValueText )
-
-                            aPropertyList.append( aProperty )
-
-        return aPropertyList
-
-
-
-
-
-    def getSystemEntityList( self ):
-
-        aSystemEntityList = []
-        for aSystemElement in self.__theDocument.getElementsByTagName( 'system' ):
-            aSystem = {}
-
-            aSystem[ 'Type' ]   = str( aSystemElement.getAttribute( 'class' ) )
-            aSystem[ 'FullID' ] = str( 'System:' \
-                                       + self.asPathToSystem( aSystemElement.getAttribute( 'id' ) ) )
-            aSystem[ 'Name' ]   = str( aSystemElement.getAttribute( 'name' ) )
-            
-            if not aSystem[ 'FullID' ] == 'System::/':
-                aSystemEntityList.append( aSystem )
-
-        return aSystemEntityList
-
-
-
-    def getVariableOrProcessEntityList( self ):
-
-        anEntityEntityList = []
-        for aSystemElement in self.__theDocument.getElementsByTagName( 'system' ):
-
-            aSystemPath = self.asSystemPath( aSystemElement )
-
-            for aChildElement in aSystemElement.childNodes:
-
-                if aChildElement.tagName == 'variable' or \
-                   aChildElement.tagName == 'process':
-
-                    anEntity = {}                    
-                    anEntity[ 'Type' ] = str( aChildElement.getAttribute( 'class' ) )
-                    anEntity[ 'FullID' ] = str( string.capwords( aChildElement.tagName ) + ':' + \
-                                                aSystemPath + ':' + \
-                                                aChildElement.getAttribute( 'id' ) )
-                    anEntity[ 'Name' ]   = str( aChildElement.getAttribute( 'name' ) )
-                    
-                    anEntityEntityList.append( anEntity )    
-        return anEntityEntityList
-
-
-
-
-
-
-
-    def getPropertyElementsList( self ):
-        aPropertyList = self.getElementsByTagName( 'Property' )
-        return aPropertyList
-
-
-    def getElementsByTagName( self, aTagName ):
-        anElementsList = self.__theDocument.getElementsByTagName( aTagName )
-        return anElementsList
-
-
-
-
     ##---------------------------------------------
     ## Methods for Methods
     ##---------------------------------------------
 
-    def createElement( self, aTagName ):
+    def __createElement( self, aTagName ):
         """make an element"""
-        aNewElement = self.__theDocument.createElement( aTagName )
-        return aNewElement
+        return self.__theDocument.createElement( aTagName )
 
 
+    def __createPropertyNode( self, aPropertyName, aValueList ):
 
-
-    def createPropertyNode( self, aPropertyName, aValueList ):
-
-        aPropertyElement = self.createElement( 'property' )
+        aPropertyElement = self.__createElement( 'property' )
         aPropertyElement.setAttribute( 'name', aPropertyName )
 
-
         for aValue in aValueList:
-            aValueNode = self.createValueNode( aValue )
+            aValueNode = self.__createValueNode( aValue )
 
             if aValueNode:
                 aPropertyElement.appendChild( aValueNode )
@@ -723,24 +503,22 @@ class Eml:
         return aPropertyElement
     
 
-
-
-    def createValueNode( self, aValue ):
+    def __createValueNode( self, aValue ):
 
         if type( aValue ) is types.TupleType or \
                type( aValue ) is types.ListType:    # vector value
 
-            aValueNode = self.createElement( 'value' )
+            aValueNode = self.__createElement( 'value' )
 
             for anItem in aValue:
-                aChildValueData = self.createValueNode( anItem )
+                aChildValueData = self.__createValueNode( anItem )
                 aValueNode.appendChild( aChildValueData )
 
             return aValueNode
 
         else:        # scaler value
  
-            aValueNode = self.createElement( 'value' )
+            aValueNode = self.__createElement( 'value' )
             aValueData = self.__theDocument.createTextNode( aValue )
             aValueNode.appendChild( aValueData )
 
@@ -748,37 +526,14 @@ class Eml:
 
 
 
-    def appendValueElements( self, aMotherElement, aValueList ):
-
-        for aValue in aValueList:
-
-            anIsString = isinstance( aValueList, StringType )
-
-            if anIsString:
-                        
-                aValueElement = self.createElement( 'value' )
-                aValueData = self.__theDocument.createTextNode( aValue )
-                aValueElement.appendChild( aValueData )
-                aMotherElement.appendChild( aValueElement )
-
-            else:
-                pass
-                
-        return aMotherElement
-
-
-
-
-
     def asEntityInfo( self, aFullID ):
         aTargetEntity = {}
-        aTargetEntity[ 'Type' ] = aFullID.split( ':' )[0]
-        aTargetEntity[ 'Path' ] = aFullID.split( ':' )[1]
-        aTargetEntity[ 'ID' ]   = aFullID.split( ':' )[2]
+        aParsedFullID = aFullID.split( ':' )
+        aTargetEntity[ 'Type' ] = aParsedFullID[0]
+        aTargetEntity[ 'Path' ] = aParsedFullID[1]
+        aTargetEntity[ 'ID' ]   = aParsedFullID[2]
 
         return aTargetEntity
-
-
 
 
 
@@ -787,9 +542,10 @@ class Eml:
         aSystemFullID : ex) System:/CELL:CYTOPLASM
         return -> aSystemID [string] : ex) /CELL/CYTOPLASM
         """
+        aParsedSystemFullID = aSystemFullID.split( ':' )
 
-        aPathToSystem   = aSystemFullID.split( ':' )[1]
-        aSystemSimpleID = aSystemFullID.split( ':' )[2]
+        aPathToSystem   = aParsedSystemFullID[1]
+        aSystemSimpleID = aParsedSystemFullID[2]
 
         if( aSystemSimpleID == '/' ):
             aSystemID = '/'
@@ -812,27 +568,24 @@ class Eml:
         return -> aSystemFullID [string] : ex) System:/CELL:CYTOPLASM
         """
 
-        aSystemIDArray  = aSystemID.split( '/' )
-        aSystemSimpleID = aSystemIDArray[-1]
+        aParsedSystemID  = aSystemID.split( '/' )
+        aSystemSimpleID = aParsedSystemID[-1]
         
         if ( aSystemID == '/' ):
             aSystemFullID = 'System::/'
 
-        elif( len( aSystemIDArray ) == 2 ):
+        elif( len( aParsedSystemID ) == 2 ):
             aSystemFullID = 'System:/:' + aSystemSimpleID
 
         else:
-            del aSystemIDArray[-1]
-            aPathToSystem = string.join( aSystemIDArray, '/' )
+            del aParsedSystemID[-1]
+            aPathToSystem = string.join( aParsedSystemID, '/' )
             aSystemFullID = 'System:' + aPathToSystem + ':' + aSystemSimpleID
 
         return aSystemFullID
 
 
-
-
-
-    def asSystemPath( self, aTargetSystem ):
+    def __asSystemPath( self, aTargetSystem ):
         """convert fullid of system to fullpath
            ex.) System:/CELL:CYTOPLASM -> /CELL/CYTOPLASM
         """
@@ -841,27 +594,3 @@ class Eml:
         aSystemPath = aSystemID
         return aSystemPath
 
-
-
-
-
-    def asPathToSystem( self, aFullPathOfSystem ):
-
-
-        if( aFullPathOfSystem == '/' ):
-            aPathToTargetSystem = ':/'
-
-        else:
-            aFullPathInfo = aFullPathOfSystem.split( '/' )
-            aTargetSystemID = aFullPathInfo[-1]
-
-            del aFullPathInfo[-1]
-            aPathToTargetSystemInfo = aFullPathInfo
-
-            if( len( aPathToTargetSystemInfo ) == 1 ):
-                aPathToTargetSystem = '/:' + aTargetSystemID
-            else:
-                aPathToTargetSystem = str( string.join( aPathToTargetSystemInfo, '/' ) + ':' + aTargetSystemID )
-
-        return aPathToTargetSystem
-        
