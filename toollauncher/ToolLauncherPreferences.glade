@@ -13,7 +13,6 @@
   <property name="destroy_with_parent">True</property>
   <property name="default_width">480</property>
   <property name="default_height">100</property>
-  <property name="icon">toollauncher.ico</property>
 
   <child>
     <widget class="GtkVBox" id="vbox3">

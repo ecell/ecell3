@@ -34,7 +34,10 @@ class ToolLauncherOkCancel( ParentWindow ):
 			'on_cancel_button_clicked'              : self.onCancel ,
 		}
 		self.addHandlers( self.theHandlerMap )
-		self.__update( msg )
+                self.setIconList(
+			os.environ['TLPATH'] + os.sep + "toollauncher.png",
+			os.environ['TLPATH'] + os.sep + "toollauncher32.png")
+                self.__update( msg )
 	# end of openWindow
 
 

@@ -30,8 +30,12 @@ class ToolLauncherPreferences( ParentWindow ):
 		self.thePathSelectorDlg.ok_button.connect('clicked', self.updatePathSelection)
 		self.thePathSelectorDlg.cancel_button.connect('clicked', self.hidePathSelectorDlg)
 		self.thePathSelectorDlg.connect('delete_event', self.__deleteFileSelection)
-		iconPixbuf = gtk.gdk.pixbuf_new_from_file(os.environ['TLPATH'] + os.sep + "toollauncher.ico")
-		self.thePathSelectorDlg.set_icon(iconPixbuf)
+                aPixbuf16 = gtk.gdk.pixbuf_new_from_file(
+                           os.environ['TLPATH'] + os.sep + "toollauncher.png")
+                aPixbuf32 = gtk.gdk.pixbuf_new_from_file(
+                           os.environ['TLPATH'] + os.sep + "toollauncher32.png")
+                self.thePathSelectorDlg.set_icon_list(aPixbuf16, aPixbuf32)
+
 		self.defaultPref = Preferences( self.theToolLauncher )
 
 
@@ -50,7 +54,10 @@ class ToolLauncherPreferences( ParentWindow ):
 		}
 		self.addHandlers( self.theHandlerMap )
 		self.theOpenFlag = "1"
-		self.__update()
+                self.setIconList(
+			os.environ['TLPATH'] + os.sep + "toollauncher.png",
+			os.environ['TLPATH'] + os.sep + "toollauncher32.png")
+                self.__update()
 
 	def getOpenFlg( self ):
 		return self.theOpenFlag
@@ -107,9 +114,13 @@ class ToolLauncherPreferences( ParentWindow ):
 			self.thePathSelectorDlg = gtk.FileSelection( 'Select Path' )
 			self.thePathSelectorDlg.ok_button.connect('clicked', self.updatePathSelection)
 			self.thePathSelectorDlg.cancel_button.connect('clicked', self.hidePathSelectorDlg)
-			self.thePathSelectorDlg.connect('delete_event', self.__deleteFileSelection)
-			iconPixbuf = gtk.gdk.pixbuf_new_from_file(os.environ['TLPATH'] + os.sep + "toollauncher.ico")
-			self.thePathSelectorDlg.set_icon(iconPixbuf)
+			self.thePathSelectorDlg.connect('delete_event', self.__deleteFileSelection) 
+                        aPixbuf16 = gtk.gdk.pixbuf_new_from_file(
+                           os.environ['TLPATH'] + os.sep + "toollauncher.png")
+                        aPixbuf32 = gtk.gdk.pixbuf_new_from_file(
+                           os.environ['TLPATH'] + os.sep + "toollauncher32.png")
+                        self.thePathSelectorDlg.set_icon_list(
+                                        aPixbuf16, aPixbuf32)
 
 
 		if arg[0] == self['editor_path_button']:

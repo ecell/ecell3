@@ -51,8 +51,11 @@ class ToolLauncher(ParentWindow):
 		self.theFileSelectorDlg.cancel_button.connect('clicked', self.hideFileSelectorDlg)
 
 		self.theFileSelectorDlg.connect('delete_event', self.__deleteFileSelection)
-		iconPixbuf = gtk.gdk.pixbuf_new_from_file(os.environ['TLPATH'] + os.sep + "toollauncher.png")
-		self.theFileSelectorDlg.set_icon(iconPixbuf)
+                aPixbuf16 = gtk.gdk.pixbuf_new_from_file(
+                           os.environ['TLPATH'] + os.sep + "toollauncher.png")
+                aPixbuf32 = gtk.gdk.pixbuf_new_from_file(
+                           os.environ['TLPATH'] + os.sep + "toollauncher32.png")
+                self.theFileSelectorDlg.set_icon_list(aPixbuf16, aPixbuf32)
 
 		self.conversionDirection = 'em2eml'
 		self.theMessageBufferList=gtk.TextBuffer(None)
@@ -132,7 +135,9 @@ class ToolLauncher(ParentWindow):
 		# initializes AboutDialog reference
 		self.theAboutToolLauncher = None
 		self.openAboutToolLauncher = False 
-
+                self.setIconList(
+			os.environ['TLPATH'] + os.sep + "toollauncher.png",
+			os.environ['TLPATH'] + os.sep + "toollauncher32.png")
 		self.update()
 		self.isPrefOK()
 
@@ -416,9 +421,14 @@ class ToolLauncher(ParentWindow):
 			self.theFileSelectorDlg.cancel_button.connect('clicked', self.hideFileSelectorDlg)
 
 			self.theFileSelectorDlg.connect('delete_event', self.__deleteFileSelection)
-			iconPixbuf = gtk.gdk.pixbuf_new_from_file(os.environ['TLPATH'] + os.sep + "toollauncher.png")
-			self.theFileSelectorDlg.set_icon(iconPixbuf)
 
+                        aPixbuf16 = gtk.gdk.pixbuf_new_from_file(
+                           os.environ['TLPATH'] + os.sep + "toollauncher.png")
+                        aPixbuf32 = gtk.gdk.pixbuf_new_from_file(
+                           os.environ['TLPATH'] + os.sep + "toollauncher32.png")
+                        self.theFileSelectorDlg.set_icon_list(
+                                        aPixbuf16, aPixbuf32)
+                        
 
                 idealDir = os.path.join(
                         self.thePref['models_path'],

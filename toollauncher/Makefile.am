@@ -19,7 +19,7 @@ ToolLauncherPreferences.py\
 AboutToolLauncher.py\
 Window.py\
 toollauncher.png\
-toollauncher.ico\
+toollauncher32.png\
 toollauncher_large.png
 
 EXTRA_DIST=${toollauncher_PYTHON}

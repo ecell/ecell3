@@ -138,6 +138,21 @@ class Window:
 		"""
 		return self[ aKey ]
 
+
+	# ==============================================================
+        def setIconList( self, anIconFile16, anIconFile32 ):
+		"""sets the window icon according to icon size
+		anIconFile16 --- icon 16x16 filename 
+		anIconFile32 --- icon 32x32 filename 
+		"""
+                aPixbuf16 = gtk.gdk.pixbuf_new_from_file(anIconFile16)
+                aPixbuf32 = gtk.gdk.pixbuf_new_from_file(anIconFile32)
+
+		theWidget=self[ self.__class__.__name__ ]
+		if theWidget!=None:
+                        theWidget.set_icon_list( aPixbuf16, aPixbuf32 )
+
+
 	# ==============================================================
 	def editTitle( self, aTitle ):
 		"""edits and saves title

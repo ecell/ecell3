@@ -35,6 +35,10 @@ class ToolLauncherErrorMessage( ParentWindow ):
 			'on_ok_button_clicked'              : self.onOK ,
 		}
 		self.addHandlers( self.theHandlerMap )
+                self.setIconList(
+			os.environ['TLPATH'] + os.sep + "toollauncher.png",
+			os.environ['TLPATH'] + os.sep + "toollauncher32.png")
+
 		self.__update( msg )
 
 	def __update( self, msg):
