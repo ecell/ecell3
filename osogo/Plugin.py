@@ -57,6 +57,15 @@ class PluginManager:
     def printMessage( self, aMessageString ):
         self.theMainWindow.printMessage( aMessageString )
 
+    def printProperty( self, fullpn ):
+        self.theMainWindow.printProperty( fullpn )
+    
+    def printAllProperties( self, fullid ):
+        self.theMainWindow.printAllProperties( fullid )
+
+    def printList( self, primitivetype, systempath, list ):
+        self.theMainWindow.printList( primitive, systempath, list )
+
     def updateAllPluginWindow( self ):
         for anInstance in self.theInstanceList:
             anInstance.update()
