@@ -1,10 +1,10 @@
-%Id: README,v 1.0 2002/10/02 17:10 yoyo Exp %
+%Id: README,v 1.0 2002/10/16 21:03 yoyo Exp %
 
 
 
 == About ==
 
-This is a model of the budding yeast cell cycle
+This is a model of the budding yeast cell cycle,
 to be run on E-Cell Simulation Environment Version 3.
 This model is based on the model introduced in the following publication.
 
@@ -13,17 +13,13 @@ K.C.Chen, A.Csikasz-Nagy, B.Gyorffy, J.Val, B.Novak, J.J.Tyson,
 Molecular Biology of the Cell, Vol.11:369-391, Jan 2000.
 
 Presently, the simulation results of this model do not match those of 
-the above publication's model. We plan to debug this model in the near future,
-so the results do match.
-
-
+the above publication's model. It can be suggested that there is an
+intrinsic problem in the original model. We intend to further examine 
+and identify the source of the behavioral differences in the near future.
 
 == Files and directories ==
 
-README:		This file
-tyson.eml:	Model file(eml file) for this model
-
-dm/	--> Reactor files(dm files) for this model
-
-
-
+README:         This file
+tyson.em:       Model file(em file) for this model
+tyson.eml:      Model file(eml file) for this model
+*.dm:	        Process files(dm files) for this model
