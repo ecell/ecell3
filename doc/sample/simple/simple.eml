@@ -57,14 +57,14 @@
 </property>
 
 
-<substance class="SRMSubstance" id="S" name="substance S">
+<substance class="Substance" id="S" name="substance S">
 <property name="Quantity">
 <value number="0">1000000</value>
 </property>
 </substance>
 
 
-<substance class="SRMSubstance" id="P" name="substance P">
+<substance class="Substance" id="P" name="substance P">
 <property name="Quantity">
 <value number="0">0</value>
 </property>
@@ -72,7 +72,7 @@
 
 
 
-<substance class="SRMSubstance" id="E" name="substance E">
+<substance class="Substance" id="E" name="substance E">
 <property name="Quantity">
 <value number="0">1000</value>
 </property>
