@@ -1,7 +1,9 @@
 #!/usr/bin/env python2
 
 from ecell.spark import *
-import sys , os ,string , getopt , tempfile
+import sys
+import string 
+import getopt
 import ecell.eml
 
 class Token:
@@ -323,8 +325,37 @@ class Interpret(GenericASTTraversal):
 				aValueList.append( j )
 			self.eml.setStepperProperty( anID, aPropertyName,\
 						     aValueList )
-			
+
+	def n_system_stmt( self, node ):
+		aType = node[0].attr
+		aClassname = node[1][0].attr
+		anID = node[1][1].attr
+		anID = convert2FullID( self.eml , aType, anID)
+
+		self.eml.createEntity( aClassname, anID )
 		
+		aPropertyList = []
+		aPropertyNodeList = flatten_nodetree( node[2][0] )
+		for i in aPropertyNodeList:
+			if len(i[0]) != 0: 
+				aPropertyName = i[0][0].attr
+			else:
+				aPropertyName = i[0].attr
+				
+			if aPropertyName == 'Substance' or aPropertyName == 'Reactor':
+				self.n_system_stmt(i[0])
+				continue
+			if len(i[0]) != 0:
+				aValueNodeList = flatten_propertytree( i[0][1] )
+			else:
+				aValueNodeList = flatten_propertytree( i[1] )
+
+			aValueList = []
+			for j in aValueNodeList:
+				aValueList.append( j )
+			print aPropertyName, aValueList
+			self.eml.setEntityProperty( anID, aPropertyName,\
+						     aValueList )
 		
 	def default( self, node):
 		pass
