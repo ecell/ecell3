@@ -89,7 +89,9 @@ namespace libecs
 	}
       else // if theTime == rhs.theTime,
 	{  // then higher priority comes first 
-	  if( theStepperPtr->getPriority() > rhs.theStepperPtr->getPriority() )
+	  return false;
+	  /*
+	  if( theStepperPtr->getPriority() > rhs.getStepper()->getPriority() )
 	    {
 	      return true;
 	    }
@@ -97,6 +99,7 @@ namespace libecs
 	    {
 	      return false;
 	    }
+	  */
 	}
     }
 
