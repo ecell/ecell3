@@ -41,7 +41,9 @@ namespace libecs
    * @{ 
    */ 
   
-  class SystemMaker : public StaticModuleMaker<System>
+  class SystemMaker 
+    : 
+    public SharedModuleMaker<System>
   {
 
   protected:

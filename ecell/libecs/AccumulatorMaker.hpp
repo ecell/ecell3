@@ -43,7 +43,9 @@ namespace libecs
    * @{ 
    */ 
   
-  class AccumulatorMaker : public StaticModuleMaker< Accumulator >
+  class AccumulatorMaker 
+    : 
+    public SharedModuleMaker< Accumulator >
   {
 
   protected:

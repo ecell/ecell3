@@ -42,7 +42,9 @@ namespace libecs
    */ 
   
 
-  class StepperMaker : public StaticModuleMaker<Stepper>
+  class StepperMaker 
+    : 
+    public SharedModuleMaker<Stepper>
   {
 
   protected:

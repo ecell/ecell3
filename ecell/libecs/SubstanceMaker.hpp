@@ -41,7 +41,9 @@ namespace libecs
    * @{ 
    */ 
   
-  class SubstanceMaker : public StaticModuleMaker<Substance>
+  class SubstanceMaker 
+    : 
+    public SharedModuleMaker<Substance>
   {
 
   public:

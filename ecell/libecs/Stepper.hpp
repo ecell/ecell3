@@ -273,28 +273,22 @@ namespace libecs
       return getCurrentTime() < rhs.getCurrentTime();
     }
 
-    virtual StringLiteral getClassName() const  { return "Stepper"; }
-
-
-  protected:
-
 
     SystemVectorCref getSystemVector() const
     {
       return theSystemVector;
     }
 
-
     void setCurrentTime( RealCref aTime )
     {
       theCurrentTime = aTime;
     }
 
+    virtual StringLiteral getClassName() const  { return "Stepper"; }
+
+  protected:
+
     void calculateStepsPerSecond();
-
-
-    void searchSlaves( SystemPtr aStartSystemPtr );
-
 
   protected:
 

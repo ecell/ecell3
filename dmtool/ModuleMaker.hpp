@@ -140,8 +140,6 @@ template<class T,class DMAllocator=SimpleAllocator( T )>
 class SharedModuleMaker : public StaticModuleMaker<T,DMAllocator>
 {
 
-  typedef typename StaticModuleMaker<T,DMAllocator>::Module Module;
-
 public:
 
   typedef SharedDynamicModule<T> SharedModule;
@@ -161,13 +159,6 @@ protected:
 
   void loadModule( const string& classname );
 
-private:
-
-  // hide this
-  void addClass( Module* m )
-  {
-    StaticModuleMaker<T,DMAllocator>::addClass( m );
-  }
 
 };
 
