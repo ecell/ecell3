@@ -14,6 +14,7 @@ dnl
 AC_PROG_CC
 AC_OUTPUT(
 Makefile
+toollauncher
 misc/Makefile,
 chmod +x toollauncher
 )

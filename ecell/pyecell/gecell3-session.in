@@ -1,4 +1,4 @@
-#!/usr/bin/env ecell3-python
+#!/usr/bin/env @prefix@ecell3-python
 
 import sys
 import string
@@ -6,14 +6,15 @@ import getopt
 import os
 
 import ecell.emc
-import ecell.Session
+import ecell.GtkSessionMonitor
+import gtk
 
 #FIXME: commandline processing needed
 
 def usage():
     aProgramName = os.path.basename( sys.argv[0] )
     print '''
-%s -- invoke ecell3 python interactive mode or run ess file
+%s -- invoke ecell3 python intract mode or run ess file
 
 Usage:
 
@@ -33,7 +34,7 @@ Options:
        -DNAME=VALUE                       :  Set session parameter
        --parameters="[python dictionary]" :  Set session parameters
         
-       example: 
+       eaxmple: 
 
        ecell3-session -DNAME1=VALUE1 -DNAME2=VALUE2
        ecell3-session --parameters="{NAME1:VALUE1,NAME2:VALUE2}"
@@ -53,6 +54,17 @@ Configurations:
 
 '''% ( aProgramName, aProgramName, aProgramName, aProgramName, aProgramName )
 
+def startInteract( aTupple ):
+	aSession = aTupple[0]
+	aParameters = aTupple[1]
+        aSession.interact( aParameters )
+
+def loadScript( aTupple ):
+	aSession = aTupple[0]
+	aParameters = aTupple[1]
+	anEssFile = aTupple[2]
+        aSession.loadScript( anEssFile, aParameters )
+
 def main():
 
     # -------------------------------------
@@ -69,22 +81,18 @@ def main():
     # and set anESSfile 
     # -------------------------------------
 
-    for i in range(len(sys.argv)-1):
-        i = i + 1
-        if not (sys.argv[i])[0] == "-":
-	    if os.path.isfile( sys.argv[i] ):
-	        if (sys.argv[i-1]) != "-e" and (sys.argv[i-1]) != "-f" :
-		    anEssFile = sys.argv[i]
-	    else:
-	        print "File Name Error: "+ sys.argv[1] + " does not exist."
-                sys.exit(1)
-	
+    if len( sys.argv ) == 2:	
+        if not (sys.argv[1])[0] == "-":
+            if not os.path.isfile( sys.argv[1] ):
+                print "File Name Error: "+ sys.argv[1] + " is not Exist."
+                
+            anEssFile = sys.argv[1]
 
     # -------------------------------------
     # gets options
     # -------------------------------------
     try:
-	opts , args = getopt.getopt( sys.argv[1:] , 'he:f:D:',
+        opts , args = getopt.getopt( sys.argv[1:] , 'he:f:D:',
                                      ["parameters=","help", "exec=", "file="])
     except:
         usage()
@@ -154,15 +162,19 @@ def main():
                 
             
     aSimulator = ecell.emc.Simulator()
-    aSession = ecell.Session( aSimulator )
+    aSession = ecell.GtkSessionMonitor.GtkSessionMonitor( aSimulator )
 
     if anEmlFile:
         aSession.loadModel(anEmlFile)
 
     if anEssFile:
-        aSession.loadScript( anEssFile, aParameters )
+
+	gtk.timeout_add( 1, loadScript, [aSession, aParameters, anEssFile] )
+
     else:
-        aSession.interact( aParameters )
+	gtk.timeout_add( 1, startInteract, [aSession, aParameters] )
+    aSession.GUI_interact()
+
          
 if __name__ == '__main__':
 	main()

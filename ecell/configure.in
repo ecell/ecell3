@@ -271,16 +271,21 @@ AC_CHECK_FUNCS(mkdir select strdup strerror strtod uname modf modfl)
 AC_CHECK_FUNCS(strdup strstr)
 
 AC_CONFIG_FILES([pyecs/ecell3-python], [chmod +x pyecs/ecell3-python])
-AC_CONFIG_FILES([Makefile
-		 libecs/Makefile
-		 libemc/Makefile
-		 pyecs/Makefile
-		 pyecs/windows/Makefile
-		 pyecs/windows/ecell3-installer.iss
-		 pyecs/windows/pathVariables
-		 pyecell/Makefile
-		 pyecell/ecell/Makefile
-		 pyecell/ecell/SessionManager/Makefile
-		 dm/Makefile])
-AC_OUTPUT
+AC_OUTPUT([Makefile
+           libecs/Makefile
+           libemc/Makefile
+           pyecs/Makefile
+           pyecs/windows/Makefile
+           pyecs/windows/ecell3-installer.iss
+           pyecs/windows/pathVariables
+           pyecell/Makefile
+           pyecell/ecell3-eml2sbml
+           pyecell/ecell3-sbml2eml
+           pyecell/ecell3-session
+           pyecell/ecell3-session-manager
+           pyecell/gecell3-session
+           pyecell/ecell/Makefile
+           pyecell/ecell/SessionManager/Makefile
+           dm/Makefile,
+           chmod -x ecell3-eml2sbml ecell3-sbml2eml ecell3-session ecell3-session-manager gecell3-session])
 
