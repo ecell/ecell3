@@ -40,7 +40,9 @@
 namespace libecs
 {
 
-  const String Substance::SYSTEM_DEFAULT_ACCUMULATOR_NAME = "ReserveAccumulator";
+  //  const String Substance::SYSTEM_DEFAULT_ACCUMULATOR_NAME = "ReserveAccumulator";
+
+  const String Substance::SYSTEM_DEFAULT_ACCUMULATOR_NAME = "SimpleAccumulator";
 
   String Substance::USER_DEFAULT_ACCUMULATOR_NAME 
   = Substance::SYSTEM_DEFAULT_ACCUMULATOR_NAME;
@@ -152,7 +154,8 @@ namespace libecs
       }
 
     theAccumulator->update();
-    updateConcentration();
+    
+    //    updateConcentration(); -- accumulator does this
   }
 
   const Real Substance::saveQuantity()
@@ -188,11 +191,12 @@ namespace libecs
       }
   }
 
-  void Substance::updateConcentration()
-  {
-    theConcentration = 
-      getSuperSystem()->calculateConcentration( theQuantity );
-  }
+  //FIXME: inline this
+  //  void Substance::updateConcentration()
+  //  {
+  //    theConcentration = 
+  //      getSuperSystem()->calculateConcentration( theQuantity );
+  //  }
 
 
 } // namespace libecs

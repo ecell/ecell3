@@ -29,6 +29,7 @@
 //
 
 #include <functional>
+#include <algorithm>
 
 #include "Substance.hpp"
 #include "Integrators.hpp"
@@ -81,9 +82,19 @@ namespace libecs
     theSystemVector.erase( i );
   }
 
-  void Stepper::registerPropertySlot( PropertySlotPtr propertyslot )
+  void Stepper::registerPropertySlotWithProxy( PropertySlotPtr aSlotPtr )
   {
-    thePropertySlotVector.push_back( propertyslot );
+    if( std::find( thePropertySlotWithProxyVector.begin(),
+		   thePropertySlotWithProxyVector.end(), aSlotPtr ) == 
+	thePropertySlotWithProxyVector.end() )
+      {
+	thePropertySlotWithProxyVector.push_back( aSlotPtr );
+      }
+  }
+
+  void Stepper::registerLoggedPropertySlot( PropertySlotPtr aPropertySlotPtr )
+  {
+    theLoggedPropertySlotVector.push_back( aPropertySlotPtr );
   }
 
   void Stepper::setStepInterval( RealCref aStepInterval )
@@ -94,17 +105,20 @@ namespace libecs
 
   void Stepper::calculateStepsPerSecond() 
   {
-    theStepsPerSecond = 1 / getStepInterval();
+    theStepsPerSecond = 1.0 / getStepInterval();
   }
 
   void Stepper::sync()
   {
-    FOR_ALL( PropertySlotVector, thePropertySlotVector, sync );
+    FOR_ALL( PropertySlotVector, thePropertySlotWithProxyVector, sync );
   }
 
   void Stepper::push()
   {
-    FOR_ALL( PropertySlotVector, thePropertySlotVector, push );
+    FOR_ALL( PropertySlotVector, thePropertySlotWithProxyVector, push );
+
+    // update loggers
+    FOR_ALL( PropertySlotVector, theLoggedPropertySlotVector, updateLogger );
   }
 
 

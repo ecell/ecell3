@@ -130,6 +130,19 @@ public:\
   DEFINE_EXCEPTION( BadSystemPath,         BadID);
   DEFINE_EXCEPTION( InvalidPrimitiveType,  BadID);
 
+
+/**
+   This macro throws UnexpectedError exception with a method name.
+
+   Use this macro to indicate where must not be reached.
+*/
+
+#define NEVER_GET_HERE\
+      THROW_EXCEPTION( UnexpectedError, \
+		       "never get here (" + String( __PRETTY_FUNCTION__ )\
+		       + ")." )
+
+
   /** @} */ //end of libecs_module 
 
 } // namespace libecs

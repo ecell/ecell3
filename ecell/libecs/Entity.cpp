@@ -100,18 +100,18 @@ namespace libecs
   PropertySlotPtr Entity::getPropertySlot( StringCref aPropertyName,
 					   EntityCptr aRequester )
   {
-    PropertySlotPtr aPropertySlotPtr( NULL );
+    PropertySlotPtr 
+      aPropertySlotPtr( PropertyInterface::getPropertySlot( aPropertyName ) );
+
+    StepperPtr aStepper( getStepper() );
 
     //FIXME: Stepper::operator== not defined
-    if( aRequester->getStepper() == getStepper() )
-      {
-	aPropertySlotPtr = PropertyInterface::getPropertySlot( aPropertyName );
-      }
-    else
+    if( aRequester->getStepper() != aStepper )
       {
 	// create ProxyPropertySlot
-	//FIXME: not implemented
-	aPropertySlotPtr = PropertyInterface::getPropertySlot( aPropertyName );
+	ProxyPropertySlotPtr aProxyPtr( aPropertySlotPtr->createProxy() );
+	aStepper->registerPropertySlotWithProxy( aPropertySlotPtr );
+	aPropertySlotPtr = aProxyPtr;
       }
 
     return aPropertySlotPtr;

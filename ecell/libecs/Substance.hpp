@@ -34,6 +34,7 @@
 #include "PrimitiveType.hpp"
 #include "Integrators.hpp"
 #include "Entity.hpp"
+#include "System.hpp"
 
 
 namespace libecs
@@ -127,8 +128,11 @@ namespace libecs
       return theConcentration;
     }
 
-    void updateConcentration();
-
+    void updateConcentration()
+    {
+      theConcentration = 
+	getSuperSystem()->calculateConcentration( theQuantity );
+    }
 
     /**
        Initializes this substance. 

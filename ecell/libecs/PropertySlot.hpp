@@ -31,11 +31,13 @@
 #ifndef __PROPERTYSLOT_HPP
 #define __PROPERTYSLOT_HPP
 
+#include <iostream>
+#include <signal.h>
+
 #include "libecs.hpp"
 #include "Util.hpp"
 
 #include "UVariable.hpp"
-
 
 namespace libecs
 {
@@ -149,10 +151,7 @@ namespace libecs
   }
 
 
-#if 1
-  DECLARE_CLASS(PropertySlotProxy);
-  DECLARE_VECTOR(PropertySlotProxyPtr, PropertySlotProxyVector);
-#endif //0
+  DECLARE_VECTOR( ProxyPropertySlotPtr, ProxyPropertySlotVector );
 
   /**
      Base class for PropertySlot classes.
@@ -161,13 +160,11 @@ namespace libecs
      @see Message
   */
 
-  //  class PropertySlotBase
   class PropertySlot
   {
 
   public:
 
-    //    PropertySlotBase( StringCref aName )
     PropertySlot( StringCref aName )
       :
       theName( aName ),
@@ -195,22 +192,11 @@ namespace libecs
     virtual const bool isSetable() const = 0;
     virtual const bool isGetable() const = 0;
 
+
     virtual void sync() = 0;
+    virtual void push() = 0;
 
-
-    virtual void push()
-    {
-      if( isLogged() )
-	{
-	  updateLogger();
-	}
-      //      updateProxies();
-    }
-
-
-    //    virtual PropertySlotProxyPtr createProxy( void );
-
-    
+    virtual ProxyPropertySlotPtr createProxy() = 0;
 
     StringCref getName() const
     {
@@ -220,6 +206,12 @@ namespace libecs
     const bool isLogged()
     {
       return theLogger != NULLPTR;
+    }
+
+    // this method is here so that ProxyPropertySlot can call this.
+    virtual void disconnectProxy( ProxyPropertySlotPtr aProxyPtr ) 
+    {
+      NEVER_GET_HERE;
     }
 
     void connectLogger( LoggerPtr logger );
@@ -234,60 +226,253 @@ namespace libecs
     void updateLogger();
 
 
+    template < typename TYPE >
+    inline void set( TYPE aValue )
+    {
+      DefaultSpecializationInhibited();
+    }
+
+    template < typename TYPE >
+    inline TYPE get()
+    {
+      DefaultSpecializationInhibited();
+    }
+
   protected:
 
     String                   theName;
     LoggerPtr                theLogger;
-    PropertySlotProxyVector  theProxyVector;
 
   };
 
 
-
-
-  class FixPolicy
+  template <>
+  inline void PropertySlot::set( UVariableVectorRCPtrCref aValue )
   {
+    setUVariableVectorRCPtr( aValue );
+  }
 
-
-  };
-
-
-  class CanBeFixed
+  template <>
+  inline void PropertySlot::set( RealCref aValue )
   {
+    setReal( aValue );
+  }
 
-
-  };
-
-  class CannotBeFixed
+  template <>
+  inline void PropertySlot::set( StringCref aValue )
   {
+    setString( aValue );
+  }
+
+  template <>
+  inline const UVariableVectorRCPtr PropertySlot::get()
+  {
+    getUVariableVectorRCPtr();
+  }
+
+  template <>
+  inline const String PropertySlot::get()
+  {
+    getString();
+  }
+
+  template <>
+  inline const Real PropertySlot::get()
+  {
+    getReal();
+  }
 
 
+  class ProxyPropertySlot
+    :
+    public PropertySlot
+  {
+    
+  public:
+      
+    ProxyPropertySlot( PropertySlotRef aPropertySlot )
+      :
+      PropertySlot( aPropertySlot.getName() ),
+      thePropertySlot( aPropertySlot ),
+      theIsSet( false )
+    {
+      std::cerr << aPropertySlot.getName() << std::endl;
+    }
+
+    virtual ~ProxyPropertySlot()
+    {
+      thePropertySlot.disconnectProxy( this );
+    }
+
+
+    virtual const bool isSetable() const
+    {
+      return thePropertySlot.isSetable();
+    }
+    virtual const bool isGetable() const
+    {
+      return thePropertySlot.isGetable();
+    }
+
+    virtual ProxyPropertySlotPtr createProxy()
+    {
+      assert( 0 );
+    }
+
+    bool isSet() const
+    {
+      return theIsSet;
+    }
+
+    void setIsSet()
+    {
+      theIsSet = false;
+    }
+
+    void clearIsSet()
+    {
+      theIsSet = false;
+    }
+
+    bool operator==( ProxyPropertySlotCref rhs ) const
+    {
+      if( &(rhs.thePropertySlot) == &(this->thePropertySlot) )
+	{
+	  return true;
+	}
+      return false;
+    }
+
+
+  private:
+      
+    ProxyPropertySlot( void );
+    ProxyPropertySlot( ProxyPropertySlotRef  );
+    ProxyPropertySlot( ProxyPropertySlotCref );
+    void operator=( ProxyPropertySlotCref );
+      
+  protected:
+
+    PropertySlotRef   thePropertySlot;
+    bool     theIsSet;
+    
   };
 
 
 
-  /**
-
-  Determines when and how the property value is updated.
-  
-  Following three methods must be defined in subclass.
-  
-  GetType get() const
-  void set( SetType aValue )
-  void sync()
-  
-  */
-
-  template 
+  template
   < 
     class T,
-    typename SlotType_ 
-    >
-  class UpdatePolicy
+    typename SlotType_
+  >
+  class ConcreteProxyPropertySlot
+    :
+    public ProxyPropertySlot
   {
 
   public:
 
+    DECLARE_TYPE( SlotType_, SlotType );
+
+    ConcreteProxyPropertySlot( PropertySlotRef aPropertySlot )
+      :
+      ProxyPropertySlot( aPropertySlot ),
+      // FIXME: should be something like null_value<SlotType>
+      theOriginalValue( 0 ),
+      theCachedValue( 0 )
+    {
+      ; // do nothing
+    }
+
+    virtual ~ConcreteProxyPropertySlot()
+    {
+      ; // do nothing
+    }
+
+
+
+    virtual void setUVariableVectorRCPtr( UVariableVectorRCPtrCref aValue )
+    {
+      setImpl( aValue );
+    }
+
+    virtual const UVariableVectorRCPtr getUVariableVectorRCPtr() const
+    {
+      return getImpl< const UVariableVectorRCPtr >();
+    }
+
+    virtual void setReal( RealCref aValue )
+    {
+      setImpl( aValue );
+    }
+
+    virtual const Real getReal() const
+    {
+      return getImpl< const Real >();
+    }
+
+    virtual void setString( StringCref aValue )
+    {
+      setImpl( aValue );
+    }
+
+    virtual const String getString() const
+    {
+      return getImpl< const String >();
+    }
+
+    virtual void sync()
+    {
+      NEVER_GET_HERE;
+    }
+
+    virtual void push() 
+    {
+      NEVER_GET_HERE;
+    }
+
+
+    void setOriginalValue( const SlotType& aValue )
+    {
+      theOriginalValue = aValue;
+    }
+
+
+  protected:
+
+    template < typename TYPE >
+    inline void setImpl( TYPE aValue )
+    {
+      setIsSet();
+      theCachedValue = convertTo( aValue, Type2Type<const SlotType>() );
+    }
+
+    template < typename TYPE >
+    inline TYPE getImpl() const
+    {
+      return convertTo( theOriginalValue, Type2Type<TYPE>() );
+    }
+
+  private:
+
+    SlotType theOriginalValue;
+    SlotType theCachedValue;
+
+  };
+
+
+
+  template
+  < 
+    class T,
+    typename SlotType_
+  >
+  class ConcretePropertySlot
+    :
+    public PropertySlot
+  {
+
+  public:
 
     DECLARE_TYPE( SlotType_, SlotType );
 
@@ -296,241 +481,68 @@ namespace libecs
     typedef SlotTypeCref, SetType;
 
     typedef GetType ( T::* GetMethodPtr )() const;
-    typedef void ( T::* SetMethodPtr )( SlotTypeCref );
+    typedef void    ( T::* SetMethodPtr )( SlotTypeCref );
 
-    typedef GetType ( UpdatePolicy::* CallGetMethodPtr )() const;
-    typedef void ( UpdatePolicy::* CallSetMethodPtr )( SetType );
+    typedef GetType ( ConcretePropertySlot::* CallGetMethodPtr )() const;
+    typedef void    ( ConcretePropertySlot::* CallSetMethodPtr )( SetType );
 
-    UpdatePolicy( T& anObject,
-		  const SetMethodPtr aSetMethodPtr,
-		  const GetMethodPtr aGetMethodPtr )
-      :
-      theObject( anObject ),
-      theSetMethodPtr( aSetMethodPtr ),
-      theGetMethodPtr( aGetMethodPtr ),
-      theCallSetMethodPtr( &UpdatePolicy::callNullSetMethod ),
-      theCallGetMethodPtr( &UpdatePolicy::callNullGetMethod )
-    {
-      if( isSetable() )
-	{
-	  theCallSetMethodPtr = &UpdatePolicy::callSetMethodPtr;
-	}
+    typedef ConcreteProxyPropertySlot<T,SlotType> ProxySlot_;
+    DECLARE_TYPE( ProxySlot_, ProxySlot );
 
-      if( isGetable() )
-	{
-	  theCallGetMethodPtr = &UpdatePolicy::callGetMethodPtr;
-	}
-    }
-
-    ~UpdatePolicy()
-    {
-      ; // do nothing
-    }
-
-    const bool isSetable() const
-    {
-      return theSetMethodPtr != NULLPTR;
-    }
-
-    const bool isGetable() const
-    {
-      return theGetMethodPtr != NULLPTR;
-    }
-
-
-  protected:
-
-    void callSetMethod( SetType aValue )
-    {
-      ( this->*theCallSetMethodPtr )( aValue );
-    }
-
-    GetType callGetMethod() const
-    {
-      return ( this->*theCallGetMethodPtr )();
-    }
-
-
-  private:
-
-    void callSetMethodPtr( SetType aValue )    
-    {
-      ( theObject.*theSetMethodPtr )( aValue );
-    }
-
-    GetType callGetMethodPtr() const
-    {
-      return ( ( theObject.*theGetMethodPtr )() );
-    }
-
-    void callNullSetMethod( SetType )    
-    {
-      THROW_EXCEPTION( AttributeError, "Not setable." );
-    }
-
-    GetType callNullGetMethod() const
-    {
-      THROW_EXCEPTION( AttributeError, "Not getable." );
-    }
-
-  private:
-
-    T& theObject;
-    const SetMethodPtr theSetMethodPtr;
-    const GetMethodPtr theGetMethodPtr;
-
-    CallSetMethodPtr theCallSetMethodPtr;
-    CallGetMethodPtr theCallGetMethodPtr;
-
-  };
-
-
-
-  template
-  < 
-    class T,
-    typename SlotType_ 
-    >
-  class UpdateImmediately
-    : 
-    public UpdatePolicy< T, SlotType_ >
-  {
-
-  public:
-
-    typedef typename UpdatePolicy< T, SlotType_ >::SetType SetType;
-    typedef typename UpdatePolicy< T, SlotType_ >::GetType GetType;
-    typedef typename UpdatePolicy< T, SlotType_ >::SetMethodPtr SetMethodPtr;
-    typedef typename UpdatePolicy< T, SlotType_ >::GetMethodPtr GetMethodPtr;
-
-
-    UpdateImmediately( T& anObject,
-		       const SetMethodPtr aSetMethodPtr,
-		       const GetMethodPtr aGetMethodPtr )
-      : 
-      UpdatePolicy< T, SlotType_ >( anObject, 
-				    aSetMethodPtr,
-				    aGetMethodPtr )
-    {
-      ; // do nothing
-    }
-
-    ~UpdateImmediately()
-    {
-      ; // do nothing
-    }
-
-    void set( SetType aValue )
-    {
-      callSetMethod( aValue );
-    }
-
-    GetType get() const
-    {
-      return callGetMethod();
-    }
-
-    void sync()
-    {
-      ; // do nothing
-    }
-
-  };
-
-  template
-  < 
-    class T,
-    typename SlotType_ 
-    >
-  class UpdateAtSync
-    : 
-    public UpdatePolicy< T, SlotType_ >
-  {
-
-  public:
-
-    typedef typename UpdatePolicy< T, SlotType_ >::SetType SetType;
-    typedef typename UpdatePolicy< T, SlotType_ >::GetType GetType;
-    typedef typename UpdatePolicy< T, SlotType_ >::SetMethodPtr SetMethodPtr;
-    typedef typename UpdatePolicy< T, SlotType_ >::GetMethodPtr GetMethodPtr;
-
-
-    UpdateAtSync( T& anObject,
-		  const SetMethodPtr aSetMethodPtr,
-		  const GetMethodPtr aGetMethodPtr )
-      : 
-      UpdatePolicy< T, SlotType_ >( anObject, 
-					aSetMethodPtr,
- 					aGetMethodPtr )
-    {
-      ; // do nothing
-    }
-
-    ~UpdateAtSync()
-    {
-      ; // do nothing
-    }
-
-    void set( SetType aValue )
-    {
-      theValue = aValue;
-    }
-
-    GetType get() const
-    {
-      return callGetMethod();
-    }
-
-    void sync()
-    {
-      return callSetMethod( theValue );
-    }
-
-  private:
-
-    SetType theValue;
-
-  };
-
-
-  template
-  < 
-    class T,
-    typename SlotType_,
-    template < class U, typename V > class UpdatePolicy_ = UpdateImmediately
-  >
-  class ConcretePropertySlot
-    :
-    //    public PropertySlotBase,
-    public PropertySlot,
-    public UpdatePolicy_< T, SlotType_ >
-  {
-
-  public:
-
-    typedef UpdatePolicy_< T, SlotType_ > UpdatePolicy;
-
-    DECLARE_TYPE( SlotType_, SlotType );
-    typedef typename UpdatePolicy::SetType SetType;
-    typedef typename UpdatePolicy::GetType GetType;
-    typedef typename UpdatePolicy::SetMethodPtr SetMethodPtr;
-    typedef typename UpdatePolicy::GetMethodPtr GetMethodPtr;
+    typedef std::vector<ProxySlotPtr> ProxyVector;
+    typedef typename ProxyVector::iterator ProxyVectorIterator;
+    typedef typename ProxyVector::const_iterator ProxyVectorConstIterator;
 
 
     ConcretePropertySlot( StringCref aName, T& anObject, 
 			  const SetMethodPtr aSetMethodPtr,
 			  const GetMethodPtr aGetMethodPtr )
       :
-      //      PropertySlotBase( aName ),
       PropertySlot( aName ),
-      UpdatePolicy( anObject, aSetMethodPtr, aGetMethodPtr )
+      theObject( anObject ),
+      theSetMethodPtr( aSetMethodPtr ),
+      theGetMethodPtr( aGetMethodPtr ),
+      theCallSetMethodPtr( &ConcretePropertySlot::callNullSetMethod ),
+      theCallGetMethodPtr( &ConcretePropertySlot::callNullGetMethod )
     {
-      ; // do nothing
+      // set theCallSetMethod Ptr and theCallGetMethodPtr.
+      // if method pointers given in the constructor parameters are
+      // null, these are not set, leaving them point to callNull[SG]etMethod.
+
+      if( isSetable() )
+	{
+	  theCallSetMethodPtr = &ConcretePropertySlot::callSetMethodPtr;
+	}
+
+      if( isGetable() )
+	{
+	  theCallGetMethodPtr = &ConcretePropertySlot::callGetMethodPtr;
+	}
     }
 
     virtual ~ConcretePropertySlot()
     {
       ; // do nothing
+    }
+
+    virtual void connectProxy( ProxySlotPtr aProxyPtr )
+    {
+      theProxyVector.push_back( aProxyPtr );
+    }
+
+    // this takes ProxyPropertySlotPtr.  
+    // In this way ~ProxyPropertySlot can call PropertySlot's disconnectProxy.
+    virtual void disconnectProxy( ProxyPropertySlotPtr aProxyPtr )
+    {
+      std::remove( theProxyVector.begin(),
+		   theProxyVector.end(),
+		   aProxyPtr );
+
+      //      if( theProxyVector.empty() )
+      //	{
+      //            **should remove itself from Stepper's slot vector**
+      //	}
+
     }
 
     virtual void setUVariableVectorRCPtr( UVariableVectorRCPtrCref aValue )
@@ -565,93 +577,115 @@ namespace libecs
 
     virtual void sync()
     {
-      UpdatePolicy::sync();
+      for( ProxyVectorConstIterator i( theProxyVector.begin() ); 
+	   i != theProxyVector.end(); ++i )
+	{
+	  ProxySlotPtr aProxySlotPtr( *i );
+	  
+	  // get the value only if the proxy has a value set.
+	  if( aProxySlotPtr->isSet() )
+	    {
+	      PropertySlot::set<SlotTypeCref>( aProxySlotPtr->PropertySlot::
+					       get<const SlotType>() );
+	      aProxySlotPtr->clearIsSet();
+	    }
+	}
+    }
+
+    virtual void push()
+    {
+      for( ProxyVectorConstIterator i( theProxyVector.begin() ); 
+	   i != theProxyVector.end(); ++i )
+	{
+	  ProxySlotPtr aProxySlotPtr( *i );
+
+	  aProxySlotPtr->setOriginalValue( getImpl<GetType>() );
+	}
     }
 
     virtual const bool isSetable() const
     {
-      return UpdatePolicy::isSetable();
+      return theSetMethodPtr != NULLPTR;
     }
 
     virtual const bool isGetable() const
     {
-      return UpdatePolicy::isGetable();
+      return theGetMethodPtr != NULLPTR;
+    }
+
+
+    virtual ProxyPropertySlotPtr createProxy()
+    {
+      ProxySlotPtr aProxySlotPtr( new ProxySlot( *this ) );
+    
+      connectProxy( aProxySlotPtr );
+
+      return aProxySlotPtr;
     }
       
 
+
   protected:
+
+    void callSetMethod( SetType aValue )
+    {
+      ( this->*theCallSetMethodPtr )( aValue );
+    }
+
+    GetType callGetMethod() const
+    {
+      return ( this->*theCallGetMethodPtr )();
+    }
+
 
     template < typename TYPE >
     inline void setImpl( TYPE aValue )
     {
-      UpdatePolicy::set( convertTo( aValue, Type2Type< SetType >() ) );
-      //      UpdatePolicy::set( convertTo< TYPE, SetType >( aValue ) );
+      callSetMethod( convertTo( aValue, Type2Type< SetType >() ) );
     }
 
     template < typename TYPE >
     inline TYPE getImpl() const
     {
-      return convertTo( UpdatePolicy::get(), Type2Type< TYPE >() );
+      return convertTo( callGetMethod(), Type2Type< TYPE >() );
     }
 
-
-  };
-
-
-
-
-#if 0 
-  class PropertySlotProxy
-  {
-    
-  public:
-      
-    PropertySlotProxy( PropertySlotBasePtr aPropertySlot )
-      :
-      thePropertySlot( aPropertySlot )
-    {
-      ; // do nothing
-    }
-
-    // copy constructor
-    
-    PropertySlotProxy( PropertySlotProxyRef rhs )
-      :
-      thePropertySlot( rhs.thePropertySlot )
-    {
-      ;
-    }
-
-    // copy constructor 
-
-    PropertySlotProxy( PropertySlotProxyCref rhs )
-      :
-      thePropertySlot( rhs.thePropertySlot )
-    {
-      ;
-    }
-
-    bool operator!=( PropertySlotProxyCref rhs ) const
-    {
-      if( rhs.thePropertySlot != this->thePropertySlot )
-	{
-	  return true;
-	}
-      return false;
-    }
-
-      
   private:
-      
-    PropertySlotProxy( void );
-      
-  private:    
 
-    PropertySlotPtr   thePropertySlot;
-    
-    
+    void callSetMethodPtr( SetType aValue )    
+    {
+      ( theObject.*theSetMethodPtr )( aValue );
+    }
+
+    GetType callGetMethodPtr() const
+    {
+      return ( ( theObject.*theGetMethodPtr )() );
+    }
+
+    void callNullSetMethod( SetType )    
+    {
+      THROW_EXCEPTION( AttributeError, "Not setable." );
+    }
+
+    GetType callNullGetMethod() const
+    {
+      THROW_EXCEPTION( AttributeError, "Not getable." );
+    }
+
+
+  private:
+
+    T& theObject;
+    const SetMethodPtr theSetMethodPtr;
+    const GetMethodPtr theGetMethodPtr;
+
+    CallSetMethodPtr theCallSetMethodPtr;
+    CallGetMethodPtr theCallGetMethodPtr;
+
+    ProxyVector        theProxyVector;
+
   };
-#endif // 0
+
 
   /** @} */ //end of libecs_module 
 

@@ -45,9 +45,12 @@
  *::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
  *	$Id$
  :	$Log$
+ :	Revision 1.2  2002/06/23 14:45:10  shafi
+ :	added ProxyPropertySlot. deprecated UpdatePolicy for ConcretePropertySlot. added NEVER_GET_HERE macro.
+ :
  :	Revision 1.1  2002/04/30 11:21:53  shafi
  :	gabor's vvector logger patch + modifications by shafi
- :
+ :	
  :	Revision 1.9  2002/01/08 10:23:02  ishikawa
  :	Functions for reactor path are defined but do not work in this version
  :	
@@ -184,7 +187,8 @@ int	osif_is_dir(const char *__name)
 #else
 	struct stat statbuf;
 	if (stat(__name, &statbuf) ==0
-	 && !(S_IFDIR & statbuf.st_rdev)) {
+	    && (S_ISDIR ( statbuf.st_mode))) { // gabor
+	  //	  && !(S_IFDIR & statbuf.st_rdev)) {
 		return 1;
 	} else {
 		return 0;

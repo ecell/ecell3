@@ -49,7 +49,6 @@ namespace libecs
   void Integrator::clear()
   {
     theStepCounter=0;
-    theOriginalQuantity = theSubstance.saveQuantity();
   }
 
   ////////////////////////////// Euler1Integrator
@@ -90,6 +89,7 @@ namespace libecs
   void RungeKutta4Integrator::clear()
   {
     Integrator::clear();
+    theOriginalQuantity = theSubstance.saveQuantity();
     theTurnMethodPtr = &theTurnMethods[0];
   }
 

@@ -136,15 +136,19 @@ namespace libecs
     }
 
     void registerSlaves( SystemPtr );
-    void registerPropertySlot( PropertySlotPtr );
 
-    virtual void sync();
+    void registerPropertySlotWithProxy( PropertySlotPtr );
+
+    void registerLoggedPropertySlot( PropertySlotPtr );
+
+
+    void sync();
     void step() 
     { 
       compute();
       theCurrentTime += getStepInterval();
     }
-    virtual void push();
+    void push();
 
     // each stepper class defines this
     virtual void compute() = 0;
@@ -182,7 +186,9 @@ namespace libecs
     Real                theStepsPerSecond;
 
     SystemVector        theSystemVector;
-    PropertySlotVector  thePropertySlotVector;
+
+    PropertySlotVector  thePropertySlotWithProxyVector;
+    PropertySlotVector  theLoggedPropertySlotVector;
 
     String              theName;
 

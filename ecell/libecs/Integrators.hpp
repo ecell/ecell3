@@ -69,7 +69,6 @@ namespace libecs
 
     SubstanceRef theSubstance;
     int          theStepCounter;
-    Real         theOriginalQuantity;
 
   };
 
@@ -98,7 +97,7 @@ namespace libecs
     virtual ~RungeKutta4Integrator() {}
 
 
-    virtual int getNumberOfSteps() { return 4; }
+    virtual int  getNumberOfSteps() { return 4; }
     virtual void clear();
     virtual void turn();
     virtual void integrate();
@@ -111,6 +110,8 @@ namespace libecs
     void turn3();
 
   private:
+
+    Real              theOriginalQuantity;
 
     TurnMethodPtr     theTurnMethodPtr;
     Real              theK[4];
