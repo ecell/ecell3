@@ -87,10 +87,9 @@ namespace libecs
        
     */
 
-    LoggerPtr getLogger( FullPNCref aFullPN, RealCref anInterval = 0.0 ) const;
+    LoggerPtr getLogger( FullPNCref aFullPN ) const;
 
-
-    LoggerPtr createLogger( FullPNCref aFullPN, RealCref anInterval = 0.0 );
+    LoggerPtr createLogger( FullPNCref aFullPN );
 
 
     /**

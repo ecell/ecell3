@@ -64,7 +64,7 @@ namespace libecs
 
 
   LoggerPtr 
-  LoggerBroker::getLogger( FullPNCref aFullPN, RealCref anInterval ) const
+  LoggerBroker::getLogger( FullPNCref aFullPN ) const
   {
     LoggerMapConstIterator aLoggerMapIterator( theLoggerMap.find( aFullPN ) );
 
@@ -77,8 +77,7 @@ namespace libecs
     return aLoggerMapIterator->second;
   }
 
-  LoggerPtr LoggerBroker::createLogger( FullPNCref aFullPN, 
-					RealCref anInterval )
+  LoggerPtr LoggerBroker::createLogger( FullPNCref aFullPN ) 
   {
     if( theLoggerMap.find( aFullPN ) != theLoggerMap.end() )
       {

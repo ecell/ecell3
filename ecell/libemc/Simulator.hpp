@@ -101,7 +101,7 @@ namespace libemc
     }
 
     /**
-       Delete a Stepper.  This method is not supported.
+       Delete a Stepper.  This method is not supported yet.
 
     */
 

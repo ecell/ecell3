@@ -6,16 +6,15 @@ import sys
 import os
 
 from Numeric import *
-import ecell.Session
 import ecell.ecs
 
 from ecell.ecssupport import *
 import ecell.DataFileManager
 import ecell.ECDDataFile
 
-from ecell.FullID import *
-from ecell.util import *
-from ecell.ECS import *
+#from ecell.FullID import *
+#from ecell.util import *
+#from ecell.ECS import *
 
 class Session:
 
@@ -24,6 +23,45 @@ class Session:
         self.thePrintMethod = self.__plainPrintMethod
         self.theSimulator = aSimulator
 
+
+    #
+    # Session methods
+    #
+
+    def loadScript( self, ecs ):
+        execfile( ecs )
+
+    def loadModel( self, aFile ):
+        print type( aFile )
+        if type( aFile ) == str:
+            aFileObject = open( aFile )
+        else:
+            aFileObject = aFile
+
+        self.theEml = eml.Eml( aFileObject )
+
+        self.__loadStepper()
+
+        # load root system properties
+        aPropertyList = self.theEml.getEntityPropertyList( 'System::/' )
+        self.__loadEntityPropertyList( 'System::/', aPropertyList )
+
+        self.__loadEntity()
+        
+    def saveModel( self ):
+        pass
+
+    def setPrintMethod( self, aMethod ):
+        self.thePrintMethod = aMethod
+
+    def printMessage( self, message ):
+        self.thePrintMethod( message )
+
+
+    #
+    # Simulator methods
+    #
+    
     def run( self , time='' ):
         if not time:
             self.theSimulator.run()
@@ -33,31 +71,55 @@ class Session:
     def stop( self ):
         self.theSimulator.stop()
 
-    def step( self, num='' ):
+    def step( self, num=None ):
         if not num:
             self.theSimulator.step()
         else:
-            for i in range(num):
+            # Simulator should support step( num )
+            for i in xrange(num):
                 self.theSimulator.step()
 
-# no need to initialize explicitly
-#    def initialize( self ):
-#        self.theSimulator.initialize()
+    def getCurrentTime( self ):
+        return self.theSimulator.getCurrentTime()
 
-    def createLogger( self,fullpn ):
-        #self.theSimulator.getLogger( fullpn )
+    def setPendingEventChecker( self, event ):
+        self.theSimulator.setPendingEventChecker( event )
 
-	for aLogger in self.theSimulator.getLoggerList():
-		if aLogger == fullpn:
-			return None
+    def setEventHandler( self, event ):
+        self.theSimulator.setEventHandler( event )
 
-        self.theSimulator.createLogger( fullpn )
 
-    def getLogger( self, fullpn ):
-        return self.theSimulator.getLogger( fullpn )
+    #
+    # Stepper methods
+    #
+
+    def getStepperList():
+        return self.theSimulator.getStepperList()
+
+    def createStepperStub( self, id ):
+        return StepperStub( self.theSimulator, id )
+
+
+    #
+    # Entity methods
+    #
+
+    def getEntityList( self, entityType, systemPath ):
+        return self.theSimulator.getEntityList( entityType, systemPath )
+
+    def createEntityStub( self, fullid ):
+        return EntityStub( self.theSimulator, fullid )
+
+
+    #
+    # Logger methods
+    #
 
     def getLoggerList( self ):
         return self.theSimulator.getLoggerList()
+        
+    def createLoggerStub( self, fullpn ):
+        return LoggerStub( self.theSimulator, fullpn )
 
     def saveLoggerData( self, aFullPNString='', aStartTime=-1, aEndTime=-1, aInterval=-1, aSaveDirectory='./Data'):
 
@@ -65,7 +127,7 @@ class Session:
             os.mkdir( aSaveDirectory )
         # creates instance datafilemanager
         except:
-            print "\'" + aSaveDirectory + "\'" + " file exists."
+            printMessage( "\'" + aSaveDirectory + "\'" + " file exists." )
         aDataFileManager = ecell.DataFileManager.DataFileManager()
 
         # sets root directory to datafilemanager
@@ -134,51 +196,16 @@ class Session:
             return None
 
         aDataFileManager.saveAll()         
-        print "All files are saved."
-
-    def setPendingEventChecker( self, event ):
-
-        self.theSimulator.setPendingEventChecker( event )
+        printMessage( "All files are saved." )
 
 
-    def setEventHandler( self, event ):
-        self.theSimulator.setEventHandler( event )
 
+    #
+    # private methods
+    #
 
-    def getCurrentTime( self ):
-        return self.theSimulator.getCurrentTime()
-
-
-    def setPrintMethod( self, aMethod ):
-        self.thePrintMethod = aMethod
-
-
-    def printMessage( self, message ):
-        self.thePrintMethod( message )
-
-
-    def loadScript( self, ecs ):
-        execfile(ecs)
-
-
-    def __plainPrintMethod( aMessage ):
+    def __plainPrintMethod( self, aMessage ):
         print aMessage
-
-
-    def loadModel( self, aFileObject ):
-        self.theEml = eml.Eml( aFileObject )
-
-        self.__loadStepper()
-
-        # load root system properties
-        aPropertyList = self.theEml.getEntityPropertyList( 'System::/' )
-        self.__loadEntityPropertyList( 'System::/', aPropertyList )
-
-        self.__loadEntity()
-
-        
-    def saveModel( self ):
-        pass
 
 
     def __loadStepper( self ):
