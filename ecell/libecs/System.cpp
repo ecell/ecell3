@@ -32,8 +32,8 @@
 
 #include "System.h"
 #include "Reactor.h"
-#include "CellComponents.h"
 #include "RootSystem.h"
+#include "Substance.h"
 #include "Stepper.h"
 #include "StepperMaker.h"
 #include "FQPN.h"
