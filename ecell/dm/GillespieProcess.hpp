@@ -186,8 +186,6 @@ protected:
 
   Real k;    
 
-  GillespieProcessVector theEffectList;
-
   Int theOrder;
 
   RealMethodPtr theGetMultiplicityMethodPtr;

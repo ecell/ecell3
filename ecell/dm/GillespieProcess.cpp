@@ -1,4 +1,5 @@
 
+#include <libecs/FullID.hpp>
 
 #include "GillespieProcess.hpp"
 
