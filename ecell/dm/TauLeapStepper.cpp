@@ -28,72 +28,44 @@
 // E-Cell Project, Institute for Advanced Biosciences, Keio University.
 //
 
-#include "TauLeapProcess.hpp"
+#include "TauLeapStepper.hpp"
  
-LIBECS_DM_INIT( TauLeapProcess, Process );
+LIBECS_DM_INIT( TauLeapStepper, Stepper );
 
-void TauLeapProcess::calculateOrder()
+const Real TauLeapStepper::getTau( )
 {
-  theOrder = 0;
+  const Real anA0( getTotalPropensity() );      
   
-  for( VariableReferenceVectorConstIterator 
-	 i( theVariableReferenceVector.begin() );
-       i != theVariableReferenceVector.end() ; ++i )
+  for( TauLeapProcessVector::size_type i( 0 ); i < theTauLeapProcessVector.size(); ++i )
     {
-      VariableReferenceCref aVariableReference( *i );
-      const Integer aCoefficient( aVariableReference.getCoefficient() );
-      
-      // here assume aCoefficient != 0
-      if( aCoefficient == 0 )
+      for( TauLeapProcessVector::size_type j( 0 ); j < theTauLeapProcessVector.size(); ++j )
 	{
-	  THROW_EXCEPTION( InitializationFailed,
-			   "[" + getFullID().getString() + 
-			   "]: Zero stoichiometry is not allowed." );
-	}
-      
-      if( aCoefficient < 0 )
+	  Real aFF( 0 );
+	  VariableReferenceVector aVariableReferenceVector( theTauLeapProcessVector[j]->getVariableReferenceVector() );
+	  
+	  for( VariableReferenceVector::size_type k( 0 ); 
+	       k < aVariableReferenceVector.size(); ++k )
 	    {
-	      // sum the coefficient to get the order of this reaction.
-	      theOrder -= aCoefficient; 
+	      VariableReferenceRef aVariableReferenceRef( aVariableReferenceVector[k] );
+	      aFF += theTauLeapProcessVector[i]->getPD( aVariableReferenceRef.getVariable() ) * aVariableReferenceRef.getCoefficient();
 	    }
-    }
-  
-  // set theGetPropensityMethodPtr and theGetMinValueMethodPtr
-  
-  if( getOrder() == 0 )   // no substrate
-    {
-      theGetPropensityMethodPtr       = &TauLeapProcess::getZero;
-      theGetPDMethodPtr       = &TauLeapProcess::getZero;
-    }
-  else if( getOrder() == 1 )   // one substrate, first order.
-    {
-      theGetPropensityMethodPtr = 
-	&TauLeapProcess::getPropensity_FirstOrder;
-      theGetPDMethodPtr = 
-	&TauLeapProcess::getPD_FirstOrder;
+	  
+	  theFFVector[j] = aFF;
+	}
       
-    }
-  else if( getOrder() == 2 )
-    {
-      if( getZeroVariableReferenceOffset() == 2 ) // 2 substrates, 2nd order
-	{  
-	  theGetPropensityMethodPtr = 
-	    &TauLeapProcess::getPropensity_SecondOrder_TwoSubstrates;
-	  theGetPDMethodPtr = 
-	    &TauLeapProcess::getPD_SecondOrder_TwoSubstrates;
-	}
-      else // one substrate, second order (coeff == -2)
+      Real aMean( 0 );
+      Real aVariance( 0 );
+      
+      for( RealVector::size_type j( 0 ); j < theFFVector.size(); ++j )
 	{
-	  theGetPropensityMethodPtr = 
-	    &TauLeapProcess::getPropensity_SecondOrder_OneSubstrate;
-	  theGetPDMethodPtr = 
-	    &TauLeapProcess::getPD_SecondOrder_OneSubstrate;
+	  aMean += theFFVector[j] * theTauLeapProcessVector[j]->getPropensity();
+	  aVariance += pow( theFFVector[j], 2 ) * theTauLeapProcessVector[j]->getPropensity();
 	}
+      theMeanVector[i] = Epsilon * anA0 / std::abs( aMean );
+      theVarianceVector[i] = pow( Epsilon, 2 ) * pow( anA0, 2 ) / aVariance;
     }
-  else
-    {
-      //FIXME: generic functions should come here.
-      theGetPropensityMethodPtr       = &TauLeapProcess::getZero;
-      theGetPDMethodPtr           = &TauLeapProcess::getZero;
-    }
+  
+  return std::min( *std::min_element( theMeanVector.begin(), theMeanVector.end() ), 
+		   *std::min_element( theVarianceVector.begin(), theVarianceVector.end() ) );
+  
 }

@@ -28,219 +28,110 @@
 // E-Cell Project, Institute for Advanced Biosciences, Keio University.
 //
 
-#include "libecs.hpp"
-#include "Util.hpp"
-#include "PropertyInterface.hpp"
-#include "FullID.hpp"
-#include "Stepper.hpp"
+#ifndef __TAULEAP_HPP
+#define __TAULEAP_HPP
 
-#include <gsl/gsl_randist.h>
+#include "TauLeapProcess.hpp"
 
-#include "System.hpp"
+#include "libecs/DifferentialStepper.hpp"
+#include "libecs/libecs.hpp"
 
-#include "ContinuousProcess.hpp"
+#include <vector>
 
 USE_LIBECS;
 
-LIBECS_DM_CLASS( TauLeapProcess, ContinuousProcess )
-{
+DECLARE_CLASS( TauLeapProcess );
+DECLARE_VECTOR( TauLeapProcessPtr, TauLeapProcessVector );
 
-  typedef const Real (TauLeapProcess::* getPropensityMethodPtr)( ) const;
-  typedef const Real (TauLeapProcess::* getPDMethodPtr)( VariablePtr ) const;
-
- public:
-
-  LIBECS_DM_OBJECT( TauLeapProcess, Process )
-    {
-      INHERIT_PROPERTIES( Process );
-      PROPERTYSLOT_SET_GET( Real, k );
-
-      PROPERTYSLOT_GET_NO_LOAD_SAVE( Real, Propensity );
-      PROPERTYSLOT_GET_NO_LOAD_SAVE( Integer,  Order );
-    }
+LIBECS_DM_CLASS( TauLeapStepper, DifferentialStepper )
+{  
   
-  TauLeapProcess() 
+public:
+
+  LIBECS_DM_OBJECT( TauLeapStepper, Stepper )
+    {
+      INHERIT_PROPERTIES( DifferentialStepper );
+      PROPERTYSLOT_SET_GET( Real, Epsilon );
+    }
+
+  TauLeapStepper( void )
     :
-    theOrder( 0 ),
-    k( 0.0 ),
-    theGetPropensityMethodPtr( &TauLeapProcess::getZero ),
-    theGetPDMethodPtr( &TauLeapProcess::getZero )
+    Epsilon( 0.03 )
     {
       ; // do nothing
     }
-
-  virtual ~TauLeapProcess()
+  
+  virtual ~TauLeapStepper( void )
     {
       ; // do nothing
-    }
-
-  SIMPLE_SET_GET_METHOD( Real, k );
-  
-  GET_METHOD( Integer, Order )
-    {
-      return theOrder;
-    }
-  
-  GET_METHOD( Real, Propensity )
-    {
-      return ( this->*theGetPropensityMethodPtr )();
-    }
-  
-  const Real getPD( VariablePtr value )const
-    {
-      return ( this->*theGetPDMethodPtr )( value );
-    }
-
-  virtual void initialize()
-    {
-      ContinuousProcess::initialize();
-      // declareUnidirectional();
-      
-      calculateOrder();
-      
-      if( ! ( getOrder() == 1 || getOrder() == 2 ) )
-	{
-	  THROW_EXCEPTION( ValueError, 
-			   String( getClassName() ) + 
-			   "[" + getFullID().getString() + 
-			   "]: Only first or second order scheme is allowed." );
-	}
     }  
-
-  virtual void fire()
-    {
-      setFlux( gsl_ran_poisson( getStepper()->getRng(), getPropensity() ) );
-    }
   
+  SIMPLE_SET_GET_METHOD( Real, Epsilon );
+
+  void initialize()
+    {
+      DifferentialStepper::initialize();
+      
+      theTauLeapProcessVector.clear();
+      theTauLeapProcessVector.resize( theProcessVector.size() );
+      
+      for( ProcessVector::size_type i( 0 ); i < theProcessVector.size(); ++i )
+	{
+	  TauLeapProcessPtr aTauLeapProcessPtr( dynamic_cast<TauLeapProcessPtr>( theProcessVector[i] ) );
+	  theTauLeapProcessVector[i] = aTauLeapProcessPtr;
+	}
+
+      // resize tmp vector.
+      theFFVector.clear();
+      theMeanVector.clear();
+      theVarianceVector.clear();
+      theFFVector.resize( theProcessVector.size() );
+      theMeanVector.resize(theProcessVector.size() );
+      theVarianceVector.resize(theProcessVector.size() );
+
+    }
+
+  void step()
+    {      
+      const VariableVector::size_type aSize( getReadOnlyVariableOffset() );
+      
+      clearVariables();
+      
+      setStepInterval( getTau() );
+      
+      fireProcesses();
+      
+      for( VariableVector::size_type c( 0 ); c < aSize; ++c )
+	{
+	  VariablePtr const aVariable( theVariableVector[ c ] );
+	  theVelocityBuffer[ c ] = aVariable->getVelocity();
+	}
+    }
+
  protected:
-
-  void calculateOrder();
   
-  static void checkNonNegative( const Real aValue )
+  const Real getTotalPropensity( )
     {
-      if( aValue < 0.0 )
+      Real anA0( 0.0 );
+      for( TauLeapProcessVector::size_type i( 0 ); i < theTauLeapProcessVector.size(); ++i )
 	{
-	  THROW_EXCEPTION( SimulationError, "Variable value <= -1.0" );
+	  anA0 += theTauLeapProcessVector[i]->getPropensity();
 	}
-  }
-
-  const Real getZero( VariablePtr value ) const
-    {
-      return 0.0;
+      return anA0;
     }
 
-  const Real getZero( ) const
-    {
-      return 0.0;
-    }
-    
-  const Real getPropensity_FirstOrder() const
-    {
-      const Real 
-	aMultiplicity( theVariableReferenceVector[0].getValue() );
-      
-      if( aMultiplicity > 0.0 )
-	{
-	  return k * aMultiplicity;
-	}
-      else
-	{
-	  return 0.0;
-	}
-    }
-
-  const Real getPD_FirstOrder( VariablePtr value ) const
-    {
-      if( theVariableReferenceVector[0].getVariable() == value )
-	{
-	  return k;
-	}
-      else
-	{
-	  return 0.0;
-	}
-    }
-
-  const Real getPropensity_SecondOrder_TwoSubstrates() const
-    {
-      const Real 
-	aMultiplicity( theVariableReferenceVector[0].getValue() *
-		       theVariableReferenceVector[1].getValue() );
-      
-      if( aMultiplicity > 0.0 )
-	{
-	  return ( k * aMultiplicity ) / ( getSuperSystem()->getSizeVariable()->getValue() * N_A );
-	    
-	}
-      else
-	{
-	  return 0;
-	}
-    }
-
-  const Real getPD_SecondOrder_TwoSubstrates( VariablePtr value ) const
-    {
-
-      if( theVariableReferenceVector[0].getVariable() == value )
-	{
-	  return ( k * theVariableReferenceVector[1].getValue() ) / ( getSuperSystem()->getSizeVariable()->getValue() * N_A );
-	}
-      else if( theVariableReferenceVector[1].getVariable() == value )
-	{
-	  return ( k * theVariableReferenceVector[0].getValue() ) / ( getSuperSystem()->getSizeVariable()->getValue() * N_A );
-	}
-      else
-	{
-	  return 0;
-	}
-    }
-  
-  const Real getPropensity_SecondOrder_OneSubstrate() const
-    {
-      const Real aValue( theVariableReferenceVector[0].getValue() );
-      
-      if( aValue > 1.0 ) // there must be two or more molecules
-	{
-	  return ( k * aValue * ( aValue - 1.0 ) ) / ( getSuperSystem()->getSizeVariable()->getValue() * N_A );
-	    
-	}
-      else
-	{
-	  checkNonNegative( aValue );
-	  return 0;
-	}
-      
-    }
-
-  const Real getPD_SecondOrder_OneSubstrate( VariablePtr value ) const
-    {
-      if( theVariableReferenceVector[0].getVariable() == value )
-	{
-	  const Real aValue( theVariableReferenceVector[0].getValue() );
-	  if( aValue > 1.0 ) // there must be two or more molecules
-	    {
-	      return  ( ( 2 * k * aValue - k ) / ( getSuperSystem()->getSizeVariable()->getValue() * N_A ) ) * 2;
-	    }
-	  else
-	    {
-	      checkNonNegative( aValue );
-	      return 0.0;
-	    }      
-	}
-      else
-	{
-	  return 0.0;
-	}
-    }
+  const Real getTau( );
   
  protected:
   
-  Real k;
-  Integer theOrder;
+  Real Epsilon;
+  std::vector< TauLeapProcessPtr > theTauLeapProcessVector;
   
-  getPropensityMethodPtr theGetPropensityMethodPtr;
-  getPDMethodPtr theGetPDMethodPtr;
-  
+  // tmp vectors.
+  RealVector theFFVector;
+  RealVector theMeanVector;
+  RealVector theVarianceVector;
+
 };
 
-
+#endif /* __TAULEAP_HPP */
