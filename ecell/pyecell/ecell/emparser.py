@@ -38,6 +38,7 @@ tokens = reserved + (
 	'number',
 	'name',
 	'quotedstring',
+	'quotedstrings',
 	'control',
 	'comment',
 	'nl',
@@ -117,6 +118,11 @@ def t_name(t):
 	r'[a-zA-Z_/][\w\:\/.]*'
 	return t
 
+def t_quotedstrings(t):
+	r' """[^"]*""" | \'\'\'[^\']*\'\'\' '
+	t.value = t.value[3:-3]
+	return t
+
 def t_quotedstring(t):
 	r' "(^"|.)*" | \'(^\'|.)*\' '
 	t.value = t.value[1:-1]
@@ -161,7 +167,7 @@ def t_error(t):
 
 precedence = (
 	('left', 'stmts', 'stmt' ),
-	('right', 'property')
+	('right', 'property', 'quotedstrings')
 	)
 
 def p_stmts(t):
@@ -201,10 +207,21 @@ def p_entity_other_stmt (t):
 
 def p_object_decl(t):
 	'''
-	object_decl : name LPAREN name RPAREN
+	object_decl : name LPAREN name RPAREN 
+	            | name LPAREN name RPAREN info
 	'''
-	t[0] = t[1], t[3]
-	
+	if len(t.slice) == 6:
+		t[0] = t[1], t[3], t[5]
+	else:
+		t[0] = t[1], t[3]
+
+def p_info(t):
+	'''
+	info : quotedstrings
+	     | quotedstring
+	'''
+	t[0] = t[1]
+
 def p_stepper_object_decl(t):
 	'''
 	stepper_object_decl : Stepper object_decl
@@ -213,6 +230,8 @@ def p_stepper_object_decl(t):
 	t.classname = t[2][0]
 	t.id = t[2][1]
 	anEml.createStepper(t.classname, t.id)
+	if len(t[2]) == 3:
+		anEml.setStepperInfo( t.id, t[2][2])
 	
 	t[0] = t[1], t[2]
 	
@@ -225,6 +244,8 @@ def p_system_object_decl(t):
 	t.path      = t[2][1]
 	t.fullid = convert2FullID(t.type, t.path)
 	anEml.createEntity(t.classname, t.fullid)
+	if len(t[2]) == 3:
+		anEml.setEntityInfo( t.fullid, t[2][2])
 	
 	t[0] = t[1], t[2]
 	
@@ -238,6 +259,8 @@ def p_entity_other_object_decl (t):
 	t.id        = t.path + ':' + t[2][1]
 	t.fullid = convert2FullID(t.type, t.id)
 	anEml.createEntity(t.classname, t.fullid)
+	if len(t[2]) == 3:
+		anEml.setEntityInfo( t.fullid, t[2][2])
 	
 	t[0] = t[1], t[2]
 
@@ -354,7 +377,8 @@ def initializePLY():
 	lextabname = "emlextab"
 	yacctabname = "emparsetab"
 
-	lex.lex(lextab=lextabname)
+	lex.lex(lextab=lextabname, optimize=1)
+	#lex.lex(lextab=lextabname)
 	yacc.yacc(tabmodule=yacctabname)
 
 def convertEm2Eml( anEmFileObject, debug=0 ):
