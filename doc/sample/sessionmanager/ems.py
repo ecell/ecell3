@@ -7,14 +7,13 @@ import os
 MODEL_FILE = 'model.eml'
 ESS_FILE = 'runsession.py'
 
-setTmpDirRemovable(False)
-
 # Register jobs.
 
 aJobIDList = []
 
-for VALUE_OF_S in xrange(0,5):
-
+for i in xrange(0,5):
+	
+	VALUE_OF_S = i * 1000
 	aParameterDict = { 'MODEL_FILE': MODEL_FILE, 'VALUE_OF_S': VALUE_OF_S }
 
 	#registerEcellSession( ESS file, parameters, files that ESS uses )
