@@ -639,9 +639,13 @@
 	<widget>
 	  <class>GtkButton</class>
 	  <child_name>Toolbar:button</child_name>
-	  <name>button1</name>
-	  <label>button1</label>
-	  <icon>ecell.xpm</icon>
+	  <name>logo_button</name>
+	  <signal>
+	    <name>clicked</name>
+	    <handler>logo_button_clicked</handler>
+	    <last_modification_time>Fri, 17 Aug 2001 04:26:50 GMT</last_modification_time>
+	  </signal>
+	  <label>test mode</label>
 	</widget>
       </widget>
     </widget>
