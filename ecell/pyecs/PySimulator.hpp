@@ -1,7 +1,7 @@
 #ifndef ___PY_SIMULATOR_H___
 #define ___PY_SIMULATOR_H___
 
-#include "Simulator.hpp"
+#include "emc/Simulator.hpp"
 #include "CXX/Extensions.hxx"
 
 using namespace Py;

@@ -14,7 +14,7 @@ class Simulator
 public:
 
   Simulator();
-  ~Simulator(){};
+  ~Simulator() {}
 
   void makePrimitive( StringCref classname, 
 		      FQPNCref fqpn,

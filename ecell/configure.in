@@ -35,6 +35,9 @@ AC_PROG_LN_S
 AC_PROG_MAKE_SET
 AC_PROG_RANLIB
 
+AC_LIBTOOL_DLOPEN
+AM_PROG_LIBTOOL
+
 AC_LANG_CPLUSPLUS
 
 dnl Checks for libraries.
@@ -111,9 +114,8 @@ if test "$KORANDOM_DIR" = "" ; then
 
         AC_MSG_RESULT($ac_cv_korandom_dir)
         KORANDOM_DIR=$ac_cv_korandom_dir
-        KORANDOM_INCLUDE=$ac_cv_korandom_dir
 fi
-AC_SUBST(KORANDOM_INCLUDE)
+AC_SUBST(KORANDOM_DIR)
 
 
 
@@ -149,6 +151,7 @@ Makefile
 util/Makefile
 libecs/Makefile 
 emc/Makefile
+pyecs/Makefile
 )
 
 

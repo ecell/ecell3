@@ -1,4 +1,4 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-SUBDIRS = util libecs emc
+SUBDIRS = util libecs emc pyecs

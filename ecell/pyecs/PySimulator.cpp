@@ -1,4 +1,8 @@
+#include "libecs/FQPN.hpp"
+#include "util/Message.hpp"
+
 #include "PySimulator.hpp"
+
 
 PySimulator::PySimulator()
 {
@@ -30,7 +34,7 @@ Object PySimulator::makePrimitive( const Tuple& args )
   const string fqpn( static_cast<Py::String>( args[1] ) );
   const string name( static_cast<Py::String>( args[2] ) );
 
-  Simulator::makePrimitive( classname, fqpn, name );
+  Simulator::makePrimitive( classname, FQPN( fqpn ), name );
 
   return Py::Object();
 }
@@ -42,7 +46,7 @@ Object PySimulator::sendMessage( const Tuple& args )
   const string propertyname( static_cast<Py::String>( args[1] ) );
   const string message( static_cast<Py::String>( args[2] ) );
   
-  Simulator::sendMessage( fqpn, propertyname, message );
+  Simulator::sendMessage( FQPN( fqpn ), Message( propertyname, message ) );
 
   return Object();
 }

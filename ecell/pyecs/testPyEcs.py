@@ -2,8 +2,8 @@
 
 import ecs
 
-s = ecs.makeSimulator()
+s = ecs.Simulator()
 s.step()
-s.makePrimitive('Cell','/:CELL','The cell')
-s.getMessage()
-s.sendMessage()
+#s.makePrimitive('Cell','/:CELL','The cell')
+#s.getMessage()
+#s.sendMessage()

@@ -1,3 +1,5 @@
+#include "util/Message.hpp"
+
 #include "LocalSimulatorImplementation.hpp"
 
 RootSystem* theRootSystem = new RootSystem();
@@ -17,12 +19,12 @@ void LocalSimulatorImplementation::sendMessage( FQPNCref fqpn,
 {
 }
 
-/*
-Message LocalSimulatorImplementation::getMessage( StringCref fqpn,
+
+Message LocalSimulatorImplementation::getMessage( FQPNCref fqpn,
 StringCref propertyName )
 {
 }
-*/
+
 
 void LocalSimulatorImplementation::step()
 {

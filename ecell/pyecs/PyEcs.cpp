@@ -1,7 +1,8 @@
 #include <iostream>
 
+#include "emc/Simulator.hpp"
+
 #include "PySimulator.hpp"
-#include "Simulator.hpp"
 
 #include "PyEcs.hpp"
 

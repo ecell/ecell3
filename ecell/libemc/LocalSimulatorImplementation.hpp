@@ -13,7 +13,7 @@ class LocalSimulatorImplementation
 public:
 
   LocalSimulatorImplementation();
-  ~LocalSimulatorImplementation() {};
+  ~LocalSimulatorImplementation() {}
 
   RootSystemPtr getRootSystemPtr() { return theRootSystem; }
 
