@@ -28,11 +28,11 @@ class PluginModule:
                 aFp.close()
 
 
-    def createInstance( self, sim, data, parent=None ):
+    def createInstance( self, sim, data, pluginmanager, parent=None ):
         aConstructor = self.theModule.__dict__[self.theName]
-        anArgumentTuple = ( self.theDirectoryName, sim , data )
-        apply( aConstructor, anArgumentTuple )
-
+        anArgumentTuple = ( self.theDirectoryName, sim , data, pluginmanager )
+        return apply( aConstructor, anArgumentTuple )
+        
 
 
 class PluginManager:
@@ -48,12 +48,12 @@ class PluginManager:
             aPlugin = PluginModule( classname )
             self.thePluginMap[ classname ] = aPlugin
 
-        anInstance = aPlugin.createInstance( sim, data, parent )
+        anInstance = aPlugin.createInstance( sim, data, self, parent )
         self.appendInstance( anInstance )
 
         return anInstance
 
-    def update( self ):
+    def updateAllPluginWindow( self ):
         for anInstance in self.theInstanceList:
             anInstance.update()
 

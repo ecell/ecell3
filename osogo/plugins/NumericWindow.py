@@ -6,7 +6,7 @@ from ecssupport import *
 
 class NumericWindow( PluginWindow ):
 
-    def __init__( self, dirname, sim, data ):
+    def __init__( self, dirname, sim, data, pluginmanager ):
 
         PluginWindow.__init__( self, dirname, sim, data )
 
@@ -16,27 +16,24 @@ class NumericWindow( PluginWindow ):
 
         self.theFPN = data[0]
         self.initialize(self.theFPN)
-        
+        self.thePluginManager = pluginmanager
 
     def initialize( self, fpn ):
 
         self.theFPN = fpn
         self.theID = str( self.theFPN[ID] )
-#        self.theProperty = str( self.theFPN[PROPERTY] )
-#        self.theFullID = FullPropertyNameToFullID( self.theFPN )
-#        aFullIDString = FullIDString(self.theFullID)
         
         self["id_label"].set_text( self.theID )
         value = self.theSimulator.getProperty( self.theFPN )
         self.theCurValue = value[0]
         self["value_frame"].set_text(str(self.theCurValue))
 
-#        self.update()
         
     def update( self ):
 
-        pass
-
+        value = self.theSimulator.getProperty( self.theFPN )
+        self.theCurValue = value[0]
+        self["value_frame"].set_text(str(self.theCurValue))
 
     def inputValue( self, obj ):
 
@@ -60,6 +57,9 @@ class NumericWindow( PluginWindow ):
 
         value = (self.theCurValue,)
         self.theSimulator.setProperty(self.theFPN, value)
+        self.thePluginManager.updateAllPluginWindow()
+
+        ### for check
         print self.theSimulator.getProperty(self.theFPN)
 
 
