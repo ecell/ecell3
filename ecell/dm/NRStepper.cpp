@@ -92,6 +92,8 @@ void NRStepper::initialize()
 	}
     }
 
+
+  const Real aCurrentTime( getCurrentTime() );
   thePriorityQueue.clear();
   for( NRProcessVector::const_iterator i( theNRProcessVector.begin() );
        i != theNRProcessVector.end(); ++i )
@@ -105,7 +107,8 @@ void NRStepper::initialize()
       anNRProcessPtr->setIndex( anIndex );
       anNRProcessPtr->updateStepInterval();
 	
-      thePriorityQueue.push( NREvent( anNRProcessPtr->getStepInterval(),
+      thePriorityQueue.push( NREvent( anNRProcessPtr->getStepInterval()
+				      + aCurrentTime,
 				      anNRProcessPtr ) );
     }
 
@@ -124,6 +127,7 @@ void NRStepper::step()
   theTimeScale = 
     aMuProcess->getMinValue() * aMuProcess->getStepInterval() * theTolerance;
 
+  const Real aCurrentTime( getCurrentTime() );
   // Update relevant mus
   NRProcessVectorCref anEffectList( aMuProcess->getEffectList() );
   for ( NRProcessVectorConstIterator i( anEffectList.begin() );
@@ -136,14 +140,14 @@ void NRStepper::step()
 
       Int anIndex( anAffectedProcess->getIndex() );
       thePriorityQueue.changeOneKey( anIndex,
-				     NREvent( aStepInterval,
+				     NREvent( aStepInterval + aCurrentTime,
 					      anAffectedProcess ) );
       //	  std::cerr << "change: " << anIndex << ' ' << aStepInterval << ' ' << anAffectedProcess->getID() << std::endl;
 
     }
 
   NREventCref aTopEvent( thePriorityQueue.top() );
-  const Real aNextStepInterval( aTopEvent.getTime() );
+  const Real aNextStepInterval( aTopEvent.getTime() - aCurrentTime );
 
   setStepInterval( aNextStepInterval );
 
@@ -160,49 +164,28 @@ void NRStepper::step()
 void NRStepper::interrupt( StepperPtr const aCaller )
 {
   // update step intervals of NRProcesses
-  //    return;
-
-  //    NREventCref anOldNextEvent( thePriorityQueue.top() );
-
-  //    const Real anOldStepInterval( anOldNextEvent.getTime() );
-  //    const Real anOldNextTime( getCurrentTime() + anOldStepInterval );
-
-  //    NRProcessPtr anOldNextProcess( anOldNextEvent.getProcess() );
-
+  const Real aCurrentTime( getCurrentTime() );
   for( NRProcessVector::const_iterator i( theNRProcessVector.begin() );
        i != theNRProcessVector.end(); ++i )
     {      
-      NRProcessPtr anNRProcessPtr( *i );
+      NRProcessPtr const anNRProcessPtr( *i );
 	
       anNRProcessPtr->updateStepInterval();
       const Real aStepInterval( anNRProcessPtr->getStepInterval() );
 
       thePriorityQueue.changeOneKey( anNRProcessPtr->getIndex(),
-				     NREvent( aStepInterval,
+				     NREvent( aStepInterval + aCurrentTime,
 					      anNRProcessPtr ) );
     }
 
   NREventCref aTopEvent( thePriorityQueue.top() );
   const Real aCallerCurrentTime( aCaller->getCurrentTime() );
-  const Real aNewStepInterval( aTopEvent.getTime() );
-  //    const Real aNewNextTime( aNewStepInterval + aCallerCurrentTime );
-    
-  //    if( aNewNextTime > anOldNextTime )
-  //      {
-  // if the new next reaction occurs after the old next reaction,
-  // take the old next reaction.  
+  const Real aNewTime( aTopEvent.getTime() );
 
-  // resume the old one as a top.
-  //      	thePriorityQueue.changeOneKey( anOldNextProcess->getIndex(),
-  //				       NREvent( anOldStepInterval,
-  //						anOldNextProcess ) );
-  //    	return;
-  //      }
-    
-  setStepInterval( aCallerCurrentTime - getCurrentTime() + 
-		   aNewStepInterval );
+  // reschedule this Stepper to aNewStepInterval past current time of
+  // the interruption caller.
+  setStepInterval( aNewTime - aCallerCurrentTime );
   getModel()->reschedule( this );
-
 }
 
 
