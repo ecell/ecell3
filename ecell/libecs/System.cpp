@@ -140,12 +140,7 @@ namespace libecs
     return getStepper()->getID();
   }
 
-  GET_METHOD_DEF( Real, Size, System )
-  {
-    return theSizeVariable->getValue();
-  }
-
-  VariablePtr System::getSizeVariable() const
+  VariableCptr const System::findSizeVariable() const
   {
     try
       {
@@ -163,13 +158,18 @@ namespace libecs
 			     " supersystem == this.  Probably a bug." );
 	  }
 
-	return aSuperSystem->getSizeVariable();
+	return aSuperSystem->findSizeVariable();
       }
   }
 
-  void System::setSizeVariable()
+  GET_METHOD_DEF( Real, Size, System )
   {
-    theSizeVariable = getSizeVariable();
+    return theSizeVariable->getValue();
+  }
+
+  void System::configureSizeVariable()
+  {
+    theSizeVariable = findSizeVariable();
   }
 
   void System::initialize()
@@ -201,7 +201,7 @@ namespace libecs
 	aProcessPtr->initialize();
       }
 
-    setSizeVariable();
+    configureSizeVariable();
   }
 
   ProcessPtr System::getProcess( StringCref anID ) const

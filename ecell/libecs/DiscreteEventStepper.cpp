@@ -28,6 +28,8 @@
 // E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
 
+#include <algorithm>
+
 #include "FullID.hpp"
 
 #include "DiscreteEventStepper.hpp"
@@ -50,7 +52,7 @@ namespace libecs
   }
 
 
-  GET_METHOD_DEF( String, LastProcess, DiscreteEventStepper )
+  GET_METHOD_DEF( String, LastProcessName, DiscreteEventStepper )
   {
     return theLastProcess->getFullID().getString();
   }
@@ -59,8 +61,8 @@ namespace libecs
   {
     Stepper::initialize();
 
-    // dynamic_cast theProcessVector of this Stepper to DiscreteEventProcess,
-    // and store it in theDiscreteEventProcessVector.
+    // dynamic_cast each Process in theProcessVector of this Stepper
+    // to DiscreteEventProcess, and store it in theDiscreteEventProcessVector.
     theDiscreteEventProcessVector.clear();
     try
       {
@@ -76,17 +78,13 @@ namespace libecs
 			 "in this Stepper." );
       }
 
-    // optimization: sort by memory address
-    std::sort( theDiscreteEventProcessVector.begin(), 
-	       theDiscreteEventProcessVector.end() );
-
-
     // (1) check Process dependency
     // (2) update step interval of each Process
     // (3) construct the priority queue (scheduler)
     thePriorityQueue.clear();
     const Real aCurrentTime( getCurrentTime() );
-    for( DiscreteEventProcessVector::const_iterator i( theDiscreteEventProcessVector.begin() );
+    for( DiscreteEventProcessVector::const_iterator 
+	   i( theDiscreteEventProcessVector.begin() );
 	 i != theDiscreteEventProcessVector.end(); ++i )
       {      
 	DiscreteEventProcessPtr anDiscreteEventProcessPtr( *i );
@@ -114,15 +112,16 @@ namespace libecs
 
 	anDiscreteEventProcessPtr->setIndex( anIndex );
 	anDiscreteEventProcessPtr->updateStepInterval();
-	thePriorityQueue.push( StepperEvent( anDiscreteEventProcessPtr->getStepInterval()
-					+ aCurrentTime,
-					anDiscreteEventProcessPtr ) );
+	thePriorityQueue.
+	  push( StepperEvent( anDiscreteEventProcessPtr->getStepInterval()
+			      + aCurrentTime,
+			      anDiscreteEventProcessPtr ) );
       }
 
     // here all the DiscreteEventProcesses are updated, then set new
     // step interval and reschedule this stepper.
     // That means, this Stepper doesn't necessary steps immediately
-    // after initialize()
+    // after initialize().
     StepperEventCref aTopEvent( thePriorityQueue.top() );
     const Real aNewTime( aTopEvent.getTime() );
 
@@ -132,9 +131,6 @@ namespace libecs
   }
   
 
-  // this doesn't necessary occur at the first step of the simulation,
-  // and imediately after initialize(), because initialize() recalculates
-  // all propensities and reschedules this stepper.
   void DiscreteEventStepper::step()
   {
     StepperEventCref anEvent( thePriorityQueue.top() );
@@ -147,10 +143,10 @@ namespace libecs
 
     // Update relevant processes
     DiscreteEventProcessVectorCref 
-      aDependentProcessVector( aMuProcess->getDependentProcessVector() );
+      theDependentProcessVector( aMuProcess->getDependentProcessVector() );
     for ( DiscreteEventProcessVectorConstIterator 
-	    i( aDependentProcessVector.begin() );
-	  i != aDependentProcessVector.end(); ++i ) 
+	    i( theDependentProcessVector.begin() );
+	  i != theDependentProcessVector.end(); ++i ) 
       {
 	DiscreteEventProcessPtr const anAffectedProcess( *i );
 	anAffectedProcess->updateStepInterval();
@@ -158,9 +154,10 @@ namespace libecs
 	// aTime is time in the priority queue
 
 	Int anIndex( anAffectedProcess->getIndex() );
-	thePriorityQueue.changeOneKey( anIndex,
-				       StepperEvent( aStepInterval + aCurrentTime,
-						anAffectedProcess ) );
+	thePriorityQueue.
+	  changeOneKey( anIndex,
+			StepperEvent( aStepInterval + aCurrentTime,
+				      anAffectedProcess ) );
       }
 
     StepperEventCref aTopEvent( thePriorityQueue.top() );
@@ -178,19 +175,22 @@ namespace libecs
 
   void DiscreteEventStepper::interrupt( StepperPtr const aCaller )
   {
-    // update step intervals of DiscreteEventProcesses
+    // update step intervals of all the DiscreteEventProcesses.
     const Real aCurrentTime( aCaller->getCurrentTime() );
-    for( DiscreteEventProcessVector::const_iterator i( theDiscreteEventProcessVector.begin() );
+    for( DiscreteEventProcessVector::const_iterator 
+	   i( theDiscreteEventProcessVector.begin() );
 	 i != theDiscreteEventProcessVector.end(); ++i )
       {      
 	DiscreteEventProcessPtr const anDiscreteEventProcessPtr( *i );
 	
 	anDiscreteEventProcessPtr->updateStepInterval();
-	const Real aStepInterval( anDiscreteEventProcessPtr->getStepInterval() );
+	const Real 
+	  aStepInterval( anDiscreteEventProcessPtr->getStepInterval() );
 
-	thePriorityQueue.changeOneKey( anDiscreteEventProcessPtr->getIndex(),
-				       StepperEvent( aStepInterval + aCurrentTime,
-						     anDiscreteEventProcessPtr ) );
+	thePriorityQueue.
+	  changeOneKey( anDiscreteEventProcessPtr->getIndex(),
+			StepperEvent( aStepInterval + aCurrentTime,
+				      anDiscreteEventProcessPtr ) );
       }
 
     StepperEventCref aTopEvent( thePriorityQueue.top() );

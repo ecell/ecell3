@@ -270,10 +270,16 @@ namespace libecs
       theModel = aModel;
     }
 
+    VariableCptr const getSizeVariable() const
+    {
+      return theSizeVariable;
+    }
+
     void notifyChangeOfEntityList();
 
-    VariablePtr getSizeVariable() const;
-    void setSizeVariable();
+    VariableCptr const findSizeVariable() const;
+
+    void configureSizeVariable();
 
   public: // property slots
 
@@ -293,7 +299,7 @@ namespace libecs
     ProcessMap   theProcessMap;
     SystemMap    theSystemMap;
 
-    VariablePtr  theSizeVariable;
+    VariableCptr  theSizeVariable;
 
     bool         theEntityListChanged;
 
@@ -370,6 +376,7 @@ namespace libecs
   */
 
 
+
   template <>
   inline VariableMapCref System::getMap() const
   {
@@ -393,6 +400,7 @@ namespace libecs
   /*@}*/
 
 } // namespace libecs
+
 
 #endif /* __SYSTEM_HPP */
 

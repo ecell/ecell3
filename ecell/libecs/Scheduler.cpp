@@ -50,7 +50,7 @@ namespace libecs
  
   void Scheduler::registerStepper( StepperPtr aStepper )
   {
-    Int anIndex( registerEvent( Event( aStepper->getCurrentTime(),
+    Int anIndex( registerEvent( SchedulerEvent( aStepper->getCurrentTime(),
 				       aStepper ) ) );
 
     aStepper->setSchedulerIndex( anIndex );
@@ -65,7 +65,7 @@ namespace libecs
 
   void Scheduler::step()
   {
-    EventCref aTopEvent( theScheduleQueue.top() );
+    SchedulerEventCref aTopEvent( theScheduleQueue.top() );
     const Time aCurrentTime( aTopEvent.getTime() );
     const StepperPtr aStepperPtr( aTopEvent.getStepper() );
 
@@ -95,7 +95,8 @@ namespace libecs
     */
 
     // schedule a new event
-    theScheduleQueue.changeTopKey( Event( aScheduledTime, aStepperPtr ) );
+    theScheduleQueue.changeTopKey( SchedulerEvent( aScheduledTime, 
+						   aStepperPtr ) );
    }
 
 
@@ -112,7 +113,8 @@ namespace libecs
      		     "Attempt to go past." );
 
     theScheduleQueue.changeOneKey( aStepperPtr->getSchedulerIndex(),
-				   Event( aScheduledTime, aStepperPtr ) );
+				   SchedulerEvent( aScheduledTime, 
+						   aStepperPtr ) );
   }
 
 

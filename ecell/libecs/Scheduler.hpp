@@ -48,14 +48,13 @@ namespace libecs
 
   /** @file */
 
-
-  class Event
+  class SchedulerEvent
   {
 
 
   public:
 
-    Event( TimeCref aTime, StepperPtr aStepperPtr )
+    SchedulerEvent( TimeCref aTime, StepperPtr aStepperPtr )
       :
       theTime( aTime ),
       theStepperPtr( aStepperPtr )
@@ -76,7 +75,7 @@ namespace libecs
     // this method is basically used in initializing and rescheduling 
     // in the Scheduler to determine if
     // goUp()/goDown (position change) is needed 
-    const bool operator< ( EventCref rhs ) const
+    const bool operator< ( SchedulerEventCref rhs ) const
     {
       if( theTime > rhs.theTime )
 	{
@@ -102,7 +101,7 @@ namespace libecs
 	}
     }
 
-    const bool operator!= ( EventCref rhs ) const
+    const bool operator!= ( SchedulerEventCref rhs ) const
     {
       if( theTime != rhs.theTime || theStepperPtr != rhs.theStepperPtr )
 	{
@@ -128,7 +127,7 @@ namespace libecs
 
 
     // dummy, because DynamicPriorityQueue requires this. better without.
-    Event()
+    SchedulerEvent()
     {
       ; // do nothing
     }
@@ -142,8 +141,10 @@ namespace libecs
   };
 
 
-  typedef DynamicPriorityQueue<Event> EventDynamicPriorityQueue;
-  DECLARE_TYPE( EventDynamicPriorityQueue, ScheduleQueue );
+  typedef DynamicPriorityQueue<SchedulerEvent> 
+  SchedulerEventDynamicPriorityQueue;
+
+  DECLARE_TYPE( SchedulerEventDynamicPriorityQueue, ScheduleQueue );
 
 
   /**
@@ -188,7 +189,7 @@ namespace libecs
 
     void step();
 
-    EventCref getNextEvent() const
+    SchedulerEventCref getNextEvent() const
     {
       return theScheduleQueue.top();
     }
@@ -200,7 +201,7 @@ namespace libecs
        Returns the current time.
 
        The current time of this scheduler is scheduled time of the
-       Event on the top of the ScheduleQueue.
+       SchedulerEvent on the top of the ScheduleQueue.
 
        @return the current time of this scheduler.
     */
@@ -225,7 +226,7 @@ namespace libecs
 
     void reset();
 
-    IndexType registerEvent( EventCref anEvent )
+    IndexType registerEvent( SchedulerEventCref anEvent )
     {
       theScheduleQueue.push( anEvent );
       return theScheduleQueue.size() - 1;

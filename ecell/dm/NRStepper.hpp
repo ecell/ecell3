@@ -50,12 +50,7 @@
 #ifndef __NRSTEPPER_HPP
 #define __NRSTEPPER_HPP
 
-#include <algorithm>
-
-#include "libecs/DynamicPriorityQueue.hpp"
 #include "libecs/DiscreteEventStepper.hpp"
-
-#include "GillespieProcess.hpp"
 
 USE_LIBECS;
 

@@ -119,7 +119,7 @@ namespace libecs
 	PROPERTYSLOT_SET_GET( Real, Tolerance );
 
 	PROPERTYSLOT_GET_NO_LOAD_SAVE( Real, TimeScale );
-	PROPERTYSLOT_GET_NO_LOAD_SAVE( String, LastProcess );
+	PROPERTYSLOT_GET_NO_LOAD_SAVE( String, LastProcessName );
 
       }
 
@@ -146,12 +146,16 @@ namespace libecs
     
     virtual GET_METHOD( Real, TimeScale )
       {
-	//return theLastProcess->getTimeScale();
 	return theTimeScale;
       }
 
-    GET_METHOD( String, LastProcess );
+    GET_METHOD( String, LastProcessName );
 
+
+    DiscreteEventProcessPtr const getLastProcess() const
+      {
+	return theLastProcess;
+      }
 
     DiscreteEventProcessVectorCref getDiscreteEventProcessVector() const
       {

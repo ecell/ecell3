@@ -178,10 +178,15 @@ namespace libecs
   //  DECLARE_TYPE( HighReal, Time );
   DECLARE_TYPE( Real, Time );
     
+  //! Infinity.  Currently this is defined as INFINITY symbol of C99 standard.
+  const Real INF( INFINITY );
+
 
   //! Avogadro number. 
   const Real N_A( 6.0221367e+23 );
 
+  //! 1 / Avogadro number (reciprocal of N_A)
+  const Real R_N_A( 1.0 / N_A );
 
   // functions
 

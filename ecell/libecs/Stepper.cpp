@@ -500,10 +500,9 @@ namespace libecs
   void Stepper::log()
   {
     // update loggers
-    const Real aCurrentTime( getCurrentTime() );
     FOR_ALL( LoggerVector, theLoggerVector )
       {
-	(*i)->log( aCurrentTime );
+	(*i)->log( theCurrentTime );
       }
   }
 

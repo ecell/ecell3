@@ -395,7 +395,7 @@ namespace libemc
   const libecs::Polymorph LocalSimulatorImplementation::
   getNextEvent() const
   {
-    libecs::EventCref aNextEvent( getModel().getNextEvent() );
+    libecs::SchedulerEventCref aNextEvent( getModel().getNextEvent() );
 
     PolymorphVector aVector;
     aVector.push_back( static_cast<Real>( aNextEvent.getTime() ) );

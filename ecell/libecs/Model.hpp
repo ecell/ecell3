@@ -100,11 +100,11 @@ namespace libecs
 
 
     /**
-       Get the next Stepper.
+       Get the next event to occur on the scheduler.
 
      */
 
-    EventCref const getNextEvent() const
+    SchedulerEventCref const getNextEvent() const
     {
       return theScheduler.getNextEvent();
     }
@@ -113,13 +113,13 @@ namespace libecs
     /**
        Reschedule a Stepper.
 
-       This method changes the next scheduled time of a Stepper on the
+       This method changes the next scheduled time of the Stepper on the
        Scheduler.   
 
        The next time is calculated as Stepper::CurrentTime +
        Stepper::StepInterval.   
 
-       If the next time is less than Model::CurrentTime, this method
+       If the next time is before Model::CurrentTime, this method
        throws a SimulationError exception.
 
        @param aStepperPtr a pointer to the Stepper to be rescheduled

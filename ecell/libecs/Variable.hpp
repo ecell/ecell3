@@ -315,7 +315,8 @@ namespace libecs
 
     GET_METHOD( Real, MolarConc )
     {
-      return getValue() / ( getSuperSystem()->getSizeN_A() );
+      // R_N_A = 1.0 / N_A
+      return getNumberConc() * R_N_A;
     }
 
     /**
@@ -328,7 +329,12 @@ namespace libecs
 
     GET_METHOD( Real, NumberConc )
     {
-      return getValue() / ( getSuperSystem()->getSize() );
+      return getValue() / 
+	getSuperSystem()->getSizeVariable()->getValue();
+
+      // This does not use
+      //   getSuperSystem()->getSize()
+      // because otherwise it is impossible to inline this operation.
     }
 
 

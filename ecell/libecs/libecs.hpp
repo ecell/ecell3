@@ -70,7 +70,7 @@ namespace libecs
   DECLARE_CLASS( VariableProxy );
   DECLARE_CLASS( Model );
   DECLARE_CLASS( Scheduler );
-  DECLARE_CLASS( Event );
+  DECLARE_CLASS( SchedulerEvent );
   DECLARE_CLASS( StepperMaker );
   DECLARE_CLASS( Variable );
   DECLARE_CLASS( VariableMaker );

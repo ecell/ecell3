@@ -78,8 +78,6 @@ LIBECS_DM_CLASS( GillespieProcess, DiscreteEventProcess )
   }
   
 
-
-  // a uniform random number (0...1) must be given as u
   virtual void updateStepInterval()
   {
     const Real aMu( getMu() );
@@ -91,12 +89,16 @@ LIBECS_DM_CLASS( GillespieProcess, DiscreteEventProcess )
 
 	if( getOrder() == 2 )
 	  {
-	    theStepInterval *= getSuperSystem()->getSizeN_A();
+	    theStepInterval *= 
+	      getSuperSystem()->getSizeVariable()->getValue() * N_A;
+	    // A trick: which is faster than:
+	    //theStepInterval *= getSuperSystem()->getSizeN_A();
 	  }
       }
     else // aMu == 0.0 (or aMu < 0.0 but this won't happen)
       {
-	theStepInterval = std::numeric_limits<Real>::max();
+	theStepInterval = libecs::INF;
+	  // std::numeric_limits<Real>::max();
       }
   }
 
@@ -104,21 +106,7 @@ LIBECS_DM_CLASS( GillespieProcess, DiscreteEventProcess )
   void calculateOrder();
 
 
-  virtual void initialize()
-  {
-    DiscreteEventProcess::initialize();
-    declareUnidirectional();
-
-    calculateOrder();
-
-    if( ! ( getOrder() == 1 || getOrder() == 2 ) )
-      {
-	THROW_EXCEPTION( ValueError, 
-			 String( getClassName() ) + 
-			 "[" + getFullID().getString() + 
-			 "]: Only first or second order scheme is allowed." );
-      }
-  }
+  virtual void initialize();
 
   virtual void process()
   {
@@ -130,9 +118,6 @@ LIBECS_DM_CLASS( GillespieProcess, DiscreteEventProcess )
 	aVariableReference.addValue( aVariableReference.getCoefficient() );
       }
   }
-
-  //  virtual const bool 
-  //    checkEffect( GillespieProcessPtr anGillespieProcessPtr ) const;
 
 
 protected:
@@ -211,64 +196,6 @@ protected:
   RealMethodPtr theGetMinValueMethodPtr;
 
 };
-
-
-void GillespieProcess::calculateOrder()
-{
-  theOrder = 0;
-    
-  for( VariableReferenceVectorConstIterator 
-	 i( theVariableReferenceVector.begin() );
-       i != theVariableReferenceVector.end() ; ++i )
-    {
-      VariableReferenceCref aVariableReference( *i );
-      const Int aCoefficient( aVariableReference.getCoefficient() );
-	
-      // here assume aCoefficient != 0
-      if( aCoefficient == 0 )
-	{
-	  THROW_EXCEPTION( InitializationFailed,
-			   "[" + getFullID().getString() + 
-			   "]: Zero stoichiometry is not allowed." );
-	}
-
-	
-      if( aCoefficient < 0 )
-	{
-	  // sum the coefficient to get the order of this reaction.
-	  theOrder -= aCoefficient; 
-	}
-    }
-
-  // set theGetMultiplicityMethodPtr and theGetMinValueMethodPtr
-
-  if( getOrder() == 0 )   // no substrate
-    {
-      theGetMultiplicityMethodPtr = &GillespieProcess::getZero;
-      theGetMinValueMethodPtr     = &GillespieProcess::getZero;
-    }
-  else if( getOrder() == 1 )   // one substrate, first order.
-    {
-      theGetMultiplicityMethodPtr = 
-	&GillespieProcess::getMultiplicity_FirstOrder;
-      theGetMinValueMethodPtr = &GillespieProcess::getMinValue_FirstOrder;
-    }
-  else if( getZeroVariableReferenceOffset() == 2 ) // 2 substrates, 2nd order
-    {  
-      theGetMultiplicityMethodPtr = 
-	&GillespieProcess::getMultiplicity_SecondOrder_TwoSubstrates;
-      theGetMinValueMethodPtr = 
-	&GillespieProcess::getMinValue_SecondOrder_TwoSubstrates;
-    }
-  else // one substrate, second order (coeff == -2)
-    {
-      theGetMultiplicityMethodPtr = 
-	&GillespieProcess::getMultiplicity_SecondOrder_OneSubstrate;
-      theGetMinValueMethodPtr = 
-	&GillespieProcess::getMinValue_SecondOrder_OneSubstrate;
-    }
-
-}
 
 
 
