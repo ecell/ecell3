@@ -32,3 +32,9 @@ ENTITYTYPE_DICT =\
     'System'   : SYSTEM
 }    
 
+# File extension
+
+MODEL_FILE_EXTENSION = 'eml' 
+SCRIPT_FILE_EXTENSION = 'ess' 
+
+
