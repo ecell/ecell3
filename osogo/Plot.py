@@ -653,7 +653,7 @@ class Plot:
 		self.reframey()
 		for fpn in self.data_list:
 		    self.data_stack[fpn]=self.getxframe_from_logger(fpn)
-		    
+
 	    #reframey
 	    #drawall
 	    self.drawall()
@@ -859,27 +859,41 @@ class Plot:
 		self.printxlabel(tickvalue)
 			    
 	def printTraceLabels(self):
-
 	    if self.size_status!='minimized':
 		return
 	    _textshift=10
 	    for fpn in self.data_list:
 		if not self.trace_onoff[fpn]:
-			break
-		theSum=0
+			continue
+
+		theSum = 0
+		theNum = 0
+
 		for dp in self.data_stack[fpn]:
-			theSum += dp[1]
-		if len(self.data_stack[fpn]) != 0:
-			theAvg = theSum / len(self.data_stack[fpn])
+			if dp[1] <= self.yframe[1] and dp[1] >= self.yframe[0]:
+				theSum += dp[1]
+				theNum += 1
+
+		if  theNum != 0 :
+			theAvg = theSum / theNum
 			theAvgPos = self.converty_to_plot(theAvg)
-		else:
+
+		elif len(self.data_stack[fpn]) == 0:
 			theAvgPos = _textshift + self.plotaread[1]
-			
-		if theAvgPos < self.plotaread[1] or theAvgPos > self.plotaread[3]:
+		else:
+			continue
+		
+		if theAvgPos < self.plotaread[1] or theAvgPos > self.plotaread[3] + 10 :
 			break
 		_bias = 10
 		if theAvgPos - self.plotaread[1] > self.plotaread[3] - theAvgPos:
 			_bias = -15
+
+		self.drawtext( "background", self.plotaread[0] + _textshift + 2, theAvgPos + _bias - 2, \
+			self.FullPNMap[fpn][1] )
+		self.drawtext( "background", self.plotaread[0] + _textshift + 1, theAvgPos + _bias - 1, \
+			self.FullPNMap[fpn][1] )
+
 		self.drawtext( fpn, self.plotaread[0] + _textshift, theAvgPos + _bias, \
 			self.FullPNMap[fpn][1] )
 		_textshift += 20		
@@ -891,17 +905,19 @@ class Plot:
 	    for fpn in self.data_list:
 		if self.trace_onoff[fpn]:
 		    self.drawtrace(fpn)
+
 	    self. printTraceLabels()
 
 
 	
 	def drawtrace(self, aFullPNString):
 	    #get databuffer, for each point draw
-	    databuffer=self.data_stack[aFullPNString]
+	    databuffer=self.data_stack[aFullPNString][:]
 	    self.lastx[aFullPNString]=None	
 	    self.lasty[aFullPNString]=None
 	    for datapoint in databuffer:
 		self.drawpoint(aFullPNString, datapoint)
+	    fpn = aFullPNString
 
 	def withinframes(self,point):
 	    return point[0]<self.plotaread[2] and point[0]>self.plotaread[0] and\
