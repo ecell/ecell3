@@ -276,7 +276,7 @@ class Eml:
             if aChild.nodeName == 'property' and\
                    aChild.getAttribute( 'name' ) == aPropertyName:
 
-                aTargetSystem.removeChild( aPropertyNode )
+                aTargetNode.removeChild( aChild )
 
 
     def getEntityList( self, anEntityType, aSystemPath ):
