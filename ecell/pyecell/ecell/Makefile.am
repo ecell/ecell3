@@ -1,5 +1,9 @@
 AUTOMAKE_OPTIONS = foreign
 
+if OS_WIN32
+  no_undefined = -no-undefined
+endif
+
 CXX_FLAGS=@CXX_FLAGS@
 PYTHON_INCLUDES=@PYTHON_INCLUDES@
 pkgpythondir=@pkgpythondir@
@@ -44,7 +48,7 @@ INCLUDES=-I. -I.. ${PYTHON_INCLUDES}
 
 pkgpython_LTLIBRARIES = _tableio.la
 
-_tableio_la_LDFLAGS=-module -export-dynamic -avoid-version
+_tableio_la_LDFLAGS=-module -export-dynamic -avoid-version $(no_undefined)
 _tableio_la_LIBADD=
 _tableio_la_SOURCES = \
 _tableio.c
