@@ -14,24 +14,43 @@ class NumericWindow( PluginWindow ):
                             'increase_value' :self.increaseValue,
                             'decrease_value' :self.decreaseValue } )
 
-        self.theFullPN = data[0]
-        self.initialize(self.theFullPN)
+        self.theFPN = data[0]
+        self.theFullID = convertFullPNToFullID(self.theFPNs[0])
+        aFullPropertyName = convertFullIDToFullPN(self.theFullID,
+                                                  'PropertyList')
+        aPropertyList =\
+        list( self.theSimulator.getProperty( aFullPropertyName ) )
+        aAttributeList = convertFullIDToFullPN(self.theFullID,
+                                                  'PropertyAttributes')
+        aAttributeList =\
+        list(self.theSimulator.getProperty( aAttributeList ))
+        num = 0
+
+        for aProperty in aPropertyList:
+            if (aProperty =='Quantity'):
+                print aProperty,
+                print "=",
+                print aAttributeList[num]
+            else :
+                pass
+            num += 1        
+        self.initialize(self.theFPN)
         self.thePluginManager = pluginmanager
 
     def initialize( self, fpn ):
 
-        self.theFullPN = fpn
-        self.theID = str( self.theFullPN[ID] )
+        self.theFPN = fpn
+        self.theID = str( self.theFPN[ID] )
         
         self["id_label"].set_text( self.theID )
-        value = self.theSimulator.getProperty( self.theFullPN )
+        value = self.theSimulator.getProperty( self.theFPN )
         self.theCurValue = value[0]
         self["value_frame"].set_text(str(self.theCurValue))
 
         
     def update( self ):
 
-        value = self.theSimulator.getProperty( self.theFullPN )
+        value = self.theSimulator.getProperty( self.theFPN )
         self.theCurValue = value[0]
         self["value_frame"].set_text(str(self.theCurValue))
 
@@ -56,14 +75,12 @@ class NumericWindow( PluginWindow ):
     def changeValue( self ):
 
         value = (self.theCurValue,)
-        self.theSimulator.setProperty(self.theFullPN, value)
+        self.theSimulator.setProperty(self.theFPN, value)
         self.thePluginManager.updateAllPluginWindow()
 
         ### for check
-        self.thePluginManager.printMessage( getFullPNString( self.theFullPN ) )
-        self.thePluginManager.printMessage( ' -> ' )
-        self.thePluginManager.printMessage( str( self.theSimulator.getProperty(self.theFullPN)[0] ) )
-        self.thePluginManager.printMessage( "\n" )
+        print self.theSimulator.getProperty(self.theFPN)
+
 
 ### test code
 
