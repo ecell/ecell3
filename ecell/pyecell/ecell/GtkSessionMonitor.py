@@ -90,7 +90,7 @@ class GtkSessionMonitor(Session):
 		self.theUpdateInterval = 150
 		self.stuckRequests = 0
 		self.theStepSizeOrSec = 1.0
-		self.theRunningFlag = 0
+		self.theRunningFlag = False
 
 		# -------------------------------------
 		# creates PluginManager
@@ -626,7 +626,7 @@ class GtkSessionMonitor(Session):
 		""" step according to num, if num is not given,
 			according to set step parameters
 		"""
-		if self.theRunningFlag == 1:
+		if self.theRunningFlag == True:
 			return
 
 		if num == None:
@@ -635,7 +635,7 @@ class GtkSessionMonitor(Session):
 			    self.message( "Zero step value overridden to 1\n" )
 
 		try:
-			self.theRunningFlag = 1
+			self.theRunningFlag = True
 			# this can fail if the simulator is not ready
 			self.theSimulator.initialize()
 
@@ -644,13 +644,13 @@ class GtkSessionMonitor(Session):
 
 			Session.step( self, int( num ) )
 
-			self.theRunningFlag = 0
+			self.theRunningFlag = False
 			self.__removeTimeOut()
 
 		except:
 			anErrorMessage = traceback.format_exception(sys.exc_type,sys.exc_value,sys.exc_traceback)
 			self.message( anErrorMessage )
-			self.theRunningFlag = 0
+			self.theRunningFlag = False
 
 		self.updateWindows()
 		#self._synchronize()
