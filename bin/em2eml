@@ -338,35 +338,28 @@ def convertEm2Eml( anEmFileObject , mode='' ):
 	# Scanning
 	aScanner = EmScanner()
 	aTokenList = aScanner.tokenize( anEmFileObject.read() )
-	if mode == 'debug':print aTokenList
 
 	# Parsing 
 	aParser = EmParser()
 	anAst = aParser.parse( aTokenList )
-	if mode == 'debug':print 'AST:', anAst
 
 	# Generating
 	anInterpreter = Interpret( anAst )
 	aQueueList = sortSystemID(anInterpreter.queue)
-	if mode == 'debug':print aQueueList
 
 	for part in aQueueList:
                 (aType, aClass, anID, aPropertyList) = part[0], part[1], part[2], part[3:]
 		aFullID = convert2FullID(anEml, aType,  anID)
 		if aType == 'Stepper':
 			anEml.createStepper(aClass, aFullID)
-			if mode == 'debug':print "createStepper(%s, %s)" % (aClass, aFullID)
 			continue
 		else:
 			anEml.createEntity(aClass, aFullID)
-			if mode == 'debug':print "createEntity(%s, %s)" % (aClass, anID)
 
 		for i in aPropertyList:
 			for j in i:
 				(aPropertyName, aValueList) = j[0], j[1:]
 				anEml.setEntityProperty(aFullID, aPropertyName, aValueList)
-				if mode == 'debug':print "\tsetEntityProperty(%s, %s, %s)" % (aFullID, aPropertyName, aValueList)
-
 
 	aString = anEml.asString()
 	    
