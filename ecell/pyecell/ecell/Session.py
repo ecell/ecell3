@@ -259,7 +259,7 @@ class Session:
         elif type( fullpn ) == tuple: 
             aLoggerNameList = fullpn
         else:
-            self.mesage( fullpn +" is not suitable type.\nuse string or list or tuple" )
+            self.message( fullpn +" is not suitable type.\nuse string or list or tuple" )
             return
             
         # -------------------------------------------------
