@@ -242,6 +242,79 @@ namespace libecs
     }
   };
 
+  /**
+     These functions are prepared for ExpressionFluxProcess
+     and used in it.
+  */
+
+  Real sec( Real n )
+  {
+    return 1 / cos( n );
+  }
+
+  Real csc( Real n )
+  {
+    return 1 / sin( n );
+  }
+
+  Real cot( Real n )
+  {
+    return 1 / tan( n );
+  }
+
+  Real asec( Real n )
+  {
+    return 1 / acos( n );
+  }
+
+  Real acsc( Real n )
+  {
+    return 1 / asin( n );
+  }
+
+  Real acot( Real n )
+  {
+    return 1 / atan( n );
+  }
+
+  Real sech( Real n )
+  {
+    return 1 / cosh( n );
+  }
+  
+  Real csch( Real n )
+  {
+    return 1 / sinh( n );
+  }
+  
+  Real coth( Real n )
+  {
+    return 1 / tanh( n );
+  }
+  
+  Real asech( Real n )
+  {
+    return 1 / acosh( n );
+  }
+
+  Real acsch( Real n )
+  {
+    return 1 / asinh( n );
+  }
+
+  Real acoth( Real n )
+  {
+    return 1 / atanh( n );
+  }
+
+  Real sum = 1;
+  Real fact( Real n )
+  {
+    for( Real num = n; num > 0; num--)
+      sum = sum * num;
+    
+    return sum;
+  }
 
   const Polymorph convertStringMapToPolymorph( StringMapCref aMap );
 
