@@ -55,16 +55,16 @@ class Session:
         self.__thePreModel = anEmlParser.parse()
 
 
-        print 'load stepper' ##DebugMessage
+        #print 'load stepper' ##DebugMessage
         self.loadStepper()
         
-        print 'load entity' ## has bugs
+        #print 'load entity' ## has bugs
         self.loadEntity()
 
-        print 'load system-stepper' ##DebugMessage
+        #print 'load system-stepper' ##DebugMessage
         self.loadSystemStepper()
 
-        print 'load property' ##DebugMessage
+        #print 'load property' ##DebugMessage
         self.loadProperty()
 
         
