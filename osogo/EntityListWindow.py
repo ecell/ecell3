@@ -20,181 +20,182 @@ DEFAULT_PROCESS_PROPERTY = 'Activity'
 
 
 class EntityListWindow(OsogoWindow):
-	"""EntityListWindow
-	"""
+        '''EntityListWindow
+	'''
 
-	VARIABLE_COLUMN_LIST= ( 'ID',\
-				'Value',\
-				'Classname',\
-				'Path' )
 
-	PROCESS_COLUMN_LIST=( 'ID',\
-			      'Activity',\
-			      'Classname',\
-			      'Path' )
-
+	#               Name:        Type,                Entity property?
+	VARIABLE_COLUMN_INFO_LIST= [
+	    ( 'ID',        gobject.TYPE_STRING, False ),
+	    ( 'Value',     gobject.TYPE_FLOAT,  True ),
+	    ( 'Classname', gobject.TYPE_STRING, False ),
+	    ( 'Path',      gobject.TYPE_STRING, False )
+	    ]
+	
+	PROCESS_COLUMN_INFO_LIST= [
+	    ( 'ID',        gobject.TYPE_STRING, False ),
+	    ( 'Activity',  gobject.TYPE_FLOAT,  True ),
+	    ( 'Classname', gobject.TYPE_STRING, False ),
+	    ( 'Path',      gobject.TYPE_STRING, False )
+	    ]
+	
+    
 	def __init__( self, aSession, rootWidget ):
-		'''Constructor
+	        '''Constructor
 		aSession   --   a reference to GtkSessionMonitor
 		'''
-		
-		# calls superclass's constructor 
+	
+		# call superclass's constructor 
 		OsogoWindow.__init__( self, aSession, rootWidget=rootWidget )
-
-		self.theSession = aSession
 		
+		self.theSession = aSession
+	
 		# initialize parameters
 		self.theSelectedFullPNList = []
-
+	
 		self.searchString = ''
-		
+	
 		# fix me
 		if( self.theSession != None ):
-			self.thePluginManager = aSession.thePluginManager
-			
+		        self.thePluginManager = aSession.thePluginManager
+		
 		self.thePluginInstanceSelection = None
-			
+		
 		self.theSelectedSystemIter = None
-
+		
 	def openWindow( self ):
-
-		# call superclass's openWindow
+			
+                # call superclass's openWindow
 		OsogoWindow.openWindow( self )
 		
 		
 		# add handers
 		self.addHandlers( { 
-			# system tree
-			'on_system_tree_cursor_changed' :\
-			self.updateSystemSelection,\
-			'on_system_tree_button_press_event' : self.popupMenu,\
-			# entity list
-#			'on_process_tree_cursor_changed': self.selectProcess,\
-#			'on_variable_tree_cursor_changed':self.selectVariable,\
-			'on_view_button_clicked': self.createPluginWindow,\
-			'on_variable_tree_button_press_event': self.popupMenu,\
-			'on_process_tree_button_press_event': self.popupMenu,\
-			# search 
-			'on_search_button_released': self.pushSearchButton,\
-			'on_search_entry_key_press_event':\
-			self.keypressOnSearchEntry,\
-			} )
-
-
-		self.theLastSelectWindow = None
-
-		
+		    # system tree
+		    #			'on_system_tree_cursor_changed' :\
+		    #			self.updateSystemSelection,\
+		    'on_system_tree_button_press_event' : self.popupMenu,\
+		    # entity list
+		    #			'on_process_tree_cursor_changed': self.selectProcess,\
+		    #			'on_variable_tree_cursor_changed':self.selectVariable,\
+		    'on_view_button_clicked': self.createPluginWindow,\
+		    'on_variable_tree_button_press_event': self.popupMenu,\
+		    'on_process_tree_button_press_event': self.popupMenu,\
+		    # search 
+		    'on_search_button_released': self.pushSearchButton,\
+		    'on_search_entry_key_press_event':\
+		    self.keypressOnSearchEntry,\
+		    } )
+	
+	
+		self.theLastSelectedWindow = None
+	
+	
 		self.systemTree   = self['system_tree']
 		self.processTree  = self['process_tree']
 		self.variableTree = self['variable_tree']
-		
+	
 		# --------------------------------------------
 		# initialize components
 		# --------------------------------------------
-
+		
 		if( self.theSession == None ):
-			self['search_button'].set_sensitive(0)
+		        self['search_button'].set_sensitive(0)
 			self['view_button'].set_sensitive(0)
 			self['search_entry'].set_sensitive(0)
 			self['plugin_optionmenu'].set_sensitive(0)
 		else:
-
-			self.__initializeSystemTree()
+		
+		        self.__initializeSystemTree()
 			self.__initializeProcessTree()
 			self.__initializeVariableTree()
-
+		
 			self.__initializePluginWindowOptionMenu()
 			self.__initializePropertyWindow()
 			self.__initializePopupMenu()
 
-			# --------------------------------------------
-			# initialize system tree
-			# --------------------------------------------
-			# set up system tree
-			self.theSysTreeStore.clear()
-			
-			# create route ID
 			aRootSystemFullID = createFullID( 'System::/' )
 			self.constructTree( None, aRootSystemFullID )
 			self.update()
-
-			# --------------------------------------------
-			# initialize buffer
-			# --------------------------------------------
-			self.theSelectedEntityList = []
-			self.theSelectedPluginInstanceList = []
-			
-			# --------------------------------------------
-			# initialize Add to Board button
-			# --------------------------------------------
-		        #self.checkBoardExists()
-		        self.CloseOrder = False
-
-	def setSession( self, aSession ):
-		self.theSession = aSession
-		self.thePluginManager = aSession.thePluginManager
-
-		self['search_button'].set_sensitive(1)
-		self['view_button'].set_sensitive(1)
-		self['search_entry'].set_sensitive(1)
-		self['plugin_optionmenu'].set_sensitive(1)
-
-		self.__initializeSystemTree()
-		self.__initializeProcessTree()
-		self.__initializeVariableTree()
-		
-		self.__initializePluginWindowOptionMenu()
-		self.__initializePropertyWindow()
-		self.__initializePopupMenu()
-
-		
-		# --------------------------------------------
-		# initialize system tree
-		# --------------------------------------------
-		# set up system tree
-		self.theSysTreeStore.clear()
-		
-		# create route ID
-		aRootSystemFullID = createFullID( 'System::/' )
-		self.constructTree( None, aRootSystemFullID )
-		self.update()
 		
 		# --------------------------------------------
 		# initialize buffer
 		# --------------------------------------------
 		self.theSelectedEntityList = []
 		self.theSelectedPluginInstanceList = []
-			
+		
 		# --------------------------------------------
-		# initialize Add to Board buttons
+		# initialize Add to Board button
 		# --------------------------------------------
 		#self.checkBoardExists()
 		self.CloseOrder = False
+
+	def setSession( self, aSession ):
+	        self.theSession = aSession
+		self.thePluginManager = aSession.thePluginManager
+
+		self['search_button'].set_sensitive(1)
+		self['view_button'].set_sensitive(1)
+		self['search_entry'].set_sensitive(1)
+		self['plugin_optionmenu'].set_sensitive(1)
+	    
+		self.__initializeSystemTree()
+		self.__initializeProcessTree()
+		self.__initializeVariableTree()
+	    
+		self.__initializePluginWindowOptionMenu()
+		self.__initializePropertyWindow()
+		self.__initializePopupMenu()
+	    
+	    
+		# --------------------------------------------
+		# initialize system tree
+		# --------------------------------------------
+		# set up system tree
+		self.systemTree.get_model().clear()
+	    
+		# create route ID
+		aRootSystemFullID = createFullID( 'System::/' )
+		self.constructTree( None, aRootSystemFullID )
+		self.update()
+	    
+		# --------------------------------------------
+		# initialize buffer
+		# --------------------------------------------
+		self.theSelectedEntityList = []
+		self.theSelectedPluginInstanceList = []
+	    
+		# --------------------------------------------
+		# initialize Add to Board buttons
+		# --------------------------------------------
+	        #self.checkBoardExists()
+		self.CloseOrder = False
 			
 	def checkBoardExists( self ):
-		if self.theSession.getWindow('BoardWindow').exists():
-			self['add_to_board'].set_sensitive(TRUE)
+	        if self.theSession.getWindow('BoardWindow').exists():
+		    self['add_to_board'].set_sensitive(TRUE)
 		else:
-			self['add_to_board'].set_sensitive(FALSE)
+		    self['add_to_board'].set_sensitive(FALSE)
 		
 
 	def deleted( self, *arg ):
-		self.close()
+	        self.close()
 
 
 	def close( self ):
-		if self.CloseOrder:
-			return
+	        if self.CloseOrder:
+		    return
 		self.CloseOrder = True
 
 		if self.thePluginInstanceSelection != None:
-			self.thePluginInstanceSelection.deleted()
-			self.thePluginInstanceSelection = None
+		    self.thePluginInstanceSelection.deleted()
+		    self.thePluginInstanceSelection = None
+
 		self.theSession.deleteEntityListWindow( self )
 		OsogoWindow.close(self)
 	
 	def deletePluginInstanceSelection( self, *arg ):
-		"""sets 'delete_event' as 'hide_event'
+                """sets 'delete_event' as 'hide_event'
 		"""
 
 		# hide this window
@@ -204,73 +205,74 @@ class EntityListWindow(OsogoWindow):
 		return TRUE
 
 	def __initializeSystemTree( self ):
-		"""initialize SystemTree
+	        """initialize SystemTree
 		"""
 
-		self.theSysTreeStore=gtk.TreeStore( gobject.TYPE_STRING )
-		self.systemTree.set_model(self.theSysTreeStore)
-		column=gtk.TreeViewColumn( 'System Tree',
-					   gtk.CellRendererText(),
-					   text=0 )
+		treeStore = gtk.TreeStore( gobject.TYPE_STRING )
+		column = gtk.TreeViewColumn( 'System Tree',
+					     gtk.CellRendererText(),
+					     text=0 )
 		column.set_visible( gtk.TRUE )
 		self.systemTree.append_column(column)
 
+		selection = self.systemTree.get_selection()
+		selection.set_mode( gtk.SELECTION_MULTIPLE )
+		selection.connect( 'changed', self.selectSystem )
+		
+		self.systemTree.set_model( treeStore )
 
 	def __initializeProcessTree( self ):
-		"""initialize ProcessTree
+	        """initialize ProcessTree
 		"""
 
 		columnTypeList = []
 
-		for i in range( len( self.PROCESS_COLUMN_LIST ) ):
-			title = self.PROCESS_COLUMN_LIST[i]
-			
-			column = gtk.TreeViewColumn( title,
-						     gtk.CellRendererText(),
-						     text=i )
-			column.set_reorderable( True )
-			column.set_sort_column_id( i )
-			self.processTree.append_column( column )
-			columnTypeList.append( gobject.TYPE_STRING )
+		for i in range( len( self.PROCESS_COLUMN_INFO_LIST ) ):
+		    title, type, _dummy = self.PROCESS_COLUMN_INFO_LIST[i]
+
+		    column = gtk.TreeViewColumn( title,
+						 gtk.CellRendererText(),
+						 text=i )
+		    column.set_reorderable( True )
+		    column.set_sort_column_id( i )
+		    self.processTree.append_column( column )
+		    columnTypeList.append( type )
+
 
 
 		selection = self.processTree.get_selection()
-		selection.set_mode(\
-			gtk.SELECTION_MULTIPLE )
-		selection.connect( 'changed',\
-				   self.selectProcess )
+		selection.set_mode( gtk.SELECTION_MULTIPLE )
+		selection.connect( 'changed', self.selectProcess )
 		self.processTree.set_model( gtk.ListStore( *columnTypeList ) )
 
 
 	def __initializeVariableTree( self ):
-		"""initializes VariableTree
+	        """initializes VariableTree
 		"""
 
 		columnTypeList = []
 
-		for i in range( len( EntityListWindow.VARIABLE_COLUMN_LIST ) ):
-			title = EntityListWindow.VARIABLE_COLUMN_LIST[i]
-			
-			column = gtk.TreeViewColumn( title,
-						     gtk.CellRendererText(),
-						     text=i )
-			column.set_reorderable( True )
-			column.set_sort_column_id( i )
-			self.variableTree.append_column( column )
-			columnTypeList.append( gobject.TYPE_STRING )
+		for i in range( len( self.VARIABLE_COLUMN_INFO_LIST ) ):
+		    title, type, _dummy = self.VARIABLE_COLUMN_INFO_LIST[i]
+		
+		    column = gtk.TreeViewColumn( title,
+						 gtk.CellRendererText(),
+						 text=i )
+		    column.set_reorderable( True )
+		    column.set_sort_column_id( i )
+		    self.variableTree.append_column( column )
+		    columnTypeList.append( type )
 
 		selection = self.variableTree.get_selection()
-		selection.set_mode(\
-			gtk.SELECTION_MULTIPLE )
-		selection.connect( 'changed',\
-				   self.selectVariable )
+		selection.set_mode( gtk.SELECTION_MULTIPLE )
+		selection.connect( 'changed', self.selectVariable )
 		self.variableTree.set_model( gtk.ListStore( *columnTypeList ) )
 
 		
 
 
 	def __initializePluginWindowOptionMenu( self ):
-		"""initializes PluginWindowOptionMenu
+	        """initializes PluginWindowOptionMenu
 		"""
 
 		aPluginWindowNameList = []
@@ -278,27 +280,26 @@ class EntityListWindow(OsogoWindow):
 
 		for aPluginWindowName in self.thePluginManager.thePluginMap.keys():
 
-			aButton = gtk.Button()
-			aMenuItem = gtk.MenuItem(aPluginWindowName)
+		    aButton = gtk.Button()
+		    aMenuItem = gtk.MenuItem(aPluginWindowName)
 
-			if aPluginWindowName == DEFAULT_WINDOW:
-				aMenu.prepend( aMenuItem )
-			else:
-				aMenu.append( aMenuItem )
+		    if aPluginWindowName == DEFAULT_WINDOW:
+			aMenu.prepend( aMenuItem )
+		    else:
+			aMenu.append( aMenuItem )
 
 		self['plugin_optionmenu'].set_menu(aMenu)
 		self['plugin_optionmenu'].show_all()
 
-		# set default menu
-
 
 	def __initializePropertyWindow( self ):
 
-		self.thePropertyWindow= \
-		self.thePluginManager.createInstance( 'PropertyWindow',\
-						      [(SYSTEM, '', '/', '')],\
-						      rootWidget= 'top_frame',\
-						      parent= self ) 
+	        self.thePropertyWindow= self.thePluginManager.createInstance(
+		    'PropertyWindow',\
+		    [(SYSTEM, '', '/', '')],\
+		    rootWidget= 'top_frame',\
+		    parent= self ) 
+
 		self.thePropertyWindow.setStatusBar( self['statusbar'] )
 
 		aPropertyWindowTopVBox = self.thePropertyWindow['top_frame']
@@ -308,18 +309,18 @@ class EntityListWindow(OsogoWindow):
 
 
 	def __initializePopupMenu( self ):
-		"""Initialize popup menu
+	        """Initialize popup menu
 		Returns None
 		[Note]:In this method, only 'PluginWindow type' menus, 'Create 
-		       Logger' menu and 'Add to Board' menu are created. 
-		       The menus of PluginWindow instances are appended
-		       dinamically in self.popupMenu() method.
+		Logger' menu and 'Add to Board' menu are created. 
+		The menus of PluginWindow instances are appended
+		dinamically in self.popupMenu() method.
 		"""
 
 		# ------------------------------------------
 		# menus for PluginWindow
 		# ------------------------------------------
-
+	    
 		# creaets menus of PluginWindow
 		for aPluginWindowType in self.thePluginManager.thePluginMap.keys(): 
 			aMenuItem = gtk.MenuItem( aPluginWindowType )
@@ -463,7 +464,8 @@ class EntityListWindow(OsogoWindow):
 			# When PopupMenu was displayed last time without PluginWindows'
 			# menus, the buffer (self.thePopupSubMenu) is None.
 			if self.thePopupSubMenu != None:
-				self['EntityPopupMenu'].remove( self.thePopupSubMenu )
+				pass
+#				self['EntityPopupMenu'].remove( self.thePopupSubMenu )
 
 			if len(self.thePluginManager.theInstanceList)!=0:
 
@@ -489,17 +491,17 @@ class EntityListWindow(OsogoWindow):
 					aMenuItem.set_submenu( aSubMenu )
 
 					# appends parent MenuItem to PopupMenu
-					self['EntityPopupMenu'].append( aMenuItem )
+#					self['EntityPopupMenu'].append( aMenuItem )
 
 					# saves this submenu set to buffer (self.thePopupSubMenu)
 					self.thePopupSubMenu = aMenuItem
 
 
 			# displays all items on PopupMenu
-			self['EntityPopupMenu'].show_all() 
+#			self['EntityPopupMenu'].show_all() 
 
 			# displays popup menu
-			self['EntityPopupMenu'].popup(None,None,None,anEvent.button,anEvent.time)
+#			self['EntityPopupMenu'].popup(None,None,None,anEvent.button,anEvent.time)
 
 
 
@@ -526,10 +528,11 @@ class EntityListWindow(OsogoWindow):
 
 		aNewlabel = aSystemFullID[ID] 
 
-		iter  = self.theSysTreeStore.append( aParentTree )
-		self.theSysTreeStore.set_value( iter, 0, aNewlabel )
-		key = str( self.theSysTreeStore.get_path( iter ) )
-		self.theSysTreeStore.set_data( key, aSystemFullID )
+		systemStore = self.systemTree.get_model()
+		iter  = systemStore.append( aParentTree )
+		systemStore.set_value( iter, 0, aNewlabel )
+		key = str( systemStore.get_path( iter ) )
+		systemStore.set_data( key, aSystemFullID )
 		    
 		aSystemPath = createSystemPathFromFullID( aSystemFullID )
 		aSystemList = self.theSession.getEntityList( 'System',\
@@ -543,58 +546,61 @@ class EntityListWindow(OsogoWindow):
 			aNewSystemFullID = ( SYSTEM, aSystemPath, aSystemID )
 			self.constructTree( iter, aNewSystemFullID )
 
-			aPath = self.theSysTreeStore.get_path( iter )
+			aPath = systemStore.get_path( iter )
 			if aSystemListLength < 6 and len( aPath ) < 6:
 				self.systemTree.expand_row( aPath, gtk.TRUE )
 				
 
-	def updateSystemSelection( self, obj=None ):
-		self.theSelectedSystemIter = self.systemTree.get_selection().get_selected()[1]
+	def selectSystem( self, obj ):
+
+		# select the first selected System in the PropertyWindow
+		systemFullID = self.getSelectedSystemList()[0]
+
+		fullPN = convertFullIDToFullPN( systemFullID )
+		self.thePropertyWindow.setRawFullPNList( [ fullPN ] )
+
 		self.updateLists()
 
-		if type(obj) == gtk.TreeView:
-
-			sysTreeStore = self.theSysTreeStore
-			selectedSystemIter = self.theSelectedSystemIter
-			key=str( sysTreeStore.get_path( selectedSystemIter ) )
-			systemFullID = sysTreeStore.get_data( key )
-			systemPath = createSystemPathFromFullID( systemFullID )
-			entityList= self.theSession.getEntityList( 'System',\
-								   systemPath )
-
-			aFullPN =  convertFullIDToFullPN( systemFullID ) 
-			fullPN = convertFullIDToFullPN( systemFullID )
-			self.thePropertyWindow.setRawFullPNList( [ fullPN ] )
 
 	def getSelectedSystemList( self ):
+		'''
+		Return - a list of FullIDs of the currently selected Systems.
+		'''
 
 		# get system ID from selected items of system tree,
 		# and get entity list from session
-		selectedSystemIter = self.theSelectedSystemIter
-		key = str( self.theSysTreeStore.get_path( selectedSystemIter ) )
-		systemFullID = self.theSysTreeStore.get_data( key )
-		systemPath = createSystemPathFromFullID( systemFullID )
 
-		return ( systemPath, )
+		systemList = []
+		
+		selection = self.systemTree.get_selection()
+		selectedSystemTreePathList = selection.get_selected_rows()[1]
+
+		systemStore = self.systemTree.get_model()
+
+		for treePath in selectedSystemTreePathList:
+
+			systemFullID = systemStore.get_data( str( treePath ) )
+			systemList.append( systemFullID )
+
+		return systemList
 
 
 	def updateLists( self ):
-		if self.theSelectedSystemIter == None:
-			return None
 
 		selectedSystemList = self.getSelectedSystemList()
 
+		if len( selectedSystemList ) == 0:
+			return
+		
 		# Variable list
-		store = self.variableTree.get_model()
-		self.updateEntityList( 'Variable', store,\
-				       self.variableTree.get_columns(),\
-				       selectedSystemList )
+		self.updateEntityList( 'Variable', self.variableTree,\
+				       selectedSystemList,\
+				       self.VARIABLE_COLUMN_INFO_LIST )
 
 		# Process list
-		store = self.processTree.get_model()
-		self.updateEntityList( 'Process', store,
-				       self.processTree.get_columns(),\
-				       selectedSystemList )
+		self.updateEntityList( 'Process', self.processTree,\
+				       selectedSystemList,\
+				       self.PROCESS_COLUMN_INFO_LIST )
 
 		self.updateListLabels()
 
@@ -616,62 +622,70 @@ class EntityListWindow(OsogoWindow):
 
 
 
-	def updateEntityList( self, entityType, entityStore, columnList,\
-			      systemList ):
+	def updateEntityList( self, type, view, systemList, columnInfoList ):
 		
-		# get the entity list in the selected system(s)
+	    # get the entity list in the selected system(s)
+	    typeID = ENTITYTYPE_DICT[ type ]
 
-		systemPath = systemList[0]
+	    fullIDList = []
+	    for systemFullID in systemList:
 
-		if len( systemList ) == 1:
-			shownPath = '.'
-		else:
-			shownPath = systemPath
+		systemPath = createSystemPathFromFullID( systemFullID )
 
-		entityList = self.theSession.getEntityList( entityType,\
-							    systemPath )
+		idList = self.theSession.getEntityList( type, systemPath )
+		fullIDList += [ ( typeID, systemPath, id ) for id in idList ]
+		    
 
-		# clear the store
-		entityStore.clear()
 
+	    entityStore = view.get_model()
 		
-		# re-create the list
-		for ID in entityList:
+	    # clear the store
+	    entityStore.clear()
 
-			# temporary hack for the entity searching.
-			# this can be like this in python 2.3 or above
-			# if not self.searchString in ID:
-			if ID.find( self.searchString ) < 0:
-				continue
+	    #		columnList = view.get_columns()
+	    
+	    # re-create the list
+	    for fullID in fullIDList:
 
-			iter = entityStore.append()
+		ID = fullID[2]
+		# temporary hack for the entity searching.
+		# this can be like this in python 2.3 or above:
+		#    if not self.searchString in ID:
+		if ID.find( self.searchString ) < 0:
+		    continue
 
-			typeID = ENTITYTYPE_DICT[ entityType ]
-			fullID = ( typeID, systemPath, ID )
-			fullIDString = createFullIDString( fullID )
-			stub = self.theSession.createEntityStub( fullIDString )
-			entityStore.set_data( ID, fullID )
+		fullIDString = createFullIDString( fullID )
+		stub = self.theSession.createEntityStub( fullIDString )
+
+		valueList = []
+
+		for columnInfo in columnInfoList:
+
+		    title = columnInfo[0]
+		    isProperty = columnInfo[2]
+		    if isProperty:  # property?
+			value = stub[ title ]
+		    elif title == 'ID':
+			value = ID
+		    elif title == 'Classname':
+			value = stub.getClassname()
+		    elif title == 'Path':
+			value = systemPath
+		    else:
+			raise "Unexpected error: invalid title"
+
+		    valueList.append( value )
+
+		iter = entityStore.append( valueList )
+		iterString = entityStore.get_string_from_iter( iter )
+		entityStore.set_data( iterString, fullID )
 			
-			for i in range( len( columnList ) ):
-				title = columnList[i].get_title()
-
-				if title == 'ID':
-					value = ID
-				elif title == 'Classname':
-					value = stub.getClassname()
-				elif title == 'Path':
-					value = shownPath
-				else:  # usual entity property
-					value = stub[ title ]
-
-				entityStore.set_value( iter, i, str( value ) )
-
 
 
 
 	def selectProcess( self, selection ):
 
-		self.theLastSelectWindow = "Process"
+		self.theLastSelectedWindow = "Process"
 
 		# clear fullPN list
 		self.theSelectedFullPNList = []
@@ -689,7 +703,7 @@ class EntityListWindow(OsogoWindow):
 
 	def selectVariable( self, selection ):
 
-		self.theLastSelectWindow = "Variable"
+		self.theLastSelectedWindow = "Variable"
 
 		# clear fullPN list
 		self.theSelectedFullPNList = []
@@ -729,8 +743,9 @@ class EntityListWindow(OsogoWindow):
 		Return None
 		'''
 
-		key=self.variableTree.get_model().get_value(iter,0)
-		entityFullID = self.variableTree.get_model().get_data( key )
+		variableStore = self.variableTree.get_model()
+		iterString = variableStore.get_string_from_iter( iter )
+		entityFullID = variableStore.get_data( iterString )
 		entityFullPN = entityFullID + ( DEFAULT_VARIABLE_PROPERTY, )
 		self.theSelectedFullPNList.append( entityFullPN )
 
@@ -741,8 +756,9 @@ class EntityListWindow(OsogoWindow):
 		Return None
 		'''
 
-		key=self.processTree.get_model().get_value(iter,0)
-		entityFullID = self.processTree.get_model().get_data( key )
+		processStore = self.processTree.get_model()
+		iterString = processStore.get_string_from_iter( iter )
+		entityFullID = processStore.get_data( iterString )
 		entityFullPN = entityFullID + ( DEFAULT_PROCESS_PROPERTY, )
 		self.theSelectedFullPNList.append( entityFullPN )
 
@@ -894,15 +910,15 @@ class EntityListWindow(OsogoWindow):
 
 		self.theSelectedFullPNList = []
 
-		if ( self.theLastSelectWindow == "None" ):
+		if ( self.theLastSelectedWindow == "None" ):
 			return None
 
-		if ( self.theLastSelectWindow == "Variable" ):
+		if ( self.theLastSelectedWindow == "Variable" ):
 		
 			selection=self.variableTree.get_selection()
 			selection.selected_foreach(self.variable_select_func)
 
-		if ( self.theLastSelectWindow == "Process" ):
+		if ( self.theLastSelectedWindow == "Process" ):
 			
 			selection=self.processTree.get_selection()
 			selection.selected_foreach(self.process_select_func)
@@ -910,8 +926,9 @@ class EntityListWindow(OsogoWindow):
 		if len(self.theSelectedFullPNList) == 0:
 			aSelectedSystemIter = self.systemTree.get_selection().get_selected()[1]
 			if aSelectedSystemIter != None:
-				key=str(self.theSysTreeStore.get_path(aSelectedSystemIter))
-				aSystemFullID = self.theSysTreeStore.get_data( key )
+				systemStore = self.systemTree.get_model()
+				key=str(systemStore.get_path(aSelectedSystemIter))
+				aSystemFullID = systemStore.get_data( key )
 				self.theSelectedFullPNList = [(aSystemFullID[0],aSystemFullID[1],aSystemFullID[2],'')]
 
 
@@ -1005,9 +1022,6 @@ class EntityListWindow(OsogoWindow):
 		"""search Entities
 		Returns None
 		"""
-		if self.theSelectedSystemIter == None:
-			return
-
 		self.searchString = self['search_entry'].get_text()
 
 		self.updateLists()
