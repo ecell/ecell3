@@ -510,7 +510,9 @@ def createEntity( anEml, aSBMLModel, aFullID, anOptional='' ):
                 elif ( aPropertyName == "Priority" or
                        aPropertyName == "Activity" or
                        aPropertyName == "IsContinuous" or
-                       aPropertyName == "StepperID" ):
+                       aPropertyName == "StepperID" or
+                       aPropertyName == "FireMethod" or
+                       aPropertyName == "InitializeMethod" ):
 
                     pass
 
