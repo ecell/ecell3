@@ -303,7 +303,7 @@
 </property>
 
 <property name="k2">
-<value number="0">0.01</value>
+<value number="0">2</value>
 </property>
 
 <property name="k3">

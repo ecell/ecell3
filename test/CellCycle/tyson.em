@@ -1,6 +1,6 @@
 
 # created by eml2em program
-# from file: tyson.eml, date: Wed Oct  9 23:43:48 2002
+# from file: tyson.eml, date: Tue Oct 15 01:53:02 2002
 #
 
 Stepper Euler1Stepper( SRM_01 )
@@ -176,7 +176,7 @@ System System( /CELL/CYTOPLASM )
 	{
 		VariableReferenceList	[ S0 Variable:/CELL/CYTOPLASM:Clb2t -1 ] [ C0 Variable:/CELL/CYTOPLASM:Hct1t 0 ] [ C1 Variable:/CELL/CYTOPLASM:Hct1a 0 ] [ C2 Variable:/CELL/CYTOPLASM:Cdc20a 0 ];
 		k1	0.01;
-		k2	0.01;
+		k2	2;
 		k3	0.05;
 	}
 	
