@@ -11,10 +11,7 @@ import MainWindow
 import string
 import copy
 
-import PekinTest
-
-#import test
-
+# import test
 
 class EntryListWindow(Window):
 
@@ -22,8 +19,8 @@ class EntryListWindow(Window):
 
         Window.__init__( self, gladefile )
         self.addHandlers( {
-#            'selection_changed': self.showList2 
-#            'select_child': self.showList2 
+            # 'selection_changed': self.showList 
+            # 'select_child': self.showList
             } )
 
         self.theTree = self.getWidget( 'tree10' )
@@ -50,12 +47,6 @@ class EntryListWindow(Window):
         aMenuItem.connect( 'activate', self.showListPre, rText )
 
 
-    # def addHandler( self, name, handler, *args ):
-        # self.widgets.signal_connect( name, handler, args )
-    # aWindow = EntryListWindow( 'EntryListWindow2.glade' )
-    # aWindow.addHandler( 'gtk_main_quit', mainQuit )    
-
-
         s = MainWindow.simulator()
         
         self.initialize()
@@ -71,6 +62,7 @@ class EntryListWindow(Window):
         self.theRootTreeItem = gtk.GtkTreeItem( label='/')
         self.theTree.append( self.theRootTreeItem )
         self.theRootTreeItem.show()
+        self.theRootTreeItem.connect( 'select', self.showListTre, s.theRootSystem )
 
         self.constructTree( self.theRootTreeItem, s.theRootSystem  )
 
@@ -110,47 +102,27 @@ class EntryListWindow(Window):
         self.theList.clear_items( 0,-1 )
         self.appendItemList( list )
 
-    # def showList2( self, a, systemname ):          #a is GtkTreeItem instance
-        # aList = systemname['SubstanceList']
-        # self.doList( aList )
-        # print 'a is', a
-        
-    # def showList3( self, a, systemname ):
-        # aList = systemname['ReactorList']
-        # self.doList( aList )
-
     def showListPre( self, b, opmenu ):                   #OptionMenu activate
         self.theB = b
         self.theOpmenu = opmenu
-        self.showListW( b, self.theSystemname, opmenu )
+        self.showList( b, self.theSystemname, opmenu )
 
     def showListTre( self, a, systemname ):               #TreeItem selected
         self.theSystemname = systemname
         self.theA = a
-        # if self.theOpmenu == None:
-            # self.theOpmenu = 'Substance'
-        # print self.theOpmenu
-        self.showListW( a, systemname, self.theOpmenu )
+        self.showList( a, systemname, self.theOpmenu )
         
-    def showListW( self, a, systemname, opmenu='substance' ):
+    def showList( self, a, systemname, opmenu='substance' ):
         if opmenu == 'Substance':
             aListType = 'SubstanceList'
         if opmenu == 'Reactor':
             aListType = 'ReactorList'
         aList = systemname[aListType]
-
-        self.theA = a
-        print self.theA
-        self.Test()
-
-        self.theSystemname = systemname
+        # self.theA = a
+        # self.theSystemname = systemname
         self.doList( aList )
 
-    def Test(self):
-        print self.theA #seikou
-
 def mainQuit( obj, data ):
-#    print obj,data
     gtk.mainquit()
 
 def mainLoop():
