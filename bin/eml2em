@@ -6,16 +6,35 @@ import os
 import time
 import getopt
 import types
+import re
 
 from ecell.ecssupport import *
 from ecell.eml import *
 
+# taken from em2eml source code, slightly modified. ( put ^ and $ )
+NumberRe = re.compile( r'^[+-]?(\d+(\.\d*)?|\d*\.\d+)([eE][+-]?\d+)?$' )
+NameRe = re.compile( r'^[a-zA-Z_/][\w\:/\.]*$' )
+
+
+def stringify( aValue ):
+
+    # quote with '"'s if the value is neither a number or a simple name
+    # string defined in the EM file format.
+    aString = str( aValue )
+    
+    if NumberRe.match( aString ) is not None or \
+           NameRe.match( aString ) is not None:
+        return aString
+    else:
+        return '"' + aString + '"'
+
+
 def expandValueList( aValue, aLevel=0 ):
     aType = type( aValue )
 
-    # just apply str() to scalar type
+    # apply stringify() to scalar type
     if aType != types.TupleType and aType != types.ListType:
-        return str( aValue )
+        return stringify( aValue )
 
     # recursively apply this method for nested lists
     aValue = map( expandValueList, aValue, (aLevel+1,) * len( aValue ) )
@@ -39,7 +58,6 @@ def expandValueList( aValue, aLevel=0 ):
 
 
 def createObjectDef( aType, aClass, anArgList, aPropertyList, anOptional='' ):
-
 
     # declaration line
     anArgListString = string.join( anArgList, ',' ) 
