@@ -2,120 +2,60 @@
 
 import string
 
+
+# PropertyAttribute masks
 SETABLE = 1 << 0   # == 1
 GETABLE = 1 << 1   # == 2
 
 
-class ID:
+# FullID and FullPropertyName field numbers
+TYPE       = 0
+SYSTEMPATH = 1
+ID         = 2
+PROPERTY   = 3
 
-    def __init__(self, name):
-        list = string.split(name, ':')
 
-    def getType(self):
-        return self.type
 
-    def getSystemPath(self):
-        return self.SystemPath
+def parseFullID( fullid ):
+    if string.count( fullid, ':' ) != 2:
+        raise ValueError( "FullID must have 2 ':'s." )
+    return string.split( fullid, ':' )
 
-    def getID(self):
-        return self.ID
 
-    def getPropertyName(self):
-        return self.PropertyName
+def parseFullPropertyName( fullpropertyname ):
+    if string.count( fullpropertyname, ':' ) != 3:
+        raise ValueError( "FullPropertyName must have 3 ':'s." )
+    return string.split( fullpropertyname, ':' )
 
-    def __getitem__(self, key):
-        keyl = string.lower(key)
 
-class FullID( ID ):
-    
-    def __init__(self, name):
-        self.fid = name
-        list = string.split(name, ':')
-        self.type =  list[0]
-        self.SystemPath =  list[1]
-        self.ID =  list[2]
+def constructFullID( words ):
+    aLength = len( words )
+    if aLength != 3:
+        raise ValueError(
+            "FullID has 3 parts. ( %d given )" % aLength )
+    return string.join( words, ':' )
 
-    def getFullPropertyName(self, PropertyName = ''):
-        self.fpn = self.fid + ':' + PropertyName
-        return self.fpn
 
-    def convertToFullPropertyName(self, PropertyName = ''):
-        fpn = self.getFullPropertyName(PropertyName)
-        return FullPropertyName(fpn)
+def constructFullPropertyName( words ):
+    aLength = len( words )
+    if aLength != 4:
+        raise ValueError(
+            "FullPropertyName has 4 parts. ( %d given )" % aLength )
+    return string.join( words, ':' )
 
-    def __getitem__(self, key):
-        keyl = string.lower(key)
-        if keyl == 'type':
-            return self.type
-        elif keyl == 'systempath':
-            return self.SystemPath
-        elif keyl == 'id':
-            return self.ID
-        elif keyl == 'fullpropertyname':
-            return self.getFullPropertyName()
-
-    
-class FullPropertyName( ID ):
-
-    def __init__(self, name):
-        list = string.split(name, ':')
-        self.type =  list[0]
-        self.SystemPath =  list[1]
-        self.ID =  list[2]
-        self.PropertyName = list[3]
-
-    def getFullID(self):
-        return self.type + ':' + self.SystemPath + ':' + self.ID
-
-    def convertToFullID(self):
-        fid = self.getFullID
-        return FullID(fpn)
-
-    def __getitem__(self, key):
-        keyl = string.lower(key)
-        if keyl == 'type':
-            return self.type
-        elif keyl == 'systempath':
-            return self.SystemPath
-        elif keyl == 'id':
-            return self.ID
-        elif keyl == 'propertyname':
-            return self.PropertyName
-        elif keyl == 'fullid':
-            return self.getFullID()
 
 
 if __name__ == "__main__":
     
-    fid = 'Substance:/CELL/CYTOPLASM:ADP'
-    i = FullID(fid)
-    
-    print i['type']
-    print i['SystemPath']
-    print i['ID']
-    print i['fullpropertyname']
-    print i.getFullPropertyName('Concentration')
+    fullid  = parseFullID( 'System:/CELL/CYTOPLASM:MT0' )
+    print fullid
 
-    j = i.convertToFullPropertyName('Concentration')
-    print j['PropertyName']
-    
-    print '------------------------------------------'
+    fullproperty =  parseFullPropertyName(
+        'System:/CELL/CYTOPLASM:MT0:activity' )
+    print fullproperty
 
-    fpn = 'Substance:/CELL/CYTOPLASM:ATP:Quantity'
-    f = FullPropertyName(fpn)
-    
-    print f['type']
-    print f['SystemPath']
-    print f['ID']
-    print f['PropertyName']
-    print f['fullID']
+    fullidstring = constructFullID( fullid )
+    print fullidstring
 
-    g = j.convertToFullID()
-    print g['SystemPath']
-
-
-
-
-
-
-
+    fullpropertystring = constructFullPropertyName( fullproperty )
+    print fullpropertystring
