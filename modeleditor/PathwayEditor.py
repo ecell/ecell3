@@ -84,6 +84,8 @@ class PathwayEditor( ListWindow ):
 
 	def deleted( self, *args ):
 		ListWindow.deleted( self, args )
+		
+		
 				
 
 	def __zoom_in( self, *args ):

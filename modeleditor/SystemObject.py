@@ -5,7 +5,7 @@ from EditorObject import *
 class SystemObject(EditorObject):
 
 
-	def __init__( self, aLayout, aFullID,  x,y, canvas= None ):
+	def __init__( self, aLayout, aFullID,  x, y , parentSystem ):
 		pass
 
 
@@ -27,3 +27,13 @@ class SystemObject(EditorObject):
 	def show( self ):
 		#render to canvas
 		pass
+
+
+	def getObjectList( self ):
+		# return IDs
+		pass
+		
+	def isWithinSystem( self, objectID ):
+		#returns true if is within system
+		pass
+		

@@ -13,7 +13,6 @@ def copyValue ( aValue ):
 		return aValue
 
 def getFullIDType( aFullID ):
-	
 	aList = aFullID.split(':')
 	return aList[0]
 
@@ -33,8 +32,6 @@ def convertSysIDToSysPath( aSystemFullID ):
 
 
 def convertSysPathToSysID( aSystemPath ):
-	
-
 	if aSystemPath == '/':
 		return  'System::/'
 		
@@ -84,7 +81,6 @@ def getAbsoluteReference( aProcessFullID, aVariableRef ):
 		raise Exception("INVALID REFERENCE")
 
 	return aVariable[0] + ':' + absolutePath + ':' + aVariable[2]
-
 
 
 def getRelativeReference( aProcessFullID, aVariableFullID ):
@@ -144,6 +140,7 @@ def isAbsoluteReference( aVariableRef ):
 	aList = aVariableRef.split(':')
 	return aList[1][0] == '/'
 
+
 def isRelativeReference( aVariableRef ):
 	aList = aVariableRef.split(':')
 	return aList[1][0] == '.'
@@ -157,10 +154,10 @@ def getFullID( aFullPN ):
 	aList = aFullPN.split(':')
 	return aList[0] + ':' + aList[1] + ':' +aList[2]
 
+
 def getPropertyName( aFullPN ):
 	aList = aFullPN.split(':')
 	return aList[3]
-
 
 
 def createFullIDList( aType, aParent, IDList):
@@ -169,3 +166,21 @@ def createFullIDList( aType, aParent, IDList):
 	for anID in IDList:
 		return_list.append( ':'.join( [aType, parentPath, anID] ) )
 	return return_list
+
+def getUniqueVarrefName ( aVarrefList, aVarrefName = None ):
+	# get existing varrefnamelist
+	nameList = []
+	for aVarref in aVarrefList:
+		nameList.append( aVarref[MS_VARREF_NAME] )
+
+	# get initial varrefname
+	if aVarrefName = None:
+		aVarrefName = '___'
+	elif aVarrefName not in nameList:
+		return aVarrefName
+	counter = 0	
+	# try other values
+	incVarrefName = aVarrefName + zfill( str( counter ) )
+	while incVarrefName in nameList:
+		incVarrefName = aVarrefName + zfill( str( counter ) )
+	return incVarrefName

@@ -1,3 +1,4 @@
+
 from ConfirmWindow import *
 
 # Layout constants
@@ -77,7 +78,7 @@ DM_VARIABLE_CLASS = 'Variable'
 
 
 
-#message types
+# message types
 ME_PLAINMESSAGE = 0
 ME_OKCANCEL = 1
 ME_YESNO = 2
@@ -87,36 +88,36 @@ ME_ERROR = 4
 ME_RESULT_OK = OK_PRESSED
 ME_RESULT_CANCEL = CANCEL_PRESSED
 
-#propertyattributes
+# propertyattributes
 ME_GETTABLE_FLAG = MS_GETTABLE_FLAG
 ME_SETTABLE_FLAG = MS_SETTABLE_FLAG
 ME_DELETEABLE_FLAG = MS_DELETEABLE_FLAG
 
 ME_ROOTID = 'System::/'
 
-#varref indexes
+# varref indexes
 ME_VARREF_NAME = 0
 ME_VARREF_FULLID = 1
 ME_VARREF_COEF = 2
 
-#entity types
+# entity types
 ME_SYSTEM_TYPE = "System"
 ME_VARIABLE_TYPE = "Variable"
 ME_PROCESS_TYPE = "Process"
 ME_STEPPER_TYPE = "Stepper"
 ME_PROPERTY_TYPE = "Property"
 
-#special properties
+# special properties
 ME_STEPPER_SYSTEMLIST = MS_STEPPER_SYSTEMLIST
 ME_STEPPER_PROCESSLIST = MS_STEPPER_PROCESSLIST
 ME_VARIABLE_PROCESSLIST = MS_VARIABLE_PROCESSLIST
 ME_PROCESS_VARREFLIST = MS_PROCESS_VARREFLIST
 ME_STEPPERID = MS_SYSTEM_STEPPERID
 
-#undo
+# undo
 MAX_REDOABLE_COMMAND = 20
 
-#ADCP flags
+# ADCP flags
 ME_ADD_FLAG = 0
 ME_DELETE_FLAG = 1
 ME_COPY_FLAG = 2
@@ -126,6 +127,81 @@ ME_BROWSE_FLAG = 5
 
 ME_FLAGS_NO = 6
 
-#varrefs
+# varrefs
 ME_VARREF_FULLID = 1
 
+### PATHWAYEDITOR CONSTANTS
+
+# object types
+OB_TYPE_PROCESS = "Process"
+OB_TYPE_VARIABLE = "Variable"
+OB_TYPE_SYSTEM = "System"
+OB_TYPE_TEXT = "Text"
+OB_TYPE_CONNECTION = "Connection"
+
+OB_MIN_WIDTH = 80
+OB_MIN_HEIGTH = 40
+
+# object properties
+OB_POS_X = 'x'
+OB_POS_Y = 'y'
+OB_FULLID = 'FullID'
+OB_STEPPERID = 'StepperID'
+OB_TYPE = 'Type'
+OB_DIMENSION_X = 'DimensionX'
+OB_DIMENSION_Y = 'DimensionY'
+OB_HASFULLID = 'HasFullID'
+
+OB_COLOR = "Color"
+OB_SHAPE_TYPE = "ShapeType"
+
+# connection constants
+# directions
+PROCESS_TO_VARIABLE = 0
+VARIABLE_TO_PROCESS = 1
+
+# connection properties
+CO_PROCESS_ATTACHED = "ProcessAttached"  # this is an OBJECT!
+CO_VARIABLE_ATTACHED = "VariableAttached" # this is an OBJECT!
+CO_PROCESS_RING = "ProcessRing"
+CO_VARIABLE_RING = "VariableRing"
+CO_NAME = "Name"
+CO_COEF = "Coefficient"
+CO_DIRECTION = "Direction"
+
+
+CO_LINETYPE = "LineType"
+CO_LINECOLOR = "LineColor"
+CO_LINEWIDTH = "LineWidth"
+
+# process properties
+PR_CONNECTIONLIST = "ConnectionList"
+
+# variable properties
+VR_CONNECTIONLIST = "ConnectionList"
+
+
+# system properties
+SY_INSIDE_DIMENSION_X = "InsideDimensionX"
+SY_INSIDE_DIMENSION_Y = "InsideDimensionY"
+SY_PASTE_CONNECTIONLIST = "PasteConnectionList"
+
+
+# local/global properties
+
+GLOBALPROPERTYSET = [ CO_COEF, CO_NAME, SHAPE_TYPE, LINE_TYPE ]
+MODELPROPERTYSET = [ CO_COEF, CO_NAME ]
+
+### CANVAS CONSTANTS
+
+# shape types
+SHAPE_TYPE_SQUARE = "Square"
+SHAPE_TYPE_VARIABLE = "Variable"
+SHAPE_TYPE_PROCESS = "Process"
+SHAPE_TYPE_SYSTEM = "System"
+SHAPE_TYPE_TEXTBOX = "TextBox"
+SHAPE_TYPE_CUSTOM = "Custom"
+
+# layout properties
+LO_SCROLL_REGION = "ScrollRegion" # list of int
+LO_PIXELS_PER_UNIT ="PPU"

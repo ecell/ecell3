@@ -551,9 +551,6 @@ class PropertyListBuffer( Buffer ):
 		self.thePropertyList = []
 
 
-# VALUELIST MUST BE COPIED WHEN SET AND GET!!!!!!
-#ask me!
-
 	def getPropertyList( self ):
 		toReturn = [] #must be initialized so that the interpreter knows this is a list
 

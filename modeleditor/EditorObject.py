@@ -4,7 +4,7 @@
 class EditorObject:
 
 
-	def __init__(self, aLayout, basicType, shapeType, x, y, aCanvas=None ):
+	def __init__(self, aLayout, objectID, basicType, shapeType, x, y, parentSystem ):
 		pass
 	
 
@@ -18,6 +18,7 @@ class EditorObject:
 
 	def handleDrag( self, deltaX, deltaY ):
 		pass
+
 
 	def handleMouseClicked( self, x, y ):
 		pass
@@ -52,6 +53,7 @@ class EditorObject:
 
 
 	def setProperty( self, aPropertyName, aPropertyValue ):
+		# if fullID property is changed, change legend, too
 		pass
 
 
@@ -59,11 +61,15 @@ class EditorObject:
 		pass
 
 
+	def getPropertyList( self ):
+		pass
+
+
 	def getAbsolutePosition( self ):
 		pass
 
 
-	def getsize( self ):
+	def getSize( self ):
 		pass
 
 
@@ -75,4 +81,14 @@ class EditorObject:
 		pass
 
 	def setPropertyMap( self, aPropertyMap ):
+		pass
+		
+	def getID( self ):
+		pass
+		
+	def getLayout( self ):
+		pass
+
+
+	def getParent( self ):
 		pass

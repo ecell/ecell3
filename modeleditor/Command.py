@@ -14,6 +14,7 @@ class Command:
 		self.theReceiver = aReceiver
 		self.executed = False
 		self.theReverseCommandList = None
+		self.doMultiplex = True
 
 	def reset( self ):
 		self.executed = False
@@ -27,6 +28,7 @@ class Command:
 		returns True if successful
 		returns False if command is non executable
 		"""
+		
 		if self.isExecutable() and not self.isExecuted():
 
 			self.createReverseCommand()
@@ -35,6 +37,8 @@ class Command:
 			else:
 				raise Exception("%s command failed.\n Arguments: %s"%(self.__class__.__name__, self.thaArgs) )
 				self.theReverseCommandList = None
+		else:
+			raise Exception("%s command argumentcheck failed. Cannot execute.\n Arguments: %s"%(self.__class__.__name__, self.thaArgs) )
 
 
 
@@ -85,9 +89,30 @@ class Command:
 		else:
 			return ( None, None )
 
+	
+	def getSecondAffectedObject( self ):
+		if self.executed:
+			return self.getAffected2()
+		else:
+			return ( None, None )
+
+
 	def getAffected( self ):
 		return ( None, None )
+
+	def getAffected2( self ):
+		return ( None, None )
 	
+	def doNotMultiplexReverse( self ):
+		if type(self.theReverseCommandList) == type([]):
+			for aReverseCmd in self.theReverseCommandList:
+				if type(aReverseCmd) != type(self):
+					continue
+				aReverseCmd.doNotMultiplex()
+				
+	def doNotMultiplex( self ):
+		doMultiplex = False
+		
 
 class ModelCommand( Command ):
 

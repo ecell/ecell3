@@ -515,10 +515,8 @@ class BufferPaster:
 			aBufferPropertyList = [ aPropertyName ]
 		else:
 			aBufferPropertyList = aBuffer.getPropertyList()
-
 		aModelPropertyList = self.theModel.getEntityPropertyList( aFullID)
 		for aPropertyName in aBufferPropertyList:
-
 			aValueList = aBuffer.getProperty( aPropertyName )
 			if aPropertyName in aModelPropertyList:
 				aFullPN = createFullPN( aFullID, aPropertyName )

@@ -339,6 +339,12 @@ class ModelEditor:
 
 			( aType, anID ) = aCommand.getAffectedObject()
 			self.updateWindows( aType, anID )
+			( aType, anID ) = aCommand.getSecondAffectedObject()
+			if aType == None and anID == None:
+				pass
+			else:
+				self.updateWindows( aType, anID )
+	
 			# get undocommands
 			undoCommand = aCommand.getReverseCommandList()
 			
@@ -376,6 +382,11 @@ class ModelEditor:
 			aCommand.execute()
 			( aType, anID ) = aCommand.getAffectedObject()
 			self.updateWindows( aType, anID )
+			( aType, anID ) = aCommand.getSecondAffectedObject()
+			if aType == None and anID == None:
+				pass
+			else:
+				self.updateWindows( aType, anID )
 
 			aCommand.reset()
 		self.changesSaved = False
@@ -397,6 +408,12 @@ class ModelEditor:
 
 			( aType, anID ) = aCommand.getAffectedObject()
 			self.updateWindows( aType, anID )
+			( aType, anID ) = aCommand.getSecondAffectedObject()
+			if aType == None and anID == None:
+				pass
+			else:
+				self.updateWindows( aType, anID )
+
 			aCommand.reset()
 		self.changesSaved = False
 
@@ -417,7 +434,8 @@ class ModelEditor:
 		newWindow = PathwayEditor( self )
 		newWindow.openWindow()
 		self.thePathwayEditorList.append( newWindow )
-
+		return newWindow
+		
 		pass
 #		newWindow = PathwayEditor( self, args )
 #		newWindow.openWindow()

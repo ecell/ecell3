@@ -726,10 +726,9 @@ class PasteEntityPropertyList(ModelCommand):
 		deleteCommand = DeleteEntityPropertyList( self.theReceiver, deleteList )
 		pasteCommand = PasteEntityPropertyList( self.theReceiver, self.__theID, pasteBuffer )
 		self.theReverseCommandList = [ deleteCommand, pasteCommand ]
-
 		return True
-		
-		
+
+
 
 	def createReverseCommand( self ):
 		#reverse command is created while doing operation
@@ -754,7 +753,7 @@ class SetEntityInfo(ModelCommand):
 			return False
 		return True
 
-	
+
 	def do( self ):
 		self.theModel.setEntityInfo( self.__theID, self.__theStrings )
 		return True
@@ -768,3 +767,97 @@ class SetEntityInfo(ModelCommand):
 	def getAffected( self ):
 		return (getFullIDType( self.__theID ), self.__theID )
 
+
+class RelocateEntity( ModelCommand ):
+	"""
+	args: system cannot be entityID!!! system cannot be relocated in this version
+	"""
+	ARGS_NO = 2
+	ENTITYID = 0
+	TARGETSYSTEMID = 1
+
+
+	def checkArgs( self ):
+		if not ModelCommand.checkArgs( self ):
+			return False
+		self.sourceID = self.theArgs[ self.ENTITYID ]
+		self.entityType = getFullIDType( self.sourceID )
+		self.theID = self.sourceID.split(':')[2]
+		self.targetSystem = self.theArgs[ self.TARGETSYSTEMID ]
+		self.sourceSystem = getParentSystemOfFullID( self.sourceID )
+		self.targetID = ':'.join( [ self.entityType, self.targetSystem, self.theID ] )
+		if self.entityType not in [ ME_VARIABLE_TYPE, ME_PROCESS_TYPE ]:
+			return False
+		if self.theModel.isEntityExist( self.targetID ):
+			return False
+		if not self.theModel.isEntityExist( self.targetID ):
+			return False
+
+		return True
+
+	def do( self ):
+		# get class
+		aClass = self.theModel.getEntityClassName( self.sourceID )
+		# create a buffer copy of the properties
+		aFullPNList = []
+		for aPropertyName in self.theModel.getEntityPropertyList( self.sourceID ):
+			aFullPNList.append( createFullPN( self.sourceID, aPropertyName ) )
+
+		propBuffer = self.theBufferFactory.createEntityPropertyListBuffer( aFullPNList  )
+
+		if self.entityType == ME_PROCESS_TYPE:
+		# for processes:
+			aVarrefList = propBuffer.getProperty( MS_PROCESS_VARREFLIST )
+			# modify varref properties
+			for aVarref in aVarrefList:
+				aVariableID = aVarref [MS_VARREF_FULLID ]
+				
+				if not isAbsoluteReference( aVariableID ):
+					relFlag = True
+					absoluteVariableID = getAbsoluteReference( self.sourceID, aVariableID )
+					aVarref [MS_VARREF_FULLID ] = getRelativeReference( self.targetID, absoluteVariableID )
+				propBuffer.setProperty( MS_PROCESS_VARREFLIST, aVarrefList )
+		else:
+		# for variables:
+			aProcessList = self.theModel.getEntityProperty( createFullPN( self.sourceID, ME_VARIABLE_PROCESSLIST ) )
+			# modify corresponding process
+			for aProcess in aProcessList:
+				aVarrefList = self.theModel.getEntityProperty( createFullPN( self.aProcess, MS_PROCESS_VARREFLIST ) )
+				writeFlag = False
+				for aVarref in aVarrefList:
+					aVariableID = aVarref [MS_VARREF_FULLID ]
+					if not isAbsoluteReference( aVariableID ):
+						relFlag = True
+						absoluteVariableID = getAbsoluteReference( self.aProcess, aVariableID )
+					else:
+						relFlag = False
+						absoluteVariableID = aVariableID
+					if self.sourceID.lstrip(MS_VARIABLE_TYPE) == absoluteVariableID.lstrip(MS_VARIABLE_TYPE):
+						writeFlag = False
+						absoluteVariableID = self.targetID
+						if relFlag:
+							aVariableID = getRelativeReference( aProcess, absoluteVariableID )
+						else:
+							aVariableID = absoluteVariableID
+						aVarref [MS_VARREF_FULLID ] = aVariableID
+				if writeFlag:
+					self.theModel.setEntityProperty( createFullPN( self.aProcess, MS_PROCESS_VARREFLIST ), aVarrefList )
+
+		# delete entity
+		self.theModel.deleteEntity( self.sourceID )
+
+		# paste entity
+		self.theModel.createEntity( aClass, self.targetID )
+
+		# paste propertylist
+		self.theBufferPaster.pasteEntityPropertyListBuffer(propBuffer, self.targetID)
+
+
+	def createReverseCommand( self ):
+		self.theReverseCommandList = [ RelocateEntity(self.theReceiver, self.targetID, self.sourceSystem) ]
+
+	def getAffected( self ):
+		return [ self.entityType, self.sourceSystem ]
+
+	def getAffected2( self ):
+		return [ self.entityType, self.targetSystem ]
