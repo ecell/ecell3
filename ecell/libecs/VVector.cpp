@@ -45,6 +45,10 @@
  *::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
  *	$Id$
  :	$Log$
+ :	Revision 1.12  2004/06/04 09:18:28  satyanandavel
+ :	bugfix.
+ :	----------------------------------------------------------------------
+ :
  :	Revision 1.11  2004/05/29 11:54:51  bgabor
  :	Introducing logger policy .
  :	User cen set and get the policy for a certain logger either when the logger is creater or anytime later.
@@ -56,7 +60,7 @@
  :			0-throw exception when disk space is used up
  :			1-start overwriting earliest data
  :	third element:	x parameter for minimum step or time interval for first element
- :
+ :	
  :	Revision 1.10  2004/01/21 06:26:30  shafi
  :	a fix from gabor, remove tmp files when exitting abnormally
  :	
@@ -179,7 +183,7 @@ vvectorbase::vvectorbase()
 #ifdef	_Windows
       _defaultDirectory = strdup("c:\\temp");
 #else
-      _defaultDirectory = strdup("/bmp");
+      _defaultDirectory = strdup("/tmp");
 #endif	/* _Windows */
       _directoryPriority = 4;
     }
