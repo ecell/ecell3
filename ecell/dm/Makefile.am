@@ -11,6 +11,8 @@ MichaelisUniUniProcess.cpp\
 RapidEquilibriumProcess.cpp\
 MichaelisUniUniReversibleProcess.cpp\
 CatalyzedMassActionFluxProcess.cpp\
+DecayFluxProcess.cpp\
+IsoUniUniFluxProcess.cpp\
 SSystemProcess.cpp\
 NRProcess.cpp\
 NRStepper.cpp\
@@ -20,7 +22,8 @@ ODE23Stepper.cpp\
 CashKarp45Stepper.cpp\
 ODE45Stepper.cpp
 
-EXTRA_DIST = ${DMS}
+EXTRA_DIST = ${DM 
+     S}
 dmdir = ${DM_SRC_DIR}
 dm_DATA = ${DMS}
 
