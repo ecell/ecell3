@@ -1,4 +1,5 @@
 
+
 def copyValue ( aValue ):
 	"""
 	in: anytype aValue

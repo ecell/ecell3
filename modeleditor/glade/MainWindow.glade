@@ -64,7 +64,7 @@
 		      <child>
 			<widget class="GtkImageMenuItem" id="load_model_menu">
 			  <property name="visible">True</property>
-			  <property name="label" translatable="yes">_Load Model...</property>
+			  <property name="label" translatable="yes">_Open Model...</property>
 			  <property name="use_underline">True</property>
 			  <signal name="activate" handler="load_model_menu_activate" last_modification_time="Wed, 02 Apr 2003 06:05:30 GMT"/>
 			  <accelerator key="o" modifiers="GDK_CONTROL_MASK" signal="activate"/>
@@ -86,7 +86,7 @@
 		      <child>
 			<widget class="GtkMenuItem" id="load_recent">
 			  <property name="visible">True</property>
-			  <property name="label" translatable="yes">Load Recent</property>
+			  <property name="label" translatable="yes">Open Recent</property>
 			  <property name="use_underline">True</property>
 			</widget>
 		      </child>

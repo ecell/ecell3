@@ -61,7 +61,9 @@ class PropertyList( ViewComponent ):
 		# set up liststore
 		self.theListStore=gtk.ListStore( gobject.TYPE_STRING, gobject.TYPE_STRING, \
 					gobject.TYPE_BOOLEAN, gobject.TYPE_BOOLEAN, \
-					gobject.TYPE_BOOLEAN, gobject.TYPE_BOOLEAN )
+					gobject.TYPE_BOOLEAN, gobject.TYPE_BOOLEAN,\
+					gobject.TYPE_BOOLEAN, gobject.TYPE_BOOLEAN,\
+					 gobject.TYPE_STRING,gobject.TYPE_STRING)
 
 		self['theTreeView'].set_model(self.theListStore)
 		self.noActivate = False
@@ -78,7 +80,6 @@ class PropertyList( ViewComponent ):
 		column = gtk.TreeViewColumn( 'Value', renderer, text = 1, editable = 5)
 		column.set_visible( gtk.TRUE )
 		column.set_resizable( gtk.TRUE )
-
 		self['theTreeView'].append_column(column)
 		self.theValueColumn = column
 
@@ -86,7 +87,6 @@ class PropertyList( ViewComponent ):
 		column=gtk.TreeViewColumn( 'Settable', renderer, active = 2)
 		column.set_visible( gtk.TRUE )
 		column.set_resizable( gtk.TRUE )
-
 		self['theTreeView'].append_column(column)
 
 
@@ -94,17 +94,37 @@ class PropertyList( ViewComponent ):
 		column=gtk.TreeViewColumn( 'Deleteable', renderer, active = 3)
 		column.set_visible( gtk.TRUE )
 		column.set_resizable( gtk.TRUE )
-
 		self['theTreeView'].append_column(column)
+
+		renderer = gtk.CellRendererToggle()
+		column=gtk.TreeViewColumn( 'Loadable', renderer, active = 6)
+		column.set_visible( gtk.TRUE )
+		column.set_resizable( gtk.TRUE )
+		self['theTreeView'].append_column(column)
+
+		renderer = gtk.CellRendererToggle()
+		column=gtk.TreeViewColumn( 'Saveable', renderer, active = 7)
+		column.set_visible( gtk.TRUE )
+		column.set_resizable( gtk.TRUE )
+		self['theTreeView'].append_column(column)
+
+		# add variable type column
+		renderer = gtk.CellRendererText()
+		column = gtk.TreeViewColumn( 'Type', renderer, text = 8, editable = 5)
+		column.set_visible( gtk.TRUE )
+		column.set_resizable( gtk.TRUE )
+		self['theTreeView'].append_column(column)
+		self.theTypeColumn = column
 
 		self['theTreeView'].set_headers_visible(gtk.TRUE)
 
 		self.theListSelection =  self['theTreeView'].get_selection()
 		self.theListSelection.set_mode( gtk.SELECTION_MULTIPLE )
+		self.theListSelection.connect('changed',self.__setDeleteButton)
 
 		# set up variables
 
-		self.theFlags = [ True, True, True, True, True ]
+		self.theFlags = [ True, True, True, True, True, False ]
 		self.theSelection = []
 		self.theDisplayedEntity = None
 		self.theType = None
@@ -116,6 +136,9 @@ class PropertyList( ViewComponent ):
 
 		self.addHandlers ( { 'on_Add_clicked' : self.__add_clicked,\
 					'on_Delete_clicked' : self.__delete_clicked})
+
+		self.addButton=self.getWidget('Add')
+		self.delButton=self.getWidget('Delete')
 		self.update()
 
 
@@ -136,15 +159,22 @@ class PropertyList( ViewComponent ):
 		return self.theParentWindow
 
 
+	def getDisplayedEntity( self ):
+		return self.theDisplayedEntity
+
 
 	def getPropertyValue( self, aName ):
+
 		if self.theType == 'Stepper':
 			if self.theModelEditor.getModel().getStepperPropertyAttributes( self.theDisplayedEntity, aName )[MS_GETTABLE_FLAG]:
 				return self.theModelEditor.getModel().getStepperProperty( self.theDisplayedEntity, aName )
 			else:
 				return ''
 		elif self.theType == 'Entity':
+			#print''
+			#print 'getPropertyValue PropList'
 			fpn = self.theDisplayedEntity + ':' + aName
+			#print fpn,'fpn'
 			if self.theModelEditor.getModel().getEntityPropertyAttributes( fpn )[MS_GETTABLE_FLAG]:
 				return self.theModelEditor.getModel().getEntityProperty( fpn )
 			else:
@@ -160,6 +190,15 @@ class PropertyList( ViewComponent ):
 		elif self.theType == 'Entity':
 			fpn = self.theDisplayedEntity + ':' + aName
 			return self.theModelEditor.getModel().getEntityPropertyType( fpn )
+		else:
+			return None
+
+	def getPropertyChangeable ( self, aName ):
+		if self.theType == 'Stepper':
+			return self.theModelEditor.getModel().getStepperPropertyAttributes( self.theDisplayedEntity, aName )[ME_CHANGEABLE_FLAG]
+		elif self.theType == 'Entity':
+			fpn = self.theDisplayedEntity + ':' + aName
+			return self.theModelEditor.getModel().getEntityPropertyAttributes( fpn )[ME_CHANGEABLE_FLAG]
 		else:
 			return None
 
@@ -181,6 +220,26 @@ class PropertyList( ViewComponent ):
 		elif self.theType == 'Entity':
 			fpn = self.theDisplayedEntity + ':' + aName
 			return self.theModelEditor.getModel().getEntityPropertyAttributes( fpn )[ME_DELETEABLE_FLAG]
+		else:
+			return None
+
+	
+	def getPropertySaveable( self, aName ):
+		if self.theType == 'Stepper':
+			return self.theModelEditor.getModel().getStepperPropertyAttributes( self.theDisplayedEntity, aName )[ME_SAVEABLE_FLAG]
+		elif self.theType == 'Entity':
+			fpn = self.theDisplayedEntity + ':' + aName
+			return self.theModelEditor.getModel().getEntityPropertyAttributes( fpn )[ME_SAVEABLE_FLAG]
+		else:
+			return None
+
+	
+	def getPropertyLoadable( self, aName ):
+		if self.theType == 'Stepper':
+			return self.theModelEditor.getModel().getStepperPropertyAttributes( self.theDisplayedEntity, aName )[ME_LOADABLE_FLAG]
+		elif self.theType == 'Entity':
+			fpn = self.theDisplayedEntity + ':' + aName
+			return self.theModelEditor.getModel().getEntityPropertyAttributes( fpn )[ME_LOADABLE_FLAG]
 		else:
 			return None
 
@@ -209,11 +268,16 @@ class PropertyList( ViewComponent ):
 			return False
 
 
-
 	def update( self ):
 		"""
 		in:  None update without condition
 		"""
+		# set button's sensitivity
+		if self.canAddNewProperty():
+			self.addButton.set_sensitive(gtk.TRUE)
+		else:
+			self.addButton.set_sensitive(gtk.FALSE)
+		self.delButton.set_sensitive(gtk.FALSE)
 
 		self.__buildList()
 
@@ -251,7 +315,6 @@ class PropertyList( ViewComponent ):
 
 
 	def setDisplayedEntity ( self, aType, selectedID ):
-
 		self.theDisplayedEntity = selectedID 
 		self.theType = aType
 		if self.theDisplayedEntity == None:
@@ -279,7 +342,6 @@ class PropertyList( ViewComponent ):
 		"""
 		# change self.theSelection
 		# if cannot change select nothing
-
 		self.theSelection = []
 
 		wholePropertyList = self.getPropertyList()
@@ -374,7 +436,6 @@ self.theDisplayedEntity, newID, aValue, aType)
 		self.__selectRows( [ newID ], True )
 
 
-
 	def delete ( self ):
 		if len( self.theSelection ) == 0:
 			return
@@ -383,7 +444,9 @@ self.theDisplayedEntity, newID, aValue, aType)
 self.theDisplayedEntity, self.theSelection )
 		else:
 			aCommand = DeleteEntityPropertyList ( self.theModelEditor, self.getFullPNList() )
+			
 		self.theModelEditor.doCommandList( [ aCommand ] )
+	
 
 
 
@@ -411,31 +474,36 @@ self.theDisplayedEntity, self.theSelection )
 			self.theSelection = [ newName ]
 			
 			self.theModelEditor.doCommandList( [ aCommand ] )
+			self.__changeColor()
 		else:
 			self.theModelEditor.printMessage( "%s cannot be renamed to %s"%(changedID, newName), ME_ERROR )
 			self.theListStore.set_value( anIter, 0, changedID )
-
+			
 
 
 	def changeValue( self, newValue, anIter ):
+		
 		aName = self.theListStore.get_value( anIter, 0 )
 
 		oldValue = self.getPropertyValue( aName )
 		if str(oldValue) == str(newValue):
 			return
+
+		
 		if self.theType == 'Stepper':
 			aCommand = ChangeStepperProperty( self.theModelEditor, self.theDisplayedEntity, aName, newValue )
 		else:
 			fpn = self.theDisplayedEntity + ':' + aName
 			aCommand = ChangeEntityProperty( self.theModelEditor, fpn, newValue )
 
-
 		if aCommand.isExecutable():
 			self.theModelEditor.doCommandList( [ aCommand ] )
+			self.__changeColor()
 		else:
 			self.theModelEditor.printMessage( "Illegal value for %s"%aName, ME_ERROR )
 			self.theListStore.set_value( anIter, 1, oldValue )
-
+			
+		
 
 	def edit( self ):
 		"""
@@ -472,13 +540,29 @@ self.theDisplayedEntity, self.theSelection )
 	#    Private methods/Signal Handlers	#
 	#########################################
 
+	def __setDeleteButton(self,*args):
+		selected = self.__getSelection()
+		canDelete=[]
+		if len(selected)>0:
+			for each in selected:
+				canDelete.append(self.getPropertyDeleteable(each))
+		if len(canDelete)>0:
+			for d in canDelete:
+				if d==0:
+					self.delButton.set_sensitive(gtk.FALSE)
+					return
+		self.delButton.set_sensitive(gtk.TRUE)
+				
+
 	def __button_pressed( self, *args ):
+		self.__setDeleteButton()
 		# when any button is pressed on list
 		self.theModelEditor.setLastUsedComponent( self )
 		if args[1].button == 3:
 			self.selectByUser()
 			self.theModelEditor.createPopupMenu( self, args[1] )
 			return gtk.TRUE
+		
 
 
 
@@ -513,6 +597,7 @@ self.theDisplayedEntity, self.theSelection )
 		if self.theDisplayedEntity == None:
 			return
 		aValueList = []
+		
 		for anID in self.getPropertyList():
 			aValue = []
 			aValue.append( anID )
@@ -521,7 +606,18 @@ self.theDisplayedEntity, self.theSelection )
 			aValue.append( self.getPropertyDeleteable( anID ) )
 			aValue.append( self.getPropertyDeleteable( anID ) and self.canAddNewProperty() )
 			aValue.append( self.isEditable( anID ) )
+			aValue.append( self.getPropertyLoadable( anID ) )
+			aValue.append( self.getPropertySaveable( anID ) )
+			aValue.append( self.getPropertyType( anID ))
+			'''
+			if self.getPropertyChangeable( anID )==0:
+				aValue.append( 'black' )
+			else:
+				aValue.append( 'black' )
+			'''
 			aValueList.append( aValue )
+		
+		
 		self.__addRows( aValueList )
 
 		self.noActivate = False
@@ -531,6 +627,7 @@ self.theDisplayedEntity, self.theSelection )
 		"""
 		in: list of  [Name, Value, Settable, Creator Flag]
 		"""
+		
 		for aValue in aValueList:
 			anIter = self.theListStore.append(  )
 			self.theListStore.set_value ( anIter, 0 , aValue[0] )
@@ -539,8 +636,10 @@ self.theDisplayedEntity, self.theSelection )
 			self.theListStore.set_value ( anIter, 3 , aValue[3] )
 			self.theListStore.set_value ( anIter, 4 , aValue[4] )
 			self.theListStore.set_value ( anIter, 5 , aValue[5] )
-
-
+			self.theListStore.set_value ( anIter, 6 , aValue[6] )
+			self.theListStore.set_value ( anIter, 7 , aValue[7] )
+			self.theListStore.set_value ( anIter, 8 , aValue[8] )
+			#self.theListStore.set_value( anIter, 9 , aValue[9] )
 
 	def __deleteRows( self, aNameList ):
 		"""
@@ -660,9 +759,14 @@ self.theDisplayedEntity, self.theSelection )
 		args[1]: path
 		args[2]: newstring
 		"""
-
+		
 		newName = args[2]
 		aPath = args[1]
 		anIter = self.theListStore.get_iter_from_string( aPath )
 		self.changeValue ( newName, anIter )
+		
 
+	def __changeColor(self):
+		aName=self.theSelection[0]
+		anIter=self.__getIter(aName)
+		self.theListStore.set_value(anIter, 9,'blue')

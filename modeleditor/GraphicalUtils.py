@@ -1,6 +1,9 @@
+
+
 from Constants import *
 import gtk
 import gnome.canvas
+import Numeric as n
 
 class GraphicalUtils:
 
@@ -12,6 +15,7 @@ class GraphicalUtils:
 		self.testCanvas = gnome.canvas.Canvas()
 		self.testCanvasRoot = self.testCanvas.root()
 		self.testText=self.testCanvasRoot.add(gnome.canvas.CanvasText, text = 'Hello' )
+		self.opMatrix= n.array(((0,0,1,0,-1,0,0,0),(-1,0,0,0,0,0,1,0),(0,0,0,1,0,-1,0,0),(0,-1,0,0,0,0,0,1)))
 
 	def getGdkColorByName( self, aColorName ):
 
@@ -43,4 +47,8 @@ class GraphicalUtils:
 	def truncateTextToSize ( self, aText, aSize ):
 		return aText
 		
-		
+	
+	def areOverlapping( self, rect1, rect2 ):
+		b= n.concatenate( (rect1,rect2))
+		return  n.sometrue(n.less(n.dot(self.opMatrix,b),0))
+

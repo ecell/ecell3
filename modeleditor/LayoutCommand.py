@@ -18,13 +18,15 @@ class CreateLayout(LayoutCommand):
 	arg1: NAME
 	"""
 	RECEIVER = 'LayoutManager'
-	ARGS_NO = 1
+	ARGS_NO = 2
 	NAME = 0
+	SHOW = 1
 
 	def checkArgs( self ):
 		if not LayoutCommand.checkArgs(self):
 			return False
 		self.theName = self.theArgs[ self.NAME ]
+		self.isShow = self.theArgs[ self.SHOW ]
 		#check if layout name exists
 		if self.theReceiver.doesLayoutExist(self.theName):
 			return False
@@ -33,6 +35,8 @@ class CreateLayout(LayoutCommand):
 	
 	def do( self ):
 		self.theReceiver.createLayout( self.theName)
+		if self.isShow:
+			self.theReceiver.showLayout(self.theName)
 		return True
 
 
@@ -53,10 +57,12 @@ class DeleteLayout(LayoutCommand):
 	ARGS_NO = 1
 	NAME = 0
 
+
 	def checkArgs( self ):
 		if not LayoutCommand.checkArgs(self):
 			return False
 		self.theName = self.theArgs[ self.NAME ]
+
 		#check if layout name exists
 		if not self.theReceiver.doesLayoutExist(self.theName):
 			return False
@@ -66,7 +72,11 @@ class DeleteLayout(LayoutCommand):
 	def do( self ):
 		# prepare copy of layout
 		layoutBuffer = self.theReceiver.theLayoutBufferFactory.createLayoutBuffer( self.theName )
-		self.theReverseCommandList = [ PasteLayout( self.theReceiver, layoutBuffer, None ) ]
+		layoutBuffer.setUndoFlag( True )
+		# check if layout was shown and set show flag in pastelayout command accorddingly
+		aLayout = self.theReceiver.getLayout( self.theName )
+		
+		self.theReverseCommandList = [ PasteLayout( self.theReceiver, layoutBuffer, None, aLayout.isShown() ) ]
 		self.theReceiver.deleteLayout( self.theName)
 		return True
 
@@ -104,12 +114,13 @@ class RenameLayout(LayoutCommand):
 
 
 	def do( self ):
-		self.theReceiver.renameLayout( self.theName)
+		self.theReceiver.renameLayout( self.oldName,self.newName)
 		return True
 
 
 	def createReverseCommand( self ):
-		self.theReverseCommandList = [ RenameLayout( self.theReceiver,  self.oldName, self.newName  ) ]
+		#self.theReverseCommandList = [ RenameLayout( self.theReceiver,  self.oldName, self.newName  ) ]
+		self.theReverseCommandList = [ RenameLayout( self.theReceiver,  self.newName, self.oldName  ) ]
 
 
 	def getAffected( self ):
@@ -153,15 +164,17 @@ class PasteLayout(LayoutCommand):
 	arg2: new name if no new name, submit None
 	"""
 	RECEIVER = 'LayoutManager'
-	ARGS_NO = 2
+	ARGS_NO = 3
 	BUFFER = 0
 	NEWNAME = 1
+	SHOW = 2
 
 	def checkArgs( self ):
 		if not LayoutCommand.checkArgs(self):
 			return False
 		self.theBuffer = self.theArgs[ self.BUFFER ]
 		self.newName = self.theArgs[ self.NEWNAME ]
+		self.isShow = self.theArgs[ self.SHOW ]
 		return True
 
 
@@ -169,18 +182,21 @@ class PasteLayout(LayoutCommand):
 		overWrite = False
 		if self.newName == None:
 			self.newName = self.theBuffer.getName()
-		if not self.theReceiver.doesLayoutExist(self.newName):
-			overWrite = True
-		if overWrite:
+		if self.theReceiver.doesLayoutExist(self.newName):
 			#if self.theReceiver.theModelEditor.printMessage( "Do you want to overwrite layout %s"%self.newName ) = ME_RESULT_OK:
 			# get copy of layout
 			layoutBuffer = self.theReceiver.theLayoutBufferFactory.createLayoutBuffer( self.newName )
-			self.theReverseCommandList = [ PasteLayout( self.theReceiver, layoutBuffer, None ) ]
+			layoutBuffer.setUndoFlag( True )
+			#check if layougt was shown, and set flag in pastelayout command
+			self.theReverseCommandList = [ PasteLayout( self.theReceiver, layoutBuffer, None, self.isShow ) ]
 			self.theReceiver.deleteLayout( self.newName)
 		else:
 			self.theReverseCommandList = [ DeleteLayout( self.theReceiver, self.newName ) ]
 
-		self.theReceiver.theLayoutBufferPaster.pasteLayoutBuffer( layoutBuffer, newName )
+
+		self.theReceiver.theLayoutBufferPaster.pasteLayoutBuffer( self.theBuffer, self.newName )
+		if self.isShow:
+			self.theReceiver.showLayout(self.newName)
 		return True
 
 
@@ -246,6 +262,7 @@ class DeleteObject(LayoutCommand):
 
 	def do(self):
 		objectBuffer = self.theReceiver.theLayoutBufferFactory.createObjectBuffer( self.theReceiver.getName(), self.objectID )
+
 		self.theReverseCommandList = [ UndeleteObject( self.theReceiver, objectBuffer, None, None, None ) ]
 		
 		self.theReceiver.deleteObject(self.objectID)
@@ -382,7 +399,7 @@ class UndeleteObject(LayoutCommand):
 		self.x = self.theArgs[ self.X ]
 		self.y = self.theArgs[ self.Y ]
 		self.theParent = self.theArgs[ self.PARENT ]
-		self.theBuffer.undoFlag = True
+		self.theBuffer.setUndoFlag ( True )
 		return True
 
 
@@ -416,7 +433,8 @@ class MoveObject(LayoutCommand):
 		self.objectID = self.theArgs[ self.OBJECTID ]
 		self.newx = self.theArgs[ self.NEWX ]
 		self.newy = self.theArgs[ self.NEWY ]
-		self.newParent = self.theArgs[ self.NEWPARENT ]
+		#self.newParent = self.theArgs[ self.NEWPARENT ]
+		self.newParent=None
 		return True
 
 
@@ -465,11 +483,12 @@ class ResizeObject(LayoutCommand):
 
 
 	def createReverseCommand( self ):
-		antiUp = - self.up
-		antiDown = - self.down
-		antiLeft = - self.left
-		antiRight = - self.right
+		antiUp = -self.up
+		antiDown = -self.down
+		antiLeft = -self.left
+		antiRight = -self.right
 		self.theReverseCommandList = [ ResizeObject( self.theReceiver, self.objectID, antiUp, antiDown, antiLeft, antiRight ) ]
+		
 
 
 	def getAffected( self ):

@@ -232,6 +232,7 @@ class VariableReferenceEditor(ViewComponent):
 		newName = self.getUniqueVarrefName()
 		aFullIDBrowserWindow = FullIDBrowserWindow( self, convertSysPathToSysID( self.theProcessID.split(':')[1] ) )
 		aVariableRef = aFullIDBrowserWindow.return_result()
+		
 		if aVariableRef == None:
 			#aVariableRef = '.'
 			return
@@ -240,7 +241,7 @@ class VariableReferenceEditor(ViewComponent):
 
 		if isAbsoluteReference( aVariableRef ):
 			aVariableRef = getRelativeReference( self.theProcessID,  aVariableRef )
-
+		
 		#aVariableRef = aVariableRef.replace( ME_VARIABLE_TYPE, '', 1)
 		aVarref = [ newName, aVariableRef, 0 ]
 		self.theVarrefList.append( aVarref )

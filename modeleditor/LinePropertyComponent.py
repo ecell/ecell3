@@ -52,11 +52,12 @@ class  LinePropertyComponent(ViewComponent):
 	#    GENERAL CASES    #
 	#######################
 
-	def __init__( self, aParentWindow, pointOfAttach ):
+	def __init__( self, aParentWindow,aConnObjectEditor, anObject ,pointOfAttach ):
 		
 		
 		self.theModelEditor = aParentWindow.theModelEditor
 		self.theParent  =aParentWindow
+		self.theConnObjectEditorWindow = aConnObjectEditor
 		
 		ViewComponent.__init__( self, pointOfAttach, 'attachment_box', 'LinePropertyComponent.glade' )
 
@@ -64,17 +65,22 @@ class  LinePropertyComponent(ViewComponent):
 		#Add Handlers
 
 		self.addHandlers({
-			'on_arw_color_changed'	: self.__change_arw_color,
+			'on_arw_color_button_clicked'	: self.__ColorFillSelection_displayed,
 			'on_arw_style_changed'	: self.__change_arw_style,
-			'on_arw_type_changed'	: self.__change_arw_type,
-			'on_arw_heads_toggled'	: self.__toggle_arw_heads,
-			
+			'on_arw_type_selection_received':self.__change_arw_type,
 			})
 
-
-		                
-		
-                
+		self.theColor=None
+		self.theColorDialog=None
+		self.theDrawingArea=None
+		self.theColorList=['red', 'yellow', 'green', 'brown', 'blue', 'magenta',
+                 'darkgreen', 'bisque1']
+		self.theAvailableArrowTypeList=[]
+		self.theArwTypeCombo=ViewComponent.getWidget(self,'cboArwType')
+		self.theLineTypeCombo=ViewComponent.getWidget(self,'cboArwStyle')
+		self.theObject = anObject
+		self.populateComboBox(self.theObject)           
+               
         def close( self ):
 		"""
 		closes subcomponenets
@@ -83,44 +89,109 @@ class  LinePropertyComponent(ViewComponent):
 
 	#########################################
 	#    Private methods/Signal Handlers    #
-	#########################################
+	#########################################	
+
+	def __ColorFillSelection_displayed( self,*args):
+		aDialog,aColorSel=self.setColorDialog()
+		response=aDialog.run()
+		if response==gtk.RESPONSE_OK:
+			aColor=aColorSel.get_current_color()
+			aDa=ViewComponent.getWidget(self,'da_fill')
+			aDa.modify_bg(gtk.STATE_NORMAL,aColor)
+			aDialog.destroy()
+			self.setHexadecimal(aColor,OB_FILL_COLOR)
+			self.__LineProperty_updated(OB_FILL_COLOR,self.theHex)
+		else:
+			aDialog.destroy()
+
+	def __LineProperty_updated(self, aKey,aNewValue):
+		self.theConnObjectEditorWindow.modifyConnObjectProperty(aKey,aNewValue)		
 
 
-			
-
-		
-
-	def __change_arw_color( self, textString ):
-		newClass = (ViewComponent.getWidget(self,'arw_color')).get_text()
-		if str(newClass) == 'Black':
-			print 'Arrow color set to #00000.'
-		if str(newClass) == 'Red':
-			print 'Arrow color set to #FF0000.'
-		if str(newClass) == 'Green':
-			print 'Arrow color set to #00FF00.'
-		if str(newClass) == 'Blue':
-			print 'Arrow colro set to #0000FF.'
-
-
-	def __change_arw_style( self, textString ):
+	def __change_arw_style( self, *args ):
 		newClass = (ViewComponent.getWidget(self,'arw_style')).get_text()
-		if str(newClass) != '':
-			print 'Arrow style set to ' + str(newClass) + '.'
-
-	def __change_arw_type( self, textString ):
-		newClass = (ViewComponent.getWidget(self,'arw_type')).get_text()
-		if str(newClass) != '':
-			print 'Arrow type set to ' + str(newClass) + '.'
-
-	def __toggle_arw_heads( self, textString ):
-		newClass = (ViewComponent.getWidget(self,'arw_heads')).get_active()
-		if str(newClass) == '1':
-			print 'Arrow heads are shown.'
-		if str(newClass) == '0':
-			print 'Arrow heads are hidden.'
+		
+	def __change_arw_type( self, *args ):
+		newArwType = (ViewComponent.getWidget(self,'arw_type')).get_text()
+		self.changeArwType(newArwType)
 		
 
+	###############################################################################
+	#PRIVATE METHOD#
+	###############################################################################
+	def populateComboBox(self,anObject):
+		self.theAvailableArrowTypeList=anObject.getAvailableArrowType()
+		anObjArrowType = anObject.getProperty(OB_SHAPE_TYPE)
+		for i in range (len(self.theAvailableArrowTypeList)):
+			if self.theAvailableArrowTypeList[i]==anObjArrowType:
+				temp = self.theAvailableArrowTypeList[0]
+				self.theAvailableArrowTypeList[0]=self.theAvailableArrowTypeList[i]
+				self.theAvailableArrowTypeList[i]=temp
+		self.theArwTypeCombo.set_popdown_strings(self.theAvailableArrowTypeList)
+		self.theLineTypeCombo.set_popdown_strings(anObject.getAvailableLineType())
 
+	def setDisplayedLineProperty(self ,connObj):
+		if connObj ==None:
+			self.clearLineProperty()
+			return
+		self.theObject=connObj
+		self.theFillColor=self.getColorObject(self.theObject.getProperty(OB_FILL_COLOR))
+		self.thecoef = connObj.getProperty(CO_COEF)
+		self.populateComboBox(self.theObject)
+		self.updateLineProperty()
+
+	def clearLineProperty(self):
+		self.theFillColor = self.getColorObject([0,0,0])
+		self.thecoef = 0
+		self.theArwTypeCombo.set_sensitive(gtk.FALSE)
+		self.theLineTypeCombo.set_sensitive(gtk.FALSE)
+		ViewComponent.getWidget(self,'arw_color_button').set_sensitive(gtk.FALSE)
+		ViewComponent.getWidget(self,'chk_last_arw').set_active(gtk.FALSE)
+		ViewComponent.getWidget(self,'chk_first_arw').set_active(gtk.FALSE)
+
+	def updateLineProperty(self):
+		self.theArwTypeCombo.set_sensitive(gtk.TRUE)
+		self.theLineTypeCombo.set_sensitive(gtk.TRUE)
+		ViewComponent.getWidget(self,'arw_color_button').set_sensitive(gtk.TRUE)
+		ViewComponent.getWidget(self,'da_fill').modify_bg(gtk.STATE_NORMAL,self.theFillColor)
+		
+		if int(self.thecoef) < 0:
+			ViewComponent.getWidget(self,'chk_first_arw').set_active(gtk.TRUE)
+			ViewComponent.getWidget(self,'chk_last_arw').set_active(gtk.FALSE)
+		elif int(self.thecoef) > 0:
+			ViewComponent.getWidget(self,'chk_last_arw').set_active(gtk.TRUE)
+			ViewComponent.getWidget(self,'chk_first_arw').set_active(gtk.FALSE)
+		elif int(self.thecoef) == 0:
+			ViewComponent.getWidget(self,'chk_last_arw').set_active(gtk.FALSE)
+			ViewComponent.getWidget(self,'chk_first_arw').set_active(gtk.FALSE)
+		
+	def changeArwType(self, newArwType):
+		if newArwType!="" and  self.theObject.getProperty(OB_SHAPE_TYPE) != newArwType:
+			self.__LineProperty_updated(OB_SHAPE_TYPE,newArwType)
+				
+	
+	def setColorDialog( self, *args ):
+		aColor=gtk.gdk.color_parse(self.theColorList[randint (0, 3)])
+		aDialog=gtk.ColorSelectionDialog("Select Fill Color")
+		aColorSel=aDialog.colorsel
+		aColorSel.set_previous_color(aColor)
+		aColorSel.set_current_color(aColor)
+		aColorSel.set_has_palette(gtk.TRUE)
+		return[aDialog,aColorSel]
+	
+	def setHexadecimal(self,theColor,theColorMode ):
+		self.theRed=theColor.red
+		self.theGreen=theColor.green
+		self.theBlue=theColor.blue
+		self.theHex = [self.theRed,self.theGreen,self.theBlue]
+		
+
+	def getColorObject(self, anRGB):
+		aColor=gtk.gdk.color_parse(self.theColorList[randint (0, 3)])
+		aColor.red= anRGB[0]
+		aColor.green= anRGB[1]
+		aColor.blue= anRGB[2]
+		return aColor
 	
 
 

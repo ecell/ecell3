@@ -170,6 +170,7 @@ class EntityList(ViewComponent):
 		# modify flags
 		
 		# change physically selected row if not user selected
+		
 		if not userSelect:
 			aNameList = []
 			for aSelection in self.theSelection:
@@ -199,8 +200,9 @@ class EntityList(ViewComponent):
 		# get selected sysid
 		aNameList = copyValue( self.__getSelection() )
 		aSelectionList = []
+		
 		aPath = convertSysIDToSysPath( self.theDisplayedSysID )
-
+		
 		for aName in aNameList:
 
 			aSelectionList.append( ':'.join( [ self.theType, aPath, aName ] ) )
@@ -356,11 +358,13 @@ class EntityList(ViewComponent):
 		"""
 		clear and build list
 		"""
+		
 		self.theListSelection.unselect_all()
 		self.theListStore.clear()
 		aNameList = []
 		if self.theDisplayedSysID != None:
 			aNameList = self.theModelEditor.getModel().getEntityList ( self.theType, convertSysIDToSysPath( self.theDisplayedSysID ) )
+			#print'\n buildList',aNameList	
 
 		self.__addRows( aNameList )
 		
@@ -474,6 +478,9 @@ class EntityList(ViewComponent):
 
 		newName = args[2]
 		aPath = args[1]
+		noActivate = self.noActivate
+		self.noActivate = True
 		anIter = self.theListStore.get_iter_from_string( aPath )
 		self.rename ( newName, anIter )
+		self.noActivate= noActivate
 

@@ -156,7 +156,7 @@ class MainWindow( ListWindow ):
 		in: nothing
 		returns nothing
 		"""
-		pass
+		self.theModelEditor.printMessage("Sorry, not implemented !", ME_ERROR )
 
 
 	def displayMessage ( self, aMessage ):
@@ -283,13 +283,10 @@ class MainWindow( ListWindow ):
 
 	def showAbout ( self ):
 		# show about information
-		pass
+		self.theModelEditor.printMessage("Sorry, not implemented !", ME_ERROR )
 
 
-	def importModel( self ):
-		pass
-
-
+	
 	def __getFileSelection ( self, aDirname, aFileName = '' ):
 		"""
 		in: str aDirname, str aFileName
@@ -405,7 +402,7 @@ class MainWindow( ListWindow ):
 	def __pathway_editor_activated( self, *args ):
 		layoutManager = self.theModelEditor.theLayoutManager
 		layoutName = layoutManager.getUniqueLayoutName()
-		aCommand = CreateLayout( layoutManager, layoutName )
+		aCommand = CreateLayout( layoutManager, layoutName, True )
 		self.theModelEditor.doCommandList( [ aCommand ] )
 
 	

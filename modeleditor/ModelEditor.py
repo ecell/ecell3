@@ -21,10 +21,14 @@ from DMInfo import *
 from PopupMenu import *
 from PathwayEditor import *
 from LayoutManager import *
-from ecell.eml import *
+
 from CommandMultiplexer import *
 from ObjectEditorWindow import *
+from ConnectionObjectEditorWindow import *
+from LayoutEml import *
+from GraphicalUtils import *
 
+from Error import *
 
 RECENTFILELIST_FILENAME = '~/.modeleditor/.recentlist'
 RECENTFILELIST_DIRNAME = '~/.modeleditor'
@@ -61,20 +65,17 @@ class ModelEditor:
 		self.thePathwayEditorList = []
 		self.theLayoutManagerWindow=None 
 		self.theObjectEditorWindow = None
+		self.theConnObjectEditorWindow = None
 		self.theFullIDBrowser = None
 		self.thePopupMenu = PopupMenu( self )
 		self.theMainWindow = MainWindow( self )
-		self.theLayoutManager = LayoutManager( self )
-		self.theMultiplexer = CommandMultiplexer( self, self.theLayoutManager )
 		self.changesSaved = True
-		self.openLayoutWindow = False
-		self.openObjectEditorWindow = False
 		# create untitled model
 		self.__createModel()
-		self.theLastComponent = None
 
 		# set up windows
 		self.theMainWindow.openWindow()
+		self.theGraphicalUtils = GraphicalUtils( self.theMainWindow )
 		
 		# load file
 		if aFileName != None:
@@ -97,10 +98,10 @@ class ModelEditor:
 		# create new Model
 		self.__createModel()
 		self.updateWindows()
-	
 
-	def validateModel( ):
-		printMessage("Sorry, not implemented!", ME_ERROR )
+
+	def validateModel( self):
+		self.printMessage("Sorry, not implemented!", ME_ERROR )
 
 
 	def loadModel ( self, aFileName ):
@@ -108,7 +109,6 @@ class ModelEditor:
 		in: nothing
 		returns nothing
 		"""
-
 		# check if it is dir
 		if os.path.isdir( aFileName ):
 			self.loadDirName = aFileName.rstrip('/')
@@ -122,9 +122,9 @@ class ModelEditor:
 		if self.loadDirName != '':
 			os.chdir(self.loadDirName )
 
+
 		# create new model
 		self.__createModel()
-
 
 		# tries to parse file
 		try:
@@ -139,22 +139,38 @@ class ModelEditor:
 	
 		except:
 			#display message dialog
+			
 			self.printMessage( "Error loading file %s"%aFileName, ME_ERROR )
+			
+			if str(sys.exc_type)=="Error.ClassNotExistError":
+				anErrorMessage= string.join( sys.exc_value )
+			else:
+				anErrorMessage = string.join( traceback.format_exception(sys.exc_type,sys.exc_value, \
+					sys.exc_traceback), '\n' )
+			
+			self.printMessage( anErrorMessage, ME_PLAINMESSAGE )
+			self.__createModel()
+			return
+		# load layouts
+		try:
+			self.loadLayoutEml( os.path.split( aFileName ) )
+		except:
+			#display message dialog
+			self.printMessage( "Error loading layout information from file %s"%aFileName, ME_ERROR )
 			anErrorMessage = string.join( traceback.format_exception(sys.exc_type,sys.exc_value, \
 					sys.exc_traceback), '\n' )
 			self.printMessage( anErrorMessage, ME_PLAINMESSAGE )
-			return
-
-		self.__closeWindows()
-
 		# log to recent list
 		self.__addToRecentFileList ( aFileName )
 		self.theModelFileName = aFileName
 		self.theModelName = os.path.split( aFileName )[1]
+
 		self.modelHasName = True
 		self.changesSaved = True
 		self.printMessage("Model %s loaded successfully."%aFileName )
 		self.updateWindows()
+
+
 
 
 	def saveModel ( self,  aFileName = None ):
@@ -169,7 +185,7 @@ class ModelEditor:
 
 		# check if it is eml file
 		self.saveDirName = os.path.split( aFileName )[0]
-		
+
 		anEml = Eml()
 
 
@@ -192,7 +208,8 @@ class ModelEditor:
 <eml>
 ''' % time.asctime( time.localtime() )
    		aString = anEml.asString()
-		aBuffer = string.join( string.split(aString, '<eml>\n'), aCurrentInfo)
+		anEml.destroy()
+		aBuffer = aString #+ aCurrentInfo
 		try:
 			aFileObject = open( aFileName, 'w' )
 			aFileObject.write( aBuffer )
@@ -204,7 +221,9 @@ class ModelEditor:
 					sys.exc_traceback), '\n' )
 			self.printMessage( anErrorMessage, ME_PLAINMESSAGE )
 			return
-		
+		# save layout eml
+		self.saveLayoutEml(os.path.split( aFileName ))
+
 		# log to recent list
 		self.__addToRecentFileList ( aFileName )
 		self.theModelFileName = aFileName
@@ -214,6 +233,169 @@ class ModelEditor:
 		self.changesSaved = True
 		self.updateWindows()
 
+	def lemlExist(self,fileName):
+		if os.path.isfile(fileName):
+			return True
+		else:
+			return False
+
+	def loadLayoutEml( self, (emlPath, emlName) ):
+		fileName = os.path.join( emlPath, self.__getLemlFromEml( emlName ) )
+		if not self.lemlExist(fileName):
+			return
+		fileObject = open(fileName, "r")
+		aLayoutEml = LayoutEml(fileObject)
+
+		aLayoutNameList =  aLayoutEml.getLayoutList()
+		# create layouts
+
+		for aLayoutName in  aLayoutNameList:
+			self.theLayoutManager.createLayout(aLayoutName)
+			aLayout = self.theLayoutManager.getLayout(aLayoutName)
+		# create layoutproperties
+		
+			propList = aLayoutEml.getLayoutPropertyList(aLayoutName)
+			for aProp in propList:
+				aPropValue =aLayoutEml.getLayoutProperty(aLayoutName,aProp)
+				aLayout.setProperty(aProp,aPropValue)
+				
+			aRootID = aLayout.getProperty( LO_ROOT_SYSTEM )
+			self.__loadObject( aLayout, aRootID, aLayoutEml, None)
+			aConnObjectList = aLayoutEml.getObjectList(OB_TYPE_CONNECTION, aLayoutName)
+			# finally read and create connections for layout
+			for aConnID in aConnObjectList:
+				aProAttachedID = aLayoutEml.getObjectProperty(aLayoutName, aConnID,CO_PROCESS_ATTACHED)
+				aVarAttachedID =aLayoutEml.getObjectProperty(aLayoutName, aConnID,CO_VARIABLE_ATTACHED)
+				aProRing = aLayoutEml.getObjectProperty(aLayoutName, aConnID,CO_PROCESS_RING)
+				aVarRing = aLayoutEml.getObjectProperty(aLayoutName, aConnID,CO_VARIABLE_RING)
+				aVarrefName =  aLayoutEml.getObjectProperty(aLayoutName, aConnID,CO_NAME)
+				aLayout.createConnectionObject(aConnID, aProAttachedID, aVarAttachedID,  aProRing, aVarRing,PROCESS_TO_VARIABLE, aVarrefName )
+				anObject =aLayout.getObject(aConnID)
+				propList = aLayoutEml.getObjectPropertyList(aLayoutName, aConnID )
+				for aProp in propList:
+					if aProp in (CO_PROCESS_ATTACHED, CO_VARIABLE_ATTACHED,CO_PROCESS_RING,CO_VARIABLE_RING, CO_NAME):
+						continue
+					aPropValue = aLayoutEml.getObjectProperty(aLayoutName, aConnID,aProp)
+					if aPropValue == None:
+						continue
+					anObject.setProperty(aProp,aPropValue)
+
+		
+
+	def __loadObject( self, aLayout, anObjectID,  aLayoutEml, parentSys ):
+		aLayoutName = aLayout.getName()
+		propList = aLayoutEml.getObjectPropertyList(aLayoutName, anObjectID )
+
+		objectType = aLayoutEml.getObjectProperty(aLayoutName, anObjectID ,OB_TYPE)
+		aFullID = aLayoutEml.getObjectProperty(aLayoutName, anObjectID ,OB_FULLID)
+		if objectType != OB_TYPE_CONNECTION:
+			x=aLayoutEml.getObjectProperty(aLayoutName, anObjectID ,OB_POS_X)
+			y=aLayoutEml.getObjectProperty(aLayoutName, anObjectID ,OB_POS_Y)
+
+			aLayout.createObject(anObjectID, objectType, aFullID,x, y, parentSys )
+			anObject =aLayout.getObject(anObjectID)
+			for aProp in propList:
+				if aProp in ( OB_TYPE,OB_FULLID,OB_POS_X,OB_POS_Y) :
+					continue
+				aPropValue = aLayoutEml.getObjectProperty(aLayoutName, anObjectID,aProp)
+				if aPropValue == None :
+					continue
+				anObject.setProperty(aProp,aPropValue)
+		# create subobjects
+		if objectType == OB_TYPE_SYSTEM:
+			anObjectList = self.__getObjectList(aLayoutEml,aLayoutName, anObjectID)
+			for anID in anObjectList:
+				self.__loadObject( aLayout, anID, aLayoutEml,anObject )
+		
+		
+	def __getObjectList(self,aLayoutEml,aLayoutName,aParentID):
+		anObjectList=[]
+		aProObjectList = aLayoutEml.getObjectList(OB_TYPE_PROCESS, aLayoutName, aParentID)
+		aVarObjectList = aLayoutEml.getObjectList(OB_TYPE_VARIABLE, aLayoutName, aParentID)
+		aSysObjectList = aLayoutEml.getObjectList(OB_TYPE_SYSTEM, aLayoutName, aParentID)
+		aTextObjectList = aLayoutEml.getObjectList(OB_TYPE_TEXT, aLayoutName, aParentID)
+		anObjectList = aProObjectList + aVarObjectList + aSysObjectList+ aTextObjectList
+		return anObjectList
+
+
+
+	def saveLayoutEml( self, (emlPath, emlName) ):
+		fileName = os.path.join( emlPath, self.__getLemlFromEml( emlName ) )
+		aLayoutEml = LayoutEml()
+		# create layouts
+		for aLayoutName in self.theLayoutManager.getLayoutNameList():
+			self.__saveLayout( aLayoutName, aLayoutEml )
+
+		#aCurrentInfo = '''<!-- created by ecell ModelEditor
+# date: %s
+#
+#-->
+#<leml>
+#''' % time.asctime( time.localtime() )
+   		aString = aLayoutEml.asString()
+		aLayoutEml.destroy()
+#		aBuffer = string.join( string.split(aString, '<leml>\n'), aCurrentInfo)
+		aBuffer = aString
+		try:
+			aFileObject = open( fileName, 'w' )
+			aFileObject.write( aBuffer )
+			aFileObject.close()
+		except:
+			#display message dialog
+			self.printMessage( "Error saving file %s"%fileName, ME_ERROR )
+			anErrorMessage = string.join( traceback.format_exception(sys.exc_type,sys.exc_value, \
+					sys.exc_traceback), '\n' )
+			self.printMessage( anErrorMessage, ME_PLAINMESSAGE )
+			
+
+
+
+	def __saveLayout( self, aLayoutName, aLayoutEml ):
+		aLayoutEml.createLayout( aLayoutName )
+		# save properties
+		aLayoutObject = self.theLayoutManager.getLayout( aLayoutName )
+		propList = aLayoutObject.getPropertyList()
+		for aProperty in propList:
+			aValue = aLayoutObject.getProperty( aProperty)
+			aLayoutEml.setLayoutProperty( aLayoutName, aProperty, aValue )
+		# save objects
+		aRootID = aLayoutObject.getProperty( LO_ROOT_SYSTEM )
+		self.__saveObject( aLayoutObject, aRootID, aLayoutEml )
+		# save connections
+		conList = aLayoutObject.getObjectList( OB_TYPE_CONNECTION )
+		for aConID in conList:
+			self.__saveObject( aLayoutObject, aConID, aLayoutEml )
+
+
+	def __saveObject( self, aLayoutObject, anObjectID,  aLayoutEml, parentID = 'layout' ):
+		aLayoutName = aLayoutObject.getName()
+		# create object
+		anObject = aLayoutObject.getObject( anObjectID )
+		aType = anObject.getProperty( OB_TYPE )
+		aLayoutEml.createObject(  aType, aLayoutName, anObjectID, parentID )
+
+		# save properties
+		propList = anObject.getPropertyList()
+		for aProperty in propList:
+			if aProperty in ( PR_CONNECTIONLIST, VR_CONNECTIONLIST ):
+				continue
+			aValue = anObject.getProperty( aProperty)
+			aLayoutEml.setObjectProperty( aLayoutName, anObjectID, aProperty, aValue )
+
+		# save subobjects
+		if aType == OB_TYPE_SYSTEM:
+			for anID in anObject.getObjectList():
+				self.__saveObject( aLayoutObject, anID, aLayoutEml, anObjectID )
+			
+		
+
+
+	def __getLemlFromEml( self, emlName ):
+		trunk = emlName.split('.')
+		if trunk[ len(trunk)-1] == 'eml':
+			trunk.pop()
+		return '.'.join( trunk ) + '.leml'
+	
 
 	def closeModel ( self ):
 		"""
@@ -382,7 +564,11 @@ class ModelEditor:
 	def undoCommandList( self ):
 		aCommandList = self.theUndoQueue.moveback()
 		self.theRedoQueue.moveback()
-		for aCommand in aCommandList:
+		cmdList = aCommandList[:]
+		cmdList.reverse()
+
+		for aCommand in cmdList:
+
 			# execute commands
 			aCommand.execute()
 			( aType, anID ) = aCommand.getAffectedObject()
@@ -450,20 +636,19 @@ class ModelEditor:
 		self.openLayoutWindow=isOpen
 
 	def createLayoutWindow( self ):
-                 if not self.openLayoutWindow:
+		if not self.openLayoutWindow:
 			newWindow = LayoutManagerWindow( self )
 			self.theLayoutManagerWindow=newWindow
 			newWindow.openWindow()
 			self.openLayoutWindow=True
-		 else:
-			
+		else:		
 			self.theLayoutManagerWindow.present()
 
 	def createObjectEditorWindow(self, aLayoutName, anObjectID ):
 		if not self.openObjectEditorWindow:
 			ObjectEditorWindow(self, aLayoutName, anObjectID)
 		else:
-			self.theObjectEditorWindow.displayObjectEditorWindow( aLayoutName, anObjectID)
+			self.theObjectEditorWindow.setDisplayObjectEditorWindow( aLayoutName, anObjectID)
 		
 	def toggleObjectEditorWindow(self,isOpen,anObjectEditor):
 		self.theObjectEditorWindow=anObjectEditor
@@ -471,6 +656,17 @@ class ModelEditor:
 
 	def deleteObjectEditorWindow( self ):
 		self.theObjectEditorWindow = None
+
+	def createConnObjectEditorWindow(self, aLayoutName, anObjectID ):
+		if not self.openConnObjectEditorWindow:
+			ConnectionObjectEditorWindow(self, aLayoutName, anObjectID)
+		else:
+			self.theConnObjectEditorWindow.setDisplayConnObjectEditorWindow( aLayoutName, anObjectID)
+		
+	def toggleConnObjectEditorWindow(self,isOpen,aConnObjectEditor):
+		self.theConnObjectEditorWindow=aConnObjectEditor
+		self.openConnObjectEditorWindow=isOpen
+
 		
 	def copy(self ):
 		self.theLastComponent.copy()
@@ -527,7 +723,10 @@ class ModelEditor:
 			aStepperWindow.update( aType, anID )
 		for anEntityWindow in self.theEntityListWindowList:
 			anEntityWindow.update( aType, anID )
-
+		if self.theObjectEditorWindow!=None:
+			self.theObjectEditorWindow.update(aType, anID)
+		if self.theConnObjectEditorWindow!=None:
+			self.theConnObjectEditorWindow.update(aType, anID)
 		for aPathwayEditor in self.thePathwayEditorList:
 			aPathwayEditor.update( aType, anID )
 		if self.theFullIDBrowser != None:
@@ -537,6 +736,7 @@ class ModelEditor:
 		#self.theLayoutManager.update( aType, anID )
 		if self.theLayoutManagerWindow!=None:
 			self.theLayoutManagerWindow.update()
+		
 
 	def __closeModel ( self ):
 		""" 
@@ -550,12 +750,15 @@ class ModelEditor:
 
 		# close ModelStore
 		self.theModelStore = None
+		self.theLayoutManager = None
+		self.theMultiplexer = None
 
 		# set name 
 		self.theModelName = ''
 		self.theUndoQueue = None
 		self.theRedoQueue = None
 		self.changesSaved = True
+		self.theLayoutManager = None
 		self.__closeWindows()
 		#self.updateWindows()
 		return True
@@ -570,17 +773,26 @@ class ModelEditor:
 
 		for aPathwayEditor in self.thePathwayEditorList:
 			aPathwayEditor.close( )
-		       
+		if self.theConnObjectEditorWindow!=None:
+			self.theConnObjectEditorWindow.destroy()
+		if self.theObjectEditorWindow!=None:
+			self.theObjectEditorWindow.destroy()
+		if self.theLayoutManagerWindow!=None:
+			self.theLayoutManagerWindow.close()
+			self.theLayoutManagerWindow=None
+			self.toggleOpenLayoutWindow(False)
+
 
 	def __createModel (self ):
 		""" 
 		in: nothing
 		out nothingfrom EntityListWindow import *
 		"""
-		
 		self.__closeModel()
 		# create new model
 		self.theModelStore = ModelStore()
+		self.theLayoutManager = LayoutManager( self )
+		self.theMultiplexer = CommandMultiplexer( self, self.theLayoutManager )
 		self.theUndoQueue = CommandQueue(MAX_REDOABLE_COMMAND)
 		self.theRedoQueue = CommandQueue(MAX_REDOABLE_COMMAND)
 		
@@ -590,6 +802,10 @@ class ModelEditor:
 		self.theModelName = 'Untitled'
 		self.modelHasName = False
 		self.changesSaved = True
+		self.openLayoutWindow = False
+		self.openObjectEditorWindow = False
+		self.openConnObjectEditorWindow = False
+		self.theLastComponent = None
 
 
 
@@ -670,14 +886,21 @@ class ModelEditor:
 
 		for aValueListNode in aValueList:
 
-			if type( aValueListNode ) == type([]):
+			if type( aValueListNode ) in (type([]), type( () ) ):
 
-				if type( aValueListNode[0] ) == type([]):
+				isList = False
+				for aSubNode in aValueListNode:
+					if type(aSubNode) in (type([]), type( () ) ):
+						isList = True
+						break
+				if isList:
 					aConvertedList = self.__convertPropertyValueList( aValueListNode )
 				else:
 					aConvertedList = map(str, aValueListNode)
 
 				aList.append( aConvertedList )
+			else:
+				aList.append( str (aValueListNode) )
 
 		return aList
 
@@ -714,6 +937,7 @@ class ModelEditor:
 
 		aStepperList = anEml.getStepperList()
 
+
 		for aStepper in aStepperList:
 
 			aClassName = anEml.getStepperClass( aStepper )
@@ -721,13 +945,14 @@ class ModelEditor:
 				str( aStepper ) )
 
 			aPropertyList = anEml.getStepperPropertyList( aStepper )
-
+			
 			for aProperty in aPropertyList:
-				
+
 				aValue = anEml.getStepperProperty( aStepper, aProperty )
 				self.theModelStore.loadStepperProperty( aStepper,\
 						   aProperty,\
 						   aValue )
+
 											 
 	def __loadEntity( self, anEml, aSystemPath='/' ):
 
@@ -773,21 +998,27 @@ class ModelEditor:
 
 			aFullPNList = map( lambda x: aFullID + ':' + x, aPropertyList ) 
 			aValueList = map( anEml.getEntityProperty, aFullPNList )
-
 			map( self.theModelStore.loadEntityProperty,
 				 aFullPNList, aValueList )
 
-			
+#####################################################################################################################	
 	def __loadEntityList( self, anEml, anEntityTypeString,\
 						  aSystemPath, anIDList ):
 		
 		aPrefix = anEntityTypeString + ':' + aSystemPath + ':'
+		aMessage=''
 
 		aFullIDList = map( lambda x: aPrefix + x, anIDList )
 		aClassNameList = map( anEml.getEntityClass, aFullIDList )
 		map( self.theModelStore.createEntity, aClassNameList, aFullIDList )
-
-
+		"""
+		if len(self.theModelStore.getNotExistClass())>0:
+			aMessage='There is no .desc file for '
+			for aClass in self.theModelStore.getNotExistClass():
+				aMessage=aMessage + aClass + ', '
+			self.printMessage( aMessage[:-1], ME_PLAINMESSAGE )
+			self.theModelStore.setNotExistClass()
+		"""
 
 
 	def __saveStepper( self , anEml ):
@@ -807,17 +1038,17 @@ class ModelEditor:
 				anAttributeList = self.theModelStore.getStepperPropertyAttributes( aStepper, aProperty)
 
 				# check get attribute 
-				if anAttributeList[ME_SETTABLE_FLAG] and anAttributeList[ME_GETTABLE_FLAG]:
+				if anAttributeList[ME_SAVEABLE_FLAG]:
 									
 					aValue = self.theModelStore.saveStepperProperty( aStepper, aProperty )
-					if aValue == '':
+					if aValue == '' or aValue == []:
 						continue
 
 					aValueList = list()
 					if type( aValue ) != type([]):
-						aValueList.append( (aValue) )
+						aValueList.append( str(aValue) )
 					else:
-						aValueList = aValue
+						aValueList = self.__convertPropertyValueList( aValue )
 
 					anEml.setStepperProperty( aStepper, aProperty, aValueList )
 	
@@ -884,15 +1115,16 @@ class ModelEditor:
 				anAttributeList = self.theModelStore.getEntityPropertyAttributes(aFullPN)
 
 				# check savable
-				if anAttributeList[ME_SETTABLE_FLAG] and anAttributeList[ME_GETTABLE_FLAG]:
+				if anAttributeList[ME_SAVEABLE_FLAG] :
 					
 					aValue = self.theModelStore.saveEntityProperty(aFullPN)
 
-					if aValue != '':
+					if aValue != '' and aValue != []:
 
 						aValueList = list()
 						if type( aValue ) != type([]):
-							aValueList.append( (aValue) )
+							aValueList.append( str(aValue) )
+
 						else:
 							# ValueList convert into string for eml
 							aValueList = self.__convertPropertyValueList( aValue )

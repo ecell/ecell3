@@ -181,6 +181,7 @@ class SystemTree(ViewComponent):
 		elif len(self.theSelection) == 1:
 			if self.theSelection[0] == MS_SYSTEM_ROOT:
 				self.theFlags[ME_DELETE_FLAG] = False
+				self.theFlags[ME_COPY_FLAG ] = False
 			else:
 				self.theFlags[ME_DELETE_FLAG] = True
 		else:

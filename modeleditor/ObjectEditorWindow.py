@@ -50,18 +50,23 @@ from Constants import *
 from LayoutManager import *
 from Layout import *
 from EditorObject import *
-
+from LayoutCommand import *
+from EntityCommand import *
+from ResizeableText import *
 
 class ObjectEditorWindow :
 
 	def __init__( self, aModelEditor, aLayoutName, anObjectId ):
 		"""
 		sets up a modal dialogwindow displaying 
-		either both the EntityEditor and the ShapeProperty
-                or the ConnectionObjectEditorWindow
-
+		the EntityEditor and the ShapeProperty
+             
 		""" 
 		self.theModelEditor = aModelEditor	
+		self.isBoxShow=False
+		self.isFrameShow=False
+		self.attBox=None
+		self.frameBox=None # OB_HAS_FULLID=False
 		
 		# Create the Dialog
 		self.win = gtk.Dialog('Object Editor Window', None)
@@ -75,63 +80,231 @@ class ObjectEditorWindow :
 
 		# Sets title
 		self.win.set_title("ObjectEditor")
+
+		self.theComponent=None
+		self.theShapeProperty=None
 		
-		self.getTheObjectProperty(aLayoutName, anObjectId)
-		
-		
+		self.getTheObject(aLayoutName, anObjectId)
+		self.theEntityType = self.theObject.getProperty(OB_TYPE)
 		if self.theObject.getProperty(OB_HASFULLID):
-			
-		
-	                self.theComponent = EntityEditor( self, self.win.vbox,OB_TYPE_VARIABLE)
-			FullId = self.theObject.getProperty(OB_FULLID)
-		
-			self.theComponent.setDisplayedEntity (FullId)
-			
-                	#Add the ShapePropertyComponent
-	   		aNoteBook=ViewComponent.getWidget(self.theComponent,'editor_notebook')
-			aShapeFrame=gtk.Frame()
-			aShapeFrame.show()
-			aShapeLabel=gtk.Label('ShapeProperty')
-			aShapeLabel.show()
-			aNoteBook.append_page(aShapeFrame,aShapeLabel)
-		
-			self.theComponent.theShapeProperty = ShapePropertyComponent( self.theComponent.theParentWindow, aShapeFrame )
-			self.theComponent.theShapeProperty.setDisplayedShapeProperty(self.theObject,FullId,self.theObjShapeType, self.theObjWidth, self.theObjHeight)
-			self.theComponent.update()
-			
-		
-              	else:
+	                self.createComponent()
+			self.isBoxShow=True
+			self.attBox=self.getAttachmentBox()
+
+              	elif self.theObject.getProperty(OB_TYPE)== OB_TYPE_TEXT:
 			self.theShapeProperty=ShapePropertyComponent( self, self.win.vbox )
-
-
+			self.isFrameShow=True
+			self.frameBox=self.getAttachmentFrame()
+			
 
 		self.win.show_all()
-		self.theModelEditor.toggleObjectEditorWindow(True,self)
 
-
-
-
-	# ==========================================================================
-	def getTheObjectProperty(self,aLayoutName, anObjectId):
-		self.theLayout =self.theModelEditor.theLayoutManager.getLayout(aLayoutName)
-		self.theObject = self.theLayout.getObject(anObjectId)
-		self.theObjWidth = self.theObject.theShape.width
-		self.theObjHeight = self.theObject.theShape.height 
-		self.theObjShapeType = self.theObject.getProperty(OB_SHAPE_TYPE)
-		
-		
-	# ==========================================================================
-	def displayObjectEditorWindow(self,aLayoutName, anObjectId):
-		self.getTheObjectProperty(aLayoutName, anObjectId)
 		if self.theObject.getProperty(OB_HASFULLID):
-			FullId = self.theObject.getProperty(OB_FULLID)
-		        self.theComponent.setDisplayedEntity(FullId)
-			self.theComponent.theShapeProperty.setDisplayedShapeProperty(self.theObject,FullId,self.theObjShapeType, self.theObjWidth, self.theObjHeight)
-		else:
-			self.theShapeProperty=ShapePropertyComponent( self, self.win.vbox )
-			
-			
+			#self.theLastFullID = self.theObject.getProperty(OB_FULLID)
+			self.selectEntity( [self.theObject] )
+		self.update()
 
+		
+		self.theModelEditor.toggleObjectEditorWindow(True,self)	
+
+	def createComponent(self):
+		self.theComponent = EntityEditor( self, self.win.vbox,self.theEntityType,self )
+		self.theComponent.setDisplayedEntity (self.theObject.getProperty(OB_FULLID))
+		self.theShapeProperty=self.theComponent.theShapeProperty
+		self.theComponent.update()
+		
+
+	# ==========================================================================
+	def getTheObject(self,aLayoutName, anObjectId):
+		self.theLayout =self.theModelEditor.theLayoutManager.getLayout(aLayoutName)
+		self.theObjectId = anObjectId
+		self.theObject = self.theLayout.getObject(self.theObjectId)
+		
+
+	# ==========================================================================
+	def modifyObjectProperty(self,aPropertyName, aPropertyValue):
+		aCommand = None
+		if  aPropertyName == OB_OUTLINE_COLOR  or aPropertyName == OB_FILL_COLOR :
+			# create command
+			aCommand=SetObjectProperty(self.theLayout,self.theObjectId,aPropertyName, aPropertyValue )  
+			if aCommand != None:
+				self.theLayout.passCommand( [aCommand] )
+			
+		
+		elif aPropertyName == OB_FULLID:
+			if self.theObject.getProperty(OB_HASFULLID):
+				
+				aCommand = RenameEntity( self.theModelEditor, self.theObject.getProperty(OB_FULLID), aPropertyValue )
+				if aCommand.isExecutable():
+					self.theModelEditor.doCommandList( [ aCommand ] )
+				self.selectEntity( [self.theObject] )
+							
+
+			else:
+				pass
+		
+		elif  aPropertyName == OB_DIMENSION_Y  :
+			objHeight = self.theObject.getProperty(OB_DIMENSION_Y)
+			deltaHeight = objHeight-aPropertyValue
+			maxShiftPos= self.theObject.getMaxShiftPos(self.theObject,DIRECTION_DOWN)
+			maxShiftNeg= self.theObject.getMaxShiftNeg(DIRECTION_DOWN) 
+			if deltaHeight>0:
+				if  maxShiftNeg > deltaHeight:
+					# create command
+					aCommand=ResizeObject(self.theLayout,self.theObjectId,0,-deltaHeight, 0, 0 )
+					self.theLayout.passCommand( [aCommand] )
+				else:
+					self.updateShapeProperty()
+			elif deltaHeight<0:
+				if  maxShiftPos > -deltaHeight:
+					aCommand=ResizeObject(self.theLayout,self.theObjectId,0, -deltaHeight, 0, 0 )
+					self.theLayout.passCommand( [aCommand] )
+				
+			self.update()
+		
+		elif  aPropertyName == OB_DIMENSION_X :
+		 	objWidth = self.theObject.getProperty(OB_DIMENSION_X)
+
+			deltaWidth = objWidth-aPropertyValue
+			maxShiftPos= self.theObject.getMaxShiftPos(self.theObject,DIRECTION_RIGHT)
+			maxShiftNeg= self.theObject.getMaxShiftNeg(DIRECTION_RIGHT) 
+			if deltaWidth>0:
+				if  maxShiftNeg > deltaWidth:
+					# create command
+					aCommand=ResizeObject(self.theLayout,self.theObjectId,0, 0, 0, -deltaWidth )
+					self.theLayout.passCommand( [aCommand] )
+				else:
+					self.updateShapeProperty()
+
+			elif deltaWidth<0:
+				if  maxShiftPos > -deltaWidth:
+					# create command
+					aCommand=ResizeObject(self.theLayout,self.theObjectId,0, 0,0, -deltaWidth )
+					self.theLayout.passCommand( [aCommand] )
+				else:
+					self.updateShapeProperty()
+		
+	# ==========================================================================
+	def getAttachmentBox(self):
+		childs=self.win.vbox.get_children()
+		for obj in childs:
+			if obj.get_name()=='attachment_box':
+				return obj
+
+	def setAttachmentBox(self,action):
+		if self.attBox==None:
+			return
+		if action=='hide':
+			self.attBox.hide_all()
+			self.isBoxShow=False
+		else:
+			self.attBox.show_all()
+			self.isBoxShow=True
+
+	def getAttachmentFrame(self):
+		childs=self.win.vbox.get_children()
+		for obj in childs:
+			if obj.get_name()=='attachment_frame':
+				return obj
+
+	def setAttachmentFrame(self,action):
+		if self.frameBox==None:
+			return
+		if action=='hide':
+			self.frameBox.hide_all()
+			self.isFrameShow=False
+		else:
+			self.frameBox.show_all()
+			self.isFrameShow=True
+	# ==========================================================================
+
+	def setDisplayObjectEditorWindow(self,aLayoutName, anObjectId):
+		self.getTheObject( aLayoutName, anObjectId)
+		if self.theObject.getProperty(OB_HASFULLID):
+			self.theLastFullID = self.theObject.getProperty(OB_FULLID)
+			if self.theComponent==None:
+				self.createComponent()
+				self.attBox=self.getAttachmentBox()
+			else:
+				self.setAttachmentBox('show')
+			if self.isFrameShow:
+				self.setAttachmentFrame('hide')
+
+			self.theComponent.setDisplayedEntity (self.theLastFullID)
+			self.theShapeProperty=self.theComponent.theShapeProperty
+			self.theComponent.update()
+			
+		elif self.theObject.getProperty(OB_TYPE)== OB_TYPE_TEXT:
+
+			# an OB_TYPE_TEXT is being clicked
+			if self.frameBox==None:
+				self.theShapeProperty=ShapePropertyComponent( self, self.win.vbox )
+				self.frameBox=self.getAttachmentFrame()
+				self.isFrameShow=True
+			else:
+				self.setAttachmentFrame('show')
+			if self.isBoxShow:
+				self.setAttachmentBox('hide')	
+
+			
+			
+		self.updateShapeProperty()
+
+
+	# ==========================================================================
+	
+	def update(self, aType = None, aFullID = None):
+
+		if self.theObject !=None:
+			anObjectID = self.theObject.getID()
+			existObjectList = self.theLayout.getObjectList()
+			if anObjectID not in existObjectList:
+				self.theObject =None
+				self.theComponent.setDisplayedEntity (None)
+		
+			else:		
+				if self.theObject.getProperty(OB_HASFULLID):
+					self.theLastFullID = self.theObject.getProperty(OB_FULLID)
+					if not self.theModelEditor.getModel().isEntityExist(self.theLastFullID):
+						self.theLastFullID = None
+					self.updatePropertyList()
+				else:
+					self.theLastFullID = None
+					self.updatePropertyList()
+		self.updateShapeProperty()
+
+
+	
+	def updatePropertyList ( self, aFullID = None ):
+		"""
+		in: anID where changes happened
+		"""
+		# get selected objectID
+		propertyListEntity = self.theComponent.getDisplayedEntity()
+		# check if displayed fullid is affected by changes
+
+		if propertyListEntity != self.theLastFullID:
+			self.theComponent.setDisplayedEntity ( self.theLastFullID )
+		else:
+			self.theComponent.update()
+
+
+
+		
+
+	def updateShapeProperty(self):
+		self.theShapeProperty.setDisplayedShapeProperty(self.theObject)
+
+	def selectEntity(self,anEntityList):
+		if type(anEntityList) == type(""):
+			return
+		self.theLastObject = anEntityList[0]
+		if self.theObject.getProperty(OB_HASFULLID):
+			self.theLastFullID = self.theObject.getProperty(OB_FULLID)
+			if not self.theModelEditor.getModel().isEntityExist(self.theLastFullID):
+				self.theLastFullID = None
+		self.theComponent.setDisplayedEntity (self.theLastFullID)
+		self.theComponent.update()
 
 	# ==========================================================================
 	def return_result( self ):
@@ -148,7 +321,8 @@ class ObjectEditorWindow :
 		
 		self.win.destroy()
 		
-	        self.theModelEditor.toggleObjectEditorWindow(False,None)
+
+		self.theModelEditor.toggleObjectEditorWindow(False,None)
 		
 		
 

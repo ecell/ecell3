@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 from Utils import *
 import gtk
+import gobject
 
 import os
 import os.path
@@ -10,81 +11,94 @@ from ViewComponent import *
 from Constants import *
 from ShapePropertyComponent import *
 from LinePropertyEditor import *
+from LayoutManager import *
+from Layout import *
+from EditorObject import *
+from LayoutCommand import *
+from EntityCommand import *
 
 
-class ConnectionObjectEditorWindow(ViewComponent):
+class ConnectionObjectEditorWindow:
 	
 	#######################
 	#    GENERAL CASES    #
 	#######################
 
-	def __init__( self, aParentWindow, pointOfAttach ):
-		
-		
-		self.theModelEditor = aParentWindow.theModelEditor
-		
-		ViewComponent.__init__( self, pointOfAttach, 'attachment_box', 'ConnectionObjectEditorWindow.glade' )
-
-
-		#Add Handlers
-
-		self.addHandlers({ 
-			'on_BrowseButton_clicked' : self.__FullIDBrowse_displayed,\
-			'on_conn_notebook_switch_page' : self.__select_page,\
-		        'on_EditButton_clicked' : self.__change_var_reference
-			})
-
-		
-                # initate Editors
-		#self.theLineProperty = LinePropertyEditor(self.theParentWindow, self
-#['LinePropertyFrame'] ) 
-
-
-        def close( self ):
+	def __init__( self, aModelEditor, aLayoutName, anObjectId ):
 		"""
-		closes subcomponenets
-		"""
-		#close thaw's part
-		ViewComponent.close(self)
+		sets up a modal dialogwindow displaying 
+		the VariableReferenceEditor and the LineProperty
+             
+		""" 
+		self.theModelEditor = aModelEditor	
+		
+		# Create the Dialog
+		self.win = gtk.Dialog('ConnectionObject' , None)
+		self.win.connect("destroy",self.destroy)
 
-	#########################################
-	#    Private methods/Signal Handlers    #
-	#########################################
+		# Sets size and position
+		self.win.set_border_width(2)
+		self.win.set_default_size(300,75)
+		self.win.set_position(gtk.WIN_POS_MOUSE)
 
+		# Sets title
+		self.win.set_title('ConnectionObjectEditor')
+		
+		
+		self.getTheObject(aLayoutName, anObjectId)
+		self.theComponent = VariableReferenceEditorComponent( self, self.win.vbox,self.theLayout,self.theObject)
+		self.theComponent.setDisplayedVarRef(self.theLayout,self.theObject)
+		
+		self.win.show_all()
+		self.update()
+		self.theModelEditor.toggleConnObjectEditorWindow(True,self)
+		
 
-	def __FullIDBrowse_displayed( self, *args ):
-		self.FullIDBrowser = FullIDBrowserWindow(self, ME_VARIABLE_TYPE)
-		self.NewFullID = self.FullIDBrowser.return_result()
-		if self.NewFullID != None:
-			(ViewComponent.getWidget(self,'ent_id')).set_text(self.NewFullID) 
-		else:
-			pass
-
-	def __select_page( self, *args ):
-		pass
-
-	def __change_var_reference( self, *args ):
-		self.getNewVarRefValue()
 		
 
 	#########################################
 	#    Private methods			#
 	#########################################
 
-	def getNewVarRefValue(self):
-
-            	aVarName=(ViewComponent.getWidget(self,'ent_varname')).get_text()
-		aVarFullId=(ViewComponent.getWidget(self,'ent_id')).get_text()
-		aVarCoef=(ViewComponent.getWidget(self,'ent_coef')).get_text()
-
+	def setDisplayConnObjectEditorWindow(self,aLayoutName, anObjectId):
+		self.getTheObject( aLayoutName, anObjectId)
+		self.theComponent.setDisplayedVarRef(self.theLayout,self.theObject)
+		self.update()
+	def getTheObject(self,aLayoutName, anObjectId):
+		self.theLayout =self.theModelEditor.theLayoutManager.getLayout(aLayoutName)
+		self.theObjectId = anObjectId
+		self.theObject = self.theLayout.getObject(self.theObjectId)
 		
-		
-		self.setNewVarRefValue(aVarName,aVarFullId,aVarCoef)
 
-	def setNewVarRefValue(self,name,id,coef):
-		print 'The new Var Name: ' + name
-		print 'The new Full Id: ' + id
-		print 'The coeff: ' + coef
+	def modifyConnObjectProperty(self,aPropertyName, aPropertyValue):
+		aCommand = None
+		if  aPropertyName == OB_FILL_COLOR :
+			# create command
+			aCommand=SetObjectProperty(self.theLayout,self.theObjectId,aPropertyName, aPropertyValue )  
+			if aCommand != None:
+				self.theLayout.passCommand( [aCommand] )
+		if  aPropertyName == OB_SHAPE_TYPE :
+			# create command
+			aCommand=SetObjectProperty(self.theLayout,self.theObjectId,aPropertyName, aPropertyValue ) 
+			if aCommand != None:
+				self.theLayout.passCommand( [aCommand] )
+
+
+	def update(self, aType = None, aFullID = None):
+
+		self.theComponent.update()
+		
+
+	# ==========================================================================
+	def destroy( self, *arg ):
+		"""destroy dialog
+		"""
+		
+		self.win.destroy()
+
+		self.theModelEditor.toggleConnObjectEditorWindow(False,None)
+		
+
 		
 		
 

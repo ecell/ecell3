@@ -6,6 +6,7 @@ from SystemObject import *
 from ProcessObject import *
 from VariableObject import *
 from TextObject import *
+from ConnectionObject import *
 import gnome.canvas 
 
 
@@ -32,13 +33,17 @@ class Layout:
 
 		# allways add root dir object
 		anObjectID = self.getUniqueObjectID( ME_SYSTEM_TYPE )
-		
 		self.createObject( anObjectID, ME_SYSTEM_TYPE, ME_ROOTID, default_scrollregion[0], default_scrollregion[1], None )
+		self.thePropertyMap[ LO_ROOT_SYSTEM ] = anObjectID
 
 
 	def update( self, aType = None, anID = None ):
 		# i am not sure this is necessary
 		pass
+
+	def isShown( self ):
+		return self.theCanvas != None
+
 
 	def attachToCanvas( self, aCanvas ):
 		self.theCanvas = aCanvas
@@ -50,17 +55,36 @@ class Layout:
 		# set canvas ppu
 		ppu = self.getProperty( LO_ZOOM_RATIO )
 		self.theCanvas.setZoomRatio( ppu )
+		self.theCanvas.scrollTo( scrollRegion[0], scrollRegion[1],'attach')
 
 		# set canvas for objects and show objects
-		for objectID in self.theObjectMap.keys():
+
+
+		self.__showObject( self.thePropertyMap[ LO_ROOT_SYSTEM ] )
+
+		# then get all the connections, setcanvas, show
+
+		for objectID in self.getObjectList(OB_TYPE_CONNECTION):
 			anObject = self.theObjectMap[ objectID ]
 			anObject.setCanvas( self.theCanvas )
 			anObject.show()
 		
-
+	def __showObject( self, anObjectID ):
+		
+		anObject = self.theObjectMap[ anObjectID ]
+		anObject.setCanvas( self.theCanvas )
+		anObject.show()
+		
+		if anObject.getProperty( OB_TYPE ) == OB_TYPE_SYSTEM:
+			objectList = anObject.getObjectList()
+			
+			for anID in objectList:
+				self.__showObject( anID )
+		
+		
 
 	def detachFromCanvas( self ):
-
+		
 		# hide objects and setcanvas none
 		for objectID in self.theObjectMap.keys():
 			anObject = self.theObjectMap[ objectID ]
@@ -77,7 +101,8 @@ class Layout:
 
 	def rename( self, newName ):
 		self.theName = newName
-		self.thePathwayEditor.update()
+		if self.thePathwayEditor!=None:
+			self.thePathwayEditor.update()
 		
 		
 	#########################################
@@ -85,7 +110,7 @@ class Layout:
 	#########################################
 
 
-	def createObject( self, objectID, objectType, aFullID, x=None, y=None, parentSystem = None  ):
+	def createObject( self, objectID, objectType, aFullID=None, x=None, y=None, parentSystem = None  ):
 		# object must be within a system except for textboxes 
 		# parentSystem object cannot be None, just for root
 		if x == None and y == None:
@@ -109,10 +134,11 @@ class Layout:
 		elif objectType == OB_TYPE_TEXT:
 			if parentSystem == None:
 				parentSystem = self
-			newObject = TextObject( self, objectID, aFullID, x, y, parentSystem )
+			newObject = TextObject( self, objectID, x, y, parentSystem )
 
 		elif objectType == OB_TYPE_CONNECTION:
-			pass
+			raise "Connection object cannot be created via Layout.createObject"
+
 		else:
 			raise Exception("Object type %s does not exists"%objectType)
 		
@@ -129,13 +155,23 @@ class Layout:
 		anObject = self.getObject( anObjectID )
 		aParent = anObject.getParent()
 		anObject.destroy()
-		aParent.unregisterObject( anObjectID )
+		if aParent != self:
+			aParent.unregisterObject( anObjectID )
 		self.theObjectMap.__delitem__( anObjectID )
 
 
 	def getObjectList( self, anObjectType = None ):
 		# returns IDs
-		return self.theObjectMap.keys()
+		if anObjectType == None:
+			return self.theObjectMap.keys()
+		returnList = []
+		for anID in self.theObjectMap.keys():
+			anObject = self.theObjectMap[ anID ]
+			if anObject.getProperty( OB_TYPE ) == anObjectType:
+				returnList.append( anID )
+		return returnList
+			
+			
 
 
 	def getPropertyList( self ):
@@ -150,7 +186,7 @@ class Layout:
 	
 	
 	def setProperty( self, aPropertyName, aValue ):
-		pass
+		self.thePropertyMap[aPropertyName] = aValue
 
 	def getAbsoluteInsidePosition( self ):
 		return ( 0, 0 )
@@ -173,13 +209,20 @@ class Layout:
 	def resizeObject( self, anObjectID, deltaTop, deltaBottom, deltaLeft, deltaRight ):
 		# inward movement negative, outward positive
 		anObject = self.getObject( anObjectID )
+		
 		anObject.resize( deltaTop, deltaBottom, deltaLeft, deltaRight )
 
 
 	def createConnectionObject( self, anObjectID, aProcessObjectID = None, aVariableObjectID=None,  processRing=None, variableRing=None, direction = PROCESS_TO_VARIABLE, aVarrefName = None ):
 		# if processobjectid or variableobjectid is None -> no change on their part
 		# if process or variableID is the same as connection objectid, means that it should be left unattached
-		pass
+		# direction is omitted
+		newObject = ConnectionObject( self, anObjectID, aVariableObjectID, aProcessObjectID, variableRing, processRing, aVarrefName, self )
+		
+		self.theObjectMap[ anObjectID ] = newObject
+		if self.theCanvas!=None:
+			newObject.setCanvas( self.theCanvas )
+			newObject.show()
 
 
 	def redirectConnectionObject( self, anObjectID, newProcessObjectID, newVariableObjectID = None, processRing = None, variableRing = None ):
@@ -233,24 +276,60 @@ class Layout:
 		
 
 	def graphUtils( self ):
-		return self.theLayoutManager.theGraphicalUtils
+		return self.theLayoutManager.theModelEditor.theGraphicalUtils
 
 
 	def popupObjectEditor( self, anObjectID ):
-		
-		self.theLayoutManager.theModelEditor.createObjectEditorWindow(self.theName, anObjectID)
+		anObject = self.getObject( anObjectID )
+		if anObject.getProperty(OB_TYPE) == OB_TYPE_CONNECTION:
+			self.theLayoutManager.theModelEditor.createConnObjectEditorWindow(self.theName, anObjectID)
+		else:
+			if  anObject.getProperty(OB_HASFULLID): 
+				self.theLayoutManager.theModelEditor.createObjectEditorWindow(self.theName, anObjectID)
+			else:
+				self.theLayoutManager.theModelEditor.printMessage("Sorry, not implemented!", ME_ERROR )
+
 
 	def getPaletteButton( self ):
 		return self.thePathwayEditor.getPaletteButton()
 
+
 	def passCommand( self, aCommandList):
 		self.theLayoutManager.theModelEditor.doCommandList( aCommandList)
 
+
 	def registerObject( self, anObject ):
 		self.theRootObject = anObject
+
 
 	def selectRequest( self, objectID ):
 		if self.theSelectedObjectID != None:
 			self.getObject( self.theSelectedObjectID ).unselected()
 		self.theSelectedObjectID = objectID
 		self.getObject( self.theSelectedObjectID ).selected()
+		
+		if self.getObject( self.theSelectedObjectID ).getProperty(OB_TYPE) == OB_TYPE_CONNECTION:
+			if self.theLayoutManager.theModelEditor.openConnObjectEditorWindow:
+				self.theLayoutManager.theModelEditor.theConnObjectEditorWindow.setDisplayConnObjectEditorWindow( self.theName, objectID)
+		else:
+			if self.theLayoutManager.theModelEditor.openObjectEditorWindow:
+				self.theLayoutManager.theModelEditor.theObjectEditorWindow.setDisplayObjectEditorWindow( self.theName, objectID)
+		
+	def checkConnection( self, x, y, checkFor ):
+		objectIDList = self.getObjectList( checkFor )
+		for anObjectID in objectIDList:
+			anObject = self.theObjectMap[ anObjectID ]
+			(objx1, objy1) = anObject.getAbsolutePosition()
+			if x< objx1 and y < objy1:
+				continue
+			objx2 = objx1 + anObject.getProperty( OB_DIMENSION_X )
+			objy2 = objy1 + anObject.getProperty( OB_DIMENSION_Y )
+
+			if x > objx2 and y > objy2:
+				continue
+			rsize = anObject.getRingSize()
+			for aRingName in [ RING_TOP, RING_BOTTOM, RING_LEFT, RING_RIGHT ]:
+				(rx, ry) = anObject.getRingPosition( aRingName )
+				if x>=rx and x<=rx+rsize and y>=ry and y<= ry+rsize:
+					return ( anObjectID, aRingName )
+		return ( None, None )

@@ -1,3 +1,4 @@
+PREFIX = '@prefix@'
 EDITOR_PATH = '@prefix@/lib/modeleditor'
 
 # where to place .glade files for main (non-plugin) windows
@@ -7,4 +8,3 @@ DM_PATH = '@ecell_dm_path@'
 PACKAGE = '@PACKAGE@'
 VERSION = '@VERSION@'
 GNOME_INSTALLED = '@GNOME_INSTALLED@'
-

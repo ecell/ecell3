@@ -1,6 +1,7 @@
 import gnome.canvas
 from Constants import *
 from Utils import *
+from ResizeableText import *
 
 
 class ComplexShape:
@@ -16,16 +17,30 @@ class ComplexShape:
 		self.shapeMap = {}
 		self.lastmousex = 0
 		self.lastmousey = 0
+		
 		self.buttonpressed = False
-
-
+		self.sumdeltax=0
+		self.sumdeltay=0
+		self.outlinedrag=False
+		
+		self.firstdrag=False
+		self.dragbefore=False
+		
+		
+		self.outlinedragged=False
+		self.objectdragged=False
+		self.shapename=None
+		
 
 	def show ( self ):
 		self.theRoot = self.parentObject.theCanvas.getRoot()
+		
 		self.shapeDescriptorList = self.parentObject.getProperty( OB_SHAPEDESCRIPTORLIST ).getDescriptorList()
+		
 		self.__sortByZOrder( self.shapeDescriptorList )
 		self.isSelected = False
 		for aDescriptor in self.shapeDescriptorList:
+			
 			if aDescriptor[SD_TYPE] == CV_RECT:
 				self.createRectangle( aDescriptor )
 			elif aDescriptor[SD_TYPE] == CV_ELL:
@@ -36,7 +51,9 @@ class ComplexShape:
 				self.createLine( aDescriptor )
 		self.isSelected = False
 
+#-------------------------------------------------------------------------------------------------------------
 
+	
 	def delete( self ):
 		
 		for aShapeName in self.shapeMap.keys():
@@ -57,9 +74,10 @@ class ComplexShape:
 			for i in range(0,3):
 				anRGB[i] = 32768 + anRGB[i]
 		for aDescriptor in self.shapeDescriptorList:
-			if aDescriptor[ SD_COLOR ] == SD_OUTLINE:
-
+			if aDescriptor[ SD_COLOR ] == SD_OUTLINE:  
+				
 				aColor = self.graphUtils.getGdkColorByRGB( anRGB )
+				
 				if aDescriptor[SD_TYPE] == CV_RECT:
 					self.changeRectColor( aDescriptor[ SD_NAME ] , aColor )
 				elif aDescriptor[SD_TYPE] == CV_ELL:
@@ -67,9 +85,34 @@ class ComplexShape:
 				elif aDescriptor[SD_TYPE] == CV_LINE:
 					self.changeLineColor( aDescriptor[ SD_NAME ] , aColor )
 
-	
-	def move( self, deltax, deltay ):
 
+	def fillColorChanged( self ):
+		# find shapes with outline color
+		anRGB = copyValue( self.parentObject.getProperty( OB_FILL_COLOR ) )
+		for aDescriptor in self.shapeDescriptorList:
+			if aDescriptor[ SD_COLOR ] == SD_FILL: 
+				
+				aColor = self.graphUtils.getGdkColorByRGB( anRGB )
+				
+				if aDescriptor[SD_TYPE] == CV_RECT:
+					self.changeRectColor( aDescriptor[ SD_NAME ] , aColor )
+				elif aDescriptor[SD_TYPE] == CV_ELL:
+					self.changeEllipseColor( aDescriptor[ SD_NAME ] , aColor )
+				elif aDescriptor[SD_TYPE] == CV_LINE:
+					self.changeLineColor( aDescriptor[ SD_NAME ] , aColor )
+	def labelChanged(self, newLabel):
+		self.parentObject.getProperty( OB_SHAPEDESCRIPTORLIST ).renameLabel(newLabel)
+		self.shapeDescriptorList = self.parentObject.getProperty( OB_SHAPEDESCRIPTORLIST ).getDescriptorList()
+		for aDescriptor in self.shapeDescriptorList:
+			if aDescriptor[SD_NAME] == 'text':
+				self.renameText( aDescriptor )
+		self.resize(0,0)
+		
+		
+	def move( self, deltax , deltay ):
+		for aShapeName in self.shapeMap.keys():
+			self.shapeMap[ aShapeName ].move( deltax, deltay)
+		return
 		for aDescriptor in self.shapeDescriptorList:
 			if aDescriptor[SD_TYPE] == CV_RECT:
 				self.moveRectangle( aDescriptor, deltax, deltay )
@@ -79,6 +122,8 @@ class ComplexShape:
 				self.moveText( aDescriptor, deltax, deltay  )
 			elif aDescriptor[SD_TYPE] == CV_LINE:
 				self.moveLine( aDescriptor, deltax, deltay  )
+
+
 
 	def resize( self, deltawidth, deltaheight ):
 		self.width += deltawidth
@@ -93,6 +138,8 @@ class ComplexShape:
 			elif aDescriptor[SD_TYPE] == CV_LINE:
 				self.resizeLine( aDescriptor )
 		
+			
+		
 
 	def calculateRectCorners( self, aDescriptor ):
 		rectSpec = aDescriptor[ SD_SPECIFIC ]
@@ -104,13 +151,13 @@ class ComplexShape:
 		X1 = relativeX1 + offsetx
 		X2 = relativeX2 + offsetx 
 		Y1 = relativeY1 + offsety
-		Y2 = relativeY2 + offsety 
-		
+		Y2 = relativeY2 + offsety
 		return ( X1, X2, Y1, Y2 )
 	
 	
 	def createRectangle( self, aDescriptor ):
 		( X1, X2, Y1, Y2 ) = self.calculateRectCorners( aDescriptor )
+		
 		aGdkColor = self.getGdkColor( aDescriptor )
 		if aDescriptor[SD_NAME] == 'ring1':
 			pass
@@ -122,6 +169,9 @@ class ComplexShape:
 	def resizeRectangle( self, aDescriptor ):
 		( X1, X2, Y1, Y2 ) = self.calculateRectCorners( aDescriptor )
 		aShape = self.shapeMap[ aDescriptor[ SD_NAME ] ]
+		(X1, Y1) = aShape.w2i( X1, Y1 )
+		(X2, Y2) = aShape.w2i( X2, Y2 )
+
 		aShape.set_property( 'x1', X1 )
 		aShape.set_property( 'y1', Y1 )
 		aShape.set_property( 'x2', X2 )
@@ -159,6 +209,8 @@ class ComplexShape:
 	def resizeEllipse( self, aDescriptor ):
 		( X1, X2, Y1, Y2 ) = self.calculateEllipseCorners( aDescriptor )
 		aShape = self.shapeMap[ aDescriptor[ SD_NAME ] ]
+		(X1, Y1) = aShape.w2i( X1, Y1 )
+		(X2, Y2) = aShape.w2i( X2, Y2 )
 		aShape.set_property( 'x1', X1 )
 		aShape.set_property( 'y1', Y1 )
 		aShape.set_property( 'x2', X2 )
@@ -199,6 +251,8 @@ class ComplexShape:
 	def resizeLine( self, aDescriptor ):
 		( X1, X2, Y1, Y2 ) = self.calculateLineDimensions( aDescriptor )
 		aShape = self.shapeMap[ aDescriptor[ SD_NAME ] ]
+		(X1, Y1) = aShape.w2i( X1, Y1 )
+		(X2, Y2) = aShape.w2i( X2, Y2 )
 		aShape.set_property( 'points', [X1,Y1,X2,Y2] )
 
 
@@ -217,21 +271,29 @@ class ComplexShape:
 		Y1 = relativeY1 + offsety
 		return (X1, Y1 )
 
+####################################################################################################
 	def createText( self, aDescriptor ):
 		textSpec = aDescriptor[SD_SPECIFIC]
 		(X1, Y1) = self.calculateTextDimensions( aDescriptor )
 		aGdkColor = self.getGdkColor( aDescriptor )
-		aText = self.theRoot.add( gnome.canvas.CanvasText,x=X1,y=Y1, fill_color_gdk = aGdkColor, text = textSpec[TEXT_TEXT], anchor = gtk.ANCHOR_NW )
+		#aText = self.theRoot.add( gnome.canvas.CanvasText,x=X1,y=Y1, fill_color_gdk = aGdkColor, text = textSpec[TEXT_TEXT], anchor #= gtk.ANCHOR_NW )
+		aText = ResizeableText( self.theRoot, self.theCanvas, X1, Y1, aGdkColor, textSpec[TEXT_TEXT], gtk.ANCHOR_NW )
 		self.addHandlers( aText, aDescriptor[ SD_NAME ] )
+		#aText.addHandlers(aDescriptor[ SD_NAME ])
 		self.shapeMap[ aDescriptor[ SD_NAME ] ] = aText
 
 	def resizeText( self, aDescriptor ):
 		#by default text cannot be resized, it defines size 
 		(x1, y1) = self.calculateTextDimensions( aDescriptor )
 		aShape = self.shapeMap[ aDescriptor[ SD_NAME ] ]
+		(x1, y1) = aShape.w2i( x1, y1 )
 		aShape.set_property( 'x', x1 )
 		aShape.set_property( 'y', y1 )
 
+	def renameText( self, aDescriptor ):
+		textSpec = aDescriptor[SD_SPECIFIC]
+		text=textSpec[TEXT_TEXT]
+		self.shapeMap[ aDescriptor[ SD_NAME ] ].set_property('text', text )
 
 	def moveRectangle( self, aDescriptor, deltax, deltay ):
 		aShape = self.shapeMap[ aDescriptor[ SD_NAME ] ]
@@ -292,9 +354,9 @@ class ComplexShape:
 			queryProp = OB_OUTLINE_COLOR
 		elif aColorType == SD_TEXT:
 			queryProp = OB_TEXT_COLOR
-
+		
 		anRGBColor = self.parentObject.getProperty( queryProp )
-
+		
 		return self.graphUtils.getGdkColorByRGB( anRGBColor )
 
 
@@ -313,29 +375,34 @@ class ComplexShape:
 			self.parentObject.doSelect()
 
 
-		if self.getShapeDescriptor(shapeName)[SD_FUNCTION] == SD_FILL:
+		if self.getShapeDescriptor(shapeName)[SD_FUNCTION] in [ SD_FILL, SD_RING ]:
 			self.changeCursor( shapeName, x, y, True )
 
 
 	def rightClick ( self, shapeName, x, y, anEvent ):
 		# usually show menu
 		self.parentObject.doSelect()
-		self.parentObject.showMenu( anEvent)
+		self.parentObject.showMenu(anEvent,x, y)
 
-
+		
 	def mouseDrag( self, shapeName, deltax, deltay, origx, origy ):
 		# decide whether resize or move or draw arrow
 		if self.getShapeDescriptor(shapeName)[SD_FUNCTION] == SD_OUTLINE:
-
+			if not self.firstdrag and not self.dragbefore:
+				self.outlinedragged=True
+				self.firstdrag=True
 			self.parentObject.outlineDragged( deltax, deltay, origx, origy )
 		elif self.getShapeDescriptor(shapeName)[SD_FUNCTION] == SD_RING:
-			print self.getShapeDescriptor(shapeName)[SD_NAME], 'mouse drag'
-			print 'deltax, deltay:', deltax, deltay
-			#self.parentObject.objectDragged( deltax, deltay )
-		else:
-			
+			self.parentObject.ringDragged( shapeName, deltax, deltay )
+		elif self.getShapeDescriptor(shapeName)[SD_FUNCTION] == SD_FILL:
+			if not self.firstdrag and not self.dragbefore:
+				self.firstdrag=True
+				self.objectdragged=True
+                                self.orgx=origx
+				self.orgy=origy
+				self.shapename=shapeName
 			self.parentObject.objectDragged( deltax, deltay )
-
+			self.setCursor(CU_MOVE)
 
 	def  doubleClick( self, shapeName ):
 		self.parentObject.popupEditor()
@@ -344,28 +411,54 @@ class ComplexShape:
 	def getShapeDescriptor( self, shapeName ):
 		return self.parentObject.getProperty( OB_SHAPEDESCRIPTORLIST ).getDescriptor( shapeName )
 
-
+#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	def addHandlers( self, canvasObject, aName ):
+		#canvasObject.connect('event', self.rect_event, aName )
 		canvasObject.connect('event', self.rect_event, aName )
 
 	def releaseButton( self, shapeName, x, y ):
 		self.changeCursor( shapeName, x, y, False )
+		self.parentObject.buttonReleased()
 
 	def mouseEntered( self, shapeName, x, y ):
 		self.changeCursor( shapeName, x, y )
 
 	def changeCursor( self, shapeName, x, y, buttonpressed  = False):
 		aFunction = self.getShapeDescriptor(shapeName)[SD_FUNCTION]
+		#self.parentObject.__class__.__name__ ,'H'
 		aCursorType = self.parentObject.getCursorType( aFunction, x, y , buttonpressed)
 		self.theCanvas.setCursor( aCursorType )
 
+	def setCursor( self, aCursorType):
+		self.theCanvas.setCursor( aCursorType )
+	
+	def getFirstDrag(self):
+		return self.firstdrag
+	
+	def setFirstDrag(self,aValue):
+		self.firstdrag=aValue
+
+	def getDragBefore(self):
+		return self.dragbefore
+	
+	def setDragBefore(self,aValue):
+		self.dragbefore=aValue
+
+	def getIsButtonPressed(self):
+		return self.buttonpressed
+
+	def getOutlineDragged(self):
+		return self.outlinedragged
+
+	def getObjectDragged(self):
+		return self.objectdragged
 
 	def rect_event( self, *args ):
 
 		event = args[1]
 		item = args[0]
 		shapeName = args[2]
-
+		
 		if event.type == gtk.gdk.BUTTON_PRESS:
 			if event.button == 1:
 				self.lastmousex = event.x
@@ -379,6 +472,14 @@ class ComplexShape:
 		elif event.type == gtk.gdk.BUTTON_RELEASE:
 			if event.button == 1:
 				self.buttonpressed = False
+				if self.dragbefore:
+					self.dragbefore=False
+				if self.objectdragged:	
+					self.parentObject.objectDragged( 0,0 )
+					self.objectdragged=False
+				if self.outlinedragged:
+					self.parentObject.outlineDragged( 0, 0, 0, 0 )
+					self.outlinedragged=False
 				self.releaseButton(shapeName, event.x, event.y )
 
 		elif event.type == gtk.gdk.MOTION_NOTIFY:
@@ -399,3 +500,5 @@ class ComplexShape:
 		elif event.type == gtk.gdk.ENTER_NOTIFY:
 			self.mouseEntered( shapeName, event.x, event.y )
 
+
+		

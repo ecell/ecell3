@@ -10,7 +10,7 @@ class CreateEntity(ModelCommand):
 	ARGS_NO = 2
 	FULLID = 0
 	CLASSNAME = 1
-
+	
 	def checkArgs( self ):
 		if not ModelCommand.checkArgs(self):
 			return False
@@ -42,16 +42,19 @@ class DeleteEntityList(ModelCommand):
 	"""
 	IDLIST = 0
 	ARGS_NO = 1
-
+	
 	def checkArgs( self ):
+		
+
 		if not ModelCommand.checkArgs(self):
 			return False
 		self.__theIDList = self.theArgs[ self.IDLIST ]
 		self.__theType = getFullIDType( self.__theIDList[0] )
 		return True
-
+		
 	
 	def do( self ):
+		
 
 		sortedList = self.theBufferFactory.sortSystemIDs( self.__theIDList )
 		self.theReverseCommandList = []
@@ -78,12 +81,12 @@ class DeleteEntityList(ModelCommand):
 				
 			
 	def createReverseCommand( self ):
+		
 		#reverse commandlist is created throughout do command
 		self.theReverseCommandList = None
 
 
 	def getAffected( self ):
-
 		return (self.__theType,  convertSysPathToSysID( self.theAffectedPath ) ) 
 
 
@@ -97,6 +100,8 @@ class RenameEntity(ModelCommand):
 	OLDID = 0
 	NEWID = 1
 
+	
+
 	def checkArgs( self ):
 		# oldID should exist
 		# newID shouldn't exist
@@ -104,6 +109,7 @@ class RenameEntity(ModelCommand):
 			return False
 		self.__theOldID = self.theArgs[ self.OLDID ]
 		self.__theNewID = self.theArgs[ self.NEWID ]
+		
 		if not self.theModel.isEntityExist(self.__theOldID):
 			return False
 		if self.theModel.isEntityExist( self.__theNewID ):
@@ -113,6 +119,7 @@ class RenameEntity(ModelCommand):
 
 
 	def do( self ):
+		
 		# store properties
 		aFullPNList = []
 		for aPropertyName in self.theModel.getEntityPropertyList( self.__theOldID ):
@@ -194,6 +201,8 @@ class CopyEntityList(ModelCommand):
 
 	ARGS_NO = 1
 	IDLIST = 0
+	
+	
 
 	def checkArgs( self ):
 		if not ModelCommand.checkArgs(self):
@@ -225,6 +234,7 @@ class CutEntityList(ModelCommand):
 	ARGS_NO = 1
 	IDLIST = 0
 
+	
 	def checkArgs( self ):
 		if not ModelCommand.checkArgs(self):
 			return False
@@ -272,6 +282,7 @@ class PasteEntityList(ModelCommand):
 	SYSPATH = 1
 	ARGS_NO = 2
 
+	
 	def checkArgs( self ):
 
 		if not ModelCommand.checkArgs(self):
@@ -343,7 +354,8 @@ class ChangeEntityClass(ModelCommand):
 	CLASSNAME = 0
 	ID =1
 	# SUPPORTS CHANGING CLASS IN PROCESSES ONLY!!!
-
+	
+	
 	def checkArgs( self ):
 		if not ModelCommand.checkArgs(self):
 			return False
@@ -418,6 +430,8 @@ class ChangeEntityProperty(ModelCommand):
 	ARGS_NO = 2
 	FULLPN = 0
 	VALUE = 1
+	
+	
 
 	def checkArgs( self ):
 		#check if fullPN exists
@@ -431,7 +445,7 @@ class ChangeEntityProperty(ModelCommand):
 		if self.theModel.getEntityPropertyAttributes( self.__theFullPN )[MS_GETTABLE_FLAG]:
 			self.__theoldProp = self.theModel.getEntityProperty(self.__theFullPN )
 		else:
-			self.theoldProp = None
+			self.__theoldProp = None
 		aPropertyType = self.theModel.getEntityPropertyType( self.__theFullPN )
 		convertedValue = DMTypeCheck( self.__theValue, aPropertyType )
 		if convertedValue == None:
@@ -442,6 +456,8 @@ class ChangeEntityProperty(ModelCommand):
 
 	def do( self ):
 		self.theModel.setEntityProperty( self.__theFullPN, self.__theValue )
+		
+		
 		return True
 
 	def createReverseCommand( self ):
@@ -467,6 +483,8 @@ class CreateEntityProperty(ModelCommand):
 	TYPE = 2
 	ARGS_NO = 3
 
+	
+
 	def checkArgs( self ):
 		if not ModelCommand.checkArgs(self):
 			return False
@@ -483,7 +501,7 @@ class CreateEntityProperty(ModelCommand):
 			self.__theValue = convertedValue
 		else:
 			return False
-
+		
 		#CHECK WHETHER PROPERTIES CAN BE CREATED WHEN DM IS AVAILABLE!!!
 		aClass = self.theReceiver.getModel().getEntityClassName( getFullID( self.__theFullPN ) )
 		classInfoList = self.theReceiver.getDMInfo().getClassInfoList( aClass )
@@ -499,6 +517,8 @@ class CreateEntityProperty(ModelCommand):
 
 	
 	def do( self ):
+
+		
 		try:
 			self.theModel.createEntityProperty( getFullID( self.__theFullPN), getPropertyName( self.__theFullPN ), self.__theValue, self.__theType )
 		except Exception:
@@ -522,6 +542,7 @@ class DeleteEntityPropertyList(ModelCommand):
 	FULLPNLIST = 0
 	# ASSUMES THAT ALL FULLPNS BELONG TO ONE FULLID!!!
 
+	
 
 	def checkArgs( self ):
 		if not ModelCommand.checkArgs(self):
@@ -564,6 +585,8 @@ class RenameEntityProperty(ModelCommand):
 	FULLID = 0
 	OLDNAME = 1
 	NEWNAME = 2
+
+	
 
 	def checkArgs( self ):
 		if not ModelCommand.checkArgs(self):
@@ -616,6 +639,7 @@ class CopyEntityPropertyList(ModelCommand):
 	ARGS_NO= 1
 	FULLPNLIST = 0
 
+	
 	def checkArgs( self ):
 		if not ModelCommand.checkArgs(self):
 			return False
@@ -645,7 +669,8 @@ class CutEntityPropertyList(ModelCommand):
 
 	ARGS_NO= 1
 	FULLPNLIST = 0
-
+	
+	
 	def checkArgs( self ):
 		if not ModelCommand.checkArgs(self):
 			return False
@@ -683,6 +708,8 @@ class PasteEntityPropertyList(ModelCommand):
 	ARGS_NO = 2
 	FULLID = 0
 	BUFFER = 1
+
+	
 
 	def checkArgs( self ):
 		if not ModelCommand.checkArgs(self):
@@ -744,6 +771,7 @@ class SetEntityInfo(ModelCommand):
 	ID = 0
 	STRINGS = 1
 
+	
 	def checkArgs( self ):
 		if not ModelCommand.checkArgs(self):
 			return False
@@ -776,6 +804,7 @@ class RelocateEntity( ModelCommand ):
 	ENTITYID = 0
 	TARGETSYSTEMID = 1
 
+	
 
 	def checkArgs( self ):
 		if not ModelCommand.checkArgs( self ):

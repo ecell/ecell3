@@ -69,7 +69,8 @@ class EntityListWindow(ListWindow):
 		# create systree, processlist, propertylist
 		self.theSystemTree = SystemTree( self, self['SystemTreeFrame'] )
 		self.theEntityType = self.__getEntityType()
-
+		
+		###############################################################################
 		self.theEntityList = EntityList( self, self['EntityListFrame'], self.theEntityType )
 		self.theEntityEditorList = EntityEditor( self, self['EntityEditorFrame'], self.theEntityType )
 
@@ -78,7 +79,7 @@ class EntityListWindow(ListWindow):
 				'on_process1_activate' : self.__entitychooser_changed
 				})
 
-		#self.theEntityList.changeDisplayedType( self.theEntityType )
+		self.theEntityList.changeDisplayedType( self.theEntityType )
 
 		self. selectEntity( [ME_ROOTID] )
 
@@ -104,15 +105,18 @@ class EntityListWindow(ListWindow):
 			self.updatePropertyList( aFullID )
 		else:
 			self.updateSystemTree()
-
-
+		
 	def selectEntity( self, anEntityList ):
+
 		aType = getFullIDType ( anEntityList[0] )
 		if aType == ME_SYSTEM_TYPE:
 			self.theLastActiveComponent = self.theSystemTree
+			
 		elif aType in [ ME_PROCESS_TYPE, ME_VARIABLE_TYPE ]:
 			displayedType = self.__getEntityType()
+			
 			if aType != displayedType:
+				
 				self.theEntityList.changeDisplayedType( aType )
 
 			self.theLastActiveComponent = self.theEntityList 
@@ -128,6 +132,7 @@ class EntityListWindow(ListWindow):
 		"""
 		in: string aSystemFullID where changes happened
 		"""
+
 		if not self.exists():
 			return
 		if aSystemFullID != None:
@@ -166,6 +171,7 @@ class EntityListWindow(ListWindow):
 		"""
 		in: anID where changes happened
 		"""
+
 		if not self.exists():
 			return
 		# get selected process or systemid
@@ -186,6 +192,7 @@ class EntityListWindow(ListWindow):
 			self.theEntityEditorList.setDisplayedEntity ( selectedID )
 
 		elif aFullID == selectedID or aFullID == None:
+
 			self.theEntityEditorList.update()
 
 			

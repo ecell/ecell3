@@ -32,7 +32,6 @@
 # E-CELL Project, Lab. for Bioinformatics, Keio University.
 #
 
-
 from Utils import *
 import gtk
 import gobject

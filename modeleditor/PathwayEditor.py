@@ -51,9 +51,8 @@ class PathwayEditor( ListWindow ):
 		ListWindow.__init__( self, theModelEditor )
 		self.theLayout = aLayout
 		self.theModelEditor = theModelEditor
-
+		self.zoom=0.25
 		
-
 
 	def openWindow( self ):
 		"""
@@ -96,6 +95,10 @@ class PathwayEditor( ListWindow ):
 		custom = ListWindow.getWidget(self,'custom_button')
 		text = ListWindow.getWidget(self,'text_button')
 
+		self.zoomin=ListWindow.getWidget(self,'zoom_in_button')
+		self.zoomout=ListWindow.getWidget(self,'zoom_out_button')
+		self.zoomtofit=ListWindow.getWidget(self,'zoom_to_fit_button')
+		
 			
 	
 		
@@ -108,6 +111,7 @@ class PathwayEditor( ListWindow ):
 		self.__PrevPaletteButton = None
 		self.isFirst=True
 
+	
 
 	def update( self, arg1 = None, arg2 = None):
 		if not self.exists():
@@ -147,17 +151,36 @@ class PathwayEditor( ListWindow ):
 	#Callback Handlers
 	############################################################
 	def __zoom_in( self, *args ):
-		pass
+		aZoomratio=self.thePathwayCanvas.getZoomRatio()
+		aNewratio=aZoomratio+self.zoom
+		self.thePathwayCanvas.setZoomRatio(aNewratio)
+		if not self.zoomout.get_property('sensitive'):
+			self.zoomout.set_sensitive(gtk.TRUE)
+		if not self.zoomtofit.get_property('sensitive'):
+			self.zoomtofit.set_sensitive(gtk.TRUE)
 
 
 	def __zoom_out( self, *args ):
-		pass
+		width,height=self.thePathwayCanvas.getSize()
+		if width<860:
+			self.zoomout.set_sensitive(gtk.FALSE)
+			self.zoomtofit.set_sensitive(gtk.FALSE)
+			return
 
+		if width>860:
+			aZoomratio=self.thePathwayCanvas.getZoomRatio()
+			aNewratio=aZoomratio-self.zoom
+			self.thePathwayCanvas.setZoomRatio(aNewratio)
+		
 	def __zoom_to_fit( self, *args ):
-		pass
+		aNewratio=self.zoom
+		self.thePathwayCanvas.setZoomRatio(aNewratio)
+		self.zoomtofit.set_sensitive(gtk.FALSE)
+		self.zoomout.set_sensitive(gtk.FALSE)
+
 
 	def __print( self, *args ):
-		pass
+		self.theModelEditor.printMessage("Sorry, not implemented !", ME_ERROR )
 
 	def __rename_layout( self, *args ):
 		if len(self['layout_name_entry'].get_text())>0:
@@ -171,6 +194,8 @@ class PathwayEditor( ListWindow ):
 	def __palette_toggled( self, *args ):
 		aButtonName=args[0].get_name().split('_')[0]
 		if self.isFirst:
+			if aButtonName =='custom' or aButtonName =='text':
+				self.theModelEditor.printMessage("Sorry, not implemented !", ME_ERROR )
 			if aButtonName!=self.__CurrPaletteButton:
 				self.isFirst=False
 				self.toggle(aButtonName,True)	
@@ -192,8 +217,7 @@ class PathwayEditor( ListWindow ):
 	
 			
 	def __search( self, *args ):
-		pass
-
+		self.theModelEditor.printMessage("Sorry, not implemented !", ME_ERROR )
 	
 
 	

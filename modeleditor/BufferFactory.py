@@ -41,8 +41,8 @@ class BufferFactory:
 
 	def addToSystemListBuffer( self, aBuffer, aFullID ):
 
-		if aBuffer.isEntityExist( aFullID ):
-			return
+		#if aBuffer.isEntityExist( aFullID ):
+		#	return
 
 		# get System class from model
 		aClass = self.theModel.getEntityClassName( aFullID )
@@ -90,8 +90,8 @@ class BufferFactory:
 
 
 	def __incrementSystemBuffer( self, toBuffer, fromBuffer, aFullID ):
-		if toBuffer.isEntityExist( aFullID ):
-			return
+		#if toBuffer.isEntityExist( aFullID ):
+		#	return
 
 		# get System class from model
 		aClass = fromBuffer.getEntityClassName( aFullID )
@@ -422,7 +422,7 @@ class BufferPaster:
 			for anID in anIDList:
 				aFullID = aType + ':' + aSysPath + ':' + anID
 
-				# call self recursively
+				# call self recursively	
 				self.__pasteSystemListBuffer( aBuffer, aFullID )
 
 

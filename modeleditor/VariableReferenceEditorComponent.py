@@ -44,6 +44,9 @@ from ViewComponent import *
 from Constants import *
 from ShapePropertyComponent import *
 from LinePropertyComponent import *
+from FullIDBrowserWindow import *
+from LayoutCommand import *
+from EntityCommand import *
 
 
 class  VariableReferenceEditorComponent(ViewComponent):
@@ -52,11 +55,12 @@ class  VariableReferenceEditorComponent(ViewComponent):
 	#    GENERAL CASES    #
 	#######################
 
-	def __init__( self, aParentWindow, pointOfAttach ):
+	def __init__( self, aParentWindow, pointOfAttach, aLayout,connObj ):
 		
 		
 		self.theModelEditor = aParentWindow.theModelEditor
-		
+		self.theLayout =aLayout
+		self.theConnObj =connObj
 		ViewComponent.__init__( self, pointOfAttach, 'attachment_box', 'VariableReferenceEditorComponent.glade' )
 
 
@@ -69,21 +73,18 @@ class  VariableReferenceEditorComponent(ViewComponent):
 			'on_check_accFlag_toggled' : self.__change_flag_reference,\
 			'on_ent_ProName_focus_out_event':self.__changeProcess_displayed,\
 			'on_ent_ProName_activate':self.__changeProcess_displayed,\
-			'on_ent_coef_focus_out_event' : self.__change_coef_reference,\
-			'on_ent_coef_activate' : self.__change_coef_reference,\
-			'on_ent_varname_focus_out_event' : self.__change_varname_reference,\
-			'on_ent_varname_activate' : self.__change_varname_reference,\
-			'on_ent_id_changed' : self.__change_id_reference,\
-			'on_ent_id_activate' : self.__change_id_reference
+			'on_ent_coef_editing_done' : self.__change_coef_reference,\
+			'on_ent_varid_focus_out_event' : self.__change_varname_reference,\
+			'on_ent_varid_activate' : self.__change_varname_reference,\
+			'on_ent_conname_editing_done' : self.__change_conname_reference
 					
 			})
 
 		
                 # initate Editors
-		self.theLineProperty = LinePropertyComponent(self, self
+		self.theLineProperty = LinePropertyComponent(self,aParentWindow, connObj ,self
 ['LinePropertyFrame'] ) 
-
-
+		
        
 
 
@@ -93,10 +94,15 @@ class  VariableReferenceEditorComponent(ViewComponent):
 
 
 	def __FullIDBrowse_displayed( self, *args ):
-		self.FullIDBrowser = FullIDBrowserWindow(self, ME_VARIABLE_TYPE)
-		self.NewFullID = self.FullIDBrowser.return_result()
-		if self.NewFullID != None:
-			(ViewComponent.getWidget(self,'ent_id')).set_text(self.NewFullID) 
+		aFullIDBrowserWindow = FullIDBrowserWindow( self, convertSysPathToSysID(self.proFullID.split(':')[1] ) )
+		aVariableRef = aFullIDBrowserWindow.return_result()
+		
+		if aVariableRef == None:
+			return
+		if getFullIDType( aVariableRef ) != ME_VARIABLE_TYPE:
+			return
+		if aVariableRef != None:
+			(ViewComponent.getWidget(self,'ent_varid')).set_text(aVariableRef) 
 		else:
 			pass
 
@@ -110,11 +116,13 @@ class  VariableReferenceEditorComponent(ViewComponent):
 		pass
 
 	def __change_coef_reference( self, *args ):
-		pass
+		aVarCoef=(ViewComponent.getWidget(self,'ent_coef')).get_text()
+		
+		self.changeCoef(aVarCoef)
 
-
-	def __change_id_reference( self, *args ):
-		pass
+	def __change_conname_reference( self, *args ):
+		avarreffName=(ViewComponent.getWidget(self,'ent_conname')).get_text()
+		self.changeConnName(avarreffName)
 
 	def __change_flag_reference (self, *args ):
 		pass
@@ -129,37 +137,102 @@ class  VariableReferenceEditorComponent(ViewComponent):
 	#########################################
 	#    Private methods			#
 	#########################################
+	def updateVarRef(self):
+		ViewComponent.getWidget(self,'ent_conname').set_sensitive(gtk.TRUE)
+		ViewComponent.getWidget(self,'ent_coef').set_sensitive(gtk.TRUE)
+		ViewComponent.getWidget(self,'ent_ProName').set_text(self.proFullID )
+		ViewComponent.getWidget(self,'ent_conname').set_text(self.varreffName)
+		ViewComponent.getWidget(self,'ent_varid').set_text( self.varFullID)
+		ViewComponent.getWidget(self,'ent_coef').set_text( str(self.acoef) )
+		
+	def setDisplayedVarRef(self, aLayout,connObj):
+		self.theLayout = aLayout
+		self.theConnObj = connObj
+		self.update()
 
-	def getNewVarRefValue(self):
+	def update( self ):
+		if self.theConnObj ==  None  : 
+			self.clearVarRef()
+			self.theLineProperty.setDisplayedLineProperty(self.theConnObj)
+			return 
+		else:
+			existObjectList = self.theLayout.getObjectList()
+			self.theConnObjID = self.theConnObj.getID()
 
-            	aVarName=(ViewComponent.getWidget(self,'ent_varname')).get_text()
-		aVarFullId=(ViewComponent.getWidget(self,'ent_id')).get_text()
-		aVarCoef=(ViewComponent.getWidget(self,'ent_coef')).get_text()
-		aAccel=(ViewComponent.getWidget(self,'check_accFlag')).get_active()
+			self.varreffName = self.theConnObj.getProperty(CO_NAME)
+			self.acoef = self.theConnObj.getProperty(CO_COEF)
+			varID = self.theConnObj.getProperty(CO_VARIABLE_ATTACHED)
+			if self.theConnObjID not in existObjectList : 
+				self.clearVarRef()
+				self.theConnObj =  None
+				self.theLineProperty.setDisplayedLineProperty(self.theConnObj)
+				return
+			if varID ==None:
+				self.varFullID = ":.:___NOTHING"
+			else:
+				if varID not in existObjectList:
+					self.clearVarRef()
+					self.theConnObj =  None
+					self.theLineProperty.setDisplayedLineProperty(self.theConnObj)
+
+					return
+				else:
+
+					self.varFullID = self.theLayout.getObject( varID ).getProperty(OB_FULLID)
+
+			proID = self.theConnObj.getProperty(CO_PROCESS_ATTACHED)
+			if proID not in existObjectList:
+				self.clearVarRef()
+				self.theConnObj =  None
+				self.theLineProperty.setDisplayedLineProperty(self.theConnObj)
+				return
+				
+			else:	
+				self.proFullID = self.theLayout.getObject( proID ).getProperty(OB_FULLID)
+				self.updateVarRef()
+				self.theLineProperty.setDisplayedLineProperty(self.theConnObj)
+		
+	def clearVarRef(self):
+		self.proFullID = ''
+		self.varreffName=''
+		self.varFullID=''
+		self.acoef=''
+		self.updateVarRef()
+		ViewComponent.getWidget(self,'ent_conname').set_sensitive(gtk.FALSE)
+		ViewComponent.getWidget(self,'ent_coef').set_sensitive(gtk.FALSE)
+
+	def changeConnName(self,newName):
+		
+		aVarReffList =copyValue(self.theModelEditor.theModelStore.getEntityProperty(self.proFullID+':' +MS_PROCESS_VARREFLIST))
+		existReffname =[]
+		for aVarRef in aVarReffList: 
+			existReffname += [aVarRef[MS_VARREF_NAME]]
+		if newName not in existReffname:	
+			for aVarRef in aVarReffList: 
+				if self.varreffName == aVarRef[MS_VARREF_NAME] :
+					aVarRef[MS_VARREF_NAME] = newName
+					aCommand = ChangeEntityProperty( self.theModelEditor, self.proFullID+':' +MS_PROCESS_VARREFLIST, aVarReffList )
+					self.theLayout.passCommand( [ aCommand ] )
+		
+		self.updateVarRef()
 
 		
+
+	def changeCoef(self,newCoef):
+		try :
+			newCoef = int( newCoef)
+		except:
+			self.updateVarRef()
+			return None
 		
-		self.setNewVarRefValue(aVarName,aVarFullId,aVarCoef,aAccel)
+		aCommand = None
+		aVarReffList =copyValue(self.theModelEditor.theModelStore.getEntityProperty(self.proFullID+':' +MS_PROCESS_VARREFLIST))
+		for aVarRef in aVarReffList: 
+			if self.varreffName == aVarRef[MS_VARREF_NAME]:
+				if aVarRef[MS_VARREF_COEF]!=newCoef:
+					aVarRef[MS_VARREF_COEF] = newCoef
+					aCommand = ChangeEntityProperty( self.theModelEditor, self.proFullID+':' +MS_PROCESS_VARREFLIST, aVarReffList )
+		if aCommand !=None:
+			self.theLayout.passCommand( [ aCommand ] )
 
-	
-
-	def setNewVarRefValue(self,name,id,coef,accel):
-		print 'The new Var Name: ' + name
-		print 'The new Full Id: ' + id
-		print 'The coeff: ' + coef
-		print 'The Accel:' + str(accel)
-		
-		
-
-		
-
-	
-
-
-	
-
-
-
-
-
-
+		self.updateVarRef()

@@ -9,8 +9,9 @@ BufferFactory.py\
 Command.py\
 CommandQueue.py\
 ComplexShape.py\
+ComplexLine.py\
 ConfirmWindow.py\
-ConnectionLine.py\
+ConnectionObject.py\
 ConnectionObjectEditorWindow.py\
 Constants.py\
 DMInfo.py\
@@ -19,14 +20,17 @@ EntityCommand.py\
 EntityEditor.py\
 EntityList.py\
 EntityListWindow.py\
+Error.py\
 FullIDBrowserWindow.py\
 Layout.py\
 LayoutBuffer.py\
 LayoutBufferFactory.py\
 LayoutCommand.py\
+LayoutEml.py\
 LayoutManager.py\
 LayoutManagerWindow.py\
 LayoutXML.py\
+LinePropertyEditor.py\
 ListWindow.py\
 MainWindow.py\
 ModelEditor.py\
@@ -39,6 +43,7 @@ PopupMenu.py\
 ProcessObject.py\
 PropertyEditor.py\
 PropertyList.py\
+ResizeableText.py\
 ShapePropertyComponent.py\
 StepperChooser.py\
 StepperCommand.py\

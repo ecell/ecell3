@@ -85,7 +85,8 @@ class PropertyEditor:
 
 		# sets the return number
 		self.__value = self.theComponent.getValue()
-		self.destroy()
+		if self.__value != None:
+			self.destroy()
 
 
 	# ==========================================================================

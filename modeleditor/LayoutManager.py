@@ -3,7 +3,7 @@ from ModelEditor import *
 from Layout import *
 from LayoutBufferFactory import *
 from PathwayCanvas import *
-from GraphicalUtils import *
+
 
 class LayoutManager:
 
@@ -12,7 +12,7 @@ class LayoutManager:
 		self.theLayoutMap = {}
 		self.theLayoutBufferFactory = LayoutBufferFactory( self.theModelEditor, self )
 		self.theLayoutBufferPaster = LayoutBufferPaster( self.theModelEditor, self )
-		self.theGraphicalUtils = GraphicalUtils( self.theModelEditor.theMainWindow )
+		self.theShowMap={}
 
 
 	def createLayout( self, aLayoutName ):
@@ -22,7 +22,6 @@ class LayoutManager:
 			raise Exception("Layout %s already exists!"%aLayoutName )
 		newLayout = Layout ( self, aLayoutName )
 		self.theLayoutMap[ aLayoutName ] = newLayout
-		self.showLayout( aLayoutName )
 
 
 	def deleteLayout( self, aLayoutName ):
@@ -41,17 +40,8 @@ class LayoutManager:
 			return
 		# create new pathwayeditor
 		anEditorWindow = self.theModelEditor.createPathwayEditor( aLayout )
+		
 
-
-
-	def saveLayouts( self, aFileName ):
-		# LATER
-		pass
-
-
-	def loadLayouts( self, aFileName ):
-		# LATER
-		pass
 
 
 	def update( self, aType = None, anID = None ):
@@ -169,6 +159,7 @@ class ObjectIterator:
 				self.currentObjectID = self.objectList[ curpos ]
 				return self.currentObjectID
 		self.__getNextLayout()
+
 		if self.currentLayout != None:
 			curpos = 0
 			self.currentObjectID = self.objectList[ curpos ]
@@ -191,11 +182,11 @@ class ObjectIterator:
 			curpos = self.layoutList.index( self.currentLayout )
 			curpos += 1
 		while curpos < len( self.layoutList ):
-			self.currentLayout = self.layoutList[0]
+			self.currentLayout = self.layoutList[curpos]
 			layout = self.theLayoutManager.getLayout( self.currentLayout )
 			self.objectList = layout.getObjectList()
 			if self.objectList != []:
-				return None
+				return
 			curpos += 1
 		self.currentLayout = None
 		return None

@@ -44,6 +44,7 @@ from ViewComponent import *
 from Constants import *
 from EntityCommand import *
 from ShapePropertyComponent import *
+from ResizeableText import *
 
 
 class EntityEditor(ViewComponent):
@@ -52,14 +53,15 @@ class EntityEditor(ViewComponent):
 	#    GENERAL CASES    #
 	#######################
 
-	def __init__( self, aParentWindow, pointOfAttach, anEntityType=None):
+	def __init__( self, aParentWindow, pointOfAttach, anEntityType, aThirdFrame=None):
 		
 
 		# call superclass
 		ViewComponent.__init__( self,  pointOfAttach, 'attachment_box' , 'ObjectEditor.glade' )
 		
-
+		self.theThirdFrame=aThirdFrame
 		self.theParentWindow = aParentWindow
+		self.theModelEditor = self.theParentWindow.theModelEditor
 		self.theType = anEntityType
 		
 		self.updateInProgress = False
@@ -78,15 +80,24 @@ class EntityEditor(ViewComponent):
 
 
 		# initate Editors
-		self.thePropertyList = PropertyList( self.theParentWindow, self['PropertyListFrame'] )
+		self.thePropertyList = PropertyList(self.theParentWindow, self['PropertyListFrame'] )
+		if self.theThirdFrame != None:
+			#Add the ShapePropertyComponent
+	   		aNoteBook=ViewComponent.getWidget(self,'editor_notebook')
+			aShapeFrame=gtk.Frame()
+			aShapeFrame.show()
+			aShapeLabel=gtk.Label('ShapeProperty')
+			aShapeLabel.show()
+			aNoteBook.append_page(aShapeFrame,aShapeLabel)
 		
+			self.theShapeProperty = ShapePropertyComponent(self.theParentWindow, aShapeFrame )
+			
 		
-
 		# make sensitive change class button for process
 		if self.theType == ME_PROCESS_TYPE:
 			self['class_combo'].set_sensitive( gtk.TRUE )
 
-		self.theModelEditor = self.theParentWindow.theModelEditor
+		
 		self.setDisplayedEntity( None )
                 
              
@@ -112,9 +123,11 @@ class EntityEditor(ViewComponent):
 		"""
 		# update Name
 		self.updateEditor()
-
-		# update propertyeditor
-		self.thePropertyList.update()
+		if self.theDisplayedEntity != self.thePropertyList.getDisplayedEntity():
+			self.thePropertyList.setDisplayedEntity( self.theDisplayedEntity)
+		else:
+			# update propertyeditor
+			self.thePropertyList.update()
 
 
 	def updateEditor( self ):
@@ -173,6 +186,10 @@ class EntityEditor(ViewComponent):
 		if self.theDisplayedEntity != None:
 			infoText = self.theModelEditor.getModel().getEntityInfo( self.theDisplayedEntity )
 		self.__setInfoText( infoText )
+		
+		
+    			
+		
 		self.updateInProgress = False
 
 
@@ -184,10 +201,9 @@ class EntityEditor(ViewComponent):
 
 		self.theDisplayedEntity = selectedID 
 
-
 		# sets displayed entity for Property Editor
 		self.thePropertyList.setDisplayedEntity('Entity', self.theDisplayedEntity )
-
+	
 		self.updateEditor()
 
 
@@ -207,19 +223,24 @@ class EntityEditor(ViewComponent):
 
 
 	def changeName ( self, newName ):
+		
 		newTuple = self.theDisplayedEntity.split(':')
+		oldName=newTuple[2]
 		newTuple[2] = newName
 		newID = ':'.join( newTuple )
-		aCommand = RenameEntity( self.theModelEditor, self.theDisplayedEntity, newID )
-		if aCommand.isExecutable:
-			self.theDisplayedEntity = newID
-			self.theModelEditor.doCommandList ( [ aCommand ] )
-			self.theParentWindow.selectEntity( [ newID ] )
-		else:
-			self.theModelEditor.printMessage( "%s cannot be renamed to %s"%(self.theDisplayedEntity, newID ), ME_ERROR )
-			self.updateEditor()
+		sysPath = self.theDisplayedEntity.split(':')[1]
+		existEntityList = self.theModelEditor.getModel().getEntityList(newTuple[0],sysPath)	
 
-
+		if not newName in existEntityList:
+			aCommand = RenameEntity( self.theModelEditor, self.theDisplayedEntity, newID )
+			if aCommand.isExecutable:
+				#ResizeableText.deregisterText(oldName)
+				self.theDisplayedEntity = newID
+				self.theModelEditor.doCommandList ( [ aCommand ] )
+				self.theParentWindow.selectEntity( [ newID ] )
+			else:
+				self.theModelEditor.printMessage( "%s cannot be renamed to %s"%(self.theDisplayedEntity, newID ), ME_ERROR )
+		self.updateEditor()
 
 	def changeInfo( self, newInfo ):
 		aCommand = SetEntityInfo( self.theModelEditor, self.theDisplayedEntity, newInfo )

@@ -26,10 +26,18 @@ MS_PROCESS_VARREFLIST = 'VariableReferenceList'
 MS_PROPERTY_VALUE = 0
 MS_PROPERTY_FLAGS = 1
 MS_PROPERTY_TYPE = 2
+MS_PROPERTY_COLOR = 3
+
+#MS_SETTABLE_FLAG = 0
+#MS_GETTABLE_FLAG = 1
+
 
 MS_SETTABLE_FLAG = 0
 MS_GETTABLE_FLAG = 1
+MS_LOADABLE_FLAG = 2
+MS_SAVEABLE_FLAG = 3
 MS_DELETEABLE_FLAG = 4
+MS_CHANGEABLE_FLAG = 5
 
 MS_VARREF_NAME = 0
 MS_VARREF_FULLID = 1
@@ -62,7 +70,12 @@ DM_PROPERTYLIST ="PROPERTYLIST"
 DM_PROPERTY_DEFAULTVALUE = "DEFAULTVALUE"
 DM_PROPERTY_SETTABLE_FLAG = "SETTABLEFLAG"
 DM_PROPERTY_GETTABLE_FLAG = "GETTABLEFLAG"
+DM_PROPERTY_SAVEABLE_FLAG = "SAVEABLEFLAG"
+DM_PROPERTY_LOADABLE_FLAG = "LOADABLEFLAG"
 DM_PROPERTY_DELETEABLE_FLAG = "DELETEABLEFLAG"
+DM_PROPERTY_LOADABLE_FLAG = "LOADABLEFLAG"
+DM_PROPERTY_SAVEABLE_FLAG = "SAVEABLEFLAG"
+
 DM_PROPERTY_TYPE = "TYPE"
 
 DM_PROPERTY_STRING = "STRING"
@@ -91,7 +104,10 @@ ME_RESULT_CANCEL = CANCEL_PRESSED
 # propertyattributes
 ME_GETTABLE_FLAG = MS_GETTABLE_FLAG
 ME_SETTABLE_FLAG = MS_SETTABLE_FLAG
+ME_LOADABLE_FLAG = MS_LOADABLE_FLAG
+ME_SAVEABLE_FLAG = MS_SAVEABLE_FLAG
 ME_DELETEABLE_FLAG = MS_DELETEABLE_FLAG
+ME_CHANGEABLE_FLAG = MS_CHANGEABLE_FLAG
 
 ME_ROOTID = 'System::/'
 
@@ -136,10 +152,14 @@ ME_VARREF_FULLID = 1
 
 ### PATHWAYEDITOR CONSTANTS
 # direction
-DIRECTION_UP = 1
-DIRECTION_DOWN = 2
-DIRECTION_LEFT = 4
-DIRECTION_RIGHT = 8
+DIRECTION_UP = 4
+DIRECTION_DOWN = 8
+DIRECTION_LEFT = 1
+DIRECTION_RIGHT = 2
+DIRECTION_BOTTOM_RIGHT=10
+DIRECTION_BOTTOM_LEFT=9
+DIRECTION_TOP_RIGHT=6
+DIRECTION_TOP_LEFT=5
 
 # CURSOR types
 CU_POINTER = 0
@@ -153,7 +173,8 @@ CU_RESIZE_BOTTOM_RIGHT = 7
 CU_RESIZE_BOTTOM = 8
 CU_RESIZE_BOTTOM_LEFT = 9
 CU_RESIZE_LEFT = 10
-
+CU_CONN_INIT = 11
+CU_CROSS=12
 
 #4- up, 5, down, 
 
@@ -163,27 +184,28 @@ OB_TYPE_VARIABLE = "Variable"
 OB_TYPE_SYSTEM = "System"
 OB_TYPE_TEXT = "Text"
 OB_TYPE_CONNECTION = "Connection"
+OB_NOTHING = "NOTHING"
 
 OB_MIN_WIDTH = 80
 OB_MIN_HEIGTH = 40
 
 # object properties
-OB_POS_X = 'x'
-OB_POS_Y = 'y'
-OB_FULLID = 'FullID'
-OB_STEPPERID = 'StepperID'
-OB_TYPE = 'Type'
-OB_DIMENSION_X = 'DimensionX'
-OB_DIMENSION_Y = 'DimensionY'
-OB_HASFULLID = 'HasFullID'
+OB_POS_X = 'x'   #omitted
+OB_POS_Y = 'y'   #omitted
+OB_FULLID = 'FullID'  #rename action
+OB_STEPPERID = 'StepperID' #omitted
+OB_TYPE = 'Type' #omitted
+OB_DIMENSION_X = 'DimensionX' #omitted in Editor Object, resize action in SystemObject
+OB_DIMENSION_Y = 'DimensionY' #omitted in Editor Object, resize action in SystemObject
+OB_HASFULLID = 'HasFullID' #omitted
 
-OB_OUTLINE_COLOR = "OutlineColor"
-OB_FILL_COLOR = "FillColor"
-OB_TEXT_COLOR = "TextColor"
-OB_OUTLINE_WIDTH = "Outline"
+OB_OUTLINE_COLOR = "OutlineColor" #outline change action
+OB_FILL_COLOR = "FillColor"  #fill change action
+OB_TEXT_COLOR = "TextColor" # textcolot change action
+OB_OUTLINE_WIDTH = "Outline" #outline change action
 
-OB_SHAPE_TYPE = "ShapeType"
-OB_SHAPEDESCRIPTORLIST = "ShapeDescriptorList"
+OB_SHAPE_TYPE = "ShapeType" #shapetype change action
+OB_SHAPEDESCRIPTORLIST = "ShapeDescriptorList" # cannot change: omitted
 
 
 
@@ -193,30 +215,38 @@ PROCESS_TO_VARIABLE = 0
 VARIABLE_TO_PROCESS = 1
 
 # connection properties
-CO_PROCESS_ATTACHED = "ProcessAttached"  # this is an OBJECT!
-CO_VARIABLE_ATTACHED = "VariableAttached" # this is an OBJECT!
-CO_PROCESS_RING = "ProcessRing"
-CO_VARIABLE_RING = "VariableRing"
-CO_NAME = "Name"
-CO_COEF = "Coefficient"
-CO_DIRECTION = "Direction"
+CO_PROCESS_ATTACHED = "ProcessAttached"  # this is an ID or None! #omitted
+CO_VARIABLE_ATTACHED = "VariableAttached" # this is an ID or None! #omitted
+CO_PROCESS_RING = "ProcessRing"  #omitted
+CO_VARIABLE_RING = "VariableRing" #omitted
+CO_NAME = "Name" #rename action
+CO_COEF = "Coefficient" # change coef action
+CO_ISRELATIVE = "Isrelative" # omitted
+# lower level connection properties
+CO_LINETYPE = "LineType"  # change linetype action
+CO_LINEWIDTH = "LineWidth" # change linewidth
+CO_ENDPOINT1 = "Endpoint1" # omitted
+CO_ENDPOINT2 = "Endpoint2" # omitted
+CO_DIRECTION1 = "Direction1" #omitted
+CO_DIRECTION2 = "Direction2" #omitted
+CO_HASARROW1 = "Hasarrow1" #change arrow action
+CO_HASARROW2 = "Hasarrow2" #change arrow action
+CO_ATTACHMENT1TYPE = "Attachment1Type" # attached thing to endpoint 1 ( Process, Variable, Nothing ) #omitted
+CO_ATTACHMENT2TYPE = "Attachment2Type" #omitted
 
-
-CO_LINETYPE = "LineType"
-CO_LINECOLOR = "LineColor"
-CO_LINEWIDTH = "LineWidth"
+CO_USEROVERRIDEARROW = "UserSetArrow" #omitted
 
 # process properties
-PR_CONNECTIONLIST = "ConnectionList"
+PR_CONNECTIONLIST = "ConnectionList" #omitted
 
 # variable properties
-VR_CONNECTIONLIST = "ConnectionList"
+VR_CONNECTIONLIST = "ConnectionList" #omitted
 
 
 # system properties
-SY_INSIDE_DIMENSION_X = "InsideDimensionX"
-SY_INSIDE_DIMENSION_Y = "InsideDimensionY"
-SY_PASTE_CONNECTIONLIST = "PasteConnectionList"
+SY_INSIDE_DIMENSION_X = "InsideDimensionX"  #omitted
+SY_INSIDE_DIMENSION_Y = "InsideDimensionY" #omitted
+SY_PASTE_CONNECTIONLIST = "PasteConnectionList" #omitted
 
 # selector variable
 PE_SELECTOR = "Selector"
@@ -241,10 +271,13 @@ SHAPE_TYPE_PROCESS = "Process"
 SHAPE_TYPE_SYSTEM = "System"
 SHAPE_TYPE_TEXTBOX = "TextBox"
 SHAPE_TYPE_CUSTOM = "Custom"
+SHAPE_TYPE_STRAIGHT_LINE = "Straight"
+SHAPE_TYPE_CORNERED_LINE = "Cornered"
 
 # layout properties
 LO_SCROLL_REGION = "ScrollRegion" # list of int
 LO_ZOOM_RATIO ="Zoom ratio"
+LO_ROOT_SYSTEM = "Rootsystem"
 
 #SHAPEDESCRIPTOR properties
 SD_NAME = 0
@@ -266,9 +299,8 @@ RECT_ABSY1 = 5
 RECT_ABSX2 = 6
 RECT_ABSY2 = 7
 
-LINE_POINTS = 0 # [ x1abs, x1rel, y1abs, y1rel,... ]
+LINE_POINTS = 0 # [ x1abs, x1rel, y1abs, y1rel,... ] for connection lines it x1, y1, x2, y2
 LINE_WIDTH = 1
-
 
 TEXT_TEXT = 0
 TEXT_RELX = 1
@@ -283,7 +315,9 @@ SD_TEXT = 2
 SD_RING = 3 # initates connectionobject by mousedrag
 SD_NONE = 4 # does nothing by mousedrag
 SD_SYSTEM_CANVAS = 5
-
+SD_ARROWHEAD = 6
+SD_FIXEDLINE = 7
+SD_MOVINGLINE = 8
 
 #gnome canvasobjects:
 CV_RECT = "CanvasRect"
@@ -291,3 +325,31 @@ CV_ELL = "CanvasEllipse"
 CV_TEXT = "CanvasText"
 CV_LINE = "CanvasLine"
 
+# parameters for minimum SYSTEM_TYPE dimensions
+SYS_MINWIDTH=230
+SYS_MINHEIGHT=200
+
+# parameters for minimum VARIABLE_TYPE dimensions
+VAR_MINWIDTH=119
+VAR_MINHEIGHT=30
+
+# parameters for minimum PROCESS_TYPE dimensions
+PRO_MINWIDTH=92
+PRO_MINHEIGHT=30
+
+# parameters for minimum TEXT_TYPE dimensions
+TEXT_MINWIDTH=205
+TEXT_MINHEIGHT=27
+
+# attachment points
+RING_TOP = "RingTop"
+RING_BOTTOM = "RingBottom"
+RING_LEFT = "RingLeft"
+RING_RIGHT = "RingRight"
+
+# line parts
+ARROWHEAD1 = "arrowhead1"
+ARROWHEAD2 = "arrowhead2"
+EXTEND1 = "extendline1"
+EXTEND2 = "extendline2"
+ARROWHEAD_LENGTH = 10

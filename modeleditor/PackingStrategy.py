@@ -1,5 +1,5 @@
 from Constants import *
-
+from LayoutCommand import *
 
 class PackingStrategy:
 
@@ -65,9 +65,66 @@ class PackingStrategy:
 
 
 
-	def autoConnect( self,  processObjectID, variableObjectID ):
+	def autoConnect( self, processObjectID, variableObjectID,varrefName ):
 		# return cmdlist
-		pass
+		cmdList = []
+		
+		aProObject = self.theLayout.getObject( processObjectID )
+		aVarObject = self.theLayout.getObject( variableObjectID )
+
+		# get dimensions of object and x, y pos
+		aProObjectWidth = aProObject.getProperty( OB_DIMENSION_X )
+		aProObjectHeigth = aProObject.getProperty( OB_DIMENSION_Y )
+		(aProObjectX1,aProObjectY1)=aProObject.getAbsolutePosition()
+		aProObjectX2 = aProObjectX1 + aProObjectWidth
+		aProObjectY2 = aProObjectY1 + aProObjectHeigth
+		aProObjectXCenter = aProObjectX1 + aProObjectWidth/2
+		aProObjectYCenter = aProObjectY1 + aProObjectHeigth/2
+
+		aVarObjectWidth = aVarObject.getProperty( OB_DIMENSION_X )
+		aVarObjectHeigth = aVarObject.getProperty( OB_DIMENSION_Y )
+		(aVarObjectX1,aVarObjectY1)=aVarObject.getAbsolutePosition()
+		aVarObjectXCenter = aVarObjectX1 +aVarObjectWidth/2
+		aVarObjectYCenter = aVarObjectY1 +aVarObjectHeigth/2
+
+		if aVarObjectXCenter >= aProObjectXCenter and aVarObjectYCenter <= aProObjectYCenter:
+			if aVarObjectYCenter >=aProObjectY1:
+				processRing =RING_RIGHT
+				variableRing =RING_LEFT
+			if aVarObjectYCenter <= aProObjectY1:
+				processRing =RING_TOP
+				variableRing =RING_BOTTOM
+		if aVarObjectXCenter >= aProObjectXCenter and aVarObjectYCenter >= aProObjectYCenter:
+			if aVarObjectYCenter <= aProObjectY2:
+				processRing =RING_RIGHT
+				variableRing =RING_LEFT
+			if aVarObjectYCenter >=aProObjectY2:
+				processRing =RING_BOTTOM
+				variableRing =RING_TOP
+		if aVarObjectXCenter <= aProObjectXCenter and aVarObjectYCenter >= aProObjectYCenter:
+			if aVarObjectYCenter >= aProObjectY2:
+				processRing =RING_BOTTOM
+				variableRing =RING_TOP
+			if aVarObjectYCenter <=aProObjectY2:
+				processRing =RING_LEFT
+				variableRing =RING_RIGHT
+		if aVarObjectXCenter <= aProObjectXCenter and aVarObjectYCenter<= aProObjectYCenter:
+			if aVarObjectYCenter >= aProObjectY1:
+				processRing =RING_LEFT
+				variableRing =RING_RIGHT
+			if aVarObjectYCenter <= aProObjectY1:
+				processRing =RING_TOP
+				variableRing =RING_BOTTOM
+
+
+
+		newID = self.theLayout.getUniqueObjectID( OB_TYPE_CONNECTION )
+		cmdList.append(CreateConnection( self.theLayout, newID,  processObjectID, variableObjectID, processRing, variableRing, PROCESS_TO_VARIABLE, varrefName ))
+		return cmdList
+		
+		
+		
+		
 
 
 	def autoShowObject( self, aFullID ):

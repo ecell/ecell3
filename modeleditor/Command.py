@@ -35,10 +35,10 @@ class Command:
 			if self.do():
 				self.executed = True
 			else:
-				raise Exception("%s command failed.\n Arguments: %s"%(self.__class__.__name__, self.thaArgs) )
+				raise Exception("%s command failed.\n Arguments: %s"%(self.__class__.__name__, self.theArgs) )
 				self.theReverseCommandList = None
 		else:
-			raise Exception("%s command argumentcheck failed. Cannot execute.\n Arguments: %s"%(self.__class__.__name__, self.thaArgs) )
+			raise Exception("%s command argumentcheck failed. Cannot execute.\n Arguments: %s"%(self.__class__.__name__, self.theArgs) )
 
 
 

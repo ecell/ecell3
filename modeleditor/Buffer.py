@@ -251,6 +251,7 @@ class EntityListBuffer(Buffer):
 		if self.getEntity( anID ) == None:
 			newEntity = {'Name' : anID, 'Class': aClass, 'PropertyList':PropertyListBuffer() }
 			self.theEntityList.append( newEntity )
+		
 		else:
 			raise Exception("%s already in Buffer" % anID )
 
@@ -286,11 +287,10 @@ class EntityListBuffer(Buffer):
 
 
 	def isEntityExist( self, anID ):
-		try:
-			self.getEntity( anID )
-		except:
-			return False
-		return True
+		if self.getEntity( anID ) == None:
+	
+			return True
+		return False
 
 
 
@@ -375,7 +375,7 @@ class SystemListBuffer( EntityListBuffer ):
 			if aSystem == None:
 				raise Exception("Illegal fullid passed to Buffer"%aFullID )
 			else:
-				return aSystem['ProcessList'].getEntityClassName( anEntity[2] )
+				return aSystem['VariableList'].getEntityClassName( anEntity[2] )
 
 		aSystem = self.getEntityOrSubSystemList( aFullID )			
 		if aSystem == None:
@@ -410,6 +410,7 @@ class SystemListBuffer( EntityListBuffer ):
 				return aSystem['SystemList'].listSystems()
 
 			elif anEntityType == ME_VARIABLE_TYPE:
+				
 				return aSystem['VariableList'].getEntityList()
 			else:
 				raise Exception ("Wrong argument for anEntityType %s" % anEntityType)
@@ -504,6 +505,8 @@ class SystemListBuffer( EntityListBuffer ):
 		
 
 	def __getAbsoluteDir( self, relativeDir ):
+		if relativeDir =='':
+			return '/'
 		if relativeDir[0]!=".":
 			if relativeDir[0] == '/':
 				return relativeDir

@@ -2,7 +2,7 @@ import ModelEditor
 import gtk
 import getopt
 import sys
-usageString = " ModelEditor for ecell3 modeling environement.\n (C): Keio University 2003 \n Author: Gabor Bereczki <gabor.bereczki@talk21.com>\n\n Usage:\n\t-f\t:\t file to load.\n\t-h\t:\t prints this help.\n"
+usageString = " ModelEditor for ecell3 modeling environement.\n (C): Keio University 2003-2004 \n Authors: Gabor Bereczki <gabor.bereczki@talk21.com>, Sylvia Kinta, Dini Karnaga\n\n Usage:\n\t-f\t:\t file to load.\n\t-h\t:\t prints this help.\n"
 
 aFileName = None
 if len( sys.argv)>1:
