@@ -66,8 +66,6 @@ namespace libemc
     getRootSystem().createEntity( classname, 
 				  FullID( type, systempath, id ),
 				  name );
-				  
-						     
   }
     
   void LocalSimulatorImplementation::setProperty( PrimitiveType type,
@@ -113,9 +111,9 @@ namespace libemc
 	    libecs::StringCref    propertyname )
   {
     return theLoggerBroker.getLogger( FullPN( type, 
-							systempath,
-							id,
-							propertyname ) );
+					      systempath,
+					      id,
+					      propertyname ) );
   }
 
 

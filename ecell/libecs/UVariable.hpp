@@ -299,7 +299,7 @@ namespace libecs
       return theData->createClone();
     }
 
-  private:
+  protected:
 
     UConstantDataPtr theData;
     Type             theType;

@@ -35,8 +35,7 @@
 namespace libecs
 {
 
-  UConstantStringData::
-  UConstantStringData( const Real f )
+  UConstantStringData::UConstantStringData( const Real f )
     :
     theString( toString<Real>( f ) )
   {
@@ -52,6 +51,7 @@ namespace libecs
 
   const Real UConstantStringData::asReal() const
   {
+    cerr << "R "<< theString << endl;
     return stringTo<Real>( theString );
   }
 
@@ -61,8 +61,7 @@ namespace libecs
   }
 
 
-  UConstantRealData::
-  UConstantRealData( StringCref str )
+  UConstantRealData::UConstantRealData( StringCref str )
     :
     theReal( stringTo<Real>( str ) )
   {
@@ -74,16 +73,14 @@ namespace libecs
     return toString<Real>( theReal );
   }
 
-  UConstantIntData::
-  UConstantIntData( StringCref str )
+  UConstantIntData::UConstantIntData( StringCref str )
     :
     theInt( stringTo<Int>( str ) )
   {
     ; // do nothing
   }
 
-  UConstantIntData::
-  UConstantIntData( const Real f )
+  UConstantIntData::UConstantIntData( const Real f )
     :
     // FIXME: range check?
     theInt( static_cast<Int>( f ) )

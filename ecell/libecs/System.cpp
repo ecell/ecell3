@@ -450,7 +450,7 @@ namespace libecs
 			     StringCref name )
   {
     SystemPtr aSystem ( getSystem( fullid.getSystemPath() ) );
-			      
+
     ReactorPtr   aReactorPtr;
     SystemPtr    aSystemPtr;
     SubstancePtr aSubstancePtr;

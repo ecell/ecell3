@@ -33,6 +33,7 @@
 #include "libecs/FullID.hpp"
 #include "libecs/Message.hpp"
 
+#include "PyUVariable.hpp"
 #include "PyEcs.hpp"
 #include "PyLogger.hpp"
 
@@ -101,18 +102,17 @@ Object PySimulator::setProperty( const Py::Tuple& args )
   aFullPN.verify_length( 4 );
 
   const PrimitiveType aType ( static_cast<Py::Int>( aFullPN[0] ) );
-  const String aPath     ( static_cast<Py::String>( aFullPN[1] ) );
-  const String anID      ( static_cast<Py::String>( aFullPN[2] ) );
-  const String aPropertyName 
-    ( static_cast<Py::String>( aFullPN[3] ) );
+  const String aPath        ( static_cast<Py::String>( aFullPN[1] ) );
+  const String anID         ( static_cast<Py::String>( aFullPN[2] ) );
+  const String aPropertyName( static_cast<Py::String>( aFullPN[3] ) );
 
   const Py::Tuple aMessageSequence( static_cast<Py::Sequence>( args[1] ) );
   
-  UConstantVector aMessageBody( aMessageSequence.size() );
-  for( Py::Tuple::const_iterator i = aMessageSequence.begin() ;
+  UConstantVector aMessageBody;
+  for( Py::Tuple::const_iterator i( aMessageSequence.begin() );
        i != aMessageSequence.end() ; ++i )
     {
-      aMessageBody.push_back( UConstant( (*i).as_string() ) );
+      aMessageBody.push_back( PyUConstant( *i ) );
     }
 
   Simulator::setProperty( aType, aPath, anID, aPropertyName, aMessageBody );
@@ -131,11 +131,10 @@ Object PySimulator::getProperty( const Py::Tuple& args )
   const Py::Sequence& aFullPN( args[0] );
   aFullPN.verify_length( 4 );
 
-  const PrimitiveType aType ( static_cast<Py::Int>( aFullPN[0] ) );
-  const String aPath     ( static_cast<Py::String>( aFullPN[1] ) );
-  const String anID      ( static_cast<Py::String>( aFullPN[2] ) );
-  const String aPropertyName
-    ( static_cast<Py::String>( aFullPN[3] ) );
+  const PrimitiveType aType    ( static_cast<Py::Int>( aFullPN[0] ) );
+  const String aPath        ( static_cast<Py::String>( aFullPN[1] ) );
+  const String anID         ( static_cast<Py::String>( aFullPN[2] ) );
+  const String aPropertyName( static_cast<Py::String>( aFullPN[3] ) );
 
   UConstantVector aVector( Simulator::getProperty( aType,
 						   aPath,
@@ -148,30 +147,8 @@ Object PySimulator::getProperty( const Py::Tuple& args )
 
   for( UConstantVector::size_type i( 0 ) ; i < aSize ; ++i )
     {
-      UConstantCref aUConstant( aVector[i] );
-      Py::Object anObject;
-
-      switch( aUConstant.getType() )
-	{
-	case UConstant::REAL:
-	  anObject = Py::Float( aUConstant.asReal() );
-	  break;
-
-	case UConstant::INT:
-	  anObject = Py::Int( static_cast<long int>( aUConstant.asInt() ) );
-	  break;
-
-	case UConstant::STRING:
-	case UConstant::NONE:
-	  anObject = Py::String( aUConstant.asString() );
-	  break;
-
-	default:
-	  assert( 0 );
-	  ; //FIXME: assert: NEVER_GET_HERE
-	}
-
-      aTuple[i] = anObject;
+      PyUConstant aPyUConstant( aVector[i] );
+      aTuple[i] = aPyUConstant.asPyObject();
     }
 
   return aTuple;
@@ -201,11 +178,10 @@ Object PySimulator::getLogger( const Py::Tuple& args )
   const Py::Sequence& aFullPN( args[0] );
   aFullPN.verify_length( 4 );
 
-  const PrimitiveType aType ( static_cast<Py::Int>( aFullPN[0] ) );
-  const String aPath     ( static_cast<Py::String>( aFullPN[1] ) );
-  const String anID      ( static_cast<Py::String>( aFullPN[2] ) );
-  const String aPropertyName
-    ( static_cast<Py::String>( aFullPN[3] ) );
+  const PrimitiveType aType    ( static_cast<Py::Int>( aFullPN[0] ) );
+  const String aPath        ( static_cast<Py::String>( aFullPN[1] ) );
+  const String anID         ( static_cast<Py::String>( aFullPN[2] ) );
+  const String aPropertyName( static_cast<Py::String>( aFullPN[3] ) );
 
   const Logger* aLogger( Simulator::getLogger( aType,
 					       aPath,
