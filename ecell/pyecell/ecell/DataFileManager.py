@@ -102,8 +102,7 @@ class DataFileManager:
 			aFileName = self.theFileMap[aKey].getFileName()
 			aFileName = split(aFileName,'/')[-1]
 			aFileName = self.theRootDirectory + '/' + aFileName
-			self.theFileMap[aKey].setFileName(aFileName)
-			self.theFileMap[aKey].save()
+			self.theFileMap[aKey].save(aFileName)
 
 	# end of saveAll()
 
