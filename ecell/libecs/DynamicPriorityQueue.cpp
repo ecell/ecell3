@@ -48,7 +48,7 @@ int main()
 
   for( int i( 0 ); i < 10000  ; ++i )
     {
-      dpq.changeOneKey( i, i+1000 );
+      dpq.changeOneKey( dpq.topIndex(), i+1000 );
     }
 
   DynamicPriorityQueue<int> copy( dpq );
