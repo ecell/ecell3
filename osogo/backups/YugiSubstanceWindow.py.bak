@@ -2,13 +2,15 @@
 
 import string
 import ecs
-
+import re
 import gtk
 import gnome.ui
 import GDK
 import libglade
 
+#
 # from "test.py"
+#
 
 def printProperty( sim, fqpi, propertyname ):
     value = sim.getProperty( fqpi, propertyname )
@@ -69,6 +71,9 @@ s.step()
 printProperty( s, 'System:/:/', 'CurrentTime' )
 s.step()
 
+#
+# end of "test.py"
+#
 
 class Window:
 
@@ -97,6 +102,14 @@ class SubstanceWindow(Window):
                                }
         
         Window.__init__( self, gladefile )
+        
+#        init_quantity = s.getProperty('Substance:/:C', 'Quantity')
+#        id = s.getProperty('Substance:/:C', 'ID') 
+
+        self['name_label'].set_text("cAMP")
+#        self['quantity_spin'].set_value( init_quantity )
+#        self['conc_spin'].set_value( init_conc )
+
         self.addHandlers( self.theHandlerMap )
         self.fixed = 0
 
@@ -130,7 +143,7 @@ def mainLoop():
     gtk.mainloop()
 
 def main():
-    aWindow = SubstanceWindow( 'substance_window.glade' )
+    aWindow = SubstanceWindow( 'yugi_substance_window.glade' )
     aWindow.addHandler( 'gtk_main_quit', mainQuit )
     mainLoop()
 
