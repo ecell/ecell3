@@ -156,14 +156,10 @@ namespace libecs
     if ( maxError > 1.1 )
       {
 	reset();
-	setOriginalStepInterval( 0.0 );
-
 	return false;
       }
 
     // set the error limit interval
-    setOriginalStepInterval( getStepInterval() );
-
     return true;
   }
 

@@ -92,7 +92,7 @@ LIBECS_DM_CLASS( ODE45Stepper, AdaptiveDifferentialStepper )
       const Real k4( theStepper.getK7()[ theIndex ] );
 
       const Real 
-	aStepIntervalInv( 1.0 / theStepper.getOriginalStepInterval() );
+	aStepIntervalInv( 1.0 / theStepper.getTolerableStepInterval() );
 
       const Real k1__4k2_4k3__k4( ( k1 + ( k3 - k2 ) * 4.0 - k4 ) );
       const Real k1__k2_2( ( k1 - k2 ) * 2.0 );
@@ -109,36 +109,38 @@ LIBECS_DM_CLASS( ODE45Stepper, AdaptiveDifferentialStepper )
       return ( i1 - i2 );
     }
 
-//     const Real interpolate( RealCref anInterval )
-//     {
-//       const Real theta( anInterval / theStepper.getOriginalStepInterval() );
+    /**
+    const Real interpolate( RealCref anInterval )
+    {
+      const Real theta( anInterval / theStepper.getTolerableStepInterval() );
       
-//       const Real k1 = theStepper.getK1()[ theIndex ];
-//       const Real k2 = theStepper.getMidVelocityBuffer()[ theIndex ];
-//       const Real k3 = theStepper.getVelocityBuffer()[ theIndex ];
-//       const Real k4 = theStepper.getK7()[ theIndex ];
+      const Real k1 = theStepper.getK1()[ theIndex ];
+      const Real k2 = theStepper.getMidVelocityBuffer()[ theIndex ];
+      const Real k3 = theStepper.getVelocityBuffer()[ theIndex ];
+      const Real k4 = theStepper.getK7()[ theIndex ];
       
-//       return anInterval * ( k1 + theta
-// 			    * ( (theta - 0.5) * 2.0 * (k3 - k1)
-// 				+ (theta - 1.0) * 4.0 * (k1 - k2) 
-// 				+ (theta - 0.5) * (theta - 1.0) 
-// 				* 2.0 * (k4 - k1 - 4*k3 + 4*k2) ) );
-//     }
+      return anInterval * ( k1 + theta
+ 			    * ( (theta - 0.5) * 2.0 * (k3 - k1)
+ 				+ (theta - 1.0) * 4.0 * (k1 - k2) 
+ 				+ (theta - 0.5) * (theta - 1.0) 
+ 				* 2.0 * (k4 - k1 - 4*k3 + 4*k2) ) );
+    }
    
-//     virtual const Real getDifference( RealCref aTime, RealCref anInterval )
-//     {
-//       const Real aTimeInterval( aTime - theStepper.getCurrentTime() );
-
-//       const Real i1 = interpolate( aTimeInterval );
-//       const Real i2 = interpolate( aTimeInterval - anInterval );
-
-//       return ( i1 - i2 );
-//     }
+    virtual const Real getDifference( RealCref aTime, RealCref anInterval )
+    {
+      const Real aTimeInterval( aTime - theStepper.getCurrentTime() );
+      
+      const Real i1 = interpolate( aTimeInterval );
+      const Real i2 = interpolate( aTimeInterval - anInterval );
+       
+      return ( i1 - i2 );
+    }
+    */
 
   protected:
 
     ODE45StepperRef theStepper;
-    UnsignedInteger                 theIndex;
+    UnsignedInteger theIndex;
   };
 
 public:
@@ -147,7 +149,6 @@ public:
     {
       INHERIT_PROPERTIES( AdaptiveDifferentialStepper );
     }
-
 
   ODE45Stepper();
   virtual ~ODE45Stepper();

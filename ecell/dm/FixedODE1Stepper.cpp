@@ -53,26 +53,32 @@ namespace libecs
 
     clearVariables();
 
-    fireProcesses();
-
     setStepInterval( getNextStepInterval() );
+
+    fireProcesses();
 
     for( VariableVector::size_type c( 0 ); c < aSize; ++c )
       {
 	VariablePtr const aVariable( theVariableVector[ c ] );
 
 	theVelocityBuffer[ c ] = aVariable->getVelocity();
-
-	// avoid negative value
-	while( aVariable->checkRange( getStepInterval() ) == false )
-	  {
-	    // don't use setStepInterval()
-	    //FIXME:
-	    loadStepInterval( getStepInterval() * 0.5 );
-	  }
       }
 
-    if( getStepInterval() < getTolerantStepInterval() )
+    /**
+       avoid negative value
+
+    FOR_ALL( VariableVector, theVariableVector )
+      {
+	while ( (*i)->checkRange( getStepInterval() ) == false )
+	  {
+	    //FIXME:
+	    setStepInterval( getStepInterval() * 0.5 );
+	  }
+      }
+    */
+
+    /**
+    if ( getStepInterval() < getTolerableStepInterval() )
       {
   	setNextStepInterval( getStepInterval() * 2.0 );
       }
@@ -80,6 +86,9 @@ namespace libecs
       {
 	setNextStepInterval( getStepInterval() );
       }
+    */
+
+    setNextStepInterval( getTolerableStepInterval() );
   }
 
 }

@@ -72,7 +72,9 @@ namespace libecs
   {
     AdaptiveDifferentialStepper::step();
 
-    if ( getOriginalStepInterval() > getStepInterval() )
+    //   check if the step interval was changed, by epsilon
+    if ( fabs( getTolerableStepInterval() - getStepInterval() )
+	 > std::numeric_limits<Real>::epsilon() )
       {
 	theInterrupted = true;
       }
@@ -316,14 +318,11 @@ namespace libecs
       {
 	// reset the stepper current time
 	reset();
-	setOriginalStepInterval( 0.0 );
 	theInterrupted = true;
-
 	return false;
       }
 
     // set the error limit interval
-    setOriginalStepInterval( getStepInterval() );
     theInterrupted = false;
 
     return true;
