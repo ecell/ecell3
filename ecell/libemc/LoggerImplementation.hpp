@@ -64,7 +64,7 @@ public:
   //  virtual void push( const Float& t, const Float& v ) = 0;
 
 
-}
+};
 
 #endif
 

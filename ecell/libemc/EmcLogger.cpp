@@ -2,7 +2,7 @@
 //
 //        This file is part of E-CELL Simulation Environment package
 //
-//                Copyright (C) 1996-2000 Keio University
+//                Copyright (C) 2000-2001 Keio University
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
@@ -29,40 +29,6 @@
 //
 
 
-#if !defined( __LOCAL_LOGGER_IMPLEMENTATION_HPP )
-#define       __LOCAL_LOGGER_IMPLEMENTATION_HPP
-
-#include "libecs.hpp"
-
-#include "LoggerImplementation.hpp"
-
-class LocalLoggerImplementation
-  :
-  public LoggerImplementation
-{
-
-public:
-
-  LocalLoggerImplementation( ObjectPtr optr );
-  virtual ~LocalLoggerImplementation( );
-
-  FloatLogger::DataPointVector& getData( const Float& first,
-					 const Float& last,
-					 const Float& interval ) const;
-
-  void update( void );
-
-  void update( FloatLogger::containee_type& datapoint );
-
-  //  void push( const FloatLogger::containee_type& x );
-
-  //  void push( const Float& t, const Float& v ); 
-
-private:
-
-  FloatLogger theFloatLogger;
-					
-};
+#include "EmcLogger.hpp"
 
 
-#endif
