@@ -86,11 +86,8 @@ NOTE: If you get this package via cvs, use ./autogen.sh instead of
 
   == Boost library installed under non-standard directories ==
 
-  Use --with-boost-include-dir= configure option to specify
-  non-standard include directory for boost.
-
-  Use --with-boost-lib-dir= configure option to specify
-  non-standard lib directory for boost.
+  Use --with-boost-root-dir= configure option to specify
+  non-standard root installation directory for boost.
 
 
 

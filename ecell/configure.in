@@ -61,6 +61,7 @@ rm -f conftest
 rm -f conftest
 dnl
 dnl compatibility for libtool 1.5.x
+LTDL_SHLIB_EXT=""
 if test -n "$shrext"; then
   LTDL_SHLIB_EXT=$shrext
   AC_SUBST(LTDL_SHLIB_EXT)
@@ -174,39 +175,49 @@ dnl
 dnl boost package
 dnl
 dnl
-AC_ARG_WITH( boost-include-dir,,
-  [BOOST_INCLUDE="-I$withval"],
-  [BOOST_INCLUDE=])
-AC_SUBST(BOOST_INCLUDE)
-AC_ARG_WITH( boost-lib-dir,,
-  [BOOST_LIB="-L$withval"],
-  [BOOST_LIB=])
-AC_SUBST(BOOST_LIB)
+AC_ARG_WITH( boost-root-dir,,
+  [BOOST_ROOT_DIR="$withval"],
+  [BOOST_ROOT_DIR=])
+EXT_GUESS="$BOOST_ROOT_DIR $EXT_GUESS "
 
-if test "$BOOST_INCLUDE" = "" ; then
-	AC_MSG_CHECKING( for boost include dir );
-	ac_cv_boost_dir=""	
-	for ac_dir in $EXT_GUESS ; do
-		if test -d $ac_dir/include/boost ; then
-			ac_cv_boost_dir=`(cd $ac_dir/include ; pwd)`
-			BOOST_INCLUDE=$ac_cv_boost_dir
+AC_MSG_CHECKING( for boost include dir );
+BOOST_INCLUDE=""	
+for ac_dir in $EXT_GUESS ; do
+	if test -f $ac_dir/include/boost/python.hpp ; then
+		BOOST_INCLUDE=`(cd $ac_dir/include ; pwd)`
+	else
+		if test -f $ac_dir/include/boost*/boost/python.hpp ; then
+			BOOST_INCLUDE=`(cd $ac_dir/include/boost* ; pwd)` 
 		fi
-	done
-	if test "$BOOST_INCLUDE" = "" ; then	
-		for ac_dir in $EXT_GUESS ; do
-			if test -d $ac_dir/include/boost*/boost ; then
-				ac_cv_boost_dir=`(cd $ac_dir/include/boost* ; pwd)`
-				BOOST_INCLUDE=$ac_cv_boost_dir
-			fi
-		done
 	fi
-	if test "$BOOST_INCLUDE" = "" ; then
-		AC_MSG_ERROR(boost not found);
-	fi
+done
+if test "$BOOST_INCLUDE" = "" ; then
+	AC_MSG_ERROR(boost includes not found);
+else
 	BOOST_INCLUDE="-I$BOOST_INCLUDE"
-	AC_MSG_RESULT($ac_cv_boost_dir);
 fi
+AC_MSG_RESULT($BOOST_INCLUDE)
 AC_SUBST(BOOST_INCLUDE)
+
+AC_MSG_CHECKING( for boost python lib );
+BOOST_PYTHON_LIB=""	
+for ac_dir in $EXT_GUESS ; do
+	if test -f $ac_dir/lib/libboost_python$LTDL_SHLIB_EXT ; then
+		BOOST_PYTHON_LIB="-lboost_python"
+		BOOST_LIB="-L$ac_dir/lib"
+	else
+		if test -f $ac_dir/lib/libboost_python-gcc$LTDL_SHLIB_EXT ; then
+			BOOST_PYTHON_LIB="-lboost_python-gcc"
+			BOOST_LIB="-L$ac_dir/lib"
+		fi
+	fi
+done
+if test "$BOOST_PYTHON_LIB" = "" ; then
+	AC_MSG_ERROR(boost python lib not found);
+fi
+AC_MSG_RESULT($BOOST_LIB $BOOST_PYTHON_LIB)
+AC_SUBST(BOOST_PYTHON_LIB)
+AC_SUBST(BOOST_LIB)
 
 AM_CHECK_PYTHON_HEADERS(,[AC_MSG_ERROR([])])
 

@@ -44,12 +44,9 @@ dnl
 dnl
 dnl
 dnl
-AC_ARG_WITH( boost-include,
-  AC_HELP_STRING([--with-boost-include-dir=],
-               [specify a non-standard include directory for boost library.]) )
-AC_ARG_WITH( boost-lib-dir,
-  AC_HELP_STRING([--with-boost-lib-dir=],
-               [specify a non-standard library directory for boost library.]) )
+AC_ARG_WITH( boost-root,
+  AC_HELP_STRING([--with-boost-root-dir=],
+               [specify a non-standard root installation directory for boost library.]) )
 dnl
 dnl
 AM_CONFIG_HEADER([ecell3_config.h])

@@ -57,6 +57,7 @@ def main():
     # initialize file names
     # -------------------------------------
     prefix = os.environ['ECELL3_PREFIX']
+    BOOST_LIBRARIES = os.environ['BOOST_LIBRARIES']
     exec_prefix = prefix
     BINDIR = exec_prefix + os.sep + 'bin'
     STDLIBDIR = '-L' + exec_prefix + os.sep + 'lib'
@@ -153,7 +154,7 @@ def main():
     if not NO_STDLIBDIR:
 	LDFLAGS = LDFLAGS + ' ' + STDLIBDIR
 	
-    LDFLAGS = LDFLAGS + ADDFLAGS + ' -lecs -lgsl -lboost_python'
+    LDFLAGS = LDFLAGS + ADDFLAGS + ' -lecs -lgsl ' + BOOST_LIBRARIES 
     os.environ['LDFLAGS'] = LDFLAGS
     
     if NO_DEFINE_CXXFLAGS:
