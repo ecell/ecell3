@@ -236,7 +236,6 @@ class PropertyWindow(OsogoPluginWindow):
         # ----------------------------------------------------
         # checks a value is changed or not
         # ----------------------------------------------------
-
         # check the fullID
         if self.thePreFullID != self.theFullID():
             fullUpdate = True
@@ -317,13 +316,13 @@ class PropertyWindow(OsogoPluginWindow):
 
 
 
-
         # save current full id to previous full id.
         self.preFullID = self.theFullID()
 
         # updates status bar
         if self['statusbar'] != None:
             self['statusbar'].push(1,'')
+
 
 
                 

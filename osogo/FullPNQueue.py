@@ -29,6 +29,9 @@ class FullPNQueue:
 
         self.__applyFullPNList( aRawFullPNList )
         self.__updateNavigatorButtons()
+        
+    def getActualFullPNList( self ):
+        return self.__copyList( self.theRawFullPNList )
 
     def __applyFullPNList( self, aRawFullPNList ):
         self.theRawFullPNList = self.__copyList( aRawFullPNList )
