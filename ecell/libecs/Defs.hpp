@@ -43,7 +43,7 @@ const int RANDOM_NUMBER_BUFFER_SIZE(65535);
 //FIXME: const char* const REACTOR_SO_DIR= DM_SO_DIR "/reactor"; 
 
 // FIXME: use numeric_limits
-#if SIZEOF_LONG_LONG >= 0
+#if SIZEOF_LONG_LONG > 0
 typedef long long Int;
 const int INT_SIZE=SIZEOF_LONG_LONG;
 #else
