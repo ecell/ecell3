@@ -136,6 +136,7 @@ class TracerWindow( OsogoPluginWindow ):
         logPolicy = self.theSession.getLogPolicyParameters()
         for fpn in fpnlist:
             if not self.hasLogger(fpn):
+
                 try:
                     self.theSession.theSimulator.createLogger(fpn, logPolicy )
                 except:
@@ -441,8 +442,7 @@ class TracerWindow( OsogoPluginWindow ):
             return
         aSeries = self.thePlotInstance.getDataSeries( aFullPNString )
         currentState = aSeries.isOn()
-        if currentState:
-            return None
+
         if currentState == aBoolean:
             return None
         anIter=self.theListStore.get_iter_first()
@@ -450,7 +450,6 @@ class TracerWindow( OsogoPluginWindow ):
             if anIter == None:
                 return None
             aTitle = self.theListStore.get_value(anIter, COL_TXT )
-
             if aTitle == aFullPNString:
                 aSeries = self.thePlotInstance.getDataSeries( aFullPNString )
                 if aBoolean:
@@ -460,6 +459,7 @@ class TracerWindow( OsogoPluginWindow ):
                 self.noHandle = True
                 self.theListStore.set_value( anIter, COL_ON, aSeries.isOn() )
                 self.noHandle = False
+                self.thePlotInstance.totalRedraw()
 
                 break
             anIter=self.theListStore.iter_next( anIter )
@@ -473,7 +473,7 @@ class TracerWindow( OsogoPluginWindow ):
         if x1<0 or x1<=x0 or y1<=y0:
             self.thePluginManager.theSession.message("bad arguments")
             return
-        self.thePlotInstance.zoomIn( [x0, x1], [y1, y0])
+        self.thePlotInstance.zoomIn( [float(x0), float(x1)], [float(y1), float(y0)])
 
     # ========================================================================
     def zoomOut(self, aNum = 1):

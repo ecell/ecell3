@@ -328,11 +328,11 @@ class OsogoPluginManager(PluginManager):
 
 
 
-	# ========================================================================
-	def deletePropertyWindowOnEntityListWinsow( self, aPropertyWindowOnEntityListWindow ):
-		"""deletes PropertyWindow on EntityListWindow
-		Returns None
-		"""
+    # ========================================================================
+    def deletePropertyWindowOnEntityListWinsow( self, aPropertyWindowOnEntityListWindow ):
+        """deletes PropertyWindow on EntityListWindow
+        Returns None
+        """
 
         if self.thePropertyWindowOnEntityListWindows.has_key(aPropertyWindowOnEntityListWindow):
             del self.thePropertyWindowOnEntityListWindows[aPropertyWindowOnEntityListWindow]

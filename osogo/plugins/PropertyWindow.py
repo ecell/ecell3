@@ -57,12 +57,14 @@ class PropertyWindow(OsogoPluginWindow):
         # initializes buffer
         self.thePreFullID = None
         self.thePrePropertyMap = {}
-        if self.theParent == None:
-            self.theQueue = FullPNQueue( self['navigator_area'], self.theRawFullPNList )
-    
+        if self.theParent != None:
+            if   self.theParent.__class__.__name__ == "EntityListWindow":
+                self.theQueue = self.theParent.getQueue()
+            else:
+                self.theQueue = FullPNQueue( self['navigator_area'], self.theRawFullPNList )
         else:
-            self.theQueue = self.theParent.getQueue()
-
+            self.theQueue = FullPNQueue( self['navigator_area'], self.theRawFullPNList )
+ 
         self.theQueue.registerCallback( self.setRawFullPNList )
        
         # initializes ListStore

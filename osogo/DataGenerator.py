@@ -202,7 +202,6 @@ class DataGenerator:
             pass
             #return
             # do Xaxis interpolation here for phase plotting
-
         aDataSeries.replacePoints( dataList )
 
     # end of requestDataSlice
