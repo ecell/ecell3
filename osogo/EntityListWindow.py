@@ -72,6 +72,9 @@ class EntityListWindow(OsogoWindow):
         # call superclass's openWindow
         OsogoWindow.openWindow( self )
 
+        self['search_method'].set_property('active', 0)
+        self['search_scope'].set_property('active', 0)
+        
         # add handers
         self.addHandlers( { 
             # system tree
@@ -89,7 +92,7 @@ class EntityListWindow(OsogoWindow):
             'on_search_entry_key_press_event':\
             self.keypressOnSearchEntry,\
             'on_clear_button_clicked': self.pushClearButton, 
-            'on_find_all_button_clicked': self.pushFindAllButton
+            'on_search_scope_changed': self.searchScopeChanged
             } )
 
         self.entitySelected = False
@@ -1238,36 +1241,46 @@ class EntityListWindow(OsogoWindow):
         self.searchString = searchString
         self.theQueue.pushFullPNList( aFullPNList )
         self['search_button'].set_sensitive( gtk.FALSE)
-        self['find_all_button'].set_sensitive(gtk.FALSE )
-        self['clear_button'].set_sensitive(gtk.TRUE )
+        if self.searchString != '':
+            self['clear_button'].set_sensitive(gtk.TRUE )
 
 
     def filterSelectedSystems( self ):
+        
         self.searchString = self['search_entry'].get_text()
         self.reconstructLists()
+        self['search_button'].set_sensitive( gtk.FALSE)
+        if self.searchString != '':
+            self['clear_button'].set_sensitive(gtk.TRUE )
+        else:
+            self['clear_button'].set_sensitive(gtk.FALSE )
 
 
     def pushSearchButton( self, *arg ):
-        self.filterSelectedSystems()
-        self['search_button'].set_sensitive(gtk.FALSE )
-        self['clear_button'].set_sensitive(gtk.TRUE )
+        searchScope = self['search_scope'].get_property( 'active' )
+        if searchScope == 0:
+            self.searchEntity()
+        else:
+            self.filterSelectedSystems()
+
 
     def keypressOnSearchEntry( self, *arg ):
 
         if( arg[1].keyval == 65293 ):
 
-            self.filterSelectedSystems()
-        else:
+            self.pushSearchButton( None )
+        else :
             self['search_button'].set_sensitive(gtk.TRUE )
-            self['find_all_button'].set_sensitive(gtk.TRUE )
 
-    def pushFindAllButton( self, *args ):
-        self.searchEntity()
         
     def pushClearButton( self, *args ):
         self['search_entry'].set_text('')
-        self['search_button'].set_sensitive( gtk.FALSE)
-        self['find_all_button'].set_sensitive(gtk.FALSE )
-        self['clear_button'].set_sensitive(gtk.FALSE )
         self.filterSelectedSystems()
         
+    def searchScopeChanged( self, *args ):
+        searchString = self['search_entry'].get_text()
+        if self.searchString != '':
+            self['search_button'].set_sensitive( gtk.TRUE)
+        else:
+            self['search_button'].set_sensitive( gtk.FALSE)
+            
