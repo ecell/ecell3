@@ -479,3 +479,51 @@ def getUnitDefinition( aSBMLmodel ):
     return LIST
 
 
+
+def getIDListFromFile( aSBMLString ):
+
+    aSBMLDocument = libsbml.readSBMLFromString( aSBMLString )
+    aSBMLModel = aSBMLDocument.getModel()
+
+    aSBMLLevel = aSBMLDocument.getLevel()
+    
+    aSpeciesList = getSpecies( aSBMLModel )
+    aParameterList = getParameter( aSBMLModel )
+    aReactionList = getReaction( aSBMLModel, aSBMLDocument )
+    aRuleList = getRule( aSBMLModel )
+
+    anIDList = []
+    aSpeciesIDList = []
+    aParameterIDList = []
+    aReactionIDList = []
+    aRuleIDList = []
+
+    if( aSBMLLevel == 1 ):
+
+        for aSpecies in aSpeciesList:
+            aSpeciesIDList.append( aSpecies[1] )
+        for aParameter in aParameterList:
+            aParameterIDList.append( aParameter[1] )
+        for aReaction in aReactionList:
+            aReactionIDList.append( aReaction[1] )
+        for aRule in aRuleList:
+            aRuleIDList.append( aRule[1] )
+        
+    elif( aSBMLLevel == 2 ):
+
+        for aSpecies in aSpeciesList:
+            aSpeciesIDList.append( aSpecies[2] )
+        for aParameter in aParameterList:
+            aParameterIDList.append( aParameter[2] )
+        for aReaction in aReactionList:
+            aReactionIDList.append( aReaction[2] )
+        for aRule in aRuleList:
+            aRuleIDList.append( aRule[2] )
+
+
+    anIDList.append( aSpeciesIDList )
+    anIDList.append( aParameterIDList )
+    anIDList.append( aReactionIDList )
+    anIDList.append( aRuleIDList )
+
+    return anIDList
