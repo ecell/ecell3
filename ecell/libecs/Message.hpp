@@ -167,6 +167,8 @@ template <class T>
 class MessageCallback : public AbstractMessageCallback
 {
 
+public:
+
   typedef void (T::*SetMessageFunc)(const Message&);
   typedef const Message (T::*GetMessageFunc)(const string&);
 
