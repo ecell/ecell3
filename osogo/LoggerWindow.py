@@ -359,10 +359,8 @@ class LoggerWindow(OsogoWindow):
 					aErrorMessage='\nLogger doesn\'t exist.!\n'
 					aWarningWindow = ConfirmWindow(0,aErrorMessage)
 					return None
-
                                 aLoggerStartTime= aLoggerStub.getStartTime()
 				aLoggerEndTime= aLoggerStub.getEndTime()
-
 				if aStartTime == -1 or anEndTime == -1:
 					# gets start time and end time from logger
 					aStartTime = aLoggerStartTime

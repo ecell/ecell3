@@ -11,9 +11,9 @@ from OsogoPluginWindow import *
 import gobject
 from ecell.ecssupport import *
 from Plot import *
-COL_LOG=0
+COL_LOG=2
 COL_PIX=1
-COL_ON=2
+COL_ON=0
 COL_TXT=3
 class PlotterPluginWindow( OsogoPluginWindow ):
 	#
@@ -32,19 +32,19 @@ class PlotterPluginWindow( OsogoPluginWindow ):
 		    gobject.TYPE_OBJECT, gobject.TYPE_BOOLEAN,\
 		    gobject.TYPE_STRING)
 		self.ListWindow.set_model(self.ListStore)
+		renderer4=gtk.CellRendererToggle()
+		renderer4.connect('toggled',self.trace_toggled,self.ListStore)
 		renderer=gtk.CellRendererToggle()
 		renderer.connect('toggled',self.toggle_pressed,self.ListStore)
 		renderer2=gtk.CellRendererPixbuf()
-		renderer4=gtk.CellRendererToggle()
-		renderer4.connect('toggled',self.trace_toggled,self.ListStore)
 		column1=gtk.TreeViewColumn('color',renderer2,pixbuf=COL_PIX)
-		column4=gtk.TreeViewColumn('on',renderer4,active=COL_ON)
-		column3=gtk.TreeViewColumn('lg',renderer,active=COL_LOG)
 		column2=gtk.TreeViewColumn('trace',gtk.CellRendererText(),text=COL_TXT)
-		self.ListWindow.append_column(column3)
-		self.ListWindow.append_column(column1)
-		self.ListWindow.append_column(column2)
+		column3=gtk.TreeViewColumn('lg',renderer,active=COL_LOG)
+		column4=gtk.TreeViewColumn('on',renderer4,active=COL_ON)
 		self.ListWindow.append_column(column4)
+		self.ListWindow.append_column(column1)
+		self.ListWindow.append_column(column3)
+		self.ListWindow.append_column(column2)
 		self.ListSelection=self.ListWindow.get_selection()
 		self.ListSelection.set_mode(gtk.SELECTION_MULTIPLE)
 		self.theWindow=self.getWidget(self.__class__.__name__)

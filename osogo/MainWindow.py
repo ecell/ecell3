@@ -119,11 +119,11 @@ class MainWindow(OsogoWindow):
 	def openWindow( self ):
 
 		OsogoWindow.openWindow(self)
-
-		# -------------------------------------
+		self['MainWindow'].connect('expose-event',self.expose)
 		# creates MessageWindow 
 		# -------------------------------------
-		self.theMessageWindow = MessageWindow.MessageWindow( self )
+		
+		self.theMessageWindow = MessageWindow.MessageWindow( self['textview1'] ) 
 		self.theMessageWindow.openWindow()
 
 		# -------------------------------------
@@ -231,6 +231,17 @@ class MainWindow(OsogoWindow):
 	def exitCompulsorily(self, *obj):
 		mainQuit()
 
+	def expose(self,obj,obj2):
+#	    print "obj1",obj
+#	    print "obj2",obj2
+#	    print "mainw",self['MainWindow'].get_child_requisition()
+#	    print "actual",self['MainWindow'].get_size()    
+#	    print "status",self['statusbar'].get_child_requisition()
+#	    print "menu",self['handlebox22'].get_child_requisition()
+#	    print "message",self['handlebox24'].get_child_requisition()
+#	    print "toolbar",self['hbox8'].get_child_requisition()
+	    pass
+	    
 	def setUnSensitiveMenu( self ):
 		self['palette_window_menu'].set_sensitive(0)
 		self['create_new_entity_list_menu'].set_sensitive(0)
@@ -1011,25 +1022,35 @@ class MainWindow(OsogoWindow):
 		# ------------------------------------------------------
 		#if button_obj.get_active() :
 		#if MessageWindowWillBeShown == gtk.TRUE:
-		if self.theMessageWindow.isShown == gtk.TRUE:
+		if self.theMessageWindow.isShown == gtk.FALSE:
 
 			# --------------------------------------------------
 			# If instance of Message Window Widget has destroyed,
 			# creates new instance of Message Window Widget.
 			# --------------------------------------------------
-			if ( self.theMessageWindow.getExist() == 0 ):
-				self.theMessageWindow.openWindow()
+			self['handlebox24'].hide()
+			dimensions=self['MainWindow'].get_size()
+			self.statusbar_req=self['statusbar'].get_child_requisition()
+			self.menubar_req=self['handlebox22'].get_child_requisition()
+			self.toolbar_req=self['hbox8'].get_child_requisition()
+			self.window_heigth_without_messagebox=self.statusbar_req[1]+\
+			    self.menubar_req[1]+self.toolbar_req[1]
+			self['MainWindow'].resize(dimensions[0],\
+			    self.window_heigth_without_messagebox)
+#			if ( self.theMessageWindow.getExist() == 0 ):
+#				self.theMessageWindow.openWindow()
+
 
 			# --------------------------------------------------
 			# If instance of Message Window Widget has not destroyed,
 			# calls show method of Message Window Widget.
 			# --------------------------------------------------
-			else:
-				self.theMessageWindow['MessageWindow'].hide()
-				self.theMessageWindow['MessageWindow'].show_all()
+#			else:
+#				self.theMessageWindow['MessageWindow'].hide()
+#				self.theMessageWindow['MessageWindow'].show_all()
 
-			self['message_togglebutton'].set_active(gtk.TRUE)
-			self['message_window_menu'].set_active(gtk.TRUE)
+#			self['message_togglebutton'].set_active(gtk.FALSE)
+#			self['message_window_menu'].set_active(gtk.TRUE)
 
 		# ------------------------------------------------------
 		# button or menu is toggled as non-active
@@ -1040,18 +1061,20 @@ class MainWindow(OsogoWindow):
 			# If instance of Message Window Widget has destroyed,
 			# does nothing.
 			# --------------------------------------------------
-			if ( self.theMessageWindow.getExist() == 0 ):
-				pass
+			self['handlebox24'].show()
+
+#			if ( self.theMessageWindow.getExist() == 0 ):
+#				pass
 
 			# --------------------------------------------------
 			# If instance of Message Window Widget has not destroyed,
 			# calls hide method of Message Window Widget.
 			# --------------------------------------------------
-			else:
-				self.theMessageWindow['MessageWindow'].hide()
+#			else:
+#				self.theMessageWindow['MessageWindow'].hide()
 
-			self['message_togglebutton'].set_active(gtk.FALSE)
-			self['message_window_menu'].set_active(gtk.FALSE)
+#			self['message_togglebutton'].set_active(gtk.FALSE)
+#			self['message_window_menu'].set_active(gtk.FALSE)
 
 
 	# end of toggleMessageWindow
@@ -1346,7 +1369,7 @@ class MainWindow(OsogoWindow):
 		# calls update method of each Window
 		# -------------------------------------------
 
-		self.theMessageWindow.update()
+#		self.theMessageWindow.update()
 		self.theLoggerWindow.update()
 		self.theInterfaceWindow.update()
 		self.theStepperWindow.update()

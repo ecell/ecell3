@@ -44,7 +44,7 @@ from gtk import *
 # MessageWindow -> OsogoWindow
 #   - manages MessageWindow
 # ---------------------------------------------------------------
-class MessageWindow(OsogoWindow):
+class MessageWindow:
 
 	# ---------------------------------------------------------------
 	# Constructor
@@ -52,14 +52,14 @@ class MessageWindow(OsogoWindow):
 	# return -> None
 	# This method is throwable exception.
 	# ---------------------------------------------------------------
-	def __init__( self, aMainWindow ):
+	def __init__( self, theMessageBox ):
 
 		#OsogoWindow.__init__( self )
-		OsogoWindow.__init__( self, aMainWindow )
+#		OsogoWindow.__init__( self, aMainWindow )
 		#OsogoWindow.openWindow(self)
 		#self.printMessage('')
 		self.theMessageBufferList=gtk.TextBuffer(None)
-		
+		self.theMessageBox=theMessageBox			
 	# end of __init__
 
 
@@ -133,10 +133,11 @@ class MessageWindow(OsogoWindow):
 	# ---------------------------------------------------------------
 	def openWindow( self ):
 
-		OsogoWindow.openWindow( self )
+		self.isShown=gtk.TRUE
+#		OsogoWindow.openWindow( self )
 #		self.printMessage( self.theMessageBufferList )
 #		self.theMessageBufferList = []
-		self["message_text_box"].set_buffer(self.theMessageBufferList)
+		self.theMessageBox.set_buffer(self.theMessageBufferList)
 
 	# end of openWindow
 

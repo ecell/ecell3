@@ -9,7 +9,7 @@ import operator
 from PlotterPluginWindow import *
 from Plot import *
 from ecell.ecssupport import *
-LoggerMinimumInterval=0.00000001
+LoggerMinimumInterval=0.000001
 
 class TracerWindow( PlotterPluginWindow ):
 

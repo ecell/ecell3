@@ -25,25 +25,30 @@ class Plot:
 	    self.ColorFullPNMap={"pen":"black", "background":"grey"} # key is FullPN, value color
 	    self.RawColorFullPNMap={}
 	    self.GCFullPNMap={} #replaces RawColorFullPNMap
-	    self.ColorList=["red","blue","orange","green",
-			    "purple","navy","brown","black",
-			    "white", "yellow","cyan","pink"]
+	    self.ColorList=["pink","cyan","yellow","navy",
+			    "brown","white","purple","black",
+			    "green", "orange","blue","red"]
 	    self.data_list=[] #list of displayed fullpnstrings
 	    self.trace_onoff={}
 	    self.available_colors=[]
 	    for acolor in self.ColorList:
 		self.available_colors.append(acolor)
 	    self.pixmapmap={} #key is color, value pixmap
-	    self.plotwidth=480
+	    self.plotwidth=600
 	    self.plotheigth=350
-	    self.plotarea=[70,20,370,300]
+	    self.origo=[70,320]
+
+	    self.plotarea=[self.origo[0],20,\
+		self.plotwidth-40-self.origo[0],\
+		self.origo[1]-20]
 	    self.plotaread=[self.plotarea[0],self.plotarea[1],\
 		self.plotarea[2]+self.plotarea[0],\
 		self.plotarea[3]+self.plotarea[1]]
-	    self.ylabelsarea=[0,0,69,325]
-	    self.xlabelsarea=[30,325,450,25]
-	    self.xticksarea=[70,322,410,3]
-	    self.origo=[70,320]
+	    self.ylabelsarea=[0,0,self.origo[0]-1,self.origo[1]+5]
+	    self.xlabelsarea=[self.plotarea[0]-30,self.origo[1]+5,\
+		    self.plotwidth-self.plotarea[0]+30,25]
+	    self.xticksarea=[self.origo[0],self.origo[1]+2,\
+		    self.plotwidth-self.origo[0],3]
 	    self.yaxis_x=self.origo[0]-1
 	    self.xaxis_y=self.origo[1]+1
 	    self.xaxislength=self.plotarea[2]+1
