@@ -143,117 +143,117 @@ System System( / )
         
         Process @(MAIN_PROCESS)( S32_transcription )
         {
-                VariableReferenceList   [ S0 Variable:/:DNAS32 -1 ] 
-                                        [ P0 Variable:/:mRNAS32 1 ]
-                                        [ P1 Variable:/:DNAS32 1];
+                VariableReferenceList   [ _ Variable:/:DNAS32 -1 ] 
+                                        [ _ Variable:/:mRNAS32 1 ]
+                                        [ _ Variable:/:DNAS32 1];
                 k       1.4e-3;
         }
         
         Process @(MAIN_PROCESS)( S32_translation )
         {
-                VariableReferenceList   [ S0 Variable:/:mRNAS32 -1 ]
-                                        [ P0 Variable:/:S32 1 ] 
-                                        [ P1 Variable:/:mRNAS32 1];
+                VariableReferenceList   [ _ Variable:/:mRNAS32 -1 ]
+                                        [ _ Variable:/:S32 1 ] 
+                                        [ _ Variable:/:mRNAS32 1];
                 k       0.07;
         
         }
         
         Process @(MAIN_PROCESS)( mRNAS32_degradation )
         {
-                VariableReferenceList   [ S0 Variable:/:mRNAS32 -1 ] 
-                                        [ P0 Variable:/:mRNAS32_Nothing 1 ];
+                VariableReferenceList   [ _ Variable:/:mRNAS32 -1 ] 
+                                        [ _ Variable:/:mRNAS32_Nothing 1 ];
                 k       1.4e-6;
         
         }
 
         Process @(MAIN_PROCESS)( E_S32_association )
         {
-                VariableReferenceList   [ S0 Variable:/:S32 -1 ]
-                                        [ P0 Variable:/:E_S32 1];
+                VariableReferenceList   [ _ Variable:/:S32 -1 ]
+                                        [ _ Variable:/:E_S32 1];
                 k       0.7;
         }
         
         Process @(MAIN_PROCESS)( E_S32_dissociation )
         {
-                VariableReferenceList   [ S0 Variable:/:E_S32 -1 ] 
-                                        [ P0 Variable:/:S32 1 ];
+                VariableReferenceList   [ _ Variable:/:E_S32 -1 ] 
+                                        [ _ Variable:/:S32 1 ];
                 k       0.13;
         }
         
         Process @(MAIN_PROCESS)( DnaJ_expression )
         {
-                VariableReferenceList   [ S0 Variable:/:DNADnaJ -1 ]
-                                        [ S1 Variable:/:E_S32 -1]
-                                        [ P0 Variable:/:DnaJ 1 ]
-                                        [ P1 Variable:/:DNADnaJ 1]
-                                        [ P2 Variable:/:S32 1];
+                VariableReferenceList   [ _ Variable:/:DNADnaJ -1 ]
+                                        [ _ Variable:/:E_S32 -1]
+                                        [ _ Variable:/:DnaJ 1 ]
+                                        [ _ Variable:/:DNADnaJ 1]
+                                        [ _ Variable:/:S32 1];
                 k       4.41e6;
         }
 
         Process @(MAIN_PROCESS)( DnaJ_degradation )
         {
-                VariableReferenceList   [ S0 Variable:/:DnaJ -1 ]
-                                        [ P0 Variable:/:DnaJ_Nothing 1];
+                VariableReferenceList   [ _ Variable:/:DnaJ -1 ]
+                                        [ _ Variable:/:DnaJ_Nothing 1];
                 k       6.4e-10;
         
         }
         
         Process @(MAIN_PROCESS)( S32_DnaJ_association )
         {
-                VariableReferenceList   [ S0 Variable:/:S32 -1 ]
-                                        [ S1 Variable:/:DnaJ -1 ]
-                                        [ P0 Variable:/:S32_DnaJ 1];
+                VariableReferenceList   [ _ Variable:/:S32 -1 ]
+                                        [ _ Variable:/:DnaJ -1 ]
+                                        [ _ Variable:/:S32_DnaJ 1];
                 k       3.27e5;
         }
         
         Process @(MAIN_PROCESS)( S32_DnaJ_dissociation )
         {
-                VariableReferenceList   [ S0 Variable:/:S32_DnaJ -1 ]
-                                        [ P0 Variable:/:S32 1 ]
-                                        [ P1 Variable:/:DnaJ 1];
+                VariableReferenceList   [ _ Variable:/:S32_DnaJ -1 ]
+                                        [ _ Variable:/:S32 1 ]
+                                        [ _ Variable:/:DnaJ 1];
                 k       4.4e-4;
         }
 
         Process @(MAIN_PROCESS)( FtsH_expression )
         {
-                VariableReferenceList   [ S0 Variable:/:DNAFtsH -1 ]
-                                        [ S1 Variable:/:E_S32 -1]
-                                        [ P0 Variable:/:FtsH 1 ]
-                                        [ P1 Variable:/:DNAFtsH 1]
+                VariableReferenceList   [ _ Variable:/:DNAFtsH -1 ]
+                                        [ _ Variable:/:E_S32 -1]
+                                        [ _ Variable:/:FtsH 1 ]
+                                        [ _ Variable:/:DNAFtsH 1]
                                         [ P2 Variable:/:S32 1];
                 k       4.41e6;
         }
         
         Process @(MAIN_PROCESS)( FtsH_degradation )
         {
-                VariableReferenceList   [ S0 Variable:/:FtsH -1 ]
-                                        [ P0 Variable:/:FtsH_Nothing 1 ];
+                VariableReferenceList   [ _ Variable:/:FtsH -1 ]
+                                        [ _ Variable:/:FtsH_Nothing 1 ];
                 k       7.4e-11;#
         }
         
         Process @(MAIN_PROCESS)( S32_degradation )
         {
-                VariableReferenceList   [ S0 Variable:/:S32_DnaJ -1 ]
-                                        [ S1 Variable:/:FtsH -1]
-                                        [ P0 Variable:/:DnaJ 1 ]
-                                        [P1 Variable:/:FtsH 1];
+                VariableReferenceList   [ _ Variable:/:S32_DnaJ -1 ]
+                                        [ _ Variable:/:FtsH -1]
+                                        [ _ Variable:/:DnaJ 1 ]
+                                        [_ Variable:/:FtsH 1];
                 k       1.28e3;#
         }
 
         Process @(MAIN_PROCESS)( GroEL_expression )
         {
-                VariableReferenceList   [ S0 Variable:/:DNAGroEL -1 ]
-                                        [ S1 Variable:/:E_S32 -1]
-                                        [ P0 Variable:/:GroEL 1 ]
-                                        [ P1 Variable:/:DNAGroEL 1]
-                                        [ P2 Variable:/:S32 1];
+                VariableReferenceList   [ _ Variable:/:DNAGroEL -1 ]
+                                        [ _ Variable:/:E_S32 -1]
+                                        [ _ Variable:/:GroEL 1 ]
+                                        [ _ Variable:/:DNAGroEL 1]
+                                        [ _ Variable:/:S32 1];
                 k       5.69e6;
         }
         
         Process @(MAIN_PROCESS)( GroEL_degradation )
         {
-                VariableReferenceList   [ S0 Variable:/:GroEL -1 ]
-                                        [ P0 Variable:/:GroEL_Nothing 1 ];
+                VariableReferenceList   [ _ Variable:/:GroEL -1 ]
+                                        [ _ Variable:/:GroEL_Nothing 1 ];
                 k       1.8e-8;
         }
 
@@ -266,26 +266,26 @@ System System( / )
         Process @(HYBRID_PROCESS)( Unfold )
         {
                 StepperID @HYBRID_STEPPER;
-                VariableReferenceList   [ S0 Variable:/:Protein -1]
-                                        [ P0 Variable:/:UnProtein 1];
+                VariableReferenceList   [ _ Variable:/:Protein -1]
+                                        [ _ Variable:/:UnProtein 1];
                 k       @(UNFOLD);
         }
 
         Process @(HYBRID_PROCESS)( UnProteinBinding )
         {
                 StepperID @HYBRID_STEPPER;
-                VariableReferenceList   [S0 Variable:/:DnaJ -1]
-                                        [S1 Variable:/:UnProtein -1]
-                                        [P0 Variable:/:DnaJ_UnProtein 1]; 
+                VariableReferenceList   [_ Variable:/:DnaJ -1]
+                                        [_ Variable:/:UnProtein -1]
+                                        [_ Variable:/:DnaJ_UnProtein 1]; 
                 k       @(UNPROTEIN_BINDING);
         }
 
         Process @(HYBRID_PROCESS)( Refold )
         {
                 StepperID @HYBRID_STEPPER;
-                VariableReferenceList   [S0 Variable:/:DnaJ_UnProtein -1]
-                                        [P0 Variable:/:Protein 1] 
-                                        [P1 Variable:/:DnaJ 1];
+                VariableReferenceList   [_ Variable:/:DnaJ_UnProtein -1]
+                                        [_ Variable:/:Protein 1] 
+                                        [_ Variable:/:DnaJ 1];
                 k       @(REFOLD);
         }
         
