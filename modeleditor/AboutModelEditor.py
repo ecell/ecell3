@@ -45,14 +45,11 @@ class  AboutModelEditor:
 		
 		
 		ViewComponent( self.win.vbox, 'attachment_box', 'AboutModelEditor.glade' )
-		iconPixbuf = None
-		try:
-			import os
-			iconPixbuf = gtk.gdk.pixbuf_new_from_file(os.environ['MEPATH'] + os.sep + "glade" + os.sep + "modeleditor.ico")
-		except:
-			pass
-		self.win.set_icon(iconPixbuf)
-
+		aPixbuf16 = gtk.gdk.pixbuf_new_from_file( os.environ['MEPATH'] +
+                                os.sep + "glade" + os.sep + "modeleditor.png")
+		aPixbuf32 = gtk.gdk.pixbuf_new_from_file( os.environ['MEPATH'] +
+                                os.sep + "glade" + os.sep + "modeleditor32.png")
+		self.win.set_icon_list(aPixbuf16, aPixbuf32)
 		
 		self.win.show_all()
 		

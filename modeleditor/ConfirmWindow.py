@@ -31,6 +31,7 @@
 #
 
 import gtk 
+import os
 
 # Constants for ConfirmWindow
 OK_MODE = 0
@@ -71,13 +72,11 @@ class ConfirmWindow(gtk.Dialog):
 		self.win.set_border_width(2)
 		self.win.set_default_size(300,75)
 		self.win.set_position(gtk.WIN_POS_MOUSE)
-		iconPixbuf = None
-		try:
-			import os
-			iconPixbuf = gtk.gdk.pixbuf_new_from_file(os.environ['MEPATH'] + os.sep + "glade" + os.sep + "modeleditor.ico")
-		except:
-			pass
-		self.win.set_icon(iconPixbuf)
+		aPixbuf16 = gtk.gdk.pixbuf_new_from_file( os.environ['MEPATH'] +
+                                os.sep + "glade" + os.sep + "modeleditor.png")
+		aPixbuf32 = gtk.gdk.pixbuf_new_from_file( os.environ['MEPATH'] +
+                                os.sep + "glade" + os.sep + "modeleditor32.png")
+		self.win.set_icon_list(aPixbuf16, aPixbuf32)
 		self.win.show()
 
 		# Sets title

@@ -12,7 +12,7 @@
   <property name="resizable">True</property>
   <property name="destroy_with_parent">False</property>
   <property name="has_separator">True</property>
-  <property name="icon">modeleditor.ico</property>
+  <property name="icon">modeleditor.png</property>
 
   <child internal-child="vbox">
     <widget class="GtkVBox" id="dialog-vbox1">

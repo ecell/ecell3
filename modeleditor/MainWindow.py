@@ -100,6 +100,9 @@ class MainWindow( ListWindow ):
 		self['textview1'].set_buffer(self.theMessageBuffer)
 		endIter=self.theMessageBuffer.get_end_iter()
 		self.endMark=self.theMessageBuffer.create_mark('EM',endIter,gtk.FALSE)
+                self.setIconList( os.environ['MEPATH'] + os.sep + "glade" +
+                     os.sep + "modeleditor.png", os.environ['MEPATH'] + os.sep
+                     + "glade" + os.sep + "modeleditor32.png" )	
 		# update 
 		self.update()
 
@@ -296,8 +299,11 @@ class MainWindow( ListWindow ):
 
 		# set init path for dialog
 		aDialog.set_filename( defaultName )
-		iconPixbuf = gtk.gdk.pixbuf_new_from_file(os.environ['MEPATH'] + os.sep + "glade" + os.sep + "modeleditor.ico")
-		aDialog.set_icon(iconPixbuf)
+                aPixbuf16 = gtk.gdk.pixbuf_new_from_file( os.environ['MEPATH'] +
+                        os.sep + "glade" + os.sep + "modeleditor.png")
+		aPixbuf32 = gtk.gdk.pixbuf_new_from_file( os.environ['MEPATH'] +
+                        os.sep + "glade" + os.sep + "modeleditor32.png")
+		aDialog.set_icon_list(aPixbuf16, aPixbuf32)
 		aDialog.set_title("Select a file name")
 		aDialog.show_fileop_buttons( )
 

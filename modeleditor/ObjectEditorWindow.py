@@ -80,10 +80,11 @@ class ObjectEditorWindow :
 
 		# Sets title
 		self.win.set_title("ObjectEditor")
-		iconPixbuf = None
-		iconPixbuf = gtk.gdk.pixbuf_new_from_file(os.environ['MEPATH'] \
-				+ os.sep + 'glade' + os.sep + "modeleditor.ico")
-		self.win.set_icon(iconPixbuf)
+		aPixbuf16 = gtk.gdk.pixbuf_new_from_file( os.environ['MEPATH'] +
+                                os.sep + "glade" + os.sep + "modeleditor.png")
+		aPixbuf32 = gtk.gdk.pixbuf_new_from_file( os.environ['MEPATH'] +
+                                os.sep + "glade" + os.sep + "modeleditor32.png")
+		self.win.set_icon_list(aPixbuf16, aPixbuf32)
 
 		self.theComponent=None
 		self.theShapeProperty=None
