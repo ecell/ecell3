@@ -16,6 +16,9 @@ import LoggerWindow
 
 import string
 
+def false():
+    return false
+
 class MainWindow(Window):
 
     def __init__( self ):
@@ -75,10 +78,11 @@ class MainWindow(Window):
         self.theMessageWindowWindow = self.theMessageWindow[ 'message_window' ]
         self.theMessageWindowWindow.hide()
 
-        ### initialize for run() method ###
-        #self.theSimulator.setPendingEventChecker( gtk.events_pending )
-        #self.theSimulator.setEventHandler( gtk.mainiteration  )
-        #self.theSimulator.run()
+        ### initialize for run method ###
+        self.theSimulator.setPendingEventChecker( gtk.events_pending )
+        #self.theSimulator.setPendingEventChecker( false )
+        self.theSimulator.setEventHandler( gtk.mainiteration  )
+        
 
     ###### window operation ####
     def closeParentWindow( self, button_obj):
@@ -117,9 +121,11 @@ class MainWindow(Window):
 
     def startSimulation( self, a ) :
         self.printMessage( "start\n" )
+        self.theSimulator.run();
 
     def stopSimulation( self, a ) :
         self.printMessage( 'this function STOP is not supported.\n' )
+        self.theSimulator.stop();
 
     def stepSimulation( self, a ) : 
         self.theCurrentTime += 1
