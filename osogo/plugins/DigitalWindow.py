@@ -6,77 +6,96 @@ from ecell.ecssupport import *
 import GTK
 import operator
 
+# ------------------------------------------------------
+# DigitalWindow -> OsogoPluginWindow
+#   - show one numerical property 
+# ------------------------------------------------------
 class DigitalWindow( OsogoPluginWindow ):
 
-    def __init__( self, dirname, data, pluginmanager, root=None ):
-	
+	# ------------------------------------------------------
+	# Constructor
+	# 
+	# aDirName:  directory name that includes glade file
+	# data:      RawFullPN
+	# aPluginManager
+	# return -> None
+	# ------------------------------------------------------
+	def __init__( self, aDirName, aData, aPluginManager, aRoot=None ):
 
-        #PluginWindow.__init__( self, dirname, data, pluginmanager, root )
-        OsogoPluginWindow.__init__( self, dirname, data, pluginmanager, root )
+		# calla constructor of superclass
+		OsogoPluginWindow.__init__( self, aDirName, aData, aPluginManager, aRoot )
         
-        self.theSession = pluginmanager.theSession
-        aFullPNString = createFullPNString( self.theFullPN() )
+		aFullPNString = createFullPNString( self.theFullPN() )
+		aValue = self.theSession.theSimulator.getProperty( aFullPNString )
 
-        aValue = self.theSession.theSimulator.getProperty( aFullPNString )
+		if operator.isNumberType( aValue[0] ):
+			self.thePluginManager.appendInstance( self )
 
-        if operator.isNumberType( aValue[0] ):
+			# ----------------------------------------------------------------
+			self['toolbar5'].set_style( GTK.TOOLBAR_ICONS )
+			self['toolbar5'].set_button_relief( GTK.RELIEF_HALF )
 
-            #self.openWindow()
-            self.thePluginManager.appendInstance( self )
-            #PluginWindow.initialize( self, root )
-            #OsogoPluginWindow.initialize( self, root )
-            self.initialize()
+			self.addHandlers( { 'input_value'    :self.inputValue,
+		  	            'increase_value' :self.increaseValue,
+			            'decrease_value' :self.decreaseValue,
+			            'window_exit'    :self.exit,
+			            'test'           :self.test } )
 
-        else:
-            self.theSession.printMessage( "%s: not numerical data\n" % aFullPNString )
+			aString = str( self.theFullPN()[ID] )
+			aString += ':\n' + str( self.theFullPN()[PROPERTY] )
+			self["id_label"].set_text( aString )
+			self.update()
+			# ----------------------------------------------------------------
 
-        if len( self.theFullPNList() ) > 1:
-            aClassName = self.__class__.__name__
-            self.thePluginManager.createInstance( aClassName, self.theFullPNList()[1:], root )
+		else:
+			self.thePluginManager.printMessage( "%s: (%s) not numerical data.\n" 
+			                            %(self.getTitle(),aFullPNString) )
+
+		if len( self.theFullPNList() ) > 1:
+			self.addPopupMenu(1,1,1)
+		else:
+			self.addPopupMenu(0,1,1)
+
+		#if len( self.theFullPNList() ) > 1:
+		#	self.thePopupMenu.addFullPNList( self.theFullPNList() )
+		#	aClassName = self.__class__.__name__
+		#	self.thePluginManager.createInstance( aClassName, self.theFullPNList()[1:], aRoot )
+
+	def changeFullPN( self, anObject ):
+
+		OsogoPluginWindow.changeFullPN( self, anObject )
+
+		aString = str( self.theFullPN()[ID] )
+		aString += ':\n' + str( self.theFullPN()[PROPERTY] )
+		self["id_label"].set_text( aString )
+
+	# end of changeFullPN
 
 
-    def initialize( self ):
+	def update( self ):
+		self["value_frame"].set_text( str( self.getValue( self.theFullPN() ) ) )
 
-        self['toolbar5'].set_style( GTK.TOOLBAR_ICONS )
-        self['toolbar5'].set_button_relief( GTK.RELIEF_HALF )
 
-        self.addHandlers( { 'input_value'    :self.inputValue,
-                            'increase_value' :self.increaseValue,
-                            'decrease_value' :self.decreaseValue,
-          		    'window_exit'    :self.exit,
-                            'test'           :self.test } )
+	def inputValue( self, obj ):
+		aValue =  string.atof(obj.get_text())
+		self.setValue( self.theFullPN(), aValue )
 
-        aString = str( self.theFullPN()[ID] )
-        aString += ':\n' + str( self.theFullPN()[PROPERTY] )
-        self["id_label"].set_text( aString )
-        self.update()
+
+	def increaseValue( self, obj ):
+
+		if self.getValue( self.theFullPN() ):
+			self.setValue( self.theFullPN(), self.getValue( self.theFullPN() ) * 2.0 )
+		else:
+			self.setValue( self.theFullPN(), 1.0 )
         
 
-    def update( self ):
-        self["value_frame"].set_text( str( self.getValue( self.theFullPN() ) ) )
+	def decreaseValue( self, obj ):
 
-
-    def inputValue( self, obj ):
-
-        aValue =  string.atof(obj.get_text())
-        self.setValue( self.theFullPN(), aValue )
-
-
-    def increaseValue( self, obj ):
-
-        if self.getValue( self.theFullPN() ):
-            self.setValue( self.theFullPN(), self.getValue( self.theFullPN() ) * 2.0 )
-        else:
-            self.setValue( self.theFullPN(), 1.0 )
-        
-
-    def decreaseValue( self, obj ):
-
-        self.setValue( self.theFullPN(), self.getValue( self.theFullPN() ) * 0.5 )
+		self.setValue( self.theFullPN(), self.getValue( self.theFullPN() ) * 0.5 )
 
 			
-    def test( self, obj ):
-        print 'you did it'
+	def test( self, obj ):
+		print 'you did it'
 
 ### test code
 
@@ -95,7 +114,7 @@ if __name__ == "__main__":
 
     fpn = ('Substance','/CELL/CYTOPLASM','ATP','Quantity')
 
-    def mainQuit( obj, data ):
+    def mainQuit( obj, aData ):
         gtk.mainquit()
         
     def mainLoop():

@@ -8,123 +8,122 @@ import GTK
 
 class SubstanceWindow( OsogoPluginWindow ):
 
-    def __init__( self, dirname,  data, pluginmanager, root=None ):
+	def __init__( self, dirname,  data, pluginmanager, root=None ):
         
-        #PluginWindow.__init__( self, dirname, data, pluginmanager, root )
-        OsogoPluginWindow.__init__( self, dirname, data, pluginmanager, root )
+		OsogoPluginWindow.__init__( self, dirname, data, pluginmanager, root )
 
-        #self.openWindow()
-        self.thePluginManager.appendInstance( self )    
-        #PluginWindow.initialize( self, root )
-        #OsogoPluginWindow.initialize( self, root )
-        self.initialize()
-
-        self.theSession = pluginmanager.theSession
+		self.thePluginManager.appendInstance( self )    
+		#self.initialize()
+		# ------------------------------------------------------------
+		# 0 : not fixed  1: fixed
+		self.theFixFlag = 0
         
-        if len( self.theFullPNList() ) > 1:
-            i = 1
-            preFullID = self.theFullID()
-            aClassName = self.__class__.__name__
-            while i < len( self.theFullPNList() ):
-                aFullID = self.theFullIDList()[i]
-                if aFullID != preFullID:
-                    self.thePluginManager.createInstance( aClassName, (self.theFullPNList()[i],), root)
-                preFullID = aFullID
-                i = i + 1
+		self['toolbar1'].set_style( GTK.TOOLBAR_ICONS )
+		self['toolbar1'].set_button_relief( GTK.RELIEF_HALF )
+		self['toolbar2'].set_style( GTK.TOOLBAR_ICONS )
+		self['toolbar2'].set_button_relief( GTK.RELIEF_HALF )
+		self['toolbar3'].set_style( GTK.TOOLBAR_ICONS )
+		self['toolbar3'].set_button_relief( GTK.RELIEF_HALF )
+		self['toolbar4'].set_style( GTK.TOOLBAR_ICONS )
+		self['toolbar4'].set_button_relief( GTK.RELIEF_HALF )        
+        
+		self.addHandlers( {'button_toggled': self.fix_mode,
+		                   'qty_increase_pressed': self.increaseQuantity, 
+		                   'qty_decrease_pressed': self.decreaseQuantity,
+		                   'concentration_increase_pressed': self.increaseConcentration,
+		                   'concentration_decrease_pressed': self.decreaseConcentration,
+		                   'input_quantity': self.inputQuantity,
+		                   'input_concentration': self.inputConcentration,
+		                   'window_exit' : self.exit } )
+
+		self.theQtyFPN = convertFullIDToFullPN( self.theFullID(), 'Quantity' )
+		self.theConcFPN = convertFullIDToFullPN( self.theFullID(), 'Concentration' )
+
+		aFullIDString = createFullIDString( self.theFullID() )
+		self["id_label"].set_text( aFullIDString )
+
+		self.update()
+		# ------------------------------------------------------------
+
+		self.theSession = pluginmanager.theSession
+        
+		#if len( self.theFullPNList() ) > 1:
+		#	i = 1
+		#	preFullID = self.theFullID()
+		#	aClassName = self.__class__.__name__
+		#	while i < len( self.theFullPNList() ):
+		#		aFullID = self.theFullIDList()[i]
+		#		if aFullID != preFullID:
+		#			self.thePluginManager.createInstance( aClassName, (self.theFullPNList()[i],), root)
+		#		preFullID = aFullID
+		#		i = i + 1
 
         
-    def initialize( self ):
-
-        # 0 : not fixed  1: fixed
-        self.theFixFlag = 0
-        
-        self['toolbar1'].set_style( GTK.TOOLBAR_ICONS )
-        self['toolbar1'].set_button_relief( GTK.RELIEF_HALF )
-        self['toolbar2'].set_style( GTK.TOOLBAR_ICONS )
-        self['toolbar2'].set_button_relief( GTK.RELIEF_HALF )
-        self['toolbar3'].set_style( GTK.TOOLBAR_ICONS )
-        self['toolbar3'].set_button_relief( GTK.RELIEF_HALF )
-        self['toolbar4'].set_style( GTK.TOOLBAR_ICONS )
-        self['toolbar4'].set_button_relief( GTK.RELIEF_HALF )        
-        
-        self.addHandlers( {'button_toggled': self.fix_mode,
-                           'qty_increase_pressed': self.increaseQuantity, 
-                           'qty_decrease_pressed': self.decreaseQuantity,
-                           'concentration_increase_pressed': self.increaseConcentration,
-                           'concentration_decrease_pressed': self.decreaseConcentration,
-                           'input_quantity': self.inputQuantity,
-                           'input_concentration': self.inputConcentration,
-				   'window_exit' : self.exit } )
-
-        self.theQtyFPN = convertFullIDToFullPN( self.theFullID(), 'Quantity' )
-        self.theConcFPN = convertFullIDToFullPN( self.theFullID(), 'Concentration' )
-
-        aFullIDString = createFullIDString( self.theFullID() )
-        self["id_label"].set_text( aFullIDString )
-
-        self.update()
+		if len( self.theFullPNList() ) > 1:
+			self.addPopupMenu(1,1,1)
+		else:
+			self.addPopupMenu(0,1,1)
 
 
-    def update( self ):
+	def update( self ):
 
-        self.theQtyValue = self.getValue( self.theQtyFPN )
-        self.theConcValue = self.getValue( self.theConcFPN )
-        self['Quantity_entry'].set_text( str( self.theQtyValue ) )
-        self['Concentration_entry'].set_text( str( self.theConcValue ) )
+		self.theQtyValue = self.getValue( self.theQtyFPN )
+		self.theConcValue = self.getValue( self.theConcFPN )
+		self['Quantity_entry'].set_text( str( self.theQtyValue ) )
+		self['Concentration_entry'].set_text( str( self.theConcValue ) )
     
 
-    def fix_mode( self, a ) :
-
-        self.theFixFlag = 1 - self.theFixFlag
-        if self.theFixFlag == 0:
-            self.theSession.printMessage( "not fixed\n" )
-        else:
-            self.theSession.printMessage( "fixed\n" )
-
-
-    def inputQuantity( self, obj ):
-
-        self.theQtyValue = string.atof( obj.get_text() )
-        self.setValue( self.theQtyFPN, self.theQtyValue )
+	def fix_mode( self, a ) :
+		self.theFixFlag = 1 - self.theFixFlag
+		if self.theFixFlag == 0:
+			self.theSession.printMessage( "not fixed\n" )
+		else:
+			self.theSession.printMessage( "fixed\n" )
 
 
-    def inputConcentration( self, obj ):
+	def inputQuantity( self, obj ):
+
+		self.theQtyValue = string.atof( obj.get_text() )
+		self.setValue( self.theQtyFPN, self.theQtyValue )
+
+
+	def inputConcentration( self, obj ):
         
-        self.theConcValue = string.atof( obj.get_text() )
-        self.setValue( self.theConcFPN, self.theConcValue )
+		self.theConcValue = string.atof( obj.get_text() )
+		self.setValue( self.theConcFPN, self.theConcValue )
 
 
-    def increaseQuantity( self, button_object ):
+	def increaseQuantity( self, button_object ):
 
-        if self.getValue( self.theQtyFPN ):
-           self.theQtyValue *= 2.0
-        else:
-           self.theQtyValue = 1.0
+		if self.getValue( self.theQtyFPN ):
+			self.theQtyValue *= 2.0
+		else:
+			self.theQtyValue = 1.0
 
-        self.setValue( self.theQtyFPN, self.theQtyValue )
-
-
-    def decreaseQuantity( self, button_object ):
-
-        self.theQtyValue *= 0.5
-        self.setValue( self.theQtyFPN, self.theQtyValue )
+		self.setValue( self.theQtyFPN, self.theQtyValue )
 
 
-    def increaseConcentration( self, button_object ):
+	def decreaseQuantity( self, button_object ):
 
-        self.theConcValue *= 2.0
-        self.setValue( self.theConcFPN, self.theConcValue )
+		self.theQtyValue *= 0.5
+		self.setValue( self.theQtyFPN, self.theQtyValue )
 
 
-    def decreaseConcentration( self, button_object ):
+	def increaseConcentration( self, button_object ):
 
-        self.theConcValue *= 0.5
-        self.setValue( self.theConcFPN, self.theConcValue )
+		self.theConcValue *= 2.0
+		self.setValue( self.theConcFPN, self.theConcValue )
+
+
+	def decreaseConcentration( self, button_object ):
+
+		self.theConcValue *= 0.5
+		self.setValue( self.theConcFPN, self.theConcValue )
 
     
-    def mainLoop():
-        # FIXME: should be a custom function
-        gtk.mainloop()
+	def mainLoop():
+		# FIXME: should be a custom function
+		gtk.mainloop()
 
 if __name__ == "__main__":
 

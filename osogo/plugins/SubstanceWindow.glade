@@ -15,10 +15,16 @@
 <widget>
   <class>GtkWindow</class>
   <name>SubstanceWindow</name>
+  <events>GDK_BUTTON_PRESS_MASK | GDK_KEY_PRESS_MASK</events>
   <signal>
     <name>destroy</name>
     <handler>window_exit</handler>
     <last_modification_time>Mon, 25 Feb 2002 09:36:51 GMT</last_modification_time>
+  </signal>
+  <signal>
+    <name>button_press_event</name>
+    <handler>button_press_event</handler>
+    <last_modification_time>Thu, 04 Jul 2002 11:40:41 GMT</last_modification_time>
   </signal>
   <title>SubstanceWindow</title>
   <type>GTK_WINDOW_TOPLEVEL</type>

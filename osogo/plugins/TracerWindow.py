@@ -17,172 +17,180 @@ from ecell.ecssupport import *
 
 class TracerWindow( OsogoPluginWindow ):
 
-    def __init__( self, dirname, data, pluginmanager, root=None ):
+	def __init__( self, dirname, data, pluginmanager, root=None ):
 
-        #PluginWindow.__init__( self, dirname, data, pluginmanager, root )
-        OsogoPluginWindow.__init__( self, dirname, data, pluginmanager, root )
-        IDflag = 1
-        if len( self.theFullPNList() ) > 1:
-            for aFullID in self.theFullIDList():
-                if aFullID == self.theFullID():
-                    IDflag = 0
-                else:
-                    IDflag = 1
+
+		#PluginWindow.__init__( self, dirname, data, pluginmanager, root )
+		OsogoPluginWindow.__init__( self, dirname, data, pluginmanager, root )
+		IDflag = 1
+		if len( self.theFullPNList() ) > 1:
+			for aFullID in self.theFullIDList():
+				if aFullID == self.theFullID():
+					IDflag = 0
+				else:
+					IDflag = 1
+
         
-        self.theSession = pluginmanager.theSession
-        aFullPNString = createFullPNString( self.theFullPN() )
-        if IDflag == 1:
-            aValue = self.theSession.theSimulator.getProperty( aFullPNString )
-            if operator.isNumberType( aValue[0] ):
-                #self.openWindow()
-                self.thePluginManager.appendInstance( self )                    
-                #PluginWindow.initialize( self, root )
-                #OsogoPluginWindow.initialize( self, root )
-                self.initialize()
-            else:
-                self.theSession.printMessage( "%s: not numerical data\n" % aFullPNString )                    
+		self.theSession = pluginmanager.theSession
+		aFullPNString = createFullPNString( self.theFullPN() )
+
+
+		if IDflag == 1:
+			aValue = self.theSession.theSimulator.getProperty( aFullPNString )
+			if operator.isNumberType( aValue[0] ):
+				self.thePluginManager.appendInstance( self )                    
+				#self.initialize()
+				# ------------------------------------------------------
+				self.xaxis = None
+				self.yaxis = None
+				self.scale = "linear"
+				self.arg = 0
+				self.step_size = 0
+				self.StartTime = 0
+				self.theLoggerList = []
+				self.theDataList = []
+				self.xList = []
+				self.yList = []
+				self.FullDataList = []
+
+				self['toolbar1'].set_style(GTK.TOOLBAR_ICONS)
+				self.addHandlers( { 'on_button9_clicked' : self.popInputWindow,
+				                    'checkbutton1_clicked' : self.changeScale } )
+				                    #'window_exit' : self.exit,
+        
+				aWindowWidget = self.getWidget( 'frame8' )
+				self.theColorMap = aWindowWidget.get_colormap()
+
+				self.canvas = GtkPlotCanvas(450,300)
+				self.canvas.set_background( self.theColorMap.alloc("light blue") )
+
+
+				self.plot = GtkPlot(width=0.8, height=0.8)
+				self.plot.set_background( self.theColorMap.alloc("white") )
+				self.plot.set_yscale(PLOT_SCALE_LINEAR)
+				self.plot.autoscale()
+				self.plot.axis_set_ticks(PLOT_AXIS_X, 1, 1)
+				self.plot.axis_set_visible(PLOT_AXIS_RIGHT, FALSE)
+				self.plot.axis_set_visible(PLOT_AXIS_TOP, FALSE)
+				self.plot.grids_set_visible(TRUE, FALSE, TRUE, FALSE)
+				self.plot.major_hgrid_set_attributes( PLOT_LINE_SOLID, 1.0,
+				                                     self.theColorMap.alloc("light blue") )
+				self.plot.major_vgrid_set_attributes( PLOT_LINE_SOLID, 1.0,
+				                                     self.theColorMap.alloc("light blue") )
+
+
+				self.plot.axis_hide_title(PLOT_AXIS_TOP)
+				self.plot.axis_hide_title(PLOT_AXIS_RIGHT)
+				self.plot.axis_hide_title(PLOT_AXIS_LEFT)
+				self.plot.axis_hide_title(PLOT_AXIS_BOTTOM)                
+				self.plot.hide_legends()
+				self.canvas.add_plot(self.plot, 0.16, 0.05)
+				self.theDataList = []
+				for num in range( 2,9 ):
+					data = GtkPlotData()
+					data.set_symbol(PLOT_SYMBOL_NONE, PLOT_SYMBOL_OPAQUE, 0, 0, self.getColor(num-2))
+					data.set_line_attributes(PLOT_LINE_SOLID, 1, self.getColor(num-2))
+        
+					self.plot.add_data(data)
+					self.theDataList.append(data)
+
+				self['frame8'].add(self.canvas)
+
+				self.createLogger()
+				self.plot.clip_data(TRUE)
+
+				aWindowWidget.show_all()
+				self.update()
+				# ------------------------------------------------------
+
+			else:
+				self.thePluginManager.printMessage( "%s: not numerical data\n" % aFullPNString )                    
                 
-        else:
-            aClassName = self.__class__.__name__
-            for aFullPN in self.theFullPNList():
-                if self.theSession.theSimulator.isNumber( aFullPN ):
-                    a = self.thePluginManager.createInstance( aClassName, (aFullPN,), root)
-                else:
-                    aFullPNString = createFullPNString( self.theFullPN() )     
-                    self.theSession.printMessage( "%s: not numerical data\n" % aFullPNString )                    
-            
+		else:
+			aClassName = self.__class__.__name__
+			for aFullPN in self.theFullPNList():
+				if self.theSession.theSimulator.isNumber( aFullPN ):
+					a = self.thePluginManager.createInstance( aClassName, (aFullPN,), root)
+				else:
+					aFullPNString = createFullPNString( self.theFullPN() )     
+					self.theSession.printMessage( "%s: not numerical data\n" % aFullPNString )                    
+		self.addPopupMenu(0,1,0)
 
-    def initialize( self ):
-        self.xaxis = None
-        self.yaxis = None
-        self.scale = "linear"
-        self.arg = 0
-        self.step_size = 0
-        self.StartTime = 0
-        self.theLoggerList = []
-        self.theDataList = []
-        self.xList = []
-        self.yList = []
-        self.FullDataList = []
+	# end of __init__
 
-        self['toolbar1'].set_style(GTK.TOOLBAR_ICONS)
-        self.addHandlers( { 'on_button9_clicked' : self.popInputWindow,
-                            'checkbutton1_clicked' : self.changeScale } )
-        
-        aWindowWidget = self.getWidget( 'frame8' )
-        self.theColorMap = aWindowWidget.get_colormap()
+	def popInputWindow(self, obj):
 
-        self.canvas = GtkPlotCanvas(450,300)
-        self.canvas.set_background( self.theColorMap.alloc("light blue") )
+		Window.__init__(self, 'plugins/InputWindow.glade',None)
 
-        self.plot = GtkPlot(width=0.8, height=0.8)
-        self.plot.set_background( self.theColorMap.alloc("white") )
-        self.plot.set_yscale(PLOT_SCALE_LINEAR)
-        self.plot.autoscale()
-        self.plot.axis_set_ticks(PLOT_AXIS_X, 1, 1)
-        self.plot.axis_set_visible(PLOT_AXIS_RIGHT, FALSE)
-        self.plot.axis_set_visible(PLOT_AXIS_TOP, FALSE)
-        self.plot.grids_set_visible(TRUE, FALSE, TRUE, FALSE)
-        self.plot.major_hgrid_set_attributes( PLOT_LINE_SOLID, 1.0,
-                                              self.theColorMap.alloc("light blue") )
-        self.plot.major_vgrid_set_attributes( PLOT_LINE_SOLID, 1.0,
-                                              self.theColorMap.alloc("light blue") )
-        self.plot.axis_hide_title(PLOT_AXIS_TOP)
-        self.plot.axis_hide_title(PLOT_AXIS_RIGHT)
-        self.plot.axis_hide_title(PLOT_AXIS_LEFT)
-        self.plot.axis_hide_title(PLOT_AXIS_BOTTOM)                
-        self.plot.hide_legends()
-        self.canvas.add_plot(self.plot, 0.16, 0.05)
-        self.theDataList = []
-        for num in range( 2,9 ):
-            data = GtkPlotData()
-            data.set_symbol(PLOT_SYMBOL_NONE, PLOT_SYMBOL_OPAQUE, 0, 0, self.getColor(num-2))
-            data.set_line_attributes(PLOT_LINE_SOLID, 1, self.getColor(num-2))
-        
-            self.plot.add_data(data)
-            self.theDataList.append(data)
+		self.addHandlers({'entry1_activate' : self.changexaxis,
+		                  'entry2_activate' : self.changeyaxis,
+		                  'entry3_activate' : self.changeyaxis,
+		                  'entry4_activate' : self.changeyaxis,
+		                  'entry5_activate' : self.changeyaxis,
+		                  'entry6_activate' : self.changeyaxis,
+		                  'entry7_activate' : self.changeyaxis,
+		                  'entry8_activate' : self.changeyaxis,
+		                 })
 
-        self['frame8'].add(self.canvas)
+		for num in range( 1,8 ):
+			self['toolbar%i'%num].set_style(GTK.TOOLBAR_ICONS)
 
-        self.createLogger()
-        self.plot.clip_data(TRUE)
-
-        aWindowWidget.show_all()
-        self.update()
-
-
-    def popInputWindow(self, obj):
-
-	Window.__init__(self, 'plugins/InputWindow.glade',None)
-
-        self.addHandlers({'entry1_activate' : self.changexaxis,
-                          'entry2_activate' : self.changeyaxis,
-                          'entry3_activate' : self.changeyaxis,
-                          'entry4_activate' : self.changeyaxis,
-                          'entry5_activate' : self.changeyaxis,
-                          'entry6_activate' : self.changeyaxis,
-                          'entry7_activate' : self.changeyaxis,
-                          'entry8_activate' : self.changeyaxis,
-                          })
-
-#        self['togglebutton2'].set_mode(TRUE)
-        for num in range( 1,8 ):
-            self['toolbar%i'%num].set_style(GTK.TOOLBAR_ICONS)
-
-        self['entry1'].set_text( 'time' )
-        num = 1
-        for fpn in self.theFullPNList():
-            entrynum = num + 1
-            self['entry%i'%entrynum].set_text( 'X%i'%num )
-            num += 1
+		self['entry1'].set_text( 'time' )
+		num = 1
+		for fpn in self.theFullPNList():
+			entrynum = num + 1
+			self['entry%i'%entrynum].set_text( 'X%i'%num )
+			num += 1
 
             
-    def changeScale( self, obj ):
+	def changeScale( self, obj ):
 
-        if obj.get_active():
-            self.plot.set_yscale(PLOT_SCALE_LOG10)
-            self.scale = "log"
-            self.plot.autoscale()
+		if obj.get_active():
+			self.plot.set_yscale(PLOT_SCALE_LOG10)
+			self.scale = "log"
+			self.plot.autoscale()
             
-        else:
-            self.plot.set_yscale(PLOT_SCALE_LINEAR)
-            self.scale = 'linear'
-            self.plot.autoscale()
+		else:
+			self.plot.set_yscale(PLOT_SCALE_LINEAR)
+			self.scale = 'linear'
+			self.plot.autoscale()
 
+	def createLogger( self ):
 
-    def createLogger( self ):
+		n = 1
+		for fpn in self.theFullPNList():
 
-        n = 1
-        for fpn in self.theFullPNList():
-            ID = fpn[2]
-            aFullPNString = createFullPNString( fpn )
-            self.theLoggerList.append(self.theSession.getLogger( aFullPNString ))
-            label = "label%d"%(n)
-            self[label].set_text(ID)
-            n += 1
-        while n <= 7:
-            self['button%i'%n].set_mode(TRUE)
-            n += 1
+			ID = fpn[2]
+			aFullPNString = createFullPNString( fpn )
+			self.theLoggerList.append(self.theSession.getLogger( aFullPNString ))
+			label = "label%d"%(n)
+			self[label].set_text(ID)
+			n += 1
 
-        self.thePluginManager.updateLoggerWindow()
+		while n <= 7:
+
+			self['button%i'%n].set_mode(TRUE)
+			n += 1
+
+		self.thePluginManager.updateBasicWindows()
         
 
-    def getColor( self, num ):
+	def getColor( self, num ):
 
-        aColorList = ["red", "blue", "orange", "green",
-                      "purple", "navy", "brown", "black",
-                      "white", "light_blue", "light_yellow", "black"]
+		aColorList = ["red", "blue", "orange", "green",
+		              "purple", "navy", "brown", "black",
+		              "white", "light_blue", "light_yellow", "black"]
 
-        return self.theColorMap.alloc( aColorList[num] )
+		return self.theColorMap.alloc( aColorList[num] )
     
 
-    def updateLoggerDataList(self):
-        self.LoggerDataList =[]
-        for aLogger in self.theLoggerList:
-            aEndTime = aLogger.getEndTime()
-            self.LoggerDataList.append( aLogger.getData(self.StartTime, aEndTime, 1) )
+	def updateLoggerDataList(self):
+		self.LoggerDataList =[]
+		for aLogger in self.theLoggerList:
+			aEndTime = aLogger.getEndTime()
+			self.LoggerDataList.append( aLogger.getData(self.StartTime, aEndTime, 1) )
 
-        self.StartTime = aEndTime
+		self.StartTime = aEndTime
 #            print aLogger.getData()[0]
             
 #        if self.LoggerDataList[0] != ():
@@ -199,191 +207,183 @@ class TracerWindow( OsogoPluginWindow ):
 #                self.entry['X%s' % str(num+1)] = self.LoggerDataList[num]
 #            num += 1
 
-    def setStateList( self ):
-        aStateList = []
-        if self['togglebutton2'] == None:
-            aStateList = [0,0,0,0,0,0,0]
-        else:
-            for togglebuttonnum in range( 2,9 ):
-                togglebutton = 'togglebutton%i'%togglebuttonnum
-                aStateList.append(self[togglebutton].get_active())
-        return aStateList
+	def setStateList( self ):
+		aStateList = []
+		if self['togglebutton2'] == None:
+			aStateList = [0,0,0,0,0,0,0]
+		else:
+			for togglebuttonnum in range( 2,9 ):
+				togglebutton = 'togglebutton%i'%togglebuttonnum
+				aStateList.append(self[togglebutton].get_active())
+		return aStateList
 
-    def updateFullDataList( self ):
-        num = 0
-        FullDataList_prev = self.FullDataList
-        self.FullDataList = []
-        for LoggerData in self.LoggerDataList:
-            if len(FullDataList_prev) > num :
-                self.FullDataList.append( concatenate( (FullDataList_prev[num], array( LoggerData ))))
-            if num >= len(FullDataList_prev):
-                self.FullDataList.append( array(LoggerData) )
+	def updateFullDataList( self ):
+		num = 0
+		FullDataList_prev = self.FullDataList
+		self.FullDataList = []
+		for LoggerData in self.LoggerDataList:
+			if len(FullDataList_prev) > num :
+				self.FullDataList.append( concatenate( (FullDataList_prev[num], array( LoggerData ))))
+			if num >= len(FullDataList_prev):
+				self.FullDataList.append( array(LoggerData) )
                 
-            num += 1
+			num += 1
 
-        num = 0
-        self.entry = {}
-        while num < len(self.theLoggerList):
-            if self.LoggerDataList[num] == ():
-                pass
-            else:
-                self.entry['X%s' % str(num+1)] = self.FullDataList[num]
+		num = 0
+		self.entry = {}
+		while num < len(self.theLoggerList):
+			if self.LoggerDataList[num] == ():
+				pass
+			else:
+				self.entry['X%s' % str(num+1)] = self.FullDataList[num]
 #just temporarily                
-                self.entry['time'] = self.FullDataList[0]
-            num += 1
+				self.entry['time'] = self.FullDataList[0]
+			num += 1
 
-
-
-    def update( self ):
-        if self.arg % 10 == 5:
-            theStateList = self.setStateList()
-            self.updateLoggerDataList()
+	def update( self ):
+		if self.arg % 10 == 5:
+			theStateList = self.setStateList()
+			self.updateLoggerDataList()
             
-            if self.LoggerDataList[0] == ():
-                pass
-            else:
-                self.updateFullDataList()
-                self.xList = []
-                self.yList = []
-                if self.xaxis == None or self.xaxis == 'time':
-                    if self.yaxis == None:
-                        for num in range(len(self.LoggerDataList)):
-                            self.xList.append(self.FullDataList[num][:,0])
-                            self.yList.append(self.FullDataList[num][:,1])
+			if self.LoggerDataList[0] == ():
+				pass
+			else:
+				self.updateFullDataList()
+				self.xList = []
+				self.yList = []
+				if self.xaxis == None or self.xaxis == 'time':
+					if self.yaxis == None:
+						for num in range(len(self.LoggerDataList)):
+							self.xList.append(self.FullDataList[num][:,0])
+							self.yList.append(self.FullDataList[num][:,1])
 
-                    else:
-                        num = 2
-                        for yaxis in self.yaxis:
-                            if yaxis == '':
-                                self.xList.append (['None'])
-                                self.yList.append (['None'])
-                            else:
+					else:
+						num = 2
+						for yaxis in self.yaxis:
+							if yaxis == '':
+								self.xList.append (['None'])
+								self.yList.append (['None'])
+							else:
 ## Must execute interpolation when the caluculated objects don't have the same step intervals
 ## Now I assume they have the same step intervals                        
                                 
-                                try:
-                                    self.xList.append ( self.FullDataList[0][:,0] )    
-                                    self.yList.append ( eval(yaxis, self.entry)[:,1] )
-                                except NameError:
-                                    self.theSession.printMessage( "name '%s' is not defined \n" % yaxis )
-                                    self["entry%i"%num].set_text ('')
-                                    self.changeyaxis( self["entry%i"%num])
-                                    self.yList.append(['None'])
-                                except (SyntaxError,TypeError):
-                                    self.theSession.printMessage( "'%s' is SyntaxError or TypeError\n" % yaxis )
-                                    self["entry%i"%num].set_text ('')
-                                    self.changeyaxis( self["entry%i"%num])
-                                    self.yList.append(['None'])
-                            num += 1
+								try:
+									self.xList.append ( self.FullDataList[0][:,0] )    
+									self.yList.append ( eval(yaxis, self.entry)[:,1] )
+								except NameError:
+									self.theSession.printMessage( "name '%s' is not defined \n" % yaxis )
+									self["entry%i"%num].set_text ('')
+									self.changeyaxis( self["entry%i"%num])
+									self.yList.append(['None'])
+								except (SyntaxError,TypeError):
+									self.theSession.printMessage( "'%s' is SyntaxError or TypeError\n" % yaxis )
+									self["entry%i"%num].set_text ('')
+									self.changeyaxis( self["entry%i"%num])
+									self.yList.append(['None'])
+							num += 1
                                     
 
-                else:
-                    if self.yaxis == None:
-                        for num in range(len(self.LoggerDataList)):
-                            try :
-                                self.xList.append ( eval(self.xaxis, self.entry)[:,1] )
-                            except NameError:
-                                self.theSession.printMessage( "name '%s' is not defined \n" % self.xaxis )
-                                self["entry1"].set_text ('time')
-                                self.changexaxis( self["entry1"] )
-                                self.xList.append(self.FullDataList[0][:,0])
-                            except (SyntaxError,TypeError):
-                                self.theSession.printMessage( "'%s' is SyntaxError or TypeError\n" % self.xaxis )
-                                self["entry1"].set_text ('time')
-                                self.changexaxis( self["entry1"] )                                
-                                self.xList.append(self.FullDataList[0][:,0]) 
-                            self.yList.append ( self.FullDataList[num][:,1] )
-                    else:
-                        num = 2
-                        for yaxis in self.yaxis:
-                            if yaxis == '':
-                                self.xList.append (['None'])
-                                self.yList.append (['None'])
-                            else:
-                                try:
-                                    self.xList.append( eval(self.xaxis, self.entry)[:,1])
-                                except NameError:
-                                    self.theSession.printMessage( "name '%s' is not defined \n" % self.xaxis )
-                                    self["entry1"].set_text ('time')
-                                    self.changexaxis( self["entry1"] )                                    
-                                    self.xList.append(self.FullDataList[0][:,0])
-                                except (SyntaxError,TypeError):
-                                    self.theSession.printMessage( "'%s' is SyntaxError or TypeError\n" % self.xaxis )
-                                    self["entry1"].set_text ('time')
-                                    self.changexaxis( self["entry1"] )                                    
-                                    self.xList.append(self.FullDataList[0][:,0])                                    
-                                try:
-                                    self.yList.append( eval(yaxis, self.entry)[:,1])
-                                except NameError:
-                                    self.theSession.printMessage( "name '%s' is not defined \n" % yaxis )
-                                    self["entry%i"%num].set_text ('')
-                                    self.changeyaxis( self["entry%i"%num] )
-                                    self.yList.append(['None'])
-                                except (SyntaxError,TypeError):
-                                    self.theSession.printMessage( "'%s' is SyntaxError or TypeError \n" % yaxis )
-                                    self["entry%i"%num].set_text ('')
-                                    self.changeyaxis( self["entry%i"%num] )
-                                    self.yList.append(['None'])
-                            num += 1
+				else:
+					if self.yaxis == None:
+						for num in range(len(self.LoggerDataList)):
+							try :
+								self.xList.append ( eval(self.xaxis, self.entry)[:,1] )
+							except NameError:
+								self.theSession.printMessage( "name '%s' is not defined \n" % self.xaxis )
+								self["entry1"].set_text ('time')
+								self.changexaxis( self["entry1"] )
+								self.xList.append(self.FullDataList[0][:,0])
+							except (SyntaxError,TypeError):
+								self.theSession.printMessage( "'%s' is SyntaxError or TypeError\n" % self.xaxis )
+								self["entry1"].set_text ('time')
+								self.changexaxis( self["entry1"] )                                
+								self.xList.append(self.FullDataList[0][:,0]) 
+							self.yList.append ( self.FullDataList[num][:,1] )
+					else:
+						num = 2
+						for yaxis in self.yaxis:
+							if yaxis == '':
+								self.xList.append (['None'])
+								self.yList.append (['None'])
+							else:
+								try:
+									self.xList.append( eval(self.xaxis, self.entry)[:,1])
+								except NameError:
+									self.theSession.printMessage( "name '%s' is not defined \n" % self.xaxis )
+									self["entry1"].set_text ('time')
+									self.changexaxis( self["entry1"] )                                    
+									self.xList.append(self.FullDataList[0][:,0])
+								except (SyntaxError,TypeError):
+									self.theSession.printMessage( "'%s' is SyntaxError or TypeError\n" % self.xaxis )
+									self["entry1"].set_text ('time')
+									self.changexaxis( self["entry1"] )                                    
+									self.xList.append(self.FullDataList[0][:,0])                                    
 
-                        
+								try:
+									self.yList.append( eval(yaxis, self.entry)[:,1])
+								except NameError:
+									self.theSession.printMessage( "name '%s' is not defined \n" % yaxis )
+									self["entry%i"%num].set_text ('')
+									self.changeyaxis( self["entry%i"%num] )
+									self.yList.append(['None'])
+								except (SyntaxError,TypeError):
+									self.theSession.printMessage( "'%s' is SyntaxError or TypeError \n" % yaxis )
+									self["entry%i"%num].set_text ('')
+									self.changeyaxis( self["entry%i"%num] )
+									self.yList.append(['None'])
+							num += 1
             
-            if self.yaxis == None:
-                num = 0
-                for LoggerData in self.LoggerDataList:
-                    if LoggerData == ():
-                        pass
-                    else:
-                        if theStateList[num] == 1:
-                            self.theDataList[num].set_points( None, None )
-                        else:
-                            if self.scale == "log":
-                                if min(array(LoggerData)[:,1]) <= 0:
-                                    self.theSession.printMessage( "value is under 0, set yaxis to linear scale\n" )
-#                                    self['checkbutton1'].set_active(TRUE)
-                                    self.plot.set_yscale(PLOT_SCALE_LINEAR)
-                                    self.scale = "linear"
-                            self.theDataList[num].set_points( self.xList[num], self.yList[num] )
-                            
-                    num += 1
+			#
+			if self.yaxis == None:
+				num = 0
+				for LoggerData in self.LoggerDataList:
+					if LoggerData == ():
+						pass
+					else:
+						if theStateList[num] == 1:
+							self.theDataList[num].set_points( None, None )
+						else:
+							if self.scale == "log":
+								if min(array(LoggerData)[:,1]) <= 0:
+									self.theSession.printMessage( "value is under 0, set yaxis to linear scale\n" )
+									self.plot.set_yscale(PLOT_SCALE_LINEAR)
+									self.scale = "linear"
+							self.theDataList[num].set_points( self.xList[num], self.yList[num] )
+					num += 1
 
-            else:
-                num = 0
-                for yaxis in self.yaxis:
-                    if theStateList[num] == 1:
-                        self.theDataList[num].set_points(None,None)
-                    elif yaxis == '':
-                        self.theDataList[num].set_points(None,None)
-                    else :
-                        if self.scale == 'log':
-                            if min(array(LoggerData)[:,1] ) <= 0:
-                                self.theSession.printMessage( "value is under 0, set yaxis to linear scale\n" )
-#                                self['checkbutton1'].set_active(TRUE)
-                                self.plot.set_yscale(PLOT_SCALE_LINEAR)
-                                self.scale = 'linear'
-                        self.theDataList[num].set_points(self.xList[num],self.yList[num])
-                        
+			else:
+				num = 0
+				for yaxis in self.yaxis:
+					if theStateList[num] == 1:
+						self.theDataList[num].set_points(None,None)
+					elif yaxis == '':
+						self.theDataList[num].set_points(None,None)
+					else :
+						if self.scale == 'log':
+							if min(array(LoggerData)[:,1] ) <= 0:
+								self.theSession.printMessage( "value is under 0, set yaxis to linear scale\n" )
+								self.plot.set_yscale(PLOT_SCALE_LINEAR)
+								self.scale = 'linear'
+						self.theDataList[num].set_points(self.xList[num],self.yList[num])
+					num += 1
+            
+			self.plot.autoscale()
+			self.canvas.paint()
+			self.canvas.refresh()
+            
 
-                    num += 1
-            
-            self.plot.autoscale()
-            self.canvas.paint()
-            self.canvas.refresh()
-            
-        self.arg += 1
-        return TRUE
+		self.arg += 1
+		return TRUE
 
     
-    def changexaxis(self, obj):
-
-        self.xaxis = obj.get_text()
+	def changexaxis(self, obj):
+		self.xaxis = obj.get_text()
         
         
-    def changeyaxis(self, obj):
-
-        self.yaxis = []
-        for num in range( 2,9 ):
-            self.yaxis.append(self['entry%i'%num].get_text())
+	def changeyaxis(self, obj):
+		self.yaxis = []
+		for num in range( 2,9 ):
+			self.yaxis.append(self['entry%i'%num].get_text())
 
 
 

@@ -9,186 +9,161 @@ from ecell.ecssupport import *
 #class PropertyWindow(PluginWindow):
 class PropertyWindow(OsogoPluginWindow):
 
-    def __init__( self, dirname, data, pluginmanager, root = None ):
+	def __init__( self, dirname, data, pluginmanager, root = None ):
 
-        #PluginWindow.__init__( self, dirname, data, pluginmanager, root )
-        OsogoPluginWindow.__init__( self, dirname, data, pluginmanager, root )
+		OsogoPluginWindow.__init__( self, dirname, data, pluginmanager, root )
+		self.thePluginManager.appendInstance( self ) 
+		#self.initialize()
 
-        #OsogoPluginWindow.openWindow(self)
-        self.thePluginManager.appendInstance( self ) 
-              
-	#PluginWindow.initialize( self, root )
-	#OsogoPluginWindow.initialize( self, root )
-
-        self.initialize()
-
-        if len( self.theFullPNList() ) > 1 and root != 'top_vbox':
-            i = 1
-            preFullID = self.theFullID()
-            aClassName = self.__class__.__name__
-            while i < len( self.theFullPNList() ):
-                aFullID = self.theFullIDList()[i]
-                if aFullID != preFullID:
-                    self.thePluginManager.createInstance( aClassName, (self.theFullPNList()[i],), root)
-                preFullID = aFullID
-                i = i + 1
-
-
-    def initialize( self ):
-
-        self.addHandlers( { 'input_row_pressed'   : self.selectProperty,
-                            'show_button_pressed' : self.show,
-			    'window_exit'	  : self.exit } )
+		# ------------------------------------------------------------------s
+		self.addHandlers( { 'input_row_pressed'   : self.selectProperty,
+		                    # 'show_button_pressed' : self.show,
+		                     'window_exit'	  : self.exit } )
         
-        self.thePropertyClist = self.getWidget( "property_clist" )
-        self.theTypeEntry     = self.getWidget( "entry_TYPE" )
-        self.theIDEntry       = self.getWidget( "entry_ID" )
-        self.thePathEntry     = self.getWidget( "entry_PATH" )
-        self.theClassNameEntry     = self.getWidget( "entry_NAME" )
-        self.prevFullID = None
+		self.thePropertyClist = self.getWidget( "property_clist" )
+		self.theTypeEntry     = self.getWidget( "entry_TYPE" )
+		self.theIDEntry       = self.getWidget( "entry_ID" )
+		self.thePathEntry     = self.getWidget( "entry_PATH" )
+		self.theClassNameEntry     = self.getWidget( "entry_NAME" )
+		self.prevFullID = None
 
-        if self.theRawFullPNList == ():
-            return
-        self.setFullPNList()
+		if self.theRawFullPNList == ():
+			return
+		self.setFullPNList()
+		# ------------------------------------------------------------------e
 
+		if ( len( self.theFullPNList() ) > 1 ) and ( root != 'top_vbox' ):
+			i = 1
+			preFullID = self.theFullID()
+			aClassName = self.__class__.__name__
+
+		if root != 'top_vbox':
+			if len( self.theFullPNList() ) > 1:
+				self.addPopupMenu(1,1,1)
+			else:
+				self.addPopupMenu(0,1,1)
        
-    def setFullPNList( self ):
+	def setFullPNList( self ):
 
-        self.theSelected = ''
+		self.theSelected = ''
         
-        aNameFullPN = convertFullIDToFullPN( self.theFullID() ,'Name' )
-        #print createFullPNString( aNameFullPN )
-        aNameList = list( self.theSession.theSimulator.getProperty( createFullPNString( aNameFullPN ) ) )
+		aNameFullPN = convertFullIDToFullPN( self.theFullID() ,'Name' )
+		aNameList = list( self.theSession.theSimulator.getProperty( createFullPNString( aNameFullPN ) ) )
         
-#        self.theClassName = aNameList[0]
-        aClassName = aNameList[0]
-#        print 'Here', self.theClassName
-        #self.theType = PRIMITIVETYPE_STRING_LIST[ self.theFullID()[TYPE] ]
-        self.theType =ENTITYTYPE_STRING_LIST[ self.theFullID()[TYPE] ]
-        self.theID   = str( self.theFullID()[ID] )
-        self.thePath = str( self.theFullID()[SYSTEMPATH] )
-        aClassNameFullPN = convertFullIDToFullPN( self.theFullID(),
-                                                  'ClassName' )
-        aList = self.theSession.theSimulator.getProperty( createFullPNString( aClassNameFullPN ) )
+		aClassName = aNameList[0]
+		self.theType =ENTITYTYPE_STRING_LIST[ self.theFullID()[TYPE] ]
+		self.theID   = str( self.theFullID()[ID] )
+		self.thePath = str( self.theFullID()[SYSTEMPATH] )
+		aClassNameFullPN = convertFullIDToFullPN( self.theFullID(),
+		                                          'ClassName' )
+		aList = self.theSession.theSimulator.getProperty( createFullPNString( aClassNameFullPN ) )
 
-        self.theTypeEntry.set_text( self.theType  )
-        self.theIDEntry.set_text  ( self.theID )
-        self.thePathEntry.set_text( self.thePath )
-#        self.theClassNameEntry.set_text( self.theClassName )
-        self.theClassNameEntry.set_text( aClassName )
+		self.theTypeEntry.set_text( self.theType  )
+		self.theIDEntry.set_text  ( self.theID )
+		self.thePathEntry.set_text( self.thePath )
+		self.theClassNameEntry.set_text( aClassName )
 
-        self.update()
+		self.update()
 
 
-    def update( self ):
+	def update( self ):
 
-        if self.prevFullID == self.theFullID():
-            self.updatePropertyList()
-            row = 0
-            for aValue in self.theList:
-                self.thePropertyClist.set_text(row,2,aValue[2])
-                row += 1
-        else:
-            self.updatePropertyList()
-            self.thePropertyClist.clear()
-            for aValue in self.theList:
-                self.thePropertyClist.append( aValue )
+		if self.prevFullID == self.theFullID():
+			self.updatePropertyList()
+			row = 0
+			for aValue in self.theList:
+				self.thePropertyClist.set_text(row,2,aValue[2])
+				row += 1
+		else:
+			self.updatePropertyList()
+			self.thePropertyClist.clear()
+			for aValue in self.theList:
+				self.thePropertyClist.append( aValue )
 
 
-    def updatePropertyList( self ):
+	def updatePropertyList( self ):
 
-        #print 'updatePropetyList'
+		self.theList = []
 
-        self.theList = []
+		aPropertyListFullPN = convertFullIDToFullPN( self.theFullID(),
+		                                             'PropertyList' )
+		self.prevFullID = convertFullPNToFullID( aPropertyListFullPN )        
+		aPropertyList = self.theSession.theSimulator.getProperty( createFullPNString( aPropertyListFullPN ) )
 
-        aPropertyListFullPN = convertFullIDToFullPN( self.theFullID(),
-                                                     'PropertyList' )
-        self.prevFullID = convertFullPNToFullID( aPropertyListFullPN )        
-        aPropertyList = self.theSession.theSimulator.getProperty( createFullPNString( aPropertyListFullPN ) )
-
-        #print 'aPropetyList= ',
-        #print aPropertyList
-
-        for aProperty in aPropertyList:
-            if (aProperty == 'ClassName'):
-                pass
-            elif (aProperty == 'PropertyList'):
-                pass
-            elif (aProperty == 'PropertyAttributes'):
-                pass
-            elif (aProperty == 'FullID'):
-                pass
-            elif (aProperty == 'ID'):
-                pass
-            elif (aProperty == 'Name'):
-                pass
-
-            else :
+		for aProperty in aPropertyList:
+			if (aProperty == 'ClassName'):
+				pass
+			elif (aProperty == 'PropertyList'):
+				pass
+			elif (aProperty == 'PropertyAttributes'):
+				pass
+			elif (aProperty == 'FullID'):
+				pass
+			elif (aProperty == 'ID'):
+				pass
+			elif (aProperty == 'Name'):
+				pass
+			else :
                 
-		#print "####################" 
-		#print "aProperty %s" %aProperty
-
-                aFullPN = convertFullIDToFullPN( self.theFullID(),
+				aFullPN = convertFullIDToFullPN( self.theFullID(),
                                                           aProperty )
-                aAttribute = self.getAttribute( aFullPN )
-                aAttributeData = self.decodeAttribute( aAttribute )
-                get = aAttributeData[0]
-                set = aAttributeData[1]
+				aAttribute = self.getAttribute( aFullPN )
+				aAttributeData = self.decodeAttribute( aAttribute )
+				get = aAttributeData[0]
+				set = aAttributeData[1]
                 
-                if aAttribute != 1:
-                    aValueList = self.theSession.theSimulator.getProperty( createFullPNString( aFullPN ) )
-                    aLength = len( aValueList )
+				if aAttribute != 1:
+					aValueList = self.theSession.theSimulator.getProperty( createFullPNString( aFullPN ) )
+					aLength = len( aValueList )
                 
             
-                    if  aLength > 1 :
-                        aNumber = 1
-                        for aValue in aValueList :
-                            aList = [ aProperty, aNumber, aValue , get, set ]
-                            aList = map( str, aList )
-                            self.theList.append( aList ) 
-                            aNumber += 1
+					if  aLength > 1 :
+						aNumber = 1
+						for aValue in aValueList :
+							aList = [ aProperty, aNumber, aValue , get, set ]
+							aList = map( str, aList )
+							self.theList.append( aList ) 
+							aNumber += 1
 
-                    else:
-                        for aValue in aValueList :
-                            aList = [ aProperty, '', aValue , get, set]
-                            aList = map( str, aList )
-                            self.theList.append( aList )
-
-
-    def decodeAttribute(self, aAttribute):
-
-        data = {1 : ('-','+'),2 : ('+','-'),3 : ('+','+')}
-        return data[ aAttribute ]
+					else:
+						for aValue in aValueList :
+							aList = [ aProperty, '', aValue , get, set]
+							aList = map( str, aList )
+							self.theList.append( aList )
 
 
-    def selectProperty(self, obj, data1, data2, data3):
+	def decodeAttribute(self, aAttribute):
 
-        aSelectedItem = self.theList[data1]
-        aFullPN = None
+		data = {1 : ('-','+'),2 : ('+','-'),3 : ('+','+')}
+		return data[ aAttribute ]
 
-        #print aSelectedItem
-        try:
-            aFullPropertyName = createFullPN( aSelectedItem[2] )
-        except ValueError:
-            pass
 
-        if not aFullPropertyName:
-            try:
-                aFullID = createFullID( aSelectedItem[2] )
-                aFullPN = convertFullIDToFullPN( aFullID )
-            except ValueError:
-                pass
+	def selectProperty(self, obj, data1, data2, data3):
+
+		aSelectedItem = self.theList[data1]
+		aFullPN = None
+
+		try:
+			aFullPropertyName = createFullPN( aSelectedItem[2] )
+		except ValueError:
+			pass
+
+		if not aFullPropertyName:
+			try:
+				aFullID = createFullID( aSelectedItem[2] )
+				aFullPN = convertFullIDToFullPN( aFullID )
+			except ValueError:
+				pass
             
-        if not aFullPN:
-            aFullPN = [ self.theType, self.thePath,
-                          self.theID, aSelectedItem[0] ]
+		if not aFullPN:
+			aFullPN = [ self.theType, self.thePath,
+			            self.theID, aSelectedItem[0] ]
 
-        self.theSelected = aFullPN
+		self.theSelected = aFullPN
 
 
-    def show( self, obj ):
-
-        print self.theSelected
+	#def show( self, obj ):
+	#	print self.theSelected
 
    
 if __name__ == "__main__":
