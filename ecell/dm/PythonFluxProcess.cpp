@@ -58,9 +58,7 @@ void PythonFluxProcess::process()
 		       "]: The expression gave a non-float object." );
     }
 
-  Real aFlux( PyFloat_AS_DOUBLE( aResultObject.ptr() ) );
-
-  aFlux *= N_A * getSuperSystem()->getVolume();
+  const Real aFlux( PyFloat_AS_DOUBLE( aResultObject.ptr() ) );
 
   setFlux( aFlux );
 }

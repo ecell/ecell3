@@ -114,6 +114,11 @@ namespace libecs
 
     virtual GET_METHOD( Real, Volume ) = 0;
 
+    GET_METHOD( Real, VolumeN_A )
+    {
+      return getVolume() * N_A;
+    }
+
     /**
        Set a new volume of this System in [L] (liter).
 

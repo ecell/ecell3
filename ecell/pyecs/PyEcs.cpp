@@ -184,6 +184,8 @@ BOOST_PYTHON_MODULE( _ecs )
     .add_property( "Volume",
 		   &System::getVolume,
 		   &System::setVolume )
+    .add_property( "VolumeN_A",
+		   &System::getVolumeN_A )
     .add_property( "StepperID",
 		   &System::getStepperID )
     // methods
