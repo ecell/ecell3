@@ -84,19 +84,19 @@ namespace libecs
 	PROPERTYSLOT_NO_LOAD_SAVE( Real, Velocity,
 				   NOMETHOD,
 				   &Variable::getVelocity );
-	//				   &Variable::addVelocity, 
 
-	PROPERTYSLOT_LOAD_SAVE( Real, MolarConc,
-				&Variable::setMolarConc,
-				&Variable::getMolarConc,
-				&Variable::setMolarConc,
-				NOMETHOD );
+	PROPERTYSLOT_NO_LOAD_SAVE( Real, MolarConc,
+				   &Variable::setMolarConc,
+				   &Variable::getMolarConc );
 
-	PROPERTYSLOT_LOAD_SAVE( Real, NumberConc,
-				&Variable::setNumberConc,
-				&Variable::getNumberConc,
-				&Variable::setNumberConc,
-				NOMETHOD );
+	//				&Variable::setMolarConc,
+	// NOMETHOD );
+
+	PROPERTYSLOT_NO_LOAD_SAVE( Real, NumberConc,
+				   &Variable::setNumberConc,
+				   &Variable::getNumberConc );
+	//				&Variable::setNumberConc,
+	// NOMETHOD );
       }
 
     class IsIntegrationNeeded
