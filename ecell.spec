@@ -32,12 +32,10 @@ make
 
 %install
 #rm -rf $RPM_BUILD_ROOT
- 
+
+make strip 
 make prefix="$RPM_BUILD_ROOT/usr" install
 make prefix="$RPM_BUILD_ROOT/usr" doc-install
-strip $RPM_BUILD_ROOT/usr/lib/ecell/%{version}/*.so
-strip $RPM_BUILD_ROOT/usr/lib/libecs.so
-strip $RPM_BUILD_ROOT/usr/lib/libemc.so
 
 %clean
 rm -rf $RPM_BUILD_ROOT
