@@ -807,9 +807,10 @@ Options:
 
     createModel( anEml, aSBMLModel )
 
-    aWriteSBML = libsbml.writeSBML( aSBMLDocument, aSbmlFileName )
-
-    if ( aWriteSBML ):
-        pass
+    aSbmlString = libsbml.writeSBMLToString( aSBMLDocument )
+    
+    if( aSbmlString != '' ):
+         aSbmlFile.write( aSbmlString )
     else:
-        raise IOError," failed to write the SBML file(.xml)"
+         raise IOError," failed to write the SBML file(.xml)"
+

@@ -94,6 +94,7 @@ sys.path = [
 	os.environ['PYTHONDIR'],
 	os.path.join( os.environ['PYTHONDIR'], 'Numeric'),
 	os.path.join( os.environ['PYTHONDIR'], 'gtk-2.0'),
+	os.path.join( os.environ['PYTHONDIR'], 'libsbml'),
 	os.environ['OSOGOPATH'],
 	os.path.join( python_prefix, 'lib', 'site-packages' ),
 	os.path.join( python_prefix, 'DLLs' ),
