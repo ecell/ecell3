@@ -94,6 +94,8 @@ class OsogoPluginWindow(PluginWindow):
 
 	# end of __init__
 
+	def setRawFullPNList( self, aRawFullPNList ):
+		self.theRawFullPNList = aRawFullPNList
 
 	# ---------------------------------------------------------------
 	# getRawFullPNList
@@ -104,8 +106,6 @@ class OsogoPluginWindow(PluginWindow):
 	# ---------------------------------------------------------------
 	def getRawFullPNList( self ):
 		return self.theRawFullPNList 
-
-
 
 	# ---------------------------------------------------------------
 	# theFullPNList

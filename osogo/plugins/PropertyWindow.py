@@ -8,17 +8,17 @@ PROPERTY_COL  = 0
 VALUE_COL     = 1
 GETABLE_COL   = 2
 SETTABLE_COL  = 3
+
 import gobject
 import gtk
+
 PROPERTY_COL_TYPE=gobject.TYPE_STRING
 VALUE_COL_TYPE=gobject.TYPE_STRING
 GETABLE_COL_TYPE=gobject.TYPE_STRING
 SETTABLE_COL_TYPE=gobject.TYPE_STRING
 
 
-
 class PropertyWindow(OsogoPluginWindow):
-
 
 	# ---------------------------------------------------------------
 	# constructor
@@ -28,91 +28,122 @@ class PropertyWindow(OsogoPluginWindow):
 	# ---------------------------------------------------------------
 	def __init__( self, aDirName, aData, aPluginManager, aRoot=None ):
 
-
+		# calls superclass's constructor
 		OsogoPluginWindow.__init__( self, aDirName, aData, aPluginManager, aRoot )
+		self.theStatusBarWidget = None
 		self.openWindow()
-		#print self.getWidget("PropertyWindow")
-		#print self.widgets
 		
+		# registers myself to PluginManager
 		self.thePluginManager.appendInstance( self ) 
 
-		self.addHandlers( { 'cursor_changed'             : self.selectProperty,
-		                    'on_property_clist_button_press_event'  : self.popupMenu,
-		                    'on_update_button_pressed'              : self.updateValue,
+		# sets handlers
+		self.addHandlers( { \
+		                    # property tree
+		                    'cursor_changed'                        : self.__selectProperty,
+		                    'on_property_clist_button_press_event'  : self.__popupMenu,
+		                    # button
+		                    'on_update_button_pressed'              : self.__updateValue,
 		                    'window_exit'	                        : self.exit } )
         
-		self.thePropertyCList     = self.getWidget( "property_clist" )
-		self.theTypeEntry         = self.getWidget( "entry_TYPE" )
-		self.theIDEntry           = self.getWidget( "entry_ID" )
-		self.thePathEntry         = self.getWidget( "entry_PATH" )
-		self.theClassNameEntry    = self.getWidget( "entry_NAME" )
-		self.preFullID = None
+		# initializes buffer
+		self.thePreFullID = None
+		self.thePrePropertyMap = {}
 
-		self.theSelectedFullPNList = []
-		self.theSelectedRowNumber = -1
+		# initializes Iter
+		self.theSelectedIter = None
+
+		# initializes ListStore
 		self.thePropertyListStore=gtk.ListStore(PROPERTY_COL_TYPE,
 					    VALUE_COL_TYPE,
 					    GETABLE_COL_TYPE,
 					    SETTABLE_COL_TYPE)
-		self.thePropertyCList.set_model(self.thePropertyListStore)
+		self['property_clist'].set_model(self.thePropertyListStore)
 		renderer=gtk.CellRendererText()
 		column=gtk.TreeViewColumn("Property",renderer,text=PROPERTY_COL)
-		self.thePropertyCList.append_column(column)
+		self['property_clist'].append_column(column)
 		column=gtk.TreeViewColumn("Value",renderer,text=VALUE_COL)
-		self.thePropertyCList.append_column(column)
+		self['property_clist'].append_column(column)
 		column=gtk.TreeViewColumn("Get",renderer,text=GETABLE_COL)
-		self.thePropertyCList.append_column(column)
+		self['property_clist'].append_column(column)
 		column=gtk.TreeViewColumn("Set",renderer,text=SETTABLE_COL)
-		self.thePropertyCList.append_column(column)
+		self['property_clist'].append_column(column)
 		
-		
-					
+		# creates popu menu
 		self.thePopupMenu =  PropertyWindowPopupMenu( self.thePluginManager, self )
 
 		if self.theRawFullPNList == ():
 			return
-		self.setFullPNList()
 
-		if ( len( self.theFullPNList() ) > 1 ) and ( aRoot != 'top_vbox' ):
-			self.preFullID = self.theFullID()
-			aClassName = self.__class__.__name__
-	
-	# end of __init__
-
-       
-	# ---------------------------------------------------------------
-	# setFullPNList
-	#  - this method is called from EntryList Window, when users select 
-	#    some entries.
-	#  - display all properties of selected entity.
-	#
-	# return -> None
-	# This method is throwable exception.
-	# ---------------------------------------------------------------
-	def setFullPNList( self ):
-
-		#self.theSelected = ''
-		self.theSelectedFullPN = ''
-        
-		aNameFullPN = convertFullIDToFullPN( self.theFullID() ,'Name' )
-
-		aClassName = self.theSession.theSimulator.getEntityProperty( createFullPNString( aNameFullPN ) ) 
-
-		self.theType =ENTITYTYPE_STRING_LIST[ self.theFullID()[TYPE] ]
-		self.theID   = str( self.theFullID()[ID] )
-		self.thePath = str( self.theFullID()[SYSTEMPATH] )
-
-		aClassName = self.theSession.theSimulator.getEntityClassName( createFullIDString( self.theFullID() ) )
-		aName = self.theSession.theSimulator.getEntityProperty( createFullPNString( aNameFullPN ) )
-
-		self.theTypeEntry.set_text( self.theType + ' : ' + aClassName )
-		self.theIDEntry.set_text( self.theID )
-		self.thePathEntry.set_text( self.thePath )
-		self.theClassNameEntry.set_text( aName )
-
+		#self.__setFullPNList()
 		self.update()
 
-	# end of setFullPNList
+		if ( len( self.theFullPNList() ) > 1 ) and ( aRoot != 'top_vbox' ):
+			self.thePreFullID = self.theFullID()
+			aClassName = self.__class__.__name__
+
+	# end of __init__
+
+
+	# ---------------------------------------------------------------
+	# This method is used by EntityListWindow
+	# Sets statusbar of EntityListWindows to this instance
+	#
+	# aStatusBarWidget  : a status bar widget
+	# return -> None
+	# ---------------------------------------------------------------
+	def setStatusBar( self, aStatusBarWidget ):
+
+		self.theStatusBarWidget = aStatusBarWidget
+
+	# end of setStatusBar
+
+
+	# ---------------------------------------------------------------
+	# Overwrite Window.__getitem__
+	# When this instance is on EntityListWindow,
+	# self['statusbar'] returns the statusbar of EntityListWindow
+	#
+	# aKey  : a key to access widget
+	# return -> a widget
+	# ---------------------------------------------------------------
+	def __getitem__( self, aKey ):
+
+		# When key is not statusbar, return default widget
+		if aKey != 'statusbar':
+				return self.widgets.get_widget( aKey )
+
+		# When is 'statusbar' and self.setStatusBar method has already called,
+		# returns, the statusbar of EntityWindow.
+		else:
+			if self.theStatusBarWidget != None:
+				return self.theStatusBarWidget
+			else:
+				return None
+
+	# end of __getitem__
+
+	# ---------------------------------------------------------------
+	# Overwrite Window.setRawFullPNList
+	# This method is used by EntityListWindow
+	# change RawFullPNList
+	#
+	# aRawFullPNList  : a RawFullPNList
+	# return -> None
+	# ---------------------------------------------------------------
+	def setRawFullPNList( self, aRawFullPNList ):
+
+		# When aRawFullPNList is not changed, does nothing.
+		if self.theRawFullPNList == aRawFullPNList:
+			# do nothing
+			pass
+
+		# When aRawFullPNList is changed, updates its and call self.update().
+		else:
+			# update RawFullPNList
+			OsogoPluginWindow.setRawFullPNList(self,aRawFullPNList)
+			self.update()
+       
+	# end of setRawFullPNList
 
 
 	# ---------------------------------------------------------------
@@ -123,16 +154,57 @@ class PropertyWindow(OsogoPluginWindow):
 	# ---------------------------------------------------------------
 	def update( self ):
 
-		self.updatePropertyList()
+		# initializes flag 
+		aChangedFlag = FALSE
 
-		# if current full id matches previous full id,
-		# then does nothing.
-		if self.preFullID == self.theFullID:
+		# ----------------------------------------------------
+		# checks a value is changed or not
+		# ----------------------------------------------------
+
+		# check the fullID
+		if self.thePreFullID != self.theFullID():
+			aChangedFlag = TRUE
+			
+		# check all property's value
+		if aChangedFlag == FALSE:
+			anEntityStub = EntityStub( self.theSession.theSimulator, \
+			               createFullIDString(self.theFullID()) )
+
+			for aProperty in anEntityStub.getPropertyList():
+				# When a value is changed, 
+				if self.thePrePropertyMap[aProperty] != anEntityStub.getProperty(aProperty):
+					aChangedFlag = TRUE
+					break
+
+		# ----------------------------------------------------
+		# updates widgets
+		# ----------------------------------------------------
+		if aChangedFlag == FALSE:
+			# does nothing
 			pass
 
-		# if current full id doesn't match previous full id,
-		# then rewrite all property of clist.
 		else:
+
+			self.theSelectedFullPN = ''
+
+			# creates EntityStub
+			anEntityStub = EntityStub( self.theSession.theSimulator, createFullIDString(self.theFullID()) )
+			# -----------------------------------------------
+			# updates each widget
+			# Type, ID, Path, Classname
+			# -----------------------------------------------
+			self['entry_TYPE'].set_text( ENTITYTYPE_STRING_LIST[self.theFullID()[TYPE]] \
+			                             + ' : ' + anEntityStub.getClassname() )
+			self['entry_ID'].set_text( self.theFullID()[ID] )
+			self['entry_PATH'].set_text( str( self.theFullID()[SYSTEMPATH] ) )
+			self['entry_NAME'].set_text( anEntityStub.getProperty( 'Name' ) )
+
+			# saves properties to buffer
+			for aProperty in anEntityStub.getPropertyList():
+				self.thePrePropertyMap[str(aProperty)] = anEntityStub.getProperty(aProperty)
+
+			# updates PropertyListStore
+			self.__updatePropertyList()
 			self.thePropertyListStore.clear()
 			for aValue in self.theList:
 				iter=self.thePropertyListStore.append( )
@@ -144,29 +216,25 @@ class PropertyWindow(OsogoPluginWindow):
 		# save current full id to previous full id.
 		self.preFullID = self.theFullID()
 
-		self['value_entry'].set_text('')
-		self['value_entry'].set_sensitive(FALSE)
-		self['update_button'].set_sensitive(FALSE)
+		# updates status bar
+		if self['statusbar'] != None:
+			self['statusbar'].push(1,'')
 	
 	# ---------------------------------------------------------------
-	# updatePropertyList
-	#   - 
+	# __updatePropertyList
 	#
 	# return -> None
 	# This method is throwable exception.
 	# ---------------------------------------------------------------
-	def updatePropertyList( self ):
+	def __updatePropertyList( self ):
 
 		self.theList = []
-
-		aPropertyList = self.theSession.theSimulator.getEntityPropertyList( createFullIDString( self.theFullID() ) )
-
-		aPropertyList = list( aPropertyList )
+		anEntityStub = EntityStub( self.theSession.theSimulator, createFullIDString(self.theFullID()) )
+		aPropertyList = anEntityStub.getPropertyList()
 
 		# do nothing for following properties
 		try:
 			aPropertyList.remove( 'FullID' )
-			#			aPropertyList.remove( 'ID' )
 			aPropertyList.remove( 'Name' )
 		except:
 			pass
@@ -200,6 +268,7 @@ class PropertyWindow(OsogoPluginWindow):
 			aList = [ aProperty, aValueString, aGetString, aSetString ]
 			self.theList.append( aList )
 
+		self.thePropertyListStore.clear()
 
 		for aValue in self.theList:
 			iter=self.thePropertyListStore.append( )
@@ -208,7 +277,8 @@ class PropertyWindow(OsogoPluginWindow):
 			    self.thePropertyListStore.set_value(iter,cntr,valueitem)
 			    cntr+=1
 
-	# end of updatePropertyList
+	# end of __updatePropertyList
+
 
 	# ---------------------------------------------------------------
 	# updateValue
@@ -217,7 +287,7 @@ class PropertyWindow(OsogoPluginWindow):
 	# return -> None
 	# This method is throwable exception.
 	# ---------------------------------------------------------------
-	def updateValue( self, anObject ):
+	def __updateValue( self, anObject ):
 
 		# ------------------------------------
 		# gets inputted value from text field
@@ -227,12 +297,20 @@ class PropertyWindow(OsogoPluginWindow):
 		# ------------------------------------
 		# gets selected number
 		# ------------------------------------
-		self.theSelectedRowNumber = self.thePropertyCList.get_selection().get_selected()[1]
+		self.theSelectedIter = self['property_clist'].get_selection().get_selected()[1]
+
+		# If nothing is selected, displays a confirm window.
+		if self.theSelectedIter == None:
+			aMessage = 'Select a property.'
+			if self['statusbar'] != None:
+				self['statusbar'].push(1,'Can\'t update inputted value. Select a Property.')
+			aDialog = ConfirmWindow(OK_MODE,aMessage,'Error!')
+			return None
 
 		# ------------------------------------
 		# gets getable status
 		# ------------------------------------
-		aGetable = self.thePropertyListStore.get_value(self.theSelectedRowNumber,GETABLE_COL)
+		aGetable = self.thePropertyListStore.get_value(self.theSelectedIter,GETABLE_COL)
 
 		# ------------------------------------
 		# checks the type of inputted value 
@@ -258,8 +336,10 @@ class PropertyWindow(OsogoPluginWindow):
 					self.theSession.message("---------------------------")
 
 					# creates and display error message dialog.
-					anErrorMessage = "The inputted value must be integer!"
+					anErrorMessage = "Input an integer!"
 					anErrorTitle = "The type error!"
+					if self['statusbar'] != None:
+						self['statusbar'].push(1,anErrorMessage)
 					anErrorWindow = ConfirmWindow(OK_MODE,anErrorMessage,anErrorTitle)
 					return None
 
@@ -280,8 +360,10 @@ class PropertyWindow(OsogoPluginWindow):
 					self.theSession.message("---------------------------")
 
 					# creates and display error message dialog.
-					anErrorMessage = "The inputted value must be float!"
+					anErrorMessage = "Input a float!"
 					anErrorTitle = "The type error!"
+					if self['statusbar'] != None:
+						self['statusbar'].push(1,anErrorMessage)
 					anErrorWindow = ConfirmWindow(OK_MODE,anErrorMessage,anErrorTitle)
 					return None
 
@@ -302,8 +384,10 @@ class PropertyWindow(OsogoPluginWindow):
 					self.theSession.message("---------------------------")
 
 					# creates and display error message dialog.
-					anErrorMessage = "The inputted value must be tuple!"
+					anErrorMessage = "Input a tuple!"
 					anErrorTitle = "The type error!"
+					if self['statusbar'] != None:
+						self['statusbar'].push(1,anErrorMessage)
 					anErrorWindow = ConfirmWindow(OK_MODE,anErrorMessage,anErrorTitle)
 					return None
 
@@ -312,6 +396,7 @@ class PropertyWindow(OsogoPluginWindow):
 
 		try:
 			self.setValue( self.theSelectedFullPN, aValue ) 
+			self['property_clist'].get_selection().select_iter(self.theSelectedIter)
 		except:
 
 			# print out traceback
@@ -325,19 +410,24 @@ class PropertyWindow(OsogoPluginWindow):
 			# creates and display error message dialog.
 			anErrorMessage = "An error happened!\nSee MessageWindow."
 			anErrorTitle = "An error happened!"
+			if self['statusbar'] != None:
+				self['statusbar'].push(1,anErrorMessage)
 			anErrorWindow = ConfirmWindow(OK_MODE,anErrorMessage,anErrorTitle)
 
 		else:
 
-			self.updatePropertyList()
+			self.__updatePropertyList()
 			#self.thePluginManager.updateAllPluginWindow() 
 
 	# end of updateValue
 
 
+	def getSelectedFullPN( self ):
+		self.__selectProperty(None)
+		return self.theSelectedFullPN
 
 	# ---------------------------------------------------------------
-	# selectProperty
+	# __selectProperty
 	#   - 
 	#
 	# anObject       : a selected object
@@ -348,31 +438,33 @@ class PropertyWindow(OsogoPluginWindow):
 	# return -> None
 	# This method is throwable exception.
 	# ---------------------------------------------------------------
-	def selectProperty(self, anObject):
-		self.theSelectedRowNumber = self.thePropertyCList.get_selection().get_selected()[1]
-		self.theSelectedFullPN = ''
+	def __selectProperty(self, anObject):
+
+		self.theSelectedIter = self['property_clist'].get_selection().get_selected()[1]
+
+		# When selected row number is none, do nothing
+		if self.theSelectedIter == None:
+			self.theSelectedFullPN = ''
+			return None
 
 		# ---------------------------
 		# sets selected full pn
 		# ---------------------------
-		aProperty = self.thePropertyListStore.get_value(self.theSelectedRowNumber,PROPERTY_COL)
-		aType = string.strip( string.split(self.theTypeEntry.get_text(),':')[0] )
-		anID = self.theIDEntry.get_text()
-		aPath = self.thePathEntry.get_text()
-
-		self.theSelectedFullPN = (ENTITYTYPE_DICT[aType],aPath,anID,aProperty)
+		aSelectedProperty = self.thePropertyListStore.get_value(self.theSelectedIter,PROPERTY_COL)
+		self.theSelectedFullPN = convertFullIDToFullPN( self.theFullID(), aSelectedProperty )
 
 		# ---------------------------
-		# sets value
+		# sets value to value entry
 		# ---------------------------
-		aValue = self.thePropertyListStore.get_value(self.theSelectedRowNumber,VALUE_COL)
-		self['value_entry'].set_text(aValue)
+		anEntityStub = EntityStub( self.theSession.theSimulator, createFullIDString(self.theFullID()) )
+		aValue = anEntityStub.getProperty( aSelectedProperty )
+		self['value_entry'].set_text( str(aValue) )
 
 		# ---------------------------
-		# sets sensitive
+		# sets sensitive of value entry
 		# ---------------------------
-		self.theSelectedRowNumber = self.thePropertyCList.get_selection().get_selected()[1]
-		aSetable = self.thePropertyListStore.get_value(self.theSelectedRowNumber,SETTABLE_COL)
+		self.theSelectedIter = self['property_clist'].get_selection().get_selected()[1]
+		aSetable = self.thePropertyListStore.get_value(self.theSelectedIter,SETTABLE_COL)
 
 		if aSetable == decodeAttribute(TRUE):
 			self['value_entry'].set_sensitive(TRUE)
@@ -394,31 +486,33 @@ class PropertyWindow(OsogoPluginWindow):
 	# return -> None
 	# This method is throwable exception.
 	# ---------------------------------------------------------------
-	def popupMenu( self, aWidget, anEvent ):
+	def __popupMenu( self, aWidget, anEvent ):
 
 		if anEvent.button == 3:  # 3 means right
 
 			if self['property_clist'].get_selection().get_selected()[1]==None :
 				return None
 
-			self.theSelectedRowNumber = self['property_clist'].get_selection().get_selected()[1]
-			aGetable = self.thePropertyListStore.get_value(self.theSelectedRowNumber,GETABLE_COL)
-
-			if aGetable == decodeAttribute(TRUE):
-				self.thePopupMenu.popup( None, None, None, 1, 0 )
+			self.thePopupMenu.popup( None, None, None, 1, 0 )
 
 	# end of poppuMenu
 
 	def createNewPluginWindow( self, anObject ):
 
+		# gets PluginWindowName from selected MenuItem
 		aPluginWindowName = anObject.get_name()
-		aRow = self.thePropertyCList.get_selection().get_selected()[1]
-		aProperty = self.thePropertyListStore.get_value(aRow,PROPERTY_COL)
-		aType = string.strip( string.split(self.theTypeEntry.get_text(),':')[0] )
-		anID = self.theIDEntry.get_text()
-		aPath = self.thePathEntry.get_text()
 
-		aRawFullPN = [(ENTITYTYPE_DICT[aType],aPath,anID,aProperty)]
+		# gets selected property
+		aRow = self['property_clist'].get_selection().get_selected()[1]
+		aSelectedProperty = self.thePropertyListStore.get_value(aRow,PROPERTY_COL)
+
+		# creates RawFullPN
+		aType = ENTITYTYPE_STRING_LIST[self.theFullID()[TYPE]] 
+		anID = self.theFullID()[ID]
+		aPath = self.theFullID()[SYSTEMPATH] 
+		aRawFullPN = [(ENTITYTYPE_DICT[aType],aPath,anID,aSelectedProperty)]
+
+		# creates PluginWindow
 		self.thePluginManager.createInstance( aPluginWindowName, aRawFullPN )
 
 	# end of createNewPluginWindow

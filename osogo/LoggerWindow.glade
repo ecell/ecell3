@@ -4,6 +4,8 @@
 <glade-interface>
 
 <widget class="GtkWindow" id="LoggerWindow">
+  <property name="width_request">458</property>
+  <property name="height_request">403</property>
   <property name="visible">True</property>
   <property name="events">GDK_BUTTON_PRESS_MASK</property>
   <property name="title" translatable="yes">LoggerWindow</property>
@@ -12,6 +14,8 @@
   <property name="modal">False</property>
   <property name="resizable">True</property>
   <property name="destroy_with_parent">False</property>
+  <signal name="delete_event" handler="on_LoggerWindow_delete_event" last_modification_time="Wed, 12 Mar 2003 03:27:30 GMT"/>
+  <signal name="destroy_event" handler="on_LoggerWindow_destroy_event" last_modification_time="Wed, 12 Mar 2003 03:27:37 GMT"/>
 
   <child>
     <widget class="GtkVBox" id="vbox9">

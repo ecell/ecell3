@@ -49,7 +49,7 @@ import gtk
 #import GTK
 
 import MessageWindow
-import PaletteWindow 
+#import PaletteWindow 
 import EntityListWindow
 import LoggerWindow
 import InterfaceWindow 
@@ -165,8 +165,8 @@ class MainWindow(OsogoWindow):
 		# -------------------------------------
 		# creates PaletteManager
 		# -------------------------------------
-		self.thePaletteWindow = PaletteWindow.PaletteWindow( self )
-		self.thePaletteWindow.setPluginList( self.thePluginManager.thePluginMap )
+		#self.thePaletteWindow = PaletteWindow.PaletteWindow( self )
+		#self.thePaletteWindow.setPluginList( self.thePluginManager.thePluginMap )
 
 		self.theEntityChecker = 0
 		self.theStepperChecker = 0
@@ -195,7 +195,7 @@ class MainWindow(OsogoWindow):
 			'exit_menu_activate'                   : self.exit ,
 			'message_window_menu_activate'         : self.toggleMessageWindowByMenu ,
 			'interface_window_menu_activate'       : self.toggleInterfaceWindowByMenu ,
-			'palette_window_menu_activate'         : self.togglePaletteWindowByMenu ,
+			#'palette_window_menu_activate'         : self.togglePaletteWindowByMenu ,
 			'create_new_entity_list_menu_activate' : self.clickEntityListWindow ,
 			'logger_window_menu_activate'          : self.toggleLoggerWindowByMenu ,
 			'stepper_window_menu_activate'         : self.toggleStepperWindowByMenu ,
@@ -209,7 +209,7 @@ class MainWindow(OsogoWindow):
 			'step_sec_toggled'                     : self.changeStepType ,
 			'entitylist_clicked'                   : self.clickEntityListWindow ,
 			'logger_togglebutton_toggled'          : self.toggleLoggerWindowByButton ,
-			'palette_togglebutton_toggled'         : self.togglePaletteWindowByButton ,
+			#'palette_togglebutton_toggled'         : self.togglePaletteWindowByButton ,
 			'message_togglebutton_toggled'         : self.toggleMessageWindowByButton ,
 			'interface_togglebutton_toggled'       : self.toggleInterfaceWindowByButton ,
 			'stepper_togglebutton_toggled'         : self.toggleStepperWindowByButton ,
@@ -257,7 +257,7 @@ class MainWindow(OsogoWindow):
 	    self['MainWindow'].resize(window_width,window_heigth)
 	
 	def setUnSensitiveMenu( self ):
-		self['palette_window_menu'].set_sensitive(FALSE)
+		#self['palette_window_menu'].set_sensitive(FALSE)
 		self['create_new_entity_list_menu'].set_sensitive(FALSE)
 
 	# end of setUnSensitiveMenu
@@ -275,8 +275,8 @@ class MainWindow(OsogoWindow):
 		self['stop_button'].set_sensitive(FALSE)
 		self['step_button'].set_sensitive(FALSE)
 		self['entitylist'].set_sensitive(FALSE)
-		self['palette_togglebutton'].set_sensitive(FALSE)
-		self['palette_window_menu'].set_sensitive(FALSE)
+		#pself['palette_togglebutton'].set_sensitive(FALSE)
+		#self['palette_window_menu'].set_sensitive(FALSE)
 		self['create_new_entity_list_menu'].set_sensitive(FALSE)
 		self['save_model_menu'].set_sensitive(FALSE)
 
@@ -1213,10 +1213,10 @@ class MainWindow(OsogoWindow):
 	# return -> None
 	# This method is throwable exception.
 	# ---------------------------------------------------------------
-	def initializePaletteWindow( self ):
+	#def initializePaletteWindow( self ):
 
-		self.thePaletteWindow = PaletteWindow.PaletteWindow( self )
-		self.thePaletteWindow.setPluginList( self.thePluginManager.thePluginMap )
+	#	self.thePaletteWindow = PaletteWindow.PaletteWindow( self )
+	#	self.thePaletteWindow.setPluginList( self.thePluginManager.thePluginMap )
 
 	# end of initializePaletteWindow
 
@@ -1233,10 +1233,10 @@ class MainWindow(OsogoWindow):
 	# return -> None
 	# This method is throwable exception.
 	# ---------------------------------------------------------------
-	def togglePaletteWindowByMenu( self, button_obj ) :
+	#def togglePaletteWindowByMenu( self, button_obj ) :
 
-		self.thePaletteWindow.isShown = self['palette_window_menu'].active 
-		self.togglePaletteWindow()
+	#	self.thePaletteWindow.isShown = self['palette_window_menu'].active 
+	#	self.togglePaletteWindow()
 
 	# end of togglePaletteWindowByMenu
 
@@ -1252,10 +1252,10 @@ class MainWindow(OsogoWindow):
 	# return -> None
 	# This method is throwable exception.
 	# ---------------------------------------------------------------
-	def togglePaletteWindowByButton( self, button_obj ) :
+	#def togglePaletteWindowByButton( self, button_obj ) :
 
-		self.thePaletteWindow.isShown = self['palette_togglebutton'].get_active()
-		self.togglePaletteWindow()
+	#	self.thePaletteWindow.isShown = self['palette_togglebutton'].get_active()
+	#	self.togglePaletteWindow()
 
 	# end of togglePaletteWindowByButton
 
@@ -1268,37 +1268,37 @@ class MainWindow(OsogoWindow):
 	# return -> None
 	# This method is throwable exception.
 	# ---------------------------------------------------------------
-	def togglePaletteWindow( self ) :
-
-		# ------------------------------------------------------
-		# button is toggled to active 
-		# ------------------------------------------------------
-		if self.thePaletteWindow.isShown == TRUE:
-
-			if self.thePaletteWindow.getExist() == 0:
-				self.initializePaletteWindow()
-			else:
-				pass	
-
-			self.thePaletteWindow.hide()
-			self.thePaletteWindow.show_all()
-
-			self['palette_togglebutton'].set_active(TRUE)
-			self['palette_window_menu'].set_active(TRUE)
-
-		# ------------------------------------------------------
-		# button is toggled to non-active
-		# ------------------------------------------------------
-		else:
-			if self.thePaletteWindow.getExist() == 0:
-				pass
-			else:
-				self.thePaletteWindow.hide()
-
-			self['palette_togglebutton'].set_active(FALSE)
-			self['palette_window_menu'].set_active(FALSE)
-        
-	# end of togglePaletteWindow
+#	def togglePaletteWindow( self ) :
+#
+#		# ------------------------------------------------------
+#		# button is toggled to active 
+#		# ------------------------------------------------------
+#		if self.thePaletteWindow.isShown == TRUE:
+#
+#			if self.thePaletteWindow.getExist() == 0:
+#				self.initializePaletteWindow()
+#			else:
+#				pass	
+#
+#			self.thePaletteWindow.hide()
+#			self.thePaletteWindow.show_all()
+#
+#			self['palette_togglebutton'].set_active(TRUE)
+#			self['palette_window_menu'].set_active(TRUE)
+#
+#		# ------------------------------------------------------
+#		# button is toggled to non-active
+#		# ------------------------------------------------------
+#		else:
+#			if self.thePaletteWindow.getExist() == 0:
+#				pass
+#			else:
+#				self.thePaletteWindow.hide()
+#
+#			self['palette_togglebutton'].set_active(FALSE)
+#			self['palette_window_menu'].set_active(FALSE)
+#        
+#	# end of togglePaletteWindow
 
 
 	# ---------------------------------------------------------------
@@ -1491,16 +1491,16 @@ class MainWindow(OsogoWindow):
 				self['interface_togglebutton'].set_active(FALSE)
 				self['interface_window_menu'].set_active(FALSE)
 
-			if self.theStepperChecker:
+			#if self.theStepperChecker:
 
 				# if palette button pressed
-				if self['palette_togglebutton'].get_active():
-					if self.thePaletteWindow.isShown == TRUE :
-						self['palette_togglebutton'].set_active(TRUE)
-						self['palette_window_menu'].set_active(TRUE)
-					else:
-						self['palette_togglebutton'].set_active(FALSE)
-						self['palette_window_menu'].set_active(FALSE)
+				#if self['palette_togglebutton'].get_active():
+				#	if self.thePaletteWindow.isShown == TRUE :
+				#		self['palette_togglebutton'].set_active(TRUE)
+				#		self['palette_window_menu'].set_active(TRUE)
+				#	else:
+				#		self['palette_togglebutton'].set_active(FALSE)
+				#		self['palette_window_menu'].set_active(FALSE)
 
 			# entity window
 			# detects the destroyed EntityWindows, and delete them from
@@ -1528,8 +1528,8 @@ class MainWindow(OsogoWindow):
 			self['stop_button'].set_sensitive(TRUE)
 			self['step_button'].set_sensitive(TRUE)
 			self['entitylist'].set_sensitive(TRUE)
-			self['palette_togglebutton'].set_sensitive(TRUE)
-			self['palette_window_menu'].set_sensitive(TRUE)
+			#self['palette_togglebutton'].set_sensitive(TRUE)
+			#self['palette_window_menu'].set_sensitive(TRUE)
 			self['create_new_entity_list_menu'].set_sensitive(TRUE)
 			self['load_rule_menu'].set_sensitive(FALSE)
 			self['load_script_menu'].set_sensitive(FALSE)
