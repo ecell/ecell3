@@ -35,6 +35,8 @@
 
 USE_LIBECS;
 
+DECLARE_VECTOR( int, IntVector );
+
 LIBECS_DM_CLASS( DAEStepper, DifferentialStepper )
 {
 
@@ -176,6 +178,8 @@ public:
   bool calculate();
   virtual void step();
 
+  void checkDependency();
+
   Real estimateLocalError();
 
   void calculateJacobian();
@@ -200,6 +204,10 @@ protected:
   Real    alpha, beta, gamma;
 
   VariableVector::size_type     theSystemSize;
+
+  // IntVector as std::vector<VariableVector::size_type>
+  IntVector  theContinuousVariableVector;
+  RealVector theDiscreteActivityBuffer;
 
   std::vector<RealVector>    theJacobian;
 

@@ -35,6 +35,7 @@
 
 #include <gsl/gsl_linalg.h>
 #include <gsl/gsl_complex.h>
+#include <gsl/gsl_complex_math.h>
 
 #include "DAEStepper.hpp"
 
@@ -66,7 +67,8 @@ namespace libecs
     theAcceptedError( 0.0 ),
     theAcceptedStepInterval( 0.0 ),
     thePreviousStepInterval( 0.001 ),
-    theJacobianRecalculateTheta( 0.001 )
+    theJacobianRecalculateTheta( 0.001 ),
+    theContinuousVariableVector( NULLPTR )
   {
     const Real pow913( pow( 9.0, 1.0 / 3.0 ) );
 
@@ -114,7 +116,14 @@ namespace libecs
     const VariableVector::size_type aSize( getReadOnlyVariableOffset() );
     if ( theSystemSize != aSize )
       {
-	theSystemSize = aSize;
+	checkDependency();
+
+	theSystemSize = theContinuousVariableVector.size()
+	  + theProcessVector.size() - getDiscreteProcessOffset();
+
+	if ( aSize != theSystemSize )
+	  THROW_EXCEPTION( InitializationFailed,
+			   "definitions are required, are given." );
 
 	theJacobian.resize( aSize );
 	for ( VariableVector::size_type c( 0 ); c < aSize; c++ )
@@ -163,23 +172,77 @@ namespace libecs
     */
   }
 
+  void DAEStepper::checkDependency()
+  {
+    theContinuousVariableVector.clear();
+
+    // FOR_ALL( ProcessVector, theProcessVector )
+    const ProcessVector::size_type
+      aDiscreteProcessOffset( getDiscreteProcessOffset() );
+    for ( ProcessVector::size_type c( 0 ); c < aDiscreteProcessOffset; c++ )
+      {
+	ProcessPtr aProcess( theProcessVector[ c ] );
+
+	VariableReferenceVectorCref
+	  aVariableReferenceVector( aProcess->getVariableReferenceVector() );
+
+	const VariableReferenceVector::size_type
+	  aPositiveVariableReferenceOffset
+	  ( aProcess->getPositiveVariableReferenceOffset() );
+	const VariableReferenceVector::size_type
+	  aZeroVariableReferenceOffset
+	  ( aProcess->getZeroVariableReferenceOffset() );
+
+	const bool aContinuity( aProcess->isContinuous() );
+	if ( aContinuity ) {
+	  for ( VariableReferenceVector::size_type i( 0 );
+		i < aVariableReferenceVector.size(); i++)
+	    {
+	      if ( i == aZeroVariableReferenceOffset )
+		{
+		  if ( aPositiveVariableReferenceOffset
+		       == aVariableReferenceVector.size() )
+		    break;
+		  else
+		    i = aPositiveVariableReferenceOffset;
+		}
+
+	      VariablePtr const 
+		aVariable( aVariableReferenceVector[ i ].getVariable() );
+	      const VariableVector::size_type
+		anIndex( getVariableIndex( aVariable ) );
+
+	      if ( std::find( theContinuousVariableVector.begin(),
+			      theContinuousVariableVector.end(), anIndex )
+		   == theContinuousVariableVector.end() )
+		theContinuousVariableVector.push_back( anIndex );
+	    }
+	}
+      }
+
+    std::sort( theContinuousVariableVector.begin(),
+	       theContinuousVariableVector.end() );
+
+    theDiscreteActivityBuffer.clear();
+    theDiscreteActivityBuffer.resize( theProcessVector.size() 
+				      - aDiscreteProcessOffset );
+  }
+
   void DAEStepper::calculateJacobian()
   {
     UnsignedInteger aSize( getReadOnlyVariableOffset() );
     Real aPerturbation;
+    //    aPerturbation = 1e-9 * getStepInterval();
 
     for ( VariableVector::size_type i( 0 ); i < aSize; ++i )
       {
 	const VariablePtr aVariable( theVariableVector[ i ] );
 	const Real aValue( aVariable->getValue() );
 
-	//	aPerturbation = aValue * 1e-6 + 1e-13;
-	//	aVariable->loadValue( aValue + aPerturbation );
-	aPerturbation = theValueBuffer[ i ] * 1e-6 + 1e-13;
+	aPerturbation = sqrt( Uround * std::max( 1e-5, fabs( aValue ) ) );
 	aVariable->loadValue( theValueBuffer[ i ] + aPerturbation );
 
-	fireProcesses();
-	
+	/**
 	for ( VariableVector::size_type j( 0 ); j < aSize; ++j )
 	  {
 	    theJacobian[ j ][ i ]
@@ -190,6 +253,35 @@ namespace libecs
 	    //		      << aPartialDerivative << std::endl;
 
 	    theVariableVector[ j ]->clearVelocity();
+	  }
+	*/
+
+	fireProcesses();
+
+	const ProcessVector::size_type
+	  aDiscreteProcessOffset( getDiscreteProcessOffset() );
+	for ( ProcessVector::size_type c( aDiscreteProcessOffset );
+	      c < theProcessVector.size(); c++ )
+	  {
+	    const ProcessVector::size_type
+	      anIndex( c - aDiscreteProcessOffset );
+
+	    theJacobian[ theContinuousVariableVector.size() + anIndex ][ i ]
+	      = - ( theProcessVector[ c ]->getActivity()
+	      - theDiscreteActivityBuffer[ anIndex ] ) / aPerturbation;
+	  }
+
+	for ( IntVector::size_type j( 0 );
+	      j < theContinuousVariableVector.size(); ++j )
+	  {
+	    // int as VariableVector::size_type
+	    const int anIndex( theContinuousVariableVector[ j ] );
+	    const VariablePtr aVariable( theVariableVector[ anIndex ] );
+
+	    theJacobian[ j ][ i ]
+	      = - ( aVariable->getVelocity() - theVelocityBuffer[ anIndex ] )
+	      / aPerturbation;
+	    aVariable->clearVelocity();
 	  }
 
 	aVariable->loadValue( aValue );
@@ -205,6 +297,7 @@ namespace libecs
     const Real betah( beta / aStepInterval );
     const Real gammah( gamma / aStepInterval );
 
+    /**
     gsl_complex comp;
 
     for ( VariableVector::size_type i( 0 ); i < aSize; ++i )
@@ -227,17 +320,50 @@ namespace libecs
 	    gsl_matrix_complex_set( theJacobianMatrix2, i, j, comp );
 	  }
 	}
+    */
+
+    gsl_complex comp1, comp2;
+
+    for ( RealVector::size_type i( 0 ); i < theSystemSize; i++ )
+      for ( RealVector::size_type j( 0 ); j < theSystemSize; j++ )
+	{
+	  const Real aPartialDerivative( theJacobian[ i ][ j ] );
+
+	  gsl_matrix_set( theJacobianMatrix1, i, j, aPartialDerivative );
+
+	  GSL_SET_COMPLEX( &comp1, aPartialDerivative, 0 );
+	  gsl_matrix_complex_set( theJacobianMatrix2, i, j, comp1 );
+	}
+
+    for ( IntVector::size_type c( 0 );
+	  c < theContinuousVariableVector.size(); c++ )
+      {
+	const int anIndex( theContinuousVariableVector[ c ] );
+	
+	const Real aPartialDerivative
+	  ( gsl_matrix_get( theJacobianMatrix1, c, anIndex ) );
+	gsl_matrix_set( theJacobianMatrix1, c, anIndex,
+			gammah + aPartialDerivative );
+
+	comp1 = gsl_matrix_complex_get( theJacobianMatrix2, c, anIndex );
+	GSL_SET_COMPLEX( &comp2, alphah, betah );
+	gsl_matrix_complex_set( theJacobianMatrix2, c, anIndex,
+				gsl_complex_add( comp1, comp2 ) );	
+      }
 
     /**
     std::cout << std::endl;
     for ( UnsignedInteger i( 0 ); i < aSize; ++i )
       for ( UnsignedInteger j( 0 ); j < aSize; ++j )
-	std::cout << "m(" << i << "," << j << ") = " 
+	std::cout << "m1(" << i << "," << j << ") = " 
      << gsl_matrix_get( theJacobianMatrix1, i, j ) << std::endl;
-    for ( UnsignedInteger i( 0 ); i < aSize*2; ++i )
-      for ( UnsignedInteger j( 0 ); j < aSize*2; ++j )
-	std::cout << "m(" << i+aSize << "," << j+aSize << ") = " 
-		  << gsl_matrix_get( theJacobianMatrix2, i, j ) << std::endl;
+    for ( UnsignedInteger i( 0 ); i < aSize; ++i )
+      for ( UnsignedInteger j( 0 ); j < aSize; ++j )
+	std::cout << "m2(" << i << "," << j << ") = " 
+		  << gsl_matrix_complex_get( theJacobianMatrix2, i, j ).dat[0]
+		  << ", "
+		  << gsl_matrix_complex_get( theJacobianMatrix2, i, j ).dat[1]
+		  << std::endl;
     */
 
     decompJacobianMatrix();
@@ -256,6 +382,8 @@ namespace libecs
     const Real aCurrentTime( getCurrentTime() );
     const Real aStepInterval( getStepInterval() );
     const VariableVector::size_type aSize( getReadOnlyVariableOffset() );
+    const ProcessVector::size_type
+      aDiscreteProcessOffset( getDiscreteProcessOffset() );
 
     const Real alphah( alpha / aStepInterval );
     const Real betah( beta / aStepInterval );
@@ -275,68 +403,152 @@ namespace libecs
 	theVariableVector[ c ]->loadValue( theValueBuffer[ c ] + z );
       }
 
+    // ========= 1 ===========
+
     setCurrentTime( aCurrentTime
 		    + aStepInterval * ( 4.0 - sqrt( 6.0 ) ) / 10.0 );
     fireProcesses();
 
+    for ( ProcessVector::size_type c( aDiscreteProcessOffset );
+	  c < theProcessVector.size(); c++ )
+      {
+	const ProcessVector::size_type anIndex
+	  ( theContinuousVariableVector.size() + c - aDiscreteProcessOffset );
+	const ProcessPtr aProcess( theProcessVector[ c ] );
+
+	aTIF[ anIndex ] 
+	  = aProcess->getActivity() * 4.3255798900631553510;
+	aTIF[ anIndex + aSize ]
+	  = aProcess->getActivity() * -4.1787185915519047273;
+	aTIF[ anIndex + aSize*2 ]
+	  = aProcess->getActivity() * -0.50287263494578687595;
+      }
+
+    for ( IntVector::size_type c( 0 );
+	  c < theContinuousVariableVector.size(); c++ )
+      {
+	const int anIndex( theContinuousVariableVector[ c ] );
+	const VariablePtr aVariable( theVariableVector[ anIndex ] );
+
+	aTIF[ c ] 
+	  = aVariable->getVelocity() * 4.3255798900631553510;
+	aTIF[ c + aSize ]
+	  = aVariable->getVelocity() * -4.1787185915519047273;
+	aTIF[ c + aSize*2 ]
+	  = aVariable->getVelocity() * -0.50287263494578687595;
+
+	aVariable->clearVelocity();
+      }
+
     for ( VariableVector::size_type c( 0 ); c < aSize; ++c )
       {
-	aTIF[ c ] 
-	  = theVariableVector[ c ]->getVelocity() * 4.3255798900631553510;
-	aTIF[ c + aSize ]
-	  = theVariableVector[ c ]->getVelocity() * -4.1787185915519047273;
-	aTIF[ c + aSize*2 ]
-	  = theVariableVector[ c ]->getVelocity() * -0.50287263494578687595;
-
 	const Real z( theW[ c ] * 0.24171793270710701896
 		      + theW[ c + aSize ] * 0.20412935229379993199
 		      + theW[ c + 2*aSize ] * 0.38294211275726193779 );
 
 	theVariableVector[ c ]->loadValue( theValueBuffer[ c ] + z );
-	theVariableVector[ c ]->clearVelocity();
       }
+
+    // ========= 2 ===========
 
     setCurrentTime( aCurrentTime
 		    + aStepInterval * ( 4.0 + sqrt( 6.0 ) ) / 10.0 );
     fireProcesses();
 
+    for ( ProcessVector::size_type c( aDiscreteProcessOffset );
+	  c < theProcessVector.size(); c++ )
+      {
+	const ProcessVector::size_type anIndex
+	  ( theContinuousVariableVector.size() + c - aDiscreteProcessOffset );
+	const ProcessPtr aProcess( theProcessVector[ c ] );
+
+	aTIF[ anIndex ] 
+	  += aProcess->getActivity() * 0.33919925181580986954;
+	aTIF[ anIndex + aSize ]
+	  -= aProcess->getActivity() * 0.32768282076106238708;
+	aTIF[ anIndex + aSize*2 ]
+	  += aProcess->getActivity() * 2.5719269498556054292;
+      }
+
+    for ( IntVector::size_type c( 0 );
+	  c < theContinuousVariableVector.size(); c++ )
+      {
+	const int anIndex( theContinuousVariableVector[ c ] );
+	const VariablePtr aVariable( theVariableVector[ anIndex ] );
+
+	aTIF[ c ] 
+	  += aVariable->getVelocity() * 0.33919925181580986954;
+	aTIF[ c + aSize ]
+	  -= aVariable->getVelocity() * 0.32768282076106238708;
+	aTIF[ c + aSize*2 ]
+	  += aVariable->getVelocity() * 2.5719269498556054292;
+
+	aVariable->clearVelocity();
+      }
+
     for ( VariableVector::size_type c( 0 ); c < aSize; ++c )
       {
-	aTIF[ c ] 
-	  += theVariableVector[ c ]->getVelocity() * 0.33919925181580986954;
-	aTIF[ c + aSize ]
-	  -= theVariableVector[ c ]->getVelocity() * 0.32768282076106238708;
-	aTIF[ c + aSize*2 ]
-	  += theVariableVector[ c ]->getVelocity() * 2.5719269498556054292;
-
 	const Real z( theW[ c ] * 0.96604818261509293619 + theW[ c + aSize ] );
 
 	theVariableVector[ c ]->loadValue( theValueBuffer[ c ] + z );
-	theVariableVector[ c ]->clearVelocity();
       }
+
+    // ========= 3 ===========
 
     setCurrentTime( aCurrentTime + aStepInterval );
     fireProcesses();
 
-    for ( VariableVector::size_type c( 0 ); c < aSize; ++c )
+    for ( ProcessVector::size_type c( aDiscreteProcessOffset );
+	  c < theProcessVector.size(); c++ )
       {
+	const ProcessVector::size_type anIndex
+	  ( theContinuousVariableVector.size() + c - aDiscreteProcessOffset );
+	const ProcessPtr aProcess( theProcessVector[ c ] );
+
+	aTIF[ anIndex ]
+	  += aProcess->getActivity() * 0.54177053993587487119;
+	aTIF[ anIndex + aSize ]
+	  += aProcess->getActivity() * 0.47662355450055045196;
+	aTIF[ anIndex + aSize*2 ]
+	  -= aProcess->getActivity() * 0.59603920482822492497;
+
+	gsl_vector_set( theVelocityVector1, anIndex, aTIF[ anIndex ] );
+
+	GSL_SET_COMPLEX( &comp, aTIF[ anIndex + aSize ], 
+			 aTIF[ anIndex + aSize*2 ] );
+	gsl_vector_complex_set( theVelocityVector2, anIndex, comp );
+      }
+
+    for ( IntVector::size_type c( 0 );
+	  c < theContinuousVariableVector.size(); c++ )
+      {
+	const int anIndex( theContinuousVariableVector[ c ] );
+	const VariablePtr aVariable( theVariableVector[ anIndex ] );
+
 	aTIF[ c ]
-	  += theVariableVector[ c ]->getVelocity() * 0.54177053993587487119;
+	  += aVariable->getVelocity() * 0.54177053993587487119;
 	aTIF[ c + aSize ]
-	  += theVariableVector[ c ]->getVelocity() * 0.47662355450055045196;
+	  += aVariable->getVelocity() * 0.47662355450055045196;
 	aTIF[ c + aSize*2 ]
-	  -= theVariableVector[ c ]->getVelocity() * 0.59603920482822492497;
+	  -= aVariable->getVelocity() * 0.59603920482822492497;
 
 	gsl_vector_set( theVelocityVector1, c,
-			aTIF[ c ] - theW[ c ] * gammah );
+			aTIF[ c ] - theW[ anIndex ] * gammah );
 
-	GSL_SET_COMPLEX( &comp, aTIF[ c + aSize ] - theW[ c + aSize ] * alphah + theW[ c + aSize*2 ] * betah, aTIF[ c + aSize*2 ] - theW[ c + aSize ] * betah - theW[ c + aSize*2 ] * alphah );
-
+	GSL_SET_COMPLEX( &comp, aTIF[ c + aSize ] - theW[ anIndex + aSize ] * alphah + theW[ anIndex + aSize*2 ] * betah, aTIF[ c + aSize*2 ] - theW[ anIndex + aSize ] * betah - theW[ anIndex + aSize*2 ] * alphah );
 	gsl_vector_complex_set( theVelocityVector2, c, comp );
 
-	// theVariableVector[ c ]->loadValue( theValueBuffer[ c ] );
-	theVariableVector[ c ]->clearVelocity();
+	// aVariable->loadValue( theValueBuffer[ c ] );
+	aVariable->clearVelocity();
       }
+
+    /**
+    for ( int c( 0 ); c < aSize; c++ )
+	std::cout << "tifvector[ " << c << " ] = " << gsl_vector_get( theVelocityVector1, c ) << std::endl;
+
+    for ( RealVector::size_type c( 0 ); c < aTIF.size(); c++ )
+	std::cout << "TIF[ " << c << " ] = " << aTIF[ c ] << std::endl;
+    */
 
     setCurrentTime( aCurrentTime );
   }
@@ -353,8 +565,6 @@ namespace libecs
     Real aNorm( 0.0 );
     Real aDeltaW( 0.0 );
     gsl_complex comp;
-
-    //    std::cout << std::endl;
 
     for ( VariableVector::size_type c( 0 ); c < aSize; ++c )
       {
@@ -533,7 +743,7 @@ namespace libecs
 	  {
 	    setStepInterval( aNewStepInterval );
 	  }
-	
+
 	return false;
       }
   }
@@ -541,6 +751,8 @@ namespace libecs
   Real DAEStepper::estimateLocalError()
   {
     const VariableVector::size_type aSize( getReadOnlyVariableOffset() );
+    const ProcessVector::size_type 
+      aDiscreteProcessOffset( getDiscreteProcessOffset() );
     const Real aStepInterval( getStepInterval() );
 
     Real anError;
@@ -549,15 +761,27 @@ namespace libecs
     const Real hee2( ( -13.0 + 7.0 * sqrt( 6.0 ) ) / ( 3.0 * aStepInterval ) );
     const Real hee3( -1.0 / ( 3.0 * aStepInterval ) );
 
-    for ( VariableVector::size_type c( 0 ); c < aSize; ++c )
+    // theW must already be transformed to Z-form
+    for ( ProcessVector::size_type c( aDiscreteProcessOffset );
+	  c < theProcessVector.size(); c++ )
       {
-	// theW must already be transformed to Z-form
+	const ProcessVector::size_type anIndex
+	  ( theContinuousVariableVector.size() + c - aDiscreteProcessOffset );
+
+	gsl_vector_set( theVelocityVector1, anIndex,
+			theDiscreteActivityBuffer[ c ] );	
+      }
+
+    for ( IntVector::size_type c( 0 );
+	  c < theContinuousVariableVector.size(); c++ )
+      {
+	const int anIndex( theContinuousVariableVector[ c ] );
 
 	gsl_vector_set( theVelocityVector1, c,
-			theVelocityBuffer[ c ]
-			+ theW[ c ] * hee1
-			+ theW[ c + aSize ] * hee2
-			+ theW[ c + 2*aSize ] * hee3 );
+			theVelocityBuffer[ anIndex ]
+			+ theW[ anIndex ] * hee1
+			+ theW[ anIndex + aSize ] * hee2
+			+ theW[ anIndex + 2*aSize ] * hee3 );
       }
 
     gsl_linalg_LU_solve( theJacobianMatrix1, thePermutation1,
@@ -585,15 +809,29 @@ namespace libecs
       {
 	fireProcesses();
 
-	for ( VariableVector::size_type c( 0 ); c < aSize; ++c )
+	for ( ProcessVector::size_type c( aDiscreteProcessOffset );
+	      c < theProcessVector.size(); c++ )
 	  {
-	    gsl_vector_set( theVelocityVector1, c,
-			    theVariableVector[ c ]->getVelocity()
-			    + theW[ c ] * hee1
-			    + theW[ c + aSize ] * hee2
-			    + theW[ c + 2*aSize ] * hee3 );
+	    const ProcessVector::size_type anIndex
+	      ( theContinuousVariableVector.size() + c
+		- aDiscreteProcessOffset );
 
-	    theVariableVector[ c ]->clearVelocity();
+	    gsl_vector_set( theVelocityVector1, anIndex,
+			    theProcessVector[ c ]->getActivity() );	
+	  }
+
+	for ( IntVector::size_type c( 0 );
+	      c < theContinuousVariableVector.size(); c++ )
+	  {
+	    const int anIndex( theContinuousVariableVector[ c ] );
+
+	    gsl_vector_set( theVelocityVector1, c,
+			    theVariableVector[ anIndex ]->getVelocity()
+			    + theW[ anIndex ] * hee1
+			    + theW[ anIndex + aSize ] * hee2
+			    + theW[ anIndex + 2*aSize ] * hee3 );
+
+	    theVariableVector[ anIndex ]->clearVelocity();
 	  }
 
 	gsl_linalg_LU_solve( theJacobianMatrix1, thePermutation1,
@@ -630,7 +868,21 @@ namespace libecs
 
     theRejectedStepFlag = false;
 
+    /**
+       set initial activities
+       to theDiscreteActivityBuffer and theVelocityBuffer
+    */
     fireProcesses();
+
+    const ProcessVector::size_type
+      aDiscreteProcessOffset( getDiscreteProcessOffset() );
+    for ( ProcessVector::size_type c( aDiscreteProcessOffset );
+	  c < theProcessVector.size(); c++ )
+      {
+	theDiscreteActivityBuffer[ c - aDiscreteProcessOffset ] 
+	  = theProcessVector[ c ]->getActivity();
+      }
+
     for ( VariableVector::size_type i( 0 ); i < aSize; ++i )
       {
 	theVelocityBuffer[ i ] = theVariableVector[ i ]->getVelocity();
@@ -679,7 +931,7 @@ namespace libecs
 
     for ( VariableVector::size_type c( 0 ); c < aSize; c++ )
       {
-	//	std::cout << "z : " << theW[c] << " : "<< theW[c+aSize] << " : " << theW[c+2*aSize] << std::endl;
+	//	std::cout << "z : " << theW[ c ] << " : "<< theW[ c+aSize ] << " : " << theW[ c+2*aSize ] << std::endl;
 
 	const Real z2( theW[ c + aSize ] );
 	const Real z1( theW[ c ] );
