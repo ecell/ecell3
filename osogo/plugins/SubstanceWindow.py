@@ -4,6 +4,7 @@ import string
 
 from PluginWindow import *
 from ecssupport import *
+import GTK
 
 class SubstanceWindow(PluginWindow):
 
@@ -13,6 +14,15 @@ class SubstanceWindow(PluginWindow):
         self.theFixFlug = 0
 
         PluginWindow.__init__( self,dirname,sim, data, pluginmanager )
+
+        self['toolbar1'].set_style( GTK.TOOLBAR_ICONS )
+        self['toolbar1'].set_button_relief( GTK.RELIEF_HALF )
+        self['toolbar2'].set_style( GTK.TOOLBAR_ICONS )
+        self['toolbar2'].set_button_relief( GTK.RELIEF_HALF )
+        self['toolbar3'].set_style( GTK.TOOLBAR_ICONS )
+        self['toolbar3'].set_button_relief( GTK.RELIEF_HALF )
+        self['toolbar4'].set_style( GTK.TOOLBAR_ICONS )
+        self['toolbar4'].set_button_relief( GTK.RELIEF_HALF )        
         
         self.addHandlers( {'button_toggled': self.fix_mode,
                               'qty_increase_pressed': self.increaseQuantity, 
