@@ -88,7 +88,7 @@ Object PySimulator::createStepper( const Py::Tuple& args )
 {
   ECS_TRY;
 
-  args.verify_length( 2, 3 );
+  args.verify_length( 2,3 );
 
   const String        aClassname ( static_cast<Py::String>( args[0] ) );
   const String        anID       ( static_cast<Py::String>( args[1] ) );
@@ -107,6 +107,8 @@ Object PySimulator::createStepper( const Py::Tuple& args )
     }
 
   Simulator::createStepper( aClassname, anID, aMessageBody );
+
+  return Py::Object();
 
   ECS_CATCH;
 }
