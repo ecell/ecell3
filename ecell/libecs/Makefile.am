@@ -3,11 +3,11 @@ DMTOOL_INCLUDE=-I@DMTOOL_INCLUDE@
 KORANDOM_INCLUDE=-I@KORANDOM_INCLUDE@
 
 INCLUDES = -I..  -I../include ${KORANDOM_INCLUDE} ${DMTOOL_INCLUDE}
-noinst_LIBRARIES = libecscore.a
+noinst_LIBRARIES = libecs.a
 
-CXXFLAGS=-D_GNU_SOURCE
+CXXFLAGS=-D_GNU_SOURCE -D_REENTRANT -D_THREAD_SAFE
 
-libecscore_a_SOURCES =\
+libecs_a_SOURCES =\
 AccumulatorMaker.cpp\
 FQPN.cpp\
 ReactorMaker.cpp\
