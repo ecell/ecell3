@@ -1,0 +1,19 @@
+dnl Process this file with autoconf to produce a configure script.
+AC_INIT(em2eml.py)
+AM_INIT_AUTOMAKE(bin, 0.0)
+
+dnl Checks for programs.
+dnl AC_PROG_CC
+
+dnl Checks for libraries.
+
+dnl Checks for header files.
+
+dnl Checks for typedefs, structures, and compiler characteristics.
+
+dnl Checks for library functions.
+
+AC_OUTPUT(Makefile
+,chmod +x em2eml.py
+)
+
