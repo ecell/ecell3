@@ -30,10 +30,16 @@
 
 
 #include "EmcLogger.hpp"
-
+#include "LocalLoggerImplementation.hpp"
+#include "MessageInterface.hpp"
 
 namespace libemc
 {
 
+  EmcLogger::EmcLogger( AbstractMessageCallbackCptr aMessageCallback )
+  {
+    theLoggerImplementation = new LocalLoggerImplementation( aMessageCallback );
+  }
 
 } // namespace libemc
+

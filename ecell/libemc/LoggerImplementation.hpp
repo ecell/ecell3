@@ -32,10 +32,13 @@
 #ifndef ___LOGGER_IMPLEMENTATION_H___
 #define ___LOGGER_IMPLEMENTATION_H___
 
+#include "libecs.hpp"
 #include "Logger.hpp" 
 
 namespace libemc
 {
+
+  using namespace libecs;
 
   /**
      Pure virtual base class (interface definition) of logger
@@ -47,24 +50,25 @@ namespace libemc
 
   public:
 
-    typedef Logger<Real,Real> RealLogger;
-
     LoggerImplementation() {}
     virtual ~LoggerImplementation() {}
 
-    virtual RealLogger::DataPointVector&
-    getData( const Real& first,
-	     const Real& last,
-	     const Real& interval ) const = 0;
+    virtual Logger::DataPointVectorCref
+    getData( void ) const = 0;
+
+    virtual Logger::DataPointVectorCref
+    getData( libecs::RealCref start,
+	     libecs::RealCref end ) const = 0;
+
+    virtual Logger::DataPointVectorCref
+    getData( libecs::RealCref start,
+	     libecs::RealCref end,
+	     libecs::RealCref interval ) const = 0;
 
     virtual void update( void ) = 0;
 
     // FIXME temporary
-    virtual void update( RealLogger::containee_type& datapoint ) = 0;  
-
-    //  virtual void push( const RealLogger::containee_type& x ) = 0;
-
-    //  virtual void push( const Real& t, const Real& v ) = 0;
+    virtual void update( Logger::containee_type& datapoint ) = 0;  
 
 
   };

@@ -39,6 +39,8 @@
 namespace libemc
 {
 
+  using namespace libecs;
+
   class LocalLoggerImplementation
     :
     public LoggerImplementation
@@ -46,24 +48,28 @@ namespace libemc
 
   public:
 
-    LocalLoggerImplementation( ObjectPtr optr );
+    LocalLoggerImplementation( AbstractMessageCallbackCptr );
     virtual ~LocalLoggerImplementation( );
 
-    RealLogger::DataPointVector& getData( const Real& first,
-					  const Real& last,
-					  const Real& interval ) const;
+    Logger::DataPointVectorCref
+    getData( void ) const;
+
+    Logger::DataPointVectorCref
+    getData( libecs::RealCref start,
+	     libecs::RealCref end ) const;
+
+    Logger::DataPointVectorCref
+    getData( libecs::RealCref start,
+	     libecs::RealCref end,
+	     libecs::RealCref interval ) const;
 
     void update( void );
 
-    void update( RealLogger::containee_type& datapoint );
-
-    //  void push( const RealLogger::containee_type& x );
-
-    //  void push( const Real& t, const Real& v ); 
+    void update( Logger::containee_type& datapoint );
 
   private:
 
-    RealLogger theRealLogger;
+    Logger theLogger;
 					
   };
 

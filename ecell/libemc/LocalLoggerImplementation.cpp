@@ -30,13 +30,14 @@
 
 
 #include "LocalLoggerImplementation.hpp"
+#include "MessageInterface.hpp"
 
 namespace libemc
 {
 
-  LocalLoggerImplementation::LocalLoggerImplementation( ObjectPtr optr )
+  LocalLoggerImplementation::LocalLoggerImplementation( AbstractMessageCallbackCptr aMessageCallbackCptr )
     :
-    theRealLogger( RealLogger( optr ) ) 
+    theLogger( Logger( aMessageCallbackCptr ) ) 
   {
     ; // do nothing
   }
@@ -48,26 +49,38 @@ namespace libemc
 
   void LocalLoggerImplementation::update( )
   {
-    theRealLogger.update( );
+    theLogger.update( );
   }
 
   void
-  LocalLoggerImplementation::update( RealLogger::containee_type& datapoint )
+  LocalLoggerImplementation::update( Logger::containee_type& datapoint )
   {
-    theRealLogger.update( datapoint );
+    theLogger.update( datapoint );
+  }
+
+  Logger::DataPointVectorCref
+  LocalLoggerImplementation::getData( libecs::RealCref start,
+				      libecs::RealCref end,
+				      libecs::RealCref interval ) const
+  {
+    return theLogger.getData( start, end, interval );
+  }
+
+  Logger::DataPointVectorCref
+  LocalLoggerImplementation::getData( libecs::RealCref start,
+				      libecs::RealCref end ) const
+				      
+  {
+    return theLogger.getData( start, end );
+  }
+
+  Logger::DataPointVectorCref
+  LocalLoggerImplementation::getData( void ) const
+				      
+  {
+    return theLogger.getData();
   }
 
 
-  /*
-    void LocalLoggerImplementation::push( const RealLogger::containee_type& x )
-    {
-    theRealLogger.push( x );
-    }
-
-    void LocalLoggerImplementation::push( const Real& t, const Real& v )
-    {
-    theRealLogger.push( t, v );
-    } 
-  */
 
 } // namespace libemc

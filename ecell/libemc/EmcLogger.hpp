@@ -38,15 +38,47 @@
 namespace libemc
 {
 
+  using namespace libecs;
+
   class EmcLogger
   {
 
   public:
 
-    EmcLogger( );
+    EmcLogger( AbstractMessageCallbackCptr );
     virtual ~EmcLogger( ) { }
 
-  
+    Logger::DataPointVectorCref
+    getData( void ) const
+    {
+      return theLoggerImplementation->getData();
+    }
+
+    Logger::DataPointVectorCref
+    getData( libecs::RealCref start, libecs::RealCref end ) const
+    {
+      return theLoggerImplementation->getData( start, end );
+    }
+
+    Logger::DataPointVectorCref
+    getData( libecs::RealCref start, libecs::RealCref end, libecs::RealCref interval ) const
+    {
+      return theLoggerImplementation->getData( start, end, interval );
+    }
+
+    void update( void )
+    {
+      theLoggerImplementation->update();
+    }
+
+    void update( Logger::containee_type& datapoint )
+    {
+      theLoggerImplementation->update( datapoint );
+    }
+ 
+
+  private:
+    LoggerImplementation* theLoggerImplementation;
 
   };
 

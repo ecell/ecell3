@@ -33,7 +33,7 @@
 
 namespace libemc
 {
-
+  using namespace libecs;
   // nothing here
 
 } // namespace libemc
