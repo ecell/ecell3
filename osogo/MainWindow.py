@@ -206,56 +206,64 @@ class simulator :
 
     def __init__(self) :
         self.theATP={
-            'PropertyList': ( 'PropertyList', 'Activity', 'Quantity', 'Concentration' ),
+            'PropertyList': ( 'PropertyList', 'Activity', 'Quantity', 'Concentration','ClassName' ),
+            'ClassName' : ('Substance',),
             'Activity' : (100, ),
             'Quantity' : (15, ),
             'Concentration' : (0.0017, )
             }
     
         self.theADP={
-            'PropertyList': ( 'PropertyList', 'Activity', 'Quantity', 'Concentration' ),
+            'PropertyList': ( 'PropertyList', 'Activity', 'Quantity', 'Concentration','ClassName' ),
+            'ClassName' : ('Substance',),
             'Activity' : (120, ),
             'Quantity' : (30, ),
             'Concentration' : (0.0318318, )
             }
     
         self.theAMP={
-            'PropertyList': ( 'PropertyList', 'Activity', 'Quantity', 'Concentration' ),
+            'PropertyList': ( 'PropertyList', 'Activity', 'Quantity', 'Concentration','ClassName' ),
+            'ClassName' : ('Substance',),
             'Activity' : (777, ),
             'Quantity' : (40, ),
             'Concentration' : (0.0037, )
             }
 
         self.theAaa={
-            'PropertyList': ( 'PropertyList', 'Activity', 'Quantity', 'Concentration' ),
+            'PropertyList': ( 'PropertyList', 'Activity', 'Quantity', 'Concentration','ClassName' ),
+            'ClassName' : ('Substance',),
             'Activity' : (100, ),
             'Quantity' : (45, ),
             'Concentration' : (0.03103, )
             }
 
         self.theBbb={
-            'PropertyList': ( 'PropertyList', 'Activity', 'Quantity', 'Concentration' ),
+            'PropertyList': ( 'PropertyList', 'Activity', 'Quantity', 'Concentration','ClassName' ),
+            'ClassName' : ('Substance',),
             'Activity' : (38976, ),
             'Quantity' : (18394, ),
             'Concentration' : (0.001083, )
             }
 
         self.theCcc={
-            'PropertyList': ( 'PropertyList', 'Activity', 'Quantity', 'Concentration' ),
+            'PropertyList': ( 'PropertyList', 'Activity', 'Quantity', 'Concentration','ClassName' ),
+            'ClassName' : ('Substance',),
             'Activity' : (938, ),
             'Quantity' : (896, ),
             'Concentration' : (0.082136, )
             }
 
         self.theDdd={
-            'PropertyList': ( 'PropertyList', 'Activity', 'Quantity', 'Concentration' ),
+            'PropertyList': ( 'PropertyList', 'Activity', 'Quantity', 'Concentration','ClassName' ),
+            'ClassName' : ('Substance',),
             'Activity' : (765938, ),
             'Quantity' : (89696, ),
             'Concentration' : (0.0782136, )
             }
 
         self.theEee={
-            'PropertyList': ( 'PropertyList', 'Activity', 'Quantity', 'Concentration' ),
+            'PropertyList': ( 'PropertyList', 'Activity', 'Quantity', 'Concentration','ClassName' ),
+            'ClassName' : ('Substance',),
             'Activity' : (9978638, ),
             'Quantity' : (89876, ),
             'Concentration' : (0.09682136, )
