@@ -1,16 +1,16 @@
 $Id$
 
-  Installation notes for E-CELL Simulation Environment Version 3 (E-CELL SE 3)
+  Installation notes for E-Cell Simulation Environment Version 3 (E-Cell SE 3)
 
                                        Kouichi Takahashi <shafi@e-cell.org>
 
 
 
-== Getting the latest version of E-CELL 3 ==
+== Getting the latest version of E-Cell 3 ==
 
 1. Get source code via CVS:
 
-   Official development site of E-CELL 3 is:
+   Official development site of E-Cell 3 is:
 
    http://bioinformatics.org/project/?group_id=46
 
@@ -44,7 +44,10 @@ NOTE: If you get this package via cvs, use ./autogen.sh instead of
 
   == Operating Systems ==
 
-  We've tested with RedHat Linux 7.3 on i386 platform.
+  Starting from version 3.1.1, the primary target of ecell3 
+  is RedHat Linux 8.x.
+
+  We've tested with RedHat Linux 8.0 on i386 platform.
 
 
   == Compilers ==
@@ -52,59 +55,36 @@ NOTE: If you get this package via cvs, use ./autogen.sh instead of
   We've tested with gcc-3.1 and gcc-3.2.
 
 
-  == Note for RedHat 7.3 users ==
+  == Note for RedHat 8.0 users ==
 
-  If you are using RedHat Linux 7.3, you need some additional packages to 
-  successfully build and run E-CELL 3.
+  If you are using RedHat Linux 8.0, you need some additional packages to 
+  successfully build and run E-Cell 3.
 
-  1. gcc3:
-     must be installed.  This is an optional package of RedHat 7.3.
-     If it is installed as gcc3, not gcc, 
-     you should set environment variables(CC=gcc3 CXX=g++3) at configure.
-
-  2. python2: 
-     must be installed.  This is an optional package of RedHat 7.3.
-
-  3. Numeric Python for python2:
+  1. Numeric Python for python2:
      note that this should be built for python2, not python.
      You may have to build and install from tarball.
 
      http://numpy.sourceforge.net
 
-  (below is for osogo GUI)
 
-  4. gnome-python 1.4.2 or better for python2:
-     note that this is for python2, not python.
-     You may have to build and install from source code.
+  2. GNU Scientific Library:
+
+     This is provided as optional packages of RedHat 8.0.
+     Find gsl-*.rpm and gsl-devel*.rpm files in the distribution and
+     use rpm command to install them.
      
-     (We have experienced crashing problems with version 1.4.1)
 
-     The configure script of gnome-python doesn't find /usr/bin/python2.
-     A workaround is:
+  3. Boost C++ Libraries
 
-     1. % rm /usr/bin/python    
-        (this should be safe because it's a hard link)
-     2. % ln /usr/bin/python2 /usr/bin/python
-     3. In gnome-python directory,
-        % ./configure ; make ; make install 
-     4. % rm /usr/bin/python ; ln /usr/bin/python1.5 /usr/bin/python
+     You need to have boost C++ Libraries version 1.29.0 or later.
 
-
-     http://www.daa.com.au/+james/pygtk
-
-  5. GtkExtra and PyGtkExtra:
-
-     http://gtkextra.sourceforge.net
-     http://python-gtkextra.sourceforge.net
-
-  6. Boost C++ Libraries
-
-     http://www.boost.org
+     Go http://www.boost.org
      You may have to extract Boost tarball at the same directory of 
-     E-CELL3 source code and should rename the package name to boost.
+     E-Cell3 source code and should rename the package name to boost.
 
      % gzip -dc boost_all.tar.gz | tar xvf -
-     % mv boost_1_28_0 boost
+     % mv boost_1_29_0 boost
+
 
   I recommend http://www.freshmeat.net for finding the latest URLs for the
   packages.
@@ -114,47 +94,37 @@ NOTE: If you get this package via cvs, use ./autogen.sh instead of
 == Usage ==
 
 
-   == 1. Using E-CELL from python interpreter ==
+   == 1. Using E-Cell from python interpreter ==
 
    By default a python binding (pyecs) is built.
 
-   To invoke a python interpreter for E-CELL, use:
+   To invoke a E-Cell Session Script interpreter in interactive mode, use:
 
-      % {PREFIX}/bin/ecell3
+      % {PREFIX}/bin/ecell3-session
 
    (where {PREFIX} is the prefix specified in step 1 of 'Install'. 
     The default is /usr/local.)
 
-   then import E-CELL module by 'import ecell.ecs'.
-
-   Below is an example of using E-CELL from python:
-
-      lupin:~/test$ bin/ecell3
-      Python 2.2 (#1, Dec 23 2001, 09:30:32) 
-      [GCC 2.96 20000731 (Red Hat Linux 7.1 2.96-98)] on linux2
-      Type "help", "copyright", "credits" or "license" for more information.
-      >>> import ecell.ecs
-      >>> dir( ecell.ecs )
-      ['Simulator', '__doc__', '__file__', '__name__']
-      >>> s = ecell.ecs.Simulator()
-      >>> dir( s )
-      ['createEntity', 'getLogger', 'getLoggerList', 'getProperty', ... ]
-      >>> (Ctrl+d)
-      lupin:~/test$ 
+      holly:~/test$ ecell3-session
+      ecell3-session [ for E-Cell SE Version 3, on Python Version 2.2.1 ]
+      Copyright (C) 1996-2002 Keio University.
+      Written by Kouichi Takahashi <shafi@e-cell.org>
+      ecell3-session>>> loadModel( 'simple.eml' )
+      <simple.eml, t=0>>> run( 10 )
+      <simple.eml, t=10.0023>>> (press Ctrl+d to exit)
+      holly:~/test$ 
 
 
 
-   == 2. Using E-CELL from Osogo GUI ==
+   == 2. Using E-Cell from Osogo GUI ==
 
-   If you have python, gnome-python (aka. pygnome) and PyGtkExtra installed,
+   If you have python, and gnome-python  installed,
    a GUI session monitor, Osogo, is built.
 
    To use Osogo, type:
 
    % {PREFIX}/bin/gecell
 
-   Osogo is a python program which runs on the 'ecell3' command, explained 
-   above.
 
 
 == Documentation ==
@@ -167,9 +137,22 @@ NOTE: If you get this package via cvs, use ./autogen.sh instead of
 
       http://www.red-bean.com/cvs2cl
 
-   2. set up cvs for E-CELL 3 project (check the 'Getting...' section above)
+   2. set up cvs for E-Cell 3 project (check the 'Getting...' section above)
 
    3. run the cvs2cl.pl
+
+  
+   == Users Manual ==
+
+   The E-Cell 3 users manual is placed under doc/users-manual/.
+
+   To render it as a pdf file, use the following command:
+
+   ecell3/doc/users-manual$ db2pdf ecell3-users-manual.xml
+
+   Then you get ecell3-users-manual.pdf.
+
+   The manual is still incomplete.
 
 
    == Reference Manual (by Chris Pickett) ==
