@@ -22,11 +22,6 @@ def expandValueList( aValue, aLevel=0 ):
 
     aValueString = ''
 
-    # don't use [] in uppermost level
-    if aLevel != 0:
-        aValueString += '[ '
-
-    
     # don't print a space before the first item
     if len( aValue ) > 0:
         aValueString += str( aValue[0] )
@@ -35,8 +30,9 @@ def expandValueList( aValue, aLevel=0 ):
         aValueString += ' '
         aValueString += str( anItem )
 
+    # don't use [] in uppermost level
     if aLevel != 0:
-        aValueString += ' ]'
+        aValueString = '[ ' + aValueString + ' ]'
 
     return aValueString
         
@@ -50,12 +46,15 @@ def createObjectDef( aType, aClass, anArgList, aPropertyList, anOptional='' ):
     aBuffer = '%s %s( %s )\n{\n' % ( aType, aClass, anArgListString )
 
     # properties
-    for aProperty in aPropertyList:
-        aPropertyName = aProperty[0]
-        aPropertyValueListString = expandValueList( aProperty[1] )
-
-        aBuffer += '\t%s\t%s;\n' % ( aPropertyName, aPropertyValueListString )
-
+    if len( aPropertyList ) != 0:
+        for aProperty in aPropertyList:
+            aPropertyName = aProperty[0]
+            aPropertyValueListString = expandValueList( aProperty[1] )
+            aBuffer += '\t%s\t%s;\n' % ( aPropertyName,
+                                         aPropertyValueListString )
+    else:
+        aBuffer += '\t# no property\n'
+    
     # optional field
     if anOptional != '':
         aBuffer += '\n\t'
@@ -83,6 +82,7 @@ def createStepperList( anEml ):
 
         aBuffer += createObjectDef( 'Stepper', aClass, anArgList,
                                     aPropertyList )
+        aBuffer += '\n'
 
     return aBuffer
 
@@ -120,10 +120,12 @@ def createSystemList( anEml, aSystemPath='' ):
     for anID in anEml.getEntityList( 'Substance', aSystemPath ):
         aFullID = ( SUBSTANCE, aSystemPath, anID )
         anOptional += createEntity( anEml, aFullID )
+        anOptional += '\n'
 
     for anID in anEml.getEntityList( 'Reactor', aSystemPath ):
         aFullID = ( REACTOR, aSystemPath, anID )
         anOptional += createEntity( anEml, aFullID )
+        anOptional += '\n'
 
     if aSystemPath == '':
         aFullID = ( SYSTEM, '', '/' )
