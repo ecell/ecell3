@@ -139,6 +139,9 @@ namespace libemc
 
   void LocalSimulatorImplementation::run()
   {
+    assert( thePendingEventChecker != NULLPTR );
+    assert( theEventHandler != NULLPTR );
+
     theRunningFlag = true;
 
     do
@@ -146,11 +149,17 @@ namespace libemc
 	step();
 
 	while( (*thePendingEventChecker)() )
-	  {
-	    (*theEventHandler)();
-	  }
+        {
+	  (*theEventHandler)();
+	  
+	  if( !theRunningFlag )
+	    {
+	      break;
+	    }
+	}
 
       }	while( theRunningFlag );
+
   }
 
   void LocalSimulatorImplementation::stop()
