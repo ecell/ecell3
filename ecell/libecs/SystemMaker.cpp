@@ -42,7 +42,7 @@ namespace libecs
 
   void SystemMaker::makeClassList()
   {
-
+    NewSystemModule( System );
   }
 
 } // namespace libecs

@@ -324,6 +324,8 @@ namespace libecs
     Real getDeltaT() const;
 
 
+    static SystemPtr instance() { return new System; }
+
   public: // message slots
 
     void setStepper( MessageCref message );

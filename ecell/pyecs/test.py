@@ -20,6 +20,8 @@ def printList( sim, primitivetype, systempath,list ):
 print 'create Simulator instance.'
 s = ecs.Simulator()
 
+s.createEntity( 'System', ( 'System', '/', 'CYTOPLASM' ), 'cytoplasm' )
+
 print 'make substances...'
 s.createEntity( 'Substance', ( 'Substance', '/', 'A' ), 'substance A' )
 s.createEntity( 'Substance', ( 'Substance', '/', 'B' ), 'substance B' )
@@ -40,6 +42,9 @@ s.setProperty( ( 'Substance', '/', 'A', 'Quantity' ), (30,) )
 print 'initialize()...'
 s.initialize()
 
+printAllProperties( s, ( 'System', '/', 'CYTOPLASM' ) )
+
+
 substancelist = s.getProperty( ( 'System', '/', '/', 'SubstanceList' ) )
 
 printList( s, 'Substance', '/' , substancelist )
@@ -52,7 +57,7 @@ s.setProperty( ( 'Substance', '/', 'A', 'Quantity' ), (1, ) )
 printProperty( s, ( 'Substance', '/', 'A', 'Quantity' ) )
 
 try:
-    printAllProperties( s, 'Reactor:/:RC1' )
+    printAllProperties( s, ( 'Reactor', '/', 'RC1' ) )
 except:
     pass
 
