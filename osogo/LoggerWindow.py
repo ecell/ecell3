@@ -1,14 +1,7 @@
 #!/usr/bin/env python
 
-import string
 from Window import *
 from gtk import *
-
-### for test
-import sys
-sys.path.append('.')
-import Plugin
-### for test
 
 from ecssupport import *
 
@@ -57,13 +50,15 @@ if __name__ == "__main__":
 
     class simulator:
 
-        dic={('Substance', '/CELL/CYTOPLASM', 'ATP','Quantity') : (1950,),}
+        def __init__( self ):
+
+            self.dic={('Substance', '/CELL/CYTOPLASM', 'ATP','Quantity') : (1950,),}
 
         def getProperty( self, fpn ):
-            return simulator.dic[fpn]
+            return self.dic[fpn]
 
         def setProperty( self, fpn, value ):
-            simulator.dic[fpn] = value
+            self.dic[fpn] = value
 
         def getLogger( self, fpn ):
             logger = Logger( fpn )

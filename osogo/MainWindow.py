@@ -121,7 +121,7 @@ class MainWindow(Window):
 
     def startSimulation( self, a ) :
         self.printMessage( "start\n" )
-        self.theSimulator.run();
+        self.theSimulator.run()
 
     def stopSimulation( self, a ) :
         self.printMessage( 'this function STOP is not supported.\n' )
@@ -153,7 +153,12 @@ class MainWindow(Window):
         value = self.theSimulator.getProperty( fullpn )
         self.printMessage( getFullPNString( fullpn ) )
         self.printMessage( ' = ' )
-        self.printMessage( str(value[0]) )
+        if len(value) == 1:
+            self.printMessage( str(value[0]) )
+        else:
+            for i in value:
+                self.printMessage( str(i) )
+                self.printMessage( ',' )
         self.printMessage( "\n" )
     
     def printAllProperties( self, fullid ):
