@@ -11,9 +11,9 @@ pkgpythondir=@pkgpythondir@
 if OS_WIN32
   no_undefined = -no-undefined
   LIBPYTHON = -lpython22
-  SHLEXT = .dll
+  ECELL3_PYTHON_EXT = .bat
 else
-  SHLEXT = @LTDL_SHLIB_EXT@
+  ECELL3_PYTHON_EXT =
 endif
 
 BOOST_INCLUDE=@BOOST_INCLUDE@
@@ -50,17 +50,17 @@ _ecs_la_LIBADD=$(LIBECS) $(LIBEMC) $(LIBBOOSTPYTHON) $(LIBPYTHON)
 _ecs_la_DEPENDENCIES=$(LIBECS) $(LIBEMC)
 
 
-all-local: _ecs$(SHLEXT)
+all-local: _ecs@LTDL_SHLIB_EXT@
 
 
-_ecs$(SHLEXT): _ecs.la 
-	ln -sf .libs/_ecs$(SHLEXT) ./_ecs$(SHLEXT)
+_ecs@LTDL_SHLIB_EXT@: _ecs.la 
+	ln -sf .libs/_ecs@LTDL_SHLIB_EXT@ ./_ecs@LTDL_SHLIB_EXT@
 
 clean-local:
-	rm -f _ecs$(SHLEXT)
+	rm -f _ecs@LTDL_SHLIB_EXT@
 
 bin_SCRIPTS =\
-ecell3-python
+ecell3-python$(ECELL3_PYTHON_EXT)
 
 
 
