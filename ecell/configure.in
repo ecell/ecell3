@@ -115,7 +115,7 @@ dnl disable checking dlopen for windows
 case ${host_os} in
   *cygwin* | *mingw* | *win32*)
     os_win32=yes
-    pythondir=$PREFIX/python$PYTHON_WIN_VERSION/lib/site-packages
+    AM_CHECK_PYMOD(py2exe,,,[AC_MSG_ERROR([could not find py2exe module])])
     ;;
   *)
     AC_CHECK_LIB(dl, dlopen, LIBDL="-ldl")

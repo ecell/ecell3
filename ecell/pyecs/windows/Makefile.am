@@ -12,7 +12,8 @@ BINS = \
 ecell3-console
 
 BINS_SHARED = \
-shared.zip
+shared.zip\
+_winreg.pyd
 
 EXE = ${BINS:=$(EXEEXT)}
 bin_SCRIPTS = ${EXE} ${BINS_SHARED}

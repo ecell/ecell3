@@ -8,25 +8,71 @@ import sys
 os.environ['PACKAGE'] = '@PACKAGE@'
 os.environ['VERSION'] = '@VERSION@'
 
+# Get installed E-Cell prefix
 prefix = os.path.split(sys.prefix)[0]
-os.environ['ECELL3_PREFIX'] = prefix
 
-prefix = prefix + os.sep
-os.environ['OSOGOPATH'] = prefix + 'lib' + os.sep + 'osogo'
-os.environ['MEPATH'] = prefix + 'lib' + os.sep + 'modeleditor'
-os.environ['TLPATH'] = prefix + 'lib' + os.sep + 'toollauncher'
-os.environ['PYTHONDIR'] = prefix + 'python@PYTHON_WIN_VERSION@' + os.sep + \
-		'lib' + os.sep + \
-		'site-packages' # used by dmgen
-os.environ['LTDL_LIBRARY_PATH'] = prefix + 'lib' + os.sep + 'ecell' + \
-		os.sep + os.environ['VERSION']
-os.environ['PATH'] = prefix + 'bin' + os.pathsep + prefix + 'lib' + os.pathsep \
-		+ prefix + 'python@PYTHON_WIN_VERSION@' + os.pathsep + \
+os.environ['ECELL3_PREFIX']=\
+	prefix
+
+os.environ['OSOGOPATH']=\
+	os.path.join( prefix, 'lib', 'osogo' )
+
+os.environ['MEPATH']=\
+	os.path.join( prefix, 'lib', 'modeleditor' )
+
+os.environ['TLPATH']=\
+	os.path.join( prefix, 'lib', 'toollauncher' )
+
+os.environ['LTDL_LIBRARY_PATH']=\
+	os.path.join( prefix, 'lib', 'ecell', os.environ['VERSION'] )
+
+os.environ['VVECTORTMPDIR']=\
+	os.environ['TMP']
+
+# PYTHONDIR contains E-Cell, pygtk and Numeric python modules
+# PYTHONDIR is used by dmgen
+os.environ['PYTHONDIR']=\
+	os.path.join( prefix, 'lib', 'python' + sys.winver, 'site-packages' )
+
+# Include E-Cell python module location in Python module search path
+os.environ['PYTHONPATH']=\
+	os.environ['PYTHONDIR']
+	
+# BOOST_LIBRARIES is used by ecell3-dmc		
+os.environ['BOOST_LIBRARIES']=\
+	'-L' + os.path.join( prefix, 'lib' ) + ' -lboost_python'
+
+# Get installed Python prefix from Windows registry
+import _winreg
+try:
+	key = _winreg.OpenKey( _winreg.HKEY_LOCAL_MACHINE, \
+		r'Software\Python\PythonCore\%s' % (sys.winver) )
+except:
+	print "Could not find Python in registry"
+	sys.exit(1)
+
+python_prefix = os.path.abspath( _winreg.QueryValue( key, 'InstallPath' ) )
+_winreg.CloseKey( key )
+
+os.environ['PATH']=\
+	os.pathsep.join([
+		os.path.join( prefix, 'bin' ),
+		os.path.join( prefix, 'lib' ),
+		python_prefix,
 		os.environ['PATH']
-os.environ['VVECTORTMPDIR'] = os.environ['TMP']		
-os.environ['PYTHONPATH'] = os.environ['PYTHONDIR']
-os.environ['BOOST_LIBRARIES'] = '-L' + prefix + 'lib' + ' -lboost_python'
+	])
 
-python_prefix = prefix + 'python@PYTHON_WIN_VERSION@' + os.sep
-sys.path = [ python_prefix, python_prefix + 'lib\\site-packages', python_prefix + 'lib\\site-packages\\Numeric', python_prefix + 'lib\\site-packages\\gtk-2.0', os.environ['OSOGOPATH'], python_prefix + 'DLLs', python_prefix + 'lib', python_prefix + 'lib\\plat-win', python_prefix + 'lib\\lib-tk' ]
+# Set sys.path to point to all locations of Python modules
+sys.path = [
+	python_prefix,
+	os.environ['PYTHONDIR'],
+	os.path.join( python_prefix, 'lib', 'site-packages' ),
+	os.path.join( python_prefix, 'lib', 'site-packages', 'Numeric'),
+	os.path.join( python_prefix, 'lib', 'site-packages', 'gtk-2.0'),
+	os.environ['OSOGOPATH'],
+	os.path.join( python_prefix, 'DLLs' ),
+	os.path.join( python_prefix, 'lib' ),
+	os.path.join( python_prefix, 'lib', 'plat-win'),
+	os.path.join( python_prefix, 'lib', 'lib-tk' )
+]
 

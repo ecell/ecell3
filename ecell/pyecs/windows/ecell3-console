@@ -1,10 +1,36 @@
+# Script to create a convenience console in MS-Windows
+# The console can be used for E-Cell command line interface
+# Author: Satya Arjunan < satya@sfc.keio.ac.jp >
+
 import os
 import sys
 
 pathSaved = os.environ['PATH']
-prefix = os.path.split(sys.prefix)[0] + os.sep
-os.environ['PATH'] = prefix + 'bin' + os.pathsep + prefix + 'lib' + os.pathsep \
-		+ prefix + 'python23' + os.pathsep +  os.environ['PATH']
-os.popen('start "E-Cell3 Console" /D' + prefix)
+
+# Get installed E-Cell prefix
+# Forced quotes for paths containing whitespaces
+prefix = os.path.split(sys.prefix)[0]
+
+# Get installed Python prefix from Windows registry
+import _winreg
+try:
+	key = _winreg.OpenKey( _winreg.HKEY_LOCAL_MACHINE, \
+		r'Software\Python\PythonCore\%s' % (sys.winver) )
+except:
+	print "Could not find Python in registry"
+	sys.exit(1)
+
+python_prefix = os.path.abspath( _winreg.QueryValue( key, 'InstallPath' ) )
+_winreg.CloseKey( key )
+
+os.environ['PATH']=\
+	os.pathsep.join([
+		os.path.join( prefix, 'bin' ),
+		os.path.join( prefix, 'lib' ),
+		python_prefix,
+		os.environ['PATH']
+	])
+os.chdir( prefix )
+os.popen('start "E-Cell3 Console"' )
 os.environ['PATH'] = pathSaved
 
