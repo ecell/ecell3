@@ -34,6 +34,9 @@ PythonFluxProcess.cpp\
 PythonProcess.cpp
 
 DMH = CashKarp45Stepper.hpp\
+PythonFluxProcess.hpp\
+PythonProcess.hpp\
+PythonProcessBase.hpp\
 FixedODE1Stepper.hpp\
 FixedRungeKutta4Stepper.hpp\
 GillespieProcess.hpp\
