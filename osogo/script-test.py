@@ -1,5 +1,7 @@
 #!/usr/bin/python2
 
+from ecssupport import *
+
 ENTITY     = 1
 SUBSTANCE  = 2
 REACTOR    = 3
@@ -41,3 +43,8 @@ except:
 
 print 'initialize()...'
 MainWindow.theSimulator.initialize()
+
+
+printAllProperties( MainWindow.theSimulator, ( SYSTEM, '', '/' ) )
+printAllProperties( MainWindow.theSimulator, ( SYSTEM, '/', 'CYTOPLASM' ) )
+printProperty( MainWindow.theSimulator, ( SUBSTANCE, '/', 'A', 'Quantity' ) )
