@@ -1,8 +1,388 @@
 <!-- ============= Automating Simulation Sessions with ECS ========== -->
 <chapter id="writing-ecs"> 
-  <title>Automating Simulation Sessions with E-Cell Script</title> 
+  <title>Automating Simulation Sessions with &ecell Session Script</title> 
 
-  <para>Writing .ecs file which is loaded by Session class.</para>
+  <highlights>
+    <para>By reading this chapter, you can get information about the
+    following items:
+      <simplelist>
+	<member>What is &ecell Session Script (<acronym>ESS</acronym>).</member>
+
+	<member>How to automate the simulation by writing the
+          <acronym>ESS</acronym> files.</member>
+
+	<member>How to run &ecell in scripting mode.</member>
+
+        <member>How to customize existing frontend software components.</member>
+	<member>How to write a new frontend program to &ecell&.</member>
+
+      </simplelist>
+</para>
+  </highlights>
+
+  <sect1>
+    <title>What is &ecell Session Script?</title>
+
+    <para>need description here.</para>
+
+  </sect1>
+
+
+  
+
+
+  <sect1>
+    <title>Running &ecell Session Script</title>
+
+    <para>There are roughly three ways to execute <acronym>ESS</acronym>;
+
+      <itemizedlist>
+	<listitem>
+	  <para>Execute the script from operating system's command
+	  line (shell prompt).
+          </para>
+	</listitem>
+	<listitem>
+	  <para>Load the script from a frontend software such as Osogo
+	  Session Monitor.</para>
+	</listitem>
+	<listitem>
+	  <para>Use SessionManager to automate the invokation of the
+	  simulation sessions, as well as the generation of the <acronym>ESS</acronym>
+	  itself, for simulations involving multiple runs of the
+	  simulator.</para>
+	</listitem>
+
+      </itemizedlist>
+    </para>
+
+    <sect2>
+      <title>Running the <acronym>ESS</acronym> in command line mode</title>
+
+      <para>To run a <acronym>ESS</acronym> in command line, use
+      <command>ecell3-session</command> command.
+      </para>
+
+      <cmdsynopsis>
+	<command>ecell3-session</command>
+	<arg><replaceable>file.ess</replaceable></arg>
+      </cmdsynopsis>
+
+      
+      <sect3>
+	<title>In batch mode</title>
+	
+
+	<para>
+	To execute a <acronym>ESS</acronym> file, type the following
+	command at the shell prompt:
+
+        <screen>
+          <userinput>
+            <command>ecell3-session</command> <replaceable>filename.ess</replaceable>
+          </userinput>
+        </screen>
+
+        <command>ecell3-session</command> command loads the
+        <acronym>ESS</acronym> file and runs a single simulation
+        session as described in the file.
+      </para>
+
+      </sect3>
+
+      <sect3>
+	<title>In interactive mode</title>
+	<para>??? - is this possible?</para>
+      </sect3>
+
+      <sect3>
+	<title>Giving parameters to the script</title>
+	<para>not implemented yet</para>
+      </sect3>
+
+
+    </sect2>
+
+    <sect2>
+      <title>Loading <acronym>ESS</acronym> from Osogo Session Monitor</title>
+
+      <para>need explanation here, or just say see osogo's manual?</para>
+
+    </sect2>
+
+
+    <sect2>
+      <title>Using SessionManager</title>
+
+      <para>need description here.</para>
+
+    </sect2>
+
+  </sect1>
+
+  <sect1>
+    <title>Writing &ecell Session Script</title>
+
+    <para>The syntax of <acronym>ESS</acronym> is a full set of
+    <productname>Python</productname> script with some convenient
+    features.</para>
+
+    <para>In <acronym>ESS</acronym>, methods defined in
+    <classname>Session</classname> class, or Session API, can be used.
+    For example, to run the simulation for 10 seconds, you may use
+    <methodname>run</methodname> method of a
+    <classname>Session</classname> object in your
+    <acronym>ESS</acronym> file.
+
+    <informalexample> 
+	<programlisting>self.run( 10 )</programlisting>
+    </informalexample> 
+
+    where <methodname>self.</methodname> is the current
+    <classname>Session</classname> object given by the system.
+    </para>
+
+    <para>Unlike usual <productname>Python</productname> script, you
+    have no need to specify the object on which the method is called
+    if the object is the current <classname>Session</classname>.  
+    Thus <methodname>self.</methodname> can be ommited.
+    <informalexample>
+	<programlisting>run( 10 )</programlisting>
+    </informalexample>
+    </para>
+
+
+    <example>
+      <title>A simple <acronym>ESS</acronym> example.</title>
+
+      <programlisting>
+loadModel( 'simple.eml' )
+run( 100 )
+</programlisting>
+    </example>
+
+
+    <table pgwide='1' tocentry='1' frame='bottom' rowsep='0'>
+      <title>Session API: methods and properties</title>
+      
+      <tgroup cols="3">
+	<colspec colnum='1' colname='c1'/>
+	<colspec colnum='2' colname='c2'/>
+	<colspec colnum='3' colname='c3'/>
+	<thead>
+	  <row>
+	    <entry namest="c1" nameend='c2'>Synopsis</entry>
+	    <entry>Return</entry>
+	  </row>
+	  <row>
+	    <entry namest='c1' nameend='c3' align='left' rowsep='1'>Description</entry>	  </row>
+	</thead>
+	
+	<tbody>
+
+
+<!-- ============== Session Methods ==================== -->
+	  <row>
+	    <entry namest='c1' nameend='c3' align='center'rowsep='1'><emphasis>Session methods</emphasis></entry>
+	  </row>
+
+
+<!-- log -->
+	  <row>
+	    <entry namest='c1' nameend='c2' align='left'>
+<synopsis><methodname>log</methodname>( <parameter>message</parameter> )
+</synopsis></entry>
+
+	    <entry>None</entry>
+	  </row>
+	  <row>
+	    <entry namest="c1" nameend='c3' rowsep='1'>
+<para></para>
+            </entry>
+	  </row>
+
+
+
+<!-- loadScript -->
+	  <row>
+	    <entry namest='c1' nameend='c2' align='left'>
+<synopsis><methodname>loadScript</methodname>( <parameter>filename</parameter> )
+</synopsis></entry>
+
+	    <entry>None</entry>
+	  </row>
+
+	  <row>
+	    <entry namest="c1" nameend='c3' rowsep='1'>
+<para>Load a ESS file.  Usually this is not used in an ESS.  
+</para>
+
+<para>?? what happens then?  can this be called recursively?
+</para>
+
+            </entry>
+	  </row>
+
+
+<!-- loadModel -->
+
+	  <row>
+	    <entry namest='c1' nameend='c2' align='left'>
+<synopsis><methodname>loadModel</methodname>( <parameter>file</parameter> )
+</synopsis></entry>
+
+	    <entry>None</entry>
+	  </row>
+
+	  <row>
+	    <entry namest="c1" nameend='c3' rowsep='1'>
+<para>Load an EML file, and create a cell model as described in the file.
+</para>
+
+<para><parameter>file</parameter> can be either a filename or a file object.
+</para>
+
+            </entry>
+	  </row>
+
+<!-- setLogMethod -->
+
+	  <row>
+	    <entry namest='c1' nameend='c2' align='left'>
+<synopsis><methodname>setLogMethod</methodname>( <parameter>file</parameter> )
+</synopsis></entry>
+
+	    <entry>None</entry>
+	  </row>
+
+	  <row>
+	    <entry namest="c1" nameend='c3' rowsep='1'>
+<para>Load an EML file, and create a cell model as described in the file.
+</para>
+
+<para><parameter>file</parameter> can be either a filename or a file object.
+</para>
+
+            </entry>
+	  </row>
+
+<!-- ============ Simulation Methods ================== -->
+
+	  <row>
+	    <entry namest='c1' nameend='c3' align='center' rowsep='1'>
+<emphasis>Simulation methods</emphasis></entry>
+	  </row>
+
+<!-- getCurrentTime() -->
+
+	  <row>
+	    <entry namest='c1' nameend='c2' align='left'>
+<synopsis><methodname>getCurrentTime</methodname>()
+</synopsis></entry>
+
+	    <entry>The current time as float</entry>
+	  </row>
+
+	  <row>
+	    <entry namest="c1" nameend='c3' rowsep='1'>
+
+            </entry>
+	  </row>
+
+
+<!-- run -->
+	  <row>
+	    <entry namest='c1' nameend='c2' align='left'>
+<synopsis><methodname>run</methodname>( <optional><parameter>sec</parameter></optional> )
+</synopsis>
+            </entry>
+
+	    <entry>None</entry>
+
+	  </row>
+	  <row>
+	    <entry namest="c1" nameend='c3' rowsep='1'>
+	    <para>Run the simulation for <parameter>sec</parameter>
+	    seconds.</para> <para>If <parameter>sec</parameter> is
+	    omitted, this method will not return unless the event
+	    checker object is set by using
+	    <methodname>setEventChecker</methodname>() and it returns
+	    true.</para> 
+            <para>See also:
+	    <methodname>setEventChecker</methodname>() and
+	    <methodname>setEventHandler</methodname>()</para></entry>
+	  </row>
+
+<!-- setEventChecker() -->
+
+	  <row>
+	    <entry namest='c1' nameend='c2' align='left'>
+<synopsis><methodname>setEventChecker</methodname>( <parameter>eventchecker</parameter> )
+</synopsis></entry>
+
+	    <entry>None</entry>
+	  </row>
+
+	  <row>
+	    <entry namest="c1" nameend='c3' rowsep='1'>
+            </entry>
+	  </row>
+
+<!-- setEventHandler() -->
+
+	  <row>
+	    <entry namest='c1' nameend='c2' align='left'>
+<synopsis><methodname>setEventHandler</methodname>( <parameter>eventhandler</parameter> )
+</synopsis></entry>
+
+	    <entry>None</entry>
+	  </row>
+
+	  <row>
+	    <entry namest="c1" nameend='c3' rowsep='1'>
+            </entry>
+	  </row>
+
+
+
+<!-- step -->
+	  <row>
+	    <entry namest='c1' nameend='c2' align='left'>
+<synopsis><methodname>step</methodname>( <optional><parameter>numsteps</parameter></optional> )
+</synopsis></entry>
+
+	    <entry>None</entry>
+	  </row>
+
+	  <row>
+	    <entry namest="c1" nameend='c3' rowsep='1'>
+            </entry>
+	  </row>
+
+
+<!-- step -->
+	  <row>
+	    <entry namest='c1' nameend='c2' align='left'>
+<synopsis><methodname>stop</methodname>( <optional><parameter>numsteps</parameter></optional> )
+</synopsis></entry>
+
+	    <entry>None</entry>
+	  </row>
+
+	  <row>
+	    <entry namest="c1" nameend='c3' rowsep='1'>
+            </entry>
+	  </row>
+
+
+	</tbody>
+      </tgroup>
+    </table>
+
+  </sect1>
+
+  
+
 
 </chapter>
 

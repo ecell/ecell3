@@ -107,14 +107,15 @@
                 in scripting mode, type the following command, 
     		then press <keycap>Return</keycap>:</para>
 	    <para> 
-			<command>ecell3</command> 
-			<replaceable>[filename.py]</replaceable>
-    		</para> 
+		<command>ecell3</command> <optional><parameter><replaceable>filename.py</replaceable></parameter></optional>
+    	    </para> 
 	    <para>where  
 			<replaceable>filename.py</replaceable> 
                         is the name of the python script file you
 			want to execute.  
-    		</para> 
+    		</para>
+	  <para>If <replaceable>filename.py</replaceable> is omitted,
+	  the interpreter starts up in interactive mode.</para>
 	  </listitem>
     	</varlistentry>
 
