@@ -94,6 +94,7 @@ namespace libecs
     if ( theInterrupted )
     //    if ( 1 )
       {
+	interIntegrate();
 	process();
 
 	for( UnsignedInt c( 0 ); c < aSize; ++c )
@@ -131,6 +132,7 @@ namespace libecs
 
     // ========= 2 ===========
     setCurrentTime( aCurrentTime + getStepInterval() * 0.2 );
+    interIntegrate();
     process();
 
     for( UnsignedInt c( 0 ); c < aSize; ++c )
@@ -152,6 +154,7 @@ namespace libecs
 
     // ========= 3 ===========
     setCurrentTime( aCurrentTime + getStepInterval() * 0.3 );
+    interIntegrate();
     process();
 
     for( UnsignedInt c( 0 ); c < aSize; ++c )
@@ -173,6 +176,7 @@ namespace libecs
 
     // ========= 4 ===========
     setCurrentTime( aCurrentTime + getStepInterval() * 0.8 );
+    interIntegrate();
     process();
 
     for( UnsignedInt c( 0 ); c < aSize; ++c )
@@ -195,6 +199,7 @@ namespace libecs
 
     // ========= 5 ===========
     setCurrentTime( aCurrentTime + getStepInterval() * ( 8.0 / 9.0 ) );
+    interIntegrate();
     process();
 
     for( UnsignedInt c( 0 ); c < aSize; ++c )
@@ -218,6 +223,7 @@ namespace libecs
 
     // ========= 6 ===========
     setCurrentTime( aCurrentTime + getStepInterval() );
+    interIntegrate();
     process();
 
     for( UnsignedInt c( 0 ); c < aSize; ++c )
@@ -242,6 +248,7 @@ namespace libecs
 
     // ========= 7 ===========
     setCurrentTime( aCurrentTime + getStepInterval() );
+    interIntegrate();
     process();
 
     // evaluate error
@@ -297,9 +304,10 @@ namespace libecs
 	    maxError = anError;
 	  }
 	
-	aVariable->loadValue( theValueBuffer[ c ] );
-	//	aVariable->setVelocity( 0.0 );
+	aVariable->setVelocity( theVelocityBuffer[ c ] );
       }
+
+    resetAll(); // reset all value
 
     setMaxErrorRatio( maxError );
     setCurrentTime( aCurrentTime );
