@@ -89,7 +89,7 @@ namespace libecs
   void DifferentialStepper::resetAll()
   {
     const VariableVector::size_type aSize( theVariableVector.size() );
-    for( VariableVector::size_type c( aSize ); c < aSize; ++c )
+    for( VariableVector::size_type c( 0 ); c < aSize; ++c )
       {
 	VariablePtr const aVariable( theVariableVector[ c ] );
 	aVariable->loadValue( theValueBuffer[ c ] );
@@ -263,7 +263,6 @@ namespace libecs
 
     theStateFlag = true;
 
-    const Real anAdaptedStepInterval( getStepInterval() );
     const VariableVector::size_type aSize( getReadOnlyVariableOffset() );
 
     for( VariableVector::size_type c( 0 ); c < aSize; ++c )
