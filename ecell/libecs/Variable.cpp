@@ -41,6 +41,10 @@
 namespace libecs
 {
 
+  LIBECS_DM_INIT_STATIC( Variable, Variable );
+  LIBECS_DM_INIT_STATIC( PositiveVariable, Variable );
+
+
   Variable::Variable()
     : 
     theValue( 0.0 ),  
@@ -49,15 +53,7 @@ namespace libecs
     theLastTime( 0.0 ),
     theFixed( false )
   {
-    // Use addVelocity as a set method.
-    CREATE_PROPERTYSLOT( Real, Velocity, 
-			 &Variable::addVelocity,
-			 &Variable::getVelocity );
-    CREATE_PROPERTYSLOT_SET_GET( Real, Value,         Variable );
-    CREATE_PROPERTYSLOT_GET    ( Real, TotalVelocity, Variable );
-    CREATE_PROPERTYSLOT_GET    ( Real, Concentration, Variable );
-    CREATE_PROPERTYSLOT_SET_GET( Int,  Fixed,         Variable );
-
+    ; // do nothing
   } 
 
 

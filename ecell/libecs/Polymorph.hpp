@@ -56,10 +56,7 @@ namespace libecs
 
   public:
 
-    virtual ~PolymorphData()
-    {
-      ; // do nothing
-    }
+    virtual ~PolymorphData();
 
     virtual const String asString()        const = 0;
     virtual const Real   asReal()          const = 0;
@@ -190,10 +187,7 @@ namespace libecs
 
     PolymorphNoneData() {}
 
-    virtual ~PolymorphNoneData()
-    {
-      ; // do nothing
-    }
+    virtual ~PolymorphNoneData();
 
     virtual const String asString() const 
     { 

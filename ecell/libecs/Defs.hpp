@@ -134,7 +134,22 @@ namespace libecs
       typedef name::reverse_iterator name ## Riterator;            \
       typedef name::reverse_iterator& name ## RiteratorRef;        \
       typedef name::reverse_iterator* name ## RiteratorPtr
-   
+
+#define DECLARE_ASSOCVECTOR_TEMPLATE(key,value,comp,name)                \
+      typedef ::Loki::AssocVector<key,value,comp > name;                      \
+      typedef name *       name ## Ptr;                            \
+      typedef const name * name ## Cptr;                           \
+      typedef name &       name ## Ref;                            \
+      typedef const name & name ## Cref;                           \
+      typedef typename name::iterator name ## Iterator;                     \
+      typedef typename name::iterator& name ## IteratorRef;                 \
+      typedef typename name::iterator* name ## IteratorPtr;                 \
+      typedef typename name::const_iterator name ## ConstIterator;          \
+      typedef typename name::const_iterator& name ## ConstIteratorRef;      \
+      typedef typename name::const_iterator* name ## ConstIteratorPtr;      \
+      typedef typename name::reverse_iterator name ## Riterator;            \
+      typedef typename name::reverse_iterator& name ## RiteratorRef;        \
+      typedef typename name::reverse_iterator* name ## RiteratorPtr
 
 
   // String

@@ -54,14 +54,22 @@ namespace libecs
 
   DECLARE_CLASS( DifferentialStepper );
 
-  class DifferentialStepper
-    :
-    public Stepper
+  LIBECS_DM_CLASS( DifferentialStepper, Stepper )
   {
 
-
   public:
-    
+
+    LIBECS_DM_OBJECT_ABSTRACT( DifferentialStepper )
+      {
+	INHERIT_PROPERTIES( Stepper );
+
+	PROPERTYSLOT( Real, StepInterval,
+			     &DifferentialStepper::initializeStepInterval,
+			     &DifferentialStepper::getStepInterval );
+	
+	PROPERTYSLOT_GET( Real, NextStepInterval );
+      }
+
     class VariableProxy
       :
       public libecs::VariableProxy
@@ -173,11 +181,25 @@ namespace libecs
 
   DECLARE_CLASS( AdaptiveDifferentialStepper );
 
-  class AdaptiveDifferentialStepper
-    :
-    public DifferentialStepper
+  LIBECS_DM_CLASS( AdaptiveDifferentialStepper, DifferentialStepper )
   {
+
   public:
+
+    LIBECS_DM_OBJECT_ABSTRACT( AdaptiveDifferentialStepper )
+      {
+	INHERIT_PROPERTIES( DifferentialStepper );
+
+	PROPERTYSLOT_SET_GET( Real, Tolerance );
+	PROPERTYSLOT_SET_GET( Real, AbsoluteToleranceFactor );
+	PROPERTYSLOT_SET_GET( Real, StateToleranceFactor );
+	PROPERTYSLOT_SET_GET( Real, DerivativeToleranceFactor );
+	PROPERTYSLOT_SET_GET( Real, AbsoluteEpsilon );
+	PROPERTYSLOT_SET_GET( Real, RelativeEpsilon );
+	PROPERTYSLOT_GET    ( Real, MaxErrorRatio );
+	PROPERTYSLOT_GET    ( Int,  Order );
+      }
+
 
     class VariableProxy
       :

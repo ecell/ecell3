@@ -58,16 +58,23 @@ namespace libecs
 
   */
 
-  class Entity 
-    : 
-    public PropertyInterface
+
+  LIBECS_DM_CLASS( Entity, PropertiedClass )
   {
 
   public:
 
+    LIBECS_DM_OBJECT_ABSTRACT( Entity ) 
+      {
+	INHERIT_PROPERTIES( PropertiedClass );
+
+	PROPERTYSLOT_SET_GET( String, Name );
+	PROPERTYSLOT        ( String, FullID,
+			      NULLPTR, &Entity::getFullIDString );
+      }
+
     Entity(); 
     virtual ~Entity();
-
 
     /**
        Get a System to which this Entity belongs.
@@ -211,6 +218,8 @@ namespace libecs
     String    theID;
     String    theName;
   };
+
+
 
   /*@}*/
 

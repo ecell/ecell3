@@ -39,6 +39,7 @@
 #include "Model.hpp"
 #include "FullID.hpp"
 #include "PropertySlotMaker.hpp"
+#include "Logger.hpp"
 
 #include "Stepper.hpp"
 
@@ -46,6 +47,7 @@
 namespace libecs
 {
 
+  LIBECS_DM_INIT_STATIC( Stepper, Stepper );
 
   ////////////////////////// Stepper
 
@@ -64,22 +66,6 @@ namespace libecs
     theMinStepInterval( 1e-50 ),
     theMaxStepInterval( 1e+50 )
   {
-    CREATE_PROPERTYSLOT_SET_GET( Int,       Priority,             Stepper );
-    CREATE_PROPERTYSLOT_GET    ( Real,      CurrentTime,          Stepper );
-    CREATE_PROPERTYSLOT_SET_GET( Real,      StepInterval,         Stepper );
-    CREATE_PROPERTYSLOT_SET_GET( Real,      OriginalStepInterval, Stepper );
-    CREATE_PROPERTYSLOT_SET_GET( Real,      MaxStepInterval,      Stepper );
-    CREATE_PROPERTYSLOT_SET_GET( Real,      MinStepInterval,      Stepper );
-    CREATE_PROPERTYSLOT_GET    ( Polymorph, ReadVariableList,     Stepper );
-    CREATE_PROPERTYSLOT_GET    ( Polymorph, WriteVariableList,    Stepper );
-    CREATE_PROPERTYSLOT_GET    ( Polymorph, ProcessList,          Stepper );
-    CREATE_PROPERTYSLOT_GET    ( Polymorph, SystemList,           Stepper );
-    CREATE_PROPERTYSLOT_GET    ( Polymorph, DependentStepperList, Stepper );
-    CREATE_PROPERTYSLOT_SET    ( String,    RngSeed,              Stepper );
-
-    // setting rng type:  not yet supported
-    //CREATE_PROPERTYSLOT_SET_GET( Polymorph, Rng,              Stepper );
-
     gsl_rng_env_setup();
 
     theRng = gsl_rng_alloc( gsl_rng_default );
@@ -116,7 +102,7 @@ namespace libecs
     // (not just read or write variables)
     theValueBuffer.resize( theVariableVector.size() );
 
-    updateLoggedPropertySlotVector();
+    updateLoggerVector();
   }
 
  
@@ -239,10 +225,8 @@ namespace libecs
   }
 
 
-  void Stepper::updateLoggedPropertySlotVector()
+  void Stepper::updateLoggerVector()
   {
-    theLoggedPropertySlotVector.clear();
-
     EntityVector anEntityVector;
     anEntityVector.reserve( theProcessVector.size() + 
 			    getReadOnlyVariableOffset() +
@@ -260,27 +244,30 @@ namespace libecs
     // append theSystemVector
     std::copy( theSystemVector.begin(), theSystemVector.end(),
 	       std::back_inserter( anEntityVector ) );
-		   
 
-    // Scan all the relevant Entities, and find logged PropertySlots.
+
+    theLoggerVector.clear();
+
+    // Scan all the relevant Entities, and find loggers
     for( EntityVectorConstIterator i( anEntityVector.begin() );
 	 i != anEntityVector.end() ; ++i )
       {
-	PropertySlotMapCref aPropertySlotMap( (*i)->getPropertySlotMap() );
-	for( PropertySlotMapConstIterator j( aPropertySlotMap.begin() );
-	     j != aPropertySlotMap.end(); ++j )
-	  {
-	    PropertySlotPtr aPropertySlotPtr( j->second );
-	    if( aPropertySlotPtr->isLogged() )
-	      {
-		theLoggedPropertySlotVector.push_back( aPropertySlotPtr );
-	      }
-	  }
+	EntityPtr anEntityPtr( *i );
 
+	LoggerVectorCref aLoggerVector( anEntityPtr->getLoggerVector() );
+
+	if( ! aLoggerVector.empty() )
+	  {
+	    theLoggerVector.insert( theLoggerVector.end(),
+				    aLoggerVector.begin(),
+				    aLoggerVector.end() );
+	  }
       }
 
-
+    // optimization: sort by memory address.
+    std::sort( theLoggerVector.begin(), theLoggerVector.end() );
   }
+
 
   void Stepper::updateDependentStepperVector()
   {
@@ -433,11 +420,12 @@ namespace libecs
   }
 
 
+  /*
   void Stepper::registerLoggedPropertySlot( PropertySlotPtr aPropertySlotPtr )
   {
     theLoggedPropertySlotVector.push_back( aPropertySlotPtr );
   }
-
+  */
 
   /*
   void Stepper::setStepIntervalConstraint( PolymorphCref aValue )
@@ -490,7 +478,7 @@ namespace libecs
   {
     // update loggers
     const Real aCurrentTime( getCurrentTime() );
-    FOR_ALL( PropertySlotVector, theLoggedPropertySlotVector )
+    FOR_ALL( LoggerVector, theLoggerVector )
       {
 	(*i)->log( aCurrentTime );
       }

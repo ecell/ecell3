@@ -37,6 +37,15 @@
 
 namespace libecs
 {
+  PolymorphData::~PolymorphData()
+  {
+    ; // do nothing
+  }
+
+  PolymorphNoneData::~PolymorphNoneData()
+  {
+    ; // do nothing
+  }
 
   const PolymorphVector PolymorphNoneData::asPolymorphVector() const
   { 

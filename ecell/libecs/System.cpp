@@ -44,6 +44,9 @@
 namespace libecs
 {
 
+  LIBECS_DM_INIT_STATIC( System, System );
+  LIBECS_DM_INIT_STATIC( VirtualSystem, System );
+  LIBECS_DM_INIT_STATIC( CompartmentSystem, System );
 
   /////////////////////// System
 
@@ -100,12 +103,7 @@ namespace libecs
     theModel( NULLPTR ),
     theEntityListChanged( false )
   {
-    //    CREATE_PROPERTYSLOT_GET    ( Polymorph, SystemList,   System );
-    //    CREATE_PROPERTYSLOT_GET    ( Polymorph, VariableList, System );
-    //    CREATE_PROPERTYSLOT_GET    ( Polymorph, ProcessList,  System );
-    //    CREATE_PROPERTYSLOT_SET_GET( Real,      Dimension,       System );
-    CREATE_PROPERTYSLOT_GET    ( Real,      Size,         System );
-    CREATE_PROPERTYSLOT_SET_GET( String,    StepperID,    System );
+    ; // do nothing
   }
 
   System::~System()

@@ -57,14 +57,15 @@ namespace libecs
 
   */
 
-  class PassiveStepper
-    :
-    public Stepper
+  LIBECS_DM_CLASS( PassiveStepper, Stepper )
   {
 
   public:
 
-    LIBECS_DM_OBJECT( Stepper, PassiveStepper );
+    LIBECS_DM_OBJECT( PassiveStepper, Stepper )
+      {
+	INHERIT_PROPERTIES( Stepper );
+      }
 
 
     PassiveStepper();

@@ -5,7 +5,7 @@
 
 #include "Exceptions.hpp"
 #include "PropertySlot.hpp"
-#include "PropertyInterface.hpp"
+#include "PropertiedClass.hpp"
 
 
 
@@ -25,15 +25,19 @@ namespace libecs
      @internal
   */
 
+
+  template
+  <
+    class T
+    >
   class PropertySlotMaker
   {
     
   public:
     
-    template<class T, typename SlotType>
-    static PropertySlotPtr 
-    createPropertySlot( T& anObject,
-			Type2Type<SlotType>,
+    template<typename SlotType>
+    static PropertySlot<T>*
+    createPropertySlot( Type2Type<SlotType>,
 			typename ConcretePropertySlot<T,SlotType>::SetMethodPtr
 			aSetMethodPtr,
 			typename ConcretePropertySlot<T,SlotType>::GetMethodPtr
@@ -41,19 +45,19 @@ namespace libecs
     {
       if( aSetMethodPtr == NULLPTR )
 	{
-	  aSetMethodPtr = &PropertyInterface::nullSet;
+	  aSetMethodPtr = &PropertiedClass::nullSet;
 	}
       
       if( aGetMethodPtr == NULLPTR )
 	{
-	  aGetMethodPtr = &PropertyInterface::nullGet<SlotType>;
+	  aGetMethodPtr = &PropertiedClass::nullGet<SlotType>;
 	}
       
 
-      PropertySlotPtr aPropertySlotPtr( 
-	new ConcretePropertySlot<T,SlotType>( anObject,
-					      aSetMethodPtr,
-					      aGetMethodPtr ) );
+      PropertySlot<T>* 
+	aPropertySlotPtr( new ConcretePropertySlot<T,SlotType>
+			  ( aSetMethodPtr,
+			    aGetMethodPtr ) );
 
       return aPropertySlotPtr;
     }

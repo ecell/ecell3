@@ -89,25 +89,22 @@ namespace libecs
     EntityPtr anEntityPtr( getModel().getEntity( aFullPN.getFullID() ) );
 
     const String aPropertyName( aFullPN.getPropertyName() );
-    PropertySlotMapCref aPropertySlotMap( anEntityPtr->getPropertySlotMap() );
 
-    PropertySlotMapConstIterator 
-      aPropertySlotMapIterator( aPropertySlotMap.find( aPropertyName ) );
+    PropertySlotProxyPtr 
+      aPropertySlotProxy( anEntityPtr->
+			  createPropertySlotProxy( aPropertyName ) );
 
-    if( aPropertySlotMapIterator == aPropertySlotMap.end() )
-      {
-	THROW_EXCEPTION( NotFound, "PropertySlot not found" );
-      }
+    LoggerAdapterPtr aLoggerAdapter
+      ( new PropertySlotProxyLoggerAdapter( aPropertySlotProxy ) );
 
-    PropertySlotPtr aPropertySlotPtr( aPropertySlotMapIterator->second );
 
-    LoggerPtr aNewLogger( new Logger( *aPropertySlotPtr ) );
+    LoggerPtr aNewLogger( new Logger( aLoggerAdapter ) );
 
-    aPropertySlotPtr->connectLogger( aNewLogger );
+    anEntityPtr->registerLogger( aNewLogger );
     theLoggerMap[aFullPN] = aNewLogger;
 
     // it should have at least one datapoint to work correctly.
-    aPropertySlotPtr->log( getModel().getCurrentTime() );
+    aNewLogger->log( getModel().getCurrentTime() );
     aNewLogger->flush();
 
     return aNewLogger;

@@ -31,9 +31,8 @@
 #ifndef __SCHEDULER_HPP
 #define __SCHEDULER_HPP
 
+#include "libecs.hpp"
 #include "DynamicPriorityQueue.hpp"
-
-#include "Stepper.hpp"
 
 
 namespace libecs

@@ -43,17 +43,16 @@
 namespace libecs
 {
 
+  LIBECS_DM_INIT_STATIC( DifferentialStepper, Stepper );
+  LIBECS_DM_INIT_STATIC( AdaptiveDifferentialStepper, Stepper );
+
 
   DifferentialStepper::DifferentialStepper()
     :
     theTolerantStepInterval( 0.001 ),
     theNextStepInterval( 0.001 )
   {
-    CREATE_PROPERTYSLOT( Real, StepInterval, 
-			 &DifferentialStepper::initializeStepInterval,
-			 &DifferentialStepper::getStepInterval );
-
-    CREATE_PROPERTYSLOT_GET( Real, NextStepInterval, DifferentialStepper );
+    ; // do nothing
   }
 
   void DifferentialStepper::initialize()
@@ -182,22 +181,7 @@ namespace libecs
     safety( 0.9 ),
     theMaxErrorRatio( 1.0 )
   {
-    CREATE_PROPERTYSLOT_SET_GET( Real, Tolerance, 
-				 AdaptiveDifferentialStepper );
-    CREATE_PROPERTYSLOT_SET_GET( Real, AbsoluteToleranceFactor, 
-				 AdaptiveDifferentialStepper );
-    CREATE_PROPERTYSLOT_SET_GET( Real, StateToleranceFactor, 
-				 AdaptiveDifferentialStepper );
-    CREATE_PROPERTYSLOT_SET_GET( Real, DerivativeToleranceFactor, 
-				 AdaptiveDifferentialStepper );
-    CREATE_PROPERTYSLOT_SET_GET( Real, AbsoluteEpsilon, 
-				 AdaptiveDifferentialStepper );
-    CREATE_PROPERTYSLOT_SET_GET( Real, RelativeEpsilon, 
-				 AdaptiveDifferentialStepper );
-    CREATE_PROPERTYSLOT_GET    ( Real, MaxErrorRatio, 
-				 AdaptiveDifferentialStepper );
-    CREATE_PROPERTYSLOT_GET    ( Int,  Order, AdaptiveDifferentialStepper );
-
+    ; // do nothing
   }
 
   void AdaptiveDifferentialStepper::initialize()

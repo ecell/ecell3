@@ -34,6 +34,9 @@
 namespace libecs
 {
 
+  LIBECS_DM_INIT_STATIC( DiscreteEventStepper, Stepper );
+
+
   //////////////////// DiscreteEventStepper
 
   DiscreteEventStepper::DiscreteEventStepper()

@@ -36,13 +36,13 @@
 namespace libecs
 {
 
-
+  LIBECS_DM_INIT_STATIC( DiscreteTimeStepper, Stepper );
 
   //////////////////// DiscreteTimeStepper
 
   DiscreteTimeStepper::DiscreteTimeStepper()
   {
-    ; // do nothing -- no additional property slots
+    ; // do nothing
   }
 
   void DiscreteTimeStepper::step()

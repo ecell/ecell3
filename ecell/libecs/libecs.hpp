@@ -75,24 +75,27 @@ namespace libecs
   DECLARE_CLASS( VariableMaker );
   DECLARE_CLASS( System );
   DECLARE_CLASS( SystemMaker );
-  DECLARE_CLASS( PropertySlot );
-  DECLARE_CLASS( PropertyInterface );
-  DECLARE_CLASS( PropertySlotMaker );
+  DECLARE_CLASS( PropertySlotBase );
+  //  DECLARE_CLASS( PropertyInterface );
+  DECLARE_CLASS( PropertiedClass );
+  DECLARE_CLASS( PropertySlotProxy );
   DECLARE_CLASS( Polymorph );
   DECLARE_CLASS( LoggerBroker );
   DECLARE_CLASS( Logger );
+  DECLARE_CLASS( LoggerAdapter );
   DECLARE_CLASS( DataPoint );
   DECLARE_CLASS( DataPointVector );
 
 
   // containers
 
-  DECLARE_VECTOR( Polymorph, PolymorphVector );
-  DECLARE_VECTOR( VariablePtr, VariableVector );
+  DECLARE_VECTOR( Polymorph,    PolymorphVector );
+  DECLARE_VECTOR( VariablePtr,  VariableVector );
   DECLARE_VECTOR( ProcessPtr,   ProcessVector );
   DECLARE_VECTOR( SystemPtr,    SystemVector );
-  DECLARE_VECTOR( StepperPtr, StepperVector );
-  DECLARE_VECTOR( PropertySlotPtr, PropertySlotVector );
+  DECLARE_VECTOR( StepperPtr,   StepperVector );
+  DECLARE_VECTOR( LoggerPtr,    LoggerVector );
+  //  DECLARE_VECTOR( PropertySlotPtr, PropertySlotVector );
 
   // exceptions
 

@@ -58,17 +58,21 @@ namespace libecs
 
   */
 
-  class Process 
-    : 
-    public Entity
+  LIBECS_DM_CLASS( Process, Entity )
   {
 
-  public: 
-
-    DM_BASECLASS( Process );
-
-
   public:
+
+    LIBECS_DM_BASECLASS( Process );
+    LIBECS_DM_OBJECT_ABSTRACT( Process )
+      {
+	INHERIT_PROPERTIES( Entity );
+
+	PROPERTYSLOT_SET_GET( Polymorph, VariableReferenceList );
+	PROPERTYSLOT_SET_GET( Real,      Activity );
+	PROPERTYSLOT_SET_GET( Int,       Priority );
+	PROPERTYSLOT_SET_GET( String,    StepperID );
+      }
 
     /** 
 	Sort Processes in reversed order of 'Priority' values.
@@ -326,6 +330,35 @@ namespace libecs
 		     std::bind2nd
 		     ( std::mem_fun_ref
 		       ( &VariableReference::addValue ), aValue ) );
+    }
+
+
+    /**
+       Set velocity of each VariableReference according to stoichiometry.
+
+       VariableReferences with zero coefficients are skipped for optimization.
+
+       This is a convenient method for use in subclasses.
+
+       @param aVelocity a base velocity to be added.
+    */
+
+    void setFlux( const Real aVelocity )
+    {
+      setActivity( aVelocity );
+
+      // Increase or decrease variables, skipping zero coefficients.
+      std::for_each( theVariableReferenceVector.begin(),
+		     theZeroVariableReferenceIterator,
+		     std::bind2nd
+		     ( std::mem_fun_ref
+		       ( &VariableReference::addFlux ), aVelocity ) );
+
+      std::for_each( thePositiveVariableReferenceIterator,
+		     theVariableReferenceVector.end(),
+		     std::bind2nd
+		     ( std::mem_fun_ref
+		       ( &VariableReference::addFlux ), aVelocity ) );
     }
 
     /**

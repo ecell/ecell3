@@ -59,14 +59,15 @@ namespace libecs
 
   */
 
-  class DiscreteTimeStepper
-    :
-    public Stepper
+  LIBECS_DM_CLASS( DiscreteTimeStepper,Stepper )
   {
 
   public:
 
-    LIBECS_DM_OBJECT( Stepper, DiscreteTimeStepper );
+    LIBECS_DM_OBJECT( DiscreteTimeStepper, Stepper )
+      {
+	INHERIT_PROPERTIES( Stepper );
+      }
 
 
     DiscreteTimeStepper();

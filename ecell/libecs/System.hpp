@@ -55,14 +55,21 @@ namespace libecs
 	       std::less<const String>, SystemMap );
 
 
-  class System 
-    : 
-    public Entity
+  LIBECS_DM_CLASS( System, Entity )
   {
-
+    
   public:
 
-    DM_BASECLASS( System );
+    LIBECS_DM_BASECLASS( System );
+
+    LIBECS_DM_OBJECT_ABSTRACT( System )
+    {
+      INHERIT_PROPERTIES( Entity );
+      
+      //    PROPERTYSLOT_SET_GET( Real,      Dimension );
+      PROPERTYSLOT_GET    ( Real,      Size );
+      PROPERTYSLOT_SET_GET( String,    StepperID );
+    }
 
 
     System();
@@ -284,14 +291,17 @@ namespace libecs
   };
 
 
-  class VirtualSystem 
-    : 
-    public System
+
+
+  LIBECS_DM_CLASS( VirtualSystem, System )
   {
 
   public:
 
-    LIBECS_DM_OBJECT( System, VirtualSystem );
+    LIBECS_DM_OBJECT( VirtualSystem, System )
+      {
+	INHERIT_PROPERTIES( System );
+      }
 
 
     VirtualSystem();
@@ -319,14 +329,15 @@ namespace libecs
 
 
 
-  class CompartmentSystem 
-    : 
-    public VirtualSystem
+  LIBECS_DM_CLASS( CompartmentSystem, VirtualSystem )
   {
 
   public:
 
-    LIBECS_DM_OBJECT( System, CompartmentSystem );
+    LIBECS_DM_OBJECT( CompartmentSystem, System )
+      {
+	INHERIT_PROPERTIES( VirtualSystem );
+      }
 
     CompartmentSystem();
     virtual ~CompartmentSystem();

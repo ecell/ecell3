@@ -38,15 +38,16 @@
 namespace libecs
 {
 
+  LIBECS_DM_INIT_STATIC( Entity, Entity );
+
+
   Entity::Entity()
     : 
     theSuperSystem( NULLPTR ),
     theID( "" ),
     theName( "" ) 
   {
-    CREATE_PROPERTYSLOT_SET_GET( String, Name,   Entity );
-    CREATE_PROPERTYSLOT        ( String, FullID, 
-				 NULLPTR, &Entity::getFullIDString );
+
   }
 
 

@@ -23,6 +23,7 @@ Polymorph.cpp\
 FullID.cpp\
 PropertySlot.cpp\
 PropertyInterface.cpp\
+PropertiedClass.cpp\
 ProcessMaker.cpp\
 Variable.cpp\
 VariableMaker.cpp\
@@ -57,8 +58,9 @@ convertTo.hpp\
 Polymorph.hpp\
 FullID.hpp\
 PropertySlot.hpp\
-PropertySlotMaker.hpp\
+PropertySlotProxy.hpp\
 PropertyInterface.hpp\
+PropertiedClass.hpp\
 ProcessMaker.hpp\
 Variable.hpp\
 VariableMaker.hpp\
@@ -90,8 +92,8 @@ RCPtr.hpp\
 VariableReference.hpp\
 DynamicPriorityQueue.hpp\
 AssocVector.h\
-FluxProcess.hpp\
-ecell3_dm.hpp
+FluxProcess.hpp
+
 
 bin_SCRIPTS =\
 emtool

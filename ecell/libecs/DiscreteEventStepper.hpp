@@ -50,12 +50,16 @@ namespace libecs
 
   */
 
-  class DiscreteEventStepper
-    :
-    public Stepper
+
+  LIBECS_DM_CLASS( DiscreteEventStepper, Stepper )
   {
 
   public:
+
+    LIBECS_DM_OBJECT_ABSTRACT( DiscreteEventStepper )
+      {
+	INHERIT_PROPERTIES( Stepper );
+      }
 
     DiscreteEventStepper();
     virtual ~DiscreteEventStepper() {}

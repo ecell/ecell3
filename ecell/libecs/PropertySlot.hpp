@@ -36,9 +36,9 @@
 
 #include "libecs.hpp"
 #include "Util.hpp"
-#include "PropertyInterface.hpp"
+#include "PropertiedClass.hpp"
 #include "convertTo.hpp"
-
+#include "Logger.hpp"
 #include "Polymorph.hpp"
 
 namespace libecs
@@ -53,79 +53,32 @@ namespace libecs
 
   /** @file */
 
+
+
   /**
      Base class for PropertySlot classes.
 
      @see PropertyInterface
   */
 
-  class PropertySlot
+  class PropertySlotBase
   {
 
   public:
-
-    class LogCaller 
-      :
-      std::binary_function< PropertySlotPtr, Real, void > 
-    {
-    public:
-      LogCaller(){}
-
-      void operator()( const PropertySlotPtr& aPropertySlotPtr, 
-		       RealCref aTime ) const
-      {
-	aPropertySlotPtr->log( aTime );
-      }
-
-    };
-
-
-  public:
-
-    PropertySlot()
-      :
-      theLogger( NULLPTR )
+    PropertySlotBase()
     {
       ; // do nothing
     }
     
-    virtual ~PropertySlot()
+    virtual ~PropertySlotBase()
     {
       ; // do nothing
     }
-
-    virtual void setPolymorph( PolymorphCref ) = 0;
-    virtual const Polymorph getPolymorph() const = 0;
-    
-    virtual void setReal( RealCref real ) = 0;
-    virtual const Real getReal() const = 0;
-
-    virtual void setInt( IntCref real ) = 0;
-    virtual const Int getInt() const = 0;
-
-    virtual void setString( StringCref string ) = 0;
-    virtual const String getString() const = 0;
 
     virtual const bool isSetable() const = 0;
     virtual const bool isGetable() const = 0;
 
-    const bool isLogged()
-    {
-      return theLogger != NULLPTR;
-    }
-
-    void connectLogger( LoggerPtr logger );
-
-    void disconnectLogger();
-
-    LoggerCptr getLogger() const
-    {
-      return theLogger;
-    }
-
-    void log( const Real aTime ) const;
-
-    virtual PropertyInterfaceCref getPropertyInterface() const = 0;
+    //    virtual PropertyInterfaceCref getPropertyInterface() const = 0;
 
 
     template < typename Type >
@@ -140,62 +93,56 @@ namespace libecs
       DefaultSpecializationInhibited();
     }
 
-  protected:
 
-    LoggerPtr                theLogger;
+  protected:
 
   };
 
 
-  template <>
-  inline void PropertySlot::set( PolymorphCref aValue )
+  template
+  < 
+    class T
+  >
+  class PropertySlot
+    :
+    public PropertySlotBase
   {
-    setPolymorph( aValue );
-  }
 
-  template <>
-  inline void PropertySlot::set( RealCref aValue )
-  {
-    setReal( aValue );
-  }
+  public:
 
-  template <>
-  inline void PropertySlot::set( IntCref aValue )
-  {
-    setInt( aValue );
-  }
+    PropertySlot()
+    {
+      ; // do nothing
+    }
 
-  template <>
-  inline void PropertySlot::set( StringCref aValue )
-  {
-    setString( aValue );
-  }
-
-  template <>
-  inline const Polymorph PropertySlot::get() const
-  {
-    return getPolymorph();
-  }
-
-  template <>
-  inline const String PropertySlot::get() const
-  {
-    return getString();
-  }
-
-  template <>
-  inline const Real PropertySlot::get() const
-  {
-    return getReal();
-  }
+    virtual ~PropertySlot()
+    {
+      ; // do nothing
+    }
 
 
-  template <>
-  inline const Int PropertySlot::get() const
-  {
-    return getInt();
-  }
+#define _PROPERTYSLOT_SETMETHOD( TYPE )\
+    virtual void set ## TYPE( T& anObject, TYPE ## Cref aValue ) = 0;
 
+#define _PROPERTYSLOT_GETMETHOD( TYPE )\
+    virtual const TYPE get ## TYPE( const T& anObject ) const = 0;
+
+    _PROPERTYSLOT_SETMETHOD( Polymorph );
+    _PROPERTYSLOT_GETMETHOD( Polymorph );
+
+    _PROPERTYSLOT_SETMETHOD( Real );
+    _PROPERTYSLOT_GETMETHOD( Real );
+
+    _PROPERTYSLOT_SETMETHOD( Int );
+    _PROPERTYSLOT_GETMETHOD( Int );
+
+    _PROPERTYSLOT_SETMETHOD( String );
+    _PROPERTYSLOT_GETMETHOD( String );
+
+#undef _PROPERTYSLOT_SETMETHOD
+#undef _PROPERTYSLOT_GETMETHOD
+
+  };
 
 
   template
@@ -205,7 +152,7 @@ namespace libecs
   >
   class ConcretePropertySlot
     :
-    public PropertySlot
+    public PropertySlot<T>
   {
 
   public:
@@ -222,11 +169,9 @@ namespace libecs
     typedef GetType ( ConcretePropertySlot::* CallGetMethodPtr )() const;
     typedef void    ( ConcretePropertySlot::* CallSetMethodPtr )( SetType );
 
-    ConcretePropertySlot( T& anObject, 
-			  const SetMethodPtr aSetMethodPtr,
+    ConcretePropertySlot( const SetMethodPtr aSetMethodPtr,
 			  const GetMethodPtr aGetMethodPtr )
       :
-      theObject( anObject ),
       theSetMethodPtr( aSetMethodPtr ),
       theGetMethodPtr( aGetMethodPtr )
     {
@@ -238,92 +183,74 @@ namespace libecs
       ; // do nothing
     }
 
-    virtual void setPolymorph( PolymorphCref aValue )
-    {
-      setImpl( aValue );
-    }
-
-    virtual const Polymorph getPolymorph() const
-    {
-      return getImpl<Polymorph>();
-    }
-
-    virtual void setReal( RealCref aValue )
-    {
-      setImpl( aValue );
-    }
-
-    virtual const Real getReal() const
-    {
-      return getImpl<Real>();
-    }
-
-    virtual void setInt( IntCref aValue )
-    {
-      setImpl( aValue );
-    }
-
-    virtual const Int getInt() const
-    {
-      return getImpl<Int>();
-    }
-
-    virtual void setString( StringCref aValue )
-    {
-      setImpl( aValue );
-    }
-
-    virtual const String getString() const
-    {
-      return getImpl<String>();
-    }
 
     virtual const bool isSetable() const
     {
-      const SetMethodPtr aNullMethodPtr( &PropertyInterface::nullSet );
+      const SetMethodPtr aNullMethodPtr( &PropertiedClass::nullSet );
       return theSetMethodPtr != aNullMethodPtr;
     }
 
     virtual const bool isGetable() const
     {
       const GetMethodPtr
-	aNullMethodPtr( &PropertyInterface::nullGet<SlotType> );
+	aNullMethodPtr( &PropertiedClass::nullGet<SlotType> );
       return theGetMethodPtr != aNullMethodPtr;
     }
 
-    virtual PropertyInterfaceCref getPropertyInterface() const
-    {
-      return static_cast<PropertyInterfaceCref>( theObject );
+#define _PROPERTYSLOT_SETMETHOD( TYPE )\
+    virtual void set ## TYPE( T& anObject, TYPE ## Cref aValue )\
+    {\
+      setImpl( anObject, aValue );\
     }
+
+#define _PROPERTYSLOT_GETMETHOD( TYPE )\
+    virtual const TYPE get ## TYPE( const T& anObject ) const\
+    {\
+      return getImpl<TYPE>( anObject );\
+    }
+
+    _PROPERTYSLOT_SETMETHOD( Polymorph );
+    _PROPERTYSLOT_GETMETHOD( Polymorph );
+
+    _PROPERTYSLOT_SETMETHOD( Real );
+    _PROPERTYSLOT_GETMETHOD( Real );
+
+    _PROPERTYSLOT_SETMETHOD( Int );
+    _PROPERTYSLOT_GETMETHOD( Int );
+
+    _PROPERTYSLOT_SETMETHOD( String );
+    _PROPERTYSLOT_GETMETHOD( String );
+
+#undef _PROPERTYSLOT_SETMETHOD
+#undef _PROPERTYSLOT_GETMETHOD
 
 
   protected:
 
-    inline void callSetMethod( SetType aValue )    
+    inline void callSetMethod( T& anObject, SetType aValue )    
     {
-      ( theObject.*theSetMethodPtr )( aValue );
+      ( anObject.*theSetMethodPtr )( aValue );
     }
 
-    inline GetType callGetMethod() const
+    inline GetType callGetMethod( const T& anObject ) const
     {
-      return ( ( theObject.*theGetMethodPtr )() );
-    }
-
-    template < typename Type >
-    inline void setImpl( Type aValue )
-    {
-      callSetMethod( convertTo<SlotType>( aValue ) );
+      return ( ( anObject.*theGetMethodPtr )() );
     }
 
     template < typename Type >
-    inline const Type getImpl() const
+    inline void setImpl( T& anObject, Type aValue )
     {
-      return convertTo<Type>( callGetMethod() );
+      callSetMethod( anObject, convertTo<SlotType>( aValue ) );
+    }
+    
+    template < typename Type >
+    inline const Type getImpl( const T& anObject ) const
+    {
+      return convertTo<Type>( callGetMethod( anObject ) );
     }
 
   protected:
 
-    T& theObject;
     const SetMethodPtr theSetMethodPtr;
     const GetMethodPtr theGetMethodPtr;
 

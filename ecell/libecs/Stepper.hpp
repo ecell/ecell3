@@ -69,14 +69,35 @@ namespace libecs
 
   */
 
-  class Stepper
-    :
-    public PropertyInterface
+
+  LIBECS_DM_CLASS( Stepper, PropertiedClass )
   {
 
   public:
 
-    DM_BASECLASS( Stepper );
+    LIBECS_DM_BASECLASS( Stepper );
+
+    LIBECS_DM_OBJECT_ABSTRACT( Stepper )
+      {
+	INHERIT_PROPERTIES( PropertiedClass );
+	
+	PROPERTYSLOT_SET_GET( Int,       Priority );
+	PROPERTYSLOT_GET    ( Real,      CurrentTime );
+	PROPERTYSLOT_SET_GET( Real,      StepInterval );
+	PROPERTYSLOT_SET_GET( Real,      OriginalStepInterval );
+	PROPERTYSLOT_SET_GET( Real,      MaxStepInterval );
+	PROPERTYSLOT_SET_GET( Real,      MinStepInterval );
+	PROPERTYSLOT_GET    ( Polymorph, ReadVariableList );
+	PROPERTYSLOT_GET    ( Polymorph, WriteVariableList );
+	PROPERTYSLOT_GET    ( Polymorph, ProcessList );
+	PROPERTYSLOT_GET    ( Polymorph, SystemList );
+	PROPERTYSLOT_GET    ( Polymorph, DependentStepperList );
+	PROPERTYSLOT_SET    ( String,    RngSeed );
+
+	// setting rng type:  not yet supported
+	//PROPERTYSLOT_SET_GET( Polymorph, Rng,              Stepper );
+      }
+
 
     class PriorityCompare
     {
@@ -341,7 +362,7 @@ namespace libecs
     }
 
 
-    void registerLoggedPropertySlot( PropertySlotPtr );
+    void registerLogger( LoggerPtr );
 
 
 
@@ -518,13 +539,13 @@ m
 
     /**
        Scan all the relevant Entity objects to this Stepper and construct
-       the list of logged PropertySlots.
+       the list of loggers.
 
-       The list, theLoggedPropertySlotVector, is used when in log() method.
+       The list, theLoggerVector, is used in log() method.
 
     */
 
-    void updateLoggedPropertySlotVector();
+    void updateLoggerVector();
 
 
 
@@ -533,9 +554,8 @@ m
 
     SystemVector        theSystemVector;
 
-    PropertySlotVector  theLoggedPropertySlotVector;
-
-    //    StepIntervalConstraintMap theStepIntervalConstraintMap;
+    //    PropertySlotVector  theLoggedPropertySlotVector;
+    LoggerVector  theLoggerVector;
 
     VariableVector         theVariableVector;
     VariableVector::size_type theReadWriteVariableOffset;

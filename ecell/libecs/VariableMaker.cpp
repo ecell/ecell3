@@ -36,9 +36,6 @@ namespace libecs
 
   void VariableMaker::makeClassList()
   {
-    // temporary workaround
-    //    addClass( new Module( "Variable", PlainVariable::createInstance ) );
-
     NewVariableModule( Variable );
     NewVariableModule( PositiveVariable );
   }

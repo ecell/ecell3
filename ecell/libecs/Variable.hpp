@@ -57,16 +57,25 @@ namespace libecs
 
   */
 
-  class Variable 
-    : 
-    public Entity
+  LIBECS_DM_CLASS( Variable, Entity )
   {
-
-    LIBECS_DM_OBJECT( Variable, Variable );
 
   public:
 
-    DM_BASECLASS( Variable );
+    LIBECS_DM_BASECLASS( Variable );
+
+    LIBECS_DM_OBJECT( Variable, Variable )
+      {
+	INHERIT_PROPERTIES( Entity );
+	
+	// Use addVelocity as the set method.
+	PROPERTYSLOT( Real, Velocity,
+		      &Variable::addVelocity, &Variable::getVelocity );
+	PROPERTYSLOT_SET_GET( Real, Value );
+	PROPERTYSLOT_GET    ( Real, TotalVelocity );
+	PROPERTYSLOT_GET    ( Real, Concentration );
+	PROPERTYSLOT_SET_GET( Int,  Fixed );
+      }
 
     Variable();
     virtual ~Variable();
@@ -304,14 +313,15 @@ namespace libecs
 
 
 
-  class PositiveVariable
-    :
-    public Variable
+  LIBECS_DM_CLASS( PositiveVariable, Variable )
   {
 
   public:
 
-    LIBECS_DM_OBJECT( Variable, Variable );
+    LIBECS_DM_OBJECT( PositiveVariable, Variable )
+      {
+	INHERIT_PROPERTIES( Variable );
+      }
 
 
     PositiveVariable()

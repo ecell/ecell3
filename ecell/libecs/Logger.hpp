@@ -55,6 +55,21 @@ namespace libecs
   /** @file */
 
 
+  class LoggerAdapter
+  {
+
+  public:
+
+    virtual ~LoggerAdapter();
+
+    virtual const Real getValue() const = 0;
+
+  protected:
+
+    LoggerAdapter();
+
+  };
+
 
   /**
    
@@ -75,11 +90,15 @@ namespace libecs
     */
   
     //    explicit Logger( ModelCref aModel, PropertySlotRef aPropertySlot );
-    explicit Logger( PropertySlotRef aPropertySlot );
+    //    explicit Logger( PropertySlotRef aPropertySlot );
+    explicit Logger( LoggerAdapterPtr aLoggerAdapter );
   
     /// Destructor
 
     ~Logger( void );
+
+
+    void log( const Real aTime );
 
 
     /**
@@ -200,7 +219,8 @@ namespace libecs
 
     /// Data members
 
-    PropertySlotRef      thePropertySlot;
+    //    PropertySlotRef      thePropertySlot;
+    LoggerAdapterPtr     theLoggerAdapter;
 
     PhysicalLogger*	 thePhysicalLoggers;
     DataInterval	 theDataInterval;

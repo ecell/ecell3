@@ -30,20 +30,40 @@
 // 14/04/2002
 
 
-#include "Logger.hpp"
 #include <cmath>
 #include <assert.h>
-//#include <stdio.h>
-#define _LOGGER_MAX_PHYSICAL_LOGGERS 5
-#define _LOGGER_DIVIDE_STEP 100
+#include "PropertySlotProxy.hpp"
+
+
+#include "Logger.hpp"
 
 namespace libecs
 {
 
+  ///////////////////////////// LoggerAdapter
+
+  LoggerAdapter::LoggerAdapter()
+  {
+    ; // do nothing
+  }
+
+  LoggerAdapter::~LoggerAdapter()
+  {
+    ; // do nothing
+  }
+
+
+
+  ////////////////////////////// Logger
+
+
+  static const Int _LOGGER_MAX_PHYSICAL_LOGGERS = 5;
+  static const Int _LOGGER_DIVIDE_STEP = 100;
+
   // Constructor
-  Logger::Logger( PropertySlotRef aPropertySlot ) 
+  Logger::Logger( LoggerAdapterPtr aLoggerAdapter )
     :
-    thePropertySlot( aPropertySlot ),
+    theLoggerAdapter( aLoggerAdapter ),
     theMinimumInterval( 0.0 ),
     theLastTime( 0.0 ) // theStepper.getCurrentTime() - theMinimumInterval )
   {
@@ -53,8 +73,16 @@ namespace libecs
   Logger::~Logger()
   {
     delete[] thePhysicalLoggers;
+    delete theLoggerAdapter;
   }
   
+
+  void Logger::log( const Real aTime )
+  {
+    appendData( aTime, theLoggerAdapter->getValue() );
+  }
+
+
   DataPointVectorRCPtr Logger::getData( void ) const
   {
     if (thePhysicalLoggers[0].empty())

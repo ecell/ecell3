@@ -42,6 +42,8 @@
 namespace libecs
 {
 
+  LIBECS_DM_INIT_STATIC( Process, Process );
+
   void Process::setVariableReferenceList( PolymorphCref aValue )
   {
     const PolymorphVector aVector( aValue.asPolymorphVector() );
@@ -92,10 +94,7 @@ namespace libecs
     thePriority( 0 ),
     theStepper( NULLPTR )
   {
-    CREATE_PROPERTYSLOT_SET_GET( Polymorph, VariableReferenceList, Process ); 
-    CREATE_PROPERTYSLOT_SET_GET( Real,      Activity,              Process ); 
-    CREATE_PROPERTYSLOT_SET_GET( Int,       Priority,              Process ); 
-    CREATE_PROPERTYSLOT_SET_GET( String,    StepperID,             Process ); 
+    ; // do nothing
   }
 
   Process::~Process()

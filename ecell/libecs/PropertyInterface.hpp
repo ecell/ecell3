@@ -40,7 +40,8 @@
 #include "libecs.hpp"
 #include "Defs.hpp"
 #include "Exceptions.hpp"
-
+#include "PropertySlot.hpp"
+#include "PropertySlotProxy.hpp"
 
 namespace libecs
 {
@@ -56,32 +57,118 @@ namespace libecs
   // probably better to replace by AssocVector.
   //  DECLARE_MAP( const String, PropertySlotPtr, 
   //	       std::less<const String>, PropertySlotMap );
-  DECLARE_ASSOCVECTOR( String, PropertySlotPtr, 
-		       std::less<const String>, PropertySlotMap );
 
-  /**
-     Common base class for classes with PropertySlots.
-
-     Properties is a group of methods which can be accessed via (1)
-     PropertySlots and (2) set/getProperty() methods, in addition to
-     normal C++ method calls.
-
-     @note  Subclasses of PropertyInterface MUST call their own makeSlots()
-     to create their property slots in their constructors.
-     (virtual functions don't work in constructors)
-
-     @todo class-static slots?
-
-     @see PropertySlot
-
-  */
-
-  class PropertyInterface
+  class PropertyInterfaceBase
   {
   public:
 
-    PropertyInterface();
-    virtual ~PropertyInterface();
+    PropertyInterfaceBase()
+    {
+      ; // do nothing
+    }
+
+    ~PropertyInterfaceBase()
+    {
+      ; // do nothing
+    }
+
+
+    void throwNoSlot( StringCref aClassName, StringCref aPropertyName ) const;
+
+  };
+
+
+
+  template
+  <
+    class T
+  >
+  class PropertyInterface
+    :
+    public PropertyInterfaceBase
+  {
+  public:
+
+    typedef PropertySlot<T> PropertySlot_;
+    DECLARE_TYPE( PropertySlot_, PropertySlot );
+
+    DECLARE_ASSOCVECTOR_TEMPLATE( String, PropertySlot*,
+				  std::less<const String>, PropertySlotMap );
+
+    PropertySlotMapCref getPropertySlotMap() const
+    {
+      return thePropertySlotMap;
+    }
+
+    PropertyInterface()
+    {
+      ; // do nothing
+    }
+
+    ~PropertyInterface()
+    {
+      for( PropertySlotMapIterator i( thePropertySlotMap.begin() ); 
+	   i != thePropertySlotMap.end() ; ++i )
+	{
+	  delete i->second;
+	}
+    }
+
+
+    PropertySlotPtr getPropertySlot( StringCref aPropertyName ) const
+    {
+      PropertySlotMapConstIterator 
+	i( thePropertySlotMap.find( aPropertyName ) );
+
+      if( i == thePropertySlotMap.end() )
+	{
+	  throwNoSlot( "This class", aPropertyName );
+	}
+
+      return i->second;
+    }
+
+
+    template<typename SlotType>
+    static PropertySlotPtr
+    createPropertySlot( Type2Type<SlotType>,
+			typename ConcretePropertySlot<T,SlotType>::SetMethodPtr
+			aSetMethodPtr,
+			typename ConcretePropertySlot<T,SlotType>::GetMethodPtr
+			aGetMethodPtr )
+    {
+      if( aSetMethodPtr == NULLPTR )
+	{
+	  aSetMethodPtr = &PropertiedClass::nullSet;
+	}
+      
+      if( aGetMethodPtr == NULLPTR )
+	{
+	  aGetMethodPtr = &PropertiedClass::nullGet<SlotType>;
+	}
+      
+
+      PropertySlotPtr
+	aPropertySlotPtr( new ConcretePropertySlot<T,SlotType>
+			  ( aSetMethodPtr,
+			    aGetMethodPtr ) );
+
+      return aPropertySlotPtr;
+    }
+
+    PropertySlotProxyPtr createPropertySlotProxy( T& anObject,
+						  StringCref aPropertyName )
+    {
+      try
+	{
+	  PropertySlotPtr aPropertySlot( getPropertySlot( aPropertyName ) );
+	  return new ConcretePropertySlotProxy<T>( anObject, *aPropertySlot );
+	}
+      catch( NoSlotCref )
+	{
+	  throwNoSlot( anObject.getClassName(), aPropertyName );
+	}
+    }
 
 
     /**
@@ -95,7 +182,22 @@ namespace libecs
        @throw NoSlot 
     */
 
-    void setProperty( StringCref aPropertyName, PolymorphCref aValue );
+    void setProperty( T& anObject, StringCref aPropertyName, 
+			PolymorphCref aValue )
+    {
+      PropertySlotMapConstIterator 
+	aPropertySlotMapIterator( thePropertySlotMap.find( aPropertyName ) );
+      
+      if( aPropertySlotMapIterator != thePropertySlotMap.end() )
+	{
+	  aPropertySlotMapIterator->second->setPolymorph( anObject, aValue );
+	}
+      else
+	{
+	  anObject.defaultSetProperty( aPropertyName, aValue );
+	}
+    }
+    
 
     /**
        Get a property value from this object via a PropertySlot.
@@ -108,7 +210,21 @@ namespace libecs
        @throw NoSlot
     */
 
-    const Polymorph getProperty( StringCref aPropertyName ) const;
+    const Polymorph getProperty( const T& anObject,
+				 StringCref aPropertyName ) const
+    {
+      PropertySlotMapConstIterator 
+	aPropertySlotMapIterator( thePropertySlotMap.find( aPropertyName ) );
+      
+      if( aPropertySlotMapIterator != thePropertySlotMap.end() )
+	{
+	  return aPropertySlotMapIterator->second->getPolymorph( anObject );
+	}
+      else
+	{
+	  return anObject.defaultGetProperty( aPropertyName );
+	}
+    }
 
 
     /**
@@ -119,130 +235,68 @@ namespace libecs
        @return a borrowed pointer to the PropertySlot with the name.
     */
 
-    PropertySlotPtr getPropertySlot( StringCref aPropertyName ) const
+    //    PropertySlotBasePtr getPropertySlot( StringCref aPropertyName ) const
+    //    {
+    //      return getPropertySlotMap().find( aPropertyName )->second;
+    //    }
+
+    const Polymorph getPropertyList() const
     {
-      return getPropertySlotMap().find( aPropertyName )->second;
+      PolymorphVector aVector;
+      aVector.reserve( thePropertySlotMap.size() );
+      
+      for( PropertySlotMapConstIterator i( thePropertySlotMap.begin() ); 
+	   i != thePropertySlotMap.end() ; ++i )
+	{
+	  aVector.push_back( i->first );
+	}
+      
+      return aVector;
     }
 
-    virtual const Polymorph getPropertyList() const;
-
-    virtual const Polymorph 
-    getPropertyAttributes( StringCref aPropertyName ) const;
-
-
+    
     /// @internal 
 
     //FIXME: can be a protected member?
 
-    PropertySlotMapCref getPropertySlotMap() const 
+    //    virtual PropertySlotMapCref getPropertySlotMap() const = 0;
+
+
+    static void 
+    registerSlot( StringCref aName, PropertySlotPtr aPropertySlotPtr )
     {
-      return thePropertySlotMap;
+      if( thePropertySlotMap.find( aName ) != thePropertySlotMap.end() )
+	{
+	  // it already exists. take the latter one.
+	  delete thePropertySlotMap[ aName ];
+	  thePropertySlotMap.erase( aName );
+	}
+
+      thePropertySlotMap[ aName ] = aPropertySlotPtr;
     }
 
-    const String getClassNameString() const { return getClassName(); }
 
-    virtual StringLiteral getClassName() const { return "PropertyInterface"; }
-
-
-    /// @internal
-
-    template <typename Type>
-    void nullSet( const Type& )
+    /*
+    static void removeSlot( StringCref aName );
     {
-      THROW_EXCEPTION( AttributeError, "Not setable." );
+      if( thePropertySlotMap.find( aName ) == thePropertySlotMap.end() )
+	{
+	  THROW_EXCEPTION( NoSlot,
+			   getClassName() + String( ":no slot for keyword [" ) +
+			   aName + String( "] found.\n" ) );
+	}
+      
+      delete thePropertySlotMap[ aName ];
+      thePropertySlotMap.erase( aName );
     }
+    */
 
-    /// @internal
-
-    template <typename Type>
-    const Type nullGet() const
-    {
-      THROW_EXCEPTION( AttributeError, "Not getable." );
-    }
-
-  protected:
-
-    static PropertySlotMakerPtr getPropertySlotMaker();
-
-    void registerSlot( StringCref aName, PropertySlotPtr aPropertySlotPtr );
-    void removeSlot( StringCref aName );
-
-
-    virtual void defaultSetProperty( StringCref aPropertyName, 
-				     PolymorphCref aValue );
-
-    virtual const Polymorph 
-    defaultGetProperty( StringCref aPorpertyName ) const;
 
   private:
 
-    PropertySlotMap thePropertySlotMap;
-    
-    //    LoggerVector theLoggerVector;
+    static PropertySlotMap        thePropertySlotMap;
 
   };
-
-
-#define GET_METHOD( TYPE, NAME )\
-const TYPE get ## NAME() const
-
-#define SET_METHOD( TYPE, NAME )\
-void set ## NAME( TYPE ## Cref value )
-
-#define GET_METHOD_DEF( TYPE, NAME, CLASS )\
-const TYPE CLASS::get ## NAME() const
-
-#define SET_METHOD_DEF( TYPE, NAME, CLASS )\
-void CLASS::set ## NAME( TYPE ## Cref value )
-
-
-#define SIMPLE_GET_METHOD( TYPE, NAME )\
-GET_METHOD( TYPE, NAME )\
-{\
-  return NAME;\
-} //
-
-#define SIMPLE_SET_METHOD( TYPE, NAME )\
-SET_METHOD( TYPE, NAME )\
-{\
-  NAME = value;\
-} //
-
-#define SIMPLE_SET_GET_METHOD( TYPE, NAME )\
-SIMPLE_SET_METHOD( TYPE, NAME )\
-SIMPLE_GET_METHOD( TYPE, NAME )
-
-#define LIBECS_DM_OBJECT( TYPE, CLASSNAME )\
-public:\
- virtual StringLiteral getClassName() const { return XSTR( CLASSNAME ); }\
- DM_OBJECT( TYPE, CLASSNAME )
-
-#define DEFINE_PROPERTYSLOT( TYPE, NAME, SETMETHOD, GETMETHOD )\
-CREATE_PROPERTYSLOT( TYPE, NAME, SETMETHOD, GETMETHOD )\
-
-#define CREATE_PROPERTYSLOT( TYPE, NAME, SETMETHOD, GETMETHOD )\
-    registerSlot( # NAME,\
-		  getPropertySlotMaker()->\
-		  createPropertySlot( *this, Type2Type<TYPE>(),\
-				      SETMETHOD,\
-				      GETMETHOD\
-				      ) )
-
-#define CREATE_PROPERTYSLOT_SET_GET( TYPE, NAME, CLASS )\
-CREATE_PROPERTYSLOT( TYPE, NAME,\
-                     & CLASS::set ## NAME,\
-                     & CLASS::get ## NAME )
-
-#define CREATE_PROPERTYSLOT_SET( TYPE, NAME, CLASS )\
-CREATE_PROPERTYSLOT( TYPE, NAME,\
-                     & CLASS::set ## NAME,\
-                     NULLPTR )
-
-
-#define CREATE_PROPERTYSLOT_GET( TYPE, NAME, CLASS )\
-CREATE_PROPERTYSLOT( TYPE, NAME,\
-                     NULLPTR,\
-                     & CLASS::get ## NAME )
 
 
 

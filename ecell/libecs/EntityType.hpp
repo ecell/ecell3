@@ -136,23 +136,11 @@ namespace libecs
       return aString;
     }
 
-    inline static StringCref  EntityTypeStringOfProcess()
-    {
-      const static String aString( "Process" );
-      return aString;
-    }
+    static StringCref  EntityTypeStringOfProcess();
     
-    inline static StringCref  EntityTypeStringOfVariable()
-    {
-      const static String aString( "Variable" );
-      return aString;
-    }
+    static StringCref  EntityTypeStringOfVariable();
     
-    inline static StringCref  EntityTypeStringOfSystem()
-    { 
-      const static String aString( "System" );
-      return aString;
-    }
+    static StringCref  EntityTypeStringOfSystem();
 
   private:
 

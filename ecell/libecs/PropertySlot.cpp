@@ -31,7 +31,7 @@
 // E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
 
-#include "Logger.hpp"
+//#include "Logger.hpp"
 #include "Exceptions.hpp"
 
 #include "PropertySlot.hpp"
@@ -40,7 +40,7 @@
 namespace libecs
 {
 
-
+  /*
   void PropertySlot::connectLogger( LoggerPtr aLoggerPtr )
   {
     if( isLogged() )
@@ -64,7 +64,7 @@ namespace libecs
   {
     theLogger->appendData( aTime, getReal() );
   }
-
+  */
   
 
 }
