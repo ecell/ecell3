@@ -109,14 +109,14 @@ class LogoAnimation:
         self.image.set_from_file( os.environ['OSOGOPATH'] + os.sep + "ecell32.png" )
         self.image.show()
 
-        self.iconList = [ os.environ['OSOGOPATH'] + os.sep + "ecell3-1.png",
-                          os.environ['OSOGOPATH'] + os.sep + "ecell3-2.png",
-                          os.environ['OSOGOPATH'] + os.sep + "ecell3-3.png",
-                          os.environ['OSOGOPATH'] + os.sep + "ecell3-4.png",
-                          os.environ['OSOGOPATH'] + os.sep + "ecell3-5.png",
-                          os.environ['OSOGOPATH'] + os.sep + "ecell3-6.png",
-                          os.environ['OSOGOPATH'] + os.sep + "ecell3-7.png",
-                          os.environ['OSOGOPATH'] + os.sep + "ecell3-8.png",
+        self.iconList = [ os.environ['OSOGOPATH'] + os.sep + "ecell32-1.png",
+                          os.environ['OSOGOPATH'] + os.sep + "ecell32-2.png",
+                          os.environ['OSOGOPATH'] + os.sep + "ecell32-3.png",
+                          os.environ['OSOGOPATH'] + os.sep + "ecell32-4.png",
+                          os.environ['OSOGOPATH'] + os.sep + "ecell32-5.png",
+                          os.environ['OSOGOPATH'] + os.sep + "ecell32-6.png",
+                          os.environ['OSOGOPATH'] + os.sep + "ecell32-7.png",
+                          os.environ['OSOGOPATH'] + os.sep + "ecell32-8.png",
                           os.environ['OSOGOPATH'] + os.sep + "ecell32.png" ]
 
         #for i in range( len( self.iconList ) ): 

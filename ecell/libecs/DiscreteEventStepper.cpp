@@ -226,6 +226,12 @@ namespace libecs
 
   void DiscreteEventStepper::log()
   {
+    if( theLoggerVector.empty() )
+      {
+	return;
+      }
+
+
     // call Logger::log() of Loggers that are attached to
     // theLastProcess and Variables in its VariableReferenceVector.
 
