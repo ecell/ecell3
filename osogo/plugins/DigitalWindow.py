@@ -23,7 +23,8 @@ class DigitalWindow( OsogoPluginWindow ):
 	def __init__( self, aDirName, aData, aPluginManager, aRoot=None ):
 
 		# call constructor of superclass
-		OsogoPluginWindow.__init__( self, aDirName, aData, aPluginManager, aRoot )
+		OsogoPluginWindow.__init__( self, aDirName, aData, \
+		                            aPluginManager, aRoot )
         
 		aFullPNString = createFullPNString( self.theFullPN() )
 		aValue = self.theSession.theSimulator.getEntityProperty( aFullPNString )
@@ -36,28 +37,33 @@ class DigitalWindow( OsogoPluginWindow ):
 	# end of __init__
 
 	def openWindow(self):
+
 		OsogoPluginWindow.openWindow(self)
-		self[self.__class__.__name__].show_all()
 
 		aFullPNString = createFullPNString( self.theFullPN() )
 		aValue = self.theSession.theSimulator.getEntityProperty( aFullPNString )
-		#if operator.isNumberType( aValue ):
-		if TRUE:
-			self.thePluginManager.appendInstance( self )
+		anAttribute = self.theSession.theSimulator.getEntityPropertyAttributes( \
+		              aFullPNString )
 
-			self.addHandlers( { 
-			            'on_value_frame_changed' :self.inputValue,
-		  	            'on_increase_button_clicked' :self.increaseValue,
-		  	            'on_decrease_button_clicked' :self.decreaseValue,
-			            } )
+		self.thePluginManager.appendInstance( self )
 
-			aString = str( self.theFullPN()[ID] )
-			aString += ':\n' + str( self.theFullPN()[PROPERTY] )
-			self["id_label"].set_text( aString )
-			self.update()
-			# ----------------------------------------------------------------
+		self.addHandlers( { 
+		            'on_value_frame_activate'        :self.inputValue,
+	  	            'on_increase_button_clicked'     :self.increaseValue,
+	  	            'on_decrease_button_clicked'     :self.decreaseValue,
+		            } )
 
-		#else:
+		aString = str( self.theFullPN()[ID] )
+		aString += ':\n' + str( self.theFullPN()[PROPERTY] )
+		self["id_label"].set_text( aString )
+
+		# If this property is not settable, sets unsensitive TextEntry and Buttons.
+		if anAttribute[SETTABLE] == FALSE:
+			self["value_frame"].set_editable( FALSE )
+			self["increase_button"].set_sensitive( FALSE )
+			self["decrease_button"].set_sensitive( FALSE )
+
+		self.update()
 
 	# ------------------------------------------------------
 	# changeFullPN
@@ -96,7 +102,7 @@ class DigitalWindow( OsogoPluginWindow ):
 	# anObject(any)   : a dammy object
 	# return -> None
 	# ------------------------------------------------------
-	def inputValue( self, obj ):
+	def inputValue( self, *arg ):
 
 		# gets text from text field.
 		aText = string.split(self['value_frame'].get_text())

@@ -74,7 +74,8 @@ class PlotterPluginWindow( OsogoPluginWindow ):
 		#init plotter instance
 		#if plot_type=='TracerPlot':
 		if self.thePlotType=='TracerPlot':
-		    self.thePlotInstance=TracerPlot(self, 'linear',self.theWindow)
+		    #self.thePlotInstance=TracerPlot(self, 'linear',self.theWindow)
+		    self.thePlotInstance=TracerPlot(self, 'linear', self.getParent() )
 		#attach plotterwidget to window
 		self.PlotWidget= self.thePlotInstance.getWidget() 
 		aWindowWidget.add( self.PlotWidget )
@@ -100,12 +101,6 @@ class PlotterPluginWindow( OsogoPluginWindow ):
 		self.addtrace_to_plot(self.theFullPNList())
 		self.refresh_loggers()
 
-	#def addFullPNList( self, aFullPNList ):
-		#print "######################1"
-		#print self.theFullPNList()
-		#print "######################2"
-		#print aFullPNList
-		#print "######################3"
 
 	def refresh_loggers(self):
 	    #refreshes loggerlist
@@ -204,10 +199,10 @@ class PlotterPluginWindow( OsogoPluginWindow ):
 		text=self.ListStore.get_value(iter,COL_TXT)
 		self.selection_list.append([text,iter])
 	    
-	def addtrace(self, aFullPN): #called from outside
+	#def addtrace(self, aFullPN): #called from outside
 	    #add to FullPNlist
 	    #addtrace_to_plot
-	    print "addtrace" #dummy command
+		
 	    
 	def change_scale(self,obj):  #this is a buttonhandler
 	    #simply calls plotinstance.change_scale
@@ -244,5 +239,5 @@ class PlotterPluginWindow( OsogoPluginWindow ):
 	    
 	    
 	def remove_trace_from_list(self,aFullPNString):
-		print "remove_trace_from_list"
+		pass
 	    

@@ -364,7 +364,7 @@ class LoggerWindow(OsogoWindow):
 	# ---------------------------------------------------------------
 	def update( self ):
 
-		if self.isShown == gtk.FALSE:
+		if self.getExist() == FALSE:
 			return None
 
 		self.theFullPNList = self.theSession.getLoggerList()
@@ -402,9 +402,10 @@ class LoggerWindow(OsogoWindow):
 	# ---------------------------------------------------------------
 	def closeWindow ( self, obj ):
 		#gtk.mainquit()
-		self[self.__class__.__name__].hide_all()
-		self.isShown=gtk.FALSE
-		self.theMainWindow.toggleLoggerWindow()
+		self[self.__class__.__name__].iconify()
+		#self[self.__class__.__name__].hide_all()
+		#self.isShown=gtk.FALSE
+		#self.theMainWindow.toggleLoggerWindow()
 		
 	# closeWindow
 

@@ -13,6 +13,7 @@ class InterfaceWindow( OsogoWindow ):
 	# -------------------------------------------------------------
 	def __init__( self, aMainWindow ):
 
+		self.thePluginManager = aMainWindow.thePluginManager
 		OsogoWindow.__init__( self, aMainWindow )
 		self.theSelectedRow = None
 
@@ -99,8 +100,7 @@ class InterfaceWindow( OsogoWindow ):
 		# if no data is selected, show error message.
 		if self.theSelectedRow == None:
 			anErrorMessage='\nNo data is selected.!\n'
-			self.theMainWindow.printMessage( anErrorMessage )
-			aWarningWindow = ConfirmWindow(0,anErrorMessage,"!")
+			aWarningWindow = ConfirmWindow(OK_MODE,anErrorMessage,"Error!")
 			return None
 
 		# if a data is selected, then remove it.
@@ -111,18 +111,12 @@ class InterfaceWindow( OsogoWindow ):
 	
 			if len(aNewTitle) == 0:
 				anErrorMessage='\nError text field is blank.!\n'
-				self.theMainWindow.printMessage( anErrorMessage )
-				aWarningWindow = ConfirmWindow(0,anErrorMessage,"!")
+				aWarningWindow = ConfirmWindow(OK_MODE,anErrorMessage,"Error!")
 				return None
 
 			aTitle =  self['InterfaceCList'].get_model().get_value( self.theSelectedRow ,0 )
-			aTitleDict = self.theMainWindow.thePluginManager.thePluginTitleDict
 
-			anInstanceList = self.theMainWindow.thePluginManager.theInstanceList
-			for anInstance in anInstanceList:
-				if aTitle == aTitleDict[ anInstance ]:
-					self.theMainWindow.thePluginManager.editModuleTitle( anInstance, aNewTitle )
-					break
+			self.theMainWindow.thePluginManager.editInstanceTitle( aTitle, aNewTitle )
 
 		self.theMainWindow.updateFundamentalWindows()
 
@@ -163,8 +157,7 @@ class InterfaceWindow( OsogoWindow ):
 		# if no data is selected, show error message.
 		if self.theSelectedRow == None:
 			anErrorMessage='\nNo data is selected.!\n'
-			self.theMainWindow.printMessage( anErrorMessage )
-			aWarningWindow = ConfirmWindow(0,anErrorMessage,"!")
+			aWarningWindow = ConfirmWindow(OK_MODE,anErrorMessage,"Error!")
 			return None
 
 		# if a data is selected, then remove it.
@@ -178,10 +171,6 @@ class InterfaceWindow( OsogoWindow ):
 				if aTitle == aTitleDict[ anInstance ]:
 					self.theMainWindow.thePluginManager.showPlugin( anInstance )
 			
-			#	if aTitle == aTitleDict[ anInstance ]:
-			#		anInstance[ anInstance.__class__.__name__ ].hide()
-			#		anInstance[ anInstance.__class__.__name__ ].show_all()
-			#		break
 
 	# end of showWindow
 
@@ -212,13 +201,16 @@ class InterfaceWindow( OsogoWindow ):
 		else:
 
 			aTitle =  self['InterfaceCList'].get_model().get_value( self.theSelectedRow ,0 )
-			aTitleDict = self.theMainWindow.thePluginManager.thePluginTitleDict
+			#aTitleDict = self.theMainWindow.thePluginManager.thePluginTitleDict
+			#self.theMainWindow.theBoardWindow.deletePluginWindowByTitle( aTitle )
+			self.theMainWindow.getWindow('BoardWindow').deletePluginWindowByTitle( aTitle )
+			self.thePluginManager.removeInstanceByTitle( aTitle )
 
-			anInstanceList = self.theMainWindow.thePluginManager.theInstanceList
-			for anInstance in anInstanceList:
-				if aTitle == aTitleDict[ anInstance ]:
-					self.theMainWindow.thePluginManager.removeInstance( anInstance )
-					break
+			#anInstanceList = self.theMainWindow.thePluginManager.theInstanceList
+			#for anInstance in anInstanceList:
+			#	if aTitle == aTitleDict[ anInstance ]:
+			#		self.theMainWindow.thePluginManager.removeInstance( anInstance )
+			#		break
 
 			# clear select status
 			self.theSelectedRow = None

@@ -155,7 +155,8 @@ class StepperWindow(OsogoWindow):
 	def selectStepperID( self, *objects ):
 
 		# If Window is closed, do nothing.
-		if self.isShown == gtk.FALSE:
+		#if self.isShown == gtk.FALSE:
+		if self.exists() == FALSE:
 			return None
 
 		# --------------------------------------------------
@@ -214,7 +215,7 @@ class StepperWindow(OsogoWindow):
 	def selectProperty( self, *objects ):
 
 		# If Window is closed, do nothing.
-		if self.isShown == gtk.FALSE:
+		if self.exists() == FALSE:
 			return None
 
 		# --------------------------------------------------
@@ -285,7 +286,7 @@ class StepperWindow(OsogoWindow):
 	def updateProperty( self, *objects ):
 
 		# If Window is closed, do nothing.
-		if self.isShown == gtk.FALSE:
+		if self.exists() == FALSE:
 			return None
 
 		# --------------------------------------------------
@@ -407,7 +408,7 @@ class StepperWindow(OsogoWindow):
 	# ---------------------------------------------------------------
 	def update( self ):
 
-		if self.isShown == gtk.FALSE:
+		if self.getExist() == FALSE:
 			return None
 
 		self['statusbar'].pop(1)
@@ -439,9 +440,11 @@ class StepperWindow(OsogoWindow):
 	# ---------------------------------------------------------------
 	def closeWindow ( self, obj ):
 
-		self[self.__class__.__name__].hide_all()
-		self.isShown = FALSE
-		self.theMainWindow.toggleStepperWindow()
+		self[self.__class__.__name__].iconify()
+
+	#	self[self.__class__.__name__].hide_all()
+	#	self.isShown = FALSE
+	#	self.theMainWindow.toggleStepperWindow()
 
 	# end of closeWindow
 
@@ -451,88 +454,3 @@ class StepperWindow(OsogoWindow):
 
 
 
-# ---------------------------------------------------------------
-# Test code
-# ---------------------------------------------------------------
-
-
-if __name__ == "__main__":
-
-	class Session:
-		def __init__( self ):
-			self.theSimulator = simulator()
-		def getLoggerList( self ):
-			#fpnlist = ((VARIABLE, '/CELL/CYTOPLASM', 'ATP', 'Value'),
-			#	(VARIABLE, '/CELL/CYTOPLASM', 'ADP', 'Value'),
-			#	(VARIABLE, '/CELL/CYTOPLASM', 'AMP', 'Value'))
-			fpnlist = ('Variable:/CELL/CYTOPLASM/aa:E:Quality',
-					   'Variable:/CELL/CYTOPLASM/bb:F:Quality',
-					   'Variable:/CELL/CYTOPLASM/cc:G:Quality')
-			return fpnlist
-
-		def getLogger( self, fpn ):
-			logger = Logger( fpn )
-			return logger
-
-	class MainWindow:
-		def __init__( self ):
-			self.theSimulator = simulator()
-			self.theRunningFlag  =0
-			#theRunningFlag:
-			#if self.theMainWindow.theRunningFlag:
-
-	class simulator:
-
-		def __init__( self ):
-			self.dic={('Variable', '/CELL/CYTOPLASM', 'ATP','Value') : (1950,),}
-
-		def getProperty( self, fpn ):
-			return self.dic[fpn]
-
-		def setProperty( self, fpn, value ):
-			self.dic[fpn] = value
-
-		def getLogger( self, fpn ):
-			logger = Logger( fpn )
-			return logger
-
-		#def getLoggerList( self ):
-		#	fpnlist = ((VARIABLE, '/CELL/CYTOPLASM', 'ATP', 'Value'),
-		#		(VARIABLE, '/CELL/CYTOPLASM', 'ADP', 'Value'),
-		#		(VARIABLE, '/CELL/CYTOPLASM', 'AMP', 'Value'))
-		#	return fpnlist
-
-	class Logger:
-
-		def __init__( self, fpn ):
-			pass
-
-		def getStartTime( self ):
-			return 2
-
-		def getEndTime( self ):
-			return 108
-
-		def getLoggerData( self ,start=0,end=0,interval=0):
-			return array([[0,0],[0.1,0.1],[0.2,0.3],[0.3,0.7],[0.4,0.9],[0.5,1.0]])
-
-		def getData( self ,start=0,end=0,interval=0):
-			return array([[0,0],[0.1,0.1],[0.2,0.3],[0.3,0.7],[0.4,0.9],[0.5,1.0]])
-		
-              
-	def mainQuit( obj, data ):
-		gtk.mainquit()
-		quit()
-        
-	def mainLoop():
-		# FIXME: should be a custom function
-
-		gtk.mainloop()
-
-	def main():
-		aMainWindow = MainWindow()
-		aSession = Session()
-		aLoggerWindow = LoggerWindow( aSession, aMainWindow )
-		mainLoop()
-
-	main()

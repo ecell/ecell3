@@ -15,7 +15,7 @@
   <property name="icon">icon_ecelllogo.xpm</property>
 
   <child>
-    <widget class="GtkVBox" id="vbox61">
+    <widget class="GtkVBox" id="top_frame">
       <property name="visible">True</property>
       <property name="homogeneous">False</property>
       <property name="spacing">0</property>

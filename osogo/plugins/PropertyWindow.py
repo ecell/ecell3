@@ -87,7 +87,8 @@ class PropertyWindow(OsogoPluginWindow):
 		#self.__setFullPNList()
 		self.update()
 
-		if ( len( self.theFullPNList() ) > 1 ) and ( aRoot != 'top_vbox' ):
+		#if ( len( self.theFullPNList() ) > 1 ) and ( aRoot != 'top_vbox' ):
+		if ( len( self.theFullPNList() ) > 1 ) and ( aRoot != 'EntityWindow' ):
 			self.thePreFullID = self.theFullID()
 			aClassName = self.__class__.__name__
 

@@ -45,7 +45,7 @@ import gtk.glade
 
 from ecell.Window import *
 from ConfirmWindow import *
-
+from OsogoUtil import *
 
 # ---------------------------------------------------------------
 # OsogoWindow -> Window
@@ -64,8 +64,7 @@ class OsogoWindow(Window):
 	def __init__( self, aMainWindow, aGladeFile=None, aRoot=None ):
 
 		self.theMainWindow = aMainWindow
-		self.theExist = gtk.FALSE
-		self.isShown = gtk.FALSE
+		self.theExist = FALSE
 		Window.__init__( self, aGladeFile, aRoot )
 
 	# end of __init__
@@ -77,22 +76,16 @@ class OsogoWindow(Window):
 	# return -> exist status  
 	# ---------------------------------------------------------------
 	def getExist( self ):
-
 		return self.theExist
 
 	# end of getExist
 
+	def exists( self ):
+		return self.theExist
 
-	# ---------------------------------------------------------------
-	# getIsShown
-	#  
-	# return -> shown status  
-	# ---------------------------------------------------------------
-	def getIsShown( self ):
-
-		return self.isShown
-
-	# end of getIsShown
+	def present( self ):
+		if self.getExist():
+			self[self.__class__.__name__].present()
 
 
 	# ---------------------------------------------------------------
@@ -102,14 +95,10 @@ class OsogoWindow(Window):
 	#
 	# return -> exist status  
 	# ---------------------------------------------------------------
-	def destroyWindow( self, *objects ):
+	def deleted( self, *arg ):
 
-		self.theExist = gtk.FALSE
-		self.isShown = gtk.FALSE
-		#try:
-		self.theMainWindow.updateFundamentalWindows()
-		#except:
-		#	pass
+		self[self.__class__.__name__].iconify()
+		return TRUE
 
 	# end of destroyWindow
 
@@ -121,26 +110,27 @@ class OsogoWindow(Window):
 	# ---------------------------------------------------------------
 	def openWindow( self ):
 
-
 		# --------------------------------------------------
 		# If instance of Window Widget has destroyed,
 		# creates instance of Window Widget.
 		# --------------------------------------------------
 		if self.theExist == gtk.FALSE:
+			self.theExist = TRUE
 			Window.openWindow(self)
+			self[self.__class__.__name__].show_all()
+			self[self.__class__.__name__].connect('delete_event',self.deleted)
 
 		# --------------------------------------------------
 		# If instance of Message Window Widget has destroyed,
 		# calls the show method of Window Widget.
 		# --------------------------------------------------
-		self[self.__class__.__name__].show_all()
 
 		# sets signalhander
-		self[self.__class__.__name__].connect('destroy',self.destroyWindow)
+		#self[self.__class__.__name__].connect('destroy',self.destroyWindow)
 
 		# sets exist status 'exists'
-		self.theExist = gtk.TRUE
-		self.isShown = gtk.TRUE
+		#self.theExist = gtk.TRUE
+		#self.isShown = gtk.TRUE
 
 	# end of openWindow
 

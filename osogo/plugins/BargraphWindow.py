@@ -36,7 +36,7 @@ class BargraphWindow( OsogoPluginWindow ):
 		#self.openWindow()
 		#this should be removed:
 		#self.root = self[self.__class__.__name__]
-		root=self.getWidget('BargraphWindow')
+		#root=self.getWidget('BargraphWindow')
 		#gets HandleBox
 		self.handlebox=self.getWidget('handlebox1')
 		self.drawingarea=self.getWidget('drawingarea1')
@@ -62,10 +62,13 @@ class BargraphWindow( OsogoPluginWindow ):
 			    [1000,'red',None]]
 			    
 		for i in range(len(self.colored_ranges)):
-		    gc=root.window.new_gc()
-		    gc.set_foreground(\
-			self.ColorMap.alloc_color(self.colored_ranges[i][1]))
-		    self.colored_ranges[i][2]=gc
+		        aRootWindow=self.getParent()
+		        root = aRootWindow[aRootWindow.__class__.__name__]
+		        gc=root.window.new_gc()
+		        gc.set_foreground(\
+		        self.ColorMap.alloc_color(self.colored_ranges[i][1]))
+		        self.colored_ranges[i][2]=gc
+
 		#lastvalue zero
 		self.lastvalue=0
 		self.lastscale=0
@@ -169,7 +172,9 @@ class BargraphWindow( OsogoPluginWindow ):
 		self.BAR_HEIGTH=new_heigth
 #		self.drawingarea.set_size_request(self.BAR_WIDTH,self.BAR_HEIGTH)
 #		del self.pm
-		root=self.getWidget('BargraphWindow')
+		#root=self.getWidget('BargraphWindow')
+		aRootWindow=self.getParent()
+		root = aRootWindow[aRootWindow.__class__.__name__]
 		#self.pm=gtk.gdk.Pixmap(self.root.window,self.BAR_WIDTH,self.BAR_HEIGTH,-1)
 		self.pm=gtk.gdk.Pixmap(root.window,self.BAR_WIDTH,self.BAR_HEIGTH,-1)
 		

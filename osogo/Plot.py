@@ -67,6 +67,12 @@ class Plot:
 	    self.theWidget.connect('motion-notify-event',self.motion)
 	    self.theWidget.connect('button-release-event',self.release)
 	    
+	    #aRootWindow=self.getParent()
+	    #print "------------p--------------1"
+	    #print aRootWindow
+	    #root = aRootWindow[aRootWindow.__class__.__name__]
+
+	    root = root[root.__class__.__name__]
 	    
 	    self.theColorMap=self.theWidget.get_colormap()
 	    newgc=root.window.new_gc()

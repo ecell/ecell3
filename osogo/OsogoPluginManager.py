@@ -30,8 +30,7 @@
 #'Design and application Framework: Kouichi Takahashi <shafi@e-cell.org>',
 #'Programming: Yuki Fujita',
 #             'Yoshiya Matsubara',
-# 'Yuusuke Saito'
-#
+#             'Yuusuke Saito'
 # modified by Masahiro Sugimoto <sugi@bioinformatics.org> at
 # E-CELL Project, Lab. for Bioinformatics, Keio University.
 #
@@ -44,66 +43,40 @@ import imp
 import glob
 from ecell.ECS import *
 from config import *
-#from Plugin import *
 from ecell.Plugin import *
 
-# ---------------------------------------------------------------
-# OsogoPluginManager -> PluginManager
-#   - sets the information about plugin modules to show interface
-#     Interface Window
-#   - updates the information on LoggerWindow
-#   - sets the message to MessageWindow
-#   - catchs the message from Session
-# ---------------------------------------------------------------
+
 class OsogoPluginManager(PluginManager):
+	"""PluginManager specified for Osogo
+	"""
 
+	# ========================================================================
+	def __init__( self, aMainWindow ):
+		"""Constructor
+		aMainWindow   ---  the instance of MainWindow (MainWindow)
+		"""
 
-	# ---------------------------------------------------------------
-	# Constructor
-	#   - alls the constructor of superclass 
-	#   - sets the reference to some window
-	#
-	# aSession          : session
-	# aLoggerWindow     : LoggerWindow
-	# anInterfaceWindow : InterfaceWindow
-	# aMessageWindow    : MessageWindow
-	# return -> None
-	# ---------------------------------------------------------------
-	def __init__( self, aMainWindow  ):
+		PluginManager.__init__(self)
 
-		try:
+		self.theSession = aMainWindow.theSession
+		self.theMainWindow = aMainWindow
 
-			PluginManager.__init__(self)
-
-			self.theSession = aMainWindow.theSession
-			self.theMainWindow = aMainWindow
-
-			self.thePluginTitleDict = {}     # key is instance , value is title
-			self.thePluginWindowNumber = {}
-
-		except:
-			aMessage  = '\n----------Error------------\n'
-			aMessage += 'ErroType[%s]\n'  %sys.exc_type
-			aMessage += 'ErroValue[%s]\n' %sys.exc_value
-			traceback.print_exc()
-			print aMessage
+		self.thePluginTitleDict = {}     # key is instance , value is title
+		self.thePluginWindowNumber = {}
+		self.thePropertyWindowOnEntityListWindows = {}  # key is instance, value is None
 
 	# end of __init__
         
 
-	# ---------------------------------------------------------------
-	# createInstace (overrides PluginManager)
-	#   - creates one plugin module
-	#   - adds record to InterfaceWindow
-	#   - call initialize method of the simulator of the session
-	#
-	# aClassName        : class name of plugin module
-	# aData             : data 
-	# aRoot             : None or 'menu' or 'top_vbox'
-	# aParent           : parent window
-	# return -> one instance
-	# ---------------------------------------------------------------
+	# ========================================================================
 	def createInstance( self, aClassname, data, root=None, parent=None ):
+		"""creates new Plugin Instance
+		aClassName  --- a class name of PluginWindow (str)
+		aData       --- a RawFullPN (RawFullPN)
+		aRoot       --- a root widget (str) 
+		aParent     --- ParentWindow (Window)          # NOT gtk.Window
+		Returns a PluginWindow instance (PluginWindow)
+		"""
 	
 		if self.thePluginMap.has_key( aClassname ):
 			pass
@@ -117,8 +90,15 @@ class OsogoPluginManager(PluginManager):
 		# then creates new title and sets it to plugin window.
 		# -------------------------------------------------------
 		aTitle = ""
-		if root !='top_vbox':                # if(1)
+		#if root !='top_vbox':                # if(1)
+		#if root !='EntityListWindow':                # if(1)
 
+
+		#if root == None:                # if(1)
+		#if parent == None:                # if(1)
+		if root != None and root.__class__.__name__ == 'EntityListWindow':
+			pass
+		else:
 			aTitle = aClassname[:-6]
 
 			if self.thePluginWindowNumber.has_key( aClassname ):
@@ -130,6 +110,7 @@ class OsogoPluginManager(PluginManager):
 
 			# if(1)
 
+
 		# Nothing is selected.
 		if len(data) == 0:
 			self.printMessage("Nothing is selected.")
@@ -137,105 +118,70 @@ class OsogoPluginManager(PluginManager):
 		else:
 
 			try:
-				anInstance = aPlugin.createInstance( data, self, root, parent )
+				anInstance = aPlugin.createInstance( data, self, root )
 			except TypeError:
 				return None
 
 			anInstance.openWindow()
 
-			try:
-				if root !='top_vbox':              
+			#try:
+			if TRUE:
+				#if root !='top_vbox':              
+				#if root != 'EntityListWindow':              
+				#if root == None:
+				#if root != self.theMainWindow.theEntityListWindow:
+				if root != None and root.__class__.__name__ == 'EntityListWindow':
+					self.thePropertyWindowOnEntityListWindows[ anInstance ] = None
+				else:
 					anInstance.editTitle( aTitle )
 					self.thePluginTitleDict[ anInstance ] = aTitle
 					self.theInstanceList.append( anInstance )
-
 				# initializes session
 				self.theMainWindow.theSession.theSimulator.initialize()
 				self.updateFundamentalWindows()
-			except:
-				pass
+			#except:
+			#	pass
 
 			return anInstance
 
 	# end of createInstance
 
-	# ---------------------------------------------------------------
-	# Loads a module (overrides PluginManager)
-	#   - If catchs exception from the method of super class,
-	#     then print message to MessageWindow.
-	#
-	# aClassName     : class name
-	# return -> None 
-	# ---------------------------------------------------------------
+	# ========================================================================
 	def loadModule( self, aClassname ):
-	
-		#try:
-		#print " OsogoPluginManager.loadModule %s " %aClassname
+		"""loads plugin window
+		aClassname   ---   a class name of PluginWindow
+		"""
+
 		PluginManager.loadModule(self,aClassname)
-		#except:
-		#	aMessage  = '\n----------Error------------\n'
-		#	aMessage += 'ErroType[%s]\n'  %sys.exc_type
-		#	aMessage += 'ErroValue[%s]\n' %sys.exc_value
-		#	traceback.print_exc()
-		#	self.printMessage(aMessage)
 
-	# end of loadModule
-
-	# ---------------------------------------------------------------
-	# loadAll (overrides PluginManager)
-	#   - loads all plugin modules
-	#   - adds record to InterfaceWindow
-	#   - call initialize method of the simulator of the session
-	#
-	# return -> None
-	# ---------------------------------------------------------------
+	# ========================================================================
 	def loadAll( self ):
+		"""loads all plugin windows' files
+		Returns None
+		"""
 
-		#try:
-			for aPath in PLUGIN_PATH:
-				aFileList = glob.glob( os.path.join( aPath, '*.glade' ) )
-				for aFile in aFileList:
-					aModulePath = os.path.splitext( aFile )[0]
-					if( os.path.isfile( aModulePath + '.py' ) ):
-						aModuleName = os.path.basename( aModulePath )
-						self.loadModule( aModuleName )
-						###self.theInterfaceWindow.thePluginWindowsNoDict[ aModuleName[ : -6 ] ] = 0
-		#except:
-		#	aMessage  = '\n----------Error------------\n'
-		#	aMessage += 'ErroType[%s]\n'  %sys.exc_type
-		#	aMessage += 'ErroValue[%s]\n' %sys.exc_value
-		#	traceback.print_exc()
-		#	self.printMessage(aMessage)
-
-	# end of loadAll
+		for aPath in PLUGIN_PATH:
+			aFileList = glob.glob( os.path.join( aPath, '*.glade' ) )
+			for aFile in aFileList:
+				aModulePath = os.path.splitext( aFile )[0]
+				if( os.path.isfile( aModulePath + '.py' ) ):
+					aModuleName = os.path.basename( aModulePath )
+					self.loadModule( aModuleName )
 
 
-
-	# ---------------------------------------------------------------
-	# updateAllPluginWindow (overrides PluginManager)
-	#   - updates all plugin window
-	#   - If catchs exception from the method of super class,
-	#     then print message to MessageWindow.
-	#
-	# return -> None
-	# ---------------------------------------------------------------
+	# ========================================================================
 	def updateAllPluginWindow( self ):
+		"""updates all plugin windows
+		Returns None
+		"""
 
-		#print "updateAllPluginWindow"
-
-		#try:
+		# updates all plugin windows
 		PluginManager.updateAllPluginWindow(self)
-		#except:
-		#	aMessage  = '\n----------Error------------\n'
-		#	aMessage += 'ErroType[%s]\n'  %sys.exc_type
-		#	aMessage += 'ErroValue[%s]\n' %sys.exc_value
-		#	traceback.print_exc()
-		#	self.printMessage(aMessage)
 
-		#self.theMainWindow.updateFundamentalWindows()
-		
-
-	# end of updateAllPluginWindow
+		# updates PropertyWindow on EntityListWindow
+		if self.thePropertyWindowOnEntityListWindows != None:
+			for aPropertyWindowOnEntityListWindow in self.thePropertyWindowOnEntityListWindows.keys():
+				aPropertyWindowOnEntityListWindow.update()
 
 
 	# ---------------------------------------------------------------
@@ -247,6 +193,7 @@ class OsogoPluginManager(PluginManager):
 	# anInstance     : an instance
 	# return -> None
 	# ---------------------------------------------------------------
+	# ========================================================================
 	def appendInstance( self, anInstance ):
 
 		pass
@@ -268,123 +215,105 @@ class OsogoPluginManager(PluginManager):
 	# end of appendInstance
 
 
-	# ---------------------------------------------------------------
-	# removeInstance (overrides PluginManager)
-	#   - removes an instance from instance list
-	#   - If catchs exception from the method of super class,
-	#     then print message to MessageWindow.
-	#
-	# anInstance     : an instance
-	# return -> None
-	# This method is throwable exception. (ValueError)
-	# ---------------------------------------------------------------
+	# ========================================================================
 	def removeInstance( self, anInstance ):
+		"""override superclass's method
+		anInstance   --- a PluginWindow instance 
+		Returns None
+		"""
 
-		#for Instance in self.theInstanceList:
-		#	print Instance.getTitle()
-
+		# calls superclass's method
 		PluginManager.removeInstance(self, anInstance)
 
+		# deletes it from the instance map
 		if self.thePluginTitleDict.has_key( anInstance ):
 			del self.thePluginTitleDict[ anInstance ] 
 		else:
 			pass
 
+		# The following process is verbose
+		# when the instance is not deleted, destroy it.
 		if anInstance != None:
-			#print "#############################$$$$$$$$$$$"
-			#print anInstance.__class__.__name__
-			#print type(anInstance[anInstance.__class__.__name__])
-			#print anInstance[anInstance.__class__.__name__]
 			if anInstance[anInstance.__class__.__name__] != None:
 				anInstance[anInstance.__class__.__name__].destroy()
 
+		# updaets fundamental windows
 		self.theMainWindow.updateFundamentalWindows()
 
-	# end of removeInstance
+
+	# ========================================================================
+	def removeInstanceByTitle( self, aTitle ):
+		"""removes PluginWindow instance by title
+		aTitle   --- a PluginWindow's title (str)
+		Returns None
+		"""
+		
+		# converts the title to str type
+		aTitle = str(aTitle)
+
+		# removes the instance
+		for anInstance in self.theInstanceList:
+			if aTitle == self.thePluginTitleDict[ anInstance ]:
+				self.removeInstance( anInstance )
+				break
+
+	# ========================================================================
+	def editModuleTitle( self, aPluginInstance, aTitle ):
+		"""overwrites superclass's method
+		edits PluginWindow's title
+		aPluginInstance   --- the PluginWindow to change title (PluginWindow)
+		aTitle            --- a new PluginWindow's title (str)
+		Returns None
+		"""
+
+		self.thePluginTitleDict[aPluginInstance] = aTitle
+		PluginManager.editModuleTitle( self, aPluginInstance, aTitle)
+
+	# ========================================================================
+	def editInstanceTitle( self, anOldTitle, aNewTitle ):
+		"""edits PluginWindow's title
+		anOldTitle   --- current PluginWindow's title (str)
+		anNewTitle   --- a new PluginWindow's title (str)
+		Returns None
+		"""
+
+		# converts the title to str type
+		anOldTitle = str(anOldTitle)
+		aNewTitle = str(aNewTitle)
+
+		# edits the instance's title
+		for anInstance in self.theInstanceList:
+			#print self.thePluginTitleDict[ anInstance ]
+			if anOldTitle == self.thePluginTitleDict[ anInstance ]:
+				self.editModuleTitle( anInstance, aNewTitle )
+				break
 
 
-	# ---------------------------------------------------------------
-	# showPlugin (overrides PluginManager)
-	#   - shows plugin window
-	#   - If catchs exception from the method of super class,
-	#     then print message to MessageWindow.
-	#
-	# aIndex       : an index of module
-	# *Objects     : dammy elements of argument
-	# return -> None
-	# This method is throwable exception. (IndexError)
-	# ---------------------------------------------------------------
-	#def showPlugin( self, num, obj ):
+	# ========================================================================
 	def showPlugin( self, aPluginInstance ):
+		"""overwrites superclass's method
+		aPluginInstance   ---  a PluginWindow instance 
+		Returns None
+		"""
 
 		PluginManager.showPlugin(self, aPluginInstance)
 
-		#try:
-		#PluginManager.showPlugin(self, anIndex, *Objects)
-		#except:
-		#	aMessage  = '\n----------Error------------\n'
-		#	aMessage += 'ErroType[%s]\n'  %sys.exc_type
-		#	aMessage += 'ErroValue[%s]\n' %sys.exc_value
-		#	aMessage += '%s' %traceback.print_exc()
-		#	self.printMessage(aMessage)
 
-	# end of showPlugin
-
-
-	# ---------------------------------------------------------------
-	# editModuleTitle (overrides PluginManager)
-	#   - edits module title
-	#   - If catchs exception from the method of super class,
-	#     then print message to MessageWindow.
-	#
-	# anIndex    : index of instance
-	# aTitle     : title of instance
-	# return -> None
-	# This method is throwable exception. (IndexError)
-	# ---------------------------------------------------------------
-	#def editModuleTitile( self, anIndex, aTitle ):
-	def editModuleTitile( self, aPluginInstance, aTitle ):
-
-		self.thePluginTitleDict[aPluginInstance] = aTitle
-		WindowManager.editModuleTitle( self, anIndex, aTitle)
-
-		#try:
-			##self.theInstanceList[ anIndex + 1 ].editTitle( aTitle )
-		#except:
-		#	aMessage  = '\n----------Error------------\n'
-		#	aMessage += 'ErroType[%s]\n'  %sys.exc_type
-		#	aMessage += 'ErroValue[%s]\n' %sys.exc_value
-		#	traceback.print_exc()
-		#	self.printMessage(aMessage)
-
-	# end of getModule
-
-
-	# ---------------------------------------------------------------
-	# deleteModule (overrides PluginManager)
-	#   - deletes a module
-	#   - If catchs exception from the method of super class,
-	#     then print message to MessageWindow.
-	#
-	# anIndex     : index of instance
-	# *Object     : dammy elements of argument
-	# return -> None
-	# This method is throwable exception. (IndexError)
-	# ---------------------------------------------------------------
-	def deleteModule( self, anIndex, *Objects ):
+	# ========================================================================
+	def deleteModule( self, *arg ):
+		"""overwrites superclass's method
+		aPluginInstance   ---  a PluginWindow instance 
+		Returns None
+		"""
 
 		self.theMainWindow.update()
 
-	# end of deleteModule
 
-
-	# ---------------------------------------------------------------
-	# updateLoggerWindow 
-	#   - call update method of LoggerWindow
-	#
-	# return -> None
-	# ---------------------------------------------------------------
+	# ========================================================================
 	def updateFundamentalWindows( self ):
+		"""updates fundamental windows
+		Returns None
+		"""
 
 		try:
 			self.theMainWindow.updateFundamentalWindows()
@@ -392,27 +321,35 @@ class OsogoPluginManager(PluginManager):
 		except:
 			pass
 
-	# end of updateLoggerWindow
 
-	# ---------------------------------------------------------------
-	# printMessage
-	#   - sets message to MessageWindow
-	#
-	# aMessage( string or list or tuple) : message will be shown on
-	#                                      MessageWindow
-	#
-	# return -> None
-	# ---------------------------------------------------------------
+	# ========================================================================
 	def printMessage( self, aMessage ):
+		"""prints message on MessageWindow
+		Returns None
+		"""
 
 		self.theMainWindow.printMessage(aMessage)
 
-	# end of printMessage
 
+	# ========================================================================
 	def updateAllWindows( self ):
+		"""updates all windows
+		Returns None
+		"""
+
 		self.updateAllPluginWindow()
+		self.theMainWindow.update()
 		self.theMainWindow.updateFundamentalWindows()
 
+
+	# ========================================================================
+	def deletePropertyWindowOnEntityListWinsow( self, aPropertyWindowOnEntityListWindow ):
+		"""deletes PropertyWindow on EntityListWindow
+		Returns None
+		"""
+
+		if self.thePropertyWindowOnEntityListWindows.has_key(aPropertyWindowOnEntityListWindow):
+			del self.thePropertyWindowOnEntityListWindows[aPropertyWindowOnEntityListWindow]
 
 if __name__ == "__main__":
     pass

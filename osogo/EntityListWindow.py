@@ -87,6 +87,9 @@ class EntityListWindow(OsogoWindow):
 		self.theSelectedEntityList = []
 		self.theSelectedPluginInstanceList = []
 
+	def deleted( self, *arg ):
+		self.theMainWindow.deleteEntityListWindow( self )
+		return FALSE
 	
 	# ====================================================================
 	def deletePluginWindowSelection( self, *arg ):
@@ -151,14 +154,12 @@ class EntityListWindow(OsogoWindow):
 
 	# ====================================================================
 	def __initializePropertyWindow( self ):
-		# ------------------------------------------
-		# setup PropertyWindow
-		# ------------------------------------------
+
 		self.thePropertyWindow = self.thePluginManager.createInstance( \
-		                         'PropertyWindow', [(SYSTEM, '', '/', '')], 'top_vbox' ) 
+		         'PropertyWindow', [(SYSTEM, '', '/', '')],  self ) 
 		self.thePropertyWindow.setStatusBar( self['statusbar'] )
 
-		aPropertyWindowTopVBox = self.thePropertyWindow['top_vbox']
+		aPropertyWindowTopVBox = self.thePropertyWindow['top_frame']
 		self['property_area'].add( aPropertyWindowTopVBox )
 		self.thePropertyWindow['property_clist'].connect( 'select_cursor_row', self.selectPropertyName )
 
@@ -167,10 +168,15 @@ class EntityListWindow(OsogoWindow):
 	def __initializePopupMenu( self ):
 		"""Initialize popup menu
 		Returns None
-		[Note]:Only 'PluginWindow type' menus and 'Create Logger' menu are
-		       created. The menus of PluginWindow instances are appended
+		[Note]:In this method, only 'PluginWindow type' menus, 'Create 
+		       Logger' menu and 'Add to Board' menu are created. 
+		       The menus of PluginWindow instances are appended
 		       dinamically in self.popupMenu() method.
 		"""
+
+		# ------------------------------------------
+		# menus for PluginWindow
+		# ------------------------------------------
 
 		# creaets menus of PluginWindow
 		for aPluginWindowType in self.thePluginManager.thePluginMap.keys(): 
@@ -185,6 +191,9 @@ class EntityListWindow(OsogoWindow):
 		# appends separator
 		self['EntityPopupMenu'].append( gtk.MenuItem() )
 
+		# ------------------------------------------
+		# menus for Logger
+		# ------------------------------------------
 		# creates menu of Logger
 		aLogMenuString = "Create Logger"
 		aMenuItem = gtk.MenuItem( aLogMenuString )
@@ -195,7 +204,34 @@ class EntityListWindow(OsogoWindow):
 		# appends separator
 		self['EntityPopupMenu'].append( gtk.MenuItem() )
 
-		# initializes the buffer of submenu of this PopupMenu
+		# ------------------------------------------
+		# menus for Bord
+		# ------------------------------------------
+		# creates menu of Board
+		aSubMenu = gtk.Menu()
+
+		for aPluginWindowType in self.thePluginManager.thePluginMap.keys(): 
+			aMenuItem = gtk.MenuItem( aPluginWindowType )
+			aMenuItem.connect('activate', self.addToBoard )
+			aMenuItem.set_name( aPluginWindowType )
+			if aPluginWindowType == DEFAULT_WINDOW:
+				aSubMenu.prepend( aMenuItem )
+			else:
+				aSubMenu.append( aMenuItem )
+
+		aMenuString = "Add to Board"
+		aMenuItem = gtk.MenuItem( aMenuString )
+		aMenuItem.set_name( aLogMenuString )
+		aMenuItem.set_submenu( aSubMenu )
+		self['EntityPopupMenu'].append( aMenuItem )
+		self.theBoardMenu = aMenuItem
+
+		# appends separator
+		self['EntityPopupMenu'].append( gtk.MenuItem() )
+
+		# ------------------------------------------
+		# menus for submenu
+		# ------------------------------------------
 		self.thePopupSubMenu = None  
 
 
@@ -267,6 +303,11 @@ class EntityListWindow(OsogoWindow):
 
 		# When right button is pressed
 		if anEvent.type == gtk.gdk.BUTTON_PRESS and anEvent.button == 3:
+
+			if self.theMainWindow.getWindow('BoardWindow').exists():
+				self.theBoardMenu.set_sensitive(TRUE)
+			else:
+				self.theBoardMenu.set_sensitive(FALSE)
 
 			# removes previous sub menu
 			# When PopupMenu was displayed last time without PluginWindows'
@@ -523,7 +564,7 @@ class EntityListWindow(OsogoWindow):
 			# When no FullPN is selected, displays error message.
 			if len( self.__getSelectedRawFullPNList() ) == 0:
 				aMessage = 'No entity is selected.'
-				self.theMainWindow.printMessage(aMessage)
+				#self.theMainWindow.printMessage(aMessage)
 				aDialog = ConfirmWindow(OK_MODE,aMessage,'Error!')
 				self.thePropertyWindow.showMessageOnStatusBar(aMessage)
 				return FALSE
@@ -532,7 +573,7 @@ class EntityListWindow(OsogoWindow):
 			if len(self.theSelectedPluginInstanceList) == 0:
 
 				aMessage = 'No Plugin Instance is selected.'
-				self.theMainWindow.printMessage(aMessage)
+				#self.theMainWindow.printMessage(aMessage)
 				aDialog = ConfirmWindow(OK_MODE,aMessage,'Error!')
 				self.thePropertyWindow.showMessageOnStatusBar(aMessage)
 				return FALSE
@@ -644,7 +685,6 @@ class EntityListWindow(OsogoWindow):
 					aMessage += aNoPropertyFullIDString + '\n'
 
 				# print message to message 
-				self.theMainWindow.printMessage(aMessage)
 				aDialog = ConfirmWindow(OK_MODE,aMessage,'Error!')
 				return None
 
@@ -652,6 +692,19 @@ class EntityListWindow(OsogoWindow):
 			#self.thePluginManager.createInstance( aPluginWindowType, aSelectedFullPNListWithSpecified )
 			return aSelectedFullPNListWithSpecified
 
+
+
+	# ========================================================================
+	def addToBoard( self, *arg ):
+
+		# checks the length of argument, but this is verbose
+		if len( arg ) < 1:
+			return None
+
+		self.thePropertyWindow.clearStatusBar()
+		aPluginWindowType = arg[0].get_name()
+		self.theMainWindow.getWindow('BoardWindow').addPluginWindows( aPluginWindowType, \
+		self.__getSelectedRawFullPNList() )
 
 
 	# ========================================================================
@@ -667,7 +720,7 @@ class EntityListWindow(OsogoWindow):
 			# print message to message 
 			aMessage = 'No Entity is selected.'
 			self.thePropertyWindow.showMessageOnStatusBar(aMessage)
-			self.theMainWindow.printMessage(aMessage)
+			#self.theMainWindow.printMessage(aMessage)
 			aDialog = ConfirmWindow(OK_MODE,aMessage,'Error!')
 			return None
 
@@ -730,7 +783,7 @@ class EntityListWindow(OsogoWindow):
 					aMessage += aNoPropertyFullIDString + '\n'
 
 				# print message to message 
-				self.theMainWindow.printMessage(aMessage)
+				#self.theMainWindow.printMessage(aMessage)
 				aDialog = ConfirmWindow(OK_MODE,aMessage,'Error!')
 				self.theMainWindow.printMessage(aMessage)
 				return None

@@ -98,7 +98,7 @@ class OsogoPluginWindow(PluginWindow):
 		"""
 
 		# calls superclass's method
-		Window.openWindow( self )
+		PluginWindow.openWindow( self )
 
 		# When this is top window, appends 'destroy' signal handler.
 		if self.theRoot == None:

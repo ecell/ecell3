@@ -24,7 +24,7 @@
       <property name="spacing">0</property>
 
       <child>
-	<widget class="GtkVBox" id="top_vbox">
+	<widget class="GtkVBox" id="top_frame">
 	  <property name="visible">True</property>
 	  <property name="homogeneous">False</property>
 	  <property name="spacing">0</property>

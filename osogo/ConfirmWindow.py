@@ -30,41 +30,41 @@
 # E-CELL Project, Lab. for Bioinformatics, Keio University.
 #
 
-#from gtk import *
 import gtk 
 
-# Constant for ConfirmWindow
+# Constants for ConfirmWindow
 OK_MODE = 0
 OKCANCEL_MODE = 1
 
-# --------------------------------------------------------
-# This is confirm popup window class.
-#
-# mode 0 : The window has 'OK' button.
-# mode 1 : The window has 'OK' and 'Cancel' button.
-#
-# If OK is clicked, return 0
-# If Cancel is clicked or close Window, return -1
-#
-# --------------------------------------------------------
-class ConfirmWindow(gtk.Dialog):
+# Constans for result
+OK_PRESSED = 0
+CANCEL_PRESSED = -1
 
-	# ----------------------------------------------------
-	# Constructor
-	# aMode : mode number that is 0(OK) or 1(OK and Cancel).
-	# aMessage : the message that is displayed in the center
-	#            of this window
-	# aTitle : the title of this window
-	# ----------------------------------------------------
-	def __init__(self, aMode, aMessage, aTitle='' ):
+class ConfirmWindow(gtk.Dialog):
+	"""This is confirm popup window class.
+
+	OK_MODE        : The window has 'OK' button.
+	OK_CANCEL_MODE : The window has 'OK' and 'Cancel' button.
+
+	When OK is clicked, return OK_PRESSED
+	When Cancel is clicked or close Window, return CANCEL_PRESSED
+	"""
+
+	# ==========================================================================
+	def __init__(self, aMode, aMessage, aTitle='Confirm' ):
+		"""Constructor
+		aMode    ---  mode number that is 0(OK) or 1(OK and Cancel).
+		aMessage ---  the message that is displayed in the center
+		              of this window
+		aTitle   ---  the title of this window
+		"""
 
 		# Sets the return number
-		self._num = -1
+		self.___num = CANCEL_PRESSED
 
 		# Create the Dialog
 		self.win = gtk.Dialog()
-		self.win.connect("destroy",self.hide)
-		#self.win.connect("destroy",self.quit)
+		self.win.connect("destroy",self.destroy)
 
 		# Sets size and position
 		self.win.set_border_width(2)
@@ -76,73 +76,76 @@ class ConfirmWindow(gtk.Dialog):
 		self.win.set_title(aTitle)
 
 		# Sets message
+		aMessage = '\n' + aMessage + '\n'
 		aMessageLabel = gtk.Label(aMessage)
 		self.win.vbox.pack_start(aMessageLabel)
 		aMessageLabel.show()
 	
+		# appends ok button
 		ok_button = gtk.Button("  OK  ")
 		self.win.action_area.pack_start(ok_button,gtk.FALSE,gtk.FALSE,)
 		ok_button.set_flags(gtk.CAN_DEFAULT)
 		ok_button.grab_default()
 		ok_button.show()
-		ok_button.connect("clicked",self.OKButtonClicked)
+		ok_button.connect("clicked",self.oKButtonClicked)
 
-		if aMode == 0:
+		# when ok mode 
+		if aMode == OK_MODE:
 			pass
+
+		# when ok cancel mode 
 		else:
+
+			# appends cancel button
 			cancel_button = gtk.Button(" Cancel ")
 			self.win.action_area.pack_start(cancel_button,gtk.FALSE,gtk.FALSE)
 			cancel_button.show()
-			cancel_button.connect("clicked",self.CancelButtonClicked)	
+			cancel_button.connect("clicked",self.cancelButtonClicked)	
 
 		gtk.mainloop()
 
-	# end of __init__
 
-	# ----------------------------------------------------
-	# If OK button clicked or the return pressed, this
-	# method is called.
-	# ----------------------------------------------------
-	def OKButtonClicked( self, *obj ):
+	# ==========================================================================
+	def oKButtonClicked( self, *arg ):
+		"""If OK button clicked or the return pressed, this method is called.
+		"""
+
+		# sets the return number
+		self.___num = OK_PRESSED
+		self.destroy()
+
+
+	# ==========================================================================
+	def cancelButtonClicked( self, *arg ):
+		"""If Cancel button clicked or the return pressed, this method is called.
+		"""
+
 		# set the return number
-		self._num = 0
-		self.quit()
-
-	# end of OKButtonClicked
-
-	# ----------------------------------------------------
-	# If Cancel button clicked or the return pressed, this
-	# method is called.
-	# ----------------------------------------------------
-	def CancelButtonClicked( self, *obj ):
-		# set the return number
-		self._num = -1
-		self.quit()
+		self.___num = CANCEL_PRESSED
+		self.destroy()
 	
-	# end of CancelButtonClicked
 
-	# ----------------------------------------------------
-	# Override the method of return_result
-	# ----------------------------------------------------
+	# ==========================================================================
 	def return_result( self ):
-		return self._num
+		"""Returns result
+		"""
 
-	# end of return_result
+		return self.___num
 
-	# ----------------------------------------------------
-	# quit
-	# ----------------------------------------------------
-	def quit( self, *obj ):
+
+	# ==========================================================================
+	def destroy( self, *arg ):
+		"""destroy dialog
+		"""
 		self.win.hide()
 		gtk.mainquit()
 
-	# end of quit
 
 # ----------------------------------------------------
 # Test code
 # ----------------------------------------------------
 if __name__=="__main__":
-	c = ConfirmWindow(0,'hoge\n')
+	c = ConfirmWindow(1,'hoge\n')
 	print c.return_result()
 
 

@@ -5,6 +5,8 @@ SUBDIRS = plugins
 osogodir=${pkglibdir}
 osogo_PYTHON=\
 osogo.ini\
+BoardWindow.py\
+BoardWindow.glade\
 ConfirmWindow.py\
 EntityListWindow.glade\
 EntityListWindow.py\
