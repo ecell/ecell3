@@ -22,7 +22,6 @@ ProcessList, NESTED_LIST, [], 0100
 ReadVariableList, NESTED_LIST, [], 0100
 RelativeTolerance, FLOAT, 1e-10, 1111
 RngSeed, STRING, "", 1111
-InvalidStepInterval, FLOAT, 0.001, 1111
 SystemList, NESTED_LIST, [], 0100
 Uround, FLOAT, 1e-16, 1111
 WriteVariableList, NESTED_LIST, [], 0100
