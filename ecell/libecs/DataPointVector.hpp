@@ -54,26 +54,24 @@ namespace libecs
 
   public:
 
-    DataPointVector( DataPointVectorIterator );
+    DataPointVector( DataPointVectorIterator, Int );
 
-    ~DataPointVector()
-    {
-      delete[] theRawArray;
-    }
+    ~DataPointVector();
 
-    DataPointRef operator[]( DataPointVectorIterator aPosition );
+    DataPointRef asShort( DataPointVectorIterator aPosition );
 
-    DataPointCref operator[]( DataPointVectorIterator aPosition ) const;
+    DataPointCref asShort( DataPointVectorIterator aPosition ) const;
+
+    DataPointLongRef asLong( DataPointVectorIterator aPosition );
+
+    DataPointLongCref asLong( DataPointVectorIterator aPosition ) const;
 
     DataPointVectorIterator getSize() const
     {
       return theSize;
     }
 
-    size_t getElementSize() const
-    {
-      return sizeof( DataPoint );
-    }
+    size_t getElementSize() const;
 	
     DataPointVectorIterator begin() const
     {
@@ -90,8 +88,12 @@ namespace libecs
   private:
 
     DataPointVectorIterator theSize;
+
+	Int PointSize;
     
     DataPoint* theRawArray;
+
+	DataPointLong* theRawArrayLong;
 
   };
 

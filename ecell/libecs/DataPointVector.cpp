@@ -29,34 +29,92 @@
 
 
 #include "DataPointVector.hpp"
-
+#include <assert.h>
 
 
 namespace libecs
 {
+    DataPointVector::~DataPointVector()
+    {
+	if (PointSize==2)
+	{
+	      delete[] theRawArray;
+	}
+	else
+	{
+		delete[] theRawArrayLong;
+	}
+    }
 
-  DataPointVector::DataPointVector(DataPointVectorIterator aLength) 
+
+
+  DataPointVector::DataPointVector(DataPointVectorIterator aLength, Int aPointSize) 
     :
     theSize( aLength ),
-    theRawArray( new DataPoint[ theSize ] )
+    PointSize(aPointSize)
   {
-    ; // do nothing
+   // init the appropriate array
+
+	if (PointSize == 2)
+	{
+		theRawArray = new DataPoint[ aLength ];
+	}
+	else
+	{
+		theRawArrayLong = new DataPointLong[ aLength ];
+	}
   }
 
-  DataPointRef DataPointVector::operator[]( DataPointVectorIterator aPosition )
+
+   size_t DataPointVector::getElementSize() const
+    {
+	if (PointSize == 2)
+	{
+		return sizeof(DataPoint);
+	}
+      return sizeof(DataPointLong);
+    }
+
+
+
+
+
+  DataPointRef DataPointVector::asShort( DataPointVectorIterator aPosition )
   {
-    return theRawArray[ aPosition ];
+	assert (PointSize == 2);
+	return theRawArray[ aPosition ];
   }
 
   DataPointCref 
-  DataPointVector::operator[]( DataPointVectorIterator aPosition ) const
+  DataPointVector::asShort( DataPointVectorIterator aPosition ) const
   {
-    return theRawArray[ aPosition ];
+	assert (PointSize == 2);
+	return theRawArray[ aPosition ];
   }
+
+  DataPointLongRef DataPointVector::asLong( DataPointVectorIterator aPosition )
+  {
+	assert (PointSize == 5);
+	return theRawArrayLong[ aPosition ];
+  }
+
+
+  DataPointLongCref 
+  DataPointVector::asLong( DataPointVectorIterator aPosition ) const
+  {
+	assert (PointSize == 5);
+	return theRawArrayLong[ aPosition ];
+  }
+
 
   const void* DataPointVector::getRawArray() const
   {
-    return  (void*) theRawArray;
+	if (PointSize == 2)
+	{
+	    return (void*) theRawArray;
+	}
+    return (void*) theRawArrayLong;
+
   }
 
 } // namespace libecs

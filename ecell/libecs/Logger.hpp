@@ -39,6 +39,8 @@
 #include "Polymorph.hpp"
 #include "PhysicalLogger.hpp"
 #include "DataPointVector.hpp"
+#define _LOGGER_MAX_PHYSICAL_LOGGERS 5
+#define _LOGGER_DIVIDE_STEP 200
 
 namespace libecs
 {
@@ -145,7 +147,7 @@ namespace libecs
 
     const Int getSize() const
     {
-      return thePhysicalLoggers[0].size();
+      return thePhysicalLoggers[0]->size();
     }
 
     /**
@@ -190,8 +192,8 @@ namespace libecs
 				  const_iterator end,
 				  RealCref t ) 
     {
-      return thePhysicalLoggers[0].lower_bound( thePhysicalLoggers[0].begin(), 
-    					    thePhysicalLoggers[0].end(), 
+      return thePhysicalLoggers[0]->lower_bound( thePhysicalLoggers[0]->begin(), 
+    					    thePhysicalLoggers[0]->end(), 
 					    t );
     }
     
@@ -222,8 +224,11 @@ namespace libecs
     //    PropertySlotRef      thePropertySlot;
     LoggerAdapterPtr     theLoggerAdapter;
 
-    PhysicalLogger*	 thePhysicalLoggers;
-    DataInterval	 theDataInterval;
+    PhysicalLogger*	 thePhysicalLoggers[_LOGGER_MAX_PHYSICAL_LOGGERS];
+
+    void aggregate( DataPointLong , int );
+
+    DataPointAggregator* theDataAggregators;
     Real                 theLastTime;
 
     Real                 theMinimumInterval;

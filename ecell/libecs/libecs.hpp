@@ -90,6 +90,9 @@ namespace libecs
   DECLARE_CLASS( Logger );
   DECLARE_CLASS( LoggerAdapter );
   DECLARE_CLASS( DataPoint );
+  DECLARE_CLASS( DataPointLong );
+  DECLARE_CLASS( DataPointAggregator );
+
   DECLARE_CLASS( DataPointVector );
 
 

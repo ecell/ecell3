@@ -54,23 +54,23 @@ namespace libecs
   {
 
     typedef vvector<DataPoint> Vector;
+    typedef vvector<DataPointLong> VectorLong;
     
   public:
 
     DECLARE_TYPE( Vector::size_type, iterator );
     DECLARE_TYPE( Vector::size_type, size_type );
 
-    PhysicalLogger();
+    PhysicalLogger(Int );
 
     virtual ~PhysicalLogger()
     {
       ; // do nothing
     }
 	
-    void push( DataPointCref aDataPoint )
-    {
-      theVector.push_back( aDataPoint );
-    }
+    void push( DataPointCref  );
+
+    void push( DataPointLongCref  );
 
     iterator lower_bound( const iterator& start,
 			  const iterator& end,
@@ -102,97 +102,36 @@ namespace libecs
 			  RealCref time,
 			  RealCref time_per_step ) const;
 
-    iterator lower_bound_search( const iterator& start,
-			  const iterator& end,
-			  RealCref time,
-			  bool isLinearSearch ) const;
-
-    iterator upper_bound_search( const iterator& start,
-			  const iterator& end,
-			  RealCref time,
-			  bool isLinearSearch ) const;
-
     iterator next_index( const iterator& start) const;
 
     void getItem( const iterator&, DataPointPtr ) const;
     
-//    void set_stats(const iterator& distance,const iterator&) const;
-    
-//    void set_default_stats() const;
-
     DataPointVectorRCPtr getVector( const iterator& start,
 				    const iterator& end ) const;
 
-    size_type size() const
-    {
-      return theVector.size();
-    }
+    size_type size() const;
 
+    bool empty() const;
 
-    bool empty() const
-    {
-      return ( size() == 0 );
-    }
+    DataPointLong front() const;
 
-    DataPoint front() const
-    {
-      if ( empty ( ) )
-        {
-    	    return anEmptyDataPoint;
-	}
-	return theVector[ 0 ];
-    }
+    DataPointLong back() const;
 
-    DataPoint back() const
-    {
-      // danger!!  undefined behavior with vvector if size() == 0 - sha
-//      DEBUG_EXCEPTION( size() > 0, AssertionFailed, "" );
-//	not anymore - gabor
-      if ( empty ( ) )
-        {
-    	    return anEmptyDataPoint;
-	}
+    iterator begin() const;
 
-      return theVector[ end() ];
-    }
-
-    iterator begin() const
-    {
-      return 0;
-    }
-
-    iterator end() const
-    {
-      // is this ok? - sha
-      //no, but I fixed it - gabor
-       if ( size() > 0 )
-        {
-    	    return size() - 1;
-	}
-       else
-        {
-	    return 0;
-	}
-    }
-
+    iterator end() const;
   
-Real get_avg_interval() const
-   {
-   if (size()<2)
-     {
-       return -1.0;
-     }
-   else
-     {
-       return (back().getTime()-front().getTime())/(size()-1);
-     }
-   }
+    Real get_avg_interval() const;
+
+    DataPointLong at( const iterator& ) const;
 
   private:
     iterator theCurrentPosition;
     DataPoint anEmptyDataPoint;
     // this mutable can be removed if vvector supports const operations
     mutable Vector theVector;
+    mutable VectorLong theVectorLong;
+    Int PointSize;
     
   };
 

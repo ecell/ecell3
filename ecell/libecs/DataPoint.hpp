@@ -51,47 +51,176 @@ namespace libecs
 
   */
 
-  class DataPoint
+  class DataPointLong;
+  class DataPoint;
+// two element size datapoint
+
+  class DataPoint 
   {
 
 
   public:
 
-    enum 
-      {  
-	TIME_OFFSET = 0,
-	VALUE_OFFSET,
-	AVG_OFFSET,
-	MIN_OFFSET,
-	MAX_OFFSET,
-	DATAPOINT_LENGTH 
-      };
-
-
     DataPoint()
       :
-      theTime ( 0.0 ), 
-      theValue( 0.0 ), 
-      theAvg  ( 0.0 ), 
-      theMin  ( 0.0 ),
-      theMax  ( 0.0 )      
+      theTime ( 0.0 ),
+      theValue( 0.0 )
     {
       ; // do nothing
     }
 
-    DataPoint( RealCref aTime, RealCref aValue, 
-	       RealCref anAvg, RealCref aMin, RealCref aMax )
-      : 
-      theTime ( aTime ), 
-      theValue( aValue ), 
-      theAvg  ( anAvg ), 
-      theMin  ( aMin ),
-      theMax  ( aMax )      
+    DataPoint( RealCref aTime, RealCref aValue )
+      :
+      theTime ( aTime ),
+      theValue( aValue )   
     {
       ; //do nothing
     }
 
+
+
     ~DataPoint()
+    {
+      ; // do nothing
+    }
+
+    RealCref getTime() const
+    {
+      return theTime;
+    }
+
+    RealCref getValue() const
+    {
+      return theValue;
+    }
+
+    RealCref getAvg() const
+    {
+      return theValue;
+    }
+
+    RealCref getMin() const
+    {
+      return theValue;
+    }
+
+    RealCref getMax() const
+    {
+      return theValue;
+    }
+
+
+    void setTime( RealCref aReal )
+    {
+      theTime = aReal;
+    }
+
+    void setValue( RealCref aReal )
+    {
+      theValue = aReal;
+    }
+
+    void setAvg( RealCref aReal )
+    {
+      ;
+    }
+
+    void setMin( RealCref aReal )
+    {
+      ;
+    }
+
+    void setMax( RealCref aReal )
+    {
+      ;
+    }
+
+    static const size_t getElementSize()
+    {
+      return sizeof( Real);
+    }
+
+    static const Int getElementNumber()
+    {
+      return 2;
+    }
+   
+    DataPoint& operator = ( const DataPointLong& dpt5 );
+
+  protected:
+
+    Real theTime;
+    Real theValue;
+
+  };
+
+
+
+  class DataPointLong :
+	public DataPoint
+  {
+
+
+  public:
+
+    DataPointLong() //constructor with no arguments
+     
+    {
+      theTime = 0.0 ;
+      theValue = 0.0 ;
+      theAvg = 0.0 ;
+      theMax = 0.0 ;
+      theMin = 0.0 ;
+
+    }
+
+
+    DataPointLong( RealCref aTime, RealCref aValue ) //constructor with 2 args
+    
+    {
+      theTime = aTime ;
+      theValue = aValue ;
+      theAvg = aValue ;
+      theMax = aValue ;
+      theMin = aValue ;
+    }
+
+    DataPointLong( RealCref aTime, RealCref aValue, RealCref anAvg,
+		RealCref aMax, RealCref aMin ) //constructor with 5 args
+
+    {
+      theTime = aTime ;
+      theValue = aValue ;
+      theAvg = anAvg ;
+      theMax = aMax ;
+      theMin = aMin ;
+    }
+
+
+    DataPointLong( const DataPoint& dpt) // constructor from DP2
+	{
+	
+	
+		theTime = dpt.getTime() ;
+		theValue = dpt.getValue() ;
+		theAvg = dpt.getAvg() ;
+		theMin = dpt.getMin() ;
+		theMax = dpt.getMax() ;
+	
+
+	}
+
+
+    DataPointLong& operator = ( const DataPoint& dpt )
+	{
+		setTime( dpt.getTime() );
+		setValue ( dpt.getValue() );
+		setAvg ( dpt.getAvg() );
+		setMin ( dpt.getMin() );
+		setMax ( dpt.getMax() );
+	}
+
+    ~DataPointLong()
     {
       ; // do nothing
     }
@@ -143,212 +272,66 @@ namespace libecs
     }
 
     void setMax( RealCref aReal )
+
     {
       theMax = aReal;
     }
 
     static const size_t getElementSize()
     {
-      return sizeof( Real );
+      return sizeof( Real);
     }
-    
+
+    static const Int getElementNumber()
+    {
+      return 5;
+    }
+   
   protected:
 
-    Real theTime;
-    Real theValue;
     Real theAvg;
-    Real theMin;
     Real theMax;
+    Real theMin;
 
   };
 
 
-  /**
 
-  @internal 
-
-  */
-
-  class DataInterval 
-  {
-    
-  public:
-
-    DataInterval() 
-      : 
-      theDataPoint(),
-      theInterval( -1.0 )
-    {
-      ; //do nothing
-    }
-
-    DataPointCref getFinalDataPoint()
-    {
-      doPendingCalculations(); //calculate correct AVG 
-      return theDataPoint;
-    }
-
-
-    DataPointCref getDataPoint() const
-    {
-      return theDataPoint;
-    }
-
-    DataPointRef getDataPoint()
-    {
-
-      return theDataPoint;
-    }
-
-    RealCref getInterval() const
-    {
-      return theInterval;
-    }
-
-    RealCref getTime() const
-    {
-      return getDataPoint().getTime();
-    }
-
-    RealCref getValue() const
-    {
-      return getDataPoint().getValue();
-    }
-
-    RealCref getAvg() const
-    {
-      return getDataPoint().getAvg();
-    }
-
-    RealCref getMin() const
-    {
-      return getDataPoint().getMin();
-    }
-
-    RealCref getMax() const
-    {
-      return getDataPoint().getMax();
-    }
-
-    void beginNewInterval()
-    {
-      theInterval = -1.0;
-    }
-    
-    void addPoint( RealCref aTime, RealCref aValue ) 
-    {
-      if ( theInterval < 0 ) //the very first time data is added
+ class DataPointAggregator
 	{
-	  theDataPoint.setTime ( aTime );
-	  theDataPoint.setValue( aValue );
-	  theDataPoint.setAvg  ( aValue );
-	  theDataPoint.setMin  ( aValue );
-	  theDataPoint.setMax  ( aValue );
-	  theInterval            = 0.0;
-	  theLastNonzeroInterval = theInterval;
-	  theLastNonzeroValue    = aValue;    
-	}
-      else
-	{
-	  const Real aNewInterval( aTime - getTime() );
 
-	  /*
-	    theDataPoint.setAvg( getAvg() * theInterval + 
-	    aValue * aNewInterval );
-	    theDataPoint.setAvg( getAvg() / getInterval() );
-	  */
+	public:
 
-	  //if newinterval is nonzero, calculate previous AVG
-	  if ( aNewInterval > 0.0 )
-	    {
-	      doPendingCalculations();
-	      theLastNonzeroInterval = aNewInterval;
-	    }
+	DataPointAggregator();
 
-	  theLastNonzeroValue = aValue;
+	DataPointAggregator( const DataPointLong& );
 
-	  if ( aValue < getMin() ) 
-	    { 
-	      theDataPoint.setMin( aValue ); 
-	    }
-	  else if ( aValue > getMax() )  // assume theMax > theMin
-	    { 
-	      theDataPoint.setMax( aValue );
-	    }
 
-	  theDataPoint.setValue( aValue );
-	  theDataPoint.setTime( aTime );
-	  theInterval += aNewInterval;
-	  
-	}
-    }
+	~DataPointAggregator();
 
-    void aggregatePoint( DataPointCref aDataPoint, RealCref anInterval )
-    {
-      if ( theInterval < 0 ) //the very first time data is added
-	{
-	  theDataPoint           = aDataPoint;
-	  theInterval            = anInterval;
-	  theLastNonzeroInterval = anInterval;
-	  theLastNonzeroValue    = aDataPoint.getAvg();
+	void aggregate( const DataPointLong& );
 
-	}
-      else
-	{
-	  if( aDataPoint.getMin() < getMin() ) 
-	    { 
-	      theDataPoint.setMin( aDataPoint.getMin() );
-	    }
-	  if ( aDataPoint.getMax() > getMax() ) 
-	    { 
-	      theDataPoint.setMax( aDataPoint.getMax() );
-	    }
+	const DataPointLong& getData();
 
-	  //call doPendingCalculations() if anInterval is nonzero
-	  if ( anInterval > 0 ) 
-	    {
-	      doPendingCalculations();
-	      theLastNonzeroInterval=anInterval;
-	    }
+	void beginNextPoint();
 
-	  theLastNonzeroValue=aDataPoint.getAvg();
-	  theDataPoint.setValue( aDataPoint.getValue() );
-	  theDataPoint.setTime( getTime() + anInterval );
+	DataPointLong getLastPoint();
 
-	  theInterval += anInterval;
-	}
-    }
-  
-  private:
+	private:
+	void store( const DataPointLong& );
 
-    void doPendingCalculations()
-    {
-      // perform AVG calculations for last nonzero interval
-      // 1. last nonzero interval is nonzero, perform calculations normally
-      if ( ( theLastNonzeroInterval > 0 ) && ( getInterval() > 0 ) )
-	{
-	  theDataPoint.
-	    setAvg( getAvg() * ( getInterval() - theLastNonzeroInterval ) + 
-		    ( theLastNonzeroValue * theLastNonzeroInterval ) );
-	  theDataPoint.setAvg( getAvg() / ( getInterval() ) );
-	}
-      // 2. last nonzero interval is zero, total interval nonzero, 
-      //    AVG left unchg
-      
-      // 3. last nonzero interval is zero, total interval zero, AVG=VAL
-      if ( ( theLastNonzeroInterval == 0 ) && ( getInterval() == 0 ) )
-	{
-	  theDataPoint.setAvg ( theLastNonzeroValue );
-	}
-      
-    }
-    
-    DataPoint theDataPoint;
-    Real      theInterval;
-    Real 	theLastNonzeroInterval;
-    Real	theLastNonzeroValue;
+	bool stockpile( DataPointLong&, const DataPointLong& );
+	void calculate( const DataPointLong& );
+	void calculateMinMax( DataPointLong&, const DataPointLong& );
 
-  };
+	DataPointLong Accumulator;
+	DataPointLong Collector;
+	DataPointLong PreviousPoint;
+
+	public:
+	void printDP( const DataPointLong& );
+	void printDP(  );
+	};
 
 
   //@}
