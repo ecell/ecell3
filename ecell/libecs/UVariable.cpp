@@ -31,6 +31,7 @@
 #include <typeinfo>
 
 #include "Util.hpp"
+#include "Exceptions.hpp"
 
 #include "UVariable.hpp"
 
@@ -99,25 +100,25 @@ namespace libecs
 
   const UConstant::Type UConstant::getType() const
   {
-    if( typeid( theData) == typeid( UConstantRealData ) )
+    if( typeid( *theData) == typeid( UConstantRealData ) )
       {
 	return REAL;
       }
-    else if( typeid( theData ) == typeid( UConstantIntData ) )
+    else if( typeid( *theData ) == typeid( UConstantIntData ) )
       {
 	return INT;
       }
-    else if( typeid( theData ) == typeid( UConstantStringData ) )
+    else if( typeid( *theData ) == typeid( UConstantStringData ) )
       {
 	return STRING;
       }
-    else if( typeid( theData ) == typeid( UConstantNoneData ) )
+    else if( typeid( *theData ) == typeid( UConstantNoneData ) )
       {
 	return NONE;
       }
     
     // NEVER_GET_HERE
-    assert( 0 );
+    throw UnexpectedError( __PRETTY_FUNCTION__ + String( "NEVER_GET_HERE" ) );
   }
 
 
