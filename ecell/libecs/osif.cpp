@@ -45,9 +45,12 @@
  *::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
  *	$Id$
  :	$Log$
+ :	Revision 1.6  2003/08/08 13:40:07  satyanandavel
+ :	Added support for native windows compilation using MinGW
+ :
  :	Revision 1.5  2002/10/11 15:51:32  shafi
  :	rename: Connection -> VariableReference
- :
+ :	
  :	Revision 1.4  2002/10/03 08:40:40  shafi
  :	react -> process, REACTANT -> CONNECTION
  :	
@@ -91,7 +94,7 @@
  *::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
  */
 #include "libecs.hpp"
-#if defined(_Windows)
+#if defined(__BORLANDC__) || defined(__WINDOWS__) || defined(__MINGW32__)
 /* MS-Windows */
 #include <dos.h>
 #include <process.h>
@@ -130,7 +133,7 @@ long		osif_get_pid(void)
 
 long		osif_disk_free(const char *__path)
 {
-#if	defined(_Windows)
+#if defined(__BORLANDC__) || defined(__WINDOWS__) || defined(__MINGW32__)
 	ULARGE_INTEGER	free_bytes_available;
 	ULARGE_INTEGER	total_number_of_bytes;
 	ULARGE_INTEGER	total_number_of_free_bytes;
@@ -174,7 +177,7 @@ int	osif_mkdir(const char *__name)
 #if	defined(_MSC_VER)
 #include <direct.h>
 	return _mkdir(__name);
-#elif	defined(__BORLANDC__)
+#elif defined(__BORLANDC__) || defined(__WINDOWS__) || defined(__MINGW32__)
 #include <dir.h>
 	return mkdir(__name);
 #else
@@ -185,7 +188,7 @@ int	osif_mkdir(const char *__name)
 
 int	osif_is_dir(const char *__name)
 {
-#ifdef	_Windows
+#if defined(__BORLANDC__) || defined(__MINGW32__)
 	DWORD result;
 	result = GetFileAttributes(__name);
 	if (result != (DWORD)-1 && (result & FILE_ATTRIBUTE_DIRECTORY)) {
@@ -193,7 +196,7 @@ int	osif_is_dir(const char *__name)
 	} else {
 		return 0;
 	}
-#else
+#elif
 	struct stat statbuf;
 	if (stat(__name, &statbuf) ==0
 	    && (S_ISDIR ( statbuf.st_mode))) { // gabor
@@ -248,7 +251,7 @@ int	main(int argc, char **argv)
 {
 	printf("pid = %ld\n", osif_get_pid());
 	printf("Disk free by KBytes = %ld on .\n", osif_disk_free("."));
-#ifdef	_Windows
+#if defined(__BORLANDC__) || defined(__WINDOWS__) || defined(__MINGW32__)
 	printf("Disk free by KBytes = %ld on c:/tmp\n", osif_disk_free("c:/tmp"));
 	printf("Disk free by KBytes = %ld on c:/tmp/\n", osif_disk_free("c:/tmp/"));
 #endif	/* _Windows */
