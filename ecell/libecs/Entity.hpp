@@ -227,9 +227,6 @@ namespace libecs
 
     /// @internal
 
-    virtual PropertySlotPtr getPropertySlot( StringCref aPropertyName, 
-					     EntityCptr aRequester );
-
     virtual StringLiteral getClassName() const { return "Entity"; }
 
 

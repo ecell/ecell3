@@ -89,8 +89,7 @@ namespace libecs
 		  createPropertySlot( "Velocity",*this,
 				      Type2Type<Real>(),
 				      &PlainSubstance::addVelocity,
-				      &PlainSubstance::getVelocity,
-				      &PlainSubstance::addProxyInput ) );
+				      &PlainSubstance::getVelocity ) );
 
 
     registerSlot( getPropertySlotMaker()->
@@ -98,14 +97,6 @@ namespace libecs
 				      Type2Type<Real>(),
 				      &PlainSubstance::setFixed,
 				      &PlainSubstance::getFixed ) );
-
-
-    registerSlot( getPropertySlotMaker()->
-		  createPropertySlot( "ProxyInput",*this,
-				      Type2Type<Real>(),
-				      NULLPTR,
-				      &PlainSubstance::getProxyInput ) );
-
   }
 
 
@@ -114,7 +105,6 @@ namespace libecs
     : 
     theQuantity( 0.0 ),  
     theVelocity( 0.0 ),
-    theProxyInput( 0.0 ),
     theFixed( false )
   {
     makeSlots();

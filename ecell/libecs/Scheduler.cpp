@@ -77,7 +77,7 @@ namespace libecs
  
     // three-phase progression of the step
     // 1. sync:  synchronize with proxies of the PropertySlots
-    aStepperPtr->sync();
+    //    aStepperPtr->sync();
     // 2. step:  do the computation
     aStepperPtr->step();
     // 3. push:  re-sync with the proxies, and push new values to Loggers

@@ -101,26 +101,6 @@ namespace libecs
     return getSuperSystem()->getStepper();
   }
 
-  PropertySlotPtr Entity::getPropertySlot( StringCref aPropertyName,
-					   EntityCptr aRequester )
-  {
-    PropertySlotPtr 
-      aPropertySlotPtr( PropertyInterface::getPropertySlot( aPropertyName ) );
-
-    StepperPtr aStepper( getStepper() );
-
-    //FIXME: Stepper::operator== not defined
-    if( aRequester->getStepper() != aStepper )
-      {
-	// create ProxyPropertySlot
-	ProxyPropertySlotPtr aProxyPtr( aPropertySlotPtr->createProxy() );
-	aStepper->registerPropertySlotWithProxy( aPropertySlotPtr );
-	aPropertySlotPtr = aProxyPtr;
-      }
-
-    return aPropertySlotPtr;
-  }
-
 
 } // namespace libecs
 

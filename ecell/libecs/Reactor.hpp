@@ -144,19 +144,14 @@ namespace libecs
 
 
     /**
-       @return the number of substrates.
+       @return a const reference to the reactant map
     */
-    const Int getNumberOfReactants() const
+    ReactantMapCref getReactantMap() const
     {
-      return theReactantMap.size();
+      return theReactantMap;
     }
 
   protected:
-
-    // convenience methods for use in subclasses
-
-    PropertySlotPtr getPropertySlotOfReactant( StringCref aReactantName,
-					       StringCref aPropertyName );
 
     void makeSlots();
 

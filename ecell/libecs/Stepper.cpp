@@ -182,16 +182,6 @@ namespace libecs
     theSystemVector.erase( i );
   }
 
-  void Stepper::registerPropertySlotWithProxy( PropertySlotPtr aSlotPtr )
-  {
-    if( std::find( thePropertySlotWithProxyVector.begin(),
-		   thePropertySlotWithProxyVector.end(), aSlotPtr ) == 
-	thePropertySlotWithProxyVector.end() )
-      {
-	thePropertySlotWithProxyVector.push_back( aSlotPtr );
-      }
-  }
-
   void Stepper::registerLoggedPropertySlot( PropertySlotPtr aPropertySlotPtr )
   {
     theLoggedPropertySlotVector.push_back( aPropertySlotPtr );
@@ -266,15 +256,8 @@ namespace libecs
     return aMaxInterval;
   }
   
-  void Stepper::sync()
-  {
-    FOR_ALL( PropertySlotVector, thePropertySlotWithProxyVector, sync );
-  }
-
   void Stepper::push()
   {
-    FOR_ALL( PropertySlotVector, thePropertySlotWithProxyVector, push );
-
     // update loggers
     FOR_ALL( PropertySlotVector, theLoggedPropertySlotVector, updateLogger );
   }
@@ -362,15 +345,38 @@ namespace libecs
     //    if( isEntityListChanged() )
     //      {
 
-    theSubstanceCache.update( theSystemVector );
-    
     theReactorCache.update( theSystemVector );
     std::sort( theReactorCache.begin(), theReactorCache.end(),
 	       SRMReactor::PriorityCompare() );
 
+    // get all the substances which are reactants of the Reactors
+    theSubstanceCache.clear();
+
+    // for all the reactors
+    for( ReactorCache::const_iterator i( theReactorCache.begin());
+	 i != theReactorCache.end() ; ++i )
+      {
+	ReactantMapCref aReactantMap( (*i)->getReactantMap() );
+
+	// for all the reactants
+	for( ReactantMapConstIterator j( aReactantMap.begin() );
+	     j != aReactantMap.end(); ++j )
+	  {
+	    SubstancePtr aSubstancePtr( j->second.getSubstance() );
+
+	    // prevent duplication
+	    if( std::find( theSubstanceCache.begin(), theSubstanceCache.end(),
+			   aSubstancePtr ) == theSubstanceCache.end() )
+	      {
+		// add this substance to the cache
+		theSubstanceCache.push_back( aSubstancePtr );
+	      }
+	  }
+      }
+
+
     // move RuleReactors from theReactorCache to theRuleReactorCache
     theRuleReactorCache.clear();
-    //FIXME: can be faster
     std::remove_copy_if( theReactorCache.begin(), theReactorCache.end(),
 			 std::back_inserter( theRuleReactorCache ), 
 			 not1( RuleSRMReactor::IsRuleReactor() ) );

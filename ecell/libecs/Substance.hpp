@@ -199,8 +199,6 @@ namespace libecs
     virtual void clear()
     { 
       theVelocity = 0.0; 
-      theQuantity += theProxyInput;
-      theProxyInput = 0.0;
     }
 
     virtual void turn()
@@ -264,15 +262,6 @@ namespace libecs
       theVelocity += aVelocity; 
     }
 
-    const Real getProxyInput() const
-    {
-      return theProxyInput;
-    }
-
-    void addProxyInput( RealCref aValue )
-    {
-      theProxyInput += aValue;
-    }
 
     /**
        Get a quantity via save() method of the Accumulator.
@@ -311,8 +300,6 @@ namespace libecs
 
     Real theQuantity;
     Real theVelocity;
-
-    Real theProxyInput;
 
     bool theFixed;
 

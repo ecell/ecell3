@@ -74,7 +74,7 @@ namespace libecs
 
     SubstancePtr theSubstance;
     Int theStoichiometry;
-
+    // bool mutable
   };
 
   //@}

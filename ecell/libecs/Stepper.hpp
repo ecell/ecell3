@@ -295,8 +295,6 @@ namespace libecs
     //@}
 
 
-    void registerPropertySlotWithProxy( PropertySlotPtr );
-
     void registerLoggedPropertySlot( PropertySlotPtr );
 
 
@@ -396,7 +394,6 @@ namespace libecs
 
     SystemVector        theSystemVector;
 
-    PropertySlotVector  thePropertySlotWithProxyVector;
     PropertySlotVector  theLoggedPropertySlotVector;
 
     StepIntervalConstraintMap theStepIntervalConstraintMap;
@@ -430,7 +427,7 @@ namespace libecs
   {
   public:
 
-    typedef EntityCache<Substance> SubstanceCache;
+    typedef std::vector<SubstancePtr> SubstanceCache;
     typedef EntityCache<Reactor,SRMReactor> ReactorCache;
     //    typedef EntityCache<Reactor,Reactor> ReactorCache;
 

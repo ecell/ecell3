@@ -154,13 +154,6 @@ namespace libecs
     ; // do nothing
   }
 
-  PropertySlotPtr 
-  Reactor::getPropertySlotOfReactant( StringCref aReactantName,
-				      StringCref aPropertyName )
-  {
-    return getReactant( aReactantName ).
-      getSubstance()->getPropertySlot( aPropertyName, this );
-  }
 
 } // namespace libecs
 

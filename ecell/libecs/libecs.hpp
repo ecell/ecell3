@@ -79,7 +79,6 @@ namespace libecs
   DECLARE_CLASS( System );
   DECLARE_CLASS( SystemMaker );
   DECLARE_CLASS( PropertySlot );
-  DECLARE_CLASS( ProxyPropertySlot );
   DECLARE_CLASS( PropertyInterface );
   DECLARE_CLASS( PropertySlotMaker );
   DECLARE_CLASS( Polymorph );
