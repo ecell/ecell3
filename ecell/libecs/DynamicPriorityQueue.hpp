@@ -123,7 +123,7 @@ DynamicPriorityQueue< key_type >::DynamicPriorityQueue()
 
 
 template < typename key_type >
-DynamicPriorityQueue< key_type >::clear()
+void DynamicPriorityQueue< key_type >::clear()
 {
   theIndices.clear();
   c.clear();
