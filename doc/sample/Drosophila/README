@@ -19,19 +19,18 @@ Drosophila.em:  Model file(em file) for this model
 *.cpp:        Process files(dm files) for this model
 
 
-
 === Running this model ===
 
 1. (If necessary) Convert the .em file to .eml file.
 
    % ecell3-em2eml Drosophila.em
    % ls Drosophila.eml
-   droTest.eml
+   Drosophila.eml
 
 
-2. Compile .dm files.
+2. Compile .cpp files.
 
-   Run emtool -a for each .dm file.
+   Run emtool -a for each .cpp file.
 
    % ecell3-dmc ...cpp
 
@@ -41,6 +40,6 @@ Drosophila.em:  Model file(em file) for this model
    % for i in *.cpp ; do ecell3-dmc $i ; done
    
 
-3. Run gecell, File->loadModel and load the droTest.eml file.
+3. Run gecell, File->loadModel and load the Drosophila.eml file.
 
 
