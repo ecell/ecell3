@@ -34,6 +34,9 @@
 
 #include "libecs/libecs.hpp"
 #include "libecs/Stepper.hpp"
+#include "libecs/System.hpp"
+#include "libecs/Process.hpp"
+#include "libecs/Variable.hpp"
 #include "libecs/LoggerBroker.hpp"
 
 #include "LocalSimulatorImplementation.hpp"

@@ -130,9 +130,18 @@ namespace libecs
 
     void makeSlots();
 
+    /*
+    void connectLogger( LoggerPtr aLoggerPtr );
+    void disconnectLogger( LoggerPtr aLoggerPtr );
+
+    const bool isLogged()
+    {
+      return ! theLoggerVector.empty();
+    }
+    */
 
     // to be deprecated
-    const Polymorph getPropertyListWithAttributes() const;
+    //    const Polymorph getPropertyListWithAttributes() const;
 
     const Polymorph getPropertyList() const;
 
@@ -141,7 +150,7 @@ namespace libecs
 
     /// @internal 
 
-    //FIXME: can be protected?
+    //FIXME: can be a protected member?
 
     PropertySlotMapCref getPropertySlotMap() const 
     {
@@ -173,14 +182,27 @@ namespace libecs
 
     static PropertySlotMakerPtr getPropertySlotMaker();
 
-    void registerSlot( PropertySlotPtr );
-    void removeSlot( StringCref keyword );
+    void registerSlot( StringCref aName, PropertySlotPtr aPropertySlotPtr );
+    void removeSlot( StringCref aName );
 
   private:
 
     PropertySlotMap thePropertySlotMap;
+    
+    //    LoggerVector theLoggerVector;
 
   };
+
+
+#define DEFINE_PROPERTYSLOT( NAME, TYPE, SETMETHOD, GETMETHOD )\
+    registerSlot( NAME,\
+		  getPropertySlotMaker()->\
+		  createPropertySlot( *this, Type2Type<TYPE>(),\
+				      SETMETHOD,\
+				      GETMETHOD\
+				      ) );
+
+
 
   /*@}*/
   

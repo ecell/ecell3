@@ -89,13 +89,15 @@ namespace libecs
        NULL pointer if it is not set.
     */
 
-    virtual StepperPtr getStepper() const 
+    StepperPtr getStepper() const 
     { 
       return theStepper; 
     }
 
     /**
-       Register the Stepper object as a stepper for this System by an ID.
+       Set a StepperID.
+
+       This provides a default Stepper to Processes holded by this System.
 
        @param anID Stepper ID.
     */
@@ -104,7 +106,7 @@ namespace libecs
 
 
     /**
-       Get an ID of the Stepper.
+       Get the default StepperID in this System.
 
        @return an ID of the Stepper as a String.
     */
@@ -215,6 +217,7 @@ namespace libecs
     virtual const SystemPath getSystemPath() const;
 
     void notifyChangeOfEntityList();
+
 
     virtual StringLiteral getClassName() const { return "System"; }
     //    static SystemPtr createInstance() { return new System; }

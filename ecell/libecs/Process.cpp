@@ -46,23 +46,30 @@ namespace libecs
 
   void Process::makeSlots()
   {
-    registerSlot( getPropertySlotMaker()->
-		  createPropertySlot( "VariableReferenceList", *this, 
-				      Type2Type<Polymorph>(),
+    registerSlot( "VariableReferenceList", 
+		  getPropertySlotMaker()->
+		  createPropertySlot( *this, Type2Type<Polymorph>(),
 				      &Process::setVariableReferenceList,
 				      &Process::getVariableReferenceList ) );
 
-    registerSlot( getPropertySlotMaker()->
-		  createPropertySlot( "Activity", *this, 
-				      Type2Type<Real>(),
+    registerSlot( "Activity",  
+		  getPropertySlotMaker()->
+		  createPropertySlot( *this, Type2Type<Real>(),
 				      &Process::setActivity,
 				      &Process::getActivity ) );
 
-    registerSlot( getPropertySlotMaker()->
-		  createPropertySlot( "Priority", *this, 
-				      Type2Type<Int>(),
+    registerSlot( "Priority",  
+		  getPropertySlotMaker()->
+		  createPropertySlot( *this, Type2Type<Int>(),
 				      &Process::setPriority,
 				      &Process::getPriority ) );
+
+    registerSlot( "StepperID",  
+		  getPropertySlotMaker()->
+		  createPropertySlot( *this, Type2Type<String>(),
+				      &Process::setStepperID,
+				      &Process::getStepperID ) );
+
   }
 
 
@@ -111,16 +118,48 @@ namespace libecs
     theFirstPositiveVariableReferenceIterator
     ( theVariableReferenceVector.end() ),
     theActivity( 0.0 ),
-    thePriority( 0 )
+    thePriority( 0 ),
+    theStepper( NULLPTR )
   {
     makeSlots();
   }
 
   Process::~Process()
   {
-    ; // do nothing
+    getStepper()->removeProcess( this );
   }
 
+
+  void Process::setStepperID( StringCref anID )
+  {
+    StepperPtr aStepperPtr( getModel()->getStepper( anID ) );
+
+    setStepper( aStepperPtr );
+  }
+
+  const String Process::getStepperID() const
+  {
+    return getStepper()->getID();
+  }
+
+
+  void Process::setStepper( StepperPtr const aStepper )
+  {
+    if( theStepper != aStepper )
+      {
+	if( aStepper != NULLPTR )
+	  {
+	    aStepper->registerProcess( this );
+	  }
+	else
+	  {
+	    theStepper->removeProcess( this );
+	  }
+
+	theStepper = aStepper;
+      }
+
+  }
 
   VariableReference Process::getVariableReference( StringCref aName )
   {
@@ -190,8 +229,8 @@ namespace libecs
 
     // first sort by reference name
     std::sort( theVariableReferenceVector.begin(), 
-		      theVariableReferenceVector.end(), 
-		      VariableReference::NameCompare() );
+	       theVariableReferenceVector.end(), 
+	       VariableReference::NameCompare() );
 
     // then sort by coefficient, preserving the relative order by the names
     std::stable_sort( theVariableReferenceVector.begin(), 

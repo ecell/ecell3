@@ -30,7 +30,6 @@
 
 #include "System.hpp"
 #include "FullID.hpp"
-#include "Stepper.hpp"
 #include "PropertySlotMaker.hpp"
 
 #include "Entity.hpp"
@@ -57,25 +56,11 @@ namespace libecs
 
   void Entity::makeSlots()
   {
+    DEFINE_PROPERTYSLOT( "ID", String, NULLPTR, &Entity::getID );
 
-    registerSlot( getPropertySlotMaker()->
-		  createPropertySlot( "ID", *this, 
-				      Type2Type<String>(),
-				      NULLPTR,
-				      &Entity::getID ) );
-
-    registerSlot( getPropertySlotMaker()->
-		  createPropertySlot( "FullID", *this, 
-				      Type2Type<String>(),
-				      NULLPTR,
-				      &Entity::getFullIDString ) );
+    DEFINE_PROPERTYSLOT( "FullID", String, NULLPTR, &Entity::getFullIDString );
     
-    registerSlot( getPropertySlotMaker()->
-		  createPropertySlot( "Name", *this, 
-				      Type2Type<String>(),
-				      &Entity::setName,
-				      &Entity::getName ) );
-
+    DEFINE_PROPERTYSLOT( "Name", String, &Entity::setName, &Entity::getName );
   }
 
   const FullID Entity::getFullID() const
@@ -95,12 +80,6 @@ namespace libecs
     aSystemPath.push_back( aSystemPtr->getID() );
     return aSystemPath;
   }
-
-  StepperPtr Entity::getStepper() const
-  {
-    return getSuperSystem()->getStepper();
-  }
-
 
 } // namespace libecs
 

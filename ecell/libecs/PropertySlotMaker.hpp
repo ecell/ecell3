@@ -32,8 +32,7 @@ namespace libecs
     
     template<class T, typename SlotType>
     static PropertySlotPtr 
-    createPropertySlot( StringCref aName,
-			T& anObject,
+    createPropertySlot( T& anObject,
 			Type2Type<SlotType>,
 			typename ConcretePropertySlot<T,SlotType>::SetMethodPtr
 			aSetMethodPtr,
@@ -52,8 +51,7 @@ namespace libecs
       
 
       PropertySlotPtr aPropertySlotPtr( 
-	new ConcretePropertySlot<T,SlotType>( aName,
-					      anObject,
+	new ConcretePropertySlot<T,SlotType>( anObject,
 					      aSetMethodPtr,
 					      aGetMethodPtr ) );
 
@@ -61,8 +59,6 @@ namespace libecs
     }
 
   };
-
-
 
 
   /*@}*/

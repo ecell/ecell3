@@ -50,11 +50,9 @@ namespace libecs
   {
     const UnsignedInt aSize( theVariableProxyVector.size() );
 
-    processNegative();
-    log();
-
     clear();
-    processNormal();
+
+    process();
 
     setStepInterval( getNextStepInterval() );
 
@@ -95,15 +93,11 @@ namespace libecs
 
   void FixedRungeKutta4Stepper::step()
   {
-    processNegative();
-
-    log();
-
     // clear
     clear();
 
     // ========= 1 ===========
-    processNormal();
+    process();
 
     const UnsignedInt aSize( theVariableProxyVector.size() );
     for( UnsignedInt c( 0 ); c < aSize; ++c )
@@ -125,7 +119,7 @@ namespace libecs
       }
 
     // ========= 2 ===========
-    processNormal();
+    process();
 
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
@@ -145,7 +139,7 @@ namespace libecs
       }
 
     // ========= 3 ===========
-    processNormal();
+    process();
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
 	VariablePtr const aVariable( theVariableProxyVector[ c ]->
@@ -163,7 +157,7 @@ namespace libecs
       }
 
     // ========= 4 ===========
-    processNormal();
+    process();
 
     // restore theValueBuffer
     for( UnsignedInt c( 0 ); c < aSize; ++c )
@@ -200,9 +194,6 @@ namespace libecs
 
   void Euler1Stepper::step()
   {
-    processNegative();
-
-    log();
     clear();
 
     setStepInterval( getNextStepInterval() );
@@ -231,7 +222,7 @@ namespace libecs
 	Real aNewStepInterval( getStepInterval() 
 			       * pow(maxError, -0.5) * safety );
 	
-	if( aNewStepInterval >= getUserMaxInterval() )
+	if( aNewStepInterval >= getMaxInterval() )
 	  {
 	    aNewStepInterval = getStepInterval();
 	  }
@@ -258,7 +249,7 @@ namespace libecs
     const Real a_dydt( getDerivativeToleranceFactor() );
 
     // ========= 1 ===========
-    processNormal();
+    process();
 
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
@@ -278,7 +269,7 @@ namespace libecs
       }
 
     // ========= 2 ===========
-    processNormal();
+    process();
 
     Real maxError( 0.0 );
 	
@@ -350,10 +341,6 @@ namespace libecs
 
   void Midpoint2Stepper::step()
   {
-    processNegative();
-
-    log();
-
     // clear
     clear();
 
@@ -383,7 +370,7 @@ namespace libecs
 			       * safety );
 	//  	    Real aNewStepInterval( getStepInterval() * 2.0 );
 
-	if( aNewStepInterval >= getUserMaxInterval() )
+	if( aNewStepInterval >= getMaxInterval() )
 	  {
 	    aNewStepInterval = getStepInterval();
 	  }
@@ -408,7 +395,7 @@ namespace libecs
     const Real a_dydt( getDerivativeToleranceFactor() );
 
     // ========= 1 ===========
-    processNormal();
+    process();
 
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
@@ -428,7 +415,7 @@ namespace libecs
       }
 
     // ========= 2 ===========
-    processNormal();
+    process();
 
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
@@ -453,7 +440,7 @@ namespace libecs
       }
 	
     // ========= 3 ===========
-    processNormal();
+    process();
 	
     Real maxError( 0.0 );
 
@@ -533,10 +520,6 @@ namespace libecs
   
   void CashKarp4Stepper::step()
   {
-    processNegative();
-
-    log();
-
     // clear
     clear();
 
@@ -559,7 +542,7 @@ namespace libecs
 	Real aNewStepInterval( getStepInterval() 
 			       * pow(maxError , -0.25) * safety );
 	    
-	if( aNewStepInterval >= getUserMaxInterval() )
+	if( aNewStepInterval >= getMaxInterval() )
 	  {
 	    aNewStepInterval = getStepInterval();
 	  }
@@ -582,7 +565,7 @@ namespace libecs
     const Real a_dydt( getDerivativeToleranceFactor() );
 
     // ========= 1 ===========
-    processNormal();
+    process();
 
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
@@ -607,7 +590,7 @@ namespace libecs
       }
 
     // ========= 2 ===========
-    processNormal();
+    process();
 
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
@@ -632,7 +615,7 @@ namespace libecs
       }
 	
     // ========= 3 ===========
-    processNormal();
+    process();
 	
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
@@ -658,7 +641,7 @@ namespace libecs
       }
     
     // ========= 4 ===========
-    processNormal();
+    process();
     
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
@@ -685,7 +668,7 @@ namespace libecs
       }
 		
     // ========= 5 ===========
-    processNormal();
+    process();
 	
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
@@ -717,7 +700,7 @@ namespace libecs
       }
 
     // ========= 6 ===========
-    processNormal();
+    process();
 	
     Real maxError( 0.0 );
     
@@ -796,9 +779,6 @@ namespace libecs
 
   void DormandPrince547MStepper::step()
   {
-    processNegative();
-
-    log();
     clear();
 
     setStepInterval( getNextStepInterval() );
@@ -827,7 +807,7 @@ namespace libecs
 	Real aNewStepInterval( getStepInterval() 
 			       * pow(maxError, -0.2) * safety );
 	
-	if( aNewStepInterval >= getUserMaxInterval() )
+	if( aNewStepInterval >= getMaxInterval() )
 	  {
 	    aNewStepInterval = getStepInterval();
 	  }
@@ -853,7 +833,7 @@ namespace libecs
     const Real a_dydt( getDerivativeToleranceFactor() );
 
     // ========= 1 ===========
-    processNormal();
+    process();
 
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
@@ -878,7 +858,7 @@ namespace libecs
       }
 
     // ========= 2 ===========
-    processNormal();
+    process();
 
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
@@ -906,7 +886,7 @@ namespace libecs
 
 
     // ========= 3 ===========
-    processNormal();
+    process();
 
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
@@ -935,7 +915,7 @@ namespace libecs
 
 
     // ========= 4 ===========
-    processNormal();
+    process();
 
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
@@ -964,7 +944,7 @@ namespace libecs
       }
 
     // ========= 5 ===========
-    processNormal();
+    process();
 
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
@@ -994,7 +974,7 @@ namespace libecs
       }
 
     // ========= 6 ===========
-    processNormal();
+    process();
 
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
@@ -1025,7 +1005,7 @@ namespace libecs
       }
 
     // ========= 7 ===========
-    processNormal();
+    process();
 
     Real maxError( 0.0 );
 	

@@ -47,35 +47,25 @@ namespace libecs
 
   void Variable::makeSlots()
   {
-    registerSlot( getPropertySlotMaker()->
-		  createPropertySlot( "Value",*this,
-				      Type2Type<Real>(),
-				      &Variable::setValue,
-				      &Variable::getValue ) );
+    DEFINE_PROPERTYSLOT( "Value", Real,
+			 &Variable::setValue,
+			 &Variable::getValue );
 
-    registerSlot( getPropertySlotMaker()->
-		  createPropertySlot( "Velocity",*this,
-				      Type2Type<Real>(),
-				      &Variable::addVelocity,
-				      &Variable::getVelocity ) );
+    DEFINE_PROPERTYSLOT( "Velocity", Real,
+			 &Variable::addVelocity,
+			 &Variable::getVelocity );
 
-    registerSlot( getPropertySlotMaker()->
-		  createPropertySlot( "TotalVelocity",*this,
-				      Type2Type<Real>(),
-				      NULLPTR,
-				      &Variable::getTotalVelocity ) );
+    DEFINE_PROPERTYSLOT( "TotalVelocity", Real,
+			 NULLPTR,
+			 &Variable::getTotalVelocity );
 
-    registerSlot( getPropertySlotMaker()->
-		  createPropertySlot( "Fixed",*this,
-				      Type2Type<Int>(),
-				      &Variable::setFixed,
-				      &Variable::getFixed ) );
+    DEFINE_PROPERTYSLOT( "Fixed", Int,
+			 &Variable::setFixed,
+			 &Variable::getFixed );
 
-    registerSlot( getPropertySlotMaker()->
-		  createPropertySlot( "Concentration", *this,
-				      Type2Type<Real>(),
-				      NULLPTR,
-				      &Variable::getConcentration ) );
+    DEFINE_PROPERTYSLOT( "Concentration", Real,
+			 NULLPTR,
+			 &Variable::getConcentration );
   }
 
 
@@ -250,7 +240,7 @@ namespace libecs
   void SRMVariable::makeSlots()
   {
     registerSlot( getPropertySlotMaker()->
-		  createPropertySlot( "AccumulatorClass",*this,
+		  createPropertySlot( "AccumulatorClass", *this,
 				      Type2Type<String>(),
 				      &SRMVariable::setAccumulatorClass,
 				      &SRMVariable::getAccumulatorClass ) );

@@ -32,7 +32,7 @@
 #define __PROPERTYSLOT_HPP
 
 #include <iostream>
-#include <signal.h>
+#include <functional>
 
 #include "libecs.hpp"
 #include "Util.hpp"
@@ -64,9 +64,26 @@ namespace libecs
 
   public:
 
-    PropertySlot( StringCref aName )
+    class LogCaller 
       :
-      theName( aName ),
+      std::binary_function< PropertySlotPtr, Real, void > 
+    {
+    public:
+      LogCaller(){}
+
+      void operator()( const PropertySlotPtr& aPropertySlotPtr, 
+		       RealCref aTime ) const
+      {
+	aPropertySlotPtr->log( aTime );
+      }
+
+    };
+
+
+  public:
+
+    PropertySlot()
+      :
       theLogger( NULLPTR )
     {
       ; // do nothing
@@ -92,11 +109,6 @@ namespace libecs
     virtual const bool isSetable() const = 0;
     virtual const bool isGetable() const = 0;
 
-    StringCref getName() const
-    {
-      return theName;
-    }
-
     const bool isLogged()
     {
       return theLogger != NULLPTR;
@@ -111,7 +123,9 @@ namespace libecs
       return theLogger;
     }
 
-    void updateLogger();
+    void log( Real aTime ) const;
+
+    virtual PropertyInterfaceCref getPropertyInterface() const = 0;
 
 
     template < typename Type >
@@ -128,7 +142,6 @@ namespace libecs
 
   protected:
 
-    String                   theName;
     LoggerPtr                theLogger;
 
   };
@@ -209,11 +222,10 @@ namespace libecs
     typedef GetType ( ConcretePropertySlot::* CallGetMethodPtr )() const;
     typedef void    ( ConcretePropertySlot::* CallSetMethodPtr )( SetType );
 
-    ConcretePropertySlot( StringCref aName, T& anObject, 
+    ConcretePropertySlot( T& anObject, 
 			  const SetMethodPtr aSetMethodPtr,
 			  const GetMethodPtr aGetMethodPtr )
       :
-      PropertySlot( aName ),
       theObject( anObject ),
       theSetMethodPtr( aSetMethodPtr ),
       theGetMethodPtr( aGetMethodPtr )
@@ -277,6 +289,11 @@ namespace libecs
       const GetMethodPtr
 	aNullMethodPtr( &PropertyInterface::nullGet<SlotType> );
       return theGetMethodPtr != aNullMethodPtr;
+    }
+
+    virtual PropertyInterfaceCref getPropertyInterface() const
+    {
+      return static_cast<PropertyInterfaceCref>( theObject );
     }
 
 

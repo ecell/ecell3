@@ -50,33 +50,33 @@ namespace libecs
   void System::makeSlots()
   {
 
-    registerSlot( getPropertySlotMaker()->
-		  createPropertySlot( "SystemList", *this,
-				      Type2Type<Polymorph>(),
+    registerSlot( "SystemList",  
+		  getPropertySlotMaker()->
+		  createPropertySlot( *this, Type2Type<Polymorph>(),
 				      NULLPTR,
 				      &System::getSystemList ) );
 
-    registerSlot( getPropertySlotMaker()->
-		  createPropertySlot( "VariableList", *this,
-				      Type2Type<Polymorph>(),
+    registerSlot( "VariableList",  
+		  getPropertySlotMaker()->
+		  createPropertySlot( *this, Type2Type<Polymorph>(),
 				      NULLPTR,
 				      &System::getVariableList ) );
 
-    registerSlot( getPropertySlotMaker()->
-		  createPropertySlot( "ProcessList", *this,
-				      Type2Type<Polymorph>(),
+    registerSlot( "ProcessList", 
+		  getPropertySlotMaker()->
+		  createPropertySlot( *this, Type2Type<Polymorph>(),
 				      NULLPTR,
 				      &System::getProcessList ) );
 
-    registerSlot( getPropertySlotMaker()->
-		  createPropertySlot( "StepperID", *this,
-				      Type2Type<String>(),
+    registerSlot( "StepperID", 
+		  getPropertySlotMaker()->
+		  createPropertySlot( *this, Type2Type<String>(),
 				      &System::setStepperID,
 				      &System::getStepperID ) );
 
-    registerSlot( getPropertySlotMaker()->
-		  createPropertySlot( "Volume", *this,
-				      Type2Type<Real>(),
+    registerSlot( "Volume",  
+		  getPropertySlotMaker()->
+		  createPropertySlot( *this, Type2Type<Real>(),
 				      &System::setVolume, 
 				      &System::getVolume ) );
   }
@@ -271,9 +271,9 @@ namespace libecs
 
   void VirtualSystem::makeSlots()
   {
-    registerSlot( getPropertySlotMaker()->
-		  createPropertySlot( "ProcessList", *this,
-				      Type2Type<Polymorph>(),
+    registerSlot( "ProcessList",  
+		  getPropertySlotMaker()->
+		  createPropertySlot( *this, Type2Type<Polymorph>(),
 				      NULLPTR,
 				      &System::getProcessList ) );
   }
@@ -289,7 +289,14 @@ namespace libecs
     for( ProcessMapConstIterator i( getProcessMap().begin() );
 	 i != getProcessMap().end() ; ++i )
       {
-	i->second->initialize();
+	ProcessPtr aProcessPtr( i->second );
+
+	if( aProcessPtr->getStepper() == NULLPTR )
+	  {
+	    aProcessPtr->setStepper( getStepper() );
+	  }
+
+	aProcessPtr->initialize();
       }
 
   }
@@ -333,9 +340,9 @@ namespace libecs
 
   void LogicalSystem::makeSlots()
   {
-    registerSlot( getPropertySlotMaker()->
-		  createPropertySlot( "VariableList", *this,
-				      Type2Type<Polymorph>(),
+    registerSlot( "VariableList",  
+		  getPropertySlotMaker()->
+		  createPropertySlot( *this, Type2Type<Polymorph>(),
 				      NULLPTR,
 				      &System::getVariableList ) );
 
@@ -390,9 +397,9 @@ namespace libecs
 
   void CompartmentSystem::makeSlots()
   {
-    registerSlot( getPropertySlotMaker()->
-		  createPropertySlot( "Volume", *this,
-				      Type2Type<Real>(),
+    registerSlot( "Volume",  
+		  getPropertySlotMaker()->
+		  createPropertySlot( *this, Type2Type<Real>(),
 				      &System::setVolume, 
 				      &System::getVolume ) );
   }

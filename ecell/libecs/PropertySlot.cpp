@@ -41,26 +41,28 @@ namespace libecs
 {
 
 
-  void PropertySlot::connectLogger( LoggerPtr logger )
+  void PropertySlot::connectLogger( LoggerPtr aLoggerPtr )
   {
     if( isLogged() )
       {
 	THROW_EXCEPTION( UnexpectedError,
-			 "PropertySlot [" + getName() + 
-			 "]: only one Logger can be connected." );
+			 "Only one Logger can be connected to a PropertySlot." );
       }
 
-    theLogger = logger;
+    theLogger = aLoggerPtr;
+
+    //    theObject.connectLogger( aLoggerPtr );
   }
 
   void PropertySlot::disconnectLogger()
   {
+    //    theObject.disconnectLogger( theLoggerPtr );
     theLogger = NULLPTR;
   }
 
-  void PropertySlot::updateLogger()
+  void PropertySlot::log( Real aTime ) const
   {
-    theLogger->appendData( getReal() );
+    theLogger->appendData( aTime, getReal() );
   }
 
   

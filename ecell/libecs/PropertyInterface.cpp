@@ -52,52 +52,24 @@ namespace libecs
   void PropertyInterface::makeSlots()
   {
 
-    // to be deprecated
-    registerSlot( getPropertySlotMaker()->
-		  createPropertySlot( "ClassName", *this, 
+    // deprecated
+    /*
+    registerSlot( "ClassName", getPropertySlotMaker()->
+		  createPropertySlot( *this, 
 				      Type2Type<String>(),
 				      NULLPTR,
 				      &PropertyInterface::
 				      getClassNameString ) );
-    
 
-    // to be deprecated
-    registerSlot( getPropertySlotMaker()->
-		  createPropertySlot( "PropertyList",*this,
+    registerSlot( "PropertyList", getPropertySlotMaker()->
+		  createPropertySlot( *this,
 				      Type2Type<Polymorph>(),
 				      NULLPTR,
 				      &PropertyInterface::getPropertyListWithAttributes ) );
-    
+    */
 
   }
 
-  const Polymorph PropertyInterface::getPropertyListWithAttributes() const
-  {
-    PolymorphVector aVector;
-    aVector.reserve( thePropertySlotMap.size() );
-
-    for( PropertySlotMapConstIterator i( thePropertySlotMap.begin() ); 
-	 i != thePropertySlotMap.end() ; ++i )
-      {
-	PolymorphVector anInnerVector;
-	PropertySlotPtr aPropertySlotPtr( i->second );
-
-	// the name of the property slot
-	anInnerVector.push_back( aPropertySlotPtr->getName() );
-
-	// is setable?
-	anInnerVector.push_back( static_cast<Int>
-				 ( aPropertySlotPtr->isSetable() ) );
-
-	// is getable?
-	anInnerVector.push_back( static_cast<Int>
-				 ( aPropertySlotPtr->isGetable() ) );
-
-	aVector.push_back( anInnerVector );
-      }
-
-    return aVector;
-  }
 
   const Polymorph PropertyInterface::getPropertyList() const
   {
@@ -107,8 +79,7 @@ namespace libecs
     for( PropertySlotMapConstIterator i( thePropertySlotMap.begin() ); 
 	 i != thePropertySlotMap.end() ; ++i )
       {
-	PropertySlotPtr aPropertySlotPtr( i->second );
-	aVector.push_back( aPropertySlotPtr->getName() );
+	aVector.push_back( i->first );
       }
 
     return aVector;
@@ -122,12 +93,10 @@ namespace libecs
     PolymorphVector aVector;
 
     // is setable?
-    aVector.push_back( static_cast<Int>
-		       ( aPropertySlotPtr->isSetable() ) );
+    aVector.push_back( static_cast<Int>( aPropertySlotPtr->isSetable() ) );
 
     // is getable?
-    aVector.push_back( static_cast<Int>
-		       ( aPropertySlotPtr->isGetable() ) );
+    aVector.push_back( static_cast<Int>( aPropertySlotPtr->isGetable() ) );
 
     return aVector;
   }
@@ -147,30 +116,30 @@ namespace libecs
       }
   }
 
-  void PropertyInterface::registerSlot( PropertySlotPtr slot )
+  void PropertyInterface::registerSlot( StringCref aName,
+					PropertySlotPtr aPropertySlotPtr )
   {
-    String keyword = slot->getName();
-    if( thePropertySlotMap.find( keyword ) != thePropertySlotMap.end() )
+    if( thePropertySlotMap.find( aName ) != thePropertySlotMap.end() )
       {
 	// it already exists. take the latter one.
-	delete thePropertySlotMap[ keyword ];
-	thePropertySlotMap.erase( keyword );
+	delete thePropertySlotMap[ aName ];
+	thePropertySlotMap.erase( aName );
       }
 
-    thePropertySlotMap[ keyword ] = slot;
+    thePropertySlotMap[ aName ] = aPropertySlotPtr;
   }
 
-  void PropertyInterface::removeSlot( StringCref keyword )
+  void PropertyInterface::removeSlot( StringCref aName )
   {
-    if( thePropertySlotMap.find( keyword ) == thePropertySlotMap.end() )
+    if( thePropertySlotMap.find( aName ) == thePropertySlotMap.end() )
       {
 	THROW_EXCEPTION( NoSlot,
 			 getClassName() + String( ":no slot for keyword [" ) +
-			 keyword + String( "] found.\n" ) );
+			 aName + String( "] found.\n" ) );
       }
 
-    delete thePropertySlotMap[ keyword ];
-    thePropertySlotMap.erase( keyword );
+    delete thePropertySlotMap[ aName ];
+    thePropertySlotMap.erase( aName );
   }
 
   void PropertyInterface::setProperty( StringCref aPropertyName, 
@@ -206,6 +175,18 @@ namespace libecs
 
     return aPropertySlotMapIterator->second->getPolymorph();
   }
+
+  /*
+  void PropertyInterface::connectLogger( LoggerPtr aLoggerPtr )
+  {
+    theLoggerVector.push_back( aLoggerPtr );
+  }
+
+  void PropertyInterface::disconnectLogger( LoggerPtr aLoggerPtr )
+  {
+    theLoggerVector.erase( aLoggerPtr );
+  }
+  */
 
 
 } // namespace libecs

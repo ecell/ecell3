@@ -31,6 +31,7 @@
 
 #include "libecs.hpp"
 
+#include "Entity.hpp"
 #include "Util.hpp"
 #include "Logger.hpp"
 #include "PropertyInterface.hpp"
@@ -99,18 +100,15 @@ namespace libecs
       }
 
     PropertySlotPtr aPropertySlotPtr( aPropertySlotMapIterator->second );
-    StepperPtr aStepperPtr( anEntityPtr->getStepper() );
 
-    LoggerPtr aNewLogger( new Logger( *aPropertySlotPtr, *aStepperPtr ) );
+    LoggerPtr aNewLogger( new Logger( *aPropertySlotPtr ) );
 
     aPropertySlotPtr->connectLogger( aNewLogger );
     theLoggerMap[aFullPN] = aNewLogger;
 
-    // don't forget this!
-    aPropertySlotPtr->updateLogger();
+    // it should have at least one datapoint to work correctly.
+    aPropertySlotPtr->log( getModel().getCurrentTime() );
     aNewLogger->flush();
-
-    aStepperPtr->registerLoggedPropertySlot( aPropertySlotPtr );
 
     return aNewLogger;
   }

@@ -76,8 +76,7 @@ namespace libecs
     */
   
     //    explicit Logger( ModelCref aModel, PropertySlotRef aPropertySlot );
-    explicit Logger( PropertySlotRef aPropertySlot,
-		     StepperCref aStepper ); 
+    explicit Logger( PropertySlotRef aPropertySlot );
   
     /// Destructor
 
@@ -154,7 +153,7 @@ namespace libecs
 
     */
 
-    void appendData( RealCref v );
+    void appendData( RealCref aTime, RealCref aValue );
 
 
     /**
@@ -203,7 +202,6 @@ namespace libecs
 
     /// Data members
 
-    StepperCref          theStepper;
     PropertySlotRef      thePropertySlot;
 
     PhysicalLogger	 thePhysicalLogger;

@@ -204,6 +204,38 @@ namespace libecs
       return thePriority;
     }
 
+    /**
+       Register the Stepper of this Process by an ID.
+
+       @param anID Stepper ID.
+    */
+
+    void setStepperID( StringCref anID );
+
+
+    /**
+       Get an ID of the Stepper of this Process.
+
+       @return StepperID as a String.
+    */
+
+    const String getStepperID() const;
+
+
+    void setStepper( StepperPtr const aStepper );
+
+    /**
+       Returns a pointer to a Stepper object that this Process belongs.
+
+       @return A pointer to a Stepper object that this Process, or
+       NULLPTR if it is not set yet.
+    */
+
+    StepperPtr getStepper() const
+    {
+      return theStepper;
+    }
+
   protected:
 
     void makeSlots();
@@ -217,6 +249,8 @@ namespace libecs
     theFirstPositiveVariableReferenceIterator;
 
   private:
+
+    StepperPtr  theStepper;
 
     Real        theActivity;
     Int         thePriority;

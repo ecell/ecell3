@@ -27,7 +27,7 @@ def propertyvariableinit():
 
 def createpropertyslots():
     for i in PROPERTIES:
-	print '  registerSlot( getPropertySlotMaker()->createPropertySlot( "%s",*this, Type2Type<%s>(),&%s::set%s, &%s::get%s ));'\
+	print '  DEFINE_PROPERTYSLOT( "%s", %s, &%s::set%s, &%s::get%s );'\
               % (i[1],i[0],CLASSNAME,i[1],CLASSNAME,i[1])
 
 def variablepropertyslotvariabledecls():

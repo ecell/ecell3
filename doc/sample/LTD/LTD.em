@@ -11,6 +11,12 @@ Stepper Midpoint2Stepper( SRM_01 )
 	# no property
 }
 
+Stepper SlaveStepper( SLAVE_1 )
+{
+	# no property
+}
+
+
 System System( / )
 {
 	StepperID	SRM_01;
@@ -633,13 +639,6 @@ System System( /CELL/CYTOPLASM )
 		VariableReferenceList	[ S0 Variable:/CELL/CYTOPLASM:PP2A_G_Sub_P -1 ] [ P0 Variable:/CELL/CYTOPLASM:G_Sub_P 1 ] [ P1 Variable:/CELL/CYTOPLASM:PP2A 1 ];
 	}
 	
-	Process MakesignalPProcess( ADD )
-	{
-		Name	add;
-		Priority	-1
-		add	0.000000012;
-		VariableReferenceList	[ S0 Variable:/CELL/CYTOPLASM:NO -1 ] [ P0 Variable:/CELL/CYTOPLASM:NO 1 ];
-	}
 	
 	Process MichaelisUniUniProcess( Raf_P_Raf )
 	{
@@ -824,13 +823,6 @@ System System( /CELL/CYTOPLASM )
 		VariableReferenceList	[ S0 Variable:/CELL/CYTOPLASM:PLA2_P -1 ] [ P0 Variable:/CELL/CYTOPLASM:PLA2 1 ];
 	}
 	
-	Process MakesignalPProcess( ADDCa )
-	{
-		Name	addCa;
-		Priority	-1;
-		add	0.00000055;
-		VariableReferenceList	[ S0 Variable:/CELL/CYTOPLASM:Ca -1 ] [ P0 Variable:/CELL/CYTOPLASM:Ca 1 ];
-	}
 	
 	Process MassActionProcess( PKC_Ca_PKC )
 	{
@@ -1030,26 +1022,44 @@ System System( /CELL/CYTOPLASM )
 		VariableReferenceList	[ S0 Variable:/CELL/CYTOPLASM:mGluR_Gq -1 ] [ P0 Variable:/CELL/CYTOPLASM:MgluR 1 ] [ P1 Variable:/CELL/CYTOPLASM:Gabc 1 ];
 	}
 	
+
+	Process MakesignalPProcess( ADD )
+	{
+		Name	add;
+		StepperID SLAVE_1;	
+		add	0.000000012;
+		VariableReferenceList	[ S0 Variable:/CELL/CYTOPLASM:NO 0 ] [ P0 Variable:/CELL/CYTOPLASM:NO 1 ];
+	}
+
+
+	Process MakesignalPProcess( ADDCa )
+	{
+		Name	addCa;
+		StepperID SLAVE_1;	
+		add	0.00000055;
+		VariableReferenceList	[ S0 Variable:/CELL/CYTOPLASM:Ca 0 ] [ P0 Variable:/CELL/CYTOPLASM:Ca 1 ];
+	}
+
 	Process MakesignalPProcess( ADDGlu )
 	{
 		Name	addGlu;
-		Priority	-1;
+		StepperID SLAVE_1;	
 		add	0.0000012;
-		VariableReferenceList	[ S0 Variable:/CELL/CYTOPLASM:Glu -1 ] [ P0 Variable:/CELL/CYTOPLASM:Glu 1 ];
+		VariableReferenceList	[ S0 Variable:/CELL/CYTOPLASM:Glu 0 ] [ P0 Variable:/CELL/CYTOPLASM:Glu 1 ];
 	}
 	
 	Process PKCactivePProcess( PKC_PKCactive )
 	{
 		Name	PKC_PKC_active;
-		Priority	-1;
-		VariableReferenceList	[ S0 Variable:/CELL/CYTOPLASM:Ca_DAG_PKC -1 ] [ S1 Variable:/CELL/CYTOPLASM:DAG_AA_PKC -1 ] [ S2 Variable:/CELL/CYTOPLASM:AA_PKC -1 ] [ S3 Variable:/CELL/CYTOPLASM:Ca_AA_PKC -1 ] [ P0 Variable:/CELL/CYTOPLASM:PKCactive 1 ];
+		StepperID SLAVE_1;	
+		VariableReferenceList	[ S0 Variable:/CELL/CYTOPLASM:Ca_DAG_PKC 0 ] [ S1 Variable:/CELL/CYTOPLASM:DAG_AA_PKC 0 ] [ S2 Variable:/CELL/CYTOPLASM:AA_PKC 0 ] [ S3 Variable:/CELL/CYTOPLASM:Ca_AA_PKC 0 ] [ P0 Variable:/CELL/CYTOPLASM:PKCactive 1 ];
 	}
 	
 	Process MAPPProcess( MAPact )
 	{
 		Name	MAPact;
-		Priority	-1;
-		VariableReferenceList	[ S0 Variable:/CELL/CYTOPLASM:MAPK_P -1 ] [ S1 Variable:/CELL/CYTOPLASM:MAPK_PP -1 ] [ P0 Variable:/CELL/CYTOPLASM:MAPKactive 1 ];
+		StepperID SLAVE_1;	
+		VariableReferenceList	[ S0 Variable:/CELL/CYTOPLASM:MAPK_P 0 ] [ S1 Variable:/CELL/CYTOPLASM:MAPK_PP 0 ] [ P0 Variable:/CELL/CYTOPLASM:MAPKactive 1 ];
 	}
 	
 	

@@ -50,6 +50,8 @@ namespace libecs
 
   /** @file */
 
+  DECLARE_VECTOR( EntityPtr, EntityVector );
+
   
   /**
      Entity class is a base class for all components in the cell model.
@@ -125,20 +127,6 @@ namespace libecs
     */
 
     virtual const SystemPath getSystemPath() const;
-
-    /**
-       Returns a pointer to a Stepper object that this Entity belongs.
-
-       The Stepper of an Entity is defined as a Stepper of a
-       supersystem of the Entity.  As a exception, a System has a
-       pointer to a Stepper as its member variable, thus this method
-       returns the variable in System class.
-
-       @return A pointer to a Stepper object that this Entity belongs or
-       NULLPTR if it is not set.
-    */
-
-    virtual StepperPtr getStepper() const;
 
 
     /// \name Properties

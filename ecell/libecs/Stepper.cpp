@@ -52,89 +52,62 @@ namespace libecs
   void Stepper::makeSlots()
   {
 
-    registerSlot( getPropertySlotMaker()->
-		  createPropertySlot( "ID", *this,
-				      Type2Type<String>(),
-				      NULLPTR,
-				      &Stepper::getID ) );
+    DEFINE_PROPERTYSLOT( "ID", String,
+			 NULLPTR,
+			 &Stepper::getID );
 
-    registerSlot( getPropertySlotMaker()->
-		  createPropertySlot( "SystemList", *this,
-				      Type2Type<Polymorph>(),
-				      NULLPTR,
-				      &Stepper::getSystemList ) );
+    DEFINE_PROPERTYSLOT( "CurrentTime", Real,
+			 NULLPTR,
+			 &Stepper::getCurrentTime );
 
-    registerSlot( getPropertySlotMaker()->
-		  createPropertySlot( "CurrentTime", *this,
-				      Type2Type<Real>(),
-				      NULLPTR,
-				      &Stepper::getCurrentTime ) );
+    DEFINE_PROPERTYSLOT( "StepInterval", Real,
+			 &Stepper::setStepInterval,
+			 &Stepper::getStepInterval );
 
-    registerSlot( getPropertySlotMaker()->
-		  createPropertySlot( "StepInterval", *this,
-				      Type2Type<Real>(),
-				      &Stepper::setStepInterval,
-				      &Stepper::getStepInterval ) );
+    DEFINE_PROPERTYSLOT( "UserMaxInterval", Real,
+			 &Stepper::setUserMaxInterval,
+			 &Stepper::getUserMaxInterval );
 
-    registerSlot( getPropertySlotMaker()->
-		  createPropertySlot( "UserMaxInterval", *this,
-				      Type2Type<Real>(),
-				      &Stepper::setUserMaxInterval,
-				      &Stepper::getUserMaxInterval ) );
+    DEFINE_PROPERTYSLOT( "UserMinInterval", Real,
+			 &Stepper::setUserMinInterval,
+			 &Stepper::getUserMinInterval );
 
-    registerSlot( getPropertySlotMaker()->
-		  createPropertySlot( "UserMinInterval", *this,
-				      Type2Type<Real>(),
-				      &Stepper::setUserMinInterval,
-				      &Stepper::getUserMinInterval ) );
+    DEFINE_PROPERTYSLOT( "MaxInterval", Real,
+			 NULLPTR,
+			 &Stepper::getMaxInterval );
 
-    registerSlot( getPropertySlotMaker()->
-		  createPropertySlot( "MaxInterval", *this,
-				      Type2Type<Real>(),
-				      NULLPTR,
-				      &Stepper::getMaxInterval ) );
+    DEFINE_PROPERTYSLOT( "MinInterval", Real,
+			 NULLPTR,
+			 &Stepper::getMinInterval );
 
-    registerSlot( getPropertySlotMaker()->
-		  createPropertySlot( "MinInterval", *this,
-				      Type2Type<Real>(),
-				      NULLPTR,
-				      &Stepper::getMinInterval ) );
+    //    DEFINE_PROPERTYSLOT( "StepIntervalConstraint", Polymorph,
+    //			 &Stepper::setStepIntervalConstraint,
+    //			 &Stepper::getStepIntervalConstraint );
 
-    registerSlot( getPropertySlotMaker()->
-		  createPropertySlot( "StepIntervalConstraint", *this,
-				      Type2Type<Polymorph>(),
-				      &Stepper::setStepIntervalConstraint,
-				      &Stepper::getStepIntervalConstraint ) );
+    DEFINE_PROPERTYSLOT( "ReadVariableList", Polymorph,
+			 NULLPTR,
+			 &Stepper::getReadVariableList );
 
-    registerSlot( getPropertySlotMaker()->
-		  createPropertySlot( "ReadVariableList", *this,
-				      Type2Type<Polymorph>(),
-				      NULLPTR,
-				      &Stepper::getReadVariableList ) );
+    DEFINE_PROPERTYSLOT( "WriteVariableList", Polymorph,
+			 NULLPTR,
+			 &Stepper::getWriteVariableList );
 
-    registerSlot( getPropertySlotMaker()->
-		  createPropertySlot( "WriteVariableList", *this,
-				      Type2Type<Polymorph>(),
-				      NULLPTR,
-				      &Stepper::getWriteVariableList ) );
+    DEFINE_PROPERTYSLOT( "ProcessList", Polymorph,
+			 NULLPTR,
+			 &Stepper::getProcessList );
 
-    registerSlot( getPropertySlotMaker()->
-		  createPropertySlot( "ProcessList", *this,
-				      Type2Type<Polymorph>(),
-				      NULLPTR,
-				      &Stepper::getProcessList ) );
+    DEFINE_PROPERTYSLOT( "SystemList", Polymorph,
+			 NULLPTR,
+			 &Stepper::getSystemList );
 
-    registerSlot( getPropertySlotMaker()->
-		  createPropertySlot( "DependentStepperList", *this,
-				      Type2Type<Polymorph>(),
-				      NULLPTR,
-				      &Stepper::getDependentStepperList ) );
+    DEFINE_PROPERTYSLOT( "DependentStepperList", Polymorph,
+			 NULLPTR,
+			 &Stepper::getDependentStepperList );
 
   }
 
   Stepper::Stepper() 
     :
-    theFirstNormalProcess( theProcessVector.begin() ),
     theModel( NULLPTR ),
     theSchedulerIndex( -1 ),
     theCurrentTime( 0.0 ),
@@ -153,7 +126,7 @@ namespace libecs
     //
     // update theProcessVector
     //
-    updateProcessVector();
+    //    updateProcessVector();
 
 
     //
@@ -168,11 +141,14 @@ namespace libecs
     const Int aSize( theVariableProxyVector.size() );
 
     theValueBuffer.resize( aSize );
+
+    updateLoggedPropertySlotVector();
   }
 
  
   void Stepper::updateProcessVector()
   {
+    /*
     theProcessVector.clear();
     for( SystemVectorConstIterator i( theSystemVector.begin() );
 	 i != theSystemVector.end() ; ++i )
@@ -188,6 +164,7 @@ namespace libecs
 	      theProcessVector.push_back( aProcessPtr );
 	    }
 	}
+    */
 
     // sort by memory address. this is an optimization.
     std::sort( theProcessVector.begin(), theProcessVector.end() );
@@ -196,10 +173,6 @@ namespace libecs
     std::stable_sort( theProcessVector.begin(), theProcessVector.end(),
 		      Process::PriorityCompare() );
 
-    // find boundary of negative and zero priority processes
-    theFirstNormalProcess = 
-      std::lower_bound( theProcessVector.begin(), theProcessVector.end(), 0,
-			Process::PriorityCompare() );
   }
 
   void Stepper::updateVariableVectors()
@@ -275,6 +248,44 @@ namespace libecs
 
   }
 
+
+  void Stepper::updateLoggedPropertySlotVector()
+  {
+    theLoggedPropertySlotVector.clear();
+
+    EntityVector anEntityVector;
+    anEntityVector.reserve( theProcessVector.size() + 
+			    theVariableProxyVector.size() +
+			    theSystemVector.size() );
+
+    std::copy( theProcessVector.begin(), theProcessVector.end(),
+	       std::back_inserter( anEntityVector ) );
+
+    for( VariableProxyVectorConstIterator i( theVariableProxyVector.begin() );
+	 i != theVariableProxyVector.end(); ++i )
+      {
+	anEntityVector.push_back( (*i)->getVariable() );
+      }
+		   
+    for( EntityVectorConstIterator i( anEntityVector.begin() );
+	 i != anEntityVector.end() ; ++i )
+      {
+	PropertySlotMapCref aPropertySlotMap( (*i)->getPropertySlotMap() );
+	for( PropertySlotMapConstIterator j( aPropertySlotMap.begin() );
+	     j != aPropertySlotMap.end(); ++j )
+	  {
+	    PropertySlotPtr aPropertySlotPtr( j->second );
+	    if( aPropertySlotPtr->isLogged() )
+	      {
+		theLoggedPropertySlotVector.push_back( aPropertySlotPtr );
+	      }
+	  }
+
+      }
+
+
+  }
+
   void Stepper::updateDependentStepperVector()
   {
     theDependentStepperVector.clear();
@@ -338,6 +349,7 @@ namespace libecs
     return aVector;
   }
 
+
   const Polymorph Stepper::getDependentStepperList() const
   {
     PolymorphVector aVector;
@@ -355,31 +367,63 @@ namespace libecs
   }
 
 
-  void Stepper::registerSystem( SystemPtr aSystem )
+  void Stepper::registerSystem( SystemPtr aSystemPtr )
   { 
-    if( std::find( theSystemVector.begin(), theSystemVector.end(), aSystem ) 
-   	== theSystemVector.end() )
+    if( std::find( theSystemVector.begin(), theSystemVector.end(), aSystemPtr )
+	== theSystemVector.end() )
       {
-   	theSystemVector.push_back( aSystem );
+   	theSystemVector.push_back( aSystemPtr );
       }
   }
 
-  void Stepper::removeSystem( SystemPtr aSystem )
+  void Stepper::removeSystem( SystemPtr aSystemPtr )
   { 
     SystemVectorIterator i( find( theSystemVector.begin(), 
-				  theSystemVector.end(),
-				  aSystem ) );
+				   theSystemVector.end(),
+				   aSystemPtr ) );
     
     if( i == theSystemVector.end() )
       {
 	THROW_EXCEPTION( NotFound,
 			 getClassName() + String( ": " ) 
-			 + getID() + ": " + aSystem->getFullID().getString() 
-			 + " not found in this stepper." );
+			 + getID() + ": " 
+			 + aSystemPtr->getFullID().getString() 
+			 + " not found in this stepper. Can't remove." );
       }
 
     theSystemVector.erase( i );
   }
+
+
+  void Stepper::registerProcess( ProcessPtr aProcessPtr )
+  { 
+    if( std::find( theProcessVector.begin(), theProcessVector.end(), 
+		   aProcessPtr ) == theProcessVector.end() )
+      {
+   	theProcessVector.push_back( aProcessPtr );
+      }
+
+    updateProcessVector();
+  }
+
+  void Stepper::removeProcess( ProcessPtr aProcessPtr )
+  { 
+    ProcessVectorIterator i( find( theProcessVector.begin(), 
+				   theProcessVector.end(),
+				   aProcessPtr ) );
+    
+    if( i == theProcessVector.end() )
+      {
+	THROW_EXCEPTION( NotFound,
+			 getClassName() + String( ": " ) 
+			 + getID() + ": " 
+			 + aProcessPtr->getFullID().getString() 
+			 + " not found in this stepper. Can't remove." );
+      }
+
+    theProcessVector.erase( i );
+  }
+
 
   void Stepper::registerLoggedPropertySlot( PropertySlotPtr aPropertySlotPtr )
   {
@@ -387,6 +431,7 @@ namespace libecs
   }
 
 
+  /*
   void Stepper::setStepIntervalConstraint( PolymorphCref aValue )
   {
     PolymorphVector aVector( aValue.asPolymorphVector() );
@@ -418,6 +463,8 @@ namespace libecs
     return aVector;
   }
 
+
+
   void Stepper::setStepIntervalConstraint( StepperPtr aStepperPtr,
 					   RealCref aFactor )
   {
@@ -429,11 +476,13 @@ namespace libecs
 	  insert( std::make_pair( aStepperPtr, aFactor ) );
       }
   }
+  */
 
   const Real Stepper::getMaxInterval() const
   {
     Real aMaxInterval( getUserMaxInterval() );
 
+    /*
     for( StepIntervalConstraintMapConstIterator 
 	   i( theStepIntervalConstraintMap.begin() ); 
 	      i != theStepIntervalConstraintMap.end() ; ++i )
@@ -446,6 +495,7 @@ namespace libecs
 	    aMaxInterval = aConstraint;
 	  }
       }
+    */
 
     return aMaxInterval;
   }
@@ -453,7 +503,10 @@ namespace libecs
   void Stepper::log()
   {
     // update loggers
-    FOR_ALL( PropertySlotVector, theLoggedPropertySlotVector, updateLogger );
+    std::for_each( theLoggedPropertySlotVector.begin(), 
+		   theLoggedPropertySlotVector.end(),
+		   std::bind2nd( std::mem_fun( &PropertySlot::log ), 
+				 getCurrentTime() ) );
   }
 
   const Polymorph Stepper::getWriteVariableList() const
@@ -541,17 +594,6 @@ namespace libecs
 		   std::mem_fun( &Process::process ) );
   }
 
-  void Stepper::processNegative()
-  {
-    std::for_each( theProcessVector.begin(), theFirstNormalProcess, 
-		   std::mem_fun( &Process::process ) );
-  }
-
-  void Stepper::processNormal()
-  {
-    std::for_each( theFirstNormalProcess, theProcessVector.end(),
-    		   std::mem_fun( &Process::process ) );
-  }
 
   void Stepper::integrate()
   {
@@ -584,7 +626,7 @@ namespace libecs
   {
     std::for_each( theDependentStepperVector.begin(),
 		   theDependentStepperVector.end(),
-		   std::bind1st( std::mem_fun( &Stepper::interrupt ), this ) );
+		   std::bind2nd( std::mem_fun( &Stepper::interrupt ), this ) );
   }
 
   void Stepper::interrupt( StepperPtr const )
@@ -613,47 +655,29 @@ namespace libecs
 
   void DifferentialStepper::makeSlots()
   {
-    registerSlot( getPropertySlotMaker()->
-		  createPropertySlot( "StepInterval", *this,
-				      Type2Type<Real>(),
-				      &DifferentialStepper::initializeStepInterval,
-				      &DifferentialStepper::getStepInterval 
-				      ) );
+    DEFINE_PROPERTYSLOT( "StepInterval", Real, 
+			 &DifferentialStepper::initializeStepInterval,
+			 &DifferentialStepper::getStepInterval );
 
-    registerSlot( getPropertySlotMaker()->
-		  createPropertySlot( "Tolerance", *this,
-				      Type2Type<Real>(),
-				      &DifferentialStepper::setTolerance,
-				      &DifferentialStepper::getTolerance
-				      ) );
+    DEFINE_PROPERTYSLOT( "Tolerance", Real,
+			 &DifferentialStepper::setTolerance,
+			 &DifferentialStepper::getTolerance );
 
-    registerSlot( getPropertySlotMaker()->
-		  createPropertySlot( "AbsoluteToleranceFactor", *this,
-				      Type2Type<Real>(),
-				      &DifferentialStepper::setAbsoluteToleranceFactor,
-				      &DifferentialStepper::getAbsoluteToleranceFactor
-				      ) );
+    DEFINE_PROPERTYSLOT( "AbsoluteToleranceFactor", Real,
+			 &DifferentialStepper::setAbsoluteToleranceFactor,
+			 &DifferentialStepper::getAbsoluteToleranceFactor );
  
-    registerSlot( getPropertySlotMaker()->
-		  createPropertySlot( "StateToleranceFactor", *this,
-				      Type2Type<Real>(),
-				      &DifferentialStepper::setStateToleranceFactor,
-				      &DifferentialStepper::getStateToleranceFactor
-				      ) ); 
+    DEFINE_PROPERTYSLOT( "StateToleranceFactor", Real,
+			 &DifferentialStepper::setStateToleranceFactor,
+			 &DifferentialStepper::getStateToleranceFactor );
 
-    registerSlot( getPropertySlotMaker()->
-		  createPropertySlot( "DerivativeToleranceFactor", *this,
-				      Type2Type<Real>(),
-				      &DifferentialStepper::setDerivativeToleranceFactor,
-				      &DifferentialStepper::getDerivativeToleranceFactor
-				      ) );
+    DEFINE_PROPERTYSLOT( "DerivativeToleranceFactor", Real,
+			 &DifferentialStepper::setDerivativeToleranceFactor,
+			 &DifferentialStepper::getDerivativeToleranceFactor );
 
-    registerSlot( getPropertySlotMaker()->
-		  createPropertySlot( "MaxErrorRatio", *this,
-				      Type2Type<Real>(),
-				      NULLPTR,
-				      &DifferentialStepper::getMaxErrorRatio
-				      ) ); 
+    DEFINE_PROPERTYSLOT( "MaxErrorRatio", Real,
+			 NULLPTR,
+			 &DifferentialStepper::getMaxErrorRatio );
   }
 
   void DifferentialStepper::initialize()
@@ -734,20 +758,43 @@ namespace libecs
     const Real aCallerCurrentTime( aCaller->getCurrentTime() );
     const Real aCallerNextStep   ( aCallerCurrentTime + aCallerTimeScale );
 
-    // If a step of this occurs *before* the next step of the caller,
+    // If the next step of this occurs *before* the next step of the caller,
     // just shrink step size of this Stepper.
     if( aNextStep < aCallerNextStep )
       {
 	return;
       }
 
-    // If a step of this will occur *after* the caller,
+    // If the next step of this will occur *after* the caller,
     // reschedule this Stepper, as well as shrinking the next step size.
     setStepInterval( aCallerCurrentTime + ( aCallerTimeScale * 0.5 ) );
 
     getModel()->reschedule( this );
   }
 
+
+  //////////////////// DiscreteTimeStepper
+
+  DiscreteTimeStepper::DiscreteTimeStepper()
+  {
+    ; // do nothing -- no additional property slots
+  }
+
+  void DiscreteTimeStepper::step()
+  {
+    process();
+  }
+
+
+  ////////////////////// SlaveStepper
+
+  SlaveStepper::SlaveStepper()
+  {
+    // gcc3 doesn't currently support numeric_limits::infinity.
+    // using max() instead.
+    setStepInterval( std::numeric_limits<Real>::max() );
+    setCurrentTime( std::numeric_limits<Real>::max() );
+  }
 
 
 } // namespace libecs

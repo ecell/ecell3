@@ -77,11 +77,11 @@ namespace libecs
        Procedure of the initialization is as follows:
 
        1. Initialize Systems recursively starting from theRootSystem.
-       ( System::initialize() )
-       1. Check if all the Systems have a Stepper.
-       1. Initialize Steppers. ( Stepper::initialize() )
-       1. Construct Stepper interdependency graph 
-       ( Stepper::updateDependentStepperVector() )
+          ( System::initialize() )
+       2. Check if all the Systems have a Stepper.
+       3. Initialize Steppers. ( Stepper::initialize() )
+       4. Construct Stepper interdependency graph 
+          ( Stepper::updateDependentStepperVector() )
 
     */
 

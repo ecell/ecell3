@@ -42,7 +42,7 @@
 #include "Polymorph.hpp"
 #include "VariableProxy.hpp"
 #include "PropertyInterface.hpp"
-#include "System.hpp"
+//#include "System.hpp"
 
 
 
@@ -54,6 +54,7 @@ namespace libecs
    */
 
   /** @file */
+
 
   //  DECLARE_TYPE( std::valarray<Real>, RealValarray );
 
@@ -77,8 +78,8 @@ namespace libecs
     //    typedef std::pair<StepperPtr,Real> StepIntervalConstraint;
     //    DECLARE_VECTOR( StepIntervalConstraint, StepIntervalConstraintVector );
 
-    DECLARE_ASSOCVECTOR( StepperPtr, Real, std::less<StepperPtr>,
-			 StepIntervalConstraintMap );
+    //    DECLARE_ASSOCVECTOR( StepperPtr, Real, std::less<StepperPtr>,
+    //			 StepIntervalConstraintMap );
 
     /** 
 	A function type that returns a pointer to Stepper.
@@ -95,7 +96,7 @@ namespace libecs
       ; // do nothing
     }
 
-    virtual void makeSlots();
+    void makeSlots();
 
     /**
 
@@ -134,18 +135,42 @@ namespace libecs
     virtual void reset();
     
     /**
-       @param aSystem
+       Register a System to this Stepper.
 
+       @param aSystemPtr a pointer to a System object to register
     */
 
-    void registerSystem( SystemPtr aSystem );
+    void registerSystem( SystemPtr aSystemPtr );
 
     /**
-       @param aSystem
+       Remove a System from this Stepper.
 
+       @note This method is not currently supported.  Calling this method
+       causes undefined behavior.
+
+       @param aSystemPtr a pointer to a System object
     */
 
-    void removeSystem( SystemPtr aSystem );
+    void removeSystem( SystemPtr aSystemPtr );
+
+    /**
+       Register a Process to this Stepper.
+
+       @param aProcessPtr a pointer to a Process object to register
+    */
+
+    void registerProcess( ProcessPtr aProcessPtr );
+
+    /**
+       Remove a Process from this Stepper.
+
+       @note This method is not currently supported.  Calling this method
+       causes undefined behavior.
+
+       @param aProcessPtr a pointer to a Process object
+    */
+
+    void removeProcess( ProcessPtr aProcessPtr );
 
     /**
        Get the current time of this Stepper.
@@ -173,19 +198,19 @@ namespace libecs
 
     virtual void setStepInterval( RealCref aStepInterval )
     {
-      loadStepInterval( aStepInterval );
-    }
-
-    void loadStepInterval( RealCref aStepInterval )
-    {
-      if( aStepInterval > getUserMaxInterval()
-	  || aStepInterval <= getUserMinInterval() )
+      if( aStepInterval > getMaxInterval()
+	  || aStepInterval < getMinInterval() )
 	{
 	  // should use other exception?
 	  THROW_EXCEPTION( RangeError, "Stepper StepInterval: out of range. ("
 			   + toString( aStepInterval ) + String( ")\n" ) );
 	}
 
+      loadStepInterval( aStepInterval );
+    }
+
+    void loadStepInterval( RealCref aStepInterval )
+    {
       theStepInterval = aStepInterval;
     }
 
@@ -273,11 +298,11 @@ namespace libecs
 
     const Real getMaxInterval() const;
 
-    void setStepIntervalConstraint( PolymorphCref aValue );
+    //    void setStepIntervalConstraint( PolymorphCref aValue );
 
-    void setStepIntervalConstraint( StepperPtr aStepperPtr, RealCref aFactor );
+    //    void setStepIntervalConstraint( StepperPtr aStepperPtr, RealCref aFactor );
 
-    const Polymorph getStepIntervalConstraint() const;
+    //    const Polymorph getStepIntervalConstraint() const;
 
 
     SystemVectorCref getSystemVector() const
@@ -328,6 +353,8 @@ namespace libecs
 
     void updateVariableVectors();
 
+    void updateLoggedPropertySlotVector();
+
     /**
 
 	Definition of the Stepper dependency:
@@ -376,7 +403,7 @@ namespace libecs
 
     PropertySlotVector  theLoggedPropertySlotVector;
 
-    StepIntervalConstraintMap theStepIntervalConstraintMap;
+    //    StepIntervalConstraintMap theStepIntervalConstraintMap;
 
     VariableVector        theReadVariableVector;
 
@@ -549,7 +576,7 @@ namespace libecs
       setNextStepInterval( aStepInterval );
     }
 
-    virtual void makeSlots();
+    void makeSlots();
 
     virtual void initialize();
 
@@ -595,6 +622,94 @@ namespace libecs
     Real theNextStepInterval;
 
     Real theMaxErrorRatio;
+  };
+
+
+  /**
+     DiscreteTimeStepper has a fixed step interval.
+     
+     This stepper ignores incoming interruptions, but dispatches 
+     interruptions always when it steps.
+
+     Process objects in this Stepper isn't allowed to use 
+     Variable::addVelocity() method, but Variable::setValue() method only.
+
+  */
+
+  class DiscreteTimeStepper
+    :
+    public Stepper
+  {
+
+  public:
+
+    DiscreteTimeStepper();
+    virtual ~DiscreteTimeStepper() {}
+
+
+    virtual void step();
+
+    virtual void interrupt( StepperPtr const aCaller )
+    {
+      ; // do nothing -- ignore interruption
+    }
+
+
+    static StepperPtr createInstance() { return new DiscreteTimeStepper; }
+
+    virtual StringLiteral getClassName() const 
+    { 
+      return "DiscreteTimeStepper";
+    }
+
+
+  };
+
+
+  /**
+     SlaveStepper steps only when triggered by incoming interruptions from
+     other Steppers.
+
+     This Stepper never dispatch interruptions to other Steppers.
+
+     The step interval of this Stepper is fixed to infinity -- which 
+     means that this doesn't step spontaneously.
+
+  */
+
+  class SlaveStepper
+    :
+    public DiscreteTimeStepper
+  {
+  public:
+
+    SlaveStepper();
+    ~SlaveStepper() {}
+    
+    virtual void interrupt( StepperPtr const )
+    {
+      step();
+    }
+
+    virtual void setStepInterval( RealCref aStepInterval )
+    {
+      // skip range check
+      loadStepInterval( aStepInterval );
+    }
+
+    virtual void dispatchInterruptions()
+    {
+      ; // do nothing
+    }
+
+    static StepperPtr createInstance() { return new SlaveStepper; }
+
+    virtual StringLiteral getClassName() const 
+    { 
+      return "SlaveStepper";
+    }
+
+
   };
 
 

@@ -52,6 +52,9 @@ namespace libecs
     NewStepperModule( Midpoint2Stepper );
     NewStepperModule( CashKarp4Stepper );
     NewStepperModule( DormandPrince547MStepper );
+
+    NewStepperModule( DiscreteTimeStepper );
+    NewStepperModule( SlaveStepper );
   }
 
 

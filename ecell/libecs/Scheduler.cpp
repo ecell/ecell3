@@ -53,7 +53,8 @@ namespace libecs
   {
     // need check if this is a slave stepper
 
-    Int anIndex( registerEvent( Event( getCurrentTime(), aStepper ) ) );
+    Int anIndex( registerEvent( Event( aStepper->getCurrentTime(),
+				       aStepper ) ) );
 
     aStepper->setSchedulerIndex( anIndex );
   }
@@ -77,20 +78,17 @@ namespace libecs
     setCurrentTime( aTopEvent.getTime() );
  
     aStepperPtr->integrate();
-
     aStepperPtr->setCurrentTime( getCurrentTime() );
-    //    aStepperPtr->proceedTime();
-
     aStepperPtr->step();
+    aStepperPtr->dispatchInterruptions();
+    aStepperPtr->log();
 
     const Real aStepInterval( aStepperPtr->getStepInterval() );
     const Real aScheduledTime( getCurrentTime() + aStepInterval );
 
     // schedule a new event
     theScheduleQueue.changeTopKey( Event( aScheduledTime, aStepperPtr ) );
- 
-    //    theCurrentTime = ( theScheduleQueue.top() ).getTime();
-  }
+   }
 
 
   void Scheduler::reschedule( StepperPtr const aStepperPtr )
