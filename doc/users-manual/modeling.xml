@@ -812,6 +812,17 @@ System CompartmentSystem( / )
          &VariableReference;, in turn, is usually a list of the
          following three or four elements:
 
+<programlisting>[ <replaceable>reference_name</replaceable> <replaceable>FullID</replaceable> <replaceable>coefficient</replaceable> <replaceable>accessor_flag</replaceable> ]</programlisting>
+         The last two fields can be omitted:         
+
+<programlisting>[ <replaceable>reference_name</replaceable> <replaceable>FullID</replaceable> <replaceable>coefficient</replaceable> ]</programlisting>
+
+         or,
+
+<programlisting>[ <replaceable>reference_name</replaceable> <replaceable>FullID</replaceable> ]</programlisting>
+
+         Each field has the following meanings.
+
 <orderedlist>
 	    <listitem>
 	      <para>A reference name</para>
@@ -864,6 +875,9 @@ System CompartmentSystem( / )
                as a stoichiometric constant.  If the coefficient is -1,
                the value of the &Variable; is decreased by 1 in a single
                occurence or the forward reaction.</para>
+
+	      <para>If omitted, <emphasis>this field defaults to
+	      zero</emphasis>.</para>
 	    </listitem>
 
 	    <listitem>
@@ -879,15 +893,57 @@ System CompartmentSystem( / )
                of this field.</para>
 
               <para><emphasis>The default of is 1 (true).</emphasis>
-               This field is often omitted.</para>
+               This field is often omitted.  Some &Process; objects
+               automatically sets this information.</para>
+
+	      <note>
+		<title>How isAccessor flag is used in the
+		simulation</title> <para>In multi-stepper simulations,
+		this information sometimes helps the system to run
+		efficiently.  If the system knows, for example, all
+		&Process; objects in a &Stepper; <literal>A</literal>
+		do not change any &Variable; connected to the other
+		&Stepper; <literal>B</literal>, it can give
+		<literal>B</literal> more chance to have larger stepsizes,
+		rather than always checking whether &Stepper;
+		<literal>A</literal> changes the &Variable;s. 
+                This flag is mainly used when there are more than one
+                &Stepper;s.</para>
+	      </note>
+
 	    </listitem>
 	  </orderedlist>
 
 	</para>
 
-         <para>In &EM; syntax, it looks
-         like this (the accessor flag is not used):
-<programlisting>[ Reference_name FullID coefficient ]</programlisting>
+	<para>
+	 Consider a reaction &Process; <literal>R</literal> in the
+	 root system, and we want to configure this &Process; to
+	 consumes a &Variable; <literal>S</literal> and produces a
+	 &Variable; <literal>P</literal>, taking <literal>E</literal>
+	 as the enzyme.  This class of &Process; requires to give the
+	 enzyme as a &VariableReference; of name
+	 <literal>ENZYME</literal>.  All the &Variable;s are in the
+	 same root system. In &EM; files,
+	 <property>VariableReferenceList</property> of thie &Process;
+	 may appear like this:
+
+<programlisting>
+System CompartmentSystem( / )
+{
+# ...
+
+    Process SomeReactionProcess( R )
+    {
+        # ...
+
+        VariableReferenceList [ S0     :.:S -1 ]
+                              [ P0     :.:P  1 ]
+                              [ ENZYME :.:E  0 ];
+
+    }
+}
+</programlisting>
 
 </para>
 
