@@ -593,7 +593,7 @@ class MainWindow(OsogoWindow):
 
 			if aFileType == 'Model':
 				self.theSession.loadModel( aFileName )
-				self.theSession.theSimulator.initialize()
+				# self.theSession.theSimulator.initialize()
 			elif aFileType == 'Script':
 
 				self.theSession.loadScript( aFileName )
