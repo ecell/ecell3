@@ -91,8 +91,7 @@ namespace libecs
   // string STL containers.
   DECLARE_LIST  ( String, StringList );
   DECLARE_VECTOR( String, StringVector );
-  DECLARE_MAP( const String, String, std::less<const String>,
-			   StringMap );
+  DECLARE_MAP( const String, String, std::less<const String>, StringMap );
   DECLARE_SHAREDPTR( StringList );
   DECLARE_SHAREDPTR( StringVector );
 

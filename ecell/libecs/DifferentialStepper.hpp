@@ -53,8 +53,8 @@ namespace libecs
 
   //  DECLARE_VECTOR( RealVector, RealMatrix );
   
-  typedef boost::multi_array<Real, 2> RealMatrix;
-  typedef boost::const_multi_array_ref<Real, 2> RealMatrixCref;
+  typedef boost::multi_array<Real, 2> RealMatrix_;
+  DECLARE_TYPE( RealMatrix_, RealMatrix );
 
 
   DECLARE_CLASS( DifferentialStepper );
@@ -147,54 +147,62 @@ namespace libecs
       virtual const Real getDifference( RealParam aTime, 
 					RealParam anInterval ) const
       {
-        Real aDifference( 0.0 );
-
         if ( !theStepper.theStateFlag )
           {
             return 0.0;
           }
 
-        const Real aStepIntervalInv( 1.0 / 
-				     theStepper.getTolerableStepInterval() );
-
         const Real aTimeInterval1( aTime - theStepper.getCurrentTime() );
         const Real aTimeInterval2( aTimeInterval1 - anInterval );
 
-        const Real theta1( aTimeInterval1 * aStepIntervalInv );
-        const Real theta2( aTimeInterval2 * aStepIntervalInv );
-
-        RealMatrixCref aTaylorSeries( theStepper.getTaylorSeries() );
-	const RealMatrix::size_type aTaylorSize( aTaylorSeries.size() );
-
-        Real aFactorialInv1( aTimeInterval1 );
-        Real aFactorialInv2( aTimeInterval2 );
-
+        const RealMatrixCref aTaylorSeries( theStepper.getTaylorSeries() );
 	RealCptr aTaylorCoefficientPtr( aTaylorSeries.origin() + theIndex );
-	const RealMatrix::size_type aStride( aTaylorSeries.strides()[0] );
 
-	{
-	  // aTaylorSeries[ 0 ][ theIndex ]
-	  const Real aTaylorCoefficient( *aTaylorCoefficientPtr );
-	  aDifference += aTaylorCoefficient * aFactorialInv1;
-	  aDifference -= aTaylorCoefficient * aFactorialInv2;
-	}
+	// calculate first order.
+	// here it assumes that always aTaylorSeries.size() >= 1
 
-	for ( RealMatrix::size_type s( 1 ); s < aTaylorSize; ++s )
-          {
-	    // aTaylorSeries[ s ][ theIndex ]
-	    aTaylorCoefficientPtr += aStride;
-	    const Real aTaylorCoefficient( *aTaylorCoefficientPtr );
+	// *aTaylorCoefficientPtr := aTaylorSeries[ 0 ][ theIndex ]
+	Real aValue1( *aTaylorCoefficientPtr * aTimeInterval1 );
+	Real aValue2( *aTaylorCoefficientPtr * aTimeInterval2 );
 
-            aFactorialInv1 *= theta1;
-            aFactorialInv2 *= theta2;
 
-	    aDifference += aTaylorCoefficient * aFactorialInv1;
-	    aDifference -= aTaylorCoefficient * aFactorialInv2;
+	// check if second and higher order calculations are necessary.
+	const RealMatrix::size_type aTaylorSize( aTaylorSeries.size() );
+	if( aTaylorSize >= 2)
+	  {
+	    const Real 
+	      aStepIntervalInv( 1.0 / theStepper.getTolerableStepInterval() );
+	    
+	    const RealMatrix::size_type aStride( aTaylorSeries.strides()[0] );
 
-	    // LIBECS_PREFETCH( aTaylorCoefficientPtr + aStride, 0, 1 );
-          }
+	    Real aFactorialInv1( aTimeInterval1 );
+	    Real aFactorialInv2( aTimeInterval2 );
 
-        return aDifference;
+	    RealMatrix::size_type s( aTaylorSize - 1 );
+
+	    const Real theta1( aTimeInterval1 * aStepIntervalInv );
+	    const Real theta2( aTimeInterval2 * aStepIntervalInv );
+
+	    do 
+	      {
+		// main calculation for the 2+ order
+		
+		// aTaylorSeries[ s ][ theIndex ]
+		aTaylorCoefficientPtr += aStride;
+		const Real aTaylorCoefficient( *aTaylorCoefficientPtr );
+		
+		aFactorialInv1 *= theta1;
+		aFactorialInv2 *= theta2;
+		
+		aValue1 += aTaylorCoefficient * aFactorialInv1;
+		aValue2 += aTaylorCoefficient * aFactorialInv2;
+		
+		// LIBECS_PREFETCH( aTaylorCoefficientPtr + aStride, 0, 1 );
+		--s;
+	      } while( s != 0 );
+	  }
+
+	return aValue1 - aValue2;
       }
       
     protected:
