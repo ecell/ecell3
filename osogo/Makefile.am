@@ -36,6 +36,7 @@ A-sample-rule.py\
 B-sample-rule.py\
 samplerule.py\
 sample-script.py\
+icon_board.xpm\
 icon_down.xpm\
 icon_ecelllogo.xpm\
 icon_entity.xpm\
