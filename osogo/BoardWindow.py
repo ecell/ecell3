@@ -98,17 +98,17 @@ class BoardWindow(OsogoWindow):
 
 	def displayScroll(self):
 		if self.theViewPort.get_child() == None:
-			board_table=self['board_table']
+			board_table=self['vbox3']
 			self['hbox6'].remove(board_table)
-			self.theViewPort.add(self['board_table'])
+			self.theViewPort.add(self['vbox3'])
 			self['hbox6'].add(self.theScrolledWindow)
 	
 	def deleteScroll(self):
 		if self.theViewPort.get_child() != None:
-			board_table=self['board_table']
+			board_table=self['vbox3']
 			self.theViewPort.remove(board_table)
 			self['hbox6'].remove(self.theScrolledWindow)
-			self['hbox6'].add(self['board_table'])
+			self['hbox6'].add(self['vbox3'])
 
 
 	# end of openWindow
@@ -277,20 +277,9 @@ class BoardWindow(OsogoWindow):
 			aRequisitionList[r * __matrixsize + c ] = anElement.size_request()
 
 		#shrink to fit
-		theTableHeight = 0
-		theTableWidth = 0
-		for r in range (0, __matrixsize):
-			for c in range (0, __matrixsize):
-				aRequisition = aRequisitionList[ r * __matrixsize + c ]
-				if aRequisition == None:
-					break
-				theColumnWidths[c] = max (theColumnWidths[c], aRequisition[0] )
-				theRowHeights[r] = max ( theRowHeights[r], aRequisition[1] )
-		for i in range(0, __matrixsize):
-			theTableHeight += theRowHeights[i]
-			theTableWidth += theColumnWidths[i]
-
-		self['board_table'].set_size_request( theTableWidth , theTableHeight )
+#		return False
+		theTableHeight = self['board_table'].size_request()[1]
+		theTableWidth = self['board_table'].size_request()[0]
 
 		#calculate window dimensions
 		__hboxrequisition = self['hbox1'].size_request()
@@ -311,7 +300,8 @@ class BoardWindow(OsogoWindow):
 			self.displayScroll()
 		else:
 			self.deleteScroll()
-		self['board_table'].set_size_request(theTableWidth, theTableHeight)
+
+#		self['board_table'].set_size_request(theTableWidth, theTableHeight)
 
 	def changeAlignment( self, *arg ):
 		# --------------------------------------------
