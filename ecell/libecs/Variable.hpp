@@ -72,6 +72,7 @@ namespace libecs
 				&Variable::loadValue,
 				&Variable::saveValue );
 
+
 	PROPERTYSLOT_SET_GET( Integer,  Fixed );
 
 	PROPERTYSLOT_GET_NO_LOAD_SAVE( Real, TotalVelocity );

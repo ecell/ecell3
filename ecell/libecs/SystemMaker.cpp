@@ -44,7 +44,7 @@ namespace libecs
   {
 
     //temporary workaround
-    addClass( new Module( "CompartmentSystem", System::createInstance ) );
+    addClass( new Module( "CompartmentSystem", System::createInstance, System::getClassInfoPtr ) );
 
     NewSystemModule( System );
     //    NewSystemModule( VirtualSystem );

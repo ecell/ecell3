@@ -130,7 +130,15 @@ public:\
  getPropertyAttributes( StringCref aPropertyName ) const\
  {\
   return thePropertyInterface.getPropertyAttributes( *this, aPropertyName );\
- } //
+ } \
+static const PolymorphMapCref getClassInfo( void )\
+{\
+  return thePropertyInterface.getInfoMap();\
+}\
+static const void* getClassInfoPtr()\
+{\
+return reinterpret_cast<const void*>(&thePropertyInterface.getInfoMap());\
+}//
 
 
   //
@@ -142,15 +150,47 @@ public:\
 
 #define NOMETHOD NULLPTR
 
+#define CLASSINFO_TRUE 1
+#define CLASSINFO_FALSE 0
+
+#define METHODFLAG( METHODPTR, NULLVALUE ) \
+ (  # METHODPTR  == # NULLVALUE ? CLASSINFO_TRUE : CLASSINFO_FALSE )
+
+
+  /**
+	 macro for setting class Info string
+	 Info is expected as PropertyName, Value both Strings
+	Property descriptor strings 
+  */
+
+#define CLASS_INFO( FIELDNAME, FIELDVALUE) \
+ PropertyInterface<TT>::setInfoField( String ( FIELDNAME ), String( FIELDVALUE ) );
+
+
+  /** 
+	  macro for setting Property class info
+	 PropertyName, Type, set_flag, get_flag, save_flag, load_flag
+  */
+#define CLASSPROPERTY_INFO( PROPERTYNAME, TYPE, SETMETHOD, GETMETHOD, SAVEMETHOD, LOADMETHOD ) \
+ PropertyInterface<TT>::setPropertyInfoField( String( PROPERTYNAME ), String( TYPE ), \
+											  METHODFLAG(SETMETHOD, NULLPTR ), METHODFLAG( GETMETHOD, NULLPTR ), \
+METHODFLAG( SAVEMETHOD, NULLPTR ), METHODFLAG( LOADMETHOD, NULLPTR ) )
+
+
+
+
 #define PROPERTYSLOT( TYPE, NAME, SETMETHOD, GETMETHOD )\
   PropertyInterface<TT>::registerPropertySlot( # NAME,\
-         new ConcretePropertySlot<TT,TYPE>( SETMETHOD, GETMETHOD ) );
+         new ConcretePropertySlot<TT,TYPE>( SETMETHOD, GETMETHOD ) );\
+CLASSPROPERTY_INFO( # NAME, # TYPE, SETMETHOD, GETMETHOD, NULLPTR, NULLPTR )
 
 #define PROPERTYSLOT_LOAD_SAVE( TYPE, NAME, SETMETHOD, GETMETHOD,\
 				LOADMETHOD, SAVEMETHOD )\
   PropertyInterface<TT>::registerPropertySlot( # NAME,\
          new LoadSaveConcretePropertySlot<TT,TYPE>( SETMETHOD, GETMETHOD,\
-						    LOADMETHOD, SAVEMETHOD ) )
+						    LOADMETHOD, SAVEMETHOD ) );\
+CLASSPROPERTY_INFO( # NAME, # TYPE, SETMETHOD, GETMETHOD, SAVEMETHOD, LOADMETHOD )
+
 
 #define PROPERTYSLOT_NO_LOAD_SAVE( TYPE, NAME, SETMETHOD, GETMETHOD )\
         PROPERTYSLOT_LOAD_SAVE( TYPE, NAME, SETMETHOD, GETMETHOD,\
@@ -189,8 +229,6 @@ public:\
 
   // Info
 
-#define CLASS_INFO( FIELD, INFO )\
-  PropertyInterface<TT>::setClassInfo( #FIELD, INFO )
 
   ///@internal
 #define LIBECS_DM_DEFINE_PROPERTIES()\

@@ -37,6 +37,7 @@
 #include "PropertySlot.hpp"
 #include "PropertySlotProxy.hpp"
 
+
 namespace libecs
 {
 
@@ -103,6 +104,9 @@ namespace libecs
     public PropertyInterfaceBase
   {
 
+  private:
+	static const char* PROPERTY_FIELD; 
+	static const char* PROPERTYLIST_FIELD;
   public:
 
     typedef PropertySlot<T> PropertySlot_;
@@ -113,6 +117,9 @@ namespace libecs
 
     PropertyInterface()
     {
+	  PROPERTY_FIELD = "Property__";
+	  PROPERTYLIST_FIELD = "PropertyList";
+	  theInfoMap[ String( PROPERTYLIST_FIELD )] = Polymorph( PolymorphVector() ) ;
       T::initializePropertyInterface( Type2Type<T>() );
     }
 
@@ -127,6 +134,67 @@ namespace libecs
 	}
       */
     }
+
+
+	/**
+	   get InfoMap 
+
+	*/
+	static PolymorphMapCref getInfoMap( void ) 
+	{
+	  return  theInfoMap;
+	}
+
+	/** 
+		set Info field
+		if info field key begins with "Property_" then append PropertyName to "PropertyList" infofield
+		
+	*/
+	static void setInfoField( StringCref aFieldName, PolymorphCref aValue )
+	{
+	  theInfoMap[ aFieldName ] = aValue;
+
+	}
+
+	/**
+	   set property info field ( type, setflag, getflag, saveflag, loadflag are the params
+
+	*/
+
+
+	static void setPropertyInfoField( StringCref aPropertyName, StringCref aTypeString,
+									  Integer setFlag, Integer getFlag, 
+									  Integer saveFlag, Integer loadFlag )
+	{
+	  String PROP_FIELD( PROPERTY_FIELD );
+	  String PROPLIST_FIELD ( PROPERTYLIST_FIELD );
+
+	  PolymorphVector aPropertyDescriptor;
+	  aPropertyDescriptor.push_back( aTypeString );
+	  aPropertyDescriptor.push_back( setFlag );
+	  aPropertyDescriptor.push_back( getFlag );
+	  aPropertyDescriptor.push_back( saveFlag );
+	  aPropertyDescriptor.push_back( loadFlag );
+	  String aPropertyNameField( aPropertyName );
+	  aPropertyNameField.insert( 0, PROP_FIELD );
+	  setInfoField( aPropertyNameField, aPropertyDescriptor );
+
+
+	  PolymorphVector aPolymorphVector( getInfoField(  PROPLIST_FIELD  ).asPolymorphVector());
+	  aPolymorphVector.push_back( aPropertyName );
+	  setInfoField( PROPLIST_FIELD, Polymorph( aPolymorphVector ) );
+		
+	}
+
+	/**
+	   get Field from info map
+	*/
+
+	static PolymorphCref getInfoField( StringCref aFieldName ) 
+	  {
+		return theInfoMap[ aFieldName ];
+	  }
+
 
     /**
        Get a PropertySlot by name.
@@ -425,7 +493,7 @@ namespace libecs
 
     static PropertySlotMap  thePropertySlotMap;
 
-    //    static StringMap        theClassInfoMap;
+    static PolymorphMap     theInfoMap;
 
   };
 
