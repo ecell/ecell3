@@ -15,16 +15,19 @@ import copy
 
 class EntryListWindow(Window):
 
-    def __init__( self, gladefile ):
+    def __init__( self, aMainWindow, aSimulator ):
 
-        self.theSimulator = MainWindow.simulator()
-        
-        Window.__init__( self, gladefile )
-        self.addHandlers( { } )
+        Window.__init__( self, 'EntryListWindow.glade' )
+        self.addHandlers( { 'show_button_clicked' : self.openNewPluginWindow
+                            } )
 
+        self.theSimulator = aSimulator
+        self.theMainWindow = aMainWindow
+        self.thePaletteWindow = aMainWindow.thePaletteWindow
         self.theSystemTree = self.getWidget( 'system_tree' )
         self.theEntryList = self.getWidget( 'entry_list' )
         self.theTypeOptionMenu = self.getWidget( 'type_optionmenu' )
+        self.theStatusBar = self.getWidget( 'statusbar' )
 
         self.theTypeMenu = self.theTypeOptionMenu.get_menu()
         aTypeMenuItemMap = self.theTypeMenu.children()
@@ -34,7 +37,7 @@ class EntryListWindow(Window):
 
         self.theSelectedEntityType = 'Substance'
         self.theSelectedSystemFullID = ''
-        self.theSelectedEntityID = []
+        self.theSelectedEntityList = []
 
         self.theSystemTree.show()
         self.theEntryList.show()
@@ -88,16 +91,46 @@ class EntryListWindow(Window):
         else:
             self.listEntity( aEntityType, aSystemFullID )
 
-    def listEntity( self, aEntityType, aSystemFullID ):
-        aListPN = aEntityType + 'List'
+    def listEntity( self, aEntityTypeString, aSystemFullID ):
+        aListPN = aEntityTypeString + 'List'
         aListFullPN = FullIDToFullPropertyName( aSystemFullID, aListPN ) 
         aEntityList = self.theSimulator.getProperty( aListFullPN )
         for aEntityID in aEntityList:
             aListItem = gtk.GtkListItem( aEntityID )
+
+            if aSystemFullID[SYSTEMPATH] == '/':
+                if aSystemFullID[ID] == '/':
+                    aSystemPath = '/'
+                else:
+                    aSystemPath = '/' + aSystemFullID[ID]
+            else:
+                aSystemPath = aSystemFullID[SYSTEMPATH] + '/' + aSystemFullID[ID]
+
+            aListItem.connect( 'select', self.selectEntity, aEntityTypeString,
+                               aSystemPath, aEntityID )
             self.theEntryList.add( aListItem )
             aListItem.show()
 
+    def selectEntity( self, a, aEntityTypeString, aSystemPath, aID ):
+        if aEntityTypeString == 'Substance':
+            aEntityType = SUBSTANCE
+        elif aEntityTypeString == 'Reactor':
+            aEntityType = REACTOR
 
+        self.theSelectedEntityList = (( aEntityType, aSystemPath, aID, 'Quantity' ), )
+        
+    def openNewPluginWindow( self, button_obj ) :
+        
+        aPluginList = self.thePaletteWindow.get_data( 'plugin_list' )
+        for plugin_name in aPluginList :
+            aButton = self.thePaletteWindow.get_data( plugin_name )
+            if aButton.get_active() :
+                aPluginName = plugin_name
+
+        print self.theSelectedEntityList
+        self.theMainWindow.thePluginManager.createInstance( aPluginName,
+                   self.theSimulator, self.theSelectedEntityList )
+                                                            
 
 def mainQuit( obj, data ):
     gtk.mainquit()
