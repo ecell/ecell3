@@ -15,6 +15,6 @@ dnl
 dnl
 dnl Create the top-level Makefile.
 dnl
-AC_OUTPUT(Makefile include/Makefile dmtool dmgen)
+AC_OUTPUT(Makefile include/Makefile dmtool)
 
 
