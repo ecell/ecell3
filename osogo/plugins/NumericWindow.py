@@ -50,13 +50,13 @@ class NumericWindow( PluginWindow ):
 
     def increaseValue( self, value ):
 
-        self.theCurValue = self.theCurValue * 2.0
+        self.theCurValue *= 2.0
         self["value_frame"].set_text(str(self.theCurValue))
         self.changeValue()
 
     def decreaseValue( self, obj ):
 
-        self.theCurValue = self.theCurValue * 0.5
+        self.theCurValue *= 0.5
         self["value_frame"].set_text(str(self.theCurValue))
         self.changeValue()
 
