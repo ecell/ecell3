@@ -54,7 +54,7 @@ case $CC in
 *xlc | *xlc\ * | *lcc | *lcc\ *) am_opt=--include-deps;;
 esac
 
-for dir in . 
+for dir in . ecell
 do 
   echo processing $dir
   (cd $dir; \
