@@ -59,10 +59,9 @@ void StlDataPointVector<T,V,Containee,Container>::push(const Containee& x)
 template <class T, class V, class Containee, class Container>
 StlDataPointVector<T,V,Containee,Container>::const_iterator StlDataPointVector<T,V,Containee,Container>::binary_search(const_iterator first, const_iterator last, const T& val) const
 {
-  V v = V();
-  DataPoint<T,V>* dp = new DataPoint<T,V>(val,v);
-  const_iterator itr = lower_bound(first,last,dp);
-  delete dp;
+  V v;
+  DataPoint<T,V> dp(val,v);
+  const_iterator itr = lower_bound(first,last,&dp);
   return itr;
 
 }
