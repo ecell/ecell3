@@ -72,9 +72,6 @@ namespace libecs
 				&Variable::loadValue,
 				&Variable::saveValue );
 
-	//	PROPERTYSLOT_SET_GET( Real, MinLimit );
-	//	PROPERTYSLOT_SET_GET( Real, MaxLimit );
-
 	PROPERTYSLOT_SET_GET( Integer,  Fixed );
 
 	PROPERTYSLOT_GET_NO_LOAD_SAVE( Real, TotalVelocity );
@@ -87,14 +84,9 @@ namespace libecs
 				   &Variable::setMolarConc,
 				   &Variable::getMolarConc );
 
-	//				&Variable::setMolarConc,
-	// NOMETHOD );
-
 	PROPERTYSLOT_NO_LOAD_SAVE( Real, NumberConc,
 				   &Variable::setNumberConc,
 				   &Variable::getNumberConc );
-	//				&Variable::setNumberConc,
-	// NOMETHOD );
       }
 
     class IsIntegrationNeeded
@@ -145,87 +137,40 @@ namespace libecs
 
     virtual void integrate( RealParam aTime )
     {
-      if( isFixed() == false ) {
-	updateValue( aTime );
-      }
-      else {
-	theLastTime = aTime;
-      }
+      if( isFixed() == false ) 
+	{
+	  updateValue( aTime );
+	}
+      else 
+	{
+	  theLastTime = aTime;
+	}
     }
 
-    const Real calculateVelocitySum( RealParam aCurrentTime, 
-				     RealParam anInterval ) const
-    {
-      Real aVelocitySum( 0.0 );
-      FOR_ALL( VariableProxyVector, theVariableProxyVector )
-	{
-	  VariableProxyPtr const anVariableProxyPtr( *i );
-	  aVelocitySum += anVariableProxyPtr->getDifference( aCurrentTime,
-							     anInterval );
-	}
-
-      return aVelocitySum;
-    }
-
-
-    void updateValue( RealParam aCurrentTime )
-    {
-      const Real anInterval( aCurrentTime - theLastTime );
-
-      if( anInterval == 0.0 )
-	{
-	  return;
-	}
-
-      const Real aVelocitySum( calculateVelocitySum( aCurrentTime,
-						     anInterval ) );
-
-      // Give it in per second.
-      theTotalVelocity = aVelocitySum / anInterval;
-      
-      loadValue( getValue() + aVelocitySum );
-
-      theLastTime = aCurrentTime;
-    }
-
-    const Real calculateTempVelocitySum( RealParam aCurrentTime )
-    {
-      const Real anInterval( aCurrentTime - theLastTime );
-
-      if ( anInterval <= 0.0 )
-	{
-	  return 0.0;
-	}
-
-      Real aVelocitySum( 0.0 );
-      FOR_ALL( VariableProxyVector, theVariableProxyVector )
-	{
-	  VariableProxyPtr const anVariableProxyPtr( *i );
-	  aVelocitySum += anVariableProxyPtr->getDifference( aCurrentTime,
-							     anInterval );
-	}
-
-      return aVelocitySum;
-    }
 
     /**
-       Check if the current total velocity doesn't exceed value range of 
-       this object.
 
+    This method is used internally by DifferentialStepper.
 
-       @return true -> if estimated value at the next step is
-       within the value range, false -> otherwise
-
-       @note Variable class itself doesn't have the value range, thus
-       this check always succeed.  Each subclass of Variable should override
-       this method if it has the range.
+    @internal
     */
 
-    virtual const bool checkRange( RealParam aStepInterval ) const
-    {
-      // this class has no range limit, thus this check always succeeds
-      return true;
-    }
+    void interIntegrate( RealParam aCurrentTime, RealParam aBaseValue )
+      {
+	const Real anInterval( aCurrentTime - theLastTime );
+	
+	if ( anInterval > 0.0 )
+	  {
+	    Real aVelocitySum( calculateVelocitySum( aCurrentTime,
+						     anInterval ) );
+	    loadValue( aBaseValue + aVelocitySum );
+	  }
+	else
+	  {
+	    loadValue( aBaseValue );
+	  }
+      }
+
 
     /**
        This simply sets the value of this Variable if getFixed() is false.
@@ -235,9 +180,10 @@ namespace libecs
 
     virtual SET_METHOD( Real, Value )
     { 
-      if ( !isFixed() ) {
-	loadValue( value ); 
-      }
+      if ( !isFixed() ) 
+	{
+	  loadValue( value ); 
+	}
     }
 
 
@@ -264,18 +210,10 @@ namespace libecs
       return theValue;
     }
 
-    SET_METHOD( Real, theVelocity )
+    SET_METHOD( Real, Velocity )
     {
       theVelocity = value;
     }
-
-
-    // provide interface for value passing. (mainly for STL)
-    void setVelocity( RealParam value )
-    {
-      theVelocity = value;
-    }
-
 
     /**
        @return current velocity value in (number of molecules)/(step)
@@ -396,8 +334,44 @@ namespace libecs
 
   protected:
 
-    void clearVariableProxyVector();
+    const Real calculateVelocitySum( RealParam aCurrentTime, 
+				     RealParam anInterval ) const
+    {
+      Real aVelocitySum( 0.0 );
+      FOR_ALL( VariableProxyVector, theVariableProxyVector )
+	{
+	  VariableProxyPtr const anVariableProxyPtr( *i );
+	  aVelocitySum += anVariableProxyPtr->getDifference( aCurrentTime,
+							     anInterval );
+	}
 
+      return aVelocitySum;
+    }
+
+
+    void updateValue( RealParam aCurrentTime )
+    {
+      const Real anInterval( aCurrentTime - theLastTime );
+
+      if( anInterval == 0.0 )
+	{
+	  return;
+	}
+
+      const Real aVelocitySum( calculateVelocitySum( aCurrentTime,
+						     anInterval ) );
+
+      // Give it in per second.
+      theTotalVelocity = aVelocitySum / anInterval;
+      
+      loadValue( getValue() + aVelocitySum );
+
+      theLastTime = aCurrentTime;
+    }
+
+
+
+    void clearVariableProxyVector();
 
   private:
 
@@ -416,65 +390,9 @@ namespace libecs
 
     Real theLastTime;
 
-    //    Real theMinLimit;
-    //    Real theMaxLimit;
-
     VariableProxyVector theVariableProxyVector;
 
     bool theFixed;
-  };
-
-
-
-  LIBECS_DM_CLASS( PositiveVariable, Variable )
-  {
-
-  public:
-
-    LIBECS_DM_OBJECT( PositiveVariable, Variable )
-      {
-	INHERIT_PROPERTIES( Variable );
-      }
-
-
-    PositiveVariable()
-    {
-      // do nothing
-    }
-
-    virtual ~PositiveVariable()
-    {
-      // do nothing
-    }
-
-    virtual SET_METHOD( Real, Value );
-
-
-    /** 
-	Integrate.
-
-	In this class, the range (non-negative) is checked.
-    */
-
-    virtual void integrate( RealParam aTime );
-
-    virtual const bool checkRange( RealParam anInterval ) const
-    {
-      const Real aPutativeValue( getValue() + 
-				 calculateVelocitySum( theLastTime 
-						       + anInterval,
-						       anInterval ) );
-
-      if( aPutativeValue >= 0.0 )
-	{
-	  return true;
-	}
-      else
-	{
-	  return false;
-	}
-    }
-
   };
 
 

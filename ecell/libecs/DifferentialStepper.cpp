@@ -99,31 +99,14 @@ namespace libecs
     Real const aCurrentTime( getCurrentTime() );
 
     for( VariableVector::size_type c( theReadWriteVariableOffset );
-	  c != theReadOnlyVariableOffset; ++c )
-      {
-	VariablePtr const aVariable( theVariableVector[ c ] );
-
-	const Real aDifference
-	  ( aVariable->calculateTempVelocitySum( aCurrentTime ) );
-
-	aVariable->loadValue( aVariable->getValue() + aDifference );
-
-	//	std::cout << aValue << ":" << aDifference << std::endl;
-      }
-
-    for ( VariableVector::size_type c( theReadOnlyVariableOffset );
 	  c != theVariableVector.size(); ++c )
       {
 	VariablePtr const aVariable( theVariableVector[ c ] );
 
-	const Real aDifference
-	  ( aVariable->calculateTempVelocitySum( aCurrentTime ) );
-
-	aVariable->loadValue( theValueBuffer[ c ] + aDifference );
-
-	//	std::cout << theValueBuffer[ c ]
-	//		  << ":" << aDifference << std::endl;
+	aVariable->interIntegrate( aCurrentTime, theValueBuffer [ c ] );
+	//	std::cout << aValue << ":" << aDifference << std::endl;
       }
+
   }
 
   void DifferentialStepper::interrupt( StepperPtr const aCaller )

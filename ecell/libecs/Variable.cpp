@@ -41,7 +41,6 @@ namespace libecs
 {
 
   LIBECS_DM_INIT_STATIC( Variable, Variable );
-  LIBECS_DM_INIT_STATIC( PositiveVariable, Variable );
 
 
   Variable::Variable()
@@ -91,48 +90,6 @@ namespace libecs
   //					       anVariableProxyPtr ) );
   //  }
 
-
-  ///////////////////////// PositiveVariable
-
-  SET_METHOD_DEF( Real, Value, PositiveVariable )
-  {
-    if( value >= 0 )
-      {
-	Variable::setValue( value );
-      }
-    else
-      {
-	THROW_EXCEPTION( RangeError, "PositiveVariable [" + 
-			 getFullID().getString() + 
-			 "]: attempt to set a negative value." );
-      }
-  }
-
-
-  void PositiveVariable::integrate( RealParam aTime )
-  {
-    Variable::integrate( aTime );
-
-    //    
-    // Check if the value is in positive range.
-    // | value | < epsilon is rounded to zero.
-    //
-    const Real anEpsilon( std::numeric_limits<Real>::epsilon() );
-    const Real aValue( getValue() );
-    if( aValue < anEpsilon )
-      {
-	if( aValue > - anEpsilon )
-	  {
-	    loadValue( 0.0 );
-	  }
-	else
-	  {
-	    THROW_EXCEPTION( RangeError, "PositiveVariable [" + 
-			     getFullID().getString() + 
-			     "]: negative value occured in integrate()." );
-	  }
-      }
-  }
 
 
 } // namespace libecs

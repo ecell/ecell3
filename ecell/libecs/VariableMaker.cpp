@@ -37,7 +37,6 @@ namespace libecs
   void VariableMaker::makeClassList()
   {
     NewVariableModule( Variable );
-    NewVariableModule( PositiveVariable );
   }
 
 } // namespace libecs
