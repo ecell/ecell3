@@ -370,21 +370,44 @@ class Eml:
 
         aStepperPropertyList = []
 
-        aStepperList = []
-        aStepperlistElement = self.__theDocument.getElementsByTagName( 'stepperlist' )[0]
-        for aStepper in aStepperlistElement.childNodes:
-            if aStepper.tagName == 'stepper':
-                aStepperId    = str( aStepper.getAttribute( 'id' ) )
-                aStepperList.append( aStepperId )
+
+        #aStepperList = []
+        #aStepperlistElement = self.__theDocument.getElementsByTagName( 'stepperlist' )[0]
+        #for aStepper in aStepperlistElement.childNodes:
+        #    if aStepper.tagName == 'stepper':
+        #        aStepperId    = str( aStepper.getAttribute( 'id' ) )
+        #        aStepperList.append( aStepperId )
+
 
         for aSystemElement in self.__theDocument.getElementsByTagName( 'system' ):
             aStepperProperty = {}
-            aStepperProperty[ 'FullPn' ] = 'System:' + self.asPathToSystem( aSystemElement.getAttribute( 'id' ) ) + ':StepperID'
-            aStepperProperty[ 'StepperList' ] = aStepperList
+            aStepperProperty[ 'FullPn' ] = str( 'System:' + self.asPathToSystem( aSystemElement.getAttribute( 'id' ) ) + ':StepperID' )
 
+
+            ## Initialization
+            aStepperId = ''
+            aStepperProperty[ 'StepperId' ] = ''
+            
+            for aChildElementOfSystemElement in aSystemElement.childNodes:
+
+                if aChildElementOfSystemElement.tagName == 'property' and \
+                   aChildElementOfSystemElement.getAttribute( 'name' ) == 'StepperID':
+
+                    aStepperIdPropertyElement =  aChildElementOfSystemElement
+
+                    for aChildElementOfStepperIdProperty in aStepperIdPropertyElement.childNodes:
+                        if aChildElementOfStepperIdProperty.tagName == 'value':
+                            aStepperId = aChildElementOfStepperIdProperty.firstChild.toxml()
+
+            aStepperProperty[ 'StepperId' ] = [ aStepperId ]            
             aStepperPropertyList.append( aStepperProperty )
 
         return aStepperPropertyList
+
+
+
+
+
 
         
     # Method for Method
