@@ -117,9 +117,9 @@ class PropertyWindow(OsogoPluginWindow):
         self.theNoteBook = self['notebookProperty']
         self.theVarrefEditor = None
 
-        self['entrySystemSubsystems'].set_property( 'xalign', 0.5 )
-        self['entrySystemProcesses'].set_property( 'xalign', 0.5 )
-        self['entrySystemVariables'].set_property( 'xalign', 0.5 )
+        self['entrySystemSubsystems'].set_property( 'xalign', 1 )
+        self['entrySystemProcesses'].set_property( 'xalign', 1 )
+        self['entrySystemVariables'].set_property( 'xalign', 1 )
 
         self['entryProcessVarRefTotal'].set_property( 'xalign', 1 )
         self['entryProcessVarRefPositive'].set_property( 'xalign', 1 )
