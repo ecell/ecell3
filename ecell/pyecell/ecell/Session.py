@@ -172,8 +172,8 @@ class Session:
         return self.theSimulator.getLoggerList()
         
     def createLogger( self, fullpn ):
-        message( 'createLogger method will be deprecated. Use LoggerStub.' )
-        aStub = createLoggerStub( fullpn )
+        self.message( 'createLogger method will be deprecated. Use LoggerStub.' )
+        aStub = self.createLoggerStub( fullpn )
         aStub.create()
 
     def createLoggerStub( self, fullpn ):
