@@ -1,0 +1,138 @@
+#!/usr/bin/python2
+
+import string
+import ecs
+
+import gtk
+import gnome.ui
+import GDK
+import libglade
+
+# from "test.py"
+
+def printProperty( sim, fqpi, propertyname ):
+    value = sim.getProperty( fqpi, propertyname )
+    print fqpi, '::', propertyname, '\t=\t', value
+
+def printAllProperties( sim, fqpi ):
+    properties = sim.getProperty( fqpi, 'PropertyList' )
+    for property in properties:
+        printProperty( sim, fqpi, property )
+
+def printList( sim, primitivetype, systempath,list ):
+    for i in list:
+        printAllProperties( sim, primitivetype + ':' + systempath + ':' + i )
+
+
+
+print 'create Simulator instance.'
+s = ecs.Simulator()
+
+print 'make substances...'
+s.createEntity('Substance','Substance:/:A','substance A')
+s.createEntity('Substance','Substance:/:B','substance B')
+s.createEntity('Substance','Substance:/:C','substance C')
+
+print 'make reactors...'
+#s.createEntity('ConstantActivityReactor','Reactor:/:RC1','constant reactor')
+
+print 'set Substance:/:A Quantity = 30'
+s.setProperty( 'Substance:/:A', 'Quantity', (30,) )
+
+print 'initialize()...'
+s.initialize()
+
+substancelist = s.getProperty( 'System:/:/', 'SubstanceList' )
+
+printList( s, 'Substance', '/' , substancelist )
+
+print
+
+printProperty( s, 'Substance:/:A', 'Quantity' )
+print 'changing Quantity of Substance:/:A...'
+s.setProperty( 'Substance:/:A', 'Quantity', (1,) )
+printProperty( s, 'Substance:/:A', 'Quantity' )
+
+print
+#printAllProperties( s, 'Reactor:/:RC1' )
+#print
+print 'step()...'
+printProperty( s, 'System:/:/', 'CurrentTime' )
+s.step()
+
+printProperty( s, 'System:/:/', 'CurrentTime' )
+s.step()
+
+printProperty( s, 'System:/:/', 'CurrentTime' )
+s.step()
+
+printProperty( s, 'System:/:/', 'CurrentTime' )
+s.step()
+
+
+class Window:
+
+    def __init__( self, gladefile=None, root=None ):
+        self.widgets = libglade.GladeXML( filename=gladefile, root=root )
+
+    def addHandlers( self, handlers ):
+        self.widgets.signal_autoconnect( handlers )
+        
+    def addHandler( self, name, handler, *args ):
+        self.widgets.signal_connect( name, handler, args )
+
+    def getWidget( self, key ):
+        return self.widgets.get_widget( key )
+
+    def __getitem__( self, key ):
+        return self.widgets.get_widget( key )
+
+
+class SubstanceWindow(Window):
+
+    def __init__( self, gladefile ):
+
+        self.theHandlerMap = { 'fixbutton_toggled' : self.fixbutton_toggled,
+                               'quantity_changed': self.quantity_changed
+                               }
+        
+        Window.__init__( self, gladefile )
+        self.addHandlers( self.theHandlerMap )
+        self.fixed = 0
+
+    def fixbutton_toggled( self,obj, ):
+        if self.fixed :
+            self.fixed = 0
+            print 'unfixed : ' + str(self.fixed)
+
+        else :
+            self.fixed = 1
+            print 'fixed : ' + str(self.fixed)
+            
+    def quantity_changed( self,obj ):
+        aNumberString = obj.get_text()
+        aNumber = string.atof( aNumberString )
+
+        obj.set_value( aNumber )
+        s.setProperty( 'Substance:/:A', 'Quantity', (aNumber,) )
+        printProperty( s, 'Substance:/:A', 'Quantity' )
+
+    def setLabel(self,name,text):
+        obj = self.getWidget(name)
+        obj.set_label(text)
+
+def mainQuit( obj, data ):
+    print obj,data
+    gtk.mainquit()
+
+def mainLoop():
+    # FIXME: should be a custom function
+    gtk.mainloop()
+
+def main():
+    aWindow = SubstanceWindow( 'substance_window.glade' )
+    aWindow.addHandler( 'gtk_main_quit', mainQuit )
+    mainLoop()
+
+if __name__ == "__main__":
+    main()
