@@ -257,6 +257,8 @@ namespace libecs
 
     FOR_ALL_SECOND( StepperMap, theStepperMap, initialize );
 
+    FOR_ALL_SECOND( StepperMap, theStepperMap, updateDependentStepperVector );
+
   }
 
 

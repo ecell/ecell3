@@ -260,15 +260,32 @@ namespace libecs
 
     const Polymorph getStepIntervalConstraint() const;
 
-    bool operator<( StepperCref rhs )
-    {
-      return getCurrentTime() < rhs.getCurrentTime();
-    }
 
     SystemVectorCref getSystemVector() const
     {
       return theSystemVector;
     }
+
+    ProcessVectorCref getProcessVector() const
+    {
+      return theProcessVector;
+    }
+
+    VariableVectorCref getWriteVariableVector() const
+    {
+      return theWriteVariableVector;
+    }
+
+    VariableVectorCref getReadVariableVector() const
+    {
+      return theReadVariableVector;
+    }
+
+    StepperVectorCref getDependentStepperVector() const
+    {
+      return theDependentStepperVector;
+    }
+
 
     const UnsignedInt findInWriteVariableVector( VariablePtr aVariable );
 
@@ -277,13 +294,52 @@ namespace libecs
       return &theVelocityBuffer[ anIndex ];
     }
 
-    const Polymorph getWriteVariableList() const;
-    const Polymorph getReadVariableList() const;
-    const Polymorph getProcessList() const;
+
+    /**
+       Update theProcessVector and theFirstNormalProcess iterator.
+
+    */
+
+    void updateProcessVector();
+
+
+    /**
+       Update theReadVariableVector and theWriteVariableVector.
+
+    */
+
+    void updateVariableVectors();
+
+    /**
+
+	Definition of the Stepper dependency:
+	Stepper A depends on Stepper B 
+	if:
+	- A and B share at least one Variable, AND
+	- A reads AND B writes (changes) the Variable.
+
+	See VariableReference class about the definitions of
+	Variable 'read' and 'write'.
+
+
+	@see Process, VariableReference
+    */
+
+    void updateDependentStepperVector();
+
+
+    const Polymorph getWriteVariableList()    const;
+    const Polymorph getReadVariableList()     const;
+    const Polymorph getProcessList()          const;
+    const Polymorph getSystemList()           const;
+    const Polymorph getDependentStepperList() const;
+
+    bool operator<( StepperCref rhs )
+    {
+      return getCurrentTime() < rhs.getCurrentTime();
+    }
 
     virtual StringLiteral getClassName() const  { return "Stepper"; }
-
-    const Polymorph getSystemList() const;
 
   protected:
 
@@ -297,8 +353,9 @@ namespace libecs
     VariableVector        theWriteVariableVector;
 
     ProcessVector         theProcessVector;
-
     ProcessVectorIterator theFirstNormalProcess;
+
+    StepperVector         theDependentStepperVector;
 
     RealVector theValueBuffer;
     RealVector theVelocityBuffer;

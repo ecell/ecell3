@@ -124,6 +124,12 @@ namespace libecs
 				      NULLPTR,
 				      &Stepper::getProcessList ) );
 
+    registerSlot( getPropertySlotMaker()->
+		  createPropertySlot( "DependentStepperList", *this,
+				      Type2Type<Polymorph>(),
+				      NULLPTR,
+				      &Stepper::getDependentStepperList ) );
+
   }
 
   Stepper::Stepper() 
@@ -148,6 +154,27 @@ namespace libecs
     //
     // update theProcessVector
     //
+    updateProcessVector();
+
+
+    //
+    // Update theWriteVariableVector and theReadVariableVector
+    //
+    updateVariableVectors();
+
+
+    //    clearEntityListChanged();
+    //      }
+
+    Int aSize( theWriteVariableVector.size() );
+
+    theValueBuffer.resize( aSize );
+    theVelocityBuffer.resize( aSize );
+  }
+
+ 
+  void Stepper::updateProcessVector()
+  {
     theProcessVector.clear();
     for( SystemVectorConstIterator i( theSystemVector.begin() );
 	 i != theSystemVector.end() ; ++i )
@@ -172,13 +199,12 @@ namespace libecs
 
     // find boundary of negative and zero priority processes
     theFirstNormalProcess = 
-      std::lower_bound( theProcessVector.begin(), theProcessVector.end(),	0,
+      std::lower_bound( theProcessVector.begin(), theProcessVector.end(), 0,
 			Process::PriorityCompare() );
+  }
 
-    //
-    // Update theWriteVariableVector
-    //
-
+  void Stepper::updateVariableVectors()
+  {
     // (1) for each Variable which is included in the VariableReferenceVector
     //     of the Processes of this Stepper,
     // (2) if the Variable is mutable, 
@@ -186,6 +212,8 @@ namespace libecs
     //       and register this Stepper to the StepperList of the Variable.
     // (3) if the Variable is accessible,
     //           puto it into theReadVariableVector
+    // (4) sort theReadVariableVector and theWriteVariableVector by 
+    //     memory address.
     theWriteVariableVector.clear();
     theReadVariableVector.clear();
     // for all the processs
@@ -235,13 +263,49 @@ namespace libecs
 	  }
       }
 
-    //    clearEntityListChanged();
-    //      }
+    std::sort( theReadVariableVector.begin(), theReadVariableVector.end() );
+    std::sort( theWriteVariableVector.begin(), theWriteVariableVector.end() );
 
-    Int aSize( theWriteVariableVector.size() );
+  }
 
-    theValueBuffer.resize( aSize );
-    theVelocityBuffer.resize( aSize );
+  void Stepper::updateDependentStepperVector()
+  {
+    theDependentStepperVector.clear();
+
+    StepperMapCref aStepperMap( getModel()->getStepperMap() );
+
+    for( StepperMapConstIterator i( aStepperMap.begin() );
+	 i != aStepperMap.end(); ++i )
+      {
+	StepperPtr aStepperPtr( i->second );
+
+	if( aStepperPtr == this )
+	  {
+	    continue;
+	  }
+
+	VariableVectorCref aTargetVector( aStepperPtr->
+					  getReadVariableVector() );
+
+	// This search assumes both vectors are sorted by pointer addresses.
+	//
+	// For efficiency, binary_search should be done for possibly longer
+	// vector, and linear iteration for possibly shorter vector.
+	//
+	for( VariableVectorConstIterator j( theWriteVariableVector.begin() );
+	     j != theWriteVariableVector.end(); ++j )
+	  {
+	    VariablePtr aVariablePtr( *j );
+
+	    if( std::binary_search( aTargetVector.begin(), aTargetVector.end(),
+				    aVariablePtr ) )
+	      {
+		theDependentStepperVector.push_back( aStepperPtr );
+		break;
+	      }
+	  }
+      }
+
   }
 
   const Polymorph Stepper::getSystemList() const
@@ -261,6 +325,23 @@ namespace libecs
 
     return aVector;
   }
+
+  const Polymorph Stepper::getDependentStepperList() const
+  {
+    PolymorphVector aVector;
+    aVector.reserve( theDependentStepperVector.size() );
+
+    for( StepperVectorConstIterator i( getDependentStepperVector().begin() );
+	 i != getDependentStepperVector().end() ; ++i )
+      {
+	StepperCptr aStepperPtr( *i );
+
+	aVector.push_back( aStepperPtr->getID() );
+      }
+
+    return aVector;
+  }
+
 
   void Stepper::registerSystem( SystemPtr aSystem )
   { 
