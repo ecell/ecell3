@@ -75,6 +75,9 @@ namespace libecs
 				 getFullID().getString() );
 	// Coefficient
 	anInnerVector.push_back( aVariableReference.getCoefficient() );
+	// isAccessor
+	anInnerVector.
+	  push_back( static_cast<Int>( aVariableReference.isAccessor() ) );
 
 	aVector.push_back( anInnerVector );
       }

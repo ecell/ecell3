@@ -4,7 +4,7 @@ SHELL = @SHELL@
 
 ECELL3_DMC = ../../bin/ecell3-dmc
 DM_SO_DIR = ${prefix}/lib/${PACKAGE}/${VERSION}
-DM_DIR =  ${prefix}/share/${PACKAGE}/${VERSION}/DM
+DM_SRC_DIR =  ${prefix}/share/${PACKAGE}/${VERSION}/DM
 
 DMS = MassActionProcess.cpp\
 MichaelisUniUniProcess.cpp\
@@ -19,7 +19,7 @@ CashKarp45Stepper.cpp\
 DormandPrince547MStepper.cpp
 
 EXTRA_DIST = ${DMS}
-dmdir = ${DM_DIR}
+dmdir = ${DM_SRC_DIR}
 dm_DATA = ${DMS}
 
 SOS = ${DMS:.cpp=.so}

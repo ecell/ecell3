@@ -154,6 +154,14 @@ namespace libecs
 
   DECLARE_TYPE( double, Real );
 
+#if defined( HAVE_LONG_DOUBLE )
+  DECLARE_TYPE( long double, HighReal );
+#else
+  DECLARE_TYPE( double, HighReal );
+#endif /* defined( HAVE_LONG_DOUBLE ) */
+    
+  DECLARE_TYPE( HighReal, Time );
+    
 
   //! Avogadro number. 
   const Real N_A( 6.0221367e+23 );

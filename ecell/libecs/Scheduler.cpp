@@ -67,7 +67,7 @@ namespace libecs
   void Scheduler::step()
   {
     EventCref aTopEvent( theScheduleQueue.top() );
-    const Real aCurrentTime( aTopEvent.getTime() );
+    const Time aCurrentTime( aTopEvent.getTime() );
     const StepperPtr aStepperPtr( aTopEvent.getStepper() );
 
     setCurrentTime( aCurrentTime );
@@ -78,9 +78,9 @@ namespace libecs
 
     aStepperPtr->dispatchInterruptions();
 
-    const Real aStepInterval( aStepperPtr->getStepInterval() );
-    const Real aScheduledTime( aCurrentTime + aStepInterval );
-
+    // Use higher precision for this procedure:
+    const Time aStepInterval( aStepperPtr->getStepInterval() );
+    const Time aScheduledTime( aCurrentTime + aStepInterval );
 
     // If the stepinterval is too small to proceed time,
     // throw an exception.   
@@ -102,8 +102,10 @@ namespace libecs
 
   void Scheduler::reschedule( StepperPtr const aStepperPtr )
   {
-    const Real aScheduledTime( aStepperPtr->getCurrentTime() + 
-			       aStepperPtr->getStepInterval() );
+    // Use higher precision for this addition.
+    const Time 
+      aScheduledTime( static_cast<Time>( aStepperPtr->getCurrentTime() ) + 
+		      static_cast<Time>( aStepperPtr->getStepInterval() ) );
 
     //    DEBUG_EXCEPTION( aScheduledTime >= getCurrentTime(),
     //		     SimulationError,

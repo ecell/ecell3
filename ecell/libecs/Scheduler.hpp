@@ -56,7 +56,7 @@ namespace libecs
 
   public:
 
-    Event( RealCref aTime, StepperPtr aStepperPtr )
+    Event( TimeCref aTime, StepperPtr aStepperPtr )
       :
       theTime( aTime ),
       theStepperPtr( aStepperPtr )
@@ -64,7 +64,7 @@ namespace libecs
       ; // do nothing
     }
 
-    const Real getTime() const
+    const Time getTime() const
     {
       return theTime;
     }
@@ -94,7 +94,7 @@ namespace libecs
 
   private:
 
-    Real       theTime;
+    Time       theTime;
     StepperPtr theStepperPtr;
 
   };
@@ -163,12 +163,12 @@ namespace libecs
        @return the current time of this scheduler.
     */
 
-    const Real getCurrentTime() const
+    const Time getCurrentTime() const
     {
       return theCurrentTime;
     }
 
-    void setCurrentTime( RealCref aTime )
+    void setCurrentTime( TimeCref aTime )
     {
       theCurrentTime = aTime;
     }
@@ -192,7 +192,7 @@ namespace libecs
   private:
 
     ScheduleQueue       theScheduleQueue;
-    Real                theCurrentTime;
+    Time                theCurrentTime;
 
   };
 

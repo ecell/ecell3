@@ -357,7 +357,7 @@ namespace libemc
     libecs::EventCref aNextEvent( getModel().getNextEvent() );
 
     PolymorphVector aVector;
-    aVector.push_back( aNextEvent.getTime() );
+    aVector.push_back( static_cast<Real>( aNextEvent.getTime() ) );
     aVector.push_back( aNextEvent.getStepper()->getID() );
     return aVector;
   }
