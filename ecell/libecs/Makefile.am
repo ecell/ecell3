@@ -27,6 +27,7 @@ ProcessMaker.cpp\
 Variable.cpp\
 VariableMaker.cpp\
 Stepper.cpp\
+Steppers.cpp\
 Model.cpp\
 Scheduler.cpp\
 EntityType.cpp\
@@ -57,6 +58,7 @@ ProcessMaker.hpp\
 Variable.hpp\
 VariableMaker.hpp\
 Stepper.hpp\
+Steppers.hpp\
 Model.hpp\
 Scheduler.hpp\
 EntityType.hpp\

@@ -28,14 +28,13 @@
 // E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
 
-#ifndef ___STEPPER_H___
-#define ___STEPPER_H___
+#ifndef __STEPPER_HPP
+#define __STEPPER_HPP
 
 #include <vector>
-#include <map>
 #include <algorithm>
 #include <utility>
-#include <valarray>
+//#include <valarray>
 
 #include "libecs.hpp"
 
@@ -55,7 +54,7 @@ namespace libecs
 
   /** @file */
 
-  DECLARE_TYPE( std::valarray<Real>, RealValarray );
+  //  DECLARE_TYPE( std::valarray<Real>, RealValarray );
 
   DECLARE_VECTOR( Real, RealVector );
 
@@ -471,126 +470,9 @@ namespace libecs
   };
 
 
-  class FixedEuler1Stepper
-    :
-    public DifferentialStepper
-  {
-  public:
-    
-    FixedEuler1Stepper();
-    virtual ~FixedEuler1Stepper() {}
-
-    static StepperPtr createInstance() { return new FixedEuler1Stepper; }
-    
-    virtual void step();
-
-    virtual StringLiteral getClassName() const { return "FixedEuler1Stepper"; }
-
-
-  protected:
-  };
-
-
-  class FixedRungeKutta4Stepper
-    : 
-    public DifferentialStepper
-  {
-
-  public:
-
-    FixedRungeKutta4Stepper();
-    virtual ~FixedRungeKutta4Stepper() {}
-    static StepperPtr createInstance() { return new FixedRungeKutta4Stepper; }
-
-    virtual void step();
-
-    virtual StringLiteral getClassName() const { return "FixedRungeKutta4Stepper"; }
-
-
-  protected:
-  };
-
-
-  class Euler1Stepper
-    :
-    public DifferentialStepper
-  {
-
-  public:
-
-    Euler1Stepper();
-    virtual ~Euler1Stepper() {}
-
-    static StepperPtr createInstance() { return new Euler1Stepper; }
-
-    virtual void initialize();
-    virtual void step();
-
-    virtual StringLiteral getClassName() const { return "Euler1Stepper"; }
-
-
-  protected:
-  };
-
-
-  class Midpoint2Stepper
-    : 
-    public DifferentialStepper
-  {
-
-  public:
-
-    Midpoint2Stepper();
-    virtual ~Midpoint2Stepper() {}
-
-    static StepperPtr createInstance() { return new Midpoint2Stepper; }
-
-    virtual void initialize();
-    virtual void step();
-
-    virtual StringLiteral getClassName() const { return "Midpoint2Stepper"; }
-
-
-  protected:
-
-    RealVector theK1;
-  };
-
-
-  class CashKarp4Stepper
-    : 
-    public DifferentialStepper
-  {
-
-  public:
-
-    CashKarp4Stepper();
-    virtual ~CashKarp4Stepper() {}
-
-    static StepperPtr createInstance() { return new CashKarp4Stepper; }
-
-    virtual void initialize();
-    virtual void step();
-
-    virtual StringLiteral getClassName() const { return "CashKarp4Stepper"; }
-
-
-  protected:
-
-    RealVector theK1;
-    RealVector theK2;
-    RealVector theK3;
-    RealVector theK4;
-    RealVector theK5;
-    RealVector theK6;
-
-    RealVector theErrorEstimate;
-
-  };
-
 } // namespace libecs
 
-#endif /* ___STEPPER_H___ */
+#endif /* __STEPPER_HPP */
 
 
 

@@ -28,6 +28,8 @@
 // E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
 
+#include "Steppers.hpp"
+
 #include "StepperMaker.hpp"
 
 namespace libecs
