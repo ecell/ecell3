@@ -29,8 +29,8 @@ class SubstanceWindow(PluginWindow):
     def initialize( self, fpn ):
         
         self.theFullID = convertToFullID( fpn )
-        self.theFPNQuantity = tuple(convertToFullPropertyName( self.theFullID, 'quantity' ))
-        self.theFPNConcentration = tuple(convertToFullPropertyName( self.theFullID, 'concentration' ))
+        self.theFPNQuantity = tuple(convertToFullPropertyName( self.theFullID, 'Quantity' ))
+        self.theFPNConcentration = tuple(convertToFullPropertyName( self.theFullID, 'Concentration' ))
         self.theType = str( self.theFullID[TYPE] )
         self.theID   = str( self.theFullID[ID] )
         self.thePath = str( self.theFullID[SYSTEMPATH] )
