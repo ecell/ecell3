@@ -34,9 +34,9 @@ SOSUFFIX=".so"
 # internal variables. DO NOT EDIT BELOW
 OPTS="vcd::fho:st:T:"
 LONGOPTS=\
-"verbose,compile,docify::,force,help,outdir:,strip,templatedir:,tmpdir:"
+"verbose,compile,docify::,force,help,outdir:,strip,templatedir:,tmpdir:,test"
 
-unset VERBOSE DO_COMPILE DO_DOCIFY DO_STRIP FORCE CLASS
+unset VERBOSE DO_COMPILE DO_DOCIFY DO_STRIP FORCE CLASS TEST_MODE
 DTTMPDIR="$TMPDIR/dmtool.$$"
 
 
@@ -57,18 +57,19 @@ help()
 usage
 cat << EOT_HELP
 Options:
-	-v or --verbose)	print what this is doing.
-	-c or --compile)	compile dynamic module.
+	-c or --compile)	Compile dynamic module.
 	-d[filename] or
-	--docify[filename])	make TeX documentation from input files.
-	-f or --force)		proceed even if input is older than output.
+  	  --docify[filename])	Make TeX documentation from input files.
+	-f or --force)		Proceed even if input is older than output.
 	-o [dir] or
-	 --outdir [dir])	specify output directory.
-	-t or --templatedir)	specify template directory.
+	  --outdir [dir])	Specify output directory.
+	-t or --templatedir)	Specify template directory.
 				[default=$TEMPLATEDIR]
-	-T or --tmpdir)     	specify temporary directory.
+	-T or --tmpdir)     	Specify temporary directory.
 				[default=$TMPDIR]
-	-h or --help)		print this message.
+	--test)			Do nothing. Just print what will happen.
+	-v or --verbose)	Be verbose.
+	-h or --help)		Print this message.
 
 This program is part of E-CELL Simulation Environment.
 Written by Kouichi Takahashi <shafi@e-cell.org>
@@ -96,7 +97,11 @@ interrupted()
 run_command()
 {
 	[ $VERBOSE ] && echo $@
-	echo $@
+	if [ $TEST_MODE ] ; then
+		echo $@
+	else
+		`$@`
+	fi
 }
 
 
@@ -138,6 +143,7 @@ while true ; do
 		-s|--strip)  DO_STRIP=yes ; shift ;;
 		-t|--templatedir) TEMPLATEDIR=$2 ; shift ;;
 		-T|--tmpdir)      TMPDIR=$2 ; shift ;;
+		--test)		TEST_MODE=yes ; shift ;;
 		-h|--help) help ; exit 0 ;;
 		--) shift ; break ;;
 		*) echo "Internal error!" ; exit 1 ;;
@@ -177,7 +183,7 @@ if [ $DO_COMPILE  ] ; then
 		fi
 
 		# make source files. (-> .[Ch])
-		run_command "$RD2CH -d $DTTMPDIR -t $TEMPLATEDIR $rdfile"
+		run_command "$RD2CH -d $DTTMPDIR -t $TEMPLATEDIR/$CLASS $rdfile"
 		if [ $? ] ; then
 			:
 		else
@@ -187,7 +193,7 @@ if [ $DO_COMPILE  ] ; then
 		fi
 
 		# compile
-		run_command $CXX $CXXFLAGS $DTTMPDIR/$cppfile -o $DTTMPDIR/$sofile
+		run_command "$CXX $CXXFLAGS $DTTMPDIR/$cppfile -o $DTTMPDIR/$sofile"
 		if [ $? ] ; then
 			# move resulting so to OUTDIR
 			run_command $MV $DTTMPDIR/$sofile $OUTDIR
