@@ -1,0 +1,239 @@
+  <!-- ================ Writing em ================================ -->
+
+  <chapter id="write-em"> 
+    <title>Writing a Model File in E-Cell Model format</title> 
+
+
+    <sect1>
+      <title>General rules</title>
+
+      <para>
+	  The file suffix must be ".em". It is an abbreviation of
+	  "E-Cell Model"
+	  </para>
+
+    </sect1>
+
+    <sect1>
+      <title>general structure</title>
+
+      <programlisting>
+ObjectType [ClassName] ( ID )
+{ 
+        property_name1 property_value1 ;
+        property_name2 property_value2 ;
+        ...
+        property_namen property_valuen ;
+} 
+</programlisting>
+
+      <para>where <emphasis>ObjectType</emphasis> is one of:
+
+      <itemizedlist>
+	  <listitem>
+	    <para><classname>Stepper</classname></para>
+	  </listitem>
+
+	  <listitem>
+	    <para><classname>Variable</classname></para>
+	  </listitem>
+
+	  <listitem>
+	    <para><classname>Process</classname></para>
+	  </listitem>
+
+	  <listitem>
+	    <para><classname>System</classname></para>
+	  </listitem>
+	</itemizedlist>
+
+
+    </para>
+      
+      <para><emphasis>ID</emphasis> is
+      <classname>SystemPath</classname> for System definitions, and ID
+      string for other <emphasis>ObjectType</emphasis>s</para>
+
+      <para><emphasis>property_value</emphasis> can be one of 
+
+<itemizedlist>
+	  <listitem>
+	    <para>Real number (ex. 3.33e+10, 1.0)</para>
+	  </listitem>
+	  <listitem>
+	    <para>Int number  (ex. 3, 100)</para>
+	  </listitem>
+	  <listitem>
+	    <para>String (ex. C10:A)</para>
+	  </listitem>
+	  <listitem>
+	    <para>Quoted string (ex. "[EC35.3.33]+30")</para>
+	  </listitem>
+	  <listitem>
+	    <para>List of items consists of above types of elements.  This list
+can be nested. 
+(ex. [ A 10 [ 1 1.0 1e+10 ] ] )
+</para>
+	  </listitem>
+	</itemizedlist>
+
+
+</para>
+
+
+
+      <example>
+	<title>simple 'Toy Pathway' model</title>
+
+	<programlisting>
+
+Stepper Euler1Stepper( SRM_01 ) 
+{ 
+        # no property 
+} 
+ 
+System System( / ) 
+{ 
+        StepperID       SRM_01; 
+        Volume  0.000000000000001; 
+} 
+ 
+System System( /CELL ) 
+{ 
+        StepperID       SRM_01; 
+        Volume  1e-18;
+} 
+ 
+System System( /CELL/CYTOPLASM ) 
+{ 
+        StepperID       SRM_01; 
+        Volume  1e-18; 
+ 
+        Variable Variable( S ) 
+        { 
+                Value   1000000; 
+        } 
+ 
+        Variable Variable( P ) 
+        { 
+                Value   0; 
+        } 
+ 
+        Variable Variable( E ) 
+        { 
+                Value   1000; 
+        } 
+ 
+        Process MichaelisUniUniProcess( E ) 
+        { 
+                VariableReferenceList   [ S0 Variable:/CELL/CYTOPLASM:S -1 ]  
+                                        [ P0 Variable:/CELL/CYTOPLASM:P 1 ]  
+                                        [ C0 Variable:/CELL/CYTOPLASM:E 0 ]; 
+                KmS     1; 
+                KcF     10; 
+        } 
+ 
+} 
+ 
+#target /CELL/CYTOPLASM; 
+ 
+#/MT0  -> /MT0 
+#MT0   -> /CELL/CYTOPLASM/MT0 
+#Reatant S0 .:S -1; 
+#Reatant S0 ../CYTOPLASM1:S -1; 
+ 
+	</programlisting> 
+      </example> 
+
+      <example>
+	<title>Another example</title>
+
+
+	<programlisting>
+
+Stepper Euler1Stepper ( SRM_01 ) 
+{ 
+# no property 
+} 
+ 
+System CompartmentSystem ( / ) 
+{ 
+        Name "ENVIRONMENT"; 
+        Stepper SRM_01; 
+        Volume  1.0E-15; 
+} 
+ 
+System CompartmentSystem ( /CELL )  
+{ 
+        Name "CELL"; 
+        Stepper SRM_01; 
+        Volume  unknown; 
+} 
+ 
+System CompartmentSystem ( /CELL/CYTOPLASM ) 
+{ 
+        Name "CYTOPLASM"; 
+        Stepper SRM_01; 
+        Volume  1.0E-18; 
+ 
+        Substance Substance ( S ) 
+        { 
+                Name "S"; 
+                Quantity 1000000; 
+        } 
+ 
+        Substance Substance ( P ) 
+        { 
+                Name "P"; 
+                Quantity 0; 
+        } 
+ 
+        Substance Substance ( E ) 
+        { 
+                Name "E"; 
+                Quantity 1000; 
+        } 
+ 
+ 
+#/MT0  -> /MT0 
+#MT0   -> /CELL/CYTOPLASM/MT0 
+#Reatant S0 .:S -1; 
+#Reatant S0 ../CYTOPLASM1:S -1; 
+ 
+        Reactor MichaelisUniUniReactor ( R ) 
+        { 
+                Name "R"; 
+                VariableReferenceList [S0 S -1] 
+                                      [P0 P 1] 
+                                      [E0 ./E 0]; 
+ 
+                KmS 1; 
+                KcF 10; 
+        } 
+ 
+} 
+ 
+System System ( /CELL/MEMBRANE ) 
+{ 
+        Name "MEMBRANE"; 
+        Stepper SRM_01; 
+        Volume  unknown; 
+} 
+
+</programlisting>
+      </example>
+    </sect1>
+
+
+
+
+  </chapter>
+
+
+<!--
+Local Variables:
+mode: sgml
+sgml-parent-document: ("ecell3-users-manual.xml" "book" "chapter")
+End:
+-->
+

@@ -1,0 +1,18 @@
+  <!-- ============= Introduction ============================== -->
+  <!-- Use the Introduction section to give a brief overview of what
+  the application is and what it does. -->
+  <chapter id="ecell3-introduction"> 
+  <title>Introduction</title> 
+  <para>The &app; is a software environment for simulation of various
+cellular phenomena.
+    </para> 
+  </chapter>
+
+
+
+<!--
+Local Variables:
+mode: sgml
+sgml-parent-document: ("ecell3-users-manual.xml" "book" "chapter")
+End:
+-->

@@ -1,0 +1,15 @@
+<!-- ============= Automating Simulation Sessions with ECS ========== -->
+<chapter id="writing-ecs"> 
+  <title>Automating Simulation Sessions with E-Cell Script</title> 
+
+  <para>Writing .ecs file which is loaded by Session class.</para>
+
+</chapter>
+
+<!--
+Local Variables:
+mode: sgml
+sgml-parent-document: ("ecell3-users-manual.xml" "book" "chapter")
+End:
+-->
+
