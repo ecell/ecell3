@@ -2,7 +2,7 @@
 # A very simple model with one michaelis-uni-uni reaction.
 #
 
-#Stepper Midpoint2Stepper( DE1 )
+#Stepper Fehlberg23Stepper( DE1 )
 Stepper FixedEuler1Stepper( DE1 )
 {
 	# no property

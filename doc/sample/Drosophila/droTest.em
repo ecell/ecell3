@@ -3,34 +3,34 @@
 # from file: droTest.eml, date: Sun Oct 13 15:04:54 2002
 #
 
-#Stepper FixedEuler1Stepper( SRM_01 )
-#Stepper Midpoint2Stepper( SRM_01 )
-Stepper DormandPrince547MStepper( SRM_01 )
+#Stepper FixedEuler1Stepper( DE )
+#Stepper Fehlberg23Stepper( DE )
+Stepper DormandPrince547MStepper( DE )
 {
 	# no property
 }
 
 System System( / )
 {
-	StepperID	SRM_01;
+	StepperID	DE;
 	Volume	0.000000000000001;
 }
 
 System System( / )
 {
-	StepperID	SRM_01;
+	StepperID	DE;
 	Volume	0.000000000000001;
 }
 
 System System( /CELL )
 {
-	StepperID	SRM_01;
+	StepperID	DE;
 	Volume	unknown;
 }
 
 System System( /CELL/CYTOPLASM )
 {
-	StepperID	SRM_01;
+	StepperID	DE;
 	Volume	1e-18;
 
 	Variable Variable( M )

@@ -86,17 +86,17 @@ namespace libecs
   };
 
 
-  class Euler1Stepper
+  class Fehlberg21Stepper
     :
     public DifferentialStepper
   {
 
   public:
 
-    Euler1Stepper();
-    virtual ~Euler1Stepper() {}
+    Fehlberg21Stepper();
+    virtual ~Fehlberg21Stepper() {}
 
-    static StepperPtr createInstance() { return new Euler1Stepper; }
+    static StepperPtr createInstance() { return new Fehlberg21Stepper; }
 
     virtual void initialize();
     virtual void step();
@@ -104,16 +104,16 @@ namespace libecs
     bool calculate();
 
 
-    virtual StringLiteral getClassName() const { return "Euler1Stepper"; }
+    virtual StringLiteral getClassName() const { return "Fehlberg21Stepper"; }
 
 
   protected:
   };
 
 
-  DECLARE_CLASS( Midpoint2Stepper );
+  DECLARE_CLASS( Fehlberg23Stepper );
 
-  class Midpoint2Stepper
+  class Fehlberg23Stepper
     : 
     public DifferentialStepper
   {
@@ -126,7 +126,7 @@ namespace libecs
     {
     public:
 
-      VariableProxy( Midpoint2StepperRef aStepper, 
+      VariableProxy( Fehlberg23StepperRef aStepper, 
 		     VariablePtr const aVariablePtr )
 	:
 	libecs::VariableProxy( aVariablePtr ),
@@ -152,24 +152,24 @@ namespace libecs
 
     protected:
 
-      Midpoint2StepperRef theStepper;
+      Fehlberg23StepperRef theStepper;
       UnsignedInt         theIndex;
     };
 
 
   public:
 
-    Midpoint2Stepper();
-    virtual ~Midpoint2Stepper() {}
+    Fehlberg23Stepper();
+    virtual ~Fehlberg23Stepper() {}
 
-    static StepperPtr createInstance() { return new Midpoint2Stepper; }
+    static StepperPtr createInstance() { return new Fehlberg23Stepper; }
 
     virtual void initialize();
     virtual void step();
 
     bool calculate();
 
-    virtual StringLiteral getClassName() const { return "Midpoint2Stepper"; }
+    virtual StringLiteral getClassName() const { return "Fehlberg23Stepper"; }
 
     //    virtual VariableProxyPtr createVariableProxy( VariablePtr aVariable )
     //    {
@@ -188,24 +188,24 @@ namespace libecs
   };
 
 
-  class CashKarp4Stepper
+  class CashKarp45Stepper
     : 
     public DifferentialStepper
   {
 
   public:
 
-    CashKarp4Stepper();
-    virtual ~CashKarp4Stepper() {}
+    CashKarp45Stepper();
+    virtual ~CashKarp45Stepper() {}
 
-    static StepperPtr createInstance() { return new CashKarp4Stepper; }
+    static StepperPtr createInstance() { return new CashKarp45Stepper; }
 
     virtual void initialize();
     virtual void step();
  
     bool calculate();
 
-    virtual StringLiteral getClassName() const { return "CashKarp4Stepper"; }
+    virtual StringLiteral getClassName() const { return "CashKarp45Stepper"; }
 
 
   protected:

@@ -47,10 +47,10 @@ namespace libecs
   void StepperMaker::makeClassList()
   {
     NewStepperModule( FixedEuler1Stepper );
-    NewStepperModule( Euler1Stepper );
     NewStepperModule( FixedRungeKutta4Stepper );
-    NewStepperModule( Midpoint2Stepper );
-    NewStepperModule( CashKarp4Stepper );
+    NewStepperModule( Fehlberg21Stepper );
+    NewStepperModule( Fehlberg23Stepper );
+    NewStepperModule( CashKarp45Stepper );
     NewStepperModule( DormandPrince547MStepper );
 
     NewStepperModule( DiscreteTimeStepper );

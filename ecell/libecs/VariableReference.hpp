@@ -192,7 +192,7 @@ namespace libecs
       return theVariablePtr->getValue();
     }
 
-    void setValue( const Real aValue )
+    void setValue( const Real aValue ) const
     {
       theVariablePtr->setValue( aValue );
     }
@@ -206,7 +206,7 @@ namespace libecs
        @param aValue a Real value to be added.
     */
 
-    void addValue( const Real aValue )
+    void addValue( const Real aValue ) const
     {
       setValue( ( aValue * theCoefficient ) + getValue() );
     }
@@ -238,13 +238,13 @@ namespace libecs
       return theVariablePtr->isFixed();
     }
 
-    void setFixed( const bool aValue )
+    void setFixed( const bool aValue ) const
     {
       theVariablePtr->setFixed( aValue );
     }
 
 
-    void addFlux( const Real aVelocity )
+    void addFlux( const Real aVelocity ) const
     {
       theVariablePtr->addVelocity( aVelocity * theCoefficient );
     }

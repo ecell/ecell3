@@ -1,11 +1,11 @@
 loadModel( 'droTest.eml' )
 
 a = createEntityStub( 'Variable:/CELL/CYTOPLASM:P0' )
-s = createStepperStub( 'SRM_01' )
+#s = createStepperStub( 'DE' )
 
 
-print s.getProperty( 'ReadVariableList' )
-print s.getProperty( 'SystemList' )
+#print s.getProperty( 'ReadVariableList' )
+#print s.getProperty( 'SystemList' )
 print a.getProperty( 'Value' )
 run( 10 )
 

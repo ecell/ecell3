@@ -174,20 +174,20 @@ namespace libecs
   }
 
 
-  ////////////////////////// Euler1Stepper
+  ////////////////////////// Fehlberg21Stepper
 
 
-  Euler1Stepper::Euler1Stepper()
+  Fehlberg21Stepper::Fehlberg21Stepper()
   {
     ; // do nothing
   }
 
-  void Euler1Stepper::initialize()
+  void Fehlberg21Stepper::initialize()
   {
     DifferentialStepper::initialize();
   }
 
-  void Euler1Stepper::step()
+  void Fehlberg21Stepper::step()
   {
     clear();
 
@@ -233,7 +233,7 @@ namespace libecs
       }
   }
 
-  bool Euler1Stepper::calculate()
+  bool Fehlberg21Stepper::calculate()
   {
     const UnsignedInt aSize( getReadOnlyVariableOffset() );
 
@@ -315,15 +315,15 @@ namespace libecs
   }
 
 
-  ////////////////////////// Midpoint2Stepper
+  ////////////////////////// Fehlberg23Stepper
 
 
-  Midpoint2Stepper::Midpoint2Stepper()
+  Fehlberg23Stepper::Fehlberg23Stepper()
   {
     ; // do nothing
   }
 
-  void Midpoint2Stepper::initialize()
+  void Fehlberg23Stepper::initialize()
   {
     DifferentialStepper::initialize();
 
@@ -333,7 +333,7 @@ namespace libecs
     theK1.resize( aSize );
   }
 
-  void Midpoint2Stepper::step()
+  void Fehlberg23Stepper::step()
   {
     // clear
     clear();
@@ -379,7 +379,7 @@ namespace libecs
       }
   }
 
-  bool Midpoint2Stepper::calculate()
+  bool Fehlberg23Stepper::calculate()
   {
     const UnsignedInt aSize( getReadOnlyVariableOffset() );
 
@@ -485,15 +485,15 @@ namespace libecs
   }
 
 
-  ////////////////////////// CashKarp4Stepper
+  ////////////////////////// CashKarp45Stepper
 
 
-  CashKarp4Stepper::CashKarp4Stepper()
+  CashKarp45Stepper::CashKarp45Stepper()
   {
     ; // do nothing
   }
 
-  void CashKarp4Stepper::initialize()
+  void CashKarp45Stepper::initialize()
   {
     DifferentialStepper::initialize();
 
@@ -509,7 +509,7 @@ namespace libecs
     theErrorEstimate.resize( aSize );
   }
   
-  void CashKarp4Stepper::step()
+  void CashKarp45Stepper::step()
   {
     // clear
     clear();
@@ -546,7 +546,7 @@ namespace libecs
       }
   }
 
-  bool CashKarp4Stepper::calculate()
+  bool CashKarp45Stepper::calculate()
   {
     const UnsignedInt aSize( getReadOnlyVariableOffset() );
 

@@ -245,10 +245,6 @@ namespace libecs
 
     theReadOnlyVariableOffset = aReadOnlyVariableReferenceIterator 
       - aVariableReferenceVector.begin();
-    //    theReadOnlyVariableOffset = theVariableVector.size();
-
-    std::cerr <<  getID() << ' ' <<   theReadWriteVariableOffset << ' ' <<
-      theReadOnlyVariableOffset << ' ' << theVariableVector.size ()<< std::endl;
 
     // For each part of the vector, sort by memory address. 
     // This is an optimization.
