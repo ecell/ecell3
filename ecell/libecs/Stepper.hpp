@@ -143,10 +143,11 @@ namespace libecs
     }
 
     /**
+       Update loggers.
 
     */
 
-    void push();
+    void log();
 
     
     /**

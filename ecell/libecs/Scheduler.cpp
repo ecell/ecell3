@@ -75,13 +75,8 @@ namespace libecs
     EventCref aTopEvent( theScheduleQueue.top() );
     const StepperPtr aStepperPtr( aTopEvent.getStepper() );
  
-    // three-phase progression of the step
-    // 1. sync:  synchronize with proxies of the PropertySlots
-    //    aStepperPtr->sync();
-    // 2. step:  do the computation
     aStepperPtr->step();
-    // 3. push:  re-sync with the proxies, and push new values to Loggers
-    aStepperPtr->push();
+    aStepperPtr->log();
 
     // schedule a new event
     theScheduleQueue.changeTopKey( Event( aStepperPtr->getCurrentTime(),

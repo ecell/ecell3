@@ -260,7 +260,7 @@ namespace libecs
     return aMaxInterval;
   }
   
-  void Stepper::push()
+  void Stepper::log()
   {
     // update loggers
     FOR_ALL( PropertySlotVector, theLoggedPropertySlotVector, updateLogger );
