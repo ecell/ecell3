@@ -97,7 +97,7 @@ class OsogoPluginManager(PluginManager):
         if rootWidget != None:
             pass
         else:
-            title = aClassname[:-6]
+            title = classname[:-6]
 
             if self.thePluginWindowNumber.has_key( classname ):
                 self.thePluginWindowNumber[ classname ] += 1
