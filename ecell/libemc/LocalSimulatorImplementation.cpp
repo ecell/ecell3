@@ -123,7 +123,7 @@ namespace libemc
   StringVectorRCPtr LocalSimulatorImplementation::getLoggerList()
   {
     StringVectorRCPtr aLoggerListPtr( new StringVector );
-    aLoggerList->reserve( theLoggerBroker.getLoggerMap().size() );
+    aLoggerListPtr->reserve( theLoggerBroker.getLoggerMap().size() );
 
     LoggerBroker::LoggerMapCref aLoggerMap( theLoggerBroker.getLoggerMap() );
 

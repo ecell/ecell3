@@ -109,7 +109,7 @@ namespace libemc
 						    propertyname );
     }
 
-    libecs::StringVector getLoggerList()
+    libecs::StringVectorRCPtr getLoggerList()
     {
       return theSimulatorImplementation->getLoggerList();
     }
