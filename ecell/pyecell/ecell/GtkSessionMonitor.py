@@ -227,12 +227,22 @@ class GtkSessionMonitor(Session):
 		# When the Window is already created, move it to the top of desktop
 		if self.theFundamentalWindows[aWindowName].exists():
 			self.theFundamentalWindows[aWindowName].present()
-
-		# When the Window is not created yet, create it.
+			pass
 		else:
 			self.theFundamentalWindows[aWindowName].openWindow()
 			self.theFundamentalWindows[aWindowName].update()
-		
+	
+	# ==========================================================================
+	def toggleWindow( self, aWindowName ):
+		if self.theFundamentalWindows[aWindowName].exists():
+			self.theFundamentalWindows[aWindowName].close()
+			
+		else:
+			self.theFundamentalWindows[aWindowName].openWindow()
+			self.theFundamentalWindows[aWindowName].update()
+		if self.theFundamentalWindows['MainWindow'].exists():
+			self.theFundamentalWindows['MainWindow'].update()
+
 
 	# ==========================================================================
 	def createPluginWindow(self, aType, aFullPNList):

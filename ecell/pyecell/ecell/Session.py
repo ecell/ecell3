@@ -47,13 +47,14 @@ class Session:
     #
 
     def loadScript( self, ecs, parameters={} ):
-
+	(ecsDir, ecsFile ) = os.path.split( ecs )
+	if ecsDir != '':
+		os.chdir( ecsDir )
         aContext = self.__createScriptContext( parameters )
 
-        execfile( ecs, aContext )
+        execfile( ecsFile, aContext )
             
     def interact( self, parameters={} ):
-
         aContext = self.__createScriptContext( parameters )
 	if os.name != "nt":
 	    import readline # to provide convenient commandline editing :)
@@ -595,7 +596,7 @@ class Session:
                                                  aValueList )
                     
     def __convertPropertyValueList( self, aValueList ):
-        
+       
         aList = list()
 
         for aValueListNode in aValueList:
@@ -611,6 +612,9 @@ class Session:
 
         return aList
 
+
+
+ 
     class _session_prompt:
         def __init__( self, aSession ):
             self.theSession = aSession
