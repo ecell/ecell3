@@ -31,6 +31,8 @@
 #include "Variable.hpp"
 #include "Process.hpp"
 
+#include <stdio.h>
+
 #define GSL_RANGE_CHECK_OFF
 
 #include <gsl/gsl_linalg.h>
@@ -54,7 +56,7 @@ ODEStepper::ODEStepper()
   theSolutionVector2( NULLPTR ),
   theMaxIterationNumber( 7 ),
   eta( 1.0 ),
-  Uround( 1e-16 ),
+  Uround( 1e-10 ),
   theStoppingCriterion( 0.0 ),
   theFirstStepFlag( true ),
   theRejectedStepFlag( false ),
@@ -161,26 +163,38 @@ void ODEStepper::calculateJacobian()
   
   for ( VariableVector::size_type i( 0 ); i < theSystemSize; ++i )
     {
-      const VariablePtr aVariable( theVariableVector[ i ] );
-      const Real aValue( aVariable->getValue() );
+      const VariablePtr aVariable1( theVariableVector[ i ] );
+      const Real aValue( aVariable1->getValue() );
       
       aPerturbation = sqrt( Uround * std::max( 1e-5, fabs( aValue ) ) );
-      aVariable->loadValue( theValueBuffer[ i ] + aPerturbation );
+      aVariable1->loadValue( theValueBuffer[ i ] + aPerturbation );
 
       fireProcesses();
       
       for ( VariableVector::size_type j( 0 ); j < theSystemSize; ++j )
 	{
-	  const VariablePtr aVariable( theVariableVector[ j ] );
+	  const VariablePtr aVariable2( theVariableVector[ j ] );
 	  
 	  theJacobian[ j ][ i ]
-	    = - ( aVariable->getVelocity() - theVelocityBuffer[ j ] )
+	    = - ( aVariable2->getVelocity() - theVelocityBuffer[ j ] )
 	    / aPerturbation;
-	  aVariable->clearVelocity();
+	  aVariable2->clearVelocity();
 	}
       
-      aVariable->loadValue( aValue );
+      aVariable1->loadValue( aValue );
     }
+
+  /**
+  for ( VariableVector::size_type i( 0 ); i < theSystemSize; i++ )
+    {
+      std::cout << theVariableVector[ i ]->getID() << "\t";
+      for ( VariableVector::size_type j( 0 ); j < theSystemSize; j++ )
+	//	std::cout << theJacobian[ i ][ j ] << "\t";
+	printf( "%e\t", theJacobian[ i ][ j ] );
+      //	std::cout << gsl_matrix_get( theJacobianMatrix1, i, j ) << "\t";
+      std::cout << std::endl;
+    }
+  */
 
   setSpectralRadius( calculateJacobianNorm() );
 }
@@ -245,7 +259,8 @@ Real ODEStepper::calculateJacobianNorm()
   return sqrt( anEuclideanNorm );
   */
 
-  RealVector theEigenVector( theSystemSize, sqrt( 1.0 / theSystemSize ) ), theTempVector( theSystemSize );
+  RealVector theEigenVector( theSystemSize, sqrt( 1.0 / theSystemSize ) ),
+    theTempVector( theSystemSize );
 
   Real sum, norm;
 
@@ -294,7 +309,7 @@ void ODEStepper::calculateRhs()
       const Real z( theW[ c ] * 0.091232394870892942792
 		    - theW[ c + theSystemSize ] * 0.14125529502095420843
 		    - theW[ c + 2*theSystemSize ] * 0.030029194105147424492 );
-      
+
       theVariableVector[ c ]->loadValue( theValueBuffer[ c ] + z );
     }
   
@@ -395,16 +410,19 @@ Real ODEStepper::solve()
       deltaW = gsl_vector_get( theSolutionVector1, c );
       theW[ c ] += deltaW;
       aNorm += deltaW * deltaW / aTolerance2;
+      //      std::cout << deltaW << "\t";
       
       comp = gsl_vector_complex_get( theSolutionVector2, c );
       
       deltaW = GSL_REAL( comp );
       theW[ c + theSystemSize ] += deltaW;
       aNorm += deltaW * deltaW / aTolerance2;
+      //      std::cout << deltaW << "\t";
 
       deltaW = GSL_IMAG( comp );
       theW[ c + theSystemSize*2 ] += deltaW;
       aNorm += deltaW * deltaW / aTolerance2;
+      //      std::cout << deltaW << std::endl;
     }
 
   return sqrt( aNorm / ( 3 * theSystemSize ) );
@@ -429,7 +447,7 @@ bool ODEStepper::calculate()
       const Real z1( c1q * ( cont[ c ] + ( c1q - c2 ) * ( cont[ c + theSystemSize ] + ( c1q - c1 ) * cont[ c + theSystemSize*2 ] ) ) );
       const Real z2( c2q * ( cont[ c ] + ( c2q - c2 ) * ( cont[ c + theSystemSize ] + ( c2q - c1 ) * cont[ c + theSystemSize*2 ] ) ) );
       const Real z3( c3q * ( cont[ c ] + ( c3q - c2 ) * ( cont[ c + theSystemSize ] + ( c3q - c1 ) * cont[ c + theSystemSize*2 ] ) ) );
-      
+
       theW[ c ] = 4.3255798900631553510 * z1
 	+ 0.33919925181580986954 * z2 + 0.54177053993587487119 * z3;
       theW[ c+theSystemSize ] = -4.1787185915519047273 * z1
@@ -440,8 +458,14 @@ bool ODEStepper::calculate()
 
   eta = pow( std::max( eta, Uround ), 0.8 );
   
-  while ( anIterator < getMaxIterationNumber() )
+  while ( 1 )
     {
+      if ( anIterator == getMaxIterationNumber() )
+	{
+	  std::cerr << "matrix is repeatedly singular" << std::endl;
+	  break;
+	}
+
       calculateRhs();
       
       const Real previousNorm( std::max( aNorm, Uround ) );
@@ -465,12 +489,15 @@ bool ODEStepper::calculate()
 		  aNewStepInterval = aStepInterval * 0.8 * pow( std::max( 1e-4, std::min( 20.0, anIterationError ) ) , -1.0 / ( 4 + getMaxIterationNumber() - 2 - anIterator ) );
 		  setStepInterval( aNewStepInterval );
 
+		  // std::cout << "iteration error >= 1.0" << std::endl;
 		  return false;
 		}
 	    }
 	  else
 	    {
 	      setStepInterval( aStepInterval * 0.5 );
+
+	      // std::cout << anIterator << " : theta >= 0.99" << std::endl;
 	      return false;
 	    }
 	}
@@ -559,6 +586,7 @@ bool ODEStepper::calculate()
 	  setStepInterval( aNewStepInterval );
 	}
       
+      // std::cout << "error >= 1.0" << std::endl;
       return false;
     }
 }
