@@ -6,7 +6,7 @@ LIBLTDL=@LIBLTDL@
 libdir=@libdir@
 
 INCLUDES = -I..  -I../.. -I../include ${KORANDOM_INCLUDE} ${DMTOOL_INCLUDE} ${INCLTDL}
-noinst_LTLIBRARIES = libecs.la
+lib_LTLIBRARIES = libecs.la
 
 CXXFLAGS= @CXXFLAGS@ # -D_REENTRANT
 
