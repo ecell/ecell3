@@ -15,7 +15,7 @@ import copy
 
 class EntryListWindow(Window):
 
-    def __init__( self, aMainWindow, aSimulator ):
+    def __init__( self, aMainWindow ):
 
         self.theSelectedFullPNList = []
 
@@ -25,7 +25,7 @@ class EntryListWindow(Window):
                             'entry_list_selection_changed' : self.selectEntity
                             } )
 
-        self.theSimulator = aSimulator
+        self.theSimulator = aMainWindow.theSimulator
         self.theMainWindow = aMainWindow
         self.thePaletteWindow = aMainWindow.thePaletteWindow
         self.theSystemTree = self.getWidget( 'system_tree' )

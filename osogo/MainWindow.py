@@ -122,7 +122,7 @@ class MainWindow(Window):
     def stepSimulation( self, a ) : pass
 
     def createNewEntryList( self, button_obj ) :
-        aEntryList = EntryListWindow.EntryListWindow( self, self.theSimulator )
+        aEntryList = EntryListWindow.EntryListWindow( self )
     
     def createNewLoggerList( self, a ) : pass
 
