@@ -50,25 +50,23 @@ namespace libecs
     String aString( systempathstring );
     eraseWhiteSpaces( aString );
 
-    // ignore leading white spaces
     String::size_type aFieldStart( 0 );
-    String::size_type aFieldEnd( aString.
-				 find_first_of( DELIMITER,
-						aFieldStart ) );
     
      // absolute path ( start with '/' )
-    if( aFieldEnd == 0 )
+    if( aString[0] == DELIMITER )
        {
 	 push_back( String( 1, DELIMITER ) );
-	 ++aFieldStart;
-	 aFieldEnd = aString.find_first_of( DELIMITER, aFieldStart );
 
-	 if( aFieldEnd == String::npos )
+	 if( aString.size() == 1 )
 	   {
 	     return;
 	   }
+
+	 ++aFieldStart;
        }
 
+    String::size_type aFieldEnd( aString.find_first_of( DELIMITER, 
+							aFieldStart ) );
     push_back( aString.substr( aFieldStart, 
 			       aFieldEnd - aFieldStart ) );
 
@@ -241,7 +239,7 @@ main()
 
   SystemPath aSystemPath2( aSystemPath );
   cout << aSystemPath2.getString() << endl;
-  
+
   aSystemPath2.pop_front();
   aSystemPath2.pop_back();
   cout << aSystemPath2.getString() << endl;
@@ -263,6 +261,9 @@ main()
 
   //  SystemPath aSystemPath2( "/A/../B" );
   //  cout << aSystemPath2.getString() << endl;
+
+  SystemPath aSystemPath4( "/CYTOPLASM" );
+  cout << aSystemPath4.getString() << endl;
 
   cout << "\n::::::::::" << endl;
 
@@ -310,6 +311,7 @@ main()
 
 }
 
+// g++ -I.. -I../.. FullID.cpp PrimitiveType.cpp Util.cpp -DTEST_FULLID ../../korandom/.libs/libkorandom.a 
 
 #endif /* TEST_FULLID */
 
