@@ -34,6 +34,7 @@ FixedDAE1Stepper.cpp\
 ODE23Stepper.cpp\
 CashKarp45Stepper.cpp\
 ODE45Stepper.cpp\
+DAEStepper.cpp\
 ESSYNSStepper.cpp\
 GMAProcess.cpp\
 SSystemProcess.cpp\
@@ -58,10 +59,10 @@ GillespieProcess.hpp\
 NRStepper.hpp\
 ESSYNSStepper.hpp\
 ODE23Stepper.hpp\
+DAEStepper.hpp\
 FluxDistributionStepper.hpp\
 QuasiDynamicFluxProcess.hpp\
 ODE45Stepper.hpp
-
 
 EXTRA_DIST = ${DMS} ${DMH}
 dmdir = ${DM_SRC_DIR}
