@@ -25,6 +25,8 @@ class GillespieProcess
 
   LIBECS_DM_OBJECT( Process, GillespieProcess );
 
+  typedef const Real (GillespieProcess::* GetMultiplicityMethodPtr)() const;
+
 public:
 
 
@@ -33,7 +35,8 @@ public:
     theOrder( 0 ),
     theStepInterval( 0.0 ),
     k( 0.0 ),
-    Index( -1 )
+    Index( -1 ),
+    theGetMultiplicityMethodPtr( &GillespieProcess::getMultiplicity_Zero )
   {
     CREATE_PROPERTYSLOT_SET_GET( Real, k,            GillespieProcess );
     CREATE_PROPERTYSLOT_GET    ( Real, Mu,           GillespieProcess );
@@ -59,7 +62,7 @@ public:
 
   GET_METHOD( Real, Mu )
   {
-    return k * getMultiplicity();
+    return k * ( this->*theGetMultiplicityMethodPtr )();
   }
 
 
@@ -83,31 +86,35 @@ public:
   }
 
 
-  GET_METHOD( Real, Multiplicity )
+  const Real getMultiplicity_Zero() const
+  {
+    return 0.0;
+  }
+
+  const Real getMultiplicity_FirstOrder() const
+  {
+    return roundValue( theVariableReferenceVector[0].getValue() );
+  }
+
+  const Real getMultiplicity_SecondOrder_TwoSubstrates() const
+  {
+    Real aMultiplicity( roundValue( theVariableReferenceVector[0].
+				    getValue() ) );
+    aMultiplicity *= roundValue( theVariableReferenceVector[1].getValue() );
+
+    return aMultiplicity;
+  }
+
+  const Real getMultiplicity_SecondOrder_OneSubstrate() const
   {
     Real aMultiplicity( roundValue( theVariableReferenceVector[0].
 				    getValue() ) );
 
-    if( getOrder() == 1 )   // one substrate, first order.
-      {
-	; // do nothing
-      }
-    else if( getZeroVariableReferenceOffset() == 2 ) // 2 substrates, 2nd order
-      {  
-	aMultiplicity *= roundValue( theVariableReferenceVector[1].
-				     getValue() );
-      }
-    else // one substrate, second order (coeff == -2)
-      {
-	aMultiplicity *= ( aMultiplicity - 1.0 ) * 0.5;
-      }
+    aMultiplicity *= ( aMultiplicity - 1.0 ) * 0.5;
 
-    // this method never return a negative number
     return aMultiplicity;
   }
 
-
-  GET_METHOD( Real, u );
 
   GET_METHOD( Real, StepInterval )
   {
@@ -179,7 +186,7 @@ public:
 	THROW_EXCEPTION( ValueError, 
 			 String( getClassName() ) + 
 			 "[" + getFullID().getString() + 
-			 "]: Either first or second order reaction is allowed." );
+			 "]: Only first or second order scheme is allowed." );
       }
 
 
@@ -223,6 +230,8 @@ protected:
 
   Real k;    
   Int Index;
+
+  GetMultiplicityMethodPtr theGetMultiplicityMethodPtr;
 
 };
 
@@ -274,16 +283,38 @@ void GillespieProcess::calculateOrder()
 	}
     }
 
+  // set theGetMultiplicityMethodPtr
 
-  // this is checked in initialize()
-  // assert( theOrder == 1 || theOrder == 2 );
+  if( getOrder() == 0 )   // no substrate
+    {
+      theGetMultiplicityMethodPtr = 
+	&GillespieProcess::getMultiplicity_Zero;
+    }
+  else if( getOrder() == 1 )   // one substrate, first order.
+    {
+      theGetMultiplicityMethodPtr = 
+	&GillespieProcess::getMultiplicity_FirstOrder;
+    }
+  else if( getZeroVariableReferenceOffset() == 2 ) // 2 substrates, 2nd order
+    {  
+      theGetMultiplicityMethodPtr = 
+	&GillespieProcess::getMultiplicity_SecondOrder_TwoSubstrates;
+    }
+  else // one substrate, second order (coeff == -2)
+    {
+      theGetMultiplicityMethodPtr = 
+	&GillespieProcess::getMultiplicity_SecondOrder_OneSubstrate;
+    }
+
 }
 
 
-const bool GillespieProcess::checkEffect( GillespieProcessPtr anGillespieProcessPtr ) const
+const bool GillespieProcess::checkEffect( GillespieProcessPtr 
+					  anGillespieProcessPtr ) const
 {
   VariableReferenceVectorCref 
-    aVariableReferenceVector( anGillespieProcessPtr->getVariableReferenceVector() );
+    aVariableReferenceVector( anGillespieProcessPtr->
+			      getVariableReferenceVector() );
     
   for( VariableReferenceVectorConstIterator 
 	 i( theVariableReferenceVector.begin() );
