@@ -309,8 +309,6 @@ class Interpret(GenericASTTraversal):
 	def n_stepper_stmt( self, node ):
 		aClassname = node[1][0].attr
 		anID = node[1][1].attr
-		print aClassname, anID
-
 
 		self.eml.createStepper( aClassname, anID )
 		
@@ -323,7 +321,6 @@ class Interpret(GenericASTTraversal):
 			aValueList = []
 			for j in aValueNodeList:
 				aValueList.append( j )
-			print aPropertyName, aValueList
 			self.eml.setStepperProperty( anID, aPropertyName,\
 						     aValueList )
 			

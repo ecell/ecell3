@@ -33,7 +33,7 @@ class Eml:
         """read EML file and make domtree"""
 
         if aFileObject is None:
-            aStringData = '<?xml version="1.0" ?><eml><stepperlist/></eml>'
+            aStringData = '<?xml version="1.0" ?><eml></eml>'
         else:
             aStringData = string.join( string.join( aFileObject.readlines(), '' ).split( '\n' ), '' )
 
@@ -68,9 +68,7 @@ class Eml:
         aStepperElement.setAttribute( 'id', anID )
 
         
-        for aTargetNode in self.__theDocument.documentElement.childNodes:
-            if aTargetNode.tagName == 'stepperlist':
-                aTargetNode.childNodes.append( aStepperElement )
+        self.__theDocument.documentElement.childNodes.append( aStepperElement )
 
 
     
@@ -79,14 +77,10 @@ class Eml:
         """delete a stepper"""
 
         for anElement in self.__theDocument.firstChild.childNodes:
-            if anElement.tagName == 'stepperlist':
+            if anElement.tagName == 'stepper' and \
+                   anElement.getAttribute( 'id' )    == anID:
 
-                aStepperlistNode = anElement
-                for aChildElement in aStepperlistNode.childNodes:
-                    if aChildElement.tagName == 'stepper' and \
-                       aChildElement.getAttribute( 'id' )    == anID:
-
-                        aStepperlistNode.removeChild( aChildElement )
+                anElement.removeChild( aChildElement )
         
 
     
@@ -162,13 +156,9 @@ class Eml:
         aStepperNodeList = []
 
         for aTargetNode in self.__theDocument.documentElement.childNodes:
-            if aTargetNode.tagName == 'stepperlist':
-                aStepperlistElement = aTargetNode
-
-                for aTargetNode in aStepperlistElement.childNodes:
-                    if aTargetNode.tagName == 'stepper':
-                        aStepperNode = aTargetNode
-                        aStepperNodeList.append( aStepperNode )
+            if aTargetNode.tagName == 'stepper':
+                aStepperNode = aTargetNode
+                aStepperNodeList.append( aStepperNode )
 
         return aStepperNodeList
 
