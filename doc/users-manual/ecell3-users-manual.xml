@@ -179,7 +179,8 @@
   &cpp-basics;
 
 
-
+  <index>
+    
   <indexterm zone="index">
     <primary>em2eml</primary>
   </indexterm>
@@ -193,7 +194,10 @@
   <indexterm zone="index">
     <primary>E-Cell Model description Language</primary>
     <secondary>EML</secondary>
-  </indexterm>
+  </indexterm>    
+
+  </index>
+
 
 
 </book>
