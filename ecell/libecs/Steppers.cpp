@@ -48,7 +48,7 @@ namespace libecs
 
   void FixedEuler1Stepper::step()
   {
-    const UnsignedInt aSize( getFirstReadOnlyVariableIndex() );
+    const UnsignedInt aSize( getReadOnlyVariableOffset() );
 
     clear();
 
@@ -66,6 +66,7 @@ namespace libecs
 	while( aVariable->checkRange( getStepInterval() ) == false )
 	  {
 	    // don't use setStepInterval()
+	    //FIXME:
 	    loadStepInterval( getStepInterval() * 0.5 );
 	  }
       }
@@ -97,7 +98,7 @@ namespace libecs
     // ========= 1 ===========
     process();
 
-    const UnsignedInt aSize( getFirstReadOnlyVariableIndex() );
+    const UnsignedInt aSize( getReadOnlyVariableOffset() );
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
 	VariablePtr const aVariable( theVariableVector[ c ] );
@@ -112,7 +113,7 @@ namespace libecs
 	theVelocityBuffer[ c ] = aVelocity;
 
 	// clear velocity
-	aVariable->setVelocity( 0 );
+	aVariable->setVelocity( 0.0 );
       }
 
     // ========= 2 ===========
@@ -131,7 +132,7 @@ namespace libecs
 
 
 	// clear velocity
-	aVariable->setVelocity( 0 );
+	aVariable->setVelocity( 0.0 );
       }
 
     // ========= 3 ===========
@@ -234,7 +235,7 @@ namespace libecs
 
   bool Euler1Stepper::calculate()
   {
-    const UnsignedInt aSize( getFirstReadOnlyVariableIndex() );
+    const UnsignedInt aSize( getReadOnlyVariableOffset() );
 
     // don't expect too much from euler
     const Real eps_rel( getTolerance() );
@@ -298,7 +299,7 @@ namespace libecs
 	      {
 		//		setMaxErrorRatio( maxError );
 		reset();
-		return 0;
+		return false;
 	      }
 	  }
 	
@@ -310,7 +311,7 @@ namespace libecs
       }
 
     setMaxErrorRatio( maxError );
-    return 1;
+    return true;
   }
 
 
@@ -327,7 +328,7 @@ namespace libecs
     DifferentialStepper::initialize();
 
     // the number of write variables
-    const UnsignedInt aSize( getFirstReadOnlyVariableIndex() );
+    const UnsignedInt aSize( getReadOnlyVariableOffset() );
 
     theK1.resize( aSize );
   }
@@ -380,7 +381,7 @@ namespace libecs
 
   bool Midpoint2Stepper::calculate()
   {
-    const UnsignedInt aSize( getFirstReadOnlyVariableIndex() );
+    const UnsignedInt aSize( getReadOnlyVariableOffset() );
 
     const Real eps_rel( getTolerance() );
     const Real eps_abs( getTolerance() * getAbsoluteToleranceFactor() );
@@ -468,7 +469,7 @@ namespace libecs
 	      {
 		//		setMaxErrorRatio( maxError );
 		reset();		
-		return 0;
+		return false;
 	      }
 	  }
 
@@ -480,7 +481,7 @@ namespace libecs
       }
     
     setMaxErrorRatio( maxError );
-    return 1;
+    return true;
   }
 
 
@@ -496,7 +497,7 @@ namespace libecs
   {
     DifferentialStepper::initialize();
 
-    const UnsignedInt aSize( getFirstReadOnlyVariableIndex() );
+    const UnsignedInt aSize( getReadOnlyVariableOffset() );
 
     theK1.resize( aSize );
     theK2.resize( aSize );
@@ -547,7 +548,7 @@ namespace libecs
 
   bool CashKarp4Stepper::calculate()
   {
-    const UnsignedInt aSize( getFirstReadOnlyVariableIndex() );
+    const UnsignedInt aSize( getReadOnlyVariableOffset() );
 
     const Real eps_rel( getTolerance() );
     const Real eps_abs( getTolerance() * getAbsoluteToleranceFactor() );
@@ -719,7 +720,7 @@ namespace libecs
 	      {
 		//		setMaxErrorRatio( maxError );
 		reset();
-		return 0;
+		return false;
 	      }
 	  }
 
@@ -731,7 +732,7 @@ namespace libecs
       }
 
     setMaxErrorRatio( maxError );
-    return 1;
+    return true;
   }
 
 
@@ -747,7 +748,7 @@ namespace libecs
   {
     DifferentialStepper::initialize();
 
-    const UnsignedInt aSize( getFirstReadOnlyVariableIndex() );
+    const UnsignedInt aSize( getReadOnlyVariableOffset() );
 
     theK1.resize( aSize );
     theK2.resize( aSize );
@@ -809,7 +810,7 @@ namespace libecs
 
   bool DormandPrince547MStepper::calculate()
   {
-    const UnsignedInt aSize( getFirstReadOnlyVariableIndex() );
+    const UnsignedInt aSize( getReadOnlyVariableOffset() );
 
     const Real eps_rel( getTolerance() );
     const Real eps_abs( getTolerance() * getAbsoluteToleranceFactor() );
@@ -1016,7 +1017,7 @@ namespace libecs
 	      {
 		//		setMaxErrorRatio( maxError );
 		reset();
-		return 0;
+		return false;
 	      }
 	  }
 	
@@ -1028,7 +1029,7 @@ namespace libecs
       }
 
     setMaxErrorRatio( maxError );
-    return 1;
+    return true;
   }
 
 

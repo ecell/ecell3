@@ -109,8 +109,8 @@ namespace libecs
 
   Stepper::Stepper() 
     :
-    theFirstReadWriteVariableIterator( theVariableVector.end() ),
-    theFirstReadOnlyVariableIterator( theVariableVector.end() ),
+    theReadWriteVariableOffset( 0 ),
+    theReadOnlyVariableOffset( 0 ),
     theModel( NULLPTR ),
     theSchedulerIndex( -1 ),
     theCurrentTime( 0.0 ),
@@ -198,12 +198,13 @@ namespace libecs
 		VariableReferenceRef aVariableReference( anIterator->second );
 
 		aVariableReference.
-		  setIsAccessor( aVariableReference.isAccessor() |
+		  setIsAccessor( aVariableReference.isAccessor() ||
 				 aNewVariableReference.isAccessor() );
 		
 		aVariableReference.
-		  setCoefficient( aVariableReference.getCoefficient() +
-				  aNewVariableReference.getCoefficient() );
+		  setCoefficient( abs( aVariableReference.getCoefficient() )
+				  + abs( aNewVariableReference.
+					 getCoefficient() ) );
 	      }
 	  }
       }
@@ -219,14 +220,14 @@ namespace libecs
 	aVariableReferenceVector.push_back( i->second );
       }
     
-    VariableReferenceVectorIterator aFirstReadOnlyVariableReferenceIterator = 
+    VariableReferenceVectorIterator aReadOnlyVariableReferenceIterator = 
       std::partition( aVariableReferenceVector.begin(),
 		      aVariableReferenceVector.end(),
 		      std::mem_fun_ref( &VariableReference::isMutator ) );
 
-    VariableReferenceVectorIterator aFirstReadWriteVariableReferenceIterator = 
+    VariableReferenceVectorIterator aReadWriteVariableReferenceIterator = 
       std::partition( aVariableReferenceVector.begin(),
-		      aFirstReadOnlyVariableReferenceIterator,
+		      aReadOnlyVariableReferenceIterator,
 		      std::not1
 		      ( std::mem_fun_ref( &VariableReference::isAccessor ) )
 		      );
@@ -239,30 +240,35 @@ namespace libecs
 		    std::back_inserter( theVariableVector ),
 		    std::mem_fun_ref( &VariableReference::getVariable ) );
 
-    theFirstReadWriteVariableIterator = 
-      theVariableVector.begin() + ( aFirstReadWriteVariableReferenceIterator 
-				    - aVariableReferenceVector.begin() );
+    theReadWriteVariableOffset = aReadWriteVariableReferenceIterator 
+      - aVariableReferenceVector.begin();
 
-    theFirstReadOnlyVariableIterator = 
-      theVariableVector.begin() + ( aFirstReadOnlyVariableReferenceIterator 
-				    - aVariableReferenceVector.begin() );
+    theReadOnlyVariableOffset = aReadOnlyVariableReferenceIterator 
+      - aVariableReferenceVector.begin();
+    //    theReadOnlyVariableOffset = theVariableVector.size();
+
+    std::cerr <<  getID() << ' ' <<   theReadWriteVariableOffset << ' ' <<
+      theReadOnlyVariableOffset << ' ' << theVariableVector.size ()<< std::endl;
 
     // For each part of the vector, sort by memory address. 
     // This is an optimization.
-    std::sort( theVariableVector.begin(), theFirstReadWriteVariableIterator );
-    std::sort( theFirstReadWriteVariableIterator,
-	       theFirstReadOnlyVariableIterator );
-    std::sort( theFirstReadOnlyVariableIterator, theVariableVector.end() );
+    VariableVectorIterator aReadWriteVariableIterator = 
+      theVariableVector.begin() + theReadWriteVariableOffset;
+    VariableVectorIterator aReadOnlyVariableIterator = 
+      theVariableVector.begin() + theReadOnlyVariableOffset;
+
+    std::sort( theVariableVector.begin(),  aReadWriteVariableIterator );
+    std::sort( aReadWriteVariableIterator, aReadOnlyVariableIterator );
+    std::sort( aReadOnlyVariableIterator,  theVariableVector.end() );
   }
 
 
   void Stepper::createVariableProxies()
   {
     // create VariableProxies.
-    for( VariableVectorIterator i( theVariableVector.begin() );
-	 i != theFirstReadOnlyVariableIterator; ++i )
+    for( UnsignedInt c( 0 );  c != theReadOnlyVariableOffset; ++c )
       {
-	VariablePtr aVariablePtr( *i );
+	VariablePtr aVariablePtr( theVariableVector[ c ] );
 	aVariablePtr->registerProxy( createVariableProxy( aVariablePtr ) );
       }
   }
@@ -274,7 +280,7 @@ namespace libecs
 
     EntityVector anEntityVector;
     anEntityVector.reserve( theProcessVector.size() + 
-			    getFirstReadOnlyVariableIndex() +
+			    getReadOnlyVariableOffset() +
 			    theSystemVector.size() );
 
     // copy theProcessVector
@@ -283,7 +289,7 @@ namespace libecs
 
     // append theVariableVector
     std::copy( theVariableVector.begin(), 
-	       theFirstReadOnlyVariableIterator,
+	       theVariableVector.begin() + theReadOnlyVariableOffset,
 	       std::back_inserter( anEntityVector ) );
 
     // append theSystemVector
@@ -330,29 +336,28 @@ namespace libecs
 
 	VariableVectorCref aTargetVector( aStepperPtr->getVariableVector() );
 
-	VariableVectorConstIterator aFirstReadWriteTargetVariableIterator
+	VariableVectorConstIterator aReadWriteTargetVariableIterator
 	  ( aTargetVector.begin() + 
-	    aStepperPtr->getFirstReadWriteVariableIndex() );
+	    aStepperPtr->getReadWriteVariableOffset() );
 
-	VariableVectorConstIterator aFirstReadOnlyTargetVariableIterator
+	VariableVectorConstIterator aReadOnlyTargetVariableIterator
 	  ( aTargetVector.begin() +
-	    aStepperPtr->getFirstReadOnlyVariableIndex() );
+	    aStepperPtr->getReadOnlyVariableOffset() );
 
 	// For efficiency, binary_search should be done for possibly longer
 	// vector, and linear iteration for possibly shorter vector.
 	//
 
 	// if one Variable in this::readlist appears in the target::write list
-	for( VariableVectorConstIterator j( theVariableVector.begin() );
-	     j != theFirstReadOnlyVariableIterator; ++j )
+	for( UnsignedInt c( 0 ); c != theReadOnlyVariableOffset; ++c )
 	  {
-	    VariablePtr const aVariablePtr( *j );
+	    VariablePtr const aVariablePtr( theVariableVector[ c ] );
 
 	    // search in target::readwrite and target::read list.
-	    if( std::binary_search( aFirstReadWriteTargetVariableIterator,
-				    aFirstReadOnlyTargetVariableIterator,
+	    if( std::binary_search( aReadWriteTargetVariableIterator,
+				    aReadOnlyTargetVariableIterator,
 				    aVariablePtr ) ||
-		std::binary_search( aFirstReadOnlyTargetVariableIterator,
+		std::binary_search( aReadOnlyTargetVariableIterator,
 				    aTargetVector.end(),
 				    aVariablePtr ) )
 	      {
@@ -552,10 +557,9 @@ namespace libecs
     PolymorphVector aVector;
     aVector.reserve( theVariableVector.size() );
 
-    for( VariableVectorConstIterator i( theVariableVector.begin() );
-	 i != theFirstReadOnlyVariableIterator; ++i )
+    for( UnsignedInt c( 0 ); c != theReadOnlyVariableOffset; ++c )
       {
-	aVector.push_back( (*i)->getFullID().getString() );
+	aVector.push_back( theVariableVector[c]->getFullID().getString() );
       }
     
     return aVector;
@@ -566,10 +570,10 @@ namespace libecs
     PolymorphVector aVector;
     aVector.reserve( theVariableVector.size() );
     
-    for( VariableVectorConstIterator i( theFirstReadWriteVariableIterator );
-	 i != theVariableVector.end() ; ++i )
+    for( UnsignedInt c( theReadWriteVariableOffset ); 
+	 c != theVariableVector.size(); ++c )
       {
-	aVector.push_back( (*i)->getFullID().getString() );
+	aVector.push_back( theVariableVector[c]->getFullID().getString() );
       }
     
     return aVector;
@@ -643,7 +647,7 @@ namespace libecs
   void Stepper::reset()
   {
     // restore original values and clear velocity of all the *write* variables.
-    for( UnsignedInt c( 0 ); c < getFirstReadOnlyVariableIndex(); ++c )
+    for( UnsignedInt c( 0 ); c < getReadOnlyVariableOffset(); ++c )
       {
 	VariablePtr const aVariable( theVariableVector[ c ] );
 
@@ -721,7 +725,7 @@ namespace libecs
     Stepper::initialize();
 
     // size of the velocity buffer == the number of *write* variables.
-    theVelocityBuffer.resize( getFirstReadOnlyVariableIndex() );
+    theVelocityBuffer.resize( getReadOnlyVariableOffset() );
 
     // should create another method for property slot ?
     //    setNextStepInterval( getStepInterval() );

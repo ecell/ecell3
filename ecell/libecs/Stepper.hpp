@@ -318,16 +318,15 @@ namespace libecs
       return theVariableVector;
     }
 
-    const VariableVector::size_type getFirstReadWriteVariableIndex()
+    const VariableVector::size_type getReadWriteVariableOffset()
     {
-      return theFirstReadWriteVariableIterator - theVariableVector.begin();
+      return theReadWriteVariableOffset;
     }
 
-    const VariableVector::size_type getFirstReadOnlyVariableIndex()
+    const VariableVector::size_type getReadOnlyVariableOffset()
     {
-      return theFirstReadOnlyVariableIterator - theVariableVector.begin();
+      return theReadOnlyVariableOffset;
     }
-
 
     StepperVectorCref getDependentStepperVector() const
     {
@@ -441,8 +440,8 @@ namespace libecs
     //    StepIntervalConstraintMap theStepIntervalConstraintMap;
 
     VariableVector         theVariableVector;
-    VariableVectorIterator theFirstReadWriteVariableIterator;
-    VariableVectorIterator theFirstReadOnlyVariableIterator;
+    VariableVector::size_type theReadWriteVariableOffset;
+    VariableVector::size_type theReadOnlyVariableOffset;
 
     ProcessVector         theProcessVector;
 
