@@ -8,7 +8,7 @@ SETABLE = 1 << 0   # == 1
 GETABLE = 1 << 1   # == 2
 
 
-# FullID and FullPropertyName field numbers
+# FullID and FullPN field numbers
 TYPE       = 0
 SYSTEMPATH = 1
 ID         = 2
@@ -32,7 +32,7 @@ PrimitiveTypeDictionary =\
 }    
 
 
-def FullID( fullidstring ):
+def getFullID( fullidstring ):
 
     aFullID = string.split( fullidstring, ':' )
     try:
@@ -43,44 +43,44 @@ def FullID( fullidstring ):
     return  tuple( aFullID )
 
 
-def FullPropertyName( fullpropertynamestring ):
+def getFullPN( fullpnstring ):
 
-    aFullPropertyName = string.split( fullpropertynamestring, ':' )
+    aFullPN = string.split( fullpnstring, ':' )
     try:
-        aFullPropertyName[0] = PrimitiveTypeDictionary[aFullPropertyName[0]]
+        aFullPN[0] = PrimitiveTypeDictionary[aFullPN[0]]
     except IndexError:
         raise ValueError( "Invalid PrimitiveType string (%s)." %\
-                          aFullPropertyName[0] )
-    validateFullPropertyName( aFullPropertyName )
-    return tuple( aFullPropertyName )
+                          aFullPN[0] )
+    validateFullPN( aFullPN )
+    return tuple( aFullPN )
 
 
-def FullIDString( fullid ):
+def getFullIDString( fullid ):
 
     validateFullID( fullid )
     aTypeString = PrimitiveTypeString[int(fullid[0])]
     return aTypeString + ':' + string.join( fullid[1:], ':' )
 
 
-def FullPropertyNameString( fullpropertyname ):
+def getFullPNString( fullpn ):
 
-    validateFullPropertyName( fullpropertyname )
-    aTypeString = PrimitiveTypeString[fullpropertyname[0]]
-    return aTypeString + ':' + string.join( fullpropertyname[1:], ':' )
+    validateFullPN( fullpn )
+    aTypeString = PrimitiveTypeString[fullpn[0]]
+    return aTypeString + ':' + string.join( fullpn[1:], ':' )
 
 
-def FullIDToFullPropertyName( fullid, property='' ):
+def convertFullIDToFullPN( fullid, property='' ):
 
     validateFullID( fullid )
     # must be deep copy
-    fullpropertyname = tuple( fullid ) + (property,)
-    return fullpropertyname
+    fullpn = tuple( fullid ) + (property,)
+    return fullpn
 
 
-def FullPropertyNameToFullID( fullpropertyname ):
+def convertFullPNToFullID( fullpn ):
 
-    validateFullPropertyName( fullpropertyname )
-    fullid = tuple( fullpropertyname[:3] )
+    validateFullPN( fullpn )
+    fullid = tuple( fullpn[:3] )
     return fullid
 
 
@@ -92,12 +92,12 @@ def validateFullID( fullid ):
             "FullID has 3 fields. ( %d given )" % aLength )
 
 
-def validateFullPropertyName( fullpropertyname ):
+def validateFullPN( fullpn ):
 
-    aLength = len( fullpropertyname )
+    aLength = len( fullpn )
     if aLength != 4:
         raise ValueError(
-            "FullPropertyName has 4 fields. ( %d given )" % aLength )
+            "FullPN has 4 fields. ( %d given )" % aLength )
 
 
 def createSystemPathFromFullID( aSystemFullID ):
@@ -114,9 +114,9 @@ def createSystemPathFromFullID( aSystemFullID ):
 
 ##########################################################################
 
-def printProperty( sim, fullpropertyname ):
-    value = sim.getProperty( fullpropertyname )
-    print fullpropertyname, '\t=\t', value
+def printProperty( sim, fullpn ):
+    value = sim.getProperty( fullpn )
+    print fullpn, '\t=\t', value
 
 def printAllProperties( sim, fullid ):
     properties = sim.getProperty( fullid +  ('PropertyList',) )
@@ -132,26 +132,26 @@ def printList( sim, primitivetype, systempath,list ):
 
 if __name__ == "__main__":
     
-    fullid  = FullID( 'System:/CELL/CYTOPLASM:MT0' )
+    fullid  = getFullID( 'System:/CELL/CYTOPLASM:MT0' )
     print fullid
 
-    fullproperty = FullPropertyName(
+    fullpn = getFullPN(
         'System:/CELL/CYTOPLASM:MT0:activity' )
-    print fullproperty
+    print fullpn
 
-    fullidstring = FullIDString( fullid )
+    fullidstring = getFullIDString( fullid )
     print fullidstring
 
-    fullpropertystring = FullPropertyNameString( fullproperty )
-    print fullpropertystring
+    fullpnstring = getFullPNString( fullpn )
+    print fullpnstring
 
-    print FullIDToFullPropertyName( fullid )
+    print convertFullIDToFullPN( fullid )
 
-    print FullPropertyNameToFullID( fullproperty )
+    print convertFullPNToFullID( fullpn )
 
-    systemfullid1  = FullID( 'System:/:CELL' )
-    systemfullid2  = FullID( 'System:/CELL:CYTOPLASM' )
-    systemfullid3  = FullID( 'System:/:/' )
+    systemfullid1  = getFullID( 'System:/:CELL' )
+    systemfullid2  = getFullID( 'System:/CELL:CYTOPLASM' )
+    systemfullid3  = getFullID( 'System:/:/' )
     print createSystemPathFromFullID( systemfullid1 )
     print createSystemPathFromFullID( systemfullid2 )
     print createSystemPathFromFullID( systemfullid3 )
