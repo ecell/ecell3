@@ -957,7 +957,7 @@ Now the data is stored in a matrix variable with the same name as the file witho
 	<methodname>getDMSearchPath</methodname>() methods.  These
 	methods gets and returns a colon (:) separated list of
 	directory names.  The search path can also be specified by
-	using <varname>ECELL3_DM_PATH</varname> environment
+	using <envar>ECELL3_DM_PATH</envar> environment
 	variable. See the previous section for more about
 	<acronym>DM</acronym>search path.</para>
 
@@ -1088,10 +1088,10 @@ The '<computeroutput>PYTHON =</computeroutput>' line gives the path of the
       <title>Debugging</title>
 
       <para>To invoke <command>ecell3</command> command in debugging
-	mode, set <varname>ECELL_DEBUG</varname> environment variable.
+	mode, set <envar>ECELL_DEBUG</envar> environment variable.
 	This runs the command on a debugger software.  If found,
 	<productname>GNU gdb</productname> is used as the
-	debugger. <varname>ECELL_DEBUG</varname> can be used for any
+	debugger. <envar>ECELL_DEBUG</envar> can be used for any
 	commands run on <command>ecell3</command>, including
 	<command>ecell3-session</command> and
 	<command>gecell</command>.  For example, to run <command>ecell3-session</command> in debug mode on the shell prompt:
@@ -1125,7 +1125,7 @@ It automatically runs the program with the commandline options with '<parameter>
 	</keycombo>.
 </para>
 
-      <para><varname>ECELL_DEBUG</varname> runs
+      <para><envar>ECELL_DEBUG</envar> runs
 	<productname>gdb</productname>, which is for debugging at the
 	level of lower level C++ code.  See
 	<productname>Python</productname> Library Reference Manual for
@@ -1139,12 +1139,12 @@ It automatically runs the program with the commandline options with '<parameter>
       <para>It is possible to run <command>ecell3</command> command
 	in profiling mode, if the operating system has
 	<productname>GNU sprof</productname> command, and its C
-	library supports <varname>LD_PROFILE</varname> environmental
+	library supports <envar>LD_PROFILE</envar> environmental
 	variable.  Currently it only supports per-shared object
 	profiling. (See GNU C Library Reference Manual)</para>
 
       <para>To run <command>ecell3</command> in profiling mode, set
-	<varname>ECELL_PROFILE</varname> environment variable to
+	<envar>ECELL_PROFILE</envar> environment variable to
 	<emphasis>SONAME</emphasis> of the shared object.  SONAME of
 	a shared object file can be found by using
 	<productname>objdump</productname> command, with, for example,
@@ -1161,7 +1161,7 @@ It automatically runs the program with the commandline options with '<parameter>
         <filename>libecs.so.2.profile</filename>.  The binary
         profiling data can be converted to a text format by using
         <command>sprof</command> command. For example:
-        <informalexample> <screen><prompt>$ </prompt><userinput>sprof -p libecs.so.2</userinput></screen>
+        <informalexample> <screen><prompt>$ </prompt><userinput>sprof -p libecs.so.2 libecs.so.2.profile</userinput></screen>
 	</informalexample>
 </para>
 

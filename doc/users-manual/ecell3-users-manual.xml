@@ -24,6 +24,7 @@
   <!ENTITY writing-em SYSTEM "writing-em.xml">
   <!ENTITY writing-dm SYSTEM "writing-dm.xml">
   <!ENTITY writing-ecs SYSTEM "writing-ecs.xml">
+  <!ENTITY stddmlib SYSTEM "stddmlib.xml">
   <!ENTITY inside-ecell SYSTEM "inside-ecell.xml">
 
   <!ENTITY empy-manual SYSTEM "empy-manual.xml">
@@ -146,6 +147,7 @@
   &writing-em;
   &writing-dm;
   &writing-ecs;
+  &stddmlib;
   &inside-ecell;
 
   <!-- ============= Bugs ================================== -->

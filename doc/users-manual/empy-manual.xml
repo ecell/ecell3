@@ -7,7 +7,7 @@ All occurences of '<'s are converted to '&lt '.
 <appendix>
   <title>Empy Module Manual</title>
 
-  <literallayout class="monospaced">
+  <literallayout class="monospaced" width="90">
 Summary
 
     A templating system for Python.

@@ -1,0 +1,123 @@
+
+  <chapter id="ecell3-stddmlib"> 
+  <title>Standard Dynamic Module Library</title> 
+  <highlights>
+    <para>This chapter overviews:</para>
+    <simplelist>
+      <member>A incomplete list of classes available as the Standard
+      Dynamic Module Library, and,</member> 
+      <member>Some usage the classes in the Standard Dynamic Module Library.</member>
+    </simplelist>
+  </highlights>
+
+    <para>This chapter briefly describes the Standard Dynamic Module Library
+    distributed with &app;.  If the system is installed correctly, the
+    classes provided by the library can be used without any special
+    procedure.</para>
+
+  <para>This chapter is not meant to be a complete reference.  To know
+  more about the classes defined in the library, see the E-Cell3
+  Standard Dynamic Module Library Reference Manual (under preparation).</para>
+
+  <sect1>
+    <title>Steppers</title>
+
+    <para>There are three direct sub-classes of <classname>Stepper</classname>:
+<simplelist>
+	<member>DifferentialStepper</member>
+	<member>DiscreteEventStepper</member>
+	<member>DiscreteTimeStepper</member>
+      </simplelist>
+</para>
+    
+    <sect2>
+      <title>DifferentialSteppers</title>
+
+      <para>
+       <itemizedlist>
+	  <listitem>
+	    <para><classname>ODE45Stepper</classname></para>
+	    <para>This <classname>Stepper</classname> implements
+	    Dormand-Prince 5(4)7M algorithm for ODE systems.</para>
+	    <para>In most cases this <classname>Stepper</classname> is
+	    the best general purpose solver for ODE models.</para>
+	  </listitem>
+	  <listitem>
+	    <para><classname>ODE23Stepper</classname></para>
+	    <para>This <classname>Stepper</classname> implements
+	    Fehlberg 2(3) algorithm for ODE systems.</para> 
+
+	    <para>Try this <classname>Stepper</classname> if other
+	    part of the model has smaller timescales.  This
+	    <classname>Stepper</classname> can be used for a
+	    moderately stiff systems of differential equations.</para>
+	  </listitem>
+	  <listitem>
+	    <para><classname>FixedODE1Stepper</classname></para>
+	    <para>A <classname>DifferentialStepper</classname> without
+	    adaptive stepsizing mechanism.  The solution of this
+	    <classname>Stepper</classname> is the first order.</para>
+
+	    <para>This stepper calls
+	    <methodname>process</methodname>() method of each
+	    <classname>Process</classname> just once in a single
+	    step. Although this
+	    <classname>Stepper</classname> is not suitable for smooth
+	    continuous systems of differential equations, the simplicity
+	    of the algorithm is sometimes useful.</para>
+	  </listitem>
+	</itemizedlist>
+</para>
+    </sect2>
+
+    <sect2>
+      <title>DiscreteEventSteppers</title>
+      <para>
+
+<itemizedlist>
+	  <listitem>
+	    <para>NRStepper</para> <para>An implementation of
+	    Gillespie-Gibson algorithm with modification to enable
+	    multi-stepper simulations.</para>
+
+	    <para>This <classname>Stepper</classname> should be used
+	    in combination with
+	    <classname>NRProcess</classname>.</para>
+	  </listitem>
+	</itemizedlist>
+</para>
+    </sect2>
+
+    <sect2>
+      <title>DiscreteTimeStepper</title>
+
+      <para>
+<itemizedlist>
+	  <listitem>
+	    <para>DiscreteTimeStepper</para>
+	  </listitem>
+	</itemizedlist>
+</para>
+
+    </sect2>
+
+
+    <sect2>
+      <title>Processes</title>
+
+      <para></para>
+    </sect2>
+
+  </sect1>
+
+
+  </chapter>
+
+
+
+<!--
+Local Variables:
+mode: sgml
+sgml-parent-document: ("ecell3-users-manual.xml" "book" "chapter")
+End:
+-->
