@@ -31,7 +31,7 @@ Usage:
         $BASENAME [OPTIONS]     --> invoke the python interpreter
         $BASENAME -h            --> print this message
 
-    Debugging:
+    Debugging mode:   (this would only work with gdb)
 
         If environment variable ECELL_DEBUG is set,
 
@@ -41,8 +41,16 @@ Usage:
 
         $DEBUGGER $PYTHON 
 
-        PYTHONOPTIONS are passed to the program via debugger's 
-        --command= option.
+        with PYTHONOPTIONS passed via debugger's --command= option.
+
+    Profiling mode:   (this would only work on systems with GNU sprof)
+
+        If environment variable ECELL_PROFILE is set to soname of a
+        shared library, it does profiling by passing LD_PROFILE and
+        LD_PROFILE_OUTPUT.  The profiling output file ./SONAME.profile
+        can be inspected by sprof.  
+        ex. 
+          sprof lib/libecs.so.0 ./libecs.so.0.profile
 
 
 Configurations:
@@ -75,6 +83,12 @@ if [ "$1" = '-h' ] ; then
     exit 0
 fi
 
+if [ $ECELL_PROFILE ] ; then
+    export LD_PROFILE_OUTPUT=.
+    export LD_PROFILE=$ECELL_PROFILE
+    rm -f $LD_PROFILE_OUTPUT/$ECELL_PROFILE.profile
+fi
+
 if [ ! $ECELL_DEBUG ] ; then
     exec $PYTHON $*
 else
@@ -88,6 +102,4 @@ else
     $DEBUGGER --command=$TMPFILE $PYTHON
     rm -f $TMPFILE
 fi
-
-
 

@@ -99,7 +99,7 @@ LAOBJ=$CLASSNAME.la
 SOBJ=$CLASSNAME$SHLEXT
 
 #FIXME:
-LDFLAGS="-Wl,-rpath $libdir -L$libdir -lecs"
+LDFLAGS="-Wl,-rpath $libdir -Wl,-soname $SOBJ -L$libdir -lecs"
 
 
 ## main routine
