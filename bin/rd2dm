@@ -6,9 +6,10 @@
 
 
 #TO-DOS, in order of importance, as of 09/30/02
-#-Make this program comment out "#"
-#-Make the value of 'DESCRIPTION' support multi-lines 
-#-Make the value of 'BRIEF_DESCRIPTION' support multi-lines 
+#-Make this program put its executable under --prefix=/.../bin/
+#-Make this program comment out "#" in 'react'
+#-Make this program allow multi-line 'DESCRIPTION' values
+#-Make this program allow multi-line 'BRIEF_DESCRIPTION' values
 #-Make this program support *.rd syntax (will be supported by shell?)
 
 import sys
@@ -219,6 +220,10 @@ for aLine in aTextList: # Iterate for each element(line) in aTextList
 		aReactFuncCounter = aReactFuncCounter + 1
 		if aTextDictionary.has_key('REACT_FUNC') == FALSE: 
 			aTextDictionary['REACT_FUNC'] = [aStrippedLine[anIndex:],]
+
+		elif string.find( aStrippedLine, '#' ) == 0:
+			aTextDictionary['REACT_FUNC'].append('')
+			#pass
 		else: 
 			aTextDictionary['REACT_FUNC'].append(' ' + aStrippedLine) 
 		aReactFuncText = aReactFuncText + ' ' + aTextDictionary['REACT_FUNC'][aReactFuncCounter-1] + '\n'
