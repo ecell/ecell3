@@ -202,14 +202,10 @@ AC_SUBST(BOOST_INCLUDE)
 AC_MSG_CHECKING( for boost python lib );
 BOOST_PYTHON_LIB=""	
 for ac_dir in $EXT_GUESS ; do
-	if test -f $ac_dir/lib/libboost_python$LTDL_SHLIB_EXT ; then
+  BOOST_PYTHON_LIST=($ac_dir/lib/libboost_python*)
+	if test ${#BOOST_PYTHON_LIST[*]} -ge 2; then
 		BOOST_PYTHON_LIB="-lboost_python"
 		BOOST_LIB="-L$ac_dir/lib"
-	else
-		if test -f $ac_dir/lib/libboost_python-gcc$LTDL_SHLIB_EXT ; then
-			BOOST_PYTHON_LIB="-lboost_python-gcc"
-			BOOST_LIB="-L$ac_dir/lib"
-		fi
 	fi
 done
 if test "$BOOST_PYTHON_LIB" = "" ; then
