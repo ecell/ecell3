@@ -48,10 +48,13 @@ namespace libecs
   
 
   /**
-     LoggerBroker administrates Loggers in the model.
+     LoggerBroker creates and administrates Loggers in a model.
 
-     
+     This class creates, holds in a map which associates FullPN with a Logger,
+     and responds to requests to Loggers.
 
+     \see FullPN
+     \see Logger
   */
 
   class LoggerBroker
@@ -98,23 +101,29 @@ namespace libecs
     void flush();
 
 
-    //FIXME: should be private
+    /**
+       Get a const reference to the LoggerMap.
+
+       Use this method for const operations such as LoggerMap::size() 
+       and LoggerMap::begin().
+
+       \return a const reference to the LoggerMap.
+    */
+
     LoggerMapCref getLoggerMap() const
     {
       return theLoggerMap;
     }
 
-    //FIXME: should be private
+  private:
+    
+    LoggerPtr createLogger( FullPNCref aFullPN );
+    
     ModelRef getModel() const
     {
       return theModel;
     }
 
-  protected:
-    
-    LoggerPtr createLogger( FullPNCref aFullPN );
-    
-  private:
 
     // prevent copy
     LoggerBroker( LoggerBrokerCref );

@@ -72,50 +72,136 @@ namespace libecs
 
 
 
+  /**
+     A Stepper class defines and governs computation unit in a model.
+
+
+
+  */
+
   class Stepper
   {
 
   public:
 
     Stepper(); 
-    virtual ~Stepper() {}
+    virtual ~Stepper() 
+    {
+      ; // do nothing
+    }
+
+    /**
+
+    */
+
+    virtual void initialize();
+
+    /**
+
+
+    */
+
+    void sync();
+
+    /**
+
+    */
+
+    void step() 
+    { 
+      compute();
+      theCurrentTime += getStepInterval();
+    }
+
+    /**
+
+    */
+
+    void push();
+
+    
+    /**
+
+     \note each stepper class defines this
+
+    */
+
+    virtual void compute() = 0;
+
+
+
+    /**
+
+    \param aParameterList
+    */
 
     virtual void setParameterList( UVariableVectorCref aParameterList );
 
+
+    /**
+
+
+       \param aSystem
+    */
+
     void registerSystem( SystemPtr aSystem );
+
+    /**
+
+
+       \param aSystem
+    */
+
     void removeSystem( SystemPtr aSystem );
 
+
+    /**
+       Get the current time of this Stepper.
+
+       The current time is defined as a next scheduled point in time
+       of this Stepper.
+
+       \return the current time in Real.
+    */
 
     RealCref getCurrentTime() const
     {
       return theCurrentTime;
     }
 
-    void setCurrentTime( RealCref aTime )
-    {
-      theCurrentTime = aTime;
-    }
-
-
     /**
+       Get the step interval of this Stepper.
 
-    This may be overridden in dynamically scheduled steppers.
-
+       The step interval is a length of time that this Stepper proceeded
+       in the last step.
+       
+       \return the step interval of this Stepper
     */
-
-    void setStepInterval( RealCref aStepInterval );
-
-    void calculateStepsPerSecond();
 
     RealCref getStepInterval() const
     {
       return theStepInterval;
     }
 
+    /**
+       Get the number of steps per a second.
+
+       'StepsPerSecond' is defined as 1.0 / getStepInterval().
+
+       If you need to get a reciprocal of the step interval,
+       use of this is more efficient than just getStepInterval(), because
+       it is pre-calculated when the setStepInterval() is called.
+
+
+       \return the number of steps per a second. (== 1.0 / getStepInterval )
+    */
+
     RealCref getStepsPerSecond() const
     {
       return theStepsPerSecond;
     }
+
+    //@{
 
     bool isEntityListChanged() const
     {
@@ -132,30 +218,14 @@ namespace libecs
       theEntityListChanged = false;
     }
 
-    virtual void initialize();
+    //@}
 
-    SystemVectorCref getSystemVector() const
-    {
-      return theSystemVector;
-    }
 
     void registerSlaves( SystemPtr );
 
     void registerPropertySlotWithProxy( PropertySlotPtr );
 
     void registerLoggedPropertySlot( PropertySlotPtr );
-
-
-    void sync();
-    void step() 
-    { 
-      compute();
-      theCurrentTime += getStepInterval();
-    }
-    void push();
-
-    // each stepper class defines this
-    virtual void compute() = 0;
 
 
     StringCref getName() const
@@ -188,20 +258,51 @@ namespace libecs
       return theMaxInterval;
     }
 
+
     bool operator<( StepperCref rhs )
     {
       return getCurrentTime() < rhs.getCurrentTime();
     }
-
 
     virtual StringLiteral getClassName() const  { return "Stepper"; }
 
 
   protected:
 
+
+    SystemVectorCref getSystemVector() const
+    {
+      return theSystemVector;
+    }
+
+
+    void setCurrentTime( RealCref aTime )
+    {
+      theCurrentTime = aTime;
+    }
+
+    /**
+
+    This may be overridden in dynamically scheduled steppers.
+
+    */
+
+    void setStepInterval( RealCref aStepInterval );
+
+    void calculateStepsPerSecond();
+
+
     void searchSlaves( SystemPtr aStartSystemPtr );
 
+
   protected:
+
+    SystemVector        theSystemVector;
+
+    PropertySlotVector  thePropertySlotWithProxyVector;
+    PropertySlotVector  theLoggedPropertySlotVector;
+
+  private:
 
     Real                theCurrentTime;
 
@@ -210,11 +311,6 @@ namespace libecs
 
     Real                theMinInterval;
     Real                theMaxInterval;
-
-    SystemVector        theSystemVector;
-
-    PropertySlotVector  thePropertySlotWithProxyVector;
-    PropertySlotVector  theLoggedPropertySlotVector;
 
     String              theName;
 

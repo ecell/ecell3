@@ -88,10 +88,13 @@ namespace libecs
     DataPointVectorRCPtr getData( void ) ;
 
     /**
-       It is assumed for both following  getData methods that the Time values
-       returned by GetCurrentTime method are monotonously increasing, therefore
-       a, a newer theTime is always greater than previous
-       b, no 2 theTime values are the same 
+
+
+    \note It is assumed for both following getData methods that the
+       Time values returned by GetCurrentTime method are monotonously
+       increasing, therefore
+       - a newer theTime is always greater than previous
+       - no 2 theTime values are the same 
     */
 
     DataPointVectorRCPtr getData( RealCref aStartTine,
@@ -148,19 +151,12 @@ namespace libecs
 
     void flush();
 
+
   protected:
 
     /**
 
-
-    PropertySlotCref getPropertySlot( void ) const
-    {
-    return thePropertySlotProxy;
-    }
-    */
-  
-  
-    /**
+    \internal
 
     */
 
