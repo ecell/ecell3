@@ -10,13 +10,13 @@ Stepper ODE45Stepper( DE1 )
 
 @#{MAIN_STEPPER='DE1'}
 @#{MAIN_PROCESS='MassActionFluxProcess'}
-@{HYBRID_STEPPER='DE1'}
-@{HYBRID_PROCESS='MassActionFluxProcess'}
+@{FOLDING_STEPPER='DE1'}
+@{FOLDING_PROCESS='MassActionFluxProcess'}
 
 @{MAIN_STEPPER='NR1'}
 @{MAIN_PROCESS='GillespieProcess'}
-@#{HYBRID_STEPPER='NR1'}
-@#{HYBRID_PROCESS='GillespieProcess'}
+@#{FOLDING_STEPPER='NR1'}
+@#{FOLDING_PROCESS='GillespieProcess'}
 
 Stepper NRStepper( NR1 ){Tolerance      0;}
 
@@ -263,26 +263,26 @@ System System( / )
 
         ########################################
 
-        Process @(HYBRID_PROCESS)( Unfold )
+        Process @(FOLDING_PROCESS)( Unfold )
         {
-                StepperID @HYBRID_STEPPER;
+                StepperID @FOLDING_STEPPER;
                 VariableReferenceList   [ _ Variable:/:Protein -1]
                                         [ _ Variable:/:UnProtein 1];
                 k       @(UNFOLD);
         }
 
-        Process @(HYBRID_PROCESS)( UnProteinBinding )
+        Process @(FOLDING_PROCESS)( UnProteinBinding )
         {
-                StepperID @HYBRID_STEPPER;
+                StepperID @FOLDING_STEPPER;
                 VariableReferenceList   [_ Variable:/:DnaJ -1]
                                         [_ Variable:/:UnProtein -1]
                                         [_ Variable:/:DnaJ_UnProtein 1]; 
                 k       @(UNPROTEIN_BINDING);
         }
 
-        Process @(HYBRID_PROCESS)( Refold )
+        Process @(FOLDING_PROCESS)( Refold )
         {
-                StepperID @HYBRID_STEPPER;
+                StepperID @FOLDING_STEPPER;
                 VariableReferenceList   [_ Variable:/:DnaJ_UnProtein -1]
                                         [_ Variable:/:Protein 1] 
                                         [_ Variable:/:DnaJ 1];
