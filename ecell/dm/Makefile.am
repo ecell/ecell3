@@ -42,7 +42,8 @@ FluxDistributionProcess.cpp\
 QuasiDynamicFluxProcess.cpp\
 PythonFluxProcess.cpp\
 PythonProcess.cpp\
-ExpressionFluxProcess.cpp
+ExpressionFluxProcess.cpp\
+ExpressionAlgebraicProcess.cpp
 
 DMH = \
 ESSYNSProcess.hpp\
