@@ -297,7 +297,12 @@ class RCGA:
 					                 %(getJobDirectory(aJobID),
 					                   os.sep,
 					                   getStderrFileName()))
-					sys.stderr.write("If you set \'TMP REMOVABLE\' is True, change it to False and try again.\n")
+					sys.stderr.write("If you set \'TMP REMOVABLE\' is True, change it to False and try again for debugging.\n")
+					sys.stderr.write("If not, see %s%s%s for details.\n" \
+					                  %(getJobDirectory(aJobID),
+					                   os.sep,
+					                   getSessionProxy(aJobID).getStderrFileName() ))
+
 					sys.stderr.flush()
 					
 					sys.exit(SCRIPTFILE_EXIT)
