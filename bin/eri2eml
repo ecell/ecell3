@@ -2,71 +2,154 @@
 
 import sys
 import string
+import os
+import time
+import getopt
+import types
 
 from ecell.eml import *
 
-def convertFQEN2SystemID( aFQEN ):
-    aPathToSystem = aFQEN.split( ':' )[0]
-    aSystemSimpleID = aFQEN.split( ':' )[1]
-
-    if ( aPathToSystem == '/' ):
-        aSystemID = '/' +aSystemSimpleID
-    else:
-        asystemID = aPathToSystem + '/' +aSystemSimpleID
-    return aSystemID
+#def convertFQEN2SystemID( aFQEN ):
+#    aPathToSystem = aFQEN.split( ':' )[0]
+#    aSystemSimpleID = aFQEN.split( ':' )[1]
+#
+#    if ( aPathToSystem == '/' ):
+#        aSystemID = '/' +aSystemSimpleID
+#    else:
+#        asystemID = aPathToSystem + '/' +aSystemSimpleID
+#    return aSystemID
 
 if __name__ == '__main__':
-    aFilename = sys.argv[1]
-    aFile = open( aFilename )
-    s = aFile.readlines()
 
-test = []
-for l in s:
-     w = l.split('\t')
-     test.append(w)
-#print test
 
-anEml = Eml()
+    def usage():
+        aProgramName = os.path.basename( sys.argv[0] )
 
-anEml.createStepper( 'Euler1Stepper', 'SRM_01')
+        print '''
+%s -- conver eri to eml (for E-Cell SE version 1 user)
 
-for anEriLine in test:
-    if ( anEriLine[0] == 'SYSTEM' ):
-        # aSystemID = convertFQEN2SystemID( line[2] )
-        if ( anEriLine[2] == '/:ENVIRONMENT' ):
-            aSystemFullID = 'System::/'
+Usage:
+       %s [-h] [-f] [-o outfile] infile
+
+Options:
+       -h or --help    : Print this message.
+       -f or --force   : Force overwrite even if outfile already exists.
+       -o or --outfile=: specify output file name. '-' means stdout.
+       
+''' % ( aProgramName, aProgramName )
+
+
+    # commandline processing
+    try:
+        opts, args = getopt.getopt( sys.argv[1:], "hfo:",
+                                    ["help","force","outfile="] )
+    except getopt.GetoptError:
+        usage()
+        sys.exit( 1 )
+
+
+    anEmlFileName = None
+    aForceFlag = 0
+
+    for anOption, anArg in opts:
+        if anOption in ( "-h", '--help' ):
+            usage()
+            sys.exit( 0 )
+
+        if anOption in ( "-f", '--force' ):
+            aForceFlag = 1
+
+        if anOption in ( "-o", "--outfile" ):
+            anEmlFileName = anArg
+
+    if len( args ) == 0:
+        sys.stderr.write("No input File.\n")
+        usage()
+        sys.exit( 1 )
+
+    anEriFileName = args[0]
+
+
+    anEriFile = open( anEriFileName )
+    anEriData = anEriFile.readlines()
+    anEriFile.close()
+
+    aBaseName = os.path.basename( anEriFileName )
+    aBaseName, anExt = os.path.splitext( aBaseName )
+
+    if anEmlFileName == None:
+        if anExt == '.eri':
+            anExt = '.eml'
         else:
-            aSystemFullID = 'System:' +anEriLine[2]
+            anExt += '.eml'
 
-        anEml.createEntity( 'System', aSystemFullID )
-        anEml.setEntityProperty( aSystemFullID, 'StepperID', ['SRM_01'] )
-        anEml.setEntityProperty( aSystemFullID, 'Name', anEriLine[3:4] )
-        
-    elif ( anEriLine[0] == 'SUBSTANCE' ):
-        aSystemFullID = 'Substance:' +anEriLine[2]
-        anEriChunk = anEriLine[4].split()
-        anEml.createEntity( 'Substance', aSystemFullID )
-        anEml.setEntityProperty( aSystemFullID, anEriChunk[0], anEriChunk[1:] )
-        anEml.setEntityProperty( aSystemFullID, 'Name', anEriLine[3:4] )
-        
-    elif ( anEriLine[0] == 'REACTOR' ):
-        aSystemFullID = 'Reactor:' +anEriLine[2]
-        if ( anEriLine[1] == 'ConstantParameterReactor' ):
-            aSystemID = anEriLine[2].split(':')[0]
-            print aSystemID
-            if ( aSystemID == '/ENVIRONMENT'):
+        anEmlFileName = aBaseName + anExt
+
+
+#    if anEriFileName == '-':
+#        anEmlFile = sys.stdout
+#    else:
+#        if os.path.isfile( anEmlFileName ) and aForceFlag == 0:
+#            sys.stderr.write("Output file %s exists. Use -f to overwrite.\n"
+#                             % anEmlFileName )
+#            sys.exit( 1 )
+
+#        anEmlFile = open( anEmlFileName, 'w' )
+#
+#    aBuffer = '''
+## created by eri2eml program
+## from file: %s, date: %s
+##
+#''' % ( anEriFileName, time.asctime( time.localtime() ) )
+#
+#    try:
+#
+
+
+    # eri2eml main   
+    anEriStrings = []
+    for anEriLineData in anEriData:
+        anEriLineWord = anEriLineData.split('\t')
+        anEriStrings.append(anEriLineWord)
+
+    anEml = Eml()
+
+    anEml.createStepper( 'Euler1Stepper', 'SRM_01')
+
+    for anEriLine in anEriStrings:
+        if ( anEriLine[0] == 'SYSTEM' ):
+            if ( anEriLine[2] == '/:ENVIRONMENT' ):
                 aSystemFullID = 'System::/'
             else:
-                # aSystemFullID = 'System:' +aSystemID
-                aSystemFullID = anEml.convertSystemID2SystemFullID( aSystemID )
-            print aSystemFullID
-                
+                aSystemFullID = 'System:' +anEriLine[2]
+
+                anEml.createEntity( 'System', aSystemFullID )
+                anEml.setEntityProperty( aSystemFullID, 'StepperID', ['SRM_01'] )
+                anEml.setEntityProperty( aSystemFullID, 'Name', anEriLine[3:4] )        
+        elif ( anEriLine[0] == 'SUBSTANCE' ):
+            aSystemFullID = 'Substance:' +anEriLine[2]
             anEriChunk = anEriLine[4].split()
-            anEml.setEntityProperty( aSystemFullID, 'Volume', anEriChunk[1:] )
-        else:            
-            anEml.createEntity( anEriLine[1], aSystemFullID )
+            anEml.createEntity( 'Substance', aSystemFullID )
+            anEml.setEntityProperty( aSystemFullID, anEriChunk[0], anEriChunk[1:] )
             anEml.setEntityProperty( aSystemFullID, 'Name', anEriLine[3:4] )
-            # print anEriLine[4:]
+        
+        elif ( anEriLine[0] == 'REACTOR' ):
+            aSystemFullID = 'Reactor:' +anEriLine[2]
+            if ( anEriLine[1] == 'ConstantParameterReactor' ):
+                aSystemID = anEriLine[2].split(':')[0]
+#                print aSystemID
+                if ( aSystemID == '/ENVIRONMENT'):
+                    aSystemFullID = 'System::/'
+                else:
+                    aSystemFullID = anEml.convertSystemID2SystemFullID( aSystemID )
+#                    print aSystemFullID
+                
+                    anEriChunk = anEriLine[4].split()
+                    anEml.setEntityProperty( aSystemFullID, 'Volume', anEriChunk[1:] )
+            else:            
+                anEml.createEntity( anEriLine[1], aSystemFullID )
+                anEml.setEntityProperty( aSystemFullID, 'Name', anEriLine[3:4] )
+
             aReactantList = []
             aSubstrateNumber = 0
             aProductNumber = 0
@@ -82,9 +165,6 @@ for anEriLine in test:
                     aSubstrateList.append( 'Substance:' + anEriChunkElement[1])
                     aSubstrateList.append( str(-1 * int(anEriChunkElement[2])) )
                     aReactantList.append( aSubstrateList )
-#                    anEml.setEntityProperty( aSystemFullID, 'ReactantList', aReactantList )
-                    # print aReactantList
-                    # print anEriChunkElement[0]
                 elif ( anEriChunkElement[0] == 'Product' ):
                     aProductList = []
                     aProductList.append( 'P' + str(aProductNumber) )
@@ -92,7 +172,7 @@ for anEriLine in test:
                     aProductList.append( 'Substance:' + anEriChunkElement[1])
                     aProductList.append( str(1 * int(anEriChunkElement[2])) )
                     aReactantList.append( aProductList )
-#                    anEml.setEntityProperty( aSystemFullID, 'ReactantList', aReactantList )
+
                 elif ( anEriChunkElement[0] == 'Catalyst' ):
                     aCatalystList = []
                     aCatalystList.append( 'C' + str(aCatalystNumber) )
@@ -100,7 +180,7 @@ for anEriLine in test:
                     aCatalystList.append( 'Substance:' + anEriChunkElement[1])
                     aCatalystList.append( '0' )
                     aReactantList.append( aCatalystList )
-#                    anEml.setEntityProperty( aSystemFullID, 'ReactantList', aReactantList )
+
                 elif ( anEriChunkElement[0] == 'Effector' ):
                     anEffectorList = []
                     anEffectorList.append( 'E' + str(anEffectorNumber) )
@@ -108,18 +188,19 @@ for anEriLine in test:
                     anEffectorList.append( 'Substance:' + anEriChunkElement[1])
                     anEffectorList.append( '0' )
                     aReactantList.append( anEffectorList )
-#                   anEml.setEntityProperty( aSystemFullID, 'ReactantList', aReactantList )
+
                 else:
-                    # print anEriChunkElement[0]
-                    # print anEriChunkElement[1:]
                     anEml.setEntityProperty( aSystemFullID, anEriChunkElement[0], anEriChunkElement[1:] )
-            anEml.setEntityProperty( aSystemFullID, 'ReactantList', aReactantList )
+                        
+                anEml.setEntityProperty( aSystemFullID, 'ReactantList', aReactantList )
     else: 
-            pass
+        pass
 
-anEml.save('test1.eml')
-aString = anEml.asString()
 
-print aString
+
+    anEml.save( anEmlFileName )
+#        aString = anEml.asString()
+
+#        print aString
 
 
