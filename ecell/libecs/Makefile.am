@@ -43,10 +43,6 @@ Logger.cpp\
 PhysicalLogger.cpp\
 LoggerBroker.cpp
 
-#Accumulators.cpp\
-#AccumulatorMaker.cpp\
-
-
 libecsdir=${pkgincludedir}/libecs
 libecs_HEADERS=\
 libecs.hpp\
@@ -85,11 +81,6 @@ RCPtr.hpp\
 Connection.hpp\
 DynamicPriorityQueue.hpp\
 AssocVector.h
-
-#AccumulatorMaker.hpp\
-#Accumulators.hpp\
-
-
 
 bin_SCRIPTS =\
 emtool

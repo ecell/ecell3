@@ -38,8 +38,6 @@
 #include "Defs.hpp"
 #include "Exceptions.hpp"
 
-#include "korandom/korandom.h"
-
 namespace libecs
 {
 
