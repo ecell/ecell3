@@ -167,6 +167,7 @@ class EmParser( GenericParser ):
 	def p_object_decl( self, args ):
 		'''
 		object_decl ::= name ( name )
+                object_decl ::= Substance ( name )
 		'''
 		return AST ( Token( 'object_decl' ), ( args[0], args[2] ) )
 
@@ -347,7 +348,6 @@ class Interpret(GenericASTTraversal):
 			aValueList = []
 			for j in aValueNodeList:
 				aValueList.append( j )
-			print aPropertyName, aValueList
 			self.eml.setEntityProperty( anID, aPropertyName,\
 						     aValueList )
 		
