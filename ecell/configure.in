@@ -1,0 +1,87 @@
+AC_REVISION([$Id$])dnl
+
+dnl Process this file with autoconf to produce a configure script.
+
+
+VERSION=\"3.0\"
+PACKAGE=\"ecell\"
+
+AC_SUBST(VERSION)
+AC_SUBST(PACKAGE)
+
+AC_INIT(Koyurugi/Entity.h)
+AM_INIT_AUTOMAKE(ecell,3.0)
+
+AM_SANITY_CHECK
+
+AC_CANONICAL_HOST
+
+
+if test $prefix = "NONE" ; then
+	PREFIX=$ac_default_prefix
+else
+	PREFIX=$prefix
+fi
+
+AC_SUBST(PREFIX)
+
+dnl Checks for programs.
+
+AC_LANG_CPLUSPLUS
+
+dnl Checks for libraries.
+
+dnl assuming libc and libm always present...
+
+AC_CHECK_LIB(m, sin, LIBM="-lm")
+AC_SUBST(LIBM)
+dnl
+AC_CHECK_LIB(c, open, LIBC="-lc")
+AC_SUBST(LIBC)
+dnl
+
+AC_CHECK_LIB(dl, dlopen, LIBDL="-ldl")
+if test "$LIBDL" = ""; then
+AC_MSG_ERROR([The libdl could not be found.])
+fi
+AC_SUBST(LIBDL)
+
+dnl Checks for header files.
+AC_HEADER_DIRENT
+AC_HEADER_STDC
+AC_CHECK_HEADERS(fcntl.h unistd.h)
+AC_CHECK_HEADERS(stl.h)
+
+
+
+dnl Checks for typedefs, structures, and compiler characteristics.
+AC_LANG_SAVE
+AC_C_CONST
+AC_C_INLINE
+AC_TYPE_OFF_T
+AC_TYPE_SIZE_T
+AC_TYPE_SIGNAL
+AC_STRUCT_ST_RDEV
+AC_LANG_RESTORE
+
+ICE_CXX_PRETTY_FUNCTION
+ICE_CXX_STD_EXCEPTIONS
+ICE_CXX_TYPEINFO
+
+dnl Checks for library functions.
+AC_TYPE_SIGNAL
+dnl AC_FUNC_VPRINTF
+AC_CHECK_FUNCS(mkdir select strdup strerror strtod uname)
+
+dnl Checks for library functions.
+AC_CHECK_FUNCS(strdup strstr)
+
+AM_CONFIG_HEADER(config.h)
+
+AC_OUTPUT(
+Makefile 
+Koyurugi/Makefile 
+korandom/Makefile
+util/Makefile
+)
+
