@@ -68,6 +68,8 @@ namespace libecs
     gsl_rng_env_setup();
 
     theRng = gsl_rng_alloc( gsl_rng_default );
+
+    setRngSeed( "TIME" );
   }
 
   Stepper::~Stepper()
@@ -611,6 +613,10 @@ namespace libecs
     if( value == "TIME" )
       {
 	aSeed = static_cast<UnsignedInt>( time( NULLPTR ) );
+      }
+    else if( value == "DEFAULT" )
+      {
+	aSeed = gsl_rng_default_seed;
       }
     else
       {
