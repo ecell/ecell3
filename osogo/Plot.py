@@ -36,8 +36,9 @@ class Plot:
 	    self.plotwidth=480
 	    self.plotheigth=350
 	    self.plotarea=[70,20,370,300]
-	    self.ylabelsarea=[0,0,65,325]
+	    self.ylabelsarea=[0,0,69,325]
 	    self.xlabelsarea=[30,325,450,25]
+	    self.xticksarea=[70,322,410,3]
 	    self.origo=[70,320]
 	    self.yaxis_x=self.origo[0]-1
 	    self.xaxis_y=self.origo[1]+1
@@ -125,6 +126,8 @@ class Plot:
 	def clearxlabelarea(self):
 	    self.drawbox("background",self.xlabelsarea[0],self.xlabelsarea[1],
 			self.xlabelsarea[2],self.xlabelsarea[3])
+	    self.drawbox("background",self.xticksarea[0],self.xticksarea[1],
+			self.xticksarea[2],self.xticksarea[3])
 	    
 	def clearylabelarea(self):
 	    self.drawbox("background",self.ylabelsarea[0],self.ylabelsarea[1],
@@ -135,19 +138,17 @@ class Plot:
 	    self.xticks_no=ticks
 	    self.drawline("pen", self.yaxis_x,self.xaxis_y,
 			    self.yaxis_x+self.xaxislength,self.xaxis_y)
-	    self.xticks_step=self.plotarea[2]/float(ticks)
-	    for t in range(ticks):
-		x=round((t+1)*self.xticks_step)+self.origo[0]
-		self.drawline("pen",x,self.xaxis_y,x,self.xaxis_y+5)
+#	    self.xticks_step=self.plotarea[2]/float(ticks)
+#	    for t in range(ticks):
+#		x=round((t+1)*self.xticks_step)+self.origo[0]
 	    
 	def drawyaxis(self,ticks):
 	    self.yticks_no=ticks
 	    self.drawline("pen", self.yaxis_x,self.xaxis_y-self.yaxislength,
 			    self.yaxis_x,self.xaxis_y)
-	    self.yticks_step=self.plotarea[3]/float(ticks)
-	    for t in range(ticks):
-		y=self.origo[1]-round((t+1)*self.yticks_step)
-		self.drawline("pen",self.yaxis_x-5,y,self.yaxis_x,y)
+#	    self.yticks_step=self.plotarea[3]/float(ticks)
+#	    for t in range(ticks):
+#		y=self.origo[1]-round((t+1)*self.yticks_step)
 	    
 	def drawpoint_on_plot(self, aFullPNString,x,y):
 	    #uses raw plot coordinates!
@@ -198,17 +199,20 @@ class Plot:
 			self.plotarea[3])
 	    self.theWidget.queue_draw()
 	    
-	def printxlabel(self, position, num):
-	    text=self.num_to_sci(num)
-	    x=round(self.xticks_step*position+self.yaxis_x-self.font.string_width(str(text))/2)
+	def printxlabel(self, num):
+	    text=self.num_to_sci(int(num))
+	    x=self.convertx_to_plot(num)
 	    y=self.xaxis_y+10
-	    self.drawtext("pen",x,y,text)
+	    self.drawtext("pen",x-self.font.string_width(str(text))/2,y,text)
+	    self.drawline("pen",x,self.xaxis_y,x,self.xaxis_y+5)
 	    
 	def printylabel(self,position,num):
 	    text=self.num_to_sci(num)
 	    x=self.yaxis_x-5-self.font.string_width(text)
-	    y=self.xaxis_y-round(self.yticks_step*position)-7
-	    self.drawtext("pen",x,y,text)
+	    y=self.converty_to_plot(num)
+	    self.drawtext("pen",x,y-7,text)
+	    self.drawline("pen",self.yaxis_x-5,y,self.yaxis_x,y)
+	    
 	    
 	def num_to_sci(self,num):
 	    if (num<0.00001 and num>-0.00001 and num!=0) or num >999999 or num<-9999999:
@@ -254,6 +258,23 @@ class Plot:
 		    yrange=(self.minmax[1]-self.minmax[0])/(self.yframemax_when_rescaling-self.yframemin_when_rescaling)
 		    self.yframe[1]=self.minmax[1]+(1-self.yframemax_when_rescaling)*yrange
 		    self.yframe[0]=self.minmax[0]-(self.yframemin_when_rescaling*yrange)
+		    exponent=pow(10,floor(log10(self.yframe[1]-self.yframe[0])))
+		    mantissa1=ceil(self.yframe[1]/exponent)
+		    mantissa0=floor(self.yframe[0]/exponent)
+		    ticks=mantissa1-mantissa0
+		    if ticks>10:
+			mantissa0=floor(mantissa0/2)*2	
+			mantissa1=ceil(mantissa1/2)*2
+			ticks=(mantissa1-mantissa0)/2
+		    elif ticks<5:
+			ticks*=2
+		    self.yticks_no=ticks
+
+
+		    self.yframe[1]=mantissa1*exponent
+		    self.yframe[0]=mantissa0*exponent
+		
+		    self.yticks_step=(self.yframe[1]-self.yframe[0])/self.yticks_no
 		else:
 		    if self.minmax[0]<0 or self.minmax[1]<=0:
 			self.theOwner.theSession.message("negative value in data, fallback to linear scale!\n")
@@ -265,10 +286,52 @@ class Plot:
 			miny=self.minmax[0]
 		    self.yframe[1]=pow(10,ceil(log10(self.minmax[1])))
 		    self.yframe[0]=pow(10,floor(log10(miny)))	    
+		    diff=int(log10(self.yframe[1]/self.yframe[0]))
+		    if diff==0:diff=1
+		    if diff<6:
+			self.yticks_no=diff
+			self.yticks_step=10
+		    else:
+			self.yticks_no=5
+			self.yticks_step=pow(10,ceil(diff/5))
+		self.ygrid[0]=self.yframe[0]
+		self.ygrid[1]=self.yframe[1]
+	    else:
+		if self.scale_type=='linear':
+		    ticks=0
+		    exponent=pow(10,floor(log10(self.yframe[1]-self.yframe[0])))
+		    while ticks<5:
+			mantissa1=floor(self.yframe[1]/exponent)
+			mantissa0=ceil(self.yframe[0]/exponent)
+			ticks=mantissa1-mantissa0
+			if ticks<5: exponent=exponent/2
+			
+		    if ticks>10:
+			mantissa0=ceil(mantissa0/2)*2	
+			mantissa1=floor(mantissa1/2)*2
+			ticks=(mantissa1-mantissa0)/2
+		    self.yticks_no=ticks
+		    self.ygrid[1]=mantissa1*exponent
+		    self.ygrid[0]=mantissa0*exponent
+		    		    		
+		    self.yticks_step=(self.ygrid[1]-self.ygrid[0])/self.yticks_no
+		
+		#scale is log
+		else:	
+		    self.ygrid[1]=pow(10,floor(log10(self.yframe[1])))
+		    self.ygrid[0]=pow(10,ceil(log10(self.yframe[0])))	    
+		    diff=int(log10(self.ygrid[1]/self.ygrid[0]))
+		    if diff==0:diff=1
+		    if diff<6:
+			self.yticks_no=diff
+			self.yticks_step=10
+		    else:
+			self.yticks_no=5
+			self.yticks_step=pow(10,ceil(diff/5))
+				
 	    self.reframey2()
 #	    self.yframe0max=self.yframe[0]+(self.yframe[1]-self.yframe[0])*self.yvaluemin_trigger_rescale
 #	    self.yframe1min=self.yframe[0]+(self.yframe[1]-self.yframe[0])*self.yvaluemax_trigger_rescale
-	    
 	    return 0
 
 	def reframey2(self):
@@ -300,21 +363,17 @@ class Plot:
 	def reprint_ylabels(self):
 	    #clears ylabel area
 	    self.clearylabelarea()
-	    tick_step=1.0
+	    tick=1
 	    if self.scale_type=='linear':
-		tick_step=float(self.yframe[1]-self.yframe[0])/self.yticks_no
+		for tick in range(self.yticks_no+1):
+		    tickvalue=self.ygrid[0]+tick*self.yticks_step
+		    self.printylabel(tick,tickvalue)
 	    else:
-		if self.yframe[0]==0:
-		    tick_step=pow(self.yframe[1],-self.yticks_no)
-		else:
-		    tick_step=pow(float(self.yframe[1])/self.yframe[0],float(1)/self.yticks_no)
-	    tickvalue=1.0
-	    for tick in range(self.yticks_no+1):
-		if self.scale_type=='linear':
-		    tickvalue=self.yframe[0]+tick*tick_step
-		else:
-		    tickvalue=(self.yframe[1])/pow(tick_step,(self.yticks_no-tick))	    
-		self.printylabel(tick,tickvalue)
+		tickvalue=self.ygrid[1]
+		while tickvalue>self.ygrid[0]:
+		    self.printylabel(tick,tickvalue)
+		    tickvalue=tickvalue/self.yticks_step
+		self.printylabel(tick,self.ygrid[0])	    
 	    #writes labels
 
 
@@ -340,8 +399,8 @@ class TracerPlot(Plot):
 	    self.xframe_when_rescaling=0.5
 	    self.yvaluemax_trigger_rescale=0.70 #if max(values) falls to low
 	    self.yvaluemin_trigger_rescale=0.30
-	    self.yframemin_when_rescaling=0.15
-	    self.yframemax_when_rescaling=0.85	    
+	    self.yframemin_when_rescaling=0.1
+	    self.yframemax_when_rescaling=0.9	    
 	    self.stripinterval=1000
 	    self.zerovalue=1e-50 #very small amount to substitute 0 in log scale calculations
 	    # stripinterval/pixel
@@ -354,11 +413,16 @@ class TracerPlot(Plot):
 	    self.zoomlevel=0    
 	    #set yframes
 	    self.yframe=[0,1]
+	    self.ygrid=[0,1]
 	    self.xframe=[0,1000]
+	    self.xgrid=[0,1000]
 	    self.pixelwidth=float(self.xframe[1]-self.xframe[0])/self.plotarea[2]
 	    self.pixelheigth=float(self.yframe[1]-self.yframe[0])/self.plotarea[3]
-	    self.drawxaxis(6)
+	    
+	    self.drawxaxis(5)
 	    self.drawyaxis(10)
+	    self.yticks_step=0.1
+	    self.xticks_step=200
 	    self.reprint_xlabels()
 	    self.reprint_ylabels()	    
 	    self.setstrip=False
@@ -394,6 +458,7 @@ class TracerPlot(Plot):
 			redraw_flag=True
 		if shift_flag:
 		    newxframe=max(xmax,self.xframe[1]+self.stripinterval*(1-self.xframe_when_rescaling))
+#		    newxframe=ceil(newxframe/self.stripinterval)*self.stripinterval
 		    shift=newxframe-self.xframe[1]
 		    self.xframe[1]+=shift
 		    self.xframe[0]+=shift
@@ -466,7 +531,7 @@ class TracerPlot(Plot):
 	    for fpn in self.data_list:
 	        if pointmap[fpn][0]>self.xframe[1]:
 		    self.xframe[1]=pointmap[fpn][0]
-		    self.xframe[0]=self.xframe[1]-self.stripinterval*self.xframe_when_rescaling
+	    self.xframe[0]=floor(self.xframe[1]/self.stripinterval)*self.stripinterval
 	    if self.xframe[0]<0: self.xframe[0]=0
 	    self.xframe[1]=self.xframe[0]+self.stripinterval	
 	    #try to get whole data within given xframes		
@@ -575,7 +640,7 @@ class TracerPlot(Plot):
 	    return return_list
 
 	def getminmax(self):
-	    self.minmax=[0,1,0,100,0.01]
+	    self.minmax=[0,1,0,100,10000000000]
 	    #search
 	    a=[]
 	    for fpn in self.data_list:
@@ -764,10 +829,11 @@ class TracerPlot(Plot):
 	def reprint_xlabels(self):
 	    #clears xlabel area
 	    self.clearxlabelarea()
-	    tick_step=float(self.xframe[1]-self.xframe[0])/self.xticks_no
+#	    tick_step=float(self.xframe[1]-self.xframe[0])/self.xticks_no
 	    for tick in range(self.xticks_no+1):
-		tickvalue=self.xframe[0]+tick*tick_step
-		self.printxlabel(tick,tickvalue)
+		tickvalue=self.xgrid[0]+tick*self.xticks_step
+
+		self.printxlabel(tickvalue)
 			    
 	    #writes labels
 	    
@@ -815,11 +881,31 @@ class TracerPlot(Plot):
 		#setlast
 		self.lastx[aFullPNString]=x
 		self.lasty[aFullPNString]=y
+	else:
+		self.lastx[aFullPNString]=None
+		self.lasty[aFullPNString]=None
+
 
 	    
 	    
 	def reframex(self):
-	    self.pixelwidth=float(self.xframe[1]-self.xframe[0])/self.plotarea[2]
+		ticks=0
+		exponent=pow(10,floor(log10(self.xframe[1]-self.xframe[0])))
+		while ticks < 3:
+			
+			mantissa1=floor(self.xframe[1]/exponent)
+			mantissa0=ceil(self.xframe[0]/exponent)
+			ticks=mantissa1-mantissa0
+			if ticks<3: exponent=exponent/2
 
-	    self.reprint_xlabels()
-	    
+		if ticks > 6:
+			mantissa0=ceil(mantissa0/2)*2
+			mantissa1=floor(mantissa1/2)*2
+			ticks=(mantissa1-mantissa0)/2
+		self.xticks_no=ticks
+		self.xgrid[1]=mantissa1*exponent
+		self.xgrid[0]=mantissa0*exponent
+		self.xticks_step=(self.xgrid[1]-self.xgrid[0])/self.xticks_no
+		self.pixelwidth=float(self.xframe[1]-self.xframe[0])/self.plotarea[2]
+		self.reprint_xlabels()
+
