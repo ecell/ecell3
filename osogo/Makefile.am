@@ -4,22 +4,25 @@ SUBDIRS = plugins
 
 osogodir=${pkglibdir}
 osogo_DATA=\
+ConfirmWindow.py\
 EntryListWindow.glade\
 EntryListWindow.py\
 InterfaceWindow.py\
 InterfaceWindow.glade\
+LoggerFactory.py\
 LoggerWindow.glade\
 LoggerWindow.py\
 MainWindow.glade\
 MainWindow.py\
 MessageWindow.glade\
 MessageWindow.py\
+OsogoPluginManager.py\
+OsogoPluginWindow.py\
 PaletteWindow.glade\
 PaletteWindow.py\
 Plugin.py\
 PluginWindow.py\
 PluginWindowPopupMenu.glade\
-ViewWindow.py\
 Window.py\
 board.glade\
 config.py\
