@@ -34,6 +34,13 @@ class PropertyWindow(PluginWindow):
         
     def initialize( self ):
 
+        if self.theFPNs == ():
+            return
+        self.setFullPNList( self.theFPNs )
+    
+    def setFullPNList( self, aFullPNList ):
+        self.theFPNs = aFullPNList
+        
         self.theSelected = ''
         
         self.theFullID = convertFullPNToFullID( self.theFPNs[0] )
