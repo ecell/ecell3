@@ -401,46 +401,77 @@ import StringIO
 import ecell.em
 em = ecell.em ; del ecell.em
 
-def lineControl( file, line ):
-	return '%%line %d %s\n' % ( line, file )
-
-def beforeHook( interpreter, keywords ):
-	interpreter.write( lineControl( keywords['name'], 1 ) )
-
-def afterHook( interpreter, keywords ):
-	( file, line ) = interpreter.context().identify()
-	interpreter.write( lineControl( file, line ) )
 
 
-def preprocess( file, filename ):
+class Preprocessor:
 
-	Output = StringIO.StringIO()
+	def __init__( self, file, filename ):
+		self.need_linecontrol = 0
+		self.file = file
+		self.filename = filename
 
-	interpreter = em.Interpreter( output = Output )
+	def lineControl( self, interpreter, file, line ):
+		interpreter.write( '%%line %d %s\n' % ( line, file ) )
 
-        interpreter.pseudo.flatten()
+	def needLineControl( self, *args ):
+		self.need_linecontrol = 1
 
-	interpreter.pseudo.addHook( 'before_include', beforeHook )
-	interpreter.pseudo.addHook( 'after_include', afterHook )
+	def atParseHook( self, interpreter, keywords ):
+		if not self.need_linecontrol:
+			return
 
-	interpreter.write( lineControl( filename, 1 ) )
+		( file, line ) = interpreter.context().identify()
+		self.lineControl( interpreter, file, line )
+		self.need_linecontrol = 0
 
-	#
-	# FIXME: need more hooks here for multiline string expansions
-	#
+	def beforeIncludeHook( self, interpreter, keywords ):
+		self.lineControl( interpreter, keywords['name'], 1 )
+
+	def afterIncludeHook( self, interpreter, keywords ):
+		( file, line ) = interpreter.context().identify()
+		self.lineControl( interpreter, file, line )
+
+	def preprocess( self ):
+
+		#
+		# init
+		#
+		Output = StringIO.StringIO()
+		interpreter = em.Interpreter( output = Output )
+		pseudo = interpreter.pseudo
+		pseudo.flatten()
+
+		#
+		# set hooks
+		#
+		pseudo.addHook( 'after_include', self.afterIncludeHook )
+		pseudo.addHook( 'after_expand', self.needLineControl )
+		# 'after_evaluate' may not work in a bug in empy2.0?
+		pseudo.addHook( 'before_evaluate', self.needLineControl )
+		pseudo.addHook( 'after_execute', self.needLineControl )
+		pseudo.addHook( 'after_substitute', self.needLineControl )
+		pseudo.addHook( 'after_significate', self.needLineControl )
+		pseudo.addHook( 'at_parse', self.atParseHook )
 
 
-	# start processing
-	if file is not None:
-		interpreter.wrap( interpreter.file, (file, filename), 0, 1 )
+		#
+		# processing
+		#
 
-	interpreter.flush()
+		# write first line
+		self.lineControl( interpreter, self.filename, 1 )
 
-	OutputString = Output.getvalue()
+		if self.file is not None:
+			interpreter.wrap( interpreter.file,\
+					  ( self.file, self.filename ), 0, 1 )
 
-	interpreter.shutdown()
+		interpreter.flush()
 
-	return OutputString
+		OutputString = Output.getvalue()
+
+		interpreter.shutdown()
+
+		return OutputString
 
 
 def usage():
@@ -514,7 +545,9 @@ if __name__ == '__main__':
 	if anEmlFileName == '-':
 		anEmlFile = sys.stdout
 
-	aTempFile = StringIO.StringIO( preprocess( anEmFile, anEmFileName ) )
+	preprocessor = Preprocessor( anEmFile, anEmFileName )
+	aTempFile = StringIO.StringIO( preprocessor.preprocess() )
+	del preprocessor
 
 	aTempFile.seek( 0 )
 
