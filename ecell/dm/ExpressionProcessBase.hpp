@@ -39,6 +39,7 @@
 
 #include "boost/spirit/core.hpp"
 #include "boost/spirit/tree/ast.hpp"
+#include "boost/shared_ptr.hpp"
 
 #include "Process.hpp"
 
@@ -58,9 +59,14 @@ namespace libecs
     class Compiler;
 
     DECLARE_CLASS( Instruction );
+    DECLARE_CLASS( Code );
     DECLARE_VECTOR( Int, IntVector );
     DECLARE_VECTOR( Real, RealVector );
     DECLARE_VECTOR( InstructionPtr, InstructionVector );
+
+    DECLARE_ASSOCVECTOR( String, Real, std::less<const String>, ConstantMap);
+    DECLARE_ASSOCVECTOR( String, Real, std::less<const String>, PropertyMap);
+    DECLARE_ASSOCVECTOR( String, Real(*)(Real), std::less<const String>, FunctionMap);
 
     typedef const Real (libecs::VariableReference::* VariableReferenceMethodPtr)() const;
     typedef SystemPtr (libecs::Process::* System_Func)() const;
@@ -73,6 +79,7 @@ namespace libecs
       Instruction() {}
       virtual ~Instruction() {}
       
+      virtual void initialize() = 0;
       virtual void execute( StackMachine& aStackMachine ) = 0;
     };
 
@@ -89,6 +96,11 @@ namespace libecs
       }
       virtual ~PUSH() {}
     
+      virtual void initialize()
+      {
+	; //do nothing
+      }
+
       virtual void execute( StackMachine& aStackMachine );
 
     private:
@@ -103,8 +115,12 @@ namespace libecs
       NEG() {}
       virtual ~NEG() {}
     
-      virtual void execute( StackMachine& aStackMachine );
-    
+      virtual void initialize()
+      {
+	; //do nothing
+      }
+
+      virtual void execute( StackMachine& aStackMachine );    
     };
   
     class ADD
@@ -115,8 +131,12 @@ namespace libecs
       ADD() {}
       virtual ~ADD() {}
     
-      virtual void execute( StackMachine& aStackMachine );
-    
+      virtual void initialize()
+      {
+	; //do nothing
+      }
+
+      virtual void execute( StackMachine& aStackMachine );    
     };
   
     class SUB
@@ -127,8 +147,12 @@ namespace libecs
       SUB() {}
       virtual ~SUB() {}
     
-      virtual void execute( StackMachine& aStackMachine );
-    
+      virtual void initialize()
+      {
+	 //do nothing
+      }
+
+      virtual void execute( StackMachine& aStackMachine );    
     };
   
     class MUL
@@ -139,8 +163,12 @@ namespace libecs
       MUL() {}
       virtual ~MUL() {}
     
-      virtual void execute( StackMachine& aStackMachine );
-    
+      virtual void initialize()
+      {
+	; //do nothing
+      }
+
+      virtual void execute( StackMachine& aStackMachine );    
     };
   
     class DIV
@@ -151,8 +179,12 @@ namespace libecs
       DIV() {}
       virtual ~DIV() {}
     
+      virtual void initialize()
+      {
+	; //do nothing
+      }
+
       virtual void execute( StackMachine& aStackMachine );
-    
     };
   
     class POW
@@ -163,8 +195,12 @@ namespace libecs
       POW() {}
       virtual ~POW() {}
     
-      virtual void execute( StackMachine& aStackMachine );
-    
+      virtual void initialize()
+      {
+	; //do nothing
+      }
+
+      virtual void execute( StackMachine& aStackMachine );    
     };
   
 
@@ -181,6 +217,11 @@ namespace libecs
       }
       virtual ~CALL_FUNC() {}
     
+      virtual void initialize()
+      {
+	; //do nothing
+      }
+
       virtual void execute( StackMachine& aStackMachine );
 
     private:
@@ -188,13 +229,38 @@ namespace libecs
     };
 
 
-    class VARREF_METHOD
+
+    class CALL_PROPERTY
       :
       public Instruction
     {
     public:
-      VARREF_METHOD() {}
-      VARREF_METHOD( VariableReference tmpVariableReference,
+      CALL_PROPERTY( PropertyMap &aPropertyMap, String aName )
+      {
+	thePropertyMapIterator = ( aPropertyMap ).find( aName ) ;
+      }
+      virtual ~CALL_PROPERTY() {}
+    
+      virtual void initialize()
+      {
+	theValue = thePropertyMapIterator->second;
+      }
+
+      virtual void execute( StackMachine& aStackMachine );
+
+    private:
+      Real theValue;
+      PropertyMapIterator thePropertyMapIterator;
+    };
+
+
+    class VARREF_FUNC
+      :
+      public Instruction
+    {
+    public:
+      VARREF_FUNC() {}
+      VARREF_FUNC( VariableReference tmpVariableReference,
 	    VariableReferenceMethodPtr aFuncPtr )
 	:
 	theVariableReference( tmpVariableReference ),
@@ -202,22 +268,29 @@ namespace libecs
       {
 	; // do nothing
       }
-      virtual ~VARREF_METHOD() {}
+      virtual ~VARREF_FUNC() {}
     
+      virtual void initialize()
+      {
+	; //do nothing
+      }
+
       virtual void execute( StackMachine& aStackMachine );
     
     private:
       VariableReference theVariableReference;
       VariableReferenceMethodPtr theFuncPtr;
     };
-  
-    class SYSTEM_METHOD
+    
+
+
+    class SYSTEM_FUNC
       :
       public Instruction
     {
     public:
-      SYSTEM_METHOD() {}
-      SYSTEM_METHOD( ProcessPtr aProcessPtr,
+      SYSTEM_FUNC() {}
+      SYSTEM_FUNC( ProcessPtr aProcessPtr,
 		     System_Func aFuncPtr,
 		     System_Attribute aAttributePtr )
 	:
@@ -227,8 +300,13 @@ namespace libecs
       {
 	; // do nothing
       }
-      virtual ~SYSTEM_METHOD() {}
+      virtual ~SYSTEM_FUNC() {}
     
+      virtual void initialize()
+      {
+	; //do nothing
+      }
+
       virtual void execute( StackMachine& aStackMachine );
     
     private:
@@ -237,7 +315,51 @@ namespace libecs
       System_Attribute theAttributePtr;
     };
 
+        
+    class Code
+      : 
+      private InstructionVector
+    {
+    public: 
+      Code()
+      {
+	; // do nothing;
+      }
+      
+      ~Code() {}
+
+      iterator begin() { return theCode.InstructionVector::begin(); }
+      const_iterator begin() const { return theCode.InstructionVector::begin(); }
+      iterator end() { return theCode.InstructionVector::end(); }
+      const_iterator end() const { return theCode.InstructionVector::end(); }
+
+      bool empty() const { return theCode.InstructionVector::empty(); }
+      size_type size() const { return theCode.InstructionVector::size(); }
+      size_type max_size() { return theCode.InstructionVector::max_size(); }
+
+      void clear()
+      {
+	for( InstructionVectorConstIterator 
+	       i( theCode.InstructionVector::begin() );
+	     i != theCode.InstructionVector::end(); i++ )
+	  {
+	    delete *i;
+	  }
+
+	theCode.InstructionVector::clear();
+      }
+
+      void push_back( InstructionPtr anInstruction )
+      {
+	theCode.InstructionVector::push_back( anInstruction );
+      }
+
+    protected:
+      InstructionVector theCode;
+    };
     
+
+
     class StackMachine
     {
     public:
@@ -265,10 +387,10 @@ namespace libecs
 	return theStackPtr;
       }
     
-      const Real execute( InstructionVectorCref aCode )
+      const Real execute( CodeCref aCode )
       {
 	reset();
-	for( InstructionVectorConstIterator i( aCode.begin() );
+ 	for( InstructionVectorConstIterator i( aCode.begin() );
 	     i != aCode.end(); ++i )
 	  {
 	    (*i)->execute( *this );
@@ -279,7 +401,6 @@ namespace libecs
     
     protected:
     
-      //std::vector<Real> theStack;
       RealVector theStack;
     
       RealPtr theStackPtr;
@@ -293,12 +414,14 @@ namespace libecs
     
       Compiler()
       {
-	if( theConstantMap.size() == 0 )
-	  setConstantMap();
-	else if( theFunctionMap.size() == 0 )
-	  setFunctionMap();
-	else
-	  ; // do nothing
+	if( theConstantMap.empty() == 1 )
+	  {
+	    fillConstantMap();
+	  }
+	if( theFunctionMap.empty() == 1 )
+	  {
+	    setFunctionMap();
+	  }
       }
     
       ~Compiler()
@@ -310,28 +433,6 @@ namespace libecs
       typedef tree_match<iterator_t> parse_tree_match_t;
       typedef parse_tree_match_t::tree_iterator TreeIterator;
       //    DECLARE_CLASS( TreeIterator );
-    
-      const InstructionVector compileExpression( StringCref anExpression )
-      {
-	InstructionVector aCode;
-	CompileGrammar calc;
-
-	theStackSize = 1;
-
-	tree_parse_info<> 
-	  info( ast_parse( anExpression.c_str(), calc, space_p ) );
-
-	if( info.full )
-	  {
-	    compileTree( info.trees.begin(), aCode );
-	  }
-	else
-	  {
-	    THROW_EXCEPTION( UnexpectedError, "Input string parse error" );
-	  }
-
-	return aCode;
-      }
 
       void setProcessPtr( ProcessPtr aProcessPtr )
       {
@@ -349,7 +450,7 @@ namespace libecs
 	return theStackSize;
       }
       
-      void setConstantMap()
+      void fillConstantMap()
       {
 	theConstantMap[ "true" ] = 1.0;
 	theConstantMap[ "false" ] = 0.0;
@@ -361,11 +462,32 @@ namespace libecs
       }
     
       void setFunctionMap();
-            
-    private:
 
-      void compileTree( TreeIterator const&  i,
-			InstructionVectorRef aCode );  
+      const Code compileExpression( StringCref anExpression )
+      {
+	Code aCode;
+	CompileGrammar calc;
+	
+	theStackSize = 1;
+	
+	tree_parse_info<> 
+	  info( ast_parse( anExpression.c_str(), calc, space_p ) );
+	
+	if( info.full )
+	  {
+	    compileTree( info.trees.begin(), aCode );
+	  }
+	else
+	  {
+	    THROW_EXCEPTION( UnexpectedError, "Input string parse error" );
+	  }
+	
+	return aCode;
+      }
+      
+    private:
+      
+      void compileTree( TreeIterator const&  i, CodeRef aCode );  
 
       class CompileGrammar;
 
@@ -375,8 +497,8 @@ namespace libecs
       ProcessPtr theProcessPtr;
       ExpressionProcessBasePtr theExpressionProcessBasePtr;
 
-      std::map<String, Real> theConstantMap;
-      std::map<String, Real(*)(Real)> theFunctionMap;
+      ConstantMap theConstantMap;
+      FunctionMap theFunctionMap;
     };
 
 
@@ -388,48 +510,53 @@ namespace libecs
 	   GROUP = 1,
 	   INTEGER,
 	   FLOATING,
-	   EXPONENTIAL,
+	   NEGATIVE,
+	   EXPONENT,
 	   FACTOR,
 	   TERM,
 	   EXPRESSION,
 	   VARIABLE,
-	   CALL_FUNCION,
-	   SYSTEM_FUNCTION,
+	   CALL_FUNC,
+	   SYSTEM_FUNC,
 	   ARGUMENT,
-	   PROPERTY,
-	   OBJECT,
-	   ATTRIBUTE,
+	   IDENTIFIER,
 	   CONSTANT,
 	};
 
       template <typename ScannerT>
       struct definition
       {
+#define leafNode( str ) leaf_node_d[lexeme_d[str]]
+#define rootNode( str ) root_node_d[lexeme_d[str]]
+    
 	definition(CompileGrammar const& /*self*/)
 	{
-	  integer     =   leaf_node_d[ lexeme_d[ +digit_p ] ];
-	  floating    =   leaf_node_d[ lexeme_d[ +digit_p >> ch_p('.') >> +digit_p ] ];
-	  exponential =   ( integer | floating ) >>
-	                  root_node_d[ ch_p('e') | ch_p('E') ] >>
+	  integer     =   leafNode( +digit_p );
+	  floating    =   leafNode( +digit_p >> ch_p('.') >> +digit_p );
+
+	  exponent    =   ( integer | floating ) >>
+	                  rootNode( ch_p('e') | ch_p('E') ) >>
 	                  ( factor | discard_first_node_d[ ch_p('+') >> factor ] );
+	  negative    =	  rootNode( ch_p('-') ) >> factor; 
+
+	  identifier  =   leafNode( alpha_p >> *( alnum_p | ch_p('_') ) );
+
+	  argument    =   inner_node_d[ ch_p('(') >> 
+					infix_node_d[ *expression >>
+						      *( ch_p(',') >>
+							 expression ) ] >>
+					ch_p(')') ];
+	  
+	  variable    =   identifier >>
+	                  rootNode( ch_p('.') ) >>
+	                  identifier;
 	
-	  property    =   leaf_node_d[ lexeme_d[ +( alnum_p | ch_p('_') ) ] ];
-
-	  object      =   leaf_node_d[ lexeme_d[ alpha_p >> *( alnum_p | ch_p('_') ) ] ];
-	  attribute   =   leaf_node_d[ lexeme_d[ +( alpha_p | ch_p('_') ) ] ];
-
-	  argument   =   inner_node_d[ ch_p('(') >> infix_node_d[ *expression >> *( ch_p(',') >> expression ) ] >> ch_p(')') ];
-
-	  variable    =   object >>
-	                  root_node_d[ lexeme_d[ ch_p('.') ] ] >>
-	                  attribute;
-	
- 	  system_method = object >>
-	                  root_node_d[ lexeme_d[ ch_p('.') ] ] >>
-	                  +( leaf_node_d[ lexeme_d[ +( alpha_p | ch_p('_') ) ] ] >>
+ 	  system_func = identifier >>
+	                rootNode( ch_p('.') ) >>
+	                +( leafNode( +( alpha_p | ch_p('_') ) ) >>
 			  discard_node_d[ argument ] >>
 			  discard_node_d[ ch_p('.') ] ) >>
-	                  attribute;
+	                  identifier;
 
 	  ///////////////////////////////////////////////////
 	  //                                               //
@@ -438,86 +565,89 @@ namespace libecs
           //                                               //
 	  ///////////////////////////////////////////////////
             
-	    call_func = (   root_node_d[ lexeme_d[ str_p("abs")] ]
-			    | root_node_d[ lexeme_d[ str_p("sqrt")] ]
-			    | root_node_d[ lexeme_d[ str_p("exp")] ]
-			    | root_node_d[ lexeme_d[ str_p("log10")] ]
-			    | root_node_d[ lexeme_d[ str_p("log")] ]
-			    | root_node_d[ lexeme_d[ str_p("floor")] ]
-			    | root_node_d[ lexeme_d[ str_p("ceil")] ]
-			    | root_node_d[ lexeme_d[ str_p("sin")] ]
-			    | root_node_d[ lexeme_d[ str_p("cos")] ]
-			    | root_node_d[ lexeme_d[ str_p("tan")] ]
-			    | root_node_d[ lexeme_d[ str_p("sinh")] ]
-			    | root_node_d[ lexeme_d[ str_p("cosh")] ]
-			    | root_node_d[ lexeme_d[ str_p("tanh")] ]
-			    | root_node_d[ lexeme_d[ str_p("asin")] ]
-			    | root_node_d[ lexeme_d[ str_p("acos")] ]
-			    | root_node_d[ lexeme_d[ str_p("atan")] ]
+	    call_func = (   rootNode( str_p("abs") )
+			    | rootNode( str_p("sqrt") )
+			    | rootNode( str_p("exp") )
+			    | rootNode( str_p("log10") )
+			    | rootNode( str_p("log") )
+			    | rootNode( str_p("floor") )
+			    | rootNode( str_p("ceil") )
+			    | rootNode( str_p("sin") )
+			    | rootNode( str_p("cos") )
+			    | rootNode( str_p("tan") )
+			    | rootNode( str_p("sinh") )
+			    | rootNode( str_p("cosh") )
+			    | rootNode( str_p("tanh") )
+			    | rootNode( str_p("asin") )
+			    | rootNode( str_p("acos") )
+			    | rootNode( str_p("atan") )
 #ifndef __MINGW32__
-         		    | root_node_d[ lexeme_d[ str_p("fact")] ]
-			    | root_node_d[ lexeme_d[ str_p("asinh")] ]
-			    | root_node_d[ lexeme_d[ str_p("acosh")] ]
-			    | root_node_d[ lexeme_d[ str_p("atanh")] ]
-			    | root_node_d[ lexeme_d[ str_p("asech")] ]
-			    | root_node_d[ lexeme_d[ str_p("acsch")] ]
-			    | root_node_d[ lexeme_d[ str_p("acoth")] ]
-			    | root_node_d[ lexeme_d[ str_p("sech")] ]
-			    | root_node_d[ lexeme_d[ str_p("csch")] ]
-			    | root_node_d[ lexeme_d[ str_p("coth")] ]
-			    | root_node_d[ lexeme_d[ str_p("asec")] ]
-			    | root_node_d[ lexeme_d[ str_p("acsc")] ]
-			    | root_node_d[ lexeme_d[ str_p("acot")] ]
-			    | root_node_d[ lexeme_d[ str_p("sec")] ]
-			    | root_node_d[ lexeme_d[ str_p("csc")] ]
-			    | root_node_d[ lexeme_d[ str_p("cot")] ]
+         		    | rootNode( str_p("fact") )
+			    | rootNode( str_p("asinh") )
+			    | rootNode( str_p("acosh") )
+			    | rootNode( str_p("atanh") )
+			    | rootNode( str_p("asech") )
+			    | rootNode( str_p("acsch") )
+			    | rootNode( str_p("acoth") )
+			    | rootNode( str_p("sech") )
+			    | rootNode( str_p("csch") )
+			    | rootNode( str_p("coth") )
+			    | rootNode( str_p("asec") )
+			    | rootNode( str_p("acsc") )
+			    | rootNode( str_p("acot") )
+			    | rootNode( str_p("sec") )
+			    | rootNode( str_p("csc") )
+			    | rootNode( str_p("cot") )
 #endif  			    
 			    ) >> argument;
-	
+
 	  group       =   inner_node_d[ ch_p('(') >> expression >> ch_p(')')];
 	
-	  constant    =   exponential
+	  constant    =   exponent
 	              |   floating
-	              |   integer
-	              |   property;
+	              |   integer;
 
 	  factor      =   call_func
-	              |   system_method
+	              |   system_func
 	              |   group
 	              |   variable 
 	              |   constant
-	              |   (root_node_d[ch_p('-')] >> factor);
+	              |   identifier
+	              |   negative;
 	
 	  term        =  factor >>
-	                 *( (root_node_d[ch_p('*')] >> factor)
-	              |  (root_node_d[ch_p('/')] >> factor)
-	              |  (root_node_d[ch_p('^')] >> factor) );
+	              *( ( rootNode( ch_p('*') ) >> factor )
+	              |  ( rootNode( ch_p('/') ) >> factor )
+	              |  ( rootNode( ch_p('^') ) >> factor ) );
 	
-	
+
 	  expression  =  term >>
-	                 *( (root_node_d[ch_p('+')] >> term)
-	              |  (root_node_d[ch_p('-')] >> term) );
+	              *( (rootNode( ch_p('+') ) >> term)
+	              |  (rootNode( ch_p('-') ) >> term) );
 	}
       
 	rule<ScannerT, parser_context, parser_tag<VARIABLE> >     variable;
-	rule<ScannerT, parser_context, parser_tag<CALL_FUNCION> > call_func;
-	rule<ScannerT, parser_context, parser_tag<SYSTEM_FUNCTION> >  system_method;
+	rule<ScannerT, parser_context, parser_tag<CALL_FUNC> >    call_func;
 	rule<ScannerT, parser_context, parser_tag<EXPRESSION> >   expression;
 	rule<ScannerT, parser_context, parser_tag<TERM> >         term;
 	rule<ScannerT, parser_context, parser_tag<FACTOR> >       factor;
 	rule<ScannerT, parser_context, parser_tag<FLOATING> >     floating;
-	rule<ScannerT, parser_context, parser_tag<EXPONENTIAL> >  exponential;
+	rule<ScannerT, parser_context, parser_tag<EXPONENT> >     exponent;
 	rule<ScannerT, parser_context, parser_tag<INTEGER> >      integer;
+	rule<ScannerT, parser_context, parser_tag<NEGATIVE> >     negative;
 	rule<ScannerT, parser_context, parser_tag<GROUP> >        group;
 	rule<ScannerT, parser_context, parser_tag<ARGUMENT> >     argument;
-	rule<ScannerT, parser_context, parser_tag<PROPERTY> >     property;
-	rule<ScannerT, parser_context, parser_tag<OBJECT> >       object;
-	rule<ScannerT, parser_context, parser_tag<ATTRIBUTE> >    attribute;
+	rule<ScannerT, parser_context, parser_tag<IDENTIFIER> >   identifier;
 	rule<ScannerT, parser_context, parser_tag<CONSTANT> >     constant;
+	rule<ScannerT, parser_context, parser_tag<SYSTEM_FUNC> >  system_func;
 
 	rule<ScannerT, parser_context, parser_tag<EXPRESSION> > const&
 	start() const { return expression; }
       };
+
+#undef leafNode
+#undef rootNode
+ 
     };
   
 
@@ -534,7 +664,7 @@ namespace libecs
 
     ExpressionProcessBase()
       {
-	; // do nothing
+	;// do nothing
       }
 
     virtual ~ExpressionProcessBase()
@@ -551,13 +681,20 @@ namespace libecs
       {
 	return theExpression;
       }
-    
+
     void defaultSetProperty( StringCref aPropertyName,
 			     PolymorphCref aValue)
       {
 	if( getClassName() == "ExpressionFluxProcess")
 	  {
 	    thePropertyMap[ aPropertyName ] = aValue.asReal();
+	    
+	    for( InstructionVectorConstIterator i( theCompiledCode.begin() );
+		 i != theCompiledCode.end(); ++i )
+	      {
+		(*i)->initialize();
+	      }
+	    //	    ( static_cast<PropertiedClass*>( this ) )->setProperty( aPropertyName, aValue );
 	  }
 	else
 	  THROW_EXCEPTION( NoSlot,
@@ -575,22 +712,30 @@ namespace libecs
 	theCompiler.setProcessPtr( static_cast<Process*>( this ) );
 	theCompiler.setExpressionProcessBasePtr( this );
 
+	theCompiledCode.clear();
 	theCompiledCode = theCompiler.compileExpression( theExpression );
+
 	theStackMachine.resize( theCompiler.getStackSize() );
+
+	for( InstructionVectorConstIterator i( theCompiledCode.begin() );
+	     i != theCompiledCode.end(); ++i )
+	  {
+	    (*i)->initialize();
+	  }
       }
 
   protected:
 
     String    theExpression;
       
-    InstructionVector theCompiledCode;
+    Code theCompiledCode;
     StackMachine theStackMachine;
 
-    std::map<String, Real> thePropertyMap;
+    PropertyMap thePropertyMap;
   };
 
-
-
+  
+  
   void libecs::ExpressionProcessBase::Compiler::setFunctionMap()
   {
     theFunctionMap["abs"] = fabs;
@@ -609,7 +754,7 @@ namespace libecs
     theFunctionMap["asin"] = asin;
     theFunctionMap["acos"] = acos;
     theFunctionMap["atan"] = atan;
-    /**#ifndef __MINGW32__
+    #ifndef __MINGW32__
     theFunctionMap["fact"] = fact;
     theFunctionMap["asinh"] = asinh;
     theFunctionMap["acosh"] = acosh;
@@ -626,7 +771,7 @@ namespace libecs
     theFunctionMap["sec"] = sec;
     theFunctionMap["csc"] = csc;
     theFunctionMap["cot"] = cot;
-    #endif */   
+    #endif   
   }
 
 
@@ -636,7 +781,7 @@ namespace libecs
   */
   
   void
-  libecs::ExpressionProcessBase::Compiler::compileTree( TreeIterator const& i, InstructionVectorRef aCode )
+  libecs::ExpressionProcessBase::Compiler::compileTree( TreeIterator const& i, CodeRef theCode )
   {
     /**
         std::cout << "In compileExpression. i->value = " <<
@@ -648,11 +793,12 @@ namespace libecs
     String str, str_child1, str_child2, str_child3;
     VariableReference aVariableReference;
 
-    std::map<String, Real>::iterator theConstantMapIterator;
-    std::map<String, Real>::iterator thePropertyMapIterator;
-    std::map<String, Real(*)(Real)>::iterator theFunctionMapIterator;
+    ConstantMapIterator theConstantMapIterator;
+    PropertyMapIterator thePropertyMapIterator;
+    FunctionMapIterator theFunctionMapIterator;
 	    
     std::vector<char>::iterator container_iterator;
+
 
     switch ( i->value.id().to_long() )
       {
@@ -666,12 +812,14 @@ namespace libecs
 	
 	for( container_iterator = i->value.begin();
 	     container_iterator != i->value.end(); container_iterator++ )
-	  str += *container_iterator;
-
+	  {
+	    str += *container_iterator;
+	  }
+	
 	n = stringTo<Real>( str.c_str() );
     
 	theStackSize++;
-	aCode.push_back( new PUSH( n ) );
+	theCode.push_back( new PUSH( n ) );
 
 	return;
       
@@ -687,12 +835,14 @@ namespace libecs
 
 	for( container_iterator = i->value.begin();
 	     container_iterator != i->value.end(); container_iterator++ )
-	  str += *container_iterator;
+	  {	  
+	    str += *container_iterator;
+	  }
 
 	n = stringTo<Real>( str.c_str() );
 	
 	theStackSize++;
-	aCode.push_back( new PUSH( n ) );
+	theCode.push_back( new PUSH( n ) );
 	  
 	return; 
 	
@@ -701,25 +851,29 @@ namespace libecs
 	   Grammar compile
 	*/
 
-      case CompileGrammar::EXPONENTIAL:
+      case CompileGrammar::EXPONENT:
 	
 	assert( *i->value.begin() == 'E' || *i->value.begin() == 'e' );
 	
 	for( container_iterator = i->children.begin()->value.begin();
 	     container_iterator != i->children.begin()->value.end();
 	     container_iterator++ )
-	  str_child1 += *container_iterator;
+	  {
+	    str_child1 += *container_iterator;
+	  }
 
 	for( container_iterator = ( i->children.begin()+1 )->value.begin();
 	     container_iterator != ( i->children.begin()+1 )->value.end();
 	     container_iterator++ )
-	  str_child2 += *container_iterator;
+	  {
+	    str_child2 += *container_iterator;
+	  }
 	
 	n1 = stringTo<Real>( str_child1.c_str() );
 	n2 = stringTo<Real>( str_child2.c_str() );
 	
 	theStackSize++;
-	aCode.push_back( new PUSH( n1 * pow(10, n2) ) );
+	theCode.push_back( new PUSH( n1 * pow(10, n2) ) );
 	
 	return; 
 	
@@ -729,7 +883,7 @@ namespace libecs
 	   Call_Func Grammar compile
 	*/
 
-      case CompileGrammar::CALL_FUNCION :
+      case CompileGrammar::CALL_FUNC :
 	
 	assert( i->children.size() != 0 );
 	
@@ -738,22 +892,27 @@ namespace libecs
 	  {
 	    for( container_iterator = i->value.begin();
 		 container_iterator != i->value.end(); container_iterator++ )
-	      str += *container_iterator;
-	    
+	      {
+		str += *container_iterator;
+	      }
+
 	    theFunctionMapIterator = theFunctionMap.find( str );
 	    
 	    if( i->children.begin()->value.id() == CompileGrammar::INTEGER ||
 		i->children.begin()->value.id() == CompileGrammar::FLOATING  )
 	      {
 		for( container_iterator = i->children.begin()->value.begin();
-		     container_iterator != i->children.begin()->value.end(); container_iterator++ )
-		  str_child1 += *container_iterator;
-		
+		     container_iterator != i->children.begin()->value.end();
+		     container_iterator++ )
+		  {
+		    str_child1 += *container_iterator;
+		  }
+
 		n = stringTo<Real>( str_child1.c_str() );
 		
 		if( theFunctionMapIterator != theFunctionMap.end() )
 		  {
-		    aCode.push_back( new PUSH( ( *theFunctionMapIterator->second )( n ) ) );
+		    theCode.push_back( new PUSH( ( *theFunctionMapIterator->second )( n ) ) );
 		  }
 		else
 		  {
@@ -762,11 +921,11 @@ namespace libecs
 	      }
 	    else
 	      {
-		compileTree( i->children.begin(), aCode );	  
+		compileTree( i->children.begin(), theCode );	  
 		
 		if( theFunctionMapIterator != theFunctionMap.end() )
 		  {
-		    aCode.push_back( new CALL_FUNC( theFunctionMapIterator->second ) );
+		    theCode.push_back( new CALL_FUNC( theFunctionMapIterator->second ) );
 		  }
 		else
 		  {
@@ -786,23 +945,27 @@ namespace libecs
 	
 
 	/**
-	   System_Method Grammar compile
+	   System_Func Grammar compile
 	*/
 
-      case CompileGrammar::SYSTEM_FUNCTION :
+      case CompileGrammar::SYSTEM_FUNC :
       
 	theStackSize++;
 	
 	for( container_iterator = i->children.begin()->value.begin();
 	     container_iterator != i->children.begin()->value.end();
 	     container_iterator++ )
-	  str_child1 += *container_iterator;
+	  {
+	    str_child1 += *container_iterator;
+	  }
 
 	for( container_iterator = ( i->children.begin()+1 )->value.begin();
 	     container_iterator != ( i->children.begin()+1 )->value.end();
 	     container_iterator++ )
-	  str_child2 += *container_iterator;
-
+	  {
+	    str_child2 += *container_iterator;
+	  }
+	
 	assert( str_child1 == "self" );
 	assert( *i->value.begin() == '.' );
 	
@@ -811,16 +974,18 @@ namespace libecs
 	    for( container_iterator = ( i->children.begin()+2 )->value.begin();
 		 container_iterator != ( i->children.begin()+2 )->value.end();
 		 container_iterator++ )
-	      str_child3 += *container_iterator;
+	      {
+		str_child3 += *container_iterator;
+	      }
 
 	    if( str_child3 == "Size" )
-	      aCode.push_back( 
-		 new SYSTEM_METHOD( theProcessPtr,
+	      theCode.push_back(   
+		  new SYSTEM_FUNC( theProcessPtr,
                                     &libecs::Process::getSuperSystem,
 				    &libecs::System::getSize ) );
 	    else if( str_child3 == "SizeN_A" )
-	      aCode.push_back( 
-		 new SYSTEM_METHOD( theProcessPtr,
+	      theCode.push_back( 
+		  new SYSTEM_FUNC( theProcessPtr,
 				    &libecs::Process::getSuperSystem,
 				    &libecs::System::getSizeN_A ) );
 	    else
@@ -844,48 +1009,52 @@ namespace libecs
 	for( container_iterator = i->children.begin()->value.begin();
 	     container_iterator != i->children.begin()->value.end();
 	     container_iterator++ )
-	  str_child1 += *container_iterator;
+	  {
+	    str_child1 += *container_iterator;
+	  }
 
 	for( container_iterator = ( i->children.begin()+1 )->value.begin();
 	     container_iterator != ( i->children.begin()+1 )->value.end();
 	     container_iterator++ )
-	  str_child2 += *container_iterator;
+	  {
+	    str_child2 += *container_iterator;
+	  }
 
 	aVariableReference = theProcessPtr->libecs::Process::getVariableReference( str_child1 );
 	
 	if( str_child2 == "MolarConc" ){
-	  aCode.push_back( 
-	     new VARREF_METHOD( aVariableReference,
+	  theCode.push_back( 
+	      new VARREF_FUNC( aVariableReference,
 				&libecs::VariableReference::getMolarConc ) );
 	  }
 	else if( str_child2 == "NumberConc" ){
-	  aCode.push_back(
-             new VARREF_METHOD( aVariableReference,
+	  theCode.push_back(
+	      new VARREF_FUNC( aVariableReference,
 				&libecs::VariableReference::getNumberConc ) );
 	  }
 	else if( str_child2 == "Value" ){
-	  aCode.push_back( 
-             new VARREF_METHOD( aVariableReference,
+	  theCode.push_back(
+              new VARREF_FUNC( aVariableReference,
 				&libecs::VariableReference::getValue ) );
 	}
 	/**       	else if( str_child2 == "Coefficient" ){
-	  aCode.push_back( 
-             new VARREF_METHOD( aVariableReference,
+	  theCode.push_back(
+              new VARREF_FUNC( aVariableReference,
 	                        &libecs::VariableReference::getCoefficient ) );
 	} 
 	else if( str_child2 == "Fixed" ){
-	  aCode.push_back( 
-	     new VARREF_METHOD( aVariableReference,
+	  theCode.push_back(
+	      new VARREF_FUNC( aVariableReference,
 	                        &libecs::VariableReference::isFixed ) );
 	  }*/
 	else if( str_child2 == "Volocity" ){
-	  aCode.push_back( 
-             new VARREF_METHOD( aVariableReference,
+	  theCode.push_back(
+              new VARREF_FUNC( aVariableReference,
 				&libecs::VariableReference::getVelocity ) );
 	}
 	else if( str_child2 == "TotalVelocity" ){
-	  aCode.push_back( 
-             new VARREF_METHOD( aVariableReference,
+	  theCode.push_back(
+              new VARREF_FUNC( aVariableReference,
 				&libecs::VariableReference::getTotalVelocity ) );
 	}
 	else
@@ -896,10 +1065,10 @@ namespace libecs
 
 
 	/**
-	   Property Grammar compile
+	   Identifier Grammar compile
 	*/
 
-      case CompileGrammar::PROPERTY :
+      case CompileGrammar::IDENTIFIER :
 	
 	assert( i->children.size() == 0 );
 	
@@ -907,18 +1076,21 @@ namespace libecs
 
 	for( container_iterator = i->value.begin();
 	     container_iterator != i->value.end(); container_iterator++ )
-	  str += *container_iterator;
+	  {
+	    str += *container_iterator;
+	  }
 
 	theConstantMapIterator = theConstantMap.find( str );
 	thePropertyMapIterator = ( theExpressionProcessBasePtr->thePropertyMap).find( str );
 	
 	if( theConstantMapIterator != theConstantMap.end() )
 	  {
-	    aCode.push_back( new PUSH( theConstantMapIterator->second ) );
+	    theCode.push_back( new PUSH( theConstantMapIterator->second ) );
 	  }
-	else if( thePropertyMapIterator != ( theExpressionProcessBasePtr->thePropertyMap).end() )
+	else if( thePropertyMapIterator != ( (theExpressionProcessBasePtr->thePropertyMap).end() ) )
 	  {
-	    aCode.push_back( new PUSH( thePropertyMapIterator->second ) );
+	    theCode.push_back( new CALL_PROPERTY( theExpressionProcessBasePtr->thePropertyMap, str ) );
+	    //	    theCode.push_back( InstructPtr ( new CALL_PROPERTY( thePropertyMapIterator->second ) ) );
 	  }
 	else
 	  {
@@ -931,17 +1103,19 @@ namespace libecs
 
 
 	/**
-	   Factor Grammar compile 
+	   Negative Grammar compile 
 	*/
     
-      case CompileGrammar::FACTOR :
+      case CompileGrammar::NEGATIVE :
 			       
 	assert( *i->value.begin() == '-' );
 
 	for( container_iterator = i->children.begin()->value.begin();
 	     container_iterator != i->children.begin()->value.end();
 	     container_iterator++ )
-	  str_child1 += *container_iterator;
+	  {
+	    str_child1 += *container_iterator;
+	  }
 
 	n = stringTo<Real>( str_child1.c_str() );
 
@@ -949,12 +1123,12 @@ namespace libecs
 	    i->children.begin()->value.id() == CompileGrammar::FLOATING  )
 	  {
 	    theStackSize++;
-	    aCode.push_back( new PUSH( -n ) ); 
+	    theCode.push_back( new PUSH( -n ) ); 
 	  }
 	else
 	  {
-	    compileTree(i->children.begin(), aCode);
-	    aCode.push_back( new NEG() );
+	    compileTree(i->children.begin(), theCode );
+	    theCode.push_back( new NEG() );
 	  }
 	return;
       
@@ -976,12 +1150,16 @@ namespace libecs
 	    for( container_iterator = i->children.begin()->value.begin();
 		 container_iterator != i->children.begin()->value.end();
 		 container_iterator++ )
-	      str_child1 += *container_iterator;
+	      {
+		str_child1 += *container_iterator;
+	      }
 
 	    for( container_iterator = ( i->children.begin()+1 )->value.begin();
 		 container_iterator != ( i->children.begin()+1 )->value.end();
 		 container_iterator++ )
-	      str_child2 += *container_iterator;
+	      {
+		str_child2 += *container_iterator;
+	      }
 
 	    n1 = stringTo<Real>( str_child1.c_str() );
 	    n2 = stringTo<Real>( str_child2.c_str() );	  
@@ -990,19 +1168,19 @@ namespace libecs
 
 	    if (*i->value.begin() == '*')
 	      {
-		aCode.push_back( new PUSH( n1 * n2 ) );
+		theCode.push_back( new PUSH( n1 * n2 ) );
 	      }	
 	    else if (*i->value.begin() == '/')
 	      {
-		aCode.push_back( new PUSH( n1 / n2 ) ); 
+		theCode.push_back( new PUSH( n1 / n2 ) ); 
 	      }
 	    else if (*i->value.begin() == '^')
 	      {
-		aCode.push_back( new PUSH( pow( n1, n2 ) ) ); 
+		theCode.push_back( new PUSH( pow( n1, n2 ) ) ); 
 	      }
 	    else if (*i->value.begin() == 'e' || 'E')
 	      {
-		aCode.push_back( new PUSH( n1 * pow( 10, n2 ) ) );
+		theCode.push_back( new PUSH( n1 * pow( 10, n2 ) ) );
 	      }
 	    else
 	      THROW_EXCEPTION( NoSlot, String( " unexpected error " ) );
@@ -1011,21 +1189,21 @@ namespace libecs
 	  }
 	else
 	  {
-	    compileTree( i->children.begin(), aCode );
-	    compileTree( ( i->children.begin()+1 ), aCode );
+	    compileTree( i->children.begin(), theCode );
+	    compileTree( i->children.begin()+1, theCode );
 	    
 	    if (*i->value.begin() == '*')
 	      {
-		aCode.push_back( new MUL() );
+		theCode.push_back( new MUL() );
 	      }
 	    
 	    else if (*i->value.begin() == '/')
 	      {
-		aCode.push_back( new DIV() );
+		theCode.push_back( new DIV() );
 	      }
 	    else if (*i->value.begin() == '^')
 	      {
-		aCode.push_back( new POW() );
+		theCode.push_back( new POW() );
 	      }
 	    else
 	      THROW_EXCEPTION( NoSlot, String( " unexpected error " ) );
@@ -1053,12 +1231,16 @@ namespace libecs
 	    for( container_iterator = i->children.begin()->value.begin();
 		 container_iterator != i->children.begin()->value.end();
 		 container_iterator++ )
-	      str_child1 += *container_iterator;
+	      {
+		str_child1 += *container_iterator;
+	      }
 
 	    for( container_iterator = ( i->children.begin()+1 )->value.begin();
 		 container_iterator != ( i->children.begin()+1 )->value.end();
 		 container_iterator++ )
-	      str_child2 += *container_iterator;
+	      {
+		str_child2 += *container_iterator;
+	      }
 
 	    n1 = stringTo<Real>( str_child1.c_str() );
 	    n2 = stringTo<Real>( str_child2.c_str() );	  
@@ -1067,27 +1249,27 @@ namespace libecs
 
 	    if (*i->value.begin() == '+')
 	      {
-		aCode.push_back( new PUSH( n1 + n2 ) );
+		theCode.push_back( new PUSH( n1 + n2 ) );
 	      }	
 	    else if (*i->value.begin() == '-')
 	      {
-		aCode.push_back( new PUSH( n1 - n2 ) );
+		theCode.push_back( new PUSH( n1 - n2 ) );
 	      }
 	    else
 	      THROW_EXCEPTION( NoSlot, String( " unexpected error " ) );
 	  }
 	else
 	  {
-	    compileTree(i->children.begin(), aCode);
-	    compileTree( ( i->children.begin()+1 ), aCode );
+	    compileTree( i->children.begin(), theCode );
+	    compileTree( i->children.begin()+1, theCode );
 		
 	    if (*i->value.begin() == '+')
 	      {
-		aCode.push_back( new ADD() );
+		theCode.push_back( new ADD() );
 	      }
 	    else if (*i->value.begin() == '-')
 	      {
-		aCode.push_back( new SUB() );
+		theCode.push_back( new SUB() );
 	      }
 	    else
 	      THROW_EXCEPTION( NoSlot, String( " unexpected error " ) );
@@ -1160,20 +1342,27 @@ namespace libecs
     *( aStackMachine.getStackPtr() ) = ( *theFuncPtr )( *( aStackMachine.getStackPtr() ) );
   }
 
-  void ExpressionProcessBase::VARREF_METHOD::execute( StackMachine& aStackMachine )
+  void ExpressionProcessBase::CALL_PROPERTY::execute( StackMachine& aStackMachine )
+  {
+    aStackMachine.getStackPtr()++;
+
+    *aStackMachine.getStackPtr() = theValue;
+  }
+  
+  void ExpressionProcessBase::VARREF_FUNC::execute( StackMachine& aStackMachine )
   {
     aStackMachine.getStackPtr()++;
 
     *aStackMachine.getStackPtr() = ( theVariableReference.*theFuncPtr )();
   }
 
-  void ExpressionProcessBase::SYSTEM_METHOD::execute( StackMachine& aStackMachine )
+  void ExpressionProcessBase::SYSTEM_FUNC::execute( StackMachine& aStackMachine )
   {
     aStackMachine.getStackPtr()++;
-
+    
     *aStackMachine.getStackPtr() = ( ( theProcessPtr->*theFuncPtr )()->*theAttributePtr)();
   }
-
+  
   LIBECS_DM_INIT_STATIC( ExpressionProcessBase, ExpressionFluxProcess );
   
 } // namespace libecs
