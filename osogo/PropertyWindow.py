@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-a
+
 import string
 
 import gtk
@@ -62,6 +62,7 @@ class MainWindow(Window):
         aPropertyList = aPropertyList[1:] 
         # remove PropertyList itself
         aPropertyList.remove( 'PropertyList' )
+
         aPropertyList.remove( 'Name' )
         
         self.thePropertyClist.clear()
@@ -81,31 +82,51 @@ class MainWindow(Window):
         
         
         
-        for x in aPropertyList:
-            if (x=='Substrate' or x=='Product') :
-                
-                for y in x:
-
-                    aValueList = list( tmpget( y ) )
+       # for x in aPropertyList:
+           # if x=='Substrate' or x=='Product' :
+               # print x
+               # for y in x:
+                   # print y
+        #            aValueList = list( tmpget( y ) )
                     #aValueList = tmpget( y )
                     #aValueList = tmpget( x )
-                    
                     #            aName = aValueList[0]
                     #            aValueList = aValueList[1:]
+                    #            aValueList = map( toString, aValueList )
+                    #            self.thePropertyClist.append( aValueList) 
+                    #            print aValueList
+                    #else:
+                    # aValueList = tmpget( x )
+                    # aValueList = map( toString, aValueList )
+                    # self.thePropertyClist.append( aValueList )
+
+        for x in aPropertyList:
+                   if x=='Substrate' or x=='Product' :
+                       print x
+                       for y in x:
+                           print y
+                           aValueList = list( tmpget( y ) )
+                           aValueList = tmpget( y )
+                           aValueList = tmpget( x )
+                    
+                           aName = aValueList[0]
+                           aValueList = aValueList[1:]
                     
                     aValueList = map( toString, aValueList )
                     
                     self.thePropertyClist.append( aValueList) 
                     
                     
-                    #            print aValueList
+                    print aValueList
                     
-                else:
-                    aValueList = tmpget( x )
-                    aValueList = map( toString, aValueList )
+
+
+            else:
+                aValueList = tmpget( x )
+                aValueList = map( toString, aValueList )
                     
-                    self.thePropertyClist.append( aValueList )
-                
+                self.thePropertyClist.append( aValueList )
+       
 
 def toString( object ):
     return str( object )
@@ -161,3 +182,14 @@ def tmpget( name ):
 if __name__ == "__main__":
 
     main()
+
+
+
+
+
+
+
+
+
+
+
