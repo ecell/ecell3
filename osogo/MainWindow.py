@@ -88,7 +88,7 @@ DESCRIPTION = 'Osogo is a simulation session monitoring module for E-CELL SE Ver
 # ---------------------------------------------------------------
 class MainWindow(OsogoWindow):
 
-	RuleFileExtension = 'eml'
+	ModelFileExtension = 'eml'
 	ScriptFileExtension = 'py'
 	CellStateFileExtension = 'cs'
 
@@ -102,7 +102,7 @@ class MainWindow(OsogoWindow):
 	#   - creates Session 
 	#   - adds signal to handers
 	#   - creates ScriptFileSelection
-	#   - creates RuleFileSelection
+	#   - creates ModelFileSelection
 	#   - creates CellStateFileSelection
 	#   - initialize Session
 	#
@@ -131,6 +131,8 @@ class MainWindow(OsogoWindow):
 		# -------------------------------------
 		self.theSession = ecell.Session.Session( ecell.ecs.Simulator() )
 		self.theSession.setMessageMethod( self.theMessageWindow.printMessage )
+		self.theSession.theMainWindow = self
+
 
 		# -------------------------------------
 		# creates LoggerWindow
@@ -177,7 +179,7 @@ class MainWindow(OsogoWindow):
 		self.theEntityListWindowList = []
 
 		self.theHandlerMap = \
-		  { 'load_rule_menu_activate'                  : self.openRuleFileSelection ,
+		  { 'load_rule_menu_activate'                  : self.openModelFileSelection ,
 			'load_script_menu_activate'            : self.openScriptFileSelection ,
 			'save_cell_state_menu_activate'        : self.saveCellStateToTheFile ,
 			'save_cell_state_as_menu_activate'     : self.openSaveCellStateFileSelection ,
@@ -209,7 +211,7 @@ class MainWindow(OsogoWindow):
 		# -------------------------------------
 		# create Save Cell State File Selection 
 		# -------------------------------------
-		self.theSaveFileSelection = gtk.FileSelection( 'Select Rule File for Saving' )
+		self.theSaveFileSelection = gtk.FileSelection( 'Select Model File for Saving' )
 		self.theSaveFileSelection.ok_button.connect('clicked', self.saveCellState)
 		self.theSaveFileSelection.cancel_button.connect('clicked', self.closeParentWindow)
 		self.theSaveFileSelection.complete( '*.' + self.CellStateFileExtension )
@@ -274,37 +276,37 @@ class MainWindow(OsogoWindow):
 
 
 	# ---------------------------------------------------------------
-	# openRuleFileSelection
+	# openModelFileSelection
 	#
 	# anObject: a reference to widget
 	#
 	# return -> None
 	# This method is throwable exception.
 	# ---------------------------------------------------------------
-	def openRuleFileSelection( self, anObject ) :
+	def openModelFileSelection( self, anObject ) :
 
-		self.theRuleFileSelection = gtk.FileSelection( 'Select Rule File' )
-		#self.theRuleFileSelection.set_modal(gtk.TRUE)
-		self.theRuleFileSelection.ok_button.connect('clicked', self.loadRule)
-		self.theRuleFileSelection.cancel_button.connect('clicked', self.closeParentWindow)
-		self.theRuleFileSelection.complete( '*.' + self.RuleFileExtension )
-		self.theRuleFileSelection.show_all()
+		self.theModelFileSelection = gtk.FileSelection( 'Select Model File' )
+		#self.theModelFileSelection.set_modal(gtk.TRUE)
+		self.theModelFileSelection.ok_button.connect('clicked', self.loadModel)
+		self.theModelFileSelection.cancel_button.connect('clicked', self.closeParentWindow)
+		self.theModelFileSelection.complete( '*.' + self.ModelFileExtension )
+		self.theModelFileSelection.show_all()
 
-	# end of openRuleFileSelection
+	# end of openModelFileSelection
 
 
 	# ---------------------------------------------------------------
-	# loadRule
+	# loadModel
 	#
 	# button_obj: reference to button
 	#
 	# return -> None
 	# This method is throwable exception.
 	# ---------------------------------------------------------------
-	def loadRule( self, button_obj ) :
+	def loadModel( self, button_obj ) :
 
 		try:
-			aFileName = self.theRuleFileSelection.get_filename()
+			aFileName = self.theModelFileSelection.get_filename()
 
 			if os.path.isfile( aFileName ):
 				pass
@@ -314,7 +316,7 @@ class MainWindow(OsogoWindow):
 				aDialog = ConfirmWindow(0,aMessage,'Error!')
 				return None
 
-			self.theRuleFileSelection.hide()
+			self.theModelFileSelection.hide()
 			self.theSession.message( 'loading rule file %s\n' % aFileName)
 			aModelFile = open( aFileName )
 			self.theSession.loadModel( aModelFile )
@@ -342,7 +344,7 @@ class MainWindow(OsogoWindow):
 			self['load_script_menu'].set_sensitive(0)
 			#self.setUnSensitiveMenu()
 
-	# end of loadRule
+	# end of loadModel
 
 
 	# ---------------------------------------------------------------
@@ -375,23 +377,29 @@ class MainWindow(OsogoWindow):
 	# ---------------------------------------------------------------
 	def loadScript( self, anObject ):
 
+		aFileName = self.theScriptFileSelection.get_filename()
+		self.theScriptFileSelection.hide()
+
+		if not os.access( aFileName, os.R_OK ):
+			self.printMessage('Error: loadScript: can\'t load [%s]' % aFileName)
+			return
+
+		self.theSession.message( 'loading script file %s\n' % aFileName )
+
 		try:
-			aFileName = self.theScriptFileSelection.get_filename()
-			self.theScriptFileSelection.hide()
-			self.theSession.message( 'loading script file %s\n' % aFileName )
-			aGlobalNameMap = { 'theMainWindow' : self }
-			execfile( aFileName, aGlobalNameMap )
-			self.update()
-			self.updateFundamentalWindows()
+			self.theSession.loadScript( aFileName )
 		except:
 			import sys
 			import traceback
-			self.printMessage(' can\'t load [%s]' %aFileName)
+			self.printMessage(' error while executing ESS [%s]' %aFileName)
 			aErrorMessage = string.join( traceback.format_exception(sys.exc_type,sys.exc_value,sys.exc_traceback), '\n' )
 			self.printMessage("-----------")
 			self.printMessage(aErrorMessage)
 			self.printMessage("-----------")
 		else:
+			self.update()
+			self.updateFundamentalWindows()
+
 			self.theStepperChecker = 1
 			self['start_button'].set_sensitive(1)
 			self['stop_button'].set_sensitive(1)

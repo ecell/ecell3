@@ -87,7 +87,8 @@ class MessageWindow(OsogoWindow):
 			# save aMessage to theMessageBugger
 			# --------------------------------------------------
 			for aLine in aMessage:
-				self.theMessageBufferList.insert_at_cursor( aLine, len(aLine) )
+				aString = str( aMessage )
+				self.theMessageBufferList.insert_at_cursor( aString, len(aString) )
 
 			# --------------------------------------------------
 			# If instance of Message Window Widget has not destroyed,
@@ -101,9 +102,10 @@ class MessageWindow(OsogoWindow):
 		# If message is not list or touple, then print out row data.
 		# -------------------------------------------------------
 		else: 
-			
-			if string.find(aMessage,'\n') != 0:
-				aMessage = '\n' + aMessage
+			aString = str( aMessage )
+
+			if string.find(aString,'\n') != 0:
+				aString = '\n' + aString
 
 			# --------------------------------------------------
 			# If instance of Message Window Widget has destroyed,
@@ -117,7 +119,7 @@ class MessageWindow(OsogoWindow):
 			# print out aMessage on theMessageBugger
 			# --------------------------------------------------
 #			else:
-			self.theMessageBufferList.insert_at_cursor( aMessage ,len(aMessage) )
+			self.theMessageBufferList.insert_at_cursor( aString ,len(aString) )
 
 
 	# end of printMessage

@@ -70,7 +70,7 @@ class LoggerWindow(OsogoWindow):
 		# ---------------------------------------------------------------
 		# Creates save file selection
 		# ---------------------------------------------------------------
-		self.theSaveDirectorySelection = gtk.FileSelection( 'Select Rule File' )
+		self.theSaveDirectorySelection = gtk.FileSelection( 'Select File' )
 		self.theSaveDirectorySelection.ok_button.connect('clicked', self.changeSaveDirectory)
 		self.theSaveDirectorySelection.cancel_button.connect('clicked', self.closeParentWindow)
 
