@@ -43,6 +43,12 @@
 
 #include "Process.hpp"
 
+#if SPIRIT_VERSION >= 0x1800
+#define PARSER_CONTEXT parser_context<>
+#else
+#define PARSER_CONTEXT parser_context
+#endif
+
 using namespace boost::spirit;
 
 USE_LIBECS;
@@ -693,22 +699,22 @@ namespace libecs
 	       |  (rootNode( ch_p('-') ) >> term) );
 	}
       
-	rule<ScannerT, parser_context<>, parser_tag<VARIABLE> >     variable;
-	rule<ScannerT, parser_context<>, parser_tag<CALL_FUNC1> >   call_func;
-	rule<ScannerT, parser_context<>, parser_tag<EXPRESSION> >   expression;
-	rule<ScannerT, parser_context<>, parser_tag<TERM> >         term;
-	rule<ScannerT, parser_context<>, parser_tag<POWER> >        power;
-	rule<ScannerT, parser_context<>, parser_tag<FACTOR> >       factor;
-	rule<ScannerT, parser_context<>, parser_tag<FLOATING> >     floating;
-	rule<ScannerT, parser_context<>, parser_tag<EXPONENT> >     exponent;
-	rule<ScannerT, parser_context<>, parser_tag<INTEGER> >      integer;
-	rule<ScannerT, parser_context<>, parser_tag<NEGATIVE> >     negative;
-	rule<ScannerT, parser_context<>, parser_tag<GROUP> >        group;
-	rule<ScannerT, parser_context<>, parser_tag<IDENTIFIER> >   identifier;
-	rule<ScannerT, parser_context<>, parser_tag<CONSTANT> >     constant;
-	rule<ScannerT, parser_context<>, parser_tag<SYSTEM_FUNC> >  system_func;
+	rule<ScannerT, PARSER_CONTEXT, parser_tag<VARIABLE> >     variable;
+	rule<ScannerT, PARSER_CONTEXT, parser_tag<CALL_FUNC1> >   call_func;
+	rule<ScannerT, PARSER_CONTEXT, parser_tag<EXPRESSION> >   expression;
+	rule<ScannerT, PARSER_CONTEXT, parser_tag<TERM> >         term;
+	rule<ScannerT, PARSER_CONTEXT, parser_tag<POWER> >        power;
+	rule<ScannerT, PARSER_CONTEXT, parser_tag<FACTOR> >       factor;
+	rule<ScannerT, PARSER_CONTEXT, parser_tag<FLOATING> >     floating;
+	rule<ScannerT, PARSER_CONTEXT, parser_tag<EXPONENT> >     exponent;
+	rule<ScannerT, PARSER_CONTEXT, parser_tag<INTEGER> >      integer;
+	rule<ScannerT, PARSER_CONTEXT, parser_tag<NEGATIVE> >     negative;
+	rule<ScannerT, PARSER_CONTEXT, parser_tag<GROUP> >        group;
+	rule<ScannerT, PARSER_CONTEXT, parser_tag<IDENTIFIER> >   identifier;
+	rule<ScannerT, PARSER_CONTEXT, parser_tag<CONSTANT> >     constant;
+	rule<ScannerT, PARSER_CONTEXT, parser_tag<SYSTEM_FUNC> >  system_func;
 
-	rule<ScannerT, parser_context<>, parser_tag<EXPRESSION> > const&
+	rule<ScannerT, PARSER_CONTEXT, parser_tag<EXPRESSION> > const&
 	start() const { return expression; }
       };
 
