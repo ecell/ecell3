@@ -16,12 +16,11 @@ INCLTDL=@INCLTDL@
 LIBLTDL=@LIBLTDL@
 BOOST_INCLUDE=@BOOST_INCLUDE@
 
+AM_CXXFLAGS=@CXXFLAGS@
 
 INCLUDES = -I..  -I../.. ${BOOST_INCLUDE} ${DMTOOL_INCLUDE} ${INCLTDL}
 
 lib_LTLIBRARIES = libecs.la
-
-CXXFLAGS= @CXXFLAGS@ # -D_REENTRANT
 
 libecs_la_LDFLAGS= -version-info 2:0:0 $(no_undefined) #-rpath ${libdir}
 libecs_la_LIBADD=  -lstdc++ ${LIBLTDL} ${GSL_LIBADD}

@@ -94,9 +94,6 @@ public:
 
   typedef void (*InstructionAppender)( CodeRef );
 
-  DECLARE_ASSOCVECTOR
-  ( String, SystemMethodPtr, std::less<const String>, SystemMethodMap );
-
 
   enum Opcode// the order of items is optimized. don't change.
     {
@@ -108,25 +105,17 @@ public:
       // Those instructions above are candidates of stack operations folding
       // in the stack machine, and grouped here to optimize the switch(). 
 
-      , NEG    // no arg
-      //, CALL_FUNC0 // RealFunc0
       , CALL_FUNC1 // RealFunc1
-      , LOAD_REAL  // Real*
+      //, CALL_FUNC0 // RealFunc0
+      , NEG    // no arg
+      //      , PUSH_POINTER // Pointer
       , PUSH_REAL   // Real
-      , VARREF_REAL_METHOD //VariableReferencePtr, VariableReferenceMethodPtr
-      , PUSH_INTEGER // Integer
-      , PUSH_POINTER // Pointer
-      , SYSTEM_FUNC  // 
-      , PROCESS_METHOD // ProcessPtr, ProcessMethodPtr
-      , VARREF_INTEGER_METHOD // VariableReferenceIntegerMethodPtr
-      , SYSTEM_METHOD // SystemPtr, SystemMethodPtr
-      , VARREF_TO_SYSTEM_METHOD  // VariableReferenceSystemMethodPtr
-      , PROCESS_TO_SYSTEM_METHOD // ProcessMethodPtr
-      , SYSTEM_TO_REAL_METHOD // SystemMethodPtr
-      , RET   // no arg
-      , NOP
+      , LOAD_REAL  // Real*
+      , OBJECT_METHOD_REAL //VariableReferencePtr, VariableReferenceMethodPtr
+      , OBJECT_METHOD_INTEGER // VariableReferenceIntegerMethodPtr
 
-      , END=NOP
+      , RET   // no arg
+      , END=RET
     };
 
 
@@ -418,8 +407,7 @@ public:
     thePropertyMapPtr( aPropertyMap )
   {
     if( theConstantMap.empty() == true ||
-	theFunctionMap1.empty() == true ||
-	theSystemMethodMap.empty() == true )
+	theFunctionMap1.empty() == true )
       {
 	fillMap();
       }
@@ -455,11 +443,16 @@ protected:
      appendInstruction( aCode, Instruction<OPCODE>() );
      }*/
 
-  void 
+  static void 
   appendVariableReferenceMethodInstruction( Code& aCode,
 					    VariableReferencePtr
 					    aVariableReference,
 					    StringCref aMethodName );
+
+  static void 
+  appendSystemMethodInstruction( Code& aCode,
+				 SystemPtr aSystemPtr,
+				 StringCref aMethodName );
 
 private:
     
@@ -475,8 +468,6 @@ private:
   static ConstantMap        theConstantMap;
   static FunctionMap1       theFunctionMap1;
   static FunctionMap2       theFunctionMap2;
-
-  static SystemMethodMap    theSystemMethodMap;
 
 }; // ExpressionCompiler
 
@@ -515,22 +506,15 @@ public:
 
     
 SPECIALIZE_OPCODE2OPERAND( PUSH_REAL,                Real );
-SPECIALIZE_OPCODE2OPERAND( PUSH_INTEGER,             Integer );
-SPECIALIZE_OPCODE2OPERAND( PUSH_POINTER,             Pointer );
+//SPECIALIZE_OPCODE2OPERAND( PUSH_POINTER,             Pointer );
 SPECIALIZE_OPCODE2OPERAND( LOAD_REAL,                RealPtr const );
 //SPECIALIZE_OPCODE2OPERAND( CALL_FUNC0,           RealFunc0 );
 SPECIALIZE_OPCODE2OPERAND( CALL_FUNC1,               RealFunc1 );
 SPECIALIZE_OPCODE2OPERAND( CALL_FUNC2,               RealFunc2 );
-SPECIALIZE_OPCODE2OPERAND( VARREF_REAL_METHOD, 
+SPECIALIZE_OPCODE2OPERAND( OBJECT_METHOD_REAL, 
 			   RealObjectMethodProxy );
-SPECIALIZE_OPCODE2OPERAND( VARREF_INTEGER_METHOD, 
+SPECIALIZE_OPCODE2OPERAND( OBJECT_METHOD_INTEGER, 
 			   IntegerObjectMethodProxy );
-SPECIALIZE_OPCODE2OPERAND( PROCESS_METHOD,           ProcessMethod );
-SPECIALIZE_OPCODE2OPERAND( SYSTEM_METHOD,            SystemMethod );
-SPECIALIZE_OPCODE2OPERAND( PROCESS_TO_SYSTEM_METHOD, ProcessMethodPtr );
-SPECIALIZE_OPCODE2OPERAND( SYSTEM_TO_REAL_METHOD,    SystemMethodPtr );  
-SPECIALIZE_OPCODE2OPERAND( VARREF_TO_SYSTEM_METHOD,  
-			   VariableReferenceSystemMethodPtr );
 
   
 #define DEFINE_OPCODE2INSTRUCTION( CODE )\
@@ -544,27 +528,20 @@ SPECIALIZE_OPCODE2OPERAND( VARREF_TO_SYSTEM_METHOD,
 
       
 DEFINE_OPCODE2INSTRUCTION( PUSH_REAL );
-DEFINE_OPCODE2INSTRUCTION( PUSH_INTEGER );
-DEFINE_OPCODE2INSTRUCTION( PUSH_POINTER );
+//DEFINE_OPCODE2INSTRUCTION( PUSH_POINTER );
 DEFINE_OPCODE2INSTRUCTION( NEG );
 DEFINE_OPCODE2INSTRUCTION( ADD );
 DEFINE_OPCODE2INSTRUCTION( SUB );
 DEFINE_OPCODE2INSTRUCTION( MUL );
 DEFINE_OPCODE2INSTRUCTION( DIV );
-//  DEFINE_OPCODE2INSTRUCTION( POW );
+//DEFINE_OPCODE2INSTRUCTION( POW );
 DEFINE_OPCODE2INSTRUCTION( LOAD_REAL );
 //DEFINE_OPCODE2INSTRUCTION( CALL_FUNC0 );
 DEFINE_OPCODE2INSTRUCTION( CALL_FUNC1 );
 DEFINE_OPCODE2INSTRUCTION( CALL_FUNC2 );
-DEFINE_OPCODE2INSTRUCTION( VARREF_INTEGER_METHOD );
-DEFINE_OPCODE2INSTRUCTION( VARREF_REAL_METHOD );
-DEFINE_OPCODE2INSTRUCTION( PROCESS_METHOD );
-DEFINE_OPCODE2INSTRUCTION( SYSTEM_METHOD );
-DEFINE_OPCODE2INSTRUCTION( VARREF_TO_SYSTEM_METHOD );
-DEFINE_OPCODE2INSTRUCTION( PROCESS_TO_SYSTEM_METHOD );
-DEFINE_OPCODE2INSTRUCTION( SYSTEM_TO_REAL_METHOD );
+DEFINE_OPCODE2INSTRUCTION( OBJECT_METHOD_INTEGER );
+DEFINE_OPCODE2INSTRUCTION( OBJECT_METHOD_REAL );
 DEFINE_OPCODE2INSTRUCTION( RET );
-DEFINE_OPCODE2INSTRUCTION( NOP );
 
 
 
@@ -656,11 +633,23 @@ void ExpressionCompiler::fillMap()
   theFunctionMap2["geq"]   = libecs::real_geq;
   theFunctionMap2["leq"]   = libecs::real_leq;
 
-
-  // set SystemMethodMap
-  theSystemMethodMap["Size"]    = &libecs::System::getSize;
-  theSystemMethodMap["SizeN_A"] = &libecs::System::getSizeN_A;
 }
+
+#define APPEND_OBJECT_METHOD_REAL( OBJECT, CLASSNAME, METHODNAME )\
+	appendInstruction\
+	  ( aCode, \
+	    Instruction<OBJECT_METHOD_REAL>\
+	    ( RealObjectMethodProxy::\
+	      create< CLASSNAME, & CLASSNAME::METHODNAME >\
+	      ( OBJECT ) ) ) // \
+
+#define APPEND_OBJECT_METHOD_INTEGER( OBJECT, CLASSNAME, METHODNAME )\
+	appendInstruction\
+	  ( aCode, \
+	    Instruction<OBJECT_METHOD_INTEGER>\
+	    ( IntegerObjectMethodProxy::\
+	      create< CLASSNAME, & CLASSNAME::METHODNAME >\
+	      ( OBJECT ) ) ) // \
 
 
 void 
@@ -670,51 +659,42 @@ appendVariableReferenceMethodInstruction( Code& aCode,
 					  aVariableReference,
 					  StringCref aMethodName )
 {
-#define APPEND_VARREF_REAL_METHOD( METHODNAME )\
-	appendInstruction\
-	  ( aCode, \
-	    Instruction<VARREF_REAL_METHOD>\
-	    ( RealObjectMethodProxy::\
-	      create< VariableReference, &VariableReference::METHODNAME >\
-	      ( aVariableReference ) ) ); // \
-
-#define APPEND_VARREF_INTEGER_METHOD( METHODNAME )\
-	appendInstruction\
-	  ( aCode, \
-	    Instruction<VARREF_INTEGER_METHOD>\
-	    ( IntegerObjectMethodProxy::\
-	      create< VariableReference, &VariableReference::METHODNAME >\
-	      ( aVariableReference ) ) ); // \
 
 
   if( aMethodName == "MolarConc" )
     {
-      APPEND_VARREF_REAL_METHOD( getMolarConc );
+      APPEND_OBJECT_METHOD_REAL( aVariableReference, VariableReference,
+				 getMolarConc );
     }
   else if( aMethodName == "NumberConc" )
     {
-      APPEND_VARREF_REAL_METHOD( getNumberConc );
+      APPEND_OBJECT_METHOD_REAL( aVariableReference, VariableReference,
+				 getNumberConc );
     }
   else if( aMethodName == "Value" )
     {
-      APPEND_VARREF_REAL_METHOD( getValue );
+      APPEND_OBJECT_METHOD_REAL( aVariableReference, VariableReference,
+				 getValue );
     }
   else if( aMethodName == "Velocity" )
     {
-      APPEND_VARREF_REAL_METHOD( getVelocity );
+      APPEND_OBJECT_METHOD_REAL( aVariableReference, VariableReference,
+				 getVelocity );
     }
   else if( aMethodName == "TotalVelocity" )
     {
-      APPEND_VARREF_REAL_METHOD( getTotalVelocity );
+      APPEND_OBJECT_METHOD_REAL( aVariableReference, VariableReference,
+				 getTotalVelocity );
     }
   else if( aMethodName == "Coefficient" )
     {
-      APPEND_VARREF_INTEGER_METHOD( getCoefficient );
+      APPEND_OBJECT_METHOD_INTEGER( aVariableReference, VariableReference,
+				    getCoefficient );
     }
 
   /**else if( str_child2 == "Fixed" ){
      aCode.push_back(
-     new VARREF_REAL_METHOD( aVariableReference,
+     new OBJECT_METHOD_REAL( aVariableReference,
      &libecs::VariableReference::isFixed ) );
      }*/
 
@@ -727,10 +707,36 @@ appendVariableReferenceMethodInstruction( Code& aCode,
     }
 
 
-#undef APPEND_VARREF_REAL_METHOD
-#undef APPEND_VARREF_INTEGER_METHOD
+}
+
+void 
+ExpressionCompiler::
+appendSystemMethodInstruction( Code& aCode,
+			       SystemPtr aSystemPtr,
+			       StringCref aMethodName )
+{
+  if( aMethodName == "Size" )
+    {
+      APPEND_OBJECT_METHOD_REAL( aSystemPtr, System, getSize );
+    }
+  else if( aMethodName == "SizeN_A" )
+    {
+      APPEND_OBJECT_METHOD_REAL( aSystemPtr, System, getSizeN_A );
+    }
+  else
+    {
+      THROW_EXCEPTION
+	( NotFound,
+	  "ExpressionCompiler: System attribute [" +
+	  aMethodName + "] not found." ); 
+    }
 
 }
+
+#undef APPEND_OBJECT_METHOD_REAL
+#undef APPEND_OBJECT_METHOD_INTEGER
+
+
 
 
 
@@ -813,13 +819,13 @@ void ExpressionCompiler::compileTree
 	      
 	    appendInstruction
 	      ( aCode, Instruction<PUSH_REAL>
-		( aBaseValue * pow(10, anExponentValue ) ) );
+		( aBaseValue * pow( 10, anExponentValue ) ) );
 	  }
 	else
 	  {
 	    const String 
-	      anExponentString1( ( aChildTreeIterator + 2)->value.begin(),
-				 ( aChildTreeIterator + 2)->value.end() );
+	      anExponentString1( ( aChildTreeIterator + 2 )->value.begin(),
+				 ( aChildTreeIterator + 2 )->value.end() );
 	      
 	    const Real 
 	      anExponentValue = stringCast<Real>( anExponentString1 );
@@ -852,7 +858,6 @@ void ExpressionCompiler::compileTree
 
 	if( aChildTreeSize == 1 )
 	  {
-
 	    FunctionMap1Iterator aFunctionMap1Iterator;
 
 	    aFunctionMap1Iterator = 
@@ -862,8 +867,7 @@ void ExpressionCompiler::compileTree
 	      aChildTreeIterator( aTreeIterator->children.begin() );
 
 
-	    if( aChildTreeIterator->value.id() == CompileGrammar::INTEGER
-		||
+	    if( aChildTreeIterator->value.id() == CompileGrammar::INTEGER ||
 		aChildTreeIterator->value.id() == CompileGrammar::FLOAT )
 	      {
 		const String 
@@ -967,50 +971,20 @@ void ExpressionCompiler::compileTree
 
 	if( aClassString == "self" )  // Process Class
 	  {
-	    appendInstruction
-	      ( aCode, Instruction<PUSH_POINTER>( theProcessPtr ) );
-	      
-
-	    if( aClassMethodString == "getSuperSystem" )
-	      {
-		appendInstruction
-		  ( aCode, Instruction<PROCESS_TO_SYSTEM_METHOD>
-		    ( &libecs::Process::getSuperSystem ) );		  
-		  
-		const String 
-		  aSystemMethodString
-		  ( ( aChildTreeIterator+2 )->value.begin(),
-		    ( aChildTreeIterator+2 )->value.end() );
-
-
-		SystemMethodMapIterator aSystemMethodMapIterator;
-	  
-		aSystemMethodMapIterator =
-		  theSystemMethodMap.find( aSystemMethodString );
-
-	
-		if( aSystemMethodMapIterator != theSystemMethodMap.end() )
-		  {
-		    appendInstruction
-		      ( aCode, Instruction<SYSTEM_TO_REAL_METHOD>
-			( theSystemMethodMap[aSystemMethodString] ) );
-		  }
-
-		else
-		  {
-		    THROW_EXCEPTION( NoSlot,
-				     aSystemMethodString + 
-				     String
-				     (" : No such System method.") );
-		  }
-	      }
-	    else
+	    if( aClassMethodString != "getSuperSystem" )
 	      {
 		THROW_EXCEPTION( NoSlot,
 				 aClassMethodString + 
 				 String
 				 ( " : No such Process method." ) );
 	      }
+
+	    SystemPtr aSystemPtr( theProcessPtr->getSuperSystem() );
+
+	    const String aMethodName( ( aChildTreeIterator+2 )->value.begin(),
+				      ( aChildTreeIterator+2 )->value.end() );
+	    
+	    appendSystemMethodInstruction( aCode, aSystemPtr, aMethodName );
 	  }		  		
 	else // VariableReference Class
 	  {
@@ -1018,52 +992,20 @@ void ExpressionCompiler::compileTree
 	      aVariableReference( theProcessPtr->
 				  getVariableReference( aClassString ) );
 	      
-	    appendInstruction
-	      ( aCode, Instruction<PUSH_POINTER>
-		( const_cast<VariableReference*>( &aVariableReference ) ) );
-	      
-
-	    if( aClassMethodString == "getSuperSystem" )
-	      {
-		appendInstruction
-		  ( aCode, Instruction<VARREF_TO_SYSTEM_METHOD>
-		    ( &libecs::VariableReference::getSuperSystem ) );
-
-		  
-		const String 
-		  aSystemMethodString
-		  ( ( aChildTreeIterator+2 )->value.begin(),
-		    ( aChildTreeIterator+2 )->value.end() );
-
-		  
-		SystemMethodMapIterator aSystemMethodMapIterator;
-	  
-		aSystemMethodMapIterator = 
-		  theSystemMethodMap.find( aSystemMethodString );
-		  
-		  
-		if( aSystemMethodMapIterator != theSystemMethodMap.end() )
-		  {
-		    appendInstruction
-		      ( aCode, Instruction<SYSTEM_TO_REAL_METHOD>
-			( theSystemMethodMap[aSystemMethodString] ) );
-		  }
-		  
-		else
-		  {
-		    THROW_EXCEPTION( NoSlot,
-				     aSystemMethodString + 
-				     String
-				     (" : No such System method.") );
-		  } 
-	      }
-	    else
+	    if( aClassMethodString != "getSuperSystem" )
 	      {
 		THROW_EXCEPTION( NoSlot,
 				 aClassMethodString + 
-				 String
-				 ( " : No such Process method." ) );
+				 String( " : No such Process method." ) );
 	      }
+
+	    SystemPtr const aSystemPtr( aVariableReference.getSuperSystem() );
+
+	    const String aMethodName( ( aChildTreeIterator+2 )->value.begin(),
+				      ( aChildTreeIterator+2 )->value.end() );
+	    
+	    appendSystemMethodInstruction( aCode, aSystemPtr, aMethodName );
+
 	  }
 	return;
       }
@@ -1424,9 +1366,6 @@ void ExpressionCompiler::compileTree
 ConstantMap ExpressionCompiler::theConstantMap;
 FunctionMap1 ExpressionCompiler::theFunctionMap1;
 FunctionMap2 ExpressionCompiler::theFunctionMap2;
-//  ExpressionCompiler::VariableReferenceMethodProxyMap
-//  ExpressionCompiler::theVariableReferenceMethodProxyMap;  
-ExpressionCompiler::SystemMethodMap ExpressionCompiler::theSystemMethodMap;
 
 #endif /* __EXPRESSIONCOMPILER_HPP */
 

@@ -99,7 +99,7 @@ LIBECS_DM_CLASS( ExpressionProcessBase, Process )
 
   ExpressionProcessBase()
     :
-    theNeedRecompile( true )
+    theRecompileFlag( true )
     {
       // ; do nothing
     }
@@ -112,7 +112,7 @@ LIBECS_DM_CLASS( ExpressionProcessBase, Process )
   SET_METHOD( String, Expression )
     {
       theExpression = value;
-      theNeedRecompile = true;
+      theRecompileFlag = true;
     }
 
   GET_METHOD( String, Expression )
@@ -146,10 +146,10 @@ LIBECS_DM_CLASS( ExpressionProcessBase, Process )
     {
       Process::initialize();
 
-      if( theNeedRecompile )
+      if( theRecompileFlag )
 	{
 	  compileExpression();
-	  theNeedRecompile = false;
+	  theRecompileFlag = false;
 	}
     }
 
@@ -168,7 +168,7 @@ LIBECS_DM_CLASS( ExpressionProcessBase, Process )
   Code theCompiledCode;
   VirtualMachine theVirtualMachine;
 
-  bool theNeedRecompile;
+  bool theRecompileFlag;
 
   PropertyMap thePropertyMap;
 };
@@ -196,8 +196,8 @@ const Real ExpressionProcessBase::VirtualMachine::execute( CodeCref aCode )
   //    std::cout << #OPCODE << std::endl;
 
   StackElement aStack[100];
-  aStack[0].theReal = 0.0;
-  StackElementPtr aStackPtr( aStack );
+  //  aStack[0].theReal = 0.0;
+  StackElementPtr aStackPtr( aStack - 1 );
 
   const unsigned char* aPC( &aCode[0] );
 
@@ -209,46 +209,76 @@ const Real ExpressionProcessBase::VirtualMachine::execute( CodeCref aCode )
       switch ( FETCH_OPCODE() )
 	{
 
-	case ExpressionCompiler::PUSH_REAL:
+	case ExpressionCompiler::ADD:
 	  {
-	    DECODE_INSTRUCTION( PUSH_REAL );
+	    ( aStackPtr - 1 )->theReal += aStackPtr->theReal;
+	    --aStackPtr;
 
-	    bypass = anInstruction->getOperand();
-
-	    INCREMENT_PC( PUSH_REAL );
-	    goto bypass_real;
-	  }
-	    
-	case ExpressionCompiler::LOAD_REAL:
-	  {
-	    DECODE_INSTRUCTION( LOAD_REAL );
-	      
-	    bypass = *( anInstruction->getOperand() );
-
-	    INCREMENT_PC( LOAD_REAL );
-	    goto bypass_real;
-	  }
-
-	case ExpressionCompiler::VARREF_REAL_METHOD:
-	  {
-	    DECODE_INSTRUCTION( VARREF_REAL_METHOD );
-	      
-	    bypass = ( anInstruction->getOperand() )();
-
-	    INCREMENT_PC( VARREF_REAL_METHOD );
-	    goto bypass_real;
-	  }
-
-	case ExpressionCompiler::VARREF_INTEGER_METHOD:
-	  {
-	    DECODE_INSTRUCTION( VARREF_INTEGER_METHOD );
-	      
-	    aStackPtr->theReal = ( anInstruction->getOperand() )();
-
-	    INCREMENT_PC( VARREF_INTEGER_METHOD );
+	    INCREMENT_PC( ADD );
 	    continue;
 	  }
 
+	case ExpressionCompiler::SUB:
+	  {
+	    ( aStackPtr - 1 )->theReal -= aStackPtr->theReal;
+	    --aStackPtr;
+
+	    INCREMENT_PC( SUB );
+	    continue;
+	  }
+
+	case ExpressionCompiler::MUL:
+	  {
+	    ( aStackPtr - 1 )->theReal *= aStackPtr->theReal;
+	    --aStackPtr;
+
+	    INCREMENT_PC( MUL );
+	    continue;
+	  }
+
+	case ExpressionCompiler::DIV:
+	  {
+	    ( aStackPtr - 1 )->theReal /= aStackPtr->theReal;
+	    --aStackPtr;
+
+	    INCREMENT_PC( DIV );
+	    continue;
+	  }
+
+	case ExpressionCompiler::CALL_FUNC2:
+	  {
+	    DECODE_INSTRUCTION( CALL_FUNC2 );
+
+	    ( aStackPtr - 1 )->theReal
+	      = ( anInstruction->getOperand() )( ( aStackPtr - 1 )->theReal, 
+						 aStackPtr->theReal );
+	    --aStackPtr;
+
+	    INCREMENT_PC( CALL_FUNC2 );
+	    continue;
+	  }
+
+
+	case ExpressionCompiler::CALL_FUNC1:
+	  {
+	    DECODE_INSTRUCTION( CALL_FUNC1 );
+
+	    aStackPtr->theReal
+	      = ( anInstruction->getOperand() )( aStackPtr->theReal );
+
+	    INCREMENT_PC( CALL_FUNC1 );
+	    continue;
+	  }
+
+	case ExpressionCompiler::NEG:
+	  {
+	    aStackPtr->theReal = - aStackPtr->theReal;
+
+	    INCREMENT_PC( NEG );
+	    continue;
+	  }
+
+#if 0
 	case ExpressionCompiler::PUSH_INTEGER:
 	  {
 	    DECODE_INSTRUCTION( PUSH_INTEGER );
@@ -271,125 +301,46 @@ const Real ExpressionProcessBase::VirtualMachine::execute( CodeCref aCode )
 	    continue;
 	  }
 
-	case ExpressionCompiler::NEG:
-	  {
-	    aStackPtr->theReal = - aStackPtr->theReal;
+#endif // 0
 
-	    INCREMENT_PC( NEG );
-	    continue;
+	case ExpressionCompiler::PUSH_REAL:
+	  {
+	    DECODE_INSTRUCTION( PUSH_REAL );
+
+	    bypass = anInstruction->getOperand();
+
+	    INCREMENT_PC( PUSH_REAL );
+	    goto bypass_real;
 	  }
-
-	case ExpressionCompiler::ADD:
+	    
+	case ExpressionCompiler::LOAD_REAL:
 	  {
-	    Real aStackTopValue( aStackPtr->theReal );
-	    --aStackPtr;
-
-	    aStackPtr->theReal += aStackTopValue;
-
-	    INCREMENT_PC( ADD );
-	    continue;
-	  }
-
-	case ExpressionCompiler::SUB:
-	  {
-	    Real aStackTopValue( aStackPtr->theReal );
-	    --aStackPtr;
+	    DECODE_INSTRUCTION( LOAD_REAL );
 	      
-	    aStackPtr->theReal -= aStackTopValue;
+	    bypass = *( anInstruction->getOperand() );
 
-	    INCREMENT_PC( SUB );
-	    continue;
+	    INCREMENT_PC( LOAD_REAL );
+	    goto bypass_real;
 	  }
 
-	case ExpressionCompiler::MUL:
+	case ExpressionCompiler::OBJECT_METHOD_REAL:
 	  {
-	    Real aStackTopValue( aStackPtr->theReal );
-	    --aStackPtr;
+	    DECODE_INSTRUCTION( OBJECT_METHOD_REAL );
+	      
+	    bypass = ( anInstruction->getOperand() )();
 
-	    aStackPtr->theReal *= aStackTopValue;
-
-	    INCREMENT_PC( MUL );
-	    continue;
+	    INCREMENT_PC( OBJECT_METHOD_REAL );
+	    goto bypass_real;
 	  }
 
-	case ExpressionCompiler::DIV:
+	case ExpressionCompiler::OBJECT_METHOD_INTEGER:
 	  {
-	    Real aStackTopValue( aStackPtr->theReal );
-	    --aStackPtr;	      
+	    DECODE_INSTRUCTION( OBJECT_METHOD_INTEGER );
+	      
+	    bypass = static_cast<Real>( ( anInstruction->getOperand() )() );
 
-	    aStackPtr->theReal /= aStackTopValue;
-
-	    INCREMENT_PC( DIV );
-	    continue;
-	  }
-
-	case ExpressionCompiler::CALL_FUNC1:
-	  {
-	    DECODE_INSTRUCTION( CALL_FUNC1 );
-
-	    aStackPtr->theReal
-	      = ( anInstruction->getOperand() )( aStackPtr->theReal );
-
-	    INCREMENT_PC( CALL_FUNC1 );
-	    continue;
-	  }
-
-	case ExpressionCompiler::CALL_FUNC2:
-	  {
-	    DECODE_INSTRUCTION( CALL_FUNC2 );
-
-	    Real aStackTopValue( aStackPtr->theReal );
-	    --aStackPtr;
-
-	    aStackPtr->theReal
-	      = ( anInstruction->getOperand() )( aStackPtr->theReal, 
-						 aStackTopValue );
-
-	    INCREMENT_PC( CALL_FUNC2 );
-	    continue;
-	  }
-
-	case ExpressionCompiler::PROCESS_TO_SYSTEM_METHOD:
-	  {
-	    DECODE_INSTRUCTION( PROCESS_TO_SYSTEM_METHOD );
-
-	    ProcessPtr const aProcessPtr( static_cast<ProcessPtr>
-					  ( aStackPtr->thePointer ) );
-
-	    aStackPtr->thePointer =
-	      ( aProcessPtr->*( anInstruction->getOperand() ) )();
-
-	    INCREMENT_PC( PROCESS_TO_SYSTEM_METHOD );
-	    continue;
-	  }
-
-	case ExpressionCompiler::VARREF_TO_SYSTEM_METHOD:
-	  {
-	    DECODE_INSTRUCTION( VARREF_TO_SYSTEM_METHOD );
-
-	    VariableReferencePtr const 
-	      aVariableReferencePtr( static_cast<VariableReferencePtr>
-				     ( aStackPtr->thePointer ) );
-
-	    aStackPtr->thePointer =
-	      ( aVariableReferencePtr->*( anInstruction->getOperand() ) )();
-
-	    INCREMENT_PC( VARREF_TO_SYSTEM_METHOD );
-	    continue;
-	  }
-
-	case ExpressionCompiler::SYSTEM_TO_REAL_METHOD:
-	  {
-	    DECODE_INSTRUCTION( SYSTEM_TO_REAL_METHOD );
-
-	    SystemPtr const aSystemPtr( static_cast<SystemPtr>
-					( aStackPtr->thePointer ) );
-
-	    aStackPtr->theReal =
-	      ( aSystemPtr->*( anInstruction->getOperand() ) )();
-
-	    INCREMENT_PC( SYSTEM_TO_REAL_METHOD );
-	    continue;
+	    INCREMENT_PC( OBJECT_METHOD_INTEGER );
+	    goto bypass_real;
 	  }
 
 	case ExpressionCompiler::RET:
@@ -447,8 +398,7 @@ const Real ExpressionProcessBase::VirtualMachine::execute( CodeCref aCode )
 	    DECODE_INSTRUCTION( CALL_FUNC2 );
 
 	    aStackPtr->theReal
-	      = ( anInstruction->getOperand() )( aStackPtr->theReal, 
-						 bypass );
+	      = ( anInstruction->getOperand() )( aStackPtr->theReal, bypass );
 
 	    INCREMENT_PC( CALL_FUNC2 );
 	    break;
