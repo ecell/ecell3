@@ -5,8 +5,6 @@
 <requires lib="gnome"/>
 
 
-<widget class="GtkMenu" id="EntityPopupMenu">
-</widget>
 
 
 <widget class="GtkWindow" id="EntityListWindow">
@@ -21,12 +19,21 @@
   <property name="skip_pager_hint">False</property>
   <property name="type_hint">GDK_WINDOW_TYPE_HINT_NORMAL</property>
 
+  <child>
+<widget class="GtkMenu" id="EntityPopupMenu">
+</widget>
+  </child>
+
+
+
+
 
   <child>
   <widget class="GtkVBox" id="top_frame">
   <property name="visible">True</property>
   <property name="homogeneous">False</property>
   <property name="spacing">0</property>
+
 
   <child>
     <widget class="GtkHPaned" id="hpaned7">
@@ -478,5 +485,7 @@
   </child>
 
 </widget>
+
+
 
 </glade-interface>

@@ -107,7 +107,6 @@ class EntityListWindow(OsogoWindow):
 			self.__initializePropertyWindow()
 			self.__initializePopupMenu()
 
-
 			# --------------------------------------------
 			# initialize system tree
 			# --------------------------------------------
@@ -327,14 +326,12 @@ class EntityListWindow(OsogoWindow):
 			aMenuItem.connect('activate', self.createPluginWindow )
 			aMenuItem.set_name( aPluginWindowType )
 			if aPluginWindowType == DEFAULT_WINDOW:
-				pass
-#				self['EntityPopupMenu'].prepend( aMenuItem )
+				self['EntityPopupMenu'].prepend( aMenuItem )
 			else:
-				pass
-#				self['EntityPopupMenu'].append( aMenuItem )
+				self['EntityPopupMenu'].append( aMenuItem )
 
 		# appends separator
-#		self['EntityPopupMenu'].append( gtk.MenuItem() )
+		self['EntityPopupMenu'].append( gtk.MenuItem() )
 
 		# ------------------------------------------
 		# menus for Logger
@@ -344,10 +341,10 @@ class EntityListWindow(OsogoWindow):
 		aMenuItem = gtk.MenuItem( aLogMenuString )
 		aMenuItem.connect('activate', self.createLogger )
 		aMenuItem.set_name( aLogMenuString )
-#		self['EntityPopupMenu'].append( aMenuItem )
+		self['EntityPopupMenu'].append( aMenuItem )
 
 		# appends separator
-#		self['EntityPopupMenu'].append( gtk.MenuItem() )
+		self['EntityPopupMenu'].append( gtk.MenuItem() )
 
 		# ------------------------------------------
 		# menus for Bord
@@ -368,18 +365,16 @@ class EntityListWindow(OsogoWindow):
 		aMenuItem = gtk.MenuItem( aMenuString )
 		aMenuItem.set_name( aLogMenuString )
 		aMenuItem.set_submenu( aSubMenu )
-#		self['EntityPopupMenu'].append( aMenuItem )
+		self['EntityPopupMenu'].append( aMenuItem )
 		self.theBoardMenu = aMenuItem
 
 		# appends separator
-#		self['EntityPopupMenu'].append( gtk.MenuItem() )
+		self['EntityPopupMenu'].append( gtk.MenuItem() )
 
 		# ------------------------------------------
 		# menus for submenu
 		# ------------------------------------------
 		self.thePopupSubMenu = None  
-
-
 
 
 	def __openPluginInstanceSelectionWindow( self, *arg ):
