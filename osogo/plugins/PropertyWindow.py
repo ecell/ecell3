@@ -85,7 +85,7 @@ class PropertyWindow(OsogoPluginWindow):
 			return
 
 		#self.__setFullPNList()
-		self.update()
+		self.update(True)
 
 		#if ( len( self.theFullPNList() ) > 1 ) and ( aRoot != 'top_vbox' ):
 		if ( len( self.theFullPNList() ) > 1 ) and ( aRoot != 'EntityWindow' ):
@@ -186,10 +186,8 @@ class PropertyWindow(OsogoPluginWindow):
 	# return -> None
 	# This method is throwable exception.
 	# ---------------------------------------------------------------
-	def update( self ):
+	def update( self, fullUpdate = False ):
 
-		# initializes flag 
-		aChangedFlag = FALSE
 
 		# ----------------------------------------------------
 		# checks a value is changed or not
@@ -197,32 +195,36 @@ class PropertyWindow(OsogoPluginWindow):
 
 		# check the fullID
 		if self.thePreFullID != self.theFullID():
-			aChangedFlag = TRUE
+			fullUpdate = True
 			
 		# check all property's value
-		if aChangedFlag == FALSE:
-			anEntityStub = EntityStub( self.theSession.theSimulator, \
-			               createFullIDString(self.theFullID()) )
-
-			for aProperty in anEntityStub.getPropertyList():
+		#if aChangedFlag == FALSE:
+		#	anEntityStub = EntityStub( self.theSession.theSimulator, \
+		#	               createFullIDString(self.theFullID()) )
+		#
+		#	for aProperty in anEntityStub.getPropertyList():
 				# When a value is changed, 
-				if self.thePrePropertyMap[aProperty] != anEntityStub.getProperty(aProperty):
-					aChangedFlag = TRUE
-					break
+		#		if self.thePrePropertyMap[aProperty] != anEntityStub.getProperty(aProperty):
+		#			aChangedFlag = TRUE
+		#			break
 
 		# ----------------------------------------------------
 		# updates widgets
 		# ----------------------------------------------------
-		if aChangedFlag == FALSE:
-			# does nothing
-			pass
+		# creates EntityStub
+		anEntityStub = EntityStub( self.theSession.theSimulator, createFullIDString(self.theFullID()) )
 
+		if fullUpdate == False:
+			# gets propery values for thePreProperyMap in case value is not tuple
+			for aPropertyName in self.thePrePropertyMap.keys():
+				aProperty = self.thePrePropertyMap[aPropertyName]
+				if type( aProperty[0] ) not in ( type( () ), type( [] ) ):
+					aProperty[0] = anEntityStub.getProperty(aPropertyName)
+				
 		else:
 
 			self.theSelectedFullPN = ''
 
-			# creates EntityStub
-			anEntityStub = EntityStub( self.theSession.theSimulator, createFullIDString(self.theFullID()) )
 			# -----------------------------------------------
 			# updates each widget
 			# Type, ID, Path, Classname
@@ -233,18 +235,14 @@ class PropertyWindow(OsogoPluginWindow):
 			self['entry_path'].set_text( str( self.theFullID()[SYSTEMPATH] ) )
 
 			# saves properties to buffer
+			self.thePrePropertyMap = {}
 			for aProperty in anEntityStub.getPropertyList():
-				self.thePrePropertyMap[str(aProperty)] = anEntityStub.getProperty(aProperty)
-
+				self.thePrePropertyMap[str(aProperty)] = [None, None]
+				self.thePrePropertyMap[str(aProperty)][0] = anEntityStub.getProperty(aProperty)
+				self.thePrePropertyMap[str(aProperty)][1] = anEntityStub.getPropertyAttributes(aProperty)
+				
 			# updates PropertyListStore
 			self.__updatePropertyList()
-			self.thePropertyListStore.clear()
-			for aValue in self.theList:
-				iter=self.thePropertyListStore.append( )
-				cntr=0
-				for valueitem in aValue:
-				    self.thePropertyListStore.set_value(iter,cntr,valueitem)
-				    cntr+=1
 
 		# save current full id to previous full id.
 		self.preFullID = self.theFullID()
@@ -262,8 +260,8 @@ class PropertyWindow(OsogoPluginWindow):
 	def __updatePropertyList( self ):
 
 		self.theList = []
-		anEntityStub = EntityStub( self.theSession.theSimulator, createFullIDString(self.theFullID()) )
-		aPropertyList = anEntityStub.getPropertyList()
+		#anEntityStub = EntityStub( self.theSession.theSimulator, createFullIDString(self.theFullID()) )
+		aPropertyList = self.thePrePropertyMap.keys()
 
 		# do nothing for following properties
 		try:
@@ -272,17 +270,16 @@ class PropertyWindow(OsogoPluginWindow):
 		except:
 			pass
 
-		for aProperty in aPropertyList: # for (1)
+		for aPropertyName in aPropertyList: # for (1)
 
-			aFullPN = convertFullIDToFullPN( self.theFullID(), aProperty )
-			anAttribute = self.theSession.theSimulator.getEntityPropertyAttributes( \
-			                                              createFullPNString( aFullPN ) )
+			aProperty = self.thePrePropertyMap[aPropertyName]
+			anAttribute = aProperty[1]
 
 			# When the getable attribute is false, value is ''
 			if anAttribute[GETABLE] == FALSE:
 				aValue = ''
 			else:
-				aValue = str( self.theSession.theSimulator.getEntityProperty( createFullPNString( aFullPN ) ) )
+				aValue = str( aProperty[0] )
 
 			aSetString = decodeAttribute( anAttribute[SETTABLE] )
 			aGetString = decodeAttribute( anAttribute[GETABLE] )
@@ -298,7 +295,7 @@ class PropertyWindow(OsogoPluginWindow):
 				else:
 					aValueString = aValueString[:25]+ ' ..'
 
-			aList = [ aProperty, aValueString, aGetString, aSetString ]
+			aList = [ aPropertyName, aValueString, aGetString, aSetString ]
 			self.theList.append( aList )
 
 		self.thePropertyListStore.clear()

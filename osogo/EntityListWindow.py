@@ -443,6 +443,10 @@ class EntityListWindow(OsogoWindow):
 			anEntityTypeString = self['entity_optionmenu'].get_children()[0].get()
 			key=str(self.theSysTreeStore.get_path(aSelectedSystemIter))
 			aSystemFullID = self.theSysTreeStore.get_data( key )
+			aSystemPath = createSystemPathFromFullID( aSystemFullID )
+			aEntityList = self.theSession.getEntityList( 'System', aSystemPath )
+			self['label2'].set_text('System ('+str(len(aEntityList))+')')
+
 			aFullPN =  convertFullIDToFullPN(aSystemFullID) 
 			self.thePropertyWindow.setRawFullPNList( [convertFullIDToFullPN(aSystemFullID)] )
 
@@ -474,6 +478,7 @@ class EntityListWindow(OsogoWindow):
 			self.theEntityListStore.set_value(iter,0,anEntityID)
 			aEntityFullPN = ( aEntityType, aSystemPath, anEntityID, '' )
 			self.theEntityListStore.set_data( anEntityID, aEntityFullPN )
+		self['label3'].set_text('Entity (' + str(len(aEntityList)) + ')' )
 
 
 	# ========================================================================

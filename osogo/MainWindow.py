@@ -213,7 +213,7 @@ class MainWindow(OsogoWindow):
 		statusbar_heigth=self['statusbar'].get_child_requisition()[1]
 
 		# gets window_width
-		window_width=self['MainWindow'].get_size()[1]
+		window_width=self['MainWindow'].get_size()[0]
 
 		# resizes
 		window_heigth=menu_heigth+toolbar_heigth+statusbar_heigth+msg_heigth
