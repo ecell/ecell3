@@ -28,7 +28,12 @@ Window.py\
 eml.py\
 em.py\
 spark.py\
-TableIO.py
+TableIO.py\
+emparser.py\
+lex.py\
+yacc.py\
+lextab.py\
+parser.out
 
 INCLUDES=-I. -I.. ${PYTHON_INCLUDES}
 
