@@ -260,10 +260,6 @@ namespace libecs
       theSuperSystem = supersystem; 
     }
 
-    /**
-       @internal
-    */
-
     void setModel( ModelPtr const aModel )
     {
       theModel = aModel;

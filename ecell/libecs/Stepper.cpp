@@ -32,8 +32,10 @@
 #include <algorithm>
 #include <limits>
 
+#include "Util.hpp"
 #include "Substance.hpp"
 #include "Reactor.hpp"
+#include "Model.hpp"
 #include "FullID.hpp"
 #include "PropertySlotMaker.hpp"
 
@@ -84,26 +86,45 @@ namespace libecs
 				      &Stepper::getStepsPerSecond ) );
 
     registerSlot( getPropertySlotMaker()->
+		  createPropertySlot( "UserMaxInterval", *this,
+				      Type2Type<Real>(),
+				      &Stepper::setUserMaxInterval,
+				      &Stepper::getUserMaxInterval ) );
+
+    registerSlot( getPropertySlotMaker()->
+		  createPropertySlot( "UserMinInterval", *this,
+				      Type2Type<Real>(),
+				      &Stepper::setUserMinInterval,
+				      &Stepper::getUserMinInterval ) );
+
+    registerSlot( getPropertySlotMaker()->
 		  createPropertySlot( "MaxInterval", *this,
 				      Type2Type<Real>(),
-				      &Stepper::setMaxInterval,
+				      NULLPTR,
 				      &Stepper::getMaxInterval ) );
 
     registerSlot( getPropertySlotMaker()->
 		  createPropertySlot( "MinInterval", *this,
 				      Type2Type<Real>(),
-				      &Stepper::setMinInterval,
+				      NULLPTR,
 				      &Stepper::getMinInterval ) );
+
+    registerSlot( getPropertySlotMaker()->
+		  createPropertySlot( "StepIntervalConstraint", *this,
+				      Type2Type<PolymorphVectorRCPtr>(),
+				      &Stepper::setStepIntervalConstraint,
+				      &Stepper::getStepIntervalConstraint ) );
 
 
   }
 
   Stepper::Stepper() 
     :
+    theModel( NULLPTR ),
     theCurrentTime( 0.0 ),
     theStepInterval( 0.001 ),
-    theMinInterval( 0.0 ),
-    theMaxInterval( std::numeric_limits<Real>::max() ),
+    theUserMinInterval( 0.0 ),
+    theUserMaxInterval( std::numeric_limits<Real>::max() ),
     theEntityListChanged( true )
   {
     makeSlots();
@@ -118,20 +139,20 @@ namespace libecs
 
   const PolymorphVectorRCPtr Stepper::getSystemList() const
   {
-    PolymorphVectorRCPtr aVectorPtr( new PolymorphVector );
-    aVectorPtr->reserve( theSystemVector.size() );
+    PolymorphVectorRCPtr aVectorRCPtr( new PolymorphVector );
+    aVectorRCPtr->reserve( theSystemVector.size() );
 
-    for( SystemVectorConstIterator i = getSystemVector().begin() ;
+    for( SystemVectorConstIterator i( getSystemVector().begin() );
 	 i != getSystemVector().end() ; ++i )
       {
 	SystemCptr aSystemPtr( *i );
 	FullIDCref aFullID( aSystemPtr->getFullID() );
 	const String aFullIDString( aFullID.getString() );
 
-	aVectorPtr->push_back( aFullIDString );
+	aVectorRCPtr->push_back( aFullIDString );
       }
 
-    return aVectorPtr;
+    return aVectorRCPtr;
   }
 
 
@@ -178,11 +199,65 @@ namespace libecs
     calculateStepsPerSecond();
   }
 
-  void Stepper::calculateStepsPerSecond() 
+  void Stepper::setStepIntervalConstraint( PolymorphVectorRCPtrCref aValue )
   {
-    theStepsPerSecond = 1.0 / getStepInterval();
+    checkSequenceSize( *aValue, 2 );
+
+    const StepperPtr aStepperPtr( getModel()->
+				  getStepper( (*aValue)[0].asString() ) );
+    const Real aFactor( (*aValue)[1].asReal() );
+
+    setStepIntervalConstraint( aStepperPtr, aFactor );
   }
 
+  const PolymorphVectorRCPtr Stepper::getStepIntervalConstraint() const
+  {
+    PolymorphVectorRCPtr aVectorRCPtr( new PolymorphVector );
+    aVectorRCPtr->reserve( theStepIntervalConstraintMap.size() * 2 );
+
+    for( StepIntervalConstraintMapConstIterator 
+	   i( theStepIntervalConstraintMap.begin() ); 
+	      i != theStepIntervalConstraintMap.end() ; ++i )
+      {
+	aVectorRCPtr->push_back( (*i).first->getID() );
+	aVectorRCPtr->push_back( (*i).second );
+      }
+
+    return aVectorRCPtr;
+  }
+
+  void Stepper::setStepIntervalConstraint( StepperPtr aStepperPtr,
+					   RealCref aFactor )
+  {
+    theStepIntervalConstraintMap.erase( aStepperPtr );
+
+    if( aFactor != 0.0 )
+      {
+	theStepIntervalConstraintMap.
+	  insert( std::make_pair( aStepperPtr, aFactor ) );
+      }
+  }
+
+  const Real Stepper::getMaxInterval() const
+  {
+    Real aMaxInterval( getUserMaxInterval() );
+
+    for( StepIntervalConstraintMapConstIterator 
+	   i( theStepIntervalConstraintMap.begin() ); 
+	      i != theStepIntervalConstraintMap.end() ; ++i )
+      {
+	const StepperPtr aStepperPtr( (*i).first );
+	Real aConstraint( aStepperPtr->getStepInterval() * (*i).second );
+
+	if( aMaxInterval > aConstraint )
+	  {
+	    aMaxInterval = aConstraint;
+	  }
+      }
+
+    return aMaxInterval;
+  }
+  
   void Stepper::sync()
   {
     FOR_ALL( PropertySlotVector, thePropertySlotWithProxyVector, sync );

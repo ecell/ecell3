@@ -119,27 +119,29 @@ public:\
 
 
   // system errors
-  DEFINE_EXCEPTION( UnexpectedError,       Exception);
-  DEFINE_EXCEPTION( NotFound,              Exception);
-  DEFINE_EXCEPTION( CantOpen,              Exception); 
-  DEFINE_EXCEPTION( CallbackFailed,        Exception);
-  DEFINE_EXCEPTION( AssertionFailed,       Exception);
-  DEFINE_EXCEPTION( RangeError,            Exception);
-  DEFINE_EXCEPTION( AlreadyExist,          Exception);
+  DEFINE_EXCEPTION( UnexpectedError,        Exception );
+  DEFINE_EXCEPTION( NotFound,               Exception );
+  DEFINE_EXCEPTION( CantOpen,               Exception ); 
+  DEFINE_EXCEPTION( CallbackFailed,         Exception );
+  DEFINE_EXCEPTION( AssertionFailed,        Exception );
+  DEFINE_EXCEPTION( RangeError,             Exception );
+  DEFINE_EXCEPTION( AlreadyExist,           Exception );
 
   // simulation errors
-  DEFINE_EXCEPTION( InitializationFailed,  Exception);
+  DEFINE_EXCEPTION( SimulationError,        Exception );
+  DEFINE_EXCEPTION( InitializationFailed,   SimulationError );
+  DEFINE_EXCEPTION( StepIntervalRangeError, SimulationError );
 
   // PropertySlot errors
-  DEFINE_EXCEPTION( PropertyException,     Exception);
-  DEFINE_EXCEPTION( NoMethod,              PropertyException);
-  DEFINE_EXCEPTION( NoSlot,                PropertyException);
-  DEFINE_EXCEPTION( AttributeError,        PropertyException);
+  DEFINE_EXCEPTION( PropertyException,      Exception );
+//  DEFINE_EXCEPTION( NoMethod,               PropertyException );
+  DEFINE_EXCEPTION( NoSlot,                 PropertyException );
+  DEFINE_EXCEPTION( AttributeError,         PropertyException );
 
   // FullID errors
-  DEFINE_EXCEPTION( BadID,                 Exception); 
-  DEFINE_EXCEPTION( BadSystemPath,         BadID);
-  DEFINE_EXCEPTION( InvalidEntityType,  BadID);
+  DEFINE_EXCEPTION( BadID,                  Exception ); 
+  DEFINE_EXCEPTION( BadSystemPath,          BadID );
+  DEFINE_EXCEPTION( InvalidEntityType,      BadID);
 
 
 /**

@@ -141,6 +141,10 @@ namespace libecs
 
   public:
 
+    //    typedef std::pair<StepperPtr,Real> StepIntervalConstraint;
+    //    DECLARE_VECTOR( StepIntervalConstraint, StepIntervalConstraintVector );
+    DECLARE_ASSOCVECTOR( StepperPtr, Real, std::less<StepperPtr>,
+			 StepIntervalConstraintMap );
 
     /** 
 	A function type that returns a pointer to Stepper.
@@ -300,25 +304,57 @@ namespace libecs
       theID = anID;
     }
 
-    void setMinInterval( RealCref aValue )
+    ModelPtr getModel() const
     {
-      theMinInterval = aValue;
+      return theModel;
+    }
+
+
+    /**
+       @internal
+    */
+
+    void setModel( ModelPtr const aModel )
+    {
+      theModel = aModel;
+    }
+
+
+
+
+
+    void setUserMinInterval( RealCref aValue )
+    {
+      theUserMinInterval = aValue;
+    }
+
+    const Real getUserMinInterval() const
+    {
+      return theUserMinInterval;
+    }
+
+    void setUserMaxInterval( RealCref aValue )
+    {
+      theUserMaxInterval = aValue;
+    }
+
+    const Real getUserMaxInterval() const
+    {
+      return theUserMaxInterval;
     }
 
     const Real getMinInterval() const
     {
-      return theMinInterval;
+      return getUserMinInterval();
     }
 
-    void setMaxInterval( RealCref aValue )
-    {
-      theMaxInterval = aValue;
-    }
+    const Real getMaxInterval() const;
 
-    const Real getMaxInterval() const
-    {
-      return theMaxInterval;
-    }
+    void setStepIntervalConstraint( PolymorphVectorRCPtrCref aValue );
+
+    void setStepIntervalConstraint( StepperPtr aStepperPtr, RealCref aFactor );
+
+    const PolymorphVectorRCPtr getStepIntervalConstraint() const;
 
 
     bool operator<( StepperCref rhs )
@@ -345,7 +381,10 @@ namespace libecs
 
   protected:
 
-    void calculateStepsPerSecond();
+    void calculateStepsPerSecond()
+    {
+      theStepsPerSecond = 1.0 / getStepInterval();
+    }
 
   protected:
 
@@ -354,15 +393,19 @@ namespace libecs
     PropertySlotVector  thePropertySlotWithProxyVector;
     PropertySlotVector  theLoggedPropertySlotVector;
 
+    StepIntervalConstraintMap theStepIntervalConstraintMap;
+
   private:
+
+    ModelPtr            theModel;
 
     Real                theCurrentTime;
 
     Real                theStepInterval;
     Real                theStepsPerSecond;
 
-    Real                theMinInterval;
-    Real                theMaxInterval;
+    Real                theUserMinInterval;
+    Real                theUserMaxInterval;
 
     String              theID;
 

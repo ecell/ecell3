@@ -58,9 +58,9 @@ namespace libecs
     theAccumulatorMaker( *new AccumulatorMaker      )
   {
     theRootSystemPtr = getSystemMaker().make( "System" );
+    theRootSystemPtr->setModel( this );
     theRootSystemPtr->setID( "/" );
     theRootSystemPtr->setName( "The Root System" );
-    theRootSystemPtr->setModel( this );
     // super system of the root system is itself.
     theRootSystemPtr->setSuperSystem( theRootSystemPtr );
   }
@@ -104,18 +104,21 @@ namespace libecs
 	aSubstancePtr = getSubstanceMaker().make( aClassname );
 	aSubstancePtr->setID( aFullID.getID() );
 	aSubstancePtr->setName( aName );
+	aSubstancePtr->setModel( this );
 	aContainerSystemPtr->registerSubstance( aSubstancePtr );
 	break;
       case EntityType::REACTOR:
 	aReactorPtr = getReactorMaker().make( aClassname );
 	aReactorPtr->setID( aFullID.getID() );
 	aReactorPtr->setName( aName );
+	aReactorPtr->setModel( this );
 	aContainerSystemPtr->registerReactor( aReactorPtr );
 	break;
       case EntityType::SYSTEM:
 	aSystemPtr = getSystemMaker().make( aClassname );
 	aSystemPtr->setID( aFullID.getID() );
 	aSystemPtr->setName( aName );
+	aSystemPtr->setModel( this );
 	aContainerSystemPtr->registerSystem( aSystemPtr );
 	break;
 
@@ -227,6 +230,7 @@ namespace libecs
   void Model::createStepper( StringCref aClassName, StringCref anID )
   {
     StepperPtr aStepper( getStepperMaker().make( aClassName ) );
+    aStepper->setModel( this );
     aStepper->setID( anID );
 
     theStepperMap.insert( std::make_pair( anID, aStepper ) );

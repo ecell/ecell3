@@ -226,7 +226,6 @@ namespace libecs
 
     theSystemMap[ anID ] = aSystem;
     aSystem->setSuperSystem( this );
-    aSystem->setModel( getModel() );
 
     notifyChangeOfEntityList();
   }
@@ -317,7 +316,6 @@ namespace libecs
 
     theReactorMap[ anID ] = aReactor;
     aReactor->setSuperSystem( this );
-    aReactor->setModel( getModel() );
 
     notifyChangeOfEntityList();
   }
@@ -379,7 +377,6 @@ namespace libecs
 
     theSubstanceMap[ anID ] = aSubstance;
     aSubstance->setSuperSystem( this );
-    aSubstance->setModel( getModel() );
 
     notifyChangeOfEntityList();
   }
