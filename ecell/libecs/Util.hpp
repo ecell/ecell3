@@ -38,7 +38,7 @@
 #define ___UTIL_H___
 #include <string>
 #include <typeinfo>
-#include "Koyurugi/Defs.h"
+#include "Defs.h"
 #include "korandom/korandom.h"
 
 /////////////// KoRandom random number generator
