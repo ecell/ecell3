@@ -61,8 +61,18 @@ namespace libecs
     public Entity
   {
 
-
   public: 
+
+
+    class PriorityCompare
+    {
+    public:
+      bool operator()( ReactorPtr aLhs, ReactorPtr aRhs ) const
+      {
+	return ( aLhs->getPriority() < aRhs->getPriority() );
+      }
+    };
+
 
     /** 
 	A function type that returns a pointer to Reactor.  
@@ -142,13 +152,22 @@ namespace libecs
 
     Reactant getReactant( StringCref aReactantName );
 
-
     /**
        @return a const reference to the reactant map
     */
     ReactantMapCref getReactantMap() const
     {
       return theReactantMap;
+    }
+
+    void setPriority( IntCref aValue )
+    {
+      thePriority = aValue;
+    }
+
+    const Int getPriority() const
+    {
+      return thePriority;
     }
 
   protected:
@@ -159,10 +178,10 @@ namespace libecs
 
     ReactantMap theReactantMap;
 
-
   private:
 
     Real        theActivity;
+    Int         thePriority;
 
   };
 

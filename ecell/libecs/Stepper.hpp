@@ -375,8 +375,7 @@ namespace libecs
 
 
     DECLARE_TYPE( SubstanceVector, SubstanceCache );
-    //    DECLARE_TYPE( ReactorVector,   ReactorCache );
-    DECLARE_VECTOR( SRMReactorPtr, ReactorCache );
+    DECLARE_TYPE( ReactorVector, ReactorCache );
 
     SRMStepper();
     virtual ~SRMStepper() {}

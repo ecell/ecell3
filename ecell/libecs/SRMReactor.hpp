@@ -46,20 +46,9 @@ namespace libecs
 
   public:
 
-    class PriorityCompare
-    {
-    public:
-      bool operator()( SRMReactorPtr aLhs, SRMReactorPtr aRhs ) const
-      {
-	return ( aLhs->getPriority() < aRhs->getPriority() );
-      }
-    };
-
     SRMReactor() 
-      :
-      thePriority( 0 )
     {
-      makeSlots();  
+      // makeSlots();  
     } 
     
     virtual ~SRMReactor()
@@ -77,15 +66,6 @@ namespace libecs
       ; // do nothing
     }
 
-    void setPriority( IntCref aValue )
-    {
-      thePriority = aValue;
-    }
-
-    const Int getPriority() const
-    {
-      return thePriority;
-    }
 
 
   protected:
@@ -94,7 +74,7 @@ namespace libecs
 
   private:
 
-    Int         thePriority;
+
 
   };
 
@@ -102,11 +82,7 @@ namespace libecs
 
   inline void SRMReactor::makeSlots()
   {
-    registerSlot( getPropertySlotMaker()->
-		  createPropertySlot( "Priority", *this, 
-				      Type2Type<Int>(),
-				      &SRMReactor::setPriority,
-				      &SRMReactor::getPriority ) );
+
   }
 
 

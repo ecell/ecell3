@@ -305,7 +305,7 @@ namespace libecs
     for( SubstanceCache::const_iterator i( theSubstanceCache.begin() );
 	 i != theSubstanceCache.end() ; ++i )
       {
-	aVector.push_back( (*i)->getID() );
+	aVector.push_back( (*i)->getFullID().getString() );
       }
     
     return aVector;
@@ -319,7 +319,7 @@ namespace libecs
     for( ReactorCache::const_iterator i( theReactorCache.begin() );
 	 i != theReactorCache.end() ; ++i )
       {
-	aVector.push_back( (*i)->getID() );
+	aVector.push_back( (*i)->getFullID().getString() );
       }
     
     return aVector;
@@ -362,19 +362,13 @@ namespace libecs
 	    {
 	      ReactorPtr aReactorPtr( (*j).second );
 
-	      SRMReactorPtr aSRMReactorPtr( dynamic_cast<SRMReactorPtr>
-					    ( aReactorPtr ) );
-
-	      if( aSRMReactorPtr != NULLPTR )
-		{
-		  theReactorCache.push_back( aSRMReactorPtr );
-		}
+	      theReactorCache.push_back( aReactorPtr );
 	    }
 	}
 
     // sort by Reactor priority
     std::sort( theReactorCache.begin(), theReactorCache.end(),
-	       SRMReactor::PriorityCompare() );
+	       Reactor::PriorityCompare() );
 
 
     //

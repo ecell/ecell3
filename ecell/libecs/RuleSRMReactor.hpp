@@ -47,7 +47,7 @@ namespace libecs
 
     class IsRuleReactor
       : 
-      public std::unary_function<SRMReactorPtr,bool>
+      public std::unary_function<ReactorPtr,bool>
     {
     public:
       result_type operator()( const argument_type aReactorPtr ) const

@@ -67,6 +67,12 @@ namespace libecs
 				      Type2Type<Real>(),
 				      NULLPTR,
 				      &Reactor::getActivityPerSecond ) );
+
+    registerSlot( getPropertySlotMaker()->
+		  createPropertySlot( "Priority", *this, 
+				      Type2Type<Int>(),
+				      &Reactor::setPriority,
+				      &Reactor::getPriority ) );
   }
 
   const Real Reactor::getActivityPerSecond() const
@@ -115,7 +121,8 @@ namespace libecs
 
   Reactor::Reactor() 
     :
-    theActivity( 0.0 )
+    theActivity( 0.0 ),
+    thePriority( 0 )
   {
     makeSlots();
   }

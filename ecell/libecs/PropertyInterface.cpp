@@ -82,7 +82,21 @@ namespace libecs
     for( PropertySlotMapConstIterator i( thePropertySlotMap.begin() ); 
 	 i != thePropertySlotMap.end() ; ++i )
       {
-	aVector.push_back( i->first );
+	PolymorphVector anInnerVector;
+	PropertySlotPtr aPropertySlotPtr( i->second );
+
+	// the name of the property slot
+	anInnerVector.push_back( aPropertySlotPtr->getName() );
+
+	// is setable?
+	anInnerVector.push_back( static_cast<Int>
+				 ( aPropertySlotPtr->isSetable() ) );
+
+	// is getable?
+	anInnerVector.push_back( static_cast<Int>
+				 ( aPropertySlotPtr->isGetable() ) );
+
+	aVector.push_back( anInnerVector );
       }
 
     return aVector;
