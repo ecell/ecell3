@@ -60,7 +60,6 @@ class OsogoWindow(Window):
 		"""
 
 		# calls superclass's constructor
-
 		Window.__init__( self, gladeFile, rootWidget=rootWidget )
 
 		# saves a reference to Session
@@ -69,7 +68,17 @@ class OsogoWindow(Window):
 		# initializes exist flag
 		self.__theExist = False
 
+		# set top the widget 
+		self.setTopWidgetName( rootWidget )
 
+
+	def setTopWidgetName( self, rootWidget ):
+
+		if( rootWidget != None ):
+			self.theTopWidget = rootWidget
+		else:
+			self.theTopWidget = self.__class__.__name__
+		
 
 	def exists( self ):
 		"""Returns TRUE:When glade file is loaded and does not deleted.
@@ -91,7 +100,7 @@ class OsogoWindow(Window):
 		# calla present() method of Window widget of this window.
 		if self.exists():
 
-			self[self.__class__.__name__].present()
+			self[self.theTopWidget].present()
 
 	def iconify( self ):
 		"""moves this window to the taskbar.
@@ -104,7 +113,7 @@ class OsogoWindow(Window):
 		# calls iconify() method of Window widget of this window.
 		if self.exists():
 
-			self[self.__class__.__name__].iconify()
+			self[self.theTopWidget].iconify()
 
 	def move( self, xpos, ypos ):
 		"""moves this window on the desktop to (xpos,ypos).
@@ -117,7 +126,7 @@ class OsogoWindow(Window):
 		# calls move(x,y) method of Window widget of this window.
 		if self.exists():
 
-			self[self.__class__.__name__].move( xpos, ypos)
+			self[self.theTopWidget].move( xpos, ypos)
 
 	def resize( self, width, heigth ):
 		"""resizes this window according to width and heigth.
@@ -130,7 +139,7 @@ class OsogoWindow(Window):
 		# calls resize(width,heigth) method of Window widget of this window.
 		if self.exists():
 
-			self[self.__class__.__name__].resize( width, heigth)
+			self[self.theTopWidget].resize( width, heigth)
 
 	def deleted( self, *arg ):
 		""" When 'delete_event' signal is chatcked( for example, [X] button is clicked ),
@@ -173,8 +182,8 @@ class OsogoWindow(Window):
 			Window.openWindow(self)
 
 			# connects 'delete_event' and self.delete() method.
-			self[self.__class__.__name__].show_all()
-			self[self.__class__.__name__].connect('delete_event',self.deleted)
+			self[self.theTopWidget].show_all()
+			self[self.theTopWidget].connect('delete_event',self.deleted)
 
 
 
@@ -188,10 +197,11 @@ class OsogoWindow(Window):
 	def close ( self ):
 		""" destroys Widgets and sets __theExist FALSE """
 		if self.exists():
-			self[self.__class__.__name__].destroy()
+			self[self.theTopWidget].destroy()
 			self.__theExist = gtk.FALSE
 			self.widgets = None
-			self.theSession.updateFundamentalWindows()
+			self.theSession.theMainWindow.update()
+#			self.theSession.updateFundamentalWindows()
 
 
 
