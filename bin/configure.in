@@ -7,6 +7,8 @@ dnl Checks for programs.
 dnl AC_PROG_CC
 
 dnl Checks for libraries.
+AC_PROG_LIBTOOL
+AC_PROG_CXX
 
 dnl Checks for header files.
 
@@ -14,7 +16,6 @@ dnl Checks for typedefs, structures, and compiler characteristics.
 
 dnl Checks for library functions.
 
-AC_OUTPUT(Makefile
-,chmod +x em2eml eml2em rd2dm eri2eml
-)
+AC_OUTPUT(Makefile ecell3-dmc
+,chmod +x em2eml eml2em rd2dm eri2eml ecell3-dmc)
 
