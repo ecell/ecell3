@@ -2,6 +2,7 @@
 
 #from string import *
 from OsogoPluginWindow import *
+from VariableReferenceEditor import *
 
 # column index of clist
 PROPERTY_COL  = 0
@@ -86,15 +87,15 @@ class PropertyWindow(OsogoPluginWindow):
         self.theValueColumn = column
 
         renderer=gtk.CellRendererToggle()
-        column=gtk.TreeViewColumn("Get",renderer, active=GETABLE_COL )
+        column=gtk.TreeViewColumn( "Get", renderer, active = GETABLE_COL )
         column.set_visible( True )
         column.set_resizable( True )
         column.set_sort_column_id( GETABLE_COL )
         column.set_reorderable( True )
         self['theTreeView'].append_column(column)
-        
+
         renderer=gtk.CellRendererToggle()
-        column=gtk.TreeViewColumn("Set",renderer, active=SETTABLE_COL )
+        column=gtk.TreeViewColumn( "Set", renderer, active = SETTABLE_COL )
         column.set_visible( True )
         column.set_reorderable( True )
         column.set_sort_column_id( SETTABLE_COL )
@@ -102,17 +103,18 @@ class PropertyWindow(OsogoPluginWindow):
         self['theTreeView'].append_column(column)
 
         # creates popu menu
-        self.thePopupMenu = PropertyWindowPopupMenu(
-                                        self.thePluginManager, self )
+        self.thePopupMenu = PropertyWindowPopupMenu( self.thePluginManager, self )
         # initializes statusbar
         self.theStatusBarWidget = self['statusbar']
 
         if self.theRawFullPNList == ():
             return
-
+        self.theVarrefTabNumber  = -1
+        self.theNoteBook = self['notebookProperty']
+        self.theVarrefEditor = None
         # set default as not to view all properties
         self['checkViewAll'].set_active( False )
-        
+
         self.setIconList(
             os.environ['OSOGOPATH'] + os.sep + "ecell.png",
             os.environ['OSOGOPATH'] + os.sep + "ecell32.png")
@@ -127,8 +129,6 @@ class PropertyWindow(OsogoPluginWindow):
 
         # registers myself to PluginManager
         self.thePluginManager.appendInstance( self ) 
-
-
 
 
 
@@ -256,6 +256,8 @@ class PropertyWindow(OsogoPluginWindow):
                 aProperty = self.thePrePropertyMap[aPropertyName]
                 if type( aProperty[0] ) not in ( type( () ), type( [] ) ):
                     aProperty[0] = anEntityStub.getProperty(aPropertyName)
+            if self.theVarrefEditor != None:
+                self.theVarrefEditor.update()
                 
         else:
 
@@ -293,11 +295,17 @@ class PropertyWindow(OsogoPluginWindow):
             # update the respective Entity's PropertyList
             self.__setDiscardList()
             if self.theFullID()[TYPE] == PROCESS:
+                self.__createVariableReferenceListTab()
                 self.__updateProcess()
             elif self.theFullID()[TYPE] == VARIABLE:
+                self.__deleteVariableReferenceListTab()
                 self.__updateVariable()
             elif self.theFullID()[TYPE] == SYSTEM:
+                self.__deleteVariableReferenceListTab()
                 self.__updateSystem()
+        
+
+
 
         # save current full id to previous full id.
         self.preFullID = self.theFullID()
@@ -344,6 +352,7 @@ class PropertyWindow(OsogoPluginWindow):
                 self.theListStore.set_value(iter,cntr,valueitem)
                 cntr+=1
 
+
     def __updateProcess( self ):
         self.__updatePropertyList() 
         aVariableReferenceList = self.thePrePropertyMap[
@@ -388,6 +397,7 @@ class PropertyWindow(OsogoPluginWindow):
         self['label3'].hide()
         self['entry3'].hide()
 
+
     def __updateSystem( self ):
         self.__updatePropertyList()
         aSystemPath = createSystemPathFromFullID( self.theFullID() )
@@ -405,9 +415,11 @@ class PropertyWindow(OsogoPluginWindow):
         self['label3'].hide()
         self['entry3'].hide()
 
+
     def updateViewAllProperties( self, *anObject ):
         self.__setDiscardList()
         self.__updatePropertyList()
+
 
     def __setDiscardList( self ):
         isViewAll = self['checkViewAll'].get_active()
@@ -616,7 +628,29 @@ class PropertyWindow(OsogoPluginWindow):
 
     # end of createNewPluginWindow
 
+    def __createVariableReferenceListTab( self ):
+        if self.theVarrefTabNumber  != -1:
+            if self.theVarrefEditor.getProcessFullID() == self.theFullID():
+                return
+            else:
+                self.theVarrefEditor.setDisplayedFullID( self.theFullID() )
+        else:
+            aFrame = gtk.Frame()
+            aFrame.show()
+            aLabel = gtk.Label("VariableReferenceList")
+            aLabel.show()
+            self.theNoteBook.append_page(  aFrame, aLabel )
+            self.theVarrefTabNumber = 2
+            self.theVarrefEditor = VariableReferenceEditor( self, aFrame )
 
+
+    def __deleteVariableReferenceListTab( self ):
+        if self.theVarrefTabNumber  == -1:
+            return
+        self.theNoteBook.remove_page( self.theVarrefTabNumber )
+        self.theVarrefTabNumber  = -1
+        self.theVarrefEditor = None
+        
 
 # ----------------------------------------------------------
 # PropertyWindowPopupMenu -> gtk.Menu

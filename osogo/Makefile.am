@@ -32,6 +32,7 @@ OsogoUtil.py\
 PluginInstanceSelection.glade\
 PluginInstanceSelection.py\
 PluginWindowPopupMenu.glade\
+VariableReferenceEditor.py\
 Plot.py\
 board.glade\
 config.py\

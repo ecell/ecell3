@@ -156,17 +156,45 @@ class DataGenerator:
 
     # end of requestDataSlice
 
-
-#    def setXAxis( self, fullPNString ):
-#        '''
-#        chose aFullPNString of the propety as XAxis
-#        or it simply means time
-#        '''
-#
-#        pass
-#
-#    # end of setXAxis
-
-# Xaxis varies from Dataseries to Dataseries so it is not global
-
 # end of DataGenerator
+
+class CachedLoggerAdapter:
+    def __init__ ( self, aSession ):
+        pass
+        
+    def update( self ):
+        pass
+        
+    def getData( fullPNString, start, end, interval ):
+        pass
+        
+    def getStartTime( fullPNString ):
+        pass
+        
+    def getEndTime( fullPNString ):
+        pass
+        
+    def getSize( fullPNString ):
+        pass
+
+    
+
+class CachedLogger:
+    def __init__( self, aSession, fullPNString ):
+        pass
+
+    def update( self ):
+        pass
+        
+    def getData( start, end, interval ):
+        pass
+        
+    def getStartTime( ):
+        pass
+        
+    def getEndTime(  ):
+        pass
+
+    def getSize( ):
+        pass
+        
