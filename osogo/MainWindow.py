@@ -87,14 +87,8 @@ class MainWindow(Window):
     def loadRule( self, button_obj ) :
         aFileName = self.theRuleFileSelection.get_filename()
         self.theRuleFileSelection.hide()
-        aGlobalMap = { 'MainWindow' : self }
-        execfile( aFileName, aGlobalMap )
-        
-#          aModuleName = string.replace( aFilename, '.py', '' )
-#          aScript = 'import ' + aModuleName
-#          exec( aScript )
-#          aScript = 'aScriptModule = ' + aModuleName
-#          self.theSimulator = aModuleName.makeSimulator()
+        aGlobalNameMap = { 'aMainWindow' : self }
+        execfile( aFileName, aGlobalNameMap )
 
     ###### Load Script ######
     def openScriptFileSelection( self, obj ) :
@@ -103,7 +97,6 @@ class MainWindow(Window):
     def loadScript( self, button_obj ):
         aFileName = self.theScriptFileSelection.get_filename()
         self.theScriptFileSelection.hide()
-        print aFileName
         aGlobalNameMap = { 'aMainWindow' : self }
         execfile(aFileName, aGlobalNameMap)
         
@@ -122,7 +115,7 @@ class MainWindow(Window):
     def stepSimulation( self, a ) : pass
 
     def createNewEntryList( self, button_obj ) :
-        aEntryList = EntryListWindow.EntryListWindow( self )
+        aEntryList = EntryListWindow.EntryListWindow( self, self.theSimulator )
     
     def createNewLoggerList( self, a ) : pass
 
