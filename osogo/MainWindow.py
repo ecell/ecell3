@@ -74,6 +74,11 @@ class MainWindow(Window):
         self.theMessageWindowWindow = self.theMessageWindow[ 'message_window' ]
         self.theMessageWindowWindow.hide()
 
+        ### initialize for run() method ###
+        self.theSimulator.setPendingEventChecker( gtk.events_pending )
+        self.theSimulator.setEventHandler( gtk.mainiteration  )
+        #self.theSimulator.run()
+
     ###### window operation ####
     def closeParentWindow( self, button_obj):
         aParentWindow = button_obj.get_parent_window()
