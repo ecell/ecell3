@@ -520,6 +520,8 @@ class EntityListWindow(OsogoWindow):
         """
 
         # updates this window
+        if not self.exists():
+            return
         OsogoWindow.update(self)
 
         # updates property window

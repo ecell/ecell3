@@ -127,7 +127,7 @@ class BargraphWindow( OsogoPluginWindow ):
 		else:
 		    icon_id=gtk.STOCK_REMOVE
 		self.arrow.set_from_stock(icon_id,4)  
-		self.current_position=self.convert_value(self.current_value)
+		self.current_position=int(self.convert_value(self.current_value))
 		#if scalechange, drawall
 		if self.lastscale!=self.current_scale:
 		    #draw painted area and draw grey area

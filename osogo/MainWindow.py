@@ -133,7 +133,7 @@ class LogoAnimation:
 
         self.extraCount = 0
         self.delay = 100
-
+        self.theTimer = None
 
         #def setLogoWidget( self, aLogoAnimationWidget ):
 
@@ -157,6 +157,9 @@ class LogoAnimation:
     def stop( self ):
 
         self.__running = False
+        if self.theTimer != None:
+            gtk.timeout_remove( self.theTimer )
+            self.theTimer = None
         
 
     def animate( self ):
@@ -176,7 +179,7 @@ class LogoAnimation:
             self.image.set_from_file( self.iconList[self.__currentImage] )
             self.__currentImage += 1
 
-            gobject.timeout_add( self.delay, LogoAnimation.animate, self )
+            self.theTimer = gtk.timeout_add( self.delay, LogoAnimation.animate, self )
 
             
             #if ( self.__currentImage == self.END_ROTATION ):
@@ -202,7 +205,7 @@ class LogoAnimation:
 
                 self.image.set_from_file( self.iconList[self.__currentImage] )
                 self.__currentImage += 1
-                gobject.timeout_add( 60, LogoAnimation.animate, self )
+                self.theTimer = gtk.timeout_add( 60, LogoAnimation.animate, self )
 
 
 
@@ -685,6 +688,7 @@ class MainWindow(OsogoWindow):
 		if self.theSession.theRunningFlag:
 		# stop simulation temporarily
 			self.theSession.stop()
+
 			running_flag = True
 
 		# If there is no logger data, exit this program.
@@ -700,9 +704,14 @@ class MainWindow(OsogoWindow):
 				if running_flag:
 					self.theSession.run()
 				return gtk.TRUE		
-		
+
+		self.setStopState()
+		self.theEntityListWindow.close()
+
 		self.close()
+
 		self.theSession.QuitGUI()
+
 		return gtk.TRUE
 
 
@@ -715,6 +724,7 @@ class MainWindow(OsogoWindow):
 
                 self.theEntityListWindow.close()
 		OsogoWindow.close( self )
+
 
 
         def setStartState( self ):
@@ -747,7 +757,9 @@ class MainWindow(OsogoWindow):
 		arg[0]  ---  simulation button (gtk.Button)
 		Returns None
 		"""
-                
+                if not self.exists():
+                    return
+
                 if ( self.SimulationButton.getCurrentState() == 'stop' ):
 
                     self.setStartState()
@@ -899,7 +911,7 @@ class MainWindow(OsogoWindow):
 
 
 
-                    
+                   
                 if self.indicatorVisible:
 
                     if( self.updateCount == 0 ):

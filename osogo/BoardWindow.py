@@ -58,9 +58,9 @@ MAXHEIGHT=800
 class BoardWindow(OsogoWindow):
 
 
-    def __init__( self, aSession ): 
+    def __init__( self, aSession, aRootWidget = 'BoardWindow.glade' ): 
 
-        OsogoWindow.__init__( self, aSession, 'BoardWindow.glade' )
+        OsogoWindow.__init__( self, aSession, aRootWidget )
 
         self.thePluginManager = aSession.thePluginManager
         self.theX = 0
@@ -140,7 +140,8 @@ class BoardWindow(OsogoWindow):
 
         aButton = self.thePluginManager.createInstance( \
             aPluginWindowType, aRawFullPNList, 'top_frame', self )
-
+        if aButton == None:
+            return
         aTopFrame = aButton['top_frame']
 
         aPluginFrame = gtk.Frame()
