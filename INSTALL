@@ -44,26 +44,26 @@ NOTE: If you get this package via cvs, use ./autogen.sh instead of
 
   == Operating Systems ==
 
-  We've tested with RedHat Linux 7.2 on i386 platform.
+  We've tested with RedHat Linux 7.3 on i386 platform.
 
 
   == Compilers ==
 
-  We've tested with gcc-3.0.2 and gcc-3.0.3.
+  We've tested with gcc-3.1.
 
 
-  == Note for RedHat 7.2 users ==
+  == Note for RedHat 7.3 users ==
 
-  If you are using RedHat Linux 7.2, you need some additional packages to 
+  If you are using RedHat Linux 7.3, you need some additional packages to 
   successfully build and run E-CELL 3.
 
   1. gcc3:
-     must be installed.  This is an optional package of RedHat 7.2.
+     must be installed.  This is an optional package of RedHat 7.3.
      If it is installed as gcc3, not gcc, 
      you should set environment variables(CC=gcc3 CXX=g++3) at configure.
 
   2. python2: 
-     must be installed.  This is an optional package of RedHat 7.2.
+     must be installed.  This is an optional package of RedHat 7.3.
 
   3. Numeric Python for python2:
      note that this should be built for python2, not python.
@@ -97,7 +97,14 @@ NOTE: If you get this package via cvs, use ./autogen.sh instead of
      http://gtkextra.sourceforge.net
      http://python-gtkextra.sourceforge.net
 
+  6. Boost C++ Libraries
 
+     http://www.boost.org
+     You may have to extract Boost tarball at the same directory of 
+     E-CELL3 source code and should rename the package name to boost.
+
+     % gunzip <boost_all.tar.gz | tar xvf -
+     % mv boost_1_28_0 boost
 
   I recommend http://www.freshmeat.net for finding the latest URLs for the
   packages.
@@ -380,16 +387,4 @@ operates.
      script, and exit.
 
 `configure' also accepts some other, not widely useful, options.
-
-
-
-
-
-
-
-
-
-
-
-
 
