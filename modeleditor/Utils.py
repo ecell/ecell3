@@ -174,7 +174,7 @@ def getUniqueVarrefName ( aVarrefList, aVarrefName = None ):
 		nameList.append( aVarref[MS_VARREF_NAME] )
 
 	# get initial varrefname
-	if aVarrefName = None:
+	if aVarrefName == None:
 		aVarrefName = '___'
 	elif aVarrefName not in nameList:
 		return aVarrefName

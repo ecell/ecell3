@@ -145,7 +145,7 @@ class LayoutBufferPaster:
 		
 		
 	
-	def pasteObjectBuffer( self, aLayoutName, aBuffer, x = None, y = None, theParent  ):
+	def pasteObjectBuffer( self, aLayoutName, aBuffer, x = None, y = None, theParent = '/' ):
 		# dont create connections and entities
 		aLayout = self.theLayoutManager.getLayout( aLayoutName )
 		aType = aBuffer.getProperty( OB_TYPE )

@@ -1,12 +1,13 @@
 from Constants import *
 from Utils import *
+from Command import *
 
 class LayoutCommand( Command ):
 
 
 	def __checkArgs( self ):
 		if type (self.theReceiver) == type(self):
-			if self.theReceiver.__class__.__name__ = self.RECEIVER:
+			if self.theReceiver.__class__.__name__ == self.RECEIVER:
 				return True
 
 		return False

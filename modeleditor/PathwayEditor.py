@@ -37,11 +37,12 @@ import os
 import os.path
 import string
 from Constants import *
+from PathwayCanvas import *
 
 class PathwayEditor( ListWindow ):
 
 
-	def __init__( self, theModelEditor ):
+	def __init__( self, theModelEditor, aLayout ):
 		"""
 		in: ModelEditor theModelEditor
 		returns nothing
@@ -49,6 +50,8 @@ class PathwayEditor( ListWindow ):
 
 		# init superclass
 		ListWindow.__init__( self, theModelEditor )
+		self.theLayout = aLayout
+		self.theModelEditor = theModelEditor
 
 
 	def openWindow( self ):
@@ -61,6 +64,9 @@ class PathwayEditor( ListWindow ):
 		ListWindow.openWindow( self )
 
 		# add signal handlers
+
+		self.thePathwayCanvas = PathwayCanvas( self, self['pathway_canvas'] )
+		self.theLayout.attachToCanvas( self.thePathwayCanvas )
 
 		self.addHandlers({ 
 				'on_zoom_in_button_clicked' : self.__zoom_in,\
@@ -77,16 +83,25 @@ class PathwayEditor( ListWindow ):
 				'on_custom_button_toggled' : self.__palette_toggled,\
 				'on_search_entry_activate' : self.__search,\
 				'on_search_entry_editing_done' : self.__search })
+		self.update()
 
 
 	def update( self, arg1 = None, arg2 = None):
-		pass
+		if not self.exists():
+			return
+		self['layout_name_entry'].set_text( self.theLayout.getName() )
+
 
 	def deleted( self, *args ):
+		# detach canvas from layout
+		self.thePathwayCanvas.getLayout().detachFromCanvas()
 		ListWindow.deleted( self, args )
 		
-		
-				
+	def getPathwayCanvas( self ):	
+		return self.thePathwayCanvas
+
+	def getLayout( self ):
+		return self.theLayout
 
 	def __zoom_in( self, *args ):
 		pass

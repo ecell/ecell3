@@ -79,19 +79,23 @@ class FullIDBrowserWindow:
 		# Sets title
 		
 		self.theComponent = ViewComponent( self.win.vbox, 'attachment_box', 'FullIDChooser.glade' )
-
+               
 		# create systree, processlist, propertylist
 		self.theSystemTree = SystemTree( self, self.theComponent['SystemTreeFrame'] )
 		self.theEntityList = EntityList( self, self.theComponent['EntityListFrame'], ME_VARIABLE_TYPE )
-
+               
 		if getFullIDType( anEntity) == ME_SYSTEM_TYPE:
 			aSysID = anEntity
 		else:
 			aSysID = convertSysPathToSysID( anEntity.split(':')[1] )
-		
+
 		self.theSystemTree.changeSelection( [ aSysID ] )
+		
 		self.theSystemTree.selectByUser()
+		
 		self.theModelEditor.setFullIDBrowser( self )
+		
+		
 		self.win.show_all()
 		gtk.mainloop()
 
@@ -154,6 +158,8 @@ class FullIDBrowserWindow:
 			selectedID = None
 
 		self.__value = selectedID
+		
+		
 		self.destroy()
 
 
@@ -171,7 +177,6 @@ class FullIDBrowserWindow:
 	def return_result( self ):
 		"""Returns result
 		"""
-
 		return self.__value
 
 

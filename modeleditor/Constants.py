@@ -114,6 +114,10 @@ ME_VARIABLE_PROCESSLIST = MS_VARIABLE_PROCESSLIST
 ME_PROCESS_VARREFLIST = MS_PROCESS_VARREFLIST
 ME_STEPPERID = MS_SYSTEM_STEPPERID
 
+#special editor type
+ME_ENTITY_EDITOR = 'ME_ENTITY_EDITOR'
+ME_CONNNECTION_OBJ_EDITOR = 'ME_CONNNECTION_OBJ_EDITOR'
+
 # undo
 MAX_REDOABLE_COMMAND = 20
 
@@ -152,8 +156,15 @@ OB_DIMENSION_X = 'DimensionX'
 OB_DIMENSION_Y = 'DimensionY'
 OB_HASFULLID = 'HasFullID'
 
-OB_COLOR = "Color"
+OB_OUTLINE_COLOR = "OutlineColor"
+OB_FILL_COLOR = "FillColor"
+OB_TEXT_COLOR = "TextColor"
+OB_OUTLINE_WIDTH = "Outline"
+
 OB_SHAPE_TYPE = "ShapeType"
+OB_SHAPEDESCRIPTORLIST = "ShapeDescriptorList"
+
+
 
 # connection constants
 # directions
@@ -189,7 +200,7 @@ SY_PASTE_CONNECTIONLIST = "PasteConnectionList"
 
 # local/global properties
 
-GLOBALPROPERTYSET = [ CO_COEF, CO_NAME, SHAPE_TYPE, LINE_TYPE ]
+GLOBALPROPERTYSET = [ CO_COEF, CO_NAME, OB_SHAPE_TYPE, CO_LINETYPE ]
 MODELPROPERTYSET = [ CO_COEF, CO_NAME ]
 
 ### CANVAS CONSTANTS
@@ -204,4 +215,48 @@ SHAPE_TYPE_CUSTOM = "Custom"
 
 # layout properties
 LO_SCROLL_REGION = "ScrollRegion" # list of int
-LO_PIXELS_PER_UNIT ="PPU"
+LO_ZOOM_RATIO ="Zoom ratio"
+
+#SHAPEDESCRIPTOR properties
+SD_NAME = 0
+SD_TYPE = 1
+SD_FUNCTION = 2
+SD_COLOR = 3
+SD_Z = 4
+SD_SPECIFIC = 5
+SD_PROPERTIES = 6
+
+
+#specific descriptors
+RECT_RELX = 0
+RECT_RELY = 1
+RECT_RELWIDTH = 2
+RECT_RELHEIGTH = 3
+RECT_ABSX = 4
+RECT_ABSY = 5
+RECT_ABSWIDTH = 6
+RECT_HEIGHT = 7
+
+LINE_POINTS = 0 # [ x1abs, x1rel, y1abs, y1rel,... ]
+LINE_WIDTH = 1
+
+
+TEXT_TEXT = 0
+TEXT_RELX = 1
+TEXT_RELY = 2
+TEXT_ABSX = 3
+TEXT_ABSY = 4
+
+# parameters for SD_FUNCTION and SD_COLOR
+SD_OUTLINE = 0
+SD_FILL = 1
+SD_TEXT = 2
+SD_RING = 3 # initates connectionobject by mousedrag
+SD_NONE = 4 # does nothing by mousedrag
+
+
+#gnome canvasobjects:
+CV_RECT = "CanvasRect"
+CV_ELL = "CanvasEllipse"
+CV_TEXT = "CanvasText"
+CV_LINE = "CanvasLine"

@@ -1,31 +1,44 @@
-
-
+from ComplexShape import *
+from Constants import *
 
 class EditorObject:
 
 
-	def __init__(self, aLayout, objectID, basicType, shapeType, x, y, parentSystem ):
-		pass
-	
+	def __init__(self, aLayout, objectID,  x, y, parentSystem ):
+		self.theLayout = aLayout
+		self.theID = objectID
+		self.parentSystem = parentSystem
+		self.thePropertyMap = {}
+		self.thePropertyMap[ OB_POS_X ] = x
+		self.thePropertyMap[ OB_POS_Y ] = y
+		self.thePropertyMap[ OB_HASFULLID ] = False
+		self.theCanvas = None
+		self.theShape = None
+		# default colors
+		self.thePropertyMap [ OB_OUTLINE_COLOR ] = self.theLayout.graphUtils().getRRGByName("black")
+		self.thePropertyMap [ OB_FILL_COLOR ] = self.theLayout.graphUtils().getRRGByName("white")
+		self.thePropertyMap [ OB_TEXT_COLOR ] = self.theLayout.graphUtils().getRRGByName("black")
+
+		# default outline
+		self.thePropertyMap [ OB_OUTLINE_WIDTH ] = 1
+
+
 
 	def destroy(self):
 		pass
 
 
-	def move( self, deltaX, deltaY ):
+	def fillMoveBegin( self, deltaX, deltaY ):
 		pass
 
 
-	def handleDrag( self, deltaX, deltaY ):
+	def outlineDragBegin( self, deltaX, deltaY ):
 		pass
 
 
-	def handleMouseClicked( self, x, y ):
+	def connectionDragBegin( self, x, y ):
 		pass
 
-	
-	def handleMouseReleased( self ):
-		pass
 	
 
 	def getMenuItems( self ):
@@ -37,15 +50,12 @@ class EditorObject:
 
 
 	def setCanvas( self, aCanvas ):
-		pass
+		self.theCanvas = aCanvas
 
 
 	def show( self ):
-		pass
-
-
-	def hide( self ):
-		pass
+		self.theShape = ComplexShape( self, self.theCanvas, self.thePropertyMap[ OB_POS_X ], self.thePropertyMap[ OB_POS_Y ], self.thePropertyMap[ OB_DIMENSION_X ], self.thePropertyMap[ OB_DIMENSION_Y ] )
+		self.theShape.show()
 
 
 	def setDetailMode( self, aDetailMode ):
@@ -58,7 +68,10 @@ class EditorObject:
 
 
 	def getProperty( self, aPropertyName ):
-		pass
+		if aPropertyName in self.thePropertyMap.keys():
+			return self.thePropertyMap[aPropertyName]
+		else:
+			raise Exception("Unknown property %s for object %s"%(self.theName, self.theID ) )
 
 
 	def getPropertyList( self ):
@@ -66,7 +79,8 @@ class EditorObject:
 
 
 	def getAbsolutePosition( self ):
-		pass
+		( xpos, ypos ) = self.parentSystem.getAbsolutePosition()
+		return ( xpos + self.thePropertyMap[ OB_POS_X ], ypos + self.thePropertyMap[ OB_POS_Y ] )
 
 
 	def getSize( self ):
@@ -92,3 +106,6 @@ class EditorObject:
 
 	def getParent( self ):
 		pass
+
+	def getGraphUtils( self ):
+		return self.theLayout.graphUtils()

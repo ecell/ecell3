@@ -37,11 +37,13 @@ import os
 import os.path
 import string
 from Constants import *
+from LayoutCommand import *
 
 class MainWindow( ListWindow ):
 
 
 	def __init__( self, theModelEditor ):
+		
 		"""
 		in: ModelEditor theModelEditor
 		returns nothing
@@ -52,6 +54,7 @@ class MainWindow( ListWindow ):
 
 
 	def openWindow( self ):
+		
 		"""
 		in: nothing
 		returns nothing
@@ -61,7 +64,7 @@ class MainWindow( ListWindow ):
 		ListWindow.openWindow( self )
 
 		# add signal handlers
-
+		
 		self.addHandlers({ 
 			'on_new_menu_activate' : self.__new_menu_clicked,\
 			'load_model_menu_activate' : self.__load_menu_clicked,\
@@ -91,6 +94,7 @@ class MainWindow( ListWindow ):
 			'on_StepperButton_clicked' : self.__stepper_window_activated,\
 			'on_EntityButton_clicked' : self.__entity_window_activated,\
 			'on_PathwayButton_clicked' : self.__pathway_editor_activated,\
+			'on_LayoutButton_clicked' : self.__layout_window_activated,\
 			'on_About_button_clicked' : self.__about_menu_clicked,\
 			'on_scrolledwindow1_expose_event' : self.__scrollwindow_exposed
 			})
@@ -399,8 +403,15 @@ class MainWindow( ListWindow ):
 
 
 	def __pathway_editor_activated( self, *args ):
+		layoutManager = self.theModelEditor.theLayoutManager
+		layoutName = layoutManager.getUniqueLayoutName()
+		aCommand = CreateLayout( layoutManager, layoutName )
+		self.theModelEditor.doCommandList( [ aCommand ] )
 
-		self.theModelEditor.createPathwayEditor()
+	
+	def __layout_window_activated( self, *args ):
+
+		self.theModelEditor.createLayoutWindow()
 
 
 	def __about_menu_clicked( self, *args ):

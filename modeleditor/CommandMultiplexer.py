@@ -219,7 +219,7 @@ class CommandMultiplexer:
 				newFullID = ':'.join( fullIDList )
 				# if fullid exists do nothing
 				# else create new fullid
-				if not self.theModelEditor.getModel().isEntityExist( newFullID )
+				if not self.theModelEditor.getModel().isEntityExist( newFullID ):
 					entityBuffer = aBuffer.getEntityBuffer()
 					pasteCmd = PasteEntity( self.theModelEditor, entityBuffer, parentSysPath )
 					returnCmdList.insert( len( returnCmdList) - 1, pasteCmd )

@@ -43,6 +43,7 @@ from PropertyList import *
 from ViewComponent import *
 from Constants import *
 from EntityCommand import *
+from ShapePropertyComponent import *
 
 
 class EntityEditor(ViewComponent):
@@ -51,12 +52,16 @@ class EntityEditor(ViewComponent):
 	#    GENERAL CASES    #
 	#######################
 
-	def __init__( self, aParentWindow, pointOfAttach, anEntityType ):
+	def __init__( self, aParentWindow, pointOfAttach, anEntityType=None):
+		
 
 		# call superclass
 		ViewComponent.__init__( self,  pointOfAttach, 'attachment_box' , 'ObjectEditor.glade' )
+		
+
 		self.theParentWindow = aParentWindow
 		self.theType = anEntityType
+		
 		self.updateInProgress = False
 		self.theInfoBuffer = gtk.TextBuffer()
 		self.theDescriptionBuffer = gtk.TextBuffer()
@@ -74,7 +79,8 @@ class EntityEditor(ViewComponent):
 
 		# initate Editors
 		self.thePropertyList = PropertyList( self.theParentWindow, self['PropertyListFrame'] )
-
+		
+		
 
 		# make sensitive change class button for process
 		if self.theType == ME_PROCESS_TYPE:
@@ -82,9 +88,10 @@ class EntityEditor(ViewComponent):
 
 		self.theModelEditor = self.theParentWindow.theModelEditor
 		self.setDisplayedEntity( None )
-
-
-
+                
+             
+			
+		
 	def close( self ):
 		"""
 		closes subcomponenets

@@ -3,12 +3,12 @@
 import gtk
 import gnome
 import gnome.canvas
-
+import gtk.gdk
 
 def rect_event( *args ):
 	event = args[1]
 	item = args[0]
-	print item, event.type
+
 	if event.type == gtk.gdk.BUTTON_PRESS:
 		item.set_data('lastmousex', event.x)
 		item.set_data('lastmousey', event.y)
@@ -52,7 +52,7 @@ def setup_canvas():
 	#rect.move(100,100)
 	rect.connect('event', rect_event)
 	line.connect('event', rect_event)
-	rt.connect('event', rect_event)
+	#rt.connect('event', rect_event)
 
 
 def window_deleted(*args):
@@ -73,4 +73,12 @@ v.pack_start(s)
 w.add(v)
 w.set_default_size(100,100)
 w.show_all()
+style = canv.get_style()
+style2 = style.copy()
+wind = canv.window
+colormap=wind.get_colormap()
+color = colormap.alloc_color("white")
+color.red =1000
+style2.bg[0] = color
+canv.set_style(style2)
 gtk.mainloop()

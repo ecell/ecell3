@@ -3,14 +3,16 @@ from ModelEditor import *
 from Layout import *
 from LayoutBufferFactory import *
 from PathwayCanvas import *
+from GraphicalUtils import *
 
 class LayoutManager:
 
-	def __init__( self, aModeleditor):
+	def __init__( self, aModelEditor):
 		self.theModelEditor = aModelEditor
 		self.theLayoutMap = {}
 		self.theLayoutBufferFactory = LayoutBufferFactory( self.theModelEditor, self )
 		self.theLayoutBufferPaster = LayoutBufferPaster( self.theModelEditor, self )
+		self.theGraphicalUtils = GraphicalUtils( self.theModelEditor.theMainWindow )
 
 
 	def createLayout( self, aLayoutName ):
@@ -31,14 +33,12 @@ class LayoutManager:
 
 	def showLayout( self, aLayoutName ):
 		aLayout = self.theLayoutMap[ aLayoutName ]
-		if aLayout.getCanvas() != None
+		if aLayout.getCanvas() != None:
 			return
 		# create new pathwayeditor
-		anEditorWindow = self.theModelEditor.createPathwayEditor()
-		aCanvas = PathwayCanvas( anEditorWindow )
-		aLayout.attachToCanvas( aCanvas )
-		
-		
+		anEditorWindow = self.theModelEditor.createPathwayEditor( aLayout )
+
+
 
 	def saveLayouts( self, aFileName ):
 		# LATER
@@ -63,8 +63,8 @@ class LayoutManager:
 		layoutName = tryThisName
 		while layoutName in nameList:
 			layoutName = tryThisName + str( counter )
-			counter + = 1
-		return LayoutName
+			counter += 1
+		return layoutName
 
 
 	def getLayoutNameList( self ):

@@ -13,6 +13,7 @@ import sys
 from ModelStore import *
 import time
 
+from LayoutManagerWindow import *
 from MainWindow import *
 from StepperWindow import *
 from EntityListWindow import *
@@ -20,7 +21,7 @@ from EntityListWindow import *
 from DMInfo import *
 from PopupMenu import *
 from PathwayEditor import *
-
+from LayoutManager import *
 from ecell.eml import *
 
 
@@ -57,12 +58,14 @@ class ModelEditor:
 		self.theStepperWindowList = []
 		self.theEntityListWindowList = []
 		self.thePathwayEditorList = []
+		self.theLayoutManagerWindowList = []
+		
 		self.theFullIDBrowser = None
 		self.thePopupMenu = PopupMenu( self )
 		self.theMainWindow = MainWindow( self )
-
+		self.theLayoutManager = LayoutManager( self )
 		self.changesSaved = True
-
+		self.openLayoutWindow = False
 		# create untitled model
 		self.__createModel()
 		self.theLastComponent = None
@@ -108,7 +111,7 @@ class ModelEditor:
 			self.loadDirName = aFileName.rstrip('/')
 			return
 
-		# check if it is eml file
+		# check if it is eml fileself.printMessage( "Only one Layout Window allowed", ME_PLAINMESSAGE )
 		if not os.path.isfile( aFileName ):
 			self.printMessage("%s file cannot be found!"%aFileName, ME_ERROR )
 			return
@@ -265,7 +268,7 @@ class ModelEditor:
 
 	def getUniqueStepperPropertyName ( self, anID ):
 		"""
-		in: string anID
+		in: string anIDon_LayoutButton_toggled
 		returns new unique propertyname
 		"""
 		# get Propertylist
@@ -423,15 +426,14 @@ class ModelEditor:
 		newWindow.openWindow()
 		self.theStepperWindowList.append( newWindow )
 
-		
 	def createEntityWindow( self ):
 		newWindow = EntityListWindow( self )
 		newWindow.openWindow()
 		self.theEntityListWindowList.append( newWindow )
 
 
-	def createPathwayEditor( self ):
-		newWindow = PathwayEditor( self )
+	def createPathwayEditor( self, aLayout ):
+		newWindow = PathwayEditor( self, aLayout )
 		newWindow.openWindow()
 		self.thePathwayEditorList.append( newWindow )
 		return newWindow
@@ -440,6 +442,19 @@ class ModelEditor:
 #		newWindow = PathwayEditor( self, args )
 #		newWindow.openWindow()
 #		self.thePathwayEditorList.append( newWindow )
+
+	def toggleOpenLayoutWindow(self,isOpen):
+		self.openLayoutWindow=isOpen
+
+	def createLayoutWindow( self ):
+                 if not self.openLayoutWindow:
+			newWindow = LayoutManagerWindow( self )
+			self.theLayoutManagerWindow=newWindow
+			newWindow.openWindow()
+			self.openLayoutWindow=True
+		 else:
+			
+			self.theLayoutManagerWindow.present()
 
 
 	def copy(self ):
@@ -539,12 +554,15 @@ class ModelEditor:
 		for aPathwayEditor in self.thePathwayEditorList:
 			aPathwayEditor.close( )
 
+		for aLayoutManagerWindow in self.theLayoutManagerWindowList:
+			aLayoutManagerWindow.close( )
+                        
 
 
 	def __createModel (self ):
 		""" 
 		in: nothing
-		out nothing
+		out nothingfrom EntityListWindow import *
 		"""
 
 		self.__closeModel()
