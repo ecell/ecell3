@@ -37,6 +37,7 @@
 #include "libecs.hpp"
 #include "Util.hpp"
 #include "PropertySlot.hpp"
+#include "LoggerAdapter.hpp"
 #include "convertTo.hpp"
 
 #include "Polymorph.hpp"

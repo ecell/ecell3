@@ -56,6 +56,7 @@ DataPointVector.cpp\
 VVector.cpp\
 osif.cpp\
 Logger.cpp\
+LoggerAdapter.cpp\
 PhysicalLogger.cpp\
 VariableReference.cpp\
 LoggerBroker.cpp\
@@ -99,6 +100,7 @@ VVector.h\
 osif.h\
 PhysicalLogger.hpp\
 Logger.hpp\
+LoggerAdapter.hpp\
 LoggerBroker.hpp\
 Exceptions.hpp\
 Util.hpp\

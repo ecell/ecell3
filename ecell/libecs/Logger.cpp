@@ -43,19 +43,6 @@
 namespace libecs
 {
 
-  ///////////////////////////// LoggerAdapter
-
-  LoggerAdapter::LoggerAdapter()
-  {
-    ; // do nothing
-  }
-
-  LoggerAdapter::~LoggerAdapter()
-  {
-    ; // do nothing
-  }
-
-
 
   ////////////////////////////// Logger
 //#   define _LOGGER_MAX_PHYSICAL_LOGGERS  5;
@@ -91,12 +78,6 @@ namespace libecs
     delete theLoggerAdapter;
   }
   
-
-  void Logger::log( const Real aTime )
-  {
-    appendData( aTime, theLoggerAdapter->getValue() );
-  }
-
 
   DataPointVectorRCPtr Logger::getData( void ) const
   {

@@ -38,7 +38,6 @@
 #include "Util.hpp"
 #include "PropertiedClass.hpp"
 #include "convertTo.hpp"
-#include "Logger.hpp"
 #include "Polymorph.hpp"
 
 

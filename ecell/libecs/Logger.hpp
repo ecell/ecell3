@@ -37,6 +37,7 @@
 #include "libecs.hpp"
 #include "Model.hpp"
 #include "Polymorph.hpp"
+#include "LoggerAdapter.hpp"
 #include "PhysicalLogger.hpp"
 #include "DataPointVector.hpp"
 #define _LOGGER_MAX_PHYSICAL_LOGGERS 5
@@ -55,23 +56,6 @@ namespace libecs
    */ 
 
   /** @file */
-
-
-  class LoggerAdapter
-  {
-
-  public:
-
-    virtual ~LoggerAdapter();
-
-    virtual const Real getValue() const = 0;
-
-  protected:
-
-    LoggerAdapter();
-
-  };
-
 
   /**
    
@@ -100,7 +84,10 @@ namespace libecs
     ~Logger( void );
 
 
-    void log( const Real aTime );
+    void log( const Real aTime )
+    {
+      appendData( aTime, theLoggerAdapter->getValue() );
+    }
 
 
     /**
