@@ -49,34 +49,42 @@ void GillespieProcess::calculateOrder()
 	}
     }
 
-  // set theGetMultiplicityMethodPtr and theGetMinValueMethodPtr
+  // set theGetMuVInvMethodPtr and theGetMinValueMethodPtr
 
   if( getOrder() == 0 )   // no substrate
     {
-      theGetMultiplicityMethodPtr = &GillespieProcess::getZero;
+      theGetMuVInvMethodPtr       = &GillespieProcess::getInf;
       theGetMinValueMethodPtr     = &GillespieProcess::getZero;
     }
   else if( getOrder() == 1 )   // one substrate, first order.
     {
-      theGetMultiplicityMethodPtr = 
-	&GillespieProcess::getMultiplicity_FirstOrder;
+      theGetMuVInvMethodPtr = 
+	&GillespieProcess::getMuVInv_FirstOrder;
       theGetMinValueMethodPtr = &GillespieProcess::getMinValue_FirstOrder;
     }
-  else if( getZeroVariableReferenceOffset() == 2 ) // 2 substrates, 2nd order
-    {  
-      theGetMultiplicityMethodPtr = 
-	&GillespieProcess::getMultiplicity_SecondOrder_TwoSubstrates;
-      theGetMinValueMethodPtr = 
-	&GillespieProcess::getMinValue_SecondOrder_TwoSubstrates;
-    }
-  else // one substrate, second order (coeff == -2)
+  else if( getOrder() == 2 )
     {
-      theGetMultiplicityMethodPtr = 
-	&GillespieProcess::getMultiplicity_SecondOrder_OneSubstrate;
-      theGetMinValueMethodPtr = 
-	&GillespieProcess::getMinValue_SecondOrder_OneSubstrate;
+      if( getZeroVariableReferenceOffset() == 2 ) // 2 substrates, 2nd order
+	{  
+	  theGetMuVInvMethodPtr = 
+	    &GillespieProcess::getMuVInv_SecondOrder_TwoSubstrates;
+	  theGetMinValueMethodPtr = 
+	    &GillespieProcess::getMinValue_SecondOrder_TwoSubstrates;
+	}
+      else // one substrate, second order (coeff == -2)
+	{
+	  theGetMuVInvMethodPtr = 
+	    &GillespieProcess::getMuVInv_SecondOrder_OneSubstrate;
+	  theGetMinValueMethodPtr = 
+	    &GillespieProcess::getMinValue_SecondOrder_OneSubstrate;
+	}
     }
-
+  else
+    {
+      //FIXME: generic functions should come here.
+      theGetMuVInvMethodPtr       = &GillespieProcess::getInf;
+      theGetMinValueMethodPtr     = &GillespieProcess::getZero;
+    }
 }
 
 
