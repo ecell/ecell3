@@ -628,9 +628,6 @@ class Plot:
 	    self.zoomlevel=0
 	    self.zoombuffer=[]
 	    self.zoomkeypressed=False
-	    #drawall
-	    #zoomlevel=0
-	    #mode=strip
 
 	    
 	def setmode_history(self):
@@ -1011,11 +1008,35 @@ class Plot:
 
 
 	def drawpoint(self, aFullPNString, datapoint):
+		#convert to plot coordinates
+
+		if self.trace_onoff[aFullPNString]==gtk.FALSE:
+			return 0
+		x=self.convertx_to_plot(datapoint[DP_TIME])
+		y=self.converty_to_plot(datapoint[DP_VALUE])
+		ymax=self.converty_to_plot(datapoint[DP_MAX])
+		ymin=self.converty_to_plot(datapoint[DP_MIN])
+
+		#getlastpoint, calculate change to the last
+		lastx=self.lastx[aFullPNString]
+		lasty=self.lasty[aFullPNString]
+		lastymax=self.lastymax[aFullPNString]
+		lastymin=self.lastymin[aFullPNString]
+
+		self.lastx[aFullPNString]=x
+		self.lasty[aFullPNString]=y
+		self.lastymax[aFullPNString]=ymax
+		self.lastymin[aFullPNString]=ymin
+		if x == lastx and y==lasty and ymax==lastymax and ymin==lastymin:
+			return
+
+		#print x, y, ymax, ymin, datapoint[DP_TIME], datapoint[DP_VALUE], datapoint[DP_MAX], datapoint[DP_MIN]
 		if self.strip_mode == 'history':
-			self.drawpoint_minmax(aFullPNString, datapoint)
-		else:
-			self.drawpoint_connect(aFullPNString, datapoint)
-		
+			if not self.drawpoint_minmax(aFullPNString, x, y, ymax, ymin, lastx, lasty, lastymax, lastymin ):
+				#return
+				pass
+		self.drawpoint_connect(aFullPNString, x, y, ymax, ymin, lastx, lasty, lastymax, lastymin )
+
 
 	def drawminmax(self, fpn, x, ymax, ymin):
 		#first check x
@@ -1036,48 +1057,33 @@ class Plot:
 
 
 
-	def drawpoint_minmax(self, aFullPNString, datapoint):
-	    #get datapoint x y values
-	    #convert to plot coordinates
-	    if self.trace_onoff[aFullPNString]==gtk.FALSE:
-		return 0
-	    x=self.convertx_to_plot(datapoint[DP_TIME])
-	    ymax=self.converty_to_plot(datapoint[DP_MAX])
-	    ymin=self.converty_to_plot(datapoint[DP_MIN])
-
-	    #getlastpoint, calculate change to the last
-	    lastx=self.lastx[aFullPNString]
-	    lastymax=self.lastymax[aFullPNString]
-	    lastymin=self.lastymin[aFullPNString]
-
-	    self.lastx[aFullPNString]=x
-	    self.lastymax[aFullPNString]=ymax
-	    self.lastymin[aFullPNString]=ymin
+	def drawpoint_minmax(self, aFullPNString, x, y, ymax, ymin, lastx, lasty, lastymax, lastymin ):
 
 	    if lastx!=None:
 		dx=abs(lastx-x)
 	    else:
 		dx=1
-	    if dx<2:
-		#draw just a point
-	        self.drawminmax(aFullPNString,x,ymax, ymin)
+	    #draw just a point
+	    self.drawminmax(aFullPNString,x,ymax, ymin)
 
+	    if dx>1:
+		return True
 	    else:
+		return False
+
 		#draw area
-		x0=lastx
-		ymax0=lastymax
-		ymin0=lastymin
-		x1=x
-		ymax1=ymax
-		ymin1=ymin
-		#mmax=(ymax1-ymax0)/dx
-		#mmin=(ymin1-ymin0)/dx
-		x=x0+1
-		while x<=x1:
-			#ymax=(x-x0)*mmax+ymax0
-			#ymin=(x-x0)*mmin+ymin0
-			self.drawminmax(aFullPNString, x, ymax, ymin)
-			x+=1
+		#x0=lastx
+		#ymax0=lastymax
+		#ymin0=lastymin
+		#x1=x
+		#ymax1=ymax
+		#ymin1=ymin
+		#x=x0+1
+		#while x<=x1:
+		#	#ymax=(x-x0)*mmax+ymax0
+		#	#ymin=(x-x0)*mmin+ymin0
+		#	self.drawminmax(aFullPNString, x, ymax, ymin)
+		#	x+=1
 
 
 
@@ -1086,22 +1092,8 @@ class Plot:
 		   point[1]<=self.plotaread[3] and point[1]>=self.plotaread[1]
 
 
-	def drawpoint_connect(self, aFullPNString, datapoint):
+	def drawpoint_connect(self, aFullPNString, x, y, ymax, ymin, lastx, lasty, lastymax, lastymin ):
 	    #get datapoint x y values
-	    #convert to plot coordinates
-	    if self.trace_onoff[aFullPNString]==gtk.FALSE:
-		return 0
-	    x=self.convertx_to_plot(datapoint[0])
-	    y=self.converty_to_plot(datapoint[1])
-	    cur_point_within_frame=self.withinframes([x,y])
-	    #getlastpoint, calculate change to the last
-	    lastx=self.lastx[aFullPNString]
-	    lasty=self.lasty[aFullPNString]
-	    self.lastx[aFullPNString]=x
-	    self.lasty[aFullPNString]=y
-	    last_point_within_frame=self.withinframes([lastx,lasty])
-	    lastymax=self.lastymax[aFullPNString]
-	    lastymin=self.lastymin[aFullPNString]
 	
 	    if lastx!=None :
 		dx=abs(lastx-x)
@@ -1117,6 +1109,9 @@ class Plot:
 		else:
 			lasty=(lastymin+lastymax)/2
 
+	    cur_point_within_frame=self.withinframes([x,y])
+	    last_point_within_frame=self.withinframes([lastx,lasty])
+
 	    if lasty!=None:
 		dy=abs(lasty-y)
 	    else:
@@ -1128,10 +1123,10 @@ class Plot:
 		    self.drawpoint_on_plot(aFullPNString,x,y)
 	    else:
 		#draw line    
-		if (not cur_point_within_frame) and (not last_point_within_frame):
+		#if (not cur_point_within_frame) and (not last_point_within_frame):
 		    #if neither points are in frame do not draw line
-		    pass
-		else:
+		    #pass
+		if True:
 		    #draw line
 		    x0=lastx
 		    y0=lasty
@@ -1147,26 +1142,38 @@ class Plot:
 			#there are 2 boundary cases x0=x1 and y0=y1
 			if x0==x1:
 			    #adjust y if necessary
-			    if y0<self.plotaread[1] and y1>=self.plotaread[1]:
+			    if y0<self.plotaread[1] and y1<self.plotaread[1]:
+				return
+
+			    if y0>self.plotaread[3] and y1>self.plotaread[3]:
+				return
+
+			    if y0<self.plotaread[1]:
 				y0=self.plotaread[1]
-			    if y0>self.plotaread[3] and y1<=self.plotaread[3]:
+			    if y0>self.plotaread[3] :
 				y0=self.plotaread[3]
 
-			    if y1<self.plotaread[1] and y0>=self.plotaread[1]:
+			    if y1<self.plotaread[1]:
 				y1=self.plotaread[1]
-			    if y1>self.plotaread[3] and y0<=self.plotaread[3]:
+			    if y1>self.plotaread[3]:
 				y1=self.plotaread[3]
 	    
 			elif y0==y1:
+			    if x0<self.plotaread[0] and x1<self.plotaread[0]:
+				return
+
+			    if x0>self.plotaread[2] and x1>self.plotaread[2]:
+				return
+
 			    #adjust x values if necessary
-			    if x0<self.plotaread[0] and x1>=self.plotaread[0]:
+			    if x0<self.plotaread[0] :
 				x0=self.plotaread[0]
-			    if x0>self.plotaread[2] and x1<=self.plotaread[2]:
+			    if x0>self.plotaread[2] :
 				x0=self.plotaread[2]
 
-			    if x1<self.plotaread[0] and x0>=self.plotaread[0]:
+			    if x1<self.plotaread[0] :
 				x1=self.plotaread[0]
-			    if x1>self.plotaread[2] and x0<=self.plotaread[2]:
+			    if x1>self.plotaread[2] :
 				x1=self.plotaread[2]
 	    
 			else:
@@ -1176,6 +1183,8 @@ class Plot:
 			    my=1/mx
 			    xi=x0
 			    yi=y0
+			    xe=x1
+			    ye=y1
 			    #check whether either point is out of plot area
 	    
 			    #if x0 is out then interpolate x=leftside, create new x0, y0
@@ -1185,15 +1194,17 @@ class Plot:
 			    #if y0 is still out, interpolate y=upper and lower side, 
 			    #whichever x0 is smaller, create new x0
 			    if y0<self.plotaread[1] or y0>self.plotaread[3]:
-				#upper side
-				y0=self.plotaread[1]
-				x0=xi+round((y0-yi)*my)
-				#lower side
-				y02=self.plotaread[3]
-				x02=xi+round((y02-yi)*my)
-				if x02<x0:
-				    x0=x02
-				    y0=y02
+				if y0<self.plotaread[1]:
+					#upper side
+					y0=self.plotaread[1]
+					x0=xi+round((y0-yi)*my)
+				elif y0>self.plotaread[3]:
+					#lower side
+					y0=self.plotaread[3]
+					x0=xi+round((y0-yi)*my)
+				if x0<self.plotaread[0] or x0>self.plotaread[2] or x0<xi or x0>x1:
+					return
+
 			    #repeat it with x1 and y1, but compare to left side
 			    if x1>self.plotaread[2]:
 				x1=self.plotaread[2]
@@ -1201,15 +1212,17 @@ class Plot:
 			    #if y0 is still out, interpolate y=upper and lower side, 
 			    #whichever x0 is smaller, create new x0
 			    if y1<self.plotaread[1] or y1>self.plotaread[3]:
-				#upper side
-				y1=self.plotaread[1]
-				x1=xi+round((y1-yi)*my)
-				#lower side
-				y12=self.plotaread[3]
-				x12=xi+round((y12-yi)*my)
-				if x12>x1:
-				    x1=x12
-				    y1=y12
+				if y1<self.plotaread[1]:
+					#upper side
+					y1=self.plotaread[1]
+					x1=xi+round((y1-yi)*my)
+				elif y1>self.plotaread[3]:
+					#lower side
+					y1=self.plotaread[3]
+					x1=xi+round((y1-yi)*my)
+				if x1<self.plotaread[0] or x1>self.plotaread[2] or x1<x0 or x1>xe:
+					return
+
 #interpolation section ends
 		    self.drawline(aFullPNString,x0,y0,x1,y1)
 	    
