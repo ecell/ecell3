@@ -246,10 +246,13 @@ Object PySimulator::setPendingEventChecker( const Py::Tuple& args )
 {
   ECS_TRY;
 
+  Object aTmpPendingEventChecker;
+
   args.verify_length( 1 );
 
-  theTmpPendingEventChecker = static_cast<Py::Object>( args[0] );
-  thePendingEventChecker = static_cast<Py::Callable *>( &theTmpPendingEventChecker );
+  aTmpPendingEventChecker = static_cast<Py::Object>( args[0] );
+
+  thePendingEventChecker = static_cast<Py::Callable *>( &aTmpPendingEventChecker );
 
   if( !thePendingEventChecker->isCallable() )
     throw Py::TypeError("Object is not Callable type.");
@@ -265,10 +268,13 @@ Object PySimulator::setEventHandler( const Py::Tuple& args )
 {
   ECS_TRY;
 
+  Object aTmpEventHandler;
+
   args.verify_length( 1 );
 
-  theTmpEventHandler = static_cast<Py::Object>( args[0] );
-  theEventHandler = static_cast<Py::Callable *>( &theTmpEventHandler );
+  aTmpEventHandler = static_cast<Py::Object>( args[0] );
+
+  theEventHandler = static_cast<Py::Callable *>( &aTmpEventHandler );
 
   if( !theEventHandler->isCallable() )
     throw Py::TypeError("Object is not Callable type.");

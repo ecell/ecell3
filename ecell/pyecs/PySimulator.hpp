@@ -71,8 +71,6 @@ private:
   static void callEventHandler();  
   static Callable* thePendingEventChecker;
   static Callable* theEventHandler;
-  Object theTmpPendingEventChecker;
-  Object theTmpEventHandler;
 
 };
 
