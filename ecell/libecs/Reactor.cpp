@@ -37,257 +37,264 @@
 
 #include "Reactor.hpp"
 
-Reactor::Condition Reactor::theGlobalCondition;// = Reactor::Condition::Good;
 
-void Reactor::makeSlots()
+namespace libecs
 {
-  //FIXME: get methods
-  MessageSlot( "AppendSubstrate",Reactor,*this,&Reactor::setAppendSubstrate,
-	       NULLPTR );
-  MessageSlot( "AppendProduct",Reactor,*this,&Reactor::setAppendProduct,
-	       NULLPTR );
-  MessageSlot( "AppendCatalyst",Reactor,*this,&Reactor::setAppendCatalyst,
-	       NULLPTR );
-  MessageSlot( "AppendEffector",Reactor,*this,&Reactor::setAppendEffector,
-	       NULLPTR );
 
-  MessageSlot( "SubstrateList",Reactor,*this,&Reactor::setSubstrateList,
-	       &Reactor::getSubstrateList);
-  MessageSlot( "ProductList",Reactor,*this,&Reactor::setProductList,
-	       &Reactor::getProductList);
-  MessageSlot( "CatalystList",Reactor,*this,&Reactor::setCatalystList,
-	       &Reactor::getCatalystList);
-  MessageSlot( "EffectorList",Reactor,*this,&Reactor::setEffectorList,
-	       &Reactor::getEffectorList);
+  Reactor::Condition Reactor::theGlobalCondition;// = Reactor::Condition::Good;
 
-  MessageSlot( "InitialActivity",Reactor,*this,&Reactor::setInitialActivity,
-	       &Reactor::getInitialActivity );
-}
+  void Reactor::makeSlots()
+  {
+    //FIXME: get methods
+    MessageSlot( "AppendSubstrate",Reactor,*this,&Reactor::setAppendSubstrate,
+		 NULLPTR );
+    MessageSlot( "AppendProduct",Reactor,*this,&Reactor::setAppendProduct,
+		 NULLPTR );
+    MessageSlot( "AppendCatalyst",Reactor,*this,&Reactor::setAppendCatalyst,
+		 NULLPTR );
+    MessageSlot( "AppendEffector",Reactor,*this,&Reactor::setAppendEffector,
+		 NULLPTR );
 
-void Reactor::setAppendSubstrate( MessageCref message )
-{
-  //FIXME: range check
-  appendSubstrate( message[0].asString(), message[1].asInt() );
-}
+    MessageSlot( "SubstrateList",Reactor,*this,&Reactor::setSubstrateList,
+		 &Reactor::getSubstrateList);
+    MessageSlot( "ProductList",Reactor,*this,&Reactor::setProductList,
+		 &Reactor::getProductList);
+    MessageSlot( "CatalystList",Reactor,*this,&Reactor::setCatalystList,
+		 &Reactor::getCatalystList);
+    MessageSlot( "EffectorList",Reactor,*this,&Reactor::setEffectorList,
+		 &Reactor::getEffectorList);
 
-void Reactor::setAppendProduct( MessageCref message )
-{
-  //FIXME: range check
-  appendSubstrate( message[0].asString(), message[1].asInt() );
-}
+    MessageSlot( "InitialActivity",Reactor,*this,&Reactor::setInitialActivity,
+		 &Reactor::getInitialActivity );
+  }
 
-void Reactor::setAppendCatalyst( MessageCref message )
-{
-  //FIXME: range check
-  appendSubstrate( message[0].asString(), message[1].asInt() );
-}
+  void Reactor::setAppendSubstrate( MessageCref message )
+  {
+    //FIXME: range check
+    appendSubstrate( message[0].asString(), message[1].asInt() );
+  }
 
-void Reactor::setAppendEffector( MessageCref message )
-{
-  //FIXME: range check
-  appendSubstrate( message[0].asString(), message[1].asInt() );
-}
+  void Reactor::setAppendProduct( MessageCref message )
+  {
+    //FIXME: range check
+    appendSubstrate( message[0].asString(), message[1].asInt() );
+  }
 
-void Reactor::setSubstrateList( MessageCref message )
-{
-  cerr << "not implemented yet." << endl;
-}
+  void Reactor::setAppendCatalyst( MessageCref message )
+  {
+    //FIXME: range check
+    appendSubstrate( message[0].asString(), message[1].asInt() );
+  }
 
-void Reactor::setProductList( MessageCref message )
-{
-  cerr << "not implemented yet." << endl;
-}
+  void Reactor::setAppendEffector( MessageCref message )
+  {
+    //FIXME: range check
+    appendSubstrate( message[0].asString(), message[1].asInt() );
+  }
 
-void Reactor::setEffectorList( MessageCref message )
-{
-  cerr << "not implemented yet." << endl;
-}
+  void Reactor::setSubstrateList( MessageCref message )
+  {
+    cerr << "not implemented yet." << endl;
+  }
 
-void Reactor::setCatalystList( MessageCref message )
-{
-  cerr << "not implemented yet." << endl;
-}
+  void Reactor::setProductList( MessageCref message )
+  {
+    cerr << "not implemented yet." << endl;
+  }
 
-const Message Reactor::getSubstrateList( StringCref keyword )
-{
-  UniversalVariableVector aList;
+  void Reactor::setEffectorList( MessageCref message )
+  {
+    cerr << "not implemented yet." << endl;
+  }
+
+  void Reactor::setCatalystList( MessageCref message )
+  {
+    cerr << "not implemented yet." << endl;
+  }
+
+  const Message Reactor::getSubstrateList( StringCref keyword )
+  {
+    UniversalVariableVector aList;
   
-  for( ReactantVectorConstIterator i = theSubstrateList.begin() ;
-       i != theSubstrateList.end() ; ++i )
-    {
-      aList.push_back( (*i)->getSubstance().getFqid() );
-    }
+    for( ReactantVectorConstIterator i = theSubstrateList.begin() ;
+	 i != theSubstrateList.end() ; ++i )
+      {
+	aList.push_back( (*i)->getSubstance().getFqid() );
+      }
 
-  return Message( keyword, aList );
-}
+    return Message( keyword, aList );
+  }
 
-const Message Reactor::getProductList( StringCref keyword )
-{
-  UniversalVariableVector aList;
+  const Message Reactor::getProductList( StringCref keyword )
+  {
+    UniversalVariableVector aList;
   
-  for( ReactantVectorConstIterator i = theProductList.begin() ;
-       i != theProductList.end() ; ++i )
-    {
-      aList.push_back( (*i)->getSubstance().getFqid() );
-    }
+    for( ReactantVectorConstIterator i = theProductList.begin() ;
+	 i != theProductList.end() ; ++i )
+      {
+	aList.push_back( (*i)->getSubstance().getFqid() );
+      }
 
-  return Message( keyword, aList );
-}
+    return Message( keyword, aList );
+  }
 
-const Message Reactor::getEffectorList( StringCref keyword )
-{
-  UniversalVariableVector aList;
+  const Message Reactor::getEffectorList( StringCref keyword )
+  {
+    UniversalVariableVector aList;
   
-  for( ReactantVectorConstIterator i = theEffectorList.begin() ;
-       i != theEffectorList.end() ; ++i )
-    {
-      aList.push_back( (*i)->getSubstance().getFqid() );
-    }
+    for( ReactantVectorConstIterator i = theEffectorList.begin() ;
+	 i != theEffectorList.end() ; ++i )
+      {
+	aList.push_back( (*i)->getSubstance().getFqid() );
+      }
 
-  return Message( keyword, aList );
-}
+    return Message( keyword, aList );
+  }
 
-const Message Reactor::getCatalystList( StringCref keyword )
-{
-  UniversalVariableVector aList;
+  const Message Reactor::getCatalystList( StringCref keyword )
+  {
+    UniversalVariableVector aList;
   
-  for( ReactantVectorConstIterator i = theCatalystList.begin() ;
-       i != theCatalystList.end() ; ++i )
-    {
-      aList.push_back( (*i)->getSubstance().getFqid() );
-    }
+    for( ReactantVectorConstIterator i = theCatalystList.begin() ;
+	 i != theCatalystList.end() ; ++i )
+      {
+	aList.push_back( (*i)->getSubstance().getFqid() );
+      }
 
-  return Message( keyword, aList );
-}
+    return Message( keyword, aList );
+  }
 
-void Reactor::setInitialActivity( MessageCref message )
-{
-  setInitialActivity( message[0].asReal() );
-}
+  void Reactor::setInitialActivity( MessageCref message )
+  {
+    setInitialActivity( message[0].asReal() );
+  }
 
-const Message Reactor::getInitialActivity( StringCref keyword )
-{
-  return Message( keyword, UniversalVariable( theInitialActivity ) );
-}
+  const Message Reactor::getInitialActivity( StringCref keyword )
+  {
+    return Message( keyword, UniversalVariable( theInitialActivity ) );
+  }
 
-void Reactor::appendSubstrate( FQIDCref fqid, int coefficient )
-{
-  SubstancePtr aSubstance( getSuperSystem()->getRootSystem()->
-			   getSubstance( fqid ) );
+  void Reactor::appendSubstrate( FQIDCref fqid, int coefficient )
+  {
+    SubstancePtr aSubstance( getSuperSystem()->getRootSystem()->
+			     getSubstance( fqid ) );
 
-  appendSubstrate( *aSubstance, coefficient );
-}
+    appendSubstrate( *aSubstance, coefficient );
+  }
 
-void Reactor::appendProduct( FQIDCref fqid, int coefficient )
-{
-  SubstancePtr aSubstance( getSuperSystem()->getRootSystem()->
-			   getSubstance( fqid ) );
+  void Reactor::appendProduct( FQIDCref fqid, int coefficient )
+  {
+    SubstancePtr aSubstance( getSuperSystem()->getRootSystem()->
+			     getSubstance( fqid ) );
   
-  appendProduct( *aSubstance, coefficient );
-}
+    appendProduct( *aSubstance, coefficient );
+  }
 
-void Reactor::appendCatalyst( FQIDCref fqid,int coefficient)
-{
-  SubstancePtr aSubstance( getSuperSystem()->getRootSystem()->
-			   getSubstance( fqid ) );
+  void Reactor::appendCatalyst( FQIDCref fqid,int coefficient)
+  {
+    SubstancePtr aSubstance( getSuperSystem()->getRootSystem()->
+			     getSubstance( fqid ) );
   
-  appendCatalyst( *aSubstance, coefficient );
-}
+    appendCatalyst( *aSubstance, coefficient );
+  }
 
-void Reactor::appendEffector( FQIDCref fqid, int coefficient )
-{
-  SubstancePtr aSubstance( getSuperSystem()->getRootSystem()->
-			   getSubstance( fqid ) );
+  void Reactor::appendEffector( FQIDCref fqid, int coefficient )
+  {
+    SubstancePtr aSubstance( getSuperSystem()->getRootSystem()->
+			     getSubstance( fqid ) );
   
-  appendEffector( *aSubstance, coefficient );
-}
+    appendEffector( *aSubstance, coefficient );
+  }
 
-void Reactor::setInitialActivity( Real activity )
-{
-  theInitialActivity = activity;
-  // FIXME: take delta T from supersystem
-  theActivity= activity * 
-    getSuperSystem()->getStepper()->getDeltaT();
-}
+  void Reactor::setInitialActivity( Real activity )
+  {
+    theInitialActivity = activity;
+    // FIXME: take delta T from supersystem
+    theActivity= activity * 
+      getSuperSystem()->getStepper()->getDeltaT();
+  }
 
-Reactor::Reactor() 
-  :
-  theInitialActivity( 0 ),
-  theActivityBuffer( 0 ),
-  theCondition( Premature ),
-  theActivity( 0 )
-{
-  makeSlots();
-}
+  Reactor::Reactor() 
+    :
+    theInitialActivity( 0 ),
+    theActivityBuffer( 0 ),
+    theCondition( Premature ),
+    theActivity( 0 )
+  {
+    makeSlots();
+  }
 
-const String Reactor::getFqpi() const
-{
-  return PrimitiveTypeStringOf( *this ) + ":" + getFqid();
-}
+  const String Reactor::getFqpi() const
+  {
+    return PrimitiveTypeStringOf( *this ) + ":" + getFqid();
+  }
 
-void Reactor::appendSubstrate( SubstanceRef substrate, int coefficient )
-{
-  ReactantPtr reactant = new Reactant( substrate, coefficient );
-  theSubstrateList.insert( theSubstrateList.end(), reactant );
-}
+  void Reactor::appendSubstrate( SubstanceRef substrate, int coefficient )
+  {
+    ReactantPtr reactant = new Reactant( substrate, coefficient );
+    theSubstrateList.insert( theSubstrateList.end(), reactant );
+  }
 
-void Reactor::appendProduct( SubstanceRef product, int coefficient )
-{
-  ReactantPtr reactant = new Reactant( product, coefficient );
-  theProductList.insert( theProductList.end(), reactant );
-}
+  void Reactor::appendProduct( SubstanceRef product, int coefficient )
+  {
+    ReactantPtr reactant = new Reactant( product, coefficient );
+    theProductList.insert( theProductList.end(), reactant );
+  }
 
-void Reactor::appendCatalyst( SubstanceRef catalyst, int coefficient )
-{
-  ReactantPtr reactant = new Reactant( catalyst, coefficient );
-  theCatalystList.insert( theCatalystList.end(), reactant );
-}
+  void Reactor::appendCatalyst( SubstanceRef catalyst, int coefficient )
+  {
+    ReactantPtr reactant = new Reactant( catalyst, coefficient );
+    theCatalystList.insert( theCatalystList.end(), reactant );
+  }
 
-void Reactor::appendEffector( SubstanceRef effector, int coefficient )
-{
-  ReactantPtr reactant = new Reactant( effector, coefficient );
-  theEffectorList.insert( theEffectorList.end(), reactant );
-}
+  void Reactor::appendEffector( SubstanceRef effector, int coefficient )
+  {
+    ReactantPtr reactant = new Reactant( effector, coefficient );
+    theEffectorList.insert( theEffectorList.end(), reactant );
+  }
 
-Reactor::Condition Reactor::condition( Condition condition )
-{
-  theCondition = static_cast<Condition>( theCondition | condition );
-  if( theCondition  != Good )
-    return theGlobalCondition = Bad;
-  return Good;
-}
+  Reactor::Condition Reactor::condition( Condition condition )
+  {
+    theCondition = static_cast<Condition>( theCondition | condition );
+    if( theCondition  != Good )
+      return theGlobalCondition = Bad;
+    return Good;
+  }
 
-void Reactor::warning( StringCref message )
-{
-//FIXME:   *theMessageWindow << className() << " [" << fqen() << "]";
-//FIXME:   *theMessageWindow << ":\n\t" << message << "\n";
-}
+  void Reactor::warning( StringCref message )
+  {
+    //FIXME:   *theMessageWindow << className() << " [" << fqen() << "]";
+    //FIXME:   *theMessageWindow << ":\n\t" << message << "\n";
+  }
 
-void Reactor::initialize()
-{
-  if( getNumberOfSubstrates() > getMaximumNumberOfSubstrates() )
-    warning("too many substrates.");
-  else if( getNumberOfSubstrates() < getMinimumNumberOfSubstrates() )
-    warning("too few substrates.");
-  if( getNumberOfProducts() > getMaximumNumberOfProducts() )
-    warning("too many products.");
-  else if( getNumberOfProducts() < getMinimumNumberOfProducts() )
-    warning("too few products.");
-  if( getNumberOfCatalysts() > getMaximumNumberOfCatalysts() )
-    warning("too many catalysts.");
-  else if( getNumberOfCatalysts() < getMinimumNumberOfCatalysts() )
-    warning("too few catalysts.");
-  if( getNumberOfEffectors() > getMaximumNumberOfEffectors() )
-    warning("too many effectors.");
-  else if( getNumberOfEffectors() < getMinimumNumberOfEffectors() )
-    warning("too few effectors.");
-}
+  void Reactor::initialize()
+  {
+    if( getNumberOfSubstrates() > getMaximumNumberOfSubstrates() )
+      warning("too many substrates.");
+    else if( getNumberOfSubstrates() < getMinimumNumberOfSubstrates() )
+      warning("too few substrates.");
+    if( getNumberOfProducts() > getMaximumNumberOfProducts() )
+      warning("too many products.");
+    else if( getNumberOfProducts() < getMinimumNumberOfProducts() )
+      warning("too few products.");
+    if( getNumberOfCatalysts() > getMaximumNumberOfCatalysts() )
+      warning("too many catalysts.");
+    else if( getNumberOfCatalysts() < getMinimumNumberOfCatalysts() )
+      warning("too few catalysts.");
+    if( getNumberOfEffectors() > getMaximumNumberOfEffectors() )
+      warning("too many effectors.");
+    else if( getNumberOfEffectors() < getMinimumNumberOfEffectors() )
+      warning("too few effectors.");
+  }
 
 
-Real Reactor::getActivity() 
-{
-  return theActivity;
-}
+  Real Reactor::getActivity() 
+  {
+    return theActivity;
+  }
+
+
+} // namespace libecs
 
 
 /*

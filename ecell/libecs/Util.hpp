@@ -36,102 +36,109 @@
 #include "Defs.hpp"
 #include "korandom/korandom.h"
 
-typedef korandom_d_c  RandomNumberGenerator;
-
-/**
-   Random number generator
- */
-//FIXME: thread safe?
-extern RandomNumberGenerator* theRandomNumberGenerator; 
-
-/**
-   least common multiple.
- */
-
-inline int lcm( int a, int b )
+namespace libecs
 {
-  if( a > b )
-    {
-      int i;
-      for( i = 1; ( a * i ) % b ; ++i ) 
-	{
-	  ; // do nothing
-	}
-      return a * i;
-    }
-  else
-    {
-      int i;
-      for( i = 1 ; ( b * i ) % a ; ++i ) 
-	{
-	  ; // do nothing
-	}
-      return b * i;
-    }
-}
 
-/**
-   table lookup function.
- */
+  typedef ::korandom_d_c  RandomNumberGenerator;
 
-int table_lookup( StringCref str, const char** table );
+  /**
+     Random number generator
+  */
+  //FIXME: thread safe?
+  extern RandomNumberGenerator* theRandomNumberGenerator; 
 
-/** 
-    Universal String -> object converter.
-    Real and Int specializations are defined in Util.cpp.
-    Conversion to the other classes are conducted using 
-    istrstream.
- */
+  /**
+     least common multiple.
+  */
 
-template <class T> 
-const T stringTo( StringCref str )
-{
-  istrstream ist( str.c_str() );
-  T aT;
-  ist >> aT;
-  return aT;
-}
+  inline int lcm( int a, int b )
+  {
+    if( a > b )
+      {
+	int i;
+	for( i = 1; ( a * i ) % b ; ++i ) 
+	  {
+	    ; // do nothing
+	  }
+	return a * i;
+      }
+    else
+      {
+	int i;
+	for( i = 1 ; ( b * i ) % a ; ++i ) 
+	  {
+	    ; // do nothing
+	  }
+	return b * i;
+      }
+  }
 
-// specializations
-template<> const Real stringTo<Real>( StringCref str );
-template<> const Int   stringTo<Int>( StringCref str );
-template<> const UnsignedInt  stringTo<UnsignedInt>( StringCref str );
+  /**
+     table lookup function.
+  */
 
-/**
-   Any to String converter function template.
-   Using ostrstream by default. A specialization for Real type
-   with precision( FLOAT_DIG ) is also defined.
-*/
+  int table_lookup( StringCref str, const char** table );
 
-template <class T> const String toString( const T& t )
-{
-  ostrstream os;
-  os << t;
-  os << ends;
-  return os.str();
-}
+  /** 
+      Universal String -> object converter.
+      Real and Int specializations are defined in Util.cpp.
+      Conversion to the other classes are conducted using 
+      istrstream.
+  */
 
-// specialization 
-template<> const String toString<Real>( const Real& f );
+  template <class T> 
+  const T stringTo( StringCref str )
+  {
+    istrstream ist( str.c_str() );
+    T aT;
+    ist >> aT;
+    return aT;
+  }
+
+  // specializations
+  template<> const Real stringTo<Real>( StringCref str );
+  template<> const Int   stringTo<Int>( StringCref str );
+  template<> const UnsignedInt  stringTo<UnsignedInt>( StringCref str );
+
+  /**
+     Any to String converter function template.
+     Using ostrstream by default. A specialization for Real type
+     with precision( FLOAT_DIG ) is also defined.
+  */
+
+  template <class T> const String toString( const T& t )
+  {
+    ostrstream os;
+    os << t;
+    os << ends;
+    return os.str();
+  }
+
+  // specialization 
+  template<> const String toString<Real>( const Real& f );
 
 
-/**
-   extract a filename from a path string
-*/
+  /**
+     extract a filename from a path string
+  */
 
-String basenameOf( StringCref str, String::size_type maxlength = 0 );
+  String basenameOf( StringCref str, String::size_type maxlength = 0 );
 
 
-/**
-   reversed order compare
-*/
+  /**
+     reversed order compare
+  */
 
-template <class T>
-class ReverseCmp
-{
-public:
-  bool operator()( const T x, const T y ) const { return x > y; }
-};
+  template <class T>
+  class ReverseCmp
+  {
+  public:
+    bool operator()( const T x, const T y ) const { return x > y; }
+  };
+
+
+} // namespace libecs
+
 
 #endif /* ___UTIL_H___ */
 

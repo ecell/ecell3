@@ -31,40 +31,43 @@
 
 #include "LocalLoggerImplementation.hpp"
 
-
-
-LocalLoggerImplementation::LocalLoggerImplementation( ObjectPtr optr )
-  :
-  theRealLogger( RealLogger( optr ) ) 
+namespace libemc
 {
-  ; // do nothing
-}
 
-LocalLoggerImplementation::~LocalLoggerImplementation( )
-{
-  ;
-}
+  LocalLoggerImplementation::LocalLoggerImplementation( ObjectPtr optr )
+    :
+    theRealLogger( RealLogger( optr ) ) 
+  {
+    ; // do nothing
+  }
 
-void LocalLoggerImplementation::update( )
-{
-  theRealLogger.update( );
-}
+  LocalLoggerImplementation::~LocalLoggerImplementation( )
+  {
+    ;
+  }
 
-void
-LocalLoggerImplementation::update( RealLogger::containee_type& datapoint )
-{
-  theRealLogger.update( datapoint );
-}
+  void LocalLoggerImplementation::update( )
+  {
+    theRealLogger.update( );
+  }
+
+  void
+  LocalLoggerImplementation::update( RealLogger::containee_type& datapoint )
+  {
+    theRealLogger.update( datapoint );
+  }
 
 
-/*
-void LocalLoggerImplementation::push( const RealLogger::containee_type& x )
-{
-  theRealLogger.push( x );
-}
+  /*
+    void LocalLoggerImplementation::push( const RealLogger::containee_type& x )
+    {
+    theRealLogger.push( x );
+    }
 
-void LocalLoggerImplementation::push( const Real& t, const Real& v )
-{
-  theRealLogger.push( t, v );
-} 
-*/
+    void LocalLoggerImplementation::push( const Real& t, const Real& v )
+    {
+    theRealLogger.push( t, v );
+    } 
+  */
+
+} // namespace libemc

@@ -39,7 +39,7 @@
 
 #ifdef DEBUG_RCPTR
 
-
+using namespace libecs;
 
 /*
  * Example of how to use the AutoRelease Library

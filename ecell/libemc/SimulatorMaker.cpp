@@ -30,13 +30,19 @@
 
 #include "SimulatorMaker.h"
 
-////////////////////// SimulatorMaker
+namespace libemc
+{
+
+
+  ////////////////////// SimulatorMaker
  
 
-SimulatorMaker::SimulatorMaker()
-{
-  ; // do nothing
-}
+  SimulatorMaker::SimulatorMaker()
+  {
+    ; // do nothing
+  }
 
+
+} // namespace libemc
 
 

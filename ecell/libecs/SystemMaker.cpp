@@ -30,16 +30,19 @@
 
 #include "SystemMaker.hpp"
 
+namespace libecs
+{
 
-////////////////////// SystemMaker
+  ////////////////////// SystemMaker
  
-SystemMaker::SystemMaker()
-{
-  makeClassList();
-}
+  SystemMaker::SystemMaker()
+  {
+    makeClassList();
+  }
 
-void SystemMaker::makeClassList()
-{
+  void SystemMaker::makeClassList()
+  {
 
-}
+  }
 
+} // namespace libecs

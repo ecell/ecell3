@@ -30,18 +30,24 @@
 
 #include "StepperMaker.hpp"
 
-////////////////////// StepperMaker
+namespace libecs
+{
+
+
+  ////////////////////// StepperMaker
  
 
-StepperMaker::StepperMaker()
-{
-  makeClassList();
-}
+  StepperMaker::StepperMaker()
+  {
+    makeClassList();
+  }
 
-void StepperMaker::makeClassList()
-{
-  NewStepperModule(SlaveStepper);
-  NewStepperModule(Euler1Stepper);
-  NewStepperModule(RungeKutta4Stepper);
-}
+  void StepperMaker::makeClassList()
+  {
+    NewStepperModule(SlaveStepper);
+    NewStepperModule(Euler1Stepper);
+    NewStepperModule(RungeKutta4Stepper);
+  }
 
+
+} // namespace libecs

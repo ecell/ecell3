@@ -34,21 +34,27 @@
 #include "Accumulators.hpp"
 #include "ModuleMaker.hpp"
 
-class AccumulatorMaker : public StaticModuleMaker< Accumulator >
+namespace libecs
 {
 
-protected:
+  class AccumulatorMaker : public StaticModuleMaker< Accumulator >
+  {
 
-  virtual void makeClassList();
+  protected:
 
-public:
+    virtual void makeClassList();
 
-  AccumulatorMaker();
-  virtual ~AccumulatorMaker() {}
+  public:
 
-};
+    AccumulatorMaker();
+    virtual ~AccumulatorMaker() {}
+
+  };
 
 #define NewAccumulatorModule( CLASS ) NewDynamicModule( Accumulator, CLASS )
+
+}
+
 
 #endif /* ___ACCUMULATORMAKER_H___ */
 

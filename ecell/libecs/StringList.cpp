@@ -30,66 +30,75 @@
 
 #include "StringList.hpp"
 
-StringList::StringList( StringCref str, StringCref delim,
-			StringCref spacer )
-{
-  parse( str, delim, spacer );
-}
 
-void StringList::parse( StringCref str, StringCref delim,
-			StringCref spacer)
+namespace libecs
 {
-  if( str == "" )
-    {
-      clear();
-      return;
-    }
 
-  String::size_type   s = str.find_first_not_of( spacer );
-  String::size_type   e = str.find_first_of( delim, s );
+  StringList::StringList( StringCref str, StringCref delim,
+			  StringCref spacer )
+  {
+    parse( str, delim, spacer );
+  }
+
+  void StringList::parse( StringCref str, StringCref delim,
+			  StringCref spacer)
+  {
+    if( str == "" )
+      {
+	clear();
+	return;
+      }
+
+    String::size_type   s = str.find_first_not_of( spacer );
+    String::size_type   e = str.find_first_of( delim, s );
  
-  // non-empty field
-  if( s != e )
-    {                   
-      insert( end(), str.substr( s, e - s ) );
-    }
-  // empty field
-  else
-    {                   
-      insert( end(), "" );
-    }
+    // non-empty field
+    if( s != e )
+      {                   
+	insert( end(), str.substr( s, e - s ) );
+      }
+    // empty field
+    else
+      {                   
+	insert( end(), "" );
+      }
 
-  // continue...
-  if( e != String::npos )
-    { 
-      parse( str.substr( e + 1, String::npos ), delim, spacer );
-    }
+    // continue...
+    if( e != String::npos )
+      { 
+	parse( str.substr( e + 1, String::npos ), delim, spacer );
+      }
 
-  // end of the string
-  return; 
-}
+    // end of the string
+    return; 
+  }
 
-const String StringList::dump( const char delim )
-{
-  if( size() == 0 )
-    {
-      return "";
-    }
+  const String StringList::dump( const char delim )
+  {
+    if( size() == 0 )
+      {
+	return "";
+      }
 
-  //vector< String >::iterator i = begin();
-  iterator i = begin();
-  String str( *i );
-  for( ++i ; i != end() ; ++i )
-    {
-      str += delim;
-      str += *i;
-    }
-  return str;
-}
+    //vector< String >::iterator i = begin();
+    iterator i = begin();
+    String str( *i );
+    for( ++i ; i != end() ; ++i )
+      {
+	str += delim;
+	str += *i;
+      }
+    return str;
+  }
+
+
+} // namespace libecs
 
 
 
 #ifdef __STRINGLIST_TEST__
+
+using namespace libecs;
 
 main()
 {

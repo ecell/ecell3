@@ -33,65 +33,72 @@
 
 #include "libecs.hpp"
 
-enum PrimitiveType
+
+namespace libecs
 {
-  ENTITY    = 1,
-  SUBSTANCE = 2,
-  REACTOR   = 3,
-  SYSTEM    = 4,
-  NONE      = 0
-};
 
-// public utility functions
-PrimitiveType PrimitiveTypeOf( StringCref typestring );
-const String  PrimitiveTypeStringOf( PrimitiveType type );
-const String  PrimitiveTypeStringOf( StringCref fqpistring );
+  enum PrimitiveType
+  {
+    ENTITY    = 1,
+    SUBSTANCE = 2,
+    REACTOR   = 3,
+    SYSTEM    = 4,
+    NONE      = 0
+  };
 
-
-inline StringCref  PrimitiveTypeStringOfEntity()
-{
-  const static String aString( "Entity" );
-  return aString;
-}
-
-inline StringCref  PrimitiveTypeStringOfReactor()
-{
-  const static String aString( "Reactor" );
-  return aString;
-}
-
-inline StringCref  PrimitiveTypeStringOfSubstance()
-{
-  const static String aString( "Substance" );
-  return aString;
-}
-
-inline StringCref  PrimitiveTypeStringOfSystem()
-{ 
-  const static String aString( "System" );
-  return aString;
-}
+  // public utility functions
+  PrimitiveType PrimitiveTypeOf( StringCref typestring );
+  const String  PrimitiveTypeStringOf( PrimitiveType type );
+  const String  PrimitiveTypeStringOf( StringCref fqpistring );
 
 
-inline StringCref  PrimitiveTypeStringOf( EntityCref )
-{
-  return PrimitiveTypeStringOfEntity();
-}
+  inline StringCref  PrimitiveTypeStringOfEntity()
+  {
+    const static String aString( "Entity" );
+    return aString;
+  }
 
-inline StringCref  PrimitiveTypeStringOf( ReactorCref ) 
-{
-  return PrimitiveTypeStringOfReactor();
-}
+  inline StringCref  PrimitiveTypeStringOfReactor()
+  {
+    const static String aString( "Reactor" );
+    return aString;
+  }
 
-inline StringCref  PrimitiveTypeStringOf( SubstanceCref )
-{
-  return PrimitiveTypeStringOfSubstance();
-}
+  inline StringCref  PrimitiveTypeStringOfSubstance()
+  {
+    const static String aString( "Substance" );
+    return aString;
+  }
 
-inline StringCref  PrimitiveTypeStringOf( SystemCref )
-{
-  return PrimitiveTypeStringOfSystem();
-}
+  inline StringCref  PrimitiveTypeStringOfSystem()
+  { 
+    const static String aString( "System" );
+    return aString;
+  }
+
+
+  inline StringCref  PrimitiveTypeStringOf( EntityCref )
+  {
+    return PrimitiveTypeStringOfEntity();
+  }
+
+  inline StringCref  PrimitiveTypeStringOf( ReactorCref ) 
+  {
+    return PrimitiveTypeStringOfReactor();
+  }
+
+  inline StringCref  PrimitiveTypeStringOf( SubstanceCref )
+  {
+    return PrimitiveTypeStringOfSubstance();
+  }
+
+  inline StringCref  PrimitiveTypeStringOf( SystemCref )
+  {
+    return PrimitiveTypeStringOfSystem();
+  }
+
+
+} // namespace libecs
 
 
 #endif /* __PRIMITIVETYPE_HPP */

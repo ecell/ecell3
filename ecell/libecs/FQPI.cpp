@@ -31,186 +31,190 @@
 #include <string>
 #include "FQPI.hpp"
 
-
-///////////////////////  SystemPath
-
-SystemPath::SystemPath( StringCref rqsn ) 
-  :
-  theSystemPath( rqsn )
+namespace libecs
 {
-  standardize();
-}
 
-SystemPath::SystemPath( SystemPathCref systempath )
-  :
-  theSystemPath( systempath.getSystemPathString() )
-{
-  standardize();
-}
+  ///////////////////////  SystemPath
 
-const String SystemPath::last() const
-{
-  int anInt( theSystemPath.rfind( DELIMITER ) ); 
-  ++anInt;
-  return theSystemPath.substr( anInt, String::npos );
-}
+  SystemPath::SystemPath( StringCref rqsn ) 
+    :
+    theSystemPath( rqsn )
+  {
+    standardize();
+  }
 
-const String SystemPath::first() const
-{
- int anInt( theSystemPath.find( DELIMITER ) ); 
- String aString( "/" );
+  SystemPath::SystemPath( SystemPathCref systempath )
+    :
+    theSystemPath( systempath.getSystemPathString() )
+  {
+    standardize();
+  }
 
- if( anInt != 0 )
-   {
-     aString = theSystemPath.substr( 0, anInt );
-   }
+  const String SystemPath::last() const
+  {
+    int anInt( theSystemPath.rfind( DELIMITER ) ); 
+    ++anInt;
+    return theSystemPath.substr( anInt, String::npos );
+  }
 
- return aString;
-}
+  const String SystemPath::first() const
+  {
+    int anInt( theSystemPath.find( DELIMITER ) ); 
+    String aString( "/" );
 
-SystemPath SystemPath::next() const 
-{
-  String::size_type aPosition = theSystemPath.find( DELIMITER );
+    if( anInt != 0 )
+      {
+	aString = theSystemPath.substr( 0, anInt );
+      }
 
-  if( aPosition != String::npos )
-    {
-      ++aPosition;
-      return SystemPath( theSystemPath.substr( aPosition, 
-					       String::npos ) ); 
-    }
+    return aString;
+  }
 
-  return SystemPath( "" );
-}
+  SystemPath SystemPath::next() const 
+  {
+    String::size_type aPosition = theSystemPath.find( DELIMITER );
+
+    if( aPosition != String::npos )
+      {
+	++aPosition;
+	return SystemPath( theSystemPath.substr( aPosition, 
+						 String::npos ) ); 
+      }
+
+    return SystemPath( "" );
+  }
 
 
-void SystemPath::standardize()
-{
-  // FIXME: incomplete
-}
+  void SystemPath::standardize()
+  {
+    // FIXME: incomplete
+  }
 
 
-////////////////////////////////  FQID
+  ////////////////////////////////  FQID
 
-FQID::FQID( StringCref systemname, StringCref id )
-  :
-  SystemPath( systemname ), 
-  theId( id )
-{
-  ; // do nothing
-}
+  FQID::FQID( StringCref systemname, StringCref id )
+    :
+    SystemPath( systemname ), 
+    theId( id )
+  {
+    ; // do nothing
+  }
 
-FQID::FQID( StringCref fqid ) 
-  : 
-  SystemPath( SystemPathOf( fqid ) ),
-  theId( IdOf( fqid ) )
-{
-  standardize();
-}
+  FQID::FQID( StringCref fqid ) 
+    : 
+    SystemPath( SystemPathOf( fqid ) ),
+    theId( IdOf( fqid ) )
+  {
+    standardize();
+  }
 
-const String FQID::IdOf( StringCref fqid )
-{
-  String::size_type aBorder = fqid.find( ':' );
+  const String FQID::IdOf( StringCref fqid )
+  {
+    String::size_type aBorder = fqid.find( ':' );
 
-  if( aBorder == String::npos )
-    {
-      throw BadID( __PRETTY_FUNCTION__,
-		   "no \':\' found in FQID \"" + fqid + "\"." );
-    }
-
-  ++aBorder;
-  if( fqid.find( ':', aBorder ) != String::npos )
-    {
-      throw BadID( __PRETTY_FUNCTION__,
-		   "too many \':\'s in FQID \"" + fqid + "\"." );
-    }
-
-  return fqid.substr( aBorder, String::npos );
-}
-
-const String FQID::SystemPathOf( StringCref fqid )
-{
-  String::size_type aBorder = fqid.find( ':' );
-
-  if( aBorder == String::npos )
-    {
-      throw BadID( __PRETTY_FUNCTION__,
+    if( aBorder == String::npos )
+      {
+	throw BadID( __PRETTY_FUNCTION__,
 		     "no \':\' found in FQID \"" + fqid + "\"." );
-    }
+      }
 
-  if( fqid.find( ':', aBorder + 1 ) != String::npos )
-    {
-      throw BadID( __PRETTY_FUNCTION__,
-		   "to many \':\'s in FQID \"" + fqid + "\"." );
-    }
+    ++aBorder;
+    if( fqid.find( ':', aBorder ) != String::npos )
+      {
+	throw BadID( __PRETTY_FUNCTION__,
+		     "too many \':\'s in FQID \"" + fqid + "\"." );
+      }
 
-  return fqid.substr( 0, aBorder );
-}
+    return fqid.substr( aBorder, String::npos );
+  }
+
+  const String FQID::SystemPathOf( StringCref fqid )
+  {
+    String::size_type aBorder = fqid.find( ':' );
+
+    if( aBorder == String::npos )
+      {
+	throw BadID( __PRETTY_FUNCTION__,
+		     "no \':\' found in FQID \"" + fqid + "\"." );
+      }
+
+    if( fqid.find( ':', aBorder + 1 ) != String::npos )
+      {
+	throw BadID( __PRETTY_FUNCTION__,
+		     "to many \':\'s in FQID \"" + fqid + "\"." );
+      }
+
+    return fqid.substr( 0, aBorder );
+  }
 
 
-const String FQID::getFqidString() const
-{
-  return ( SystemPath::getString() + ":" + getIdString() );
-}
+  const String FQID::getFqidString() const
+  {
+    return ( SystemPath::getString() + ":" + getIdString() );
+  }
 
 
-////////////////////////////////  FQPI
+  ////////////////////////////////  FQPI
 
-FQPI::FQPI( const PrimitiveType type, const FQID& fqid )
-  :
-  FQID( fqid ),
-  thePrimitiveType( type )
-{
-  ; // do nothing
-}
+  FQPI::FQPI( const PrimitiveType type, const FQID& fqid )
+    :
+    FQID( fqid ),
+    thePrimitiveType( type )
+  {
+    ; // do nothing
+  }
 
-//FIXME: ??
-FQPI::FQPI( StringCref fqpistring )
-  : 
-  FQID( fqidOf( fqpistring ) ),
-  thePrimitiveType( PrimitiveTypeOf( PrimitiveTypeStringOf( fqpistring ) ) )
-{
-  ; // do nothing
-}
+  //FIXME: ??
+  FQPI::FQPI( StringCref fqpistring )
+    : 
+    FQID( fqidOf( fqpistring ) ),
+    thePrimitiveType( PrimitiveTypeOf( PrimitiveTypeStringOf( fqpistring ) ) )
+  {
+    ; // do nothing
+  }
 
-FQPI::FQPI( FQPICref fqpi )
-  :
-  FQID( static_cast<FQID>( fqpi ) ),
-  thePrimitiveType( fqpi.getPrimitiveType() )
-{
-  ; // do nothing
-}
+  FQPI::FQPI( FQPICref fqpi )
+    :
+    FQID( static_cast<FQID>( fqpi ) ),
+    thePrimitiveType( fqpi.getPrimitiveType() )
+  {
+    ; // do nothing
+  }
 
-const String FQPI::fqidOf( StringCref fqpi )
-{
-  String::size_type aBorder( fqpi.find( ':' ) );
+  const String FQPI::fqidOf( StringCref fqpi )
+  {
+    String::size_type aBorder( fqpi.find( ':' ) );
 
-  if( aBorder == String::npos )
-    {
-      throw BadID( __PRETTY_FUNCTION__,
-		   "no \':\' found in FQPI \"" + fqpi + "\"." );
-    }
+    if( aBorder == String::npos )
+      {
+	throw BadID( __PRETTY_FUNCTION__,
+		     "no \':\' found in FQPI \"" + fqpi + "\"." );
+      }
 
-  ++aBorder;
-  if( fqpi.find( ':', aBorder ) == String::npos )
-    {
-      throw BadID( __PRETTY_FUNCTION__,
+    ++aBorder;
+    if( fqpi.find( ':', aBorder ) == String::npos )
+      {
+	throw BadID( __PRETTY_FUNCTION__,
 		     "not enough \':\'s found in FQPI \"" + fqpi + "\"." );
-    }
+      }
 
-  return fqpi.substr( aBorder, String::npos );
-}
+    return fqpi.substr( aBorder, String::npos );
+  }
 
-const String FQPI::getFqpiString() const 
-{
-  String aString( PrimitiveTypeStringOf( thePrimitiveType ) + ':' 
-		  + FQID::getString() );
-  return aString;
-}
+  const String FQPI::getFqpiString() const 
+  {
+    String aString( PrimitiveTypeStringOf( thePrimitiveType ) + ':' 
+		    + FQID::getString() );
+    return aString;
+  }
 
 
-
+} // namespace libecs
 
 #ifdef TEST_FQPI
+
+using namespace libecs;
 
 main()
 {

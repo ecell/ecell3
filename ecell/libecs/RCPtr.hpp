@@ -28,13 +28,17 @@
 // E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
 
-#ifndef __AUTORELEASE_HPP
-#define __AUTORELEASE_HPP
+#ifndef __RCPTR_HPP
+#define __RCPTR_HPP
 
-/**
-   Use this macro if you want to use 
-   SomeClassRCPtr instead of RCPtr<SomeClass>.
-*/
+namespace libecs
+{
+
+
+  /**
+     Use this macro if you want to use 
+     SomeClassRCPtr instead of RCPtr<SomeClass>.
+  */
 
 #define DECLARE_RCPTR( type )\
 DECLARE_TYPE( RCPtr<type>, type ## RCPtr )
@@ -42,176 +46,179 @@ DECLARE_TYPE( RCPtr<type>, type ## RCPtr )
 
 #include "Defs.hpp"
 
-/**
-   A simple reference counted pointer class.
+  /**
+     A simple reference counted pointer class.
 
-   Inspired by, but rewritten version of, the AutoRelease Library
-   (Reference Counting Garbage Collector for C++) taken from
-   http://www.fukt.hk-r.se/~per/autorelease/
-   written by Per Liden <per@fukt.hk-r.se>.
-*/
+     Inspired by, but rewritten version of, the AutoRelease Library
+     (Reference Counting Garbage Collector for C++) taken from
+     http://www.fukt.hk-r.se/~per/autorelease/
+     written by Per Liden <per@fukt.hk-r.se>.
+  */
 
 
-template <class T>
-class RCPtr
-{
-
-  DECLARE_TYPE( RCPtr<T>, TRCPtr );
-
-public:
-
-  RCPtr()
-    :
-    theObject( NULLPTR ),
-    theCount( NULLPTR )
+  template <class T>
+  class RCPtr
   {
-    ; // do nothing
-  }
 
-  RCPtr( TRCPtrCref rhs )
-  {
-    if( rhs.isNonNull() )
-      {
-	theObject = rhs.theObject;
-	theCount  = rhs.theCount;
-	incrementReferenceCount();
-      }
-    else
-      {
-	theObject = NULLPTR;
-	theCount  = NULLPTR;
-      }
-  }
+    DECLARE_TYPE( RCPtr<T>, TRCPtr );
 
-  explicit RCPtr( const T* rhs )
-  {
-    if( rhs != NULLPTR )
-      {
-	theObject = const_cast<T*>( rhs );
-	theCount  = new UnsignedInt( 1 );
-      }
-    else
-      {
-	theObject = NULLPTR;
-	theCount  = NULLPTR;
-      }
-  }
+  public:
 
-  explicit RCPtr( T& rhs )
-    :
-    theObject( &rhs ),
-    theCount( new UnsignedInt( 1 ) )
-  {
-    ; // do nothing
-  }
+    RCPtr()
+      :
+      theObject( NULLPTR ),
+      theCount( NULLPTR )
+    {
+      ; // do nothing
+    }
 
-  ~RCPtr()
-  {
-    if( isNonNull() )
-      {
-	decrementReferenceCount();
-      }
-  }
+    RCPtr( TRCPtrCref rhs )
+    {
+      if( rhs.isNonNull() )
+	{
+	  theObject = rhs.theObject;
+	  theCount  = rhs.theCount;
+	  incrementReferenceCount();
+	}
+      else
+	{
+	  theObject = NULLPTR;
+	  theCount  = NULLPTR;
+	}
+    }
 
-  TRCPtrRef operator =( TRCPtrCref rhs )
-  {
-    if( rhs.isNonNull() )
-      {
-	rhs.incrementReferenceCount();
-      }
+    explicit RCPtr( const T* rhs )
+    {
+      if( rhs != NULLPTR )
+	{
+	  theObject = const_cast<T*>( rhs );
+	  theCount  = new UnsignedInt( 1 );
+	}
+      else
+	{
+	  theObject = NULLPTR;
+	  theCount  = NULLPTR;
+	}
+    }
+
+    explicit RCPtr( T& rhs )
+      :
+      theObject( &rhs ),
+      theCount( new UnsignedInt( 1 ) )
+    {
+      ; // do nothing
+    }
+
+    ~RCPtr()
+    {
+      if( isNonNull() )
+	{
+	  decrementReferenceCount();
+	}
+    }
+
+    TRCPtrRef operator =( TRCPtrCref rhs )
+    {
+      if( rhs.isNonNull() )
+	{
+	  rhs.incrementReferenceCount();
+	}
  
-    if( isNonNull() )
-      {
-	decrementReferenceCount();
-      }
+      if( isNonNull() )
+	{
+	  decrementReferenceCount();
+	}
 
-    theObject = rhs.theObject;
-    theCount  = rhs.theCount;
+      theObject = rhs.theObject;
+      theCount  = rhs.theCount;
 
-    return *this;
-  }
+      return *this;
+    }
 
-  TRCPtrRef operator =( const T* rhs )
-  {
-    if( isNonNull() )
-      {
-	decrementReferenceCount();
-      }
+    TRCPtrRef operator =( const T* rhs )
+    {
+      if( isNonNull() )
+	{
+	  decrementReferenceCount();
+	}
 
-    if( rhs != NULLPTR )
-      {
-	theObject = const_cast<T*>( rhs );
-	theCount  = new UnsignedInt( 1 );
-      }
-    else
-      {
-	theObject = NULLPTR;
-	theCount  = NULLPTR;
-      }
+      if( rhs != NULLPTR )
+	{
+	  theObject = const_cast<T*>( rhs );
+	  theCount  = new UnsignedInt( 1 );
+	}
+      else
+	{
+	  theObject = NULLPTR;
+	  theCount  = NULLPTR;
+	}
 
-    return *this;
-  }
+      return *this;
+    }
 
-  T* operator ->() const 
-  {
-    return theObject;
-  }
+    T* operator ->() const 
+    {
+      return theObject;
+    }
 
-  T& operator *() const
-  {
-    return *theObject;
-  }
+    T& operator *() const
+    {
+      return *theObject;
+    }
 
-  operator T*() const
-  {
-    return theObject;
-  }
+    operator T*() const
+    {
+      return theObject;
+    }
 
-  operator T() const
-  {
-    return *theObject;
-  }
+    operator T() const
+    {
+      return *theObject;
+    }
 
-private:
+  private:
 
-  const bool isNonNull() const
-  {
-    if( theObject != NULLPTR )
-      {
-	return true;
-      }
-    else
-      {
-	return false;
-      }
+    const bool isNonNull() const
+    {
+      if( theObject != NULLPTR )
+	{
+	  return true;
+	}
+      else
+	{
+	  return false;
+	}
 
-    assert( 0 );
-    // NEVER_GET_HERE
-  }
-  void incrementReferenceCount() const
-  {
-    ++(*theCount);
-  }
+      assert( 0 );
+      // NEVER_GET_HERE
+    }
+    void incrementReferenceCount() const
+    {
+      ++(*theCount);
+    }
 
-  void decrementReferenceCount() const
-  {
-    if( (*theCount) == 1 )
-      {
-	delete theCount;
-	delete theObject;
-      }
-    else
-      {
-	--(*theCount);
-      }
-  }
+    void decrementReferenceCount() const
+    {
+      if( (*theCount) == 1 )
+	{
+	  delete theCount;
+	  delete theObject;
+	}
+      else
+	{
+	  --(*theCount);
+	}
+    }
 
-private:
+  private:
 
-  T*                   theObject;
-  mutable UnsignedInt* theCount;
+    T*                   theObject;
+    mutable UnsignedInt* theCount;
 
-};
+  };
+
+
+} // namespace libecs
 
 
 #endif /* __AUTORELEASE_HPP */

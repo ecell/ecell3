@@ -33,48 +33,53 @@
 
 #include "System.hpp"
 
-
-class RootSystem : public System
+namespace libecs
 {
 
-public:
+  class RootSystem : public System
+  {
 
-  RootSystem();
-  ~RootSystem();
+  public:
 
-  int check();
+    RootSystem();
+    ~RootSystem();
 
-  SystemPtr getSystem( SystemPathCref systempath );
+    int check();
 
-  SystemPtr getSystem( StringCref id ) ;
+    SystemPtr getSystem( SystemPathCref systempath );
 
-  virtual void initialize();
+    SystemPtr getSystem( StringCref id ) ;
 
-  StepperLeaderRef    getStepperLeader()    { return theStepperLeader; }
+    virtual void initialize();
 
-  ReactorMakerRef     getReactorMaker()     { return theReactorMaker; }
-  SubstanceMakerRef   getSubstanceMaker()   { return theSubstanceMaker; }
-  SystemMakerRef      getSystemMaker()      { return theSystemMaker; }
-  StepperMakerRef     getStepperMaker()     { return theStepperMaker; }
-  AccumulatorMakerRef getAccumulatorMaker() { return theAccumulatorMaker; }
+    StepperLeaderRef    getStepperLeader()    { return theStepperLeader; }
 
-  virtual const char* const className() const { return "RootSystem"; }
+    ReactorMakerRef     getReactorMaker()     { return theReactorMaker; }
+    SubstanceMakerRef   getSubstanceMaker()   { return theSubstanceMaker; }
+    SystemMakerRef      getSystemMaker()      { return theSystemMaker; }
+    StepperMakerRef     getStepperMaker()     { return theStepperMaker; }
+    AccumulatorMakerRef getAccumulatorMaker() { return theAccumulatorMaker; }
 
-private:
+    virtual const char* const className() const { return "RootSystem"; }
 
-  void install();
+  private:
 
-private:
+    void install();
 
-  StepperLeaderRef    theStepperLeader;
+  private:
 
-  ReactorMakerRef     theReactorMaker;
-  SubstanceMakerRef   theSubstanceMaker;
-  SystemMakerRef      theSystemMaker;
-  StepperMakerRef     theStepperMaker;
-  AccumulatorMakerRef theAccumulatorMaker;
+    StepperLeaderRef    theStepperLeader;
 
-};
+    ReactorMakerRef     theReactorMaker;
+    SubstanceMakerRef   theSubstanceMaker;
+    SystemMakerRef      theSystemMaker;
+    StepperMakerRef     theStepperMaker;
+    AccumulatorMakerRef theAccumulatorMaker;
+
+  };
+
+
+} // namespace libecs
 
 #endif /* ___ROOTSYSTEM_H___ */
 

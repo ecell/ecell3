@@ -30,112 +30,119 @@
 
 #include "Integrators.hpp"
 
-////////////////////////////// Integrator
 
-Integrator::Integrator( SubstanceRef substance ) 
-  :
-  theSubstance( substance ),
-  theStepCounter( 0 )
+namespace libecs
 {
-  theSubstance.setIntegrator( this );
-}
 
-void Integrator::clear()
-{
-  theStepCounter=0;
-  theNumberOfMoleculesCache = theSubstance.getQuantity();
-}
+  ////////////////////////////// Integrator
 
-////////////////////////////// Euler1Integrator
+  Integrator::Integrator( SubstanceRef substance ) 
+    :
+    theSubstance( substance ),
+    theStepCounter( 0 )
+  {
+    theSubstance.setIntegrator( this );
+  }
 
-Euler1Integrator::Euler1Integrator( SubstanceRef substance ) 
-  : 
-  Integrator( substance )
-{
-  ; // do nothing
-}
+  void Integrator::clear()
+  {
+    theStepCounter=0;
+    theNumberOfMoleculesCache = theSubstance.getQuantity();
+  }
 
-void Euler1Integrator::turn()
-{
-  ++theStepCounter;
-}
+  ////////////////////////////// Euler1Integrator
 
+  Euler1Integrator::Euler1Integrator( SubstanceRef substance ) 
+    : 
+    Integrator( substance )
+  {
+    ; // do nothing
+  }
 
-////////////////////////////// RungeKutta4Integrator
-
-const Real RungeKutta4Integrator::theOne6th = (Real)1.0 / (Real)6.0;
-
-RungeKutta4Integrator::TurnFunc RungeKutta4Integrator::theTurnFuncs[4] =
-{
-  &RungeKutta4Integrator::turn0,
-  &RungeKutta4Integrator::turn1,
-  &RungeKutta4Integrator::turn2,
-  &RungeKutta4Integrator::turn3
-};
+  void Euler1Integrator::turn()
+  {
+    ++theStepCounter;
+  }
 
 
-RungeKutta4Integrator::RungeKutta4Integrator( SubstanceRef substance ) 
-  : 
-  Integrator(substance)
-{
-  ; // do nothing
-}
+  ////////////////////////////// RungeKutta4Integrator
 
-void RungeKutta4Integrator::clear()
-{
-  Integrator::clear();
-  theTurnFuncPtr = &theTurnFuncs[0];
-}
+  const Real RungeKutta4Integrator::theOne6th = (Real)1.0 / (Real)6.0;
 
-void RungeKutta4Integrator::turn()
-{
-  theK[ theStepCounter ] = theSubstance.getVelocity();
-  ( this->*( *theTurnFuncPtr ) )();
-  ++theTurnFuncPtr;
-  ++theStepCounter;
-  setVelocity( 0 );
-}
+  RungeKutta4Integrator::TurnFunc RungeKutta4Integrator::theTurnFuncs[4] =
+  {
+    &RungeKutta4Integrator::turn0,
+      &RungeKutta4Integrator::turn1,
+      &RungeKutta4Integrator::turn2,
+      &RungeKutta4Integrator::turn3
+      };
 
-void RungeKutta4Integrator::turn0()
-{
-  setQuantity( ( theK[0] * .5 ) + theNumberOfMoleculesCache );
-}
 
-void RungeKutta4Integrator::turn1()
-{
-  setQuantity( ( theK[1] * .5 ) + theNumberOfMoleculesCache );
-}
+  RungeKutta4Integrator::RungeKutta4Integrator( SubstanceRef substance ) 
+    : 
+    Integrator(substance)
+  {
+    ; // do nothing
+  }
 
-void RungeKutta4Integrator::turn2()
-{
-  setQuantity( theK[2] + theNumberOfMoleculesCache );
-}
+  void RungeKutta4Integrator::clear()
+  {
+    Integrator::clear();
+    theTurnFuncPtr = &theTurnFuncs[0];
+  }
 
-void RungeKutta4Integrator::turn3()
-{
-  setQuantity( theNumberOfMoleculesCache );
-}
+  void RungeKutta4Integrator::turn()
+  {
+    theK[ theStepCounter ] = theSubstance.getVelocity();
+    ( this->*( *theTurnFuncPtr ) )();
+    ++theTurnFuncPtr;
+    ++theStepCounter;
+    setVelocity( 0 );
+  }
 
-void RungeKutta4Integrator::transit()
-{
-  //// x(n+1) = x(n) + 1/6 * (k1 + k4 + 2 * (k2 + k3)) + O(h^5)
+  void RungeKutta4Integrator::turn0()
+  {
+    setQuantity( ( theK[0] * .5 ) + theNumberOfMoleculesCache );
+  }
 
-  Real* k( &theK[0] );
+  void RungeKutta4Integrator::turn1()
+  {
+    setQuantity( ( theK[1] * .5 ) + theNumberOfMoleculesCache );
+  }
 
-  // FIXME: prefetching here makes this faster on alpha?
+  void RungeKutta4Integrator::turn2()
+  {
+    setQuantity( theK[2] + theNumberOfMoleculesCache );
+  }
 
-  //                      k1  + (2 * k2)  + (2 * k3)  + k4
-  Real aResult = *k++;
-  aResult += *k;
-  aResult += *k++;
-  aResult += *k;
-  aResult += *k++;
-  aResult += *k;
+  void RungeKutta4Integrator::turn3()
+  {
+    setQuantity( theNumberOfMoleculesCache );
+  }
 
-  aResult *= theOne6th;
+  void RungeKutta4Integrator::transit()
+  {
+    //// x(n+1) = x(n) + 1/6 * (k1 + k4 + 2 * (k2 + k3)) + O(h^5)
 
-  setVelocity( aResult );
-}
+    Real* k( &theK[0] );
+
+    // FIXME: prefetching here makes this faster on alpha?
+
+    //                      k1  + (2 * k2)  + (2 * k3)  + k4
+    Real aResult = *k++;
+    aResult += *k;
+    aResult += *k++;
+    aResult += *k;
+    aResult += *k++;
+    aResult += *k;
+
+    aResult *= theOne6th;
+
+    setVelocity( aResult );
+  }
+
+
+} // namespace libecs
 
 
 /*

@@ -33,86 +33,92 @@
 #define ___INTEGRATORS_H___
 #include "Substance.hpp"
 
-class Integrator
+
+namespace libecs
 {
 
-public:
+  class Integrator
+  {
 
-  Integrator(SubstanceRef);
-  virtual ~Integrator() {}
+  public:
 
-  /**
-     how many times to be called during an single integration cycle  
-  */
-  virtual int getNumberOfSteps() = 0;
+    Integrator(SubstanceRef);
+    virtual ~Integrator() {}
 
-  virtual void clear();
-  //  virtual Real velocity(Real v) = 0;
-  virtual void turn() {}
-  virtual void transit() = 0;
+    /**
+       how many times to be called during an single integration cycle  
+    */
+    virtual int getNumberOfSteps() = 0;
 
-protected:
+    virtual void clear();
+    //  virtual Real velocity(Real v) = 0;
+    virtual void turn() {}
+    virtual void transit() = 0;
 
-  void setQuantity( Real quantity ) { theSubstance.theQuantity = quantity; }
-  void setVelocity( Real velocity ) { theSubstance.theVelocity = velocity; }
+  protected:
 
-protected:
+    void setQuantity( Real quantity ) { theSubstance.theQuantity = quantity; }
+    void setVelocity( Real velocity ) { theSubstance.theVelocity = velocity; }
 
-  SubstanceRef theSubstance;
-  int          theStepCounter;
-  Real        theNumberOfMoleculesCache;
+  protected:
 
-};
+    SubstanceRef theSubstance;
+    int          theStepCounter;
+    Real        theNumberOfMoleculesCache;
 
-class Euler1Integrator  : public Integrator
-{
+  };
 
-public:
+  class Euler1Integrator  : public Integrator
+  {
 
-  Euler1Integrator( SubstanceRef ); 
-  virtual ~Euler1Integrator() {}
+  public:
 
-  virtual int getNumberOfSteps() { return 1; }
-  //  virtual Real velocity(Real );
-  virtual void turn();
-  virtual void transit() {}
-};
+    Euler1Integrator( SubstanceRef ); 
+    virtual ~Euler1Integrator() {}
 
-class RungeKutta4Integrator : public Integrator
-{
+    virtual int getNumberOfSteps() { return 1; }
+    //  virtual Real velocity(Real );
+    virtual void turn();
+    virtual void transit() {}
+  };
 
-  typedef void (RungeKutta4Integrator::*TurnFunc_)();
-  DECLARE_TYPE(TurnFunc_,TurnFunc);
+  class RungeKutta4Integrator : public Integrator
+  {
 
-public:
+    typedef void (RungeKutta4Integrator::*TurnFunc_)();
+    DECLARE_TYPE(TurnFunc_,TurnFunc);
 
-  RungeKutta4Integrator( SubstanceRef );
-  virtual ~RungeKutta4Integrator() {}
+  public:
+
+    RungeKutta4Integrator( SubstanceRef );
+    virtual ~RungeKutta4Integrator() {}
 
 
-  virtual int getNumberOfSteps() { return 4; }
-  virtual void clear();
-  //  virtual Real velocity( Real );
-  virtual void turn();
-  virtual void transit();
+    virtual int getNumberOfSteps() { return 4; }
+    virtual void clear();
+    //  virtual Real velocity( Real );
+    virtual void turn();
+    virtual void transit();
 
-private:
+  private:
 
-  void turn0();
-  void turn1();
-  void turn2();
-  void turn3();
+    void turn0();
+    void turn1();
+    void turn2();
+    void turn3();
 
-private:
+  private:
 
-  static TurnFunc theTurnFuncs[4];
-  TurnFuncPtr theTurnFuncPtr;
+    static TurnFunc theTurnFuncs[4];
+    TurnFuncPtr theTurnFuncPtr;
 
-  static const Real theOne6th;
-  Real theK[4];
+    static const Real theOne6th;
+    Real theK[4];
 
-};
+  };
 
+
+} // namespace libecs
 
 #endif /* ___INTEGRATORS_H___ */
 

@@ -36,8 +36,13 @@
 #include <string>
 #include "config.h"
 
+#include "CoreLinuxCompatibility.hpp"
 
-// cmath
+
+namespace libecs
+{
+
+  // cmath
 
 #if defined( HAVE_CMATH )
 #include <cmath>
@@ -48,17 +53,15 @@
 #endif /* HAVE_CMATH */
 
 
-// system constants
+  // system constants
 
-const int RANDOM_NUMBER_BUFFER_SIZE( 65535 );
+  const int RANDOM_NUMBER_BUFFER_SIZE( 65535 );
 
+  // CoreLinux++ compatibility
 
-// CoreLinux++ compatibility
+  using namespace corelinux;
 
-#include "CoreLinuxCompatibility.hpp"
-
-
-// replace CORELINUX from macro names
+  // replace CORELINUX from macro names
 
 #define DECLARE_LIST        CORELINUX_LIST
 #define DECLARE_VECTOR      CORELINUX_VECTOR
@@ -70,34 +73,39 @@ const int RANDOM_NUMBER_BUFFER_SIZE( 65535 );
 #define DECLARE_STACK       CORELINUX_STACK     
 
 
-// String
+  // String
 
 #include <string>
 
-DECLARE_TYPE( std::string, String );
+  DECLARE_TYPE( std::string, String );
 
 
-// Numeric types
+  // Numeric types
 
-// FIXME: use numeric_limits
-DECLARE_TYPE( int64_t, Int );
-DECLARE_TYPE( uint64_t, UnsignedInt );
-const int INT_SIZE( sizeof( Int ) );
+  // FIXME: use numeric_limits
+  DECLARE_TYPE( int64_t, Int );
+  DECLARE_TYPE( uint64_t, UnsignedInt );
+  const int INT_SIZE( sizeof( Int ) );
 
-// FIXME: not portable
-const int REAL_DIG( DBL_DIG );
+  DECLARE_TYPE( corelinux::Real, Real );
 
-//! Avogadro number. 
-const Real N_A( 6.0221367e+23 );
+  // FIXME: not portable
+  const int REAL_DIG( DBL_DIG );
 
-const int NOMATCH( -1 );
+  //! Avogadro number. 
+  const Real N_A( 6.0221367e+23 );
+
+  const int NOMATCH( -1 );
 
 
-// MACROS
+  // MACROS
 
 #ifndef HAVE_PRETTY_FUNCTION
 #define __PRETTY_FUNCTION__ ""
 #endif
+
+
+} // namespace libecs
 
 
 #endif /* ___DEFS_H___ */

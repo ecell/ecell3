@@ -31,5 +31,9 @@
 
 #include "LoggerImplementation.hpp"
 
+namespace libemc
+{
 
-// nothing here
+  // nothing here
+
+} // namespace libemc

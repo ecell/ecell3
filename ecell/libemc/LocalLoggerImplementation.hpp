@@ -36,33 +36,38 @@
 
 #include "LoggerImplementation.hpp"
 
-class LocalLoggerImplementation
-  :
-  public LoggerImplementation
+namespace libemc
 {
 
-public:
+  class LocalLoggerImplementation
+    :
+    public LoggerImplementation
+  {
 
-  LocalLoggerImplementation( ObjectPtr optr );
-  virtual ~LocalLoggerImplementation( );
+  public:
 
-  RealLogger::DataPointVector& getData( const Real& first,
-					 const Real& last,
-					 const Real& interval ) const;
+    LocalLoggerImplementation( ObjectPtr optr );
+    virtual ~LocalLoggerImplementation( );
 
-  void update( void );
+    RealLogger::DataPointVector& getData( const Real& first,
+					  const Real& last,
+					  const Real& interval ) const;
 
-  void update( RealLogger::containee_type& datapoint );
+    void update( void );
 
-  //  void push( const RealLogger::containee_type& x );
+    void update( RealLogger::containee_type& datapoint );
 
-  //  void push( const Real& t, const Real& v ); 
+    //  void push( const RealLogger::containee_type& x );
 
-private:
+    //  void push( const Real& t, const Real& v ); 
 
-  RealLogger theRealLogger;
+  private:
+
+    RealLogger theRealLogger;
 					
-};
+  };
 
+
+} // namespace libemc
 
 #endif

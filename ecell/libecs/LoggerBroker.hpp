@@ -37,23 +37,29 @@
 #include "libecs.hpp"
 #include "Logger.hpp"
 
-typedef string IDString;
 
-class LoggerBroker
+namespace libecs
 {
-public:
-  LoggerBroker( void )
+
+  typedef string IDString;
+
+  class LoggerBroker
   {
-    ;
+  public:
+    LoggerBroker( void )
+    {
+      ;
+    }
+
+    Logger* getLogger( IDString );
+
+  private:
+    LoggerBroker( cosnt  LoggerBroker& );
+    LoggerBroker& operator=( const LoggerBroker& );
+    std::map< IDString, Logger* > theLoggerMap;
+
   }
 
-  Logger* getLogger( IDString );
-
-private:
-  LoggerBroker( cosnt  LoggerBroker& );
-  LoggerBroker& operator=( const LoggerBroker& );
-  std::map< IDString, Logger* > theLoggerMap;
-
-}
+} // namespace libecs
 
 #endif

@@ -35,17 +35,22 @@
 #include "libecs.hpp"
 #include "LoggerImplementation.hpp"
 
-class EmcLogger
+namespace libemc
 {
 
-public:
+  class EmcLogger
+  {
 
-  EmcLogger( );
-  virtual ~EmcLogger( ) { }
+  public:
+
+    EmcLogger( );
+    virtual ~EmcLogger( ) { }
 
   
 
-};
+  };
 
+
+} // namespace libemc
 
 #endif

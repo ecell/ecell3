@@ -33,27 +33,34 @@
 
 #include "libecs.hpp"
 
-class Reactant
+
+namespace libecs
 {
 
-public:
+  class Reactant
+  {
 
-  Reactant( SubstanceRef s, const int c ) 
-    : 
-    theSubstance( s ), theCoefficient( c ) 
+  public:
+
+    Reactant( SubstanceRef s, const int c ) 
+      : 
+      theSubstance( s ), theCoefficient( c ) 
     {
       ; // do nothing
     }
-  virtual ~Reactant() {}
+    virtual ~Reactant() {}
 
-  SubstanceRef getSubstance() const { return theSubstance; }
-  int getCoefficient() const { return theCoefficient; }
+    SubstanceRef getSubstance() const { return theSubstance; }
+    int getCoefficient() const { return theCoefficient; }
 
-private:
+  private:
 
-  SubstanceRef theSubstance;
-  int theCoefficient;
+    SubstanceRef theSubstance;
+    int theCoefficient;
 
-};
+  };
+
+
+} // namespace libecs
 
 #endif /* __REACTANT_H___ */

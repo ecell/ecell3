@@ -33,21 +33,27 @@
 #include "Substance.hpp"
 #include "ModuleMaker.hpp"
 
-
-class SubstanceMaker : public StaticModuleMaker<Substance>
+namespace libecs
 {
 
-public:
+  class SubstanceMaker : public StaticModuleMaker<Substance>
+  {
 
-  SubstanceMaker() { makeClassList(); }
+  public:
 
-protected:
+    SubstanceMaker() { makeClassList(); }
 
-  virtual void makeClassList();
+  protected:
 
-};
+    virtual void makeClassList();
+
+  };
 
 #define NewSubstanceModule( CLASS ) NewDynamicModule( Substance, CLASS )
+
+
+} // namespace libecs
+
 
 #endif /* ___SUBSTANCEMAKER_H___ */
 

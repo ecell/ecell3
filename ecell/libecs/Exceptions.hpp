@@ -35,15 +35,19 @@
 #include "config.h"
 #include "Defs.hpp"
 
-/// Base exception class
-class Exception /* : public exception */
-{
-public:
-  Exception( StringCref method, StringCref message = "" )
-    : theMethod( method ), theMessage( message ) {}
-  virtual ~Exception() {}
 
-  virtual const String message() const 
+namespace libecs
+{
+
+  /// Base exception class
+  class Exception /* : public exception */
+  {
+  public:
+    Exception( StringCref method, StringCref message = "" )
+      : theMethod( method ), theMessage( message ) {}
+    virtual ~Exception() {}
+
+    virtual const String message() const 
     {
 #ifdef DEBUG
       return theMethod + ":\n" + 
@@ -53,14 +57,14 @@ public:
 #endif /* DEBUG */
     }
 
-  virtual const char* what() const { return theMessage.c_str(); }
-  virtual const char* const getClassName() const  {return "Exception";}
+    virtual const char* what() const { return theMessage.c_str(); }
+    virtual const char* const getClassName() const  {return "Exception";}
 
-protected:
+  protected:
 
-  const String theMethod;
-  const String theMessage;
-};
+    const String theMethod;
+    const String theMessage;
+  };
 
 #define DEFINE_EXCEPTION( CLASSNAME, BASECLASS )\
 class CLASSNAME : public BASECLASS\
@@ -73,16 +77,19 @@ public:\
     { return #CLASSNAME ; }\
 };\
 
-DEFINE_EXCEPTION( UnexpectedError,       Exception);
-DEFINE_EXCEPTION( NotFound,              Exception);
-DEFINE_EXCEPTION( CantOpen,              Exception); 
-DEFINE_EXCEPTION( BadID,                 Exception); 
-DEFINE_EXCEPTION( MessageException,      Exception);
-DEFINE_EXCEPTION( CallbackFailed,        Exception);
-DEFINE_EXCEPTION( BadMessage,            MessageException); 
-DEFINE_EXCEPTION( NoMethod,              MessageException);
-DEFINE_EXCEPTION( NoSlot,                MessageException);
-DEFINE_EXCEPTION( InvalidPrimitiveType,  Exception);
+  DEFINE_EXCEPTION( UnexpectedError,       Exception);
+  DEFINE_EXCEPTION( NotFound,              Exception);
+  DEFINE_EXCEPTION( CantOpen,              Exception); 
+  DEFINE_EXCEPTION( BadID,                 Exception); 
+  DEFINE_EXCEPTION( MessageException,      Exception);
+  DEFINE_EXCEPTION( CallbackFailed,        Exception);
+  DEFINE_EXCEPTION( BadMessage,            MessageException); 
+  DEFINE_EXCEPTION( NoMethod,              MessageException);
+  DEFINE_EXCEPTION( NoSlot,                MessageException);
+  DEFINE_EXCEPTION( InvalidPrimitiveType,  Exception);
+
+
+} // namespace libecs
 
 #endif /* ___EXCEPTIONS_H___ */
 

@@ -34,22 +34,30 @@
 #include "Simulator.h"
 #include "ModuleMaker.h"
 
-class SimulatorMaker : public SharedModuleMaker<Simulator>
+namespace libemc
 {
-private:
 
-protected:
+  using namespace libecs;
 
-public:
 
-  SimulatorMaker();
-  Simulator* make(const string& classname) throw(CantInstantiate);
-  void install(const string& systementry);
+  class SimulatorMaker : public SharedModuleMaker<Simulator>
+  {
+  private:
 
-  virtual const char* const className() const {return "SimulatorMaker";}
-};
+  protected:
+
+  public:
+
+    SimulatorMaker();
+    Simulator* make(const string& classname) throw(CantInstantiate);
+    void install(const string& systementry);
+
+    virtual const char* const className() const {return "SimulatorMaker";}
+  };
 
 #define NewSimulatorModule(CLASS) NewDynamicModule(Simulator,CLASS)
+
+} // namespace libemc
 
 #endif /* ___SIMULATORMAKER_H___ */
 

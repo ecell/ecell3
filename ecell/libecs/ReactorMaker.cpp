@@ -30,12 +30,17 @@
 
 #include "ReactorMaker.hpp"
 
-////////////////////// ReactorMaker
+
+namespace libecs
+{
+
+  ////////////////////// ReactorMaker
  
 
-ReactorMaker::ReactorMaker()
-{
-  ; // do nothing
-}
+  ReactorMaker::ReactorMaker()
+  {
+    ; // do nothing
+  }
 
 
+} // namespace libecs

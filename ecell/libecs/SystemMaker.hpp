@@ -33,21 +33,27 @@
 #include "System.hpp"
 #include "ModuleMaker.hpp"
 
-
-class SystemMaker : public StaticModuleMaker<System>
+namespace libecs
 {
 
-protected:
 
-  virtual void makeClassList();
+  class SystemMaker : public StaticModuleMaker<System>
+  {
 
-public:
+  protected:
 
-  SystemMaker();
-  ~SystemMaker() {}
+    virtual void makeClassList();
 
-};
+  public:
+
+    SystemMaker();
+    ~SystemMaker() {}
+
+  };
 
 #define NewSystemModule(CLASS) NewDynamicModule(System,CLASS)
+
+
+} // namespace libecs
 
 #endif /* ___SYSTEMMAKER_H___ */

@@ -36,137 +36,145 @@
 #include "Exceptions.hpp"
 #include "PrimitiveType.hpp"
 
-/** 
-  SystemPath 
+namespace libecs
+{
+
+
+
+  /** 
+      SystemPath 
   */
-class SystemPath {
+  class SystemPath {
 
-public:
+  public:
 
-  SystemPath( StringCref rqsn = "" );
-  SystemPath( SystemPathCref systempath );
-  virtual ~SystemPath() {}
+    SystemPath( StringCref rqsn = "" );
+    SystemPath( SystemPathCref systempath );
+    virtual ~SystemPath() {}
 
-  StringCref getSystemPathString() const { return theSystemPath; }
-  virtual const String getString() const { return getSystemPathString(); }
-  virtual operator String() const { return getSystemPathString(); }
+    StringCref getSystemPathString() const { return theSystemPath; }
+    virtual const String getString() const { return getSystemPathString(); }
+    virtual operator String() const { return getSystemPathString(); }
+
+    /**
+       Extract the first system name.
+       @return name of the first system
+    */
+    const String first() const;
+
+    /**
+       Extract the last system name.
+
+       @return name of the last system in given systempath.
+    */
+    const String last() const;
+
+    /**
+       @return SystemPath without the first system name.
+    */
+    SystemPath next() const;
+
+  protected:
+
+    /**
+       Standardize a SystemPath. 
+       Reduce '..'s and remove extra white spaces.
+
+       @return reference to the systempath
+    */
+    void standardize();
+
+    SystemPath() {}
+
+  private:
+
+    SystemPathRef operator=( SystemPathCref rhs );
+
+  public:
+
+    static const char DELIMITER = '/';
+
+  private:
+
+    const String theSystemPath;
+
+  };
 
   /**
-    Extract the first system name.
-    @return name of the first system
-    */
-  const String first() const;
+     FQID(Fully Qualified entity ID)
+
+     The FQID is a identifier (ID) of Entity objects of certain PrimitiveType.
+     Given a PrimitiveType, one can identify unique Entity in a
+     cell model with a SystemPath and an id.  
+
+     @see SystemPath
+  */
+  class FQID : public SystemPath
+  {
+
+  public:
+
+    FQID( StringCref systemname, StringCref id );
+    FQID( StringCref fqid );
+    FQID( FQIDCref fqid );
+    virtual ~FQID() {}
+
+    const String getFqidString() const;
+    virtual const String getString() const { return getFqidString(); }
+    StringCref getIdString() const { return theId; }
+    virtual operator String() const { return getFqidString(); }
+
+    static const String IdOf( StringCref fqen );
+    static const String SystemPathOf( StringCref fqen );
+
+  private:
+
+    FQIDRef operator=( FQIDCref rhs );
+
+  private:
+
+    const String theId;
+
+  };
 
   /**
-    Extract the last system name.
+     FQPI (Fully Qualified Primitive Id).
 
-    @return name of the last system in given systempath.
-    */
-  const String last() const;
+     One can identify an unique Entiy in a cell model with a FQPI.
+     The FQPI consists of FQID and PrimitiveType.
 
-  /**
-    @return SystemPath without the first system name.
-    */
-  SystemPath next() const;
+     @see FQID, PrimitiveType
+  */
+  class FQPI : public FQID
+  {
 
-protected:
+  public:
 
-  /**
-    Standardize a SystemPath. 
-    Reduce '..'s and remove extra white spaces.
+    static const String  fqidOf( StringCref fqpi );
 
-    @return reference to the systempath
-    */
-  void standardize();
-
-  SystemPath() {}
-
-private:
-
-  SystemPathRef operator=( SystemPathCref rhs );
-
-public:
-
-  static const char DELIMITER = '/';
-
-private:
-
-  const String theSystemPath;
-
-};
-
-/**
-  FQID(Fully Qualified entity ID)
-
-  The FQID is a identifier (ID) of Entity objects of certain PrimitiveType.
-  Given a PrimitiveType, one can identify unique Entity in a
-  cell model with a SystemPath and an id.  
-
-  @see SystemPath
-*/
-class FQID : public SystemPath
-{
-
-public:
-
-  FQID( StringCref systemname, StringCref id );
-  FQID( StringCref fqid );
-  FQID( FQIDCref fqid );
-  virtual ~FQID() {}
-
-  const String getFqidString() const;
-  virtual const String getString() const { return getFqidString(); }
-  StringCref getIdString() const { return theId; }
-  virtual operator String() const { return getFqidString(); }
-
-  static const String IdOf( StringCref fqen );
-  static const String SystemPathOf( StringCref fqen );
-
-private:
-
-  FQIDRef operator=( FQIDCref rhs );
-
-private:
-
-  const String theId;
-
-};
-
-/**
-  FQPI (Fully Qualified Primitive Id).
-
-  One can identify an unique Entiy in a cell model with a FQPI.
-  The FQPI consists of FQID and PrimitiveType.
-
-  @see FQID, PrimitiveType
-*/
-class FQPI : public FQID
-{
-
-public:
-
-  static const String  fqidOf( StringCref fqpi );
-
-  FQPI( const PrimitiveType type, FQIDCref fqid );
-  FQPI( StringCref fqpistring );
-  FQPI( FQPICref fqpi );
-  virtual ~FQPI() {}
+    FQPI( const PrimitiveType type, FQIDCref fqid );
+    FQPI( StringCref fqpistring );
+    FQPI( FQPICref fqpi );
+    virtual ~FQPI() {}
   
-  const String getFqpiString() const;
-  const PrimitiveType getPrimitiveType() const { return thePrimitiveType; }
+    const String getFqpiString() const;
+    const PrimitiveType getPrimitiveType() const { return thePrimitiveType; }
 
-  virtual const String getString() const { return getFqpiString(); }
-  virtual operator const String() const { return getFqpiString(); }
+    virtual const String getString() const { return getFqpiString(); }
+    virtual operator const String() const { return getFqpiString(); }
 
-private:
+  private:
 
-  FQPIRef operator=( FQPICref rhs );
+    FQPIRef operator=( FQPICref rhs );
 
-private:
+  private:
 
-  PrimitiveType thePrimitiveType;
+    PrimitiveType thePrimitiveType;
 
-};
+  };
+
+
+} // namespace libecs
 
 #endif /*  ___FQPI_H___ */
 

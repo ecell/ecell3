@@ -33,3 +33,8 @@
 
 
 // nothing here
+
+namespace libemc
+{
+
+} // namespace libemc

@@ -35,22 +35,28 @@
 
 #include "Defs.hpp"
 
-class StringList : public vector<String>
+namespace libecs 
 {
 
-public:
 
-  StringList( StringCref str="", StringCref delim= " ",
-	      StringCref spacer = "" );
+  class StringList : public vector<String>
+  {
 
-  const String dump( const char delim=' ' );
+  public:
 
-protected:
+    StringList( StringCref str="", StringCref delim= " ",
+		StringCref spacer = "" );
 
-  void parse( StringCref str, StringCref delim, StringCref spacer );
+    const String dump( const char delim=' ' );
 
-};
+  protected:
 
+    void parse( StringCref str, StringCref delim, StringCref spacer );
+
+  };
+
+
+} // namespace libecs
 
 #endif /* __STRINGLIST_H___ */
 

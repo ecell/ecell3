@@ -31,47 +31,54 @@
 #include "Message.hpp"
 #include "UniversalVariable.hpp"
 
-////////////////////// Message
 
-Message::Message( StringCref keyword, UniversalVariableVectorCref uvl)
-  : 
-  theKeyword( keyword ),
-  theBody( uvl )
+namespace libecs
 {
-  ; // do nothing
-}
 
-Message::Message( StringCref keyword, UniversalVariableCref uv )
-  :
-  theKeyword( keyword )
-{
-  theBody.push_back( uv );
-}
+  ////////////////////// Message
 
-Message::Message( MessageCref message )
-  :
-  theKeyword( message.getKeyword() ),
-  theBody( message.getBody() )
-{
-  ; // do nothing
-}
+  Message::Message( StringCref keyword, UniversalVariableVectorCref uvl)
+    : 
+    theKeyword( keyword ),
+    theBody( uvl )
+  {
+    ; // do nothing
+  }
 
-Message& Message::operator=( MessageCref rhs )
-{
-  if( this != &rhs )
-    {
-      theKeyword = rhs.getKeyword();
-      theBody = rhs.getBody();
-    }
+  Message::Message( StringCref keyword, UniversalVariableCref uv )
+    :
+    theKeyword( keyword )
+  {
+    theBody.push_back( uv );
+  }
 
-  return *this;
-}
+  Message::Message( MessageCref message )
+    :
+    theKeyword( message.getKeyword() ),
+    theBody( message.getBody() )
+  {
+    ; // do nothing
+  }
 
-// FIXME: is this ok?
-Message::~Message()
-{
-  ; // do nothing
-}
+  Message& Message::operator=( MessageCref rhs )
+  {
+    if( this != &rhs )
+      {
+	theKeyword = rhs.getKeyword();
+	theBody = rhs.getBody();
+      }
+
+    return *this;
+  }
+
+  // FIXME: is this ok?
+  Message::~Message()
+  {
+    ; // do nothing
+  }
+
+
+} // namespace libecs
 
 
 /*

@@ -33,133 +33,140 @@
 #include "libecs.hpp"
 #include "MessageInterface.hpp"
 
-/**
-   Entity class is a base class for all components in the cell model.
-   Entity is-a MessageInterface. 
 
-*/
-
-class Entity : public MessageInterface
+namespace libecs
 {
 
-public:
-
-  Entity(); 
-  virtual ~Entity();
-
   /**
-    Set supersystem pointer of this Entity.  
-    Usually no need to set this manually because a System object will 
-    do this when an Entity is installed to the System.
+     Entity class is a base class for all components in the cell model.
+     Entity is-a MessageInterface. 
 
-    @param supersystem a pointer to a System to which this object belongs.
-   */
-  virtual void setSuperSystem( SystemPtr const supersystem ) 
-   { 
-     theSuperSystem = supersystem; 
-   }
+  */
 
-  SystemPtr getSuperSystem() const 
+  class Entity : public MessageInterface
   {
-    return theSuperSystem;
-  }
 
-  /**
-    Set an identifier of this Entity.
+  public:
 
-    @param entryname entryname of this Entry.
-   */
-  void setId( StringCref id ) 
-  { 
-    theId = id; 
-  }
+    Entity(); 
+    virtual ~Entity();
+
+    /**
+       Set supersystem pointer of this Entity.  
+       Usually no need to set this manually because a System object will 
+       do this when an Entity is installed to the System.
+
+       @param supersystem a pointer to a System to which this object belongs.
+    */
+    virtual void setSuperSystem( SystemPtr const supersystem ) 
+    { 
+      theSuperSystem = supersystem; 
+    }
+
+    SystemPtr getSuperSystem() const 
+    {
+      return theSuperSystem;
+    }
+
+    /**
+       Set an identifier of this Entity.
+
+       @param entryname entryname of this Entry.
+    */
+    void setId( StringCref id ) 
+    { 
+      theId = id; 
+    }
 
 
-  const Message getClassName( StringCref keyword );
-  const Message getId( StringCref keyword );
-  const Message getSystemPath( StringCref keyword );
-  const Message getName( StringCref keyword );
-  const Message getActivity( StringCref keyword );
-  const Message getActivityPerSecond( StringCref keyword );
+    const Message getClassName( StringCref keyword );
+    const Message getId( StringCref keyword );
+    const Message getSystemPath( StringCref keyword );
+    const Message getName( StringCref keyword );
+    const Message getActivity( StringCref keyword );
+    const Message getActivityPerSecond( StringCref keyword );
 
-  /**
-    @return entryname of this Entity.
-   */
-  StringCref getId() const 
-  { 
-    return theId; 
-  }
+    /**
+       @return entryname of this Entity.
+    */
+    StringCref getId() const 
+    { 
+      return theId; 
+    }
 
-  /**
-    Set name of this Entity.
+    /**
+       Set name of this Entity.
 
-    @param name name of this Entity.
-   */
-  void setName( StringCref name ) 
-  { 
-    theName = name; 
-  }
+       @param name name of this Entity.
+    */
+    void setName( StringCref name ) 
+    { 
+      theName = name; 
+    }
 
-  /**
-    @return name of this Entity.
-   */
-  StringCref getName() const 
-  { 
-    return theName; 
-  }
+    /**
+       @return name of this Entity.
+    */
+    StringCref getName() const 
+    { 
+      return theName; 
+    }
 
-  /**
-    @return SystemPath of this Entity.
-   */
-  const String getSystemPath() const;
+    /**
+       @return SystemPath of this Entity.
+    */
+    const String getSystemPath() const;
 
-  /**
-    @return FQID (Fully Qualified ID) of this Entity.
-   */
-  const String getFqid() const;
+    /**
+       @return FQID (Fully Qualified ID) of this Entity.
+    */
+    const String getFqid() const;
 
-  /**
-    @return FQPI (Fully Qualified Primitive ID) of this Entity.
-   */
-  const String getFqpi() const;
+    /**
+       @return FQPI (Fully Qualified Primitive ID) of this Entity.
+    */
+    const String getFqpi() const;
 
-  /**
-    Returns activity value (per delta-T) of this Entity.
-    Override this in subclasses.  If there is no overriding method,
-    this returns zero.
+    /**
+       Returns activity value (per delta-T) of this Entity.
+       Override this in subclasses.  If there is no overriding method,
+       this returns zero.
 
-    @return activity of this Entity
-    @see getActivityPerSecond()
-   */
-  virtual Real getActivity();
+       @return activity of this Entity
+       @see getActivityPerSecond()
+    */
+    virtual Real getActivity();
 
-  /**
-    Returns activity value (per second).
-    Default action of this method is to return getActivity() / delta-T,
-    but this can be changed in subclasses.
+    /**
+       Returns activity value (per second).
+       Default action of this method is to return getActivity() / delta-T,
+       but this can be changed in subclasses.
 
-    @return activity of this Entity per second
-   */
-  virtual Real getActivityPerSecond();
+       @return activity of this Entity per second
+    */
+    virtual Real getActivityPerSecond();
 
-  virtual const char* const getClassName() const { return "Entity"; }
+    virtual const char* const getClassName() const { return "Entity"; }
 
-protected:
+  protected:
 
-  virtual void makeSlots();
+    virtual void makeSlots();
 
-private:
+  private:
 
-  // hide them
-  Entity( EntityRef );
-  EntityRef operator=( EntityRef );
+    // hide them
+    Entity( EntityRef );
+    EntityRef operator=( EntityRef );
 
-private:
+  private:
 
-  SystemPtr theSuperSystem;
-  String theId;
-  String theName;
-};
+    SystemPtr theSuperSystem;
+    String theId;
+    String theName;
+  };
+ 
+
+} // namespace libecs
 
 #endif /*  ___ENTITY_H___ */
 

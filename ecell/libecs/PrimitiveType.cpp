@@ -33,76 +33,83 @@
 #include "Exceptions.hpp"
 #include "PrimitiveType.hpp"
 
-const String PrimitiveTypeStringOf( PrimitiveType type )
+
+namespace libecs
 {
-  switch( type )
-    {
-    case SUBSTANCE:
-      return PrimitiveTypeStringOfSubstance();
-    case REACTOR:
-      return PrimitiveTypeStringOfReactor();
-    case SYSTEM:
-      return PrimitiveTypeStringOfSystem();
-    case ENTITY:
-      return PrimitiveTypeStringOfEntity();
-    default:
-      throw InvalidPrimitiveType( __PRETTY_FUNCTION__, 
-				  "can't create PrimitiveTypeString." );
-    }
 
-  //FIXME: NEVER_GET_HERE
-  assert( 0 );
-  return "";
-}
+  const String PrimitiveTypeStringOf( PrimitiveType type )
+  {
+    switch( type )
+      {
+      case SUBSTANCE:
+	return PrimitiveTypeStringOfSubstance();
+      case REACTOR:
+	return PrimitiveTypeStringOfReactor();
+      case SYSTEM:
+	return PrimitiveTypeStringOfSystem();
+      case ENTITY:
+	return PrimitiveTypeStringOfEntity();
+      default:
+	throw InvalidPrimitiveType( __PRETTY_FUNCTION__, 
+				    "can't create PrimitiveTypeString." );
+      }
 
-const String PrimitiveTypeStringOf( StringCref fqpi )
-{
-  String::size_type aBorder( fqpi.find( ':' ) );
+    //FIXME: NEVER_GET_HERE
+    assert( 0 );
+    return "";
+  }
 
-  if( aBorder == String::npos )
-    {
-      throw BadID( __PRETTY_FUNCTION__,
-		   "no \':\' found in \"" + fqpi + "\"." );
-    }
-  if( fqpi.find( ':', aBorder + 1 ) == String::npos )
-    {
-      throw BadID( __PRETTY_FUNCTION__,
-		   "not enough \':\'s found in \"" + fqpi + "\"." );
-    }
+  const String PrimitiveTypeStringOf( StringCref fqpi )
+  {
+    String::size_type aBorder( fqpi.find( ':' ) );
+
+    if( aBorder == String::npos )
+      {
+	throw BadID( __PRETTY_FUNCTION__,
+		     "no \':\' found in \"" + fqpi + "\"." );
+      }
+    if( fqpi.find( ':', aBorder + 1 ) == String::npos )
+      {
+	throw BadID( __PRETTY_FUNCTION__,
+		     "not enough \':\'s found in \"" + fqpi + "\"." );
+      }
   
-  String aTypeString( fqpi.substr( 0, aBorder ) );
+    String aTypeString( fqpi.substr( 0, aBorder ) );
 
-  return aTypeString;
-}
+    return aTypeString;
+  }
 
-PrimitiveType PrimitiveTypeOf( StringCref typestring )
-{
-  PrimitiveType aType;
+  PrimitiveType PrimitiveTypeOf( StringCref typestring )
+  {
+    PrimitiveType aType;
 
-  if( typestring == PrimitiveTypeStringOfSubstance() )
-    {
-      aType = SUBSTANCE;
-    }
-  else if( typestring == PrimitiveTypeStringOfReactor() )
-    {
-      aType = REACTOR;
-    }
-  else if( typestring == PrimitiveTypeStringOfSystem() )
-    {
-      aType = SYSTEM;
-    }
-  else if( typestring == PrimitiveTypeStringOfEntity() )
-    {
-      aType = ENTITY;
-    }
-  else
-    {
-      throw InvalidPrimitiveType( __PRETTY_FUNCTION__, 
-				  "can't convert typestring [" + typestring
-				  + "] to PrimitiveType." );
-    }
+    if( typestring == PrimitiveTypeStringOfSubstance() )
+      {
+	aType = SUBSTANCE;
+      }
+    else if( typestring == PrimitiveTypeStringOfReactor() )
+      {
+	aType = REACTOR;
+      }
+    else if( typestring == PrimitiveTypeStringOfSystem() )
+      {
+	aType = SYSTEM;
+      }
+    else if( typestring == PrimitiveTypeStringOfEntity() )
+      {
+	aType = ENTITY;
+      }
+    else
+      {
+	throw InvalidPrimitiveType( __PRETTY_FUNCTION__, 
+				    "can't convert typestring [" + typestring
+				    + "] to PrimitiveType." );
+      }
 
-  return aType;
-}
+    return aType;
+  }
 
+
+
+} // namespace libecs
 

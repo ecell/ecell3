@@ -32,10 +32,14 @@
 #include "LocalSimulatorImplementation.hpp"
 #include "Simulator.hpp"
 
-Simulator::Simulator()
+namespace libemc
 {
-  //FIXME: should be created by SimulatorMaker
-  theSimulatorImplementation = new LocalSimulatorImplementation();
-}
+
+  Simulator::Simulator()
+  {
+    //FIXME: should be created by SimulatorMaker
+    theSimulatorImplementation = new LocalSimulatorImplementation();
+  }
 
 
+} // namespace libemc

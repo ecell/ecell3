@@ -35,260 +35,268 @@
 
 #include "libecs.hpp"
 
-typedef IntegratorPtr ( *IntegratorAllocator_ )( Substance& );
-DECLARE_TYPE( IntegratorAllocator_, IntegratorAllocator );
-
-typedef StepperPtr (* StepperAllocatorFunc )();
-
-
-class Stepper
-{
-
-public:
-
-  Stepper(); 
-  virtual ~Stepper() {}
-
-  void setOwner( SystemPtr owner ) { theOwner = owner; }
-  SystemPtr getOwner() const { return theOwner; }
-
-  virtual void initialize();
-
-  virtual Real getDeltaT() = 0;
-  virtual bool isMasterStepper() const { return false; }
-
-  virtual void clear() = 0;
-  virtual void react() = 0;
-  virtual void transit() = 0;
-  virtual void postern() = 0;
-
-  virtual void distributeIntegrator( IntegratorAllocatorPtr );
-
-  virtual const char* const className() const  { return "Stepper"; }
-
-protected:
-
-  SystemPtr theOwner;
-
-};
-
-class MasterStepper : public Stepper
-{
-
-public:
-
-  typedef list<SlaveStepperPtr> SlaveStepperList;
-  typedef SlaveStepperList::iterator SlaveStepperListIterator;
-
-  MasterStepper();
-
-  void setPace( int pace ) { thePace = pace; }
-  void setdeltaT( Real dt ) { theDeltaT = dt; }
-
-  virtual ~MasterStepper() {}
-
-  virtual int getNumberOfSteps() const { return 1; }
-  int getPace() const { return thePace; }
-
-  virtual Real getDeltaT(); 
-  virtual void initialize();
-
-  virtual void distributeIntegrator( IntegratorAllocator );
-  void registerSlaves( SystemPtr );
-
-  virtual bool isMasterStepper() const { return true; }
-
-  virtual const char* const className() const  { return "MasterStepper"; }
-
-protected:
-
-  int                 thePace;
-  Real               theDeltaT;
-  IntegratorAllocator theAllocator;
-  SlaveStepperList    theSlavesList;
-
-};
-
-
-class StepperLeader
-{
-
-  typedef multimap<int,MasterStepperPtr> MasterStepperMap;
-
-public:
-
-  StepperLeader();
-  virtual ~StepperLeader() {}
-
-  void registerMasterStepper( MasterStepperPtr newstepper );
-
-  static void setDefaultUpdateDepth( int d ) { DEFAULT_UPDATE_DEPTH = d; }
-  static int getDefaultUpdateDepth()         { return DEFAULT_UPDATE_DEPTH; }
-
-  void setUpdateDepth( int d ) { theUpdateDepth = d; }
-  int getUpdateDepth()         { return theUpdateDepth; }
-
-  virtual void initialize();
-
-  Real getDeltaT()
-  {
-    return theStepInterval;
-  }
-
-  int getBaseClock() 
-  { 
-    return theBaseClock; 
-  }
-
-  void step();
-  virtual void clear();
-  virtual void react();
-  virtual void transit();
-  virtual void postern();
-
-  void update();
-  virtual const char* const className() const  { return "StepperLeader"; }
-
-protected:
-
-  void setBaseClock( int baseclock );
-
-protected:
-
-  MasterStepperMap theStepperList;
-
-private:
-
-  int theUpdateDepth;
-  int theBaseClock;
-
-  Real theStepInterval;
-
-  static int DEFAULT_UPDATE_DEPTH;
-
-};
-
-
 #include "System.hpp"
 
-class SlaveStepper : public Stepper
+
+
+namespace libecs
 {
 
-public:
 
-  SlaveStepper() {}
-  virtual ~SlaveStepper() {}
+  typedef IntegratorPtr ( *IntegratorAllocator_ )( Substance& );
+  DECLARE_TYPE( IntegratorAllocator_, IntegratorAllocator );
+
+  typedef StepperPtr (* StepperAllocatorFunc )();
+
+
+  class Stepper
+  {
+
+  public:
+
+    Stepper(); 
+    virtual ~Stepper() {}
+
+    void setOwner( SystemPtr owner ) { theOwner = owner; }
+    SystemPtr getOwner() const { return theOwner; }
+
+    virtual void initialize();
+
+    virtual Real getDeltaT() = 0;
+    virtual bool isMasterStepper() const { return false; }
+
+    virtual void clear() = 0;
+    virtual void react() = 0;
+    virtual void transit() = 0;
+    virtual void postern() = 0;
+
+    virtual void distributeIntegrator( IntegratorAllocatorPtr );
+
+    virtual const char* const className() const  { return "Stepper"; }
+
+  protected:
+
+    SystemPtr theOwner;
+
+  };
+
+  class MasterStepper : public Stepper
+  {
+
+  public:
+
+    typedef list<SlaveStepperPtr> SlaveStepperList;
+    typedef SlaveStepperList::iterator SlaveStepperListIterator;
+
+    MasterStepper();
+
+    void setPace( int pace ) { thePace = pace; }
+    void setdeltaT( Real dt ) { theDeltaT = dt; }
+
+    virtual ~MasterStepper() {}
+
+    virtual int getNumberOfSteps() const { return 1; }
+    int getPace() const { return thePace; }
+
+    virtual Real getDeltaT(); 
+    virtual void initialize();
+
+    virtual void distributeIntegrator( IntegratorAllocator );
+    void registerSlaves( SystemPtr );
+
+    virtual bool isMasterStepper() const { return true; }
+
+    virtual const char* const className() const  { return "MasterStepper"; }
+
+  protected:
+
+    int                 thePace;
+    Real               theDeltaT;
+    IntegratorAllocator theAllocator;
+    SlaveStepperList    theSlavesList;
+
+  };
+
+
+  class StepperLeader
+  {
+
+    typedef multimap<int,MasterStepperPtr> MasterStepperMap;
+
+  public:
+
+    StepperLeader();
+    virtual ~StepperLeader() {}
+
+    void registerMasterStepper( MasterStepperPtr newstepper );
+
+    static void setDefaultUpdateDepth( int d ) { DEFAULT_UPDATE_DEPTH = d; }
+    static int getDefaultUpdateDepth()         { return DEFAULT_UPDATE_DEPTH; }
+
+    void setUpdateDepth( int d ) { theUpdateDepth = d; }
+    int getUpdateDepth()         { return theUpdateDepth; }
+
+    virtual void initialize();
+
+    Real getDeltaT()
+    {
+      return theStepInterval;
+    }
+
+    int getBaseClock() 
+    { 
+      return theBaseClock; 
+    }
+
+    void step();
+    virtual void clear();
+    virtual void react();
+    virtual void transit();
+    virtual void postern();
+
+    void update();
+    virtual const char* const className() const  { return "StepperLeader"; }
+
+  protected:
+
+    void setBaseClock( int baseclock );
+
+  protected:
+
+    MasterStepperMap theStepperList;
+
+  private:
+
+    int theUpdateDepth;
+    int theBaseClock;
+
+    Real theStepInterval;
+
+    static int DEFAULT_UPDATE_DEPTH;
+
+  };
+
+
+  class SlaveStepper : public Stepper
+  {
+
+  public:
+
+    SlaveStepper() {}
+    virtual ~SlaveStepper() {}
 
   
-  // virtual and inlined.
-  // this is for optimization in operations with SlaveStepperPtrs.
-  // (e.g. loops over SlaveStepperList in MasterStepper)
-  virtual void clear()
+    // virtual and inlined.
+    // this is for optimization in operations with SlaveStepperPtrs.
+    // (e.g. loops over SlaveStepperList in MasterStepper)
+    virtual void clear()
+    {
+      theOwner->clear();
+    }
+
+    virtual void react()
+    {
+      theOwner->react();
+    }
+
+    virtual void turn()
+    {
+      theOwner->turn();
+    }
+
+    virtual void transit()
+    {
+      theOwner->transit();
+    }
+
+    virtual void postern()
+    {
+      theOwner->postern();
+    }
+
+    virtual void initialize()
+    {
+      Stepper::initialize();
+    }
+
+    void setMaster( MasterStepperPtr master ) 
+    { 
+      theMaster = master; 
+    }
+
+    Real getDeltaT() 
+    { 
+      // Slaves are synchronous to their masters.
+      return theMaster->getDeltaT(); 
+    }
+
+    static StepperPtr instance() { return new SlaveStepper; }
+
+    virtual const char* const className() const  { return "SlaveStepper"; }
+
+  private:
+
+    MasterStepperPtr theMaster;
+
+  };
+
+
+  class Euler1Stepper : public MasterStepper
   {
-    theOwner->clear();
-  }
 
-  virtual void react()
-  {
-    theOwner->react();
-  }
+  public:
 
-  virtual void turn()
-  {
-    theOwner->turn();
-  }
+    Euler1Stepper();
+    virtual ~Euler1Stepper() {}
 
-  virtual void transit()
-  {
-    theOwner->transit();
-  }
+    static StepperPtr instance() { return new Euler1Stepper; }
 
-  virtual void postern()
-  {
-    theOwner->postern();
-  }
+    virtual int getNumberOfSteps() { return 1; }
+    virtual void clear();
+    virtual void react();
+    //  virtual void check();
+    virtual void transit();
+    virtual void postern();
+    virtual void initialize();
 
-  virtual void initialize()
-  {
-    Stepper::initialize();
-  }
-
-  void setMaster( MasterStepperPtr master ) 
-  { 
-    theMaster = master; 
-  }
-
-  Real getDeltaT() 
-  { 
-    // Slaves are synchronous to their masters.
-    return theMaster->getDeltaT(); 
-  }
-
-  static StepperPtr instance() { return new SlaveStepper; }
-
-  virtual const char* const className() const  { return "SlaveStepper"; }
-
-private:
-
-  MasterStepperPtr theMaster;
-
-};
-
-
-class Euler1Stepper : public MasterStepper
-{
-
-public:
-
-  Euler1Stepper();
-  virtual ~Euler1Stepper() {}
-
-  static StepperPtr instance() { return new Euler1Stepper; }
-
-  virtual int getNumberOfSteps() { return 1; }
-  virtual void clear();
-  virtual void react();
-//  virtual void check();
-  virtual void transit();
-  virtual void postern();
-  virtual void initialize();
-
-  virtual const char* const className() const  { return "Euler1Stepper"; }
+    virtual const char* const className() const  { return "Euler1Stepper"; }
  
-protected:
+  protected:
 
-  static IntegratorPtr newEuler1( SubstanceRef substance );
+    static IntegratorPtr newEuler1( SubstanceRef substance );
 
-};
-
-
-class RungeKutta4Stepper : public MasterStepper
-{
-
-public:
-
-  RungeKutta4Stepper();
-  virtual ~RungeKutta4Stepper() {}
-
-  static StepperPtr instance() { return new RungeKutta4Stepper; }
-
-  virtual int getNumberOfSteps() { return 4; }
-
-  virtual void clear();
-  virtual void react();
-  virtual void transit();
-  virtual void postern();
-
-  virtual void initialize();
+  };
 
 
-  virtual const char* const className() const  { return "RungeKuttaStepper"; }
+  class RungeKutta4Stepper : public MasterStepper
+  {
 
-protected:
+  public:
 
-  static IntegratorPtr newRungeKutta4( SubstanceRef substance );
+    RungeKutta4Stepper();
+    virtual ~RungeKutta4Stepper() {}
 
-};
+    static StepperPtr instance() { return new RungeKutta4Stepper; }
+
+    virtual int getNumberOfSteps() { return 4; }
+
+    virtual void clear();
+    virtual void react();
+    virtual void transit();
+    virtual void postern();
+
+    virtual void initialize();
+
+
+    virtual const char* const className() const  { return "RungeKuttaStepper"; }
+
+  protected:
+
+    static IntegratorPtr newRungeKutta4( SubstanceRef substance );
+
+  };
+
+} // namespace libecs
 
 #endif /* ___STEPPER_H___ */
 

@@ -36,36 +36,42 @@
 
 #include "SimulatorImplementation.hpp"
 
-
-class LocalSimulatorImplementation
-  :
-  public SimulatorImplementation
+namespace libemc
 {
 
-public:
+  class LocalSimulatorImplementation
+    :
+    public SimulatorImplementation
+  {
 
-  LocalSimulatorImplementation();
-  virtual ~LocalSimulatorImplementation();
+  public:
 
-  RootSystemRef getRootSystem() { return theRootSystem; }
+    LocalSimulatorImplementation();
+    virtual ~LocalSimulatorImplementation();
 
-  void createEntity( StringCref classname, 
-		      FQPICref fqpi, 
-		      StringCref name );
+    RootSystemRef getRootSystem() { return theRootSystem; }
 
-  void setProperty( FQPICref fqpi, 
-		    MessageCref message );
+    void createEntity( StringCref classname, 
+		       FQPICref fqpi, 
+		       StringCref name );
 
-  const Message getProperty( FQPICref fqpi, StringCref propertyName );
+    void setProperty( FQPICref fqpi, 
+		      MessageCref message );
 
-  void step();
+    const Message getProperty( FQPICref fqpi, StringCref propertyName );
 
-  void initialize();
+    void step();
 
-private:
+    void initialize();
 
-  RootSystemRef     theRootSystem;
+  private:
 
-};   //end of class LocalSimulatorImplementation
+    RootSystemRef     theRootSystem;
+
+  };   //end of class LocalSimulatorImplementation
+
+
+} // namespace libemc
+
 
 #endif   /* ___LOCAL_SIMULATOR_IMPLEMENTATION_H___ */

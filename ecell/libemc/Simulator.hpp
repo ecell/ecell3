@@ -37,51 +37,58 @@
 
 #include "SimulatorImplementation.hpp"
 
-
-class Simulator
+namespace libemc
 {
 
-public:
 
-  Simulator();
-  virtual ~Simulator() {}
+  using namespace libecs;
 
-  void createEntity( StringCref classname, 
-		      FQPICref fqpi,
-		      StringCref name )
+  class Simulator
   {
-    theSimulatorImplementation->createEntity( classname, fqpi, name );
-  }
 
-  void setProperty( FQPICref fqpi, 
-		    MessageCref message )
-  {
-    theSimulatorImplementation->setProperty( fqpi, message );
-  }
+  public:
 
+    Simulator();
+    virtual ~Simulator() {}
 
-  const Message getProperty( FQPICref fqpi, 
-		      StringCref propertyName )
-  {
-    return theSimulatorImplementation->getProperty( fqpi, propertyName ); 
-  }
+    void createEntity( StringCref classname, 
+		       FQPICref fqpi,
+		       StringCref name )
+    {
+      theSimulatorImplementation->createEntity( classname, fqpi, name );
+    }
 
-  void step()
-  {
-    theSimulatorImplementation->step();
-  }
-
-  void initialize()
-  {
-    theSimulatorImplementation->initialize();
-  }
+    void setProperty( FQPICref fqpi, 
+		      MessageCref message )
+    {
+      theSimulatorImplementation->setProperty( fqpi, message );
+    }
 
 
-private:
+    const Message getProperty( FQPICref fqpi, 
+			       StringCref propertyName )
+    {
+      return theSimulatorImplementation->getProperty( fqpi, propertyName ); 
+    }
 
-  SimulatorImplementation* theSimulatorImplementation;
+    void step()
+    {
+      theSimulatorImplementation->step();
+    }
 
-};
+    void initialize()
+    {
+      theSimulatorImplementation->initialize();
+    }
+
+
+  private:
+
+    SimulatorImplementation* theSimulatorImplementation;
+
+  };
+
+} // namespace libemc
 
 #endif   /* ___SIMULATOR_H___ */
 

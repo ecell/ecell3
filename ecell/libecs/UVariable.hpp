@@ -35,272 +35,278 @@
 
 #include "libecs.hpp"
 
-DECLARE_CLASS( UniversalVariableData );
-DECLARE_CLASS( UniversalVariableStringData );
-DECLARE_CLASS( UniversalVariableRealData );
-DECLARE_CLASS( UniversalVariableIntData );
 
-
-
-class UniversalVariableData
+namespace libecs
 {
 
-public:
+  DECLARE_CLASS( UniversalVariableData );
+  DECLARE_CLASS( UniversalVariableStringData );
+  DECLARE_CLASS( UniversalVariableRealData );
+  DECLARE_CLASS( UniversalVariableIntData );
 
-  virtual ~UniversalVariableData()
+
+
+  class UniversalVariableData
   {
-    ; // do nothing
-  }
 
-  virtual const String asString() const = 0;
-  virtual const Real  asReal()  const = 0;
-  virtual const Int    asInt()    const = 0;
+  public:
 
-  virtual const bool isString() const 
-  {
-    return false;
-  }
+    virtual ~UniversalVariableData()
+    {
+      ; // do nothing
+    }
 
-  virtual const bool isReal() const
-  {
-    return false;
-  }
+    virtual const String asString() const = 0;
+    virtual const Real  asReal()  const = 0;
+    virtual const Int    asInt()    const = 0;
 
-  virtual const bool isInt() const
-  {
-    return false;
-  }
+    virtual const bool isString() const 
+    {
+      return false;
+    }
 
-  virtual UniversalVariableDataPtr createClone() const = 0;
+    virtual const bool isReal() const
+    {
+      return false;
+    }
 
-protected:
+    virtual const bool isInt() const
+    {
+      return false;
+    }
+
+    virtual UniversalVariableDataPtr createClone() const = 0;
+
+  protected:
   
-  UniversalVariableData( UniversalVariableDataCref ) {}
-  UniversalVariableData() {}
+    UniversalVariableData( UniversalVariableDataCref ) {}
+    UniversalVariableData() {}
 
-private:
+  private:
 
-  UniversalVariableCref operator= ( UniversalVariableCref );
+    UniversalVariableCref operator= ( UniversalVariableCref );
 
-};
+  };
 
 
-class UniversalVariableStringData : public UniversalVariableData
-{
+  class UniversalVariableStringData : public UniversalVariableData
+  {
   
-public:
+  public:
 
-  UniversalVariableStringData( StringCref  str ) 
-    : 
-    theString( str ) 
-  {
-    ; // do nothing
-  }
+    UniversalVariableStringData( StringCref  str ) 
+      : 
+      theString( str ) 
+    {
+      ; // do nothing
+    }
   
-  UniversalVariableStringData( const Real f );
-  UniversalVariableStringData( const Int   i );
+    UniversalVariableStringData( const Real f );
+    UniversalVariableStringData( const Int   i );
 
-  UniversalVariableStringData( UniversalVariableDataCref uvi )
-    :
-    theString( uvi.asString() )
+    UniversalVariableStringData( UniversalVariableDataCref uvi )
+      :
+      theString( uvi.asString() )
+    {
+      ; // do nothing
+    }
+
+    const String asString() const { return theString; }
+    const Real  asReal() const;
+    const Int    asInt() const;
+
+    virtual const bool isString() const
+    {
+      return true;
+    }
+
+    virtual UniversalVariableDataPtr createClone() const
+    {
+      return new UniversalVariableStringData( *this );
+    }
+
+  private:
+
+    String theString;
+
+  };
+
+  class UniversalVariableRealData : public UniversalVariableData
   {
-    ; // do nothing
-  }
 
-  const String asString() const { return theString; }
-  const Real  asReal() const;
-  const Int    asInt() const;
+  public:
 
-  virtual const bool isString() const
+    UniversalVariableRealData( StringCref str );
+    UniversalVariableRealData( const Real      f ) 
+      : 
+      theReal( f ) 
+    {
+      ; // do nothing
+    }
+
+    UniversalVariableRealData( const Int        i ) 
+      : 
+      theReal( static_cast<Real>( i ) )
+    {
+      ; // do nothing
+    }
+
+    const String asString() const;
+    const Real  asReal() const { return theReal; }
+    // FIXME: range check
+    const Int    asInt() const { return static_cast<Int>( theReal ); }
+
+    virtual const bool isReal() const
+    {
+      return true;
+    }
+
+    virtual UniversalVariableDataPtr createClone() const
+    {
+      return new UniversalVariableRealData( *this );
+    }
+
+  private:
+
+    Real theReal;
+
+  };
+
+  class UniversalVariableIntData : public UniversalVariableData
   {
-    return true;
-  }
 
-  virtual UniversalVariableDataPtr createClone() const
-  {
-    return new UniversalVariableStringData( *this );
-  }
+  public:
 
-private:
+    UniversalVariableIntData( StringCref str );
+    UniversalVariableIntData( const Real      f );
+    UniversalVariableIntData( const Int        i ) 
+      : 
+      theInt( i ) 
+    {
+      ; // do nothing
+    }
 
-  String theString;
-
-};
-
-class UniversalVariableRealData : public UniversalVariableData
-{
-
-public:
-
-  UniversalVariableRealData( StringCref str );
-  UniversalVariableRealData( const Real      f ) 
-    : 
-    theReal( f ) 
-  {
-    ; // do nothing
-  }
-
-  UniversalVariableRealData( const Int        i ) 
-    : 
-    theReal( static_cast<Real>( i ) )
-  {
-    ; // do nothing
-  }
-
-  const String asString() const;
-  const Real  asReal() const { return theReal; }
-  // FIXME: range check
-  const Int    asInt() const { return static_cast<Int>( theReal ); }
-
-  virtual const bool isReal() const
-  {
-    return true;
-  }
-
-  virtual UniversalVariableDataPtr createClone() const
-  {
-    return new UniversalVariableRealData( *this );
-  }
-
-private:
-
-  Real theReal;
-
-};
-
-class UniversalVariableIntData : public UniversalVariableData
-{
-
-public:
-
-  UniversalVariableIntData( StringCref str );
-  UniversalVariableIntData( const Real      f );
-  UniversalVariableIntData( const Int        i ) 
-    : 
-    theInt( i ) 
-  {
-    ; // do nothing
-  }
-
-  const String asString() const;
-  const Real  asReal() const { return static_cast<Real>( theInt ); }
-  const Int    asInt() const   { return theInt; }
+    const String asString() const;
+    const Real  asReal() const { return static_cast<Real>( theInt ); }
+    const Int    asInt() const   { return theInt; }
   
-  virtual const bool isInt() const
+    virtual const bool isInt() const
+    {
+      return true;
+    }
+
+    virtual UniversalVariableDataPtr createClone() const
+    {
+      return new UniversalVariableIntData( *this );
+    }
+
+  private:
+
+    Int theInt;
+
+  };
+
+
+
+  class UniversalVariable
   {
-    return true;
-  }
 
-  virtual UniversalVariableDataPtr createClone() const
-  {
-    return new UniversalVariableIntData( *this );
-  }
-
-private:
-
-  Int theInt;
-
-};
-
-
-
-class UniversalVariable
-{
-
-public:
+  public:
   
-  UniversalVariable( StringCref  string ) 
-    //    :
-    //    theData( new UniversalVariableStringData( string ) )
-  {
-    theData = new UniversalVariableStringData( string );
-    ; // do nothing
-  }
+    UniversalVariable( StringCref  string ) 
+      //    :
+      //    theData( new UniversalVariableStringData( string ) )
+    {
+      theData = new UniversalVariableStringData( string );
+      ; // do nothing
+    }
   
-  UniversalVariable( const Real f )      
-    :
-    theData( new UniversalVariableRealData( f ) )
-  {
-    ; // do nothing
-  }
+    UniversalVariable( const Real f )      
+      :
+      theData( new UniversalVariableRealData( f ) )
+    {
+      ; // do nothing
+    }
 
-  UniversalVariable( const Int   i )      
-    :
-    theData( new UniversalVariableIntData( i ) )
-  {
-    ; // do nothing
-  }
+    UniversalVariable( const Int   i )      
+      :
+      theData( new UniversalVariableIntData( i ) )
+    {
+      ; // do nothing
+    }
 
-  UniversalVariable( UniversalVariableCref uv )
-    :
-    theData( uv.createDataClone() )
-  {
-    ; // do nothing
-  }
+    UniversalVariable( UniversalVariableCref uv )
+      :
+      theData( uv.createDataClone() )
+    {
+      ; // do nothing
+    }
 
-  virtual ~UniversalVariable()
-  {
-    delete theData;
-  }
+    virtual ~UniversalVariable()
+    {
+      delete theData;
+    }
 
-  UniversalVariableCref operator= ( UniversalVariableCref rhs )
-  {
-    if( this != &rhs )
-      {
-	delete theData;
-	theData = rhs.createDataClone();
-      }
+    UniversalVariableCref operator= ( UniversalVariableCref rhs )
+    {
+      if( this != &rhs )
+	{
+	  delete theData;
+	  theData = rhs.createDataClone();
+	}
     
-    return *this;
-  }
+      return *this;
+    }
 
-  const String asString() const
-  { 
-    return theData->asString(); 
-  }
+    const String asString() const
+    { 
+      return theData->asString(); 
+    }
 
-  const Real  asReal() const
-  { 
-    assert( theData );
-    return theData->asReal(); 
-  }
+    const Real  asReal() const
+    { 
+      assert( theData );
+      return theData->asReal(); 
+    }
   
-  const Int    asInt() const
-  { 
-    return theData->asInt();
-  }
+    const Int    asInt() const
+    { 
+      return theData->asInt();
+    }
 
-  const bool isString() const
-  { 
-    return theData->isString();
-  }
+    const bool isString() const
+    { 
+      return theData->isString();
+    }
 
-  const bool isReal() const
-  {
-    return theData->isReal();
-  }
+    const bool isReal() const
+    {
+      return theData->isReal();
+    }
 
-  const bool isInt() const
-  { 
-    return theData->isInt(); 
-  }
+    const bool isInt() const
+    { 
+      return theData->isInt(); 
+    }
 
-protected:
+  protected:
 
-  UniversalVariableDataPtr createDataClone() const
-  {
-    return theData->createClone();
-  }
+    UniversalVariableDataPtr createDataClone() const
+    {
+      return theData->createClone();
+    }
 
-private:
+  private:
 
-  UniversalVariable();
+    UniversalVariable();
 
-private:
+  private:
 
-  UniversalVariableDataPtr theData;
+    UniversalVariableDataPtr theData;
 
-};
+  };
 
+
+} // namespace libecs
 
 #endif /* ___UNIVERSALVARIABLE_H___ */

@@ -34,404 +34,409 @@
 
 #include "Stepper.hpp"
 
-
-////////////////////////// Stepper
-
-Stepper::Stepper() : theOwner( NULLPTR )
+namespace libecs
 {
 
-}
+  ////////////////////////// Stepper
 
-void Stepper::distributeIntegrator( IntegratorAllocator* allocator )
-{
-  assert( theOwner );
+  Stepper::Stepper() : theOwner( NULLPTR )
+  {
+
+  }
+
+  void Stepper::distributeIntegrator( IntegratorAllocator* allocator )
+  {
+    assert( theOwner );
   
-  for( SubstanceListIterator s = theOwner->getFirstSubstanceIterator();
-       s != theOwner->getLastSubstanceIterator() ; ++s)
-    {
-      (*allocator)(*(s->second));
-    }
-}
+    for( SubstanceListIterator s = theOwner->getFirstSubstanceIterator();
+	 s != theOwner->getLastSubstanceIterator() ; ++s)
+      {
+	(*allocator)(*(s->second));
+      }
+  }
 
-void Stepper::initialize()
-{
-  // FIXME: use exception?
-  assert( theOwner );
-}
+  void Stepper::initialize()
+  {
+    // FIXME: use exception?
+    assert( theOwner );
+  }
 
-////////////////////////// MasterStepper
+  ////////////////////////// MasterStepper
 
-MasterStepper::MasterStepper() 
-  :
-  thePace( 1 ),
-  theAllocator( NULLPTR )
-{
+  MasterStepper::MasterStepper() 
+    :
+    thePace( 1 ),
+    theAllocator( NULLPTR )
+  {
 
-}
+  }
 
-void MasterStepper::initialize()
-{
-  // FIXME: is this multiple-time-initialization-proof?
+  void MasterStepper::initialize()
+  {
+    // FIXME: is this multiple-time-initialization-proof?
 
-  Stepper::initialize();
+    Stepper::initialize();
 
-  getOwner()->getRootSystem()->
-    getStepperLeader().registerMasterStepper( this );
+    getOwner()->getRootSystem()->
+      getStepperLeader().registerMasterStepper( this );
 
-  registerSlaves( theOwner );
+    registerSlaves( theOwner );
 
-  distributeIntegrator( IntegratorAllocator( theAllocator ) );
+    distributeIntegrator( IntegratorAllocator( theAllocator ) );
 
-  for( SlaveStepperListIterator i = theSlavesList.begin() ; 
-       i != theSlavesList.end() ; ++i )
-    {
-      (*i)->initialize();
-    }
-}
+    for( SlaveStepperListIterator i = theSlavesList.begin() ; 
+	 i != theSlavesList.end() ; ++i )
+      {
+	(*i)->initialize();
+      }
+  }
 
-void MasterStepper::distributeIntegrator(IntegratorAllocator allocator)
-{
-  Stepper::distributeIntegrator( &allocator );
-  for( SlaveStepperListIterator i = theSlavesList.begin() ; 
-       i != theSlavesList.end() ; ++i )
-    {
-      (*i)->distributeIntegrator( &allocator );
-    }
-}
+  void MasterStepper::distributeIntegrator(IntegratorAllocator allocator)
+  {
+    Stepper::distributeIntegrator( &allocator );
+    for( SlaveStepperListIterator i = theSlavesList.begin() ; 
+	 i != theSlavesList.end() ; ++i )
+      {
+	(*i)->distributeIntegrator( &allocator );
+      }
+  }
 
 
-void MasterStepper::registerSlaves(System* system)
-{
-  for( SystemListIterator s = theOwner->getFirstSystemIterator() ;
-       s != theOwner->getLastSystemIterator() ; ++s )
-    {
-      SystemPtr aSystemPtr = s->second;
-      SlaveStepperPtr aSlaveStepperPtr;
+  void MasterStepper::registerSlaves(System* system)
+  {
+    for( SystemListIterator s = theOwner->getFirstSystemIterator() ;
+	 s != theOwner->getLastSystemIterator() ; ++s )
+      {
+	SystemPtr aSystemPtr = s->second;
+	SlaveStepperPtr aSlaveStepperPtr;
 
-      //FIXME: handle bad_cast
-      if( ( aSlaveStepperPtr = 
-	    dynamic_cast< SlaveStepperPtr >( aSystemPtr->getStepper() ) ) )
-	{
-	  theSlavesList.insert( theSlavesList.end(), aSlaveStepperPtr );
-	  aSlaveStepperPtr->setMaster( this );
-	  registerSlaves( aSystemPtr );
+	//FIXME: handle bad_cast
+	if( ( aSlaveStepperPtr = 
+	      dynamic_cast< SlaveStepperPtr >( aSystemPtr->getStepper() ) ) )
+	  {
+	    theSlavesList.insert( theSlavesList.end(), aSlaveStepperPtr );
+	    aSlaveStepperPtr->setMaster( this );
+	    registerSlaves( aSystemPtr );
 #ifdef DEBUG_STEPPER
-	  cerr << "MasterStepper(on " << owner()->fqen() << "): registered " << it->fqen()  << endl;
+	    cerr << "MasterStepper(on " << owner()->fqen() << "): registered " << it->fqen()  << endl;
 #endif /* DEBUG_STEPPER */
-	}
-    }
-}
+	  }
+      }
+  }
 
-Real MasterStepper::getDeltaT()
-{
-  // FIXME: should be return theDeltaT
-  return getOwner()->getRootSystem()->getStepperLeader().getDeltaT();
-}
+  Real MasterStepper::getDeltaT()
+  {
+    // FIXME: should be return theDeltaT
+    return getOwner()->getRootSystem()->getStepperLeader().getDeltaT();
+  }
 
 
-////////////////////////// StepperLeader
+  ////////////////////////// StepperLeader
 
-int StepperLeader::DEFAULT_UPDATE_DEPTH(1);
+  int StepperLeader::DEFAULT_UPDATE_DEPTH(1);
 
-StepperLeader::StepperLeader() 
-  : 
-  theUpdateDepth( DEFAULT_UPDATE_DEPTH ),
-  theBaseClock( 1 ),
-  theStepInterval( 0.001 )
-{
-  ; // do nothing
-}
+  StepperLeader::StepperLeader() 
+    : 
+    theUpdateDepth( DEFAULT_UPDATE_DEPTH ),
+    theBaseClock( 1 ),
+    theStepInterval( 0.001 )
+  {
+    ; // do nothing
+  }
 
-void StepperLeader::setBaseClock( int clock )
-{
-  theBaseClock = clock;
-}
+  void StepperLeader::setBaseClock( int clock )
+  {
+    theBaseClock = clock;
+  }
 
-void StepperLeader::registerMasterStepper( MasterStepperPtr newone )
-{
-  theStepperList.insert( pair< int, MasterStepperPtr >( newone->getPace(),
-							newone ) );
-  setBaseClock( lcm( newone->getPace(), getBaseClock() ) );
+  void StepperLeader::registerMasterStepper( MasterStepperPtr newone )
+  {
+    theStepperList.insert( pair< int, MasterStepperPtr >( newone->getPace(),
+							  newone ) );
+    setBaseClock( lcm( newone->getPace(), getBaseClock() ) );
 
 #ifdef DEBUG_STEPPER
-  cerr << "registered new master stepper (pace: " << newone->pace() << ")." << endl;
-  cerr << "base clock: " << getBaseClock() << endl;
+    cerr << "registered new master stepper (pace: " << newone->pace() << ")." << endl;
+    cerr << "base clock: " << getBaseClock() << endl;
 #endif  
-}
+  }
 
-void StepperLeader::initialize()
-{
-  for( MasterStepperMap::iterator i = theStepperList.begin();
-       i != theStepperList.end() ; i++)
-    {
-      (*i).second->initialize();
-    }
-}
+  void StepperLeader::initialize()
+  {
+    for( MasterStepperMap::iterator i = theStepperList.begin();
+	 i != theStepperList.end() ; i++)
+      {
+	(*i).second->initialize();
+      }
+  }
 
-void StepperLeader::step()
-{
+  void StepperLeader::step()
+  {
 #ifdef DEBUG_STEPPER
-  cerr << "StepperLeader: step()" << endl;
+    cerr << "StepperLeader: step()" << endl;
 #endif /* DEBUG_STEPPER */
 
-  clear();
-  react();
-  transit();
-  postern();
-}
+    clear();
+    react();
+    transit();
+    postern();
+  }
 
-void StepperLeader::clear()
-{
+  void StepperLeader::clear()
+  {
 #ifdef DEBUG_STEPPER
-  cerr << "StepperLeader: clear()" << endl;
+    cerr << "StepperLeader: clear()" << endl;
 #endif /* DEBUG_STEPPER */
 
-  for( MasterStepperMap::iterator i = theStepperList.begin();
-       i != theStepperList.end() ; ++i )
-    {
-      i->second->clear();
-    }
-}
+    for( MasterStepperMap::iterator i = theStepperList.begin();
+	 i != theStepperList.end() ; ++i )
+      {
+	i->second->clear();
+      }
+  }
 
-void StepperLeader::react()
-{
+  void StepperLeader::react()
+  {
 #ifdef DEBUG_STEPPER
-  cerr << "StepperLeader: react()" << endl;
+    cerr << "StepperLeader: react()" << endl;
 #endif /* DEBUG_STEPPER */
 
-  for( MasterStepperMap::iterator i = theStepperList.begin();
-       i != theStepperList.end(); i++ )
-    {
-      (*i).second->react();
-    }
-}
+    for( MasterStepperMap::iterator i = theStepperList.begin();
+	 i != theStepperList.end(); i++ )
+      {
+	(*i).second->react();
+      }
+  }
 
-void StepperLeader::transit()
-{
+  void StepperLeader::transit()
+  {
 #ifdef DEBUG_STEPPER
-  cerr << "StepperLeader: transit()" << endl;
+    cerr << "StepperLeader: transit()" << endl;
 #endif /* DEBUG_STEPPER */
 
-  for( MasterStepperMap::iterator i = theStepperList.begin();
-       i != theStepperList.end(); ++i )
-    {
-      i->second->transit();
-    }
+    for( MasterStepperMap::iterator i = theStepperList.begin();
+	 i != theStepperList.end(); ++i )
+      {
+	i->second->transit();
+      }
 
-}
+  }
 
-void StepperLeader::postern()
-{
+  void StepperLeader::postern()
+  {
 #ifdef DEBUG_STEPPER
-  cerr << "StepperLeader: transit()" << endl;
+    cerr << "StepperLeader: transit()" << endl;
 #endif /* DEBUG_STEPPER */
 
-  for( MasterStepperMap::iterator i = theStepperList.begin();
-       i != theStepperList.end(); ++i )
-    {
-      i->second->postern();
-    }
-}
+    for( MasterStepperMap::iterator i = theStepperList.begin();
+	 i != theStepperList.end(); ++i )
+      {
+	i->second->postern();
+      }
+  }
 
-void StepperLeader::update()
-{
-  for( int i = theUpdateDepth ; i > 0 ; --i )
-    {
-      for (MasterStepperMap::iterator i = theStepperList.begin();
-	   i != theStepperList.end(); ++i )
-	{
-	  i->second->postern();
-	}
-    }
-}
+  void StepperLeader::update()
+  {
+    for( int i = theUpdateDepth ; i > 0 ; --i )
+      {
+	for (MasterStepperMap::iterator i = theStepperList.begin();
+	     i != theStepperList.end(); ++i )
+	  {
+	    i->second->postern();
+	  }
+      }
+  }
 
-////////////////////////// Euler1Stepper
+  ////////////////////////// Euler1Stepper
 
-Euler1Stepper::Euler1Stepper()
-{
-  theAllocator = IntegratorAllocator( &Euler1Stepper::newEuler1 );
-}
+  Euler1Stepper::Euler1Stepper()
+  {
+    theAllocator = IntegratorAllocator( &Euler1Stepper::newEuler1 );
+  }
 
-IntegratorPtr Euler1Stepper::newEuler1( SubstanceRef substance )
-{
-  return new Euler1Integrator( substance );
-}
+  IntegratorPtr Euler1Stepper::newEuler1( SubstanceRef substance )
+  {
+    return new Euler1Integrator( substance );
+  }
 
-void Euler1Stepper::initialize()
-{
-  MasterStepper::initialize();
-}
+  void Euler1Stepper::initialize()
+  {
+    MasterStepper::initialize();
+  }
 
-void Euler1Stepper::clear()
-{
+  void Euler1Stepper::clear()
+  {
 #ifdef DEBUG_STEPPER
-  cerr << "Euler1Stepper: clear()" << endl;
+    cerr << "Euler1Stepper: clear()" << endl;
 #endif /* DEBUG_STEPPER */
-  theOwner->clear();
-  for( SlaveStepperListIterator i = theSlavesList.begin() ; 
-       i != theSlavesList.end() ; ++i )
-    {
-      (*i)->clear();
-    }
-}
+    theOwner->clear();
+    for( SlaveStepperListIterator i = theSlavesList.begin() ; 
+	 i != theSlavesList.end() ; ++i )
+      {
+	(*i)->clear();
+      }
+  }
 
-void Euler1Stepper::react()
-{  
+  void Euler1Stepper::react()
+  {  
 #ifdef DEBUG_STEPPER
-  cerr << "Euler1Stepper: react()" << endl;
+    cerr << "Euler1Stepper: react()" << endl;
 #endif /* DEBUG_STEPPER */
 
-  theOwner->react();
-  for( SlaveStepperListIterator i = theSlavesList.begin() ; 
-       i != theSlavesList.end() ; ++i )
-    {
+    theOwner->react();
+    for( SlaveStepperListIterator i = theSlavesList.begin() ; 
+	 i != theSlavesList.end() ; ++i )
+      {
 #ifdef DEBUG_STEPPER
-      cerr << "react slaves: owner: "<< (*i)->owner()->entryname() << endl;
+	cerr << "react slaves: owner: "<< (*i)->owner()->entryname() << endl;
 #endif /* DEBUG_STEPPER */
-      (*i)->react();
-    }
-  theOwner->turn();
-  for( SlaveStepperListIterator i = theSlavesList.begin() ; 
-       i != theSlavesList.end() ; ++i )
-    {
-      (*i)->turn();
-    }
-}
+	(*i)->react();
+      }
+    theOwner->turn();
+    for( SlaveStepperListIterator i = theSlavesList.begin() ; 
+	 i != theSlavesList.end() ; ++i )
+      {
+	(*i)->turn();
+      }
+  }
 
-void Euler1Stepper::transit()
-{
+  void Euler1Stepper::transit()
+  {
 #ifdef DEBUG_STEPPER
-  cerr << "Euler1Stepper: transit()" << endl;
+    cerr << "Euler1Stepper: transit()" << endl;
 #endif /* DEBUG_STEPPER */
-  theOwner->transit();
-  for( SlaveStepperListIterator i = theSlavesList.begin() ; 
-       i != theSlavesList.end() ; ++i )
-    {
-      (*i)->transit();
-    }
-}
+    theOwner->transit();
+    for( SlaveStepperListIterator i = theSlavesList.begin() ; 
+	 i != theSlavesList.end() ; ++i )
+      {
+	(*i)->transit();
+      }
+  }
 
-void Euler1Stepper::postern()
-{
+  void Euler1Stepper::postern()
+  {
 #ifdef DEBUG_STEPPER
-  cerr << "Euler1Stepper: transit()" << endl;
+    cerr << "Euler1Stepper: transit()" << endl;
 #endif /* DEBUG_STEPPER */
-  theOwner->postern();
-  for( SlaveStepperListIterator i = theSlavesList.begin() ; 
-       i != theSlavesList.end() ; ++i )
-    {
-      (*i)->postern();
-    }
-}
+    theOwner->postern();
+    for( SlaveStepperListIterator i = theSlavesList.begin() ; 
+	 i != theSlavesList.end() ; ++i )
+      {
+	(*i)->postern();
+      }
+  }
 
 
-////////////////////////// RungeKutta4Stepper
+  ////////////////////////// RungeKutta4Stepper
 
-RungeKutta4Stepper::RungeKutta4Stepper()
-{
-  theAllocator = IntegratorAllocator( &RungeKutta4Stepper::newRungeKutta4 ); 
-}
+  RungeKutta4Stepper::RungeKutta4Stepper()
+  {
+    theAllocator = IntegratorAllocator( &RungeKutta4Stepper::newRungeKutta4 ); 
+  }
 
-IntegratorPtr RungeKutta4Stepper::newRungeKutta4( SubstanceRef substance )
-{
-  return new RungeKutta4Integrator( substance );
-}
+  IntegratorPtr RungeKutta4Stepper::newRungeKutta4( SubstanceRef substance )
+  {
+    return new RungeKutta4Integrator( substance );
+  }
 
-void RungeKutta4Stepper::initialize()
-{
-  MasterStepper::initialize();
-}
+  void RungeKutta4Stepper::initialize()
+  {
+    MasterStepper::initialize();
+  }
 
-void RungeKutta4Stepper::clear()
-{
-  theOwner->clear();
-  for( SlaveStepperListIterator i = theSlavesList.begin() ; 
-       i != theSlavesList.end() ; ++i )
-    {
-      (*i)->clear();
-    }
-}
+  void RungeKutta4Stepper::clear()
+  {
+    theOwner->clear();
+    for( SlaveStepperListIterator i = theSlavesList.begin() ; 
+	 i != theSlavesList.end() ; ++i )
+      {
+	(*i)->clear();
+      }
+  }
 
-void RungeKutta4Stepper::react()
-{
-  // 1
-  theOwner->react();
-  for( SlaveStepperListIterator i = theSlavesList.begin() ; 
-       i != theSlavesList.end() ; ++i )
-    {
-      (*i)->react();
-    }
-  theOwner->turn();
-  for( SlaveStepperListIterator i = theSlavesList.begin() ; 
-       i != theSlavesList.end() ; ++i )
-    {
-      (*i)->turn();
-    }
+  void RungeKutta4Stepper::react()
+  {
+    // FIXME: use inline function
 
-  // 2
-  theOwner->react();
-  for( SlaveStepperListIterator i = theSlavesList.begin() ; 
-       i != theSlavesList.end() ; ++i )
-    {
-      (*i)->react();
-    }
-  theOwner->turn();
-  for( SlaveStepperListIterator i = theSlavesList.begin() ; 
-       i != theSlavesList.end() ; ++i )
-    {
-      (*i)->turn();
-    }
+    // 1
+    theOwner->react();
+    for( SlaveStepperListIterator i = theSlavesList.begin() ; 
+	 i != theSlavesList.end() ; ++i )
+      {
+	(*i)->react();
+      }
+    theOwner->turn();
+    for( SlaveStepperListIterator i = theSlavesList.begin() ; 
+	 i != theSlavesList.end() ; ++i )
+      {
+	(*i)->turn();
+      }
 
-  // 3
-  theOwner->react();
-  for( SlaveStepperListIterator i = theSlavesList.begin() ; 
-       i != theSlavesList.end() ; ++i )
-    {
-      (*i)->react();
-    }
-  theOwner->turn();
-  for( SlaveStepperListIterator i = theSlavesList.begin() ; 
-       i != theSlavesList.end() ; ++i )
-    {
-      (*i)->turn();
-    }
+    // 2
+    theOwner->react();
+    for( SlaveStepperListIterator i = theSlavesList.begin() ; 
+	 i != theSlavesList.end() ; ++i )
+      {
+	(*i)->react();
+      }
+    theOwner->turn();
+    for( SlaveStepperListIterator i = theSlavesList.begin() ; 
+	 i != theSlavesList.end() ; ++i )
+      {
+	(*i)->turn();
+      }
 
-  // 4
-  theOwner->react();
-  for( SlaveStepperListIterator i = theSlavesList.begin() ; 
-       i != theSlavesList.end() ; ++i )
-    {
-      (*i)->react();
-    }
-  theOwner->turn();
-  for( SlaveStepperListIterator i = theSlavesList.begin() ; 
-       i != theSlavesList.end() ; ++i )
-    {
-      (*i)->turn();
-    }
-}
+    // 3
+    theOwner->react();
+    for( SlaveStepperListIterator i = theSlavesList.begin() ; 
+	 i != theSlavesList.end() ; ++i )
+      {
+	(*i)->react();
+      }
+    theOwner->turn();
+    for( SlaveStepperListIterator i = theSlavesList.begin() ; 
+	 i != theSlavesList.end() ; ++i )
+      {
+	(*i)->turn();
+      }
 
-void RungeKutta4Stepper::transit()
-{
-  theOwner->transit();
-  for( SlaveStepperListIterator i = theSlavesList.begin() ; 
-       i != theSlavesList.end() ; ++i )
-    {
-      (*i)->transit();
-    }
-}
+    // 4
+    theOwner->react();
+    for( SlaveStepperListIterator i = theSlavesList.begin() ; 
+	 i != theSlavesList.end() ; ++i )
+      {
+	(*i)->react();
+      }
+    theOwner->turn();
+    for( SlaveStepperListIterator i = theSlavesList.begin() ; 
+	 i != theSlavesList.end() ; ++i )
+      {
+	(*i)->turn();
+      }
+  }
 
-void RungeKutta4Stepper::postern()
-{
-  theOwner->postern();
-  for( SlaveStepperListIterator i = theSlavesList.begin() ; 
-       i != theSlavesList.end() ; ++i )
-    {
-      (*i)->postern();
-    }
-}
+  void RungeKutta4Stepper::transit()
+  {
+    theOwner->transit();
+    for( SlaveStepperListIterator i = theSlavesList.begin() ; 
+	 i != theSlavesList.end() ; ++i )
+      {
+	(*i)->transit();
+      }
+  }
+
+  void RungeKutta4Stepper::postern()
+  {
+    theOwner->postern();
+    for( SlaveStepperListIterator i = theSlavesList.begin() ; 
+	 i != theSlavesList.end() ; ++i )
+      {
+	(*i)->postern();
+      }
+  }
 
 
+} // namespace libecs
 
 
 /*

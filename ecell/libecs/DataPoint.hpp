@@ -4,6 +4,10 @@
 #include "libecs.hpp"
 
 
+namespace libecs
+{
+
+
 /*
 
  */
@@ -155,6 +159,10 @@ private:
   V theValue;
   
 };
+
+
+
+} // namespace libecs
 
 
 #endif /* __DATAPOINT_HPP */

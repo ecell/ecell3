@@ -33,24 +33,29 @@
 
 #include "AccumulatorMaker.hpp"
 
+namespace libecs
+{
 
 
-//template MultiClassModuleMaker<Accumulator>;
+  //template MultiClassModuleMaker<Accumulator>;
 
-////////////////////// AccumulatorMaker
+  ////////////////////// AccumulatorMaker
  
 
-AccumulatorMaker::AccumulatorMaker()
-{
-  makeClassList();
-}
+  AccumulatorMaker::AccumulatorMaker()
+  {
+    makeClassList();
+  }
 
 
-void AccumulatorMaker::makeClassList()
-{
-  NewAccumulatorModule( SimpleAccumulator );
-  NewAccumulatorModule( RoundDownAccumulator );
-  NewAccumulatorModule( RoundOffAccumulator );
-  NewAccumulatorModule( ReserveAccumulator );
-  NewAccumulatorModule( MonteCarloAccumulator );
-}
+  void AccumulatorMaker::makeClassList()
+  {
+    NewAccumulatorModule( SimpleAccumulator );
+    NewAccumulatorModule( RoundDownAccumulator );
+    NewAccumulatorModule( RoundOffAccumulator );
+    NewAccumulatorModule( ReserveAccumulator );
+    NewAccumulatorModule( MonteCarloAccumulator );
+  }
+
+
+} // namespace libecs

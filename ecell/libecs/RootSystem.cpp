@@ -39,68 +39,76 @@
 #include "RootSystem.hpp"
 
 
-RootSystem::RootSystem() 
-  :
-  theStepperLeader( *new StepperLeader ),
-  theReactorMaker( *new ReactorMaker ),
-  theSubstanceMaker( *new SubstanceMaker ),
-  theSystemMaker( *new SystemMaker ),
-  theStepperMaker( *new StepperMaker ),
-  theAccumulatorMaker( *new AccumulatorMaker )
+namespace libecs
 {
-  setId( "/" );
-  setName( "The RootSystem" );
-   setRootSystem( this );
-  //setSuperSystem( this );
-}
 
-RootSystem::~RootSystem()
-{
-  delete &theAccumulatorMaker;
-  delete &theStepperMaker;
-  delete &theSystemMaker;
-  delete &theSubstanceMaker;
-  delete &theReactorMaker;
-  delete &theStepperLeader;
-}
 
-void RootSystem::initialize()
-{
-  System::initialize();
-  getStepperLeader().initialize();
-  getStepperLeader().update();
-}
+  RootSystem::RootSystem() 
+    :
+    theStepperLeader( *new StepperLeader ),
+    theReactorMaker( *new ReactorMaker ),
+    theSubstanceMaker( *new SubstanceMaker ),
+    theSystemMaker( *new SystemMaker ),
+    theStepperMaker( *new StepperMaker ),
+    theAccumulatorMaker( *new AccumulatorMaker )
+  {
+    setId( "/" );
+    setName( "The RootSystem" );
+    setRootSystem( this );
+    //setSuperSystem( this );
+  }
 
-int RootSystem::check()
-{
-  bool status = true;
+  RootSystem::~RootSystem()
+  {
+    delete &theAccumulatorMaker;
+    delete &theStepperMaker;
+    delete &theSystemMaker;
+    delete &theSubstanceMaker;
+    delete &theReactorMaker;
+    delete &theStepperLeader;
+  }
+
+  void RootSystem::initialize()
+  {
+    System::initialize();
+    getStepperLeader().initialize();
+    getStepperLeader().update();
+  }
+
+  int RootSystem::check()
+  {
+    bool status = true;
   
   
-  return status;
-}
+    return status;
+  }
 
-SystemPtr RootSystem::getSystem( SystemPathCref systempath ) 
-{
-  if( systempath.first() != "/" )
-    {
-      throw BadID( __PRETTY_FUNCTION__,
-		   "Fully qualified system path must start with '/'. ([" + 
-		   systempath.getString() + "].");
-    }
+  SystemPtr RootSystem::getSystem( SystemPathCref systempath ) 
+  {
+    if( systempath.first() != "/" )
+      {
+	throw BadID( __PRETTY_FUNCTION__,
+		     "Fully qualified system path must start with '/'. ([" + 
+		     systempath.getString() + "].");
+      }
 
-  return getSystem( systempath.getSystemPathString() );
-}
+    return getSystem( systempath.getSystemPathString() );
+  }
 
-SystemPtr RootSystem::getSystem( StringCref id ) 
-{
-  // the root System(this!) is requested.
-  if( id == "/" )
-    {
-      return this;
-    }
+  SystemPtr RootSystem::getSystem( StringCref id ) 
+  {
+    // the root System(this!) is requested.
+    if( id == "/" )
+      {
+	return this;
+      }
   
-  return System::getSystem( id );
-}
+    return System::getSystem( id );
+  }
+
+
+} // namespace libecs
+
 
 /*
   Do not modify

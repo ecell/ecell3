@@ -33,79 +33,85 @@
 #include "Exceptions.hpp"
 #include "Util.hpp"
 
-
-RandomNumberGenerator* theRandomNumberGenerator = 
-new RandomNumberGenerator( 
-			  // FIXME: is this cast good?
-			  // should be reinterpret_cast or something?
-			  static_cast<Real>( time( NULLPTR ) ) ,
-			  RANDOM_NUMBER_BUFFER_SIZE);
-
-int table_lookup( StringCref str, const char** table )
+namespace libecs
 {
-  for( int i = 0 ; table[i] != NULLPTR ; ++i )
-    {
-      if( str == String( table[ i ] ) )
-	{
-	  return i;
-	}
-    }
 
-  throw NotFound( __PRETTY_FUNCTION__ );
-}
 
-template<> const Real stringTo<Real>( StringCref str )
-{
-  // FIXME: error check, throw exception
-  return strtod( str.c_str(), NULLPTR );
-}
+  RandomNumberGenerator* theRandomNumberGenerator = 
+  new RandomNumberGenerator( 
+			    // FIXME: is this cast good?
+			    // should be reinterpret_cast or something?
+			    static_cast<Real>( time( NULLPTR ) ) ,
+			    RANDOM_NUMBER_BUFFER_SIZE);
 
-template<> const Int stringTo<Int>( StringCref str )
-{
-  // FIXME: error check, throw exception
-  return strtol( str.c_str(), NULLPTR, 10 );
-}
+  int table_lookup( StringCref str, const char** table )
+  {
+    for( int i = 0 ; table[i] != NULLPTR ; ++i )
+      {
+	if( str == String( table[ i ] ) )
+	  {
+	    return i;
+	  }
+      }
 
-template<> const UnsignedInt stringTo<UnsignedInt>( StringCref str )
-{
-  // FIXME: error check, throw exception
-  return strtoul( str.c_str(), NULLPTR, 10 );
-}
+    throw NotFound( __PRETTY_FUNCTION__ );
+  }
 
-template<> const String toString<Real>( const Real& f )
-{ 
-  ostrstream os;
-  os.precision( REAL_DIG );
-  os << f;
-  os << ends;
-  return os.str();
-}
+  template<> const Real stringTo<Real>( StringCref str )
+  {
+    // FIXME: error check, throw exception
+    return strtod( str.c_str(), NULLPTR );
+  }
 
-string basenameOf( StringCref str, String::size_type maxlength )
-{
-  String::size_type s = str.rfind( '/' );
-  if( s == String::npos )
-    {
-      s = 0;
-    } 
-  else
-    {
-      s++;
-    }
+  template<> const Int stringTo<Int>( StringCref str )
+  {
+    // FIXME: error check, throw exception
+    return strtol( str.c_str(), NULLPTR, 10 );
+  }
 
-  String::size_type e = str.rfind( '.' );
-  if( e == String::npos )
-    {
-      e = str.size();
-    }
+  template<> const UnsignedInt stringTo<UnsignedInt>( StringCref str )
+  {
+    // FIXME: error check, throw exception
+    return strtoul( str.c_str(), NULLPTR, 10 );
+  }
 
-  String::size_type l = e - s;
-  if( maxlength != 0 && maxlength < l ) 
-    {
-      l = maxlength;
-    }
-  return str.substr( s, l );
-}
+  template<> const String toString<Real>( const Real& f )
+  { 
+    ostrstream os;
+    os.precision( REAL_DIG );
+    os << f;
+    os << ends;
+    return os.str();
+  }
+
+  string basenameOf( StringCref str, String::size_type maxlength )
+  {
+    String::size_type s = str.rfind( '/' );
+    if( s == String::npos )
+      {
+	s = 0;
+      } 
+    else
+      {
+	s++;
+      }
+
+    String::size_type e = str.rfind( '.' );
+    if( e == String::npos )
+      {
+	e = str.size();
+      }
+
+    String::size_type l = e - s;
+    if( maxlength != 0 && maxlength < l ) 
+      {
+	l = maxlength;
+      }
+    return str.substr( s, l );
+  }
+
+
+} // namespace libecs
 
 
 #ifdef UTIL_TEST

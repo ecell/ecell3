@@ -14,66 +14,75 @@
 #include <stdio.h> // FIXME : for debugging
 
 
-template <class T, class V> class DataPoint;
-template <class T, class V, class Containee, class Container> 
-class StlDataPointVector;
 
-template <class T, class V, class Containee, class Container>
-StlDataPointVector<T,V,Containee,Container>::
-StlDataPointVector( const StlDataPointVector& datapointvector )
-  :
-  theContainer( datapointvector.theContainer )
+namespace libecs
 {
-  ; // do nothing
-}
+
+  template <class T, class V> class DataPoint;
+  template <class T, class V, class Containee, class Container> 
+  class StlDataPointVector;
+
+  template <class T, class V, class Containee, class Container>
+  StlDataPointVector<T,V,Containee,Container>::
+  StlDataPointVector( const StlDataPointVector& datapointvector )
+    :
+    theContainer( datapointvector.theContainer )
+  {
+    ; // do nothing
+  }
   
 
 
-// Destructor
+  // Destructor
 
-template <class T, class V, class Containee, class Container>
-StlDataPointVector<T,V,Containee,Container>::~StlDataPointVector( void )
-{
-  for( iterator i( begin() ) ; i < end(); i++ )
-    {
-      delete *i;
-    }
-}
+  template <class T, class V, class Containee, class Container>
+  StlDataPointVector<T,V,Containee,Container>::~StlDataPointVector( void )
+  {
+    for( iterator i( begin() ) ; i < end(); i++ )
+      {
+	delete *i;
+      }
+  }
 
-//
+  //
 
-template <class T, class V, class Containee, class Container>
-void StlDataPointVector<T,V,Containee,Container>::push(const T& t, const V& val)
-{
-  theContainer.push_back( new Containee( t, val ) );
-}
+  template <class T, class V, class Containee, class Container>
+  void StlDataPointVector<T,V,Containee,Container>::push(const T& t, const V& val)
+  {
+    theContainer.push_back( new Containee( t, val ) );
+  }
 
-template <class T, class V, class Containee, class Container>
-void StlDataPointVector<T,V,Containee,Container>::push(const Containee& x)
-{
-  theContainer.push_back( new Containee( x ) );
-}
+  template <class T, class V, class Containee, class Container>
+  void StlDataPointVector<T,V,Containee,Container>::push(const Containee& x)
+  {
+    theContainer.push_back( new Containee( x ) );
+  }
 
-//
+  //
 
 
-template <class T, class V, class Containee, class Container>
-StlDataPointVector<T,V,Containee,Container>::const_iterator 
-StlDataPointVector<T,V,Containee,Container>::
-binary_search(const_iterator first, const_iterator last, const T& val) const
-{
-  V v;
-  DataPoint<T,V> dp(val,v);
-  const_iterator itr = lower_bound( first, last, &dp );
-  return itr;
+  template <class T, class V, class Containee, class Container>
+  StlDataPointVector<T,V,Containee,Container>::const_iterator 
+  StlDataPointVector<T,V,Containee,Container>::
+  binary_search(const_iterator first, const_iterator last, const T& val) const
+  {
+    V v;
+    DataPoint<T,V> dp(val,v);
+    const_iterator itr = lower_bound( first, last, &dp );
+    return itr;
 
-}
+  }
+
+
+} // namespace libecs
 
 
 #if defined(STLDATAPOINTVECTOR_TEST)
 
 #include <iostream>
 #include "DataPoint.cpp"
+
+using namespace libecs;
 
 typedef double Real;
 

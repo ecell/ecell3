@@ -37,63 +37,67 @@
 
 #include "Message.hpp"
 
-DECLARE_CLASS( AbstractMessageCallback );
 
-DECLARE_MAP( const String, AbstractMessageCallbackPtr, 
-	     std::less<const String>, PropertyMap );
-
-
-/**
-   A base class for MessageCallback class.
-
-   @see MessageCallback
-   @see MessageInterface
-   @see Message
- */
-class AbstractMessageCallback
+namespace libecs
 {
 
-public:
+  DECLARE_CLASS( AbstractMessageCallback );
 
-  virtual void set( MessageCref message ) = 0;
-  virtual const Message get( StringCref keyword ) = 0;
+  DECLARE_MAP( const String, AbstractMessageCallbackPtr, 
+	       std::less<const String>, PropertyMap );
 
-  virtual void operator()( MessageCref message ) 
+
+  /**
+     A base class for MessageCallback class.
+
+     @see MessageCallback
+     @see MessageInterface
+     @see Message
+  */
+  class AbstractMessageCallback
+  {
+
+  public:
+
+    virtual void set( MessageCref message ) = 0;
+    virtual const Message get( StringCref keyword ) = 0;
+
+    virtual void operator()( MessageCref message ) 
     { set( message ); }
-  virtual const Message operator()( StringCref keyword ) 
+    virtual const Message operator()( StringCref keyword ) 
     { return get(keyword); }
-};
+  };
 
 
-/**
-   Calls callback methods for getting and sending Message objects.
+  /**
+     Calls callback methods for getting and sending Message objects.
 
-   @see Message
-   @see MessageInterface
-   @see AbstractMessageCallback
- */
-template <class T>
-class MessageCallback : public AbstractMessageCallback
-{
+     @see Message
+     @see MessageInterface
+     @see AbstractMessageCallback
+  */
+  template <class T>
+  class MessageCallback : public AbstractMessageCallback
+  {
 
-public:
+  public:
 
-  typedef void ( T::* SetMessageFunc )( MessageCref );
-  typedef const Message ( T::* GetMessageFunc )( StringCref );
+    typedef void ( T::* SetMessageFunc )( MessageCref );
+    typedef const Message ( T::* GetMessageFunc )( StringCref );
 
-public:
+  public:
 
-  MessageCallback( T& object, const SetMessageFunc setmethod,
-		   const GetMessageFunc getmethod )
-    : 
-    theObject( object ), 
-    theSetMethod( setmethod ), 
-    theGetMethod( getmethod ) 
+    MessageCallback( T& object, const SetMessageFunc setmethod,
+		     const GetMessageFunc getmethod )
+      : 
+      theObject( object ), 
+      theSetMethod( setmethod ), 
+      theGetMethod( getmethod ) 
     {
       ; // do nothing
     }
   
-  virtual void set( MessageCref message ) 
+    virtual void set( MessageCref message ) 
     {
       if( theSetMethod == NULLPTR )
 	{
@@ -103,7 +107,7 @@ public:
       ( theObject.*theSetMethod )( message );
     }
 
-  virtual const Message get( StringCref keyword ) 
+    virtual const Message get( StringCref keyword ) 
     {
       if( theGetMethod == NULLPTR )
 	{
@@ -113,55 +117,55 @@ public:
       return ( ( theObject.*theGetMethod )( keyword ));
     }
 
-private:
+  private:
 
-  T& theObject;
-  const SetMessageFunc theSetMethod;
-  const GetMessageFunc theGetMethod;
+    T& theObject;
+    const SetMessageFunc theSetMethod;
+    const GetMessageFunc theGetMethod;
 
-};
+  };
 
-/**
-  Common base class for classes which receive Messages.
+  /**
+     Common base class for classes which receive Messages.
 
-  NOTE:  Subclasses of MessageInterface MUST call their own makeSlots(),
-  if any, to make their slots in their constructors.
-  (virtual functions won't work in constructors)
+     NOTE:  Subclasses of MessageInterface MUST call their own makeSlots(),
+     if any, to make their slots in their constructors.
+     (virtual functions won't work in constructors)
 
-  FIXME: class-static slots?
+     FIXME: class-static slots?
 
-  @see Message
-  @see MessageCallback
-*/
+     @see Message
+     @see MessageCallback
+  */
 
-class MessageInterface
-{
-public:
+  class MessageInterface
+  {
+  public:
 
-  MessageInterface();
-  virtual ~MessageInterface();
+    MessageInterface();
+    virtual ~MessageInterface();
 
-  void set( MessageCref );
-  const Message get( StringCref );
+    void set( MessageCref );
+    const Message get( StringCref );
 
-  virtual void makeSlots();
+    virtual void makeSlots();
 
-  virtual const char* const className() const { return "MessageInterface"; }
+    virtual const char* const className() const { return "MessageInterface"; }
 
-public: // message slots
+  public: // message slots
 
-  const Message getPropertyList( StringCref keyword );
+    const Message getPropertyList( StringCref keyword );
 
-protected:
+  protected:
 
-  void appendSlot( StringCref keyword, AbstractMessageCallbackPtr );
-  void deleteSlot( StringCref keyword );
+    void appendSlot( StringCref keyword, AbstractMessageCallbackPtr );
+    void deleteSlot( StringCref keyword );
 
-private:
+  private:
 
-  PropertyMap thePropertyMap;
+    PropertyMap thePropertyMap;
 
-};
+  };
 
 
 #define MessageSlot( KEY, CLASS, OBJ, SETMETHOD, GETMETHOD )\
@@ -171,6 +175,8 @@ appendSlot( KEY, new MessageCallback< CLASS >\
 	    static_cast< MessageCallback< CLASS >::GetMessageFunc >\
 	    ( GETMETHOD ) ) )
 
+
+} // namespace libecs
 
 #endif /* __MESSAGEINTERFACE_HPP */
 

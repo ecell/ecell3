@@ -33,20 +33,27 @@
 #include "Reactor.hpp"
 #include "ModuleMaker.hpp"
 
-class ReactorMaker : public SharedModuleMaker<Reactor>
+
+namespace libecs
 {
-private:
 
-protected:
+  class ReactorMaker : public SharedModuleMaker<Reactor>
+  {
+  private:
 
-//  virtual void makeClassList();
+  protected:
 
-public:
+    //  virtual void makeClassList();
 
-  ReactorMaker();
-  virtual ~ReactorMaker() {}
-};
+  public:
+
+    ReactorMaker();
+    virtual ~ReactorMaker() {}
+  };
 
 #define NewReactorModule(CLASS) NewDynamicModule(Reactor,CLASS)
+
+
+} // namespace libecs
 
 #endif /* ___REACTORMAKER_H___ */

@@ -34,217 +34,224 @@
 #include "Entity.hpp"
 
 
-/**
-  Substance class is used to represent molecular species.
-*/
-
-class Substance : public Entity
+namespace libecs
 {
-  friend class Integrator;
-  friend class Accumulator;
 
-public: // message slots
-
-  void setQuantity( MessageCref message );
-  void setAccumulatorClass( MessageCref message );
-  const Message getQuantity( StringCref keyword );
-  const Message getAccumulatorClass( StringCref keyword );
-
-public:
-
-  Substance();
-  virtual ~Substance();
-
-  static SubstancePtr instance() { return new Substance; }
-
-  const String getFqpi() const;
 
   /**
-    @return the number of molecules.
-   */
-  Real getQuantity() const                    
-  { 
-    return theQuantity; 
-  }
+     Substance class is used to represent molecular species.
+  */
 
-  /**
-    Fixes or unfixes this Substance.
-    @param f Boolean value. true -> fix, false -> unfix.
-   */
-  void fix( bool f )                           
-  { 
-    theFixed = f; 
-  }
-
-  /**
-    @return true if the Substance is fixed or false if not.
-   */
-  bool isFixed() const                         
-  { 
-    return theFixed; 
-  }
-
-  /**
-    Whether concentration of this substance can be calculated or not.
-    It must have a supersystem which have volume other than zero to
-    calculate concentration.
-    \return true -> if concentration can be obtained. false -> if not.
-   */
-  bool haveConcentration() const;
-
-  /**
-    Returns a concentration if it have.
-    Invalid if haveConcentration() is false.
-    @return Concentration in M (mol/L).
-   */
-  Real getConcentration() 
+  class Substance : public Entity
   {
-    if ( theConcentration < 0 ) 
-      {
-	calculateConcentration(); 
-      }
+    friend class Integrator;
+    friend class Accumulator;
 
-    return theConcentration;
-  }
+  public: // message slots
 
-  /**
-    Initializes this substance. 
-    Called at startup.
-   */
-  void initialize();
+    void setQuantity( MessageCref message );
+    void setAccumulatorClass( MessageCref message );
+    const Message getQuantity( StringCref keyword );
+    const Message getAccumulatorClass( StringCref keyword );
 
-  /**
-    Clear phase.
-    Then call clear() of the integrator.
-   */
-  void clear();
+  public:
 
-  /**
-    This is called one or several times in react phase.
-    Time of call is determined by the type of the integrator.
-   */
-  void turn();
+    Substance();
+    virtual ~Substance();
 
-  /**
-    Transit phase.
-    Perform integration by a result calculated by integrator.
-   */
-  void transit();
+    static SubstancePtr instance() { return new Substance; }
 
-  /**
-    @return current velocity value in (number of molecules)/(step)
-   */
-  Real getVelocity() const
+    const String getFqpi() const;
+
+    /**
+       @return the number of molecules.
+    */
+    Real getQuantity() const                    
+    { 
+      return theQuantity; 
+    }
+
+    /**
+       Fixes or unfixes this Substance.
+       @param f Boolean value. true -> fix, false -> unfix.
+    */
+    void fix( bool f )                           
+    { 
+      theFixed = f; 
+    }
+
+    /**
+       @return true if the Substance is fixed or false if not.
+    */
+    bool isFixed() const                         
+    { 
+      return theFixed; 
+    }
+
+    /**
+       Whether concentration of this substance can be calculated or not.
+       It must have a supersystem which have volume other than zero to
+       calculate concentration.
+       \return true -> if concentration can be obtained. false -> if not.
+    */
+    bool haveConcentration() const;
+
+    /**
+       Returns a concentration if it have.
+       Invalid if haveConcentration() is false.
+       @return Concentration in M (mol/L).
+    */
+    Real getConcentration() 
+    {
+      if ( theConcentration < 0 ) 
+	{
+	  calculateConcentration(); 
+	}
+
+      return theConcentration;
+    }
+
+    /**
+       Initializes this substance. 
+       Called at startup.
+    */
+    void initialize();
+
+    /**
+       Clear phase.
+       Then call clear() of the integrator.
+    */
+    void clear();
+
+    /**
+       This is called one or several times in react phase.
+       Time of call is determined by the type of the integrator.
+    */
+    void turn();
+
+    /**
+       Transit phase.
+       Perform integration by a result calculated by integrator.
+    */
+    void transit();
+
+    /**
+       @return current velocity value in (number of molecules)/(step)
+    */
+    Real getVelocity() const
     { 
       return theVelocity; 
     }
 
-  /**
-    @param v velocity in number of molecules to be added.
-   */
-  void addVelocity( Real velocity ) 
-  {
-    theVelocity += velocity; 
-  }
-
-  /**
-    Returns activity value of a Substance object.
-    The activity is current velocity.
-    @see getActivityPerSecond
-    @return activity value of Substance in Real.
-   */
-  Real getActivity();
-
-  /**
-    Set a quantity with no check. (i.e. isFixed() is ignored.)
-    This updates the accumulator immediately.
-    (e.g. loading cell state.) Use setQuantity() for usual purposes.
-
-    @see setQuantity
-   */
-  void loadQuantity( Real q );
-
-  /**
-    This simply set the quantity of this Substance with check of isFixed().
-    This updates the accumulator immediately.
-
-    @see isFixed
+    /**
+       @param v velocity in number of molecules to be added.
     */
-  void setQuantity(Real q)    
-  { 
-    if( !isFixed() ) 
-      {
-	loadQuantity( q ); 
-      }
-  }
+    void addVelocity( Real velocity ) 
+    {
+      theVelocity += velocity; 
+    }
+
+    /**
+       Returns activity value of a Substance object.
+       The activity is current velocity.
+       @see getActivityPerSecond
+       @return activity value of Substance in Real.
+    */
+    Real getActivity();
+
+    /**
+       Set a quantity with no check. (i.e. isFixed() is ignored.)
+       This updates the accumulator immediately.
+       (e.g. loading cell state.) Use setQuantity() for usual purposes.
+
+       @see setQuantity
+    */
+    void loadQuantity( Real q );
+
+    /**
+       This simply set the quantity of this Substance with check of isFixed().
+       This updates the accumulator immediately.
+
+       @see isFixed
+    */
+    void setQuantity(Real q)    
+    { 
+      if( !isFixed() ) 
+	{
+	  loadQuantity( q ); 
+	}
+    }
 
 
-  /**
-    Get a quantity via save() method of the Accumulator.
-   */
-  Real saveQuantity();
+    /**
+       Get a quantity via save() method of the Accumulator.
+    */
+    Real saveQuantity();
 
 
-  virtual const char* const getClassName() const { return "Substance"; }
+    virtual const char* const getClassName() const { return "Substance"; }
 
-  /**
-     set a class name string of user default accumulator
-  */
-  static void setUserDefaultAccumulatorName( StringCref name ) 
+    /**
+       set a class name string of user default accumulator
+    */
+    static void setUserDefaultAccumulatorName( StringCref name ) 
     { 
       USER_DEFAULT_ACCUMULATOR_NAME = name; 
     }
 
-  /**
-     a class name string of user default accumulator
-  */
-  static StringCref userDefaultAccumulatorName() 
+    /**
+       a class name string of user default accumulator
+    */
+    static StringCref userDefaultAccumulatorName() 
     { 
       return USER_DEFAULT_ACCUMULATOR_NAME; 
     }
 
-protected:
+  protected:
 
-  void setAccumulator( StringCref classname );
-  void setAccumulator( AccumulatorPtr accumulator );
-  void setIntegrator( IntegratorPtr integrator ) 
-  { 
-    theIntegrator = integrator; 
-  }
+    void setAccumulator( StringCref classname );
+    void setAccumulator( AccumulatorPtr accumulator );
+    void setIntegrator( IntegratorPtr integrator ) 
+    { 
+      theIntegrator = integrator; 
+    }
 
-  void makeSlots();
+    void makeSlots();
 
-private:
+  private:
 
-  void calculateConcentration();
-  void mySetQuantity( Real q ) 
-  { 
-    theQuantity = q; 
-    theConcentration = -1; 
-  }
+    void calculateConcentration();
+    void mySetQuantity( Real q ) 
+    { 
+      theQuantity = q; 
+      theConcentration = -1; 
+    }
 
-public:
+  public:
 
-  /**
-     A class name string of system default accumulator
-  */
-  const static String SYSTEM_DEFAULT_ACCUMULATOR_NAME;
+    /**
+       A class name string of system default accumulator
+    */
+    const static String SYSTEM_DEFAULT_ACCUMULATOR_NAME;
 
-private:
+  private:
 
-  static String USER_DEFAULT_ACCUMULATOR_NAME;
+    static String USER_DEFAULT_ACCUMULATOR_NAME;
 
-  AccumulatorPtr theAccumulator;
-  IntegratorPtr theIntegrator;
+    AccumulatorPtr theAccumulator;
+    IntegratorPtr theIntegrator;
 
-  Real theQuantity;
-  Real theFraction;
-  Real theVelocity;
+    Real theQuantity;
+    Real theFraction;
+    Real theVelocity;
 
-  bool theFixed;
+    bool theFixed;
 
-  Real theConcentration;
-};
+    Real theConcentration;
+  };
+
+
+} // namespace libecs
 
 #endif /* ___SUBSTANCE_H___ */
 

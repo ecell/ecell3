@@ -33,113 +33,118 @@
 #include "FQPI.hpp"
 #include "Stepper.hpp"
 
-
-Entity::Entity()
-  : 
-  theSuperSystem( NULLPTR ),
-  theId( "" ),
-  theName( "" ) 
+namespace libecs
 {
-  makeSlots();
-}
+
+  Entity::Entity()
+    : 
+    theSuperSystem( NULLPTR ),
+    theId( "" ),
+    theName( "" ) 
+  {
+    makeSlots();
+  }
 
 
-Entity::~Entity()
-{
-  ; // do nothing
-}
+  Entity::~Entity()
+  {
+    ; // do nothing
+  }
 
-void Entity::makeSlots()
-{
-  MessageSlot( "ClassName", Entity, *this, NULLPTR, &Entity::getClassName );
-  MessageSlot( "Id", Entity, *this, NULLPTR, &Entity::getId );
-  MessageSlot( "SystemPath", Entity, *this, NULLPTR, &Entity::getSystemPath );
-  MessageSlot( "Name", Entity, *this, NULLPTR, &Entity::getName );
-  MessageSlot( "Activity", Entity, *this, NULLPTR, &Entity::getActivity );
-  MessageSlot( "ActivityPerSecond", Entity, *this, NULLPTR, 
-	       &Entity::getActivityPerSecond );
-}
+  void Entity::makeSlots()
+  {
+    MessageSlot( "ClassName", Entity, *this, NULLPTR, &Entity::getClassName );
+    MessageSlot( "Id", Entity, *this, NULLPTR, &Entity::getId );
+    MessageSlot( "SystemPath", Entity, *this, NULLPTR, &Entity::getSystemPath );
+    MessageSlot( "Name", Entity, *this, NULLPTR, &Entity::getName );
+    MessageSlot( "Activity", Entity, *this, NULLPTR, &Entity::getActivity );
+    MessageSlot( "ActivityPerSecond", Entity, *this, NULLPTR, 
+		 &Entity::getActivityPerSecond );
+  }
 
-const Message Entity::getClassName( StringCref keyword )
-{
-  return Message( keyword, UniversalVariable( getClassName() ) );
-}
+  const Message Entity::getClassName( StringCref keyword )
+  {
+    return Message( keyword, UniversalVariable( getClassName() ) );
+  }
 
-const Message Entity::getId( StringCref keyword )
-{
-  return Message( keyword, UniversalVariable( getId() ) );
-}
+  const Message Entity::getId( StringCref keyword )
+  {
+    return Message( keyword, UniversalVariable( getId() ) );
+  }
 
-const Message Entity::getSystemPath( StringCref keyword )
-{
-  return Message( keyword, UniversalVariable( getSystemPath() ) );
-}
+  const Message Entity::getSystemPath( StringCref keyword )
+  {
+    return Message( keyword, UniversalVariable( getSystemPath() ) );
+  }
 
-const Message Entity::getName( StringCref keyword )
-{
-  return Message( keyword, UniversalVariable( getName() ) );
-}
+  const Message Entity::getName( StringCref keyword )
+  {
+    return Message( keyword, UniversalVariable( getName() ) );
+  }
 
-const Message Entity::getActivity( StringCref keyword )
-{
-  return Message( keyword, UniversalVariable( getActivity() ) );
-}
+  const Message Entity::getActivity( StringCref keyword )
+  {
+    return Message( keyword, UniversalVariable( getActivity() ) );
+  }
 
-const Message Entity::getActivityPerSecond( StringCref keyword )
-{
-  return Message( keyword, UniversalVariable( getActivityPerSecond() ) );
-}
+  const Message Entity::getActivityPerSecond( StringCref keyword )
+  {
+    return Message( keyword, UniversalVariable( getActivityPerSecond() ) );
+  }
 
-Real Entity::getActivity() 
-{
-  return 0;
-}
+  Real Entity::getActivity() 
+  {
+    return 0;
+  }
 
-Real Entity::getActivityPerSecond() 
-{
-  return ( getActivity()  / getSuperSystem()->getStepper()->getDeltaT() );
-}
+  Real Entity::getActivityPerSecond() 
+  {
+    return ( getActivity()  / getSuperSystem()->getStepper()->getDeltaT() );
+  }
 
-const String Entity::getFqid() const
-{
-  String aFqid = getSystemPath();
-  if( aFqid != "" )
-    {
-      aFqid += ":";
-    }
-  aFqid += getId();
+  const String Entity::getFqid() const
+  {
+    String aFqid = getSystemPath();
+    if( aFqid != "" )
+      {
+	aFqid += ":";
+      }
+    aFqid += getId();
 
-  return aFqid;
-}
+    return aFqid;
+  }
 
-const String Entity::getFqpi() const
-{
-  //FIXME: slow? use virtual methods
-  return PrimitiveTypeStringOf( *this ) + ":" + getFqid();
-}
+  const String Entity::getFqpi() const
+  {
+    //FIXME: slow? use virtual methods
+    return PrimitiveTypeStringOf( *this ) + ":" + getFqid();
+  }
 
-const String Entity::getSystemPath() const
-{
-  if( getSuperSystem() == NULLPTR )
-    {
-      return "";
-    }
+  const String Entity::getSystemPath() const
+  {
+    if( getSuperSystem() == NULLPTR )
+      {
+	return "";
+      }
 
-  String aSystemPath = getSuperSystem()->getSystemPath(); 
+    String aSystemPath = getSuperSystem()->getSystemPath(); 
 
-  if( aSystemPath != "" )
-    {
-      if( aSystemPath != "/" )
-	{
-	  aSystemPath += SystemPath::DELIMITER;
-	}
-    }
+    if( aSystemPath != "" )
+      {
+	if( aSystemPath != "/" )
+	  {
+	    aSystemPath += SystemPath::DELIMITER;
+	  }
+      }
 
-  //FIXME: suspicious
-  aSystemPath += getSuperSystem()->getId();
+    //FIXME: suspicious
+    aSystemPath += getSuperSystem()->getId();
 
-  return aSystemPath;
-}
+    return aSystemPath;
+  }
+
+
+} // namespace libecs
 
 /*
   Do not modify

@@ -12,51 +12,59 @@
 
 
 
-// Constructor that sets the
-// internal value
-
-template <class T, class V>
-DataPoint<T,V>::DataPoint( const T& t, const V& v )
-  :
-  theTime( t ),
-  theValue( v )
- { 
-   ; // do nothing
- }
-
-
-// Copy constructor 
-
-template <class T, class V>
-DataPoint<T,V>::DataPoint( DataPointCref datapoint )
-  :
-  theTime( datapoint.getTime() ),
-  theValue( datapoint.getValue() )
+namespace libecs
 {
-  ; // do nothing
-}
+
+
+  // Constructor that sets the
+  // internal value
+
+  template <class T, class V>
+  DataPoint<T,V>::DataPoint( const T& t, const V& v )
+    :
+    theTime( t ),
+    theValue( v )
+  { 
+    ; // do nothing
+  }
+
+
+  // Copy constructor 
+
+  template <class T, class V>
+  DataPoint<T,V>::DataPoint( DataPointCref datapoint )
+    :
+    theTime( datapoint.getTime() ),
+    theValue( datapoint.getValue() )
+  {
+    ; // do nothing
+  }
 
 
 
-// Assignment operator from another DataPoint
+  // Assignment operator from another DataPoint
 
-template <class T, class V>
-DataPoint<T,V>& DataPoint<T,V>::operator=( DataPointCref rhs )
-{
-  if( this == &rhs )
-    {
-      return *this;
-    }
+  template <class T, class V>
+  DataPoint<T,V>& DataPoint<T,V>::operator=( DataPointCref rhs )
+  {
+    if( this == &rhs )
+      {
+	return *this;
+      }
 
-  theTime  = rhs.getTime();
-  theValue = rhs.getValue();
+    theTime  = rhs.getTime();
+    theValue = rhs.getValue();
 
-  return *this;
-}
+    return *this;
+  }
 
+
+} // namespace libecs
 
 #if defined(DATAPOINT_TEST)
 #include <stdio.h>
+
+using namespace libecs;
 
 main()
 {

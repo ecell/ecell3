@@ -35,7 +35,11 @@
 #include "Simulator.hpp"
 #include "CXX/Extensions.hxx"
 
-using namespace Py;
+using namespace libemc;
+
+using Py::Object;
+using Py::Tuple;
+using Py::PythonExtension;
 
 class PySimulator 
   :

@@ -34,164 +34,169 @@
 
 #include "Substance.hpp"
 
-
-class Accumulator
+namespace libecs
 {
 
-public:
-
-  Accumulator() 
-    : 
-    theSubstance( NULLPTR ) 
+  class Accumulator
   {
-    ; // do nothing
-  }
 
-  virtual ~Accumulator() 
+  public:
+
+    Accumulator() 
+      : 
+      theSubstance( NULLPTR ) 
+    {
+      ; // do nothing
+    }
+
+    virtual ~Accumulator() 
+    {
+      ; // do nothing
+    }
+
+    void setOwner( SubstancePtr substance ) 
+    { 
+      theSubstance = substance; 
+    }
+
+    virtual Real save() 
+    { 
+      return getQuantity(); 
+    }
+
+    virtual void update() 
+    {
+      ; // do nothing
+    }
+
+    virtual void doit() = 0;
+
+    virtual const char* const className() const { return "Accumulator"; }
+
+  protected:
+
+    Real& getQuantity() 
+    { 
+      return const_cast<Real&>( theSubstance->theQuantity ); 
+    }
+
+    Real& getVelocity() 
+    { 
+      return const_cast<Real&>( theSubstance->theVelocity ); 
+    }
+
+  protected:
+
+    SubstancePtr theSubstance;
+
+  };
+
+  class SimpleAccumulator : public Accumulator
   {
-    ; // do nothing
-  }
 
-  void setOwner( SubstancePtr substance ) 
-  { 
-    theSubstance = substance; 
-  }
+  public:
 
-  virtual Real save() 
-  { 
-    return getQuantity(); 
-  }
+    SimpleAccumulator() 
+    {
+      ; // do nothing
+    }
 
-  virtual void update() 
+    static AccumulatorPtr instance() { return new SimpleAccumulator; }
+
+    virtual void doit();
+
+    virtual const char* const className() const {return "SimpleAccumulator";}
+
+  };
+
+  class RoundDownAccumulator : public Accumulator
   {
-    ; // do nothing
-  }
 
-  virtual void doit() = 0;
+  public:
 
-  virtual const char* const className() const { return "Accumulator"; }
+    RoundDownAccumulator() 
+    {
+      ; // do nothing
+    }
 
-protected:
+    static AccumulatorPtr instance() { return new RoundDownAccumulator; }
 
-  Real& getQuantity() 
-  { 
-    return const_cast<Real&>( theSubstance->theQuantity ); 
-  }
+    virtual void update();
+    virtual void doit();
 
-  Real& getVelocity() 
-  { 
-    return const_cast<Real&>( theSubstance->theVelocity ); 
-  }
+    virtual const char* const className() const 
+    { return "RoundDownAccumulator"; }
 
-protected:
+  };
 
-  SubstancePtr theSubstance;
-
-};
-
-class SimpleAccumulator : public Accumulator
-{
-
-public:
-
-  SimpleAccumulator() 
+  class RoundOffAccumulator : public Accumulator
   {
-    ; // do nothing
-  }
 
-  static AccumulatorPtr instance() { return new SimpleAccumulator; }
+  public:
 
-  virtual void doit();
+    RoundOffAccumulator() 
+    {
+      ; // do nothing
+    }
 
-  virtual const char* const className() const {return "SimpleAccumulator";}
+    static AccumulatorPtr instance() { return new RoundOffAccumulator; }
 
-};
+    virtual void update();
+    virtual void doit();
 
-class RoundDownAccumulator : public Accumulator
-{
+    virtual const char* const className() const
+    { return "RoundOffAccumulator"; }
 
-public:
+  };
 
-  RoundDownAccumulator() 
+  class ReserveAccumulator : public Accumulator
   {
-    ; // do nothing
-  }
 
-  static AccumulatorPtr instance() { return new RoundDownAccumulator; }
+  public:
 
-  virtual void update();
-  virtual void doit();
+    ReserveAccumulator() 
+      : 
+      theFraction( 0 ) 
+    {
+      ; // do nothing
+    }
 
-  virtual const char* const className() const 
-  { return "RoundDownAccumulator"; }
+    static AccumulatorPtr instance() { return new ReserveAccumulator; }
 
-};
+    virtual Real save();
+    virtual void update();
+    virtual void doit();
 
-class RoundOffAccumulator : public Accumulator
-{
+    virtual const char* const className() const {return "ReserveAccumulator";}
 
-public:
+  private:
 
-  RoundOffAccumulator() 
+    Real theFraction;
+
+  };
+
+  class MonteCarloAccumulator : public Accumulator
   {
-    ; // do nothing
-  }
 
-  static AccumulatorPtr instance() { return new RoundOffAccumulator; }
+  public:
 
-  virtual void update();
-  virtual void doit();
+    MonteCarloAccumulator() 
+    {
+      ; // do nothing
+    }
 
-  virtual const char* const className() const
-  { return "RoundOffAccumulator"; }
+    static AccumulatorPtr instance() { return new MonteCarloAccumulator; }
 
-};
+    virtual void update();
+    virtual void doit();
 
-class ReserveAccumulator : public Accumulator
-{
+    virtual const char* const className() const 
+    { return "MonteCarloAccumulator"; }
 
-public:
+  };
 
-  ReserveAccumulator() 
-    : 
-    theFraction( 0 ) 
-  {
-    ; // do nothing
-  }
 
-  static AccumulatorPtr instance() { return new ReserveAccumulator; }
-
-  virtual Real save();
-  virtual void update();
-  virtual void doit();
-
-  virtual const char* const className() const {return "ReserveAccumulator";}
-
-private:
-
-  Real theFraction;
-
-};
-
-class MonteCarloAccumulator : public Accumulator
-{
-
-public:
-
-  MonteCarloAccumulator() 
-  {
-    ; // do nothing
-  }
-
-  static AccumulatorPtr instance() { return new MonteCarloAccumulator; }
-
-  virtual void update();
-  virtual void doit();
-
-  virtual const char* const className() const 
-  { return "MonteCarloAccumulator"; }
-
-};
+} // namespace libecs
 
 
 #endif /* ___ACCUMULATOR_H___ */

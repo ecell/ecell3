@@ -30,12 +30,16 @@
 
 #include "SubstanceMaker.hpp"
 
-void SubstanceMaker::makeClassList()
+
+namespace libecs
 {
-  NewSubstanceModule( Substance );
-}
 
+  void SubstanceMaker::makeClassList()
+  {
+    NewSubstanceModule( Substance );
+  }
 
+} // namespace libecs
 
 /*
   Do not modify

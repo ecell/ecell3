@@ -39,7 +39,12 @@
 #include "UniversalVariable.hpp"
 
 #include <vector>
-DECLARE_VECTOR( UniversalVariable, UniversalVariableVector );
+
+namespace libecs
+{
+
+
+  DECLARE_VECTOR( UniversalVariable, UniversalVariableVector );
 
 
   /**
@@ -48,67 +53,68 @@ DECLARE_VECTOR( UniversalVariable, UniversalVariableVector );
 
      @see MessageInterface
      @see AbstractMessageSlot
-   */
-class Message
-{
-
-public:
-
-  Message( StringCref keyword )
-    :
-    theKeyword( keyword )
+  */
+  class Message
   {
-    ; // do nothing
-  }
 
-  Message( StringCref keyword, UniversalVariableVectorCref uvl ); 
-  Message( StringCref keyword, UniversalVariableCref uv ); 
+  public:
 
-  // copy procedures
-  Message( MessageCref message );
-  MessageRef operator=( MessageCref );
+    Message( StringCref keyword )
+      :
+      theKeyword( keyword )
+    {
+      ; // do nothing
+    }
+
+    Message( StringCref keyword, UniversalVariableVectorCref uvl ); 
+    Message( StringCref keyword, UniversalVariableCref uv ); 
+
+    // copy procedures
+    Message( MessageCref message );
+    MessageRef operator=( MessageCref );
   
-  virtual ~Message();
+    virtual ~Message();
 
-  /**
-    Returns keyword string of this Message.
+    /**
+       Returns keyword string of this Message.
 
-    @return keyword string.
-    @see body()
-   */
-  StringCref getKeyword() const { return theKeyword; }
+       @return keyword string.
+       @see body()
+    */
+    StringCref getKeyword() const { return theKeyword; }
 
-  /**
-    @return 
-   */
-  UniversalVariableVectorRef getBody()
-  {
-    return theBody;
-  }
+    /**
+       @return 
+    */
+    UniversalVariableVectorRef getBody()
+    {
+      return theBody;
+    }
 
-  UniversalVariableVectorCref getBody() const
-  {
-    return theBody;
-  }
+    UniversalVariableVectorCref getBody() const
+    {
+      return theBody;
+    }
 
-  UniversalVariableRef operator[]( int i )
-  {
-    return theBody.operator[]( i );
-  }
+    UniversalVariableRef operator[]( int i )
+    {
+      return theBody.operator[]( i );
+    }
 
-  UniversalVariableCref operator[]( int i ) const
-  {
-    return theBody.operator[]( i );
-  }
+    UniversalVariableCref operator[]( int i ) const
+    {
+      return theBody.operator[]( i );
+    }
 
-private:
+  private:
 
-  String theKeyword;
-  UniversalVariableVector theBody;
+    String theKeyword;
+    UniversalVariableVector theBody;
 
-};
+  };
 
 
+} // namespace libecs
 
 #endif /* ___MESSAGE_H___*/
 

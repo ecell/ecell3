@@ -30,93 +30,101 @@
 
 #include "MessageInterface.hpp"
 
-///////////////////////////// MessageInterface
 
-void MessageInterface::makeSlots()
+namespace libecs
 {
-  MessageSlot( "PropertyList",MessageInterface,*this,NULLPTR,
-	       &MessageInterface::getPropertyList);
 
-}
+  ///////////////////////////// MessageInterface
 
-const Message MessageInterface::getPropertyList( StringCref keyword )
-{
-  UniversalVariableVector aPropertyList;
+  void MessageInterface::makeSlots()
+  {
+    MessageSlot( "PropertyList",MessageInterface,*this,NULLPTR,
+		 &MessageInterface::getPropertyList);
 
-  for( PropertyMapConstIterator i = thePropertyMap.begin() ; 
-       i != thePropertyMap.end() ; ++i )
-    {
-      aPropertyList.push_back( UniversalVariable( i->first ) );
-    }
+  }
 
-  return Message( keyword, aPropertyList );
-}
+  const Message MessageInterface::getPropertyList( StringCref keyword )
+  {
+    UniversalVariableVector aPropertyList;
 
-MessageInterface::MessageInterface()
-{
-  makeSlots();
-}
+    for( PropertyMapConstIterator i = thePropertyMap.begin() ; 
+	 i != thePropertyMap.end() ; ++i )
+      {
+	aPropertyList.push_back( UniversalVariable( i->first ) );
+      }
 
-MessageInterface::~MessageInterface()
-{
-  for( PropertyMapIterator i = thePropertyMap.begin() ; i != thePropertyMap.end() ; ++i )
-    {
-      delete i->second;
-    }
-}
+    return Message( keyword, aPropertyList );
+  }
 
-void MessageInterface::appendSlot( StringCref keyword, 
-				   AbstractMessageCallback* func )
-{
-  if( thePropertyMap.find( keyword ) != thePropertyMap.end() )
-    {
-      //      *theMessageWindow << "MessageSlot: appendSlot(): slot for keyword [" 
-      //	<< keyword << "] already exists. Taking later one.\n";
-      delete thePropertyMap[ keyword ];
-      thePropertyMap.erase( keyword );
-    }
-  thePropertyMap[ keyword ] = func;
-}
+  MessageInterface::MessageInterface()
+  {
+    makeSlots();
+  }
 
-void MessageInterface::deleteSlot( StringCref keyword )
-{
-  if( thePropertyMap.find( keyword ) == thePropertyMap.end() )
-    {
-      //      *theMessageWindow << "MessageSlot: deleteSlot(): no slot for keyword [" 
-      //	<< keyword << "] found.\n";
-      return;
-    }
-  delete thePropertyMap[ keyword ];
-  thePropertyMap.erase( keyword );
-}
+  MessageInterface::~MessageInterface()
+  {
+    for( PropertyMapIterator i = thePropertyMap.begin() ; i != thePropertyMap.end() ; ++i )
+      {
+	delete i->second;
+      }
+  }
 
-void MessageInterface::set( MessageCref message ) 
-{
-  PropertyMapIterator sm( thePropertyMap.find( message.getKeyword() ) );
+  void MessageInterface::appendSlot( StringCref keyword, 
+				     AbstractMessageCallback* func )
+  {
+    if( thePropertyMap.find( keyword ) != thePropertyMap.end() )
+      {
+	//      *theMessageWindow << "MessageSlot: appendSlot(): slot for keyword [" 
+	//	<< keyword << "] already exists. Taking later one.\n";
+	delete thePropertyMap[ keyword ];
+	thePropertyMap.erase( keyword );
+      }
+    thePropertyMap[ keyword ] = func;
+  }
 
-  if( sm == thePropertyMap.end() )
-    {
-      throw NoSlot(__PRETTY_FUNCTION__,
-		   className() + String(": got a Message (keyword = [")
-		   + message.getKeyword() + "]) but no slot for it.");
-    }
+  void MessageInterface::deleteSlot( StringCref keyword )
+  {
+    if( thePropertyMap.find( keyword ) == thePropertyMap.end() )
+      {
+	//      *theMessageWindow << "MessageSlot: deleteSlot(): no slot for keyword [" 
+	//	<< keyword << "] found.\n";
+	return;
+      }
+    delete thePropertyMap[ keyword ];
+    thePropertyMap.erase( keyword );
+  }
 
-  sm->second->set( message );
-}
+  void MessageInterface::set( MessageCref message ) 
+  {
+    PropertyMapIterator sm( thePropertyMap.find( message.getKeyword() ) );
 
-const Message MessageInterface::get( StringCref keyword ) 
-{
-  PropertyMapIterator sm( thePropertyMap.find( keyword ) );
+    if( sm == thePropertyMap.end() )
+      {
+	throw NoSlot(__PRETTY_FUNCTION__,
+		     className() + String(": got a Message (keyword = [")
+		     + message.getKeyword() + "]) but no slot for it.");
+      }
 
-  if( sm == thePropertyMap.end() )
-    {
-      throw NoSlot( __PRETTY_FUNCTION__, className()
-		    + String( ": got a request for Message (keyword = [" )
-		    + keyword + "]) but no slot for it.\n" );
-    }
+    sm->second->set( message );
+  }
 
-  return sm->second->get( keyword );
-}
+  const Message MessageInterface::get( StringCref keyword ) 
+  {
+    PropertyMapIterator sm( thePropertyMap.find( keyword ) );
+
+    if( sm == thePropertyMap.end() )
+      {
+	throw NoSlot( __PRETTY_FUNCTION__, className()
+		      + String( ": got a request for Message (keyword = [" )
+		      + keyword + "]) but no slot for it.\n" );
+      }
+
+    return sm->second->get( keyword );
+  }
+
+
+} // namespace libecs
+
 
 /*
   Do not modify

@@ -32,67 +32,70 @@
 
 #include "UniversalVariable.hpp"
 
-
-UniversalVariableStringData::
-UniversalVariableStringData( const Real f )
-  :
-  theString( toString<Real>( f ) )
+namespace libecs
 {
-  ; // do nothing
-}
 
-UniversalVariableStringData::UniversalVariableStringData( const Int i )
-  :
-  theString( toString<Int>( i ) )
-{
-  ; // do nothing
-}
+  UniversalVariableStringData::
+  UniversalVariableStringData( const Real f )
+    :
+    theString( toString<Real>( f ) )
+  {
+    ; // do nothing
+  }
 
-const Real UniversalVariableStringData::asReal() const
-{
-  return stringTo<Real>( theString );
-}
+  UniversalVariableStringData::UniversalVariableStringData( const Int i )
+    :
+    theString( toString<Int>( i ) )
+  {
+    ; // do nothing
+  }
 
-const Int UniversalVariableStringData::asInt() const
-{
-  return stringTo<Int>( theString );
-}
+  const Real UniversalVariableStringData::asReal() const
+  {
+    return stringTo<Real>( theString );
+  }
 
-
-UniversalVariableRealData::
-UniversalVariableRealData( StringCref str )
-  :
-  theReal( stringTo<Real>( str ) )
-{
-  ; // do nothing
-}
-
-const String UniversalVariableRealData::asString() const
-{
-  return toString<Real>( theReal );
-}
-
-UniversalVariableIntData::
-UniversalVariableIntData( StringCref str )
-  :
-  theInt( stringTo<Int>( str ) )
-{
-  ; // do nothing
-}
-
-UniversalVariableIntData::
-UniversalVariableIntData( const Real f )
-  :
-  // FIXME: range check?
-  theInt( static_cast<Int>( f ) )
-{
-  ; // do nothing
-}
+  const Int UniversalVariableStringData::asInt() const
+  {
+    return stringTo<Int>( theString );
+  }
 
 
-const String UniversalVariableIntData::asString() const
-{
-  return toString<Int>( theInt );
-}
+  UniversalVariableRealData::
+  UniversalVariableRealData( StringCref str )
+    :
+    theReal( stringTo<Real>( str ) )
+  {
+    ; // do nothing
+  }
+
+  const String UniversalVariableRealData::asString() const
+  {
+    return toString<Real>( theReal );
+  }
+
+  UniversalVariableIntData::
+  UniversalVariableIntData( StringCref str )
+    :
+    theInt( stringTo<Int>( str ) )
+  {
+    ; // do nothing
+  }
+
+  UniversalVariableIntData::
+  UniversalVariableIntData( const Real f )
+    :
+    // FIXME: range check?
+    theInt( static_cast<Int>( f ) )
+  {
+    ; // do nothing
+  }
 
 
+  const String UniversalVariableIntData::asString() const
+  {
+    return toString<Int>( theInt );
+  }
+
+
+} // namespace libecs

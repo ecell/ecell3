@@ -33,20 +33,28 @@
 #include "Stepper.hpp"
 #include "ModuleMaker.hpp"
 
-class StepperMaker : public StaticModuleMaker<Stepper>
+namespace libecs
 {
 
-protected:
 
-  virtual void makeClassList();
+  class StepperMaker : public StaticModuleMaker<Stepper>
+  {
 
-public:
+  protected:
 
-  StepperMaker();
-  ~StepperMaker() {}
+    virtual void makeClassList();
 
-};
+  public:
+
+    StepperMaker();
+    ~StepperMaker() {}
+
+  };
+
 
 #define NewStepperModule(CLASS) NewDynamicModule(Stepper,CLASS)
+
+} // namespace libecs
+
 
 #endif /* ___STEPPERMAKER_H___ */

@@ -56,27 +56,30 @@
 
 
 
-// from Common.hpp
+namespace corelinux
+{
+
+  // from Common.hpp
 
 #define IN_COMMON_HPP
 
 
-/**
-IGNORE_RETURN is an indicator that the return
-value for a function is ignored.
-i.e   IGNORE_RETURN getSomething( ... );
-Eliminates a lint warning.
-*/
+  /**
+     IGNORE_RETURN is an indicator that the return
+     value for a function is ignored.
+     i.e   IGNORE_RETURN getSomething( ... );
+     Eliminates a lint warning.
+  */
 
 #define IGNORE_RETURN (void)
 
-/**
-Declare a new type and its pointer,
-const pointer, reference, and const reference types. For example
-DECLARE_TYPE( Dword, VeryLongTime );
-@param mydecl The base type
-@param mytype The new type
-*/
+  /**
+     Declare a new type and its pointer,
+     const pointer, reference, and const reference types. For example
+     DECLARE_TYPE( Dword, VeryLongTime );
+     @param mydecl The base type
+     @param mytype The new type
+  */
 
 #define DECLARE_TYPE( mydecl, mytype )  \
 typedef mydecl         mytype;         \
@@ -85,13 +88,13 @@ typedef const mytype * mytype ## Cptr; \
 typedef mytype &       mytype ## Ref;  \
 typedef const mytype & mytype ## Cref;
 
-/**
-Declare class , class pointer , 
-const pointer, class reference 
-and const class reference types for classes. For example
-DECLARE_CLASS( Exception );
-@param tag The class being declared
-*/
+  /**
+     Declare class , class pointer , 
+     const pointer, class reference 
+     and const class reference types for classes. For example
+     DECLARE_CLASS( Exception );
+     @param tag The class being declared
+  */
 
 #define DECLARE_CLASS( tag )            \
    class   tag;                        \
@@ -101,31 +104,31 @@ DECLARE_CLASS( Exception );
    typedef const tag & tag ## Cref;
 
 
-// from Types.hpp
+  // from Types.hpp
 
 
-// *******************************************
-// Floating Point.
-// *******************************************
+  // *******************************************
+  // Floating Point.
+  // *******************************************
 
-DECLARE_TYPE( double, Real );
+  DECLARE_TYPE( double, Real );
    
-// *******************************************
-// Define the void pointer type.
-// *******************************************
+  // *******************************************
+  // Define the void pointer type.
+  // *******************************************
    
-typedef void * VoidPtr;
+  typedef void * VoidPtr;
 
-// *******************************************
-// Define the NULLPTR
-// *******************************************
+  // *******************************************
+  // Define the NULLPTR
+  // *******************************************
 
 #define  NULLPTR  0
    
 
 
 
-// from List.hpp
+  // from List.hpp
 
   /**
      STL list template. This macro generates all
@@ -147,7 +150,7 @@ typedef void * VoidPtr;
       typedef name::reverse_iterator* name ## RiteratorPtr
 
 
-// from Vector.hpp
+  // from Vector.hpp
 
   /**
      STL vector template. This macro generates all
@@ -169,7 +172,7 @@ typedef void * VoidPtr;
    typedef name::reverse_iterator* name ## RiteratorPtr
 
 
-// from Set.hpp
+  // from Set.hpp
 
   /**
      STL set template. This macro generates all
@@ -196,13 +199,13 @@ typedef void * VoidPtr;
       typedef name::reverse_iterator* name ## RiteratorPtr
    
   /**
-   STL multiset template. This macro generates all
-   the type references and pointers for the collection and
-   respective iterators for a multiset.
-   @param name The name you want to give the collection
-   @param key The object that represents the mutliset key
-   @param comp The comparator functor
-   */
+     STL multiset template. This macro generates all
+     the type references and pointers for the collection and
+     respective iterators for a multiset.
+     @param name The name you want to give the collection
+     @param key The object that represents the mutliset key
+     @param comp The comparator functor
+  */
 #define CORELINUX_MULTISET(key,comp,name)                                  \
       typedef multiset<key, comp > name;                                      \
       typedef name *       name ## Ptr;                                       \
@@ -220,7 +223,7 @@ typedef void * VoidPtr;
       typedef name::reverse_iterator* name ## RiteratorPtr
 
 
-// from Map.hpp
+  // from Map.hpp
 
 
   /**
@@ -249,14 +252,14 @@ typedef void * VoidPtr;
       typedef name::reverse_iterator* name ## RiteratorPtr
    
   /**
-   STL multimap template. This macro generates all
-   the type references and pointers for the collection and
-   respective iterators for a multimap.
-   @param name The name you want to give the collection
-   @param key The object that represents the map key
-   @param value The object that the key is associated to
-   @param comp The comparator functor
-   */
+     STL multimap template. This macro generates all
+     the type references and pointers for the collection and
+     respective iterators for a multimap.
+     @param name The name you want to give the collection
+     @param key The object that represents the map key
+     @param value The object that the key is associated to
+     @param comp The comparator functor
+  */
 
 #define CORELINUX_MULTIMAP(key,value,comp,name)                 \
       typedef std::multimap<key,value,comp > name;                 \
@@ -275,7 +278,7 @@ typedef void * VoidPtr;
       typedef name::reverse_iterator* name ## RiteratorPtr
 
 
-// from Queue.hpp
+  // from Queue.hpp
 
   /**
      STL queue template. This macro generates all
@@ -297,7 +300,7 @@ typedef void * VoidPtr;
       typedef name::reverse_iterator* name ## RiteratorPtr
 
 
-// from Stack.hpp
+  // from Stack.hpp
 
   /**
      STL stack template. This macro generates all
@@ -309,3 +312,6 @@ typedef void * VoidPtr;
 #define CORELINUX_STACK( type, name )                                 \
       DECLARE_TYPE(stack<type>,name)                                   
 
+
+
+} // namespace corelinux

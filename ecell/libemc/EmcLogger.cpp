@@ -32,3 +32,8 @@
 #include "EmcLogger.hpp"
 
 
+namespace libemc
+{
+
+
+} // namespace libemc

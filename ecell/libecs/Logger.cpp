@@ -38,6 +38,8 @@
 #include "Logger.hpp"
 #endif
 
+namespace libecs
+{
 
 // Constructor
 
@@ -206,7 +208,7 @@ const T& Logger<T, V>::getCurrentInterval( void ) const
 }
 
 
-
+} // namespace libecs
 
 
 #ifdef LOGGER_TEST
@@ -216,6 +218,8 @@ const T& Logger<T, V>::getCurrentInterval( void ) const
 #include <iostream>
 #include "DataPoint.cpp"
 #include "StlDataPointVector.cpp"
+
+using namespace libecs;
 
 const Real& func(void)
 {
@@ -257,5 +261,7 @@ main()
   printf("%f\n",lg.getStartTime());
   printf("%f\n",lg.getEndTime());
 }
+
+
 
 #endif /* LOGGER_TEST */

@@ -32,74 +32,81 @@
 #include "Util.hpp"
 #include "Accumulators.hpp"
 
-void SimpleAccumulator::doit()
-{
-  getQuantity() += getVelocity();
-}
 
-void RoundDownAccumulator::doit()
+namespace libecs
 {
-  getVelocity() = floor( getVelocity() );
-  getQuantity() += getVelocity();
-}
 
-void RoundDownAccumulator::update()
-{
-  getQuantity() = floor( getQuantity() );
-}
+  void SimpleAccumulator::doit()
+  {
+    getQuantity() += getVelocity();
+  }
 
-void RoundOffAccumulator::doit()
-{
-  getVelocity() = rint( getVelocity() );
-  getQuantity() += getVelocity();
-}
+  void RoundDownAccumulator::doit()
+  {
+    getVelocity() = floor( getVelocity() );
+    getQuantity() += getVelocity();
+  }
 
-void RoundOffAccumulator::update()
-{
-  getQuantity() = rint( getQuantity() );
-}
+  void RoundDownAccumulator::update()
+  {
+    getQuantity() = floor( getQuantity() );
+  }
 
-void ReserveAccumulator::doit()
-{
-  Real tmp;
-  getVelocity() += theFraction;
-  theFraction = modf( getVelocity(), &tmp );
-  getQuantity() += tmp;
-  getVelocity() = tmp;
-}
+  void RoundOffAccumulator::doit()
+  {
+    getVelocity() = rint( getVelocity() );
+    getQuantity() += getVelocity();
+  }
 
-Real ReserveAccumulator::save()
-{
-  return getQuantity() + theFraction;
-}
+  void RoundOffAccumulator::update()
+  {
+    getQuantity() = rint( getQuantity() );
+  }
 
-void ReserveAccumulator::update()
-{
-  Real tmp;
-  theFraction = modf( getQuantity(), &tmp );
-  getQuantity() = tmp;
-}
+  void ReserveAccumulator::doit()
+  {
+    Real tmp;
+    getVelocity() += theFraction;
+    theFraction = modf( getVelocity(), &tmp );
+    getQuantity() += tmp;
+    getVelocity() = tmp;
+  }
 
-void MonteCarloAccumulator::doit()
-{
-  Real aWhole;
-  Real aFraction = modf( getVelocity(), &aWhole );
+  Real ReserveAccumulator::save()
+  {
+    return getQuantity() + theFraction;
+  }
 
-  if( theRandomNumberGenerator->toss( aFraction ) )
-    {
-      ++aWhole;
-    }
-  getVelocity() = aWhole;
-  getQuantity() += aWhole;
-}
+  void ReserveAccumulator::update()
+  {
+    Real tmp;
+    theFraction = modf( getQuantity(), &tmp );
+    getQuantity() = tmp;
+  }
 
-void MonteCarloAccumulator::update()
-{
-  Real aWhole;
-  Real aFraction = modf( getQuantity(), &aWhole );
-  if( theRandomNumberGenerator->toss( aFraction ) )
-    {
-      ++aWhole;
-    }
-  getQuantity() = aWhole;
-}
+  void MonteCarloAccumulator::doit()
+  {
+    Real aWhole;
+    Real aFraction = modf( getVelocity(), &aWhole );
+
+    if( theRandomNumberGenerator->toss( aFraction ) )
+      {
+	++aWhole;
+      }
+    getVelocity() = aWhole;
+    getQuantity() += aWhole;
+  }
+
+  void MonteCarloAccumulator::update()
+  {
+    Real aWhole;
+    Real aFraction = modf( getQuantity(), &aWhole );
+    if( theRandomNumberGenerator->toss( aFraction ) )
+      {
+	++aWhole;
+      }
+    getQuantity() = aWhole;
+  }
+
+
+} // namespace libecs

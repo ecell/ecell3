@@ -33,7 +33,9 @@
 
 #include "CXX/Extensions.hxx"
 
-using namespace Py;
+using Py::ExtensionModule;
+using Py::Object;
+using Py::Tuple;
 
 class PyEcs
   : 

@@ -7,105 +7,109 @@
 
 #include "DataPoint.hpp"
 
-
-/**
-
- */
-
-
-template<class T, class V, class Containee = DataPoint<T,V>,
-	 class Container = vector<Containee*> >
-class StlDataPointVector
+namespace libecs
 {
 
-public:
-  typedef Containee containee_type;
-  typedef typename Container::value_type value_type;
-  typedef typename Container::size_type size_type;
-  typedef typename Container::iterator iterator;
-  typedef typename Container::const_iterator const_iterator;
-  typedef typename Container::reference reference;
-  typedef typename Container::const_reference const_reference;
+  /**
+
+   */
 
 
-public:
-
-  explicit StlDataPointVector()
+  template<class T, class V, class Containee = DataPoint<T,V>,
+    class Container = vector<Containee*> >
+  class StlDataPointVector
   {
-    ; // do nothing
-  }
 
-  explicit StlDataPointVector( const Container& vect )
-    :
-    theContainer( vect )
-  {
-    ; // do nothing
-  }
-
-  StlDataPointVector( const StlDataPointVector& );
-
-  StlDataPointVector( size_type sz )
-  {
-    theContainer = Container( sz );
-  }
-
-  ~StlDataPointVector(void);
-
-  reference operator[] ( size_type sz )
-  {
-    return *(theContainer[sz]);
-  }
+  public:
+    typedef Containee containee_type;
+    typedef typename Container::value_type value_type;
+    typedef typename Container::size_type size_type;
+    typedef typename Container::iterator iterator;
+    typedef typename Container::const_iterator const_iterator;
+    typedef typename Container::reference reference;
+    typedef typename Container::const_reference const_reference;
 
 
-  const_reference operator[] ( size_type sz ) const
-  {
-    return *(theContainer[sz]);
-  }
+  public:
 
-  bool empty() const
-  {
-    return theContainer.empty();
-  }
+    explicit StlDataPointVector()
+    {
+      ; // do nothing
+    }
 
-  size_type size() const
-  {
-    return theContainer.size();
-  }
+    explicit StlDataPointVector( const Container& vect )
+      :
+      theContainer( vect )
+    {
+      ; // do nothing
+    }
 
-  const_iterator begin() const
-  {
-    return theContainer.begin();
-  }
+    StlDataPointVector( const StlDataPointVector& );
 
-  iterator begin()
-  {
-    return theContainer.begin();
-  }
+    StlDataPointVector( size_type sz )
+    {
+      theContainer = Container( sz );
+    }
 
-  const_iterator end() const
-  {
-    return theContainer.end();
-  }
+    ~StlDataPointVector(void);
 
-  iterator end()
-  {
-    return theContainer.end();
-  }
+    reference operator[] ( size_type sz )
+    {
+      return *(theContainer[sz]);
+    }
 
-  void push( const containee_type& x );
 
-  void push( const T&, const V& );
+    const_reference operator[] ( size_type sz ) const
+    {
+      return *(theContainer[sz]);
+    }
 
-  const_iterator binary_search( const_iterator first, const_iterator last,
-				const T&) const;
+    bool empty() const
+    {
+      return theContainer.empty();
+    }
 
-  /*  const_iterator binary_search(size_type, size_type, const T&) const; */
+    size_type size() const
+    {
+      return theContainer.size();
+    }
 
-private:
+    const_iterator begin() const
+    {
+      return theContainer.begin();
+    }
 
-  Container theContainer;
+    iterator begin()
+    {
+      return theContainer.begin();
+    }
 
-};
+    const_iterator end() const
+    {
+      return theContainer.end();
+    }
 
+    iterator end()
+    {
+      return theContainer.end();
+    }
+
+    void push( const containee_type& x );
+
+    void push( const T&, const V& );
+
+    const_iterator binary_search( const_iterator first, const_iterator last,
+				  const T&) const;
+
+    /*  const_iterator binary_search(size_type, size_type, const T&) const; */
+
+  private:
+
+    Container theContainer;
+
+  };
+
+
+} // namespace libecs
 
 #endif /* __DATAPOINTVECTOR_HPP */

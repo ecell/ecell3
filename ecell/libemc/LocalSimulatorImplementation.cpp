@@ -39,140 +39,145 @@
 
 #include "LocalSimulatorImplementation.hpp"
 
-LocalSimulatorImplementation::LocalSimulatorImplementation()
-  :
-  theRootSystem( *new RootSystem )
+namespace libemc
 {
-  ; // do nothing
-}
 
-LocalSimulatorImplementation::~LocalSimulatorImplementation()
-{
-  delete &theRootSystem;
-}
+  LocalSimulatorImplementation::LocalSimulatorImplementation()
+    :
+    theRootSystem( *new RootSystem )
+  {
+    ; // do nothing
+  }
 
-void LocalSimulatorImplementation::createEntity( StringCref classname,
-						  FQPICref fqpi, 
-						  StringCref name )
-{
-  PrimitiveType aType = fqpi.getPrimitiveType();
-  SystemPtr aTargetSystem = getRootSystem().getSystem( fqpi );
+  LocalSimulatorImplementation::~LocalSimulatorImplementation()
+  {
+    delete &theRootSystem;
+  }
 
-  SubstancePtr aSubstancePtr;
-  ReactorPtr   aReactorPtr;
-  SystemPtr    aSystemPtr;
+  void LocalSimulatorImplementation::createEntity( StringCref classname,
+						   FQPICref fqpi, 
+						   StringCref name )
+  {
+    PrimitiveType aType = fqpi.getPrimitiveType();
+    SystemPtr aTargetSystem = getRootSystem().getSystem( fqpi );
 
-  switch( aType )
-    {
+    SubstancePtr aSubstancePtr;
+    ReactorPtr   aReactorPtr;
+    SystemPtr    aSystemPtr;
 
-    case SUBSTANCE:
-      aSubstancePtr = getRootSystem().getSubstanceMaker().make( classname );
-      aSubstancePtr->setId( fqpi.getIdString() );
-      aSubstancePtr->setName( name );
-      aTargetSystem->addSubstance( aSubstancePtr );
-      break;
+    switch( aType )
+      {
 
-    case REACTOR:
-      aReactorPtr = getRootSystem().getReactorMaker().make( classname );
-      aReactorPtr->setId( fqpi.getIdString() );
-      aReactorPtr->setName( name );
-      aTargetSystem->addReactor( aReactorPtr );
-      break;
+      case SUBSTANCE:
+	aSubstancePtr = getRootSystem().getSubstanceMaker().make( classname );
+	aSubstancePtr->setId( fqpi.getIdString() );
+	aSubstancePtr->setName( name );
+	aTargetSystem->addSubstance( aSubstancePtr );
+	break;
 
-    case SYSTEM:
-      aSystemPtr = getRootSystem().getSystemMaker().make( classname );
-      aSystemPtr->setId( fqpi.getIdString() );
-      aSystemPtr->setName( name );
-      aTargetSystem->addSystem( aSystemPtr );
-      break;
+      case REACTOR:
+	aReactorPtr = getRootSystem().getReactorMaker().make( classname );
+	aReactorPtr->setId( fqpi.getIdString() );
+	aReactorPtr->setName( name );
+	aTargetSystem->addReactor( aReactorPtr );
+	break;
 
-    case NONE:
-    default:
-      throw InvalidPrimitiveType( __PRETTY_FUNCTION__, 
-				  "bad PrimitiveType specified." );
+      case SYSTEM:
+	aSystemPtr = getRootSystem().getSystemMaker().make( classname );
+	aSystemPtr->setId( fqpi.getIdString() );
+	aSystemPtr->setName( name );
+	aTargetSystem->addSystem( aSystemPtr );
+	break;
 
-    }
+      case NONE:
+      default:
+	throw InvalidPrimitiveType( __PRETTY_FUNCTION__, 
+				    "bad PrimitiveType specified." );
 
-}
+      }
 
-void LocalSimulatorImplementation::setProperty( FQPICref fqpi, 
-						MessageCref message)
-{
-  PrimitiveType aType = fqpi.getPrimitiveType();
-  SystemPtr aSystem = getRootSystem().getSystem( SystemPath(fqpi) );
+  }
 
-  EntityPtr anEntityPtr;
+  void LocalSimulatorImplementation::setProperty( FQPICref fqpi, 
+						  MessageCref message)
+  {
+    PrimitiveType aType = fqpi.getPrimitiveType();
+    SystemPtr aSystem = getRootSystem().getSystem( SystemPath(fqpi) );
 
-  switch( aType )
-    {
+    EntityPtr anEntityPtr;
 
-    case SUBSTANCE:
-      anEntityPtr = aSystem->getSubstance( fqpi.getIdString() );
-      break;
+    switch( aType )
+      {
 
-    case REACTOR:
-      anEntityPtr = aSystem->getReactor( fqpi.getIdString() );
-      break;
+      case SUBSTANCE:
+	anEntityPtr = aSystem->getSubstance( fqpi.getIdString() );
+	break;
 
-    case SYSTEM:
-      anEntityPtr = aSystem->getSystem( fqpi.getIdString() );
-      break;
+      case REACTOR:
+	anEntityPtr = aSystem->getReactor( fqpi.getIdString() );
+	break;
 
-    case NONE:
-    default:
-      throw InvalidPrimitiveType( __PRETTY_FUNCTION__, 
-				  "bad PrimitiveType specified." );
+      case SYSTEM:
+	anEntityPtr = aSystem->getSystem( fqpi.getIdString() );
+	break;
 
-    }
+      case NONE:
+      default:
+	throw InvalidPrimitiveType( __PRETTY_FUNCTION__, 
+				    "bad PrimitiveType specified." );
 
-  anEntityPtr->set( message );
-}
+      }
 
-
-const Message LocalSimulatorImplementation::
-getProperty( FQPICref fqpi,
-	    StringCref propertyName )
-{
-  PrimitiveType aType = fqpi.getPrimitiveType();
-  SystemPtr aSystem = getRootSystem().getSystem( fqpi );
-
-  EntityPtr anEntityPtr;
-
-  switch( aType )
-    {
-
-    case SUBSTANCE:
-      anEntityPtr = aSystem->getSubstance( fqpi.getIdString() );
-      break;
-
-    case REACTOR:
-      anEntityPtr = aSystem->getReactor( fqpi.getIdString() );
-      break;
-
-    case SYSTEM:
-      anEntityPtr = aSystem->getSystem( fqpi.getIdString() );
-      break;
-
-    case NONE:
-    default:
-      throw InvalidPrimitiveType( __PRETTY_FUNCTION__, 
-				  "bad PrimitiveType specified." );
-
-    }
-
-  return anEntityPtr->get( propertyName );
-}
+    anEntityPtr->set( message );
+  }
 
 
-void LocalSimulatorImplementation::step()
-{
-  theRootSystem.getStepperLeader().step();  
-}
+  const Message LocalSimulatorImplementation::
+  getProperty( FQPICref fqpi,
+	       StringCref propertyName )
+  {
+    PrimitiveType aType = fqpi.getPrimitiveType();
+    SystemPtr aSystem = getRootSystem().getSystem( fqpi );
 
-void LocalSimulatorImplementation::initialize()
-{
-  theRootSystem.initialize();
-}
+    EntityPtr anEntityPtr;
+
+    switch( aType )
+      {
+
+      case SUBSTANCE:
+	anEntityPtr = aSystem->getSubstance( fqpi.getIdString() );
+	break;
+
+      case REACTOR:
+	anEntityPtr = aSystem->getReactor( fqpi.getIdString() );
+	break;
+
+      case SYSTEM:
+	anEntityPtr = aSystem->getSystem( fqpi.getIdString() );
+	break;
+
+      case NONE:
+      default:
+	throw InvalidPrimitiveType( __PRETTY_FUNCTION__, 
+				    "bad PrimitiveType specified." );
+
+      }
+
+    return anEntityPtr->get( propertyName );
+  }
 
 
+  void LocalSimulatorImplementation::step()
+  {
+    theRootSystem.getStepperLeader().step();  
+  }
+
+  void LocalSimulatorImplementation::initialize()
+  {
+    theRootSystem.initialize();
+  }
+
+
+
+} // namespace libemc
 
