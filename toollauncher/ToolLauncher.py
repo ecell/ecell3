@@ -447,7 +447,7 @@ class ToolLauncher(ParentWindow):
 	# ==========================================================================
 	def copyNewModel( self, symlinks=0):
 
-		newDir = self.thePref['ecell3_path']+self.thePref['model_home']+os.sep+self['new_model_name'].get_text()
+		newDir = self.thePref['model_path']+os.sep+self['new_model_name'].get_text()
 		copyClass = CopyDirectory( self, newDir )
 		copyClass.copyDirectory( )
 		self.thePref['model_path'] = newDir
@@ -485,7 +485,7 @@ class ToolLauncher(ParentWindow):
 
 			uncompressClass = ZipManager( self )
 			modelname = uncompressClass.uncompress( self['model_path'].get_text() )
-			self.thePref['model_path'] = self.thePref['ecell3_path']+self.thePref['model_home']+os.sep+modelname
+			self.thePref['model_path'] = self.thePref['model_home']+os.sep+modelname
 			self.savePreferences()
 
 		# catch exceptions

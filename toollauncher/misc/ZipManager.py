@@ -125,7 +125,13 @@ class ZipManager:
 		pref = Preferences( self.theToolLauncher )
 		return pref.getModelHome()
 
-	# end of getModelPath
+	# end of getModelHome
+
+	# ==========================================================================
+	def getModelPath( self ):
+
+		pref = Preferences( self.theToolLauncher )
+		return pref.getModelPath()
 
 
 	# ==========================================================================

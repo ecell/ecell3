@@ -110,7 +110,8 @@ class Preferences:
 
 	# ==========================================================================
 	def getModelHome( self ):
-		return self.theToolLauncher.thePref['ecell3_path']+self.theToolLauncher.thePref['model_home']
+		return self.theToolLauncher.thePref['model_home']
+
 	# end of getModelHome
 
 

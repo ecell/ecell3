@@ -122,7 +122,7 @@ class ToolLauncherPreferences( ParentWindow ):
 		    	self.theToolLauncher.thePref['save_eml'] = '0' 
 
 		self.theToolLauncher.thePref['editor_path'] = self['editor_path'].get_text()
-		self.theToolLauncher.thePref['model_path'] = self['model_path'].get_text()
+		self.theToolLauncher.thePref['model_home'] = self['model_path'].get_text()
 		self.theToolLauncher.thePref['programs_path'] = self['programs_path'].get_text()
 		self.theToolLauncher.savePreferences()
 		flg = self.theToolLauncher.checkPref()
@@ -150,7 +150,7 @@ class ToolLauncherPreferences( ParentWindow ):
 
 
 		self['editor_path'].set_text( self.theToolLauncher.thePref['editor_path'] )
-		self['model_path'].set_text( self.theToolLauncher.thePref['model_path'] )
+		self['model_path'].set_text( self.theToolLauncher.thePref['model_home'] )
 		self['programs_path'].set_text( self.theToolLauncher.thePref['programs_path'] )
 		self.update()
 
