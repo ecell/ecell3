@@ -1,7 +1,9 @@
 #! /usr/bin/env python
 import string
 import eml
-        
+import os
+import sys        
+
 class Session:
 
     def __init__( self, aSimulator ):
@@ -70,6 +72,10 @@ class Session:
         
     def saveModel( self ):
         pass
+
+    def loadScript( self, ecs ):
+        execfile(ecs)
+
 
     def plainPrintMethod( aMessage ):
         print aMessage
@@ -187,6 +193,21 @@ class Session:
             #print aPrintFullPn, aValue, ')'
             ## -------------------------------------------------
 
+if __name__ == "__main__":
+
+    import ecs
+
+    aSession = Session( ecs.Simulator() )
+    aSimulator = aSession.theSimulator
+    anEmlFileName = sys.argv[1]
+    anEcsFileName = sys.argv[2]
+
+    aFile = open( anEmlFileName )
+    
+    aSession.loadModel( aFile )
+    aFile.close()
+    
+    aSession.loadScript( anEcsFileName )
 
 
 
