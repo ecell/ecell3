@@ -1,7 +1,7 @@
 
 #AUTOMAKE_OPTIONS = foreign
 
-SUBDIRS = libltdl dmtool ecell osogo bin
+SUBDIRS = @ECELL_SUBDIR@
 
 EXTRA_DIST = autogen.sh\
 doc\
