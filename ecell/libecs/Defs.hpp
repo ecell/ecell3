@@ -186,7 +186,7 @@ namespace libecs
   const Real N_A( 6.0221367e+23 );
 
   //! 1 / Avogadro number (reciprocal of N_A)
-  const Real R_N_A( 1.0 / N_A );
+  const Real N_A_R( 1.0 / N_A );
 
   // functions
 

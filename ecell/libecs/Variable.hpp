@@ -338,8 +338,8 @@ namespace libecs
 
     GET_METHOD( Real, MolarConc )
     {
-      // R_N_A = 1.0 / N_A
-      return getNumberConc() * R_N_A;
+      // N_A_R = 1.0 / N_A
+      return getNumberConc() * N_A_R;
     }
 
     /**
