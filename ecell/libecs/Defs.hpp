@@ -84,7 +84,7 @@ DECLARE_TYPE( int64_t, Int );
 DECLARE_TYPE( uint64_t, UnsignedInt );
 const int INT_SIZE( sizeof( Int ) );
 
-DECLARE_TYPE( double, Real );
+// FIXME: not portable
 const int REAL_DIG( DBL_DIG );
 
 //! Avogadro number. 
