@@ -1,0 +1,416 @@
+#!/usr/bin/python2
+#
+# rd2dm.py --- A program for converting an rd file into a dm file.
+#
+# Author: Yohei Yamada <yoyo@e-cell.org>
+
+
+#TO-DOS, in order of importance, as of 09/24/02
+#-Fix the problem with $$ in 'EQUATION'
+#-Make 'DESCRIPTION' support multi-lines 
+#-Make 'BRIEF_DESCRIPTION' support multi-lines 
+#-Fix non-essential keys that are currently commented out (e.g. AUTHOR, DESCRIPTION)
+#-support both defined and undefined in AUTHOR, EMAIL, DATE, VERSION, BRIEF_DESCRIPTION, DESCRIPTION, EQUATION, PARAMETER
+#-Make this program support *.rd syntax (will be supported by shell?)
+
+import sys
+
+##########open files
+
+anInputfilename = sys.argv[1] # assign the name of the rd file to anInputfilename
+anInputfile = open( anInputfilename, 'r' )
+anOutputfilename = anInputfilename[:-2] + 'dm'
+anOutputfile = open( anOutputfilename, 'w' )
+
+aText = anInputfile.read() # assign aText with the contents of the rd file
+
+if len( sys.argv ) != 2: # Error if there are too many arguments(rd2dm.py, inputfile)
+	print "ArgumentError: Too many arguments (% rd2dm.py inputfile)"
+	sys.exit( 0 )
+
+import string
+aTextList = string.split( aText,'\n' ) # Split aText into lines and assign each line into an element of aTextList
+
+TRUE = 1 # TRUE flag for @REACT_FUNC:
+FALSE = 0 # FALSE flag for @REACT_FUNC:
+
+aReact_Func_Flag = FALSE # Initialize aReact_Func_Flag with FALSE
+
+aTextDictionary = {} # Create a new dictionary
+
+aReactFuncCounter = 0 # Counter for @REACT_FUNC:
+aReactFuncText = '' # String for @REACT_FUNC:
+
+##########start storing
+
+for aLine in aTextList: # Iterate for each element(line) in aTextList
+	aStrippedLine = string.strip( aLine ) # Strip the white spaces from aLine and assign into aStrippedLine 
+
+	###CLASSNAME
+	if aStrippedLine[:1] != '#' and string.find( aStrippedLine,'@CLASSNAME:' ) == 0:
+		aReact_Func_Flag = FALSE
+		anIndex = 0
+		for c in aStrippedLine:
+			anIndex = anIndex + 1
+			if c is ':':
+				aTextDictionary['CLASSNAME'] = aStrippedLine[anIndex:]
+				aTextDictionary['CLASSNAME'] = string.strip(aTextDictionary['CLASSNAME'])
+	#if aTextDictionary.has_key('CLASSNAME') == FALSE: # initialize, if it has not yet been initialized
+		#aTextDictionary['CLASSNAME'] = ''
+
+	###BASECLASS
+	if aStrippedLine[:1] != '#' and string.find( aStrippedLine,'@BASECLASS:' ) == 0:
+		aReact_Func_Flag = FALSE
+		anIndex = 0
+		for c in aStrippedLine:
+			anIndex = anIndex + 1
+			if c is ':':
+				aTextDictionary['BASECLASS'] = aStrippedLine[anIndex:]
+				aTextDictionary['BASECLASS'] = string.strip(aTextDictionary['BASECLASS'])
+	#if aTextDictionary.has_key('BASECLASS') == FALSE: # initialize, if it has not yet been initialized
+		#aTextDictionary['BASECLASS'] = ''
+
+	###AUTHOR			
+	if aStrippedLine[:1] != '#' and string.find( aStrippedLine,'@AUTHOR:' ) == 0:
+		aReact_Func_Flag = FALSE
+		anIndex = 0
+		for c in aStrippedLine:
+			anIndex = anIndex + 1
+			if c is ':':
+				aTextDictionary['AUTHOR'] = aStrippedLine[anIndex:]
+				aTextDictionary['AUTHOR'] = string.strip(aTextDictionary['AUTHOR'])
+	if aTextDictionary.has_key('AUTHOR') == FALSE: # initialize, if it has not yet been initialized
+		aTextDictionary['AUTHOR'] = ''
+
+	###EMAIL
+	if aStrippedLine[:1] != '#' and string.find( aStrippedLine,'@EMAIL:' ) == 0:
+		aReact_Func_Flag = FALSE
+		anIndex = 0
+		for c in aStrippedLine:
+			anIndex = anIndex + 1
+			if c is ':':
+				aTextDictionary['EMAIL'] = aStrippedLine[anIndex:]
+				aTextDictionary['EMAIL'] = string.strip(aTextDictionary['EMAIL'])
+	if aTextDictionary.has_key('EMAIL') == FALSE: # initialize, if it has not yet been initialized
+		aTextDictionary['EMAIL'] = ''
+
+	###DATE
+	if aStrippedLine[:1] != '#' and string.find( aStrippedLine,'@DATE:' ) == 0:
+		aReact_Func_Flag = FALSE
+		anIndex = 0
+		for c in aStrippedLine:
+			anIndex = anIndex + 1
+			if c is ':':
+				aTextDictionary['DATE'] = aStrippedLine[anIndex:]
+				aTextDictionary['DATE'] = string.strip(aTextDictionary['DATE'])
+	if aTextDictionary.has_key('DATE') == FALSE: # initialize, if it has not yet been initialized
+		aTextDictionary['DATE'] = ''
+
+	###BRIEF_DESCRIPTION
+	if aStrippedLine[:1] != '#' and string.find( aStrippedLine,'@BRIEF_DESCRIPTION:' ) == 0: # cannot support multi-lines(as of now)
+		aReact_Func_Flag = FALSE
+		anIndex = 0
+		for c in aStrippedLine:
+			anIndex = anIndex + 1
+			if c is ':':
+				aTextDictionary['BRIEF_DESCRIPTION'] = aStrippedLine[anIndex:]
+				aTextDictionary['BRIEF_DESCRIPTION'] = string.strip(aTextDictionary['BRIEF_DESCRIPTION'])
+	if aTextDictionary.has_key('BRIEF_DESCRIPTION') == FALSE: # initialize, if it has not yet been initialized
+		aTextDictionary['BRIEF_DESCRIPTION'] = ''
+
+	###DESCRIPTION
+	if aStrippedLine[:1] != '#' and string.find( aStrippedLine,'@DESCRIPTION:' ) == 0: # cannot support multi-lines(as of now)
+		aReact_Func_Flag = FALSE
+		anIndex = 0
+		for c in aStrippedLine:
+			anIndex = anIndex + 1
+			if c is ':':
+				aTextDictionary['DESCRIPTION'] = aStrippedLine[anIndex:]
+				aTextDictionary['DESCRIPTION'] = string.strip(aTextDictionary['DESCRIPTION'])
+	if aTextDictionary.has_key('DESCRIPTION') == FALSE: # initialize, if it has not yet been initialized
+		aTextDictionary['DESCRIPTION'] = ''
+
+	###EQUATION
+	if aStrippedLine[:1] != '#' and string.find( aStrippedLine,'@EQUATION:' ) == 0:
+		aReact_Func_Flag = FALSE
+		anIndex = 0
+		for c in aStrippedLine:
+			anIndex = anIndex + 1
+			if c is ':':
+				aTextDictionary['EQUATION'] = aStrippedLine[anIndex:]
+				aTextDictionary['EQUATION'] = string.strip(aTextDictionary['EQUATION'])
+	if aTextDictionary.has_key('EQUATION') == FALSE: # initialize, if it has not yet been initialized
+		aTextDictionary['EQUATION'] = ''
+
+	###VERSION
+	if aStrippedLine[:1] != '#' and string.find( aStrippedLine,'%VERSION:' ) == 0:
+		aReact_Func_Flag = FALSE
+		anIndex = 0
+		aBeginIndex = 0
+		anEndIndex = 0
+		aValueList = []
+		for c in aStrippedLine:
+			anIndex = anIndex + 1
+			if c is ':':
+				aValue = aStrippedLine[anIndex:]
+				for a in aValue:
+					anEndIndex = anEndIndex + 1
+					if a is ',':
+						aValueList.append(string.strip(aValue[aBeginIndex:anEndIndex-1]))
+						aBeginIndex = anEndIndex
+				aValueList.append(string.strip(aValue[aBeginIndex:anEndIndex]))
+				aTextDictionary['VERSION'] = aValueList
+	if aTextDictionary.has_key('VERSION') == FALSE: # initialize, if it has not yet been initialized
+		aTextDictionary['VERSION'] = []
+
+	###SUBSTANCE
+	if aStrippedLine[:1] != '#' and string.find( aStrippedLine,'%SUBSTANCE:' ) == 0:
+		aReact_Func_Flag = FALSE
+		anIndex = 0
+		aBeginIndex = 0
+		anEndIndex = 0
+		aValueList = []
+		for c in aStrippedLine:
+			anIndex = anIndex + 1
+			if c is ':':
+				aValue = aStrippedLine[anIndex:]
+				for a in aValue:
+					anEndIndex = anEndIndex + 1
+					if a is ',':
+						aValueList.append(string.strip(aValue[aBeginIndex:anEndIndex-1]))
+						aBeginIndex = anEndIndex
+				aValueList.append(string.strip(aValue[aBeginIndex:anEndIndex]))
+				if aTextDictionary.has_key('SUBSTANCE') == FALSE:
+					aTextDictionary['SUBSTANCE'] = [aValueList,]
+				else:
+					aTextDictionary['SUBSTANCE'].append(aValueList)
+	if aTextDictionary.has_key('SUBSTANCE') == FALSE: # initialize, if it has not yet been initialized
+		aTextDictionary['SUBSTANCE'] = []
+
+	###PARAMETER
+	if aStrippedLine[:1] != '#' and string.find( aStrippedLine,'%PARAMETER:' ) == 0:
+		aReact_Func_Flag = FALSE
+		anIndex = 0
+		aBeginIndex = 0
+		anEndIndex = 0
+		aValueList = []
+		for c in aStrippedLine:
+			anIndex = anIndex + 1
+			if c is ':':
+				aValue = string.strip(aStrippedLine[anIndex:]) # strip white space from line
+				for a in aValue:
+					anEndIndex = anEndIndex + 1
+					if a is ',':
+						aValueList.append(string.strip(aValue[aBeginIndex:anEndIndex-1])) 
+						aBeginIndex = anEndIndex
+				aValueList.append(string.strip(aValue[aBeginIndex:anEndIndex]))
+				if aTextDictionary.has_key('PARAMETER') == FALSE:
+					aTextDictionary['PARAMETER'] = [aValueList,]
+					#aTextDictionary['PARAMETER'].append(aValueList)
+				else:
+					aTextDictionary['PARAMETER'].append(aValueList)
+	if aTextDictionary.has_key('PARAMETER') == FALSE: # initialize, if it has not yet been initialized
+		aTextDictionary['PARAMETER'] = []
+
+
+	###REACT_FUNC	
+	if aStrippedLine[:1] != '#' and string.find( aStrippedLine,'@REACT_FUNC:' ) == 0:
+		aReact_Func_Flag = TRUE
+
+	if aReact_Func_Flag == TRUE:
+		aReactFuncCounter = aReactFuncCounter + 1
+		if aTextDictionary.has_key('REACT_FUNC') == FALSE: 
+			aTextDictionary['REACT_FUNC'] = [aStrippedLine[anIndex:],]
+		else: 
+			aTextDictionary['REACT_FUNC'].append(' ' + aStrippedLine) 
+		aReactFuncText = aReactFuncText + ' ' + aTextDictionary['REACT_FUNC'][aReactFuncCounter-1] + '\n'
+
+aTextDictionary['REACT_FUNC'] = aReactFuncText # Assign text to value of 'REACT_FUNC' key
+
+#sys.stdout
+
+#print aTextDictionary
+#anOutputfile.write(aTextDictionary)
+#anOutputfile.write('hey!!!')
+
+###########end storing
+###########begin copying
+
+anEditedTextDictionary = {} # create new dictionary
+anEditedTextDictionary['CLASSNAME'] = aTextDictionary['CLASSNAME']
+anEditedTextDictionary['BASECLASS'] = aTextDictionary['BASECLASS']
+anEditedTextDictionary['AUTHOR'] = aTextDictionary['AUTHOR']
+anEditedTextDictionary['EMAIL'] = aTextDictionary['EMAIL']
+anEditedTextDictionary['DATE'] = aTextDictionary['DATE']
+anEditedTextDictionary['VERSION'] = aTextDictionary['VERSION']
+anEditedTextDictionary['BRIEF_DESCRIPTION'] = aTextDictionary['BRIEF_DESCRIPTION']
+anEditedTextDictionary['DESCRIPTION'] = aTextDictionary['DESCRIPTION']
+anEditedTextDictionary['EQUATION'] = aTextDictionary['EQUATION']
+anEditedTextDictionary['PROPERTIES'] = aTextDictionary['PARAMETER']
+anEditedTextDictionary['PROTECTED_AUX'] = ''
+anEditedTextDictionary['INITIALIZE'] = ''
+anEditedTextDictionary['REACT'] = aTextDictionary['REACT_FUNC']
+
+##########end copying
+##########begin editing
+
+###CLASSNAME
+# do nothing
+
+###BASECLASS
+# do nothing
+
+###AUTHOR
+# do nothing
+
+###EMAIL
+# do nothing
+
+###DATE
+# do nothing
+
+###VERSION
+anEditedTextDictionary['VERSION'] = tuple(anEditedTextDictionary['VERSION']) # convert list to tuple
+
+###BRIEF_DESCRIPTION
+# do nothing
+
+###DESCRIPTION
+# do nothing
+
+###EQUATION
+# do nothing
+
+###PROPERTIES
+# convert list into tuple
+aPropertiesIndex = 0
+while aPropertiesIndex < len(anEditedTextDictionary['PROPERTIES']):
+	temp = anEditedTextDictionary['PROPERTIES'][aPropertiesIndex][1]
+	anEditedTextDictionary['PROPERTIES'][aPropertiesIndex][1] = anEditedTextDictionary['PROPERTIES'][aPropertiesIndex][0] 
+	anEditedTextDictionary['PROPERTIES'][aPropertiesIndex][0] =  temp
+	del anEditedTextDictionary['PROPERTIES'][aPropertiesIndex][2:]
+	anEditedTextDictionary['PROPERTIES'][aPropertiesIndex].append(0.0)
+	if string.find(anEditedTextDictionary['PROPERTIES'][aPropertiesIndex][0],'Float') == 0: 
+		anEditedTextDictionary['PROPERTIES'][aPropertiesIndex][0] = 'Real'
+	anEditedTextDictionary['PROPERTIES'][aPropertiesIndex] = tuple(anEditedTextDictionary['PROPERTIES'][aPropertiesIndex])
+	aPropertiesIndex = aPropertiesIndex + 1
+	
+###PROTECTED_AUX
+
+aNumberOfSubstrate = string.count(anEditedTextDictionary['REACT'], 'substrate(')
+aNumberOfProduct = string.count(anEditedTextDictionary['REACT'], 'product(')
+aNumberOfCatalyst = string.count(anEditedTextDictionary['REACT'], 'catalyst(')
+aNumberOfEffector = string.count(anEditedTextDictionary['REACT'], 'effector(')
+
+aProtectedAuxIndex = 0
+while aProtectedAuxIndex < aNumberOfSubstrate:
+	anEditedTextDictionary['PROTECTED_AUX'] = anEditedTextDictionary['PROTECTED_AUX'] + '\n' + '  ' + 'Reactant S' + str(aProtectedAuxIndex) + ';'
+	aProtectedAuxIndex = aProtectedAuxIndex + 1
+aProtectedAuxIndex = 0
+while aProtectedAuxIndex < aNumberOfProduct:
+	anEditedTextDictionary['PROTECTED_AUX'] = anEditedTextDictionary['PROTECTED_AUX'] + '\n' + '  ' + 'Reactant P' + str(aProtectedAuxIndex) + ';'
+	aProtectedAuxIndex = aProtectedAuxIndex + 1
+aProtectedAuxIndex = 0
+while aProtectedAuxIndex < aNumberOfCatalyst:
+	anEditedTextDictionary['PROTECTED_AUX'] = anEditedTextDictionary['PROTECTED_AUX'] + '\n' + '  ' + 'Reactant C' + str(aProtectedAuxIndex) + ';'
+	aProtectedAuxIndex = aProtectedAuxIndex + 1
+aProtectedAuxIndex = 0
+while aProtectedAuxIndex < aNumberOfEffector:
+	anEditedTextDictionary['PROTECTED_AUX'] = anEditedTextDictionary['PROTECTED_AUX'] + '\n' + '  ' + 'Reactant E' + str(aProtectedAuxIndex) + ';'	
+	aProtectedAuxIndex = aProtectedAuxIndex + 1
+
+###INITIALIZE
+
+anInitializeIndex = 0
+while anInitializeIndex < aNumberOfSubstrate:
+	anEditedTextDictionary['INITIALIZE'] = anEditedTextDictionary['INITIALIZE'] + '  S' + str(anInitializeIndex) + ' = getReactant( "S' + str(anInitializeIndex) + '" );\n'
+	anInitializeIndex = anInitializeIndex + 1
+anInitializeIndex = 0
+while anInitializeIndex < aNumberOfProduct:
+	anEditedTextDictionary['INITIALIZE'] = anEditedTextDictionary['INITIALIZE'] + '  P' + str(anInitializeIndex) + ' = getReactant( "P' + str(anInitializeIndex) + '" );\n'
+	anInitializeIndex = anInitializeIndex + 1
+anInitializeIndex = 0
+while anInitializeIndex < aNumberOfCatalyst:
+	anEditedTextDictionary['INITIALIZE'] = anEditedTextDictionary['INITIALIZE'] + '  C' + str(anInitializeIndex) + ' = getReactant( "C' + str(anInitializeIndex) + '" );\n'
+	anInitializeIndex = anInitializeIndex + 1
+anInitializeIndex = 0
+while anInitializeIndex < aNumberOfEffector:
+	anEditedTextDictionary['INITIALIZE'] = anEditedTextDictionary['INITIALIZE'] + '  E' + str(anInitializeIndex) + ' = getReactant( "E' + str(anInitializeIndex) + '" );\n'
+	anInitializeIndex = anInitializeIndex + 1
+	
+###REACT
+anEditedTextDictionary['REACT'] = string.replace(anEditedTextDictionary['REACT'],'Float','Real') # Replace Float with Real
+
+anEditedTextDictionary['REACT'] = string.replace(anEditedTextDictionary['REACT'],'substrate(','S') # Replace substrate with S
+anEditedTextDictionary['REACT'] = string.replace(anEditedTextDictionary['REACT'],'product(','P') # Replace product with P
+anEditedTextDictionary['REACT'] = string.replace(anEditedTextDictionary['REACT'],'catalyst(','C') # Replace catalyst with C
+anEditedTextDictionary['REACT'] = string.replace(anEditedTextDictionary['REACT'],'effector(','E') # Replace effector with E
+
+anEditedTextDictionary['REACT'] = string.replace(anEditedTextDictionary['REACT'], ')->quantity()','.getSubstance()->getQuantity()')
+anEditedTextDictionary['REACT'] = string.replace(anEditedTextDictionary['REACT'], ') -> quantity()','.getSubstance()->getQuantity()')
+anEditedTextDictionary['REACT'] = string.replace(anEditedTextDictionary['REACT'], ')->concentration()','.getSubstance()->getConcentration()')
+anEditedTextDictionary['REACT'] = string.replace(anEditedTextDictionary['REACT'], ') -> concentration()','.getSubstance()->getConcentration()')
+
+anEditedTextDictionary['REACT'] = string.replace(anEditedTextDictionary['REACT'], 'supersystem()','getSuperSystem()')
+anEditedTextDictionary['REACT'] = string.replace(anEditedTextDictionary['REACT'], 'volume()','getVolume()')
+anEditedTextDictionary['REACT'] = string.replace(anEditedTextDictionary['REACT'], 'stepper()','getStepper()')
+anEditedTextDictionary['REACT'] = string.replace(anEditedTextDictionary['REACT'], 'deltaT()','getStepInterval()')
+anEditedTextDictionary['REACT'] = string.replace(anEditedTextDictionary['REACT'], 'coefficient()','getStoichiometry()') # will probably change in the future
+anEditedTextDictionary['REACT'] = string.replace(anEditedTextDictionary['REACT'], ')->setQuantity','.getSubstance()->setQuantity')
+anEditedTextDictionary['REACT'] = string.replace(anEditedTextDictionary['REACT'], ') -> setQuantity','.getSubstance()->setQuantity')
+
+#anEditedTextDictionary['REACT'] = string.replace(anEditedTextDictionary['REACT'], '', '')
+#anEditedTextDictionary['REACT'] = string.replace(anEditedTextDictionary['REACT'], '//','#')
+#anEditedTextDictionary['REACT'] = string.replace(anEditedTextDictionary['REACT'], 'num(Substrate)','') # don't edit 'num(Substrate)'
+
+##########end editing
+##########begin writing
+
+#anOutputfile.write("# This has been created using the 'rd2dm' module. \n# Please remove this comment after checking for errors.\n\n")
+
+classname = "CLASSNAME = " + "'" + str(anEditedTextDictionary['CLASSNAME'] + "'")
+anOutputfile.write(classname + '\n\n')
+
+baseclass = "BASECLASS = " + "'" + str(anEditedTextDictionary['BASECLASS'] + "'")
+anOutputfile.write(baseclass + '\n')
+
+author = "AUTHOR = " + "'" + str(anEditedTextDictionary['AUTHOR'] + "'")
+anOutputfile.write(author + '\n')
+
+email = "EMAIL = " + "'" + str(anEditedTextDictionary['EMAIL'] + "'")
+anOutputfile.write(email + '\n')
+
+date = "DATE = " + "'" + str(anEditedTextDictionary['DATE'] + "'")
+anOutputfile.write(date + '\n\n')
+
+version = "VERSION = " + str(anEditedTextDictionary['VERSION'])
+anOutputfile.write(version + '\n\n')
+
+brief_description = "BRIEF_DESCRIPTION = " + "'" + str(anEditedTextDictionary['BRIEF_DESCRIPTION'] + "'")
+anOutputfile.write(brief_description + '\n\n')
+
+description = "DESCRIPTION = " + "'" + str(anEditedTextDictionary['DESCRIPTION'] + "'")
+anOutputfile.write(description + '\n\n')
+
+#equation = "EQUATION = " + str(anEditedTextDictionary['EQUATION']) ## '$$' gets in the way
+#anOutputfile.write(equation + '\n\n')
+
+properties = "PROPERTIES = " + str(anEditedTextDictionary['PROPERTIES'])
+anOutputfile.write(properties + '\n\n')
+
+protected_aux = "PROTECTED_AUX = '''" + str(anEditedTextDictionary['PROTECTED_AUX'])
+anOutputfile.write(protected_aux + "\n'''\n\n")
+
+initialize = "defineMethod( 'initialize', '''\n" + str(anEditedTextDictionary['INITIALIZE'])
+anOutputfile.write(initialize + "''' )\n\n")
+
+react = "defineMethod( 'react', '''" + str(anEditedTextDictionary['REACT'])
+anOutputfile.write(react + "\n''' )\n\n")
+
+#print "CONVERTED:", anInputfile, "\nTO:", anOutputfile
+
+##########end writing
+##########close files
+
+anInputfile.close()
+anOutputfile.close()
