@@ -17,6 +17,9 @@ aSession.loadModel( aFile )
 aFile.close()
 
 
+aLogger1 = aSimulator.getLogger( 'Substance:/CELL/CYTOPLASM:S:Quantity'  )
+
+
 aSimulator.initialize()
 
 #printAllProperties( aSimulator, 'System::/' )
@@ -41,3 +44,6 @@ printProperty( aSimulator, 'Substance:/CELL/CYTOPLASM:S:Activity' )
 printProperty( aSimulator, 'Substance:/CELL/CYTOPLASM:S:Velocity' )
 printProperty( aSimulator, 'Substance:/CELL/CYTOPLASM:P:Quantity' )
 
+#d = aLogger1.getData()
+#print len( d )
+#print d[0:100]
