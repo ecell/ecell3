@@ -67,10 +67,23 @@ namespace libecs
     theESSYNSMatrix.resize(theSystemSize+1);
     RealVector tmp;
     tmp.resize(theTaylorOrder+1);
-    for(int i( 0 ); i < theSystemSize + 1; i++)
+
+    for(int i( 0 ); i < theSystemSize; i++)
     {
       theESSYNSMatrix[i] = tmp;
     }
+
+    theIndexVector.resize( theSystemSize );
+    VariableReferenceVectorCref aVariableReferenceVectorCref
+      ( theESSYNSProcessPtr->getVariableReferenceVector() );
+
+    for ( VariableReferenceVector::size_type c( theESSYNSProcessPtr->getPositiveVariableReferenceOffset() ); c < theSystemSize; c++  )
+      {
+	VariableReferenceCref aVariableReferenceCref( aVariableReferenceVectorCref[ c ] );
+	const VariablePtr aVariablePtr( aVariableReferenceCref.getVariable() );
+
+	theIndexVector[ c ] = getVariableIndex( aVariablePtr );
+      }
 
     /* for( int i( 1 ); i < theSystemSize+1; i++)
       {
@@ -88,13 +101,12 @@ namespace libecs
 
     // write step() function
   
-     theESSYNSMatrix = theESSYNSProcessPtr->getESSYNSMatrix();
+    theESSYNSMatrix = theESSYNSProcessPtr->getESSYNSMatrix();
 
     //integrate
-    Real aY( 0.0 ); 
     for( int i( 1 ); i < theSystemSize+1; i++ )
       {
-	aY = 0.0;//reset aY 
+	Real aY( 0.0 ); //reset aY 
 	for( int m( 1 ); m <= theTaylorOrder; m++ )
 	  {
 	    aY += ((theESSYNSMatrix[i-1])[m] *
@@ -105,19 +117,17 @@ namespace libecs
       }
     
     //set value
-    int anIndex( 0 );
     for( int c( 0 ); c < aSize; ++c )
       {
-	VariablePtr const aVariable( theVariableVector[ c ] );
+	const VariableVector::size_type anIndex( theIndexVector[ c ] );
+	VariablePtr const aVariable( theVariableVector[ anIndex ] );
 	
-	const Real aVelocity( ( exp( (theESSYNSMatrix[anIndex])[0] ) - ( aVariable->getValue() ) ) / aStepInterval );
+	const Real aVelocity( ( exp( (theESSYNSMatrix[c])[0] ) - ( aVariable->getValue() ) ) / aStepInterval );
 		     
-	
-	theVelocityBuffer[ c ] = aVelocity;
-	aVariable->setVelocity( theVelocityBuffer[ c ] );
-		     
-	anIndex++;
+	theVelocityBuffer[ anIndex ] = aVelocity;
+	aVariable->setVelocity( aVelocity );
 
+	theK1[ anIndex ] = aVelocity;
       }
 
     return true;

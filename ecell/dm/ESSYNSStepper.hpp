@@ -42,6 +42,38 @@ USE_LIBECS;
 LIBECS_DM_CLASS( ESSYNSStepper, AdaptiveDifferentialStepper )
 {
 
+ public:
+
+    class VariableProxy
+      :
+      public libecs::VariableProxy
+    {
+    public:
+      VariableProxy( ESSYNSStepperRef aStepper, 
+		     VariablePtr const aVariablePtr )
+	:
+	libecs::VariableProxy( aVariablePtr ),
+	theStepper( aStepper ),
+	theIndex( theStepper.getVariableIndex( aVariablePtr ) )
+      {
+	; // do nothing
+      }
+
+      virtual const Real getDifference( RealCref aTime, RealCref anInterval )
+      {
+	// First order interpolation.  This should be overridden in
+	// higher order DifferentialSteppers.
+	return theStepper.getVelocityBuffer()[ theIndex ] * anInterval;
+      }
+      
+
+    protected:
+
+      ESSYNSStepperRef    theStepper;
+      VariableVector::size_type theIndex;
+
+    };
+
 public:
 
   LIBECS_DM_OBJECT( ESSYNSStepper, Stepper )
@@ -76,10 +108,14 @@ public:
   virtual void initialize();
   virtual bool calculate();
     
-
   virtual Integer const getOrder() const 
     {
       return theTaylorOrder;
+    }
+
+  virtual VariableProxyPtr createVariableProxy( VariablePtr aVariable )
+    {
+      return new ESSYNSStepper::VariableProxy( *this, aVariable );
     }
 
 protected:
@@ -88,7 +124,7 @@ protected:
   Integer theTaylorOrder;
   ESSYNSProcessPtr   theESSYNSProcessPtr;
   std::vector<RealVector> theESSYNSMatrix;
-
+  std::vector<VariableVector::size_type> theIndexVector;
 
   //  RealVector theK1;
 };
