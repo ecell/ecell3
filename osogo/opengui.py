@@ -31,8 +31,8 @@ def usage():
 Usage: %s [-h] ([-e EmlFile]|[-f ModelFile])
 
 Options:
-        -e or --exec=[.eml file]  :  load script (.ess) file
-        -f or --file=[.ess file]  :  load model (.eml) file
+        -e or --exec=[.ess file]  :  load script (.ess) file
+        -f or --file=[.eml file]  :  load model (.eml) file
         -h or --help              :  print this message.
 
 	Do not use -e and -f at same time.
