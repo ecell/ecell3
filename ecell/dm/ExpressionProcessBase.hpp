@@ -132,10 +132,7 @@ namespace libecs
 
     void compileExpression()
       {
-	ExpressionCompiler theCompiler;
-	
-	theCompiler.setProcessPtr( static_cast<Process*>( this ) );
-	theCompiler.setPropertyMap( &thePropertyMap );
+	ExpressionCompiler theCompiler( this, &( getPropertyMap() ) );
 
 	theCompiledCode.clear();
 	theCompiledCode = theCompiler.compileExpression( theExpression );
@@ -145,10 +142,10 @@ namespace libecs
 	theNeedRecompile = false;
       }
 
-    /**virtual const Polymorph getExtraPropertyList()
+    PropertyMapCref getPropertyMap() const
       {
 	return thePropertyMap;
-	}*/
+      }
 
     virtual void initialize()
       {
@@ -159,6 +156,14 @@ namespace libecs
 	    compileExpression();
 	  }
       }
+
+  protected:
+
+    PropertyMapRef getPropertyMap()
+      {
+	return thePropertyMap;
+      }
+
 
   protected:
 

@@ -433,7 +433,10 @@ namespace libecs
     
   public:
     
-    ExpressionCompiler()
+    ExpressionCompiler( ProcessPtr aProcess, PropertyMapPtr aPropertyMap )
+      :
+      theProcessPtr( aProcess ),
+      thePropertyMapPtr( aPropertyMap )
     {
       if( theConstantMap.empty() == true ||
 	  theFunctionMap1.empty() == true ||
@@ -456,16 +459,6 @@ namespace libecs
     typedef parse_tree_match_t::tree_iterator TreeIterator;
     //    DECLARE_CLASS( TreeIterator );
     
-
-    void setProcessPtr( ProcessCref aProcessPtr )
-    {
-      theProcessPtr = const_cast<ProcessPtr>( &aProcessPtr );
-    }
-
-    void setPropertyMap( PropertyMapPtr aPropertyMapPtr )
-    {
-     thePropertyMapPtr = aPropertyMapPtr;
-    }
 
     const Code compileExpression( StringCref anExpression );
     
@@ -501,9 +494,8 @@ namespace libecs
 
   private:
     
-    ProcessPtr theProcessPtr;
-    
-    PropertyMapPtr thePropertyMapPtr;
+    ProcessPtr      theProcessPtr;
+    PropertyMapPtr  thePropertyMapPtr;
     
     static ConstantMap theConstantMap;
     static FunctionMap1 theFunctionMap1;
@@ -511,13 +503,6 @@ namespace libecs
     static VariableReferenceMethodMap theVariableReferenceMethodMap;
     static SystemMethodMap theSystemMethodMap;
     static BooleanFunctionMap theBooleanFunctionMap;
-
-    /**ConstantMap theConstantMap;
-    FunctionMap1 theFunctionMap1;
-    FunctionMap2 theFunctionMap2;
-    VariableReferenceMethodMap theVariableReferenceMethodMap;
-    SystemMethodMap theSystemMethodMap;
-    BooleanFunctionMap theBooleanFunctionMap;*/
 
   }; // ExpressionCompiler
 
@@ -1118,7 +1103,7 @@ namespace libecs
 	  else
 	    {
 	      VariableReferenceCref
-		aVariableReference( theProcessPtr->libecs::Process::
+		aVariableReference( theProcessPtr->
 				    getVariableReference( aString1 ) );
 	      
 	      appendInstruction
@@ -1198,7 +1183,7 @@ namespace libecs
 	    }
       	
 	  VariableReferenceCref
-	    aVariableReference( theProcessPtr->libecs::Process::
+	    aVariableReference( theProcessPtr->
 				getVariableReference( aString1 ) );
 	  
 
@@ -1264,7 +1249,7 @@ namespace libecs
 	  String aString1;
 	  ConstantMapIterator theConstantMapIterator;
 	  PropertyMapIterator thePropertyMapIterator;
-    
+
 	  assert( i->children.size() == 0 );
 	
 	  for( CharIterator = i->value.begin();
@@ -1274,7 +1259,7 @@ namespace libecs
 	    }
 
 	  theConstantMapIterator = theConstantMap.find( aString1 );
-	  thePropertyMapIterator = (*thePropertyMapPtr).find( aString1 );
+	  thePropertyMapIterator = thePropertyMapPtr->find( aString1 );
 	
 	  if( theConstantMapIterator != theConstantMap.end() )
 	    {
@@ -1283,7 +1268,7 @@ namespace libecs
 		  Instruction<PUSH_REAL>( theConstantMapIterator->second ) );
 	    }
 
-	  else if( thePropertyMapIterator != (*thePropertyMapPtr).end() )
+	  else if( thePropertyMapIterator != thePropertyMapPtr->end() )
 	    {
 	      appendInstruction
 		( aCode, Instruction<LOAD_REAL>
