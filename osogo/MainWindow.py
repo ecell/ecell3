@@ -106,7 +106,7 @@ class MainWindow(Window):
     #### these method is not supported in summer GUI project
     def toggleMessageWindow( self, a ) : pass
     def loadCellState( self ) : pass
-    def saveCellStateToThe( self ) : pass
+    def saveCellStateToTheFile( self ) : pass
     def openPreferences( self ) : pass
     def openAbout( self ) : pass
     #### these method is not supported in summer GUI project
