@@ -1,13 +1,8 @@
 #!/usr/bin/env python2
 
-import sys
-import string 
-import getopt
-import tempfile
-
-import ecell.eml
 from ecell.spark import *
-
+import sys , os ,string , getopt , tempfile
+import ecell.eml
 
 class Token:
 	def __init__(self, type, attr=None, filename="?" , lineno='???'):
@@ -20,14 +15,8 @@ class Token:
 		return cmp(self.type, o)
 
         def __repr__(self):
-                return str(self.type) + ':' + str(self.attr)
+                return str(self.type)
 	
-	def __getitem__(self,i):
-		raise IndexError
-
-	def __len__(self):
-		return 0
-
 	def info(self):
 		return "File " + repr(self.filename) + ", line " + repr(self.lineno)
 	def error(self):
@@ -47,69 +36,58 @@ class AST:
 		return len(self._kids)
 
 	def __repr__(self):
-                return str(self.type) + ':' + str(self._kids)
+		return str(self.type)
 
 class EmScanner( GenericScanner , object ):
 	
 	def __init__( self ):
 		GenericScanner.__init__( self )
 
-	def tokenize( self, input, filename='???' ):
+	def tokenize( self, input ):
 		self.rv = []
 		self.lineno = 1
-		self.filename = filename
 #		GenericScanner.tokenize( self, input )
                 super (EmScanner, self).tokenize( input )
 		return self.rv
 
-	def createToken( self, type, attr=None ):
-		return Token( type, attr, self.filename, self.lineno )
-
 	def t_keywords( self, s ):
 		r' Reactor[\s\t] | Substance[\s\t] | Stepper[\s|\t] | System[\s\t] '
 		s = string.strip( s )
-		self.rv.append( self.createToken( s, s ) )
+		self.rv.append( Token( type=s, attr=s ) )
 
 	def t_symbols( self, s ):
   		r' [\;\{\}\(\)\,\[\]] '
-		self.rv.append( self.createToken( s, s ) )
+		self.rv.append( Token( type=s, attr=s ) )
 
 	def t_number( self, s ):
 		r' [+-]? ( \d+(\.\d*)? | \d*\.\d+ ) ([eE][+-]?\d+)? '
-		self.rv.append( self.createToken( 'number', s ) )
+		self.rv.append( Token( type='number', attr=s ) )
 
 	def t_name( self, s ):
 		r' [a-zA-Z_/][\w\:\/\.]* '
-		self.rv.append( self.createToken( 'name', s ) )
+		self.rv.append( Token( type='name', attr=s ) )
 
 	def t_quotedstring( self, s ):
 		r' "(^"|.)*" '
-		self.rv.append( self.createToken( 'quotedstring', s ) )
+		self.rv.append( Token( type='quotedstring', attr=s ) )
 		
-	def t_control( self, s ):
-		r' \% [^\n]* '
-		seq = s.split()
-		self.lineno = int( seq[1] )
-		self.filename = str( seq[2] )
-
-		print seq
-
 	def t_comment( self, s ):
 		r' \# [^\n]* '
 		pass
-#		self.rv.append( self.createToken( type='comment', attr=s ) )
+#		self.rv.append( Token( type='comment', attr=s ) )
 
 	def t_nl( self, s ):
 		r' \n '
 		self.lineno = self.lineno + 1
+		pass
     
 	def t_whitespace( self, s ):
-		r' [ |\t]+ '
+		r' [\s|\t]+ '
 		pass
 
         def t_default(self, s ):
-		r' .+ '
-		raise ValueError, "Unexpected error: unmatched input: %s, line %d." % (self.filename, self.lineno)
+		r' . + '
+		raise ValueError, "Specification error: unmatched input: %s,line %d" % (`s`, self.lineno)
 
 
 class EmParser( GenericParser ):
@@ -121,22 +99,26 @@ class EmParser( GenericParser ):
 		'''
 		start ::= stmts
 		'''
-		return AST( Token( 'start' ), args )
+		return AST( args[0], ( args[0], ) )
 	
-	def p_stmts( self, args ):
+	def p_stmts_1( self, args ):
 		'''
 		stmts ::= stmt stmts
-		stmts ::= stmt
-		stmts ::=
 		'''
-		return AST( Token( 'stmts' ), args )
+		return AST ( args[0], args )
 
+	def p_stmts_2( self, args ):
+		'''
+		stmts ::= stmt
+		'''
+		return AST( args[0] )
+	
 	def p_stmt( self, args ):
 		'''
 		stmt ::= stepper_stmt
 		stmt ::= system_stmt
 		'''
-		return AST( Token( 'stmt' ), args )
+		return AST( args[0] )
 	
 	# statements
 
@@ -147,29 +129,29 @@ class EmParser( GenericParser ):
 		'''
 		stepper_stmt ::= Stepper object_decl stepper_def
 		'''
-		return AST( Token( 'stepper_stmt' ), args )
+		return AST ( args[0], ( args[1], args[2] ) )
 
 	def p_system_stmt ( self, args ):
                 '''
 		system_stmt ::= System object_decl system_def
 		'''
-		return AST( Token( 'system_stmt' ), args )
+
+		return AST ( args[0], args )
 
 	def p_entity_other_stmt ( self, args ):
                 '''
 		entity_other_stmt ::= Substance object_decl entity_other_def
 		entity_other_stmt ::= Reactor object_decl entity_other_def
 		'''
-		return AST ( Token( 'entity_other_stmt' ), args )
+		return AST ( args[0], ( args[1], args[2] ) )
 
 	# object declarations
 
 	def p_object_decl( self, args ):
 		'''
 		object_decl ::= name ( name )
-                object_decl ::= Substance ( name )
 		'''
-		return AST ( Token( 'object_decl' ), ( args[0], args[2] ) )
+		return AST ( args[0], ( args[0], args[2] ) )
 
 	# object definitions
 
@@ -177,19 +159,19 @@ class EmParser( GenericParser ):
 		'''
 		stepper_def ::= { propertylist }
 		'''
-		return AST ( Token( 'stepper_def' ), ( args[1], ) )
+		return AST ( args[1] )
 
 	def p_system_def( self, args ):
 		'''
 		system_def ::= { property_entity_list }
 		'''
-		return AST ( Token( 'system_def' ), ( args[1], ) )
+		return AST ( args[1] )
 
 	def p_entity_other_def( self, args ):
 		'''
 		entity_other_def ::= { propertylist }
 		'''
-		return AST ( Token( 'entity_other_def' ), ( args[1], ) )
+		return AST ( args[1] )
 
 	# property
 
@@ -199,13 +181,19 @@ class EmParser( GenericParser ):
 		propertylist ::= property
 		propertylist ::=
 		'''
-		return AST ( Token('propertylist'), args )
+		return AST ( args[0], args )
+
+	def p_propertylist_1( self, args ):
+		'''
+		propertylist ::=
+		'''
+		pass
 
 	def p_property( self, args ):
 		'''
 		property ::= name valuelist ;
 		'''
-		return AST( Token('property'), args[:2] )
+		return AST( args[0], args )
 
 
 
@@ -215,33 +203,39 @@ class EmParser( GenericParser ):
 		'''
 		property_entity_list ::= property_entity property_entity_list
 		property_entity_list ::= property_entity
+		'''
+
+		return AST( args[0], args )
+
+	def p_property_entity_list_empty( self, args ):
+		'''
 		property_entity_list ::=
 		'''
-		return AST( Token( 'property_entity_list' ), args )
+		pass
 
 	def p_property_entity( self, args ):
 		'''
 		property_entity ::= property
 		property_entity ::= entity_other_stmt
 		'''
-		return AST( Token( 'property_entity' ), args )
+		return AST( args[0], args )
 
 
 	# value
 
-	def p_valuelist( self, args ):
+	def p_valuelist_1( self, args ):
 		'''
 		valuelist ::= value valuelist
 		valuelist ::= value
 		'''
-		return AST( Token( 'valuelist' ), args )
+		return AST( args[0], args )
 
 	def p_value( self, args ):
 		'''
 		value ::= scalervalue
 		value ::= vectorvalue
 		'''
-		return AST( Token( 'value' ), args )
+		return AST( args[0] )
 
 	def p_scalervalue( self, args ):
 		'''
@@ -249,118 +243,114 @@ class EmParser( GenericParser ):
 		scalervalue ::= quotedstring
 		scalervalue ::= name
 		'''
-		return AST( Token( 'scalervalue' ), args )
+		return AST( args[0] )
 
 	def p_vectorvalue( self, args ):
 		'''
 		vectorvalue ::= [ valuelist ]
 		'''
-		return AST( Token( 'vectorvalue' ), ( args[1], ) )
+		return AST( args[1], args )
 
-
-	def error( self, token ):
-		sys.stderr.write( "Syntax error at or near token '%s', line %d of file %s.\n" % ( token.attr, token.lineno, token.filename ) )
-		raise SystemExit
-
-
-def flatten_nodetree( node ):
-	aList = []
-
-	if node is None or len( node ) == 0:
-		return aList
-
-	aList.append( node[0] )
-
-	while len( node ) > 1:
-		node = node[1]
-		if len( node ) is 0:
-			break
-		else:
-			aList.append( node[0] )
-		
-	return aList
-
-def flatten_propertytree( node ):
-	anNodeList = flatten_nodetree( node )
-	aList = []
-
-	for i in anNodeList:
-		if i[0].type == 'vectorvalue':
-			aList.append( flatten_propertytree( i[0][0] ) )
-		else:
-			aList.append( i[0][0].attr )
-
-	return aList
-	
 
 
 class Interpret(GenericASTTraversal):
-	def __init__( self, ast, eml ):
+	def __init__( self, ast ):
 		GenericASTTraversal.__init__( self, ast )
-		self.eml = eml
 		
+		# eml stack
+		self.queue = []
 		self.postorder()
 
+		ast.value = self.queue
+#		print ast.value
+
+	def n_number( self, node):
+		node.value = node.attr
+
+        def n_name( self, node):
+		node.value = node.attr
+
+	def n_quotedstring(self, node):
+		node.value = node.attr
+		
 	def n_stepper_stmt( self, node ):
-		aClassname = node[1][0].attr
-		anID = node[1][1].attr
+		node.value = node.attr
+		if node[1] != None and node[1].type != 'name':
+			aList = [node.value] + node[1].value
+			self.queue.append(aList)
 
-		self.eml.createStepper( aClassname, anID )
+	def n_system_stmt( self, node):
+		node.value = node.attr
+		if node[1] != None:
+			aList = [node.value] + node[1].value
+			self.queue.append(aList)
+
+	def n_Reactor( self, node):
+		node.value = node.attr
+		if node[1] != None:
+			aList = [node.value] + node[1].value
+			self.queue.append(aList)
 		
-		aPropertyList = []
-		aPropertyNodeList = flatten_nodetree( node[2][0] )
-		for i in aPropertyNodeList:
-			aPropertyName = i[0].attr
-
-			aValueNodeList = flatten_propertytree( i[1] )
-
-			aValueList = []
-			for j in aValueNodeList:
-				aValueList.append( j )
-
-			self.eml.setStepperProperty( anID, aPropertyName,\
-						     aValueList )
-
-	def n_system_stmt( self, node ):
-		aType = node[0].attr
-		aClassname = node[1][0].attr
-		anID = node[1][1].attr
-		anID = convert2FullID( self.eml , aType, anID)
-
-		self.eml.createEntity( aClassname, anID )
-		
-		aPropertyList = []
-		aPropertyNodeList = flatten_nodetree( node[2][0] )
-		for i in aPropertyNodeList:
-			if len(i[0]) != 0: 
-				aPropertyName = i[0][0].attr
-			else:
-				aPropertyName = i[0].attr
-				
-			if aPropertyName == 'Substance' or aPropertyName == 'Reactor':
-				self.n_system_stmt(i[0])
-				continue
-			if len(i[0]) != 0:
-				aValueNodeList = flatten_propertytree( i[0][1] )
-			else:
-				aValueNodeList = flatten_propertytree( i[1] )
-
-			aValueList = []
-			for j in aValueNodeList:
-				aValueList.append( j )
-			self.eml.setEntityProperty( anID, aPropertyName,\
-						     aValueList )
+	def n_Substance( self, node):
+		node.value = node.attr
+		if node[1] != None:
+			aList = [node.value] + node[1].value
+			self.queue.append(aList)
 		
 	def default( self, node):
-		pass
+#               left  = node[0].value
+#		right = node[1].value
 
+		if node.type == '(':
+			aClass = node[0].value
+			if node[0].type == 'name' and node[1].type == 'name':
+				anID = node[1].value
+			else:
+				aSystemID = node[1][0].value
+                                anID = aSystemID			
+			node.value = [aClass, anID, node[1].value]
+
+		elif ( node.type == '{' ):
+                        aSystemID = node[0].value
+			aPropertyList = []
+			nodekid = node[1]
+			while nodekid.type == ';':
+				aPropertyList.append(nodekid.value)
+				nodekid = nodekid[1]
+			node.value = aPropertyList
 			
-def convertEm2Eml( anEmFileObject , aFileName= '???', mode='' ):
-	anEml = ecell.eml.Eml()
+		elif ( node.type == ',' ):
+			aList = []
+			nodekid = node[0]
+			while hasattr(nodekid, 'right'):
+				aList.append(nodekid.value)
+				nodekid = nodekid[1]
+                        node.value = tuple(aList)
+				
+		elif ( node.type == ';' ):
+			aValueList = []
+			nodepro = node[0][1]
+			while hasattr(nodepro, 'value'):
+				aValueList.append(nodepro.value)
+				nodepro = nodepro[1]
+			aPropertyName = node[0].value
+			node.value = (aPropertyName, aValueList)
+		
+		else:
+			print "Syntax error..%s %s" % (node.type, node.attr)
+			node.value = node.attr
+			
+def convertEm2Eml( anEmFileObject , mode='' ):
+	# template EmlFile generate
+	tempFilename = tempfile.mktemp()
+	tempFile = open(tempFilename, 'w')
+	tempFile.write('<?xml version="1.0" ?><eml><stepperlist/></eml>')
+	tempFile.close()
+	anEml = ecell.eml.Eml( open(tempFilename) )
 
 	# Scanning
 	aScanner = EmScanner()
-	aTokenList = aScanner.tokenize( anEmFileObject.read(), aFileName )
+	aTokenList = aScanner.tokenize( anEmFileObject.read() )
 	if mode == 'debug':print aTokenList
 
 	# Parsing 
@@ -369,10 +359,33 @@ def convertEm2Eml( anEmFileObject , aFileName= '???', mode='' ):
 	if mode == 'debug':print 'AST:', anAst
 
 	# Generating
-	anInterpreter = Interpret( anAst, anEml )
+	anInterpreter = Interpret( anAst )
+	aQueueList = sortSystemID(anInterpreter.queue)
+	if mode == 'debug':print aQueueList
+
+	for part in aQueueList:
+		(aType, aClass, anID, aPropertyList) = part[0], part[1], part[2], part[3:]
+		aFullID = convert2FullID(anEml, aType,  anID)
+		if aType == 'Stepper':
+			anEml.createStepper(aClass, aFullID)
+			if mode == 'debug':print "createStepper(%s, %s)" % (aClass, aFullID)
+			continue
+		else:
+			anEml.createEntity(aClass, aFullID)
+			if mode == 'debug':print "createEntity(%s, %s)" % (aClass, aFullID)
+
+		for i in aPropertyList:
+			for j in i:
+				(aPropertyName, aValueList) = j[0], j[1]
+				if mode == 'debug':print "\tsetEntityProperty(%s, %s, %s)" % (aFullID, aPropertyName, aValueList)
+				anEml.setEntityProperty(aFullID, aPropertyName, aValueList)
+
+
 
 	aString = anEml.asString()
 	    
+	os.unlink(tempFilename)
+
 	return anEml
 
 def convert2FullID( anEml, aType, aSystemID ):
@@ -391,6 +404,19 @@ def convert2FullID( anEml, aType, aSystemID ):
 	    
 	return anID
     
+def sortSystemID( aList ):
+	aSortList  = []
+	aLowList   = []
+	aHightList = []
+	for i in aList:
+                aType = i[0]
+		if aType == 'System' or aType == 'Stepper':
+			aHightList.append(i)
+		else:
+			aLowList.append(i)
+		aSortList = aHightList + aLowList
+	    
+	return aSortList
     
 def usage():
 	sys.stderr.write("""\
@@ -401,10 +427,6 @@ Valid options:
   -f      stdout mode
 """)
 if __name__ == '__main__':
-
-	import os
-	import ecell.em
-
 	try:
 		opts , args = getopt.getopt(sys.argv[1:] , 'fD')
 	except:
@@ -425,18 +447,8 @@ if __name__ == '__main__':
 		else:
 			anEmFilename = filename
 			anEmFile = open( anEmFilename, 'r')
-
-
-	aTempFileName = tempfile.mktemp()
-	ecell.em.invoke( ( "-o", aTempFileName, anEmFilename ) )
-
-	aTempFile = open( aTempFileName, 'r' )
-	
-	anEmlObject = convertEm2Eml(aTempFile, anEmFilename, mode=mode)
-
-	aTempFile.close()
-	os.unlink( aTempFileName )
-
+			
+	anEmlObject = convertEm2Eml(anEmFile, mode=mode)
 	aString = anEmlObject.asString()
 	
 	if mode == 'stdout' or mode == 'debug':
