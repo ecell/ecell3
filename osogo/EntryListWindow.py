@@ -5,7 +5,6 @@ from Window import *
 from gtk import *
 from ecssupport import *
 
-# from MainWindow import *
 import MainWindow
 
 import string
@@ -46,16 +45,10 @@ class EntryListWindow(Window):
 
         aPManager = self.theMainWindow.thePluginManager
         self.thePropertyWindow = aPManager.createInstance( 'PropertyWindow',
-                                                           () )
-#        aPropertyWindowTopVBox = self.thePropertyWindow['scrolledwindow1']
-#        aPropertyWindowVBox = self.thePropertyWindow['vbox2']
-#        aPropertyWindowVBox.unparent()
-#        self['property_frame'].add( aPropertyWindowVBox )
+                                                           (),'top_vbox' )
 
         aPropertyWindowTopVBox = self.thePropertyWindow['top_vbox']
-        aPropertyWindowTopVBox.unparent()
         self['property_frame'].add( aPropertyWindowTopVBox )
-        self.thePropertyWindow['PropertyWindow'].hide()
         self.thePropertyWindow['property_clist'].connect( 'select_row', self.selectPropertyName )
         
         self.update()
