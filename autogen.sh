@@ -55,6 +55,12 @@ done
 
 ./configure "$@"
 
-echo 
-echo "Now type 'make' to compile $PROJECT."
+if test "$?" -eq 0
+then
+	echo
+	echo "Now type 'make' to compile $PROJECT."
+else
+	echo
+	echo "./autogen.sh got error!. Aborted."
+fi
 
