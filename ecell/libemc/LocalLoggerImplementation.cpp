@@ -35,7 +35,7 @@
 namespace libemc
 {
 
-  LocalLoggerImplementation::LocalLoggerImplementation( AbstractMessageCallbackCptr aMessageCallbackCptr )
+  LocalLoggerImplementation::LocalLoggerImplementation( MessageSlotObject aMessageCallbackCptr )
     :
     theLogger( Logger( aMessageCallbackCptr ) ) 
   {

@@ -41,6 +41,8 @@ namespace libemc
 
   using namespace libecs;
 
+  typedef AbstractMessageCallbackCptr MessageSlotObject;
+
   class LocalLoggerImplementation
     :
     public LoggerImplementation
@@ -48,7 +50,7 @@ namespace libemc
 
   public:
 
-    LocalLoggerImplementation( AbstractMessageCallbackCptr );
+    LocalLoggerImplementation( MessageSlotObject );
     virtual ~LocalLoggerImplementation( );
 
     Logger::DataPointVectorCref

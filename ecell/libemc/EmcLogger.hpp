@@ -45,7 +45,12 @@ namespace libemc
 
   public:
 
-    EmcLogger( AbstractMessageCallbackCptr );
+    EmcLogger( void )
+    {
+      theLoggerImplementation = 0;
+    }
+
+    EmcLogger( MessageSlotObject );
     virtual ~EmcLogger( ) { }
 
     Logger::DataPointVectorCref
@@ -64,6 +69,11 @@ namespace libemc
     getData( libecs::RealCref start, libecs::RealCref end, libecs::RealCref interval ) const
     {
       return theLoggerImplementation->getData( start, end, interval );
+    }
+
+    void setMessageCallback( MessageSlotObject aMessageCallback )
+    {
+      theLoggerImplementation = new LocalLoggerImplementation( aMessageCallback );
     }
 
     void update( void )
