@@ -29,45 +29,4 @@
 //
 
 
-#ifndef ___LOGGER_IMPLEMENTATION_H___
-#define ___LOGGER_IMPLEMENTATION_H___
-
-#include "Logger.hpp" 
-
-/**
-   Pure virtual base class (interface definition) of logger
-   implementation.
-*/
-
-class LoggerImplementation
-{
-
-  typedef Logger<Float,Float> FloatLogger;
-
-public:
-
-  
-
-  LoggerImplementation() {}
-  virtual ~LoggerImplementation() {}
-
-  virtual FloatLogger::DataPointVector&
-  getData( const Float& first,
-	   const Float& last,
-	   const Float& interval ) const = 0;
-
-  virtual void update( void ) = 0;
-
-  // FIXME temporary
-  virtual void update( FloatLogger::containee_type& datapoint ) = 0;  
-
-  virtual void push( const FloatLogger::containee_type& x ) = 0;
-
-  virtual void push( const Float& t, const Float& v ) = 0;
-
-
-}
-
-#endif
-
-
+#include "LocalLoggerImplementation.hpp"
