@@ -13,20 +13,26 @@ class InterfaceWindow( OsogoWindow ):
 	def __init__( self, aMainWindow ):
 
 		OsogoWindow.__init__( self, aMainWindow )
-		OsogoWindow.openWindow(self)
-
-		#self.theMainWindow = aMainWindow
-
 		self.theSelectedRow = -1
 
+	# end of __init__
+
+	# -------------------------------------------------------------
+	# openWindow
+	#
+	# return -> None
+	# This method is throwable exception
+	# -------------------------------------------------------------
+	def openWindow( self ):
+		OsogoWindow.openWindow(self)
+		self.theSelectedRow = -1
 		self.addHandlers( { 'interfacelist_select_row' : self.rowSelected,
 		                    'ShowButton_clicked'       : self.showWindow,
 		                    'SaveButton_clicked'       : self.editTitle,
 		                    'DeleteButton_clicked'     : self.deleteWindow } )
 
-		self.noSelectedMessage = " Nothing is selected. "
+	# end of openWindow
 
-	# end of __init__
 	
 	# -------------------------------------------------------------
 	# update
@@ -41,9 +47,9 @@ class InterfaceWindow( OsogoWindow ):
 			self[ 'InterfaceCList' ].clear()
 
 		# gets
-		aInstanceList = self.theMainWindow.thePluginManager.theInstanceList
+		anInstanceList = self.theMainWindow.thePluginManager.theInstanceList
 
-		for anInstance in aInstanceList:
+		for anInstance in anInstanceList:
 			aTitle = anInstance.getTitle()
 			aClass =  anInstance.__class__.__name__
 			aFullPN = createFullPNString( anInstance.theFullPN() )
@@ -54,11 +60,23 @@ class InterfaceWindow( OsogoWindow ):
 
 	# end of update
 
+
+	# -------------------------------------------------------------
+	# update
+	#    - update CList
+	#
+	# return -> None
+	# This method is throwable exception
+	# -------------------------------------------------------------
 	def editTitle( self , obj ):
 		
 		# if no data is selected, show error message.
 		if self.theSelectedRow == -1:
-			self.theMainWindow.printMessage( self.noSelectedMessage )
+			anErrorMessage='\nNo data is selected.!\n'
+			self.theMainWindow.printMessage( anErrorMessage )
+			aWarningWindow = ConfirmWindow(0,anErrorMessage,"!")
+			return None
+
 		# if a data is selected, then remove it.
 		else:
 
@@ -66,7 +84,9 @@ class InterfaceWindow( OsogoWindow ):
 			aNewTitle = strip( aNewTitle )
 	
 			if len(aNewTitle) == 0:
-				self.theMainWindow.printMessage(" Error text field is blank. ")
+				anErrorMessage='\nError text field is blank.!\n'
+				self.theMainWindow.printMessage( anErrorMessage )
+				aWarningWindow = ConfirmWindow(0,anErrorMessage,"!")
 				return None
 
 			aTitle =  self['InterfaceCList'].get_text( self.theSelectedRow ,0 )
@@ -83,13 +103,30 @@ class InterfaceWindow( OsogoWindow ):
 	# end of editTitle
 
                     
+	# -------------------------------------------------------------
+	# update
+	#    - update CList
+	#
+	# return -> None
+	# This method is throwable exception
+	# -------------------------------------------------------------
 	def rowSelected( self , obj , row , column , data3 ):
 
 		self.theSelectedRow = row
 		aText =  self['InterfaceCList'].get_text( row,0 )
 		self[ "SelectedTitle" ].set_text( aText )
 
-	def showWindow( self , obj ):
+
+	# -------------------------------------------------------------
+	# updateWindow
+	#    - shows selected instance of plug-in window
+	#
+	# anObject : dammy object
+	#
+	# return -> None
+	# This method is throwable exception
+	# -------------------------------------------------------------
+	def showWindow( self , anObject ):
 
 		# -------------------------------------------
 		# show an Instance
@@ -97,7 +134,11 @@ class InterfaceWindow( OsogoWindow ):
 
 		# if no data is selected, show error message.
 		if self.theSelectedRow == -1:
-			self.theMainWindow.printMessage( self.noSelectedMessage )
+			anErrorMessage='\nNo data is selected.!\n'
+			self.theMainWindow.printMessage( anErrorMessage )
+			aWarningWindow = ConfirmWindow(0,anErrorMessage,"!")
+			return None
+
 		# if a data is selected, then remove it.
 		else:
 
@@ -107,15 +148,26 @@ class InterfaceWindow( OsogoWindow ):
 			anInstanceList = self.theMainWindow.thePluginManager.theInstanceList
 			for anInstance in anInstanceList:
 				if aTitle == aTitleDict[ anInstance ]:
-					#self.theMainWindow.thePluginManager.showPlugin( anInstance )
-					anInstance[ anInstance.__class__.__name__ ].hide()
-					anInstance[ anInstance.__class__.__name__ ].show_all()
-					break
+					self.theMainWindow.thePluginManager.showPlugin( anInstance )
+			
+			#	if aTitle == aTitleDict[ anInstance ]:
+			#		anInstance[ anInstance.__class__.__name__ ].hide()
+			#		anInstance[ anInstance.__class__.__name__ ].show_all()
+			#		break
 
 	# end of showWindow
 
                     
-	def deleteWindow( self , obj ):
+	# -------------------------------------------------------------
+	# deleteWindow
+	#    - deletes selected instance of plug-in window
+	#
+	# anObject : dammy object
+	#
+	# return -> None
+	# This method is throwable exception
+	# -------------------------------------------------------------
+	def deleteWindow( self , anObject ):
 
 		# -------------------------------------------
 		# delete an Instance
@@ -123,7 +175,10 @@ class InterfaceWindow( OsogoWindow ):
 
 		# if no data is selected, show error message.
 		if self.theSelectedRow == -1:
-			self.theMainWindow.printMessage( self.noSelectedMessage )
+			anErrorMessage='\nNo data is selected.!\n'
+			self.theMainWindow.printMessage( anErrorMessage )
+			aWarningWindow = ConfirmWindow(0,anErrorMessage,"!")
+			return None
 
 		# if a data is selected, then remove it.
 		else:

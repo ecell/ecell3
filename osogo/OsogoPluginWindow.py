@@ -294,7 +294,8 @@ class OsogoPluginWindow(PluginWindow):
 	# return -> None
 	# This method is throwable exception.
 	# ---------------------------------------------------------------
-	def setValue( self, aFfullPN, aValue ):
+	#def setValue( self, aFfullPN, aValue ):
+	def setValue( self, aFullPN, aValue ):
 
 		if self.getAttribute( aFullPN ) == 3:
 

@@ -44,12 +44,13 @@ import os
 import re
 import string
 
+from OsogoWindow import *
 
 # ---------------------------------------------------------------
 # PaletteWindow -> GtkWindow
 #   - manages PaletteWindow
 # ---------------------------------------------------------------
-class PaletteWindow(GtkWindow):
+class PaletteWindow(GtkWindow,OsogoWindow):
 
 	# ---------------------------------------------------------------
 	# Constructor
@@ -60,6 +61,7 @@ class PaletteWindow(GtkWindow):
 	# ---------------------------------------------------------------
 	def __init__( self, aMainWindow ):
 
+		OsogoWindow.__init__( self, aMainWindow )
 		GtkWindow.__init__( self, WINDOW_TOPLEVEL )
 		self.theMainWindow = aMainWindow
 		self.theToolbar = GtkToolbar( ORIENTATION_VERTICAL, TOOLBAR_BOTH )
@@ -67,6 +69,8 @@ class PaletteWindow(GtkWindow):
 		self.set_data('toolbar', self.theToolbar)
 		self.connect('destroy', self.destroy)
 		self.theExist = 1
+                self.signal_connect( 'destroy', self.destroyWindow )
+
 
 	# end of __init__
 
@@ -141,12 +145,12 @@ class PaletteWindow(GtkWindow):
 	# return -> None
 	# This method is throwable exception.
 	# ---------------------------------------------------------------
-	def destroy( self, *objects ):
-		self.theExist = 0
-		self.theMainWindow.updateBasicWindows()
+	#def destroy( self, *objects ):
+	#	self.theExist = 0
+	#	self.theMainWindow.updateBasicWindows()
 
-	def getExist( self ):
-		return self.theExist
+	#def getExist( self ):
+	#	return self.theExist
 
 
 if __name__ == "__main__":

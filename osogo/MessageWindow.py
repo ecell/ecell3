@@ -36,6 +36,7 @@
 # E-CELL Project, Lab. for Bioinformatics, Keio University.
 #
 
+import string
 from OsogoWindow import *
 from gtk import *
 
@@ -55,8 +56,8 @@ class MessageWindow(OsogoWindow):
 
 		#OsogoWindow.__init__( self )
 		OsogoWindow.__init__( self, aMainWindow )
-		OsogoWindow.openWindow(self)
-		self.printMessage('')
+		#OsogoWindow.openWindow(self)
+		#self.printMessage('')
 		self.theMessageBufferList=[]
 
 	# end of __init__
@@ -77,12 +78,17 @@ class MessageWindow(OsogoWindow):
 		# -------------------------------------------------------
 		if type(aMessage) == type([]) or type(aMessage) == type(()) :  
 
+			if len(aMessage)>0:
+				if string.find(aMessage[0],'\n') != 0:
+					aMessage = '\n' + aMessage[0]
+
 			# --------------------------------------------------
 			# If instance of Message Window Widget has destroyed,
 			# save aMessage to theMessageBugger
 			# --------------------------------------------------
 			if OsogoWindow.getExist(self) == 0 :
-				self.theMessageBufferList.append( aMessage )
+				for aLine in aMessage:
+					self.theMessageBufferList.append( aLine )
 
 			# --------------------------------------------------
 			# If instance of Message Window Widget has not destroyed,
@@ -96,6 +102,9 @@ class MessageWindow(OsogoWindow):
 		# If message is not list or touple, then print out row data.
 		# -------------------------------------------------------
 		else: 
+
+			if string.find(aMessage,'\n') != 0:
+				aMessage = '\n' + aMessage
 
 			# --------------------------------------------------
 			# If instance of Message Window Widget has destroyed,
@@ -115,7 +124,14 @@ class MessageWindow(OsogoWindow):
 	# end of printMessage
 
 
+	# ---------------------------------------------------------------
+	# openWindow
+	#
+	# return -> None
+	# This method is throwable exception.
+	# ---------------------------------------------------------------
 	def openWindow( self ):
+
 		OsogoWindow.openWindow( self )
 		self.printMessage( self.theMessageBufferList )
 		self.theMessageBufferList = []

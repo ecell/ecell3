@@ -62,7 +62,8 @@ class OsogoWindow(Window):
 	def __init__( self, aMainWindow, aGladeFile=None, aRoot=None ):
 
 		self.theMainWindow = aMainWindow
-		self.theExist = 0
+		self.theExist = gtk.FALSE
+		self.isShown = gtk.FALSE
 		Window.__init__( self, aGladeFile, aRoot )
 
 	# end of __init__
@@ -81,6 +82,18 @@ class OsogoWindow(Window):
 
 
 	# ---------------------------------------------------------------
+	# getIsShown
+	#  
+	# return -> shown status  
+	# ---------------------------------------------------------------
+	def getIsShown( self ):
+
+		return self.isShown
+
+	# end of getIsShown
+
+
+	# ---------------------------------------------------------------
 	# destroyWindow
 	#  
 	# *objects : dammy objects
@@ -89,11 +102,12 @@ class OsogoWindow(Window):
 	# ---------------------------------------------------------------
 	def destroyWindow( self, *objects ):
 
-		self.theExist = 0
-		try:
-			self.theMainWindow.updateBasicWindows()
-		except:
-			pass
+		self.theExist = gtk.FALSE
+		self.isShown = gtk.FALSE
+		#try:
+		self.theMainWindow.updateBasicWindows()
+		#except:
+		#	pass
 
 	# end of destroyWindow
 
@@ -105,25 +119,26 @@ class OsogoWindow(Window):
 	# ---------------------------------------------------------------
 	def openWindow( self ):
 
+
 		# --------------------------------------------------
 		# If instance of Window Widget has destroyed,
 		# creates instance of Window Widget.
 		# --------------------------------------------------
-		if self.theExist == 0:
+		if self.theExist == gtk.FALSE:
 			Window.openWindow(self)
 
 		# --------------------------------------------------
 		# If instance of Message Window Widget has destroyed,
 		# calls the show method of Window Widget.
 		# --------------------------------------------------
-		else:
-			self[self.__class__.__name__].show_all()
+		self[self.__class__.__name__].show_all()
 
 		# sets signalhander
 		self[self.__class__.__name__].signal_connect('destroy',self.destroyWindow)
 
 		# sets exist status 'exists'
-		self.theExist = 1
+		self.theExist = gtk.TRUE
+		self.isShown = gtk.TRUE
 
 	# end of openWindow
 

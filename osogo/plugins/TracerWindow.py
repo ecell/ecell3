@@ -34,6 +34,8 @@ class TracerWindow( OsogoPluginWindow ):
 		self.theSession = pluginmanager.theSession
 		aFullPNString = createFullPNString( self.theFullPN() )
 
+		#print ' IDflag = %s' %IDflag
+
 
 		if IDflag == 1:
 			aValue = self.theSession.theSimulator.getProperty( aFullPNString )
@@ -120,7 +122,8 @@ class TracerWindow( OsogoPluginWindow ):
 
 	def popInputWindow(self, obj):
 
-		Window.__init__(self, 'plugins/InputWindow.glade',None)
+		aInputWindow = Window('plugins/InputWindow.glade')
+		aInputWindow.openWindow()
 
 		self.addHandlers({'entry1_activate' : self.changexaxis,
 		                  'entry2_activate' : self.changeyaxis,
@@ -133,15 +136,18 @@ class TracerWindow( OsogoPluginWindow ):
 		                 })
 
 		for num in range( 1,8 ):
-			self['toolbar%i'%num].set_style(GTK.TOOLBAR_ICONS)
+		#for num in range( 1,7 ):
+			#self['toolbar%i'%num].set_style(GTK.TOOLBAR_ICONS)
+			aInputWindow['toolbar%i'%num].set_style(GTK.TOOLBAR_ICONS)
 
-		self['entry1'].set_text( 'time' )
+		#self['entry1'].set_text( 'time' )
+		aInputWindow['entry1'].set_text( 'time' )
 		num = 1
 		for fpn in self.theFullPNList():
 			entrynum = num + 1
-			self['entry%i'%entrynum].set_text( 'X%i'%num )
+			#self['entry%i'%entrynum].set_text( 'X%i'%num )
+			aInputWindow['entry%i'%entrynum].set_text( 'X%i'%num )
 			num += 1
-
             
 	def changeScale( self, obj ):
 

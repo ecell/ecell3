@@ -285,6 +285,10 @@ class OsogoPluginManager(PluginManager):
 			pass
 
 		if anInstance != None:
+			#print "#############################$$$$$$$$$$$"
+			#print anInstance.__class__.__name__
+			#print type(anInstance[anInstance.__class__.__name__])
+			#print anInstance[anInstance.__class__.__name__]
 			anInstance[anInstance.__class__.__name__].destroy()
 
 		self.theMainWindow.updateBasicWindows()

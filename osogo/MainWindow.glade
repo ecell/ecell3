@@ -198,6 +198,19 @@
 	      <active>True</active>
 	      <always_show_toggle>True</always_show_toggle>
 	    </widget>
+
+	    <widget>
+	      <class>GtkCheckMenuItem</class>
+	      <name>logger_window_menu</name>
+	      <signal>
+		<name>activate</name>
+		<handler>logger_window_menu_activate</handler>
+		<last_modification_time>Wed, 24 Jul 2002 15:42:23 GMT</last_modification_time>
+	      </signal>
+	      <label>_Logger Window</label>
+	      <active>False</active>
+	      <always_show_toggle>True</always_show_toggle>
+	    </widget>
 	  </widget>
 	</widget>
 
@@ -219,18 +232,6 @@
 		<last_modification_time>Wed, 15 Aug 2001 09:23:44 GMT</last_modification_time>
 	      </signal>
 	      <label>Create New _Entry List</label>
-	      <right_justify>False</right_justify>
-	    </widget>
-
-	    <widget>
-	      <class>GtkMenuItem</class>
-	      <name>create_new_logger_list_menu</name>
-	      <signal>
-		<name>activate</name>
-		<handler>create_new_logger_list_menu_activate</handler>
-		<last_modification_time>Wed, 15 Aug 2001 09:08:07 GMT</last_modification_time>
-	      </signal>
-	      <label>Create New _Logger List</label>
 	      <right_justify>False</right_justify>
 	    </widget>
 	  </widget>
@@ -629,23 +630,27 @@
 	      <tooltips>True</tooltips>
 
 	      <widget>
-		<class>GtkToggleButton</class>
+		<class>GtkButton</class>
 		<child_name>Toolbar:button</child_name>
-		<name>entry_list</name>
+		<name>entrylist</name>
 		<signal>
-		  <name>toggled</name>
-		  <handler>entrylist_togglebutton_toggled</handler>
-		  <last_modification_time>Wed, 30 Jan 2002 12:50:48 GMT</last_modification_time>
+		  <name>clicked</name>
+		  <handler>entrylist_clicked</handler>
+		  <last_modification_time>Thu, 25 Jul 2002 06:53:01 GMT</last_modification_time>
 		</signal>
 		<label>EntryList</label>
 		<icon>icon_entry.xpm</icon>
-		<active>False</active>
+	      </widget>
+
+	      <widget>
+		<class>GtkVSeparator</class>
+		<name>vseparator5</name>
 	      </widget>
 
 	      <widget>
 		<class>GtkToggleButton</class>
 		<child_name>Toolbar:button</child_name>
-		<name>logger_togglebutton</name>
+		<name>loggertogglebutton</name>
 		<signal>
 		  <name>toggled</name>
 		  <handler>logger_togglebutton_toggled</handler>
@@ -654,12 +659,6 @@
 		<label>Logger</label>
 		<icon>icon_logger.xpm</icon>
 		<active>False</active>
-	      </widget>
-
-	      <widget>
-		<class>GtkVSeparator</class>
-		<name>vseparator5</name>
-		<height>40</height>
 	      </widget>
 
 	      <widget>

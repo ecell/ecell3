@@ -60,16 +60,28 @@ class LoggerWindow(OsogoWindow):
 
 		#OsogoWindow.__init__( self, 'LoggerWindow.glade', aMainWindow )
 		OsogoWindow.__init__( self, aMainWindow, 'LoggerWindow.glade' )
+		self.theSession = aSession
+		self.theDefaultSaveDirectory='Data'
+		self.thePopupMenu = PopupMenu( self )
+		self.theList = []
+
+		# ---------------------------------------------------------------
+		# Creates save file selection
+		# ---------------------------------------------------------------
+		self.theSaveDirectorySelection = gtk.GtkFileSelection( 'Select Rule File' )
+		self.theSaveDirectorySelection.ok_button.connect('clicked', self.changeSaveDirectory)
+		self.theSaveDirectorySelection.cancel_button.connect('clicked', self.closeParentWindow)
+
+	# end of the __init__
+
+
+	def openWindow(self):
+
 		OsogoWindow.openWindow(self)
 		#self.theMainWindow = aMainWindow
 
-		self.theSession = aSession
 		self.theEntryList = self['loggerWindow_clist']
-		self.theList = []
 		self.initialize()
-		self.theDefaultSaveDirectory='Data'
-
-		self.thePopupMenu = PopupMenu( self )
 
 		# reset
 		self.resetAllValues()
@@ -102,14 +114,8 @@ class LoggerWindow(OsogoWindow):
 
 			})
 
-		# ---------------------------------------------------------------
-		# Creates save file selection
-		# ---------------------------------------------------------------
-		self.theSaveDirectorySelection = gtk.GtkFileSelection( 'Select Rule File' )
-		self.theSaveDirectorySelection.ok_button.connect('clicked', self.changeSaveDirectory)
-		self.theSaveDirectorySelection.cancel_button.connect('clicked', self.closeParentWindow)
 
-	# end of the __init__
+	# end of openWindow
 
 
 	# ---------------------------------------------------------------
@@ -434,10 +440,10 @@ class LoggerWindow(OsogoWindow):
 	# ---------------------------------------------------------------
 	def update( self ):
 
-		#print "LoggerWindow"
+		if self.isShown == gtk.TRUE:
+			self.theEntryList.clear()
 
 		self.theFullPNList = self.theSession.getLoggerList()
-		self.theEntryList.clear()
 		self.theList = []
 
 		for aFullPNString in self.theFullPNList :
