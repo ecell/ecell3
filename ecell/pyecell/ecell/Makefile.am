@@ -4,6 +4,10 @@ AUTOMAKE_OPTIONS = foreign
 pyecelldir=${pythondir}/ecell
 pyecell_DATA=\
 __init__.py\
+EntityStub.py\
+LoggerStub.py\
+StepperStub.py\
+PropertyInterfaceStub.py\
 DataFileManager.py\
 DataFile.py\
 ECDDataFile.py\

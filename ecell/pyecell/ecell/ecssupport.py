@@ -2,6 +2,10 @@
 
 # this module is deprecated
 
+#from PropertyInterfaceStub import *
+from EntityStub import *
+from LoggerStub import *
+from StepperStub import *
 
 import string
 from ECS import *
