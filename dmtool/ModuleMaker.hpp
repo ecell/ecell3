@@ -212,8 +212,8 @@ StaticModuleMaker<T,DMAllocator>::StaticModuleMaker()
 template<class T,class DMAllocator>
 StaticModuleMaker<T,DMAllocator>::~StaticModuleMaker()
 {
-  for( ModuleMapIterator i = theModuleMap.begin();
-       i != theModuleMap.end(); ++i )
+  for( ModuleMapIterator i = this->theModuleMap.begin();
+       i != this->theModuleMap.end(); ++i )
     {
       delete i->second;
     }
@@ -238,7 +238,7 @@ T* StaticModuleMaker<T,DMAllocator>::make( const std::string& aClassname )
       throw DMException( "Can't instantiate [" + aClassname + "]." );
     }
 
-  ++theNumberOfInstances;
+  ++(this->theNumberOfInstances);
 
   return anInstance;
 }
@@ -249,7 +249,7 @@ void StaticModuleMaker<T,DMAllocator>::addClass( Module* dm )
 {
   assert( dm );
 
-  theModuleMap[ dm->getModuleName() ] = dm;
+  this->theModuleMap[ dm->getModuleName() ] = dm;
 }
 
 
@@ -257,12 +257,12 @@ template<class T,class DMAllocator>
 DMAllocator StaticModuleMaker<T,DMAllocator>::
 getAllocator( const std::string& aClassname )
 {
-  if( theModuleMap.find( aClassname ) == theModuleMap.end() )
+  if( this->theModuleMap.find( aClassname ) == this->theModuleMap.end() )
     {
       throw DMException( "Class [" + aClassname + "] not found." );
     }
 
-  return theModuleMap[ aClassname ]->getAllocator();
+  return this->theModuleMap[ aClassname ]->getAllocator();
 }
 
 
@@ -324,20 +324,20 @@ void
 SharedModuleMaker<T,DMAllocator>::loadModule( const std::string& aClassname )
 {
   // return immediately if already loaded
-  if( theModuleMap.find( aClassname ) != theModuleMap.end() )
+  if( this->theModuleMap.find( aClassname ) != this->theModuleMap.end() )
     {
       return;      
     }
     
-  SharedModule* sm( NULL );
+  SharedModule* aSharedModule( NULL );
   try 
     {
-      sm = new SharedModule( aClassname );
-      addClass( sm );
+      aSharedModule = new SharedModule( aClassname );
+      addClass( aSharedModule );
     }
-  catch ( const DMException& e )
+  catch ( const DMException& )
     {
-      delete sm;
+      delete aSharedModule;
       
       throw;
     }

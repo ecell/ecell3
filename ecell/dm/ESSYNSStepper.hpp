@@ -28,8 +28,8 @@
 // E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
 
-#ifndef __ESSYNS_HPP
-#define __ESSYNS_HPP
+#ifndef __ESSYNSSTEPPER_HPP
+#define __ESSYNSSTEPPER_HPP
 
 
 // #include <iostream>
@@ -129,4 +129,4 @@ protected:
   //  RealVector theK1;
 };
 
-#endif /* __ESSYNS_HPP */
+#endif /* __ESSYNSSTEPPER_HPP */

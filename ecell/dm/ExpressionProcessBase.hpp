@@ -531,6 +531,7 @@ namespace libecs
       {
 	// ; do nothing
       }
+
       virtual ~VARIABLE_SYSTEM_FUNC() {}
     
       virtual void initialize()
@@ -599,7 +600,7 @@ namespace libecs
     
       ~StackMachine() {}
     
-      void resize( IntVector::size_type aSize )
+      void resize( RealVector::size_type aSize )
       {
 	theStack.resize( aSize );
       }
@@ -638,102 +639,12 @@ namespace libecs
   
     class Compiler
     {
-    public:
-    
-      Compiler()
-      {
-	if( theConstantMap.empty() == true )
-	  {
-	    fillConstantMap();
-	  }
-	if( theFunctionMap1.empty() == true )
-	  {
-	    fillFunctionMap();
-	  }
-      }
-    
-      ~Compiler()
-      {
-	;
-      }
-    
-      typedef char const*         iterator_t;
-      typedef tree_match<iterator_t> parse_tree_match_t;
-      typedef parse_tree_match_t::tree_iterator TreeIterator;
-      //    DECLARE_CLASS( TreeIterator );
-
-      void setProcessPtr( ProcessPtr aProcessPtr )
-      {
-	theProcessPtr = aProcessPtr;
-      }
-
-      void setExpressionProcessBasePtr( ExpressionProcessBasePtr 
-					aExpressionProcessBasePtr )
-      {
-	theExpressionProcessBasePtr = aExpressionProcessBasePtr;
-      }
-
-      const int getStackSize()
-      {
-	return theStackSize;
-      }
-      
-      void fillConstantMap()
-      {
-	theConstantMap[ "true" ] = 1.0;
-	theConstantMap[ "false" ] = 0.0;
-	theConstantMap[ "pi" ] = M_PI;
-	theConstantMap[ "NaN" ] = std::numeric_limits<Real>::quiet_NaN();
-	theConstantMap[ "INF"] = std::numeric_limits<Real>::infinity();
-	theConstantMap[ "N_A" ] = N_A;
-	theConstantMap[ "exp" ] = M_E;
-      }
-    
-      void fillFunctionMap();
-
-      const Code compileExpression( StringCref anExpression )
-      {
-	Code aCode;
-	CompileGrammar aGrammer;
-	
-	theStackSize = 1;
-
-	tree_parse_info<> 
-	  info( ast_parse( anExpression.c_str(), aGrammer, space_p ) );
-
-	if( info.full )
-	  {
-	    compileTree( info.trees.begin(), aCode );
-	  }
-	else
-	  {
-	    THROW_EXCEPTION( UnexpectedError, 
-			     "Parse error in the expression. Expression : " + anExpression );
-	  }
-	
-	return aCode;
-      }
-      
-    private:
-      
-      void compileTree( TreeIterator const&  i, CodeRef aCode );  
-
-      class CompileGrammar;
 
     private:
 
-      int theStackSize;
-      ProcessPtr theProcessPtr;
-      ExpressionProcessBasePtr theExpressionProcessBasePtr;
-
-      ConstantMap theConstantMap;
-      FunctionMap1 theFunctionMap1;
-      FunctionMap2 theFunctionMap2;
-    };
-
-   
-    class Compiler::CompileGrammar 
-      : public grammar<CompileGrammar>
+    class CompileGrammar 
+      : 
+  public grammar<CompileGrammar>
     {
     public:
       enum GrammarType
@@ -889,6 +800,100 @@ namespace libecs
 #undef rootNode
  
     };
+
+
+    public:
+    
+      Compiler()
+      {
+	if( theConstantMap.empty() == true )
+	  {
+	    fillConstantMap();
+	  }
+	if( theFunctionMap1.empty() == true )
+	  {
+	    fillFunctionMap();
+	  }
+      }
+    
+      ~Compiler()
+      {
+	;
+      }
+    
+      typedef char const*         iterator_t;
+      typedef tree_match<iterator_t> parse_tree_match_t;
+      typedef parse_tree_match_t::tree_iterator TreeIterator;
+      //    DECLARE_CLASS( TreeIterator );
+
+      void setProcessPtr( ProcessPtr aProcessPtr )
+      {
+	theProcessPtr = aProcessPtr;
+      }
+
+      void setExpressionProcessBasePtr( ExpressionProcessBasePtr 
+					aExpressionProcessBasePtr )
+      {
+	theExpressionProcessBasePtr = aExpressionProcessBasePtr;
+      }
+
+      const int getStackSize()
+      {
+	return theStackSize;
+      }
+      
+      void fillConstantMap()
+      {
+	theConstantMap[ "true" ] = 1.0;
+	theConstantMap[ "false" ] = 0.0;
+	theConstantMap[ "pi" ] = M_PI;
+	theConstantMap[ "NaN" ] = std::numeric_limits<Real>::quiet_NaN();
+	theConstantMap[ "INF"] = std::numeric_limits<Real>::infinity();
+	theConstantMap[ "N_A" ] = N_A;
+	theConstantMap[ "exp" ] = M_E;
+      }
+    
+      void fillFunctionMap();
+
+      const Code compileExpression( StringCref anExpression )
+      {
+	Code aCode;
+	CompileGrammar aGrammer;
+	
+	theStackSize = 1;
+
+	tree_parse_info<> 
+	  info( ast_parse( anExpression.c_str(), aGrammer, space_p ) );
+
+	if( info.full )
+	  {
+	    compileTree( info.trees.begin(), aCode );
+	  }
+	else
+	  {
+	    THROW_EXCEPTION( UnexpectedError, 
+			     "Parse error in the expression. Expression : " + anExpression );
+	  }
+	
+	return aCode;
+      }
+      
+    private:
+      
+      void compileTree( TreeIterator const&  i, CodeRef aCode );  
+
+    private:
+
+      int theStackSize;
+      ProcessPtr theProcessPtr;
+      ExpressionProcessBasePtr theExpressionProcessBasePtr;
+
+      ConstantMap theConstantMap;
+      FunctionMap1 theFunctionMap1;
+      FunctionMap2 theFunctionMap2;
+    };
+
+   
 
 
 
@@ -1973,7 +1978,7 @@ namespace libecs
       = ( ( theVariableReference.*theFuncPtr )()->*theAttributePtr)();
   }
   
-  LIBECS_DM_INIT_STATIC( ExpressionProcessBase, ExpressionFluxProcess );
+  LIBECS_DM_INIT_STATIC( ExpressionProcessBase, Process );
   
 } // namespace libecs
 

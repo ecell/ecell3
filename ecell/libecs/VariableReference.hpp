@@ -247,14 +247,14 @@ namespace libecs
       return theIsAccessor;
     }
 
-    const Real getValue() const
-    {
-      return theVariablePtr->getValue();
-    }
-
     void setValue( RealParam aValue ) const
     {
       theVariablePtr->setValue( aValue );
+    }
+
+    const Real getValue() const
+    {
+      return theVariablePtr->getValue();
     }
 
     /**

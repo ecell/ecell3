@@ -9,6 +9,8 @@
 namespace libecs
 {
 
+  DECLARE_VECTOR( Real, RealVector );
+
   LIBECS_DM_CLASS( ESSYNSProcess, Process )
   {
   
@@ -48,6 +50,9 @@ namespace libecs
   };
 
   LIBECS_DM_INIT_STATIC( ESSYNSProcess, Process );
-}
+
+
+} // namespace libecs
+
 
 #endif /* __ESSYNSPROCESS_HPP */

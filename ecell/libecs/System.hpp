@@ -127,10 +127,10 @@ namespace libecs
     }
 
     template <class C>
-    const std::map<const String,C*,std::less<const String> >& getMap() const
-    {
-      DEFAULT_SPECIALIZATION_INHIBITED();
-    }
+      const std::map<const String,C*,std::less<const String> >& getMap() const;
+    //    {
+    //      DEFAULT_SPECIALIZATION_INHIBITED();
+    //    }
 
     VariableMapCref getVariableMap() const
     {

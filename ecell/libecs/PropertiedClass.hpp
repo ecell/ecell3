@@ -74,16 +74,14 @@ namespace libecs
   LIBECS_DM_INIT_STATIC( CLASSNAME, DMTYPE )
 
 
-  // definition and initialization of static members.
-  // thePropertyInterface should come last, because thePropertySlotMap
-  // is initialized in the constructor of the PropertyInterface object.
+  // This macro does two things:
+  // (1) template specialization of PropertyInterface for CLASSNAME
+  //     is necessary here to instantiate thePropertySlotMap static variable.
+  // (2) thePropertyInterface static variable must also be instantiated.
 
 #define LIBECS_DM_INIT_STATIC( CLASSNAME, DMTYPE )\
-  libecs::PropertyInterface<CLASSNAME>::PropertySlotMap\
-    libecs::PropertyInterface<CLASSNAME>::thePropertySlotMap;\
-  libecs::StringMap libecs::PropertyInterface<CLASSNAME>::theClassInfoMap;\
+  template class PropertyInterface<CLASSNAME>;\
   libecs::PropertyInterface<CLASSNAME> CLASSNAME::thePropertyInterface
-
 
   ///@internal
 #define LIBECS_DM_OBJECT_DEF( CLASSNAME, DMTYPE )\

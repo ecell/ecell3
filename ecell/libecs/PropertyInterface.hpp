@@ -74,6 +74,8 @@ namespace libecs
 
 
     // info-related helper methods.
+
+    /*
     static void setInfoField( StringMapRef anInfoMap,
 			      StringCref aFieldName, StringCref anInfoString );
 
@@ -86,6 +88,8 @@ namespace libecs
     convertInfoMapToPolymorph( StringMapCref anInfoMap );
 
     virtual StringMapCref getClassInfoMap() = 0;
+
+    */
 
   };
 
@@ -318,6 +322,7 @@ namespace libecs
 
     // info-related methods
 
+    /*
     static void 
     setClassInfo( StringCref aFieldName, StringCref anInfoString )
     {
@@ -329,6 +334,7 @@ namespace libecs
     {
       return theClassInfoMap;
     }
+    */
 
     /*
     static void 
@@ -369,10 +375,16 @@ namespace libecs
 
     static PropertySlotMap  thePropertySlotMap;
 
-    static StringMap        theClassInfoMap;
+    //    static StringMap        theClassInfoMap;
 
   };
 
+
+  // This is necessary for the static data member of 
+  // the PropertyInterface template class to be instantiated
+  // when the class is specialized (in LIBECS_DM_INIT_STATIC()).
+  template< class T > class libecs::PropertyInterface< T>::PropertySlotMap
+  libecs::PropertyInterface< T>::thePropertySlotMap;
 
 
   /*@}*/

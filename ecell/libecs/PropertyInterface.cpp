@@ -64,6 +64,7 @@ namespace libecs
   }
 
 
+  /*
   void PropertyInterfaceBase::setInfoField( StringMapRef anInfoMap,
 					    StringCref aFieldName, 
 					    StringCref anInfoString )
@@ -78,7 +79,7 @@ namespace libecs
   {
     return convertStringMapToPolymorph( anInfoMap );
   }
-
+  */
 
 } // namespace libecs
 

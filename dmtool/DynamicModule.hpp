@@ -57,7 +57,9 @@ class DMException : public std::exception
 {
 public: 
 
-  DMException( const std::string& message ) : theMessage( message )
+  DMException( const std::string& message ) 
+    : 
+    theMessage( message )
   {
     ; // do nothing
   }
@@ -96,7 +98,7 @@ public:
 
   const std::string& getModuleName() const
   {
-    return theModuleName;
+    return this->theModuleName;
   }
 
   virtual const std::string getFileName() const
@@ -106,7 +108,7 @@ public:
 
   const DMAllocator& getAllocator() const
   {
-    return theAllocator;
+    return this->theAllocator;
   }
 
 protected:
@@ -210,17 +212,18 @@ SharedDynamicModule( const std::string& classname )
   theHandle( NULL )
 {
   std::string filename( classname );
-  theHandle = lt_dlopenext( filename.c_str() );
+  this->theHandle = lt_dlopenext( filename.c_str() );
 
-  if( theHandle == NULL ) 
+  if( this->theHandle == NULL ) 
     {
       throw DMException( "Failed to find or load a DM [" + classname + 
 			 "]: " + lt_dlerror() );
     }
 
-  theAllocator = *((DMAllocator*)( lt_dlsym( theHandle, "CreateObject" ) ));
+  this->theAllocator = 
+    *((DMAllocator*)( lt_dlsym( this->theHandle, "CreateObject" ) ));
 
-  if( theAllocator == NULL )
+  if( this->theAllocator == NULL )
     {
       throw DMException( "[" + getFileName() + "] is not a valid DM file: "
 			  + lt_dlerror() );  
@@ -230,16 +233,16 @@ SharedDynamicModule( const std::string& classname )
 template < class Base, class DMAllocator >
 SharedDynamicModule<Base,DMAllocator>::~SharedDynamicModule()
 {
-  if( theHandle != NULL )
+  if( this->theHandle != NULL )
     {
-      lt_dlclose( theHandle );
+      lt_dlclose( this->theHandle );
     }
 }
 
 template < class Base, class DMAllocator >
 const std::string SharedDynamicModule<Base,DMAllocator>::getFileName() const
 {
-  const lt_dlinfo* aDlInfo = lt_dlgetinfo( theHandle );
+  const lt_dlinfo* aDlInfo = lt_dlgetinfo( this->theHandle );
 
   if( aDlInfo == NULL )
     {

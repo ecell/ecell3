@@ -83,16 +83,16 @@ namespace libecs
     virtual const bool isGetable() const = 0;
 
     template < typename Type >
-    inline void set( typename Param<Type>::type aValue )
-    {
-      DefaultSpecializationInhibited();
-    }
+    inline void set( typename Param<Type>::type aValue );
+    //    {
+    //      DefaultSpecializationInhibited();
+    //    }
 
     template < typename Type >
-    inline const Type get() const
-    {
-      DefaultSpecializationInhibited();
-    }
+    inline const Type get() const;
+    //    {
+    //      DefaultSpecializationInhibited();
+    //    }
 
 
   protected:

@@ -18,6 +18,7 @@ LIBECS_DM_CLASS( DecayFluxProcess, ContinuousProcess )
 
   LIBECS_DM_OBJECT( DecayFluxProcess, Process )
     {
+      /*
       CLASS_INFO( BriefDescription, "A continuous decay process." );
 
       CLASS_INFO( Description, 
@@ -27,7 +28,7 @@ LIBECS_DM_CLASS( DecayFluxProcess, ContinuousProcess )
 		  "VariableReference S0, which must be specified "
 		  "in the model:\n"
 		  "S0 --> (..0, 1, or more products..)\n"
-		  "The half-time T is converted to rate constant k as:\n"
+		  "The half-time T is converted to the rate constant k as:\n"
 		  "k = log( 2 ) / T\n\n"
 		  "Flux rate of this Process is calculated by the following "
 		  "equation:\n"
@@ -44,17 +45,20 @@ LIBECS_DM_CLASS( DecayFluxProcess, ContinuousProcess )
       CLASS_INFO( VariableReference__S0__Description,
 		  "A Variable that decays." );
       CLASS_INFO( VariableReference__S0__Required,    "true" );
-
+      */
 
       INHERIT_PROPERTIES( ContinuousProcess );
 
       PROPERTYSLOT_SET_GET( Real, T );
+
+      /*
       CLASS_INFO( PropertySlot__T__BriefDescription, "half-time" );
       CLASS_INFO( PropertySlot__T__Description, 
 		  "A positive, non-zero half-time in second." );
       CLASS_INFO( PropertySlot__T__Unit,        "sec" );
       CLASS_INFO( PropertySlot__T__Default,     "1.0" );
       CLASS_INFO( PropertySlot__T__IsRequired,  "false" );
+      */
 
     }  
 

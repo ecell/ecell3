@@ -31,6 +31,8 @@
 #ifndef __POLYMORPH_HPP
 #define __POLYMORPH_HPP
 
+#include <boost/static_assert.hpp>
+
 #include "libecs.hpp"
 #include "convertTo.hpp"
 #include "Util.hpp"
@@ -62,10 +64,7 @@ namespace libecs
     virtual const PolymorphVector asPolymorphVector() const = 0;
 
     template< typename T >
-    const T as() const
-    {
-      DefaultSpecializationInhibited();
-    }
+    const T as() const;
 
     virtual PolymorphValuePtr createClone() const = 0;
 
@@ -287,10 +286,10 @@ namespace libecs
     }
 
     template< typename T >
-    const T as() const
-    {
-      DefaultSpecializationInhibited();
-    }
+    const T as() const;
+      //    {
+      //      DefaultSpecializationInhibited();
+      //    }
 
     const Type getType() const;
 
