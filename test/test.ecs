@@ -1,0 +1,6 @@
+aLogger1 = aSimulator.getLogger( 'Substance:/CELL/CYTOPLASM:S:Quantity'  )
+aSimulator.run( 1000 )
+aEcdFile = open('test.txt','w')
+aEcdFile.write('exit')
+aEcdFile.close()
+

@@ -1,11 +1,13 @@
 import ecell.Session
 import ecell.ecs
 
+
 from ecell.FullID import *
 
 from ecell.util import *
 from ecell.ECS import *
 
+from Numeric import *
 
 print 'create a Session'
 aSession = ecell.Session.Session( ecell.ecs.Simulator() )
@@ -46,9 +48,6 @@ print 'set Substance:/:A Quantity = 30'
 aSimulator.setProperty( 'Substance:/:A:Quantity', (30,) )
 
 
-
-
-
 printAllProperties( aSimulator, 'System::/' )
 
 printAllProperties( aSimulator, 'System:/:CYTOPLASM' )
@@ -63,7 +62,6 @@ substancelist = aSimulator.getProperty( 'System:/:CYTOPLASM:SubstanceList' )
 
 for i in substancelist:
     printAllProperties( aSimulator, 'Substance:/CYTOPLASM:' + i )
-
 
 print
 
@@ -87,3 +85,84 @@ aSimulator.step()
 
 print aSimulator.getCurrentTime()
 aSimulator.step()
+
+print "getLogger"
+aALogger = aSimulator.getLogger('Substance:/:A:Quantity')
+aBLogger = aSimulator.getLogger('Substance:/:B:Quantity')
+
+print aSimulator.getCurrentTime()
+aSimulator.run(10)
+print aSimulator.getCurrentTime()
+
+start= aALogger.getStartTime()
+
+
+
+    
+
+end  = aALogger.getEndTime()
+print start ,end
+print aSimulator.getLoggerList()
+
+############################################
+#setResultFileList()#
+
+a = array(([20,30],
+           [40,50],
+           [60,70],
+           [80,90],
+           [100,110],
+           [120,130],
+           [140,150],
+           [160,170],
+           [180,190],
+           [200,210],
+           [220,230],
+           [240,250],
+           [260,270],
+           [280,290],
+           [300,310],
+           [320,330],
+           [340,350]))  //aALogger.getData()
+
+sizeOfArrayInArray1 = len(a[0])
+sizeOfArrayInArray2 = len(a[1])
+sizeOfArray = len(a)
+
+List = aSimulator.getLoggerList()
+
+for x in List: 
+    tmpx = string.replace(x, ':', '-')
+    string.replace(tmpx, '/', '_')
+
+appendedList = List.append(tmpx)
+print appendedList
+    
+data = 'DATA:' + List
+size = "SIZE: %s %s"%(sizeOfArrayInArray1, sizeOfArray)
+label = "LABEL: time quantity"
+note = "NOTE:\n\n-------------------------"
+
+stringList = [ data , size , label , note ]
+numericList = [sizeOfArrayInArray1 , sizeOfArrayInArray2 ]
+
+output = open('/home/jiji/ecell3/test/test.test','w')
+for x in stringList:
+    print x
+    output.writelines("%s\n"%x)
+    
+    for numericList in a:
+        print numericList
+        tmp = ''
+        for y in numericList:
+            
+            tmp = tmp + "%10s"%y 
+
+        output.writelines(tmp+"\n")
+             
+    output.writelines("\n///")        
+            
+            
+if  __name__ == "__main__":
+    
+    setResultFileList("result.ecd")
