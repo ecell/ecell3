@@ -1,15 +1,18 @@
 #!/usr/bin/env python
 
-from Interface import *
+import sys
+sys.path.append('..')
+sys.path.append('/home/ecell/ecell3/ecell/pyecs')
+from ViewWindow import *
 from ecssupport import *
 import ecs
 
-class NumericWindow( Interface ):
+class NumericWindow( ViewWindow ):
 
     def __init__( self, fpn, sim ):
         self.sim = sim
         self.theGladeFileName = 'NumericWindow.glade'
-        Interface.__init__( self, self.theGladeFileName, fpn )
+        ViewWindow.__init__( self, self.theGladeFileName, fpn )
         self.addHandler('input_value', self.inputValue)
         self.addHandler('increase_value', self.increaseValue)
         self.addHandler('decrease_value', self.decreaseValue)
