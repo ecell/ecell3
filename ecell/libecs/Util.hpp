@@ -103,16 +103,19 @@ namespace libecs
   */
   void eraseWhiteSpaces( StringRef str );
 
-  /**
-     reversed order compare
-  */
-
-  template <typename T>
-  class ReverseCmp
+  template < class T >
+  struct PtrGreater
   {
-  public:
-    bool operator()( const T x, const T y ) const { return x > y; }
+    bool operator()( T x, T y ) const { return *y < *x; }
   };
+
+
+  template < class T >
+  struct PtrLess
+  {
+    bool operator()( T x, T y ) const { return *y > *x; }
+  };
+
 
 
   /**

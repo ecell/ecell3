@@ -138,6 +138,7 @@ namespace libecs
     void slave();
     void clear();
     void process();
+    void processNegative();
     void processNormal();
 
     void reset();
@@ -363,7 +364,7 @@ namespace libecs
     VariableVector        theVariableCache;
     ProcessVector         theProcessCache;
 
-    ProcessVectorConstIterator theFirstNormalProcess;
+    ProcessVectorIterator theFirstNormalProcess;
 
     RealValarray theValueBuffer;
     RealValarray theVelocityBuffer;

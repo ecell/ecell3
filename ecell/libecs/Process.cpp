@@ -65,6 +65,7 @@ namespace libecs
 				      &Process::getPriority ) );
   }
 
+
   void Process::setVariableReferenceList( PolymorphCref aValue )
   {
     const PolymorphVector aVector( aValue.asPolymorphVector() );
@@ -73,23 +74,7 @@ namespace libecs
       {
 	const PolymorphVector anInnerVector( (*i).asPolymorphVector() );
 
-	// Require ( tagname, fullid, coefficient ) 3-tuple
-	if( anInnerVector.size() < 2 )
-	  {
-	    THROW_EXCEPTION( ValueError, "Process [" + getFullID().getString()
-			     + "]: ill-formed VariableReferenceList given." );
-	  }
-
-	const String aVariableReferenceName(  anInnerVector[0].asString() );
-	const FullID aFullID(                 anInnerVector[1].asString() );
-	Int          aCoefficient( 0 );
-
-	if( anInnerVector.size() >= 3 )
-	  {
-	    aCoefficient = anInnerVector[2].asInt();
-	  }
-
-	registerVariableReference( aVariableReferenceName, aFullID, aCoefficient );
+	setVariableReference( anInnerVector );
       }
 
   }
@@ -97,16 +82,16 @@ namespace libecs
   const Polymorph Process::getVariableReferenceList() const
   {
     PolymorphVector aVector;
-    aVector.reserve( theVariableReferenceMap.size() );
+    aVector.reserve( theVariableReferenceVector.size() );
   
-    for( VariableReferenceMapConstIterator i( theVariableReferenceMap.begin() );
-	 i != theVariableReferenceMap.end() ; ++i )
+    for( VariableReferenceVectorConstIterator i( theVariableReferenceVector.begin() );
+	 i != theVariableReferenceVector.end() ; ++i )
       {
 	PolymorphVector anInnerVector;
-	VariableReferenceCref aVariableReference( i->second );
+	VariableReferenceCref aVariableReference( *i );
 
 	// Tagname
-	anInnerVector.push_back( i->first );
+	anInnerVector.push_back( aVariableReference.getName() );
 	// FullID
 	anInnerVector.push_back( aVariableReference.getVariable()->
 				 getFullID().getString() );
@@ -119,17 +104,11 @@ namespace libecs
     return aVector;
   }
 
-  void Process::registerVariableReference( StringCref aName, FullIDCref aFullID, 
-				  const Int aCoefficient )
-  {
-    SystemPtr aSystem( getModel()->getSystem( aFullID.getSystemPath() ) );
-    VariablePtr aVariable( aSystem->getVariable( aFullID.getID() ) );
-
-    registerVariableReference( aName, aVariable, aCoefficient );
-  }
 
   Process::Process() 
     :
+    theFirstZeroVariableReference( theVariableReferenceVector.end() ),
+    theFirstPositiveVariableReference( theVariableReferenceVector.end() ),
     theActivity( 0.0 ),
     thePriority( 0 )
   {
@@ -142,28 +121,109 @@ namespace libecs
   }
 
 
-  void Process::registerVariableReference( StringCref aName, VariablePtr aVariable, 
-				  const Int aCoefficient )
-  {
-    VariableReference aVariableReference( aVariable, aCoefficient );
-    theVariableReferenceMap.insert( VariableReferenceMap::value_type( aName, aVariableReference ) );
-  }
-
-
   VariableReference Process::getVariableReference( StringCref aName )
   {
-    VariableReferenceMapConstIterator anIterator( theVariableReferenceMap.find( aName ) );
+    return *( findVariableReference( aName ) );
+  }
 
-    if( anIterator == theVariableReferenceMap.end() )
+  void Process::removeVariableReference( StringCref aName )
+  {
+    theVariableReferenceVector.erase( findVariableReference( aName ) );
+  }
+
+  void Process::setVariableReference( PolymorphVectorCref aValue )
+  {
+
+    UnsignedInt aVectorSize( aValue.size() );
+    
+    // Require ( tagname, fullid, coefficient ) 3-tuple
+    if( aVectorSize < 2 )
       {
-	THROW_EXCEPTION( NotFound,
-			 "[" + getFullID().getString() + 
-			 "]: VariableReference [" + aName + 
-			 "] not found in this Process." );
+	THROW_EXCEPTION( ValueError, "Process [" + getFullID().getString()
+			 + "]: ill-formed VariableReference given." );
       }
 
-    return ( *anIterator ).second;
+    const String aVariableReferenceName(  aValue[0].asString() );
+    const String aFullIDString( aValue[1].asString() );
+    if( ! aFullIDString.empty() )
+      {
+	const FullID aFullID( aValue[1].asString() );
+	Int          aCoefficient( 0 );
+	
+	if( aVectorSize >= 3 )
+	  {
+	    aCoefficient = aValue[2].asInt();
+	  }
+	
+	registerVariableReference( aVariableReferenceName, aFullID, 
+				   aCoefficient );
+      }
+    else // if the FullID is empty, remove the VariableReference
+      {
+	removeVariableReference( aVariableReferenceName );
+      }
   }
+
+
+
+  void Process::registerVariableReference( StringCref aName, 
+					   FullIDCref aFullID, 
+					   const Int aCoefficient )
+  {
+    SystemPtr aSystem( getModel()->getSystem( aFullID.getSystemPath() ) );
+    VariablePtr aVariable( aSystem->getVariable( aFullID.getID() ) );
+
+    registerVariableReference( aName, aVariable, aCoefficient );
+  }
+
+
+  void Process::registerVariableReference( StringCref aName, 
+					   VariablePtr aVariable, 
+					   const Int aCoefficient )
+  {
+    VariableReference aVariableReference( aName, aVariable, aCoefficient );
+    theVariableReferenceVector.push_back( aVariableReference );
+
+    // sort by coefficient
+    std::sort( theVariableReferenceVector.begin(), 
+	       theVariableReferenceVector.end(), 
+	       VariableReference::CoefficientCompare() );
+
+    // find the first VariableReference whose coefficient is 0,
+    // and the first VariableReference whose coefficient is positive.
+    std::pair<VariableReferenceVectorConstIterator,
+      VariableReferenceVectorConstIterator> 
+      aZeroRange( std::equal_range( theVariableReferenceVector.begin(), 
+				    theVariableReferenceVector.end(), 
+				    0, 
+				    VariableReference::CoefficientCompare()
+				    ) );
+
+    theFirstZeroVariableReference     = aZeroRange.first;
+    theFirstPositiveVariableReference = aZeroRange.second;
+  }
+
+
+  VariableReferenceVectorIterator 
+  Process::findVariableReference( StringCref aName )
+  {
+    // well this is a linear search.. but this won't be used in simulation.
+    for( VariableReferenceVectorIterator 
+	   i( theVariableReferenceVector.begin() );
+	 i != theVariableReferenceVector.end(); ++i )
+      {
+	if( (*i).getName() == aName )
+	  {
+	    return i;
+	  }
+      }
+
+    THROW_EXCEPTION( NotFound,
+		     "[" + getFullID().getString() + 
+		     "]: VariableReference [" + aName + 
+		     "] not found in this Process." );
+  }
+
 
   void Process::initialize()
   {

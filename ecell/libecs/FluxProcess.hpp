@@ -34,6 +34,14 @@ namespace libecs
       Process::initialize();
     }
 
+    inline void setVariableFlux( VariableReferenceCref aVariableReference, 
+				 const Real aVelocity )
+    {
+      const Int aCoefficient( aVariableReference.getCoefficient() );
+      aVariableReference.getVariable()->
+	addVelocity( aVelocity * aCoefficient );
+    }
+
     void setFlux( RealCref velocity )
     {
       Real aVelocity( velocity );
@@ -41,17 +49,19 @@ namespace libecs
       setActivity( aVelocity );
 
       // Increase or decrease variables.
-
-      for( VariableReferenceMapIterator s( theVariableReferenceMap.begin() );
-	   s != theVariableReferenceMap.end() ; ++s )
+      for( VariableReferenceVectorConstIterator 
+	     i( theVariableReferenceVector.begin() ); 
+	   i != theFirstZeroVariableReference ; ++i )
 	{
-	  VariableReference aVariableReference( s->second );
-	  const Int aCoefficient( aVariableReference.getCoefficient() );
-	  if( aCoefficient != 0 )
-	    {
-	      aVariableReference.getVariable()->
-		addVelocity( aVelocity * aCoefficient );
-	    }
+	  setVariableFlux( *i, aVelocity );
+	}
+
+      // skip zero coefficients
+      for( VariableReferenceVectorConstIterator 
+	     i( theFirstPositiveVariableReference );
+	   i != theVariableReferenceVector.end() ; ++i )
+	{
+	  setVariableFlux( *i, aVelocity );
 	}
       
     }

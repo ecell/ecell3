@@ -49,6 +49,51 @@ namespace libecs
 
   public:
 
+    class CoefficientCompare
+    {
+    public:
+
+      bool operator()( VariableReferenceCref aLhs, 
+		       VariableReferenceCref aRhs ) const
+      {
+	return compare( aLhs.getCoefficient(), aRhs.getCoefficient() );
+      }
+
+      bool operator()( const Int aLhs, 
+		       VariableReferenceCref aRhs ) const
+      {
+	return compare( aLhs, aRhs.getCoefficient() );
+      }
+
+      bool operator()( VariableReferenceCref aLhs, 
+		       const Int aRhs ) const
+      {
+	return compare( aLhs.getCoefficient(), aRhs );
+      }
+
+
+    private:
+
+      // if statement can be faster than returning an expression directly
+      inline static bool compare( const Int aLhs, const Int aRhs )
+      {
+	if( aLhs < aRhs )
+	  {
+	    return true;
+	  }
+	else
+	  {
+	    return false;
+	  }
+      }
+
+
+    };
+
+
+
+  public:
+
     VariableReference()
       :
       theVariable( NULLPTR ),
@@ -57,8 +102,11 @@ namespace libecs
       ; // do nothing
     }
 
-    VariableReference( VariablePtr aVariablePtr, const Int aCoefficient ) 
+    VariableReference( StringCref aName, 
+		       VariablePtr aVariablePtr, 
+		       const Int aCoefficient ) 
       : 
+      theName( aName ),
       theVariable( aVariablePtr ), 
       theCoefficient( aCoefficient )
     {
@@ -67,13 +115,15 @@ namespace libecs
 
     ~VariableReference() {}
 
+    StringCref  getName() const { return theName; }
     VariablePtr getVariable() const { return theVariable; }
-    const Int getCoefficient() const { return theCoefficient; }
+    const Int   getCoefficient() const { return theCoefficient; }
 
   private:
 
+    String      theName;
     VariablePtr theVariable;
-    Int theCoefficient;
+    Int         theCoefficient;
     // bool mutable
   };
 

@@ -188,22 +188,22 @@ namespace libecs
     // Update theVariableCache
     //
 
-    // get all the variables which are included in the VariableReferenceMap
+    // get all the variables which are included in the VariableReferenceVector
     // of the Processs
     theVariableCache.clear();
     // for all the processs
     for( ProcessVectorConstIterator i( theProcessCache.begin());
 	 i != theProcessCache.end() ; ++i )
       {
-	VariableReferenceMapCref 
-	  aVariableReferenceMap( (*i)->getVariableReferenceMap() );
+	VariableReferenceVectorCref 
+	  aVariableReferenceVector( (*i)->getVariableReferenceVector() );
 
 	// for all the VariableReferences
-	for( VariableReferenceMapConstIterator 
-	       j( aVariableReferenceMap.begin() );
-	     j != aVariableReferenceMap.end(); ++j )
+	for( VariableReferenceVectorConstIterator 
+	       j( aVariableReferenceVector.begin() );
+	     j != aVariableReferenceVector.end(); ++j )
 	  {
-	    VariablePtr aVariablePtr( j->second.getVariable() );
+	    VariablePtr aVariablePtr( j->getVariable() );
 
 	    // prevent duplication
 	    if( std::find( theVariableCache.begin(), theVariableCache.end(),
@@ -445,13 +445,17 @@ namespace libecs
     FOR_ALL( ProcessVector, theProcessCache, process );
   }
 
+  void Stepper::processNegative()
+  {
+    std::for_each( theProcessCache.begin(), theFirstNormalProcess, 
+		   std::mem_fun( &Process::process ) );
+  }
+
+
   void Stepper::processNormal()
   {
-    for( ProcessVectorConstIterator i( theFirstNormalProcess );
-	 i != theProcessCache.end(); ++i )
-      {
-	(*i)->process();
-      }
+    std::for_each( theFirstNormalProcess, theProcessCache.end(),
+		   std::mem_fun( &Process::process ) );
   }
 
   void Stepper::integrate()
@@ -519,7 +523,10 @@ namespace libecs
       {
   	setNextStepInterval( getStepInterval() * 2.0 );
       }
-    else setNextStepInterval( getStepInterval() );
+    else 
+      {
+	setNextStepInterval( getStepInterval() );
+      }
   }
 
 
@@ -535,9 +542,12 @@ namespace libecs
   {
     integrate();
     slave();
+
+    processNegative();
     log();
+
     clear();
-    process();
+    processNormal();
 
     updateVelocityBuffer();
   }
@@ -557,13 +567,15 @@ namespace libecs
 
     slave();
 
+    processNegative();
+
     log();
 
     // clear
     clear();
 
     // ========= 1 ===========
-    process();
+    processNormal();
 
     const UnsignedInt aSize( theVariableCache.size() );
     for( UnsignedInt c( 0 ); c < aSize; ++c )
@@ -575,7 +587,7 @@ namespace libecs
 
 	// restore k1 / 2 + x
 	aVariable->loadValue( aVelocity * .5 * getStepInterval()
-				  + theValueBuffer[ c ] );
+			      + theValueBuffer[ c ] );
 
 	theVelocityBuffer[ c ] = aVelocity;
 
@@ -661,12 +673,15 @@ namespace libecs
   {
     integrate();
     slave();
+
+    processNegative();
+
     log();
     clear();
 
     // don't expect too much from euler
-    const Real eps_abs( 1.0e-10 );
-    const Real eps_rel( 1.0e-6 );
+    const Real eps_abs( 1.0e-5 );
+    const Real eps_rel( 1.0e-5 );
     const Real a_y( 1.0 );
     const Real a_dydt( 1.0 );
 
@@ -685,7 +700,7 @@ namespace libecs
       {
 
 	// ========= 1 ===========
-	process();
+	processNormal();
 
 	for( UnsignedInt c( 0 ); c < aSize; ++c )
 	  {
@@ -730,8 +745,8 @@ namespace libecs
 		    //               	    setStepInterval( getStepInterval() * 0.5 );
       		    setStepInterval( getStepInterval() * pow(delta_max, -1.0) *  safety );
 
-		    std::cerr << "s " << getCurrentTime() << ' ' 
-		     << getStepInterval() << std::endl;
+		    //		    std::cerr << "s " << getCurrentTime() << ' ' 
+		    //		     << getStepInterval() << std::endl;
 
 		    reset();
 		    continue;
@@ -756,8 +771,8 @@ namespace libecs
 		aStepInterval = aMaxInterval;
 	      }
 
-	    std::cerr << "g " << getCurrentTime() << ' ' 
-		      << aStepInterval << std::endl;
+	    //	    std::cerr << "g " << getCurrentTime() << ' ' 
+	    //		      << aStepInterval << std::endl;
 
 	    setNextStepInterval( aStepInterval );
 	  }
@@ -811,6 +826,8 @@ namespace libecs
 
     slave();
 
+    processNegative();
+
     log();
 
     // clear
@@ -822,7 +839,7 @@ namespace libecs
       {
 
 	// ========= 1 ===========
-	process();
+	processNormal();
 
 	for( UnsignedInt c( 0 ); c < aSize; ++c )
 	  {
@@ -968,6 +985,8 @@ namespace libecs
 
     slave();
 
+    processNegative();
+
     log();
 
     // clear
@@ -979,7 +998,7 @@ namespace libecs
       {
 
 	// ========= 1 ===========
-	process();
+	processNormal();
 
 	for( UnsignedInt c( 0 ); c < aSize; ++c )
 	  {

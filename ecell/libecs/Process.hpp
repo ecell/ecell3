@@ -50,6 +50,8 @@ namespace libecs
   DECLARE_ASSOCVECTOR( String, VariableReference, std::less< const String >, 
 		       VariableReferenceMap  );
 
+  DECLARE_VECTOR( VariableReference, VariableReferenceVector );
+
   /**
      Process class is used to represent chemical and other phenonema which 
      may or may not result in change in value of one or more Variables.
@@ -145,11 +147,13 @@ namespace libecs
       return theActivity;
     }
 
-    void setVariableReference( PolymorphCref aValue );
+    void setVariableReference( PolymorphVectorCref aValue );
 
     void setVariableReferenceList( PolymorphCref );
 
     const Polymorph getVariableReferenceList() const;
+
+    void removeVariableReference( StringCref aName );
 
     void registerVariableReference( StringCref aName, FullIDCref aFullID,
 				    const Int aCoefficient );
@@ -167,12 +171,14 @@ namespace libecs
 
     VariableReference getVariableReference( StringCref aVariableReferenceName );
 
+    VariableReferenceVectorIterator findVariableReference( StringCref aName );
+
     /**
-       @return a const reference to the VariableReferenceMap
+       @return a const reference to the VariableReferenceVector
     */
-    VariableReferenceMapCref getVariableReferenceMap() const
+    VariableReferenceVectorCref getVariableReferenceVector() const
     {
-      return theVariableReferenceMap;
+      return theVariableReferenceVector;
     }
 
     void setPriority( IntCref aValue )
@@ -191,7 +197,9 @@ namespace libecs
 
   protected:
 
-    VariableReferenceMap theVariableReferenceMap;
+    VariableReferenceVector theVariableReferenceVector;
+    VariableReferenceVectorConstIterator theFirstZeroVariableReference;
+    VariableReferenceVectorConstIterator theFirstPositiveVariableReference;
 
   private:
 
