@@ -1,35 +1,16 @@
-
-# created by eml2em program
-# from file: simple.eml, date: Sun Oct 13 05:59:45 2002
+#
+# A very simple model with one michaelis-uni-uni reaction.
 #
 
-Stepper Midpoint2Stepper( SRM_01 )
-#Stepper FixedEuler1Stepper( SRM_01 )
+#Stepper Midpoint2Stepper( DE1 )
+Stepper FixedEuler1Stepper( DE1 )
 {
 	# no property
 }
 
 System System( / )
 {
-	StepperID	SRM_01;
-	Volume	0.000000000000001;
-}
-
-System System( / )
-{
-	StepperID	SRM_01;
-	Volume	0.000000000000001;
-}
-
-System System( /CELL )
-{
-	StepperID	SRM_01;
-	Volume	unknown;
-}
-
-System System( /CELL/CYTOPLASM )
-{
-	StepperID	SRM_01;
+	StepperID	DE1;
 	Volume	1e-18;
 
 	Variable Variable( S )
@@ -49,11 +30,12 @@ System System( /CELL/CYTOPLASM )
 	
 	Process MichaelisUniUniProcess( E )
 	{
-		VariableReferenceList	[ S0 Variable:/CELL/CYTOPLASM:S -1 ] [ P0 Variable:/CELL/CYTOPLASM:P 1 ] [ C0 Variable:/CELL/CYTOPLASM:E 0 ];
+		VariableReferenceList	[ S0 Variable:/:S -1 ]
+ 					 [ P0 Variable:/:P 1 ]
+					 [ C0 Variable:/:E 0 ];
 		KmS	1;
 		KcF	10;
 	}
-	
 	
 }
 

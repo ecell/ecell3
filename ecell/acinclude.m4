@@ -578,7 +578,7 @@ AC_LANG_RESTORE
 ])
 AC_MSG_RESULT($ice_cv_have_bool)
 if test "$ice_cv_have_bool" = yes; then
-AC_DEFINE(HAVE_BOOL)
+AC_DEFINE(HAVE_BOOL,1,[])
 fi
 ])dnl
 dnl
@@ -604,7 +604,7 @@ AC_LANG_RESTORE
 ])
 AC_MSG_RESULT($ice_cv_have_explicit)
 if test "$ice_cv_have_explicit" = yes; then
-AC_DEFINE(HAVE_EXPLICIT)
+AC_DEFINE(HAVE_EXPLICIT,1,[])
 fi
 ])dnl
 dnl
@@ -630,7 +630,7 @@ AC_LANG_RESTORE
 ])
 AC_MSG_RESULT($ice_cv_have_mutable)
 if test "$ice_cv_have_mutable" = yes; then
-AC_DEFINE(HAVE_MUTABLE)
+AC_DEFINE(HAVE_MUTABLE,1,[])
 fi
 ])dnl
 dnl
@@ -664,7 +664,7 @@ AC_LANG_RESTORE
 ])
 AC_MSG_RESULT($ice_cv_have_namespace)
 if test "$ice_cv_have_namespace" = yes; then
-AC_DEFINE(HAVE_NAMESPACE)
+AC_DEFINE(HAVE_NAMESPACE,1,[])
 fi
 ])dnl
 dnl
@@ -700,7 +700,7 @@ AC_LANG_RESTORE
 ])
 AC_MSG_RESULT($ice_cv_have_named_return_values)
 if test "$ice_cv_have_named_return_values" = yes; then
-AC_DEFINE(HAVE_NAMED_RETURN_VALUES)
+AC_DEFINE(HAVE_NAMED_RETURN_VALUES,1,[])
 fi
 ])dnl
 dnl
@@ -729,7 +729,7 @@ AC_LANG_RESTORE
 ])
 AC_MSG_RESULT($ice_cv_have_explicit_template_instantiation)
 if test "$ice_cv_have_explicit_template_instantiation" = yes; then
-AC_DEFINE(HAVE_EXPLICIT_TEMPLATE_INSTANTIATION)
+AC_DEFINE(HAVE_EXPLICIT_TEMPLATE_INSTANTIATION,1,[])
 fi
 ])dnl
 dnl
@@ -758,7 +758,7 @@ AC_LANG_RESTORE
 ])
 AC_MSG_RESULT($ice_cv_have_pretty_function)
 if test "$ice_cv_have_pretty_function" = yes; then
-AC_DEFINE(HAVE_PRETTY_FUNCTION)
+AC_DEFINE(HAVE_PRETTY_FUNCTION,1,[])
 fi
 ])dnl
 dnl
@@ -788,7 +788,7 @@ AC_LANG_RESTORE
 ])
 AC_MSG_RESULT($ice_cv_have_array_operator_new)
 if test "$ice_cv_have_array_operator_new" = yes; then
-AC_DEFINE(HAVE_ARRAY_OPERATOR_NEW)
+AC_DEFINE(HAVE_ARRAY_OPERATOR_NEW,1,[])
 fi
 ])dnl
 dnl
@@ -818,7 +818,7 @@ AC_LANG_RESTORE
 ])
 AC_MSG_RESULT($ice_cv_have_placement_new)
 if test "$ice_cv_have_placement_new" = yes; then
-AC_DEFINE(HAVE_PLACEMENT_NEW)
+AC_DEFINE(HAVE_PLACEMENT_NEW,1,[])
 fi
 ])dnl
 dnl
@@ -883,7 +883,7 @@ AC_LANG_RESTORE
 ])
 AC_MSG_RESULT($ice_cv_have_ansi_lifetime_of_temporaries)
 if test "$ice_cv_have_ansi_lifetime_of_temporaries" = yes; then
-AC_DEFINE(HAVE_ANSI_LIFETIME_OF_TEMPORARIES)
+AC_DEFINE(HAVE_ANSI_LIFETIME_OF_TEMPORARIES,1,[])
 fi
 ])dnl
 dnl
@@ -924,7 +924,7 @@ AC_LANG_RESTORE
 ])
 AC_MSG_RESULT($ice_cv_ostrstream_pcount_broken)
 if test "$ice_cv_ostrstream_pcount_broken" = yes; then
-AC_DEFINE(OSTRSTREAM_PCOUNT_BROKEN)
+AC_DEFINE(OSTRSTREAM_PCOUNT_BROKEN,1,[])
 fi
 ])dnl
 dnl
@@ -949,7 +949,7 @@ AC_LANG_RESTORE
 ])
 AC_MSG_RESULT($ice_cv_have_long_long)
 if test "$ice_cv_have_long_long" = yes; then
-AC_DEFINE(HAVE_LONG_LONG)
+AC_DEFINE(HAVE_LONG_LONG,1,[])
 fi
 ])dnl
 dnl
@@ -974,7 +974,7 @@ AC_LANG_RESTORE
 ])
 AC_MSG_RESULT($ice_cv_have_exceptions)
 if test "$ice_cv_have_exceptions" = yes; then
-AC_DEFINE(HAVE_EXCEPTIONS)
+AC_DEFINE(HAVE_EXCEPTIONS,1,[])
 fi
 ])dnl
 dnl
@@ -1007,7 +1007,7 @@ AC_LANG_RESTORE
 ])
 AC_MSG_RESULT($ice_cv_have_std_exceptions)
 if test "$ice_cv_have_std_exceptions" = yes; then
-AC_DEFINE(HAVE_STD_EXCEPTIONS)
+AC_DEFINE(HAVE_STD_EXCEPTIONS,1,[])
 fi
 ])dnl
 dnl
@@ -1038,7 +1038,7 @@ AC_LANG_RESTORE
 ])
 AC_MSG_RESULT($ice_cv_have_typeinfo)
 if test "$ice_cv_have_typeinfo" = yes; then
-AC_DEFINE(HAVE_TYPEINFO)
+AC_DEFINE(HAVE_TYPEINFO,1,[])
 fi
 ])dnl
 dnl
@@ -1104,7 +1104,7 @@ ice_cv_have_path_max=no)
 ])
 AC_MSG_RESULT($ice_cv_have_path_max)
 if test "$ice_cv_have_path_max" = yes; then
-AC_DEFINE(HAVE_PATH_MAX)
+AC_DEFINE(HAVE_PATH_MAX,1,[])
 fi
 ])dnl
 dnl
@@ -1125,7 +1125,7 @@ ice_cv_have_posix_path_max=no)
 ])
 AC_MSG_RESULT($ice_cv_have_posix_path_max)
 if test "$ice_cv_have_posix_path_max" = yes; then
-AC_DEFINE(HAVE_POSIX_PATH_MAX)
+AC_DEFINE(HAVE_POSIX_PATH_MAX,1,[])
 fi
 ])dnl
 dnl
@@ -1146,7 +1146,7 @@ ice_cv_have_maxpathlen=no)
 ])
 AC_MSG_RESULT($ice_cv_have_maxpathlen)
 if test "$ice_cv_have_maxpathlen" = yes; then
-AC_DEFINE(HAVE_MAXPATHLEN)
+AC_DEFINE(HAVE_MAXPATHLEN,1,[])
 fi
 ])dnl
 dnl

@@ -143,8 +143,9 @@ namespace libecs
     //    clearEntityListChanged();
     //      }
 
-    // size of the value buffer == the number of *write* variables.
-    theValueBuffer.resize( getFirstReadOnlyVariableIndex() );
+    // size of the value buffer == the number of *all* variables.
+    // (not just read or write variables)
+    theValueBuffer.resize( theVariableVector.size() );
 
     updateLoggedPropertySlotVector();
   }

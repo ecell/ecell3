@@ -6,7 +6,7 @@ INCLTDL=@INCLTDL@
 LIBLTDL=@LIBLTDL@
 PYTHON_INCLUDES=@PYTHON_INCLUDES@
 
-ecellpyexecdir=$(pyexecdir)/ecell
+pkgpythondir=@pkgpythondir@
 
 BOOST_DIR=@BOOST_DIR@
 
@@ -22,18 +22,6 @@ LIBEMC=$(ECELLDIR)/libemc/libemc.la
 LIBECS=$(ECELLDIR)/libecs/libecs.la
 
 CFLAGS=${CXXFLAGS}
-
-BPLV1SRC=\
-classes.cpp\
-conversions.cpp\
-cross_module.cpp\
-errors.cpp\
-extension_class.cpp\
-functions.cpp\
-init_function.cpp\
-module_builder.cpp\
-objects.cpp\
-types.cpp
 
 BPLV2SRC=\
 numeric.cpp\
@@ -75,14 +63,18 @@ $(BPLSRC):
 	fi
 
 
-ecellpyexec_LTLIBRARIES = _ecs.la
+#noinst_LTLIBRARIES= libbpl.la
+#libbpl_la_SOURCES=$(BPLSRC)
+
+
+pkgpython_LTLIBRARIES = _ecs.la
 
 _ecs_la_SOURCES=\
 PyEcs.cpp\
 $(BPLSRC)
 
 
-pyecs_HEADERS=\
+noinst_HEADERS=\
 PyEcs.hpp
 
 _ecs_la_LDFLAGS=-module -export-dynamic -avoid-version
@@ -91,21 +83,13 @@ _ecs_la_LIBADD= $(LIBEMC) $(LIBECS) -lstdc++ $(LIBLTDL)
 
 all-local: _ecs.so
 
-#FIXME: should be removed after ecs.la is renamed to _ecs.la
-#FIXME: messy
-#install-exec-local:
-#	mv -f $(ecellpyexecdir)/ecs.so $(ecellpyexecdir)/_ecs.so
-#	mv -f $(ecellpyexecdir)/ecs.la $(ecellpyexecdir)/_ecs.la
-
 
 _ecs.so: _ecs.la 
 	ln -sf .libs/_ecs.so ./_ecs.so
 
 clean-local:
-	rm -f ecs.so _ecs.so
+	rm -f _ecs.so
 	rm -f $(BPLSRC)
-
-pyecsdir=${pkgincludedir}/pyecs
 
 bin_SCRIPTS =\
 ecell3

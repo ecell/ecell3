@@ -132,10 +132,13 @@ namespace libecs
 
   // MACROS
 
+#if 0
+
 #if !defined( HAVE_PRETTY_FUNCTION )
 #define __PRETTY_FUNCTION__ ""
 #endif
 
+#endif // 0
 
   /**
      Converts each type into a unique, insipid type.

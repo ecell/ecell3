@@ -3,16 +3,15 @@
 loadModel( 'simple.eml' )
 
 # create stubs
-S_Logger = createLoggerStub( 'Variable:/CELL/CYTOPLASM:S:Value' )
+S_Logger = createLoggerStub( 'Variable:/:S:Value' )
 S_Logger.create()
-S = createEntityStub( 'Variable:/CELL/CYTOPLASM:S' )
+S = createEntityStub( 'Variable:/:S' )
 
 
 # print some values
 message( 't= \t%s' % getCurrentTime() )
 message( 'S:Value= \t%s' % S.getProperty( 'Value' ) )
 message( 'S:Concentration= \t%s' % S.getProperty( 'Concentration' ) )
-
 # run
 duration = 1000
 message( '\n' )
@@ -29,4 +28,4 @@ message( '\n' )
 
 # print some logger data
 message( 'Last ten log points of %s:' % S_Logger.getName() )
-message( S_Logger.getData() )
+message( S_Logger.getData()[-10:] )
