@@ -5,7 +5,7 @@ DESCRIPTION=OrderedBiBiFluxProcess
 ACCEPTNEWPROPERTY=True
 
 # propertyname, type, defaultvalue, flags 
-# flags are: (gettable, settable, loadable, saveable) 1 means True, 0 means false
+# flags are: (settable, gettable, loadable, saveable) 1 means True, 0 means false
 # type can be: NESTED_LIST, STRING, MULTILINE, INTEGER, FLOAT
 PROPERTYLIST
 Activity,FLOAT,0.0,1100
