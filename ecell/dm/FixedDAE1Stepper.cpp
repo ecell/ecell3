@@ -67,8 +67,6 @@ namespace libecs
   {
     DifferentialStepper::initialize();
     
-    initializeStepInterval( getStepInterval() );
-
     const UnsignedInt aSize( getReadOnlyVariableOffset() );
     if ( theSystemSize != aSize )
       {

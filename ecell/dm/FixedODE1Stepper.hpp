@@ -44,11 +44,8 @@ public:
 
   LIBECS_DM_OBJECT( FixedODE1Stepper, Stepper )
     {
-      INHERIT_PROPERTIES( Stepper );
+      INHERIT_PROPERTIES( DifferentialStepper );
     }
-
-
-
 
   FixedODE1Stepper( void );
   
