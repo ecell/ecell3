@@ -59,7 +59,7 @@ from ecell.ecs_constants import *
 from ConfirmWindow import *
 
 NAME        = 'gecell (Osogo)'
-VERSION     = '0.0'
+VERSION     = ''
 COPYRIGHT   = '(C) 2001-2002 Keio University'
 AUTHORLIST  =  [
     'Design: Kenta Hashimoto <kem@e-cell.org>',
