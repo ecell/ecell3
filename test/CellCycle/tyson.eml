@@ -8,9 +8,7 @@
 <lastsaved>2002/09/10</lastsaved>
 </info>
 
-<stepperlist>
 <stepper class="Euler1Stepper" id="SRM_01" />
-</stepperlist>
 
 
 <!-- ROOT -->

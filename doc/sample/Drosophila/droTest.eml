@@ -9,9 +9,7 @@
 </info>
 
 
-<stepperlist>
 <stepper class="Euler1Stepper" id="SRM_01" />
-</stepperlist>
 
 
 <!-- ROOT -->
