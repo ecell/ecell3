@@ -105,7 +105,7 @@ class OsogoWindow(Window):
 		self.theExist = gtk.FALSE
 		self.isShown = gtk.FALSE
 		#try:
-		self.theMainWindow.updateBasicWindows()
+		self.theMainWindow.updateFundamentalWindows()
 		#except:
 		#	pass
 

@@ -195,7 +195,7 @@
 		<last_modification_time>Wed, 15 Aug 2001 09:06:59 GMT</last_modification_time>
 	      </signal>
 	      <label>_Palette Window</label>
-	      <active>True</active>
+	      <active>False</active>
 	      <always_show_toggle>True</always_show_toggle>
 	    </widget>
 
@@ -208,6 +208,19 @@
 		<last_modification_time>Wed, 24 Jul 2002 15:42:23 GMT</last_modification_time>
 	      </signal>
 	      <label>_Logger Window</label>
+	      <active>False</active>
+	      <always_show_toggle>True</always_show_toggle>
+	    </widget>
+
+	    <widget>
+	      <class>GtkCheckMenuItem</class>
+	      <name>stepper_window_menu</name>
+	      <signal>
+		<name>activate</name>
+		<handler>stepper_window_menu_activate</handler>
+		<last_modification_time>Fri, 13 Sep 2002 01:08:34 GMT</last_modification_time>
+	      </signal>
+	      <label>_Stepper Window</label>
 	      <active>False</active>
 	      <always_show_toggle>True</always_show_toggle>
 	    </widget>
@@ -622,6 +635,7 @@
 	    <widget>
 	      <class>GtkToolbar</class>
 	      <name>toolbar27</name>
+	      <border_width>3</border_width>
 	      <orientation>GTK_ORIENTATION_HORIZONTAL</orientation>
 	      <type>GTK_TOOLBAR_BOTH</type>
 	      <space_size>5</space_size>
@@ -636,7 +650,7 @@
 		<signal>
 		  <name>clicked</name>
 		  <handler>entrylist_clicked</handler>
-		  <last_modification_time>Thu, 25 Jul 2002 06:53:01 GMT</last_modification_time>
+		  <last_modification_time>Fri, 13 Sep 2002 00:57:46 GMT</last_modification_time>
 		</signal>
 		<label>EntryList</label>
 		<icon>icon_entry.xpm</icon>
@@ -645,16 +659,18 @@
 	      <widget>
 		<class>GtkVSeparator</class>
 		<name>vseparator5</name>
+		<width>11</width>
+		<height>41</height>
 	      </widget>
 
 	      <widget>
 		<class>GtkToggleButton</class>
 		<child_name>Toolbar:button</child_name>
-		<name>loggertogglebutton</name>
+		<name>logger_togglebutton</name>
 		<signal>
 		  <name>toggled</name>
 		  <handler>logger_togglebutton_toggled</handler>
-		  <last_modification_time>Wed, 30 Jan 2002 10:47:42 GMT</last_modification_time>
+		  <last_modification_time>Fri, 13 Sep 2002 01:31:01 GMT</last_modification_time>
 		</signal>
 		<label>Logger</label>
 		<icon>icon_logger.xpm</icon>
@@ -665,11 +681,10 @@
 		<class>GtkToggleButton</class>
 		<child_name>Toolbar:button</child_name>
 		<name>palette_togglebutton</name>
-		<width>60</width>
 		<signal>
 		  <name>toggled</name>
 		  <handler>palette_togglebutton_toggled</handler>
-		  <last_modification_time>Wed, 15 Aug 2001 07:39:58 GMT</last_modification_time>
+		  <last_modification_time>Fri, 13 Sep 2002 00:59:10 GMT</last_modification_time>
 		</signal>
 		<label>Palette</label>
 		<icon>icon_palette.xpm</icon>
@@ -680,12 +695,10 @@
 		<class>GtkToggleButton</class>
 		<child_name>Toolbar:button</child_name>
 		<name>message_togglebutton</name>
-		<width>60</width>
-		<height>42</height>
 		<signal>
 		  <name>toggled</name>
 		  <handler>message_togglebutton_toggled</handler>
-		  <last_modification_time>Wed, 15 Aug 2001 07:40:05 GMT</last_modification_time>
+		  <last_modification_time>Fri, 13 Sep 2002 00:59:41 GMT</last_modification_time>
 		</signal>
 		<label>Message</label>
 		<icon>icon_message.xpm</icon>
@@ -696,15 +709,27 @@
 		<class>GtkToggleButton</class>
 		<child_name>Toolbar:button</child_name>
 		<name>interface_togglebutton</name>
-		<width>60</width>
-		<height>42</height>
 		<signal>
 		  <name>toggled</name>
 		  <handler>interface_togglebutton_toggled</handler>
-		  <last_modification_time>Wed, 15 Aug 2001 09:00:49 GMT</last_modification_time>
+		  <last_modification_time>Fri, 13 Sep 2002 01:00:12 GMT</last_modification_time>
 		</signal>
 		<label>Interface</label>
 		<icon>icon_interface.xpm</icon>
+		<active>False</active>
+	      </widget>
+
+	      <widget>
+		<class>GtkToggleButton</class>
+		<child_name>Toolbar:button</child_name>
+		<name>stepper_togglebutton</name>
+		<signal>
+		  <name>toggled</name>
+		  <handler>stepper_togglebutton_toggled</handler>
+		  <last_modification_time>Fri, 13 Sep 2002 01:00:33 GMT</last_modification_time>
+		</signal>
+		<label>Stepper</label>
+		<icon>icon_stepper.xpm</icon>
 		<active>False</active>
 	      </widget>
 	    </widget>
@@ -750,7 +775,7 @@
 	    <handler>logo_button_clicked</handler>
 	    <last_modification_time>Fri, 17 Aug 2001 04:26:50 GMT</last_modification_time>
 	  </signal>
-	  <label>ecell</label>
+	  <label></label>
 	  <icon>ecell.xpm</icon>
 	</widget>
       </widget>

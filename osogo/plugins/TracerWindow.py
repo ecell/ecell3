@@ -179,7 +179,7 @@ class TracerWindow( OsogoPluginWindow ):
 			self['button%i'%n].set_mode(TRUE)
 			n += 1
 
-		self.thePluginManager.updateBasicWindows()
+		self.thePluginManager.updateFundamentalWindows()
         
 
 	def getColor( self, num ):

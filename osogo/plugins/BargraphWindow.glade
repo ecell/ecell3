@@ -194,7 +194,7 @@
 	<class>GtkProgressBar</class>
 	<name>progressbar</name>
 	<width>125</width>
-	<height>17</height>
+	<height>20</height>
 	<value>0</value>
 	<lower>0</lower>
 	<upper>1000</upper>

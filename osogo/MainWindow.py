@@ -53,6 +53,7 @@ import PaletteWindow
 import EntryListWindow
 import LoggerWindow
 import InterfaceWindow 
+import StepperWindow 
 
 import string
 
@@ -114,6 +115,7 @@ class MainWindow(OsogoWindow):
 	# end of init
 
 	def openWindow( self ):
+
 		OsogoWindow.openWindow(self)
 
 		# -------------------------------------
@@ -163,11 +165,17 @@ class MainWindow(OsogoWindow):
 		self.theStepType = 0
 		self.theRunningFlag = 0
 
+		# -------------------------------------
+		# creates StepperWindow
+		# -------------------------------------
+		self.theStepperWindow = StepperWindow.StepperWindow( self.theSession , self )
+		self.theStepperWindow.openWindow()
+
 
 		self.theEntryListWindowList = []
 
 		self.theHandlerMap = \
-		  { 'load_rule_menu_activate'              : self.openRuleFileSelection ,
+		  { 'load_rule_menu_activate'                  : self.openRuleFileSelection ,
 			'load_script_menu_activate'            : self.openScriptFileSelection ,
 			'save_cell_state_menu_activate'        : self.saveCellStateToTheFile ,
 			'save_cell_state_as_menu_activate'     : self.openSaveCellStateFileSelection ,
@@ -176,7 +184,8 @@ class MainWindow(OsogoWindow):
 			'interface_window_menu_activate'       : self.toggleInterfaceWindowByMenu ,
 			'palette_window_menu_activate'         : self.togglePaletteWindowByMenu ,
 			'create_new_entry_list_menu_activate'  : self.clickEntryListWindow ,
-			'logger_window_menu_activate' : self.toggleLoggerWindowByMenu ,
+			'logger_window_menu_activate'          : self.toggleLoggerWindowByMenu ,
+			'stepper_window_menu_activate'         : self.toggleStepperWindowByMenu ,
 			'preferences_menu_activate'            : self.openPreferences ,
 			'about_menu_activate'                  : self.openAbout ,
 			'start_button_clicked'                 : self.startSimulation ,
@@ -184,11 +193,12 @@ class MainWindow(OsogoWindow):
 			'step_button_clicked'                  : self.stepSimulation ,
 			'input_step_size'                      : self.setStepSize ,
 			'step_sec_toggled'                     : self.changeStepType ,
-			'entrylist_clicked'       : self.clickEntryListWindow ,
+			'entrylist_clicked'                    : self.clickEntryListWindow ,
 			'logger_togglebutton_toggled'          : self.toggleLoggerWindowByButton ,
 			'palette_togglebutton_toggled'         : self.togglePaletteWindowByButton ,
 			'message_togglebutton_toggled'         : self.toggleMessageWindowByButton ,
 			'interface_togglebutton_toggled'       : self.toggleInterfaceWindowByButton ,
+			'stepper_togglebutton_toggled'         : self.toggleStepperWindowByButton ,
 			'logo_button_clicked'                  : self.openAbout,
 		}
 		self.addHandlers( self.theHandlerMap )
@@ -209,7 +219,10 @@ class MainWindow(OsogoWindow):
 		self.theSession.theSimulator.setEventHandler( gtk.mainiteration  )
 		self['ecell_logo_toolbar'].set_style( GTK.TOOLBAR_ICONS )
 		self.setInitialWidgetStatus()
-		self.updateBasicWindows()
+		self.updateFundamentalWindows()
+
+		self[self.__class__.__name__].hide_all()
+		self[self.__class__.__name__].show_all()
 
 	# end of __init__
 
@@ -306,7 +319,7 @@ class MainWindow(OsogoWindow):
 			aModelFile.close()
 			self.theSession.theSimulator.initialize()
 			self.update()
-			self.updateBasicWindows()
+			self.updateFundamentalWindows()
 
 		except:
 			self.printMessage(' can\'t load [%s]' %aFileName)
@@ -367,7 +380,7 @@ class MainWindow(OsogoWindow):
 			aGlobalNameMap = { 'theMainWindow' : self }
 			execfile( aFileName, aGlobalNameMap )
 			self.update()
-			self.updateBasicWindows()
+			self.updateFundamentalWindows()
 		except:
 			import sys
 			import traceback
@@ -499,7 +512,7 @@ class MainWindow(OsogoWindow):
 				self.theSession.printMessage( "Stop\n" )
 				self.removeTimeOut()
 				self.update()
-				self.updateBasicWindows()
+				self.updateFundamentalWindows()
 				self.theLoggerWindow.update()
 
 		except:
@@ -511,7 +524,7 @@ class MainWindow(OsogoWindow):
 		else:
 			self.theRunningFlag = 0
 
-		self.updateBasicWindows()
+		self.updateFundamentalWindows()
 
 	# end of stopSimulation
 
@@ -540,7 +553,7 @@ class MainWindow(OsogoWindow):
 				self.theSession.step( self.theStepSize )
 			self.removeTimeOut()
 			self.update()
-			self.updateBasicWindows()
+			self.updateFundamentalWindows()
 			self.theLoggerWindow.update()
 
 
@@ -663,7 +676,7 @@ class MainWindow(OsogoWindow):
 			self.theEntryListWindowList.append(anEntryListWindow)
 			self.theEntryChecker = 1
 		
-		self.updateBasicWindows()
+		self.updateFundamentalWindows()
 
 
 	# end of toggleEntryList
@@ -701,7 +714,7 @@ class MainWindow(OsogoWindow):
 	# ---------------------------------------------------------------
 	def toggleLoggerWindowByButton( self, button_obj ) :
 
-		self.theLoggerWindow.isShown = self['loggertogglebutton'].get_active()
+		self.theLoggerWindow.isShown = self['logger_togglebutton'].get_active()
 		self.toggleLoggerWindow()
 
 	# end of toggleLoggerWindowByButton
@@ -739,7 +752,7 @@ class MainWindow(OsogoWindow):
 				self.theLoggerWindow['LoggerWindow'].hide()
 				self.theLoggerWindow['LoggerWindow'].show_all()
 
-			self['loggertogglebutton'].set_active(gtk.TRUE)
+			self['logger_togglebutton'].set_active(gtk.TRUE)
 			self['logger_window_menu'].set_active(gtk.TRUE)
 
 		# ------------------------------------------------------
@@ -761,10 +774,120 @@ class MainWindow(OsogoWindow):
 			else:
 				self.theLoggerWindow['LoggerWindow'].hide()
 
-			self['loggertogglebutton'].set_active(gtk.FALSE)
+			self['logger_togglebutton'].set_active(gtk.FALSE)
 			self['logger_window_menu'].set_active(gtk.FALSE)
 
 	# end of toggleLoggerWindow
+
+
+
+	# ---------------------------------------------------------------
+	# toggleStepperWindowByMenu
+	#   - called when stepper menu is toggled.
+	#   - sets the "isShown" attribute.
+	#   - calls toggleStepperWindow
+	#
+	# *objects : dammy objects 
+	#
+	# return -> None
+	# This method is throwable exception.
+	# ---------------------------------------------------------------
+	def toggleStepperWindowByMenu( self, button_obj ) :
+
+		self.theStepperWindow.isShown = self['stepper_window_menu'].active 
+		self.toggleStepperWindow()
+
+	# end of toggleStepperWindowByMenu
+
+
+	# ---------------------------------------------------------------
+	# toggleStepperWindowByButton
+	#   - called when stepper menu is toggled.
+	#   - sets the "isShown" attribute.
+	#   - calls toggleStepperWindow
+	#
+	# *objects : dammy objects 
+	#
+	# return -> None
+	# This method is throwable exception.
+	# ---------------------------------------------------------------
+	def toggleStepperWindowByButton( self, button_obj ) :
+
+		self.theStepperWindow.isShown = self['stepper_togglebutton'].get_active()
+		self.toggleStepperWindow()
+
+	# end of toggleStepperWindowByButton
+
+	# ---------------------------------------------------------------
+	# toggleStepperWindow
+	#
+	# button_obj : button
+	#
+	# return -> None
+	# This method is throwable exception.
+	# ---------------------------------------------------------------
+	def toggleStepperWindow( self ):
+
+		# ------------------------------------------------------
+		# button is toggled to active 
+		# ------------------------------------------------------
+		#if button_obj.get_active() :
+		if self.theStepperWindow.isShown == gtk.TRUE:
+
+			# --------------------------------------------------
+			# If instance of Stepper Window Widget has destroyed,
+			# creates new instance of Stepper Window Widget.
+			# --------------------------------------------------
+			if ( self.theStepperWindow.getExist() == 0 ):
+				self.theStepperWindow.openWindow()
+				#self.theStepperWindow = StepperWindow.StepperWindow( self.theSession , self )
+				self.theStepperWindow.update()
+
+			# --------------------------------------------------
+			# If instance of Stepper Window Widget has not destroyed,
+			# calls show method of Stepper Window Widget.
+			# --------------------------------------------------
+			else:
+				self.theStepperWindow['StepperWindow'].hide()
+				self.theStepperWindow['StepperWindow'].show_all()
+				self.theStepperWindow.update()
+
+			self['stepper_togglebutton'].set_active(gtk.TRUE)
+			self['stepper_window_menu'].set_active(gtk.TRUE)
+
+		# ------------------------------------------------------
+		# button is toggled to non-active
+		# ------------------------------------------------------
+		else:
+
+			# --------------------------------------------------
+			# If instance of Stepper Window Widget has destroyed,
+			# do nothing.
+			# --------------------------------------------------
+			if ( self.theStepperWindow.getExist() == 0 ):
+				pass
+
+			# --------------------------------------------------
+			# If instance of Stepper Window Widget has not destroyed,
+			# calls hide method of Stepper Window Widget.
+			# --------------------------------------------------
+			else:
+				self.theStepperWindow['StepperWindow'].hide()
+
+			self['stepper_togglebutton'].set_active(gtk.FALSE)
+			self['stepper_window_menu'].set_active(gtk.FALSE)
+
+	# end of toggleStepperWindow
+
+
+
+
+
+
+
+
+
+
 
 
 	# ---------------------------------------------------------------
@@ -1133,14 +1256,14 @@ class MainWindow(OsogoWindow):
 
 
 	# ---------------------------------------------------------------
-	# updateBasicWindows
+	# updateFundamentalWindows
 	#  - update MessageWindow, LoggerWindow, InterfaceWindow
 	#  - update status of each menu and button
 	#
 	# return -> None
 	# This method is throwable exception.
 	# ---------------------------------------------------------------
-	def updateBasicWindows( self ):
+	def updateFundamentalWindows( self ):
 
 
 		# -------------------------------------------
@@ -1150,6 +1273,7 @@ class MainWindow(OsogoWindow):
 		self.theMessageWindow.update()
 		self.theLoggerWindow.update()
 		self.theInterfaceWindow.update()
+		self.theStepperWindow.update()
 
 
 		for anEntryListWindow in self.theEntryListWindowList:
@@ -1173,11 +1297,19 @@ class MainWindow(OsogoWindow):
 
 			# checks logger button
 			if self.theLoggerWindow.isShown == gtk.TRUE:
-				self['loggertogglebutton'].set_active(gtk.TRUE)
+				self['logger_togglebutton'].set_active(gtk.TRUE)
 				self['logger_window_menu'].set_active(gtk.TRUE)
 			else:
-				self['loggertogglebutton'].set_active(gtk.FALSE)
+				self['logger_togglebutton'].set_active(gtk.FALSE)
 				self['logger_window_menu'].set_active(gtk.FALSE)
+
+			# checks stepper button
+			if self.theStepperWindow.isShown == gtk.TRUE:
+				self['stepper_togglebutton'].set_active(gtk.TRUE)
+				self['stepper_window_menu'].set_active(gtk.TRUE)
+			else:
+				self['stepper_togglebutton'].set_active(gtk.FALSE)
+				self['stepper_window_menu'].set_active(gtk.FALSE)
 
 
 			# checks interface button
@@ -1199,7 +1331,7 @@ class MainWindow(OsogoWindow):
 						self['palette_togglebutton'].set_active(gtk.FALSE)
 						self['palette_window_menu'].set_active(gtk.FALSE)
 
-	# end of updateBasicWindow
+	# end of updateFundamentalWindow
 
 
 

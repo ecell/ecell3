@@ -90,7 +90,9 @@ class BargraphWindow( OsogoPluginWindow ):
 		self.theIDEntry.set_text  ( aString )
 
 		aValue = self.theSession.theSimulator.getProperty( createFullPNString( self.theFullPN() ) )
-		value = aValue[0]
+		
+
+		value = aValue
 		self.theActualValue = value
 		self.theBarLength , self.theMultiplier , self.thePositiveFlag \
 		                              = self.calculateBarLength( value )

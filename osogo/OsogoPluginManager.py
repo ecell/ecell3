@@ -147,7 +147,7 @@ class OsogoPluginManager(PluginManager):
 
 				# initializes session
 				self.theMainWindow.theSession.theSimulator.initialize()
-				self.updateBasicWindows()
+				self.updateFundamentalWindows()
 				return anInstance
 
 
@@ -291,7 +291,7 @@ class OsogoPluginManager(PluginManager):
 			#print anInstance[anInstance.__class__.__name__]
 			anInstance[anInstance.__class__.__name__].destroy()
 
-		self.theMainWindow.updateBasicWindows()
+		self.theMainWindow.updateFundamentalWindows()
 
 	# end of removeInstance
 
@@ -377,10 +377,10 @@ class OsogoPluginManager(PluginManager):
 	#
 	# return -> None
 	# ---------------------------------------------------------------
-	def updateBasicWindows( self ):
+	def updateFundamentalWindows( self ):
 
 		try:
-			self.theMainWindow.updateBasicWindows()
+			self.theMainWindow.updateFundamentalWindows()
 			self.theMainWindow.update()
 		except:
 			pass

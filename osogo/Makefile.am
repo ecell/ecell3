@@ -18,6 +18,9 @@ MessageWindow.py\
 OsogoWindow.py\
 OsogoPluginManager.py\
 OsogoPluginWindow.py\
+StepperWindow.glade\
+StepperWindow.py\
+OsogoUtil.py\
 PaletteWindow.glade\
 PaletteWindow.py\
 PluginWindowPopupMenu.glade\
@@ -37,6 +40,7 @@ icon_interface.xpm\
 icon_logger.xpm\
 icon_message.xpm\
 icon_palette.xpm\
+icon_stepper.xpm\
 icon_start.xpm\
 icon_step.xpm\
 icon_stop.xpm\
