@@ -1,8 +1,9 @@
 #include <iostream>
 
-#include "PyEcs.hpp"
 #include "PySimulator.hpp"
 #include "Simulator.hpp"
+
+#include "PyEcs.hpp"
 
 //-----------------//
 // PyEcs class     //
@@ -10,17 +11,20 @@
 
 PyEcs::PyEcs()
   :
-  Py::ExtensionModule<PyEcs>("ecs")
+  Py::ExtensionModule<PyEcs>( "ecs" )
 {
-  add_varargs_method( "createSimulator", &PyEcs::createSimulator );
+  PySimulator::init_type();
+  add_varargs_method( "Simulator", 
+		      &PyEcs::createSimulator, 
+		      "Simulator( type = \"Local\" )" );
+    
   initialize();
 }
 
-Py::Object PyEcs::createSimulator( const Py::Tuple& args )
+Object PyEcs::createSimulator( const Tuple& args )
 {
-  cout<<"this is PyEcs::createSimulator module."<<endl;
-  PySimulator* pySimulator = new PySimulator();
-  return Py::asObject( pySimulator );
+  PySimulator* aPySimulator = new PySimulator();
+  return asObject( aPySimulator );
 }
 
 void initecs()

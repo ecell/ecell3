@@ -4,9 +4,11 @@
 #include "Simulator.hpp"
 #include "CXX/Extensions.hxx"
 
+using namespace Py;
+
 class PySimulator 
   :
-  public Py::PythonExtension< PySimulator >,
+  public PythonExtension< PySimulator >,
   public Simulator
 {
 public:
@@ -16,10 +18,10 @@ public:
 
   static void init_type();
 
-  Py::Object makePrimitive( const Py::Tuple& args );
-  Py::Object sendMessage( const Py::Tuple& args );
-  Py::Object getMessage( const Py::Tuple& args );
-  Py::Object step( const Py::Tuple& args );
+  Object makePrimitive( const Tuple& args );
+  Object sendMessage( const Tuple& args );
+  Object getMessage( const Tuple& args );
+  Object step( const Tuple& args );
 
 };
 

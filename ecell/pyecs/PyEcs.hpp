@@ -3,9 +3,11 @@
 
 #include "CXX/Extensions.hxx"
 
+using namespace Py;
+
 class PyEcs
   : 
-  public Py::ExtensionModule< PyEcs >
+  public ExtensionModule< PyEcs >
 {
 
 public:  
@@ -13,9 +15,7 @@ public:
   PyEcs();
   ~PyEcs(){};
  
-  static void init_type();
-  
-  Py::Object createSimulator( const Py::Tuple& args );
+  Object createSimulator( const Tuple& args );
 
 private:
 

@@ -4,9 +4,8 @@ CXXO=/usr/etc/CXX
 PYLIB=/usr/include/python1.6
 ECELL_INCLUDE=-I$(ECELLDIR) -I$(ECELLDIR)/ecell -I$(ECELLDIR)/ecell/include -I$(ECELLDIR)/dmtool/include
 THREAD_OPTION=-D_REENTRANT -D_THREAD_SAFE -pthread  -g -O2 -D_GNU_SOURCE
-COMMON_CPP=/usr/local/lib
 LIBUTIL=$(ECELLDIR)/ecell/util/libutil.a
-LIBECSCORE=$(ECELLDIR)/ecell/libecs/libecscore.a
+LIBECSCORE=$(ECELLDIR)/ecell/libecs/libecs.a
 LIBKORANDOM=$(ECELLDIR)/korandom/libkorandom.a
 
 G++ = /usr/local/bin/g++
@@ -30,7 +29,7 @@ Simulator.o:	Simulator.hpp	Simulator.cpp
 	$(G++) $(ECELL_INCLUDE) $(THREAD_OPTION) -c Simulator.cpp
 
 PyEcs.so: PyEcs.o PySimulator.o Simulator.o SimulatorImplementation.o LocalSimulatorImplementation.o Makefile
-	$(G++) --shared $(CXXO)/*.o Simulator.o SimulatorImplementation.o LocalSimulatorImplementation.o PySimulator.o PyEcs.o $(LIBECSCORE) $(LIBUTIL) $(LIBKORANDOM) $(COMMON_CPP)/*.a -o ecs.so
+	$(G++) --shared $(CXXO)/*.o Simulator.o SimulatorImplementation.o LocalSimulatorImplementation.o PySimulator.o PyEcs.o $(LIBECSCORE) $(LIBUTIL) $(LIBKORANDOM) -o ecs.so
 
 clean:
 	rm -f *.o *~ *.so core

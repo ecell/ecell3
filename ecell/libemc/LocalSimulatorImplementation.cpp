@@ -6,16 +6,20 @@ LocalSimulatorImplementation::LocalSimulatorImplementation()
 {
 }
 
-void LocalSimulatorImplementation::makePrimitive( StringCref classname, FQPNCref fqpn, StringCref name )
+void LocalSimulatorImplementation::makePrimitive( StringCref classname,
+					     FQPNCref fqpn, 
+					     StringCref name )
 {
 }
 
-void LocalSimulatorImplementation::sendMessage( FQPNCref fqpn, MessageCref message )
+void LocalSimulatorImplementation::sendMessage( FQPNCref fqpn, 
+						MessageCref message)
 {
 }
 
 /*
-Message LocalSimulatorImplementation::getMessage( FQPNCref fqpn, StringCref propertyName )
+Message LocalSimulatorImplementation::getMessage( StringCref fqpn,
+StringCref propertyName )
 {
 }
 */

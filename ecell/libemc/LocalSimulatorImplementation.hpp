@@ -2,21 +2,30 @@
 #define ___LOCAL_SIMULATOR_IMPLEMENTATION_H___
 
 #include "libecs/libecs.hpp"
-#include "libecs/RootSystem.hpp"
-#include "util/Message.hpp"
+
+#include "SimulatorImplementation.hpp"
 
 class LocalSimulatorImplementation
+  :
+  public SimulatorImplementation
 {
 
 public:
 
   LocalSimulatorImplementation();
   ~LocalSimulatorImplementation() {};
-  RootSystem* getRootSystemPtr() { return theRootSystem; }
 
-  void makePrimitive( StringCref classname, FQPNCref fqpn, StringCref name );
-  void sendMessage( FQPNCref fqpn, MessageCref message );
-  //  Message getMessage( FQPNCref fqpn, StringCref propertyName );
+  RootSystemPtr getRootSystemPtr() { return theRootSystem; }
+
+  void makePrimitive( StringCref classname, 
+		      FQPNCref fqpn, 
+		      StringCref name );
+
+  void sendMessage( FQPNCref fqpn, 
+		    MessageCref message);
+
+  Message getMessage( FQPNCref fqpn, StringCref propertyName );
+
   void step();
 
 private:
