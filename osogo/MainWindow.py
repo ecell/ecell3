@@ -208,6 +208,7 @@ class simulator :
         self.theATP={
             'PropertyList': ( 'PropertyList', 'Activity', 'Quantity', 'Concentration','ClassName' ),
             'ClassName' : ('Substance',),
+            'Name' : ('ATP Molecule',),
             'Activity' : (100, ),
             'Quantity' : (15, ),
             'Concentration' : (0.0017, )
@@ -216,6 +217,7 @@ class simulator :
         self.theADP={
             'PropertyList': ( 'PropertyList', 'Activity', 'Quantity', 'Concentration','ClassName' ),
             'ClassName' : ('Substance',),
+            'Name' : ('ADP Molecule',),
             'Activity' : (120, ),
             'Quantity' : (30, ),
             'Concentration' : (0.0318318, )
@@ -224,6 +226,7 @@ class simulator :
         self.theAMP={
             'PropertyList': ( 'PropertyList', 'Activity', 'Quantity', 'Concentration','ClassName' ),
             'ClassName' : ('Substance',),
+            'Name' : ('AMP Molecule',),
             'Activity' : (777, ),
             'Quantity' : (40, ),
             'Concentration' : (0.0037, )
@@ -232,6 +235,7 @@ class simulator :
         self.theAaa={
             'PropertyList': ( 'PropertyList', 'Activity', 'Quantity', 'Concentration','ClassName' ),
             'ClassName' : ('Substance',),
+            'Name' : ('Aaa Molecule',),
             'Activity' : (100, ),
             'Quantity' : (45, ),
             'Concentration' : (0.03103, )
@@ -240,6 +244,7 @@ class simulator :
         self.theBbb={
             'PropertyList': ( 'PropertyList', 'Activity', 'Quantity', 'Concentration','ClassName' ),
             'ClassName' : ('Substance',),
+            'Name' : ('Bbb Molecule',),
             'Activity' : (38976, ),
             'Quantity' : (18394, ),
             'Concentration' : (0.001083, )
@@ -248,6 +253,7 @@ class simulator :
         self.theCcc={
             'PropertyList': ( 'PropertyList', 'Activity', 'Quantity', 'Concentration','ClassName' ),
             'ClassName' : ('Substance',),
+            'Name' : ('Ccc Molecule',),
             'Activity' : (938, ),
             'Quantity' : (896, ),
             'Concentration' : (0.082136, )
@@ -256,6 +262,7 @@ class simulator :
         self.theDdd={
             'PropertyList': ( 'PropertyList', 'Activity', 'Quantity', 'Concentration','ClassName' ),
             'ClassName' : ('Substance',),
+            'Name' : ('Ddd Molecule',),
             'Activity' : (765938, ),
             'Quantity' : (89696, ),
             'Concentration' : (0.0782136, )
@@ -264,6 +271,7 @@ class simulator :
         self.theEee={
             'PropertyList': ( 'PropertyList', 'Activity', 'Quantity', 'Concentration','ClassName' ),
             'ClassName' : ('Substance',),
+            'Name' : ('Eee Molecule',),
             'Activity' : (9978638, ),
             'Quantity' : (89876, ),
             'Concentration' : (0.09682136, )
@@ -278,6 +286,7 @@ class simulator :
                           'Substance:/CELL/CYTOPLASM:ADP', ),
             'Product': ('Substance:/CELL/CYTOPLASM:AMP', ),
             'ClassName' : 'MichaelisMentenReactor'
+            'Name' : ('AAA Reactor',),
             }
 
         self.theBBB={
@@ -288,6 +297,7 @@ class simulator :
             'Substrate': ('Substance:/ENVIRONMENT:Ccc',),
             'Product': ('Substance:/ENVIRONMENT:Ddd', 'Substance:/ENVIRONMENT:Eee' ),
             'ClassName' : 'MichaosUniUniReactor'
+            'Name' : ('BBB Reactor',),
             }
 
         self.theCytoplasm={
@@ -296,6 +306,7 @@ class simulator :
             'SubstanceList' : ( 'ATP', 'ADP', 'AMP'),
             'ReactorList' : ( 'AAA', ),
             'ClassName': ( 'System', ),
+            'Name' : ('Cytoplasm System',),
             'ATP' : self.theATP,
             'ADP' : self.theADP, 
             'AMP' : self.theAMP,
@@ -308,6 +319,7 @@ class simulator :
             'SubstanceList' : ( 'Aaa', 'Bbb' ),
             'ReactorList' : ( ),
             'ClassName': ( 'System', ),
+            'Name' : ('Cell System',),
             'CYTOPLASM' : self.theCytoplasm,
             'Aaa' : self.theAaa,
             'Bbb' : self.theBbb,
@@ -319,6 +331,7 @@ class simulator :
             'SubstanceList' : ( 'Ccc', 'Ddd', 'Eee'),
             'ReactorList' : ( 'BBB', ),
             'ClassName': ( 'System', ),
+            'Name' : ('Environtment System',),
             'Ccc' : self.theCcc,
             'Ddd' : self.theDdd,
             'Eee' : self.theEee
@@ -330,6 +343,7 @@ class simulator :
             'SubstanceList' : ( ),
             'ReactorList' : ( ),
             'ClassName': ( 'System', ),
+            'Name' : ('Root System',),
             'Activity': ( 1234, ),
             'CELL' : self.theCell,
             'ENVIRONMENT' : self.theEnvironment
