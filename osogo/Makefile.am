@@ -23,6 +23,8 @@ OsogoPluginManager.py\
 OsogoPluginWindow.py\
 StepperWindow.glade\
 StepperWindow.py\
+AboutSessionMonitor.glade\
+AboutSessionMonitor.py\
 OsogoUtil.py\
 PluginInstanceSelection.glade\
 PluginInstanceSelection.py\
@@ -30,26 +32,24 @@ PluginWindowPopupMenu.glade\
 Plot.py\
 board.glade\
 config.py\
-ecell.xpm\
 main.py\
 opengui.py\
 A-sample-rule.py\
 B-sample-rule.py\
 samplerule.py\
 sample-script.py\
-icon_board.xpm\
-icon_down.xpm\
-icon_ecelllogo.xpm\
-icon_entity.xpm\
-icon_interface.xpm\
-icon_logger.xpm\
-icon_message.xpm\
-icon_palette.xpm\
-icon_stepper.xpm\
-icon_start.xpm\
-icon_step.xpm\
-icon_stop.xpm\
-icon_up.xpm
+ecell.png\
+ecell_logo_large.png\
+icon_board.png\
+icon_ecelllogo.png\
+icon_entity.png\
+icon_interface.png\
+icon_logger.png\
+icon_message.png\
+icon_start.png\
+icon_step.png\
+icon_stepper.png\
+icon_stop.png
 
 
 bin_SCRIPTS =\
