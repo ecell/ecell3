@@ -46,10 +46,9 @@ public:
 
   SystemPtr getSystem( SystemPathCref systempath )
     throw( NotFound, BadID );
-#if 0
-  EntityPtr getEntity( FQPICref fqpi ) 
-    throw( InvalidPrimitiveType, NotFound );
-#endif /* 0 */
+
+  SystemPtr getSystem( StringCref id )
+    throw( NotFound, BadID );
 
   virtual void initialize();
 

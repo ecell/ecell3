@@ -370,7 +370,7 @@ void System::addSystem( SystemPtr system )
 SystemPtr System::getSystem( SystemPathCref systempath ) throw( NotFound )
 {
   SystemPtr  aSystem = getSystem( systempath.first() );
-  SystemPath anNext    = systempath.next();
+  SystemPath anNext  = systempath.next();
 
   if( anNext.getString() != "" ) // not a leaf
     {
@@ -380,7 +380,7 @@ SystemPtr System::getSystem( SystemPathCref systempath ) throw( NotFound )
   return aSystem;
 }
 
-SystemPtr System::getSystem( StringCref id ) throw(NotFound)
+SystemPtr System::getSystem( StringCref id ) throw( NotFound )
 {
   SystemListIterator i = getSystemIterator( id );
   if( i == getLastSystemIterator() )

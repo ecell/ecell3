@@ -50,8 +50,8 @@ RootSystem::RootSystem()
 {
   setId( "/" );
   setName( "The RootSystem" );
-  setRootSystem( this );
-  setSuperSystem( this );
+   setRootSystem( this );
+  //setSuperSystem( this );
 }
 
 RootSystem::~RootSystem()
@@ -75,21 +75,6 @@ int RootSystem::check()
 {
   bool status = true;
   
-  //FIXME:  *theMessageWindow << "Reactor initialization ";
-//FIXME  switch(Reactor::globalCondition())
-//FIXME    {
-//FIXME    case Reactor::Good:
-//FIXME      *theMessageWindow 
-//FIXME        << "succeeded. condition Good.\n";
-//FIXME      break;
-//FIXME    case Reactor::InitFail:
-//FIXME      *theMessageWindow << "condition InitFail.\n";
-//FIXME    default:
-//FIXME      *theMessageWindow << "initialization failed. "
-//FIXME        << "trying to continue... \n";
-//FIXME      theInfoDialogManager->post("Reactor initialization failed.");
-//FIXME      status = false;
-//FIXME    }
   
   return status;
 }
@@ -103,28 +88,20 @@ SystemPtr RootSystem::getSystem( SystemPathCref systempath )
 		   "Fully qualified system path must start with '/'. ([" + 
 		   systempath.getString() + "].");
     }
-   
-  SystemPath next( systempath.next() );
 
+  return getSystem( systempath.getSystemPathString() );
+}
+
+SystemPtr RootSystem::getSystem( StringCref id ) throw( NotFound, BadID )
+{
   // the root System(this!) is requested.
-  if( next.getSystemPathString() == "" )
+  if( id == "/" )
     {
       return this;
     }
-
-  return System::getSystem( next );
+  
+  return System::getSystem( id );
 }
-
-#if 0
-EntityPtr RootSystem::getEntity( FQPICref fqpi ) 
-  throw( InvalidPrimitiveType, NotFound )
-{
-  // FIXME: handle exceptions?
-
-  SystemPtr sys = getSystem( fqpi.getSystemPathString() );
-  return sys->getEntity( fqpi.getPrimitiveType(), fqpi.getIdString() );
-}
-#endif /* 0 */
 
 /*
   Do not modify

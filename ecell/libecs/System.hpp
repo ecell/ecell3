@@ -303,7 +303,7 @@ public:
   /**
     @return An pointer to a System object in this System whose ID is id.
     */
-  SystemPtr getSystem( StringCref id ) throw( NotFound );
+  virtual SystemPtr getSystem( StringCref id ) throw( NotFound );
 
   /**
     This method finds recursively a System object pointed by
@@ -312,7 +312,7 @@ public:
     @return An pointer to a System object in this or subsystems of this
     System object pointed by @a systempath
     */
-  SystemPtr getSystem( SystemPathCref systempath ) throw( NotFound ); 
+  virtual SystemPtr getSystem( SystemPathCref systempath ) throw( NotFound ); 
 
 
 public: // message interfaces
