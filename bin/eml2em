@@ -1,0 +1,164 @@
+#!/usr/bin/env ecell3
+
+import sys
+import string
+import os
+import time
+import pprint
+
+from ecell.ecssupport import *
+from ecell.eml import *
+from types import *
+
+def expandValueList( aValue ):
+    aType = type( aValue )
+
+    # just apply str() to scalar type
+    if aType != TupleType and aType != ListType:
+        return str( aValue )
+
+    aValue = map( expandValueList, aValue )
+
+    aValueString = '[ '
+    for i in aValue:
+        aValueString += str( i )
+        aValueString += ' '
+
+    aValueString += ']'
+
+    return aValueString
+        
+
+
+def createObjectDef( aType, aClass, anArgList, aPropertyList, anOptional='' ):
+
+    # declaration line
+    anArgListString = string.join( anArgList, ',' ) 
+    aBuffer = '%s %s( %s )\n{\n' % ( aType, aClass, anArgListString )
+
+    # properties
+    for aProperty in aPropertyList:
+        aPropertyName = aProperty[0]
+        aPropertyValueListString = expandValueList( aProperty[1][0] )
+
+        aBuffer += '\t%s %s;\n' % ( aPropertyName, aPropertyValueListString )
+
+    # optional field
+    if anOptional != '':
+        aBuffer += '\n\t'
+        aBuffer += string.replace( anOptional, '\n', '\n\t' )
+        aBuffer += '\n'
+
+    aBuffer += '}\n'
+    
+    return aBuffer
+
+
+def createStepperList( anEml ):
+    aBuffer = ''
+
+    for aStepperID in anEml.getStepperList():
+        aType = 'Stepper'
+        aClass = anEml.getStepperClass( aStepperID )
+        anArgList = ( aStepperID, )
+        aPropertyNameList = anEml.getStepperPropertyList( aStepperID )
+        aPropertyList = []
+        for aPropertyName in aPropertyNameList:
+            aPropertyValue = anEml.getStepperProperty( aStepperID,\
+                                                       aPropertyName )
+            aPropertyList.append( ( aPropertyName, aPropertyValue ) )
+
+        aBuffer += createObjectDef( 'Stepper', aClass, anArgList,
+                                    aPropertyList )
+
+    return aBuffer
+
+def createEntity( anEml, aFullID, anOptional='' ):
+
+    aFullIDString = createFullIDString( aFullID )
+    aType = ENTITYTYPE_STRING_LIST[ aFullID[ TYPE ] ]
+    aClass = anEml.getEntityClass( aFullIDString )
+
+    if aFullID[TYPE] != SYSTEM:
+        anArgList = ( aFullID[ ID ], )
+    else:
+        if len( aFullID[SYSTEMPATH] ) == 0 or aFullID[SYSTEMPATH][-1] == '/':
+            aSystemPath = aFullID[SYSTEMPATH] + aFullID[ID]
+        else:
+            aSystemPath = aFullID[SYSTEMPATH] + '/' + aFullID[ID]
+        anArgList = ( aSystemPath, )
+
+    aPropertyNameList = anEml.getEntityPropertyList( aFullIDString )
+    aPropertyList = []
+    for aPropertyName in aPropertyNameList:
+        aFullPN = aFullIDString + ':' + aPropertyName
+        aPropertyValue = anEml.getEntityProperty( aFullPN )
+        aPropertyList.append( ( aPropertyName, aPropertyValue ) )
+        
+    return createObjectDef( aType, aClass, anArgList, aPropertyList,
+                            anOptional )
+    
+
+def createSystemList( anEml, aSystemPath='' ):
+    aBuffer = ''
+
+    anOptional = ''
+
+    for anID in anEml.getEntityList( 'Substance', aSystemPath ):
+        aFullID = ( SUBSTANCE, aSystemPath, anID )
+        anOptional += createEntity( anEml, aFullID )
+
+    for anID in anEml.getEntityList( 'Reactor', aSystemPath ):
+        aFullID = ( REACTOR, aSystemPath, anID )
+        anOptional += createEntity( anEml, aFullID )
+
+    if aSystemPath == '':
+        aFullID = ( SYSTEM, '', '/' )
+    else:
+        aLastSlash = string.rindex( aSystemPath, '/' )
+        if aLastSlash == 0:
+            aPath = aSystemPath[:aLastSlash+1]
+        else:
+            aPath = aSystemPath[:aLastSlash]
+        anID = aSystemPath[aLastSlash+1:]
+        aFullID = ( SYSTEM, aPath, anID )
+
+    aBuffer += createEntity( anEml, aFullID, anOptional )
+    aBuffer += '\n'
+
+    for aSystem in anEml.getEntityList( 'System', aSystemPath ):
+        aBuffer += createSystemList( anEml, aSystem )
+
+    return aBuffer
+
+
+if __name__ == '__main__':
+
+    # need commandline processing
+    anEmlFileName = sys.argv[1]
+    anEmlFile = open( anEmlFileName )
+    anEml = Eml( anEmlFile )
+    anEmlFile.close()
+
+    aBaseName = os.path.basename( anEmlFileName )
+    aBaseName, anExt = os.path.splitext( aBaseName )
+
+    if anExt == '.eml' or anExt == '.xml':
+        anExt = '.em'
+    else:
+        anExt += '.em'
+
+    anEmFileName = aBaseName + anExt
+
+    anEmFile = open( anEmFileName, 'w' )
+
+    aHeader = '''
+# created by eml2em program
+# from file: %s, date: %s
+#
+
+''' % ( anEmlFileName, time.asctime( time.localtime() ) )
+
+    anEmFile.write( aHeader )
+    anEmFile.write( createStepperList( anEml ) )
+    anEmFile.write( createSystemList( anEml ) )
