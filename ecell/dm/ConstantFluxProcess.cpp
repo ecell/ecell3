@@ -1,8 +1,4 @@
 #include "libecs.hpp"
-#include "Util.hpp"
-#include "PropertyInterface.hpp"
-
-#include "System.hpp"
 
 #include "ContinuousProcess.hpp"
 
@@ -15,34 +11,41 @@ LIBECS_DM_CLASS( ConstantFluxProcess, ContinuousProcess )
 
   LIBECS_DM_OBJECT( ConstantFluxProcess, Process )
     {
-      INHERIT_PROPERTIES( Process );
+      INHERIT_PROPERTIES( ContinuousProcess );
 
-      PROPERTYSLOT_SET_GET( Real, Flux );
+      PROPERTYSLOT_SET_GET( Real, k);
     }
 
   ConstantFluxProcess()
     :
-    Flux( 0.0 )
+    k( 0.0 )
     {
       ; // do nothing
     }
   
-  SIMPLE_SET_GET_METHOD( Real, Flux );
-  
-  virtual void process()
-  {
-    setFlux(Flux);
-  }
+  SIMPLE_SET_GET_METHOD( Real, k );
   
   virtual void initialize()
   {
     Process::initialize();
-    declareUnidirectional();
+  
+    // force unset isAccessor flag of all variablereferences.
+    std::for_each( theVariableReferenceVector.begin(),
+		   theVariableReferenceVector.end(),
+		   std::bind2nd
+		   ( std::mem_fun_ref
+		     ( &VariableReference::setIsAccessor ), false ) );
   }  
 
+  virtual void process()
+  {
+    // constant flux
+    setFlux( k );
+  }
+  
  protected:
   
-  Real Flux;
+  Real k;
     
 };
 
