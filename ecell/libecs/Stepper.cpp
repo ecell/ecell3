@@ -136,6 +136,7 @@ namespace libecs
     :
     theFirstNormalProcess( theProcessVector.begin() ),
     theModel( NULLPTR ),
+    theSchedulerIndex( -1 ),
     theCurrentTime( 0.0 ),
     theStepInterval( 0.001 ),
     theUserMinInterval( std::numeric_limits<Real>::min() * 10 ),
@@ -167,7 +168,6 @@ namespace libecs
     const Int aSize( theVariableProxyVector.size() );
 
     theValueBuffer.resize( aSize );
-    theVelocityBuffer.resize( aSize );
   }
 
  
@@ -313,6 +313,10 @@ namespace libecs
 	      }
 	  }
       }
+    
+    // optimization: sort by memory address.
+    std::sort( theDependentStepperVector.begin(), 
+	       theDependentStepperVector.end() );
 
   }
 
@@ -562,9 +566,6 @@ namespace libecs
 
   void Stepper::reset()
   {
-    // clear velocity buffer
-    theVelocityBuffer.assign( theVelocityBuffer.size(), 0.0 );
-
     const UnsignedInt aSize( theVariableProxyVector.size() );
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
@@ -577,6 +578,20 @@ namespace libecs
 	aVariable->setVelocity( 0.0 );
       }
   }
+
+
+  void Stepper::dispatchInterruptions()
+  {
+    std::for_each( theDependentStepperVector.begin(),
+		   theDependentStepperVector.end(),
+		   std::bind1st( std::mem_fun( &Stepper::interrupt ), this ) );
+  }
+
+  void Stepper::interrupt( StepperPtr const )
+  {
+    ; // do nothing
+  }
+
 
 
   ////////////////////////// DifferentialStepper
@@ -645,9 +660,95 @@ namespace libecs
   {
     Stepper::initialize();
 
+    theVelocityBuffer.resize( theVariableProxyVector.size() );
+
     // should create another method for property slot ?
     //    setNextStepInterval( getStepInterval() );
   }
+
+
+  void DifferentialStepper::reset()
+  {
+    // clear velocity buffer
+    theVelocityBuffer.assign( theVelocityBuffer.size(), 0.0 );
+
+    Stepper::reset();
+  }
+
+
+
+  #if 0
+  const bool DifferentialStepper::checkExternalError() const
+  {
+    const Real aSize( theValueVector.size() );
+    for( UnsignedInt c( 0 ); c < aSize; ++c )
+      {
+
+	// no!! theValueVector and theReadVariableVector holds completely
+	// different sets of Variables
+	const Real anOriginalValue( theValueVector[ c ] + 
+				    numeric_limit<Real>::epsilon() );
+
+	const Real aCurrentValue( theReadVariableVector[ c ]->getValue() );
+
+	const Real anRelativeError( fabs( aCurrentValue - anOriginalValue ) 
+				    / anOriginalValue );
+	if( anRelativeError <= aTolerance )
+	  {
+	    continue;
+	  }
+
+	return false;
+      }
+
+    return true;
+  }
+#endif /* 0 */
+
+  void DifferentialStepper::interrupt( StepperPtr const aCaller )
+  {
+    const Real aCallerTimeScale( aCaller->getTimeScale() );
+    const Real aStepInterval   ( getStepInterval() );
+
+    // If the step size of this is less than double of the caller's,
+    // ignore this interruption.
+    if( aCallerTimeScale < aStepInterval )
+      {
+	return;
+      }
+
+    // if all Variables didn't change its value more than 10%,
+    // ignore this interruption.
+    /*  !!! currently this cannot be used
+    if( checkExternalError() )
+      {
+	return;
+      }
+    */
+
+    // Shrink the next step size to that of caller's
+    setNextStepInterval( aCallerTimeScale );
+
+    const Real aCurrentTime      ( getCurrentTime() );
+    const Real aNextStep         ( aCurrentTime + aStepInterval );
+    const Real aCallerCurrentTime( aCaller->getCurrentTime() );
+    const Real aCallerNextStep   ( aCallerCurrentTime + aCallerTimeScale );
+
+    // If a step of this occurs *before* the next step of the caller,
+    // just shrink step size of this Stepper.
+    if( aNextStep < aCallerNextStep )
+      {
+	return;
+      }
+
+    // If a step of this will occur *after* the caller,
+    // reschedule this Stepper, as well as shrinking the next step size.
+    setStepInterval( aCallerCurrentTime + ( aCallerTimeScale * 0.5 ) );
+
+    getModel()->reschedule( this );
+  }
+
+
 
 } // namespace libecs
 

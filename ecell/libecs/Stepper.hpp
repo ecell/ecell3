@@ -131,7 +131,7 @@ namespace libecs
     void processNegative();
     void processNormal();
 
-    void reset();
+    virtual void reset();
     
     /**
        @param aSystem
@@ -203,6 +203,10 @@ namespace libecs
       return theStepInterval;
     }
 
+    virtual const Real getTimeScale() const
+    {
+      return getStepInterval();
+    }
 
     void registerLoggedPropertySlot( PropertySlotPtr );
 
@@ -230,6 +234,17 @@ namespace libecs
     {
       theModel = aModel;
     }
+
+    void setSchedulerIndex( IntCref anIndex )
+    {
+      theSchedulerIndex = anIndex;
+    }
+
+    const Int getSchedulerIndex() const
+    {
+      return theSchedulerIndex;
+    }
+
 
     void setUserMinInterval( RealCref aValue )
     {
@@ -295,10 +310,6 @@ namespace libecs
       return theValueBuffer;
     }
 
-    RealVectorCref getVelocityBuffer() const
-    {
-      return theVelocityBuffer;
-    }
 
     const UnsignedInt getVariableProxyIndex( VariableCptr const aVariable );
 
@@ -333,6 +344,10 @@ namespace libecs
     */
 
     void updateDependentStepperVector();
+
+
+    virtual void dispatchInterruptions();
+    virtual void interrupt( StepperPtr const aCaller );
 
 
     const Polymorph getWriteVariableList()    const;
@@ -373,12 +388,13 @@ namespace libecs
     StepperVector         theDependentStepperVector;
 
     RealVector theValueBuffer;
-    RealVector theVelocityBuffer;
-
 
   private:
 
     ModelPtr            theModel;
+    
+    // the index on the scheduler
+    Int                 theSchedulerIndex;
 
     Real                theCurrentTime;
 
@@ -537,6 +553,16 @@ namespace libecs
 
     virtual void initialize();
 
+    virtual void reset();
+
+    virtual void interrupt( StepperPtr const aCaller );
+
+
+    RealVectorCref getVelocityBuffer() const
+    {
+      return theVelocityBuffer;
+    }
+
 
     virtual VariableProxyPtr createVariableProxy( VariablePtr aVariable )
     {
@@ -550,8 +576,13 @@ namespace libecs
 
   protected:
 
+    const bool isExternalErrorTolerable() const;
+
+  protected:
+
     Real safety;
 
+    RealVector theVelocityBuffer;
 
   private:
 

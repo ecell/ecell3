@@ -99,6 +99,12 @@ namespace libecs
     }
 
 
+    void reschedule( StepperPtr const aStepperPtr )
+    {
+      theScheduler.reschedule( aStepperPtr );
+    }
+
+
     /**
        Returns the current time.
 

@@ -53,7 +53,9 @@ namespace libecs
   {
     // need check if this is a slave stepper
 
-    registerEvent( Event( getCurrentTime(), aStepper ) );
+    Int anIndex( registerEvent( Event( getCurrentTime(), aStepper ) ) );
+
+    aStepper->setSchedulerIndex( anIndex );
   }
 
   void Scheduler::reset()
@@ -90,6 +92,19 @@ namespace libecs
     //    theCurrentTime = ( theScheduleQueue.top() ).getTime();
   }
 
+
+  void Scheduler::reschedule( StepperPtr const aStepperPtr )
+  {
+    const Real aScheduledTime( aStepperPtr->getCurrentTime() + 
+			       aStepperPtr->getStepInterval() );
+
+    DEBUG_EXCEPTION( aScheduledTime >= getCurrentTime(),
+		     UnexpectedError,
+		     "Attempt to go past." );
+
+    theScheduleQueue.changeOneKey( aStepperPtr->getSchedulerIndex(),
+				   Event( aScheduledTime, aStepperPtr ) );
+  }
 
 
 } // namespace libecs

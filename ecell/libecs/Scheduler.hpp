@@ -121,6 +121,8 @@ namespace libecs
 
   public:
 
+    typedef ScheduleQueue::index_type IndexType;
+
     Scheduler();
     ~Scheduler();
 
@@ -144,6 +146,8 @@ namespace libecs
 
     void step();
 
+
+    void reschedule( StepperPtr const aStepper );
 
     /**
        Returns the current time.
@@ -174,9 +178,10 @@ namespace libecs
 
     void reset();
 
-    void registerEvent( EventCref anEvent )
+    IndexType registerEvent( EventCref anEvent )
     {
       theScheduleQueue.push( anEvent );
+      return theScheduleQueue.size();
     }
 
   private:
