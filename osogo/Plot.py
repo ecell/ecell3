@@ -79,7 +79,8 @@ class Plot:
 	    for acolor in self.ColorList:
 		newgc.set_foreground(self.theColorMap.alloc_color(acolor))
 		newpm.draw_rectangle(newgc,gtk.TRUE,0,0,10,10)
-		pb=gtk.gdk.Pixbuf(gtk.gdk.COLORSPACE_RGB,gtk.TRUE,root.get_visual().bits_per_rgb,10,10)
+#		pb=gtk.gdk.Pixbuf(gtk.gdk.COLORSPACE_RGB,gtk.TRUE,root.get_visual().bits_per_rgb,10,10)
+		pb=gtk.gdk.Pixbuf(gtk.gdk.COLORSPACE_RGB,gtk.TRUE,8,10,10)
 
 		newpb=pb.get_from_drawable(newpm,self.theColorMap,0,0,0,0,10,10)
 		self.pixmapmap[acolor]=newpb
@@ -859,31 +860,31 @@ class TracerPlot(Plot):
 	    #get datapoint x y values
 	    #convert to plot coordinates
 	    if datapoint[0]<self.xframe[1] and datapoint[0]>self.xframe[0] and\
-		datapoint[1]<self.yframe[1] and datapoint[1]>self.yframe[0]:
-		x=self.convertx_to_plot(datapoint[0])
-		y=self.converty_to_plot(datapoint[1])
-		#getlastpoint, calculate change to the last
-		lastx=self.lastx[aFullPNString]
-		lasty=self.lasty[aFullPNString]
-		if lastx!=None:
-		    dx=abs(lastx-x)
-		    dy=abs(lasty-y)
-		else:
-		    dx=0
-		    dy=0
-		if dx<2 and dy<2:
-		    self.drawpoint_on_plot(aFullPNString,x,y)
-		else:
-		    self.drawline(aFullPNString,lastx,lasty,x,y)
+		   datapoint[1]<self.yframe[1] and datapoint[1]>self.yframe[0]:
+		    x=self.convertx_to_plot(datapoint[0])
+		    y=self.converty_to_plot(datapoint[1])
+		    #getlastpoint, calculate change to the last
+		    lastx=self.lastx[aFullPNString]
+		    lasty=self.lasty[aFullPNString]
+		    if lastx!=None:
+			    dx=abs(lastx-x)
+			    dy=abs(lasty-y)
+		    else:
+			    dx=0
+			    dy=0
+		    if dx<2 and dy<2:
+			    self.drawpoint_on_plot(aFullPNString,x,y)
+		    else:
+			    self.drawline(aFullPNString,lastx,lasty,x,y)
 		    
-		#if change is 1 pixel in x or y direction drawpoint
-		#else drawline
-		#setlast
-		self.lastx[aFullPNString]=x
-		self.lasty[aFullPNString]=y
-	else:
-		self.lastx[aFullPNString]=None
-		self.lasty[aFullPNString]=None
+		    #if change is 1 pixel in x or y direction drawpoint
+		    #else drawline
+		    #setlast
+		    self.lastx[aFullPNString]=x
+		    self.lasty[aFullPNString]=y
+	    else:
+		    self.lastx[aFullPNString]=None
+		    self.lasty[aFullPNString]=None
 
 
 	    
