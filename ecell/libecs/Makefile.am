@@ -3,11 +3,12 @@ DMTOOL_INCLUDE=-I@DMTOOL_INCLUDE@
 KORANDOM_INCLUDE=-I@KORANDOM_DIR@
 
 INCLUDES = -I..  -I../include ${KORANDOM_INCLUDE} ${DMTOOL_INCLUDE}
-noinst_LIBRARIES = libecs.a
+noinst_LTLIBRARIES = libecs.la
 
-CXXFLAGS= @CXXFLAGS@ -D_GNU_SOURCE -D_REENTRANT -D_THREAD_SAFE 
+CXXFLAGS= @CXXFLAGS@ 
 
-libecs_a_SOURCES =\
+libecs_la_LDFLAGS=-static
+libecs_la_SOURCES =\
 Util.cpp\
 StringList.cpp\
 Message.cpp\

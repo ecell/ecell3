@@ -10,11 +10,20 @@ AM_INIT_AUTOMAKE(package, version, do-not-define)
 AC_PROG_MAKE_SET
 dnl
 dnl
+AC_LIBLTDL_CONVENIENCE
+AC_SUBST(INCLTDL)
+AC_SUBST(LIBLTDL)
+AC_LIBTOOL_DLOPEN
+AM_PROG_LIBTOOL
+dnl
+dnl
 dnl
 AC_MSG_CHECKING([for packages to be configured and built])
-ecell_subdirs="ecell"
+ecell_subdirs=""
+ecell_subdirs="ecell $ecell_subdirs"
 ecell_subdirs="korandom $ecell_subdirs"
 ecell_subdirs="dmtool $ecell_subdirs"
+ecell_subdirs="libltdl $ecell_subdirs"
 AC_MSG_RESULT($ecell_subdirs)
 AC_CONFIG_SUBDIRS($ecell_subdirs)
 dnl
