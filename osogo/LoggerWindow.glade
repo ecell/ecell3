@@ -1,0 +1,648 @@
+<?xml version="1.0"?>
+<GTK-Interface>
+
+<project>
+  <name>EcellGUI</name>
+  <program_name>ecellgui</program_name>
+  <directory></directory>
+  <source_directory>src</source_directory>
+  <pixmaps_directory>pixmaps</pixmaps_directory>
+  <language>C</language>
+  <gnome_support>True</gnome_support>
+  <gettext_support>True</gettext_support>
+</project>
+
+<widget>
+  <class>GtkWindow</class>
+  <name>Logger Window</name>
+  <title>Logger Window</title>
+  <type>GTK_WINDOW_TOPLEVEL</type>
+  <position>GTK_WIN_POS_NONE</position>
+  <modal>False</modal>
+  <allow_shrink>False</allow_shrink>
+  <allow_grow>True</allow_grow>
+  <auto_shrink>False</auto_shrink>
+
+  <widget>
+    <class>GtkVBox</class>
+    <name>vbox60</name>
+    <homogeneous>False</homogeneous>
+    <spacing>0</spacing>
+
+    <widget>
+      <class>GtkHandleBox</class>
+      <name>handlebox24</name>
+      <shadow_type>GTK_SHADOW_OUT</shadow_type>
+      <handle_position>GTK_POS_LEFT</handle_position>
+      <snap_edge>GTK_POS_TOP</snap_edge>
+      <child>
+	<padding>0</padding>
+	<expand>False</expand>
+	<fill>False</fill>
+      </child>
+
+      <widget>
+	<class>GtkMenuBar</class>
+	<name>menubar8</name>
+	<shadow_type>GTK_SHADOW_NONE</shadow_type>
+
+	<widget>
+	  <class>GtkMenuItem</class>
+	  <name>menuitem61</name>
+	  <stock_item>GNOMEUIINFO_MENU_FILE_TREE</stock_item>
+
+	  <widget>
+	    <class>GtkMenu</class>
+	    <name>menu11</name>
+
+	    <widget>
+	      <class>GtkPixmapMenuItem</class>
+	      <name>pixmapmenuitem29</name>
+	      <signal>
+		<name>activate</name>
+		<handler>on_load_rule_activate</handler>
+		<last_modification_time>Wed, 01 Aug 2001 18:36:04 GMT</last_modification_time>
+	      </signal>
+	      <label>Load _Rule ...</label>
+	      <right_justify>False</right_justify>
+	      <stock_icon>GNOME_STOCK_MENU_OPEN</stock_icon>
+	    </widget>
+
+	    <widget>
+	      <class>GtkPixmapMenuItem</class>
+	      <name>pixmapmenuitem30</name>
+	      <signal>
+		<name>activate</name>
+		<handler>on_load_cell_state_activate</handler>
+		<last_modification_time>Wed, 01 Aug 2001 18:36:56 GMT</last_modification_time>
+	      </signal>
+	      <label>Load _Cell State ...</label>
+	      <right_justify>False</right_justify>
+	      <stock_icon>GNOME_STOCK_MENU_REVERT</stock_icon>
+	    </widget>
+
+	    <widget>
+	      <class>GtkPixmapMenuItem</class>
+	      <name>pixmapmenuitem31</name>
+	      <signal>
+		<name>activate</name>
+		<handler>on_save_cell_state_activate</handler>
+		<last_modification_time>Wed, 01 Aug 2001 18:38:09 GMT</last_modification_time>
+	      </signal>
+	      <label>_Save Cell State ...</label>
+	      <right_justify>False</right_justify>
+	      <stock_icon>GNOME_STOCK_MENU_SAVE</stock_icon>
+	    </widget>
+
+	    <widget>
+	      <class>GtkPixmapMenuItem</class>
+	      <name>pixmapmenuitem32</name>
+	      <signal>
+		<name>activate</name>
+		<handler>on_execute_script_activate</handler>
+		<last_modification_time>Wed, 01 Aug 2001 18:38:15 GMT</last_modification_time>
+	      </signal>
+	      <label>_Execute Script ...</label>
+	      <right_justify>False</right_justify>
+	      <stock_icon>GNOME_STOCK_MENU_EXEC</stock_icon>
+	    </widget>
+
+	    <widget>
+	      <class>GtkMenuItem</class>
+	      <name>menuitem62</name>
+	      <right_justify>False</right_justify>
+	    </widget>
+
+	    <widget>
+	      <class>GtkMenuItem</class>
+	      <name>menuitem63</name>
+	      <accelerator>
+		<modifiers>GDK_CONTROL_MASK</modifiers>
+		<key>GDK_q</key>
+		<signal>activate</signal>
+	      </accelerator>
+	      <signal>
+		<name>activate</name>
+		<handler>on_exit_activate</handler>
+		<last_modification_time>Wed, 01 Aug 2001 18:44:56 GMT</last_modification_time>
+	      </signal>
+	      <label>E_xit</label>
+	      <right_justify>False</right_justify>
+	    </widget>
+	  </widget>
+	</widget>
+
+	<widget>
+	  <class>GtkMenuItem</class>
+	  <name>menuitem64</name>
+	  <stock_item>GNOMEUIINFO_MENU_EDIT_TREE</stock_item>
+
+	  <widget>
+	    <class>GtkMenu</class>
+	    <name>menu12</name>
+
+	    <widget>
+	      <class>GtkMenuItem</class>
+	      <name>menuitem65</name>
+	      <accelerator>
+		<modifiers>GDK_CONTROL_MASK</modifiers>
+		<key>GDK_x</key>
+		<signal>activate</signal>
+	      </accelerator>
+	      <signal>
+		<name>activate</name>
+		<handler>on_cut_activate</handler>
+		<last_modification_time>Wed, 01 Aug 2001 22:26:29 GMT</last_modification_time>
+	      </signal>
+	      <label>C_ut</label>
+	      <right_justify>False</right_justify>
+	    </widget>
+
+	    <widget>
+	      <class>GtkMenuItem</class>
+	      <name>menuitem66</name>
+	      <accelerator>
+		<modifiers>GDK_CONTROL_MASK</modifiers>
+		<key>GDK_c</key>
+		<signal>activate</signal>
+	      </accelerator>
+	      <signal>
+		<name>activate</name>
+		<handler>on_copy_activate</handler>
+		<last_modification_time>Wed, 01 Aug 2001 22:26:57 GMT</last_modification_time>
+	      </signal>
+	      <label>_Copy</label>
+	      <right_justify>False</right_justify>
+	    </widget>
+
+	    <widget>
+	      <class>GtkMenuItem</class>
+	      <name>menuitem67</name>
+	      <accelerator>
+		<modifiers>GDK_CONTROL_MASK</modifiers>
+		<key>GDK_v</key>
+		<signal>activate</signal>
+	      </accelerator>
+	      <signal>
+		<name>activate</name>
+		<handler>on_paste_activate</handler>
+		<last_modification_time>Wed, 01 Aug 2001 22:27:15 GMT</last_modification_time>
+	      </signal>
+	      <label>_Paste</label>
+	      <right_justify>False</right_justify>
+	    </widget>
+
+	    <widget>
+	      <class>GtkMenuItem</class>
+	      <name>menuitem68</name>
+	      <accelerator>
+		<modifiers>0</modifiers>
+		<key>GDK_Delete</key>
+		<signal>activate</signal>
+	      </accelerator>
+	      <signal>
+		<name>activate</name>
+		<handler>on_clear_activate</handler>
+		<last_modification_time>Wed, 01 Aug 2001 22:27:30 GMT</last_modification_time>
+	      </signal>
+	      <label>Clear</label>
+	      <right_justify>False</right_justify>
+	    </widget>
+	  </widget>
+	</widget>
+
+	<widget>
+	  <class>GtkMenuItem</class>
+	  <name>menuitem69</name>
+	  <stock_item>GNOMEUIINFO_MENU_VIEW_TREE</stock_item>
+
+	  <widget>
+	    <class>GtkMenu</class>
+	    <name>menu13</name>
+
+	    <widget>
+	      <class>GtkCheckMenuItem</class>
+	      <name>checkmenuitem4</name>
+	      <signal>
+		<name>activate</name>
+		<handler>on_message_window_activate</handler>
+		<last_modification_time>Wed, 01 Aug 2001 22:28:26 GMT</last_modification_time>
+	      </signal>
+	      <label>_Message Window</label>
+	      <active>True</active>
+	      <always_show_toggle>True</always_show_toggle>
+	    </widget>
+
+	    <widget>
+	      <class>GtkCheckMenuItem</class>
+	      <name>checkmenuitem5</name>
+	      <signal>
+		<name>activate</name>
+		<handler>on_interface_window_activate</handler>
+		<last_modification_time>Wed, 01 Aug 2001 22:28:58 GMT</last_modification_time>
+	      </signal>
+	      <label>_Interface Window</label>
+	      <active>False</active>
+	      <always_show_toggle>True</always_show_toggle>
+	    </widget>
+
+	    <widget>
+	      <class>GtkCheckMenuItem</class>
+	      <name>checkmenuitem6</name>
+	      <signal>
+		<name>activate</name>
+		<handler>on_palette_window_activate</handler>
+		<last_modification_time>Wed, 01 Aug 2001 23:56:41 GMT</last_modification_time>
+	      </signal>
+	      <label>_Palette Window</label>
+	      <active>False</active>
+	      <always_show_toggle>True</always_show_toggle>
+	    </widget>
+	  </widget>
+	</widget>
+
+	<widget>
+	  <class>GtkMenuItem</class>
+	  <name>menuitem70</name>
+	  <stock_item>GNOMEUIINFO_MENU_WINDOWS_TREE</stock_item>
+
+	  <widget>
+	    <class>GtkMenu</class>
+	    <name>menu14</name>
+
+	    <widget>
+	      <class>GtkMenuItem</class>
+	      <name>menuitem71</name>
+	      <signal>
+		<name>activate</name>
+		<handler>on_create_new_entry_list1_activate</handler>
+		<last_modification_time>Wed, 01 Aug 2001 22:30:03 GMT</last_modification_time>
+	      </signal>
+	      <label>Create New _Entry List</label>
+	      <right_justify>False</right_justify>
+	    </widget>
+
+	    <widget>
+	      <class>GtkMenuItem</class>
+	      <name>menuitem72</name>
+	      <signal>
+		<name>activate</name>
+		<handler>on_create_new_interface_activate</handler>
+		<last_modification_time>Wed, 01 Aug 2001 22:31:06 GMT</last_modification_time>
+	      </signal>
+	      <label>Create New _Interface</label>
+	      <right_justify>False</right_justify>
+	    </widget>
+
+	    <widget>
+	      <class>GtkMenuItem</class>
+	      <name>menuitem73</name>
+	      <signal>
+		<name>activate</name>
+		<handler>on_create_new_board_activate</handler>
+		<last_modification_time>Wed, 01 Aug 2001 22:31:06 GMT</last_modification_time>
+	      </signal>
+	      <label>Create New _Board</label>
+	      <right_justify>False</right_justify>
+	    </widget>
+
+	    <widget>
+	      <class>GtkMenuItem</class>
+	      <name>menuitem74</name>
+	      <signal>
+		<name>activate</name>
+		<handler>on_create_new_logger_list_activate</handler>
+		<last_modification_time>Wed, 01 Aug 2001 22:31:07 GMT</last_modification_time>
+	      </signal>
+	      <label>Create New _Logger List</label>
+	      <right_justify>False</right_justify>
+	    </widget>
+	  </widget>
+	</widget>
+
+	<widget>
+	  <class>GtkMenuItem</class>
+	  <name>menuitem75</name>
+	  <stock_item>GNOMEUIINFO_MENU_SETTINGS_TREE</stock_item>
+
+	  <widget>
+	    <class>GtkMenu</class>
+	    <name>menu15</name>
+
+	    <widget>
+	      <class>GtkPixmapMenuItem</class>
+	      <name>pixmapmenuitem33</name>
+	      <signal>
+		<name>activate</name>
+		<handler>on_preferences1_activate</handler>
+		<last_modification_time>Wed, 01 Aug 2001 22:40:28 GMT</last_modification_time>
+	      </signal>
+	      <stock_item>GNOMEUIINFO_MENU_PREFERENCES_ITEM</stock_item>
+	    </widget>
+	  </widget>
+	</widget>
+
+	<widget>
+	  <class>GtkMenuItem</class>
+	  <name>menuitem76</name>
+	  <stock_item>GNOMEUIINFO_MENU_HELP_TREE</stock_item>
+
+	  <widget>
+	    <class>GtkMenu</class>
+	    <name>menu16</name>
+
+	    <widget>
+	      <class>GtkPixmapMenuItem</class>
+	      <name>pixmapmenuitem34</name>
+	      <signal>
+		<name>activate</name>
+		<handler>on_about1_activate</handler>
+		<last_modification_time>Wed, 01 Aug 2001 18:32:41 GMT</last_modification_time>
+	      </signal>
+	      <stock_item>GNOMEUIINFO_MENU_ABOUT_ITEM</stock_item>
+	    </widget>
+	  </widget>
+	</widget>
+      </widget>
+    </widget>
+
+    <widget>
+      <class>GtkFrame</class>
+      <name>frame36</name>
+      <label>Logger</label>
+      <label_xalign>0</label_xalign>
+      <shadow_type>GTK_SHADOW_ETCHED_IN</shadow_type>
+      <child>
+	<padding>0</padding>
+	<expand>True</expand>
+	<fill>True</fill>
+      </child>
+
+      <widget>
+	<class>GtkScrolledWindow</class>
+	<name>scrolledwindow17</name>
+	<hscrollbar_policy>GTK_POLICY_ALWAYS</hscrollbar_policy>
+	<vscrollbar_policy>GTK_POLICY_ALWAYS</vscrollbar_policy>
+	<hupdate_policy>GTK_UPDATE_CONTINUOUS</hupdate_policy>
+	<vupdate_policy>GTK_UPDATE_CONTINUOUS</vupdate_policy>
+
+	<widget>
+	  <class>GtkCList</class>
+	  <name>clist3</name>
+	  <can_focus>True</can_focus>
+	  <columns>3</columns>
+	  <column_widths>271,87,80</column_widths>
+	  <selection_mode>GTK_SELECTION_SINGLE</selection_mode>
+	  <show_titles>True</show_titles>
+	  <shadow_type>GTK_SHADOW_IN</shadow_type>
+
+	  <widget>
+	    <class>GtkLabel</class>
+	    <child_name>CList:title</child_name>
+	    <name>label60</name>
+	    <label>Entry</label>
+	    <justify>GTK_JUSTIFY_CENTER</justify>
+	    <wrap>False</wrap>
+	    <xalign>0.5</xalign>
+	    <yalign>0.5</yalign>
+	    <xpad>0</xpad>
+	    <ypad>0</ypad>
+	  </widget>
+
+	  <widget>
+	    <class>GtkLabel</class>
+	    <child_name>CList:title</child_name>
+	    <name>label61</name>
+	    <label>start</label>
+	    <justify>GTK_JUSTIFY_CENTER</justify>
+	    <wrap>False</wrap>
+	    <xalign>0.5</xalign>
+	    <yalign>0.5</yalign>
+	    <xpad>0</xpad>
+	    <ypad>0</ypad>
+	  </widget>
+
+	  <widget>
+	    <class>GtkLabel</class>
+	    <child_name>CList:title</child_name>
+	    <name>label62</name>
+	    <label>end</label>
+	    <justify>GTK_JUSTIFY_CENTER</justify>
+	    <wrap>False</wrap>
+	    <xalign>0.5</xalign>
+	    <yalign>0.5</yalign>
+	    <xpad>0</xpad>
+	    <ypad>0</ypad>
+	  </widget>
+	</widget>
+      </widget>
+    </widget>
+
+    <widget>
+      <class>GtkHBox</class>
+      <name>hbox68</name>
+      <border_width>4</border_width>
+      <homogeneous>False</homogeneous>
+      <spacing>4</spacing>
+      <child>
+	<padding>0</padding>
+	<expand>False</expand>
+	<fill>False</fill>
+      </child>
+
+      <widget>
+	<class>GtkLabel</class>
+	<name>label63</name>
+	<label>Save </label>
+	<justify>GTK_JUSTIFY_CENTER</justify>
+	<wrap>False</wrap>
+	<xalign>0.5</xalign>
+	<yalign>0.5</yalign>
+	<xpad>0</xpad>
+	<ypad>0</ypad>
+	<child>
+	  <padding>0</padding>
+	  <expand>False</expand>
+	  <fill>False</fill>
+	</child>
+      </widget>
+
+      <widget>
+	<class>GtkToolbar</class>
+	<name>toolbar21</name>
+	<orientation>GTK_ORIENTATION_HORIZONTAL</orientation>
+	<type>GTK_TOOLBAR_TEXT</type>
+	<space_size>5</space_size>
+	<space_style>GTK_TOOLBAR_SPACE_EMPTY</space_style>
+	<relief>GTK_RELIEF_NORMAL</relief>
+	<tooltips>True</tooltips>
+	<child>
+	  <padding>0</padding>
+	  <expand>False</expand>
+	  <fill>False</fill>
+	</child>
+
+	<widget>
+	  <class>GtkRadioButton</class>
+	  <child_name>Toolbar:button</child_name>
+	  <name>radiobutton18</name>
+	  <label>All</label>
+	  <active>True</active>
+	</widget>
+
+	<widget>
+	  <class>GtkRadioButton</class>
+	  <child_name>Toolbar:button</child_name>
+	  <name>radiobutton19</name>
+	  <label>Selected</label>
+	  <active>False</active>
+	</widget>
+      </widget>
+
+      <widget>
+	<class>GtkLabel</class>
+	<name>label64</name>
+	<label> to file </label>
+	<justify>GTK_JUSTIFY_CENTER</justify>
+	<wrap>False</wrap>
+	<xalign>0.5</xalign>
+	<yalign>0.5</yalign>
+	<xpad>0</xpad>
+	<ypad>0</ypad>
+	<child>
+	  <padding>0</padding>
+	  <expand>False</expand>
+	  <fill>False</fill>
+	</child>
+      </widget>
+
+      <widget>
+	<class>GtkButton</class>
+	<name>button121</name>
+	<can_focus>True</can_focus>
+	<label> Now </label>
+	<child>
+	  <padding>0</padding>
+	  <expand>False</expand>
+	  <fill>False</fill>
+	</child>
+      </widget>
+
+      <widget>
+	<class>GtkFrame</class>
+	<name>frame37</name>
+	<label_xalign>0</label_xalign>
+	<shadow_type>GTK_SHADOW_ETCHED_IN</shadow_type>
+	<child>
+	  <padding>0</padding>
+	  <expand>False</expand>
+	  <fill>False</fill>
+	</child>
+
+	<widget>
+	  <class>GtkHBox</class>
+	  <name>hbox69</name>
+	  <homogeneous>False</homogeneous>
+	  <spacing>0</spacing>
+
+	  <widget>
+	    <class>GtkCheckButton</class>
+	    <name>checkbutton25</name>
+	    <can_focus>True</can_focus>
+	    <label>at</label>
+	    <active>False</active>
+	    <draw_indicator>True</draw_indicator>
+	    <child>
+	      <padding>0</padding>
+	      <expand>False</expand>
+	      <fill>False</fill>
+	    </child>
+	  </widget>
+
+	  <widget>
+	    <class>GtkSpinButton</class>
+	    <name>spinbutton7</name>
+	    <width>80</width>
+	    <can_focus>True</can_focus>
+	    <climb_rate>1</climb_rate>
+	    <digits>3</digits>
+	    <numeric>False</numeric>
+	    <update_policy>GTK_UPDATE_ALWAYS</update_policy>
+	    <snap>False</snap>
+	    <wrap>False</wrap>
+	    <value>1</value>
+	    <lower>0</lower>
+	    <upper>100000</upper>
+	    <step>1</step>
+	    <page>10</page>
+	    <page_size>10</page_size>
+	    <child>
+	      <padding>0</padding>
+	      <expand>False</expand>
+	      <fill>False</fill>
+	    </child>
+	  </widget>
+	</widget>
+      </widget>
+
+      <widget>
+	<class>GtkFrame</class>
+	<name>frame38</name>
+	<label_xalign>0</label_xalign>
+	<shadow_type>GTK_SHADOW_ETCHED_IN</shadow_type>
+	<child>
+	  <padding>0</padding>
+	  <expand>False</expand>
+	  <fill>False</fill>
+	</child>
+
+	<widget>
+	  <class>GtkHBox</class>
+	  <name>hbox70</name>
+	  <homogeneous>False</homogeneous>
+	  <spacing>0</spacing>
+
+	  <widget>
+	    <class>GtkCheckButton</class>
+	    <name>checkbutton26</name>
+	    <can_focus>True</can_focus>
+	    <label>every</label>
+	    <active>False</active>
+	    <draw_indicator>True</draw_indicator>
+	    <child>
+	      <padding>0</padding>
+	      <expand>False</expand>
+	      <fill>False</fill>
+	    </child>
+	  </widget>
+
+	  <widget>
+	    <class>GtkSpinButton</class>
+	    <name>spinbutton8</name>
+	    <width>80</width>
+	    <can_focus>True</can_focus>
+	    <climb_rate>1</climb_rate>
+	    <digits>3</digits>
+	    <numeric>False</numeric>
+	    <update_policy>GTK_UPDATE_ALWAYS</update_policy>
+	    <snap>False</snap>
+	    <wrap>False</wrap>
+	    <value>10157</value>
+	    <lower>0</lower>
+	    <upper>100000</upper>
+	    <step>1</step>
+	    <page>10</page>
+	    <page_size>10</page_size>
+	    <child>
+	      <padding>0</padding>
+	      <expand>False</expand>
+	      <fill>False</fill>
+	    </child>
+	  </widget>
+	</widget>
+      </widget>
+    </widget>
+  </widget>
+</widget>
+
+</GTK-Interface>
