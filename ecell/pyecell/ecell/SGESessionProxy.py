@@ -49,20 +49,26 @@ class SGESessionProxy(SessionProxy):
 		'''constructor
 		'''
 
-		# calls superclass's constructor
+		# call superclass's constructor
 		SessionProxy.__init__(self)
 
-		# initializes parameter
+		# initialize parameter
 		self.__theSGEJobID = None
-		self.__theTmpScriptFileName = 'script.sh'
+
+		# initialize script name
+		# for example, script.tcsh if $SHELL is '/bin/tcsh'
+		self.__theTmpScriptFileName = "script." + os.path.basename( os.getenv('SHELL') )
+
 
 
 	def getSGEJobID(self):
+		'''return job id 
+		'''
 		return self.__theSGEJobID 
 
 
 	def retry(self):
-		'''retrys
+		'''retry
 		Return None
 		'''
 
@@ -71,54 +77,58 @@ class SGESessionProxy(SessionProxy):
 		if self.getStatus() == RUN:
 			os.popen("qdel %s" %self.__theSGEJobID )
 
-		# runs again.
+		# run again.
 		self.run()
 
 
 
 	def run(self):
-		'''runs process
+		'''run process
 		Return None
 		'''
 
 		self.setStatus(RUN)
 
 		# --------------------------------
-		# sets up
+		# set up
 		# --------------------------------
-		# calls super class's method
+		# call super class's method
 		SessionProxy.run(self)
 
-		# checks status
+		# check status
 		if self.getStatus() == FINISHED or self.getStatus() == ERROR:
 			return None
 
 
-		# saves current directory
+		# save current directory
 		aCwd = os.getcwd()
 
-		# changes directory to job directory
+		# change directory to job directory
 		os.chdir( self.getJobDirectory() )
 
 		# --------------------------------
-		# executes script
+		# execute script
 		# --------------------------------
-		# creates context
+		# create context
 
 		# argument
 		anArgment = ''
 		if self.getInterpreter() == ECELL3_SESSION:
 
-			# writes temporary script
+			# write temporary script
 			anArgument = "--parameters=\"%s\"" %str(self.getSessionArgument())
-			aScriptContext = "#!/bin/sh\nuname -a\nexec %s -e %s %s " %(ECELL3_SESSION,
-			                                                       self.getScriptFileName(),
-			                                                       anArgument)
-			open( self.__theTmpScriptFileName, 'w' ).write( aScriptContext)
+			aScriptContext = "#!%s\nuname -a\n%s -e %s %s\n exit $?" \
+			                  %(os.getenv('SHELL'),
+			                    ECELL3_SESSION,
+			                    self.getScriptFileName(),
+			                    anArgument)
+			open( self.__theTmpScriptFileName, 'w' ).write( aScriptContext )
 
 
-			# creates context to be thrown by qsub
-			aContext = "%s -cwd -S /bin/sh -o %s -e %s %s" %(QSUB,
+			# create context to be thrown by qsub
+			aContext = "%s -cwd -S %s -o %s -e %s %s" \
+			                                                 %(QSUB,
+			                                                 os.getenv('SHELL'),
 					                                         self.getStdoutFileName(),
 					                                         self.getStderrFileName(),
 		                                                     self.__theTmpScriptFileName)
@@ -135,27 +145,27 @@ class SGESessionProxy(SessionProxy):
 		                                            anArgument)
 
 
-		# executes the context
+		# execute the context
 		self.__theSGEJobID = string.split(os.popen(aContext).readline())[2]
 		
 
-		# gets back previous directory
+		# get back previous directory
 		os.chdir( aCwd )
 
 
 
 	def update( self ):
-		'''updates jobs's status
+		'''update jobs's status
 		Return None
 		'''
 
-		# calls super class's method
+		# call super class's method
 		SessionProxy.update(self)
 
 
 
 	def stop(self):
-		'''stops the job
+		'''stop the job
 		Return None
 		'''
 
@@ -164,7 +174,7 @@ class SGESessionProxy(SessionProxy):
 
 			os.popen("qdel %s" %self.__theSGEJobID )
 
-		# sets error status
+		# set error status
 		self.setStatus(ERROR) 
 
 
