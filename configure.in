@@ -20,6 +20,7 @@ dnl
 dnl
 AC_MSG_CHECKING([for packages to be configured and built])
 ecell_subdirs=""
+ecell_subdirs="bin $ecell_subdirs"
 ecell_subdirs="osogo $ecell_subdirs"
 ecell_subdirs="ecell $ecell_subdirs"
 ecell_subdirs="korandom $ecell_subdirs"
