@@ -121,10 +121,10 @@ class PropertyWindow(OsogoPluginWindow):
         self['entrySystemProcesses'].set_property( 'xalign', 0.5 )
         self['entrySystemVariables'].set_property( 'xalign', 0.5 )
 
-        self['entryProcessVarRefTotal'].set_property( 'xalign', 0.5 )
-        self['entryProcessVarRefPositive'].set_property( 'xalign', 0.5 )
-        self['entryProcessVarRefZero'].set_property( 'xalign', 0.5 )
-        self['entryProcessVarRefNegative'].set_property( 'xalign', 0.5 )
+        self['entryProcessVarRefTotal'].set_property( 'xalign', 1 )
+        self['entryProcessVarRefPositive'].set_property( 'xalign', 1 )
+        self['entryProcessVarRefZero'].set_property( 'xalign', 1 )
+        self['entryProcessVarRefNegative'].set_property( 'xalign', 1 )
 
         if self.theRawFullPNList == ():
             return
