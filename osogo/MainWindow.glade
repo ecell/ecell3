@@ -11,7 +11,7 @@
   <property name="modal">False</property>
   <property name="resizable">True</property>
   <property name="destroy_with_parent">False</property>
-  <property name="icon">icon_ecelllogo.png</property>
+  <property name="icon">ecell.png</property>
   <property name="skip_taskbar_hint">False</property>
   <property name="skip_pager_hint">False</property>
   <property name="type_hint">GDK_WINDOW_TYPE_HINT_NORMAL</property>
@@ -239,8 +239,7 @@
 			  <child internal-child="image">
 			    <widget class="GtkImage" id="image242">
 			      <property name="visible">True</property>
-			      <property name="stock">gtk-about</property>
-			      <property name="icon_size">1</property>
+			       <property name="pixbuf">ecell.png</property>
 			      <property name="xalign">0.5</property>
 			      <property name="yalign">0.5</property>
 			      <property name="xpad">0</property>
@@ -998,7 +997,7 @@
 				      <child>
 					<widget class="GtkImage" id="image6">
 					  <property name="visible">True</property>
-					  <property name="pixbuf">ecell.png</property>
+					  <property name="pixbuf">icon_ecell.png</property>
 					  <property name="xalign">0.5</property>
 					  <property name="yalign">0.5</property>
 					  <property name="xpad">0</property>

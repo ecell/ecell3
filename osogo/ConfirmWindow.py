@@ -74,7 +74,7 @@ class ConfirmWindow(gtk.Dialog):
 		iconPixbuf = None
 		try:
 			import os
-			iconPixbuf = gtk.gdk.pixbuf_new_from_file(os.environ['OSOGOPATH'] + os.sep + "icon_ecelllogo.png")
+			iconPixbuf = gtk.gdk.pixbuf_new_from_file(os.environ['OSOGOPATH'] + os.sep + "ecell.png")
 		except:
 			pass
 		self.win.set_icon(iconPixbuf)

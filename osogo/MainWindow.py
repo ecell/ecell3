@@ -287,7 +287,7 @@ class MainWindow(OsogoWindow):
 			self.theFileSelection = gtk.FileSelection()
 			self.theFileSelection.connect('delete_event', self.__deleteFileSelection )
 			self.theFileSelection.cancel_button.connect('clicked', self.__deleteFileSelection)
-			iconPixbuf = gtk.gdk.pixbuf_new_from_file(os.environ['OSOGOPATH'] + os.sep + "icon_ecelllogo.png")
+			iconPixbuf = gtk.gdk.pixbuf_new_from_file(os.environ['OSOGOPATH'] + os.sep + "ecell.png")
 			self.theFileSelection.set_icon(iconPixbuf)
 
 			# when 'Load Model' is selected

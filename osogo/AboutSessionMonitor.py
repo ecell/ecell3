@@ -2,7 +2,6 @@
 import gtk
 import gtk.glade
 import os
-import os.path
 import gtk.gdk
 
 from MainWindow import *
@@ -25,8 +24,7 @@ class  AboutSessionMonitor:
 		filename = os.environ["OSOGOPATH"] + os.sep + "AboutSessionMonitor.glade"
 		widgets=gtk.glade.XML(filename,"attachment_box")
 		att_box = widgets.get_widget("attachment_box")
-#		widgets.get_widget("window1").remove( att_box )
-#		widgets.get_widget("window1").destroy()
+
 		# Create the Dialog
 		self.win = gtk.Dialog('AboutSessionMonitor' , None)
 		self.win.connect("destroy",self.destroy)
@@ -48,7 +46,7 @@ class  AboutSessionMonitor:
 		self.win.set_title('About Session Monitor')
 		iconPixbuf = None
 		try:
-			iconPixbuf = gtk.gdk.pixbuf_new_from_file(os.environ['OSOGOPATH'] + os.sep + "icon_ecelllogo.png")
+			iconPixbuf = gtk.gdk.pixbuf_new_from_file(os.environ['OSOGOPATH'] + os.sep + "ecell.png")
 		except:
 			pass
 		self.win.set_icon(iconPixbuf)
