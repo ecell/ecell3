@@ -107,28 +107,7 @@ class EntityListWindow(OsogoWindow):
         # initialize components
         # --------------------------------------------
 
-        if( self.theSession == None ):
-            self['search_button'].set_sensitive(0)
-            self['view_button'].set_sensitive(0)
-            self['search_entry'].set_sensitive(0)
-            self['plugin_optionmenu'].set_sensitive(0)
-        else:
-
-            self.__initializeSystemTree()
-            self.reconstructSystemTree()
-
-            self.__initializeProcessTree()
-            self.__initializeVariableTree()
-            aFullPN = convertFullIDToFullPN( createFullID ( 'System::/' ) )
-            
-            self.theQueue = FullPNQueue( self["navigator_area"] , [ aFullPN ] )
-            self.theQueue.registerCallback( self.doSelection )
-
-
-            self.__initializePluginWindowOptionMenu()
-                    
-            self.__initializePropertyWindow()
-            self.__initializePopupMenu()
+        self.initializeComponents()
 
         # --------------------------------------------
         # initialize buffer
@@ -140,6 +119,35 @@ class EntityListWindow(OsogoWindow):
         # initialize Add to Board button
         # --------------------------------------------
         self.CloseOrder = False
+
+
+
+    def initializeComponents( self, session = None ):
+
+        if ( session != None ):
+            self.theSession = session
+            self.thePluginManager = session.thePluginManager
+
+        if ( self.theSession == None ):
+            self['search_button'].set_sensitive(0)
+            self['view_button'].set_sensitive(0)
+            self['search_entry'].set_sensitive(0)
+            self['plugin_optionmenu'].set_sensitive(0)
+        else:
+            self.__initializeSystemTree()
+            self.reconstructSystemTree()
+            
+            self.__initializeProcessTree()
+            self.__initializeVariableTree()
+            aFullPN = convertFullIDToFullPN( createFullID ( 'System::/' ) )
+            
+            self.theQueue = FullPNQueue( self["navigator_area"] , [ aFullPN ] )
+            self.theQueue.registerCallback( self.doSelection )        
+            
+            self.__initializePluginWindowOptionMenu()        
+            self.__initializePropertyWindow()
+            self.__initializePopupMenu()
+        
 
     def getQueue( self ):
         return self.theQueue
