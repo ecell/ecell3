@@ -7,5 +7,6 @@ import string
 OSOGOPATH = os.environ['OSOGOPATH']
 PYTHONPATH = os.environ['PYTHONPATH']
 os.environ['PYTHONPATH'] = OSOGOPATH + os.pathsep + PYTHONPATH
+os.environ['LANG'] = 'C'
 
 os.system('python' + ' ' + '\"' + OSOGOPATH + '\"' + os.sep + 'opengui.py' + ' \"' + string.join( sys.argv[1:], '\" \"' ) + '\"')
