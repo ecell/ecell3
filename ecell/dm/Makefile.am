@@ -25,9 +25,18 @@ ODE23Stepper.cpp\
 CashKarp45Stepper.cpp\
 ODE45Stepper.cpp
 
-EXTRA_DIST = ${DMS}
+DMH = CashKarp45Stepper.hpp\
+FixedODE1Stepper.hpp\
+FixedRungeKutta4Stepper.hpp\
+NRProcess.hpp\
+NRStepper.hpp\
+ODE23Stepper.hpp\
+ODE45Stepper.hpp
+
+
+EXTRA_DIST = ${DMS} ${DMH}
 dmdir = ${DM_SRC_DIR}
-dm_DATA = ${DMS}
+dm_DATA = ${DMS} ${DMH}
 
 SOS = ${DMS:.cpp=.so}
 
