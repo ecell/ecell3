@@ -25,6 +25,8 @@ message( "current temporary dir = %s" %getTmpDir() )
 setStdoutFileName('stdout.txt')
 setStderrFileName('stderr.txt')
 
+# [1-4] set the removable flag of working directory
+setTmpDirRemovable(True)
 
 # -----------------------------------------------------
 # [2] register jobs
@@ -38,7 +40,7 @@ aDmPath = os.path.abspath('.')
 
 # If not, ECELL3_DM_PATH need to be set as relative path.
 #anEssFile = 'onerun.ess'
-#anExtraFileList = ['simple.eml','TestProcess.so']
+#anExtraFileList = ['simple.eml','TestFluxProcess.so']
 #aDmPath = '.'
 
 
