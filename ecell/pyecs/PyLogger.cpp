@@ -79,7 +79,7 @@ Object PyLogger::getData( const Py::Tuple& args )
     {
       Py::Tuple aPyTuple( 2 );
       aPyTuple[0] = Py::Float( (*aDataPointVector)[i]->getTime() );
-      aPyTuple[1] = Py::Float( (*aDataPointVector)[i]->getValue().asReal() );
+      aPyTuple[1] = Py::Float( (*aDataPointVector)[i]->getValue() );
       (*aPyTupleReturned)[i] = aPyTuple;
     }
   
