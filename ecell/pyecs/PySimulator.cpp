@@ -230,7 +230,6 @@ Object PySimulator::setPendingEventChecker( const Py::Tuple& args )
 
   theTmpPendingEventChecker = static_cast<Py::Object>( args[0] );
   thePendingEventChecker = static_cast<Py::Callable *>( &theTmpPendingEventChecker );
-  // *thePendingEventChecker = theTmpPendingEventChecker;
 
   if( !thePendingEventChecker->isCallable() )
     throw Py::TypeError("Object is not Callable type.");
@@ -250,7 +249,6 @@ Object PySimulator::setEventHandler( const Py::Tuple& args )
 
   theTmpEventHandler = static_cast<Py::Object>( args[0] );
   theEventHandler = static_cast<Py::Callable *>( &theTmpEventHandler );
-  //  *theEventHandler = theTmpEventHandler;
 
   if( !theEventHandler->isCallable() )
     throw Py::TypeError("Object is not Callable type.");
