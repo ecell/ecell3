@@ -95,6 +95,12 @@ namespace libecs
 	; // do nothing
       }
       
+
+      /*
+	The getDifference() below is an optimized version of
+        the original implementation based on the following two functions.
+	(2004/10/19)
+
       const Real interpolate( const RealMatrixCref aTaylorSeries,
 			      const Real anInterval,
 			      const Real aStepInterval )
@@ -117,6 +123,7 @@ namespace libecs
       virtual const Real getDifference( RealParam aTime, 
 					RealParam anInterval )
       {
+
 	if ( !theStepper.theStateFlag )
 	  {
 	    return 0.0;
@@ -126,10 +133,68 @@ namespace libecs
 	const Real aTimeInterval( aTime - theStepper.getCurrentTime() );
 	const Real aStepInterval( theStepper.getTolerableStepInterval() );
 
-	const Real i1( interpolate( aTaylorSeries, aTimeInterval, aStepInterval ) );
-	const Real i2( interpolate( aTaylorSeries, aTimeInterval - anInterval, aStepInterval ) );
-
+	const Real i1( interpolate( aTaylorSeries, 
+	                            aTimeInterval, 
+                                    aStepInterval ) );
+	const Real i2( interpolate( aTaylorSeries, 
+                                    aTimeInterval - anInterval, 
+                                    aStepInterval ) );
 	return ( i1 - i2 );
+
+	}
+      */
+
+      virtual const Real getDifference( RealParam aTime, 
+					RealParam anInterval ) const
+      {
+        Real aDifference( 0.0 );
+
+        if ( !theStepper.theStateFlag )
+          {
+            return 0.0;
+          }
+
+        const Real aStepIntervalInv( 1.0 / 
+				     theStepper.getTolerableStepInterval() );
+
+        const Real aTimeInterval1( aTime - theStepper.getCurrentTime() );
+        const Real aTimeInterval2( aTimeInterval1 - anInterval );
+
+        const Real theta1( aTimeInterval1 * aStepIntervalInv );
+        const Real theta2( aTimeInterval2 * aStepIntervalInv );
+
+        RealMatrixCref aTaylorSeries( theStepper.getTaylorSeries() );
+	const RealMatrix::size_type aTaylorSize( aTaylorSeries.size() );
+
+        Real aFactorialInv1( aTimeInterval1 );
+        Real aFactorialInv2( aTimeInterval2 );
+
+	RealCptr aTaylorCoefficientPtr( aTaylorSeries.origin() + theIndex );
+	const RealMatrix::size_type aStride( aTaylorSeries.strides()[0] );
+
+	{
+	  // aTaylorSeries[ 0 ][ theIndex ]
+	  const Real aTaylorCoefficient( *aTaylorCoefficientPtr );
+	  aDifference += aTaylorCoefficient * aFactorialInv1;
+	  aDifference -= aTaylorCoefficient * aFactorialInv2;
+	}
+
+	for ( RealMatrix::size_type s( 1 ); s < aTaylorSize; ++s )
+          {
+	    // aTaylorSeries[ s ][ theIndex ]
+	    aTaylorCoefficientPtr += aStride;
+	    const Real aTaylorCoefficient( *aTaylorCoefficientPtr );
+
+            aFactorialInv1 *= theta1;
+            aFactorialInv2 *= theta2;
+
+	    aDifference += aTaylorCoefficient * aFactorialInv1;
+	    aDifference -= aTaylorCoefficient * aFactorialInv2;
+
+	    // LIBECS_PREFETCH( aTaylorCoefficientPtr + aStride, 0, 1 );
+          }
+
+        return aDifference;
       }
       
     protected:

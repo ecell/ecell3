@@ -524,10 +524,13 @@ namespace libemc
 
     do
       {
-	for( unsigned int i( theEventCheckInterval ); i != 0; --i )
+	unsigned int aCounter( theEventCheckInterval );
+	do
 	  {
 	    getModel().step();
+	    --aCounter;
 	  }
+	while( aCounter != 0 );
 	
 	handleEvent();
 
@@ -573,7 +576,8 @@ namespace libemc
 
     do
       {
-	for( unsigned int i( theEventCheckInterval ); i != 0; --i )
+	unsigned int aCounter( theEventCheckInterval );
+	do 
 	  {
 	    if( getModel().getNextEvent().getStepper() == aSystemStepper )
 	      {
@@ -583,7 +587,9 @@ namespace libemc
 	      }
 	    
 	    getModel().step();
-	  }
+
+	    --aCounter;
+	  } while( aCounter != 0 );
 
 	handleEvent();
 

@@ -88,7 +88,8 @@ namespace libecs
 
     virtual ~Interpolant();
     
-    virtual const Real getDifference( RealParam aTime, RealParam anInterval )
+    virtual 
+    const Real getDifference( RealParam aTime, RealParam anInterval ) const
     {
       return 0.0;
     }
