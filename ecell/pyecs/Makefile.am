@@ -29,9 +29,6 @@ cxxsupport.cxx
 $(CXXSRC):
 	cp -f ${CXXSRCDIR}/$@ .
 
-clean-local:
-	rm -f ${CXXSRC}
-
 pyexec_LTLIBRARIES=ecs.la
 ecs_la_SOURCES=\
 PyUVariable.cpp\
