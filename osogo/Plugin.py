@@ -40,7 +40,7 @@ class PluginModule:
 
     def createInstance( self, sim, data, parent=None ):
         aConstructor = self.theModule.__dict__[self.theName]
-        anArgumentTuple = tuple( self.theDirectoryName ) + sim + data
+        anArgumentTuple = tuple( self.theDirectoryName ) + (sim,) + (data,)
         apply( aConstructor, anArgumentTuple )
 
 
@@ -51,12 +51,12 @@ class PluginManager:
         self.thePluginMap = {}
         self.theInstanceList = []
 
-    def createInstance( self, name, sim, data, parent=None ):
+    def createInstance( self, classname, sim, data, parent=None ):
         try:
-            aPlugin = self.thePluginMap[ name ]
+            aPlugin = self.thePluginMap[ classname ]
         except KeyError:
-            aPlugin = PluginModule( name )
-            self.thePluginMap[ name ] = aPlugin
+            aPlugin = PluginModule( classname )
+            self.thePluginMap[ classname ] = aPlugin
 
         anInstance = aPlugin.createInstance( sim, data, parent )
         self.appendInstance( anInstance )
