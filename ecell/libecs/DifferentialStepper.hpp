@@ -140,6 +140,9 @@ namespace libecs
       setNextStepInterval( aStepInterval );
     }
 
+    void resetValue();
+    void interIntegrate();
+ 
     virtual void initialize();
 
     virtual void reset();

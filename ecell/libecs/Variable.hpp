@@ -179,6 +179,29 @@ namespace libecs
       theLastTime = aCurrentTime;
     }
 
+    const Real calculateTempVelocitySum( StepperPtr aCaller,
+					 const Real aCurrentTime )
+    {
+      const Real anInterval( aCurrentTime - theLastTime );
+
+      if ( anInterval <= 0.0 )
+	{
+	  return 0.0;
+	}
+
+      Real aVelocitySum( 0.0 );
+      FOR_ALL( VariableProxyVector, theVariableProxyVector )
+	{
+	  VariableProxyPtr const anVariableProxyPtr( *i );
+	  if ( anVariableProxyPtr->getStepperPtr() != aCaller )
+	    {
+	      aVelocitySum += anVariableProxyPtr->getDifference( aCurrentTime,
+								 anInterval );
+	    }
+	}
+
+      return aVelocitySum;
+    }
 
     /**
        Check if the current total velocity doesn't exceed value range of 

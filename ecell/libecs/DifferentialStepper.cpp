@@ -106,6 +106,39 @@ namespace libecs
   }
 #endif /* 0 */
 
+  void DifferentialStepper::resetValue()
+  {
+    const UnsignedInt aSize( theVariableVector.size() );
+    for ( UnsignedInt c( 0 ); c < aSize; ++c )
+      {
+	VariablePtr const aVariable( theVariableVector[ c ] );
+	aVariable->loadValue( theValueBuffer[ c ] );
+      }
+  }
+
+  void DifferentialStepper::interIntegrate()
+  {
+    Real const aCurrentTime( getCurrentTime() );
+
+    for ( UnsignedInt c( theReadWriteVariableOffset );
+	  c != theReadOnlyVariableOffset; ++c )
+      {
+	VariablePtr const aVariable( theVariableVector[ c ] );
+
+	const Real aValue( aVariable->getValue() );
+
+	aVariable->loadValue( aValue + aVariable->calculateTempVelocitySum( this, aCurrentTime ) );
+      }
+
+    for ( UnsignedInt c( theReadOnlyVariableOffset );
+	  c != theVariableVector.size(); ++c )
+      {
+	VariablePtr const aVariable( theVariableVector[ c ] );
+
+	aVariable->loadValue( theValueBuffer[ c ] + aVariable->calculateTempVelocitySum( this, aCurrentTime ) );
+      }
+  }
+
   void DifferentialStepper::interrupt( StepperPtr const aCaller )
   {
     const Real aCallerTimeScale( aCaller->getTimeScale() );
