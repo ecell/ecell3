@@ -23,7 +23,7 @@ class PropertyWindow(PluginWindow):
         self.addHandlers( { 'input_row_pressed'   : self.select_property,
                             'show_button_pressed' : self.show } )
         
-        self.thePropertyClist = self.getWidget( "clist1" )
+        self.thePropertyClist = self.getWidget( "property_clist" )
         self.theTypeEntry     = self.getWidget( "entry_TYPE" )
         self.theIDEntry       = self.getWidget( "entry_ID" )
         self.thePathEntry     = self.getWidget( "entry_PATH" )
@@ -40,17 +40,23 @@ class PropertyWindow(PluginWindow):
     
     def setFullPNList( self, aFullPNList ):
         self.theFPNs = aFullPNList
+#        print self.theFPNs
         
         self.theSelected = ''
         
         self.theFullID = convertFullPNToFullID( self.theFPNs[0] )
+        aFullName = convertFullIDToFullPN( self.theFullID,
+                                                      'Name' )
+        aNameList =\
+        list( self.theSimulator.getProperty( aFullName ) )
+        self.theClassName = aNameList[0]
+        
         self.theType = PrimitiveTypeString[ self.theFullID[TYPE] ]
         self.theID   = str( self.theFullID[ID] )
         self.thePath = str( self.theFullID[SYSTEMPATH] )
         aFullPropertyName = convertFullIDToFullPN( self.theFullID,
                                                       'ClassName' )
         aList = self.theSimulator.getProperty( aFullPropertyName )
-        self.theClassName  = aList[0]
         self.theTypeEntry.set_text( self.theType  )
         self.theIDEntry.set_text  ( self.theID )
         self.thePathEntry.set_text( self.thePath )
@@ -92,6 +98,12 @@ class PropertyWindow(PluginWindow):
             elif (aProperty == 'PropertyList'):
                 pass
             elif (aProperty == 'PropertyAttributes'):
+                pass
+            elif (aProperty == 'FullID'):
+                pass
+            elif (aProperty == 'ID'):
+                pass
+            elif (aProperty == 'Name'):
                 pass
 
             else :
@@ -194,8 +206,6 @@ if __name__ == "__main__":
         aPropertyWindow.update()
 
         mainLoop()
-
-    
 
     main()
 
