@@ -187,7 +187,7 @@ namespace libecs
 	}
       else
 	{
-	  anObject.defaultSetProperty( aPropertyName, aValue );
+	  anObject.defaultSetProperty( aPropertyName, aValue );	  
 	}
     }
     
@@ -225,10 +225,11 @@ namespace libecs
     {
       PropertySlotMapConstIterator 
 	aPropertySlotMapIterator( findPropertySlot( aPropertyName ) );
-      
+
       if( aPropertySlotMapIterator != thePropertySlotMap.end() )
 	{
 	  PropertySlotPtr aPropertySlotPtr( aPropertySlotMapIterator->second );
+
 	  if( aPropertySlotPtr->isLoadable() )
 	    {
 	      aPropertySlotPtr->loadPolymorph( anObject, aValue );
@@ -244,8 +245,9 @@ namespace libecs
 	}
     }
     
-    static const Polymorph saveProperty( const T& anObject,
-					 StringCref aPropertyName )
+
+    static const Polymorph
+    saveProperty( const T& anObject, StringCref aPropertyName )
     {
       PropertySlotMapConstIterator 
 	aPropertySlotMapIterator( findPropertySlot( aPropertyName ) );
@@ -268,18 +270,29 @@ namespace libecs
 	}
     }
 
-    static const Polymorph getPropertyList()
+    static const Polymorph getPropertyList( const T& anObject )
     {
-      PolymorphVector aVector;
+      PolymorphVector aVector1, aVector2;
       // aVector.reserve( thePropertySlotMap.size() );
       
       for( PropertySlotMapConstIterator i( thePropertySlotMap.begin() ); 
 	   i != thePropertySlotMap.end() ; ++i )
 	{
-	  aVector.push_back( i->first );
+	  aVector1.push_back( i->first );
 	}
-      
-      return aVector;
+
+      aVector2 = anObject.defaultGetPropertyList();
+
+      if( aVector2.size() > 0 )
+	{
+	  for( PolymorphVectorIterator i( aVector2.begin() );
+	       i != aVector2.end(); ++i )
+	    {
+	      aVector1.push_back( i->asString() );
+	    }
+	}
+
+      return aVector1;
     }
 
     
@@ -295,6 +308,43 @@ namespace libecs
 
       //      thePropertySlotMap[ aName ] = aPropertySlotPtr;
       thePropertySlotMap.insert( std::make_pair( aName, aPropertySlotPtr ) );
+    }
+
+
+    static const Polymorph
+    getPropertyAttributes( const T& anObject, StringCref aPropertyName )
+    {
+      PropertySlotMapConstIterator i( findPropertySlot( aPropertyName ) );
+
+      if( i != thePropertySlotMap.end() )
+	{
+	  PropertySlotBasePtr 
+	    aPropertySlotPtr( getPropertySlot( aPropertyName ) );
+	  
+	  PolymorphVector aVector;
+	  
+	  // is setable?
+	  aVector.push_back
+	    ( static_cast<Integer>( aPropertySlotPtr->isSetable() ) );
+      
+	  // is getable?
+	  aVector.push_back
+	    ( static_cast<Integer>( aPropertySlotPtr->isGetable() ) );
+      
+	  // is getable?
+	  aVector.push_back
+	    ( static_cast<Integer>( aPropertySlotPtr->isLoadable() ) );
+      
+	  // is getable?
+	  aVector.push_back
+	    ( static_cast<Integer>( aPropertySlotPtr->isSavable() ) );
+      
+	  return aVector;
+	}
+      else
+	{
+	  return anObject.defaultGetPropertyAttributes( aPropertyName );
+	}
     }
 
 

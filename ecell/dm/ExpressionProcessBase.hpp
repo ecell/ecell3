@@ -1,3 +1,4 @@
+
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
 //        This file is part of E-Cell Simulation Environment package
@@ -120,12 +121,30 @@ LIBECS_DM_CLASS( ExpressionProcessBase, Process )
       return theExpression;
     }
 
-  virtual void defaultSetProperty( StringCref aPropertyName,
-				   PolymorphCref aValue )
+  void defaultSetProperty( StringCref aPropertyName,
+			   PolymorphCref aValue )
     {
       thePropertyMap[ aPropertyName ] = aValue.asReal();
+      
+      thePropertyVector.push_back( aPropertyName );
     } 
 
+  const Polymorph defaultGetProperty( StringCref aPropertyName ) const
+  {
+    PropertyMapConstIterator
+      aPropertyMapIterator( thePropertyMap.find( aPropertyName ) );
+
+    if( aPropertyMapIterator != thePropertyMap.end() )
+      {
+	return aPropertyMapIterator->second;
+      }
+    else
+      {
+	THROW_EXCEPTION( NoSlot, getClassNameString() +
+			 " : Property [" + aPropertyName +
+			 "] is not defined " );
+      }
+  }
 
   void compileExpression()
     {
@@ -141,6 +160,27 @@ LIBECS_DM_CLASS( ExpressionProcessBase, Process )
     {
       return thePropertyMap;
     }
+  
+  const Polymorph defaultGetPropertyList() const
+    {
+      return thePropertyVector;
+    }
+  
+  const Polymorph 
+    defaultGetPropertyAttributes( StringCref aPropertyName ) const
+    {
+      PolymorphVector aVector;
+      
+      Integer aValue( 1 );
+      
+      aVector.push_back( aValue );
+      aVector.push_back( aValue );
+      aVector.push_back( aValue );
+      aVector.push_back( aValue );
+      
+      return aVector;
+    }
+
 
   virtual void initialize()
     {
@@ -171,6 +211,8 @@ LIBECS_DM_CLASS( ExpressionProcessBase, Process )
   bool theRecompileFlag;
 
   PropertyMap thePropertyMap;
+
+  PolymorphVector thePropertyVector;
 };
 
 

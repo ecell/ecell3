@@ -119,12 +119,17 @@ public:\
  }\
  virtual const Polymorph getPropertyList() const\
  {\
-  return thePropertyInterface.getPropertyList();\
+  return thePropertyInterface.getPropertyList( *this );\
  }\
  virtual PropertySlotProxyPtr\
  createPropertySlotProxy( StringCref aPropertyName )\
  {\
   return thePropertyInterface.createPropertySlotProxy( *this, aPropertyName );\
+ }\
+ virtual const Polymorph\
+ getPropertyAttributes( StringCref aPropertyName ) const\
+ {\
+  return thePropertyInterface.getPropertyAttributes( *this, aPropertyName );\
  } //
 
 
@@ -312,15 +317,20 @@ public:\
 
     virtual const Polymorph getPropertyList() const = 0;
 
+    virtual const Polymorph 
+    getPropertyAttributes( StringCref aPropertyName ) const = 0;
+
     virtual void defaultSetProperty( StringCref aPropertyName, 
 				     PolymorphCref aValue );
-
+    
     virtual const Polymorph 
     defaultGetProperty( StringCref aPorpertyName ) const;
-
-    const Polymorph 
-    getPropertyAttributes( StringCref aPropertyName ) const;
     
+    virtual const Polymorph defaultGetPropertyList() const;
+    
+    virtual const Polymorph 
+    defaultGetPropertyAttributes( StringCref aPropertyName ) const;
+
     void registerLogger( LoggerPtr aLogger );
 
     void removeLogger( LoggerPtr aLogger );

@@ -42,31 +42,25 @@ namespace libecs
 
   ///////////////////////////// PropertiedClass
 
-  const Polymorph 
-  PropertiedClass::getPropertyAttributes( StringCref aPropertyName ) const
+  const Polymorph PropertiedClass::
+  defaultGetPropertyAttributes( StringCref aPropertyName ) const
   {
-    PropertySlotBasePtr aPropertySlotPtr( getPropertySlot( aPropertyName ) );
-    
-    PolymorphVector aVector;
-    
-    // is setable?
-    aVector.push_back( static_cast<Integer>( aPropertySlotPtr->isSetable() ) );
-    
-    // is getable?
-    aVector.push_back( static_cast<Integer>( aPropertySlotPtr->isGetable() ) );
-
-    // is getable?
-    aVector.push_back( static_cast<Integer>( aPropertySlotPtr->isLoadable() ) );
-
-    // is getable?
-    aVector.push_back( static_cast<Integer>( aPropertySlotPtr->isSavable() ) );
-    
-    return aVector;
+    THROW_EXCEPTION( NoSlot, 
+		     getClassName() + 
+		     String( ": No property slot [" )
+		     + aPropertyName + "].  Get property attributes failed." );
   }
 
+  const Polymorph 
+  PropertiedClass::defaultGetPropertyList() const
+  {
+    PolymorphVector aVector;
 
+    return aVector;
+  }
+  
   void PropertiedClass::defaultSetProperty( StringCref aPropertyName, 
-					     PolymorphCref aValue )
+					    PolymorphCref aValue )
   {
     THROW_EXCEPTION( NoSlot,
 		     getClassName() + 
@@ -82,8 +76,7 @@ namespace libecs
 		     String( ": No property slot [" )
 		     + aPropertyName + "].  Get property failed." );
   }
-
-
+  
   void PropertiedClass::registerLogger( LoggerPtr aLoggerPtr )
   {
     if( std::find( theLoggerVector.begin(), theLoggerVector.end(), aLoggerPtr )
