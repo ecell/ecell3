@@ -1,5 +1,6 @@
 #! /usr/bin/env python
 import string
+import eml
         
 class Session:
 
@@ -45,8 +46,11 @@ class Session:
     def printMessage( self, message ):
         self.thePrintMethod( message )
 
-    def loadModel( self, aModel ):
-        self.__thePreModel = aModel
+    def loadModel( self, aFileObject ):
+        anEmlParser = eml.EmlParser( aFileObject )
+        self.__thePreModel = anEmlParser.parse()
+        
+        #self.__thePreModel = aModel
 
         self.loadStepper()
         self.loadEntity()
