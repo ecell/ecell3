@@ -52,9 +52,10 @@ namespace libecs
 
     PropertySlot( StringCref name )
       :
-      theName( name ),
-      // FIXME: dummyLogger ?
-      theLogger( NULLPTR )
+      theName( name )
+      //      theName( name ),
+      //      // FIXME: dummyLogger ?
+      //      theLogger( NULLPTR )
     {
       ; // do nothing
     }
