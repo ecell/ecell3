@@ -1,42 +1,37 @@
-
-char const Stepper_C_rcsid[] = "$Id$";
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
-// 		This file is part of Serizawa (E-CELL Core System)
+//        This file is part of E-CELL Simulation Environment package
 //
-//	       written by Kouichi Takahashi  <shafi@sfc.keio.ac.jp>
-//
-//                              E-CELL Project,
-//                          Lab. for Bioinformatics,  
-//                             Keio University.
-//
-//             (see http://www.e-cell.org for details about E-CELL)
+//                Copyright (C) 1996-2000 Keio University
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
 //
-// Serizawa is free software; you can redistribute it and/or
+// E-CELL is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
 // License as published by the Free Software Foundation; either
 // version 2 of the License, or (at your option) any later version.
 // 
-// Serizawa is distributed in the hope that it will be useful,
+// E-CELL is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 // See the GNU General Public License for more details.
 // 
 // You should have received a copy of the GNU General Public
-// License along with Serizawa -- see the file COPYING.
+// License along with E-CELL -- see the file COPYING.
 // If not, write to the Free Software Foundation, Inc.,
 // 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 // 
 //END_HEADER
+//
+// written by Kouichi Takahashi <shafi@e-cell.org> at
+// E-CELL Project, Lab. for Bioinformatics, Keio University.
+//
 
 
 
 
 #include <exception>
-#include <typeinfo>
 #include "Stepper.h"
 #include "SystemMaker.h"
 //FIXME: #include "ecell/TimeManager.h"
@@ -55,127 +50,128 @@ void StepperMaker::makeClassList()
 
 ////////////////////////// Stepper
 
-Stepper::Stepper()
+Stepper::Stepper() : theOwner(NULL)
 {
-  _owner = NULL;
 
 }
 
-void Stepper::distributeIntegrator(IntegratorAllocator* allocator)
+void Stepper::distributeIntegrator( IntegratorAllocator* allocator )
 {
-  assert(_owner);
+  assert( theOwner );
   
-  SSystem* ssystem = dynamic_cast<SSystem*>(_owner);
-  if(ssystem)
-    for(SubstanceListIterator s = ssystem->firstSubstance();
-	s != ssystem->lastSubstance() ; ++s)
-      {
-	(*allocator)(*(s->second));
-      }
+  for( SubstanceListIterator s = theOwner->getFirstSubstanceIterator();
+       s != theOwner->getLastSubstanceIterator() ; ++s)
+    {
+      (*allocator)(*(s->second));
+    }
 }
 
 void Stepper::initialize()
 {
-  assert(_owner);
+  assert(theOwner);
 }
 
 ////////////////////////// MasterStepper
 
-MasterStepper::MasterStepper()
+MasterStepper::MasterStepper() 
+  :
+  thePace(1),
+  theAllocator(NULL)
 {
-  _pace = 1;
-  _allocator = NULL;
-  theRootSystem->stepperLeader().registerMasterStepper(this);  
+  theRootSystem->getStepperLeader().registerMasterStepper( this );
 }
 
 void MasterStepper::initialize()
 {
   Stepper::initialize();
-  registerSlaves(_owner);
+  registerSlaves( theOwner );
 
-  distributeIntegrator((IntegratorAllocator)_allocator);
+  distributeIntegrator( IntegratorAllocator( theAllocator ) );
 
-  for(SlaveStepperListIterator i = _slavesList.begin() ; 
-      i != _slavesList.end() ; ++i)
+  for( SlaveStepperListIterator i = theSlavesList.begin() ; 
+       i != theSlavesList.end() ; ++i )
     (*i)->initialize();
 }
 
 void MasterStepper::distributeIntegrator(IntegratorAllocator allocator)
 {
-  Stepper::distributeIntegrator(&allocator);
-  for(SlaveStepperListIterator i = _slavesList.begin() ; 
-      i != _slavesList.end() ; ++i)
-    (*i)->distributeIntegrator(&allocator);
+  Stepper::distributeIntegrator( &allocator );
+  for( SlaveStepperListIterator i = theSlavesList.begin() ; 
+       i != theSlavesList.end() ; ++i )
+    (*i)->distributeIntegrator( &allocator );
 }
 
 
 void MasterStepper::registerSlaves(System* system)
 {
-  MetaSystem* metasystem = dynamic_cast<MetaSystem*>(system);
-  if(metasystem)
+  for( SystemListIterator s = theOwner->getFirstSystemIterator() ;
+       s != theOwner->getLastSystemIterator() ; ++s )
     {
-      for(SystemListIterator s = metasystem->firstSystem() ;
-	  s != metasystem->lastSystem() ; s++)
+      SystemPtr aSystemPtr = s->second;
+      SlaveStepperPtr aSlaveStepperPtr;
+
+      //FIXME: handle bad_cast
+      if( ( aSlaveStepperPtr = 
+	    dynamic_cast< SlaveStepperPtr >( aSystemPtr->getStepper() ) ) )
 	{
-	  System* it = s->second;
-	  SlaveStepper* slave;
-	  if((slave = dynamic_cast<SlaveStepper*>(it->stepper())))
-	    {
-	      _slavesList.insert(_slavesList.end(),slave);
-	      slave->masterIs(this);
-	      registerSlaves(it);
+	  theSlavesList.insert( theSlavesList.end(), aSlaveStepperPtr );
+	  aSlaveStepperPtr->setMaster( this );
+	  registerSlaves( aSystemPtr );
 #ifdef DEBUG_STEPPER
-  cerr << "MasterStepper(on " << owner()->fqen() << "): registered " << it->fqen()  << endl;
+	  cerr << "MasterStepper(on " << owner()->fqen() << "): registered " << it->fqen()  << endl;
 #endif /* DEBUG_STEPPER */
-	    }
 	}
     }
 }
 
-Float MasterStepper::deltaT()
+Float MasterStepper::getDeltaT()
 {
-  return theRootSystem->stepperLeader().deltaT();
-
+  return theRootSystem->getStepperLeader().getDeltaT();
 }
 
 
 ////////////////////////// StepperLeader
 
-int StepperLeader::_DEFAULT_UPDATE_DEPTH(1);
+int StepperLeader::DEFAULT_UPDATE_DEPTH(1);
 
-StepperLeader::StepperLeader() : 
-_updateDepth(_DEFAULT_UPDATE_DEPTH),_baseClock(1)
+StepperLeader::StepperLeader() 
+  : 
+  theUpdateDepth( DEFAULT_UPDATE_DEPTH ),
+  theBaseClock( 1 )
 {
+  ; // do nothing
 }
 
-void StepperLeader::setBaseClock(int clock)
+void StepperLeader::setBaseClock( int clock )
 {
-  _baseClock = clock;
+  theBaseClock = clock;
 }
 
-Float StepperLeader::deltaT()
+Float StepperLeader::getDeltaT()
 {
-  //FIXME: return theTimeManager->stepInterval();
+  //FIXME: 
+  // return theTimeManager->stepInterval();
 }
 
 
-void StepperLeader::registerMasterStepper(MasterStepper* newone)
+void StepperLeader::registerMasterStepper( MasterStepperPtr newone )
 {
-  _stepperList.insert(pair<int,MasterStepper*>(newone->pace(),newone));
-  setBaseClock(lcm(newone->pace(),baseClock()));
+  theStepperList.insert( pair< int, MasterStepperPtr >( newone->getPace(),
+							newone ) );
+  setBaseClock( lcm( newone->getPace(), getBaseClock() ) );
 
 #ifdef DEBUG_STEPPER
   cerr << "registered new master stepper (pace: " << newone->pace() << ")." << endl;
-  cerr << "base clock: " << baseClock() << endl;
+  cerr << "base clock: " << getBaseClock() << endl;
 #endif  
 }
 
 void StepperLeader::initialize()
 {
-  for(MasterStepperMap::iterator it = _stepperList.begin();
-      it != _stepperList.end() ; it++)
+  for( MasterStepperMap::iterator i = theStepperList.begin();
+       i != theStepperList.end() ; i++)
     {
-      ((*it)).second->initialize();
+      (*i).second->initialize();
     }
 }
 
@@ -197,9 +193,9 @@ void StepperLeader::clear()
   cerr << "StepperLeader: clear()" << endl;
 #endif /* DEBUG_STEPPER */
 
-  for (MasterStepperMap::iterator it = _stepperList.begin();
-       it != _stepperList.end();++it)
-    it->second->clear();
+  for( MasterStepperMap::iterator i = theStepperList.begin();
+       i != theStepperList.end() ; ++i )
+    i->second->clear();
 }
 
 void StepperLeader::react()
@@ -208,9 +204,11 @@ void StepperLeader::react()
   cerr << "StepperLeader: react()" << endl;
 #endif /* DEBUG_STEPPER */
 
-  for(MasterStepperMap::iterator it = _stepperList.begin();
-      it != _stepperList.end(); it++)
-    (*it).second->react();
+  for( MasterStepperMap::iterator i = theStepperList.begin();
+       i != theStepperList.end(); i++ )
+    {
+      (*i).second->react();
+    }
 }
 
 void StepperLeader::transit()
@@ -219,9 +217,11 @@ void StepperLeader::transit()
   cerr << "StepperLeader: transit()" << endl;
 #endif /* DEBUG_STEPPER */
 
-  for (MasterStepperMap::iterator it = _stepperList.begin();
-       it != _stepperList.end();++it)
-    it->second->transit();
+  for( MasterStepperMap::iterator i = theStepperList.begin();
+       i != theStepperList.end(); ++i )
+    {
+      i->second->transit();
+    }
 
 }
 
@@ -231,22 +231,24 @@ void StepperLeader::postern()
   cerr << "StepperLeader: transit()" << endl;
 #endif /* DEBUG_STEPPER */
 
-  for (MasterStepperMap::iterator it = _stepperList.begin();
-       it != _stepperList.end();++it)
-    it->second->postern();
-
+  for( MasterStepperMap::iterator i = theStepperList.begin();
+       i != theStepperList.end(); ++i )
+    {
+      i->second->postern();
+    }
 }
 
 void StepperLeader::update()
 {
-  for(int i = _updateDepth ; i > 0 ; i--)
+  for( int i = theUpdateDepth ; i > 0 ; --i )
     {
-      for (MasterStepperMap::iterator it = _stepperList.begin();
-	   it != _stepperList.end();++it)
-	it->second->postern();
+      for (MasterStepperMap::iterator i = theStepperList.begin();
+	   i != theStepperList.end(); ++i )
+	{
+	  i->second->postern();
+	}
     }
 }
-
 
 ////////////////////////// SlaveStepper
 
@@ -262,27 +264,27 @@ void SlaveStepper::initialize()
 
 void SlaveStepper::clear()
 {
-  _owner->clear();
+  theOwner->clear();
 }
 
 void SlaveStepper::react()
 {
-  _owner->react();
+  theOwner->react();
 }
 
 void SlaveStepper::turn()
 {
-  _owner->turn();
+  theOwner->turn();
 }
 
 void SlaveStepper::transit()
 {
-  _owner->transit();
+  theOwner->transit();
 }
 
 void SlaveStepper::postern()
 {
-  _owner->postern();
+  theOwner->postern();
 }
 
 
@@ -290,12 +292,12 @@ void SlaveStepper::postern()
 
 Eular1Stepper::Eular1Stepper()
 {
-  _allocator = (IntegratorAllocator)&Eular1Stepper::newEular1;
+  theAllocator = IntegratorAllocator( &Eular1Stepper::newEular1 );
 }
 
-Integrator* Eular1Stepper::newEular1(Substance& substance)
+IntegratorPtr Eular1Stepper::newEular1( SubstanceRef substance )
 {
-  return new Eular1Integrator(substance);
+  return new Eular1Integrator( substance );
 }
 
 void Eular1Stepper::initialize()
@@ -308,10 +310,12 @@ void Eular1Stepper::clear()
 #ifdef DEBUG_STEPPER
   cerr << "Eular1Stepper: clear()" << endl;
 #endif /* DEBUG_STEPPER */
-  _owner->clear();
-  for(SlaveStepperListIterator i = _slavesList.begin() ; 
-      i != _slavesList.end() ; ++i)
-    (*i)->clear();
+  theOwner->clear();
+  for( SlaveStepperListIterator i = theSlavesList.begin() ; 
+       i != theSlavesList.end() ; ++i )
+    {
+      (*i)->clear();
+    }
 }
 
 void Eular1Stepper::react()
@@ -320,19 +324,21 @@ void Eular1Stepper::react()
   cerr << "Eular1Stepper: react()" << endl;
 #endif /* DEBUG_STEPPER */
 
-  _owner->react();
-  for(SlaveStepperListIterator i = _slavesList.begin() ; 
-      i != _slavesList.end() ; ++i)
+  theOwner->react();
+  for( SlaveStepperListIterator i = theSlavesList.begin() ; 
+       i != theSlavesList.end() ; ++i )
     {
 #ifdef DEBUG_STEPPER
       cerr << "react slaves: owner: "<< (*i)->owner()->entryname() << endl;
 #endif /* DEBUG_STEPPER */
       (*i)->react();
     }
-  _owner->turn();
-  for(SlaveStepperListIterator i = _slavesList.begin() ; 
-      i != _slavesList.end() ; ++i)
-    (*i)->turn();
+  theOwner->turn();
+  for( SlaveStepperListIterator i = theSlavesList.begin() ; 
+       i != theSlavesList.end() ; ++i )
+    {
+      (*i)->turn();
+    }
 }
 
 void Eular1Stepper::transit()
@@ -340,9 +346,9 @@ void Eular1Stepper::transit()
 #ifdef DEBUG_STEPPER
   cerr << "Eular1Stepper: transit()" << endl;
 #endif /* DEBUG_STEPPER */
-  _owner->transit();
-  for(SlaveStepperListIterator i = _slavesList.begin() ; 
-      i != _slavesList.end() ; ++i)
+  theOwner->transit();
+  for( SlaveStepperListIterator i = theSlavesList.begin() ; 
+       i != theSlavesList.end() ; ++i )
     {
       (*i)->transit();
     }
@@ -353,9 +359,9 @@ void Eular1Stepper::postern()
 #ifdef DEBUG_STEPPER
   cerr << "Eular1Stepper: transit()" << endl;
 #endif /* DEBUG_STEPPER */
-  _owner->postern();
-  for(SlaveStepperListIterator i = _slavesList.begin() ; 
-      i != _slavesList.end() ; ++i)
+  theOwner->postern();
+  for( SlaveStepperListIterator i = theSlavesList.begin() ; 
+       i != theSlavesList.end() ; ++i )
     {
       (*i)->postern();
     }
@@ -366,12 +372,12 @@ void Eular1Stepper::postern()
 
 RungeKutta4Stepper::RungeKutta4Stepper()
 {
-  _allocator = (IntegratorAllocator)&RungeKutta4Stepper::newRungeKutta4;
+  theAllocator = IntegratorAllocator( &RungeKutta4Stepper::newRungeKutta4 ); 
 }
 
-Integrator* RungeKutta4Stepper::newRungeKutta4(Substance& substance)
+IntegratorPtr RungeKutta4Stepper::newRungeKutta4( SubstanceRef substance )
 {
-  return new RungeKutta4Integrator(substance);
+  return new RungeKutta4Integrator( substance );
 }
 
 void RungeKutta4Stepper::initialize()
@@ -381,69 +387,100 @@ void RungeKutta4Stepper::initialize()
 
 void RungeKutta4Stepper::clear()
 {
-  _owner->clear();
-  for(SlaveStepperListIterator i = _slavesList.begin() ; 
-      i != _slavesList.end() ; ++i)
-    (*i)->clear();
+  theOwner->clear();
+  for( SlaveStepperListIterator i = theSlavesList.begin() ; 
+       i != theSlavesList.end() ; ++i )
+    {
+      (*i)->clear();
+    }
 }
 
 void RungeKutta4Stepper::react()
 {
   // 1
-  _owner->react();
-  for(SlaveStepperListIterator i = _slavesList.begin() ; 
-      i != _slavesList.end() ; ++i)
-    (*i)->react();
-  _owner->turn();
-  for(SlaveStepperListIterator i = _slavesList.begin() ; 
-      i != _slavesList.end() ; ++i)
-    (*i)->turn();
+  theOwner->react();
+  for( SlaveStepperListIterator i = theSlavesList.begin() ; 
+       i != theSlavesList.end() ; ++i )
+    {
+      (*i)->react();
+    }
+  theOwner->turn();
+  for( SlaveStepperListIterator i = theSlavesList.begin() ; 
+       i != theSlavesList.end() ; ++i )
+    {
+      (*i)->turn();
+    }
 
   // 2
-  _owner->react();
-  for(SlaveStepperListIterator i = _slavesList.begin() ; 
-      i != _slavesList.end() ; ++i)
-    (*i)->react();
-  _owner->turn();
-  for(SlaveStepperListIterator i = _slavesList.begin() ; 
-      i != _slavesList.end() ; ++i)
-    (*i)->turn();
+  theOwner->react();
+  for( SlaveStepperListIterator i = theSlavesList.begin() ; 
+       i != theSlavesList.end() ; ++i )
+    {
+      (*i)->react();
+    }
+  theOwner->turn();
+  for( SlaveStepperListIterator i = theSlavesList.begin() ; 
+       i != theSlavesList.end() ; ++i )
+    {
+      (*i)->turn();
+    }
 
   // 3
-  _owner->react();
-  for(SlaveStepperListIterator i = _slavesList.begin() ; 
-      i != _slavesList.end() ; ++i)
-    (*i)->react();
-  _owner->turn();
-  for(SlaveStepperListIterator i = _slavesList.begin() ; 
-      i != _slavesList.end() ; ++i)
-    (*i)->turn();
+  theOwner->react();
+  for( SlaveStepperListIterator i = theSlavesList.begin() ; 
+       i != theSlavesList.end() ; ++i )
+    {
+      (*i)->react();
+    }
+  theOwner->turn();
+  for( SlaveStepperListIterator i = theSlavesList.begin() ; 
+       i != theSlavesList.end() ; ++i )
+    {
+      (*i)->turn();
+    }
 
   // 4
-  _owner->react();
-  for(SlaveStepperListIterator i = _slavesList.begin() ; 
-      i != _slavesList.end() ; ++i)
-    (*i)->react();
-  _owner->turn();
-  for(SlaveStepperListIterator i = _slavesList.begin() ; 
-      i != _slavesList.end() ; ++i)
-    (*i)->turn();
+  theOwner->react();
+  for( SlaveStepperListIterator i = theSlavesList.begin() ; 
+       i != theSlavesList.end() ; ++i )
+    {
+      (*i)->react();
+    }
+  theOwner->turn();
+  for( SlaveStepperListIterator i = theSlavesList.begin() ; 
+       i != theSlavesList.end() ; ++i )
+    {
+      (*i)->turn();
+    }
 }
 
 void RungeKutta4Stepper::transit()
 {
-  _owner->transit();
-  for(SlaveStepperListIterator i = _slavesList.begin() ; 
-      i != _slavesList.end() ; ++i)
-    (*i)->transit();
+  theOwner->transit();
+  for( SlaveStepperListIterator i = theSlavesList.begin() ; 
+       i != theSlavesList.end() ; ++i )
+    {
+      (*i)->transit();
+    }
 }
 
 void RungeKutta4Stepper::postern()
 {
-  _owner->postern();
-  for(SlaveStepperListIterator i = _slavesList.begin() ; 
-      i != _slavesList.end() ; ++i)
+  theOwner->postern();
+  for( SlaveStepperListIterator i = theSlavesList.begin() ; 
+       i != theSlavesList.end() ; ++i )
     {
       (*i)->postern();
     }
 }
+
+
+
+
+/*
+  Do not modify
+  $Author$
+  $Revision$
+  $Date$
+  $Locker$
+*/

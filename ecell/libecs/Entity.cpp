@@ -1,36 +1,32 @@
-
-char const Entity_C_rcsid[] = "$Id$";
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
-// 		This file is part of Serizawa (E-CELL Core System)
+//        This file is part of E-CELL Simulation Environment package
 //
-//	       written by Kouichi Takahashi  <shafi@sfc.keio.ac.jp>
-//
-//                              E-CELL Project,
-//                          Lab. for Bioinformatics,  
-//                             Keio University.
-//
-//             (see http://www.e-cell.org for details about E-CELL)
+//                Copyright (C) 1996-2000 Keio University
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
 //
-// Serizawa is free software; you can redistribute it and/or
+// E-CELL is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
 // License as published by the Free Software Foundation; either
 // version 2 of the License, or (at your option) any later version.
 // 
-// Serizawa is distributed in the hope that it will be useful,
+// E-CELL is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 // See the GNU General Public License for more details.
 // 
 // You should have received a copy of the GNU General Public
-// License along with Serizawa -- see the file COPYING.
+// License along with E-CELL -- see the file COPYING.
 // If not, write to the Free Software Foundation, Inc.,
 // 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 // 
 //END_HEADER
+//
+// written by Kouichi Takahashi <shafi@e-cell.org> at
+// E-CELL Project, Lab. for Bioinformatics, Keio University.
+//
 
 
 
@@ -44,7 +40,7 @@ char const Entity_C_rcsid[] = "$Id$";
 
 
 Entity::Entity()
-: _supersystem(NULL),_entryname(""),_name("") 
+: theSupersystem(NULL),theId(""),theName("") 
 {
   makeSlots();
 }
@@ -52,71 +48,68 @@ Entity::Entity()
 
 Entity::~Entity()
 {
-  makeSlots();
+  ; // do nothing
 }
 
 void Entity::makeSlots()
 {
-  // empty
-
+  ; // do nothing
 }
 
-Float Entity::activity() 
+Float Entity::getActivity() 
 {
-//FIXME:   *theMessageWindow << "warning: request for activity from " << className() 
-//FIXME:     << " [" << entryname() << "] which have no activity function defined.\n";
   return 0;
 }
 
-Float Entity::activityPerSec() 
+Float Entity::getActivityPerSecond() 
 {
-  return (activity()  / supersystem()->stepper()->deltaT());
+  return ( getActivity()  / getSupersystem()->getStepper()->getDeltaT() );
 }
 
-const string Entity::fqen() const
+const String Entity::getFqin() const
 {
-  string fqen = systemPath();
-  if(fqen != "")
-    fqen += ":";
-  fqen += entryname();
+  String aFqin = getSystemPath();
+  if( aFqin != "" )
+    {
+      aFqin += ":";
+    }
+  aFqin += getId();
 
-  return fqen;
+  return aFqin;
 }
 
-const string Entity::fqpn() const
+const String Entity::getFqpn() const
 {
-  return Primitive::PrimitiveTypeString(Primitive::ENTITY) + ":" + fqen();
+  return Primitive::PrimitiveTypeString( Primitive::ENTITY ) + 
+    ":" + getFqin();
 }
 
-const string Entity::systemPath() const
+const String Entity::getSystemPath() const
 {
-  if(!supersystem())
-    return "";
+  if( !getSupersystem() )
+    {
+      return "";
+    }
 
-  string systempath = supersystem()->systemPath(); 
-  if(systempath != "" && systempath != "/")
-    systempath += SystemPath::DELIMITER;      
-  systempath += supersystem()->entryname(); 
+  String aSystemPath = getSupersystem()->getSystemPath(); 
 
+  if( aSystemPath != "" )
+    {
+      if( aSystemPath != "/" )
+	{
+	  aSystemPath += SystemPath::DELIMITER;
+	}
+    }
 
-  return systempath;
+  aSystemPath += getSupersystem()->getId();
+
+  return aSystemPath;
 }
-
-
 
 /*
-void Entity::setSupersystem(const string& supersystem)
-{
-  System* s;
-  try {
-    s = theRootSystem->name2System(supersystem);
-    }
-  catch(MetaSystem::CantFindSystem& e)
-    {
-//FIXME:       *theMessageWindow << __PRETTY_FUNCTION__ << ": " 
-//FIXME: 	<< e.message() << "\n";
-      return;
-    }
-  setSupersystem(s);
-}
+  Do not modify
+  $Author$
+  $Revision$
+  $Date$
+  $Locker$
 */

@@ -1,84 +1,51 @@
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
-// 		This file is part of Serizawa (E-CELL Core System)
+//        This file is part of E-CELL Simulation Environment package
 //
-//	       written by Kouichi Takahashi  <shafi@sfc.keio.ac.jp>
-//
-//                              E-CELL Project,
-//                          Lab. for Bioinformatics,  
-//                             Keio University.
-//
-//             (see http://www.e-cell.org for details about E-CELL)
+//                Copyright (C) 1996-2000 Keio University
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
 //
-// Serizawa is free software; you can redistribute it and/or
+// E-CELL is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
 // License as published by the Free Software Foundation; either
 // version 2 of the License, or (at your option) any later version.
 // 
-// Serizawa is distributed in the hope that it will be useful,
+// E-CELL is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 // See the GNU General Public License for more details.
 // 
 // You should have received a copy of the GNU General Public
-// License along with Serizawa -- see the file COPYING.
+// License along with E-CELL -- see the file COPYING.
 // If not, write to the Free Software Foundation, Inc.,
 // 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 // 
 //END_HEADER
-
-
-
-
+//
+// written by Kouichi Takahashi <shafi@e-cell.org> at
+// E-CELL Project, Lab. for Bioinformatics, Keio University.
+//
 
 #ifndef ___ROOTSYSTEM_H___
 #define ___ROOTSYSTEM_H___
-#include <stl.h>
-#include <fstream.h>
 #include "System.h"
 #include "Primitive.h"
-//#include "CDS.h"
-
-class Cell;
-class System;
-class Environment;
-class ReactorMaker;
-class SubstanceMaker;
-class SystemMaker;
-class StepperMaker;
-class AccumulatorMaker;
-class StepperLeader;
 
 
-class RootSystem : public MetaSystem
+class RootSystem : public System
 {
+
 public:
 
   class MalformedSystemName : public NotFound
     {
     public:
-      MalformedSystemName(const string& method,const string& message) 
-	: NotFound(method,message) {}
-      const string what() const {return "Malformed system name.";}
+      MalformedSystemName( StringCref method, StringCref message ) 
+	: NotFound( method, message ) {}
+      const String what() const { return "Malformed system name."; }
     };
-
-private:
-
-//  Cell* _Cell;
-//  Environment* _Environment;
-
-  void install();
-
-  StepperLeader& _stepperLeader;
-
-  ReactorMaker& _reactorMaker;
-  SubstanceMaker& _substanceMaker;
-  SystemMaker& _systemMaker;
-  StepperMaker& _stepperMaker;
-  AccumulatorMaker& _accumulatorMaker;
 
 public:
 
@@ -87,29 +54,48 @@ public:
 
   int check();
 
-  System* findSystem(const SystemPath& systempath) throw(NotFound,
-							 MalformedSystemName);
-  Primitive getPrimitive(const FQPN& fqpn) throw(UnmatchedSystemClass,
-						 InvalidPrimitiveType,
-						 NotFound);
+  SystemPtr getSystem( SystemPathCref systempath )
+    throw( NotFound, MalformedSystemName );
+  Primitive getPrimitive( FQPNCref fqpn ) 
+    throw( InvalidPrimitiveType, NotFound );
 
   virtual void initialize();
 
-  StepperLeader& stepperLeader() const   {return _stepperLeader;}
+  StepperLeaderRef    getStepperLeader()    const { return theStepperLeader; }
 
-  ReactorMaker& reactorMaker() const     {return _reactorMaker;}
-  SubstanceMaker& substanceMaker() const {return _substanceMaker;}
-  SystemMaker& systemMaker() const       {return _systemMaker;}
-  StepperMaker& stepperMaker() const     {return _stepperMaker;}
-  AccumulatorMaker& accumulatorMaker() const {return _accumulatorMaker;}
+  ReactorMakerRef     reactorMaker()     const { return theReactorMaker; }
+  SubstanceMakerRef   substanceMaker()   const { return theSubstanceMaker; }
+  SystemMakerRef      systemMaker()      const { return theSystemMaker; }
+  StepperMakerRef     stepperMaker()     const { return theStepperMaker; }
+  AccumulatorMakerRef accumulatorMaker() const { return theAccumulatorMaker; }
 
-  /// only the Application can instantiate RootSystem.
-  System* instance() { return NULL; }
-  virtual const char* const className() const {return "RootSystem";}
+  virtual const char* const className() const { return "RootSystem"; }
+
+private:
+
+  void install();
+
+private:
+
+  StepperLeaderRef theStepperLeader;
+
+  ReactorMakerRef theReactorMaker;
+  SubstanceMakerRef theSubstanceMaker;
+  SystemMakerRef theSystemMaker;
+  StepperMakerRef theStepperMaker;
+  AccumulatorMakerRef theAccumulatorMaker;
+
 };
 
-extern RootSystem *theRootSystem;
+extern RootSystemPtr theRootSystem;
 
 #endif /* ___ROOTSYSTEM_H___ */
 
 
+/*
+  Do not modify
+  $Author$
+  $Revision$
+  $Date$
+  $Locker$
+*/

@@ -1,41 +1,33 @@
-
-char const Reactor_C_rcsid[] = "$Id$";
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
-// 		This file is part of Serizawa (E-CELL Core System)
+//        This file is part of E-CELL Simulation Environment package
 //
-//	       written by Kouichi Takahashi  <shafi@sfc.keio.ac.jp>
-//
-//                              E-CELL Project,
-//                          Lab. for Bioinformatics,  
-//                             Keio University.
-//
-//             (see http://www.e-cell.org for details about E-CELL)
+//                Copyright (C) 1996-2000 Keio University
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
 //
-// Serizawa is free software; you can redistribute it and/or
+// E-CELL is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
 // License as published by the Free Software Foundation; either
 // version 2 of the License, or (at your option) any later version.
 // 
-// Serizawa is distributed in the hope that it will be useful,
+// E-CELL is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 // See the GNU General Public License for more details.
 // 
 // You should have received a copy of the GNU General Public
-// License along with Serizawa -- see the file COPYING.
+// License along with E-CELL -- see the file COPYING.
 // If not, write to the Free Software Foundation, Inc.,
 // 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 // 
 //END_HEADER
+//
+// written by Kouichi Takahashi <shafi@e-cell.org> at
+// E-CELL Project, Lab. for Bioinformatics, Keio University.
+//
 
-
-
-
-//FIXME: #include "ecell/MessageWindow.h"
 #include "Reactant.h"
 #include "RootSystem.h"
 #include "Stepper.h"
@@ -43,136 +35,145 @@ char const Reactor_C_rcsid[] = "$Id$";
 
 #include "Reactor.h"
 
-Reactor::Condition Reactor::_globalCondition;// = Reactor::Condition::Good;
-const char* Reactor::LIGAND_STRING_TABLE[] = {"substrate","product","catalyst"
-					"effector",NULL};
+Reactor::Condition Reactor::theGlobalCondition;// = Reactor::Condition::Good;
+const char* Reactor::LIGAND_STRING_TABLE[] = 
+{ 
+  "substrate", 
+    "product", 
+    "catalyst", 
+    "effector", 
+    NULL 
+    };
 
 void Reactor::makeSlots()
 {
-  // No get methods for them. They should be get by 
-  // usual methods like substrate(int).
-  MessageSlot("Substrate",Reactor,*this,&Reactor::setSubstrate,NULL);
-  MessageSlot("Product",Reactor,*this,&Reactor::setProduct,NULL);
-  MessageSlot("Catalyst",Reactor,*this,&Reactor::setCatalyst,NULL);
-  MessageSlot("Effector",Reactor,*this,&Reactor::setEffector,NULL);
-  MessageSlot("InitialActivity",Reactor,*this,&Reactor::setInitialActivity,
-	      &Reactor::getInitialActivity);
+  //FIXME: get methods
+  MessageSlot( "Substrate",Reactor,*this,&Reactor::setSubstrate,NULL );
+  MessageSlot( "Product",Reactor,*this,&Reactor::setProduct,NULL );
+  MessageSlot( "Catalyst",Reactor,*this,&Reactor::setCatalyst,NULL );
+  MessageSlot( "Effector",Reactor,*this,&Reactor::setEffector,NULL );
+  MessageSlot( "InitialActivity",Reactor,*this,&Reactor::setInitialActivity,
+	       &Reactor::getInitialActivity );
 }
 
-void Reactor::setSubstrate(const Message& message)
+void Reactor::setSubstrate( MessageCref message )
 {
-  setSubstrate(message.body(0),asInt(message.body(1)));
+  setSubstrate( message.getBody( 0 ), asInt( message.getBody( 1 ) ) );
 }
 
-void Reactor::setProduct(const Message& message)
+void Reactor::setProduct( MessageCref message )
 {
-  setProduct(message.body(0),asInt(message.body(1)));
+  setProduct( message.getBody( 0 ), asInt( message.getBody( 1 ) ) );
 }
 
-void Reactor::setCatalyst(const Message& message)
+void Reactor::setCatalyst( MessageCref message )
 {
-  setCatalyst(message.body(0),asInt(message.body(1)));
+  setCatalyst( message.getBody( 0 ), asInt( message.getBody( 1 ) ) );
 }
 
-void Reactor::setEffector(const Message& message)
+void Reactor::setEffector( MessageCref message )
 {
-  setEffector(message.body(0),asInt(message.body(1)));
+  setEffector( message.getBody( 0 ), asInt( message.getBody( 1 ) ) );
 }
 
-void Reactor::setInitialActivity(const Message& message)
+void Reactor::setInitialActivity( MessageCref message )
 {
-  setInitialActivity(asFloat(message.body(0)));
+  setInitialActivity( asFloat( message.getBody() ) );
 }
 
-const Message Reactor::getInitialActivity(const string& keyword)
+const Message Reactor::getInitialActivity( StringCref keyword )
 {
-  return Message(keyword,_initialActivity);
+  return Message( keyword, theInitialActivity );
 }
 
-void Reactor::setSubstrate(const FQEN& fqen,int coefficient)
+void Reactor::setSubstrate( FQINCref fqin, int coefficient )
 {
-  FQPN fqpn(Primitive::SUBSTANCE,fqen);
-  Primitive p = theRootSystem->getPrimitive(fqpn);
+  FQPN fqpn( Primitive::SUBSTANCE, fqin );
+  Primitive aPrimitive = theRootSystem->getPrimitive( fqpn );
   
-  addSubstrate(*(p.substance),coefficient);
+  addSubstrate( *(aPrimitive.substance), coefficient );
 }
 
-void Reactor::setProduct(const FQEN& fqen,int coefficient)
+void Reactor::setProduct( FQINCref fqin, int coefficient )
 {
-  FQPN fqpn(Primitive::SUBSTANCE,fqen);
-  Primitive p = theRootSystem->getPrimitive(fqpn);
+  FQPN fqpn( Primitive::SUBSTANCE, fqin );
+  Primitive aPrimitive = theRootSystem->getPrimitive( fqpn );
   
-  addProduct(*(p.substance),coefficient);
+  addProduct( *(aPrimitive.substance), coefficient );
 }
 
-void Reactor::setCatalyst(const FQEN& fqen,int coefficient)
+void Reactor::setCatalyst( FQINCref fqin,int coefficient)
 {
-  FQPN fqpn(Primitive::SUBSTANCE,fqen);
-  Primitive p = theRootSystem->getPrimitive(fqpn);
+  FQPN fqpn( Primitive::SUBSTANCE, fqin );
+  Primitive aPrimitive = theRootSystem->getPrimitive( fqpn );
   
-  addCatalyst(*(p.substance),coefficient);
+  addCatalyst( *(aPrimitive.substance), coefficient );
 }
 
-void Reactor::setEffector(const FQEN& fqen,int coefficient)
+void Reactor::setEffector( FQINCref fqin, int coefficient )
 {
-  FQPN fqpn(Primitive::SUBSTANCE,fqen);
-  Primitive p = theRootSystem->getPrimitive(fqpn);
+  FQPN fqpn( Primitive::SUBSTANCE, fqin );
+  Primitive aPrimitive = theRootSystem->getPrimitive( fqpn );
   
-  addEffector(*(p.substance),coefficient);
+  addEffector( *(aPrimitive.substance), coefficient );
 }
 
-void Reactor::setInitialActivity(Float activity)
+void Reactor::setInitialActivity( Float activity )
 {
-  _initialActivity = activity;
-//  _activity= activity * supersystem()->stepper()->deltaT();
-  _activity= activity * theRootSystem->stepperLeader().deltaT();
+  theInitialActivity = activity;
+//  theActivity= activity * supersystem()->stepper()->deltaT();
+  theActivity= activity * theRootSystem->getStepperLeader().getDeltaT();
 }
 
 Reactor::Reactor() 
-:_initialActivity(0),_activityBuffer(0),_condition(Premature),_activity(0)
+  :
+  theInitialActivity( 0 ),
+  theActivityBuffer( 0 ),
+  theCondition( Premature ),
+  theActivity( 0 )
 {
   makeSlots();
 }
 
-const string Reactor::fqpn() const
+const String Reactor::getFqpn() const
 {
-  return Primitive::PrimitiveTypeString(Primitive::REACTOR) + ":" + fqen();
+  return Primitive::PrimitiveTypeString( Primitive::REACTOR ) 
+    + ":" + getFqin();
 }
 
-void Reactor::addSubstrate(Substance& substrate,int coefficient)
+void Reactor::addSubstrate( SubstanceRef substrate, int coefficient )
 {
-  Reactant* reactant = new Reactant(substrate,coefficient);
-  _substrateList.insert(_substrateList.end(),reactant);
+  ReactantPtr reactant = new Reactant( substrate, coefficient );
+  theSubstrateList.insert( theSubstrateList.end(), reactant );
 }
 
-void Reactor::addProduct(Substance& product,int coefficient)
+void Reactor::addProduct( SubstanceRef product, int coefficient )
 {
-  Reactant* reactant = new Reactant(product,coefficient);
-  _productList.insert(_productList.end(),reactant);
+  ReactantPtr reactant = new Reactant( product, coefficient );
+  theProductList.insert( theProductList.end(), reactant );
 }
 
-void Reactor::addCatalyst(Substance& catalyst,int coefficient)
+void Reactor::addCatalyst( SubstanceRef catalyst, int coefficient )
 {
-  Reactant* reactant = new Reactant(catalyst,coefficient);
-  _catalystList.insert(_catalystList.end(),reactant);
+  ReactantPtr reactant = new Reactant( catalyst, coefficient );
+  theCatalystList.insert( theCatalystList.end(), reactant );
 }
 
-void Reactor::addEffector(Substance& effector,int coefficient)
+void Reactor::addEffector( SubstanceRef effector, int coefficient )
 {
-  Reactant* reactant = new Reactant(effector,coefficient);
-  _effectorList.insert(_effectorList.end(),reactant);
+  ReactantPtr reactant = new Reactant( effector, coefficient );
+  theEffectorList.insert( theEffectorList.end(), reactant );
 }
 
-Reactor::Condition Reactor::condition(Condition condition)
+Reactor::Condition Reactor::condition( Condition condition )
 {
-  _condition = static_cast<Condition>(_condition | condition);
-  if(_condition  != Good)
-    return _globalCondition = Bad;
+  theCondition = static_cast<Condition>( theCondition | condition );
+  if( theCondition  != Good )
+    return theGlobalCondition = Bad;
   return Good;
 }
 
-
-void Reactor::warning(const string& message)
+void Reactor::warning( StringCref message )
 {
 //FIXME:   *theMessageWindow << className() << " [" << fqen() << "]";
 //FIXME:   *theMessageWindow << ":\n\t" << message << "\n";
@@ -180,26 +181,35 @@ void Reactor::warning(const string& message)
 
 void Reactor::initialize()
 {
-  if(numSubstrate() > maxSubstrate())
+  if( getNumberOfSubstrates() > getMaximumNumberOfSubstrates() )
     warning("too many substrates.");
-  else if(numSubstrate() < minSubstrate())
+  else if( getNumberOfSubstrates() < getMinimumNumberOfSubstrates() )
     warning("too few substrates.");
-  if(numProduct() > maxProduct())
+  if( getNumberOfProducts() > getMaximumNumberOfProducts() )
     warning("too many products.");
-  else if(numProduct() < minProduct())
+  else if( getNumberOfProducts() < getMinimumNumberOfProducts() )
     warning("too few products.");
-  if(numCatalyst() > maxCatalyst())
+  if( getNumberOfCatalysts() > getMaximumNumberOfCatalysts() )
     warning("too many catalysts.");
-  else if(numCatalyst() < minCatalyst())
+  else if( getNumberOfCatalysts() < getMinimumNumberOfCatalysts() )
     warning("too few catalysts.");
-  if(numEffector() > maxEffector())
+  if( getNumberOfEffectors() > getMaximumNumberOfEffectors() )
     warning("too many effectors.");
-  else if(numEffector() < minEffector())
+  else if( getNumberOfEffectors() < getMinimumNumberOfEffectors() )
     warning("too few effectors.");
 }
 
 
-Float Reactor::activity() 
+Float Reactor::getActivity() 
 {
-  return _activity;
+  return theActivity;
 }
+
+
+/*
+  Do not modify
+  $Author$
+  $Revision$
+  $Date$
+  $Locker$
+*/

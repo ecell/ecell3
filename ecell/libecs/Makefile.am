@@ -17,7 +17,6 @@ Accumulators.C\
 Integrators.C\
 RootSystem.C\
 SubstanceMaker.C\
-CellComponents.C\
 Primitive.C\
 Stepper.C\
 System.C\

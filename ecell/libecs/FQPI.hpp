@@ -1,38 +1,32 @@
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
-// 		This file is part of Serizawa (E-CELL Core System)
+//        This file is part of E-CELL Simulation Environment package
 //
-//	       written by Kouichi Takahashi  <shafi@sfc.keio.ac.jp>
-//
-//                              E-CELL Project,
-//                          Lab. for Bioinformatics,  
-//                             Keio University.
-//
-//             (see http://www.e-cell.org for details about E-CELL)
+//                Copyright (C) 1996-2000 Keio University
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
 //
-// Serizawa is free software; you can redistribute it and/or
+// E-CELL is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
 // License as published by the Free Software Foundation; either
 // version 2 of the License, or (at your option) any later version.
 // 
-// Serizawa is distributed in the hope that it will be useful,
+// E-CELL is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 // See the GNU General Public License for more details.
 // 
 // You should have received a copy of the GNU General Public
-// License along with Serizawa -- see the file COPYING.
+// License along with E-CELL -- see the file COPYING.
 // If not, write to the Free Software Foundation, Inc.,
 // 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 // 
 //END_HEADER
-
-
-
-
+//
+// written by Kouichi Takahashi <shafi@e-cell.org> at
+// E-CELL Project, Lab. for Bioinformatics, Keio University.
+//
 
 #ifndef ___FQPN_H___
 #define ___FQPN_H___
@@ -41,164 +35,181 @@
 #include "Exceptions.h"
 #include "Primitive.h"
 
-/*! 
+/** 
   SystemPath 
   */
 class SystemPath {
+
 public:
 
   static const char DELIMITER = '/';
-
 
   // exceptions.
 
   class SystemPathException : public Exception
     { 
     public: 
-      SystemPathException(const string& method,const string& what) 
-	: Exception(method,what) {} 
-      const string what() const {return "";}
+      SystemPathException( StringCref method, StringCref what ) 
+	: Exception( method, what ) {} 
+      const String what() const { return ""; }
     };
   class BadSystemPath : public SystemPathException
     { 
     public: 
-      BadSystemPath(const string& method,const string& what) 
-	: SystemPathException(method,what) {} 
-      const string what() const {return "Bad SystemPath.";}
+      BadSystemPath( StringCref method, StringCref what ) 
+	: SystemPathException( method, what ) {} 
+      const String what() const { return "Bad SystemPath."; }
     };
-
-
-private:
-
-
-protected:
-
-  /*!
-    Standardize a SystemPath. (i.e. convert RQSN -> FQSN)
-    Reduce '..'s and remove trailing white spaces.
-
-    \return reference to the systempath
-    */
-  void standardize();
-
-  const string _systempath;
-  SystemPath() {}
 
 public:
 
-  SystemPath(const string& systempath);
+  SystemPath( StringCref systempath = "" );
   virtual ~SystemPath() {}
 
-  const string& systemPathString() const {return _systempath;}
-//  virtual const string string() const {return systemPathString();}
+  StringCref getSystemPath() const { return theSystemPath; }
+  virtual const String getString() const { return getSystemPath(); }
 
-  virtual operator string() const {return systemPathString();}
+  virtual operator String() const { return getString(); }
 
-  /*!
-    Extract the first system name. Implicitly standardize given string.
-    \return Pointer to static char[]. Valid until next call.
+  /**
+    Extract the first system name. Standardize given string.
+    @return name of the first system
     */
-  const string first() const;
-  /*!
-    Extract the last system name. Implicitly standardize given string.
+  const String first() const;
 
-    \return Pointer to the last system name in given systempath.
+  /**
+    Extract the last system name. Standardize given string.
+
+    @return name of the last system in given systempath.
     */
-  const string last() const;
-  /*!
-    Remove the first system name. Implicitly standardize given string.
-    \return
+  const String last() const;
+  /**
+    Remove the first system name. Standardize given string.
+    @return
     */
   SystemPath next() const;
 
-};
+protected:
 
-/*!
-  FQEN(Fully Qualified EntryName)
+  /**
+    Standardize a SystemPath. (i.e. convert RQSN -> FQSN)
+    Reduce '..'s and remove trailing white spaces.
 
-  The Entryname is a identifier of Entity objects.  Given a Primitive type,
-  one can identify unique Entity in RootSystem with a SystemPath and an entryname.
-  \sa SystemPath, Primitive
-*/
-class FQEN : public SystemPath
-{
-public: // exceptions
+    @return reference to the systempath
+    */
+  void standardize();
 
-  class FQENException : public Exception
-    { 
-    public: 
-      FQENException(const string& method,const string& what)
-	: Exception(method,what) {} 
-      const string what() const {return "";}
-    };
-  class BadFQEN : public FQENException
-    { 
-    public: 
-      BadFQEN(const string& method,const string& what) 
-	: FQENException(method,what) {} 
-      const string what() const {return "Bad FQEN";}
-    };
+  SystemPath() {}
 
 private:
 
-  const string _entryname;
+  const String theSystemPath;
+
+};
+
+/**
+  FQIN(Fully Qualified Id Name)
+
+  The Entryname is a identifier (ID) of Entity objects.  Given a
+  Primitive type, one can identify unique Entity in a cell model with a
+  SystemPath and an id.  
+  @see SystemPath, Primitive 
+*/
+class FQIN : public SystemPath
+{
+public: // exceptions
+
+  class FQINException : public Exception
+    { 
+    public: 
+      FQINException( StringCref method, StringCref what )
+	: Exception( method, what ) {} 
+      const String what() const { return ""; }
+    };
+
+  class BadFQIN : public FQINException
+    { 
+    public: 
+      BadFQIN( StringCref method, StringCref what ) 
+	: FQINException( method,what ) {} 
+      const String what() const { return "Bad FQIN"; }
+    };
 
 public:
 
-  FQEN(const string& systemname,const string& entryname);
-  
-  static const string entrynameOf(const string& fqen);
-  static const string systempathOf(const string& fqen);
+  FQIN( StringCref systemname, StringCref id );
+  FQIN( StringCref fqen );
+  virtual ~FQIN() {}
 
-  FQEN(const string& fqen);
-  virtual ~FQEN() {}
+  const String getFqin() const;
+  virtual const String getString() const { return getFqin(); }
+  StringCref getId() const { return theId; }
+  virtual operator String() const { return getString(); }
 
-  const string fqenString() const;
-  const string& entrynameString() const {return _entryname;}
-//  virtual const string string() const {return fqenString();}
-  virtual operator string() const {return fqenString();}
+  static const String IdOf( StringCref fqen );
+  static const String SystemPathOf( StringCref fqen );
+
+private:
+
+  const String theId;
+
 };
 
-/*!
+/**
   FQPN (Fully Qualified Primitive Name).
 
-  One can identify an unique Entiy in RootSystem with FQPN.
-  The FQPN consists of FQEN and PrimitiveType.
+  One can identify an unique Entiy in a cell model with a FQPN.
+  The FQPN consists of FQIN and PrimitiveType.
 
-  \sa FQEN, PrimitiveType
+  @see FQIN, PrimitiveType
 */
-class FQPN : public FQEN
+class FQPN : public FQIN
 {
+
+public: // exceptions
+
   class FQPNException : public Exception
     { 
     public: 
-      FQPNException(const string& method,const string& message) 
-	: Exception(method,message) {} 
-      const string what() const {return "";}
+      FQPNException( StringCref method, StringCref message ) 
+	: Exception( method, message ) {} 
+      const String what() const { return ""; }
     };
   class BadFQPN : public FQPNException
     { 
     public:
-      BadFQPN(const string& method,const string& message) 
-	: FQPNException(method,message) {} 
-      const string what() const {return "Bad FQPN.";}
+      BadFQPN( StringCref method, StringCref message ) 
+	: FQPNException( method, message ) {} 
+      const String what() const { return "Bad FQPN."; }
     };
-
-  Primitive::Type _type;
 
 public:
 
-  FQPN(const Primitive::Type type,const FQEN& fqen);
-  FQPN(const string& fqpn);
+  FQPN( const Primitive::Type type, const FQIN& fqin );
+  FQPN( StringCref fqpn );
   virtual ~FQPN() {}
   
-  static const string fqenOf(const string& fqpn);
-  static Primitive::Type typeOf(const string& fqpn);
+  const String getFqpn() const;
+  const Primitive::Type& getType() const { return theType; }
 
-  const Primitive::Type& type() const {return _type;}
-  const string fqpnString() const;
-//  virtual const string string() const {return fqpnString();}
-  virtual operator string() const {return fqpnString();}
+  virtual const String getString() const { return getFqpn(); }
+  virtual operator String() const { return getString(); }
+
+  static const String fqinOf( StringCref fqpn );
+  static Primitive::Type typeOf( StringCref fqpn );
+
+private:
+
+  Primitive::Type theType;
+
 };
 
 #endif /*  ___FQPN_H___ */
+
+/*
+  Do not modify
+  $Author$
+  $Revision$
+  $Date$
+  $Locker$
+*/

@@ -1,39 +1,32 @@
-
-char const FQPN_C_rcsid[] = "$Id$";
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
-// 		This file is part of Serizawa (E-CELL Core System)
+//        This file is part of E-CELL Simulation Environment package
 //
-//	       written by Kouichi Takahashi  <shafi@sfc.keio.ac.jp>
-//
-//                              E-CELL Project,
-//                          Lab. for Bioinformatics,  
-//                             Keio University.
-//
-//             (see http://www.e-cell.org for details about E-CELL)
+//                Copyright (C) 1996-2000 Keio University
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
 //
-// Serizawa is free software; you can redistribute it and/or
+// E-CELL is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
 // License as published by the Free Software Foundation; either
 // version 2 of the License, or (at your option) any later version.
 // 
-// Serizawa is distributed in the hope that it will be useful,
+// E-CELL is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 // See the GNU General Public License for more details.
 // 
 // You should have received a copy of the GNU General Public
-// License along with Serizawa -- see the file COPYING.
+// License along with E-CELL -- see the file COPYING.
 // If not, write to the Free Software Foundation, Inc.,
 // 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 // 
 //END_HEADER
-
-
-
+//
+// written by Kouichi Takahashi <shafi@e-cell.org> at
+// E-CELL Project, Lab. for Bioinformatics, Keio University.
+//
 
 #include <string>
 #include "FQPN.h"
@@ -41,140 +34,210 @@ char const FQPN_C_rcsid[] = "$Id$";
 
 ///////////////////////  SystemPath
 
-SystemPath::SystemPath(const string& rqsn) : _systempath(rqsn)
+SystemPath::SystemPath( StringCref rqsn ) 
+  :
+  theSystemPath( rqsn )
 {
   standardize();
-
 }
 
 
-const string SystemPath::last() const
+const String SystemPath::last() const
 {
-  int i = _systempath.rfind(DELIMITER); ++i;
-  return _systempath.substr(i,string::npos);
+  int anInt( theSystemPath.rfind( DELIMITER ) ); 
+  ++anInt;
+  return theSystemPath.substr( anInt, String::npos );
 }
 
-const string SystemPath::first() const
+const String SystemPath::first() const
 {
- int i = _systempath.find(DELIMITER); 
- if(i != 0)
-   return _systempath.substr(0,i);
+ int    anInt( theSystemPath.find( DELIMITER ) ); 
+
+ if( anInt != 0 )
+   {
+     return theSystemPath.substr( 0, anInt );
+   }
 
  return "/";
-
-// int j = _systempath.find(DELIMITER,1);
-// return _systempath.substr(0,j-1);
 }
 
 SystemPath SystemPath::next() const 
 {
-  string::size_type i = _systempath.find(DELIMITER);
-  if(i!=string::npos)
+  String::size_type aPosition = theSystemPath.find( DELIMITER );
+
+  if( aPosition != String::npos )
     {
-      ++i;
-      return SystemPath(_systempath.substr(i,string::npos)); 
+      ++aPosition;
+      return SystemPath( theSystemPath.substr( aPosition, 
+					       String::npos ) ); 
     }
-  else
-    return SystemPath("");
+
+  return SystemPath( "" );
 }
 
 
 void SystemPath::standardize()
 {
   // FIXME: incomplete
-   
 }
 
 
-////////////////////////////////  FQEN
+////////////////////////////////  FQIN
 
-FQEN::FQEN(const string& systemname,const string& entryname)
-:SystemPath(systemname),_entryname(entryname)
+FQIN::FQIN( StringCref systemname, StringCref id )
+  :
+  SystemPath( systemname ), 
+  theId( id )
 {
-  
+  ; // do nothing
 }
 
-FQEN::FQEN(const string& fqen) 
-: SystemPath(systempathOf(fqen)),_entryname(entrynameOf(fqen))
+FQIN::FQIN( StringCref fqin ) 
+  : 
+  SystemPath( SystemPathOf( fqin ) ),
+  theId( IdOf( fqin ) )
 {
   standardize();
 }
 
-const string FQEN::entrynameOf(const string& fqen)
+const String FQIN::IdOf( StringCref fqin )
 {
-  string::size_type border = fqen.find(':');
-  if(border == string::npos)
-    throw BadFQEN(__PRETTY_FUNCTION__,
-		  "no \':\' found in \"" + fqen + "\".");
-  if(fqen.find(':',border+1) != string::npos)
-    throw BadFQEN(__PRETTY_FUNCTION__,
-		  "too many \':\' in \"" + fqen + "\".");
+  String::size_type aBorder = fqin.find( ':' );
 
-  return fqen.substr(border+1,string::npos);
+  if( aBorder == String::npos )
+    {
+      throw BadFQIN(__PRETTY_FUNCTION__,
+		    "no \':\' found in \"" + fqin + "\".");
+    }
+
+  if( fqin.find( ':', aBorder + 1 ) != String::npos )
+    {
+      throw BadFQIN(__PRETTY_FUNCTION__,
+		    "too many \':\'s in \"" + fqin + "\".");
+    }
+
+  return fqin.substr( aBorder + 1, String::npos );
 }
 
-const string FQEN::systempathOf(const string& fqen)
+const String FQIN::SystemPathOf( StringCref fqin )
 {
-  string::size_type border = fqen.find(':');
-  if(border == string::npos)
-    throw BadFQEN(__PRETTY_FUNCTION__,
-		  "no \':\' found in \"" + fqen + "\".");
-  if(fqen.find(':',border+1) != string::npos)
-    throw BadFQEN(__PRETTY_FUNCTION__,
-		  "to many \':\' in \"" + fqen + "\".");
+  String::size_type aBorder = fqin.find( ':' );
 
-  return fqen.substr(0,border);
+  if( aBorder == String::npos )
+    {
+      throw BadFQIN( __PRETTY_FUNCTION__,
+		     "no \':\' found in \"" + fqin + "\"." );
+    }
+
+  if( fqin.find( ':', aBorder + 1 ) != String::npos )
+    {
+      throw BadFQIN(__PRETTY_FUNCTION__,
+		    "to many \':\'s in \"" + fqin + "\".");
+    }
+
+  return fqin.substr( 0, aBorder );
 }
 
 
-const string FQEN::fqenString() const
+const String FQIN::getFqin() const
 {
-  return (systemPathString() + ":" + entrynameString());
+  return ( SystemPath::getString() + ":" + getId() );
 }
 
 
 ////////////////////////////////  FQPN
 
-FQPN::FQPN(const Primitive::Type type,const FQEN& fqen)
-: FQEN(fqen),_type(type)
+FQPN::FQPN( const Primitive::Type type, const FQIN& fqin )
+  :
+  FQIN( fqin ),
+  theType( type )
 {
+  ; // do nothing
 }
 
-FQPN::FQPN(const string& fqpn) : FQEN(fqenOf(fqpn)),_type(typeOf(fqpn))
+FQPN::FQPN( StringCref fqpn )
+  : FQIN( fqinOf( fqpn ) ),
+  theType( typeOf( fqpn ) )
 {
+  ; // do nothing
 }
 
-const string FQPN::fqenOf(const string& fqpn)
+const String FQPN::fqinOf( StringCref fqpn )
 {
-  string::size_type border;
-  border = fqpn.find(':');
-  if(border == string::npos)
-    throw BadFQPN(__PRETTY_FUNCTION__,
-		  "no \':\' found in \"" + fqpn + "\".");
-  if(fqpn.find(':',border+1) == string::npos)
-        throw BadFQPN(__PRETTY_FUNCTION__,
-		      "no enough \':\' found in \"" + fqpn + "\".");
+  String::size_type aBorder( fqpn.find(':') );
 
-  return fqpn.substr(border+1,string::npos);
+  if( aBorder == String::npos )
+    {
+      throw BadFQPN(__PRETTY_FUNCTION__,
+		    "no \':\' found in \"" + fqpn + "\".");
+    }
+  if( fqpn.find( ':', aBorder + 1 ) == String::npos )
+    {
+      throw BadFQPN(__PRETTY_FUNCTION__,
+		    "no enough \':\'s found in \"" + fqpn + "\".");
+    }
+
+  return fqpn.substr( aBorder + 1, String::npos );
 }
 
-Primitive::Type FQPN::typeOf(const string& fqpn)
+Primitive::Type FQPN::typeOf( StringCref fqpn )
 {
-  string::size_type border;
-  border = fqpn.find(':');
-  if(border == string::npos)
-    throw BadFQPN(__PRETTY_FUNCTION__,
-		  "no \':\' found in \"" + fqpn + "\".");
-  if(fqpn.find(':',border+1) == string::npos)
-        throw BadFQPN(__PRETTY_FUNCTION__,
-		      "no enough \':\' found in \"" + fqpn + "\".");
+  String::size_type aBorder( fqpn.find(':') );
+
+  if( aBorder == String::npos )
+    {
+      throw BadFQPN(__PRETTY_FUNCTION__,
+		    "no \':\' found in \"" + fqpn + "\".");
+    }
+  if( fqpn.find( ':', aBorder + 1 ) == String::npos )
+    {
+      throw BadFQPN(__PRETTY_FUNCTION__,
+		    "no enough \':\'s found in \"" + fqpn + "\".");
+    }
   
-  string typestring = fqpn.substr(0,border);
-  return Primitive::PrimitiveType(typestring);
+  String aTypeString = fqpn.substr( 0, aBorder );
+
+  return Primitive::PrimitiveType( aTypeString );
 }
 
-
-const string FQPN::fqpnString() const 
+const String FQPN::getFqpn() const 
 {
-  return (Primitive::PrimitiveTypeString(_type) + ":" + fqenString());
+  return Primitive::PrimitiveTypeString( theType ) 
+    + ':' + FQIN::getString();
 }
+
+
+#ifdef TEST_FQPN
+
+main()
+{
+  SystemPath aSystemPath( "/A/B" );
+  cout << aSystemPath.getString() << endl;
+
+  SystemPath aSystemPath2( "/A/../B" );
+  cout << aSystemPath2.getString() << endl;
+
+  FQIN aFQIN( "/A/B:S" );
+  cout << aFQIN.getString() << endl;
+  cout << aFQIN.getSystemPath() << endl;
+  cout << aFQIN.getId() << endl;
+
+  FQPN aFQPN( "Substance:/A/B:S" );
+  cout << aFQPN.getString() << endl;
+  cout << Primitive::PrimitiveTypeString( aFQPN.getType() ) << endl;
+  cout << aFQPN.getSystemPath() << endl;
+  cout << aFQPN.getId() << endl;
+  cout << aFQPN.getFqin() << endl;
+}
+
+
+#endif
+
+
+/*
+  Do not modify
+  $Author$
+  $Revision$
+  $Date$
+  $Locker$
+*/

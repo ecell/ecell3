@@ -1,39 +1,32 @@
-
-char const Substance_C_rcsid[] = "$Id$";
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
-// 		This file is part of Serizawa (E-CELL Core System)
+//        This file is part of E-CELL Simulation Environment package
 //
-//	       written by Kouichi Takahashi  <shafi@sfc.keio.ac.jp>
-//
-//                              E-CELL Project,
-//                          Lab. for Bioinformatics,  
-//                             Keio University.
-//
-//             (see http://www.e-cell.org for details about E-CELL)
+//                Copyright (C) 1996-2000 Keio University
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
 //
-// Serizawa is free software; you can redistribute it and/or
+// E-CELL is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
 // License as published by the Free Software Foundation; either
 // version 2 of the License, or (at your option) any later version.
 // 
-// Serizawa is distributed in the hope that it will be useful,
+// E-CELL is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 // See the GNU General Public License for more details.
 // 
 // You should have received a copy of the GNU General Public
-// License along with Serizawa -- see the file COPYING.
+// License along with E-CELL -- see the file COPYING.
 // If not, write to the Free Software Foundation, Inc.,
 // 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 // 
 //END_HEADER
-
-
-
+//
+// written by Kouichi Takahashi <shafi@e-cell.org> at
+// E-CELL Project, Lab. for Bioinformatics, Keio University.
+//
 
 #include "Substance.h"
 #include "Integrators.h"
@@ -45,8 +38,9 @@ char const Substance_C_rcsid[] = "$Id$";
 //FIXME: #include "ecell/MessageWindow.h"
 
 
-const string Substance::SYSTEM_DEFAULT_ACCUMULATOR_NAME = "ReserveAccumulator";
-string Substance::USER_DEFAULT_ACCUMULATOR_NAME 
+const String Substance::SYSTEM_DEFAULT_ACCUMULATOR_NAME = "ReserveAccumulator";
+
+String Substance::USER_DEFAULT_ACCUMULATOR_NAME 
 = Substance::SYSTEM_DEFAULT_ACCUMULATOR_NAME;
 
 void Substance::makeSlots()
@@ -57,164 +51,191 @@ void Substance::makeSlots()
 	      &Substance::getAccumulator);
 }
 
-void Substance::setQuantity(const Message& message)
+void Substance::setQuantity( MessageCref message )
 {
-  Float f = asFloat(message.body());
+  Float aQuantity = asFloat( message.getBody() );
 
-  if(_accumulator)
-    loadQuantity(f);
+  if( theAccumulator )
+    {
+      loadQuantity( aQuantity );
+    }
   else
     {
-      mySetQuantity(f);
+      mySetQuantity( aQuantity );
     }
 }
 
 
-void Substance::setAccumulator(const Message& message)
+void Substance::setAccumulator( MessageCref message )
 {
-  setAccumulator(message.body(0));
+  setAccumulator( message.getBody() );
 }
 
-const Message Substance::getQuantity(const string& keyword)
+const Message Substance::getQuantity( StringCref keyword )
 {
-  return Message(keyword,quantity());
+  return Message( keyword, getQuantity() );
 }
 
-const Message Substance::getAccumulator(const string& keyword)
+const Message Substance::getAccumulator( StringCref keyword )
 {
-  if(_accumulator)
-    return Message(keyword,_accumulator->className());
+  if( theAccumulator )
+    {
+      return Message( keyword, theAccumulator->className() );
+    }
   else
-    return Message(keyword,"");
+    {
+      return Message( keyword, "" );
+    }
 }
 
 Substance::Substance()
-: _accumulator(NULL),_integrator(NULL),_quantity(0),  
-  _fraction(0),  _velocity(0), _bias(0),
-  _fixed(false) ,_concentration(-1)
+  : 
+  theAccumulator( NULL ),
+  theIntegrator( NULL ),
+  theQuantity( 0 ),  
+  theFraction( 0 ),
+  theVelocity( 0 ),
+  theBias( 0 ),
+  theFixed( false ) ,
+  theConcentration( -1 )
 {
   makeSlots();
 } 
 
 Substance::~Substance()
 {
-  delete _integrator;
-  delete _accumulator;
+  delete theIntegrator;
+  delete theAccumulator;
 }
 
-void Substance::setAccumulator(const string& classname)
+void Substance::setAccumulator( StringCref classname )
 {
-  //FIXME: try {
-    Accumulator* a;
-    a = theRootSystem->accumulatorMaker().make(classname);
-    setAccumulator(a);
-    //FIXME: if(classname != userDefaultAccumulatorName())
-    //FIXME:  *theMessageWindow << "[" << fqpn() 
-    //FIXME: << "]: accumulator is changed to: " << classname << ".\n";
-    //FIXME: }
-  //FIXME:  catch(Exception& e)
-  //FIXME:    {
-  //FIXME:      *theMessageWindow << "[" << fqpn() << "]:\n" << e.message();
-  //FIXME:      if(_accumulator)   // _accumulator is already set
-  //FIXME:	{
-  //FIXME:	  *theMessageWindow << "[" << fqpn() << 
-  //FIXME:	    "]: falling back to :" << _accumulator->className() << ".\n";
-  //FIXME:	}
-  //FIXME:    }
+  try {
+    AccumulatorPtr aAccumulatorPtr;
+    aAccumulatorPtr = theRootSystem->accumulatorMaker().make( classname );
+    setAccumulator(aAccumulatorPtr);
+    if( classname != userDefaultAccumulatorName() )
+      {
+	cerr << __PRETTY_FUNCTION__ << endl;
+	//FIXME:    *theMessageWindow << "[" << fqpn() 
+	//FIXME: << "]: accumulator is changed to: " << classname << ".\n";
+      }
+  }
+  catch( Exception& e )
+    {
+      //FIXME:     *theMessageWindow << "[" << fqpn() << "]:\n" << e.message();
+      // warn if theAccumulator is already set
+      if( theAccumulator != NULL )   
+       {
+	 //FIXME: *theMessageWindow << "[" << fqpn() << 
+	 //FIXME: "]: falling back to :" << theAccumulator->className() 
+	 //FIXME: << ".\n";
+       }
+  }
 }
 
-void Substance::setAccumulator(Accumulator* a)
+void Substance::setAccumulator( AccumulatorPtr accumulator )
 {
-  if(_accumulator)
-    delete _accumulator;
-  _accumulator = a;
-  _accumulator->setOwner(this);
-  _accumulator->update();
+  if( theAccumulator )
+    delete theAccumulator;
+  theAccumulator = accumulator;
+  theAccumulator->setOwner( this );
+  theAccumulator->update();
 }
 
-const string Substance::fqpn() const
+const String Substance::getFqpn() const
 {
-  return Primitive::PrimitiveTypeString(Primitive::SUBSTANCE) + ":" + fqen();
+  return Primitive::PrimitiveTypeString( Primitive::SUBSTANCE ) 
+    + ":" + getFqin();
 }
 
 
 void Substance::initialize()
 {
-  if(!_accumulator)
-    setAccumulator(USER_DEFAULT_ACCUMULATOR_NAME);
-  if(!_accumulator)  // if the user default is invalid fall back to the
-    {                // system default.
+  if( theAccumulator == NULL )
+    setAccumulator( USER_DEFAULT_ACCUMULATOR_NAME );
+
+  // if the user default is invalid fall back to the system default.
+  if( !theAccumulator )  
+    {               
       //FIXME:      *theMessageWindow << "Substance: " 
       //FIXME:	<< "falling back to the system default accumulator: " 
       //FIXME:	  << SYSTEM_DEFAULT_ACCUMULATOR_NAME  << ".\n";
       setUserDefaultAccumulatorName(SYSTEM_DEFAULT_ACCUMULATOR_NAME);
       setAccumulator(USER_DEFAULT_ACCUMULATOR_NAME);
     }
-
 }
 
 Float Substance::saveQuantity()
 {
-  return _accumulator->save();
+  return theAccumulator->save();
 }
 
-void Substance::loadQuantity(Float q)
+void Substance::loadQuantity( Float quantity )
 {
-  mySetQuantity(q);
-  _accumulator->update();
+  mySetQuantity( quantity );
+  theAccumulator->update();
 }
 
-Float Substance::activity()
+Float Substance::getActivity()
 {
-  return velocity();
+  return getVelocity();
 }
 
-Concentration Substance::calculateConcentration()
+void Substance::calculateConcentration()
 {
-  return _concentration = _quantity / (Float)(supersystem()->volume()*N_A); 
+  theConcentration = theQuantity / ( getSupersystem()->getVolume() * N_A ); 
 }
 
 
-bool Substance::haveConcentration()
+bool Substance::haveConcentration() const
 {
-  return (supersystem()->volumeIndex()) ? true : false;
+  bool aBool(true);
+
+  if( getSupersystem()->getVolumeIndex() == NULL ) 
+    {
+      aBool = false;
+    }
+
+  return true;
 }
 
 void Substance::transit()
 { 
-  _concentration = -1;
+  theConcentration = -1;
 
-  if(_fixed) 
+  if( theFixed ) 
     return;
 
-  _integrator->transit();
+  theIntegrator->transit();
 
-  _accumulator->doit();
+  theAccumulator->doit();
   
-   if(_quantity < 0) 
+   if( theQuantity < 0 ) 
      {
-       _quantity = 0;
+       theQuantity = 0;
 //       throw LTZ();
      }
 }
 
 void Substance::clear()
 { 
-  _quantity += _bias; 
-  _bias = 0;
-  _velocity = 0; 
-  _integrator->clear();
+  theQuantity += theBias; 
+  theBias = 0;
+  theVelocity = 0; 
+  theIntegrator->clear();
 }
 
 void Substance::turn()
 {
-  _integrator->turn();
-}
-
-Float Substance::velocity(Float v)
-{
-  _velocity += v;
-  return _velocity;
+  theIntegrator->turn();
 }
 
 
+/*
+  Do not modify
+  $Author$
+  $Revision$
+  $Date$
+  $Locker$
+*/

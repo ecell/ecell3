@@ -1,124 +1,115 @@
-
-char const Accumulators_C_rcsid[] = "$Id$";
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
-// 		This file is part of Serizawa (E-CELL Core System)
+//        This file is part of E-CELL Simulation Environment package
 //
-//	       written by Kouichi Takahashi  <shafi@sfc.keio.ac.jp>
-//
-//                              E-CELL Project,
-//                          Lab. for Bioinformatics,  
-//                             Keio University.
-//
-//             (see http://www.e-cell.org for details about E-CELL)
+//                Copyright (C) 1996-2000 Keio University
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
 //
-// Serizawa is free software; you can redistribute it and/or
+// E-CELL is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
 // License as published by the Free Software Foundation; either
 // version 2 of the License, or (at your option) any later version.
 // 
-// Serizawa is distributed in the hope that it will be useful,
+// E-CELL is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 // See the GNU General Public License for more details.
 // 
 // You should have received a copy of the GNU General Public
-// License along with Serizawa -- see the file COPYING.
+// License along with E-CELL -- see the file COPYING.
 // If not, write to the Free Software Foundation, Inc.,
 // 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 // 
 //END_HEADER
-
-
+//
+// written by Kouichi Takahashi <shafi@e-cell.org> at
+// E-CELL Project, Lab. for Bioinformatics, Keio University.
+//
 
 
 #include <cmath>
-
 #include "Accumulators.h"
 #include "AccumulatorMaker.h"
 
 void AccumulatorMaker::makeClassList()
 {
-  NewAccumulatorModule(SimpleAccumulator);
-  NewAccumulatorModule(RoundDownAccumulator);
-  NewAccumulatorModule(RoundOffAccumulator);
-  NewAccumulatorModule(ReserveAccumulator);
-  NewAccumulatorModule(MonteCarloAccumulator);
+  NewAccumulatorModule( SimpleAccumulator );
+  NewAccumulatorModule( RoundDownAccumulator );
+  NewAccumulatorModule( RoundOffAccumulator );
+  NewAccumulatorModule( ReserveAccumulator );
+  NewAccumulatorModule( MonteCarloAccumulator );
 }
-
-
 
 void SimpleAccumulator::doit()
 {
-  quantity() += velocity();
+  getQuantity() += getVelocity();
 }
 
 void RoundDownAccumulator::doit()
 {
-  velocity() = floor(velocity());
-  quantity() += velocity();
+  getVelocity() = floor( getVelocity() );
+  getQuantity() += getVelocity();
 }
 
 void RoundDownAccumulator::update()
 {
-  quantity() = floor(quantity());
+  getQuantity() = floor( getQuantity() );
 }
 
 void RoundOffAccumulator::doit()
 {
-  velocity() = rint(velocity());
-  quantity() +=  velocity();
+  getVelocity() = rint( getVelocity() );
+  getQuantity() += getVelocity();
 }
 
 void RoundOffAccumulator::update()
 {
-  quantity() = rint(quantity());
+  getQuantity() = rint( getQuantity() );
 }
 
 void ReserveAccumulator::doit()
 {
   Float tmp;
-  velocity() += _fraction;
-  _fraction = MODF(velocity(),&tmp);
-  quantity() += tmp;
-  velocity() = tmp;
+  getVelocity() += theFraction;
+  theFraction = modf( getVelocity(), &tmp );
+  getQuantity() += tmp;
+  getVelocity() = tmp;
 }
 
 Float ReserveAccumulator::save()
 {
-  return quantity() + _fraction;
+  return getQuantity() + theFraction;
 }
 
 void ReserveAccumulator::update()
 {
   Float tmp;
-  _fraction = MODF(quantity(),&tmp);
-  quantity() = tmp;
+  theFraction = modf( getQuantity(), &tmp );
+  getQuantity() = tmp;
 }
 
 void MonteCarloAccumulator::doit()
 {
-  Float whole;
-  Float fraction = MODF(velocity(),&whole);
+  Float aWhole;
+  Float aFraction = modf( getVelocity(), &aWhole );
 
-  if( theRandomNumberGenerator->toss(fraction) )
+  if( theRandomNumberGenerator->toss( aFraction ) )
     {
-      whole++;
+      ++aWhole;
     }
-  velocity() = whole;
-  quantity() += whole;
+  getVelocity() = aWhole;
+  getQuantity() += aWhole;
 }
 
 void MonteCarloAccumulator::update()
 {
-  Float whole;
-  Float fraction = MODF(quantity(),&whole);
-  if( theRandomNumberGenerator->toss(fraction) )
+  Float aWhole;
+  Float aFraction = modf( getQuantity(), &aWhole );
+  if( theRandomNumberGenerator->toss( aFraction ) )
     {
-      whole++;
+      ++aWhole;
     }
-  quantity() = whole;
+  getQuantity() = aWhole;
 }

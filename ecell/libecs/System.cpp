@@ -1,44 +1,38 @@
-
-char const System_C_rcsid[] = "$Id$";
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
-// 		This file is part of Serizawa (E-CELL Core System)
+//        This file is part of E-CELL Simulation Environment package
 //
-//	       written by Kouichi Takahashi  <shafi@sfc.keio.ac.jp>
-//
-//                              E-CELL Project,
-//                          Lab. for Bioinformatics,  
-//                             Keio University.
-//
-//             (see http://www.e-cell.org for details about E-CELL)
+//                Copyright (C) 1996-2000 Keio University
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
 //
-// Serizawa is free software; you can redistribute it and/or
+// E-CELL is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
 // License as published by the Free Software Foundation; either
 // version 2 of the License, or (at your option) any later version.
 // 
-// Serizawa is distributed in the hope that it will be useful,
+// E-CELL is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 // See the GNU General Public License for more details.
 // 
 // You should have received a copy of the GNU General Public
-// License along with Serizawa -- see the file COPYING.
+// License along with E-CELL -- see the file COPYING.
 // If not, write to the Free Software Foundation, Inc.,
 // 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 // 
 //END_HEADER
+//
+// written by Kouichi Takahashi <shafi@e-cell.org> at
+// E-CELL Project, Lab. for Bioinformatics, Keio University.
+//
 
-
-
+#include <memory>
 
 #include "System.h"
 #include "Reactor.h"
 #include "CellComponents.h"
-//FIXME: #include "ecell/MessageWindow.h"
 #include "RootSystem.h"
 #include "Stepper.h"
 #include "StepperMaker.h"
@@ -48,480 +42,399 @@ char const System_C_rcsid[] = "$Id$";
 template SubstanceList;
 template ReactorList;
 template SystemList;
-//template GenomicElementList;
-
-
-
-
 
 /////////////////////// System
 
 void System::makeSlots()
 {
-  MessageSlot("Stepper",System,*this,&System::setStepper,&System::getStepper);
-  MessageSlot("VolumeIndex",System,*this,
-	      &System::setVolumeIndex,&System::getVolumeIndex);
+  MessageSlot( "Stepper", System, *this,
+	       &System::setStepper, &System::getStepper );
+  MessageSlot( "VolumeIndex", System, *this,
+	       &System::setVolumeIndex, &System::getVolumeIndex );
 }
 
 System::System()
-:_volumeIndexName(NULL),_volumeIndex(NULL),_stepper(NULL) 
+  :
+  theVolumeIndexName( NULL ),
+  theVolumeIndex( NULL ),
+  theStepper( NULL ) 
 {
   makeSlots();
+  theFirstRegularReactorIterator = getFirstReactorIterator();
 }
 
 System::~System()
 {
-  delete _stepper;
+  delete theStepper;
+  delete theVolumeIndexName;
 }
 
-const string System::fqpn() const
+const String System::getFqpn() const
 {
-  return Primitive::PrimitiveTypeString(Primitive::SYSTEM) + ":" + fqen();
+  return Primitive::PrimitiveTypeString( Primitive::SYSTEM ) + ":" + getFqin();
 }
 
-void System::setStepper(const Message& message)
+void System::setStepper( const Message& message )
 {
-  setStepper(message.body(0));
+  setStepper( message.getBody() );
 }
 
-const Message System::getStepper(const string& keyword)
+const Message System::getStepper( StringCref keyword )
 {
-  return Message(keyword,stepper()->className());
+  return Message( keyword, getStepper()->className() );
 }
 
-void System::setVolumeIndex(const Message& message)
+void System::setVolumeIndex( const Message& message )
 {
-  setVolumeIndex(FQEN(message.body()));
+  setVolumeIndex( FQIN( message.getBody() ) );
 }
 
-const Message System::getVolumeIndex(const string& keyword)
+const Message System::getVolumeIndex( StringCref keyword )
 {
-  if(!volumeIndex())
-    return Message(keyword,"");
+  if( !getVolumeIndex() )
+    return Message( keyword, "" );
 
-  return Message(keyword,volumeIndex()->fqen());
+  return Message( keyword, getVolumeIndex()->getFqin() );
 }
 
-void System::setStepper(const string& classname)
+void System::setStepper( StringCref classname )
 {
-  Stepper* stepper;
-  stepper = theRootSystem->stepperMaker().make(classname);
-  stepper->setOwner(this);
+  StepperPtr aStepper;
+  aStepper = theRootSystem->stepperMaker().make( classname );
+  aStepper->setOwner( this );
 
-  _stepper = stepper;
+  theStepper = aStepper;
 }
 
-Float System::volume() 
+Float System::getVolume() 
 {
-  return _volumeIndex->activityPerSec();
+  return theVolumeIndex->getActivityPerSecond();
 }
 
-void System::setVolumeIndex(const FQEN& volumeindex)
+void System::setVolumeIndex( FQINCref volumeindex )
 {
-  _volumeIndexName = new FQEN(volumeindex);
+  theVolumeIndexName = new FQIN( volumeindex );
 }
 
-
-Primitive System::getPrimitive(const string& entryname,Primitive::Type type)
-throw(UnmatchedSystemClass,InvalidPrimitiveType,NotFound)
+Primitive System::getPrimitive( StringCref id, Primitive::Type type )
+throw( InvalidPrimitiveType, NotFound )
 {
-  union {
-    SSystem* ssystem;
-    RSystem* rsystem;
-    MetaSystem* metasystem;
-//    Genome* genome;    
-  } s;
+  Primitive aPrimitive;
 
-  Primitive primitive;
-
-  primitive.type = type;
+  aPrimitive.type = type;
 
   switch(type)
     {
     case Primitive::SUBSTANCE:
-      if(!(s.ssystem = dynamic_cast<SSystem*>(this)))
-	throw UnmatchedSystemClass(__PRETTY_FUNCTION__,"[" 
-				   + fqen() + "]: this is not a SSystem");
-      primitive.substance = s.ssystem->getSubstance(entryname);
+      aPrimitive.substance = getSubstance( id );
       break;
     case Primitive::REACTOR:
-      if(!(s.rsystem = dynamic_cast<RSystem*>(this)))
-	throw UnmatchedSystemClass(__PRETTY_FUNCTION__,"[" + 
-				   fqen() + "]: this is not a RSystem");
-      primitive.reactor = s.rsystem->getReactor(entryname);
+      aPrimitive.reactor = getReactor( id );
       break;
     case Primitive::SYSTEM:
-      if(!(s.metasystem = dynamic_cast<MetaSystem*>(this)))
-	throw UnmatchedSystemClass(__PRETTY_FUNCTION__,"[" + 
-				   fqen() + "]: this is not a MetaSystem");
-      primitive.system = s.metasystem->getSystem(entryname);
+      aPrimitive.system = getSystem( id );
       break;
-/*    case Primitive::GENOMICELEMENT:
-      if(!(s.genome = dynamic_cast<Genome*>(this)))
-	throw UnmatchedSystemClass(__PRETTY_FUNCTION__,"[" + 
-				   fqen() + "]: this is not a Genome");
-      primitive.genomicElement = s.genome->getGenomicElement(entryname);
-      break;*/
-    case Primitive::PRIMITIVE_NONE:
+    case Primitive::NONE:
     default:
 	throw InvalidPrimitiveType(__PRETTY_FUNCTION__,"[" 
-				   + fqen() + "]: request type invalid.");
+				   + getFqin() + "]: request type invalid.");
     }
 
-  return primitive;
+  return aPrimitive;
 }
 
-int System::sizeOfPrimitiveList(Primitive::Type type)
+int System::getNumberOfPrimitives( Primitive::Type type )
 {
-  union {
-    SSystem* ssystem;
-    RSystem* rsystem;
-    MetaSystem* metasystem;
-//    Genome* genome;
-  } s;
-  switch(type)
+  int aNumber( 0 );
+  switch( type )
     {
     case Primitive::SUBSTANCE:
-      if(!(s.ssystem = dynamic_cast<SSystem*>(this)))
-	return 0;
-      return s.ssystem->sizeOfSubstanceList();
+      aNumber = getNumberOfSubstances();
+      break;
     case Primitive::REACTOR:
-      if(!(s.rsystem = dynamic_cast<RSystem*>(this)))
-	return 0;
-      return s.rsystem->sizeOfReactorList();
+      aNumber = getNumberOfReactors();
+      break;
     case Primitive::SYSTEM:
-      if(!(s.metasystem = dynamic_cast<MetaSystem*>(this)))
-	return 0;
-      return s.metasystem->sizeOfSystemList();
-/*    case Primitive::GENOMICELEMENT:
-      if(!(s.genome = dynamic_cast<Genome*>(this)))
-	return 0;
-      return s.genome->sizeOfGenomicElementList();*/
-    case Primitive::PRIMITIVE_NONE:
+      aNumber = getNumberOfSystems();
+      break;
+    case Primitive::NONE:
     default:
 	throw InvalidPrimitiveType(__PRETTY_FUNCTION__,"[" 
-				   + fqen() + "]: request type invalid");
+				   + getFqin() + "]: request type invalid");
     }
-
-  throw UnexpectedError(__PRETTY_FUNCTION__);
+  return aNumber;
 }
 
-void System::forAllPrimitives(Primitive::Type type,PrimitiveCallback cb,
-			      void* clientData)
+void System::forAllPrimitives( Primitive::Type type, PrimitiveCallback cb,
+			       void* clientData )
 {
-  assert(cb);
+  assert( cb );
 
-  union {
-    SSystem* ssystem;
-    RSystem* rsystem;
-    MetaSystem* metasystem;
-//    Genome* genome;
-  } s;
+  SubstanceListIterator si( NULL );
+  ReactorListIterator ri( NULL );
+  SystemListIterator yi( NULL );
 
-  SubstanceListIterator si = NULL;
-  ReactorListIterator ri = NULL;
-  SystemListIterator yi = NULL;
-//  GenomicElementListIterator gi = NULL;
-
-  Primitive* primitive;
+  PrimitivePtr aPrimitivePtr;
 
   switch(type)
     {
     case Primitive::SUBSTANCE:
-      if(!(s.ssystem = dynamic_cast<SSystem*>(this)))
-	throw UnmatchedSystemClass(__PRETTY_FUNCTION__,"[" 
-				   + fqen() + "]: this is not a SSystem");
-      for(si = s.ssystem->firstSubstance(); 
-	  si != s.ssystem->lastSubstance(); si++)
+      for( si = getFirstSubstanceIterator(); 
+	   si != getLastSubstanceIterator(); ++si )
 	{
-	  primitive = new Primitive(si->second);
-	  cb(primitive,clientData);
-	  delete primitive;
+	  auto_ptr< Primitive > aPrimitivePtr( new Primitive( si->second ) );
+	  cb( aPrimitivePtr.get(), clientData );
 	}
-      return;
+      break;
     case Primitive::REACTOR:
-      if(!(s.rsystem = dynamic_cast<RSystem*>(this)))
-	throw UnmatchedSystemClass(__PRETTY_FUNCTION__,"[" 
-				   + fqen() + "]: this is not a RSystem");
-      for(ri = s.rsystem->firstReactor(); ri != s.rsystem->lastReactor(); ri++)
+      for( ri = getFirstReactorIterator(); 
+	   ri != getLastReactorIterator(); ++ri )
 	{
-	  primitive = new Primitive(ri->second);
-	  cb(primitive,clientData);
-	  delete primitive;
+	  auto_ptr< Primitive > aPrimitivePtr( new Primitive( ri->second ) );
+	  cb( aPrimitivePtr.get(), clientData );
 	}
-      return;
+      break;
     case Primitive::SYSTEM:
-      if(!(s.metasystem = dynamic_cast<MetaSystem*>(this)))
-	throw UnmatchedSystemClass(__PRETTY_FUNCTION__,"[" 
-				   + fqen() + "]: this is not a MetaSystem");
-      for(yi = s.metasystem->firstSystem(); 
-	  yi != s.metasystem->lastSystem(); yi++)
+      for( yi = getFirstSystemIterator(); 
+	   yi != getLastSystemIterator(); ++yi )
 	{
-	  primitive = new Primitive(yi->second);
-	  cb(primitive,clientData);
-	  delete primitive;
+	  auto_ptr< Primitive > aPrimitivePtr( new Primitive( yi->second ) );
+	  cb( aPrimitivePtr.get(), clientData );
 	}
-      return;
-/*    case Primitive::GENOMICELEMENT:
-      if(!(s.genome = dynamic_cast<Genome*>(this)))
-	throw UnmatchedSystemClass(__PRETTY_FUNCTION__,"[" 
-				   + fqen() + "]: this is not a Genome");
-      for(gi = s.genome->firstGenomicElement(); 
-	  gi != s.genome->lastGenomicElement(); gi++)
-	{
-	  primitive = new Primitive(*gi);
-	  cb(primitive,clientData);
-	  delete primitive;
-	}
-      return;*/
-    case Primitive::PRIMITIVE_NONE:
+      break;
+    case Primitive::NONE:
     default:
-	throw InvalidPrimitiveType(__PRETTY_FUNCTION__,"[" 
-				   + fqen() + "]: request type invalid");
+	throw InvalidPrimitiveType( __PRETTY_FUNCTION__,"[" 
+				    + getFqin() + "]: request type invalid" );
     }
 } 
 
 void System::initialize()
 {
-  assert(_stepper);
+  assert(theStepper);
 
   try{
-    if(_volumeIndexName != NULL)
+    if( theVolumeIndexName != NULL )
       {
-	FQPN fqpn(Primitive::REACTOR,*_volumeIndexName);
-	Primitive p(theRootSystem->getPrimitive(fqpn));
-	_volumeIndex = p.reactor;
-	//FIXME: *theMessageWindow << fqen() << ": volume index is [" 
-	//FIXME: 	  << _volumeIndex->fqen() << "].\n";
+	FQPN fqpn( Primitive::REACTOR, *theVolumeIndexName );
+	Primitive aPrimitive( theRootSystem->getPrimitive( fqpn ) );
+	theVolumeIndex = aPrimitive.reactor;
+	//FIXME: *theMessageWindow << getFqin() << ": volume index is [" 
+	//FIXME: 	  << _volumeIndex->getFqin() << "].\n";
 
       }
     else
       {
-	//FIXME: *theMessageWindow << fqen() << ": no volume index is specified.\n"; 
+	//FIXME: *theMessageWindow << getFqin() << ": no volume index is specified.\n"; 
       }
   }
-  catch(NotFound)
+  catch( NotFound )
     {
-      //FIXME: *theMessageWindow << fqen() << ": volume index [" 
-	//FIXME: << _volumeIndexName->fqenString() << "] not found.\n";
+      //FIXME: *theMessageWindow << getFqin() << ": volume index [" 
+	//FIXME: << _volumeIndexName->fqinString() << "] not found.\n";
     }
 
-  delete _volumeIndexName;
+  delete theVolumeIndexName;
+  theVolumeIndexName = NULL;
+
+  //
+  // Substance::initialize()
+  //
+  for( SubstanceListIterator i = getFirstSubstanceIterator() ; 
+       i != getLastSubstanceIterator() ; ++i )
+    {
+      i->second->initialize();
+    }
+
+  //
+  // Reactor::initialize()
+  //
+  for( ReactorListIterator i = getFirstReactorIterator() ;
+       i != getLastReactorIterator() ; ++i )
+    {
+      i->second->initialize();
+    }
+
+  theFirstRegularReactorIterator = find_if( getFirstReactorIterator(), 
+					    getLastReactorIterator(),
+					    isRegularReactorItem() );
+
+  //
+  // System::initialize()
+  //
+  for( SystemListIterator i = getFirstSystemIterator();
+       i != getLastSystemIterator(); ++i )
+    {
+      i->second->initialize();
+    }
 }
 
-
-
-
-/////////////////////// RSystem
-
-RSystem::RSystem()
+void System::clear()
 {
-//  _reactorList.clear();
-  _firstRegularReactor = _reactorList.begin();
+  //
+  // Substance::clear()
+  //
+  for( SubstanceListIterator i = getFirstSubstanceIterator() ; 
+      i != getLastSubstanceIterator() ; ++i )
+    {
+      i->second->clear();
+    }
 }
 
-bool RSystem::newReactor(Reactor *reactor)
+void System::react()
+{
+  for( ReactorListIterator i = getFirstRegularReactorIterator() ; 
+       i != getLastReactorIterator() ; ++i )
+    {
+      i->second->react();
+    }
+}
+
+void System::turn()
+{
+  for( SubstanceListIterator i = getFirstSubstanceIterator() ; 
+       i != getLastSubstanceIterator() ; ++i )
+    {
+      i->second->turn();
+    }
+}
+
+void System::transit()
+{
+  for( ReactorListIterator i = getFirstRegularReactorIterator() ; 
+       i != getLastReactorIterator() ; ++i )
+    {
+      i->second->transit();
+    }
+
+  for( SubstanceListIterator i = getFirstSubstanceIterator() ;
+       i != getLastSubstanceIterator() ; ++i )
+    {
+      i->second->transit();
+    }
+}
+
+void System::postern()
+{
+  for( ReactorListIterator i = getFirstReactorIterator() ; 
+       i != getFirstRegularReactorIterator() ; ++i )
+    {
+      i->second->react();
+    }
+
+  // update activity of posterior reactors by buffered values 
+  for( ReactorListIterator i = getFirstReactorIterator() ; 
+       i != getFirstRegularReactorIterator() ; ++i )
+    {
+      i->second->transit();
+    }
+}
+
+void System::addReactor( ReactorPtr reactor )
 {
   assert(reactor);
 
-  if(containsReactor(reactor->entryname()))
+  if( containsReactor( reactor->getId() ) )
     {
       //FIXME: *theMessageWindow << "multiple definition of reactor [" 
-	//FIXME: << reactor->entryname() << "] on [" << entryname() << 
+	//FIXME: << reactor->getId() << "] on [" << getId() << 
 	  //FIXME: "], later one discarded.\n";
-      return false;
+
+      //FIXME: throw exception
+      return;
     }
 
-  _reactorList[reactor->entryname()] = reactor;
-  return true;
+  theReactorList[ reactor->getId() ] = reactor;
+  return;
 }
 
-void RSystem::initialize()
+ReactorPtr System::getReactor( StringCref id ) throw( NotFound )
 {
-  for(ReactorListIterator i = firstReactor() ; i != lastReactor() ; i++)
-    i->second->initialize();
-
-  _firstRegularReactor = find_if(firstReactor(),lastReactor(),
-				 isRegularReactorItem());
+  ReactorListIterator i = getReactorIterator( id );
+  if( i == getLastReactorIterator() )
+    {
+      throw NotFound( __PRETTY_FUNCTION__, "[" + getFqin() + 
+		      "]: Reactor [" + id + "] not found in this System." );
+    }
+  return i->second;
 }
 
-
-void RSystem::react()
+void System::addSubstance( SubstancePtr newone )
 {
-#ifdef DEBUG_STEPPER
-  cerr << fqen() <<": react() " << endl;
-#endif /* DEBUG_STEPPER */
-  for(ReactorListIterator i = firstRegularReactor() ; i != lastReactor() ; i++)
-    i->second->react();
-}
-
-void RSystem::transit()
-{
-  for(ReactorListIterator i = firstRegularReactor() ; i != lastReactor() ; i++)
-    i->second->transit();
-}
-
-void RSystem::postern()
-{
-#ifdef DEBUG_STEPPER
-  cerr << fqen() <<": postern() " << endl;
-#endif /* DEBUG_STEPPER */
-  for(ReactorListIterator i = firstReactor() ; 
-      i != firstRegularReactor() ; i++)
-    i->second->react();
-
-  // update activity of posterior reactors by buffered values 
-  for(ReactorListIterator i = firstReactor() ; 
-      i != firstRegularReactor() ; i++)
-    i->second->transit();
-}
-
-
-
-Reactor* RSystem::getReactor(const string& e_name) throw(NotFound)
-{
-  ReactorListIterator it = getReactorIterator(e_name);
-  if(it == lastReactor())
-    throw NotFound(__PRETTY_FUNCTION__, "[" + fqen() + 
-		   "]: Reactor [" + e_name + "] not found in this System.");
-  return it->second;
-}
-
-
-
-///////////////////// SSystem
-
-SSystem::SSystem()
-{
-//  _substanceList.clear();
-}
-
-bool SSystem::newSubstance(Substance* newone)
-{
-  if(containsSubstance(newone->entryname()))
+  if( containsSubstance( newone->getId() ) )
     {
 //FIXME:       *theMessageWindow << "multiple definition of substance [" 
-//FIXME: 	<< newone->entryname() << "] on [" << entryname() << 
+//FIXME: 	<< newone->getId() << "] on [" << getId() << 
 //FIXME: 	  "], name and quantity overwrote.\n";
-      _substanceList[newone->entryname()]->setName(newone->name());
-      Message m("Quantity",newone->quantity());
-      _substanceList[newone->entryname()]->set(m);
-//      _substanceList[newone->entryname()]->setQuantity(newone->quantity());
+      theSubstanceList[ newone->getId() ]->setName( newone->getName() );
+      Message aMessage( "Quantity", newone->getQuantity() );
+      theSubstanceList[ newone->getId() ]->set(aMessage);
       delete newone;
-      return false;
+      //FIXME: throw exception
+      return;
     }
-  _substanceList[newone->entryname()] = newone;
-  newone->setSupersystem(this);
-  return true;
+  theSubstanceList[ newone->getId() ] = newone;
+  newone->setSupersystem( this );
+
 }
 
-void SSystem::initialize()
+SubstancePtr System::getSubstance( StringCref id ) throw( NotFound )
 {
-  for(SubstanceListIterator i = _substanceList.begin() ; 
-      i != _substanceList.end() ; i++)
-    i->second->initialize();
-}
-
-void SSystem::clear()
-{
-  for(SubstanceListIterator i = _substanceList.begin() ; 
-      i != _substanceList.end() ; i++)
-    i->second->clear();
-}
-
-void SSystem::turn()
-{
-  for(SubstanceListIterator i = _substanceList.begin() ; 
-      i != _substanceList.end() ; i++)
-    i->second->turn();
-}
-
-void SSystem::transit()
-{
-  for(SubstanceListIterator i = _substanceList.begin() ; 
-      i != _substanceList.end() ; i++)
-    i->second->transit();
-}
-
-void SSystem::fixSubstance(const string& entry)
-{
-  Substance* s;
-  if( (s = getSubstance(entry)) == NULL)
+  SubstanceListIterator i = getSubstanceIterator( id );
+  if( i == getLastSubstanceIterator() )
     {
-//FIXME:       *theMessageWindow << "fix request to undefined substance [" 
-//FIXME: 	<< entry << "] on [" << entryname() << "]. ignoring.\n";
-      return; 
+      throw NotFound(__PRETTY_FUNCTION__, "[" + getFqin() + 
+		     "]: Substance [" + id + "] not found in this System.");
     }
-  s->fix();
-}
 
-Substance* SSystem::getSubstance(const string& e_name) throw(NotFound)
-{
-  SubstanceListIterator it = getSubstanceIterator(e_name);
-  if(it == lastSubstance())
-    throw NotFound(__PRETTY_FUNCTION__, "[" + fqen() + 
-		   "]: Substance [" + e_name + "] not found in this System.");
-  return it->second;
+  return i->second;
 }
 
 
-////////////////////// MetaSystem
-
-MetaSystem::MetaSystem()
+void System::addSystem( SystemPtr system )
 {
-//  _subsystemList.clear();
-}
-
-
-bool MetaSystem::newSystem(System* system)
-{
-  if(containsSystem(system->entryname()))
+  if( containsSystem( system->getId() ) )
     {
 //FIXME:       *theMessageWindow << "multiple definition of system [" 
-//FIXME: 	<< system->entryname() << "] on [" << entryname() << 
+//FIXME: 	<< system->getId() << "] on [" << getId() << 
 //FIXME: 	  "], later one discarded.\n";
       delete system;
-      return false;
+      //FIXME: throw exception
+      return;
     }
 
-  _subsystemList[system->entryname()] = system;
-  return true;
+  theSubsystemList[ system->getId() ] = system;
+
 }
 
-void MetaSystem::initialize()
+SystemPtr System::getSystem( SystemPathCref systempath ) throw( NotFound )
 {
-  for(SystemListIterator s = firstSystem();s != lastSystem(); s++)
+  SystemPtr  aSystem = getSystem( systempath.first() );
+  SystemPath anNext    = systempath.next();
+
+  if( anNext.getString() != "" ) // not a leaf
     {
-      s->second->System::initialize();
-      s->second->initialize();
+      aSystem = aSystem->getSystem( anNext );
     }
-}
-
-System* MetaSystem::findSystem(const SystemPath& systempath) 
-throw(NotFound)
-{
-  System* s = getSystem(systempath.first());
-  SystemPath next = systempath.next();
-
-  if(next.systemPathString() == "") // a leaf
-    return s;
   
-  // an node, not a leaf
-  MetaSystem* ms = dynamic_cast<MetaSystem*>(s);
-  if(!ms)
-    throw NotFound(__PRETTY_FUNCTION__,
-		   "attempt to get a subsystem of non-MetaSystem [" +
-		   next.systemPathString() + "] in [" + fqen() + "].");
-
-  return ms->findSystem(next);
+  return aSystem;
 }
 
-System* MetaSystem::getSystem(const string& e_name) throw(NotFound)
+SystemPtr System::getSystem( StringCref id ) throw(NotFound)
 {
-  SystemListIterator it = getSystemIterator(e_name);
-  if(it == lastSystem())
-    throw NotFound(__PRETTY_FUNCTION__, "[" + fqen() + 
-		   "]: System [" + e_name + "] not found in this System.");
-  return it->second;
+  SystemListIterator i = getSystemIterator( id );
+  if( i == getLastSystemIterator() )
+    {
+      throw NotFound(__PRETTY_FUNCTION__, "[" + getFqin() + 
+		     "]: System [" + id + "] not found in this System.");
+    }
+  return i->second;
 }
 
+/*
+  Do not modify
+  $Author$
+  $Revision$
+  $Date$
+  $Locker$
+*/

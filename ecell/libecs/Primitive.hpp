@@ -1,85 +1,81 @@
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
-// 		This file is part of Serizawa (E-CELL Core System)
+//        This file is part of E-CELL Simulation Environment package
 //
-//	       written by Kouichi Takahashi  <shafi@sfc.keio.ac.jp>
-//
-//                              E-CELL Project,
-//                          Lab. for Bioinformatics,  
-//                             Keio University.
-//
-//             (see http://www.e-cell.org for details about E-CELL)
+//                Copyright (C) 1996-2000 Keio University
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
 //
-// Serizawa is free software; you can redistribute it and/or
+// E-CELL is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
 // License as published by the Free Software Foundation; either
 // version 2 of the License, or (at your option) any later version.
 // 
-// Serizawa is distributed in the hope that it will be useful,
+// E-CELL is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 // See the GNU General Public License for more details.
 // 
 // You should have received a copy of the GNU General Public
-// License along with Serizawa -- see the file COPYING.
+// License along with E-CELL -- see the file COPYING.
 // If not, write to the Free Software Foundation, Inc.,
 // 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 // 
 //END_HEADER
-
-
-
-
+//
+// written by Kouichi Takahashi <shafi@e-cell.org> at
+// E-CELL Project, Lab. for Bioinformatics, Keio University.
+//
 
 #ifndef ___PRIMITIVE_H___
 #define ___PRIMITIVE_H___
 #include <string>
-
-class Entity;
-class Substance;
-class CDS;
-class GenomicElement;
-class Reactor;
-class System;
-
-
+#include "Koyurugi.h"
 
 class Primitive
 {
+
 public:
 
-  enum Type {ENTITY = 0x01,SUBSTANCE=0x02,REACTOR=0x04,
-	     SYSTEM=0x08,CDS=0x10,GENOMICELEMENT=0x20,
-	     PRIMITIVE_NONE = 0x00};
+  enum Type 
+  {
+    ENTITY    = 0x01,
+    SUBSTANCE = 0x02,
+    REACTOR   = 0x04,
+    SYSTEM    = 0x08,
+    NONE = 0x00};
 
+//FIXME: do not use union 
   union
     {
-      Entity* entity;
-      Substance* substance;
-      Reactor* reactor;
-      System* system;
-//      CDS* cds;
-      GenomicElement* genomicElement;
+      EntityPtr entity;
+      SubstancePtr substance;
+      ReactorPtr reactor;
+      SystemPtr system;
     };
 
   Primitive::Type type;
   
-  Primitive() : entity(NULL) {type = PRIMITIVE_NONE;}
-  Primitive(Entity* e) : entity(e),type(ENTITY) {}
-  Primitive(Substance* s) : substance(s),type(SUBSTANCE) {}
-  Primitive(Reactor* r) : reactor(r),type(REACTOR) {}
-  Primitive(System* s) : system(s),type(SYSTEM) {}
-//  Primitive(CDS* g) : cds(g),type(CDS) {}
-  Primitive(GenomicElement* ge) : genomicElement(ge),type(GENOMICELEMENT) {}
+  Primitive() : entity( NULL ) { type = NONE; }
+  Primitive( EntityPtr e )    : entity( e ),    type( ENTITY ) {}
+  Primitive( SubstancePtr s ) : substance( s ), type( SUBSTANCE ) {}
+  Primitive( ReactorPtr r )   : reactor( r ),   type( REACTOR ) {}
+  Primitive( SystemPtr s )    : system( s ),    type( SYSTEM ) {}
 
-
-  static const string PrimitiveTypeString(Type type);
-  static Type PrimitiveType(const string& typestring);
+  static const String PrimitiveTypeString( Type type );
+  static Type PrimitiveType( StringCref typestring );
 
 };
 
 
 #endif /* ___PRIMITIVE_H___ */
+
+
+/*
+  Do not modify
+  $Author$
+  $Revision$
+  $Date$
+  $Locker$
+*/

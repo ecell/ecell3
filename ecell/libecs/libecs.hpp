@@ -28,30 +28,50 @@
 // E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
 
-#ifndef __STRINGLIST_H___
-#define __STRINGLIST_H___
-#include <stl.h>
-#include <string>
+#ifndef __KOYURUGI_H
+#define __KOYURUGI_H
 #include "Defs.h"
 
-class StringList : public vector< String >
-{
+DECLARE_CLASS( System );
+DECLARE_CLASS( AccumulatorMaker );
+DECLARE_CLASS( Accumulator );
+DECLARE_CLASS( SimpleAccumulator );
+DECLARE_CLASS( RoundDownAccumulator );
+DECLARE_CLASS( RoundOffAccumulator );
+DECLARE_CLASS( ReserveAccumulator );
+DECLARE_CLASS( MonteCarloAccumulator );
+DECLARE_CLASS( Environment );
+DECLARE_CLASS( Monolithic );
+DECLARE_CLASS( Cytoplasm );
+DECLARE_CLASS( Membrane );
+DECLARE_CLASS( Cell );
+DECLARE_CLASS( Entity );
+DECLARE_CLASS( SystemPath );
+DECLARE_CLASS( FQIN );
+DECLARE_CLASS( FQPN );
+DECLARE_CLASS( Integrator );
+DECLARE_CLASS( Eular1Integrator );
+DECLARE_CLASS( RungeKutta4Integrator );
+DECLARE_CLASS( Primitive );
+DECLARE_CLASS( Reactant );
+DECLARE_CLASS( Reactor );
+DECLARE_CLASS( isRegularReactor );
+DECLARE_CLASS( ReactorMaker );
+DECLARE_CLASS( RootSystem );
+DECLARE_CLASS( Stepper );
+DECLARE_CLASS( MasterStepper );
+DECLARE_CLASS( StepperLeader );
+DECLARE_CLASS( SlaveStepper );
+DECLARE_CLASS( Eular1Stepper );
+DECLARE_CLASS( RungeKutta4Stepper );
+DECLARE_CLASS( StepperMaker );
+DECLARE_CLASS( Substance );
+DECLARE_CLASS( SubstanceMaker );
+DECLARE_CLASS( System );
+DECLARE_CLASS( isRegularReactorItem );
+DECLARE_CLASS( SystemMaker );
 
-public:
-
-  StringList( StringCref str="", StringCref delim= " ",
-	      StringCref spacer = "" );
-
-  const String dump( const char delim=' ' );
-
-protected:
-
-  void parse( StringCref str, StringCref delim, StringCref spacer );
-
-};
-
-
-#endif __STRINGLIST_H___
+#endif // __KOYURUGI_H
 
 
 /*
