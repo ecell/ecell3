@@ -7,12 +7,15 @@ DM_SO_DIR = ${prefix}/lib/${PACKAGE}/${VERSION}
 DM_SRC_DIR =  ${prefix}/share/${PACKAGE}/${VERSION}/DM
 
 DMS = MassActionProcess.cpp\
-MichaelisUniUniProcess.cpp\
-RapidEquilibriumProcess.cpp\
-MichaelisUniUniReversibleProcess.cpp\
 CatalyzedMassActionFluxProcess.cpp\
+MichaelisUniUniProcess.cpp\
+MichaelisUniUniReversibleProcess.cpp\
+RapidEquilibriumProcess.cpp\
 DecayFluxProcess.cpp\
 IsoUniUniFluxProcess.cpp\
+OrderedBiBiFluxProcess.cpp\
+OrderedBiUniFluxProcess.cpp\
+OrderedUniBiFluxProcess.cpp\
 SSystemProcess.cpp\
 NRProcess.cpp\
 NRStepper.cpp\
