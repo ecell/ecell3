@@ -33,6 +33,7 @@ SSystemProcess.cpp\
 GillespieProcess.cpp\
 NRStepper.cpp\
 FixedODE1Stepper.cpp\
+FixedDAE1Stepper.cpp\
 FixedRungeKutta4Stepper.cpp\
 ODE23Stepper.cpp\
 CashKarp45Stepper.cpp\
@@ -45,6 +46,7 @@ PythonFluxProcess.hpp\
 PythonProcess.hpp\
 PythonProcessBase.hpp\
 FixedODE1Stepper.hpp\
+FixedDAE1Stepper.hpp\
 FixedRungeKutta4Stepper.hpp\
 GillespieProcess.hpp\
 NRStepper.hpp\
