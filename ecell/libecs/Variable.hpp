@@ -145,10 +145,12 @@ namespace libecs
 
     virtual void integrate( RealParam aTime )
     {
-      if( isFixed() == false )
-	{
-	  updateValue( aTime );
-	}
+      if( isFixed() == false ) {
+	updateValue( aTime );
+      }
+      else {
+	theLastTime = aTime;
+      }
     }
 
     const Real calculateVelocitySum( RealParam aCurrentTime, 
@@ -233,10 +235,9 @@ namespace libecs
 
     virtual SET_METHOD( Real, Value )
     { 
-      if( ! isFixed() ) 
-	{
-	  loadValue( value ); 
-	}
+      if ( !isFixed() ) {
+	loadValue( value ); 
+      }
     }
 
 
