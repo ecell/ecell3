@@ -115,30 +115,9 @@ namespace libecs
   
   public:
 
-    ConcretePolymorphValue( StringCref  aValue ) 
+    ConcretePolymorphValue( typename Param<T>::type  aValue ) 
       :
-      theValue( convertTo<T>( aValue ) )
-    {
-      ; // do nothing
-    }
-
-    ConcretePolymorphValue( RealParam aValue ) 
-      :
-      theValue( convertTo<T>( aValue ) )
-    {
-      ; // do nothing
-    }
-
-    ConcretePolymorphValue( IntegerParam  aValue )
-      :
-      theValue( convertTo<T>( aValue ) )
-    {
-      ; // do nothing
-    }
-
-    ConcretePolymorphValue( PolymorphVectorCref aValue )
-      :
-      theValue( convertTo<T>( aValue ) )
+      theValue( aValue )
     {
       ; // do nothing
     }
@@ -396,16 +375,6 @@ namespace libecs
   //
 
   // to PolymorphVector object
-
-  // identity
-
-  //  template<>
-  //  inline const PolymorphVector 
-  //  convertTo( PolymorphVectorCref aValue, 
-  //	     Type2Type< PolymorphVector > )
-  //  {
-  //    return aValue;
-  //  }
 
   // from Real
   template<>

@@ -34,8 +34,6 @@
 #include "libecs.hpp"
 #include "Util.hpp"
 
-//#include "Polymorph.hpp"
-
 namespace libecs
 {
 
@@ -65,15 +63,6 @@ namespace libecs
 
   // to String
 
-  // identity
-  template<>
-  inline const String
-  convertTo( StringCref aValue,
-	     Type2Type< String > )
-  {
-    return aValue;
-  }
-
   template<>
   inline const String convertTo( RealCref aValue,
 				 Type2Type< String > )
@@ -90,16 +79,6 @@ namespace libecs
 
 
   // to Real
-
-
-  // identity
-  template<>
-  inline const Real
-  convertTo( RealCref aValue,
-	     Type2Type< Real > )
-  {
-    return aValue;
-  }
 
   template<>
   inline const Real convertTo( StringCref aValue,
@@ -118,16 +97,6 @@ namespace libecs
 
 
   // to Integer
-
-
-  // identity
-  template<>
-  inline const Integer
-  convertTo( IntegerCref aValue,
-	     Type2Type< Integer > )
-  {
-    return aValue;
-  }
 
   template<>
   inline const Integer convertTo( RealCref aValue,

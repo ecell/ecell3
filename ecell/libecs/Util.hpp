@@ -85,10 +85,10 @@ namespace libecs
   }
 
   /// Specializations, mainly for the sake of binary size.
-  template <> inline const String toString( const Real& t );
-  template <> inline const String toString( const Integer& t );
-  template <> inline const String toString( const UnsignedInteger& t );
-  template <> inline const String toString( const String& t );
+  template <> const String toString( const Real& t );
+  template <> const String toString( const Integer& t );
+  template <> const String toString( const UnsignedInteger& t );
+  template <> const String toString( const String& t );
 
   /**
      Erase white space characters ( ' ', '\t', and '\n' ) from a string

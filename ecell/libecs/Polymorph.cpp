@@ -102,11 +102,12 @@ namespace libecs
 	break;
       case STRING:
 	aPolymorphValuePtr = 
-	  new ConcretePolymorphValue<Integer>( theValue->asString() );
+	  new ConcretePolymorphValue<String>( theValue->asString() );
 	break;
       case POLYMORPH_VECTOR:
 	aPolymorphValuePtr = 
-	  new ConcretePolymorphValue<Integer>( theValue->asPolymorphVector() );
+	  new ConcretePolymorphValue<PolymorphVector>
+	  ( theValue->asPolymorphVector() );
 	break;
       case NONE:
 	aPolymorphValuePtr = new PolymorphNoneValue();
