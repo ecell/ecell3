@@ -42,11 +42,9 @@
 class LoggerImplementation
 {
 
-  typedef Logger<Float,Float> FloatLogger;
-
 public:
 
-  
+  typedef Logger<Float,Float> FloatLogger;
 
   LoggerImplementation() {}
   virtual ~LoggerImplementation() {}

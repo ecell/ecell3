@@ -43,8 +43,8 @@ class LocalLoggerImplementation
 
 public:
 
-  LocalLoggerImplementation();
-  virtual ~LocalLoggerImplementation();
+  LocalLoggerImplementation( ObjectPtr optr );
+  virtual ~LocalLoggerImplementation( );
 
   FloatLogger::DataPointVector& getData( const Float& first,
 					 const Float& last,
@@ -57,6 +57,10 @@ public:
   void push( const FloatLogger::containee_type& x );
 
   void push( const Float& t, const Float& v ); 
+
+private:
+
+  FloatLogger theFloatLogger;
 					
 }
 
