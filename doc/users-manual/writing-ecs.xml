@@ -700,7 +700,7 @@ else:
 	<para>To create the backend object, just call
 	<methodname>create</methodname>() method.
 <informalexample>
-aStepperStub.create()<lineannotation># Stepper 'STEPPER_01' is created here</lineannotation>
+<programlisting>aStepperStub.create()<lineannotation># Stepper 'STEPPER_01' is created here</lineannotation>
 </programlisting>
 	  </informalexample></para>
 

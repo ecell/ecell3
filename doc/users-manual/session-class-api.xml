@@ -199,7 +199,7 @@ events are scheduled at the same point in time.</para>
 
             <para>If <emphasis>event checker</emphasis>
 	    <emphasis>event handler</emphasis> object are set,
-	    <parameter>sec</parameter> can be omitted <para>See also:
+	    <parameter>sec</parameter> can be omitted.</para> <para>See also:
 	    <methodname>setEventChecker</methodname> and
 	    <methodname>setEventHandler</methodname></para></entry>
       </row>
