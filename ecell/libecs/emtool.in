@@ -41,7 +41,7 @@ Compile and/or dynamic module in
 E-CELL Simulation Environment Versin 3.
 
 Usage:
-	`basename $0` <classname> [OPTIONS] files...
+	`basename $0` [OPTIONS] files...
 	`basename $0` -h|--help
 EOT_USAGE
 }
@@ -52,12 +52,13 @@ usage
 cat << EOT_HELP
 
 Options:
-	-a or --all)	        All dynamic module compile.
-	-g or --generate)       Generate dm to cpp/hpp source file.
-	-c or --compile)        Compile cpp to so file.
-        -t or --template)       Specify dmgen template class
-	-i or --include)        Specify dmcompile include file
-        -m or --munch)          Specify munch file
+	-a or --all)	        Create a so file from a dm file.
+	-g or --generate)       Generate a .cpp file from a dm file.
+	-c or --compile)        Compile a .cpp file.
+        -C or --class)          Specify a template class.
+        -t or --template)       Specify a dmgen template file.
+	-i or --include)        Specify a dmcompile include file.
+        -m or --munch)          Specify munch file.
         -h or --help)		Print this message.
 
 This program is part of E-CELL Simulation Environment Version 3.
@@ -86,7 +87,7 @@ interrupted()
 
 run_command()
 {
-	#echo $@
+	echo $@
 	$@
 	return $?
 }
@@ -109,8 +110,8 @@ fi
 
 # get dynamic module class
 
-CLASS=$1
-shift
+#default class is reactor
+CLASS='reactor'
 
 TEMPLATEDIR="${prefix}/share/ecell/@VERSION@/template/$CLASS"
 
@@ -118,6 +119,7 @@ while [ -n "$(echo $1 | grep '-')" ]; do
     case "$1" in
 	-a|--all) DO_ALL=yes ; shift ; break ;;
 	-g|--generate) DO_GENERATE=yes ; shift ; break ;;
+	-C|--class) CLASS=$2 ; shift ; break ;;
 	-c|--compile) DO_COMPILE=yes ; shift ; break ;;
 	-t|--template) DO_TEMPLATE=yes ; templatefile=$2 ; shift 2 ;;
 	-i|--include) DO_INCLUDE=yes ; includefile=$2 ; shift 2;;
@@ -218,12 +220,12 @@ if [ $DO_COMPILE  ] ; then
     base=`basename $inputfile .cpp`	     			
     sofile=$base$SOSUFFIX
 
-    if [ -f $sofile -a $sofile -nt $ ] ; then
-	echo "$sofile is newer than $inputfile..." 
-	echo "skipping..."
-	cleanup
-	exit 0
-    fi
+#    if [ -f $sofile -a $sofile -nt $ ] ; then
+#	echo "$sofile is newer than $inputfile..." 
+#	echo "skipping..."
+#	cleanup
+#	exit 0
+#    fi
 
     if [ $DO_INCLUDE ] ; then 
 	run_command "$DMCOMPILE $base.cpp -I $includefile -I $ECELL_INCLUDE -I $EMTOOL_INCLUDE -I . -I .." 
