@@ -303,8 +303,6 @@ class Session:
         aProcessList   = anEml.getEntityList( 'Process',   aSystemPath )
         aSubSystemList = anEml.getEntityList( 'System',    aSystemPath )
 
-        print aSubSystemList
-
         self.__loadPropertyList( anEml, 'Variable',\
                                  aSystemPath, aVariableList )
         self.__loadPropertyList( anEml, 'Process',  aSystemPath, aProcessList )
