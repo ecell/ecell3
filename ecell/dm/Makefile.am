@@ -36,7 +36,7 @@ PythonProcess.cpp
 DMH = CashKarp45Stepper.hpp\
 FixedODE1Stepper.hpp\
 FixedRungeKutta4Stepper.hpp\
-NRProcess.hpp\
+GillespieProcess.hpp\
 NRStepper.hpp\
 ODE23Stepper.hpp\
 ODE45Stepper.hpp
