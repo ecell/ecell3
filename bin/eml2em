@@ -225,13 +225,20 @@ Options:
         anEmFile = open( anEmFileName, 'w' )
             
 
-    aHeader = '''
+    aBuffer = '''
 # created by eml2em program
 # from file: %s, date: %s
 #
 
 ''' % ( anEmlFileName, time.asctime( time.localtime() ) )
 
-    anEmFile.write( aHeader )
-    anEmFile.write( createStepperList( anEml ) )
-    anEmFile.write( createSystemList( anEml ) )
+    try:
+        aBuffer += createStepperList( anEml )
+        aBuffer += createSystemList( anEml )
+    except:
+        sys.stderr.write( 'Error: ' + str( sys.exc_type ) + '\n' )
+        sys.exit( 1 )
+
+
+    anEmFile.write( aBuffer )
+
