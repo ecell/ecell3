@@ -6,7 +6,7 @@ ECELL3_DMC = ../../bin/ecell3-dmc
 DM_SO_DIR = ${prefix}/lib/${PACKAGE}/${VERSION}
 DM_SRC_DIR =  ${prefix}/share/${PACKAGE}/${VERSION}/DM
 
-BOOST_DIR=@BOOST_DIR@
+BOOST_INCLUDE=@BOOST_INCLUDE@
 PYTHON_INCLUDES=@PYTHON_INCLUDES@
 
 DMS = MassActionFluxProcess.cpp\
@@ -56,7 +56,7 @@ dmsodir = ${DM_SO_DIR}
 dmso_DATA = ${SOS}
 
 %.so : %.cpp
-	${SHELL} ${ECELL3_DMC} -v --dmcompile=${top_srcdir}/../dmtool --no-stdinclude --no-stdlibdir --ldflags=-L${top_srcdir}/libecs --cxxflags='-I${top_srcdir}/libecs -I${top_srcdir}/.. -I${top_srcdir} ${PYTHON_INCLUDES} -I${BOOST_DIR}' $< 
+	${SHELL} ${ECELL3_DMC} -v --dmcompile=${top_srcdir}/../dmtool --no-stdinclude --no-stdlibdir --ldflags=-L${top_srcdir}/libecs --cxxflags='-I${top_srcdir}/libecs -I${top_srcdir}/.. -I${top_srcdir} ${PYTHON_INCLUDES} ${BOOST_INCLUDE}' $< 
 
 clean-local:
 	${RM} -rf ${dmso_DATA}

@@ -8,10 +8,12 @@ PYTHON_INCLUDES=@PYTHON_INCLUDES@
 
 pkgpythondir=@pkgpythondir@
 
-BOOST_DIR=@BOOST_DIR@
+BOOST_INCLUDE=@BOOST_INCLUDE@
+BOOST_INCLUDE=@BOOST_INCLUDE@
 
-BPLSRCDIR=$(BOOST_DIR)/libs/python/src
-BPLINCLUDE=-I$(BOOST_DIR)
+#BPLSRCDIR=$(BOOST_DIR)/libs/python/src
+#BPLINCLUDE=-I$(BOOST_DIR)
+BPLINCLUDE=
 
 BPLCXXFLAGS=-ftemplate-depth-70
 
@@ -23,51 +25,9 @@ LIBEMCDIR=$(ECELLDIR)/libemc
 
 LIBECS=$(LIBECSDIR)/libecs.la
 LIBEMC=$(LIBEMCDIR)/libemc.la
+LIBBOOSTPYTHON=-lboost_python
 
 CFLAGS=${CXXFLAGS}
-
-BPLV2SRC=\
-numeric.cpp\
-list.cpp\
-long.cpp\
-dict.cpp\
-tuple.cpp\
-str.cpp\
-aix_init_module.cpp\
-from_python.cpp\
-registry.cpp\
-type_id.cpp\
-enum.cpp\
-class.cpp\
-function.cpp\
-inheritance.cpp\
-life_support.cpp\
-pickle_support.cpp\
-errors.cpp\
-module.cpp\
-builtin_converters.cpp\
-arg_to_python_base.cpp\
-iterator.cpp\
-object_protocol.cpp\
-object_operators.cpp
-
-
-BPLSRC=$(BPLV2SRC)
-
-
-$(BPLSRC):
-	echo $(BPLV2SRC)
-	if [ -f $(BPLSRCDIR)/$@ ]; then\
-		cp -f $(BPLSRCDIR)/$@ . ;\
-	elif [ -f $(BPLSRCDIR)/converter/$@ ] ; then\
-		cp -f $(BPLSRCDIR)/converter/$@ . ;\
-	elif [ -f $(BPLSRCDIR)/object/$@ ] ; then\
-		cp -f $(BPLSRCDIR)/object/$@ . ;\
-	fi
-
-
-#noinst_LTLIBRARIES= libbpl.la
-#libbpl_la_SOURCES=$(BPLSRC)
 
 
 pkgpython_LTLIBRARIES = _ecs.la
@@ -82,7 +42,7 @@ PyEcs.hpp
 
 _ecs_la_LDFLAGS=-module -export-dynamic -avoid-version
 
-_ecs_la_LIBADD=$(LIBECS) $(LIBEMC)
+_ecs_la_LIBADD=$(LIBECS) $(LIBEMC) $(LIBBOOSTPYTHON)
 
 _ecs_la_DEPENDENCIES=$(LIBECS) $(LIBEMC)
 
@@ -99,4 +59,41 @@ clean-local:
 
 bin_SCRIPTS =\
 ecell3-python
+
+
+
+# BPLSRC=\
+# numeric.cpp\
+# list.cpp\
+# long.cpp\
+# dict.cpp\
+# tuple.cpp\
+# str.cpp\
+# aix_init_module.cpp\
+# from_python.cpp\
+# registry.cpp\
+# type_id.cpp\
+# enum.cpp\
+# class.cpp\
+# function.cpp\
+# inheritance.cpp\
+# life_support.cpp\
+# pickle_support.cpp\
+# errors.cpp\
+# module.cpp\
+# builtin_converters.cpp\
+# arg_to_python_base.cpp\
+# iterator.cpp\
+# object_protocol.cpp\
+# object_operators.cpp
+
+# $(BPLSRC):
+# 	echo $(BPLV2SRC)
+# 	if [ -f $(BPLSRCDIR)/$@ ]; then\
+# 		cp -f $(BPLSRCDIR)/$@ . ;\
+# 	elif [ -f $(BPLSRCDIR)/converter/$@ ] ; then\
+# 		cp -f $(BPLSRCDIR)/converter/$@ . ;\
+# 	elif [ -f $(BPLSRCDIR)/object/$@ ] ; then\
+# 		cp -f $(BPLSRCDIR)/object/$@ . ;\
+# 	fi
 
