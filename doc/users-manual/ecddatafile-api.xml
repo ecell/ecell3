@@ -36,7 +36,7 @@
 <para>Constructor.  <parameter>data</parameter> must be a rank-2
 <type>array</type> object of <productname>Numeric Python</productname>
 or an equivalent object.  If <parameter>data</parameter> is not given,
-an empty matrix ([[]]) is set.</para>
+an empty matrix (<constant>[[]]</constant>) is set.</para>
             </entry>
       </row>
 
@@ -71,7 +71,7 @@ This method returns the data as a rank-2 <type>array</type> of
 	<entry namest="c1" nameend='c2' rowsep='1'>
 <para>
 This method returns a name of the data.  The default value of the name is
-an empty string ('').
+an empty string (<constant>''</constant>).
 </para>
             </entry>
       </row>
@@ -88,9 +88,9 @@ an empty string ('').
       <row>
 	<entry namest="c1" nameend='c2' rowsep='1'>
 <para>
-If either loading or saving of the data is succeeded, this method returns
-the name of the file the data is loaded from or saved to.  Otherwise this
-method returns an empty string ('').
+If either loading or saving of the data from a file is succeeded, this method returns
+the name of the file.  Otherwise this
+method returns an empty string (<constant>''</constant>).
 </para>
             </entry>
       </row>
@@ -108,7 +108,7 @@ method returns an empty string ('').
       <row>
 	<entry namest="c1" nameend='c2' rowsep='1'>
 <para>
-Thie method returns the list of axes names as a <type>tuple</type> containing
+This method returns the list of axis names as a <type>tuple</type> containing
 <type>string</type> objects.  The default value is <constant>( 't', 'value', 'avg', 'min', 'max' )</constant>.
 </para>
             </entry>
@@ -178,7 +178,7 @@ This method saves the data to a file <parameter>filename</parameter>.
       <row>
 	<entry namest="c1" nameend='c2' rowsep='1'>
 <para>
-This method replaces data of this <classname>ECDDataFile</classname>
+This method replaces the data of this <classname>ECDDataFile</classname>
 object by <parameter>data</parameter>.  <parameter>data</parameter>
 must be a rank-2 <type>array</type> of <productname>Numeric
 Python</productname> or an equivalent object.

@@ -130,7 +130,7 @@ which takes just one string parameter.</para>
 <synopsis><methodname>getCurrentTime</methodname>()
 </synopsis></entry>
 
-	<entry>Simulator's current time as a <type>float</type></entry>
+	<entry>The current time as a <type>float</type></entry>
       </row>
 
       <row>
@@ -152,9 +152,18 @@ which takes just one string parameter.</para>
 
       <row>
 	<entry namest="c1" nameend='c2' rowsep='1'>
-<para>This method returns the next event structure as a Python 2-<type>tuple</type> consisting of a scheduled time and a StepperID.  The event will be processed in the next time <methodname>step</methodname>() or <methodname>run</methodname>() is called.</para>
+<para>This method returns the next scheduled event as a Python
+2-<type>tuple</type> consisting of a scheduled time and a StepperID.
+The event will be processed in the next time
+whe <methodname>step</methodname>() or <methodname>run</methodname>() is
+called.</para>
 
-<para>The time is usually different from one that <methodname>getCurrentTime</methodname>() returns.   This method returns the scheduled time of the next event, while <methodname>getCurrentTime</methodname>() returns the time of the last event.  These methods can return the same number if more than one events are scheduled at the same point in time, of course.</para>
+<para>The time is usually different from one that
+<methodname>getCurrentTime</methodname>() returns.  This method
+returns the scheduled time of the next event, while
+<methodname>getCurrentTime</methodname>() returns the time of the last
+event.  These methods can return the same number if more than one
+events are scheduled at the same point in time.</para>
 
             </entry>
       </row>
@@ -175,23 +184,22 @@ which takes just one string parameter.</para>
 	    <para>Run the simulation for <parameter>sec</parameter>
 	    seconds.</para> 
 
-            <para>When this method is called, internally the simulator
+            <para>When this method is called, the simulator internally
             calls <methodname>step</methodname>() method repeatedly
             until the equation
             <literal>t<subscript>current</subscript> >
             t<subscript>start</subscript> +
             <parameter>sec</parameter></literal> holds.  That means,
             the simulator stops immediately after the simulation step
-            in which the time exceeds the specified point, and the
-            time can be far after the point if all step sizes taken by
-            <classname>Stepper</classname>s in the model are long.
+            in which the time exceeds the specified point. The time
+            can be far after the specified time point if all step
+            sizes taken by <classname>Stepper</classname>s in the
+            model are very long.
             </para>
 
-            <para>If <parameter>sec</parameter> is omitted, this
-	    method will not return unless the <emphasis>event
-	    checker</emphasis> object is set by using
-	    <methodname>setEventChecker</methodname> and it returns
-	    true.</para> <para>See also:
+            <para>If <emphasis>event checker</emphasis>
+	    <emphasis>event handler</emphasis> object are set,
+	    <parameter>sec</parameter> can be omitted <para>See also:
 	    <methodname>setEventChecker</methodname> and
 	    <methodname>setEventHandler</methodname></para></entry>
       </row>
@@ -218,24 +226,22 @@ integer number set by using
 <methodname>setEventCheckInterval</methodname> (default
 <parameter>n</parameter>= 20 steps).  If it happens, the simulator
 then calls the <emphasis>event handler</emphasis>.  If the
-<emphasis>event handler</emphasis> called
+<emphasis>event handler</emphasis> calls
 <methodname>stop</methodname> method of
 <classname>Session</classname>, the simulator stops before the next
-iteration.  This is the only way to quit from simulation loop when
+step.  This is the only way to quit from the simulation loop when
 <methodname>run</methodname> is called without an argument.</para>
 
 <para>This mechanism is used to implement, mainly but not limited to,
-GUI frontend to <classname>Session</classname> efficiently and easily.</para>
+GUI frontend components to the <classname>Session</classname> class.</para>
 
-<para><parameter>eventchecker</parameter> and <parameter>event
+<para><parameter>event checker</parameter> and <parameter>event
 handler</parameter> must be Python callable objects.
-<parameter>eventchecker</parameter> must return an object which can be
+<parameter>event checker</parameter> must return an object which can be
 evaluated as either <constant>true</constant> or
 <constant>false</constant>.</para>
 
-<para>If either of the <emphasis>event checker</emphasis> and the
-<emphasis>event handler</emphasis> is not set, both of them are never
-called.</para></entry>
+</entry>
       </row>
 
 
@@ -285,14 +291,14 @@ called.</para></entry>
 
       <row>
 	<entry namest="c1" nameend='c2' rowsep='1'>
-<para>Perform a step of simulation.  If the optional integer
+<para>Perform a step of the simulation.  If the optional integer
 <parameter>numsteps</parameter> parameter is given, the simulator
-steps that number.</para>
+steps that number. If it is omitted, it steps just once.</para>
             </entry>
       </row>
 
 
-      <!-- step -->
+      <!-- stop -->
       <row>
 	<entry namest='c1' nameend='c1' align='left'>
 <synopsis><methodname>stop</methodname>()</synopsis></entry>
@@ -321,7 +327,7 @@ steps that number.</para>
 
       <row>
 	<entry namest="c1" nameend='c2' rowsep='1'>
-<para>Do preparation of simulation.  Usually there is no need to call
+<para>Do preparation of the simulation.  Usually there is no need to call
 this method because this is automatically called before executing
 <methodname>step</methodname> and <methodname>run</methodname>.</para>
             </entry>
@@ -337,15 +343,14 @@ this method because this is automatically called before executing
 	<entry namest='c1' nameend='c1' align='left'>
 <synopsis><methodname>getStepperList</methodname>()</synopsis></entry>
 
-	<entry>A Python <type>tuple</type> containing a list of
-ID strings.</entry>
+	<entry>A Python <type>tuple</type> of ID strings.</entry>
       </row>
 
       <row>
 	<entry namest="c1" nameend='c2' rowsep='1'>
 <para>This method returns a Python <type>tuple</type> which contains
 ID strings of <classname>Stepper</classname>
-objects existing in the simulator.</para>
+objects in the simulator.</para>
             </entry>
       </row>
 
@@ -354,7 +359,7 @@ objects existing in the simulator.</para>
 	<entry namest='c1' nameend='c1' align='left'>
 <synopsis><methodname>createStepperStub</methodname>( <parameter>id</parameter> )</synopsis></entry>
 
-	<entry>A <classname>StepperStub</classname> object</entry>
+	<entry>A new <classname>StepperStub</classname> object</entry>
       </row>
 
       <row>
@@ -377,17 +382,16 @@ bound to this <classname>Session</classname> object and the given
 	<entry namest='c1' nameend='c1' align='left'>
 <synopsis><methodname>getEntityList</methodname>( <parameter>entitytype</parameter>, <parameter>systempath</parameter> )</synopsis></entry>
 
-	<entry>A Python <type>tuple</type> containing a list of
-	      <classname>FullID</classname> strings.</entry>
+	<entry>A Python <type>tuple</type> of <classname>FullID</classname> strings.</entry>
       </row>
 
       <row>
 	<entry namest="c1" nameend='c2' rowsep='1'>
 <para>This method returns a Python <type>tuple</type> which contains
 <classname>FullID</classname> strings of <classname>Entity</classname>
-objects of <parameter>entitytype</parameter> existing in a
+objects of <parameter>entitytype</parameter> existing in the
 <classname>System</classname> pointed by
-<parameter>systempath</parameter></para>
+the <parameter>systempath</parameter> argument</para>
 
 <para><parameter>entitytype</parameter> must be one of
 <constant>VARIABLE</constant>, <constant>PROCESS</constant>, or
@@ -402,7 +406,7 @@ objects of <parameter>entitytype</parameter> existing in a
 	<entry namest='c1' nameend='c1' align='left'>
 <synopsis><methodname>createEntityStub</methodname>( <parameter>fullid</parameter> )</synopsis></entry>
 
-	<entry>an <classname>EntityStub</classname> object</entry>
+	<entry>A new <classname>EntityStub</classname> object</entry>
       </row>
 
       <row>
@@ -423,7 +427,7 @@ objects of <parameter>entitytype</parameter> existing in a
 	<entry namest='c1' nameend='c1' align='left'>
 <synopsis><methodname>getLoggerList</methodname>()</synopsis></entry>
 
-	<entry>A Python <type>tuple</type> containing a list of
+	<entry>A Python <type>tuple</type> of 
 <classname>FullPN</classname> strings.</entry>
       </row>
 
@@ -431,7 +435,7 @@ objects of <parameter>entitytype</parameter> existing in a
 	<entry namest="c1" nameend='c2' rowsep='1'>
 <para>This method returns a Python <type>tuple</type> which contains
 <classname>FullPN</classname> strings of all the
-<classname>Logger</classname> objects existing in the
+<classname>Logger</classname> objects in the
 simulator.</para>
             </entry>
       </row>
@@ -440,9 +444,9 @@ simulator.</para>
 
       <row>
 	<entry namest='c1' nameend='c1' align='left'>
-<synopsis><methodname>createLoggerStub</methodname>( <parameter>id</parameter> )</synopsis></entry>
+<synopsis><methodname>createLoggerStub</methodname>( <parameter>fullpn</parameter> )</synopsis></entry>
 
-	<entry>A <classname>LoggerStub</classname> object</entry>
+	<entry>A new <classname>LoggerStub</classname> object</entry>
       </row>
 
       <row>

@@ -40,7 +40,7 @@
 
       <row>
 	<entry namest="c1" nameend='c2' rowsep='1'>
-<para>Create the object.  If this is a
+<para>Create the object.  For example, if this is a
 <classname>StepperStub</classname>, it attempts to create a
 <classname>Stepper</classname> object with the name specified when this
 <classname>ObjectStub</classname> is created.</para>
@@ -53,13 +53,13 @@
 <synopsis><methodname>isExist</methodname>()
 </synopsis></entry>
 
-	<entry>Boolean (true or false)</entry>
+	<entry><type>boolean</type></entry>
       </row>
 
       <row>
 	<entry namest="c1" nameend='c2' rowsep='1'>
 <para>This method returns true if the object this
-<classname>ObjectStub</classname> points to exists, and false otherwise.</para>
+<classname>ObjectStub</classname> points to exists, or false otherwise.</para>
             </entry>
       </row>
 
@@ -71,7 +71,7 @@
 <synopsis><methodname>getName</methodname>()
 </synopsis></entry>
 
-	<entry><constant>None</constant></entry>
+	<entry>The name as a <type>string</type></entry>
       </row>
       <row>
 	<entry namest="c1" nameend='c2' rowsep='1'>
@@ -120,14 +120,18 @@ recording.</para>
 <synopsis><methodname>getProperty</methodname>( <parameter>propertyname</parameter> )
 </synopsis></entry>
 
-	<entry>A property value as one of <type>int</type>, <type>float</type>, <type>string</type>, or a Python <type>tuple</type> in which these types are mixed.</entry>
+	<entry>A property value as one of <type>int</type>, <type>float</type>, <type>string</type>, or a Python <type>tuple</type> of these types mixed.</entry>
       </row>
 
       <row>
 	<entry namest="c1" nameend='c2' rowsep='1'>
-<para>This method returns the value of a property of the
-<classname>Entity</classname> or the <classname>Stepper</classname>
-object of which name is <parameter>propertyname</parameter>.</para>
+<para>This method returns a value of the <classname>Entity</classname> or the <classname>Stepper</classname>
+object's property of name <parameter>propertyname</parameter>.</para>
+
+<para>The value can be either an <type>int</type>, a
+<type>float</type>, a <type>string</type>, or a <type>tuple</type> of
+these types mixed.  The <type>tuple</type> can be nested.</para>
+
 
 <para>This method is also available via <methodname>__getitem__</methodname> special method, which means that;
 
@@ -163,7 +167,7 @@ values which mean ( <emphasis>setable</emphasis>,
 is read-only.</para>
 
 <para>Attempts to set a value to a read-only propertiy and to
-get a value from a write-only property raises exceptions.</para>
+get a value from a write-only property raise exceptions.</para>
 </entry>
 
       </row>
@@ -206,10 +210,9 @@ This method is used to get the list of all the properties of the
 to <parameter>value</parameter>.  </para>
 
 <para>The <parameter>value</parameter> can be an object of one of
-<type>int</type>, <type>float</type>, <type>string</type> types, or a
-Python <type>tuple</type>, or a Python <type>list</type> in which
-these types are mixed.</para>
-
+<type>int</type>, <type>float</type>, <type>string</type>, a
+Python <type>tuple</type>, or a Python <type>list</type>.  
+These types can be mixed in the sequence types.</para>
 
 <para>This method can be used via <methodname>__setitem__</methodname>
 special method.  That is;
@@ -245,26 +248,32 @@ are equivalent.
       <row>
 	<entry namest="c1" nameend='c2' rowsep='1'>
 <para>This method is used get the data of the
-<classname>Logger</classname>.  Returned data is an
-<classname>array</classname> object of Numeric Python, of which each
-row is a 5-tuple representing a data interval of thie form: (
+<classname>Logger</classname>.  Returned data is a rank-2
+<classname>array</classname> object of Numeric Python.  Each row of
+the data can be either a 5-tuple or a 2-tuple.  A row of the data
+represents a logged data point or a logged time inteval.
+The 5-tuple format has the following form: (
 <emphasis>time</emphasis>, <emphasis>value</emphasis>,
 <emphasis>average</emphasis>, <emphasis>min</emphasis>,
-<emphasis>max</emphasis> ), where <emphasis>time</emphasis> is the
-time when the last data point is aggregated,
-<emphasis>value</emphasis> is the value of the last data point
-aggregated to this data interval, <emphasis>average</emphasis> is an
+<emphasis>max</emphasis> ), and the 2-tuple format has the form of:
+( <emphasis>time</emphasis>, <emphasis>value</emphasis> ).
+<emphasis>time</emphasis> is the
+time when the last data point is logged,
+<emphasis>value</emphasis> is the value of the last data logged
+in this data interval, <emphasis>average</emphasis> is an
 weighted average of the value of this data interval ignoring
 zero-intervals, and <emphasis>min</emphasis> and
-<emphasis>max</emphasis> are minimum and maximum values in this data
+<emphasis>max</emphasis> are the minimum and the maximum values in this data
 interval.  The data interval is either an aggregation of data points
 or a data point. (see <methodname>setMinimumInterval</methodname>()
 for data point aggregation.)  If the data aggregation is disabled,
 <emphasis>average</emphasis>, <emphasis>min</emphasis>, and
 <emphasis>max</emphasis> have the same value as
-<emphasis>value</emphasis>.</para>
+<emphasis>value</emphasis> in the 5-tuple data format.</para>
 
-<para>If this method is called without an argument, (i.e. <literal>getData()</literal> ), it returns whole data.</para>
+<para>If this method is called without an argument,
+(i.e. <literal>getData()</literal> ), it returns whole data stored in the
+<classname>Logger</classname>.</para>
 
 <para>If this method is called only with
 <parameter>starttime</parameter>, (i.e. <literal>getData(
@@ -286,8 +295,8 @@ interval [ <parameter>starttime</parameter>,
 <literal>d(n)</literal> if <literal>|d(n-1)-d(n+1)| >
 <parameter>interval</parameter></literal>.  Be careful about using
 this feature because the returned data can differ even with the same
-<parameter>interval</parameter> if <parameter>starttime</parameter> is
-different.  Therefore this is not necessariry suitable for accurate
+<parameter>interval</parameter>, if <parameter>starttime</parameter> is
+different.  Therefore this is not suitable for
 scientific data analysis, but can be useful for real-time GUI
 frontends.</para>
 
@@ -348,7 +357,7 @@ Usually these two times are the same.</para>
       <row>
 	<entry namest="c1" nameend='c2' rowsep='1'>
 <para>This method is used to get the number of data points this
-<classname>Logger</classname> has.</para>
+<classname>Logger</classname>.</para>
             </entry>
       </row>
 
