@@ -38,13 +38,31 @@ class ProgressbarWindow(PluginWindow):
         self.theMultiplier2Entry = self.getWidget("multiplier2_label")
         self.theMultiplier3Entry = self.getWidget("multiplier3_label")
         self.theFPN = data[0]
+        self.theFullID = convertFullPNToFullID( self.theFPN )
+        aFullPropertyName = convertFullIDToFullPN(self.theFullID,
+                                                  'PropertyList')
+        aPropertyList =\
+        list( self.theSimulator.getProperty( aFullPropertyName ) )
+        aAttributeList = convertFullIDToFullPN(self.theFullID,
+                                                  'PropertyAttributes')
+        aAttributeList =\
+        list(self.theSimulator.getProperty( aAttributeList ))
+        num = 0
+
+        for aProperty in aPropertyList:
+            if (aProperty == 'Quantity'):
+                print aProperty,
+                print "=",
+                print aAttributeList[num]
+            else :
+                pass
+            num += 1
         self.initialize()
         
     def initialize( self ):
 
         self.theSelected = ''
         
-        self.theFullID = convertFullPNToFullID( self.theFPN )
         self.theType = str( self.theFullID[TYPE] )
         self.theID   = str( self.theFullID[ID] )
         self.thePath = str( self.theFullID[SYSTEMPATH] )

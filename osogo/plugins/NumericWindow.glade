@@ -224,12 +224,12 @@
 
 	  <widget>
 	    <class>GtkToolbar</class>
-	    <name>toolbar2</name>
+	    <name>toolbar4</name>
 	    <orientation>GTK_ORIENTATION_VERTICAL</orientation>
 	    <type>GTK_TOOLBAR_ICONS</type>
-	    <space_size>5</space_size>
+	    <space_size>0</space_size>
 	    <space_style>GTK_TOOLBAR_SPACE_EMPTY</space_style>
-	    <relief>GTK_RELIEF_NORMAL</relief>
+	    <relief>GTK_RELIEF_HALF</relief>
 	    <tooltips>True</tooltips>
 	    <child>
 	      <padding>0</padding>
@@ -241,30 +241,24 @@
 	      <class>GtkButton</class>
 	      <child_name>Toolbar:button</child_name>
 	      <name>increase_button</name>
-	      <width>20</width>
-	      <height>20</height>
 	      <signal>
 		<name>clicked</name>
 		<handler>increase_value</handler>
-		<last_modification_time>Wed, 15 Aug 2001 13:41:34 GMT</last_modification_time>
+		<last_modification_time>Mon, 10 Sep 2001 06:31:44 GMT</last_modification_time>
 	      </signal>
-	      <label>button1</label>
-	      <stock_pixmap>GNOME_STOCK_PIXMAP_UP</stock_pixmap>
+	      <label>*2</label>
 	    </widget>
 
 	    <widget>
 	      <class>GtkButton</class>
 	      <child_name>Toolbar:button</child_name>
 	      <name>decrease_button</name>
-	      <width>12</width>
-	      <height>12</height>
 	      <signal>
 		<name>clicked</name>
 		<handler>decrease_value</handler>
-		<last_modification_time>Wed, 15 Aug 2001 13:41:44 GMT</last_modification_time>
+		<last_modification_time>Mon, 10 Sep 2001 06:30:56 GMT</last_modification_time>
 	      </signal>
-	      <label>button2</label>
-	      <stock_pixmap>GNOME_STOCK_PIXMAP_DOWN</stock_pixmap>
+	      <label>*0.5</label>
 	    </widget>
 	  </widget>
 	</widget>

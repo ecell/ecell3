@@ -24,11 +24,33 @@ class SubstanceWindow(PluginWindow):
                              } )
 
         self.theFullPropertyName = data[0]
+        self.theFullID = convertFullPNToFullID( self.theFullPropertyName )
+        aFullPropertyName = convertFullIDToFullPN(self.theFullID,
+                                                  'PropertyList')
+        aPropertyList =\
+        list( self.theSimulator.getProperty( aFullPropertyName ) )
+        aAttributeList = convertFullIDToFullPN(self.theFullID,
+                                                  'PropertyAttributes')
+        aAttributeList =\
+        list(self.theSimulator.getProperty( aAttributeList ))
+        num = 0
+
+        for aProperty in aPropertyList:
+            if (aProperty == 'Quantity'):
+                print aProperty,
+                print "=",
+                print aAttributeList[num]
+            elif (aProperty == 'Concentration'):
+                print aProperty,
+                print "=",
+                print aAttributeList[num]
+            else :
+                pass
+            num += 1
         self.initialize( self.theFullPropertyName )
         
     def initialize( self, fpn ):
         
-        self.theFullID = convertFullPNToFullID( fpn )
         self.theFPNQuantity = tuple( convertFullIDToFullPN( self.theFullID, 'Quantity' ) )
         self.theFPNConcentration = tuple(convertFullIDToFullPN( self.theFullID, 'Concentration' ))
         self.theType = str( self.theFullID[TYPE] )
