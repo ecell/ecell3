@@ -65,7 +65,7 @@ class MessageWindow( Window ):
 		if type( message ) == list or type( message ) == tuple:  
 			
 			# print message list
-			messageString = message.join()
+			messageString = string.join( message )
 
 		else:  # anything else is stringified.
 			messageString = str( message )
