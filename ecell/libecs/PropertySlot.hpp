@@ -53,14 +53,11 @@ namespace libecs
 
   public:
 
-  public:
-
     PropertySlot( StringCref name )
       :
-      theName( name )
-      //      theName( name ),
+      theName( name ),
       //      // FIXME: dummyLogger ?
-      //      theLogger( NULLPTR )
+      theLogger( NULLPTR )
     {
       ; // do nothing
     }
@@ -98,23 +95,22 @@ namespace libecs
 
     void push( RealCref aTime )
     {
-      theCurrentTime = aTime;
-      updateLogger();
+      updateLogger( aTime );
       //      updateProxy();
     }
 
-    void updateLogger();
+    void updateLogger( const Real aTime );
 
   protected:
 
-    virtual Real getCurrentTime() = 0;
+    //FIXME:
+    virtual Real getCurrentTime() {return 0;}
 
   protected:
 
     String                   theName;
     LoggerPtr                theLogger;
     PropertySlotProxyVector  theProxyVector;
-    Real                     theCurrentTime;
     
 
   };
@@ -190,12 +186,6 @@ namespace libecs
   public:
 
     ClassPropertySlot( StringCref name, T& object );
-
-    virtual Real getCurrentTime()
-    {
-      //FIXME:
-      return theCurrentTime;
-    }
 
   protected:
 
