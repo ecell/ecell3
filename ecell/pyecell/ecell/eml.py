@@ -488,9 +488,9 @@ class Eml:
 
                     anEntity = {}                    
                     anEntity[ 'Type' ] = str( aChildElement.getAttribute( 'class' ) )
-                    anEntity[ 'FullId' ] = str( 'Substance' + ':' + \
-                                                  aSystemPath + ':' + \
-                                                  aChildElement.getAttribute( 'id' ) )
+                    anEntity[ 'FullId' ] = str( string.capwords( aChildElement.tagName ) + ':' + \
+                                                aSystemPath + ':' + \
+                                                aChildElement.getAttribute( 'id' ) )
                     anEntity[ 'Name' ]   = str( aChildElement.getAttribute( 'name' ) )
                     
                     anEntityEntityList.append( anEntity )    
