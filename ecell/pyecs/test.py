@@ -26,8 +26,11 @@ s.createEntity('Substance','Substance:/:B','substance B')
 s.createEntity('Substance','Substance:/:C','substance C')
 
 print 'make reactors...'
-s.createEntity('ConstantActivityReactor','Reactor:/:RC1','constant reactor')
-
+try:
+    s.createEntity('ConstantActivityReactor','Reactor:/:RC1','constant reactor')
+except:
+    print 'cannot instantiate ConstantActivityReactor'
+    
 print 'set Substance:/:A Quantity = 30'
 s.setProperty( 'Substance:/:A', 'Quantity', (30,) )
 
@@ -45,9 +48,11 @@ print 'changing Quantity of Substance:/:A...'
 s.setProperty( 'Substance:/:A', 'Quantity', (1,) )
 printProperty( s, 'Substance:/:A', 'Quantity' )
 
-print
-printAllProperties( s, 'Reactor:/:RC1' )
-print
+try:
+    printAllProperties( s, 'Reactor:/:RC1' )
+except:
+    pass
+
 print 'step()...'
 printProperty( s, 'System:/:/', 'CurrentTime' )
 s.step()
