@@ -205,12 +205,13 @@ namespace libecs
 
     virtual void turn()
     {
-      theVelocity = 0.0;
+      //      theVelocity = 0.0;
     }
 
     virtual void integrate()
     {
-      theQuantity += theVelocity;
+      // PlainSubstance doesn't currently support integration
+      //      theQuantity += theVelocity;
     }
 
     /**

@@ -90,14 +90,12 @@ namespace libecs
   {
     Integrator::clear();
     theOriginalQuantity = theSubstance.saveQuantity();
-    theTurnMethodPtr = &theTurnMethods[0];
   }
 
   void RungeKutta4Integrator::turn()
   {
     theK[ theStepCounter ] = theSubstance.getVelocity();
-    ( this->*( *theTurnMethodPtr ) )();
-    ++theTurnMethodPtr;
+    ( this->*( theTurnMethods[ theStepCounter ] ) )();
     ++theStepCounter;
     theSubstance.setVelocity( 0 );
   }

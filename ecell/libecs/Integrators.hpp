@@ -125,7 +125,6 @@ namespace libecs
 
     Real              theOriginalQuantity;
 
-    TurnMethodPtr     theTurnMethodPtr;
     Real              theK[4];
 
 
