@@ -5,21 +5,17 @@ RANDOM SEED             = 0
 
 [GA]
 MAX GENERATION          = 4
-POPULATION              = 4
-FINISH CONDITION        = 0.00005
+POPULATION              = 6
+FINISH CONDITION        = 0.005
 
 [Input file or directory]
 EML KEY                 = _EML_
-EML FILES               = simple1.eml
-                          simple2.eml
-                          simple3.eml
+EML FILES               = simple.eml
 
 ESS FILE                = runsession.py
 
 DIR KEY                 = _DATA_
-EXTRA DIRS              = Data1
-                          Data2
-                          Data3
+EXTRA DIRS              = Data
 
 PARAMETERS              = _KmS_ 0.1 20.0 float
                           _KcF_ 0.1 20.0 float
@@ -27,7 +23,8 @@ PARAMETERS              = _KmS_ 0.1 20.0 float
 
 [Temporary directory]
 TMP DIRECTORY           = work
-TMPDIR REMOVABLE        = True
+#TMPDIR REMOVABLE        = True
+TMPDIR REMOVABLE        = False
 
 
 [Output files]

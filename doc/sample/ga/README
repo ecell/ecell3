@@ -23,57 +23,36 @@ Bioinformatics. 2003 Mar 22;19(5):643-50.
 === Files and directories ===
 
 README                      This file
-createsampledata.sh         The script file to generate sample input files
+Data/						Training time-course
 ga.py                       EMS file of GA
-observable.py               ESS file to generate sample input time-courses
 runsession.py               ESS file that is used by GA
 setting.txt:                Setting file for ga.esm
-simple1.em                  Model file (EM file) 
-simple2.em                  Model file (EM file) 
-simple3.em                  Model file (EM file) 
+simple.em                   Model file (EM file) 
 
 
 === Running this script ===
 
-1. Run the script to generate input files
-
-   % python createsampledata.py
-
-   This script convert em file and execute observable.py.
-   The following files and directries are generated.
-
-   Data*/S.ecd
-   Data*/P.ecd
-   simple*.eml
-
-   (1, 2, and 3 is applied to *.)
-   Those simple*.eml model is same except for the initial quantities.
-   The dummy value is written to unknown parameters of KmS KcF.
-
-
-
-2. (If necessary) Modify setting.txt file.
+1. (If necessary) Modify setting.txt file.
 
    Refer to the following cahpter for details.
 
 
 3. Run ga.esm file.
 
-   % ecell3-session-manager ga.py
-     GA on E-Cell3 ........ start 
-     (12/12) .....[1]        1.03504734313
-     (12/12) .....[2]        0.869721171408
-     (12/12) .....[3]        0.746480699514
-     (12/12) .....[4]        0.711716319935
+     [%] ecell3-session-manager ga.py
+     GA on E-Cell3 ........ start
+     (6/6) .....[1]  0.985788386581
+     (6/6) .....[2]  0.130706428151
+     (6/6) .....[3]  0.094226048664
+     (6/6) .....[4]  0.0567317324954
      reached max generation
      ----------------------------------------
      |   Result                             |
      ----------------------------------------
-     (Evaluated Value)       = 0.711716319935
-     _KmS_   = 7.45037005381
-     _KcF_   = 4.83779253249
-     job id = [37, 38, 39]
-
+     (Evaluated Value)       = 0.0567317324954
+     _KmS_   = 13.0605221658
+     _KcF_   = 4.51648123432
+     job id = [22]
 
    ga.esm tries to 'setting.txt' in current working directory.
    If you'd like to use other setting file, do as below.
@@ -89,7 +68,7 @@ simple3.em                  Model file (EM file)
      time-course data and predicted ones using gnuplot like
      as below.
 
-     % cd elite/37
+     % cd elite/22
      % gnuplot gnuplot.dat
 
    - The transitions of evaluated value or mutation ratio are
