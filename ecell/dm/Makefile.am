@@ -9,11 +9,13 @@ SUFFIXES = .cpp $(SHLEXT)
 
 SHELL = @SHELL@
 
+ECELL3_PYTHON = ../pyecs/ecell3-python
 ECELL3_DMC = ../../bin/ecell3-dmc
 DM_SO_DIR = ${prefix}/lib/${PACKAGE}/${VERSION}
 DM_SRC_DIR =  ${prefix}/share/${PACKAGE}/${VERSION}/DM
 
 BOOST_INCLUDE=@BOOST_INCLUDE@
+BOOST_LIB=@BOOST_LIB@
 PYTHON_INCLUDES=@PYTHON_INCLUDES@
 
 DMS = MassActionFluxProcess.cpp\
@@ -78,7 +80,7 @@ dmsodir = ${DM_SO_DIR}
 dmso_DATA = ${SOS}
 
 %$(SHLEXT) : %.cpp
-	${SHELL} ${ECELL3_DMC} -v --dmcompile=${top_srcdir}/../dmtool --no-stdinclude --no-stdlibdir --ldflags=-L${top_srcdir}/libecs --cxxflags='-I${top_srcdir}/libecs -I${top_srcdir}/.. -I${top_srcdir} ${PYTHON_INCLUDES} ${BOOST_INCLUDE}' $< 
+	${ECELL3_PYTHON} ${ECELL3_DMC} -v --dmcompile=${top_srcdir}/../dmtool --no-stdinclude --no-stdlibdir --ldflags="-L${top_srcdir}/libecs ${BOOST_LIB}" --cxxflags='-I${top_srcdir}/libecs -I${top_srcdir}/.. -I${top_srcdir} ${PYTHON_INCLUDES} ${BOOST_INCLUDE}' $< 
 
 clean-local:
 	${RM} -rf ${dmso_DATA}
