@@ -41,7 +41,7 @@ import gnome.ui
 import GDK
 import libglade
 
-from Window import *
+from ecell.Window import *
 
 
 # ---------------------------------------------------------------
