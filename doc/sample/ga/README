@@ -59,7 +59,7 @@ simple.em                   Model file (EM file)
    ga.py tries to 'setting.txt' in current working directory.
    If you'd like to use other setting file, do as below.
 
-   % ecell3-session-manager ga.py -DSETTING=otherfile
+   % ecell3-session-manager -DSETTING=otherfile ga.py
 
 
 4. See results.
