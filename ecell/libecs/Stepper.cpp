@@ -264,8 +264,6 @@ namespace libecs
 	SystemPtr aSystem( (*i)->getOwner() );
 	theSystemCache.push_back( aSystem );
 
-	cerr << aSystem->getSubstanceMap().size() << endl;
-	
 	for( SubstanceMapConstIterator i( aSystem->getSubstanceMap().begin() );
 	     i != aSystem->getSubstanceMap().end(); ++i )
 	  {
@@ -280,9 +278,6 @@ namespace libecs
 
       }
 
-    std::cout << theSystemCache.size() << endl;
-    std::cout << theSubstanceCache.size() << endl;
-    std::cout << theReactorCache.size() << endl;
   }
 
 
