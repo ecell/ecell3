@@ -71,7 +71,7 @@ namespace libecs
 
     String aPropertyName( fpn.getPropertyName() );
 
-    PropertyMapIterator 
+    PropertyMapConstIterator 
       aPropertyMapIterator( anEntityPtr->getPropertySlot( aPropertyName ) );
 
     LoggerPtr aLoggerPtr( new Logger( *aPropertyMapIterator->second ) );

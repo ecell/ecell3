@@ -76,7 +76,7 @@ namespace libecs
 
     */
   
-    Logger( AbstractPropertySlotCref aPropertySlot );
+    Logger( PropertySlotCref aPropertySlot );
 
   
     /// Destructor
@@ -151,7 +151,7 @@ namespace libecs
 
     void appendData( const containee_type& );
 
-    void appendData( RealCref t, UConstantCref v );
+    void appendData( RealCref t, UVariableCref v );
 
 
   protected:
@@ -159,7 +159,7 @@ namespace libecs
     /**
 
 
-    AbstractPropertySlotCref getPropertySlot( void ) const
+    PropertySlotCref getPropertySlot( void ) const
     {
       return thePropertySlotProxy;
     }
@@ -210,7 +210,7 @@ namespace libecs
 
     /// Data members
 
-    AbstractPropertySlotCref    thePropertySlot;
+    PropertySlotCref    thePropertySlot;
     DataPointVector             theDataPointVector;
     Real                        theMinimumInterval;
     Real                        theCurrentInterval;

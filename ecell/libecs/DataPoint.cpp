@@ -50,7 +50,7 @@ namespace libecs
   // Constructor that sets the
   // internal value
 
-  DataPoint::DataPoint( RealCref t, UConstantCref v )
+  DataPoint::DataPoint( RealCref t, UVariableCref v )
     :
     theTime( t ),
     theValue( v )
@@ -62,7 +62,7 @@ namespace libecs
   DataPoint::DataPoint( RealCref t, RealCref v )
     :
     theTime( t ),
-    theValue( UConstant( v ) )
+    theValue( UVariable( v ) )
   { 
     ; // do nothing
   }

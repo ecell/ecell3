@@ -53,66 +53,22 @@ namespace libecs
 
   void Entity::makeSlots()
   {
-    makePropertySlot( "ClassName", Entity, *this, NULLPTR, &Entity::getClassName );
-    makePropertySlot( "ID", Entity, *this, NULLPTR, &Entity::getID );
-    makePropertySlot( "FullID", Entity, *this, NULLPTR, &Entity::getFullID );
+    createPropertySlot( "ClassName", *this, NULLPTR, &Entity::getClassName );
+    createPropertySlot( "ID", *this, NULLPTR, &Entity::getID );
+    createPropertySlot( "FullID", *this, NULLPTR, &Entity::getFullIDString );
     
-    makePropertySlot( "Name", Entity, *this, NULLPTR, &Entity::getName );
-    makePropertySlot( "Activity", Entity, *this, NULLPTR, &Entity::getActivity );
-    makePropertySlot( "ActivityPerSecond", Entity, *this, NULLPTR, 
-		     &Entity::getActivityPerSecond );
+    createPropertySlot( "Name", *this, NULLPTR, &Entity::getName );
+    createPropertySlot( "Activity", *this, NULLPTR, &Entity::getActivity );
+    createPropertySlot( "ActivityPerSecond", *this, NULLPTR, 
+			&Entity::getActivityPerSecond );
   }
 
-  const Message Entity::getClassName( StringCref keyword )
+  const Real Entity::getActivity() const
   {
-    return Message( keyword, UConstant( getClassName() ) );
+    return 0.0;
   }
 
-  const Message Entity::getID( StringCref keyword )
-  {
-    return Message( keyword, UConstant( getID() ) );
-  }
-
-  const Message Entity::getFullID( StringCref keyword )
-  {
-
-    return Message( keyword, UConstant( getFullID().getString() ) );
-
-
-#if 0
-    FullID aFullID = getFullID();
-    UConstantVector aVector( 3 );
-
-    aVector[0] = static_cast<Int>( aFullID.getPrimitiveType().getType() );
-    aVector[1] = aFullID.getSystemPath().getString();
-    aVector[2] = aFullID.getID();
-
-    return Message( keyword, aVector );
-#endif /* 0 */
-
-  }
-
-  const Message Entity::getName( StringCref keyword )
-  {
-    return Message( keyword, UConstant( getName() ) );
-  }
-
-  const Message Entity::getActivity( StringCref keyword )
-  {
-    return Message( keyword, UConstant( getActivity() ) );
-  }
-
-  const Message Entity::getActivityPerSecond( StringCref keyword )
-  {
-    return Message( keyword, UConstant( getActivityPerSecond() ) );
-  }
-
-  Real Entity::getActivity() 
-  {
-    return 0;
-  }
-
-  Real Entity::getActivityPerSecond() 
+  const Real Entity::getActivityPerSecond() const
   {
     return getActivity() * getSuperSystem()->getStepper()->getStepsPerSecond();
   }
@@ -120,6 +76,11 @@ namespace libecs
   const FullID Entity::getFullID() const
   {
     return FullID( getPrimitiveType(), getSystemPath(), getID() );
+  }
+
+  const String Entity::getFullIDString() const
+  {
+    return getFullID().getString();
   }
 
   const SystemPath Entity::getSystemPath() const

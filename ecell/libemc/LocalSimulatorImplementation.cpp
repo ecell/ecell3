@@ -75,17 +75,18 @@ namespace libemc
 						  StringCref    systempath,
 						  StringCref    id,
 						  StringCref    property,
-						  UConstantVectorCref data )
+						  UVariableVectorCref data )
   {
     EntityPtr anEntityPtr( getRootSystem().getEntity( FullID( type, 
 							      systempath, 
 							      id ) ) );
     // this new does not cause memory leak since Message will get it as a RCPtr
-    anEntityPtr->set( Message( property, new UConstantVector( data ) ) );
+    anEntityPtr->setMessage( Message( property, 
+				      new UVariableVector( data ) ) );
   }
 
 
-  const UConstantVectorRCPtr
+  const UVariableVectorRCPtr
   LocalSimulatorImplementation::getProperty( PrimitiveType type,
 					     StringCref    systempath,
 					     StringCref    id,
@@ -94,7 +95,7 @@ namespace libemc
     EntityPtr anEntityPtr( getRootSystem().getEntity( FullID( type, 
 							      systempath, 
 							      id ) ) );
-    return anEntityPtr->get( propertyname ).getBody();
+    return anEntityPtr->getMessage( propertyname ).getBody();
   }
 
 

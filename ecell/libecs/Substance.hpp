@@ -50,11 +50,8 @@ namespace libecs
 
   public: // message slots
 
-    void setQuantity( MessageCref message );
-    void setAccumulatorClass( MessageCref message );
-    const Message getQuantity( StringCref keyword );
-    const Message getConcentration( StringCref keyword );
-    const Message getAccumulatorClass( StringCref keyword );
+    void setAccumulatorClass( UVariableVectorCref message );
+    const UVariableVectorRCPtr getAccumulatorClass() const;
 
   public:
 
@@ -72,7 +69,7 @@ namespace libecs
     /**
        @return the number of molecules.
     */
-    Real getQuantity() const                    
+    const Real getQuantity() const
     { 
       return theQuantity; 
     }
@@ -107,7 +104,7 @@ namespace libecs
        Invalid if haveConcentration() is false.
        @return Concentration in M (mol/L).
     */
-    Real getConcentration() 
+    const Real getConcentration() const
     {
       if ( theConcentration < 0 ) 
 	{
@@ -180,11 +177,11 @@ namespace libecs
 
        @see isFixed
     */
-    void setQuantity(Real q)    
+    void setQuantity( const Real quantity )
     { 
       if( !isFixed() ) 
 	{
-	  loadQuantity( q ); 
+	  loadQuantity( quantity ); 
 	}
     }
 
@@ -195,7 +192,7 @@ namespace libecs
     Real saveQuantity();
 
 
-    virtual const char* const getClassName() const { return "Substance"; }
+    virtual const String getClassName() const { return "Substance"; }
 
     /**
        set a class name string of user default accumulator
@@ -226,7 +223,7 @@ namespace libecs
 
   private:
 
-    void calculateConcentration();
+    void calculateConcentration() const;
     void mySetQuantity( Real q ) 
     { 
       theQuantity = q; 
@@ -253,7 +250,7 @@ namespace libecs
 
     bool theFixed;
 
-    Real theConcentration;
+    mutable Real theConcentration;
   };
 
 

@@ -79,31 +79,26 @@ namespace libecs
 
     // PropertyInterfaces
 
-    void setAppendSubstrate( MessageCref message );
-    void setAppendProduct( MessageCref message );
-    void setAppendCatalyst( MessageCref message );
-    void setAppendEffector( MessageCref message );
+    void setAppendSubstrate( UVariableVectorCref message );
+    void setAppendProduct( UVariableVectorCref message );
+    void setAppendCatalyst( UVariableVectorCref message );
+    void setAppendEffector( UVariableVectorCref message );
 
-    void setSubstrateList( MessageCref message );
-    void setProductList( MessageCref message );
-    void setCatalystList( MessageCref message );
-    void setEffectorList( MessageCref message );
+    void setSubstrateList( UVariableVectorCref message );
+    void setProductList( UVariableVectorCref message );
+    void setCatalystList( UVariableVectorCref message );
+    void setEffectorList( UVariableVectorCref message );
 
-    void setInitialActivity( MessageCref message );
-
-    const Message getSubstrateList( StringCref keyword );
-    const Message getProductList( StringCref keyword );
-    const Message getCatalystList( StringCref keyword );
-    const Message getEffectorList( StringCref keyword );
-
-    const Message getInitialActivity( StringCref keyword );
-
+    const UVariableVectorRCPtr getSubstrateList() const;
+    const UVariableVectorRCPtr getProductList() const;
+    const UVariableVectorRCPtr getCatalystList() const;
+    const UVariableVectorRCPtr getEffectorList() const;
 
     void appendSubstrate( FullIDCref fullid, int coefficient );
     void appendProduct  ( FullIDCref fullid, int coefficient );
     void appendCatalyst ( FullIDCref fullid, int coefficient );
     void appendEffector ( FullIDCref fullid, int coefficient );
-    void setInitialActivity( RealCref activity );
+
 
     /**
        Reactor Condition enum is used by Reactor's self-diagnosis system.
@@ -174,7 +169,18 @@ namespace libecs
        @return [the number of molecule that this yield] / [s].
        @see setActivity()
     */
-    virtual Real getActivity();
+    virtual const Real getActivity() const
+    {
+      return theActivity;
+    }
+
+    const Real getInitialActivity() const
+    {
+      return theInitialActivity;
+    }
+
+    void setInitialActivity( const Real activity );
+
 
     void appendSubstrate( SubstanceRef substrate, int coefficient );
     void appendProduct( SubstanceRef product, int coefficient );
@@ -217,23 +223,23 @@ namespace libecs
     /**
        @return the number of substrates.
     */
-    int getNumberOfSubstrates() { return theSubstrateList.size(); }
+    int getNumberOfSubstrates() const { return theSubstrateList.size(); }
 
     /**
        @return the number of products.
     */
-    int getNumberOfProducts()   { return theProductList.size(); }
+    int getNumberOfProducts() const { return theProductList.size(); }
 
     /**
        @return the number of catalysts.
     */
 
-    int getNumberOfCatalysts()  { return theCatalystList.size(); }
+    int getNumberOfCatalysts() const { return theCatalystList.size(); }
 
     /**
        @return the number of effectors.
     */
-    int getNumberOfEffectors()  { return theEffectorList.size(); }
+    int getNumberOfEffectors() const { return theEffectorList.size(); }
 
     virtual int getMinimumNumberOfSubstrates() const { return 0; }
     virtual int getMinimumNumberOfProducts() const { return 0; }

@@ -44,8 +44,8 @@ namespace libecs
 
   void RootSystem::makeSlots()
   {
-    makePropertySlot( "CurrentTime", RootSystem, *this,
-		      NULLPTR, &RootSystem::getCurrentTime );
+    createPropertySlot( "CurrentTime", *this,
+			NULLPTR, &RootSystem::getCurrentTime );
   }
   
 
@@ -76,10 +76,9 @@ namespace libecs
   }
 
 
-  const Message RootSystem::getCurrentTime( StringCref keyword )
+  const Real RootSystem::getCurrentTime() const
   {
-    return Message( keyword, 
-		    UConstant( theStepperLeader.getCurrentTime() ) );
+    return theStepperLeader.getCurrentTime();
   }
 
 

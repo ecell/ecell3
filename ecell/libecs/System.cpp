@@ -50,98 +50,81 @@ namespace libecs
 
   void System::makeSlots()
   {
-    makePropertySlot( "SystemList", System, *this,
-		      NULLPTR, &System::getSystemList );
-    makePropertySlot( "SubstanceList", System, *this,
-		      NULLPTR, &System::getSubstanceList );
-    makePropertySlot( "ReactorList", System, *this,
-		      NULLPTR, &System::getReactorList );
+    createPropertySlot( "SystemList", *this,
+			NULLPTR, &System::getSystemList );
+    createPropertySlot( "SubstanceList", *this,
+			NULLPTR, &System::getSubstanceList );
+    createPropertySlot( "ReactorList", *this,
+			NULLPTR, &System::getReactorList );
 
-    makePropertySlot( "Stepper", System, *this,
-		      &System::setStepper, &System::getStepper );
+    createPropertySlot( "Stepper", *this,
+			&System::setStepperClass, &System::getStepperClass );
 
-    makePropertySlot( "Volume", System, *this,
-		      &System::setVolume, &System::getVolume );
+    createPropertySlot( "Volume", *this,
+			&System::setVolume, &System::getVolume );
 
-    makePropertySlot( "StepInterval", System, *this,
-		      NULLPTR, &System::getStepInterval );
+    createPropertySlot( "StepInterval", *this,
+			NULLPTR, &System::getStepInterval );
   }
 
 
   // Message slots
 
-  const Message System::getSystemList( StringCref keyword )
+  const UVariableVectorRCPtr System::getSystemList() const
   {
-    UConstantVectorRCPtr aVectorPtr( new UConstantVector );
+    UVariableVectorRCPtr aVectorPtr( new UVariableVector );
     aVectorPtr->reserve( theSystemMap.size() );
 
-    for( SystemMapIterator i = getFirstSystemIterator() ;
+    for( SystemMapConstIterator i = getFirstSystemIterator() ;
 	 i != getLastSystemIterator() ; ++i )
       {
 	aVectorPtr->push_back( i->second->getID() );
       }
 
-    return Message( keyword, aVectorPtr );
+    return aVectorPtr;
   }
 
-  const Message System::getSubstanceList( StringCref keyword )
+  const UVariableVectorRCPtr System::getSubstanceList() const
   {
-    UConstantVectorRCPtr aVectorPtr( new UConstantVector );
+    UVariableVectorRCPtr aVectorPtr( new UVariableVector );
     aVectorPtr->reserve( theSubstanceMap.size() );
 
-    for( SubstanceMapIterator i = getFirstSubstanceIterator() ;
+    for( SubstanceMapConstIterator i = getFirstSubstanceIterator() ;
 	 i != getLastSubstanceIterator() ; ++i )
       {
 	aVectorPtr->push_back( i->second->getID() );
       }
 
-    return Message( keyword, aVectorPtr );
+    return aVectorPtr;
   }
 
-  const Message System::getReactorList( StringCref keyword )
+  const UVariableVectorRCPtr System::getReactorList() const
   {
-    UConstantVectorRCPtr aVectorPtr( new UConstantVector );
+    UVariableVectorRCPtr aVectorPtr( new UVariableVector );
     aVectorPtr->reserve( theReactorMap.size() );
 
-    for( ReactorMapIterator i = getFirstReactorIterator() ;
+    for( ReactorMapConstIterator i = getFirstReactorIterator() ;
 	 i != getLastReactorIterator() ; ++i )
       {
 	aVectorPtr->push_back( i->second->getID() );
       }
 
-    return Message( keyword, aVectorPtr );
+    return aVectorPtr;
   }
 
 
-  void System::setStepper( const Message& message )
+  void System::setStepperClass( UVariableVectorCref uvector )
   {
     //FIXME: range check
-    setStepper( message[0].asString() );
+    setStepperClass( uvector[0].asString() );
   }
 
-  const Message System::getStepper( StringCref keyword )
+  const UVariableVectorRCPtr System::getStepperClass() const
   {
-    return Message( keyword, 
-		    UConstant( getStepper()->className() ) );
+    UVariableVectorRCPtr aVector( new UVariableVector );
+    aVector->push_back( UVariable( getStepper()->className() ) );
+    return aVector;
   }
-
-  void System::setVolume( const Message& message )
-  {
-    setVolume( message[0].asReal() );
-  }
-
-  const Message System::getVolume( StringCref keyword )
-  {
-    return Message( keyword, getVolume() );
-  }
-
-  const Message System::getStepInterval( StringCref keyword )
-  {
-    return Message( keyword, getStepInterval() ) ;
-  }
-
-
-
 
   System::System()
     :
@@ -151,7 +134,7 @@ namespace libecs
     theRootSystem( NULLPTR )
   {
     makeSlots();
-    theFirstRegularReactorIterator = getFirstReactorIterator();
+    theFirstRegularReactorIterator = theReactorMap.begin();
   }
 
   System::~System()
@@ -183,7 +166,7 @@ namespace libecs
     theRootSystem = getSuperSystem()->getRootSystem();
   }
 
-  void System::setStepper( StringCref classname )
+  void System::setStepperClass( StringCref classname )
   {
     StepperPtr aStepper( getRootSystem()->
 			 getStepperMaker().make( classname ) );
@@ -200,12 +183,12 @@ namespace libecs
     theStepper = aStepper;
   }
 
-  RealCref System::getStepInterval() const
+  const Real System::getStepInterval() const
   {
     return theStepper->getStepInterval();
   }
 
-  RealCref System::getStepsPerSecond() const
+  const Real System::getStepsPerSecond() const
   {
     return theStepper->getStepsPerSecond();
   }
@@ -215,7 +198,7 @@ namespace libecs
     if( theStepper == NULLPTR )
       {
 	//FIXME: make this default user customizable
-	setStepper( "Euler1Stepper" );
+	setStepperClass( "Euler1Stepper" );
       }
 
     theStepper->initialize();
@@ -223,7 +206,7 @@ namespace libecs
     //
     // Substance::initialize()
     //
-    for( SubstanceMapIterator i( getFirstSubstanceIterator() ); 
+    for( SubstanceMapConstIterator i( getFirstSubstanceIterator() ); 
 	 i != getLastSubstanceIterator() ; ++i )
       {
 	i->second->initialize();
@@ -232,20 +215,20 @@ namespace libecs
     //
     // Reactor::initialize()
     //
-    for( ReactorMapIterator i( getFirstReactorIterator() );
+    for( ReactorMapConstIterator i( getFirstReactorIterator() );
 	 i != getLastReactorIterator() ; ++i )
       {
 	i->second->initialize();
       }
 
-    theFirstRegularReactorIterator = find_if( getFirstReactorIterator(), 
-					      getLastReactorIterator(),
+    theFirstRegularReactorIterator = find_if( theReactorMap.begin(),
+					      theReactorMap.end(),
 					      isRegularReactorItem() );
 
     //
     // System::initialize()
     //
-    for( SystemMapIterator i( getFirstSystemIterator() );
+    for( SystemMapConstIterator i( getFirstSystemIterator() );
 	 i != getLastSystemIterator(); ++i )
       {
 	i->second->initialize();
@@ -257,7 +240,7 @@ namespace libecs
     //
     // Substance::clear()
     //
-    for( SubstanceMapIterator i( getFirstSubstanceIterator() );
+    for( SubstanceMapConstIterator i( getFirstSubstanceIterator() );
 	 i != getLastSubstanceIterator() ; ++i )
       {
 	i->second->clear();
@@ -266,7 +249,7 @@ namespace libecs
 
   void System::react()
   {
-    for( ReactorMapIterator i( getFirstRegularReactorIterator() ); 
+    for( ReactorMapConstIterator i( getFirstRegularReactorIterator() ); 
 	 i != getLastReactorIterator() ; ++i )
       {
 	i->second->react();
@@ -275,7 +258,7 @@ namespace libecs
 
   void System::turn()
   {
-    for( SubstanceMapIterator i( getFirstSubstanceIterator() );
+    for( SubstanceMapConstIterator i( getFirstSubstanceIterator() );
 	 i != getLastSubstanceIterator() ; ++i )
       {
 	i->second->turn();
@@ -284,13 +267,13 @@ namespace libecs
 
   void System::transit()
   {
-    for( ReactorMapIterator i( getFirstRegularReactorIterator() ); 
+    for( ReactorMapConstIterator i( getFirstRegularReactorIterator() ); 
 	 i != getLastReactorIterator() ; ++i )
       {
 	i->second->transit();
       }
 
-    for( SubstanceMapIterator i( getFirstSubstanceIterator() );
+    for( SubstanceMapConstIterator i( getFirstSubstanceIterator() );
 	 i != getLastSubstanceIterator() ; ++i )
       {
 	i->second->transit();
@@ -301,14 +284,14 @@ namespace libecs
 
   void System::postern()
   {
-    for( ReactorMapIterator i( getFirstReactorIterator() ); 
+    for( ReactorMapConstIterator i( getFirstReactorIterator() ); 
 	 i != getFirstRegularReactorIterator() ; ++i )
       {
 	i->second->react();
       }
 
     // update activity of posterior reactors by buffered values 
-    for( ReactorMapIterator i( getFirstReactorIterator() ); 
+    for( ReactorMapConstIterator i( getFirstReactorIterator() ); 
 	 i != getFirstRegularReactorIterator() ; ++i )
       {
 	i->second->transit();
@@ -472,7 +455,7 @@ namespace libecs
   }
 
 
-  Real System::getActivityPerSecond()
+  const Real System::getActivityPerSecond() const
   {
     return getActivity() * getStepper()->getStepsPerSecond();
   }

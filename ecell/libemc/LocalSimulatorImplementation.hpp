@@ -70,9 +70,9 @@ namespace libemc
 			      libecs::StringCref          systempath,
 			      libecs::StringCref          id,
 			      libecs::StringCref          propertyname,
-			      libecs::UConstantVectorCref data );
+			      libecs::UVariableVectorCref data );
 
-    virtual const libecs::UConstantVectorRCPtr
+    virtual const libecs::UVariableVectorRCPtr
     getProperty( libecs::PrimitiveType type,
 		 libecs::StringCref    systempath,
 		 libecs::StringCref    id,

@@ -46,75 +46,75 @@ namespace libecs
   void Reactor::makeSlots()
   {
     //FIXME: get methods
-    makePropertySlot( "AppendSubstrate",Reactor,*this,&Reactor::setAppendSubstrate,
-		      NULLPTR );
-    makePropertySlot( "AppendProduct",Reactor,*this,&Reactor::setAppendProduct,
-		      NULLPTR );
-    makePropertySlot( "AppendCatalyst",Reactor,*this,&Reactor::setAppendCatalyst,
-		      NULLPTR );
-    makePropertySlot( "AppendEffector",Reactor,*this,&Reactor::setAppendEffector,
-		      NULLPTR );
+    createPropertySlot( "AppendSubstrate",*this,&Reactor::setAppendSubstrate,
+			NULLPTR );
+    createPropertySlot( "AppendProduct",*this,&Reactor::setAppendProduct,
+			NULLPTR );
+    createPropertySlot( "AppendCatalyst",*this,&Reactor::setAppendCatalyst,
+			NULLPTR );
+    createPropertySlot( "AppendEffector",*this,&Reactor::setAppendEffector,
+			NULLPTR );
 
-    makePropertySlot( "SubstrateList",Reactor,*this,&Reactor::setSubstrateList,
-		      &Reactor::getSubstrateList);
-    makePropertySlot( "ProductList",Reactor,*this,&Reactor::setProductList,
-		      &Reactor::getProductList);
-    makePropertySlot( "CatalystList",Reactor,*this,&Reactor::setCatalystList,
-		      &Reactor::getCatalystList);
-    makePropertySlot( "EffectorList",Reactor,*this,&Reactor::setEffectorList,
-		      &Reactor::getEffectorList);
+    createPropertySlot( "SubstrateList",*this,&Reactor::setSubstrateList,
+			&Reactor::getSubstrateList);
+    createPropertySlot( "ProductList",*this,&Reactor::setProductList,
+			&Reactor::getProductList);
+    createPropertySlot( "CatalystList",*this,&Reactor::setCatalystList,
+			&Reactor::getCatalystList);
+    createPropertySlot( "EffectorList",*this,&Reactor::setEffectorList,
+			&Reactor::getEffectorList);
 
-    makePropertySlot( "InitialActivity",Reactor,*this,&Reactor::setInitialActivity,
-		      &Reactor::getInitialActivity );
+    createPropertySlot( "InitialActivity",*this,&Reactor::setInitialActivity,
+			&Reactor::getInitialActivity );
   }
 
-  void Reactor::setAppendSubstrate( MessageCref message )
+  void Reactor::setAppendSubstrate( UVariableVectorCref uvector )
   {
     //FIXME: range check
-    appendSubstrate( message[0].asString(), message[1].asInt() );
+    appendSubstrate( uvector[0].asString(), uvector[1].asInt() );
   }
 
-  void Reactor::setAppendProduct( MessageCref message )
+  void Reactor::setAppendProduct( UVariableVectorCref uvector )
   {
     //FIXME: range check
-    appendProduct( message[0].asString(), message[1].asInt() );
+    appendProduct( uvector[0].asString(), uvector[1].asInt() );
   }
 
-  void Reactor::setAppendCatalyst( MessageCref message )
+  void Reactor::setAppendCatalyst( UVariableVectorCref uvector )
   {
     //FIXME: range check
-    appendCatalyst( message[0].asString(), message[1].asInt() );
+    appendCatalyst( uvector[0].asString(), uvector[1].asInt() );
   }
 
-  void Reactor::setAppendEffector( MessageCref message )
+  void Reactor::setAppendEffector( UVariableVectorCref uvector )
   {
     //FIXME: range check
-    appendEffector( message[0].asString(), message[1].asInt() );
+    appendEffector( uvector[0].asString(), uvector[1].asInt() );
   }
 
-  void Reactor::setSubstrateList( MessageCref message )
+  void Reactor::setSubstrateList( UVariableVectorCref uvector )
   {
     //    cerr << "not implemented yet." << endl;
   }
 
-  void Reactor::setProductList( MessageCref message )
+  void Reactor::setProductList( UVariableVectorCref uvector )
   {
     //    cerr << "not implemented yet." << endl;
   }
 
-  void Reactor::setEffectorList( MessageCref message )
+  void Reactor::setEffectorList( UVariableVectorCref uvector )
   {
     //    cerr << "not implemented yet." << endl;
   }
 
-  void Reactor::setCatalystList( MessageCref message )
+  void Reactor::setCatalystList( UVariableVectorCref uvector )
   {
     //    cerr << "not implemented yet." << endl;
   }
 
-  const Message Reactor::getSubstrateList( StringCref keyword )
+  const UVariableVectorRCPtr Reactor::getSubstrateList() const
   {
-    UConstantVectorRCPtr aVectorPtr( new UConstantVector );
+    UVariableVectorRCPtr aVectorPtr( new UVariableVector );
     aVectorPtr->reserve( theSubstrateList.size() );
   
     for( ReactantVectorConstIterator i( theSubstrateList.begin() );
@@ -123,12 +123,12 @@ namespace libecs
 	aVectorPtr->push_back( (*i)->getSubstance().getFullID().getString() );
       }
 
-    return Message( keyword, aVectorPtr );
+    return aVectorPtr;
   }
 
-  const Message Reactor::getProductList( StringCref keyword )
+  const UVariableVectorRCPtr Reactor::getProductList() const
   {
-    UConstantVectorRCPtr aVectorPtr( new UConstantVector );
+    UVariableVectorRCPtr aVectorPtr( new UVariableVector );
     aVectorPtr->reserve( theProductList.size() );
   
     for( ReactantVectorConstIterator i( theProductList.begin() );
@@ -137,12 +137,12 @@ namespace libecs
 	aVectorPtr->push_back( (*i)->getSubstance().getFullID().getString() );
       }
 
-    return Message( keyword, aVectorPtr );
+    return aVectorPtr;
   }
 
-  const Message Reactor::getEffectorList( StringCref keyword )
+  const UVariableVectorRCPtr Reactor::getEffectorList() const
   {
-    UConstantVectorRCPtr aVectorPtr( new UConstantVector );
+    UVariableVectorRCPtr aVectorPtr( new UVariableVector );
     aVectorPtr->reserve( theEffectorList.size() );
   
     for( ReactantVectorConstIterator i( theEffectorList.begin() );
@@ -151,12 +151,12 @@ namespace libecs
 	aVectorPtr->push_back( (*i)->getSubstance().getFullID().getString() );
       }
 
-    return Message( keyword, aVectorPtr );
+    return aVectorPtr;
   }
 
-  const Message Reactor::getCatalystList( StringCref keyword )
+  const UVariableVectorRCPtr Reactor::getCatalystList() const
   {
-    UConstantVectorRCPtr aVectorPtr( new UConstantVector );
+    UVariableVectorRCPtr aVectorPtr( new UVariableVector );
     aVectorPtr->reserve( theCatalystList.size() );
   
     for( ReactantVectorConstIterator i( theCatalystList.begin() );
@@ -165,17 +165,7 @@ namespace libecs
 	aVectorPtr->push_back( (*i)->getSubstance().getFullID().getString() );
       }
 
-    return Message( keyword, aVectorPtr );
-  }
-
-  void Reactor::setInitialActivity( MessageCref message )
-  {
-    setInitialActivity( message[0].asReal() );
-  }
-
-  const Message Reactor::getInitialActivity( StringCref keyword )
-  {
-    return Message( keyword, theInitialActivity );
+    return aVectorPtr;
   }
 
   void Reactor::appendSubstrate( FullIDCref fullid, int coefficient )
@@ -214,7 +204,7 @@ namespace libecs
     appendEffector( *aSubstance, coefficient );
   }
 
-  void Reactor::setInitialActivity( RealCref activity )
+  void Reactor::setInitialActivity( const Real activity )
   {
     theInitialActivity = activity;
 
@@ -314,12 +304,6 @@ namespace libecs
       warning("too many effectors.");
     else if( getNumberOfEffectors() < getMinimumNumberOfEffectors() )
       warning("too few effectors.");
-  }
-
-
-  Real Reactor::getActivity() 
-  {
-    return theActivity;
   }
 
 

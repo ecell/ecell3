@@ -38,52 +38,52 @@
 namespace libecs
 {
 
-  UConstantStringData::UConstantStringData( const Real f )
+  UVariableStringData::UVariableStringData( const Real f )
     :
     theString( toString<Real>( f ) )
   {
     ; // do nothing
   }
 
-  UConstantStringData::UConstantStringData( const Int i )
+  UVariableStringData::UVariableStringData( const Int i )
     :
     theString( toString<Int>( i ) )
   {
     ; // do nothing
   }
 
-  const Real UConstantStringData::asReal() const
+  const Real UVariableStringData::asReal() const
   {
     cerr << "R "<< theString << endl;
     return stringTo<Real>( theString );
   }
 
-  const Int UConstantStringData::asInt() const
+  const Int UVariableStringData::asInt() const
   {
     return stringTo<Int>( theString );
   }
 
 
-  UConstantRealData::UConstantRealData( StringCref str )
+  UVariableRealData::UVariableRealData( StringCref str )
     :
     theReal( stringTo<Real>( str ) )
   {
     ; // do nothing
   }
 
-  const String UConstantRealData::asString() const
+  const String UVariableRealData::asString() const
   {
     return toString<Real>( theReal );
   }
 
-  UConstantIntData::UConstantIntData( StringCref str )
+  UVariableIntData::UVariableIntData( StringCref str )
     :
     theInt( stringTo<Int>( str ) )
   {
     ; // do nothing
   }
 
-  UConstantIntData::UConstantIntData( const Real f )
+  UVariableIntData::UVariableIntData( const Real f )
     :
     // FIXME: range check?
     theInt( static_cast<Int>( f ) )
@@ -92,27 +92,27 @@ namespace libecs
   }
 
 
-  const String UConstantIntData::asString() const
+  const String UVariableIntData::asString() const
   {
     return toString<Int>( theInt );
   }
 
 
-  const UConstant::Type UConstant::getType() const
+  const UVariable::Type UVariable::getType() const
   {
-    if( typeid( *theData) == typeid( UConstantRealData ) )
+    if( typeid( *theData) == typeid( UVariableRealData ) )
       {
 	return REAL;
       }
-    else if( typeid( *theData ) == typeid( UConstantIntData ) )
+    else if( typeid( *theData ) == typeid( UVariableIntData ) )
       {
 	return INT;
       }
-    else if( typeid( *theData ) == typeid( UConstantStringData ) )
+    else if( typeid( *theData ) == typeid( UVariableStringData ) )
       {
 	return STRING;
       }
-    else if( typeid( *theData ) == typeid( UConstantNoneData ) )
+    else if( typeid( *theData ) == typeid( UVariableNoneData ) )
       {
 	return NONE;
       }

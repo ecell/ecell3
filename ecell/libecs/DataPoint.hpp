@@ -62,7 +62,7 @@ namespace libecs
        @param 2 objects which are components of DataPoint
     */
     
-    DataPoint( RealCref, UConstantCref );
+    DataPoint( RealCref, UVariableCref );
     
     DataPoint( RealCref, RealCref );
 
@@ -135,7 +135,7 @@ namespace libecs
        @return V constant reference
     */
     
-    UConstantCref getValue( void ) const
+    UVariableCref getValue( void ) const
     {
       return theValue;
     }
@@ -168,7 +168,7 @@ namespace libecs
     /// The internal value
     
     Real theTime;
-    UConstant theValue;
+    UVariable theValue;
     
   };
   

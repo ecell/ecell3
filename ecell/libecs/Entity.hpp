@@ -30,6 +30,7 @@
 
 #ifndef ___ENTITY_H___
 #define ___ENTITY_H___
+
 #include "libecs.hpp"
 #include "PrimitiveType.hpp"
 #include "PropertyInterface.hpp"
@@ -82,7 +83,7 @@ namespace libecs
     /**
        @return entryname of this Entity.
     */
-    StringCref getID() const 
+    const String getID() const
     { 
       return theID; 
     }
@@ -100,7 +101,7 @@ namespace libecs
     /**
        @return name of this Entity.
     */
-    StringCref getName() const 
+    const String getName() const 
     { 
       return theName; 
     }
@@ -110,6 +111,8 @@ namespace libecs
     */
 
     const FullID getFullID() const;
+
+    const String getFullIDString() const;
 
     virtual const PrimitiveType getPrimitiveType() const
     {
@@ -126,7 +129,7 @@ namespace libecs
        @return activity of this Entity
        @see getActivityPerSecond()
     */
-    virtual Real getActivity();
+    virtual const Real getActivity() const;
 
     /**
        Returns activity value (per second).
@@ -135,18 +138,16 @@ namespace libecs
 
        @return activity of this Entity per second
     */
-    virtual Real getActivityPerSecond();
+    virtual const Real getActivityPerSecond() const;
 
-    virtual const char* const getClassName() const { return "Entity"; }
+    virtual const String getClassName() const { return "Entity"; }
 
 
 
-    const Message getClassName( StringCref keyword );
-    const Message getID( StringCref keyword );
-    const Message getFullID( StringCref keyword );
-    const Message getName( StringCref keyword );
-    const Message getActivity( StringCref keyword );
-    const Message getActivityPerSecond( StringCref keyword );
+    //    const UVariableVectorRCPtr getClassName();
+    //    const UVariableVectorRCPtr getID();
+    //    const UVariableVectorRCPtr getFullID();
+    //    const UVariableVectorRCPtr getName();
 
 
   protected:

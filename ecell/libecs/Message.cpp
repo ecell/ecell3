@@ -40,12 +40,12 @@ namespace libecs
   Message::Message( StringCref keyword )
       :
     theKeyword( keyword ),
-    theBody( new UConstantVector )
+    theBody( new UVariableVector )
     {
       ; // do nothing
     }
 
-  Message::Message( StringCref keyword, const UConstantVector* uvl)
+  Message::Message( StringCref keyword, const UVariableVector* uvl)
     : 
     theKeyword( keyword ),
     theBody( uvl )
@@ -53,15 +53,15 @@ namespace libecs
     ; // do nothing
   }
 
-  Message::Message( StringCref keyword, UConstantVectorCref uvl)
+  Message::Message( StringCref keyword, UVariableVectorCref uvl)
     : 
     theKeyword( keyword ),
-    theBody( new UConstantVector( uvl ) )
+    theBody( new UVariableVector( uvl ) )
   {
     ; // do nothing
   }
 
-  Message::Message( StringCref keyword, UConstantVectorRCPtr uvl)
+  Message::Message( StringCref keyword, UVariableVectorRCPtr uvl)
     : 
     theKeyword( keyword ),
     theBody( uvl )
@@ -69,10 +69,10 @@ namespace libecs
     ; // do nothing
   }
 
-  Message::Message( StringCref keyword, UConstantCref uv )
+  Message::Message( StringCref keyword, UVariableCref uv )
     :
     theKeyword( keyword ),
-    theBody( new UConstantVector )
+    theBody( new UVariableVector )
   {
     (*theBody).push_back( uv );
   }

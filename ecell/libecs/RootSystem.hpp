@@ -62,11 +62,9 @@ namespace libecs
     StepperMakerRef     getStepperMaker()     { return theStepperMaker; }
     AccumulatorMakerRef getAccumulatorMaker() { return theAccumulatorMaker; }
 
+    const Real getCurrentTime() const;
+
     virtual const char* const className() const { return "RootSystem"; }
-
-  public: // message interfaces
-
-    const Message getCurrentTime( StringCref keyword );
 
   private:
 

@@ -36,60 +36,60 @@
 
 #include "CXX/Objects.hxx"
 
-class PyUConstant 
+class PyUVariable 
   : 
-  public libecs::UConstant
+  public libecs::UVariable
 {
 
 public:
 
-  PyUConstant( const Py::Object& aPyObject )
+  PyUVariable( const Py::Object& aPyObject )
   {
     // FIXME: ugly to use _TYPE_Check()?
     if( Py::_Float_Check( *aPyObject ) )
       {
-	theData = new libecs::UConstantRealData( Py::Float( aPyObject ) );
+	theData = new libecs::UVariableRealData( Py::Float( aPyObject ) );
       }
     else if( Py::_Int_Check( *aPyObject ) )
       {
-	theData = new libecs::UConstantIntData( Py::Int( aPyObject ) );
+	theData = new libecs::UVariableIntData( Py::Int( aPyObject ) );
       }
     else if( Py::_Long_Check( *aPyObject ) )
       {
-	theData = new libecs::UConstantRealData( Py::Float( aPyObject ) );
+	theData = new libecs::UVariableRealData( Py::Float( aPyObject ) );
       }
     else // assume everything else as a string
       {
-	theData = new libecs::UConstantStringData( aPyObject.as_string() );
+	theData = new libecs::UVariableStringData( aPyObject.as_string() );
       }
   }
 
 
-  PyUConstant( libecs::UConstantCref uc )
+  PyUVariable( libecs::UVariableCref uc )
     :
-    UConstant( uc )
+    UVariable( uc )
   {
     ; // do nothing
   }
 
   const Py::Object asPyObject() const
   {
-    return toPyObject( static_cast<UConstant>( *this ) );
+    return toPyObject( static_cast<UVariable>( *this ) );
   }
 
-  static const Py::Object toPyObject( libecs::UConstantCref uconstant )
+  static const Py::Object toPyObject( libecs::UVariableCref uconstant )
   {
     switch( uconstant.getType() )
       {
-      case UConstant::REAL:
+      case UVariable::REAL:
 	return Py::Float( uconstant.asReal() );
 	
-      case UConstant::INT:
+      case UVariable::INT:
 	// FIXME: ugly... determine the type by autoconf?
 	return Py::Int( static_cast<long int>( uconstant.asInt() ) );
 	
-      case UConstant::STRING:
-      case UConstant::NONE:
+      case UVariable::STRING:
+      case UVariable::NONE:
 	return Py::String( uconstant.asString() );
 	
       default:

@@ -75,7 +75,7 @@ namespace libecs
   //
 
   void StlDataPointVector::push( RealCref t,
-				 UConstantCref val)
+				 UVariableCref val)
   {
     theContainer.push_back( new Containee( t, val ) );
   }

@@ -118,12 +118,12 @@ namespace libecs
 
        @param classname Classname of the Stepper that this System may have.
     */
-    void setStepper( StringCref classname );
+    void setStepperClass( StringCref classname );
 
     /**
        @return Volume of this System. Unit is [L].
     */
-    virtual RealCref getVolume()
+    virtual const Real getVolume() const
     {
       return theVolume;
     }
@@ -154,7 +154,7 @@ namespace libecs
     /**
        @return An iterator which points to the first Reactor in this System.
     */
-    ReactorMapIterator getFirstReactorIterator()
+    ReactorMapConstIterator getFirstReactorIterator() const
     {
       return theReactorMap.begin();
     }
@@ -163,7 +163,7 @@ namespace libecs
        @return An iterator which points to the first regular Reactor
        (i.e. not posterior Reactor) in this System.
     */
-    ReactorMapIterator getFirstRegularReactorIterator() const
+    ReactorMapConstIterator getFirstRegularReactorIterator() const
     {
       return theFirstRegularReactorIterator;
     }
@@ -171,7 +171,7 @@ namespace libecs
     /**
        @return An iterator which points to the last Reactor in this System.
     */
-    ReactorMapIterator getLastReactorIterator() 
+    ReactorMapConstIterator getLastReactorIterator() const
     { 
       return theReactorMap.end();
     }
@@ -208,7 +208,7 @@ namespace libecs
     /**
        @return An iterator which points to the first Substance in this System.
     */
-    SubstanceMapIterator getFirstSubstanceIterator()
+    SubstanceMapConstIterator getFirstSubstanceIterator() const
     {
       return theSubstanceMap.begin();
     }
@@ -216,7 +216,7 @@ namespace libecs
     /**
        @return An iterator which points to the last Substance in this System.
     */
-    SubstanceMapIterator getLastSubstanceIterator()
+    SubstanceMapConstIterator getLastSubstanceIterator() const
     {
       return theSubstanceMap.end();
     }
@@ -259,7 +259,7 @@ namespace libecs
     /**
        @return An iterator which points to the first System in this System.
     */
-    SystemMapIterator getFirstSystemIterator()
+    SystemMapConstIterator getFirstSystemIterator() const
     {
       return theSystemMap.begin();
     }
@@ -267,7 +267,7 @@ namespace libecs
     /**
        @return An iterator which points to the last System in this System.
     */
-    SystemMapIterator getLastSystemIterator()
+    SystemMapConstIterator getLastSystemIterator() const
     {
       return theSystemMap.end();
     }
@@ -318,27 +318,23 @@ namespace libecs
 			       StringCref name );
 
 
-    Real getActivityPerSecond();
+    const Real getActivityPerSecond() const;
 
-    RealCref getStepInterval() const;
-    RealCref getStepsPerSecond() const;
+    const Real getStepInterval() const;
+    const Real getStepsPerSecond() const;
 
 
     static SystemPtr instance() { return new System; }
 
   public: // message slots
 
-    void setStepper( MessageCref message );
-    void setVolume( MessageCref message);
+    void setStepperClass( UVariableVectorCref message );
 
-    const Message getStepper( StringCref keyword );
+    const UVariableVectorRCPtr getStepperClass() const;
 
-    const Message getSystemList( StringCref keyword );
-    const Message getSubstanceList( StringCref keyword );
-    const Message getReactorList( StringCref keyword );
-
-    const Message getVolume( StringCref keyword );
-    const Message getStepInterval( StringCref keyword );
+    const UVariableVectorRCPtr getSystemList() const;
+    const UVariableVectorRCPtr getSubstanceList() const;
+    const UVariableVectorRCPtr getReactorList() const;
 
   protected:
 

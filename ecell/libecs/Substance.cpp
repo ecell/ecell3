@@ -48,16 +48,16 @@ namespace libecs
 
   void Substance::makeSlots()
   {
-    makePropertySlot( "Quantity",Substance,*this,&Substance::setQuantity,
-		      &Substance::getQuantity );
-    makePropertySlot( "Concentration",Substance,*this,NULL,
-		      &Substance::getConcentration );
-    makePropertySlot( "AccumulatorClass",Substance,*this,
-		      &Substance::setAccumulatorClass,
-		      &Substance::getAccumulatorClass );
+    createPropertySlot( "Quantity",*this,&Substance::setQuantity,
+			&Substance::getQuantity );
+    createPropertySlot( "Concentration",*this,NULLPTR,
+			&Substance::getConcentration );
+    createPropertySlot( "AccumulatorClass",*this,
+			&Substance::setAccumulatorClass,
+			&Substance::getAccumulatorClass );
   }
 
-  void Substance::setQuantity( MessageCref message )
+  /*
   {
     // FIXME: range check
 
@@ -72,36 +72,25 @@ namespace libecs
 	mySetQuantity( aQuantity );
       }
   }
+  */
 
-
-  void Substance::setAccumulatorClass( MessageCref message )
+  void Substance::setAccumulatorClass( UVariableVectorCref message )
   {
     // FIXME: range check
 
     setAccumulator( message[0].asString() );
   }
 
-  const Message Substance::getQuantity( StringCref keyword )
+  const UVariableVectorRCPtr Substance::getAccumulatorClass() const
   {
-    return Message( keyword, getQuantity() );
-  }
-
-  const Message Substance::getConcentration( StringCref keyword )
-  {
-    return Message( keyword, getConcentration() );
-  }
-
-  const Message Substance::getAccumulatorClass( StringCref keyword )
-  {
-    if( theAccumulator )
+    UVariableVectorRCPtr aUVariableVector( new UVariableVector );
+    if( theAccumulator ) 
       {
-	return Message( keyword, 
-			UConstant( theAccumulator->className() ) );
+	aUVariableVector->
+	  push_back( UVariable( theAccumulator->className() ) );
       }
-    else
-      {
-	return Message( keyword );
-      }
+
+    return aUVariableVector;
   }
 
   Substance::Substance()
@@ -115,6 +104,8 @@ namespace libecs
     theConcentration( -1 )
   {
     makeSlots();
+    // FIXME: use AccumulatorMaker
+    setAccumulator( new ReserveAccumulator );
   } 
 
   Substance::~Substance()
@@ -196,7 +187,7 @@ namespace libecs
     return getVelocity();
   }
 
-  void Substance::calculateConcentration()
+  void Substance::calculateConcentration() const
   {
     theConcentration = theQuantity / ( getSuperSystem()->getVolume() * N_A ); 
   }

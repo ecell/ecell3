@@ -117,11 +117,11 @@ Object PySimulator::setProperty( const Py::Tuple& args )
   const String aPropertyName( static_cast<Py::String>( aFullPN[3] ) );
   const Py::Tuple aMessageSequence( static_cast<Py::Sequence>( args[1] ) );
   
-  UConstantVector aMessageBody;
+  UVariableVector aMessageBody;
   for( Py::Tuple::const_iterator i( aMessageSequence.begin() );
        i != aMessageSequence.end() ; ++i )
     {
-      aMessageBody.push_back( PyUConstant( *i ) );
+      aMessageBody.push_back( PyUVariable( *i ) );
     }
 
   Simulator::setProperty( aType, aPath, anID, aPropertyName, aMessageBody );
@@ -145,18 +145,18 @@ Object PySimulator::getProperty( const Py::Tuple& args )
   const String anID         ( static_cast<Py::String>( aFullPN[2] ) );
   const String aPropertyName( static_cast<Py::String>( aFullPN[3] ) );
 
-  UConstantVectorRCPtr aVectorPtr( Simulator::getProperty( aType,
+  UVariableVectorRCPtr aVectorPtr( Simulator::getProperty( aType,
 							   aPath,
 							   anID,
 							   aPropertyName ) );
 
-  UConstantVector::size_type aSize( aVectorPtr->size() );
+  UVariableVector::size_type aSize( aVectorPtr->size() );
 
   Py::Tuple aTuple( aSize );
 
-  for( UConstantVector::size_type i( 0 ) ; i < aSize ; ++i )
+  for( UVariableVector::size_type i( 0 ) ; i < aSize ; ++i )
     {
-      aTuple[i] = PyUConstant::toPyObject( (*aVectorPtr)[i] );
+      aTuple[i] = PyUVariable::toPyObject( (*aVectorPtr)[i] );
     }
 
   return aTuple;

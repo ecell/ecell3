@@ -75,17 +75,17 @@ namespace libecs
   DECLARE_CLASS( isRegularReactorItem );
   DECLARE_CLASS( SystemMaker );
   DECLARE_CLASS( Message );
-  DECLARE_CLASS( AbstractPropertySlot );
+  DECLARE_CLASS( PropertySlot );
   DECLARE_CLASS( PropertySlotProxy );
   DECLARE_CLASS( PropertyInterface );
-  DECLARE_CLASS( UConstant );
+  DECLARE_CLASS( UVariable );
   DECLARE_CLASS( LoggerBroker );
   DECLARE_CLASS( Logger );
   DECLARE_CLASS( DataPoint );
 
   // containers
 
-  DECLARE_VECTOR( UConstant, UConstantVector );
+  DECLARE_VECTOR( UVariable, UVariableVector );
 
 
   // exceptions
@@ -106,7 +106,7 @@ namespace libecs
 
   // reference counted pointer types
 
-  DECLARE_RCPTR( UConstantVector );
+  DECLARE_RCPTR( UVariableVector );
 
 } // namespace libecs
 

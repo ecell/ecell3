@@ -37,20 +37,21 @@
 namespace libecs
 {
 
+
   ///////////////////////////// PropertyInterface
 
   void PropertyInterface::makeSlots()
   {
-    makePropertySlot( "PropertyList",PropertyInterface,*this,NULLPTR,
-		      &PropertyInterface::getPropertyList);
-    makePropertySlot( "PropertyAttributes",PropertyInterface,*this,NULLPTR,
-		      &PropertyInterface::getPropertyAttributes);
+    createPropertySlot( "PropertyList",*this,NULLPTR,
+			&PropertyInterface::getPropertyList );
+    createPropertySlot( "PropertyAttributes",*this,NULLPTR,
+    			&PropertyInterface::getPropertyAttributes);
 
   }
 
-  const Message PropertyInterface::getPropertyList( StringCref keyword )
+  const UVariableVectorRCPtr PropertyInterface::getPropertyList() const
   {
-    UConstantVectorRCPtr aPropertyVectorPtr( new UConstantVector );
+    UVariableVectorRCPtr aPropertyVectorPtr( new UVariableVector );
     aPropertyVectorPtr->reserve( thePropertyMap.size() );
 
     for( PropertyMapConstIterator i( thePropertyMap.begin() ); 
@@ -59,12 +60,12 @@ namespace libecs
 	aPropertyVectorPtr->push_back( i->first );
       }
 
-    return Message( keyword, aPropertyVectorPtr );
+    return aPropertyVectorPtr;
   }
 
-  const Message PropertyInterface::getPropertyAttributes( StringCref keyword )
+  const UVariableVectorRCPtr PropertyInterface::getPropertyAttributes() const
   {
-    UConstantVectorRCPtr aPropertyAttributesVector( new UConstantVector );
+    UVariableVectorRCPtr aPropertyAttributesVector( new UVariableVector );
     aPropertyAttributesVector->reserve( thePropertyMap.size() );
 
     for( PropertyMapConstIterator i( thePropertyMap.begin() ); 
@@ -85,7 +86,7 @@ namespace libecs
 	aPropertyAttributesVector->push_back( anAttributeFlag );
       }
 
-    return Message( keyword, aPropertyAttributesVector );
+    return aPropertyAttributesVector;
   }
 
   PropertyInterface::PropertyInterface()
@@ -102,9 +103,9 @@ namespace libecs
       }
   }
 
-  void PropertyInterface::appendSlot( StringCref keyword, 
-				      AbstractPropertySlot* func )
+  void PropertyInterface::appendSlot( PropertySlotPtr slot )
   {
+    String keyword = slot->getName();
     if( thePropertyMap.find( keyword ) != thePropertyMap.end() )
       {
 	// it already exists. take the latter one.
@@ -112,7 +113,7 @@ namespace libecs
 	thePropertyMap.erase( keyword );
       }
 
-    thePropertyMap[ keyword ] = func;
+    thePropertyMap[ keyword ] = slot;
   }
 
   void PropertyInterface::deleteSlot( StringCref keyword )
@@ -128,9 +129,9 @@ namespace libecs
     thePropertyMap.erase( keyword );
   }
 
-  void PropertyInterface::set( MessageCref message ) 
+  void PropertyInterface::setMessage( MessageCref message ) 
   {
-    PropertyMapIterator sm( thePropertyMap.find( message.getKeyword() ) );
+    PropertyMapConstIterator sm( thePropertyMap.find( message.getKeyword() ) );
 
     if( sm == thePropertyMap.end() )
       {
@@ -139,12 +140,12 @@ namespace libecs
 		      + message.getKeyword() + "]) but no slot for it.");
       }
 
-    sm->second->set( message );
+    sm->second->setUVariableVector( message.getBody() );
   }
 
-  const Message PropertyInterface::get( StringCref keyword ) 
+  const Message PropertyInterface::getMessage( StringCref keyword ) const
   {
-    PropertyMapIterator sm( thePropertyMap.find( keyword ) );
+    PropertyMapConstIterator sm( thePropertyMap.find( keyword ) );
 
     if( sm == thePropertyMap.end() )
       {
@@ -153,7 +154,9 @@ namespace libecs
 		      + keyword + "]) but no slot for it.\n" );
       }
 
-    return sm->second->get( keyword );
+    return 
+      Message( keyword, 
+	       UVariableVectorRCPtr( sm->second->getUVariableVector() ) );
   }
 
 

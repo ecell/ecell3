@@ -75,7 +75,7 @@ namespace libemc
       return theDataPoint->getTime();
     }
 
-    const UConstant& getValue() const
+    const UVariable& getValue() const
     {
       return theDataPoint->getValue();
     }

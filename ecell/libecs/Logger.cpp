@@ -46,7 +46,7 @@ namespace libecs
 
   // Constructor
 
-  Logger::Logger( AbstractPropertySlotCref aPropertySlot )
+  Logger::Logger( PropertySlotCref aPropertySlot )
     :
     thePropertySlot( aPropertySlot ),
     theMinimumInterval( 0.0 ),
@@ -160,7 +160,7 @@ namespace libecs
   
   //
   
-  void Logger::appendData( RealCref aTime, UConstantCref aValue )
+  void Logger::appendData( RealCref aTime, UVariableCref aValue )
   {
     theCurrentInterval = aTime - theDataPointVector.back()->getTime();
     theDataPointVector.push( aTime, aValue );
