@@ -67,17 +67,19 @@ namespace libecs
   void Scheduler::step()
   {
     EventCref aTopEvent( theScheduleQueue.top() );
+    const Real aCurrentTime( aTopEvent.getTime() );
     const StepperPtr aStepperPtr( aTopEvent.getStepper() );
-    setCurrentTime( aTopEvent.getTime() );
+
+    setCurrentTime( aCurrentTime );
  
-    aStepperPtr->integrate( getCurrentTime() );
+    aStepperPtr->integrate( aCurrentTime );
     aStepperPtr->step();
     aStepperPtr->log();
 
     aStepperPtr->dispatchInterruptions();
 
     const Real aStepInterval( aStepperPtr->getStepInterval() );
-    const Real aScheduledTime( getCurrentTime() + aStepInterval );
+    const Real aScheduledTime( aCurrentTime + aStepInterval );
 
     // schedule a new event
     theScheduleQueue.changeTopKey( Event( aScheduledTime, aStepperPtr ) );
