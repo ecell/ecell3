@@ -55,55 +55,55 @@
 </property>
 
 
-<substance class="Substance" id="M" name="M">
-<property name="Quantity">
+<variable class="Variable" id="M" name="M">
+<property name="Value">
 <value>3.61328202E-01</value>
 </property>
-</substance>
+</variable>
 
 
-<substance class="Substance" id="Pn" name="Pn">
-<property name="Quantity">
+<variable class="Variable" id="Pn" name="Pn">
+<property name="Value">
 <value>6.21367E-01</value>
 </property>
-</substance>
+</variable>
 
 
-<substance class="Substance" id="P0" name="P0">
-<property name="Quantity">
+<variable class="Variable" id="P0" name="P0">
+<property name="Value">
 <value>3.01106835E-01</value>
 </property>
-</substance>
+</variable>
 
 
-<substance class="Substance" id="P1" name="P1">
-<property name="Quantity">
+<variable class="Variable" id="P1" name="P1">
+<property name="Value">
 <value>3.01106835E-01</value>
 </property>
-</substance>
+</variable>
 
 
-<substance class="Substance" id="P2" name="P2">
-<property name="Quantity">
+<variable class="Variable" id="P2" name="P2">
+<property name="Value">
 <value>3.61328202E-01</value>
 </property>
-</substance>
+</variable>
 
 
 
 
 
-<reactor class="FM1Reactor" id="R.toy1" name="Toy reaction">
+<process class="FM1Process" id="R.toy1" name="Toy reaction">
 
-<property name="ReactantList">
+<property name="ConnectionList">
 <value>
 <value number="0">P0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:M</value>
+<value number="1">Variable:/CELL/CYTOPLASM:M</value>
 <value number="2">1</value>
 </value>
 <value>
 <value number="0">C0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Pn</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Pn</value>
 <value number="2">0</value>
 </value>
 </property>
@@ -116,15 +116,15 @@
 <value number="0">1</value>
 </property>
 
-</reactor>
+</process>
 
 
-<reactor class="FM2Reactor" id="R.toy2" name="Toy reaction">
+<process class="FM2Process" id="R.toy2" name="Toy reaction">
 
-<property name="ReactantList">
+<property name="ConnectionList">
 <value>
 <value number="0">P0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:M</value>
+<value number="1">Variable:/CELL/CYTOPLASM:M</value>
 <value number="2">1</value>
 </value>
 </property>
@@ -137,22 +137,22 @@
 <value number="0">0.5</value>
 </property>
 
-</reactor>
+</process>
 
 
 
 
-<reactor class="FP01Reactor" id="R.toy3" name="Toy reaction">
+<process class="FP01Process" id="R.toy3" name="Toy reaction">
 
-<property name="ReactantList">
+<property name="ConnectionList">
 <value>
 <value number="0">P0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:P0</value>
+<value number="1">Variable:/CELL/CYTOPLASM:P0</value>
 <value number="2">1</value>
 </value>
 <value>
 <value number="0">C0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:M</value>
+<value number="1">Variable:/CELL/CYTOPLASM:M</value>
 <value number="2">0</value>
 </value>
 </property>
@@ -161,21 +161,21 @@
 <value number="0">0.38</value>
 </property>
 
-</reactor>
+</process>
 
 
 
-<reactor class="FP02Reactor" id="R.toy4" name="Toy reaction">
+<process class="FP02Process" id="R.toy4" name="Toy reaction">
 
-<property name="ReactantList">
+<property name="ConnectionList">
 <value>
 <value number="0">P0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:P0</value>
+<value number="1">Variable:/CELL/CYTOPLASM:P0</value>
 <value number="2">1</value>
 </value>
 <value>
 <value number="0">C0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:P0</value>
+<value number="1">Variable:/CELL/CYTOPLASM:P0</value>
 <value number="2">0</value>
 </value>
 </property>
@@ -188,22 +188,22 @@
 <value number="0">2</value>
 </property>
 
-</reactor>
+</process>
 
 
 
 
-<reactor class="FP03Reactor" id="R.toy5" name="Toy reaction">
+<process class="FP03Process" id="R.toy5" name="Toy reaction">
 
-<property name="ReactantList">
+<property name="ConnectionList">
 <value>
 <value number="0">P0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:P0</value>
+<value number="1">Variable:/CELL/CYTOPLASM:P0</value>
 <value number="2">1</value>
 </value>
 <value>
 <value number="0">C0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:P1</value>
+<value number="1">Variable:/CELL/CYTOPLASM:P1</value>
 <value number="2">0</value>
 </value>
 </property>
@@ -216,23 +216,23 @@
 <value number="0">2</value>
 </property>
 
-</reactor>
+</process>
 
 
 
 
 
-<reactor class="FP11Reactor" id="R.toy6" name="Toy reaction">
+<process class="FP11Process" id="R.toy6" name="Toy reaction">
 
-<property name="ReactantList">
+<property name="ConnectionList">
 <value>
 <value number="0">P0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:P1</value>
+<value number="1">Variable:/CELL/CYTOPLASM:P1</value>
 <value number="2">1</value>
 </value>
 <value>
 <value number="0">C0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:P0</value>
+<value number="1">Variable:/CELL/CYTOPLASM:P0</value>
 <value number="2">0</value>
 </value>
 </property>
@@ -245,23 +245,23 @@
 <value number="0">2</value>
 </property>
 
-</reactor>
+</process>
 
 
 
 
 
-<reactor class="FP12Reactor" id="R.toy7" name="Toy reaction">
+<process class="FP12Process" id="R.toy7" name="Toy reaction">
 
-<property name="ReactantList">
+<property name="ConnectionList">
 <value>
 <value number="0">P0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:P1</value>
+<value number="1">Variable:/CELL/CYTOPLASM:P1</value>
 <value number="2">1</value>
 </value>
 <value>
 <value number="0">C0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:P1</value>
+<value number="1">Variable:/CELL/CYTOPLASM:P1</value>
 <value number="2">0</value>
 </value>
 </property>
@@ -274,22 +274,22 @@
 <value number="0">2</value>
 </property>
 
-</reactor>
+</process>
 
 
 
 
-<reactor class="FP13Reactor" id="R.toy8" name="Toy reaction">
+<process class="FP13Process" id="R.toy8" name="Toy reaction">
 
-<property name="ReactantList">
+<property name="ConnectionList">
 <value>
 <value number="0">P0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:P1</value>
+<value number="1">Variable:/CELL/CYTOPLASM:P1</value>
 <value number="2">1</value>
 </value>
 <value>
 <value number="0">C0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:P1</value>
+<value number="1">Variable:/CELL/CYTOPLASM:P1</value>
 <value number="2">0</value>
 </value>
 </property>
@@ -302,23 +302,23 @@
 <value number="0">2</value>
 </property>
 
-</reactor>
+</process>
 
 
 
 
 
-<reactor class="FP14Reactor" id="R.toy9" name="Toy reaction">
+<process class="FP14Process" id="R.toy9" name="Toy reaction">
 
-<property name="ReactantList">
+<property name="ConnectionList">
 <value>
 <value number="0">P0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:P1</value>
+<value number="1">Variable:/CELL/CYTOPLASM:P1</value>
 <value number="2">1</value>
 </value>
 <value>
 <value number="0">C0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:P2</value>
+<value number="1">Variable:/CELL/CYTOPLASM:P2</value>
 <value number="2">0</value>
 </value>
 </property>
@@ -331,23 +331,23 @@
 <value number="0">2</value>
 </property>
 
-</reactor>
+</process>
 
 
 
 
 
-<reactor class="FP21Reactor" id="R.toy10" name="Toy reaction">
+<process class="FP21Process" id="R.toy10" name="Toy reaction">
 
-<property name="ReactantList">
+<property name="ConnectionList">
 <value>
 <value number="0">P0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:P2</value>
+<value number="1">Variable:/CELL/CYTOPLASM:P2</value>
 <value number="2">1</value>
 </value>
 <value>
 <value number="0">C0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:P1</value>
+<value number="1">Variable:/CELL/CYTOPLASM:P1</value>
 <value number="2">0</value>
 </value>
 </property>
@@ -360,23 +360,23 @@
 <value number="0">2</value>
 </property>
 
-</reactor>
+</process>
 
 
 
 
 
-<reactor class="FP22Reactor" id="R.toy11" name="Toy reaction">
+<process class="FP22Process" id="R.toy11" name="Toy reaction">
 
-<property name="ReactantList">
+<property name="ConnectionList">
 <value>
 <value number="0">P0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:P2</value>
+<value number="1">Variable:/CELL/CYTOPLASM:P2</value>
 <value number="2">1</value>
 </value>
 <value>
 <value number="0">C0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:P2</value>
+<value number="1">Variable:/CELL/CYTOPLASM:P2</value>
 <value number="2">0</value>
 </value>
 </property>
@@ -389,23 +389,23 @@
 <value number="0">2</value>
 </property>
 
-</reactor>
+</process>
 
 
 
 
 
-<reactor class="FP23Reactor" id="R.toy12" name="Toy reaction">
+<process class="FP23Process" id="R.toy12" name="Toy reaction">
 
-<property name="ReactantList">
+<property name="ConnectionList">
 <value>
 <value number="0">P0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:P2</value>
+<value number="1">Variable:/CELL/CYTOPLASM:P2</value>
 <value number="2">1</value>
 </value>
 <value>
 <value number="0">C0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:P2</value>
+<value number="1">Variable:/CELL/CYTOPLASM:P2</value>
 <value number="2">0</value>
 </value>
 </property>
@@ -414,21 +414,21 @@
 <value number="0">1.9</value>
 </property>
 
-</reactor>
+</process>
 
 
 
-<reactor class="FP24Reactor" id="R.toy13" name="Toy reaction">
+<process class="FP24Process" id="R.toy13" name="Toy reaction">
 
-<property name="ReactantList">
+<property name="ConnectionList">
 <value>
 <value number="0">P0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:P2</value>
+<value number="1">Variable:/CELL/CYTOPLASM:P2</value>
 <value number="2">1</value>
 </value>
 <value>
 <value number="0">C0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Pn</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Pn</value>
 <value number="2">0</value>
 </value>
 </property>
@@ -437,22 +437,22 @@
 <value number="0">1.3</value>
 </property>
 
-</reactor>
+</process>
 
 
 
 
-<reactor class="FP25Reactor" id="R.toy14" name="Toy reaction">
+<process class="FP25Process" id="R.toy14" name="Toy reaction">
 
-<property name="ReactantList">
+<property name="ConnectionList">
 <value>
 <value number="0">P0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:P2</value>
+<value number="1">Variable:/CELL/CYTOPLASM:P2</value>
 <value number="2">1</value>
 </value>
 <value>
 <value number="0">C0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:P2</value>
+<value number="1">Variable:/CELL/CYTOPLASM:P2</value>
 <value number="2">0</value>
 </value>
 </property>
@@ -465,23 +465,23 @@
 <value number="0">0.2</value>
 </property>
 
-</reactor>
+</process>
 
 
 
 
 
-<reactor class="FPn1Reactor" id="R.toy15" name="Toy reaction">
+<process class="FPn1Process" id="R.toy15" name="Toy reaction">
 
-<property name="ReactantList">
+<property name="ConnectionList">
 <value>
 <value number="0">P0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Pn</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Pn</value>
 <value number="2">1</value>
 </value>
 <value>
 <value number="0">C0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:P2</value>
+<value number="1">Variable:/CELL/CYTOPLASM:P2</value>
 <value number="2">0</value>
 </value>
 </property>
@@ -490,22 +490,22 @@
 <value number="0">1.9</value>
 </property>
 
-</reactor>
+</process>
 
 
 
 
-<reactor class="FPn2Reactor" id="R.toy16" name="Toy reaction">
+<process class="FPn2Process" id="R.toy16" name="Toy reaction">
 
-<property name="ReactantList">
+<property name="ConnectionList">
 <value>
 <value number="0">P0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Pn</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Pn</value>
 <value number="2">1</value>
 </value>
 <value>
 <value number="0">C0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Pn</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Pn</value>
 <value number="2">0</value>
 </value>
 </property>
@@ -514,7 +514,7 @@
 <value number="0">1.3</value>
 </property>
 
-</reactor>
+</process>
 
 
 

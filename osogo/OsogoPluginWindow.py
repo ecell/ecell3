@@ -175,9 +175,9 @@ class OsogoPluginWindow(PluginWindow):
 		if aFullPN[PROPERTY] != '' :
 			return aFullPN
 		else :
-			if aFullPN[TYPE] == SUBSTANCE :
-				aPropertyName = 'Quantity'
-			elif aFullPN[TYPE] == REACTOR :
+			if aFullPN[TYPE] == VARIABLE :
+				aPropertyName = 'Value'
+			elif aFullPN[TYPE] == PROCESS :
 				aPropertyName = 'Activity'
 			elif aFullPN[TYPE] == SYSTEM :
 				aPropertyName = 'Activity'

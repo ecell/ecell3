@@ -54,7 +54,7 @@ if __name__ == "__main__":
 
     class simulator:
 
-        dic={('Substance', '/CELL/CYTOPLASM', 'ATP','Quantity') : (1950,),}
+        dic={('Variable', '/CELL/CYTOPLASM', 'ATP','Value') : (1950,),}
 
         def getEntityProperty( self, fpn ):
             return simulator.dic[fpn]
@@ -63,7 +63,7 @@ if __name__ == "__main__":
             simulator.dic[fpn] = value
 
 
-    fpn = ('Substance','/CELL/CYTOPLASM','ATP','Quantity')
+    fpn = ('Variable','/CELL/CYTOPLASM','ATP','Value')
 
     def mainQuit( obj, data ):
         print obj,data

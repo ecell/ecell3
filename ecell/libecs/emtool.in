@@ -122,8 +122,8 @@ fi
 
 # get dynamic module class
 
-#default class is reactor
-TYPE='Reactor'
+#default class is process
+TYPE='Process'
 
 TEMPLATEDIR="${prefix}/share/ecell/@VERSION@/template/$TYPE"
 
@@ -160,8 +160,8 @@ if [ $DO_ALL ] ; then
     #copy dmfile to ETTMPDIR
     run_command "cp $inputfile $ETTMPDIR" 
 
-    #fix me:where FluxReactor.hpp ?
-    run_command "cp FluxReactor.hpp $ETTMPDIR"
+    #fix me:where FluxProcess.hpp ?
+    run_command "cp FluxProcess.hpp $ETTMPDIR"
 
     run_command "pushd $ETTMPDIR"     
     DO_GENERATE=yes

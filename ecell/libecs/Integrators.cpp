@@ -28,7 +28,7 @@
 // E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
 
-#include "Substance.hpp"
+#include "Variable.hpp"
 
 #include "Integrators.hpp"
 
@@ -38,12 +38,12 @@ namespace libecs
 
   ////////////////////////////// Integrator
 
-  Integrator::Integrator( SRMSubstanceRef substance ) 
+  Integrator::Integrator( SRMVariableRef variable ) 
     :
-    theSubstance( substance ),
+    theVariable( variable ),
     theStepCounter( 0 )
   {
-    theSubstance.setIntegrator( this );
+    theVariable.setIntegrator( this );
   }
 
   void Integrator::clear()
@@ -53,9 +53,9 @@ namespace libecs
 
   ////////////////////////////// Euler1Integrator
 
-  Euler1Integrator::Euler1Integrator( SRMSubstanceRef aSubstance ) 
+  Euler1Integrator::Euler1Integrator( SRMVariableRef aVariable ) 
     : 
-    Integrator( aSubstance )
+    Integrator( aVariable )
   {
     ; // do nothing
   }
@@ -79,9 +79,9 @@ namespace libecs
   };
 
 
-  RungeKutta4Integrator::RungeKutta4Integrator( SRMSubstanceRef aSubstance ) 
+  RungeKutta4Integrator::RungeKutta4Integrator( SRMVariableRef aVariable ) 
     : 
-    Integrator( aSubstance )
+    Integrator( aVariable )
   {
     ; // do nothing
   }
@@ -92,35 +92,35 @@ namespace libecs
   void RungeKutta4Integrator::clear()
   {
     Integrator::clear();
-    theOriginalQuantity = theSubstance.saveQuantity();
+    theOriginalValue = theVariable.saveValue();
   }
 
   void RungeKutta4Integrator::turn()
   {
-    theK[ theStepCounter ] = theSubstance.getVelocity();
+    theK[ theStepCounter ] = theVariable.getVelocity();
     ( this->*( theTurnMethods[ theStepCounter ] ) )();
     ++theStepCounter;
-    theSubstance.setVelocity( 0 );
+    theVariable.setVelocity( 0 );
   }
 
   void RungeKutta4Integrator::turn0()
   {
-    theSubstance.loadQuantity( ( theK[0] * .5 ) + theOriginalQuantity );
+    theVariable.loadValue( ( theK[0] * .5 ) + theOriginalValue );
   }
 
   void RungeKutta4Integrator::turn1()
   {
-    theSubstance.loadQuantity( ( theK[1] * .5 ) + theOriginalQuantity );
+    theVariable.loadValue( ( theK[1] * .5 ) + theOriginalValue );
   }
 
   void RungeKutta4Integrator::turn2()
   {
-    theSubstance.loadQuantity( theK[2] + theOriginalQuantity );
+    theVariable.loadValue( theK[2] + theOriginalValue );
   }
 
   void RungeKutta4Integrator::turn3()
   {
-    theSubstance.loadQuantity( theOriginalQuantity );
+    theVariable.loadValue( theOriginalValue );
   }
 
   void RungeKutta4Integrator::integrate()
@@ -130,7 +130,7 @@ namespace libecs
     Real aResult( theOne6th );
     aResult *= theK[0] + theK[1] + theK[1] + theK[2] + theK[2] + theK[3];
 
-    theSubstance.setVelocity( aResult );
+    theVariable.setVelocity( aResult );
   }
 
 

@@ -63,29 +63,29 @@ anEml.setProperty( 'System:/CELL:CYTOPLASM', 'StepperID', [ 'SRM_01' ] )
 
 
 
-## createEntity [Substance] TEST
-anEml.createEntity( 'Substance', 'SRMSubstance', 'Substance:/CELL/CYTOPLASM:S', 'substance S' )
-anEml.createEntity( 'Substance', 'SRMSubstance', 'Substance:/CELL/CYTOPLASM:P', 'substance P' )
-anEml.createEntity( 'Substance', 'SRMSubstance', 'Substance:/CELL/CYTOPLASM:E', 'substance E' )
+## createEntity [Variable] TEST
+anEml.createEntity( 'Variable', 'SRMVariable', 'Variable:/CELL/CYTOPLASM:S', 'variable S' )
+anEml.createEntity( 'Variable', 'SRMVariable', 'Variable:/CELL/CYTOPLASM:P', 'variable P' )
+anEml.createEntity( 'Variable', 'SRMVariable', 'Variable:/CELL/CYTOPLASM:E', 'variable E' )
 
-anEml.setProperty( 'Substance:/CELL/CYTOPLASM:S', 'Quantity', [ '1000' ] )
-anEml.setProperty( 'Substance:/CELL/CYTOPLASM:P', 'Quantity', [ '0' ] )
-anEml.setProperty( 'Substance:/CELL/CYTOPLASM:E', 'Quantity', [ '1400' ] )
-
-
-## createEntity [Reactor] TEST
-anEml.createEntity( 'Reactor', 'MichaelisUniUniReactor', 'Reactor:/CELL/CYTOPLASM:E', 'reactor E' )
+anEml.setProperty( 'Variable:/CELL/CYTOPLASM:S', 'Value', [ '1000' ] )
+anEml.setProperty( 'Variable:/CELL/CYTOPLASM:P', 'Value', [ '0' ] )
+anEml.setProperty( 'Variable:/CELL/CYTOPLASM:E', 'Value', [ '1400' ] )
 
 
-anEml.setProperty( 'Reactor:/CELL/CYTOPLASM:E', 'Reactant', \
-                   ( 'S0', 'Substance:/CELL/CYTOPLASM:S', '-1' ) )
-anEml.setProperty( 'Reactor:/CELL/CYTOPLASM:E','Reactant', \
-                   ( 'P0', 'Substance:/CELL/CYTOPLASM:P', '1') )
-anEml.setProperty( 'Reactor:/CELL/CYTOPLASM:E','Reactant', \
-                   ( 'C0', 'Substance:/CELL/CYTOPLASM:E', '0') )
+## createEntity [Process] TEST
+anEml.createEntity( 'Process', 'MichaelisUniUniProcess', 'Process:/CELL/CYTOPLASM:E', 'process E' )
 
-anEml.setProperty( 'Reactor:/CELL/CYTOPLASM:E','KmS', [ '1' ] )
-anEml.setProperty( 'Reactor:/CELL/CYTOPLASM:E','KcF', [ '10' ] )
+
+anEml.setProperty( 'Process:/CELL/CYTOPLASM:E', 'Connection', \
+                   ( 'S0', 'Variable:/CELL/CYTOPLASM:S', '-1' ) )
+anEml.setProperty( 'Process:/CELL/CYTOPLASM:E','Connection', \
+                   ( 'P0', 'Variable:/CELL/CYTOPLASM:P', '1') )
+anEml.setProperty( 'Process:/CELL/CYTOPLASM:E','Connection', \
+                   ( 'C0', 'Variable:/CELL/CYTOPLASM:E', '0') )
+
+anEml.setProperty( 'Process:/CELL/CYTOPLASM:E','KmS', [ '1' ] )
+anEml.setProperty( 'Process:/CELL/CYTOPLASM:E','KcF', [ '10' ] )
 
 anEml.save( 'output.eml' )
 
@@ -95,6 +95,6 @@ anEml.save( 'output.eml' )
 
 
 ### ToDo ###
-## redundancy of entity -> system, substance and reactor, ok!
-## redundancy of Property -> system, substance almost ok! reactor???
+## redundancy of entity -> system, variable and process, ok!
+## redundancy of Property -> system, variable almost ok! process???
 ##  error for no parents

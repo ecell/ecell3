@@ -133,8 +133,8 @@
 	      <class>GtkOptionMenu</class>
 	      <name>type_optionmenu</name>
 	      <can_focus>True</can_focus>
-	      <items>Substance
-Reactor
+	      <items>Variable
+Process
 All
 </items>
 	      <initial_choice>0</initial_choice>

@@ -77,8 +77,8 @@ namespace libecs
     //    typedef std::pair<StepperPtr,Real> StepIntervalConstraint;
     //    DECLARE_VECTOR( StepIntervalConstraint, StepIntervalConstraintVector );
 
-    DECLARE_TYPE( SubstanceVector, SubstanceCache );
-    DECLARE_TYPE( ReactorVector, ReactorCache );
+    DECLARE_TYPE( VariableVector, VariableCache );
+    DECLARE_TYPE( ProcessVector, ProcessCache );
 
     DECLARE_ASSOCVECTOR( StepperPtr, Real, std::less<StepperPtr>,
 			 StepIntervalConstraintMap );
@@ -333,15 +333,15 @@ namespace libecs
       theCurrentTime = aTime;
     }
 
-    const UnsignedInt getSubstanceCacheIndex( SubstancePtr aSubstance );
+    const UnsignedInt getVariableCacheIndex( VariablePtr aVariable );
 
     RealCptr getVelocityBufferElementPtr( UnsignedInt anIndex )
     {
       return &theVelocityBuffer[ anIndex ];
     }
 
-    const Polymorph getSubstanceCache() const;
-    const Polymorph getReactorCache() const;
+    const Polymorph getVariableCache() const;
+    const Polymorph getProcessCache() const;
 
 
     virtual StringLiteral getClassName() const  { return "Stepper"; }
@@ -357,10 +357,10 @@ namespace libecs
 
     StepIntervalConstraintMap theStepIntervalConstraintMap;
 
-    SubstanceCache        theSubstanceCache;
-    ReactorCache          theReactorCache;
+    VariableCache        theVariableCache;
+    ProcessCache          theProcessCache;
 
-    RealValarray theQuantityBuffer;
+    RealValarray theValueBuffer;
     RealValarray theVelocityBuffer;
 
 

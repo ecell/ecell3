@@ -18,8 +18,6 @@ BPLCXXFLAGS=-ftemplate-depth-21
 ECELLINCLUDES=-I${ECELLDIR} ${DMTOOL_INCLUDE} ${INCLTDL} ${PYTHON_INCLUDES}
 CXXFLAGS=@CXXFLAGS@ ${BPLINCLUDE} ${ECELLINCLUDES} ${BPLCXXFLAGS}
 
-KORANDOM_DIR=@KORANDOM_DIR@
-LIBKORANDOM=$(KORANDOM_DIR)/korandom/libkorandom.la
 LIBEMC=$(ECELLDIR)/libemc/libemc.la 
 LIBECS=$(ECELLDIR)/libecs/libecs.la
 
@@ -73,7 +71,7 @@ PyEcs.hpp
 
 ecs_la_LDFLAGS=-module -export-dynamic -avoid-version
 
-ecs_la_LIBADD= $(LIBEMC) $(LIBECS) $(LIBKORANDOM) -lstdc++ $(LIBLTDL)
+ecs_la_LIBADD= $(LIBEMC) $(LIBECS) -lstdc++ $(LIBLTDL)
 
 all-local: ecs.so
 

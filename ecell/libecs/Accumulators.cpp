@@ -38,79 +38,79 @@ namespace libecs
 
   void SimpleAccumulator::accumulate()
   {
-    theSubstance->updateQuantity();
+    theVariable->updateValue();
   }
 
   void RoundDownAccumulator::accumulate()
   {
-    theSubstance->
-      setTotalVelocity( floor( theSubstance->calculateTotalVelocity() ) );
-    theSubstance->updateQuantity();
+    theVariable->
+      setTotalVelocity( floor( theVariable->calculateTotalVelocity() ) );
+    theVariable->updateValue();
   }
 
   void RoundDownAccumulator::update()
   {
-    setQuantity( floor( theSubstance->getQuantity() ) );
+    setValue( floor( theVariable->getValue() ) );
   }
 
   void RoundOffAccumulator::accumulate()
   {
-    theSubstance->setTotalVelocity( rint( theSubstance->calculateTotalVelocity() ) );
-    theSubstance->updateQuantity();
+    theVariable->setTotalVelocity( rint( theVariable->calculateTotalVelocity() ) );
+    theVariable->updateValue();
   }
 
   void RoundOffAccumulator::update()
   {
-    setQuantity( rint( theSubstance->getQuantity() ) );
+    setValue( rint( theVariable->getValue() ) );
   }
 
   void ReserveAccumulator::accumulate()
   {
-    Real aVelocity( theSubstance->calculateTotalVelocity() );
+    Real aVelocity( theVariable->calculateTotalVelocity() );
     aVelocity += theFraction;
     Real tmp;
     theFraction = modf( aVelocity, &tmp );
 
-    theSubstance->setTotalVelocity( tmp );
-    theSubstance->updateQuantity();
+    theVariable->setTotalVelocity( tmp );
+    theVariable->updateValue();
   }
 
   Real ReserveAccumulator::save()
   {
-    return theSubstance->getQuantity() + theFraction;
+    return theVariable->getValue() + theFraction;
   }
 
   void ReserveAccumulator::update()
   {
     Real tmp;
-    theFraction = modf( theSubstance->getQuantity(), &tmp );
-    setQuantity( tmp );
+    theFraction = modf( theVariable->getValue(), &tmp );
+    setValue( tmp );
   }
 
   void MonteCarloAccumulator::accumulate()
   {
     Real aWhole;
-    Real aFraction = modf( theSubstance->calculateTotalVelocity(), &aWhole );
+    Real aFraction = modf( theVariable->calculateTotalVelocity(), &aWhole );
 
     if( theRandomNumberGenerator->toss( aFraction ) )
       {
 	++aWhole;
       }
 
-    theSubstance->setTotalVelocity( aWhole );
-    theSubstance->updateQuantity();
+    theVariable->setTotalVelocity( aWhole );
+    theVariable->updateValue();
   }
 
   void MonteCarloAccumulator::update()
   {
     Real aWhole;
-    Real aFraction = modf( theSubstance->getQuantity(), &aWhole );
+    Real aFraction = modf( theVariable->getValue(), &aWhole );
     if( theRandomNumberGenerator->toss( aFraction ) )
       {
 	++aWhole;
       }
 
-    setQuantity( aWhole );
+    setValue( aWhole );
   }
 
 

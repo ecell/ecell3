@@ -47,10 +47,10 @@ namespace libecs
 
 
   // Maps used for entry lists
-  DECLARE_MAP( const String, SubstancePtr, 
-	       std::less<const String>, SubstanceMap );
-  DECLARE_MAP( const String, ReactorPtr,   
-	       std::less<const String>, ReactorMap );
+  DECLARE_MAP( const String, VariablePtr, 
+	       std::less<const String>, VariableMap );
+  DECLARE_MAP( const String, ProcessPtr,   
+	       std::less<const String>, ProcessMap );
   DECLARE_MAP( const String, SystemPtr,    
 	       std::less<const String>, SystemMap );
 
@@ -135,9 +135,9 @@ namespace libecs
       DEFAULT_SPECIALIZATION_INHIBITED();
     }
 
-    virtual SubstanceMapCref getSubstanceMap() const = 0;
+    virtual VariableMapCref getVariableMap() const = 0;
 
-    virtual ReactorMapCref   getReactorMap() const = 0;
+    virtual ProcessMapCref   getProcessMap() const = 0;
 
     virtual SystemMapCref    getSystemMap() const
     {
@@ -146,25 +146,25 @@ namespace libecs
 
 
     /**
-       Find a Reactor with given id in this System.  
+       Find a Process with given id in this System.  
        
        This method throws NotFound exception if it is not found.
 
-       @return a borrowed pointer to a Reactor object in this System named @a id.
+       @return a borrowed pointer to a Process object in this System named @a id.
     */
 
-    ReactorPtr getReactor( StringCref anID ) ;
+    ProcessPtr getProcess( StringCref anID ) ;
 
 
     /**
-       Find a Substance with given id in this System. 
+       Find a Variable with given id in this System. 
        
        This method throws NotFound exception if it is not found.
 
-       @return a borrowed pointer to a Substance object in this System named @a id.
+       @return a borrowed pointer to a Variable object in this System named @a id.
     */
 
-    SubstancePtr getSubstance( StringCref id );
+    VariablePtr getVariable( StringCref id );
 
     /**
        Find a System with given id in this System. 
@@ -178,23 +178,23 @@ namespace libecs
 
 
     /**
-       Register a Reactor object in this System.
+       Register a Process object in this System.
 
        This method steals ownership of the given pointer, and deletes
        it if there is an error.
     */
 
-    virtual void registerReactor( ReactorPtr aReactor );
+    virtual void registerProcess( ProcessPtr aProcess );
   
 
     /**
-       Register a Substance object in this System.
+       Register a Variable object in this System.
 
        This method steals ownership of the given pointer, and deletes
        it if there is an error.
     */
 
-    virtual void registerSubstance( SubstancePtr aSubstance );
+    virtual void registerVariable( VariablePtr aVariable );
   
 
     /**
@@ -222,8 +222,8 @@ namespace libecs
   public: // property slots
 
     const Polymorph getSystemList() const;
-    const Polymorph getSubstanceList() const;
-    const Polymorph getReactorList() const;
+    const Polymorph getVariableList() const;
+    const Polymorph getProcessList() const;
 
   protected:
 
@@ -265,7 +265,7 @@ namespace libecs
       return getSuperSystem()->getVolume();
     }
 
-    virtual void registerReactor( ReactorPtr aReactor );
+    virtual void registerProcess( ProcessPtr aProcess );
 
     /**
        Set a new volume of this System in [L] (liter).
@@ -280,14 +280,14 @@ namespace libecs
       getSuperSystem()->setVolume( aVolume );
     }
 
-    virtual SubstanceMapCref getSubstanceMap() const
+    virtual VariableMapCref getVariableMap() const
     {
-      return getSuperSystem()->getSubstanceMap();
+      return getSuperSystem()->getVariableMap();
     }
 
-    virtual ReactorMapCref   getReactorMap() const
+    virtual ProcessMapCref   getProcessMap() const
     {
-      return theReactorMap;
+      return theProcessMap;
     }
 
     virtual StringLiteral getClassName() const { return "VirtualSystem"; }
@@ -299,7 +299,7 @@ namespace libecs
 
   private:
 
-    ReactorMap   theReactorMap;
+    ProcessMap   theProcessMap;
 
   };
 
@@ -316,12 +316,12 @@ namespace libecs
 
     virtual void initialize();
 
-    virtual SubstanceMapCref getSubstanceMap() const
+    virtual VariableMapCref getVariableMap() const
     {
-      return theSubstanceMap;
+      return theVariableMap;
     }
 
-    virtual void registerSubstance( SubstancePtr aSubstance );
+    virtual void registerVariable( VariablePtr aVariable );
 
     virtual StringLiteral getClassName() const { return "LogicalSystem"; }
     static SystemPtr createInstance() { return new LogicalSystem; }
@@ -332,7 +332,7 @@ namespace libecs
 
   private:
 
-    SubstanceMap theSubstanceMap;
+    VariableMap theVariableMap;
 
   };
 
@@ -387,15 +387,15 @@ namespace libecs
 
 
   template <>
-  inline SubstanceMapCref System::getMap() const
+  inline VariableMapCref System::getMap() const
   {
-    return getSubstanceMap();
+    return getVariableMap();
   }
 
   template <>
-  inline ReactorMapCref   System::getMap() const
+  inline ProcessMapCref   System::getMap() const
   {
-    return getReactorMap();
+    return getProcessMap();
   }
 
   template <>

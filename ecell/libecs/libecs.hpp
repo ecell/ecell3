@@ -65,17 +65,17 @@ namespace libecs
   DECLARE_CLASS( FullID );
   DECLARE_CLASS( FullPN );
   DECLARE_CLASS( Integrator );
-  DECLARE_CLASS( Reactant );
-  DECLARE_CLASS( Reactor );
-  DECLARE_CLASS( ReactorMaker );
+  DECLARE_CLASS( Connection );
+  DECLARE_CLASS( Process );
+  DECLARE_CLASS( ProcessMaker );
   DECLARE_CLASS( Stepper );
   DECLARE_CLASS( MasterStepper );
   DECLARE_CLASS( Model );
   DECLARE_CLASS( Scheduler );
   DECLARE_CLASS( Event );
   DECLARE_CLASS( StepperMaker );
-  DECLARE_CLASS( Substance );
-  DECLARE_CLASS( SubstanceMaker );
+  DECLARE_CLASS( Variable );
+  DECLARE_CLASS( VariableMaker );
   DECLARE_CLASS( System );
   DECLARE_CLASS( SystemMaker );
   DECLARE_CLASS( PropertySlot );
@@ -91,8 +91,8 @@ namespace libecs
   // containers
 
   DECLARE_VECTOR( Polymorph, PolymorphVector );
-  DECLARE_VECTOR( SubstancePtr, SubstanceVector );
-  DECLARE_VECTOR( ReactorPtr,   ReactorVector );
+  DECLARE_VECTOR( VariablePtr, VariableVector );
+  DECLARE_VECTOR( ProcessPtr,   ProcessVector );
   DECLARE_VECTOR( SystemPtr,    SystemVector );
   DECLARE_VECTOR( StepperPtr, StepperVector );
   DECLARE_VECTOR( PropertySlotPtr, PropertySlotVector );

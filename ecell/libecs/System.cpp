@@ -30,9 +30,9 @@
 
 #include <algorithm>
 
-#include "Reactor.hpp"
+#include "Process.hpp"
 #include "Model.hpp"
-#include "Substance.hpp"
+#include "Variable.hpp"
 #include "Stepper.hpp"
 #include "FullID.hpp"
 #include "PropertyInterface.hpp"
@@ -57,16 +57,16 @@ namespace libecs
 				      &System::getSystemList ) );
 
     registerSlot( getPropertySlotMaker()->
-		  createPropertySlot( "SubstanceList", *this,
+		  createPropertySlot( "VariableList", *this,
 				      Type2Type<Polymorph>(),
 				      NULLPTR,
-				      &System::getSubstanceList ) );
+				      &System::getVariableList ) );
 
     registerSlot( getPropertySlotMaker()->
-		  createPropertySlot( "ReactorList", *this,
+		  createPropertySlot( "ProcessList", *this,
 				      Type2Type<Polymorph>(),
 				      NULLPTR,
-				      &System::getReactorList ) );
+				      &System::getProcessList ) );
 
     registerSlot( getPropertySlotMaker()->
 		  createPropertySlot( "StepperID", *this,
@@ -98,13 +98,13 @@ namespace libecs
     return aVector;
   }
 
-  const Polymorph System::getSubstanceList() const
+  const Polymorph System::getVariableList() const
   {
     PolymorphVector aVector;
-    aVector.reserve( getSubstanceMap().size() );
+    aVector.reserve( getVariableMap().size() );
 
-    for( SubstanceMapConstIterator i( getSubstanceMap().begin() );
-	 i != getSubstanceMap().end() ; ++i )
+    for( VariableMapConstIterator i( getVariableMap().begin() );
+	 i != getVariableMap().end() ; ++i )
       {
 	aVector.push_back( i->second->getID() );
       }
@@ -112,13 +112,13 @@ namespace libecs
     return aVector;
   }
 
-  const Polymorph System::getReactorList() const
+  const Polymorph System::getProcessList() const
   {
     PolymorphVector aVector;
-    aVector.reserve( getReactorMap().size() );
+    aVector.reserve( getProcessMap().size() );
 
-    for( ReactorMapConstIterator i( getReactorMap().begin() );
-	 i != getReactorMap().end() ; ++i )
+    for( ProcessMapConstIterator i( getProcessMap().begin() );
+	 i != getProcessMap().end() ; ++i )
       {
 	aVector.push_back( i->second->getID() );
       }
@@ -163,41 +163,41 @@ namespace libecs
 
   }
 
-  void System::registerReactor( ReactorPtr aReactor )
+  void System::registerProcess( ProcessPtr aProcess )
   {
-    getSuperSystem()->registerReactor( aReactor );
+    getSuperSystem()->registerProcess( aProcess );
   }
 
 
 
-  ReactorPtr System::getReactor( StringCref anID ) 
+  ProcessPtr System::getProcess( StringCref anID ) 
   {
-    ReactorMapConstIterator i( getReactorMap().find( anID ) );
+    ProcessMapConstIterator i( getProcessMap().find( anID ) );
 
-    if( i == getReactorMap().end() )
+    if( i == getProcessMap().end() )
       {
 	THROW_EXCEPTION( NotFound, 
 			 "[" + getFullID().getString() + 
-			 "]: Reactor [" + anID + 
+			 "]: Process [" + anID + 
 			 "] not found in this System." );
       }
 
     return i->second;
   }
 
-  void System::registerSubstance( SubstancePtr aSubstance )
+  void System::registerVariable( VariablePtr aVariable )
   {
-    getSuperSystem()->registerSubstance( aSubstance );
+    getSuperSystem()->registerVariable( aVariable );
   }
 
-  SubstancePtr System::getSubstance( StringCref anID ) 
+  VariablePtr System::getVariable( StringCref anID ) 
   {
-    SubstanceMapConstIterator i( getSubstanceMap().find( anID ) );
-    if( i == getSubstanceMap().end() )
+    VariableMapConstIterator i( getVariableMap().find( anID ) );
+    if( i == getVariableMap().end() )
       {
 	THROW_EXCEPTION( NotFound,
 			 "[" + getFullID().getString() + 
-			 "]: Substance [" + anID + 
+			 "]: Variable [" + anID + 
 			 "] not found in this System.");
       }
 
@@ -261,8 +261,8 @@ namespace libecs
 
   VirtualSystem::~VirtualSystem()
   {
-    for( ReactorMapIterator i( theReactorMap.begin() );
-	 i != theReactorMap.end() ; ++i )
+    for( ProcessMapIterator i( theProcessMap.begin() );
+	 i != theProcessMap.end() ; ++i )
       {
 	delete i->second;
       }
@@ -272,10 +272,10 @@ namespace libecs
   void VirtualSystem::makeSlots()
   {
     registerSlot( getPropertySlotMaker()->
-		  createPropertySlot( "ReactorList", *this,
+		  createPropertySlot( "ProcessList", *this,
 				      Type2Type<Polymorph>(),
 				      NULLPTR,
-				      &System::getReactorList ) );
+				      &System::getProcessList ) );
   }
 
 
@@ -284,10 +284,10 @@ namespace libecs
     System::initialize();
 
     //
-    // Reactor::initialize()
+    // Process::initialize()
     //
-    for( ReactorMapConstIterator i( getReactorMap().begin() );
-	 i != getReactorMap().end() ; ++i )
+    for( ProcessMapConstIterator i( getProcessMap().begin() );
+	 i != getProcessMap().end() ; ++i )
       {
 	i->second->initialize();
       }
@@ -295,21 +295,21 @@ namespace libecs
   }
 
 
-  void VirtualSystem::registerReactor( ReactorPtr aReactor )
+  void VirtualSystem::registerProcess( ProcessPtr aProcess )
   {
-    const String anID( aReactor->getID() );
+    const String anID( aProcess->getID() );
 
-    if( getReactorMap().find( anID ) != getReactorMap().end() )
+    if( getProcessMap().find( anID ) != getProcessMap().end() )
       {
-	delete aReactor;
+	delete aProcess;
 
 	THROW_EXCEPTION( AlreadyExist, 
 			 "[" + getFullID().getString() + 
-			 "]: Reactor [" + anID + "] already exist." );
+			 "]: Process [" + anID + "] already exist." );
       }
 
-    theReactorMap[ anID ] = aReactor;
-    aReactor->setSuperSystem( this );
+    theProcessMap[ anID ] = aProcess;
+    aProcess->setSuperSystem( this );
 
     notifyChangeOfEntityList();
   }
@@ -323,8 +323,8 @@ namespace libecs
 
   LogicalSystem::~LogicalSystem()
   {
-    for( SubstanceMapIterator i( theSubstanceMap.begin() );
-	 i != theSubstanceMap.end() ; ++i )
+    for( VariableMapIterator i( theVariableMap.begin() );
+	 i != theVariableMap.end() ; ++i )
       {
 	delete i->second;
       }
@@ -334,10 +334,10 @@ namespace libecs
   void LogicalSystem::makeSlots()
   {
     registerSlot( getPropertySlotMaker()->
-		  createPropertySlot( "SubstanceList", *this,
+		  createPropertySlot( "VariableList", *this,
 				      Type2Type<Polymorph>(),
 				      NULLPTR,
-				      &System::getSubstanceList ) );
+				      &System::getVariableList ) );
 
   }
 
@@ -346,31 +346,31 @@ namespace libecs
     VirtualSystem::initialize();
 
     //
-    // Substance::initialize()
+    // Variable::initialize()
     //
-    for( SubstanceMapConstIterator i( getSubstanceMap().begin() );
-	 i != getSubstanceMap().end() ; ++i )
+    for( VariableMapConstIterator i( getVariableMap().begin() );
+	 i != getVariableMap().end() ; ++i )
       {
 	i->second->initialize();
       }
 
   }
 
-  void LogicalSystem::registerSubstance( SubstancePtr aSubstance )
+  void LogicalSystem::registerVariable( VariablePtr aVariable )
   {
-    const String anID( aSubstance->getID() );
+    const String anID( aVariable->getID() );
 
-    if( getSubstanceMap().find( anID ) != getSubstanceMap().end() )
+    if( getVariableMap().find( anID ) != getVariableMap().end() )
       {
-	delete aSubstance;
+	delete aVariable;
 
 	THROW_EXCEPTION( AlreadyExist, 
 			 "[" + getFullID().getString() + 
-			 "]: Substance [" + anID + "] already exist." );
+			 "]: Variable [" + anID + "] already exist." );
       }
 
-    theSubstanceMap[ anID ] = aSubstance;
-    aSubstance->setSuperSystem( this );
+    theVariableMap[ anID ] = aVariable;
+    aVariable->setSuperSystem( this );
 
     notifyChangeOfEntityList();
   }

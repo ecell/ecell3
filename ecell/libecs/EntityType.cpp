@@ -39,13 +39,13 @@ namespace libecs
 
   EntityType::EntityType( StringCref typestring )
   {
-    if( typestring == EntityTypeStringOfSubstance() )
+    if( typestring == EntityTypeStringOfVariable() )
       {
-	theType = SUBSTANCE;
+	theType = VARIABLE;
       }
-    else if( typestring == EntityTypeStringOfReactor() )
+    else if( typestring == EntityTypeStringOfProcess() )
       {
-	theType = REACTOR;
+	theType = PROCESS;
       }
     else if( typestring == EntityTypeStringOfSystem() )
       {
@@ -78,10 +78,10 @@ namespace libecs
   {
     switch( theType )
       {
-      case SUBSTANCE:
-	return EntityTypeStringOfSubstance();
-      case REACTOR:
-	return EntityTypeStringOfReactor();
+      case VARIABLE:
+	return EntityTypeStringOfVariable();
+      case PROCESS:
+	return EntityTypeStringOfProcess();
       case SYSTEM:
 	return EntityTypeStringOfSystem();
       case ENTITY:

@@ -3,16 +3,13 @@ libdir=@libdir@
 ECELLDIR=..
 
 DMTOOL_INCLUDE=-I@DMTOOL_INCLUDE_DIR@
-KORANDOM_INCLUDE=-I@KORANDOM_DIR@
 INCLTDL=@INCLTDL@
 LIBLTDL=@LIBLTDL@
 BOOST_DIR=@BOOST_DIR@
 
-KORANDOM_DIR=@KORANDOM_DIR@
-LIBKORANDOM=$(KORANDOM_DIR)/korandom/libkorandom.la
 LIBECS=$(ECELLDIR)/libecs/libecs.la
 
-INCLUDES = -I.. -I${BOOST_DIR} ${KORANDOM_INCLUDE} ${DMTOOL_INCLUDE} ${INCLTDL}
+INCLUDES = -I.. -I${BOOST_DIR} ${DMTOOL_INCLUDE} ${INCLTDL}
 lib_LTLIBRARIES = libemc.la
 
 CXXFLAGS= @CXXFLAGS@ #-D_REENTRANT
@@ -20,7 +17,7 @@ CXXFLAGS= @CXXFLAGS@ #-D_REENTRANT
 libemc_la_LDFLAGS= -version-info 0:1:0
 
 #FIXME: specifing .libs is ugly
-libemc_la_LIBADD= $(LIBECS) $(LIBKORANDOM) -lstdc++ 
+libemc_la_LIBADD= $(LIBECS) -lstdc++ 
 libemc_la_DEPENDENCIES=$(ECELLDIR)/libecs/libecs.la
 libemc_la_SOURCES=\
 Simulator.cpp\

@@ -67,7 +67,8 @@ namespace libecs
 
   // system constants
 
-  const int RANDOM_NUMBER_BUFFER_SIZE( 65535 );
+  // system constants -- nothing here yet
+
 
   // CoreLinux++ compatibility
 

@@ -16,19 +16,19 @@ PROPERTY   = 3
 
 # Entity type numbers
 ENTITY     = 1
-SUBSTANCE  = 2
-REACTOR    = 3
+VARIABLE  = 2
+PROCESS    = 3
 SYSTEM     = 4
 
 ENTITYTYPE_STRING_LIST =\
-( 'NONE', 'Entity', 'Substance', 'Reactor', 'System' )
+( 'NONE', 'Entity', 'Variable', 'Process', 'System' )
 
 
 ENTITYTYPE_DICT =\
 {
     'Entity'   : ENTITY,
-    'Substance': SUBSTANCE,
-    'Reactor'  : REACTOR,
+    'Variable': VARIABLE,
+    'Process'  : PROCESS,
     'System'   : SYSTEM
 }    
 

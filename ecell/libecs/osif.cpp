@@ -45,14 +45,17 @@
  *::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
  *	$Id$
  :	$Log$
+ :	Revision 1.3  2002/10/03 08:19:06  shafi
+ :	removed korandom, renamings Reactor -> Process, Substance -> Variable, Reactant -> Connection, Quantity -> Value, Stoichiometry -> Coefficient
+ :
  :	Revision 1.2  2002/06/23 14:45:10  shafi
  :	added ProxyPropertySlot. deprecated UpdatePolicy for ConcretePropertySlot. added NEVER_GET_HERE macro.
- :
+ :	
  :	Revision 1.1  2002/04/30 11:21:53  shafi
  :	gabor's vvector logger patch + modifications by shafi
  :	
  :	Revision 1.9  2002/01/08 10:23:02  ishikawa
- :	Functions for reactor path are defined but do not work in this version
+ :	Functions for process path are defined but do not work in this version
  :	
  :	Revision 1.8  2001/10/21 15:27:12  ishikawa
  :	osif_is_dir()
@@ -109,8 +112,8 @@
 
 
 #define	MAX_RECTOR_PATH 256
-static char	*reactor_path[MAX_RECTOR_PATH];
-int		num_reactor_path;
+static char	*process_path[MAX_RECTOR_PATH];
+int		num_process_path;
 
 
 long		osif_get_pid(void)
@@ -208,19 +211,19 @@ int	osif_add_path(const char *dir, int to_first)
 {
 	if (!osif_is_dir(dir)) {
 		return -1; /* not directory */
-	} else if (MAX_RECTOR_PATH <= num_reactor_path) {
+	} else if (MAX_RECTOR_PATH <= num_process_path) {
 		return -1; /* to many path */
 	} else if (to_first) {
 		int		iii;
-		for (iii = num_reactor_path; iii == 1; iii--) {
-			reactor_path[iii] = reactor_path[iii - 1];
+		for (iii = num_process_path; iii == 1; iii--) {
+			process_path[iii] = process_path[iii - 1];
 		}
-		reactor_path[0] = strdup(dir);
-		++num_reactor_path;
+		process_path[0] = strdup(dir);
+		++num_process_path;
 		return 0;
 	} else {
-		reactor_path[num_reactor_path] = strdup(dir);
-		++num_reactor_path;
+		process_path[num_process_path] = strdup(dir);
+		++num_process_path;
 		return 0;
 	}
 }

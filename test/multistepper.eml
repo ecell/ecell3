@@ -59,42 +59,42 @@
 </property>
 
 
-<substance class="Substance" id="S" name="substance S">
-<property name="Quantity">
+<variable class="Variable" id="S" name="variable S">
+<property name="Value">
 <value number="0">1000000</value>
 </property>
-</substance>
+</variable>
 
-<substance class="Substance" id="P" name="substance P">
-<property name="Quantity">
+<variable class="Variable" id="P" name="variable P">
+<property name="Value">
 <value number="0">0</value>
 </property>
-</substance>
+</variable>
 
 
-<substance class="Substance" id="E" name="substance E">
-<property name="Quantity">
+<variable class="Variable" id="E" name="variable E">
+<property name="Value">
 <value number="0">1000</value>
 </property>
-</substance>
+</variable>
 
-<reactor class="MichaelisUniUniReactor" id="E" name="E">
-<property name="ReactantList">
+<process class="MichaelisUniUniProcess" id="E" name="E">
+<property name="ConnectionList">
 <value>
 <value number="0">S0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:S</value>
+<value number="1">Variable:/CELL/CYTOPLASM:S</value>
 <value number="2">-1</value>
 </value>
 
 <value>
 <value number="0">P0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:P</value>
+<value number="1">Variable:/CELL/CYTOPLASM:P</value>
 <value number="2">1</value>
 </value>
 
 <value>
 <value number="0">C0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:E</value>
+<value number="1">Variable:/CELL/CYTOPLASM:E</value>
 <value number="2">0</value>
 </value>
 </property>
@@ -107,7 +107,7 @@
 <property name="KcF">
 <value number="0">10</value>
 </property>
-</reactor>
+</process>
 
 </system>
 
@@ -129,41 +129,41 @@
 </property>
 
 
-<substance class="Substance" id="S" name="substance S">
-<property name="Quantity">
+<variable class="Variable" id="S" name="variable S">
+<property name="Value">
 <value number="0">1000000</value>
 </property>
-</substance>
+</variable>
 
-<substance class="Substance" id="P" name="substance P">
-<property name="Quantity">
+<variable class="Variable" id="P" name="variable P">
+<property name="Value">
 <value number="0">0</value>
 </property>
-</substance>
+</variable>
 
-<substance class="Substance" id="E" name="substance E">
-<property name="Quantity">
+<variable class="Variable" id="E" name="variable E">
+<property name="Value">
 <value number="0">1000</value>
 </property>
-</substance>
+</variable>
 
-<reactor class="MichaelisUniUniReactor" id="E" name="E">
-<property name="Reactant">
+<process class="MichaelisUniUniProcess" id="E" name="E">
+<property name="Connection">
 <value number="0">S0</value>
-<value number="1">Substance:/CELL/CYTOPLASM2:S</value>
+<value number="1">Variable:/CELL/CYTOPLASM2:S</value>
 <value number="2">-1</value>
 </property>
 
-<property name="ReactantList">
+<property name="ConnectionList">
 <value>
 <value number="0">P0</value>
-<value number="1">Substance:/CELL/CYTOPLASM2:P</value>
+<value number="1">Variable:/CELL/CYTOPLASM2:P</value>
 <value number="2">1</value>
 </value>
 
 <value>
 <value number="0">C0</value>
-<value number="1">Substance:/CELL/CYTOPLASM2:E</value>
+<value number="1">Variable:/CELL/CYTOPLASM2:E</value>
 <value number="2">0</value>
 </value>
 </property>
@@ -175,7 +175,7 @@
 <property name="KcF">
 <value number="0">10</value>
 </property>
-</reactor>
+</process>
 
 </system>
 

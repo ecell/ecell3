@@ -212,11 +212,11 @@ namespace libecs
 
     /// @internal
 
-    ReactorMakerRef     getReactorMaker()     { return theReactorMaker; }
+    ProcessMakerRef     getProcessMaker()     { return theProcessMaker; }
 
     /// @internal
 
-    SubstanceMakerRef   getSubstanceMaker()   { return theSubstanceMaker; }
+    VariableMakerRef   getVariableMaker()   { return theVariableMaker; }
 
     /// @internal
 
@@ -257,8 +257,8 @@ namespace libecs
 
     StepperMakerRef     theStepperMaker;
     SystemMakerRef      theSystemMaker;
-    SubstanceMakerRef   theSubstanceMaker;
-    ReactorMakerRef     theReactorMaker;
+    VariableMakerRef   theVariableMaker;
+    ProcessMakerRef     theProcessMaker;
     //    AccumulatorMakerRef theAccumulatorMaker;
 
 

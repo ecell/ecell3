@@ -202,7 +202,7 @@ class Eml:
             anEntityElement.setAttribute( 'id', anID )
             self.__theDocument.documentElement.appendChild( anEntityElement )
 
-        elif( anEntityType == 'Substance' or anEntityType == 'Reactor' ):
+        elif( anEntityType == 'Variable' or anEntityType == 'Process' ):
 
             anID = aFullID.split( ':' )[2]
             anEntityElement.setAttribute( 'id', anID )
@@ -260,7 +260,7 @@ class Eml:
                 if aSystemPath == aTargetEntity[ 'Path' ]:
                     anExistence = 1
 
-            ## for Substance or Reactor
+            ## for Variable or Process
             else:
                 aSystemPath = self.asSystemPath( aSystem )
 
@@ -553,9 +553,9 @@ class Eml:
         """OLD METHOD"""
 
         aSystemPropertyList  = self.getSystemPropertyList()
-        aSubstanceOrReactorPropertyList = self.getSubstanceOrReactorPropertyList()
+        aVariableOrProcessPropertyList = self.getVariableOrProcessPropertyList()
 
-        aPropertyList = aSystemPropertyList + aSubstanceOrReactorPropertyList
+        aPropertyList = aSystemPropertyList + aVariableOrProcessPropertyList
 
         return aPropertyList        
 
@@ -598,22 +598,22 @@ class Eml:
         return aPropertyList
 
 
-    def getSubstanceOrReactorPropertyList( self ):
+    def getVariableOrProcessPropertyList( self ):
         aPropertyList = []
         for aSystemElement in self.__theDocument.getElementsByTagName( 'system' ):
 
             aSystemPath = self.asSystemPath( aSystemElement )
             for aChildElement in aSystemElement.childNodes:
                 
-                ## Property for Substance or Reactor
-                if aChildElement.tagName == 'substance' or \
-                   aChildElement.tagName == 'reactor':
+                ## Property for Variable or Process
+                if aChildElement.tagName == 'variable' or \
+                   aChildElement.tagName == 'process':
 
                     anEntityType = string.capwords( aChildElement.tagName )
-                    aSubstanceElement = aChildElement
+                    aVariableElement = aChildElement
 
 
-                    for aPropertyElement in aSubstanceElement.childNodes:
+                    for aPropertyElement in aVariableElement.childNodes:
                         if aPropertyElement.tagName == 'property':
 
                             aProperty = {}
@@ -655,7 +655,7 @@ class Eml:
 
 
 
-    def getSubstanceOrReactorEntityList( self ):
+    def getVariableOrProcessEntityList( self ):
 
         anEntityEntityList = []
         for aSystemElement in self.__theDocument.getElementsByTagName( 'system' ):
@@ -664,8 +664,8 @@ class Eml:
 
             for aChildElement in aSystemElement.childNodes:
 
-                if aChildElement.tagName == 'substance' or \
-                   aChildElement.tagName == 'reactor':
+                if aChildElement.tagName == 'variable' or \
+                   aChildElement.tagName == 'process':
 
                     anEntity = {}                    
                     anEntity[ 'Type' ] = str( aChildElement.getAttribute( 'class' ) )

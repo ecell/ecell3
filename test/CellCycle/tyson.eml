@@ -56,7 +56,7 @@
 
 
 <!-- CYTOPLASM -->
-<!-- for SUBSTANCE -->
+<!-- for VARIABLE -->
 <system class="System" id="/CELL/CYTOPLASM" name="The Cytoplasm">
 <property name="StepperID">
 <value>SRM_01</value>
@@ -65,160 +65,160 @@
 <value>1e-18</value>
 </property>
 
-<substance class="Substance" id="Cln2" name="Cln2">
-<property name="Quantity">
+<variable class="Variable" id="Cln2" name="Cln2">
+<property name="Value">
 <value>0</value>
 </property>
-</substance>
+</variable>
 
-<substance class="Substance" id="Clb2" name="Clb2">
-<property name="Quantity">
+<variable class="Variable" id="Clb2" name="Clb2">
+<property name="Value">
 <value>828044</value>
 </property>
-</substance>
+</variable>
 
-<substance class="Substance" id="Clb2t" name="Clb2total">
-<property name="Quantity">
+<variable class="Variable" id="Clb2t" name="Clb2total">
+<property name="Value">
 <value>828044</value>
 </property>
-</substance>
+</variable>
 
-<substance class="Substance" id="Clb5" name="Clb5">
-<property name="Quantity">
+<variable class="Variable" id="Clb5" name="Clb5">
+<property name="Value">
 <value>48177</value>
 </property>
-</substance>
+</variable>
 
-<substance class="Substance" id="Clb5t" name="Clb5total">
-<property name="Quantity">
+<variable class="Variable" id="Clb5t" name="Clb5total">
+<property name="Value">
 <value>48177</value>
 </property>
-</substance>
+</variable>
 
-<substance class="Substance" id="Cln3" name="Cln3">
-<property name="Quantity">
+<variable class="Variable" id="Cln3" name="Cln3">
+<property name="Value">
 <value>0</value>
 </property>
-</substance>
+</variable>
 
-<substance class="Substance" id="Sic1" name="Sic1">
-<property name="Quantity">
+<variable class="Variable" id="Sic1" name="Sic1">
+<property name="Value">
 <value>0</value>
 </property>
-</substance>
+</variable>
 
-<substance class="Substance" id="Sic1t" name="Sic1total">
-<property name="Quantity">
+<variable class="Variable" id="Sic1t" name="Sic1total">
+<property name="Value">
 <value>0</value>
 </property>
-</substance>
+</variable>
 
-<substance class="Substance" id="Swi5" name="Swi5">
-<property name="Quantity">
+<variable class="Variable" id="Swi5" name="Swi5">
+<property name="Value">
 <value>0</value>
 </property>
-</substance>
+</variable>
 
-<substance class="Substance" id="Clb2Sic1" name="Clb2Sic1">
-<property name="Quantity">
+<variable class="Variable" id="Clb2Sic1" name="Clb2Sic1">
+<property name="Value">
 <value>0</value>
 </property>
-</substance>
+</variable>
 
-<substance class="Substance" id="Clb5Sic1" name="Slb5Sic1">
-<property name="Quantity">
+<variable class="Variable" id="Clb5Sic1" name="Slb5Sic1">
+<property name="Value">
 <value>0</value>
 </property>
-</substance>
+</variable>
 
-<substance class="Substance" id="SBF" name="SBF">
-<property name="Quantity">
+<variable class="Variable" id="SBF" name="SBF">
+<property name="Value">
 <value>0</value>
 </property>
-</substance>
+</variable>
 
-<substance class="Substance" id="MBF" name="MBF">
-<property name="Quantity">
+<variable class="Variable" id="MBF" name="MBF">
+<property name="Value">
 <value>0</value>
 </property>
-</substance>
+</variable>
 
-<substance class="Substance" id="Mcm1" name="Mcm1">
-<property name="Quantity">
+<variable class="Variable" id="Mcm1" name="Mcm1">
+<property name="Value">
 <value>566081</value>
 </property>
-</substance>
+</variable>
 
-<substance class="Substance" id="mass" name="mass">
-<property name="Quantity">
+<variable class="Variable" id="mass" name="mass">
+<property name="Value">
 <value>903321</value>
 </property>
-</substance>
+</variable>
 
-<substance class="Substance" id="Bck2" name="Bck2">
-<property name="Quantity">
+<variable class="Variable" id="Bck2" name="Bck2">
+<property name="Value">
 <value>0</value>
 </property>
-</substance>
+</variable>
 
-<substance class="Substance" id="ORI" name="ORI">
-<property name="Quantity">
+<variable class="Variable" id="ORI" name="ORI">
+<property name="Value">
 <value>0</value>
 </property>
-</substance>
+</variable>
 
-<substance class="Substance" id="BUD" name="BUD">
-<property name="Quantity">
+<variable class="Variable" id="BUD" name="BUD">
+<property name="Value">
 <value>0</value>
 </property>
-</substance>
+</variable>
 
-<substance class="Substance" id="SPN" name="SPN">
-<property name="Quantity">
+<variable class="Variable" id="SPN" name="SPN">
+<property name="Value">
 <value>578125</value>
 </property>
-</substance>
+</variable>
 
-<substance class="Substance" id="Hct1t" name="Hct1total">
-<property name="Quantity">
+<variable class="Variable" id="Hct1t" name="Hct1total">
+<property name="Value">
 <value>602214</value>
 </property>
-</substance>
+</variable>
 
-<substance class="Substance" id="Hct1a" name="Hct1act">
-<property name="Quantity">
+<variable class="Variable" id="Hct1a" name="Hct1act">
+<property name="Value">
 <value>0</value>
 </property>
-</substance>
+</variable>
 
-<substance class="Substance" id="Cdc20t" name="Cdc20total">
-<property name="Quantity">
+<variable class="Variable" id="Cdc20t" name="Cdc20total">
+<property name="Value">
 <value>481771</value>
 </property>
-</substance>
+</variable>
 
-<substance class="Substance" id="Cdc20a" name="Cdc20act">
-<property name="Quantity">
+<variable class="Variable" id="Cdc20a" name="Cdc20act">
+<property name="Value">
 <value>46370</value>
 </property>
-</substance>
+</variable>
 
-<!-- for REACTOR -->
-<reactor class="CyclinsynthesisReactor" id="Cln2syn" name="Cln2 synthesis">
-<property name="ReactantList">
+<!-- for PROCESS -->
+<process class="CyclinsynthesisProcess" id="Cln2syn" name="Cln2 synthesis">
+<property name="ConnectionList">
 <value>
 <value number="0">P0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Cln2</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Cln2</value>
 <value number="2">1</value>
 </value>
 <value>
 <value number="0">C0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:SBF</value>
+<value number="1">Variable:/CELL/CYTOPLASM:SBF</value>
 <value number="2">0</value>
 </value>
 <value>
 <value number="0">C1</value>
-<value number="1">Substance:/CELL/CYTOPLASM:mass</value>
+<value number="1">Variable:/CELL/CYTOPLASM:mass</value>
 <value number="2">0</value>
 </value>
 </property>
@@ -230,13 +230,13 @@
 <property name="k2">
 <value number="0">0.05</value>
 </property>
-</reactor>
+</process>
 
-<reactor class="DegradeReactor" id="Cln2deg" name="Cln2 degrade">
-<property name="ReactantList">
+<process class="DegradeProcess" id="Cln2deg" name="Cln2 degrade">
+<property name="ConnectionList">
 <value>
 <value number="0">S0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Cln2</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Cln2</value>
 <value number="2">-1</value>
 </value>
 </property>
@@ -244,23 +244,23 @@
 <property name="kd">
 <value number="0">0.1</value>
 </property>
-</reactor>
+</process>
 
-<reactor class="CyclinsynthesisReactor" id="Clb2syn" name="Clb2 synthesis">
-<property name="ReactantList">
+<process class="CyclinsynthesisProcess" id="Clb2syn" name="Clb2 synthesis">
+<property name="ConnectionList">
 <value>
 <value number="0">P0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Clb2t</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Clb2t</value>
 <value number="2">1</value>
 </value>
 <value>
 <value number="0">C0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Mcm1</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Mcm1</value>
 <value number="2">0</value>
 </value>
 <value>
 <value number="0">C1</value>
-<value number="1">Substance:/CELL/CYTOPLASM:mass</value>
+<value number="1">Variable:/CELL/CYTOPLASM:mass</value>
 <value number="2">0</value>
 </value>
 </property>
@@ -272,28 +272,28 @@
 <property name="k2">
 <value number="0">0.05</value>
 </property>
-</reactor>
+</process>
 
-<reactor class="DegradeClb2Reactor" id="Clb2deg" name="Clb2 degrade">
-<property name="ReactantList">
+<process class="DegradeClb2Process" id="Clb2deg" name="Clb2 degrade">
+<property name="ConnectionList">
 <value>
 <value number="0">S0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Clb2t</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Clb2t</value>
 <value number="2">-1</value>
 </value>
 <value>
 <value number="0">C0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Hct1t</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Hct1t</value>
 <value number="2">0</value>
 </value>
 <value>
 <value number="0">C1</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Hct1a</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Hct1a</value>
 <value number="2">0</value>
 </value>
 <value>
 <value number="0">C2</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Cdc20a</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Cdc20a</value>
 <value number="2">0</value>
 </value>
 </property>
@@ -309,23 +309,23 @@
 <property name="k3">
 <value number="0">0.05</value>
 </property>
-</reactor>
+</process>
 
-<reactor class="CyclinsynthesisReactor" id="Clb5syn" name="Clb5 synthesis">
-<property name="ReactantList">
+<process class="CyclinsynthesisProcess" id="Clb5syn" name="Clb5 synthesis">
+<property name="ConnectionList">
 <value>
 <value number="0">P0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Clb5t</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Clb5t</value>
 <value number="2">1</value>
 </value>
 <value>
 <value number="0">C0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:MBF</value>
+<value number="1">Variable:/CELL/CYTOPLASM:MBF</value>
 <value number="2">0</value>
 </value>
 <value>
 <value number="0">C1</value>
-<value number="1">Substance:/CELL/CYTOPLASM:mass</value>
+<value number="1">Variable:/CELL/CYTOPLASM:mass</value>
 <value number="2">0</value>
 </value>
 </property>
@@ -337,18 +337,18 @@
 <property name="k2">
 <value number="0">0.02</value>
 </property>
-</reactor>
+</process>
 
-<reactor class="DegradeClb5Reactor" id="Clb5deg" name="Clb5 degrade">
-<property name="ReactantList">
+<process class="DegradeClb5Process" id="Clb5deg" name="Clb5 degrade">
+<property name="ConnectionList">
 <value>
 <value number="0">S0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Clb5t</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Clb5t</value>
 <value number="2">-1</value>
 </value>
 <value>
 <value number="0">C0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Cdc20a</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Cdc20a</value>
 <value number="2">0</value>
 </value>
 </property>
@@ -360,21 +360,21 @@
 <property name="k2">
 <value number="0">0.25</value>
 </property>
-</reactor>
+</process>
 
-<reactor class="Bck2PReactor" id="!Bck" name="Bck calculate">
+<process class="Bck2PProcess" id="!Bck" name="Bck calculate">
 <property name="Priority">
 <value number="0">-1</value>
 </property>
-<property name="ReactantList">
+<property name="ConnectionList">
 <value>
 <value number="0">P0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Bck2</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Bck2</value>
 <value number="2">1</value>
 </value>
 <value>
 <value number="0">C0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:mass</value>
+<value number="1">Variable:/CELL/CYTOPLASM:mass</value>
 <value number="2">0</value>
 </value>
 </property>
@@ -382,21 +382,21 @@
 <property name="Bck2">
 <value number="0">0.0027</value>
 </property>
-</reactor>
+</process>
 
-<reactor class="Cln3PReactor" id="!Cln3cal" name="Cln3 calculate">
+<process class="Cln3PProcess" id="!Cln3cal" name="Cln3 calculate">
 <property name="Priority">
 <value number="0">-1</value>
 </property>
-<property name="ReactantList">
+<property name="ConnectionList">
 <value>
 <value number="0">P0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Cln3</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Cln3</value>
 <value number="2">1</value>
 </value>
 <value>
 <value number="0">C0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:mass</value>
+<value number="1">Variable:/CELL/CYTOPLASM:mass</value>
 <value number="2">0</value>
 </value>
 </property>
@@ -412,18 +412,18 @@
 <property name="J">
 <value number="0">6</value>
 </property>
-</reactor>
+</process>
 
-<reactor class="Sic1Reactor" id="Sic1syn" name="Sic1 synthesis">
-<property name="ReactantList">
+<process class="Sic1Process" id="Sic1syn" name="Sic1 synthesis">
+<property name="ConnectionList">
 <value>
 <value number="0">P0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Sic1t</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Sic1t</value>
 <value number="2">1</value>
 </value>
 <value>
 <value number="0">C0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Swi5</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Swi5</value>
 <value number="2">0</value>
 </value>
 </property>
@@ -435,13 +435,13 @@
 <property name="k2">
 <value number="0">0.1</value>
 </property>
-</reactor>
+</process>
 
-<reactor class="DegradeReactor" id="Sic1deg1" name="Sic1 degrade1">
-<property name="ReactantList">
+<process class="DegradeProcess" id="Sic1deg1" name="Sic1 degrade1">
+<property name="ConnectionList">
 <value>
 <value number="0">S0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Sic1t</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Sic1t</value>
 <value number="2">-1</value>
 </value>
 </property>
@@ -449,43 +449,43 @@
 <property name="kd">
 <value number="0">0.01</value>
 </property>
-</reactor>
+</process>
 
-<reactor class="Sic1ComplexDegradeReactor" id="Sic1deg2" name="Sic1 degrade2">
-<property name="ReactantList">
+<process class="Sic1ComplexDegradeProcess" id="Sic1deg2" name="Sic1 degrade2">
+<property name="ConnectionList">
 <value>
 <value number="0">S0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Sic1t</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Sic1t</value>
 <value number="2">-1</value>
 </value>
 <value>
 <value number="0">C0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Cln3</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Cln3</value>
 <value number="2">0</value>
 </value>
 <value>
 <value number="0">C1</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Bck2</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Bck2</value>
 <value number="2">0</value>
 </value>
 <value>
 <value number="0">C2</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Cln2</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Cln2</value>
 <value number="2">0</value>
 </value>
 <value>
 <value number="0">C3</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Clb5</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Clb5</value>
 <value number="2">0</value>
 </value>
 <value>
 <value number="0">C4</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Clb2</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Clb2</value>
 <value number="2">0</value>
 </value>
 <value>
 <value number="0">C5</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Sic1t</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Sic1t</value>
 <value number="2">0</value>
 </value>
 </property>
@@ -513,23 +513,23 @@
 <property name="J">
 <value number="0">0.05</value>
 </property>
-</reactor>
+</process>
 
-<reactor class="BiUniReactor" id="Clb2Sic1syn" name="Clb2Sic1 synthesis">
-<property name="ReactantList">
+<process class="BiUniProcess" id="Clb2Sic1syn" name="Clb2Sic1 synthesis">
+<property name="ConnectionList">
 <value>
 <value number="0">P0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Clb2Sic1</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Clb2Sic1</value>
 <value number="2">1</value>
 </value>
 <value>
 <value number="0">C0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Clb2</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Clb2</value>
 <value number="2">0</value>
 </value>
 <value>
 <value number="0">C1</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Sic1</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Sic1</value>
 <value number="2">0</value>
 </value>
 </property>
@@ -537,13 +537,13 @@
 <property name="k">
 <value number="0">50</value>
 </property>
-</reactor>
+</process>
 
-<reactor class="DegradeReactor" id="Clb2Sic1deg1" name="Clb2Sic1 degrade1">
-<property name="ReactantList">
+<process class="DegradeProcess" id="Clb2Sic1deg1" name="Clb2Sic1 degrade1">
+<property name="ConnectionList">
 <value>
 <value number="0">S0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Clb2Sic1</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Clb2Sic1</value>
 <value number="2">-1</value>
 </value>
 </property>
@@ -551,28 +551,28 @@
 <property name="kd">
 <value number="0">0.05</value>
 </property>
-</reactor>
+</process>
 
-<reactor class="DegradeClb2Reactor" id="Clb2Sic1deg2" name="Clb2Sic1 degrade2">
-<property name="ReactantList">
+<process class="DegradeClb2Process" id="Clb2Sic1deg2" name="Clb2Sic1 degrade2">
+<property name="ConnectionList">
 <value>
 <value number="0">S0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Clb2Sic1</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Clb2Sic1</value>
 <value number="2">-1</value>
 </value>
 <value>
 <value number="0">C0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Hct1t</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Hct1t</value>
 <value number="2">0</value>
 </value>
 <value>
 <value number="0">C1</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Hct1a</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Hct1a</value>
 <value number="2">0</value>
 </value>
 <value>
 <value number="0">C2</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Cdc20a</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Cdc20a</value>
 <value number="2">0</value>
 </value>
 </property>
@@ -588,14 +588,14 @@
 <property name="k3">
 <value number="0">0.05</value>
 </property>
-</reactor>
+</process>
 
 
-<reactor class="DegradeReactor" id="Clb2Sic1deg3" name="Clb2Sic1 degrade3">
-<property name="ReactantList">
+<process class="DegradeProcess" id="Clb2Sic1deg3" name="Clb2Sic1 degrade3">
+<property name="ConnectionList">
 <value>
 <value number="0">S0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Clb2Sic1</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Clb2Sic1</value>
 <value number="2">-1</value>
 </value>
 </property>
@@ -603,43 +603,43 @@
 <property name="kd">
 <value number="0">0.01</value>
 </property>
-</reactor>
+</process>
 
-<reactor class="Sic1ComplexDegradeReactor" id="Clb2Sic1deg4" name="Clb2Sic1 degrade4">
-<property name="ReactantList">
+<process class="Sic1ComplexDegradeProcess" id="Clb2Sic1deg4" name="Clb2Sic1 degrade4">
+<property name="ConnectionList">
 <value>
 <value number="0">S0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Clb2Sic1</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Clb2Sic1</value>
 <value number="2">-1</value>
 </value>
 <value>
 <value number="0">C0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Cln3</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Cln3</value>
 <value number="2">0</value>
 </value>
 <value>
 <value number="0">C1</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Bck2</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Bck2</value>
 <value number="2">0</value>
 </value>
 <value>
 <value number="0">C2</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Cln2</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Cln2</value>
 <value number="2">0</value>
 </value>
 <value>
 <value number="0">C3</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Clb5</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Clb5</value>
 <value number="2">0</value>
 </value>
 <value>
 <value number="0">C4</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Clb2</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Clb2</value>
 <value number="2">0</value>
 </value>
 <value>
 <value number="0">C5</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Sic1t</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Sic1t</value>
 <value number="2">0</value>
 </value>
 </property>
@@ -667,23 +667,23 @@
 <property name="J">
 <value number="0">0.05</value>
 </property>
-</reactor>
+</process>
 
-<reactor class="BiUniReactor" id="Clb5Sic1syn" name="Clb5Sic1 synthesis">
-<property name="ReactantList">
+<process class="BiUniProcess" id="Clb5Sic1syn" name="Clb5Sic1 synthesis">
+<property name="ConnectionList">
 <value>
 <value number="0">P0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Clb5Sic1</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Clb5Sic1</value>
 <value number="2">1</value>
 </value>
 <value>
 <value number="0">C0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Clb5</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Clb5</value>
 <value number="2">0</value>
 </value>
 <value>
 <value number="0">C1</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Sic1</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Sic1</value>
 <value number="2">0</value>
 </value>
 </property>
@@ -691,14 +691,14 @@
 <property name="k">
 <value number="0">50</value>
 </property>
-</reactor>
+</process>
 
 
-<reactor class="DegradeReactor" id="Clb5Sic1deg1" name="Clb5Sic1 degrade1">
-<property name="ReactantList">
+<process class="DegradeProcess" id="Clb5Sic1deg1" name="Clb5Sic1 degrade1">
+<property name="ConnectionList">
 <value>
 <value number="0">S0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Clb5Sic1</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Clb5Sic1</value>
 <value number="2">-1</value>
 </value>
 </property>
@@ -706,19 +706,19 @@
 <property name="kd">
 <value number="0">0.05</value>
 </property>
-</reactor>
+</process>
 
 
-<reactor class="DegradeClb5Reactor" id="Clb5Sic1deg2" name="Clb5Sic1 degrade2">
-<property name="ReactantList">
+<process class="DegradeClb5Process" id="Clb5Sic1deg2" name="Clb5Sic1 degrade2">
+<property name="ConnectionList">
 <value>
 <value number="0">S0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Clb5Sic1</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Clb5Sic1</value>
 <value number="2">-1</value>
 </value>
 <value>
 <value number="0">C0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Cdc20a</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Cdc20a</value>
 <value number="2">0</value>
 </value>
 </property>
@@ -730,13 +730,13 @@
 <property name="k2">
 <value number="0">0.25</value>
 </property>
-</reactor>
+</process>
 
-<reactor class="DegradeReactor" id="Clb5Sic1deg3" name="Clb5Sic1 degrade3">
-<property name="ReactantList">
+<process class="DegradeProcess" id="Clb5Sic1deg3" name="Clb5Sic1 degrade3">
+<property name="ConnectionList">
 <value>
 <value number="0">S0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Clb5Sic1</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Clb5Sic1</value>
 <value number="2">-1</value>
 </value>
 </property>
@@ -744,44 +744,44 @@
 <property name="kd">
 <value number="0">0.01</value>
 </property>
-</reactor>
+</process>
 
 
-<reactor class="Sic1ComplexDegradeReactor" id="Clb5Sic1deg4" name="Clb5Sic1 degrade4">
-<property name="ReactantList">
+<process class="Sic1ComplexDegradeProcess" id="Clb5Sic1deg4" name="Clb5Sic1 degrade4">
+<property name="ConnectionList">
 <value>
 <value number="0">S0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Clb5Sic1</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Clb5Sic1</value>
 <value number="2">-1</value>
 </value>
 <value>
 <value number="0">C0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Cln3</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Cln3</value>
 <value number="2">0</value>
 </value>
 <value>
 <value number="0">C1</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Bck2</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Bck2</value>
 <value number="2">0</value>
 </value>
 <value>
 <value number="0">C2</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Cln2</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Cln2</value>
 <value number="2">0</value>
 </value>
 <value>
 <value number="0">C3</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Clb5</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Clb5</value>
 <value number="2">0</value>
 </value>
 <value>
 <value number="0">C4</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Clb2</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Clb2</value>
 <value number="2">0</value>
 </value>
 <value>
 <value number="0">C5</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Sic1t</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Sic1t</value>
 <value number="2">0</value>
 </value>
 </property>
@@ -809,18 +809,18 @@
 <property name="J">
 <value number="0">0.05</value>
 </property>
-</reactor>
+</process>
 
-<reactor class="Sic1Reactor" id="Cdc20tsyn" name="Cdc20t synthesis">
-<property name="ReactantList">
+<process class="Sic1Process" id="Cdc20tsyn" name="Cdc20t synthesis">
+<property name="ConnectionList">
 <value>
 <value number="0">P0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Cdc20t</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Cdc20t</value>
 <value number="2">1</value>
 </value>
 <value>
 <value number="0">C0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Clb2</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Clb2</value>
 <value number="2">0</value>
 </value>
 </property>
@@ -832,14 +832,14 @@
 <property name="k2">
 <value number="0">0.06</value>
 </property>
-</reactor>
+</process>
 
 
-<reactor class="DegradeReactor" id="Cdc20tdeg" name="Cdc20t degrade">
-<property name="ReactantList">
+<process class="DegradeProcess" id="Cdc20tdeg" name="Cdc20t degrade">
+<property name="ConnectionList">
 <value>
 <value number="0">S0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Cdc20t</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Cdc20t</value>
 <value number="2">-1</value>
 </value>
 </property>
@@ -847,18 +847,18 @@
 <property name="kd">
 <value number="0">0.08</value>
 </property>
-</reactor>
+</process>
 
-<reactor class="Cdc20ActivateReactor" id="Cdc20act" name="Cdc20 activate">
-<property name="ReactantList">
+<process class="Cdc20ActivateProcess" id="Cdc20act" name="Cdc20 activate">
+<property name="ConnectionList">
 <value>
 <value number="0">P0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Cdc20a</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Cdc20a</value>
 <value number="2">1</value>
 </value>
 <value>
 <value number="0">C0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Cdc20t</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Cdc20t</value>
 <value number="2">0</value>
 </value>
 </property>
@@ -866,23 +866,23 @@
 <property name="k">
 <value number="0">1</value>
 </property>
-</reactor>
+</process>
 
-<reactor class="Cdc20InactivateReactor" id="Cdc20ina" name="Cdc20 inactivate">
-<property name="ReactantList">
+<process class="Cdc20InactivateProcess" id="Cdc20ina" name="Cdc20 inactivate">
+<property name="ConnectionList">
 <value>
 <value number="0">S0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Cdc20a</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Cdc20a</value>
 <value number="2">-1</value>
 </value>
 <value>
 <value number="0">C0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:ORI</value>
+<value number="1">Variable:/CELL/CYTOPLASM:ORI</value>
 <value number="2">0</value>
 </value>
 <value>
 <value number="0">C1</value>
-<value number="1">Substance:/CELL/CYTOPLASM:SPN</value>
+<value number="1">Variable:/CELL/CYTOPLASM:SPN</value>
 <value number="2">0</value>
 </value>
 </property>
@@ -898,24 +898,24 @@
 <property name="kd">
 <value number="0">0.08</value>
 </property>
-</reactor>
+</process>
 
 
-<reactor class="Hct1ActivateReactor" id="Hct1act" name="Hct1 activate">
-<property name="ReactantList">
+<process class="Hct1ActivateProcess" id="Hct1act" name="Hct1 activate">
+<property name="ConnectionList">
 <value>
 <value number="0">P0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Hct1a</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Hct1a</value>
 <value number="2">1</value>
 </value>
 <value>
 <value number="0">C0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Cdc20a</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Cdc20a</value>
 <value number="2">0</value>
 </value>
 <value>
 <value number="0">C1</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Hct1t</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Hct1t</value>
 <value number="2">0</value>
 </value>
 </property>
@@ -931,34 +931,34 @@
 <property name="J">
 <value number="0">0.05</value>
 </property>
-</reactor>
+</process>
 
 
-<reactor class="Hct1InactivateReactor" id="Hct1ina" name="Hct1 inactivate">
-<property name="ReactantList">
+<process class="Hct1InactivateProcess" id="Hct1ina" name="Hct1 inactivate">
+<property name="ConnectionList">
 <value>
 <value number="0">S0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Hct1a</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Hct1a</value>
 <value number="2">-1</value>
 </value>
 <value>
 <value number="0">C0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Cln3</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Cln3</value>
 <value number="2">0</value>
 </value>
 <value>
 <value number="0">C1</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Cln2</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Cln2</value>
 <value number="2">0</value>
 </value>
 <value>
 <value number="0">C2</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Clb5</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Clb5</value>
 <value number="2">0</value>
 </value>
 <value>
 <value number="0">C3</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Clb2</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Clb2</value>
 <value number="2">0</value>
 </value>
 </property>
@@ -986,18 +986,18 @@
 <property name="J">
 <value number="0">0.05</value>
 </property>
-</reactor>
+</process>
 
-<reactor class="MassCalculateReactor" id="masscalc" name="mass calculate">
-<property name="ReactantList">
+<process class="MassCalculateProcess" id="masscalc" name="mass calculate">
+<property name="ConnectionList">
 <value>
 <value number="0">P0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:mass</value>
+<value number="1">Variable:/CELL/CYTOPLASM:mass</value>
 <value number="2">1</value>
 </value>
 <value>
 <value number="0">C0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:mass</value>
+<value number="1">Variable:/CELL/CYTOPLASM:mass</value>
 <value number="2">0</value>
 </value>
 </property>
@@ -1005,14 +1005,14 @@
 <property name="m">
 <value number="0">0.005776</value>
 </property>
-</reactor>
+</process>
 
 
-<reactor class="DegradeReactor" id="ORIdeg" name="ORI deg">
-<property name="ReactantList">
+<process class="DegradeProcess" id="ORIdeg" name="ORI deg">
+<property name="ConnectionList">
 <value>
 <value number="0">S0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:ORI</value>
+<value number="1">Variable:/CELL/CYTOPLASM:ORI</value>
 <value number="2">-1</value>
 </value>
 </property>
@@ -1020,29 +1020,29 @@
 <property name="kd">
 <value number="0">0.06</value>
 </property>
-</reactor>
+</process>
 
 
-<reactor class="BUDReactor" id="BUD" name="BUD">
-<property name="ReactantList">
+<process class="BUDProcess" id="BUD" name="BUD">
+<property name="ConnectionList">
 <value>
 <value number="0">P0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:BUD</value>
+<value number="1">Variable:/CELL/CYTOPLASM:BUD</value>
 <value number="2">1</value>
 </value>
 <value>
 <value number="0">C0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Cln2</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Cln2</value>
 <value number="2">0</value>
 </value>
 <value>
 <value number="0">C1</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Cln3</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Cln3</value>
 <value number="2">0</value>
 </value>
 <value>
 <value number="0">C2</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Clb5</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Clb5</value>
 <value number="2">0</value>
 </value>
 </property>
@@ -1054,14 +1054,14 @@
 <property name="e">
 <value number="0">1</value>
 </property>
-</reactor>
+</process>
 
 
-<reactor class="DegradeReactor" id="BUDdeg" name="BUD deg">
-<property name="ReactantList">
+<process class="DegradeProcess" id="BUDdeg" name="BUD deg">
+<property name="ConnectionList">
 <value>
 <value number="0">S0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:BUD</value>
+<value number="1">Variable:/CELL/CYTOPLASM:BUD</value>
 <value number="2">-1</value>
 </value>
 </property>
@@ -1069,18 +1069,18 @@
 <property name="kd">
 <value number="0">0.06</value>
 </property>
-</reactor>
+</process>
 
-<reactor class="SPNReactor" id="SPN" name="SPN">
-<property name="ReactantList">
+<process class="SPNProcess" id="SPN" name="SPN">
+<property name="ConnectionList">
 <value>
 <value number="0">P0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:SPN</value>
+<value number="1">Variable:/CELL/CYTOPLASM:SPN</value>
 <value number="2">1</value>
 </value>
 <value>
 <value number="0">C0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Clb2</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Clb2</value>
 <value number="2">0</value>
 </value>
 </property>
@@ -1092,14 +1092,14 @@
 <property name="J">
 <value number="0">0.2</value>
 </property>
-</reactor>
+</process>
 
 
-<reactor class="DegradeReactor" id="SPNdeg" name="SPN deg">
-<property name="ReactantList">
+<process class="DegradeProcess" id="SPNdeg" name="SPN deg">
+<property name="ConnectionList">
 <value>
 <value number="0">S0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:SPN</value>
+<value number="1">Variable:/CELL/CYTOPLASM:SPN</value>
 <value number="2">-1</value>
 </value>
 </property>
@@ -1107,41 +1107,41 @@
 <property name="kd">
 <value number="0">0.06</value>
 </property>
-</reactor>
+</process>
 
-<reactor class="SBFcalcPReactor2" id="!SBF" name="SBF">
+<process class="SBFcalcPProcess2" id="!SBF" name="SBF">
 <property name="Priority">
 <value number="0">-1</value>
 </property>
-<property name="ReactantList">
+<property name="ConnectionList">
 <value>
 <value number="0">P0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:SBF</value>
+<value number="1">Variable:/CELL/CYTOPLASM:SBF</value>
 <value number="2">1</value>
 </value>
 <value>
 <value number="0">C0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Cln2</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Cln2</value>
 <value number="2">0</value>
 </value>
 <value>
 <value number="0">C1</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Cln3</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Cln3</value>
 <value number="2">0</value>
 </value>
 <value>
 <value number="0">C2</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Bck2</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Bck2</value>
 <value number="2">0</value>
 </value>
 <value>
 <value number="0">C3</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Clb5</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Clb5</value>
 <value number="2">0</value>
 </value>
 <value>
 <value number="0">C4</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Clb2</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Clb2</value>
 <value number="2">0</value>
 </value>
 </property>
@@ -1173,42 +1173,42 @@
 <property name="J2">
 <value number="0">0.01</value>
 </property>
-</reactor>
+</process>
 
 
-<reactor class="SBFcalcPReactor2" id="!MBF" name="MBF">
+<process class="SBFcalcPProcess2" id="!MBF" name="MBF">
 <property name="Priority">
 <value number="0">-1</value>
 </property>
-<property name="ReactantList">
+<property name="ConnectionList">
 <value>
 <value number="0">P0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:MBF</value>
+<value number="1">Variable:/CELL/CYTOPLASM:MBF</value>
 <value number="2">1</value>
 </value>
 <value>
 <value number="0">C0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Cln2</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Cln2</value>
 <value number="2">0</value>
 </value>
 <value>
 <value number="0">C1</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Cln3</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Cln3</value>
 <value number="2">0</value>
 </value>
 <value>
 <value number="0">C2</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Bck2</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Bck2</value>
 <value number="2">0</value>
 </value>
 <value>
 <value number="0">C3</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Clb5</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Clb5</value>
 <value number="2">0</value>
 </value>
 <value>
 <value number="0">C4</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Clb2</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Clb2</value>
 <value number="2">0</value>
 </value>
 </property>
@@ -1240,22 +1240,22 @@
 <property name="J2">
 <value number="0">0.01</value>
 </property>
-</reactor>
+</process>
 
-<reactor class="Mcm1calcPReactor" id="!Mcm1" name="Mcm1">
+<process class="Mcm1calcPProcess" id="!Mcm1" name="Mcm1">
 <property name="Priority">
 <value number="0">-1</value>
 </property>
 
-<property name="ReactantList">
+<property name="ConnectionList">
 <value>
 <value number="0">P0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Mcm1</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Mcm1</value>
 <value number="2">1</value>
 </value>
 <value>
 <value number="0">C0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Clb2</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Clb2</value>
 <value number="2">0</value>
 </value>
 </property>
@@ -1275,27 +1275,27 @@
 <property name="J2">
 <value number="0">1</value>
 </property>
-</reactor>
+</process>
 
 
-<reactor class="Swi5calcPReactor2" id="!Swi5" name="Swi5">
+<process class="Swi5calcPProcess2" id="!Swi5" name="Swi5">
 <property name="Priority">
 <value number="0">-1</value>
 </property>
-<property name="ReactantList">
+<property name="ConnectionList">
 <value>
 <value number="0">P0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Swi5</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Swi5</value>
 <value number="2">1</value>
 </value>
 <value>
 <value number="0">C0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Cdc20a</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Cdc20a</value>
 <value number="2">0</value>
 </value>
 <value>
 <value number="0">C1</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Clb2</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Clb2</value>
 <value number="2">0</value>
 </value>
 </property>
@@ -1319,32 +1319,32 @@
 <property name="J2">
 <value number="0">0.1</value>
 </property>
-</reactor>
+</process>
 
 
-<reactor class="DivisionPReactor" id="!divide" name="divide">
+<process class="DivisionPProcess" id="!divide" name="divide">
 <property name="Priority">
 <value number="0">-1</value>
 </property>
-<property name="ReactantList">
+<property name="ConnectionList">
 <value>
 <value number="0">C0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Clb2</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Clb2</value>
 <value number="2">0</value>
 </value>
 <value>
 <value number="0">P0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:mass</value>
+<value number="1">Variable:/CELL/CYTOPLASM:mass</value>
 <value number="2">1</value>
 </value>
 <value>
 <value number="0">P1</value>
-<value number="1">Substance:/CELL/CYTOPLASM:BUD</value>
+<value number="1">Variable:/CELL/CYTOPLASM:BUD</value>
 <value number="2">1</value>
 </value>
 <value>
 <value number="0">P2</value>
-<value number="1">Substance:/CELL/CYTOPLASM:SPN</value>
+<value number="1">Variable:/CELL/CYTOPLASM:SPN</value>
 <value number="2">1</value>
 </value>
 </property>
@@ -1352,104 +1352,104 @@
 <property name="m">
 <value number="0">0.005776</value>
 </property>
-</reactor>
+</process>
 
-<reactor class="ORIPReactor" id="!ORIP" name="ORIP">
+<process class="ORIPProcess" id="!ORIP" name="ORIP">
 <property name="Priority">
 <value number="0">-1</value>
 </property>
-<property name="ReactantList">
+<property name="ConnectionList">
 <value>
 <value number="0">C0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Clb2</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Clb2</value>
 <value number="2">0</value>
 </value>
 <value>
 <value number="0">C1</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Clb5</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Clb5</value>
 <value number="2">0</value>
 </value>
 <value>
 <value number="0">P0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:ORI</value>
+<value number="1">Variable:/CELL/CYTOPLASM:ORI</value>
 <value number="2">1</value>
 </value>
 </property>
-</reactor>
+</process>
 
-<reactor class="TotalPReactor" id="!clb2total2" name="CLB2">
+<process class="TotalPProcess" id="!clb2total2" name="CLB2">
 <property name="Priority">
 <value number="0">-1</value>
 </property>
-<property name="ReactantList">
+<property name="ConnectionList">
 <value>
 <value number="0">P0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Clb2</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Clb2</value>
 <value number="2">1</value>
 </value>
 <value>
 <value number="0">C0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Clb2t</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Clb2t</value>
 <value number="2">0</value>
 </value>
 <value>
 <value number="0">C1</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Clb2Sic1</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Clb2Sic1</value>
 <value number="2">0</value>
 </value>
 </property>
-</reactor>
+</process>
 
-<reactor class="TotalPReactor" id="!clb5total2" name="CLB5">
+<process class="TotalPProcess" id="!clb5total2" name="CLB5">
 <property name="Priority">
 <value number="0">-1</value>
 </property>
-<property name="ReactantList">
+<property name="ConnectionList">
 <value>
 <value number="0">P0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Clb5</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Clb5</value>
 <value number="2">1</value>
 </value>
 <value>
 <value number="0">C0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Clb5t</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Clb5t</value>
 <value number="2">0</value>
 </value>
 <value>
 <value number="0">C1</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Clb5Sic1</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Clb5Sic1</value>
 <value number="2">0</value>
 </value>
 </property>
-</reactor>
+</process>
 
-<reactor class="Sic1TotalPReactor" id="!sic1total2" name="SIC1">
+<process class="Sic1TotalPProcess" id="!sic1total2" name="SIC1">
 <property name="Priority">
 <value number="0">-1</value>
 </property>
-<property name="ReactantList">
+<property name="ConnectionList">
 <value>
 <value number="0">P0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Sic1</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Sic1</value>
 <value number="2">1</value>
 </value>
 <value>
 <value number="0">C0</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Sic1t</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Sic1t</value>
 <value number="2">0</value>
 </value>
 <value>
 <value number="0">C1</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Clb2Sic1</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Clb2Sic1</value>
 <value number="2">0</value>
 </value>
 <value>
 <value number="0">C2</value>
-<value number="1">Substance:/CELL/CYTOPLASM:Clb5Sic1</value>
+<value number="1">Variable:/CELL/CYTOPLASM:Clb5Sic1</value>
 <value number="2">0</value>
 </value>
 </property>
-</reactor>
+</process>
 
 </system>
 

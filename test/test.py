@@ -22,9 +22,9 @@ aSimulator.setProperty( 'System::/:StepperID', ('RK4_0',) )
 print aSimulator.getStepperProperty( 'RK4_0', 'StepInterval' )
 print aSimulator.getStepperProperty( 'RK4_0', 'SystemList' )
 
-print 'make substances...'
-aSimulator.createEntity( 'SRMSubstance', 'Substance:/:A', 'substance A' )
-aSimulator.createEntity( 'SRMSubstance', 'Substance:/:B', 'substance B' )
+print 'make variables...'
+aSimulator.createEntity( 'SRMVariable', 'Variable:/:A', 'variable A' )
+aSimulator.createEntity( 'SRMVariable', 'Variable:/:B', 'variable B' )
 
 aSimulator.run(10)
 
@@ -37,16 +37,16 @@ aSimulator.createEntity( 'System', 'System:/:CYTOPLASM', 'cytoplasm' )
 aSimulator.setProperty( 'System:/:CYTOPLASM:StepperID', ('RK4_0',) )
 
 
-aSimulator.createEntity( 'SRMSubstance', 'Substance:/CYTOPLASM:CA', 's CA' )
-aSimulator.createEntity( 'SRMSubstance', 'Substance:/CYTOPLASM:CB', 's CB' )
+aSimulator.createEntity( 'SRMVariable', 'Variable:/CYTOPLASM:CA', 's CA' )
+aSimulator.createEntity( 'SRMVariable', 'Variable:/CYTOPLASM:CB', 's CB' )
 
 
 print 'initialize()...'
 aSimulator.initialize()
 
 
-print 'set Substance:/:A Quantity = 30'
-aSimulator.setProperty( 'Substance:/:A:Quantity', (30,) )
+print 'set Variable:/:A Value = 30'
+aSimulator.setProperty( 'Variable:/:A:Value', (30,) )
 
 
 printAllProperties( aSimulator, 'System::/' )
@@ -54,24 +54,24 @@ printAllProperties( aSimulator, 'System::/' )
 printAllProperties( aSimulator, 'System:/:CYTOPLASM' )
 
 
-substancelist = aSimulator.getProperty( 'System::/:SubstanceList' )
+variablelist = aSimulator.getProperty( 'System::/:VariableList' )
 
-for i in substancelist:
-    printAllProperties( aSimulator, 'Substance:/:' + i )
+for i in variablelist:
+    printAllProperties( aSimulator, 'Variable:/:' + i )
 
-substancelist = aSimulator.getProperty( 'System:/:CYTOPLASM:SubstanceList' )
+variablelist = aSimulator.getProperty( 'System:/:CYTOPLASM:VariableList' )
 
-for i in substancelist:
-    printAllProperties( aSimulator, 'Substance:/CYTOPLASM:' + i )
+for i in variablelist:
+    printAllProperties( aSimulator, 'Variable:/CYTOPLASM:' + i )
 
 print
 
-printProperty( aSimulator, 'Substance:/:A:Quantity' )
+printProperty( aSimulator, 'Variable:/:A:Value' )
 
-#printProperty( aSimulator, 'Substance:/:A:Quantity' )
-print 'changing Quantity of Substance:/:A...'
-aSimulator.setProperty( 'Substance:/:A:Quantity', (10.0, ) )
-printProperty( aSimulator, 'Substance:/:A:Quantity' )
+#printProperty( aSimulator, 'Variable:/:A:Value' )
+print 'changing Value of Variable:/:A...'
+aSimulator.setProperty( 'Variable:/:A:Value', (10.0, ) )
+printProperty( aSimulator, 'Variable:/:A:Value' )
 
 
 print 'step()...'
@@ -88,8 +88,8 @@ print aSimulator.getCurrentTime()
 aSimulator.step()
 
 print "getLogger"
-aALogger = aSimulator.getLogger('Substance:/:A:Quantity')
-aBLogger = aSimulator.getLogger('Substance:/:B:Quantity')
+aALogger = aSimulator.getLogger('Variable:/:A:Value')
+aBLogger = aSimulator.getLogger('Variable:/:B:Value')
 
 print aSimulator.getCurrentTime()
 aSimulator.run(10)
@@ -141,7 +141,7 @@ print appendedList
     
 data = 'DATA:' + str( List )
 size = "SIZE: %s %s"%(sizeOfArrayInArray1, sizeOfArray)
-label = "LABEL: time quantity"
+label = "LABEL: time value"
 note = "NOTE:\n\n-------------------------"
 
 stringList = [ data , size , label , note ]
@@ -181,16 +181,16 @@ from ecell.ECDDataFile import *
 # save data 
 # List is the FullPN list which has created by getLogger() method.
 # In this sample, List include three FullPNs,
-# Saving [Substance:/:A:Quantity] will be success.
-# Saving [Substance:/:B:Quantity] will be success.
-# Saving [Substance-/-B-Quantity] will be failure.
+# Saving [Variable:/:A:Value] will be success.
+# Saving [Variable:/:B:Value] will be success.
+# Saving [Variable-/-B-Value] will be failure.
 
 for aFullPNString in List:
     try:
         #print aFullPNString
 
         # creates save file name
-        # ex.  [Substance:/:A:Quantity] -> [A_Quantity]
+        # ex.  [Variable:/:A:Value] -> [A_Value]
         aFileName=join( split(aFullPNString,':')[2:], '_' )
         #print " aFileName = %s" %aFileName 
 

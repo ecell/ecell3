@@ -58,8 +58,8 @@ class EntryListWindow(OsogoWindow):
 		self.theTypeMenu.connect( 'selection-done', self.updateEntryList)
 
 		aTypeMenuItemMap = self.theTypeMenu.children()
-		aTypeMenuItemMap[0].set_data( 'LABEL', 'Substance' )
-		aTypeMenuItemMap[1].set_data( 'LABEL', 'Reactor' )
+		aTypeMenuItemMap[0].set_data( 'LABEL', 'Variable' )
+		aTypeMenuItemMap[1].set_data( 'LABEL', 'Process' )
 		aTypeMenuItemMap[2].set_data( 'LABEL', 'All' )
 
 		self.theSystemTree.show()
@@ -116,8 +116,8 @@ class EntryListWindow(OsogoWindow):
 
 		#if aPrimitiveTypeString == 'All':
 		if aEntryTypeString == 'All':
-			self.listEntity( 'Substance', aSystemFullID )
-			self.listEntity( 'Reactor', aSystemFullID )
+			self.listEntity( 'Variable', aSystemFullID )
+			self.listEntity( 'Process', aSystemFullID )
 		else:
 			#self.listEntity( aPrimitiveTypeString, aSystemFullID )
 			self.listEntity( aEntryTypeString, aSystemFullID )
@@ -132,19 +132,19 @@ class EntryListWindow(OsogoWindow):
 		for aEntityID in aEntityList:
 			aListItem = gtk.GtkListItem( aEntityID )
             
-			#if aPrimitiveTypeString == 'Substance':
-			if aEntryTypeString == 'Substance':
-				#aPrimitiveType = SUBSTANCE
-				aEntryType = SUBSTANCE
-			#elif aPrimitiveTypeString == 'Reactor':
-			elif aEntryTypeString == 'Reactor':
-				aEntryType = REACTOR
+			#if aPrimitiveTypeString == 'Variable':
+			if aEntryTypeString == 'Variable':
+				#aPrimitiveType = VARIABLE
+				aEntryType = VARIABLE
+			#elif aPrimitiveTypeString == 'Process':
+			elif aEntryTypeString == 'Process':
+				aEntryType = PROCESS
 
 			aSystemPath = createSystemPathFromFullID( aSystemFullID )
 
 			#aEntityFullPN = ( aPrimitiveType, aSystemPath, aEntityID, '' )
 			aEntityFullPN = ( aEntryType, aSystemPath, aEntityID, '' )
-#            aEntityFullPN = ( aPrimitiveType, aSystemPath, aEntityID, 'Quantity' )
+#            aEntityFullPN = ( aPrimitiveType, aSystemPath, aEntityID, 'Value' )
 
 			aListItem.set_data( 'FULLPN', aEntityFullPN)
 #            aFullPNList = ( aEntityFullPN, )

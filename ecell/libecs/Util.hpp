@@ -53,15 +53,6 @@ namespace libecs
   /** @file */
 
   
-  typedef ::korandom_d_c  RandomNumberGenerator;
-
-  /**
-     Random number generator
-  */
-  //FIXME: thread safe?
-  extern RandomNumberGenerator* theRandomNumberGenerator; 
-
-
   /** 
       Universal String -> object converter.
       Real and Int specializations are defined in Util.cpp.
@@ -195,8 +186,8 @@ namespace libecs
     };
   
     
-    for_each( theReactorVector.begin(), theReactorVector.end(), 
-  	      DifferentiateCaller<Reactor>() );
+    for_each( theProcessVector.begin(), theProcessVector.end(), 
+  	      DifferentiateCaller<Process>() );
 
 
     (Kouichi Takahashi)

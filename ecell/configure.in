@@ -104,28 +104,6 @@ if test "$DMTOOL_DIR" = "" ; then
 fi
 AC_SUBST(DMTOOL_DIR)
 AC_SUBST(DMTOOL_INCLUDE_DIR)
-dnl
-dnl
-dnl korandom package
-dnl
-if test "$KORANDOM_DIR" = "" ; then
-        AC_MSG_CHECKING( for korandom dir)
-        ac_cv_korandom_dir="no"
-        for ac_dir in $EXT_GUESS ; do
-                if test -d $ac_dir/korandom ; then
-                        ac_cv_korandom_dir=`(cd $ac_dir ; pwd)`
-			KORANDOM_DIR=$ac_cv_korandom_dir
-                fi
-        done
-
-	if test "$KORANDOM_DIR" = "" ; then	
-		AC_MSG_ERROR("korandom not found.")
-	fi
-
-        AC_MSG_RESULT($ac_cv_korandom_dir)
-        KORANDOM_DIR=$ac_cv_korandom_dir
-fi
-AC_SUBST(KORANDOM_DIR)
 
 dnl
 dnl
@@ -184,7 +162,7 @@ Makefile
 libecs/Makefile
 libecs/emtool
 libecs/dmtemplates/Makefile
-libecs/dmtemplates/Reactor/Makefile
+libecs/dmtemplates/Process/Makefile
 libemc/Makefile
 pyecs/Makefile
 pyecs/ecell3

@@ -32,8 +32,8 @@
 
 #include "Util.hpp"
 #include "StepperMaker.hpp"
-#include "SubstanceMaker.hpp"
-#include "ReactorMaker.hpp"
+#include "VariableMaker.hpp"
+#include "ProcessMaker.hpp"
 #include "SystemMaker.hpp"
 //#include "AccumulatorMaker.hpp"
 #include "LoggerBroker.hpp"
@@ -53,8 +53,8 @@ namespace libecs
     theLoggerBroker(     *new LoggerBroker( *this ) ),
     theStepperMaker(     *new StepperMaker          ),
     theSystemMaker(      *new SystemMaker           ),
-    theSubstanceMaker(   *new SubstanceMaker        ),
-    theReactorMaker(     *new ReactorMaker          )
+    theVariableMaker(   *new VariableMaker        ),
+    theProcessMaker(     *new ProcessMaker          )
     //    ,theAccumulatorMaker( *new AccumulatorMaker      )
   {
     theRootSystemPtr = getSystemMaker().make( "System" );
@@ -69,8 +69,8 @@ namespace libecs
   {
     delete theRootSystemPtr;
     //    delete &theAccumulatorMaker;
-    delete &theReactorMaker;
-    delete &theSubstanceMaker;
+    delete &theProcessMaker;
+    delete &theVariableMaker;
     delete &theSystemMaker;
     delete &theStepperMaker;
     delete &theLoggerBroker;
@@ -93,23 +93,23 @@ namespace libecs
 
     SystemPtr aContainerSystemPtr( getSystem( aFullID.getSystemPath() ) );
 
-    ReactorPtr   aReactorPtr  ( NULLPTR );
+    ProcessPtr   aProcessPtr  ( NULLPTR );
     SystemPtr    aSystemPtr   ( NULLPTR );
-    SubstancePtr aSubstancePtr( NULLPTR );
+    VariablePtr aVariablePtr( NULLPTR );
 
     switch( aFullID.getEntityType() )
       {
-      case EntityType::SUBSTANCE:
-	aSubstancePtr = getSubstanceMaker().make( aClassname );
-	aSubstancePtr->setID( aFullID.getID() );
-	aSubstancePtr->setModel( this );
-	aContainerSystemPtr->registerSubstance( aSubstancePtr );
+      case EntityType::VARIABLE:
+	aVariablePtr = getVariableMaker().make( aClassname );
+	aVariablePtr->setID( aFullID.getID() );
+	aVariablePtr->setModel( this );
+	aContainerSystemPtr->registerVariable( aVariablePtr );
 	break;
-      case EntityType::REACTOR:
-	aReactorPtr = getReactorMaker().make( aClassname );
-	aReactorPtr->setID( aFullID.getID() );
-	aReactorPtr->setModel( this );
-	aContainerSystemPtr->registerReactor( aReactorPtr );
+      case EntityType::PROCESS:
+	aProcessPtr = getProcessMaker().make( aClassname );
+	aProcessPtr->setID( aFullID.getID() );
+	aProcessPtr->setModel( this );
+	aContainerSystemPtr->registerProcess( aProcessPtr );
 	break;
       case EntityType::SYSTEM:
 	aSystemPtr = getSystemMaker().make( aClassname );
@@ -190,11 +190,11 @@ namespace libecs
 
     switch( aFullID.getEntityType() )
       {
-      case EntityType::SUBSTANCE:
-	anEntity = aSystem->getSubstance( aFullID.getID() );
+      case EntityType::VARIABLE:
+	anEntity = aSystem->getVariable( aFullID.getID() );
 	break;
-      case EntityType::REACTOR:
-	anEntity = aSystem->getReactor(   aFullID.getID() );
+      case EntityType::PROCESS:
+	anEntity = aSystem->getProcess(   aFullID.getID() );
 	break;
       case EntityType::SYSTEM:
 	anEntity = aSystem->getSystem(    aFullID.getID() );

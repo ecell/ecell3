@@ -83,8 +83,8 @@ class Session:
 
                 # ---------------------------------------------\----
                 # creates filename
-                # from [Substance:/CELL/CYTOPLASM:E:Quantity]
-                # to   [CYTOPLASM-E-Quantity]
+                # from [Variable:/CELL/CYTOPLASM:E:Value]
+                # to   [CYTOPLASM-E-Value]
                 # ---------------------------------------------\----
                 aFileName=string.split(string.join(string.split(aFullPNString,':')[1:],'-'),'/')[-1]
                 
@@ -202,12 +202,12 @@ class Session:
                                              
     def __loadEntity( self, aSystemPath='/' ):
 
-        aSubstanceList = self.theEml.getEntityList( 'Substance', aSystemPath )
-        aReactorList   = self.theEml.getEntityList( 'Reactor',   aSystemPath )
+        aVariableList = self.theEml.getEntityList( 'Variable', aSystemPath )
+        aProcessList   = self.theEml.getEntityList( 'Process',   aSystemPath )
         aSubSystemList = self.theEml.getEntityList( 'System',    aSystemPath )
 
-        self.__loadEntityList( 'Substance', aSystemPath, aSubstanceList )
-        self.__loadEntityList( 'Reactor',   aSystemPath, aReactorList )
+        self.__loadEntityList( 'Variable', aSystemPath, aVariableList )
+        self.__loadEntityList( 'Process',   aSystemPath, aProcessList )
         self.__loadEntityList( 'System',    aSystemPath, aSubSystemList )
 
         for aSystem in aSubSystemList:

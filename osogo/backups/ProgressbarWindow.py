@@ -58,7 +58,7 @@ class ProgressbarWindow(PluginWindow):
         num = 0
 
         for aProperty in aPropertyList:
-            if (aProperty == 'Quantity'):
+            if (aProperty == 'Value'):
                 print aProperty,
                 print "=",
                 print aAttributeList[num]
@@ -192,7 +192,7 @@ if __name__ == "__main__":
 
     class simulator:
 
-        dic={('Substance','/CELL/CYTOPLASM','ATP','quantity') : (1950,),}
+        dic={('Variable','/CELL/CYTOPLASM','ATP','value') : (1950,),}
         
         def getEntityProperty( self, fpn ):
             return simulator.dic[fpn]
@@ -201,7 +201,7 @@ if __name__ == "__main__":
             simulator.dic[fpn] = value
 
 
-    fpn = ('Substance','/CELL/CYTOPLASM','ATP','quantity')
+    fpn = ('Variable','/CELL/CYTOPLASM','ATP','value')
 
     def mainQuit( obj, data ):
         print obj,data

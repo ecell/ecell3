@@ -160,10 +160,10 @@ namespace libemc
 
     switch( anEntityType )
       {
-      case libecs::EntityType::SUBSTANCE:
-	return aSystemPtr->getSubstanceList();
-      case libecs::EntityType::REACTOR:
-	return aSystemPtr->getReactorList();
+      case libecs::EntityType::VARIABLE:
+	return aSystemPtr->getVariableList();
+      case libecs::EntityType::PROCESS:
+	return aSystemPtr->getProcessList();
       case libecs::EntityType::SYSTEM:
 	return aSystemPtr->getSystemList();
       }

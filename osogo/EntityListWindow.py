@@ -58,8 +58,8 @@ class EntityListWindow(OsogoWindow):
 		self.theTypeMenu.connect( 'selection-done', self.updateEntityList)
 
 		aTypeMenuItemMap = self.theTypeMenu.children()
-		aTypeMenuItemMap[0].set_data( 'LABEL', 'Substance' )
-		aTypeMenuItemMap[1].set_data( 'LABEL', 'Reactor' )
+		aTypeMenuItemMap[0].set_data( 'LABEL', 'Variable' )
+		aTypeMenuItemMap[1].set_data( 'LABEL', 'Process' )
 		aTypeMenuItemMap[2].set_data( 'LABEL', 'All' )
 
 		self.theSystemTree.show()
@@ -116,8 +116,8 @@ class EntityListWindow(OsogoWindow):
 
 		#if aPrimitiveTypeString == 'All':
 		if aEntityTypeString == 'All':
-			self.listEntity( 'Substance', aSystemFullID )
-			self.listEntity( 'Reactor', aSystemFullID )
+			self.listEntity( 'Variable', aSystemFullID )
+			self.listEntity( 'Process', aSystemFullID )
 		else:
 			#self.listEntity( aPrimitiveTypeString, aSystemFullID )
 			self.listEntity( aEntityTypeString, aSystemFullID )
@@ -132,19 +132,19 @@ class EntityListWindow(OsogoWindow):
 		for aEntityID in aEntityList:
 			aListItem = gtk.GtkListItem( aEntityID )
             
-			#if aPrimitiveTypeString == 'Substance':
-			if aEntityTypeString == 'Substance':
-				#aPrimitiveType = SUBSTANCE
-				aEntityType = SUBSTANCE
-			#elif aPrimitiveTypeString == 'Reactor':
-			elif aEntityTypeString == 'Reactor':
-				aEntityType = REACTOR
+			#if aPrimitiveTypeString == 'Variable':
+			if aEntityTypeString == 'Variable':
+				#aPrimitiveType = VARIABLE
+				aEntityType = VARIABLE
+			#elif aPrimitiveTypeString == 'Process':
+			elif aEntityTypeString == 'Process':
+				aEntityType = PROCESS
 
 			aSystemPath = createSystemPathFromFullID( aSystemFullID )
 
 			#aEntityFullPN = ( aPrimitiveType, aSystemPath, aEntityID, '' )
 			aEntityFullPN = ( aEntityType, aSystemPath, aEntityID, '' )
-#            aEntityFullPN = ( aPrimitiveType, aSystemPath, aEntityID, 'Quantity' )
+#            aEntityFullPN = ( aPrimitiveType, aSystemPath, aEntityID, 'Value' )
 
 			aListItem.set_data( 'FULLPN', aEntityFullPN)
 #            aFullPNList = ( aEntityFullPN, )

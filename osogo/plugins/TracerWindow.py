@@ -412,7 +412,7 @@ if __name__ == '__main__':
     class simulator :
 
         def __init__( self ):
-            self.dic = {('Substance', '/CELL/CYTOPLASM', 'ATP','Quantity') : (1950,),}
+            self.dic = {('Variable', '/CELL/CYTOPLASM', 'ATP','Value') : (1950,),}
 
         def getEntityProperty( self, fpn ):
             return self.dic[fpn]
@@ -425,19 +425,19 @@ if __name__ == '__main__':
             return logger
 
         def getLoggerList( self ):
-            fpnlist = ((SUBSTANCE, '/CELL/CYTOPLASM', 'ATP', 'Quantity'),
-                       (SUBSTANCE, '/CELL/CYTOPLASM', 'ADP', 'Quantity'))
+            fpnlist = ((VARIABLE, '/CELL/CYTOPLASM', 'ATP', 'Value'),
+                       (VARIABLE, '/CELL/CYTOPLASM', 'ADP', 'Value'))
                        
             return fpnlist
 
-    fpnlist = (('Substance','/CELL/CYTOPLASM','ATP',''),
-               ('Substance','/CELL/CYTOPLASM','ADP',''))
+    fpnlist = (('Variable','/CELL/CYTOPLASM','ATP',''),
+               ('Variable','/CELL/CYTOPLASM','ADP',''))
 
 
     class Logger:
 
         def __init__( self, fpn ):
-            if(fpn ==('Substance', '/CELL/CYTOPLASM', 'ATP', '')) :
+            if(fpn ==('Variable', '/CELL/CYTOPLASM', 'ATP', '')) :
                 a = 'CYTOPLASM-Cln2_C.ecd'
                 alist = []
                 fp = open(a,'r')
@@ -445,7 +445,7 @@ if __name__ == '__main__':
                 for line in fp.readlines():
                     if re.search('^\d+.\d+\s',line):
                         alist+=[[string.atof(re.split('\s+',line)[0]),string.atof(re.split('\s+',line)[1])]]
-            elif(fpn ==('Substance', '/CELL/CYTOPLASM', 'ADP', '')) :
+            elif(fpn ==('Variable', '/CELL/CYTOPLASM', 'ADP', '')) :
                 a = 'CYTOPLASM-mass_C.ecd'
                 alist = []
                 fp = open(a,'r')

@@ -67,7 +67,7 @@ class EmScanner( GenericScanner , object ):
 		return Token( type, attr, self.filename, self.lineno )
 
 	def t_keywords( self, s ):
-		r' Reactor[\s\t] | Substance[\s\t] | Stepper[\s|\t] | System[\s\t] '
+		r' Process[\s\t] | Variable[\s\t] | Stepper[\s|\t] | System[\s\t] '
 		s = string.strip( s )
 		self.rv.append( self.createToken( s, s ) )
 
@@ -156,8 +156,8 @@ class EmParser( GenericParser ):
 
 	def p_entity_other_stmt ( self, args ):
                 '''
-		entity_other_stmt ::= Substance object_decl entity_other_def
-		entity_other_stmt ::= Reactor object_decl entity_other_def
+		entity_other_stmt ::= Variable object_decl entity_other_def
+		entity_other_stmt ::= Process object_decl entity_other_def
 		'''
 		return AST ( Token( 'entity_other_stmt' ), args )
 
@@ -166,7 +166,7 @@ class EmParser( GenericParser ):
 	def p_object_decl( self, args ):
 		'''
 		object_decl ::= name ( name )
-		object_decl ::= Substance ( name )
+		object_decl ::= Variable ( name )
 		'''
 		return AST ( Token( 'object_decl' ), ( args[0], args[2] ) )
 
@@ -337,7 +337,7 @@ class Interpret(GenericASTTraversal):
 				aPropertyName = i[0].attr
 
 			if aType == 'System' and\
-			       aPropertyName in ( 'Substance', 'Reactor' ):
+			       aPropertyName in ( 'Variable', 'Process' ):
 				self.n_system_stmt(i[0], anID)
 				continue
 			
@@ -378,12 +378,12 @@ def convert2FullID( anEml, aType, aSystemID ):
         aFullID = anEml.convertSystemID2SystemFullID(aSystemID)
         if aType == 'System':
 		anID = aFullID
-	elif aType == 'Substance':
-		anID = 'Substance:' + aSystemID
+	elif aType == 'Variable':
+		anID = 'Variable:' + aSystemID
 	elif aType == 'Stepper':
 		anID = aSystemID
-	elif aType == 'Reactor':
-		anID = 'Reactor:' + aSystemID
+	elif aType == 'Process':
+		anID = 'Process:' + aSystemID
 	else:
 		raise ValueError, 'Type Error %s %s %s' (aType, aClass, aSystemID)
 	    

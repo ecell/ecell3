@@ -206,11 +206,11 @@ if __name__ == '__main__':
 
     print
 
-    aTuple = ( SUBSTANCE , ( '/' , 'CELL' , 'CYTOPLASM' ) , 'ATP' , 'CONC' )
+    aTuple = ( VARIABLE , ( '/' , 'CELL' , 'CYTOPLASM' ) , 'ATP' , 'CONC' )
     aFullPN = createFullPN( aTuple )
     print aFullPN
 
-    aFullPN = createFullPN( 'Substance:/CELL/CYTOPLASM:ATP:CONC' )
+    aFullPN = createFullPN( 'Variable:/CELL/CYTOPLASM:ATP:CONC' )
     print aFullPN
 
     print
@@ -234,7 +234,7 @@ if __name__ == '__main__':
         print 'type error!'
 
 
-    aFullID = createFullID( 'Substance:/CELL/CYTOPLASM:ATP' )
+    aFullID = createFullID( 'Variable:/CELL/CYTOPLASM:ATP' )
     try:
         print aFullID.convertToSystemPath()
     except TypeError:

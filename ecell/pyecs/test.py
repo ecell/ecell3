@@ -3,8 +3,8 @@
 import ecs
 
 ENTITY     = 1
-SUBSTANCE  = 2
-REACTOR    = 3
+VARIABLE  = 2
+PROCESS    = 3
 SYSTEM     = 4
 
 def printProperty( sim, fullpropertyname ):
@@ -31,25 +31,25 @@ s.setProperty( ( SYSTEM, '/', 'CYTOPLASM', 'StepperClass' ),
 s.setProperty( ( SYSTEM, '/', 'CYTOPLASM', 'StepInterval' ),
                (0.05,) )
 
-print 'make substances...'
-s.createEntity( 'Substance', ( SUBSTANCE, '/', 'A' ), 'substance A' )
-s.createEntity( 'Substance', ( SUBSTANCE, '/', 'B' ), 'substance B' )
-s.createEntity( 'Substance', ( SUBSTANCE, '/CYTOPLASM', 'CA' ), 's CA' )
-s.createEntity( 'Substance', ( SUBSTANCE, '/CYTOPLASM', 'CB' ), 's CB' )
+print 'make variables...'
+s.createEntity( 'Variable', ( VARIABLE, '/', 'A' ), 'variable A' )
+s.createEntity( 'Variable', ( VARIABLE, '/', 'B' ), 'variable B' )
+s.createEntity( 'Variable', ( VARIABLE, '/CYTOPLASM', 'CA' ), 's CA' )
+s.createEntity( 'Variable', ( VARIABLE, '/CYTOPLASM', 'CB' ), 's CB' )
 
 
-print 'make reactors...'
+print 'make processs...'
 try:
-    s.createEntity('ConstantActivityReactor',
-                   ( REACTOR, '/CYTOPLASM', 'RC1' ),
-                   'constant reactor' )
+    s.createEntity('ConstantActivityProcess',
+                   ( PROCESS, '/CYTOPLASM', 'RC1' ),
+                   'constant process' )
 except:
-    print 'cannot instantiate ConstantActivityReactor'
+    print 'cannot instantiate ConstantActivityProcess'
     
-print 'set Substance:/:A Quantity = 30'
-s.setProperty( ( SUBSTANCE, '/', 'A', 'Quantity' ), (30,) )
+print 'set Variable:/:A Value = 30'
+s.setProperty( ( VARIABLE, '/', 'A', 'Value' ), (30,) )
 
-l = s.getLogger( ( SUBSTANCE, '/', 'A', 'Quantity') )
+l = s.getLogger( ( VARIABLE, '/', 'A', 'Value') )
 #print l
 print dir(l)
 
@@ -62,24 +62,24 @@ printAllProperties( s, ( SYSTEM, '', '/' ) )
 printAllProperties( s, ( SYSTEM, '/', 'CYTOPLASM' ) )
 
 
-substancelist = s.getProperty( ( SYSTEM, '', '/', 'SubstanceList' ) )
+variablelist = s.getProperty( ( SYSTEM, '', '/', 'VariableList' ) )
 
-printList( s, SUBSTANCE, '/' , substancelist )
+printList( s, VARIABLE, '/' , variablelist )
 
-substancelist = s.getProperty( ( SYSTEM, '/', 'CYTOPLASM', 'SubstanceList' ) )
+variablelist = s.getProperty( ( SYSTEM, '/', 'CYTOPLASM', 'VariableList' ) )
 
-printList( s, SUBSTANCE, '/CYTOPLASM' , substancelist )
+printList( s, VARIABLE, '/CYTOPLASM' , variablelist )
 
 
 print
 
-printProperty( s, ( SUBSTANCE, '/', 'A', 'Quantity' ) )
-print 'changing Quantity of Substance:/:A...'
-s.setProperty( ( SUBSTANCE, '/', 'A', 'Quantity' ), (10.0, ) )
-printProperty( s, ( SUBSTANCE, '/', 'A', 'Quantity' ) )
+printProperty( s, ( VARIABLE, '/', 'A', 'Value' ) )
+print 'changing Value of Variable:/:A...'
+s.setProperty( ( VARIABLE, '/', 'A', 'Value' ), (10.0, ) )
+printProperty( s, ( VARIABLE, '/', 'A', 'Value' ) )
 
 try:
-    printAllProperties( s, ( REACTOR, '/CYTOPLASM', 'RC1' ) )
+    printAllProperties( s, ( PROCESS, '/CYTOPLASM', 'RC1' ) )
 except:
     pass
 

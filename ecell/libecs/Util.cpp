@@ -38,13 +38,6 @@ namespace libecs
 {
 
 
-  RandomNumberGenerator* theRandomNumberGenerator = 
-  new RandomNumberGenerator( 
-			    // FIXME: is this cast good?
-			    // should be reinterpret_cast or something?
-			    static_cast<Real>( time( NULLPTR ) ) ,
-			    RANDOM_NUMBER_BUFFER_SIZE);
-
   template<> const Real stringTo<Real>( StringCref str )
   {
     // FIXME: error check, throw exception

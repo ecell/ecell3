@@ -505,17 +505,17 @@ if __name__ == "__main__":
 
         dic={'PropertyList':
              ('PropertyList', 'ClassName', 'A','B','C','Substrate','Product'),
-             'ClassName': ('MichaelisMentenReactor', ),
+             'ClassName': ('MichaelisMentenProcess', ),
              'A': ('aaa', ) ,
              'B': (1.04E-3, ) ,
              'C': (41, ),
-             'Substrate': ('Substance:/CELL/CYTOPLASM:ATP',
-                           'Substance:/CELL/CYTOPLASM:ADP',
-                           'Substance:/CELL/CYTOPLASM:AMP',
+             'Substrate': ('Variable:/CELL/CYTOPLASM:ATP',
+                           'Variable:/CELL/CYTOPLASM:ADP',
+                           'Variable:/CELL/CYTOPLASM:AMP',
                            ),
-             'Product': ('Substance:/CELL/CYTOPLASM:GLU',
-                         'Substance:/CELL/CYTOPLASM:LAC',
-                         'Substance:/CELL/CYTOPLASM:PYR',
+             'Product': ('Variable:/CELL/CYTOPLASM:GLU',
+                         'Variable:/CELL/CYTOPLASM:LAC',
+                         'Variable:/CELL/CYTOPLASM:PYR',
                          ),
              'PropertyAttributes' : ('1','2','3','4','5','6','7','8'),
              } 
@@ -523,7 +523,7 @@ if __name__ == "__main__":
         def getEntityProperty( self, fpn ):
             return simulator.dic[fpn[PROPERTY]]
     
-    fpn = FullPropertyName('Reactor:/CELL/CYTOPLASM:MichaMen:PropertyName')
+    fpn = FullPropertyName('Process:/CELL/CYTOPLASM:MichaMen:PropertyName')
 
 
 

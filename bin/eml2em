@@ -117,13 +117,13 @@ def createSystemList( anEml, aSystemPath='' ):
 
     anOptional = ''
 
-    for anID in anEml.getEntityList( 'Substance', aSystemPath ):
-        aFullID = ( SUBSTANCE, aSystemPath, anID )
+    for anID in anEml.getEntityList( 'Variable', aSystemPath ):
+        aFullID = ( VARIABLE, aSystemPath, anID )
         anOptional += createEntity( anEml, aFullID )
         anOptional += '\n'
 
-    for anID in anEml.getEntityList( 'Reactor', aSystemPath ):
-        aFullID = ( REACTOR, aSystemPath, anID )
+    for anID in anEml.getEntityList( 'Process', aSystemPath ):
+        aFullID = ( PROCESS, aSystemPath, anID )
         anOptional += createEntity( anEml, aFullID )
         anOptional += '\n'
 

@@ -57,8 +57,8 @@ namespace libecs
     enum Type
       {
 	ENTITY    = 1,
-	SUBSTANCE = 2,
-	REACTOR   = 3,
+	VARIABLE = 2,
+	PROCESS   = 3,
 	SYSTEM    = 4
       };
 
@@ -136,15 +136,15 @@ namespace libecs
       return aString;
     }
 
-    inline static StringCref  EntityTypeStringOfReactor()
+    inline static StringCref  EntityTypeStringOfProcess()
     {
-      const static String aString( "Reactor" );
+      const static String aString( "Process" );
       return aString;
     }
     
-    inline static StringCref  EntityTypeStringOfSubstance()
+    inline static StringCref  EntityTypeStringOfVariable()
     {
-      const static String aString( "Substance" );
+      const static String aString( "Variable" );
       return aString;
     }
     

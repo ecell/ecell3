@@ -330,8 +330,8 @@ class LoggerWindow(OsogoWindow):
 
 				# -------------------------------------------------
 				# creates filename
-				# from [Substance:/CELL/CYTOPLASM:E:Quantity] 
-				# to   [CYTOPLASM-E-Quantity]
+				# from [Variable:/CELL/CYTOPLASM:E:Value] 
+				# to   [CYTOPLASM-E-Value]
 				# -------------------------------------------------
 
 				aFileName=split(join(split(aFullPNString,':')[1:],'-'),'/')[-1]
@@ -582,12 +582,12 @@ if __name__ == "__main__":
 		def __init__( self ):
 			self.theSimulator = simulator()
 		def getLoggerList( self ):
-			#fpnlist = ((SUBSTANCE, '/CELL/CYTOPLASM', 'ATP', 'Quantity'),
-			#	(SUBSTANCE, '/CELL/CYTOPLASM', 'ADP', 'Quantity'),
-			#	(SUBSTANCE, '/CELL/CYTOPLASM', 'AMP', 'Quantity'))
-			fpnlist = ('Substance:/CELL/CYTOPLASM/aa:E:Quality',
-					   'Substance:/CELL/CYTOPLASM/bb:F:Quality',
-					   'Substance:/CELL/CYTOPLASM/cc:G:Quality')
+			#fpnlist = ((VARIABLE, '/CELL/CYTOPLASM', 'ATP', 'Value'),
+			#	(VARIABLE, '/CELL/CYTOPLASM', 'ADP', 'Value'),
+			#	(VARIABLE, '/CELL/CYTOPLASM', 'AMP', 'Value'))
+			fpnlist = ('Variable:/CELL/CYTOPLASM/aa:E:Quality',
+					   'Variable:/CELL/CYTOPLASM/bb:F:Quality',
+					   'Variable:/CELL/CYTOPLASM/cc:G:Quality')
 			return fpnlist
 
 		def getLogger( self, fpn ):
@@ -604,7 +604,7 @@ if __name__ == "__main__":
 	class simulator:
 
 		def __init__( self ):
-			self.dic={('Substance', '/CELL/CYTOPLASM', 'ATP','Quantity') : (1950,),}
+			self.dic={('Variable', '/CELL/CYTOPLASM', 'ATP','Value') : (1950,),}
 
 		def getEntityProperty( self, fpn ):
 			return self.dic[fpn]
@@ -617,9 +617,9 @@ if __name__ == "__main__":
 			return logger
 
 		#def getLoggerList( self ):
-		#	fpnlist = ((SUBSTANCE, '/CELL/CYTOPLASM', 'ATP', 'Quantity'),
-		#		(SUBSTANCE, '/CELL/CYTOPLASM', 'ADP', 'Quantity'),
-		#		(SUBSTANCE, '/CELL/CYTOPLASM', 'AMP', 'Quantity'))
+		#	fpnlist = ((VARIABLE, '/CELL/CYTOPLASM', 'ATP', 'Value'),
+		#		(VARIABLE, '/CELL/CYTOPLASM', 'ADP', 'Value'),
+		#		(VARIABLE, '/CELL/CYTOPLASM', 'AMP', 'Value'))
 		#	return fpnlist
 
 	class Logger:

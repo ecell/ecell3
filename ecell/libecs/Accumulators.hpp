@@ -32,7 +32,7 @@
 #ifndef ___ACCUMULATOR_H___
 #define ___ACCUMULATOR_H___
 
-#include "Substance.hpp"
+#include "Variable.hpp"
 
 namespace libecs
 {
@@ -42,7 +42,7 @@ namespace libecs
    * @{ 
    */ 
 
-  DECLARE_CLASS( SRMSubstance );
+  DECLARE_CLASS( SRMVariable );
   
   DECLARE_CLASS( SimpleAccumulator );
   DECLARE_CLASS( RoundDownAccumulator );
@@ -58,7 +58,7 @@ namespace libecs
 
     Accumulator() 
       : 
-      theSubstance( NULLPTR ) 
+      theVariable( NULLPTR ) 
     {
       ; // do nothing
     }
@@ -68,14 +68,14 @@ namespace libecs
       ; // do nothing
     }
 
-    void setOwner( SRMSubstancePtr substance ) 
+    void setOwner( SRMVariablePtr variable ) 
     { 
-      theSubstance = substance; 
+      theVariable = variable; 
     }
 
     virtual Real save() 
     { 
-      return theSubstance->getQuantity();
+      return theVariable->getValue();
     }
 
     virtual void update() 
@@ -89,14 +89,14 @@ namespace libecs
 
   protected:
 
-    void setQuantity( const Real aQuantity )
+    void setValue( const Real aValue )
     {
-      theSubstance->accumulatorSetQuantity( aQuantity );
+      theVariable->accumulatorSetValue( aValue );
     }
 
   protected:
 
-    SRMSubstancePtr theSubstance;
+    SRMVariablePtr theVariable;
 
   };
 

@@ -11,9 +11,9 @@ DigitalWindow.xpm\
 PropertyWindow.glade\
 PropertyWindow.py\
 PropertyWindow.xpm\
-SubstanceWindow.glade\
-SubstanceWindow.py\
-SubstanceWindow.xpm\
+VariableWindow.glade\
+VariableWindow.py\
+VariableWindow.xpm\
 TracerWindow.py\
 TracerWindow.glade\
 TracerWindow.xpm\

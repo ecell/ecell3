@@ -20,33 +20,33 @@ def printList( sim, primitivetype, systempath,list ):
 print 'create Simulator instance.'
 s = ecs.Simulator()
 
-print 'make substances...'
-s.createEntity('Substance','Substance:/:A','substance A')
-s.createEntity('Substance','Substance:/:B','substance B')
-s.createEntity('Substance','Substance:/:C','substance C')
+print 'make variables...'
+s.createEntity('Variable','Variable:/:A','variable A')
+s.createEntity('Variable','Variable:/:B','variable B')
+s.createEntity('Variable','Variable:/:C','variable C')
 
-print 'make reactors...'
-#s.createEntity('ConstantActivityReactor','Reactor:/:RC1','constant reactor')
+print 'make processs...'
+#s.createEntity('ConstantActivityProcess','Process:/:RC1','constant process')
 
-print 'set Substance:/:A Quantity = 30'
-s.setEntityProperty( 'Substance:/:A', 'Quantity', (30,) )
+print 'set Variable:/:A Value = 30'
+s.setEntityProperty( 'Variable:/:A', 'Value', (30,) )
 
 print 'initialize()...'
 s.initialize()
 
-substancelist = s.getEntityProperty( 'System:/:/', 'SubstanceList' )
+variablelist = s.getEntityProperty( 'System:/:/', 'VariableList' )
 
-printList( s, 'Substance', '/' , substancelist )
-
-print
-
-printProperty( s, 'Substance:/:A', 'Quantity' )
-print 'changing Quantity of Substance:/:A...'
-s.setEntityProperty( 'Substance:/:A', 'Quantity', (1,) )
-printProperty( s, 'Substance:/:A', 'Quantity' )
+printList( s, 'Variable', '/' , variablelist )
 
 print
-printAllProperties( s, 'Reactor:/:RC1' )
+
+printProperty( s, 'Variable:/:A', 'Value' )
+print 'changing Value of Variable:/:A...'
+s.setEntityProperty( 'Variable:/:A', 'Value', (1,) )
+printProperty( s, 'Variable:/:A', 'Value' )
+
+print
+printAllProperties( s, 'Process:/:RC1' )
 print
 print 'step()...'
 printProperty( s, 'System:/:/', 'CurrentTime' )

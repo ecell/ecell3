@@ -45,7 +45,7 @@ namespace libecs
   DECLARE_CLASS( Euler1Integrator );
   DECLARE_CLASS( RungeKutta4Integrator );
 
-  DECLARE_CLASS( SRMSubstance );
+  DECLARE_CLASS( SRMVariable );
 
   class Integrator
   {
@@ -60,10 +60,10 @@ namespace libecs
 
     */
 
-    typedef IntegratorPtr (* AllocatorFuncPtr )( SRMSubstanceRef );
+    typedef IntegratorPtr (* AllocatorFuncPtr )( SRMVariableRef );
 
 
-    Integrator( SRMSubstanceRef aSubstance );
+    Integrator( SRMVariableRef aVariable );
     virtual ~Integrator() {}
 
     /**
@@ -79,7 +79,7 @@ namespace libecs
 
   protected:
 
-    SRMSubstanceRef theSubstance;
+    SRMVariableRef theVariable;
     int             theStepCounter;
 
   };
@@ -89,7 +89,7 @@ namespace libecs
 
   public:
 
-    Euler1Integrator( SRMSubstanceRef aSubstance ); 
+    Euler1Integrator( SRMVariableRef aVariable ); 
     virtual ~Euler1Integrator() {}
 
     virtual int getNumberOfSteps() { return 1; }
@@ -105,7 +105,7 @@ namespace libecs
 
   public:
 
-    RungeKutta4Integrator( SRMSubstanceRef aSubstance );
+    RungeKutta4Integrator( SRMVariableRef aVariable );
     virtual ~RungeKutta4Integrator() {}
 
 
@@ -123,7 +123,7 @@ namespace libecs
 
   private:
 
-    Real              theOriginalQuantity;
+    Real              theOriginalValue;
 
     Real              theK[4];
 

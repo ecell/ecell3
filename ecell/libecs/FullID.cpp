@@ -271,7 +271,7 @@ main()
 
   try
     {
-      FullID aFullID( "       \t  \n  Substance:/A/B:S   \t   \n" );
+      FullID aFullID( "       \t  \n  Variable:/A/B:S   \t   \n" );
       cout << aFullID.getString() << endl;
       cout << aFullID.getEntityType() << endl;
       cout << aFullID.getSystemPath().getString() << endl;
@@ -281,7 +281,7 @@ main()
       FullID aFullID2( aFullID );
       cout << aFullID2.getString() << endl;
 
-      FullID aFullID3( "Reactor:/:R" );
+      FullID aFullID3( "Process:/:R" );
       cout << aFullID3.getString() << endl;
       aFullID3 = aFullID2;
       cout << aFullID3.getString() << endl;
@@ -290,7 +290,7 @@ main()
       //      FullPN aFullPN( 1,aFullID.getSystemPath(),"/", "PNAME" );
 
       FullPN 
-	aFullPN( "       \t  \n  Substance:/A/B:S:PNAME   \t   \n" );
+	aFullPN( "       \t  \n  Variable:/A/B:S:PNAME   \t   \n" );
       cout << aFullPN.getString() << endl;
       cout << aFullPN.getEntityType() << endl;
       cout << aFullPN.getSystemPath().getString() << endl;
@@ -301,7 +301,7 @@ main()
       FullPN aFullPN2( aFullPN );
       cout << aFullPN2.getString() << endl;
 
-      FullPN aFullPN3( "Reactor:/:R:P" );
+      FullPN aFullPN3( "Process:/:R:P" );
       cout << aFullPN3.getString() << endl;
       aFullPN3 = aFullPN2;
       cout << aFullPN3.getString() << endl;

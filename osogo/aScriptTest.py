@@ -3,8 +3,8 @@
 from ecssupport import *
 
 ENTITY     = 1
-SUBSTANCE  = 2
-REACTOR    = 3
+VARIABLE  = 2
+PROCESS    = 3
 SYSTEM     = 4
 
 aMainWindow.printMessage("load rule\n")
@@ -20,38 +20,38 @@ aMainWindow.theSimulator.createEntity( 'System', ( SYSTEM, '/CELL', 'CYTOPLASM' 
 aMainWindow.theSimulator.createEntity( 'System', ( SYSTEM, '/CELL', 'MEMBRANE' ), 'membrane' )
 aMainWindow.theSimulator.createEntity( 'System', ( SYSTEM, '/', 'ENVIRONMENT' ), 'environment' )
 
-aMainWindow.printMessage('make substances...')
-aMainWindow.theSimulator.createEntity( 'Substance', ( SUBSTANCE, '/', 'A' ), 'substance A' )
-aMainWindow.theSimulator.createEntity( 'Substance', ( SUBSTANCE, '/', 'B' ), 'substance B' )
-aMainWindow.theSimulator.createEntity( 'Substance', ( SUBSTANCE, '/', 'C' ), 'substance C' )
+aMainWindow.printMessage('make variables...')
+aMainWindow.theSimulator.createEntity( 'Variable', ( VARIABLE, '/', 'A' ), 'variable A' )
+aMainWindow.theSimulator.createEntity( 'Variable', ( VARIABLE, '/', 'B' ), 'variable B' )
+aMainWindow.theSimulator.createEntity( 'Variable', ( VARIABLE, '/', 'C' ), 'variable C' )
 
-#  aMainWindow.theSimulator.createEntity( 'Substance', ( SUBSTANCE, '/CELL/CYTOPLASM', 'ATP' ), 'substance ATP' )
-#  aMainWindow.theSimulator.createEntity( 'Substance', ( SUBSTANCE, '/CELL/CYTOPLASM', 'ADP' ), 'substance ADP' )
-#  aMainWindow.theSimulator.createEntity( 'Substance', ( SUBSTANCE, '/CELL/CYTOPLASM', 'AMP' ), 'substance AMP' )
+#  aMainWindow.theSimulator.createEntity( 'Variable', ( VARIABLE, '/CELL/CYTOPLASM', 'ATP' ), 'variable ATP' )
+#  aMainWindow.theSimulator.createEntity( 'Variable', ( VARIABLE, '/CELL/CYTOPLASM', 'ADP' ), 'variable ADP' )
+#  aMainWindow.theSimulator.createEntity( 'Variable', ( VARIABLE, '/CELL/CYTOPLASM', 'AMP' ), 'variable AMP' )
 
-#  aMainWindow.theSimulator.createEntity( 'Substance', ( SUBSTANCE, '/ENVIRONMENT', 'GLU' ), 'Glucose' )
-#  aMainWindow.theSimulator.createEntity( 'Substance', ( SUBSTANCE, '/ENVIRONMENT', 'PYR' ), 'Pyruvate' )
-#  aMainWindow.theSimulator.createEntity( 'Substance', ( SUBSTANCE, '/ENVIRONMENT', 'LCT' ), 'Lactate' )
+#  aMainWindow.theSimulator.createEntity( 'Variable', ( VARIABLE, '/ENVIRONMENT', 'GLU' ), 'Glucose' )
+#  aMainWindow.theSimulator.createEntity( 'Variable', ( VARIABLE, '/ENVIRONMENT', 'PYR' ), 'Pyruvate' )
+#  aMainWindow.theSimulator.createEntity( 'Variable', ( VARIABLE, '/ENVIRONMENT', 'LCT' ), 'Lactate' )
 
-#  aMainWindow.theSimulator.createEntity( 'Substance', ( SUBSTANCE, '/CELL/MEMBRANE', 'CI' ), 'Channel 1' )
-#  aMainWindow.theSimulator.createEntity( 'Substance', ( SUBSTANCE, '/CELL/MEMBRANE', 'CII' ), 'Channel 2' )
-#  aMainWindow.theSimulator.createEntity( 'Substance', ( SUBSTANCE, '/CELL/MEMBRANE', 'CIII' ), 'Channel 3' )
+#  aMainWindow.theSimulator.createEntity( 'Variable', ( VARIABLE, '/CELL/MEMBRANE', 'CI' ), 'Channel 1' )
+#  aMainWindow.theSimulator.createEntity( 'Variable', ( VARIABLE, '/CELL/MEMBRANE', 'CII' ), 'Channel 2' )
+#  aMainWindow.theSimulator.createEntity( 'Variable', ( VARIABLE, '/CELL/MEMBRANE', 'CIII' ), 'Channel 3' )
 
 
-aMainWindow.printMessage("make reactors...\n")
+aMainWindow.printMessage("make processs...\n")
 try:
-    aMainWindow.theSimulator.createEntity('ConstantActivityReactor',
-                                         ( REACTOR, '/CELL/CYTOPLASM', 'RC1' ),
-                                         'constant reactor' )
+    aMainWindow.theSimulator.createEntity('ConstantActivityProcess',
+                                         ( PROCESS, '/CELL/CYTOPLASM', 'RC1' ),
+                                         'constant process' )
 except:
-    print 'cannot instantiate ConstantActivityReactor'
+    print 'cannot instantiate ConstantActivityProcess'
    
-#  print 'set Substance:/CELL/CYTOPLASM:ATP Quantity = 30'
-#  aMainWindow.theSimulator.setEntityProperty( ( SUBSTANCE, '/CELL/CYTOPLASM', 'ATP', 'Quantity' ), (30,) )
+#  print 'set Variable:/CELL/CYTOPLASM:ATP Value = 30'
+#  aMainWindow.theSimulator.setEntityProperty( ( VARIABLE, '/CELL/CYTOPLASM', 'ATP', 'Value' ), (30,) )
 
 aMainWindow.printMessage("initialize()...\n")
 aMainWindow.theSimulator.initialize()
 
 printAllProperties( aMainWindow.theSimulator, ( SYSTEM, '', '/' ) )
 printAllProperties( aMainWindow.theSimulator, ( SYSTEM, '/', 'CYTOPLASM' ) )
-printProperty( aMainWindow.theSimulator, ( SUBSTANCE, '/', 'A', 'Quantity' ) )
+printProperty( aMainWindow.theSimulator, ( VARIABLE, '/', 'A', 'Value' ) )

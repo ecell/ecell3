@@ -91,7 +91,7 @@ namespace libecs
     /**
        Get EntityType of this Entity.
 
-       This method is overridden in Substance, Reactor and System classes.
+       This method is overridden in Variable, Process and System classes.
 
        @return EntityType of this Entity object.
        @see EntityType

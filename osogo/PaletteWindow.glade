@@ -50,13 +50,13 @@
     <widget>
       <class>GtkRadioButton</class>
       <child_name>Toolbar:button</child_name>
-      <name>substance_button</name>
+      <name>variable_button</name>
       <signal>
 	<name>toggled</name>
-	<handler>substance_button_toggled</handler>
+	<handler>variable_button_toggled</handler>
 	<last_modification_time>Wed, 15 Aug 2001 09:54:29 GMT</last_modification_time>
       </signal>
-      <label>Substance</label>
+      <label>Variable</label>
       <stock_pixmap>GNOME_STOCK_PIXMAP_UP</stock_pixmap>
       <active>False</active>
     </widget>

@@ -11,74 +11,74 @@ class simulator :
 
     def __init__(self) :
         self.theATP={
-            'PropertyList': ( 'PropertyList', 'Activity', 'Quantity', 'Concentration','ClassName' ),
-            'ClassName' : ('Substance',),
+            'PropertyList': ( 'PropertyList', 'Activity', 'Value', 'Concentration','ClassName' ),
+            'ClassName' : ('Variable',),
             'Name' : ('ATP Molecule',),
             'Activity' : (100, ),
-            'Quantity' : (15, ),
+            'Value' : (15, ),
             'Concentration' : (0.0017, )
             }
     
         self.theADP={
-            'PropertyList': ( 'PropertyList', 'Activity', 'Quantity', 'Concentration','ClassName' ),
-            'ClassName' : ('Substance',),
+            'PropertyList': ( 'PropertyList', 'Activity', 'Value', 'Concentration','ClassName' ),
+            'ClassName' : ('Variable',),
             'Name' : ('ADP Molecule',),
             'Activity' : (120, ),
-            'Quantity' : (30, ),
+            'Value' : (30, ),
             'Concentration' : (0.0318318, )
             }
     
         self.theAMP={
-            'PropertyList': ( 'PropertyList', 'Activity', 'Quantity', 'Concentration','ClassName' ),
-            'ClassName' : ('Substance',),
+            'PropertyList': ( 'PropertyList', 'Activity', 'Value', 'Concentration','ClassName' ),
+            'ClassName' : ('Variable',),
             'Name' : ('AMP Molecule',),
             'Activity' : (777, ),
-            'Quantity' : (40, ),
+            'Value' : (40, ),
             'Concentration' : (0.0037, )
             }
 
         self.theAaa={
-            'PropertyList': ( 'PropertyList', 'Activity', 'Quantity', 'Concentration','ClassName' ),
-            'ClassName' : ('Substance',),
+            'PropertyList': ( 'PropertyList', 'Activity', 'Value', 'Concentration','ClassName' ),
+            'ClassName' : ('Variable',),
             'Name' : ('Aaa Molecule',),
             'Activity' : (100, ),
-            'Quantity' : (45, ),
+            'Value' : (45, ),
             'Concentration' : (0.03103, )
             }
 
         self.theBbb={
-            'PropertyList': ( 'PropertyList', 'Activity', 'Quantity', 'Concentration','ClassName' ),
-            'ClassName' : ('Substance',),
+            'PropertyList': ( 'PropertyList', 'Activity', 'Value', 'Concentration','ClassName' ),
+            'ClassName' : ('Variable',),
             'Name' : ('Bbb Molecule',),
             'Activity' : (38976, ),
-            'Quantity' : (18394, ),
+            'Value' : (18394, ),
             'Concentration' : (0.001083, )
             }
 
         self.theCcc={
-            'PropertyList': ( 'PropertyList', 'Activity', 'Quantity', 'Concentration','ClassName' ),
-            'ClassName' : ('Substance',),
+            'PropertyList': ( 'PropertyList', 'Activity', 'Value', 'Concentration','ClassName' ),
+            'ClassName' : ('Variable',),
             'Name' : ('Ccc Molecule',),
             'Activity' : (938, ),
-            'Quantity' : (896, ),
+            'Value' : (896, ),
             'Concentration' : (0.082136, )
             }
 
         self.theDdd={
-            'PropertyList': ( 'PropertyList', 'Activity', 'Quantity', 'Concentration','ClassName' ),
-            'ClassName' : ('Substance',),
+            'PropertyList': ( 'PropertyList', 'Activity', 'Value', 'Concentration','ClassName' ),
+            'ClassName' : ('Variable',),
             'Name' : ('Ddd Molecule',),
             'Activity' : (765938, ),
-            'Quantity' : (89696, ),
+            'Value' : (89696, ),
             'Concentration' : (0.0782136, )
             }
 
         self.theEee={
-            'PropertyList': ( 'PropertyList', 'Activity', 'Quantity', 'Concentration','ClassName' ),
-            'ClassName' : ('Substance',),
+            'PropertyList': ( 'PropertyList', 'Activity', 'Value', 'Concentration','ClassName' ),
+            'ClassName' : ('Variable',),
             'Name' : ('Eee Molecule',),
             'Activity' : (9978638, ),
-            'Quantity' : (89876, ),
+            'Value' : (89876, ),
             'Concentration' : (0.09682136, )
             }
 
@@ -87,11 +87,11 @@ class simulator :
             'Activity': ( 123, ),
             'Km' : ( 1.233, ),
             'Vmax' : ( 349, ),
-            'Substrate': ('Substance:/CELL/CYTOPLASM:ATP',
-                          'Substance:/CELL/CYTOPLASM:ADP', ),
-            'Product': ('Substance:/CELL/CYTOPLASM:AMP', ),
-            'ClassName' : 'MichaelisMentenReactor',
-            'Name' : ('AAA Reactor',)
+            'Substrate': ('Variable:/CELL/CYTOPLASM:ATP',
+                          'Variable:/CELL/CYTOPLASM:ADP', ),
+            'Product': ('Variable:/CELL/CYTOPLASM:AMP', ),
+            'ClassName' : 'MichaelisMentenProcess',
+            'Name' : ('AAA Process',)
             }
 
         self.theBBB={
@@ -99,17 +99,17 @@ class simulator :
             'Activity': ( 123, ),
             'Km' : ( 1.233, ),
             'Vmax' : ( 349, ),
-            'Substrate': ('Substance:/ENVIRONMENT:Ccc',),
-            'Product': ('Substance:/ENVIRONMENT:Ddd', 'Substance:/ENVIRONMENT:Eee' ),
-            'ClassName' : 'MichaosUniUniReactor',
-            'Name' : ('BBB Reactor',)
+            'Substrate': ('Variable:/ENVIRONMENT:Ccc',),
+            'Product': ('Variable:/ENVIRONMENT:Ddd', 'Variable:/ENVIRONMENT:Eee' ),
+            'ClassName' : 'MichaosUniUniProcess',
+            'Name' : ('BBB Process',)
             }
 
         self.theCytoplasm={
-            'PropertyList': ( 'PropertyList', 'SystemList', 'SubstanceList', 'ReactorList', 'ClassName', 'Activity' ),
+            'PropertyList': ( 'PropertyList', 'SystemList', 'VariableList', 'ProcessList', 'ClassName', 'Activity' ),
             'SystemList' : ( ) ,
-            'SubstanceList' : ( 'ATP', 'ADP', 'AMP'),
-            'ReactorList' : ( 'AAA', ),
+            'VariableList' : ( 'ATP', 'ADP', 'AMP'),
+            'ProcessList' : ( 'AAA', ),
             'ClassName': ( 'System', ),
             'Name' : ('Cytoplasm System',),
             'ATP' : self.theATP,
@@ -119,10 +119,10 @@ class simulator :
             }
 
         self.theCell={
-            'PropertyList': ( 'PropertyList', 'SystemList', 'SubstanceList', 'ReactorList', 'ClassName', 'Activity' ),
+            'PropertyList': ( 'PropertyList', 'SystemList', 'VariableList', 'ProcessList', 'ClassName', 'Activity' ),
             'SystemList' : ( 'CYTOPLASM', ),
-            'SubstanceList' : ( 'Aaa', 'Bbb' ),
-            'ReactorList' : ( ),
+            'VariableList' : ( 'Aaa', 'Bbb' ),
+            'ProcessList' : ( ),
             'ClassName': ( 'System', ),
             'Name' : ('Cell System',),
             'CYTOPLASM' : self.theCytoplasm,
@@ -131,10 +131,10 @@ class simulator :
             }
         
         self.theEnvironment={
-            'PropertyList': ( 'PropertyList', 'SystemList', 'SubstanceList', 'ReactorList', 'ClassName', 'Activity' ),
+            'PropertyList': ( 'PropertyList', 'SystemList', 'VariableList', 'ProcessList', 'ClassName', 'Activity' ),
             'SystemList' : ( ) ,
-            'SubstanceList' : ( 'Ccc', 'Ddd', 'Eee'),
-            'ReactorList' : ( 'BBB', ),
+            'VariableList' : ( 'Ccc', 'Ddd', 'Eee'),
+            'ProcessList' : ( 'BBB', ),
             'ClassName': ( 'System', ),
             'Name' : ('Environtment System',),
             'Ccc' : self.theCcc,
@@ -143,10 +143,10 @@ class simulator :
             }
 
         self.theRootSystem= {
-            'PropertyList': ( 'PropertyList', 'SystemList', 'SubstanceList', 'ReactorList', 'ClassName', 'Activity' ),
+            'PropertyList': ( 'PropertyList', 'SystemList', 'VariableList', 'ProcessList', 'ClassName', 'Activity' ),
             'SystemList' : ( 'CELL', 'ENVIRONMENT' ),
-            'SubstanceList' : ( ),
-            'ReactorList' : ( ),
+            'VariableList' : ( ),
+            'ProcessList' : ( ),
             'ClassName': ( 'System', ),
             'Name' : ('Root System',),
             'Activity': ( 1234, ),
@@ -165,13 +165,13 @@ class simulator :
             for x in aSystemList[1:] :
                 aSystem = aSystem[ x ]
             
-        if fpn[TYPE] == SUBSTANCE :
-            aSubstance = aSystem[fpn[ID]]
-            return aSubstance[fpn[PROPERTY]]
+        if fpn[TYPE] == VARIABLE :
+            aVariable = aSystem[fpn[ID]]
+            return aVariable[fpn[PROPERTY]]
 
-        elif fpn[TYPE] == REACTOR :
-            aReactor = aSystem[fpn[ID]]
-            return aReactor[fpn[PROPERTY]]
+        elif fpn[TYPE] == PROCESS :
+            aProcess = aSystem[fpn[ID]]
+            return aProcess[fpn[PROPERTY]]
 
         elif fpn[TYPE] == SYSTEM :
             if fpn[ID] == '/' and fpn[SYSTEMPATH] == '/':
@@ -191,16 +191,16 @@ class simulator :
             for x in aSystemList[1:] :
                 aSystem = aSystem[ x ]
             
-        if fpn[TYPE] == SUBSTANCE :
-            aSubstance = aSystem[fpn[ID]]
-            aSubstance[fpn[PROPERTY]] = arg_list
+        if fpn[TYPE] == VARIABLE :
+            aVariable = aSystem[fpn[ID]]
+            aVariable[fpn[PROPERTY]] = arg_list
             print arg_list ,
             print ' is set to ' ,
             print fpn[PROPERTY]
 
-        elif fpn[TYPE] == REACTOR :
-            aReactor = aSystem[fpn[ID]]
-            aReactor[fpn[PROPERTY]] = arg_list
+        elif fpn[TYPE] == PROCESS :
+            aProcess = aSystem[fpn[ID]]
+            aProcess[fpn[PROPERTY]] = arg_list
             print arg_list ,
             print ' is set to ' ,
             print fpn[PROPERTY]

@@ -57,40 +57,40 @@ print anEntityList,'\n'
 
 
 ## 
-anEntityType = 'Substance'
+anEntityType = 'Variable'
 aSystemPath  = '/CELL/CYTOPLASM'
-print '## TEST for getEntityList ( EntityType: Substance, SystemPath: /CELL/CYTOPLASM )'
+print '## TEST for getEntityList ( EntityType: Variable, SystemPath: /CELL/CYTOPLASM )'
 anEntityList = anEml.getEntityList( anEntityType, aSystemPath )
 print anEntityList, '\n'
 
 
 ## 
-anEntityType = 'Reactor'
+anEntityType = 'Process'
 aSystemPath  = '/CELL/CYTOPLASM'
-print '## TEST for getEntityList ( EntityType: Reactor, SystemPath: /CELL/CYTOPLASM )'
+print '## TEST for getEntityList ( EntityType: Process, SystemPath: /CELL/CYTOPLASM )'
 anEntityList = anEml.getEntityList( anEntityType, aSystemPath )
 print anEntityList, '\n'
 
 
 
 ## 
-print '## TEST for getEntityPropertyList (Substance S)'
-anEntityPropertyList = anEml.getEntityPropertyList( 'Substance:/CELL/CYTOPLASM:S' )
+print '## TEST for getEntityPropertyList (Variable S)'
+anEntityPropertyList = anEml.getEntityPropertyList( 'Variable:/CELL/CYTOPLASM:S' )
 print anEntityPropertyList, '\n'
 
 ## 
-print '## TEST for getEntityPropertyList (Reactor E)'
-anEntityPropertyList = anEml.getEntityPropertyList( 'Reactor:/CELL/CYTOPLASM:E' )
+print '## TEST for getEntityPropertyList (Process E)'
+anEntityPropertyList = anEml.getEntityPropertyList( 'Process:/CELL/CYTOPLASM:E' )
 print anEntityPropertyList, '\n'
 
 ## 
-print '## TEST for getEntityProperty (Substance S, Quantity)'
-anEntityProperty = anEml.getEntityProperty( 'Substance:/CELL/CYTOPLASM:S', 'Quantity' )
+print '## TEST for getEntityProperty (Variable S, Value)'
+anEntityProperty = anEml.getEntityProperty( 'Variable:/CELL/CYTOPLASM:S', 'Value' )
 print anEntityProperty, '\n'
 
 ## 
-print '## TEST for getEntityProperty (Reactant E, Reactant)'
-anEntityProperty = anEml.getEntityProperty( 'Reactor:/CELL/CYTOPLASM:E', 'Reactant' )
+print '## TEST for getEntityProperty (Connection E, Connection)'
+anEntityProperty = anEml.getEntityProperty( 'Process:/CELL/CYTOPLASM:E', 'Connection' )
 print anEntityProperty, '\n'
 
 

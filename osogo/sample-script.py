@@ -14,13 +14,13 @@ aModelInterpreter = aSession.theModelInterpreter
 aModelInterpreter.load( aCellModelObject )
 aDriver.initialize()
 
-aDriver.printProperty( ( SUBSTANCE, '/CELL/CYTOPLASM', 'S', 'Quantity' ) )
-aDriver.printProperty( ( SUBSTANCE, '/CELL/CYTOPLASM', 'P', 'Quantity' ) )
-aDriver.printProperty( ( SUBSTANCE, '/CELL/CYTOPLASM', 'E', 'Quantity' ) )
+aDriver.printProperty( ( VARIABLE, '/CELL/CYTOPLASM', 'S', 'Value' ) )
+aDriver.printProperty( ( VARIABLE, '/CELL/CYTOPLASM', 'P', 'Value' ) )
+aDriver.printProperty( ( VARIABLE, '/CELL/CYTOPLASM', 'E', 'Value' ) )
 
 #print '------------------------------------a'
-#aDriver.getLogger( ( SUBSTANCE, '/CELL/CYTOPLASM', 'S', 'Quantity' ) )
-#aDriver.getLogger( ( SUBSTANCE, '/CELL/CYTOPLASM', 'P', 'Quantity' ) )
+#aDriver.getLogger( ( VARIABLE, '/CELL/CYTOPLASM', 'S', 'Value' ) )
+#aDriver.getLogger( ( VARIABLE, '/CELL/CYTOPLASM', 'P', 'Value' ) )
 #print aDriver.getLoggerList()
 #aDriver.initialize()
 #print '------------------------------------b'
@@ -29,9 +29,9 @@ print '----------------- LoggerList -------------------'
 print aDriver.getLoggerList()
 print '------------------------------------'
 
-loggerS = aDriver.getLogger( ( SUBSTANCE, '/CELL/CYTOPLASM', 'S', 'Quantity' ) )
-loggerP = aDriver.getLogger( ( SUBSTANCE, '/CELL/CYTOPLASM', 'P', 'Quantity' ) )
-loggerE = aDriver.getLogger( ( SUBSTANCE, '/CELL/CYTOPLASM', 'E', 'Quantity' ) )
+loggerS = aDriver.getLogger( ( VARIABLE, '/CELL/CYTOPLASM', 'S', 'Value' ) )
+loggerP = aDriver.getLogger( ( VARIABLE, '/CELL/CYTOPLASM', 'P', 'Value' ) )
+loggerE = aDriver.getLogger( ( VARIABLE, '/CELL/CYTOPLASM', 'E', 'Value' ) )
 
 print '----------------- LoggerList -------------------'
 print aDriver.getLoggerList()
@@ -44,17 +44,17 @@ aSession.run( 100 )
 
 print aDriver.getCurrentTime()
 
-aDriver.printProperty( ( SUBSTANCE, '/CELL/CYTOPLASM', 'S', 'Quantity' ) )
-aDriver.printProperty( ( SUBSTANCE, '/CELL/CYTOPLASM', 'P', 'Quantity' ) )
-aDriver.printProperty( ( SUBSTANCE, '/CELL/CYTOPLASM', 'E', 'Quantity' ) )
+aDriver.printProperty( ( VARIABLE, '/CELL/CYTOPLASM', 'S', 'Value' ) )
+aDriver.printProperty( ( VARIABLE, '/CELL/CYTOPLASM', 'P', 'Value' ) )
+aDriver.printProperty( ( VARIABLE, '/CELL/CYTOPLASM', 'E', 'Value' ) )
 
 aSession.run( 100 )
 
 print aDriver.getCurrentTime()
 
-aDriver.printProperty( ( SUBSTANCE, '/CELL/CYTOPLASM', 'S', 'Quantity' ) )
-aDriver.printProperty( ( SUBSTANCE, '/CELL/CYTOPLASM', 'P', 'Quantity' ) )
-aDriver.printProperty( ( SUBSTANCE, '/CELL/CYTOPLASM', 'E', 'Quantity' ) )
+aDriver.printProperty( ( VARIABLE, '/CELL/CYTOPLASM', 'S', 'Value' ) )
+aDriver.printProperty( ( VARIABLE, '/CELL/CYTOPLASM', 'P', 'Value' ) )
+aDriver.printProperty( ( VARIABLE, '/CELL/CYTOPLASM', 'E', 'Value' ) )
 
 #print loggerS.getData()
 
