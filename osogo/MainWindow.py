@@ -41,6 +41,7 @@ from main import *
 if GNOME_INSTALLED =='yes':
     import gnome.ui
 
+
 import gtk
 
 import MessageWindow

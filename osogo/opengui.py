@@ -11,6 +11,8 @@ __license__ = 'GPL'
 import sys
 
 try:
+	import pygtk
+	pygtk.require('2.0')
 	import os
 	import string 
 	import getopt
