@@ -42,7 +42,7 @@ import string
 import os
 import imp
 import glob
-from ecell.ECS import *
+from ecell.ecs_constants import *
 from config import *
 from ecell.Plugin import *
 

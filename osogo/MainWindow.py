@@ -55,7 +55,7 @@ import traceback
 #
 from ecell.GtkSessionMonitor import *
 from ecell.ecssupport import *
-from ecell.ECS import *
+from ecell.ecs_constants import *
 from ConfirmWindow import *
 
 NAME        = 'gecell (Osogo)'

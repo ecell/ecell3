@@ -39,7 +39,7 @@ import os
 
 from config import *
 from gtk import *
-from ecell.ECS import *
+from ecell.ecs_constants import *
 import string
 import sys
 import traceback
