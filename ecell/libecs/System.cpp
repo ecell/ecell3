@@ -102,8 +102,9 @@ namespace libecs
     //    CREATE_PROPERTYSLOT_GET    ( Polymorph, SystemList,   System );
     //    CREATE_PROPERTYSLOT_GET    ( Polymorph, VariableList, System );
     //    CREATE_PROPERTYSLOT_GET    ( Polymorph, ProcessList,  System );
-    CREATE_PROPERTYSLOT_SET_GET( String,    StepperID,    System );
+    CREATE_PROPERTYSLOT_SET_GET( Real,      Dimension,       System );
     CREATE_PROPERTYSLOT_SET_GET( Real,      Volume,       System );
+    CREATE_PROPERTYSLOT_SET_GET( String,    StepperID,    System );
   }
 
   System::~System()
@@ -272,7 +273,8 @@ namespace libecs
 
   VirtualSystem::VirtualSystem()
   {
-    //    CREATE_PROPERTYSLOT_GET( Polymorph, ProcessList, VirtualSystem );
+    CREATE_PROPERTYSLOT_GET( Real, Dimension, VirtualSystem );
+    CREATE_PROPERTYSLOT_GET( Real, Volume, VirtualSystem );
   }
 
   VirtualSystem::~VirtualSystem()
@@ -382,8 +384,10 @@ namespace libecs
 
   CompartmentSystem::CompartmentSystem()
     :
-    theVolume( 1.0 )
+    theVolume( 1.0 ),
+    theDimension( 3.0 )
   {
+    CREATE_PROPERTYSLOT_SET_GET( Real, Dimension, System );
     CREATE_PROPERTYSLOT_SET_GET( Real, Volume, System );
   }
 

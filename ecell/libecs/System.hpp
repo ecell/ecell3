@@ -120,6 +120,20 @@ namespace libecs
     }
 
     /**
+       Set a new spatial dimension of this System.
+
+     */
+
+    virtual SET_METHOD( Real, Dimension ) = 0;
+
+    /**
+       Get the spatial dimension of this System.
+
+    */
+
+    virtual GET_METHOD( Real, Dimension ) = 0;
+
+    /**
        Set a new volume of this System in [L] (liter).
 
        The volume is updated at the beginning of the next step.
@@ -128,6 +142,7 @@ namespace libecs
      */
 
     virtual SET_METHOD( Real, Volume ) = 0;
+
 
     template <class C>
     const std::map<const String,C*,std::less<const String> >& getMap() const
@@ -327,6 +342,17 @@ namespace libecs
       getSuperSystem()->setVolume( value );
     }
 
+
+    virtual GET_METHOD( Real, Dimension )
+    {
+      return getSuperSystem()->getDimension();
+    }
+
+    virtual SET_METHOD( Real, Dimension )
+    {
+      getSuperSystem()->setDimension( value );
+    }
+
     virtual void initialize();
 
     virtual void registerProcess( ProcessPtr aProcess );
@@ -407,11 +433,23 @@ namespace libecs
       theVolume = value;
     }
 
+
+    virtual GET_METHOD( Real, Dimension )
+    {
+      return theDimension;
+    }
+
+    virtual SET_METHOD( Real, Dimension )
+    {
+      theDimension = value;
+    }
+
     virtual void initialize();
  
   private:
 
     Real theVolume;
+    Real theDimension;
 
   };
 
