@@ -32,8 +32,8 @@ TableIO.py\
 emparser.py\
 lex.py\
 yacc.py\
-lextab.py\
-parser.out
+emlextab.py\
+emparsetab.py
 
 INCLUDES=-I. -I.. ${PYTHON_INCLUDES}
 
