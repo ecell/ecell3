@@ -188,10 +188,14 @@ class PropertyWindow(OsogoPluginWindow):
                 
 			aValueString = str( aValue )
 			if( len( aValueString ) > 30 ):
-				aValueString = aValueString[:20]\
-					       + ' .. (' +\
-					       str( len( aValue ) ) +\
-					       ' items)'
+				if type( aValue ) == list or\
+				   type( aValue ) == tuple:
+					aValueString = aValueString[:20]\
+						       + ' .. (' +\
+						       str( len( aValue ) ) +\
+						       ' items)'
+				else:
+					aValueString = aValueString[:25]+ ' ..'
 
 			aList = [ aProperty, aValueString, aGetString, aSetString ]
 			self.theList.append( aList )
