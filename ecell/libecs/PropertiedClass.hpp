@@ -104,6 +104,14 @@ public:\
  {\
   return thePropertyInterface.getProperty( *this, aPropertyName );\
  }\
+ virtual void loadProperty( StringCref aPropertyName, PolymorphCref aValue )\
+ {\
+  thePropertyInterface.loadProperty( *this, aPropertyName, aValue );\
+ }\
+ virtual const Polymorph saveProperty( StringCref aPropertyName ) const\
+ {\
+  thePropertyInterface.saveProperty( *this, aPropertyName );\
+ }\
  virtual const Polymorph getPropertyList() const\
  {\
   return thePropertyInterface.getPropertyList();\
@@ -131,6 +139,17 @@ public:\
 #define PROPERTYSLOT( TYPE, NAME, SETMETHOD, GETMETHOD )\
   PropertyInterface<TT>::registerPropertySlot( # NAME,\
          new ConcretePropertySlot<TT,TYPE>( SETMETHOD, GETMETHOD ) );
+
+#define PROPERTYSLOT_LOAD_SAVE( TYPE, NAME, SETMETHOD, GETMETHOD,\
+				LOADMETHOD, SAVEMETHOD )\
+  PropertyInterface<TT>::registerPropertySlot( # NAME,\
+         new LoadSaveConcretePropertySlot<TT,TYPE>( SETMETHOD, GETMETHOD,\
+						    LOADMETHOD, SAVEMETHOD ) )
+
+#define PROPERTYSLOT_NO_LOAD_SAVE( TYPE, NAME, SETMETHOD, GETMETHOD )\
+  PropertyInterface<TT>::registerPropertySlot( # NAME,\
+         new LoadSaveConcretePropertySlot<TT,TYPE>( SETMETHOD, GETMETHOD,\
+						    NULLPTR, NULLPTR ) )
 
 #define PROPERTYSLOT_SET_GET( TYPE, NAME )\
   PROPERTYSLOT( TYPE, NAME,\
@@ -238,6 +257,12 @@ public:\
 
     virtual const Polymorph 
     getProperty( StringCref aPropertyName ) const = 0;
+
+    virtual void 
+    loadProperty( StringCref aPropertyName, PolymorphCref aValue ) = 0;
+
+    virtual const Polymorph 
+    saveProperty( StringCref aPropertyName ) const = 0;
 
     virtual const Polymorph getPropertyList() const = 0;
 

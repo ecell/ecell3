@@ -212,6 +212,8 @@ BOOST_PYTHON_MODULE( _ecs )
 	  &Simulator::getStepperPropertyAttributes )
     .def( "setStepperProperty",           &Simulator::setStepperProperty )
     .def( "getStepperProperty",           &Simulator::getStepperProperty )
+    .def( "loadStepperProperty",          &Simulator::loadStepperProperty )
+    .def( "saveStepperProperty",          &Simulator::saveStepperProperty )
     .def( "getStepperClassName",          &Simulator::getStepperClassName )
 
 
@@ -223,6 +225,8 @@ BOOST_PYTHON_MODULE( _ecs )
     .def( "getEntityPropertyList",        &Simulator::getEntityPropertyList )
     .def( "setEntityProperty",            &Simulator::setEntityProperty )
     .def( "getEntityProperty",            &Simulator::getEntityProperty )
+    .def( "loadEntityProperty",           &Simulator::loadEntityProperty )
+    .def( "saveEntityProperty",           &Simulator::saveEntityProperty )
     .def( "getEntityPropertyAttributes", 
 	  &Simulator::getEntityPropertyAttributes )
     .def( "getEntityClassName",           &Simulator::getEntityClassName )

@@ -154,7 +154,7 @@ namespace libemc
 
   
     /**
-       Set a property value of an Stepper.
+       Set a property value of a Stepper.
 
        @param aStepperID    the Stepper ID.
        @param aValue        the value to set as a Polymorph.
@@ -170,7 +170,7 @@ namespace libemc
     }
 
     /**
-       Get a value of a property from an Stepper.
+       Get a value of a property from a Stepper.
 
        @param aStepperID the Stepper ID.
        @param aPropertyName the name of the property.
@@ -184,6 +184,40 @@ namespace libemc
     {
       return theSimulatorImplementation->getStepperProperty( aStepperID,
 							     aPropertyName );
+    }
+
+
+    /**
+       Load a property value of a Stepper.
+
+       @param aStepperID    the Stepper ID.
+       @param aValue        the value to set as a Polymorph.
+    */
+
+    void loadStepperProperty( libecs::StringCref          aStepperID,
+			      libecs::StringCref          aPropertyName,
+			      libecs::PolymorphCref aValue )
+    {
+      theSimulatorImplementation->loadStepperProperty( aStepperID,
+						       aPropertyName,
+						       aValue );
+    }
+
+    /**
+       Get a value of a property from an Stepper.
+
+       @param aStepperID the Stepper ID.
+       @param aPropertyName the name of the property.
+       @return the property value as a reference counted pointor of a 
+       Polymorph.
+    */
+
+    const libecs::Polymorph
+    saveStepperProperty( libecs::StringCref aStepperID,
+			 libecs::StringCref aPropertyName ) const
+    {
+      return theSimulatorImplementation->saveStepperProperty( aStepperID,
+							      aPropertyName );
     }
 
     /**
@@ -303,6 +337,34 @@ namespace libemc
     getEntityProperty( libecs::StringCref aFullPNString ) const
     {
       return theSimulatorImplementation->getEntityProperty( aFullPNString );
+    }
+
+
+    /**
+       Load a property value of an Entity.
+
+       @param aFullPNString a FullPN of the Property to set.
+       @param aValue        the value to be set.
+    */
+
+    void loadEntityProperty( libecs::StringCref      aFullPNString,
+			     libecs::PolymorphCref   aValue )
+    {
+      theSimulatorImplementation->loadEntityProperty( aFullPNString,
+						      aValue );
+    }
+
+    /**
+       Save a value of a property from an Entity.
+
+       @param aFullPNString a FullPN of the property.
+       @return the property value.
+    */
+
+    const libecs::Polymorph
+    saveEntityProperty( libecs::StringCref aFullPNString ) const
+    {
+      return theSimulatorImplementation->saveEntityProperty( aFullPNString );
     }
 
     /**

@@ -284,7 +284,6 @@ namespace libecs
 
   };
 
-
   template
   < 
     class T,
@@ -297,8 +296,9 @@ namespace libecs
 
   public:
 
-    typedef ConcretePropertySlot<T,SlotType_> ConcretePropertySlot;
     DECLARE_TYPE( SlotType_, SlotType );
+
+    typedef ConcretePropertySlot<T,SlotType> ConcretePropertySlot;
 
     typedef typename ConcretePropertySlot::SetType SetType;
     typedef typename ConcretePropertySlot::GetType GetType;
@@ -310,7 +310,6 @@ namespace libecs
 				  const GetMethodPtr aGetMethodPtr,
 				  const SetMethodPtr aLoadMethodPtr,
 				  const GetMethodPtr aSaveMethodPtr )
-				  
       :
       ConcretePropertySlot( aSetMethodPtr, aGetMethodPtr ),
       theLoadMethodPtr( SetMethod( aLoadMethodPtr ) ),
@@ -319,7 +318,7 @@ namespace libecs
       ; // do nothing
     }
 
-    virtual ~LoadSaveConcretePropertySlot()
+    ~LoadSaveConcretePropertySlot()
     {
       ; // do nothing
     }
@@ -327,12 +326,12 @@ namespace libecs
 
     virtual const bool isLoadable() const
     {
-      return checkSetable( theLoadMethod );
+      return checkSetable( theLoadMethodPtr );
     }
 
     virtual const bool isSavable()  const
     {
-      return checkGetable( theSaveMethod );
+      return checkGetable( theSaveMethodPtr );
     }
 
     virtual void loadPolymorph( T& anObject, PolymorphCref aValue )
@@ -365,7 +364,7 @@ namespace libecs
     
     inline const Polymorph saveImpl( const T& anObject ) const
     {
-      return convertTo<Type>( callSaveMethod( anObject ) );
+      return convertTo<SlotType>( callSaveMethod( anObject ) );
     }
 
   protected:
@@ -374,10 +373,6 @@ namespace libecs
     const GetMethodPtr theSaveMethodPtr;
 
   };
-
-
-
-
 
   /*@}*/
 

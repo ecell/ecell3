@@ -391,9 +391,9 @@ class Session:
             for aProperty in aPropertyList:
                 
                 aValue = anEml.getStepperProperty( aStepper, aProperty )
-                self.theSimulator.setStepperProperty( aStepper,\
-                                                      aProperty,\
-                                                      aValue )
+                self.theSimulator.loadStepperProperty( aStepper,\
+                                                       aProperty,\
+                                                       aValue )
                                              
     def __loadEntity( self, anEml, aSystemPath='/' ):
 
@@ -439,7 +439,8 @@ class Session:
 
             aFullPNList = map( lambda x: aFullID + ':' + x, aPropertyList ) 
             aValueList = map( anEml.getEntityProperty, aFullPNList )
-            map( self.theSimulator.setEntityProperty, aFullPNList, aValueList )
+            map( self.theSimulator.loadEntityProperty,
+                 aFullPNList, aValueList )
 
             
     def __loadEntityList( self, anEml, anEntityTypeString,\
@@ -491,16 +492,13 @@ class Session:
                 anAttribute = self.theSimulator.getStepperPropertyAttributes( aStepper, aProperty)
 
                 # check get attribute 
-                if anAttribute[1] == 0:
+                if anAttribute[3] != 0:
                     pass
                 
-                # check set attribute
-                elif anAttribute[0] == 0:
-                    pass
-
                 else:
                                     
-                    aValue = self.theSimulator.getStepperProperty( aStepper, aProperty )
+                    aValue = self.theSimulator.saveStepperProperty( aStepper,
+                                                                    aProperty )
                     #if aValue == '':
                     #    pass
                     
@@ -511,8 +509,8 @@ class Session:
                         aValueList = aValue
 
                     anEml.setStepperProperty( aStepper,\
-                                                      aProperty,\
-                                                      aValueList )
+                                              aProperty,\
+                                              aValueList )
     
     def __saveEntity( self, anEml, aSystemPath='/' ):
 
@@ -574,26 +572,25 @@ class Session:
             for aProperty in aPropertyList:
                 aFullPN = aFullID + ':' + aProperty
                 
-                aValue = self.theSimulator.getEntityProperty(aFullPN)
                 anAttribute = self.theSimulator.getEntityPropertyAttributes(aFullPN)
 
-                if anAttribute[0] == 0:
-                    pass
-                
-                elif aValue == '':
-                    pass
-                
-                else:
+                # check savable
+                if anAttribute[3] != 0:
                     
-                    aValueList = list()
-                    if type( aValue ) != tuple:
-                        aValueList.append( str(aValue) )
-                    else:
-                        # ValueList convert into string for eml
-                        aValueList = self.__convertPropertyValueList( aValue )
-                        #aValueList = aValue
-                        
-                    anEml.setEntityProperty( aFullID, aProperty, aValueList )
+                    aValue = self.theSimulator.getEntityProperty(aFullPN)
+
+                    if aValue != '':
+
+                        aValueList = list()
+                        if type( aValue ) != tuple:
+                            aValueList.append( str(aValue) )
+                        else:
+                            # ValueList convert into string for eml
+                            aValueList = self.__convertPropertyValueList( aValue )
+                            #aValueList = aValue
+                            
+                        anEml.setEntityProperty( aFullID, aProperty,
+                                                 aValueList )
                     
     def __convertPropertyValueList( self, aValueList ):
         

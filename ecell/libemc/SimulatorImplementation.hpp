@@ -84,6 +84,14 @@ namespace libemc
     getStepperProperty( libecs::StringCref aStepperID,
 			libecs::StringCref aPropertyName ) const = 0;
 
+    virtual void loadStepperProperty( libecs::StringCref    aStepperID,
+				      libecs::StringCref    aPropertyName,
+				      libecs::PolymorphCref aValue ) = 0;
+
+    virtual const libecs::Polymorph
+    saveStepperProperty( libecs::StringCref aStepperID,
+			 libecs::StringCref aPropertyName ) const = 0;
+
     virtual const libecs::String
     getStepperClassName( libecs::StringCref aStepperID ) const = 0;
 
@@ -107,6 +115,12 @@ namespace libemc
 
     virtual const libecs::Polymorph
     getEntityProperty( libecs::StringCref aFullPNString ) const = 0;
+
+    virtual void loadEntityProperty( libecs::StringCref    aFullPNString,
+				     libecs::PolymorphCref aValue ) = 0;
+
+    virtual const libecs::Polymorph
+    saveEntityProperty( libecs::StringCref aFullPNString ) const = 0;
 
     virtual const libecs::Polymorph
     getEntityPropertyAttributes( libecs::StringCref aFullPNString ) const = 0;

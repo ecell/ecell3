@@ -54,6 +54,12 @@ namespace libecs
     
     // is getable?
     aVector.push_back( static_cast<Int>( aPropertySlotPtr->isGetable() ) );
+
+    // is getable?
+    aVector.push_back( static_cast<Int>( aPropertySlotPtr->isLoadable() ) );
+
+    // is getable?
+    aVector.push_back( static_cast<Int>( aPropertySlotPtr->isSavable() ) );
     
     return aVector;
   }

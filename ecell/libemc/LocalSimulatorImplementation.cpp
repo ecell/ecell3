@@ -143,6 +143,25 @@ namespace libemc
     return aStepperPtr->getProperty( aPropertyName );
   }
 
+  void LocalSimulatorImplementation::
+  loadStepperProperty( libecs::StringCref          aStepperID,
+		       libecs::StringCref          aPropertyName,
+		       libecs::PolymorphCref aValue )
+  {
+    StepperPtr aStepperPtr( getModel().getStepper( aStepperID ) );
+    
+    aStepperPtr->loadProperty( aPropertyName, aValue );
+  }
+
+  const libecs::Polymorph LocalSimulatorImplementation::
+  saveStepperProperty( libecs::StringCref aStepperID,
+		      libecs::StringCref aPropertyName ) const
+  {
+    StepperCptr aStepperPtr( getModel().getStepper( aStepperID ) );
+
+    return aStepperPtr->saveProperty( aPropertyName );
+  }
+
   const libecs::String LocalSimulatorImplementation::
   getStepperClassName( libecs::StringCref aStepperID ) const
   {
@@ -245,6 +264,24 @@ namespace libemc
     EntityCptr anEntityPtr( getModel().getEntity( aFullPN.getFullID() ) );
 
     return anEntityPtr->getProperty( aFullPN.getPropertyName() );
+  }
+
+  void LocalSimulatorImplementation::
+  loadEntityProperty( StringCref aFullPNString, PolymorphCref aValue )
+  {
+    FullPN aFullPN( aFullPNString );
+    EntityPtr anEntityPtr( getModel().getEntity( aFullPN.getFullID() ) );
+
+    anEntityPtr->loadProperty( aFullPN.getPropertyName(), aValue );
+  }
+
+  const Polymorph LocalSimulatorImplementation::
+  saveEntityProperty( StringCref aFullPNString ) const
+  {
+    FullPN aFullPN( aFullPNString );
+    EntityCptr anEntityPtr( getModel().getEntity( aFullPN.getFullID() ) );
+
+    return anEntityPtr->saveProperty( aFullPN.getPropertyName() );
   }
 
   const libecs::Polymorph LocalSimulatorImplementation::
