@@ -73,22 +73,33 @@ class Window:
 		       throws an exception.
 		"""
 
+		# ------------------------------------------------
 		# loads GLADEFILE_PATH/CLASSNAME.glade by default
+		# ------------------------------------------------
 		if self.theGladeFile == None:
 			self.theGladeFile = GLADEFILE_PATH
 			self.theGladeFile += '/' + self.__class__.__name__ + ".glade"
 		else:
 
+			# ------------------------------------------------
 			# When abusolute path
+			# ------------------------------------------------
 			if os.path.isabs( self.theGladeFile ) :
 				pass
+			# ------------------------------------------------
 			# When relative path
+			# ------------------------------------------------
 			else:
 				self.theGladeFile = GLADEFILE_PATH + '/' + self.theGladeFile
 
+		# ------------------------------------------------
 		# checks and loads glade file
+		# ------------------------------------------------
 		if os.access( os.path.join( GLADEFILE_PATH, self.theGladeFile ), os.R_OK ):
-			self.widgets = gtk.glade.XML( self.theGladeFile, root=self.theRoot )
+			if self.theRoot != None:
+				self.widgets = gtk.glade.XML( self.theGladeFile, root='top_frame' )
+			else:
+				self.widgets = gtk.glade.XML( self.theGladeFile, root=None )
 		else:
 			raise IOError( "can't read %s." %self.theGladeFile )
 		
@@ -162,6 +173,21 @@ class Window:
 		"""
 		return self.theTitle
 
+	def getParent( self ):
+
+		if self.theRoot == None:
+			return self
+		else:
+			return self.__getParent( self.theRoot )
+
+	def __getParent( self, *obj ):
+
+		if obj[0].theRoot == None:
+			return obj[0]
+		else:
+			return obj[0].__getParent( self.theRoot )
+
+		
 
 # end of Window
 
