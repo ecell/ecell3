@@ -91,6 +91,19 @@ def createSystemPathFromFullID( aSystemFullID ):
 
     return aNewSystemPath
 
+
+def createFullIDFromSystemPath( aSystemPath ):
+    if aSystemPath == '/':
+        return  [ SYSTEM, '', '/' ]
+        
+    aPos = aSystemPath.rfind('/')
+    newSysID = [SYSTEM, aSystemPath[0:aPos], aSystemPath[aPos+1:len(aSystemPath) ] ]
+    if newSysID[1] == '':
+        newSysID[1] = '/'
+    return newSysID
+
+
+
 def joinSystemPath( aSystemPath1, aSystemPath2 ):
     if len( aSystemPath1 ) == 0:
         return aSystemPath2

@@ -384,6 +384,7 @@ class GtkSessionMonitor(Session):
 		self.updateFundamentalWindows()
 		# updates all plugin windows
 		self.thePluginManager.updateAllPluginWindow()
+
  	
 
 	# ==========================================================================
