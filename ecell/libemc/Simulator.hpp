@@ -40,6 +40,11 @@ public:
     theSimulatorImplementation->step();
   }
 
+  void initialize()
+  {
+    theSimulatorImplementation->initialize();
+  }
+
 
 private:
 

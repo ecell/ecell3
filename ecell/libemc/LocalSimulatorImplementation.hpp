@@ -28,6 +28,8 @@ public:
 
   void step();
 
+  void initialize();
+
 private:
 
   RootSystem     theRootSystem;

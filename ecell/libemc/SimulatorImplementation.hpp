@@ -31,6 +31,8 @@ public:
 			      StringCref propertyName ) = 0;
   virtual void step() = 0;
 
+  virtual void initialize() = 0;
+
 };   //end of class Simulator
 
 #endif   /* ___SIMULATOR_IMPLEMENTATION_H___ */
