@@ -3,7 +3,7 @@
 import string
 
 from PluginWindow import *
-from ecssupport import *
+from ecell.ecssupport import *
 
 import Numeric
 import GTK
