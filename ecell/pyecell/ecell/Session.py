@@ -2,12 +2,15 @@
 
 import Driver
 
-
+def plainPrintMethod( aMessage ):
+    print aMessage
+    
+        
 class Session:
 
     def __init__( self, aDriver ):
 
-        self.thePrintMethod = print
+        self.thePrintMethod = plainPrintMethod
         self.theDriver = aDriver
 
     def run( self , time='' ):
@@ -29,7 +32,7 @@ class Session:
         self.thePrintMethod = aMethod
 
     def printMessage( self, message ):
-        print message
+        self.thePrintMethod( message )
 
     def loadModel( self, aModel ):
         pass

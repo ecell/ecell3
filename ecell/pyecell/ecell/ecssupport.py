@@ -1,35 +1,9 @@
 #!/usr/bin/env python
 
+# this module is deprecated
+
+
 import string
-
-
-# PropertyAttribute bit masks
-SETABLE = 1 << 0   # == 1
-GETABLE = 1 << 1   # == 2
-
-
-# FullID and FullPN field numbers
-TYPE       = 0
-SYSTEMPATH = 1
-ID         = 2
-PROPERTY   = 3
-
-# Primitive type numbers
-ENTITY     = 1
-SUBSTANCE  = 2
-REACTOR    = 3
-SYSTEM     = 4
-
-PrimitiveTypeString =\
-( 'NONE', 'Entity', 'Substance', 'Reactor', 'System' )
-
-PrimitiveTypeDictionary =\
-{
-    'Entity'   : ENTITY,
-    'Substance': SUBSTANCE,
-    'Reactor'  : REACTOR,
-    'System'   : SYSTEM
-}    
 
 
 def createFullID( fullidstring ):

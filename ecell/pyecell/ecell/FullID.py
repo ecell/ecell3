@@ -1,30 +1,17 @@
 #!/usr/bin/env python
 
+
+# this is done in __init__.py
+# from ECS import *
+
 import string
 import types
 
-# FullID and FullPN field numbers
+# FullPN field numbers
 TYPE       = 0
 SYSTEMPATH = 1
 ID         = 2
 PROPERTY   = 3
-
-# Primitive type numbers
-ENTITY     = 1
-SUBSTANCE  = 2
-REACTOR    = 3
-SYSTEM     = 4
-
-PRIMITIVE_TYPE_STRING_LIST =\
-( 'NONE', 'Entity', 'Substance', 'Reactor', 'System' )
-
-PRIMITIVE_TYPE_DICT =\
-{
-    'Entity'   : ENTITY,
-    'Substance': SUBSTANCE,
-    'Reactor'  : REACTOR,
-    'System'   : SYSTEM
-}    
 
 
 class FullID( tuple ):
@@ -39,7 +26,7 @@ class FullID( tuple ):
                               % len( aSequence ) )
 
     def getPrimitiveTypeString( self ):
-        return PRIMITIVE_TYPE_STRING_LIST[ int( self[ TYPE ] ) ]
+        return PRIMITIVETYPE_STRING_LIST[ int( self[ TYPE ] ) ]
 
     def getSystemPathString( self ):
         return self[ SYSTEMPATH ].getString()
@@ -173,7 +160,7 @@ def convertToFullIDList( aValue ):
         if isinstance( aValue , str ):
             aList = string.split( aValue, ':' )
             try:
-                aList[ 0 ] = PRIMITIVE_TYPE_DICT[ aList[ 0 ] ]
+                aList[ 0 ] = PRIMITIVETYPE_DICT[ aList[ 0 ] ]
             except IndexError:
                 raise ValueError( 'Invalid PrimitiveType string (%s).'
                                   % aList[ 0 ] )
