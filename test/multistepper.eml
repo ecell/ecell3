@@ -47,7 +47,7 @@
 
 
 
-<system class="System" id="/CELL/CYTOPLASM1" name="Cytoplasm 1">
+<system class="System" id="/CELL/CYTOPLASM" name="Cytoplasm 1">
 
 
 <property name="StepperID">
@@ -80,19 +80,19 @@
 <reactor class="MichaelisUniUniReactor" id="E" name="E">
 <property name="Reactant">
 <value number="0">S0</value>
-<value number="1">Substance:/CELL/CYTOPLASM1:S</value>
+<value number="1">Substance:/CELL/CYTOPLASM:S</value>
 <value number="2">-1</value>
 </property>
 
 <property name="Reactant">
 <value number="0">P0</value>
-<value number="1">Substance:/CELL/CYTOPLASM1:P</value>
+<value number="1">Substance:/CELL/CYTOPLASM:P</value>
 <value number="2">1</value>
 </property>
 
 <property name="Reactant">
 <value number="0">C0</value>
-<value number="1">Substance:/CELL/CYTOPLASM1:E</value>
+<value number="1">Substance:/CELL/CYTOPLASM:E</value>
 <value number="2">0</value>
 </property>
 

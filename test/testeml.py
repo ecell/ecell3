@@ -1,5 +1,7 @@
 from Numeric import *
 
+import sys
+
 import ecell.Session
 import ecell.ecs
 
@@ -11,7 +13,7 @@ print 'create a simulation session instance'
 aSession = ecell.Session.Session( ecell.ecs.Simulator() )
 aSimulator = aSession.theSimulator
 
-aFile = open( 'simple.eml' )
+aFile = open( sys.argv[1] )
 
 print 'load Model'
 aSession.loadModel( aFile )
@@ -21,7 +23,7 @@ aFile.close()
 print 'init'
 aSimulator.initialize()
 
-aLogger1 = aSimulator.getLogger( 'Substance:/CELL/CYTOPLASM:S:Quantity'  )
+aLogger1 = aSimulator.getLogger( 'Substance:/CELL/CYTOPLASM2:S:Quantity'  )
 
 
 
