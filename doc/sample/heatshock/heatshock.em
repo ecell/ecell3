@@ -38,99 +38,99 @@ System System( / )
 {
         StepperID       @MAIN_STEPPER;
 
-        Variable PositiveVariable( SIZE )
+        Variable Variable( SIZE )
         {
                 Value   1.5e-15;
         }
 
-        Variable PositiveVariable( DNAS32 )
+        Variable Variable( DNAS32 )
         {
                 Value   1;
         }
         
-        Variable PositiveVariable( mRNAS32 )
+        Variable Variable( mRNAS32 )
         {
                 Value   17;
         }
         
-        Variable PositiveVariable( S32 )
+        Variable Variable( S32 )
         {
                 Value   15;
         }
 
 
-        Variable PositiveVariable( mRNAS32_Nothing )
+        Variable Variable( mRNAS32_Nothing )
         {
                 Value   0;
         }
 
-        Variable PositiveVariable( E_S32 )
+        Variable Variable( E_S32 )
         {
                 Value   76;
         }
         
-        Variable PositiveVariable( DNADnaJ )
+        Variable Variable( DNADnaJ )
         {
                 Value   1;
         }
 
 
-        Variable PositiveVariable( DnaJ )
+        Variable Variable( DnaJ )
         {
                 Value 464;
         }
 
-        Variable PositiveVariable( DnaJ_Nothing )
+        Variable Variable( DnaJ_Nothing )
         {
                 Value 0;
         }
 
-        Variable PositiveVariable( S32_DnaJ )
+        Variable Variable( S32_DnaJ )
         {
                 Value   2959;
         }
         
-        Variable PositiveVariable( DNAFtsH )
+        Variable Variable( DNAFtsH )
         {
                 Value   0;
         }
         
-        Variable PositiveVariable( FtsH )
+        Variable Variable( FtsH )
         {
                 Value   200;
         }
 
-        Variable PositiveVariable( FtsH_Nothing )
+        Variable Variable( FtsH_Nothing )
         {
                 Value   0;
         }
 
-        Variable PositiveVariable( DNAGroEL )
+        Variable Variable( DNAGroEL )
         {
                 Value   1;
         }
         
-        Variable PositiveVariable( GroEL )
+        Variable Variable( GroEL )
         {
                 Value   4314;
         }
         
-        Variable PositiveVariable( GroEL_Nothing )
+        Variable Variable( GroEL_Nothing )
         {
                 Value   0;
         }
 
-        Variable PositiveVariable( Protein )
+        Variable Variable( Protein )
         {
                 Value   @(PROTEIN);
         }
 
-        Variable PositiveVariable( UnProtein )
+        Variable Variable( UnProtein )
         {
                 Value   @(UNPROTEIN);
         }
 
-        Variable PositiveVariable( DnaJ_UnProtein )
+        Variable Variable( DnaJ_UnProtein )
         {
                 Value   @(DNAJ_UNPROTEIN);
         }
