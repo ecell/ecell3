@@ -38,12 +38,13 @@ namespace libecs
 {
 
   // Constructor
-  Logger::Logger( StepperCref aStepper, PropertySlotRef aPropertySlot, 
+  Logger::Logger( PropertySlotRef aPropertySlot, 
+		  StepperCref aStepper,
 		  RealCref aMinimumInterval )
 
     :
-    theStepper( aStepper ),
     thePropertySlot( aPropertySlot ),
+    theStepper( aStepper ),
     theMinimumInterval( aMinimumInterval ),
     theLastTime( theStepper.getCurrentTime() - theMinimumInterval )
   {
@@ -184,14 +185,6 @@ namespace libecs
     // dummy.
     thePhysicalLogger.push( theDataInterval.getDataPoint() );
   }
-
-  //
-
-  StringCref Logger::getName() const
-  {
-    return thePropertySlot.getName();
-  }
-
 
   //
 

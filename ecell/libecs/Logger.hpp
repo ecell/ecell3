@@ -69,7 +69,8 @@ namespace libecs
     */
   
     //    explicit Logger( ModelCref aModel, PropertySlotRef aPropertySlot );
-    explicit Logger( StepperCref aStepper, PropertySlotRef aPropertySlot,
+    explicit Logger( PropertySlotRef aPropertySlot,
+		     StepperCref aStepper, 
 		     RealCref aMinimumInterval = 0.1 );
   
     /// Destructor
@@ -105,8 +106,6 @@ namespace libecs
 				  RealCref anInterval ) ;
     
 
-
-    StringCref getName() const;
 
     /**
 
@@ -196,7 +195,6 @@ namespace libecs
 
     /// Data members
 
-    //    ModelCref            theModel;
     StepperCref          theStepper;
     PropertySlotRef      thePropertySlot;
 

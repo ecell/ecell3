@@ -90,8 +90,8 @@ namespace libecs
     PropertySlotPtr aPropertySlotPtr( aPropertySlotMapIterator->second );
 
     //    LoggerPtr aNewLogger( new Logger( theModel, *(aPropertySlotPtr) ) );
-    LoggerPtr aNewLogger( new Logger( *( anEntityPtr->getStepper() ),
-				      *(aPropertySlotPtr) ) );
+    LoggerPtr aNewLogger( new Logger( *(aPropertySlotPtr),
+				      *(anEntityPtr->getStepper()) ) );
     aPropertySlotPtr->connectLogger( aNewLogger );
     theLoggerMap[fpn] = aNewLogger;
 

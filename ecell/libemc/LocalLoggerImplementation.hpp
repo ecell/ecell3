@@ -64,11 +64,6 @@ namespace libemc
 	     libecs::RealCref end,
 	     libecs::RealCref interval );
 
-    virtual const libecs::String getName() const
-    {
-      return theLogger.getName();
-    }
-
     virtual const libecs::Real getStartTime() 
     {
       return theLogger.getStartTime();

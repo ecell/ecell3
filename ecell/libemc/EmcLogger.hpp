@@ -78,11 +78,6 @@ namespace libemc
       theLoggerImplementation = new LocalLoggerImplementation( lptr );
     }
 
-    const libecs::String getName() const
-    {
-      return theLoggerImplementation->getName();
-    }
-
     const libecs::Real getStartTime() 
     {
       return theLoggerImplementation->getStartTime();

@@ -74,7 +74,6 @@ BOOST_PYTHON_MODULE_INIT(_ecs)
 						libecs::RealCref ) )
 		    &libemc::EmcLogger::getData, 
 		    "getData" );
-  aLoggerClass.def( &libemc::EmcLogger::getName,      "getName" );  
   aLoggerClass.def( &libemc::EmcLogger::getStartTime, "getStartTime" );  
   aLoggerClass.def( &libemc::EmcLogger::getEndTime,   "getEndTime" );    
   aLoggerClass.def( &libemc::EmcLogger::getMinimumInterval,
