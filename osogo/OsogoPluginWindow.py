@@ -369,7 +369,7 @@ class OsogoPluginWindow(PluginWindow):
 	# ---------------------------------------------------------------
 	def createLogger( self, *objects ):
 
-		self.theSession.getLogger( createFullPNString(self.theFullPN()) )
+		self.theSession.createLogger( createFullPNString(self.theFullPN()) )
 		self.thePluginManager.updateFundamentalWindows()
 
 	# end of createLogger

@@ -125,6 +125,7 @@ public:\
 //  DEFINE_EXCEPTION( CallbackFailed,         Exception );
   DEFINE_EXCEPTION( AssertionFailed,        Exception );
   DEFINE_EXCEPTION( AlreadyExist,           Exception );
+  DEFINE_EXCEPTION( ValueError,             Exception );
 
   // simulation errors
   DEFINE_EXCEPTION( SimulationError,        Exception );

@@ -121,6 +121,8 @@ namespace libecs
 
     void setReactant( PolymorphCref aValue );
 
+    void setReactantList( PolymorphCref );
+
     const Polymorph getReactantList() const;
 
     void registerReactant( StringCref aName, FullIDCref aFullID,

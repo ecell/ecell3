@@ -39,13 +39,11 @@ namespace libecs
 
   // Constructor
   Logger::Logger( PropertySlotRef aPropertySlot, 
-		  StepperCref aStepper,
-		  RealCref aMinimumInterval )
-
+		  StepperCref aStepper )
     :
     thePropertySlot( aPropertySlot ),
     theStepper( aStepper ),
-    theMinimumInterval( aMinimumInterval ),
+    theMinimumInterval( 0.1 ),
     theLastTime( theStepper.getCurrentTime() - theMinimumInterval )
   {
     ; // do nothing
@@ -151,6 +149,17 @@ namespace libecs
       }
 
     return DataPointVectorRCPtr( aDataPointVector );
+  }
+
+  void Logger::setMinimumInterval( RealCref anInterval )
+  {
+    if( anInterval < 0 )
+      {
+	THROW_EXCEPTION( ValueError, 
+			 "Negative value given to Logger::MinimumInterval" );
+      }
+    
+    theMinimumInterval = anInterval;
   }
 
 

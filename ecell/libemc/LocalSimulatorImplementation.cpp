@@ -211,6 +211,13 @@ namespace libemc
     return getLogger( aFullPNString )->getEndTime();
   }
 
+  void LocalSimulatorImplementation::
+  setLoggerMinimumInterval( libecs::StringCref aFullPNString, 
+			    libecs::RealCref anInterval )
+  {
+    getLogger( aFullPNString )->setMinimumInterval( anInterval );
+  }
+
   const libecs::Real LocalSimulatorImplementation::
   getLoggerMinimumInterval( libecs::StringCref aFullPNString ) const
   {

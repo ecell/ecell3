@@ -147,6 +147,10 @@ namespace libemc
     virtual const libecs::Real 
     getLoggerEndTime( libecs::StringCref aFullPNString ) const = 0;
 
+    virtual void 
+    setLoggerMinimumInterval( libecs::StringCref aFullPNString, 
+			      libecs::RealCref anInterval ) = 0;
+
     virtual const libecs::Real 
     getLoggerMinimumInterval( libecs::StringCref aFullPNString ) const = 0;
 

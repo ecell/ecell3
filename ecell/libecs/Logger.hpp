@@ -77,8 +77,7 @@ namespace libecs
   
     //    explicit Logger( ModelCref aModel, PropertySlotRef aPropertySlot );
     explicit Logger( PropertySlotRef aPropertySlot,
-		     StepperCref aStepper, 
-		     RealCref aMinimumInterval = 0.1 );
+		     StepperCref aStepper ); 
   
     /// Destructor
 
@@ -134,6 +133,12 @@ namespace libecs
     {
       return thePhysicalLogger.size();
     }
+
+    /**
+
+    */
+
+    void setMinimumInterval( RealCref anInterval );
 
     /**
 

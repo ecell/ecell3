@@ -111,6 +111,8 @@ BOOST_PYTHON_MODULE_INIT(_ecs)
 		       "getLoggerEndTime" );    
   aSimulatorClass.def( &libemc::Simulator::getLoggerMinimumInterval, 
 		       "getLoggerMinimumInterval" );    
+  aSimulatorClass.def( &libemc::Simulator::setLoggerMinimumInterval, 
+		       "setLoggerMinimumInterval" );    
   aSimulatorClass.def( &libemc::Simulator::getLoggerSize, "getLoggerSize" );
 
 

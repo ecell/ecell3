@@ -28,6 +28,8 @@
 // E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
 
+#include <iostream>
+
 #include "Util.hpp"
 #include "Reactant.hpp"
 #include "Stepper.hpp"
@@ -53,7 +55,7 @@ namespace libecs
     registerSlot( getPropertySlotMaker()->
 		  createPropertySlot( "ReactantList", *this, 
 				      Type2Type<Polymorph>(),
-				      NULLPTR,
+				      &Reactor::setReactantList,
 				      &Reactor::getReactantList ) );
 
     registerSlot( getPropertySlotMaker()->
@@ -74,8 +76,34 @@ namespace libecs
     PolymorphVector aVector( aValue.asPolymorphVector() );
     checkSequenceSize( aVector, 3 );
 
+    std::cerr << "Use of Reactor::setReactant() is deprecated. This method will be removed." << std::endl;
+
     registerReactant( aVector[0].asString(), FullID( aVector[1].asString() ), 
 		      aVector[2].asInt() );
+  }
+
+  void Reactor::setReactantList( PolymorphCref aValue )
+  {
+    const PolymorphVector aVector( aValue.asPolymorphVector() );
+    for( PolymorphVectorConstIterator i( aVector.begin() );
+	 i != aVector.end(); ++i )
+      {
+	const PolymorphVector anInnerVector( (*i).asPolymorphVector() );
+
+	// Require ( tagname, fullid, stoichiometry ) 3-tuple
+	if( anInnerVector.size() <= 3 )
+	  {
+	    THROW_EXCEPTION( ValueError, "Reactor [" + getFullID().getString()
+			     + "]: ill-formed ReactantList given." );
+	  }
+
+	const String aReactantName(  anInnerVector[0].asString() );
+	const FullID aFullID(        anInnerVector[1].asString() );
+	const Int    aStoichiometry( anInnerVector[2].asInt() );
+
+	registerReactant( aReactantName, aFullID, aStoichiometry );
+      }
+
   }
 
   const Polymorph Reactor::getReactantList() const
@@ -89,8 +117,12 @@ namespace libecs
 	PolymorphVector anInnerVector;
 	ReactantCref aReactant( i->second );
 
+	// Tagname
+	anInnerVector.push_back( i->first );
+	// FullID
 	anInnerVector.push_back( aReactant.getSubstance()->
 				 getFullID().getString() );
+	// Stoichiometry
 	anInnerVector.push_back( aReactant.getStoichiometry() );
 
 	aVector.push_back( anInnerVector );

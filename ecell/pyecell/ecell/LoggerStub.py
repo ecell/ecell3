@@ -70,9 +70,9 @@ class LoggerStub( PropertyInterfaceStub ):
 	# This method can throw exceptions.
 	# ---------------------------------------------------------------
 
-	def createLogger( self, anInterval=0.0 ):
+	def create( self ):
 
-		self.theLogger = self.theSimulator.createLogger( self.theFullPNString, anInterval )
+		self.theLogger = self.theSimulator.createLogger( self.theFullPNString )
 
 	# end of createLogger
 
@@ -195,6 +195,19 @@ class LoggerStub( PropertyInterfaceStub ):
 
 
 	# ---------------------------------------------------------------
+	# setMinimumInterval
+	#
+	# This method can throw exceptions.
+	# ---------------------------------------------------------------
+
+	def setMinimumInterval( self, anInterval ):
+
+		return self.theSimulator.setLoggerMinimumInterval( self.theFullPNString, anInterval )
+
+	# end of setMinimumInterval
+
+
+	# ---------------------------------------------------------------
 	# getMinimumInterval
 	#
 	# return -> the minimum interval
@@ -205,7 +218,7 @@ class LoggerStub( PropertyInterfaceStub ):
 
 		return self.theSimulator.getLoggerMinimumInterval( self.theFullPNString )
 
-	# end of getInterval
+	# end of getMinimumInterval
 
 # end of LoggerStub
 
