@@ -1,25 +1,30 @@
 #!/usr/bin/env python
 
 
-from PluginWindow import *
+from OsogoPluginWindow import *
 from ecell.ecssupport import *
 import GTK
 import operator
 
-class DigitalWindow( PluginWindow ):
+class DigitalWindow( OsogoPluginWindow ):
 
     def __init__( self, dirname, data, pluginmanager, root=None ):
 	
-        PluginWindow.__init__( self, dirname, data, pluginmanager, root )
+
+        #PluginWindow.__init__( self, dirname, data, pluginmanager, root )
+        OsogoPluginWindow.__init__( self, dirname, data, pluginmanager, root )
         
         self.theSession = pluginmanager.theSession
         aFullPNString = createFullPNString( self.theFullPN() )
+
         aValue = self.theSession.theSimulator.getProperty( aFullPNString )
+
         if operator.isNumberType( aValue[0] ):
 
             self.openWindow()
             self.thePluginManager.appendInstance( self )
-            PluginWindow.initialize( self, root )
+            #PluginWindow.initialize( self, root )
+            OsogoPluginWindow.initialize( self, root )
             self.initialize()
 
         else:
@@ -32,7 +37,7 @@ class DigitalWindow( PluginWindow ):
 
     def initialize( self ):
 
-	self['toolbar5'].set_style( GTK.TOOLBAR_ICONS )
+        self['toolbar5'].set_style( GTK.TOOLBAR_ICONS )
         self['toolbar5'].set_button_relief( GTK.RELIEF_HALF )
 
         self.addHandlers( { 'input_value'    :self.inputValue,

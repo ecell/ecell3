@@ -2,18 +2,19 @@
 
 import string
 
-from PluginWindow import *
+from OsogoPluginWindow import *
 from ecell.ecssupport import *
 
 import Numeric
 import GTK
 import operator
 
-class BargraphWindow( PluginWindow ):
+class BargraphWindow( OsogoPluginWindow ):
     
     def __init__( self, dirname, data, pluginmanager, root=None ):
 
-        PluginWindow.__init__( self, dirname, data, pluginmanager, root )
+        #PluginWindow.__init__( self, dirname, data, pluginmanager, root )
+        OsogoPluginWindow.__init__( self, dirname, data, pluginmanager, root )
 
         self.theSession = pluginmanager.theSession
         aFullPNString = createFullPNString( self.theFullPN() )
@@ -22,7 +23,8 @@ class BargraphWindow( PluginWindow ):
         if operator.isNumberType( aValue[0] ):
             self.openWindow()
             self.thePluginManager.appendInstance( self )   
-            PluginWindow.initialize( self, root )
+            #PluginWindow.initialize( self, root )
+            OsogoPluginWindow.initialize( self, root )
             self.initialize()
 
         else:

@@ -9,16 +9,18 @@ import GTK
 import re
 import string
 import operator
-from PluginWindow import *
+from OsogoPluginWindow import *
+
 from ecell.ecssupport import *
 #from testTracerglade import *
 #from data1 import *
 
-class TracerWindow( PluginWindow ):
+class TracerWindow( OsogoPluginWindow ):
 
     def __init__( self, dirname, data, pluginmanager, root=None ):
 
-	PluginWindow.__init__( self, dirname, data, pluginmanager, root )
+        #PluginWindow.__init__( self, dirname, data, pluginmanager, root )
+        OsogoPluginWindow.__init__( self, dirname, data, pluginmanager, root )
         IDflag = 1
         if len( self.theFullPNList() ) > 1:
             for aFullID in self.theFullIDList():
@@ -34,7 +36,8 @@ class TracerWindow( PluginWindow ):
             if operator.isNumberType( aValue[0] ):
                 self.openWindow()
                 self.thePluginManager.appendInstance( self )                    
-                PluginWindow.initialize( self, root )
+                #PluginWindow.initialize( self, root )
+                OsogoPluginWindow.initialize( self, root )
                 self.initialize()
             else:
                 self.theSession.printMessage( "%s: not numerical data\n" % aFullPNString )                    

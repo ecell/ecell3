@@ -2,19 +2,24 @@
 
 import string
 
-from PluginWindow import *
+#from PluginWindow import *
+from OsogoPluginWindow import *
 from ecell.ecssupport import *
 
-class PropertyWindow(PluginWindow):
+#class PropertyWindow(PluginWindow):
+class PropertyWindow(OsogoPluginWindow):
 
     def __init__( self, dirname, data, pluginmanager, root = None ):
 
-        PluginWindow.__init__( self, dirname, data, pluginmanager, root )
+        #PluginWindow.__init__( self, dirname, data, pluginmanager, root )
+        OsogoPluginWindow.__init__( self, dirname, data, pluginmanager, root )
 
         self.openWindow()
         self.thePluginManager.appendInstance( self ) 
               
-	PluginWindow.initialize( self, root )
+	#PluginWindow.initialize( self, root )
+	OsogoPluginWindow.initialize( self, root )
+
         self.initialize()
 
         if len( self.theFullPNList() ) > 1 and root != 'top_vbox':
@@ -91,12 +96,17 @@ class PropertyWindow(PluginWindow):
 
     def updatePropertyList( self ):
 
+        #print 'updatePropetyList'
+
         self.theList = []
 
         aPropertyListFullPN = convertFullIDToFullPN( self.theFullID(),
                                                      'PropertyList' )
         self.prevFullID = convertFullPNToFullID( aPropertyListFullPN )        
         aPropertyList = self.theSession.theSimulator.getProperty( createFullPNString( aPropertyListFullPN ) )
+
+        #print 'aPropetyList= ',
+        #print aPropertyList
 
         for aProperty in aPropertyList:
             if (aProperty == 'ClassName'):
@@ -114,6 +124,9 @@ class PropertyWindow(PluginWindow):
 
             else :
                 
+		#print "####################" 
+		#print "aProperty %s" %aProperty
+
                 aFullPN = convertFullIDToFullPN( self.theFullID(),
                                                           aProperty )
                 aAttribute = self.getAttribute( aFullPN )

@@ -2,19 +2,21 @@
 
 import string
 
-from PluginWindow import *
+from OsogoPluginWindow import *
 from ecell.ecssupport import *
 import GTK
 
-class SubstanceWindow( PluginWindow ):
+class SubstanceWindow( OsogoPluginWindow ):
 
     def __init__( self, dirname,  data, pluginmanager, root=None ):
         
-        PluginWindow.__init__( self, dirname, data, pluginmanager, root )
+        #PluginWindow.__init__( self, dirname, data, pluginmanager, root )
+        OsogoPluginWindow.__init__( self, dirname, data, pluginmanager, root )
 
         self.openWindow()
         self.thePluginManager.appendInstance( self )    
-        PluginWindow.initialize( self, root )
+        #PluginWindow.initialize( self, root )
+        OsogoPluginWindow.initialize( self, root )
         self.initialize()
 
         self.theSession = pluginmanager.theSession
