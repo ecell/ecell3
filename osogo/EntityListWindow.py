@@ -90,7 +90,7 @@ class EntityListWindow(OsogoWindow):
 		aLeaf.show()
 
 		aSystemListFullPN = convertFullIDToFullPN( aSystemFullID, 'SystemList' ) 
-		aSystemList = self.theMainWindow.theSession.theSimulator.getProperty( createFullPNString( aSystemListFullPN ) )
+		aSystemList = self.theMainWindow.theSession.theSimulator.getEntityProperty( createFullPNString( aSystemListFullPN ) )
 		if aSystemList != ():
 			aTree = gtk.GtkTree()
 			aLeaf.set_subtree( aTree )
@@ -127,7 +127,7 @@ class EntityListWindow(OsogoWindow):
 		#aListPN = aPrimitiveTypeString + 'List'
 		aListPN = aEntityTypeString + 'List'
 		aListFullPN = convertFullIDToFullPN( aSystemFullID, aListPN ) 
-		aEntityList = self.theMainWindow.theSession.theSimulator.getProperty( createFullPNString( aListFullPN ) )
+		aEntityList = self.theMainWindow.theSession.theSimulator.getEntityProperty( createFullPNString( aListFullPN ) )
 
 		for aEntityID in aEntityList:
 			aListItem = gtk.GtkListItem( aEntityID )

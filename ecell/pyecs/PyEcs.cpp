@@ -3,10 +3,6 @@
 
 #include "libemc/libemc.hpp"
 #include "libemc/Simulator.hpp"
-#include "libemc/EmcLogger.hpp"
-
-//#include "PySimulator.hpp"
-//#include "PyLogger.hpp"
 
 #include "PyEcs.hpp"
 

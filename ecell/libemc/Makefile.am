@@ -25,10 +25,7 @@ libemc_la_DEPENDENCIES=$(ECELLDIR)/libecs/libecs.la
 libemc_la_SOURCES=\
 Simulator.cpp\
 SimulatorImplementation.cpp\
-LocalSimulatorImplementation.cpp\
-LocalLoggerImplementation.cpp\
-LoggerImplementation.cpp\
-EmcLogger.cpp
+LocalSimulatorImplementation.cpp
 
 libemcdir=${pkgincludedir}/libemc
 libemc_HEADERS=\
@@ -36,7 +33,4 @@ LocalSimulatorImplementation.hpp\
 Simulator.hpp\
 SimulatorImplementation.hpp\
 SimulatorMaker.hpp\
-EmcLogger.hpp\
-LocalLoggerImplementation.hpp\
-LoggerImplementation.hpp\
 libemc.hpp

@@ -34,9 +34,10 @@
 
 #include "libecs/libecs.hpp"
 #include "libecs/EntityType.hpp"
+#include "libecs/Polymorph.hpp"
+#include "libecs/DataPointVector.hpp"
 
 #include "libemc.hpp"
-#include "EmcLogger.hpp"
 #include "SimulatorImplementation.hpp"
 
 namespace libemc

@@ -34,8 +34,6 @@
 #include "libecs/Stepper.hpp"
 #include "libecs/LoggerBroker.hpp"
 
-#include "EmcLogger.hpp"
-
 #include "LocalSimulatorImplementation.hpp"
 
 namespace libemc
