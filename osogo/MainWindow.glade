@@ -48,20 +48,20 @@
 
 	<widget>
 	  <class>GtkMenuItem</class>
-	  <name>menuitem41</name>
+	  <name>file_menu</name>
 	  <stock_item>GNOMEUIINFO_MENU_FILE_TREE</stock_item>
 
 	  <widget>
 	    <class>GtkMenu</class>
-	    <name>menuitem41_menu</name>
+	    <name>file_menu_menu</name>
 
 	    <widget>
 	      <class>GtkPixmapMenuItem</class>
-	      <name>load_rule</name>
+	      <name>load_rule_menu</name>
 	      <signal>
 		<name>activate</name>
-		<handler>on_load_rule_activate</handler>
-		<last_modification_time>Wed, 01 Aug 2001 18:36:04 GMT</last_modification_time>
+		<handler>load_rule_menu_activate</handler>
+		<last_modification_time>Wed, 15 Aug 2001 09:03:46 GMT</last_modification_time>
 	      </signal>
 	      <label>Load _Rule ...</label>
 	      <right_justify>False</right_justify>
@@ -70,11 +70,11 @@
 
 	    <widget>
 	      <class>GtkPixmapMenuItem</class>
-	      <name>load_cell_state</name>
+	      <name>load_cell_state_menu</name>
 	      <signal>
 		<name>activate</name>
-		<handler>on_load_cell_state_activate</handler>
-		<last_modification_time>Wed, 01 Aug 2001 18:36:56 GMT</last_modification_time>
+		<handler>load_cell_state_menu_activate</handler>
+		<last_modification_time>Wed, 15 Aug 2001 09:03:52 GMT</last_modification_time>
 	      </signal>
 	      <label>Load _Cell State ...</label>
 	      <right_justify>False</right_justify>
@@ -83,11 +83,11 @@
 
 	    <widget>
 	      <class>GtkPixmapMenuItem</class>
-	      <name>save_cell_state_1</name>
+	      <name>save_cell_state_menu</name>
 	      <signal>
 		<name>activate</name>
-		<handler>on_save_cell_state_activate</handler>
-		<last_modification_time>Wed, 01 Aug 2001 18:38:09 GMT</last_modification_time>
+		<handler>save_cell_state_menu_activate</handler>
+		<last_modification_time>Wed, 15 Aug 2001 09:04:31 GMT</last_modification_time>
 	      </signal>
 	      <label>_Save Cell State ...</label>
 	      <right_justify>False</right_justify>
@@ -96,11 +96,11 @@
 
 	    <widget>
 	      <class>GtkPixmapMenuItem</class>
-	      <name>execute_script</name>
+	      <name>execute_script_menu</name>
 	      <signal>
 		<name>activate</name>
-		<handler>on_execute_script_activate</handler>
-		<last_modification_time>Wed, 01 Aug 2001 18:38:15 GMT</last_modification_time>
+		<handler>execute_script_menu_activate</handler>
+		<last_modification_time>Wed, 15 Aug 2001 09:04:40 GMT</last_modification_time>
 	      </signal>
 	      <label>_Execute Script ...</label>
 	      <right_justify>False</right_justify>
@@ -115,7 +115,7 @@
 
 	    <widget>
 	      <class>GtkMenuItem</class>
-	      <name>exit2</name>
+	      <name>exit_menu</name>
 	      <accelerator>
 		<modifiers>GDK_CONTROL_MASK</modifiers>
 		<key>GDK_q</key>
@@ -123,8 +123,8 @@
 	      </accelerator>
 	      <signal>
 		<name>activate</name>
-		<handler>on_exit_activate</handler>
-		<last_modification_time>Wed, 01 Aug 2001 18:44:56 GMT</last_modification_time>
+		<handler>exit_menu_activate</handler>
+		<last_modification_time>Wed, 15 Aug 2001 09:04:57 GMT</last_modification_time>
 	      </signal>
 	      <label>E_xit</label>
 	      <right_justify>False</right_justify>
@@ -134,99 +134,20 @@
 
 	<widget>
 	  <class>GtkMenuItem</class>
-	  <name>menuitem43</name>
-	  <stock_item>GNOMEUIINFO_MENU_EDIT_TREE</stock_item>
-
-	  <widget>
-	    <class>GtkMenu</class>
-	    <name>menuitem43_menu</name>
-
-	    <widget>
-	      <class>GtkMenuItem</class>
-	      <name>cut</name>
-	      <accelerator>
-		<modifiers>GDK_CONTROL_MASK</modifiers>
-		<key>GDK_x</key>
-		<signal>activate</signal>
-	      </accelerator>
-	      <signal>
-		<name>activate</name>
-		<handler>on_cut_activate</handler>
-		<last_modification_time>Wed, 01 Aug 2001 22:26:29 GMT</last_modification_time>
-	      </signal>
-	      <label>C_ut</label>
-	      <right_justify>False</right_justify>
-	    </widget>
-
-	    <widget>
-	      <class>GtkMenuItem</class>
-	      <name>copy</name>
-	      <accelerator>
-		<modifiers>GDK_CONTROL_MASK</modifiers>
-		<key>GDK_c</key>
-		<signal>activate</signal>
-	      </accelerator>
-	      <signal>
-		<name>activate</name>
-		<handler>on_copy_activate</handler>
-		<last_modification_time>Wed, 01 Aug 2001 22:26:57 GMT</last_modification_time>
-	      </signal>
-	      <label>_Copy</label>
-	      <right_justify>False</right_justify>
-	    </widget>
-
-	    <widget>
-	      <class>GtkMenuItem</class>
-	      <name>paste</name>
-	      <accelerator>
-		<modifiers>GDK_CONTROL_MASK</modifiers>
-		<key>GDK_v</key>
-		<signal>activate</signal>
-	      </accelerator>
-	      <signal>
-		<name>activate</name>
-		<handler>on_paste_activate</handler>
-		<last_modification_time>Wed, 01 Aug 2001 22:27:15 GMT</last_modification_time>
-	      </signal>
-	      <label>_Paste</label>
-	      <right_justify>False</right_justify>
-	    </widget>
-
-	    <widget>
-	      <class>GtkMenuItem</class>
-	      <name>clear</name>
-	      <accelerator>
-		<modifiers>0</modifiers>
-		<key>GDK_Delete</key>
-		<signal>activate</signal>
-	      </accelerator>
-	      <signal>
-		<name>activate</name>
-		<handler>on_clear_activate</handler>
-		<last_modification_time>Wed, 01 Aug 2001 22:27:30 GMT</last_modification_time>
-	      </signal>
-	      <label>Clear</label>
-	      <right_justify>False</right_justify>
-	    </widget>
-	  </widget>
-	</widget>
-
-	<widget>
-	  <class>GtkMenuItem</class>
-	  <name>menuitem45</name>
+	  <name>view_menu</name>
 	  <stock_item>GNOMEUIINFO_MENU_VIEW_TREE</stock_item>
 
 	  <widget>
 	    <class>GtkMenu</class>
-	    <name>menuitem45_menu</name>
+	    <name>view_menu_menu</name>
 
 	    <widget>
 	      <class>GtkCheckMenuItem</class>
-	      <name>message_window</name>
+	      <name>message_window_menu</name>
 	      <signal>
 		<name>activate</name>
-		<handler>on_message_window_activate</handler>
-		<last_modification_time>Wed, 01 Aug 2001 22:28:26 GMT</last_modification_time>
+		<handler>message_window_menu_activate</handler>
+		<last_modification_time>Wed, 15 Aug 2001 09:06:12 GMT</last_modification_time>
 	      </signal>
 	      <label>_Message Window</label>
 	      <active>True</active>
@@ -235,11 +156,11 @@
 
 	    <widget>
 	      <class>GtkCheckMenuItem</class>
-	      <name>interface_window</name>
+	      <name>interface_window_menu</name>
 	      <signal>
 		<name>activate</name>
-		<handler>on_interface_window_activate</handler>
-		<last_modification_time>Wed, 01 Aug 2001 22:28:58 GMT</last_modification_time>
+		<handler>interface_window_menu_activate</handler>
+		<last_modification_time>Wed, 15 Aug 2001 09:06:30 GMT</last_modification_time>
 	      </signal>
 	      <label>_Interface Window</label>
 	      <active>False</active>
@@ -248,11 +169,11 @@
 
 	    <widget>
 	      <class>GtkCheckMenuItem</class>
-	      <name>palette_window</name>
+	      <name>palette_window_menu</name>
 	      <signal>
 		<name>activate</name>
-		<handler>on_palette_window_activate</handler>
-		<last_modification_time>Wed, 01 Aug 2001 23:56:41 GMT</last_modification_time>
+		<handler>palette_window_menu_activate</handler>
+		<last_modification_time>Wed, 15 Aug 2001 09:06:59 GMT</last_modification_time>
 	      </signal>
 	      <label>_Palette Window</label>
 	      <active>False</active>
@@ -263,20 +184,20 @@
 
 	<widget>
 	  <class>GtkMenuItem</class>
-	  <name>menuitem46</name>
+	  <name>window_menu</name>
 	  <stock_item>GNOMEUIINFO_MENU_WINDOWS_TREE</stock_item>
 
 	  <widget>
 	    <class>GtkMenu</class>
-	    <name>menuitem46_menu</name>
+	    <name>window_menu_menu</name>
 
 	    <widget>
 	      <class>GtkMenuItem</class>
-	      <name>create_new_entry_list1</name>
+	      <name>create_new_entry_list_menu</name>
 	      <signal>
 		<name>activate</name>
-		<handler>on_create_new_entry_list1_activate</handler>
-		<last_modification_time>Wed, 01 Aug 2001 22:30:03 GMT</last_modification_time>
+		<handler>create_new_entry_list_menu_activate</handler>
+		<last_modification_time>Wed, 15 Aug 2001 09:23:44 GMT</last_modification_time>
 	      </signal>
 	      <label>Create New _Entry List</label>
 	      <right_justify>False</right_justify>
@@ -284,35 +205,11 @@
 
 	    <widget>
 	      <class>GtkMenuItem</class>
-	      <name>create_new_interface</name>
+	      <name>create_new_logger_list_menu</name>
 	      <signal>
 		<name>activate</name>
-		<handler>on_create_new_interface_activate</handler>
-		<last_modification_time>Wed, 01 Aug 2001 22:31:06 GMT</last_modification_time>
-	      </signal>
-	      <label>Create New _Interface</label>
-	      <right_justify>False</right_justify>
-	    </widget>
-
-	    <widget>
-	      <class>GtkMenuItem</class>
-	      <name>create_new_board</name>
-	      <signal>
-		<name>activate</name>
-		<handler>on_create_new_board_activate</handler>
-		<last_modification_time>Wed, 01 Aug 2001 22:31:06 GMT</last_modification_time>
-	      </signal>
-	      <label>Create New _Board</label>
-	      <right_justify>False</right_justify>
-	    </widget>
-
-	    <widget>
-	      <class>GtkMenuItem</class>
-	      <name>create_new_logger_list</name>
-	      <signal>
-		<name>activate</name>
-		<handler>on_create_new_logger_list_activate</handler>
-		<last_modification_time>Wed, 01 Aug 2001 22:31:07 GMT</last_modification_time>
+		<handler>create_new_logger_list_menu_activate</handler>
+		<last_modification_time>Wed, 15 Aug 2001 09:08:07 GMT</last_modification_time>
 	      </signal>
 	      <label>Create New _Logger List</label>
 	      <right_justify>False</right_justify>
@@ -322,20 +219,20 @@
 
 	<widget>
 	  <class>GtkMenuItem</class>
-	  <name>menuitem47</name>
+	  <name>setting_menu</name>
 	  <stock_item>GNOMEUIINFO_MENU_SETTINGS_TREE</stock_item>
 
 	  <widget>
 	    <class>GtkMenu</class>
-	    <name>menuitem47_menu</name>
+	    <name>setting_menu_menu</name>
 
 	    <widget>
 	      <class>GtkPixmapMenuItem</class>
-	      <name>preferences1</name>
+	      <name>preferences_menu</name>
 	      <signal>
 		<name>activate</name>
-		<handler>on_preferences1_activate</handler>
-		<last_modification_time>Wed, 01 Aug 2001 22:40:28 GMT</last_modification_time>
+		<handler>preferences_menu_activate</handler>
+		<last_modification_time>Wed, 15 Aug 2001 09:08:27 GMT</last_modification_time>
 	      </signal>
 	      <stock_item>GNOMEUIINFO_MENU_PREFERENCES_ITEM</stock_item>
 	    </widget>
@@ -344,20 +241,20 @@
 
 	<widget>
 	  <class>GtkMenuItem</class>
-	  <name>help2</name>
+	  <name>help_menu</name>
 	  <stock_item>GNOMEUIINFO_MENU_HELP_TREE</stock_item>
 
 	  <widget>
 	    <class>GtkMenu</class>
-	    <name>help2_menu</name>
+	    <name>help_menu_menu</name>
 
 	    <widget>
 	      <class>GtkPixmapMenuItem</class>
-	      <name>pixmapmenuitem23</name>
+	      <name>about_menu</name>
 	      <signal>
 		<name>activate</name>
-		<handler>on_about1_activate</handler>
-		<last_modification_time>Wed, 01 Aug 2001 18:32:41 GMT</last_modification_time>
+		<handler>about_menu_activate</handler>
+		<last_modification_time>Wed, 15 Aug 2001 09:08:54 GMT</last_modification_time>
 	      </signal>
 	      <stock_item>GNOMEUIINFO_MENU_ABOUT_ITEM</stock_item>
 	    </widget>
@@ -437,9 +334,14 @@
 		<widget>
 		  <class>GtkButton</class>
 		  <child_name>Toolbar:button</child_name>
-		  <name>button71</name>
+		  <name>start_button</name>
 		  <width>31</width>
 		  <height>42</height>
+		  <signal>
+		    <name>clicked</name>
+		    <handler>start_button_clicked</handler>
+		    <last_modification_time>Wed, 15 Aug 2001 07:33:35 GMT</last_modification_time>
+		  </signal>
 		  <label>Start</label>
 		  <stock_pixmap>GNOME_STOCK_PIXMAP_FORWARD</stock_pixmap>
 		</widget>
@@ -447,9 +349,14 @@
 		<widget>
 		  <class>GtkButton</class>
 		  <child_name>Toolbar:button</child_name>
-		  <name>button72</name>
+		  <name>stop_button</name>
 		  <width>35</width>
 		  <height>42</height>
+		  <signal>
+		    <name>clicked</name>
+		    <handler>stop_button_clicked</handler>
+		    <last_modification_time>Wed, 15 Aug 2001 07:33:56 GMT</last_modification_time>
+		  </signal>
 		  <label>Stop</label>
 		  <stock_pixmap>GNOME_STOCK_PIXMAP_STOP</stock_pixmap>
 		</widget>
@@ -492,9 +399,14 @@
 		    <widget>
 		      <class>GtkButton</class>
 		      <child_name>Toolbar:button</child_name>
-		      <name>button132</name>
+		      <name>step_button</name>
 		      <width>35</width>
 		      <height>42</height>
+		      <signal>
+			<name>clicked</name>
+			<handler>step_button_clicked</handler>
+			<last_modification_time>Wed, 15 Aug 2001 07:34:29 GMT</last_modification_time>
+		      </signal>
 		      <label>Step</label>
 		      <stock_pixmap>GNOME_STOCK_PIXMAP_LAST</stock_pixmap>
 		    </widget>
@@ -502,7 +414,7 @@
 
 		  <widget>
 		    <class>GtkCombo</class>
-		    <name>combo1</name>
+		    <name>step_combo</name>
 		    <width>69</width>
 		    <value_in_list>False</value_in_list>
 		    <ok_if_empty>True</ok_if_empty>
@@ -524,7 +436,7 @@
 		    <widget>
 		      <class>GtkEntry</class>
 		      <child_name>GtkCombo:entry</child_name>
-		      <name>combo-entry1</name>
+		      <name>step_combo_entry</name>
 		      <can_focus>True</can_focus>
 		      <editable>True</editable>
 		      <text_visible>True</text_visible>
@@ -559,7 +471,7 @@
 
 		<widget>
 		  <class>GtkLabel</class>
-		  <name>label55</name>
+		  <name>time_label</name>
 		  <label>Time(Seconds)</label>
 		  <justify>GTK_JUSTIFY_CENTER</justify>
 		  <wrap>False</wrap>
@@ -576,7 +488,7 @@
 
 		<widget>
 		  <class>GtkEntry</class>
-		  <name>entry2</name>
+		  <name>time_entry</name>
 		  <width>100</width>
 		  <can_focus>True</can_focus>
 		  <editable>True</editable>
@@ -618,8 +530,13 @@
 	      <widget>
 		<class>GtkButton</class>
 		<child_name>Toolbar:button</child_name>
-		<name>button133</name>
+		<name>entry_button</name>
 		<width>60</width>
+		<signal>
+		  <name>clicked</name>
+		  <handler>entry_button_clicked</handler>
+		  <last_modification_time>Wed, 15 Aug 2001 07:39:45 GMT</last_modification_time>
+		</signal>
 		<label>Entry</label>
 		<stock_pixmap>GNOME_STOCK_PIXMAP_TEXT_BULLETED_LIST</stock_pixmap>
 	      </widget>
@@ -627,8 +544,13 @@
 	      <widget>
 		<class>GtkButton</class>
 		<child_name>Toolbar:button</child_name>
-		<name>button134</name>
+		<name>logger_button</name>
 		<width>60</width>
+		<signal>
+		  <name>clicked</name>
+		  <handler>logger_button_clicked</handler>
+		  <last_modification_time>Wed, 15 Aug 2001 07:39:51 GMT</last_modification_time>
+		</signal>
 		<label>Logger</label>
 		<stock_pixmap>GNOME_STOCK_PIXMAP_ADD</stock_pixmap>
 	      </widget>
@@ -642,8 +564,13 @@
 	      <widget>
 		<class>GtkToggleButton</class>
 		<child_name>Toolbar:button</child_name>
-		<name>togglebutton4</name>
+		<name>palette_togglebutton</name>
 		<width>60</width>
+		<signal>
+		  <name>toggled</name>
+		  <handler>palette_togglebutton_toggled</handler>
+		  <last_modification_time>Wed, 15 Aug 2001 07:39:58 GMT</last_modification_time>
+		</signal>
 		<label>Palette</label>
 		<stock_pixmap>GNOME_STOCK_PIXMAP_COLORSELECTOR</stock_pixmap>
 		<active>False</active>
@@ -652,9 +579,14 @@
 	      <widget>
 		<class>GtkToggleButton</class>
 		<child_name>Toolbar:button</child_name>
-		<name>togglebutton5</name>
+		<name>message_togglebutton</name>
 		<width>60</width>
 		<height>42</height>
+		<signal>
+		  <name>toggled</name>
+		  <handler>message_togglebutton_toggled</handler>
+		  <last_modification_time>Wed, 15 Aug 2001 07:40:05 GMT</last_modification_time>
+		</signal>
 		<label>Message</label>
 		<stock_pixmap>GNOME_STOCK_PIXMAP_ALIGN_JUSTIFY</stock_pixmap>
 		<active>False</active>
@@ -663,9 +595,14 @@
 	      <widget>
 		<class>GtkToggleButton</class>
 		<child_name>Toolbar:button</child_name>
-		<name>togglebutton6</name>
+		<name>interface_togglebutton</name>
 		<width>60</width>
 		<height>42</height>
+		<signal>
+		  <name>toggled</name>
+		  <handler>interface_togglebutton_toggled</handler>
+		  <last_modification_time>Wed, 15 Aug 2001 09:00:49 GMT</last_modification_time>
+		</signal>
 		<label>Interface</label>
 		<stock_pixmap>GNOME_STOCK_PIXMAP_INDEX</stock_pixmap>
 		<active>False</active>
@@ -676,7 +613,7 @@
 
 	<widget>
 	  <class>GtkStatusbar</class>
-	  <name>statusbar3</name>
+	  <name>statusbar</name>
 	  <child>
 	    <padding>0</padding>
 	    <expand>False</expand>
@@ -703,7 +640,7 @@
 	<widget>
 	  <class>GtkButton</class>
 	  <child_name>Toolbar:button</child_name>
-	  <name>button122</name>
+	  <name>ecell_logo_button</name>
 	  <label>button122</label>
 	  <icon>ecell.xpm</icon>
 	</widget>
