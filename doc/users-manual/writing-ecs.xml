@@ -80,8 +80,7 @@
 	command at the shell prompt:
 
         <screen>
-          <userinput>
-            <command>ecell3-session</command> <replaceable>filename.ess</replaceable>
+          <prompt>$</prompt> <userinput><command>ecell3-session</command> <replaceable>filename.ess</replaceable>
           </userinput>
         </screen>
 
@@ -94,7 +93,21 @@
 
       <sect3>
 	<title>In interactive mode</title>
-	<para>??? - is this possible?</para>
+
+	<para>To run the <command>ecell3-session</command> in
+	interactive mode, invoke the command without the filename
+	argument.
+
+        <screen><prompt>$</prompt> <userinput><command>ecell3-session</command></userinput>
+ecell3-session [ for E-Cell SE Version 3, on Python Version 2.2.1 ]
+Copyright (C) 1996-2002 Keio University.
+Written by Kouichi Takahashi <email>shafi@e-cell.org</email>
+<prompt>ecell3-session>>> </prompt>
+        </screen>
+        
+        The banner and the prompt shown here may vary according to the
+        version you are using.
+</para>
       </sect3>
 
       <sect3>
@@ -134,48 +147,116 @@
     <classname>ObjectStub</classname> classes, and
     <classname>Datafile</classname> classes.</para>
 
+    <para>This section explains how to use these classes in your ESS.</para>
+
     <sect2>
       <title>Using Session methods</title>
 
 
-    <para>In <acronym>ESS</acronym>, methods defined in
-    <classname>Session</classname> class, or Session API, can be used.
-    For example, to run the simulation for 10 seconds, you may use
+      <sect3>
+	<title>General rules</title>
+
+      <para>In <acronym>ESS</acronym>, usualy an instance of
+    <classname>Session</classname> is given, and any methods defined
+    in the class can be used as if it is defined in global namespace.
+    </para>
+
+      <para>For example, to run the simulation for 10 seconds, you may use
     <methodname>run</methodname> method of a
     <classname>Session</classname> object in your
     <acronym>ESS</acronym> file.
 
     <informalexample> 
-	<programlisting>self.run( 10 )</programlisting>
-    </informalexample> 
+	  <programlisting>self.run( 10 )</programlisting>
+	</informalexample> 
 
     where <methodname>self.</methodname> is the current
-    <classname>Session</classname> object given by the system.
+    <classname>Session</classname> object given by the
+    system. Alternatively you can use <varname>theSession</varname> as
+    the <varname>self</varname>.
+
+    <informalexample> 
+	  <programlisting>theSession.run( 10 )</programlisting>
+	</informalexample> 
     </para>
 
     <para>Unlike usual <productname>Python</productname> script, you
-    have no need to specify the object on which the method is called
-    if the object is the current <classname>Session</classname>.  
-    Thus <methodname>self.</methodname> can be ommited.
+    can omit the object on which the method is called if the object is
+    the current <classname>Session</classname>.
     <informalexample>
 	<programlisting>run( 10 )</programlisting>
     </informalexample>
     </para>
 
+      </sect3>
+
+
+      <sect3>
+	<title>Loading a model</title>
+
+      <para>Let's try this in the interactive mode of the
+      <command>ecell3-session</command> command.  On the prompt of the
+      command, you may load a model by using
+      <methodname>loadModel</methodname>() method.
+
+      <informalexample>
+	  <screen><prompt>ecell3-session>>> </prompt><userinput>loadModel( 'simple.eml' )</userinput></screen>
+	</informalexample>
+    
+    Then the prompt changes from <prompt>ecell3-session>>> </prompt> to <prompt><replaceable>model name</replaceable>, t=<replaceable>current time</replaceable>>>> </prompt>
+
+    <informalexample><screen><prompt>simple.eml, t=0>>> </prompt></screen>
+	</informalexample>
+    </para>
+      </sect3>
+
+      <sect3>
+	<title>Running the simulation</title>
+
+	<para>To proceed the time by executing the simulation,
+	<methodname>step</methodname>() and
+	<methodname>run</methodname>() methods are used.</para>
+
+	<informalexample><screen><prompt>simple.eml, t=0>>> </prompt><userinput>step()</userinput>
+<prompt>simple.eml, t=0>>> </prompt><userinput>step()</userinput>
+<prompt>simple.eml, t=7.67306e-07>>> </prompt><userinput>run( 10 )</userinput>
+<prompt>simple.eml, t=10.0032>>> </prompt>
+</screen>
+	</informalexample>
+
+	<para><methodname>step</methodname>() conducts a single step of the simulation</para>
 
       <para>
-Write something about step(), message(), loadModel(), getCurrentTime() here.
+message(), getCurrentTime() here.
 </para>
 
 
-    <example>
-      <title>A simple <acronym>ESS</acronym> example.</title>
+      </sect3>
+      
+      <sect3>
+	<title>Printing messages</title>
 
-      <programlisting>
+	<para>message()</para>
+      </sect3>
+
+
+      <sect3>
+	<title></title>
+
+	<para>
+<example>
+	    <title>A simple <acronym>ESS</acronym> example.</title>
+	    
+	    <programlisting>
 loadModel( 'simple.eml' )
 run( 100 )
 </programlisting>
-    </example>
+	  </example>
+        </para>
+	
+      </sect3>
+
+
 
     </sect2>
 
