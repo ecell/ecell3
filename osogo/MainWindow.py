@@ -138,7 +138,7 @@ class MainWindow(OsogoWindow):
 		# creates LoggerWindow
 		# -------------------------------------
 		self.theLoggerWindow = LoggerWindow.LoggerWindow( self.theSession , self )
-		self.theLoggerWindow.openWindow()
+#		self.theLoggerWindow.openWindow()
 
 		# -------------------------------------
 		# creates InterfaceWindow
@@ -149,9 +149,6 @@ class MainWindow(OsogoWindow):
 		# -------------------------------------
 		# creates PluginManager
 		# -------------------------------------
-		#self.thePluginManager = OsogoPluginManager( self.theSession, 
-		#        self.theLoggerWindow, self.theInterfaceWindow, self.theMessageWindow )
-
 		self.thePluginManager = OsogoPluginManager( self )
 		self.thePluginManager.loadAll()
 
@@ -173,7 +170,7 @@ class MainWindow(OsogoWindow):
 		# creates StepperWindow
 		# -------------------------------------
 		self.theStepperWindow = StepperWindow.StepperWindow( self.theSession , self )
-		self.theStepperWindow.openWindow()
+#		self.theStepperWindow.openWindow()
 
 
 		self.theEntityListWindowList = []

@@ -5,14 +5,12 @@ from OsogoPluginWindow import *
 
 # column index of clist
 PROPERTY_COL  = 0
-NUMBER_COL    = 1
-VALUE_COL     = 2
-GETABLE_COL   = 3
-SETTABLE_COL  = 4
+VALUE_COL     = 1
+GETABLE_COL   = 2
+SETTABLE_COL  = 3
 import gobject
 import gtk
 PROPERTY_COL_TYPE=gobject.TYPE_STRING
-NUMBER_COL_TYPE=gobject.TYPE_STRING
 VALUE_COL_TYPE=gobject.TYPE_STRING
 GETABLE_COL_TYPE=gobject.TYPE_STRING
 SETTABLE_COL_TYPE=gobject.TYPE_STRING
@@ -53,15 +51,12 @@ class PropertyWindow(OsogoPluginWindow):
 		self.theSelectedFullPNList = []
 		self.theSelectedRowNumber = -1
 		self.thePropertyListStore=gtk.ListStore(PROPERTY_COL_TYPE,
-					    NUMBER_COL_TYPE,
 					    VALUE_COL_TYPE,
 					    GETABLE_COL_TYPE,
 					    SETTABLE_COL_TYPE)
 		self.thePropertyCList.set_model(self.thePropertyListStore)
 		renderer=gtk.CellRendererText()
 		column=gtk.TreeViewColumn("Property",renderer,text=PROPERTY_COL)
-		self.thePropertyCList.append_column(column)
-		column=gtk.TreeViewColumn("Number",renderer,text=NUMBER_COL)
 		self.thePropertyCList.append_column(column)
 		column=gtk.TreeViewColumn("Value",renderer,text=VALUE_COL)
 		self.thePropertyCList.append_column(column)
@@ -166,18 +161,17 @@ class PropertyWindow(OsogoPluginWindow):
 
 		aPropertyList = self.theSession.theSimulator.getEntityPropertyList( createFullIDString( self.theFullID() ) )
 
+		aPropertyList = list( aPropertyList )
+
+		# do nothing for following property
+		try:
+			aPropertyList.remove( 'FullID' )
+			aPropertyList.remove( 'ID' )
+			aPropertyList.remove( 'Name' )
+		except:
+			pass
+
 		for aProperty in aPropertyList: # for (1)
-
-			# does nothing for following property
-			if aProperty=='PropertyList' or \
-			   aProperty=='ClassName' or \
-			   aProperty=='PropertyAttributes' or \
-			   aProperty=='FullID' or \
-			   aProperty=='ID' or \
-			   aProperty=='Name':
-
-				# does nothing.
-				continue
 
 			aFullPN = convertFullIDToFullPN( self.theFullID(), aProperty )
 			anAttribute = self.theSession.theSimulator.getEntityPropertyAttributes( \
@@ -185,38 +179,24 @@ class PropertyWindow(OsogoPluginWindow):
 
 			# When the getable attribute is false, value is ''
 			if anAttribute[GETABLE] == FALSE:
-				aValueList = ''
+				aValue = ''
 			else:
-				aValueList = self.theSession.theSimulator.getEntityProperty( createFullPNString( aFullPN ) )
+				aValue = self.theSession.theSimulator.getEntityProperty( createFullPNString( aFullPN ) )
 
 			aSetString = decodeAttribute( anAttribute[SETTABLE] )
 			aGetString = decodeAttribute( anAttribute[GETABLE] )
                 
-			aFullPNString =  createFullPNString( aFullPN ) 
+			aValueString = str( aValue )
+			if( len( aValueString ) > 30 ):
+				aValueString = aValueString[:20]\
+					       + ' .. (' +\
+					       str( len( aValue ) ) +\
+					       ' items)'
+
+			aList = [ aProperty, aValueString, aGetString, aSetString ]
+			self.theList.append( aList )
 
 
-			aDisplayedFlag = 0
-			if type(aValueList) == type(()):
-				if len(aValueList)  > 1 :
-					aNumber = 1
-					for aValue in aValueList :
-						#if type(aValue) == type(()):
-						#	aValue = aValue[0]
-						aList = [aProperty, aNumber, aValue , aGetString, aSetString ]
-						aList = map( str, aList )
-						self.theList.append( aList ) 
-						aNumber += 1
-					aDisplayedFlag = 1
-
-			if aDisplayedFlag == 0:
-				aList = [ aProperty, '', aValueList , aGetString, aSetString ]
-				aList = map( str, aList )
-				self.theList.append( aList )
-
-		row = 0
-#		for aValue in self.theList:
-#			self.thePropertyCList.set_text(row,2,aValue[2])
-#			row += 1
 		for aValue in self.theList:
 			iter=self.thePropertyListStore.append( )
 			cntr=0
@@ -324,43 +304,10 @@ class PropertyWindow(OsogoPluginWindow):
 					return None
 
 
-		# ---------------------------------------------------
-		# when the number column is not blank, reate tuple.
-		# ---------------------------------------------------
-		aPropertyValue = []
-		aNumber = self.thePropertyListStore.get_value(self.theSelectedRowNumber,NUMBER_COL)
-		if aNumber != '':
-
-			aSelectedProperty = self.thePropertyListStore.get_value(self.theSelectedRowNumber,PROPERTY_COL)
-			#print "aSelectedProperty = %s" %aSelectedProperty
-			aRow=self.thePropertyListStore.get_iter_first()
-			while aRow!=None:
-
-				if aSelectedProperty != self.thePropertyListStore.get_value(aRow,PROPERTY_COL):
-					continue
-
-				if aRow == self.theSelectedRowNumber:
-					aPropertyValue.append( aValue )
-				else:
-					aCListValue = self.thePropertyListStore.get_value(aRow,VALUE_COL) 
-					aCListValue = convertStringToTuple( aCListValue )
-					aPropertyValue.append( aCListValue )
-
-			aPropertyValue = tuple(aPropertyValue)
-
-		else:
-			aPropertyValue = aValue
-
-
 		aFullPNString = createFullPNString(self.theSelectedFullPN)
 
-		#if aGetable == decodeAttribute(TRUE):
-		#	print self.theSession.theSimulator.getEntityProperty( createFullPNString(self.theSelectedFullPN) ) 
 		try:
-			#self.theSession.theSimulator.setEntityProperty( createFullPNString(self.theSelectedFullPN), aPropertyValue ) 
-			#self.setValue( createFullPNString(self.theSelectedFullPN), aPropertyValue ) 
-			#print self.theSelectedFullPN
-			self.setValue( self.theSelectedFullPN, aPropertyValue ) 
+			self.setValue( self.theSelectedFullPN, aValue ) 
 		except:
 
 			# print out traceback

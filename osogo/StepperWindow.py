@@ -168,14 +168,8 @@ class StepperWindow(OsogoWindow):
 
 				for aProperty in self.theSession.theSimulator.getStepperPropertyList( aStepperID ):
 
-					if aProperty == 'PropertyAttributes':
-						continue
-
-					elif aProperty == 'PropertyList': # This should be removed.
-						continue                  # This should be removed.
-
-					elif aProperty == 'ClassName':    # This should be removed.
-						continue                  # This should be removed.
+					if aProperty == 'ClassName':
+						continue            
 
 					data =  self.theSession.theSimulator.getStepperProperty( aStepperID, aProperty )
 
