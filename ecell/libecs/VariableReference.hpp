@@ -51,6 +51,7 @@ namespace libecs
 
     class CoefficientLess
     {
+
     public:
 
       CoefficientLess()
@@ -76,10 +77,12 @@ namespace libecs
 	return compare( aLhs.getCoefficient(), aRhs );
       }
 
-
     private:
 
-      static const std::less<Integer> compare;
+      static const bool compare( IntegerParam aLhs, IntegerParam aRhs )
+      {
+	return std::less<Integer>()( aLhs, aRhs );
+      }
 
     };
 
@@ -123,7 +126,7 @@ namespace libecs
 	// both are ellipses, or both are normal names.
 	if( anIsLhsEllipsis == anIsLhsEllipsis )
 	  {
-	    return stringcompare( aLhs, aRhs );
+	    return std::less<String>()( aLhs, aRhs );
 	  }
 	else // always sort ellipses last
 	  {
@@ -131,7 +134,6 @@ namespace libecs
 	  }
       }
 
-      static const std::less<String> stringcompare;
     };
 
 
@@ -159,8 +161,7 @@ namespace libecs
 	  } 
 	else // lhs.coeff == rhs.coeff
 	  {
-	    static NameLess aNameLess;
-	    return aNameLess( aLhs, aRhs );
+	    return NameLess()( aLhs, aRhs );
 	  }
       }
 

@@ -34,6 +34,7 @@
 
 namespace libecs
 {
+
   const String VariableReference::ELLIPSIS_PREFIX( "___" );
   const String VariableReference::DEFAULT_NAME( "_" );
 
