@@ -113,22 +113,28 @@ namespace libecs
 				      &Stepper::getSlaveStepperID ) );
 
     registerSlot( getPropertySlotMaker()->
-		  createPropertySlot( "VariableCache", *this,
+		  createPropertySlot( "ReadVariableList", *this,
 				      Type2Type<Polymorph>(),
 				      NULLPTR,
-				      &Stepper::getVariableCache ) );
+				      &Stepper::getReadVariableList ) );
 
     registerSlot( getPropertySlotMaker()->
-		  createPropertySlot( "ProcessCache", *this,
+		  createPropertySlot( "WriteVariableList", *this,
 				      Type2Type<Polymorph>(),
 				      NULLPTR,
-				      &Stepper::getProcessCache ) );
+				      &Stepper::getWriteVariableList ) );
+
+    registerSlot( getPropertySlotMaker()->
+		  createPropertySlot( "ProcessList", *this,
+				      Type2Type<Polymorph>(),
+				      NULLPTR,
+				      &Stepper::getProcessList ) );
 
   }
 
   Stepper::Stepper() 
     :
-    theFirstNormalProcess( theProcessCache.begin() ),
+    theFirstNormalProcess( theProcessVector.begin() ),
     theModel( NULLPTR ),
     theCurrentTime( 0.0 ),
     theStepInterval( 0.001 ),
@@ -147,9 +153,9 @@ namespace libecs
     //      {
 
     //
-    // update theProcessCache
+    // update theProcessVector
     //
-    theProcessCache.clear();
+    theProcessVector.clear();
     for( SystemVectorConstIterator i( theSystemVector.begin() );
 	 i != theSystemVector.end() ; ++i )
 	{
@@ -161,31 +167,37 @@ namespace libecs
 	    {
 	      ProcessPtr aProcessPtr( (*j).second );
 
-	      theProcessCache.push_back( aProcessPtr );
+	      theProcessVector.push_back( aProcessPtr );
 
 	      aProcessPtr->initialize();
 	    }
 	}
 
     // sort by Process priority
-    std::sort( theProcessCache.begin(), theProcessCache.end(),
+    std::sort( theProcessVector.begin(), theProcessVector.end(),
 	       Process::PriorityCompare() );
 
     // find boundary of negative and zero priority processes
     theFirstNormalProcess = 
-      std::lower_bound( theProcessCache.begin(), theProcessCache.end(),	0,
+      std::lower_bound( theProcessVector.begin(), theProcessVector.end(),	0,
 			Process::PriorityCompare() );
 
     //
-    // Update theVariableCache
+    // Update theWriteVariableVector
     //
 
-    // get all the variables which are included in the VariableReferenceVector
-    // of the Processs
-    theVariableCache.clear();
+    // (1) for each Variable which is included in the VariableReferenceVector
+    //     of the Processes of this Stepper,
+    // (2) if the Variable is mutable, 
+    //           put it into theWriteVariableVector, 
+    //       and register this Stepper to the StepperList of the Variable.
+    // (3) if the Variable is accessible,
+    //           puto it into theReadVariableVector
+    theWriteVariableVector.clear();
+    theReadVariableVector.clear();
     // for all the processs
-    for( ProcessVectorConstIterator i( theProcessCache.begin());
-	 i != theProcessCache.end() ; ++i )
+    for( ProcessVectorConstIterator i( theProcessVector.begin());
+	 i != theProcessVector.end() ; ++i )
       {
 	VariableReferenceVectorCref 
 	  aVariableReferenceVector( (*i)->getVariableReferenceVector() );
@@ -195,23 +207,45 @@ namespace libecs
 	       j( aVariableReferenceVector.begin() );
 	     j != aVariableReferenceVector.end(); ++j )
 	  {
-	    VariablePtr aVariablePtr( j->getVariable() );
+	    VariableReferenceCref aVariableReference( *j );
+	    VariablePtr aVariablePtr( aVariableReference.getVariable() );
 
-	    // prevent duplication
-	    if( std::find( theVariableCache.begin(), theVariableCache.end(),
-			   aVariablePtr ) == theVariableCache.end() )
+	    if( aVariableReference.isMutator() )
 	      {
-		theVariableCache.push_back( aVariablePtr );
-		aVariablePtr->registerStepper( this );
-		aVariablePtr->initialize();
+		// prevent duplication
+
+		if( std::find( theWriteVariableVector.begin(), 
+			       theWriteVariableVector.end(),
+			       aVariablePtr ) == theWriteVariableVector.end() )
+		  {
+		    
+		    theWriteVariableVector.push_back( aVariablePtr );
+		    
+		    aVariablePtr->registerStepper( this );
+		    // FIXME: this this needed?
+		    aVariablePtr->initialize();
+		  }
 	      }
+
+	    if( aVariableReference.isAccessor() )
+	      {
+		// prevent duplication
+
+		if( std::find( theReadVariableVector.begin(), 
+			       theReadVariableVector.end(),
+			       aVariablePtr ) == theReadVariableVector.end() )
+		  {
+		    theReadVariableVector.push_back( aVariablePtr );
+		  }
+	      }
+
 	  }
       }
 
     //    clearEntityListChanged();
     //      }
 
-    Int aSize( theVariableCache.size() );
+    Int aSize( theWriteVariableVector.size() );
 
     theValueBuffer.resize( aSize );
     theVelocityBuffer.resize( aSize );
@@ -360,13 +394,27 @@ namespace libecs
     FOR_ALL( PropertySlotVector, theLoggedPropertySlotVector, updateLogger );
   }
 
-  const Polymorph Stepper::getVariableCache() const
+  const Polymorph Stepper::getWriteVariableList() const
   {
     PolymorphVector aVector;
-    aVector.reserve( theVariableCache.size() );
+    aVector.reserve( theWriteVariableVector.size() );
     
-    for( VariableVectorConstIterator i( theVariableCache.begin() );
-	 i != theVariableCache.end() ; ++i )
+    for( VariableVectorConstIterator i( theWriteVariableVector.begin() );
+	 i != theWriteVariableVector.end() ; ++i )
+      {
+	aVector.push_back( (*i)->getFullID().getString() );
+      }
+    
+    return aVector;
+  }
+
+  const Polymorph Stepper::getReadVariableList() const
+  {
+    PolymorphVector aVector;
+    aVector.reserve( theReadVariableVector.size() );
+    
+    for( VariableVectorConstIterator i( theReadVariableVector.begin() );
+	 i != theReadVariableVector.end() ; ++i )
       {
 	aVector.push_back( (*i)->getFullID().getString() );
       }
@@ -374,13 +422,13 @@ namespace libecs
     return aVector;
   }
   
-  const Polymorph Stepper::getProcessCache() const
+  const Polymorph Stepper::getProcessList() const
   {
     PolymorphVector aVector;
-    aVector.reserve( theProcessCache.size() );
+    aVector.reserve( theProcessVector.size() );
     
-    for( ProcessVectorConstIterator i( theProcessCache.begin() );
-	 i != theProcessCache.end() ; ++i )
+    for( ProcessVectorConstIterator i( theProcessVector.begin() );
+	 i != theProcessVector.end() ; ++i )
       {
 	aVector.push_back( (*i)->getFullID().getString() );
       }
@@ -388,13 +436,13 @@ namespace libecs
     return aVector;
   }
   
-  const UnsignedInt Stepper::findInVariableCache( VariablePtr aVariable )
+  const UnsignedInt Stepper::findInWriteVariableVector( VariablePtr aVariable )
   {
     VariableVectorConstIterator
-      anIterator( std::find( theVariableCache.begin(), 
-			     theVariableCache.end(), aVariable ) );
+      anIterator( std::find( theWriteVariableVector.begin(), 
+			     theWriteVariableVector.end(), aVariable ) );
 
-    return anIterator - theVariableCache.begin();
+    return anIterator - theWriteVariableVector.begin();
   }
 
   void Stepper::clear()
@@ -402,10 +450,10 @@ namespace libecs
     //
     // Variable::clear()
     //
-    const UnsignedInt aSize( theVariableCache.size() );
+    const UnsignedInt aSize( theWriteVariableVector.size() );
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
-	VariablePtr const aVariable( theVariableCache[ c ] );
+	VariablePtr const aVariable( theWriteVariableVector[ c ] );
 
 	// save original value values
 	theValueBuffer[ c ] = aVariable->saveValue();
@@ -415,7 +463,7 @@ namespace libecs
       }
 
 
-    //    FOR_ALL( VariableCache, theVariableCache, clear );
+    //    FOR_ALL( WriteVariableVector, theWriteVariableVector, clear );
       
     //
     // Process::clear() ?
@@ -433,18 +481,18 @@ namespace libecs
     //
     // Process::process()
     //
-    FOR_ALL( ProcessVector, theProcessCache, process );
+    FOR_ALL( ProcessVector, theProcessVector, process );
   }
 
   void Stepper::processNegative()
   {
-    std::for_each( theProcessCache.begin(), theFirstNormalProcess, 
+    std::for_each( theProcessVector.begin(), theFirstNormalProcess, 
 		   std::mem_fun( &Process::process ) );
   }
 
   void Stepper::processNormal()
   {
-    std::for_each( theFirstNormalProcess, theProcessCache.end(),
+    std::for_each( theFirstNormalProcess, theProcessVector.end(),
 		   std::mem_fun( &Process::process ) );
   }
 
@@ -453,11 +501,11 @@ namespace libecs
     //
     // Variable::integrate()
     //
-    const UnsignedInt aSize( theVariableCache.size() );
+    const UnsignedInt aSize( theWriteVariableVector.size() );
 
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
-	VariablePtr const aVariable( theVariableCache[ c ] );
+	VariablePtr const aVariable( theWriteVariableVector[ c ] );
 
 	aVariable->integrate( getCurrentTime() );
       }
@@ -476,10 +524,10 @@ namespace libecs
 
   void Stepper::reset()
   {
-    const UnsignedInt aSize( theVariableCache.size() );
+    const UnsignedInt aSize( theWriteVariableVector.size() );
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
-	VariablePtr const aVariable( theVariableCache[ c ] );
+	VariablePtr const aVariable( theWriteVariableVector[ c ] );
 
 	// restore x (original value)
 	aVariable->setValue( theValueBuffer[ c ] );
