@@ -41,6 +41,11 @@
 namespace libecs
 {
 
+  /** @defgroup libecs_module The Libecs Module 
+   * This is the libecs module 
+   * @{ 
+   */ 
+  
   class LoggerBroker
   {
 
@@ -81,6 +86,8 @@ namespace libecs
     GetCurrentTimeMethodType theGetCurrentTimeMethod;
     
   };
+
+  /** @} */ //end of libecs_module
   
 } // namespace libecs
 

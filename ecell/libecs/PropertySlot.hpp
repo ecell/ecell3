@@ -47,6 +47,11 @@ struct Type2Type
 namespace libecs
 {
 
+  /** @defgroup libecs_module The Libecs Module 
+   * This is the libecs module 
+   * @{ 
+   */ 
+  
   template< typename FromType, typename ToType >
   ToType convertTo( const FromType& aValue )
   {
@@ -647,6 +652,7 @@ namespace libecs
   };
 #endif // 0
 
+  /** @} */ //end of libecs_module 
 
 }
 

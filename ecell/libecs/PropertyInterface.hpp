@@ -42,6 +42,11 @@
 namespace libecs
 {
 
+  /** @defgroup libecs_module The Libecs Module 
+   * This is the libecs module 
+   * @{ 
+   */ 
+  
   DECLARE_MAP( const String, PropertySlotPtr, 
 	       std::less<const String>, PropertySlotMap );
 
@@ -149,9 +154,7 @@ namespace libecs
 
   };
   
-
-
-
+  /** @} */ //end of libecs_module 
 
 } // namespace libecs
 

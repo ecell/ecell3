@@ -39,6 +39,11 @@
 namespace libecs
 {
 
+  /** @defgroup libecs_module The Libecs Module 
+   * This is the libecs module 
+   * @{ 
+   */ 
+  
   /**
      Entity class is a base class for all components in the cell model.
      Entity is-a PropertyInterface. 
@@ -161,7 +166,8 @@ namespace libecs
     String    theID;
     String    theName;
   };
- 
+
+  /** @} */ //end of libecs_module 
 
 } // namespace libecs
 

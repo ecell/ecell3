@@ -36,6 +36,11 @@
 namespace libecs
 {
 
+  /** @defgroup libecs_module The Libecs Module 
+   * This is the libecs module 
+   * @{ 
+   */ 
+  
 
   /**
      Use this macro if you want to use 
@@ -208,7 +213,8 @@ DECLARE_TYPE( RCPtr<type>, type ## RCPtr )
 
   };
 
-
+  /** @} */ //end of libecs_module 
+  
 } // namespace libecs
 
 

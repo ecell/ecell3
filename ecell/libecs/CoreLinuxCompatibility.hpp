@@ -59,6 +59,11 @@
 namespace corelinux
 {
 
+  /** @defgroup libecs_module The Libecs Module 
+   * This is the libecs module 
+   * @{ 
+   */ 
+  
   // from Common.hpp
 
 #define IN_COMMON_HPP
@@ -312,6 +317,6 @@ typedef const mytype & mytype ## Cref;
 #define CORELINUX_STACK( type, name )                                 \
       DECLARE_TYPE(stack<type>,name)                                   
 
-
+  /** @} */ //end of libecs_module 
 
 } // namespace corelinux

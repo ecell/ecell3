@@ -36,6 +36,11 @@
 namespace libecs
 {
 
+  /** @defgroup libecs_module The Libecs Module 
+   * This is the libecs module 
+   * @{ 
+   */ 
+  
   class PrimitiveType
   {
 
@@ -147,6 +152,8 @@ namespace libecs
 
   };
 
+  /** @} */ //end of libecs_module 
+  
 } // namespace libecs
 
 

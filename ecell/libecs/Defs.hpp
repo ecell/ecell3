@@ -54,6 +54,11 @@
 namespace libecs
 {
 
+  /** @defgroup libecs_module The Libecs Module 
+   * This is the libecs module 
+   * @{ 
+   */ 
+  
   // system constants
 
   const int RANDOM_NUMBER_BUFFER_SIZE( 65535 );
@@ -102,6 +107,7 @@ namespace libecs
 #define __PRETTY_FUNCTION__ ""
 #endif
 
+  /** @} */ //end of libecs_module 
 
 } // namespace libecs
 

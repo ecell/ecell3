@@ -37,7 +37,11 @@
 namespace libecs
 {
 
-
+  /** @defgroup libecs_module The Libecs Module 
+   * This is the libecs module 
+   * @{ 
+   */ 
+  
   // Declarations to be exported
 
 
@@ -107,6 +111,8 @@ namespace libecs
   // reference counted pointer types
 
   DECLARE_RCPTR( UVariableVector );
+
+  /** @} */ //end of libecs_module 
 
 } // namespace libecs
 

@@ -38,6 +38,11 @@
 namespace libecs
 {
 
+  /** @defgroup libecs_module The Libecs Module 
+   * This is the libecs module 
+   * @{ 
+   */ 
+  
   class AccumulatorMaker : public StaticModuleMaker< Accumulator >
   {
 
@@ -53,6 +58,8 @@ namespace libecs
   };
 
 #define NewAccumulatorModule( CLASS ) NewDynamicModule( Accumulator, CLASS )
+
+  /** @} */ //end of libecs_module 
 
 }
 

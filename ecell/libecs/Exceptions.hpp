@@ -39,6 +39,11 @@
 namespace libecs
 {
 
+  /** @defgroup libecs_module The Libecs Module 
+   * This is the libecs module 
+   * @{ 
+   */ 
+  
   /// Base exception class
   class Exception /* : public exception */
   {
@@ -89,6 +94,7 @@ public:\
   DEFINE_EXCEPTION( AttributeError,        PropertyException);
   DEFINE_EXCEPTION( InvalidPrimitiveType,  Exception);
 
+  /** @} */ //end of libecs_module 
 
 } // namespace libecs
 
