@@ -19,7 +19,7 @@
 USE_LIBECS;
 
 ECELL3_DM_CLASS
-    :  
+  :  
   public FluxProcess
 {
 
@@ -61,8 +61,6 @@ ECELL3_DM_CLASS
   VariableReference C0;
   
 };
-
-
 
 ECELL3_DM_INIT;
 
