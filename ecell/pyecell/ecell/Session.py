@@ -121,9 +121,9 @@ class Session:
             anId  = aTargetEntity[2]
             aName = aTargetEntity[3]
 
-            if aType == 'System':
 
-                ## need refactoring about PathConvert!!                
+            ## need refactoring about PathConvert!!                
+            if aType == 'System':
                 if aPath == '/':
                     aPath = ''
                 else:
@@ -133,17 +133,30 @@ class Session:
                     aPath     = string.join( aPathList, '/' )
                     if aPath == '':
                         aPath = '/'
-                ## --------------------------------------------------
+            ## --------------------------------------------------
 
-                    aFullId = aType + ':' + aPath + ':' + anId
-                    self.theSimulator.createEntity( aType, aFullId, aName )
+            if not ( aType == 'System' or aType == 'Substance' ):
+                anEntityType = 'Reactor'
+                aFullId = anEntityType + ':' + aPath + ':' + anId
+            else:
+                aFullId = aType + ':' + aPath + ':' + anId
 
-            ## TemporarySample ---------------------------------------
-            #aPrintFullId = "self.theSimulator.createEntity('" + aType + "',"
+
+            ## Temporary
+            #aPrintFullId = "aSimulator.createEntity('" + aType + "',"
             #aPrintType   = "'" + aFullId + "',"
             #aPrintName   = "'" + aName + "')"
-            #print aPrintFullId, aPrintType, aPrintName ## Temporary
-            ## -------------------------------------------------------
+            #print aPrintFullId, aPrintType, aPrintName
+
+
+            ## check!!
+            if not aPath == '':
+                self.theSimulator.createEntity( aType, aFullId, aName )
+
+            
+
+
+
 
 
             
