@@ -37,8 +37,8 @@
 
  */
 
-#if !defined(__DATAPOINT_HPP)
-#include "StlDataPointVector.hpp"
+#if !defined(__DATAPOINTVECTOR_STL_HPP)
+#include "DataPointStlVector.hpp"
 #endif
 
 #include <algorithm>
