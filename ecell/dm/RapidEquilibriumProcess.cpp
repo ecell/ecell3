@@ -30,8 +30,16 @@ LIBECS_DM_CLASS( RapidEquilibriumProcess, Process )
       ; // do nothing
     }
 
-  SIMPLE_SET_GET_METHOD( Real, Keq );
-    
+  GET_METHOD( Real, Keq )
+    {
+      return theOriginalKeq;
+    }
+
+  SET_METHOD( Real, Keq )
+    {
+      theOriginalKeq = value;
+    }
+
   void process();
 
   void initialize()
@@ -53,13 +61,14 @@ LIBECS_DM_CLASS( RapidEquilibriumProcess, Process )
 	  d_Keq += (*i).getCoefficient();
 	}
 
-      Keq *= pow(N_A, d_Keq);
+      Keq = theOriginalKeq * pow(N_A, d_Keq);
 
     }
 
  protected:
 
     Real Keq;
+    Real theOriginalKeq;
 };
 
 LIBECS_DM_INIT( RapidEquilibriumProcess, Process );
