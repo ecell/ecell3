@@ -113,12 +113,13 @@ public:\
   DEFINE_EXCEPTION( UnexpectedError,        Exception );
   DEFINE_EXCEPTION( NotFound,               Exception );
   DEFINE_EXCEPTION( CantOpen,               Exception ); 
+  DEFINE_EXCEPTION( NotImplemented,         Exception ); 
 
 //    DEFINE_EXCEPTION( CallbackFailed,         Exception );
   DEFINE_EXCEPTION( AssertionFailed,        Exception );
   DEFINE_EXCEPTION( AlreadyExist,           Exception );
   DEFINE_EXCEPTION( ValueError,             Exception );
-  DEFINE_EXCEPTION( TypeError,             Exception );
+  DEFINE_EXCEPTION( TypeError,              Exception );
 
   // simulation errors
   DEFINE_EXCEPTION( SimulationError,        Exception );

@@ -207,13 +207,15 @@ namespace libemc
 
   private:
 
+    bool                       theRunningFlag;
+    bool                       theMutatedFlag;
+
+    libecs::Integer            theEventCheckInterval;
+
     libecs::ModelRef           theModel;
 
-    bool                       theRunningFlag;
-    libecs::Integer                theEventCheckInterval;
-
-    EventCheckerSharedPtr          theEventChecker;
-    EventHandlerSharedPtr          theEventHandler;
+    EventCheckerSharedPtr      theEventChecker;
+    EventHandlerSharedPtr      theEventHandler;
 
   };  
 

@@ -53,9 +53,10 @@ namespace libemc
 
   LocalSimulatorImplementation::LocalSimulatorImplementation()
     :
-    theModel( *new Model ),
     theRunningFlag( false ),
+    theMutatedFlag( true ),
     theEventCheckInterval( 20 ),
+    theModel( *new Model ),
     theEventChecker(),
     theEventHandler()
   {
@@ -88,7 +89,8 @@ namespace libemc
 
   void LocalSimulatorImplementation::deleteStepper( libecs::StringCref anID )
   {
-    std::cerr << "deleteStepper() method is not supported yet." << std::endl;
+    THROW_EXCEPTION( libecs::NotImplemented,
+		     "deleteStepper() method is not supported yet." );
   }
 
   const libecs::Polymorph LocalSimulatorImplementation::getStepperList() const
@@ -187,7 +189,8 @@ namespace libemc
 
   void LocalSimulatorImplementation::deleteEntity( StringCref aFullIDString )
   {
-    std::cerr << "deleteEntity() method is not supported yet." << std::endl;
+    THROW_EXCEPTION( libecs::NotImplemented,
+		     "deleteEntity() method is not supported yet." );
   }
 
   const libecs::Polymorph LocalSimulatorImplementation::
@@ -318,7 +321,8 @@ namespace libemc
 
 
   void LocalSimulatorImplementation::
-  createLogger( libecs::StringCref aFullPNString, libecs::Polymorph aParamList )
+  createLogger( libecs::StringCref aFullPNString, 
+		libecs::Polymorph aParamList )
   {
     if( theRunningFlag )
       {
@@ -329,11 +333,12 @@ namespace libemc
     if ( aParamList.getType() != libecs::Polymorph::POLYMORPH_VECTOR )
       {
 	THROW_EXCEPTION( libecs::Exception,
-			 "2nd argument of createLogger must be a list of numbers.");
+			 "2nd argument of createLogger must be a list.");
       }
 
     FullPN aFullPN( aFullPNString );
-    getModel().getLoggerBroker().createLogger( aFullPN, aParamList.asPolymorphVector() );
+    getModel().getLoggerBroker().
+      createLogger( aFullPN, aParamList.asPolymorphVector() );
   }
 
   const Polymorph LocalSimulatorImplementation::getLoggerList() const
@@ -406,8 +411,6 @@ namespace libemc
   }
 
 
-
-
   void LocalSimulatorImplementation::
   setLoggerPolicy( libecs::StringCref aFullPNString, 
 		   libecs::Polymorph aParamList )
@@ -415,7 +418,7 @@ namespace libemc
     if ( aParamList.getType() != libecs::Polymorph::POLYMORPH_VECTOR )
       {
 	THROW_EXCEPTION( libecs::Exception,
-			 "2nd parameter of logger policy must be a number list.");
+			 "2nd parameter of logger policy must be a list.");
       }
 
     getLogger( aFullPNString )->setLoggerPolicy( aParamList );
