@@ -1,6 +1,6 @@
 Summary: E-Cell is a generic software package for cellular modeling and simulation.
 Name: ecell
-Version: 3.1.94
+Version: 3.1.95
 Release: 1
 URL: http://www.e-cell.org
 Source0: %{name}-%{version}.tar.gz
@@ -23,11 +23,12 @@ CFLAGS="$RPM_OPT_FLAGS" ./configure --prefix=%{_prefix}
 
 %build
 make
-
+make doc
 
 %install
 #rm -rf $RPM_BUILD_ROOT
 make prefix="$RPM_BUILD_ROOT/usr" install
+make prefix="$RPM_BUILD_ROOT/usr" doc install
 
 %clean
 rm -rf $RPM_BUILD_ROOT
