@@ -62,14 +62,14 @@ class StepperWindow(OsogoWindow):
 
 	# ---------------------------------------------------------------
 	# ==========================================================================
-	def __init__( self, aSession, aMainWindow ): 
+	def __init__( self, aSession ): 
 		"""Constructor
 		aSession     ---  the reference of session
-		aMainWindow  ---  the reference of MainWindow
+		aSession  ---  the reference of Session
 		"""
 
 		# calls superclass's constructor
-		OsogoWindow.__init__( self, aMainWindow, 'StepperWindow.glade' )
+		OsogoWindow.__init__( self, aSession, 'StepperWindow.glade' )
 
 		self.theSession = aSession
 

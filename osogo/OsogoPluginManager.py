@@ -38,6 +38,7 @@
 
 import sys
 import traceback
+import string
 import os
 import imp
 import glob
@@ -51,15 +52,15 @@ class OsogoPluginManager(PluginManager):
 	"""
 
 	# ========================================================================
-	def __init__( self, aMainWindow ):
+	def __init__( self, aSession ):
 		"""Constructor
-		aMainWindow   ---  the instance of MainWindow (MainWindow)
+		aSession   ---  the instance of Session (Session)
 		"""
 
 		PluginManager.__init__(self)
 
-		self.theSession = aMainWindow.theSession
-		self.theMainWindow = aMainWindow
+		self.theSession = aSession
+
 
 		self.thePluginTitleDict = {}     # key is instance , value is title
 		self.thePluginWindowNumber = {}
@@ -77,7 +78,7 @@ class OsogoPluginManager(PluginManager):
 		aParent     --- ParentWindow (Window)          # NOT gtk.Window
 		Returns a PluginWindow instance (PluginWindow)
 		"""
-	
+		print data
 		if self.thePluginMap.has_key( aClassname ):
 			pass
 		else:
@@ -120,16 +121,15 @@ class OsogoPluginManager(PluginManager):
 			try:
 				anInstance = aPlugin.createInstance( data, self, root )
 			except TypeError:
+				anErrorMessage = string.join( traceback.format_exception(sys.exc_type,sys.exc_value, \
+					sys.exc_traceback), '\n' )
+				self.theSession.message(anErrorMessage)
 				return None
 
 			anInstance.openWindow()
 
 			#try:
 			if TRUE:
-				#if root !='top_vbox':              
-				#if root != 'EntityListWindow':              
-				#if root == None:
-				#if root != self.theMainWindow.theEntityListWindow:
 				if root != None and root.__class__.__name__ == 'EntityListWindow':
 					self.thePropertyWindowOnEntityListWindows[ anInstance ] = None
 				else:
@@ -137,7 +137,7 @@ class OsogoPluginManager(PluginManager):
 					self.thePluginTitleDict[ anInstance ] = aTitle
 					self.theInstanceList.append( anInstance )
 				# initializes session
-				self.theMainWindow.theSession.theSimulator.initialize()
+				self.theSession.theSimulator.initialize()
 				self.updateFundamentalWindows()
 			#except:
 			#	pass
@@ -197,20 +197,6 @@ class OsogoPluginManager(PluginManager):
 	def appendInstance( self, anInstance ):
 
 		pass
-		#print ""
-		#print " anInstance = "
-		#print anInstance 
-
-		#try:
-#		PluginManager.appendInstance(self, anInstance)
-		#except:
-		#	aMessage  = '\n----------Error------------\n'
-		#	aMessage += 'ErroType[%s]\n'  %sys.exc_type
-		#	aMessage += 'ErroValue[%s]\n' %sys.exc_value
-		#	traceback.print_exc()
-		#	self.printMessage(aMessage)
-
-		#self.theMainWindow.update()
 
 	# end of appendInstance
 
@@ -238,7 +224,7 @@ class OsogoPluginManager(PluginManager):
 				anInstance[anInstance.__class__.__name__].destroy()
 
 		# updaets fundamental windows
-		self.theMainWindow.updateFundamentalWindows()
+		self.theSession.updateFundamentalWindows()
 
 
 	# ========================================================================
@@ -301,7 +287,7 @@ class OsogoPluginManager(PluginManager):
 
 		# When the specified instance exists on BoardWindow.
 		except AttributeError:
-			self.theMainWindow.getWindow('BoardWindow').present()
+			self.theSession.getWindow('BoardWindow').present()
 
 
 	# ========================================================================
@@ -311,7 +297,7 @@ class OsogoPluginManager(PluginManager):
 		Returns None
 		"""
 
-		self.theMainWindow.update()
+		self.theSession.updateFundamentalWindows()
 
 
 	# ========================================================================
@@ -321,8 +307,8 @@ class OsogoPluginManager(PluginManager):
 		"""
 
 		try:
-			self.theMainWindow.updateFundamentalWindows()
-			self.theMainWindow.update()
+			self.theSession.updateFundamentalWindows()
+
 		except:
 			pass
 
@@ -333,7 +319,7 @@ class OsogoPluginManager(PluginManager):
 		Returns None
 		"""
 
-		self.theMainWindow.printMessage(aMessage)
+		self.theSession.message(aMessage)
 
 
 	# ========================================================================
@@ -343,8 +329,8 @@ class OsogoPluginManager(PluginManager):
 		"""
 
 		self.updateAllPluginWindow()
-		self.theMainWindow.update()
-		self.theMainWindow.updateFundamentalWindows()
+
+		self.theSession.updateFundamentalWindows()
 
 
 	# ========================================================================

@@ -21,16 +21,16 @@ class InterfaceWindow( OsogoWindow ):
 	"""
     
 	# ==========================================================================
-	def __init__( self, aMainWindow ):
+	def __init__( self, aSession ):
 		"""Constructor
-		aMainWindow   ---  a reference to MainWindow (MainWindow)
+		aSession   ---  a reference to Session (Session)
 		"""
 
 		# calls superclass's constructor
-		OsogoWindow.__init__( self, aMainWindow )
+		OsogoWindow.__init__( self, aSession )
 
 		# saves reference to PluginManager
-		self.thePluginManager = aMainWindow.thePluginManager
+		self.thePluginManager = aSession.thePluginManager
 
 		# initializes row selection attributes
 		self.theSelectedRow = None
@@ -86,7 +86,7 @@ class InterfaceWindow( OsogoWindow ):
 			aModel.clear()
 
 		# gets
-		anInstanceList = self.theMainWindow.thePluginManager.theInstanceList
+		anInstanceList = self.theSession.thePluginManager.theInstanceList
 		for anInstance in anInstanceList:
 			aTitle = anInstance.getTitle()
 			aClass =  anInstance.__class__.__name__
@@ -131,10 +131,10 @@ class InterfaceWindow( OsogoWindow ):
 			aTitle =  self['InterfaceCList'].get_model().get_value(self.theSelectedRow,TITLE)
 
 			# sets new title 
-			self.theMainWindow.thePluginManager.editInstanceTitle( aTitle, aNewTitle )
+			self.theSession.thePluginManager.editInstanceTitle( aTitle, aNewTitle )
 
 		# updates all fundamental windows
-		self.theMainWindow.updateFundamentalWindows()
+		self.theSession.updateWindows()
 
                     
 	# ==========================================================================
@@ -172,12 +172,12 @@ class InterfaceWindow( OsogoWindow ):
 		else:
 
 			aTitle =  self['InterfaceCList'].get_model().get_value(self.theSelectedRow,TITLE)
-			aTitleDict = self.theMainWindow.thePluginManager.thePluginTitleDict
+			aTitleDict = self.theSession.thePluginManager.thePluginTitleDict
 
-			anInstanceList = self.theMainWindow.thePluginManager.theInstanceList
+			anInstanceList = self.theSession.thePluginManager.theInstanceList
 			for anInstance in anInstanceList:
 				if aTitle == aTitleDict[ anInstance ]:
-					self.theMainWindow.thePluginManager.showPlugin( anInstance )
+					self.theSession.thePluginManager.showPlugin( anInstance )
 			
 
 	# end of showWindow
@@ -196,7 +196,7 @@ class InterfaceWindow( OsogoWindow ):
 		# if no data is selected, show error message.
 		if self.theSelectedRow == None:
 			anErrorMessage='\nNothing is selected.!\n'
-			#self.theMainWindow.printMessage( anErrorMessage )
+			#self.theSession.message( anErrorMessage )
 			aWarningWindow = ConfirmWindow(0,anErrorMessage,"!")
 			return None
 
@@ -204,7 +204,7 @@ class InterfaceWindow( OsogoWindow ):
 		else:
 
 			aTitle =  self['InterfaceCList'].get_model().get_value( self.theSelectedRow ,0 )
-			self.theMainWindow.getWindow('BoardWindow').deletePluginWindowByTitle( aTitle )
+			self.theSession.getWindow('BoardWindow').deletePluginWindowByTitle( aTitle )
 			self.thePluginManager.removeInstanceByTitle( aTitle )
 
 			# clear select status

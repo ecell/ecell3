@@ -6,7 +6,6 @@ from OsogoUtil import *
 import gtk
 from ecell.ecssupport import *
 import gobject
-import MainWindow
 
 import string
 import copy
@@ -15,17 +14,17 @@ class PluginInstanceSelection(OsogoWindow):
 	"""PluginInstanceSelection
 	"""
 
-	def __init__( self, aMainWindow, anEntityListWindow ):
+	def __init__( self, aSession, anEntityListWindow ):
 		"""Constructor
-		aMainWindow         ---   a reference to MainWindow (MainWindow)
+		aSession         ---   a reference to Session (Session)
 		anEntityListWindow  ---   a reference to EntityListWindow (EntityListWindow)
 		"""
 
 		# calls superclass's constructor 
-		OsogoWindow.__init__( self, aMainWindow )
+		OsogoWindow.__init__( self, aSession )
 
 		self.theEntityListWindow = anEntityListWindow
-		self.thePluginManager = aMainWindow.thePluginManager
+		self.thePluginManager = aSession.thePluginManager
 
 
 	# ====================================================================

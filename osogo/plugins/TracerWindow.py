@@ -101,7 +101,7 @@ class TracerWindow( OsogoPluginWindow ):
 		self.addHandlers({\
 		    'on_button9_clicked' : self.remove_trace,\
 		    'on_button12_clicked'  : self.change_scale,\
-		    'on_minimize_clicked'  : self.minimize_clicked})
+		    'on___minimize_clicked'  : self.__minimize_clicked})
 		self.ListWindow.connect("button-press-event",self.button_pressed_on_list)
 		self['button12'].set_label('Log10 Scale')
 
@@ -113,19 +113,14 @@ class TracerWindow( OsogoPluginWindow ):
 		self['entry1'].set_text(str(self.thePlotInstance.getstripinterval()))
 		self['entry1'].connect('activate',self.entry1_activated)
 		self['entry1'].connect('focus_out_event',self.stripinterval_changes)
-		self['button13'].connect('clicked',self.createlogger_pressed)
-		self['togglebutton3'].connect('toggled',self.togglestrip)
+		self['button13'].connect('clicked',self.__createlogger_pressed)
+		self['togglebutton3'].connect('toggled',self.__togglestrip)
 		self.lastTime=self.theSession.theSimulator.getCurrentTime()
 		if not self.isStandAlone():
 			self.minimize()
 		else:
-#			alloc_rect=self['top_frame'].get_allocation()
-#			self['top_frame'].set_size_request(alloc_rect[2], alloc_rect[3])
-			self['TracerWindow'].connect('expose-event',self.resize)
+			self['TracerWindow'].connect('expose-event',self.__resize)
 
-
-	def isStandAlone(self):
-		return self.getParent().__class__.__name__[:6]=='Tracer'
 
 
 	def update(self):
@@ -145,18 +140,18 @@ class TracerWindow( OsogoPluginWindow ):
 		return True
 		
 	def create_logger(self,fpnlist):
-		LoggerMinimumInterval=float(self.theSession.theMainWindow.get_parameter('logger_min_interval'))
+		LoggerMinimumInterval=float(self.theSession.getParameter('logger_min_interval'))
 		for fpn in fpnlist:
 		    if not self.haslogger(fpn):
 			try:
 			    self.theSession.theSimulator.createLogger(fpn)
 			except:
-			    self.theSession.theMainWindow.printMessage('Error while creating logger\n logger for '+ fpn + ' not created\n')
+			    self.theSession.message('Error while creating logger\n logger for '+ fpn + ' not created\n')
 			else:
 			    self.theSession.theSimulator.setLoggerMinimumInterval(fpn,LoggerMinimumInterval)
 			    self.theSession.message("Logger created for "+fpn)
 		self.check_history_button()
-		self.thePluginManager.theMainWindow.updateFundamentalWindows()
+		self.thePluginManager.updateFundamentalWindows()
 			
 	def recache(self, aFullPNString, value_from, value_to, interval):
 		#it is called from the plotinstance
@@ -317,7 +312,6 @@ class TracerWindow( OsogoPluginWindow ):
 		pass
 
 	def shrink_to_fit(self):
-#		alloc_rect=self['top_frame'].get_allocation()
 		self['TracerWindow'].resize(self.desired_window_size[0],
 				self.desired_window_size[1])
 
@@ -335,7 +329,7 @@ class TracerWindow( OsogoPluginWindow ):
 		if not self.isStandAlone():
 			plot_size_alloc=[ _LARGE_PLOTWIDTH, _LARGE_PLOTHEIGTH]
 		else:
-			plot_size_alloc = self.get_frame8_space()
+			plot_size_alloc = self.__get_frame8_space()
 			self.desired_window_size= [ max( plot_size_alloc[0], alloc_rect2[0], alloc_rect3[0]),\
 				plot_size_alloc[1] + alloc_rect2[1] + alloc_rect3[1]]
 		self['top_frame'].set_size_request(top_frame_size[0],top_frame_size[1])
@@ -350,7 +344,7 @@ class TracerWindow( OsogoPluginWindow ):
 			plot_size_alloc = self.desired_plot_size[:]
 		else:
 			self.desired_plot_size = [_LARGE_PLOTWIDTH, _LARGE_PLOTHEIGTH]
-			plot_size_alloc = self.get_frame8_space()
+			plot_size_alloc = self.__get_frame8_space()
 		self.desired_window_size = [plot_size_alloc[0] + 4, plot_size_alloc[1] + 4]
 		self['vbox1'].remove(self['scrolledwindow1'])
 		self['vbox2'].remove(self['fixed1'])
@@ -361,7 +355,7 @@ class TracerWindow( OsogoPluginWindow ):
 		self.thePlotInstance.printTraceLabels()
 
 
-	def get_frame8_space (self):
+	def __get_frame8_space (self):
 		aSizeAlloc=self['frame8'].get_allocation()
 		return_width = aSizeAlloc[2] - 4
 		return_heigth = aSizeAlloc[3] - 4
@@ -372,7 +366,13 @@ class TracerWindow( OsogoPluginWindow ):
 		return [ return_width, return_heigth ]
 
 			
-
+	# ========================================================================
+	def resize( self, width, heigth ):
+		"""resizes this window according to width and heigth.
+		Returns None
+		"""
+		self[self.__class__.__name__].resize( width, heigth)
+		self.__resize(None, None)
 
 		
 #----------------------------------------------
@@ -439,7 +439,7 @@ class TracerWindow( OsogoPluginWindow ):
 	#this signal handler is called when "linear scale" or "log10 scale" button is pressed
 	#---------------------------------------------------------
    
-	def change_scale(self,obj):  #this is a buttonhandler
+	def change_scale(self,obj = None):  #this is a buttonhandler
 	    #simply calls plotinstance.change_scale
 	    self.thePlotInstance.change_scale()
 	
@@ -447,7 +447,7 @@ class TracerWindow( OsogoPluginWindow ):
 	#this signal handler is called when "Remove Trace" button is pressed
 	#---------------------------------------------------------
 
-	def remove_trace(self, obj):
+	def remove_trace(self, obj = None):
 	    #identify selected FullPNs
 	    fpnlist=[]	    
 	    selected_list=self.getselected()
@@ -475,7 +475,7 @@ class TracerWindow( OsogoPluginWindow ):
 	#this signal handler is called when "Log All" button is pressed
 	#---------------------------------------------------------
 
-	def createlogger_pressed(self,obj):
+	def __createlogger_pressed(self,obj):
 	    #creates logger in simulator for all FullPNs 
 	    self.create_logger(self.displayedFullPNStringList)		
 	    self.refresh_loggers()
@@ -484,7 +484,7 @@ class TracerWindow( OsogoPluginWindow ):
 	#this signal handler is called when "Show History" button is toggled
 	#---------------------------------------------------------
 		
-	def togglestrip(self, obj):
+	def __togglestrip(self, obj):
 		#if history, change to strip, try to get data for strip interval
 		stripmode=self.thePlotInstance.getstripmode()
 		if stripmode=='history':
@@ -507,18 +507,16 @@ class TracerWindow( OsogoPluginWindow ):
 	#this signal handler is called when "Minimize" button is pressed
 	#--------------------------------------------------------
 
-	def minimize_clicked(self,button_obj):
+	def __minimize_clicked(self,button_obj):
 		self.min_button_clicked=True
 		self.minimize()
 		self.min_button_clicked=False
 
 	#--------------------------------------------------------
-	#this signal handler is called when TracerWindow is resized
+	#this signal handler is called when TracerWindow is __resized
 	#--------------------------------------------------------
 
-	def resize(self, window, event):
-#		if self.no_expose:
-#			return gtk.FALSE
-		self.thePlotInstance.resize( self.get_frame8_space() )
+	def __resize(self, window, event):
+		self.thePlotInstance.resize( self.__get_frame8_space() )
 		return gtk.FALSE
 

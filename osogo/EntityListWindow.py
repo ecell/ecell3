@@ -6,7 +6,7 @@ from PluginInstanceSelection import *
 import gtk
 from ecell.ecssupport import *
 import gobject
-import MainWindow
+
 
 import string
 import copy
@@ -19,19 +19,17 @@ class EntityListWindow(OsogoWindow):
 	"""EntityListWindow
 	"""
 
-	def __init__( self, aMainWindow ):
+	def __init__( self, aSession ):
 		"""Constructor
-		aMainWindow   --   a reference to MainWindow (MainWindow)
+		aSession   --   a reference to GtkSessionMonitor
 		"""
 
 		# calls superclass's constructor 
-		OsogoWindow.__init__( self, aMainWindow )
+		OsogoWindow.__init__( self, aSession, 'EntityListWindow.glade' )
 
 		# initializes parameters
 		self.theSelectedFullPNList = []
-		self.thePluginManager = aMainWindow.thePluginManager
-		self.theSession = aMainWindow.theSession
-
+		self.thePluginManager = aSession.thePluginManager
 		self.thePluginInstanceSelection = None
 
 	def openWindow( self ):
@@ -39,7 +37,6 @@ class EntityListWindow(OsogoWindow):
 		# calls superclass's openWindow
 		OsogoWindow.openWindow( self )
 
-		#self.thePluginInstanceSelection = PluginInstanceSelection( self.theMainWindow, self )
 
 		# add handers
 		self.addHandlers( { 
@@ -100,7 +97,7 @@ class EntityListWindow(OsogoWindow):
 		self.checkBoardExists()
 
 	def checkBoardExists( self ):
-		if self.theMainWindow.getWindow('BoardWindow').exists():
+		if self.theSession.getWindow('BoardWindow').exists():
 			self['add_to_board'].set_sensitive(TRUE)
 		else:
 			self['add_to_board'].set_sensitive(FALSE)
@@ -111,7 +108,7 @@ class EntityListWindow(OsogoWindow):
 		if self.thePluginInstanceSelection != None:
 			self.thePluginInstanceSelection.deleted()
 			self.thePluginInstanceSelection = None
-		self.theMainWindow.deleteEntityListWindow( self )
+		self.theSession.deleteEntityListWindow( self )
 
 		return FALSE
 	
@@ -288,7 +285,7 @@ class EntityListWindow(OsogoWindow):
 		else:
 
 			self.thePluginInstanceSelection = \
-			PluginInstanceSelection( self.theMainWindow, self )
+			PluginInstanceSelection( self.theSession, self )
 			self.thePluginInstanceSelection.openWindow()
 
 			# updates list of PluginInstance
@@ -340,7 +337,7 @@ class EntityListWindow(OsogoWindow):
 		# When right button is pressed
 		if anEvent.type == gtk.gdk.BUTTON_PRESS and anEvent.button == 3:
 
-			if self.theMainWindow.getWindow('BoardWindow').exists():
+			if self.theSession.getWindow('BoardWindow').exists():
 				self.theBoardMenu.set_sensitive(TRUE)
 			else:
 				self.theBoardMenu.set_sensitive(FALSE)
@@ -469,7 +466,7 @@ class EntityListWindow(OsogoWindow):
 
 		aSystemPath = createSystemPathFromFullID( aSystemFullID )
 
-		aEntityList = self.theMainWindow.theSession.getEntityList( aEntityTypeString, aSystemPath )
+		aEntityList = self.theSession.getEntityList( aEntityTypeString, aSystemPath )
 
 		if aEntityTypeString == 'Variable':
 			aEntityType = VARIABLE
@@ -646,7 +643,7 @@ class EntityListWindow(OsogoWindow):
 			if len(anAppendedTitle) > 0 and anErrorFlag == FALSE:
 				# displays message
 				aMessage = "Selected Data are added to %s" %str(anAppendedTitle)
-				self.theMainWindow.printMessage(aMessage)
+				self.theSession.message(aMessage)
 				self.thePropertyWindow.showMessageOnStatusBar(aMessage)
 
 				# closes PluginInstanceSelectionWindow
@@ -755,14 +752,14 @@ class EntityListWindow(OsogoWindow):
 
 		# When this method is called by popup menu
 		if type( arg[0] ) == gtk.MenuItem:
-			aPluginWindowType = obj[0].get_name()
+			aPluginWindowType = arg[0].get_name()
 
 		# When this method is called by 'CreateWindow' button
 		elif type( arg[0] ) == gtk.Button:
 			aPluginWindowType = self['plugin_optionmenu'].get_children()[0].get()
 
 		else:
-			raise TypeErrir("%s must be gtk.MenuItem or gtk.Button" %str(type(obj[0])))
+			raise TypeErrir("%s must be gtk.MenuItem or gtk.Button" %str(type(arg[0])))
 
 		aSelectedRawFullPNList = self.__getSelectedRawFullPNList()
 
@@ -774,7 +771,7 @@ class EntityListWindow(OsogoWindow):
 			self.thePropertyWindow.showMessageOnStatusBar(aMessage)
 			return FALSE
 
-		self.theMainWindow.getWindow('BoardWindow').addPluginWindows( aPluginWindowType, \
+		self.theSession.getWindow('BoardWindow').addPluginWindows( aPluginWindowType, \
 		self.__getSelectedRawFullPNList() )
 
 

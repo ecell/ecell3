@@ -17,6 +17,7 @@ try:
 	import traceback
 	import gtk
 	import MainWindow
+	import ecell.GtkSessionMonitor
 
 except KeyboardInterrupt:
 	sys.exit(1)
@@ -24,9 +25,10 @@ except KeyboardInterrupt:
 # -----------------------------------------------------------------
 # main
 #   - checks arguments
-#   - creates GUI instance 
+#   - creates GtkSessioMonitor instance 
+#   - creates MainWindow instance
 #   - executs options
-#   - calls gtk.mainloops() 
+#   - calls GUI_interact() 
 # -----------------------------------------------------------------
 def main():
 
@@ -72,9 +74,10 @@ def main():
 		sys.exit(0)
 
 	# -------------------------------------
-	# creates an instance of GUI
+	# creates an instance of GtkSession and 
+	# creates MainWindow instance
 	# -------------------------------------
-	aMainWindow = MainWindow.MainWindow()
+	aSession = ecell.GtkSessionMonitor.GtkSessionMonitor()
 
 	# -------------------------------------
 	# executes options
@@ -87,27 +90,26 @@ def main():
 			pass
 		else:
 			aMessage = " Error ! [%s] No such file. \n" %anEmlFile
-			print aMessage
+			aSession.message( Message )
 			sys.exit(1)
 
-		# print message on MainWindow
-		aMainWindow.theSession.message("%s is loaded.\n" %anEmlFile )
+		# print message 
+		aSession.message("%s is loaded.\n" %anEmlFile )
 
 		# load model
 		try:
-			aMainWindow.theSession.loadModel( anEmlFile )
+			aSession.loadModel( anEmlFile )
 		except:
-			aMainWindow.theSession.message(' can\'t load [%s]' %anEmlFile)
+			aSession.message(' can\'t load [%s]' %anEmlFile)
 			anErrorMessage = string.join( traceback.format_exception(sys.exc_type,sys.exc_value,sys.exc_traceback), '\n' )
-			aMainWindow.theSession.message("-----------")
-			aMainWindow.theSession.message(anErrorMessage)
-			aMainWindow.theSession.message("-----------")
+			aSession.message("-----------")
+			aSession.message(anErrorMessage)
+			aSession.message("-----------")
 		else:
 
 			# initialize & update windows
-			aMainWindow.theSession.theSimulator.initialize()
-			aMainWindow.update()
-			aMainWindow.updateFundamentalWindows()
+			aSession.theSimulator.initialize()
+			aSession.updateWindows()
 
 	# executes script file (.ess)
 	elif anEssFile != None:
@@ -117,33 +119,35 @@ def main():
 			pass
 		else:
 			aMessage = " Error ! [%s] No such file. \n" %anEssFile
-			print aMessage
+			aSession.message( aMessage )
 			sys.exit(1)
 
 		# print message on MainWindow
-		aMainWindow.theSession.message("%s is loaded and executed.\n" %anEssFile )
+		aSession.message("%s is loaded and executed.\n" %anEssFile )
 
 		# load script
 		try:
 			# load ane execute script file
-			aMainWindow.theSession.loadScript( anEssFile )
+			aSession.loadScript( anEssFile )
 		except:
-			aMainWindow.theSession.message(' can\'t load [%s]' %anEssFile)
+			aSession.message(' can\'t load [%s]' %anEssFile)
 			anErrorMessage = string.join( traceback.format_exception(sys.exc_type,sys.exc_value,sys.exc_traceback), '\n' )
-			aMainWindow.theSession.message("-----------")
-			aMainWindow.theSession.message(anErrorMessage)
-			aMainWindow.theSession.message("-----------")
+			aSession.message("-----------")
+			aSession.message(anErrorMessage)
+			aSession.message("-----------")
 		else:
 
 			# initialize & update windows
-			aMainWindow.read_ini( anEssFile )
-			aMainWindow.update()
-			aMainWindow.updateFundamentalWindows()
+			aSession.read_ini( anEssFile )
+			aSession.updateWindow()
+
 
 	# -------------------------------------
 	# calls gtk.mainloop()
 	# -------------------------------------
-	gtk.mainloop()
+	aMainWindow = aSession.openWindow('MainWindow')
+	print "na idajig eljutottunk"
+	aSession.GUI_interact()
 
 
 # -----------------------------------------------------------------

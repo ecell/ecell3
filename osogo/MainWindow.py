@@ -37,19 +37,13 @@
 from OsogoWindow import *
 
 from main import *
-from OsogoPluginManager import *
-if GNOME_INSTALLED=='yes':
+
+if GNOME_INSTALLED =='yes':
     import gnome.ui
 
 import gtk
 
 import MessageWindow
-import EntityListWindow
-import LoggerWindow
-import InterfaceWindow 
-import StepperWindow 
-import BoardWindow 
-import ConfigParser
 
 import string
 import sys
@@ -58,10 +52,10 @@ import traceback
 #
 #import pyecell module
 #
-import ecell.Session
+from ecell.GtkSessionMonitor import *
 from ecell.ecssupport import *
 from ecell.ECS import *
-
+from ConfirmWindow import *
 
 NAME        = 'gecell (Osogo)'
 VERSION     = '0.0'
@@ -84,7 +78,7 @@ class MainWindow(OsogoWindow):
 	"""
 
 	# ==========================================================================
-	def __init__( self ):
+	def __init__( self, aSession ):
 		"""Constructor 
 		- calls super class's constructor
 		- calls openWindow
@@ -93,8 +87,10 @@ class MainWindow(OsogoWindow):
 		# calls super class's constructor
 		OsogoWindow.__init__( self, self, 'MainWindow.glade' )
 
-		# calls openWindow
-		self.openWindow()
+		# -------------------------------------
+		# stores pointer to Session
+		# -------------------------------------
+		self.theSession = aSession
 
 	# end of init
 
@@ -107,69 +103,25 @@ class MainWindow(OsogoWindow):
 		# calls superclass's method
 		OsogoWindow.openWindow(self)
 
-		# -------------------------------------
-		# reads defaults from osogo.ini 
-		# -------------------------------------
-		self.theConfigDB=ConfigParser.ConfigParser()
-    		self.theConfigDB.read(OSOGO_PATH+os.sep+'osogo.ini')
-		
+
 		
 		# -------------------------------------
 		# creates MessageWindow 
 		# -------------------------------------
-		self.theMessageWindow = MessageWindow.MessageWindow( self['textview1'] ) 
-		self.theMessageWindow.openWindow()
-		self.MessageWindow_attached=TRUE
+		self.__theMessageWindow = MessageWindow.MessageWindow( self['textview1'] ) 
+		self.__theMessageWindow.openWindow()
+		self.__MessageWindow_attached = TRUE
+		self.theSession.setMessageMethod( self.__printMessage )
+
 		#get and setresizewindowminimumsize
-		self.expose(None,None)
-		self.MW_minimal_size=self.MW_actual_size[:]
+		self.__expose(None,None)
+		self.__MWminimalSize=self.__MWactualSize[:]
 		self['scrolledwindow1'].set_size_request(\
-		    self.MW_minimal_size[0],self.MW_minimal_size[1])
-		self['handlebox24'].connect('child-attached',self.MW_child_attached)
-		self['handlebox24'].connect('child-detached',self.MW_child_detached)
+		    self.__MWminimalSize[0],self.__MWminimalSize[1])
+		self['handlebox24'].connect('child-attached',self.__MWChildAttached)
+		self['handlebox24'].connect('child-detached',self.__MWChildDetached)
 		
-		# -------------------------------------
-		# creates Session
-		# -------------------------------------
-		self.theSession = ecell.Session()
-		self.theSession.theMainWindow = self
-		self.theSession.setMessageMethod( self.theMessageWindow.printMessage )
 
-		# -------------------------------------
-		# creates PluginManager
-		# -------------------------------------
-		self.thePluginManager = OsogoPluginManager( self )
-		self.thePluginManager.loadAll()
-
-		# -------------------------------------
-		# creates FundamentalWindow
-		# -------------------------------------
-		
-		# key:window name(str) value:window instance
-		self.__theFundamentalWindows = {}
-
-		# creates fundamental windows
-		aLoggerWindow     = LoggerWindow.LoggerWindow( self.theSession , self )
-		anInterfaceWindow = InterfaceWindow.InterfaceWindow( self )
-		aStepperWindow    = StepperWindow.StepperWindow( self.theSession , self )
-		aBoardWindow      = BoardWindow.BoardWindow( self.theSession, self )
-
-		# saves them to map
-		self.__theFundamentalWindows['LoggerWindow'] = aLoggerWindow
-		self.__theFundamentalWindows['InterfaceWindow'] = anInterfaceWindow
-		self.__theFundamentalWindows['StepperWindow'] = aStepperWindow
-		self.__theFundamentalWindows['BoardWindow'] = aBoardWindow
-
-		# key:EntityListWindow instance value:None
-		# In deleteEntityListWindow method, an instance of EntityListWindow is
-		# accessed directory. The sequence information of EntityListWindow does
-		# not need. So the references to EntityListWindow instances should be 
-		# held dict's key. Values of dict are not also imported.
-		self.theEntityListInstanceMap = {}  
-
-		self.theUpdateInterval = 150
-		self.theStepSizeOrSec = 1.0
-		self.theRunningFlag = 0
 
 		# -------------------------------------
 		# appends signal handlers
@@ -179,10 +131,10 @@ class MainWindow(OsogoWindow):
 			'load_model_menu_activate'             : self.__openFileSelection ,
 			'load_script_menu_activate'            : self.__openFileSelection ,
 			'save_model_menu_activate'             : self.__openFileSelection ,
-			'exit_menu_activate'                   : self.deleted ,
+			'exit_menu_activate'                   : self.__deleted ,
 			'message_window_menu_activate'         : self.__toggleMessageWindow ,
 			'interface_window_menu_activate'       : self.__displayWindow ,
-			'create_new_entity_list_menu_activate' : self.createEntityListWindow ,
+			'create_new_entity_list_menu_activate' : self.__createEntityListWindow ,
 			'logger_window_menu_activate'          : self.__displayWindow ,
 			'stepper_window_menu_activate'         : self.__displayWindow ,
 			'board_window_menu_activate'           : self.__displayWindow ,
@@ -190,32 +142,28 @@ class MainWindow(OsogoWindow):
 			'about_menu_activate'                  : self.openAbout ,
 
 			# toolbars
-			'start_button_clicked'                 : self.startSimulation ,
-			'stop_button_clicked'                  : self.stopSimulation ,
-			'step_button_clicked'                  : self.stepSimulation ,
+			'start_button_clicked'                 : self.__startSimulation ,
+			'stop_button_clicked'                  : self.__stopSimulation ,
+			'step_button_clicked'                  : self.__stepSimulation ,
 
-			'on_sec_step_entry_activate'           : self.setStepSizeOrSec ,
+			'on_sec_step_entry_activate'           : self.__setStepSizeOrSec ,
 
-			'on_entitylist_button_clicked'         : self.createEntityListWindow ,
+			'on_entitylist_button_clicked'         : self.__createEntityListWindow ,
 			'on_logger_button_clicked'             : self.__displayWindow,
 			'on_message_togglebutton_toggled'      : self.__toggleMessageWindow ,
 			'on_stepper_button_clicked'            : self.__displayWindow,
 			'on_interface_button_clicked'          : self.__displayWindow,
 			'on_board_button_clicked'              : self.__displayWindow,
 			'logo_button_clicked'                  : self.openAbout,
-			'on_scrolledwindow1_expose_event'	: self.expose
+			'on_scrolledwindow1_expose_event'	: self.__expose
 		}
 		self.addHandlers( self.theHandlerMap )
 
 
-		# -------------------------------------
-		# initializes for run method 
-		# -------------------------------------
-		self.theSession.theSimulator.setEventChecker( gtk.events_pending )
-		self.theSession.theSimulator.setEventHandler( gtk.mainiteration  )
+
 		self['ecell_logo_toolbar'].set_style( gtk.TOOLBAR_ICONS )
-		self.setMenuAndButtonsStatus( FALSE )
-		self.updateFundamentalWindows()
+		self.__setMenuAndButtonsStatus( FALSE )
+		#self.theSession.updateFundamentalWindows()
 
 
 		# toggles message window menu and button
@@ -227,30 +175,32 @@ class MainWindow(OsogoWindow):
 		self[self.__class__.__name__].show_all()
 		self.present()
 
+		self.theStepSizeOrSec = 1
 
 		# initializes FileSelection reference
 		self.theFileSelection = None
 
 		# initializes AboutDialog reference
 		self.theAboutDialog = None
-
-
+		self.update()
+		
 	# ==========================================================================
-	def expose(self,obj,obj2):
+	def __expose( self, *arg ):
 		"""expose
 		Return None
 		"""
 
 	    # gets actual dimensions of scrolledwindow1 if it is displayed
 	    # and attached
-		if self.MessageWindow_attached and self.theMessageWindow.isShown:
+
+		if self.__MessageWindow_attached and self.__theMessageWindow.isShown:
 			alloc_rect=self['scrolledwindow1'].get_allocation()
-			self.MW_actual_size=[alloc_rect[2],alloc_rect[3]]
+			self.__MWactualSize=[alloc_rect[2],alloc_rect[3]]
 		
 
 	# ==========================================================================
-	def resize_vertically(self,msg_heigth): #gets messagebox heigth
-		"""resize_vertically
+	def __resizeVertically( self, msg_heigth ): #gets messagebox heigth
+		"""__resizeVertically
 		Return None
 		"""
 
@@ -270,7 +220,7 @@ class MainWindow(OsogoWindow):
 	
 
 	# ==========================================================================
-	def setMenuAndButtonsStatus( self, aDataLoadedStatus ):
+	def __setMenuAndButtonsStatus( self, aDataLoadedStatus ):
 		"""sets initial widgets status
 		aDataLoadedStatus  -- the status of loading data
 		         (TRUE:Model or Script is loaded / FALSE:Not loaded)
@@ -301,56 +251,8 @@ class MainWindow(OsogoWindow):
 		self['save_model_menu'].set_sensitive(aDataLoadedStatus)
 
 
-	# ==========================================================================
-	def read_ini(self,aPath):
-		"""read osogo.ini file
-		an osogo.ini file may be in the given path
-		that have an osogo section or others but no default
-		argument may be a filename as well
-		"""
-
-	    # first delete every section apart from default
-		for aSection in self.theConfigDB.sections():
-			self.theConfigDB.remove(aSection)
-
-		# gets pathname
-		if not os.path.isdir( aPath ):
-			aPath=os.path.dirname( aPath )
-
-		# checks whether file exists
-		aFilename=aPath+os.sep+'osogo.ini'
-		if not os.path.isfile( aFilename ):
-			self.printMessage('There is no osogo.ini file in this directory.\n Falling back to system defauls.\n')
-			return None
-
-	    # tries to read file
-
-		try:
-			self.printMessage('Reading osogo.ini file from directory [%s]' %aPath)
-			self.theConfigDB.read( aFilename )
-
-		# catch exceptions
-		except:
-			self.printMessage(' error while executing ini file [%s]' %aFileName)
-			anErrorMessage = string.join( traceback.format_exception(sys.exc_type,sys.exc_value,sys.exc_traceback), '\n' )
-			self.printMessage(anErrorMessage)
 
 
-	# ==========================================================================
-	def get_parameter(self, aParameter):
-		"""tries to get a parameter from ConfigDB
-		if the param is not present in either osogo or default section
-		raises exception and quits
-		"""
-
-		# first try to get it from osogo section
-		if self.theConfigDB.has_section('osogo'):
-			if self.theConfigDB.has_option('osogo',aParameter):
-				return self.theConfigDB.get('osogo',aParameter)
-
-		# gets it from default
-		return self.theConfigDB.get('DEFAULT',aParameter)
-		    
 
 	# ==========================================================================
 	def __openFileSelection( self, *arg ) :
@@ -454,13 +356,12 @@ class MainWindow(OsogoWindow):
 			pass
 		else:
 			aMessage = ' Error ! No such file. \n[%s]' %aFileName
-			self.printMessage(aMessage)
+			self.__printMessage(aMessage)
 			aDialog = ConfirmWindow(OK_MODE,aMessage,'Error!')
 			self.theFileSelection.present()
 			return None
 
 		self.__deleteFileSelection()
-		self.read_ini(aFileName)
 		self.theSession.message('Loading %s file %s\n' %(aFileType, aFileName) )
 
 		try:
@@ -486,13 +387,14 @@ class MainWindow(OsogoWindow):
 
 			# displays message on MessageWindow
 			aMessage = 'Can\'t load [%s]' %aFileName
-			self.printMessage(aMessage)
-			anErrorMessage = string.join( traceback.format_exception(sys.exc_type,sys.exc_value,sys.exc_traceback), '\n' )
-			self.printMessage(anErrorMessage)
+			self.__printMessage(aMessage)
+			anErrorMessage = string.join( traceback.format_exception(sys.exc_type,sys.exc_value, \
+					sys.	exc_traceback), '\n' )
+			self.__printMessage(anErrorMessage)
 
 
 		self.update()
-		self.updateFundamentalWindows()
+		self.theSession.updateFundamentalWindows()
 
 	# end of loadModel
 
@@ -537,167 +439,135 @@ class MainWindow(OsogoWindow):
 			aDialog = ConfirmWindow(OK_MODE,aMessage,'Error!')
 
 			# displays error message of MessageWindow
-			self.printMessage('Can\'t save [%s]' %aFileName)
+			self.__printMessage('Can\'t save [%s]' %aFileName)
 			anErrorMessage = string.join( traceback.format_exception(sys.exc_type,sys.exc_value,sys.exc_traceback), '\n' )
-			self.printMessage(anErrorMessage)
+			self.__printMessage(anErrorMessage)
 
 		# updates
 		self.update()
-		self.updateFundamentalWindows()
+		self.updateButtons()
+		self.theSession.updateFundamentalWindows()
 
 	# end of loadModel
 
 
 	# ==========================================================================
-	def deleted( self, *arg ):
+	def __deleted( self, *arg ):
 		"""When delete_event happens or exit menu is selected, 
 		this method is called.
 		"""
+		running_flag = False
+		if self.theSession.theRunningFlag:
+		# stop simulation temporarily
+			self.theSession.stop()
+			running_flag = True
 
-		aMessage = 'Are you sure you want to quit?'
-		aTitle = 'Question'
+		# If there is no logger data, exit this program.
+		if len(self.theSession.getLoggerList()) != 0:
+			aMessage = 'Are you sure you want to quit?'
+			aTitle = 'Question'
+			# Popup confirm window, and check user request
+			aDialog = ConfirmWindow(1,aMessage,aTitle)
 
-		# If simulation is running
-		if self.theRunningFlag == TRUE:
+			# ok is pressed
+		
+			if aDialog.return_result() != OK_PRESSED:
+				print "cancel pressed"
+				if running_flag:
+					self.theSession.run()
+				return gtk.TRUE		
 
-			# stop simulation temporarily
-			self.stopSimulation()
 
-			# If there is no logger data, exit this program.
-			if len(self.theSession.getLoggerList())==FALSE:
-				mainQuit()
+		
+		print "OK pressed"
+		self.close()
+		self.theSession.QuitGUI()
+		return gtk.TRUE
 
-			else:
-
-				# Popup confirm window, and check user request
-				aDialog = ConfirmWindow(1,aMessage,aTitle)
-
-				# ok is pressed
-				if aDialog.return_result() == FALSE:
-					mainQuit()
-				# cancel is pressed
-				else:
-					self.startSimulation('')
-					return TRUE
-
-		# If simulation is not running
-		else:
-
-			# If there is no logger data, exit this program.
-			if len(self.theSession.getLoggerList()) == FALSE:
-				mainQuit()
-			else:
-				# Popup confirm window, and check user request
-				aDialog = ConfirmWindow(OKCANCEL_MODE,aMessage,aTitle)
-
-				# ok is pressed
-				if aDialog.return_result() == FALSE:
-					mainQuit()
-				else:
-				# cancel is pressed
-					pass
-
-		return TRUE
+	# ==========================================================================
+	def close( self ):
+		""" restores message method and closes window """
+		self.theSession.restoreMessageMethod()
+		OsogoWindow.close( self )
 
 
 	# ==========================================================================
-	def startSimulation( self, arg ) :
+	def __startSimulation( self, *arg ) :
 		"""starts simulation
 		arg[0]  ---  stop button (gtk.Button)
 		Returns None
 		"""
+		self.theSession.run()
 
-		if self.theRunningFlag == TRUE:
-			return
-
-		try:
-			self.theRunningFlag = TRUE
-			# this can fail if the simulator is not ready
-			self.theSession.theSimulator.initialize()
-
-			aCurrentTime = self.theSession.getCurrentTime()
-			self.theSession.message("%15s"%aCurrentTime + ":Start\n" )
-			self.theTimer = gtk.timeout_add(self.theUpdateInterval, self.updateByTimeOut, FALSE)
-			self.theSession.run()
-			self.theRunningFlag = FALSE
-			self.removeTimeOut()
-
-		except:
-			anErrorMessage = traceback.format_exception(sys.exc_type,sys.exc_value,sys.exc_traceback)
-			self.theMessageWindow.printMessage(anErrorMessage)
-			self.theRunningFlag = 0
+	# ==========================================================================
+	def startSimulation( self ) :
+		""" starts simulation """
+		self.__startSimulation( self, None )
 
 
 	# ==========================================================================
-	def stopSimulation( self, *arg ) :
-		"""stos simulation
+	def __stopSimulation( self, *arg  ) :
+		"""stops simulation
 		arg[0]  ---  stop button (gtk.Button)
 		Returns None
 		"""
-
-		try:
-			if self.theRunningFlag == TRUE:
-				self.theSession.stop()
-
-				aCurrentTime = self.theSession.getCurrentTime()
-				self.theSession.message( ("%15s"%aCurrentTime + ":Stop\n" ))
-				self.removeTimeOut()
-				self.update()
-				self.updateFundamentalWindows()
-				self.theRunningFlag = FALSE
-
-		except:
-			anErrorMessage = traceback.format_exception(sys.exc_type,sys.exc_value,sys.exc_traceback)
-			self.theMessageWindow.printMessage(anErrorMessage)
-
-		self.updateFundamentalWindows()
-
+		self.theSession.stop()
 
 	# ==========================================================================
-	def stepSimulation( self, arg ) : 
+	def stopSimulation( self ) :
+		""" stops simulation """
+		self.__stopSimulation( self, None )
+
+	# ==========================================================================
+	def __stepSimulation( self, *arg  ) : 
 		"""steps simulation
 		arg[0]  ---  stop button (gtk.Button)
 		Returns None
+		if step measure is second, then Session.run()
+		if step measure is step than Session.step ()
 		"""
-
-		if self.theRunningFlag == 1:
-			return
-
-		try:
-			if self.theStepSizeOrSec==0:
-			    self.theStepSizeOrSec=1
-			    self.theSession.message( "Zero step value overridden to 1\n" )
-			self.theRunningFlag = 1
-			# this can fail if the simulator is not ready
-			self.theSession.theSimulator.initialize()
-
-			self.theSession.message( "Step\n" )
-			self['sec_step_entry'].set_text( str( self.theStepSizeOrSec ) )
-
-			self.theTimer = gtk.timeout_add( self.theUpdateInterval, self.updateByTimeOut, 0 )
-			#if self.theStepType == 0:
-			# When 'sec' is selected.
-			if self['sec_radiobutton'].get_active() == TRUE:
-				self.theSession.run( float( self.theStepSizeOrSec ) )
-
-			# When 'step' is selected.
-			else:
-				self.theSession.step( int( self.theStepSizeOrSec ) )
-
-			self.theRunningFlag = 0
-			self.removeTimeOut()
-			self.update()
-			self.updateFundamentalWindows()
-
-		except:
-			anErrorMessage = traceback.format_exception(sys.exc_type,sys.exc_value,sys.exc_traceback)
-			self.theMessageWindow.printMessage( anErrorMessage )
-			self.theRunningFlag = 0
-
-            
+		if self.getStepType:
+			self.theSession.run( self.getStepSize() )
+		else:
+			self.theSession.step( self.getStepSize() )
 
 	# ==========================================================================
-	def setStepSizeOrSec( self, *arg ):
+	def stepSimulation( self ) :
+		""" steps simulation """
+		self.__stepSimulation( self, None )
+
+
+	# ==========================================================================
+	def getStepType( self ):
+		""" returns state of sec radiobutton
+			gtk.TRUE: seconds
+			gtk.FALSE: steps
+		"""
+		return self['sec_radiobutton'].get_active()
+
+	# ==========================================================================
+	def setStepType( self, aState ):
+		""" sets Step Type radiobutton state 
+			values for aState
+			gtk.TRUE : seconds
+			gtk.FALSE : step			
+			"""
+		if aState == gtk.TRUE or aState == gtk.FALSE:
+			self['sec_radiobutton'].set_active( aState )
+
+	# ==========================================================================
+	def getStepSize( self ):
+		""" returns user or script specifid step size """
+		return self.theStepSizeOrSec
+
+	# ==========================================================================
+	def getStepSize( self, num ):
+		""" sets Stepsize entry box to num """
+		self['sec_step_entry'].set_text( str (num) )
+		self.__setStepSizeOrSec( self, None )
+
+	# ==========================================================================
+	def __setStepSizeOrSec( self, *arg ):
 
 		# gets the inputerd characters from the GtkEntry. 
 		aNewValue = string.strip( self['sec_step_entry'].get_text() )
@@ -747,58 +617,41 @@ class MainWindow(OsogoWindow):
 			
 
 	# ==========================================================================
-	def updateByTimeOut( self, arg ):
-		"""when time out, calls updates method()
-		Returns None
-		"""
-
-		self.update()
-		self.updateFundamentalWindows()
-
-		self.theTimer = gtk.timeout_add( self.theUpdateInterval, self.updateByTimeOut, 0 )
-
-
-	# ==========================================================================
-	def removeTimeOut( self ):
-		"""removes time out
-		Returns None
-		"""
-
-		gtk.timeout_remove( self.theTimer )
-
-
-	# ==========================================================================
 	def update( self ):
 		"""updates this window 
 		Returns None
 		"""
-
+		if not self.exists():
+			return None
 		# updates time
 		aTime = self.theSession.theSimulator.getCurrentTime()
 		self.theCurrentTime = aTime
 		self['time_entry'].set_text( str( self.theCurrentTime ) )
-
-		# updates all plugin windows
-		self.thePluginManager.updateAllPluginWindow()
-        
-
-	# ==========================================================================
-	def createEntityListWindow( self, *arg ):
-		"""creaets an EntityListWindow
-		"""
-
+		self['sec_step_entry'].set_text( str( self.theStepSizeOrSec ) )
 		# when Model is already loaded.
 		if len(self.theSession.theModelName) > 0:
+			# updates status of menu and button 
+			self.__setMenuAndButtonsStatus( TRUE )
 
-			# creates new EntityListWindow instance
-			anEntityListWindow = EntityListWindow.EntityListWindow( self )
-			anEntityListWindow.openWindow()
-
-			# saves the instance into map
-			self.theEntityListInstanceMap[ anEntityListWindow ] = None
+			self.updateButtons()
+        
+	# ==========================================================================
+	def updateButtons( self ):
+		""" updates Buttons and menus with 
+		latest FundamentalWindow status
+		"""
+		pass
 		
-		# updates all fundamental windows
-		self.updateFundamentalWindows()
+		#if self.exists():
+
+		#MessageWindow
+		#	if self.__theMessageWindow.exists():
+		#		flag = gtk.TRUE
+		#	else:
+		#		flag = gtk.FALSE
+		#		self['message_window_menu'].activate()
+		#
+		#	self['message_togglebutton'].set_active( flag )
 
 
 	# ==========================================================================
@@ -818,47 +671,35 @@ class MainWindow(OsogoWindow):
 		# When LoggerWindow is selected
 		if arg[0] == self['logger_button'] or \
 		   arg[0] == self['logger_window_menu']:
-			self.displayWindow('LoggerWindow')
+			self.theSession.displayWindow('LoggerWindow')
 
 		# When StepperWindow is selected
 		elif arg[0] == self['stepper_button'] or \
 		     arg[0] == self['stepper_window_menu']:
-			self.displayWindow('StepperWindow')
+			self.theSession.displayWindow('StepperWindow')
 
 		# When InterfaceWindow is selected
 		elif arg[0] == self['interface_button'] or \
 		     arg[0] == self['interface_window_menu']:
-			self.displayWindow('InterfaceWindow')
+			self.theSession.displayWindow('InterfaceWindow')
 
 		# When BoardWindow is selected
 		elif arg[0] == self['board_button'] or \
 		     arg[0] == self['board_window_menu']:
-			self.displayWindow('BoardWindow')
+			self.theSession.displayWindow('BoardWindow')
+
 
 
 	# ==========================================================================
-	def displayWindow( self, aWindowName ):
-		"""When the Window is not created, calls its openWidow() method.
-		When already created, move it to the top of desktop.
-		aWindowName   ---  window name(str)
-		Return None
-		[None]:When the WindowName does not matched, creates nothing.
-		"""
+	def hideMessageWindow( self ):
+		self['message_togglebutton'].set_active(gtk.FALSE)
+		self.__toggleMessageWindow( self['message_togglebutton'] ) 
 
-		# When the WindowName does not matched, creates nothing.
-		if self.__theFundamentalWindows.has_key( aWindowName ) == FALSE:
-			print "No such WindowType (%s) " %aWindowName
-			return None
 
-		# When the Window is already created, move it to the top of desktop
-		if self.__theFundamentalWindows[aWindowName].exists():
-			self.__theFundamentalWindows[aWindowName].present()
-
-		# Whend the Window is not created yet, create it.
-		else:
-			self.__theFundamentalWindows[aWindowName].openWindow()
-			self.__theFundamentalWindows[aWindowName].update()
-
+	# ==========================================================================
+	def showMessageWindow( self ):
+		self['message_togglebutton'].set_active(gtk.TRUE)
+		self.__toggleMessageWindow( self['message_togglebutton'] ) 
 
 	# ==========================================================================
 	def __toggleMessageWindow( self, *arg ) :
@@ -875,45 +716,45 @@ class MainWindow(OsogoWindow):
 		if arg[0].get_active() == TRUE:
 
 			self['handlebox24'].show()
-			if self.MessageWindow_attached:
-				self.resize_vertically(self.MW_actual_size[1])
+			if self.__MessageWindow_attached:
+				self.__resizeVertically(self.__MWactualSize[1])
 			else:
-				self.resize_vertically(0)
+				self.__resizeVertically(0)
 
 		# When Message is required to be folded.
 		else:
 
 			# hide handlebox, resize window
 			self['handlebox24'].hide()
-			self.resize_vertically(0)
+			self.__resizeVertically(0)
 			self['message_togglebutton'].set_active(FALSE)
 
 
 	# ==========================================================================
-	def MW_child_attached(self,obj,obj2):
-		"""MW_child_attached
+	def __MWChildAttached(self,obj,obj2):
+		"""__MWChildAttached
 		called when MessageBox is reatached to MainWindow
 		must resize msgbox scrolledwindow to minimal size
 		and the Mainwindow to extended size
 		"""
 
 		self['scrolledwindow1'].set_size_request(\
-		                        self.MW_minimal_size[0], self.MW_minimal_size[1])
-		self.resize_vertically(self.MW_actual_size[1])
-		self.MessageWindow_attached=TRUE
+		                        self.__MWminimalSize[0], self.__MWminimalSize[1])
+		self.__resizeVertically(self.__MWactualSize[1])
+		self.__MessageWindow_attached=TRUE
 
 	    
 	# ==========================================================================
-	def MW_child_detached(self,obj,obj2):
-		"""MW_child_detached
+	def __MWChildDetached(self,obj,obj2):
+		"""__MWChildDetached
 		called when MessageBox is detached from MainWindow
 		must resize msgbox scrolledwindow to actual size
 		and the Mainwindow to minimalsize
 		"""
 
-		self['scrolledwindow1'].set_size_request(self.MW_actual_size[0], self.MW_actual_size[1])
-		self.resize_vertically(0)
-		self.MessageWindow_attached=FALSE
+		self['scrolledwindow1'].set_size_request(self.__MWactualSize[0], self.__MWactualSize[1])
+		self.__resizeVertically(0)
+		self.__MessageWindow_attached=FALSE
 	        
 
 	# ==========================================================================
@@ -967,72 +808,28 @@ class MainWindow(OsogoWindow):
 
 
 	# ==========================================================================
-	def printMessage( self, aMessage ):
+	def __printMessage( self, aMessage ):
 		"""prints message on MessageWindow
 		aMessage   ---  a message (str or list)
 		Return None
 		"""
 
 		# prints message on MessageWindow
-		self.theMessageWindow.printMessage( aMessage )
-
-
-	# ==========================================================================
-	def updateFundamentalWindows( self ):
-		"""updates fundamental windows
-		Return None
-		"""
-
-		# updates all fundamental windows
-		for aFundamentalWindow in self.__theFundamentalWindows.values():
-			aFundamentalWindow.update()
-
-		# updates all EntityListWindow
-		for anEntityListWindow in self.theEntityListInstanceMap.keys():
-			anEntityListWindow.update()
-
-		# when Model is already loaded.
-		if len(self.theSession.theModelName) > 0:
-
-			# updates status of menu and button 
-			self.setMenuAndButtonsStatus( TRUE )
-
-
-	def getWindow( self, aWindowName ):
-		"""
-		aWindowName   ---  Window name (str)
-		Returns Window or EntityListWindow list
-		"""
-
-		if self.__theFundamentalWindows.has_key(aWindowName):
-			return self.__theFundamentalWindows[aWindowName]
-
-		elif aWindowName == 'EntityListWindow':
-			return self.theEntityListInstanceMap.keys()
-
-		else:
-			raise "(%s) does not match." %aWindowName
+		self.__theMessageWindow.printMessage( aMessage )
 
 	# ==========================================================================
-	def deleteEntityListWindow( self, anEntityListWindow ):
-		"""deletes the reference to the instance of EntityListWindow
-		anEntityListWindow   ---  an instance of EntityListWindow(EntityListWindow)
-		Return None
-		[Note]: When the argument is not anEntityListWindow, throws exception.
-		        When this has not the reference to the argument, does nothing.
+	def __createEntityListWindow( self, *arg ):
+		self.theSession.createEntityListWindow( )
+
+	# ========================================================================
+	def deleted( self, *arg ):
+		""" When 'delete_event' signal is chatcked( for example, [X] button is clicked ),
+		delete this window.
+		Returns TRUE
 		"""
+		return self.__deleted( *arg )
 
-		# When the argument is not anEntityListWindow, throws exception.
-		if anEntityListWindow.__class__.__name__ != 'EntityListWindow':
-			raise "(%s) must be EntityListWindow" %anEntityListWindow
 
-		# deletes the reference to the PropertyWindow instance on the EntityListWindow
-		self.thePluginManager.deletePropertyWindowOnEntityListWinsow( anEntityListWindow.thePropertyWindow )
-
-		# deletes the reference to the EntityListWindow instance
-		if self.theEntityListInstanceMap.has_key( anEntityListWindow ):
-			del self.theEntityListInstanceMap[ anEntityListWindow ]
-	
 
 # end of MainWindow
 

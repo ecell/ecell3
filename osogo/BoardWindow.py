@@ -58,11 +58,11 @@ MAXHEIGHT=800
 class BoardWindow(OsogoWindow):
 
 
-	def __init__( self, aSession, aMainWindow ): 
+	def __init__( self, aSession ): 
 
-		OsogoWindow.__init__( self, aMainWindow, 'BoardWindow.glade' )
+		OsogoWindow.__init__( self, aSession, 'BoardWindow.glade' )
 
-		self.thePluginManager = aMainWindow.thePluginManager
+		self.thePluginManager = aSession.thePluginManager
 		self.theX = 0
 		self.theY = 0
 		self.theRowSize = -1
@@ -71,7 +71,7 @@ class BoardWindow(OsogoWindow):
 		self.theCol = -1
 		self.thePluginMap = {}
 		self.theSelectedPluginFrame = None
-		self.theMainWindow = aMainWindow
+		self.theSession = aSession
 	# end of the __init__
 
 	def openWindow(self):
@@ -93,7 +93,7 @@ class BoardWindow(OsogoWindow):
 		self.theScrolledWindow = self['scrolledwindow1']
 		self.theViewPort=self['viewport1']
 		self.deleteScroll()
-		for anEntityWindow in self.theMainWindow.getWindow('EntityListWindow'):
+		for anEntityWindow in self.theSession.getWindow('EntityListWindow'):
 			anEntityWindow.checkBoardExists()
 
 	def displayScroll(self):
@@ -277,7 +277,6 @@ class BoardWindow(OsogoWindow):
 			aRequisitionList[r * __matrixsize + c ] = anElement.size_request()
 
 		#shrink to fit
-#		return False
 		theTableHeight = self['board_table'].size_request()[1]
 		theTableWidth = self['board_table'].size_request()[0]
 
@@ -301,7 +300,6 @@ class BoardWindow(OsogoWindow):
 		else:
 			self.deleteScroll()
 
-#		self['board_table'].set_size_request(theTableWidth, theTableHeight)
 
 	def changeAlignment( self, *arg ):
 		# --------------------------------------------
@@ -327,18 +325,29 @@ class BoardWindow(OsogoWindow):
 	
 		if len(aNewTitle) == 0:
 			anErrorMessage='\nError text field is blank.!\n'
-			#self.theMainWindow.printMessage( anErrorMessage )
+			#self.theSession.message( anErrorMessage )
 			aWarningWindow = ConfirmWindow(OK_MODE,anErrorMessage,"!")
 			return None
 
 		aTitle = self.thePluginMap[str(self.theSelectedPluginFrame)].getTitle()
 
-		self.theMainWindow.thePluginManager.editInstanceTitle( aTitle, aNewTitle )
-		self.theMainWindow.updateFundamentalWindows()
+		self.thePluginManager.editInstanceTitle( aTitle, aNewTitle )
+		self.theSession.updateWindows()
 
 
 	def shrink_to_fit(self):
 		self.updatePositions()
+
+	# ========================================================================
+	def resize( self, width, heigth ):
+		"""resizes this window according to width and heigth.
+		When glade file is not loaded yet or already deleted, does nothing.
+		Returns None
+		"""
+		if self.exists():
+			self[self.__class__.__name__].resize( width, heigth)
+			self.updatePositions()
+
 
 	# end of editTitle
 

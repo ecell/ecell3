@@ -55,13 +55,11 @@ class LoggerWindow(OsogoWindow):
 	# ---------------------------------------------------------------
 	# constructor
 	# aSession : the reference of session
-	# aMainWindow : the reference of MainWindow
+	# aSession : the reference of Session
 	# ---------------------------------------------------------------
-	def __init__( self, aSession, aMainWindow ): 
+	def __init__( self, aSession ): 
 
-		#OsogoWindow.__init__( self, 'LoggerWindow.glade', aMainWindow )
-		OsogoWindow.__init__( self, aMainWindow, 'LoggerWindow.glade' )
-		self.theSession = aSession
+		OsogoWindow.__init__( self, aSession, 'LoggerWindow.glade' )
 		self.theDefaultSaveDirectory='Data'
 		self.thePopupMenu = PopupMenu( self )
 		self.theList = []
@@ -79,7 +77,6 @@ class LoggerWindow(OsogoWindow):
 	def openWindow(self):
 
 		OsogoWindow.openWindow(self)
-		#self.theMainWindow = aMainWindow
 
 		self.theEntryList = self['loggerWindow_clist']
 
@@ -374,7 +371,7 @@ class LoggerWindow(OsogoWindow):
 
 			aLoggerStub = self.theSession.createLoggerStub( aFullPNString )
 			start = str( aLoggerStub.getStartTime() )
-			if self.theMainWindow.theRunningFlag:
+			if self.theSession.theRunningFlag:
 				end = 'running'
 			else:
 				end = str( aLoggerStub.getEndTime() )
@@ -401,11 +398,7 @@ class LoggerWindow(OsogoWindow):
 	# return -> None
 	# ---------------------------------------------------------------
 	def closeWindow ( self, obj ):
-		#gtk.mainquit()
 		self[self.__class__.__name__].iconify()
-		#self[self.__class__.__name__].hide_all()
-		#self.isShown=gtk.FALSE
-		#self.theMainWindow.toggleLoggerWindow()
 		
 	# closeWindow
 
@@ -576,9 +569,8 @@ if __name__ == "__main__":
 		gtk.mainloop()
 
 	def main():
-		aMainWindow = MainWindow()
 		aSession = Session()
-		aLoggerWindow = LoggerWindow( aSession, aMainWindow )
+		aLoggerWindow = LoggerWindow( aSession )
 		mainLoop()
 
 	main()

@@ -63,7 +63,7 @@ class ConfirmWindow(gtk.Dialog):
 		self.___num = CANCEL_PRESSED
 
 		# Create the Dialog
-		self.win = gtk.Dialog()
+		self.win = gtk.Dialog(aTitle, None, gtk.DIALOG_MODAL)
 		self.win.connect("destroy",self.destroy)
 
 		# Sets size and position
@@ -73,7 +73,7 @@ class ConfirmWindow(gtk.Dialog):
 		self.win.show()
 
 		# Sets title
-		self.win.set_title(aTitle)
+		# self.win.set_title(aTitle)
 
 		# Sets message
 		aMessage = '\n' + aMessage + '\n'

@@ -83,7 +83,7 @@ class OsogoPluginWindow(PluginWindow):
 		# calls superclass's constructor
 		PluginWindow.__init__( self, aDirName, aPluginManager, aRoot )
 
-		self.theSession = self.thePluginManager.theMainWindow.theSession 
+		self.theSession = self.thePluginManager.theSession 
 		self.theRawFullPNList = aData
 
 		# sets default title
@@ -250,7 +250,7 @@ class OsogoPluginWindow(PluginWindow):
 			self.theSession.theSimulator.setEntityProperty( createFullPNString( aFullPN ), aValue )
 
 			self.thePluginManager.updateAllPluginWindow()
-			self.thePluginManager.theMainWindow.updateFundamentalWindows()
+			self.thePluginManager.theSession.updateFundamentalWindows()
 
 			#return None
 		else:
@@ -399,7 +399,51 @@ class OsogoPluginWindow(PluginWindow):
 
 	# end of changeFullPN
 
+	# ========================================================================
+	def isStandAlone(self):
+		""" returns True if plugin is in a separate window
+			False if it is on a BoardWindow
+		"""
+		return self.getParent().__class__.__name__[:5]!='Board'
+		
+
+
+	# ========================================================================
+	def present( self ):
+		"""moves this window to the top of desktop.
+		if plugin is on BoardWindow, does nothing.
+		Returns None
+		"""
+
+		if self.isStandAlone():
+			self[self.__class__.__name__].present()
+
+	# ========================================================================
+	def iconify( self ):
+		"""moves this window to the taskbar.
+		When it is on Boardwindow, does nothing.
+		Returns None
+		"""
+	
+		if self.isStandAlone():
+			self[self.__class__.__name__].iconify()
+
+	# ========================================================================
+	def move( self, xpos, ypos ):
+		"""moves this window on the desktop to (xpos,ypos).
+		When it is on Boardwindow, does nothing.
+		Returns None
+		"""
+
+		if self.isStandAlone():
+			self[self.__class__.__name__].move( xpos, ypos)
+
+	# ========================================================================
+	def resize( self, width, heigth ):
+		"""resizes this window according to width and heigth.
+		Returns None
+		"""
+		self[self.__class__.__name__].resize( width, heigth)
+
 
 # end of OsogoPluginWindow
-
-

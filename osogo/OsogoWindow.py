@@ -54,17 +54,17 @@ class OsogoWindow(Window):
 	"""
 
 	# ========================================================================
-	def __init__( self, aMainWindow, aGladeFile=None ):
+	def __init__( self, aSession = None, aGladeFile=None ):
 		"""constructor
-		aMainWindow  -- a reference to MainWindow (MainWindow)
+		aSession  -- a reference to Session (Session)
 		aGladeFile   -- a glade file name (str)
 		"""
 
 		# calls superclass's constructor
 		Window.__init__( self, aGladeFile, aRoot=None )
 
-		# saves a reference to MainWindow
-		self.theMainWindow = aMainWindow
+		# saves a reference to Session
+		self.theSession = aSession
 
 		# initializes exist flag
 		self.__theExist = FALSE
@@ -95,7 +95,47 @@ class OsogoWindow(Window):
 
 			self[self.__class__.__name__].present()
 
+	# ========================================================================
+	def iconify( self ):
+		"""moves this window to the taskbar.
+		When glade file is not loaded yet or already deleted, does nothing.
+		Returns None
+		"""
 
+	
+		# When glade file is not loaded yet or already deleted, does nothing
+		# calls iconify() method of Window widget of this window.
+		if self.exists():
+
+			self[self.__class__.__name__].iconify()
+
+	# ========================================================================
+	def move( self, xpos, ypos ):
+		"""moves this window on the desktop to (xpos,ypos).
+		When glade file is not loaded yet or already deleted, does nothing.
+		Returns None
+		"""
+
+	
+		# When glade file is not loaded yet or already deleted, does nothing
+		# calls move(x,y) method of Window widget of this window.
+		if self.exists():
+
+			self[self.__class__.__name__].move( xpos, ypos)
+
+	# ========================================================================
+	def resize( self, width, heigth ):
+		"""resizes this window according to width and heigth.
+		When glade file is not loaded yet or already deleted, does nothing.
+		Returns None
+		"""
+
+	
+		# When glade file is not loaded yet or already deleted, does nothing
+		# calls resize(width,heigth) method of Window widget of this window.
+		if self.exists():
+
+			self[self.__class__.__name__].resize( width, heigth)
 
 	# ========================================================================
 	def deleted( self, *arg ):
@@ -153,6 +193,13 @@ class OsogoWindow(Window):
 
 		pass
 
+	# ========================================================================
+	def close ( self ):
+		""" destroys Widgets and sets __theExist FALSE """
+		if self.exists:
+			self[self.__class__.__name__].destroy()
+			self.__theExist = gtk.FALSE
+			self.theSession.theMainWindow.update()
 
 # end of OsogoWindow
 
