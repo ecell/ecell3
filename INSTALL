@@ -187,14 +187,13 @@ NOTE: If you get this package via cvs, use ./autogen.sh instead of
    Browsable html is in 'doc/refman/html' and latex source is in 
    'doc/latex'.
 
-   Point your browser to '~/ecell3/doc/html/index.html' to browse
-   the html files.  To compile the latex source, type '% make' in
-   '~/ecell3/doc/latex/'.  This generates 'refman.dvi'.  To create a
-   PostScript file type '% make ps'.  '% make ps_2on1'.  '% make pdf' and
-   '% make pdf_2on1' generate pdf files instead.
+   Point your browser to 'ecell3/doc/refman/html/index.html' to browse
+   the html files.  To create a PostScript file type '% make doc-ps'.
+   '% make doc-pdf' generates a pdf file instead.  '% make doc-html-archive'
+   generates a gzipped tarball of the html manual.  These files are 
+   placed at doc/refman/.
 
-   Edit ecell3.doxy to configure the documentation generated.  Currently, the
-   internals as well as the API are visible in the output.
+   Edit ecell3.doxy to configure the documentation generated. 
 
    The documentation is currently incomplete.
  
