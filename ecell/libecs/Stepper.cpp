@@ -643,10 +643,10 @@ namespace libecs
     
     if( value == "TIME" )
       {
-	//FIXME: this still gives the same seeds to Steppers
-	//       in multi-stepper environment.  A solution is
-	//       to add a number hashed from stepper id to time().
-	aSeed = static_cast<UnsignedInt>( time( NULLPTR ) );
+	// Using just time() still gives the same seeds to Steppers
+	// in multi-stepper model.  Stepper index is added to prevent this.
+	aSeed = static_cast<UnsignedInt>( time( NULLPTR ) 
+					  + getSchedulerIndex() );
       }
     else if( value == "DEFAULT" )
       {
