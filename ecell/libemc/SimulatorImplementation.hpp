@@ -13,9 +13,9 @@ public:
   ~SimulatorImplementation() {};
   RootSystem* getRootSystemPtr() { return theRootSystem; }
 
-  void makePrimitive( StringCref, FQPNCref, StringCref );
-  void sendMessage( FQPNCref, MessageCref );
-  Message getMessage( FQPNCref, StringCref );
+  void makePrimitive( StringCref classname, FQPNCref fqpn, StringCref name );
+  void sendMessage( FQPNCref fqpn, MessageCref message );
+  Message getMessage( FQPNCref fqpn, StringCref propertyName );
   void step();
 
 private:

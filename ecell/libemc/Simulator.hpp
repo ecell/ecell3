@@ -13,10 +13,12 @@ public:
   Simulator();
   ~Simulator(){};
 
-  void makePrimitive( StringCref, FQPNCref, StringCref );
-  void sendMessage( FQPNCref, Message );
-  Message getMessage( FQPNCref, StringCref );
+  void makePrimitive( StringCref classname, FQPNCref fqpn, StringCref name );
+  void sendMessage( FQPNCref fqpn, Message message );
+  Message getMessage( FQPNCref fqpn, StringCref propertyName );
   void step();
 };
 
 #endif   /* ___SIMULATOR_H___ */
+
+
