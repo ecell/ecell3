@@ -56,17 +56,19 @@ void Stepper::distributeIntegrator( IntegratorAllocator* allocator )
 
 void Stepper::initialize()
 {
-  assert(theOwner);
+  // FIXME: use exception
+  assert( theOwner );
 }
 
 ////////////////////////// MasterStepper
 
 MasterStepper::MasterStepper() 
   :
-  thePace(1),
-  theAllocator(NULL)
+  thePace( 1 ),
+  theAllocator( NULL )
 {
-  theRootSystem->getStepperLeader().registerMasterStepper( this );
+  getOwner()->getRootSystem()->
+    getStepperLeader().registerMasterStepper( this );
 }
 
 void MasterStepper::initialize()
@@ -114,7 +116,7 @@ void MasterStepper::registerSlaves(System* system)
 
 Float MasterStepper::getDeltaT()
 {
-  return theRootSystem->getStepperLeader().getDeltaT();
+  return getOwner()->getRootSystem()->getStepperLeader().getDeltaT();
 }
 
 

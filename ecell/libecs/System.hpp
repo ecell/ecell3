@@ -101,7 +101,25 @@ public:
   virtual const char* const className() const { return "System"; }
 
   /**
-    @return An pointer to a Stepper object that this System has or
+     Get a pointer to the RootSystem that this System belongs.
+     Unlike other Primitive classes, System objects must the pointer
+     to the RootSystem.
+
+     @return the pointer to the RootSystem.
+  */
+  RootSystemPtr getRootSystem() const { return theRootSystem; }
+
+  /**
+     Set supersystem of this System.
+     Unlike other Primitive classes, theRootSystem is also set 
+     in this method as well as theSupersystem.
+
+     @param supersystem a pointer to a System to which this object belongs.
+   */
+  void setSuperSystem( SystemPtr const supersystem );
+
+  /**
+    @return A pointer to a Stepper object that this System has or
     NULL pointer if it is not set.
     */
   StepperPtr getStepper() { return theStepper; }
@@ -241,14 +259,6 @@ public:
     */
   ReactorPtr getReactor( StringCref id ) throw( NotFound );
 
-
-  //FIXME: remove this
-  /**
-    Fixes a Substance object named @a id in this System.
-    (i.e. bypass numerical integration.)
-    */
-  //  void fixSubstance( StringCref id );
-
   /**
     Add a Substance object in this System.
     */
@@ -375,7 +385,7 @@ protected:
 
 protected:
 
-  FQIDPtr theVolumeIndexName;
+  FQIDPtr    theVolumeIndexName;
   ReactorPtr theVolumeIndex;
   StepperPtr theStepper;
 
@@ -383,9 +393,11 @@ protected:
 
 private:
 
-  ReactorList theReactorList;
+  ReactorList   theReactorList;
   SubstanceList theSubstanceList;
-  SystemList theSubsystemList;
+  SystemList    theSubsystemList;
+
+  RootSystemPtr theRootSystem;
 
 };
 

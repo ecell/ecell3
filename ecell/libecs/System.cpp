@@ -57,7 +57,8 @@ System::System()
   :
   theVolumeIndexName( NULL ),
   theVolumeIndex( NULL ),
-  theStepper( NULL ) 
+  theStepper( NULL ),
+  theRootSystem( NULL )
 {
   makeSlots();
   theFirstRegularReactorIterator = getFirstReactorIterator();
@@ -67,6 +68,12 @@ System::~System()
 {
   delete theStepper;
   delete theVolumeIndexName;
+}
+
+void System::setSuperSystem( SystemPtr const supersystem )
+{
+  setSuperSystem( supersystem );
+  theRootSystem = getSuperSystem()->getRootSystem();
 }
 
 const String System::getFqpi() const
@@ -100,7 +107,7 @@ const Message System::getVolumeIndex( StringCref keyword )
 void System::setStepper( StringCref classname )
 {
   StepperPtr aStepper;
-  aStepper = theRootSystem->getStepperMaker().make( classname );
+  aStepper = getRootSystem()->getStepperMaker().make( classname );
   aStepper->setOwner( this );
 
   theStepper = aStepper;
@@ -374,7 +381,7 @@ void System::addSubstance( SubstancePtr newone )
       return;
     }
   theSubstanceList[ newone->getId() ] = newone;
-  newone->setSupersystem( this );
+  newone->setSuperSystem( this );
 
 }
 

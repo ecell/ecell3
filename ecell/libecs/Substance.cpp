@@ -110,7 +110,8 @@ void Substance::setAccumulator( StringCref classname )
 {
   try {
     AccumulatorPtr aAccumulatorPtr;
-    aAccumulatorPtr = theRootSystem->getAccumulatorMaker().make( classname );
+    aAccumulatorPtr = getSuperSystem()->getRootSystem()->
+      getAccumulatorMaker().make( classname );
     setAccumulator(aAccumulatorPtr);
     if( classname != userDefaultAccumulatorName() )
       {
@@ -182,7 +183,7 @@ Float Substance::getActivity()
 
 void Substance::calculateConcentration()
 {
-  theConcentration = theQuantity / ( getSupersystem()->getVolume() * N_A ); 
+  theConcentration = theQuantity / ( getSuperSystem()->getVolume() * N_A ); 
 }
 
 
@@ -190,7 +191,7 @@ bool Substance::haveConcentration() const
 {
   bool aBool(true);
 
-  if( getSupersystem()->getVolumeIndex() == NULL ) 
+  if( getSuperSystem()->getVolumeIndex() == NULL ) 
     {
       aBool = false;
     }

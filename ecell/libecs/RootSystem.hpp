@@ -91,8 +91,6 @@ private:
 
 };
 
-extern RootSystemPtr theRootSystem;
-
 #endif /* ___ROOTSYSTEM_H___ */
 
 

@@ -54,13 +54,12 @@ public:
     Usually no need to set this manually because a System object will 
     do this when an Entity is installed to the System.
 
-    @param supersystem name of a System object to which this object
-    belongs.
+    @param supersystem a pointer to a System to which this object belongs.
    */
-  virtual void setSupersystem( SystemPtr const supersystem ) 
-   { theSupersystem = supersystem; }
+  virtual void setSuperSystem( SystemPtr const supersystem ) 
+   { theSuperSystem = supersystem; }
 
-  SystemPtr getSupersystem() const {return theSupersystem;}
+  SystemPtr getSuperSystem() const {return theSuperSystem;}
 
   /**
     Set an identifier of this Entity.
@@ -136,7 +135,7 @@ private:
 
 private:
 
-  SystemPtr theSupersystem;
+  SystemPtr theSuperSystem;
   String theId;
   String theName;
 };

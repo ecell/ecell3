@@ -88,7 +88,8 @@ const Message Reactor::getInitialActivity( StringCref keyword )
 void Reactor::setSubstrate( FQIDCref fqid, int coefficient )
 {
   FQPI fqpi( Primitive::SUBSTANCE, fqid );
-  Primitive aPrimitive = theRootSystem->getPrimitive( fqpi );
+  Primitive aPrimitive = 
+    getSuperSystem()->getRootSystem()->getPrimitive( fqpi );
   
   addSubstrate( *(aPrimitive.substance), coefficient );
 }
@@ -96,32 +97,33 @@ void Reactor::setSubstrate( FQIDCref fqid, int coefficient )
 void Reactor::setProduct( FQIDCref fqid, int coefficient )
 {
   FQPI fqpi( Primitive::SUBSTANCE, fqid );
-  Primitive aPrimitive = theRootSystem->getPrimitive( fqpi );
-  
+  Primitive aPrimitive = 
+    getSuperSystem()->getRootSystem()->getPrimitive( fqpi );
   addProduct( *(aPrimitive.substance), coefficient );
 }
 
 void Reactor::setCatalyst( FQIDCref fqid,int coefficient)
 {
   FQPI fqpi( Primitive::SUBSTANCE, fqid );
-  Primitive aPrimitive = theRootSystem->getPrimitive( fqpi );
-  
+  Primitive aPrimitive = 
+    getSuperSystem()->getRootSystem()->getPrimitive( fqpi );
   addCatalyst( *(aPrimitive.substance), coefficient );
 }
 
 void Reactor::setEffector( FQIDCref fqid, int coefficient )
 {
   FQPI fqpi( Primitive::SUBSTANCE, fqid );
-  Primitive aPrimitive = theRootSystem->getPrimitive( fqpi );
-  
+  Primitive aPrimitive = 
+    getSuperSystem()->getRootSystem()->getPrimitive( fqpi );
   addEffector( *(aPrimitive.substance), coefficient );
 }
 
 void Reactor::setInitialActivity( Float activity )
 {
   theInitialActivity = activity;
-//  theActivity= activity * supersystem()->stepper()->deltaT();
-  theActivity= activity * theRootSystem->getStepperLeader().getDeltaT();
+  // FIXME: take delta T from supersystem
+  theActivity= activity * 
+    getSuperSystem()->getRootSystem()->getStepperLeader().getDeltaT();
 }
 
 Reactor::Reactor() 

@@ -36,7 +36,10 @@
 
 
 Entity::Entity()
-: theSupersystem(NULL),theId(""),theName("") 
+  : 
+  theSuperSystem( NULL ),
+  theId( "" ),
+  theName( "" ) 
 {
   makeSlots();
 }
@@ -59,7 +62,7 @@ Float Entity::getActivity()
 
 Float Entity::getActivityPerSecond() 
 {
-  return ( getActivity()  / getSupersystem()->getStepper()->getDeltaT() );
+  return ( getActivity()  / getSuperSystem()->getStepper()->getDeltaT() );
 }
 
 const String Entity::getFqid() const
@@ -82,12 +85,12 @@ const String Entity::getFqpi() const
 
 const String Entity::getSystemPath() const
 {
-  if( !getSupersystem() )
+  if( !getSuperSystem() )
     {
       return "";
     }
 
-  String aSystemPath = getSupersystem()->getSystemPath(); 
+  String aSystemPath = getSuperSystem()->getSystemPath(); 
 
   if( aSystemPath != "" )
     {
@@ -97,7 +100,7 @@ const String Entity::getSystemPath() const
 	}
     }
 
-  aSystemPath += getSupersystem()->getId();
+  aSystemPath += getSuperSystem()->getId();
 
   return aSystemPath;
 }
