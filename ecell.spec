@@ -23,7 +23,7 @@ E-Cell Simulation Environment (E-Cell SE) is a software package for cellular and
 
 %prep
 %setup 
-%setup -a 1
+#%setup -a 1
 
 CFLAGS="$RPM_OPT_FLAGS" ./configure --prefix=%{_prefix}
 
