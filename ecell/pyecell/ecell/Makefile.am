@@ -46,7 +46,9 @@ GtkSessionMonitor.py\
 gui_config.py\
 SbmlFunctions.py\
 convertSBML2EML.py\
+expressionlextab.py\
 expressionparser.py\
+expressionparsetab.py\
 ModelWalker.py
 
 INCLUDES=-I. -I.. ${PYTHON_INCLUDES}
