@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #
@@ -26,27 +26,33 @@
 # 
 #END_HEADER
 #
-# written by Masahiro Sugimoto <sugi@bioinformatics.org> at
+#'Design: Kenta Hashimoto <kem@e-cell.org>',
+#'Design and application Framework: Kouichi Takahashi <shafi@e-cell.org>',
+#'Programming: Masahiro Sugimoto <sugi@bioinformatics.org>' at
 # E-CELL Project, Lab. for Bioinformatics, Keio University.
 #
 
-from Window import *
+#from Window import *
+from OsogoWindow import *
 from gtk import *
 from Numeric import *
 
-from LoggerFactory import *     # This file should be moved proper directory.
+#from LoggerFactory import *     # This file should be moved proper directory.
 from ConfirmWindow import *
 
 from os import *
 
 from ecell.ecssupport import *
 
+from ecell.DataFileManager import *
+from ecell.ECDDataFile import *
 
 # ---------------------------------------------------------------
 # This is LoggerWindow class .
 #
 # ---------------------------------------------------------------
-class LoggerWindow(Window):
+#class LoggerWindow(Window):
+class LoggerWindow(OsogoWindow):
 
 
 	# ---------------------------------------------------------------
@@ -56,7 +62,9 @@ class LoggerWindow(Window):
 	# ---------------------------------------------------------------
 	def __init__( self, session, aMainWindow ): 
 
-		Window.__init__( self, 'LoggerWindow.glade' )
+		#Window.__init__( self, 'LoggerWindow.glade' )
+		OsogoWindow.__init__( self, 'LoggerWindow.glade' )
+		OsogoWindow.openWindow(self)
 		self.theMainWindow = aMainWindow
 
 		self.theSession = session
@@ -67,6 +75,8 @@ class LoggerWindow(Window):
 
 		# reset
 		self.resetAllValues()
+
+		#self.exist = 1
 
 		# ---------------------------------------------------------------
 		# Adds handlers
@@ -89,7 +99,13 @@ class LoggerWindow(Window):
 	  			'on_time_checkbox_toggled' : self.updateStartEnd,
 
 				# window event
-		 		'on_exit_activate' : self.closeWindow
+		 		'on_exit_activate' : self.closeWindow,
+
+				# test
+				#'on_loggerWindow_destroy'  : self.destroy,
+				#'on_loggerWindow_delete_event'  : self.delete_event,
+				#'on_loggerWindow_destroy_event'  : self.destroy_event,
+
 			})
 
 		# ---------------------------------------------------------------
@@ -143,7 +159,8 @@ class LoggerWindow(Window):
 	# return -> None
 	# ---------------------------------------------------------------
 	def closeParentWindow( self, obj ):
-		aParentWindow = button_obj.get_parent_window()
+		#aParentWindow = button_obj.get_parent_window()
+		aParentWindow = self.theSaveDirectorySelection.cancel_button.get_parent_window()
 		aParentWindow.hide()
 
 	# end of closeParentWindow
@@ -293,30 +310,35 @@ class LoggerWindow(Window):
 				self["statusbar"].push(1,'%s was created.'%aSaveDirectory)
 
 
-		aLoggerFactory = LoggerFactory()
-
 		# -------------------------------------------------
 		# [3] Execute saving.
 		# -------------------------------------------------
+		#aLoggerFactory = LoggerFactory()
+
+		# creates instance datafilemanager
+		aDataFileManager = DataFileManager()
+
+		# sets root directory to datafilemanager
+		aDataFileManager.setRootDirectory(aSaveDirectory)
+
+		aFileIndex=0
+
 		try: #(1)
+
+			# gets all list of selected property name
 			for aFullPNString in self.theSelectedPropertyName(): #(2)
 
 				# -------------------------------------------------
-				# gets ECDFileName and DirectoryName to save.
+				# creates filename
+				# from [Substance:/CELL/CYTOPLASM:E:Quantity] 
+				# to   [CYTOPLASM-E-Quantity]
 				# -------------------------------------------------
-				aECDFileName = \
-					aLoggerFactory.getECDFileNameFromFullPNString( aFullPNString )
-				aDirectoryName = \
-					aLoggerFactory.getDirectoryNameFromFullPNString( aFullPNString )
 
-				# -------------------------------------------------
-				# If there is not the directory to save, create it.
-				# -------------------------------------------------
-				aDirectoryName = aSaveDirectory + '/' + aDirectoryName
+				aFileName=split(join(split(aFullPNString,':')[1:],'-'),'/')[-1]
 
-				if not os.path.isdir(aDirectoryName): #(3)
-					os.mkdir(aDirectoryName)
-					
+				aECDDataFile = ECDDataFile()
+				aECDDataFile.setFileName(aFileName)
+
 				# -------------------------------------------------
 				# Gets logger
 				# -------------------------------------------------
@@ -342,15 +364,26 @@ class LoggerWindow(Window):
 					# gets data without specifing interval 
 					aMatrixData = aLogger.getData(aStartTime,aEndTime,aInterval)
 
-				aLoggerFactory.printECDFormatDataToFile( \
-				aDirectoryName + '/' + aECDFileName, \
-											aMatrixData, \
-											aFullPNString, \
-											'time quantity', \
-											'' )
-			# end of for(2)
+
+				# sets data name 
+				aECDDataFile.setDataName(aFullPNString)
+
+				# sets matrix data
+				aECDDataFile.setMatrixData(aMatrixData)
+
+				# -------------------------------------------------
+				# adds data file to data file manager
+				# -------------------------------------------------
+				aDataFileManager.getFileMap()[`aFileIndex`] = aECDDataFile
+
+				aFileIndex = aFileIndex + 1
+
+			# for(2)
+
+			aDataFileManager.saveAll()
 
 		except: #try(1)
+
 			# -------------------------------------------------
 			# displays error message and exit this method.
 			# -------------------------------------------------
@@ -438,6 +471,37 @@ class LoggerWindow(Window):
 		self['loggerWindow'].hide_all()
 
 	# closeWindow
+
+
+	#def destroy( self, *obj ):
+	#	print 'loggerWindow_Destroy'
+
+	#def delete_event( self, *obj ):
+	#	print 'loggerWindow_delete_event'
+
+	#def destroy_event( self, *obj ):
+	#	print 'self.loggerWindow_destroy_event'
+
+	#def aaa( self ):
+	#	print 'show_all ---------------------------s'
+#
+#		if self.exist == 1:
+#			print "ari"
+#			self['loggerWindow'].show_all()
+#		else:
+#			print "nashi"
+#			#self.__init__(self.theSession, self.theMainWindow)
+#			OsogoWindow.openWindow(self)
+
+#		#self.__init__(self.theSession, self.theMainWindow)
+#		#self['loggerWindow'].show_all()
+#		print 'show_all ---------------------------e'
+
+
+
+#'destroy' : self.loggerWindow_Destory ,
+#'delete_event' : self.loggerWindow_delete_event ,
+#'destroy_enevt' : self.loggerWindow_destory_event ,
 
 
 # end of LoggerWindow
