@@ -5,4 +5,4 @@ bin_SCRIPTS = dmtool dmgen dmcompile
 
 pkginclude_HEADERS=DynamicModule.hpp ModuleMaker.hpp
 
-#EXTRA_DIST = $(bin_SCRIPTS)
+EXTRA_DIST = $(bin_SCRIPTS)
