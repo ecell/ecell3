@@ -224,7 +224,7 @@ namespace libecs
       }
 
     // ========= 2 ===========
-    setCurrentTime( aCurrentTime + getCurrentTime()*0.5 );
+    setCurrentTime( aCurrentTime + getStepInterval()*0.5 );
     process();
 
     Real maxError( 0.0 );
@@ -332,7 +332,7 @@ namespace libecs
       }
 
     // ========= 2 ===========
-    setCurrentTime( aCurrentTime + getCurrentTime() );
+    setCurrentTime( aCurrentTime + getStepInterval() );
     process();
 
     for( UnsignedInt c( 0 ); c < aSize; ++c )
@@ -357,7 +357,7 @@ namespace libecs
       }
 	
     // ========= 3 ===========
-    setCurrentTime( aCurrentTime + getCurrentTime()*0.5 );
+    setCurrentTime( aCurrentTime + getStepInterval()*0.5 );
     process();
 	
     Real maxError( 0.0 );
@@ -476,7 +476,7 @@ namespace libecs
       }
 
     // ========= 2 ===========
-    setCurrentTime( aCurrentTime + getCurrentTime()*0.2 );
+    setCurrentTime( aCurrentTime + getStepInterval()*0.2 );
     process();
 
     for( UnsignedInt c( 0 ); c < aSize; ++c )
@@ -501,7 +501,7 @@ namespace libecs
       }
 	
     // ========= 3 ===========
-    setCurrentTime( aCurrentTime + getCurrentTime()*0.3 );
+    setCurrentTime( aCurrentTime + getStepInterval()*0.3 );
     process();
 	
     for( UnsignedInt c( 0 ); c < aSize; ++c )
@@ -527,7 +527,7 @@ namespace libecs
       }
     
     // ========= 4 ===========
-    setCurrentTime( aCurrentTime + getCurrentTime()*0.6 );
+    setCurrentTime( aCurrentTime + getStepInterval()*0.6 );
     process();
     
     for( UnsignedInt c( 0 ); c < aSize; ++c )
@@ -554,7 +554,7 @@ namespace libecs
       }
 		
     // ========= 5 ===========
-    setCurrentTime( aCurrentTime + getCurrentTime() );
+    setCurrentTime( aCurrentTime + getStepInterval() );
     process();
 	
     for( UnsignedInt c( 0 ); c < aSize; ++c )
@@ -586,7 +586,7 @@ namespace libecs
       }
 
     // ========= 6 ===========
-    setCurrentTime( aCurrentTime + getCurrentTime() * ( 7.0 / 8.0 ) );
+    setCurrentTime( aCurrentTime + getStepInterval() * ( 7.0 / 8.0 ) );
     process();
 	
     Real maxError( 0.0 );
@@ -707,7 +707,7 @@ namespace libecs
       }
 
     // ========= 2 ===========
-    setCurrentTime( aCurrentTime + getCurrentTime() * 0.2 );
+    setCurrentTime( aCurrentTime + getStepInterval() * 0.2 );
     process();
 
     for( UnsignedInt c( 0 ); c < aSize; ++c )
@@ -735,7 +735,7 @@ namespace libecs
 
 
     // ========= 3 ===========
-    setCurrentTime( aCurrentTime + getCurrentTime() * 0.3 );
+    setCurrentTime( aCurrentTime + getStepInterval() * 0.3 );
     process();
 
     for( UnsignedInt c( 0 ); c < aSize; ++c )
@@ -764,7 +764,7 @@ namespace libecs
 
 
     // ========= 4 ===========
-    setCurrentTime( aCurrentTime + getCurrentTime() * 0.8 );
+    setCurrentTime( aCurrentTime + getStepInterval() * 0.8 );
     process();
 
     for( UnsignedInt c( 0 ); c < aSize; ++c )
@@ -793,7 +793,7 @@ namespace libecs
       }
 
     // ========= 5 ===========
-    setCurrentTime( aCurrentTime + getCurrentTime() * ( 8.0 / 9.0 ) );
+    setCurrentTime( aCurrentTime + getStepInterval() * ( 8.0 / 9.0 ) );
     process();
 
     for( UnsignedInt c( 0 ); c < aSize; ++c )
@@ -823,7 +823,7 @@ namespace libecs
       }
 
     // ========= 6 ===========
-    setCurrentTime( aCurrentTime + getCurrentTime() );
+    setCurrentTime( aCurrentTime + getStepInterval() );
     process();
 
     for( UnsignedInt c( 0 ); c < aSize; ++c )
@@ -854,7 +854,7 @@ namespace libecs
       }
 
     // ========= 7 ===========
-    setCurrentTime( aCurrentTime + getCurrentTime() );
+    setCurrentTime( aCurrentTime + getStepInterval() );
     process();
 
     Real maxError( 0.0 );
