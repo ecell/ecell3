@@ -42,7 +42,7 @@ namespace libecs
   template<> const NEW stringCast<NEW,GIVEN>( const GIVEN& aValue )\
   {\
     return boost::lexical_cast<NEW>( aValue );\
-  }
+  } //
 
   __STRINGCAST_SPECIALIZATION_DEF( String, Real );
   __STRINGCAST_SPECIALIZATION_DEF( String, HighReal );
