@@ -132,14 +132,15 @@ Options:
             anEml.setEntityProperty( aSystemFullID, 'StepperID', ['SRM_01'] )
             anEml.setEntityProperty( aSystemFullID, 'Name', anEriLine[3:4] )        
         elif ( anEriLine[0] == 'SUBSTANCE' ):
-            aSystemFullID = 'Substance:' +anEriLine[2]
+            aSystemFullID = 'Variable:' +anEriLine[2]
             anEriChunk = anEriLine[4].split()
-            anEml.createEntity( 'Substance', aSystemFullID )
-            anEml.setEntityProperty( aSystemFullID, anEriChunk[0], anEriChunk[1:] )
+            anEml.createEntity( 'Variable', aSystemFullID )
+#            anEml.setEntityProperty( aSystemFullID, anEriChunk[0], anEriChunk[1:] )
+            anEml.setEntityProperty( aSystemFullID, 'Value', anEriChunk[1:] )
             anEml.setEntityProperty( aSystemFullID, 'Name', anEriLine[3:4] )
         
         elif ( anEriLine[0] == 'REACTOR' ):
-            aSystemFullID = 'Reactor:' +anEriLine[2]
+            aSystemFullID = 'Process:' +anEriLine[2]
             if ( anEriLine[1] == 'ConstantParameterReactor' ): # set Volume of the System.
                 aSystemID = anEriLine[2].split(':')[0]
                 if ( aSystemID == '/ENVIRONMENT'):
@@ -154,8 +155,8 @@ Options:
                 anEml.createEntity( anEriLine[1], aSystemFullID )
                 anEml.setEntityProperty( aSystemFullID, 'Name', anEriLine[3:4] )
 
-                # create ReactantList from Eri data
-                aReactantList = []
+                # create ConnectionList from Eri data
+                aConnectionList = []
                 aSubstrateNumber = 0
                 aProductNumber = 0
                 aCatalystNumber = 0
@@ -167,38 +168,38 @@ Options:
                         aSubstrateList = []
                         aSubstrateList.append( 'S' + str(aSubstrateNumber) )
                         aSubstrateNumber = aSubstrateNumber + 1
-                        aSubstrateList.append( 'Substance:' + anEriChunkElement[1])
+                        aSubstrateList.append( 'Variable:' + anEriChunkElement[1])
                         aSubstrateList.append( str(-1 * int(anEriChunkElement[2])) )
-                        aReactantList.append( aSubstrateList )
+                        aConnectionList.append( aSubstrateList )
                     elif ( anEriChunkElement[0] == 'Product' ):
                         aProductList = []
                         aProductList.append( 'P' + str(aProductNumber) )
                         aProductNumber = aProductNumber + 1
-                        aProductList.append( 'Substance:' + anEriChunkElement[1])
+                        aProductList.append( 'Variable:' + anEriChunkElement[1])
                         aProductList.append( str(1 * int(anEriChunkElement[2])) )
-                        aReactantList.append( aProductList )
+                        aConnectionList.append( aProductList )
 
                     elif ( anEriChunkElement[0] == 'Catalyst' ):
                         aCatalystList = []
                         aCatalystList.append( 'C' + str(aCatalystNumber) )
                         aCatalystNumber = aCatalystNumber + 1
-                        aCatalystList.append( 'Substance:' + anEriChunkElement[1])
+                        aCatalystList.append( 'Variable:' + anEriChunkElement[1])
                         aCatalystList.append( '0' )
-                        aReactantList.append( aCatalystList )
+                        aConnectionList.append( aCatalystList )
 
                     elif ( anEriChunkElement[0] == 'Effector' ):
                         anEffectorList = []
                         anEffectorList.append( 'E' + str(anEffectorNumber) )
                         anEffectorNumber = anEffectorNumber + 1
-                        anEffectorList.append( 'Substance:' + anEriChunkElement[1])
+                        anEffectorList.append( 'Variable:' + anEriChunkElement[1])
                         anEffectorList.append( '0' )
-                        aReactantList.append( anEffectorList )
+                        aConnectionList.append( anEffectorList )
 
                     else:
                         anEml.setEntityProperty( aSystemFullID, anEriChunkElement[0], anEriChunkElement[1:] )
 
-                # set ReactantList
-                anEml.setEntityProperty( aSystemFullID, 'ReactantList', aReactantList )
+                # set ConnectionList
+                anEml.setEntityProperty( aSystemFullID, 'ConnectionList', aConnectionList )
     else: 
         pass
 
