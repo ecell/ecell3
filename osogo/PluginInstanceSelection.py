@@ -59,7 +59,6 @@ class PluginInstanceSelection(OsogoWindow):
 
 		self.thePluginInstanceListStore.clear()
 		aPluginInstanceList = self.thePluginManager.thePluginTitleDict.keys()
-
 		for aPluginInstance in aPluginInstanceList:
 			if aPluginInstance.theViewType == MULTIPLE:
 				aPluginInstanceTitle = self.thePluginManager.thePluginTitleDict[aPluginInstance]

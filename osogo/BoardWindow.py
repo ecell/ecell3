@@ -52,6 +52,9 @@ SELECTED_SHADOW_TYPE=1
 MAXROW=100
 MAXCOL=100
 
+MAXWIDTH=1200
+MAXHEIGHT=800
+
 class BoardWindow(OsogoWindow):
 
 
@@ -62,7 +65,7 @@ class BoardWindow(OsogoWindow):
 		self.thePluginManager = aMainWindow.thePluginManager
 		self.theX = 0
 		self.theY = 0
-		self.theRowSize = 3
+		self.theRowSize = -1
 		self.theColSize = 3
 		self.theRow = -1
 		self.theCol = -1
@@ -87,6 +90,25 @@ class BoardWindow(OsogoWindow):
 		self['board_table'].resize( MAXROW, MAXCOL )
 		self['size_spinbutton'].set_text( str(self.theColSize) )
 		#self[self.__class__.__name__].connect('delete_event',self.hide)
+		self.theScrolledWindow = self['scrolledwindow1']
+		self.theViewPort=self['viewport1']
+		self.deleteScroll()
+
+
+	def displayScroll(self):
+		if self.theViewPort.get_child() == None:
+			board_table=self['board_table']
+			self['hbox6'].remove(board_table)
+			self.theViewPort.add(self['board_table'])
+			self['hbox6'].add(self.theScrolledWindow)
+	
+	def deleteScroll(self):
+		if self.theViewPort.get_child() != None:
+			board_table=self['board_table']
+			self.theViewPort.remove(board_table)
+			self['hbox6'].remove(self.theScrolledWindow)
+			self['hbox6'].add(self['board_table'])
+
 
 	# end of openWindow
 
@@ -217,59 +239,75 @@ class BoardWindow(OsogoWindow):
 
 	def updatePositions( self, *arg ):
 		anElementList = []
-		arequisitionList = []
+		aRequisitionList = []
+		theRowHeights = []
+		theColumnWidths = []
+
 		for anElement in self['board_table'].get_children():
 			anElementList.insert( 0, anElement )
 			self['board_table'].remove( anElement )
 
-		print "Colsize",self.theColSize
-		print "Rowsize",self.theRowSize
-		print "length", len(anElementList)
-
 		#calculate dimensions
 		if self.theRowSize == -1:
-			__rowsize = ceil( len( anElementList ) / self.theColSize ) 
+			__rowsize = int(ceil( float(len( anElementList )) / self.theColSize ) )
 			__colsize = self.theColSize
 		else:
 			__rowsize = self.theRowSize
-			__colsize = ceil( len(anElementList ) / self.theRowSize )
+			__colsize = int(ceil( ceil(len(anElementList )) / self.theRowSize ) )
 
-		print __rowsize, __colsize
 
 		#init requisitionlist
- 		for i in range(0 , __rowsize*__colsize - 1):
-			aRecqusitionList.append(None)
+		__matrixsize = max (__rowsize, __colsize)
+ 		for i in range(0 , __matrixsize * __matrixsize ):
+			aRequisitionList.append(None)
 		
+		for i in range(0, __matrixsize ):
+			theRowHeights.append( 0 )
+			theColumnWidths.append( 0 )
+	
 		self.__initializePosition()
 		
 		for anElement in anElementList:
 			r,c = self.__getNextPosition()
 			self.__appendPluginFrame( anElement, r, c )
-			arequisitionList[r * __rowsize + c ] = anElement.get_child_requisition()
-		
-		print arequisitionList
+			aRequisitionList[r * __matrixsize + c ] = anElement.size_request()
 
 		#shrink to fit
 		theTableHeight = 0
 		theTableWidth = 0
-		for r in range (0, __rowsize):
-			theRowHeight = 0
-			theRowWidth = 0
-			for c in range (0, __colsize):
-				arequisition = arequisitionList[ r * __rowsize + c ]
-				if arequisition == None:
+		for r in range (0, __matrixsize):
+			for c in range (0, __matrixsize):
+				aRequisition = aRequisitionList[ r * __matrixsize + c ]
+				if aRequisition == None:
 					break
-				theRowWidth += arequisition[0]
-				theRowHeight = max ( theRowheight, arequisition[1] )
-			theTableHeight += theRowHeight
-			theTableWidth = max ( theTableWidth, theRowWidth)
+				theColumnWidths[c] = max (theColumnWidths[c], aRequisition[0] )
+				theRowHeights[r] = max ( theRowHeights[r], aRequisition[1] )
+		for i in range(0, __matrixsize):
+			theTableHeight += theRowHeights[i]
+			theTableWidth += theColumnWidths[i]
+
 		self['board_table'].set_size_request( theTableWidth , theTableHeight )
 
 		#calculate window dimensions
-		__hboxrequisition = self['hbox1'].get_child_requisition()
-		theTableHeight +=__hboxrequisition[1]
-		theTableWidth = max ( theTableWidth, __hboxrequisition[0] )
-		self['BoardWindow'].resize( theTableWidth, theTableHeight )		
+		__hboxrequisition = self['hbox1'].size_request()
+		theWindowHeight = theTableHeight + __hboxrequisition[1]
+		theWindowWidth = max ( theTableWidth, __hboxrequisition[0] )
+		scroll_needed = False
+		if theWindowHeight > MAXHEIGHT:
+			theWindowHeight = MAXHEIGHT
+			scroll_needed = True
+			theWindowWidth += 10
+		if theWindowWidth > MAXWIDTH:
+			theWindowWidth = MAXWIDTH
+			scroll_needed = True
+			theWindowHeight += 10
+
+		self['BoardWindow'].resize( theWindowWidth, theWindowHeight )		
+		if scroll_needed:
+			self.displayScroll()
+		else:
+			self.deleteScroll()
+		self['board_table'].set_size_request(theTableWidth, theTableHeight)
 
 	def changeAlignment( self, *arg ):
 		# --------------------------------------------

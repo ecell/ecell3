@@ -16,15 +16,15 @@ from ecell.ecssupport import *
 #changes screen, handles color allocation when adding/removing traces
 #clears plot areas on request, sets tityle
 
+
 class Plot:
-    #properties:
-    #ColorFullPNMap{key: FullPNString,value: aColor}
-	def __init__( self, scale_type, root, plottitle="" ):
+
+
+	def __init__( self, owner, scale_type, root, width, heigth ):
 	# ------------------------------------------------------
 	    self.scale_type=scale_type
 	    self.ColorFullPNMap={"pen":"black", "background":"grey"} # key is FullPN, value color
-	    self.RawColorFullPNMap={}
-	    self.GCFullPNMap={} #replaces RawColorFullPNMap
+	    self.GCFullPNMap={} 
 	    self.ColorList=["pink","cyan","yellow","navy",
 			    "brown","white","purple","black",
 			    "green", "orange","blue","red"]
@@ -34,26 +34,10 @@ class Plot:
 	    for acolor in self.ColorList:
 		self.available_colors.append(acolor)
 	    self.pixmapmap={} #key is color, value pixmap
-	    self.plotwidth=600
-	    self.plotheigth=350
-	    self.origo=[70,320]
-
-	    self.plotarea=[self.origo[0],20,\
-		self.plotwidth-40-self.origo[0],\
-		self.origo[1]-20]
-	    self.plotaread=[self.plotarea[0],self.plotarea[1],\
-		self.plotarea[2]+self.plotarea[0],\
-		self.plotarea[3]+self.plotarea[1]]
-	    
-	    self.ylabelsarea=[0,0,self.origo[0]-1,self.origo[1]+5]
-	    self.xlabelsarea=[self.plotarea[0]-30,self.origo[1]+5,\
-		    self.plotwidth-self.plotarea[0]+30,25]
-	    self.xticksarea=[self.origo[0],self.origo[1]+2,\
-		    self.plotwidth-self.origo[0],3]
-	    self.yaxis_x=self.origo[0]-1
-	    self.xaxis_y=self.origo[1]+1
-	    self.xaxislength=self.plotarea[2]+1
-	    self.yaxislength=self.plotarea[3]+1
+	    self.FullPNMap={} #key: FullPNString, values [FullPN,shortname]
+	    self.plotwidth=width
+	    self.plotheigth=heigth
+	    self.recalculate_size()
 	    self.xframe=[]
 	    self.yframe=[]
 	    #creates widget
@@ -67,12 +51,8 @@ class Plot:
 	    self.theWidget.connect('button-press-event',self.press)
 	    self.theWidget.connect('motion-notify-event',self.motion)
 	    self.theWidget.connect('button-release-event',self.release)
-	    
-	    #aRootWindow=self.getParent()
-	    #root = aRootWindow[aRootWindow.__class__.__name__]
-
 	    root = root[root.__class__.__name__]
-	    
+	    self.theRoot=root
 	    self.theColorMap=self.theWidget.get_colormap()
 	    newgc=root.window.new_gc()
 	    newgc.set_foreground(self.theColorMap.alloc_color(self.ColorFullPNMap["pen"]))
@@ -80,47 +60,82 @@ class Plot:
 	    newgc=root.window.new_gc()
 	    newgc.set_foreground(self.theColorMap.alloc_color(self.ColorFullPNMap["background"]))
 	    self.GCFullPNMap["background"]=newgc
-
 	    self.st=self.theWidget.get_style()
 	    self.font=gtk.gdk.font_from_description(self.st.font_desc)
-	    
 	    self.ascent=self.font.ascent
 	    self.descent=self.font.descent
 	    self.pm=gtk.gdk.Pixmap(root.window,self.plotwidth,self.plotheigth,-1)
 	    self.pm2=gtk.gdk.Pixmap(root.window,self.plotwidth,self.plotheigth,-1)
 	    newpm=gtk.gdk.Pixmap(root.window,10,10,-1)
-	    
+	    newgc=root.window.new_gc()
 	    for acolor in self.ColorList:
 		newgc.set_foreground(self.theColorMap.alloc_color(acolor))
 		newpm.draw_rectangle(newgc,gtk.TRUE,0,0,10,10)
-#		pb=gtk.gdk.Pixbuf(gtk.gdk.COLORSPACE_RGB,gtk.TRUE,root.get_visual().bits_per_rgb,10,10)
 		pb=gtk.gdk.Pixbuf(gtk.gdk.COLORSPACE_RGB,gtk.TRUE,8,10,10)
-
 		newpb=pb.get_from_drawable(newpm,self.theColorMap,0,0,0,0,10,10)
 		self.pixmapmap[acolor]=newpb
-	    #sets background
 	    
-	    newgc.set_foreground(self.theColorMap.alloc_color(self.ColorFullPNMap["background"]))
-	    self.pm.draw_rectangle(newgc,gtk.TRUE,0,0,self.plotwidth,
-				    self.plotheigth)
-	    self.theWidget.queue_draw_area(0,0,self.plotwidth,self.plotheigth)
+	    self.zoomlevel=0
+	    self.zoombuffer=[]
+	    self.zoomkeypressed=False
+	    self.button_timestamp=None
+	    self.theOwner=owner
+	    #initializes variables
+	    self.xframe_when_rescaling=0.5
+	    self.yvaluemax_trigger_rescale=0.70 #if max(values) falls to low
+	    self.yvaluemin_trigger_rescale=0.30
+	    self.yframemin_when_rescaling=0.1
+	    self.yframemax_when_rescaling=0.9	    
+	    self.stripinterval=1000
+	    self.zerovalue=1e-50 #very small amount to substitute 0 in log scale calculations
+	    # stripinterval/pixel
+	    self.requires_scale=gtk.TRUE
+	    self.size_status='maximized'
+	    #initialize data buffers
+	    self.data_stack={} #key:FullPNString, value: DataBuffer[[x0,y0],[x1,y1],[x2,y2]]}	
+	    self.lastx={}
+	    self.lasty={}
+	    self.strip_mode='strip'
+	    self.zoomlevel=0    
+	    #set yframes
+	    self.yframe=[0,1]
+	    self.ygrid=[0,1]
+	    self.xframe=[0.0,1000]
+	    self.xgrid=[0,1000]
+	    self.clearplot()
+	    self.drawaxes()
+	    self.reframey()
+	    self.reframex()
+	    self.drawall()
+
+
+
+	def recalculate_size(self):
+	    self.max_yticks_no=int(self.plotheigth/150)*5
+	    self.max_xticks_no=int(self.plotwidth/100)
+	    self.origo=[70,self.plotheigth-30]
+	    self.plotarea=[self.origo[0],20,\
+	    	self.plotwidth-40-self.origo[0],\
+	    	self.origo[1]-20]
+	    self.plotaread=[self.plotarea[0],self.plotarea[1],\
+	    	self.plotarea[2]+self.plotarea[0],\
+	    	self.plotarea[3]+self.plotarea[1]]
+	    self.ylabelsarea=[0,0,self.origo[0]-1,self.origo[1]+5]
+	    self.xlabelsarea=[0,self.origo[1]+5,\
+	    	self.plotwidth,25]
+	    self.xticksarea=[self.origo[0],self.origo[1]+2,\
+	    	self.plotwidth-self.origo[0],3]
+	    self.yaxis_x=self.origo[0]-1
+	    self.xaxis_y=self.origo[1]+1
+	    self.xaxislength=self.plotarea[2]+1
+	    self.yaxislength=self.plotarea[3]+1
+	
+
 
 	def expose(self, obj, event):
 	    obj.window.draw_drawable(self.pm.new_gc(),self.pm,event.area[0],event.area[1],
 					event.area[0],event.area[1],event.area[2],event.area[3])
-	def press(self,obj, event):
-	    #"this must be overriden"
-	    return True
-
-	def motion(self,obj,event):
-	    #this must be overriden
-	    return True
-	    
-	def release(self,obj,event):
-	    #this must be overriden
-	    return True
-	    
-	def addtrace(self, aFullPNString):		
+	def allocate_color(self, aFullPNString):		
 	    #checks whether there's room for new traces
 	    if len(self.available_colors)>0 and \
 		(not self.data_list.__contains__(aFullPNString)):
@@ -139,12 +154,12 @@ class Plot:
 		self.GCFullPNMap[fpn]=newgc
 		return self.pixmapmap[color]
 
-	def remove_trace(self, FullPNStringList):
+	def remove_color(self, FullPNStringList):
 	    #remove from colorlist
 	    for fpn in FullPNStringList:
 		self.deregister_color(fpn)
-		self.ColorFullPNMap[fpn]=None
-		self.GCFullPNMap[fpn]=None
+		self.ColorFullPNMap.__delitem__(fpn)
+		self.GCFullPNMap.__delitem__(fpn)
 
 	def deregister_color(self, fpn):
 	    acolor=self.ColorFullPNMap[fpn]
@@ -155,6 +170,9 @@ class Plot:
 	def clearplotarea(self):
 	    self.drawbox("background",self.plotarea[0],self.plotarea[1],self.plotarea[2]+1,
 			self.plotarea[3]+1)
+
+	def clearplot(self):
+	    self.drawbox("background",0,0,self.plotwidth,self.plotheigth)
 	    
 	def clearxlabelarea(self):
 	    self.drawbox("background",self.xlabelsarea[0],self.xlabelsarea[1],
@@ -166,14 +184,15 @@ class Plot:
 	    self.drawbox("background",self.ylabelsarea[0],self.ylabelsarea[1],
 			self.ylabelsarea[2],self.ylabelsarea[3])
 
-	    
-	def drawxaxis(self,ticks):
-	    self.xticks_no=ticks
+	def drawaxes(self):
+		self.drawxaxis()
+		self.drawyaxis()
+	
+	def drawxaxis(self):
 	    self.drawline("pen", self.yaxis_x,self.xaxis_y,
 			    self.yaxis_x+self.xaxislength,self.xaxis_y)
 	    
-	def drawyaxis(self,ticks):
-	    self.yticks_no=ticks
+	def drawyaxis(self):
 	    self.drawline("pen", self.yaxis_x,self.xaxis_y-self.yaxislength,
 			    self.yaxis_x,self.xaxis_y)
 	    
@@ -282,7 +301,7 @@ class Plot:
 		    elif mantissa1<=5.0:mantissa1=5.0
 		    else: mantissa1=10.0
 		    
-		    self.yticks_no=10
+		    self.yticks_no=self.max_yticks_no
 		    if self.yframe[0]<0:
 			if mantissa0<=1.0:mantissa0=1.0
 			elif mantissa0<=2.0:mantissa0=2.0
@@ -322,12 +341,12 @@ class Plot:
 		    self.yframe[0]=pow(10,floor(log10(miny)))	    
 		    diff=int(log10(self.yframe[1]/self.yframe[0]))
 		    if diff==0:diff=1
-		    if diff<6:
+		    if diff<self.max_yticks_no:
 			self.yticks_no=diff
 			self.yticks_step=10
 		    else:
-			self.yticks_no=5
-			self.yticks_step=pow(10,ceil(diff/5))
+			self.yticks_no=self.max_yticks_no
+			self.yticks_step=pow(10,ceil(diff/self.yticks_no))
 		self.ygrid[0]=self.yframe[0]
 		self.ygrid[1]=self.yframe[1]
 
@@ -336,13 +355,13 @@ class Plot:
 		    ticks=0
 		    if self.yframe[1]==self.yframe[0]:self.yframe[1]=self.yframe[0]+1
 		    exponent=pow(10,floor(log10(self.yframe[1]-self.yframe[0])))
-		    while ticks<5:
+		    while ticks<self.max_yticks_no/2:
 			mantissa1=floor(self.yframe[1]/exponent)
 			mantissa0=ceil(self.yframe[0]/exponent)
 			ticks=mantissa1-mantissa0
-			if ticks<5: exponent=exponent/2
+			if ticks<self.max_yticks_no/2: exponent=exponent/2
 			
-		    if ticks>10:
+		    if ticks>self.max_yticks_no:
 			mantissa0=ceil(mantissa0/2)*2	
 			mantissa1=floor(mantissa1/2)*2
 			ticks=(mantissa1-mantissa0)/2
@@ -359,19 +378,17 @@ class Plot:
 			self.ygrid[0]=pow(10,ceil(log10(self.yframe[0])))	    
 			diff=int(log10(self.ygrid[1]/self.ygrid[0]))
 			if diff==0:diff=1
-			if diff<6:
+			if diff<self.max_yticks_no:
 			    self.yticks_no=diff
 			    self.yticks_step=10
 			else:
-			    self.yticks_no=5
-			    self.yticks_step=pow(10,ceil(diff/5))
+			    self.yticks_no=self.max_yticks_no
+			    self.yticks_step=pow(10,ceil(diff/self.max_yticks_no))
 		    else:
 			self.theOwner.theSession.printMessage("negative value in range, falling back to linear scale")		
 			self.change_scale()
 			return
 	    self.reframey2()
-#	    self.yframe0max=self.yframe[0]+(self.yframe[1]-self.yframe[0])*self.yvaluemin_trigger_rescale
-#	    self.yframe1min=self.yframe[0]+(self.yframe[1]-self.yframe[0])*self.yvaluemax_trigger_rescale
 	    return 0
 
 	def reframey2(self):
@@ -415,62 +432,8 @@ class Plot:
 		    self.printylabel(tick,tickvalue)
 		    tickvalue=tickvalue/self.yticks_step
 		self.printylabel(tick,self.ygrid[0])	    
-	    #writes labels
-
-
-#Barplot
-#handles data updates, data handling when adding/removing trace
 	
 	    
-class TracerPlot(Plot):
-	#properties:
-	#data_stack{key:FullPNString, value: DataBuffer[[x0,y0],[x1,y1],[x2,y2]]}	
-	#last_point{key:FullPNString, value: [x,y]}
-
-	def __init__(self, owner, scale_type,root):
-	    #calls superclass for initialization
-	    #stores owner class for data recaching requests
-	    Plot.__init__(self, scale_type,root)
-	    self.zoomlevel=0
-	    self.zoombuffer=[]
-	    self.zoomkeypressed=False
-	    self.button_timestamp=None
-	    self.theOwner=owner
-	    #initializes variables
-	    self.xframe_when_rescaling=0.5
-	    self.yvaluemax_trigger_rescale=0.70 #if max(values) falls to low
-	    self.yvaluemin_trigger_rescale=0.30
-	    self.yframemin_when_rescaling=0.1
-	    self.yframemax_when_rescaling=0.9	    
-	    self.stripinterval=1000
-	    self.zerovalue=1e-50 #very small amount to substitute 0 in log scale calculations
-	    # stripinterval/pixel
-	    self.requires_scale=gtk.TRUE
-	    self.size_status='maximized'
-	    #initialize data buffers
-	    self.data_stack={} #key:FullPNString, value: DataBuffer[[x0,y0],[x1,y1],[x2,y2]]}	
-	    self.lastx={}
-	    self.lasty={}
-	    self.strip_mode='strip'
-	    self.zoomlevel=0    
-	    #set yframes
-	    self.yframe=[0,1]
-	    self.ygrid=[0,1]
-	    self.xframe=[0.0,1000.0]
-	    self.xgrid=[0,1000]
-	    self.pixelwidth=float(self.xframe[1]-self.xframe[0])/self.plotarea[2]
-	    self.pixelheigth=float(self.yframe[1]-self.yframe[0])/self.plotarea[3]
-	    
-	    self.drawxaxis(5)
-	    self.drawyaxis(10)
-	    self.yticks_step=0.1
-	    self.xticks_step=200
-	    self.reprint_xlabels()
-	    self.reprint_ylabels()	    
-	    self.setstrip=False
-	    
-	def maximize(self):
-		self.theOwner.maximize()
 
 	def convertx_to_plot(self,x):
 	    return round((x-self.xframe[0])/float(self.pixelwidth))+self.origo[0]
@@ -505,7 +468,6 @@ class TracerPlot(Plot):
 			redraw_flag=True
 		if shift_flag:
 		    newxframe=max(xmax,self.xframe[1]+self.stripinterval*(1-self.xframe_when_rescaling))
-#		    newxframe=ceil(newxframe/self.stripinterval)*self.stripinterval
 		    shift=newxframe-self.xframe[1]
 		    self.xframe[1]+=shift
 		    self.xframe[0]+=shift
@@ -613,8 +575,13 @@ class TracerPlot(Plot):
 	    #reframey
 	    self.strip_mode='history'
 	    self.addtrace([])
-	    #drawall
-	    #mode history
+
+	def getShortName(self, aFullPN ):
+		IdString = str( aFullPN[ID] )
+		PropertyString = str( aFullPN[PROPERTY] )
+		if PropertyString != 'Value':
+			IdString += '/' + PropertyString[:2]
+		return IdString
 	    
 	    
 	def addtrace(self,add_list):
@@ -624,9 +591,11 @@ class TracerPlot(Plot):
 	    #allocates a color
 		aFullPNString= add_item[0]
 		
-		pm=Plot.addtrace(self,aFullPNString)
+		pm=self.allocate_color(aFullPNString)
 		if pm!=None:
+		    self.FullPNMap[aFullPNString]=[add_item[2], self.getShortName(add_item[2])]
 		    return_list.append([aFullPNString,pm])
+
 	    #try to get more from logger
 	    self.refresh_loggerstartendmap()
 	    #if mode is strip
@@ -730,11 +699,12 @@ class TracerPlot(Plot):
 	
 	def remove_trace(self, FullPNStringList):
 	    #call superclass
-	    Plot.remove_trace(self,FullPNStringList)
+	    self.remove_color(FullPNStringList)
 	    #redraw
 	    for fpn in FullPNStringList:
 		self.data_list.remove(fpn)
-		self.data_stack[fpn]=None
+		self.data_stack.__delitem__(fpn)
+		self.FullPNMap.__delitem__(fpn)
 		if self.trace_onoff.has_key(fpn):
 		    self.trace_onoff.__delitem__(fpn)
 	    self.reframey()
@@ -747,8 +717,11 @@ class TracerPlot(Plot):
 	    #if button is 1
 	    if button==1:
 		tstamp=event.get_time()
-		if self.button_timestamp==tstamp and self.size_status=='minimized':
-			self.maximize()
+		if self.button_timestamp==tstamp: 
+			if self.size_status=='minimized':
+				self.maximize()
+			else:
+				self.minimize_action()
 		self.button_timestamp=tstamp			
 		if self.strip_mode=='history':
 		#check that mode is history 
@@ -759,7 +732,6 @@ class TracerPlot(Plot):
 		    self.y0=max(self.plotarea[1],self.y0)
 		    self.x0=min(self.plotarea[2]+self.plotarea[0],self.x0)
 		    self.y0=min(self.plotarea[3]+self.plotarea[1],self.y0)
-
 		    self.x1=self.x0
 		    self.y1=self.y0
 		    self.realx0=self.x0
@@ -877,25 +849,15 @@ class TracerPlot(Plot):
 	    
 	def getstripmode(self):
 	    return self.strip_mode
-#
-#
-#	Private methods
-#
-#
 
 	def reprint_xlabels(self):
 	    #clears xlabel area
 	    self.clearxlabelarea()
-#	    tick_step=float(self.xframe[1]-self.xframe[0])/self.xticks_no
 	    for tick in range(self.xticks_no+1):
 		tickvalue=self.xgrid[0]+tick*self.xticks_step
 
 		self.printxlabel(tickvalue)
 			    
-	    #writes labels
-	    
-	    
-
 	def drawall(self):
 	    #clears plotarea
 	    self.clearplotarea()
@@ -903,6 +865,7 @@ class TracerPlot(Plot):
 	    for fpn in self.data_list:
 		if self.trace_onoff[fpn]:
 		    self.drawtrace(fpn)
+
 	
 	def drawtrace(self, aFullPNString):
 	    #get databuffer, for each point draw
@@ -910,8 +873,7 @@ class TracerPlot(Plot):
 	    self.lastx[aFullPNString]=None	
 	    self.lasty[aFullPNString]=None
 	    for datapoint in databuffer:
-	#	if datapoint[0]>=self.xframe[0]:
-		    self.drawpoint(aFullPNString, datapoint)
+		self.drawpoint(aFullPNString, datapoint)
 
 	def withinframes(self,point):
 	    return point[0]<self.plotaread[2] and point[0]>self.plotaread[0] and\
@@ -952,8 +914,6 @@ class TracerPlot(Plot):
 		    y0=lasty
 		    x1=x
 		    y1=y
-
-
 		    if cur_point_within_frame and last_point_within_frame:
 		    #if both points are in frame no interpolation needed
 			pass
@@ -1039,14 +999,14 @@ class TracerPlot(Plot):
 		ticks=0
 		if self.xframe[0]==self.xframe[1]: self.xframe[1]=self.xframe[0]+100
 		exponent=pow(10,floor(log10(self.xframe[1]-self.xframe[0])))
-		while ticks < 3:
+		while ticks < self.max_xticks_no/2:
 			
 			mantissa1=floor(self.xframe[1]/exponent)
 			mantissa0=ceil(self.xframe[0]/exponent)
 			ticks=mantissa1-mantissa0
-			if ticks<3: exponent=exponent/2
+			if ticks<self.max_xticks_no/2: exponent=exponent/2
 
-		if ticks > 6:
+		if ticks > self.max_xticks_no:
 			mantissa0=ceil(mantissa0/2)*2
 			mantissa1=floor(mantissa1/2)*2
 			ticks=(mantissa1-mantissa0)/2
@@ -1080,5 +1040,31 @@ class TracerPlot(Plot):
 	    self.drawall()
 	    return pixbuf
 
+	def minimize_action(self):
+		self.theOwner.minimize()
+
 	def minimize(self):
 		self.size_status='minimized'		
+
+	
+	def maximize(self):
+		self.size_status='maximized'
+		self.theOwner.maximize()
+
+	def resize(self, new_width, new_heigth):
+		if new_width==self.plotwidth and new_heigth==self.plotheigth: 
+			return
+		self.plotwidth=new_width
+		self.plotheigth=new_heigth
+		self.pm=gtk.gdk.Pixmap(self.theRoot.window,self.plotwidth,self.plotheigth,-1)
+		aSizeAlloc= self.theWidget.get_allocation()
+		aSizeAlloc[2]=self.plotwidth
+		aSizeAlloc[3]=self.plotheigth
+		self.theWidget.size_allocate(aSizeAlloc)
+		self.recalculate_size()
+		self.clearplot()
+		self.drawaxes()
+		self.reframey()
+		self.reframex()
+		self.drawall()
+
