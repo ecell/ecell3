@@ -56,12 +56,15 @@ LIBECS_DM_CLASS( ExpressionFluxProcess, ExpressionProcessBase )
     ; // do nothing
   }
   
-  
   virtual void fire()
     { 
       setFlux( theVirtualMachine.execute( theCompiledCode ) );
     }
 
+  virtual const bool isContinuous() const
+    {
+      return true;
+    }
 };
 
 LIBECS_DM_INIT( ExpressionFluxProcess, Process );
