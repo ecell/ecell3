@@ -148,7 +148,7 @@ namespace libemc
     do
       {
 
-	for( int i = 0 ; i < 20 ; i++ )
+	for( int i( 0 ) ; i < 20 ; i++ )
 	  {
 	    step();
 	  }
@@ -156,9 +156,6 @@ namespace libemc
 	while( (*thePendingEventChecker)() )
         {
 	  (*theEventHandler)();
-
-	  if( !theRunningFlag )
-	    break;
 	}
 
       }	while( theRunningFlag );
@@ -172,13 +169,13 @@ namespace libemc
 
     theRunningFlag = true;
 
-    libecs::Real aStopTime( theRootSystem.getStepperLeader().getCurrentTime() + aDuration );
+    libecs::Real aStopTime( theRootSystem.getStepperLeader().getCurrentTime() 
+			    + aDuration );
 
     do
       {
-	for( int i = 0 ; i < 20 ; i++ )
+	for( int i( 0 ) ; i < 20 ; i++ )
 	  {
-
 	    if( theRootSystem.getStepperLeader().getCurrentTime() 
 		>= aStopTime )
 	      {
@@ -192,9 +189,6 @@ namespace libemc
 	while( (*thePendingEventChecker)() )
         {
 	  (*theEventHandler)();
-
-	  if( !theRunningFlag )
-	    break;
 	}
 
       }	while( theRunningFlag );

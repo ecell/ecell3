@@ -132,10 +132,12 @@ class MainWindow(Window):
         self.printMessage( "Start\n" )
         self.theTimer = gtk.timeout_add(self.theUpdateInterval, self.updateByTimeOut, 0)
         self.theSimulator.run()
+        self.removeTimeOut()
 
     def stopSimulation( self, a ) :
         self.printMessage( "Stop\n" )
         self.theSimulator.stop()
+        self.removeTimeOut()
         self.update()
 
     def stepSimulation( self, a ) : 
@@ -147,6 +149,7 @@ class MainWindow(Window):
         else:
             for i in range( int ( self.theStepSize ) ):
                 self.theSimulator.step()
+        self.removeTimeOut()
         self.update()
 
     def changeStepType ( self, a ):
@@ -163,8 +166,11 @@ class MainWindow(Window):
         self.update()
         self.theTimer = gtk.timeout_add( self.theUpdateInterval, self.updateByTimeOut, 0 )
 
-    def update( self ):
+    def removeTimeOut( self ):
         gtk.timeout_remove( self.theTimer )
+
+    def update( self ):
+
         aTime = self.theSimulator.getProperty( ( SYSTEM, '/', '/', 'CurrentTime') ) 
         self.theCurrentTime = aTime[0]
         self['time_entry'].set_text( str( self.theCurrentTime ) )
