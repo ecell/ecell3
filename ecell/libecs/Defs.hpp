@@ -76,22 +76,24 @@
 //
 //
 // LIBECS_LIKELY( EXP ), LIBECS_UNLIKELY( EXP )
-// This macro indicates the expression EXP is very (un)likely to be true,
+// These macros indicate the expression EXP is very (un)likely to be true,
 // and the branch based on this will be frequently (not) taken.
-// Typically used in if() statements.   Unless you are very sure,
-// it is a good idea to rely on the compiler and CPU's branch prediction
-// mechanisms and profile-based branch counters.
-// These macros does nothing when libecs does not support branch prediction
-// on the platform.
+// These are typically used in if() statements.   Unless you are very sure,
+// it is a good idea to not to try to do this job by yourself and just 
+// rely on the compiler and CPU's branch prediction mechanisms and 
+// profile-based branch counters. These macros do nothing when 
+// libecs does not support branch prediction on the platform.
 //
 //
 // LIBECS_PREFETCH( ADDR, RW, LOCALITY )
 // This macro prefetches the content of memory at the address ADDR,
 // and refreshes the cache.   If RW is zero, the cache is prepared for
 // a read access, and one for a write access.  LOCALITY (0..3) indicates
-// the temporal locality of the access.   
-// These macros does nothing when libecs does not support prefetching
+// the temporal locality of the access.   Larger values let the
+// accessed addresses more sticky on the cache.
+// These macros do nothing when libecs does not support prefetching
 // on the platform.
+//
 
 #if defined( USE_COMPILER_EXTENSIONS ) && defined( __GNUC__ )
 #    define LIBECS_USE_PMF_CONVERSIONS 1
