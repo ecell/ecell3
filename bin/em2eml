@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
 from spark import *
 
@@ -42,11 +42,11 @@ class ErScanner( GenericScanner ):
 		return self.rv
 
 	def t_keywords( self, s ):
-		r' Reactor | Substance | Stepper | System '
+		r' Reactor | Reactant | Substance | Stepper | System '
 		self.rv.append( Token( type=s, attr=s ) )
 
 	def t_symbols( self, s ):
-		r' [\;\{\}\(\)\,] '
+  		r' [\;\{\}\(\)\,] '
 		self.rv.append( Token( type=s, attr=s ) )
 
 	def t_number( self, s ):
@@ -100,14 +100,27 @@ class ErParser( GenericParser ):
 	
 	def p_system_stmt ( self, args ):
 		'''
-		stmt ::= System System ( name , quotedstring ) { Stepper name ; property substancelist }
+		stmt ::= System System ( name , quotedstring ) { Stepper name ; property substancelist reactor }
 		stmt ::= System System ( name , quotedstring ) { Stepper name ; property }
 		'''
 		return AST( type=args[0] )
-	def p_reactor_stmt ( self, args ):
+	def p_reactor ( self, args ):
 		'''
+		reactor ::= Reactor name ( name , quotedstring ) { reactantlist propertylist }
 		'''
 		return AST( type=args[0] )
+	
+	def p_reactantlist( self, args ):
+		'''
+		reactantlist ::= reactantlist reactant
+		reactantlist ::=
+		'''
+	def p_reatant( self, args ):
+		'''
+		reactant ::= Reactant name property
+		'''
+		return AST( type=args[0] )
+                
 
 	def p_substancelist( self, args ):
 		'''
@@ -155,8 +168,27 @@ class ErParser( GenericParser ):
 		'''
 		return AST( type=args[0] )
 
+class Interpret(GenericASTTraversal):
+	def __init__( self, ast ):
+		GenericASTTraversal.__init__( self, ast )
+		self.postorder()
+		print ast.value
 
+	def n_number( self, node):
+		node.value = node.attr
 
+        def n_name( self, node):
+		node.value = node.attr
+
+	def n_Stepper( self, node ):
+		node.value = node.attr
+
+	def n_System( self, node):
+		node.value = node.attr
+
+#	def default( self, node):
+#		node.value = node.type
+		
 
 if __name__ == '__main__':
 	import sys
@@ -167,4 +199,5 @@ if __name__ == '__main__':
 	print aTokenList
 	aParser = ErParser()
 	anAst = aParser.parse( aTokenList )
+	aInterpreter = Interpret( anAst )
 	print anAst
