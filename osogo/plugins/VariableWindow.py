@@ -18,32 +18,22 @@ class VariableWindow( OsogoPluginWindow ):
 		# 0 : not fixed  1: fixed
 		self.theFixFlag = 0
         
-		#self['toolbar1'].set_style( GTK.TOOLBAR_ICONS )
-		#self['toolbar1'].set_button_relief( GTK.RELIEF_HALF )
-		#self['toolbar2'].set_style( GTK.TOOLBAR_ICONS )
-		#self['toolbar2'].set_button_relief( GTK.RELIEF_HALF )
-		#self['toolbar3'].set_style( GTK.TOOLBAR_ICONS )
-		#self['toolbar3'].set_button_relief( GTK.RELIEF_HALF )
-		#self['toolbar4'].set_style( GTK.TOOLBAR_ICONS )
-		#self['toolbar4'].set_button_relief( GTK.RELIEF_HALF )        
-        
 		self.addHandlers( {'button_toggled': self.fix_mode,
-		                   #'qty_increase_pressed': self.increaseValue, 
-		                   #'qty_decrease_pressed': self.decreaseValue,
-		                    'on_value_spinbutton_changed' : self.changeValue,
-		                   #'concentration_increase_pressed': self.increaseConcentration,
-		                   #'concentration_decrease_pressed': self.decreaseConcentration,
-		                   #'input_value': self.inputValue,
-		                   #'input_concentration': self.inputConcentration,
+#		                   'qty_increase_pressed': self.increaseValue, 
+#		                   'qty_decrease_pressed': self.decreaseValue,
+				   'on_value_spinbutton_changed' : self.changeValue,
+#		                   'concentration_increase_pressed': self.increaseConcentration,
+#		                   'concentration_decrease_pressed': self.decreaseConcentration,
+		                   'input_value': self.changeValue,
+		                   'input_concentration': self.inputConcentration,
 		                   'window_exit' : self.exit } )
 
-		self.theQtyFPN = convertFullIDToFullPN( self.theFullID(), 'Value' )
-		self.theConcFPN = convertFullIDToFullPN( self.theFullID(), 'Concentration' )
+		self.theSession = pluginmanager.theSession
 
 		aFullIDString = createFullIDString( self.theFullID() )
-		self["id_label"].set_text( aFullIDString )
-		self.theSession = pluginmanager.theSession
-		self.theValueChangedByTextField = FALSE
+
+		self.theStub = self.theSession.createEntityStub( aFullIDString )
+		self["id_label"].set_text( self.theStub.getName() )
 
 		self.update()
 		# ------------------------------------------------------------
@@ -51,25 +41,19 @@ class VariableWindow( OsogoPluginWindow ):
 
 	def update( self ):
 
-		self.theQtyValue = self.getValue( self.theQtyFPN )
-		self.theConcValue = self.getValue( self.theConcFPN )
+		self.theValue = self.theStub.getProperty( 'Value' )
+		self.theConcValue = self.theStub.getProperty( 'Concentration' )
+		self.theIsFixed = self.theStub.getProperty( 'Fixed' )
 
-		if self.theValueChangedByTextField == FALSE:
-			self['value_spinbutton'].set_text( str( self.theQtyValue ) )
-
+		self['value_spinbutton'].set_text( str( self.theValue ) )
 		self['concentration_entry'].set_text( str( self.theConcValue ) )
-		self.theValueChangedByTextField == FALSE
-    
 
 	def fix_mode( self, a ) :
-		self.theFixFlag = 1 - self.theFixFlag
-		if self.theFixFlag == 0:
-			self.theSession.message( "not fixed" )
-		else:
-			self.theSession.message( "fixed" )
+		self.theFixFlag = not self.theFixFlag
+		self.theStub.setProperty( 'Fixed', self.theFixFlag )
 
+		self.thePluginManager.updateAllPluginWindow()
 
-	#def inputValue( self, obj ):
 	def changeValue( self, obj ):
 
 		aText = obj.get_text()
@@ -79,9 +63,8 @@ class VariableWindow( OsogoPluginWindow ):
 		if aText == '':
 			return None
 		else:
-			self.theQtyValue = string.atof( aText )
-			self.theValueChangedByTextField = TRUE
-			self.setValue( self.theQtyFPN, self.theQtyValue )
+			self.theValue = string.atof( aText )
+			self.theStub.setProperty( 'Value', self.theValue )
 
 			self.thePluginManager.updateAllPluginWindow()
 
@@ -89,36 +72,42 @@ class VariableWindow( OsogoPluginWindow ):
 	def inputConcentration( self, obj ):
         
 		self.theConcValue = string.atof( obj.get_text() )
-		self.setValue( self.theConcFPN, self.theConcValue )
+		self.theStub.setProperty( 'Concentration', self.theConcValue )
 
+		self.thePluginManager.updateAllPluginWindow()
 
 	def increaseValue( self, button_object ):
 
-		if self.getValue( self.theQtyFPN ):
-			self.theQtyValue *= 2.0
+		if self.theStub.getProperty( 'Value' ):
+			self.theValue *= 2.0
 		else:
-			self.theQtyValue = 1.0
+			self.theValue = 1.0
 
-		self.setValue( self.theQtyFPN, self.theQtyValue )
+		self.theStub.setProperty( 'Value', self.theValue )
 
+		self.thePluginManager.updateAllPluginWindow()
 
 	def decreaseValue( self, button_object ):
 
-		self.theQtyValue *= 0.5
-		self.setValue( self.theQtyFPN, self.theQtyValue )
+		self.theValue *= 0.5
+		self.setProperty( 'Value', self.theValue )
+
+		self.thePluginManager.updateAllPluginWindow()
 
 
 	def increaseConcentration( self, button_object ):
 
 		self.theConcValue *= 2.0
-		self.setValue( self.theConcFPN, self.theConcValue )
+		self.setProperty( 'Concentration', self.theConcValue )
 
+		self.thePluginManager.updateAllPluginWindow()
 
 	def decreaseConcentration( self, button_object ):
 
 		self.theConcValue *= 0.5
-		self.setValue( self.theConcFPN, self.theConcValue )
+		self.setProperty( 'Concentration', self.theConcValue )
 
+		self.thePluginManager.updateAllPluginWindow()
     
 	def mainLoop():
 		# FIXME: should be a custom function
