@@ -73,10 +73,10 @@ namespace libecs
 
 	PROPERTYSLOT_GET_NO_LOAD_SAVE( Real, TotalVelocity );
 
-	// Use addVelocity as the set method.  This won't be saved/loaded.
 	PROPERTYSLOT_NO_LOAD_SAVE( Real, Velocity,
-				   &Variable::addVelocity, 
+				   NULLPTR,
 				   &Variable::getVelocity );
+	//				   &Variable::addVelocity, 
 
 	// Concentration can be saved, but cannot be loaded.
 	PROPERTYSLOT_GET_NO_LOAD_SAVE( Real, Concentration );

@@ -58,6 +58,8 @@ namespace libecs
   {
     Stepper::initialize();
 
+    createVariableProxies();
+
     // size of the velocity buffer == the number of *write* variables.
     theVelocityBuffer.resize( getReadOnlyVariableOffset() );
 

@@ -93,8 +93,6 @@ namespace libecs
     //
     updateVariableVector();
 
-    createVariableProxies();
-
 
     //    clearEntityListChanged();
     //      }
@@ -104,6 +102,11 @@ namespace libecs
     theValueBuffer.resize( theVariableVector.size() );
 
     updateLoggerVector();
+
+    
+    //  Don't call
+    //    createVariableProxies();
+    //  here:  only DifferentialSteppers need this.
   }
 
  
