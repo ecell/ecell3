@@ -261,6 +261,10 @@ class ModelEditor:
 			propList = aLayoutEml.getLayoutPropertyList(aLayoutName)
 			for aProp in propList:
 				aPropValue =aLayoutEml.getLayoutProperty(aLayoutName,aProp)
+                                if aPropValue == "False":
+                                        aPropValue=False
+                                elif aPropValue == "True":
+                                        aPropValue=True
 				aLayout.setProperty(aProp,aPropValue)
 				
 			aRootID = aLayout.getProperty( LO_ROOT_SYSTEM )
@@ -282,6 +286,10 @@ class ModelEditor:
 					aPropValue = aLayoutEml.getObjectProperty(aLayoutName, aConnID,aProp)
 					if aPropValue == None:
 						continue
+                                        if aPropValue=="False":
+                                                aPropValue=False
+                                        elif aPropValue=="True":
+                                                aPropValue=True
 					anObject.setProperty(aProp,aPropValue)
 
 		
@@ -304,6 +312,10 @@ class ModelEditor:
 				aPropValue = aLayoutEml.getObjectProperty(aLayoutName, anObjectID,aProp)
 				if aPropValue == None :
 					continue
+                                if aPropValue == "False":
+                                        aPropValue = False
+                                elif aPropValue == "True":
+                                        aPropValue = True
 				anObject.setProperty(aProp,aPropValue)
 		# create subobjects
 		if objectType == OB_TYPE_SYSTEM:
@@ -828,7 +840,7 @@ class ModelEditor:
 		returns nothing
 		"""
 		self.__theRecentFileList = []
-		aFileName = os.path.expanduser( RECENTFILELIST_FILENAME )
+		aFileName = self.__getHomeDir() + os.sep +  RECENTFILELIST_FILENAME
 
 		# if not exists create it
 		if not os.path.isfile( aFileName ):
@@ -896,7 +908,6 @@ class ModelEditor:
 		# creates file 
 		aFileName = self.__getHomeDir() + os.sep + RECENTFILELIST_FILENAME
 		aFileObject = open( aFileName, 'w' )
-
 		for aLine in self.__theRecentFileList:
 			# writes lines
 			aFileObject.write( aLine + '\n' )
