@@ -231,7 +231,7 @@
 		      <child>
 			<widget class="GtkImageMenuItem" id="about_menu">
 			  <property name="visible">True</property>
-			  <property name="label" translatable="yes">About</property>
+        <property name="label" translatable="yes">About Session Monitor</property>
 			  <property name="use_underline">True</property>
 			  <signal name="activate" handler="about_menu_activate"/>
 			  <accelerator key="A" modifiers="GDK_CONTROL_MASK" signal="activate"/>
