@@ -83,7 +83,9 @@ namespace libecs
 
     virtual void makeSlots();
 
-    virtual const char* const className() const { return "PropertyInterface"; }
+    const String getClassNameString() const { return getClassName(); }
+
+    virtual StringLiteral getClassName() const { return "PropertyInterface"; }
 
   public: // message slots
 

@@ -58,7 +58,7 @@ namespace libecs
     Substance();
     virtual ~Substance();
 
-    static SubstancePtr instance() { return new Substance; }
+    static SubstancePtr createInstance() { return new Substance; }
 
     virtual const PrimitiveType getPrimitiveType() const
     {
@@ -192,7 +192,7 @@ namespace libecs
     Real saveQuantity();
 
 
-    virtual const String getClassName() const { return "Substance"; }
+    virtual StringLiteral getClassName() const { return "Substance"; }
 
     /**
        set a class name string of user default accumulator

@@ -42,6 +42,8 @@ namespace libecs
 
   void PropertyInterface::makeSlots()
   {
+    createPropertySlot( "ClassName", *this, NULLPTR, 
+			&PropertyInterface::getClassNameString );
     createPropertySlot( "PropertyList",*this,NULLPTR,
 			&PropertyInterface::getPropertyList );
     createPropertySlot( "PropertyAttributes",*this,NULLPTR,
@@ -121,7 +123,7 @@ namespace libecs
     if( thePropertyMap.find( keyword ) == thePropertyMap.end() )
       {
 	throw NoSlot( __PRETTY_FUNCTION__,
-		      className() + String( ":no slot for keyword [" ) +
+		      getClassName() + String( ":no slot for keyword [" ) +
 		      keyword + String( "] found.\n" ) );
       }
 
@@ -136,7 +138,7 @@ namespace libecs
     if( sm == thePropertyMap.end() )
       {
 	throw NoSlot( __PRETTY_FUNCTION__,
-		      className() + String(": got a Message (keyword = [")
+		      getClassName() + String(": got a Message (keyword = [")
 		      + message.getKeyword() + "]) but no slot for it.");
       }
 
@@ -149,7 +151,7 @@ namespace libecs
 
     if( sm == thePropertyMap.end() )
       {
-	throw NoSlot( __PRETTY_FUNCTION__, className()
+	throw NoSlot( __PRETTY_FUNCTION__, getClassName()
 		      + String( ": got a request for Message (keyword = [" )
 		      + keyword + "]) but no slot for it.\n" );
       }

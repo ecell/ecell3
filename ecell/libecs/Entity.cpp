@@ -53,7 +53,6 @@ namespace libecs
 
   void Entity::makeSlots()
   {
-    createPropertySlot( "ClassName", *this, NULLPTR, &Entity::getClassName );
     createPropertySlot( "ID", *this, NULLPTR, &Entity::getID );
     createPropertySlot( "FullID", *this, NULLPTR, &Entity::getFullIDString );
     

@@ -201,7 +201,7 @@ template < class Base, class Derived, class DMAllocator >
 DynamicModule< Base, Derived, DMAllocator >::
 DynamicModule( const std::string& modulename )
   : 
-  DynamicModuleBase<Base,DMAllocator>( modulename, &Derived::instance )
+  DynamicModuleBase<Base,DMAllocator>( modulename, &Derived::createInstance )
 {
   ; // do nothing
 }

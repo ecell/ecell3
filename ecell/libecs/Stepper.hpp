@@ -107,7 +107,7 @@ namespace libecs
     void push();
 
 
-    virtual const char* const className() const  { return "StepperLeader"; }
+    virtual StringLiteral getClassName() const  { return "StepperLeader"; }
 
   private:
 
@@ -159,7 +159,7 @@ namespace libecs
 
     virtual void registerPropertySlot( PropertySlotPtr ) = 0;
 
-    virtual const char* const className() const  { return "Stepper"; }
+    virtual StringLiteral getClassName() const  { return "Stepper"; }
 
   protected:
 
@@ -230,7 +230,7 @@ namespace libecs
     void registerPropertySlot( PropertySlotPtr );
 
 
-    virtual const char* const className() const  { return "MasterStepper"; }
+    virtual StringLiteral getClassName() const  { return "MasterStepper"; }
 
   protected:
 
@@ -290,9 +290,9 @@ namespace libecs
       theMasterStepper->registerPropertySlot( aPropertySlotPtr );
     }
 
-    static StepperPtr instance() { return new SlaveStepper; }
+    static StepperPtr createInstance() { return new SlaveStepper; }
 
-    virtual const char* const className() const  { return "SlaveStepper"; }
+    virtual StringLiteral getClassName() const  { return "SlaveStepper"; }
 
   private:
 
@@ -376,7 +376,7 @@ namespace libecs
     virtual void integrate();
     virtual void compute();
 
-    virtual const char* const className() const  { return "SRMStepper"; }
+    virtual StringLiteral getClassName() const  { return "SRMStepper"; }
  
 
   protected:
@@ -399,9 +399,9 @@ namespace libecs
     Euler1SRMStepper();
     virtual ~Euler1SRMStepper() {}
 
-    static StepperPtr instance() { return new Euler1SRMStepper; }
+    static StepperPtr createInstance() { return new Euler1SRMStepper; }
 
-    virtual const char* const className() const  { return "Euler1SRMStepper"; }
+    virtual StringLiteral getClassName() const  { return "Euler1SRMStepper"; }
  
   protected:
 
@@ -420,11 +420,11 @@ namespace libecs
     RungeKutta4SRMStepper();
     virtual ~RungeKutta4SRMStepper() {}
 
-    static StepperPtr instance() { return new RungeKutta4SRMStepper; }
+    static StepperPtr createInstance() { return new RungeKutta4SRMStepper; }
 
     virtual void differentiate();
 
-    virtual const char* const className() const 
+    virtual StringLiteral getClassName() const 
     { return "RungeKutta4SRMStepper"; }
 
   private:

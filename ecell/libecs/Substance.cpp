@@ -87,7 +87,7 @@ namespace libecs
     if( theAccumulator ) 
       {
 	aUVariableVector->
-	  push_back( UVariable( theAccumulator->className() ) );
+	  push_back( UVariable( theAccumulator->getClassName() ) );
       }
 
     return aUVariableVector;

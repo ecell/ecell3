@@ -122,7 +122,7 @@ namespace libecs
   const UVariableVectorRCPtr System::getStepperClass() const
   {
     UVariableVectorRCPtr aVector( new UVariableVector );
-    aVector->push_back( UVariable( getStepper()->className() ) );
+    aVector->push_back( UVariable( getStepper()->getClassName() ) );
     return aVector;
   }
 

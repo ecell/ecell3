@@ -78,7 +78,7 @@ namespace libecs
 
     virtual void accumulate() = 0;
 
-    virtual const char* const className() const { return "Accumulator"; }
+    virtual StringLiteral getClassName() const { return "Accumulator"; }
 
   protected:
 
@@ -108,11 +108,11 @@ namespace libecs
       ; // do nothing
     }
 
-    static AccumulatorPtr instance() { return new SimpleAccumulator; }
+    static AccumulatorPtr createInstance() { return new SimpleAccumulator; }
 
     virtual void accumulate();
 
-    virtual const char* const className() const {return "SimpleAccumulator";}
+    virtual StringLiteral getClassName() const {return "SimpleAccumulator";}
 
   };
 
@@ -126,12 +126,12 @@ namespace libecs
       ; // do nothing
     }
 
-    static AccumulatorPtr instance() { return new RoundDownAccumulator; }
+    static AccumulatorPtr createInstance() { return new RoundDownAccumulator; }
 
     virtual void update();
     virtual void accumulate();
 
-    virtual const char* const className() const 
+    virtual StringLiteral getClassName() const 
     { return "RoundDownAccumulator"; }
 
   };
@@ -146,12 +146,12 @@ namespace libecs
       ; // do nothing
     }
 
-    static AccumulatorPtr instance() { return new RoundOffAccumulator; }
+    static AccumulatorPtr createInstance() { return new RoundOffAccumulator; }
 
     virtual void update();
     virtual void accumulate();
 
-    virtual const char* const className() const
+    virtual StringLiteral getClassName() const
     { return "RoundOffAccumulator"; }
 
   };
@@ -168,13 +168,13 @@ namespace libecs
       ; // do nothing
     }
 
-    static AccumulatorPtr instance() { return new ReserveAccumulator; }
+    static AccumulatorPtr createInstance() { return new ReserveAccumulator; }
 
     virtual Real save();
     virtual void update();
     virtual void accumulate();
 
-    virtual const char* const className() const {return "ReserveAccumulator";}
+    virtual StringLiteral getClassName() const {return "ReserveAccumulator";}
 
   private:
 
@@ -192,12 +192,13 @@ namespace libecs
       ; // do nothing
     }
 
-    static AccumulatorPtr instance() { return new MonteCarloAccumulator; }
+    static AccumulatorPtr createInstance() 
+    { return new MonteCarloAccumulator; }
 
     virtual void update();
     virtual void accumulate();
 
-    virtual const char* const className() const 
+    virtual StringLiteral getClassName() const 
     { return "MonteCarloAccumulator"; }
 
   };

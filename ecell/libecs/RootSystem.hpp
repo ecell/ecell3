@@ -64,7 +64,7 @@ namespace libecs
 
     const Real getCurrentTime() const;
 
-    virtual const char* const className() const { return "RootSystem"; }
+    virtual StringLiteral getClassName() const { return "RootSystem"; }
 
   private:
 

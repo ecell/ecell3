@@ -70,7 +70,7 @@ namespace libecs
 
     virtual void initialize();
 
-    virtual const char* const className() const { return "System"; }
+    virtual StringLiteral getClassName() const { return "System"; }
 
     /**
        Set a pointer to the RootSystem.
@@ -211,7 +211,7 @@ namespace libecs
     void notifyChangeOfEntityList();
 
 
-    static SystemPtr instance() { return new System; }
+    static SystemPtr createInstance() { return new System; }
 
   public: // property slots
 

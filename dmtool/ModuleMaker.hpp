@@ -45,7 +45,7 @@ using namespace std;
 /// doc needed
 
 #define DynamicModuleEntry( T )\
-addClass( new Module( string( #T ), &T::instance ) );
+addClass( new Module( string( #T ), &T::createInstance ) );
 
 /**
    A base class for ModuleMakers

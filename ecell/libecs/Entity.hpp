@@ -142,7 +142,7 @@ namespace libecs
     */
     virtual const Real getActivityPerSecond() const;
 
-    virtual const String getClassName() const { return "Entity"; }
+    virtual StringLiteral getClassName() const { return "Entity"; }
 
 
 

@@ -78,6 +78,8 @@ namespace libecs
 
   DECLARE_TYPE( std::string, String );
 
+  DECLARE_TYPE( const char* const, StringLiteral );
+
   // Numeric types
 
   // FIXME: use numeric_limits
