@@ -5,17 +5,13 @@
 import sys
 import string
 import os
-import time
-import getopt
 import types
-import re
-import parser
-import token
-import symbol
-
+import getopt
+import time
 
 from ecell.ecssupport import *
 from ecell.eml import *
+from ecell.expressionparser import *
 
 import libsbml
 
@@ -46,56 +42,29 @@ def convertToMoleUnit( aValue ):
     return float( aValue ) /  6.0221367e+23  # N_A 
 
 
-# --------------------------------------------
-# convert the E-Cell Expression to SBML format
-# --------------------------------------------
-
-def convertExpression( aExpression ):
-
-    return aExpression
-
-
-
-#    if ( aNumChildren == 2 ):
-#        convertExpression( ASTNode_getLeftChild( aASTNode ) )
-#        convertExpression( ASTNode_getRightChild( aASTNode ) )
-
-#    elif ( aNumChildren == 1 ):
-#        convertExpression( ASTNode_getLeftChild( aASTNode ) )#
-
-#    elif ( aNumChildren == 0 ):
-#        if ( ASTNode_isNumber( aASTNode ) == 1 ):
-#            pass
-#        else:
-#            print ASTNode_getName( aASTNode )
-
-#    return aASTNode
-
-
 # -------------------------------
 # return the VariableReference ID
 # -------------------------------
 
-def getVariableReferenceId( aVariableReference, aReactionPath ):
-    
+def getVariableReferenceId( aVariableReference, aFullPath ):
+
     aFastColon = string.index( aVariableReference, ':' )
     aLastColon = string.rindex( aVariableReference, ':' )
 
     # set Species Id to Reactant object
     if ( aVariableReference[aFastColon+1:aLastColon] == '.' ):
-        aSpeciesReferencePath = string.replace( aReactionPath[1:], '/', '_' )
+        aSpeciesReferencePath = string.replace( aFullPath[1:], '/', '_S_' )
         
     else:
-        aSpeciesReferencePath = string.replace( aVariableReference[aFastColon+2:aLastColon], '/', '_' )
-        
+        aSpeciesReferencePath = string.replace( aVariableReference[aFastColon+2:aLastColon], '/', '_S_' )
         
     return  aSpeciesReferencePath + '_' + aVariableReference[aLastColon+1:]
 
                             
 
-# ----------------------------------------------------------
-# create Compartment, Species, Parameter and Reaction object
-# ----------------------------------------------------------
+# ------------------------------------------------------------
+#  create Compartment, Species, Parameter and Reaction object
+# ------------------------------------------------------------
 
 def createEntity( anEml, aSBMLModel, aFullID, anOptional='' ):
 
@@ -103,9 +72,9 @@ def createEntity( anEml, aSBMLModel, aFullID, anOptional='' ):
     aType = ENTITYTYPE_STRING_LIST[ aFullID[ TYPE ] ]
     aClass = anEml.getEntityClass( aFullIDString )
 
-    # ----------------------------------
-    # make the Species and the Parameter
-    # ----------------------------------
+    # ------------------------------------
+    #  make the Species and the Parameter
+    # ------------------------------------
 
     if ( aFullID[TYPE] == VARIABLE ):
 
@@ -149,15 +118,11 @@ def createEntity( anEml, aSBMLModel, aFullID, anOptional='' ):
                 aSpecies = aSBMLModel.createSpecies()
 
                 # set Species ID
-                aSpeciesID = string.replace( aFullID[1][1:], '/', '_' ) + '_' + aFullID[2]
+                aSpeciesID = string.replace( aFullID[1][1:], '/', '_S_' ) + '_' + aFullID[2]
                 aSpecies.setId( aSpeciesID )
 
                 # set Compartment of Species
-#                if( aCurrentCompartment == ''):
-#                    pass
-#                else:                    
-#                    aSpecies.setCompartment( aCurrentCompartment )
-
+                aSpecies.setCompartment( 'default' )
 
                 # set Species Name, Value and Constant
                 for aPropertyName in aPropertyNameList:
@@ -173,10 +138,11 @@ def createEntity( anEml, aSBMLModel, aFullID, anOptional='' ):
                     # set Species Value
                     elif ( aPropertyName == "Value" ):
                         
-                        aMolarValue = convertToMoleUnit(
-                            anEml.getEntityProperty( aFullPN )[0] )
+#                        aMolarValue = convertToMoleUnit(
+#                            anEml.getEntityProperty( aFullPN )[0] )
 
-                        aSpecies.setInitialConcentration( aMolarValue )
+                        aSpecies.setInitialAmount(
+                            float( anEml.getEntityProperty( aFullPN )[0] ) )
 
                     # set Species Constant
                     elif ( aPropertyName == "Fixed" ):
@@ -190,108 +156,217 @@ def createEntity( anEml, aSBMLModel, aFullID, anOptional='' ):
                     
 
 
-    # ------------------------
-    # make the Reaction object
-    # ------------------------
+    # -------------------------------------
+    # make the Reaction and the Rule object
+    # -------------------------------------
     
     elif ( aFullID[TYPE] == PROCESS ):
 
         aPropertyNameList = anEml.getEntityPropertyList( aFullIDString )
 
-        # create Parameter object
-        aReaction = aSBMLModel.createReaction()
+        aFastColon = string.index( aFullIDString, ':' )
+        aLastColon = string.rindex( aFullIDString, ':' )
 
-        # create KineticLaw Object
-        aKineticLaw = aSBMLModel.createKineticLaw()
+        
+        # ------------------
+        #  make Rule object
+        # ------------------
 
-        # set Reaction ID
-        aReaction.setId( aFullID[2] )
+        if ( aFullIDString[aFastColon+1:aLastColon] == '/SBMLRule' ):
 
-	for aPropertyName in aPropertyNameList:
+            # get Process Class
+            aProcessClass = anEml.getEntityClass( aFullIDString )
+            aVariableReferenceList = anEml.getEntityProperty( aFullIDString + ':VariableReferenceList' )
+            anExpression = convertExpression( anEml.getEntityProperty( aFullIDString + ':Expression' )[0],
+                                              aVariableReferenceList,
+                                              aFullID[1] )
 
-            aFullPN = aFullIDString + ':' + aPropertyName
 
-            # set Name property ( Name )
-	    if ( aPropertyName == "Name" ):
-                
-                # set Reaction Name
-		aReaction.setName( anEml.getEntityProperty( aFullPN )[0] )
 
-            # set Expression property ( KineticLaw Formula )
-            elif ( aPropertyName == "Expression"):
-                
-                # convert Expression of the ECELL format to SBML kineticLaw formula 
-                #aExpression = convertExpression( anEml.getEntityProperty( aFullPN )[0] )
-                print aFullID[2],''' : Sorry!!! Expression converter is not developed yet.'''
+            if( aProcessClass == 'ExpressionAlgebraicProcess' ):
 
-                # set KineticLaw Formula
-                aKineticLaw.setFormula( 'unSet' )
+                # create AlgebraicRule object
+                anAlgebraicRule = aSBMLModel.createAlgebraicRule()
+
+                # set AlgebraicRule Formula
+                anAlgebraicRule.setFormula( anExpression )
                 
 
-            # set VariableReference property ( SpeciesReference )
-            elif ( aPropertyName == "VariableReferenceList" ):
+            elif( aProcessClass == 'ExpressionAssignmentProcess' ):
 
-                # make a flag. Because SBML model is defined both Product and Reactant
-                # This flag is required in order to judge whether the Product and the
-                # Reactant are defined
-
-                aReactantFlag = False
-                aProductFlag = False
-
-                for aVariableReference in anEml.getEntityProperty( aFullPN ):
+                for aVariableReference in aVariableReferenceList:
 
                     if ( len( aVariableReference ) >= 3 ):
 
-                        # --------------------------------
-                        # add Reactants to Reaction object
-                        # --------------------------------
-                        
-                        if ( float( aVariableReference[2] ) < 0 ):
+                        if ( aVariableReference[2] != '0' ): 
 
-                            # change the Reactant Flag
-                            aReactantFlag = True
+                            # create AssignmentRule object
+                            anAssignmentRule =aSBMLModel.createAssignmentRule()
+
+                            # set AssignmentRule Formula
+                            anAssignmentRule.setFormula( aVariableReference[2] + '* ( ' + anExpression + ')' )
                             
-                            # create Reactant object
-                            aReactant = aSBMLModel.createReactant()
+                            aVariableID = getVariableReferenceId( aVariableReference[1], aFullID[1] )
+                            anAssignmentRule.setVariable( aVariableID )
 
-                            # set Species Id to Reactant object
-                            aSpeciesReferenceId = getSpeciesReferenceId( aVariableReference[1], aFullID[1] )
-
-                            aReactant.setSpecies( aSpeciesReferenceId )
-
-
-                            # set Stoichiometry 
-                            aReactant.setStoichiometry(
-                                -( float( aVariableReference[2] ) ) )
-
-
-                        # -------------------------------
-                        # add Products to Reaction object
-                        # -------------------------------
-                        
-                        elif ( float( aVariableReference[2] ) > 0 ):
-
-                            # change the Product Flag
-                            aProductFlag = True
-
-                            # create Product object
-                            aProduct = aSBMLModel.createProduct()
-                            
-                            # set Species Id
-                            aSpeciesReferenceId = getVariableReferenceId( aVariableReference[1], aFullID[1] )
-                            
-                            aProduct.setSpecies( aSpeciesReferenceId )
-
-                            # set Stoichiometry
-                            aProduct.setStoichiometry(
-                                float( aVariableReference[2] ) )
-
-
-                        # --------------------------------
-                        # add Modifiers to Reaction object
-                        # --------------------------------
-                        
                         else:
+                            pass
+
+                    else:
+                        pass
+                        
+
+            elif( aProcessClass == 'ExpressionFluxProcess' ):
+
+                for aVariableReference in aVariableReferenceList:
+
+                    if ( len( aVariableReference ) >= 3 ):
+                        
+                        if ( aVariableReference[2] != '0' ): 
+
+                            # create AssignmentRule object
+                            aRateRule = aSBMLModel.createRateRule()
+
+                            # set AssignmentRule Formula
+                            aRateRule.setFormula( aVariableReference[2] + '* ( ' + anExpression + ')' )
+
+                            aVariableID = getVariableReferenceId( aVariableReference[1], aFullID[1] )
+                            aRateRule.setVariable( aVariableID )
+
+                        else:
+                            pass
+
+                    else:
+                        pass
+
+
+            else:
+                raise TypeError, " The type of Process must be Algebraic, Assignment, Flux Processes"
+            
+
+
+        # ----------------------
+        #  make Reaction object
+        # ----------------------
+
+        else:
+
+            # create Parameter object
+            aReaction = aSBMLModel.createReaction()
+
+            # create KineticLaw Object
+            aKineticLaw = aSBMLModel.createKineticLaw()
+
+            # set Reaction ID
+            aReaction.setId( aFullID[2] )
+
+            for aPropertyName in aPropertyNameList:
+                
+                aFullPN = aFullIDString + ':' + aPropertyName
+
+                # set Name property ( Name )
+                if ( aPropertyName == "Name" ):
+                
+                    # set Reaction Name
+                    aReaction.setName( anEml.getEntityProperty( aFullPN )[0] )
+
+
+                # set Expression property ( KineticLaw Formula )
+                elif ( aPropertyName == "Expression"):
+                
+                    # convert Expression of the ECELL format to
+                    # SBML kineticLaw formula
+
+                    anExpression = convertExpression(
+                        anEml.getEntityProperty( aFullPN )[0],
+                        anEml.getEntityProperty( aFullIDString + ':VariableReferenceList' ),
+                        aFullID[1] )
+
+                    aLastSlash = string.rindex( aFullID[1], '/' )
+                    aCompartmentID = aFullID[1][aLastSlash+1:]
+
+                    anExpression = '(' + anExpression + ')/' + aCompartmentID + '/N_A'
+                    # set KineticLaw Formula
+                    aKineticLaw.setFormula( anExpression )
+                
+
+                # set VariableReference property ( SpeciesReference )
+                elif ( aPropertyName == "VariableReferenceList" ):
+
+                    # make a flag. Because SBML model is defined
+                    # both Product and Reactant. This flag is required
+                    # in order to judge whether the Product and the
+                    # Reactant are defined.
+
+                    aReactantFlag = False
+                    aProductFlag = False
+
+                    for aVariableReference in anEml.getEntityProperty( aFullPN ):
+
+                        if ( len( aVariableReference ) >= 3 ):
+
+                            # --------------------------------
+                            # add Reactants to Reaction object
+                            # --------------------------------
+                        
+                            if ( float( aVariableReference[2] ) < 0 ):
+
+                                # change the Reactant Flag
+                                aReactantFlag = True
+                            
+                                # create Reactant object
+                                aReactant = aSBMLModel.createReactant()
+
+                                # set Species Id to Reactant object
+                                aSpeciesReferenceId = getSpeciesReferenceId( aVariableReference[1], aFullID[1] )
+
+                                aReactant.setSpecies( aSpeciesReferenceId )
+
+
+                                # set Stoichiometry 
+                                aReactant.setStoichiometry(
+                                    -( float( aVariableReference[2] ) ) )
+
+
+                                # -------------------------------
+                                # add Products to Reaction object
+                                # -------------------------------
+                        
+                            elif ( float( aVariableReference[2] ) > 0 ):
+
+                                # change the Product Flag
+                                aProductFlag = True
+                                
+                                # create Product object
+                                aProduct = aSBMLModel.createProduct()
+                                
+                                # set Species Id
+                                aSpeciesReferenceId = getVariableReferenceId( aVariableReference[1], aFullID[1] )
+
+                                aProduct.setSpecies( aSpeciesReferenceId )
+                                
+                                # set Stoichiometry
+                                aProduct.setStoichiometry(
+                                    float( aVariableReference[2] ) )
+
+
+                            # --------------------------------
+                            # add Modifiers to Reaction object
+                            # --------------------------------
+                            
+                            else:
+                                # create Modifier object
+                                aModifier = aSBMLModel.createModifier()
+                                
+                                # set Species Id to Modifier object
+                                aVariableReferenceId = getVariableReferenceId( aVariableReference[1], aFullID[1] )
+
+                                aModifier.setSpecies( aVariableReferenceId )
+
+                            
+                        # if there isn't the stoichiometry
+                        elif ( len( aVariableReference ) == 2 ):
+
                             # create Modifier object
                             aModifier = aSBMLModel.createModifier()
 
@@ -300,72 +375,60 @@ def createEntity( anEml, aSBMLModel, aFullID, anOptional='' ):
 
                             aModifier.setSpecies( aVariableReferenceId )
 
-                            
-                    # if there isn't the stoichiometry
-                    elif ( len( aVariableReference ) == 2 ):
-
-                        # create Modifier object
-                        aModifier = aSBMLModel.createModifier()
-
-                        # set Species Id to Modifier object
-                        aVariableReferenceId = getVariableReferenceId( aVariableReference[1], aFullID[1] )
-
-                        aModifier.setSpecies( aVariableReferenceId )
 
 
+                    if ( aReactantFlag == False or aProductFlag == False ):
 
-                if ( aReactantFlag == False or aProductFlag == False ):
-
-                    # set EmptySet Species, because if it didn't define,
-                    # Reactant or Product can not be defined.
+                        # set EmptySet Species, because if it didn't define,
+                        # Reactant or Product can not be defined.
                     
-                    if ( aReactantFlag == False ):
+                        if ( aReactantFlag == False ):
 
-                        # create Reactant object
-                        aReactant = aSBMLModel.createReactant()
+                            # create Reactant object
+                            aReactant = aSBMLModel.createReactant()
+                            
+                            # set Species Id to Reactant object
+                            aReactant.setSpecies( 'EmptySet' )
 
-                        # set Species Id to Reactant object
-                        aReactant.setSpecies( 'EmptySet' )
-
-                        # set Stoichiometry 
-                        aReactant.setStoichiometry( 0 )
+                            # set Stoichiometry 
+                            aReactant.setStoichiometry( 0 )
                         
 
-                    elif( aProductFlag == False ):
+                        elif( aProductFlag == False ):
 
-                        # create Product object
-                        aProduct = aSBMLModel.createProduct()
+                            # create Product object
+                            aProduct = aSBMLModel.createProduct()
                             
-                        # set Species Id
-                        aProduct.setSpecies( 'EmptySet' )
+                            # set Species Id
+                            aProduct.setSpecies( 'EmptySet' )
+                            
+                            # set Stoichiometry
+                            aProduct.setStoichiometry( 0 )
 
-                        # set Stoichiometry
-                        aProduct.setStoichiometry( 0 )
 
+                # These properties are not defined in SBML Lv2
+                elif ( aPropertyName == "Priority" or
+                       aPropertyName == "Activity" or
+                       aPropertyName == "IsContinuous" or
+                       aPropertyName == "StepperID" ):
 
-            # These properties are not defined in SBML Lv2
-            elif ( aPropertyName == "Priority" or
-                   aPropertyName == "Activity" or
-                   aPropertyName == "IsContinuous" or
-                   aPropertyName == "StepperID" ):
+                    pass
 
-                pass
-
-            else:
+                else:
                 
-                # create Parameter Object (Local)
-                aParameter = aSBMLModel.createKineticLawParameter()
+                    # create Parameter Object (Local)
+                    aParameter = aSBMLModel.createKineticLawParameter()
                 
-                # set Parameter ID
-                aParameter.setId( aPropertyName )
+                    # set Parameter ID
+                    aParameter.setId( aPropertyName )
 
-                # set Parameter Value
-                aParameter.setValue(
-                  float ( anEml.getEntityProperty( aFullPN )[0] ) )
+                    # set Parameter Value
+                    aParameter.setValue(
+                        float ( anEml.getEntityProperty( aFullPN )[0] ) )
                 
 
-        # add KineticLaw Object to Reaction Object
-        aReaction.setKineticLaw( aKineticLaw )
+            # add KineticLaw Object to Reaction Object
+            aReaction.setKineticLaw( aKineticLaw )
 
 
     # --------------------
@@ -381,7 +444,7 @@ def createEntity( anEml, aSBMLModel, aFullID, anOptional='' ):
 
             # set ID ROOT System and Other System
             if ( aFullID[2] == '' ):
-                aCompartment.setId( "ROOT" )
+                aCompartment.setId( "default" )
             else:
                 aCompartment.setId( aFullID[2] )
 
@@ -423,7 +486,7 @@ def createEntity( anEml, aSBMLModel, aFullID, anOptional='' ):
             # set Outside element of Compartment
             if( aFullID[1] == '/' ):
                 if( aFullID[2] != '' ):
-                    aCompartment.setOutside( "ROOT" )
+                    aCompartment.setOutside( "default" )
                     
             else:
                 aLastSlash = string.rindex( aFullID[1], '/' )
@@ -466,6 +529,43 @@ def createModel( anEml, aSBMLModel, aSystemPath='/' ):
         createModel( anEml, aSBMLModel, aSubSystemPath )
 
 
+
+def initialize( aSBMLModel ):
+
+    # -------------------
+    #  set N_A Parameter
+    # -------------------
+
+    # create Parameter object
+    aParameter = aSBMLModel.createParameter()
+
+    # set Parameter Id
+    aParameter.setId( 'N_A' )
+
+    # set Parameter Value
+    aParameter.setValue( float( 6.0221367e+23 ) )
+    
+    # set Parameter Constant
+    aParameter.setConstant( int( 1 ) )
+    
+
+    # ------------
+    # set EmptySet
+    # ------------
+    
+    # create Species object
+    aSpecies = aSBMLModel.createSpecies()
+    
+    # set Species Id
+    aSpecies.setId( 'EmptySet' )
+    
+    # set Species Amount
+    aSpecies.setInitialAmount( float( 0 ) )
+    
+    # set Species Constant
+    aSpecies.setConstant( int( 1 ) )    
+
+    
 
 # --------
 #   Main
@@ -568,22 +668,9 @@ Options:
     aSBMLDocument.setLevel( 2 )
     aSBMLDocument.setVersion( 1 )
 
-    # ------------
-    # set EmptySet
-    # ------------
-    
-    # create Species object
-    aSpecies = aSBMLModel.createSpecies()
-    
-    # set Species Id
-    aSpecies.setId( 'EmptySet' )
-    
-    # set Species Amount
-    aSpecies.setInitialAmount( float( 0 ) )
-    
-    # set Species Constant
-    aSpecies.setConstant( int( 1 ) )
-    
+    # initialize SBML model
+    initialize( aSBMLModel )
+
 
     #  SBML Model
     aSBMLModel.setId( aBaseName )
@@ -595,4 +682,4 @@ Options:
     if ( aWriteSBML ):
         pass
     else:
-        raise IOError," failed to write the SBML file"
+        raise IOError," failed to write the SBML file(.xml)"
