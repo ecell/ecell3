@@ -11,13 +11,13 @@
 ; 4. Under [Setup], set Compression=None during development/test compilation.
 ;    Set Compression=lzma/ultra for releases.
 ; 5. Compile the script
-; 6. The compiled installer will appear in the root directory of the script file
+; 6. The compiled installer will appear in the root directory of this script file
 
 
 #define FullInstall
 #define Version       '@VERSION@'
 #define PythonVersion '@PYTHON_VERSION@'
-#define GtkVersion    '@GTK_VERSION@'
+#define GtkVersion    '2.4'
 #define PythonSetup   'Python-2.3.3.exe'
 #define GtkSetup      'gtk-win32-aio-2.4-rc6.exe'
 #define Pythondll     'python@PYTHON_WIN_VERSION@.dll'
@@ -157,19 +157,19 @@ DialogFontName=Tahoma
 [Components]
 Name: file; Description: E-Cell File Associations; Types: full compact
 Name: file\eml; Description: .eml; Types: full compact
-Name: file\eml\gecell; Description: gecell; Types: full compact; Flags: exclusive
-Name: file\eml\model_editor; Description: ecell3-model-editor; Flags: exclusive
-Name: file\eml\eml2em; Description: ecell3-eml2em; Flags: exclusive
+Name: file\eml\gecell; Description: gecell (E-Cell Session Monitor); Types: full compact; Flags: exclusive
+Name: file\eml\model_editor; Description: ecell3-model-editor (E-Cell Model Editor); Flags: exclusive
+Name: file\eml\eml2em; Description: ecell3-eml2em (EML to EM File Converter); Flags: exclusive
 Name: file\em; Description: .em; Types: full compact
-Name: file\em\em2eml; Description: ecell3-em2eml; Types: full compact; Flags: exclusive
+Name: file\em\em2eml; Description: ecell3-em2em (EM to EML File Converter)l; Types: full compact; Flags: exclusive
 Name: file\ess; Description: .ess; Types: full compact
-Name: file\ess\session; Description: ecell3-session; Types: full compact; Flags: exclusive
+Name: file\ess\session; Description: ecell3-session (E-Cell Session Scripting); Types: full compact; Flags: exclusive
 Name: file\esm; Description: .esm
-Name: file\esm\session_manager; Description: ecell3-session-manager
-Name: file\cpp; Description: .cpp; Types: full compact
-Name: file\cpp\dmc; Description: ecell3-dmc; Types: full compact; Flags: exclusive
+Name: file\esm\session_manager; Description: ecell3-session-manager (E-Cell Session Manager)
+Name: file\cpp; Description: .cpp;
+Name: file\cpp\dmc; Description: ecell3-dmc (E-Cell Dynamic Module Compiler); Flags: exclusive
 Name: themes; Description: GTK+ Themes; Types: full compact
-Name: themes\wimp; Description: GTK-Wimp Theme; Types: full compact; Flags: exclusive
+Name: themes\wimp; Description: GTK-Wimp Theme (Tries to impersonate Windows UI); Types: full compact; Flags: exclusive
 Name: themes\prettyOK; Description: PrettyOK Theme; Flags: exclusive
 Name: themes\lighthouse; Description: Lighthouse Blue Theme; Flags: exclusive
 
@@ -274,7 +274,7 @@ begin
         pythondef := libdir + '\python.def';
         cmd := ExpandConstant('{cmd}')
         InstExec(cmd, '/C ' + pexports + ' ' + pythondll + ' > python.def', libdir, True, False, SW_HIDE, Dummy);
-        InstExec(dlltool, '--dllname  ' + pythondll + ' --def python.def ' + '--output-lib ' + LIBPYTHON_FILE, libdir, True, False, SW_SHOWNORMAL, Dummy);
+        InstExec(dlltool, '--dllname  ' + pythondll + ' --def python.def ' + '--output-lib ' + LIBPYTHON_FILE, libdir, True, False, SW_SHOWMINNOACTIVE, Dummy);
         if FileExists(pythondef) then
           DeleteFile(pythondef);
       end;
@@ -547,4 +547,5 @@ function BackButtonClick(CurPage: Integer): Boolean;
 begin
   Result := ScriptDlgPages(CurPage, True);
 end;
+
 
