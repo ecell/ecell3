@@ -32,7 +32,7 @@ LIBECS_DM_CLASS( GillespieProcess, DiscreteEventProcess )
       
       PROPERTYSLOT_SET_GET( Real, k );
 
-      PROPERTYSLOT_GET_NO_LOAD_SAVE( Real, MuV );
+      PROPERTYSLOT_GET_NO_LOAD_SAVE( Real, Mu );
       PROPERTYSLOT_GET_NO_LOAD_SAVE( Int,  Order );
     }
 
@@ -41,7 +41,7 @@ LIBECS_DM_CLASS( GillespieProcess, DiscreteEventProcess )
     :
     theOrder( 0 ),
     k( 0.0 ),
-    theGetMuVInvMethodPtr( &GillespieProcess::getInf ),
+    theGetMultiplicityMethodPtr( &GillespieProcess::getZero ),
     theGetMinValueMethodPtr( &GillespieProcess::getZero )
     {
       ; // do nothing
@@ -55,15 +55,10 @@ LIBECS_DM_CLASS( GillespieProcess, DiscreteEventProcess )
 
   SIMPLE_SET_GET_METHOD( Real, k );
 
-  GET_METHOD( Real, MuV )
-  {
-    return 1.0 / getMuVInv();
-  }
 
-
-  GET_METHOD( Real, MuVInv )
+  GET_METHOD( Real, Mu )
   {
-    return ( this->*theGetMuVInvMethodPtr )();
+    return k * ( this->*theGetMultiplicityMethodPtr )();
   }
 
 
@@ -78,12 +73,30 @@ LIBECS_DM_CLASS( GillespieProcess, DiscreteEventProcess )
   {
     return ( this->*theGetMinValueMethodPtr )() * getStepInterval();
   }
-
+  
 
   virtual void updateStepInterval()
   {
-    theStepInterval = getMuVInv() * 
-      ( - log( gsl_rng_uniform_pos( getStepper()->getRng() ) ) );
+    const Real aMu( getMu() );
+
+    if( aMu > 0.0 )
+      {
+	const Real u( gsl_rng_uniform_pos( getStepper()->getRng() ) );
+	theStepInterval = - log( u ) / aMu;
+
+	if( getOrder() == 2 )
+	  {
+	    theStepInterval *= 
+	      getSuperSystem()->getSizeVariable()->getValue() * N_A;
+	    // A trick: which is faster than:
+	    //theStepInterval *= getSuperSystem()->getSizeN_A();
+	  }
+      }
+    else // aMu == 0.0 (or aMu < 0.0 but this won't happen)
+      {
+	theStepInterval = libecs::INF;
+	  // std::numeric_limits<Real>::max();
+      }
   }
 
 
@@ -106,76 +119,47 @@ LIBECS_DM_CLASS( GillespieProcess, DiscreteEventProcess )
 
 protected:
 
-  static void checkNonNegative( const Real aValue )
+
+  inline static const Real roundValue( RealCref aValue )
   {
-    if( aValue < 0.0 )
+    const Real aRoundedValue( trunc( aValue ) );
+
+    if( aRoundedValue < 0.0 )
       {
 	THROW_EXCEPTION( SimulationError, "Variable value <= -1.0" );
       }
+
+    return aRoundedValue;
   }
+
 
   const Real getZero() const
   {
     return 0.0;
   }
 
-  const Real getInf() const
+  const Real getMultiplicity_FirstOrder() const
   {
-    return libecs::INF;
+    return roundValue( theVariableReferenceVector[0].getValue() );
   }
 
-  const Real getMuVInv_FirstOrder() const
+  const Real getMultiplicity_SecondOrder_TwoSubstrates() const
   {
-    const Real 
-      aMultiplicity( trunc( theVariableReferenceVector[0].getValue() ) );
+    Real aMultiplicity( roundValue( theVariableReferenceVector[0].
+				    getValue() ) );
+    aMultiplicity *= roundValue( theVariableReferenceVector[1].getValue() );
 
-    if( aMultiplicity > 0.0 )
-      {
-	return 1.0 / ( k * aMultiplicity );
-      }
-    else
-      {
-	checkNonNegative( aMultiplicity );
-
-	return libecs::INF;
-      }
+    return aMultiplicity;
   }
 
-  const Real getMuVInv_SecondOrder_TwoSubstrates() const
+  const Real getMultiplicity_SecondOrder_OneSubstrate() const
   {
-    const Real 
-      aMultiplicity( trunc( theVariableReferenceVector[0].getValue() ) *
-		     trunc( theVariableReferenceVector[1].getValue() ) );
+    Real aMultiplicity( roundValue( theVariableReferenceVector[0].
+				    getValue() ) );
 
-    if( aMultiplicity > 0.0 )
-      {
-	return ( getSuperSystem()->getSizeVariable()->getValue() * N_A ) /
-	  ( k * aMultiplicity );
-      }
-    else
-      {
-	checkNonNegative( aMultiplicity );
+    aMultiplicity *= ( aMultiplicity - 1.0 );
 
-	return libecs::INF;
-      }
-  }
-
-  const Real getMuVInv_SecondOrder_OneSubstrate() const
-  {
-    const Real aValue( trunc( theVariableReferenceVector[0].getValue() ) );
-
-    if( aValue > 1.0 ) // there must be two or more molecules
-      {
-	return ( getSuperSystem()->getSizeVariable()->getValue() * N_A ) /
-	  ( k * aValue * ( aValue - 1.0 ) );
-      }
-    else
-      {
-	checkNonNegative( aValue );
-
-	return libecs::INF;
-      }
-
+    return aMultiplicity;
   }
 
   const Real getMinValue_FirstOrder() const
@@ -203,7 +187,7 @@ protected:
 
   Int theOrder;
 
-  RealMethodPtr theGetMuVInvMethodPtr;
+  RealMethodPtr theGetMultiplicityMethodPtr;
   RealMethodPtr theGetMinValueMethodPtr;
 
 };
