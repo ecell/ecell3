@@ -64,7 +64,11 @@ namespace libecs
     }
 	
 
-    void push( RealCref aTime, RealCref aValue );
+    void push( RealCref aTime, RealCref aValue )
+    {
+      DataPoint aDataPoint( aTime, aValue );
+      theVector.push_back( aDataPoint );
+    }
 
     iterator lower_bound( const iterator& start,
 			  const iterator& end,
@@ -87,7 +91,7 @@ namespace libecs
 
     bool empty() const
     {
-      return ( theVector.size() == 0 );
+      return ( size() == 0 );
     }
 
     DataPoint front()
@@ -97,7 +101,8 @@ namespace libecs
 
     DataPoint back()
     {
-      return theVector[ theVector.size() - 1 ];
+      // danger!!  undefined behavior with vvector if size() == 0 - sha
+      return theVector[ size() - 1 ];
     }
 
 

@@ -206,6 +206,8 @@ namespace libecs
     DataPointVectorRCPtr theDataPointVector;
     PhysicalLogger	 thePhysicalLogger;
 
+    Real                 theLastTime;
+
     Real                 theMinimumInterval;
     Real                 theCurrentInterval;
 

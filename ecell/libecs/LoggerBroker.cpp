@@ -84,15 +84,17 @@ namespace libecs
 
     if( aPropertySlotMapIterator == anEntityPtr->getPropertySlotMap().end() )
       {
-	THROW_EXCEPTION( NotFound, "not found" );
+	THROW_EXCEPTION( NotFound, "PropertySlot not found" );
       }
 
-    //    aPropertyMapIterator->second->getProxy()->setLogger( aLoggerPtr );
+    PropertySlotPtr aPropertySlotPtr( aPropertySlotMapIterator->second );
 
-    //    appendLogger( aLoggerPtr );
-    theLoggerMap[fpn] = new Logger( theModel,
-				    *(aPropertySlotMapIterator->second) );
-    aPropertySlotMapIterator->second->connectLogger(theLoggerMap[fpn]);
+    LoggerPtr aNewLogger( new Logger( theModel, *(aPropertySlotPtr) ) );
+    theLoggerMap[fpn] = aNewLogger;
+    aPropertySlotPtr->connectLogger(theLoggerMap[fpn]);
+
+    // don't forget this!
+    aPropertySlotPtr->updateLogger();
 
     anEntityPtr->getSuperSystem()
       ->getStepper()->registerPropertySlot( aPropertySlotMapIterator->second );

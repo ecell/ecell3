@@ -42,12 +42,6 @@ namespace libecs
     ; // do nothing
   }
 
-  void PhysicalLogger::push( RealCref aTime, RealCref aValue )
-  {
-    DataPoint aDataPoint( aTime, aValue );
-    theVector.push_back( aDataPoint );
-  }
-
   PhysicalLoggerIterator 
   PhysicalLogger::lower_bound( PhysicalLoggerIteratorCref start,
 			       PhysicalLoggerIteratorCref end,

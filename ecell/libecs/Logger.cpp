@@ -43,6 +43,7 @@ namespace libecs
     :
     theModel( aModel ),
     thePropertySlot( aPropertySlot ),
+    theLastTime( 0.0 ),
     theMinimumInterval( 0.0 ),
     theCurrentInterval( 0.0 )
   {
@@ -54,7 +55,7 @@ namespace libecs
   {
     theDataPointVector 
       = thePhysicalLogger.getVector( thePhysicalLogger.begin(),
-				     thePhysicalLogger.end() );
+				     thePhysicalLogger.end() - 1);
     
     return theDataPointVector;
   }
@@ -125,12 +126,11 @@ namespace libecs
   {
     const Real aTime( theModel.getCurrentTime() );
 
-    if( !thePhysicalLogger.empty() )
-      {
-    	theCurrentInterval = aTime - thePhysicalLogger.back().getTime();
-      }
+    theCurrentInterval = aTime - theLastTime;
 
     thePhysicalLogger.push( aTime, aValue );
+    theLastTime = aTime;
+
     if( theMinimumInterval < theCurrentInterval )
       {
 	theMinimumInterval = theCurrentInterval;
@@ -149,15 +149,7 @@ namespace libecs
 
   Real Logger::getStartTime( void ) 
   {
-    if( !thePhysicalLogger.empty() )
-      {
-	return thePhysicalLogger.front().getTime();
-      }
-    else
-      {
-	static const Real aZero( 0.0 );
-	return aZero;
-      }
+    return thePhysicalLogger.front().getTime();
   }
 
 
@@ -165,15 +157,7 @@ namespace libecs
 
   Real Logger::getEndTime( void ) 
   {
-    if( !thePhysicalLogger.empty() )
-      {
-	return thePhysicalLogger.back().getTime();
-      }
-    else
-      {
-	static const Real aZero( 0.0 );
-	return aZero;
-      }
+    return thePhysicalLogger.back().getTime();
   }
 
 
