@@ -52,6 +52,17 @@ namespace libecs
 
   public:
 
+    /** 
+	A function type that returns a pointer to Integrator.
+
+	Every subclass must have this type of a function which returns
+	an instance for the IntegratorMaker.
+
+    */
+
+    typedef IntegratorPtr (* AllocatorFuncPtr )( SRMSubstanceRef );
+
+
     Integrator( SRMSubstanceRef aSubstance );
     virtual ~Integrator() {}
 

@@ -42,7 +42,9 @@ namespace libecs
    * @{ 
    */ 
   
-  class ReactorMaker : public SharedModuleMaker<Reactor>
+  class ReactorMaker 
+    : 
+    public SharedModuleMaker<Reactor>
   {
   private:
 

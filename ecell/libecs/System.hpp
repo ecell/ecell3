@@ -46,6 +46,7 @@ namespace libecs
 
   /** @file */
 
+
   // Maps used for entry lists
   DECLARE_MAP( const String, SubstancePtr, 
 	       std::less<const String>, SubstanceMap );
@@ -61,6 +62,16 @@ namespace libecs
   {
 
   public:
+
+    /** 
+	A function type that returns a pointer to System.
+
+	Every subclass must have this type of a function which returns
+	an instance for the SystemMaker.
+    */
+
+    typedef SystemPtr (* AllocatorFuncPtr )();
+
 
     System();
     virtual ~System();

@@ -42,16 +42,18 @@
 #include "UVariable.hpp"
 #include "PropertyInterface.hpp"
 #include "System.hpp"
-
+#include "Integrators.hpp"
 
 
 namespace libecs
 {
 
-  /* *defgroup libecs_module The Libecs Module 
-   * This is the libecs module 
-   * @{ 
-   */ 
+  /** @addtogroup stepper
+   *@{
+   */
+
+  /** @file */
+
   
   DECLARE_CLASS( Euler1Stepper );
   DECLARE_CLASS( RungeKutta4Stepper );
@@ -61,12 +63,6 @@ namespace libecs
   DECLARE_VECTOR( ReactorPtr,   ReactorVector );
   DECLARE_VECTOR( SystemPtr,    SystemVector );
   
-  typedef IntegratorPtr ( *IntegratorAllocator_ )( SubstanceRef );
-  DECLARE_TYPE( IntegratorAllocator_, IntegratorAllocator );
-
-  typedef StepperPtr (* StepperAllocator_ )();
-  DECLARE_TYPE( StepperAllocator_, StepperAllocator );
-
   DECLARE_VECTOR( StepperPtr, StepperVector );
 
   DECLARE_VECTOR( PropertySlotPtr, PropertySlotVector );
@@ -86,6 +82,17 @@ namespace libecs
   {
 
   public:
+
+
+    /** 
+	A function type that returns a pointer to Stepper.
+
+	Every subclass must have this type of a function which returns
+	an instance for the StepperMaker.
+    */
+
+    typedef StepperPtr (* AllocatorFuncPtr )();
+
 
     Stepper(); 
     virtual ~Stepper() 
@@ -414,14 +421,14 @@ namespace libecs
 
   protected:
 
-    IntegratorAllocator theIntegratorAllocator;
+    Integrator::AllocatorFuncPtr theIntegratorAllocator;
 
     SRMSubstanceCache theSubstanceCache;
     ReactorCache      theReactorCache;
 
   private:
 
-    virtual void distributeIntegrator( IntegratorAllocator );
+    virtual void distributeIntegrator( Integrator::AllocatorFuncPtr );
 
   };
 

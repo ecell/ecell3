@@ -202,7 +202,7 @@ namespace libecs
     :
     theIntegratorAllocator( NULLPTR )
   {
-
+    ; // do nothing
   }
 
   void SRMStepper::clear()
@@ -274,12 +274,13 @@ namespace libecs
     distributeIntegrator( theIntegratorAllocator );
   }
 
-  void SRMStepper::distributeIntegrator( IntegratorAllocator allocator )
+  void SRMStepper::distributeIntegrator( Integrator::AllocatorFuncPtr
+					 anAllocator )
   {
     for( SRMSubstanceCache::const_iterator s( theSubstanceCache.begin() );
 	 s != theSubstanceCache.end() ; ++s )
       {
-	(*allocator)(**s);
+	(* anAllocator )(**s);
       }
   }
 
@@ -289,8 +290,7 @@ namespace libecs
 
   Euler1SRMStepper::Euler1SRMStepper()
   {
-    theIntegratorAllocator =
-      IntegratorAllocator( &Euler1SRMStepper::newIntegrator );
+    theIntegratorAllocator = &Euler1SRMStepper::newIntegrator;
   }
 
   IntegratorPtr Euler1SRMStepper::newIntegrator( SRMSubstanceRef substance )
@@ -302,13 +302,13 @@ namespace libecs
 
   RungeKutta4SRMStepper::RungeKutta4SRMStepper()
   {
-    theIntegratorAllocator = 
-      IntegratorAllocator( &RungeKutta4SRMStepper::newIntegrator ); 
+    theIntegratorAllocator = &RungeKutta4SRMStepper::newIntegrator; 
   }
 
-  IntegratorPtr RungeKutta4SRMStepper::newIntegrator( SRMSubstanceRef substance )
+  IntegratorPtr RungeKutta4SRMStepper::
+  newIntegrator( SRMSubstanceRef aSubstance )
   {
-    return new RungeKutta4Integrator( substance );
+    return new RungeKutta4Integrator( aSubstance );
   }
 
   void RungeKutta4SRMStepper::react()

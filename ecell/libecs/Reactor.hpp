@@ -65,11 +65,14 @@ namespace libecs
 
   public: 
 
-    // Property slots
+    /** 
+	A function type that returns a pointer to Reactor.  
 
-    void setReactant( UVariableVectorRCPtrCref aValue );
+	Every Reactor class must have this type of a function which returns
+	an instance for the ReactorMaker.
+    */
 
-    const UVariableVectorRCPtr getReactantList() const;
+    typedef ReactorPtr (* AllocatorFuncPtr )();
 
 
   public:
@@ -117,6 +120,11 @@ namespace libecs
       theActivity = theActivityBuffer;
     }
 
+
+    void setReactant( UVariableVectorRCPtrCref aValue );
+
+    const UVariableVectorRCPtr getReactantList() const;
+
     void registerReactant( StringCref aName, FullIDCref aFullID,
 			   const Int aStoichiometry );
 
@@ -160,15 +168,6 @@ namespace libecs
 
   };
 
-  /** 
-      A function type that returns a pointer to Reactor.
-      Mainly used to provide a way to instantiate Reactors via
-      traditional C function specifically by ReactorMaker.
-      Every Reactor that instantiated by ReactorMaker must have
-      a this type of function which returns a instance of that Reactor.
-  */
-
-  typedef ReactorPtr (*ReactorAllocatorFunc)();
 
 
   /*@}*/

@@ -505,7 +505,22 @@ namespace libecs
       PropertySlot( aName ),
       theObject( anObject ),
       theSetMethodPtr( aSetMethodPtr ),
-      theGetMethodPtr( aGetMethodPtr )
+      theGetMethodPtr( aGetMethodPtr ),
+      theSyncMethodPtr( aSetMethodPtr )
+    {
+      ; // do nothing
+    }
+
+    ConcretePropertySlot( StringCref aName, T& anObject, 
+			  const SetMethodPtr aSetMethodPtr,
+			  const GetMethodPtr aGetMethodPtr,
+			  const SetMethodPtr aSyncMethodPtr )
+      :
+      PropertySlot( aName ),
+      theObject( anObject ),
+      theSetMethodPtr( aSetMethodPtr ),
+      theGetMethodPtr( aGetMethodPtr ),
+      theSyncMethodPtr( aSyncMethodPtr )
     {
       ; // do nothing
     }
@@ -575,8 +590,7 @@ namespace libecs
 	  // get the value only if the proxy has a value set.
 	  if( aProxySlotPtr->isSet() )
 	    {
-	      PropertySlot::set<SlotTypeCref>( aProxySlotPtr->PropertySlot::
-					       get<const SlotType>() );
+	      callSyncMethod( aProxySlotPtr->PropertySlot::get<GetType>() );
 	      aProxySlotPtr->clearIsSet();
 	    }
 	}
@@ -630,6 +644,11 @@ namespace libecs
       return ( ( theObject.*theGetMethodPtr )() );
     }
 
+    inline void callSyncMethod( SetType aValue )    
+    {
+      ( theObject.*theSyncMethodPtr )( aValue );
+    }
+
 
     template < typename TYPE >
     inline void setImpl( TYPE aValue )
@@ -643,11 +662,18 @@ namespace libecs
       return convertTo( callGetMethod(), Type2Type< TYPE >() );
     }
 
+    template < typename TYPE >
+    inline void syncImpl( TYPE aValue )
+    {
+      callSyncMethod( convertTo( aValue, Type2Type< SetType >() ) );
+    }
+
   private:
 
     T& theObject;
     const SetMethodPtr theSetMethodPtr;
     const GetMethodPtr theGetMethodPtr;
+    const SetMethodPtr theSyncMethodPtr;
 
     ProxyVector        theProxyVector;
 

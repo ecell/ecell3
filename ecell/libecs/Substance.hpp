@@ -60,6 +60,16 @@ namespace libecs
 
   public:
 
+    /** 
+	A function type that returns a pointer to Substance.
+
+	Every subclass must have this type of a function which returns
+	an instance for the SubstanceMaker.
+    */
+
+    typedef SubstancePtr (* AllocatorFuncPtr )();
+
+
     Substance();
     virtual ~Substance();
 

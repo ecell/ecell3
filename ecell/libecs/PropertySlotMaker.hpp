@@ -38,7 +38,9 @@ namespace libecs
 			typename ConcretePropertySlot<T,SlotType>::SetMethodPtr
 			aSetMethodPtr,
 			typename ConcretePropertySlot<T,SlotType>::GetMethodPtr
-			aGetMethodPtr )
+			aGetMethodPtr,
+			typename ConcretePropertySlot<T,SlotType>::SetMethodPtr
+			aSyncMethodPtr = NULLPTR )
     {
       if( aSetMethodPtr == NULLPTR )
 	{
@@ -50,11 +52,30 @@ namespace libecs
 	  aGetMethodPtr = &PropertyInterface::nullGet<SlotType>;
 	}
       
-      return new ConcretePropertySlot<T,SlotType>( aName,
-						   anObject,
-						   aSetMethodPtr,
-						   aGetMethodPtr );
-    
+
+      PropertySlotPtr aPropertySlotPtr( NULLPTR );
+
+
+      // if sync method is not given, create without it.
+      if( aSyncMethodPtr == NULLPTR )
+	{
+	  aPropertySlotPtr = 
+	    new ConcretePropertySlot<T,SlotType>( aName,
+						  anObject,
+						  aSetMethodPtr,
+						  aGetMethodPtr );
+	}
+      else // create with a sync method.
+	{
+	  aPropertySlotPtr = 
+	    new ConcretePropertySlot<T,SlotType>( aName,
+						  anObject,
+						  aSetMethodPtr,
+						  aGetMethodPtr,
+						  aSyncMethodPtr );
+	}
+
+      return aPropertySlotPtr;
     }
 
   };
