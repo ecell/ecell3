@@ -32,7 +32,7 @@ LIBECS_DM_CLASS( GillespieProcess, DiscreteEventProcess )
       
       PROPERTYSLOT_SET_GET( Real, k );
 
-      PROPERTYSLOT_GET_NO_LOAD_SAVE( Real, MuV );
+      PROPERTYSLOT_GET_NO_LOAD_SAVE( Real, Propensity );
       PROPERTYSLOT_GET_NO_LOAD_SAVE( Integer,  Order );
     }
 
@@ -41,7 +41,7 @@ LIBECS_DM_CLASS( GillespieProcess, DiscreteEventProcess )
     :
     theOrder( 0 ),
     k( 0.0 ),
-    theGetMuVInvMethodPtr( &GillespieProcess::getInf ),
+    theGetPropensity_RMethodPtr( &GillespieProcess::getInf ),
     theGetMinValueMethodPtr( &GillespieProcess::getZero )
     {
       ; // do nothing
@@ -55,15 +55,15 @@ LIBECS_DM_CLASS( GillespieProcess, DiscreteEventProcess )
 
   SIMPLE_SET_GET_METHOD( Real, k );
 
-  GET_METHOD( Real, MuV )
+  GET_METHOD( Real, Propensity )
   {
-    return 1.0 / getMuVInv();
+    return 1.0 / getPropensity_R();
   }
 
 
-  GET_METHOD( Real, MuVInv )
+  GET_METHOD( Real, Propensity_R )
   {
-    return ( this->*theGetMuVInvMethodPtr )();
+    return ( this->*theGetPropensity_RMethodPtr )();
   }
 
 
@@ -82,7 +82,7 @@ LIBECS_DM_CLASS( GillespieProcess, DiscreteEventProcess )
 
   virtual void updateStepInterval()
   {
-    theStepInterval = getMuVInv() * 
+    theStepInterval = getPropensity_R() * 
       ( - log( gsl_rng_uniform_pos( getStepper()->getRng() ) ) );
   }
 
@@ -124,7 +124,7 @@ protected:
     return libecs::INF;
   }
 
-  const Real getMuVInv_FirstOrder() const
+  const Real getPropensity_R_FirstOrder() const
   {
     const Real 
       aMultiplicity( trunc( theVariableReferenceVector[0].getValue() ) );
@@ -141,7 +141,7 @@ protected:
       }
   }
 
-  const Real getMuVInv_SecondOrder_TwoSubstrates() const
+  const Real getPropensity_R_SecondOrder_TwoSubstrates() const
   {
     const Real 
       aMultiplicity( trunc( theVariableReferenceVector[0].getValue() ) *
@@ -160,7 +160,7 @@ protected:
       }
   }
 
-  const Real getMuVInv_SecondOrder_OneSubstrate() const
+  const Real getPropensity_R_SecondOrder_OneSubstrate() const
   {
     const Real aValue( trunc( theVariableReferenceVector[0].getValue() ) );
 
@@ -203,7 +203,7 @@ protected:
 
   Integer theOrder;
 
-  RealMethodPtr theGetMuVInvMethodPtr;
+  RealMethodPtr theGetPropensity_RMethodPtr;
   RealMethodPtr theGetMinValueMethodPtr;
 
 };

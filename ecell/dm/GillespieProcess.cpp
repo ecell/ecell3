@@ -49,32 +49,32 @@ void GillespieProcess::calculateOrder()
 	}
     }
 
-  // set theGetMuVInvMethodPtr and theGetMinValueMethodPtr
+  // set theGetPropensity_RMethodPtr and theGetMinValueMethodPtr
 
   if( getOrder() == 0 )   // no substrate
     {
-      theGetMuVInvMethodPtr       = &GillespieProcess::getInf;
+      theGetPropensity_RMethodPtr       = &GillespieProcess::getInf;
       theGetMinValueMethodPtr     = &GillespieProcess::getZero;
     }
   else if( getOrder() == 1 )   // one substrate, first order.
     {
-      theGetMuVInvMethodPtr = 
-	&GillespieProcess::getMuVInv_FirstOrder;
+      theGetPropensity_RMethodPtr = 
+	&GillespieProcess::getPropensity_R_FirstOrder;
       theGetMinValueMethodPtr = &GillespieProcess::getMinValue_FirstOrder;
     }
   else if( getOrder() == 2 )
     {
       if( getZeroVariableReferenceOffset() == 2 ) // 2 substrates, 2nd order
 	{  
-	  theGetMuVInvMethodPtr = 
-	    &GillespieProcess::getMuVInv_SecondOrder_TwoSubstrates;
+	  theGetPropensity_RMethodPtr = 
+	    &GillespieProcess::getPropensity_R_SecondOrder_TwoSubstrates;
 	  theGetMinValueMethodPtr = 
 	    &GillespieProcess::getMinValue_SecondOrder_TwoSubstrates;
 	}
       else // one substrate, second order (coeff == -2)
 	{
-	  theGetMuVInvMethodPtr = 
-	    &GillespieProcess::getMuVInv_SecondOrder_OneSubstrate;
+	  theGetPropensity_RMethodPtr = 
+	    &GillespieProcess::getPropensity_R_SecondOrder_OneSubstrate;
 	  theGetMinValueMethodPtr = 
 	    &GillespieProcess::getMinValue_SecondOrder_OneSubstrate;
 	}
@@ -82,7 +82,7 @@ void GillespieProcess::calculateOrder()
   else
     {
       //FIXME: generic functions should come here.
-      theGetMuVInvMethodPtr       = &GillespieProcess::getInf;
+      theGetPropensity_RMethodPtr       = &GillespieProcess::getInf;
       theGetMinValueMethodPtr     = &GillespieProcess::getZero;
     }
 }
