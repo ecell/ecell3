@@ -291,8 +291,8 @@ class ToolLauncher(ParentWindow):
         else:
             cmd = self.thePref['editor_path']
             argList = []
-            argList.extend([ '\"' + cmd + '\"',
-                     '\"' + fileName + '\"' ])
+            # may need to use '\"' + fileName + '\"' for Windows
+            argList.extend([ '\"' + cmd + '\"', fileName ])
             msg = self.execute( cmd, argList )
             if msg == 1:
                 errorMsg = "Please specify the editor path on the preference window."
