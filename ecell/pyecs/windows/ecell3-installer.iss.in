@@ -7,20 +7,25 @@
 ; 2. Define what type of installer should be compiled:
 ;    - #define FullInstall : compile E-Cell setup together with Python and GTK
 ;    - ;#define FullInstall : compile E-Cell setup only
-; 3. Define the filenames of PythonSetup and GtkSetup if newer versions are used
-; 4. Under [Setup], set Compression=None during development/test compilation.
+; 3. Set the target architecture by commenting and uncommenting the appropriate Arch variable
+;    - #define Arch     'i686'
+;    - #define Arch     'i386'
+; 4. Define the filenames of PythonSetup and GtkSetup if newer versions are used
+; 5. Under [Setup], set Compression=None during development/test compilation.
 ;    Set Compression=lzma/ultra for releases.
-; 5. Compile the script
-; 6. The compiled installer will appear in the root directory of this script file
+; 6. Compile the script
+; 7. The compiled installer will appear in the root directory of this script file
 ;
 ; For more information, please refer to: http://moin.e-cell.org/CreatingWindowsInstaller
 
 
 #define FullInstall
+;#define Arch          'i386'
+#define Arch          'i686'
 #define Version       '@VERSION@'
 #define PythonVersion '@PYTHON_VERSION@'
 #define GtkVersion    '2.4'
-#define PythonSetup   'Python-2.3.3.exe'
+#define PythonSetup   'Python-2.3.4.exe'
 #define GtkSetup      'gtk-win32-aio-2.4-rc6.exe'
 #define Pythondll     'python@PYTHON_WIN_VERSION@.dll'
 #define Libpython     'libpython@PYTHON_WIN_VERSION@.a'
@@ -47,7 +52,7 @@ SetupIconFile=ecell3-installer.ico
 UninstallDisplayIcon={app}\bin\gecell.exe
 UninstallDisplayName=E-Cell Simulation Environment {#Version}
 ChangesAssociations=yes
-OutputBaseFilename=ecell-{#Version}{#Filename}-setup
+OutputBaseFilename=ecell-{#Version}{#Filename}.{#Arch}
 OutputDir=.
 Compression=none
 ;Compression=lzma/ultra
@@ -78,27 +83,26 @@ Source: ..\runtime\2.mingw-runtime\*.*; DestDir: {app}; Flags: recursesubdirs ig
 Source: ..\runtime\3.gcc-core\*.*; DestDir: {app}; Flags: recursesubdirs ignoreversion
 Source: ..\runtime\4.gcc-g++\*.*; DestDir: {app}; Flags: recursesubdirs ignoreversion
 Source: ..\runtime\5.binutils\*.*; DestDir: {app}; Flags: recursesubdirs ignoreversion
-Source: ..\runtime\6.boost\*.*; DestDir: {app}; Flags: recursesubdirs ignoreversion
-Source: ..\runtime\7.gsl\*.*; DestDir: {app}; Flags: recursesubdirs ignoreversion
-Source: ..\runtime\8.libart_lgpl\*.*; DestDir: {app}; Flags: recursesubdirs ignoreversion
-Source: ..\runtime\9.libgnomecanvas\*.*; DestDir: {app}; Flags: recursesubdirs ignoreversion
-Source: ..\runtime\10.msys-cp.find.grep.ls.mkdir.mv.rm\*.*; DestDir: {app}; Flags: recursesubdirs ignoreversion
-Source: ..\runtime\11.ecell3-samples\*.*; DestDir: {app}; Flags: recursesubdirs ignoreversion
-Source: ..\runtime\12.ecell3-docs\*.*; DestDir: {app}; Flags: recursesubdirs ignoreversion
+Source: ..\runtime\6.msys-cp.find.grep.ls.mkdir.mv.rm\*.*; DestDir: {app}; Flags: recursesubdirs ignoreversion
+Source: ..\runtime\7.ecell3-docs\*.*; DestDir: {app}; Flags: recursesubdirs ignoreversion
+Source: ..\runtime\{#Arch}\8.boost\*.*; DestDir: {app}; Flags: recursesubdirs ignoreversion
+Source: ..\runtime\{#Arch}\9.gsl\*.*; DestDir: {app}; Flags: recursesubdirs ignoreversion
+Source: ..\runtime\{#Arch}\10.libart_lgpl\*.*; DestDir: {app}; Flags: recursesubdirs ignoreversion
+Source: ..\runtime\{#Arch}\11.libgnomecanvas\*.*; DestDir: {app}; Flags: recursesubdirs ignoreversion
+Source: ..\runtime\{#Arch}\12.ecell3-samples\*.*; DestDir: {app}; Flags: recursesubdirs ignoreversion
 
 ;Python modules used by E-Cell
-Source: ..\pythonModules\1.pygtk\*.*; DestDir: {app}; Flags: recursesubdirs ignoreversion
-Source: ..\pythonModules\2.Numeric\*.*; DestDir: {app}; Flags: recursesubdirs ignoreversion
-Source: ..\pythonModules\3.gnome-python\*.*; DestDir: {app}; Flags: recursesubdirs ignoreversion
+Source: ..\pythonModules\1.Numeric\*.*; DestDir: {app}; Flags: recursesubdirs ignoreversion
+Source: ..\pythonModules\{#Arch}\2.pygtk\*.*; DestDir: {app}; Flags: recursesubdirs ignoreversion
+Source: ..\pythonModules\{#Arch}\3.gnome-python\*.*; DestDir: {app}; Flags: recursesubdirs ignoreversion
 
 ;Gtk libraries
-Source: ..\gtk\wimp\gtkrc; DestDir: {code:GetGtkDir}\share\themes\Default\gtk-2.0; Flags: ignoreversion; Components: themes\wimp
-Source: ..\gtk\wimp\libwimp.dll; DestDir: {code:GetGtkDir}\lib\gtk-2.0\{#GtkVersion}.0\engines; Flags: ignoreversion; Components: themes\wimp
-Source: ..\gtk\prettyOk\gtkrc; DestDir: {code:GetGtkDir}\share\themes\Default\gtk-2.0; Flags: ignoreversion; Components: themes\prettyOK
-Source: ..\gtk\prettyOK\libcleanice.dll; DestDir: {code:GetGtkDir}\lib\gtk-2.0\{#GtkVersion}.0\engines; Flags: ignoreversion; Components: themes\prettyOK
 Source: ..\gtk\lighthouse\gtkrc; DestDir: {code:GetGtkDir}\share\themes\Default\gtk-2.0; Flags: ignoreversion; Components: themes\lighthouse
 Source: ..\gtk\lighthouse\liblighthouseblue.dll; DestDir: {code:GetGtkDir}\lib\gtk-2.0\{#GtkVersion}.0\engines; Flags: ignoreversion; Components: themes\lighthouse
-
+Source: ..\gtk\{#Arch}\wimp\gtkrc; DestDir: {code:GetGtkDir}\share\themes\Default\gtk-2.0; Flags: ignoreversion; Components: themes\wimp
+Source: ..\gtk\{#Arch}\wimp\libwimp.dll; DestDir: {code:GetGtkDir}\lib\gtk-2.0\{#GtkVersion}.0\engines; Flags: ignoreversion; Components: themes\wimp
+Source: ..\gtk\{#Arch}\prettyOk\gtkrc; DestDir: {code:GetGtkDir}\share\themes\Default\gtk-2.0; Flags: ignoreversion; Components: themes\prettyOK
+Source: ..\gtk\{#Arch}\prettyOK\libcleanice.dll; DestDir: {code:GetGtkDir}\lib\gtk-2.0\{#GtkVersion}.0\engines; Flags: ignoreversion; Components: themes\prettyOK
 
 ;Files not installed on host
 #ifdef FullInstall
@@ -167,8 +171,6 @@ Name: file\em; Description: .em; Types: full compact
 Name: file\em\em2eml; Description: ecell3-em2em (EM to EML File Converter); Types: full compact; Flags: exclusive
 Name: file\ess; Description: .ess; Types: full compact
 Name: file\ess\session; Description: ecell3-session (E-Cell Session Scripting); Types: full compact; Flags: exclusive
-Name: file\esm; Description: .esm
-Name: file\esm\session_manager; Description: ecell3-session-manager (E-Cell Session Manager)
 Name: file\cpp; Description: .cpp;
 Name: file\cpp\dmc; Description: ecell3-dmc (E-Cell Dynamic Module Compiler); Flags: exclusive
 Name: themes; Description: GTK+ Themes; Types: full compact
@@ -216,13 +218,6 @@ Root: HKCR; Subkey: EcellSessionScript; ValueType: string; ValueName: ; ValueDat
 Root: HKCR; Subkey: EcellSessionScript\DefaultIcon; ValueType: string; ValueName: ; ValueData: {app}\bin\ecell3-session.exe,0; Components: file\ess\session
 Root: HKCR; Subkey: EcellSessionScript\shell\open\command; ValueType: string; ValueName: ; ValueData: """{app}\bin\ecell3-session.exe"" -e ""%1"""; Components: file\ess\session
 
-;File association for *.esm
-Root: HKCR; Subkey: .esm; ValueType: string; ValueName: ; ValueData: EcellSessionManager; Flags: createvalueifdoesntexist uninsdeletevalue; Components: file\esm
-Root: HKCR; Subkey: EcellSessionManager; ValueType: string; ValueName: ; ValueData: E-Cell Session Manager Script; Flags: createvalueifdoesntexist uninsdeletekey; Components: file\esm
-;File association for *.esm with ecell3-session-manager
-Root: HKCR; Subkey: EcellSessionManager\DefaultIcon; ValueType: string; ValueName: ; ValueData: {app}\bin\ecell3-session-manager.exe,0; Components: file\esm\session_manager
-Root: HKCR; Subkey: EcellSessionManager\shell\open\command; ValueType: string; ValueName: ; ValueData: """{app}\bin\ecell3-session-manager.exe"" -e ""%1"""; Components: file\esm\session_manager
-
 ;File association for *.cpp
 Root: HKCR; Subkey: .cpp; ValueType: string; ValueName: ; ValueData: EcellDMSource; Flags: createvalueifdoesntexist uninsdeletevalue; Components: file\cpp
 Root: HKCR; Subkey: EcellDMSource; ValueType: string; ValueName: ; ValueData: E-Cell DM Source File; Flags: createvalueifdoesntexist uninsdeletekey; Components: file\cpp
@@ -237,6 +232,7 @@ Type: filesandordirs; Name: {app}\lib
 
 [Code]
 const
+  ARCHITECTURE   =  '{#Arch}';
   ECELL_VERSION  =  '{#Version}';
   LICENSE_FILE   =  '{#LicenseFile}';
   PYTHON_VERSION =  '{#PythonVersion}';
@@ -517,12 +513,12 @@ begin
                 if CheckListBox.Checked[PythonCheck] then begin
                   MsgBox('Python version ' + PYTHON_VERSION + ' or newer was not found on your computer.' #13#10
                          'Please get it from http://www.python.org/ and install it' #13#10
-                         'or use the ecell-' + ECELL_VERSION + '-python+gtk-setup.exe installer.', mbInformation, MB_OK);
+                         'or use the ecell-' + ECELL_VERSION + '-python+gtk.' + ARCHITECTURE + '.exe installer.', mbInformation, MB_OK);
                 end;
                 if CheckListBox.Checked[GtkCheck] then begin
                   MsgBox('GTK+ Runtime version ' + GTK_VERSION + ' or newer was not found on your computer.' #13#10
-                         'Please install it from http://gladewin32.sourceforge.net/ and install it' #13#10
-                         'or use the ecell-' + ECELL_VERSION + '-python+gtk-setup.exe installer.', mbInformation, MB_OK);
+                         'Please get it from http://gladewin32.sourceforge.net/ and install it' #13#10
+                         'or use the ecell-' + ECELL_VERSION + '-python+gtk.' + ARCHITECTURE + '.exe installer.', mbInformation, MB_OK);
                 end;
               end;
             end;
