@@ -225,8 +225,20 @@ Object PySimulator::getLoggerList( const Py::Tuple& args )
 Object PySimulator::run( const Py::Tuple& args )
 {
   ECS_TRY;
+  args.verify_length( 0, 1 );
 
-  Simulator::run();
+  if( args.length() != 0 )
+    { 
+
+      Py::Float aDuration = static_cast<Py::Float>( args[0] );
+      
+      Simulator::run( aDuration );
+      
+    } else {
+      
+      Simulator::run();
+
+    }
 
   return Py::Object();
 
@@ -236,6 +248,7 @@ Object PySimulator::run( const Py::Tuple& args )
 Object PySimulator::stop( const Py::Tuple& args )
 {
   ECS_TRY;
+  args.verify_length( 0 );
  
   Simulator::stop();
 
