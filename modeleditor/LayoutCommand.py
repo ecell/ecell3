@@ -13,23 +13,23 @@ class LayoutCommand( Command ):
 
 
 
-createLayout
-deleteLayout
-renameLayout
-cloneLayout
-pastelayout
-copylayout
+#createLayout
+#deleteLayout
+#renameLayout
+#cloneLayout
+#pastelayout
+#copylayout
 
-createobject
-deleteobject
-changeobjectProperty
-copyobject
-cutobject
-pasteobject
-moveobject
-resize object
+#createobject
+#deleteobject
+#changeobjectProperty
+#copyobject
+#cutobject
+#pasteobject
+#moveobject
+#resize object
 
-createConnection
-redirectConnection
+#createConnection
+#redirectConnection
 
 
