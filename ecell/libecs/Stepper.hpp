@@ -55,6 +55,7 @@ namespace libecs
   //  DECLARE_VECTOR( SlaveStepperPtr, SlaveStepperVector );
   //  DECLARE_VECTOR( MasterStepperPtr, MasterStepperVector );
 
+  DECLARE_VECTOR( PropertySlotPtr, PropertySlotVector );
 
 
   class StepperLeader
@@ -152,6 +153,8 @@ namespace libecs
     virtual void turn() {}
     virtual void integrate() = 0;
     virtual void compute() = 0;
+    virtual void sync() = 0;
+    virtual void push() = 0;
 
     virtual void distributeIntegrator( IntegratorAllocatorPtr );
 
@@ -174,6 +177,9 @@ namespace libecs
     virtual void differentiate();
     virtual void integrate();
     virtual void compute();
+
+    virtual void sync();
+    virtual void push();
 
     void setStepInterval( RealCref stepinterval );
     void calculateStepsPerSecond();
@@ -242,6 +248,20 @@ namespace libecs
       theOwner->compute();
     }
 
+    virtual void sync()
+    {
+      ;
+    }
+
+    void push()
+    {
+      for(PropertySlotVector::iterator i( thePropertySlotVector.begin() );
+	  i != thePropertySlotVector.end(); ++i )
+	{
+	  (*i)->push();
+	}
+    }
+
     virtual void initialize()
     {
       Stepper::initialize();
@@ -271,6 +291,7 @@ namespace libecs
   private:
 
     MasterStepperPtr theMaster;
+    PropertySlotVector  thePropertySlotVector;
 
   };
 

@@ -188,6 +188,24 @@ namespace libecs
       }
   }
 
+  void MasterStepper::sync()
+  {
+    for( StepperVectorIterator i( theSlaveStepperVector.begin() );
+	 i != theSlaveStepperVector.end(); ++i )
+      {
+	(*i)->sync();
+      }
+  }
+
+  void MasterStepper::push()
+  {
+    for( StepperVectorIterator i( theSlaveStepperVector.begin() );
+	 i != theSlaveStepperVector.end() ; ++i )
+      {
+	(*i)->push();
+      }
+  }
+
   ////////////////////////// StepperLeader
 
   int StepperLeader::DEFAULT_UPDATE_DEPTH(1);
