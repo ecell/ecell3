@@ -6,7 +6,7 @@ dnl
 dnl 
 dnl 
 AC_CANONICAL_SYSTEM
-AM_INIT_AUTOMAKE(package, version, do-not-define)
+AM_INIT_AUTOMAKE(ecell,"3.0.0-a1" , do-not-define)
 AC_PROG_MAKE_SET
 dnl
 dnl
@@ -23,6 +23,7 @@ ecell_subdirs=""
 ecell_subdirs="ecell $ecell_subdirs"
 ecell_subdirs="korandom $ecell_subdirs"
 ecell_subdirs="dmtool $ecell_subdirs"
+dnl ecell_subdirs="PyCXX $ecell_subdirs"
 ecell_subdirs="libltdl $ecell_subdirs"
 AC_MSG_RESULT($ecell_subdirs)
 AC_CONFIG_SUBDIRS($ecell_subdirs)
