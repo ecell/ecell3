@@ -78,7 +78,7 @@ namespace libemc
     EntityPtr anEntityPtr( getRootSystem().getEntity( FullID( type, 
 							      systempath, 
 							      id ) ) );
-    // this new must not cause memory leak since Message get it as RCPtr
+    // this new must not cause memory leak since Message will get it as RCPtr
     anEntityPtr->set( Message( property, new UConstantVector( data ) ) );
   }
 
