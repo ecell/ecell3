@@ -43,10 +43,14 @@ ECELL3_DM_CLASS
   virtual void process()
     {
       Real velocity( KcF );
+      std::cout << velocity << std::endl;
       velocity *= C0.getValue();
+      std::cout << velocity << std::endl;
       const Real S( S0.getConcentration() );
       velocity *= S;
+      std::cout << velocity << std::endl;
       velocity /= ( KmS + S );
+      std::cout << velocity << std::endl;
       setFlux( velocity );
     }
 
