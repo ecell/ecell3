@@ -15,8 +15,10 @@
 
 BOOST_PYTHON_MODULE_INIT(_ecs)
 {
-  
+
+  // pyecs uses Numeric module
   import_array();
+
 
   python::module_builder ecs( "_ecs" );
 
@@ -28,6 +30,7 @@ BOOST_PYTHON_MODULE_INIT(_ecs)
   //
   // PySimulator Definitions
   //
+
   aSimulatorClass.def( python::constructor<>() );
   aSimulatorClass.def( &libemc::Simulator::createEntity,   "createEntity" );
   aSimulatorClass.def( &libemc::Simulator::setProperty,    "setProperty" );
@@ -52,11 +55,14 @@ BOOST_PYTHON_MODULE_INIT(_ecs)
   //
   // PyLogger definitions
   //
+
+  //  no constructor
   //  aPyLoggerClass.def( python::constructor<libecs::LoggerPtr>() );
+
   aLoggerClass.def( ( const libecs::DataPointVectorRCPtr 
 		      ( libemc::EmcLogger::* )() )
-		      &libemc::EmcLogger::getData,
-		      "getData" );
+		    &libemc::EmcLogger::getData,
+		    "getData" );
   aLoggerClass.def( ( const libecs::DataPointVectorRCPtr 
 		      ( libemc::EmcLogger::* )( libecs::RealCref, 
 						libecs::RealCref ) )

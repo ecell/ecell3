@@ -23,8 +23,14 @@ public:
     :
     thePyObjectPtr( aPyObjectPtr )
   {
+    if( ! PyCallable_Check( thePyObjectPtr ) )
+      {
+	PyErr_SetString( PyExc_TypeError, 
+			 "Callable object must be given" );
+	python::throw_argument_error();
+      }
+
     Py_INCREF( thePyObjectPtr );
-    //Py_CallableCheck( thePyObjectPtr );
   }
     
   virtual ~PythonCallable()
@@ -96,78 +102,115 @@ public:
 
 BOOST_PYTHON_BEGIN_CONVERSION_NAMESPACE
 
-PyObject* to_python( libecs::UVariableVectorCref aVector )
-{
-  libecs::UVariableVector::size_type aSize( aVector.size() );
-  
-  python::tuple aPyTuple( aSize );
-  
-  for( size_t i( 0 ) ; i < aSize ; ++i )
-    {
-      switch( aVector[i].getType() )
-	{
-	case libecs::UVariable::REAL :
-	  aPyTuple.set_item( i, BOOST_PYTHON_CONVERSION::
-			     to_python( aVector[i].asReal() ) );
-	  break;
-	case libecs::UVariable::INT :
-	  // FIXME: ugly cast... determine the type by autoconf?
+//
+// type conversions between python <-> libecs
+//
 
-	  aPyTuple.set_item( i,BOOST_PYTHON_CONVERSION::
-			  to_python( boost::numeric_cast<long>
-				     ( aVector[i].asInt() ) ) );
-	  break;
-	case libecs::UVariable::STRING :
-	case libecs::UVariable::NONE :
-	  aPyTuple.set_item( i,BOOST_PYTHON_CONVERSION::
-			  to_python( aVector[i].asString() ) );
-	  break;
-	}
+
+//
+// UVariable
+//
+
+libecs::UVariable from_python( PyObject* aPyObjectPtr,
+			       type<libecs::UVariable> )
+{
+  libecs::UVariable aUVariable;
+
+  if( PyFloat_Check( aPyObjectPtr ) )
+    {
+      libecs::Real aReal( BOOST_PYTHON_CONVERSION::
+			  from_python( aPyObjectPtr,
+				       type<libecs::Real>() ) );
+      aUVariable = aReal;
+    }
+  else if( PyInt_Check( aPyObjectPtr ) )
+    {
+      libecs::Int anInt( BOOST_PYTHON_CONVERSION::
+			 from_python( aPyObjectPtr,
+				      type<long int>()) );
+      //					  type<libecs::Int>()) );
+      aUVariable = anInt;
+    }
+  else if( PyString_Check( aPyObjectPtr ) )
+    {
+      libecs::String 
+	aString( BOOST_PYTHON_CONVERSION::
+		 from_python( aPyObjectPtr,
+			      type<libecs::String>() ) );
+      aUVariable = aString;
+    }
+  else
+    {
+      // convert with repr() ?
+      
+      PyErr_SetString( PyExc_TypeError, 
+		       "Unacceptable type of an object in the tuple." );
+      throw_argument_error();
+      
     }
 
-  return to_python( aPyTuple.get() );
+  // here I expect named return value optimization
+  return aUVariable;
 }
 
-PyObject* to_python( libecs::UVariableVectorRCPtr aVectorRCPtr )
+PyObject* to_python( libecs::UVariableCref aUVariable )
 {
-  return to_python( *aVectorRCPtr );
-}
+  PyObject* aPyObjectPtr;
 
-PyObject* to_python( libecs::StringVectorCref aVector )
-{
-  libecs::StringVector::size_type aSize( aVector.size() );
-  
-  python::tuple aPyTuple( aSize);
-  
-  for( std::size_t i( 0 ) ; i < aSize ; ++i )
+  switch( aUVariable.getType() )
     {
-      aPyTuple.set_item( i,BOOST_PYTHON_CONVERSION::to_python( aVector[i] ) );
+    case libecs::UVariable::REAL :
+      aPyObjectPtr = BOOST_PYTHON_CONVERSION::to_python( aUVariable.asReal() );
+      break;
+    case libecs::UVariable::INT :
+      // FIXME: ugly cast... determine the type by autoconf?
+      aPyObjectPtr = BOOST_PYTHON_CONVERSION::
+	to_python( boost::numeric_cast<long int>( aUVariable.asInt() ) );
+      break;
+    case libecs::UVariable::STRING :
+    case libecs::UVariable::NONE :
+    default: // should this default be an error?
+      aPyObjectPtr = BOOST_PYTHON_CONVERSION::
+	to_python( aUVariable.asString() );
+      break;
     }
 
-  return to_python( aPyTuple.get() );
+  // named return optimization
+  return aPyObjectPtr;
 }
 
-PyObject* to_python( libecs::StringVectorRCPtr aVectorRCPtr )
+PyObject* to_python( libecs::UVariableCptr aUVariablePtr )
 {
-  return to_python( *aVectorRCPtr );
+  to_python( aUVariablePtr );
 }
 
+
+
+//
+// UVariableVector
+//
 
 libecs::UVariableVector from_python( PyObject* aPyObjectPtr, 
-				     python::type<libecs::UVariableVector> )
+				     type<libecs::UVariableVector> )
 {
-  python::ref aRef;
+  ref aRef;
 
-  if( PyList_Check( aPyObjectPtr ) )
+  if ( PyTuple_Check( aPyObjectPtr ) )
+    {
+      aRef = make_ref( aPyObjectPtr );
+    }
+  else if( PyList_Check( aPyObjectPtr ) )
     {
       aRef = make_ref( PyList_AsTuple( aPyObjectPtr ) );
     }
   else
     {
-      aRef = make_ref( aPyObjectPtr );
+      PyErr_SetString( PyExc_TypeError, 
+		       "This method only takes tuple or list." );
+      throw_argument_error();
     }
   
-  python::tuple aPyTuple( aRef );
+  tuple aPyTuple( aRef );
 
   std::size_t aSize( aPyTuple.size() );
 
@@ -176,55 +219,53 @@ libecs::UVariableVector from_python( PyObject* aPyObjectPtr,
 
   for ( std::size_t i( 0 ); i < aSize; ++i )
     {
-      libecs::UVariable aUVariable;
-
-      python::ref anItemRef( aPyTuple[i] );
+      ref anItemRef( aPyTuple[i] );
       PyObject* aPyObjectPtr( anItemRef.get() ); 
 
-      if( PyFloat_Check( aPyObjectPtr ) )
-	{
-	  libecs::Real aReal( BOOST_PYTHON_CONVERSION::
-			      from_python( aPyObjectPtr,
-					   python::type<libecs::Real>() ) );
-	  aUVariable = aReal;
-	}
-      else if( PyInt_Check( aPyObjectPtr ) )
-	{
-	  libecs::Int anInt( BOOST_PYTHON_CONVERSION::
-			     from_python( aPyObjectPtr,
-					  python::type<long int>()) );
-  //					  python::type<libecs::Int>()) );
-	  aUVariable = anInt;
-	}
-      else if( PyString_Check( aPyObjectPtr ) )
-	{
-	  libecs::String aString( BOOST_PYTHON_CONVERSION::
-				  from_python( aPyObjectPtr,
-					       python::type<libecs::String>() ) );
-	  aUVariable = aString;
-	}
-      else
-	{
-	  // convert with repr() ?
-
-	  PyErr_SetString( PyExc_TypeError, 
-			   "unacceptable type of object given" );
-	  throw_argument_error();
-
-	}
-
-      aVector.push_back( aUVariable );
+      aVector.push_back( from_python( aPyObjectPtr, 
+				      type<libecs::UVariable>() ) );
     }
 
   return aVector;
 }
 
 libecs::UVariableVector from_python( PyObject* aPyObjectPtr, 
-				     python::type<libecs::UVariableVectorCref> )
+				     type<libecs::UVariableVectorCref> )
 {
-  return from_python( aPyObjectPtr, python::type<libecs::UVariableVector>() );
+  return from_python( aPyObjectPtr, type<libecs::UVariableVector>() );
 }
 
+PyObject* to_python( libecs::UVariableVectorCref aVector )
+{
+  libecs::UVariableVector::size_type aSize( aVector.size() );
+  
+  tuple aPyTuple( aSize );
+
+  for( size_t i( 0 ) ; i < aSize ; ++i )
+    {
+      aPyTuple.set_item( i, BOOST_PYTHON_CONVERSION::to_python( aVector[i] ) );
+    }
+
+  return to_python( aPyTuple.get() );
+}
+
+PyObject* to_python( libecs::UVariableVectorCptr aVectorCptr )
+{
+  return to_python( *aVectorCptr );
+}
+
+PyObject* to_python( libecs::UVariableVectorRCPtr aVectorRCPtr )
+{
+  return to_python( *aVectorRCPtr );
+}
+
+
+
+//
+// DataPointVector
+//
+
+// currently to_python only
 
 PyObject* to_python( libecs::DataPointVectorCref aVector )
 {
@@ -244,25 +285,61 @@ PyObject* to_python( libecs::DataPointVectorCref aVector )
   return PyArray_Return( anArrayObject );
 }
 
-
 PyObject* to_python( libecs::DataPointVectorRCPtr aVectorRCPtr )
 {
   return to_python( *aVectorRCPtr );
 }
 
 
+//
+// libemc::PendingEventChecker and libemc::EventHandler
+//
+
+// NOTE: these functions return pointers to newly allocated objects
+
 libemc::PendingEventCheckerPtr 
 from_python( PyObject* aPyObjectPtr, 
-	     python::type<libemc::PendingEventCheckerPtr> )
+	     type<libemc::PendingEventCheckerPtr> )
 {
   return new PythonPendingEventChecker( aPyObjectPtr );
 }
 
 libemc::EventHandlerPtr
 from_python( PyObject* aPyObjectPtr, 
-	     python::type<libemc::EventHandlerPtr> )
+	     type<libemc::EventHandlerPtr> )
 {
   return new PythonEventHandler( aPyObjectPtr );
+}
+
+
+//
+// StringVector  
+//
+
+// to_python only -- is this really needed? (sha)
+
+PyObject* to_python( libecs::StringVectorCref aVector )
+{
+  libecs::StringVector::size_type aSize( aVector.size() );
+  
+  tuple aPyTuple( aSize );
+  
+  for( std::size_t i( 0 ) ; i < aSize ; ++i )
+    {
+      aPyTuple.set_item( i, BOOST_PYTHON_CONVERSION::to_python( aVector[i] ) );
+    }
+
+  return to_python( aPyTuple.get() );
+}
+
+PyObject* to_python( libecs::StringVectorCptr aVectorCptr )
+{
+  return to_python( *aVectorCptr );
+}
+
+PyObject* to_python( libecs::StringVectorRCPtr aVectorRCPtr )
+{
+  return to_python( *aVectorRCPtr );
 }
 
 
