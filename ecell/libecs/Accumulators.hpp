@@ -66,7 +66,7 @@ namespace libecs
       ; // do nothing
     }
 
-    void setOwner( SubstancePtr substance ) 
+    void setOwner( SRMSubstancePtr substance ) 
     { 
       theSubstance = substance; 
     }
@@ -94,7 +94,7 @@ namespace libecs
 
   protected:
 
-    SubstancePtr theSubstance;
+    SRMSubstancePtr theSubstance;
 
   };
 

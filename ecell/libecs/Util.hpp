@@ -184,8 +184,8 @@ namespace libecs
   */
 
 #define FOR_ALL( SEQCLASS, SEQ, METHOD )\
-  for( SEQCLASS ## ConstIterator i( (SEQ) .begin() ) ;\
-       i != (SEQ) .end() ; ++i )\
+  for( SEQCLASS ::const_iterator i( (SEQ) .begin() ) ;\
+      i != (SEQ) .end() ; ++i )\
     { (*i)-> METHOD (); }
 
 

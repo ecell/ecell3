@@ -120,6 +120,11 @@ namespace libecs
       updateConcentrationFactor();
     }
 
+    template <class C>
+    const std::map<const String,C*> getMap() const
+    {
+      DEFAULT_SPECIALIZATION_INHIBITED();
+    }
 
     SubstanceMapCref getSubstanceMap() const
     {
@@ -288,6 +293,27 @@ namespace libecs
       return Reactor::isRegularReactor::isRegularName( ( r.second )->getID() );
     }
   };
+
+
+  template <>
+  inline const std::map<const String,SubstancePtr> System::getMap() const
+  {
+    return theSubstanceMap;
+  }
+
+  template <>
+  inline const std::map<const String,ReactorPtr>   System::getMap() const
+  {
+    return theReactorMap;
+  }
+
+  template <>
+  inline const std::map<const String,SystemPtr>    System::getMap() const
+  {
+    return theSystemMap;
+  }
+
+
 
   /*@}*/
 

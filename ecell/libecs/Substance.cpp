@@ -42,12 +42,6 @@
 namespace libecs
 {
 
-  //  const String Substance::SYSTEM_DEFAULT_ACCUMULATOR_NAME = "ReserveAccumulator";
-
-  const String Substance::SYSTEM_DEFAULT_ACCUMULATOR_NAME = "SimpleAccumulator";
-
-  String Substance::USER_DEFAULT_ACCUMULATOR_NAME 
-  = Substance::SYSTEM_DEFAULT_ACCUMULATOR_NAME;
 
   void Substance::makeSlots()
   {
@@ -69,46 +63,80 @@ namespace libecs
 				      &Substance::addVelocity,
 				      &Substance::getVelocity ) );
 
-    registerSlot( getPropertySlotMaker()->
-		  createPropertySlot( "AccumulatorClass",*this,
-				      Type2Type<String>(),
-				      &Substance::setAccumulatorClass,
-				      &Substance::getAccumulatorClass ) );
   }
 
-  const String Substance::getAccumulatorClass() const
-  {
-    return theAccumulator->getClassName();
-  }
 
   Substance::Substance()
     : 
-    theAccumulator( NULLPTR ),
-    theIntegrator( NULLPTR ),
     theQuantity( 0 ),  
-    theFraction( 0 ),
     theVelocity( 0 ),
     theFixed( false ) 
+  {
+    makeSlots();
+  } 
+
+  Substance::~Substance()
+  {
+    ; // do nothing
+  }
+
+
+  void Substance::initialize()
+  {
+
+  }
+
+
+  void Substance::loadQuantity( RealCref aQuantity )
+  {
+    theQuantity = aQuantity;
+  }
+
+  const Real Substance::getActivity()
+  {
+    return getVelocity();
+  }
+
+
+
+
+  //  const String SRMSubstance::SYSTEM_DEFAULT_ACCUMULATOR_NAME = "ReserveAccumulator";
+
+  const String SRMSubstance::SYSTEM_DEFAULT_ACCUMULATOR_NAME = "SimpleAccumulator";
+
+
+  SRMSubstance::SRMSubstance()
+    : 
+    theAccumulator( NULLPTR ),
+    theIntegrator( NULLPTR ),
+    theFraction( 0 )
   {
     makeSlots();
     // FIXME: use AccumulatorMaker
     setAccumulator( new ReserveAccumulator );
   } 
 
-  Substance::~Substance()
+  SRMSubstance::~SRMSubstance()
   {
     delete theIntegrator;
     delete theAccumulator;
   }
 
-  void Substance::setAccumulatorClass( StringCref anAccumulatorClassname )
+
+  const String SRMSubstance::getAccumulatorClass() const
+  {
+    return theAccumulator->getClassName();
+  }
+
+
+  void SRMSubstance::setAccumulatorClass( StringCref anAccumulatorClassname )
   {
     AccumulatorPtr aAccumulatorPtr( getModel()->getAccumulatorMaker()
 				    .make( anAccumulatorClassname ) );
     setAccumulator( aAccumulatorPtr );
   }
 
-  void Substance::setAccumulator( AccumulatorPtr anAccumulator )
+  void SRMSubstance::setAccumulator( AccumulatorPtr anAccumulator )
   {
     if( theAccumulator != NULLPTR )
       {
@@ -120,42 +148,42 @@ namespace libecs
     //    theAccumulator->update();
   }
 
-  void Substance::initialize()
+
+
+  void SRMSubstance::initialize()
   {
     // if the accumulator is not set, use user default
     if( theAccumulator == NULLPTR )
       {
-	setAccumulatorClass( USER_DEFAULT_ACCUMULATOR_NAME );
+	setAccumulatorClass( SYSTEM_DEFAULT_ACCUMULATOR_NAME );
       }
 
     // if the user default is invalid fall back to the system default.
     if( theAccumulator == NULLPTR )  
       {               
-	setUserDefaultAccumulatorName( SYSTEM_DEFAULT_ACCUMULATOR_NAME );
-	setAccumulatorClass( USER_DEFAULT_ACCUMULATOR_NAME );
+	setAccumulatorClass( SYSTEM_DEFAULT_ACCUMULATOR_NAME );
       }
 
     theAccumulator->update();
     
   }
 
-  const Real Substance::saveQuantity()
+
+  const Real SRMSubstance::saveQuantity()
   {
     return theAccumulator->save();
   }
 
-  void Substance::loadQuantity( RealCref aQuantity )
+
+
+  void SRMSubstance::loadQuantity( RealCref aQuantity )
   {
     theQuantity = aQuantity;
     theAccumulator->update();
   }
 
-  const Real Substance::getActivity()
-  {
-    return getVelocity();
-  }
 
-  void Substance::integrate()
+  void SRMSubstance::integrate()
   { 
     if( ! isFixed() ) 
       {
@@ -169,6 +197,16 @@ namespace libecs
 	    //FIXME:       throw LTZ();
 	  }
       }
+  }
+
+  void SRMSubstance::makeSlots()
+  {
+    registerSlot( getPropertySlotMaker()->
+		  createPropertySlot( "AccumulatorClass",*this,
+				      Type2Type<String>(),
+				      &SRMSubstance::setAccumulatorClass,
+				      &SRMSubstance::getAccumulatorClass ) );
+
   }
 
 

@@ -320,72 +320,86 @@ namespace libecs
   };
 
 
-  class StepperWithEntityCache
-    : 
-    public Stepper
+  template< class Base_, class Derived_ = Base_ >
+  class EntityCache
+    :
+    public std::vector<Derived_*>
   {
 
   public:
 
-    StepperWithEntityCache()
+    DECLARE_TYPE( Base_, Base );
+    DECLARE_TYPE( Derived_, Derived );
+
+
+    //    typedef std::map<const String, BasePtr> BaseMap_;
+    typedef std::vector<DerivedPtr> DerivedVector_;
+    //    DECLARE_TYPE( BaseMap_, BaseMap );
+    DECLARE_TYPE( DerivedVector_, DerivedVector );
+
+
+    //    typedef std::less<const String> StringLess;
+    //    DECLARE_MAP( const String, BasePtr, StringLess, BaseMap );
+
+    EntityCache()
     {
       ; // do nothing
     }
 
-    ~StepperWithEntityCache() {}
+    ~EntityCache() {}
 
-
-    virtual void initialize();
 
     /**
-       Update the cache if any of the systems have any newly added 
-       or removed Entity.
+       Update the cache.
+
     */
 
-    void updateCacheWithCheck()
+    void update( SystemVectorCref aSystemVector )
     {
-      if( isEntityListChanged() )
+      clear();
+
+      for( SystemVectorConstIterator i( aSystemVector.begin() );
+	   i != aSystemVector.end() ; ++i )
 	{
-	  updateCache();
-	  clearEntityListChanged();
+	  const SystemCptr aSystem( *i );
+
+	  typedef std::map<const String,BasePtr> BaseMap;
+	  
+	  for( typename BaseMap::const_iterator 
+		 j( aSystem->System::getMap<Base>().begin() );
+	       j != aSystem->System::getMap<Base>().end(); ++j )
+	    {
+	      BasePtr aBasePtr( (*j).second );
+
+	      try
+		{
+		  DerivedPtr 
+		    aDerivedPtr( dynamic_cast<DerivedPtr>( aBasePtr ) );
+		  push_back( aDerivedPtr );
+		}
+	      catch( const std::bad_cast& )
+		{
+		  ; // do nothing
+		}
+	    }
+
 	}
+
     }
-
-    /**
-       Update the caches.
-
-       SubstanceCache and ReactorCache are updated so that they contain
-       all Substances and Reactors in the Systems that are belong to this
-       Stepper.
-    */
-
-    void updateCache();
-
-
-    /**
-       Update the caches with sort.
-
-       SubstanceCache and ReactorCache are updated so that they contain
-       all Substances and Reactors in the Systems that are belong to this
-       Stepper.
-
-       Not fully implemented.
-    */
-
-    void updateCacheWithSort();
-
-  protected:
-
-    SubstanceVector               theSubstanceCache;
-    ReactorVector                 theReactorCache;
 
   };
 
+
+  DECLARE_CLASS( SRMSubstance );
+
   class SRMStepper 
     : 
-    public StepperWithEntityCache
+    public Stepper
   {
   public:
+
+    typedef EntityCache<Substance,SRMSubstance> SRMSubstanceCache;
+    typedef EntityCache<Reactor> ReactorCache;
 
     SRMStepper();
     virtual ~SRMStepper() {}
@@ -414,6 +428,9 @@ namespace libecs
 
     IntegratorAllocator theIntegratorAllocator;
 
+    SRMSubstanceCache theSubstanceCache;
+    ReactorCache      theReactorCache;
+
   private:
 
     virtual void distributeIntegrator( IntegratorAllocator );
@@ -436,7 +453,7 @@ namespace libecs
  
   protected:
 
-    static IntegratorPtr newIntegrator( SubstanceRef substance );
+    static IntegratorPtr newIntegrator( SRMSubstanceRef substance );
 
   };
 
@@ -460,7 +477,7 @@ namespace libecs
 
   private:
 
-    static IntegratorPtr newIntegrator( SubstanceRef substance );
+    static IntegratorPtr newIntegrator( SRMSubstanceRef substance );
 
   };
 

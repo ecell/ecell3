@@ -148,48 +148,6 @@ namespace libecs
   }
 
 
-  ////////////////////////// StepperWithEntityCache
-
-  void StepperWithEntityCache::initialize()
-  {
-    Stepper::initialize();
-    updateCache();
-  }
-
-  
-  void StepperWithEntityCache::updateCache()
-  {
-    theSubstanceCache.clear();
-    theReactorCache.clear();
-
-    for( SystemVectorConstIterator i( getSystemVector().begin() );
-	 i != getSystemVector().end() ; ++i )
-      {
-	const SystemCptr aSystem( *i );
-
-	for( SubstanceMapConstIterator j( aSystem->getSubstanceMap().begin() );
-	     j != aSystem->getSubstanceMap().end(); ++j )
-	  {
-	    theSubstanceCache.push_back( (*j).second );
-	  }
-
-	for( ReactorMapConstIterator j( aSystem->getReactorMap().begin() );
-	     j != aSystem->getReactorMap().end(); ++j )
-	  {
-	    theReactorCache.push_back( (*j).second );
-	  }
-
-      }
-
-  }
-
-
-  //FIXME: incomplete
-  void StepperWithEntityCache::updateCacheWithSort()
-  {
-    updateCache();
-  }
-
 
   ////////////////////////// SRMStepper
 
@@ -205,7 +163,7 @@ namespace libecs
     //
     // Substance::clear()
     //
-    FOR_ALL( SubstanceVector, theSubstanceCache, clear );
+    FOR_ALL( SRMSubstanceCache, theSubstanceCache, clear );
   }
 
 
@@ -223,7 +181,7 @@ namespace libecs
     //
     // Substance::turn()
     //
-    FOR_ALL( SubstanceVector, theSubstanceCache, turn );
+    FOR_ALL( SRMSubstanceCache, theSubstanceCache, turn );
   }
 
   void SRMStepper::integrate()
@@ -237,7 +195,7 @@ namespace libecs
     //
     // Substance::integrate()
     //
-    FOR_ALL( SubstanceVector, theSubstanceCache, integrate );
+    FOR_ALL( SRMSubstanceCache, theSubstanceCache, integrate );
 
   }
 
@@ -262,14 +220,22 @@ namespace libecs
 
   void SRMStepper::initialize()
   {
-    StepperWithEntityCache::initialize();
+    Stepper::initialize();
+
+    if( isEntityListChanged() )
+      {
+	theSubstanceCache.update( theSystemVector );
+	theReactorCache.update( theSystemVector );
+
+	clearEntityListChanged();
+      }
 
     distributeIntegrator( theIntegratorAllocator );
   }
 
   void SRMStepper::distributeIntegrator( IntegratorAllocator allocator )
   {
-    for( SubstanceVectorConstIterator s( theSubstanceCache.begin() );
+    for( SRMSubstanceCache::const_iterator s( theSubstanceCache.begin() );
 	 s != theSubstanceCache.end() ; ++s )
       {
 	(*allocator)(**s);
@@ -286,7 +252,7 @@ namespace libecs
       IntegratorAllocator( &Euler1SRMStepper::newIntegrator );
   }
 
-  IntegratorPtr Euler1SRMStepper::newIntegrator( SubstanceRef substance )
+  IntegratorPtr Euler1SRMStepper::newIntegrator( SRMSubstanceRef substance )
   {
     return new Euler1Integrator( substance );
   }
@@ -299,7 +265,7 @@ namespace libecs
       IntegratorAllocator( &RungeKutta4SRMStepper::newIntegrator ); 
   }
 
-  IntegratorPtr RungeKutta4SRMStepper::newIntegrator( SubstanceRef substance )
+  IntegratorPtr RungeKutta4SRMStepper::newIntegrator( SRMSubstanceRef substance )
   {
     return new RungeKutta4Integrator( substance );
   }

@@ -48,24 +48,15 @@ namespace libecs
 
 
   /**
-     Substance class is used to represent molecular species.
+     Substance class is used to represent state variables, such as
+     amounts of molecular species in a compartment.
 
   */
 
-  class Substance : public Entity
+  class Substance 
+    : 
+    public Entity
   {
-    //FIXME: for Accumulators:: to be deleted
-    friend class Accumulator;
-    void accumulatorSetQuantity( const Real aQuantity )
-    {
-      theQuantity = aQuantity;
-    }
-
-
-  public: // message slots
-
-    void setAccumulatorClass( StringCref anAccumulatorClassname );
-    const String getAccumulatorClass() const;
 
   public:
 
@@ -79,11 +70,6 @@ namespace libecs
       return EntityType( EntityType::SUBSTANCE );
     }
 
-
-    void setIntegrator( IntegratorPtr anIntegrator ) 
-    { 
-      theIntegrator = anIntegrator; 
-    }
 
     /**
        @return the number of molecules.
@@ -140,26 +126,22 @@ namespace libecs
        Clear phase.
        Then call clear() of the integrator.
     */
+
     void clear()
     { 
       theVelocity = 0.0; 
-      theIntegrator->clear();
     }
 
-    /**
-       This is called one or several times in react phase.
-       Time of call is determined by the type of the integrator.
-    */
-    void turn()
+    virtual void turn()
     {
-      theIntegrator->turn();
+      // dummy. to be deleted 
     }
 
-    /**
-       integrate phase.
-       Perform integration by a result calculated by integrator.
-    */
-    void integrate();
+
+    virtual void integrate()
+    {
+      // dummy. to be deleted 
+    }
 
     void setVelocity( RealCref aVelocity )
     {
@@ -228,23 +210,110 @@ namespace libecs
 
     virtual StringLiteral getClassName() const { return "Substance"; }
 
-    /**
-       set a class name string of user default accumulator
-    */
+  protected:
 
-    static void setUserDefaultAccumulatorName( StringCref name ) 
+    void makeSlots();
+
+  protected:
+
+    Real theQuantity;
+    Real theVelocity;
+
+    bool theFixed;
+  };
+
+
+
+  DECLARE_CLASS( SRMSubstance );
+
+  /**
+     Substance class is used to represent state variables, such as
+     amounts of molecular species in a compartment.
+
+  */
+
+  class SRMSubstance 
+    : 
+    public Substance
+  {
+    //FIXME: for Accumulators:: to be deleted
+    friend class Accumulator;
+    void accumulatorSetQuantity( const Real aQuantity )
+    {
+      theQuantity = aQuantity;
+    }
+
+
+  public: // message slots
+
+    void setAccumulatorClass( StringCref anAccumulatorClassname );
+    const String getAccumulatorClass() const;
+
+  public:
+
+    SRMSubstance();
+    virtual ~SRMSubstance();
+
+    static SubstancePtr createInstance() { return new SRMSubstance; }
+
+    void setIntegrator( IntegratorPtr anIntegrator ) 
     { 
-      USER_DEFAULT_ACCUMULATOR_NAME = name; 
+      theIntegrator = anIntegrator; 
+    }
+
+
+    /**
+       Initializes this substance. 
+       Called at startup.
+    */
+    void initialize();
+
+    /**
+       Clear phase.
+       Then call clear() of the integrator.
+    */
+    void clear()
+    { 
+      Substance::clear();
+      theIntegrator->clear();
     }
 
     /**
-       a class name string of user default accumulator
+       This is called one or several times in react phase.
+       Time of call is determined by the type of the integrator.
+    */
+    void turn()
+    {
+      theIntegrator->turn();
+    }
+
+    /**
+       integrate phase.
+       Perform integration by a result calculated by integrator.
+    */
+    void integrate();
+
+    /**
+       Set a quantity with no check. (i.e. isFixed() is ignored.)
+
+       Use setQuantity() for usual purposes.
+
+       This updates the accumulator immediately.
+
+       @see setQuantity
     */
 
-    static StringCref userDefaultAccumulatorName() 
-    { 
-      return USER_DEFAULT_ACCUMULATOR_NAME; 
-    }
+    void loadQuantity( RealCref aQuantity );
+
+
+    /**
+       Get a quantity via save() method of the Accumulator.
+    */
+
+    const Real saveQuantity();
+
+
+    virtual StringLiteral getClassName() const { return "SRMSubstance"; }
 
   protected:
 
@@ -260,20 +329,14 @@ namespace libecs
     */
     const static String SYSTEM_DEFAULT_ACCUMULATOR_NAME;
 
-  private:
+  protected:
 
-
-    //FIXME: non-const static should not be used
-    static String USER_DEFAULT_ACCUMULATOR_NAME;
 
     AccumulatorPtr theAccumulator;
     IntegratorPtr theIntegrator;
 
-    Real theQuantity;
     Real theFraction;
-    Real theVelocity;
 
-    bool theFixed;
   };
 
   /*@}*/

@@ -38,7 +38,7 @@ namespace libecs
 
   ////////////////////////////// Integrator
 
-  Integrator::Integrator( SubstanceRef substance ) 
+  Integrator::Integrator( SRMSubstanceRef substance ) 
     :
     theSubstance( substance ),
     theStepCounter( 0 )
@@ -53,7 +53,7 @@ namespace libecs
 
   ////////////////////////////// Euler1Integrator
 
-  Euler1Integrator::Euler1Integrator( SubstanceRef aSubstance ) 
+  Euler1Integrator::Euler1Integrator( SRMSubstanceRef aSubstance ) 
     : 
     Integrator( aSubstance )
   {
@@ -79,7 +79,7 @@ namespace libecs
   };
 
 
-  RungeKutta4Integrator::RungeKutta4Integrator( SubstanceRef aSubstance ) 
+  RungeKutta4Integrator::RungeKutta4Integrator( SRMSubstanceRef aSubstance ) 
     : 
     Integrator( aSubstance )
   {
@@ -128,19 +128,6 @@ namespace libecs
 
     Real aResult( theOne6th );
     aResult *= theK[0] + theK[1] + theK[1] + theK[2] + theK[2] + theK[3];
-
-    // an alternative impl.  which is faster?
-    //    Real* k( &theK[0] );
-    //    Real aResult = *k;
-    //    k++;
-    //    aResult += *k;
-    //    aResult += *k;
-    //    k++;
-    //    aResult += *k;
-    //    aResult += *k;
-    //    k++;
-    //    aResult += *k;
-    //    aResult *= theOne6th;
 
     theSubstance.setVelocity( aResult );
   }
