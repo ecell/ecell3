@@ -103,12 +103,13 @@ namespace libecs
 
     anEntityPtr->registerLogger( aNewLogger );
     theLoggerMap[aFullPN] = aNewLogger;
-	// set logger policy
-	aNewLogger->setLoggerPolicy( aParamList );
-
     // it should have at least one datapoint to work correctly.
     aNewLogger->log( getModel().getCurrentTime() );
     aNewLogger->flush();
+
+	// set logger policy
+	aNewLogger->setLoggerPolicy( aParamList );
+
 
     return aNewLogger;
   }

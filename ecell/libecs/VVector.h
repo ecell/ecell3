@@ -45,6 +45,9 @@
  *::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
  *	$Id$
  :	$Log$
+ :	Revision 1.16  2004/06/14 17:53:15  bgabor
+ :	Bugfixing in LogginPolicy
+ :
  :	Revision 1.15  2004/06/10 14:29:11  bgabor
  :	New logger policy API introduced.
  :	Logger policy is now four element long.
@@ -52,7 +55,7 @@
  :	Second: mimimum interval between logs ( 0-no logs )
  :	Third: policy at end of disk space or available space ( 0- throw ex, 1 overwrite old data )
  :	Fourth: available space for the logger in kbytes ( 0- no limit )
- :
+ :	
  :	Revision 1.14  2004/05/29 11:54:51  bgabor
  :	Introducing logger policy .
  :	User cen set and get the policy for a certain logger either when the logger is creater or anytime later.
@@ -289,7 +292,12 @@ template<class T> void vvector<T>::setEndPolicy( int anEndPolicy)
 
 template<class T> void vvector<T>::setMaxSize( int aMaxSize )
   {
+	if (aMaxSize == 0) {
+		max_size = 0;
+		}
+	else{
     max_size = ((aMaxSize/VVECTOR_WRITE_CACHE_SIZE)+1)*VVECTOR_WRITE_CACHE_SIZE;
+	}
   }
 
 template<class T> void vvector<T>::push_back(const T & x)
@@ -392,6 +400,7 @@ template<class T>  T const & vvector<T>::at(size_type i)
 //  my_close();
   return _buf;
 */
+
   assert(i < _size);
 // read cache only makes sense when not fixed size
 if (!size_fixed){
@@ -443,6 +452,7 @@ log_read_start=i2;
 	phys_read_start=i2;
 }
   my_open_to_read(static_cast<off_t>((phys_read_start) * sizeof(T)));
+
   num_red = read(_fdr, _cacheRV, num_to_read * sizeof(T));
   if (num_red < 0) {
     THROW_EXCEPTION( libecs::Exception, "read() failed in VVector.\n");

@@ -56,7 +56,8 @@ namespace libecs
     theLoggerAdapter( aLoggerAdapter ),
     theMinimumInterval( 0.0 ),
     theLastTime( 0.0 ) ,
-	theStepCounter( 0 )
+	theStepCounter( 0 ),
+	theMinimumStep (1 )
   {
 	// init physicallogers, the first 2 element, the others five element ones
 	thePhysicalLoggers[0] = new PhysicalLogger(2);
@@ -89,7 +90,7 @@ namespace libecs
 	loggingPolicy = aParamList;
 	theMinimumStep = static_cast<Integer>(loggingPolicy.asPolymorphVector()[0]);
 	theMinimumInterval = static_cast<Real>(loggingPolicy.asPolymorphVector()[1]);
-	phys_iterator theMaxSize;
+	phys_iterator theMaxSize(0);
 	//calculate maxsize from available Kbytes
 	if (loggingPolicy.asPolymorphVector()[3].asInteger()>0){
 		Real lds_inv( 1.0/_LOGGER_DIVIDE_STEP );
@@ -98,8 +99,10 @@ namespace libecs
 		Real avg_datapoint_size( static_cast<Real>(sizeof(DataPoint)) + 
 			static_cast<Real>(sizeof(DataPointLong))*longdp_part );
 		avg_datapoint_size*=1.02;
+
 		theMaxSize = static_cast<phys_iterator>(static_cast<Real>(loggingPolicy.asPolymorphVector()[3].asInteger())*1024.0/avg_datapoint_size );
 	}
+
 	for (int i=0;i<_LOGGER_MAX_PHYSICAL_LOGGERS;i++)
 	{
 	    thePhysicalLoggers[i]->setMaxSize( theMaxSize);
@@ -179,12 +182,12 @@ namespace libecs
 	bool timecondition(false);
     dp.setTime( aTime);
     dp.setValue( aValue);
-
     theDataAggregators[0].aggregate( dp ); 
 	if ((theMinimumStep>0)||(theMinimumInterval>=0)){
 
 	if (theMinimumStep>0){
 		theStepCounter++;
+
 		stepcondition = ( theStepCounter >= static_cast<const_iterator>(theMinimumStep) );
 		}
 	if (theMinimumInterval>0){
@@ -194,7 +197,6 @@ namespace libecs
 	}
     if ( logcondition )
       {
-
 		//getdata
 		dpl=theDataAggregators[0].getData();
 
