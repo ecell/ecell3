@@ -33,7 +33,6 @@
 #define __SIMULATORIMPLEMENTATION_HPP
 
 #include "libecs/libecs.hpp"
-#include "libecs/Message.hpp"
 
 #include "libemc.hpp"
 
@@ -100,6 +99,14 @@ namespace libemc
 
     virtual void createStepper( libecs::StringCref          aClassname,
 				libecs::StringCref          anId ) = 0;
+
+    virtual void setStepperProperty( libecs::StringCref            aStepperID,
+				     libecs::StringCref            aPropertyName,
+				     libecs::UVariableVectorCref   aValue ) = 0;
+
+    virtual const libecs::UVariableVectorRCPtr
+    getStepperProperty( libecs::StringCref aStepperID,
+		 libecs::StringCref aPropertyName ) = 0;
 
     virtual void createEntity( libecs::StringCref           aClassname, 
 			       libecs::StringCref           aFullIDString,

@@ -63,13 +63,13 @@ namespace libecs
 				      &Reactor::getActivity ) );
   }
 
-  void Reactor::setReactant( UVariableVectorRCPtrCref aMessage )
+  void Reactor::setReactant( UVariableVectorRCPtrCref aValue )
   {
-    checkSequenceSize( *aMessage, 3 );
+    checkSequenceSize( *aValue, 3 );
 
-    registerReactant( (*aMessage)[0].asString(), 
-		      FullID( (*aMessage)[1].asString() ), 
-		      (*aMessage)[2].asInt() );
+    registerReactant( (*aValue)[0].asString(), 
+		      FullID( (*aValue)[1].asString() ), 
+		      (*aValue)[2].asInt() );
   }
 
   const UVariableVectorRCPtr Reactor::getReactantList() const

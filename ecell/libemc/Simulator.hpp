@@ -33,7 +33,6 @@
 #define __SIMULATOR_HPP
 
 #include "libecs/libecs.hpp"
-#include "libecs/Message.hpp"
 #include "libecs/EntityType.hpp"
 
 #include "libemc.hpp"
@@ -82,6 +81,39 @@ namespace libemc
       theSimulatorImplementation->createStepper( aClassname, anId );
     }
 
+
+    /**
+       Set a property value of an Stepper.
+
+       @param aStepperID    the Stepper ID.
+       @param aValue        the value to set as a UVariableVector.
+    */
+
+    void setStepperProperty( libecs::StringCref          aStepperID,
+			     libecs::StringCref          aPropertyName,
+			     libecs::UVariableVectorCref aValue )
+    {
+      theSimulatorImplementation->setStepperProperty( aStepperID,
+						      aPropertyName,
+						      aValue );
+    }
+
+    /**
+       Get a value of a property from an Stepper.
+
+       @param aStepperID the Stepper ID.
+       @param aPropertyName the name of the property.
+       @return the property value as a reference counted pointor of a 
+       UVariableVector.
+    */
+
+    const libecs::UVariableVectorRCPtr
+    getStepperProperty( libecs::StringCref aStepperID,
+			libecs::StringCref aPropertyName )
+    {
+      return theSimulatorImplementation->getStepperProperty( aStepperID,
+							     aPropertyName );
+    }
 
     /**
        Create a new Entity in the model.

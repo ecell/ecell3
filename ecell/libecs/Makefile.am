@@ -23,7 +23,6 @@ libecs_la_SOURCES=\
 Util.cpp\
 UVariable.cpp\
 FullID.cpp\
-Message.cpp\
 PropertySlot.cpp\
 PropertyInterface.cpp\
 AccumulatorMaker.cpp\
@@ -54,7 +53,6 @@ libecs.hpp\
 Defs.hpp\
 UVariable.hpp\
 FullID.hpp\
-Message.hpp\
 PropertySlot.hpp\
 PropertySlotMaker.hpp\
 PropertyInterface.hpp\

@@ -58,6 +58,16 @@ namespace libemc
     virtual void createStepper( libecs::StringCref          aClassname,
 				libecs::StringCref          anId );
 
+
+    virtual void setStepperProperty( libecs::StringCref          aStepperID,
+				     libecs::StringCref          aPropertyName,
+				     libecs::UVariableVectorCref aValue );
+
+    virtual const libecs::UVariableVectorRCPtr
+    getStepperProperty( libecs::StringCref aStepperID,
+			libecs::StringCref aPropertyName );
+
+
     virtual void createEntity( libecs::StringCref           aClassname, 
 			       libecs::StringCref           aFullIDString,
 			       libecs::StringCref           aName );

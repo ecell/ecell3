@@ -105,6 +105,7 @@ namespace libecs
     theMaxInterval( std::numeric_limits<Real>::max() ),
     theEntityListChanged( true )
   {
+    makeSlots();
     calculateStepsPerSecond();
   }
 

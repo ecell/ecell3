@@ -3,6 +3,7 @@
 
 #include "libecs.hpp"
 
+#include "Exceptions.hpp"
 #include "PropertySlot.hpp"
 #include "PropertyInterface.hpp"
 

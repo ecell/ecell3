@@ -154,36 +154,38 @@ namespace libecs
     thePropertySlotMap.erase( keyword );
   }
 
-  void PropertyInterface::setMessage( MessageCref message ) 
+  void PropertyInterface::setProperty( StringCref aPropertyName, 
+				       UVariableVectorRCPtrCref aValue )
   {
-    PropertySlotMapConstIterator sm( thePropertySlotMap.find( message.getKeyword() ) );
+    PropertySlotMapConstIterator 
+      aPropertySlotMapIterator( thePropertySlotMap.find( aPropertyName ) );
 
-    if( sm == thePropertySlotMap.end() )
+    if( aPropertySlotMapIterator == thePropertySlotMap.end() )
       {
 	THROW_EXCEPTION( NoSlot,
 			 getClassName() + 
-			 String(": got a Message (keyword = [")
-			 + message.getKeyword() + "]) but no slot for it.");
+			 String(": No property slot found with name [")
+			 + aPropertyName + "].  Set property failed." );
       }
 
-    sm->second->setUVariableVectorRCPtr( message.getBody() );
+    aPropertySlotMapIterator->second->setUVariableVectorRCPtr( aValue );
   }
 
-  const Message PropertyInterface::getMessage( StringCref keyword ) const
+  const UVariableVectorRCPtr 
+  PropertyInterface::getProperty( StringCref aPropertyName ) const
   {
-    PropertySlotMapConstIterator sm( thePropertySlotMap.find( keyword ) );
+    PropertySlotMapConstIterator 
+      aPropertySlotMapIterator( thePropertySlotMap.find( aPropertyName ) );
 
-    if( sm == thePropertySlotMap.end() )
+    if( aPropertySlotMapIterator == thePropertySlotMap.end() )
       {
 	THROW_EXCEPTION( NoSlot, 
-			 getClassName()
-			 + String( ": got a request for Message (keyword = [" )
-			 + keyword + "]) but no slot for it.\n" );
+			 getClassName() + 
+			 String(": No property slot found with name [")
+			 + aPropertyName + "].  Get property failed." );
       }
 
-    return 
-      Message( keyword, 
-	       UVariableVectorRCPtr( sm->second->getUVariableVectorRCPtr() ) );
+    return aPropertySlotMapIterator->second->getUVariableVectorRCPtr();
   }
 
 

@@ -36,6 +36,10 @@ BOOST_PYTHON_MODULE_INIT(_ecs)
   aSimulatorClass.def( &libemc::Simulator::setProperty,    "setProperty" );
   aSimulatorClass.def( &libemc::Simulator::getProperty,    "getProperty" );
   aSimulatorClass.def( &libemc::Simulator::createStepper,  "createStepper" );
+  aSimulatorClass.def( &libemc::Simulator::setStepperProperty, 
+		       "setStepperProperty" );
+  aSimulatorClass.def( &libemc::Simulator::getStepperProperty,
+		       "getStepperProperty" );
   aSimulatorClass.def( &libemc::Simulator::getCurrentTime, "getCurrentTime" );
   aSimulatorClass.def( &libemc::Simulator::getLogger,      "getLogger" );
   aSimulatorClass.def( &libemc::Simulator::getLoggerList,  "getLoggerList" );  

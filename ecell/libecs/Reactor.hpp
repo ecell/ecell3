@@ -91,7 +91,7 @@ namespace libecs
 
     // Property slots
 
-    void setReactant( UVariableVectorRCPtrCref aMessage );
+    void setReactant( UVariableVectorRCPtrCref aValue );
 
     const UVariableVectorRCPtr getReactantList() const;
 

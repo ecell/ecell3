@@ -79,7 +79,6 @@ namespace libecs
   DECLARE_CLASS( System );
   DECLARE_CLASS( isRegularReactorItem );
   DECLARE_CLASS( SystemMaker );
-  DECLARE_CLASS( Message );
   DECLARE_CLASS( PropertySlot );
   DECLARE_CLASS( ProxyPropertySlot );
   DECLARE_CLASS( PropertyInterface );
@@ -103,9 +102,7 @@ namespace libecs
   DECLARE_CLASS( NotFound );
   DECLARE_CLASS( CantOpen );
   DECLARE_CLASS( BadID );
-  DECLARE_CLASS( MessageException );
   DECLARE_CLASS( CallbackFailed );
-  DECLARE_CLASS( BadMessage );
   DECLARE_CLASS( NoMethod );
   DECLARE_CLASS( NoSlot );
   DECLARE_CLASS( InvalidEntityType );

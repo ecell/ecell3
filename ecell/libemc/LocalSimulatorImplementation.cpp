@@ -31,7 +31,6 @@
 #include <algorithm>
 
 #include "libecs/libecs.hpp"
-#include "libecs/Message.hpp"
 #include "libecs/Stepper.hpp"
 #include "libecs/LoggerBroker.hpp"
 
@@ -66,6 +65,28 @@ namespace libemc
     getModel().createStepper( aClassname, anId );
   }
 
+  void LocalSimulatorImplementation::
+  setStepperProperty( libecs::StringCref          aStepperID,
+		      libecs::StringCref          aPropertyName,
+		      libecs::UVariableVectorCref aValue )
+  {
+    StepperPtr aStepperPtr( getModel().getStepper( aStepperID ) );
+    
+    aStepperPtr->setProperty( aPropertyName,
+			      UVariableVectorRCPtr( new UVariableVector( aValue ) ) );
+  }
+
+  const libecs::UVariableVectorRCPtr
+  LocalSimulatorImplementation::
+  getStepperProperty( libecs::StringCref aStepperID,
+		      libecs::StringCref aPropertyName )
+  {
+    StepperPtr aStepperPtr( getModel().getStepper( aStepperID ) );
+
+    return aStepperPtr->getProperty( aPropertyName );
+  }
+
+
   void LocalSimulatorImplementation::createEntity( StringCref aClassname,
 						   StringCref aFullIDString,
 						   StringCref aName )
@@ -80,9 +101,8 @@ namespace libemc
     FullPN aFullPN( aFullPNString );
     EntityPtr anEntityPtr( getModel().getEntity( aFullPN.getFullID() ) );
 
-    // this new does not cause memory leak since Message will get it as a RCPtr
-    anEntityPtr->setMessage( Message( aFullPN.getPropertyName(), 
-				      new UVariableVector( aData ) ) );
+    anEntityPtr->setProperty( aFullPN.getPropertyName(), 
+			      UVariableVectorRCPtr( new UVariableVector( aData ) ) );
   }
 
 
@@ -91,7 +111,7 @@ namespace libemc
   {
     FullPN aFullPN( aFullPNString );
     EntityPtr anEntityPtr( getModel().getEntity( aFullPN.getFullID() ) );
-    return anEntityPtr->getMessage( aFullPN.getPropertyName() ).getBody();
+    return anEntityPtr->getProperty( aFullPN.getPropertyName() );
   }
 
   void LocalSimulatorImplementation::step()

@@ -36,8 +36,8 @@
 #include "libecs.hpp"
 
 #include "Defs.hpp"
-#include "Message.hpp"
 
+#include "Exceptions.hpp"
 
 namespace libecs
 {
@@ -54,7 +54,7 @@ namespace libecs
 	       std::less<const String>, PropertySlotMap );
 
   /**
-     Common base class for classes which receive Messages.
+     Common base class for classes with PropertySlots.
 
      @note  Subclasses of PropertyInterface MUST call their own makeSlots()
      to create their property slots in their constructors.
@@ -62,7 +62,6 @@ namespace libecs
 
      @todo class-static slots?
 
-     @see Message
      @see PropertySlot
 
   */
@@ -84,23 +83,31 @@ namespace libecs
 
 
     /**
-       Send a message to this object via a PropertySlot.
+       Set a value of a property slot.
 
-       @param aMessage a Message object
+       This method checks if the property slot exists, and throws
+       NoSlot exception if not.
+
+       @param aPropertyName a name of the property.
+       @param aValue the value to set as a UVariableVectorRCPtr.
        @throw NoSlot 
     */
 
-    void setMessage( MessageCref aMessage );
+    void setProperty( StringCref aPropertyName, 
+		      UVariableVectorRCPtrCref aValue );
 
     /**
-       Get a message from this object via a PropertySlot.
+       Get a property value from this object via a PropertySlot.
 
-       @param aPropertyName a name of the PropertySlot.
-       @return the Message from this object.
+       This method checks if the property slot exists, and throws
+       NoSlot exception if not.
+
+       @param aPropertyName a name of the property.
+       @return the value as a UVariableVectorRCPtr.
        @throw NoSlot
     */
 
-    const Message getMessage( StringCref aPropertyName ) const;
+    const UVariableVectorRCPtr getProperty( StringCref aPropertyName ) const;
 
 
     /**
@@ -132,7 +139,7 @@ namespace libecs
     /** \name Properties
 
     Properties is a group of methods which can be accessed via (1)
-    PropertySlots and (2) set/getMessage() methods, in addition to
+    PropertySlots and (2) set/getProperty() methods, in addition to
     normal C++ method calls.
 
     */

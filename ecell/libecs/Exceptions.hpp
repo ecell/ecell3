@@ -129,7 +129,6 @@ public:\
 
   // PropertySlot errors
   DEFINE_EXCEPTION( PropertyException,     Exception);
-  DEFINE_EXCEPTION( BadMessage,            PropertyException); 
   DEFINE_EXCEPTION( NoMethod,              PropertyException);
   DEFINE_EXCEPTION( NoSlot,                PropertyException);
   DEFINE_EXCEPTION( AttributeError,        PropertyException);
