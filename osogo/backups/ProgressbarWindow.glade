@@ -14,7 +14,7 @@
 
 <widget>
   <class>GtkWindow</class>
-  <name>window3</name>
+  <name>BarWindow</name>
   <title>window3</title>
   <type>GTK_WINDOW_TOPLEVEL</type>
   <position>GTK_WIN_POS_NONE</position>
