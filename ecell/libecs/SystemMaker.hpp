@@ -36,7 +36,11 @@
 namespace libecs
 {
 
-
+  /** @defgroup libecs_module The Libecs Module 
+   * This is the libecs module 
+   * @{ 
+   */ 
+  
   class SystemMaker : public StaticModuleMaker<System>
   {
 
@@ -53,6 +57,7 @@ namespace libecs
 
 #define NewSystemModule(CLASS) NewDynamicModule(System,CLASS)
 
+  /** @} */ //end of libecs_module 
 
 } // namespace libecs
 

@@ -40,6 +40,11 @@
 namespace libemc
 {
 
+  /** @defgroup libemc_module The Libemc Module 
+   * This is the libemc module 
+   * @{ 
+   */ 
+  
   typedef libecs::LoggerCptr LoggerCptr;
 
   class LocalLoggerImplementation
@@ -86,6 +91,7 @@ namespace libemc
     
   };
 
+  /** @} */ //end of libemc_module 
 
 } // namespace libemc
 

@@ -40,6 +40,11 @@
 namespace libecs
 {
 
+  /** @defgroup libecs_module The Libecs Module 
+   * This is the libecs module 
+   * @{ 
+   */ 
+  
   typedef ::korandom_d_c  RandomNumberGenerator;
 
   /**
@@ -150,7 +155,7 @@ namespace libecs
        i != (SEQ) .end() ; ++i )\
     { (*i)-> METHOD (); }
 
- 
+  /** @} */ //end of libecs_module 
 
 } // namespace libecs
 

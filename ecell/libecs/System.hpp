@@ -40,6 +40,11 @@
 namespace libecs
 {
 
+  /** @defgroup libecs_module The Libecs Module 
+   * This is the libecs module 
+   * @{ 
+   */ 
+  
   // Tree data structures used for entry lists
   // for_each performance is very important. other or hybrid container type?
   DECLARE_MAP( const String, SubstancePtr, 
@@ -270,7 +275,7 @@ namespace libecs
     }
   };
 
-
+  /** @} */ //end of libecs_module 
 
 } // namespace libecs
 

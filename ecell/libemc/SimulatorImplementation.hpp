@@ -39,6 +39,12 @@
 
 namespace libemc
 {
+
+  /** @defgroup libemc_module The Libemc Module 
+   * This is the libemc module 
+   * @{ 
+   */ 
+  
   /**
      Pure virtual base class (interface definition) of simulator
      implementation.
@@ -96,6 +102,7 @@ namespace libemc
 
   };   //end of class Simulator
 
+  /** @} */ //end of libemc_module 
 
 } // namespace libemc
 

@@ -36,6 +36,11 @@
 
 #include "CXX/Objects.hxx"
 
+/** @defgroup pyecs_module The Pyecs Module 
+ * This is the pyecs module 
+ * @{ 
+ */ 
+
 class PyUVariable 
   : 
   public libecs::UVariable
@@ -102,7 +107,7 @@ public:
 
 };
 
-
+/** @} */ //end of pyecs_module 
 
 #endif /* __PYUVARIABLE_HPP */
 

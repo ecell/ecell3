@@ -42,6 +42,11 @@
 namespace libemc
 {
 
+  /** @defgroup libemc_module The Libemc Module 
+   * This is the libemc module 
+   * @{ 
+   */ 
+  
   using namespace libecs;
 
   class EmcDataPoint
@@ -90,6 +95,7 @@ namespace libemc
     const DataPoint* theDataPoint;
   };
 
+  /** @} */ //end of libemc_module 
 }
 
 

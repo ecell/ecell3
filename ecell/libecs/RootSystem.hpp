@@ -39,7 +39,11 @@
 namespace libecs
 {
 
-
+  /** @defgroup libecs_module The Libecs Module 
+   * This is the libecs module 
+   * @{ 
+   */ 
+  
   //FIXME: should be merged with PropertySlot::SlotTypes
 
   template <class T,typename Ret>
@@ -114,6 +118,7 @@ namespace libecs
 
   };
 
+  /** @} */ //end of libecs_module 
 
 } // namespace libecs
 

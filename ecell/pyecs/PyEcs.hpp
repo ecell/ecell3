@@ -35,6 +35,12 @@
 
 #include "CXX/Extensions.hxx"
 
+/** @defgroup pyecs_module The Pyecs Module 
+ * This is the pyecs module 
+ * @{ 
+ */ 
+
+
 class PyEcs
   : 
   public Py::ExtensionModule< PyEcs >
@@ -78,6 +84,7 @@ extern "C" void initecs();
       throw Py::SystemError( "E-CELL internal error (unexpected)." );\
     }
 
+/** @} */ //end of pyecs_module 
 
 #endif   /* ___PYECS_H___ */
 

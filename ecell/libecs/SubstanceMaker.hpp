@@ -36,6 +36,11 @@
 namespace libecs
 {
 
+  /** @defgroup libecs_module The Libecs Module 
+   * This is the libecs module 
+   * @{ 
+   */ 
+  
   class SubstanceMaker : public StaticModuleMaker<Substance>
   {
 
@@ -51,6 +56,7 @@ namespace libecs
 
 #define NewSubstanceModule( CLASS ) NewDynamicModule( Substance, CLASS )
 
+  /** @} */ //end of libecs_module 
 
 } // namespace libecs
 

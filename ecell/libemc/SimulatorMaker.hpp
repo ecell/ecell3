@@ -38,6 +38,11 @@
 namespace libemc
 {
 
+  /** @defgroup libemc_module The Libemc Module 
+   * This is the libemc module 
+   * @{ 
+   */ 
+  
   class SimulatorMaker : public SharedModuleMaker<Simulator>
   {
   private:
@@ -54,6 +59,8 @@ namespace libemc
   };
 
 #define NewSimulatorModule(CLASS) NewDynamicModule(Simulator,CLASS)
+
+  /** @} */ //end of libemc_module 
 
 } // namespace libemc
 

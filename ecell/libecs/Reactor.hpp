@@ -32,6 +32,7 @@
 #define ___REACTOR_H___
 
 // #include <climits>
+
 #include <vector>
 
 #include "libecs.hpp"
@@ -40,6 +41,11 @@
 namespace libecs
 {
 
+  /** @defgroup libecs_module The Libecs Module 
+   * This is the libecs module 
+   * @{ 
+   */ 
+  
   // FIXME: contain instances, not pointers
   DECLARE_VECTOR( ReactantPtr, ReactantVector );
 
@@ -251,6 +257,7 @@ namespace libecs
   */
   typedef ReactorPtr (*ReactorAllocatorFunc)();
 
+  /** @} */ //end of libecs_module \
 
 } // namespace libecs
 

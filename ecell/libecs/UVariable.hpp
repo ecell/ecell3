@@ -39,6 +39,11 @@
 namespace libecs
 {
 
+  /** @defgroup libecs_module The Libecs Module 
+   * This is the libecs module 
+   * @{ 
+   */ 
+  
   DECLARE_CLASS( UVariableData );
   DECLARE_CLASS( UVariableStringData );
   DECLARE_CLASS( UVariableRealData );
@@ -297,6 +302,7 @@ namespace libecs
 
   };
 
+  /** @} */ //end of libecs_module 
 
 } // namespace libecs
 

@@ -34,6 +34,12 @@
 #include "libemc/EmcLogger.hpp"
 #include "CXX/Extensions.hxx"
 
+/** @defgroup pyecs_module The Pyecs Module 
+ * This is the pyecs module 
+ * @{ 
+ */ 
+
+
 using Py::Object;
 using Py::Tuple;
 using Py::PythonExtension;
@@ -82,5 +88,6 @@ private:
 
 };
 
+/** @} */ //end of pyecs_module 
 
 #endif

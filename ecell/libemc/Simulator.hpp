@@ -41,6 +41,12 @@
 
 namespace libemc
 {
+  
+  /** @defgroup libemc_module The Libemc Module 
+   * This is the libemc module 
+   * @{ 
+   */ 
+  
 
   class Simulator
   {
@@ -144,6 +150,8 @@ namespace libemc
     SimulatorImplementation* theSimulatorImplementation;
 
   };
+
+  /** @} */ //end of libemc_module 
 
 } // namespace libemc
 

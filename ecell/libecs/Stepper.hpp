@@ -45,6 +45,11 @@
 namespace libecs
 {
 
+  /** @defgroup libecs_module The Libecs Module 
+   * This is the libecs module 
+   * @{ 
+   */ 
+  
   DECLARE_CLASS( Euler1Stepper );
   DECLARE_CLASS( RungeKutta4Stepper );
   DECLARE_CLASS( PropertySlotVectorImplementation );
@@ -433,6 +438,8 @@ namespace libecs
     static IntegratorPtr newIntegrator( SubstanceRef substance );
 
   };
+
+  /** @} */ //end of libecs_module 
 
 } // namespace libecs
 

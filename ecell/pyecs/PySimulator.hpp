@@ -36,6 +36,12 @@
 
 #include "CXX/Extensions.hxx"
 
+/** @defgroup pyecs_module The Pyecs Module 
+ * This is the pyecs module 
+ * @{ 
+ */ 
+
+
 using Py::Object;
 using Py::Callable;
 using Py::Tuple;
@@ -76,6 +82,8 @@ private:
   static Object theEventHandlerStore;
 
 };
+
+/** @} */ //end of pyecs_module 
 
 #endif   /* __PYSIMULATOR_HPP */
 

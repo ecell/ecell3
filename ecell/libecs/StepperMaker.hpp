@@ -36,6 +36,11 @@
 namespace libecs
 {
 
+  /** @defgroup libecs_module The Libecs Module 
+   * This is the libecs module 
+   * @{ 
+   */ 
+  
 
   class StepperMaker : public StaticModuleMaker<Stepper>
   {
@@ -54,6 +59,8 @@ namespace libecs
 
 #define NewStepperModule(CLASS) NewDynamicModule(Stepper,CLASS)
 
+  /** @} */ //end of libecs_module 
+  
 } // namespace libecs
 
 

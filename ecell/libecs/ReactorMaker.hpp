@@ -36,7 +36,12 @@
 
 namespace libecs
 {
-
+  
+  /** @defgroup libecs_module The Libecs Module 
+   * This is the libecs module 
+   * @{ 
+   */ 
+  
   class ReactorMaker : public SharedModuleMaker<Reactor>
   {
   private:
@@ -53,6 +58,7 @@ namespace libecs
 
 #define NewReactorModule(CLASS) NewDynamicModule(Reactor,CLASS)
 
+  /** @} */ //end of libecs_module 
 
 } // namespace libecs
 

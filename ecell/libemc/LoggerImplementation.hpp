@@ -38,6 +38,12 @@
 namespace libemc
 {
 
+  /** @defgroup libemc_module The Libemc Module 
+   * This is the libemc module 
+   * @{ 
+   */ 
+  
+
   /**
      Pure virtual base class (interface definition) of logger
      implementation.
@@ -68,6 +74,7 @@ namespace libemc
 
   };
 
+  /** @} */ //end of libemc_module 
 
 } // namespace libecs
 
