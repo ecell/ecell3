@@ -1186,7 +1186,8 @@ class MainWindow(OsogoWindow):
 	# ---------------------------------------------------------------
 	def openPreferences( self, button_obj ):
 
-		aPropertyBox = gnome.ui.GnomePropertyBox()
+		#aPropertyBox = gnome.ui.GnomePropertyBox()
+		aPropertyBox = gnome.ui.PropertyBox()
 		aLabel = gtk.Label( 'NOT IMPLEMENTED YET' )
 		aTabLabel = gtk.Label( 'warning' )
 		aPropertyBox.append_page( aLabel, aTabLabel )
@@ -1197,7 +1198,7 @@ class MainWindow(OsogoWindow):
 		#aPropertyBox.append_page( aLabel, aTabLabel )
 		#aPropertyBox.hide()
 		#aPropertyBox.show_all()
-		aMessage = ' Sorry ! Not implemented... [%s]\n' %'08/Dec/2002'
+		aMessage = ' Sorry ! Not implemented... [%s]\n' %'06/Mar/2003'
 		self.printMessage(aMessage)
 		aDialog = ConfirmWindow(0,aMessage,'Sorry!')
 		return None
