@@ -1,25 +1,25 @@
 #! /usr/bin/env python
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #
-#        This file is part of E-CELL Session Monitor package
+#        This file is part of E-Cell Session Monitor package
 #
-#                Copyright (C) 1996-2002 Keio University
+#                Copyright (C) 2001-2004 Keio University
 #
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #
 #
-# E-CELL is free software; you can redistribute it and/or
+# E-Cell is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public
 # License as published by the Free Software Foundation; either
 # version 2 of the License, or (at your option) any later version.
 #
-# E-CELL is distributed in the hope that it will be useful,
+# E-Cell is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 # See the GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public
-# License along with E-CELL -- see the file COPYING.
+# License along with E-Cell -- see the file COPYING.
 # If not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
@@ -32,7 +32,7 @@
 #             'Yuusuke Saito'
 # 	      'Masahiro Sugimoto <sugi@bioinformatics.org>' 
 # 	      'Gabor Bereczki <gabor.bereczki@talk21.com>' at
-# E-CELL Project, Lab. for Bioinformatics, Keio University.
+# E-Cell Project, Lab. for Bioinformatics, Keio University.
 #
 
 from gui_config import *
@@ -131,7 +131,7 @@ class GtkSessionMonitor(Session):
 		# initializes for run method 
 		# -------------------------------------
 		self.theSimulator.setEventChecker( gtk.events_pending )
-		self.theSimulator.setEventHandler( gtk.mainiteration  )		
+		self.theSimulator.setEventHandler( gtk.main_iteration  )		
 
 		# -------------------------------------
 		# creates MainWindow
@@ -142,14 +142,14 @@ class GtkSessionMonitor(Session):
 
 	# ==========================================================================
 	def GUI_interact(self):	
-		"hands over controlto the user (gtk.mainloop())"
+		"hands over controlto the user (gtk.main_loop())"
 
-		gtk.mainloop()
+		gtk.main()
 
 	# ==========================================================================
 	def QuitGUI( self ):
-		""" quits gtk.mainloop() after saving changes """
-		gtk.mainquit()
+		""" quits gtk.main_loop() after saving changes """
+		gtk.main_quit()
 
 	# ==========================================================================
 	def doesExist( self, aWindowName):
@@ -185,7 +185,7 @@ class GtkSessionMonitor(Session):
 		if len(self.theModelName) == 0 and aWindowName != 'MainWindow':
 			message ( "Model has not yet been loaded. Can't open windows." )
 			return None
-		# When the WindowName does not matched, creates nothing.
+		# When the WindowName does not match, create nothing.
 		if self.theFundamentalWindows.has_key( aWindowName ) == TRUE:
 			self.theFundamentalWindows[ aWindowName ].openWindow()
 			self.theMainWindow.updateButtons()
