@@ -23,7 +23,7 @@ class VariableObject( EditorObject ):
         self.thePropertyMap[ VR_CONNECTIONLIST ]= []
         reqWidth = aVariableSD.getRequiredWidth()
         reqHeight = aVariableSD.getRequiredHeight()
-        
+        self.connectionDragged = False
 
         self.thePropertyMap [ OB_DIMENSION_X ] = reqWidth
         if reqWidth<VAR_MINWIDTH:
@@ -98,7 +98,7 @@ class VariableObject( EditorObject ):
         # resize must be sum of deltas
         self.thePropertyMap[ OB_DIMENSION_X ] += deltaleft + deltaright
         self.thePropertyMap[ OB_DIMENSION_Y ] += deltaup + deltadown
-        #print 'variable resize done' 
+
         self.theShape.resize(deltaleft + deltaright,deltaup + deltadown)
         if self.thePropertyMap[ VR_CONNECTIONLIST ] !=[]:
                 
@@ -110,6 +110,78 @@ class VariableObject( EditorObject ):
                 conobj.thePropertyMap[ OB_SHAPEDESCRIPTORLIST ].reCalculate()
                 conobj.theShape.repaint()
 
+
+    def buttonReleased( self ):
+        EditorObject.buttonReleased( self )
+        if self.connectionDragged:
+            self.connectionDragged = False
+            # get coordinates
+            ( endx, endy) = self.theGhostLine.getEndPoint( )
+            self.theGhostLine.delete()
+            self.theGhostLine = None
+            # delete ghostline
+            # CHECK IF VARIABLE IS CONNECTED
+            ( processID, processRing ) = self.theLayout.checkConnection( endx, endy, ME_PROCESS_TYPE )
+            newVarrefName = None
+            if processID == None:
+                return                
+            # create real line
+            variableFullID = self.getProperty( OB_FULLID )
+            procObject = self.theLayout.getObject(processID)
+            processFullID = procObject.getProperty(OB_FULLID)
+            relFullID = getRelativeReference( processFullID, variableFullID )
+            #get the process varreflist
+            aProFullPN = createFullPN (processFullID, MS_PROCESS_VARREFLIST )
+            aVarrefList =  self.getModelEditor().getModel().getEntityProperty( aProFullPN) 
+            #filter aVarrefList by variableFullID
+            aSpecVarrefList=[]
+            for aVarref in aVarrefList:
+                if aVarref[ME_VARREF_FULLID] in (variableFullID, relFullID):
+                    aSpecVarrefList+=[aVarref]
+        
+            #get the pro connection obj  
+            connectionList = procObject.getProperty(PR_CONNECTIONLIST)
+
+            aSpecDisplayedVarrefList=[]
+            for conn in connectionList:
+                connObj = self.theLayout.getObject( conn )
+                varreffName = connObj.getProperty(CO_NAME)
+                varID = connObj.getProperty(CO_VARIABLE_ATTACHED)
+                #get var FUllID
+                if varID!=None:
+                    varFullID = self.theLayout.getObject( varID ).getProperty(OB_FULLID)
+                    if varFullID == variableFullID:
+                        aSpecDisplayedVarrefList+=[varreffName]
+            
+            
+            #check if there is existing varref that hasn't been displayed
+            if len(aSpecVarrefList)!=len(aSpecDisplayedVarrefList) :
+                for aVarref in aSpecVarrefList:
+                    if aVarref[ME_VARREF_NAME] not in aSpecDisplayedVarrefList:
+                        newVarrefName = aVarref[ME_VARREF_NAME]
+            else:
+                newVarrefName = self.__getNewVarrefID ( processFullID )
+
+            newID = self.theLayout.getUniqueObjectID( OB_TYPE_CONNECTION )
+            aCommand = CreateConnection( self.theLayout, newID, processID, self.theID, 
+                    processRing,self.theRingCode,  VARIABLE_TO_PROCESS, newVarrefName )
+            self.theLayout.passCommand( [ aCommand ] )
+            # newCon = self.theLayout.getObject( newID )
+            # newCon.checkConnections()
+            
+
+
+    def ringDragged( self, aShapeName, deltax, deltay ):
+        if self.connectionDragged:
+            self.theGhostLine.moveEndPoint( deltax, deltay )
+        else:
+            self.theRingCode = aShapeName
+            
+            ( x, y ) = self.getRingPosition( aShapeName )
+            x += self.theSD.getRingSize()/2
+            y += self.theSD.getRingSize()/2
+            self.theGhostLine = GhostLine( self, aShapeName, x+deltax, y+deltay )
+            self.connectionDragged = True
         
     def getRingSize( self ):
         return self.theSD.getRingSize()
@@ -118,13 +190,27 @@ class VariableObject( EditorObject ):
     def getRingPosition( self, ringCode ):
         #return absolute position of ring
         (xRing,yRing)=self.theSD.getShapeAbsolutePosition(ringCode)
-        
         ( x, y ) = self.getAbsolutePosition()
-        
         return (x+xRing, y+yRing )
-    
-    
-        
 
-        
+    def estLabelWidth(self,newLabel):
+        height,width=self.getGraphUtils().getTextDimensions(newLabel)
+        return width+46
 
+
+    def __getNewVarrefID( self, aProcessFullID ):
+        aFullPN = createFullPN ( aProcessFullID, ME_PROCESS_VARREFLIST )
+        aVarrefList = self.theLayout.theLayoutManager.theModelEditor.getModel().getEntityProperty( aFullPN )
+        aVarrefNameList = []
+        for aVarref in aVarrefList:
+            aVarrefNameList.append( aVarref[ME_VARREF_NAME] )
+        i= 0
+        while 'X' +str(i) in aVarrefNameList:
+            i += 1
+        return 'X' + str( i )
+
+    def getCursorType( self, aFunction, x, y, buttonPressed ):
+        cursorType = EditorObject.getCursorType( self,  aFunction, x, y, buttonPressed  )
+        if aFunction == SD_RING and buttonPressed:
+            return CU_CONN_INIT
+        return cursorType 

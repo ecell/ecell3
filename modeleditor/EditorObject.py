@@ -136,6 +136,11 @@ class EditorObject:
 
     def setProperty( self, aPropertyName, aPropertyValue):
         self.thePropertyMap[aPropertyName] = aPropertyValue
+        if aPropertyName == OB_LABEL:
+            self.theSD.renameLabel(aPropertyValue)
+        elif aPropertyName in ( OB_DIMENSION_X, OB_DIMENSION_Y ):
+            self.theSD.reCalculate()
+
         if  self.theCanvas !=None:
             if aPropertyName == OB_LABEL:
                 self.labelChanged(aPropertyValue)
@@ -145,6 +150,8 @@ class EditorObject:
                 self.theShape.outlineColorChanged()
             elif aPropertyName == OB_FILL_COLOR:
                 self.theShape.fillColorChanged()
+
+
 
     def labelChanged( self,aPropertyValue ):
         pass
@@ -949,3 +956,33 @@ class EditorObject:
             pos=self.maxShiftMap[dir][0]
             return abs( mshift[pos] )
 
+import gnome.canvas
+class GhostLine:
+    def __init__( self, parentObject, ringCode, endx, endy ):
+        self.parentObject = parentObject
+        self.x2 = endx
+        self.y2 = endy
+        (self.x1, self.y1) = self.parentObject.getRingPosition( ringCode )
+        self.root = self.parentObject.theCanvas.getCanvas().root()
+        self.theLine = self.root.add( gnome.canvas.CanvasLine, points=(self.x1, self.y1, self.x2, self.y2), last_arrowhead = gtk.TRUE,arrow_shape_a=5, arrow_shape_b=5, arrow_shape_c=3 )
+
+
+    def moveEndPoint( self, deltax, deltay ):
+        self.x2 += deltax
+        self.y2 += deltay
+        self.theLine.set_property( "points", (self.x1, self.y1, self.x2, self.y2) )
+
+
+    def getEndPoint( self ):
+        return ( self.x2, self.y2 )
+
+    def registerObject( self, anObject ):
+        self.theObjectMap[anObject.getID()] = anObject
+
+
+    def unregisterObject ( self, anObjectID ):
+        self.theObjectMap.__delitem__( anObjectID )
+
+
+    def delete ( self ):
+        self.theLine.destroy()

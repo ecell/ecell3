@@ -47,7 +47,6 @@ class ShapeDescriptor:
         self.reCalculate()
 
     def getShapeAbsolutePosition(self,aShapeName):
-        #print 'aShapeName', aShapeName
         aDescList=self.getDescriptor(aShapeName)[SD_SPECIFIC][SPEC_POINTS]
         x=aDescList[0] - self.absx
         y=aDescList[1] - self.absy
@@ -79,7 +78,6 @@ class ShapeDescriptor:
         self.createDescriptorList()
 
     def createDescriptorList( self ):
-
         coordsx = nu.array( [[ self.absx], [self.width], [1], [self.olw],[self.tx_width] ] )
         coordsy = nu.array( [[ self.absy], [self.height], [1], [self.olw],[self.tx_height] ] )
 

@@ -134,6 +134,7 @@ class Layout:
             if parentSystem == None:
                 parentSystem = self
             newObject = VariableObject( self, objectID, aFullID, x, y, parentSystem )
+
         elif objectType == OB_TYPE_SYSTEM:
             if parentSystem == None:
                 parentSystem = self
@@ -153,7 +154,7 @@ class Layout:
         self.theObjectMap[ objectID ] = newObject
         
         if self.theCanvas!=None:
-            
+
             newObject.setCanvas( self.theCanvas )
             newObject.show()
 

@@ -342,7 +342,7 @@ class LayoutBufferPaster:
             newID = anID
         # paste connection buffer
         # create new connection
-        
+        aVarobj = aLayout.getObject( newVariableID )
         aLayout.createConnectionObject( newID, newProcessID, newVariableID,  processRing, variableRing, None, aVarrefName )
         return newID
 

@@ -232,12 +232,10 @@ class ModelEditor:
         try:
             aFileObject = open( aFileName, 'r' )
             anEml = Eml( aFileObject )
-
             # calls load methods
             self.__loadStepper( anEml )
             self.__loadEntity( anEml )
             self.__loadProperty( anEml )
-    
         except:
             #display message dialog
             
@@ -283,13 +281,9 @@ class ModelEditor:
 <eml>
 ''' % time.asctime( time.localtime() )
 
-        
-
         aString = anEml.asString()
         anEml.destroy()
         aBuffer = aString #+ aCurrentInfo
-
-
 
         try:
             aFileObject = open( aFileName, 'w' )
@@ -352,8 +346,8 @@ class ModelEditor:
             self.theModelTmpFileName = aTmpFileName
             os.remove(self.theModelTmpFileName)
             """ 
-
-        elif anExt == '.eml':
+        #try to load as .eml
+        else: #anExt == '.eml':
             if not self.loadEmlAndLeml(aFileName):
                 self.theMainWindow.resetCursor()
                 self.__createModel()

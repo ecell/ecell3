@@ -121,7 +121,7 @@ class MainWindow( ListWindow ):
                      + "glade" + os.sep + "modeleditor32.png" )
  
         # update 
-        
+        self['MainWindow'].maximize()
         self.update()
         
 
@@ -600,10 +600,10 @@ class MainWindow( ListWindow ):
             self.theModelEditor.setAutosavePreferences(newAutosaveWindow) 
 
     def __guide_activated(self, *args):
-        webbrowser.open_new('file://'+ os.environ['MEPATH'] + os.sep + 'doc' + os.sep + 'Tutorial.htm')
+        webbrowser.open_new('file://'+ os.environ['MEPATH'] + os.sep + 'doc' + os.sep + 'HOW-TO.htm')
 
     def __manual_activated(self, *args):
-        webbrowser.open_new('file://' + os.environ['MEPATH'] + os.sep + 'doc' + os.sep + 'HOW-TO.htm')
+        webbrowser.open_new('file://' + os.environ['MEPATH'] + os.sep + 'doc' + os.sep + 'Tutorial.htm')
 
 
     def __scrollwindow_exposed( self, *args ):

@@ -108,7 +108,7 @@ class ComplexShape:
 
 
     def labelChanged(self, newLabel):
-        self.parentObject.getProperty( OB_SHAPEDESCRIPTORLIST ).renameLabel(newLabel)
+#       self.parentObject.getProperty( OB_SHAPEDESCRIPTORLIST ).renameLabel(newLabel)
         self.shapeDescriptorList = self.parentObject.getProperty( OB_SHAPEDESCRIPTORLIST ).getDescriptorList()
         self.renameText(self.shapeDescriptorList['text'])
         self.resize(0,0)

@@ -110,7 +110,7 @@ outline_color_gdk = aGdkColor )
         firstArrow = lineSpec[4]
         secondArrow = lineSpec[5]
 
-        aLine = self.theRoot.add( gnome.canvas.CanvasLine,points=[X1,Y1,X2,Y2], width_units=lineSpec[ 6 ], fill_color_gdk = aGdkColor, first_arrowhead = firstArrow, last_arrowhead = secondArrow,arrow_shape_a=5, arrow_shape_b=5, arrow_shape_c=3 )
+        aLine = self.theRoot.add( gnome.canvas.CanvasLine,points=[X1,Y1,X2,Y2], width_units=lineSpec[ 6 ], fill_color_gdk = aGdkColor, first_arrowhead = firstArrow, last_arrowhead = secondArrow,arrow_shape_a=5, arrow_shape_b=5, arrow_shape_c=5 )
         self.addHandlers( aLine, aDescriptor[ SD_NAME ] )
         self.shapeMap[ aDescriptor[ SD_NAME ] ] = aLine
 
@@ -210,7 +210,7 @@ outline_color_gdk = aGdkColor )
     def mouseDrag( self, shapeName, deltax, deltay, origx, origy ):
         # decide whether resize or move or draw arrow
         if self.getShapeDescriptor(shapeName)[SD_FUNCTION] == SD_MOVINGLINE:
-            print "movingline dragged"
+            pass
         elif self.getShapeDescriptor(shapeName)[SD_FUNCTION] == SD_ARROWHEAD:
             if not self.firstdrag:
                 self.firstdrag=True
