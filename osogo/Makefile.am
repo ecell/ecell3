@@ -29,6 +29,7 @@ Session.py\
 Driver.py\
 ModelInterpreter.py\
 A-sample-rule.py\
+B-sample-rule.py\
 samplerule.py\
 sample-script.py\
 icon_down.xpm\
