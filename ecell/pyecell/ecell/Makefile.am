@@ -10,7 +10,9 @@ Session.py\
 ecssupport.py\
 FullID.py\
 RecordingSimulator.py\
-util.py
+util.py\
+eml.py
+
 
 
 EXTRA_DIST=${pyecell_DATA}
