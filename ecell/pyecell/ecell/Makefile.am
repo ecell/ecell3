@@ -22,7 +22,8 @@ RecordingSimulator.py\
 util.py\
 Window.py\
 eml.py\
-em.py
+em.py\
+spark.py
 
 
 EXTRA_DIST=${pyecell_DATA}
