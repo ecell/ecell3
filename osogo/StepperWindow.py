@@ -214,11 +214,10 @@ class StepperWindow(OsogoWindow):
 			# gettable and settable
 			anAttribute = aStepperStub.getPropertyAttributes( aProperty )
 			# value
-			if anAttribute[GETABLE] != 0:
-				aValueString = str( aStepperStub.getProperty( aProperty ) )
-			else:
-				aValueString = ''
-				
+			if anAttribute[GETABLE] == 0:
+				continue
+
+			aValueString = str( aStepperStub.getProperty( aProperty ) )
 			# second element
 			aList.append( shortenString( aValueString,\
 						     MAX_STRING_NUMBER) )  
@@ -493,7 +492,7 @@ class StepperWindow(OsogoWindow):
 			if iter == None:
 				break
 			aProperty = self['property_list'].get_model().get_value(iter,0)
-			if aStepperStub.getAttributes()[GETABLE]:
+			if aStepperStub.getPropertyAttributes( aProperty )[GETABLE]:
 				aValue = str( aStepperStub.getProperty( aProperty ) )
 			else:
 				aValue = ''

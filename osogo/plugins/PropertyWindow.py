@@ -280,13 +280,14 @@ class PropertyWindow(OsogoPluginWindow):
 
 			# When the getable attribute is false, value is ''
 			if anAttribute[GETABLE] == FALSE:
-				aValueString = ''
+				aValue = ''
 			else:
-				aValueString = str( self.theSession.theSimulator.getEntityProperty( createFullPNString( aFullPN ) ) )
+				aValue = str( self.theSession.theSimulator.getEntityProperty( createFullPNString( aFullPN ) ) )
 
 			aSetString = decodeAttribute( anAttribute[SETTABLE] )
 			aGetString = decodeAttribute( anAttribute[GETABLE] )
-                
+
+			aValueString = str( aValue )
 			if( len( aValueString ) > 30 ):
 				if type( aValue ) == list or\
 				   type( aValue ) == tuple:
