@@ -35,7 +35,7 @@ AC_CONFIG_SUBDIRS(osogo)]
 dnl
 AC_SUBST(ECELL_SUBDIR)
 dnl
-AM_CONFIG_HEADER([config.h])
+AM_CONFIG_HEADER([ecell3_config.h])
 dnl
 dnl
 dnl Create the top-level Makefile.
