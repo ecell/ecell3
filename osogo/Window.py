@@ -19,8 +19,15 @@ class Window:
         if gladefile == None:
             gladefile = GLADEFILE_PATH
             gladefile += '/' + self.__class__.__name__ + ".glade"
+        else:
+            if os.path.isabs(gladefile) :
+                pass
+            else:
+                gladefile = GLADEFILE_PATH + '/' + gladefile
 
         if os.access( os.path.join( GLADEFILE_PATH, gladefile ), os.R_OK ):
+            print gladefile
+            print root
             self.widgets = libglade.GladeXML( filename=gladefile, root=root )
         else:
             raise IOError( "can't read %s." % gladefile )
@@ -36,4 +43,6 @@ class Window:
 
     def __getitem__( self, key ):
         return self.widgets.get_widget( key )
+
+
 
