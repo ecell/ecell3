@@ -39,12 +39,6 @@ set a list of Process FullID that QuasiDynamicFluxProcess in Static Part.
 set a list of Process FullID that Influx Process
 or efflux Process in Dynamic part.
 
--VariableReferenceList
-set a list of FullID that Variable concerned with UnknownProcessList and
-KnownProcessList. In Coefficient, set 1 in Static part , and set 0
-in DynamicPart.
-
-
 * QuasiDynamicFluxProcess
 
 When you use QuasiDynamicFluxProcess,

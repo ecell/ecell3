@@ -33,11 +33,6 @@
 # set a list of Process FullID that Influx Process 
 # or efflux Process in Dynamic part. 
 #
-# -VariableReferenceList
-# set a list of FullID that Variable concerned with UnknownProcessList and
-# KnownProcessList. In Coefficient, set 1 in Static part , and set 0 
-# in DynamicPart. 
-#
 #
 # * QuasiDynamicFluxProcess
 #
@@ -189,15 +184,6 @@ System System( /CELL/CYTOPLASM )
 		:/CELL/CYTOPLASM:E_DF
 		:/CELL/CYTOPLASM:E_EG;
 
-                VariableReferenceList
-	        [ P0 :.:C 1 ]
-		[ P1 :.:D 1 ]
-		[ P2 :.:E 1 ]
-		[ P3 :.:F 1 ]
-		[ P4 :.:G 1 ]
-		[ E0 :.:B 0 ]
-		[ E1 :.:H 0 ]
-		[ E2 :.:I 0 ];
         }
 
         Process QuasiDynamicFluxProcess( E_CD )
