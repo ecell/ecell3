@@ -351,7 +351,7 @@ private:
 			  | rootNode( str_p("sec") )
 			  | rootNode( str_p("csc") )
 			  | rootNode( str_p("cot") )
-			  ) >>	    
+			  ) >>
 	  inner_node_d[ ch_p('(') >>  
 			( expression >>
 			  *( discard_node_d[ ch_p(',') ] >>
@@ -435,7 +435,7 @@ public:
   typedef parse_tree_match_t::tree_iterator TreeIterator;
   //DECLARE_CLASS( TreeIterator );
     
-  const Code compileExpression( StringCref anExpression );
+  const Code compileExpression( ProcessPtr aProcess, StringCref anExpression );
     
 protected:
 
@@ -560,7 +560,7 @@ DEFINE_OPCODE2INSTRUCTION( RET );
 
 
 const ExpressionCompiler::Code 
-ExpressionCompiler::compileExpression( StringCref anExpression )
+ExpressionCompiler::compileExpression( ProcessPtr aProcess, StringCref anExpression )
 {
   Code aCode;
   CompileGrammar aGrammer;
@@ -568,18 +568,31 @@ ExpressionCompiler::compileExpression( StringCref anExpression )
   tree_parse_info<> 
     info( ast_parse( anExpression.c_str(), aGrammer, space_p ) );
 
-  if( info.full )
-    {
-      compileTree( info.trees.begin(), aCode );
-	  
-      // place RET at the tail.
-      appendInstruction( aCode, Instruction<RET>() );
-    }
-  else
+  if( anExpression.length() == 0 )
     {
       THROW_EXCEPTION( UnexpectedError, 
-		       "Parse error in the expression. Expression : " +
-		       anExpression );
+		       "Expression is empty\nClass : " +
+		       std::string( aProcess->getClassName() ) +
+		       "\nID : " + std::string( aProcess->getID() ) );
+    }
+  
+  else
+    {
+      if( info.full )
+	{
+	  compileTree( info.trees.begin(), aCode );
+	  
+	  // place RET at the tail.
+	  appendInstruction( aCode, Instruction<RET>() );
+	}
+      else
+	{
+	  THROW_EXCEPTION( UnexpectedError,			   
+			   "Parse error in the expression.\nExpression : "
+			   + anExpression
+			   + "\nClass : " + std::string( aProcess->getClassName() )
+			   + "\nID : " + std::string( aProcess->getID() ) );	  
+	}
     }
       
   return aCode;
