@@ -129,8 +129,6 @@ namespace libecs
     void log();
     void clear();
     void process();
-    void processNegative();
-    void processNormal();
 
     virtual void reset();
     
@@ -410,7 +408,6 @@ namespace libecs
     VariableProxyVector   theVariableProxyVector;
 
     ProcessVector         theProcessVector;
-    ProcessVectorIterator theFirstNormalProcess;
 
     StepperVector         theDependentStepperVector;
 
@@ -686,7 +683,6 @@ namespace libecs
     {
       ; // do nothing -- ignore interruption
     }
-
 
     static StepperPtr createInstance() { return new DiscreteTimeStepper; }
 

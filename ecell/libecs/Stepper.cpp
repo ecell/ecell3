@@ -734,9 +734,9 @@ namespace libecs
     const Real aCallerTimeScale( aCaller->getTimeScale() );
     const Real aStepInterval   ( getStepInterval() );
 
-    // If the step size of this is less than double of the caller's,
+    // If the step size of this is less than caller's,
     // ignore this interruption.
-    if( aCallerTimeScale < aStepInterval )
+    if( aCallerTimeScale >= aStepInterval )
       {
 	return;
       }
@@ -767,8 +767,9 @@ namespace libecs
 
     // If the next step of this will occur *after* the caller,
     // reschedule this Stepper, as well as shrinking the next step size.
-    setStepInterval( aCallerCurrentTime + ( aCallerTimeScale * 0.5 ) 
-		     - aCurrentTime );
+    //    setStepInterval( aCallerCurrentTime + ( aCallerTimeScale * 0.5 ) 
+    //		     - aCurrentTime );
+    setStepInterval( aCallerCurrentTime - aCurrentTime );
 
     getModel()->reschedule( this );
   }
