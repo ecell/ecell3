@@ -7,7 +7,7 @@ A system for processing Python as markup embedded in text.
 """
 
 __program__ = 'empy'
-__version__ = '2.0.1'
+__version__ = '2.2.6'
 __url__ = 'http://www.alcyone.com/pyos/empy/'
 __author__ = 'Erik Max Francis <max@alcyone.com>'
 __copyright__ = 'Copyright (C) 2002 Erik Max Francis'
@@ -15,50 +15,68 @@ __license__ = 'GPL'
 
 
 import getopt
-import string
-import cStringIO
+import os
 import re
+import string
 import sys
 import types
 
-StringIO = cStringIO
-del cStringIO
+try:
+    # The equivalent of import cStringIO as StringIO.
+    import cStringIO
+    StringIO = cStringIO
+    del cStringIO
+except ImportError:
+    import StringIO
 
+# For backward compatibility, we can't assume these are defined.
 False, True = 0, 1
 
-
+# Some basic defaults.
 FAILURE_CODE = 1
 DEFAULT_PREFIX = '@'
 INTERNAL_MODULE_NAME = 'empy'
-SIGNIFICATOR_RE_STRING = DEFAULT_PREFIX + r"%(\S)+\s*(.*)$"
+DEFAULT_SCRIPT_NAME = '?'
+SIGNIFICATOR_RE_STRING = DEFAULT_PREFIX + r"%(\S+)\s*(.*)\s*$"
 BANGPATH = '#!'
 
+# Environment variable names.
+OPTIONS_ENV = 'EMPY_OPTIONS'
+PREFIX_ENV = 'EMPY_PREFIX'
+FLATTEN_ENV = 'EMPY_FLATTEN'
+RAW_ENV = 'EMPY_RAW_ERRORS'
+INTERACTIVE_ENV = 'EMPY_INTERACTIVE'
+BUFFERED_ENV = 'EMPY_BUFFERED_OUTPUT'
 
-class EmpyError(Exception):
-    """The base class for all empy errors."""
+# Interpreter options.
+BANGPATH_OPT = 'processBangpaths' # process bangpaths as comments?
+BUFFERED_OPT = 'bufferedOutput' # fully buffered output?
+RAW_OPT = 'rawErrors' # raw errors?
+EXIT_OPT = 'exitOnError' # exit on error?
+FLATTEN_OPT = 'flatten' # flatten pseudomodule namespace?
+
+
+class EmPyError(Exception):
+    """The base class for all EmPy errors."""
     pass
 
-class DiversionError(EmpyError):
+class DiversionError(EmPyError):
     """An error related to diversions."""
     pass
 
-class FilterError(EmpyError):
+class FilterError(EmPyError):
     """An error related to filters."""
     pass
 
-class StackUnderflowError(EmpyError):
+class StackUnderflowError(EmPyError):
     """A stack underflow."""
     pass
 
-class CommandLineError(EmpyError):
-    """An error triggered by errors in the command line."""
-    pass
-
-class HookError(EmpyError):
+class HookError(EmPyError):
     """An error associated with hooks."""
     pass
 
-class ParseError(EmpyError):
+class ParseError(EmPyError):
     """A parse error occurred."""
     pass
 
@@ -86,7 +104,7 @@ class MetaError(Exception):
 
 class Stack:
     
-    """A simple stack that behave as a sequence (with 0 being the top
+    """A simple stack that behaves as a sequence (with 0 being the top
     of the stack, not the bottom)."""
 
     def __init__(self, seq=None):
@@ -130,11 +148,11 @@ class AbstractFile:
     """An abstracted file that, when buffered, will totally buffer the
     file, including even the file open."""
 
-    def __init__(self, filename, mode='w', bufferedOutput=False):
+    def __init__(self, filename, mode='w', buffered=False):
         self.filename = filename
         self.mode = mode
-        self.bufferedOutput = bufferedOutput
-        if bufferedOutput:
+        self.buffered = buffered
+        if buffered:
             self.bufferFile = StringIO.StringIO()
         else:
             self.bufferFile = open(filename, mode)
@@ -158,7 +176,7 @@ class AbstractFile:
             self.done = True
 
     def commit(self):
-        if self.bufferedOutput:
+        if self.buffered:
             file = open(self.filename, self.mode)
             file.write(self.bufferFile.getvalue())
             file.close()
@@ -166,12 +184,46 @@ class AbstractFile:
             self.bufferFile.close()
 
     def abort(self):
-        if self.bufferedOutput:
+        if self.buffered:
             self.bufferFile = None
         else:
             self.bufferFile.close()
             self.bufferFile = None
         self.done = True
+
+
+class Diversion:
+
+    """The representation of an active diversion.  Diversions act as
+    (writable) file objects, and then can be recalled either as pure
+    strings or (readable) file objects."""
+
+    def __init__(self):
+        self.file = StringIO.StringIO()
+
+    # These methods define the writable file-like interface for the
+    # diversion.
+
+    def write(self, data):
+        self.file.write(data)
+
+    def writelines(self, lines):
+        for line in lines:
+            self.write(line)
+
+    def flush(self):
+        self.file.flush()
+
+    def close(self):
+        self.file.close()
+
+    def asString(self):
+        """Return the diversion as a string."""
+        return self.file.getvalue()
+
+    def asFile(self):
+        """Return the diversion as a file."""
+        return StringIO.StringIO(self.file.getvalue())
 
 
 class Stream:
@@ -254,7 +306,7 @@ class Stream:
                 thisFilter, lastFilter = filter, filter
                 while thisFilter is not None:
                     lastFilter = thisFilter
-                    thisFilter = thisFilter.sink
+                    thisFilter = thisFilter.next()
                 lastFilter.attach(self.file)
                 self.filter = filter
 
@@ -262,45 +314,61 @@ class Stream:
         """Reset any current diversions."""
         self.currentDiversion = None
 
-    def divert(self, diversion):
-        """Start diverting."""
-        if diversion is None:
+    def create(self, name):
+        """Create a diversion if one does not already exist, but do not
+        divert to it yet."""
+        if name is None:
             raise DiversionError, "diversion name must be non-None"
-        self.currentDiversion = diversion
-        if not self.diversions.has_key(diversion):
-            self.diversions[diversion] = StringIO.StringIO()
+        if not self.diversions.has_key(name):
+            self.diversions[name] = Diversion()
 
-    def undivert(self, diversion, purgeAfterwards=False):
-        """Undivert a particular diversion."""
-        if diversion is None:
+    def retrieve(self, name):
+        """Retrieve the given diversion."""
+        if name is None:
             raise DiversionError, "diversion name must be non-None"
-        if self.diversions.has_key(diversion):
-            strFile = self.diversions[diversion]
-            self.filter.write(strFile.getvalue())
-            if purgeAfterwards:
-                self.purge(diversion)
+        if self.diversions.has_key(name):
+            return self.diversions[name]
         else:
-            raise DiversionError, "nonexistent diversion: %s" % diversion
+            raise DiversionError, "nonexistent diversion: %s" % name
 
-    def purge(self, diversion):
-        """Purge the specified diversion."""
-        if diversion is None:
+    def divert(self, name):
+        """Start diverting."""
+        if name is None:
             raise DiversionError, "diversion name must be non-None"
-        if self.diversions.has_key(diversion):
-            del self.diversions[diversion]
-            if self.currentDiversion == diversion:
+        self.create(name)
+        self.currentDiversion = name
+
+    def undivert(self, name, purgeAfterwards=False):
+        """Undivert a particular diversion."""
+        if name is None:
+            raise DiversionError, "diversion name must be non-None"
+        if self.diversions.has_key(name):
+            diversion = self.diversions[name]
+            self.filter.write(diversion.asString())
+            if purgeAfterwards:
+                self.purge(name)
+        else:
+            raise DiversionError, "nonexistent diversion: %s" % name
+
+    def purge(self, name):
+        """Purge the specified diversion."""
+        if name is None:
+            raise DiversionError, "diversion name must be non-None"
+        if self.diversions.has_key(name):
+            del self.diversions[name]
+            if self.currentDiversion == name:
                 self.currentDiversion = None
 
     def undivertAll(self, purgeAfterwards=True):
         """Undivert all pending diversions."""
         if self.diversions:
             self.revert() # revert before undiverting!
-            diversions = self.diversions.keys()
-            diversions.sort()
-            for diversion in diversions:
-                self.undivert(diversion)
+            names = self.diversions.keys()
+            names.sort()
+            for name in names:
+                self.undivert(name)
                 if purgeAfterwards:
-                    self.purge(diversion)
+                    self.purge(name)
             
     def purgeAll(self):
         """Eliminate all existing diversions."""
@@ -359,16 +427,22 @@ class Filter:
             raise NotImplementedError
         self.sink = None
 
+    def next(self):
+        """Return the next filter/file-like object in the sequence, or None."""
+        return self.sink
+
     def write(self, data):
+        """The standard write method; this must be overridden in subclasses."""
         raise NotImplementedError
 
     def writelines(self, lines):
+        """Standard writelines wrapper."""
         for line in lines:
             self.write(line)
 
     def _flush(self):
-        """The _flush method should always flush and should not be
-        overridden."""
+        """The _flush method should always flush the sink and should not
+        be overridden."""
         self.sink.flush()
 
     def flush(self):
@@ -376,19 +450,30 @@ class Filter:
         self._flush()
 
     def close(self):
+        """Close the filter.  Do an explicit flush first, then close the
+        sink."""
         self.flush()
         self.sink.close()
 
     def attach(self, filter):
         """Attach a filter to this one."""
+        if self.sink is not None:
+            # If it's already attached, detach it first.
+            self.detach()
         self.sink = filter
+
+    def detach(self):
+        """Detach a filter from its sink."""
+        self.flush()
+        self._flush() # do a guaranteed flush to just to be safe
+        self.sink = None
 
     def last(self):
         """Find the last filter in this chain."""
         this, last = self, self
         while this is not None:
             last = this
-            this = this.sink
+            this = this.next()
         return last
 
 class NullFilter(Filter):
@@ -440,7 +525,7 @@ class BufferedFilter(Filter):
     def flush(self):
         if self.buffer:
             self.sink.write(self.buffer)
-        self.sink.flush()
+        self._flush()
 
 class SizeBufferedFilter(BufferedFilter):
 
@@ -521,7 +606,7 @@ class Scanner:
         """Get the remainder of the buffer."""
         return self.buffer
 
-    def chop(self, count=None, slop=False):
+    def chop(self, count=None, slop=0):
         """Chop the first count + slop characters off the front, and return
         the first count.  If count is not specified, then return
         everything."""
@@ -675,19 +760,18 @@ class Scanner:
         return i
 
     def keyword(self, word, start=0, end=None, mandatory=False):
-        prefix = word[0] # keywords start with a prefix
-        if mandatory:
-            assert end is not None
-        i = -1
-        while 1:
-            i = string.find(self.buffer, word, i + 1, end)
-            if i < 0:
-                if mandatory:
-                    raise ParseError, "missing keyword %s" % word
-                else:
-                    raise TransientParseError, "missing keyword %s" % word
-            if i == 0 or (i > 0 and self.buffer[i - 1] != prefix):
-                return i
+        """Find the next occurrence of the given keyword in the string."""
+        if end is None:
+            loc = string.find(self.buffer, word, start + 1)
+        else:
+            loc = string.find(self.buffer, word, start + 1, end)
+        if loc >= 0:
+            return loc
+        else:
+            if mandatory:
+                raise ParseError, "missing keyword %s" % word
+            else:
+                raise TransientParseError, "missing keyword %s" % word
 
 
 class Context:
@@ -708,7 +792,7 @@ class Context:
 
 class PseudoModule:
     
-    """A pseudomodule for the builtin empy routines."""
+    """A pseudomodule for the builtin EmPy routines."""
 
     __name__ = INTERNAL_MODULE_NAME
 
@@ -750,11 +834,31 @@ class PseudoModule:
         context = self.interpreter.context()
         context.line = line
 
+    def clearGlobals(self, globals=None):
+        """Clear out the globals, optionally starting from a new
+        dictionary."""
+        self.interpreter.clear(globals)
+
     def atExit(self, callable):
         """Register a function to be called at exit."""
-        self.addHook('at_shutdown', lambda i, d, k=callable: k(), True)
+        self.interpreter.finals.append(callable)
 
     # Hook support.
+
+    def enableHooks(self):
+        """Enable hooks."""
+        self.interpreter.hooksEnabled = True
+
+    def disableHooks(self):
+        """Disable hooks."""
+        self.interpreter.hooksEnabled = False
+
+    def areHooksEnabled(self):
+        """Return whether or not hooks are presently enabled."""
+        if self.interpreter.hooksEnabled is None:
+            return True
+        else:
+            return self.interpreter.hooksEnabled
 
     def getHooks(self, name):
         """Get the hooks associated with the name."""
@@ -768,8 +872,16 @@ class PseudoModule:
         if self.interpreter.hooks.has_key(name):
             del self.interpreter.hooks[name]
 
+    def clearAllHooks(self):
+        """Clear all hooks associated with all names."""
+        self.interpreter.hooks = {}
+
     def addHook(self, name, hook, prepend=False):
         """Add a new hook; optionally insert it rather than appending it."""
+        if self.interpreter.hooksEnabled is None:
+            # A special optimization so that hooks can be effectively
+            # disabled until one is added or they are explicitly turned on.
+            self.interpreter.hooksEnabled = True
         if self.interpreter.hooks.has_key(name):
             if prepend:
                 self.interpreter.hooks[name].insert(0, hook)
@@ -789,22 +901,56 @@ class PseudoModule:
         """Manually invoke a hook."""
         apply(self.interpreter.invoke, (name_,), keywords)
 
+    # Direct execution.
+
+    def evaluate(self, expression, locals=None):
+        """Evaluate the expression."""
+        self.interpreter.evaluate(expression, locals)
+
+    def execute(self, statements, locals=None):
+        """Execute the statement(s)."""
+        self.interpreter.execute(statements, locals)
+
+    def single(self, source, locals=None):
+        """Interpret a 'single' code fragment just as the Python interactive
+        interpreter would."""
+        self.interpreter.single(source, locals)
+
+    def substitute(self, substitution, locals=None):
+        """Do a direct EmPy substitution."""
+        self.interpreter.substitute(substitution, locals)
+
+    def significate(self, key, value=None):
+        """Do a direct signification."""
+        self.interpreter.significate(key, value)
+
     # Source manipulation.
 
-    def include(self, fileOrFilename, locals=None, processBangpaths=True):
-        """Wrapper around include."""
-        self.interpreter.include(fileOrFilename, locals, processBangpaths)
+    def include(self, fileOrFilename, locals=None):
+        """Include a file by filename (if a string) or treat the object
+        as a file-like object directly."""
+        self.interpreter.include(fileOrFilename, locals)
 
     def expand(self, data, locals=None):
-        """Wrapper around expand."""
+        """Do an explicit expansion and return its results as a string."""
         return self.interpreter.expand(data, locals)
 
+    def string(self, data, name='<string>', locals=None):
+        """Forcibly evaluate an EmPy string."""
+        self.interpreter.string(data, name, locals)
+
     def quote(self, data):
-        """Wrapper around quote."""
+        """Quote the given string so that if expanded by EmPy it would
+        evaluate to the original."""
         return self.interpreter.quote(data)
 
+    def escape(self, data, more=''):
+        """Escape a string so that nonprintable characters are replaced
+        with compatible EmPy expansions."""
+        return self.interpreter.escape(data, more)
+
     def flush(self):
-        """Wrapper around flush."""
+        """Do a manual flush of the underlying stream."""
         self.interpreter.flush()
 
     # Pseudomodule manipulation.
@@ -839,21 +985,30 @@ class PseudoModule:
         """Stop any diverting."""
         self.interpreter.stream().revert()
 
-    def startDiversion(self, diversion):
+    def createDiversion(self, name):
+        """Create a diversion (but do not divert to it) if it does not
+        already exist."""
+        self.interpreter.stream().create(name)
+
+    def retrieveDiversion(self, name):
+        """Retrieve the diversion object associated with the name."""
+        return self.interpreter.stream().retrieve(name)
+
+    def startDiversion(self, name):
         """Start diverting to the given diversion name."""
-        self.interpreter.stream().divert(diversion)
+        self.interpreter.stream().divert(name)
 
-    def playDiversion(self, diversion):
+    def playDiversion(self, name):
         """Play the given diversion and then purge it."""
-        self.interpreter.stream().undivert(diversion, True)
+        self.interpreter.stream().undivert(name, True)
 
-    def replayDiversion(self, diversion):
+    def replayDiversion(self, name):
         """Replay the diversion without purging it."""
-        self.interpreter.stream().undivert(diversion, False)
+        self.interpreter.stream().undivert(name, False)
 
-    def purgeDiversion(self, diversion):
+    def purgeDiversion(self, name):
         """Eliminate the given diversion."""
-        self.interpreter.stream().purge(diversion)
+        self.interpreter.stream().purge(name)
 
     def playAllDiversions(self):
         """Play all existing diversions and then purge them."""
@@ -873,9 +1028,9 @@ class PseudoModule:
 
     def getAllDiversions(self):
         """Get the names of all existing diversions."""
-        diversions = self.interpreter.stream().diversions.keys()
-        diversions.sort()
-        return diversions
+        names = self.interpreter.stream().diversions.keys()
+        names.sort()
+        return names
     
     # Filter.
 
@@ -902,62 +1057,94 @@ class PseudoModule:
 
 class Interpreter:
     
-    """An interpreter can process chunks of empy code."""
+    """An interpreter can process chunks of EmPy code."""
 
-    SECONDARY_CHARS = "#%([{)]}`: \t\v\n\\"
+    SECONDARY_CHARS = "#%([{)]}`: \t\v\r\n\\"
     IDENTIFIER_FIRST = '_abcdefghijklmnopqrstuvwxyz' + \
                        'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
     IDENTIFIER_REST = IDENTIFIER_FIRST + '0123456789.'
     ENDING_CHARS = {'(': ')', '[': ']', '{': '}'}
+    ESCAPE_CODES = {0x00: '0', 0x07: 'a', 0x08: 'b', 0x1b: 'e', 0x0c: 'f', \
+                    0x7f: 'h', 0x0a: 'n', 0x0d: 'r', 0x09: 't', 0x0b: 'v', \
+                    0x04: 'z'}
 
     IF_RE = re.compile(r"^if\s+(.*)$")
     WHILE_RE = re.compile(r"^while\s+(.*)$")
     FOR_RE = re.compile(r"^for\s+(\S+)\s+in\s+(.*)$")
-    ELSE_SEPARATOR = 'else:'
+    MACRO_RE = re.compile(r"^macro\s+(.*)$")
+    NOOP_RE = re.compile(r"^noop\s*(.*)$")
 
-    # Construction, destruction.
+    DEFAULT_OPTIONS = {BANGPATH_OPT: True,
+                       BUFFERED_OPT: False,
+                       RAW_OPT: False,
+                       EXIT_OPT: True,
+                       FLATTEN_OPT: False}
 
-    def __init__(self, output=None, argv=None, globals=None, \
-                 prefix=DEFAULT_PREFIX):
+    # Construction, initialization, destruction.
+
+    def __init__(self, output=None, argv=None, prefix=DEFAULT_PREFIX, \
+                 options=None, globals=None):
         # Set up the stream.
         if output is None:
             output = sys.__stdout__
         self.output = output
         self.prefix = prefix
-        self.hooks = {}
-        # The interpreter arguents.
         if argv is None:
-            argv = []
+            argv = [DEFAULT_SCRIPT_NAME]
         self.argv = argv
+        if options is None:
+            options = {}
+        self.options = options
+        # Now set up additional attributes.
+        self.hooksEnabled = None # special sentinel meaning "false until added"
+        self.hooks = {}
+        self.finals = []
         # The interpreter stacks.
         self.contexts = Stack()
         self.streams = Stack()
-        # Set up the globals; this should come after everything else since
-        # the pseudmodule relies on the interpreter being prepared.
+        # Set up the pseudmodule.
         self.pseudo = PseudoModule(self)
-        if globals is None:
-            globals = {}
-        globals[self.pseudo.__name__] = self.pseudo
-        self.globals = globals
+        # Now set up the globals, or stamp the pseudmodule into an existing
+        # dictionary if one is provided.
+        self.globals = None
+        self.clear(globals)
         # Install a proxy stdout if one hasn't been already.
         self.installProxy()
         # Finally, reset the state of all the stacks.
         self.reset()
+        # Okay, now flatten the namespaces if that option has been set.
+        if self.options.get(FLATTEN_OPT, False):
+            self.pseudo.flatten()
 
     def __del__(self):
         self.shutdown()
 
+    def clear(self, globals=None):
+        """Reset the globals, stamping in the pseudomodule."""
+        if globals is None:
+            self.globals = {}
+        else:
+            self.globals = globals
+        self.globals[self.pseudo.__name__] = self.pseudo
+
     def shutdown(self):
         """Declare this interpreting session over; close the stream file
-        object."""
+        object.  This method is idempotent."""
         if self.streams is not None:
-            self.invoke('at_shutdown')
-            while self.streams:
-                stream = self.streams.pop()
-                stream.close()
-            self.streams = None
+            try:
+                self.invoke('at_shutdown')
+                self.finalize()
+                while self.streams:
+                    stream = self.streams.pop()
+                    stream.close()
+            finally:
+                self.streams = None
 
-    # File-like methods.
+    def ok(self):
+        """Is the interpreter still active?"""
+        return self.streams is not None
+
+    # Writeable file-like methods.
 
     def write(self, data):
         self.stream().write(data)
@@ -987,7 +1174,7 @@ class Interpreter:
 
     # Higher-level operaitons.
 
-    def include(self, fileOrFilename, locals=None, processBangpaths=True):
+    def include(self, fileOrFilename, locals=None):
         """Do an include pass on a file or filename."""
         if type(fileOrFilename) is types.StringType:
             # Either it's a string representing a filename ...
@@ -999,7 +1186,7 @@ class Interpreter:
             file = fileOrFilename
             name = "<%s>" % str(file.__class__)
         self.invoke('before_include', name=name, file=file)
-        self.file(file, name, locals, processBangpaths)
+        self.file(file, name, locals)
         self.invoke('after_include')
 
     def expand(self, data, locals=None):
@@ -1034,40 +1221,57 @@ class Interpreter:
         result.append(data[i:])
         return string.join(result, '')
 
+    def escape(self, data, more=''):
+        """Escape a string so that nonprintable characters are replaced
+        with compatible EmPy expansions."""
+        self.invoke('at_escape', string=data, more=more)
+        result = []
+        for char in data:
+            if char < ' ' or char > '~':
+                charOrd = ord(char)
+                if Interpreter.ESCAPE_CODES.has_key(charOrd):
+                    result.append(self.prefix + '\\' + \
+                                  Interpreter.ESCAPE_CODES[charOrd])
+                else:
+                    result.append(self.prefix + '\\x%02x' % charOrd)
+            elif char in more:
+                result.append(self.prefix + '\\' + char)
+            else:
+                result.append(char)
+        return string.join(result, '')
+
     # Processing.
 
-    def wrap(self, callable, args, \
-             bufferedOutput=False, rawErrors=False, exitOnError=True):
+    def wrap(self, callable, args):
         """Wrap around an application of a callable and handle errors.
-        Return true if no error occurs."""
+        Return whether no error occurred."""
         try:
             apply(callable, args)
             self.reset()
             return True
         except KeyboardInterrupt, e:
-            # Handle keyboard interrupts specially: override the
-            # exitOnError option and always exit from them.
-            self.die(e, bufferedOutput, rawErrors, True)
+            # Handle keyboard interrupts specially: we should always exit
+            # from these.
+            self.fail(e, True)
         except Exception, e:
             # A standard exception (other than a keyboard interrupt).
-            self.die(e, bufferedOutput, rawErrors, exitOnError)
+            self.fail(e)
         except:
-            # If we get here, then it must be a string exception, 
-            # so get the error info from the sys module.
+            # If we get here, then either it's an exception not derived from
+            # Exception or it's a string exception, so get the error type
+            # from the sys module.
             e = sys.exc_type
-            self.die(e, bufferedOutput, rawErrors, exitOnError)
-        # An error occurred if we get here.
+            self.fail(e)
+        # An error occurred if we leak through to here, so do cleanup.
         self.reset()
         return False
 
-    def interact(self, \
-                 bufferedOutput=False, rawErrors=False, exitOnError=True):
+    def interact(self):
         """Perform interaction."""
         done = False
         while not done:
-            result = self.wrap(self.file, (sys.stdin, '<interact>'), \
-                               bufferedOutput, rawErrors, exitOnError)
-            if exitOnError:
+            result = self.wrap(self.file, (sys.stdin, '<interact>'))
+            if self.options.get(EXIT_OPT, True):
                 done = True
             else:
                 if result:
@@ -1075,22 +1279,25 @@ class Interpreter:
                 else:
                     self.reset()
 
-    def die(self, error, \
-            bufferedOutput=False, rawErrors=False, exitOnError=True):
+    def fail(self, error, fatal=False):
         """Handle an actual error that occurred."""
-        if bufferedOutput:
-            self.output.abort()
+        if self.options.get(BUFFERED_OPT, False):
+            try:
+                self.output.abort()
+            except AttributeError:
+                # If the output file object doesn't have an abort method,
+                # something got mismatched, but it's too late to do
+                # anything about it now anyway, so just ignore it.
+                pass
         meta = self.meta(error)
         self.handle(meta)
-        if rawErrors:
+        if self.options.get(RAW_OPT, False):
             raise
-        if exitOnError:
+        if fatal or self.options.get(EXIT_OPT, True):
             sys.exit(FAILURE_CODE)
 
-    def file(self, file, name='<file>', locals=None, processBangpaths=True):
-        """Parse the entire contents of a file.  processBangpaths indicates
-        whether or not a bangpath at the start of a file will be treated
-        as a comment."""
+    def file(self, file, name='<file>', locals=None):
+        """Parse the entire contents of a file."""
         context = Context(name)
         self.contexts.push(context)
         self.invoke('before_file', name=name, file=file)
@@ -1101,9 +1308,9 @@ class Interpreter:
             context.bump()
             line = file.readline()
             if first:
-                if processBangpaths:
+                if self.options.get(BANGPATH_OPT, True):
                     # Replace a bangpath at the beginning of the first line
-                    # with an empy comment.
+                    # with an EmPy comment.
                     if string.find(line, BANGPATH) == 0:
                         line = self.prefix + '#' + line[2:]
                 first = False
@@ -1147,7 +1354,7 @@ class Interpreter:
     def parse(self, scanner, locals=None):
         """Parse as much from this scanner as possible."""
         self.invoke('at_parse', scanner=scanner)
-        while 1:
+        while True:
             loc = scanner.find(self.prefix)
             if loc < 0:
                 # The prefix isn't in the buffer, which means we can just
@@ -1164,7 +1371,7 @@ class Interpreter:
         the buffer)."""
         primary = scanner.chop(1)
         try:
-            if primary in ' \t\v\n':
+            if primary in ' \t\v\r\n':
                 # Whitespace/line continuation.
                 pass
             elif primary in ')]}':
@@ -1198,9 +1405,13 @@ class Interpreter:
                         octalCode = scanner.read(i, 3)
                         i = i + 3
                         result = chr(string.atoi(octalCode, 8))
+                    elif code == 'q': # quaternary coe
+                        quaternaryCode = scanner.read(i, 4)
+                        i = i + 4
+                        result = chr(string.atoi(quaternaryCode, 4))
                     elif code == 'r': # CR
                         result = '\x0d'
-                    elif code == 's': # SP
+                    elif code in 's ': # SP
                         result = ' '
                     elif code == 't': # HT
                         result = '\x09'
@@ -1218,7 +1429,9 @@ class Interpreter:
                         controlCode = string.upper(scanner.read(i))
                         i = i + 1
                         if controlCode >= '@' and controlCode <= '`':
-                            result = chr(ord(controlCode) - 0x40)
+                            result = chr(ord(controlCode) - ord('@'))
+                        elif controlCode == '?':
+                            result = '\x7f'
                         else:
                             raise ParseError, "invalid escape control code"
                     else:
@@ -1252,6 +1465,13 @@ class Interpreter:
                     if line[0] in ' \t\v\n':
                         raise ParseError, "no whitespace between % and key"
                     fields = string.split(line, None, 1)
+                    # Work around a subtle difference between CPython and
+                    # Jython.  In CPython, 'a '.split(None, 1) has one element,
+                    # but in Jython it has two (the second being an empty
+                    # string).  If we hit this second case, normalize it to
+                    # the first.
+                    if len(fields) == 2 and fields[1] == '':
+                        fields.pop()
                     if len(fields) < 2:
                         key = fields[0]
                         value = None
@@ -1308,7 +1528,7 @@ class Interpreter:
                 code = scanner.chop(i, 1)
                 self.stream().write(repr(self.evaluate(code, locals)))
             elif primary == ':':
-                # In-place expression substitution.
+                # In-place expression expansion.
                 i = scanner.next(':', 0)
                 j = scanner.next(':', i + 1)
                 code = scanner.chop(i, j - i + 1)
@@ -1321,7 +1541,7 @@ class Interpreter:
                     self.stream().write(":")
             elif primary == '[':
                 # Conditional and repeated substitution.
-                i = scanner.complex('[', ']', 0, None, self.prefix)
+                i = scanner.complex('[', ']', 0)
                 substitution = scanner.chop(i, 1)
                 self.substitute(substitution, locals)
             elif primary == '{':
@@ -1362,6 +1582,13 @@ class Interpreter:
 
     def execute(self, statements, locals=None):
         """Execute a statement."""
+        # If there are any carriage returns (as opposed to linefeeds/newlines)
+        # in the statements code, then remove them.  Even on DOS/Windows
+        # platforms, 
+        if string.find(statements, '\r') >= 0:
+            statements = string.replace(statements, '\r', '')
+        # If there are no newlines in the statements code, then strip any
+        # leading or trailing whitespace.
         if string.find(statements, '\n') < 0:
             statements = string.strip(statements)
         sys.stdout.push(self.stream())
@@ -1376,6 +1603,22 @@ class Interpreter:
         finally:
             sys.stdout.pop()
 
+    def single(self, source, locals=None):
+        """Execute an expression or statement, just as if it were
+        entered into the Python interactive interpreter."""
+        sys.stdout.push(self.stream())
+        try:
+            self.invoke('before_single', \
+                        source=source, locals=locals)
+            code = compile(source, '<single>', 'single')
+            if locals is not None:
+                exec code in self.globals, locals
+            else:
+                exec code in self.globals
+            self.invoke('after_single')
+        finally:
+            sys.stdout.pop()
+
     def substitute(self, substitution, locals=None):
         """Do a command substitution."""
         self.invoke('before_substitute', substitution=substitution)
@@ -1386,24 +1629,12 @@ class Interpreter:
         rest = substitution[i + 1:]
         match = Interpreter.IF_RE.search(command)
         if match is not None:
-            # if P : ... [@else: ...]
+            # if P : ...
             testCode, = match.groups()
-            try:
-                ELSE_SEPARATOR = self.prefix + Interpreter.ELSE_SEPARATOR
-                scanner.set(rest)
-                k = scanner.keyword(ELSE_SEPARATOR, 0, len(rest), True)
-                thenExpansion = rest[:k]
-                elseExpansion = rest[k + len(ELSE_SEPARATOR):]
-            except ParseError:
-                thenExpansion = rest
-                elseExpansion = ''
+            expansion = rest
             if self.evaluate(testCode, locals):
-                result = self.expand(thenExpansion)
+                result = self.expand(expansion, locals)
                 self.stream().write(str(result))
-            else:
-                if elseExpansion:
-                    result = self.expand(elseExpansion)
-                    self.stream().write(str(result))
             self.invoke('after_substitute')
             return
         match = Interpreter.WHILE_RE.search(command)
@@ -1411,10 +1642,10 @@ class Interpreter:
             # while P : ...
             testCode, = match.groups()
             expansion = rest
-            while 1:
+            while True:
                 if not self.evaluate(testCode, locals):
                     break
-                result = self.expand(expansion)
+                result = self.expand(expansion, locals)
                 self.stream().write(str(result))
             self.invoke('after_substitute')
             return
@@ -1426,26 +1657,51 @@ class Interpreter:
             expansion = rest
             for element in sequence:
                 self.globals[iterator] = element
-                result = self.expand(expansion)
+                result = self.expand(expansion, locals)
                 self.stream().write(str(result))
             self.invoke('after_substitute')
             return
-        # If we get here, we didn't find anything
+        match = Interpreter.MACRO_RE.search(command)
+        if match is not None:
+            # macro SIGNATURE : ...
+            declaration, = match.groups()
+            escaped = repr(self.escape(rest))
+            code = 'def %s:\n %s\n empy.string(%s, "<macro>", locals())\n' % (declaration, escaped, escaped)
+            self.execute(code, locals)
+            return
+        match = Interpreter.NOOP_RE.search(command)
+        if match is not None:
+            # noop : ...
+            return
+        # If we get here, we didn't find anything.
         raise ParseError, "unknown substitution type"
 
-    def significate(self, key, value):
+    def significate(self, key, value=None):
         """Declare a significator."""
         self.invoke('before_significate', key=key, value=value)
         name = '__%s__' % key
         self.globals[name] = value
         self.invoke('after_significate')
 
+    def finalize(self):
+        """Execute any remaining final routines."""
+        sys.stdout.push(self.stream())
+        try:
+            # Pop them off one at a time so they get executed in reverse
+            # order and we remove them as they're executed in case something
+            # bad happens.
+            while self.finals:
+                final = self.finals.pop()
+                final()
+        finally:
+            sys.stdout.pop()
+
     # Hooks.
 
     def invoke(self, hookName, **keywords):
         """Invoke the hook(s) associated with the hook name, should they
         exist."""
-        if self.hooks.has_key(hookName):
+        if self.hooksEnabled and self.hooks.has_key(hookName):
             for hook in self.hooks[hookName]:
                 hook(self, keywords)
 
@@ -1477,22 +1733,38 @@ class Interpreter:
             sys.stdout = ProxyFile(sys.__stdout__)
 
 
+def environment(name, default=None):
+    """Get data from the current environment.  If the default is True
+    or False, then presume that we're only interested in the existence
+    or non-existence of the environment variable."""
+    if os.environ.has_key(name):
+        # Do the True/False test by value for future compatibility.
+        if default == False or default == True:
+            return True
+        else:
+            return os.environ[name]
+    else:
+        return default
+
 def usage():
+    """Print usage information."""
     sys.stderr.write("""\
 Usage: %s [options] [<filename, or '-' for stdin> [<argument>...]]
+Welcome to EmPy version %s.
 
 Valid options:
-  -v --version                 Print version and exit
+  -V --version                 Print version and exit
   -h --help                    Print usage and exit
   -k --suppress-errors         Do not exit on errors; continue interactively
   -p --prefix=<char>           Change prefix to something other than @
   -f --flatten                 Flatten the members of pseudmodule to start
-  -r --raw --raw-errors        Show raw Python errors
+  -r --raw-errors              Show raw Python errors
   -i --interactive             Go into interactive mode after processing
   -o --output=<filename>       Specify file for output as write
   -a --append=<filename>       Specify file for output as append
-  -P --preprocess=<filename>   Interpret empy file before main processing
+  -P --preprocess=<filename>   Interpret EmPy file before main processing
   -I --import=<modules>        Import Python modules before processing
+  -D --define=<definition>     Execute Python assignment statement
   -E --execute=<statement>     Execute Python statement before processing
   -F --execute-file=<filename> Execute Python file before processing
   -B --buffered-output         Fully buffer output (even open) with -o or -a
@@ -1511,10 +1783,11 @@ The following expansions are supported (where @ is the prefix):
                                e.g., @x, @x.y, @f(a, b), @l[i], etc.
   @` EXPRESSION `              Evaluate expression and substitute with repr
   @: EXPRESSION : DUMMY :      Evaluates to @:...:expansion:
-  @[ if E : CODE ]             Expand then code if expression is true
-  @[ if E : CODE @else: CODE ] Expand then code if expression is true, or else
+  @[ noop : IGNORED ]          Contained material is ignored; block comment
+  @[ if E : CODE ]             Expand code if expression is true
   @[ while E : CODE ]          Repeatedly expand code while expression is true
   @[ for X in S : CODE ]       Expand code for each element in sequence
+  @[ macro SIGNATURE : CODE ]  Define a function as a recallable expansion
   @{ STATEMENTS }              Statements are executed for side effects
   @%% KEY WHITESPACE VALUE NL   Significator form of __KEY__ = VALUE
 
@@ -1528,6 +1801,7 @@ Valid escape sequences are:
   @\\h                          DEL, delete
   @\\n                          LF, linefeed, newline
   @\\oOOO                       three-digit octal code OOO
+  @\\qQQQQ                      four-digit quaternary code QQQQ
   @\\r                          CR, carriage return
   @\\s                          SP, space
   @\\t                          HT, horizontal tab
@@ -1537,21 +1811,26 @@ Valid escape sequences are:
   @\\^X                         control character ^X
 
 The %s pseudomodule contains the following attributes:
-  VERSION                      String representing empy version
+  VERSION                      String representing EmPy version
   SIGNIFICATOR_RE_STRING       Regular expression string matching significators
   interpreter                  Currently-executing interpreter instance
-  argv                         The epy script and command line arguments
+  argv                         The EmPy script name and command line arguments
   args                         The command line arguments only
   identify()                   Identify top context as name, line
   setName(name)                Set the name of the current context
   setLine(line)                Set the line number of the current context
-  include(file, [locals], [b]) Include filename or file-like object
-  expand(string, [locals])     Explicitly expand string
-  quote(string)                Quote prefixes in provided string
-  flatten()                    Flatten module contents into globals namespace
+  clearGlobals([dict])         Reset the interpreter's globals dictionary
+  atExit(callable)             Invoke no-argument function at shutdown
+  include(file, [loc])         Include filename or file-like object
+  expand(string, [loc])        Explicitly expand string and return
+  string(data, [name], [loc])  Process string-like object
+  quote(string)                Quote prefixes in provided string and return
+  flatten([keys])              Flatten module contents into globals namespace
   getPrefix()                  Get current prefix
   setPrefix(char)              Set new prefix
   stopDiverting()              Stop diverting; data now sent directly to output
+  createDiversion(name)        Create a diversion but do not divert to it
+  retrieveDiversion(name)      Retrieve the actual named diversion object
   startDiversion(name)         Start diverting to given diversion
   playDiversion(name)          Recall diversion and then eliminate it
   replayDiversion(name)        Recall diversion but retain it
@@ -1563,12 +1842,15 @@ The %s pseudomodule contains the following attributes:
   resetFilter()                Reset filter; no filtering
   nullFilter()                 Install null filter
   setFilter(filter)            Install new filter or filter chain
+  enableHooks()                Enable hooks (default)
+  disableHooks()               Disable hook invocation
+  areHooksEnabled()            Return whether or not hooks are enabled
   getHooks(name)               Get the list of hooks with name
   clearHooks(name)             Clear all hooks with name
+  clearAllHooks()              Clear absolutely all hooks
   addHook(name, hook, [i])     Register hook with name (optionally insert)
   removeHook(name, hook)       Remove hook from name
   invokeHook(name_, ...)       Manually invoke hook with name
-  atExit(callable)             Invoke no-argument function at shutdown
   Filter                       The base class for custom filters
   NullFilter                   A filter which never outputs anything
   FunctionFilter               A filter which calls a function
@@ -1600,100 +1882,121 @@ The following hooks are supported:
   before_significate           A significator is about to be processed
   after_significate            A significator has just finished processing
 
+The following environment variables are recognized (with their command line
+equivalents shown):
+  EMPY_OPTIONS                 Specified options will be included
+  EMPY_PREFIX                  Specify the default prefix: -p <value>
+  EMPY_FLATTEN                 Flatten empy pseudomodule if defined: -f
+  EMPY_RAW                     Show raw errors if defined: -r
+  EMPY_INTERACTIVE             Enter interactive mode if defined: -i
+  EMPY_BUFFERED_OUTPUT         Fully buffered output if defined: -B
+
 Notes: Whitespace immediately inside parentheses of @(...) are
 ignored.  Whitespace immediately inside braces of @{...} are ignored,
 unless ... spans multiple lines.  Use @{ ... }@ to suppress newline
 following expansion.  Simple expressions ignore trailing dots; `@x.'
 means `@(x).'.  A #! at the start of a file is treated as a @#
 comment.
-""" % (sys.argv[0], INTERNAL_MODULE_NAME))
+""" % (sys.argv[0], __version__, INTERNAL_MODULE_NAME))
 
 def invoke(args):
-    """Run a standalone instance of an empy interpeter."""
+    """Run a standalone instance of an EmPy interpeter."""
     # Initialize the options.
-    Output = None
-    RawErrors = False
-    BufferedOutput = False
-    ExitOnError = True
-    Preprocessing = []
-    Prefix = DEFAULT_PREFIX
-    Flatten = False
-    Interactive = False
+    _output = None
+    _options = {BUFFERED_OPT: environment(BUFFERED_ENV, False),
+                RAW_OPT: environment(RAW_ENV, False),
+                EXIT_OPT: True,
+                FLATTEN_OPT: environment(FLATTEN_ENV, False)}
+    _preprocessing = []
+    _prefix = environment(PREFIX_ENV, DEFAULT_PREFIX)
+    _interactive = environment(INTERACTIVE_ENV, False)
+    _extraArguments = environment(OPTIONS_ENV)
+    if _extraArguments is not None:
+        _extraArguments = string.split(_extraArguments)
+        args = _extraArguments + args
     # Parse the arguments.
-    pairs, remainder = getopt.getopt(args, 'vhkp:frio:a:P:I:E:F:B', ['version', 'help', 'suppress-errors', 'prefix=', 'flatten', 'raw', 'interactive', 'raw-errors', 'output=' 'append=', 'preprocess=', 'import=', 'execute=', 'execute-file=', 'buffered-output'])
+    pairs, remainder = getopt.getopt(args, 'Vhkp:frio:a:P:I:D:E:F:B', ['version', 'help', 'suppress-errors', 'prefix=', 'flatten', 'raw-errors', 'interactive', 'output=' 'append=', 'preprocess=', 'import=', 'define=', 'execute=', 'execute-file=', 'buffered-output'])
     for option, argument in pairs:
-        if option in ('-v',  '--version'):
+        if option in ('-V', '--version'):
             sys.stderr.write("%s version %s\n" % (__program__, __version__))
             return
         elif option in ('-h', '--help'):
             usage()
             return
         elif option in ('-k', '--suppress-errors'):
-            ExitOnError = False
-            Interactive = True # suppress errors implies interactive mode
+            _options[EXIT_OPT] = False
+            _interactive = True # suppress errors implies interactive mode
         elif option in ('-p', '--prefix'):
-            Prefix = argument
+            _prefix = argument
         elif option in ('-f', '--flatten'):
-            Flatten = True
-        elif option in ('-r', '--raw', '--raw-errors'):
-            RawErrors = True
+            _options[FLATTEN_OPT] = True
+        elif option in ('-r', '--raw-errors'):
+            _options[RAW_OPT] = True
         elif option in ('-i', '--interactive'):
-            Interactive = True
+            _interactive = True
         elif option in ('-o', '--output'):
-            Output = AbstractFile(argument, 'w', BufferedOutput)
+            _output = AbstractFile(argument, 'w', _options[BUFFERED_OPT])
         elif option in ('-a', '--append'):
-            Output = AbstractFile(argument, 'a', BufferedOutput)
+            _output = AbstractFile(argument, 'a', _options[BUFFERED_OPT])
         elif option in ('-P', '--preprocess'):
-            Preprocessing.append(('pre', argument))
+            _preprocessing.append(('pre', argument))
         elif option in ('-I', '--import'):
             for module in string.split(argument, ','):
                 module = string.strip(module)
-                Preprocessing.append(('import', module))
+                _preprocessing.append(('import', module))
+        elif option in ('-D', '--define'):
+            _preprocessing.append(('define', argument))
         elif option in ('-E', '--execute'):
-            Preprocessing.append(('exec', argument))
+            _preprocessing.append(('exec', argument))
         elif option in ('-F', '--execute-file'):
-            Preprocessing.append(('file', argument))
+            _preprocessing.append(('file', argument))
         elif option in ('-B', '--buffered-output'):
-            BufferedOutput = True
+            _options[BUFFERED_OPT] = True
     if not remainder:
         remainder.append('-')
     # Set up the main filename and the argument.
     filename, arguments = remainder[0], remainder[1:]
     # Set up the interpreter.
-    if BufferedOutput and Output is None:
-        raise CommandLineError, \
-              "buffered output only makes sense with -o or -a arguments."
-    interpreter = Interpreter(output=Output, argv=remainder, prefix=Prefix)
-    if Flatten:
-        interpreter.pseudo.flatten()
+    if _options[BUFFERED_OPT] and _output is None:
+        raise ValueError, \
+              "-B only makes sense with -o or -a arguments."
+    if len(_prefix) != 1:
+        raise ValueError, "prefix must be only one character long"
+    interpreter = Interpreter(_output, remainder, _prefix, _options)
     try:
         # Execute command-line statements.
         i = 0
-        for which, thing in Preprocessing:
+        for which, thing in _preprocessing:
             if which == 'pre':
                 command = interpreter.file
                 target = open(thing, 'r')
                 name = thing
+            elif which == 'define':
+                command = interpreter.string
+                if string.find(thing, '=') >= 0:
+                    target = '%s{%s}' % (_prefix, thing)
+                else:
+                    target = '%s{%s = None}' % (_prefix, thing)
+                name = '<define:%d>' % i
             elif which == 'exec':
                 command = interpreter.string
-                target = '%s{%s}' % (Prefix, thing)
+                target = '%s{%s}' % (_prefix, thing)
                 name = '<exec:%d>' % i
             elif which == 'file':
                 command = interpreter.string
                 name = '<file:%d (%s)>' % (i, thing)
-                target = '%s{execfile("""%s""")}' % (Prefix, thing)
+                target = '%s{execfile("""%s""")}' % (_prefix, thing)
             elif which == 'import':
                 command = interpreter.string
                 name = '<import:%d>' % i
-                target = '%s{import %s}' % (Prefix, thing)
+                target = '%s{import %s}' % (_prefix, thing)
             else:
                 assert 0
-            interpreter.wrap(command, (target, name), \
-                             BufferedOutput, RawErrors)
+            interpreter.wrap(command, (target, name))
             i = i + 1
-        # Start
+        # Now process the primary file.
         if filename == '-':
-            if not Interactive:
+            if not _interactive:
                 name = '<stdin>'
                 file = sys.stdin
             else:
@@ -1702,10 +2005,10 @@ def invoke(args):
             name = filename
             file = open(filename, 'r')
         if file is not None:
-            interpreter.wrap(interpreter.file, (file, name), \
-                             BufferedOutput, RawErrors, ExitOnError)
-        if Interactive:
-            interpreter.interact(BufferedOutput, RawErrors, ExitOnError)
+            interpreter.wrap(interpreter.file, (file, name))
+        # If we're supposed to go interactive afterwards, do it.
+        if _interactive:
+            interpreter.interact()
     finally:
         interpreter.shutdown()
 
