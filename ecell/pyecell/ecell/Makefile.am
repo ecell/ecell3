@@ -2,6 +2,7 @@ AUTOMAKE_OPTIONS = foreign
 
 if OS_WIN32
   no_undefined = -no-undefined
+  LIBPYTHON = -lpython22
 endif
 
 CXX_FLAGS=@CXX_FLAGS@
@@ -57,7 +58,7 @@ INCLUDES=-I. -I.. ${PYTHON_INCLUDES}
 pkgpython_LTLIBRARIES = _tableio.la
 
 _tableio_la_LDFLAGS=-module -export-dynamic -avoid-version $(no_undefined)
-_tableio_la_LIBADD=
+_tableio_la_LIBADD= $(LIBPYTHON)
 _tableio_la_SOURCES = \
 _tableio.c
 

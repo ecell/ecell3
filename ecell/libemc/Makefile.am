@@ -1,7 +1,7 @@
 libdir=@libdir@
 
 if OS_WIN32
-  no_undefined = -no-undefined
+  no_undefined = -no-undefined -Wl,--enable-runtime-pseudo-reloc
 endif
 
 ECELLDIR=..

@@ -10,6 +10,7 @@ pkgpythondir=@pkgpythondir@
 
 if OS_WIN32
   no_undefined = -no-undefined
+  LIBPYTHON = -lpython22
   SHLEXT = .dll
 else
   SHLEXT = @LTDL_SHLIB_EXT@
@@ -44,7 +45,7 @@ PyEcs.hpp
 
 _ecs_la_LDFLAGS=-module -export-dynamic -avoid-version $(no_undefined)
 
-_ecs_la_LIBADD=$(LIBECS) $(LIBEMC) $(LIBBOOSTPYTHON)
+_ecs_la_LIBADD=$(LIBECS) $(LIBEMC) $(LIBBOOSTPYTHON) $(LIBPYTHON)
 
 _ecs_la_DEPENDENCIES=$(LIBECS) $(LIBEMC)
 

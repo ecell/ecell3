@@ -22,6 +22,11 @@ STDINCLUDE="-I${prefix}/include -I${ECELL_INCLUDE} -I${LIBECS_INCLUDE} -I."
 
 DMCOMPILE="${BINDIR}/dmcompile"
 
+if OS_WIN32
+  LIBPYTHON=-lpython22 -lboost_python
+endif
+
+
 unset CXXFLAGS LDFLAGS VERBOSE NO_STDINCLUDE NO_STDLIBDIR
 
 usage() 
@@ -107,7 +112,7 @@ while [ -n "$(echo $1 | grep '-')" ]; do
     case "$1" in
 	--no-stdinclude) NO_STDINCLUDE=yes ; shift ;;
 	--no-stdlibdir) NO_STDLIBDIR=yes ; shift ;;
-	--ldflags=*) LDFLAGS="$LDFLAGS $( echo $1 | cut -d'=' -f2 )"; shift ;;
+	--ldflags=*) LDFLAGS="-Wl,--enable-runtime-pseudo-reloc $LDFLAGS $( echo $1 | cut -d'=' -f2 )"; shift ;;
 	--no-define-cxxflags=*) NO_DEFINE_CXXFLAGS=yes;CXXFLAGS="$CXXFLAGS $( echo $1 | cut -d'=' -f2 )"; shift ;;
 	--cxxflags=*) CXXCOMPILEFLAGS="$CXXFLAGS $( echo $1 | cut -d'=' -f2 )"; shift ;;
 	--dmcompile=*) DMCOMPILE=$( echo $1 | cut -d'=' -f2 )/dmcompile ; shift ;;
@@ -157,7 +162,7 @@ if [ ! $NO_STDLIBDIR ] ; then
 fi
 
 
-LDFLAGS="$LDFLAGS -lecs"
+LDFLAGS="$LDFLAGS -lecs -lgsl ${LIBPYTHON}"
 
 export LDFLAGS
 
