@@ -512,12 +512,12 @@ else:
 
 	<para>To check if a corresponding object to an
 	&ObjectStub; exists in the simulator, use
-	<methodname>isExist</methodname>() method.  For example, the
+	<methodname>exists</methodname>() method.  For example, the
 	following if statement checks if a Stepper whose ID is
 	<literal>STEPPER_01</literal> exists:
 <informalexample>
 	    <programlisting>aStepperStub = createStepperStub( 'STEPPER_01' )
-if aStepperStub.isExist():
+if aStepperStub.exists():
     # it already exists
 else:
     # it is not created yet</programlisting>

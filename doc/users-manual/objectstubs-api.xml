@@ -47,10 +47,10 @@
             </entry>
       </row>
 
-      <!-- isExist -->
+      <!-- exists -->
       <row>
 	<entry namest='c1' nameend='c1' align='left'>
-<synopsis><methodname>isExist</methodname>()
+<synopsis><methodname>exists</methodname>()
 </synopsis></entry>
 
 	<entry><type>boolean</type></entry>

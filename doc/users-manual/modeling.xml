@@ -432,10 +432,8 @@ The &Entity; class has three subclasses:
       format with a programming language-like syntax and a powerful
       embedded &empy; preprocessor, which is
       designed to be productive and intuitive especially when handled
-      by text editors and other text processing programs such as
-      UNIX's <application>grep</application>,
-      <application>diff</application> and
-      <application>cat</application>.  Semantics of &EM; and &EML; files
+      by text editors and other text processing programs.
+      Semantics of &EM; and &EML; files
       are almost completely equivalent to each other, and going
       between these two formats is meant to be possible with no loss
       of information (some exceptions are comments and directions to
@@ -450,10 +448,10 @@ The &Entity; class has three subclasses:
          Environment</application> (which is under development) will
          provide means of more sophisticated, scalable and intelligent
          model construction on the basis of &EML;, learning syntax and
-         semantics of &EM; may help you to get the idea of how object
+         semantics of &EM; may help you get the idea of how object
          model inside &ecell; is organized and how it is driven to
          conduct simulations.  Furthermore, owing to the nature of
-         plain programming language-like syntax, &EM; can be used as a
+         the plain programming language-like syntax, &EM; can be used as a
          simple and intuitive tool to communicate with other &ecell;
          users.  In fact, this manual uses &EM; to illustrate how the
          model is constructed in &ecell;</para>

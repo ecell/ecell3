@@ -529,7 +529,7 @@ are the same, this implies time scale of both sub-models are different.
 
          Setting <varname>ALGORITHM1</varname> to <literal>'NR'</literal> and
          <varname>ALGORITHM2</varname> to <literal>'ODE</literal> would be
-         an ideal configuration.  This runs a magnitute faster than
+         an ideal configuration.  This runs a magnitude faster than
          the pure-stochastic configuration.
 
 <programlisting>
