@@ -189,9 +189,12 @@ namespace libecs
 	    }
 	}
 
+    // sort by memory address. this is an optimization.
+    std::sort( theProcessVector.begin(), theProcessVector.end() );
+
     // sort by Process priority
-    std::sort( theProcessVector.begin(), theProcessVector.end(),
-	       Process::PriorityCompare() );
+    std::stable_sort( theProcessVector.begin(), theProcessVector.end(),
+		      Process::PriorityCompare() );
 
     // find boundary of negative and zero priority processes
     theFirstNormalProcess = 
@@ -256,9 +259,12 @@ namespace libecs
 	  }
       }
 
+    // sort by memory address. this is an optimization.
     std::sort( theReadVariableVector.begin(), theReadVariableVector.end() );
     std::sort( aVariableVector.begin(), aVariableVector.end() );
 
+
+    // create VariableProxies.
     for( VariableVectorIterator i( aVariableVector.begin() );
 	 i != aVariableVector.end(); ++i )
       {
@@ -267,8 +273,6 @@ namespace libecs
 	  push_back( createVariableProxy( aVariablePtr ) );
       }
 
-
-		    
   }
 
   void Stepper::updateDependentStepperVector()
