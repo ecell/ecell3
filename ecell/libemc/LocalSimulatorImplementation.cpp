@@ -42,7 +42,6 @@
 
 #include "LocalSimulatorImplementation.hpp"
 
-
 namespace libemc
 {
 
@@ -181,10 +180,10 @@ namespace libemc
 
 
   const libecs::PolymorphMap 
-  LocalSimulatorImplementation::getClassInfo( StringCref aClasstype,
-					      StringCref aClassname )
+  LocalSimulatorImplementation::getClassInfo( libecs::StringCref aClasstype,
+					      libecs::StringCref aClassname, const libecs::Integer forceReload )
   {
-    return getModel().getClassInfo( aClasstype, aClassname );
+    return getModel().getClassInfo( aClasstype, aClassname, forceReload );
   }
   
   void LocalSimulatorImplementation::createEntity( StringCref aClassname,

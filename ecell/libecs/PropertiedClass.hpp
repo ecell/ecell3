@@ -146,7 +146,11 @@ return reinterpret_cast<const void*>(&thePropertyInterface.getInfoMap());\
   //
 
 #define INHERIT_PROPERTIES( BASECLASS )\
-    BASECLASS::initializePropertyInterface( Type2Type<TT>() )
+    BASECLASS::initializePropertyInterface( Type2Type<TT>() );\
+    CLASS_INFO( "Baseclass", # BASECLASS )
+    
+#define CLASS_DESCRIPTION( DESCRIPTION )\
+    CLASS_INFO( "Description", DESCRIPTION )
 
 #define NOMETHOD NULLPTR
 
@@ -165,7 +169,7 @@ return reinterpret_cast<const void*>(&thePropertyInterface.getInfoMap());\
   */
 
 #define CLASS_INFO( FIELDNAME, FIELDVALUE) \
- PropertyInterface<TT>::setInfoField( String ( FIELDNAME ), String( FIELDVALUE ) );
+ PropertyInterface<TT>::setInfoField( String ( FIELDNAME ), String( FIELDVALUE ) )
 
 
   /** 

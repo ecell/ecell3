@@ -240,11 +240,18 @@ namespace libemc
     //@}
 
     const libecs::PolymorphMap getClassInfo( libecs::StringCref aClasstype,
-		    			   libecs::StringCref aClassname ) const
+		    			   libecs::StringCref aClassname) 
     {
-	    return theSimulatorImplementation->getClassInfo( aClasstype, aClassname );
+
+	    return theSimulatorImplementation->getClassInfo( aClasstype, aClassname, 0 );
     }
 
+    const libecs::PolymorphMap getClassInfo( libecs::StringCref aClasstype,
+		    			   libecs::StringCref aClassname, 
+		    			   const libecs::Integer forceReload ) 
+    {
+	    return theSimulatorImplementation->getClassInfo( aClasstype, aClassname, forceReload );
+    }
 
     
     /**
@@ -551,6 +558,7 @@ namespace libemc
 
     void step( const libecs::Integer aNumSteps = 1 )
     {
+
       theSimulatorImplementation->step( aNumSteps );
     }
 

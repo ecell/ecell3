@@ -97,7 +97,12 @@ BOOST_PYTHON_MODULE( _emc )
   // Simulator class
   class_<Simulator>( "Simulator" )
     .def( init<>() )
-    .def( "getClassInfo", 		  &Simulator::getClassInfo )
+    .def( "getClassInfo", 	( const PolymorphMap ( Simulator::* )
+                            ( StringCref, StringCref ) )	  
+                                          &Simulator::getClassInfo )
+    .def( "getClassInfo", 	( const PolymorphMap ( Simulator::* )
+                            ( StringCref, StringCref, const Integer ) )	  
+                                          &Simulator::getClassInfo )
     // Stepper-related methods
     .def( "createStepper",                &Simulator::createStepper )
     .def( "deleteStepper",                &Simulator::deleteStepper )

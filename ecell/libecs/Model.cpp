@@ -94,26 +94,25 @@ namespace libecs
   }
 
 
-  PolymorphMap Model::getClassInfo( StringCref aClassType, StringCref aClassname )
+  PolymorphMap Model::getClassInfo( StringCref aClassType, StringCref aClassname, Integer forceReload )
   {
 	const void* (*InfoPtrFunc)();
-    
      
 	if ( aClassType == VARIABLETYPE_NAME )
 	  {
-		InfoPtrFunc = getVariableMaker().getModule( aClassname).getInfoLoader();
+		InfoPtrFunc = getVariableMaker().getModule( aClassname, forceReload != 0 ).getInfoLoader();
 	  }
 	else if (aClassType ==  PROCESSTYPE_NAME )
 	  {
-		InfoPtrFunc = getProcessMaker().getModule( aClassname).getInfoLoader();
+		InfoPtrFunc = getProcessMaker().getModule( aClassname, forceReload != 0 ).getInfoLoader();
 	  }
 	else if ( aClassType == SYSTEMTYPE_NAME )
 	  {
-		InfoPtrFunc = getSystemMaker().getModule( aClassname).getInfoLoader();
+		InfoPtrFunc = getSystemMaker().getModule( aClassname, forceReload != 0 ).getInfoLoader();
 	  }
 	else if ( aClassType == STEPPERTYPE_NAME )
 	  {
-		InfoPtrFunc = getStepperMaker().getModule( aClassname).getInfoLoader();
+		InfoPtrFunc = getStepperMaker().getModule( aClassname, forceReload != 0 ).getInfoLoader();
 	  }
 
     else 
@@ -340,10 +339,7 @@ namespace libecs
     theSystemStepperPtr->initialize();
 
   }
-  PolymorphMapCref getClassInfo( StringCref aClassName )
-  {
 
-  }
 
 } // namespace libecs
 

@@ -93,7 +93,8 @@ namespace libemc
 
     virtual const libecs::PolymorphMap
 	   	 getClassInfo( libecs::StringCref aClasstype,
-			       libecs::StringCref aClassname );
+			       libecs::StringCref aClassname,
+			       const libecs::Integer forceReload );
 
     
     virtual void createEntity( libecs::StringCref aClassname, 
