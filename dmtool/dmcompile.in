@@ -92,7 +92,6 @@ def main():
 	msg( "Error: The compiler failed to create " + SOBJ )
 	sys.exit(1)
     
-    msg( 'generated ' + SOBJ )
     cleanup( OBJ )
 
 if __name__ == '__main__':
