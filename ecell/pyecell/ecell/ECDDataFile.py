@@ -33,6 +33,7 @@
 import string
 from DataFile import *
 import Numeric
+import TableIO
 
 # extension
 ECD_EXTENSION='ecd'
@@ -86,13 +87,9 @@ class ECDDataFile( DataFile ):
 		# writes header
 		aOutputFile.write(self.getHeaderString())
 
-		#FIXME: vefy inefficient. should use numpyio module here
-		
-		def array_print( array ):
-			aOutputFile.write( string.lstrip( Numeric.array2string( array,10000,15,1 )[1:-1] + '\n' ) )
-		map( array_print, self.theData )
+                aOutputFile.close()
+		TableIO.writeArray( self.theFileName, self.theData, 1 )
 
-		aOutputFile.close()
 
 	# end of save
 
@@ -158,7 +155,7 @@ class ECDDataFile( DataFile ):
 			if aBuff == '':
 				break	
 
-			# if separator is found, breaks this loop.
+		# if separator is found, breaks this loop.
 			if aBuff.find( '#----------------------' ) == 0:
 				break
 
@@ -168,26 +165,10 @@ class ECDDataFile( DataFile ):
 		# [6] reads matrix data
 		# ----------------------------------------------------------
 
-		#FIXME: very inefficient. use numpyio.
-		
-		aMatrixList = []
-		for aBuff in aInputFile.xreadlines():
-			aDataListOfOneLine = aBuff.strip().split()
-			aMatrixList.append( Numeric.array( map( float, aDataListOfOneLine ) ) )
-
  		#close the file 
 		aInputFile.close()
 
-		# checks matrix size
-		self.theSizeOfLine = len(aMatrixList)
-		if self.theSizeOfLine >= 1:
-			self.theSizeOfColumn = len(aMatrixList[0])
-		else:
-			self.theSizeOfColumn = 0
-
-		self.theData = Numeric.array(aMatrixList,Numeric.Float)
-
-
+		self.setData( TableIO.readTableAsArray( self.theFileName, '#' ) )
 
 	# end of load
 

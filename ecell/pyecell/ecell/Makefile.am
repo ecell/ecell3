@@ -1,8 +1,12 @@
 AUTOMAKE_OPTIONS = foreign
 
+CXX_FLAGS=@CXX_FLAGS@
+PYTHON_INCLUDES=@PYTHON_INCLUDES@
+pkgpythondir=@pkgpythondir@
 
-pyecelldir=${pythondir}/ecell
-pyecell_PYTHON=\
+LIBS=  # do not need gsl and gslcblas linked
+
+pkgpython_PYTHON=\
 __init__.py\
 EntityStub.py\
 LoggerStub.py\
@@ -23,8 +27,15 @@ util.py\
 Window.py\
 eml.py\
 em.py\
-spark.py
+spark.py\
+TableIO.py
 
+INCLUDES=-I. -I.. ${PYTHON_INCLUDES}
 
-EXTRA_DIST=${pyecell_PYTHON}
+pkgpython_LTLIBRARIES = _tableio.la
+
+_tableio_la_LDFLAGS=-module -export-dynamic -avoid-version
+_tableio_la_LIBADD=
+_tableio_la_SOURCES = \
+_tableio.c
 

@@ -1,0 +1,187 @@
+TableIO - 
+A module for reading ASCII tables into Python lists and NumPy
+arrays.
+
+--------------------------------------------------------------------
+Copyright (C) 2000 Michael A. Miller <mmiller@debian.org>
+Time-stamp: <2000-08-09 17:27:48 miller>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or (at
+your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+02111-1307 USA.
+
+--------------------------------------------------------------------
+
+
+When I first started using Python, I wanted to read lots of
+numbers into NumPy arrays.  This can be done with the standard
+Python file reading methods, but I found that to be prohibitively
+slow for largish data sets.  So I wrote TableIO, which lets me
+start with a file containing a rectangular array of ASCII data (a
+`table') and read it into Python so I can manipulate it.  For
+example, if I have a file containing an table in a file with 10
+columns and 50 rows, I can use
+
+  >>> d = TableIO.readTableAsArray(file,'#') 
+
+to get an array with shape (50,10).  (The '#' means ignore lines
+with a # in them.)  If I only want to read a couple columns, say
+the first and ninth and tenth, I can use
+
+  >>> [x, y, dy] = TableIO.readColumns(file, '#', [0, 8, 9])
+
+to read the first column in to the 1D array x and the eigth and
+ninth into y and dy (I've stuck with Python's first element = 0
+in indexing columns).
+
+The structure of the files that TableIO can handle is limited.
+The only valid data lines are those that contain a series of
+numbers (integers or floating point.  They are all converted to
+floating point.
+
+Any line containing comment character anywhere an the line is
+considered a comment line and is ignored.  Blank lines at the end
+of a file are ignored.  Blank lines in the middle of a file are
+treated as comment lines.  Comment characters are specified as
+parameters to read commands - see below for details.
+
+If you find something here that doesn't do what I say it should,
+or what you think it should, let me know.  Suggestions for
+improvements and additions are also very welcome.  I can be
+reached at <mmiller@debian.org>
+
+
+Installation
+============
+See the Setup file for instructions.  This module has been tested
+and used on Debian/GNU Linux 2.0 and HPUX 10.20.
+
+
+TableIO.py
+==========
+Contains a handful of simple functions that use tableio and
+manipulate table dictionaries:
+
+readTable(file,commentchars) 
+----------------------------
+Wrapper around tableio.readTable
+
+TableToArray(t)
+---------------
+Converts a dictionary as returned by readTable to a rectangular
+NumPy array with shape (rows, columns).
+
+readTableAsArray(file,commentchars)
+-----------------------------------
+Reads a table from a file and returns it a rectangular array.  
+
+extractColumns(table, commentchars, columns='all')
+--------------------------------------------------
+Returns a list of 1-dimensional NumPy arrays.  "table" must be a
+table dictionary as returned by tableio.readTable.  If columns is
+`all' or not present, all the columns are returned.  If columns
+is a list containing j integers [c0, c1, ..., cj], a list
+containing only the columns listed is returned.
+
+readColumns(file, commentchars, columns='all')
+----------------------------------------------
+Reads a table from a file and returns a list of 1-dimensional
+NumPy arrays using extractColumns.
+
+writeArray(file, array)
+-----------------------
+Writes a rectangular array to a file
+
+writeTable(t)
+-------------
+Writes a table (as returned by readTable) to a file
+
+writeColumns(file, list)
+------------------------
+Writes a table to file.  Each column in the table is taken from a
+1D array in list (in order).
+
+TableFromColumns(list)
+----------------------
+Makes a table for a list of 1D NumPy arrays (used internally by
+writeColumns)
+
+
+_tableio.c
+==========
+
+tableio.readTable 
+----------------- 
+Called with two Python string arguments: a file name and comment
+characters.  readTable reads the file, ignoring all lines that
+contain any character in the comment character string..  Once a
+line that is not a comment is found, it is parsed into
+whitespace-separated fields (with whitespace defined as
+`<space>\t\n') and each field is appended to a Python list
+object.  This first line is used to determine how many columns
+(fields) are in the table.  Then each following line in the file
+is read and parsed in turn.  If any line is found that contains a
+different number of columns than the first non-comment line, an
+error is set.  All lines with a comment character in them are
+skipped.
+
+After the entire file is read, the data, number of columns,
+number of rows and the file name are added to a Python dictionary
+which is returned.
+
+Here's an example file:
+
+1.6607283  1.51        0.0382   
+1.6610466  1.5104816   0.0305  
+1.6613649  1.5109631   0.0376
+1.6616832  1.5114447   0.0330
+
+and the dictionary returned by tableio.readTable:
+{'filename': 'test.data.small', 
+ 'columns': 3, 
+ 'data': [1.6607283, 1.51, 0.0382, 1.6610466, 1.5104816, 0.0305,
+          1.6613649, 1.5109631, 0.0376, 1.6616832, 1.5114447, 0.033], 
+ 'rows': 4}
+
+
+tableio.writeTable 
+------------------
+Four arguments: a file name, a list of numbers and the number of
+rows and columns in the table.  It writes a table to the file
+with a single space after each number.
+
+
+To-Do:
+======
+- Add row selection mechanism.  If I can chose columns, may as
+  well be able to chose rows.
+
+- Data types other than floats.  All returned numbers are floats.
+  They could be converted to integers easily.  Complex numbers
+  would be a bit of a trick as there would need to be more
+  parsing done.  This could be done easily if the real and
+  imaginary parts were in two separate columns.
+
+- More flexible line parsing.  What if I want to read a file with
+  a line like `1.0 0.34 +/- 0.08'?  That could be handy.  Or if I
+  have comments at the end of the line?
+
+- Error checking in TableIO.py and _tableio.c.
+
+- Probably not the cleanest thing for reading very large tables.
+  Any suggestions for improvements along that line are very
+  welcome.
+
+- Use Python file objects for reading and writing so that stdin
+  and stdout can be used.
