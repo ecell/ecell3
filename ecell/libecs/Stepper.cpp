@@ -32,7 +32,7 @@
 
 #include "Substance.hpp"
 #include "Integrators.hpp"
-#include "RootSystem.hpp"
+#include "Model.hpp"
 #include "Util.hpp"
 #include "FullID.hpp"
 
@@ -54,22 +54,13 @@ namespace libecs
 
   void Stepper::initialize()
   {
-    for( SystemVectorConstIterator i( theSystemVector.begin() ); 
-	 i != theSystemVector.end() ; ++i )
-      {
-	//FIXME: workaround, should be eliminated
-	if( typeid( **i ) != typeid( RootSystem ) )
-	  {
-	    (*i)->initialize();
-	  }
-      }
+    FOR_ALL( SystemVector, theSystemVector, initialize );
   }
 
 
   void Stepper::connectSystem( SystemPtr aSystem )
   { 
     theSystemVector.push_back( aSystem );
-
   }
 
   void Stepper::disconnectSystem( SystemPtr aSystem )

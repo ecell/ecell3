@@ -80,36 +80,6 @@ namespace libecs
     virtual StringLiteral getClassName() const { return "System"; }
 
     /**
-       Set a pointer to the RootSystem.
-       Usually no need to use this because
-       setSuperSystem() will do this automatically.
-
-       @return the pointer to the RootSystem.
-    */
-    void setRootSystem( RootSystemPtr aRootSystem ) 
-    { 
-      theRootSystem = aRootSystem; 
-    }
-
-    /**
-       Get a pointer to the RootSystem that this System belongs.
-       Unlike other Primitive classes, System objects must the pointer
-       to the RootSystem.
-
-       @return the pointer to the RootSystem.
-    */
-    virtual RootSystemPtr getRootSystem() const { return theRootSystem; }
-
-    /**
-       Set supersystem of this System.
-       Unlike other Primitive classes, theRootSystem is also set 
-       in this method as well as theSupersystem.
-
-       @param supersystem a pointer to a System to which this object belongs.
-    */
-    void setSuperSystem( SystemPtr aSystem );
-
-    /**
        Returns a pointer to a Stepper object that this System belongs.
 
        This overrides Entity::getStepper().
@@ -124,7 +94,7 @@ namespace libecs
     }
 
     /**
-       Instantiate a Stepper object of @a classname using theRootSystem's
+       Instantiate a Stepper object of @a classname using theModel's
        StepperMaker object.  Register the Stepper object as a stepper for 
        this System.
 
@@ -201,20 +171,10 @@ namespace libecs
     */
     virtual SystemPtr getSystem( StringCref id );
 
-    /**
-       This method finds recursively a System object pointed by
-       @a SystemPath
-
-       @return An pointer to a System object in this or subsystems of this
-       System object pointed by @a SystemPath
-    */
-    virtual SystemPtr getSystem( SystemPathCref aSystemPath );
-
-    virtual EntityPtr getEntity( FullIDCref aFullID );
-
-    virtual void createEntity( StringCref aClassname,
-			       FullIDCref aFullID,
-			       StringCref aName );
+    bool isRootSystem() const
+    {
+      return ( getSuperSystem() == this );
+    }
 
 
     const Real getActivityPerSecond() const;
@@ -222,6 +182,8 @@ namespace libecs
     virtual void setStepInterval( RealCref aStepInterval );
     virtual const Real getStepInterval() const;
     const Real getStepsPerSecond() const;
+
+    virtual const SystemPath getSystemPath() const;
 
     void notifyChangeOfEntityList();
 
@@ -262,8 +224,6 @@ namespace libecs
     ReactorMap   theReactorMap;
     SubstanceMap theSubstanceMap;
     SystemMap    theSystemMap;
-
-    RootSystemPtr theRootSystem;
 
     bool         theEntityListChanged;
 

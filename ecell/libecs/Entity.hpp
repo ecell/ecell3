@@ -50,7 +50,9 @@ namespace libecs
 
   */
 
-  class Entity : public PropertyInterface
+  class Entity 
+    : 
+    public PropertyInterface
   {
 
   public:
@@ -65,12 +67,20 @@ namespace libecs
 
        @param supersystem a pointer to a System to which this object belongs.
     */
-    virtual void setSuperSystem( SystemPtr const supersystem ) 
+    void setSuperSystem( SystemPtr const supersystem ) 
     { 
       theSuperSystem = supersystem; 
     }
 
-    virtual RootSystemPtr getRootSystem() const;
+    void setModel( ModelPtr const aModel )
+    {
+      theModel = aModel;
+    }
+
+    ModelPtr getModel() const
+    {
+      return theModel;
+    }
 
     SystemPtr getSuperSystem() const 
     {
@@ -126,6 +136,13 @@ namespace libecs
       return PrimitiveType( PrimitiveType::ENTITY );
     }
 
+    /**
+       Returns SystemPath of this Entity.
+
+       The SystemPath doesn't include ID of this Entity even if 
+       this Entity is a System.
+    */
+
     virtual const SystemPath getSystemPath() const;
 
     /**
@@ -180,6 +197,7 @@ namespace libecs
 
   private:
 
+    ModelPtr  theModel;
     SystemPtr theSuperSystem;
     String    theID;
     String    theName;

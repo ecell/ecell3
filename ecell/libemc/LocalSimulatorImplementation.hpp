@@ -55,15 +55,14 @@ namespace libemc
     LocalSimulatorImplementation();
     virtual ~LocalSimulatorImplementation();
 
-    libecs::RootSystemRef   getRootSystem() 
+    libecs::ModelRef getModel() 
     { 
-      return theRootSystem; 
+      return theModel; 
     }
 
-    libecs::LoggerBrokerRef getLoggerBroker()
-    { 
-      return theLoggerBroker; 
-    }
+    virtual void createStepper( libecs::StringCref          classname, 
+				libecs::StringCref          id,
+				libecs::UVariableVectorCref data );
 
     virtual void createEntity( libecs::StringCref    classname, 
 			       libecs::PrimitiveType type,
@@ -86,6 +85,8 @@ namespace libemc
     void step();
 
     void initialize();
+
+    virtual const libecs::Real getCurrentTime();
 
     virtual libecs::LoggerPtr getLogger( libecs::PrimitiveType type,
 					 libecs::StringCref    systempath,
@@ -116,8 +117,8 @@ namespace libemc
 
   private:
 
-    libecs::RootSystemRef      theRootSystem;
-    libecs::LoggerBrokerRef    theLoggerBroker;
+    libecs::ModelRef           theModel;
+
     bool                       theRunningFlag;
     PendingEventCheckerFuncPtr thePendingEventChecker;
     EventHandlerFuncPtr        theEventHandler;

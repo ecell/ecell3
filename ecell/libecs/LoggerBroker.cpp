@@ -34,7 +34,7 @@
 #include "Logger.hpp"
 #include "PropertyInterface.hpp"
 #include "FullID.hpp"
-#include "RootSystem.hpp"
+#include "Model.hpp"
 
 #include "LoggerBroker.hpp"
 
@@ -42,10 +42,10 @@
 namespace libecs
 {
 
-  LoggerBroker::LoggerBroker( RootSystemRef aRootSystem )
+  LoggerBroker::LoggerBroker( ModelRef aModel )
     :
-    theRootSystem( aRootSystem ),
-    theGetCurrentTimeMethod( theRootSystem, &RootSystem::getCurrentTime )
+    theModel( aModel ),
+    theGetCurrentTimeMethod( theModel, &Model::getCurrentTime )
   {
     ; // do nothing
   }
@@ -75,7 +75,7 @@ namespace libecs
 
   LoggerPtr LoggerBroker::createLogger( FullPNCref fpn )
   {
-    EntityPtr anEntityPtr(theRootSystem.getEntity( fpn.getFullID() ));
+    EntityPtr anEntityPtr( getModel().getEntity( fpn.getFullID() ) );
 
     String aPropertyName( fpn.getPropertyName() );
 

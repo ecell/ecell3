@@ -32,7 +32,7 @@
 
 #include "System.hpp"
 #include "Reactor.hpp"
-#include "RootSystem.hpp"
+#include "Model.hpp"
 #include "SubstanceMaker.hpp"
 #include "ReactorMaker.hpp"
 #include "Substance.hpp"
@@ -122,7 +122,7 @@ namespace libecs
   const UVariableVectorRCPtr System::getStepperID() const
   {
     UVariableVectorRCPtr aVector( new UVariableVector );
-    //    aVector->push_back( UVariable( getRootSystem()->getStepperLeader()->
+    //    aVector->push_back( UVariable( getModel()->
     //				   getStepper()->getClassName() ) );
 
     aVector->push_back( UVariable( "NOT IMPLEMENTED YET" ) );
@@ -134,7 +134,6 @@ namespace libecs
     theVolume( 1 ),
     theVolumeBuffer( 1 ),
     theStepper( NULLPTR ),
-    theRootSystem( NULLPTR ),
     theEntityListChanged( false )
   {
     makeSlots();
@@ -164,17 +163,10 @@ namespace libecs
       }
   }
 
-  void System::setSuperSystem( SystemPtr aSystem )
-  {
-    Entity::setSuperSystem( aSystem );
-    theRootSystem = getSuperSystem()->getRootSystem();
-  }
-
   void System::setStepperID( StringCref anID )
   {
-    theStepper = getRootSystem()->getStepperLeader().getStepper( anID );
+    theStepper = getModel()->getStepper( anID );
     theStepper->connectSystem( this );
-    theStepper->initialize();
   }
 
   void System::setStepInterval( RealCref aStepInterval )
@@ -239,6 +231,7 @@ namespace libecs
 
     theReactorMap[ aReactor->getID() ] = aReactor;
     aReactor->setSuperSystem( this );
+    aReactor->setModel( getModel() );
 
     notifyChangeOfEntityList();
   }
@@ -269,6 +262,7 @@ namespace libecs
 
     theSubstanceMap[ aSubstance->getID() ] = aSubstance;
     aSubstance->setSuperSystem( this );
+    aSubstance->setModel( getModel() );
 
     notifyChangeOfEntityList();
   }
@@ -298,30 +292,9 @@ namespace libecs
 
     theSystemMap[ aSystem->getID() ] = aSystem;
     aSystem->setSuperSystem( this );
+    aSystem->setModel( getModel() );
 
     notifyChangeOfEntityList();
-  }
-
-  SystemPtr System::getSystem( SystemPathCref aSystemPath )
-  {
-    if( aSystemPath.empty() )
-      {
-	return this;
-      }
-
-
-    SystemPath aSystemPathCopy( aSystemPath );
-    SystemPtr aSystem( this );
-
-    // looping is faster than recursive search
-    do
-      {
-	aSystem = aSystem->getSystem( aSystemPathCopy.front() );
-	aSystemPathCopy.pop_front();
-      }
-    while( ! aSystemPathCopy.empty() );
-
-    return aSystem;  
   }
 
   SystemPtr System::getSystem( StringCref anID ) 
@@ -335,67 +308,7 @@ namespace libecs
     return i->second;
   }
 
-  EntityPtr System::getEntity( FullIDCref aFullID )
-  {
-    SystemPtr aSystem ( getSystem( aFullID.getSystemPath() ) );
 
-    switch( aFullID.getPrimitiveType() )
-      {
-      case PrimitiveType::SUBSTANCE:
-	return aSystem->getSubstance( aFullID.getID() );
-      case PrimitiveType::REACTOR:
-	return aSystem->getReactor( aFullID.getID() );
-      case PrimitiveType::SYSTEM:
-	return aSystem->getSystem( aFullID.getID() );
-      default:
-	throw InvalidPrimitiveType( __PRETTY_FUNCTION__, 
-				    "bad PrimitiveType specified." );
-      }
-
-    // NEVER_GET_HERE
-    assert( 0 );
-  }
-
-
-  void System::createEntity( StringCref aClassname,
-			     FullIDCref aFullID,
-			     StringCref aName )
-  {
-    SystemPtr aSuperSystemPtr( getSystem( aFullID.getSystemPath() ) );
-
-    ReactorPtr   aReactorPtr  ( NULLPTR );
-    SystemPtr    aSystemPtr   ( NULLPTR );
-    SubstancePtr aSubstancePtr( NULLPTR );
-
-    switch( aFullID.getPrimitiveType() )
-      {
-      case PrimitiveType::SUBSTANCE:
-	aSubstancePtr = getRootSystem()->
-	  getSubstanceMaker().make( aClassname );
-	aSubstancePtr->setID( aFullID.getID() );
-	aSubstancePtr->setName( aName );
-	aSuperSystemPtr->registerSubstance( aSubstancePtr );
-	break;
-      case PrimitiveType::REACTOR:
-	aReactorPtr = getRootSystem()->getReactorMaker().make( aClassname );
-	aReactorPtr->setID( aFullID.getID() );
-	aReactorPtr->setName( aName );
-	aSuperSystemPtr->registerReactor( aReactorPtr );
-	break;
-      case PrimitiveType::SYSTEM:
-	aSystemPtr = getRootSystem()->getSystemMaker().make( aClassname );
-	aSystemPtr->setID( aFullID.getID() );
-	aSystemPtr->setName( aName );
-	aSuperSystemPtr->registerSystem( aSystemPtr );
-	break;
-
-      default:
-	throw InvalidPrimitiveType( __PRETTY_FUNCTION__, 
-				    "bad PrimitiveType specified." );
-
-      }
-
-  }
 
 
   const Real System::getActivityPerSecond() const
@@ -406,6 +319,18 @@ namespace libecs
   void System::notifyChangeOfEntityList()
   {
     //    getStepper()->getMasterStepper()->setEntityListChanged();
+  }
+
+  const SystemPath System::getSystemPath() const
+  {
+    if( isRootSystem() )
+      {
+	return SystemPath();
+      }
+    else
+      {
+	return Entity::getSystemPath();
+      }
   }
 
 

@@ -67,11 +67,6 @@ namespace libecs
     return 0.0;
   }
 
-  RootSystemPtr Entity::getRootSystem() const
-  {
-    return getSuperSystem()->getRootSystem();
-  }
-
   const Real Entity::getActivityPerSecond() const
   {
     return getActivity() * getSuperSystem()->getStepsPerSecond();

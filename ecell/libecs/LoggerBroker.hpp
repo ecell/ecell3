@@ -54,7 +54,7 @@ namespace libecs
     DECLARE_MAP( const FullPN, 
 		 LoggerPtr, std::less<const FullPN>, LoggerMap );
 
-    LoggerBroker( RootSystemRef aRootSystem );
+    LoggerBroker( ModelRef aModel );
 
     
     ~LoggerBroker();
@@ -65,6 +65,11 @@ namespace libecs
     LoggerMapCref getLoggerMap() const
     {
       return theLoggerMap;
+    }
+
+    ModelRef getModel() const
+    {
+      return theModel;
     }
 
   protected:
@@ -81,7 +86,7 @@ namespace libecs
   private:
 
     LoggerMap     theLoggerMap;
-    RootSystemRef theRootSystem;
+    ModelRef      theModel;
 
     GetCurrentTimeMethodType theGetCurrentTimeMethod;
     

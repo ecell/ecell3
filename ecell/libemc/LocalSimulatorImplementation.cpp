@@ -32,7 +32,6 @@
 
 #include "libecs/libecs.hpp"
 #include "libecs/Message.hpp"
-#include "libecs/RootSystem.hpp"
 #include "libecs/Stepper.hpp"
 #include "libecs/LoggerBroker.hpp"
 
@@ -45,8 +44,7 @@ namespace libemc
 
   LocalSimulatorImplementation::LocalSimulatorImplementation()
     :
-    theRootSystem( *new RootSystem ),
-    theLoggerBroker( *new LoggerBroker( theRootSystem ) ),
+    theModel( *new Model ),
     theRunningFlag( false ),
     thePendingEventChecker( defaultPendingEventChecker ),
     theEventHandler( NULL )
@@ -56,8 +54,15 @@ namespace libemc
 
   LocalSimulatorImplementation::~LocalSimulatorImplementation()
   {
-    delete &theRootSystem;
-    delete &theLoggerBroker;
+    delete &theModel;
+  }
+
+  void LocalSimulatorImplementation::
+  createStepper( libecs::StringCref          classname, 
+		 libecs::StringCref          id,
+		 libecs::UVariableVectorCref data )
+  {
+    getModel().createStepper( classname, id, data );
   }
 
   void LocalSimulatorImplementation::createEntity( StringCref    classname, 
@@ -66,9 +71,7 @@ namespace libemc
 						   StringCref    id,
 						   StringCref    name )
   {
-    getRootSystem().createEntity( classname, 
-				  FullID( type, systempath, id ),
-				  name );
+    getModel().createEntity( classname, FullID( type, systempath, id ), name );
   }
     
   void LocalSimulatorImplementation::setProperty( PrimitiveType type,
@@ -77,9 +80,9 @@ namespace libemc
 						  StringCref    property,
 						  UVariableVectorCref data )
   {
-    EntityPtr anEntityPtr( getRootSystem().getEntity( FullID( type, 
-							      systempath, 
-							      id ) ) );
+    EntityPtr anEntityPtr( getModel().getEntity( FullID( type, 
+							 systempath, 
+							 id ) ) );
     // this new does not cause memory leak since Message will get it as a RCPtr
     anEntityPtr->setMessage( Message( property, 
 				      new UVariableVector( data ) ) );
@@ -92,42 +95,50 @@ namespace libemc
 					     StringCref    id,
 					     StringCref    propertyname )
   {
-    EntityPtr anEntityPtr( getRootSystem().getEntity( FullID( type, 
-							      systempath, 
-							      id ) ) );
+    EntityPtr anEntityPtr( getModel().getEntity( FullID( type, 
+							 systempath, 
+							 id ) ) );
     return anEntityPtr->getMessage( propertyname ).getBody();
   }
 
 
   void LocalSimulatorImplementation::step()
   {
-    theRootSystem.getStepperLeader().step();  
+    getModel().step();  
   }
 
   void LocalSimulatorImplementation::initialize()
   {
-    theRootSystem.initialize();
+    getModel().initialize();
+  }
+
+  const libecs::Real LocalSimulatorImplementation::getCurrentTime()
+  {
+    return getModel().getCurrentTime();
   }
 
   LoggerPtr LocalSimulatorImplementation::
-  getLogger(libecs::PrimitiveType type,
-	    libecs::StringCref    systempath,
-	    libecs::StringCref    id,
-	    libecs::StringCref    propertyname )
+  getLogger( libecs::PrimitiveType type,
+	     libecs::StringCref    systempathstring,
+	     libecs::StringCref    id,
+	     libecs::StringCref    propertyname )
   {
+    SystemPath aSystemPath( systempathstring );
 
-    return theLoggerBroker.getLogger( FullPN( type,
-					      SystemPath( systempath ),
-					      id,
-					      propertyname ) );
+    return getModel().getLoggerBroker().getLogger( FullPN( type,
+							   aSystemPath,
+							   id,
+							   propertyname ) );
   }
 
   StringVectorRCPtr LocalSimulatorImplementation::getLoggerList()
   {
     StringVectorRCPtr aLoggerListPtr( new StringVector );
-    aLoggerListPtr->reserve( theLoggerBroker.getLoggerMap().size() );
+    aLoggerListPtr->
+      reserve( getModel().getLoggerBroker().getLoggerMap().size() );
 
-    LoggerBroker::LoggerMapCref aLoggerMap( theLoggerBroker.getLoggerMap() );
+    LoggerBroker::LoggerMapCref 
+      aLoggerMap( getModel().getLoggerBroker().getLoggerMap() );
 
     for( LoggerBroker::LoggerMapConstIterator i( aLoggerMap.begin() );
 	 i != aLoggerMap.end(); ++i )
@@ -160,9 +171,9 @@ namespace libemc
 	  }
 
 	while( (*thePendingEventChecker)() )
-        {
-	  (*theEventHandler)();
-	}
+	  {
+	    (*theEventHandler)();
+	  }
 
       }	while( theRunningFlag );
 
@@ -184,15 +195,13 @@ namespace libemc
   {
     theRunningFlag = true;
 
-    libecs::Real aStopTime( theRootSystem.getStepperLeader().getCurrentTime() 
-			    + aDuration );
+    libecs::Real aStopTime( getModel().getCurrentTime() + aDuration );
 
     do
       {
 	for( int i( 0 ) ; i < 20 ; i++ )
 	  {
-	    if( theRootSystem.getStepperLeader().getCurrentTime() 
-		>= aStopTime )
+	    if( getModel().getCurrentTime() >= aStopTime )
 	      {
 		theRunningFlag = false;
 		break;
@@ -202,9 +211,9 @@ namespace libemc
 	  }
 
 	while( (*thePendingEventChecker)() )
-        {
-	  (*theEventHandler)();
-	}
+	  {
+	    (*theEventHandler)();
+	  }
 
       }	while( theRunningFlag );
 
@@ -214,15 +223,13 @@ namespace libemc
   {
     theRunningFlag = true;
 
-    libecs::Real aStopTime( theRootSystem.getStepperLeader().getCurrentTime() 
-			    + aDuration );
+    libecs::Real aStopTime( getModel().getCurrentTime() + aDuration );
 
     do
       {
 	for( int i( 0 ) ; i < 20 ; i++ )
 	  {
-	    if( theRootSystem.getStepperLeader().getCurrentTime() 
-		>= aStopTime )
+	    if( getModel().getCurrentTime() >= aStopTime )
 	      {
 		theRunningFlag = false;
 		break;

@@ -27,10 +27,9 @@ ReactorMaker.cpp\
 Substance.cpp\
 Accumulators.cpp\
 Integrators.cpp\
-RootSystem.cpp\
 SubstanceMaker.cpp\
 Stepper.cpp\
-StepperLeader.cpp\
+Model.cpp\
 PrimitiveType.cpp\
 System.cpp\
 Entity.cpp\
@@ -56,10 +55,9 @@ ReactorMaker.hpp\
 Substance.hpp\
 Accumulators.hpp\
 Integrators.hpp\
-RootSystem.hpp\
 SubstanceMaker.hpp\
 Stepper.hpp\
-StepperLeader.hpp\
+Model.hpp\
 PrimitiveType.hpp\
 System.hpp\
 Entity.hpp\

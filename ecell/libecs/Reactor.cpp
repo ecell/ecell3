@@ -30,10 +30,10 @@
 
 #include "Util.hpp"
 #include "Reactant.hpp"
-#include "RootSystem.hpp"
 #include "Stepper.hpp"
 #include "FullID.hpp"
 #include "Substance.hpp"
+#include "Model.hpp"
 
 #include "Reactor.hpp"
 
@@ -82,8 +82,7 @@ namespace libecs
   void Reactor::registerReactant( StringCref aName, FullIDCref aFullID, 
 				  const Int aStoichiometry )
   {
-    SystemPtr aRootSystem( getRootSystem() );
-    SystemPtr aSystem( aRootSystem->getSystem( aFullID.getSystemPath() ) );
+    SystemPtr aSystem( getModel()->getSystem( aFullID.getSystemPath() ) );
     SubstancePtr aSubstance( aSystem->getSubstance( aFullID.getID() ) );
 
     registerReactant( aName, aSubstance, aStoichiometry );

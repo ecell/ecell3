@@ -57,13 +57,15 @@ void PySimulator::init_type()
   behaviors().name("Simulator");
   behaviors().doc("E-CELL Python class");
 
+  add_varargs_method( "createStepper",         &PySimulator::createStepper );
   add_varargs_method( "createEntity",          &PySimulator::createEntity );
   add_varargs_method( "setProperty",           &PySimulator::setProperty );
   add_varargs_method( "getProperty",           &PySimulator::getProperty );
   add_varargs_method( "step",                  &PySimulator::step );
   add_varargs_method( "initialize",            &PySimulator::initialize );
+  add_varargs_method( "getCurrentTime",        &PySimulator::getCurrentTime );
   add_varargs_method( "getLogger",             &PySimulator::getLogger );
-  add_varargs_method( "getLoggerList",             &PySimulator::getLoggerList );
+  add_varargs_method( "getLoggerList",         &PySimulator::getLoggerList );
   add_varargs_method( "run",                   &PySimulator::run );
   add_varargs_method( "stop",                  &PySimulator::stop );
   add_varargs_method( "setPendingEventChecker",  
@@ -71,12 +73,40 @@ void PySimulator::init_type()
   add_varargs_method( "setEventHandler",       &PySimulator::setEventHandler );
 }
 
+
 Object PySimulator::step( const Py::Tuple& args )
 {
   ECS_TRY;
 
   Simulator::step();
   return Py::Object();
+
+  ECS_CATCH;
+}
+
+Object PySimulator::createStepper( const Py::Tuple& args )
+{
+  ECS_TRY;
+
+  args.verify_length( 2, 3 );
+
+  const String        aClassname ( static_cast<Py::String>( args[0] ) );
+  const String        anID       ( static_cast<Py::String>( args[1] ) );
+
+
+  UVariableVector aMessageBody;
+
+  if( args.length() >= 3 )
+    {
+      const Py::Tuple aMessageSequence( static_cast<Py::Sequence>( args[2] ) );
+      for( Py::Tuple::const_iterator i( aMessageSequence.begin() );
+	   i != aMessageSequence.end() ; ++i )
+	{
+	  aMessageBody.push_back( PyUVariable( *i ) );
+	}
+    }
+
+  Simulator::createStepper( aClassname, anID, aMessageBody );
 
   ECS_CATCH;
 }
@@ -177,6 +207,17 @@ Object PySimulator::initialize( const Py::Tuple& )
   ECS_CATCH;
 }
 
+
+Object PySimulator::getCurrentTime( const Py::Tuple& )
+{
+  ECS_TRY;
+
+  Py::Float aTime( Simulator::getCurrentTime() );
+
+  return aTime;
+
+  ECS_CATCH;
+}
 
 
 Object PySimulator::getLogger( const Py::Tuple& args )

@@ -30,9 +30,9 @@
 
 #include "Substance.hpp"
 #include "System.hpp"
-#include "RootSystem.hpp"
 #include "Accumulators.hpp"
 #include "AccumulatorMaker.hpp"
+#include "Model.hpp"
 #include "PrimitiveType.hpp"
 #include "Util.hpp"
 
@@ -101,7 +101,7 @@ namespace libecs
   void Substance::setAccumulator( StringCref anAccumulatorClassname )
   {
     try {
-      AccumulatorPtr aAccumulatorPtr( getRootSystem()->getAccumulatorMaker()
+      AccumulatorPtr aAccumulatorPtr( getModel()->getAccumulatorMaker()
 				      .make( anAccumulatorClassname ) );
       setAccumulator( aAccumulatorPtr );
 

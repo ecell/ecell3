@@ -56,6 +56,14 @@ namespace libemc
     Simulator();
     virtual ~Simulator() {}
 
+    void  createStepper( libecs::StringCref          classname, 
+			 libecs::StringCref          id,
+			 libecs::UVariableVectorCref data )
+    {
+      theSimulatorImplementation->createStepper( classname, id, data );
+    }
+
+
     void createEntity( libecs::StringCref    classname, 
 		       libecs::PrimitiveType type,
 		       libecs::StringCref    systempath,
@@ -104,6 +112,11 @@ namespace libemc
       theSimulatorImplementation->initialize();
     }
 
+    const libecs::Real getCurrentTime()
+    {
+      return theSimulatorImplementation->getCurrentTime();
+    }
+
     libecs::LoggerPtr getLogger(  libecs::PrimitiveType type,
 				  libecs::StringCref    systempath,
 				  libecs::StringCref    id,
@@ -135,9 +148,11 @@ namespace libemc
       theSimulatorImplementation->stop();
     }
 
-    void setPendingEventChecker( PendingEventCheckerFuncPtr aPendingEventChecker )
+    void setPendingEventChecker( PendingEventCheckerFuncPtr 
+				 aPendingEventChecker )
     {
-       theSimulatorImplementation->setPendingEventChecker( aPendingEventChecker );
+       theSimulatorImplementation->
+	 setPendingEventChecker( aPendingEventChecker );
      }
 
     void setEventHandler( EventHandlerFuncPtr anEventHandler )

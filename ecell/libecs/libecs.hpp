@@ -67,10 +67,9 @@ namespace libecs
   DECLARE_CLASS( Reactor );
   DECLARE_CLASS( isRegularReactor );
   DECLARE_CLASS( ReactorMaker );
-  DECLARE_CLASS( RootSystem );
   DECLARE_CLASS( Stepper );
   DECLARE_CLASS( MasterStepper );
-  DECLARE_CLASS( StepperLeader );
+  DECLARE_CLASS( Model );
   DECLARE_CLASS( SlaveStepper );
   DECLARE_CLASS( StepperMaker );
   DECLARE_CLASS( Substance );

@@ -59,11 +59,13 @@ public:
 
   static void init_type();
 
+  Object createStepper          ( const Tuple& args );
   Object createEntity           ( const Tuple& args );
   Object setProperty            ( const Tuple& args );
   Object getProperty            ( const Tuple& args );
   Object step                   ( const Tuple& args );
   Object initialize             ( const Tuple& args );
+  Object getCurrentTime         ( const Tuple& args );
   Object getLogger              ( const Tuple& args );
   Object getLoggerList          ( const Tuple& args );
   Object run                    ( const Tuple& args );
