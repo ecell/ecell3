@@ -23,8 +23,7 @@ class Window:
         if os.access( gladefile, os.R_OK ):
             self.widgets = libglade.GladeXML( filename=gladefile, root=root )
         else:
-            print "Window: can't read %s." % gladefile
-            raise IOError()
+            raise IOError( "can't read %s." % gladefile )
 
     def addHandlers( self, handlers ):
         self.widgets.signal_autoconnect( handlers )
