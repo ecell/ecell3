@@ -60,7 +60,7 @@ class SessionManager:
 		This method should be substituded to sys.exitfunc.
 		'''
 
-		if self.__theTmpRemoval == True:
+		if self.__theTmpRemovable == True:
 			# remove the temporary directory
 			if os.access( self.getTmpRootDir(), os.W_OK ):
 				shutil.rmtree( self.getTmpRootDir() )
@@ -89,13 +89,13 @@ class SessionManager:
 		self.__theTmpRootDir = DEFAULT_TMP_DIRECTORY
 		self.__theTmpDir = None
 
-		self.__theFinishedJobRemovalFlag = True
-		self.__theErroRemovalJobFlag = True
+		self.__theFinishedJobRemovableFlag = True
+		self.__theErroRemovableJobFlag = True
 
 		self.__theUpdateInterval = 1
 		self.__theGlobalRunTimeout = 0
 
-		self.__theTmpRemoval = True
+		self.__theTmpRemovable = True
 
 		# Set up default temporary directory
 		# Temporary directory is created in run method.
@@ -235,8 +235,8 @@ class SessionManager:
 		return self.__theTmpDir
 
 	
-	def setTmpDirRemoval( self, deleteflag ):
-		'''Set a removal flag of tmp directory.
+	def setTmpDirRemovable( self, deleteflag ):
+		'''Set a removable flag of tmp directory.
 
 		deleteflag(boolean)  --  True  : delete tmp and tmp root directory,
                                          when destructor is called.
@@ -247,11 +247,11 @@ class SessionManager:
 		'''
 
 		# save deleteflat to instance attribute
-		self.__theTmpRemoval = deleteflag
+		self.__theTmpRemovable = deleteflag
 
 
-	def getTmpDirRemoval( self ):
-		'''Return the removal flag of tmp directory.
+	def getTmpDirRemovable( self ):
+		'''Return the removable flag of tmp directory.
 
 		Return boolean : True  : delete tmp and tmp root directory,
                                  when destructor is called.
@@ -260,7 +260,7 @@ class SessionManager:
 		'''
 
 		# return delete flag of tmp directory
-		return self.__theTmpRemoval 
+		return self.__theTmpRemovable 
 
 
 	def setRetryLimit( self, retrylimit ):
@@ -865,6 +865,10 @@ class SessionManager:
 		# return the path of the job directory
 		return self.__theSessionProxyDict[jobid].getJobDirectory()
 
+
+	def setRetryMaxCount( self, limit ):
+
+		SessionProxy.setRetryMaxCount(limit)
 
 	# -------------------------------------------------
 	# methods for intaractive mode

@@ -346,8 +346,8 @@ class SessionProxy:
 		[Note] This method must be called from the run method of sub class.
 		'''
 
-		# set a status
-		self.setStatus(RUN)
+		if self.getStatus() != QUEUED:
+			return None
 
 		# -----------------------------
 		# check the retry count
@@ -355,12 +355,15 @@ class SessionProxy:
 
 		# When status is RUN, and retry count is over max retry count,
 		# set ERROR status and does nothing.
-		if self.getStatus() == RUN:
+		#if self.getStatus() == RUN:
 		
-			if self.getRetryMaxCount() != 0:
-				if self.__theRetryCount > self.getRetryMaxCount():
-					self.setStatus(ERROR)
-					return None
+		if self.getRetryMaxCount() != 0:
+			if self.__theRetryCount >= self.getRetryMaxCount():
+				self.setStatus(ERROR)
+				return None
+
+		# set a status
+		self.setStatus(RUN)
 
 		# -----------------------------
 		# run

@@ -77,6 +77,9 @@ class SGESessionProxy(SessionProxy):
 		if self.getStatus() == RUN:
 			os.popen("qdel %s" %self.__theSGEJobID )
 
+		self.setStatus(QUEUED)
+	
+
 		# run again.
 		self.run()
 

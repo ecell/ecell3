@@ -145,6 +145,26 @@ class SGESystemProxy(SystemProxy):
 				# considered to be finished
 				if aStatusDict.has_key(str(aSGEJobID)) == False:
 
+					# read standard error file
+					aStderrFile = aSessionProxy.getJobDirectory() + \
+					              os.sep + aSessionProxy.getStderrFileName()
+					aStderrList = open(aStderrFile,'r').readlines()
+
+					# When something is writtend in standard error,
+					if len(aStderrList) > 0 :
+
+						if aStderrList[-1] == 'ValueError: bad marshal data\n' or \
+					      aStderrList[-1] == 'EOFError: EOF read where object expected\n':
+
+							aSessionProxy.retry()
+
+						else:
+
+							aSessionProxy.setStatus(ERROR)
+
+						continue
+
+
 					aSessionProxy.setStatus(FINISHED)
 
 				# When job is running,
