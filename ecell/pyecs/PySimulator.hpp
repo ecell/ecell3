@@ -67,10 +67,13 @@ public:
 
 private:
 
-  static void callPendingEventChecker();
+  // FIXME: make these non-static
+  static bool callPendingEventChecker();
   static void callEventHandler();  
   static Callable* thePendingEventChecker;
   static Callable* theEventHandler;
+  static Object thePendingEventCheckerStore;
+  static Object theEventHandlerStore;
 
 };
 

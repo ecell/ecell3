@@ -44,6 +44,8 @@ using namespace libecs;
 
 Callable* PySimulator::thePendingEventChecker;
 Callable* PySimulator::theEventHandler;
+Object PySimulator::thePendingEventCheckerStore;
+Object PySimulator::theEventHandlerStore;
 
 PySimulator::PySimulator()
 {
@@ -246,18 +248,20 @@ Object PySimulator::setPendingEventChecker( const Py::Tuple& args )
 {
   ECS_TRY;
 
-  Object aTmpPendingEventChecker;
-
   args.verify_length( 1 );
 
-  aTmpPendingEventChecker = static_cast<Py::Object>( args[0] );
+  thePendingEventCheckerStore =  static_cast<Py::Object>( args[0] );
 
-  thePendingEventChecker = static_cast<Py::Callable *>( &aTmpPendingEventChecker );
+  if( !thePendingEventCheckerStore.isCallable() )
+    {
+      throw Py::TypeError("Object is not Callable type.");
+    }
 
-  if( !thePendingEventChecker->isCallable() )
-    throw Py::TypeError("Object is not Callable type.");
-  
-  Simulator::setPendingEventChecker( (bool (*)())callPendingEventChecker );
+  thePendingEventChecker = 
+    static_cast<Py::Callable *>( &thePendingEventCheckerStore );
+
+  Simulator::setPendingEventChecker
+    ( static_cast<PendingEventCheckerFuncPtr>( callPendingEventChecker ) );
   
   return Py::Object();
 
@@ -268,40 +272,36 @@ Object PySimulator::setEventHandler( const Py::Tuple& args )
 {
   ECS_TRY;
 
-  Object aTmpEventHandler;
-
   args.verify_length( 1 );
 
-  aTmpEventHandler = static_cast<Py::Object>( args[0] );
+  theEventHandlerStore = static_cast<Py::Object>( args[0] );
 
-  theEventHandler = static_cast<Py::Callable *>( &aTmpEventHandler );
+  if( !theEventHandlerStore.isCallable() )
+    {
+      throw Py::TypeError("Object is not Callable type.");
+    }
 
-  if( !theEventHandler->isCallable() )
-    throw Py::TypeError("Object is not Callable type.");
+  theEventHandler = static_cast<Py::Callable *>( &theEventHandlerStore );
 
-  Simulator::setEventHandler( (void (*)())callEventHandler );
+
+  Simulator::setEventHandler
+    ( static_cast<EventHandlerFuncPtr>( callEventHandler ) );
 
   return Py::Object();
 
   ECS_CATCH;
 }
 
-void PySimulator::callPendingEventChecker()
+bool PySimulator::callPendingEventChecker()
 {
-  ECS_TRY;
+  thePendingEventChecker->apply( Py::Tuple() );
 
-  thePendingEventChecker->apply();
-
-  ECS_CATCH; 
+  return false;
 }
 
 void PySimulator::callEventHandler()
 {
-  ECS_TRY;
-
-  theEventHandler->apply();
-
-  ECS_CATCH; 
+  theEventHandler->apply( Py::Tuple() );
 }
 
 
