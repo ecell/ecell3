@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from Interface import *
+from ecssupport import *
 
 #TARGET_STRING = 0
 #TARGET_ROOTWIN = 1
@@ -11,18 +12,17 @@ from Interface import *
 
 class NumericWindow( Interface ):
 
-    def __init__( self,fqpps ):
+    def __init__( self, fpn ):
         self.theGladeFileName = 'NumericWindow.glade'
-        Interface.__init__( self, self.theGladeFileName, fqpps )
+        Interface.__init__( self, self.theGladeFileName, fpn )
         self.addHandler('input', self.inputValue)
-        self.initInterface( fqpps )
+        self.initInterface( fpn )
  #       self["fqpp_label"].drag_dest_set( gtk.DEST_DEFAULT_ALL, target, GDK.ACTION_COPY)
 #        self["fqpp_label"].drag_source_set( GDK.BUTTON1_MASK, target, GDK.ACTION_COPY|GDK.ACTION_MOVE )
 
-    def initInterface( self, fqpps ):
-        self.theFQPPList = string.split(fqpps, ':')
-        self.theIDProperty = self.theFQPPList[2]
-        self["fqpp_label"].set_text(self.theIDProperty)
+    def initInterface( self, fpn ):
+        fpnobj = FullPropertyName(fpn)
+        self["fqpp_label"].set_text(fpnobj['ID'])
         self["spinbutton"].set_text('1.00000')
 
     def inputValue( self, obj, n ):
@@ -34,10 +34,10 @@ class NumericWindow( Interface ):
 
 def mainLoop():
 
-    aFQPP1 = 'Substance:/CELL/CYTOPLASM:ATP|Quantity'
-    aWindow1 = NumericWindow( aFQPP1 )
-    aFQPP2 = 'Substance:/CELL/CYTOPLASM:ADP|Quantity'
-    aWindow2 = NumericWindow( aFQPP2 )
+    aFPN1 = 'Substance:/CELL/CYTOPLASM:ATP:Quantity'
+    aWindow1 = NumericWindow( aFPN1 )
+    aFPN2 = 'Substance:/CELL/CYTOPLASM:ADP:Quantity'
+    aWindow2 = NumericWindow( aFPN2 )
 
 #    aWindow2 = NumericWindow( 'Substance:/CELL/CYTOPLASM:ATP' )
 #    aWindow3 = NumericWindow( 'Reactor:/CELL/CYTOPLASM:ATPase-0' )
