@@ -76,13 +76,30 @@ namespace libecs
     virtual void initialize();
 
 
-    // depricated: should be dynamically scheduled
-    Real getDeltaT()
+    // depricate: should be dynamically scheduled
+    void setStepInterval( RealCref interval )
+    {
+      theStepInterval = interval;
+      calculateStepsPerSecond();
+    }
+
+    void calculateStepsPerSecond()
+    {
+      theStepsPerSecond = 1 / theStepInterval;
+    }
+
+    // should be dynamically scheduled
+    RealCref getStepInterval() const
     {
       return theStepInterval;
     }
 
-    Real getCurrentTime() const
+    RealCref getStepsPerSecond() const
+    {
+      return theStepsPerSecond;
+    }
+
+    RealCref getCurrentTime() const
     {
       return theCurrentTime;
     }
@@ -103,11 +120,11 @@ namespace libecs
   private:
 
     int theUpdateDepth;
-    int theBaseClock;
 
     Real theCurrentTime;
 
     Real theStepInterval;
+    Real theStepsPerSecond;
 
     static int DEFAULT_UPDATE_DEPTH;
 
@@ -128,7 +145,8 @@ namespace libecs
 
     virtual void initialize();
 
-    virtual Real getDeltaT() = 0;
+    virtual RealCref getStepInterval() const = 0;
+    virtual RealCref getStepsPerSecond() const = 0;
 
     virtual void clear() = 0;
     virtual void react() = 0;
@@ -158,14 +176,17 @@ namespace libecs
     virtual void transit();
     virtual void postern();
 
-    void setDeltaT( Real dt ) { theDeltaT = dt; }
+    void setStepInterval( RealCref stepinterval );
+    void calculateStepsPerSecond();
+
+    virtual RealCref getStepInterval() const; 
+    virtual RealCref getStepsPerSecond() const;
 
     virtual ~MasterStepper() {}
 
+    // FIXME: ambiguous name
     virtual int getNumberOfSteps() const { return 1; }
-    int getPace() const { return thePace; }
 
-    virtual Real getDeltaT(); 
     virtual void initialize();
 
     virtual void distributeIntegrator( IntegratorAllocator );
@@ -175,8 +196,9 @@ namespace libecs
 
   protected:
 
-    int                 thePace;
-    Real                theDeltaT;
+    Real                theStepInterval;
+    Real                theStepsPerSecond;
+
     IntegratorAllocator theAllocator;
     StepperVector       theSlaveStepperVector;
 
@@ -231,10 +253,16 @@ namespace libecs
       theMaster = master; 
     }
 
-    Real getDeltaT() 
+    RealCref getStepInterval() const
     { 
       // Slaves are synchronous to their masters.
-      return theMaster->getDeltaT(); 
+      return theMaster->getStepInterval(); 
+    }
+
+    RealCref getStepsPerSecond() const
+    { 
+      // Slaves are synchronous to their masters.
+      return theMaster->getStepsPerSecond();
     }
 
     static StepperPtr instance() { return new SlaveStepper; }

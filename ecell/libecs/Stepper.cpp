@@ -39,7 +39,9 @@ namespace libecs
 
   ////////////////////////// Stepper
 
-  Stepper::Stepper() : theOwner( NULLPTR )
+  Stepper::Stepper() 
+    : 
+    theOwner( NULLPTR )
   {
 
   }
@@ -65,10 +67,11 @@ namespace libecs
 
   MasterStepper::MasterStepper() 
     :
-    thePace( 1 ),
+    theStepInterval( 0.001 ),
+    theStepsPerSecond( 1000 ),
     theAllocator( NULLPTR )
   {
-
+    ; // do nothing
   }
 
   void MasterStepper::initialize()
@@ -80,17 +83,17 @@ namespace libecs
 
     distributeIntegrator( IntegratorAllocator( theAllocator ) );
 
-    for( StepperVectorIterator i = theSlaveStepperVector.begin() ; 
+    for( StepperVectorIterator i( theSlaveStepperVector.begin() ); 
 	 i != theSlaveStepperVector.end() ; ++i )
       {
 	(*i)->initialize();
       }
   }
 
-  void MasterStepper::distributeIntegrator(IntegratorAllocator allocator)
+  void MasterStepper::distributeIntegrator( IntegratorAllocator allocator )
   {
     Stepper::distributeIntegrator( &allocator );
-    for( StepperVectorIterator i = theSlaveStepperVector.begin() ; 
+    for( StepperVectorIterator i( theSlaveStepperVector.begin() ); 
 	 i != theSlaveStepperVector.end() ; ++i )
       {
 	(*i)->distributeIntegrator( &allocator );
@@ -98,17 +101,18 @@ namespace libecs
   }
 
 
-  void MasterStepper::registerSlaves(System* system)
+  void MasterStepper::registerSlaves( SystemPtr system )
   {
-    for( SystemMapIterator s = theOwner->getFirstSystemIterator() ;
+    for( SystemMapIterator s( theOwner->getFirstSystemIterator() );
 	 s != theOwner->getLastSystemIterator() ; ++s )
       {
-	SystemPtr aSystemPtr = s->second;
-	SlaveStepperPtr aSlaveStepperPtr;
+	SystemPtr aSystemPtr( s->second );
 
 	//FIXME: handle bad_cast
-	if( ( aSlaveStepperPtr = 
-	      dynamic_cast< SlaveStepperPtr >( aSystemPtr->getStepper() ) ) )
+	SlaveStepperPtr aSlaveStepperPtr( dynamic_cast< SlaveStepperPtr >
+					  ( aSystemPtr->getStepper() ) );
+
+	if( aSlaveStepperPtr != NULLPTR )
 	  {
 	    theSlaveStepperVector.push_back( aSlaveStepperPtr );
 	    aSlaveStepperPtr->setMaster( this );
@@ -117,15 +121,31 @@ namespace libecs
       }
   }
 
-  Real MasterStepper::getDeltaT()
+  void MasterStepper::setStepInterval( RealCref stepsize )
   {
-    return getOwner()->getRootSystem()->getStepperLeader().getDeltaT();
+    theStepInterval = stepsize;
+    calculateStepsPerSecond();
+  }
+
+  void MasterStepper::calculateStepsPerSecond() 
+  {
+    theStepsPerSecond = 1 / getStepInterval();
+  }
+
+  RealCref MasterStepper::getStepsPerSecond() const
+  {
+    return getOwner()->getRootSystem()->getStepperLeader().getStepsPerSecond();
+  }
+
+  RealCref MasterStepper::getStepInterval() const
+  {
+    return getOwner()->getRootSystem()->getStepperLeader().getStepInterval();
   }
 
   void MasterStepper::clear()
   {
     theOwner->clear();
-    for( StepperVectorIterator i = theSlaveStepperVector.begin() ; 
+    for( StepperVectorIterator i( theSlaveStepperVector.begin() ); 
 	 i != theSlaveStepperVector.end() ; ++i )
       {
 	(*i)->clear();
@@ -135,13 +155,13 @@ namespace libecs
   void MasterStepper::react()
   {  
     theOwner->react();
-    for( StepperVectorIterator i = theSlaveStepperVector.begin() ; 
+    for( StepperVectorIterator i( theSlaveStepperVector.begin() ); 
 	 i != theSlaveStepperVector.end() ; ++i )
       {
 	(*i)->react();
       }
     theOwner->turn();
-    for( StepperVectorIterator i = theSlaveStepperVector.begin() ; 
+    for( StepperVectorIterator i( theSlaveStepperVector.begin() ); 
 	 i != theSlaveStepperVector.end() ; ++i )
       {
 	(*i)->turn();
@@ -151,7 +171,7 @@ namespace libecs
   void MasterStepper::transit()
   {
     theOwner->transit();
-    for( StepperVectorIterator i = theSlaveStepperVector.begin() ; 
+    for( StepperVectorIterator i( theSlaveStepperVector.begin() ); 
 	 i != theSlaveStepperVector.end() ; ++i )
       {
 	(*i)->transit();
@@ -161,7 +181,7 @@ namespace libecs
   void MasterStepper::postern()
   {
     theOwner->postern();
-    for( StepperVectorIterator i = theSlaveStepperVector.begin() ; 
+    for( StepperVectorIterator i( theSlaveStepperVector.begin() ); 
 	 i != theSlaveStepperVector.end() ; ++i )
       {
 	(*i)->postern();
@@ -178,7 +198,7 @@ namespace libecs
     theCurrentTime( 0.0 ),
     theStepInterval( 0.001 )
   {
-    ; // do nothing
+    calculateStepsPerSecond();
   }
 
   void StepperLeader::registerMasterStepper( MasterStepperPtr newone )
@@ -188,7 +208,7 @@ namespace libecs
 
   void StepperLeader::initialize()
   {
-    for( StepperVector::iterator i = theMasterStepperVector.begin();
+    for( StepperVector::iterator i( theMasterStepperVector.begin() );
 	 i != theMasterStepperVector.end() ; i++)
       {
 	(*i)->initialize();
@@ -207,7 +227,7 @@ namespace libecs
 
   void StepperLeader::clear()
   {
-    for( StepperVector::iterator i = theMasterStepperVector.begin();
+    for( StepperVector::iterator i( theMasterStepperVector.begin() );
 	 i != theMasterStepperVector.end() ; ++i )
       {
 	(*i)->clear();
@@ -216,7 +236,7 @@ namespace libecs
 
   void StepperLeader::react()
   {
-    for( StepperVector::iterator i = theMasterStepperVector.begin();
+    for( StepperVector::iterator i( theMasterStepperVector.begin() );
 	 i != theMasterStepperVector.end(); i++ )
       {
 	(*i)->react();
@@ -225,7 +245,7 @@ namespace libecs
 
   void StepperLeader::transit()
   {
-    for( StepperVector::iterator i = theMasterStepperVector.begin();
+    for( StepperVector::iterator i( theMasterStepperVector.begin() );
 	 i != theMasterStepperVector.end(); ++i )
       {
 	(*i)->transit();
@@ -234,7 +254,7 @@ namespace libecs
 
   void StepperLeader::postern()
   {
-    for( StepperVector::iterator i = theMasterStepperVector.begin();
+    for( StepperVector::iterator i( theMasterStepperVector.begin() );
 	 i != theMasterStepperVector.end(); ++i )
       {
 	(*i)->postern();
@@ -243,9 +263,9 @@ namespace libecs
 
   void StepperLeader::update()
   {
-    for( int i = theUpdateDepth ; i > 0 ; --i )
+    for( int i( theUpdateDepth ) ; i > 0 ; --i )
       {
-	for ( StepperVector::iterator i = theMasterStepperVector.begin();
+	for ( StepperVector::iterator i( theMasterStepperVector.begin() );
 	     i != theMasterStepperVector.end(); ++i )
 	  {
 	    (*i)->postern();

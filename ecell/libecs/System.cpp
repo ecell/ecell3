@@ -65,8 +65,8 @@ namespace libecs
     makePropertySlot( "Volume", System, *this,
 		      NULLPTR, &System::getVolume );
 
-    makePropertySlot( "DeltaT", System, *this,
-		      NULLPTR, &System::getDeltaT );
+    makePropertySlot( "StepInterval", System, *this,
+		      NULLPTR, &System::getStepInterval );
   }
 
 
@@ -154,10 +154,10 @@ namespace libecs
       }
   }
 
-  const Message System::getDeltaT( StringCref keyword )
+  const Message System::getStepInterval( StringCref keyword )
   {
     return Message( keyword, 
-		    UConstant( getDeltaT() ) ) ;
+		    UConstant( getStepInterval() ) ) ;
   }
 
 
@@ -206,9 +206,14 @@ namespace libecs
     return theVolumeIndex->getActivityPerSecond();
   }
 
-  Real System::getDeltaT() const
+  RealCref System::getStepInterval() const
   {
-    return theStepper->getDeltaT();
+    return theStepper->getStepInterval();
+  }
+
+  RealCref System::getStepsPerSecond() const
+  {
+    return theStepper->getStepsPerSecond();
   }
 
   void System::setVolumeIndex( FullIDCref volumeindex )
@@ -480,7 +485,7 @@ namespace libecs
 
   Real System::getActivityPerSecond()
   {
-    return getActivity() / getStepper()->getDeltaT();
+    return getActivity() * getStepper()->getStepsPerSecond();
   }
 
 } // namespace libecs

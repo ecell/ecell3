@@ -330,7 +330,8 @@ namespace libecs
 
     Real getActivityPerSecond();
 
-    Real getDeltaT() const;
+    RealCref getStepInterval() const;
+    RealCref getStepsPerSecond() const;
 
 
     static SystemPtr instance() { return new System; }
@@ -348,7 +349,7 @@ namespace libecs
     const Message getReactorList( StringCref keyword );
 
     const Message getVolume( StringCref keyword );
-    const Message getDeltaT( StringCref keyword );
+    const Message getStepInterval( StringCref keyword );
 
   protected:
 

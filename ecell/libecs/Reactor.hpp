@@ -103,7 +103,7 @@ namespace libecs
     void appendProduct  ( FullIDCref fullid, int coefficient );
     void appendCatalyst ( FullIDCref fullid, int coefficient );
     void appendEffector ( FullIDCref fullid, int coefficient );
-    void setInitialActivity( Real activity );
+    void setInitialActivity( RealCref activity );
 
     /**
        Reactor Condition enum is used by Reactor's self-diagnosis system.
@@ -162,7 +162,11 @@ namespace libecs
        @param activity [number of molecule that this yields] / [deltaT].
        @see activity()
     */
-    void setActivity( Real activity ) { theActivityBuffer = activity; }
+    void setActivity( RealCref activity ) 
+    { 
+      theActivityBuffer = activity; 
+    }
+
     Condition condition( Condition );
     void warning( StringCref );
 
@@ -253,7 +257,7 @@ namespace libecs
     /**
        @return the number of effectors.
     */
-    int getNumberOfEffectors()  {return theEffectorList.size();}
+    int getNumberOfEffectors()  { return theEffectorList.size(); }
 
     virtual int getMinimumNumberOfSubstrates() const { return 0; }
     virtual int getMinimumNumberOfProducts() const { return 0; }
