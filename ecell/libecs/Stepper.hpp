@@ -342,16 +342,6 @@ namespace libecs
        These methods are for handling the standerd error control objects.
     */
 
-    const Real getRelativeTolerance() const
-    {
-      return theRelativeTolerance;
-    }
-
-    void setRelativeTolerance( RealCref aValue )
-    {
-      theRelativeTolerance = aValue;
-    }
-
     void setTolerance( RealCref aValue )
     {
       theTolerance = aValue;
@@ -362,24 +352,34 @@ namespace libecs
       return theTolerance;
     }
 
-    void setStateScalingFactor( RealCref aValue )
+    const Real getAbsoluteToleranceFactor() const
     {
-      theStateScalingFactor = aValue;
+      return theAbsoluteToleranceFactor;
     }
 
-    const Real getStateScalingFactor() const
+    void setAbsoluteToleranceFactor( RealCref aValue )
     {
-      return theStateScalingFactor;
+      theAbsoluteToleranceFactor = aValue;
     }
 
-    void setDerivativeScalingFactor( RealCref aValue )
+    void setStateToleranceFactor( RealCref aValue )
     {
-      theDerivativeScalingFactor = aValue;
+      theStateToleranceFactor = aValue;
     }
 
-    const Real getDerivativeScalingFactor() const
+    const Real getStateToleranceFactor() const
     {
-      return theDerivativeScalingFactor;
+      return theStateToleranceFactor;
+    }
+
+    void setDerivativeToleranceFactor( RealCref aValue )
+    {
+      theDerivativeToleranceFactor = aValue;
+    }
+
+    const Real getDerivativeToleranceFactor() const
+    {
+      return theDerivativeToleranceFactor;
     }
 
     /**
@@ -432,10 +432,10 @@ namespace libecs
 
   private:
 
-    Real theRelativeTolerance;
     Real theTolerance;
-    Real theStateScalingFactor;
-    Real theDerivativeScalingFactor;
+    Real theAbsoluteToleranceFactor;
+    Real theStateToleranceFactor;
+    Real theDerivativeToleranceFactor;
 
     Real theTolerantStepInterval;
     Real theNextStepInterval;

@@ -504,9 +504,9 @@ namespace libecs
   DifferentialStepper::DifferentialStepper()
     :
     theTolerance( 1.0e-6 ),
-    theRelativeTolerance( 1.0 ),
-    theStateScalingFactor( 1.0 ),
-    theDerivativeScalingFactor( 1.0 ),
+    theAbsoluteToleranceFactor( 1.0 ),
+    theStateToleranceFactor( 1.0 ),
+    theDerivativeToleranceFactor( 1.0 ),
     safety( 0.9 ),
     theTolerantStepInterval( 0.001 ),
     theNextStepInterval( 0.001 )
@@ -524,31 +524,31 @@ namespace libecs
 				      ) );
 
     registerSlot( getPropertySlotMaker()->
-		  createPropertySlot( "RelativeTolerance", *this,
-				      Type2Type<Real>(),
-				      &DifferentialStepper::setRelativeTolerance,
-				      &DifferentialStepper::getRelativeTolerance
-				      ) );
-
-    registerSlot( getPropertySlotMaker()->
 		  createPropertySlot( "Tolerance", *this,
 				      Type2Type<Real>(),
 				      &DifferentialStepper::setTolerance,
 				      &DifferentialStepper::getTolerance
 				      ) );
+
+    registerSlot( getPropertySlotMaker()->
+		  createPropertySlot( "AbsoluteToleranceFactor", *this,
+				      Type2Type<Real>(),
+				      &DifferentialStepper::setAbsoluteToleranceFactor,
+				      &DifferentialStepper::getAbsoluteToleranceFactor
+				      ) );
  
     registerSlot( getPropertySlotMaker()->
-		  createPropertySlot( "StateScalingFactor", *this,
+		  createPropertySlot( "StateToleranceFactor", *this,
 				      Type2Type<Real>(),
-				      &DifferentialStepper::setStateScalingFactor,
-				      &DifferentialStepper::getStateScalingFactor
+				      &DifferentialStepper::setStateToleranceFactor,
+				      &DifferentialStepper::getStateToleranceFactor
 				      ) ); 
 
     registerSlot( getPropertySlotMaker()->
-		  createPropertySlot( "DerivativeScalingFactor", *this,
+		  createPropertySlot( "DerivativeToleranceFactor", *this,
 				      Type2Type<Real>(),
-				      &DifferentialStepper::setDerivativeScalingFactor,
-				      &DifferentialStepper::getDerivativeScalingFactor
+				      &DifferentialStepper::setDerivativeToleranceFactor,
+				      &DifferentialStepper::getDerivativeToleranceFactor
 				      ) ); 
   }
 

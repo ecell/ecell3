@@ -216,10 +216,10 @@ namespace libecs
     const UnsignedInt aSize( theWriteVariableVector.size() );
 
     // don't expect too much from euler
-    const Real eps_abs( getTolerance() );
-    const Real eps_rel( getRelativeTolerance() * eps_abs );
-    const Real a_y( getStateScalingFactor() );
-    const Real a_dydt( getDerivativeScalingFactor() );
+    const Real eps_rel( getTolerance() );
+    const Real eps_abs( getTolerance() * getAbsoluteToleranceFactor() );
+    const Real a_y( getStateToleranceFactor() );
+    const Real a_dydt( getDerivativeToleranceFactor() );
 
     // ========= 1 ===========
     processNormal();
@@ -367,10 +367,10 @@ namespace libecs
   {
     const UnsignedInt aSize( theWriteVariableVector.size() );
 
-    const Real eps_abs( getTolerance() );
-    const Real eps_rel( getRelativeTolerance() * eps_abs );
-    const Real a_y( getStateScalingFactor() );
-    const Real a_dydt( getDerivativeScalingFactor() );
+    const Real eps_rel( getTolerance() );
+    const Real eps_abs( getTolerance() * getAbsoluteToleranceFactor() );
+    const Real a_y( getStateToleranceFactor() );
+    const Real a_dydt( getDerivativeToleranceFactor() );
 
     // ========= 1 ===========
     processNormal();
@@ -547,10 +547,10 @@ namespace libecs
   {
     const UnsignedInt aSize( theWriteVariableVector.size() );
 
-    const Real eps_abs( getTolerance() );
-    const Real eps_rel( getRelativeTolerance() * eps_abs );
-    const Real a_y( getStateScalingFactor() );
-    const Real a_dydt( getDerivativeScalingFactor() );
+    const Real eps_rel( getTolerance() );
+    const Real eps_abs( getTolerance() * getAbsoluteToleranceFactor() );
+    const Real a_y( getStateToleranceFactor() );
+    const Real a_dydt( getDerivativeToleranceFactor() );
 
     // ========= 1 ===========
     processNormal();
@@ -803,10 +803,10 @@ namespace libecs
     const UnsignedInt aSize( theWriteVariableVector.size() );
 
     // don't expect too much from euler
-    const Real eps_abs( getTolerance() );
-    const Real eps_rel( getRelativeTolerance() * eps_abs );
-    const Real a_y( getStateScalingFactor() );
-    const Real a_dydt( getDerivativeScalingFactor() );
+    const Real eps_rel( getTolerance() );
+    const Real eps_abs( getTolerance() * getAbsoluteToleranceFactor() );
+    const Real a_y( getStateToleranceFactor() );
+    const Real a_dydt( getDerivativeToleranceFactor() );
 
     // ========= 1 ===========
     processNormal();
