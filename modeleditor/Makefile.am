@@ -62,7 +62,7 @@ PathwayCanvas.py\
 Config.py\
 CommandMultiplexer.py\
 PackingStrategy.py\
-ecell3-me\
+ecell3-model-editor\
 opengui.py\
 VariableReferenceEditorComponent.py\
 ShapePropertyComponent.py\
@@ -78,4 +78,4 @@ ComplexShape.py
 EXTRA_DIST=${modeleditor_PYTHON}
 
 bin_SCRIPTS =\
-ecell3-me
+ecell3-model-editor

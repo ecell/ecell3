@@ -29,6 +29,6 @@ AC_OUTPUT(
 Makefile
 Config.py
 glade/Makefile
-ecell3-me,
-chmod +x ecell3-me
+ecell3-model-editor,
+chmod +x ecell3-model-editor
 )
