@@ -11,7 +11,7 @@ Stepper FixedODE1Stepper( DE1 )
 System System( / )
 {
 	StepperID	DE1;
-	ariable Variable;
+
 	Variable Variable( SIZE )
 	{
 		Value	1e-18;
