@@ -33,6 +33,7 @@
 
 //#include "Logger.hpp"
 #include "Exceptions.hpp"
+#include "Polymorph.hpp"
 
 #include "PropertySlot.hpp"
 
@@ -55,6 +56,5 @@ namespace libecs
     return isGetable();
   }
   
-
 }
 

@@ -33,6 +33,7 @@
 
 #include "Exceptions.hpp"
 #include "Util.hpp"
+#include "Polymorph.hpp"
 
 namespace libecs
 {
@@ -94,6 +95,27 @@ namespace libecs
 		     + toString( aMin ) + 
 		     + " ( " + toString( aSize ) + " given)." );
   }
+
+
+
+  const Polymorph convertStringMapToPolymorph( StringMapCref aMap )
+  {
+    PolymorphVector aVector;
+    aVector.reserve( aMap.size() );
+
+    for( StringMap::const_iterator i( aMap.begin() ); 
+	 i != aMap.end();  ++i )
+      {
+	PolymorphVector anInnerVector;
+	anInnerVector.push_back( i->first );
+	anInnerVector.push_back( i->second );
+
+	aVector.push_back( anInnerVector );
+      }
+
+    return aVector;
+  }
+
 
 
 

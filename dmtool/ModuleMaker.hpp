@@ -110,7 +110,9 @@ protected:
 */
 
 template<class T, class DMAllocator = SimpleAllocator( T )>
-class StaticModuleMaker : public ModuleMaker
+class StaticModuleMaker
+  : 
+  public ModuleMaker
 {
 
 public:
@@ -131,7 +133,7 @@ public:
      @return pointer to a new instance.
   */
 
-  virtual T* make( const std::string& classname );
+  virtual T* make( const std::string& aClassname );
 
 
   /**
@@ -155,7 +157,7 @@ protected:
     \return pointer to a new instance.
   */
 
-  virtual DMAllocator getAllocator( const std::string& classname ); 
+  virtual DMAllocator getAllocator( const std::string& aClassname ); 
 
 
 protected:
@@ -171,7 +173,9 @@ protected:
 */
 
 template<class T,class DMAllocator=SimpleAllocator( T )>
-class SharedModuleMaker : public StaticModuleMaker<T,DMAllocator>
+class SharedModuleMaker 
+  : 
+  public StaticModuleMaker<T,DMAllocator>
 {
 
 public:
@@ -184,9 +188,9 @@ public:
 protected:
 
 
-  virtual DMAllocator getAllocator( const std::string& classname );
+  virtual DMAllocator getAllocator( const std::string& aClassname );
 
-  void loadModule( const std::string& classname );
+  void loadModule( const std::string& aClassname );
 
 
 };
@@ -216,10 +220,10 @@ StaticModuleMaker<T,DMAllocator>::~StaticModuleMaker()
 }
 
 template<class T, class DMAllocator>
-T* StaticModuleMaker<T,DMAllocator>::make( const std::string& classname ) 
+T* StaticModuleMaker<T,DMAllocator>::make( const std::string& aClassname ) 
 {
 
-  DMAllocator anAllocator( getAllocator( classname ) );
+  DMAllocator anAllocator( getAllocator( aClassname ) );
   if( anAllocator == NULL )
     {
       throw DMException( std::string( "unexpected error in " ) +
@@ -231,7 +235,7 @@ T* StaticModuleMaker<T,DMAllocator>::make( const std::string& classname )
 
   if( anInstance == NULL )
     {
-      throw DMException( "Can't instantiate [" + classname + "]." );
+      throw DMException( "Can't instantiate [" + aClassname + "]." );
     }
 
   ++theNumberOfInstances;
@@ -251,14 +255,14 @@ void StaticModuleMaker<T,DMAllocator>::addClass( Module* dm )
 
 template<class T,class DMAllocator>
 DMAllocator StaticModuleMaker<T,DMAllocator>::
-getAllocator( const std::string& classname )
+getAllocator( const std::string& aClassname )
 {
-  if( theModuleMap.find( classname ) == theModuleMap.end() )
+  if( theModuleMap.find( aClassname ) == theModuleMap.end() )
     {
-      throw DMException( "Class [" + classname + "] not found." );
+      throw DMException( "Class [" + aClassname + "] not found." );
     }
 
-  return theModuleMap[ classname ]->getAllocator();
+  return theModuleMap[ aClassname ]->getAllocator();
 }
 
 
@@ -288,27 +292,27 @@ SharedModuleMaker<T,DMAllocator>::~SharedModuleMaker()
 
 template<class T,class DMAllocator>
 DMAllocator SharedModuleMaker<T,DMAllocator>::
-getAllocator( const std::string& classname ) 
+getAllocator( const std::string& aClassname ) 
 {
   DMAllocator anAllocator( NULL );
 
   try 
     {
       anAllocator = 
-	StaticModuleMaker<T,DMAllocator>::getAllocator( classname );
+	StaticModuleMaker<T,DMAllocator>::getAllocator( aClassname );
     }
   catch( DMException& )
     { 
       // load module file and try again
-      loadModule( classname );      
+      loadModule( aClassname );      
       anAllocator = 
-	StaticModuleMaker<T,DMAllocator>::getAllocator( classname );
+	StaticModuleMaker<T,DMAllocator>::getAllocator( aClassname );
     }
 
   if( anAllocator == NULL )
     {
       // getAllocator() returned NULL! why?
-      throw DMException( std::string("unexpected error in ") 
+      throw DMException( std::string( "unexpected error in " ) 
 			 + __PRETTY_FUNCTION__ );
     }
 
@@ -316,10 +320,11 @@ getAllocator( const std::string& classname )
 }
 
 template<class T,class DMAllocator>
-void SharedModuleMaker<T,DMAllocator>::loadModule( const std::string& classname )
+void 
+SharedModuleMaker<T,DMAllocator>::loadModule( const std::string& aClassname )
 {
   // return immediately if already loaded
-  if( theModuleMap.find( classname ) != theModuleMap.end() )
+  if( theModuleMap.find( aClassname ) != theModuleMap.end() )
     {
       return;      
     }
@@ -327,7 +332,7 @@ void SharedModuleMaker<T,DMAllocator>::loadModule( const std::string& classname 
   SharedModule* sm( NULL );
   try 
     {
-      sm = new SharedModule( classname );
+      sm = new SharedModule( aClassname );
       addClass( sm );
     }
   catch ( const DMException& e )

@@ -41,6 +41,7 @@
 #include "Logger.hpp"
 #include "Polymorph.hpp"
 
+
 namespace libecs
 {
 
@@ -54,6 +55,9 @@ namespace libecs
   /** @file */
 
 
+
+  // convert std::map to a Polymorph which is a nested-list.
+  //  template< class MAP >
 
   /**
      Base class for PropertySlot classes.
@@ -138,7 +142,6 @@ namespace libecs
     {
       return getPolymorph( anObject );
     }
-
 
   };
 

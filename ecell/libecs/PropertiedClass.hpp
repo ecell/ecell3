@@ -53,14 +53,14 @@ namespace libecs
 
 
 #define LIBECS_DM_OBJECT_ABSTRACT( CLASSNAME )\
-  LIBECS_DM_OBJECT_DEF( CLASSNAME );\
+  LIBECS_DM_OBJECT_DEF_ABSTRACT( CLASSNAME );\
   LIBECS_DM_EXPOSE_PROPERTYINTERFACE( CLASSNAME );\
   LIBECS_DM_DEFINE_PROPERTIES()
 
 
 #define LIBECS_DM_OBJECT( CLASSNAME, DMTYPE )\
   DM_OBJECT( CLASSNAME, DMTYPE );\
-  LIBECS_DM_OBJECT_DEF( CLASSNAME );\
+  LIBECS_DM_OBJECT_DEF( CLASSNAME, DMTYPE );\
   LIBECS_DM_EXPOSE_PROPERTYINTERFACE( CLASSNAME );\
   LIBECS_DM_DEFINE_PROPERTIES()
 
@@ -74,16 +74,23 @@ namespace libecs
   LIBECS_DM_INIT_STATIC( CLASSNAME, DMTYPE )
 
 
+  // definition and initialization of static members.
+  // thePropertyInterface should come last, because thePropertySlotMap
+  // is initialized in the constructor of the PropertyInterface object.
+
 #define LIBECS_DM_INIT_STATIC( CLASSNAME, DMTYPE )\
   libecs::PropertyInterface<CLASSNAME>::PropertySlotMap\
     libecs::PropertyInterface<CLASSNAME>::thePropertySlotMap;\
-  libecs::PropertyInterface<CLASSNAME>\
-    CLASSNAME::thePropertyInterface
+  libecs::StringMap libecs::PropertyInterface<CLASSNAME>::theClassInfoMap;\
+  libecs::PropertyInterface<CLASSNAME> CLASSNAME::thePropertyInterface
 
-//  static PropertyInitializer<CLASSNAME> a ## CLASSNAME ## PropertyInitializer
 
   ///@internal
-#define LIBECS_DM_OBJECT_DEF( CLASSNAME )\
+#define LIBECS_DM_OBJECT_DEF( CLASSNAME, DMTYPE )\
+  typedef DMTYPE _LIBECS_DMTYPE_;\
+  LIBECS_DM_OBJECT_DEF_ABSTRACT( CLASSNAME )
+
+#define LIBECS_DM_OBJECT_DEF_ABSTRACT( CLASSNAME )\
   typedef CLASSNAME _LIBECS_CLASS_;\
   virtual StringLiteral getClassName() const { return XSTR( CLASSNAME ); } //
 
@@ -128,7 +135,7 @@ public:\
   //
 
 #define INHERIT_PROPERTIES( BASECLASS )\
-    BASECLASS::initializeProperties( Type2Type<TT>() )
+    BASECLASS::initializePropertyInterface( Type2Type<TT>() )
 
 #define NOMETHOD NULLPTR
 
@@ -177,11 +184,15 @@ public:\
                              NULLPTR,\
                              & _LIBECS_CLASS_::get ## NAME )
 
+  // Info
+
+#define CLASS_INFO( FIELD, INFO )\
+  PropertyInterface<TT>::setClassInfo( #FIELD, INFO )
 
   ///@internal
 #define LIBECS_DM_DEFINE_PROPERTIES()\
   template<class TT>\
-  static void initializeProperties( Type2Type<TT> )\
+  static void initializePropertyInterface( Type2Type<TT> )
 
 
 

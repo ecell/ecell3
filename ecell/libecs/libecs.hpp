@@ -30,6 +30,8 @@
 
 #ifndef __LIBECS_HPP
 #define __LIBECS_HPP
+#include <map>
+
 #include "Defs.hpp"
 #include "RCPtr.hpp"
 
@@ -47,8 +49,11 @@ namespace libecs
   // Declarations to be exported
 
 
+  // string STL containers.
   DECLARE_LIST  ( String, StringList );
   DECLARE_VECTOR( String, StringVector );
+  DECLARE_MAP( const String, String, std::less<const String>,
+	       StringMap );
 
   DECLARE_RCPTR( StringList );
   DECLARE_RCPTR( StringVector );

@@ -16,6 +16,8 @@ Base* ObjectAllocator()
   {\
     TYPE::AllocatorFuncPtr CreateObject =\
     &ObjectAllocator<TYPE,CLASSNAME>;\
+    const char* __DM_CLASSNAME = #CLASSNAME;\
+    const char* __DM_TYPE = #TYPE;\
   } // 
 
 

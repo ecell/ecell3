@@ -35,7 +35,7 @@
 #include <functional>
 #include <limits>
 
-#include "Defs.hpp"
+#include "libecs.hpp"
 #include "Exceptions.hpp"
 
 namespace libecs
@@ -241,6 +241,9 @@ namespace libecs
 	}
     }
   };
+
+
+  const Polymorph convertStringMapToPolymorph( StringMapCref aMap );
 
 
   //@}

@@ -70,7 +70,7 @@ namespace libecs
   {
     THROW_EXCEPTION( NoSlot,
 		     getClassName() + 
-		     String( ": No property slot found by name [" )
+		     String( ": No property slot [" )
 		     + aPropertyName + "].  Set property failed." );
   }
 
@@ -79,7 +79,7 @@ namespace libecs
   {
     THROW_EXCEPTION( NoSlot, 
 		     getClassName() + 
-		     String( ": No property slot found by name [" )
+		     String( ": No property slot [" )
 		     + aPropertyName + "].  Get property failed." );
   }
 

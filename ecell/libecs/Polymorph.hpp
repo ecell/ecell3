@@ -339,6 +339,8 @@ namespace libecs
   };
 
 
+
+
   template <>
   inline const String Polymorph::as() const
   {

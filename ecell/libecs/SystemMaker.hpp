@@ -46,14 +46,14 @@ namespace libecs
     public SharedModuleMaker<System>
   {
 
-  protected:
-
-    virtual void makeClassList();
-
   public:
 
     SystemMaker();
-    ~SystemMaker() {}
+    virtual ~SystemMaker() {}
+
+  protected:
+
+    void makeClassList();
 
   };
 

@@ -74,6 +74,22 @@ namespace libecs
     static void throwNotSavable( PropertiedClassCref aClassName, 
 				 StringCref aPropertyName );
 
+
+
+    // info-related helper methods.
+    static void setInfoField( StringMapRef anInfoMap,
+			      StringCref aFieldName, StringCref anInfoString );
+
+    Polymorph getClassInfoAsPolymorph()
+    {
+      return convertInfoMapToPolymorph( getClassInfoMap() );
+    }
+
+    static const Polymorph 
+    convertInfoMapToPolymorph( StringMapCref anInfoMap );
+
+    virtual StringMapCref getClassInfoMap() = 0;
+
   };
 
 
@@ -91,12 +107,12 @@ namespace libecs
     typedef PropertySlot<T> PropertySlot_;
     DECLARE_TYPE( PropertySlot_, PropertySlot );
 
-    DECLARE_ASSOCVECTOR_TEMPLATE( String, PropertySlot*,
+    DECLARE_ASSOCVECTOR_TEMPLATE( String, PropertySlotPtr,
 				  std::less<const String>, PropertySlotMap );
 
     PropertyInterface()
     {
-      T::initializeProperties( Type2Type<T>() );
+      T::initializePropertyInterface( Type2Type<T>() );
     }
 
     ~PropertyInterface()
@@ -276,7 +292,8 @@ namespace libecs
 	  thePropertySlotMap.erase( aName );
 	}
 
-      thePropertySlotMap[ aName ] = aPropertySlotPtr;
+      //      thePropertySlotMap[ aName ] = aPropertySlotPtr;
+      thePropertySlotMap.insert( std::make_pair( aName, aPropertySlotPtr ) );
     }
 
 
@@ -301,6 +318,48 @@ namespace libecs
     }
 
 
+
+    // info-related methods
+
+    static void 
+    setClassInfo( StringCref aFieldName, StringCref anInfoString )
+    {
+      PropertyInterface::setInfoField( theClassInfoMap, 
+				       aFieldName, anInfoString );
+    }
+
+    virtual StringMapCref getClassInfoMap()
+    {
+      return theClassInfoMap;
+    }
+
+    /*
+    static void 
+    setPropertySlotInfo( StringCref aPropertySlotName, StringCref aFieldName,
+			 StringCref anInfoString )
+    {
+      PropertySlotCptr 
+	aPropertySlotPtr( getPropertySlot( aPropertySlotName ) );
+      aPropertySlotPtr->setClassInfo( aFieldName, anInfoString );
+    }
+
+    static StringMapCref
+    getPropertySlotInfoMap( StringCref aPropertySlotName )
+    {
+      PropertySlotCptr 
+	aPropertySlotPtr( getPropertySlot( aPropertySlotName ) );
+      aPropertySlotPtr->setClassInfo();
+    }
+
+    static const Polymorph
+    getPropertySlotInfoAsPolymorph( StringCref aPropertySlotName )
+    {
+      PropertySlotCptr 
+	aPropertySlotPtr( getPropertySlot( aPropertySlotName ) );
+      aPropertySlotPtr->getClassInfoAsPolymorph();
+    }
+    */
+
   private:
 
     static PropertySlotMapConstIterator 
@@ -311,7 +370,9 @@ namespace libecs
 
   private:
 
-    static PropertySlotMap        thePropertySlotMap;
+    static PropertySlotMap  thePropertySlotMap;
+
+    static StringMap        theClassInfoMap;
 
   };
 

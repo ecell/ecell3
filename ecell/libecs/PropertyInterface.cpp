@@ -64,6 +64,22 @@ namespace libecs
   }
 
 
+  void PropertyInterfaceBase::setInfoField( StringMapRef anInfoMap,
+					    StringCref aFieldName, 
+					    StringCref anInfoString )
+  {
+    anInfoMap[ aFieldName ] = anInfoString;
+
+    //    anInfoMap.insert( std::make_pair( aFieldName, anInfoString ) );
+  }
+
+  const Polymorph 
+  PropertyInterfaceBase::convertInfoMapToPolymorph( StringMapCref anInfoMap )
+  {
+    return convertStringMapToPolymorph( anInfoMap );
+  }
+
+
 } // namespace libecs
 
 

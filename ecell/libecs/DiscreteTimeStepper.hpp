@@ -59,7 +59,7 @@ namespace libecs
 
   */
 
-  LIBECS_DM_CLASS( DiscreteTimeStepper,Stepper )
+  LIBECS_DM_CLASS( DiscreteTimeStepper, Stepper )
   {
 
   public:
