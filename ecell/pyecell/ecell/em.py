@@ -7,7 +7,7 @@ A system for processing Python as markup embedded in text.
 """
 
 __program__ = 'empy'
-__version__ = '2.0'
+__version__ = '2.0.1'
 __url__ = 'http://www.alcyone.com/pyos/empy/'
 __author__ = 'Erik Max Francis <max@alcyone.com>'
 __copyright__ = 'Copyright (C) 2002 Erik Max Francis'
@@ -750,6 +750,10 @@ class PseudoModule:
         context = self.interpreter.context()
         context.line = line
 
+    def atExit(self, callable):
+        """Register a function to be called at exit."""
+        self.addHook('at_shutdown', lambda i, d, k=callable: k(), True)
+
     # Hook support.
 
     def getHooks(self, name):
@@ -764,10 +768,13 @@ class PseudoModule:
         if self.interpreter.hooks.has_key(name):
             del self.interpreter.hooks[name]
 
-    def addHook(self, name, hook):
-        """Add a new hook."""
+    def addHook(self, name, hook, prepend=False):
+        """Add a new hook; optionally insert it rather than appending it."""
         if self.interpreter.hooks.has_key(name):
-            self.interpreter.hooks[name].append(hook)
+            if prepend:
+                self.interpreter.hooks[name].insert(0, hook)
+            else:
+                self.interpreter.hooks[name].append(hook)
         else:
             self.interpreter.hooks[name] = [hook]
 
@@ -1345,10 +1352,11 @@ class Interpreter:
             self.invoke('before_evaluate', \
                         expression=expression, locals=locals)
             if locals is not None:
-                return eval(expression, self.globals, locals)
+                result = eval(expression, self.globals, locals)
             else:
-                return eval(expression, self.globals)
+                result = eval(expression, self.globals)
             self.invoke('after_evaluate')
+            return result
         finally:
             sys.stdout.pop()
 
@@ -1480,6 +1488,7 @@ Valid options:
   -p --prefix=<char>           Change prefix to something other than @
   -f --flatten                 Flatten the members of pseudmodule to start
   -r --raw --raw-errors        Show raw Python errors
+  -i --interactive             Go into interactive mode after processing
   -o --output=<filename>       Specify file for output as write
   -a --append=<filename>       Specify file for output as append
   -P --preprocess=<filename>   Interpret empy file before main processing
@@ -1556,9 +1565,10 @@ The %s pseudomodule contains the following attributes:
   setFilter(filter)            Install new filter or filter chain
   getHooks(name)               Get the list of hooks with name
   clearHooks(name)             Clear all hooks with name
-  addHook(name, hook)          Register hook with name
+  addHook(name, hook, [i])     Register hook with name (optionally insert)
   removeHook(name, hook)       Remove hook from name
   invokeHook(name_, ...)       Manually invoke hook with name
+  atExit(callable)             Invoke no-argument function at shutdown
   Filter                       The base class for custom filters
   NullFilter                   A filter which never outputs anything
   FunctionFilter               A filter which calls a function
