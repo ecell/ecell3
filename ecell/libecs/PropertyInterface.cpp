@@ -42,28 +42,31 @@ namespace libecs
   void PropertyInterface::makeSlots()
   {
     makePropertySlot( "PropertyList",PropertyInterface,*this,NULLPTR,
-		     &PropertyInterface::getPropertyList);
+		      &PropertyInterface::getPropertyList);
     makePropertySlot( "PropertyAttributes",PropertyInterface,*this,NULLPTR,
-		     &PropertyInterface::getPropertyAttributes);
+		      &PropertyInterface::getPropertyAttributes);
 
   }
 
   const Message PropertyInterface::getPropertyList( StringCref keyword )
   {
-    UConstantVector aPropertyList;
+    UConstantVectorRCPtr 
+      aPropertyVectorPtr( new UConstantVector );// thePropertyMap.size() ) );
+    aPropertyVectorPtr->reserve( thePropertyMap.size() );
 
     for( PropertyMapConstIterator i = thePropertyMap.begin() ; 
 	 i != thePropertyMap.end() ; ++i )
       {
-	aPropertyList.push_back( UConstant( i->first ) );
+	aPropertyVectorPtr->push_back( i->first );
       }
 
-    return Message( keyword, aPropertyList );
+    return Message( keyword, aPropertyVectorPtr );
   }
 
   const Message PropertyInterface::getPropertyAttributes( StringCref keyword )
   {
-    UConstantVector aPropertyList;
+    UConstantVectorRCPtr aPropertyAttributesVector( new UConstantVector );
+    aPropertyAttributesVector->reserve( thePropertyMap.size() );
 
     for( PropertyMapConstIterator i = thePropertyMap.begin() ; 
 	 i != thePropertyMap.end() ; ++i )
@@ -80,10 +83,10 @@ namespace libecs
 	    anAttributeFlag |= GETABLE;
 	  }
 
-	aPropertyList.push_back( UConstant( anAttributeFlag ) );
+	aPropertyAttributesVector->push_back( anAttributeFlag );
       }
 
-    return Message( keyword, aPropertyList );
+    return Message( keyword, aPropertyAttributesVector );
   }
 
   PropertyInterface::PropertyInterface()

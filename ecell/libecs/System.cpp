@@ -74,41 +74,44 @@ namespace libecs
 
   const Message System::getSystemList( StringCref keyword )
   {
-    UConstantVector aVector;
+    UConstantVectorRCPtr aVectorPtr( new UConstantVector );
+    aVectorPtr->reserve( theSystemMap.size() );
 
     for( SystemMapIterator i = getFirstSystemIterator() ;
 	 i != getLastSystemIterator() ; ++i )
       {
-	aVector.push_back( UConstant( i->second->getID() ) );
+	aVectorPtr->push_back( i->second->getID() );
       }
 
-    return Message( keyword, aVector );
+    return Message( keyword, aVectorPtr );
   }
 
   const Message System::getSubstanceList( StringCref keyword )
   {
-    UConstantVector aVector;
+    UConstantVectorRCPtr aVectorPtr( new UConstantVector );
+    aVectorPtr->reserve( theSubstanceMap.size() );
 
     for( SubstanceMapIterator i = getFirstSubstanceIterator() ;
 	 i != getLastSubstanceIterator() ; ++i )
       {
-	aVector.push_back( UConstant( i->second->getID() ) );
+	aVectorPtr->push_back( i->second->getID() );
       }
 
-    return Message( keyword, aVector );
+    return Message( keyword, aVectorPtr );
   }
 
   const Message System::getReactorList( StringCref keyword )
   {
-    UConstantVector aVector;
+    UConstantVectorRCPtr aVectorPtr( new UConstantVector );
+    aVectorPtr->reserve( theReactorMap.size() );
 
     for( ReactorMapIterator i = getFirstReactorIterator() ;
 	 i != getLastReactorIterator() ; ++i )
       {
-	aVector.push_back( UConstant( i->second->getID() ) );
+	aVectorPtr->push_back( i->second->getID() );
       }
 
-    return Message( keyword, aVector );
+    return Message( keyword, aVectorPtr );
   }
 
 
@@ -148,13 +151,11 @@ namespace libecs
   {
     if( haveVolumeIndex() )
       {
-	cerr << "y" << endl;
 	return Message( keyword, 
  			UConstant( getVolume() ) ) ;
       }
     else
       {
-	cerr << "n" << endl;
 	return Message( keyword );
       }
   }
@@ -389,7 +390,7 @@ namespace libecs
 	return;
       }
 
-    theSubsystemMap[ system->getID() ] = system;
+    theSystemMap[ system->getID() ] = system;
     system->setSuperSystem( this );
 
   }

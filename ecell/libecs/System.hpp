@@ -271,7 +271,7 @@ namespace libecs
     */
     SystemMapIterator getFirstSystemIterator()
     {
-      return theSubsystemMap.begin();
+      return theSystemMap.begin();
     }
 
     /**
@@ -279,7 +279,7 @@ namespace libecs
     */
     SystemMapIterator getLastSystemIterator()
     {
-      return theSubsystemMap.end();
+      return theSystemMap.end();
     }
 
     /**
@@ -287,7 +287,7 @@ namespace libecs
     */
     SystemMapIterator getSystemIterator( StringCref id )
     {
-      return theSubsystemMap.find( id );
+      return theSystemMap.find( id );
     }
 
     /**
@@ -295,7 +295,7 @@ namespace libecs
     */
     bool containsSystem( StringCref id )
     {
-      return ( getSystemIterator( id ) != theSubsystemMap.end() ) ? 
+      return ( getSystemIterator( id ) != theSystemMap.end() ) ? 
 	true : false;
     }
 
@@ -304,7 +304,7 @@ namespace libecs
     */
     int getNumberOfSystems() const
     {
-      return theSubsystemMap.size();
+      return theSystemMap.size();
     }
 
     /**
@@ -366,7 +366,7 @@ namespace libecs
 
     ReactorMap   theReactorMap;
     SubstanceMap theSubstanceMap;
-    SystemMap    theSubsystemMap;
+    SystemMap    theSystemMap;
 
     RootSystemPtr theRootSystem;
 

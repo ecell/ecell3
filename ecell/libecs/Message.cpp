@@ -96,7 +96,6 @@ namespace libecs
     return *this;
   }
 
-  // FIXME: is this ok?
   Message::~Message()
   {
     ; // do nothing

@@ -64,7 +64,7 @@ namespace libemc
 			      libecs::StringCref          systempath,
 			      libecs::StringCref          id,
 			      libecs::StringCref          propertyname,
-			      libecs::UConstantVectorRef data ) = 0;
+			      libecs::UConstantVectorCref data ) = 0;
 
     virtual const libecs::UConstantVectorRCPtr
     getProperty( libecs::PrimitiveType type,

@@ -30,51 +30,7 @@
 
 #include "PyUVariable.hpp"
 
-PyUConstant::PyUConstant( const Py::Object& aPyObject )
-{
-  // FIXME: ugly to use _TYPE_Check()?
-  if( Py::_Float_Check( *aPyObject ) )
-    {
-      theData = new libecs::UConstantRealData( Py::Float( aPyObject ) );
-      theType = REAL;
-    }
-  else if( Py::_Int_Check( *aPyObject ) )
-    {
-      theData = new libecs::UConstantIntData( Py::Int( aPyObject ) );
-      theType = INT;
-    }
-  else if( Py::_Long_Check( *aPyObject ) )
-    {
-      theData = new libecs::UConstantRealData( Py::Float( aPyObject ) );
-      theType = REAL;
-    }
-  else // assume everything else as a string
-    {
-      theData = new libecs::UConstantStringData( aPyObject.as_string() );
-      theType = STRING;
-    }
-}
 
-const Py::Object PyUConstant::asPyObject() const
-{
-  switch( getType() )
-    {
-    case UConstant::REAL:
-      return Py::Float( asReal() );
-      
-    case UConstant::INT:
-      // FIXME: ugly... determine the type by autoconf?
-      return Py::Int( static_cast<long int>( asInt() ) );
-      
-    case UConstant::STRING:
-    case UConstant::NONE:
-      return Py::String( asString() );
-      
-    default:
-      Py::SystemError( "Unexpected error at: " + 
-		       libecs::String( __PRETTY_FUNCTION__  ));
-    }
 
-}
-
+// empty
 

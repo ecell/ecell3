@@ -114,54 +114,58 @@ namespace libecs
 
   const Message Reactor::getSubstrateList( StringCref keyword )
   {
-    UConstantVector aList;
+    UConstantVectorRCPtr aVectorPtr( new UConstantVector );
+    aVectorPtr->reserve( theSubstrateList.size() );
   
     for( ReactantVectorConstIterator i( theSubstrateList.begin() );
 	 i != theSubstrateList.end() ; ++i )
       {
-	aList.push_back( (*i)->getSubstance().getFullID().getString() );
+	aVectorPtr->push_back( (*i)->getSubstance().getFullID().getString() );
       }
 
-    return Message( keyword, aList );
+    return Message( keyword, aVectorPtr );
   }
 
   const Message Reactor::getProductList( StringCref keyword )
   {
-    UConstantVector aList;
+    UConstantVectorRCPtr aVectorPtr( new UConstantVector );
+    aVectorPtr->reserve( theProductList.size() );
   
     for( ReactantVectorConstIterator i( theProductList.begin() );
 	 i != theProductList.end() ; ++i )
       {
-	aList.push_back( (*i)->getSubstance().getFullID().getString() );
+	aVectorPtr->push_back( (*i)->getSubstance().getFullID().getString() );
       }
 
-    return Message( keyword, aList );
+    return Message( keyword, aVectorPtr );
   }
 
   const Message Reactor::getEffectorList( StringCref keyword )
   {
-    UConstantVector aList;
+    UConstantVectorRCPtr aVectorPtr( new UConstantVector );
+    aVectorPtr->reserve( theEffectorList.size() );
   
     for( ReactantVectorConstIterator i( theEffectorList.begin() );
 	 i != theEffectorList.end() ; ++i )
       {
-	aList.push_back( (*i)->getSubstance().getFullID().getString() );
+	aVectorPtr->push_back( (*i)->getSubstance().getFullID().getString() );
       }
 
-    return Message( keyword, aList );
+    return Message( keyword, aVectorPtr );
   }
 
   const Message Reactor::getCatalystList( StringCref keyword )
   {
-    UConstantVector aList;
+    UConstantVectorRCPtr aVectorPtr( new UConstantVector );
+    aVectorPtr->reserve( theCatalystList.size() );
   
     for( ReactantVectorConstIterator i( theCatalystList.begin() );
 	 i != theCatalystList.end() ; ++i )
       {
-	aList.push_back( (*i)->getSubstance().getFullID().getString() );
+	aVectorPtr->push_back( (*i)->getSubstance().getFullID().getString() );
       }
 
-    return Message( keyword, aList );
+    return Message( keyword, aVectorPtr );
   }
 
   void Reactor::setInitialActivity( MessageCref message )
@@ -171,7 +175,7 @@ namespace libecs
 
   const Message Reactor::getInitialActivity( StringCref keyword )
   {
-    return Message( keyword, UConstant( theInitialActivity ) );
+    return Message( keyword, theInitialActivity );
   }
 
   void Reactor::appendSubstrate( FullIDCref fullid, int coefficient )
@@ -214,7 +218,7 @@ namespace libecs
   {
     theInitialActivity = activity;
 
-    theActivity= theInitialActivity * 
+    theActivity = theInitialActivity * 
       getSuperSystem()->getStepper()->getStepInterval();
   }
 

@@ -43,7 +43,31 @@ class PyUConstant
 
 public:
 
-  PyUConstant( const Py::Object& aPyObject );
+  PyUConstant( const Py::Object& aPyObject )
+  {
+    // FIXME: ugly to use _TYPE_Check()?
+    if( Py::_Float_Check( *aPyObject ) )
+      {
+	theData = new libecs::UConstantRealData( Py::Float( aPyObject ) );
+	theType = REAL;
+      }
+    else if( Py::_Int_Check( *aPyObject ) )
+      {
+	theData = new libecs::UConstantIntData( Py::Int( aPyObject ) );
+	theType = INT;
+      }
+    else if( Py::_Long_Check( *aPyObject ) )
+      {
+	theData = new libecs::UConstantRealData( Py::Float( aPyObject ) );
+	theType = REAL;
+      }
+    else // assume everything else as a string
+      {
+	theData = new libecs::UConstantStringData( aPyObject.as_string() );
+	theType = STRING;
+      }
+  }
+
 
   PyUConstant( libecs::UConstantCref uc )
     :
@@ -52,7 +76,32 @@ public:
     ; // do nothing
   }
 
-  const Py::Object asPyObject() const;
+  const Py::Object asPyObject() const
+  {
+    return toPyObject( static_cast<UConstant>( *this ) );
+  }
+
+  static const Py::Object toPyObject( libecs::UConstantCref uconstant )
+  {
+    switch( uconstant.getType() )
+      {
+      case UConstant::REAL:
+	return Py::Float( uconstant.asReal() );
+	
+      case UConstant::INT:
+	// FIXME: ugly... determine the type by autoconf?
+	return Py::Int( static_cast<long int>( uconstant.asInt() ) );
+	
+      case UConstant::STRING:
+      case UConstant::NONE:
+	return Py::String( uconstant.asString() );
+	
+      default:
+	Py::SystemError( "Unexpected error at: " + 
+			 libecs::String( __PRETTY_FUNCTION__  ));
+      }
+  }
+
 
 };
 

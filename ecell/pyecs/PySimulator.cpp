@@ -147,14 +147,13 @@ Object PySimulator::getProperty( const Py::Tuple& args )
 							   anID,
 							   aPropertyName ) );
 
-  cerr << "got" << endl;
   UConstantVector::size_type aSize( aVectorPtr->size() );
 
   Py::Tuple aTuple( aSize );
 
   for( UConstantVector::size_type i( 0 ) ; i < aSize ; ++i )
     {
-      aTuple[i] = ( PyUConstant( (*aVectorPtr)[i] ) ).asPyObject();
+      aTuple[i] = PyUConstant::toPyObject( (*aVectorPtr)[i] );
     }
 
   return aTuple;

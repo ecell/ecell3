@@ -57,10 +57,10 @@ namespace libecs
   public:
 
     Message( StringCref keyword );
-    Message( StringCref keyword, const UConstantVector* uvl ); 
-    Message( StringCref keyword, UConstantVectorCref uvl ); 
-    Message( StringCref keyword, UConstantVectorRCPtr uvl ); 
     Message( StringCref keyword, UConstantCref uv ); 
+    explicit Message( StringCref keyword, const UConstantVector* uvl ); 
+    explicit Message( StringCref keyword, UConstantVectorCref uvl ); 
+    explicit Message( StringCref keyword, UConstantVectorRCPtr uvl ); 
 
     // copy procedures
     Message( MessageCref message );
