@@ -44,6 +44,7 @@ FixedDAE1Stepper.cpp\
 ODE23Stepper.cpp\
 ODE45Stepper.cpp\
 DAEStepper.cpp\
+ODEStepper.cpp\
 ESSYNSStepper.cpp\
 GMAProcess.cpp\
 SSystemProcess.cpp\
@@ -68,6 +69,7 @@ GillespieProcess.hpp\
 NRStepper.hpp\
 ESSYNSStepper.hpp\
 ODE23Stepper.hpp\
+ODEStepper.hpp\
 DAEStepper.hpp\
 FluxDistributionStepper.hpp\
 QuasiDynamicFluxProcess.hpp\
@@ -95,6 +97,7 @@ IsoUniUniFluxProcess.desc\
 MassActionFluxProcess.desc\
 MichaelisUniUniFluxProcess.desc\
 NRStepper.desc\
+ODEStepper.desc\
 ODE23Stepper.desc\
 ODE45Stepper.desc\
 OrderedBiBiFluxProcess.desc\
