@@ -570,7 +570,7 @@ class MainWindow(OsogoWindow):
 			import sys
 			import traceback
 			aErrorMessage = traceback.format_exception(sys.exc_type,sys.exc_value,sys.exc_traceback)
-			self.theMessageWindow.message(aErrorMessage)
+			self.theMessageWindow.printMessage( aErrorMessage )
 
 		else:
 			pass
