@@ -103,7 +103,7 @@ public:
       }
     else // one substrate, second order (coeff == -2)
       {
-	aMultiplicity *= ( aMultiplicity - 1.0 );
+	aMultiplicity *= ( aMultiplicity - 1.0 ) * 0.5;
       }
 
     // this method never return a negative number
@@ -122,26 +122,24 @@ public:
 
   GET_METHOD( Real, MinValue )
   {
-    // coefficents == 1 only!!! 
-      
-    VariableReferenceVectorConstIterator
-      s( theVariableReferenceVector.begin() );
+    Real aMinValue( theVariableReferenceVector[0].getValue() );
 
-    Real aMinValue( s->getValue() );
-    ++s;
-
-    while( s != theVariableReferenceVector.end() )
+    if( getOrder() == 1 )   // one substrate, first order.
       {
-	VariableReference aVariableReference( *s );
-	const Real aValue( aVariableReference.getValue() );
-
-	if( aValue < aMinValue )
+	; // do nothing
+      }
+    else if( getZeroVariableReferenceOffset() == 2 ) // 2 substrates, 2nd order
+      {  
+	const Real aSecondValue( theVariableReferenceVector[1].getValue() );
+	if( aSecondValue < aMinValue )
 	  {
-	    aMinValue = aValue;
+	    aMinValue = aSecondValue;
 	  }
-
-	++s;
-      } 
+      }
+    else // one substrate, second order (coeff == -2)
+      {
+	aMinValue *= 0.5;
+      }
 
     return aMinValue;
   }
@@ -153,12 +151,6 @@ public:
   void updateStepInterval( const Real u )
   {
     const Real aMu( getMu() );
-
-    // this if is unnecessary: getMultiplicity() always gives >= 0.0
-    //if( aMu < 0.0 )
-    //      {
-    //	THROW_EXCEPTION( SimulationError, "Negative Mu value." );
-    //      }
 
     if( aMu > 0.0 )
       {
