@@ -34,27 +34,31 @@ ECELL3_DM_CLASS
   virtual void initialize()
     {
       FluxProcess::initialize();
+
+      C0 = getVariableReference( "C0" );
     }
 
   virtual void process()
     {
-
       Real velocity( k * N_A );
       velocity *= getSuperSystem()->getVolume();
-      velocity *= C0.getVariable()->getValue();
+      velocity *= C0.getValue();
       for( VariableReferenceVectorConstIterator
 	     i ( theVariableReferenceVector.begin() );
            i != theZeroVariableReferenceIterator ; ++i )
 	{
-	  
-	  for( Int j( (*i).getCoefficient()); j!=0; j-- )
+	  VariableReferenceCref aVariableReference( *i );
+	  const Real aConcentration( aVariableReference.getConcentration() );
+
+	  Int j( aVariableReference.getCoefficient() );
+	  do
 	    {	   
-	      velocity *= (*i).getVariable()->getConcentration();
-	    }
+	      velocity *= aConcentration;
+	      --j;
+	    } while( j != 0 );
 	}
 
       setFlux( velocity );
-    
     }
   
  protected:
