@@ -17,7 +17,7 @@ lib_LTLIBRARIES = libemc.la
 
 CXXFLAGS= @CXXFLAGS@ #-D_REENTRANT
 
-libemc_la_LDFLAGS=
+libemc_la_LDFLAGS= -version-info 0:1:0
 
 #FIXME: specifing .libs is ugly
 libemc_la_LIBADD= $(LIBECS) $(LIBKORANDOM) -lstdc++ 

@@ -17,7 +17,7 @@ lib_LTLIBRARIES = libecs.la
 
 CXXFLAGS= @CXXFLAGS@ # -D_REENTRANT
 
-libecs_la_LDFLAGS= #-rpath ${libdir}
+libecs_la_LDFLAGS= -version-info 0:1:0 #-rpath ${libdir}
 libecs_la_LIBADD= ${LIBLTDL} -L${KORANDOM_DIR}/korandom/ -lkorandom -lstdc++
 libecs_la_SOURCES=\
 Util.cpp\
