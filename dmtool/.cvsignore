@@ -1,0 +1,10 @@
+config.log
+config.status
+aclocal.m4
+Makefile.in
+config.h.in
+configure
+Makefile
+dmtool
+dmcompile
+libtool
