@@ -173,21 +173,77 @@ class Window:
 		"""
 		return self.theTitle
 
+
+	# ==============================================================
 	def getParent( self ):
+		"""Returns a Parent Window (Window)   # Not gtk.Window
+		"""
 
 		if self.theRoot == None:
 			return self
 		else:
 			return self.__getParent( self.theRoot )
 
-	def __getParent( self, *obj ):
 
-		if obj[0].theRoot == None:
-			return obj[0]
+	# ==============================================================
+	def __getParent( self, *arg ):
+		"""Returns a Parent Window (Window)   # Not gtk.Window
+		"""
+
+		if arg[0].theRoot == None:
+			return arg[0]
 		else:
-			return obj[0].__getParent( self.theRoot )
+			return arg[0].__getParent( self.theRoot )
 
-		
+
+	# ==============================================================
+	def getAllChildren( self ):
+		"""Returns all widget on this Window (list of widget) 
+		Other windows in same glade file are not included.
+		"""
+
+		aChildren = self[self.__class__.__name__].get_children()
+		return self.__getChildren( aChildren )
+
+
+	# ==============================================================
+	def __getChildren( self, aChildren ):
+		"""Returns all widget on this Window (list of widget) 
+		Other windows in same glade file are not included.
+		"""
+
+		aChildrenList = []    # list of widget
+
+		for aChild in aChildren:
+
+			# when aChild has no children, append it to list.
+			try:
+				aChild.get_children()
+			except AttributeError:
+				aChildrenList.append( aChild )
+			else:
+
+				# when aChild has no children, append it to list.
+				if len(aChild.get_children()) == 0:
+					aChildrenList.append( aChild )
+
+				else:
+
+					# when aChild has children, call this method.
+					aChildrenList += self.__getChildren( aChild.get_children() )
+
+		return aChildren + aChildrenList 
+
+
+	# ================================================================
+	def show_all( self ):
+		"""shows all widgets of this window
+		Returns None
+		"""
+
+		self[self.__class__.__name__].show_all()
+
+
 
 # end of Window
 
