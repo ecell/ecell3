@@ -1,10 +1,10 @@
-# created by eml2em program
-# from file: droTest.eml, date: Sun Oct 13 15:04:54 2002
+#
+# Drosophila.em
 #
 
-Stepper FixedODE1Stepper( DE )
+#Stepper FixedODE1Stepper( DE )
 #Stepper ODE23Stepper( DE )
-#Stepper ODE45Stepper( DE )
+Stepper ODE45Stepper( DE )
 {
 	# no property
 }
@@ -15,16 +15,9 @@ System System( / )
 	Variable Variable( SIZE ) { Value 0.000000000000001; }
 }
 
-System System( / )
-{
-	StepperID	DE;
-
-}
-
 System System( /CELL )
 {
 	StepperID	DE;
-
 }
 
 System System( /CELL/CYTOPLASM )
@@ -65,7 +58,7 @@ System System( /CELL/CYTOPLASM )
 
 		Expression "( (vs*KI) / (KI + (C0.MolarConc * C0.MolarConc * C0.MolarConc) ) * self.getSuperSystem().SizeN_A )";
 
-		VariableReferenceList	[ P0 Variable:.:M 1 ] [ C0 Variable:.:Pn 0 ];
+		VariableReferenceList	[ P0 Variable:.:M 1 ] [ C0 Variable:.:Pn ];
 	}
 	
 	Process ExpressionFluxProcess( R_toy2 )
@@ -84,7 +77,7 @@ System System( /CELL/CYTOPLASM )
 
 		Expression "( (Km * C0.MolarConc) * self.getSuperSystem().SizeN_A )";
 
-		VariableReferenceList	[ P0 Variable:.:P0 1 ] [ C0 Variable:.:M 0 ];
+		VariableReferenceList	[ P0 Variable:.:P0 1 ] [ C0 Variable:.:M ];
 	}
 	
 	Process ExpressionFluxProcess( R_toy4 )
@@ -94,7 +87,7 @@ System System( /CELL/CYTOPLASM )
 
 		Expression "( (-1 * V1 * C0.MolarConc) / (K1 + C0.MolarConc) * self.getSuperSystem().SizeN_A )";
 
-		VariableReferenceList	[ P0 Variable:.:P0 1 ] [ C0 Variable:.:P0 0 ];
+		VariableReferenceList	[ P0 Variable:.:P0 1 ] [ C0 Variable:.:P0 ];
 	}
 	
 	Process ExpressionFluxProcess( R_toy5 )
@@ -104,7 +97,7 @@ System System( /CELL/CYTOPLASM )
 
 		Expression "( (V2 * C0.MolarConc) / (K2 + C0.MolarConc) * self.getSuperSystem().SizeN_A )";
 
-		VariableReferenceList	[ P0 Variable:.:P0 1 ] [ C0 Variable:.:P1 0 ];
+		VariableReferenceList	[ P0 Variable:.:P0 1 ] [ C0 Variable:.:P1 ];
 	}
 	
 	Process ExpressionFluxProcess( R_toy6 )
@@ -114,7 +107,7 @@ System System( /CELL/CYTOPLASM )
 
 		Expression "( (V1 * C0.MolarConc) / (K1 + C0.MolarConc) * self.getSuperSystem().SizeN_A )";
 
-		VariableReferenceList	[ P0 Variable:.:P1 1 ] [ C0 Variable:.:P0 0 ];
+		VariableReferenceList	[ P0 Variable:.:P1 1 ] [ C0 Variable:.:P0 ];
 	}
 	
 	Process ExpressionFluxProcess( R_toy7 )
@@ -124,7 +117,7 @@ System System( /CELL/CYTOPLASM )
 
 		Expression "( (-1 * V2 * C0.MolarConc) / (K2 + C0.MolarConc) * self.getSuperSystem().SizeN_A )";
 
-		VariableReferenceList	[ P0 Variable:.:P1 1 ] [ C0 Variable:.:P1 0 ];
+		VariableReferenceList	[ P0 Variable:.:P1 1 ] [ C0 Variable:.:P1 ];
 	}
 	
 	Process ExpressionFluxProcess( R_toy8 )
@@ -134,7 +127,7 @@ System System( /CELL/CYTOPLASM )
 
 		Expression "( (-1 * V3 * C0.MolarConc) / (K3 + C0.MolarConc) * self.getSuperSystem().SizeN_A )";
 
-		VariableReferenceList	[ P0 Variable:.:P1 1 ] [ C0 Variable:.:P1 0 ];
+		VariableReferenceList	[ P0 Variable:.:P1 1 ] [ C0 Variable:.:P1 ];
 	}
 	
 	Process ExpressionFluxProcess( R_toy9 )
@@ -144,7 +137,7 @@ System System( /CELL/CYTOPLASM )
 
 		Expression "( (V4 * C0.MolarConc) / (K4 + C0.MolarConc) * self.getSuperSystem().SizeN_A )";
 
-		VariableReferenceList	[ P0 Variable:.:P1 1 ] [ C0 Variable:.:P2 0 ];
+		VariableReferenceList	[ P0 Variable:.:P1 1 ] [ C0 Variable:.:P2 ];
 	}
 	
 	Process ExpressionFluxProcess( R_toy10 )
@@ -154,7 +147,7 @@ System System( /CELL/CYTOPLASM )
 
 		Expression "( (V3 * C0.MolarConc) / (K3 + C0.MolarConc) * self.getSuperSystem().SizeN_A )";
 
-		VariableReferenceList	[ P0 Variable:.:P2 1 ] [ C0 Variable:.:P1 0 ];
+		VariableReferenceList	[ P0 Variable:.:P2 1 ] [ C0 Variable:.:P1 ];
 	}
 	
 	Process ExpressionFluxProcess( R_toy11 )
@@ -164,7 +157,7 @@ System System( /CELL/CYTOPLASM )
 
 		Expression "( (-1 * V4 * C0.MolarConc) / (K4 + C0.MolarConc) * self.getSuperSystem().SizeN_A )";
 
-		VariableReferenceList	[ P0 Variable:.:P2 1 ] [ C0 Variable:.:P2 0 ];
+		VariableReferenceList	[ P0 Variable:.:P2 1 ] [ C0 Variable:.:P2 ];
 	}
 	
 	Process ExpressionFluxProcess( R_toy12 )
@@ -173,7 +166,7 @@ System System( /CELL/CYTOPLASM )
 
 		Expression "( (-1 * k1 * C0.MolarConc) * self.getSuperSystem().SizeN_A )";
 
-		VariableReferenceList	[ P0 Variable:.:P2 1 ] [ C0 Variable:.:P2 0 ];
+		VariableReferenceList	[ P0 Variable:.:P2 1 ] [ C0 Variable:.:P2 ];
 	}
 	
 	Process ExpressionFluxProcess( R_toy13 )
@@ -182,7 +175,7 @@ System System( /CELL/CYTOPLASM )
 
 		Expression "( (k2 * C0.MolarConc) * self.getSuperSystem().SizeN_A )";
 
-		VariableReferenceList	[ P0 Variable:.:P2 1 ] [ C0 Variable:.:Pn 0 ];
+		VariableReferenceList	[ P0 Variable:.:P2 1 ] [ C0 Variable:.:Pn ];
 	}
 	
 	Process ExpressionFluxProcess( R_toy14 )
@@ -192,7 +185,7 @@ System System( /CELL/CYTOPLASM )
 
 		Expression "( (-1 * vd * C0.MolarConc) / (Kd + C0.MolarConc) * self.getSuperSystem().SizeN_A )";
 
-		VariableReferenceList	[ P0 Variable:.:P2 1 ] [ C0 Variable:.:P2 0 ];
+		VariableReferenceList	[ P0 Variable:.:P2 1 ] [ C0 Variable:.:P2 ];
 	}
 	
 	Process ExpressionFluxProcess( R_toy15 )
@@ -201,7 +194,7 @@ System System( /CELL/CYTOPLASM )
 
 		Expression "( (k1 * C0.MolarConc) * self.getSuperSystem().SizeN_A )";
 
-		VariableReferenceList	[ P0 Variable:.:Pn 1 ] [ C0 Variable:.:P2 0 ];
+		VariableReferenceList	[ P0 Variable:.:Pn 1 ] [ C0 Variable:.:P2 ];
 	}
 	
 	Process ExpressionFluxProcess( R_toy16 )
@@ -210,7 +203,7 @@ System System( /CELL/CYTOPLASM )
 
 		Expression "( (-1 * k2 * C0.MolarConc) * self.getSuperSystem().SizeN_A )";
 
-		VariableReferenceList	[ P0 Variable:.:Pn 1 ] [ C0 Variable:.:Pn 0 ];
+		VariableReferenceList	[ P0 Variable:.:Pn 1 ] [ C0 Variable:.:Pn ];
 	}
 	
 	
