@@ -238,13 +238,13 @@
 
 	    <widget>
 	      <class>GtkMenuItem</class>
-	      <name>create_new_entry_list_menu</name>
+	      <name>create_new_entity_list_menu</name>
 	      <signal>
 		<name>activate</name>
-		<handler>create_new_entry_list_menu_activate</handler>
-		<last_modification_time>Wed, 15 Aug 2001 09:23:44 GMT</last_modification_time>
+		<handler>create_new_entity_list_menu_activate</handler>
+		<last_modification_time>Fri, 13 Sep 2002 07:31:29 GMT</last_modification_time>
 	      </signal>
-	      <label>Create New _Entry List</label>
+	      <label>Create New _Entity List</label>
 	      <right_justify>False</right_justify>
 	    </widget>
 	  </widget>

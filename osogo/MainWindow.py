@@ -183,7 +183,7 @@ class MainWindow(OsogoWindow):
 			'message_window_menu_activate'         : self.toggleMessageWindowByMenu ,
 			'interface_window_menu_activate'       : self.toggleInterfaceWindowByMenu ,
 			'palette_window_menu_activate'         : self.togglePaletteWindowByMenu ,
-			'create_new_entity_list_menu_activate'  : self.clickEntityListWindow ,
+			'create_new_entity_list_menu_activate' : self.clickEntityListWindow ,
 			'logger_window_menu_activate'          : self.toggleLoggerWindowByMenu ,
 			'stepper_window_menu_activate'         : self.toggleStepperWindowByMenu ,
 			'preferences_menu_activate'            : self.openPreferences ,
@@ -193,7 +193,7 @@ class MainWindow(OsogoWindow):
 			'step_button_clicked'                  : self.stepSimulation ,
 			'input_step_size'                      : self.setStepSize ,
 			'step_sec_toggled'                     : self.changeStepType ,
-			'entitylist_clicked'                    : self.clickEntityListWindow ,
+			'entitylist_clicked'                   : self.clickEntityListWindow ,
 			'logger_togglebutton_toggled'          : self.toggleLoggerWindowByButton ,
 			'palette_togglebutton_toggled'         : self.togglePaletteWindowByButton ,
 			'message_togglebutton_toggled'         : self.toggleMessageWindowByButton ,
@@ -229,7 +229,7 @@ class MainWindow(OsogoWindow):
 
 	def setUnSensitiveMenu( self ):
 		self['palette_window_menu'].set_sensitive(0)
-		self['create_new_entry_list_menu'].set_sensitive(0)
+		self['create_new_entity_list_menu'].set_sensitive(0)
 
 	# end of setUnSensitiveMenu
 
@@ -248,7 +248,7 @@ class MainWindow(OsogoWindow):
 		self['entitylist'].set_sensitive(0)
 		self['palette_togglebutton'].set_sensitive(0)
 		self['palette_window_menu'].set_sensitive(0)
-		self['create_new_entry_list_menu'].set_sensitive(0)
+		self['create_new_entity_list_menu'].set_sensitive(0)
 
 		self.setUnSensitiveMenu()
 
@@ -335,7 +335,7 @@ class MainWindow(OsogoWindow):
 			self['entitylist'].set_sensitive(1)
 			self['palette_togglebutton'].set_sensitive(1)
 			self['palette_window_menu'].set_sensitive(1)
-			self['create_new_entry_list_menu'].set_sensitive(1)
+			self['create_new_entity_list_menu'].set_sensitive(1)
 			self['load_rule_menu'].set_sensitive(0)
 			self['load_script_menu'].set_sensitive(0)
 			#self.setUnSensitiveMenu()
@@ -396,7 +396,7 @@ class MainWindow(OsogoWindow):
 			self['step_button'].set_sensitive(1)
 			self['entitylist'].set_sensitive(1)
 			self['palette_togglebutton'].set_sensitive(1)
-			self['create_new_entry_list_menu'].set_sensitive(1)
+			self['create_new_entity_list_menu'].set_sensitive(1)
 			self['load_rule_menu'].set_sensitive(0)
 			self['load_script_menu'].set_sensitive(0)
 			self.setUnSensitiveMenu()
