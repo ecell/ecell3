@@ -92,6 +92,8 @@ namespace libecs
     virtual void initialize();
     virtual void step();
 
+    bool calculate();
+
     virtual StringLiteral getClassName() const { return "Euler1Stepper"; }
 
 
@@ -113,6 +115,8 @@ namespace libecs
 
     virtual void initialize();
     virtual void step();
+
+    bool calculate();
 
     virtual StringLiteral getClassName() const { return "Midpoint2Stepper"; }
 
@@ -137,6 +141,8 @@ namespace libecs
 
     virtual void initialize();
     virtual void step();
+ 
+    bool calculate();
 
     virtual StringLiteral getClassName() const { return "CashKarp4Stepper"; }
 

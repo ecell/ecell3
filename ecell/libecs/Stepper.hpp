@@ -380,14 +380,14 @@ namespace libecs
       theRelativeTorelance = aValue;
     }
 
-    void setAbsoluteTorelance( RealCref aValue )
+    void setTorelance( RealCref aValue )
     {
-      theAbsoluteTorelance = aValue;
+      theTorelance = aValue;
     }
 
-    const Real getAbsoluteTorelance() const
+    const Real getTorelance() const
     {
-      return theAbsoluteTorelance;
+      return theTorelance;
     }
 
     void setStateScalingFactor( RealCref aValue )
@@ -461,7 +461,7 @@ namespace libecs
   private:
 
     Real theRelativeTorelance;
-    Real theAbsoluteTorelance;
+    Real theTorelance;
     Real theStateScalingFactor;
     Real theDerivativeScalingFactor;
 

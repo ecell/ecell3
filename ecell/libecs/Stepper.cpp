@@ -544,8 +544,8 @@ namespace libecs
 
   DifferentialStepper::DifferentialStepper()
     :
-    theRelativeTorelance( 1.0e-6 ),
-    theAbsoluteTorelance( 1.0e-6 ),
+    theTorelance( 1.0e-6 ),
+    theRelativeTorelance( 1.0 ),
     theStateScalingFactor( 1.0 ),
     theDerivativeScalingFactor( 1.0 ),
     safety( 0.9 ),
@@ -572,10 +572,10 @@ namespace libecs
 				      ) );
 
     registerSlot( getPropertySlotMaker()->
-		  createPropertySlot( "AbsoluteTorelance", *this,
+		  createPropertySlot( "Torelance", *this,
 				      Type2Type<Real>(),
-				      &DifferentialStepper::setAbsoluteTorelance,
-				      &DifferentialStepper::getAbsoluteTorelance
+				      &DifferentialStepper::setTorelance,
+				      &DifferentialStepper::getTorelance
 				      ) );
  
     registerSlot( getPropertySlotMaker()->
