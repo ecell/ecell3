@@ -243,8 +243,28 @@ namespace libecs
   }
 
 
+  void Model::checkStepper( SystemCptr aSystem)
+  {
+    if( aSystem->getStepper() == NULLPTR )
+      {
+	throw InitializationFailed( __PRETTY_FUNCTION__, 
+				    "No stepper is connected with System [" +
+				    aSystem->getFullID().getString() + "]." );
+      }
+
+    for( SystemMapConstIterator i( aSystem->getSystemMap().begin() ) ;
+	 i != aSystem->getSystemMap().end() ; ++i )
+      {
+	// check it recursively
+	checkStepper( i->second );
+      }
+  }
+
   void Model::initialize()
   {
+    checkStepper( getRootSystem() );
+
+
     FOR_ALL_SECOND( StepperMap, theStepperMap, 
 		    initialize );
 

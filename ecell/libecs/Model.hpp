@@ -187,6 +187,8 @@ namespace libecs
 
   private:
 
+    void checkStepper( SystemCptr aSystem );
+
     void resetScheduleQueue();
 
   private:
