@@ -7,12 +7,12 @@ from ecssupport import *
 
 class SubstanceWindow(PluginWindow):
 
-    def __init__( self, dirname, sim, data ):
+    def __init__( self, dirname, sim, data, pluginmanager ):
         
         # 0 : not fixed  1: fixed
         self.theFixFlug = 0
 
-        PluginWindow.__init__( self,dirname,sim, data )
+        PluginWindow.__init__( self,dirname,sim, data, pluginmanager )
         
         self.addHandlers( {'button_toggled': self.fix_mode,
                               'qty_increase_pressed': self.increaseQuantity, 
@@ -38,16 +38,15 @@ class SubstanceWindow(PluginWindow):
         aFullIDString = FullIDString( self.theFullID )
         self["id_label"].set_text( aFullIDString )
 
+        self.update()
+
+    def update( self ):
+
         self.theQuantity = self.theSimulator.getProperty( self.theFPNQuantity )[0]
         self['Quantity_entry'].set_text( str( self.theQuantity ) )
 
         self.theConcentration = self.theSimulator.getProperty( self.theFPNConcentration )[0]
         self['Concentration_entry'].set_text( str( self.theConcentration ) )
-
-        #self.update()
-
-    def update( self ):
-        pass
     
     def fix_mode( self, a ) :
 
@@ -97,12 +96,14 @@ class SubstanceWindow(PluginWindow):
         
         value = (self.theQuantity,)
         self.theSimulator.setProperty( self.theFPNQuantity, value )
+        self.thePluginManager.updateAllPluginWindow()
         print self.theSimulator.getProperty( self.theFPNQuantity )
 
     def changeConcentration( self ):
         
         value = (self.theConcentration,)
         self.theSimulator.setProperty( self.theFPNConcentration, value )
+        self.thePluginManager.updateAllPluginWindow()
         print self.theSimulator.getProperty( self.theFPNConcentration )
 
 def mainLoop():
