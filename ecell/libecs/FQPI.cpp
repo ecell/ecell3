@@ -194,7 +194,7 @@ const String FQPI::fqidOf( StringCref fqpi )
   if( fqpi.find( ':', aBorder ) == String::npos )
     {
       throw BadID( __PRETTY_FUNCTION__,
-		     "no enough \':\'s found in FQPI \"" + fqpi + "\"." );
+		     "not enough \':\'s found in FQPI \"" + fqpi + "\"." );
     }
 
   return fqpi.substr( aBorder, String::npos );

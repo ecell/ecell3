@@ -69,7 +69,7 @@ const String PrimitiveTypeStringOf( StringCref fqpi )
   if( fqpi.find( ':', aBorder + 1 ) == String::npos )
     {
       throw BadID( __PRETTY_FUNCTION__,
-		   "no enough \':\'s found in \"" + fqpi + "\"." );
+		   "not enough \':\'s found in \"" + fqpi + "\"." );
     }
   
   String aTypeString( fqpi.substr( 0, aBorder ) );
