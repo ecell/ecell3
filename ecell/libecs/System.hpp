@@ -114,9 +114,10 @@ namespace libecs
        Set a new volume for this System. 
        Make the new volume effective from beginning of next time step.
      */
-    void setVolume( RealCref aVolume )
+    virtual void setVolume( RealCref aVolume )
     {
-      theVolumeBuffer = aVolume;
+      theVolume = aVolume;
+      updateConcentrationFactor();
     }
 
 
@@ -189,6 +190,17 @@ namespace libecs
 
     static SystemPtr createInstance() { return new System; }
 
+    void updateConcentrationFactor() 
+    {
+      theConcentrationFactor = 1 / ( theVolume * N_A );
+    }
+
+    const Real calculateConcentration( const Real aQuantity ) const
+    {
+      return aQuantity * theConcentrationFactor;
+    }
+
+
   public: // property slots
 
     void setStepperID( UVariableVectorRCPtrCref aMessage );
@@ -203,13 +215,6 @@ namespace libecs
 
     virtual void makeSlots();
 
-
-    //FIXME: should be called every turn
-    void updateVolume()
-    {
-      theVolume = theVolumeBuffer;
-    }
-
   protected:
 
     StepperPtr theStepper;
@@ -219,7 +224,9 @@ namespace libecs
   private:
 
     Real theVolume;
-    Real theVolumeBuffer;
+
+    // quantity * this variable forms concentration in M (molar)
+    Real theConcentrationFactor;
 
     ReactorMap   theReactorMap;
     SubstanceMap theSubstanceMap;

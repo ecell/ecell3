@@ -132,12 +132,14 @@ namespace libecs
   System::System()
     :
     theVolume( 1 ),
-    theVolumeBuffer( 1 ),
+    theConcentrationFactor( 0 ),
     theStepper( NULLPTR ),
     theEntityListChanged( false )
   {
     makeSlots();
     theFirstRegularReactorIterator = getReactorMap().begin();
+
+    updateConcentrationFactor();
   }
 
   System::~System()
@@ -186,8 +188,6 @@ namespace libecs
 
   void System::initialize()
   {
-    updateVolume();
-
     if( theStepper == NULLPTR )
       {
 	throw InitializationFailed( __PRETTY_FUNCTION__, 
@@ -218,6 +218,9 @@ namespace libecs
 					      isRegularReactorItem() );
 
     // do not need to call subsystems' initialize()
+
+
+    updateConcentrationFactor();
   }
 
   void System::registerReactor( ReactorPtr aReactor )

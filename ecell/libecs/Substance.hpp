@@ -117,6 +117,9 @@ namespace libecs
       return theConcentration;
     }
 
+    void updateConcentration();
+
+
     /**
        Initializes this substance. 
        Called at startup.
@@ -236,15 +239,6 @@ namespace libecs
 
     void makeSlots();
 
-  private:
-
-    void calculateConcentration() const;
-    void mySetQuantity( RealCref aQuantity ) 
-    { 
-      theQuantity = aQuantity; 
-      theConcentration = -1; 
-    }
-
   public:
 
     /**
@@ -254,6 +248,8 @@ namespace libecs
 
   private:
 
+
+    //FIXME: non-const static should not be used
     static String USER_DEFAULT_ACCUMULATOR_NAME;
 
     AccumulatorPtr theAccumulator;
@@ -265,7 +261,7 @@ namespace libecs
 
     bool theFixed;
 
-    mutable Real theConcentration;
+    Real theConcentration;
   };
 
   /** @} */ //end of libecs_module 

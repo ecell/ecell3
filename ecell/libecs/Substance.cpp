@@ -150,6 +150,8 @@ namespace libecs
 	setUserDefaultAccumulatorName( SYSTEM_DEFAULT_ACCUMULATOR_NAME );
 	setAccumulator( USER_DEFAULT_ACCUMULATOR_NAME );
       }
+
+    updateConcentration();
   }
 
   const Real Substance::saveQuantity()
@@ -159,22 +161,15 @@ namespace libecs
 
   void Substance::loadQuantity( RealCref aQuantity )
   {
-    mySetQuantity( aQuantity );
+    theQuantity = aQuantity;
     theAccumulator->update();
-    calculateConcentration();
+    updateConcentration();
   }
 
   Real Substance::getActivity()
   {
     return getVelocity();
   }
-
-  void Substance::calculateConcentration() const
-  {
-    //FIXME: more efficient if 1 / ( volume * N_A ) is precalculated
-    theConcentration = theQuantity / ( getSuperSystem()->getVolume() * N_A ); 
-  }
-
 
   void Substance::integrate()
   { 
@@ -191,6 +186,13 @@ namespace libecs
 	  }
       }
   }
+
+  void Substance::updateConcentration()
+  {
+    theConcentration = 
+      getSuperSystem()->calculateConcentration( theQuantity );
+  }
+
 
 } // namespace libecs
 
