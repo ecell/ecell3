@@ -60,6 +60,7 @@ namespace libecs
     theCurrentTime( 0.0 ),
     theStepInterval( 0.001 ),
     theOriginalStepInterval( 0.001 ),
+    theTolerableStepInterval( 0.001 ),
     theMinStepInterval( std::numeric_limits<Real>::min() ),
     theMaxStepInterval( std::numeric_limits<Real>::max() )
   {

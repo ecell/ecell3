@@ -48,7 +48,6 @@ namespace libecs
 
   DifferentialStepper::DifferentialStepper()
     :
-    theTolerantStepInterval( 0.001 ),
     theNextStepInterval( 0.001 ),
     theStateFlag( false )
   {
@@ -59,7 +58,6 @@ namespace libecs
   {
     ; // do nothing
   }
-
 
   void DifferentialStepper::initialize()
   {
@@ -74,8 +72,9 @@ namespace libecs
     //    setNextStepInterval( getStepInterval() );
 
     //    theStateFlag = false;
-  }
 
+    
+  }
 
   void DifferentialStepper::reset()
   {
@@ -84,7 +83,6 @@ namespace libecs
 
     Stepper::reset();
   }
-
 
   void DifferentialStepper::resetAll()
   {
@@ -105,11 +103,12 @@ namespace libecs
       {
 	VariablePtr const aVariable( theVariableVector[ c ] );
 
-	const Real aValue( aVariable->getValue() );
+	const Real aDifference
+	  ( aVariable->calculateTempVelocitySum( aCurrentTime ) );
 
-	aVariable->loadValue( aValue + aVariable->calculateTempVelocitySum( aCurrentTime ) );
+	aVariable->loadValue( aVariable->getValue() + aDifference );
 
-	//	std::cout << aValue << ":" << aVariable->calculateTempVelocitySum( aCurrentTime ) << std::endl;
+	//	std::cout << aValue << ":" << aDifference << std::endl;
       }
 
     for ( VariableVector::size_type c( theReadOnlyVariableOffset );
@@ -117,16 +116,20 @@ namespace libecs
       {
 	VariablePtr const aVariable( theVariableVector[ c ] );
 
-	aVariable->loadValue( theValueBuffer[ c ] + aVariable->calculateTempVelocitySum( aCurrentTime ) );
+	const Real aDifference
+	  ( aVariable->calculateTempVelocitySum( aCurrentTime ) );
 
-	//	std::cout << theValueBuffer[ c ] << ":" << aVariable->calculateTempVelocitySum( aCurrentTime ) << std::endl;
+	aVariable->loadValue( theValueBuffer[ c ] + aDifference );
+
+	//	std::cout << theValueBuffer[ c ]
+	//		  << ":" << aDifference << std::endl;
       }
   }
 
   void DifferentialStepper::interrupt( StepperPtr const aCaller )
   {
     const Real aCallerTimeScale( aCaller->getTimeScale() );
-    const Real aStepInterval   ( getStepInterval() );
+    const Real aStepInterval( getStepInterval() );
 
     // If the step size of this is less than caller's timescale,
     // ignore this interruption.
@@ -137,14 +140,16 @@ namespace libecs
 
     // if all Variables didn't change its value more than 10%,
     // ignore this interruption.
+
     /*  !!! currently this is disabled
+
     if( checkExternalError() )
       {
 	return;
       }
     */
 	
-    const Real aCurrentTime      ( getCurrentTime() );
+    const Real aCurrentTime( getCurrentTime() );
     const Real aCallerCurrentTime( aCaller->getCurrentTime() );
 
     // aCallerTimeScale == 0 implies need for immediate reset
@@ -153,14 +158,14 @@ namespace libecs
 	// Shrink the next step size to that of caller's
 	setNextStepInterval( aCallerTimeScale );
 
-	const Real aNextStep      ( aCurrentTime + aStepInterval );
+	const Real aNextStep( aCurrentTime + aStepInterval );
 	const Real aCallerNextStep( aCallerCurrentTime + aCallerTimeScale );
 
 	// If the next step of this occurs *before* the next step 
 	// of the caller, just shrink step size of this Stepper.
 	if( aNextStep <= aCallerNextStep )
 	  {
-	    //std::cerr << aCurrentTime << " return" << std::endl;
+	    //	    std::cerr << aCurrentTime << " return" << std::endl;
 
 	    return;
 	  }
@@ -170,18 +175,20 @@ namespace libecs
 	
 	// If the next step of this will occur *after* the caller,
 	// reschedule this Stepper, as well as shrinking the next step size.
+	
 	//    setStepInterval( aCallerCurrentTime + ( aCallerTimeScale * 0.5 ) 
 	//		     - aCurrentTime );
       }
     else
       {
 	// reset step interval to the default
+	
 	//	std::cerr << aCurrentTime << " reset" << std::endl;
 
 	setNextStepInterval( 0.001 );
       }
       
-    setStepInterval( aCallerCurrentTime - aCurrentTime );
+    loadStepInterval( aCallerCurrentTime - aCurrentTime );
     getModel()->reschedule( this );
   }
 
@@ -194,6 +201,7 @@ namespace libecs
     theAbsoluteToleranceFactor( 1.0 ),
     theStateToleranceFactor( 1.0 ),
     theDerivativeToleranceFactor( 1.0 ),
+    theEpsilonChecked( 0 ),
     theAbsoluteEpsilon( 0.1 ),
     theRelativeEpsilon( 0.1 ),
     safety( 0.9 ),
@@ -213,6 +221,9 @@ namespace libecs
   void AdaptiveDifferentialStepper::initialize()
   {
     DifferentialStepper::initialize();
+
+    theEpsilonChecked = ( theEpsilonChecked 
+			  || ( theDependentStepperVector.size() > 1 ) );
   }
 
   void AdaptiveDifferentialStepper::step()
@@ -222,87 +233,86 @@ namespace libecs
     clearVariables();
 
     setStepInterval( getNextStepInterval() );
+    //    setTolerableInterval( 0.0 );
 
-    while( !calculate() )
+    while ( !calculate() )
       {
-	const Real
-	  anExpectedStepInterval( getStepInterval() 
-				  * pow( getMaxErrorRatio(), 
-					 -1.0 / getOrder() ) 
-				  * safety );
+	const Real anExpectedStepInterval( safety * getStepInterval() 
+					   * pow( getMaxErrorRatio(),
+						  -1.0 / getOrder() ) );
+	//	const Real anExpectedStepInterval( 0.5 * getStepInterval() );
 
 	if ( anExpectedStepInterval > getMinStepInterval() )
 	  {
 	    // shrink it if the error exceeds 110%
 	    setStepInterval( anExpectedStepInterval );
 
-	    //	setStepInterval( getStepInterval() * 0.5 );
-
-	    //	std::cerr << "s " << getCurrentTime() 
-	    //		  << ' ' << getStepInterval()
-	    //		  << std::endl;
+	    //	    std::cerr << "s " << getCurrentTime() 
+	    //		      << ' ' << getStepInterval()
+	    //		      << std::endl;
 	  }
 	else
 	  {
 	    setStepInterval( getMinStepInterval() );
-	    
+
 	    // this must return false,
-	    // so theOriginalStepInterval does NOT LIMIT the error.
+	    // so theTolerableStepInterval does NOT LIMIT the error.
+	    THROW_EXCEPTION( SimulationError,
+			     "The error-limit step interval of Stepper [" + 
+			     getID() + "] is too small." );
+ 
 	    calculate();
-	    setOriginalStepInterval( getMinStepInterval() );
 	    break;
 	  }
       }
 
-    if ( getOriginalStepInterval() < getMinStepInterval() )
-      {
-	THROW_EXCEPTION( SimulationError,
-			 "The error-limit step interval of Stepper [" + 
-			 getID() + "] is too small." );
-      }
+    setTolerableStepInterval( getStepInterval() );
 
     theStateFlag = true;
 
-    const VariableVector::size_type aSize( getReadOnlyVariableOffset() );
-
-    for( VariableVector::size_type c( 0 ); c < aSize; ++c )
-      {
-	VariablePtr const aVariable( theVariableVector[ c ] );
-
-	const Real aTolerance( FMA( fabs( aVariable->getValue() ),
-				    theRelativeEpsilon,
-				    theAbsoluteEpsilon ) );
-
-	const Real aVelocity( fabs( theVelocityBuffer[ c ] ) );
-
-	if ( aTolerance < aVelocity * getStepInterval() )
-	  {
-	    setStepInterval( aTolerance / aVelocity );
-	  }
-      }
-
-    const Real maxError( getMaxErrorRatio() );
-
     // grow it if error is 50% less than desired
+    const Real maxError( getMaxErrorRatio() );
     if ( maxError < 0.5 )
       {
-	Real aNewStepInterval( getStepInterval() 
-			       * pow( maxError , -1.0 / ( getOrder() + 1 ) )
-			       * safety );
+	const Real aNewStepInterval( getTolerableStepInterval() * safety
+				     * pow( maxError ,
+					    -1.0 / ( getOrder() + 1 ) ) );
+	//	const Real aNewStepInterval( getStepInterval() * 2.0 );
 
-	//	Real aNewStepInterval( getStepInterval() * 2.0 );
+	setNextStepInterval( aNewStepInterval );
 
 	//	std::cerr << "g " << getCurrentTime() << ' ' 
 	//		  << getStepInterval() << std::endl;
-
-	setNextStepInterval( aNewStepInterval );
       }
     else 
       {
-	setNextStepInterval( getStepInterval() );
+	setNextStepInterval( getTolerableStepInterval() );
       }
-  }
 
+    // check the tolerances for Epsilon
+    if ( isEpsilonChecked() ) {
+      const VariableVector::size_type aSize( getReadOnlyVariableOffset() );
+
+      for ( VariableVector::size_type c( 0 ); c < aSize; ++c )
+	{
+	  VariablePtr const aVariable( theVariableVector[ c ] );
+
+	  const Real aTolerance( FMA( fabs( aVariable->getValue() ),
+				      theRelativeEpsilon,
+				      theAbsoluteEpsilon ) );
+
+	  const Real aVelocity( fabs( theVelocityBuffer[ c ] ) );
+
+	  if ( aTolerance < aVelocity * getStepInterval() )
+	    {
+	      setStepInterval( aTolerance / aVelocity );
+	    }
+	}
+    }
+
+    //    std::cout << getCurrentTime() << "\t"
+    //	      << getStepInterval() << std::endl;
+  }
 
 } // namespace libecs
 
@@ -314,4 +324,3 @@ namespace libecs
   $Date$
   $Locker$
 */
-

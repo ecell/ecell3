@@ -32,9 +32,7 @@
 #define __DIFFERENTIALSTEPPER_HPP
 
 #include "libecs.hpp"
-
 #include "Stepper.hpp"
-
 
 
 namespace libecs
@@ -93,7 +91,6 @@ namespace libecs
 	return theStepper.getVelocityBuffer()[ theIndex ] * anInterval;
       }
       
-
     protected:
 
       DifferentialStepperRef    theStepper;
@@ -108,21 +105,14 @@ namespace libecs
     virtual ~DifferentialStepper();
 
     /**
-       Override setStepInterval() for theTolerantStepInterval.
-
-    */
+       Override setStepInterval() for theTolerableStepInterval.
 
     virtual SET_METHOD( Real, StepInterval )
     {
-      theTolerantStepInterval = value;
-
       Stepper::setStepInterval( value );
     }
 
-    GET_METHOD( Real, TolerantStepInterval )
-    {
-      return theTolerantStepInterval;
-    }
+    */
 
     SET_METHOD( Real, NextStepInterval )
     {
@@ -137,6 +127,8 @@ namespace libecs
     void initializeStepInterval( RealCref aStepInterval )
     {
       setStepInterval( aStepInterval );
+      setOriginalStepInterval( aStepInterval );
+      setTolerableStepInterval( aStepInterval );
       setNextStepInterval( aStepInterval );
     }
 
@@ -160,7 +152,6 @@ namespace libecs
       return new DifferentialStepper::VariableProxy( *this, aVariable );
     }
 
-
   protected:
 
     const bool isExternalErrorTolerable() const;
@@ -172,7 +163,6 @@ namespace libecs
 
   private:
 
-    Real theTolerantStepInterval;
     Real theNextStepInterval;
 
   };
@@ -199,9 +189,12 @@ namespace libecs
 	PROPERTYSLOT_SET_GET( Real, AbsoluteToleranceFactor );
 	PROPERTYSLOT_SET_GET( Real, StateToleranceFactor );
 	PROPERTYSLOT_SET_GET( Real, DerivativeToleranceFactor );
+
+	PROPERTYSLOT( Integer, IsEpsilonChecked,
+		      &AdaptiveDifferentialStepper::setEpsilonChecked,
+		      &AdaptiveDifferentialStepper::isEpsilonChecked );
 	PROPERTYSLOT_SET_GET( Real, AbsoluteEpsilon );
 	PROPERTYSLOT_SET_GET( Real, RelativeEpsilon );
-
 
 	PROPERTYSLOT_GET_NO_LOAD_SAVE( Real, MaxErrorRatio );
 	PROPERTYSLOT_GET_NO_LOAD_SAVE( Integer,  Order );
@@ -226,13 +219,13 @@ namespace libecs
 
       virtual const Real getDifference( RealCref aTime, RealCref anInterval )
       {
-	const Real anOriginalStepInterval
-	  ( theStepper.getOriginalStepInterval() );
+	const Real aTolerableStepInterval
+	  ( theStepper.getTolerableStepInterval() );
 
 	const Real aTimeInterval( aTime - theStepper.getCurrentTime() );
 
 	const Real theta( FMA( aTimeInterval, 2.0, - anInterval )
-			  / anOriginalStepInterval );
+			  / aTolerableStepInterval );
 
 	const Real k1( theStepper.getK1()[ theIndex ] );
 	const Real k2( theStepper.getVelocityBuffer()[ theIndex ] );
@@ -287,7 +280,6 @@ namespace libecs
       return theStateToleranceFactor;
     }
 
-
     SET_METHOD( Real, DerivativeToleranceFactor )
     {
       theDerivativeToleranceFactor = value;
@@ -312,6 +304,21 @@ namespace libecs
        check difference in one step
     */
 
+    SET_METHOD( Integer, EpsilonChecked )
+    {
+      if ( value > 0 ) {
+	theEpsilonChecked = true;
+      }
+      else {
+	theEpsilonChecked = false;
+      }
+    }
+
+    const Integer isEpsilonChecked() const
+    {
+      return theEpsilonChecked;
+    }
+
     SET_METHOD( Real, AbsoluteEpsilon )
     {
       theAbsoluteEpsilon = value;
@@ -332,7 +339,6 @@ namespace libecs
       return theRelativeEpsilon;
     }
 
-
     virtual GET_METHOD( Integer, Order )
     { 
       return 1; 
@@ -341,7 +347,6 @@ namespace libecs
     virtual void initialize();
     virtual void step();
     virtual bool calculate() = 0;
-
 
     RealVectorCref getK1() const
     {
@@ -365,8 +370,9 @@ namespace libecs
     Real theStateToleranceFactor;
     Real theDerivativeToleranceFactor;
 
-    Real theAbsoluteEpsilon;
-    Real theRelativeEpsilon;
+    bool    theEpsilonChecked;
+    Real    theAbsoluteEpsilon;
+    Real    theRelativeEpsilon;
 
     Real theMaxErrorRatio;
   };
