@@ -313,16 +313,6 @@ const Real ExpressionProcessBase::VirtualMachine::execute( CodeCref aCode )
 	    goto bypass_real;
 	  }
 	    
-	case ExpressionCompiler::LOAD_REAL:
-	  {
-	    DECODE_INSTRUCTION( LOAD_REAL );
-	      
-	    bypass = *( anInstruction->getOperand() );
-
-	    INCREMENT_PC( LOAD_REAL );
-	    goto bypass_real;
-	  }
-
 	case ExpressionCompiler::OBJECT_METHOD_REAL:
 	  {
 	    DECODE_INSTRUCTION( OBJECT_METHOD_REAL );
@@ -348,9 +338,23 @@ const Real ExpressionProcessBase::VirtualMachine::execute( CodeCref aCode )
 	    return aStackPtr->theReal;
 	  }
 
-	default:
+	default:  // LOAD_REAL is here!!
 	  {
-	    THROW_EXCEPTION( UnexpectedError, "Invalid instruction." );
+	    // LOAD_REAL is implemented here in default: case because with 
+	    // many compilers it results in faster assembly, even if
+	    // additional check for invalid opcodes (the if below) is done.
+
+	    if( FETCH_OPCODE() != ExpressionCompiler::LOAD_REAL )
+	      {
+		THROW_EXCEPTION( UnexpectedError, "Invalid instruction." );
+	      }
+	      
+	    DECODE_INSTRUCTION( LOAD_REAL );
+
+	    bypass = *( anInstruction->getOperand() );
+
+	    INCREMENT_PC( LOAD_REAL );
+	    goto bypass_real;
 	  }
 
 	}
