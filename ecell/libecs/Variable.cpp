@@ -124,22 +124,25 @@ namespace libecs
 
   void PositiveVariable::integrate( VariableProxyPtr anVariableProxy )
   {
-    if( isFixed() == false )
+    Variable::integrate( anVariableProxy );
+
+    //    
+    // Check if the value is in positive range.
+    // | value | < epsilon is rounded to zero.
+    //
+    const Real anEpsilon( std::numeric_limits<Real>::epsilon() );
+    const Real aValue( getValue() );
+    if( aValue < anEpsilon )
       {
-	updateValue( anVariableProxy );
-      }
-    
-    if( getValue() < DBL_EPSILON )
-      {
-	if( getValue() > -DBL_EPSILON )
+	if( aValue > - anEpsilon )
 	  {
-	    setValue(0);
+	    setValue( 0.0 );
 	  }
 	else
 	  {
 	    THROW_EXCEPTION( RangeError, "PositiveVariable [" + 
 			     getFullID().getString() + 
-			     "]: negative value occured." );
+			     "]: negative value occured in integrate()." );
 	  }
       }
   }

@@ -11,6 +11,12 @@ Stepper Midpoint2Stepper( DE_1 )
 	# no property
 }
 
+Stepper DiscreteTimeStepper( DT_1 )
+{
+	StepInterval 0.001;
+}
+
+
 Stepper SlaveStepper( SLAVE_1 )
 {
 	# no property
@@ -1026,7 +1032,7 @@ System System( /CELL/CYTOPLASM )
 	Process MakesignalPProcess( ADD )
 	{
 		Name	add;
-		StepperID SLAVE_1;	
+		StepperID DT_1;	
 		add	0.000000012;
 		VariableReferenceList	[ S0 Variable:/CELL/CYTOPLASM:NO] [ P0 Variable:/CELL/CYTOPLASM:NO 1 ];
 	}
@@ -1035,7 +1041,7 @@ System System( /CELL/CYTOPLASM )
 	Process MakesignalPProcess( ADDCa )
 	{
 		Name	addCa;
-		StepperID SLAVE_1;	
+		StepperID DT_1;	
 		add	0.00000055;
 		VariableReferenceList	[ S0 Variable:/CELL/CYTOPLASM:Ca] [ P0 Variable:/CELL/CYTOPLASM:Ca 1 ];
 	}
@@ -1043,7 +1049,7 @@ System System( /CELL/CYTOPLASM )
 	Process MakesignalPProcess( ADDGlu )
 	{
 		Name	addGlu;
-		StepperID SLAVE_1;	
+		StepperID DT_1;	
 		add	0.0000012;
 		VariableReferenceList	[ S0 Variable:/CELL/CYTOPLASM:Glu] [ P0 Variable:/CELL/CYTOPLASM:Glu 1 ];
 	}
