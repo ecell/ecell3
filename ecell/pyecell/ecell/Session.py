@@ -101,13 +101,15 @@ class Session:
                 if aPath == '':
                     aPath = '/'
                 aFullPn = 'SYSTEM' + ':' + aPath + ':' + anId + ':' + aName
+
+                self.theSimulator.setProperty( aFullPn, aValueList )
             
             ## TemporarySample ---------------------------------------
             #aPrintFullId = "self.theSimulator.setProperty('" + aFullPn + "',"
             #print aPrintFullId, aValueList, ")"
             ##-------------------------------------------------------
 
-            self.theSimulator.setProperty( aFullPn, aValueList )
+            
 
 
     def loadEntity( self ):
@@ -133,8 +135,8 @@ class Session:
                         aPath = '/'
                 ## --------------------------------------------------
 
-            aFullId = aType + ':' + aPath + ':' + anId
-
+                    aFullId = aType + ':' + aPath + ':' + anId
+                    self.theSimulator.createEntity( aType, aFullId, aName )
 
             ## TemporarySample ---------------------------------------
             #aPrintFullId = "self.theSimulator.createEntity('" + aType + "',"
@@ -143,7 +145,7 @@ class Session:
             #print aPrintFullId, aPrintType, aPrintName ## Temporary
             ## -------------------------------------------------------
 
-            self.theSimulator.createEntity( aType, aFullId, aName )
+
             
 
     def loadProperty( self ):
