@@ -14,10 +14,10 @@
 
 <widget>
   <class>GtkWindow</class>
-  <name>window1</name>
+  <name>window</name>
   <width>500</width>
   <height>412</height>
-  <title>window1</title>
+  <title>Property Window</title>
   <type>GTK_WINDOW_TOPLEVEL</type>
   <position>GTK_WIN_POS_NONE</position>
   <modal>False</modal>
@@ -27,7 +27,7 @@
 
   <widget>
     <class>GtkVBox</class>
-    <name>vbox1</name>
+    <name>top_vbox</name>
     <homogeneous>False</homogeneous>
     <spacing>0</spacing>
 
