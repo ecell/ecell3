@@ -15,11 +15,9 @@
   <property name="resizable">True</property>
   <property name="destroy_with_parent">True</property>
   <property name="icon">icon_ecelllogo.png</property>
-  <property name="decorated">True</property>
   <property name="skip_taskbar_hint">False</property>
   <property name="skip_pager_hint">False</property>
   <property name="type_hint">GDK_WINDOW_TYPE_HINT_NORMAL</property>
-  <property name="gravity">GDK_GRAVITY_NORTH_WEST</property>
 
   <child>
     <widget class="GtkHBox" id="top_frame">
@@ -101,7 +99,6 @@ Property</property>
 		      <property name="tooltip" translatable="yes">multiple value</property>
 		      <property name="can_focus">True</property>
 		      <property name="relief">GTK_RELIEF_NORMAL</property>
-		      <property name="focus_on_click">True</property>
 		      <signal name="clicked" handler="on_increase_button_clicked" last_modification_time="Sat, 07 Dec 2002 15:05:59 GMT"/>
 
 		      <child>
@@ -177,7 +174,6 @@ Property</property>
 		      <property name="tooltip" translatable="yes">delete value as half</property>
 		      <property name="can_focus">True</property>
 		      <property name="relief">GTK_RELIEF_NORMAL</property>
-		      <property name="focus_on_click">True</property>
 		      <signal name="clicked" handler="on_decrease_button_clicked" last_modification_time="Sat, 07 Dec 2002 13:55:35 GMT"/>
 
 		      <child>

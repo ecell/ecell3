@@ -12,11 +12,9 @@
   <property name="resizable">True</property>
   <property name="destroy_with_parent">False</property>
   <property name="icon">icon_ecelllogo.png</property>
-  <property name="decorated">True</property>
   <property name="skip_taskbar_hint">False</property>
   <property name="skip_pager_hint">False</property>
   <property name="type_hint">GDK_WINDOW_TYPE_HINT_NORMAL</property>
-  <property name="gravity">GDK_GRAVITY_NORTH_WEST</property>
 
   <child>
     <widget class="GtkVBox" id="vbox9">
@@ -297,21 +295,13 @@
 			  <property name="orientation">GTK_ORIENTATION_HORIZONTAL</property>
 			  <property name="toolbar_style">GTK_TOOLBAR_BOTH</property>
 			  <property name="tooltips">True</property>
-			  <property name="show_arrow">True</property>
 
-			  <child>
-			    <widget class="GtkToolItem" id="toolitem1">
-			      <property name="visible">True</property>
-			      <property name="visible_horizontal">True</property>
-			      <property name="visible_vertical">True</property>
-			      <property name="is_important">False</property>
 
 			      <child>
 				<widget class="GtkButton" id="start_button">
 				  <property name="visible">True</property>
 				  <property name="can_focus">True</property>
 				  <property name="relief">GTK_RELIEF_NORMAL</property>
-				  <property name="focus_on_click">True</property>
 				  <signal name="clicked" handler="start_button_clicked" last_modification_time="Sun, 20 Oct 2002 12:47:05 GMT"/>
 
 				  <child>
@@ -360,26 +350,12 @@
 				  </child>
 				</widget>
 			      </child>
-			    </widget>
-			    <packing>
-			      <property name="expand">False</property>
-			      <property name="homogeneous">False</property>
-			    </packing>
-			  </child>
-
-			  <child>
-			    <widget class="GtkToolItem" id="toolitem2">
-			      <property name="visible">True</property>
-			      <property name="visible_horizontal">True</property>
-			      <property name="visible_vertical">True</property>
-			      <property name="is_important">False</property>
 
 			      <child>
 				<widget class="GtkButton" id="stop_button">
 				  <property name="visible">True</property>
 				  <property name="can_focus">True</property>
 				  <property name="relief">GTK_RELIEF_NORMAL</property>
-				  <property name="focus_on_click">True</property>
 				  <signal name="clicked" handler="stop_button_clicked" last_modification_time="Sun, 20 Oct 2002 12:49:54 GMT"/>
 
 				  <child>
@@ -428,12 +404,6 @@
 				  </child>
 				</widget>
 			      </child>
-			    </widget>
-			    <packing>
-			      <property name="expand">False</property>
-			      <property name="homogeneous">False</property>
-			    </packing>
-			  </child>
 			</widget>
 			<packing>
 			  <property name="padding">0</property>
@@ -449,22 +419,14 @@
 			  <property name="orientation">GTK_ORIENTATION_HORIZONTAL</property>
 			  <property name="toolbar_style">GTK_TOOLBAR_BOTH</property>
 			  <property name="tooltips">True</property>
-			  <property name="show_arrow">True</property>
 
-			  <child>
-			    <widget class="GtkToolItem" id="toolitem3">
-			      <property name="visible">True</property>
-			      <property name="visible_horizontal">True</property>
-			      <property name="visible_vertical">True</property>
-			      <property name="is_important">False</property>
 
 			      <child>
 				<widget class="GtkButton" id="step_button">
 				  <property name="visible">True</property>
 				  <property name="can_focus">True</property>
 				  <property name="relief">GTK_RELIEF_NORMAL</property>
-				  <property name="focus_on_click">True</property>
-				  <signal name="clicked" handler="step_button_clicked" last_modification_time="Sun, 20 Oct 2002 12:50:25 GMT"/>
+				  <signal name="clicked" handler="step_button_clicked" last_modification_time="Sun, 20 Oct 2002 12:48:25 GMT"/>
 
 				  <child>
 				    <widget class="GtkVBox" id="vbox61">
@@ -512,19 +474,6 @@
 				  </child>
 				</widget>
 			      </child>
-			    </widget>
-			    <packing>
-			      <property name="expand">False</property>
-			      <property name="homogeneous">False</property>
-			    </packing>
-			  </child>
-
-			  <child>
-			    <widget class="GtkToolItem" id="toolitem4">
-			      <property name="visible">True</property>
-			      <property name="visible_horizontal">True</property>
-			      <property name="visible_vertical">True</property>
-			      <property name="is_important">False</property>
 
 			      <child>
 				<widget class="GtkVBox" id="vbox58">
@@ -567,7 +516,6 @@
 					  <property name="label" translatable="yes">sec</property>
 					  <property name="use_underline">True</property>
 					  <property name="relief">GTK_RELIEF_NORMAL</property>
-					  <property name="focus_on_click">True</property>
 					  <property name="active">False</property>
 					  <property name="inconsistent">False</property>
 					  <property name="draw_indicator">True</property>
@@ -587,7 +535,6 @@
 					  <property name="label" translatable="yes">step</property>
 					  <property name="use_underline">True</property>
 					  <property name="relief">GTK_RELIEF_NORMAL</property>
-					  <property name="focus_on_click">True</property>
 					  <property name="active">False</property>
 					  <property name="inconsistent">False</property>
 					  <property name="draw_indicator">True</property>
@@ -608,12 +555,6 @@
 				  </child>
 				</widget>
 			      </child>
-			    </widget>
-			    <packing>
-			      <property name="expand">False</property>
-			      <property name="homogeneous">False</property>
-			    </packing>
-			  </child>
 			</widget>
 			<packing>
 			  <property name="padding">0</property>
@@ -696,26 +637,18 @@
 			  <property name="orientation">GTK_ORIENTATION_HORIZONTAL</property>
 			  <property name="toolbar_style">GTK_TOOLBAR_BOTH</property>
 			  <property name="tooltips">True</property>
-			  <property name="show_arrow">True</property>
 
-			  <child>
-			    <widget class="GtkToolItem" id="toolitem5">
-			      <property name="visible">True</property>
-			      <property name="visible_horizontal">True</property>
-			      <property name="visible_vertical">True</property>
-			      <property name="is_important">False</property>
 
 			      <child>
 				<widget class="GtkButton" id="entitylist_button">
 				  <property name="visible">True</property>
 				  <property name="can_focus">True</property>
 				  <property name="relief">GTK_RELIEF_NORMAL</property>
-				  <property name="focus_on_click">True</property>
 				  <signal name="clicked" handler="on_entitylist_button_clicked" last_modification_time="Wed, 02 Apr 2003 05:00:45 GMT"/>
 
 				  <child>
 				    <widget class="GtkVBox" id="vbox62">
-				      <property name="width_request">45</property>
+				      <property name="width_request">48</property>
 				      <property name="visible">True</property>
 				      <property name="homogeneous">False</property>
 				      <property name="spacing">0</property>
@@ -760,33 +693,20 @@
 				  </child>
 				</widget>
 			      </child>
-			    </widget>
-			    <packing>
-			      <property name="expand">False</property>
-			      <property name="homogeneous">False</property>
-			    </packing>
-			  </child>
 
-			  <child>
-			    <widget class="GtkToolItem" id="toolitem6">
-			      <property name="visible">True</property>
-			      <property name="visible_horizontal">True</property>
-			      <property name="visible_vertical">True</property>
-			      <property name="is_important">False</property>
 
 			      <child>
 				<widget class="GtkToggleButton" id="message_togglebutton">
 				  <property name="visible">True</property>
 				  <property name="can_focus">True</property>
 				  <property name="relief">GTK_RELIEF_NORMAL</property>
-				  <property name="focus_on_click">True</property>
 				  <property name="active">False</property>
 				  <property name="inconsistent">False</property>
 				  <signal name="toggled" handler="on_message_togglebutton_toggled" last_modification_time="Wed, 02 Apr 2003 02:15:03 GMT"/>
 
 				  <child>
 				    <widget class="GtkVBox" id="vbox66">
-				      <property name="width_request">45</property>
+              <property name="width_request">48</property>
 				      <property name="visible">True</property>
 				      <property name="homogeneous">False</property>
 				      <property name="spacing">0</property>
@@ -831,33 +751,20 @@
 				  </child>
 				</widget>
 			      </child>
-			    </widget>
-			    <packing>
-			      <property name="expand">False</property>
-			      <property name="homogeneous">False</property>
-			    </packing>
-			  </child>
 
-			  <child>
-			    <widget class="GtkToolItem" id="toolitem7">
-			      <property name="visible">True</property>
-			      <property name="visible_horizontal">True</property>
-			      <property name="visible_vertical">True</property>
-			      <property name="is_important">False</property>
 
 			      <child>
 				<widget class="GtkToggleButton" id="logger_button">
 				  <property name="visible">True</property>
 				  <property name="can_focus">True</property>
 				  <property name="relief">GTK_RELIEF_NORMAL</property>
-				  <property name="focus_on_click">True</property>
 				  <property name="active">False</property>
 				  <property name="inconsistent">False</property>
 				  <signal name="toggled" handler="on_logger_button_toggled" last_modification_time="Fri, 03 Oct 2003 11:13:45 GMT"/>
 
 				  <child>
 				    <widget class="GtkVBox" id="vbox69">
-				      <property name="width_request">45</property>
+				      <property name="width_request">48</property>
 				      <property name="visible">True</property>
 				      <property name="homogeneous">False</property>
 				      <property name="spacing">0</property>
@@ -902,33 +809,19 @@
 				  </child>
 				</widget>
 			      </child>
-			    </widget>
-			    <packing>
-			      <property name="expand">False</property>
-			      <property name="homogeneous">False</property>
-			    </packing>
-			  </child>
-
-			  <child>
-			    <widget class="GtkToolItem" id="toolitem8">
-			      <property name="visible">True</property>
-			      <property name="visible_horizontal">True</property>
-			      <property name="visible_vertical">True</property>
-			      <property name="is_important">False</property>
 
 			      <child>
 				<widget class="GtkToggleButton" id="stepper_button">
 				  <property name="visible">True</property>
 				  <property name="can_focus">True</property>
 				  <property name="relief">GTK_RELIEF_NORMAL</property>
-				  <property name="focus_on_click">True</property>
 				  <property name="active">False</property>
 				  <property name="inconsistent">False</property>
 				  <signal name="toggled" handler="on_stepper_button_toggled" last_modification_time="Fri, 03 Oct 2003 11:15:23 GMT"/>
 
 				  <child>
 				    <widget class="GtkVBox" id="vbox70">
-				      <property name="width_request">45</property>
+              <property name="width_request">48</property>
 				      <property name="visible">True</property>
 				      <property name="homogeneous">False</property>
 				      <property name="spacing">0</property>
@@ -973,33 +866,19 @@
 				  </child>
 				</widget>
 			      </child>
-			    </widget>
-			    <packing>
-			      <property name="expand">False</property>
-			      <property name="homogeneous">False</property>
-			    </packing>
-			  </child>
-
-			  <child>
-			    <widget class="GtkToolItem" id="toolitem9">
-			      <property name="visible">True</property>
-			      <property name="visible_horizontal">True</property>
-			      <property name="visible_vertical">True</property>
-			      <property name="is_important">False</property>
 
 			      <child>
 				<widget class="GtkToggleButton" id="interface_button">
 				  <property name="visible">True</property>
 				  <property name="can_focus">True</property>
 				  <property name="relief">GTK_RELIEF_NORMAL</property>
-				  <property name="focus_on_click">True</property>
 				  <property name="active">False</property>
 				  <property name="inconsistent">False</property>
 				  <signal name="toggled" handler="on_interface_button_toggled" last_modification_time="Fri, 03 Oct 2003 11:16:40 GMT"/>
 
 				  <child>
 				    <widget class="GtkVBox" id="vbox71">
-				      <property name="width_request">45</property>
+              <property name="width_request">48</property>
 				      <property name="visible">True</property>
 				      <property name="homogeneous">False</property>
 				      <property name="spacing">0</property>
@@ -1044,33 +923,19 @@
 				  </child>
 				</widget>
 			      </child>
-			    </widget>
-			    <packing>
-			      <property name="expand">False</property>
-			      <property name="homogeneous">False</property>
-			    </packing>
-			  </child>
-
-			  <child>
-			    <widget class="GtkToolItem" id="toolitem10">
-			      <property name="visible">True</property>
-			      <property name="visible_horizontal">True</property>
-			      <property name="visible_vertical">True</property>
-			      <property name="is_important">False</property>
 
 			      <child>
 				<widget class="GtkToggleButton" id="board_button">
 				  <property name="visible">True</property>
 				  <property name="can_focus">True</property>
 				  <property name="relief">GTK_RELIEF_NORMAL</property>
-				  <property name="focus_on_click">True</property>
 				  <property name="active">False</property>
 				  <property name="inconsistent">False</property>
 				  <signal name="toggled" handler="on_board_button_toggled" last_modification_time="Fri, 03 Oct 2003 11:17:36 GMT"/>
 
 				  <child>
 				    <widget class="GtkVBox" id="vbox72">
-				      <property name="width_request">45</property>
+				      <property name="width_request">48</property>
 				      <property name="visible">True</property>
 				      <property name="homogeneous">False</property>
 				      <property name="spacing">0</property>
@@ -1115,31 +980,17 @@
 				  </child>
 				</widget>
 			      </child>
-			    </widget>
-			    <packing>
-			      <property name="expand">False</property>
-			      <property name="homogeneous">False</property>
-			    </packing>
-			  </child>
-
-			  <child>
-			    <widget class="GtkToolItem" id="toolitem11">
-			      <property name="visible">True</property>
-			      <property name="visible_horizontal">True</property>
-			      <property name="visible_vertical">True</property>
-			      <property name="is_important">False</property>
 
 			      <child>
 				<widget class="GtkButton" id="logo_button">
 				  <property name="visible">True</property>
 				  <property name="can_focus">True</property>
 				  <property name="relief">GTK_RELIEF_NORMAL</property>
-				  <property name="focus_on_click">True</property>
 				  <signal name="clicked" handler="logo_button_clicked"/>
 
 				  <child>
 				    <widget class="GtkVBox" id="vbox72">
-				      <property name="width_request">45</property>
+              <property name="width_request">48</property>
 				      <property name="visible">True</property>
 				      <property name="homogeneous">False</property>
 				      <property name="spacing">0</property>
@@ -1163,12 +1014,6 @@
 				  </child>
 				</widget>
 			      </child>
-			    </widget>
-			    <packing>
-			      <property name="expand">False</property>
-			      <property name="homogeneous">False</property>
-			    </packing>
-			  </child>
 			</widget>
 			<packing>
 			  <property name="padding">0</property>
@@ -1214,8 +1059,6 @@
 		      <property name="visible">True</property>
 		      <property name="can_focus">True</property>
 		      <property name="editable">False</property>
-		      <property name="overwrite">False</property>
-		      <property name="accepts_tab">True</property>
 		      <property name="justification">GTK_JUSTIFY_LEFT</property>
 		      <property name="wrap_mode">GTK_WRAP_WORD</property>
 		      <property name="cursor_visible">True</property>
