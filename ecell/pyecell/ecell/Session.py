@@ -154,7 +154,7 @@ class Session:
     # end of saveModel
 
 
-    def restoreMessagemethod(self):
+    def restoreMessageMethod(self):
 	self.theMessageMethod=self.__plainMessageMethod
         
     def setMessageMethod( self, aMethod ):

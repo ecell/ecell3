@@ -472,14 +472,12 @@ class MainWindow(OsogoWindow):
 			# ok is pressed
 		
 			if aDialog.return_result() != OK_PRESSED:
-				print "cancel pressed"
 				if running_flag:
 					self.theSession.run()
 				return gtk.TRUE		
 
 
 		
-		print "OK pressed"
 		self.close()
 		self.theSession.QuitGUI()
 		return gtk.TRUE
@@ -561,7 +559,7 @@ class MainWindow(OsogoWindow):
 		return self.theStepSizeOrSec
 
 	# ==========================================================================
-	def getStepSize( self, num ):
+	def setStepSize( self, num ):
 		""" sets Stepsize entry box to num """
 		self['sec_step_entry'].set_text( str (num) )
 		self.__setStepSizeOrSec( self, None )

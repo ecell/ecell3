@@ -128,7 +128,7 @@ class GtkSessionMonitor(Session):
 	# ==========================================================================
 	def GUI_interact(self):			#
 		"hands over controlto the user (gtk.mainloop())"
-		if not doesExist('MainWindow'):
+		if not self.doesExist('MainWindow'):
 			openWindow('MainWindow')
 
 		gtk.mainloop()
@@ -468,7 +468,7 @@ class GtkSessionMonitor(Session):
 		if self.theRunningFlag == TRUE:
 			return
 
-		if time == '' and not doesExist('MainWindow'):
+		if time == '' and not self.doesExist('MainWindow'):
 			openWindow('MainWindow')
 
 		try:
