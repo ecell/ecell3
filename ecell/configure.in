@@ -192,21 +192,22 @@ EXT_GUESS="$BOOST_ROOT_DIR $EXT_GUESS "
 AC_MSG_CHECKING( for boost include dir );
 BOOST_INCLUDE=""	
 for ac_dir in $EXT_GUESS ; do
-    if test "$BOOST_INCLUDE" != "" ; then
-        break
-    fi
-    if test -f $ac_dir/include/boost/python.hpp ; then
-        BOOST_INCLUDE=`(cd $ac_dir/include ; pwd)`
-    elif test -f $ac_dir/include/boost*/boost/python.hpp ; then
-        BOOST_INCLUDE=`(cd $ac_dir/include/boost* ; pwd)`
+    if test "$BOOST_INCLUDE" = "" ; then
+        if test -f $ac_dir/include/boost/python.hpp ; then
+            BOOST_INCLUDE=`(cd $ac_dir/include ; pwd)`
+            BOOST_LIB=`(cd $ac_dir/lib ; pwd)`
+        elif test -f $ac_dir/include/boost*/boost/python.hpp ; then
+            BOOST_INCLUDE=`(cd $ac_dir/include/boost* ; pwd)`
+            BOOST_LIB=`(cd $ac_dir/lib ; pwd)`
+        fi
     fi
 done
 if test "$BOOST_INCLUDE" = "" ; then
     AC_MSG_ERROR(boost includes not found);
 else
     BOOST_INCLUDE="-I$BOOST_INCLUDE"
+    BOOST_LIB="-L$BOOST_LIB"
     BOOST_PYTHON_LIB="-lboost_python"
-    BOOST_LIB="-L$ac_dir/lib"
 fi
 AC_MSG_RESULT($BOOST_INCLUDE)
 AC_SUBST(BOOST_INCLUDE)
