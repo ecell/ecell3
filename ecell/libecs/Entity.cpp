@@ -55,7 +55,7 @@ namespace libecs
 
   void Entity::makeSlots()
   {
-    DEFINE_PROPERTYSLOT( "ID", String, NULLPTR, &Entity::getID );
+    //    DEFINE_PROPERTYSLOT( "ID", String, NULLPTR, &Entity::getID );
 
     DEFINE_PROPERTYSLOT( "FullID", String, NULLPTR, &Entity::getFullIDString );
     

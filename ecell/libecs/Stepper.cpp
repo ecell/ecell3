@@ -53,10 +53,6 @@ namespace libecs
   void Stepper::makeSlots()
   {
 
-    DEFINE_PROPERTYSLOT( "ID", String,
-			 NULLPTR,
-			 &Stepper::getID );
-
     DEFINE_PROPERTYSLOT( "CurrentTime", Real,
 			 NULLPTR,
 			 &Stepper::getCurrentTime );

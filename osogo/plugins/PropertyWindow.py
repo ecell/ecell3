@@ -163,10 +163,10 @@ class PropertyWindow(OsogoPluginWindow):
 
 		aPropertyList = list( aPropertyList )
 
-		# do nothing for following property
+		# do nothing for following properties
 		try:
 			aPropertyList.remove( 'FullID' )
-			aPropertyList.remove( 'ID' )
+			#			aPropertyList.remove( 'ID' )
 			aPropertyList.remove( 'Name' )
 		except:
 			pass
