@@ -526,7 +526,7 @@ class MainWindow(OsogoWindow):
 		if step measure is second, then Session.run()
 		if step measure is step than Session.step ()
 		"""
-		if self.getStepType:
+		if self.getStepType():
 			self.theSession.run( self.getStepSize() )
 		else:
 			self.theSession.step( self.getStepSize() )
