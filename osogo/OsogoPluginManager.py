@@ -74,45 +74,37 @@ class OsogoPluginManager(PluginManager):
 
 
     # ========================================================================
-    def createInstance( self, aClassname, data, root=None, parent=None ):
-        """creates new Plugin Instance
-        aClassName  --- a class name of PluginWindow (str)
-        aData       --- a RawFullPN (RawFullPN)
-        aRoot       --- a root widget (str) 
-        aParent     --- ParentWindow (Window)          # NOT gtk.Window
-        Returns a PluginWindow instance (PluginWindow)
-        """
-        if self.thePluginMap.has_key( aClassname ):
+    def createInstance( self, classname, data, rootWidget=None, parent=None ):
+        '''
+        classname  --- a class name of PluginWindow (str)
+        data       --- a RawFullPN (RawFullPN)
+        rootWidget --- a root widget (str or None)
+        parent     --- a parentWindow (Window)    # NOT gtk.Window
+        '''
+        if self.thePluginMap.has_key( classname ):
             pass
         else:
-            self.loadModule( aClassname )
+            self.loadModule( classname )
 
-        aPlugin = self.thePluginMap[ aClassname ]
+        plugin = self.thePluginMap[ classname ]
 
         # -------------------------------------------------------
         # If plugin window does not exist on EntryList,
         # then creates new title and sets it to plugin window.
         # -------------------------------------------------------
-        aTitle = ""
-        #if root !='top_vbox':                # if(1)
-        #if root !='EntityListWindow':                # if(1)
+        title = ""
 
-
-        #if root == None:                # if(1)
-        #if parent == None:                # if(1)
-        if root != None and root.__class__.__name__ == 'EntityListWindow':
+        if rootWidget != None:
             pass
         else:
-            aTitle = aClassname[:-6]
+            title = aClassname[:-6]
 
-            if self.thePluginWindowNumber.has_key( aClassname ):
-                self.thePluginWindowNumber[ aClassname ] += 1
+            if self.thePluginWindowNumber.has_key( classname ):
+                self.thePluginWindowNumber[ classname ] += 1
             else:
-                self.thePluginWindowNumber[ aClassname ] = 1
+                self.thePluginWindowNumber[ classname ] = 1
 
-            aTitle = "%s%d" %(aTitle,self.thePluginWindowNumber[ aClassname ])
-
-            # if(1)
+            title = "%s%d" %(title,self.thePluginWindowNumber[ classname ])
 
 
         # Nothing is selected.
@@ -122,30 +114,30 @@ class OsogoPluginManager(PluginManager):
         else:
 
             try:
-                anInstance = aPlugin.createInstance( data, self, root )
+                instance = plugin.createInstance( data, self, rootWidget )
             except TypeError:
-                anErrorMessage = string.join( traceback.format_exception(sys.exc_type,sys.exc_value, \
+                errorMessage = string.join( traceback.format_exception(sys.exc_type,sys.exc_value, \
                     sys.exc_traceback), '\n' )
-                self.theSession.message(anErrorMessage)
+                self.theSession.message( errorMessage )
                 return None
 
-            anInstance.openWindow()
+            instance.openWindow()
 
             #try:
             if TRUE:
-                if root != None and root.__class__.__name__ == 'EntityListWindow':
-                    self.thePropertyWindowOnEntityListWindows[ anInstance ] = None
+                if rootWidget != None:
+                    self.thePropertyWindowOnEntityListWindows[ instance ] = None
                 else:
-                    anInstance.editTitle( aTitle )
-                    self.thePluginTitleDict[ anInstance ] = aTitle
-                    self.theInstanceList.append( anInstance )
+                    instance.editTitle( title )
+                    self.thePluginTitleDict[ instance ] = title
+                    self.theInstanceList.append( instance )
                 # initializes session
                 self.theSession.theSimulator.initialize()
                 self.updateFundamentalWindows()
             #except:
             #    pass
 
-            return anInstance
+            return instance
 
     # end of createInstance
 
