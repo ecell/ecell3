@@ -12,7 +12,8 @@ class DigitalWindow( PluginWindow ):
 	
         PluginWindow.__init__( self, dirname, data, pluginmanager, root )
         
-	if self.theDriver.isNumber( self.theFullPN() ):
+        aValue = self.theSimulator.getProperty( self.theFullPN() )
+	if operator.isNumberType( aValue )
 
             self.openWindow()
             self.thePluginManager.appendInstance( self )

@@ -70,7 +70,7 @@ namespace libecs
 
     bool isAbsolute() const
     {
-      return ( ! empty() ) && ( front()[0] == DELIMITER );
+      return ( ( ( ! empty() ) && ( front()[0] == DELIMITER ) ) || empty() );
     }
 
     bool isValid() const
