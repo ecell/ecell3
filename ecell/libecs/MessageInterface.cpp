@@ -42,7 +42,7 @@ namespace libecs
   void MessageInterface::makeSlots()
   {
     makeMessageSlot( "PropertyList",MessageInterface,*this,NULLPTR,
-		 &MessageInterface::getPropertyList);
+		     &MessageInterface::getPropertyList);
 
   }
 
@@ -103,9 +103,9 @@ namespace libecs
 
     if( sm == thePropertyMap.end() )
       {
-	throw NoSlot(__PRETTY_FUNCTION__,
-		     className() + String(": got a Message (keyword = [")
-		     + message.getKeyword() + "]) but no slot for it.");
+	throw NoSlot( __PRETTY_FUNCTION__,
+		      className() + String(": got a Message (keyword = [")
+		      + message.getKeyword() + "]) but no slot for it.");
       }
 
     sm->second->set( message );

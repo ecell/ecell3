@@ -37,7 +37,6 @@
 #include "libecs.hpp"
 #include "Logger.hpp"
 #include "Message.hpp"
-#include "RCPtr.hpp"
 
 
 namespace libecs
@@ -80,7 +79,6 @@ namespace libecs
 
   class ProxyMessageSlot
   {
-    DECLARE_TYPE( RCPtr<AbstractMessageSlotPtr>, RCMessageSlotPtr );
     
   public:
       
@@ -91,16 +89,6 @@ namespace libecs
     {
       ;
     }
-
-      
-    ProxyMessageSlot( RCMessageSlotPtr aRCMessageSlotPtr )
-      :
-      theMessageSlot( aRCMessageSlotPtr ),
-      theLogger( NULLPTR )
-    {
-      ;
-    }
-
 
     // copy constructor
     
@@ -138,7 +126,7 @@ namespace libecs
 
     bool operator!=( const ProxyMessageSlot& rhs ) const
     {
-      if( *rhs.theMessageSlot != *this->theMessageSlot )
+      if( rhs.theMessageSlot != this->theMessageSlot )
 	{
 	  return true;
 	}
@@ -151,18 +139,15 @@ namespace libecs
     ProxyMessageSlot( void );
       
   private:    
-    RCMessageSlotPtr theMessageSlot;
-    LoggerPtr        theLogger;
+
+    AbstractMessageSlotPtr   theMessageSlot;
+    LoggerPtr                theLogger;
     
     
     
   };
 
   
-
-
-
-
   /**
      Calls callback methods for getting and sending Message objects.
 
@@ -182,9 +167,6 @@ namespace libecs
     typedef const Message ( T::* GetMessageFunc )( StringCref );
 
   public:
-
-
-
 
     MessageSlot( T& object, const SetMessageFunc setmethod,
 		 const GetMessageFunc getmethod )
@@ -208,7 +190,7 @@ namespace libecs
       ( theObject.*theSetMethod )( message );
       
       if( theProxy != NULL )
-	{
+      	{
 	  Message m = get("nothing");
 	  //	  theProxy.update( m.getBody() );
 	} 
@@ -232,8 +214,8 @@ namespace libecs
 
   private:
 
-    T& theObject;
-    ProxyMessageSlot theProxy;
+    T&                   theObject;
+    ProxyMessageSlot     theProxy;
     const SetMessageFunc theSetMethod;
     const GetMessageFunc theGetMethod;
   };
