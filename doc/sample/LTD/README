@@ -1,4 +1,4 @@
-%Id: README,v 1.0 2002/10/13 16:57 yoyo Exp %
+%Id: README,v 1.0 2002/10/16 21:01 yoyo Exp %
 
 
 
@@ -19,3 +19,6 @@ However, in our improved simulation using the E-Cell system, we suceeded in cons
 === Files and directories ==
 
 README:     This file
+LTD.em:     Model file(em file) for this model
+LTD.eml:    Model file(eml file) for this model
+*.dm:       Process files(dm files) for this model
