@@ -30,18 +30,18 @@ ECELL3_DM_CLASS
       ECELL3_CREATE_PROPERTYSLOT_SET_GET( Real, KcR );
       ECELL3_CREATE_PROPERTYSLOT_SET_GET( Real, Keq );
       ECELL3_CREATE_PROPERTYSLOT_SET_GET( Real, KmS );
+      ECELL3_CREATE_PROPERTYSLOT_SET_GET( Real, KmP0 );
       ECELL3_CREATE_PROPERTYSLOT_SET_GET( Real, KmP1 );
-      ECELL3_CREATE_PROPERTYSLOT_SET_GET( Real, KmP2 );
-      ECELL3_CREATE_PROPERTYSLOT_SET_GET( Real, KiP1 );
+      ECELL3_CREATE_PROPERTYSLOT_SET_GET( Real, KiP );
     }
   
   SIMPLE_SET_GET_METHOD( Real, KcF );
   SIMPLE_SET_GET_METHOD( Real, KcR );
   SIMPLE_SET_GET_METHOD( Real, Keq );
   SIMPLE_SET_GET_METHOD( Real, KmS );
+  SIMPLE_SET_GET_METHOD( Real, KmP0 );
   SIMPLE_SET_GET_METHOD( Real, KmP1 );
-  SIMPLE_SET_GET_METHOD( Real, KmP2 );
-  SIMPLE_SET_GET_METHOD( Real, KiP1 );
+  SIMPLE_SET_GET_METHOD( Real, KiP );
     
   virtual void initialize()
     {
@@ -58,14 +58,13 @@ ECELL3_DM_CLASS
       Real P0Concentration = P0.getVariable()->getConcentration();
       Real P1Concentration = P1.getVariable()->getConcentration();
       
-      Real Den( KcR * KmS + KcR * S0Concentration + KcF * KmP2 
-		* P0Concentration / Keq + KcF * KmP1 * P1Concentration / Keq 
-		+ KcR * S0Concentration * P0Concentration / KiP1
+      Real Den( KcR * KmS + KcR * S0Concentration 
+		+ KcF * KmP1 * P0Concentration / Keq 
+		+ KcF * KmP0 * P1Concentration / Keq 
+		+ KcR * S0Concentration * P0Concentration / KiP
 		+ KcR * P0Concentration * P1Concentration / Keq );
       Real velocity( KcF * KcR * C0.getVariable()->getValue()
-		     * (S0Concentration - P0Concentration 
-			* P1Concentration / Keq) 
-		     / Den );
+		     * (S0Concentration - P0Concentration * P1Concentration / Keq) / Den );
       setFlux( velocity );
     }
 
@@ -76,9 +75,9 @@ ECELL3_DM_CLASS
   Real Keq;
 
   Real KmS;
+  Real KmP0;
   Real KmP1;
-  Real KmP2;
-  Real KiP1;
+  Real KiP;
 
   VariableReference S0;
   VariableReference P0;

@@ -29,27 +29,27 @@ ECELL3_DM_CLASS
       ECELL3_CREATE_PROPERTYSLOT_SET_GET( Real, KcF );
       ECELL3_CREATE_PROPERTYSLOT_SET_GET( Real, KcR );
       ECELL3_CREATE_PROPERTYSLOT_SET_GET( Real, Keq );
+      ECELL3_CREATE_PROPERTYSLOT_SET_GET( Real, KmS0 );
       ECELL3_CREATE_PROPERTYSLOT_SET_GET( Real, KmS1 );
-      ECELL3_CREATE_PROPERTYSLOT_SET_GET( Real, KmS2 );
+      ECELL3_CREATE_PROPERTYSLOT_SET_GET( Real, KmP0 );
       ECELL3_CREATE_PROPERTYSLOT_SET_GET( Real, KmP1 );
-      ECELL3_CREATE_PROPERTYSLOT_SET_GET( Real, KmP2 );
+      ECELL3_CREATE_PROPERTYSLOT_SET_GET( Real, KiS0 );
       ECELL3_CREATE_PROPERTYSLOT_SET_GET( Real, KiS1 );
-      ECELL3_CREATE_PROPERTYSLOT_SET_GET( Real, KiS2 );
+      ECELL3_CREATE_PROPERTYSLOT_SET_GET( Real, KiP0 );
       ECELL3_CREATE_PROPERTYSLOT_SET_GET( Real, KiP1 );
-      ECELL3_CREATE_PROPERTYSLOT_SET_GET( Real, KiP2 );
     }
   
   SIMPLE_SET_GET_METHOD( Real, KcF );
   SIMPLE_SET_GET_METHOD( Real, KcR );
   SIMPLE_SET_GET_METHOD( Real, Keq );
+  SIMPLE_SET_GET_METHOD( Real, KmS0 );
   SIMPLE_SET_GET_METHOD( Real, KmS1 );
-  SIMPLE_SET_GET_METHOD( Real, KmS2 );
+  SIMPLE_SET_GET_METHOD( Real, KmP0 );
   SIMPLE_SET_GET_METHOD( Real, KmP1 );
-  SIMPLE_SET_GET_METHOD( Real, KmP2 );
+  SIMPLE_SET_GET_METHOD( Real, KiS0 );
   SIMPLE_SET_GET_METHOD( Real, KiS1 );
-  SIMPLE_SET_GET_METHOD( Real, KiS2 );
+  SIMPLE_SET_GET_METHOD( Real, KiP0 );
   SIMPLE_SET_GET_METHOD( Real, KiP1 );
-  SIMPLE_SET_GET_METHOD( Real, KiP2 );
     
   virtual void initialize()
     {
@@ -68,19 +68,19 @@ ECELL3_DM_CLASS
       Real P0Concentration = P0.getVariable()->getConcentration();
       Real P1Concentration = P1.getVariable()->getConcentration();
       
-      Real Denom( KcR * KiS1 * KmS2
-		  + KcR * KmS2 * S0Concentration + KcR * KmS1 
-		  * S1Concentration + KcF * KmP2 * P0Concentration / Keq
-		  + KcF * KmP1 * P1Concentration / Keq + KcR 
+      Real Denom( KcR * KiS0 * KmS1
+		  + KcR * KmS1 * S0Concentration + KcR * KmS0 
+		  * S1Concentration + KcF * KmP1 * P0Concentration / Keq
+		  + KcF * KmP0 * P1Concentration / Keq + KcR 
 		  * S0Concentration * S1Concentration
-		  + KcF * KmP2 * S0Concentration * P0Concentration 
-		  / (Keq * KiS1) + KcF * P0Concentration 
+		  + KcF * KmP1 * S0Concentration * P0Concentration 
+		  / (Keq * KiS0) + KcF * P0Concentration 
 		  * P1Concentration / Keq
-		  + KcR * KmS1 * S1Concentration * P1Concentration 
-		  / KiP2 + KcR * S0Concentration * S1Concentration 
-		  * P0Concentration /KiP1
+		  + KcR * KmS0 * S1Concentration * P1Concentration 
+		  / KiP1 + KcR * S0Concentration * S1Concentration 
+		  * P0Concentration /KiP0
 		  + KcF * S1Concentration * P0Concentration 
-		  * P1Concentration / (KiS2 * Keq) );
+		  * P1Concentration / (KiS1 * Keq) );
       
       Real velocity( KcF * KcR * C0.getVariable()->getValue()
 		     * ( S0Concentration * S1Concentration 
@@ -96,15 +96,15 @@ ECELL3_DM_CLASS
   Real KcR;
   Real Keq;
 
+  Real KmS0;
   Real KmS1;
-  Real KmS2;
+  Real KmP0;
   Real KmP1;
-  Real KmP2;
 
+  Real KiS0;
   Real KiS1;
-  Real KiS2;
+  Real KiP0;
   Real KiP1;
-  Real KiP2;
 
   VariableReference S0;
   VariableReference S1;
