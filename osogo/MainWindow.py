@@ -51,7 +51,7 @@ import string
 import sys
 import traceback
 import os
-
+import webbrowser
 
 
 #
@@ -62,6 +62,40 @@ from ecell.ecssupport import *
 from ecell.ecs_constants import *
 from ConfirmWindow import *
 
+
+
+class SimulationButton:
+
+	def __init__( self ):
+
+                # Image
+                self.startImage = os.environ['OSOGOPATH'] + os.sep + "icon_start.png"
+                self.stopImage = os.environ['OSOGOPATH'] + os.sep + "icon_stop.png"
+
+		self.image = gtk.Image()
+		self.image.set_from_file( self.startImage )
+                self.__currentState = 'stop'
+		self.image.show()
+
+	def getCurrentImage( self ):
+
+		return self.image
+
+        def getCurrentState( self ):
+
+                return self.__currentState
+
+        def setCurrentState( self, aCurrentState ):
+
+                self.__currentState = aCurrentState
+            
+                if ( self.__currentState == 'run' ):
+
+                    self.image.set_from_file( self.stopImage )
+
+                elif ( self.__currentState == 'stop' ):
+
+                    self.image.set_from_file( self.startImage )
 
 
 
@@ -89,6 +123,15 @@ class MainWindow(OsogoWindow):
 
 		self.__button_update = False
 		
+
+		# -------------------------------------
+		# creates SimulationButton
+		# -------------------------------------
+                
+		self.SimulationButton = SimulationButton()
+		self['SimulationButton'].add( self.SimulationButton.getCurrentImage() )
+		self['SimulationButtonLabel'].set_text('Start')
+
 		# -------------------------------------
 		# creates MessageWindow 
 		# -------------------------------------
@@ -121,8 +164,7 @@ class MainWindow(OsogoWindow):
                     'about_menu_activate'         : self.__displayAbout,
                     
                     # toolbars
-                    'start_button_clicked'        : self.__startSimulation,
-                    'stop_button_clicked'         : self.__stopSimulation,
+                    'simulation_button_clicked'        : self.__handleSimulation,
                     'step_button_clicked'         : self.__stepSimulation,
                     
                     'on_sec_step_entry_activate'  : self.__setStepSizeOrSec,
@@ -133,8 +175,8 @@ class MainWindow(OsogoWindow):
                     'on_message_togglebutton_toggled'
                     : self.__toggleMessageWindow,
                     'on_stepper_button_toggled'   : self.__displayWindow,
-                    'on_interface_button_toggled' : self.__displayWindow,
-                    'on_board_button_toggled'     : self.__displayWindow,
+#                    'on_interface_button_toggled' : self.__displayWindow,
+#                    'on_board_button_toggled'     : self.__displayWindow,
                     'logo_button_clicked'         : self.__displayAbout,
                     'on_scrolledwindow1_expose_event'
                     : self.__expose,
@@ -200,13 +242,12 @@ class MainWindow(OsogoWindow):
 		# gets fix components height
 		menu_height=self['handlebox22'].get_child_requisition()[1]
 		toolbar_height=self['handlebox19'].get_child_requisition()[1]
-		statusbar_height=self['statusbar'].get_child_requisition()[1]
 
 		# gets window_width
 		window_width=self['MainWindow'].get_size()[0]
 
 		# resizes
-		window_height=menu_height+toolbar_height+statusbar_height+msg_height
+		window_height=menu_height+toolbar_height+msg_height
 		self['MainWindow'].resize(window_width,window_height)
 	
 
@@ -218,8 +259,7 @@ class MainWindow(OsogoWindow):
 		"""
 
 		# toolbar
-		self['start_button'].set_sensitive(aDataLoadedStatus)
-		self['stop_button'].set_sensitive(aDataLoadedStatus)
+		self['simulation_button'].set_sensitive(aDataLoadedStatus)
 		self['step_button'].set_sensitive(aDataLoadedStatus)
 		self['entitylist_button'].set_sensitive(aDataLoadedStatus)
 		self['logger_button'].set_sensitive(aDataLoadedStatus)
@@ -233,7 +273,6 @@ class MainWindow(OsogoWindow):
 		self['save_model_menu'].set_sensitive(aDataLoadedStatus)
 
 		# window menu
-#		self['none'].set_sensitive(0)
 		self['logger_window_menu'].set_sensitive(aDataLoadedStatus)
 		self['stepper_window_menu'].set_sensitive(aDataLoadedStatus)
 		self['interface_window_menu'].set_sensitive(aDataLoadedStatus)
@@ -486,28 +525,29 @@ class MainWindow(OsogoWindow):
 		OsogoWindow.close( self )
 
 
-	def __startSimulation( self, *arg ) :
-		"""starts simulation
-		arg[0]  ---  stop button (gtk.Button)
+	def __handleSimulation( self, *arg ) :
+		"""handles simulation
+		arg[0]  ---  simulation button (gtk.Button)
 		Returns None
 		"""
-		self.theSession.run()
 
-	def startSimulation( self ) :
-		""" starts simulation """
-		self.__startSimulation( self, None )
+                if ( self.SimulationButton.getCurrentState() == 'stop' ):
+
+                    self.SimulationButton.setCurrentState( 'run' )
+                    self['SimulationButtonLabel'].set_text('Stop')
+                    self.theSession.run()
+
+                elif ( self.SimulationButton.getCurrentState() == 'run' ):
+
+                    self.SimulationButton.setCurrentState( 'stop' )
+                    self['SimulationButtonLabel'].set_text('Start')
+                    self.theSession.stop()
 
 
-	def __stopSimulation( self, *arg  ) :
-		"""stops simulation
-		arg[0]  ---  stop button (gtk.Button)
-		Returns None
-		"""
-		self.theSession.stop()
+	def handleSimulation( self ) :
+		""" handles simulation """
+		self.__handleSimulation( self, None )
 
-	def stopSimulation( self ) :
-		""" stops simulation """
-		self.__stopSimulation( self, None )
 
 	def __stepSimulation( self, *arg  ) : 
 		"""steps simulation
