@@ -1,8 +1,9 @@
 from Constants import *
 from LayoutCommand import *
+import math 
 
 class PackingStrategy:
-
+    angleMatrix = [ [RING_RIGHT, RING_LEFT], [RING_TOP, RING_BOTTOM], [RING_LEFT,RING_RIGHT], [RING_BOTTOM, RING_TOP] ]
     def __init__( self, aLayout ):
         self.theLayout = aLayout
         
@@ -65,36 +66,72 @@ class PackingStrategy:
 
 
 
-    def autoConnect( self, processObjectID, variableObjectID,varrefName ):
-        
-        aProObject = self.theLayout.getObject( processObjectID )
-        aVarObject = self.theLayout.getObject( variableObjectID )
+    def autoConnect( self, processObjectID, variableObjectID ):
+        # source and target can be in a form of ( centerx, centery), too
+
         
         # get dimensions of object and x, y pos
-        aProObjectWidth = aProObject.getProperty( OB_DIMENSION_X )
-        aProObjectHeigth = aProObject.getProperty( OB_DIMENSION_Y )
-        (aProObjectX1,aProObjectY1)=aProObject.getAbsolutePosition()
-        aProObjectX2 = aProObjectX1 + aProObjectWidth
-        aProObjectY2 = aProObjectY1 + aProObjectHeigth
-        aProObjectXCenter = aProObjectX1 + aProObjectWidth/2
-        aProObjectYCenter = aProObjectY1 + aProObjectHeigth/2
+        if type(processObjectID) in ( type(()), type([] ) ):
+            aProObjectXCenter, aProObjectYCenter = processObjectID
+        else:
+            aProObject = self.theLayout.getObject( processObjectID )
+            aProObjectWidth = aProObject.getProperty( OB_DIMENSION_X )
+            aProObjectHeigth = aProObject.getProperty( OB_DIMENSION_Y )
+            (aProObjectX1,aProObjectY1)=aProObject.getAbsolutePosition()
+            aProObjectXCenter = aProObjectX1 + aProObjectWidth/2
+            aProObjectYCenter = aProObjectY1 + aProObjectHeigth/2
 
-        aVarObjectWidth = aVarObject.getProperty( OB_DIMENSION_X )
-        aVarObjectHeigth = aVarObject.getProperty( OB_DIMENSION_Y )
-        (aVarObjectX1,aVarObjectY1)=aVarObject.getAbsolutePosition()
-        aVarObjectXCenter = aVarObjectX1 +aVarObjectWidth/2
-        aVarObjectYCenter = aVarObjectY1 +aVarObjectHeigth/2
+        if type(variableObjectID) in ( type(()), type([] ) ):
+            aVarObjectXCenter, aVarObjectYCenter = variableObjectID
+        else:
+            aVarObject = self.theLayout.getObject( variableObjectID )
+            aVarObjectWidth = aVarObject.getProperty( OB_DIMENSION_X )
+            aVarObjectHeigth = aVarObject.getProperty( OB_DIMENSION_Y )
+            (aVarObjectX1,aVarObjectY1)=aVarObject.getAbsolutePosition()
+            aVarObjectXCenter = aVarObjectX1 +aVarObjectWidth/2
+            aVarObjectYCenter = aVarObjectY1 +aVarObjectHeigth/2
 
         #assign process ring n var ring
-        QArray = [[RING_BOTTOM,RING_TOP],[RING_LEFT,RING_RIGHT],[RING_LEFT,RING_RIGHT],[RING_TOP,RING_BOTTOM],[RING_BOTTOM,RING_TOP],[RING_RIGHT,RING_LEFT],[RING_RIGHT,RING_LEFT],[RING_TOP,RING_BOTTOM]]
-
-        codeQ = (aVarObjectXCenter>aProObjectXCenter)*4 + (aVarObjectYCenter<aProObjectYCenter)*2 + (aVarObjectYCenter<aProObjectYCenter)
-        processRing,variableRing = QArray[codeQ]
+        return self.getRings( aProObjectXCenter, aProObjectYCenter, aVarObjectXCenter, aVarObjectYCenter )
         
-        return (processRing,variableRing)
+    def createEntity( self, anEntityType, x, y ):
+        # return command for entity and center
+        # get parent system
+        parentSystem = self.theLayout.getSystemAtXY( x, y )
+        if parentSystem == None:
+            return
+        if anEntityType == ME_SYSTEM_TYPE:
+            buttonType = PE_SYSTEM
+        elif anEntityType == ME_PROCESS_TYPE:
+            buttonType = PE_PROCESS
+        elif anEntityType == ME_VARIABLE_TYPE:
+            buttonType = PE_VARIABLE
+        else:
+            return None, 0, 0
+        #get relcords
+        command, width, height = parentSystem.createObject( x, y , buttonType )
         
-        
+        return  command,  width, height
 
     def autoShowObject( self, aFullID ):
         # return cmd or comes up with error message!
         pass
+        
+    def getRings( self, x0, y0, x1, y1 ):
+        # return sourcering, targetring
+        dy = y0-y1; dx = x1-x0;
+        if dx == 0:
+            dx = 0.0001
+        if dy == 0:
+            dy = 0.0001
+        
+        angle = math.atan( dy/dx )/math.pi*180
+        if angle < 0:
+            angle +=180
+        if dy <0:
+            angle += 180
+        idx = int(angle/90 +0.5)%4
+        return self.angleMatrix[idx]
+        
+    
+        

@@ -296,7 +296,8 @@ class ModelEditor:
                 return False
         elif not self.__saveModelStore( aFileName ):
             return False
-        self.saveLayoutEml(os.path.split( aFileName ))
+        return self.saveLayoutEml(os.path.split( aFileName ))
+
         
     def __saveSimulator( self, aFileName ):
         try:
@@ -691,6 +692,8 @@ class ModelEditor:
             anErrorMessage = string.join( traceback.format_exception(sys.exc_type,sys.exc_value, \
                     sys.exc_traceback), '\n' )
             self.printMessage( anErrorMessage, ME_PLAINMESSAGE )
+            return False
+        return True
             
 
 
@@ -963,11 +966,11 @@ class ModelEditor:
             autoSaveName = str(os.getcwd()) + os.sep + aFileName +  ".sav.eml"
         self.autoSaveName = autoSaveName
         if not self.isRunning():
-            self.saveEmlAndLeml(autoSaveName)
+            saveResult = self.saveEmlAndLeml(autoSaveName)
 
         if self.theUpdateInterval != 0:
             self.theTimer = gtk.timeout_add(self.theUpdateInterval, self.autoSave)         
-  
+        return saveResult
          
          
               
@@ -1414,7 +1417,7 @@ class ModelEditor:
 
 
 
-    def __getUniqueName( self, aType, aStringList ):
+    def __getUniqueName( self, aType, aStringList, prefix = "new" ):
         """
         in: string aType, list of string aStringList
         returns: string newName     
@@ -1422,7 +1425,7 @@ class ModelEditor:
         i = 1
         while True:
             # tries to create 'aType'1
-            newName = 'new' + aType + str(i)
+            newName = prefix + aType + str(i)
             if not aStringList.__contains__( newName ):
                 return newName
             # if it already exists in aStringList, creates aType2, etc..
@@ -1504,8 +1507,22 @@ class ModelEditor:
             aPropertyList = anEml.getEntityPropertyList( aFullID )
 
             aFullPNList = map( lambda x: aFullID + ':' + x, aPropertyList )
-            
             aValueList = map( anEml.getEntityProperty, aFullPNList )
+
+            if MS_PROCESS_VARREFLIST in aPropertyList:
+                idx = aPropertyList.index( MS_PROCESS_VARREFLIST )
+                value = aValueList[idx]
+                uniqueNameList = []
+                for aVarref in value:
+                    aName = aVarref[MS_VARREF_NAME]
+                    if aName in uniqueNameList:
+                        newName = self.__getUniqueName( "_", uniqueNameList, "" )
+                        aVarref[MS_VARREF_NAME] = newName
+                        self.printMessage( "Warning! Ambigous variablereference for %s. Old value %s changed to %s."%(aFullPNList[idx], aName, newName) )
+                        aName = newName
+                    uniqueNameList.append( aName )
+
+
             map( self.theModelStore.loadEntityProperty,
                  aFullPNList, aValueList )
 

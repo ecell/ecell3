@@ -211,7 +211,8 @@ outline_color_gdk = aGdkColor)
 
     def rightClick ( self, shapeName, x, y, anEvent, shift ):
         # usually show menu
-        self.parentObject.doSelect( shift)
+        if not self.parentObject.isSelected:
+            self.parentObject.doSelect( shift )
         self.parentObject.showMenu( anEvent)
 
     def getFirstDrag(self):

@@ -264,6 +264,9 @@ class CreateObject(LayoutCommand):
         return True
 
 
+    def getID(self):
+        return self.theArgs[ self.OBJECTID ]
+
     def do(self):
         theParent = self.theReceiver.getObject( self.theParentID )
         #print theParent

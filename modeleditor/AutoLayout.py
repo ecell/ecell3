@@ -31,6 +31,8 @@ class AutoLayout:
         self.attributeMap={}
         self.edgeAttributeMap={}
         self.objectIDMap = {}
+        self.theShapePluginManager = self.theModelEditor.getShapePluginManager()
+        self.theGraphUtils = self.theModelEditor.theGraphicalUtils
         if entityList:
             listOfSelectionFullIds = self.__collectOtherEntities( listOfSelectionFullIds )
         self.generateAutoLayout(listOfSelectionFullIds, layoutName)
@@ -109,8 +111,8 @@ class AutoLayout:
         variableIDList = map( lambda x : ':'.join([ME_VARIABLE_TYPE, systemPath, x]), variableList )
         for variableID in variableIDList:
             aDict[variableID] = [None]
-        
-        
+        #this is a temporary solution until clustering is done!
+        return aDict
         # get systems
         systemList = self.theModelStore.getEntityList(ME_SYSTEM_TYPE, systemPath )
         systemIDList = map( lambda x : ':'.join([ME_SYSTEM_TYPE, systemPath, x]), systemList )
@@ -201,7 +203,7 @@ class AutoLayout:
                     outList[pnodeID] = [ vnodeID ]
             else:
                 edgeOp = vnodeID + "->" + pnodeID
-            text+= edgeOp +  ' [ label ="' + label + '"];\n'
+            text+= edgeOp +  ';\n'
 #        for pnodeID in outList.keys():
 #            if inList.has_key( pnodeID ):
 #                for outvnodeid in outList[pnodeID]:
@@ -248,10 +250,12 @@ class AutoLayout:
             name, value = attribute.split('=')
             aMap[name] = map( float, re.findall(r'\d+\.?\d*', value ) )
         attributeList = re.findall(r'\w+=\"?[^ ^,]+\"?',aLine)
+        aLabel = ""
         for attribute in attributeList:
             name, value = attribute.split('=')
             if name == "label":
                 aLabel = value.strip('"')
+                
         
         if not anID.__contains__( ":"):
             attMap = self.attributeMap
@@ -308,10 +312,12 @@ class AutoLayout:
         
 
         # create systems
+        self.__createBB ( ME_ROOTID )
         self.__createSystems(  ME_ROOTID )
         
         self.__createConnections()
-        
+        os.unlink ( inputFileName )
+        os.unlink( outputFileName )        
         
         
         # create varrefs
@@ -324,11 +330,12 @@ class AutoLayout:
         self.theLayoutManager.showLayout( self.theLayoutName )
 
 
+
     def __createSystems( self, aFullID, parentObjectID = None ):
         # get coordinates
         dotID = self.translationList[ aFullID ]
         bb = self.attributeMap[dotID]["bb"]
-        bb = map( lambda x: x*FACTOR, bb)
+
         width = bb[2]-bb[0]
         height = bb[3]-bb[1]
         # create system
@@ -336,13 +343,15 @@ class AutoLayout:
 
             theObjectID = self.theLayout.getProperty(LO_ROOT_SYSTEM)
             theSystemObject = self.theLayout.getObject(theObjectID)
-            layoutHeight = self.theLayout.getProperty( OB_DIMENSION_Y )
-            layoutWidth = self.theLayout.getProperty( OB_DIMENSION_X )
-            deltaright = width - layoutWidth
-            deltadown = height - layoutHeight
 
-            theSystemObject.resize( 0, deltadown, 0, deltaright )
-            theSystemObject.adjustLayoutCanvas( 0, deltadown, 0, deltaright )
+            layoutbb = self.theLayout.getProperty( LO_SCROLL_REGION )
+            deltaup = layoutbb[1] - bb[1] 
+            deltaleft =  layoutbb[0] - bb[0] 
+            deltaright = bb[2] -layoutbb[2] 
+            deltadown =  bb[3] - layoutbb[3]
+
+            theSystemObject.resize( deltaup, deltadown, deltaleft, deltaright )
+            theSystemObject.adjustLayoutCanvas( deltaup, deltadown, deltaleft, deltaright )
 
             scrollRegion = self.theLayout.getProperty(LO_SCROLL_REGION )
             self.origo = [scrollRegion[0], scrollRegion[3] ]
@@ -352,17 +361,13 @@ class AutoLayout:
         else:
             parentSystem = self.theLayout.getObject( parentObjectID )
             theObjectID = self.theLayout.getUniqueObjectID( OB_TYPE_SYSTEM )
-            absx, absy = self.__convertGVToAbsolute ( bb[0], bb[3] )
-            relx, rely = self.__convertAbsToRel( absx, absy, parentSystem )
+            relx, rely = self.__convertAbsToRel( bb[0], bb[1], parentSystem )
             self.theLayout.createObject( theObjectID, OB_TYPE_SYSTEM, aFullID, relx, rely, parentSystem )
             #resize
             theSystemObject = self.theLayout.getObject( theObjectID )
             deltaright = - theSystemObject.getProperty( OB_DIMENSION_X ) + width
             deltadown = - theSystemObject.getProperty( OB_DIMENSION_Y ) + height
             theSystemObject.resize( 0, deltadown, 0, deltaright )
-        
-        
-        
         
         aDict = self.__getSystemDict( aFullID )
         
@@ -373,20 +378,46 @@ class AutoLayout:
             elif aType in [ ME_VARIABLE_TYPE, ME_PROCESS_TYPE ]:
                 entityObjectID = self.theLayout.getUniqueObjectID( aType )
                 entityDotID = self.translationList[ fullID ]
-                epos = self.attributeMap[entityDotID]["pos"]
-                epos = map( lambda x: x*FACTOR, epos)
-                ewidth = self.attributeMap[entityDotID]["width"][0]
-    #FIXME!!!!!!!!!!!!!!!!!!!!!!!!
-                if aType == ME_VARIABLE_TYPE:
-                    x = epos[0] - ewidth * POINTS_PER_INCH / 2 - 20
-                else:
-                    x = epos[0] - 15
-                y = epos[1] + 10
-                absx, absy = self.__convertGVToAbsolute ( x, y )
-                relx, rely = self.__convertAbsToRel( absx, absy, theSystemObject )
+                bb = self.attributeMap[entityDotID]["bb"]
+                relx, rely = self.__convertAbsToRel( bb[0], bb[1], theSystemObject )
                 self.theLayout.createObject( entityObjectID, aType, fullID, relx, rely, theSystemObject )
                 self.objectIDMap[ fullID ] = entityObjectID
 
+
+    def __createBB( self, aFullID, parentObjectID = None ):
+        # get coordinates
+        dotID = self.translationList[ aFullID ]
+        bb = [0,0,0,0]
+
+        aDict = self.__getSystemDict( aFullID )
+        
+        for fullID in aDict.keys():
+            aType = getFullIDType( fullID )
+            if aType == ME_SYSTEM_TYPE:
+                bbchild = self.__createBB( fullID, aFullID )
+            elif aType in [ ME_VARIABLE_TYPE, ME_PROCESS_TYPE ]:
+                entityDotID = self.translationList[ fullID ]
+                epos = self.attributeMap[entityDotID]["pos"]
+                epos = map( lambda x: x*FACTOR, epos)
+#                ewidth = self.attributeMap[entityDotID]["width"][0] *  POINTS_PER_INCH +40
+                label = fullID.split(':')[2]
+                ewidth, eheight = self.theShapePluginManager.getMinDims( aType, "Default", self.theGraphUtils, label )
+                if aType == ME_VARIABLE_TYPE:
+                    x = epos[0] - ewidth / 2 
+                else:
+                    x = epos[0] - eheight / 2
+                y = epos[1] + 10
+                x, y = self.__convertGVToAbsolute ( x, y )
+                #relx, rely = self.__convertAbsToRel( absx, absy, theSystemObject )
+                bbchild = [ x, y, x + ewidth, y + eheight ]
+                self.attributeMap[entityDotID]["bb"] = bbchild[:]
+            bb[0] = min( bb[0], bbchild[0] )
+            bb[1] = min( bb[1], bbchild[1] )
+            bb[2] = max( bb[2], bbchild[2] )
+            bb[3] = max( bb[3], bbchild[3] )
+        bb[0] -=20; bb[1] -= 30; bb[2] += 20; bb[3] += 20
+        self.attributeMap[dotID]["bb"] = bb[:]
+        return bb
 
 
     def __createConnections( self ):
@@ -440,7 +471,7 @@ class AutoLayout:
                 ringList.append( minDist[1] )
             
             '''   
-            (pring, vring) = self.theLayout.thePackingStrategy.autoConnect( pobjectID, vobjectID, aVarref[2] )
+            (pring, vring) = self.theLayout.thePackingStrategy.autoConnect( pobjectID, vobjectID )
             anID = self.theLayout.getUniqueObjectID( OB_TYPE_CONNECTION )
 
 #            self.theLayout.createConnectionObject( anID, pobjectID, vobjectID,  ringList[0], ringList[1], None, aVarref[2] )
@@ -467,7 +498,7 @@ class AutoLayout:
         
         
     def __convertGVToAbsolute( self, x, y ):
-        return self.origo[0] + x, self.origo[1]-y
+        return 0 + x, 0-y
         
     def __convertAbsToRel( self, absx, absy, system ):
         ix, iy = system.getAbsoluteInsidePosition()

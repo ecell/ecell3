@@ -18,6 +18,7 @@ class SystemObject(EditorObject):
         self.thePropertyMap[ OB_HASFULLID ] = True
         self.thePropertyMap [ OB_FULLID ] = aFullID
         self.theObjectMap = {}
+        self.theSystemMap = {}
         self.thePropertyMap [ OB_OUTLINE_WIDTH ] = 3
         self.thePropertyMap[ OB_TYPE ] = OB_TYPE_SYSTEM
         self.thePropertyMap [ OB_DIMENSION_X ]=SYS_MINWIDTH
@@ -100,6 +101,19 @@ class SystemObject(EditorObject):
         #self.UDLRMap ={'U':0,'D':1,'L':2,'R':3}
         self.UDLRMap ={'L':0,'U':1,'R':2,'D':3}
 
+    def getSystemAtXY( self, x, y ):
+        (x0, y0) = self.getAbsolutePosition()
+        (x1,y1) = self.thePropertyMap[ OB_DIMENSION_X] + x0, self.thePropertyMap[OB_DIMENSION_Y] + y0 
+        if x <x0 or x >x1 or y<y0 or y>y1:
+            return None
+        for aSubSystem in self.theSystemMap.values():
+            retVal =  aSubSystem.getSystemAtXY( x, y )
+            if retVal != None:
+                return retVal
+        return self
+                
+        
+
     def destroy( self ):
         for anObjectID in self.theObjectMap.keys()[:]:
             self.theLayout.deleteObject( anObjectID )
@@ -112,9 +126,14 @@ class SystemObject(EditorObject):
 
     def registerObject( self, anObject ):
         self.theObjectMap[anObject.getID()] = anObject
+        if anObject.__class__.__name__.startswith( ME_SYSTEM_TYPE ):
+            self.theSystemMap[anObject.getID()] = anObject
 
     def unregisterObject ( self, anObjectID ):
         self.theObjectMap.__delitem__( anObjectID )
+        if anObjectID.startswith( ME_SYSTEM_TYPE ):
+            self.theSystemMap.__delitem__( anObjectID )
+        
 
     def parentMoved( self, deltax, deltay ):
         EditorObject.parentMoved( self, deltax, deltay )
@@ -232,12 +251,32 @@ class SystemObject(EditorObject):
         EditorObject.show( self )
 
     def addItem( self, absx,absy ):
+        buttonPressed = self.theLayout.getPaletteButton()
+        if buttonPressed == PE_TEXT:
+            pass
+        elif buttonPressed == PE_SELECTOR:
+            self.doSelect()
+        elif buttonPressed == PE_CUSTOM:
+            pass
+
+        else:
+            aCommand = self.createObject( absx, absy, buttonPressed )[0]
+
+            if aCommand != None:
+                self.theLayout.passCommand( [aCommand] )
+            else:
+                self.theShape.setCursor(CU_CROSS)
+    
+    
+    def createObject( self, absx, absy, aType ):
+        buttonPressed = aType        
         (offsetx, offsety ) = self.getAbsolutePosition()
         x = absx - (self.theSD.insideX + offsetx )
         y = absy - ( self.theSD.insideY + offsety )
+        x2 = x
+        y2 = y
         aSysPath = convertSysIDToSysPath( self.getProperty( OB_FULLID ) )
         aCommand = None
-        buttonPressed = self.theLayout.getPaletteButton()
         px2=self.getProperty(SY_INSIDE_DIMENSION_X)
         py2=self.getProperty(SY_INSIDE_DIMENSION_Y)
         rpar=n.array([0,0,px2,py2])
@@ -259,12 +298,6 @@ class SystemObject(EditorObject):
                 if (not self.isOverlap(x,y,x2,y2,rn) and self.isWithinParent(x,y,x2,y2,rpar)):
                     
                     aCommand = CreateObject( self.theLayout, objectID, OB_TYPE_SYSTEM, aFullID, x, y, self )
-                else:
-                    self.theShape.setCursor(CU_CROSS)
-            else:
-                # change cursor
-                self.theShape.setCursor(CU_CROSS)
-
 
         elif buttonPressed == PE_PROCESS:
             # create command
@@ -278,9 +311,6 @@ class SystemObject(EditorObject):
             rn=self.createRnAddOthers()
             if (not self.isOverlap(x,y,x2,y2,rn) and self.isWithinParent(x,y,x2,y2,rpar)):
                 aCommand = CreateObject( self.theLayout, objectID, OB_TYPE_PROCESS, aFullID, x, y, self )
-            else:
-                # change cursor
-                self.theShape.setCursor(CU_CROSS)
 
         elif buttonPressed == PE_VARIABLE:
             # create command
@@ -295,34 +325,9 @@ class SystemObject(EditorObject):
             rn=self.createRnAddOthers()
             if (not self.isOverlap(x,y,x2,y2,rn) and self.isWithinParent(x,y,x2,y2,rpar)):
                 aCommand = CreateObject( self.theLayout, objectID, OB_TYPE_VARIABLE, aFullID, x, y, self )
-            else:
-                # change cursor
-                self.theShape.setCursor(CU_CROSS)
+        return aCommand, x2-x, y2-y
 
 
-        elif buttonPressed == PE_TEXT:
-            pass
-            '''
-            #aName = self.getModelEditor().getUniqueEntityName (ME_SYSTEM_TYPE, aSysPath )
-            objectID = self.theLayout.getUniqueObjectID( OB_TYPE_TEXT )
-
-            x2=x+TEXT_MINWIDTH
-            y2=y+TEXT_MINHEIGHT
-            # check boundaries
-            rn=self.createRnAddSystem()
-            if (not self.isOverlap(x,y,x2,y2,rn) and self.isWithinParent(x,y,x2,y2,rpar)):
-                aCommand = CreateObject( self.theLayout, objectID, OB_TYPE_TEXT,None,x, y, self)
-            else:
-                # change cursor
-                self.theShape.setCursor(CU_CROSS)
-            '''
-        elif buttonPressed == PE_SELECTOR:
-            self.doSelect()
-        elif buttonPressed == PE_CUSTOM:
-            pass
-
-        if aCommand != None:
-            self.theLayout.passCommand( [aCommand] )
 
     def getObjectList( self ):
         # return IDs

@@ -105,13 +105,21 @@ class ProcessObject( EditorObject ):
             ( variableID, variableRing ) = self.theLayout.checkConnection( endx, endy, ME_VARIABLE_TYPE )
             newVarrefName = None
             if variableID == None:
-                variableID = ( endx, endy )
-                variableRing = None
-            else:
-                pass
-                
+                aCommand , width, height = self.theLayout.thePackingStrategy.createEntity( ME_VARIABLE_TYPE, endx, endy )
+                # create totally new variable
+                if aCommand == None:
+                    self.theShape.setCursor( CU_CROSS )
+                else:
+                    ringSource, ringDest = self.theLayout.thePackingStrategy.autoConnect( self.getID(), (endx+width/2, endy+height/2) )
+                    newID = self.theLayout.getUniqueObjectID( OB_TYPE_CONNECTION )
+                    newVarrefName = self.__getNewVarrefID ()
+
+                    connectCommand = CreateConnection( self.theLayout, newID, self.theID, aCommand.getID(), self.theRingCode, ringDest, PROCESS_TO_VARIABLE, newVarrefName )
+                    self.theLayout.passCommand( [ aCommand] )
+                    self.theLayout.passCommand( [ connectCommand ] )
             # create real line
-            if type(variableID) != type( () ) :
+            else:
+                # check for already existing varref
                 varObject = self.theLayout.getObject(variableID)
                 variableFullID = varObject.getProperty(OB_FULLID)
                 relFullID = getRelativeReference(self.getProperty(OB_FULLID), variableFullID)
@@ -133,12 +141,12 @@ class ProcessObject( EditorObject ):
                     varreffName = connObj.getProperty(CO_NAME)
                     varID = connObj.getProperty(CO_VARIABLE_ATTACHED)
                     #get var FUllID
-                    if varID!=None:
+                    if varID != None:
                         varFullID = self.theLayout.getObject( varID ).getProperty(OB_FULLID)
-                        displayedVarrefList += [[varreffName,varFullID]]
+                        displayedVarrefList += [ [ varreffName, varFullID ] ]
                 for aVarref in displayedVarrefList:
                     if aVarref[ME_VARREF_FULLID] == variableFullID:
-                        aSpecDisplayedVarrefList+=[aVarref[ME_VARREF_NAME]]
+                        aSpecDisplayedVarrefList += [ aVarref [ ME_VARREF_NAME ] ]
                 
                 
                 #check if there is existing varref that hasn't been displayed
@@ -148,11 +156,11 @@ class ProcessObject( EditorObject ):
                             newVarrefName = aVarref[ME_VARREF_NAME]
             
             
-            newID = self.theLayout.getUniqueObjectID( OB_TYPE_CONNECTION )
-            if newVarrefName == None:
-                newVarrefName = self.__getNewVarrefID ()
-            aCommand = CreateConnection( self.theLayout, newID, self.theID, variableID, self.theRingCode, variableRing, PROCESS_TO_VARIABLE, newVarrefName )
-            self.theLayout.passCommand( [ aCommand ] )
+                newID = self.theLayout.getUniqueObjectID( OB_TYPE_CONNECTION )
+                if newVarrefName == None:
+                    newVarrefName = self.__getNewVarrefID ()
+                aCommand = CreateConnection( self.theLayout, newID, self.theID, variableID, self.theRingCode, variableRing, PROCESS_TO_VARIABLE, newVarrefName )
+                self.theLayout.passCommand( [ aCommand ] )
             # newCon = self.theLayout.getObject( newID )
             # newCon.checkConnections()
             

@@ -95,9 +95,11 @@ class SystemTree(ViewComponent):
         aMenu = ViewComponent.getMenuItems(self)
         aFlags = self.getADCPFlags(self.theSelectionTypeList)
          
-        aMenu.append(["generateLayout", aFlags[ME_DELETE_FLAG] or self.theSelection[0] == MS_SYSTEM_ROOT])
 
         fullPNList = map( lambda x:x+':', self.getSelectedIDs() )
+        
+        aMenu.append(["generateLayout",  len(fullPNList) == 1])
+
         tracerMenu = self.theModelEditor.theRuntimeObject.createTracerSubmenu( fullPNList )
         aMenu.append([None, tracerMenu ])
 

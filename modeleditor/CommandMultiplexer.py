@@ -175,40 +175,38 @@ class CommandMultiplexer:
                 resizeCommand = ResizeObject(theObject.getLayout(), chgdID,0, deltaHeight, 0, deltaWidth )
                 returnCmdList.append( resizeCommand )
                 
-            if chgdProperty in GLOBALPROPERTYSET:
-                if objectType == OB_TYPE_CONNECTION:
-                    aProcessID = theObject.getProperty( CO_PROCESS_ATTACHED )
-                    processObject = theLayout.getObject( aProcessID )
-                    aProcessFullID = processObject.getProperty( OB_FULLID )
-                    aVarrefName =  theObject.getProperty( CO_NAME )
-                    objectIter = self.theLayoutManager.createObjectIterator()
-                    objectIter.filterByFullID( aProcessFullID )
-                    while True:
-                        anObject = objectIter.getNextObject()
-                        if anObject == None:
-                            break
-                        connectionList = anObject.getProperty( PR_CONNECTIONLIST )
-                        for aConID in connectionList:
-                            conObject = theLayout.getObject( aConID )
-                            if conObject.getProperty( CO_NAME ) == aVarrefName and aConID!= chgdID:
-                                chgCommand = SetObjectProperty( conObject.getLayout(), conObject.getID(), chgdProperty, chgdValue )
-                                cmdList.append( chgCommand )
-                else:
-                    objectFullID = theObject.getProperty( OB_FULLID )
-                    objectIter = self.theLayoutManager.createObjectIterator()
-                    
-                    objectIter.filterByFullID( objectFullID )
-                    while True:
-                        
-                        anObject = objectIter.getNextObject()
-                        if anObject == None:
-                            break
-                        if anObject.getID() != chgdID:
-                            
-                            chgCommand = SetObjectProperty( anObject.getLayout(), anObject.getID(), chgdProperty, chgdValue )
-                            cmdList.append( chgCommand )
+#            if chgdProperty in GLOBALPROPERTYSET:
+#                if objectType == OB_TYPE_CONNECTION:
+#                    aProcessID = theObject.getProperty( CO_PROCESS_ATTACHED )
+#                    processObject = theLayout.getObject( aProcessID )
+#                    aProcessFullID = processObject.getProperty( OB_FULLID )
+#                    aVarrefName =  theObject.getProperty( CO_NAME )
+#                    objectIter = self.theLayoutManager.createObjectIterator()
+#                    objectIter.filterByFullID( aProcessFullID )
+#                    while True:
+#                        anObject = objectIter.getNextObject()
+#                        if anObject == None:
+#                            break
+#                        connectionList = anObject.getProperty( PR_CONNECTIONLIST )
+#                        for aConID in connectionList:
+#                            conObject = anObject.getLayout().getObject( aConID )
+#                            if conObject.getProperty( CO_NAME ) == aVarrefName and aConID!= chgdID:
+#                                chgCommand = SetObjectProperty( conObject.getLayout(), conObject.getID(), chgdProperty, chgdValue )
+#                                returnCmdList.append( chgCommand )
+#                else:
+#                    objectFullID = theObject.getProperty( OB_FULLID )
+#                    objectIter = self.theLayoutManager.createObjectIterator()
+#                    
+#                    objectIter.filterByFullID( objectFullID )
+#                    while True:
+#                        anObject = objectIter.getNextObject()
+#                        if anObject == None:
+#                            break
+#                        if anObject.getID() != chgdID:
+#                            chgCommand = SetObjectProperty( anObject.getLayout(), anObject.getID(), chgdProperty, chgdValue )
+#                            returnCmdList.append( chgCommand )
             # here comes the shaky part
-            # Commands that require Issuing modelcommands ( like renaming connections, changing coefficients)
+            # Commands that require Issuing modelcommands ( like renaming connections, changing coefficients )
             if chgdProperty == CO_COEF:
                 processObject = theObject.getProperty( CO_PROCESS_ATTACHED )
                 processFullID = processObject.getProperty( OB_FULLID )
@@ -220,7 +218,7 @@ class CommandMultiplexer:
                         aVarref[ MS_VARREF_COEF ] = chgdValue
                         break
                 chgCmd = ChangeEntityProperty( aFullPN, oldValue )
-                cmdList.insert(0,chgCmd)
+                returnCmdList.insert(0,chgCmd)
             elif chgdProperty == CO_NAME:
                 processObject = theObject.getProperty( CO_PROCESS_ATTACHED )
                 processFullID = processObject.getProperty( OB_FULLID )
@@ -232,7 +230,7 @@ class CommandMultiplexer:
                         aVarref[ MS_VARREF_NAME ] = chgdValue
                         break
                 chgCmd = ChangeEntityProperty( aFullPN, oldValue )
-                cmdList.insert(0,chgCmd)
+                returnCmdList.insert(0,chgCmd)
 
         elif cmdType == "MoveObject":
             # decide whether relocate or move
@@ -459,7 +457,7 @@ class CommandMultiplexer:
                                     
                                     thePackingStrategy = conObject.getLayout().thePackingStrategy
                             
-                                    (processRing, variableRing) = thePackingStrategy.autoConnect(aProObjectID, aVarID ,cmdNewVarrefName )
+                                    (processRing, variableRing) = thePackingStrategy.autoConnect(aProObjectID, aVarID )
                                     redirCommand = RedirectConnection( conObject.getLayout(), conObject.getID(), None, aVarID, processRing, variableRing, None )
                                     objCommands.append( redirCommand )
                                     

@@ -78,8 +78,7 @@ class  LinePropertyComponent(ViewComponent):
         self.theAvailableArrowTypeList=[]
         self.theArwTypeCombo=ViewComponent.getWidget(self,'cboArwType')
         self.theLineTypeCombo=ViewComponent.getWidget(self,'cboArwStyle')
-        self.theObject = anObject
-        self.populateComboBox(self.theObject)           
+        self.setDisplayedLineProperty( anObject )
                
     def close( self ):
         """
@@ -131,21 +130,21 @@ class  LinePropertyComponent(ViewComponent):
         self.theLineTypeCombo.set_popdown_strings(anObject.getAvailableLineType())
 
     def setDisplayedLineProperty(self ,connObj):
-        if connObj ==None:
+        if len(connObj.values()) == 0:
             self.clearLineProperty()
             return
-        self.theObject=connObj
+        self.theObject=connObj.values()[0]
         self.theFillColor=self.getColorObject(self.theObject.getProperty(OB_FILL_COLOR))
-        self.thecoef = connObj.getProperty(CO_COEF)
+        self.thecoef = self.theObject.getProperty(CO_COEF)
         self.populateComboBox(self.theObject)
         self.updateLineProperty()
 
     def clearLineProperty(self):
         self.theFillColor = self.getColorObject([0,0,0])
         self.thecoef = 0
-        self.theArwTypeCombo.set_sensitive(gtk.FALSE)
-        self.theLineTypeCombo.set_sensitive(gtk.FALSE)
-        ViewComponent.getWidget(self,'arw_color_button').set_sensitive(gtk.FALSE)
+        self.theArwTypeCombo.set_sensitive(gtk.TRUE)
+        self.theLineTypeCombo.set_sensitive(gtk.TRUE)
+        ViewComponent.getWidget(self,'arw_color_button').set_sensitive(gtk.TRUE)
         ViewComponent.getWidget(self,'chk_last_arw').set_active(gtk.FALSE)
         ViewComponent.getWidget(self,'chk_first_arw').set_active(gtk.FALSE)
 

@@ -114,7 +114,6 @@ class EditorObject:
     def showLine(self):
         self.theLine = ComplexLine()
     
-       
     
     def getShapeDescriptor(self, aShapeName ):
         graphUtils =  self.theLayout.graphUtils()
@@ -224,7 +223,8 @@ class EditorObject:
     def move( self, deltax, deltay ):
         self.thePropertyMap[ OB_POS_X ] += deltax
         self.thePropertyMap[ OB_POS_Y ] += deltay
-        self.theShape.move( deltax, deltay )
+        if self.theShape != None:
+            self.theShape.move( deltax, deltay )
 
 
     def parentMoved( self, deltax, deltay ):
@@ -735,7 +735,7 @@ class EditorObject:
             varrefName = variableID.split(',')[1]
             variableID = variableID.split(',')[2]
             newID = self.theLayout.getUniqueObjectID( OB_TYPE_CONNECTION )
-            (processRing, variableRing) = self.thePackingStrategy.autoConnect(self.theID, variableID,varrefName )
+            (processRing, variableRing) = self.thePackingStrategy.autoConnect(self.theID, variableID )
             aCommand = CreateConnection( self.theLayout, newID,  self.theID,variableID, processRing, variableRing, PROCESS_TO_VARIABLE, varrefName )
             
             self.theLayout.passCommand([aCommand])
@@ -761,7 +761,7 @@ class EditorObject:
                     varReffNameList+=[aVarReffList[i][ME_VARREF_NAME]]
             for avarRefName in varReffNameList:
                 newID = self.theLayout.getUniqueObjectID( OB_TYPE_CONNECTION )
-                (processRing, variableRing) = self.thePackingStrategy.autoConnect( processID, self.theID, avarRefName )
+                (processRing, variableRing) = self.thePackingStrategy.autoConnect( processID, self.theID )
                 aCommand = CreateConnection( self.theLayout, newID,  processID,self.theID, processRing, variableRing, PROCESS_TO_VARIABLE, avarRefName )
                 self.theLayout.passCommand(  [aCommand]  )  
                

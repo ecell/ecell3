@@ -147,7 +147,6 @@ class multiBcurveLineSD(LineDescriptor):
 
         pointMatrix += [[x0],[y0]] 
 
-        print "pointMatrix", pointMatrix
         
         # calculate descriptor specific
         aDescriptorList = []
@@ -162,9 +161,7 @@ class multiBcurveLineSD(LineDescriptor):
                 reverseVector.extend( list(aVect) )
 
             reversePath = tuple( [ gnome.canvas.CURVETO ] + reverseVector )
-            print "reversePath", reversePath
             aDescriptorList.insert(i, reversePath)
-            print "forwardPath", forwardPath
             aDescriptorList.insert(i, forwardPath)
         aDescriptorList.insert(0, ( gnome.canvas.MOVETO_OPEN, x0, y0) )
         self.theDescriptorList["MultiBezierCurve"][SD_SPECIFIC] [BPATH_PATHDEF] = aDescriptorList

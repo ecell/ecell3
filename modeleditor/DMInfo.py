@@ -8,7 +8,6 @@ from Constants import *
 from Utils import *
 import sys
 import string
-
 MASTERLIST_TYPE = 0
 MASTERLIST_BUILTIN = 1
 MASTERLIST_INFOLIST = 2
@@ -194,6 +193,8 @@ class DMInfo:
             baseName, extname = os.path.splitext( aFileName )
             if extname == self.theExtension:
                 aType = getClassTypeFromName( baseName )
+                if aType == None:
+                    continue
                 classNameList.append( baseName )
                 typeNameList.append( aType )
         flagMap = self.__getBinaryPropertiesM( classNameList[:], typeNameList[:] )
@@ -341,7 +342,7 @@ class DMInfo:
     def getClassInfoList( self, aClass ):
         if not self.theMasterList.has_key(aClass):
             # return basic properties of dummy class
-            return [ DM_ACCEPTNEWPROPERTY, DM_PROPERTYLIST, DM_DESCRIPTION, DM_BASECLASS ]
+            return [ DM_ACCEPTNEWPROPERTY, DM_PROPERTYLIST, DM_DESCRIPTION, DM_BASECLASS, DM_BUILTIN ]
             #raise Exception( "%s class doesnt exist\n", aClass)
         infoList = self.theMasterList[aClass][MASTERLIST_INFOLIST].keys()
         return infoList
@@ -353,9 +354,12 @@ class DMInfo:
         # verify dictionary
         descriptor = self.__getClassDescriptor( aClass )
         anInfoList = descriptor[MASTERLIST_INFOLIST]
+        if anInfo == DM_BUILTIN:
+            return descriptor[MASTERLIST_BUILTIN]
         if anInfo not in anInfoList.keys():
             raise Exception("%s class doesnt have %s info"%(aClass, anInfo) )
         # read from dictionary
+        
         return anInfoList[anInfo]
 
 

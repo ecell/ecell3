@@ -805,8 +805,7 @@ self.theDisplayedEntity, self.theSelection )
             except:
                 pass
             else:
-                fullPN = self.theDisplayedEntity + ':' + listName
-                newListValue = self.getPropertyValue( fullPN )
+                newListValue = self.getPropertyValue( listName )
                 if newListValue == None:
                     return
                 if listValue != newListValue:

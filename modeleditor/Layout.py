@@ -40,6 +40,8 @@ class Layout:
         # allways add root dir object
         anObjectID = self.getUniqueObjectID( ME_SYSTEM_TYPE )
         self.createObject( anObjectID, ME_SYSTEM_TYPE, ME_ROOTID, default_scrollregion[0], default_scrollregion[1], None )
+        self.theRootObject = self.getObject( anObjectID )
+        
         self.thePropertyMap[ LO_ROOT_SYSTEM ] = anObjectID
         #print str(anObjectID) + ' is objectID'
         #self.shift_press = False
@@ -286,7 +288,7 @@ class Layout:
         pass
 
 
-    def autoConnect( self, aProcessFullID, aVariableFullID, aName ):
+    def autoConnect( self, aProcessFullID, aVariableFullID ):
         pass
 
 
@@ -329,7 +331,8 @@ class Layout:
 
 
     def registerObject( self, anObject ):
-        self.theRootObject = anObject
+        pass
+
 
     
 
@@ -381,7 +384,7 @@ class Layout:
                 anObject.selected()
         
         if objectType == OB_TYPE_CONNECTION:
-            self.theLayoutManager.theModelEditor.createConnObjectEditorWindow( self.theName, selectedObjectID )
+            self.theLayoutManager.theModelEditor.createConnObjectEditorWindow( self.theName, self.theSelectedObjectIDList )
         else:
             self.theLayoutManager.theModelEditor.createObjectEditorWindow( self.theName, self.theSelectedObjectIDList )
             
@@ -409,7 +412,7 @@ class Layout:
                     if aVarref[ME_VARREF_NAME] == varreffName :
                         aVarReffList.remove( aVarref )
                         break
-                aCommandList = [ ChangeEntityProperty( aModelEditor, fullPN, aVarReffList ) ]
+                aCommandList += [ ChangeEntityProperty( aModelEditor, fullPN, aVarReffList ) ]
         self.passCommand(  aCommandList  )
 
             
@@ -430,12 +433,12 @@ class Layout:
         for anObjectID in objectIDList:
             anObject = self.theObjectMap[ anObjectID ]
             (objx1, objy1) = anObject.getAbsolutePosition()
-            if x< objx1 or y < objy1:
+            if x< objx1 - 3 or y < objy1 - 3:
                 continue
             objx2 = objx1 + anObject.getProperty( OB_DIMENSION_X )
             objy2 = objy1 + anObject.getProperty( OB_DIMENSION_Y )
 
-            if x > objx2 or y > objy2:
+            if x > 3 + objx2 or y > 3 + objy2:
                 continue
             rsize = anObject.getRingSize()
             chosenRing = None
@@ -449,3 +452,7 @@ class Layout:
                     
             return ( anObjectID, chosenRing )
         return ( None, None )
+        
+    def getSystemAtXY( self, x, y ):
+        # return systemID at absolute position
+        return self.theRootObject.getSystemAtXY( x, y)

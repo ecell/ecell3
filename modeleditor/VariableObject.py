@@ -134,50 +134,102 @@ class VariableObject( EditorObject ):
             ( processID, processRing ) = self.theLayout.checkConnection( endx, endy, ME_PROCESS_TYPE )
             newVarrefName = None
             if processID == None:
-                return                
-            # create real line
-            variableFullID = self.getProperty( OB_FULLID )
-            procObject = self.theLayout.getObject(processID)
-            processFullID = procObject.getProperty(OB_FULLID)
-            relFullID = getRelativeReference( processFullID, variableFullID )
-            #get the process varreflist
-            aProFullPN = createFullPN (processFullID, MS_PROCESS_VARREFLIST )
-            aVarrefList =  self.getModelEditor().getModel().getEntityProperty( aProFullPN) 
-            #filter aVarrefList by variableFullID
-            aSpecVarrefList=[]
-            for aVarref in aVarrefList:
-                if aVarref[ME_VARREF_FULLID] in (variableFullID, relFullID):
-                    aSpecVarrefList+=[aVarref]
-        
-            #get the pro connection obj  
-            connectionList = procObject.getProperty(PR_CONNECTIONLIST)
+                cmdList = []
+                # create a Process and a Variable
+                ( varID, varRing ) = self.theLayout.checkConnection( endx, endy, ME_VARIABLE_TYPE )
+                if varID == None:
+                    varx, vary = endx, endy
+                    varCommand , varwidth, varheight = self.theLayout.thePackingStrategy.createEntity( ME_VARIABLE_TYPE, varx, vary )
+                    if varCommand == None:
+                        self.theShape.setCursor( CU_CROSS )
+                        return
+                    varID = varCommand.getID()
+                    cmdList.append( varCommand )
+                else:
+                    varObject = self.theLayout.getObject( varID )
+                    varx, vary = varObject.getAbsolutePosition()
+                    varwidth, varheight = varObject.getProperty( OB_DIMENSION_X), varObject.getProperty( OB_DIMENSION_Y )
+                i = 0
+                startx, starty = self.getAbsolutePosition()
+                startx += self.getProperty(OB_DIMENSION_X)/2
+                starty += self.getProperty( OB_DIMENSION_Y )/2
+                varx += varwidth/2
+                vary += varheight/2
+                diffx, diffy = varx - startx, vary - starty
+                procCommand = None
+                while i != 5 and procCommand == None :
+                    procx, procy = startx + (i + 5) * diffx/10, starty + (i + 5) *diffy/10
+                    procCommand, procwidth, procheight = self.theLayout.thePackingStrategy.createEntity( ME_PROCESS_TYPE, procx, procy )
+                    i *= -1
+                    if i >= 0:
+                        i +=1
+                if procCommand == None:
+                    self.theShape.setCursor( CU_CROSS )
+                    return
+                procID =  procCommand.getID()
+                cmdList.append( procCommand )
+                self.theLayout.passCommand( cmdList )
+                # create lines between self, newprocess, newprocess, newvariable
+                procObject = self.theLayout.getObject( procID )
+                ringSource, ringDest = self.theLayout.thePackingStrategy.autoConnect( self.getID(), procID )
+                firstID = self.theLayout.getUniqueObjectID( OB_TYPE_CONNECTION )
+                firstVarrefName = self.__getNewVarrefID (procObject.getProperty(OB_FULLID ) )
+                firstConnectCommand = CreateConnection( self.theLayout, firstID,  procID, self.theID,  ringDest, self.theRingCode, VARIABLE_TO_PROCESS, firstVarrefName )
+                
+                ringSource, ringDest = self.theLayout.thePackingStrategy.autoConnect( procID, varID )
+                secondID = self.theLayout.getUniqueObjectID( OB_TYPE_CONNECTION )
+                secondVarrefName = firstVarrefName + "1"
+                secondConnectCommand = CreateConnection( self.theLayout, secondID, procID, varID, ringSource, ringDest, PROCESS_TO_VARIABLE, secondVarrefName )
+                self.theLayout.passCommand( [firstConnectCommand] )
+                self.theLayout.passCommand( [secondConnectCommand] )
 
-            aSpecDisplayedVarrefList=[]
-            for conn in connectionList:
-                connObj = self.theLayout.getObject( conn )
-                varreffName = connObj.getProperty(CO_NAME)
-                varID = connObj.getProperty(CO_VARIABLE_ATTACHED)
-                #get var FUllID
-                if varID!=None:
-                    varFullID = self.theLayout.getObject( varID ).getProperty(OB_FULLID)
-                    if varFullID == variableFullID:
-                        aSpecDisplayedVarrefList+=[varreffName]
+                
+                
+                
+            else:    
+                # create real line
+                variableFullID = self.getProperty( OB_FULLID )
+                procObject = self.theLayout.getObject(processID)
+                processFullID = procObject.getProperty(OB_FULLID)
+                relFullID = getRelativeReference( processFullID, variableFullID )
+                #get the process varreflist
+                aProFullPN = createFullPN (processFullID, MS_PROCESS_VARREFLIST )
+                aVarrefList =  self.getModelEditor().getModel().getEntityProperty( aProFullPN) 
+                #filter aVarrefList by variableFullID
+                aSpecVarrefList=[]
+                for aVarref in aVarrefList:
+                    if aVarref[ME_VARREF_FULLID] in (variableFullID, relFullID):
+                        aSpecVarrefList+=[aVarref]
             
-            
-            #check if there is existing varref that hasn't been displayed
-            if len(aSpecVarrefList)!=len(aSpecDisplayedVarrefList) :
-                for aVarref in aSpecVarrefList:
-                    if aVarref[ME_VARREF_NAME] not in aSpecDisplayedVarrefList:
-                        newVarrefName = aVarref[ME_VARREF_NAME]
-            else:
-                newVarrefName = self.__getNewVarrefID ( processFullID )
+                #get the pro connection obj  
+                connectionList = procObject.getProperty(PR_CONNECTIONLIST)
 
-            newID = self.theLayout.getUniqueObjectID( OB_TYPE_CONNECTION )
-            aCommand = CreateConnection( self.theLayout, newID, processID, self.theID, 
-                    processRing,self.theRingCode,  VARIABLE_TO_PROCESS, newVarrefName )
-            self.theLayout.passCommand( [ aCommand ] )
-            # newCon = self.theLayout.getObject( newID )
-            # newCon.checkConnections()
+                aSpecDisplayedVarrefList=[]
+                for conn in connectionList:
+                    connObj = self.theLayout.getObject( conn )
+                    varreffName = connObj.getProperty(CO_NAME)
+                    varID = connObj.getProperty(CO_VARIABLE_ATTACHED)
+                    #get var FUllID
+                    if varID!=None:
+                        varFullID = self.theLayout.getObject( varID ).getProperty(OB_FULLID)
+                        if varFullID == variableFullID:
+                            aSpecDisplayedVarrefList+=[varreffName]
+                
+                
+                #check if there is existing varref that hasn't been displayed
+                if len(aSpecVarrefList)!=len(aSpecDisplayedVarrefList) :
+                    for aVarref in aSpecVarrefList:
+                        if aVarref[ME_VARREF_NAME] not in aSpecDisplayedVarrefList:
+                            newVarrefName = aVarref[ME_VARREF_NAME]
+                else:
+                    newVarrefName = self.__getNewVarrefID ( processFullID )
+
+                newID = self.theLayout.getUniqueObjectID( OB_TYPE_CONNECTION )
+                aCommand = CreateConnection( self.theLayout, newID, processID, self.theID, 
+                        processRing,self.theRingCode,  VARIABLE_TO_PROCESS, newVarrefName )
+                self.theLayout.passCommand( [ aCommand ] )
+                # newCon = self.theLayout.getObject( newID )
+                # newCon.checkConnections()
             
 
 
@@ -193,79 +245,7 @@ class VariableObject( EditorObject ):
             self.theGhostLine = GhostLine( self, aShapeName, x+deltax, y+deltay )
             self.connectionDragged = True
 
-
-    def buttonReleased( self ):
-        EditorObject.buttonReleased( self )
-        if self.connectionDragged:
-            self.connectionDragged = False
-            # get coordinates
-            ( endx, endy) = self.theGhostLine.getEndPoint( )
-            self.theGhostLine.delete()
-            self.theGhostLine = None
-            # delete ghostline
-            # CHECK IF VARIABLE IS CONNECTED
-            ( processID, processRing ) = self.theLayout.checkConnection( endx, endy, ME_PROCESS_TYPE )
-            newVarrefName = None
-            if processID == None:
-                return
-            # create real line
-            variableFullID = self.getProperty( OB_FULLID )
-            procObject = self.theLayout.getObject(processID)
-            processFullID = procObject.getProperty(OB_FULLID)
-            relFullID = getRelativeReference( processFullID, variableFullID )
-            #get the process varreflist
-            aProFullPN = createFullPN (processFullID, MS_PROCESS_VARREFLIST )
-            aVarrefList =  self.getModelEditor().getModel().getEntityProperty( aProFullPN)
-            #filter aVarrefList by variableFullID
-            aSpecVarrefList=[]
-            for aVarref in aVarrefList:
-                if aVarref[ME_VARREF_FULLID] in (variableFullID, relFullID):
-                    aSpecVarrefList+=[aVarref]
-        
-            #get the pro connection obj  
-            connectionList = procObject.getProperty(PR_CONNECTIONLIST)
-
-            aSpecDisplayedVarrefList=[]
-            for conn in connectionList:
-                connObj = self.theLayout.getObject( conn )
-                varreffName = connObj.getProperty(CO_NAME)
-                varID = connObj.getProperty(CO_VARIABLE_ATTACHED)
-                #get var FUllID
-                if varID!=None:
-                    varFullID = self.theLayout.getObject( varID ).getProperty(OB_FULLID)
-                    if varFullID == variableFullID:
-                        aSpecDisplayedVarrefList+=[varreffName]
-            
-            
-            #check if there is existing varref that hasn't been displayed
-            if len(aSpecVarrefList)!=len(aSpecDisplayedVarrefList) :
-                for aVarref in aSpecVarrefList:
-                    if aVarref[ME_VARREF_NAME] not in aSpecDisplayedVarrefList:
-                        newVarrefName = aVarref[ME_VARREF_NAME]
-            else:
-                newVarrefName = self.__getNewVarrefID ( processFullID )
-
-            newID = self.theLayout.getUniqueObjectID( OB_TYPE_CONNECTION )
-            aCommand = CreateConnection( self.theLayout, newID, processID, self.theID, 
-                    processRing,self.theRingCode,  VARIABLE_TO_PROCESS, newVarrefName )
-            self.theLayout.passCommand( [ aCommand ] )
-            # newCon = self.theLayout.getObject( newID )
-            # newCon.checkConnections()
-
-
-    def ringDragged( self, aShapeName, deltax, deltay ):
-        if self.connectionDragged:
-            self.theGhostLine.moveEndPoint( deltax, deltay )
-        else:
-            self.theRingCode = aShapeName
-            
-            ( x, y ) = self.getRingPosition( aShapeName )
-            x += self.theSD.getRingSize()/2
-            y += self.theSD.getRingSize()/2
-            self.theGhostLine = GhostLine( self, aShapeName, x+deltax, y+deltay )
-            self.connectionDragged = True
-
-        
+      
     def getRingSize( self ):
         return self.theSD.getRingSize()
 

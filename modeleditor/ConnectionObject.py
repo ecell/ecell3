@@ -27,7 +27,7 @@ class ConnectionObject( EditorObject ):
         aCoef = 0
         for aVarref in aVarrefList:
             if aVarref[ MS_VARREF_NAME ] == aVarrefName:
-                aCoef = aVarref[ MS_VARREF_COEF ]
+                aCoef = int(aVarref[ MS_VARREF_COEF ])
 
 
         self.thePropertyMap[ CO_NAME ] = aVarrefName
@@ -49,7 +49,7 @@ class ConnectionObject( EditorObject ):
             aVarrefList = aModelEditor.getModel().getEntityProperty( aProcessFullID + ':' + ME_PROCESS_VARREFLIST )
             for aVarref in aVarrefList:
                 if aVarref[ MS_VARREF_NAME ] == aVarrefName:
-                    self.thePropertyMap[ CO_COEF ] = aVarref[ MS_VARREF_COEF ]
+                    self.thePropertyMap[ CO_COEF ] = int(aVarref[ MS_VARREF_COEF ])
                     break
             self.thePropertyMap[ CO_DIRECTION1 ] = self.__getRingDirection( aProcessRing )
             
@@ -82,10 +82,11 @@ class ConnectionObject( EditorObject ):
     def __defineArrowDirection( self ):
         self.thePropertyMap[ CO_HASARROW1 ] = gtk.FALSE
         self.thePropertyMap[ CO_HASARROW2 ] = gtk.FALSE
-        
-        if self.thePropertyMap[ CO_COEF ] <0:
+        if self.thePropertyMap[ CO_COEF ] == 0:
+            return
+        elif self.thePropertyMap[ CO_COEF ] <0:
             self.thePropertyMap[ CO_HASARROW1 ] = gtk.TRUE
-        elif self.thePropertyMap[ CO_COEF ] >0:
+        else:
             self.thePropertyMap[ CO_HASARROW2 ] = gtk.TRUE
 
     def arrowheadDragged(self,shapeName, deltax, deltay, absx, absy):

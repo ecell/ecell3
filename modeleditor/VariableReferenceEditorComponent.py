@@ -60,7 +60,7 @@ class  VariableReferenceEditorComponent(ViewComponent):
         
         self.theModelEditor = aParentWindow.theModelEditor
         self.theLayout =aLayout
-        self.theConnObj =connObj
+        self.theConnObjMap =connObj
         ViewComponent.__init__( self, pointOfAttach, 'attachment_box', 'VariableReferenceEditorComponent.glade' )
 
 
@@ -153,67 +153,69 @@ class  VariableReferenceEditorComponent(ViewComponent):
         ViewComponent.getWidget(self,'ent_conname').set_text(self.varreffName)
         ViewComponent.getWidget(self,'ent_varid').set_text( self.varFullID)
         ViewComponent.getWidget(self,'ent_coef').set_text( str(self.acoef) )
-        if self.showAbs :
+        if self.showAbs:
             ViewComponent.getWidget(self,'varAbs').set_active(gtk.TRUE)
-        elif not self.showAbs :
+        elif not self.showAbs:
             ViewComponent.getWidget(self,'varAbs').set_active(gtk.FALSE)
         
     def setDisplayedVarRef(self, aLayout,connObj):
         self.theLayout = aLayout
-        self.theConnObj = connObj
+        self.theConnObjMap = connObj
         self.update()
 
     def update( self ):
-        if self.theConnObj ==  None  : 
+        if len(self.theConnObjMap.values()) != 1: 
             self.clearVarRef()
-            self.theLineProperty.setDisplayedLineProperty(self.theConnObj)
+            self.theLineProperty.setDisplayedLineProperty(self.theConnObjMap)
             return 
         else:
             
             existObjectList = self.theLayout.getObjectList()
-            self.theConnObjID = self.theConnObj.getID()
+            self.theConnObjID = self.theConnObjMap.keys()[0]
+            self.theConnObj = self.theConnObjMap.values()[0]
             self.varreffName = self.theConnObj.getProperty(CO_NAME)
             self.acoef = self.theConnObj.getProperty(CO_COEF)
 
             
-            if self.theConnObjID not in existObjectList : 
+            if self.theConnObjID not in existObjectList: 
                 self.clearVarRef()
-                self.theConnObj =  None
-                self.theLineProperty.setDisplayedLineProperty(self.theConnObj)
+                self.theConnObj = None
+                self.theConnObjMap.__delitem__( self.theConnObjID )
+                self.theLineProperty.setDisplayedLineProperty({})
                 return
             
 
             proID = self.theConnObj.getProperty(CO_PROCESS_ATTACHED)
             if proID not in existObjectList:
                 self.clearVarRef()
-                self.theConnObj =  None
-                self.theLineProperty.setDisplayedLineProperty(self.theConnObj)
+                self.theConnObj = None
+                self.theConnObjMap.__delitem__( self.theConnObjID )
+                self.theLineProperty.setDisplayedLineProperty({})
                 return
+
+            varID = self.theConnObj.getProperty(CO_VARIABLE_ATTACHED)
+            if varID != None and varID not in existObjectList:
+                self.clearVarRef()
+                self.theConnObj =  None
+                self.theConnObjMap.__delitem__( self.theConnObjID )
+                self.theLineProperty.setDisplayedLineProperty({})
+                return
+
+            self.proObject = self.theLayout.getObject( proID )
+            self.proFullID = self.proObject.getProperty(OB_FULLID)
+            if not self.theModelEditor.getModel().isEntityExist(self.proFullID):
+                varObj = self.theLayout.getObject( varID )
+                self.varFullID = varObj.getProperty(OB_FULLID)
+            else:
+                aProFullPN = createFullPN ( self.proFullID, MS_PROCESS_VARREFLIST )
+                aVarrefList = copyValue( self.theModelEditor.getModel().getEntityProperty( aProFullPN) )
+                for aVarref in aVarrefList:
+                    if aVarref[ME_VARREF_NAME] == self.varreffName:
+                        self.varFullID = aVarref[ME_VARREF_FULLID]
+
                 
-            else:   
-            
-                varID = self.theConnObj.getProperty(CO_VARIABLE_ATTACHED)
-                if varID != None and varID not in existObjectList:
-                    self.clearVarRef()
-                    self.theConnObj =  None
-                    self.theLineProperty.setDisplayedLineProperty(self.theConnObj)
-                    return
-                else:   
-                    self.proObject = self.theLayout.getObject( proID )
-                    self.proFullID = self.proObject.getProperty(OB_FULLID)
-                    if not self.theModelEditor.getModel().isEntityExist(self.proFullID):
-                        varObj = self.theLayout.getObject( varID )
-                        self.varFullID = varObj.getProperty(OB_FULLID)
-                    else:
-                        aProFullPN = createFullPN ( self.proFullID, MS_PROCESS_VARREFLIST )
-                        aVarrefList = copyValue( self.theModelEditor.getModel().getEntityProperty( aProFullPN) )
-                        for aVarref in aVarrefList:
-                            if aVarref[ME_VARREF_NAME] == self.varreffName:
-                                self.varFullID = aVarref[ME_VARREF_FULLID]
-        
-                        
-                    self.checkVarAbs()
-                    self.theLineProperty.setDisplayedLineProperty(self.theConnObj)
+            self.checkVarAbs()
+            self.theLineProperty.setDisplayedLineProperty(self.theConnObjMap)
     
                     
             
@@ -285,7 +287,7 @@ class  VariableReferenceEditorComponent(ViewComponent):
         
 
     def changeCoef(self,newCoef):
-        try :
+        try:
             newCoef = int( newCoef)
         except:
             self.checkVarAbs()

@@ -17,7 +17,15 @@ import ecell.GtkSessionMonitor
 import ecell.ecssupport
 import time
 
+if os.name == 'nt':
+    import win32api
+    ecell3_session_filename = "ecell3-session.exe"
+else:
+    ecell3_session_filename = "ecell3-session"
+
+ecell3_session_path = os.environ["ECELL3_PREFIX"] + os.sep + "bin" + os.sep + ecell3_session_filename
 TIME_THRESHOLD = 5
+
 class Runtime:
 
     def __init__( self, aModelEditor ):
@@ -29,6 +37,15 @@ class Runtime:
 
     def closeModel( self ):
         self.changeToDesignMode( True )
+        
+    def createNewProcess( self, testPyFile ):
+        return os.spawnl( os.P_NOWAIT, ecell3_session_path, ecell3_session_path, testPyFile )
+        
+    def killProcess ( self, processID ):
+        if os.name == 'nt':
+            win32api.TerminateProcess( processID,0 )
+        else:
+            os.kill( processID,9 )
         
     def __preRun( self ):
         # THIS FUNCTION IS LINUX DEPENDENT!!!!
@@ -75,7 +92,7 @@ gtk.main()\n\
         fd.close()
         fd=open( testOutFile, 'w' )
         fd.close()
-        pid = os.spawnlp( os.P_NOWAIT, 'ecell3-session', 'ecell3-session',  testPyFile)
+        pid = self.createNewProcess( testPyFile )
         # first get started signal
         startedTime = time.time()
         startstr = ''
@@ -112,7 +129,7 @@ gtk.main()\n\
             os.remove( testOutFile )
             os.remove( testPyFile )
 
-            os.kill( pid,9)            
+            os.killProcess( pid)            
             return False
                 
         loadedTime = time.time()
@@ -128,7 +145,7 @@ gtk.main()\n\
 
         if len(a)<4:
             # hanging or segfault
-            os.kill( pid,9)
+            os.killProcess( pid )
 
             return False
         else:
@@ -153,7 +170,9 @@ gtk.main()\n\
 
         #save model to temp file
 
-        self.theModelEditor.autoSave()
+        if not self.theModelEditor.autoSave():
+            return
+        
         fileName = self.theModelEditor.autoSaveName
         self.theModelEditor.theMainWindow.displayHourglass()
         #instantiate GtkSessionMonitor 

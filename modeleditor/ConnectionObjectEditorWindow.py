@@ -50,8 +50,8 @@ class ConnectionObjectEditorWindow:
 
         self.theTopFrame = gtk.VBox()
         self.getTheObject(aLayoutName, anObjectId)
-        self.theComponent = VariableReferenceEditorComponent( self, self.theTopFrame,self.theLayout,self.theObject)
-        self.theComponent.setDisplayedVarRef(self.theLayout,self.theObject)
+        self.theComponent = VariableReferenceEditorComponent( self, self.theTopFrame,self.theLayout,self.theObjectMap)
+        self.theComponent.setDisplayedVarRef(self.theLayout,self.theObjectMap)
 #        self.win.show_all()
         self.update()
         self.bringToTop()
@@ -59,7 +59,7 @@ class ConnectionObjectEditorWindow:
     def bringToTop( self ):
         self.theModelEditor.theMainWindow.setSmallWindow( self.theTopFrame )
         self.theComponent.bringToTop()
-
+        
 
     #########################################
     #    Private methods            #
@@ -67,30 +67,38 @@ class ConnectionObjectEditorWindow:
 
     def setDisplayConnObjectEditorWindow(self,aLayoutName, anObjectId):
         self.getTheObject( aLayoutName, anObjectId)
-        self.theComponent.setDisplayedVarRef(self.theLayout,self.theObject)
+        self.theComponent.setDisplayedVarRef(self.theLayout,self.theObjectMap)
         self.update()
         self.bringToTop()
                 
     def getTheObject(self,aLayoutName, anObjectId):
         self.theLayout =self.theModelEditor.theLayoutManager.getLayout(aLayoutName)
-        self.theObjectId = anObjectId
-        if anObjectId != None:
-            self.theObject = self.theLayout.getObject(self.theObjectId)
-        else:
-            self.theObject = None
+        self.theObjectMap = {}
+        if anObjectId == None:
+            return
+        elif type( anObjectId ) == type([]):
+            for anId in anObjectId:
+                self.theObjectMap[ anId] = self.theLayout.getObject(anId)
+
+
+        elif type( anObjectId ) == str:
+            self.theObjectMap[ anObjectId] = self.theLayout.getObject(anObjectId)
         
     def modifyConnObjectProperty(self,aPropertyName, aPropertyValue):
-        aCommand = None
+        aCommandList = []
+
         if  aPropertyName == OB_FILL_COLOR :
             # create command
-            aCommand=SetObjectProperty(self.theLayout,self.theObjectId,aPropertyName, aPropertyValue )  
-            if aCommand != None:
-                self.theLayout.passCommand( [aCommand] )
+            for anId in self.theObjectMap.keys():
+                aCommandList += [ SetObjectProperty(self.theLayout, anId, aPropertyName, aPropertyValue )  ]
+
+
         if  aPropertyName == OB_SHAPE_TYPE :
             # create command
-            aCommand=SetObjectProperty(self.theLayout,self.theObjectId,aPropertyName, aPropertyValue ) 
-            if aCommand != None:
-                self.theLayout.passCommand( [aCommand] )
+            for anId in self.theObjectMap.keys():
+                aCommandList += [SetObjectProperty( self.theLayout, anId, aPropertyName, aPropertyValue ) ]
+        if len( aCommandList ) > 0:
+            self.theLayout.passCommand( aCommandList )
 
 
     def update(self, aType = None, aFullID = None):
