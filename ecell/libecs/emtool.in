@@ -110,7 +110,7 @@ fi
 CLASS=$1
 shift
 
-TEMPLATEDIR="${prefix}/share/ecell/3.0.0/template/$CLASS"
+TEMPLATEDIR="${prefix}/share/ecell/@VERSION@/template/$CLASS"
 
 while true ; do
     case "$1" in
