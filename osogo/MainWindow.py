@@ -157,9 +157,6 @@ class LogoAnimation:
     def stop( self ):
 
         self.__running = False
-        if self.theTimer != None:
-            gtk.timeout_remove( self.theTimer )
-            self.theTimer = None
         
 
     def animate( self ):
@@ -206,7 +203,11 @@ class LogoAnimation:
                 self.image.set_from_file( self.iconList[self.__currentImage] )
                 self.__currentImage += 1
                 self.theTimer = gtk.timeout_add( 60, LogoAnimation.animate, self )
-
+            else:
+                if self.theTimer != None:
+                    gtk.timeout_remove( self.theTimer )
+                    self.theTimer = None
+                    
 
 
 class MainWindow(OsogoWindow):
