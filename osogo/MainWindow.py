@@ -718,16 +718,23 @@ class MainWindow(OsogoWindow):
 		"""
 		if self.getStepType():
 
-                    self.setStartState()                    
-                    self.theSession.run( self.getStepSize() )
-                    self.setStopState()
+                    if( self.SimulationButton.getCurrentState() == "stop" ):
+                        self.setStartState()
+                        self.theSession.run( self.getStepSize() )
+                        self.setStopState()
+
+                    else:                        
+                        self.theSession.run( self.getStepSize() )
                     
 		else:
-                    self.setStartState()                    
-                    self.theSession.step( self.getStepSize() )
-                    self.setStopState()
+                    if( self.SimulationButton.getCurrentState() == "stop" ):
+                        self.setStartState()
+                        self.theSession.step( self.getStepSize() )
+                        self.setStopState()
+                    else:
+                        self.theSession.step( self.getStepSize() )
 
-
+                        
 	def stepSimulation( self ) :
 		""" steps simulation """
 		self.__stepSimulation( self, None )
