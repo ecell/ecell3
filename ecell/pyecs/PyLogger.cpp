@@ -118,8 +118,6 @@ Object PyLogger::convertVector( libecs::Logger::DataPointVectorCref aVector )
       Py::Tuple aPyTuple( 2 );
       aPyTuple[0] = Py::Float( (*anItr)->getTime() );
       aPyTuple[1] = Py::Float( (*anItr)->getValue() );
-      cerr << libecs::UVariable( (*anItr)->getTime() ).asString() << "\t"
-	   << libecs::UVariable( (*anItr)->getValue() ).asString() << endl;
       aReturnedPyTuple[i] = aPyTuple;
       ++i;
     }
