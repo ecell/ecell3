@@ -292,8 +292,26 @@ namespace libecs
 
   /**
      These functions are prepared for ExpressionFluxProcess
-     and used in it.
+     and are used in it. asinh, acosh and atanh are not available in 
+     MS Windows (MinGW).
   */
+  template <typename T>
+  T asinh( T n )
+  {
+    return log( n + sqrt( n * n + 1 ) );
+  }
+
+  template <typename T>
+  T acosh( T n )
+  {
+    return log( n - sqrt( n * n - 1 ) );
+  }
+
+  template <typename T>
+  T atanh( T n )
+  {
+    return 0.5 * log( ( 1 + n ) / ( 1 - n ) );
+  }
 
   template <typename T>
   T sec( T n )
