@@ -6,9 +6,6 @@ from Plugin import *
 
 import gtk
 import GTK
-from ecssupport import *
-
-import ecs
 
 import MessageWindow
 import PaletteWindow
@@ -18,7 +15,12 @@ import InterfaceWindow
 
 import string
 
-import Session
+#
+#import pyecell module
+#
+import ecell.ecs
+import ecell.Session
+from ecell.ecssupport import *
 
 class MainWindow(Window):
 

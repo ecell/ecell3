@@ -4,7 +4,7 @@ from Window import *
 
 import string
 import sys
-from ecssupport import *
+from ecell.ecssupport import *
 
 class ViewWindow( Window ):
 

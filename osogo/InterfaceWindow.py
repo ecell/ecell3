@@ -2,7 +2,7 @@
 
 from Window import *
 from gtk import *
-from ecssupport import *
+from ecell.ecssupport import *
 from string import *
 
 class InterfaceWindow( Window ):

@@ -3,7 +3,7 @@
 from Window import *
 
 from gtk import *
-from ecssupport import *
+from ecell.ecssupport import *
 
 import MainWindow
 
