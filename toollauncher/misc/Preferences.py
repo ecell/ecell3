@@ -14,10 +14,9 @@ PROGRAMS_PATH = os.environ['ECELL3_PREFIX'] + os.sep + 'bin'
 SAVE_EM = "1"
 SAVE_EML = "1"
 MODEL_PATH = os.environ['ECELL3_PREFIX'] + os.sep + 'share' + os.sep + 'doc' + \
-		os.sep + os.environ['VERSION'] + os.sep + 'sample' + os.sep + \
-		'LTD'
+        os.sep + 'ecell-' + os.environ['VERSION']
 MODEL_HOME = os.environ['ECELL3_PREFIX'] + os.sep + 'share' + os.sep + 'doc' + \
-		os.sep + os.environ['VERSION'] + os.sep + 'sample'
+		os.sep + 'ecell-' + os.environ['VERSION'] 
 AUTO_LOAD_PREF = "1"
 TRANSLATE_EM = "0"
 

@@ -6,7 +6,7 @@ import string
 
 TL_MISC_PATH = os.environ['TLPATH'] + os.sep + 'misc'
 PYTHONPATH = os.environ['PYTHONPATH']
-os.environ['PYTHONPATH'] = os.environ['TLPATH'] + os.pathsep + TL_MISC_PATH + os.pathsep + PYTHONPATH
+os.environ['PYTHONPATH'] = os.environ['OSOGOPATH'] + os.pathsep + os.environ['TLPATH'] + os.pathsep + TL_MISC_PATH + os.pathsep + PYTHONPATH
 
 os.system('python ' + os.environ['TLPATH'] + os.sep + 'ToolLauncher.py ' + string.join(sys.argv[1:]))
 

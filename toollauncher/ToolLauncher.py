@@ -88,9 +88,9 @@ class ToolLauncher(ParentWindow):
 				self.thePref['editor_path'] = os.environ['ProgramFiles'] + '\Windows NT\Accessories\wordpad.exe'
 			else:
 				self.thePref['editor_path'] = 'gedit'
-			self.thePref['model_home'] = os.environ['ECELL3_PREFIX'] + os.sep + 'share' + os.sep + 'doc' + os.sep + os.environ['VERSION'] + os.sep + 'sample'
-			self.thePref['model_path'] = os.environ['ECELL3_PREFIX'] + os.sep + 'share' + os.sep + 'doc' + os.sep + os.environ['VERSION'] + os.sep + 'sample' + os.sep + 'LTD'
-			self.thePref['programs_path'] = os.environ['ECELL3_PREFIX'] + os.sep + 'bin'
+                self.thePref['model_home'] = os.environ['ECELL3_PREFIX'] + os.sep + 'share' + os.sep + 'doc' + os.sep + 'ecell-' + os.environ['VERSION']
+                self.thePref['model_path'] = os.environ['ECELL3_PREFIX'] + os.sep + 'share' + os.sep + 'doc' + os.sep + 'ecell-' + os.environ['VERSION']
+                self.thePref['programs_path'] = os.environ['ECELL3_PREFIX'] + os.sep + 'bin'
 
 		
 	def openWindow( self 
