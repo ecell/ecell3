@@ -47,6 +47,9 @@ s.setProperty( ( SUBSTANCE, '/', 'A', 'Quantity' ), (30,) )
 print 'initialize()...'
 s.initialize()
 
+
+printAllProperties( s, ( SYSTEM, '', '/' ) )
+
 printAllProperties( s, ( SYSTEM, '/', 'CYTOPLASM' ) )
 
 
