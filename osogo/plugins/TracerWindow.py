@@ -244,7 +244,7 @@ class TracerWindow( OsogoPluginWindow ):
             if len(self.displayedFullPNStringList) < self.thePlotInstance.getMaxTraces():
                 #adds trace to plotinstance,clist, add to displaylist, colorlist
                 aValue = self.getLatestData( aFullPNString )
-                if operator.isNumberType( aValue[1] ):
+                if aValue != None:
                     self.displayedFullPNStringList.append( aFullPNString )
                     pass_list.append( aFullPNString )
                 else:
@@ -257,6 +257,8 @@ class TracerWindow( OsogoPluginWindow ):
     # ========================================================================
     def getLatestData( self, fpn ):
         value = self.theSession.theSimulator.getEntityProperty( fpn )
+        if not operator.isNumberType( value):
+            return None
         time = self.theSession.theSimulator.getCurrentTime()
         return nu.array( [time,value, value, value, value] )
         

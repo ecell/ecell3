@@ -947,6 +947,8 @@ class Plot:
         
     def addTrace( self, aFPNStringList ):
         return_list = []
+        if len( aFPNStringList ) == 0:
+            return []
         for aFullPNString in aFPNStringList:
             #checks whether there's room for new traces
             #allocates a color

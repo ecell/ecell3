@@ -84,6 +84,7 @@ class EntityListWindow(OsogoWindow):
             # entity list
             #			'on_process_tree_cursor_changed': self.selectProcess,\
             #			'on_variable_tree_cursor_changed':self.selectVariable,\
+            
             'on_view_button_clicked': self.createPluginWindow,\
             'on_variable_tree_button_press_event': self.popupMenu,\
             'on_process_tree_button_press_event': self.popupMenu,\
@@ -817,8 +818,9 @@ class EntityListWindow(OsogoWindow):
         fullPNList = []
         for systemFullID in systemFullIDList:
             fullPNList.append( convertFullIDToFullPN( systemFullID ) )
-
+        self.donotHandle = True
         self.theQueue.pushFullPNList(  fullPNList  )
+        self.donotHandle = True
 
 
 
@@ -914,8 +916,9 @@ class EntityListWindow(OsogoWindow):
         selection.selected_foreach(self.process_select_func)
 
         if len(self.theSelectedFullPNList)>0:
+            self.donotHandle = True
             self.theQueue.pushFullPNList( self.theSelectedFullPNList )
-
+            self.donotHandle = False
         # clear selection of variable list
 #        self.variableTree.get_selection().unselect_all()
 
@@ -935,7 +938,9 @@ class EntityListWindow(OsogoWindow):
         selection.selected_foreach(self.variable_select_func)
 
         if len(self.theSelectedFullPNList)>0:
+            self.donotHandle = True
             self.theQueue.pushFullPNList( self.theSelectedFullPNList )
+            self.donotHandle = False
 
         # clear selection of process list
 #        self.processTree.get_selection().unselect_all()

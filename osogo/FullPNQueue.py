@@ -36,6 +36,7 @@ class FullPNQueue:
     def __applyFullPNList( self, aRawFullPNList ):
         self.theRawFullPNList = self.__copyList( aRawFullPNList )
         for aFunction in self.callbackList:
+
             apply( aFunction, [aRawFullPNList] )
 
 

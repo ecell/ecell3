@@ -73,7 +73,10 @@ class PropertyWindow(OsogoPluginWindow):
                                         SETTABLE_COL_TYPE,
                                         PROPERTY_COL_TYPE,
                                         VALUE_COL_TYPE )
-
+        self.lockCursor = False
+        self.cursorHandler = self['theTreeView'].connect('cursor_changed', self.__cursorChanged)
+        self['theTreeView'].connect('button_press_event', self.__popupMenu)
+        
         self['theTreeView'].set_model(self.theListStore)
         
         renderer=gtk.CellRendererToggle()
@@ -234,8 +237,12 @@ class PropertyWindow(OsogoPluginWindow):
 
         # When aRawFullPNList is changed, updates its and call self.update().
         else:
+            self['theTreeView'].disconnect( self.cursorHandler )
             OsogoPluginWindow.setRawFullPNList( self, aRawFullPNList )
             self.update()
+            self.cursorHandler = self['theTreeView'].connect('cursor_changed', self.__cursorChanged)
+
+
 
        
     # end of setRawFullPNList
@@ -331,7 +338,7 @@ class PropertyWindow(OsogoPluginWindow):
 
         # save current full id to previous full id.
         self.preFullID = self.theFullID()
-
+        self.setSelectedFullPN(self.theRawFullPNList[0])
         # updates status bar
         if self['statusbar'] != None:
             self['statusbar'].push(1,'')
@@ -339,6 +346,7 @@ class PropertyWindow(OsogoPluginWindow):
 
                 
     def __updatePropertyList( self ):
+
         self.theList = []
         aPropertyList = self.thePrePropertyMap.keys()
 
@@ -366,14 +374,30 @@ class PropertyWindow(OsogoPluginWindow):
                                       anAttribute[SETTABLE],
                                       aPropertyName,
                                       aValue ] )
+        lockCursor = self.lockCursor
+        self.lockCursor = True
+        self['theTreeView'].get_selection().unselect_all()
 
-        self.theListStore.clear()
+#        self.theListStore.clear()
+        anIter = self.theListStore.get_iter_first()
+        #first rewrite properties
+
         for aValue in self.theList:
-            iter=self.theListStore.append( )
-            cntr=0
+            if anIter == None:
+                anIter=self.theListStore.append( )
+            cntr = 0
             for valueitem in aValue:
-                self.theListStore.set_value(iter,cntr,valueitem)
-                cntr+=1
+                self.theListStore.set_value(anIter,cntr,valueitem)
+                cntr += 1
+            anIter = self.theListStore.iter_next( anIter )
+        while anIter != None:
+            nextIter = self.theListStore.iter_next(anIter)
+            self.theListStore.remove( anIter )
+            anIter = nextIter
+
+        self.setSelectedFullPN( self.theRawFullPNList[0] )
+
+        self.lockCursor = lockCursor
 
 
     def __updateProcess( self ):
@@ -523,7 +547,6 @@ class PropertyWindow(OsogoPluginWindow):
                 try:
                     aValue = string.atoi(aValue)
                 except:
-                    # print out traceback
                     import sys
                     import traceback
                     anErrorMessage = string.join(
@@ -549,7 +572,6 @@ class PropertyWindow(OsogoPluginWindow):
                 try:
                     aValue = string.atof(aValue)
                 except:
-                    # print out traceback
                     import sys
                     import traceback
                     anErrorMessage = string.join( traceback.format_exception( \
@@ -574,7 +596,6 @@ class PropertyWindow(OsogoPluginWindow):
                     aValue = convertStringToTuple( aValue )
 
                 except:
-                    # print out traceback
                     import sys
                     import traceback
                     anErrorMessage = string.join( traceback.format_exception( sys.exc_type,sys.exc_value,sys.exc_traceback), '\n' )
@@ -595,10 +616,13 @@ class PropertyWindow(OsogoPluginWindow):
 
         try:
             self.setValue( self.theSelectedFullPN, aValue ) 
+            lockCursor = self.lockCursor
+            self.lockCursor = True
             self['theTreeView'].get_selection().select_iter( anIter )
+            self.lockCursor = False
         except:
 
-            # print out traceback
+
             import sys
             import traceback
             anErrorMessage = string.join( traceback.format_exception( sys.exc_type,sys.exc_value,sys.exc_traceback), '\n' )
@@ -621,6 +645,7 @@ class PropertyWindow(OsogoPluginWindow):
 
 
     def getSelectedFullPN( self ):
+
         anIter = self['theTreeView'].get_selection().get_selected()[1]
         if anIter == None:
 			self.theSelectedFullPN = ''
@@ -631,6 +656,28 @@ class PropertyWindow(OsogoPluginWindow):
                                        self.theFullID(), aSelectedProperty )
         return self.theSelectedFullPN
 
+    def setSelectedFullPN( self, aFullPN ):
+
+        aPropertyName = aFullPN[3]
+        anIter = self.theListStore.get_iter_first()
+        while anIter != None:
+            if self.theListStore.get_value( anIter, PROPERTY_COL ) == aPropertyName:
+                lockCursor = self.lockCursor
+                self.lockCursor = True
+                self['theTreeView'].get_selection().select_iter( anIter )
+                self.lockCursor = lockCursor
+                break
+            anIter = self.theListStore.iter_next( anIter ) 
+                
+    def __cursorChanged( self, *args ):
+
+        if self.lockCursor:
+            return
+
+        aFullPNList = [ self.getSelectedFullPN() ]
+        self.lockCursor = True
+        self.theQueue.pushFullPNList( aFullPNList )
+        self.lockCursor = False
 
     # ---------------------------------------------------------------
     # popupMenu
@@ -658,17 +705,17 @@ class PropertyWindow(OsogoPluginWindow):
         aPluginWindowName = anObject.get_name()
 
         # gets selected property
-        aRow = self['theTreeView'].get_selection().get_selected()[1]
-        aSelectedProperty = self.theListStore.get_value(aRow,PROPERTY_COL)
+#        aRow = self['theTreeView'].get_selection().get_selected()[1]
+#        aSelectedProperty = self.theListStore.get_value(aRow,PROPERTY_COL)
 
         # creates RawFullPN
-        aType = ENTITYTYPE_STRING_LIST[self.theFullID()[TYPE]] 
-        anID = self.theFullID()[ID]
-        aPath = self.theFullID()[SYSTEMPATH] 
-        aRawFullPN = [(ENTITYTYPE_DICT[aType],aPath,anID,aSelectedProperty)]
-
+#        aType = ENTITYTYPE_STRING_LIST[self.theFullID()[TYPE]] 
+#        anID = self.theFullID()[ID]
+#        aPath = self.theFullID()[SYSTEMPATH] 
+#        aRawFullPN = [(ENTITYTYPE_DICT[aType],aPath,anID,aSelectedProperty)]
+        
         # creates PluginWindow
-        self.thePluginManager.createInstance( aPluginWindowName, aRawFullPN )
+        self.thePluginManager.createInstance( aPluginWindowName, self.theRawFullPNList )
 
     # end of createNewPluginWindow
 
