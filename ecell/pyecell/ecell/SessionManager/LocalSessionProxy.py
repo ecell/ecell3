@@ -81,6 +81,8 @@ class LocalSessionProxy(SessionProxy):
 		# call super class's method
 		SessionProxy.run(self)
 
+		#print "run %s" %self.getJobID()
+
 		# check status
 		if self.getStatus() == FINISHED or self.getStatus() == ERROR:
 			return None
@@ -127,15 +129,15 @@ class LocalSessionProxy(SessionProxy):
 		Return None
 		'''
 
+		#print "update %s" %self.getJobID()
+
 		# call super class's method
 		SessionProxy.update(self)
 
 
+		# when this job is still waiting.
 		if self.__theSubProcess == None:
 			return None
-
-
-		#print "jobid %s---->(%s)" %(self.getJobID(),self.__theSubProcess.poll())
 
 		# check the running status 
 		if self.__theSubProcess.poll() == -1:
@@ -143,7 +145,14 @@ class LocalSessionProxy(SessionProxy):
 			# when this job if running, do nothing
 			return None
 	
-		# when this job is not running
+		# when this job is not running (finised or error)
+
+		#print "finish or error %s" %self.getJobID()
+		if self.theOutputCopyDoneStatus == True:
+			return None
+		self.theOutputCopyDoneStatus = True
+
+		#print self.__theSubProcess.fromchild
 
 		aStdout = self.__theSubProcess.fromchild
 		aStderr = self.__theSubProcess.childerr
@@ -156,7 +165,6 @@ class LocalSessionProxy(SessionProxy):
 		aStdoutFile = "%s%s%s" %( self.getJobDirectory(),
 		                          os.sep,
 		                          self.getStdoutFileName() )
-		
 		shutil.copyfileobj(aStdout,open(aStdoutFile,'a'))
 
 
@@ -183,6 +191,8 @@ class LocalSessionProxy(SessionProxy):
 			# sets error status
 			self.setStatus(ERROR) 
 
+		# relase the memory of sub process
+		self.__theSubProcess = None
 
 
 	def stop(self):

@@ -199,7 +199,7 @@ class SessionProxy:
 		self.__theJobDirectory = None
 		self.__theRetryCount = 0
 		self.__theStartTime = 0
-
+		self.theOutputCopyDoneStatus = False
 
 
 	def __del__(self):

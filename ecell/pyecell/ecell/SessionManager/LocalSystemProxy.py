@@ -90,14 +90,16 @@ class LocalSystemProxy(SystemProxy):
 
 		# calculates the number of jobs to be run
 		aFinishedJobNumber = len(self.theSessionManager.getFinishedJobList())
+		anErrorJobNumber = len(self.theSessionManager.getErrorJobList())
 		aRunningJobNumber = len(self.theSessionManager.getRunningJobList())
 		aDispatchNumber = self.theSessionManager.getConcurrency() - aRunningJobNumber
 
 		#print "cpu - finished = runnning " 
-		#print "cpu(%s) - finished(%s) = runnning(%s) " %( 
-		#                                      self.theSessionManager.getMaxCpus() ,
-		#                                      aFinishedJobNumber ,
-		#                                      aDispatchNumber )
+		print "cpu(%s) finished(%s) error(%s) runnning(%s) " %( 
+		                                      self.theSessionManager.getConcurrency() ,
+		                                      aFinishedJobNumber ,
+		                                      anErrorJobNumber ,
+		                                      aDispatchNumber )
 
 		# When some jobs to be runned,
 		if aDispatchNumber != 0:
@@ -117,7 +119,7 @@ class LocalSystemProxy(SystemProxy):
 					aDispatchCount += 1
 
 					# checks the number of jobs to be runned
-					if aDispatchCount == aDispatchNumber:
+					if aDispatchCount >= aDispatchNumber:
 						break
 
 

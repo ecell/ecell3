@@ -273,7 +273,7 @@ class Globus2SessionProxy(SessionProxy):
 
 		#GLOBUS_JOB_GET_OUTPUT='globus-job-get-output'
 
-
+		# Do nothing if the stasus is queued.
 		if STATUS[self.getStatus()] == 'QUEUED': 
 			return None
 
@@ -284,7 +284,16 @@ class Globus2SessionProxy(SessionProxy):
 		aStatus = os.popen(aCommand).readline()[:-1]
 		#print "(%s)" %aStatus
 
+		# Do nothing in the case where output file was
+		# already copied.
+		if self.theOutputCopyDoneStatus == True:
+			return None
+
+		# if the status is done, copy remote output files
+		# to local machine.
 		if aStatus == 'DONE':
+
+			self.theOutputCopyDoneStatus = True
 			self.setStatus(FINISHED) 
 
 			# save current directory
