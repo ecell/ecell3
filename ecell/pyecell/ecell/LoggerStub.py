@@ -121,12 +121,18 @@ class LoggerStub( ObjectStub ):
 
 	def getData( self, aStartTime=None, anEndTime=None, anInterval=None ):
 
-		if aStartTime == None or anEndTime == None:
+		if aStartTime == None:
 			return self.theSimulator.getLoggerData( self.theFullPNString )
+		elif anEndTime == None:
+			return self.getDataWithStartEnd( aStartTime,\
+							 self.getEndTime() )
 		elif anInterval == None:
-			return self.getDataWithStartEnd( aStartTime, anEndTime )
+			return self.getDataWithStartEnd( aStartTime,\
+							 anEndTime )
 		else:
-			return self.getDataWithStartEndInterval( aStartTime, anEndTime, anInterval )
+			return self.getDataWithStartEndInterval( aStartTime,\
+								 anEndTime,\
+								 anInterval )
 
 	# end of getData
 
