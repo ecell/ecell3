@@ -4,8 +4,10 @@
 
 === About ===
 
-This is a sample model with.
-It is intended to introduce the .
+This is a very simple sample model, 
+intended to introduce E-Cell 3 to beginners.
+This model consists of only three molecular species(S, P, E),
+and one reaction(MichaelisUniUniProcess).
 
 
 
@@ -34,5 +36,5 @@ MichaelisUniUniProcess.dm: Process file(dm file) for this model
 
    3.1) Click 'File' in Main Window
    3.2) Click 'Load Model' in pulldown menu
-   3.3) Select Model file to load
+   3.3) Select Model file to load(e.g. simple.eml)
    3.4) Click 'Start' in Main Window to start simulation
