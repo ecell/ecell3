@@ -49,7 +49,8 @@ namespace libecs
   DifferentialStepper::DifferentialStepper()
     :
     theTolerantStepInterval( 0.001 ),
-    theNextStepInterval( 0.001 )
+    theNextStepInterval( 0.001 ),
+    theStateFlag( false )
   {
     ; // do nothing
   }
@@ -71,6 +72,8 @@ namespace libecs
 
     // should create another method for property slot ?
     //    setNextStepInterval( getStepInterval() );
+
+    //    theStateFlag = false;
   }
 
 
@@ -133,9 +136,9 @@ namespace libecs
 
 	const Real aValue( aVariable->getValue() );
 
-	aVariable->loadValue( aValue + aVariable->calculateTempVelocitySum( this, aCurrentTime ) );
+	aVariable->loadValue( aValue + aVariable->calculateTempVelocitySum( aCurrentTime ) );
 
-	//	std::cout << aValue << ":" << aVariable->calculateTempVelocitySum( this, aCurrentTime ) << std::endl;
+	std::cout << aValue << ":" << aVariable->calculateTempVelocitySum( aCurrentTime ) << std::endl;
       }
 
     for ( UnsignedInt c( theReadOnlyVariableOffset );
@@ -143,9 +146,9 @@ namespace libecs
       {
 	VariablePtr const aVariable( theVariableVector[ c ] );
 
-	aVariable->loadValue( theValueBuffer[ c ] + aVariable->calculateTempVelocitySum( this, aCurrentTime ) );
+	aVariable->loadValue( theValueBuffer[ c ] + aVariable->calculateTempVelocitySum( aCurrentTime ) );
 
-	//	std::cout << theValueBuffer[ c ] << ":" << aVariable->calculateTempVelocitySum( this, aCurrentTime ) << std::endl;
+	std::cout << theValueBuffer[ c ] << ":" << aVariable->calculateTempVelocitySum( aCurrentTime ) << std::endl;
       }
   }
 
@@ -243,6 +246,8 @@ namespace libecs
 
   void AdaptiveDifferentialStepper::step()
   {
+    theStateFlag = false;
+
     // clear
     clear();
 
@@ -285,6 +290,8 @@ namespace libecs
 			 "The error-limit step interval of Stepper [" + 
 			 getID() + "] is too small." );
       }
+
+    theStateFlag = true;
 
     const Real anAdaptedStepInterval( getStepInterval() );
     const UnsignedInt aSize( getReadOnlyVariableOffset() );

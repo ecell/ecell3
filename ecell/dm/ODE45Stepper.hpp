@@ -81,6 +81,11 @@ LIBECS_DM_CLASS( ODE45Stepper, AdaptiveDifferentialStepper )
    
     virtual const Real getDifference( RealCref aTime, RealCref anInterval )
     {
+      if ( !theStepper.theStateFlag )
+      	{
+      	  return 0.0;
+      	}
+
       const Real k1( theStepper.getK1()[ theIndex ] );
       const Real k2( theStepper.getMidVelocityBuffer()[ theIndex ] );
       const Real k3( theStepper.getVelocityBuffer()[ theIndex ] );
@@ -129,11 +134,6 @@ LIBECS_DM_CLASS( ODE45Stepper, AdaptiveDifferentialStepper )
 
 //       return ( i1 - i2 );
 //     }
-
-    virtual const ODE45StepperPtr getStepperPtr()
-    {
-      return &theStepper;
-    }
 
   protected:
 

@@ -188,8 +188,7 @@ namespace libecs
       theLastTime = aCurrentTime;
     }
 
-    const Real calculateTempVelocitySum( StepperPtr aCaller,
-					 const Real aCurrentTime )
+    const Real calculateTempVelocitySum( const Real aCurrentTime )
     {
       const Real anInterval( aCurrentTime - theLastTime );
 
@@ -202,11 +201,8 @@ namespace libecs
       FOR_ALL( VariableProxyVector, theVariableProxyVector )
 	{
 	  VariableProxyPtr const anVariableProxyPtr( *i );
-	  if ( anVariableProxyPtr->getStepperPtr() != aCaller )
-	    {
-	      aVelocitySum += anVariableProxyPtr->getDifference( aCurrentTime,
-								 anInterval );
-	    }
+	  aVelocitySum += anVariableProxyPtr->getDifference( aCurrentTime,
+							     anInterval );
 	}
 
       return aVelocitySum;

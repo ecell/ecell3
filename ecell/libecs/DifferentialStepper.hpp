@@ -168,6 +168,7 @@ namespace libecs
   protected:
 
     RealVector theVelocityBuffer;
+    bool                   theStateFlag;
 
   private:
 

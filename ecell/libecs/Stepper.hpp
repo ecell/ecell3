@@ -607,7 +607,6 @@ namespace libecs
 
     String              theID;
 
-
     gsl_rng*   theRng;
 
   };

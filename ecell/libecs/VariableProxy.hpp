@@ -98,11 +98,6 @@ namespace libecs
       return theVariable;
     }
 
-    virtual const StepperPtr getStepperPtr()
-    {
-      return NULLPTR;
-    }
-
   private:
 
     VariablePtr const theVariable;
