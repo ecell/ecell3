@@ -600,7 +600,6 @@ class EntityListWindow(OsogoWindow):
 
     def reconstructEntityList( self, type, view, systemList, columnList,\
                                columnInfoList ):
-
         # get the entity list in the selected system(s)
         typeID = ENTITYTYPE_DICT[ type ]
 
@@ -820,7 +819,7 @@ class EntityListWindow(OsogoWindow):
             fullPNList.append( convertFullIDToFullPN( systemFullID ) )
         self.donotHandle = True
         self.theQueue.pushFullPNList(  fullPNList  )
-        self.donotHandle = True
+        self.donotHandle = False
 
 
 
@@ -1208,7 +1207,7 @@ class EntityListWindow(OsogoWindow):
         # When no entity is selected, displays confirm window.
         if len(aSelectedRawFullPNList) == 0:
 
-            # print message to message 
+
             aMessage = 'No Entity is selected.'
             self.thePropertyWindow.showMessageOnStatusBar(aMessage)
             aDialog = ConfirmWindow(OK_MODE,aMessage,'Error!')
