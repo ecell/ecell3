@@ -303,7 +303,7 @@ The &Entity; class has three subclasses:
       </sect3>
 
       <sect3>
-	<title>Dynamic type conversion of property values</title>
+	<title>Dynamic type adaptation of property values</title>
 
 	<para>The system automatically convert the type of the
          property value if it is different from what the objects in
@@ -313,12 +313,12 @@ The &Entity; class has three subclasses:
          backend object accepts.  The system tries to convert the type
          of the value given in the model file to the requested type by
          the objects in the simulator.  The conversion is done by the
-         backend object, when it gets a property value.  See also the
+         objects in the simulator, when it gets a property value.  See also the
          following sections.</para>
 
 	<para>The conversion is done in the following manner.  
 <itemizedlist>
-	    <title>How property value type conversion is conducted</title>
+	    <title>How property value type adaptation is conducted</title>
 	    <listitem>
 	      <para>From a numeric value (&Real; or &Int;)</para>
 	      <itemizedlist>
@@ -476,7 +476,7 @@ Stepper ODE23Stepper( ODE_1 )
         # no property 
 } 
  
-System CompartmentSystem( / ) 
+System System( / ) 
 { 
         StepperID       ODE_1;
 
@@ -750,62 +750,42 @@ converted to an &EML;:
     <title>Structure Of The Model</title>
 
     <sect2>
-      <title>Steppers and Systems</title>
+      <title>Top Level Elements</title>
 
-      <para>Usually a model has one or more &Stepper; and &System;
-	statements.  General structure of &EM; file may look like this:
+      <para>Usually an &EM; has one or more &Stepper; and one or more &System;
+	statements.  These statements are top-level elements of the file.
+        General structure of an &EM; file may look like this:
 <programlisting>
 STEPPER_0
 STEPPER_1
 ...
 STEPPER_n
 
-
 SYSTEM_0 # the root system ( '/' )
 SYSTEM_1
 ...
 SYSTEM_m
 </programlisting>
+
+        <literal>STEPPER_?</literal> is a &Stepper; statement and 
+        <literal>SYSTEM_?</literal> is a &System; statement.
 </para>
-
-      <para>A &System; statement can have zero or more
-	&Variable; and &Process; statements.  Do not put a &System;
-	statement inside &System;.
-
-<programlisting>
-System CompartmentSystem( / )
-{
-
-    Variable Variable( V0 ) {}
-    Variable Variable( V1 ) {}
-    # ...
-    Variable Variable( Vn ) {}
-
-    Process SomeProcess( P0 )  {}
-    Process SomeProcess( P1 )  {}
-    # ...
-    Process OtherProcess( Pm ) {}
-}
-</programlisting>
-</para>
-
 
     </sect2>
 
     <sect2>
 
-      <title>System Tree</title>
-      
+      <title>Systems</title>
 
       <sect3>
 	<title>The root system</title>
 	
 	<para>The model must have a &System; with a
-	 &SystemPath; <literal>/</literal>.  This &System; is called
-	 the <emphasis>root system</emphasis>.
+	 &SystemPath; '<literal>/</literal>'.  This &System; is called
+	 the <emphasis>root system</emphasis> of the model.
 
 <programlisting>
-System CompartmentSystem( / )
+System System( / )
 {
     # ...
 }
@@ -813,9 +793,9 @@ System CompartmentSystem( / )
 </para>
 
 	<para>The class of the root system is always
-         <classname>CompartmentSystem</classname>, no matter what
+         <classname>System</classname>, no matter what
          class you specify.  This is because the simulator creates the
-         root sytem when starts up, before loading the model
+         root sytem when it starts up, before loading the model
          file. That is, the statement does not actually create the
          root system object when loading the &EML; file, but just set
          its property values.  Consequently the class name specified
@@ -834,11 +814,11 @@ System CompartmentSystem( / )
          example, the following is <emphasis>not</emphasis> a valid &EM;.
 
 <programlisting>
-System CompartmentSystem( / )
+System System( / )
 {
 }
 
-System CompartmentSystem( /CELL0/MITOCHONDRION0 )
+System System( /CELL0/MITOCHONDRION0 )
 {
 }
 </programlisting>
@@ -850,15 +830,15 @@ System CompartmentSystem( /CELL0/MITOCHONDRION0 )
          <literal>/CELL0</literal>, makes it valid.
 
 <programlisting>
-System CompartmentSystem( / )
+System System( / )
 {
 }
 
-System CompartmentSystem( /CELL0 )
+System System( /CELL0 )
 {
 }
 
-System CompartmentSystem( /CELL0/MITOCHONDRION0 )
+System System( /CELL0/MITOCHONDRION0 )
 {
 }
 </programlisting>
@@ -866,13 +846,13 @@ System CompartmentSystem( /CELL0/MITOCHONDRION0 )
          Of course a &System; can have arbitrary number of sub-systems.
 
 <programlisting>
-System CompartmentSystem( / )
+System System( / )
 {
 }
 
-System CompartmentSystem( /CELL1 ) {}
-System CompartmentSystem( /CELL2 ) {}
-System CompartmentSystem( /CELL3 ) {}
+System System( /CELL1 ) {}
+System System( /CELL2 ) {}
+System System( /CELL3 ) {}
 # ...
 </programlisting>
 
@@ -890,7 +870,103 @@ System CompartmentSystem( /CELL3 ) {}
 
       </sect3>
 
+
+      <sect3>
+	<title>Sizes of the Systems</title>
+
+	<para>If you want to define the size of a &System;, create a
+         &Variable; with an ID '<literal>SIZE</literal>'.  If the
+         &System; models a three-dimensional compartment, the
+         <literal>SIZE</literal> here means the volume of that
+         compartment.  The unit of the volume is [L] (liter).  In the
+         next example, size of the root system is
+         <literal>1e-18</literal>.
+
+<programlisting>System System( / )
+{
+    Variable Variable( SIZE )    # the size (volume) of this compartment
+    {
+        Value   1e-18;
+    }
+}</programlisting>
+        </para>
+	
+	<para>If a System has no '<literal>SIZE</literal>' &Variable;,
+         then it shares the <literal>SIZE</literal> &Variable; with
+         its supersystem.  The root system always has its SIZE
+         &Variable;.  If it is not given by the model file, then the
+         simulator automatically creates it with the default value
+         1.0.  The following example has four &System; objects, and
+         two of them (<literal>/</literal> and
+         <literal>/COMPARTMENT</literal>) have their own
+         <literal>SIZE</literal> variables.  Remaining two
+         (<literal>/SUBSYSTEM</literal> and its subsystem
+         <literal>/SUBSYSTEM/SUBSUBSYSTEM</literal>) share the
+         <literal>SIZE</literal> &Variable; with the root system.
+
+
+<programlisting>
+System System( / )                       # SIZE == 1.0 (default)
+{
+    # no SIZE
+}
+
+System System( /COMPARTMENT )            # SIZE == 2.0e-15
+{
+    Variable Variable( SIZE )
+    {
+        Value 2.0e-15
+    }
+}
+
+System System( /SUBSYSTEM )              # SIZE == SIZE of the root sytem
+{
+    # no SIZE
+}
+
+System System( /SUBSYSTEM/SUBSUBSYSTEM ) # SIZE == SIZE of the root system
+{
+    # no SIZE
+}
+</programlisting>
+</para>
+
+ 
+      </sect3>
+
+
+
     </sect2>
+
+    <sect2>
+      <title>Variables and Processes</title>
+
+      <para>A &System; statement has zero, one or more &Variable; and
+	&Process; statements in addition to its properties.  Do not
+	put a &System; statement inside &System;.
+
+<programlisting>
+System System( / )
+{
+    # ... properties of this System itself comes here..
+
+    Variable Variable( V0 ) {}
+    Variable Variable( V1 ) {}
+    # ...
+    Variable Variable( Vn ) {}
+
+    Process SomeProcess( P0 )  {}
+    Process SomeProcess( P1 )  {}
+    # ...
+    Process OtherProcess( Pm ) {}
+}
+</programlisting>
+</para>
+
+
+    </sect2>
+
+
 
     <sect2>
       <title>Connecting Steppers with Entity Objects</title>
@@ -910,10 +986,10 @@ System CompartmentSystem( /CELL3 ) {}
          <literal>STEPPER1</literal>, respectively.
 
 <programlisting>
-Stepper SomeClassOfStepper( STEPPER0 ) {}
+Stepper SomeClassOfStepper( STEPPER0 )    {}
 Stepper AnotherClassOfStepper( STEPPER1 ) {}
 
-System CompartmentSystem( / )  # connected to STEPPER0
+System System( / )  # connected to STEPPER0
 {
     StepperID     STEPPER0;
 
@@ -1034,7 +1110,7 @@ System CompartmentSystem( / )  # connected to STEPPER0
 	  <listitem>
 	    <para><emphasis>isAccessor</emphasis> flag (<emphasis>optional</emphasis>)</para>
 
-	    <para>This item is either 1 (true) or 0 (false).  If
+	    <para>This is a binary flag; set either 1 (true) or 0 (false).  If
                this <emphasis>isAccessor</emphasis> flag is false, it
                indicates that the behavior of &Process; is not
                affected by the &Variable; that this
@@ -1043,10 +1119,17 @@ System CompartmentSystem( / )  # connected to STEPPER0
                may or may not change the &Variable; regardless of the value
                of this field.</para>
 
-	    <para><emphasis>The default is 1 (true).</emphasis>
-               This field is often omitted.  Some &Process; objects
-               automatically sets this information, if it knows it does
-               not change the &Variable; of this &VariableReference;.</para>
+            <para>Some &Process; objects automatically sets this
+               information, for example, if it knows it never changes
+               the value of the &Variable; of this
+               &VariableReference;.  Care should be taken when you set
+               this flag manually, because many &Process; classes do
+               not check this flag when actually read the value of the
+               &Variable;.
+             </para>
+
+	    <para><emphasis>The default is 1 (true).</emphasis> This
+               field is often omitted.</para>
 
 	    <note>
 	      <title>How isAccessor flag is used in the
@@ -1069,8 +1152,8 @@ System CompartmentSystem( / )  # connected to STEPPER0
 	</para>
 
       <para>
-	 Consider a reaction &Process; in the root system
-	 ,<literal>R</literal>, consumes the &Variable;
+	 Consider a reaction &Process; in the root system,
+	 <literal>R</literal>, consumes the &Variable;
 	 <literal>S</literal> and produces the &Variable;
 	 <literal>P</literal>, taking <literal>E</literal> as the
 	 enzyme.  This class of &Process; requires to give the enzyme
@@ -1080,7 +1163,7 @@ System CompartmentSystem( / )  # connected to STEPPER0
 	 &Process; may appear like this:
 
 <programlisting>
-System CompartmentSystem( / )
+System System( / )
 {
     # ...
     Variable Variable( S ) {}
@@ -1146,9 +1229,11 @@ System CompartmentSystem( / )
   -->
 
 
+  
+
   <sect1>
     <title>Modeling Tutorial</title>
-
+    
     <para>Some basics on usage of ODE Steppers, NRStepper (Gillespie), DiscreteTimeStepper and SlaveStepper should come here.</para>
 
 
@@ -1210,7 +1295,7 @@ S1            S2
        <literal>NR1</literal>.   Because this model has only a single
        compartment, we use the root sytem (<literal>/</literal>).
 
-<programlisting>System CompartmentSystem( / )
+<programlisting>System System( / )
 {
     StepperID       NR1;
 
@@ -1227,7 +1312,7 @@ S1            S2
          <literal>S2</literal>.  Use '<property>Value</property> properties
          of the objects to set initial values.
 
-<programlisting>System CompartmentSystem( / )
+<programlisting>System System( / )
 {
     # ...
 
@@ -1275,7 +1360,7 @@ S1            S2
     # no property
 }
 
-System CompartmentSystem( / )
+System System( / )
 {
     StepperID       NR1;
 
@@ -1328,7 +1413,7 @@ Stepper ODE45Stepper( ODE1 )
 	# no property
 }
 
-System CompartmentSystem( / )
+System System( / )
 {
 	StepperID	ODE1;
 
@@ -1361,35 +1446,11 @@ System CompartmentSystem( / )
       </example>
 
 
-      <sect3>
-	<title>Volume of the compartment</title>
-
-	<para>Incidentally, in this particular trivial model,
+<!--
+Incidentally, in this particular trivial model,
          volume of the compartment does not affect the behavior of the
-         model because all the reactions are first-order.   If you want
-         to define the volume, create a &Variable;
-         with an ID '<literal>SIZE</literal>'.  
-         Because we model this compartment as a three-dimensional
-         space, <literal>SIZE</literal> here means the volume
-         of the compartment. 
-
-<programlisting>System CompartmentSystem( / )
-{
-    # ...
-
-    Variable Variable( SIZE )    # the size (volume) of this compartment
-    {
-        Value   1e-18;
-    }
-
-    # ...
-}</programlisting>
-
-         The unit of the volume is [L] (liter).  In this example, we set
-         it to 1e-18.
-        </para>
-	
-      </sect3>
+         model because all the reactions are first-order.
+      -->
 
 
     </sect2>

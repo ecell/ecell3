@@ -565,7 +565,7 @@ is expanded to the following valid C++ program.
 };
 </programlisting>
 
-In this example, the given property value is stored in a member variable
+In this example, the given property value is stored in the member variable
 <varname>theFlux</varname>.
 </para>
 </informalexample>
