@@ -1,4 +1,11 @@
-SUFFIXES = .cpp .so
+
+if OS_WIN32
+  SHLEXT = .dll
+else
+  SHLEXT = @LTDL_SHLIB_EXT@
+endif
+
+SUFFIXES = .cpp $(SHLEXT)
 
 SHELL = @SHELL@
 
@@ -50,12 +57,12 @@ EXTRA_DIST = ${DMS} ${DMH}
 dmdir = ${DM_SRC_DIR}
 dm_DATA = ${DMS} ${DMH}
 
-SOS = ${DMS:.cpp=.so}
+SOS = ${DMS:.cpp=$(SHLEXT)}
 
 dmsodir = ${DM_SO_DIR}
 dmso_DATA = ${SOS}
 
-%.so : %.cpp
+%$(SHLEXT) : %.cpp
 	${SHELL} ${ECELL3_DMC} -v --dmcompile=${top_srcdir}/../dmtool --no-stdinclude --no-stdlibdir --ldflags=-L${top_srcdir}/libecs --cxxflags='-I${top_srcdir}/libecs -I${top_srcdir}/.. -I${top_srcdir} ${PYTHON_INCLUDES} ${BOOST_INCLUDE}' $< 
 
 clean-local:

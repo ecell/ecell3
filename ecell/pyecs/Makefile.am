@@ -8,6 +8,13 @@ PYTHON_INCLUDES=@PYTHON_INCLUDES@
 
 pkgpythondir=@pkgpythondir@
 
+if OS_WIN32
+  no_undefined = -no-undefined
+  SHLEXT = .dll
+else
+  SHLEXT = @LTDL_SHLIB_EXT@
+endif
+
 BOOST_INCLUDE=@BOOST_INCLUDE@
 BOOST_LIB=@BOOST_LIB@
 
@@ -35,21 +42,21 @@ PyEcs.cpp
 noinst_HEADERS=\
 PyEcs.hpp
 
-_ecs_la_LDFLAGS=-module -export-dynamic -avoid-version
+_ecs_la_LDFLAGS=-module -export-dynamic -avoid-version $(no_undefined)
 
 _ecs_la_LIBADD=$(LIBECS) $(LIBEMC) $(LIBBOOSTPYTHON)
 
 _ecs_la_DEPENDENCIES=$(LIBECS) $(LIBEMC)
 
 
-all-local: _ecs.so
+all-local: _ecs$(SHLEXT)
 
 
-_ecs.so: _ecs.la 
-	ln -sf .libs/_ecs.so ./_ecs.so
+_ecs$(SHLEXT): _ecs.la 
+	ln -sf .libs/_ecs$(SHLEXT) ./_ecs$(SHLEXT)
 
 clean-local:
-	rm -f _ecs.so
+	rm -f _ecs$(SHLEXT)
 
 bin_SCRIPTS =\
 ecell3-python
