@@ -192,6 +192,9 @@ EXT_GUESS="$BOOST_ROOT_DIR $EXT_GUESS "
 AC_MSG_CHECKING( for boost include dir );
 BOOST_INCLUDE=""	
 for ac_dir in $EXT_GUESS ; do
+    if test "$BOOST_INCLUDE" != "" ; then
+        break
+    fi
     if test -f $ac_dir/include/boost/python.hpp ; then
         BOOST_INCLUDE=`(cd $ac_dir/include ; pwd)`
     elif test -f $ac_dir/include/boost*/boost/python.hpp ; then
