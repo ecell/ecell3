@@ -53,7 +53,7 @@ class MainWindow(Window):
         self.theEntryListWindowWindow = self.theEntryListWindow[ 'entry_list_window' ]
 #        self.theEntryListWindowWindow.hide()
 
-        self.theUpdateInterval = 100
+        self.theUpdateInterval = 10
         self.theStepSize = 1
         self.theStepType = 0
         self.theRunningFlag = 0
