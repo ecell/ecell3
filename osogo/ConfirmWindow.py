@@ -32,6 +32,10 @@
 
 from gtk import *
 
+# Constant for ConfirmWindow
+OK_MODE = 0
+OKCANCEL_MODE = 1
+
 # --------------------------------------------------------
 # This is confirm popup window class.
 #
@@ -51,7 +55,7 @@ class ConfirmWindow(GtkDialog):
 	#            of this window
 	# aTitle : the title of this window
 	# ----------------------------------------------------
-	def __init__(self, aMode, aMessage, aTitle=None  ):
+	def __init__(self, aMode, aMessage, aTitle='' ):
 
 		# Sets the return number
 		self._num = -1
@@ -68,8 +72,7 @@ class ConfirmWindow(GtkDialog):
 		self.win.show()
 
 		# Sets title
-		if aTitle != None:
-			self.win.set_title(aTitle)
+		self.win.set_title(aTitle)
 
 		# Sets message
 		aMessageLabel = GtkLabel(aMessage)
