@@ -90,6 +90,7 @@ cleanup()
 
 interrupted()
 {
+	echo "interrupted..."
 	trap '' 2 9 15
 	cleanup
 	exit 1
@@ -97,13 +98,13 @@ interrupted()
 
 run_command()
 {
-	[ $VERBOSE ] && echo $@
 	if [ $TEST_MODE ] ; then
 		echo $@
 	else
-		echo $@
+		[ $VERBOSE ] && echo $@
 		$@
 	fi
+return $?
 }
 
 
@@ -189,7 +190,7 @@ if [ $DO_COMPILE  ] ; then
 
 		# make source files. (-> .[Ch])
 		run_command "$RD2CH $rdfile -d $DTTMPDIR -t $SHAREDIR/$CLASS/template"
-		if [ $? ] ; then
+		if [ $? = 0 ] ; then
 			:
 		else
 			echo "error: conversion of $rdfile (by $RD2CH) failed."
@@ -199,7 +200,7 @@ if [ $DO_COMPILE  ] ; then
 
 		# compile
 		run_command "$CXX $CXXFLAGS -I$SHAREDIR/$CLASS/include $DTTMPDIR/$cppfile -o $DTTMPDIR/$sofile"
-		if [ $? ] ; then
+		if [ $? = 0 ] ; then
 			# move resulting so to OUTDIR
 			run_command $MV $DTTMPDIR/$sofile $OUTDIR
 		else
