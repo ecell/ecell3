@@ -180,8 +180,7 @@ class SBML_Model:
                         return aPath
 
         else:
-            print "Version",self.Level," ????"
-            sys.exit(1)
+            raise Exception, "Version",self.Level," ????"
 
 
     # =========================================================
@@ -199,8 +198,8 @@ class SBML_Model:
                     return self.getPath( aSpecies[2] ) + ":" + aSpeciesID
 
         else:
-            print "Version",self.Level," ????"
-            sys.exit(1)
+            raise Exception, "Version",self.Level," ????"
+
 
     # =========================================================
 
@@ -286,8 +285,8 @@ class SBML_Compartment( SBML_Model ):
             elif ( self.Model.Level == 2 ):
                 aSystemID = '/:' + aCompartment[0]
             else:
-                print "Compartment Class needs a ['ID']"
-                sys.exit(1)
+                raise NameError,"Compartment Class needs a ['ID']"
+
         else:
             if( self.Model.Level == 1 ):
                 aSystemID = self.Model.getPath( aCompartment[6] ) + ':'+ aCompartment[1]
@@ -414,8 +413,7 @@ class SBML_Species( SBML_Model ):
         elif ( self.Model.Level == 2 ):
             aSystemID = self.Model.getPath( aCompartmentID ) + ':' + aSpecies[0]
         else:
-            print "Version",self.Level," ????"
-            sys.exit(1)
+            raise Exception,"Version",self.Level," ????"
                 
         return 'Variable:' + aSystemID
 
@@ -788,15 +786,13 @@ class SBML_Reaction( SBML_Model ):
             if ( aReaction[1] != '' ):
                 return 'Process:/:' + aReaction[1]
             else:
-                print "Name Error: Reaction must set the Reaction name"
-                sys.exit(1)
+                raise NameError,"Reaction must set the Reaction name"
                 
         elif ( self.Model.Level == 2 ):
             if ( aReaction[0] != '' ):
                 return 'Process:/:' + aReaction[0]
             else:
-                print "Name Error: Reaction must set the Reaction ID"
-                sys.exit(1)
+                raise NameError,"Reaction must set the Reaction ID"
 
 
     # =========================================================
@@ -851,8 +847,7 @@ class SBML_Reaction( SBML_Model ):
                                 pass
 
                         if( self.Model.Level == 2 and newName == [] ):
-                            print "NameError in libSBML :",aName,"isn't defined in VariableReferenceList"
-                            sys.exit(1)
+                            raise NameError,"in libSBML :",aName,"isn't defined in VariableReferenceList"
 
                         elif( self.Model.Level == 1 and newName == [] ):
 
@@ -989,8 +984,7 @@ class SBML_Reaction( SBML_Model ):
                         return int( aStoichiometry )
 
         else:
-           print "Version",self.Level," ????"
-           sys.exit(1)
+           raise Exception,"Version",self.Level," ????"
 
 
     # =========================================================
@@ -1027,8 +1021,7 @@ class SBML_Parameter( SBML_Model ):
                raise NameError, "Parameter must set the Parameter ID"
 
        else:
-           print "Version",self.Level," ????"
-           sys.exit(1)
+           raise Exception,"Version",self.Level," ????"
                 
 
    # =========================================================

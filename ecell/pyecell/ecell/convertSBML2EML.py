@@ -284,11 +284,10 @@ def convertSBML2EML( aSBMLString ):
             aSubstrateID = theModel.getSpeciesReferenceID( aSubstrate[0] )
             if ( aSubstrateID == None ):
                 raise NameError,"Species "+aSubstrate[0]+" not found"
-                sys.exit(1)
+
             aSubstrateList.append( 'Variable:' + aSubstrateID )
             if ( aSubstrate[2] != 1 ):
-                print "Stoichiometry Error : E-Cell System can't set a floating Stoichiometry"
-                sys.exit(1)
+                raise Exception,"Stoichiometry Error : E-Cell System can't set a floating Stoichiometry"
  
             aSubstrateList.append( str( -1 * theReaction.getStoichiometry(
                 aSubstrate[0], aSubstrate[1] ) ) )
@@ -302,11 +301,11 @@ def convertSBML2EML( aSBMLString ):
             aProductID = theModel.getSpeciesReferenceID( aProduct[0] )
             if ( aProductID == None ):
                 raise NameError,"Species "+aProduct[0]+" not found"
-                sys.exit(1)
+            
             aProductList.append( 'Variable:' + aProductID )
             if ( aProduct[2] != 1 ):
-                print "Stoichiometry Error : E-Cell System can't set a floating Stoichiometry"
-                sys.exit(1)
+                Exception "Stoichiometry Error : E-Cell System can't set a floating Stoichiometry"
+
             aProductList.append( str( 1 * theReaction.getStoichiometry(
                 aProduct[0],  aProduct[1] ) ) )
 
@@ -320,7 +319,7 @@ def convertSBML2EML( aSBMLString ):
             aModifierID = theModel.getSpeciesReferenceID( aModifier )
             if ( aModifierID == None ):
                 raise NameError,"Species "+aModifier[0]+" not found"
-                sys.exit(1)
+
             aModifierList.append( 'Variable:' + aModifierID )
             aModifierList.append( '0' )
             theReaction.VariableReferenceList.append( aModifierList )
