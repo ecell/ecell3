@@ -22,6 +22,7 @@ class DigitalWindow( OsogoPluginWindow ):
 	# ------------------------------------------------------
 	def __init__( self, aDirName, aData, aPluginManager, aRoot=None ):
 
+
 		# calla constructor of superclass
 		OsogoPluginWindow.__init__( self, aDirName, aData, aPluginManager, aRoot )
         
@@ -32,7 +33,9 @@ class DigitalWindow( OsogoPluginWindow ):
 
 
 		if operator.isNumberType( aValue ):
-		#if operator.isNumberType( aValue[0] ):
+			#if operator.isNumberType( aValue[0] ):
+
+			self.openWindow()
 			self.thePluginManager.appendInstance( self )
 
 			# ----------------------------------------------------------------
@@ -52,18 +55,10 @@ class DigitalWindow( OsogoPluginWindow ):
 			# ----------------------------------------------------------------
 
 		else:
-			self.thePluginManager.printMessage( "%s: (%s) not numerical data.\n" 
-			                            %(self.getTitle(),aFullPNString) )
+			aMessage = "Error: (%s) is not numerical data" %aFullPNString
+			self.thePluginManager.printMessage( aMessage )
+			aDialog = ConfirmWindow(0,aMessage,'Error!')
 
-		if len( self.theFullPNList() ) > 1:
-			self.addPopupMenu(1,1,1)
-		else:
-			self.addPopupMenu(0,1,1)
-
-		#if len( self.theFullPNList() ) > 1:
-		#	self.thePopupMenu.addFullPNList( self.theFullPNList() )
-		#	aClassName = self.__class__.__name__
-		#	self.thePluginManager.createInstance( aClassName, self.theFullPNList()[1:], aRoot )
 
 	def changeFullPN( self, anObject ):
 
@@ -77,7 +72,11 @@ class DigitalWindow( OsogoPluginWindow ):
 
 
 	def update( self ):
-		self["value_frame"].set_text( str( self.getValue( self.theFullPN() ) ) )
+
+		#self["value_frame"].set_text( str( self.getValue( self.theFullPN() ) ) )
+		aFullPNString = createFullPNString( self.theFullPN() )
+		aValue = self.theSession.theSimulator.getEntityProperty( aFullPNString )
+		self["value_frame"].set_text( str( aValue ) )
 
 
 	def inputValue( self, obj ):

@@ -20,6 +20,7 @@ class BargraphWindow( OsogoPluginWindow ):
 
 		#if operator.isNumberType( aValue[0] ):
 		if operator.isNumberType( aValue ):
+			self.openWindow()
 			self.thePluginManager.appendInstance( self )   
 			#self.initialize()
 			# -------------------------------------------------
@@ -49,12 +50,9 @@ class BargraphWindow( OsogoPluginWindow ):
 			# -------------------------------------------------
 
 		else:
-			self.theSession.printMessage( "%s: not numerical data\n" % aFullPNString )
-
-		if len( self.theFullPNList() ) > 1:
-			self.addPopupMenu(1,1,1)
-		else:
-			self.addPopupMenu(0,1,1)
+			aMessage = "Error: (%s) is not numerical data" %aFullPNString
+			self.thePluginManager.printMessage( aMessage )
+			aDialog = ConfirmWindow(0,aMessage,'Error!')
 
 
 	def update( self ):
