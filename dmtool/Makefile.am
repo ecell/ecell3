@@ -1,7 +1,7 @@
 
 AUTOMAKE_OPTIONS=foreign
 
-bin_SCRIPTS = dmtool dmgen dmcompile
+bin_SCRIPTS = dmgen dmcompile
 
 pkginclude_HEADERS=DynamicModule.hpp ModuleMaker.hpp
 
