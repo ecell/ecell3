@@ -180,7 +180,7 @@ class EmParser( GenericParser ):
 		'''
 		object_decl ::= name ( name )
 		'''
-		return AST ( 'object_decl', ( args[0], args[2] ) )
+		return AST ( 'object_decl', args )
 
 	# property
 
@@ -196,7 +196,7 @@ class EmParser( GenericParser ):
 		'''
 		property ::= name valuelist ;
 		'''
-		return AST( 'property', args[:2] )
+		return AST( 'property', args )
 
 
 
@@ -279,7 +279,7 @@ class Interpret(GenericASTTraversal):
 
 	def n_stepper_stmt( self, node ):
 		aClassname = node[1][0].attr
-		anID = node[1][1].attr
+		anID = node[1][2].attr
 
 		self.eml.createStepper( aClassname, anID )
 		
@@ -295,7 +295,7 @@ class Interpret(GenericASTTraversal):
 	def n_system_stmt( self, node ):
 		aType = node[0].attr
 		aClassname = node[1][0].attr
-		anID = node[1][1].attr
+		anID = node[1][2].attr
 
 		aFullID = convert2FullID( self.eml , aType, anID )
 		self.eml.createEntity( aClassname, aFullID )
@@ -303,14 +303,14 @@ class Interpret(GenericASTTraversal):
 		aPropertyNodeList = flatten_nodetree( node[3] )
 		for i in aPropertyNodeList:
 
-                        node = i[0]
-                        aPropertyName = node[0].attr
+                        n = i[0]
+                        aPropertyName = n[0].attr
 
 			if aPropertyName in ( 'Variable', 'Process' ):
-				self.entity_other( node, anID )
+				self.entity_other( n, anID )
 				continue
 			
-                        aValueList = flatten_propertytree( node[1] )
+                        aValueList = flatten_propertytree( n[1] )
 
 			self.eml.setEntityProperty( aFullID, aPropertyName,\
 						    aValueList )
@@ -319,7 +319,7 @@ class Interpret(GenericASTTraversal):
         def entity_other( self, node, path ):
 		aType = node[0].attr
 		aClassname = node[1][0].attr
-		anID = path + ':' + node[1][1].attr
+		anID = path + ':' + node[1][2].attr
 
 		aFullID = convert2FullID( self.eml , aType, anID )
 		self.eml.createEntity( aClassname, aFullID )
