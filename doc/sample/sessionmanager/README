@@ -4,18 +4,16 @@
 
 === About ===
 
-This is a very simple example of E-Cell Session Manager Script (ESM)
+This is a very simple example of E-Cell Session Manager Script (EMS)
 for SessionManager. SessionManager concurrently runs script files,
 including ESS files or other script files(sh,python,etc.).
-
 
 
 === Files and directories ===
 
 README:                     This file
-TestProcess.cpp             Process file. It is same as MichaelisUniUniFluxProcess.cpp
-onerun.ess:                 Script file for E-Cell session
-sample.esm:                 Script file for E-Cell session manager
+runsession.py:              Script file for E-Cell Session
+ems.py:                     Script file for E-Cell Session Manager
 simple.em:                  Model file(EM file) 
 
 
@@ -27,13 +25,11 @@ simple.em:                  Model file(EM file)
    % ls simple.eml
    simple.eml
 
-2. Compile the .cpp file to .so file.
+2. Run esm file.
 
-   % ecell3-dmc TestFluxProcess.cpp
-   % ls TestFluxProcess.so
-   TestFluxProcess.so
+   % ecell3-session-manager ems.py
 
-3. Run esm file.
+   Environment and Cuncurrency could be specified as bellow.
 
-   % ecell3-session-manager sample.esm
+   % ecell3-session-manager --environment=SGE --concurrency=5 ems.py
 
