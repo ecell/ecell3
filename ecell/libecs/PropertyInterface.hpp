@@ -658,7 +658,7 @@ namespace libecs
   template<class T> 
   const Real StringPropertySlot<T>::getReal() const
   {
-    stringTo<Real>( getString() );
+    return stringTo<Real>( getString() );
   }
 
 
