@@ -1,0 +1,19 @@
+#!/usr/bin/env ecell3
+
+
+import sys
+
+import ecell.ecs
+import ecell.Session
+
+
+#FIXME: commandline processing needed
+
+anEcsFileName = sys.argv[1]
+
+aSimulator = ecell.ecs.Simulator()
+aSession = ecell.Session.Session( aSimulator )
+
+
+aSession.loadScript( anEcsFileName )
+
