@@ -31,20 +31,21 @@ class Session:
     # Session methods
     #
 
-    def loadScript( self, ecs, locals={} ):
+    def loadScript( self, ecs, parameters={} ):
 
-        # theSession == self in the script
-        aGlobals = { 'theSession': self }
-        
-        # flatten class methods and object properties so that
-        # 'self.' isn't needed for each method calls in the script
-        aDict = {}
-        for aKey in self.__dict__.keys() + self.__class__.__dict__.keys():
-            aDict[ aKey ] = getattr( self, aKey )
-        aGlobals.update( aDict )
+        aContext = self.__createScriptContext( parameters )
 
-        execfile( ecs, aGlobals, locals )
+        execfile( ecs, aContext )
             
+    def interact( self, parameters={} ):
+
+        aContext = self.__createScriptContext( parameters )
+        
+        import readline # to provide convenient commandline editing :)
+        import code
+        anInterpreter = code.InteractiveConsole( aContext )
+        anInterpreter.interact( 'ecell3-session' )
+
 
     def loadModel( self, aFile ):
         if type( aFile ) == str:
@@ -52,15 +53,15 @@ class Session:
         else:
             aFileObject = aFile
 
-        self.theEml = eml.Eml( aFileObject )
+        anEml = eml.Eml( aFileObject )
 
-        self.__loadStepper()
+        self.__loadStepper( anEml )
 
         # load root system properties
-        aPropertyList = self.theEml.getEntityPropertyList( 'System::/' )
-        self.__loadEntityPropertyList( 'System::/', aPropertyList )
+        aPropertyList = anEml.getEntityPropertyList( 'System::/' )
+        self.__loadEntityPropertyList( anEml, 'System::/', aPropertyList )
 
-        self.__loadEntity()
+        self.__loadEntity( anEml )
 
         self.theSimulator.initialize()
 
@@ -71,7 +72,7 @@ class Session:
     def setPrintMethod( self, aMethod ):
         self.thePrintMethod = aMethod
 
-    def print( self, message ):
+    def message( self, message ):
         self.thePrintMethod( message )
 
     def setLogMethod( self, aMethod ):
@@ -79,7 +80,7 @@ class Session:
         self.thePrintMethod = aMethod
 
     def log( self, message ):
-        print 'log() is deprecated. use print() instead'
+        print 'log() is deprecated. use message() instead'
         self.thePrintMethod( message )
 
 
@@ -220,14 +221,14 @@ class Session:
         except:#(1)
             
             import sys
-            ## self.print( __name__ )
-            self.print( sys.exc_traceback )
+            ## self.message( __name__ )
+            self.message( sys.exc_traceback )
             aErrorMessage= "Error : could not save [%s] " %aFullPNString
-            self.print( aErrorMessage )
+            self.message( aErrorMessage )
             return None
 
         aDataFileManager.saveAll()         
-        self.print( "All files are saved." )
+        self.message( "All files are saved." )
 
 
 
@@ -239,31 +240,31 @@ class Session:
         print aMessage
 
 
-    def __loadStepper( self ):
+    def __loadStepper( self, anEml ):
         """stepper loader"""
 
-        aStepperList = self.theEml.getStepperList()
+        aStepperList = anEml.getStepperList()
 
         for aStepper in aStepperList:
 
-            aClassName = self.theEml.getStepperClass( aStepper )
+            aClassName = anEml.getStepperClass( aStepper )
             self.theSimulator.createStepper( str( aClassName ),\
                                              str( aStepper ) )
 
-            aPropertyList = self.theEml.getStepperPropertyList( aStepper )
+            aPropertyList = anEml.getStepperPropertyList( aStepper )
 
             for aProperty in aPropertyList:
                 
-                aValue = self.theEml.getStepperProperty( aProperty )
+                aValue = anEml.getStepperProperty( aProperty )
                 self.theSimulator.setStepperProperty( aStepper,\
                                                       aProperty,\
                                                       aValue )
                                              
-    def __loadEntity( self, aSystemPath='/' ):
+    def __loadEntity( self, anEml, aSystemPath='/' ):
 
-        aVariableList = self.theEml.getEntityList( 'Variable', aSystemPath )
-        aProcessList   = self.theEml.getEntityList( 'Process',   aSystemPath )
-        aSubSystemList = self.theEml.getEntityList( 'System',    aSystemPath )
+        aVariableList = anEml.getEntityList( 'Variable', aSystemPath )
+        aProcessList   = anEml.getEntityList( 'Process',   aSystemPath )
+        aSubSystemList = anEml.getEntityList( 'System',    aSystemPath )
 
         self.__loadEntityList( 'Variable', aSystemPath, aVariableList )
         self.__loadEntityList( 'Process',   aSystemPath, aProcessList )
@@ -274,26 +275,43 @@ class Session:
             self.__loadEntity( aSubSystemPath )
 
 
-    def __loadEntityList( self, anEntityTypeString, aSystemPath, anIDList ):
+    def __loadEntityList( self, anEml, anEntityTypeString, aSystemPath, anIDList ):
         
         for anID in anIDList:
 
             aFullID = anEntityTypeString + ':' + aSystemPath + ':' + anID
-            aClassName = self.theEml.getEntityClass( aFullID )
+            aClassName = anEml.getEntityClass( aFullID )
             self.theSimulator.createEntity( str( aClassName ), aFullID )
 
-            aPropertyList = self.theEml.getEntityPropertyList( aFullID )
+            aPropertyList = anEml.getEntityPropertyList( aFullID )
 
             self.__loadEntityPropertyList( aFullID, aPropertyList )
 
 
-    def __loadEntityPropertyList( self, aFullID, aPropertyList ):
+    def __loadEntityPropertyList( self, anEml, aFullID, aPropertyList ):
 
         for aProperty in aPropertyList:
             aFullPN = aFullID + ':' + aProperty
-            aValue = self.theEml.getEntityProperty( aFullPN )
+            aValue = anEml.getEntityProperty( aFullPN )
             self.theSimulator.setEntityProperty( aFullPN, aValue )
 
+    def __createScriptContext( self, parameters ):
+
+        # theSession == self in the script
+        aContext = { 'theSession': self }
+        
+        # flatten class methods and object properties so that
+        # 'self.' isn't needed for each method calls in the script
+        aDict = {}
+        for aKey in self.__dict__.keys() + self.__class__.__dict__.keys():
+            aDict[ aKey ] = getattr( self, aKey )
+
+        aContext.update( aDict )
+            
+        # add parameters to the context
+        aContext.update( parameters )
+
+        return aContext
 
 
 if __name__ == "__main__":

@@ -9,11 +9,20 @@ import ecell.Session
 
 #FIXME: commandline processing needed
 
-anEcsFileName = sys.argv[1]
+anEssFileName = None
+
+if len( sys.argv ) > 1:
+	anEssFileName = sys.argv[1]
+
+#FIXME:
+aParameters = {}
+
 
 aSimulator = ecell.ecs.Simulator()
 aSession = ecell.Session.Session( aSimulator )
 
-
-aSession.loadScript( anEcsFileName )
+if anEssFileName:
+	aSession.loadScript( anEssFileName, aParameters )
+else:
+	aSession.interact( aParameters )
 
