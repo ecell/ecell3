@@ -40,7 +40,7 @@ class PluginModule:
 
     def createInstance( self, sim, data, parent=None ):
         aConstructor = self.theModule.__dict__[self.theName]
-        anArgumentTuple = tuple( self.theDirectoryName ) + (sim,) + (data,)
+        anArgumentTuple = ( self.theDirectoryName, sim , data )
         apply( aConstructor, anArgumentTuple )
 
 
