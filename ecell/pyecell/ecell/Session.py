@@ -9,7 +9,7 @@ from Numeric import *
 import ecell.Session
 import ecell.ecs
 
-import ecell.ecssupport
+from ecell.ecssupport import *
 import ecell.DataFileManager
 import ecell.ECDDataFile
 
@@ -168,9 +168,12 @@ class Session:
         self.theEml = eml.Eml( aFileObject )
 
         self.__loadStepper()
+
+        # temporary workaround: root stepper is the first one in stepperlist.
+        self.theSimulator.setEntityProperty( 'System::/:StepperID',\
+                                             self.theEml.getStepperList()[0] )
+
         self.__loadEntity()
-        self.__loadStepperProperty()
-        self.__loadProperty()
 
         
     def saveModel( self ):
@@ -184,72 +187,49 @@ class Session:
 
         for aStepper in aStepperList:
 
-            self.theSimulator.createStepper( aStepper[ 'Class' ], \
-                                             aStepper[ 'Id' ] )
+            aClassName = self.theEml.getStepperClass( aStepper )
+            self.theSimulator.createStepper( str( aClassName ),\
+                                             str( aStepper ) )
 
-            ## ERROR: don't use the third value ... why? (020719)
-            #self.theSimulator.createStepper( aStepper[ 'Class' ], \
-            #                                 aStepper[ 'Id' ], \
-            #                                 aStepper[ 'ValueList' ] )
+            aPropertyList = self.theEml.getStepperPropertyList( aStepper )
 
-            ## Debug for Output --------------------------------------
-            #script = "self.theSimulator.createStepper( '" +\
-            #         aStepper[ 'Class' ] + "', '" +\
-            #         aStepper[ 'Id' ] + "', " +\
-            #         str( aStepper[ 'ValueList' ] ) + " )"
-            #print script
-            ## ========================================================
+            for aProperty in aPropertyList:
+                
+                aValue = self.theEml.getStepperProperty( aProperty )
+                self.theSimulator.setStepperProperty( aStepper,\
+                                                      aProperty,\
+                                                      aValue )
+                                             
+    def __loadEntity( self, aSystemPath='/' ):
 
+        aSubstanceList = self.theEml.getEntityList( 'Substance', aSystemPath )
+        aReactorList   = self.theEml.getEntityList( 'Reactor',   aSystemPath )
+        aSubSystemList = self.theEml.getEntityList( 'System',    aSystemPath )
 
+        self.__loadEntityList( 'Substance', aSystemPath, aSubstanceList )
+        self.__loadEntityList( 'Reactor',   aSystemPath, aReactorList )
+        self.__loadEntityList( 'System',    aSystemPath, aSubSystemList )
 
-    def __loadEntity( self ):
-
-        anEntityList = self.theEml.getEntityList()
-
-        for anEntity in anEntityList:
-
-            self.theSimulator.createEntity( anEntity[ 'Type' ], \
-                                            anEntity[ 'FullId' ] )
-                                            #                                            anEntity[ 'Name' ] )
-
-            ## Debug for Output -----------------------------------------------------------
-            #script = "self.theSimulator.createEntity( '" + anEntity[ 'Type' ] + "', '" + \
-            #         anEntity[ 'FullId' ] + "', '" + anEntity[ 'Name' ]   + "' )"
-            #print script
-            ##=============================================================================
+        for aSystem in aSubSystemList:
+            aSubSystemPath = joinSystemPath( aSystemPath, aSystem )
+            self.__loadEntity( aSubSystemPath )
 
 
-
-    def __loadStepperProperty( self ):
-        aStepperPropertyList = self.theEml.getStepperPropertyList()
+    def __loadEntityList( self, anEntityTypeString, aSystemPath, anIDList ):
         
-#??? -sha
-        for aStepperProperty in aStepperPropertyList:
-            self.theSimulator.setEntityProperty( str( aStepperProperty[ 'FullPn' ] ), \
-                                                  aStepperProperty[ 'StepperId' ] )
+        for anID in anIDList:
 
-            ## Debug for Output -----------------------------------------------------------
-            #script = "self.theSimulator.setProperty( '" + aStepperProperty[ 'FullPn' ] + "', " +\
-            #         str( aStepperProperty[ 'StepperId' ] ) + ')'
-            #print script
-            ##=============================================================================        
-            
+            aFullID = anEntityTypeString + ':' + aSystemPath + ':' + anID
+            aClassName = self.theEml.getEntityClass( aFullID )
+            self.theSimulator.createEntity( str( aClassName ), aFullID )
+
+            aPropertyList = self.theEml.getEntityPropertyList( aFullID )
+            for aProperty in aPropertyList:
+                aFullPN = aFullID + ':' + aProperty
+                aValue = self.theEml.getEntityProperty( aFullPN )
+                self.theSimulator.setEntityProperty( aFullPN, aValue )
 
 
-    def __loadProperty( self ):
-        aPropertyList = self.theEml.getEntityPropertyList()
-        
-        for aProperty in aPropertyList:
-
-            self.theSimulator.setEntityProperty( aProperty[ 'FullPn' ], \
-                                                 aProperty[ 'ValueList' ] )
-
-            ## Debug for Output -----------------------------------------------------------
-            #script = "self.theSimulator.setProperty( '" +str( aProperty[ 'FullPn' ] ) + "', " + \
-            #         str( aProperty[ 'ValueList' ] ) + ')'
-            #
-            #print script
-            ##=============================================================================
 
 if __name__ == "__main__":
     pass

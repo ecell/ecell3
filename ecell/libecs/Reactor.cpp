@@ -76,7 +76,7 @@ namespace libecs
     PolymorphVector aVector( aValue.asPolymorphVector() );
     checkSequenceSize( aVector, 3 );
 
-    std::cerr << "Use of Reactor::setReactant() is deprecated. This method will be removed." << std::endl;
+    std::cerr << "Use of Reactor::setReactant() is deprecated. Use ReactantList." << std::endl;
 
     registerReactant( aVector[0].asString(), FullID( aVector[1].asString() ), 
 		      aVector[2].asInt() );
@@ -91,7 +91,7 @@ namespace libecs
 	const PolymorphVector anInnerVector( (*i).asPolymorphVector() );
 
 	// Require ( tagname, fullid, stoichiometry ) 3-tuple
-	if( anInnerVector.size() <= 3 )
+	if( anInnerVector.size() < 3 )
 	  {
 	    THROW_EXCEPTION( ValueError, "Reactor [" + getFullID().getString()
 			     + "]: ill-formed ReactantList given." );

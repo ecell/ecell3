@@ -91,6 +91,12 @@ def createSystemPathFromFullID( aSystemFullID ):
 
     return aNewSystemPath
 
+def joinSystemPath( aSystemPath1, aSystemPath2 ):
+    if aSystemPath1[ -1 ] == '/':
+        return aSystemPath1 + aSystemPath2
+    else:
+        return aSystemPath1 + '/' + aSystemPath2
+
 
 if __name__ == "__main__":
     

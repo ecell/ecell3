@@ -21,6 +21,8 @@ import string
 
 from types import *
 
+from ecssupport import *
+
 #---------------------------------------------------------"""
 class Eml:
 
@@ -244,12 +246,11 @@ class Eml:
                         
 
 
-    def checkEntityExistence( self, aFullID ):
+    def isEntityExist( self, aFullID ):
 
         aTargetEntity = self.asEntityInfo( aFullID )
 
         anExistence = 0
-        anExistingSystem = 'None'
 
         aSystemList = self.__theDocument.getElementsByTagName( 'system' )
         for aSystem in aSystemList:
@@ -259,7 +260,6 @@ class Eml:
                 aSystemPath = aSystem.getAttribute( 'id' ).split( ':' )[1]
                 if aSystemPath == aTargetEntity[ 'Path' ]:
                     anExistence = 1
-                    anExistingSystem = aSystem
 
             ## for Substance or Reactor
             else:
@@ -272,12 +272,17 @@ class Eml:
                            anElement.getAttribute( 'id' ) == aTargetEntity[ 'ID' ]:
 
                             anExistence = 1
-                            anExistingSystem = aSystem
                             
-        return ( anExistence, anExistingSystem )
+        return anExistence
 
 
 
+    def getEntityClass( self, aFullID ):
+        anEntityNode = self.__getEntityNode( aFullID )
+
+        return anEntityNode.getAttribute( 'class' )
+        
+        
 
 
     ##---------------------------------------------
@@ -434,8 +439,12 @@ class Eml:
 
 
 
-    def getEntityProperty( self, aFullID, aPropertyName ):
+    def getEntityProperty( self, aFullPNString ):
 
+
+        aFullPN = createFullPN( aFullPNString )
+        aPropertyName = aFullPN[3]
+        aFullID = createFullIDString( convertFullPNToFullID( aFullPN ) )
         anEntityPropertyNode = self.__getEntityPropertyNode( aFullID, aPropertyName )
 
         anEntityPropertyValueList = []
@@ -503,29 +512,36 @@ class Eml:
 
 
     def __getEntityNode( self, aFullID ):
-
+        
         aSystemNodeList = self.__theDocument.getElementsByTagName( 'system' )
         anEntityInfo = self.asEntityInfo( aFullID )
-
-
+        
+        
         if anEntityInfo[ 'Type' ] == 'System':
-            pass
+            aSystemPath = joinSystemPath( anEntityInfo[ 'Path' ],\
+                                          anEntityInfo[ 'ID' ] )
+
+            for aSystemNode in aSystemNodeList:
+                
+                if aSystemNode.getAttribute( 'id' ) == aSystemPath:
+                    return aSystemNode
 
         else:
             aSystemPath = anEntityInfo[ 'Path' ]
 
+            for aSystemNode in aSystemNodeList:
+                
+                if aSystemNode.getAttribute( 'id' ) == aSystemPath:
 
-        for aSystemNode in aSystemNodeList:
+                    for aChildNode in aSystemNode.childNodes:
+                        
+                        if string.capwords( aChildNode.tagName ) == anEntityInfo[ 'Type' ]:
 
-            if aSystemNode.getAttribute( 'id' ) == aSystemPath:
+                            if aChildNode.getAttribute( 'id' ) == anEntityInfo[ 'ID' ]:
 
-                for aChildNode in aSystemNode.childNodes:
+                                return aChildNode
 
-                    if string.capwords( aChildNode.tagName ) == anEntityInfo[ 'Type' ]:
-
-                        if aChildNode.getAttribute( 'id' ) == anEntityInfo[ 'ID' ]:
-
-                            return aChildNode
+        raise "Entity [" + aFullID + "] not found."
 
                         
 
