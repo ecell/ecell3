@@ -40,7 +40,7 @@ cat << EOT_HELP
 
 ecell3-dmc options:
         --no-stdinclude          Don't set standard include file path.
-        --dmcompile              Specify dmcompile path.
+        --dmcompile=PATH         Specify dmcompile path.
         -v or --verbose   	 Be verbose.
         -h or --help		 Print this message.
 
