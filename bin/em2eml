@@ -97,8 +97,8 @@ class EmScanner( GenericScanner , object ):
 		self.rv.append( self.createToken( 'name', s ) )
 
 	def t_quotedstring( self, s ):
-		r' "(^"|.)*" '
-		self.rv.append( self.createToken( 'quotedstring', s ) )
+		r' "(^"|.)*" | \'(^\'|.)*\' '
+		self.rv.append( self.createToken( 'quotedstring', s[1:-1] ) )
 		
 	def t_control( self, s ):
 		r' \%line [^\n]*\n '
