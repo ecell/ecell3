@@ -38,6 +38,9 @@ FixedRungeKutta4Stepper.cpp\
 ODE23Stepper.cpp\
 CashKarp45Stepper.cpp\
 ODE45Stepper.cpp\
+ESSYNSStepper.cpp\
+GMAProcess.cpp\
+SSystemProcess.cpp\
 FluxDistributionStepper.cpp\
 FluxDistributionProcess.cpp\
 QuasiDynamicFluxProcess.cpp\
@@ -53,6 +56,7 @@ FixedDAE1Stepper.hpp\
 FixedRungeKutta4Stepper.hpp\
 GillespieProcess.hpp\
 NRStepper.hpp\
+ESSYNSStepper.hpp\
 ODE23Stepper.hpp\
 FluxDistributionStepper.hpp\
 QuasiDynamicFluxProcess.hpp\
