@@ -58,7 +58,7 @@ void FixedODE1Stepper::step()
     {
       VariablePtr const aVariable( theVariableVector[ c ] );
 
-      theVelocityBuffer[ c ] = aVariable->getVelocity();
+      theTaylorSeries[ 0 ][ c ] = aVariable->getVelocity();
     }
 
   /**

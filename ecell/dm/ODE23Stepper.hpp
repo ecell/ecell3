@@ -41,50 +41,12 @@ USE_LIBECS;
 LIBECS_DM_CLASS( ODE23Stepper, AdaptiveDifferentialStepper )
 {
 
-  class Interpolant
-    :
-  public libecs::Interpolant
-  {
-  public:
-
-    Interpolant( ODE23StepperRef aStepper, VariablePtr const aVariablePtr )
-      :
-      libecs::Interpolant( aVariablePtr ),
-      theStepper( aStepper ),
-      theIndex( theStepper.getVariableIndex( aVariablePtr ) )
-    {
-      ; // do nothing
-    }
-
-    virtual const Real getDifference( RealParam aTime, RealParam anInterval )
-    {
-      const Real aTolerableStepInterval
-	( theStepper.getTolerableStepInterval() );
-
-      const Real aTimeInterval( aTime - theStepper.getCurrentTime() );
-
-      const Real theta( FMA( aTimeInterval, 2.0, - anInterval )
-			/ aTolerableStepInterval );
-
-      const Real k1( theStepper.getK1()[ theIndex ] );
-      const Real k2( theStepper.getK2()[ theIndex ] );
-
-      return ( FMA( theta, k2, k1 ) * anInterval );
-    }
-
-  protected:
-
-    ODE23StepperRef theStepper;
-    UnsignedInteger theIndex;
-  };
-
 public:
 
   LIBECS_DM_OBJECT( ODE23Stepper, Stepper )
     {
       INHERIT_PROPERTIES( AdaptiveDifferentialStepper );
     }
-
 
   ODE23Stepper( void );
   
@@ -95,23 +57,10 @@ public:
 
   virtual GET_METHOD( Integer, Order ) { return 2; }
 
-  virtual InterpolantPtr createInterpolant( VariablePtr aVariable )
-  {
-    return new 
-      ODE23Stepper::Interpolant( *this, aVariable );
-  }
-
-  RealVectorCref getK2() const
-  {
-    return theK2;
-  }
-
   void interIntegrate2();
 
 protected:
 
-  //  RealVector theK1;
-  RealVector theK2;
 };
 
 #endif /* __ODE23_HPP */

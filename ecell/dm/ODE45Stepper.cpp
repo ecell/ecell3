@@ -37,8 +37,9 @@ LIBECS_DM_INIT( ODE45Stepper, Stepper );
 
 ODE45Stepper::ODE45Stepper()
   :
-  theInterrupted( true ),
-  theSpectralRadius( 0.0 )
+  isInterrupted( true ),
+  theSpectralRadius( 0.0 ),
+  count( 0 )
 {
   ; // do nothing
 }
@@ -52,19 +53,9 @@ void ODE45Stepper::initialize()
 {
   AdaptiveDifferentialStepper::initialize();
 
-  const VariableVector::size_type aSize( getReadOnlyVariableOffset() );
+  theRungeKuttaBuffer.resize( boost::extents[ 6 ][ getReadOnlyVariableOffset() ] );
 
-  theK1.resize( aSize );
-  theK2.resize( aSize );
-  theK3.resize( aSize );
-  theK4.resize( aSize );
-  theK5.resize( aSize );
-  theK6.resize( aSize );
-  theK7.resize( aSize );
-
-  theMidVelocityBuffer.resize( aSize );
-
-  theInterrupted = true;
+  isInterrupted = true;
 }
 
 void ODE45Stepper::step()
@@ -75,7 +66,7 @@ void ODE45Stepper::step()
   if ( fabs( getTolerableStepInterval() - getStepInterval() )
        > std::numeric_limits<Real>::epsilon() )
     {
-      theInterrupted = true;
+      isInterrupted = true;
     }
 }
 
@@ -93,8 +84,7 @@ bool ODE45Stepper::calculate()
 
   // ========= 1 ===========
 
-  if ( theInterrupted )
-    //    if ( 1 )
+  if ( isInterrupted )
     {
       interIntegrate();
       fireProcesses();
@@ -104,9 +94,9 @@ bool ODE45Stepper::calculate()
 	  VariablePtr const aVariable( theVariableVector[ c ] );
 	
 	  // get k1
-	  theK1[ c ] = aVariable->getVelocity();
+	  theTaylorSeries[ 0 ][ c ] = aVariable->getVelocity();
 	    
-	  aVariable->loadValue( theK1[ c ] * ( 1.0 / 5.0 )
+	  aVariable->loadValue( theTaylorSeries[ 0 ][ c ] * ( 1.0 / 5.0 )
 				* aStepInterval
 				+ theValueBuffer[ c ] );
 
@@ -121,9 +111,9 @@ bool ODE45Stepper::calculate()
 	  VariablePtr const aVariable( theVariableVector[ c ] );
 	
 	  // get k1
-	  theK1[ c ] = theK7[ c ];
+	  theTaylorSeries[ 0 ][ c ] = theRungeKuttaBuffer[ 5 ][ c ];
 
-	  aVariable->loadValue( theK1[ c ] * ( 1.0 / 5.0 )
+	  aVariable->loadValue( theTaylorSeries[ 0 ][ c ] * ( 1.0 / 5.0 )
 				* aStepInterval
 				+ theValueBuffer[ c ] );
 
@@ -142,17 +132,17 @@ bool ODE45Stepper::calculate()
       VariablePtr const aVariable( theVariableVector[ c ] );
 	
       // get k2
-      theK2[ c ] = aVariable->getVelocity();
+      theRungeKuttaBuffer[ 0 ][ c ] = aVariable->getVelocity();
 
-      aVariable->loadValue( ( theK1[ c ] * ( 3.0 / 40.0 ) 
-			      + theK2[ c ] * ( 9.0 / 40.0 ) )
-			    * aStepInterval
-			    + theValueBuffer[ c ] );
+      aVariable
+	->loadValue( ( theTaylorSeries[ 0 ][ c ] * ( 3.0 / 40.0 ) 
+		       + theRungeKuttaBuffer[ 0 ][ c ] * ( 9.0 / 40.0 ) )
+		     * aStepInterval
+		     + theValueBuffer[ c ] );
 
       // clear velocity
       aVariable->clearVelocity();
     }
-
 
   // ========= 3 ===========
   setCurrentTime( aCurrentTime + aStepInterval * 0.3 );
@@ -164,13 +154,14 @@ bool ODE45Stepper::calculate()
       VariablePtr const aVariable( theVariableVector[ c ] );
 	
       // get k3
-      theK3[ c ] = aVariable->getVelocity();
+      theRungeKuttaBuffer[ 1 ][ c ] = aVariable->getVelocity();
 
-      aVariable->loadValue( ( theK1[ c ] * ( 44.0 / 45.0 ) 
-			      - theK2[ c ] * ( 56.0 / 15.0 )
-			      + theK3[ c ] * ( 32.0 / 9.0 ) )
-			    * aStepInterval
-			    + theValueBuffer[ c ] );
+      aVariable
+	->loadValue( ( theTaylorSeries[ 0 ][ c ] * ( 44.0 / 45.0 ) 
+		       - theRungeKuttaBuffer[ 0 ][ c ] * ( 56.0 / 15.0 )
+		       + theRungeKuttaBuffer[ 1 ][ c ] * ( 32.0 / 9.0 ) )
+		     * aStepInterval
+		     + theValueBuffer[ c ] );
 
       // clear velocity
       aVariable->clearVelocity();
@@ -186,14 +177,15 @@ bool ODE45Stepper::calculate()
       VariablePtr const aVariable( theVariableVector[ c ] );
 	
       // get k4
-      theK4[ c ] = aVariable->getVelocity();
+      theRungeKuttaBuffer[ 2 ][ c ] = aVariable->getVelocity();
 
-      aVariable->loadValue( ( theK1[ c ] * ( 19372.0 / 6561.0 ) 
-			      - theK2[ c ] * ( 25360.0 / 2187.0 )
-			      + theK3[ c ] * ( 64448.0 / 6561.0 )
-			      - theK4[ c ] * ( 212.0 / 729.0 ) )
-			    * aStepInterval
-			    + theValueBuffer[ c ] );
+      aVariable
+	->loadValue( ( theTaylorSeries[ 0 ][ c ] * ( 19372.0 / 6561.0 ) 
+		       - theRungeKuttaBuffer[ 0 ][ c ] * ( 25360.0 / 2187.0 )
+		       + theRungeKuttaBuffer[ 1 ][ c ] * ( 64448.0 / 6561.0 )
+		       - theRungeKuttaBuffer[ 2 ][ c ] * ( 212.0 / 729.0 ) )
+		     * aStepInterval
+		     + theValueBuffer[ c ] );
 
       // clear velocity
       aVariable->clearVelocity();
@@ -209,17 +201,17 @@ bool ODE45Stepper::calculate()
       VariablePtr const aVariable( theVariableVector[ c ] );
 	
       // get k5
-      theK5[ c ] = aVariable->getVelocity();
+      theRungeKuttaBuffer[ 3 ][ c ] = aVariable->getVelocity();
 
       // temporarily set Y^6
-      theMidVelocityBuffer[ c ] 
-	= theK1[ c ] * ( 9017.0 / 3168.0 ) 
-	- theK2[ c ] * ( 355.0 / 33.0 )
-	+ theK3[ c ] * ( 46732.0 / 5247.0 )
-	+ theK4[ c ] * ( 49.0 / 176.0 )
-	- theK5[ c ] * ( 5103.0 / 18656.0 );
- 
-      aVariable->loadValue( theMidVelocityBuffer[ c ] * aStepInterval
+      theTaylorSeries[ 1 ][ c ]
+	= theTaylorSeries[ 0 ][ c ] * ( 9017.0 / 3168.0 ) 
+	- theRungeKuttaBuffer[ 0 ][ c ] * ( 355.0 / 33.0 )
+	+ theRungeKuttaBuffer[ 1 ][ c ] * ( 46732.0 / 5247.0 )
+	+ theRungeKuttaBuffer[ 2 ][ c ] * ( 49.0 / 176.0 )
+	- theRungeKuttaBuffer[ 3 ][ c ] * ( 5103.0 / 18656.0 );
+
+      aVariable->loadValue( theTaylorSeries[ 1 ][ c ] * aStepInterval
 			    + theValueBuffer[ c ] );
 
       // clear velocity
@@ -241,21 +233,20 @@ bool ODE45Stepper::calculate()
       VariablePtr const aVariable( theVariableVector[ c ] );
 	
       // get k6
-      theK6[ c ] = aVariable->getVelocity();
+      theRungeKuttaBuffer[ 4 ][ c ] = aVariable->getVelocity();
 
-      theVelocityBuffer[ c ] 
-	= theK1[ c ] * ( 35.0 / 384.0 )
-	// + theK2[ c ] * 0.0
-	+ theK3[ c ] * ( 500.0 / 1113.0 )
-	+ theK4[ c ] * ( 125.0 / 192.0 )
-	+ theK5[ c ] * ( -2187.0 / 6784.0 )
-	+ theK6[ c ] * ( 11.0 / 84.0 );
+      theTaylorSeries[ 2 ][ c ]
+	= theTaylorSeries[ 0 ][ c ] * ( 35.0 / 384.0 )
+	// + theRungeKuttaBuffer[ 0 ][ c ] * 0.0
+	+ theRungeKuttaBuffer[ 1 ][ c ] * ( 500.0 / 1113.0 )
+	+ theRungeKuttaBuffer[ 2 ][ c ] * ( 125.0 / 192.0 )
+	+ theRungeKuttaBuffer[ 3 ][ c ] * ( -2187.0 / 6784.0 )
+	+ theRungeKuttaBuffer[ 4 ][ c ] * ( 11.0 / 84.0 );
 
       aDenominator
-	+= ( theVelocityBuffer[ c ] - theMidVelocityBuffer[ c ] )
-	* ( theVelocityBuffer[ c ] - theMidVelocityBuffer[ c ] );
+	+= ( theTaylorSeries[ 2 ][ c ] - theTaylorSeries[ 1 ][ c ] ) * ( theTaylorSeries[ 2 ][ c ] - theTaylorSeries[ 1 ][ c ] );
 
-      aVariable->loadValue( theVelocityBuffer[ c ] * aStepInterval
+      aVariable->loadValue( theTaylorSeries[ 2 ][ c ] * aStepInterval
 			    + theValueBuffer[ c ] );
 
       // clear velocity
@@ -275,38 +266,32 @@ bool ODE45Stepper::calculate()
       VariablePtr const aVariable( theVariableVector[ c ] );
 
       // get k7
-      theK7[ c ] = aVariable->getVelocity();
+      theRungeKuttaBuffer[ 5 ][ c ] = aVariable->getVelocity();
 
       // calculate error
-      const Real anEstimatedError( theK1[ c ] * ( 71.0 / 57600.0 )
-				   + theK3[ c ] * ( -71.0 / 16695.0 )
-				   + theK4[ c ] * ( 71.0 / 1920.0 )
-				   + theK5[ c ] * ( -17253.0 / 339200.0 )
-				   + theK6[ c ] * ( 22.0 / 525.0 )
-				   + theK7[ c ] * ( -1.0 / 40.0 ) );
-
-      // 	const Real anEstimatedError( theK1[ c ] * ( 71.0 / 86400.0 )
-      // 				     + theK3[ c ] * ( -142.0 / 50085.0 )
-      // 				     + theK4[ c ] * ( 71.0 / 2880.0 )
-      // 				     + theK5[ c ] * ( -5751.0 / 169600.0 )
-      // 				     + theK6[ c ] * ( 44.0 / 1575.0 )
-      // 				     + theK7[ c ] * ( -1.0 / 60.0 ) );
+      const Real anEstimatedError
+	( theTaylorSeries[ 0 ][ c ] * ( 71.0 / 57600.0 )
+	  + theRungeKuttaBuffer[ 1 ][ c ] * ( -71.0 / 16695.0 )
+	  + theRungeKuttaBuffer[ 2 ][ c ] * ( 71.0 / 1920.0 )
+	  + theRungeKuttaBuffer[ 3 ][ c ] * ( -17253.0 / 339200.0 )
+	  + theRungeKuttaBuffer[ 4 ][ c ] * ( 22.0 / 525.0 )
+	  + theRungeKuttaBuffer[ 5 ][ c ] * ( -1.0 / 40.0 ) );
 
       aSpectralRadius 
-	+= ( theK7[ c ] - theK6[ c ] ) * ( theK7[ c ] - theK6[ c ] );
+	+= ( theRungeKuttaBuffer[ 5 ][ c ] - theRungeKuttaBuffer[ 4 ][ c ] ) * ( theRungeKuttaBuffer[ 5 ][ c ] - theRungeKuttaBuffer[ 4 ][ c ] );
 
       // calculate velocity for Xn+.5
-      theMidVelocityBuffer[ c ] 
-	= theK1[ c ] * ( 6025192743.0 / 30085553152.0 )
-	+ theK3[ c ] * ( 51252292925.0 / 65400821598.0 )
-	+ theK4[ c ] * ( -2691868925.0 / 45128329728.0 )
-	+ theK5[ c ] * ( 187940372067.0 / 1594534317056.0 )
-	+ theK6[ c ] * ( -1776094331.0 / 19743644256.0 )
-	+ theK7[ c ] * ( 11237099.0 / 235043384.0 );
+      theTaylorSeries[ 1 ][ c ]
+	= theTaylorSeries[ 0 ][ c ] * ( 6025192743.0 / 30085553152.0 )
+	+ theRungeKuttaBuffer[ 1 ][ c ] * ( 51252292925.0 / 65400821598.0 )
+	+ theRungeKuttaBuffer[ 2 ][ c ] * ( -2691868925.0 / 45128329728.0 )
+	+ theRungeKuttaBuffer[ 3 ][ c ] * ( 187940372067.0 / 1594534317056.0 )
+	+ theRungeKuttaBuffer[ 4 ][ c ] * ( -1776094331.0 / 19743644256.0 )
+	+ theRungeKuttaBuffer[ 5 ][ c ] * ( 11237099.0 / 235043384.0 );
 
       const Real aTolerance( eps_rel * 
 			     ( a_y * fabs( theValueBuffer[ c ] ) 
-			       + a_dydt * fabs( theVelocityBuffer[ c ] ) )
+			       + a_dydt * fabs( theTaylorSeries[ 2 ][ c ] ) )
 			     + eps_abs );
 
       const Real anError( fabs( anEstimatedError / aTolerance ) );
@@ -316,7 +301,7 @@ bool ODE45Stepper::calculate()
 	  maxError = anError;
 	}
 	
-      aVariable->setVelocity( theVelocityBuffer[ c ] );
+      aVariable->setVelocity( theTaylorSeries[ 2 ][ c ] );
     }
 
   aSpectralRadius /= aDenominator;
@@ -331,22 +316,34 @@ bool ODE45Stepper::calculate()
     {
       // reset the stepper current time
       reset();
-      theInterrupted = true;
+      isInterrupted = true;
       return false;
     }
 
+  for( VariableVector::size_type c( 0 ); c < aSize; ++c )
+    {
+      const Real k1( theTaylorSeries[ 0 ][ c ] );
+      const Real v_2( theTaylorSeries[ 1 ][ c ] );
+      const Real v1( theTaylorSeries[ 2 ][ c ] );
+      const Real k7( theRungeKuttaBuffer[ 5 ][ c ] );
+
+      theTaylorSeries[ 1 ][ c ] = -4.0 * k1 + 8.0 * v_2 - 5.0 * v1 + k7;
+      theTaylorSeries[ 2 ][ c ] = 5.0 * k1 - 16.0 * v_2 + 14.0 * v1 - 3.0 * k7;
+      theTaylorSeries[ 3 ][ c ] = -2.0 * k1 + 8.0 * v_2 - 8.0 * v1 + 2.0 * k7;
+    }
+
   // set the error limit interval
-  theInterrupted = false;
+  isInterrupted = false;
 
   setSpectralRadius( aSpectralRadius / aStepInterval );
+  if ( ++count % 1000 == 0 )
+    std::cout << getCurrentTime() << "\t" << getSpectralRadius() << std::endl;
 
   return true;
 }
 
 void ODE45Stepper::interrupt( StepperPtr aCaller )
 {
-  theInterrupted = true;
+  isInterrupted = true;
   AdaptiveDifferentialStepper::interrupt( aCaller );
 }
-
-

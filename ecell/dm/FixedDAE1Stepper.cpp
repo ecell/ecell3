@@ -100,7 +100,8 @@ void FixedDAE1Stepper::initialize()
 
 void FixedDAE1Stepper::checkDependency()
 {
-  const VariableVector::size_type aReadOnlyVariableOffset( getReadOnlyVariableOffset() );
+  const VariableVector::size_type 
+    aReadOnlyVariableOffset( getReadOnlyVariableOffset() );
   const ProcessVector::size_type aProcessNum( theProcessVector.size() );
 
   theDependentProcessVector.clear();
@@ -224,9 +225,9 @@ void FixedDAE1Stepper::checkDependency()
 
 void FixedDAE1Stepper::resetVelocity()
 {
-  for( RealVector::size_type c( 0 ); c < theVelocityBuffer.size(); c++ )
+  for( RealVector::size_type c( 0 ); c < theTaylorSeries[ 0 ].size(); c++ )
     {
-      theVelocityBuffer[ c ] = 0.0;
+      theTaylorSeries[ 0 ][ c ] = 0.0;
       theVariableVector[ c ]->clearVelocity();
     }
 }
@@ -263,7 +264,7 @@ void FixedDAE1Stepper::calculateVelocityVector()
 	     << ":" << aVariable->getVelocity() << std::endl;
 	  */
 
-	  theVelocityBuffer[ anIndex ] += aVariable->getVelocity();
+	  theTaylorSeries[ 0 ][ anIndex ] += aVariable->getVelocity();
 	    
 	  aVariable->clearVelocity();
 	}
@@ -273,7 +274,7 @@ void FixedDAE1Stepper::calculateVelocityVector()
        i < theContinuousVariableVector.size(); ++i )
     {
       const int anIndex( theContinuousVariableVector[ i ] );
-      const Real aVelocity( theVelocityBuffer[ anIndex ] * aStepInterval
+      const Real aVelocity( theTaylorSeries[ 0 ][ anIndex ] * aStepInterval
 			    + theValueBuffer[ anIndex ]
 			    - theVariableVector[ anIndex ]->getValue() );
 
@@ -284,7 +285,7 @@ void FixedDAE1Stepper::calculateVelocityVector()
 	 << ":" << aVelocity << std::endl;
       */
 
-      theVelocityBuffer[ anIndex ] = 0.0;
+      theTaylorSeries[ 0 ][ anIndex ] = 0.0;
       theVariableVector[ anIndex ]->clearVelocity();
     }
 
@@ -344,7 +345,7 @@ void FixedDAE1Stepper::calculateJacobian()
 	      for( IntVector::size_type j( 0 );
 		   j < theContinuousVariableVector.size(); ++j )
 		{
-		  theVelocityBuffer[ theContinuousVariableVector[ j ] ]
+		  theTaylorSeries[ 0 ][ theContinuousVariableVector[ j ] ]
 		    += theEachVelocityBuffer[ j * aDiscreteProcessOffset
 					      + (*i) ];
 		}
@@ -367,14 +368,14 @@ void FixedDAE1Stepper::calculateJacobian()
 	  // this calculation already includes negative factor
 	  const int anIndex( theContinuousVariableVector[ i ] );
 
-	  aJacobian = theVelocityBuffer[ anIndex ] 
+	  aJacobian = theTaylorSeries[ 0 ][ anIndex ] 
 	    - theVariableVector[ anIndex ]->getVelocity();
 	  aJacobian /= aPerturbation;
 
 	  gsl_matrix_set( theJacobianMatrix, i, c,
 			  aJacobian * getStepInterval() );
 
-	  theVelocityBuffer[ anIndex ] = 0.0;
+	  theTaylorSeries[ 0 ][ anIndex ] = 0.0;
 	  theVariableVector[ anIndex ]->clearVelocity();
 	}
 
@@ -415,8 +416,8 @@ const Real FixedDAE1Stepper::solve()
       const Real aVelocity( aVariable->getValue() - theValueBuffer[ c ] );
       aTotalVelocity += aVelocity;
 
-      theVelocityBuffer[ c ] = aVelocity / getStepInterval();
-      aVariable->setVelocity( theVelocityBuffer[ c ] );
+      theTaylorSeries[ 0 ][ c ] = aVelocity / getStepInterval();
+      aVariable->setVelocity( theTaylorSeries[ 0 ][ c ] );
     }
 
   return fabs( anError / aTotalVelocity );

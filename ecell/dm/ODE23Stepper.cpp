@@ -48,15 +48,8 @@ void ODE23Stepper::initialize()
 {
   AdaptiveDifferentialStepper::initialize();
 
-  // the number of write variables
-  const VariableVector::size_type aSize( getReadOnlyVariableOffset() );
-
-  theK1.resize( aSize );
-  theK2.resize( aSize );
-
   // theVelocityBuffer can be replaced by theK2
   // ODE23Stepper doesn't need it, but ODE45Stepper does for the efficiency 
-  theVelocityBuffer.clear();
 }
 
 void ODE23Stepper::interIntegrate2()
@@ -84,6 +77,12 @@ bool ODE23Stepper::calculate()
 
   const Real aCurrentTime( getCurrentTime() );
 
+  for ( RealMatrix::size_type s( 0 ); s < theTaylorSeries.size(); ++s )
+    for ( RealVector::size_type c( 0 ); c < theTaylorSeries[ s ].size(); ++c )
+      {
+	theTaylorSeries[ s ][ c ] = 0.0;
+      }
+
   // ========= 1 ===========
   interIntegrate2();
   fireProcesses();
@@ -91,11 +90,11 @@ bool ODE23Stepper::calculate()
   for( VariableVector::size_type c( 0 ); c < aSize; ++c )
     {
       VariablePtr const aVariable( theVariableVector[ c ] );
-	    
+      
       // get k1
       const Real aVelocity( aVariable->getVelocity() );
-      theK1[ c ] = aVelocity;
-	
+      theTaylorSeries[ 0 ][ c ] = aVelocity;
+      
       // clear velocity
       aVariable->clearVelocity();
     }
@@ -108,10 +107,10 @@ bool ODE23Stepper::calculate()
   for( VariableVector::size_type c( 0 ); c < aSize; ++c )
     {
       VariablePtr const aVariable( theVariableVector[ c ] );
-	    
+      
       // get k2
       const Real aVelocity( aVariable->getVelocity() );
-      theK2[ c ] = aVelocity - theK1[ c ];
+      theTaylorSeries[ 1 ][ c ] =  aVelocity - theTaylorSeries[ 0 ][ c ];
     
       // clear velocity
       aVariable->clearVelocity();
@@ -131,10 +130,10 @@ bool ODE23Stepper::calculate()
 	
       const Real aVelocity( aVariable->getVelocity() );
  
-      // ( k1 - k2 ) / 2 for K2
-      theK2[ c ] *= 0.5;
+      theTaylorSeries[ 1 ][ c ] *= 0.5;
 
-      const Real anExpectedVelocity( theK1[ c ] + theK2[ c ] );
+      const Real anExpectedVelocity( theTaylorSeries[ 0 ][ c ]
+      				     + theTaylorSeries[ 1 ][ c ] );
 
       // ( k1 + k2 + k3 * 4 ) / 6 for ~Yn+1
       // ( k1 + k2 - k3 * 2 ) / 3 for ( Yn+1 - ~Yn+1 ) as a local error
@@ -145,6 +144,8 @@ bool ODE23Stepper::calculate()
 			     ( a_y * fabs( theValueBuffer[ c ] ) 
 			       +  a_dydt * fabs( anExpectedVelocity ) )
 			     + eps_abs );
+
+      //      const Real aTolerance( std::max( eps_rel * ( a_y * fabs( theValueBuffer[ c ] ) + 0.0 * fabs( anExpectedVelocity ) ), eps_abs ) );
 
       const Real anError( anEstimatedError / aTolerance );
 

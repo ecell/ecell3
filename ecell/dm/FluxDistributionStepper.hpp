@@ -69,7 +69,7 @@ LIBECS_DM_CLASS( FluxDistributionStepper, DifferentialStepper )
 
       for( UnsignedInteger c( 0 ); c < getReadOnlyVariableOffset(); ++c )
 	{
-	  theVelocityBuffer[ c ] = theVariableVector[ c ]->getVelocity();
+	  theTaylorSeries[ 0 ][ c ] = theVariableVector[ c ]->getVelocity();
 	}
     }
   

@@ -30,6 +30,8 @@
 
 #include <limits>
 
+#include "boost/array.hpp"
+
 #include "Util.hpp"
 #include "Variable.hpp"
 #include "Interpolant.hpp"
@@ -45,10 +47,10 @@ namespace libecs
   LIBECS_DM_INIT_STATIC( DifferentialStepper, Stepper );
   LIBECS_DM_INIT_STATIC( AdaptiveDifferentialStepper, Stepper );
 
-
   DifferentialStepper::DifferentialStepper()
     :
     theNextStepInterval( 0.001 ),
+    theTolerableStepInterval( 0.001 ),
     theStateFlag( false )
   {
     ; // do nothing
@@ -65,21 +67,26 @@ namespace libecs
 
     createInterpolants();
 
-    // size of the velocity buffer == the number of *write* variables.
-    theVelocityBuffer.resize( getReadOnlyVariableOffset() );
+    theTaylorSeries.resize( boost::extents[ getStage() ][ getReadOnlyVariableOffset() ] );
 
     // should create another method for property slot ?
     //    setNextStepInterval( getStepInterval() );
 
     //    theStateFlag = false;
-
-    
   }
 
   void DifferentialStepper::reset()
   {
-    // clear velocity buffer
-    theVelocityBuffer.assign( theVelocityBuffer.size(), 0.0 );
+    // is this needed?
+    for ( RealMatrix::size_type i( 0 ); i != getStage(); ++i )
+      for ( RealMatrix::size_type j( 0 );
+	    j != getReadOnlyVariableOffset(); ++j )
+      {
+	theTaylorSeries[ i ][ j ] = 0.0;
+
+	//	RealMatrix::index_gen indices;
+	//	theTaylorSeries[ indices[ i ][ RealMatrix::index_range( 0, getReadOnlyVariableOffset() ) ] ].assign( 0.0 );
+      }
 
     Stepper::reset();
   }
@@ -87,7 +94,7 @@ namespace libecs
   void DifferentialStepper::resetAll()
   {
     const VariableVector::size_type aSize( theVariableVector.size() );
-    for( VariableVector::size_type c( 0 ); c < aSize; ++c )
+    for ( VariableVector::size_type c( 0 ); c < aSize; ++c )
       {
 	VariablePtr const aVariable( theVariableVector[ c ] );
 	aVariable->loadValue( theValueBuffer[ c ] );
@@ -222,10 +229,6 @@ namespace libecs
 	  {
 	    // shrink it if the error exceeds 110%
 	    setStepInterval( anExpectedStepInterval );
-
-	    //	    std::cerr << "s " << getCurrentTime() 
-	    //		      << ' ' << getStepInterval()
-	    //		      << std::endl;
 	  }
 	else
 	  {
@@ -256,38 +259,35 @@ namespace libecs
 	//	const Real aNewStepInterval( getStepInterval() * 2.0 );
 
 	setNextStepInterval( aNewStepInterval );
-
-	//	std::cerr << "g " << getCurrentTime() << ' ' 
-	//		  << getStepInterval() << std::endl;
       }
     else 
       {
 	setNextStepInterval( getTolerableStepInterval() );
       }
 
+    /**
     // check the tolerances for Epsilon
-    if ( isEpsilonChecked() ) {
-      const VariableVector::size_type aSize( getReadOnlyVariableOffset() );
+    if ( isEpsilonChecked() ) 
+      {
+	const VariableVector::size_type aSize( getReadOnlyVariableOffset() );
 
-      for ( VariableVector::size_type c( 0 ); c < aSize; ++c )
-	{
-	  VariablePtr const aVariable( theVariableVector[ c ] );
+	for ( VariableVector::size_type c( 0 ); c < aSize; ++c )
+	  {
+	    VariablePtr const aVariable( theVariableVector[ c ] );
+	    
+	    const Real aTolerance( FMA( fabs( aVariable->getValue() ),
+					theRelativeEpsilon,
+					theAbsoluteEpsilon ) );
 
-	  const Real aTolerance( FMA( fabs( aVariable->getValue() ),
-				      theRelativeEpsilon,
-				      theAbsoluteEpsilon ) );
-
-	  const Real aVelocity( fabs( theVelocityBuffer[ c ] ) );
-
-	  if ( aTolerance < aVelocity * getStepInterval() )
-	    {
-	      setStepInterval( aTolerance / aVelocity );
-	    }
-	}
-    }
-
-    //    std::cout << getCurrentTime() << "\t"
-    //	      << getStepInterval() << std::endl;
+	    const Real aVelocity( fabs( theVelocityBuffer[ c ] ) );
+	    
+	    if ( aTolerance < aVelocity * getStepInterval() )
+	      {
+		setStepInterval( aTolerance / aVelocity );
+	      }
+	  }
+      }
+    */
   }
 
 } // namespace libecs

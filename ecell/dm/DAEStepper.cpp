@@ -57,7 +57,7 @@ namespace libecs
     theSolutionVector2( NULLPTR ),
     theMaxIterationNumber( 7 ),
     eta( 1.0 ),
-    Uround( 1e-16 ),
+    Uround( 1e-10 ),
     theAbsoluteTolerance( 1e-6 ),
     theRelativeTolerance( 1e-6 ),
     theStoppingCriterion( 0.0 ),
@@ -146,7 +146,6 @@ namespace libecs
 	theSolutionVector1 = gsl_vector_calloc( aSize );
 
 	theW.resize( aSize * 3 );
-	cont.resize( aSize * 3 );
 
 	if ( theJacobianMatrix2 )
 	  gsl_matrix_complex_free( theJacobianMatrix2 );
@@ -240,7 +239,7 @@ namespace libecs
 	  {
 	    theJacobian[ j ][ i ]
 	      = ( theVariableVector[ j ]->getVelocity()
-		  - theVelocityBuffer[ j ] ) / aPerturbation;
+		  - theTaylorSeries[ 3 ][ j ] ) / aPerturbation;
 
 	    theVariableVector[ j ]->clearVelocity();
 	  }
@@ -269,7 +268,7 @@ namespace libecs
 	    const VariablePtr aVariable( theVariableVector[ anIndex ] );
 
 	    theJacobian[ j ][ i ]
-	      = - ( aVariable->getVelocity() - theVelocityBuffer[ anIndex ] )
+	      = - ( aVariable->getVelocity() - theTaylorSeries[ 3 ][ anIndex ] )
 	      / aPerturbation;
 	    aVariable->clearVelocity();
 	  }
@@ -569,11 +568,17 @@ namespace libecs
     const Real c3q( aStepInterval / thePreviousStepInterval );
     const Real c1q( c3q * c1 );
     const Real c2q( c3q * c2 );
+
     for ( VariableVector::size_type c( 0 ); c < aSize; ++c )
       {
-	const Real z1( c1q * ( cont[ c ] + ( c1q - c2 ) * ( cont[ c + aSize ] + ( c1q - c1 ) * cont[ c + aSize*2 ] ) ) );
-	const Real z2( c2q * ( cont[ c ] + ( c2q - c2 ) * ( cont[ c + aSize ] + ( c2q - c1 ) * cont[ c + aSize*2 ] ) ) );
-	const Real z3( c3q * ( cont[ c ] + ( c3q - c2 ) * ( cont[ c + aSize ] + ( c3q - c1 ) * cont[ c + aSize*2 ] ) ) );
+	const Real cont1( theTaylorSeries[ 0 ][ c ] );
+	const Real cont2( theTaylorSeries[ 1 ][ c ] );
+	const Real cont3( theTaylorSeries[ 2 ][ c ] );
+
+	const Real z1( c1q * ( cont1 + ( c1q - c2 + 1.0 ) * ( cont2 + ( c1q - c1 + 1.0 ) * cont3 ) ) );
+	const Real z2( c2q * ( cont1 + ( c2q - c2 + 1.0 ) * ( cont2 + ( c2q - c1 + 1.0 ) * cont3 ) ) );
+	const Real z3( c3q * ( cont1 + ( c3q - c2 + 1.0 ) * ( cont2 + ( c3q - c1 + 1.0 ) * cont3 ) ) )
+;
 
 	theW[ c ] = 4.3255798900631553510 * z1
 	  + 0.33919925181580986954 * z2 + 0.54177053993587487119 * z3;
@@ -740,7 +745,7 @@ namespace libecs
 	const int anIndex( theContinuousVariableVector[ c ] );
 
 	gsl_vector_set( theVelocityVector1, c,
-			theVelocityBuffer[ anIndex ]
+			theTaylorSeries[ 3 ][ anIndex ]
 			+ theW[ anIndex ] * hee1
 			+ theW[ anIndex + aSize ] * hee2
 			+ theW[ anIndex + 2*aSize ] * hee3 );
@@ -842,7 +847,7 @@ namespace libecs
 
     for ( VariableVector::size_type i( 0 ); i < aSize; ++i )
       {
-	theVelocityBuffer[ i ] = theVariableVector[ i ]->getVelocity();
+	theTaylorSeries[ 3 ][ i ] = theVariableVector[ i ]->getVelocity();
 	theVariableVector[ i ]->clearVelocity();
       }
 
@@ -876,11 +881,11 @@ namespace libecs
 
     for ( VariableVector::size_type c( 0 ); c < aSize; ++c )
       {
-	theVelocityBuffer[ c ] = theW[ c + aSize*2 ];
-	theVelocityBuffer[ c ] /= aStepInterval;
+	theTaylorSeries[ 3 ][ c ] = theW[ c + aSize*2 ];
+	theTaylorSeries[ 3 ][ c ] /= aStepInterval;
 	
 	theVariableVector[ c ]->loadValue( theValueBuffer[ c ] );
-	theVariableVector[ c ]->setVelocity( theVelocityBuffer[ c ] );
+	theVariableVector[ c ]->setVelocity( theTaylorSeries[ 3 ][ c ] );
       }
 
     const Real c1( ( 4.0 - sqrt( 6.0 ) ) / 10.0 );
@@ -892,14 +897,15 @@ namespace libecs
 	const Real z2( theW[ c + aSize ] );
 	const Real z3( theW[ c + aSize*2 ] );
 
-	cont[ c ] = ( z2 - z3 ) / ( c2 - 1.0 );
+	theTaylorSeries[ 0 ][ c ] = ( z2 - z3 ) / ( c2 - 1.0 );
 
 	const Real ak( ( z1 - z2 ) / ( c1 - c2 ) );
 	Real acont3 = z1 / c1;
 	acont3 = ( ak - acont3 ) / c2;
 
-	cont[ c+aSize ] = ( ak - cont[ c ] ) / ( c1 - 1.0 );
-	cont[ c+aSize*2 ] = cont[ c+aSize ] - acont3;
+	theTaylorSeries[ 1 ][ c ] 
+	  = ( ak - theTaylorSeries[ 0 ][ c ] ) / ( c1 - 1.0 );
+	theTaylorSeries[ 2 ][ c ] = theTaylorSeries[ 1 ][ c ] - acont3;
       }
 
     theStateFlag = true;

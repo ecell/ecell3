@@ -41,10 +41,6 @@ void ESSYNSStepper::initialize()
 {
   AdaptiveDifferentialStepper::initialize();
  
-  // the number of write variables
-  const VariableVector::size_type aSize( getReadOnlyVariableOffset() );
-  theK1.resize( aSize );
-
   // initialize()
 
   if( theProcessVector.size() == 1 )
@@ -121,10 +117,8 @@ bool ESSYNSStepper::calculate()
 	
       const Real aVelocity( ( exp( (theESSYNSMatrix[c])[0] ) - ( aVariable->getValue() ) ) / aStepInterval );
 		     
-      theVelocityBuffer[ anIndex ] = aVelocity;
+      theTaylorSeries[ 0 ][ anIndex ] = aVelocity;
       aVariable->setVelocity( aVelocity );
-
-      theK1[ anIndex ] = aVelocity;
     }
 
   return true;

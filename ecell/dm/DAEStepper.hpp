@@ -28,14 +28,14 @@
 // E-Cell Project, Institute for Advanced Biosciences, Keio University.
 //
 
-#ifndef __DAESTEPPER_HPP
-#define __DAESTEPPER_HPP
+#ifndef __DAE_HPP
+#define __DAE_HPP
 
 #include "libecs/DifferentialStepper.hpp"
 
 USE_LIBECS;
 
-DECLARE_VECTOR( int, IntVector );
+DECLARE_VECTOR( Integer, IntVector );
 
 LIBECS_DM_CLASS( DAEStepper, DifferentialStepper )
 {
@@ -70,16 +70,9 @@ LIBECS_DM_CLASS( DAEStepper, DifferentialStepper )
          return 0.0;  
        }  
 
-     const VariableVector::size_type        
-       aSize( theStepper.getReadOnlyVariableOffset() );      
-     RealVectorConstIterator         
-       anIterator( theStepper.getContinuousVector().begin() + theIndex );
-
-     const Real cont1( *anIterator ); // [ theIndex ]     
-     anIterator += aSize;      
-     const Real cont2( *anIterator ); // [ theIndex + aSize ]
-     anIterator += aSize;     
-     const Real cont3( *anIterator ); // [ theIndex + aSize * 2 ]
+     const Real cont1( theStepper.getTaylorSeries()[ 0 ][ theIndex ] );
+     const Real cont2( theStepper.getTaylorSeries()[ 1 ][ theIndex ] );
+     const Real cont3( theStepper.getTaylorSeries()[ 2 ][ theIndex ] );
 
      const Real aStepInterval( theStepper.getStepInterval() );
      const Real aStepIntervalInv( 1.0 / aStepInterval );
@@ -102,6 +95,7 @@ LIBECS_DM_CLASS( DAEStepper, DifferentialStepper )
 
     DAEStepperRef         theStepper;
     UnsignedInteger       theIndex;
+
   };
 
 public:
@@ -187,15 +181,12 @@ public:
   void calculateRhs();
   Real solve();
 
-  RealVectorCref getContinuousVector()
-    {
-      return cont;
-    }
-
   virtual InterpolantPtr createInterpolant( VariablePtr aVariable )
   {
     return new DAEStepper::Interpolant( *this, aVariable );
   }
+
+  virtual GET_METHOD( Integer, Stage ) { return 4; }
 
 protected:
 
@@ -219,7 +210,7 @@ protected:
   gsl_vector_complex*        theVelocityVector2;
   gsl_vector_complex*        theSolutionVector2;
 
-  RealVector         theW, cont;
+  RealVector         theW;
 
   UnsignedInteger     theMaxIterationNumber;
   Real                theStoppingCriterion;
@@ -236,4 +227,4 @@ protected:
 
 };
 
-#endif /* __DAESTEPPER_HPP */
+#endif /* __DAE_HPP */

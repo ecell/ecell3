@@ -42,38 +42,6 @@ USE_LIBECS;
 LIBECS_DM_CLASS( ESSYNSStepper, AdaptiveDifferentialStepper )
 {
 
- public:
-
-    class Interpolant
-      :
-      public libecs::Interpolant
-    {
-    public:
-      Interpolant( ESSYNSStepperRef aStepper, 
-		     VariablePtr const aVariablePtr )
-	:
-	libecs::Interpolant( aVariablePtr ),
-	theStepper( aStepper ),
-	theIndex( theStepper.getVariableIndex( aVariablePtr ) )
-      {
-	; // do nothing
-      }
-
-      virtual const Real getDifference( const Real aTime, const Real anInterval )
-      {
-	// First order interpolation.  This should be overridden in
-	// higher order DifferentialSteppers.
-	return theStepper.getVelocityBuffer()[ theIndex ] * anInterval;
-      }
-      
-
-    protected:
-
-      ESSYNSStepperRef    theStepper;
-      VariableVector::size_type theIndex;
-
-    };
-
 public:
 
   LIBECS_DM_OBJECT( ESSYNSStepper, Stepper )
@@ -113,10 +81,7 @@ public:
       return theTaylorOrder;
     }
 
-  virtual InterpolantPtr createInterpolant( VariablePtr aVariable )
-    {
-      return new ESSYNSStepper::Interpolant( *this, aVariable );
-    }
+  virtual GET_METHOD( Integer, Stage ) { return 1; }
 
 protected:
 

@@ -34,6 +34,7 @@
 #include "libecs.hpp"
 #include "Stepper.hpp"
 
+#include "boost/multi_array.hpp"
 
 namespace libecs
 {
@@ -49,6 +50,12 @@ namespace libecs
 
 
   */
+
+  //  DECLARE_VECTOR( RealVector, RealMatrix );
+  
+  typedef boost::multi_array<Real, 2> RealMatrix;
+  typedef boost::const_multi_array_ref<Real, 2> RealMatrixCref;
+
 
   DECLARE_CLASS( DifferentialStepper );
 
@@ -67,13 +74,17 @@ namespace libecs
 		      &DifferentialStepper::getStepInterval );
 	
 	PROPERTYSLOT_GET_NO_LOAD_SAVE( Real, NextStepInterval );
+	PROPERTYSLOT_SET_GET_NO_LOAD_SAVE( Real,  TolerableStepInterval );
+	PROPERTYSLOT_GET_NO_LOAD_SAVE( Integer,  Stage );
       }
 
     class Interpolant
       :
       public libecs::Interpolant
     {
+
     public:
+
       Interpolant( DifferentialStepperRef aStepper, 
 		     VariablePtr const aVariablePtr )
 	:
@@ -83,13 +94,42 @@ namespace libecs
       {
 	; // do nothing
       }
+      
+      const Real interpolate( const RealMatrixCref aTaylorSeries,
+			      const Real anInterval,
+			      const Real aStepInterval )
+      {
+	const Real theta( anInterval / aStepInterval );
+
+	Real aDifference( 0.0 );
+	Real aFactorialInv( 1.0 );
+
+	for ( RealMatrix::size_type s( 0 ); s < aTaylorSeries.size(); ++s )
+	  {
+	    //	    aFactorialInv /= s + 1;
+	    aDifference += aTaylorSeries[ s ][ theIndex ] * aFactorialInv;
+	    aFactorialInv *= theta;
+	  }
+
+	return aDifference * anInterval;
+      }
 
       virtual const Real getDifference( RealParam aTime, 
 					RealParam anInterval )
       {
-	// First order interpolation.  This should be overridden in
-	// higher order DifferentialSteppers.
-	return theStepper.getVelocityBuffer()[ theIndex ] * anInterval;
+	if ( !theStepper.theStateFlag )
+	  {
+	    return 0.0;
+	  }
+
+	const RealMatrixCref aTaylorSeries( theStepper.getTaylorSeries() );
+	const Real aTimeInterval( aTime - theStepper.getCurrentTime() );
+	const Real aStepInterval( theStepper.getTolerableStepInterval() );
+
+	const Real i1( interpolate( aTaylorSeries, aTimeInterval, aStepInterval ) );
+	const Real i2( interpolate( aTaylorSeries, aTimeInterval - anInterval, aStepInterval ) );
+
+	return ( i1 - i2 );
       }
       
     protected:
@@ -99,21 +139,10 @@ namespace libecs
 
     };
 
-
   public:
 
     DifferentialStepper();
     virtual ~DifferentialStepper();
-
-    /**
-       Override setStepInterval() for theTolerableStepInterval.
-
-    virtual SET_METHOD( Real, StepInterval )
-    {
-      Stepper::setStepInterval( value );
-    }
-
-    */
 
     SET_METHOD( Real, NextStepInterval )
     {
@@ -125,10 +154,19 @@ namespace libecs
       return theNextStepInterval;
     }
 
+    SET_METHOD( Real, TolerableStepInterval )
+    {
+      theTolerableStepInterval = value;
+    }
+
+    GET_METHOD( Real, TolerableStepInterval )
+    {
+      return theTolerableStepInterval;
+    }
+
     void initializeStepInterval( RealParam aStepInterval )
     {
       setStepInterval( aStepInterval );
-      setOriginalStepInterval( aStepInterval );
       setTolerableStepInterval( aStepInterval );
       setNextStepInterval( aStepInterval );
     }
@@ -142,30 +180,35 @@ namespace libecs
 
     virtual void interrupt( StepperPtr const aCaller );
 
-
-    RealVectorCref getVelocityBuffer() const
-    {
-      return theVelocityBuffer;
-    }
-
     virtual InterpolantPtr createInterpolant( VariablePtr aVariable )
     {
       return new DifferentialStepper::Interpolant( *this, aVariable );
+    }
+
+    virtual GET_METHOD( Integer, Stage )
+    { 
+      return 1; 
+    }
+
+    RealMatrixCref getTaylorSeries() const
+    {
+      return theTaylorSeries;
     }
 
   protected:
 
     const bool isExternalErrorTolerable() const;
 
+    RealMatrix theTaylorSeries;
+
   protected:
 
-    RealVector theVelocityBuffer;
-    bool                   theStateFlag;
+    bool theStateFlag;
 
   private:
 
     Real theNextStepInterval;
-
+    Real theTolerableStepInterval;
   };
 
 
@@ -200,46 +243,6 @@ namespace libecs
 	PROPERTYSLOT_GET_NO_LOAD_SAVE( Real, MaxErrorRatio );
 	PROPERTYSLOT_GET_NO_LOAD_SAVE( Integer,  Order );
       }
-
-
-    class Interpolant
-      :
-      public libecs::Interpolant
-    {
-    public:
-
-      Interpolant( AdaptiveDifferentialStepperRef aStepper, 
-		     VariablePtr const aVariablePtr )
-	:
-	libecs::Interpolant( aVariablePtr ),
-	theStepper( aStepper ),
-	theIndex( theStepper.getVariableIndex( aVariablePtr ) )
-      {
-	; // do nothing
-      }
-
-      virtual const Real getDifference( RealParam aTime, 
-					RealParam anInterval )
-      {
-	const Real aTolerableStepInterval
-	  ( theStepper.getTolerableStepInterval() );
-
-	const Real aTimeInterval( aTime - theStepper.getCurrentTime() );
-
-	const Real theta( FMA( aTimeInterval, 2.0, - anInterval )
-			  / aTolerableStepInterval );
-
-	const Real k1( theStepper.getK1()[ theIndex ] );
-	const Real k2( theStepper.getVelocityBuffer()[ theIndex ] );
-
-	return ( FMA( theta, ( k2 - k1 ), k1 ) * anInterval );
-      }
-
-    protected:
-
-      AdaptiveDifferentialStepperRef theStepper;
-      VariableVector::size_type      theIndex;
-    };
 
   public:
 
@@ -350,31 +353,22 @@ namespace libecs
     virtual void step();
     virtual bool calculate() = 0;
 
-    RealVectorCref getK1() const
-    {
-      return theK1;
+    virtual GET_METHOD( Integer, Stage )
+    { 
+      return 2;
     }
-
-    virtual InterpolantPtr createInterpolant( VariablePtr aVariable )
-    {
-      return new AdaptiveDifferentialStepper::Interpolant( *this, aVariable );
-    }
-
-  protected:
-
-    Real safety;
-    RealVector theK1;
 
   private:
 
+    Real safety;
     Real theTolerance;
     Real theAbsoluteToleranceFactor;
     Real theStateToleranceFactor;
     Real theDerivativeToleranceFactor;
 
-    bool    theEpsilonChecked;
-    Real    theAbsoluteEpsilon;
-    Real    theRelativeEpsilon;
+    bool theEpsilonChecked;
+    Real theAbsoluteEpsilon;
+    Real theRelativeEpsilon;
 
     Real theMaxErrorRatio;
   };
@@ -383,7 +377,6 @@ namespace libecs
 } // namespace libecs
 
 #endif /* __DIFFERENTIALSTEPPER_HPP */
-
 
 
 /*

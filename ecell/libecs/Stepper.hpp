@@ -89,8 +89,6 @@ namespace libecs
 
 
 	// these properties are not loaded/saved.
-	// PROPERTYSLOT_SET_GET_NO_LOAD_SAVE( Real,  OriginalStepInterval );
-	PROPERTYSLOT_SET_GET_NO_LOAD_SAVE( Real,  TolerableStepInterval );
 	PROPERTYSLOT_GET_NO_LOAD_SAVE    ( Real,      CurrentTime );
 	PROPERTYSLOT_GET_NO_LOAD_SAVE    ( Polymorph, ProcessList );
 	PROPERTYSLOT_GET_NO_LOAD_SAVE    ( Polymorph, SystemList );
@@ -204,31 +202,6 @@ namespace libecs
     virtual GET_METHOD( Real, TimeScale )
     {
       return getStepInterval();
-    }
-
-    /**
-       theOriginalStepInterval for getDifference(),
-       must need to be independent of interruption, theStepInterval.
-    */
-
-    SET_METHOD( Real, OriginalStepInterval )
-    {
-      theOriginalStepInterval = value;
-    }
-
-    GET_METHOD( Real, OriginalStepInterval )
-    {
-      return theOriginalStepInterval;
-    }
-
-    SET_METHOD( Real, TolerableStepInterval )
-    {
-      theTolerableStepInterval = value;
-    }
-
-    GET_METHOD( Real, TolerableStepInterval )
-    {
-      return theTolerableStepInterval;
     }
 
     SET_METHOD( String, ID )
@@ -629,8 +602,6 @@ namespace libecs
     Real                theCurrentTime;
 
     Real                theStepInterval;
-    Real                theOriginalStepInterval;
-    Real                theTolerableStepInterval;
 
     Real                theMinStepInterval;
     Real                theMaxStepInterval;

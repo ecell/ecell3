@@ -77,8 +77,8 @@ public:
       
       for( ProcessVector::size_type i( 0 ); i < theProcessVector.size(); ++i )
 	{
-	  TauLeapProcessPtr aTauLeapProcessPtr( dynamic_cast<TauLeapProcessPtr>( theProcessVector[i] ) );
-	  theTauLeapProcessVector[i] = aTauLeapProcessPtr;
+	  TauLeapProcessPtr aTauLeapProcessPtr( dynamic_cast<TauLeapProcessPtr>( theProcessVector[ i ] ) );
+	  theTauLeapProcessVector[ i ] = aTauLeapProcessPtr;
 	}
 
       // resize tmp vector.
@@ -104,7 +104,7 @@ public:
       for( VariableVector::size_type c( 0 ); c < aSize; ++c )
 	{
 	  VariablePtr const aVariable( theVariableVector[ c ] );
-	  theVelocityBuffer[ c ] = aVariable->getVelocity();
+	  theTaylorSeries[ 0 ][ c ] = aVariable->getVelocity();
 	}
     }
 
@@ -113,9 +113,10 @@ public:
   const Real getTotalPropensity( )
     {
       Real anA0( 0.0 );
-      for( TauLeapProcessVector::size_type i( 0 ); i < theTauLeapProcessVector.size(); ++i )
+      for( TauLeapProcessVector::size_type i( 0 );
+	   i < theTauLeapProcessVector.size(); ++i )
 	{
-	  anA0 += theTauLeapProcessVector[i]->getPropensity();
+	  anA0 += theTauLeapProcessVector[ i ]->getPropensity();
 	}
       return anA0;
     }

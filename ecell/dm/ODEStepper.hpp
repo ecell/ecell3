@@ -1,35 +1,35 @@
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
-//        This file is part of E-CELL Simulation Environment package
+//        This file is part of E-Cell Simulation Environment package
 //
 //                Copyright (C) 2002 Keio University
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
 //
-// E-CELL is free software; you can redistribute it and/or
+// E-Cell is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
 // License as published by the Free Software Foundation; either
 // version 2 of the License, or (at your option) any later version.
 // 
-// E-CELL is distributed in the hope that it will be useful,
+// E-Cell is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 // See the GNU General Public License for more details.
 // 
 // You should have received a copy of the GNU General Public
-// License along with E-CELL -- see the file COPYING.
+// License along with E-Cell -- see the file COPYING.
 // If not, write to the Free Software Foundation, Inc.,
 // 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 // 
 //END_HEADER
 //
 // written by Kouichi Takahashi <shafi@e-cell.org> at
-// E-CELL Project, Lab. for Bioinformatics, Keio University.
+// E-Cell Project, Lab. for Bioinformatics, Keio University.
 //
 
-#ifndef __ODESTEPPER_HPP
-#define __ODESTEPPER_HPP
+#ifndef __ODE_HPP
+#define __ODE_HPP
 
 #include "libecs/DifferentialStepper.hpp"
 
@@ -37,69 +37,6 @@ USE_LIBECS;
 
 LIBECS_DM_CLASS( ODEStepper, AdaptiveDifferentialStepper )
 {
-
- public:
-
-  class Interpolant
-    :
-    public libecs::Interpolant
-  {
-  public:
-
-    Interpolant( ODEStepperRef aStepper, 
-		   VariablePtr const aVariablePtr )
-      :
-      libecs::Interpolant( aVariablePtr ),
-      theStepper( aStepper ),
-      theIndex( theStepper.getVariableIndex( aVariablePtr ) )
-    {
-      ; // do nothing
-    }
-
-    virtual const Real getDifference( RealParam aTime, 
-				      RealParam anInterval )
-    {
-     const Real sq6( 2.4494897427831779 );  // sqrt( 6.0 )      
-     const Real c1( ( 4.0 - sq6 ) / 10.0 - 1.0 );      
-     const Real c2( ( 4.0 + sq6 ) / 10.0 - 1.0 );      
-
-     if ( !theStepper.theStateFlag )      
-       { 
-         return 0.0;  
-       }  
-
-     const VariableVector::size_type        
-       aSize( theStepper.getReadOnlyVariableOffset() );      
-     RealVectorConstIterator         
-       anIterator( theStepper.getContinuousVector().begin() + theIndex );
-
-     const Real cont1( *anIterator ); // [ theIndex ]     
-     anIterator += aSize;      
-     const Real cont2( *anIterator ); // [ theIndex + aSize ]
-     anIterator += aSize;     
-     const Real cont3( *anIterator ); // [ theIndex + aSize * 2 ]
-
-     const Real aStepInterval( theStepper.getStepInterval() );
-     const Real aStepIntervalInv( 1.0 / aStepInterval );
-     const Real aTimeInterval( aTime - aStepInterval    
-			       - theStepper.getCurrentTime() ); 
-
-     const Real s1( aTimeInterval * aStepIntervalInv );
-     const Real s2( ( aTimeInterval - anInterval ) * aStepIntervalInv );
-
-     const Real 
-       i1( s1 * ( cont1 + ( s1 - c2 ) * ( cont2 + ( s1 - c1 ) * cont3 ) ) );
-     const Real 
-       i2( s2 * ( cont1 + ( s2 - c2 ) * ( cont2 + ( s2 - c1 ) * cont3 ) ) );
-
-     return ( i1 - i2 );     
-    }
-
-  protected:
-
-    ODEStepperRef         theStepper;
-    UnsignedInteger       theIndex;
-  };
 
 public:
 
@@ -119,8 +56,15 @@ public:
 		    &AdaptiveDifferentialStepper::getAbsoluteToleranceFactor );
       
 
-      PROPERTYSLOT_GET_NO_LOAD_SAVE( Real, SpectralRadius );
+      PROPERTYSLOT_GET_NO_LOAD_SAVE( Real, Stiffness );
       PROPERTYSLOT_SET_GET( Real, JacobianRecalculateTheta );
+
+      PROPERTYSLOT( Integer, isStiff,
+		    &ODEStepper::setIntegrationType,
+		    &ODEStepper::getIntegrationType );
+
+      PROPERTYSLOT_SET_GET( Integer, CheckIntervalCount );
+      PROPERTYSLOT_SET_GET( Integer, SwitchingCount );
     }
 
   ODEStepper( void );
@@ -138,6 +82,17 @@ public:
 
   SIMPLE_SET_GET_METHOD( Real, Uround );
 
+  SIMPLE_SET_GET_METHOD( Integer, CheckIntervalCount );
+  SIMPLE_SET_GET_METHOD( Integer, SwitchingCount );
+
+  void setIntegrationType( Integer value )
+    {
+      isStiff = static_cast<bool>( value );
+      initializeStepper();
+    }
+
+  const Integer getIntegrationType() const { return isStiff; }
+  
   SET_METHOD( Real, JacobianRecalculateTheta )
     {
       theJacobianRecalculateTheta = value;
@@ -147,6 +102,11 @@ public:
     {
       return theJacobianRecalculateTheta;
     }
+
+  GET_METHOD( Real, Stiffness )
+  {
+    return 3.3 / theSpectralRadius;
+  }
 
   GET_METHOD( Real, SpectralRadius )
   {
@@ -159,31 +119,23 @@ public:
   }
 
   virtual void initialize();
-  bool calculate();
   virtual void step();
+  virtual bool calculate();
+  virtual void interrupt( StepperPtr const aCaller );
 
-  void checkDependency();
-
-  Real estimateLocalError();
-
-  Real calculateJacobianNorm();
+  void initializeStepper();
 
   void calculateJacobian();
-
+  Real calculateJacobianNorm();
   void setJacobianMatrix();
   void decompJacobianMatrix();
   void calculateRhs();
   Real solve();
+  Real estimateLocalError();
 
-  RealVectorCref getContinuousVector()
-    {
-      return cont;
-    }
-
-  virtual InterpolantPtr createInterpolant( VariablePtr aVariable )
-  {
-    return new ODEStepper::Interpolant( *this, aVariable );
-  }
+  void initializeRadauIIA();
+  bool calculateRadauIIA();
+  void stepRadauIIA();
 
   void initializeTolerance( RealParam value )
   {
@@ -198,13 +150,21 @@ public:
     atoler = rtoler * getAbsoluteToleranceFactor();
   }
 
+  virtual GET_METHOD( Integer, Order ) { return 5; }
+
+  virtual GET_METHOD( Integer, Stage )
+  {
+    if ( isStiff ) return 3;
+    else return 4;
+  }
+
 protected:
 
   Real    alpha, beta, gamma;
 
   VariableVector::size_type     theSystemSize;
 
-  std::vector<RealVector>    theJacobian;
+  RealMatrix    theJacobian, theW;
 
   gsl_matrix*        theJacobianMatrix1;
   gsl_permutation*   thePermutation1;
@@ -216,21 +176,22 @@ protected:
   gsl_vector_complex*        theVelocityVector2;
   gsl_vector_complex*        theSolutionVector2;
 
-  RealVector         cont, theW;
-
   UnsignedInteger    theMaxIterationNumber;
   Real               theStoppingCriterion;
   Real               eta, Uround;
 
   Real               rtoler, atoler;
 
-  bool    theFirstStepFlag, theRejectedStepFlag;
   Real    theAcceptedError, theAcceptedStepInterval, thePreviousStepInterval;
 
-  bool    theJacobianCalculateFlag;
   Real    theJacobianRecalculateTheta;
   Real    theSpectralRadius;
 
+  UnsignedInteger    theStiffnessCounter;
+  Integer    CheckIntervalCount, SwitchingCount;
+
+  bool    theFirstStepFlag, theJacobianCalculateFlag, theRejectedStepFlag;
+  bool    isInterrupted, isStiff;
 };
 
-#endif /* __ODESTEPPER_HPP */
+#endif /* __ODE_HPP */
