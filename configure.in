@@ -6,7 +6,7 @@ dnl
 dnl 
 dnl 
 AC_CANONICAL_SYSTEM
-AM_INIT_AUTOMAKE(ecell,"3.1.0" , do-not-define)
+AM_INIT_AUTOMAKE(ecell,"3.1.1" , do-not-define)
 AC_PROG_MAKE_SET
 dnl
 dnl
@@ -17,9 +17,15 @@ AC_LIBTOOL_DLOPEN
 AC_PROG_LIBTOOL
 dnl
 dnl
+AC_CONFIG_SUBDIRS( libltdl ecell bin dmtool)
 dnl
-AC_CONFIG_SUBDIRS( libltdl ecell osogo bin dmtool)
+AC_ARG_ENABLE(gtk,,[
+ECELL_SUBDIR="libltdl ecell bin dmtool"],[
+ECELL_SUBDIR="libltdl ecell bin dmtool osogo"
+AC_CONFIG_SUBDIRS(osogo)]
+)
 dnl
+AC_SUBST(ECELL_SUBDIR)
 dnl
 dnl Create the top-level Makefile.
 dnl
