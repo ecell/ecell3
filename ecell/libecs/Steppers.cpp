@@ -947,6 +947,8 @@ namespace libecs
 	aVariable->setVelocity( theVelocityBuffer[ c ] );
       }
 
+    setCurrentTime( aCurrentTime );
+
     return true;
   }
 

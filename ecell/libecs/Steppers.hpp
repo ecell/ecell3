@@ -197,6 +197,37 @@ namespace libecs
 	; // do nothing
       }
 
+      /**
+	 Quartic (4th Order) Hermite interpolation
+      */
+
+      const Real interpolate( RealCref anInterval )
+      {
+	const Real theta( anInterval / theStepper.getStepInterval() );
+
+	const Real k1 = theStepper.getK1()[ theIndex ];
+	const Real k2 = theStepper.getMidVelocityBuffer()[ theIndex ];
+	const Real k3 = theStepper.getVelocityBuffer()[ theIndex ];
+	const Real k4 = theStepper.getNextK1()[ theIndex ];
+
+	return anInterval
+	  * ( k1 + theta * ( ( theta - 0.5 ) * 2 * ( k3 - k1 )
+			     - ( theta - 1 ) * 4 * ( k1 - k2 - k2 )
+			     + ( theta - 0.5 ) * ( theta - 1 )
+			     * 2 * ( k4 - k1 - 4 * k3 + 8 * k2 ) ) );
+      }
+
+      virtual const Real getDifference( RealCref aTime, RealCref anInterval )
+      {
+	const Real aTimeInterval( aTime - theStepper.getCurrentTime() );
+
+	const Real i1 = interpolate( aTimeInterval );
+	const Real i2 = interpolate( aTimeInterval - anInterval );
+
+	return ( i1 - i2 );
+      }
+
+      /*
       virtual const Real getDifference( RealCref aTime, RealCref anInterval )
       {
 	const Real aTimeInterval( aTime - theStepper.getCurrentTime() );
@@ -217,6 +248,7 @@ namespace libecs
 	return ( ( k1 + theta * ( b + c * theta ) - c * theta1 * theta2 )
 		 * anInterval );
       }
+      */
 
     protected:
 
@@ -243,16 +275,21 @@ namespace libecs
       return "DormandPrince547MStepper";
     }
 
-    //    virtual VariableProxyPtr createVariableProxy( VariablePtr aVariable )
-    //    {
-    //      return new VariableProxy( *this, aVariable );
-    //    }
+    virtual VariableProxyPtr createVariableProxy( VariablePtr aVariable )
+    {
+      return new 
+	DormandPrince547MStepper::VariableProxy( *this, aVariable );
+    }
 
     RealVectorCref getMidVelocityBuffer() const
     {
       return theMidVelocityBuffer;
     }
 
+    RealVectorCref getNextK1() const
+    {
+      return theNextK1;
+    }
 
   protected:
 
