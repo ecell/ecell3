@@ -21,4 +21,4 @@ libemc_HEADERS=\
 LocalSimulatorImplementation.hpp\
 Simulator.hpp\
 SimulatorImplementation.hpp\
-imulatorMaker.hpp
+SimulatorMaker.hpp
