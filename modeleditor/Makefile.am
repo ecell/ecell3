@@ -81,7 +81,7 @@ EXTRA_DIST=${modeleditor_PYTHON}
 
 # Windows py2exe setup options, ignore for Unix based systems
 PY2EXE_SETUP = ../ecell/pyecs/windows/py2exeSetup
-WIN_ICON = modeleditor.ico
+WIN_ICON = glade/modeleditor.ico
 PATH_VARIABLES = ../ecell/pyecs/windows/pathVariables
 
 BINS =\

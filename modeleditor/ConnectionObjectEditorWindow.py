@@ -46,7 +46,7 @@ class ConnectionObjectEditorWindow:
 		iconPixbuf = None
 		import os
 		iconPixbuf = gtk.gdk.pixbuf_new_from_file(os.environ['MEPATH'] \
-				+ os.sep + 'glade' + os.sep + "modeleditor.png")
+				+ os.sep + 'glade' + os.sep + "modeleditor.ico")
 		self.win.set_icon(iconPixbuf)
 		
 		

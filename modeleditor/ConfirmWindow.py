@@ -74,7 +74,7 @@ class ConfirmWindow(gtk.Dialog):
 		iconPixbuf = None
 		try:
 			import os
-			iconPixbuf = gtk.gdk.pixbuf_new_from_file(os.environ['MEPATH'] + os.sep + "glade" + os.sep + "modeleditor.png")
+			iconPixbuf = gtk.gdk.pixbuf_new_from_file(os.environ['MEPATH'] + os.sep + "glade" + os.sep + "modeleditor.ico")
 		except:
 			pass
 		self.win.set_icon(iconPixbuf)

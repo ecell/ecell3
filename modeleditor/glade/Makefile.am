@@ -33,6 +33,7 @@ icon_system.png\
 icon_textbox.png\
 icon_variable.png\
 modeleditor.png\
+modeleditor.ico\
 modeleditor_large.png
 
 

@@ -296,7 +296,7 @@ class MainWindow( ListWindow ):
 
 		# set init path for dialog
 		aDialog.set_filename( defaultName )
-		iconPixbuf = gtk.gdk.pixbuf_new_from_file(os.environ['MEPATH'] + os.sep + "glade" + os.sep + "modeleditor.png")
+		iconPixbuf = gtk.gdk.pixbuf_new_from_file(os.environ['MEPATH'] + os.sep + "glade" + os.sep + "modeleditor.ico")
 		aDialog.set_icon(iconPixbuf)
 		aDialog.set_title("Select a file name")
 		aDialog.show_fileop_buttons( )
