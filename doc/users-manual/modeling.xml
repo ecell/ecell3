@@ -8,7 +8,7 @@
     
     <simplelist>
       <member>How an &ecell;'s simulation model is organized</member>
-      <member>How to create the simulation model</member
+      <member>How to create the simulation model</member>
       <member>How to write a model file in &EM; format</member>
     </simplelist>
   </highlights>
@@ -211,7 +211,8 @@ of which &ID; is 'P', in the &System; 'CELL' directly under the root system.
 
       <para>&Entity; and &Stepper; objects have
       <emphasis>properties</emphasis>.  Property is an attribute of a
-      certain object associated with a name, which can be get and set.
+      certain object associated with a name, which can be get from and
+      set to an object.
       </para>
 
       <para>A value of a property has a <emphasis>type</emphasis>,
@@ -297,11 +298,45 @@ of which &ID; is 'P', in the &System; 'CELL' directly under the root system.
     how object model inside &ecell is organized and how it is driven
     to conduct simulations.  Furthermore, owing to the nature of plain
     programming language-like syntax, &EM; can be used as a simple and
-    intuitive tool to communicate with other &ecell users.</para>
+    intuitive tool to communicate with other &ecell users.  In fact,
+    this manual uses &EM; to illustrate how a model is constructed in
+    &ecell;</para>
 
     </sect3>
 
     </sect2>
+
+
+    <sect2>
+      <title>General Syntax</title>
+
+      <para>Basically &EM; is (and thus &EML; is) a set of just one
+      type of directive: <emphasis>object instantiation</emphasis>.
+      And in &ecell;'s simulation model, the 'object' has, as we have
+      seen, only two types, &Stepper; and &Entity;.   In addition, after
+      creating an object, properties must be set.  Therefore the object
+      instantiation has two steps: (1) creating object
+      and (2) setting properties.</para>
+
+      <para>The following is the general form of definition of an object:
+
+<programlisting>
+TYPE CLASSNAME ( ID )
+[ DOCSTRING ]
+{ 
+        property_name_1 property_value_1;
+        property_name_2 property_value_2;
+        ...
+        property_name_n property_value_n;
+} 
+</programlisting>
+
+
+</para>
+
+      
+    </sect2>
+
 
 
   </sect1>
