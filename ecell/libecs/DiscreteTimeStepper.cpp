@@ -43,6 +43,19 @@ namespace libecs
     ; // do nothing
   }
 
+  void DiscreteTimeStepper::initialize()
+  {
+    Stepper::initialize();
+
+    if( getDiscreteProcessOffset() != 0 )
+      {
+	THROW_EXCEPTION( InitializationFailed,
+			 getClassNameString() 
+			 + " does not support continuous process." );
+
+      }
+  }
+
   void DiscreteTimeStepper::step()
   {
     process();

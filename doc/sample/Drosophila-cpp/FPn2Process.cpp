@@ -1,22 +1,16 @@
 #include "libecs.hpp"
-#include "Process.hpp"
-#include "Util.hpp"
-#include "PropertyInterface.hpp"
-#include "System.hpp"
-#include "Stepper.hpp"
-#include "Variable.hpp"
-#include "VariableProxy.hpp"
+#include "ContinuousProcess.hpp"
 
 USE_LIBECS;
 
-LIBECS_DM_CLASS( FPn2Process, Process )
+LIBECS_DM_CLASS( FPn2Process, ContinuousProcess )
 {
 
  public:
 
   LIBECS_DM_OBJECT( FPn2Process, Process )
     {
-      INHERIT_PROPERTIES( Process );
+      INHERIT_PROPERTIES( ContinuousProcess );
 
       PROPERTYSLOT_SET_GET( Real, k2 );
     }

@@ -74,6 +74,8 @@ namespace libecs
     virtual ~DiscreteTimeStepper() {}
 
 
+    virtual void initialize();
+
     /**
        This method calls process() method of all Processes.
     */

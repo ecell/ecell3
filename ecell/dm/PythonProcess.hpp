@@ -47,6 +47,7 @@ public:
     {
       INHERIT_PROPERTIES( PythonProcessBase );
 
+      PROPERTYSLOT_SET_GET( Int, IsContinuous );
       PROPERTYSLOT_SET_GET( String, ProcessMethod );
       PROPERTYSLOT_SET_GET( String, InitializeMethod );
     }
@@ -69,21 +70,15 @@ public:
     ; // do nothing
   }
 
-  SET_METHOD( Int, IsContinuous )
-  {
-    theIsContinuous = value;
-  }
-
   virtual const bool isContinuous() const
   {
     return theIsContinuous;
   }
 
-  //  GET_METHOD( Int, IsContinuous )
-  //  {
-  //    return theIsContinuous;
-  //  }
-
+  SET_METHOD( Int, IsContinuous )
+  {
+    theIsContinuous = value;
+  }
 
   SET_METHOD( String, ProcessMethod )
   {

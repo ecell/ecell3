@@ -451,60 +451,6 @@ namespace libecs
   }
 
 
-  /*
-  void Stepper::registerLoggedPropertySlot( PropertySlotPtr aPropertySlotPtr )
-  {
-    theLoggedPropertySlotVector.push_back( aPropertySlotPtr );
-  }
-  */
-
-  /*
-  void Stepper::setStepIntervalConstraint( PolymorphCref aValue )
-  {
-    PolymorphVector aVector( aValue.asPolymorphVector() );
-    checkSequenceSize( aVector, 2 );
-
-    const StepperPtr aStepperPtr( getModel()->
-				  getStepper( aVector[0].asString() ) );
-    const Real aFactor( aVector[1].asReal() );
-
-    setStepIntervalConstraint( aStepperPtr, aFactor );
-  }
-
-  const Polymorph Stepper::getStepIntervalConstraint() const
-  {
-    PolymorphVector aVector;
-    aVector.reserve( theStepIntervalConstraintMap.size() );
-
-    for( StepIntervalConstraintMapConstIterator 
-	   i( theStepIntervalConstraintMap.begin() ); 
-	      i != theStepIntervalConstraintMap.end() ; ++i )
-      {
-	PolymorphVector anInnerVector;
-	anInnerVector.push_back( (*i).first->getID() );
-	anInnerVector.push_back( (*i).second );
-
-	aVector.push_back( anInnerVector );
-      }
-
-    return aVector;
-  }
-
-
-
-  void Stepper::setStepIntervalConstraint( StepperPtr aStepperPtr,
-					   RealCref aFactor )
-  {
-    theStepIntervalConstraintMap.erase( aStepperPtr );
-
-    if( aFactor != 0.0 )
-      {
-	theStepIntervalConstraintMap.
-	  insert( std::make_pair( aStepperPtr, aFactor ) );
-      }
-  }
-  */
-
   void Stepper::log()
   {
     // update loggers

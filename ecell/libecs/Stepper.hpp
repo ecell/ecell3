@@ -140,13 +140,6 @@ namespace libecs
     };
 
 
-
-    //    typedef std::pair<StepperPtr,Real> StepIntervalConstraint;
-    //    DECLARE_VECTOR( StepIntervalConstraint, StepIntervalConstraintVector );
-
-    //    DECLARE_ASSOCVECTOR( StepperPtr, Real, std::less<StepperPtr>,
-    //			 StepIntervalConstraintMap );
-
     Stepper(); 
     virtual ~Stepper();
 
@@ -255,24 +248,7 @@ namespace libecs
 
     GET_METHOD( Real, MaxStepInterval )
     {
-      Real aMaxStepInterval( theMaxStepInterval );
-
-      /*
-      for( StepIntervalConstraintMapConstIterator 
-	     i( theStepIntervalConstraintMap.begin() ); 
-	   i != theStepIntervalConstraintMap.end() ; ++i )
-	{
-	  const StepperPtr aStepperPtr( (*i).first );
-	  Real aConstraint( aStepperPtr->getStepInterval() * (*i).second );
-
-	  if( aMaxStepInterval > aConstraint )
-	    {
-	      aMaxStepInterval = aConstraint;
-	    }
-	}
-      */
-
-      return aMaxStepInterval;
+      return theMaxStepInterval;
     }
 
 
@@ -422,37 +398,78 @@ namespace libecs
     }
 
   
-    //    void setStepIntervalConstraint( PolymorphCref aValue );
-
-    //    void setStepIntervalConstraint( StepperPtr aStepperPtr, RealCref aFactor );
-
-    //    const Polymorph getStepIntervalConstraint() const;
-
-
     SystemVectorCref getSystemVector() const
     {
       return theSystemVector;
     }
+
+    /**
+       Get the reference to the ProcessVector of this Stepper.
+
+       The ProcessVector holds a set of pointers to this Stepper's Processes.
+
+       The ProcessVector is partitioned in this way:
+
+       |  Continuous Processes  |  Discrete Processes |
+
+       getDiscreteProcessOffset() method returns the offset (index number)
+       of the first discrete Process in this Stepper.
+
+       Each part of the ProcessVector is sorted by Priority properties
+       of Processes.
+
+    */
 
     ProcessVectorCref getProcessVector() const
     {
       return theProcessVector;
     }
 
+    /**
+
+    @see getProcessVector()
+
+    */
+
     const ProcessVector::size_type getDiscreteProcessOffset() const
     {
       return theDiscreteProcessOffset;
     }
+
+    /**
+       Get the reference to the VariableVector of this Stepper.
+
+       In the VariableVector, Variables are classified and partitioned
+       into the following three groups:
+
+       | Write-Only Variables | Read-Write Variables | Read-Only Variables |
+
+       Use getReadWriteVariableOffset() method to get the index of the first 
+       Read-Write Variable in the VariableVector.  
+
+       Use getReadOnlyVariableOffset() method to get the index of the first
+       Read-Only Variable in the VariableVector.
+       
+
+    */
 
     VariableVectorCref getVariableVector() const
     {
       return theVariableVector;
     }
 
+    /**
+       @see getVariableVector()
+    */
+
     const VariableVector::size_type getReadWriteVariableOffset()
     {
       return theReadWriteVariableOffset;
     }
+
+    /**
+       @see getVariableVector()
+    */
 
     const VariableVector::size_type getReadOnlyVariableOffset()
     {
@@ -537,12 +554,6 @@ namespace libecs
 
     /**
        Update theVariableVector.
-
-       This method makes the following data structure:
-    
-       In theVariableVector, Variables are sorted in this order:
-     
-       | Write-Only | Read-Write.. | Read-Only.. |
 
     */
 

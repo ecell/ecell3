@@ -28,8 +28,8 @@
 // E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
 
-#ifndef ___PROCESS_H___
-#define ___PROCESS_H___
+#ifndef __PROCESS_HPP
+#define __PROCESS_HPP
 
 #include "AssocVector.h"
 
@@ -421,7 +421,7 @@ namespace libecs
 
 } // namespace libecs
 
-#endif /* ___PROCESS_H___ */
+#endif /* __PROCESS_HPP */
 
 /*
   Do not modify
