@@ -85,5 +85,5 @@ fi
 
 python $MUNCHBIN $MUNCHFILE $DMFILE $TMPLFILE > $base.cpp
 
-exit 0
+exit $?
 
