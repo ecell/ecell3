@@ -1,0 +1,170 @@
+#!/usr/bin/python
+
+from spark import *
+
+class Token:
+	def __init__(self, type, attr=None, lineno='???'):
+                self.type = type
+                self.attr = attr
+                self.lineno = lineno
+		
+	def __cmp__(self, o):
+		return cmp(self.type, o)
+        ###
+        def __repr__(self):
+                return str(self.type)
+
+
+class AST:
+        def __init__(self, type, left=None, right=None):
+                self.type = type.type
+                self.attr = type.attr
+                self._kids = []
+                self.left = left
+                self.right = right
+                if left: self._kids.append(left)
+                if right: self._kids.append(right)
+
+        def __getitem__(self, i):
+                return self._kids[i]
+
+	def __repr__(self):
+                return str(self.type)
+
+class ErScanner( GenericScanner ):
+	
+	def __init__( self ):
+		GenericScanner.__init__( self )
+
+	def tokenize( self, input ):
+		self.rv = []
+		GenericScanner.tokenize( self, input )
+		return self.rv
+
+	def t_keywords( self, s ):
+		r' Reactor | Substance | Stepper | System '
+		self.rv.append( Token( type=s, attr=s ) )
+
+	def t_symbols( self, s ):
+		r' [\;\{\}\(\)\,] '
+		self.rv.append( Token( type=s, attr=s ) )
+
+	def t_number( self, s ):
+		r' [+-]? ( \d+(\.\d*)? | \d*\.\d+ ) ([eE][+-]?\d+)? '
+		self.rv.append( Token( type='number', attr=s ) )
+
+	def t_name( self, s ):
+		r' [a-zA-Z_/][\w\:\/]* '
+		self.rv.append( Token( type='name', attr=s ) )
+
+	def t_quotedstring( self, s ):
+		r' "(^"|.)*" '
+		self.rv.append( Token( type='quotedstring', attr=s ) )
+    
+	def t_whitespace( self, s ):
+		r' \s+ '
+		pass
+#		self.rv.append( Token( type='space', attr=s ) )
+
+	def t_comment( self, s ):
+		r' \# [^\n|\r]* '
+		pass
+#		self.rv.append( Token( type='comment', attr=s ) )
+
+
+
+class ErParser( GenericParser ):
+	def __init__( self, start='start' ):
+		GenericParser.__init__( self, start )
+
+	def p_start( self, args ):
+		'''
+		start ::= stmt
+		start ::= start stmt
+		'''
+		return AST( type=args[0] )
+	
+#	def p_stmt( self, args ):
+#		'''
+#		stmt ::= entity_stmt
+#		'''
+#                '''
+#		stmt ::= stepper_stmt
+#		'''
+#		return AST( type=args[0] )
+	def p_stepper_stmt ( self, args ):
+		'''
+		stmt ::= Stepper name ( name ) { }
+		'''
+		return AST( type=args[0] )
+	
+	def p_system_stmt ( self, args ):
+		'''
+		stmt ::= System System ( name , quotedstring ) { Stepper name ; property substancelist }
+		stmt ::= System System ( name , quotedstring ) { Stepper name ; property }
+		'''
+		return AST( type=args[0] )
+	def p_reactor_stmt ( self, args ):
+		'''
+		'''
+		return AST( type=args[0] )
+
+	def p_substancelist( self, args ):
+		'''
+		substancelist ::= substancelist substance
+		substancelist ::=
+		'''
+	
+	def p_substance_stmt ( self, args ):
+		'''
+		substance  ::= Substance Substance ( name , quotedstring ) { property }
+		'''
+		return AST( type=args[0] )
+
+	
+	def p_entity_stmt( self, args ):
+		'''
+		stmt ::= Entity name ( name , quotedstring ) { propertylist }
+		'''
+		return AST( type=args[0] )
+
+	def p_propertylist( self, args ):
+		'''
+		propertylist ::= propertylist property
+		propertylist ::=
+		'''
+
+	
+	def p_property( self, args ):
+		' property ::= name valuelist ; '
+		return AST( type=args[0] )
+	
+	def p_valuelist( self, args ):
+		'''
+		valuelist ::= valuelist value
+		valuelist ::= value
+
+		'''
+		return AST( type=args[0] )
+	
+	def p_value( self, args ):
+		'''
+		value ::= number
+		value ::= quotedstring
+		value ::= name
+		'''
+		return AST( type=args[0] )
+
+
+
+
+if __name__ == '__main__':
+	import sys
+	aFilename = sys.argv[1]
+	aFile = open( aFilename )
+	aScanner = ErScanner()
+	aTokenList = aScanner.tokenize( aFile.read() )
+	print aTokenList
+	aParser = ErParser()
+	anAst = aParser.parse( aTokenList )
+	print anAst
