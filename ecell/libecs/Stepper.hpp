@@ -68,9 +68,9 @@ namespace libecs
   //  DECLARE_LIST( MasterStepperPtr, MasterStepperList )
 
 
-  typedef pair<Real,MasterStepperPtr> RealMasterStepperPtrPair;
+  typedef std::pair<Real,MasterStepperPtr> RealMasterStepperPtrPair;
   DECLARE_TYPE( RealMasterStepperPtrPair, Event );
-  DECLARE_TYPE( priority_queue<Event>, ScheduleQueue );
+  DECLARE_TYPE( std::priority_queue<Event>, ScheduleQueue );
 
   class StepperLeader
   {

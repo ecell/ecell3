@@ -28,6 +28,8 @@
 // E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
 
+#include <functional>
+
 #include "Integrators.hpp"
 #include "RootSystem.hpp"
 #include "Util.hpp"
@@ -262,16 +264,16 @@ namespace libecs
 	 i != theSystemCache.end() ; ++i )
       {
 	aSubstanceVectorIterator =
-	  transform( aMasterSystem->getSubstanceMap().begin(), 
-		     aMasterSystem->getSubstanceMap().end(), 
-		     aSubstanceVectorIterator,
-		     select2nd<SubstanceMap::value_type>() );    
+	  std::transform( aMasterSystem->getSubstanceMap().begin(), 
+			  aMasterSystem->getSubstanceMap().end(), 
+			  aSubstanceVectorIterator,
+			  std::select2nd<SubstanceMap::value_type>() );    
 
 	aReactorVectorIterator =
-	  transform( aMasterSystem->getReactorMap().begin(), 
-		     aMasterSystem->getReactorMap().end(), 
-		     aReactorVectorIterator,
-		     select2nd<ReactorMap::value_type>() );    
+	  std::transform( aMasterSystem->getReactorMap().begin(), 
+			  aMasterSystem->getReactorMap().end(), 
+			  aReactorVectorIterator,
+			  std::select2nd<ReactorMap::value_type>() );    
       }
 
   }
@@ -315,16 +317,16 @@ namespace libecs
       {
 	  
 	aSubstanceVectorIterator =
-	  transform( aMasterSystem->getSubstanceMap().begin(), 
-		     aMasterSystem->getSubstanceMap().end(), 
-		     aSubstanceVectorIterator,
-		     select2nd<SubstanceMap::value_type>() );    
+	  std::transform( aMasterSystem->getSubstanceMap().begin(), 
+			  aMasterSystem->getSubstanceMap().end(), 
+			  aSubstanceVectorIterator,
+			  std::select2nd<SubstanceMap::value_type>() );    
 
 	aReactorVectorIterator =
-	  transform( aMasterSystem->getReactorMap().begin(), 
-		     aMasterSystem->getReactorMap().end(), 
-		     aReactorVectorIterator,
-		     select2nd<ReactorMap::value_type>() );    
+	  std::transform( aMasterSystem->getReactorMap().begin(), 
+			  aMasterSystem->getReactorMap().end(), 
+			  aReactorVectorIterator,
+			  std::select2nd<ReactorMap::value_type>() );    
       }
 
     //      theMaster->push();
