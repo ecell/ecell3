@@ -31,6 +31,8 @@
 #if !defined(__PHYSICALLOGGER_HPP)
 #define __PHYSICALLOGGER_HPP
 
+#include <iostream>
+
 #include "VVector.h"
 #include "DataPoint.hpp"
 
@@ -63,10 +65,8 @@ namespace libecs
       ; // do nothing
     }
 	
-
-    void push( RealCref aTime, RealCref aValue )
+    void push( DataPointCref aDataPoint )
     {
-      DataPoint aDataPoint( aTime, aValue );
       theVector.push_back( aDataPoint );
     }
 
@@ -102,7 +102,8 @@ namespace libecs
     DataPoint back()
     {
       // danger!!  undefined behavior with vvector if size() == 0 - sha
-      return theVector[ size() - 1 ];
+        assert ( size() > 0 ); // i don't know what sort of exception should be thrown
+        return theVector[ size() - 1 ];
     }
 
 
@@ -114,7 +115,8 @@ namespace libecs
     iterator end() const
     {
       // is this ok? - sha
-      return size();
+      
+       return size() - 1;
     }
 
 
@@ -123,10 +125,8 @@ namespace libecs
 
     iterator theCurrentPosition;
 
-    DataPointVectorRCPtr theDPVector;
-
     Vectortype theVector;
-
+    
   };
 
 

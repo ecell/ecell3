@@ -98,11 +98,6 @@ namespace libemc
       return theLoggerImplementation->getMinimumInterval();
     }
 
-    const libecs::Real getCurrentInterval( void ) const
-    {
-      return theLoggerImplementation->getCurrentInterval();
-    }
-
     const libecs::Int getSize( void ) const
     {
       return theLoggerImplementation->getSize();

@@ -89,14 +89,9 @@ namespace libemc
       return theLogger.getMinimumInterval();
     }
 
-    virtual const libecs::Real getCurrentInterval( void ) const
-    {
-      return theLogger.getCurrentInterval();
-    }
-
     virtual const void appendData(libecs::RealCref aValue)
     {
-        theLogger.appendData(aValue);
+      theLogger.appendData(aValue);
     }
 
   private:

@@ -32,20 +32,20 @@
 
 
 #include "Logger.hpp"
-
  
 
 namespace libecs
 {
 
   // Constructor
-  Logger::Logger( StepperCref aStepper, PropertySlotRef aPropertySlot )
+  Logger::Logger( StepperCref aStepper, PropertySlotRef aPropertySlot, 
+		  RealCref aMinimumInterval )
+
     :
     theStepper( aStepper ),
     thePropertySlot( aPropertySlot ),
-    theLastTime( 0.0 ),
-    theMinimumInterval( 0.0 ),
-    theCurrentInterval( 0.0 )
+    theMinimumInterval( aMinimumInterval ),
+    theLastTime( theStepper.getCurrentTime() - theMinimumInterval )
   {
     ; // do nothing
   }
@@ -55,7 +55,7 @@ namespace libecs
   {
     theDataPointVector 
       = thePhysicalLogger.getVector( thePhysicalLogger.begin(),
-				     thePhysicalLogger.end() - 1);
+				     thePhysicalLogger.end() );
     
     return theDataPointVector;
   }
@@ -88,32 +88,70 @@ namespace libecs
 					RealCref anEndTime,
 					RealCref anInterval ) 
   {
+    Real theStartTime ( thePhysicalLogger.front().getTime() );
+    Real theEndTime ( thePhysicalLogger.back().getTime() );
+    if ( theStartTime < aStartTime )
+      { 
+	theStartTime = aStartTime;
+      }
+    if ( theEndTime > anEndTime )
+      { 
+	theEndTime = anEndTime;
+      }
+  
     DataPointVectorIterator 
       range( static_cast<DataPointVectorIterator>
-	     ( ( anEndTime - aStartTime ) / anInterval ) + 1 );
+	     ( ( theEndTime - theStartTime ) / anInterval ) + 1 );
     DataPointVectorIterator counter( 0 );
 
     PhysicalLoggerIterator 
       top( thePhysicalLogger.upper_bound( thePhysicalLogger.begin(),
 					  thePhysicalLogger.end(),
-					  anEndTime ) );
+					  theEndTime ) );
 
     PhysicalLoggerIterator 
-      bottom( thePhysicalLogger.lower_bound( thePhysicalLogger.begin(),
-					     top,
-					     aStartTime ) );
+      current_item( thePhysicalLogger.lower_bound( thePhysicalLogger.begin(),
+						   top,
+						   theStartTime ) );
 
-    Real rcounter( aStartTime );
+    Real rcounter( theStartTime );
+    Real rtarget( theStartTime );
     DataPointVectorPtr aDataPointVector( new DataPointVector( range ) );
     DataPoint aDataPoint;
+    Real interval( 0.0 );
+    Real dptime( aDataPoint.getTime() );
+    DataInterval aDataInterval;
+    
     PhysicalLoggerIterator it;
     while( counter < range )
       {
-	it = thePhysicalLogger.lower_bound( bottom, top , rcounter );
-	thePhysicalLogger.getItem( it, &aDataPoint );
-	( *aDataPointVector )[ counter ] = aDataPoint;
+	aDataInterval.beginNewInterval();
+        do 
+	{
+	  if ( dptime <= rcounter ) 
+	    {
+	      thePhysicalLogger.getItem( current_item , &aDataPoint );
+	      dptime=aDataPoint.getTime();
+	    }
+
+          if ( dptime > rtarget ) 
+	    { 
+	      interval = rtarget - rcounter;
+	    }
+	  else 
+	    { 
+	      interval = dptime - rcounter;
+	    }
+
+	  aDataInterval.aggregatePoint( aDataPoint, interval );
+	  ++current_item;	
+          rcounter += interval;
+
+        } while ( rcounter < rtarget );
+
+        ( *aDataPointVector )[counter] = aDataInterval.getDataPoint();
+	rtarget += anInterval;
 	++counter;
-	rcounter += anInterval;
       }
 
     theDataPointVector = aDataPointVector;
@@ -125,16 +163,23 @@ namespace libecs
   void Logger::appendData( RealCref aValue )
   {
     const Real aTime( theStepper.getCurrentTime() );
+    const Real aCurrentInterval( aTime - theLastTime );
 
-    theCurrentInterval = aTime - theLastTime;
-
-    thePhysicalLogger.push( aTime, aValue );
-    theLastTime = aTime;
-
-    if( theMinimumInterval < theCurrentInterval )
+    if( theMinimumInterval < aCurrentInterval )
       {
-	theMinimumInterval = theCurrentInterval;
+        theDataInterval.addPoint( aTime, aValue );
+        thePhysicalLogger.push( theDataInterval.getDataPoint() );
+	theLastTime = aTime;
+	theDataInterval.beginNewInterval();
       }
+
+    theDataInterval.addPoint( aTime, aValue );
+  }
+
+
+  void Logger::flush()
+  {
+    // gabor? please.
   }
 
   //

@@ -68,8 +68,10 @@ namespace libecs
       return theSize;
     }
 
-
-    size_t getElementSize() const;
+    size_t getElementSize() const
+    {
+      return sizeof( DataPoint );
+    }
 	
     DataPointVectorIterator begin() const
     {
@@ -87,11 +89,7 @@ namespace libecs
 
     DataPointVectorIterator theSize;
     
-    const size_t theElementSize;
-
     DataPoint* theRawArray;
-
-
 
   };
 

@@ -92,16 +92,17 @@ namespace libecs
     //    LoggerPtr aNewLogger( new Logger( theModel, *(aPropertySlotPtr) ) );
     LoggerPtr aNewLogger( new Logger( *( anEntityPtr->getStepper() ),
 				      *(aPropertySlotPtr) ) );
+    aPropertySlotPtr->connectLogger( aNewLogger );
     theLoggerMap[fpn] = aNewLogger;
-    aPropertySlotPtr->connectLogger(theLoggerMap[fpn]);
 
     // don't forget this!
     aPropertySlotPtr->updateLogger();
+    aNewLogger->flush();
 
     anEntityPtr->getSuperSystem()
       ->getStepper()->registerPropertySlot( aPropertySlotMapIterator->second );
 
-    return theLoggerMap[fpn];
+    return aNewLogger;
   }
 
   /*

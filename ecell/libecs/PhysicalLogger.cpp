@@ -36,8 +36,7 @@ namespace libecs
 
   PhysicalLogger::PhysicalLogger() 
     : 
-    theVector(), 
-    theDPVector()
+    theVector()
   {
     ; // do nothing
   }
@@ -50,7 +49,7 @@ namespace libecs
     PhysicalLoggerIterator iterator( ( start + end ) / 2 );
     PhysicalLoggerIterator i_start( start );
     PhysicalLoggerIterator i_end( end );
-
+    
     if ( start > end )
       {
 	i_start=end;
@@ -101,15 +100,15 @@ namespace libecs
 	awhere = theVector.size(); 
       }
 
-    *what = theVector[ awhere ];
+    *what = theVector [ awhere ];
   }
 
   DataPointVectorRCPtr 
   PhysicalLogger::getVector( PhysicalLoggerIteratorCref start,
 			     PhysicalLoggerIteratorCref end )
   {
-    PhysicalLoggerIterator i_start( start );
-    PhysicalLoggerIterator i_end( end );
+    PhysicalLoggerIterator i_start ( start );
+    PhysicalLoggerIterator i_end ( end );
 
     if ( start > end )
       {
@@ -117,28 +116,29 @@ namespace libecs
 	i_end = start;
       }
 
-    PhysicalLoggerIterator counter( start );
+    PhysicalLoggerIterator counter ( start );
 
     DataPointVectorPtr aVector;
 
     //	assert((start>=0)&&(end<=theVector.size()));
     if ( empty() )
       {
-	aVector = new DataPointVector( 0 );
-	theDPVector = aVector;
-	return theDPVector;
+	aVector = new DataPointVector ( 0 );
       }
-    aVector = new DataPointVector( end - start + 1 );
-
-    while ( counter <= end )
+    else
       {
-	( *aVector )[ counter - start ] = theVector[ counter ];
-	++counter;
+	aVector = new DataPointVector ( end - start + 1 );
+
+	while ( counter <= end )
+	  {
+	    ( *aVector )[ counter - start ] = theVector [ counter ];
+	    ++counter;
+	  }
       }
 
-    theDPVector = aVector;
+    DataPointVectorRCPtr aRCPtr( aVector );
 
-    return theDPVector;
+    return aRCPtr;
   }
 
 

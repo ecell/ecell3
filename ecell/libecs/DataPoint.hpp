@@ -48,28 +48,31 @@ namespace libecs
   class DataPoint
   {
 
+
   public:
 
-    DataPoint( RealCref aTime = 0.0, RealCref aValue = 0.0 )
+    DataPoint()
       :
-      theTime( aTime ),
-      theValue( aValue )
+      theTime ( 0.0 ), 
+      theValue( 0.0 ), 
+      theAvg  ( 0.0 ), 
+      theMin  ( 0.0 ),
+      theMax  ( 0.0 )      
     {
       ; // do nothing
     }
 
-    DataPoint( DataPointCref aDataPoint )
+    DataPoint( RealCref aTime, RealCref aValue, 
+	       RealCref anAvg, RealCref aMin, RealCref aMax )
+      : 
+      theTime ( aTime ), 
+      theValue( aValue ), 
+      theAvg  ( anAvg ), 
+      theMin  ( aMin ),
+      theMax  ( aMax )      
     {
-      theTime  = aDataPoint.getTime();
-      theValue = aDataPoint.getValue();
+      ; //do nothing
     }
-
-    DataPoint( DataPointRef aDataPoint )
-    {
-      theTime  = aDataPoint.getTime();
-      theValue = aDataPoint.getValue();
-    }
-
 
     ~DataPoint()
     {
@@ -86,44 +89,237 @@ namespace libecs
       return theValue;
     }
 
-    void SetValue( RealCref aValue )
+    RealCref getAvg() const
     {
-      theValue = aValue;
+      return theAvg;
     }
 
-    void SetTime( RealCref aTime )
+    RealCref getMin() const
     {
-      theTime = aTime;
+      return theMin;
     }
 
-    DataPointRef operator=( DataPointCref aDataPoint)
+    RealCref getMax() const
     {
-      SetTime(  aDataPoint.getTime() );
-      SetValue( aDataPoint.getValue() );
+      return theMax;
+    }
+
+
+    void setTime( RealCref aReal )
+    {
+      theTime = aReal;
+    }
+
+    void setValue( RealCref aReal )
+    {
+      theValue = aReal;
+    }
+
+    void setAvg( RealCref aReal )
+    {
+      theAvg = aReal;
+    }
+
+    void setMin( RealCref aReal )
+    {
+      theMin = aReal;
+    }
+
+    void setMax( RealCref aReal )
+    {
+      theMax = aReal;
+    }
+
+
+    /*
+
+    no need to define these; default methods should be most efficient
+
+    DataPoint( DataPointCref aDataPoint )
+    {
+      copy( aDataPoint );
+    }
+
+    DataPoint( DataPointRef aDataPoint )
+    {
+      copy( aDataPoint );
+    }
+
+    DataPointRef operator=( DataPointCref aDataPoint )
+    {
+      copy( aDataPoint );
 
       return *this;
     }
 
     DataPointRef operator=( DataPointRef aDataPoint )
     {
-      SetTime(  aDataPoint.getTime() );
-      SetValue( aDataPoint.getValue() );
+      copy( aDataPoint );
 
       return *this;
+    } 
+    */ 
+	
+    static const size_t getElementSize()
+    {
+      return sizeof( Real );
     }
-
-
-  private:
+    
+  protected:
 
     Real theTime;
     Real theValue;
+    Real theAvg;
+    Real theMin;
+    Real theMax;
+
+  public:
+
+    enum 
+      {  
+	TIME_OFFSET = 0,
+	VALUE_OFFSET,
+	AVG_OFFSET,
+	MIN_OFFSET,
+	MAX_OFFSET,
+	DATAPOINT_LENGTH 
+      };
+
 
   };
 
 
-  /** @} */ //end of libecs_module 
+  class DataInterval 
+  {
+    
+  public:
 
-} // namespace libecs
+    DataInterval() 
+      : 
+      theDataPoint(),
+      theInterval( -1 )
+    {
+      ; //do nothing
+    }
+
+    DataPointCref getDataPoint() const
+    {
+      return theDataPoint;
+    }
+
+    DataPointRef getDataPoint()
+    {
+      return theDataPoint;
+    }
+
+    Real getInterval() const
+    {
+      return theInterval;
+    }
+
+    RealCref getTime() const
+    {
+      return getDataPoint().getTime();
+    }
+
+    RealCref getValue() const
+    {
+      return getDataPoint().getValue();
+    }
+
+    RealCref getAvg() const
+    {
+      return getDataPoint().getAvg();
+    }
+
+    RealCref getMin() const
+    {
+      return getDataPoint().getMin();
+    }
+
+    RealCref getMax() const
+    {
+      return getDataPoint().getMax();
+    }
+
+    void beginNewInterval()
+    {
+      theInterval = -1.0;
+    }
+    
+    void addPoint( RealCref aTime, RealCref aValue ) 
+    {
+      if ( theInterval < 0 ) //the very first time data is added
+	{
+	  theDataPoint.setTime ( aTime );
+	  theDataPoint.setValue( aValue );
+	  theDataPoint.setAvg  ( aValue );
+	  theDataPoint.setMin  ( aValue );
+	  theDataPoint.setMax  ( aValue );
+	  theInterval = 0.0;    
+	}
+      else
+	{
+	  const Real aNewInterval( aTime - getTime() );
+
+	  theDataPoint.setAvg( getAvg() * theInterval + 
+			       aValue * aNewInterval );
+	  theInterval += aNewInterval;
+	  theDataPoint.setAvg( getAvg() / getInterval() );
+
+	  if ( aValue < getMin() ) 
+	    { 
+	      theDataPoint.setMin( aValue ); 
+	    }
+	  else if ( aValue > getMax() )  // assume theMax > theMin
+	    { 
+	      theDataPoint.setMax( aValue );
+	    }
+
+	  theDataPoint.setValue( aValue );
+	  theDataPoint.setTime( aTime );
+	}
+    }
+
+    void aggregatePoint( DataPointCref aDataPoint, RealCref anInterval )
+    {
+      if ( theInterval < 0 ) //the very first time data is added
+	{
+	  theDataPoint = aDataPoint;
+	  theInterval = anInterval;
+	}
+      else
+	{
+	  theDataPoint.setAvg( getAvg() * getInterval() + 
+			       aDataPoint.getAvg() * anInterval );
+	  theInterval += anInterval;
+	  theDataPoint.setAvg( getAvg() / getInterval() );
+	  
+	  if( aDataPoint.getMin() < getMin() ) 
+	    { 
+	      theDataPoint.setMin( aDataPoint.getMin() );
+	    }
+	  if ( aDataPoint.getMax() > getMax() ) 
+	    { 
+	      theDataPoint.setMax( aDataPoint.getMax() );
+	    }
+	  
+	  theDataPoint.setValue( aDataPoint.getValue() );
+	  theDataPoint.setTime( getTime() + anInterval );
+	}
+    }
+  
+    private:
+
+      DataPoint theDataPoint;
+      Real      theInterval;
+
+    };
+
+
+    /** @} */ //end of libecs_module 
+
+  } // namespace libecs
 
 
 #endif /* __DATAPOINT_HPP */

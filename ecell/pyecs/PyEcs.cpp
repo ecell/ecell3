@@ -73,8 +73,6 @@ BOOST_PYTHON_MODULE_INIT(_ecs)
   aLoggerClass.def( &libemc::EmcLogger::getEndTime,   "getEndTime" );    
   aLoggerClass.def( &libemc::EmcLogger::getMinimumInterval,
 		    "getMinimumInterval" );    
-  aLoggerClass.def( &libemc::EmcLogger::getCurrentInterval,
-		    "getCurrentInterval" );    
   aLoggerClass.def( &libemc::EmcLogger::getSize, "getSize" );
 
 }

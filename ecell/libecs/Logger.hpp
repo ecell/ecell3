@@ -69,8 +69,8 @@ namespace libecs
     */
   
     //    explicit Logger( ModelCref aModel, PropertySlotRef aPropertySlot );
-    explicit Logger( StepperCref aStepper, PropertySlotRef aPropertySlot );
-
+    explicit Logger( StepperCref aStepper, PropertySlotRef aPropertySlot,
+		     RealCref aMinimumInterval = 0.1 );
   
     /// Destructor
 
@@ -135,16 +135,6 @@ namespace libecs
       return theMinimumInterval;
     }
 
-    /**
-
-    */
-
-    RealCref getCurrentInterval( void ) const
-    {
-      return theCurrentInterval;
-    }
-
-
 
     /**
 
@@ -157,7 +147,7 @@ namespace libecs
 
     */
 
-
+    void flush();
 
   protected:
 
@@ -212,11 +202,10 @@ namespace libecs
 
     DataPointVectorRCPtr theDataPointVector;
     PhysicalLogger	 thePhysicalLogger;
-
+    DataInterval	 theDataInterval;
     Real                 theLastTime;
 
     Real                 theMinimumInterval;
-    Real                 theCurrentInterval;
 
   };
 

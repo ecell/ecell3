@@ -38,7 +38,6 @@ namespace libecs
   DataPointVector::DataPointVector(DataPointVectorIterator aLength) 
     :
     theSize( aLength ),
-    theElementSize( sizeof( DataPoint ) ),
     theRawArray( new DataPoint[ theSize ] )
   {
     ; // do nothing
@@ -53,11 +52,6 @@ namespace libecs
   DataPointVector::operator[]( DataPointVectorIterator aPosition ) const
   {
     return theRawArray[ aPosition ];
-  }
-
-  size_t DataPointVector::getElementSize() const
-  {
-    return theElementSize;
   }
 
   const void* DataPointVector::getRawArray() const
