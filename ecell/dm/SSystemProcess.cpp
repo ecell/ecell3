@@ -229,13 +229,13 @@ void ECELL3_DM_CLASSNAME::process()
 	 i ( thePositiveVariableReferenceIterator );
        i != theVariableReferenceVector.end() ; ++i )
     {
-      if( (*i).getVariable()->getValue() <= 0 )
+      if( (*i).getValue() <= 0 )
 	{
 	  THROW_EXCEPTION( ValueError, "Error:in SSystemPProcess::process().log() in 0.");
 	}
 
       gsl_matrix_set(theY, anIndex, 0, 
-		     gsl_sf_log( (*i).getVariable()->getValue() ) );
+		     gsl_sf_log( (*i).getValue() ) );
       anIndex++;
     }
 
@@ -326,7 +326,7 @@ void ECELL3_DM_CLASSNAME::process()
 	 i ( thePositiveVariableReferenceIterator );
        i != theVariableReferenceVector.end() ; ++i )
     {
-      (*i).getVariable()->setValue( exp( gsl_matrix_get(theY, anIndex, 0) ) );
+      (*i).setValue( exp( gsl_matrix_get(theY, anIndex, 0) ) );
       anIndex++;
     }
 }

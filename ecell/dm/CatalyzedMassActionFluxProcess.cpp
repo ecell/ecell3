@@ -40,8 +40,7 @@ ECELL3_DM_CLASS
 
   virtual void process()
     {
-      Real velocity( k * N_A );
-      velocity *= getSuperSystem()->getVolume();
+      Real velocity( k );
       velocity *= C0.getValue();
       for( VariableReferenceVectorConstIterator
 	     i ( theVariableReferenceVector.begin() );

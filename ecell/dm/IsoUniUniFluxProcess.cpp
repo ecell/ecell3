@@ -49,9 +49,9 @@ ECELL3_DM_CLASS
 
   virtual void process()
     {
-      Real S( S0.getVariable()->getConcentration() );
-      Real P( P0.getVariable()->getConcentration() );
-      Real velocity( KcF * C0.getVariable()->getConcentration() * 
+      Real S( S0.getConcentration() );
+      Real P( P0.getConcentration() );
+      Real velocity( KcF * C0.getConcentration() * 
 	(S-P/Keq) / KmS * (1+P/KmP) + S * (1+P/KiiP) );
 
       setFlux( velocity );

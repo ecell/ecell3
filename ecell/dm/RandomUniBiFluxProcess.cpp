@@ -60,11 +60,11 @@ ECELL3_DM_CLASS
 
   virtual void process()
     {
-      Real velocity( C_0.getVariable()->getValue() );
+      Real velocity( C_0.getValue() );
       
-      Real S0 = S_0.getVariable()->getConcentration();
-      Real P0 = P_0.getVariable()->getConcentration();
-      Real P1 = P_1.getVariable()->getConcentration();
+      Real S0 = S_0.getConcentration();
+      Real P0 = P_0.getConcentration();
+      Real P1 = P_1.getConcentration();
       
       Real MP( k1*k4*k5*(k2+k3)*S0+k1*k2*k4*k_3*S0*P0+k_1*(k_2*k_4*k5-k4*k_3*k_5)*P0*P1+k1*k_2*k3*k5*S0*P1-k_1*k_2*k_4*k_3*pow(P0,2)*P1-k_1*k_2*k_3*k_5*P0*pow(P1,2) );
 

@@ -103,7 +103,7 @@ void ECELL3_DM_CLASSNAME::process()
   {
     for(Int j( 0 ); j < -(*i).getCoefficient(); j++ )
     {
-      velocity_posi *= (*i).getVariable()->getValue();
+      velocity_posi *= (*i).getValue();
     }
   }
   velocity_posi *= Keq_qua;
@@ -114,7 +114,7 @@ void ECELL3_DM_CLASSNAME::process()
   {
     for(Int j( 0 ); j < (*i).getCoefficient(); j++ )
     {
-      velocity_nega *= (*i).getVariable()->getValue();
+      velocity_nega *= (*i).getValue();
     }
   }  
 
@@ -125,20 +125,20 @@ void ECELL3_DM_CLASSNAME::process()
          i ( theVariableReferenceVector.begin() );
            i != theZeroVariableReferenceIterator ; ++i )
     {
-      if( (*i).getVariable()->getValue() / -(*i).getCoefficient() < (*least).getVariable()->getValue() / -(*least).getCoefficient() )
+      if( (*i).getValue() / -(*i).getCoefficient() < (*least).getValue() / -(*least).getCoefficient() )
       {
         least = i;
       }
     }
     
-    figure = (Int)log10( -(*least).getVariable()->getValue() / -(*least).getCoefficient() );
+    figure = (Int)log10( -(*least).getValue() / -(*least).getCoefficient() );
     d = pow(10.0,figure);
     
     while(figure >= 0){
       
       velocity += d;
   
-      if( (*least).getVariable()->getValue() < velocity * -(*least).getCoefficient())
+      if( (*least).getValue() < velocity * -(*least).getCoefficient())
       {
         velocity -= d;
         figure--;
@@ -155,7 +155,7 @@ void ECELL3_DM_CLASSNAME::process()
       {
         for(Int j( 0 ); j < -(*i).getCoefficient(); j++ )
         {
-          velocity_posi *= (*i).getVariable()->getValue() - ( velocity * -(*i).getCoefficient() );
+          velocity_posi *= (*i).getValue() - ( velocity * -(*i).getCoefficient() );
         }
       }
       velocity_posi *= Keq_qua;
@@ -166,7 +166,7 @@ void ECELL3_DM_CLASSNAME::process()
       {
         for(Int j( 0 ); j < (*i).getCoefficient(); j++ )
         {
-          velocity_nega *= (*i).getVariable()->getValue() + ( velocity * (*i).getCoefficient() );
+          velocity_nega *= (*i).getValue() + ( velocity * (*i).getCoefficient() );
         }
       }  
 
@@ -191,19 +191,19 @@ void ECELL3_DM_CLASSNAME::process()
        i ( thePositiveVariableReferenceIterator );
          i != theVariableReferenceVector.end() ; ++i )
     {
-       if( (*i).getVariable()->getValue() / (*i).getCoefficient() < (*least).getVariable()->getValue() / (*least).getCoefficient() )
+       if( (*i).getValue() / (*i).getCoefficient() < (*least).getValue() / (*least).getCoefficient() )
        {
          least = i;
        }
     }
-    figure = (Int)log10( (Real)(*least).getVariable()->getValue() / (*least).getCoefficient() );
+    figure = (Int)log10( (Real)(*least).getValue() / (*least).getCoefficient() );
 
     d = pow(10.0,figure);
   
     while(figure >= 0){
       velocity -= d;
   
-      if( (*least).getVariable()->getValue() + ( velocity * (*least).getCoefficient() ) < 0 ){
+      if( (*least).getValue() + ( velocity * (*least).getCoefficient() ) < 0 ){
         velocity += d;
         figure--;
         d *= 10;
@@ -218,7 +218,7 @@ void ECELL3_DM_CLASSNAME::process()
       {
         for(Int j( 0 ); j < -(*i).getCoefficient(); j++ )
         {
-          velocity_posi *= (*i).getVariable()->getValue() - ( velocity * -(*i).getCoefficient() );
+          velocity_posi *= (*i).getValue() - ( velocity * -(*i).getCoefficient() );
         }
       }
 
@@ -230,7 +230,7 @@ void ECELL3_DM_CLASSNAME::process()
       {
         for(Int j( 0 ); j < (*i).getCoefficient(); j++ )
         {
-          velocity_nega *= (*i).getVariable()->getValue() + ( velocity * (*i).getCoefficient() );
+          velocity_nega *= (*i).getValue() + ( velocity * (*i).getCoefficient() );
         }
       }  
   
@@ -252,14 +252,14 @@ void ECELL3_DM_CLASSNAME::process()
          i ( theVariableReferenceVector.begin() );
            i != theZeroVariableReferenceIterator ; ++i )
     {
-      (*i).getVariable()->setValue( (*i).getVariable()->getValue() - velocity );
+      (*i).setValue( (*i).getValue() - velocity );
     }
 
   for( VariableReferenceVectorConstIterator
          i ( thePositiveVariableReferenceIterator );
            i != theVariableReferenceVector.end() ; ++i )
     {
-      (*i).getVariable()->setValue( (*i).getVariable()->getValue() + velocity );
+      (*i).setValue( (*i).getValue() + velocity );
     }
 
 }

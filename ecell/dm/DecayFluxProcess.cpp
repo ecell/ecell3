@@ -54,7 +54,7 @@ ECELL3_DM_CLASS
       Real velocity( k * N_A );
       velocity *= getSuperSystem()->getVolume();
 
-      velocity *= pow(S0.getVariable()->getConcentration(),S0.getCoefficient()*-1);
+      velocity *= pow(S0.getConcentration(),S0.getCoefficient()*-1);
       setFlux( velocity );
     }
 

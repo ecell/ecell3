@@ -59,10 +59,10 @@ ECELL3_DM_CLASS
 
   virtual void process()
     {
-      Real S0Concentration = S0.getVariable()->getConcentration();
-      Real S1Concentration = S1.getVariable()->getConcentration();
-      Real P0Concentration = P0.getVariable()->getConcentration();
-      Real P1Concentration = P1.getVariable()->getConcentration();
+      Real S0Concentration = S0.getConcentration();
+      Real S1Concentration = S1.getConcentration();
+      Real P0Concentration = P0.getConcentration();
+      Real P1Concentration = P1.getConcentration();
       
       Real Denom =
 	+ KcR * KmS1 * S0Concentration 
@@ -75,7 +75,7 @@ ECELL3_DM_CLASS
 	+ KcR * KmS0 * S1Concentration * P1Concentration / KiP1;
       
       
-      Real velocity = KcF * KcR * C0.getVariable()->getValue()
+      Real velocity = KcF * KcR * C0.getValue()
 	* ( S0Concentration * S1Concentration 
 	    - P0Concentration * P1Concentration / Keq ) / Denom;
 

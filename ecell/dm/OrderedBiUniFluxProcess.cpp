@@ -54,9 +54,9 @@ ECELL3_DM_CLASS
 
   virtual void process()
     {
-      Real S0Concentration = S0.getVariable()->getConcentration();
-      Real S1Concentration = S1.getVariable()->getConcentration();
-      Real P0Concentration = P0.getVariable()->getConcentration();
+      Real S0Concentration = S0.getConcentration();
+      Real S1Concentration = S1.getConcentration();
+      Real P0Concentration = P0.getConcentration();
       
       Real Den( KcF * KmP + KcF * P0Concentration 
 		+ KcR * KmS0 * S1Concentration / Keq
@@ -64,7 +64,7 @@ ECELL3_DM_CLASS
 		+ KcF * P0Concentration * S1Concentration / KiS
 		+ KcF * S0Concentration * S1Concentration / Keq );
       
-      Real velocity = KcF * KcR * C0.getVariable()->getValue()
+      Real velocity = KcF * KcR * C0.getValue()
 	* (P0Concentration  - S0Concentration  * S1Concentration  / Keq) / Den;    
       setFlux( velocity );
     }
