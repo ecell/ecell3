@@ -45,8 +45,8 @@
  *::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
  *	$Id$
  :	$Log$
- :	Revision 1.7  2003/09/27 13:01:23  bgabor
- :	Windows compatibility fix.
+ :	Revision 1.8  2003/09/27 13:09:38  bgabor
+ :	Bug fix.
  :
  :	Revision 1.6  2003/09/27 12:39:15  satyanandavel
  :	more compatibility issues in Windows
@@ -124,8 +124,8 @@ int vvectorbase::_serialNumber = 0;
 char const *vvectorbase::_defaultDirectory = NULL;
 int vvectorbase::_directoryPriority = 999;
 std::vector<char const *> vvectorbase::_tmp_name;
-std::vector<int> _file_desc_read;
-std::vector<int> _file_desc_write;
+std::vector<int> vvectorbase::_file_desc_read;
+std::vector<int> vvectorbase::_file_desc_write;
 bool vvectorbase::_atexitSet = false;
 vvectorbase::cbfp_t vvectorbase::_cb_error = NULL;
 vvectorbase::cbfp_t vvectorbase::_cb_full = NULL;
@@ -290,19 +290,22 @@ void vvectorbase::initBase(char const * const dirname)
   _file_name = strdup(pathname);
   _tmp_name.push_back(_file_name);
   _fdw = open(_file_name, O_WRONLY | O_CREAT | O_TRUNC | O_BINARY |O_LARGEFILE, 0600);
+ _fdr = open(_file_name, O_RDONLY | O_BINARY | O_LARGEFILE );
+_file_desc_write.push_back(_fdr);
+_file_desc_write.push_back(_fdw);
   if (_fdw < 0) {
     fprintf(stderr, "open(\"%s\") failed in VVector.\n", _file_name);
     cbError();
     exit(1);
   }
 
- _fdr = open(_file_name, O_RDONLY | O_BINARY | O_LARGEFILE );
   if (_fdr < 0) {
     fprintf(stderr, "open(\"%s\") failed in VVector err=%s.\n",
 	    _file_name, strerror(errno));
     cbError();
     exit(1);
   }
+
 }
 
 
