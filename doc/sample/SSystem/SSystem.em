@@ -54,7 +54,7 @@ System System( /CELL/CYTOPLASM )
 		Name	E;
 	}
 
-	Process SSystemPProcess( SSystem )
+	Process SSystemProcess( SSystem )
 	{
 		Name	"SSystemPProcess";
 		Order	3;
