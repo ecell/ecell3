@@ -396,7 +396,7 @@ class Eml:
 
         if anEntityType == 'System':
 
-            anEntityList = self.__getSystemList( anEntityType, aSystemPath )
+            anEntityList = self.__getSystemList( aSystemPath )
 
         else:
             aSystemNodeList = self.__theDocument.getElementsByTagName( 'system' )
@@ -465,7 +465,7 @@ class Eml:
             return aValueList
 
 
-    def __getSystemList( self, anEntityType, aSystemPath ):
+    def __getSystemList( self, aSystemPath ):
 
         aSystemList = []
         aSystemNodeList = self.__theDocument.getElementsByTagName( 'system' )
@@ -497,9 +497,12 @@ class Eml:
         aSystemNodeList = self.__theDocument.getElementsByTagName( 'system' )
         anEntityInfo = self.asEntityInfo( aFullID )
         
+        aSystemPath = anEntityInfo[ 'Path' ]
+        aType = anEntityInfo[ 'Type' ]
+        anID = anEntityInfo[ 'ID' ]
+
         if anEntityInfo[ 'Type' ] == 'System':
-            aSystemPath = joinSystemPath( anEntityInfo[ 'Path' ],\
-                                          anEntityInfo[ 'ID' ] )
+            aSystemPath = joinSystemPath( aSystemPath, anID )
 
             for aSystemNode in aSystemNodeList:
                 
@@ -507,19 +510,17 @@ class Eml:
                     return aSystemNode
 
         else:
-            aSystemPath = anEntityInfo[ 'Path' ]
-
             for aSystemNode in aSystemNodeList:
                 
                 if aSystemNode.getAttribute( 'id' ) == aSystemPath:
 
                     for aChildNode in aSystemNode.childNodes:
                         
-                        if string.capwords( aChildNode.tagName ) == anEntityInfo[ 'Type' ]:
+                        if string.capwords( aChildNode.tagName ) == aType and\
+                               aChildNode.getAttribute( 'id' ) == anID:
 
-                            if aChildNode.getAttribute( 'id' ) == anEntityInfo[ 'ID' ]:
+                            return aChildNode
 
-                                return aChildNode
 
         raise "Entity [" + aFullID + "] not found."
 
