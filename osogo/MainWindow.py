@@ -448,18 +448,25 @@ class MainWindow(OsogoWindow):
 	def exit( self, anObject=None ):
 
 		aMessage = '\n Are you sure you want to quit? \n'
-		aDialog = ConfirmWindow(1,aMessage,'?')
 
-		try:
+		if self.theRunningFlag == TRUE:
+			self.stopSimulation('')
+
+			aDialog = ConfirmWindow(1,aMessage,'?')
+
 			if aDialog.return_result() == 0:
 				mainQuit()
 			else:
-				if self.getExist():
-					pass
-				else:
-					OsogoWindow.openWindow(self)
-		except:
-			pass
+				self.startSimulation('')
+
+		else:
+
+			aDialog = ConfirmWindow(1,aMessage,'?')
+
+			if aDialog.return_result() == 0:
+				mainQuit()
+			else:
+				pass
         
 	# end of exit
 
