@@ -375,6 +375,8 @@ def convertEm2Eml( anEmFileObject, debug=0 ):
 	anEml = ecell.eml.Eml()
 	patchEm2Eml( anEml, anEmFileObject, debug=debug)
 
+	return anEml
+
 def patchEm2Eml( anEmlObject, anEmFileObject, debug=0 ):
 
 	# initialize eml object
