@@ -1,47 +1,58 @@
 #!/usr/bin/env python
 
-import string
-
-#from PluginWindow import *
+#from string import *
 from OsogoPluginWindow import *
-from ecell.ecssupport import *
 
-#class PropertyWindow(PluginWindow):
+# column index of clist
+PROPERTY_COL  = 0
+NUMBER_COL    = 1
+VALUE_COL     = 2
+GETABLE_COL   = 3
+SETTABLE_COL  = 4
+
 class PropertyWindow(OsogoPluginWindow):
 
-	def __init__( self, dirname, data, pluginmanager, root = None ):
 
-		OsogoPluginWindow.__init__( self, dirname, data, pluginmanager, root )
+	# ---------------------------------------------------------------
+	# constructor
+	#
+	# return -> None
+	# This method is throwable exception.
+	# ---------------------------------------------------------------
+	def __init__( self, aDirName, aData, aPluginManager, aRoot=None ):
+
+
+		OsogoPluginWindow.__init__( self, aDirName, aData, aPluginManager, aRoot )
+		self.openWindow()
 		self.thePluginManager.appendInstance( self ) 
-		#self.initialize()
 
-		# ------------------------------------------------------------------s
-		self.addHandlers( { 'input_row_pressed'   : self.selectProperty,
-		                    # 'show_button_pressed' : self.show,
-		                     'window_exit'	  : self.exit } )
+		self.addHandlers( { 'property_clist_select_row'             : self.selectProperty,
+		                    'on_property_clist_button_press_event'  : self.popupMenu,
+		                    'on_update_button_pressed'              : self.updateValue,
+		                    'window_exit'	                        : self.exit } )
         
-		self.thePropertyClist = self.getWidget( "property_clist" )
-		self.theTypeEntry     = self.getWidget( "entry_TYPE" )
-		self.theIDEntry       = self.getWidget( "entry_ID" )
-		self.thePathEntry     = self.getWidget( "entry_PATH" )
-		self.theClassNameEntry     = self.getWidget( "entry_NAME" )
-		self.prevFullID = None
+		self.thePropertyClist     = self.getWidget( "property_clist" )
+		self.theTypeEntry         = self.getWidget( "entry_TYPE" )
+		self.theIDEntry           = self.getWidget( "entry_ID" )
+		self.thePathEntry         = self.getWidget( "entry_PATH" )
+		self.theClassNameEntry    = self.getWidget( "entry_NAME" )
+		self.preFullID = None
+
+		self.theSelectedFullPNList = []
+		self.theSelectedRowNumber = -1
+
+		self.thePopupMenu =  PropertyWindowPopupMenu( self.thePluginManager, self )
 
 		if self.theRawFullPNList == ():
 			return
 		self.setFullPNList()
-		# ------------------------------------------------------------------e
 
-		if ( len( self.theFullPNList() ) > 1 ) and ( root != 'top_vbox' ):
-			i = 1
-			preFullID = self.theFullID()
+		if ( len( self.theFullPNList() ) > 1 ) and ( aRoot != 'top_vbox' ):
+			self.preFullID = self.theFullID()
 			aClassName = self.__class__.__name__
+	
+	# end of __init__
 
-		if root != 'top_vbox':
-			if len( self.theFullPNList() ) > 1:
-				self.addPopupMenu(1,1,1)
-			else:
-				self.addPopupMenu(0,1,1)
        
 	# ---------------------------------------------------------------
 	# setFullPNList
@@ -54,7 +65,8 @@ class PropertyWindow(OsogoPluginWindow):
 	# ---------------------------------------------------------------
 	def setFullPNList( self ):
 
-		self.theSelected = ''
+		#self.theSelected = ''
+		self.theSelectedFullPN = ''
         
 		aNameFullPN = convertFullIDToFullPN( self.theFullID() ,'Name' )
 
@@ -63,35 +75,56 @@ class PropertyWindow(OsogoPluginWindow):
 		self.theType =ENTITYTYPE_STRING_LIST[ self.theFullID()[TYPE] ]
 		self.theID   = str( self.theFullID()[ID] )
 		self.thePath = str( self.theFullID()[SYSTEMPATH] )
-		#aNameFullPN = convertFullIDToFullPN( self.theFullID(), 'Name' )
 
 		aClassName = self.theSession.theSimulator.getEntityClassName( createFullIDString( self.theFullID() ) )
 		aName = self.theSession.theSimulator.getEntityProperty( createFullPNString( aNameFullPN ) )
 
 		self.theTypeEntry.set_text( self.theType + ' : ' + aClassName )
-		self.theIDEntry.set_text  ( self.theID )
+		self.theIDEntry.set_text( self.theID )
 		self.thePathEntry.set_text( self.thePath )
 		self.theClassNameEntry.set_text( aName )
 
 		self.update()
 
+	# end of setFullPNList
 
+
+	# ---------------------------------------------------------------
+	# update (overwrite the method of superclass)
+	#
+	# return -> None
+	# This method is throwable exception.
+	# ---------------------------------------------------------------
 	def update( self ):
 
-		if self.prevFullID == self.theFullID():
-			self.updatePropertyList()
-			row = 0
-			for aValue in self.theList:
-				self.thePropertyClist.set_text(row,2,aValue[2])
-				row += 1
+		self.updatePropertyList()
+
+		# if current full id matches previous full id,
+		# then does nothing.
+		if self.preFullID == self.theFullID:
+			pass
+
+		# if current full id doesn't match previous full id,
+		# then rewrite all property of clist.
 		else:
-			self.updatePropertyList()
 			self.thePropertyClist.clear()
 			for aValue in self.theList:
 				self.thePropertyClist.append( aValue )
 
+		# save current full id to previous full id.
+		self.preFullID = self.theFullID()
 
+		self['value_entry'].set_text('')
+		self['value_entry'].set_sensitive(FALSE)
+		self['update_button'].set_sensitive(FALSE)
 	
+	# ---------------------------------------------------------------
+	# updatePropertyList
+	#   - 
+	#
+	# return -> None
+	# This method is throwable exception.
+	# ---------------------------------------------------------------
 	def updatePropertyList( self ):
 
 		self.theList = []
@@ -100,115 +133,371 @@ class PropertyWindow(OsogoPluginWindow):
 
 		for aProperty in aPropertyList: # for (1)
 
-			if aProperty == 'PropertyList':  # This should be removed.
-				continue                 # This should be removed.
-			elif aProperty == 'ClassName':   # This should be removed.
-				continue                 # This should be removed.
+			# does nothing for following property
+			if aProperty=='PropertyList' or \
+			   aProperty=='ClassName' or \
+			   aProperty=='PropertyAttributes' or \
+			   aProperty=='FullID' or \
+			   aProperty=='ID' or \
+			   aProperty=='Name':
 
-			Set = -1
-			aGet = -1
+				# does nothing.
+				continue
 
 			aFullPN = convertFullIDToFullPN( self.theFullID(), aProperty )
+			anAttribute = self.theSession.theSimulator.getEntityPropertyAttributes( \
+			                                              createFullPNString( aFullPN ) )
 
-			aValue = self.theSession.theSimulator.getEntityProperty( createFullPNString( aFullPN ) )
-
-			anAttribute = self.theSession.theSimulator.getEntityPropertyAttributes( createFullPNString( aFullPN ) )
-
-			aSet = anAttribute[0]
-			aGet = anAttribute[1]
-
-			# end of if (2)
-
-			if(aGet == 0):
-				continue
-
-			if (aProperty == 'ClassName'):
-
-				#aFullPN = convertFullIDToFullPN( self.theFullID(), aProperty )
-				#aValueList = self.theSession.theSimulator.getProperty( createFullPNString( aFullPN ) )
-
-				#print aValueList
-				continue
-
-			elif (aProperty == 'PropertyList'):
-				continue
-			elif (aProperty == 'PropertyAttributes'):
-				continue
-			elif (aProperty == 'FullID'):
-				continue
-			elif (aProperty == 'ID'):
-				continue
-			elif (aProperty == 'Name'):
-				continue
-			else :
-                
-				aFullPN = convertFullIDToFullPN( self.theFullID(), aProperty )
-
-				set = self.decodeAttribute( aSet )
-				get = self.decodeAttribute( aGet )
-                
-				aFullPNString =  createFullPNString( aFullPN ) 
-
+			# When the getable attribute is false, value is ''
+			if anAttribute[GETABLE] == FALSE:
+				aValueList = ''
+			else:
 				aValueList = self.theSession.theSimulator.getEntityProperty( createFullPNString( aFullPN ) )
 
-				aDisplayedFlag = 0
-				if type(aValueList) == type(()):
-					if len(aValueList)  > 1 :
-						aNumber = 1
-						for aValue in aValueList :
-							if type(aValue) == type(()):
-								aValue = aValue[0]
-							aList = [ aProperty, aNumber, aValue , get, set ]
-							aList = map( str, aList )
-							self.theList.append( aList ) 
-							aNumber += 1
-						aDisplayedFlag = 1
-
-				if aDisplayedFlag == 0:
-					aList = [ aProperty, '', aValueList , get, set]
-					aList = map( str, aList )
-					self.theList.append( aList )
-
-			# end of if (2)
-
-		# end of (1)
+			aSetString = decodeAttribute( anAttribute[SETTABLE] )
+			aGetString = decodeAttribute( anAttribute[GETABLE] )
+                
+			aFullPNString =  createFullPNString( aFullPN ) 
 
 
-	def decodeAttribute(self, aAttribute):
+			aDisplayedFlag = 0
+			if type(aValueList) == type(()):
+				if len(aValueList)  > 1 :
+					aNumber = 1
+					for aValue in aValueList :
+						#if type(aValue) == type(()):
+						#	aValue = aValue[0]
+						aList = [ aProperty, aNumber, aValue , aGetString, aSetString ]
+						aList = map( str, aList )
+						self.theList.append( aList ) 
+						aNumber += 1
+					aDisplayedFlag = 1
 
-		#data = {1 : ('-','+'),2 : ('+','-'),3 : ('+','+')}
-		data = {0 : ('-'), 1 : ('+')}
-		return data[ aAttribute ]
+			if aDisplayedFlag == 0:
+				aList = [ aProperty, '', aValueList , aGetString, aSetString ]
+				aList = map( str, aList )
+				self.theList.append( aList )
+
+		row = 0
+		for aValue in self.theList:
+			self.thePropertyClist.set_text(row,2,aValue[2])
+			row += 1
+
+	# end of updatePropertyList
+
+	# ---------------------------------------------------------------
+	# updateValue
+	#   - sets inputted value to the simulator
+	#
+	# return -> None
+	# This method is throwable exception.
+	# ---------------------------------------------------------------
+	def updateValue( self, anObject ):
+
+		# ------------------------------------
+		# gets inputted value from text field
+		# ------------------------------------
+		aValue = self['value_entry'].get_text()
+
+		# ------------------------------------
+		# gets selected number
+		# ------------------------------------
+		self.theSelectedRowNumber = self['property_clist'].selection[0]
+
+		# ------------------------------------
+		# gets getable status
+		# ------------------------------------
+		aGetable = self['property_clist'].get_text(self.theSelectedRowNumber,GETABLE_COL)
+
+		# ------------------------------------
+		# checks the type of inputted value 
+		# ------------------------------------
+		if aGetable == decodeAttribute(TRUE):
+			aPreValue = self.theSession.theSimulator.getEntityProperty( \
+			                        createFullPNString(self.theSelectedFullPN) ) 
+
+			# ------------------------------------
+			# when type is integer
+			# ------------------------------------
+			if type(aPreValue) == type(0):
+				try:
+					aValue = string.atoi(aValue)
+				except:
+					# print out traceback
+					import sys
+					import traceback
+					anErrorMessage = string.join( traceback.format_exception( \
+			    		sys.exc_type,sys.exc_value,sys.exc_traceback), '\n' )
+					self.theSession.printMessage("-----An error happens.-----")
+					self.theSession.printMessage(anErrorMessage)
+					self.theSession.printMessage("---------------------------")
+
+					# creates and display error message dialog.
+					anErrorMessage = "The inputted value must be integer!"
+					anErrorTitle = "The type error!"
+					anErrorWindow = ConfirmWindow(OK_MODE,anErrorMessage,anErrorTitle)
+					return None
+
+			# ------------------------------------
+			# when type is float
+			# ------------------------------------
+			elif type(aPreValue) == type(0.0):
+				try:
+					aValue = string.atof(aValue)
+				except:
+					# print out traceback
+					import sys
+					import traceback
+					anErrorMessage = string.join( traceback.format_exception( \
+			    		sys.exc_type,sys.exc_value,sys.exc_traceback), '\n' )
+					self.theSession.printMessage("-----An error happens.-----")
+					self.theSession.printMessage(anErrorMessage)
+					self.theSession.printMessage("---------------------------")
+
+					# creates and display error message dialog.
+					anErrorMessage = "The inputted value must be float!"
+					anErrorTitle = "The type error!"
+					anErrorWindow = ConfirmWindow(OK_MODE,anErrorMessage,anErrorTitle)
+					return None
+
+			# ------------------------------------
+			# when type is tuple
+			# ------------------------------------
+			elif type(aPreValue) == type(()):
+				try:
+					aValue = convertStringToTuple( aValue )
+
+				except:
+					# print out traceback
+					import sys
+					import traceback
+					anErrorMessage = string.join( traceback.format_exception( sys.exc_type,sys.exc_value,sys.exc_traceback), '\n' )
+					self.theSession.printMessage("-----An error happens.-----")
+					self.theSession.printMessage(anErrorMessage)
+					self.theSession.printMessage("---------------------------")
+
+					# creates and display error message dialog.
+					anErrorMessage = "The inputted value must be tuple!"
+					anErrorTitle = "The type error!"
+					anErrorWindow = ConfirmWindow(OK_MODE,anErrorMessage,anErrorTitle)
+					return None
 
 
-	def selectProperty(self, obj, data1, data2, data3):
+		# ---------------------------------------------------
+		# when the number column is not blank, reate tuple.
+		# ---------------------------------------------------
+		aPropertyValue = []
+		aNumber = self['property_clist'].get_text(self.theSelectedRowNumber,NUMBER_COL)
+		if aNumber != '':
 
-		aSelectedItem = self.theList[data1]
-		aFullPN = None
+			aSelectedProperty = self['property_clist'].get_text(self.theSelectedRowNumber,PROPERTY_COL)
+			#print "aSelectedProperty = %s" %aSelectedProperty
 
+			for aRow in range(0,self['property_clist'].rows):
+
+				if aSelectedProperty != self['property_clist'].get_text(aRow,PROPERTY_COL):
+					continue
+
+				if aRow == self.theSelectedRowNumber:
+					aPropertyValue.append( aValue )
+				else:
+					aCListValue = self['property_clist'].get_text(aRow,VALUE_COL) 
+					aCListValue = convertStringToTuple( aCListValue )
+					aPropertyValue.append( aCListValue )
+
+			aPropertyValue = tuple(aPropertyValue)
+
+		else:
+			aPropertyValue = aValue
+
+
+		aFullPNString = createFullPNString(self.theSelectedFullPN)
+
+		#if aGetable == decodeAttribute(TRUE):
+		#	print self.theSession.theSimulator.getEntityProperty( createFullPNString(self.theSelectedFullPN) ) 
 		try:
-			aFullPropertyName = createFullPN( aSelectedItem[2] )
-		except ValueError:
-			pass
+			#self.theSession.theSimulator.setEntityProperty( createFullPNString(self.theSelectedFullPN), aPropertyValue ) 
+			#self.setValue( createFullPNString(self.theSelectedFullPN), aPropertyValue ) 
+			#print self.theSelectedFullPN
+			self.setValue( self.theSelectedFullPN, aPropertyValue ) 
+		except:
 
-		if not aFullPropertyName:
-			try:
-				aFullID = createFullID( aSelectedItem[2] )
-				aFullPN = convertFullIDToFullPN( aFullID )
-			except ValueError:
-				pass
-            
-		if not aFullPN:
-			aFullPN = [ self.theType, self.thePath,
-			            self.theID, aSelectedItem[0] ]
+			# print out traceback
+			import sys
+			import traceback
+			anErrorMessage = string.join( traceback.format_exception( sys.exc_type,sys.exc_value,sys.exc_traceback), '\n' )
+			self.theSession.printMessage("-----An error happens.-----")
+			self.theSession.printMessage(anErrorMessage)
+			self.theSession.printMessage("---------------------------")
 
-		self.theSelected = aFullPN
+			# creates and display error message dialog.
+			anErrorMessage = "An error happened!\nSee MessageWindow."
+			anErrorTitle = "An error happened!"
+			anErrorWindow = ConfirmWindow(OK_MODE,anErrorMessage,anErrorTitle)
+
+		else:
+
+			self.updatePropertyList()
+			#self.thePluginManager.updateAllPluginWindow() 
+
+	# end of updateValue
 
 
-	#def show( self, obj ):
-	#	print self.theSelected
 
+	# ---------------------------------------------------------------
+	# selectProperty
+	#   - 
+	#
+	# anObject       : a selected object
+	# aSelectedRow   : a selected row number
+	# anObject1      : a dammy object
+	# anObject2      : a dammy object
+	#
+	# return -> None
+	# This method is throwable exception.
+	# ---------------------------------------------------------------
+	def selectProperty(self, anObject, aSelectedRow, anObject1, anObject2):
+
+		self.theSelectedRowNumber = self['property_clist'].selection[0]
+		self.theSelectedFullPN = ''
+
+		# ---------------------------
+		# sets selected full pn
+		# ---------------------------
+		aProperty = self['property_clist'].get_text(self.theSelectedRowNumber,PROPERTY_COL)
+		aType = string.strip( string.split(self.theTypeEntry.get_text(),':')[0] )
+		anID = self.theIDEntry.get_text()
+		aPath = self.thePathEntry.get_text()
+
+		self.theSelectedFullPN = (ENTITYTYPE_DICT[aType],aPath,anID,aProperty)
+
+		# ---------------------------
+		# sets value
+		# ---------------------------
+		aValue = self.thePropertyClist.get_text(self.theSelectedRowNumber,VALUE_COL)
+		self['value_entry'].set_text(aValue)
+
+		# ---------------------------
+		# sets sensitive
+		# ---------------------------
+		self.theSelectedRowNumber = self['property_clist'].selection[0]
+		aSetable = self['property_clist'].get_text(self.theSelectedRowNumber,SETTABLE_COL)
+
+		if aSetable == decodeAttribute(TRUE):
+			self['value_entry'].set_sensitive(TRUE)
+			self['update_button'].set_sensitive(TRUE)
+		else:
+			self['value_entry'].set_sensitive(FALSE)
+			self['update_button'].set_sensitive(FALSE)
+
+
+	# end of selectedProperty
+
+
+	# ---------------------------------------------------------------
+	# popupMenu
+	#   - show popup menu
+	#
+	# aWidget         : widget
+	# anEvent          : an event
+	# return -> None
+	# This method is throwable exception.
+	# ---------------------------------------------------------------
+	def popupMenu( self, aWidget, anEvent ):
+
+		if anEvent.button == 3:  # 3 means right
+
+			if len(self['property_clist'].selection) < 1:
+				return None
+
+			self.theSelectedRowNumber = self['property_clist'].selection[0]
+			aGetable = self['property_clist'].get_text(self.theSelectedRowNumber,GETABLE_COL)
+
+			if aGetable == decodeAttribute(TRUE):
+				self.thePopupMenu.popup( None, None, None, 1, 0 )
+
+	# end of poppuMenu
+
+	def createNewPluginWindow( self, anObject ):
+
+		aPluginWindowName = anObject.get_name()
+		aRow = self.thePropertyClist.selection[0]
+		aProperty = self.thePropertyClist.get_text(aRow,PROPERTY_COL)
+		aType = string.strip( string.split(self.theTypeEntry.get_text(),':')[0] )
+		anID = self.theIDEntry.get_text()
+		aPath = self.thePathEntry.get_text()
+
+		aRawFullPN = [(ENTITYTYPE_DICT[aType],aPath,anID,aProperty)]
+		self.thePluginManager.createInstance( aPluginWindowName, aRawFullPN )
+
+	# end of createNewPluginWindow
    
+
+# ----------------------------------------------------------
+# PropertyWindowPopupMenu -> GtkMenu
+#   - popup menu used by property window
+# ----------------------------------------------------------
+class PropertyWindowPopupMenu( GtkMenu ):
+
+	# ----------------------------------------------------------
+	# Constructor
+	#   - added PluginManager reference
+	#   - added OsogoPluginWindow reference
+	#   - acreates all menus
+	#
+	# aPluginManager : reference to PluginManager
+	# aParent        : property window
+	#
+	# return -> None
+	# This method is throwabe exception.
+	# ----------------------------------------------------------
+	def __init__( self, aPluginManager, aParent ):
+
+		GtkMenu.__init__(self)
+
+		self.theParent = aParent
+		self.thePluginManager = aPluginManager
+		self.theMenuItem = {}
+
+		# ------------------------------------------
+		# adds plugin window
+		# ------------------------------------------
+		for aPluginMap in self.thePluginManager.thePluginMap.keys():
+			self.theMenuItem[aPluginMap]= GtkMenuItem(aPluginMap)
+			self.theMenuItem[aPluginMap].connect('activate', self.theParent.createNewPluginWindow )
+			self.theMenuItem[aPluginMap].set_name(aPluginMap)
+			self.append( self.theMenuItem[aPluginMap] )
+
+		#self.append( gtk.GtkMenuItem() )
+
+
+	# end of __init__
+
+
+	# ---------------------------------------------------------------
+	# popup
+	#    - shows this popup memu
+	#
+	# return -> None
+	# This method is throwable exception.
+	# ---------------------------------------------------------------
+	def popup(self, pms, pmi, func, button, time):
+
+		# shows this popup memu
+		GtkMenu.popup(self, pms, pmi, func, button, time)
+		self.show_all(self)
+
+	# end of poup
+
+
+# end of OsogoPluginWindowPopupMenu
+
+
+
+
+
+
+
 if __name__ == "__main__":
 
 
@@ -255,11 +544,6 @@ if __name__ == "__main__":
         mainLoop()
 
     main()
-
-
-
-
-
 
 
 

@@ -368,15 +368,22 @@
 	  <widget>
 	    <class>GtkCList</class>
 	    <name>property_clist</name>
+	    <tooltip>Display all properties about selected entity.</tooltip>
 	    <can_focus>True</can_focus>
+	    <events>GDK_BUTTON_PRESS_MASK</events>
 	    <signal>
 	      <name>select_row</name>
 	      <handler>property_clist_select_row</handler>
 	      <last_modification_time>Thu, 17 Jan 2002 04:45:10 GMT</last_modification_time>
 	    </signal>
+	    <signal>
+	      <name>button_press_event</name>
+	      <handler>on_property_clist_button_press_event</handler>
+	      <last_modification_time>Wed, 25 Sep 2002 06:22:21 GMT</last_modification_time>
+	    </signal>
 	    <columns>5</columns>
 	    <column_widths>147,11,220,39,5</column_widths>
-	    <selection_mode>GTK_SELECTION_EXTENDED</selection_mode>
+	    <selection_mode>GTK_SELECTION_SINGLE</selection_mode>
 	    <show_titles>True</show_titles>
 	    <shadow_type>GTK_SHADOW_IN</shadow_type>
 
@@ -448,6 +455,79 @@
 	  </widget>
 	</widget>
       </widget>
+
+      <widget>
+	<class>GtkHBox</class>
+	<name>hbox5</name>
+	<homogeneous>False</homogeneous>
+	<spacing>0</spacing>
+	<child>
+	  <padding>0</padding>
+	  <expand>False</expand>
+	  <fill>False</fill>
+	</child>
+
+	<widget>
+	  <class>GtkLabel</class>
+	  <name>label46</name>
+	  <label>Value : </label>
+	  <justify>GTK_JUSTIFY_CENTER</justify>
+	  <wrap>False</wrap>
+	  <xalign>0.5</xalign>
+	  <yalign>0.5</yalign>
+	  <xpad>0</xpad>
+	  <ypad>0</ypad>
+	  <child>
+	    <padding>10</padding>
+	    <expand>False</expand>
+	    <fill>False</fill>
+	  </child>
+	</widget>
+
+	<widget>
+	  <class>GtkEntry</class>
+	  <name>value_entry</name>
+	  <can_focus>True</can_focus>
+	  <editable>True</editable>
+	  <text_visible>True</text_visible>
+	  <text_max_length>0</text_max_length>
+	  <text></text>
+	  <child>
+	    <padding>8</padding>
+	    <expand>True</expand>
+	    <fill>True</fill>
+	  </child>
+	</widget>
+
+	<widget>
+	  <class>GtkButton</class>
+	  <name>update_button</name>
+	  <border_width>3</border_width>
+	  <can_focus>True</can_focus>
+	  <signal>
+	    <name>pressed</name>
+	    <handler>on_update_button_pressed</handler>
+	    <last_modification_time>Wed, 25 Sep 2002 08:30:34 GMT</last_modification_time>
+	  </signal>
+	  <label>  update  </label>
+	  <relief>GTK_RELIEF_NORMAL</relief>
+	  <child>
+	    <padding>5</padding>
+	    <expand>False</expand>
+	    <fill>False</fill>
+	  </child>
+	</widget>
+      </widget>
+    </widget>
+
+    <widget>
+      <class>GtkStatusbar</class>
+      <name>statusbar</name>
+      <child>
+	<padding>0</padding>
+	<expand>False</expand>
+	<fill>False</fill>
+      </child>
     </widget>
   </widget>
 </widget>
