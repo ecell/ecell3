@@ -51,7 +51,7 @@ namespace libecs
 
   public:
     typedef DataPoint Containee;
-    typedef vector<Containee*> Container;
+    typedef std::vector<Containee*> Container;
     typedef Container::value_type value_type;
     typedef Container::size_type size_type;
     typedef Container::iterator iterator;

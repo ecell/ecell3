@@ -42,9 +42,12 @@ namespace libecs
 
   // Tree data structures used for entry lists
   // for_each performance is very important. other or hybrid container type?
-  DECLARE_MAP( const String, SubstancePtr, less<const String>, SubstanceMap );
-  DECLARE_MAP( const String, ReactorPtr,   less<const String>, ReactorMap );
-  DECLARE_MAP( const String, SystemPtr,    less<const String>, SystemMap );
+  DECLARE_MAP( const String, SubstancePtr, 
+	       std::less<const String>, SubstanceMap );
+  DECLARE_MAP( const String, ReactorPtr,   
+	       std::less<const String>, ReactorMap );
+  DECLARE_MAP( const String, SystemPtr,    
+	       std::less<const String>, SystemMap );
 
   typedef SystemPtr (*SystemAllocatorFunc)();
 
@@ -369,7 +372,7 @@ namespace libecs
   this function object takes a reference to a ReactorMap::value_type.
   */
   class System::isRegularReactorItem
-    : public unary_function< const ReactorMap::value_type,bool >
+    : public std::unary_function< const ReactorMap::value_type,bool >
   {
   public:
     bool operator()( const ReactorMap::value_type r ) const

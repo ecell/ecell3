@@ -58,7 +58,7 @@ namespace libecs
   
        ID of Posterior Reactors must start with '!'.
     */
-    class isRegularReactor : public unary_function< ReactorCptr, bool >
+    class isRegularReactor : public std::unary_function< ReactorCptr, bool >
     {
     public:
       static bool isRegularName( StringCref id )

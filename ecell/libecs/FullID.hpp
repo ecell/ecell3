@@ -211,6 +211,11 @@ namespace libecs
       return getID() == rhs.getID();
     }
 
+    bool operator!=( FullIDCref rhs ) const
+    {
+      return ! operator==( rhs );
+    }
+
   protected:
 
     void parse( StringCref fullidstring );
@@ -332,6 +337,11 @@ namespace libecs
 
       // finally compare the ID strings
       return getPropertyName() == rhs.getPropertyName();
+    }
+
+    bool operator!=( FullPNCref rhs ) const
+    {
+      return ! operator==( rhs );
     }
 
   private:

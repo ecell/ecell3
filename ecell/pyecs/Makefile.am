@@ -46,7 +46,7 @@ PyEcs.hpp\
 PySimulator.hpp\
 PyLogger.hpp
 
-ecs_la_LDFLAGS=-module -export-dynamic -avoid-version -rpath /usr/local/lib
+ecs_la_LDFLAGS=-module -export-dynamic -avoid-version
 
 ecs_la_LIBADD= $(LIBEMC) $(LIBECS) $(LIBKORANDOM) -lstdc++ $(LIBLTDL)
 

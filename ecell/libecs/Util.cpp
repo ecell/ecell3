@@ -77,10 +77,10 @@ namespace libecs
 
   template<> const String toString<Real>( const Real& f )
   { 
-    ostringstream os;
+    std::ostringstream os;
     os.precision( REAL_DIG );
     os << f;
-    os << ends;
+    os << std::ends;
     return os.str();
   }
 

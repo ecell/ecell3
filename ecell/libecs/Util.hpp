@@ -91,7 +91,7 @@ namespace libecs
   template <class T> 
   const T stringTo( StringCref str )
   {
-    istringstream ist( str.c_str() );
+    std::istringstream ist( str.c_str() );
     T aT;
     ist >> aT;
     return aT;
@@ -116,9 +116,9 @@ namespace libecs
 
   template <class T> const String toString( const T& t )
   {
-    ostringstream os;
+    std::ostringstream os;
     os << t;
-    os << ends;
+    os << std::ends;
     return os.str();
   }
 

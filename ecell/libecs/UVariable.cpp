@@ -54,7 +54,6 @@ namespace libecs
 
   const Real UVariableStringData::asReal() const
   {
-    cerr << "R "<< theString << endl;
     return stringTo<Real>( theString );
   }
 

@@ -43,7 +43,7 @@ namespace libecs
 {
 
   DECLARE_MAP( const String, PropertySlotPtr, 
-	       less<const String>, PropertyMap );
+	       std::less<const String>, PropertyMap );
 
   /**
      Common base class for classes which receive Messages.

@@ -41,9 +41,6 @@
 
 #include "CoreLinuxCompatibility.hpp"
 
-//FIXME: shold be removed
-//using namespace std;
-
 // cmath
 
 #if defined( HAVE_CMATH )
@@ -78,8 +75,6 @@ namespace libecs
 
 
   // String
-
-#include <string>
 
   DECLARE_TYPE( std::string, String );
 
