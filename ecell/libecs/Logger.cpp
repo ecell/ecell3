@@ -269,32 +269,17 @@ namespace libecs
 	return anEmptyVector();
 	}
 
-//printf("right after the start startime %f, endtime %f \n", aStartTime, anEndTime);
 	
     //choose appropriate physlogger
     Int log_no(_LOGGER_MAX_PHYSICAL_LOGGERS);
 
-    Real avg_interval;
-    do{
-    --log_no;
-    avg_interval=thePhysicalLoggers[log_no]->get_avg_interval();
-    }
-    while (((avg_interval>(anInterval/3))||(avg_interval==-1.0))&&
-	    (log_no>0));
-    Real theStartTime ( thePhysicalLoggers[log_no]->front().getTime() );
-    Real theEndTime ( thePhysicalLoggers[log_no]->back().getTime() );
-    Real time_per_step( ( theEndTime - theStartTime ) /
-		    ( thePhysicalLoggers[log_no]->end() - thePhysicalLoggers[log_no]->begin() ) );
-	theStartTime = aStartTime;
-	theEndTime = anEndTime;
-
 // set up output vector
     DataPointVectorIterator 
       range( static_cast<DataPointVectorIterator>
-	     ( ( theEndTime - theStartTime ) / anInterval ) );
+	     ( ( anEndTime - aStartTime ) / anInterval ) );
     //this is a technical adjustment, because I realized that sometimes
     //conversion from real is flawed: rounding error
-    Real range_pre( ( theEndTime - theStartTime ) / anInterval );
+    Real range_pre( ( anEndTime - aStartTime ) / anInterval );
 
     if ( ( static_cast<Real>(range) ) + 0.9999 < range_pre ) 
 	{
@@ -302,6 +287,26 @@ namespace libecs
 	}
 	
     range++;
+
+    Real avg_interval;
+    do{
+    --log_no;
+    avg_interval=thePhysicalLoggers[log_no]->get_avg_interval();
+
+	}
+    while (((avg_interval>(anInterval/3))||(avg_interval==0.0))&&
+	    (log_no>0));
+    Real theStartTime ( thePhysicalLoggers[log_no]->front().getTime() );
+    Real theEndTime ( thePhysicalLoggers[log_no]->back().getTime() );
+	
+    Real time_per_step( ( theEndTime - theStartTime ) /
+		    ( thePhysicalLoggers[log_no]->end() - thePhysicalLoggers[log_no]->begin() ) );
+	theStartTime = aStartTime;
+	theEndTime = anEndTime;
+
+
+
+
     DataPointVectorPtr aDataPointVector( new DataPointVector( range, 5 ) );
 
 
@@ -312,6 +317,8 @@ namespace libecs
 					  thePhysicalLoggers[log_no]->end(),
 					  theEndTime,
 					  time_per_step ) );
+
+
     
     PhysicalLoggerIterator 
       vectorslice_start( thePhysicalLoggers[log_no]->lower_bound_linear_estimate
@@ -340,12 +347,12 @@ namespace libecs
 				loggerCounter++;
 				readDpl = thePhysicalLoggers[log_no]->at(loggerCounter);
 
+
 				}
 			theAggregator.aggregate( readDpl );
 
 			}
 		while((readDpl.getTime() < targetTime ) && (loggerCounter < vectorslice_end));
-
 		aDataPointVector->asLong(elementCount) = theAggregator.getData();
 
 
