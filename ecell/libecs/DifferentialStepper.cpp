@@ -138,7 +138,7 @@ namespace libecs
 
 	aVariable->loadValue( aValue + aVariable->calculateTempVelocitySum( aCurrentTime ) );
 
-	std::cout << aValue << ":" << aVariable->calculateTempVelocitySum( aCurrentTime ) << std::endl;
+	//	std::cout << aValue << ":" << aVariable->calculateTempVelocitySum( aCurrentTime ) << std::endl;
       }
 
     for ( UnsignedInt c( theReadOnlyVariableOffset );
@@ -148,7 +148,7 @@ namespace libecs
 
 	aVariable->loadValue( theValueBuffer[ c ] + aVariable->calculateTempVelocitySum( aCurrentTime ) );
 
-	std::cout << theValueBuffer[ c ] << ":" << aVariable->calculateTempVelocitySum( aCurrentTime ) << std::endl;
+	//	std::cout << theValueBuffer[ c ] << ":" << aVariable->calculateTempVelocitySum( aCurrentTime ) << std::endl;
       }
   }
 
