@@ -127,16 +127,18 @@ class Globus2SystemProxy(SystemProxy):
 
 		for aHost in self.__theHostList:
 
-			aCommand = "%s -h %s objectClass=MdsCpuFree" \
+			aCommand = "%s -h %s objectClass=MdsCpu Mds-Cpu-Free-1minX100" \
 			           %(GRID_INFO_SEARCH,aHost)
 
 			aStdout, aStdin, aStderr = popen2.popen3(aCommand)
 			for aLine in aStdout.readlines():
-				if string.find(aLine,'Mds-Cpu-Total-Free-1minX100') == 0:
-					aFreeCpu = string.atoi( aLine[28:-1] )
+				#print "(%s)" %aLine[:-1]
+				if string.find(aLine,'Mds-Cpu-Free-1minX100') == 0:
+					#print "(%s)" %aLine[23:-1] 
+					aFreeCpu = string.atoi( aLine[23:-1] )
 					#print "free cpu = %s" %aFreeCpu
 					if aFreeCpu > 60:
-						self.__theFreeCpuList.append(aHost)
+						self.__theFreeCpuList.append(aHost) 
 					break
 
 	def getFreeCpuList(self):
@@ -202,12 +204,6 @@ class Globus2SystemProxy(SystemProxy):
 						self.__theFreeCpuList = self.__theFreeCpuList[1:]
 
 	# end of def update
-
-
-
-
-
-
 
 
 

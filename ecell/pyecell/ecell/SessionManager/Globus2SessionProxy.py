@@ -39,6 +39,7 @@ GLOBUS_JOB_SUBMIT='globus-job-submit'
 GLOBUS_JOB_GET_STATUS='globus-job-status'
 GLOBUS_JOB_GET_OUTPUT='globus-job-get-output'
 GLOBUS_JOB_CLEAN='globus-job-clean'
+GLOBUS_URL_COPY='globus-url-copy'
 
 class Globus2SessionProxy(SessionProxy):
 	'''Globus2SessionProxy class
@@ -111,11 +112,22 @@ class Globus2SessionProxy(SessionProxy):
 		# change directory to job directory
 		os.chdir( self.getJobDirectory() )
 
-		# --------------------------------
-		# execute script
-		# --------------------------------
-		# create context
+		# --------------------------------------------------------------------------
+		# transfer files using globus-url-copy
+		# --------------------------------------------------------------------------
+		aFiles = [self.getScriptFileName()] 
+		if self.getExtraFileList() != None:
+			aFiles += self.getExtraFileList()
+			
+		#print aFiles
 
+		for aFile in aFiles:
+
+			aLocalFile  = "file://" + os.getcwd() + os.sep + aFile
+			aRemoteFile = "gsiftp://" + self.__theCpu + os.sep  + os.getcwd() + os.sep + aFile
+			aCommand = "%s %s %s" %(GLOBUS_URL_COPY, aLocalFile,aRemoteFile)
+			#print aCommand
+			os.system(aCommand)
 
 		# --------------------------------------------------------------------------
 		# When the interpreter is E-Cell session
@@ -226,22 +238,32 @@ class Globus2SessionProxy(SessionProxy):
 		if aStatus == 'DONE':
 			self.setStatus(FINISHED) 
 
+			# save current directory
+			aCwd = os.getcwd()
+
+			# change directory to job directory
+			os.chdir( self.getJobDirectory() )
+
+			# ------------------------------------------------------
 			# standard output
 			aCommand = "%s %s" %(GLOBUS_JOB_GET_OUTPUT,\
 			                     self.__theContactString)
 			aStdout = os.popen(aCommand).readlines()
-			aStdoutFile = self.getJobDirectory() + os.sep + \
+			aStdoutFile = os.getcwd() + os.sep + \
 			              self.getStdoutFileName()
 			open(aStdoutFile,'w').write(string.join(aStdout,''))
 
+			# ------------------------------------------------------
 			# standard error output
 			aCommand = "%s -err %s" %(GLOBUS_JOB_GET_OUTPUT,\
 			                     self.__theContactString)
 			aStderr = os.popen(aCommand).readlines()
-			aStderrFile = self.getJobDirectory() + os.sep + \
+			aStderrFile = os.getcwd() + os.sep + \
 			              self.getStderrFileName()
 			open(aStderrFile,'w').write(string.join(aStderr,''))
 
+			# ------------------------------------------------------
+			os.chdir( aCwd )
 
 		#print STATUS[self.getStatus()]
 
