@@ -29,6 +29,18 @@
 //
 
 
+#include "PyLogger.hpp"
+
+PyLogger::PyLogger( void )
+{
+  ; // do nothing
+}
+
+PyLogger::PyLogger( MessageSlotObject aMessageSlot )
+{
+  EmcLogger::setMessageCallback( aMessageSlot );
+}
+
 void PyLogger::init_type()
 {
   behaviors().name("Logger");
@@ -38,3 +50,28 @@ void PyLogger::init_type()
   add_varargs_method( "setMessageCallback", &PyLogger::setMessageCallback );
   add_varargs_method( "update", &PyLogger::update );
 }
+
+Object PyLogger::getData( const Py::Tuple& args )
+{
+  args.verify_length( 0, 3 );
+
+  // FIXME
+
+  return Py::Object();
+}
+
+Object PyLogger::setMessageCallback( const Py::Tuple& args )
+{
+  // FIXME
+
+  return Py::Object();
+}
+
+Object PyLogger::update( const Py::Tuple& )
+{
+
+  EmcLogger::update();
+  return Py::Object();
+}
+
+
