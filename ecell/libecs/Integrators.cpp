@@ -28,8 +28,6 @@
 // E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
 
-#include <iostream>
-
 #include "Substance.hpp"
 
 #include "Integrators.hpp"

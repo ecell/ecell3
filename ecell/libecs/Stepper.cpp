@@ -28,7 +28,6 @@
 // E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
 
-#include <iostream>
 #include <functional>
 #include <algorithm>
 #include <limits>
@@ -159,7 +158,11 @@ namespace libecs
 
   void Stepper::registerSystem( SystemPtr aSystem )
   { 
-    theSystemVector.push_back( aSystem );
+    if( std::find( theSystemVector.begin(), theSystemVector.end(), aSystem ) 
+	== theSystemVector.end() )
+      {
+	theSystemVector.push_back( aSystem );
+      }
   }
 
   void Stepper::removeSystem( SystemPtr aSystem )
@@ -421,6 +424,8 @@ namespace libecs
     
     integrate();
     
+    rule();
+
     Stepper::step();
   }
 
