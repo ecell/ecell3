@@ -337,8 +337,13 @@ class PropertyList( ViewComponent ):
             editFlag = self.getPropertySettable( self.theSelection[0] )
         aMenu.append( [ "edit", editFlag ]  )
         if self.theType != "Stepper":
-            tracerMenu = self.theModelEditor.theRuntimeObject.createTracerSubmenu( self.getFullPNList() )
-            aMenu.append( [ None, tracerMenu ] )
+            tracerFpnList = []
+            for fpn in self.getFullPNList():
+                if self.getPropertyType( fpn.split(":")[3] ) in [ DM_PROPERTY_INTEGER, DM_PROPERTY_FLOAT ]:
+                    tracerFpnList.append( fpn )
+            if len( tracerFpnList ) > 0:
+                tracerMenu = self.theModelEditor.theRuntimeObject.createTracerSubmenu( self.getFullPNList() )
+                aMenu.append( [ None, tracerMenu ] )
         return aMenu
 
 
@@ -494,7 +499,10 @@ self.theDisplayedEntity, self.theSelection )
         changedID = self.theListStore.get_value( anIter, 0 )
         if changedID == newName:
             return
-
+        if not isIDEligible( newName ):
+            self.theModelEditor.printMessage( "Only alphanumeric characters and _ are allowed in fullid names!", ME_ERROR )
+            self.theListStore.set_value( anIter, 0, changedID )
+            return
         if self.theType == 'Stepper':
             aCommand = RenameStepperProperty( self.theModelEditor, self.theDisplayedEntity, changedID, newName )
         else:

@@ -13,7 +13,7 @@ FACTOR = 1.5
 
 class AutoLayout:
     
-    def __init__( self, aModelEditor, layoutName, listOfSelectionFullIds ):
+    def __init__( self, aModelEditor, layoutName, listOfSelectionFullIds, entityList = False ):
         self.theModelEditor = aModelEditor
         self.theModelStore = self.theModelEditor.theModelStore
 
@@ -31,9 +31,30 @@ class AutoLayout:
         self.attributeMap={}
         self.edgeAttributeMap={}
         self.objectIDMap = {}
+        if entityList:
+            listOfSelectionFullIds = self.__collectOtherEntities( listOfSelectionFullIds )
         self.generateAutoLayout(listOfSelectionFullIds, layoutName)
 
 
+    def __collectOtherEntities( self, aList ):
+        # homogenous entity list
+        # get related entities
+        newList = []
+        aType = getFullIDType( aList[0] )
+        for anEntity in aList:
+            if aType == ME_PROCESS_TYPE:
+                varrefList = self.theModelStore.getEntityProperty( anEntity + ":" + ME_PROCESS_VARREFLIST )
+                for varref in varrefList:
+                    aVarref =  getAbsoluteReference( anEntity, varref[ME_VARREF_FULLID] )
+                    variableID = ":".join( [ ME_VARIABLE_TYPE ] + aVarref.split(":")[1:] )
+                    if variableID not in newList:
+                        newList.append( variableID )
+            else:
+                processList = self.theModelStore.getEntityProperty( anEntity + ":" + ME_VARIABLE_PROCESSLIST )
+                for processID in processList:
+                    if processID not in newList:
+                        newList.append( processID )
+        return newList + aList
 
     def __getSecondarySelection( self, primarySelection ):
         if ME_ROOTID in primarySelection:
@@ -157,19 +178,36 @@ class AutoLayout:
 
     def __parseVarrefs(self):
         text=""
+        inList = {}
+        outList = {}
+        
         for aVarrefList in self.variableReferenceList:
             pnodeID = self.translationList[aVarrefList[0]]
             vnodeID = self.translationList[aVarrefList[1]]
+            
             label = aVarrefList[2]
             coef = int(aVarrefList[3])
             if coef >0:
                 edgeOp = pnodeID + "->" + vnodeID
+                if inList.has_key(pnodeID):
+                    inList[pnodeID] += [ vnodeID ]
+                else:
+                    inList[pnodeID] = [ vnodeID ]
             elif coef <0:
                 edgeOp = vnodeID + "->" + pnodeID
+                if outList.has_key(pnodeID):
+                    outList[pnodeID] += [ vnodeID ]
+                else:
+                    outList[pnodeID] = [ vnodeID ]
             else:
                 edgeOp = vnodeID + "->" + pnodeID
             text+= edgeOp +  ' [ label ="' + label + '"];\n'
-            
+#        for pnodeID in outList.keys():
+#            if inList.has_key( pnodeID ):
+#                for outvnodeid in outList[pnodeID]:
+#                    for invnodeid in inList[pnodeID]:
+#                        if outvnodeid != invnodeid:
+#                            text += outvnodeid + "->" + invnodeid + " [ label = '_' ];\n"
         return text
         
     def __parseGraph( self, anID, nextLinePos ):
@@ -243,13 +281,14 @@ class AutoLayout:
         fd.write(text)
         fd.close()
         # process file
+        os.system("dot -Tdot " + outputFileName + " -o" + inputFileName )
+        #load input file
         try:
-            os.system("dot -Tdot " + outputFileName + " -o" + inputFileName )
+            fd = open( inputFileName, 'r')
         except:
             ConfirmWindow( 0, "Auto visualization function needs Graphviz installed.\n Please download and install this free software from http://www.graphviz.org/Download.php.\n Both windows and linux binaries are available.", "")
             return
-        #load input file
-        fd = open( inputFileName, 'r')
+
         intext = " ".join(fd.readlines() )
         fd.close()
         intext = re.sub(r'[\\\n\t]','',intext)

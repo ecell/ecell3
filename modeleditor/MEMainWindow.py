@@ -125,7 +125,7 @@ class MEMainWindow( ListWindow ):
             'on_layout_name_entry_editing_done' : self.__rename_layout,\
             'on_run_mode_clicked' : self.__run_mode_clicked
             })
-
+        self.noModeToggle = False
         self['ObjectWindow'].connect ( "switch-page", self.__changeNotebookTab )
         self['MEMainWindow'].connect("delete-event", self.deleted)     
         # set up message textbox buffer
@@ -211,8 +211,6 @@ class MEMainWindow( ListWindow ):
         self.update()
 
 
-        
-    
     def __closeTab( self, *args ):
         #args[1].close()
         args[1].deleted(None)
@@ -272,7 +270,7 @@ class MEMainWindow( ListWindow ):
 
         # call modeleditor savemodel
 
-        if self.theModelEditor.changesSaved and aFileName == self.theModelEditor.theModelFileName:
+        if self.theModelEditor.changesSaved and aFileName == self.theModelEditor.theModelFileName and not self.theModelEditor.getMode() == ME_RUN_MODE:
             return aFileName
         self.theModelEditor.saveModel( aFileName )
         if self.theModelEditor.changesSaved:
@@ -488,24 +486,42 @@ class MEMainWindow( ListWindow ):
         return aFileName
 
     def updateRunMode( self ):
+        self.noModeToggle = True
         if self.theModelEditor.getMode() == ME_RUN_MODE:
-            self['run_mode'].set_property("visible", gtk.TRUE )
-            self['design_mode'].set_property( "visible", gtk.FALSE )
+            self['run_mode'].set_active( gtk.TRUE )
+            self['design_mode'].set_active( gtk.FALSE )
         else:
-            self['run_mode'].set_property("visible", gtk.FALSE )
-            self['design_mode'].set_property("visible", gtk.TRUE )
+            self['run_mode'].set_active( gtk.FALSE )
+            self['design_mode'].set_active( gtk.TRUE )
+        self.noModeToggle = False
+
+
+    def checkToggleState( self, aMode ):
+        self.theRuntimeObject.checkState( aMode )
+        self.theModelEditor.updateWindows()
+        
 
     #############################
     #      SIGNAL HANDLERS      #
     #############################
     def __design_mode_clicked( self, *args ):
-        self.theRuntimeObject.checkState( ME_RUN_MODE )
-        self.theModelEditor.updateWindows()
+        if self.noModeToggle:
+            return
+        if self['design_mode'].get_active():
+            changeTo = ME_DESIGN_MODE
+        else:
+            changeTo = ME_RUN_MODE
+        self.checkToggleState( changeTo )
     
     
     def __run_mode_clicked( self, *args ):
-        self.theRuntimeObject.checkState( ME_DESIGN_MODE )
-        self.theModelEditor.updateWindows()
+        if self.noModeToggle:
+            return
+        if self['run_mode'].get_active():
+            changeTo = ME_RUN_MODE
+        else:
+            changeTo = ME_DESIGN_MODE
+        self.checkToggleState( changeTo )
 
 
     def __gtk_button2_clicked(self,*arg):

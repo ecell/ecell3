@@ -78,10 +78,9 @@ class  VariableReferenceEditorComponent(ViewComponent):
             'on_ent_varid_activate' : self.__change_varname_reference,\
             'on_varAbs_toggled': self.__change_varAbs_reference,\
             'on_ent_conname_editing_done' : self.__change_conname_reference
-                    
             })
-        
-                # initate Editors
+
+        # initate Editors
         self.theLineProperty = LinePropertyComponent(self,aParentWindow, connObj ,self
 ['LinePropertyFrame'] ) 
         
@@ -138,12 +137,13 @@ class  VariableReferenceEditorComponent(ViewComponent):
     def __change_allVar_reference( self, *args ):
         self.getNewVarRefValue()
 
-
+    def bringToTop( self ):
+        ViewComponent.getWidget(self,'ent_conname').grab_focus()
 
     
 
     #########################################
-    #    Private methods            #
+    #    Private methods                    #
     #########################################
     def updateVarRef(self):
         ViewComponent.getWidget(self,'ent_conname').set_sensitive(gtk.TRUE)

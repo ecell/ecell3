@@ -1,4 +1,13 @@
 from Constants import *
+import re
+
+
+def isIDEligible( aString ):
+    return re.match( ".*[^A-Z|_|a-z|0-9]+", aString ) == None
+
+def isFullIDEligible( aString ):
+    return re.match( ".*[^A-Z|_|:|/|a-z|0-9]+", aString ) == None
+
 
 def copyValue ( aValue ):
     """

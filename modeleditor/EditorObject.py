@@ -53,6 +53,11 @@ class EditorObject:
                                   DIRECTION_BOTTOM_RIGHT:[2,3],DIRECTION_BOTTOM_LEFT:[0,3],DIRECTION_TOP_RIGHT:[2,1],   
                                   DIRECTION_TOP_LEFT:[0,1]}
 
+
+
+    def getMinDims( self, theType, aLabel ):
+        return self.ShapePluginManager.getMinDims( theType, "Default",self.getGraphUtils(), aLabel )
+        
         
     def destroy(self):
         if self.theShape != None:
@@ -167,6 +172,17 @@ class EditorObject:
                 self.theShape.outlineColorChanged()
             elif aPropertyName == OB_FILL_COLOR:
                 self.theShape.fillColorChanged()
+            
+    def outOfRoot( self, x, y ):
+        rootSystemID = self.theLayout.getProperty( LO_ROOT_SYSTEM )
+        rootSystem = self.theLayout.getObject ( rootSystemID )
+        rx1 = rootSystem.getProperty( OB_POS_X ) + 3
+        ry1 = rootSystem.getProperty ( OB_POS_Y ) + 20
+        rx2 = rx1 + rootSystem.getProperty( SY_INSIDE_DIMENSION_X )
+        ry2 = ry1 + rootSystem.getProperty( SY_INSIDE_DIMENSION_Y )
+        if x<rx1 or x>rx2 or y<ry1 or y>ry2:
+            return True
+        return False
 
 
     def setShapeDescriptor( self, anSD ):
@@ -219,7 +235,7 @@ class EditorObject:
         if self.theCanvas.getBeyondCanvas():
             self.parentSystem.theCanvas.setCursor(CU_MOVE)
             self.parentSystem.theCanvas.scrollTo(dx,dy)
-            #self.parentSystem.theCanvas.setLastCursorPos(dx,dy)
+            self.parentSystem.theCanvas.setLastCursorPos(dx,dy)
 
     def getDirectionShift(self,dx,dy):
         if dx>0 and dy==0:
@@ -261,7 +277,7 @@ class EditorObject:
     def objectDragged( self, deltax, deltay ):
         cmdList=[]
         theParent=self.parentSystem
-        childs=len(theParent.getObjectList())
+#        childs=len(theParent.getObjectList())
         #  parent system boundaries should be watched here!!!
         #get new positions:
         # currently move out of system is not supported!!!
@@ -280,14 +296,14 @@ class EditorObject:
             theParent.thex2org=theParent.thex1org+theParent.thePropertyMap[OB_DIMENSION_X]
             theParent.they2org=theParent.they1org+theParent.thePropertyMap[OB_DIMENSION_Y]
             # for siblings
-            if childs>1:
-                for sib in theParent.getObjectList():
-                    asib=theParent.getObject(sib)
-                    if asib.getProperty(OB_FULLID)!=self.getProperty(OB_FULLID):
-                        asib.thexorg=asib.getProperty(OB_POS_X)
-                        asib.theyorg=asib.getProperty(OB_POS_Y)
+#            if childs>1:
+#                for sib in theParent.getObjectList():
+#                    asib=theParent.getObject(sib)
+#                    if asib.getProperty(OB_FULLID)!=self.getProperty(OB_FULLID):
+#                        asib.thexorg=asib.getProperty(OB_POS_X)
+#                        asib.theyorg=asib.getProperty(OB_POS_Y)
             #for Layout
-            self.theLayout.orgScrollRegion = self.theLayout.getProperty(LO_SCROLL_REGION)
+            self.theLayout.orgScrollRegion = self.theLayout.getProperty( LO_SCROLL_REGION )
             self.theShape.setFirstDrag(False)
             self.theShape.setDragBefore(True)
             
@@ -332,13 +348,13 @@ class EditorObject:
                             else:
                                 return
                 
-            elif self.isWithinParent(newx,newy,newx2,newy2,rpar):
+            else: # stays within parent
                 if self.isOverlap(newx,newy,newx2,newy2,self.rn):   
                     return                      
                 else:           
                     self.move(deltax,deltay)
                     self.adjustCanvas(deltax,deltay)
-        else:
+        else: # button release
             #for self
             self.lastx=self.thePropertyMap[ OB_POS_X ]
             self.lasty=self.thePropertyMap[ OB_POS_Y ]
@@ -350,23 +366,25 @@ class EditorObject:
 
             #create command for self
             aCommand1 = MoveObject( self.theLayout, self.theID, newx, newy, None )
+            #revCom = MoveObject( self.theLayout, self.theID, self.thexorg, self.theyorg )
+            #aCommand1.makeExecuted([revCom])
             cmdList.append(aCommand1)
 
             #siblings
-            if childs>0:
-                for sib in theParent.getObjectList():
-                    asib=theParent.getObject(sib)
-                    if asib.getProperty(OB_FULLID)!=self.getProperty(OB_FULLID):
-                        asib.lastx=asib.thePropertyMap[ OB_POS_X ]
-                        asib.lasty=asib.thePropertyMap[ OB_POS_Y ]
-                        newxsib=asib.lastx
-                        newysib=asib.lasty
-                        asib.move(-(asib.getProperty( OB_POS_X )-asib.thexorg) ,-(asib.getProperty( OB_POS_Y )-asib.theyorg))
-                        asib.thePropertyMap[ OB_POS_X ] =asib.thexorg
-                        asib.thePropertyMap[ OB_POS_Y ] =asib.theyorg
-                        #create command for siblings
-                        aCommand= MoveObject( asib.theLayout, asib.theID, newxsib, newysib, None )
-                        cmdList.append(aCommand)
+#            if childs>0:
+#                for sib in theParent.getObjectList():
+#                    asib=theParent.getObject(sib)
+#                    if asib.getProperty(OB_FULLID)!=self.getProperty(OB_FULLID):
+#                        asib.lastx=asib.thePropertyMap[ OB_POS_X ]
+#                        asib.lasty=asib.thePropertyMap[ OB_POS_Y ]
+#                        newxsib=asib.lastx
+#                        newysib=asib.lasty
+#                        asib.move(-(asib.getProperty( OB_POS_X )-asib.thexorg) ,-(asib.getProperty( OB_POS_Y )-asib.theyorg))
+#                        asib.thePropertyMap[ OB_POS_X ] =asib.thexorg
+#                        asib.thePropertyMap[ OB_POS_Y ] =asib.theyorg
+#                        #create command for siblings
+#                        aCommand= MoveObject( asib.theLayout, asib.theID, newxsib, newysib, None )
+#                        cmdList.append(aCommand)
 
 
             #parent
@@ -374,21 +392,25 @@ class EditorObject:
             theParent.thedrightorg=theParent.thePropertyMap[OB_POS_X]+theParent.thePropertyMap[OB_DIMENSION_X]-theParent.thex2org
             theParent.theduporg=theParent.thePropertyMap[OB_POS_Y]-theParent.they1org
             theParent.theddownorg=theParent.thePropertyMap[OB_POS_Y]+theParent.thePropertyMap[OB_DIMENSION_Y]-theParent.they2org
-            theParent.resize( theParent.theduporg, -theParent.theddownorg, theParent.thedleftorg, -theParent.thedrightorg)
+            revCom2 = theParent.resize( theParent.theduporg, -theParent.theddownorg, theParent.thedleftorg, -theParent.thedrightorg )
             
             #create command for parent
             aCommand2 = ResizeObject( theParent.theLayout, theParent.theID, -theParent.theduporg, theParent.theddownorg, -theParent.thedleftorg, theParent.thedrightorg )
+            #aCommand2.makeExecuted( [revCom2] )
             cmdList.append(aCommand2)
             
 
             # Layout
             newScrollRegion=self.theLayout.getProperty(LO_SCROLL_REGION)
             self.theLayout.setProperty(LO_SCROLL_REGION,self.theLayout.orgScrollRegion)
-            self.theLayout.setProperty(OB_DIMENSION_X,self.theLayout.orgScrollRegion[2]-self.theLayout.orgScrollRegion[0])
-            self.theLayout.setProperty(OB_DIMENSION_Y,self.theLayout.orgScrollRegion[3]-self.theLayout.orgScrollRegion[1])
+            #self.theLayout.setProperty(OB_DIMENSION_X,self.theLayout.orgScrollRegion[2]-self.theLayout.orgScrollRegion[0])
+            #self.theLayout.setProperty(OB_DIMENSION_Y,self.theLayout.orgScrollRegion[3]-self.theLayout.orgScrollRegion[1])
             self.theLayout.getCanvas().setSize(self.theLayout.orgScrollRegion)
             #create command for Layout
-            aCommand3 = ChangeLayoutProperty(self.theLayout, LO_SCROLL_REGION,newScrollRegion) 
+            
+            aCommand3 = ChangeLayoutProperty(self.theLayout, LO_SCROLL_REGION,newScrollRegion)
+            revCom3 = ChangeLayoutProperty( self.theLayout, LO_SCROLL_REGION, self.theLayout.orgScrollRegion )
+            #aCommand3.makeExecuted([revCom3])
             cmdList.append(aCommand3)
             self.theLayout.passCommand( cmdList)
             lastposx,lastposy=self.theLayout.getCanvas().getLastCursorPos()
@@ -691,11 +713,11 @@ class EditorObject:
             aProcessObject = self.theLayout.getObject(proID)
             aProcessFullID = aProcessObject.getProperty( OB_FULLID )
             fullPN = aProcessFullID+':' +MS_PROCESS_VARREFLIST
-            aVarReffList = copyValue( aModelEditor.theModelStore.getEntityProperty( fullPN ) )
+            aVarReffList = copyValue( aModelEditor.theModelStore.getEntityProperty( fullPN ) )[:]
 
             for aVarref in aVarReffList:
                 if aVarref[ME_VARREF_NAME] == varreffName :
-                    del aVarref
+                    aVarReffList.remove( aVarref )
                     break
             aCommandList = [ ChangeEntityProperty( aModelEditor, fullPN, aVarReffList ) ]
 
@@ -709,7 +731,7 @@ class EditorObject:
 
     def __redo(self, *args ):
         self.getModelEditor().redoCommandList()
-        
+        GraphUtils
     def __cut(self,*args):
         
         self.__copy( None )
@@ -797,7 +819,7 @@ class EditorObject:
         aCommand = None
     
         if not aFullID in self.existobjectFullIDList:
-            aCommand=CreateObject( self.theLayout, objectID, objectType, aFullID, x,y, self )         
+            aCommand = CreateObject( self.theLayout, objectID, objectType, aFullID, x,y, self )         
                 
 
         if aCommand != None:
@@ -806,8 +828,9 @@ class EditorObject:
             rpar=n.array([0,0,px2,py2])
             if objectType == OB_TYPE_SYSTEM:
                 rn=self.createRnAddSystem()
-                x2=x+SYS_MINWIDTH
-                y2=y+SYS_MINHEIGHT
+                minreqx, minreqy = self.getMinDims( ME_SYSTEM_TYPE, aFullID )
+                x2=x+max( SYS_MINWIDTH, minreqx )
+                y2=y+max( SYS_MINHEIGHT, minreqy )
                 availspace=self.getAvailSpace(x,y,x2,y2,rn)
                 self.availSpace=availspace
                 # check boundaries
@@ -815,15 +838,17 @@ class EditorObject:
                     self.theLayout.passCommand( [aCommand] )
                     
             if objectType == OB_TYPE_PROCESS:
-                x2=x+PRO_MINWIDTH
-                y2=y+PRO_MINHEIGHT
+                minreqx, minreqy = self.getMinDims( ME_PROCESS_TYPE, aFullID.split(":")[2] )
+                x2=x+max( PRO_MINWIDTH, minreqx )
+                y2=y+max( PRO_MINHEIGHT, minreqy )
                 rn=self.createRnAddOthers()
                 if (not self.isOverlap(x,y,x2,y2,rn) and self.isWithinParent(x,y,x2,y2,rpar)):
                     self.theLayout.passCommand( [aCommand] )
 
             if objectType == OB_TYPE_VARIABLE:
-                x2=x+VAR_MINWIDTH
-                y2=y+VAR_MINHEIGHT
+                minreqx, minreqy = self.getMinDims( ME_VARIABLE_TYPE, aFullID.split(":")[2] )
+                x2=x+max( VAR_MINWIDTH, minreqx )
+                y2=y+max( VAR_MINHEIGHT, minreqy )
                 # check boundaries
                 rn=self.createRnAddOthers()
                 if (not self.isOverlap(x,y,x2,y2,rn) and self.isWithinParent(x,y,x2,y2,rpar)):
@@ -979,12 +1004,13 @@ class EditorObject:
         rpar=self.createRparent()
         matrix = self.getGraphUtils().calcMaxShiftPos(r1,rn,dir,rpar)
         mshift=matrix-r1
+        mshift = mshift * n.array( [-1,-1,1,1] )
         if len(self.maxShiftMap[dir])>1:
             posx,posy=self.maxShiftMap[dir][0],self.maxShiftMap[dir][1]
-            return abs( mshift[posx] ),abs( mshift[posy] )
+            return max(0, mshift[posx] ), max(0, mshift[posy] )
         else:
             pos=self.maxShiftMap[dir][0]
-            return abs( mshift[pos] )
+            return max(0, mshift[pos] )
 
 import gnome.canvas
 class GhostLine:
@@ -998,6 +1024,8 @@ class GhostLine:
 
 
     def moveEndPoint( self, deltax, deltay ):
+        if self.parentObject.outOfRoot( self.x2 + deltax, self.y2 + deltay ):
+            return
         self.x2 += deltax
         self.y2 += deltay
         self.theLine.set_property( "points", (self.x1, self.y1, self.x2, self.y2) )

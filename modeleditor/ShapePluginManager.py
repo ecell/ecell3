@@ -36,6 +36,10 @@ class ShapePluginManager:
         aShapeModule=self.theShapeDescriptors[aShapeType][aShapeName]
         aShapeSD=apply(aShapeModule.__dict__[os.path.basename(aShapeModule.__name__)],[EditorObject,graphUtils,aLabel])  
         return aShapeSD
+        
+    def getMinDims( self, aShapeType, aShapeName, graphUtils, aLabel ):
+        aShapeModule=self.theShapeDescriptors[aShapeType][aShapeName]
+        return apply( aShapeModule.__dict__["estLabelDims"],[graphUtils, aLabel] )
             
         
 

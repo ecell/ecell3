@@ -6,6 +6,10 @@ from ShapeDescriptor import *
 SHAPE_PLUGIN_TYPE='System' #Shape Plugin Constants
 SHAPE_PLUGIN_NAME='Default'
 
+def estLabelDims(graphUtils, aLabel):
+    (tx_height, tx_width) = graphUtils.getTextDimensions(aLabel )
+    return tx_width+16, tx_height + 20
+
 class SystemSD( ShapeDescriptor):
 
     def __init__( self, parentObject, graphUtils, aLabel ):

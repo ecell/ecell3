@@ -1253,12 +1253,14 @@
 		      </child>
 
 		      <child>
-			<widget class="GtkButton" id="design_mode">
+			<widget class="GtkToggleButton" id="design_mode">
 			  <property name="visible">True</property>
-			  <property name="tooltip" translatable="yes">Change to run mode</property>
+			  <property name="tooltip" translatable="yes">Design mode</property>
 			  <property name="can_focus">True</property>
 			  <property name="relief">GTK_RELIEF_NORMAL</property>
 			  <property name="focus_on_click">True</property>
+			  <property name="active">True</property>
+			  <property name="inconsistent">False</property>
 			  <signal name="clicked" handler="on_design_mode_clicked" last_modification_time="Mon, 22 Nov 2004 13:10:49 GMT"/>
 
 			  <child>
@@ -1281,11 +1283,14 @@
 		      </child>
 
 		      <child>
-			<widget class="GtkButton" id="run_mode">
-			  <property name="tooltip" translatable="yes">Change to design mode</property>
+			<widget class="GtkToggleButton" id="run_mode">
+			  <property name="visible">True</property>
+			  <property name="tooltip" translatable="yes">Run mode</property>
 			  <property name="can_focus">True</property>
 			  <property name="relief">GTK_RELIEF_NORMAL</property>
 			  <property name="focus_on_click">True</property>
+			  <property name="active">False</property>
+			  <property name="inconsistent">False</property>
 			  <signal name="clicked" handler="on_run_mode_clicked" last_modification_time="Mon, 22 Nov 2004 13:11:35 GMT"/>
 
 			  <child>
@@ -1386,12 +1391,31 @@
 	  <property name="spacing">0</property>
 
 	  <child>
+	    <widget class="GtkLabel" id="label63">
+	      <property name="label" translatable="yes">Simulation Time:</property>
+	      <property name="use_underline">False</property>
+	      <property name="use_markup">False</property>
+	      <property name="justify">GTK_JUSTIFY_LEFT</property>
+	      <property name="wrap">False</property>
+	      <property name="selectable">False</property>
+	      <property name="xalign">0.5</property>
+	      <property name="yalign">0.5</property>
+	      <property name="xpad">0</property>
+	      <property name="ypad">0</property>
+	    </widget>
+	    <packing>
+	      <property name="padding">0</property>
+	      <property name="expand">False</property>
+	      <property name="fill">False</property>
+	    </packing>
+	  </child>
+
+	  <child>
 	    <widget class="GtkVPaned" id="vpaned1">
 	      <property name="border_width">5</property>
-	      <property name="width_request">45</property>
-	      <property name="height_request">140</property>
 	      <property name="visible">True</property>
 	      <property name="can_focus">True</property>
+	      <property name="position">400</property>
 
 	      <child>
 		<widget class="GtkNotebook" id="ObjectWindow">
@@ -1405,6 +1429,7 @@
 
 		  <child>
 		    <widget class="GtkFrame" id="dummy_frame">
+		      <property name="height_request">200</property>
 		      <property name="visible">True</property>
 		      <property name="label_xalign">0</property>
 		      <property name="label_yalign">0.5</property>
@@ -1480,7 +1505,6 @@
 
 	      <child>
 		<widget class="GtkHandleBox" id="handlebox24">
-		  <property name="height_request">62</property>
 		  <property name="visible">True</property>
 		  <property name="shadow_type">GTK_SHADOW_OUT</property>
 		  <property name="handle_position">GTK_POS_LEFT</property>
@@ -1527,32 +1551,7 @@
 	      <property name="padding">0</property>
 	      <property name="expand">True</property>
 	      <property name="fill">True</property>
-	      <property name="pack_type">GTK_PACK_END</property>
 	    </packing>
-	  </child>
-
-	  <child>
-	    <widget class="GtkLabel" id="label63">
-	      <property name="label" translatable="yes">Simulation Time:</property>
-	      <property name="use_underline">False</property>
-	      <property name="use_markup">False</property>
-	      <property name="justify">GTK_JUSTIFY_LEFT</property>
-	      <property name="wrap">False</property>
-	      <property name="selectable">False</property>
-	      <property name="xalign">0.5</property>
-	      <property name="yalign">0.5</property>
-	      <property name="xpad">0</property>
-	      <property name="ypad">0</property>
-	    </widget>
-	    <packing>
-	      <property name="padding">0</property>
-	      <property name="expand">False</property>
-	      <property name="fill">False</property>
-	    </packing>
-	  </child>
-
-	  <child>
-	    <placeholder/>
 	  </child>
 	</widget>
 	<packing>

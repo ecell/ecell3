@@ -92,12 +92,12 @@ class ConnectionObject( EditorObject ):
         (offsetx, offsety ) = self.getAbsolutePosition()
         x = absx - offsetx
         y = absy - offsety
-
+        if self.outOfRoot( x, y ):
+            return 
         if self.theShape.getFirstDrag():
             self.redirectConnection(shapeName,x,y)
             self.theShape.setFirstDrag(False)
             self.hasBeenDragBefore = True
-            
 
     def redirectConnection(self,shapeName,x,y):
         if shapeName == ARROWHEAD1:
@@ -256,6 +256,10 @@ class ConnectionObject( EditorObject ):
             pass
         elif aPropertyName == CO_HASARROW2:
             pass
+        elif aPropertyName == OB_FILL_COLOR:
+            if self.theCanvas != None:
+                self.theShape.fillColorChanged( )
+
 
         # it should - gabor
         elif aPropertyName == CO_CONTROL_POINTS:

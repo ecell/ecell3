@@ -2,6 +2,10 @@ from Constants import *
 import Numeric as nu
 from gnome.canvas import *
 
+def estLabelDims(graphUtils, aLabel):
+    (tx_height, tx_width) = graphUtils.getTextDimensions(aLabel )
+    return tx_width+6, tx_height + 6
+
 class ShapeDescriptor:
 
     def __init__( self,parentObject, graphUtils, aLabel  ):
@@ -111,7 +115,7 @@ class ShapeDescriptor:
                     aSpecific[0].append( tuple(decodedList) )
                 
 
-
+"""
 
 class SystemSD( ShapeDescriptor):
 
@@ -302,3 +306,4 @@ class TextSD( ShapeDescriptor ):
 
         
 
+"""

@@ -172,6 +172,7 @@ class Layout:
         if self.theCanvas!=None:
             newObject.setCanvas( self.theCanvas )
             newObject.show()
+            self.selectRequest( objectID )
 
 
     def deleteObject( self, anObjectID ):
@@ -256,6 +257,7 @@ class Layout:
         if self.theCanvas!=None:
             newObject.setCanvas( self.theCanvas )
             newObject.show()
+            self.selectRequest( anObjectID )
 
 
     def redirectConnectionObject( self, anObjectID, newProcessObjectID, newVariableObjectID = None, processRing = None, variableRing = None, varrefName =None ):
@@ -378,6 +380,8 @@ class Layout:
                 if shift_press and multiSelectionAllowed :
                     self.theSelectedObjectIDList += [objectID]
                     anObject.selected()
+                else:
+                    return
             else:
                 self.theSelectedObjectIDList += [objectID]
                 anObject.selected()

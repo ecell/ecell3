@@ -112,6 +112,7 @@ class ObjectEditorWindow :
 
     def bringToTop( self ):
         self.theModelEditor.theMainWindow.setSmallWindow( self.theTopFrame )
+        self.theComponent.bringToTop()
 
 
     def createComponent(self):
@@ -142,10 +143,13 @@ class ObjectEditorWindow :
         
         elif aPropertyName == OB_FULLID:
             if self.theObject.getProperty(OB_HASFULLID):
-                
-                aCommand = RenameEntity( self.theModelEditor, self.theObject.getProperty(OB_FULLID), aPropertyValue )
-                if aCommand.isExecutable():
-                    self.theModelEditor.doCommandList( [ aCommand ] )
+                if isFullIDEligible( aPropertyValue ):
+                    aCommand = RenameEntity( self.theModelEditor, self.theObject.getProperty(OB_FULLID), aPropertyValue )
+                    if aCommand.isExecutable():
+                        self.theModelEditor.doCommandList( [ aCommand ] )
+                else:
+                    self.theModelEditor.printMessage( "Only alphanumeric characters and _ are allowed in fullid names!", ME_ERROR )
+
                 self.selectEntity( [self.theObject] )
                             
 
@@ -228,7 +232,7 @@ class ObjectEditorWindow :
     # ==========================================================================
 
     def setDisplayObjectEditorWindow(self,aLayoutName, anObjectId):
-        self.bringToTop()
+
         self.getTheObject( aLayoutName, anObjectId)
         if self.theObject.getProperty(OB_HASFULLID):
             self.theLastFullID = self.theObject.getProperty(OB_FULLID)
@@ -255,11 +259,9 @@ class ObjectEditorWindow :
                 self.setAttachmentFrame('show')
             if self.isBoxShow:
                 self.setAttachmentBox('hide')   
-
-            
             
         self.updateShapeProperty()
-
+        self.bringToTop()
 
     # ==========================================================================
     
@@ -310,7 +312,7 @@ class ObjectEditorWindow :
 
         if type(anEntityList) == type(""):
             return
-        self.bringToTop()
+
         self.theLastObject = anEntityList[0]
         if self.theObject.getProperty(OB_HASFULLID):
             self.theLastFullID = self.theObject.getProperty(OB_FULLID)
@@ -318,7 +320,8 @@ class ObjectEditorWindow :
                 self.theLastFullID = None
         self.theComponent.setDisplayedEntity (self.theLastFullID)
         self.theComponent.update()
-
+        self.bringToTop()
+        
     # ==========================================================================
     def return_result( self ):
         """Returns result

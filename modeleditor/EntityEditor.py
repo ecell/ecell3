@@ -94,15 +94,21 @@ class EntityEditor(ViewComponent):
             self.thePropertyList.hideButtons()
         else:
             aNoteBook.set_tab_pos( gtk.POS_TOP )
-            classDesc = self['class_desc']
+            desc_vertical = self['desc_vertical']
+            desc_horizontal = self['desc_horizontal']
             infoDesc = self['info_desc']
+            proplist = self['PropertyListFrame']
             vertical = self['vertical_holder']
             horizontal = self['horizontal_holder']
-            horizontal.remove( classDesc)
-            horizontal.remove( infoDesc )
-            vertical.pack_end( classDesc)
-            vertical.pack_end( infoDesc )
-            vertical.show_all()         
+            horizontal.remove( proplist)
+            desc_horizontal.remove( infoDesc )
+            vertical.pack_end( proplist)
+            vertical.child_set_property( proplist, "expand", gtk.TRUE )
+            vertical.child_set_property( proplist, "fill", gtk.TRUE )
+            vertical.child_set_property( horizontal, "expand", gtk.FALSE )
+            desc_vertical.pack_end( infoDesc )
+            vertical.show_all()
+            desc_vertical.show_all()
             
         
         # make sensitive change class button for process
@@ -126,6 +132,8 @@ class EntityEditor(ViewComponent):
         """
         return self.theDisplayedEntity
 
+    def bringToTop( self ):
+        self['ID_entry'].grab_focus()
 
     def update ( self ):
         """
@@ -236,8 +244,11 @@ class EntityEditor(ViewComponent):
         newID = ':'.join( newTuple )
         sysPath = self.theDisplayedEntity.split(':')[1]
         existEntityList = self.theModelEditor.getModel().getEntityList(newTuple[0],sysPath)
+        if not isIDEligible( newName ):
+            self.theModelEditor.printMessage( "Only alphanumeric characters and _ are allowed in entity names!", ME_ERROR )
+
         
-        if not newName in existEntityList:
+        elif not newName in existEntityList:
             aCommand = RenameEntity( self.theModelEditor, self.theDisplayedEntity, newID )
             if aCommand.isExecutable:
                 #ResizeableText.deregisterText(oldName)

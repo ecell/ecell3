@@ -7,6 +7,10 @@ SHAPE_PLUGIN_TYPE='Process' #Shape Plugin Constants
 SHAPE_PLUGIN_NAME='Default'
 OB_SHOW_LABEL=0
 
+def estLabelDims(graphUtils, aLabel):
+    (tx_height, tx_width) = graphUtils.getTextDimensions(aLabel )
+    return 20, 20
+
 class ProcessSD( ShapeDescriptor):
 
     def __init__( self, parentObject, graphUtils, aLabel ):

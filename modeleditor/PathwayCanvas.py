@@ -30,7 +30,8 @@ class PathwayCanvas( Canvas ):
                     gtk.gdk.Cursor( gtk.gdk.X_CURSOR) ]
         self.addHandlers()
         self.beyondcanvas=False
-        self.zoomratio=0
+        self.recentScroll = False
+        self.zoomratio=1
         self.theRTMap={}
         self.lastposx=0
         self.lastposy=0
@@ -56,6 +57,7 @@ class PathwayCanvas( Canvas ):
         return self.theCanvasRoot
     
     def setSize( self, scrollRegion ):
+        
         self.theCanvas.set_scroll_region( scrollRegion[0], scrollRegion[1], scrollRegion[2], scrollRegion[3] )
         
 
@@ -70,12 +72,21 @@ class PathwayCanvas( Canvas ):
         return self.lastposx,self.lastposy
     
     def scrollTo(self, dx, dy, argum=None):
+        dx*=self.zoomratio
+        dy*=self.zoomratio
         if argum==None:
             x,y=self.theCanvas.get_scroll_offsets()
             self.theCanvas.scroll_to(int(x+dx) , int(y+dy))
             self.setLastCursorPos(x+dx,y+dy)
         else:
             self.theCanvas.scroll_to( int(dx), int(dy))
+        self.recentScroll = True
+        
+    def getRecentScroll( self ):
+        if self.recentScroll:
+            self.recentScroll = False
+            return True
+        return False
             
 
 

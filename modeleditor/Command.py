@@ -20,6 +20,12 @@ class Command:
         self.executed = False
         self.theReverseCommandList = None
     
+    def makeExecuted( self, reverseCommandList ):
+        #the effects of command has already taken place
+        self.checkArgs()
+        self.executed = True
+        self.reverseCommandList = reverseCommandList
+
 
     def execute(self):
         """
@@ -28,8 +34,9 @@ class Command:
         returns True if successful
         returns False if command is non executable
         """
-        
-        if self.isExecutable() and not self.isExecuted():
+        if self.isExecuted():
+            return
+        if self.isExecutable() :
 
             self.createReverseCommand()
             if self.do():

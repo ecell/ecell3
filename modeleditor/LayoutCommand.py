@@ -124,6 +124,9 @@ class RenameLayout(LayoutCommand):
         if not LayoutCommand.checkArgs(self):
             return False
         self.newName = self.theArgs[ self.NEWNAME ]
+        if not isIDEligible( self.newName ):
+            return False
+
         self.oldName = self.theArgs[ self.OLDNAME ]
         #check if layout name exists
         if self.theReceiver.doesLayoutExist(self.newName):
@@ -195,6 +198,10 @@ class PasteLayout(LayoutCommand):
             return False
         self.theBuffer = self.theArgs[ self.BUFFER ]
         self.newName = self.theArgs[ self.NEWNAME ]
+        if self.newName != None:
+            if not isIDEligible( self.newName ):
+                return False
+
         self.isShow = self.theArgs[ self.SHOW ]
         return True
 
@@ -203,6 +210,7 @@ class PasteLayout(LayoutCommand):
         overWrite = False
         if self.newName == None:
             self.newName = self.theBuffer.getName()
+
         if self.theReceiver.doesLayoutExist(self.newName):
             #if self.theReceiver.theModelEditor.printMessage( "Do you want to overwrite layout %s"%self.newName ) = ME_RESULT_OK:
             # get copy of layout
@@ -241,7 +249,7 @@ class CreateObject(LayoutCommand):
     FULLID = 2
     X = 3
     Y = 4
-    PARENT = 5 
+    PARENT = 5
 
     def checkArgs( self ):
         # no argument check - suppose call is right

@@ -390,7 +390,7 @@ class Eml:
     def deleteStepper( self, anID ):
         """delete a stepper"""
 
-        for anElement in self.__theDocument.firstChild.childNodes:
+        for anElement in self.__theDocument.getElementsByTagName("eml")[0].childNodes:
             if anElement.nodeName == 'stepper' and \
                    anElement.getAttribute( 'id' ) == anID:
 
@@ -534,13 +534,13 @@ class Eml:
         aType = aFullID.split( ':', 1 )[0]
 
         if aType == 'System':
-            for anElement in self.__theDocument.firstChild.childNodes:
+            for anElement in self.__theDocument.getElementsByTagName("eml")[0].childNodes:
 
                 if convertSystemID2SystemFullID( anElement.getAttribute( 'id' ) ) == aFullID:
-                    self.__theDocument.firstChild.removeChild( anElement )
+                    self.__theDocument.getElementsByTagName("eml")[0].removeChild( anElement )
 
         else:
-            for anElement in self.__theDocument.firstChild.childNodes:
+            for anElement in self.__theDocument.getElementsByTagName("eml")[0].childNodes:
                 if anElement.nodeName == 'system':
                     if anElement.getAttribute( 'id' ) == aTargetEntity[ 'Path' ]:
 
@@ -604,7 +604,7 @@ class Eml:
 
             anEntityList = []
 
-            for aSystemNode in self.__theDocument.firstChild.childNodes:
+            for aSystemNode in self.__theDocument.getElementsByTagName("eml")[0].childNodes:
                 if aSystemNode.nodeName == 'system' and \
                        aSystemNode.getAttribute( 'id' ) == aSystemPath:
                     
@@ -735,10 +735,12 @@ class Eml:
 
         aTargetPath = aSystemPath.split( '/' )
         aTargetPathLength = len( aTargetPath )
+        anEML = self.__theDocument.getElementsByTagName("eml")
+        
 
         # if '' is given, return the root system ('/')
         if aTargetPathLength == 1:
-            for aSystemNode in self.__theDocument.firstChild.childNodes:
+            for aSystemNode in anEML[0].childNodes:
                 if aSystemNode.nodeName == 'system' and \
                      aSystemNode.getAttribute( 'id' ) == '/':
                     return [ '/', ]
@@ -751,7 +753,7 @@ class Eml:
             aTargetPath = aTargetPath[:-1]
             aTargetPathLength -= 1
 
-        for aSystemNode in self.__theDocument.firstChild.childNodes:
+        for aSystemNode in anEML[0].childNodes:
             if aSystemNode.nodeName == 'system':
 
                 aSystemPath = str( aSystemNode.getAttribute( 'id' ) ).split( '/' )
@@ -803,7 +805,7 @@ class Eml:
         except:
             pass
 
-        for aSystemNode in self.__theDocument.firstChild.childNodes:
+        for aSystemNode in self.__theDocument.getElementsByTagName("eml")[0].childNodes:
             if aSystemNode.nodeName == 'system' and \
                    str( aSystemNode.getAttribute( 'id' ) ) == aSystemPath:
                 self.__addToCache( aFullID, aSystemNode )

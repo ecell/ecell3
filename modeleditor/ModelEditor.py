@@ -290,6 +290,27 @@ class ModelEditor:
     def saveEmlAndLeml(self, aFileName):
         
         #aFileName = self.filenameFormatter(aFileName)
+        # save layout eml
+        if self.getMode() == ME_RUN_MODE:
+            if not self.__saveSimulator( aFileName ):
+                return False
+        elif not self.__saveModelStore( aFileName ):
+            return False
+        self.saveLayoutEml(os.path.split( aFileName ))
+        
+    def __saveSimulator( self, aFileName ):
+        try:
+            self.theRuntimeObject.getSession().saveModel( aFileName )
+        except:
+            self.printMessage( "Error saving file %s"%aFileName, ME_ERROR )
+            anErrorMessage = string.join( traceback.format_exception(sys.exc_type,sys.exc_value, \
+                    sys.exc_traceback), '\n' )
+            self.printMessage( anErrorMessage, ME_PLAINMESSAGE )
+            self.theMainWindow.resetCursor()
+            return False
+        return True
+
+    def __saveModelStore( self, aFileName ):
         anEml = Eml()
 
         self.__saveStepper( anEml )
@@ -323,8 +344,7 @@ class ModelEditor:
             self.printMessage( anErrorMessage, ME_PLAINMESSAGE )
             self.theMainWindow.resetCursor()
             return False
-        # save layout eml
-        self.saveLayoutEml(os.path.split( aFileName ))
+        return True
 
 
     def __saveModelStoreAndLayout( self ):
@@ -467,7 +487,12 @@ class ModelEditor:
         if os.path.isdir( aFileName ):
             self.saveDirName = aFileName.rstrip(os.sep)
             return
-
+        if self.getMode() == ME_RUN_MODE:
+            if self.printMessage("You are in Run mode now. \nIf you continue with save, all values will be saved \nwith their actual values in the Simulator right now\nand not with the initial values set by you.\n Do you want to proceed?\n( Simulator will be stopped. )",ME_YESNO) != ME_RESULT_OK:
+                return
+            if self.isRunning():
+                self.theRuntimeObject.stop()
+            
         self.theMainWindow.displayHourglass()
 
         self.saveDirName = os.path.split( aFileName )[0]
@@ -516,6 +541,8 @@ class ModelEditor:
         self.theModelName = os.path.split( aFileName )[1]
         self.modelHasName = True
         self.changesSaved = True
+        
+        
 	self.__changeWorkingDir( self.saveDirName )
         self.updateWindows()
         
@@ -894,8 +921,8 @@ class ModelEditor:
         else:
             autoSaveName = str(os.getcwd()) + os.sep + aFileName +  ".sav.eml"
         self.autoSaveName = autoSaveName
-           
-        self.saveEmlAndLeml(autoSaveName)
+        if not self.isRunning():
+            self.saveEmlAndLeml(autoSaveName)
 
         if self.theUpdateInterval != 0:
             self.theTimer = gtk.timeout_add(self.theUpdateInterval, self.autoSave)         

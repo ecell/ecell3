@@ -197,7 +197,9 @@ class PathwayEditor( ListWindow ):
             oldName = self.theLayout.getName()
             newName = self.theEntry.get_text()
             aCommand = RenameLayout( self.theLayout.theLayoutManager, oldName, newName )
-            if aCommand.isExecutable():
+            if not isIDEligible( newName ):
+                self.theModelEditor.printMessage( "Only alphanumeric characters and _ are allowed in layout names!", ME_ERROR )
+            if aCommand.isExecutable() and isIDEligible( newName ):
                 self.theModelEditor.doCommandList( [aCommand] )
             else:
                 self.theEntry.set_text(oldName)

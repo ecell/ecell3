@@ -246,7 +246,10 @@ class StepperList(ViewComponent):
 
         if oldName == newName:
             return
-
+        if not isIDEligible( newName ):
+            self.theModelEditor.printMessage( "Only alphanumeric characters and _ are allowed in stepper ids!", ME_ERROR )
+            self.theListStore.set_value( anIter, 0, oldName )
+            return
         aCommand = RenameStepper( self.theModelEditor, oldName, newName )
         if aCommand.isExecutable():
             self.theSelection = [ newName ]

@@ -77,15 +77,22 @@ class StepperEditor(ViewComponent):
         self['ids'].remove( self['hbox3'] ) 
         #self['hbox3'] = None
         aNoteBook.set_tab_pos( gtk.POS_TOP )
-        classDesc = self['class_desc']
+        desc_horizontal = self['desc_horizontal']
+        desc_vertical = self['desc_vertical']
+        proplist = self['PropertyListFrame']
         infoDesc = self['info_desc']
         vertical = self['vertical_holder']
         horizontal = self['horizontal_holder']
-        horizontal.remove( classDesc)
-        horizontal.remove( infoDesc )
-        vertical.pack_end( classDesc)
-        vertical.pack_end( infoDesc )
-        vertical.show_all()         
+        horizontal.remove( proplist)
+        desc_horizontal.remove( infoDesc )
+        vertical.pack_end( proplist)
+        vertical.child_set_property( proplist, "expand", gtk.TRUE )
+        vertical.child_set_property( proplist, "fill", gtk.TRUE )
+        vertical.child_set_property( horizontal, "expand", gtk.FALSE )
+
+        desc_vertical.pack_end( infoDesc )
+        vertical.show_all()
+        desc_vertical.show_all()
         # make sensitive change class button for process
         self['class_combo'].set_sensitive( gtk.TRUE )
 
@@ -195,7 +202,10 @@ class StepperEditor(ViewComponent):
 
 
     def changeName ( self, newName ):
-
+        if not isIDEligible( newName ):
+            self.theModelEditor.printMessage( "Only alphanumeric characters and _ are allowed in stepper ids!", ME_ERROR )
+            self.updateEditor()
+            return
         aCommand = RenameStepper( self.theModelEditor, self.theDisplayedStepper, newName )
         if aCommand.isExecutable:
             self.theDisplayedStepper = newName

@@ -444,7 +444,9 @@ class ComplexShape:
             deltay = event.y - oldy
             self.lastmousex = event.x
             self.lastmousey = event.y
-            self.mouseDrag( shapeName, deltax, deltay, oldx, oldy )
+            if not self.parentObject.theLayout.getCanvas().getRecentScroll():
+                # if there was a scroll, event.x, event.y gets a stupid value
+                self.mouseDrag( shapeName, deltax, deltay, oldx, oldy )
             
         elif event.type == gtk.gdk._2BUTTON_PRESS:
             if event.button == 1:

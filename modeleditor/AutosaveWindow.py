@@ -50,12 +50,12 @@ CANCEL_PRESSED = -1
 class AutosaveWindow:
        
 
-	# ==========================================================================
+        # ==========================================================================
         def __init__(self, aModelEditor, aDuration):
                
             
             self.theModelEditor = aModelEditor
-	    # Sets the return number
+            # Sets the return number
 
             self.___num = CANCEL_PRESSED
             self.__off = False
@@ -77,10 +77,10 @@ class AutosaveWindow:
             ok_button.connect("clicked",self.okButtonClicked)
 
             # appends cancel button
-	    cancel_button = gtk.Button(" Cancel ")
-	    self.win.action_area.pack_start(cancel_button,gtk.FALSE,gtk.FALSE)
-	    cancel_button.show()
-	    cancel_button.connect("clicked",self.cancelButtonClicked)
+            cancel_button = gtk.Button(" Cancel ")
+            self.win.action_area.pack_start(cancel_button,gtk.FALSE,gtk.FALSE)
+            cancel_button.show()
+            cancel_button.connect("clicked",self.cancelButtonClicked)
 
             # Sets title
             self.win.set_title('Preferences')
@@ -108,15 +108,20 @@ class AutosaveWindow:
                 self.ViewComponentObject['duration'].set_text(str(aDuration[0]))
                 self.ViewComponentObject['operations'].set_sensitive(gtk.FALSE)
                 self.ViewComponentObject['duration'].set_sensitive(gtk.TRUE)
-            else:
+            elif aDuration[1]>0:
                 self.ViewComponentObject['set_operations'].set_active(gtk.TRUE)
                 self.ViewComponentObject['operations'].set_text(str(aDuration[1]))
                 self.ViewComponentObject['operations'].set_sensitive(gtk.TRUE)
                 self.ViewComponentObject['duration'].set_sensitive(gtk.FALSE) 
+            else:
+                self.ViewComponentObject['turn_off'].set_active( gtk.TRUE)
+                self.ViewComponentObject['duration'].set_sensitive(gtk.FALSE)
+                self.ViewComponentObject['operations'].set_sensitive(gtk.FALSE)
+
         def cancelButtonClicked( self, *arg ):
-	    """
-	    If Cancel button clicked or the return pressed, this method is called.
-	    """
+            """
+            If Cancel button clicked or the return pressed, this method is called.
+            """
             # set the return number
             self.___num = None
             self.destroy()
@@ -177,8 +182,8 @@ class AutosaveWindow:
             
         
         def return_result( self ):
-	    """Returns result
-	    """
+            """Returns result
+            """
             return self.___num
 
         def __buttonChosen(self, *args):
@@ -202,7 +207,7 @@ class AutosaveWindow:
 
 
           
-		
+                
               
               
               

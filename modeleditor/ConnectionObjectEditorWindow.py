@@ -52,13 +52,13 @@ class ConnectionObjectEditorWindow:
         self.getTheObject(aLayoutName, anObjectId)
         self.theComponent = VariableReferenceEditorComponent( self, self.theTopFrame,self.theLayout,self.theObject)
         self.theComponent.setDisplayedVarRef(self.theLayout,self.theObject)
-        
 #        self.win.show_all()
         self.update()
+        self.bringToTop()
         
     def bringToTop( self ):
         self.theModelEditor.theMainWindow.setSmallWindow( self.theTopFrame )
-       
+        self.theComponent.bringToTop()
 
 
     #########################################
@@ -66,15 +66,18 @@ class ConnectionObjectEditorWindow:
     #########################################
 
     def setDisplayConnObjectEditorWindow(self,aLayoutName, anObjectId):
-        self.bringToTop()
         self.getTheObject( aLayoutName, anObjectId)
         self.theComponent.setDisplayedVarRef(self.theLayout,self.theObject)
         self.update()
-        
+        self.bringToTop()
+                
     def getTheObject(self,aLayoutName, anObjectId):
         self.theLayout =self.theModelEditor.theLayoutManager.getLayout(aLayoutName)
         self.theObjectId = anObjectId
-        self.theObject = self.theLayout.getObject(self.theObjectId)
+        if anObjectId != None:
+            self.theObject = self.theLayout.getObject(self.theObjectId)
+        else:
+            self.theObject = None
         
     def modifyConnObjectProperty(self,aPropertyName, aPropertyValue):
         aCommand = None

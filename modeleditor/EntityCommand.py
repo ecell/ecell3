@@ -26,6 +26,8 @@ class CreateEntity(ModelCommand):
         # CHECK IN DM WHETHER CLASSNAME EXISTS!!!
         if self.theModel.isEntityExist(self.__theID):
             return False
+        if not isFullIDEligible( self.__theID ):
+            return False
         return True
 
     
@@ -131,7 +133,9 @@ class RenameEntity(ModelCommand):
         
         self.__theOldID = self.theArgs[ self.OLDID ]
         self.__theNewID = self.theArgs[ self.NEWID ]
-        
+        if not isFullIDEligible( self.__theNewID ):
+            return False
+
         if not self.theModel.isEntityExist(self.__theOldID):
             return False
         if self.theModel.isEntityExist( self.__theNewID ):
@@ -513,6 +517,9 @@ class CreateEntityProperty(ModelCommand):
             return False
         
         self.__theFullPN = self.theArgs[ self.FULLPN ]
+        if not isFullIDEligible( self.__theFullPN ):
+            return False
+
         # check if full id exists
         if not self.theModel.isEntityExist( getFullID( self.__theFullPN ) ):
             return False
@@ -625,6 +632,9 @@ class RenameEntityProperty(ModelCommand):
         if not self.theModel.getEntityPropertyAttributes( self.__theOldFullPN )[ME_DELETEABLE_FLAG]:
             return False
         self.__theNewName = self.theArgs[ self.NEWNAME ]
+        if not isIDEligible( self.__theNewName ):
+            return False
+
         if self.__theNewName in self.theModel.getEntityPropertyList( self.__theID ):
             return False
         #CHECK WHETHER NEW PROPERTIES CAN BE ADDED!!!

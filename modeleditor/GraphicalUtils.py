@@ -124,58 +124,60 @@ class GraphicalUtils:
         return n.alltrue(bv)    
 
     def calcMaxShiftPos(self,r1,rn,dir,rpar):
-        rm=n.array([r1[0],r1[1],r1[2],r1[3]])
-        prevrm=n.array([r1[0],r1[1],r1[2],r1[3]])
-        rm=n.reshape(rm,(4,1))
-        prevrm=n.reshape(prevrm,(4,1))
+        #rm=n.array([r1[0],r1[1],r1[2],r1[3]])
+        #prevrm=n.array([r1[0],r1[1],r1[2],r1[3]])
+        rm=n.reshape(r1,(4,1))
+        #prevrm=n.reshape(r1,(4,1))
         rpar=n.reshape(rpar,(4,1))
-        ex,ey=self.getBigIterator(rm,rpar,dir)
-        
+        rxy=self.getBigIterator(rm,rpar,dir)
+        ex = max( abs(rxy[0]), abs(rxy[2]) )
+        ey = max( abs(rxy[1]), abs(rxy[3]) )
+        rxy = n.reshape( rxy, (4,1) )
         minint=0.0
         maxint=1.0
         m=0
-        stepx=0;stepy=0
+        stepx=1;stepy=1
         if ex!=0:
             stepx=(maxint/ex)
         if ey!=0:
             stepy=(maxint/ey)
-        if ex==0:
-            stepx=stepy
-        if ey==0:
-            stepy=stepx
+        #if ex==0:
+        #    stepx=stepy
+        #if ey==0:
+        #    stepy=stepx
         #form rxy
-        rxy=n.array([ex,ey])
-        rxy=n.reshape(rxy,(2,1))
-        rxy=n.dot(self.mapPos[dir],rxy)
+        #rxy=n.array([ex,ey])
+        #rxy=n.reshape(rxy,(2,1))
+        #rxy=n.dot(self.mapPos[dir],rxy)
         
         if rn==None:
             rm=rm+rxy
             rm=n.reshape(rm,(4,))
             return n.around(rm)
-    
-        while self.calcWithin(rpar,rm):
-            prevrm[0][0]=rm[0][0]
-            prevrm[1][0]=rm[1][0]
-            prevrm[2][0]=rm[2][0]
-            prevrm[3][0]=rm[3][0]
+        rmtemp = n.array( rm )
+        while (maxint-minint)>stepx or (maxint-minint)>stepy:
+            #prevrm[0][0]=rm[0][0]
+            #prevrm[1][0]=rm[1][0]
+            #prevrm[2][0]=rm[2][0]
+            #prevrm[3][0]=rm[3][0]
+            prevrm = n.array( rm )
             m=(minint+maxint)/2
-            cond = not self.calcOverlap(rm,rn)
-            rxy=rxy*m
+            rxytemp=rxy*m
+            rmtemp=rm+rxytemp
+
+            cond = not self.calcOverlap(rmtemp,rn)
+            
             if cond:
-                if maxint-minint>stepx and maxint-minint>stepy:
-                    minint=m
-                    rm=rm+rxy
-                else:
-                    break
+                minint=m
             else:
                 maxint=m
-                rm=rm-rxy
-            if not self.calcWithin(rpar,rm):
-                rm=prevrm
-            if maxint-minint<stepx and maxint-minint<stepy:
-                rm=prevrm
-                break
-        rm=n.reshape(rm,(4,))
+
+#            if not self.calcWithin(rpar,rm):
+#                rm=prevrm
+#            if maxint-minint<stepx and maxint-minint<stepy:
+#                rm=prevrm
+#                break
+        rm=n.reshape(rmtemp,(4,))
         return n.around(rm)
     
     def someGreater(self,amatrix):
@@ -202,41 +204,16 @@ class GraphicalUtils:
     def getBigIterator(self,r1,rpar,dir):
         x=r1[0][0];y=r1[1][0];x2=r1[2][0];y2=r1[3][0]
         px=rpar[0][0];py=rpar[1][0];px2=rpar[2][0];py2=rpar[3][0]
-        availx=0;availy=0;ex=0;exy=0;eyx=0;ey=0
-        ctotx=x2
-        ctoty=y2
-        if dir==DIRECTION_UP:
-            return 0,y
-        if dir==DIRECTION_DOWN:
-            return 0,py2-ctoty
-        if dir==DIRECTION_LEFT:
-            return x,0
-        if dir==DIRECTION_RIGHT:
-            return px2-ctotx,0
-        if dir==DIRECTION_BOTTOM_RIGHT:
-            ex=px2-ctotx
-            ey=py2-ctoty
-        elif dir==DIRECTION_BOTTOM_LEFT:
-            ex=x
-            ey=py2-ctoty
-        elif dir==DIRECTION_TOP_RIGHT:
-            ex=px2-ctotx
-            ey=y
-        elif dir==DIRECTION_TOP_LEFT:
-            ex=x
-            ey=y
-        
-        exy=(ex*y2)/x2
-        eyx=(ey*x2)/y2
-        
-        if exy<ey:
-            availx=ex
-            availy=exy
-        else:
-            availx=eyx
-            availy=ey
-        
-        return availx,availy
+        anArray = n.array( [0,0,0,0] )
+        if dir&DIRECTION_UP==DIRECTION_UP:
+            anArray[1] = -y + 1
+        if dir&DIRECTION_DOWN==DIRECTION_DOWN:
+            anArray[3] = py2 - y2 - 1
+        if dir&DIRECTION_LEFT==DIRECTION_LEFT:
+            anArray[0] = -x + 1
+        if dir&DIRECTION_RIGHT==DIRECTION_RIGHT:
+            anArray[2] = px2 - x2 - 1
+        return anArray
         
         
     def calcMaxShiftNeg(self,r1,rn,dir):

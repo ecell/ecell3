@@ -6,6 +6,12 @@ from ShapeDescriptor import *
 SHAPE_PLUGIN_TYPE='Variable' #Shape Plugin Constants
 SHAPE_PLUGIN_NAME='Default'
 
+def estLabelDims(graphUtils, aLabel):
+    (tx_height, tx_width) = graphUtils.getTextDimensions(aLabel )
+    return tx_width+46, tx_height + 9
+
+
+
 class VariableSD( ShapeDescriptor):
 
     def __init__( self, parentObject, graphUtils, aLabel ):
@@ -58,7 +64,7 @@ class VariableSD( ShapeDescriptor):
 
     def getRingSize( self ):
         return self.olw*2
-
+"""
 class TextSD( ShapeDescriptor ):
     def __init__( self, parentObject, graphUtils, aLabel ):
         ShapeDescriptor.__init__( self, parentObject, graphUtils, aLabel )
@@ -91,4 +97,4 @@ class TextSD( ShapeDescriptor ):
         return self.tx_height+ self.olw*3 
 
         
-
+"""

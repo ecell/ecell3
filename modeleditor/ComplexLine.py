@@ -84,8 +84,10 @@ class ComplexLine:
             aDescriptor = self.shapeDescriptorList[aKey]
             if aDescriptor[ SD_COLOR ] == SD_FILL:
                 aColor = self.graphUtils.getGdkColorByRGB( anRGB )
-                if aDescriptor[SD_TYPE] == CV_LINE:
+                if aDescriptor[SD_TYPE] in CV_LINE:
                     self.changeLineColor( aDescriptor[ SD_NAME ] , aColor )
+                elif aDescriptor[SD_TYPE] in CV_BPATH:
+                    self.changeLineColorB( aDescriptor[ SD_NAME ] , aColor )
 
     
     def createBpath(self, aDescriptor):
@@ -127,10 +129,12 @@ outline_color_gdk = aGdkColor)
 
     def changeLineColor ( self, shapeName, aColor ):
         aShape = self.shapeMap[  shapeName ] 
-        aclr = aShape.get_property('fill_color_gdk')
-        aShape.set_property('fill_color_gdk', aColor )
-        aclr = aShape.get_property('fill_color_gdk')
 
+        aShape.set_property('fill_color_gdk', aColor )
+        
+    def changeLineColorB ( self, shapeName, aColor ):
+        aShape = self.shapeMap[  shapeName ] 
+        aShape.set_property('outline_color_gdk', aColor )
 
     def createText( self, aDescriptor ):
         textSpec = aDescriptor[SD_SPECIFIC]

@@ -7,6 +7,11 @@ SHAPE_PLUGIN_TYPE='Variable' #Shape Plugin Constants
 SHAPE_PLUGIN_NAME='Ion'
 OB_SHOW_LABEL=1
 
+def estLabelDims(graphUtils, aLabel):
+    (tx_height, tx_width) = graphUtils.getTextDimensions(aLabel )
+    return tx_width+6, tx_height + 6
+
+
 class IonVariableSD( ShapeDescriptor):
 
     def __init__( self, parentObject, graphUtils, aLabel ):

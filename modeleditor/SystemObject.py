@@ -206,8 +206,8 @@ class SystemObject(EditorObject):
                 deltadown = aPropertyValue - oldy
                 self.resize( 0,deltadown,0,0 )
                 return
-            if aPropertyName == OB_LABEL:
-                return
+            #if aPropertyName == OB_LABEL:
+            #    return
         EditorObject.setProperty(self, aPropertyName, aPropertyValue)
             
     def estLabelWidth(self,newLabel):
@@ -250,8 +250,10 @@ class SystemObject(EditorObject):
 
             # check boundaries
             rn=self.createRnAddSystem()
-            x2=x+SYS_MINWIDTH
-            y2=y+SYS_MINHEIGHT
+            minreqx, minreqy = self.getMinDims( ME_SYSTEM_TYPE, aFullID )
+            x2=x+max( SYS_MINWIDTH, minreqx )
+            y2=y+max( SYS_MINHEIGHT, minreqy )
+
             availspace=self.getAvailSpace(x,y,x2,y2,rn)
             if availspace>0:
                 if (not self.isOverlap(x,y,x2,y2,rn) and self.isWithinParent(x,y,x2,y2,rpar)):
@@ -269,9 +271,9 @@ class SystemObject(EditorObject):
             aName = self.getModelEditor().getUniqueEntityName ( ME_PROCESS_TYPE, aSysPath )
             aFullID = ':'.join( [ME_PROCESS_TYPE, aSysPath, aName] )
             objectID = self.theLayout.getUniqueObjectID( OB_TYPE_PROCESS )
-        
-            x2=x+PRO_MINWIDTH
-            y2=y+PRO_MINHEIGHT
+            minreqx, minreqy = self.getMinDims( ME_PROCESS_TYPE, aFullID.split(":")[2] )
+            x2=x+max( PRO_MINWIDTH, minreqx )
+            y2=y+max( PRO_MINHEIGHT, minreqy )
             # check boundaries
             rn=self.createRnAddOthers()
             if (not self.isOverlap(x,y,x2,y2,rn) and self.isWithinParent(x,y,x2,y2,rpar)):
@@ -286,8 +288,9 @@ class SystemObject(EditorObject):
             aFullID = ':'.join( [ME_VARIABLE_TYPE, aSysPath, aName] )
             objectID = self.theLayout.getUniqueObjectID( OB_TYPE_VARIABLE)
             
-            x2=x+VAR_MINWIDTH
-            y2=y+VAR_MINHEIGHT
+            minreqx, minreqy = self.getMinDims( ME_VARIABLE_TYPE, aFullID.split(":")[2] )
+            x2=x+max( VAR_MINWIDTH, minreqx )
+            y2=y+max( VAR_MINHEIGHT, minreqy )
             # check boundaries
             rn=self.createRnAddOthers()
             if (not self.isOverlap(x,y,x2,y2,rn) and self.isWithinParent(x,y,x2,y2,rpar)):
@@ -407,7 +410,7 @@ class SystemObject(EditorObject):
         theParent=self.parentSystem
         direction = self.getDirection( absx, absy )
         
-        if not self.theShape.getIsButtonPressed() :
+        if not self.theShape.getIsButtonPressed() : # button released
             self.thedleftorg=self.thePropertyMap[OB_POS_X]-self.thex1org
             self.thedrightorg=self.thePropertyMap[OB_POS_X]+self.thePropertyMap[OB_DIMENSION_X]-self.thex2org
             self.theduporg=self.thePropertyMap[OB_POS_Y]-self.they1org

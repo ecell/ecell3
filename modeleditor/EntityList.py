@@ -61,7 +61,7 @@ class EntityList(ViewComponent):
 
     def __init__( self, aParentWindow, pointOfAttach, anEntityType ):
         self.theParentWindow = aParentWindow
-
+        self.userSelecting = False
         # call superclass
         ViewComponent.__init__( self,  pointOfAttach,\
          'attachment_box', 'ListComponent.glade' )
@@ -83,6 +83,7 @@ class EntityList(ViewComponent):
         self.theColumn = column
         self.theListSelection =  self['theTreeView'].get_selection()
         self.theListSelection.set_mode( gtk.SELECTION_MULTIPLE )
+        self.theListSelection.connect("changed", self.__cursor_changed )
         self['theTreeView'].set_headers_visible( gtk.FALSE )
         self.theModelEditor = self.theParentWindow.theModelEditor
         
@@ -96,8 +97,7 @@ class EntityList(ViewComponent):
         self.theSelectionTypeList = [ self.theType, ME_PROPERTY_TYPE ]
                 
         self['theTreeView'].connect('button-press-event' , self.__button_pressed )
-        self['theTreeView'].connect('cursor-changed' , self.__cursor_changed )
-        
+#        self['theTreeView'].connect('cursor-changed' , self.__cursor_changed )
         self.addHandlers ( {'on_Add_clicked' : self.__add_clicked,\
                             'on_Delete_clicked' : self.__delete_clicked
                             })                           
@@ -157,7 +157,7 @@ class EntityList(ViewComponent):
         """
                
         return self.theDisplayedSysID
-        #print theDisplayedSysID
+
 
     def setDisplayedSysID ( self, anID ):
         self.theDisplayedSysID = anID
@@ -168,6 +168,8 @@ class EntityList(ViewComponent):
         """
         just destroy and rebuild, reselet selection
         """
+        if self.userSelecting:
+            return
         # if changed system displayed clear liststore and rebuild list
         self.__buildList()
 
@@ -180,7 +182,7 @@ class EntityList(ViewComponent):
         """
         returns list of selected IDs
         """
-        
+        self.__getSelection()
         return copyValue( self.theSelection )
 
 
@@ -206,8 +208,6 @@ class EntityList(ViewComponent):
                 aNameList.append( aSelection.split(':')[2] )
 
             self.__selectRows( aNameList )
-        #print aNameList
-        #print self.theSelection
 
 
     def getADCPFlags( self, aType ):
@@ -223,12 +223,13 @@ class EntityList(ViewComponent):
     def restoreSelection( self ):
 
         # call changeselection with stored selection
+
         self.changeSelection( self.theSelection )
 
 
     def selectByUser( self ):
-
-        # get selected sysid       
+        self.userSelecting = True
+        # get selected sysid  
         aNameList = copyValue( self.__getSelection() )            
         aSelectionList = []
         
@@ -244,13 +245,16 @@ class EntityList(ViewComponent):
          
         # update parentwindow propertylist
         #self.theParentWindow = EntityListWindow instance
-        self.theParentWindow.update()        
-        
+        self.theParentWindow.update() 
+        self.userSelecting = False
+
+                
     def generateLayout(self):
       
         layoutName = self.theModelEditor.theLayoutManager.getUniqueLayoutName()
-        
-        self.theAutoLayout = AutoLayout(self.theModelEditor,layoutName,self.theSelection)
+        self.theModelEditor.theMainWindow.displayHourglass()
+        self.theAutoLayout = AutoLayout(self.theModelEditor,layoutName,self.theSelection, True)
+        self.theModelEditor.theMainWindow.resetCursor()
         
 
     def copy( self ):
@@ -359,7 +363,9 @@ class EntityList(ViewComponent):
         newID = ':'.join( newTuple )
 
         aCommand = RenameEntity( self.theModelEditor, oldID, newID )
-        if aCommand.isExecutable():
+        if not isIDEligible( newName ):
+            self.theModelEditor.printMessage( "Only alphanumeric characters and _ are allowed in entity names!", ME_ERROR )
+        elif aCommand.isExecutable():
 
             self.theModelEditor.doCommandList( [ aCommand ] )
             self.theSelection = [ newID ]
@@ -398,7 +404,7 @@ class EntityList(ViewComponent):
 
     def __button_pressed( self, *args ):
         # when any button is pressed on list
-        #print "button pressed"
+
         self.theParentWindow.setLastActiveComponent( self )
         self.theModelEditor.setLastUsedComponent( self )
 
@@ -418,6 +424,7 @@ class EntityList(ViewComponent):
         self.selectByUser()
 
 
+
     def __add_clicked( self, *args ):
         self.add_new()
 
@@ -435,16 +442,16 @@ class EntityList(ViewComponent):
         """
         clear and build list
         """
-        
+        self.noActivate = True
         self.theListSelection.unselect_all()
         self.theListStore.clear()
         aNameList = []
         if self.theDisplayedSysID != None:
             aNameList = self.theModelEditor.getModel().getEntityList ( self.theType, convertSysIDToSysPath( self.theDisplayedSysID ) )
-          #  print'\n buildList',aNameList  
+
 
         self.__addRows( aNameList )
-        
+        self.noActivate = False
 
     
     def __addRows( self, aNameList ):

@@ -91,6 +91,9 @@ class RenameStepper(ModelCommand):
             return False
         self.__theOldID = self.theArgs[ self.OLDID ]
         self.__theNewID = self.theArgs[ self.NEWID ]
+        if not isIDEligible( self.__theNewID ):
+            return False
+
         stepperList = self.theModel.getStepperList()
         if self.__theOldID not in stepperList:
             return False
@@ -401,6 +404,9 @@ class CreateStepperProperty(ModelCommand):
         if self.__theID not in self.theModel.getStepperList():
             return False
         self.__thePropertyName = self.theArgs[ self.PROPERTYNAME ]
+        if not isIDEligible( self.__thePropertyName ):
+            return False
+
         if self.__thePropertyName in self.theModel.getStepperPropertyList( self.__theID ):
             return False
         # check if type is same 
@@ -496,6 +502,9 @@ class RenameStepperProperty(ModelCommand):
         if not self.theModel.getStepperPropertyAttributes(self.__theID, self.__theOldName )[ME_DELETEABLE_FLAG]:
             return False
         self.__theNewName = self.theArgs[ self.NEWNAME ]
+        if not isIDEligible( self.__theNewName ):
+            return False
+
         if self.__theNewName in self.theModel.getStepperPropertyList( self.__theID ):
             return False
         #CHECK WHETHER NEW PROPERTIES CAN BE ADDED!!!

@@ -107,10 +107,12 @@ class SystemTree(ViewComponent):
     def generateLayout(self):
         #print self.theSelection
 
-        #self.theAutoLayout = AutoLayout()
+
         layoutName = self.theModelEditor.theLayoutManager.getUniqueLayoutName()
         #print layoutName
+        self.theModelEditor.theMainWindow.displayHourglass()
         self.theAutoLayout = AutoLayout(self.theModelEditor,layoutName,self.theSelection)
+        self.theModelEditor.theMainWindow.resetCursor()
 
 
     def getPasteableTypes( self ):
@@ -333,6 +335,10 @@ class SystemTree(ViewComponent):
         oldName = self.theSysTreeStore.get_value( anIter, 0 )
         if oldName == newName:
             return
+        if not isIDEligible( newName ):
+            self.theModelEditor.printMessage( "Only alphanumeric characters and _ are allowed in system ids", ME_ERROR )
+            self.theSysTreeStore.set_value( anIter, 0, oldName )
+            return
         #oldTuple = [ ME_SYSTEM_TYPE, convertSysIDToSysPath( self.theDisplayedSysID ), oldName ]
         #oldID = ':'.join( oldTuple )
         oldID = self.__getSysID( anIter )
@@ -346,7 +352,7 @@ class SystemTree(ViewComponent):
             self.theSelection = [ newID ]
             self.theModelEditor.doCommandList( [ aCommand ] )
         else:
-            self.theSysTreeStore.set_value( anIter, 0, oldTuple[2] )
+            self.theSysTreeStore.set_value( anIter, 0, oldName )
 
 
 
