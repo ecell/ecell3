@@ -86,9 +86,29 @@ class Session:
         self.theSimulator.initialize()
 
         
-    def saveModel( self ):
-        pass
+    def saveModel( self , aModel ):
+        
+        anEml = eml.Eml()
+        self.anEml = anEml
+        self.anEml.createEntity('System', 'System::/')
+        
+        self.__saveEntity()
 
+        self.__saveStepper()
+
+        self.__saveProperty()
+
+
+        if type( aModel ) == str:
+            aString = self.anEml.asString()
+            aFileObject = open( aModel, 'w' )
+            aFileObject.write( aString )
+            aFileObject.close()
+
+        else:
+            aModel = self.anEml
+            return aModel
+        
     def setMessageMethod( self, aMethod ):
         self.theMessageMethod = aMethod
 
@@ -262,7 +282,6 @@ class Session:
     def __plainMessageMethod( self, aMessage ):
         print aMessage
 
-
     def __loadStepper( self, anEml ):
         """stepper loader"""
 
@@ -360,6 +379,148 @@ class Session:
         aContext.update( parameters )
 
         return aContext
+
+    def __saveStepper( self ):
+        """stepper loader"""
+
+        aStepperList = self.theSimulator.getStepperList()
+
+        for aStepper in aStepperList:
+
+            aClassName = self.theSimulator.getStepperClassName( aStepper )
+            self.anEml.createStepper( str( aClassName ),\
+                                             str( aStepper ) )
+
+            aPropertyList = self.theSimulator.getStepperPropertyList( aStepper )
+
+            for aProperty in aPropertyList:
+                
+                aValue = self.theSimulator.getStepperProperty( aStepper, aProperty )
+                anAttribute = self.theSimulator.getStepperPropertyAttributes( aStepper, aProperty)
+
+                if anAttribute[0] == 0:
+                    pass
+                
+                elif aValue == '':
+                    pass
+                
+                else:
+                    aValueList = list()
+                    if type( aValue ) != tuple:
+                        aValueList.append( str(aValue) )
+                    else:
+                        aValueList = aValue
+
+                    self.anEml.setStepperProperty( aStepper,\
+                                                      aProperty,\
+                                                      aValueList )
+    
+    def __saveEntity( self, aSystemPath='/' ):
+
+        aVariableList = self.getEntityList(  2, aSystemPath )
+        aProcessList   = self.getEntityList( 3, aSystemPath )
+        aSubSystemList = self.getEntityList( 4, aSystemPath )
+        
+        self.__saveEntityList( 'System',   aSystemPath, aSubSystemList )
+        self.__saveEntityList( 'Variable', aSystemPath, aVariableList )
+        self.__saveEntityList( 'Process',  aSystemPath, aProcessList )
+
+        for aSystem in aSubSystemList:
+            aSubSystemPath = joinSystemPath( aSystemPath, aSystem )
+            self.__saveEntity( aSubSystemPath )
+            
+    def __saveEntityList( self, anEntityTypeString,\
+                          aSystemPath, anIDList ):
+
+       for anID in anIDList:
+           
+            aFullID = anEntityTypeString + ':' + aSystemPath + ':' + anID
+            aClassName = self.theSimulator.getEntityClassName( aFullID )
+
+            if aClassName == 'System::/':
+                pass
+            else:
+                self.anEml.createEntity( aClassName, aFullID )
+            
+    def __saveProperty( self, aSystemPath='' ):
+        # the default of aSystemPath is empty because
+        # unlike __loadEntity() this starts with the root system
+
+        aVariableList  = self.theSimulator.getEntityList( 2,  aSystemPath )
+        aProcessList   = self.theSimulator.getEntityList( 3,  aSystemPath )
+        aSubSystemList = self.theSimulator.getEntityList( 4,  aSystemPath )
+
+        self.__savePropertyList( 'Variable',\
+                                 aSystemPath, aVariableList )
+        self.__savePropertyList( 'Process',  aSystemPath, aProcessList )
+        self.__savePropertyList( 'System',\
+                                 aSystemPath, aSubSystemList )
+
+        for aSystem in aSubSystemList:
+            aSubSystemPath = joinSystemPath( aSystemPath, aSystem )
+            self.__saveProperty( aSubSystemPath )
+
+    def __savePropertyList( self, anEntityTypeString,\
+                            aSystemPath, anIDList ):
+
+        for anID in anIDList:
+
+            aFullID = anEntityTypeString + ':' + aSystemPath + ':' + anID
+            aPropertyList = self.theSimulator.getEntityPropertyList( aFullID )
+
+            for aProperty in aPropertyList:
+                aFullPN = aFullID + ':' + aProperty
+                
+                aValue = self.theSimulator.getEntityProperty(aFullPN)
+                anAttribute = self.theSimulator.getEntityPropertyAttributes(aFullPN)
+
+                #anExclusionList = ('Concentration',
+                #                   'Fixed',
+                #                   'FullID',
+                #                   'Name',
+                #                   'TotalVelocity',
+                #                   'Velocity',
+                #                   'Activity',
+                #                   'Priority',
+                #                   )
+                
+                if anAttribute[0] == 0:
+                    pass
+                
+                #elif aProperty in anExclusionList:
+                #    pass
+                
+                elif aValue == '':
+                    pass
+                
+                else:
+                    
+                    aValueList = list()
+                    if type( aValue ) != tuple:
+                        aValueList.append( str(aValue) )
+                    else:
+                        # ValueList convert into string for eml
+                        aValueList = self.__convertPropertyValueList( aValue )
+                        #aValueList = aValue
+                        
+                    self.anEml.setEntityProperty( aFullID, aProperty, aValueList )
+                    
+    def __convertPropertyValueList( self, aValueList ):
+        
+        aList = list()
+
+        for aValueListNode in aValueList:
+
+            if type( aValueListNode ) == tuple:
+
+                if type( aValueListNode[0] ) == tuple:
+                    aConvertedList = self.__convertPropertyValueList( aValueListNode )
+                else:
+                    aConvertedList = map(str, aValueListNode)
+
+                aList.append( aConvertedList )
+
+        return aList
 
     class _session_prompt:
         def __init__( self, aSession ):
