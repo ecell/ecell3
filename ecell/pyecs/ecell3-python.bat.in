@@ -3,16 +3,16 @@ set PACKAGE=@PACKAGE@
 set VERSION=@VERSION@
 if "x%prefix%"=="x" set paths=%PATH%
 if "x%prefix%"=="x" set prefix=%cd%
-if "x%pathsaved%"=="x" set PATH=%prefix%;%prefix%\bin;%prefix%\python22;%prefix%\lib;%PATH%
+if "x%pathsaved%"=="x" set PATH=%prefix%;%prefix%\bin;%prefix%\Python@PYTHON_WIN_VERSION@;%prefix%\lib;%PATH%
 
 set ECELL3_PREFIX=%prefix%
 set exec_prefix=%ECELL3_PREFIX%
 set OSOGOPATH=%exec_prefix%\lib\osogo
 set VVECTORTMPDIR=%TMP%
-set pythondir=%prefix%\python22\lib\site-packages
+set pythondir=%prefix%\Python@PYTHON_WIN_VERSION@\lib\site-packages
 if "x%LD_LIBRARY_PATH%"=="x" set LD_LIBRARY_PATH=%exec_prefix%\lib;%exec_prefix%\lib\osogo;%LD_LIBRARY_PATH%
 if "x%PYTHONPATH%"=="x" set PYTHONPATH=%pythondir%;%OSOGOPATH%;%PYTHONPATH%
-set PYTHON_INCLUDES="-I%prefix%\python22\include"
+set PYTHON_INCLUDES="-I%prefix%\Python@PYTHON_WIN_VERSION@\include"
 set LTDL_LIBRARY_PATH=%prefix%\lib\ecell\%VERSION%
 if "x%1"=="x" (
 	python

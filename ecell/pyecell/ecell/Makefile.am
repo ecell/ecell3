@@ -2,7 +2,7 @@ AUTOMAKE_OPTIONS = foreign
 
 if OS_WIN32
   no_undefined = -no-undefined
-  LIBPYTHON = -lpython22
+  LIBPYTHON = -lpython@PYTHON_WIN_VERSION@
 endif
 
 CXX_FLAGS=@CXX_FLAGS@

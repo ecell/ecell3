@@ -10,7 +10,7 @@ pkgpythondir=@pkgpythondir@
 
 if OS_WIN32
   no_undefined = -no-undefined
-  LIBPYTHON = -lpython23
+  LIBPYTHON = -lpython@PYTHON_WIN_VERSION@
   ECELL3_PYTHON_EXT = .bat
 else
   ECELL3_PYTHON_EXT =

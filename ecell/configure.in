@@ -63,11 +63,11 @@ dnl
 dnl compatibility for libtool 1.5.x
 LTDL_SHLIB_EXT=""
 if test -n "$shrext_cmds"; then
-  LTDL_SHLIB_EXT=$shrext_cmds
-  AC_SUBST(LTDL_SHLIB_EXT)
+    LTDL_SHLIB_EXT=$shrext_cmds
+    AC_SUBST(LTDL_SHLIB_EXT)
 elif test -n "$shrext"; then
-  LTDL_SHLIB_EXT=$shrext
-  AC_SUBST(LTDL_SHLIB_EXT)
+    LTDL_SHLIB_EXT=$shrext
+    AC_SUBST(LTDL_SHLIB_EXT)
 dnl compatibility for libtool 1.4.x
 else
   AC_CACHE_CHECK([which extension is used for shared libraries],
@@ -94,6 +94,8 @@ fi
 
 AM_PATH_PYTHON(2.2)
 AC_SUBST(PYTHON)
+PYTHON_WIN_VERSION=${am_cv_python_version/'.'}
+AC_SUBST(PYTHON_WIN_VERSION)
 
 AC_LANG([C++])
 
@@ -186,20 +188,18 @@ EXT_GUESS="$BOOST_ROOT_DIR $EXT_GUESS "
 AC_MSG_CHECKING( for boost include dir );
 BOOST_INCLUDE=""	
 for ac_dir in $EXT_GUESS ; do
-	if test -f $ac_dir/include/boost/python.hpp ; then
-		BOOST_INCLUDE=`(cd $ac_dir/include ; pwd)`
-	else
-		if test -f $ac_dir/include/boost*/boost/python.hpp ; then
-			BOOST_INCLUDE=`(cd $ac_dir/include/boost* ; pwd)` 
-		fi
-	fi
+    if test -f $ac_dir/include/boost/python.hpp ; then
+        BOOST_INCLUDE=`(cd $ac_dir/include ; pwd)`
+    elif test -f $ac_dir/include/boost*/boost/python.hpp ; then
+        BOOST_INCLUDE=`(cd $ac_dir/include/boost* ; pwd)`
+    fi
 done
 if test "$BOOST_INCLUDE" = "" ; then
-	AC_MSG_ERROR(boost includes not found);
+    AC_MSG_ERROR(boost includes not found);
 else
-	BOOST_INCLUDE="-I$BOOST_INCLUDE"
-	BOOST_PYTHON_LIB="-lboost_python"
-	BOOST_LIB="-L$ac_dir/lib"
+    BOOST_INCLUDE="-I$BOOST_INCLUDE"
+    BOOST_PYTHON_LIB="-lboost_python"
+    BOOST_LIB="-L$ac_dir/lib"
 fi
 AC_MSG_RESULT($BOOST_INCLUDE)
 AC_SUBST(BOOST_INCLUDE)
