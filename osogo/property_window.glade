@@ -15,6 +15,8 @@
 <widget>
   <class>GtkWindow</class>
   <name>window1</name>
+  <width>200</width>
+  <height>150</height>
   <title>window1</title>
   <type>GTK_WINDOW_TOPLEVEL</type>
   <position>GTK_WIN_POS_NONE</position>
@@ -108,6 +110,23 @@
 	  </widget>
 	</widget>
       </widget>
+    </widget>
+
+    <widget>
+      <class>GtkButton</class>
+      <name>button1</name>
+      <can_focus>True</can_focus>
+      <signal>
+	<name>clicked</name>
+	<handler>gtk_main_quit</handler>
+	<last_modification_time>Fri, 10 Aug 2001 07:39:51 GMT</last_modification_time>
+      </signal>
+      <stock_button>GNOME_STOCK_BUTTON_CLOSE</stock_button>
+      <child>
+	<padding>0</padding>
+	<expand>False</expand>
+	<fill>False</fill>
+      </child>
     </widget>
   </widget>
 </widget>

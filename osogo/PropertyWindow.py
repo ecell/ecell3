@@ -37,22 +37,39 @@ class MainWindow(Window):
 
         self.addHandlers( self.theHandlerMap)
          
-        self.theProperty_List = self.getWidget( "clist1" )
-        self.theProperty_Name= self.getWidget( "label3" )
+        self.thePropertyClist = self.getWidget( "clist1" )
+        self.thePropertyName= self.getWidget( "label3" )
 
 
-#    def setName( self ):
-#        MainWindow.theProperty_entity.set_text('EntytyName')
-#    setName( self )
+        #    def setName( self ):
+        #        MainWindow.thePropertyEntity.set_text('EntytyName')
+        #    setName( self )
        
     def update( self ):
-        aPropertyList = tmpget( 'PropertyList' )
+        aPropertyList = list( tmpget( 'PropertyList' ) )
+
+        # remove keyword
+        aPropertyList = aPropertyList[1:] 
+        # remove PropertyList itself
+        aPropertyList.remove( 'PropertyList' )
+
+        thePropertyClist.clear()
+
         for x in aPropertyList:
             aValueList = tmpget( x )
-            aName = aValueList[0]
-            aValueList = aValueList[1:]
-#            self.theProperty_List.append( aValueList )
+            #            aName = aValueList[0]
+            #            aValueList = aValueList[1:]
+            aValueList = map( toString, aValueList )
+
+
+            self.thePropertyClist.append( aValueList )
             print aValueList
+
+
+def toString( object ):
+    return str( object )
+    
+    
 
 def mainQuit( obj, data ):
     print obj,data
@@ -69,7 +86,7 @@ def main():
     mainLoop()
     
 testdic={ 'PropertyList': ('PropertyList', 'A','B','C'),
-          'A': ('aaa',) ,'B': (1.04E-3,) ,'C': (41,) }
+          'A': ('aaa', 234) ,'B': (1.04E-3,33) ,'C': (41,'bb','aa',90) }
 
 def tmpget( name ):
     aList = list(testdic[name])
