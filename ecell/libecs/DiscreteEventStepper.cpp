@@ -83,7 +83,7 @@ namespace libecs
 	THROW_EXCEPTION( InitializationFailed,
 			 getClassNameString() + 
 			 ": at least one DiscreteEventProcess "
-			 "must be defined." )
+			 "must be defined in this Stepper." );
       }
 
     // (1) check Process dependency
