@@ -99,7 +99,7 @@ def main():
 	    pyFile = anArg
 	    
     # check if input file is given
-    if not sys.argv[1]:
+    if len( args ) < 1:
 	help()
 	msg( "Error: not enough arguments" )
 	sys.exit(1)
@@ -120,8 +120,8 @@ def main():
     pyFile = normpath(pyFile)
     dmFile = normpath(dmFile)
     
-    cmdstr = 'python ' + EMPYBIN + ' ' + EMPYOPTIONS + ' -F ' + pyFile + \
-	    ' -F ' + dmFile + ' -o ' + outFile + ' ' + emFile
+    cmdstr = 'python \"' + EMPYBIN + '\" ' + EMPYOPTIONS + ' -F \"' + pyFile + \
+	    '\" -F \"' + dmFile + '\" -o \"' + outFile + '\" \"' + emFile + '\"'
     if execute( cmdstr ):
 	msg ( "Error: failed to create " + outFile )
 	sys.exit(1)
@@ -130,5 +130,4 @@ def main():
     
 if __name__ == '__main__':
     main()
-
 

@@ -21,10 +21,26 @@
 import sys
 import string
 import time
+import glob
 
 ##########open files
 
-anInputfilename = sys.argv[1] # assign the name of the rd file to anInputfilename
+if len( sys.argv ) < 2:
+	print "Error: please provide an input file ($ rd2dm inputfile)"
+	sys.exit(1)
+
+# Error if there are too many arguments(rd2dm.py, inputfile)
+if len( sys.argv ) != 2: 
+	print "Error: Too many arguments ($ rd2dm inputfile)"
+	sys.exit( 0 )	
+
+if len( glob.glob ( sys.argv[1].replace( '\"', '' ) ) ) < 1:
+	print "Error: source file "+ sys.argv[1] + " was not found."
+	sys.exit(1)
+else:
+	# assign the name of the rd file to anInputfilename
+	anInputfilename = sys.argv[1]
+
 anInputfile = open( anInputfilename, 'r' )
 
 #anOutputfilename = string.replace(anInputfilename, 'Reactor', 'Process') #'classname'.dm?
@@ -33,9 +49,7 @@ anInputfile = open( anInputfilename, 'r' )
 
 aText = anInputfile.read() # assign aText with the contents of the rd file
 
-if len( sys.argv ) != 2: # Error if there are too many arguments(rd2dm.py, inputfile)
-	print "ArgumentError: Too many arguments (% rd2dm.py inputfile)"
-	sys.exit( 0 )
+
 
 
 aTextList = string.split( aText,'\n' ) # Split aText into lines and assign each line into an element of aTextList
