@@ -77,10 +77,10 @@ if __name__ == "__main__":
         'System:/CELL/CYTOPLASM:MT0:activity' )
     print fullproperty
 
-    fullidstring = constructFullID( fullid )
+    fullidstring = constructFullIDString( fullid )
     print fullidstring
 
-    fullpropertystring = constructFullPropertyName( fullproperty )
+    fullpropertystring = constructFullPropertyNameString( fullproperty )
     print fullpropertystring
 
     print convertToFullPropertyName( fullid )
