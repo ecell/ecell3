@@ -333,7 +333,7 @@ void FluxDistributionProcess::process()
 	}	
     }
 
-  for( Int i( 0 ); i < theUnknownProcessPtrList.size(); ++i )
+  for( Int i( 0 ); i < theUnknownProcessPtrVector.size(); ++i )
     {
       theUnknownProcessPtrVector[i]->setFlux( gsl_vector_get( theSolutionVector, i ) ) ;
     }
