@@ -34,7 +34,7 @@
 #include "libemc/Simulator.hpp"
 #include "libecs/Exceptions.hpp"
 
-#include "libecs/FluxProcess.hpp"
+#include "libecs/Process.hpp"
 #include "libecs/VariableReference.hpp"
 
 #include "PyEcs.hpp"
@@ -156,7 +156,7 @@ BOOST_PYTHON_MODULE( _ecs )
 	  python::return_value_policy<python::reference_existing_object>() )
     ;
 
-  class_<FluxProcess, bases<>, FluxProcess, boost::noncopyable>
+  class_<Process, bases<>, Process, boost::noncopyable>
     ( "Process", no_init )
 
     // properties
@@ -173,12 +173,11 @@ BOOST_PYTHON_MODULE( _ecs )
     .def( "getSuperSystem",   // this should be a property, but not supported
 	  &Process::getSuperSystem,
 	  python::return_value_policy<python::reference_existing_object>() )
-    .def( "setFlux",     &FluxProcess::setFlux )
+    .def( "setFlux",     &Process::setFlux )
     ;
 
 
-  class_<System, bases<>, System, boost::noncopyable>
-    ( "System", no_init )
+  class_<System, bases<>, System, boost::noncopyable>( "System", no_init )
 
     // properties
     .add_property( "Size",
