@@ -52,8 +52,7 @@ Entity::~Entity()
 
 void Entity::makeSlots()
 {
-  MessageSlot( "id",Entity,*this,NULL,
-	       &Entity::getId );
+  MessageSlot( "id", Entity, *this, NULL, &Entity::getId );
 }
 
 const Message Entity::getId( StringCref keyword )

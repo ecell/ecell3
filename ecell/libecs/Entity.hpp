@@ -39,6 +39,7 @@
    Entity is-a MessageInterface. 
 
 */
+
 class Entity : public MessageInterface
 {
 
@@ -109,12 +110,12 @@ public:
   const String getSystemPath() const;
 
   /**
-    @return FQID (Fully Qualified ?????) of this Entity.
+    @return FQID (Fully Qualified ID) of this Entity.
    */
   const String getFqid() const;
 
   /**
-    @return FQPI (Fully Qualified ?????) of this Entity.
+    @return FQPI (Fully Qualified Primitive ID) of this Entity.
    */
   const String getFqpi() const;
 
@@ -146,8 +147,8 @@ protected:
 private:
 
   // hide them
-  Entity( Entity& ) {}
-  Entity& operator=( Entity& ) {}
+  Entity( EntityRef ) {}
+  EntityRef operator=( EntityRef ) {}
 
 private:
 
