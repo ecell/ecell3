@@ -41,6 +41,8 @@ namespace libecs
    * This is the libecs module 
    * @{ 
    */ 
+
+  DECLARE_CLASS( SRMSubstance );
   
   DECLARE_CLASS( SimpleAccumulator );
   DECLARE_CLASS( RoundDownAccumulator );
