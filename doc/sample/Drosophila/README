@@ -16,8 +16,6 @@ Proc R Soc Lond B Biol Sci, Vol.261:319-324, Sep 1995.
 
 README:      This file
 Drosophila.em:  Model file(em file) for this model
-*.cpp:        Process files(dm files) for this model
-
 
 === Running this model ===
 
@@ -27,19 +25,6 @@ Drosophila.em:  Model file(em file) for this model
    % ls Drosophila.eml
    Drosophila.eml
 
-
-2. Compile .cpp files.
-
-   Run emtool -a for each .cpp file.
-
-   % ecell3-dmc ...cpp
-
-   Or, to do this job at once,
-
-   (at bash prompt,)
-   % for i in *.cpp ; do ecell3-dmc $i ; done
-   
-
-3. Run gecell, File->loadModel and load the Drosophila.eml file.
+2. Run gecell, File->loadModel and load the Drosophila.eml file.
 
 
