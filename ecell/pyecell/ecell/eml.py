@@ -116,7 +116,7 @@ class Eml:
     ## Methods for Entity
     ##---------------------------------------------
 
-    def createEntity( self, anEntityType, anId, aName, aClass = 'unknown' ):
+    def createEntity( self, anEntityType, aClass, anId, aName ):
         """create an entity: system, substance and reactor"""
 
 
@@ -126,8 +126,8 @@ class Eml:
             ## I want to stop this process here!!!
 
         anEntityElement = self.createElement( string.lower( anEntityType ) )
+        anEntityElement.setAttribute( 'class', aClass )
         anEntityElement.setAttribute( 'name', aName )
-
 
         if( anEntityType == 'System' ):
             anEntityElement.setAttribute( 'id', anId )
@@ -135,9 +135,6 @@ class Eml:
 
         else:
             anEntityElement.setAttribute( 'id', anId.split( ':' )[2] )
-            
-            if( anEntityType == 'Reactor' ):
-                anEntityElement.setAttribute( 'class', aClass )
 
             aTargetFullPath = anId.split( ':' )[1]
             
@@ -351,10 +348,9 @@ class Eml:
     def getEntityList( self ):
 
         aSystemEntityList    = self.getSystemEntityList()
-        aSubstanceEntityList = self.getSubstanceEntityList()
-        aReactorEntityList   = self.getReactorEntityList()
-
-        anEntityList = aSystemEntityList + aSubstanceEntityList + aReactorEntityList
+        aSubstanceOrReactorEntityList = self.getSubstanceOrReactorEntityList()
+        #aReactorEntityList   = self.getReactorEntityList()
+        anEntityList = aSystemEntityList + aSubstanceOrReactorEntityList
 
         return anEntityList
 
@@ -466,7 +462,7 @@ class Eml:
         for aSystemElement in self.__theDocument.getElementsByTagName( 'system' ):
             aSystem = {}
 
-            aSystem[ 'Type' ]   = 'System'
+            aSystem[ 'Type' ]   = str( aSystemElement.getAttribute( 'class' ) )
             aSystem[ 'FullId' ] = str( aSystem[ 'Type' ] + ':' \
                                        + self.asPathToSystem( aSystemElement.getAttribute( 'id' ) ) )
             aSystem[ 'Name' ]   = str( aSystemElement.getAttribute( 'name' ) )
@@ -478,50 +474,51 @@ class Eml:
 
 
 
-    def getSubstanceEntityList( self ):
+    def getSubstanceOrReactorEntityList( self ):
 
-        aSubstanceEntityList = []
+        anEntityEntityList = []
         for aSystemElement in self.__theDocument.getElementsByTagName( 'system' ):
 
             aSystemPath = self.asSystemPath( aSystemElement )
 
             for aChildElement in aSystemElement.childNodes:
 
-                if aChildElement.tagName == 'substance':
+                if aChildElement.tagName == 'substance' or \
+                   aChildElement.tagName == 'reactor':
 
-                    aSubstance = {}                    
-                    aSubstance[ 'Type' ] = 'Substance'
-                    aSubstance[ 'FullId' ] = str( 'Substance' + ':' + \
+                    anEntity = {}                    
+                    anEntity[ 'Type' ] = str( aChildElement.getAttribute( 'class' ) )
+                    anEntity[ 'FullId' ] = str( 'Substance' + ':' + \
                                                   aSystemPath + ':' + \
                                                   aChildElement.getAttribute( 'id' ) )
-                    aSubstance[ 'Name' ]   = str( aChildElement.getAttribute( 'name' ) )
+                    anEntity[ 'Name' ]   = str( aChildElement.getAttribute( 'name' ) )
                     
-                    aSubstanceEntityList.append( aSubstance )    
-        return aSubstanceEntityList
+                    anEntityEntityList.append( anEntity )    
+        return anEntityEntityList
 
 
 
 
-    def getReactorEntityList( self ):
-
-        aReactorEntityList = []
-        for aSystemElement in self.__theDocument.getElementsByTagName( 'system' ):
-
-            aSystemPath = self.asSystemPath( aSystemElement )
-
-            for aChildElement in aSystemElement.childNodes:
-
-                if aChildElement.tagName == 'reactor':
-
-                    aReactor = {}
-                    aReactor[ 'Type' ]   = str( aChildElement.getAttribute( 'class' ) )
-                    aReactor[ 'FullId' ] = str( 'Reactor' + ':' + \
-                                                aSystemPath + ':' + \
-                                                aChildElement.getAttribute( 'id' ) )
-                    aReactor[ 'Name' ]   = str( aChildElement.getAttribute( 'name' ) )
-
-                    aReactorEntityList.append( aReactor )
-        return aReactorEntityList
+#    def getReactorEntityList( self ):
+#
+#        anEntityEntityList = []
+#        for aSystemElement in self.__theDocument.getElementsByTagName( 'system' ):
+#
+#            aSystemPath = self.asSystemPath( aSystemElement )
+#
+#            for aChildElement in aSystemElement.childNodes:
+#
+#                if aChildElement.tagName == 'reactor':
+#
+#                    anEntity = {}
+#                    anEntity[ 'Type' ]   = str( aChildElement.getAttribute( 'class' ) )
+#                    anEntity[ 'FullId' ] = str( 'Reactor' + ':' + \
+#                                               aSystemPath + ':' + \
+#                                                aChildElement.getAttribute( 'id' ) )
+#                    anEntity[ 'Name' ]   = str( aChildElement.getAttribute( 'name' ) )
+#
+#                    anEntityEntityList.append( anEntity )
+#        return anEntityEntityList
 
 
 
