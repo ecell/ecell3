@@ -476,7 +476,7 @@ System CompartmentSystem( / )
       special name of a &Variable;.  It determines the size of the
       compartment.  If the compartment is three-dimensional, it means
       the volume in [L] (liter).  That value is used to calculate
-      concentrations of other &Variables;.  These &Entity; objects
+      concentrations of other &Variable;s.  These &Entity; objects
       have their property values of several different types.  For
       example, 'StepperID' of the root system is a string without
       quotes (ODE_1). The initial value given to 'Value' property of
