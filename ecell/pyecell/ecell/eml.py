@@ -37,9 +37,11 @@ class Eml:
         else:
             aStringData = string.join( string.join( aFileObject.readlines(), '' ).split( '\n' ), '' )
 
+
+        # minidom.parseString() is much faster than minidom.parse().. why?
         self.__theDocument = minidom.parseString( aStringData )
 
-        self.__clearCache()
+        self.__reconstructCache()
 
 
     def asString( self ):
@@ -98,8 +100,6 @@ class Eml:
             aStepperList.append( str( aStepperID ) )
 
         return aStepperList
-
-
 
 
     def getStepperPropertyList( self, aStepperID ):
@@ -193,7 +193,7 @@ class Eml:
 
     def createEntity( self, aClass, aFullID ):
 
-        anEntityType = self.asEntityInfo( aFullID )[ 'Type' ]
+        anEntityType = aFullID.split( ':', 1 )[ 0 ]
         anEntityElement = self.__createElement( string.lower( anEntityType ) )
         anEntityElement.setAttribute( 'class', aClass )
 
@@ -226,9 +226,9 @@ class Eml:
     def deleteEntity( self, aFullID ):
         """delete an entity"""
 
-        aTargetEntity = asEntityInfo( aFullID )
+        aType = aFullID.split( ':', 1 )[0]
 
-        if aTargetEntity[ 'Type' ] == 'System':
+        if aType == 'System':
             for anElement in self.__theDocument.firstChild.childNodes:
 
                 if self.convertSystemID2SystemFullID( anElement.getAttribute( 'id' ) ) == aFullID:
@@ -294,7 +294,7 @@ class Eml:
 
         if aType == 'system':
 
-            anEntityList = self.__getSystemList( aSystemPath )
+            anEntityList = self.__getSubSystemList( aSystemPath )
 
         else:
             aSystemNodeList = self.__theDocument.getElementsByTagName( 'system' )
@@ -320,9 +320,8 @@ class Eml:
 
         anEntityNode = self.__getEntityNode( aFullID )
         anEntityPropertyList = []
-
+        
         for aChildNode in anEntityNode.childNodes:
-
             if aChildNode.nodeName == 'property':
 
                 anEntityPropertyList.append( str( aChildNode.getAttribute( 'name' ) ) )
@@ -365,6 +364,31 @@ class Eml:
 
         self.__entityNodeCache = {}
 
+    def __reconstructCache( self ):
+
+        self.__clearCache()
+
+        aSystemNodeList = self.__theDocument.getElementsByTagName( 'system' )
+
+        for aSystemNode in aSystemNodeList:
+
+            aSystemPath = aSystemNode.getAttribute( 'id' )
+            aSystemFullID = self.convertSystemID2SystemFullID( aSystemPath )
+            self.__addToCache( aSystemFullID, aSystemNode )
+
+            for aChildNode in aSystemNode.childNodes:
+                aType = string.capwords( aChildNode.nodeName )        
+
+                if  aType == 'Variable' or aType == 'Process':
+
+                    anID = aChildNode.getAttribute( 'id' )
+                    aFullID = aType + ':' + aSystemPath + ':' + anID
+                    self.__addToCache( aFullID, aChildNode )
+
+
+
+
+
 
 
     ##-------------------------------------------
@@ -373,11 +397,11 @@ class Eml:
 
     def __createValueList( self, aValueNode ):
 
-        if aValueNode.firstChild.nodeType == minidom.Node.TEXT_NODE:
+        if aValueNode.firstChild.nodeType == aValueNode.TEXT_NODE:
 
             return str( aValueNode.firstChild.nodeValue )
 
-        elif aValueNode.firstChild.nodeType == minidom.Node.ELEMENT_NODE:
+        elif aValueNode.firstChild.nodeType == aValueNode.ELEMENT_NODE:
 
             aValueList = []
             for aChildNode in aValueNode.childNodes:
@@ -387,29 +411,37 @@ class Eml:
             return aValueList
 
 
-    def __getSystemList( self, aSystemPath ):
+    def __getSubSystemList( self, aSystemPath ):
 
-        aSystemList = []
         aSystemNodeList = self.__theDocument.getElementsByTagName( 'system' )
 
-        if aSystemPath == '':
+        aTargetPath = string.split( aSystemPath, '/' )
+        aTargetPathLength = len( aTargetPath )
+
+        # if '' is given, return the root system ('/')
+        if aTargetPathLength == 1:
             for aSystemNode in aSystemNodeList:
 
                 aSystemID = str( aSystemNode.getAttribute( 'id' ) )
-                if( aSystemID == '/' ):
+                if aSystemID == '/':
                     return [ aSystemID, ]
 
 
-        aSystemPathLength = len( aSystemPath )
+        aSystemList = []
+
+        if aTargetPath[-1] == '':
+            aTargetPath = aTargetPath[:-1]
+            aTargetPathLength -= 1
 
         for aSystemNode in aSystemNodeList:
 
-            aSystemID = str( aSystemNode.getAttribute( 'id' ) )
+            aSystemPath = str( aSystemNode.getAttribute( 'id' ) ).split( '/' )
+            if aSystemPath[-1] == '':
+                aSystemPath = aSystemPath[:-1]
 
-            if len( aSystemID ) > len( aSystemPath ) and\
-                   string.find( aSystemID, aSystemPath ) == 0 and\
-                   aSystemID[aSystemPathLength+1:].find( '/' ) == -1:
-                aSystemList.append( string.split( aSystemID, '/' )[-1] )
+            if len( aSystemPath ) == aTargetPathLength + 1 and \
+                   aSystemPath[:aTargetPathLength] == aTargetPath:
+                aSystemList.append( aSystemPath[-1] )
 
         return aSystemList
 
@@ -422,58 +454,58 @@ class Eml:
         except:
             pass
 
-        aSystemNodeList = self.__theDocument.getElementsByTagName( 'system' )
-        anEntityInfo = self.asEntityInfo( aFullID )
-        
-        aSystemPath = anEntityInfo[ 'Path' ]
-        aType = anEntityInfo[ 'Type' ]
-        anID = anEntityInfo[ 'ID' ]
+        aType, aSystemPath, anID = aFullID.split( ':' )
 
-        if anEntityInfo[ 'Type' ] == 'System':
+        if aType == 'System':
             aSystemPath = joinSystemPath( aSystemPath, anID )
+            return self.__getSystemNode( aSystemPath )
+            
+        aSystemNode = self.__getSystemNode( aSystemPath )
 
-            for aSystemNode in aSystemNodeList:
-                
-                if aSystemNode.getAttribute( 'id' ) == aSystemPath:
-                    self.__addToCache( aFullID, aSystemNode )
-                    return aSystemNode
-
-        else:
-            for aSystemNode in aSystemNodeList:
-                
-                if aSystemNode.getAttribute( 'id' ) == aSystemPath:
-
-                    for aChildNode in aSystemNode.childNodes:
+        for aChildNode in aSystemNode.childNodes:
                         
-                        if string.capwords( aChildNode.nodeName ) == aType and\
-                               aChildNode.getAttribute( 'id' ) == anID:
+            if string.capwords( aChildNode.nodeName ) == aType and\
+                   aChildNode.getAttribute( 'id' ) == anID:
 
-                            self.__addToCache( aFullID, aChildNode )
-                            return aChildNode
+                self.__addToCache( aFullID, aChildNode )
+                return aChildNode
 
 
         raise "Entity [" + aFullID + "] not found."
 
                         
+    def __getSystemNode( self, aSystemPath ):
 
+        aFullID = self.convertSystemID2SystemFullID( aSystemPath )
+
+        # first look up the cache
+        try:
+            return self.__findInCache( aFullID )
+        except:
+            pass
+
+        aSystemNodeList = self.__theDocument.getElementsByTagName( 'system' )
+
+        for aSystemNode in aSystemNodeList:
+
+            if str( aSystemNode.getAttribute( 'id' ) ) == aSystemPath:
+                self.__addToCache( aFullID, aSystemNode )
+                return aSystemNode
+
+        raise "System [" + aFullID + "] not found."
 
 
     def __getEntityPropertyNode( self, aFullID, aPropertyName ):
 
         anEntityNode = self.__getEntityNode( aFullID )
 
-        anEntityInfo = self.asEntityInfo( aFullID )
-
-
         # what if multiple propety elements with the same name exist?
         for aChildNode in anEntityNode.childNodes:
 
-            if aChildNode.nodeName == 'property':
+            if aChildNode.nodeName == 'property' and \
+                   aChildNode.getAttribute( 'name' ) == aPropertyName:
 
-                aPropertyNode = aChildNode
-                if aPropertyNode.getAttribute( 'name' ) == aPropertyName:
-
-                    return aPropertyNode
+                return aChildNode
 
 
 
@@ -526,17 +558,6 @@ class Eml:
 
 
 
-    def asEntityInfo( self, aFullID ):
-        aTargetEntity = {}
-        aParsedFullID = aFullID.split( ':' )
-        aTargetEntity[ 'Type' ] = aParsedFullID[0]
-        aTargetEntity[ 'Path' ] = aParsedFullID[1]
-        aTargetEntity[ 'ID' ]   = aParsedFullID[2]
-
-        return aTargetEntity
-
-
-
     def convertSystemFullID2SystemID( self, aSystemFullID ):
         """
         aSystemFullID : ex) System:/CELL:CYTOPLASM
@@ -559,30 +580,23 @@ class Eml:
         return aSystemID
 
 
-
-
-
     def convertSystemID2SystemFullID( self, aSystemID ):
         """
         aSystemID : ex) /CELL/CYTOPLASM
         return -> aSystemFullID [string] : ex) System:/CELL:CYTOPLASM
         """
 
-        aParsedSystemID  = aSystemID.split( '/' )
-        aSystemSimpleID = aParsedSystemID[-1]
-        
         if ( aSystemID == '/' ):
-            aSystemFullID = 'System::/'
+            return 'System::/'
 
-        elif( len( aParsedSystemID ) == 2 ):
-            aSystemFullID = 'System:/:' + aSystemSimpleID
+        aLastSlash = aSystemID.rfind( '/' )
 
-        else:
-            del aParsedSystemID[-1]
-            aPathToSystem = string.join( aParsedSystemID, '/' )
-            aSystemFullID = 'System:' + aPathToSystem + ':' + aSystemSimpleID
-
-        return aSystemFullID
+        # subsystems of root: e.g. /CELL
+        if aLastSlash == 0:
+            return 'System:/:' + aSystemID[aLastSlash+1:]
+        else: # others: e.g. /CELL/CYTOPLASM
+            return 'System:' + aSystemID[:aLastSlash] + ':' +\
+                   aSystemID[aLastSlash+1:]
 
 
     def __asSystemPath( self, aTargetSystem ):
@@ -590,7 +604,5 @@ class Eml:
            ex.) System:/CELL:CYTOPLASM -> /CELL/CYTOPLASM
         """
 
-        aSystemID = aTargetSystem.getAttribute( 'id' )
-        aSystemPath = aSystemID
-        return aSystemPath
+        return aTargetSystem.getAttribute( 'id' )
 
