@@ -23,7 +23,7 @@
       
       <!-- ============== Session Methods ==================== -->
       <row>
-	<entry namest='c1' nameend='c2' align='center'rowsep='1'><emphasis>Session methods</emphasis></entry>
+	<entry namest='c1' nameend='c2' align='center' rowsep='1'><emphasis>Session methods</emphasis></entry>
       </row>
 
 
@@ -335,7 +335,7 @@ this method because this is automatically called before executing
 
       <!-- ============== Stepper methods ==================== -->
       <row>
-	<entry namest='c1' nameend='c2' align='center'rowsep='1'><emphasis>Stepper methods</emphasis></entry>
+	<entry namest='c1' nameend='c2' align='center' rowsep='1'><emphasis>Stepper methods</emphasis></entry>
       </row>
 
       <!-- getStepperList -->
@@ -374,7 +374,7 @@ bound to this <classname>Session</classname> object and the given
 
       <!-- ============== Entity methods ==================== -->
       <row>
-	<entry namest='c1' nameend='c2' align='center'rowsep='1'><emphasis>Entity methods</emphasis></entry>
+	<entry namest='c1' nameend='c2' align='center' rowsep='1'><emphasis>Entity methods</emphasis></entry>
       </row>
 
       <!-- getEntityList -->
@@ -418,7 +418,7 @@ the <parameter>systempath</parameter> argument</para>
 
       <!-- ============== Logger methods ==================== -->
       <row>
-	<entry namest='c1' nameend='c2' align='center'rowsep='1'><emphasis>Logger methods</emphasis></entry>
+	<entry namest='c1' nameend='c2' align='center' rowsep='1'><emphasis>Logger methods</emphasis></entry>
       </row>
 
       <!-- createLoggerList -->
@@ -509,7 +509,7 @@ API and the <classname>ObjectStub</classname> classes, which were in fact
 developed to make it easier by providing a simple and consistent
 object-oriented appearance to the lower level flat
 <classname>Simulator</classname> API.  For the details of
-<classname>Simulator</classname> class, consult <emphasis>&ecell C++
+<classname>Simulator</classname> class, consult <emphasis>&ecell; C++
 library reference manual</emphasis> and the sourcecode of the system,
 especially
 <filename>ecell3/ecell/libemc/Simulator.hpp</filename>.</para>

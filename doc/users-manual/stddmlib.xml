@@ -321,7 +321,7 @@ chemical and biochemical simulations.</para>
 	</listitem>
 	<listitem>
 	  <para><classname>GillespieProcess</classname></para>
-	  <para>This &Process; must be used with a Gillespie-type &Stepper,
+	  <para>This &Process; must be used with a Gillespie-type &Stepper;,
 such as <classname>NRStepper</classname>.</para>
 	</listitem>
 	<listitem>

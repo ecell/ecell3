@@ -125,7 +125,7 @@ ecell3-dmc options:
 	  <para>To start <application>&app;</application> 
                 in GUI mode, type the following command.</para> 
 
-      <screen><command>gecell</command> &</screen>
+      <screen><command>gecell</command> &amp;</screen>
 
       <para>This will invoke an instance of the simulator with
       <application>Osogo Session Manager</application> attached as a GUI
@@ -161,7 +161,7 @@ ecell3-dmc options:
 
     
     <sect2>
-      <title>Getting An &EM File From &EML;</title>
+      <title>Getting An &EM; File From &EML;</title>
 
       <para>Use <command>ecell3-eml2em</command> command to convert an
       &EML; file to an &EM; file.
@@ -183,7 +183,7 @@ Options:
     </sect2>
 
     <sect2>
-      <title>&ecell 1 Compatibility</title>
+      <title>&ecell; 1 Compatibility</title>
 
     <para>eri2eml (unsupported), rd2dm (unsupported)
 

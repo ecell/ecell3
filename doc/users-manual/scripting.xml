@@ -7,7 +7,7 @@
     <para>By reading this chapter, you can get information about the
     following items:
       <simplelist>
-	<member>What is &ecell Session Script (&ESS;).</member>
+	<member>What is &ecell; Session Script (&ESS;).</member>
 
 	<member>How to run &ESS; in scripting mode.</member>
 
@@ -16,7 +16,7 @@
 	<member>How to automate a simulation run by writing an
           &ESS; file.</member>
 
-        <member>How to write frontend software components for &ecell in &Python;.</member>
+        <member>How to write frontend software components for &ecell; in &Python;.</member>
 
       </simplelist>
 </para>
@@ -25,8 +25,8 @@
   <sect1>
     <title>Session Scripting</title>
 
-    <para>An &ecell Session Script (&ESS;) is a
-&Python; script which is loaded by a &ecell; &Session; object.  A
+    <para>An &ecell; Session Script (&ESS;) is a
+&Python; script which is loaded by a &ecell;  &Session; object.  A
 &Session; instance represents a single run of a simulation.</para>
 
     <para>An &ESS; is used to automate a single run of a simulation session.
@@ -71,7 +71,7 @@
 
 
   <sect1>
-    <title>Running &ecell Session Script</title>
+    <title>Running &ecell; Session Script</title>
 
     <para>There are three ways to execute &ESS;;
 
@@ -195,7 +195,7 @@ Both ways, <option>-D</option> and <option>--parameters</option>, can be mixed.
   </sect1>
 
   <sect1>
-    <title>Writing &ecell Session Script</title>
+    <title>Writing &ecell; Session Script</title>
 
     <para>The syntax of &ESS; is a full set of
     &Python; language with some convenient
@@ -740,7 +740,7 @@ while 1:
 
     message( 'ATP value = %s' % ATPValue )
 
-    if ATPValue <= 1000:
+    if ATPValue &lt;= 1000:
         break
 
     run( 10 )
@@ -761,7 +761,7 @@ message( 'Stopped at %s.' % getCurrentTime() )
     <sect2>
       <title>About &ECD; file</title>
 
-      <para>&ecell SE uses &ECD; (E-Cell Data) file
+      <para>&ecell; SE uses &ECD; (E-Cell Data) file
 format to store simulation results. &ECD; is a plain
 text file, and easily handled by user-written and third-party data
 processing and plotting software such as
@@ -876,7 +876,7 @@ ends with <constant>'#----...'</constant>.
     </sect2>
 
     <sect2>
-      <title>Using &ECD; outside &ecell SE</title>
+      <title>Using &ECD; outside &ecell; SE</title>
 
       <para>For most cases &NumericPython;
 	will offer any necessary functionality for scientific data
@@ -936,7 +936,7 @@ Now the data is stored in a matrix variable with the same name as the file witho
     <title>Manipulating Model Files</title>
 
     <para>This section describes how to create, modify, and read &EML; files
-     with the EML module of the &ecell; &Python; library.</para>
+     with the EML module of the &ecell;  &Python; library.</para>
 
     <sect2>
       <title>Importing &EML; module</title>
@@ -1047,7 +1047,7 @@ Now the data is stored in a matrix variable with the same name as the file witho
 	specified at compile time.  Before executing
 	&Python;, &ecell3-python;
 	sets some environment variables to ensure that it can find
-	necessary &ecell &Python; extension
+	necessary &ecell; &Python; extension
 	modules and the Standard &DM; Library. 
 	After processing the commandline options,
 	&ecell3-session; command creates an
@@ -1057,8 +1057,8 @@ Now the data is stored in a matrix variable with the same name as the file witho
 
       <para>Thus basically &ecell3-python; is just a
 	&Python; interpreter, and frontend
-	components of &ecell SE run on this command.  To use
-	the &ecell Python Library from &ecell3-python;
+	components of &ecell; SE run on this command.  To use
+	the &ecell; Python Library from &ecell3-python;
 	command, use <programlisting>import ecell</programlisting>
 	statement from the prompt:
 <informalexample>
@@ -1202,10 +1202,10 @@ It automatically runs the program with the commandline options with '<parameter>
 
 
   <sect1>
-    <title>&ecell Python Library API</title>
+    <title>&ecell; Python Library API</title>
 
     <para>This section provides a list of some commonly used 
-      classes in &ecell Python library and their APIs.
+      classes in &ecell; Python library and their APIs.
       </para>
 
 
@@ -1234,7 +1234,7 @@ It automatically runs the program with the commandline options with '<parameter>
       </itemizedlist>
 
 
-      &session-class-api
+      &session-class-api;
 
 
     </sect2>
@@ -1262,7 +1262,7 @@ It automatically runs the program with the commandline options with '<parameter>
 
 
 
-      &objectstubs-api
+      &objectstubs-api;
 
     </sect2>
 
@@ -1270,7 +1270,7 @@ It automatically runs the program with the commandline options with '<parameter>
       <title><classname>ECDDataFile</classname> Class API</title>
       <para><classname>ECDDataFile</classname> class has the following set of methods.</para>
 
-      &ecddatafile-api
+      &ecddatafile-api;
     </sect2>
 
 

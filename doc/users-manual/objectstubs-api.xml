@@ -23,7 +23,7 @@
       
       <!-- ============== Common Methods ==================== -->
       <row>
-	<entry namest='c1' nameend='c2' align='center'rowsep='1'>Common methods of <classname>EntityStub</classname>, <classname>StepperStub</classname>, and <classname>LoggerStub</classname></entry>
+	<entry namest='c1' nameend='c2' align='center' rowsep='1'>Common methods of <classname>EntityStub</classname>, <classname>StepperStub</classname>, and <classname>LoggerStub</classname></entry>
       </row>
 
 

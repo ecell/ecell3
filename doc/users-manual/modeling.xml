@@ -51,21 +51,21 @@ implement specific simulation algorithms.
 The &Entity; class has three subclasses:
 <itemizedlist>
 	  <listitem>
-	    <para>&Variable</para> <para>This class of objects represent state
+	    <para>&Variable;</para> <para>This class of objects represent state
 	  variables.  A &Variable; object holds a scalar real-number
 	  value.  A set of values of all &Variable; objects in a
 	  simulation model defines the state of the model at a certain
 	  point in time.</para>
 	  </listitem>
 	  <listitem>
-	    <para>&Process</para> <para>This class of objects
+	    <para>&Process;</para> <para>This class of objects
 	  represent phenomena in the simulation model that result in
 	  changes in the values of one or more &Variable; objects.
 	  The way of change of the &Variable; values can be either
 	  discrete or continuous.</para>
 	  </listitem>
 	  <listitem>
-	    <para>&System</para> <para>This class of objects define
+	    <para>&System;</para> <para>This class of objects define
 	  overall structure of the model.  A &System; object can
 	  contain sets of these three types of &Entity;, &Variable;,
 	  &Process;, and &System; objects.  A &System; can contain
@@ -122,7 +122,7 @@ The &Entity; class has three subclasses:
 	<para>Every &Entity; and &Stepper; object has an
 	<emphasis>ID</emphasis>.  ID is a character string of
 	arbitrary length starting from an alphabet or '_' with
-	succeeding alphabet, '_', and numeric characters.  &app treats
+	succeeding alphabet, '_', and numeric characters.  &app; treats
 	IDs in a case-sensitive way.</para>
 
 	<para>If the ID is used to indicate a &Stepper; object, it is
@@ -139,7 +139,7 @@ The &Entity; class has three subclasses:
       </sect3>
 
       <sect3>
-	<title>SystemPath</title>
+	<title>SystemPath;</title>
 
 	<para>The &SystemPath; identifies a &System; from the
 	tree-like hierarchy of &System; objects in a simulation model.
@@ -154,7 +154,7 @@ The &Entity; class has three subclasses:
 	directly under the root system, and (3) the &System;
 	<literal>B</literal> just under <literal>A</literal>.</para>
 
-	<para>A &SystemPath can be relative.  The relative
+	<para>A &SystemPath; can be relative.  The relative
 	&SystemPath; does not point at a &System; object unless the
 	current &System; is given.  A &SystemPath; is relative if (1)
 	it does not start with the leading <literal>/</literal> (the
@@ -374,7 +374,7 @@ The &Entity; class has three subclasses:
 	      <para>From a list</para>
 	      <itemizedlist>
 		<listitem>
-		  <para>To a numeric or a &StringType value</para> 
+		  <para>To a numeric or a &StringType; value</para> 
 
 		  <para>It simply takes the first item of the list.
 		  If necessary the taken value is further converted to
@@ -422,7 +422,7 @@ The &Entity; class has three subclasses:
       <title>What is &EM;?</title>
 
       <para>
-      In &app, the standard file format of model description and
+      In &app;, the standard file format of model description and
       exchange is XML-based &EML; (E-Cell Model description Language).
       Although &EML; is an ideal means of integrating E-Cell with other
       software components such as GUI model editors and databases, it
@@ -451,10 +451,10 @@ The &Entity; class has three subclasses:
          provide means of more sophisticated, scalable and intelligent
          model construction on the basis of &EML;, learning syntax and
          semantics of &EM; may help you to get the idea of how object
-         model inside &ecell is organized and how it is driven to
+         model inside &ecell; is organized and how it is driven to
          conduct simulations.  Furthermore, owing to the nature of
          plain programming language-like syntax, &EM; can be used as a
-         simple and intuitive tool to communicate with other &ecell
+         simple and intuitive tool to communicate with other &ecell;
          users.  In fact, this manual uses &EM; to illustrate how the
          model is constructed in &ecell;</para>
 
@@ -1094,7 +1094,7 @@ System System( / )  # connected to STEPPER0
 
 <programlisting>Variable:/CELL:S0</programlisting>
 
-             , if the &Process; exists in the &System <literal>/CELL</literal>.
+             , if the &Process; exists in the &System; <literal>/CELL</literal>.
 </para>
 
 	  </listitem>

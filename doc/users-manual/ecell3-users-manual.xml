@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 
 <!-- "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd"  -->
-
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN" 
 [
   <!ENTITY legal SYSTEM "legal.xml">

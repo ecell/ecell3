@@ -15,21 +15,21 @@
     
     <para>Dynamic Module (DM) is a file containing an object class,
       especially C++ class, which can be loaded and instantiated by
-      the application.  &app uses this mechanism to provide users a
+      the application.  &app; uses this mechanism to provide users a
       way of defining and adding new classes to appear in simulation
       models without recompiling the whole system.  Because the
       classes are defined in forms of native codes, this is the most
       efficient way of adding a new code or object class in terms of
       space and speed.</para>
 
-    <para>In &app, subclasses of &Process;,
+    <para>In &app;, subclasses of &Process;,
          &Variable;,
          &System; and
          &Stepper; classes can be dynamically
          loaded by the system.
       </para>
 
-    <para>In addition to standard &DM;s distributed with &app,
+    <para>In addition to standard &DM;s distributed with &app;,
       user-defined &DM; files can be created from C++ source code files
       ('.cpp' files) with the <command>ecell3-dmc</command> command.
       The compiled files usually take a form of shared library ('.so')
@@ -84,7 +84,7 @@ LIBECS_DM_INIT( <parameter>CLASSNAME</parameter>, <parameter>DMTYPE</parameter> 
       <title><parameter>DMTYPE</parameter>, <parameter>CLASSNAME</parameter> and <parameter>BASECLASS</parameter></title>
 
       <para>First of all you have to decide basic attributes of the
-    class you are going to define; such as a &DM; type (&Process;, &Variable, &System;, or &Stepper), a class name, and a base class.</para>
+    class you are going to define; such as a &DM; type (&Process;, &Variable;, &System;, or &Stepper;), a class name, and a base class.</para>
 
       <itemizedlist>
 	<listitem>
@@ -162,7 +162,7 @@ LIBECS_DM_INIT( <parameter>CLASSNAME</parameter>, <parameter>DMTYPE</parameter> 
 
 	<para><function>USE_LIBECS</function> declares use of
          <productname>libecs</productname> library, which is the core
-         library of &app, in this file after the line.</para>
+         library of &app;, in this file after the line.</para>
 
       <para><function>LIBECS_DM_CLASS</function></para>
 
@@ -271,17 +271,17 @@ LIBECS_DM_INIT( <parameter>CLASSNAME</parameter>, <parameter>DMTYPE</parameter> 
 
 	  <listitem>
 	    <para><type>TYPERef</type></para>
-	    <para>Reference type. (== <type>TYPE&</type>)</para>
+	    <para>Reference type. (== <type>TYPE&amp;</type>)</para>
 	  </listitem>
 
 	  <listitem>
 	    <para><type>TYPECref</type></para>
-	    <para>Const reference type. (== <type>const TYPE&</type>)</para>
+	    <para>Const reference type. (== <type>const TYPE&amp;</type>)</para>
 	  </listitem>
 	</itemizedlist>
 
        For example, <type>RealCref</type> is equivalent to write
-       <type>const Real&</type>.  Using these typedefs are recommended.</para>
+       <type>const Real&amp;</type>.  Using these typedefs are recommended.</para>
 
        <para>
        To declare a new type, use <function>DECLARE_TYPE</function>
@@ -290,7 +290,7 @@ LIBECS_DM_INIT( <parameter>CLASSNAME</parameter>, <parameter>DMTYPE</parameter> 
 
        is called inside the system so that
        <type>RealCref</type> can be used as <type>const
-       double&</type>.</para>
+       double&amp;</type>.</para>
 
       <para>Similary, DECLARE_CLASS can be used to enable the typedefs
       for a class. Example: 
@@ -308,7 +308,7 @@ LIBECS_DM_INIT( <parameter>CLASSNAME</parameter>, <parameter>DMTYPE</parameter> 
 	<title>Limits and other attributes of types</title>
 
 	<para>To get limits and precisions of these numeric
-       types, use <classname>std::numeric_limits<></classname>
+       types, use <classname>std::numeric_limits&lt;></classname>
        template class in the C++ standard library.  For instance, to
        get a maximum value that can be represented by the
        <type>Real</type> type, use the template class like this:
@@ -401,7 +401,7 @@ aStringPolymorph.as&lt;Integer>();  // == 213
 	compiler understands it.  There can be any C++ statements
 	inside and outside of the class definition including; other
 	class definitions, nested classes, typedefs, static functions,
-	namespaces, and even template<>.</para>
+	namespaces, and even template&lt;>.</para>
 
 	<para>Be careful, however, about namespace corruptions. You
           may want to use private C++ namespaces and static functiont
@@ -503,7 +503,7 @@ aStringPolymorph.as&lt;Integer>();  // == 213
 	<para>A set method must have the following signature to be
 	recognized by the system.
 
-	<programlisting>void CLASS::* ( const T& )</programlisting>
+	<programlisting>void CLASS::* ( const T&amp;)</programlisting>
 
 	And a get method must look like this: 
 
@@ -527,7 +527,7 @@ of a specific type and a property name.
 	      <itemizedlist>
 		<listitem>
 		  <para><emphasis>Expansion:</emphasis>
-<programlisting>void set<parameter>NAME</parameter>( const <parameter>TYPE</parameter>& value )</programlisting></para>
+<programlisting>void set<parameter>NAME</parameter>( const <parameter>TYPE</parameter>&amp;value )</programlisting></para>
 		</listitem>
 
 		<listitem>
@@ -555,7 +555,7 @@ is expanded to the following valid C++ program.
 
 <programlisting>class HogeProcess
 {
-  void setFlux( const Real& value )
+  void setFlux( const Real&amp;value )
   {
     theFlux = value;
   }
@@ -635,7 +635,7 @@ is expanded to the following valid C++ program.
 	      <itemizedlist>
 		<listitem>
 		  <para><emphasis>Expansion:</emphasis>
-<programlisting>void <parameter>CLASSNAME</parameter>::set<parameter>NAME</parameter>( const <parameter>TYPE</parameter>& value )</programlisting></para>
+<programlisting>void <parameter>CLASSNAME</parameter>::set<parameter>NAME</parameter>( const <parameter>TYPE</parameter>&amp;value )</programlisting></para>
 		</listitem>
 		
 		<listitem>
@@ -758,7 +758,7 @@ public:
 
          This registers these methods:
 
-<programlisting>void HogeProcess::setFlux( const Real& );</programlisting>
+<programlisting>void HogeProcess::setFlux( const Real&amp; );</programlisting>
 
 and       
 

@@ -2,7 +2,7 @@
   <title>Simulation Mechanism of E-Cell</title> 
   <highlights>
     <para>
-      This chapter reveals how &app represents cell models internally,
+      This chapter reveals how &app; represents cell models internally,
       and what happens when the simulation is executed inside the
       system.
     </para>

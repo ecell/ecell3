@@ -22,7 +22,7 @@
 	  </listitem>
 
 	  <listitem>
-	    <para>Convert the &EM; file to an &EML file by
+	    <para>Convert the &EM; file to an &EML; file by
 	      <command>ecell3-em2eml</command> command.
 
 <screen><prompt>$</prompt> <userinput>ecell3-em2eml simple-gillespie.em</userinput></screen>
@@ -66,7 +66,7 @@
 <literallayout class="monospaced">
     -- P1 -->
 S1            S2
-   <-- P2 --
+   &lt;-- P2 --
 </literallayout>
       <literal>S1</literal> and <literal>S2</literal> are molecular
       species, and <literal>P1</literal> and <literal>P2</literal> are
@@ -456,7 +456,7 @@ System System( / )
 <literallayout class="monospaced">
     -- P1 -->                   -- P4 -->
 S1            S2  -- P3 --> S3            S4
-^  <-- P2 --                   <-- P5 --  |
+^  &lt;-- P2 --                   &lt;-- P5 --  |
 |                                         |
  \ _______________ P6 ____________________/
 </literallayout>
@@ -469,7 +469,7 @@ S1            S2  -- P3 --> S3            S4
 Sub-model 1:
     -- P1 -->
 S1            S2
-   <-- P2 -- 
+   &lt;-- P2 -- 
 </literallayout>
 
 and
@@ -478,7 +478,7 @@ and
 Sub-model 2:
     -- P4 -->
 S3            S4
-   <-- P5 -- 
+   &lt;-- P5 -- 
 </literallayout>
 
        These two sub-models are in turn coupled by reaction processes
@@ -490,7 +490,7 @@ S3            S4
 
 <literallayout class="monospaced">
 Sub-model 1:   S2  -- P3 --> S3
-               S1 <-- P6 --> S4  :Sub-model 2
+               S1 &lt;-- P6 --> S4  :Sub-model 2
 </literallayout>
 
        Rate constants of the main reactions, <literal>P1</literal>,
