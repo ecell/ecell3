@@ -20,12 +20,13 @@ EXTRA DIRS              = Data
 PARAMETERS              = _KmS_ 0.1 20.0 float
                           _KcF_ 0.1 20.0 float
 
-RESUME FILE             = resume.txt
+RESUME FILE             = None
+#RESUME FILE             = resume.txt
 
 [Temporary directory]
 TMP DIRECTORY           = work
-TMPDIR REMOVABLE        = True
-#TMPDIR REMOVABLE        = False
+#TMPDIR REMOVABLE        = True
+TMPDIR REMOVABLE        = False
 
 
 [Output files]
