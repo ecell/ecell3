@@ -33,6 +33,7 @@
 #define __DATAPOINT_STL_VECTOR_HPP
 
 #include <vector>
+#include <algorithm>
 
 #include "libecs.hpp"
 
