@@ -11,7 +11,10 @@ aSimulator.createEntity( 'System', ( SYSTEM, '/CELL', 'CYTOPLASM' ), 'cytoplasm'
 aSimulator.createEntity( 'System', ( SYSTEM, '/CELL', 'MEMBRANE' ), 'membrane' )
 aSimulator.createEntity( 'System', ( SYSTEM, '/', 'ENVIRONMENT' ), 'environment' )
 
-aMainWindow.printMessage('make Substances...')
+# aSimulator.setProperty( ( SYSTEM, '/CELL', 'CYTOPLASM', 'VolumeIndex' ), (1234,) )
+# aSimulator.setProperty( ( SYSTEM, '/', 'ENVIRONMENT', 'VolumeIndex' ), (9876,) )
+
+aMainWindow.printMessage('make Substances...\n')
 
 aSimulator.createEntity( 'Substance', ( SUBSTANCE, '/CELL/CYTOPLASM', 'ATP' ), 'substance ATP' )
 aSimulator.createEntity( 'Substance', ( SUBSTANCE, '/CELL/CYTOPLASM', 'ADP' ), 'substance ADP' )
@@ -27,12 +30,21 @@ aSimulator.createEntity( 'Substance', ( SUBSTANCE, '/CELL/MEMBRANE', 'CIII' ), '
 
 
 aMainWindow.printMessage("make Reactors...\n")
+
 try:
     aSimulator.createEntity('ConstantActivityReactor',
-                                         ( REACTOR, '/CELL/CYTOPLASM', 'RC1' ),
+                                         ( REACTOR, '/CELL/CYTOPLASM', 'RC' ),
                                          'constant reactor' )
 except:
    aMainWindow.printMessage("cannot instantiate ConstantActivityReactor\n")
+
+try:
+    aSimulator.createEntity('MichaelisUniUniReactor',
+                                         ( REACTOR, '/CELL/CYTOPLASM', 'RM1' ),
+                                         'michaelis-menten reactor' )
+except:
+   aMainWindow.printMessage("cannot instantiate MichaelisUniUniReactor\n")
+
  
 aMainWindow.printMessage("set Quantity...\n")
 
@@ -51,10 +63,12 @@ aSimulator.setProperty( ( SUBSTANCE, '/CELL/MEMBRANE', 'CIII', 'Quantity' ), (30
 aMainWindow.printMessage("initialize()...\n")
 aSimulator.initialize()
 
+#  aMainWindow.printMessage( '---------------------------------------\n' )
 #  aMainWindow.printAllProperties( ( SYSTEM, '', '/' ) )
-#  aMainWindow.printAllProperties( ( SYSTEM, '/', 'CYTOPLASM' ) )
+#  aMainWindow.printMessage( '---------------------------------------\n' )
+#  aMainWindow.printAllProperties( ( SYSTEM, '/CELL', 'CYTOPLASM' ) )
+#  aMainWindow.printMessage( '---------------------------------------\n' )
 
-#  aMainWindow.printProperty( ( SUBSTANCE, '/', 'A', 'Quantity' ) )
 
 aMainWindow.printProperty( ( SUBSTANCE, '/CELL/CYTOPLASM', 'ATP', 'Quantity' ) )
 aMainWindow.printProperty( ( SUBSTANCE, '/CELL/CYTOPLASM', 'ADP', 'Quantity' ) )
