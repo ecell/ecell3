@@ -474,9 +474,13 @@ class EmlParser:
                 if aTargetEntity.tagName == 'substance' or \
                    aTargetEntity.tagName == 'reactor':
 
-
+                    
                     aPath         = aSystemPath
                     anEntityClass = string.capitalize( str( aTargetEntity.tagName ) )
+
+                    if anEntityClass == 'Reactor':
+                        anEntityClass = str( aTargetEntity.getAttribute( 'class' ) )
+
                     aName         = str( aTargetEntity.getAttribute( 'name' ) )
                     anId          = str( aTargetEntity.getAttribute( 'id' ) )
 
