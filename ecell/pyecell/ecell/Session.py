@@ -55,8 +55,8 @@ class Session:
     def interact( self, parameters={} ):
 
         aContext = self.__createScriptContext( parameters )
-        
-        import readline # to provide convenient commandline editing :)
+	if os.name != "nt":
+	    import readline # to provide convenient commandline editing :)
         import code
         anInterpreter = code.InteractiveConsole( aContext )
 
@@ -93,7 +93,12 @@ class Session:
         # When the type doesn't match
         else:
             raise TypeError, " The type of aModel must be EML instance, string(file name) or file object "
-
+	
+	# change directory to file's home directory
+	dirname = os.path.dirname( aModel )
+	if dirname != "":
+	    os.chdir( dirname )
+	
         # calls load methods
         self.__loadStepper( anEml )
         self.__loadEntity( anEml )
