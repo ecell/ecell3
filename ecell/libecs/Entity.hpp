@@ -70,8 +70,9 @@ namespace libecs
 	INHERIT_PROPERTIES( PropertiedClass );
 
 	PROPERTYSLOT_SET_GET( String, Name );
-	PROPERTYSLOT        ( String, FullID,
-			      NULLPTR, &Entity::getFullIDString );
+
+	//	PROPERTYSLOT_NO_LOAD_SAVE( String, FullID,
+	//				   NULLPTR, &Entity::getFullIDString );
       }
 
     Entity(); 

@@ -68,19 +68,18 @@ namespace libecs
       {
 	INHERIT_PROPERTIES( Entity );
 	
+	PROPERTYSLOT_SET_GET( Real, Value );
+	PROPERTYSLOT_SET_GET( Int,  Fixed );
+
+	PROPERTYSLOT_GET_NO_LOAD_SAVE( Real, TotalVelocity );
+
 	// Use addVelocity as the set method.  This won't be saved/loaded.
 	PROPERTYSLOT_NO_LOAD_SAVE( Real, Velocity,
 				   &Variable::addVelocity, 
 				   &Variable::getVelocity );
-	PROPERTYSLOT_SET_GET( Real, Value );
-	PROPERTYSLOT_GET    ( Real, TotalVelocity );
+
 	// Concentration can be saved, but cannot be loaded.
-	PROPERTYSLOT_LOAD_SAVE( Real, Concentration,
-				NULLPTR,
-				&Variable::getConcentration,
-				NULLPTR,
-				&Variable::getConcentration );
-	PROPERTYSLOT_SET_GET( Int,  Fixed );
+	PROPERTYSLOT_GET_NO_LOAD_SAVE( Real, Concentration );
       }
 
     Variable();

@@ -155,7 +155,7 @@ namespace libemc
 
   const libecs::Polymorph LocalSimulatorImplementation::
   saveStepperProperty( libecs::StringCref aStepperID,
-		      libecs::StringCref aPropertyName ) const
+		       libecs::StringCref aPropertyName ) const
   {
     StepperCptr aStepperPtr( getModel().getStepper( aStepperID ) );
 

@@ -69,9 +69,10 @@ namespace libecs
 	INHERIT_PROPERTIES( Entity );
 
 	PROPERTYSLOT_SET_GET( Polymorph, VariableReferenceList );
-	PROPERTYSLOT_SET_GET( Real,      Activity );
 	PROPERTYSLOT_SET_GET( Int,       Priority );
 	PROPERTYSLOT_SET_GET( String,    StepperID );
+
+	PROPERTYSLOT_SET_GET_NO_LOAD_SAVE( Real,      Activity );
       }
 
     /** 

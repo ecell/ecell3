@@ -63,11 +63,12 @@ namespace libecs
       {
 	INHERIT_PROPERTIES( Stepper );
 
+	// FIXME: load/save ??
 	PROPERTYSLOT( Real, StepInterval,
-			     &DifferentialStepper::initializeStepInterval,
-			     &DifferentialStepper::getStepInterval );
+		      &DifferentialStepper::initializeStepInterval,
+		      &DifferentialStepper::getStepInterval );
 	
-	PROPERTYSLOT_GET( Real, NextStepInterval );
+	PROPERTYSLOT_GET_NO_LOAD_SAVE( Real, NextStepInterval );
       }
 
     class VariableProxy
@@ -196,8 +197,10 @@ namespace libecs
 	PROPERTYSLOT_SET_GET( Real, DerivativeToleranceFactor );
 	PROPERTYSLOT_SET_GET( Real, AbsoluteEpsilon );
 	PROPERTYSLOT_SET_GET( Real, RelativeEpsilon );
-	PROPERTYSLOT_GET    ( Real, MaxErrorRatio );
-	PROPERTYSLOT_GET    ( Int,  Order );
+
+
+	PROPERTYSLOT_GET_NO_LOAD_SAVE( Real, MaxErrorRatio );
+	PROPERTYSLOT_GET_NO_LOAD_SAVE( Int,  Order );
       }
 
 

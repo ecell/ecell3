@@ -60,14 +60,19 @@ namespace libecs
       ; // do nothing
     }
 
-    static void throwNoSlot( StringCref aClassName, StringCref aPropertyName );
-
   protected:
 
     PropertyInterfaceBase()
     {
       ; // do nothing
     }
+
+    static void throwNoSlot( StringCref aClassName, StringCref aPropertyName );
+
+    static void throwNotLoadable( PropertiedClassCref aClassName, 
+				  StringCref aPropertyName );
+    static void throwNotSavable( PropertiedClassCref aClassName, 
+				 StringCref aPropertyName );
 
   };
 
@@ -201,13 +206,49 @@ namespace libecs
     static void loadProperty( T& anObject, StringCref aPropertyName, 
 			      PolymorphCref aValue )
     {
-      getPropertySlot( aPropertyName )->loadPolymorph( anObject, aValue );
+      PropertySlotMapConstIterator 
+	aPropertySlotMapIterator( findPropertySlot( aPropertyName ) );
+      
+      if( aPropertySlotMapIterator != thePropertySlotMap.end() )
+	{
+	  PropertySlotPtr aPropertySlotPtr( aPropertySlotMapIterator->second );
+	  if( aPropertySlotPtr->isLoadable() )
+	    {
+	      aPropertySlotPtr->loadPolymorph( anObject, aValue );
+	    }
+	  else
+	    {
+	      throwNotLoadable( anObject, aPropertyName );
+	    }
+	}
+      else
+	{
+	  anObject.defaultSetProperty( aPropertyName, aValue );
+	}
     }
     
     static const Polymorph saveProperty( const T& anObject,
 					 StringCref aPropertyName )
     {
-      return getPropertySlot( aPropertyName )->savePolymorph( anObject );
+      PropertySlotMapConstIterator 
+	aPropertySlotMapIterator( findPropertySlot( aPropertyName ) );
+      
+      if( aPropertySlotMapIterator != thePropertySlotMap.end() )
+	{
+	  PropertySlotPtr aPropertySlotPtr( aPropertySlotMapIterator->second );
+	  if( aPropertySlotPtr->isSavable() )
+	    {
+	      return aPropertySlotPtr->savePolymorph( anObject );
+	    }
+	  else
+	    {
+	      throwNotSavable( anObject, aPropertyName );
+	    }
+	}
+      else
+	{
+	  return anObject.defaultGetProperty( aPropertyName );
+	}
     }
 
     static const Polymorph getPropertyList()

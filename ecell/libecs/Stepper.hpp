@@ -82,17 +82,21 @@ namespace libecs
 	INHERIT_PROPERTIES( PropertiedClass );
 	
 	PROPERTYSLOT_SET_GET( Int,       Priority );
-	PROPERTYSLOT_GET    ( Real,      CurrentTime );
 	PROPERTYSLOT_SET_GET( Real,      StepInterval );
-	PROPERTYSLOT_SET_GET( Real,      OriginalStepInterval );
 	PROPERTYSLOT_SET_GET( Real,      MaxStepInterval );
 	PROPERTYSLOT_SET_GET( Real,      MinStepInterval );
-	PROPERTYSLOT_GET    ( Polymorph, ReadVariableList );
-	PROPERTYSLOT_GET    ( Polymorph, WriteVariableList );
-	PROPERTYSLOT_GET    ( Polymorph, ProcessList );
-	PROPERTYSLOT_GET    ( Polymorph, SystemList );
-	PROPERTYSLOT_GET    ( Polymorph, DependentStepperList );
 	PROPERTYSLOT_SET    ( String,    RngSeed );
+
+
+	// these properties are not loaded/saved.
+	PROPERTYSLOT_SET_GET_NO_LOAD_SAVE( Real,  OriginalStepInterval );
+	PROPERTYSLOT_GET_NO_LOAD_SAVE    ( Real,      CurrentTime );
+	PROPERTYSLOT_GET_NO_LOAD_SAVE    ( Polymorph, ProcessList );
+	PROPERTYSLOT_GET_NO_LOAD_SAVE    ( Polymorph, SystemList );
+	PROPERTYSLOT_GET_NO_LOAD_SAVE    ( Polymorph, DependentStepperList );
+	PROPERTYSLOT_GET_NO_LOAD_SAVE    ( Polymorph, ReadVariableList );
+	PROPERTYSLOT_GET_NO_LOAD_SAVE    ( Polymorph, WriteVariableList );
+
 
 	// setting rng type:  not yet supported
 	//PROPERTYSLOT_SET_GET( Polymorph, Rng,              Stepper );

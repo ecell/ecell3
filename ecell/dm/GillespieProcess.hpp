@@ -34,10 +34,11 @@ LIBECS_DM_CLASS( GillespieProcess, Process )
       INHERIT_PROPERTIES( Process );
       
       PROPERTYSLOT_SET_GET( Real, k );
-      PROPERTYSLOT_GET    ( Real, Mu );
-      PROPERTYSLOT_GET    ( Real, StepInterval );
-      PROPERTYSLOT_GET    ( Int,  Order );
-      
+
+      PROPERTYSLOT_GET_NO_LOAD_SAVE( Real, Mu );
+      PROPERTYSLOT_GET_NO_LOAD_SAVE( Int,  Order );
+      PROPERTYSLOT_GET_NO_LOAD_SAVE( Real, StepInterval );
+
       PROPERTYSLOT( Polymorph, EffectList,
 			   NULLPTR,
 			   &GillespieProcess::getEffectListProperty );

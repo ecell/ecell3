@@ -489,16 +489,15 @@ class Session:
 
             for aProperty in aPropertyList:
                 
-                anAttribute = self.theSimulator.getStepperPropertyAttributes( aStepper, aProperty)
+                anAttributeList = self.theSimulator.getStepperPropertyAttributes( aStepper, aProperty)
 
                 # check get attribute 
-                if anAttribute[3] != 0:
-                    pass
-                
-                else:
+                if anAttributeList[3] != 0:
                                     
+                    print aProperty
                     aValue = self.theSimulator.saveStepperProperty( aStepper,
                                                                     aProperty )
+                    print 'done'
                     #if aValue == '':
                     #    pass
                     
@@ -572,12 +571,12 @@ class Session:
             for aProperty in aPropertyList:
                 aFullPN = aFullID + ':' + aProperty
                 
-                anAttribute = self.theSimulator.getEntityPropertyAttributes(aFullPN)
+                anAttributeList = self.theSimulator.getEntityPropertyAttributes(aFullPN)
 
                 # check savable
-                if anAttribute[3] != 0:
+                if anAttributeList[3] != 0:
                     
-                    aValue = self.theSimulator.getEntityProperty(aFullPN)
+                    aValue = self.theSimulator.saveEntityProperty(aFullPN)
 
                     if aValue != '':
 

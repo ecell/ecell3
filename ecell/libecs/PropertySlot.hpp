@@ -93,6 +93,9 @@ namespace libecs
 
   public:
 
+    typedef void    ( T::* SetPolymorphMethodPtr )( PolymorphCref );
+    typedef const Polymorph ( T::* GetPolymorphMethodPtr )() const;
+
     PropertySlot()
     {
       ; // do nothing
@@ -177,12 +180,12 @@ namespace libecs
 
     virtual const bool isSetable() const
     {
-      return checkSetable( theSetMethodPtr );
+      return isSetableMethod( theSetMethodPtr );
     }
 
     virtual const bool isGetable() const
     {
-      return checkGetable( theGetMethodPtr );
+      return isGetableMethod( theGetMethodPtr );
     }
 
 #define _PROPERTYSLOT_SETMETHOD( TYPE )\
@@ -238,13 +241,13 @@ namespace libecs
     }
 
 
-    static const bool checkSetable( const SetMethodPtr aSetMethodPtr )
+    static const bool isSetableMethod( const SetMethodPtr aSetMethodPtr )
     {
       const SetMethodPtr aNullMethodPtr( &PropertiedClass::nullSet );
       return aSetMethodPtr != aNullMethodPtr;
     }
 
-    static const bool checkGetable( const GetMethodPtr aGetMethodPtr )
+    static const bool isGetableMethod( const GetMethodPtr aGetMethodPtr )
     {
       const GetMethodPtr
 	aNullMethodPtr( &PropertiedClass::nullGet<SlotType> );
@@ -326,12 +329,12 @@ namespace libecs
 
     virtual const bool isLoadable() const
     {
-      return checkSetable( theLoadMethodPtr );
+      return isSetableMethod( theLoadMethodPtr );
     }
 
     virtual const bool isSavable()  const
     {
-      return checkGetable( theSaveMethodPtr );
+      return isGetableMethod( theSaveMethodPtr );
     }
 
     virtual void loadPolymorph( T& anObject, PolymorphCref aValue )
@@ -364,7 +367,7 @@ namespace libecs
     
     inline const Polymorph saveImpl( const T& anObject ) const
     {
-      return convertTo<SlotType>( callSaveMethod( anObject ) );
+      return convertTo<Polymorph>( callSaveMethod( anObject ) );
     }
 
   protected:

@@ -122,8 +122,9 @@ public:
     {
       INHERIT_PROPERTIES( DiscreteEventStepper );
 
-      PROPERTYSLOT_GET    ( Real, TimeScale );
       PROPERTYSLOT_SET_GET( Real, Tolerance );
+
+      PROPERTYSLOT_GET_NO_LOAD_SAVE( Real, TimeScale );
     }
 
   NRStepper(void);

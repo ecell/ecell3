@@ -110,7 +110,7 @@ public:\
  }\
  virtual const Polymorph saveProperty( StringCref aPropertyName ) const\
  {\
-  thePropertyInterface.saveProperty( *this, aPropertyName );\
+  return thePropertyInterface.saveProperty( *this, aPropertyName );\
  }\
  virtual const Polymorph getPropertyList() const\
  {\
@@ -119,7 +119,7 @@ public:\
  virtual PropertySlotProxyPtr\
  createPropertySlotProxy( StringCref aPropertyName )\
  {\
-  thePropertyInterface.createPropertySlotProxy( *this, aPropertyName );\
+  return thePropertyInterface.createPropertySlotProxy( *this, aPropertyName );\
  } //
 
 
@@ -129,12 +129,6 @@ public:\
 
 #define INHERIT_PROPERTIES( BASECLASS )\
     BASECLASS::initializeProperties( Type2Type<TT>() )
-
-  /*
-#define PROPERTYSLOT( TYPE, NAME, SETMETHOD, GETMETHOD )\
-  PropertyInterface<TT>::registerPropertySlot( # NAME,\
-         new ConcretePropertySlot<TT,TYPE>( SETMETHOD, GETMETHOD ) );
-  */
 
 #define PROPERTYSLOT( TYPE, NAME, SETMETHOD, GETMETHOD )\
   PropertyInterface<TT>::registerPropertySlot( # NAME,\
@@ -147,9 +141,8 @@ public:\
 						    LOADMETHOD, SAVEMETHOD ) )
 
 #define PROPERTYSLOT_NO_LOAD_SAVE( TYPE, NAME, SETMETHOD, GETMETHOD )\
-  PropertyInterface<TT>::registerPropertySlot( # NAME,\
-         new LoadSaveConcretePropertySlot<TT,TYPE>( SETMETHOD, GETMETHOD,\
-						    NULLPTR, NULLPTR ) )
+        PROPERTYSLOT_LOAD_SAVE( TYPE, NAME, SETMETHOD, GETMETHOD,\
+				NULLPTR, NULLPTR )
 
 #define PROPERTYSLOT_SET_GET( TYPE, NAME )\
   PROPERTYSLOT( TYPE, NAME,\
@@ -166,6 +159,22 @@ public:\
   PROPERTYSLOT( TYPE, NAME,\
                        NULLPTR,\
                        & _LIBECS_CLASS_::get ## NAME )
+
+#define PROPERTYSLOT_SET_GET_NO_LOAD_SAVE( TYPE, NAME )\
+  PROPERTYSLOT_NO_LOAD_SAVE( TYPE, NAME,\
+                             & _LIBECS_CLASS_::set ## NAME,\
+                             & _LIBECS_CLASS_::get ## NAME )
+
+#define PROPERTYSLOT_SET_NO_LOAD_SAVE( TYPE, NAME )\
+  PROPERTYSLOT_NO_LOAD_SAVE( TYPE, NAME,\
+                             & _LIBECS_CLASS_::set ## NAME,\
+                             NULLPTR )
+
+#define PROPERTYSLOT_GET_NO_LOAD_SAVE( TYPE, NAME )\
+  PROPERTYSLOT_NO_LOAD_SAVE( TYPE, NAME,\
+                             NULLPTR,\
+                             & _LIBECS_CLASS_::get ## NAME )
+
 
   ///@internal
 #define LIBECS_DM_DEFINE_PROPERTIES()\

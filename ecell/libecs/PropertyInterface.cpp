@@ -47,6 +47,24 @@ namespace libecs
 		     aPropertyName + String( "] property.\n" ) );	  
   }
 
+  void PropertyInterfaceBase::throwNotLoadable( PropertiedClassCref anObject,
+						StringCref aPropertyName )
+  {
+    THROW_EXCEPTION( NoSlot,
+		     anObject.getClassNameString() + 
+		     String( ": property [" ) +
+		     aPropertyName + String( "] is not loadable.\n" ) );
+  }
+
+  void PropertyInterfaceBase::throwNotSavable( PropertiedClassCref anObject,
+					       StringCref aPropertyName )
+  {
+    THROW_EXCEPTION( NoSlot,
+		     anObject.getClassNameString() + 
+		     String( ": property [" ) +
+		     aPropertyName + String( "] is not savable.\n" ) );
+  }
+
 
 } // namespace libecs
 
