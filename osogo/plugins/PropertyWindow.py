@@ -20,7 +20,7 @@ class PropertyWindow(PluginWindow):
         
         PluginWindow.__init__( self, dirname, sim, data, pluginmanager )
         
-        self.addHandlers( { 'input_row_pressed'   : self.select_property,
+        self.addHandlers( { 'input_row_pressed'   : self.selectProperty,
                             'show_button_pressed' : self.show } )
         
         self.thePropertyClist = self.getWidget( "property_clist" )
@@ -81,11 +81,6 @@ class PropertyWindow(PluginWindow):
         list(self.theSimulator.getProperty( aAttributeList ))
         num = 0
  
-        # remove PropertyList, PropertyAttributes and ClassName
-#        aPropertyList.remove( 'PropertyList' )
-#        aPropertyList.remove( 'ClassName' )
-#        aPropertyList.remove( 'PropertyAttributes')
-
         for aProperty in aPropertyList:
             if (aProperty == 'ClassName'):
                 pass
@@ -102,17 +97,17 @@ class PropertyWindow(PluginWindow):
 
             else :
                 
-                aFullPropertyName = convertFullIDToFullPN( self.theFullID(),
+                aFullPN = convertFullIDToFullPN( self.theFullID(),
                                                           aProperty )
             
-                aValueList = self.theSimulator.getProperty( aFullPropertyName ) 
+                aValueList = self.theSimulator.getProperty( aFullPN ) 
                 aLength = len( aValueList )
-                aAttribute = aAttributeList[num]
+                aAttribute = self.getAttribute( aFullPN )
             
                 if  aLength > 1 :
                     aNumber = 1
                     for aValue in aValueList :
-                        aList = [ aProperty, aNumber, aValue , aAttribute]
+                        aList = [ aProperty, aNumber, aValue , aAttribute ]
                         aList = map( str, aList )
                         self.theList.append( aList ) 
                         aNumber += 1
@@ -125,10 +120,10 @@ class PropertyWindow(PluginWindow):
 
             num += 1
 
-    def select_property(self, obj, data1, data2, data3):
+    def selectProperty(self, obj, data1, data2, data3):
 
         aSelectedItem = self.theList[data1]
-        aFullPropertyName = None
+        aFullPN = None
 
         print aSelectedItem
         try:
@@ -139,15 +134,15 @@ class PropertyWindow(PluginWindow):
         if not aFullPropertyName:
             try:
                 aFullID = getFullID( aSelectedItem[2] )
-                aFullPropertyName = convertFullIDToFullPN( aFullID )
+                aFullPN = convertFullIDToFullPN( aFullID )
             except ValueError:
                 pass
             
-        if not aFullPropertyName:
-            aFullPropertyName = [ self.theType, self.thePath,
+        if not aFullPN:
+            aFullPN = [ self.theType, self.thePath,
                           self.theID, aSelectedItem[0] ]
 
-        self.theSelected = aFullPropertyName
+        self.theSelected = aFullPN
 
     def show( self, obj ):
 

@@ -3,7 +3,6 @@ import os
 from config import *
 from ViewWindow import *
 
-
 class PluginWindow(ViewWindow):
     '''
     self.theRawFullPNList : [ FullPN1, FullID2, FullPN3, , , ]
@@ -19,7 +18,7 @@ class PluginWindow(ViewWindow):
         ViewWindow.__init__( self, aGladeFileName, sim, data )
 
         self.thePluginManager = pluginmanager
-
+        
         self.theRawFullPNList = data
 
     def theFullPNList( self ):
@@ -48,4 +47,35 @@ class PluginWindow(ViewWindow):
             aNewFullPN = convertFullIDToFullPN( convertFullPNToFullID(aFullPN),
                                                 aPropertyName )
             return aNewFullPN
+
+    def theAttributeMap( self ):
+        aMap = {}
+        for aFullPN in self.theRawFullPNList:
+            aFullID = convertFullPNToFullID( aFullPN )
+            aPropertyName = aFullPN[PROPERTY]
+            aPropertyListFullPN = convertFullIDToFullPN( aFullID, 'PropertyList' )
+            aPropertyList = self.theSimulator.getProperty( aPropertyListFullPN )
+            aAttributeListFullPN = convertFullIDToFullPN( aFullID, 'PropertyAttributes')
+            aAttributeList = self.theSimulator.getProperty( aAttributeListFullPN )
+            num = 0
+            for aProperty in aPropertyList:
+                aPropertyFullPN = convertFullIDToFullPN( aFullID, aProperty )
+                aMap[ aPropertyFullPN ] = aAttributeList[ num ]
+                num += 1
+        return aMap
+        
+    def getAttribute( self, aFullPN ):
+        aMap = self.theAttributeMap()
+        if aMap.has_key( aFullPN ):
+            return aMap[ aFullPN ]
+        else:
+            return 99
+
+
+
+
+
+
+
+
 

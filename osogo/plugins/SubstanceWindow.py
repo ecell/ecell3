@@ -33,31 +33,9 @@ class SubstanceWindow(PluginWindow):
                              'input_concentration': self.inputConcentration
                              } )
 
-        aPropertyListFullPN = convertFullIDToFullPN(self.theFullID(),
-                                                  'PropertyList')
-        aPropertyList =\
-        list( self.theSimulator.getProperty( aPropertyListFullPN ) )
-        aAttributeListFullPN = convertFullIDToFullPN(self.theFullID(),
-                                                  'PropertyAttributes')
-        aAttributeList =\
-        list(self.theSimulator.getProperty( aAttributeListFullPN ))
-        num = 0
-
-        for aProperty in aPropertyList:
-            if (aProperty == 'Quantity'):
-                print aProperty,
-                print "=",
-                print aAttributeList[num]
-            elif (aProperty == 'Concentration'):
-                print aProperty,
-                print "=",
-                print aAttributeList[num]
-            else :
-                pass
-            num += 1
-        self.initialize( self.theFullPN() )
+        self.initialize()
         
-    def initialize( self, fpn ):
+    def initialize( self ):
         
         self.theFPNQuantity = tuple( convertFullIDToFullPN( self.theFullID(), 'Quantity' ) )
         self.theFPNConcentration = tuple(convertFullIDToFullPN( self.theFullID(), 'Concentration' ))

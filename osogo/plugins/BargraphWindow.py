@@ -44,26 +44,6 @@ class BargraphWindow(PluginWindow):
         self.theIDEntry = self.getWidget( "property_id_label" )
         self.theMultiplier1Entry = self.getWidget("multiplier1_label")
 
-        aPropertyListFullPN = convertFullIDToFullPN(self.theFullID(),
-                                                  'PropertyList')
-        aPropertyList =\
-        list( self.theSimulator.getProperty( aPropertyListFullPN ) )
-        aAttributeListFullPN = convertFullIDToFullPN(self.theFullID(),
-                                                  'PropertyAttributes')
-        aAttributeList =\
-        list(self.theSimulator.getProperty( aAttributeListFullPN ))
-        num = 0
-
-        for aProperty in aPropertyList:
-            if (aProperty == 'Quantity'):
-                print aProperty,
-                print "=",
-                print aAttributeList[num]
-            else :
-                pass
-            num += 1
-        self.initialize()
-        
     def initialize( self ):
 
         self.theSelected = ''

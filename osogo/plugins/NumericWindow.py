@@ -18,29 +18,9 @@ class NumericWindow( PluginWindow ):
                             'increase_value' :self.increaseValue,
                             'decrease_value' :self.decreaseValue } )
 
-        aPropertyListFullPN = \
-                  convertFullIDToFullPN(self.theFullID(),'PropertyList')
-        aPropertyList = \
-                  list( self.theSimulator.getProperty( aPropertyListFullPN ) )
+        self.initialize()
 
-        aAttributeListFullPN = \
-                  convertFullIDToFullPN(self.theFullID(), 'PropertyAttributes')
-        aAttributeList = \
-                  list(self.theSimulator.getProperty( aAttributeListFullPN ))
-
-        num = 0
-        for aProperty in aPropertyList:
-            if (aProperty == 'Quantity' ):
-                print aProperty,
-                print "=",
-                print aAttributeList[num]
-            else :
-                pass
-            num += 1        
-
-        self.initialize( self.theFullPN() )
-
-    def initialize( self, fpn ):
+    def initialize( self ):
         aString = str( self.theFullPN()[ID] )
         aString += ':\n' + str( self.theFullPN()[PROPERTY] )
         self["id_label"].set_text( aString )
