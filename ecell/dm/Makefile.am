@@ -63,6 +63,7 @@ PythonFluxProcess.hpp\
 PythonProcess.hpp\
 PythonProcessBase.hpp\
 ExpressionProcessBase.hpp\
+ExpressionCompiler.hpp\
 FixedODE1Stepper.hpp\
 FixedDAE1Stepper.hpp\
 GillespieProcess.hpp\
