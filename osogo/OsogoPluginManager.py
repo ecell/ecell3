@@ -298,7 +298,8 @@ class OsogoPluginManager(PluginManager):
 			#print anInstance.__class__.__name__
 			#print type(anInstance[anInstance.__class__.__name__])
 			#print anInstance[anInstance.__class__.__name__]
-			anInstance[anInstance.__class__.__name__].destroy()
+			if anInstance[anInstance.__class__.__name__] != None:
+				anInstance[anInstance.__class__.__name__].destroy()
 
 		self.theMainWindow.updateFundamentalWindows()
 
