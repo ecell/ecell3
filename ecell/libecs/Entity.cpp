@@ -51,20 +51,37 @@ Entity::~Entity()
 
 void Entity::makeSlots()
 {
-  MessageSlot( "id", Entity, *this, NULL, &Entity::getId);
-  MessageSlot( "name", Entity, *this, NULL, &Entity::getName);
+  MessageSlot( "Id", Entity, *this, NULL, &Entity::getId);
+  MessageSlot( "SystemPath", Entity, *this, NULL, &Entity::getSystemPath);
+  MessageSlot( "Name", Entity, *this, NULL, &Entity::getName);
+  MessageSlot( "Activity", Entity, *this, NULL, &Entity::getActivity);
+  MessageSlot( "ActivityPerSecond", Entity, *this, NULL, 
+	       &Entity::getActivityPerSecond);
 }
 
 const Message Entity::getId( StringCref keyword )
 {
-  static String aKeyword( "id" );
-  return Message( aKeyword, UniversalVariable( getId() ) );
+  return Message( keyword, UniversalVariable( getId() ) );
+}
+
+const Message Entity::getSystemPath( StringCref keyword )
+{
+  return Message( keyword, UniversalVariable( getSystemPath() ) );
 }
 
 const Message Entity::getName( StringCref keyword )
 {
-  static String aKeyword( "name" );
-  return Message( aKeyword, UniversalVariable( getName() ) );
+  return Message( keyword, UniversalVariable( getName() ) );
+}
+
+const Message Entity::getActivity( StringCref keyword )
+{
+  return Message( keyword, UniversalVariable( getActivity() ) );
+}
+
+const Message Entity::getActivityPerSecond( StringCref keyword )
+{
+  return Message( keyword, UniversalVariable( getActivityPerSecond() ) );
 }
 
 Float Entity::getActivity() 

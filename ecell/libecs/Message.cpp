@@ -48,7 +48,6 @@ Message::Message( StringCref keyword, UniversalVariableCref uv )
   theBody.push_back( uv );
 }
 
-// FIXME: shallow or deep copy?
 Message::Message( MessageCref message )
   :
   theKeyword( message.getKeyword() ),
@@ -57,7 +56,6 @@ Message::Message( MessageCref message )
   ; // do nothing
 }
 
-// FIXME: shallow or deep copy?
 Message& Message::operator=( MessageCref rhs )
 {
   if( this != &rhs )

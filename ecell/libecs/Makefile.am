@@ -8,7 +8,7 @@ libdir=@libdir@
 INCLUDES = -I..  -I../include ${KORANDOM_INCLUDE} ${DMTOOL_INCLUDE} ${INCLTDL}
 noinst_LTLIBRARIES = libecs.la
 
-CXXFLAGS= @CXXFLAGS@ 
+CXXFLAGS= @CXXFLAGS@ # -D_REENTRANT
 
 libecs_la_LDFLAGS= -rpath ${libdir}
 libecs_la_LIBADD= ${LIBLTDL} -lstdc++

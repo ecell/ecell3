@@ -44,10 +44,9 @@ public:
 
   int check();
 
-  SystemPtr getSystem( SystemPathCref systempath )
-    throw( NotFound, BadID );
+  SystemPtr getSystem( SystemPathCref systempath );
 
-  SystemPtr getSystem( StringCref id ) throw( NotFound );
+  SystemPtr getSystem( StringCref id ) ;
 
   virtual void initialize();
 

@@ -51,9 +51,9 @@ friend class Accumulator;
 public: // message slots
 
   void setQuantity( MessageCref message );
-  void setAccumulator( MessageCref message );
+  void setAccumulatorClass( MessageCref message );
   const Message getQuantity( StringCref keyword );
-  const Message getAccumulator( StringCref keyword );
+  const Message getAccumulatorClass( StringCref keyword );
 
 public:
 

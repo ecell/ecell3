@@ -80,7 +80,6 @@ int RootSystem::check()
 }
 
 SystemPtr RootSystem::getSystem( SystemPathCref systempath ) 
-  throw( NotFound, BadID )
 {
   if( systempath.first() != "/" )
     {
@@ -92,7 +91,7 @@ SystemPtr RootSystem::getSystem( SystemPathCref systempath )
   return getSystem( systempath.getSystemPathString() );
 }
 
-SystemPtr RootSystem::getSystem( StringCref id ) throw( NotFound )
+SystemPtr RootSystem::getSystem( StringCref id ) 
 {
   // the root System(this!) is requested.
   if( id == "/" )

@@ -76,8 +76,10 @@ public:
 
 
   const Message getId( StringCref keyword );
-
+  const Message getSystemPath( StringCref keyword );
   const Message getName( StringCref keyword );
+  const Message getActivity( StringCref keyword );
+  const Message getActivityPerSecond( StringCref keyword );
 
   /**
     @return entryname of this Entity.
