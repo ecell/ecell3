@@ -20,6 +20,7 @@ DMS = MassActionFluxProcess.cpp\
 CatalyzedMassActionFluxProcess.cpp\
 MichaelisUniUniFluxProcess.cpp\
 RandomBiUniFluxProcess.cpp\
+ConstantFluxProcess.cpp\
 RandomUniBiFluxProcess.cpp\
 RandomBiBiFluxProcess.cpp\
 RapidEquilibriumProcess.cpp\
