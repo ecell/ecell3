@@ -5,6 +5,8 @@ if OS_WIN32
   LIBPYTHON = -lpython@PYTHON_WIN_VERSION@
 endif
 
+SUBDIRS = SessionManager
+
 CXX_FLAGS=@CXX_FLAGS@
 PYTHON_INCLUDES=@PYTHON_INCLUDES@
 pkgpythondir=@pkgpythondir@
@@ -42,14 +44,6 @@ emlextab.py\
 emparsetab.py\
 GtkSessionMonitor.py\
 gui_config.py\
-SessionManager.py\
-SessionProxy.py\
-SystemProxy.py\
-LocalSessionProxy.py\
-LocalSystemProxy.py\
-SGESessionProxy.py\
-SGESystemProxy.py\
-Util.py\
 SbmlFunctions.py\
 convertSBML2EML.py\
 expressionparser.py

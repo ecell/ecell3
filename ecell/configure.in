@@ -261,6 +261,7 @@ AC_CONFIG_FILES([Makefile
 		 pyecs/windows/pathVariables
 		 pyecell/Makefile
 		 pyecell/ecell/Makefile
+		 pyecell/ecell/SessionManager/Makefile
 		 dm/Makefile])
 AC_OUTPUT
 

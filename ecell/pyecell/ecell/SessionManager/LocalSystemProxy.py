@@ -39,9 +39,9 @@ import signal
 
 
 # imports ecell modules
-from ecell.Util import *
-from ecell.LocalSessionProxy import *
-from ecell.SystemProxy import *
+from Util import *
+from LocalSessionProxy import *
+from SystemProxy import *
 
 
 class LocalSystemProxy(SystemProxy):

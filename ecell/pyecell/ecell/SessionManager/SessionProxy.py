@@ -40,8 +40,8 @@ from Numeric import *
 import ecell.emc
 import ecell.ecs
 
-from ecell.Util import *
-from ecell.SessionManager import *
+from Util import *
+from SessionManager import *
 
 class SessionProxy:
 	'''SessionProxy is an abstract class that manages one process

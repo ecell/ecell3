@@ -41,9 +41,9 @@ import popen2
 
 
 # imports ecell modules
-from ecell.Util import *
-from ecell.SGESessionProxy import *
-from ecell.SystemProxy import *
+from Util import *
+from SGESessionProxy import *
+from SystemProxy import *
 
 
 class SGESystemProxy(SystemProxy):

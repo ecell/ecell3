@@ -32,7 +32,7 @@ import sys
 import string
 import os
 
-from ecell.Util import *
+from Util import *
 from SessionProxy import *
 
 

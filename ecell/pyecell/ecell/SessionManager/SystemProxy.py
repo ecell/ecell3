@@ -37,8 +37,8 @@ import time
 
 
 # imports ecell modules
-from ecell.Util import *
-from ecell.SessionProxy import *
+from Util import *
+from SessionProxy import *
 
 
 class SystemProxy:

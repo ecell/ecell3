@@ -35,15 +35,15 @@ import sys
 import os
 import time
 import imp
-import eml
+import ecell.eml
 import re
 import shutil
 import signal
 
 
 # imports ecell modules
-from ecell.SessionProxy import *
-from ecell.Util import *
+from SessionProxy import *
+from Util import *
 
 
 class SessionManager:

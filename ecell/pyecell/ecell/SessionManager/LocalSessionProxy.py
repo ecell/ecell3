@@ -33,7 +33,7 @@ import string
 import os
 import popen2
 
-from ecell.Util import *
+from Util import *
 from SessionProxy import *
 
 class LocalSessionProxy(SessionProxy):
