@@ -1,67 +1,93 @@
 #!@SHELL@
 
 
-PROGRAM=@PROGRAM@
+PACKAGE=@PACKAGE@
 VERSION=@VERSION@
 
-prefix=@prefix@
-exec_prefix=@exec_prefix@
-export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:@libdir@"
-export PYTHONPATH="@pythondir@:${PYTHONPATH}"
+prefix=/home/shafi/test
+exec_prefix=${prefix}
+pythondir=@pythondir@
+
+export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${exec_prefix}/lib"
+export PYTHONPATH="$pythondir:${PYTHONPATH}"
 
 PYTHON=@PYTHON@
-#GDB=@GDB@
-GDB=gdb
+DEBUGGER=gdb
 
-# internal variables. DO NOT EDIT BELOW
-OPTS="dh"
-LONGOPTS=\
-"debug,help"
-unset DEBUG HELP
+BASENAME=`basename $0`
 
 ecell3_usage() 
 {
 cat << EOT_USAGE
-echo $PROGRAM $VERSION
+$BASENAME ( Package: $PACKAGE, Version: $VERSION )
 
 Invoke python interpreter ready to import E-CELL module.
 ('import ecs' to load the module.)
 
 Usage:
-        `basename $0` [OPTIONS]     --> invoke the python interpreter
-        `basename $0` -d|--debug    --> invoke the python interpreter with gdb
-        `basename $0` -h|--help     --> print this message
+
+    Basic Usage:
+
+        $BASENAME [OPTIONS]     --> invoke the python interpreter
+        $BASENAME -h            --> print this message
+
+    Debugging:
+
+        If environment variable ECELL_DEBUG is set,
+
+        $BASENAME [PYTHONOPTIONS]
+
+        invokes
+
+        $DEBUGGER $PYTHON 
+
+        PYTHONOPTIONS are passed to the program via debugger's 
+        --command= option.
+
+
+Configurations:
+
+        PACKAGE         = $PACKAGE
+        VERSION         = $VERSION
+	PYTHON          = $PYTHON
+	PYTHONPATH      = $PYTHONPATH
+        DEBUGGER        = $DEBUGGER
+	LD_LIBRARY_PATH = $LD_LIBRARY_PATH
+	prefix          = $prefix
+        pythondir       = $pythondir
 
 EOT_USAGE
 }
 
+cleanup()
+{
+    echo 'interrupted... cleaning up...'
+    if [ $TMPFILE ] ; then
+	rm -f $TMPFILE
+    fi
+    exit 1
+}
 
-#
-# parse commandline options
-#
-TEMP=`getopt -o $OPTS --long $LONGOPTS -n "$0" -- "$@"`
-if [ $? != 0 ] ; then echo "getopt error..." >&2 ; exit 1 ; fi
-eval set -- "$TEMP"
+trap cleanup 2 9 15
 
-while true ; do
-        case "$1" in
-		-d|--debug) DEBUG=yes ; shift ;;
-		-h|--help) HELP=yes ; shift ;;
-                --) shift ; break ;;
-                *) echo "Internal error!"; exit 1 ;;
-        esac
-done
-
-
-if [ $HELP ] ; then
+if [ "$1" = '-h' ] ; then
     ecell3_usage
     exit 0
 fi
 
-if [ $DEBUG ] ; then
-    exec $GDB $PYTHON $*
-else
+if [ ! $ECELL_DEBUG ] ; then
     exec $PYTHON $*
+else
+    TMPFILE=`mktemp -q /tmp/$BASENAME.XXXXXX`
+    if [ $? -ne 0 ]; then
+	echo "$BASENAME: Can't create temp file, exiting..."
+	exit 1
+    fi
+    echo "run $*" > $TMPFILE
+    echo $DEBUGGER --command=$TMPFILE $PYTHON
+    $DEBUGGER --command=$TMPFILE $PYTHON
+    rm -f $TMPFILE
 fi
+
 
 
