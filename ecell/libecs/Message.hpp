@@ -28,8 +28,8 @@
 // E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
 
-#ifndef ___MESSAGE_H___
-#define ___MESSAGE_H___
+#ifndef __MESSAGE_HPP
+#define __MESSAGE_HPP
 #include <string>
 #include <map>
 #include <vector>
@@ -205,67 +205,6 @@ private:
 
 };
 
-
-
-/**
-  Common base class for classes which receive Messages.
-
-  NOTE:  Subclasses of MessageInterface MUST call their own makeSlots() 
-  to make their slots in their constructors.
-  (virtual functions doesn't work in constructors)
-
-  @see Message
-  @see MessageCallback
-*/
-class MessageInterface
-{
-public:  
-
-  typedef map< const String, AbstractMessageCallback* > SlotMap;
-  typedef SlotMap::iterator SlotMapIterator;
-
-  // exceptions
-
-  class NoSuchSlot : public Message::MessageException
-    {
-    public: 
-      NoSuchSlot( StringCref method, StringCref what )
-	: MessageException( method, what ){}
-      const String what() const { return "No appropriate slot found"; }
-    };
-
-public:
-
-  MessageInterface();
-
-  virtual ~MessageInterface();
-
-  void set( MessageCref ) throw( NoSuchSlot );
-  const Message get( StringCref ) throw( NoSuchSlot );
-  StringList slotList();
-
-  virtual void makeSlots() = 0;
-
-  virtual const char* const className() const { return "MessageInterface"; }
-
-protected:
-
-  void appendSlot( StringCref keyword, AbstractMessageCallback* );
-  void deleteSlot( StringCref keyword );
-
-private:
-
-  SlotMap theSlotMap;
-
-};
-
-
-#define MessageSlot( KEY, CLASS, OBJ, SETMETHOD, GETMETHOD )\
-appendSlot( KEY, new MessageCallback< CLASS >\
-	   ( OBJ, static_cast< MessageCallback< CLASS >::SetMessageFunc >\
-	    ( SETMETHOD ),\
-	    static_cast< MessageCallback< CLASS >::GetMessageFunc >\
-	    ( GETMETHOD ) ) )
 
 #endif /* ___MESSAGE_H___*/
 

@@ -29,7 +29,6 @@
 //
 
 #include <strstream>
-#include <stdio.h>
 #include "Message.hpp"
 #include "StringList.hpp"
 
@@ -112,114 +111,6 @@ const String Message::getBody( int n ) const
   return second.substr( pos, second.find( FIELD_SEPARATOR ) - pos );
 }
 
-///////////////////////////// MessageInterface
-
-MessageInterface::MessageInterface()
-{
-  ; // do nothing
-}
-
-MessageInterface::~MessageInterface()
-{
-  for( SlotMapIterator i = theSlotMap.begin() ; i != theSlotMap.end() ; ++i )
-    {
-      delete i->second;
-    }
-}
-
-void MessageInterface::appendSlot( StringCref keyword, 
-				   AbstractMessageCallback* func )
-{
-  if( theSlotMap.find( keyword ) != theSlotMap.end() )
-    {
-      //      *theMessageWindow << "MessageSlot: appendSlot(): slot for keyword [" 
-      //	<< keyword << "] already exists. Taking later one.\n";
-      delete theSlotMap[ keyword ];
-      theSlotMap.erase( keyword );
-    }
-  theSlotMap[ keyword ] = func;
-}
-
-void MessageInterface::deleteSlot( StringCref keyword )
-{
-  if( theSlotMap.find( keyword ) == theSlotMap.end() )
-    {
-      //      *theMessageWindow << "MessageSlot: deleteSlot(): no slot for keyword [" 
-      //	<< keyword << "] found.\n";
-      return;
-    }
-  delete theSlotMap[ keyword ];
-  theSlotMap.erase( keyword );
-}
-
-void MessageInterface::set( MessageCref message ) throw( NoSuchSlot )
-{
-  SlotMapIterator sm( theSlotMap.find( message.getKeyword() ) );
-
-  if( sm == theSlotMap.end() )
-    {
-      throw NoSuchSlot(__PRETTY_FUNCTION__,
-		       className() + String(": got a Message (keyword = [")
-		       + message.getKeyword() + "]) but no slot for it.");
-    }
-
-  try {
-    sm->second->set( message );
-  }
-  catch( ExceptionCref e )
-    {
-      //      *theMessageWindow << className() << ": Callback has failed (keyword = [" 
-      //	<< message.getKeyword() << "]):\n\t" << e.message() << "\n";
-      return;
-    }
-  catch( ... )
-    {
-      //      *theMessageWindow << __PRETTY_FUNCTION__ << ": " 
-      //<< "callback has failed.(keyword = [" << message.getKeyword() << "])\n";
-      return;
-    }
-
-}
-
-const Message MessageInterface::get( StringCref keyword ) throw( NoSuchSlot )
-{
-  SlotMapIterator sm( theSlotMap.find( keyword ) );
-
-  if( sm == theSlotMap.end() )
-    {
-      throw NoSuchSlot( __PRETTY_FUNCTION__, className()
-			+ String( ": got a request for Message (keyword = [" )
-			+ keyword + "] but no slot for it.\n" );
-    }
-
-  try {
-    return sm->second->get( keyword );
-  }
-  catch(ExceptionCref e)
-    {
-      //      *theMessageWindow << className() << ": Callback has failed (keyword = [" 
-      //	<< keyword << "]):\n\t" << e.message() << "\n";
-      return Message( keyword, "" );
-    }
-  catch(...)
-    {
-      //      *theMessageWindow << __PRETTY_FUNCTION__ << ": " 
-      //	<< "callback has failed.(keyword = [" << keyword << "])\n";
-      return Message( keyword, "" );
-    }
-}
-
-StringList MessageInterface::slotList()
-{
-  StringList sl;
-
-  for( SlotMapIterator i = theSlotMap.begin() ; i != theSlotMap.end() ; ++i )
-    {
-      sl.insert( sl.end(), i->first );
-    }
-
-  return sl;
-}
 
 
 /*
