@@ -166,7 +166,7 @@ namespace libecs
     updateConcentration();
   }
 
-  Real Substance::getActivity()
+  const Real Substance::getActivity()
   {
     return getVelocity();
   }

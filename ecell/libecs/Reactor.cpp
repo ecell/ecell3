@@ -52,9 +52,9 @@ namespace libecs
 			NULLPTR,
 			&Reactor::getReactantList);
 
-    createPropertySlot( "InitialActivity", *this, 
-			&Reactor::setInitialActivity,
-			&Reactor::getInitialActivity );
+    createPropertySlot( "Activity", *this, 
+			&Reactor::setActivity,
+			&Reactor::getActivity );
   }
 
   void Reactor::setReactant( UVariableVectorRCPtrCref aMessage )
@@ -88,19 +88,9 @@ namespace libecs
     registerReactant( aName, aSubstance, aStoichiometry );
   }
 
-
-  void Reactor::setInitialActivity( RealCref anActivity )
-  {
-    theInitialActivity = anActivity;
-
-    theActivity = theInitialActivity * 
-      getSuperSystem()->getStepper()->getStepInterval();
-  }
-
   Reactor::Reactor() 
     :
-    theInitialActivity( 0 ),
-    theActivity( 0 )
+    theActivity( 0.0 )
   {
     makeSlots();
   }

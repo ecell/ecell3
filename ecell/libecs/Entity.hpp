@@ -156,6 +156,17 @@ namespace libecs
     virtual const Real getActivity() const;
 
     /**
+       Set activity value (per delta-T) of this Entity.
+
+       @return activity of this Entity
+       @see getActivityPerSecond()
+    */
+    virtual void setActivity( RealCref ) 
+    {
+      ; // do nothing
+    }
+
+    /**
        Returns activity value (per second).
        Default action of this method is to return getActivity() / delta-T,
        but this can be changed in subclasses.

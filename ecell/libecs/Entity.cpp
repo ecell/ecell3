@@ -57,7 +57,9 @@ namespace libecs
     createPropertySlot( "FullID", *this, NULLPTR, &Entity::getFullIDString );
     
     createPropertySlot( "Name", *this, NULLPTR, &Entity::getName );
-    createPropertySlot( "Activity", *this, NULLPTR, &Entity::getActivity );
+    createPropertySlot( "Activity", *this, 
+			&Entity::setActivity,
+			&Entity::getActivity );
     createPropertySlot( "ActivityPerSecond", *this, NULLPTR, 
 			&Entity::getActivityPerSecond );
   }

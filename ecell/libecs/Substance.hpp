@@ -132,7 +132,7 @@ namespace libecs
     */
     void clear()
     { 
-      theVelocity = 0; 
+      theVelocity = 0.0; 
       theIntegrator->clear();
     }
 
@@ -178,7 +178,8 @@ namespace libecs
        @see getActivityPerSecond
        @return activity value of Substance in Real.
     */
-    Real getActivity();
+
+    virtual const Real getActivity();
 
     /**
        Set a quantity with no check. (i.e. isFixed() is ignored.)

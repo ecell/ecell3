@@ -120,33 +120,16 @@ namespace libecs
        @param activity [number of molecule that this yields] / [deltaT].
        @see getActivity(), getActivityPerSecond()
     */
-    void setActivity( RealCref anActivity ) 
+
+    virtual void setActivity( RealCref anActivity ) 
     { 
       theActivity = anActivity; 
     }
-
-    /**
-       Returns activity of this reactor in 
-       [number of molecule that this yields] / [s].
-       This does not simply returns a value given in setActivity() which
-       takes number of molecule per deltaT. The value given in setActivity()
-       is recalculated as per second by dividing it by deltaT.
-    
-       @return [the number of molecule that this yield] / [s].
-       @see setActivity()
-    */
 
     virtual const Real getActivity() const
     {
       return theActivity;
     }
-
-    const Real getInitialActivity() const
-    {
-      return theInitialActivity;
-    }
-
-    void setInitialActivity( RealCref anActivity );
 
     void registerReactant( StringCref aName, FullIDCref aFullID,
 			   const Int aStoichiometry );
@@ -183,11 +166,9 @@ namespace libecs
 
     ReactantMap theReactantMap;
 
-    Real        theActivity;
-
   private:
 
-    Real theInitialActivity;
+    Real        theActivity;
 
   };
 
