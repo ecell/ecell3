@@ -64,6 +64,7 @@ namespace libecs
   public:
 
     LIBECS_DM_BASECLASS( Process );
+
     LIBECS_DM_OBJECT_ABSTRACT( Process )
       {
 	INHERIT_PROPERTIES( Entity );
@@ -132,6 +133,15 @@ namespace libecs
     
     virtual void process() = 0;
     
+
+    /**
+       This method returns true if this Process is compatible with 
+    */
+
+    virtual const bool isContinuous() const
+    {
+      return false;
+    }
     
     /**
        Set activity value.
