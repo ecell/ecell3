@@ -16,6 +16,6 @@ defineMethod( 'process', '''
   const Real E( C0.getVariable()->getConcentration() );
   V = m * E * getSuperSystem()->getVolume() * N_A;
 
-  process ( V );
+  setFlux( V );
 ''' )
 
