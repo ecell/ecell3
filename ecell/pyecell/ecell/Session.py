@@ -86,7 +86,7 @@ class Session:
 
             aClass  = aTargetStepperSystem[1]
             aValueList = [ aClass ]
-            aName = 'StepperId'
+            aName = 'StepperID'
 
 
             if aFullPath == '/':
