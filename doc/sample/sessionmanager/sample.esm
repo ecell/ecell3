@@ -67,19 +67,19 @@ message( "run --> end" )
 message( "copy files --> start" )
 
 # [4-1] copy output file and stdout file of first job 
-shutil.copy( getJobDirectory(aJob1) + os.sep + "S.ecd", "S1.ecd")
-shutil.copy( getJobDirectory(aJob1) + os.sep + "stdout.txt", "stdout1.txt")
-shutil.copy( getJobDirectory(aJob1) + os.sep + "stderr.txt", "stderr1.txt")
+shutil.copy( getJobDirectory(aJob1) + "S.ecd", "S1.ecd")
+shutil.copy( getJobDirectory(aJob1) + "stdout.txt", "stdout1.txt")
+shutil.copy( getJobDirectory(aJob1) + "stderr.txt", "stderr1.txt")
 
 # [4-2] copy output file and stdout file of second job 
-shutil.copy( getJobDirectory(aJob1) + os.sep + "S.ecd", "S2.ecd")
-shutil.copy( getJobDirectory(aJob2) + os.sep + "stdout.txt", "stdout2.txt")
-shutil.copy( getJobDirectory(aJob2) + os.sep + "stderr.txt", "stderr2.txt")
+shutil.copy( getJobDirectory(aJob1) + "S.ecd", "S2.ecd")
+shutil.copy( getJobDirectory(aJob2) + "stdout.txt", "stdout2.txt")
+shutil.copy( getJobDirectory(aJob2) + "stderr.txt", "stderr2.txt")
 
 # [4-3] copy output file and stdout file of third job 
-shutil.copy( getJobDirectory(aJob1) + os.sep + "S.ecd", "S3.ecd")
-shutil.copy( getJobDirectory(aJob3) + os.sep + "stdout.txt", "stdout3.txt")
-shutil.copy( getJobDirectory(aJob3) + os.sep + "stderr.txt", "stderr3.txt")
+shutil.copy( getJobDirectory(aJob1) + "S.ecd", "S3.ecd")
+shutil.copy( getJobDirectory(aJob3) + "stdout.txt", "stdout3.txt")
+shutil.copy( getJobDirectory(aJob3) + "stderr.txt", "stderr3.txt")
 
 message( "copy files --> end" )
 
