@@ -30,10 +30,15 @@ rm -f conftest
 . ./conftest
 rm -f conftest
 dnl
-dnl compatibility for libtool 1.5.x
-if test -n "$shrext"; then 
-  LTDL_SHLIB_EXT=$shrext
-  AC_SUBST(LTDL_SHLIB_EXT)
+dnl compatibility for libtool 1.5.6
+LTDL_SHLIB_EXT=""
+if test -n "$shrext_cmds"; then
+    LTDL_SHLIB_EXT=$shrext_cmds
+    AC_SUBST(LTDL_SHLIB_EXT)
+dnl compatibility for libtool 1.5.0
+elif test -n "$shrext"; then
+    LTDL_SHLIB_EXT=$shrext
+    AC_SUBST(LTDL_SHLIB_EXT)
 dnl compatibility for libtool 1.4.x
 else
   AC_CACHE_CHECK([which extension is used for shared libraries],
