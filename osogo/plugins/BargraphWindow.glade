@@ -25,14 +25,14 @@
 
   <widget>
     <class>GtkHBox</class>
-    <name>hbox3</name>
+    <name>hbox16</name>
     <homogeneous>False</homogeneous>
     <spacing>0</spacing>
 
     <widget>
       <class>GtkLabel</class>
       <name>property_id_label</name>
-      <width>120</width>
+      <width>70</width>
       <label>label1</label>
       <justify>GTK_JUSTIFY_CENTER</justify>
       <wrap>False</wrap>
@@ -48,43 +48,8 @@
     </widget>
 
     <widget>
-      <class>GtkToolbar</class>
-      <name>toolbar3</name>
-      <height>21</height>
-      <orientation>GTK_ORIENTATION_HORIZONTAL</orientation>
-      <type>GTK_TOOLBAR_BOTH</type>
-      <space_size>5</space_size>
-      <space_style>GTK_TOOLBAR_SPACE_EMPTY</space_style>
-      <relief>GTK_RELIEF_NORMAL</relief>
-      <tooltips>True</tooltips>
-      <child>
-	<padding>0</padding>
-	<expand>False</expand>
-	<fill>False</fill>
-      </child>
-
-      <widget>
-	<class>GtkButton</class>
-	<child_name>Toolbar:button</child_name>
-	<name>subtract_button</name>
-	<width>22</width>
-	<height>22</height>
-	<can_focus>True</can_focus>
-	<has_focus>True</has_focus>
-	<signal>
-	  <name>clicked</name>
-	  <handler>on_subtract_button_clicked</handler>
-	  <last_modification_time>Mon, 10 Sep 2001 01:53:14 GMT</last_modification_time>
-	</signal>
-	<label></label>
-	<stock_pixmap>GNOME_STOCK_PIXMAP_BACK</stock_pixmap>
-      </widget>
-    </widget>
-
-    <widget>
       <class>GtkVBox</class>
-      <name>vbox4</name>
-      <width>283</width>
+      <name>vbox6</name>
       <homogeneous>False</homogeneous>
       <spacing>0</spacing>
       <child>
@@ -94,10 +59,70 @@
       </child>
 
       <widget>
+	<class>GtkLabel</class>
+	<name>multiplier1_label</name>
+	<width>9</width>
+	<height>15</height>
+	<label>2</label>
+	<justify>GTK_JUSTIFY_CENTER</justify>
+	<wrap>False</wrap>
+	<xalign>0.56</xalign>
+	<yalign>0.45</yalign>
+	<xpad>8</xpad>
+	<ypad>0</ypad>
+	<child>
+	  <padding>0</padding>
+	  <expand>False</expand>
+	  <fill>False</fill>
+	</child>
+      </widget>
+
+      <widget>
+	<class>GtkToolbar</class>
+	<name>toolbar5</name>
+	<orientation>GTK_ORIENTATION_HORIZONTAL</orientation>
+	<type>GTK_TOOLBAR_ICONS</type>
+	<space_size>5</space_size>
+	<space_style>GTK_TOOLBAR_SPACE_EMPTY</space_style>
+	<relief>GTK_RELIEF_NORMAL</relief>
+	<tooltips>True</tooltips>
+	<child>
+	  <padding>0</padding>
+	  <expand>False</expand>
+	  <fill>False</fill>
+	</child>
+
+	<widget>
+	  <class>GtkButton</class>
+	  <child_name>Toolbar:button</child_name>
+	  <name>subtract_button</name>
+	  <width>21</width>
+	  <height>14</height>
+	  <signal>
+	    <name>clicked</name>
+	    <handler>on_subtract_button_clicked</handler>
+	    <last_modification_time>Thu, 13 Sep 2001 02:13:04 GMT</last_modification_time>
+	  </signal>
+	  <label>button1</label>
+	  <stock_pixmap>GNOME_STOCK_PIXMAP_BACK</stock_pixmap>
+	</widget>
+      </widget>
+    </widget>
+
+    <widget>
+      <class>GtkVBox</class>
+      <name>vbox5</name>
+      <homogeneous>False</homogeneous>
+      <spacing>0</spacing>
+      <child>
+	<padding>0</padding>
+	<expand>False</expand>
+	<fill>False</fill>
+      </child>
+
+      <widget>
 	<class>GtkHBox</class>
-	<name>hbox13</name>
-	<width>194</width>
-	<height>16</height>
+	<name>hbox20</name>
 	<homogeneous>False</homogeneous>
 	<spacing>0</spacing>
 	<child>
@@ -107,109 +132,11 @@
 	</child>
 
 	<widget>
-	  <class>GtkLabel</class>
-	  <name>multiplier1_label</name>
-	  <width>34</width>
-	  <label>1</label>
-	  <justify>GTK_JUSTIFY_LEFT</justify>
-	  <wrap>False</wrap>
-	  <xalign>0.0600002</xalign>
-	  <yalign>0.5</yalign>
-	  <xpad>0</xpad>
-	  <ypad>0</ypad>
-	  <child>
-	    <padding>0</padding>
-	    <expand>False</expand>
-	    <fill>False</fill>
-	  </child>
-	</widget>
-
-	<widget>
-	  <class>GtkLabel</class>
-	  <name>multiplier2_label</name>
-	  <width>82</width>
-	  <label>2</label>
-	  <justify>GTK_JUSTIFY_CENTER</justify>
-	  <wrap>False</wrap>
-	  <xalign>0.78</xalign>
-	  <yalign>0.5</yalign>
-	  <xpad>0</xpad>
-	  <ypad>0</ypad>
-	  <child>
-	    <padding>0</padding>
-	    <expand>False</expand>
-	    <fill>False</fill>
-	  </child>
-	</widget>
-
-	<widget>
-	  <class>GtkLabel</class>
-	  <name>multiplier3_label</name>
-	  <width>73</width>
-	  <height>16</height>
-	  <label>3</label>
-	  <justify>GTK_JUSTIFY_RIGHT</justify>
-	  <wrap>False</wrap>
-	  <xalign>1</xalign>
-	  <yalign>0.58</yalign>
-	  <xpad>0</xpad>
-	  <ypad>0</ypad>
-	  <child>
-	    <padding>0</padding>
-	    <expand>False</expand>
-	    <fill>False</fill>
-	  </child>
-	</widget>
-
-	<widget>
-	  <class>GtkFixed</class>
-	  <name>fixed1</name>
-	  <border_width>1</border_width>
-	  <child>
-	    <padding>38</padding>
-	    <expand>False</expand>
-	    <fill>False</fill>
-	  </child>
-
-	  <widget>
-	    <class>GtkEntry</class>
-	    <name>multiplier_entry</name>
-	    <x>34</x>
-	    <y>2</y>
-	    <width>21</width>
-	    <height>14</height>
-	    <can_focus>True</can_focus>
-	    <signal>
-	      <name>activate</name>
-	      <handler>multiplier_entry_activate</handler>
-	      <last_modification_time>Fri, 07 Sep 2001 01:10:42 GMT</last_modification_time>
-	    </signal>
-	    <editable>True</editable>
-	    <text_visible>True</text_visible>
-	    <text_max_length>0</text_max_length>
-	    <text></text>
-	  </widget>
-	</widget>
-      </widget>
-
-      <widget>
-	<class>GtkHBox</class>
-	<name>hbox14</name>
-	<height>9</height>
-	<homogeneous>True</homogeneous>
-	<spacing>0</spacing>
-	<child>
-	  <padding>0</padding>
-	  <expand>False</expand>
-	  <fill>False</fill>
-	</child>
-
-	<widget>
 	  <class>GtkHBox</class>
-	  <name>hbox15</name>
-	  <border_width>1</border_width>
-	  <width>181</width>
-	  <homogeneous>True</homogeneous>
+	  <name>hbox21</name>
+	  <width>85</width>
+	  <height>8</height>
+	  <homogeneous>False</homogeneous>
 	  <spacing>0</spacing>
 	  <child>
 	    <padding>0</padding>
@@ -219,9 +146,7 @@
 
 	  <widget>
 	    <class>GtkVSeparator</class>
-	    <name>vseparator11</name>
-	    <width>70</width>
-	    <height>9</height>
+	    <name>vseparator14</name>
 	    <child>
 	      <padding>0</padding>
 	      <expand>True</expand>
@@ -231,8 +156,7 @@
 
 	  <widget>
 	    <class>GtkVSeparator</class>
-	    <name>vseparator12</name>
-	    <width>70</width>
+	    <name>vseparator15</name>
 	    <child>
 	      <padding>0</padding>
 	      <expand>True</expand>
@@ -245,7 +169,8 @@
       <widget>
 	<class>GtkProgressBar</class>
 	<name>progressbar</name>
-	<width>20</width>
+	<width>125</width>
+	<height>17</height>
 	<value>0</value>
 	<lower>0</lower>
 	<upper>1000</upper>
@@ -253,58 +178,139 @@
 	<orientation>GTK_PROGRESS_LEFT_TO_RIGHT</orientation>
 	<activity_mode>False</activity_mode>
 	<show_text>True</show_text>
-	<format></format>
+	<format>%P %%</format>
 	<text_xalign>0.5</text_xalign>
-	<text_yalign>0.37</text_yalign>
+	<text_yalign>0.18</text_yalign>
 	<child>
 	  <padding>0</padding>
 	  <expand>False</expand>
 	  <fill>False</fill>
 	</child>
       </widget>
+
+      <widget>
+	<class>GtkHBox</class>
+	<name>hbox22</name>
+	<height>1</height>
+	<homogeneous>False</homogeneous>
+	<spacing>0</spacing>
+	<child>
+	  <padding>0</padding>
+	  <expand>True</expand>
+	  <fill>True</fill>
+	</child>
+
+	<widget>
+	  <class>GtkHBox</class>
+	  <name>hbox23</name>
+	  <width>85</width>
+	  <height>1</height>
+	  <homogeneous>False</homogeneous>
+	  <spacing>0</spacing>
+	  <child>
+	    <padding>0</padding>
+	    <expand>True</expand>
+	    <fill>False</fill>
+	  </child>
+
+	  <widget>
+	    <class>GtkVSeparator</class>
+	    <name>vseparator16</name>
+	    <child>
+	      <padding>0</padding>
+	      <expand>True</expand>
+	      <fill>True</fill>
+	    </child>
+	  </widget>
+
+	  <widget>
+	    <class>GtkVSeparator</class>
+	    <name>vseparator17</name>
+	    <child>
+	      <padding>0</padding>
+	      <expand>True</expand>
+	      <fill>True</fill>
+	    </child>
+	  </widget>
+	</widget>
+      </widget>
     </widget>
 
     <widget>
-      <class>GtkToolbar</class>
-      <name>toolbar4</name>
-      <orientation>GTK_ORIENTATION_HORIZONTAL</orientation>
-      <type>GTK_TOOLBAR_BOTH</type>
-      <space_size>5</space_size>
-      <space_style>GTK_TOOLBAR_SPACE_EMPTY</space_style>
-      <relief>GTK_RELIEF_NORMAL</relief>
-      <tooltips>True</tooltips>
+      <class>GtkVBox</class>
+      <name>vbox7</name>
+      <homogeneous>False</homogeneous>
+      <spacing>0</spacing>
       <child>
 	<padding>0</padding>
-	<expand>False</expand>
-	<fill>False</fill>
+	<expand>True</expand>
+	<fill>True</fill>
       </child>
 
       <widget>
-	<class>GtkButton</class>
-	<child_name>Toolbar:button</child_name>
-	<name>add_button</name>
-	<width>22</width>
-	<height>22</height>
+	<class>GtkEntry</class>
+	<name>multiplier_entry</name>
+	<width>26</width>
+	<height>14</height>
 	<can_focus>True</can_focus>
-	<has_focus>True</has_focus>
 	<signal>
-	  <name>clicked</name>
-	  <handler>on_add_button_clicked</handler>
-	  <last_modification_time>Mon, 10 Sep 2001 01:54:07 GMT</last_modification_time>
+	  <name>activate</name>
+	  <handler>multiplier_entry_activate</handler>
+	  <last_modification_time>Thu, 13 Sep 2001 02:14:30 GMT</last_modification_time>
 	</signal>
-	<label></label>
-	<stock_pixmap>GNOME_STOCK_PIXMAP_FORWARD</stock_pixmap>
+	<editable>True</editable>
+	<text_visible>True</text_visible>
+	<text_max_length>0</text_max_length>
+	<text>5</text>
+	<child>
+	  <padding>0</padding>
+	  <expand>False</expand>
+	  <fill>False</fill>
+	</child>
+      </widget>
+
+      <widget>
+	<class>GtkToolbar</class>
+	<name>toolbar6</name>
+	<orientation>GTK_ORIENTATION_HORIZONTAL</orientation>
+	<type>GTK_TOOLBAR_ICONS</type>
+	<space_size>5</space_size>
+	<space_style>GTK_TOOLBAR_SPACE_EMPTY</space_style>
+	<relief>GTK_RELIEF_NORMAL</relief>
+	<tooltips>True</tooltips>
+	<child>
+	  <padding>0</padding>
+	  <expand>False</expand>
+	  <fill>False</fill>
+	</child>
+
+	<widget>
+	  <class>GtkButton</class>
+	  <child_name>Toolbar:button</child_name>
+	  <name>add_button</name>
+	  <width>19</width>
+	  <height>14</height>
+	  <signal>
+	    <name>clicked</name>
+	    <handler>on_add_button_clicked</handler>
+	    <last_modification_time>Thu, 13 Sep 2001 02:13:44 GMT</last_modification_time>
+	  </signal>
+	  <label>button2</label>
+	  <stock_pixmap>GNOME_STOCK_PIXMAP_FORWARD</stock_pixmap>
+	</widget>
       </widget>
     </widget>
 
     <widget>
       <class>GtkCheckButton</class>
       <name>auto_button</name>
+      <width>17</width>
+      <height>24</height>
       <can_focus>True</can_focus>
       <signal>
 	<name>toggled</name>
 	<handler>auto_button_toggled</handler>
-	<last_modification_time>Tue, 14 Aug 2001 04:23:19 GMT</last_modification_time>
+	<last_modification_time>Thu, 13 Sep 2001 02:15:16 GMT</last_modification_time>
       </signal>
       <label></label>
       <active>True</active>

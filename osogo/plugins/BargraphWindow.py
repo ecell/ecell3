@@ -22,10 +22,10 @@ class BargraphWindow(PluginWindow):
         PluginWindow.__init__( self, dirname, sim, data, pluginmanager )
 
         #test
-        self['toolbar3'].set_style( GTK.TOOLBAR_ICONS )
-        self['toolbar4'].set_style( GTK.TOOLBAR_ICONS )
-        self['toolbar3'].set_button_relief( GTK.RELIEF_HALF )
-        self['toolbar4'].set_button_relief( GTK.RELIEF_HALF )        
+        self['toolbar5'].set_style( GTK.TOOLBAR_ICONS )
+        self['toolbar6'].set_style( GTK.TOOLBAR_ICONS )
+        self['toolbar5'].set_button_relief( GTK.RELIEF_HALF )
+        self['toolbar6'].set_button_relief( GTK.RELIEF_HALF )        
 
         self.pull = 0
         self.thePositiveFlag = 1
@@ -43,8 +43,6 @@ class BargraphWindow(PluginWindow):
 
         self.theIDEntry = self.getWidget( "property_id_label" )
         self.theMultiplier1Entry = self.getWidget("multiplier1_label")
-        self.theMultiplier2Entry = self.getWidget("multiplier2_label")
-        self.theMultiplier3Entry = self.getWidget("multiplier3_label")
 
         aPropertyListFullPN = convertFullIDToFullPN(self.theFullID(),
                                                   'PropertyList')
@@ -87,18 +85,14 @@ class BargraphWindow(PluginWindow):
         self.theBarLength , self.theMultiplier , self.thePositiveFlag \
                           = self.calculateBarLength( value )
 
-        # aIndicator = self.theBarLength * self.thePositiveFlag
         aIndicator = (value / (float)(10**(self.theMultiplier))) \
                      * self.thePositiveFlag
 
-#        print self.theMultiplier
-        
+
         self['progressbar'].set_value(int(self.theBarLength))
         self['progressbar'].set_format_string(str(value))
 
         self.theMultiplier1Entry.set_text(str(int(self.theMultiplier-1)))
-        self.theMultiplier2Entry.set_text(str(int(self.theMultiplier)))
-        self.theMultiplier3Entry.set_text(str(int(self.theMultiplier+1)))
         self['multiplier_entry'].set_text(str(int(self.theMultiplier+2)))
 
     def updateByAuto( self, value ):
@@ -154,11 +148,6 @@ class BargraphWindow(PluginWindow):
         else :
             aPositiveFlag = 1
 
-#        if value == 0 :
-#            aMultiplier = 0
-#            aBarLength = 0
-
-#        else :
         if self['auto_button'].get_active() :
             if value == 0 :
                 aMultiplier = 2
