@@ -125,7 +125,7 @@ public:
 protected:
 
   python::dict   theGlobalNamespace;
-  //python::dict   theLocalNamespace;
+  python::dict   theLocalNamespace;
 
 };
 
