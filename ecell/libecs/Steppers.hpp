@@ -122,44 +122,6 @@ namespace libecs
 
   public:
 
-    class VariableProxy
-      :
-      public libecs::VariableProxy
-    {
-    public:
-
-      VariableProxy( Fehlberg23StepperRef aStepper, 
-		     VariablePtr const aVariablePtr )
-	:
-	libecs::VariableProxy( aVariablePtr ),
-	theStepper( aStepper ),
-	theIndex( theStepper.getVariableIndex( aVariablePtr ) )
-      {
-	; // do nothing
-      }
-
-      virtual const Real getDifference( RealCref aTime, RealCref anInterval )
-      {
-	const Real aTimeInterval( aTime - theStepper.getCurrentTime() );
-
-	const Real theta( ( aTimeInterval + aTimeInterval - anInterval )
-			   / theStepper.getStepInterval() );
-
-	const Real k1 = theStepper.getK1()[ theIndex ];
-	const Real k2 = theStepper.getVelocityBuffer()[ theIndex ];
-
-	return ( ( k1 + ( k2 - k1 ) * theta ) * anInterval );
-      }
-
-    protected:
-
-      Fehlberg23StepperRef theStepper;
-      UnsignedInt         theIndex;
-    };
-
-
-  public:
-
     Fehlberg23Stepper();
     virtual ~Fehlberg23Stepper() {}
 
@@ -177,15 +139,10 @@ namespace libecs
     //      return new VariableProxy( *this, aVariable );
     //    }
 
-    RealVectorCref getK1() const
-    {
-      return theK1;
-    }
-
 
   protected:
 
-    RealVector theK1;
+    //    RealVector theK1;
   };
 
 
@@ -211,7 +168,7 @@ namespace libecs
 
   protected:
 
-    RealVector theK1;
+    //    RealVector theK1;
     RealVector theK2;
     RealVector theK3;
     RealVector theK4;
@@ -246,22 +203,26 @@ namespace libecs
 	; // do nothing
       }
 
-	/* FIXME: should be updated
-
       virtual const Real getDifference( RealCref aTime, RealCref anInterval )
       {
-	const Real theta( ( aTime - theStepper.getCurrentTime() )
-			  / theStepper.getStepInterval() );
+	const Real aTimeInterval( aTime - theStepper.getCurrentTime() );
+
+	const Real theta1( aTimeInterval / theStepper.getStepInterval() );
+	const Real theta2( ( aTimeInterval - anInterval )
+			   / theStepper.getStepInterval() );
+
+	const Real theta( theta1 + theta2 );
 
 	const Real k1 = theStepper.getK1()[ theIndex ];
-	const Real k2 = theStepper.getVelocityBuffer()[ theIndex ];
-	const Real k3 = theStepper.getMidVelocityBuffer()[ theIndex ];
+	const Real k2 = theStepper.getMidVelocityBuffer()[ theIndex ];
+	const Real k3 = theStepper.getVelocityBuffer()[ theIndex ];
 
-	return ( k1 + ( ( -3*k1 - k2 + 8*k3 ) 
-			+ ( 2*k1 + 2*k2 - 8*k3 ) * theta ) * theta )
-	  * ( aTime - theStepper.getCurrentTime() );
+	const Real b = (-3) * k1 + 4 * k2 + (-1) * k3;
+	const Real c = (+2) * k1 - 4 * k2 + (+2) * k3;
+
+	return ( ( k1 + theta * ( b + c * theta ) - c * theta1 * theta2 )
+		 * anInterval );
       }
-	  */
 
     protected:
 
@@ -291,11 +252,6 @@ namespace libecs
     //      return new VariableProxy( *this, aVariable );
     //    }
 
-    RealVectorCref getK1() const
-    {
-      return theK1;
-    }
-
     RealVectorCref getMidVelocityBuffer() const
     {
       return theMidVelocityBuffer;
@@ -304,7 +260,7 @@ namespace libecs
 
   protected:
 
-    RealVector theK1;
+    //    RealVector theK1;
     RealVector theK2;
     RealVector theK3;
     RealVector theK4;

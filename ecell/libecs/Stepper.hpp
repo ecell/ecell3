@@ -622,6 +622,43 @@ namespace libecs
   {
   public:
 
+    class VariableProxy
+      :
+      public libecs::VariableProxy
+    {
+    public:
+
+      VariableProxy( AdaptiveDifferentialStepperRef aStepper, 
+		     VariablePtr const aVariablePtr )
+	:
+	libecs::VariableProxy( aVariablePtr ),
+	theStepper( aStepper ),
+	theIndex( theStepper.getVariableIndex( aVariablePtr ) )
+      {
+	; // do nothing
+      }
+
+      virtual const Real getDifference( RealCref aTime, RealCref anInterval )
+      {
+	const Real aTimeInterval( aTime - theStepper.getCurrentTime() );
+
+	const Real theta( ( aTimeInterval + aTimeInterval - anInterval )
+			   / theStepper.getStepInterval() );
+
+	const Real k1 = theStepper.getK1()[ theIndex ];
+	const Real k2 = theStepper.getVelocityBuffer()[ theIndex ];
+
+	return ( ( k1 + ( k2 - k1 ) * theta ) * anInterval );
+      }
+
+    protected:
+
+      AdaptiveDifferentialStepperRef theStepper;
+      UnsignedInt                    theIndex;
+    };
+
+  public:
+
     AdaptiveDifferentialStepper();
     virtual ~AdaptiveDifferentialStepper() {}
 
@@ -694,9 +731,15 @@ namespace libecs
       return "AdaptiveDifferentialStepper";
     }
 
+    RealVectorCref getK1() const
+    {
+      return theK1;
+    }
+
   protected:
 
     Real safety;
+    RealVector theK1;
 
   private:
 
@@ -706,7 +749,6 @@ namespace libecs
     Real theDerivativeToleranceFactor;
 
     Real theMaxErrorRatio;
-
   };
 
 
