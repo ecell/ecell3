@@ -12,7 +12,9 @@ class PaletteWindow(GtkWindow):
 
         aToolbar = GtkToolbar( ORIENTATION_VERTICAL, TOOLBAR_BOTH )
         self.add( aToolbar )
+        self.set_data('toolbar', aToolbar)
 
+        aPluginNameList = []
         aIndicator = 0
         for aFileName in os.listdir( 'plugins' ) :
 
@@ -24,11 +26,17 @@ class PaletteWindow(GtkWindow):
 
                     aFirstButton = GtkRadioButton( label = aModuleName )
                     aToolbar.append_widget( aFirstButton, '', '' )
+                    aPluginNameList.append( aModuleName )
+                    self.set_data( aModuleName, aFirstButton )
 
                 else :
                     aButton = GtkRadioButton( aFirstButton, label = aModuleName )
                     aToolbar.append_widget( aButton, '', '' )
-            
+                    aPluginNameList.append( aModuleName )
+                    self.set_data( aModuleName, aButton )
+
+        self.set_data( 'plugin_list' , aPluginNameList )
+        
 def mainLoop():
     aPaletteWindow = PaletteWindow()
     gtk.mainloop()
