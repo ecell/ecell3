@@ -135,8 +135,7 @@ items.
                 the Python script file you want to execute.
     		</para>
 	  <para>If <replaceable>filename.ess</replaceable> is omitted,
-	  the interpreter starts up in interactive mode. (not
-	  implemented yet)</para>
+	  the interpreter starts up in interactive mode.</para>
 
       <para>See chapter 5 about the scripting.</para>
 
