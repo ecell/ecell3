@@ -36,9 +36,10 @@
 
 Message::Message( StringCref keyword, StringCref body ) 
   :
-  StringPair( keyword, body) 
+  StringPair( keyword, body ) 
 {
   ; // do nothing
+
 }
 
 Message::Message( StringCref message ) 
@@ -77,8 +78,10 @@ Message::Message( StringCref keyword, const Int i )
 }
 
 Message::Message( MessageCref message )
+  :
+  StringPair( message.getKeyword(), message.getBody() )
 {
-  operator=( message );
+  ; // do nothing
 }
 
 Message& Message::operator=( MessageCref rhs )
@@ -99,7 +102,7 @@ Message::~Message()
 
 const String Message::getBody( int n ) const
 {
-  String::size_type pos = 0;
+  String::size_type pos( 0 );
   while( n != 0 )
     {
       pos = second.find( FIELD_SEPARATOR, pos );
