@@ -67,35 +67,29 @@ namespace libecs
 
   LoggerPtr LoggerBroker::createLogger( FullPNCref fpn )
   {
-    EntityPtr anEntityPtr( theRootSystem.getEntity( fpn.getFullID() ) );
+    EntityPtr anEntityPtr(theRootSystem.getEntity( fpn.getFullID() ));
 
     String aPropertyName( fpn.getPropertyName() );
 
     PropertyMapConstIterator 
       aPropertyMapIterator( anEntityPtr->getPropertySlotMap().
 			    find( aPropertyName ) );
+
     if( aPropertyMapIterator == anEntityPtr->getPropertySlotMap().end() )
       {
 	throw NotFound( "not found" );
       }
 
-    LoggerPtr aLoggerPtr( new Logger( *aPropertyMapIterator->second ) );
     //    aPropertyMapIterator->second->getProxy()->setLogger( aLoggerPtr );
 
     //    appendLogger( aLoggerPtr );
-    theLoggerMap[fpn] = aLoggerPtr;
+    theLoggerMap[fpn] = new Logger( *aPropertyMapIterator->second );
+    aPropertyMapIterator->second->setLogger(theLoggerMap[fpn]);
 
-
-    /*
-      
     anEntityPtr->getSuperSystem()
       ->getStepper()->registerPropertySlot( aPropertyMapIterator->second );
 
-    */
-
-
-
-    return aLoggerPtr;
+    return theLoggerMap[fpn];
   }
 
   /*

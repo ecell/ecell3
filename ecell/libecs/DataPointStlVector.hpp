@@ -44,26 +44,114 @@ namespace libecs
   /**
 
    */
-  DECLARE_CLASS(StlDataPointVector);
-    DECLARE_TYPE(DataPoint,Containee);
-    DECLARE_VECTOR(ContaineePtr,Container);
+  DECLARE_CLASS(DataPointStlVector);
+  DECLARE_TYPE(DataPoint,Containee);
+  DECLARE_VECTOR(ContaineePtr,Container);
 
   class DataPointStlVector
-    :
-    public Container
   {
 
   public:
 
+    typedef Container::const_iterator  const_iterator;
+    typedef Container::iterator        iterator;
+    typedef Container::const_reference const_reference;
+    typedef Container::reference       reference;
+    typedef Container::size_type       size_type;
+    
+    explicit DataPointStlVector( void )
+    {
+      ; // do nothing
+    }
+
+    DataPointStlVector( DataPointStlVectorCref vector )
+      :
+      theContainer( vector.getContainer() )
+    {
+      ; // do nothing
+    }
+
+    DataPointStlVector( DataPointStlVectorRef vector )
+      :
+      theContainer( vector.getContainer() )
+    {
+      ; // do nothing
+    }
+
+
     ~DataPointStlVector(void);
 
-    void push( ContaineeCref );
+    ContainerCref getContainer() const
+    {
+      return theContainer;
+    }
 
-    void push( RealCref, UVariableCref );
+    bool empty() const
+    {
+      return theContainer.empty();
+    }
+
+    size_type size() const
+    {
+      return theContainer.size();
+    }
+
+    const_iterator begin() const
+    {
+      return theContainer.begin();
+    }
+
+    const_iterator end() const
+    {
+      return theContainer.end();
+    }
+
+    const_reference back() const
+    {
+      return theContainer.back();
+    }
+
+    iterator begin()
+    {
+      return theContainer.begin();
+    }
+
+    iterator end()
+    {
+      return theContainer.end();
+    }
+
+    reference back()
+    {
+      return theContainer.back();
+    }
+
+    void push( ContaineeCref aCref )
+    {
+      theContainer.push_back( new Containee( aCref ) );
+    }
+
+    void push( ContaineePtr aPtr )
+    {
+      theContainer.push_back( new Containee( *aPtr ) );
+    }
+
+    void push( RealCref t, UVariableCref v )
+    {
+      theContainer.push_back( new Containee( t, v ) );
+    }
+
+    void push( RealCref t, RealCref v )
+    {
+      theContainer.push_back( new Containee( t, v ) );
+    }
 
     const_iterator binary_search( const_iterator first,
 				  const_iterator last,
 				  RealCref) const;
+
+  private:
+    Container theContainer;
 
 
   };

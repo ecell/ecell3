@@ -78,6 +78,8 @@ public:
 
 private:
 
+  Object convertVector( libecs::Logger::DataPointVectorCref );
+
 };
 
 

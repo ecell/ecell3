@@ -49,31 +49,14 @@
 namespace libecs
 {
 
-  class DataPoint;
-  class DataPointStlVector;
-
-
   // Destructor
 
   DataPointStlVector::~DataPointStlVector( void )
   {
-    for( iterator i( begin() ) ; i < end(); i++ )
+    for( iterator i( theContainer.begin() ) ; i < theContainer.end(); i++ )
       {
 	delete *i;
       }
-  }
-
-  //
-
-  void DataPointStlVector::push( RealCref t,
-				 UVariableCref val)
-  {
-    theContainer->push_back( new Containee( t, val ) );
-  }
-
-  void DataPointStlVector::push(DataPointStlVector::ContaineeCref x)
-  {
-    theContainer->push_back( new Containee( x ) );
   }
 
   //
@@ -85,8 +68,8 @@ namespace libecs
 		const_iterator last,
 		RealCref aTime) const
   {
-    DataPoint dp( aTime, aTime );
-    const_iterator itr = lower_bound( first, last, &dp );
+    Containee aContainee( aTime, 0.0 );
+    const_iterator itr = lower_bound( first, last, &aContainee );
     return itr;
   }
 
@@ -94,40 +77,43 @@ namespace libecs
 } // namespace libecs
 
 
-#if defined(STLDATAPOINTVECTOR_TEST)
+#if defined(DATAPOINTSTLVECTOR_TEST)
 
 #include <iostream>
 #include "DataPoint.cpp"
+#include "libecs.hpp"
 
 using namespace libecs;
 
-typedef double Real;
 
 int main()
 {
-  DataPoint<Real,Real> dp1 = DataPoint<Real,Real>(3.14,3.14);
-  DataPointStlVector<Real,Real> dpvec = DataPointStlVector<Real,Real>(); 
-  dpvec.push(0,0);
-  dpvec.push(dp1);
-  dpvec.push(3.15,3.0);
-  dpvec.push(8.5,3.1);
-  dpvec.push(100.45, 1.0);
-  DataPointStlVector<Real,Real> dpvec_clone = DataPointStlVector<Real,Real>(dpvec); 
+  DataPoint dp1( DataPoint(3.14,3.14) );
+  DataPointStlVector* dpvec(new DataPointStlVector()); 
+  dpvec->push(0,0);
+  dpvec->push(dp1);
+  dpvec->push(3.15,3.0);
+  dpvec->push(8.5,3.1);
+  dpvec->push(100.45, 1.0);
+  //  DataPointStlVector* dpvec_clone( new DataPointStlVector( *dpvec ) ); 
+  DataPointStlVector dpvec_clone( *dpvec ); 
   
-  DataPointStlVector<Real,Real>::iterator i;
-  for(i=dpvec_clone.begin();i<dpvec_clone.end();i++)
+
+
+  for( DataPointStlVector::const_iterator i=dpvec_clone.begin();i<dpvec_clone.end();++i)
     {
       printf("%p getTime = %f, getValue = %f\n",i,(*i)->getTime(),(*i)->getValue());
     }
-  for(i=dpvec.begin();i<dpvec.end();i++)
+  for( DataPointStlVector::const_iterator i=dpvec->begin();i<dpvec->end();++i)
     {
       printf("%p getTime = %f, getValue = %f\n",i,(*i)->getTime(),(*i)->getValue());
     }
-  dpvec.binary_search(dpvec.begin(),dpvec.end(),0.4);
+
+  dpvec->binary_search(dpvec->begin(),dpvec->end(),0.4);
 
 }
 
-#endif /* END OF STLDATAPOINTVECTOR_TEST */
+#endif /* END OF DATAPOINTSTLVECTOR_TEST */
 
 
 

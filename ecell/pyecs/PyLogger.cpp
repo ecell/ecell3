@@ -49,27 +49,27 @@ Object PyLogger::getData( const Py::Tuple& args )
 {
   //ECS_TRY;
   args.verify_length( 0, 3 );
-  libecs::Logger::DataPointVectorCptr aDataPointVector( NULLPTR );
   switch( args.length() )
     {
 
     case 0:
-      aDataPointVector = &EmcLogger::getData();
-      break;
+      return convertVector( EmcLogger::getData() );
 
     case 2:
-      aDataPointVector 
-	= &EmcLogger::getData( Real( static_cast<Py::Float>( args[0] ) ),
-			       Real( static_cast<Py::Float>( args[1] ) )
-			       );
-      break;
+      return convertVector( EmcLogger
+			    ::getData( Real( static_cast<Py::Float>
+						      ( args[0] ) ),
+						Real( static_cast<Py::Float>
+						      ( args[1] ) )  ) );
 
     case 3:
-      aDataPointVector 
-	= &EmcLogger::getData( Real( static_cast<Py::Float>( args[0] ) ),
-			       Real( static_cast<Py::Float>( args[1] ) ),
-			       Real( static_cast<Py::Float>( args[2] ) )
-			       );
+      return convertVector( EmcLogger
+			    ::getData( Real( static_cast<Py::Float>
+					     ( args[0] ) ),
+				       Real( static_cast<Py::Float>
+					     ( args[1] ) ),
+				       Real( static_cast<Py::Float>
+					     ( args[2] ) ) ) );
       break;
 
     default:
@@ -77,18 +77,6 @@ Object PyLogger::getData( const Py::Tuple& args )
 
     }
 
-
-  // FIXME: should return Numeric::array
-  Py::Tuple* aPyTupleReturned = new Py::Tuple( aDataPointVector->size() );
-  for(int i = 0; i < aDataPointVector->size(); i++ )
-    {
-      Py::Tuple aPyTuple( 2 );
-      aPyTuple[0] = Py::Float( (*aDataPointVector)[i]->getTime() );
-      aPyTuple[1] = Py::Float( (*aDataPointVector)[i]->getValue() );
-      (*aPyTupleReturned)[i] = aPyTuple;
-    }
-  
-  return *aPyTupleReturned;
 
   //ECS_CATCH;
 }
@@ -98,9 +86,9 @@ Object PyLogger::getStartTime( const Py::Tuple& args )
   //ECS_TRY;
   args.verify_length( 0 );
 
-  Py::Float* aPyFloatReturned = new Py::Float( EmcLogger::getStartTime() );
+  Py::Float aReturnedPyFloat( EmcLogger::getStartTime() );
 
-  return *aPyFloatReturned;
+  return aReturnedPyFloat;
 
   //ECS_CATCH;
 }
@@ -110,12 +98,34 @@ Object PyLogger::getEndTime( const Py::Tuple& args )
   //ECS_TRY;
   args.verify_length( 0 );
 
-  Py::Float* aPyFloatReturned = new Py::Float( EmcLogger::getEndTime() );
+  Py::Float aReturnedPyFloat( EmcLogger::getEndTime() );
 
-  return *aPyFloatReturned;
+  return aReturnedPyFloat;
 
   //ECS_CATCH;
 }
 
+Object PyLogger::convertVector( libecs::Logger::DataPointVectorCref aVector )
+{
+  //ECS_TRY;
+  // FIXME: should return Numeric::array
+  Py::Tuple aReturnedPyTuple( aVector.size() );
+  int i(0);
+  for(libecs::Logger::const_iterator anItr(aVector.begin());
+      anItr < aVector.end();
+      ++anItr)
+    {
+      Py::Tuple aPyTuple( 2 );
+      aPyTuple[0] = Py::Float( (*anItr)->getTime() );
+      aPyTuple[1] = Py::Float( (*anItr)->getValue() );
+      cerr << libecs::UVariable( (*anItr)->getTime() ).asString() << "\t"
+	   << libecs::UVariable( (*anItr)->getValue() ).asString() << endl;
+      aReturnedPyTuple[i] = aPyTuple;
+      ++i;
+    }
+  
+  return aReturnedPyTuple;
+  //ECS_CATCH;
+}  
 
 

@@ -54,7 +54,25 @@ namespace libecs
     :
     theTime( t ),
     theValue( v.asReal() )
-  { 
+  {
+    ; // do nothing
+  }
+
+
+  DataPoint::DataPoint( UVariableCref t,RealCref v )
+    :
+    theTime( t.asReal() ),
+    theValue( v )
+  {
+    ; // do nothing
+  }
+
+
+  DataPoint::DataPoint( UVariableCref t, UVariableCref v )
+    :
+    theTime( t.asReal() ),
+    theValue( v.asReal() )
+  {
     ; // do nothing
   }
 
@@ -64,7 +82,7 @@ namespace libecs
     theTime( t ),
     theValue( v )
   { 
-    ; // do nothing
+      //    ; // do nothing
   }
 
 
@@ -79,23 +97,15 @@ namespace libecs
     ; // do nothing
   }
 
+  // Copy constructor 
 
-
-  // Assignment operator from another DataPoint
-  /*
-  DataPoint& DataPoint::operator=( DataPointCref rhs )
+  DataPoint::DataPoint( DataPointRef datapoint )
+    :
+    theTime( datapoint.getTime() ),
+    theValue( datapoint.getValue() )
   {
-    if( this == &rhs )
-      {
-	return *this;
-      }
-
-    theTime  = rhs.getTime();
-    theValue = rhs.getValue();
-
-    return *this;
+    ; // do nothing
   }
-  */
 
 
 } // namespace libecs

@@ -181,6 +181,16 @@ namespace libecs
       }
 
     theStepper = aStepper;
+    /*
+    if( theStepper == NULLPTR )
+      {
+	//FIXME: make this default user customizable
+	setStepperClass( "Euler1Stepper" );
+      }
+    */
+    theStepper->initialize();
+
+
   }
 
   const Real System::getStepInterval() const
@@ -195,14 +205,12 @@ namespace libecs
 
   void System::initialize()
   {
-    if( theStepper == NULLPTR )
+    /*
+    if(theStepper == NULLPTR )
       {
-	//FIXME: make this default user customizable
-	setStepperClass( "Euler1Stepper" );
+	setStepperClass("SlaveStepper");
       }
-
-    theStepper->initialize();
-
+    */
     //
     // Substance::initialize()
     //

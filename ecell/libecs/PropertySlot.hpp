@@ -37,6 +37,11 @@
 namespace libecs
 {
 
+#if 1
+  DECLARE_CLASS(PropertySlotProxy);
+  DECLARE_VECTOR(PropertySlotProxyPtr, PropertySlotProxyVector);
+#endif //0
+
   /**
      A base class for PropertySlot classes.
 
@@ -72,6 +77,8 @@ namespace libecs
     virtual const bool isSetable() const = 0;
     virtual const bool isGetable() const = 0;
 
+    virtual void sync() = 0;
+
     //    virtual PropertySlotProxyPtr createProxy( void ) = 0;
 
     StringCref getName() const
@@ -89,8 +96,9 @@ namespace libecs
       return theLogger;
     }
 
-    void push()
+    void push( RealCref aTime )
     {
+      theCurrentTime = aTime;
       updateLogger();
       //      updateProxy();
     }
@@ -105,12 +113,14 @@ namespace libecs
 
     String                   theName;
     LoggerPtr                theLogger;
+    PropertySlotProxyVector  theProxyVector;
+    Real                     theCurrentTime;
     
 
   };
 
 
-#if 0 
+#if 1 
   class PropertySlotProxy
   {
     
@@ -127,8 +137,7 @@ namespace libecs
     
     PropertySlotProxy( PropertySlotProxyRef rhs )
       :
-      thePropertySlot( rhs.thePropertySlot ),
-      theLogger( rhs.theLogger )
+      thePropertySlot( rhs.thePropertySlot )
     {
       ;
     }
@@ -137,8 +146,7 @@ namespace libecs
 
     PropertySlotProxy( PropertySlotProxyCref rhs )
       :
-      thePropertySlot( rhs.thePropertySlot ),
-      theLogger( rhs.theLogger )
+      thePropertySlot( rhs.thePropertySlot )
     {
       ;
     }
@@ -214,6 +222,11 @@ namespace libecs
     UVariableVectorPropertySlot( StringCref name, T& object, 
 				 const SetUVariableVectorMethodPtr setmethod,
 				 const GetUVariableVectorMethodPtr getmethod );
+
+    virtual void sync()
+    {
+      ;
+    }
   
     virtual const bool isSetable() const
     {
@@ -289,6 +302,11 @@ namespace libecs
 		      const SetRealMethodPtr setmethod,
 		      const GetRealMethodPtr getmethod );
 
+    virtual void sync()
+    {
+      ;
+    }
+
     virtual const bool isSetable() const
     {
      return theSetRealMethod != NULLPTR;
@@ -355,6 +373,11 @@ namespace libecs
     StringPropertySlot( StringCref name, T& object, 
 			const SetStringMethodPtr setmethod,
 			const GetStringMethodPtr getmethod );
+
+    virtual void sync()
+    {
+      ;
+    }
   
     virtual const bool isSetable() const
     {

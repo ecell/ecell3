@@ -59,7 +59,7 @@ namespace libemc
     ;
   }
 
-  Logger::DataPointVectorCref
+  const libecs::Logger::DataPointVector
   LocalLoggerImplementation::getData( libecs::RealCref start,
 				      libecs::RealCref end,
 				      libecs::RealCref interval ) const
@@ -67,7 +67,7 @@ namespace libemc
     return theLogger.getData( start, end, interval );
   }
 
-  Logger::DataPointVectorCref
+  const libecs::Logger::DataPointVector
   LocalLoggerImplementation::getData( libecs::RealCref start,
 				      libecs::RealCref end ) const
 				      
@@ -75,7 +75,7 @@ namespace libemc
     return theLogger.getData( start, end );
   }
 
-  Logger::DataPointVectorCref
+  const libecs::Logger::DataPointVector
   LocalLoggerImplementation::getData( void ) const
 				      
   {

@@ -196,8 +196,8 @@ namespace libecs
 
   void MasterStepper::sync()
   {
-    for( StepperVectorIterator i( theSlaveStepperVector.begin() );
-	 i != theSlaveStepperVector.end(); ++i )
+    for( PropertySlotVectorIterator i( thePropertySlotVector.begin() );
+	 i != thePropertySlotVector.end(); ++i )
       {
 	(*i)->sync();
       }
@@ -208,7 +208,7 @@ namespace libecs
     for( PropertySlotVectorIterator i( thePropertySlotVector.begin() );
 	 i != thePropertySlotVector.end() ; ++i )
       {
-	(*i)->push();
+	(*i)->push( theOwner->getRootSystem()->getCurrentTime() );
       }
   }
 
@@ -246,6 +246,7 @@ namespace libecs
     integrate();
     compute();
 
+    push();
     theCurrentTime += theStepInterval;
   }
 
@@ -282,6 +283,15 @@ namespace libecs
 	 i != theMasterStepperVector.end(); ++i )
       {
 	(*i)->compute();
+      }
+  }
+
+  void StepperLeader::push()
+  {
+    for( StepperVector::iterator i( theMasterStepperVector.begin() );
+	 i != theMasterStepperVector.end(); ++i )
+      {
+	(*i)->push();
       }
   }
 

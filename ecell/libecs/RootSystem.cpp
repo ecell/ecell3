@@ -63,6 +63,7 @@ namespace libecs
     setID( "/" );
     setName( "The RootSystem" );
     setRootSystem( this );
+    setStepperClass("Euler1Stepper" );
   }
 
   RootSystem::~RootSystem()

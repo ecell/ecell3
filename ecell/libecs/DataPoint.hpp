@@ -62,9 +62,13 @@ namespace libecs
        @param 2 objects which are components of DataPoint
     */
     
-    DataPoint( RealCref, UVariableCref );
+    explicit DataPoint( RealCref, UVariableCref );
     
-    DataPoint( RealCref, RealCref );
+    explicit DataPoint( UVariableCref, UVariableCref );
+    
+    explicit DataPoint( UVariableCref, RealCref );
+
+    explicit DataPoint( RealCref, RealCref );
 
     
     /**
@@ -72,7 +76,15 @@ namespace libecs
        @param Object constant reference
     */
     
-    DataPoint( DataPointCref );
+    explicit DataPoint( DataPointCref );
+    
+    
+    /**
+       Copy constructor
+       @param Object constant reference
+    */
+    
+    explicit DataPoint( DataPointRef );
     
     
     /// Destructor
@@ -105,7 +117,7 @@ namespace libecs
     }
     
     // FIXME
-    bool operator>(const DataPoint& second)
+    bool operator>(DataPointCref second)
     {
       if( getTime() > second.getTime() )
 	{
@@ -135,7 +147,6 @@ namespace libecs
        @return V constant reference
     */
     
-    //    UVariableCref getValue( void ) const
     RealCref getValue( void ) const
     {
       return theValue;
@@ -169,7 +180,6 @@ namespace libecs
     /// The internal value
     
     Real theTime;
-    //    UVariable theValue;
     Real theValue;
     
   };

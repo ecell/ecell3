@@ -55,34 +55,15 @@ namespace libecs
     ; // do nothing
   } 
   
-  // Destructor
   
-  Logger::~Logger( void )
+  const Logger::DataPointVector Logger::getData( void ) const
   {
-    delete &thePropertySlot;
-  }
-  
-  
-  
-  Logger::DataPointVectorCref Logger::getData( void ) const
-  {
-    const_iterator aItr = theDataPointVector.begin();
-    const_iterator endItr = theDataPointVector.end();
-    DataPointVectorPtr aDataPointVectorPtr( new DataPointVector() );
-    
-    while( aItr != endItr )
-      {
-	aDataPointVectorPtr->push( **aItr );
-	aItr++;
-      }
-    
-    return *aDataPointVectorPtr;
-    
+    return DataPointVector(theDataPointVector);
   }
   
   //
   
-  Logger::DataPointVectorCref Logger::getData( RealCref aStartTime,
+  const Logger::DataPointVector Logger::getData( RealCref aStartTime,
 					       RealCref anEndTime ) const
   {
     const_iterator itr_1( theDataPointVector.begin() );
@@ -91,33 +72,30 @@ namespace libecs
     
     const_iterator 
       aStartIterator( theDataPointVector.binary_search( itr_1,
-						       itr_2,
-						       aStartTime ) );
+							itr_2,
+							aStartTime ) );
     const_iterator 
       anEndIterator( theDataPointVector.binary_search( itr_1,
-						     itr_2,
-						     anEndTime ) );
-    DataPointVectorPtr aNewDataPointVectorPtr( new DataPointVector() );
+						       itr_2,
+						       anEndTime ) );
+    DataPointVector aNewDataPointVector;
     while( aStartIterator != anEndIterator )
       {
-	aNewDataPointVectorPtr->push( **aStartIterator );
-	aStartIterator++;
+	aNewDataPointVector.push( **aStartIterator );
+	++aStartIterator;
       }
     
-    return *aNewDataPointVectorPtr;
+    return aNewDataPointVector;
   }
   
   
   //
   
   
-  Logger::DataPointVectorCref Logger::getData( RealCref aStartTime,
-					       RealCref anEndTime,
-					       RealCref anInterval ) const
+  const Logger::DataPointVector Logger::getData( RealCref aStartTime,
+						 RealCref anEndTime,
+						 RealCref anInterval ) const
   {
-    
-    DataPointVectorPtr aDataPointVectorPtr( new DataPointVector() );
-    
     const_iterator aFirstIterator( binary_search( theDataPointVector.begin(),
 						  theDataPointVector.end(),
 						  aStartTime ) );
@@ -129,53 +107,29 @@ namespace libecs
     
     Real aTime( aStartTime );
     Real aLastTime( (*aLastIterator)->getTime() );
+
+    DataPointVector aDataPointVector;
     while( aTime <  aLastTime ) // FIXME
       {
 	const_iterator 
 	  anIterator( theDataPointVector.binary_search( aFirstIterator,
 							aLastIterator,
 							aTime + anInterval ) );
-	aDataPointVectorPtr->push( **anIterator );
+	aDataPointVector.push( **anIterator );
 	aTime = (*anIterator)->getTime();
 	aFirstIterator = anIterator;
       }
     
-    return *aDataPointVectorPtr;
+    return aDataPointVector;
   }
   
   
-  //
-  
-#if 0
-  void Logger::appendData( const containee_type& aDataPoint )
-  {
-    theCurrentInterval = 
-      aDataPoint.getTime() - theDataPointVector.back()->getTime();
-    theDataPointVector.push( aDataPoint );
-    if( theMinimumInterval < theCurrentInterval )
-      {
-	theMinimumInterval = theCurrentInterval; 
-      }
-  }
-  
-  
-  //
-  
-  void Logger::appendData( RealCref aTime, UVariableCref aValue )
-  {
-    theCurrentInterval = aTime - theDataPointVector.back()->getTime();
-    theDataPointVector.push( aTime, aValue );
-    if(theMinimumInterval < theCurrentInterval )
-      {
-	theMinimumInterval = theCurrentInterval; 
-      }
-  }
-#endif /* 0 */
-  
-
   void Logger::appendData( RealCref aTime, RealCref aValue )
   {
-    theCurrentInterval = aTime - theDataPointVector.back()->getTime();
+    if( !theDataPointVector.empty() )
+      {
+	theCurrentInterval = aTime - theDataPointVector.back()->getTime();
+      }
     theDataPointVector.push( aTime, aValue );
     if(theMinimumInterval < theCurrentInterval )
       {
@@ -195,7 +149,7 @@ namespace libecs
   
   RealCref Logger::getStartTime( void ) const
   {
-    return theDataPointVector[0]->getTime();
+    return (*theDataPointVector.begin())->getTime();
   }
   
   
@@ -229,20 +183,6 @@ const Real& func(void)
 
 main()
 {
-
-  Real f1 = 0.12;
-  Real f2 = 1.23;
-  Real f3 = 3.14;
-  Real f4 = 4.27;
-  Real f5 = 7.23;
-  
-  DataPoint<Real,Real> d1 = DataPoint<Real,Real>(f1,f1);
-  DataPoint<Real,Real> d2 = DataPoint<Real,Real>(f2,f2);
-  DataPoint<Real,Real> d3 = DataPoint<Real,Real>(f3,f3);
-  DataPoint<Real,Real> d4 = DataPoint<Real,Real>(f4,f4);
-  DataPoint<Real,Real> d5 = DataPoint<Real,Real>(f5,f5);
-
-  ObjectPtr op = new Object(&func);
 
 
   Logger<Real,Real> lg = Logger<Real,Real>(op);

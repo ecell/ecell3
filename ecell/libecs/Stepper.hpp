@@ -112,6 +112,8 @@ namespace libecs
     virtual void integrate();
     virtual void compute();
 
+    void push();
+
     virtual const char* const className() const  { return "StepperLeader"; }
 
   protected:
@@ -310,7 +312,8 @@ namespace libecs
 
     void push()
     {
-      theMaster->push();
+      //      theMaster->push();
+      ;
     }
 
     virtual void initialize()

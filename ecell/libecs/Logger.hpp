@@ -40,12 +40,9 @@
  */
 
 #include "DataPoint.hpp"
-//#include "PropertyInterface.hpp"
 #include "UVariable.hpp"
 
-//#if defined(STLDATAPOINTVECTOR)
-#include "StlDataPointVector.hpp"
-//#endif /* END OF STLDATAPOINTVECTOR */
+#include "DataPointStlVector.hpp"
 
 namespace libecs
 {
@@ -58,50 +55,49 @@ namespace libecs
   {
   public:
 
-    DECLARE_TYPE( StlDataPointVector, DataPointVector );
+    DECLARE_TYPE( DataPointStlVector, DataPointVector );
 
-    typedef DataPointVector::Containee containee_type;
+    typedef Containee containee_type;
     typedef DataPointVector::const_iterator const_iterator;
     typedef DataPointVector::iterator iterator;
-    typedef DataPointVector::size_type size_type;
 
 
   public:
-
-    //Logger( void ) {}
-
 
     /**
        Constructor
 
     */
   
-    Logger( PropertySlotCref aPropertySlot );
+    explicit Logger( PropertySlotCref aPropertySlot );
 
   
     /// Destructor
 
-    ~Logger( void );
+    ~Logger( void )
+    {
+      ; // do nothing
+    }
 
 
     /**
 
      */
 
-    DataPointVectorCref getData( void ) const;
+    const DataPointVector getData( void ) const;
 
     /**
 
      */
 
-    DataPointVectorCref getData( RealCref start,
+    const DataPointVector getData( RealCref start,
 				 RealCref end ) const;
 
     /**
 
      */
 
-    DataPointVectorCref getData( RealCref first,
+    const DataPointVector getData( RealCref first,
 				 RealCref last, 
 				 RealCref interval ) const;
 
@@ -146,9 +142,17 @@ namespace libecs
 
      */
 
-    //    void appendData( const containee_type& );
-    //    void appendData( RealCref t, UVariableCref v );
     void appendData( RealCref t, RealCref v );
+
+
+    /**
+
+     */
+
+    DataPointVectorCref getDataPointVector( void ) const
+    {
+      return theDataPointVector;
+    }
 
 
   protected:
@@ -160,19 +164,9 @@ namespace libecs
     {
       return thePropertySlotProxy;
     }
-     */
+    */
   
   
-    /**
-
-     */
-
-    DataPointVectorCref getDataPointVector( void ) const
-    {
-      return theDataPointVector;
-    }
-
-
     /**
 
      */
@@ -194,13 +188,12 @@ namespace libecs
     /// Assignment operator is hidden
   
     Logger& operator=( const Logger& );
+
+    /// no default constructor
+
+    Logger( void );
   
 
-
-
-    //
-    // Protected and Private data members
-    //
 
 
   private:

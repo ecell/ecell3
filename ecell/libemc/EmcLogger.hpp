@@ -54,19 +54,19 @@ namespace libemc
 
     virtual ~EmcLogger( ) { }
 
-    libecs::Logger::DataPointVectorCref
+    const libecs::Logger::DataPointVector
     getData( void ) const
     {
       return theLoggerImplementation->getData();
     }
 
-    libecs::Logger::DataPointVectorCref
+    const libecs::Logger::DataPointVector
     getData( libecs::RealCref start, libecs::RealCref end ) const
     {
       return theLoggerImplementation->getData( start, end );
     }
 
-    libecs::Logger::DataPointVectorCref
+    const libecs::Logger::DataPointVector
     getData( libecs::RealCref start, libecs::RealCref end, libecs::RealCref interval ) const
     {
       return theLoggerImplementation->getData( start, end, interval );
