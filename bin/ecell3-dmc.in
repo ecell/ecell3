@@ -110,7 +110,7 @@ while [ -n "$(echo $1 | grep '-')" ]; do
     case "$1" in
 	--no-stdinclude) NO_STDINCLUDE=yes ; shift ;;
 	--no-stdlibdir) NO_STDLIBDIR=yes ; shift ;;
-	--ldflags=*) LDFLAGS="-Wl,--enable-runtime-pseudo-reloc $LDFLAGS $( echo $1 | cut -d'=' -f2 )"; shift ;;
+	--ldflags=*) LDFLAGS="@LD_FLAGS@ $LDFLAGS $( echo $1 | cut -d'=' -f2 )"; shift ;;
 	--no-define-cxxflags=*) NO_DEFINE_CXXFLAGS=yes;CXXFLAGS="$CXXFLAGS $( echo $1 | cut -d'=' -f2 )"; shift ;;
 	--cxxflags=*) CXXCOMPILEFLAGS="$CXXFLAGS $( echo $1 | cut -d'=' -f2 )"; shift ;;
 	--dmcompile=*) DMCOMPILE=$( echo $1 | cut -d'=' -f2 )/dmcompile ; shift ;;

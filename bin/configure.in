@@ -13,12 +13,15 @@ AC_PROG_CXX
 case ${host_os} in
   *cygwin* | *mingw* | *win32*)
     PYTHON_LIBS="-lpython22 -lboost_python"
+    LD_FLAGS="-Wl,--enable-runtime-pseudo-reloc"
     ;;
   *)
     PYTHON_LIBS=
+    LD_FLAGS=
     ;;
 esac
 AC_SUBST(PYTHON_LIBS) 
+AC_SUBST(LD_FLAGS) 
 
 
 dnl Checks for typedefs, structures, and compiler characteristics.
