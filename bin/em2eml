@@ -67,7 +67,7 @@ class EmScanner( GenericScanner , object ):
 		return Token( type, attr, self.filename, self.lineno )
 
 	def t_keywords( self, s ):
-		r' Process[\s\t] | Variable[\s\t] | Stepper[\s|\t] | System[\s\t] '
+		r' Reactor[\s\t] | Substance[\s\t] | Stepper[\s|\t] | System[\s\t] '
 		s = string.strip( s )
 		self.rv.append( self.createToken( s, s ) )
 
@@ -158,8 +158,8 @@ class EmParser( GenericParser ):
 
 	def p_entity_other_stmt ( self, args ):
                 '''
-		entity_other_stmt ::= Variable object_decl entity_other_def
-		entity_other_stmt ::= Process object_decl entity_other_def
+		entity_other_stmt ::= Substance object_decl entity_other_def
+		entity_other_stmt ::= Reactor object_decl entity_other_def
 		'''
 		return AST ( Token( 'entity_other_stmt' ), args )
 
@@ -168,7 +168,7 @@ class EmParser( GenericParser ):
 	def p_object_decl( self, args ):
 		'''
 		object_decl ::= name ( name )
-		object_decl ::= Variable ( name )
+		object_decl ::= Substance ( name )
 		'''
 		return AST ( Token( 'object_decl' ), ( args[0], args[2] ) )
 
@@ -322,35 +322,34 @@ class Interpret(GenericASTTraversal):
 			self.eml.setStepperProperty( anID, aPropertyName,\
 						     aValueList )
 
-	def n_system_stmt( self, node ):
+	def n_system_stmt( self, node, path='' ):
 		aType = node[0].attr
 		aClassname = node[1][0].attr
 		anID = node[1][1].attr
-		anID = convert2FullID( self.eml , aType, anID)
-
-		self.eml.createEntity( aClassname, anID )
+		if path != '':
+			anID = path + ':' + anID
+		aFullID = convert2FullID( self.eml , aType, anID)
+		self.eml.createEntity( aClassname, aFullID )
 		
-		aPropertyList = []
 		aPropertyNodeList = flatten_nodetree( node[2][0] )
 		for i in aPropertyNodeList:
 			if len(i[0]) != 0: 
 				aPropertyName = i[0][0].attr
 			else:
 				aPropertyName = i[0].attr
-				
-			if aPropertyName == 'Variable' or aPropertyName == 'Process':
-				self.n_system_stmt(i[0])
-				continue
-			if len(i[0]) != 0:
-				aValueNodeList = flatten_propertytree( i[0][1] )
-			else:
-				aValueNodeList = flatten_propertytree( i[1] )
 
-			aValueList = []
-			for j in aValueNodeList:
-				aValueList.append( j )
-			self.eml.setEntityProperty( anID, aPropertyName,\
-						     aValueList )
+			if aType == 'System' and\
+			       aPropertyName in ( 'Substance', 'Reactor' ):
+				self.n_system_stmt(i[0], anID)
+				continue
+			
+			if len(i[0]) != 0:
+				aValueList = flatten_propertytree( i[0][1] )
+			else:
+				aValueList = flatten_propertytree( i[1] )
+
+			self.eml.setEntityProperty( aFullID, aPropertyName,\
+						    aValueList )
 		
 	def default( self, node):
 		pass
@@ -381,12 +380,12 @@ def convert2FullID( anEml, aType, aSystemID ):
         aFullID = anEml.convertSystemID2SystemFullID(aSystemID)
         if aType == 'System':
 		anID = aFullID
-	elif aType == 'Variable':
-		anID = 'Variable:' + aSystemID
+	elif aType == 'Substance':
+		anID = 'Substance:' + aSystemID
 	elif aType == 'Stepper':
 		anID = aSystemID
-	elif aType == 'Process':
-		anID = 'Process:' + aSystemID
+	elif aType == 'Reactor':
+		anID = 'Reactor:' + aSystemID
 	else:
 		raise ValueError, 'Type Error %s %s %s' (aType, aClass, aSystemID)
 	    

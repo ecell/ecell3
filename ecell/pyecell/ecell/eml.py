@@ -398,7 +398,6 @@ class Eml:
 
             anEntityList = self.__getSystemList( anEntityType, aSystemPath )
 
-
         else:
             aSystemNodeList = self.__theDocument.getElementsByTagName( 'system' )
 
@@ -468,12 +467,16 @@ class Eml:
 
     def __getSystemList( self, anEntityType, aSystemPath ):
 
-
         aSystemList = []
         aSystemNodeList = self.__theDocument.getElementsByTagName( 'system' )
 
         if aSystemPath == '':
-            aSystemPath = '/'
+            for aSystemNode in aSystemNodeList:
+
+                aSystemID = str( aSystemNode.getAttribute( 'id' ) )
+                if( aSystemID == '/' ):
+                    return [ aSystemID, ]
+
 
         aSystemPathLength = len( aSystemPath )
 
@@ -482,12 +485,9 @@ class Eml:
             aSystemID = str( aSystemNode.getAttribute( 'id' ) )
 
             if len( aSystemID ) > len( aSystemPath ) and\
-                   string.find( aSystemID, aSystemPath ) == 0:
-                aRelativePath = aSystemID[aSystemPathLength:]
-                if aRelativePath[0] == '/':
-                    aRelativePath = aRelativePath[1:]
-                if string.find( aRelativePath, '/' ) == -1:
-                    aSystemList.append( aSystemID )
+                   string.find( aSystemID, aSystemPath ) == 0 and\
+                   aSystemID[aSystemPathLength+1:].find( '/' ) == -1:
+                aSystemList.append( string.split( aSystemID, '/' )[-1] )
 
         return aSystemList
 
@@ -496,7 +496,6 @@ class Eml:
         
         aSystemNodeList = self.__theDocument.getElementsByTagName( 'system' )
         anEntityInfo = self.asEntityInfo( aFullID )
-        
         
         if anEntityInfo[ 'Type' ] == 'System':
             aSystemPath = joinSystemPath( anEntityInfo[ 'Path' ],\
@@ -775,7 +774,7 @@ class Eml:
         aTargetEntity[ 'Type' ] = aFullID.split( ':' )[0]
         aTargetEntity[ 'Path' ] = aFullID.split( ':' )[1]
         aTargetEntity[ 'ID' ]   = aFullID.split( ':' )[2]
-        
+
         return aTargetEntity
 
 

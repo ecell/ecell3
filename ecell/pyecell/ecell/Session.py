@@ -169,9 +169,9 @@ class Session:
 
         self.__loadStepper()
 
-        # temporary workaround: root stepper is the first one in stepperlist.
-        self.theSimulator.setEntityProperty( 'System::/:StepperID',\
-                                             self.theEml.getStepperList()[0] )
+        # load root system properties
+        aPropertyList = self.theEml.getEntityPropertyList( 'System::/' )
+        self.__loadEntityPropertyList( 'System::/', aPropertyList )
 
         self.__loadEntity()
 
@@ -210,6 +210,7 @@ class Session:
         self.__loadEntityList( 'Reactor',   aSystemPath, aReactorList )
         self.__loadEntityList( 'System',    aSystemPath, aSubSystemList )
 
+        print aSubSystemList
         for aSystem in aSubSystemList:
             aSubSystemPath = joinSystemPath( aSystemPath, aSystem )
             self.__loadEntity( aSubSystemPath )
@@ -224,10 +225,17 @@ class Session:
             self.theSimulator.createEntity( str( aClassName ), aFullID )
 
             aPropertyList = self.theEml.getEntityPropertyList( aFullID )
-            for aProperty in aPropertyList:
-                aFullPN = aFullID + ':' + aProperty
-                aValue = self.theEml.getEntityProperty( aFullPN )
-                self.theSimulator.setEntityProperty( aFullPN, aValue )
+
+            self.__loadEntityPropertyList( aFullID, aPropertyList )
+
+
+
+    def __loadEntityPropertyList( self, aFullID, aPropertyList ):
+
+        for aProperty in aPropertyList:
+            aFullPN = aFullID + ':' + aProperty
+            aValue = self.theEml.getEntityProperty( aFullPN )
+            self.theSimulator.setEntityProperty( aFullPN, aValue )
 
 
 
