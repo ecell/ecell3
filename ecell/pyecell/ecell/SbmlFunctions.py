@@ -186,11 +186,11 @@ def getReaction( aSBMLmodel, aSBMLDocument ):
             aName =aReaction.getName()
 
 #----------KineticLaw----------------------------------
+            ListOfKineticLaw = []
             if aReaction.isSetKineticLaw():
 
                 aKineticLaw = aReaction.getKineticLaw()
                 #            anASTNode = libsbml.ASTNode()
-                ListOfKineticLaw = []
                 if aKineticLaw != []:
 
                     if aKineticLaw.isSetFormula():

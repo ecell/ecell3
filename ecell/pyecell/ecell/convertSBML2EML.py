@@ -327,8 +327,8 @@ def convertSBML2EML( aSBMLString ):
 
 
         # setProperty
-        if( aReaction[2] != '' ):
-            if( aReaction[2][4] != '' ):
+        if( aReaction[2] != [] ):
+            if( aReaction[2][4] != [] ):
                 for aParameter in aReaction[2][4]:
                     if ( aParameter[2] != '' ): 
                         aTmpList = [ str( aParameter[2] ) ]
@@ -339,30 +339,26 @@ def convertSBML2EML( aSBMLString ):
                             anEml.setEntityProperty\
                             ( aSystemFullID, aParameter[0], aTmpList[0:1] )
                             
-        else:
-            print "Undefined error : Reaction object must set KineticLaw"
-            sys.exit(1)
-
                           
-        # --------------------------
-        # set "Expression" Property
-        # --------------------------
+            # --------------------------
+            # set "Expression" Property
+            # --------------------------
         
-        # convert SBML format formula to E-Cell format formula
-        if( aReaction[2][0] != '' ):
-            anExpression =\
-            [ str( theReaction.convertKineticLawFormula( aReaction[2][0] ) ) ]
+            # convert SBML format formula to E-Cell format formula
+            if( aReaction[2][0] != '' ):
+                anExpression =\
+                [ str( theReaction.convertKineticLawFormula( aReaction[2][0] ) ) ]
 
 
 
-            # set Expression Property for ExpressionFluxProcess
-            anEml.setEntityProperty( aSystemFullID,
-                                     'Expression',
-                                     anExpression )
+                # set Expression Property for ExpressionFluxProcess
+                anEml.setEntityProperty( aSystemFullID,
+                                         'Expression',
+                                         anExpression )
 
-        # setVariableReferenceList
-        anEml.setEntityProperty( aSystemFullID,
-                                 'VariableReferenceList',
-                                 theReaction.VariableReferenceList )
+                # setVariableReferenceList
+                anEml.setEntityProperty( aSystemFullID,
+                                         'VariableReferenceList',
+                                         theReaction.VariableReferenceList )
 
     return anEml
