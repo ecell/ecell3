@@ -148,17 +148,25 @@ done
 
 initialize
 
-if [ $DO_ALL ] ; then 
-    DO_GENERATE=yes
-    DO_COMPILE=yes
-fi
-
 inputfile=$1
 base=`basename $inputfile .dm`
 base=`basename $base .cpp`
 cppfile=$base$CPPSUFFIX
 sofile=$base$SOSUFFIX
 
+
+if [ $DO_ALL ] ; then 
+
+    #copy dmfile to ETTMPDIR
+    run_command "cp $inputfile $ETTMPDIR" 
+
+    #fix me:where FluxReactor.hpp ?
+    run_command "cp FluxReactor.hpp $ETTMPDIR"
+
+    run_command "pushd $ETTMPDIR"     
+    DO_GENERATE=yes
+    DO_COMPILE=yes
+fi
 
 
 #
@@ -211,6 +219,12 @@ if [ $DO_COMPILE  ] ; then
     fi
 
     unset command_string
+fi
+
+if [ $DO_ALL ] ; then 
+    run_command "popd"     
+    #copy sofile to current dir
+    run_command "cp $ETTMPDIR/$base.so ." 
 fi
 
 #
