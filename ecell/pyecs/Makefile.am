@@ -13,7 +13,7 @@ BOOST_DIR=@BOOST_DIR@
 BPLSRCDIR=$(BOOST_DIR)/libs/python/src
 BPLINCLUDE=-I$(BOOST_DIR)
 
-BPLCXXFLAGS=-ftemplate-depth-21
+BPLCXXFLAGS=-ftemplate-depth-70
 
 ECELLINCLUDES=-I${ECELLDIR} ${DMTOOL_INCLUDE} ${INCLTDL} ${PYTHON_INCLUDES}
 CXXFLAGS=@CXXFLAGS@ ${BPLINCLUDE} ${ECELLINCLUDES} ${BPLCXXFLAGS}
@@ -38,32 +38,50 @@ objects.cpp\
 types.cpp
 
 BPLV2SRC=\
-builtin_converters.cpp\
-callback.cpp\
+numeric.cpp\
+list.cpp\
+long.cpp\
+dict.cpp\
+tuple.cpp\
+str.cpp\
+aix_init_module.cpp\
 from_python.cpp\
 registry.cpp\
 type_id.cpp\
+enum.cpp\
 class.cpp\
 function.cpp\
 inheritance.cpp\
-life_support.cpp
+life_support.cpp\
+pickle_support.cpp\
+errors.cpp\
+module.cpp\
+builtin_converters.cpp\
+arg_to_python_base.cpp\
+iterator.cpp\
+object_protocol.cpp\
+object_operators.cpp
 
-BPLSRC=$(BPLV1SRC)
+
+BPLSRC=$(BPLV2SRC)
 
 
 $(BPLSRC):
-	cp -f $(BPLSRCDIR)/$@ .
-#	cp -f $(BPLSRCDIR)/*.cpp .
-#	cp -f $(BPLSRCDIR)/converter/*.cpp .
-#	cp -f $(BPLSRCDIR)/object/*.cpp .
-#	cp -f $(BPLSRCDIR)/detail/*.cpp .
+	echo $(BPLV2SRC)
+	if [ -f $(BPLSRCDIR)/$@ ]; then\
+		cp -f $(BPLSRCDIR)/$@ . ;\
+	elif [ -f $(BPLSRCDIR)/converter/$@ ] ; then\
+		cp -f $(BPLSRCDIR)/converter/$@ . ;\
+	elif [ -f $(BPLSRCDIR)/object/$@ ] ; then\
+		cp -f $(BPLSRCDIR)/object/$@ . ;\
+	fi
 
 
 ecellpyexec_LTLIBRARIES = ecs.la
 
 ecs_la_SOURCES=\
 PyEcs.cpp\
-$(BPLSRC) 
+$(BPLSRC)
 
 
 pyecs_HEADERS=\
@@ -73,7 +91,7 @@ ecs_la_LDFLAGS=-module -export-dynamic -avoid-version
 
 ecs_la_LIBADD= $(LIBEMC) $(LIBECS) -lstdc++ $(LIBLTDL)
 
-all-local: ecs.so
+all-local: _ecs.so
 
 #FIXME: should be removed after ecs.la is renamed to _ecs.la
 #FIXME: messy

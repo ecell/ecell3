@@ -152,9 +152,9 @@ namespace libemc
 
     void clearEventChecker();
 
-    virtual void setEventChecker( EventCheckerPtr aEventChecker );
+    virtual void setEventChecker( EventCheckerRCPtrCref aEventChecker );
 
-    virtual void setEventHandler( EventHandlerPtr anEventHandler );
+    virtual void setEventHandler( EventHandlerRCPtrCref anEventHandler );
 
 
   protected:
@@ -181,8 +181,8 @@ namespace libemc
     libecs::ModelRef           theModel;
 
     bool                       theRunningFlag;
-    EventCheckerPtr            theEventChecker;
-    EventHandlerPtr            theEventHandler;
+    EventCheckerRCPtr          theEventChecker;
+    EventHandlerRCPtr          theEventHandler;
 
   };  
 

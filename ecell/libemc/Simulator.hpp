@@ -530,11 +530,10 @@ namespace libemc
        @see setEventHandler
     */
 
-    void setEventChecker( EventCheckerPtr aEventChecker )
+    void setEventChecker( EventCheckerRCPtr aEventChecker )
     {
-       theSimulatorImplementation->
-	 setEventChecker( aEventChecker );
-     }
+       theSimulatorImplementation->setEventChecker( aEventChecker );
+    }
 
     /**
        Set an event handler.
@@ -548,7 +547,7 @@ namespace libemc
        @see setEventChecker
     */
 
-    void setEventHandler( EventHandlerPtr anEventHandler )
+    void setEventHandler( EventHandlerRCPtrCref anEventHandler )
     {
        theSimulatorImplementation->setEventHandler( anEventHandler );
     }

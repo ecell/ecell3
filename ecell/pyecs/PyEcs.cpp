@@ -1,153 +1,98 @@
-#include <boost/python/class_builder.hpp>
-#include <boost/python/cross_module.hpp>
+#include <boost/python/class.hpp>
+#include <boost/python/module.hpp>
+#include <boost/python/def.hpp>
 
 #include "libemc/libemc.hpp"
 #include "libemc/Simulator.hpp"
 
 #include "PyEcs.hpp"
 
-BOOST_PYTHON_BEGIN_CONVERSION_NAMESPACE
-
-const libecs::PolymorphVector ref_to_PolymorphVector( const ref& aRef )
-{
-  tuple aPyTuple( aRef );
-
-  std::size_t aSize( aPyTuple.size() );
-
-  libecs::PolymorphVector aVector;
-  aVector.reserve( aSize );
-      
-  for ( std::size_t i( 0 ); i < aSize; ++i )
-    {
-      ref anItemRef( aPyTuple[i] );
-      PyObject* aPyObjectPtr( anItemRef.get() ); 
-      
-      aVector.push_back( from_python( aPyObjectPtr, 
-				      type<libecs::Polymorph>() ) );
-    }
-
-  return aVector;
-}
-
-static PyObject* 
-PolymorphVector_to_python( libecs::PolymorphVectorCref aVector )
-{
-  libecs::PolymorphVector::size_type aSize( aVector.size() );
-  
-  tuple aPyTuple( aSize );
-
-  for( size_t i( 0 ) ; i < aSize ; ++i )
-    {
-      aPyTuple.set_item( i, BOOST_PYTHON_CONVERSION::to_python( aVector[i] ) );
-    }
-
-  return to_python( aPyTuple.get() );
-}
+using namespace libemc;
+using namespace libecs;
 
 
-BOOST_PYTHON_END_CONVERSION_NAMESPACE
-
-
-BOOST_PYTHON_MODULE_INIT(_ecs)
+BOOST_PYTHON_MODULE( _ecs )
 {
 
   // pyecs uses Numeric module
   import_array();
 
 
-  python::module_builder ecs( "_ecs" );
-
   // PySimulator class
-  python::class_builder<libemc::Simulator> aSimulatorClass( ecs, "Simulator" );
+  python::class_<Simulator>( "Simulator" )
+    .def( python::init<>() )
 
-  //
-  // PySimulator Definitions
-  //
-
-  aSimulatorClass.def( python::constructor<>() );
-
-  // Stepper-related methods
-  aSimulatorClass.def( &libemc::Simulator::createStepper,   "createStepper" );
-  aSimulatorClass.def( &libemc::Simulator::deleteStepper,   "deleteStepper" );
-  aSimulatorClass.def( &libemc::Simulator::getStepperList,  "getStepperList" );
-  aSimulatorClass.def( &libemc::Simulator::getStepperPropertyList, 
-		       "getStepperPropertyList" );
-  aSimulatorClass.def( &libemc::Simulator::getStepperPropertyAttributes,
-		       "getStepperPropertyAttributes" );
-  aSimulatorClass.def( &libemc::Simulator::setStepperProperty, 
-		       "setStepperProperty" );
-  aSimulatorClass.def( &libemc::Simulator::getStepperProperty,
-		       "getStepperProperty" );
-  aSimulatorClass.def( &libemc::Simulator::getStepperClassName,
-		       "getStepperClassName" );
+    // Stepper-related methods
+    .def( "createStepper",                &Simulator::createStepper )
+    .def( "deleteStepper",                &Simulator::deleteStepper )
+    .def( "getStepperList",               &Simulator::getStepperList )
+    .def( "getStepperPropertyList",       &Simulator::getStepperPropertyList )
+    .def( "getStepperPropertyAttributes", 
+	  &Simulator::getStepperPropertyAttributes )
+    .def( "setStepperProperty",           &Simulator::setStepperProperty )
+    .def( "getStepperProperty",           &Simulator::getStepperProperty )
+    .def( "getStepperClassName",          &Simulator::getStepperClassName )
 
 
-  // Entity-related methods
-  aSimulatorClass.def( &libemc::Simulator::createEntity,   "createEntity" );
-  aSimulatorClass.def( &libemc::Simulator::deleteEntity,   "deleteEntity" );
-  aSimulatorClass.def( &libemc::Simulator::getEntityList,  "getEntityList" );
-  aSimulatorClass.def( &libemc::Simulator::isEntityExist,  "isEntityExist" );
-  aSimulatorClass.def( &libemc::Simulator::getEntityPropertyList,
-		       "getEntityPropertyList" );
-  aSimulatorClass.def( &libemc::Simulator::setEntityProperty,
-		       "setEntityProperty" );
-  aSimulatorClass.def( &libemc::Simulator::getEntityProperty, 
-		       "getEntityProperty" );
-  aSimulatorClass.def( &libemc::Simulator::getEntityPropertyAttributes, 
-		       "getEntityPropertyAttributes" );
-  aSimulatorClass.def( &libemc::Simulator::getEntityClassName,
-		       "getEntityClassName" );
+    // Entity-related methods
+    .def( "createEntity",                 &Simulator::createEntity )
+    .def( "deleteEntity",                 &Simulator::deleteEntity )
+    .def( "getEntityList",                &Simulator::getEntityList )
+    .def( "isEntityExist",                &Simulator::isEntityExist )
+    .def( "getEntityPropertyList",        &Simulator::getEntityPropertyList )
+    .def( "setEntityProperty",            &Simulator::setEntityProperty )
+    .def( "getEntityProperty",            &Simulator::getEntityProperty )
+    .def( "getEntityPropertyAttributes", 
+	  &Simulator::getEntityPropertyAttributes )
+    .def( "getEntityClassName",           &Simulator::getEntityClassName )
 
 
-  // Logger-related methods
-  aSimulatorClass.def( &libemc::Simulator::getLoggerList,  "getLoggerList" );  
-  aSimulatorClass.def( &libemc::Simulator::createLogger,  "createLogger" );  
-  aSimulatorClass.def( ( const libecs::DataPointVectorRCPtr 
-			 ( libemc::Simulator::* )( libecs::StringCref ) const )
-		       &libemc::Simulator::getLoggerData,
-		       "getLoggerData" );
-  aSimulatorClass.def( ( const libecs::DataPointVectorRCPtr 
-			 ( libemc::Simulator::* )( libecs::StringCref, 
-						   libecs::RealCref, 
-						   libecs::RealCref ) const )
-		       &libemc::Simulator::getLoggerData,
-		       "getLoggerData" );
-  aSimulatorClass.def( ( const libecs::DataPointVectorRCPtr
-			 ( libemc::Simulator::* )( libecs::StringCref, 
-						   libecs::RealCref, 
-						   libecs::RealCref, 
-						   libecs::RealCref ) const )
-		       &libemc::Simulator::getLoggerData, 
-		       "getLoggerData" );
-  aSimulatorClass.def( &libemc::Simulator::getLoggerStartTime,
-		       "getLoggerStartTime" );  
-  aSimulatorClass.def( &libemc::Simulator::getLoggerEndTime, 
-		       "getLoggerEndTime" );    
-  aSimulatorClass.def( &libemc::Simulator::getLoggerMinimumInterval, 
-		       "getLoggerMinimumInterval" );    
-  aSimulatorClass.def( &libemc::Simulator::setLoggerMinimumInterval, 
-		       "setLoggerMinimumInterval" );    
-  aSimulatorClass.def( &libemc::Simulator::getLoggerSize, "getLoggerSize" );
+    // Logger-related methods
+    .def( "getLoggerList",                &Simulator::getLoggerList )  
+    .def( "createLogger",                 &Simulator::createLogger )  
+    .def( "getLoggerData", 
+	  ( const DataPointVectorRCPtr ( Simulator::* )( StringCref ) const )
+	  &Simulator::getLoggerData )
+    .def( "getLoggerData", 
+	  ( const DataPointVectorRCPtr 
+	    ( Simulator::* )( StringCref, RealCref, RealCref ) const ) 
+	  &Simulator::getLoggerData )
+    .def( "getLoggerData",
+	  ( const DataPointVectorRCPtr
+	    ( Simulator::* )( StringCref, RealCref, 
+			      RealCref, RealCref ) const ) 
+	  &Simulator::getLoggerData )
+    .def( "getLoggerStartTime",          &Simulator::getLoggerStartTime )  
+    .def( "getLoggerEndTime",            &Simulator::getLoggerEndTime )    
+    .def( "getLoggerMinimumInterval",    &Simulator::getLoggerMinimumInterval )
+    .def( "setLoggerMinimumInterval",    &Simulator::setLoggerMinimumInterval )
+    .def( "getLoggerSize",               &Simulator::getLoggerSize )
+
+
+    // Simulation-related methods
+    .def( "getCurrentTime",              &Simulator::getCurrentTime )
+    .def( "stop",                        &Simulator::stop )
+    .def( "step",                        &Simulator::step )
+    .def( "run", ( void ( Simulator::* )() )      &Simulator::run )
+    .def( "run", ( void( Simulator::* )( Real ) ) &Simulator::run )
+    
+    .def( "setEventChecker",             &Simulator::setEventChecker )
+    .def( "setEventHandler",             &Simulator::setEventHandler )
+    // usually no need to call this explicitly
+    .def( "initialize",                  &Simulator::initialize )
+    
+    ;  
 
 
 
-  // Simulation-related methods
-  aSimulatorClass.def( &libemc::Simulator::getCurrentTime, "getCurrentTime" );
-  aSimulatorClass.def( &libemc::Simulator::stop,           "stop" );
-  aSimulatorClass.def( &libemc::Simulator::step,           "step" );
-  aSimulatorClass.def( ( void ( libemc::Simulator::* )() )
-		       &libemc::Simulator::run,            "run" );
-  aSimulatorClass.def( ( void( libemc::Simulator::* )( libecs::Real ) )
-		       &libemc::Simulator::run,            "run" );
 
-  aSimulatorClass.def( &libemc::Simulator::setEventChecker,
-		       "setEventChecker" );
-  aSimulatorClass.def( &libemc::Simulator::setEventHandler, 
-		       "setEventHandler" );
+  python::to_python_converter< Polymorph, Polymorph_to_python >();
+  python::to_python_converter< DataPointVectorRCPtr, 
+    DataPointVectorRCPtr_to_python >();
 
-  // usually no need to call this explicitly
-  aSimulatorClass.def( &libemc::Simulator::initialize,     "initialize" );  
-
+  register_Polymorph_from_python();
+  register_EventCheckerRCPtr_from_python();
+  register_EventHandlerRCPtr_from_python();
 
 }
 

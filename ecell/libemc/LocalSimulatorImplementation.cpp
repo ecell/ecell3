@@ -445,22 +445,20 @@ namespace libemc
   }
 
   void LocalSimulatorImplementation::
-  setEventChecker( EventCheckerPtr aEventChecker )
+  setEventChecker( EventCheckerRCPtrCref aEventChecker )
   {
-    delete theEventChecker;
     theEventChecker = aEventChecker;
   }
 
   void LocalSimulatorImplementation::
-  setEventHandler( EventHandlerPtr anEventHandler )
+  setEventHandler( EventHandlerRCPtrCref anEventHandler )
   {
-    delete theEventHandler;
     theEventHandler = anEventHandler;
   }
 
   void LocalSimulatorImplementation::clearEventChecker()
   {
-    setEventChecker( new DefaultEventChecker() );
+    setEventChecker( EventCheckerRCPtr( new DefaultEventChecker() ) );
   }
 
 

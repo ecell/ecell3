@@ -33,8 +33,10 @@
 #define __SIMULATORIMPLEMENTATION_HPP
 
 #include "libecs/libecs.hpp"
+#include "libecs/RCPtr.hpp"
 
 #include "libemc.hpp"
+
 
 namespace libemc
 {
@@ -44,6 +46,12 @@ namespace libemc
    */ 
 
   /** @file */
+
+
+  DECLARE_RCPTR( EventChecker );
+  DECLARE_RCPTR( EventHandler );
+
+
 
   class EventHandler
     :
@@ -80,7 +88,6 @@ namespace libemc
       return false;
     }
   };
-
 
 
   /**
@@ -194,10 +201,9 @@ namespace libemc
 
     virtual void stop() = 0;
 
-    virtual void setEventChecker( EventCheckerPtr 
-				  aEventChecker ) = 0;
+    virtual void setEventChecker( EventCheckerRCPtrCref aEventChecker ) = 0;
 
-    virtual void setEventHandler( EventHandlerPtr anEventHandler ) = 0;
+    virtual void setEventHandler( EventHandlerRCPtrCref anEventHandler ) = 0;
 
   };   //end of class Simulator
 

@@ -6,6 +6,8 @@
 
 #include <boost/cast.hpp>
 
+//#include <boost/python/numeric.hpp>
+
 #include <Numeric/arrayobject.h>
 
 #include "libecs/libecs.hpp"
@@ -15,32 +17,36 @@
 
 namespace python = boost::python;
 
+
+
+DECLARE_CLASS( PythonCallable );
+DECLARE_CLASS( PythonEventChecker );
+DECLARE_CLASS( PythonEventHandler );
+
 class PythonCallable
 {
 public:
 
   PythonCallable( PyObject* aPyObjectPtr )
     :
-    thePyObjectPtr( aPyObjectPtr )
+    thePyObject( python::handle<>( aPyObjectPtr ) )
   {
-    if( ! PyCallable_Check( thePyObjectPtr ) )
+    // this check isn't needed actually, because BPL does this automatically
+    if( ! PyCallable_Check( thePyObject.ptr() ) )
       {
-	PyErr_SetString( PyExc_TypeError, 
-			 "Callable object must be given" );
+	PyErr_SetString( PyExc_TypeError, "Callable object must be given" );
 	python::throw_argument_error();
       }
-
-    Py_INCREF( thePyObjectPtr );
   }
-    
+
   virtual ~PythonCallable()
   {
-    Py_DECREF( thePyObjectPtr );
+    ; // do nothing
   }
 
 protected:
 
-  PyObject* thePyObjectPtr;
+  python::object thePyObject;
 };
 
 
@@ -62,15 +68,14 @@ public:
 
   virtual bool operator()( void ) const
   {
-    PyObject* aPyObjectPtr( PyObject_CallFunction( thePyObjectPtr, NULL ) );
+    PyObject* aPyObjectPtr( PyObject_CallFunction( thePyObject.ptr(), NULL ) );
 
     const bool aResult( PyObject_IsTrue( aPyObjectPtr ) );
     Py_DECREF( aPyObjectPtr );
 
     return aResult;
 
-    // probably faster than this
-    //    from_python<bool>( PyObject_CallFunction( thePyObjectPtr, NULL ) );
+    // faster than just return thePyObject(), unfortunately..
   }
 
 };
@@ -93,178 +98,245 @@ public:
 
   virtual void operator()( void ) const
   {
-    PyObject_CallFunction( thePyObjectPtr, NULL );
+    PyObject_CallFunction( thePyObject.ptr(), NULL );
+
+    // faster than just thePyObject() ....
+  }
+
+};
+
+class Polymorph_to_python
+{
+public:
+
+  static PyObject* convert( libecs::PolymorphCref aPolymorph )
+  {
+    switch( aPolymorph.getType() )
+      {
+      case libecs::Polymorph::REAL :
+	return PyFloat_FromDouble( aPolymorph.asReal() );
+      case libecs::Polymorph::INT :
+	return PyInt_FromLong( aPolymorph.asInt() );
+      case libecs::Polymorph::POLYMORPH_VECTOR :
+	return PolymorphVector_to_PyTuple( aPolymorph.asPolymorphVector() );
+      case libecs::Polymorph::STRING :
+      case libecs::Polymorph::NONE :
+      default: // should this default be an error?
+	return PyString_FromString( aPolymorph.asString().c_str() );
+      }
+  }
+
+  static PyObject* 
+  PolymorphVector_to_PyTuple( libecs::PolymorphVectorCref aVector )
+  {
+    libecs::PolymorphVector::size_type aSize( aVector.size() );
+    
+    PyObject* aPyTuple( PyTuple_New( aSize ) );
+    
+    for( size_t i( 0 ) ; i < aSize ; ++i )
+      {
+	PyTuple_SetItem( aPyTuple, i, 
+			 Polymorph_to_python::convert( aVector[i] ) );
+      }
+    
+    return aPyTuple;
+  }
+
+
+};
+
+
+class DataPointVectorRCPtr_to_python
+{
+public:
+
+  static PyObject* 
+  convert( const libecs::DataPointVectorRCPtr& aVectorRCPtr )
+  {
+    // here starts an ugly C hack :-/
+
+    libecs::DataPointVectorCref aVector( *aVectorRCPtr );
+
+    int aDimensions[2] = { aVector.getSize(),
+			   aVector.getElementSize() / sizeof( double ) };
+
+
+    PyArrayObject* anArrayObject( reinterpret_cast<PyArrayObject*>
+				  ( PyArray_FromDims( 2, aDimensions, 
+						      PyArray_DOUBLE ) ) );
+
+    memcpy( anArrayObject->data, aVector.getRawArray(),   
+	    aVector.getSize() * aVector.getElementSize() );
+    
+    return PyArray_Return( anArrayObject );
+  }
+
+};
+
+
+class register_Polymorph_from_python
+{
+public:
+
+  register_Polymorph_from_python()
+  {
+    python::converter::
+      registry::insert( &convertible, &construct,
+			python::type_id<libecs::Polymorph>() );
+  }
+
+  static void* convertible( PyObject* aPyObject )
+  {
+    // always passes the test for efficiency.  overload won't work.
+    return aPyObject;
+  }
+
+  static void construct( PyObject* aPyObjectPtr, 
+			 python::converter::
+			 rvalue_from_python_stage1_data* data )
+  {
+    void* storage( ( ( python::converter::
+		       rvalue_from_python_storage<libecs::Polymorph>*) 
+		     data )->storage.bytes );
+
+    new (storage) libecs::Polymorph( Polymorph_from_python( aPyObjectPtr ) );
+    data->convertible = storage;
+  }
+
+
+  static const libecs::Polymorph 
+  Polymorph_from_python( PyObject* aPyObjectPtr )
+  {
+    if( PyFloat_Check( aPyObjectPtr ) )
+      {
+	return PyFloat_AS_DOUBLE( aPyObjectPtr );
+      }
+    else if( PyInt_Check( aPyObjectPtr ) )
+      {
+	return PyInt_AS_LONG( aPyObjectPtr );
+      }
+    else if( PyList_Check( aPyObjectPtr ) )
+      {
+	return to_PolymorphVector( PyList_AsTuple( aPyObjectPtr ) );
+      }      
+    else if ( PyTuple_Check( aPyObjectPtr ) )
+      {
+	return to_PolymorphVector( aPyObjectPtr );
+      }
+    else if( PyString_Check( aPyObjectPtr ) )
+      {
+	return libecs::Polymorph( PyString_AsString( aPyObjectPtr ) );
+      }
+    else
+      {
+	// convertion is failed. ( convert with repr() ? )
+	PyErr_SetString( PyExc_TypeError, 
+			 "Unacceptable type of an object in the tuple." );
+	python::throw_argument_error();
+      }
+  }
+
+
+  static const libecs::PolymorphVector 
+  to_PolymorphVector( PyObject* aPyObjectPtr )
+  {
+    std::size_t aSize( PyTuple_GET_SIZE( aPyObjectPtr ) );
+      
+    libecs::PolymorphVector aVector;
+    aVector.reserve( aSize );
+      
+    for ( std::size_t i( 0 ); i < aSize; ++i )
+      {
+	aVector.
+	  push_back( Polymorph_from_python( PyTuple_GET_ITEM( aPyObjectPtr, 
+							      i ) ) );
+      }
+      
+    return aVector;
+  }
+    
+};
+
+
+class register_EventCheckerRCPtr_from_python
+{
+public:
+
+  register_EventCheckerRCPtr_from_python()
+  {
+    python::converter::
+      registry::insert( &convertible, &construct,
+			python::type_id<libemc::EventCheckerRCPtr>() );
+  }
+
+  static void* convertible( PyObject* aPyObjectPtr )
+  {
+    if( PyCallable_Check( aPyObjectPtr ) )
+      {
+	return aPyObjectPtr;
+      }
+    else
+      {
+	return 0;
+      }
+  }
+
+  static void 
+  construct( PyObject* aPyObjectPtr, 
+	     python::converter::rvalue_from_python_stage1_data* data )
+  {
+    void* storage( ( ( python::converter::
+		       rvalue_from_python_storage<libecs::Polymorph>*) 
+		     data )->storage.bytes );
+
+    new (storage) 
+      libemc::EventCheckerRCPtr( new PythonEventChecker( aPyObjectPtr ) );
+
+    data->convertible = storage;
   }
 
 };
 
 
 
-BOOST_PYTHON_BEGIN_CONVERSION_NAMESPACE
-
-//
-// type conversions between python <-> libecs
-//
-
-
-//
-// PolymorphVector convertion functions
-//
-
-static const libecs::PolymorphVector ref_to_PolymorphVector( const ref& aRef );
-static PyObject* 
-PolymorphVector_to_python( libecs::PolymorphVectorCref aVector );
-
-
-
-//
-// Polymorph
-//
-
-const libecs::Polymorph from_python( PyObject* aPyObjectPtr,
-				     type<libecs::Polymorph> )
+class register_EventHandlerRCPtr_from_python
 {
-  if( PyFloat_Check( aPyObjectPtr ) )
-    {
-      libecs::Real aReal( BOOST_PYTHON_CONVERSION::
-			  from_python( aPyObjectPtr,
-				       type<libecs::Real>() ) );
+public:
 
-      return aReal;
-    }
-  else if( PyInt_Check( aPyObjectPtr ) )
-    {
-      libecs::Int anInt( BOOST_PYTHON_CONVERSION::
-			 from_python( aPyObjectPtr,
-				      type<long int>()) );
-      //					  type<libecs::Int>()) );
+  register_EventHandlerRCPtr_from_python()
+  {
+    python::converter::
+      registry::insert( &convertible, &construct,
+			python::type_id<libemc::EventHandlerRCPtr>() );
+  }
 
-      return anInt;
-    }
-  else if( PyList_Check( aPyObjectPtr ) )
-    {
-      ref aRef = make_ref( PyList_AsTuple( aPyObjectPtr ) );
+  static void* convertible( PyObject* aPyObjectPtr )
+  {
+    if( PyCallable_Check( aPyObjectPtr ) )
+      {
+	return aPyObjectPtr;
+      }
+    else
+      {
+	return 0;
+      }
+  }
 
-      return ref_to_PolymorphVector( aRef );
-    }      
-  else if ( PyTuple_Check( aPyObjectPtr ) )
-    {
-      ref aRef = make_ref( aPyObjectPtr );
+  static void construct( PyObject* aPyObjectPtr, 
+			 python::converter::
+			 rvalue_from_python_stage1_data* data )
+  {
+    void* storage( ( ( python::converter::
+		       rvalue_from_python_storage<libecs::Polymorph>*) 
+		     data )->storage.bytes );
 
-      return ref_to_PolymorphVector( aRef );
-    }
-  else if( PyString_Check( aPyObjectPtr ) )
-    {
-      libecs::String 
-	aString( BOOST_PYTHON_CONVERSION::
-		 from_python( aPyObjectPtr,
-			      type<libecs::String>() ) );
+    new (storage) 
+      libemc::EventHandlerRCPtr( new PythonEventHandler( aPyObjectPtr ) );
 
-      return aString;
-    }
+    data->convertible = storage;
+  }
 
-
-  // convertion is failed. ( convert with repr() ? )
-  PyErr_SetString( PyExc_TypeError, 
-		   "Unacceptable type of an object in the tuple." );
-  throw_argument_error();
-}
-
-inline const libecs::Polymorph from_python( PyObject* aPyObjectPtr,
-					    type<libecs::PolymorphCref> )
-{
-  return from_python( aPyObjectPtr, type<libecs::Polymorph>() );
-}
-
-PyObject* to_python( libecs::PolymorphCref aPolymorph )
-{
-  PyObject* aPyObjectPtr;
-
-  switch( aPolymorph.getType() )
-    {
-    case libecs::Polymorph::REAL :
-      aPyObjectPtr = BOOST_PYTHON_CONVERSION::to_python( aPolymorph.asReal() );
-      break;
-    case libecs::Polymorph::INT :
-      // FIXME: ugly cast... determine the type by autoconf?
-      aPyObjectPtr = BOOST_PYTHON_CONVERSION::
-	to_python( boost::numeric_cast<long int>( aPolymorph.asInt() ) );
-      break;
-    case libecs::Polymorph::POLYMORPH_VECTOR :
-      aPyObjectPtr = 
-	PolymorphVector_to_python( aPolymorph.asPolymorphVector() );
-      break;
-    case libecs::Polymorph::STRING :
-    case libecs::Polymorph::NONE :
-    default: // should this default be an error?
-      aPyObjectPtr = BOOST_PYTHON_CONVERSION::
-	to_python( aPolymorph.asString() );
-      break;
-    }
-
-  // named return optimization
-  return aPyObjectPtr;
-}
-
-PyObject* to_python( libecs::PolymorphCptr aPolymorphPtr )
-{
-  to_python( aPolymorphPtr );
-}
-
-
-
-//
-// DataPointVector
-//
-
-// currently to_python only
-
-PyObject* to_python( libecs::DataPointVectorCref aVector )
-{
-  // here starts an ugly C hack :-/
-
-  int aDimensions[2] = { aVector.getSize(),
-			 aVector.getElementSize() / sizeof( double ) };
-
-  PyArrayObject* anArrayObject( reinterpret_cast<PyArrayObject*>
-				( PyArray_FromDims( 2, aDimensions, 
-						    PyArray_DOUBLE ) ) );
-
-  memcpy( anArrayObject->data, 
-	  aVector.getRawArray(),   
-	  aVector.getSize() * aVector.getElementSize() );
-
-  return PyArray_Return( anArrayObject );
-}
-
-PyObject* to_python( libecs::DataPointVectorRCPtr aVectorRCPtr )
-{
-  return to_python( *aVectorRCPtr );
-}
-
-
-//
-// libemc::EventChecker and libemc::EventHandler
-//
-
-// NOTE: these functions return pointers to newly allocated objects
-
-libemc::EventCheckerPtr 
-from_python( PyObject* aPyObjectPtr, 
-	     type<libemc::EventCheckerPtr> )
-{
-  return new PythonEventChecker( aPyObjectPtr );
-}
-
-libemc::EventHandlerPtr
-from_python( PyObject* aPyObjectPtr, 
-	     type<libemc::EventHandlerPtr> )
-{
-  return new PythonEventHandler( aPyObjectPtr );
-}
-
-
-BOOST_PYTHON_END_CONVERSION_NAMESPACE
+};
 
 
 #endif // __PYECS_HPP
