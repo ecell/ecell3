@@ -66,11 +66,6 @@ AC_CHECK_HEADER(stl.h,,
 	AC_MSG_ERROR([stl.h not found.])
 )
 dnl
-dnl Common C++
-dnl
-AC_CHECK_HEADER(cc++/thread.h,,
-	AC_MSG_ERROR([GNU CommonC++ header file(s) not found.])
-)
 dnl
 EXT_GUESS="../../../.. ../../.. ../.. ../ ./ $prefix/ /usr /usr/local"
 dnl
