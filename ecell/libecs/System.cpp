@@ -51,22 +51,22 @@ namespace libecs
   void System::makeSlots()
   {
     makePropertySlot( "SystemList", System, *this,
-		 NULLPTR, &System::getSystemList );
+		      NULLPTR, &System::getSystemList );
     makePropertySlot( "SubstanceList", System, *this,
-		 NULLPTR, &System::getSubstanceList );
+		      NULLPTR, &System::getSubstanceList );
     makePropertySlot( "ReactorList", System, *this,
-		 NULLPTR, &System::getReactorList );
+		      NULLPTR, &System::getReactorList );
 
     makePropertySlot( "Stepper", System, *this,
-		 &System::setStepper, &System::getStepper );
+		      &System::setStepper, &System::getStepper );
     makePropertySlot( "VolumeIndex", System, *this,
-		 &System::setVolumeIndex, &System::getVolumeIndex );
+		      &System::setVolumeIndex, &System::getVolumeIndex );
 
     makePropertySlot( "Volume", System, *this,
-		 NULLPTR, &System::getVolume );
+		      NULLPTR, &System::getVolume );
 
     makePropertySlot( "DeltaT", System, *this,
-		 NULLPTR, &System::getDeltaT );
+		      NULLPTR, &System::getDeltaT );
   }
 
 
@@ -186,13 +186,13 @@ namespace libecs
 
   void System::setStepper( StringCref classname )
   {
-    StepperPtr aStepper;
-    aStepper = getRootSystem()->getStepperMaker().make( classname );
+    StepperPtr aStepper( getRootSystem()->
+			 getStepperMaker().make( classname ) );
     aStepper->setOwner( this );
 
-    MasterStepperPtr aMasterStepper( NULLPTR );
-    if( ( aMasterStepper = dynamic_cast<MasterStepperPtr>(aStepper) ) 
-	!= NULLPTR )
+    MasterStepperPtr 
+      aMasterStepper( dynamic_cast<MasterStepperPtr>( aStepper ) );
+    if( aMasterStepper != NULLPTR )
       {
 	getRootSystem()->getStepperLeader().
 	  registerMasterStepper( aMasterStepper );
@@ -213,7 +213,8 @@ namespace libecs
 
   void System::setVolumeIndex( FullIDCref volumeindex )
   {
-    SystemPtr aSystem = theRootSystem->getSystem( SystemPath( volumeindex ) );
+    SystemPtr aSystem( theRootSystem->
+		       getSystem( volumeindex.getSystemPath() ) );
     theVolumeIndex = aSystem->getReactor( volumeindex.getID() );
   }
 
@@ -230,7 +231,7 @@ namespace libecs
     //
     // Substance::initialize()
     //
-    for( SubstanceMapIterator i = getFirstSubstanceIterator() ; 
+    for( SubstanceMapIterator i( getFirstSubstanceIterator() ); 
 	 i != getLastSubstanceIterator() ; ++i )
       {
 	i->second->initialize();
@@ -239,7 +240,7 @@ namespace libecs
     //
     // Reactor::initialize()
     //
-    for( ReactorMapIterator i = getFirstReactorIterator() ;
+    for( ReactorMapIterator i( getFirstReactorIterator() );
 	 i != getLastReactorIterator() ; ++i )
       {
 	i->second->initialize();
@@ -252,7 +253,7 @@ namespace libecs
     //
     // System::initialize()
     //
-    for( SystemMapIterator i = getFirstSystemIterator();
+    for( SystemMapIterator i( getFirstSystemIterator() );
 	 i != getLastSystemIterator(); ++i )
       {
 	i->second->initialize();
@@ -264,7 +265,7 @@ namespace libecs
     //
     // Substance::clear()
     //
-    for( SubstanceMapIterator i = getFirstSubstanceIterator() ; 
+    for( SubstanceMapIterator i( getFirstSubstanceIterator() );
 	 i != getLastSubstanceIterator() ; ++i )
       {
 	i->second->clear();
@@ -273,7 +274,7 @@ namespace libecs
 
   void System::react()
   {
-    for( ReactorMapIterator i = getFirstRegularReactorIterator() ; 
+    for( ReactorMapIterator i( getFirstRegularReactorIterator() ); 
 	 i != getLastReactorIterator() ; ++i )
       {
 	i->second->react();
@@ -282,7 +283,7 @@ namespace libecs
 
   void System::turn()
   {
-    for( SubstanceMapIterator i = getFirstSubstanceIterator() ; 
+    for( SubstanceMapIterator i( getFirstSubstanceIterator() );
 	 i != getLastSubstanceIterator() ; ++i )
       {
 	i->second->turn();
@@ -291,13 +292,13 @@ namespace libecs
 
   void System::transit()
   {
-    for( ReactorMapIterator i = getFirstRegularReactorIterator() ; 
+    for( ReactorMapIterator i( getFirstRegularReactorIterator() ); 
 	 i != getLastReactorIterator() ; ++i )
       {
 	i->second->transit();
       }
 
-    for( SubstanceMapIterator i = getFirstSubstanceIterator() ;
+    for( SubstanceMapIterator i( getFirstSubstanceIterator() );
 	 i != getLastSubstanceIterator() ; ++i )
       {
 	i->second->transit();
@@ -306,14 +307,14 @@ namespace libecs
 
   void System::postern()
   {
-    for( ReactorMapIterator i = getFirstReactorIterator() ; 
+    for( ReactorMapIterator i( getFirstReactorIterator() ); 
 	 i != getFirstRegularReactorIterator() ; ++i )
       {
 	i->second->react();
       }
 
     // update activity of posterior reactors by buffered values 
-    for( ReactorMapIterator i = getFirstReactorIterator() ; 
+    for( ReactorMapIterator i( getFirstReactorIterator() ); 
 	 i != getFirstRegularReactorIterator() ; ++i )
       {
 	i->second->transit();
@@ -389,10 +390,6 @@ namespace libecs
       {
 	return this;
       }
-    if( systempath.isAbsolute() )
-      {
-	return theRootSystem->getSystem( systempath );
-      }
 
     SystemPath aSystemPath( systempath );
     SystemPtr aSystem( this );
@@ -410,11 +407,11 @@ namespace libecs
 
   SystemPtr System::getSystem( StringCref id ) 
   {
-    SystemMapIterator i = getSystemIterator( id );
+    SystemMapIterator i( getSystemIterator( id ) );
     if( i == getLastSystemIterator() )
       {
-	throw NotFound(__PRETTY_FUNCTION__, "[" + getFullID().getString() + 
-		       "]: System [" + id + "] not found in this System.");
+	throw NotFound( __PRETTY_FUNCTION__, "[" + getFullID().getString() + 
+			"]: System [" + id + "] not found in this System." );
       }
     return i->second;
   }
@@ -423,25 +420,21 @@ namespace libecs
   {
     SystemPtr aSystem ( getSystem( fullid.getSystemPath() ) );
 
-    EntityPtr anEntityPtr;
-
     switch( fullid.getPrimitiveType() )
       {
       case PrimitiveType::SUBSTANCE:
-	anEntityPtr = aSystem->getSubstance( fullid.getID() );
-	break;
+	return aSystem->getSubstance( fullid.getID() );
       case PrimitiveType::REACTOR:
-	anEntityPtr = aSystem->getReactor( fullid.getID() );
-	break;
+	return aSystem->getReactor( fullid.getID() );
       case PrimitiveType::SYSTEM:
-	anEntityPtr = aSystem->getSystem( fullid.getID() );
-	break;
+	return aSystem->getSystem( fullid.getID() );
       default:
 	throw InvalidPrimitiveType( __PRETTY_FUNCTION__, 
 				    "bad PrimitiveType specified." );
       }
 
-    return anEntityPtr;
+    // NEVER_GET_HERE
+    assert( 0 );
   }
 
 
@@ -449,11 +442,11 @@ namespace libecs
 			     FullIDCref fullid, 
 			     StringCref name )
   {
-    SystemPtr aSystem ( getSystem( fullid.getSystemPath() ) );
+    SystemPtr aSuperSystemPtr( getSystem( fullid.getSystemPath() ) );
 
-    ReactorPtr   aReactorPtr;
-    SystemPtr    aSystemPtr;
-    SubstancePtr aSubstancePtr;
+    ReactorPtr   aReactorPtr  ( NULLPTR );
+    SystemPtr    aSystemPtr   ( NULLPTR );
+    SubstancePtr aSubstancePtr( NULLPTR );
 
     switch( fullid.getPrimitiveType() )
       {
@@ -461,19 +454,19 @@ namespace libecs
 	aSubstancePtr = getRootSystem()->getSubstanceMaker().make( classname );
 	aSubstancePtr->setID( fullid.getID() );
 	aSubstancePtr->setName( name );
-	aSystem->registerSubstance( aSubstancePtr );
+	aSuperSystemPtr->registerSubstance( aSubstancePtr );
 	break;
       case PrimitiveType::REACTOR:
 	aReactorPtr = getRootSystem()->getReactorMaker().make( classname );
 	aReactorPtr->setID( fullid.getID() );
 	aReactorPtr->setName( name );
-	aSystem->registerReactor( aReactorPtr );
+	aSuperSystemPtr->registerReactor( aReactorPtr );
 	break;
       case PrimitiveType::SYSTEM:
 	aSystemPtr = getRootSystem()->getSystemMaker().make( classname );
 	aSystemPtr->setID( fullid.getID() );
 	aSystemPtr->setName( name );
-	aSystem->registerSystem( aSystemPtr );
+	aSuperSystemPtr->registerSystem( aSystemPtr );
 	break;
 
       default:

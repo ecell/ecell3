@@ -45,7 +45,7 @@ namespace libecs
   void RootSystem::makeSlots()
   {
     makePropertySlot( "CurrentTime", RootSystem, *this,
-		 NULLPTR, &RootSystem::getCurrentTime );
+		      NULLPTR, &RootSystem::getCurrentTime );
   }
   
 
@@ -93,6 +93,7 @@ namespace libecs
 
   const SystemPath RootSystem::getSystemPath() const
   {
+    // return empty SystemPath
     return SystemPath();
   }
     
