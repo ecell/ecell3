@@ -211,12 +211,18 @@ class StepperWindow(OsogoWindow):
 			# property
 			aList = [ aProperty, ]  # first element
 
-			# value
-			aValue =  aStepperStub.getProperty( aProperty )
-			aList.append( shortenString( str(aValue), MAX_STRING_NUMBER) )  # second element
-
 			# gettable and settable
 			anAttribute = aStepperStub.getPropertyAttributes( aProperty )
+			# value
+			if anAttribute[GETABLE] != 0:
+				aValueString = str( aStepperStub.getProperty( aProperty ) )
+			else:
+				aValueString = ''
+				
+			# second element
+			aList.append( shortenString( aValueString,\
+						     MAX_STRING_NUMBER) )  
+
 			aList.append( decodeAttribute(anAttribute[GETABLE]) )  # third element
 			aList.append( decodeAttribute(anAttribute[SETTABLE]) ) # forth element
 
