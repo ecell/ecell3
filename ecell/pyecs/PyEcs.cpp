@@ -28,6 +28,8 @@
 // E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
 
+#include <signal.h>
+
 #include "libemc/libemc.hpp"
 #include "libemc/Simulator.hpp"
 #include "libecs/Exceptions.hpp"
@@ -51,6 +53,35 @@ void translateException( const std::exception& anException )
   PyErr_SetString( PyExc_RuntimeError, anException.what() );
 }
 
+static void PyEcsSignalHandler( int aSignal )
+{
+  static bool isCalled( false );
+  if( isCalled )  // prevent looping
+    {
+      Py_FatalError( "PyECS: Fatal error.  Aborting uncleanly." );
+    }
+  isCalled = true;
+  
+  switch( aSignal )
+    {
+    case SIGSEGV:
+      std::cerr << "PyECS: SIGSEGV. Invalid memory reference." << std::endl;
+      break;
+    case SIGFPE:
+      std::cerr << "PyECS: SIGFPE. Floating point exception." << std::endl;
+      break;
+    case SIGINT:
+      // exit without message
+      break;
+    default:
+      std::cerr << "PyECS: Unexpected error: signal " << aSignal <<
+	"." << std::endl;
+      break;
+    }
+  
+  Py_Exit( 1 );
+}
+
 
 BOOST_PYTHON_MODULE( _ecs )
 {
@@ -58,6 +89,11 @@ BOOST_PYTHON_MODULE( _ecs )
 
   // pyecs uses Numeric module
   import_array();
+
+  signal( SIGSEGV, PyEcsSignalHandler );
+  signal( SIGFPE,  PyEcsSignalHandler );
+  signal( SIGINT,  PyEcsSignalHandler );
+
 
   def( "setDMSearchPath", &libemc::setDMSearchPath );
   def( "getDMSearchPath", &libemc::getDMSearchPath );

@@ -54,9 +54,7 @@ namespace libemc
   DECLARE_CLASS( Simulator );
   DECLARE_CLASS( SimulatorImplementation );
 
-
   void setDMSearchPath( const std::string& path );
-
   const std::string getDMSearchPath();
 
 
@@ -65,8 +63,3 @@ namespace libemc
 } // namespace libemc
 
 #endif   /* __LIBEMC_HPP */
-
-
-
-
-

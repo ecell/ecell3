@@ -29,7 +29,6 @@
 //
 
 #include <iostream>
-
 #include <algorithm>
 
 #include "libecs/libecs.hpp"
@@ -531,7 +530,6 @@ namespace libemc
   {
     setEventChecker( EventCheckerRCPtr( new DefaultEventChecker() ) );
   }
-
 
 } // namespace libemc,
 

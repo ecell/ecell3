@@ -28,6 +28,8 @@
 // E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
 
+#include <signal.h>
+
 
 #include "libemc.hpp"
 
@@ -47,7 +49,3 @@ namespace libemc
 
 
 } // namespace libemc
-
-
-
-
