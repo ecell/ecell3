@@ -1,6 +1,3 @@
-#ifndef __MichaelisUniUniProcess_CPP
-#define __MichaelisUniUniProcess_CPP
-
 #include "libecs.hpp"
 #include "Process.hpp"
 #include "Util.hpp"
@@ -19,7 +16,7 @@
 USE_LIBECS;
 
 ECELL3_DM_CLASS
-    :  
+  :  
   public FluxProcess
 {
 
@@ -62,8 +59,4 @@ ECELL3_DM_CLASS
   
 };
 
-
-
 ECELL3_DM_INIT;
-
-#endif

@@ -1,6 +1,3 @@
-#ifndef __MassActionProcess_CPP
-#define __MassActionProcess_CPP
-
 #include "libecs.hpp"
 #include "Process.hpp"
 #include "Util.hpp"
@@ -72,5 +69,3 @@ ECELL3_DM_CLASS
 };
 
 ECELL3_DM_INIT;
-
-#endif

@@ -1,6 +1,3 @@
-#ifndef __RapidEquilibriumPProcess_CPP
-#define __RapidEquilibriumPProcess_CPP
-
 #include "libecs.hpp"
 #include "Process.hpp"
 #include "Util.hpp"
@@ -266,5 +263,3 @@ void ECELL3_DM_CLASSNAME::process()
     }
 
 }
-
-#endif
