@@ -446,7 +446,7 @@ class MainWindow(OsogoWindow):
 				self.theSession.loadScript( aFileName )
 
 			self.theSession.theSimulator.initialize()
-#                        self.theEntityListWindow.setSession( self.theSession )
+                        self.theEntityListWindow.setSession( self.theSession )
 
 
 		except:
