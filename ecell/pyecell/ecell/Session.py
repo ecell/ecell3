@@ -9,8 +9,8 @@ from Numeric import *
 import ecell.ecs
 
 from ecell.ecssupport import *
-import ecell.DataFileManager
-import ecell.ECDDataFile
+from ecell.DataFileManager import *
+from ecell.ECDDataFile import *
 
 #from ecell.FullID import *
 #from ecell.util import *
@@ -227,84 +227,130 @@ class Session:
     def createLoggerStub( self, fullpn ):
         return LoggerStub( self.theSimulator, fullpn )
 
-    def saveLoggerData( self, aFullPNString='', aStartTime=-1, aEndTime=-1, aInterval=-1, aSaveDirectory='./Data'):
+    def saveLoggerData( self, aFullPNString='', aStartTime=-1, anEndTime=-1, anInterval=-1, aSaveDirectory='./Data'):
+
+        # -------------------------------------------------
+        # Execute saving.
+        # -------------------------------------------------
 
         try:
             os.mkdir( aSaveDirectory )
+
         # creates instance datafilemanager
         except:
-            self.log( "\'" + aSaveDirectory + "\'" + " file exists." )
-        aDataFileManager = ecell.DataFileManager.DataFileManager()
+            self.message( "\'" + aSaveDirectory + "\'" + " file exists." )
 
-        # sets root directory to datafilemanager
-        aDataFileManager.setRootDirectory(aSaveDirectory)
-
-        aFileIndex = 0
+        aLoggerNameList = []
 
         if aFullPNString=='':
             aLoggerNameList = self.getLoggerList()
         else:
-            aLoggerNameList = aFullPNString 
+            aLoggerNameList.append( aFullPNString )         
 
-        try:#(1)
+        # creates instance datafilemanager
+        aDataFileManager = DataFileManager()
+
+        # sets root directory to datafilemanager
+        aDataFileManager.setRootDirectory(aSaveDirectory)
+        
+        aFileIndex=0
+
+        try: #(1)
             
-            for aFullPNString in aLoggerNameList:
+            # gets all list of selected property name
+            for aFullPNString in aLoggerNameList: #(2)
 
-                # ---------------------------------------------\----
-                # creates filename
+                # -------------------------------------------------
                 # from [Variable:/CELL/CYTOPLASM:E:Value]
-                # to   [CYTOPLASM-E-Value]
-                # ---------------------------------------------\----
-                aFileName=string.split(string.join(string.split(aFullPNString,':')[1:],'-'),'/')[-1]
+                # to   [Variable_CELL_CYTOPLASM_E_Value]
+                # -------------------------------------------------
+
+                aRootIndex=find(aFullPNString,':/')
+                aFileName=aFullPNString[:aRootIndex]+aFullPNString[aRootIndex+1:]
+                aFileName=replace(aFileName,':','_')
+                aFileName=replace(aFileName,'/','_')
                 
-                aECDDataFile = ecell.ECDDataFile.ECDDataFile()
+                aECDDataFile = ECDDataFile()
                 aECDDataFile.setFileName(aFileName)
-                aLogger = self.getLogger( aFullPNString )
                 
-                if aStartTime == -1 or aEndTime == -1:
+                # -------------------------------------------------
+                # Gets logger
+                # -------------------------------------------------
+                # need check if the logger exists
+                aLoggerStub = self.createLoggerStub( aFullPNString )
+                if not aLoggerStub.isExist():
+                    aErrorMessage='\nLogger doesn\'t exist.!\n'
+                    self.message( aErrorMessage )
+                    return None
+                aLoggerStartTime= aLoggerStub.getStartTime()
+                aLoggerEndTime= aLoggerStub.getEndTime()
+                if aStartTime == -1 or anEndTime == -1:
                     # gets start time and end time from logger
-                    aStartTime= aLogger.getStartTime()
-                    aEndTime  = aLogger.getEndTime()
+                    aStartTime = aLoggerStartTime
+                    anEndTime = aLoggerEndTime
                 else:
                     # checks the value
-                    if not (aLogger.getStartTime() < aStartTime < aLogger.getEndTime()):
-                        aStartTime = aLogger.getStartTime()
-                    if not (aLogger.getStartTime() < aEndTime < aLogger.getEndTime()):
-                        aEndTime = aLogger.getEndTime()
+                    if not ( aLoggerStartTime < aStartTime < aLoggerEndTime ):
+                        aStartTime = aLoggerStartTime
+                    if not ( aLoggerStartTime < anEndTime < aLoggerEndTime ):
+                        anEndTime = aLoggerEndTime
 
-                if aInterval == -1:
-                    # gets data with specifing interval
-                    aMatrixData = aLogger.getData(aStartTime,aEndTime)
+                # -------------------------------------------------
+                # gets the matrix data from logger.
+                # -------------------------------------------------
+                if anInterval == -1:
+                    # gets data with specifing interval 
+                    aMatrixData = aLoggerStub.getData( aStartTime, anEndTime )
                 else:
-                    # gets data without specifing interval
-                    aMatrixData = aLogger.getData(aStartTime,aEndTime,aInterval)
+                    # gets data without specifing interval 
+                    aMatrixData = aLoggerStub.getData( aStartTime, anEndTime, anInterval )
 
-                # sets data name
+                    
+                # sets data name 
                 aECDDataFile.setDataName(aFullPNString)
 
                 # sets matrix data
-                aECDDataFile.setMatrixData(aMatrixData)
+                aECDDataFile.setData(aMatrixData)
 
                 # -------------------------------------------------
                 # adds data file to data file manager
                 # -------------------------------------------------
                 aDataFileManager.getFileMap()[`aFileIndex`] = aECDDataFile
-
+                
                 aFileIndex = aFileIndex + 1
-        
-        except:#(1)
-            
+
+                # for(2)
+                
+            aDataFileManager.saveAll()
+
+        except: #try(1)
+
+            # -------------------------------------------------
+            # displays error message and exit this method.
+            # -------------------------------------------------
+
             import sys
-            ## self.message( __name__ )
-            self.message( sys.exc_traceback )
+            import traceback 
+            print __name__,
+            aErrorMessageList = traceback.format_exception(sys.exc_type,sys.exc_value,sys.exc_traceback)
+            for aLine in aErrorMessageList: 
+                self.message( aLine ) 
+                
             aErrorMessage= "Error : could not save [%s] " %aFullPNString
             self.message( aErrorMessage )
-            return None
+            sys.exit(0)
 
-        aDataFileManager.saveAll()         
-        self.message( "All files are saved." )
+        else: # try(1)
+            # -------------------------------------------------
+            # displays error message and exit this method.
+            # -------------------------------------------------
+            
+            aSuccessMessage= " All files you selected are saved. " 
+            self.message( aSuccessMessage )
 
+        # end of try(1)
 
+	# end of saveData
 
     #
     # private methods
