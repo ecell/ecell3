@@ -37,20 +37,19 @@
 
 #include <limits>
 
-#include "NRStepper.hpp"
+#include <libecs/Util.hpp>
 
-#include "NRProcess.hpp"
+#include "NRStepper.hpp"
 
 
 
 DM_INIT( Stepper, NRStepper );
 
 
-
 NRStepper::NRStepper()
   :
   theTimeScale( 0.0 ),
-  theTolerance( 0.1 ),
+  theTolerance( 0.0 ),
   theRng( gsl_rng_alloc( gsl_rng_mt19937 ) )
 {
   // unset the default MinStepInterval.  
@@ -75,41 +74,57 @@ void NRStepper::initialize()
 {
   DiscreteEventStepper::initialize();
 
+  // dynamic_cast theProcessVector of this Stepper to NRProcess, and store
+  // it in theNRProcessVector.
   theNRProcessVector.clear();
-  for( ProcessVector::const_iterator i( theProcessVector.begin() );
-       i != theProcessVector.end(); ++i )
+  try
     {
-      ProcessPtr aProcessPtr( *i );
-
-      NRProcessPtr 
-	anNRProcessPtr( dynamic_cast<NRProcessPtr>( aProcessPtr ) );
-      if( anNRProcessPtr != NULLPTR )
-	{
-	  theNRProcessVector.push_back( anNRProcessPtr );
-	}
-      else
-	{
-	  THROW_EXCEPTION( InitializationFailed,
-			   String( getClassName() ) + 
-			   ": Only NRProcesses are allowed to exist "
-			   "in this Stepper." );
-	}
+      std::transform( theProcessVector.begin(), theProcessVector.end(),
+		      std::back_inserter( theNRProcessVector ),
+		      libecs::DynamicCaster<NRProcessPtr,ProcessPtr>() );
+    }
+  catch( const libecs::TypeError& )
+    {
+      THROW_EXCEPTION( InitializationFailed,
+		       String( getClassName() ) + 
+		       ": Only NRProcesses are allowed to exist "
+		       "in this Stepper." );
     }
 
+  // optimization: sort by memory address
+  std::sort( theProcessVector.begin(), theProcessVector.end() );
 
-  const Real aCurrentTime( getCurrentTime() );
+
+  // (1) check Process dependency
+  // (2) update step interval of each Process
+  // (3) construct the priority queue (scheduler)
   thePriorityQueue.clear();
+  const Real aCurrentTime( getCurrentTime() );
   for( NRProcessVector::const_iterator i( theNRProcessVector.begin() );
        i != theNRProcessVector.end(); ++i )
     {      
       NRProcessPtr anNRProcessPtr( *i );
 	
+      // check Process dependencies
+      anNRProcessPtr->clearEffectList();
+      // here assume aCoefficient != 0
+      for( NRProcessVector::const_iterator j( theNRProcessVector.begin() );
+	   j != theNRProcessVector.end(); ++j )
+	{
+	  NRProcessPtr const anNRProcess2Ptr( *j );
+	  
+	  if( anNRProcessPtr->checkEffect( anNRProcess2Ptr ) )
+	    {
+	      anNRProcessPtr->addEffect( anNRProcess2Ptr );
+	    }
+	}
+
       // warning: implementation dependent
       // here we assume size() is the index of the newly pushed element
       const Int anIndex( thePriorityQueue.size() );
 
       anNRProcessPtr->setIndex( anIndex );
-      anNRProcessPtr->updateStepInterval();
+      updateNRProcess( anNRProcessPtr );
 	
       thePriorityQueue.push( NREvent( anNRProcessPtr->getStepInterval()
 				      + aCurrentTime,
@@ -126,7 +141,7 @@ void NRStepper::step()
   NRProcessPtr const aMuProcess( anEvent.getProcess() );
   aMuProcess->process();
 
-  // it assumes all coefficients are one
+  // it assumes all coefficients are one or minus one
   // Process::initialize() should check this
   theTimeScale = 
     aMuProcess->getMinValue() * aMuProcess->getStepInterval() * theTolerance;
@@ -138,7 +153,7 @@ void NRStepper::step()
 	i!= anEffectList.end(); ++i ) 
     {
       NRProcessPtr const anAffectedProcess( *i );
-      anAffectedProcess->updateStepInterval();
+      updateNRProcess( anAffectedProcess );
       const Real aStepInterval( anAffectedProcess->getStepInterval() );
       // aTime is time in the priority queue
 
@@ -146,22 +161,12 @@ void NRStepper::step()
       thePriorityQueue.changeOneKey( anIndex,
 				     NREvent( aStepInterval + aCurrentTime,
 					      anAffectedProcess ) );
-      //	  std::cerr << "change: " << anIndex << ' ' << aStepInterval << ' ' << anAffectedProcess->getID() << std::endl;
-
     }
 
   NREventCref aTopEvent( thePriorityQueue.top() );
   const Real aNextStepInterval( aTopEvent.getTime() - aCurrentTime );
 
   setStepInterval( aNextStepInterval );
-
-  //      std::cerr << aNextStepInterval << std::endl;
-
-  //NRProcessPtr const aNextProcess( aTopEvent.getProcess() );
-  //std::cerr << "next: " << aNextProcess->getID() << std::endl;
-  //      std::cerr << "next: " << aNextProcess->getStepInterval() << std::endl;
-  //      std::cerr << "next: " << aNextProcess->getMu() << std::endl;
-
 }
 
 
@@ -174,7 +179,7 @@ void NRStepper::interrupt( StepperPtr const aCaller )
     {      
       NRProcessPtr const anNRProcessPtr( *i );
 	
-      anNRProcessPtr->updateStepInterval();
+      updateNRProcess( anNRProcessPtr );
       const Real aStepInterval( anNRProcessPtr->getStepInterval() );
 
       thePriorityQueue.changeOneKey( anNRProcessPtr->getIndex(),

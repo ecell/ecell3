@@ -232,6 +232,28 @@ namespace libecs
     return String();
   }
 
+
+  template< class NEW, class GIVEN >
+  class DynamicCaster
+    :
+    std::unary_function< GIVEN, NEW >
+  {
+  public:
+    NEW operator()( GIVEN aPtr )
+    {
+      NEW aNew( dynamic_cast<NEW>( aPtr ) );
+      if( aNew != NULLPTR )
+	{
+	  return aNew;
+	}
+      else
+	{
+	  THROW_EXCEPTION( TypeError, "dynamic cast failed." );
+	}
+    }
+  };
+
+
   //@}
 
 } // namespace libecs

@@ -126,6 +126,7 @@ public:\
   DEFINE_EXCEPTION( AssertionFailed,        Exception );
   DEFINE_EXCEPTION( AlreadyExist,           Exception );
   DEFINE_EXCEPTION( ValueError,             Exception );
+  DEFINE_EXCEPTION( TypeError,             Exception );
 
   // simulation errors
   DEFINE_EXCEPTION( SimulationError,        Exception );

@@ -50,8 +50,6 @@
 #ifndef __NRSTEPPER_HPP
 #define __NRSTEPPER_HPP
 
-#include <time.h>
-
 //#include <iostream>
 #include <vector>
 #include <algorithm>
@@ -63,18 +61,24 @@
 #include "libecs/Variable.hpp"
 #include "libecs/Stepper.hpp"
 
+#include "NRProcess.hpp"
+
 USE_LIBECS;
 
-  DECLARE_CLASS( NRProcess );
+DECLARE_CLASS( NRStepper );
 
-  DECLARE_VECTOR( Int,  IntVector );
-//  DECLARE_VECTOR( Real, RealVector );
-  DECLARE_VECTOR( NRProcessPtr, NRProcessVector );
+class NRStepper 
+  : 
+  public DiscreteEventStepper 
+{
 
+  LIBECS_DM_OBJECT( Stepper, NRStepper );
 
   DECLARE_CLASS( NREvent );
-  DECLARE_CLASS( NRStepper );
+  DECLARE_TYPE( DynamicPriorityQueue<NREvent>, NRPriorityQueue );
 
+
+protected:
 
   // A pair of (reaction index, time) for inclusion in the priority queue.
   class NREvent
@@ -122,77 +126,70 @@ USE_LIBECS;
     NRProcessPtr theProcess;
 
 
-   };
-
-
-
-  DECLARE_TYPE( DynamicPriorityQueue<NREvent>, NRPriorityQueue );
-
-
-  class NRStepper 
-    : 
-    public DiscreteEventStepper 
-  {
-
-    LIBECS_DM_OBJECT( Stepper, NRStepper );
-
-  public:
-
-    NRStepper(void);
-
-    virtual ~NRStepper(void);
-
-    virtual void initialize();
-
-    virtual void step();
-
-    virtual void interrupt( StepperPtr const aCaller );
-
-
-    SET_METHOD( Real, Tolerance )
-    {
-      theTolerance = value;
-    }
-
-    GET_METHOD( Real, Tolerance )
-    {
-      return theTolerance;
-    }
-
-    virtual GET_METHOD( Real, TimeScale )
-    {
-      //return theLastProcess->getTimeScale();
-      return theTimeScale;
-    }
-
-
-    const gsl_rng* getRng() const
-    {
-      return theRng;
-    }
-
-    NRProcessVectorCref getNRProcessVector() const
-    {
-      return theNRProcessVector;
-    }
-
-
-  protected:
-
-    NRProcessVector theNRProcessVector;
-
-    NRPriorityQueue thePriorityQueue;
-
-    //    NRProcessPtr    theLastProcess;
-
-    Real            theTimeScale;
-
-    Real            theTolerance;
-
-    gsl_rng* const theRng;
-
-
   };
+
+public:
+
+  NRStepper(void);
+
+  virtual ~NRStepper(void);
+
+  virtual void initialize();
+
+  virtual void step();
+
+  virtual void interrupt( StepperPtr const aCaller );
+
+
+  SET_METHOD( Real, Tolerance )
+  {
+    theTolerance = value;
+  }
+
+  GET_METHOD( Real, Tolerance )
+  {
+    return theTolerance;
+  }
+
+  virtual GET_METHOD( Real, TimeScale )
+  {
+    //return theLastProcess->getTimeScale();
+    return theTimeScale;
+  }
+
+  const gsl_rng* getRng() const
+  {
+    return theRng;
+  }
+    
+  void updateNRProcess( NRProcessPtr aNRProcessPtr ) const
+  {
+    aNRProcessPtr->updateStepInterval( gsl_rng_uniform_pos( theRng ) );
+  }
+
+
+  NRProcessVectorCref getNRProcessVector() const
+  {
+    return theNRProcessVector;
+  }
+
+
+protected:
+
+  NRProcessVector theNRProcessVector;
+
+  NRPriorityQueue thePriorityQueue;
+
+  //    NRProcessPtr    theLastProcess;
+
+  Real            theTimeScale;
+
+  Real            theTolerance;
+
+  gsl_rng* const theRng;
+
+
+};
 
 
 

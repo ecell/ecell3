@@ -9,12 +9,10 @@
 #include <libecs/PropertySlotMaker.hpp>
 #include <libecs/FullID.hpp>
 
-#include "NRStepper.hpp"
-
 USE_LIBECS;
 
-//DECLARE_CLASS( NRProcess );
-//DECLARE_VECTOR( NRProcessPtr, NRProcessVector );
+DECLARE_CLASS( NRProcess );
+DECLARE_VECTOR( NRProcessPtr, NRProcessVector );
 
 
 /***************************************************************************
@@ -149,8 +147,9 @@ public:
 
   const Polymorph getEffectListProperty() const;
 
-
-  void updateStepInterval()
+  
+  // a uniform random number (0...1) must be given as u
+  void updateStepInterval( const Real u )
   {
     const Real aMu( getMu() );
 
@@ -164,9 +163,6 @@ public:
       {
 	THROW_EXCEPTION( SimulationError, "Negative Mu value." );
       }
-
-    //  ( 0...1 )
-    Real u( gsl_rng_uniform_pos( theNRStepper->getRng() ) );
 
     Real aMuV( aMu );
     if( getOrder() == 2 )
@@ -189,18 +185,6 @@ public:
     Process::initialize();
     declareUnidirectional();
 
-
-    theNRStepper = dynamic_cast<NRStepperPtr>( getStepper() );
-    if( theNRStepper == NULLPTR )
-      {
-	THROW_EXCEPTION( InitializationFailed, 
-			 "[" + getFullID().getString() + 
-			 "]: NRProcess must be used in conjunction with NRStepper" );
-
-      }
-
-
-
     calculateOrder();
 
     if( ! ( getOrder() == 1 || getOrder() == 2 ) )
@@ -210,8 +194,6 @@ public:
 			 "[" + getFullID().getString() + 
 			 "]: Either first or second order reaction is allowed." );
       }
-
-    updateEffectList();
 
 
   }
@@ -229,10 +211,12 @@ public:
       }
   }
 
+  void clearEffectList()
+  {
+    theEffectList.clear();
+  }
 
   void addEffect( NRProcessPtr anIndex );
-
-  void updateEffectList();
 
   const bool checkEffect( NRProcessPtr anNRProcessPtr ) const;
 
@@ -247,7 +231,6 @@ protected:
   NRProcessVector theEffectList;
 
   Int theOrder;
-  NRStepperPtr    theNRStepper;
 
   Real theStepInterval;
 
@@ -310,27 +293,6 @@ void NRProcess::calculateOrder()
 }
 
 
-void NRProcess::updateEffectList()
-{
-  theEffectList.clear();
-
-  // here assume aCoefficient != 0
-
-  NRProcessVectorCref 
-    anNRProcessVector( theNRStepper->getNRProcessVector() );
-  for( NRProcessVectorConstIterator i( anNRProcessVector.begin() );
-       i != anNRProcessVector.end(); ++i )
-    {
-      NRProcessPtr const anNRProcessPtr( *i );
-
-      if( checkEffect( anNRProcessPtr ) )
-	{
-	  addEffect( anNRProcessPtr );
-	}
-    }
-
-}
-
 const bool NRProcess::checkEffect( NRProcessPtr anNRProcessPtr ) const
 {
   VariableReferenceVectorCref 
@@ -371,6 +333,9 @@ void NRProcess::addEffect( NRProcessPtr aProcessPtr )
       == theEffectList.end() )
     {
       theEffectList.push_back( aProcessPtr );
+
+      // optimization: sort by memory address
+      std::sort( theEffectList.begin(), theEffectList.end() );
     }
 
 }
