@@ -34,6 +34,7 @@
 
 #include "libecs.hpp"
 #include "LoggerImplementation.hpp"
+#include "LocalLoggerImplementation.hpp"
 
 namespace libemc
 {
