@@ -16,6 +16,7 @@ dnl
 AC_OUTPUT(
 Makefile
 misc/Makefile
+launcher.ini
 toollauncher,
 chmod +x toollauncher
 )
