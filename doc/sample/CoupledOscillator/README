@@ -1,8 +1,9 @@
 
 
 === About ===
-This is a simple cascade oscillator model. It was developed to demonstrate
-multi-timescale simulation.
+
+This is a simple cascade of oscillators model. It was developed as a
+demonstration of multi-timescale simulation.
 
 === Files and directories ===
 
@@ -20,8 +21,8 @@ cascade.em      Model file (em file) for this model.
 
 === Configure this model ===
 
-In the begining of cascade.em file:
+In the begining of the cascade.em file:
 
-SYS_PROCESS = 5
-RATIO = 2
-INIT_V = 0.1
+SYS_PROCESS = 5  
+RATIO = 2        
+INIT_V = 0.1     
