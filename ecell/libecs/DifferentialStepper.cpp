@@ -192,7 +192,7 @@ namespace libecs
   {
     // use more narrow range
     setMinStepInterval( 1e-100 );
-    setMaxStepInterval( 1e+100 );
+    setMaxStepInterval( 1e+10 );
   }
 
   AdaptiveDifferentialStepper::~AdaptiveDifferentialStepper()
