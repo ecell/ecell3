@@ -20,7 +20,7 @@ class PluginWindow(ViewWindow):
         ViewWindow.__init__( self, aGladeFileName, data, root )
 
         self.thePluginManager = pluginmanager
-        self.theSimulator = self.thePluginManager.theMainWindow.theSimulator
+        self.theDriver = self.thePluginManager.theSession.theDriver
         self.theRawFullPNList = data
         aMenuWindow = Window( 'PluginWindowPopupMenu.glade', root='menu' )
         self.thePopupMenu = aMenuWindow['menu']
@@ -70,9 +70,9 @@ class PluginWindow(ViewWindow):
             aFullID = convertFullPNToFullID( aFullPN )
             aPropertyName = aFullPN[PROPERTY]
             aPropertyListFullPN = convertFullIDToFullPN( aFullID, 'PropertyList' )
-            aPropertyList = self.theSimulator.getProperty( aPropertyListFullPN )
+            aPropertyList = self.theDriver.getProperty( aPropertyListFullPN )
             aAttributeListFullPN = convertFullIDToFullPN( aFullID, 'PropertyAttributes')
-            aAttributeList = self.theSimulator.getProperty( aAttributeListFullPN )
+            aAttributeList = self.theDriver.getProperty( aAttributeListFullPN )
             num = 0
             for aProperty in aPropertyList:
                 aPropertyFullPN = convertFullIDToFullPN( aFullID, aProperty )
@@ -88,7 +88,7 @@ class PluginWindow(ViewWindow):
             return 99
 
     def isNumber( self, aFullPN ):
-        aValue = self.theSimulator.getProperty( aFullPN )
+        aValue = self.theDriver.getProperty( aFullPN )
         if type( aValue[0] ) is IntType:
             return 1
         elif type( aValue[0] ) is FloatType:

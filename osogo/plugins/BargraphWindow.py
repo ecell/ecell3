@@ -57,7 +57,7 @@ class BargraphWindow(PluginWindow):
         aString += ':\n' + str( self.theFullPN()[PROPERTY] )        
         self.theIDEntry.set_text  ( aString )
 
-        aValue = self.theSimulator.getProperty( self.theFullPN() )
+        aValue = self.theDriver.getProperty( self.theFullPN() )
         value = aValue[0]
         self.theActualValue = value
         self.theBarLength , self.theMultiplier , self.thePositiveFlag \

@@ -7,5 +7,5 @@ bindir=@bindir@
 export OSOGOPATH=@libdir@/@PACKAGE@
 export PYTHONPATH="${OSOGOPATH}:${PYTHONPATH}"
 
-exec ${bindir}/ecell3 ${OSOGOPATH}/MainWindow.py $*
+exec ${bindir}/ecell3 ${OSOGOPATH}/opengui.py $*
 

@@ -41,7 +41,7 @@ class PropertyWindow(PluginWindow):
         
         aNameFullPN = convertFullIDToFullPN( self.theFullID(),
                                                       'Name' )
-        aNameList = list( self.theSimulator.getProperty( aNameFullPN ) )
+        aNameList = list( self.theDriver.getProperty( aNameFullPN ) )
         self.theClassName = aNameList[0]
         
         self.theType = PrimitiveTypeString[ self.theFullID()[TYPE] ]
@@ -49,7 +49,7 @@ class PropertyWindow(PluginWindow):
         self.thePath = str( self.theFullID()[SYSTEMPATH] )
         aClassNameFullPN = convertFullIDToFullPN( self.theFullID(),
                                                   'ClassName' )
-        aList = self.theSimulator.getProperty( aClassNameFullPN )
+        aList = self.theDriver.getProperty( aClassNameFullPN )
 
         self.theTypeEntry.set_text( self.theType  )
         self.theIDEntry.set_text  ( self.theID )
@@ -70,7 +70,7 @@ class PropertyWindow(PluginWindow):
 
         aPropertyListFullPN = convertFullIDToFullPN( self.theFullID(),
                                                      'PropertyList' )
-        aPropertyList = self.theSimulator.getProperty( aPropertyListFullPN )
+        aPropertyList = self.theDriver.getProperty( aPropertyListFullPN )
 
         for aProperty in aPropertyList:
             if (aProperty == 'ClassName'):
@@ -91,7 +91,7 @@ class PropertyWindow(PluginWindow):
                 aFullPN = convertFullIDToFullPN( self.theFullID(),
                                                           aProperty )
             
-                aValueList = self.theSimulator.getProperty( aFullPN ) 
+                aValueList = self.theDriver.getProperty( aFullPN ) 
                 aLength = len( aValueList )
                 aAttribute = self.getAttribute( aFullPN )
             

@@ -38,10 +38,10 @@ class PluginModule:
 
 class PluginManager:
 
-    def __init__( self, aMainWindow ):
+    def __init__( self, session ):
         self.thePluginMap = {}
         self.theInstanceList = []
-        self.theMainWindow = aMainWindow
+        self.theSession = session
 
     def createInstance( self, classname, data, root=None, parent=None ):
         try:

@@ -17,14 +17,22 @@ import LoggerWindow
 
 import string
 
-def false():
-    return false
+import Session
 
 class MainWindow(Window):
 
     def __init__( self ):
 
-        self.theSimulator = ecs.Simulator()
+        #### create Message Window ####
+        self.theMessageWindow = MessageWindow.MessageWindow()
+        self.theMessageWindowWindow = self.theMessageWindow[ 'message_window' ]
+        self.theMessageWindowWindow.hide()
+
+        self.theSession = Session.GuiSession( self.theMessageWindow )
+
+        self.theDriver = self.theSession.theDriver
+        self.theSimulator = self.theDriver.theSimulator
+        self.theModelInterpreter = self.theSession.theModelInterpreter
 
         self.theUpdateInterval = 100
         self.theStepSize = 1
@@ -59,7 +67,7 @@ class MainWindow(Window):
               }
         self.addHandlers( self.theHandlerMap )
 
-        self.thePluginManager = PluginManager( self )
+        self.thePluginManager = PluginManager( self.theSession )
         self.thePluginManager.loadAll()
 
         #### create Script File Selection ####
@@ -81,15 +89,10 @@ class MainWindow(Window):
         self.thePaletteWindow = PaletteWindow.PaletteWindow()
         self.thePaletteWindow.setPluginList( self.thePluginManager.thePluginMap )
 
-        #### create Message Window ####
-        self.theMessageWindow = MessageWindow.MessageWindow()
-        self.theMessageWindowWindow = self.theMessageWindow[ 'message_window' ]
-        self.theMessageWindowWindow.hide()
 
         ### initialize for run method ###
-        self.theSimulator.setPendingEventChecker( gtk.events_pending )
-        #self.theSimulator.setPendingEventChecker( false )
-        self.theSimulator.setEventHandler( gtk.mainiteration  )
+        self.theDriver.setPendingEventChecker( gtk.events_pending )
+        self.theDriver.setEventHandler( gtk.mainiteration  )
 
         self['ecell_logo_toolbar'].set_style( GTK.TOOLBAR_ICONS )
 
@@ -106,7 +109,9 @@ class MainWindow(Window):
         aFileName = self.theRuleFileSelection.get_filename()
         self.theRuleFileSelection.hide()
         aGlobalNameMap = { 'aMainWindow' : self }
-        execfile( aFileName, aGlobalNameMap )
+        execfile(aFileName, aGlobalNameMap)
+        self.theModelInterpreter.load( self.theCellModelObject )
+        self.theDriver.initialize()
 
     ###### Load Script ######
     def openScriptFileSelection( self, obj ) :
@@ -115,7 +120,7 @@ class MainWindow(Window):
     def loadScript( self, button_obj ):
         aFileName = self.theScriptFileSelection.get_filename()
         self.theScriptFileSelection.hide()
-        aGlobalNameMap = { 'aMainWindow' : self }
+        aGlobalNameMap = { self : self }
         execfile(aFileName, aGlobalNameMap)
         
     ###### Save Cell State As ######
@@ -171,7 +176,7 @@ class MainWindow(Window):
 
     def update( self ):
 
-        aTime = self.theSimulator.getProperty( ( SYSTEM, '/', '/', 'CurrentTime') ) 
+        aTime = self.theDriver.getProperty( ( SYSTEM, '/', '/', 'CurrentTime') ) 
         self.theCurrentTime = aTime[0]
         self['time_entry'].set_text( str( self.theCurrentTime ) )
         self.thePluginManager.updateAllPluginWindow()
@@ -192,26 +197,6 @@ class MainWindow(Window):
     def printMessage( self, aMessageString ):
         self.theMessageWindow.printMessage( aMessageString )
 
-    def printProperty( self, fullpn ):
-        value = self.theSimulator.getProperty( fullpn )
-        self.printMessage( createFullPNString( fullpn ) )
-        self.printMessage( ' = ' )
-        if len(value) == 1:
-            self.printMessage( str(value[0]) )
-        else:
-            for i in value:
-                self.printMessage( str(i) )
-                self.printMessage( ',' )
-        self.printMessage( "\n" )
-    
-    def printAllProperties( self, fullid ):
-        properties = self.theSimulator.getProperty( fullid +  ('PropertyList',) )
-        for property in properties:
-            self.printProperty( fullid + ( property, ) )
-
-    def printList( self, primitivetype, systempath,list ):
-        for i in list:
-            printAllProperties( ( primitivetype, systempath, i ) )
 
 ##########################################################################
 
@@ -231,17 +216,6 @@ class MainWindow(Window):
     def openPreferences( self ) : pass
     def openAbout( self ) : pass
     #### these method is not supported in summer GUI project
-
-if __name__ == "__main__":
-
-    def mainLoop():
-        aMainWindow = MainWindow()
-        gtk.mainloop()
-
-    def main():
-        mainLoop()
-
-    main()
 
 
 

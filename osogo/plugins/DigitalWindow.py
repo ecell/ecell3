@@ -40,12 +40,12 @@ class DigitalWindow( PluginWindow ):
         self.setValue( self.getValue() * 0.5 )
 
     def getValue( self ):
-        aValueList = self.theSimulator.getProperty( self.theFullPN() )
+        aValueList = self.theDriver.getProperty( self.theFullPN() )
         return aValueList[0]
 
     def setValue( self, aValue ):
         aValueList = ( aValue, )
-        self.theSimulator.setProperty( self.theFullPN(), aValueList )
+        self.theDriver.setProperty( self.theFullPN(), aValueList )
         self.thePluginManager.updateAllPluginWindow()
 
 ### test code

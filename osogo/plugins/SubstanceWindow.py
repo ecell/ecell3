@@ -51,10 +51,10 @@ class SubstanceWindow(PluginWindow):
 
     def update( self ):
 
-        self.theQuantity = self.theSimulator.getProperty( self.theFPNQuantity )[0]
+        self.theQuantity = self.theDriver.getProperty( self.theFPNQuantity )[0]
         self['Quantity_entry'].set_text( str( self.theQuantity ) )
 
-        self.theConcentration = self.theSimulator.getProperty( self.theFPNConcentration )[0]
+        self.theConcentration = self.theDriver.getProperty( self.theFPNConcentration )[0]
         self['Concentration_entry'].set_text( str( self.theConcentration ) )
     
     def fix_mode( self, a ) :
@@ -104,16 +104,16 @@ class SubstanceWindow(PluginWindow):
     def changeQuantity( self ):
         
         value = (self.theQuantity,)
-        self.theSimulator.setProperty( self.theFPNQuantity, value )
+        self.theDriver.setProperty( self.theFPNQuantity, value )
         self.thePluginManager.updateAllPluginWindow()
-        print self.theSimulator.getProperty( self.theFPNQuantity )
+        print self.theDriver.getProperty( self.theFPNQuantity )
 
     def changeConcentration( self ):
         
         value = (self.theConcentration,)
-        self.theSimulator.setProperty( self.theFPNConcentration, value )
+        self.theDriver.setProperty( self.theFPNConcentration, value )
         self.thePluginManager.updateAllPluginWindow()
-        print self.theSimulator.getProperty( self.theFPNConcentration )
+        print self.theDriver.getProperty( self.theFPNConcentration )
 
 def mainLoop():
     # FIXME: should be a custom function

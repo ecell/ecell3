@@ -25,7 +25,7 @@ class EntryListWindow(Window):
                             } )
 
         self.theMainWindow = aMainWindow
-        self.theSimulator = aMainWindow.theSimulator
+        self.theDriver = aMainWindow.theDriver
         self.thePaletteWindow = aMainWindow.thePaletteWindow
 
         self.theSystemTree = self.getWidget( 'system_tree' )
@@ -66,7 +66,7 @@ class EntryListWindow(Window):
         aLeaf.show()
 
         aSystemListFullPN = convertFullIDToFullPN( aSystemFullID, 'SystemList' ) 
-        aSystemList = self.theSimulator.getProperty( aSystemListFullPN )
+        aSystemList = self.theDriver.getProperty( aSystemListFullPN )
         if aSystemList != ():
             aTree = gtk.GtkTree()
             aLeaf.set_subtree( aTree )
@@ -99,7 +99,7 @@ class EntryListWindow(Window):
     def listEntity( self, aEntityTypeString, aSystemFullID ):
         aListPN = aEntityTypeString + 'List'
         aListFullPN = convertFullIDToFullPN( aSystemFullID, aListPN ) 
-        aEntityList = self.theSimulator.getProperty( aListFullPN )
+        aEntityList = self.theDriver.getProperty( aListFullPN )
         for aEntityID in aEntityList:
             aListItem = gtk.GtkListItem( aEntityID )
             

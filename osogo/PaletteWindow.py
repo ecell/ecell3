@@ -57,9 +57,6 @@ class PaletteWindow(GtkWindow):
         aPluginList = self.get_data( 'plugin_list' )
         for aPluginName in aPluginList :
             aButton = self.get_data( aPluginName )
-            print aPluginName
-            print aButton.get_active()
-            print
             if aButton.get_active() :
                 aSelectedPluginName = aPluginName
         return aSelectedPluginName
