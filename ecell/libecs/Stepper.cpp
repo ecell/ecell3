@@ -58,14 +58,16 @@ namespace libecs
     theCurrentTime( 0.0 ),
     theStepInterval( 0.001 ),
     theOriginalStepInterval( 0.001 ),
-    theMinInterval( std::numeric_limits<Real>::min() * 10 ),
-    theMaxInterval( std::numeric_limits<Real>::max() * .1 )
+    //    theMinStepInterval( std::numeric_limits<Real>::min() * 1000 ),
+    //    theMaxStepInterval( std::numeric_limits<Real>::max() * .1 )
+    theMinStepInterval( 1e-50 ),
+    theMaxStepInterval( 1e+50 )
   {
     CREATE_PROPERTYSLOT_GET    ( Real,      CurrentTime,          Stepper );
     CREATE_PROPERTYSLOT_SET_GET( Real,      StepInterval,         Stepper );
     CREATE_PROPERTYSLOT_SET_GET( Real,      OriginalStepInterval, Stepper );
-    CREATE_PROPERTYSLOT_SET_GET( Real,      MaxInterval,          Stepper );
-    CREATE_PROPERTYSLOT_SET_GET( Real,      MinInterval,          Stepper );
+    CREATE_PROPERTYSLOT_SET_GET( Real,      MaxStepInterval,      Stepper );
+    CREATE_PROPERTYSLOT_SET_GET( Real,      MinStepInterval,      Stepper );
     CREATE_PROPERTYSLOT_GET    ( Polymorph, ReadVariableList,     Stepper );
     CREATE_PROPERTYSLOT_GET    ( Polymorph, WriteVariableList,    Stepper );
     CREATE_PROPERTYSLOT_GET    ( Polymorph, ProcessList,          Stepper );
@@ -779,7 +781,7 @@ namespace libecs
 					 -1.0 / getOrder() ) 
 				  * safety );
 
-	if ( anExpectedStepInterval > getMinInterval() )
+	if ( anExpectedStepInterval > getMinStepInterval() )
 	  {
 	    // shrink it if the error exceeds 110%
 	    setStepInterval( anExpectedStepInterval );
@@ -792,17 +794,17 @@ namespace libecs
 	  }
 	else
 	  {
-	    setStepInterval( getMinInterval() );
+	    setStepInterval( getMinStepInterval() );
 	    
 	    // this must return false,
 	    // so theOriginalStepInterval does NOT LIMIT the error.
 	    calculate();
-	    setOriginalStepInterval( getMinInterval() );
+	    setOriginalStepInterval( getMinStepInterval() );
 	    break;
 	  }
       }
 
-    if ( getOriginalStepInterval() < getMinInterval() )
+    if ( getOriginalStepInterval() < getMinStepInterval() )
       {
 	THROW_EXCEPTION( SimulationError,
 			 "The error-limit step interval of Stepper [" + 
@@ -850,6 +852,11 @@ namespace libecs
   }
 
   //////////////////// DiscreteEventStepper
+
+  DiscreteEventStepper::DiscreteEventStepper()
+  {
+    ; // do nothing
+  }
 
   void DiscreteEventStepper::dispatchInterruptions()
   {

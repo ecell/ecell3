@@ -118,13 +118,13 @@ namespace libecs
     {
       Real aNewStepInterval( value );
 
-      if( aNewStepInterval > getMaxInterval() )
+      if( aNewStepInterval > getMaxStepInterval() )
 	{
-	  aNewStepInterval = getMaxInterval();
+	  aNewStepInterval = getMaxStepInterval();
 	}
-      else if ( aNewStepInterval < getMinInterval() )
+      else if ( aNewStepInterval < getMinStepInterval() )
 	{
-	  aNewStepInterval = getMinInterval();
+	  aNewStepInterval = getMinStepInterval();
 	}
 
       loadStepInterval( aNewStepInterval );
@@ -177,24 +177,24 @@ namespace libecs
     }
 
 
-    SET_METHOD( Real, MinInterval )
+    SET_METHOD( Real, MinStepInterval )
     {
-      theMinInterval = value;
+      theMinStepInterval = value;
     }
 
-    GET_METHOD( Real, MinInterval )
+    GET_METHOD( Real, MinStepInterval )
     {
-      return theMinInterval;
+      return theMinStepInterval;
     }
 
-    SET_METHOD( Real, MaxInterval )
+    SET_METHOD( Real, MaxStepInterval )
     {
-      theMaxInterval = value;
+      theMaxStepInterval = value;
     }
 
-    GET_METHOD( Real, MaxInterval )
+    GET_METHOD( Real, MaxStepInterval )
     {
-      Real aMaxInterval( theMaxInterval );
+      Real aMaxStepInterval( theMaxStepInterval );
 
       /*
       for( StepIntervalConstraintMapConstIterator 
@@ -204,14 +204,14 @@ namespace libecs
 	  const StepperPtr aStepperPtr( (*i).first );
 	  Real aConstraint( aStepperPtr->getStepInterval() * (*i).second );
 
-	  if( aMaxInterval > aConstraint )
+	  if( aMaxStepInterval > aConstraint )
 	    {
-	      aMaxInterval = aConstraint;
+	      aMaxStepInterval = aConstraint;
 	    }
 	}
       */
 
-      return aMaxInterval;
+      return aMaxStepInterval;
     }
 
 
@@ -492,8 +492,8 @@ m
     Real                theStepInterval;
     Real                theOriginalStepInterval;
 
-    Real                theMinInterval;
-    Real                theMaxInterval;
+    Real                theMinStepInterval;
+    Real                theMaxStepInterval;
 
     String              theID;
 

@@ -131,7 +131,7 @@ USE_LIBECS;
 
   class NRStepper 
     : 
-    public Stepper 
+    public DiscreteEventStepper 
   {
 
     LIBECS_DM_OBJECT( Stepper, NRStepper );
@@ -175,9 +175,6 @@ USE_LIBECS;
     {
       return theNRProcessVector;
     }
-
-
-    void makeSlots();
 
 
   protected:
