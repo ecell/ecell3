@@ -47,27 +47,34 @@ os.mkdir('Data2')
 print "creating Data3..."
 os.mkdir('Data3')
 
-aCommand ='ecell3-em2eml simple1.em'
+if os.name == "nt":
+    anEm2eml = 'ecell3 ecell3-em2eml'
+    anEcell3session = 'ecell3 ecell3-session'
+else:
+    anEm2eml = 'ecell3-em2eml'
+    anEcell3session = 'ecell3-session'
+
+aCommand = anEm2eml + ' simple1.em'
 print aCommand
 os.system(aCommand)
 
-aCommand ='ecell3-em2eml simple2.em'
+aCommand = anEm2eml + ' simple2.em'
 print aCommand
 os.system(aCommand)
 
-aCommand ='ecell3-em2eml simple3.em'
+aCommand = anEm2eml + ' simple3.em'
 print aCommand
 os.system(aCommand)
 
-aCommand = 'ecell3-session -e observable.py --parameters=\"{\'_EML_\':\'simple1.eml\',\'_KmS_\':12.0,\'_KcF_\':4.0,\'_Data_\':\'Data1\'}\"'
+aCommand = anEcell3session + ' -e observable.py --parameters=\"{\'_EML_\':\'simple1.eml\',\'_KmS_\':12.0,\'_KcF_\':4.0,\'_Data_\':\'Data1\'}\"'
 print aCommand
 os.system(aCommand)
 
-aCommand = 'ecell3-session -e observable.py --parameters=\"{\'_EML_\':\'simple2.eml\',\'_KmS_\':12.0,\'_KcF_\':4.0,\'_Data_\':\'Data2\'}\"'
+aCommand = anEcell3session + ' -e observable.py --parameters=\"{\'_EML_\':\'simple2.eml\',\'_KmS_\':12.0,\'_KcF_\':4.0,\'_Data_\':\'Data2\'}\"'
 print aCommand
 os.system(aCommand)
 
-aCommand = 'ecell3-session -e observable.py --parameters=\"{\'_EML_\':\'simple3.eml\',\'_KmS_\':12.0,\'_KcF_\':4.0,\'_Data_\':\'Data3\'}\"'
+aCommand = anEcell3session + ' -e observable.py --parameters=\"{\'_EML_\':\'simple3.eml\',\'_KmS_\':12.0,\'_KcF_\':4.0,\'_Data_\':\'Data3\'}\"'
 print aCommand
 os.system(aCommand)
 
