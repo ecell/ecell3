@@ -31,8 +31,10 @@
 #ifndef __MODEL_HPP
 #define __MODEL_HPP
 
-#include <queue>
 #include <map>
+
+//#include <queue>
+#include "DynamicPriorityQueue.hpp"
 
 #include "Stepper.hpp"
 
@@ -51,9 +53,13 @@ namespace libecs
 
   typedef std::pair<Real,StepperPtr> RealStepperPtrPair;
   DECLARE_TYPE( RealStepperPtrPair, Event );
-  typedef std::priority_queue<Event,std::vector<Event>,std::greater<Event> >
-  EventPriorityQueue_less;
-  DECLARE_TYPE( EventPriorityQueue_less, ScheduleQueue );
+
+  //typedef std::priority_queue<Event,std::vector<Event>,std::greater<Event> >
+  //    EventPriorityQueue_less;
+  //  DECLARE_TYPE( EventPriorityQueue_less, ScheduleQueue );
+
+  typedef DynamicPriorityQueue<Event> EventDynamicPriorityQueue;
+  DECLARE_TYPE( EventDynamicPriorityQueue, ScheduleQueue );
 
 
   //FIXME: should be merged with PropertySlot::SlotTypes
@@ -85,7 +91,7 @@ namespace libecs
 
   };
 
-  typedef VoidObjectMethod<Model,const Real> GetCurrentTimeMethodType;
+  typedef VoidObjectMethod< Model, const Real > GetCurrentTimeMethodType;
 
 
   /**
@@ -139,15 +145,21 @@ namespace libecs
 
 
     /**
-       This method finds recursively a System object pointed by
-       @a SystemPath
+       This method finds a System object pointed by the @a SystemPath.  
 
-       @return An pointer to a System object in this or subsystems of this
-       System object pointed by @a SystemPath
+       @return An pointer to a System object that is pointed by @a SystemPath
     */
+
     SystemPtr getSystem( SystemPathCref aSystemPath );
 
+    /**
+       This method finds an Entity object pointed by the @a FullID.
+
+       @return An pointer to an Entity object that is pointed by @a FullID
+    */
+
     EntityPtr getEntity( FullIDCref aFullID );
+
 
     void createEntity( StringCref aClassname,
 		       FullIDCref aFullID,

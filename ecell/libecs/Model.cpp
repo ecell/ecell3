@@ -117,6 +117,45 @@ namespace libecs
   }
 
 
+
+  SystemPtr Model::getSystem( SystemPathCref aSystemPath )
+  {
+    SystemPtr aSystem( getRootSystem() );
+    SystemPath aSystemPathCopy( aSystemPath );
+
+
+    // 1. "" (empty) means Model itself, which is invalid for this method.
+    // 2. Not absolute is invalid.
+    // (not absolute implies not empty.)
+    if( aSystemPathCopy.isAbsolute() )
+      {
+	aSystemPathCopy.pop_front();
+      }
+    else
+      {
+	throw BadSystemPath( __PRETTY_FUNCTION__, "[" + 
+			     aSystemPath.getString() +
+			     "] is not an absolute SystemPath." );
+      }
+
+    // root system
+    if( aSystemPathCopy.size() == 0 )
+      {
+	return aSystem;
+      }
+
+    // looping is faster than recursive search
+    while( ! aSystemPathCopy.empty() )
+      {
+	aSystem = aSystem->getSystem( aSystemPathCopy.front() );
+	aSystemPathCopy.pop_front();
+      }
+
+
+    return aSystem;  
+  }
+
+
   EntityPtr Model::getEntity( FullIDCref aFullID )
   {
     EntityPtr anEntity( NULL );
@@ -155,44 +194,6 @@ namespace libecs
       }
 
     return anEntity;
-  }
-
-
-  SystemPtr Model::getSystem( SystemPathCref aSystemPath )
-  {
-    SystemPtr aSystem( getRootSystem() );
-    SystemPath aSystemPathCopy( aSystemPath );
-
-
-    // 1. "" (empty) means Model itself, which is invalid for this method.
-    // 2. Not absolute is invalid.
-    // (not absolute implies not empty.)
-    if( aSystemPathCopy.isAbsolute() )
-      {
-	aSystemPathCopy.pop_front();
-      }
-    else
-      {
-	throw BadSystemPath( __PRETTY_FUNCTION__, "[" + 
-			     aSystemPath.getString() +
-			     "] is not an absolute SystemPath." );
-      }
-
-    // root system
-    if( aSystemPathCopy.size() == 0 )
-      {
-	return aSystem;
-      }
-
-    // looping is faster than recursive search
-    while( ! aSystemPathCopy.empty() )
-      {
-	aSystem = aSystem->getSystem( aSystemPathCopy.front() );
-	aSystemPathCopy.pop_front();
-      }
-
-
-    return aSystem;  
   }
 
 
@@ -265,13 +266,10 @@ namespace libecs
     // the time must be memorized before the Event is deleted by the pop
     const Real aTopTime( aTopEvent.first );
 
-    //FIXME: change_top() is better than pop 'n' push.
-    // If the ScheduleQueue holds pointers of Event, not instances,
-    // it would be more efficient in the current implementation because
-    // the instantiation below can be eliminated, but
-    // if there is the change_top(), benefits would be lesser...
-    theScheduleQueue.pop();
-    theScheduleQueue.push( Event( aTopTime + aStepSize, aStepper ) );
+    // equivalent to these two lines.
+    // theScheduleQueue.pop();
+    // theScheduleQueue.push( Event( aTopTime + aStepSize, aStepper ) );
+    theScheduleQueue.changeTopKey( Event( aTopTime + aStepSize, aStepper ) );
 
     // update theCurrentTime, which is scheduled time of the Event on the top
     theCurrentTime = ( theScheduleQueue.top() ).first;

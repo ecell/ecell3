@@ -28,8 +28,8 @@
 // E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
 
-#ifndef ___FULLID_H___
-#define ___FULLID_H___
+#ifndef ___FULLID_HPP
+#define ___FULLID_HPP
 #include <string>
 
 #include "libecs.hpp"
@@ -284,8 +284,10 @@ namespace libecs
 
     FullPN( StringCref fullpropertynamestring );
 
-    ~FullPN() {}
-
+    ~FullPN() 
+    {
+      ; // do nothing
+    }
 
 
     const FullIDCref     getFullID()        const
@@ -374,7 +376,7 @@ namespace libecs
 
 } // namespace libecs
 
-#endif /*  ___FQPI_H___ */
+#endif // __FULLID_HPP
 
 /*
   Do not modify
