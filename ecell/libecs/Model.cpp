@@ -275,12 +275,12 @@ namespace libecs
     //     - fill theIntegratedVariableVector.
 
     // want select2nd<>...
-    const Real aCurrentTime( getCurrentTime() );
-    for( StepperMapConstIterator i( theStepperMap.begin() );
-	 i != theStepperMap.end(); ++i )
-      {
-	(*i).second->integrate( aCurrentTime );
-      }
+    //    const Real aCurrentTime( getCurrentTime() );
+    //    for( StepperMapConstIterator i( theStepperMap.begin() );
+    //	 i != theStepperMap.end(); ++i )
+    //      {
+    //	(*i).second->integrate( aCurrentTime );
+    //      }
     FOR_ALL_SECOND( StepperMap, theStepperMap, initialize );
     FOR_ALL_SECOND( StepperMap, theStepperMap, updateDependentStepperVector );
     FOR_ALL_SECOND( StepperMap, theStepperMap, updateIntegratedVariableVector );
