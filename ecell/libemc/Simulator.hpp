@@ -234,6 +234,7 @@ namespace libemc
       return theSimulatorImplementation->getStepperClassName( aStepperID );
     }
 
+
     //@}
 
 
@@ -396,6 +397,7 @@ namespace libemc
     {
       return theSimulatorImplementation->getEntityClassName( aFullIDString );
     }
+
 
     //@}
 

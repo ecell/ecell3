@@ -56,7 +56,11 @@ namespace libemc
 
   void setDMSearchPath( const std::string& path );
   const std::string getDMSearchPath();
-  const std::string getDMInfo();
+  const std::string getLoadedDMList();
+
+  const libecs::Polymorph getDMInfoList( const std::string& aDMName );
+  const std::string getDMInfo( const std::string& aDMName,
+			       const std::string& aFieldName );
 
 
 

@@ -127,6 +127,10 @@ BOOST_PYTHON_MODULE( _ecs )
 
   def( "setDMSearchPath", &libemc::setDMSearchPath );
   def( "getDMSearchPath", &libemc::getDMSearchPath );
+  //  def( "getDMInfoList",   &libemc::getDMInfoList );
+  //  def( "getDMInfo",       &libemc::getDMInfo );
+
+
 
   class_<VariableReference>( "VariableReference", no_init )
 
@@ -219,6 +223,7 @@ BOOST_PYTHON_MODULE( _ecs )
     .def( "loadStepperProperty",          &Simulator::loadStepperProperty )
     .def( "saveStepperProperty",          &Simulator::saveStepperProperty )
     .def( "getStepperClassName",          &Simulator::getStepperClassName )
+    .def( "getStepperClassInfo",          &Simulator::getStepperClassInfo )
 
 
     // Entity-related methods
@@ -234,6 +239,7 @@ BOOST_PYTHON_MODULE( _ecs )
     .def( "getEntityPropertyAttributes", 
 	  &Simulator::getEntityPropertyAttributes )
     .def( "getEntityClassName",           &Simulator::getEntityClassName )
+    .def( "getEntityClassInfo",           &Simulator::getEntityClassInfo )
 
 
     // Logger-related methods
@@ -273,8 +279,7 @@ BOOST_PYTHON_MODULE( _ecs )
     // usually no need to call this explicitly
     .def( "initialize",                  &Simulator::initialize )
 
-    .def( "getDMInfo",                   &Simulator::getDMInfo )
-    
+    .def( "getLoadedDMList",             &Simulator::getLoadedDMList )
     ;  
 
 
