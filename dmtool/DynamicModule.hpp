@@ -82,7 +82,7 @@ private:
   Common base class of DynamicModule and SharedDynamicModule
 */
   
-template <class Base,class DMAllocator = SimpleAllocator( Base )>
+template <class Base,typename DMAllocator = SimpleAllocator( Base )>
 class DynamicModuleBase
 {
 
@@ -117,7 +117,7 @@ protected:
    DynamicModule instantiates objects of a single class.
 */
 
-template <class Base,class Derived,class DMAllocator = SimpleAllocator( Base )>
+template <class Base,class Derived,typename DMAllocator = SimpleAllocator( Base )>
 class DynamicModule
   :
   public DynamicModuleBase< Base,DMAllocator >
@@ -143,7 +143,7 @@ public:
      - a full set of symbols needed to instantiate and use the class.
 */
 
-template <class Base,class DMAllocator = SimpleAllocator( Base )>
+template <class Base,typename DMAllocator = SimpleAllocator( Base )>
 class SharedDynamicModule : public DynamicModuleBase< Base >
 {
 
@@ -186,7 +186,7 @@ Base* CreateObject()
 
 //////////////////////////// begin implementation
 
-template < class Base, class DMAllocator >
+template < class Base, typename DMAllocator >
 DynamicModuleBase< Base, DMAllocator >::
 DynamicModuleBase( const std::string& modulename,
 		   DMAllocator allocator )
@@ -197,7 +197,7 @@ DynamicModuleBase( const std::string& modulename,
   ; // do nothing
 }
 
-template < class Base, class Derived, class DMAllocator >
+template < class Base, class Derived, typename DMAllocator >
 DynamicModule< Base, Derived, DMAllocator >::
 DynamicModule( const std::string& modulename )
   : 
@@ -206,7 +206,7 @@ DynamicModule( const std::string& modulename )
   ; // do nothing
 }
 
-template < class Base, class DMAllocator >
+template < class Base, typename DMAllocator >
 SharedDynamicModule< Base, DMAllocator >::
 SharedDynamicModule( const std::string& classname,
 		     const std::string& directory ) 
@@ -240,7 +240,7 @@ SharedDynamicModule( const std::string& classname,
     }
 }
 
-template < class Base, class DMAllocator >
+template < class Base, typename DMAllocator >
 SharedDynamicModule<Base,DMAllocator>::~SharedDynamicModule()
 {
   if( theHandle != NULL )
@@ -249,7 +249,7 @@ SharedDynamicModule<Base,DMAllocator>::~SharedDynamicModule()
     }
 }
 
-template < class Base, class DMAllocator >
+template < class Base, typename DMAllocator >
 const std::string& SharedDynamicModule<Base,DMAllocator>::getFileName() const
 {
   dlinfo* aDlInfo = dlgetinfo( theHandle );

@@ -56,7 +56,7 @@ DECLARE_TYPE( RCPtr<type>, type ## RCPtr )
   */
 
 
-  template <class T>
+  template <typename T>
   class RCPtr
   {
 

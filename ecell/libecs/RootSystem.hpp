@@ -42,7 +42,7 @@ namespace libecs
 
   //FIXME: should be merged with PropertySlot::SlotTypes
 
-  template <class T,class Ret>
+  template <class T,typename Ret>
   class VoidObjectMethod
   {
     typedef Ret (T::* Method )( void ) const;

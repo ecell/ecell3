@@ -51,7 +51,7 @@ addClass( new Module( string( #T ), &T::createInstance ) );
    A base class for ModuleMakers
  */
 
-template<class T, class DMAllocator = SimpleAllocator(T)>
+template<class T, typename DMAllocator = SimpleAllocator(T)>
 class ModuleMakerBase
 {
 
@@ -91,7 +91,7 @@ protected:
   various subclasses of certain template parameter class T. 
 */
 
-template<class T, class DMAllocator = SimpleAllocator( T )>
+template<class T, typename DMAllocator = SimpleAllocator( T )>
 class StaticModuleMaker : public ModuleMakerBase<T,DMAllocator>
 {
 
@@ -136,7 +136,7 @@ protected:
   @sa StaticClassModuleMaker, SharedDynamicModule
 */
 
-template<class T,class DMAllocator=SimpleAllocator( T )>
+template<class T,typename DMAllocator=SimpleAllocator( T )>
 class SharedModuleMaker : public StaticModuleMaker<T,DMAllocator>
 {
 
@@ -175,7 +175,7 @@ private:
 
 ////////////////////// ModuleMakerBase
 
-template<class T, class DMAllocator>
+template<class T, typename DMAllocator>
 ModuleMakerBase<T,DMAllocator>::ModuleMakerBase() 
   : 
   theNumberOfInstances( 0 ) 
@@ -183,13 +183,13 @@ ModuleMakerBase<T,DMAllocator>::ModuleMakerBase()
   ; // do nothing
 }
 
-template<class T, class DMAllocator>
+template<class T, typename DMAllocator>
 ModuleMakerBase<T,DMAllocator>::~ModuleMakerBase() 
 {
   ; // do nothing
 }
 
-template<class T, class DMAllocator>
+template<class T, typename DMAllocator>
 T* ModuleMakerBase<T,DMAllocator>::make( const string& classname ) 
 {
 
@@ -217,13 +217,13 @@ T* ModuleMakerBase<T,DMAllocator>::make( const string& classname )
 
 ////////////////////// StaticModuleMaker
 
-template<class T,class DMAllocator>
+template<class T,typename DMAllocator>
 StaticModuleMaker<T,DMAllocator>::StaticModuleMaker()
 {
   ; // do nothing
 }
 
-template<class T,class DMAllocator>
+template<class T,typename DMAllocator>
 StaticModuleMaker<T,DMAllocator>::~StaticModuleMaker()
 {
   for( ModuleMapIterator i = theModuleMap.begin();
@@ -233,7 +233,7 @@ StaticModuleMaker<T,DMAllocator>::~StaticModuleMaker()
     }
 }
 
-template<class T,class DMAllocator>
+template<class T,typename DMAllocator>
 void StaticModuleMaker<T,DMAllocator>::addClass( Module* dm )
 {
   assert( dm );
@@ -242,7 +242,7 @@ void StaticModuleMaker<T,DMAllocator>::addClass( Module* dm )
 }
 
 
-template<class T,class DMAllocator>
+template<class T,typename DMAllocator>
 DMAllocator StaticModuleMaker<T,DMAllocator>::
 getAllocator( const string& classname )
 {
@@ -257,7 +257,7 @@ getAllocator( const string& classname )
 
 ////////////////////// SharedModuleMaker
 
-template<class T,class DMAllocator>
+template<class T,typename DMAllocator>
 SharedModuleMaker<T,DMAllocator>::SharedModuleMaker()
   :
   theSearchPathString( "." )
@@ -271,7 +271,7 @@ SharedModuleMaker<T,DMAllocator>::SharedModuleMaker()
   */
 }
 
-template<class T,class DMAllocator>
+template<class T,typename DMAllocator>
 SharedModuleMaker<T,DMAllocator>::~SharedModuleMaker()
 {
   /*
@@ -283,7 +283,7 @@ SharedModuleMaker<T,DMAllocator>::~SharedModuleMaker()
   */
 }
 
-template<class T,class DMAllocator>
+template<class T,typename DMAllocator>
 DMAllocator SharedModuleMaker<T,DMAllocator>::
 getAllocator( const string& classname ) 
 {
@@ -312,7 +312,7 @@ getAllocator( const string& classname )
   return anAllocator;
 }
 
-template<class T,class DMAllocator>
+template<class T,typename DMAllocator>
 void SharedModuleMaker<T,DMAllocator>::loadModule( const string& classname )
 {
   // return immediately if already loaded
@@ -357,13 +357,13 @@ void SharedModuleMaker<T,DMAllocator>::loadModule( const string& classname )
 
 }
 
-template<class T,class DMAllocator>
+template<class T,typename DMAllocator>
 void SharedModuleMaker<T,DMAllocator>::setSearchPath( const string& path )
 {
   theSearchPathString = path;
 }
 
-template<class T,class DMAllocator>
+template<class T,typename DMAllocator>
 const string& SharedModuleMaker<T,DMAllocator>::getSearchPath() const
 {
   return theSearchPathString;

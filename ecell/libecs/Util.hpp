@@ -58,7 +58,7 @@ namespace libecs
 
   // FIXME: should be a static function object? to reduce initialization cost
 
-  template <class T> 
+  template <typename T> 
   const T stringTo( StringCref str )
   {
     std::istringstream ist( str.c_str() );
@@ -84,7 +84,7 @@ namespace libecs
 
   // FIXME: should be a static function object? to reduce initialization cost
 
-  template <class T> const String toString( const T& t )
+  template <typename T> const String toString( const T& t )
   {
     std::ostringstream os;
     os << t;
@@ -105,7 +105,7 @@ namespace libecs
      reversed order compare
   */
 
-  template <class T>
+  template <typename T>
   class ReverseCmp
   {
   public:
