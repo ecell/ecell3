@@ -216,7 +216,7 @@ class MainWindow(OsogoWindow):
 		self.theMessageWindow = MessageWindow.MessageWindow()
 
 
-                # initialize Real time
+                # initialize Timer components
                 self.startTime = 0
                 self.tempTime = 0
                 self.isStarted = False
@@ -238,6 +238,12 @@ class MainWindow(OsogoWindow):
 		self.__button_update = False
 		
 
+                self.logoMovable = True
+                self.theToolbarVisible = True
+                self.theStatusbarVisible = True
+		self.theMessageWindowVisible = True
+                self.theEntityListWindowVisible = True
+                
 		# -------------------------------------
 		# create SimulationButton
 		# -------------------------------------
@@ -253,8 +259,6 @@ class MainWindow(OsogoWindow):
 
                 self.logoAnimation = LogoAnimation()
                 self['logo_animation'].add( self.logoAnimation.getImage() )
-                self.logoMovable = True
-		self['logo_animation_menu'].set_active(TRUE)
                 
 
                 # --------------------------
@@ -265,22 +269,6 @@ class MainWindow(OsogoWindow):
                 self['time_entry'].set_property( 'xalign', 1 )
                 self['time_entry'].modify_base( gtk.STATE_NORMAL,
                                                 gtk.gdk.Color(61000,61000,61000,0) )
-
-
-                # -----------------------
-                # initialize Toolbar
-                # -----------------------
-                
-		self['toolbar_menu'].set_active(TRUE)
-                self.theToolbarVisible = True
-
-
-                # ------------------------
-                # initialize Statusbar
-                # ------------------------
-                
-		self['statusbar_menu'].set_active(TRUE)
-                self.theStatusbarVisible = True
 
 
 		# -------------------------------------
@@ -294,6 +282,7 @@ class MainWindow(OsogoWindow):
 		messageWindowSize=self.theMessageWindow.getActualSize()
 		self.theMessageWindow['scrolledwindow1'].set_size_request(\
 		    messageWindowSize[0], messageWindowSize[1] )
+
 
 		# -------------------------------------
 		# append signal handlers
@@ -359,15 +348,6 @@ class MainWindow(OsogoWindow):
 		#self.theSession.updateFundamentalWindows()
 
 
-		# toggles message window menu and button
-		# At first message window is expanded, so the toggle button and menu are active.
-
-
-		self.theMessageWindowVisible = True
-		( self['message_togglebutton'].get_child() ).set_active(TRUE)
-		self['message_window_menu'].set_active(TRUE)
-
-
 		# display MainWindow
 		self[self.__class__.__name__].show_all()
 		self.present()
@@ -389,8 +369,6 @@ class MainWindow(OsogoWindow):
 
                 self.theEntityListWindow = self.theSession.createEntityListWindow( 'top_frame', self['statusbar'] )
                 self['entitylistarea'].add( self.theEntityListWindow['top_frame'] )
-                self.theEntityListWindowVisible = True
-		self['entitylist_window_menu'].set_active(TRUE)
 
 
                 # --------------------
@@ -454,6 +432,8 @@ class MainWindow(OsogoWindow):
 		self['stepper_button'].set_sensitive(aDataLoadedStatus)
 		self['interface_button'].set_sensitive(aDataLoadedStatus)
 		self['board_button'].set_sensitive(aDataLoadedStatus)
+                self['indicator_button'].set_sensitive(aDataLoadedStatus)
+                self['timer_button'].set_sensitive(aDataLoadedStatus)
 
 		# file menu
 		self['load_model_menu'].set_sensitive(not aDataLoadedStatus)
@@ -468,6 +448,11 @@ class MainWindow(OsogoWindow):
 		self['entity_list_menu'].set_sensitive(aDataLoadedStatus)
 		self['save_model_menu'].set_sensitive(aDataLoadedStatus)
 
+                # preferences menu
+                self['logging_policy'].set_sensitive(aDataLoadedStatus)
+                self['run_speed_indicator'].set_sensitive(aDataLoadedStatus)
+                self['timer_menu'].set_sensitive(aDataLoadedStatus)
+                self['logo_animation_menu'].set_sensitive(aDataLoadedStatus)
 
 	def __openFileSelection( self, *arg ) :
 		"""checks argument and calls self.openFileSelection() method.
@@ -599,10 +584,18 @@ class MainWindow(OsogoWindow):
 			self.theSession.theSimulator.initialize()
                         self.theEntityListWindow.initializeComponents( self.theSession )
 
+                        self.update()
+                        self.theSession.updateFundamentalWindows()
 
-		except:
 
-			# expants message window, when it is folded.
+		except:                    
+                        # set load command not to be operated 
+                        self['load_model_button'].set_sensitive(0)
+                        self['load_script_button'].set_sensitive(0)
+                        self['load_model_menu'].set_sensitive(0)
+                        self['load_script_menu'].set_sensitive(0)
+
+                        # expants message window, when it is folded.
 			if self.exists():
 				if ( self['message_togglebutton'].get_child() ).get_active() == FALSE:
 					( self['message_togglebutton'].get_child() ).set_active(TRUE)
@@ -619,8 +612,6 @@ class MainWindow(OsogoWindow):
 			self.theSession.message(anErrorMessage)
 
 
-		self.update()
-		self.theSession.updateFundamentalWindows()
 
 	def __saveModel( self, *arg ) :
 

@@ -62,7 +62,7 @@
 			      <accelerator key="o" modifiers="GDK_CONTROL_MASK" signal="activate"/>
 
 			      <child internal-child="image">
-				<widget class="GtkImage" id="image458">
+				<widget class="GtkImage" id="image467">
 				  <property name="visible">True</property>
 				  <property name="stock">gtk-open</property>
 				  <property name="icon_size">1</property>
@@ -84,7 +84,7 @@
 			      <accelerator key="o" modifiers="GDK_CONTROL_MASK | GDK_SHIFT_MASK" signal="activate"/>
 
 			      <child internal-child="image">
-				<widget class="GtkImage" id="image459">
+				<widget class="GtkImage" id="image468">
 				  <property name="visible">True</property>
 				  <property name="stock">gtk-execute</property>
 				  <property name="icon_size">1</property>
@@ -106,7 +106,7 @@
 			      <accelerator key="s" modifiers="GDK_CONTROL_MASK" signal="activate"/>
 
 			      <child internal-child="image">
-				<widget class="GtkImage" id="image460">
+				<widget class="GtkImage" id="image469">
 				  <property name="visible">True</property>
 				  <property name="stock">gtk-save</property>
 				  <property name="icon_size">1</property>
@@ -226,7 +226,7 @@
 			      <property name="visible">True</property>
 			      <property name="label" translatable="yes">_EntityList</property>
 			      <property name="use_underline">True</property>
-			      <property name="active">False</property>
+			      <property name="active">True</property>
 			      <signal name="activate" handler="entitylist_window_menu_activate" last_modification_time="Wed, 04 Aug 2004 19:56:12 GMT"/>
 			      <accelerator key="Y" modifiers="GDK_CONTROL_MASK" signal="activate"/>
 			    </widget>
@@ -237,7 +237,7 @@
 			      <property name="visible">True</property>
 			      <property name="label" translatable="yes">_Message</property>
 			      <property name="use_underline">True</property>
-			      <property name="active">False</property>
+			      <property name="active">True</property>
 			      <signal name="activate" handler="message_window_menu_activate" last_modification_time="Thu, 22 Jul 2004 02:29:36 GMT"/>
 			      <accelerator key="M" modifiers="GDK_CONTROL_MASK" signal="activate"/>
 			    </widget>
@@ -248,7 +248,7 @@
 			      <property name="visible">True</property>
 			      <property name="label" translatable="yes">_Toolbar</property>
 			      <property name="use_underline">True</property>
-			      <property name="active">False</property>
+			      <property name="active">True</property>
 			      <signal name="activate" handler="on_toolbar_menu_activate" last_modification_time="Wed, 04 Aug 2004 20:18:09 GMT"/>
 			      <accelerator key="U" modifiers="GDK_CONTROL_MASK" signal="activate"/>
 			    </widget>
@@ -259,7 +259,7 @@
 			      <property name="visible">True</property>
 			      <property name="label" translatable="yes">_Statusbar</property>
 			      <property name="use_underline">True</property>
-			      <property name="active">False</property>
+			      <property name="active">True</property>
 			      <signal name="activate" handler="on_statusbar_menu_activate" last_modification_time="Wed, 04 Aug 2004 20:18:09 GMT"/>
 			      <accelerator key="R" modifiers="GDK_CONTROL_MASK" signal="activate"/>
 			    </widget>
@@ -279,7 +279,7 @@
 			<widget class="GtkMenu" id="preferences1_menu">
 
 			  <child>
-			    <widget class="GtkMenuItem" id="logging_policy1">
+			    <widget class="GtkMenuItem" id="logging_policy">
 			      <property name="visible">True</property>
 			      <property name="label" translatable="yes">Logging _Policy</property>
 			      <property name="use_underline">True</property>
@@ -325,7 +325,7 @@
 			      <property name="visible">True</property>
 			      <property name="label" translatable="yes">_Logo Animation</property>
 			      <property name="use_underline">True</property>
-			      <property name="active">False</property>
+			      <property name="active">True</property>
 			      <signal name="activate" handler="on_logo_animation_menu_activate" last_modification_time="Sat, 07 Aug 2004 13:28:37 GMT"/>
 			    </widget>
 			  </child>
@@ -351,7 +351,7 @@
 			      <signal name="activate" handler="about_menu_activate"/>
 
 			      <child internal-child="image">
-				<widget class="GtkImage" id="image461">
+				<widget class="GtkImage" id="image470">
 				  <property name="visible">True</property>
 				  <property name="pixbuf">ecell.png</property>
 				  <property name="xalign">0.5</property>
@@ -1370,7 +1370,7 @@
 		  <child>
 		    <widget class="GtkFrame" id="frame1">
 		      <property name="width_request">450</property>
-		      <property name="height_request">50</property>
+		      <property name="height_request">53</property>
 		      <property name="visible">True</property>
 		      <property name="label_xalign">0</property>
 		      <property name="label_yalign">0.5</property>
