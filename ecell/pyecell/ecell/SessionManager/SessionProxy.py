@@ -68,14 +68,14 @@ class SessionProxy:
 		[Note]:private method, the first job id is 1
 		'''
 
-		# count up jod id
+		# count up job id
 		SessionProxy.__theJobID += 1
 
 		# return job id
 		return SessionProxy.__theJobID
 
 
-	def setStdoutFileName(cls, stdout):
+	def setStdoutFileName(c, stdout):
 		'''Set an standard output.
 		stdout(str or file) -- file name or file object to be wrote
 		Return None
@@ -203,16 +203,16 @@ class SessionProxy:
 
 
 	def __del__(self):
-		'''When destractor is called, deletes the job directory.
+		'''Before destractor, this method is called. 
 		Return None
 		'''
 
-		# remove job directory
-		self.clearJobDirectory()
-
-		# destractor is called automatically after this method
-
-
+		pass
+		# Do not delete the related directory or files in this method.
+		# The deletion must be conducted by destractor of SessionManager 
+		# class. Because only SessionManager know whether a user wnats
+		# to delete job directories or not with the flag
+		# SessionManager.__theTmpRemovable.
 
 	def getJobID(self):
 		'''Return the job id
