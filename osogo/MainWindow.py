@@ -4,6 +4,7 @@ from Window import *
 from main import *
 from Plugin import *
 
+import gnome.ui
 import gtk
 import GTK
 
@@ -23,6 +24,21 @@ import ecell.Session
 from ecell.ecssupport import *
 from ecell.ECS import *
 
+
+NAME        = 'gecell (Osogo)'
+VERSION     = '0.0'
+COPYRIGHT   = '(C) 2001-2002 Keio University'
+AUTHORLIST  = [
+    'Design: Kenta Hashimoto <kem@e-cell.org>',
+    'Design and application Framework: Kouichi Takahashi <shafi@e-cell.org>',
+    'Programming: Yuki Fujita',
+    'Yoshiya Matsubara',
+    'Yuusuke Saito'
+    ]
+DESCRIPTION = 'Osogo is a simulation session monitoring module for E-CELL SE Version 3'
+
+
+
 class MainWindow(Window):
 
     def __init__( self ):
@@ -34,7 +50,7 @@ class MainWindow(Window):
         self.theMessageWindowWindow = self.theMessageWindow[ 'message_window' ]
 
         self.theSession = ecell.Session.Session( ecell.ecs.Simulator() )
-        self.theSession.setPrintMethod( self.theMessageWindow )
+        self.theSession.setPrintMethod( self.theMessageWindow.printMessage )
  
         self.theLoggerWindow = LoggerWindow.LoggerWindow( self.theSession , self )
         self.theLoggerWindowWindow = self.theLoggerWindow[ 'logger_window' ]
@@ -52,7 +68,7 @@ class MainWindow(Window):
         #self.theEntryListWindow = EntryListWindow.EntryListWindow( self )
         #self.theEntryListWindowWindow = self.theEntryListWindow[ 'entry_list_window' ]
 
-        self.theStepperChacker = 0
+        self.theStepperChecker = 0
         self.theUpdateInterval = 10
         self.theStepSize = 1
         self.theStepType = 0
@@ -100,8 +116,6 @@ class MainWindow(Window):
         self.theSaveFileSelection.ok_button.connect('clicked', self.saveCellState)
         self.theSaveFileSelection.cancel_button.connect('clicked', self.closeParentWindow)
         
-
-
         ### initialize for run method ###
         self.theSession.theSimulator.setPendingEventChecker( gtk.events_pending )
         self.theSession.theSimulator.setEventHandler( gtk.mainiteration  )
@@ -118,27 +132,26 @@ class MainWindow(Window):
         self.theRuleFileSelection.show_all()
 
     def loadRule( self, button_obj ) :
-        self.theStepperChacker = 1
+        self.theStepperChecker = 1
         aFileName = self.theRuleFileSelection.get_filename()
         self.theRuleFileSelection.hide()
-        self.theSession.printMessage( 'load rule file %s\n' % aFileName )
-        aGlobalNameMap = { 'aMainWindow' : self }
-        execfile(aFileName, aGlobalNameMap)
-        self.theModelInterpreter.load( self.theCellModelObject )
-        self.theEntryListWindow.update()
+        self.theSession.printMessage( 'loading rule file %s\n' % aFileName )
+        self.theSession.loadModel( aFileName )
+#        self.theEntryListWindow.update()
         self.theSession.theSimulator.initialize()
+        self.update()
 
     ###### Load Script ######
     def openScriptFileSelection( self, obj ) :
         self.theScriptFileSelection.show_all()
         
     def loadScript( self, button_obj ):
-        self.theStepperChacker = 1
+        self.theStepperChecker = 1
         aFileName = self.theScriptFileSelection.get_filename()
         self.theScriptFileSelection.hide()
-        self.theSession.printMessage( 'load script file %s\n' % aFileName )
-        aGlobalNameMap = { 'aMainWindow' : self }
-        execfile(aFileName, aGlobalNameMap)
+        self.theSession.printMessage( 'loading script file %s\n' % aFileName )
+        aGlobalNameMap = { 'theMainWindow' : self }
+        execfile( aFileName, aGlobalNameMap )
         self.update()
         
     ###### Save Cell State As ######
@@ -150,7 +163,6 @@ class MainWindow(Window):
     ###### Exit ######
     def exit( self, obj ):
         mainQuit()
-        os.rename(self.theTmpSessionRecordFilename, self.thePreSessionRecordFilename)
         
     def startSimulation( self, a ) :
         self.theSession.theRunningFlag = 1
@@ -207,12 +219,12 @@ class MainWindow(Window):
     
     def toggleEntryList( self, button_obj ):
 
-        if self.theStepperChacker == 1:
+        if self.theStepperChecker == 1:
             self.theEntryListWindow = EntryListWindow.EntryListWindow( self )
             self.theEntryListWindowWindow = self.theEntryListWindow[ 'entry_list_window' ]
         else:
             pass
-        if self.theStepperChacker == 1:
+        if self.theStepperChecker == 1:
             if button_obj.get_active() :
                 self.theEntryListWindowWindow.show_all()
                 self.theEntryListWindow.update()
@@ -238,6 +250,24 @@ class MainWindow(Window):
             self.theMessageWindowWindow.hide()
 
 
+    def openAbout( self, button_obj ):
+        anAboutDialog = gnome.ui.GnomeAbout( NAME,
+                                             VERSION,
+                                             COPYRIGHT,
+                                             AUTHORLIST,
+                                             DESCRIPTION )
+        anAboutDialog.show_all()
+
+
+    def openPreferences( self, button_obj ):
+        aPropertyBox = gnome.ui.GnomePropertyBox()
+        aLabel = gtk.GtkLabel( 'NOT IMPLEMENTED YET' )
+        aTabLabel = gtk.GtkLabel( 'warning' )
+        aPropertyBox.append_page( aLabel, aTabLabel )
+
+        aPropertyBox.show_all()
+
+
 
 ##########################################################################
 
@@ -258,17 +288,4 @@ class MainWindow(Window):
     #### these method is not supported in summer GUI project
     def loadCellState( self ) : pass
     def saveCellStateToTheFile( self ) : pass
-    def openPreferences( self ) : pass
-    def openAbout( self ) : pass
     #### these method is not supported in summer GUI project
-
-
-
-
-
-
-
-
-
-
-
