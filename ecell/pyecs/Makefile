@@ -15,26 +15,26 @@ G++ = /usr/local/bin/g++
 #all:	PyEcs.o	PySimulator.o SimulatorImplementation.o  Command.o StepCommand.o MakeSystemCommand.o Simulator.o PyEcs.so
 all:	PyEcs.o	PySimulator.o SimulatorImplementation.o  Command.o StepCommand.o Simulator.o PyEcs.so
 
-PyEcs.o:	PyEcs.h PyEcs.C 
-	$(G++) -I$(CXX) -I$(PYLIB) $(ECELL_INCLUDE) -c PyEcs.C
+PyEcs.o:	PyEcs.hpp PyEcs.cpp 
+	$(G++) -I$(CXX) -I$(PYLIB) $(ECELL_INCLUDE) -c PyEcs.cpp
 
-PySimulator.o:	PySimulator.h PySimulator.C
-	$(G++) -I$(CXX) -I$(PYLIB) $(ECELL_INCLUDE) -c PySimulator.C
+PySimulator.o:	PySimulator.hpp PySimulator.cpp
+	$(G++) -I$(CXX) -I$(PYLIB) $(ECELL_INCLUDE) -c PySimulator.cpp
 
-SimulatorImplementation.o: SimulatorImplementation.h SimulatorImplementation.C
-	$(G++) $(ECELL_INCLUDE) $(THREAD_OPTION) -c SimulatorImplementation.C
+SimulatorImplementation.o: SimulatorImplementation.hpp SimulatorImplementation.cpp
+	$(G++) $(ECELL_INCLUDE) $(THREAD_OPTION) -c SimulatorImplementation.cpp
 
-Simulator.o:	Simulator.h	Simulator.C
-	$(G++) $(ECELL_INCLUDE) $(THREAD_OPTION) -c Simulator.C
+Simulator.o:	Simulator.hpp	Simulator.cpp
+	$(G++) $(ECELL_INCLUDE) $(THREAD_OPTION) -c Simulator.cpp
 
-Command.o:	Command.C Command.h
-	$(G++) $(ECELL_INCLUDE) $(THREAD_OPTION) -c Command.C
+Command.o:	Command.cpp Command.hpp
+	$(G++) $(ECELL_INCLUDE) $(THREAD_OPTION) -c Command.cpp
 
-StepCommand.o:	StepCommand.C	StepCommand.h
-	$(G++) $(ECELL_INCLUDE) $(THREAD_OPTION) -c StepCommand.C
+StepCommand.o:	StepCommand.cpp	StepCommand.hpp
+	$(G++) $(ECELL_INCLUDE) $(THREAD_OPTION) -c StepCommand.cpp
 
-MakeSystemCommand.o:	MakeSystemCommand.C	MakeSystemCommand.h
-	$(G++) $(ECELL_INCLUDE) $(THREAD_OPTION) -c MakeSystemCommand.C
+MakeSystemCommand.o:	MakeSystemCommand.cpp	MakeSystemCommand.hpp
+	$(G++) $(ECELL_INCLUDE) $(THREAD_OPTION) -c MakeSystemCommand.cpp
 
 #PyEcs.so: PyEcs.o PySimulator.o Simulator.o SimulatorImplementation.o Command.o StepCommand.o MakeSystemCommand.o  Makefile
 PyEcs.so: PyEcs.o PySimulator.o Simulator.o SimulatorImplementation.o Command.o StepCommand.o Makefile
