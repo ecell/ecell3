@@ -39,9 +39,9 @@ B-sample-rule.py\
 samplerule.py\
 sample-script.py\
 ecell.png\
-ecell_logo_large.png\
+ecell_large.png\
 icon_board.png\
-icon_ecelllogo.png\
+icon_ecell.png\
 icon_entity.png\
 icon_interface.png\
 icon_logger.png\
@@ -50,7 +50,7 @@ icon_start.png\
 icon_step.png\
 icon_stepper.png\
 icon_stop.png\
-gecell.ico
+ecell.ico
 
 
 bin_SCRIPTS =\
