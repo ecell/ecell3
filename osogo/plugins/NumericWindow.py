@@ -22,12 +22,12 @@ class NumericWindow( PluginWindow ):
 
         self.theFPN = fpn
         self.theID = str( self.theFPN[ID] )
-        self.theProperty = str( self.theFPN[PROPERTY] )
-        self.theFullID = convertToFullID( self.theFPN )
-        aFullIDString = constructFullIDString(self.theFullID)
+#        self.theProperty = str( self.theFPN[PROPERTY] )
+#        self.theFullID = convertToFullID( self.theFPN )
+#        aFullIDString = constructFullIDString(self.theFullID)
         
         self["id_label"].set_text( self.theID )
-        value = self.theSimulator.getProperty( (aFullIDString, self.theProperty ))
+        value = self.theSimulator.getProperty( self.theFPN )
         self.theCurValue = value[0]
         self["value_frame"].set_text(str(self.theCurValue))
 
@@ -69,7 +69,7 @@ if __name__ == "__main__":
 
     class simulator:
 
-        dic={('Substance:/CELL/CYTOPLASM:ATP','Quantity') : (1950,),}
+        dic={('Substance', '/CELL/CYTOPLASM', 'ATP','Quantity') : (1950,),}
 
         def getProperty( self, fpn ):
             return simulator.dic[fpn]
