@@ -289,8 +289,7 @@ void FluxDistributionProcess::initialize()
 
 void FluxDistributionProcess::process()
 {
-  
-  for( Int i( 0 ); i < ( KnownProcessList.asPolymorphVector() ).size(); i++ )
+  for( Int i( 0 ); i < ( KnownProcessList.asPolymorphVector() ).size(); ++i )
     {
       gsl_vector_set( theKnownVelocityVector, i, theKnownProcessPtrVector[i]->getActivity() );
     }
@@ -316,9 +315,9 @@ void FluxDistributionProcess::process()
       if( aFlag )
 	{
 	  gsl_matrix_memcpy( theTmpUnknownMatrix, theUnknownMatrix );
-	  for( Int i( 0 ); i < aVector.size(); i++ )
+	  for( Int i( 0 ); i < aVector.size(); ++i )
 	    {
-	      for( Int j( 0 ); j < theMatrixSize; j++ )
+	      for( Int j( 0 ); j < theMatrixSize; ++j )
 		{
 		  gsl_matrix_set( theTmpUnknownMatrix, j, aVector[i], 0 );
 		}
@@ -334,7 +333,7 @@ void FluxDistributionProcess::process()
 	}	
     }
 
-  for( Int i( 0 ); i < ( UnknownProcessList.asPolymorphVector() ).size(); i++ )
+  for( Int i( 0 ); i < theUnknownProcessPtrList.size(); ++i )
     {
       theUnknownProcessPtrVector[i]->setFlux( gsl_vector_get( theSolutionVector, i ) ) ;
     }
