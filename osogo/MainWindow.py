@@ -526,6 +526,8 @@ class MainWindow(OsogoWindow):
 	def stepSimulation( self, obj ) : 
 
 		try:
+
+
 			# this can fail if the simulator is not ready
 			self.theSession.theSimulator.initialize()
 
@@ -540,6 +542,7 @@ class MainWindow(OsogoWindow):
 			self.update()
 			self.updateBasicWindows()
 			self.theLoggerWindow.update()
+
 
 		except:
 			import sys
@@ -659,6 +662,9 @@ class MainWindow(OsogoWindow):
 			anEntryListWindow = EntryListWindow.EntryListWindow( self )
 			self.theEntryListWindowList.append(anEntryListWindow)
 			self.theEntryChecker = 1
+		
+		self.updateBasicWindows()
+
 
 	# end of toggleEntryList
 
@@ -1136,6 +1142,7 @@ class MainWindow(OsogoWindow):
 	# ---------------------------------------------------------------
 	def updateBasicWindows( self ):
 
+
 		# -------------------------------------------
 		# calls update method of each Window
 		# -------------------------------------------
@@ -1143,6 +1150,10 @@ class MainWindow(OsogoWindow):
 		self.theMessageWindow.update()
 		self.theLoggerWindow.update()
 		self.theInterfaceWindow.update()
+
+
+		for anEntryListWindow in self.theEntryListWindowList:
+			anEntryListWindow.update()
 
 		# -------------------------------------------
 		# checks buttons  ane menus

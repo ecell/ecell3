@@ -102,6 +102,8 @@ class PropertyWindow(OsogoPluginWindow):
 
 			# end of if (2)
 
+			if(aGet == 0):
+				continue
 
 			if (aProperty == 'ClassName'):
 				pass
@@ -131,28 +133,26 @@ class PropertyWindow(OsogoPluginWindow):
 
 					#aValueList = self.theSession.theSimulator.getProperty( createFullPNString( aFullPN ) )
 					aFullPNString =  createFullPNString( aFullPN ) 
-					#import sys
-					#sys.exit(0)
+
 					aValueList = self.theSession.theSimulator.getProperty( createFullPNString( aFullPN ) )
-					#aLength = len( aValueList )
-            
-					#if  aLength > 1 :
-					#	aNumber = 1
-					#	for aValue in aValueList :
-					#		aList = [ aProperty, aNumber, aValue , get, set ]
-					#		aList = map( str, aList )
-					#		self.theList.append( aList ) 
-					#		aNumber += 1
 
-					#else:
-					#	for aValue in aValueList :
-					#		aList = [ aProperty, '', aValue , get, set]
-					#		aList = map( str, aList )
-					#		self.theList.append( aList )
+					aDisplayedFlag = 0
+					if type(aValueList) == type(()):
+						if len(aValueList)  > 1 :
+							aNumber = 1
+							for aValue in aValueList :
+								if type(aValue) == type(()):
+									aValue = aValue[0]
+								aList = [ aProperty, aNumber, aValue , get, set ]
+								aList = map( str, aList )
+								self.theList.append( aList ) 
+								aNumber += 1
+							aDisplayedFlag = 1
 
-					aList = [ aProperty, '', aValueList , get, set]
-					aList = map( str, aList )
-					self.theList.append( aList )
+					if aDisplayedFlag == 0:
+						aList = [ aProperty, '', aValueList , get, set]
+						aList = map( str, aList )
+						self.theList.append( aList )
 
 				# end of if (3)
 

@@ -105,7 +105,7 @@ class OsogoPluginManager(PluginManager):
 	# ---------------------------------------------------------------
 	def createInstance( self, aClassname, data, root=None, parent=None ):
 	
-		try:
+		#try:
 
 			if self.thePluginMap.has_key( aClassname ):
 				pass
@@ -151,9 +151,9 @@ class OsogoPluginManager(PluginManager):
 				return anInstance
 
 
-		except:
-			aMessage = " Some error happens, can't create plugin window."
-			self.printMessage(aMessage)
+		#except:
+		#	aMessage = " Some error happens, can't create plugin window."
+		#	self.printMessage(aMessage)
 
 
 	# end of createInstance

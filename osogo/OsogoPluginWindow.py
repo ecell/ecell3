@@ -278,8 +278,9 @@ class OsogoPluginWindow(PluginWindow):
 	# ---------------------------------------------------------------
 	def getValue( self, aFullPN ):
 
-		aValueList = self.theSession.theSimulator.getProperty( createFullPNString( aFullPN ) )
-		return aValueList[0]
+		return self.theSession.theSimulator.getProperty( createFullPNString( aFullPN ) )
+		#aValueList = self.theSession.theSimulator.getProperty( createFullPNString( aFullPN ) )
+		#return aValueList[0]
 
 	# getValue
 

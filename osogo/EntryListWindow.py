@@ -79,6 +79,8 @@ class EntryListWindow(OsogoWindow):
 		aRootSystemFullID = createFullID( 'System::/' )
 		self.constructTree( self.theSystemTree, aRootSystemFullID )
 		self.updateEntryList()
+		self.thePropertyWindow.update()
+
             
 	def constructTree( self, aParentTree, aSystemFullID ):
 		aLeaf = gtk.GtkTreeItem( label=aSystemFullID[ID] )
