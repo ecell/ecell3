@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 
-from Plugin import *
+from PluginWindow import *
 from ecssupport import *
 
 class NumericWindow( PluginWindow ):

@@ -2,7 +2,7 @@
 
 import string
 
-from Plugin import *
+from PluginWindow import *
 from ecssupport import *
 
 class SubstanceWindow(PluginWindow):
