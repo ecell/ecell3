@@ -71,28 +71,14 @@ namespace libecs
 
     registerSlot( getPropertySlotMaker()->
 		  createPropertySlot( "AccumulatorClass",*this,
-				      Type2Type<UVariableVectorRCPtr>(),
+				      Type2Type<String>(),
 				      &Substance::setAccumulatorClass,
 				      &Substance::getAccumulatorClass ) );
   }
 
-  void Substance::setAccumulatorClass( UVariableVectorRCPtrCref aMessage )
+  const String Substance::getAccumulatorClass() const
   {
-    checkSequenceSize( *aMessage, 1 );
-
-    setAccumulator( (*aMessage)[0].asString() );
-  }
-
-  const UVariableVectorRCPtr Substance::getAccumulatorClass() const
-  {
-    UVariableVectorRCPtr aUVariableVector( new UVariableVector );
-    if( theAccumulator ) 
-      {
-	aUVariableVector->
-	  push_back( UVariable( theAccumulator->getClassName() ) );
-      }
-
-    return aUVariableVector;
+    return theAccumulator->getClassName();
   }
 
   Substance::Substance()
@@ -115,7 +101,7 @@ namespace libecs
     delete theAccumulator;
   }
 
-  void Substance::setAccumulator( StringCref anAccumulatorClassname )
+  void Substance::setAccumulatorClass( StringCref anAccumulatorClassname )
   {
     AccumulatorPtr aAccumulatorPtr( getModel()->getAccumulatorMaker()
 				    .make( anAccumulatorClassname ) );
@@ -139,14 +125,14 @@ namespace libecs
     // if the accumulator is not set, use user default
     if( theAccumulator == NULLPTR )
       {
-	setAccumulator( USER_DEFAULT_ACCUMULATOR_NAME );
+	setAccumulatorClass( USER_DEFAULT_ACCUMULATOR_NAME );
       }
 
     // if the user default is invalid fall back to the system default.
     if( theAccumulator == NULLPTR )  
       {               
 	setUserDefaultAccumulatorName( SYSTEM_DEFAULT_ACCUMULATOR_NAME );
-	setAccumulator( USER_DEFAULT_ACCUMULATOR_NAME );
+	setAccumulatorClass( USER_DEFAULT_ACCUMULATOR_NAME );
       }
 
     theAccumulator->update();

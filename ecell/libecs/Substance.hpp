@@ -61,8 +61,8 @@ namespace libecs
 
   public: // message slots
 
-    void setAccumulatorClass( UVariableVectorRCPtrCref aMessage );
-    const UVariableVectorRCPtr getAccumulatorClass() const;
+    void setAccumulatorClass( StringCref anAccumulatorClassname );
+    const String getAccumulatorClass() const;
 
   public:
 
@@ -245,7 +245,6 @@ namespace libecs
 
   protected:
 
-    void setAccumulator( StringCref anAccumulatorClassname );
     void setAccumulator( AccumulatorPtr anAccumulator );
 
 
