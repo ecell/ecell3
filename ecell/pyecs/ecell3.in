@@ -8,7 +8,7 @@ prefix=@prefix@
 exec_prefix=${prefix}
 pythondir=@pythondir@
 
-export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${exec_prefix}/lib"
+export LD_LIBRARY_PATH="${exec_prefix}/lib:${LD_LIBRARY_PATH}"
 export PYTHONPATH="$pythondir:${PYTHONPATH}"
 
 PYTHON=@PYTHON@
