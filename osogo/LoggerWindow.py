@@ -340,12 +340,14 @@ class LoggerWindow(OsogoWindow):
 			for aFullPNString in self.theSelectedPropertyName(): #(2)
 
 				# -------------------------------------------------
-				# creates filename
-				# from [Variable:/CELL/CYTOPLASM:E:Value] 
-				# to   [CYTOPLASM-E-Value]
+				# from [Variable:/CELL/CYTOPLASM:E:Value]
+				# to   [Variable_CELL_CYTOPLASM_E_Value]
 				# -------------------------------------------------
 
-				aFileName=split(join(split(aFullPNString,':')[1:],'-'),'/')[-1]
+				aRootIndex=find(aFullPNString,':/')
+				aFileName=aFullPNString[:aRootIndex]+aFullPNString[aRootIndex+1:]
+				aFileName=replace(aFileName,':','_')
+				aFileName=replace(aFileName,'/','_')
 
 				aECDDataFile = ECDDataFile()
 				aECDDataFile.setFileName(aFileName)
