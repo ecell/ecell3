@@ -8,6 +8,7 @@ prefix=@prefix@
 exec_prefix=${prefix}
 pythondir=@pythondir@
 
+export OSOGOPATH=${exec_prefix}/lib/osogo
 export LD_LIBRARY_PATH="${exec_prefix}/lib:${LD_LIBRARY_PATH}"
 export PYTHONPATH="$pythondir:${PYTHONPATH}"
 
