@@ -63,7 +63,7 @@ public:
     if( ! PyCallable_Check( thePyObject.ptr() ) )
       {
 	PyErr_SetString( PyExc_TypeError, "Callable object must be given" );
-	python::throw_argument_error();
+	python::throw_error_already_set();
       }
   }
 
@@ -259,10 +259,10 @@ public:
       }
     else
       {
-	// convertion is failed. ( convert with repr() ? )
+	// conversion is failed. ( convert with repr() ? )
 	PyErr_SetString( PyExc_TypeError, 
 			 "Unacceptable type of an object in the tuple." );
-	python::throw_argument_error();
+	python::throw_error_already_set();
       }
   }
 
