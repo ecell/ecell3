@@ -28,6 +28,8 @@
 // E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
 
+#include <typeinfo>
+
 #include "Util.hpp"
 
 #include "UVariable.hpp"
@@ -92,6 +94,30 @@ namespace libecs
   const String UConstantIntData::asString() const
   {
     return toString<Int>( theInt );
+  }
+
+
+  const UConstant::Type UConstant::getType() const
+  {
+    if( typeid( theData) == typeid( UConstantRealData ) )
+      {
+	return REAL;
+      }
+    else if( typeid( theData ) == typeid( UConstantIntData ) )
+      {
+	return INT;
+      }
+    else if( typeid( theData ) == typeid( UConstantStringData ) )
+      {
+	return STRING;
+      }
+    else if( typeid( theData ) == typeid( UConstantNoneData ) )
+      {
+	return NONE;
+      }
+    
+    // NEVER_GET_HERE
+    assert( 0 );
   }
 
 

@@ -217,40 +217,35 @@ namespace libecs
   
     UConstant()
       :
-      theData( new UConstantNoneData ),
-      theType( NONE )
+      theData( new UConstantNoneData )
     {
       ; // do nothing
     }
 
     UConstant( StringCref  string ) 
       :
-      theData( new UConstantStringData( string ) ),
-      theType( STRING )
+      theData( new UConstantStringData( string ) )
     {
       ; // do nothing
     }
   
     UConstant( const Real f )      
       :
-      theData( new UConstantRealData( f ) ),
-      theType( REAL )
+      theData( new UConstantRealData( f ) )
     {
       ; // do nothing
     }
 
     UConstant( const Int   i )      
       :
-      theData( new UConstantIntData( i ) ),
-      theType( INT )
+      theData( new UConstantIntData( i ) )
     {
       ; // do nothing
     }
 
     UConstant( UConstantCref uv )
       :
-      theData( uv.createDataClone() ),
-      theType( uv.getType() )
+      theData( uv.createDataClone() )
     {
       ; // do nothing
     }
@@ -266,7 +261,6 @@ namespace libecs
 	{
 	  delete theData;
 	  theData = rhs.createDataClone();
-	  theType = rhs.getType();
 	}
     
       return *this;
@@ -287,10 +281,7 @@ namespace libecs
       return theData->asInt();
     }
 
-    const Type getType() const
-    {
-      return theType;
-    }
+    const Type getType() const;
 
   protected:
 
@@ -302,7 +293,6 @@ namespace libecs
   protected:
 
     UConstantDataPtr theData;
-    Type             theType;
 
   };
 
