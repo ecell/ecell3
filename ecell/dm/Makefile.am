@@ -14,7 +14,6 @@ RandomBiUniFluxProcess.cpp\
 RandomUniBiFluxProcess.cpp\
 RandomBiBiFluxProcess.cpp\
 RapidEquilibriumProcess.cpp\
-BisectionRapidEquilibriumProcess.cpp\
 DecayFluxProcess.cpp\
 IsoUniUniFluxProcess.cpp\
 OrderedBiBiFluxProcess.cpp\
