@@ -4,7 +4,7 @@ This is emllib for EML
 __author__     = 'suzuki'
 __email__      = 'suzuki@sfc.keio.ac.jp'
 __startDate__  = '020316'
-__lastUpdate__ = '020730'
+__lastUpdate__ = '020801'
 
 __Memo__ = '\
 '
@@ -355,10 +355,10 @@ class Eml:
 
     def getEntityList( self ):
 
-        aSystemEntityList    = self.getSystemEntityList()
+        aSystemEntityList             = self.getSystemEntityList()
         aSubstanceOrReactorEntityList = self.getSubstanceOrReactorEntityList()
-        #aReactorEntityList   = self.getReactorEntityList()
-        anEntityList = aSystemEntityList + aSubstanceOrReactorEntityList
+        #aReactorEntityList           = self.getReactorEntityList()
+        anEntityList                  = aSystemEntityList + aSubstanceOrReactorEntityList
 
         return anEntityList
 
@@ -494,7 +494,7 @@ class Eml:
             aSystem = {}
 
             aSystem[ 'Type' ]   = str( aSystemElement.getAttribute( 'class' ) )
-            aSystem[ 'FullId' ] = str( aSystem[ 'Type' ] + ':' \
+            aSystem[ 'FullId' ] = str( 'System:' \
                                        + self.asPathToSystem( aSystemElement.getAttribute( 'id' ) ) )
             aSystem[ 'Name' ]   = str( aSystemElement.getAttribute( 'name' ) )
             
