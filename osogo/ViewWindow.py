@@ -26,22 +26,22 @@ class ViewWindow( Window ):
 
     def copyFullPNList(self, a ):
         ViewWindow.theFullPNListClipBoard = self.theRawFullPNList
-        print 'copy :',
-        print ViewWindow.theFullPNListClipBoard
+        #print 'copy :',
+        #print ViewWindow.theFullPNListClipBoard
 
 
     def pasteFullPNList(self, a ):
         self.theRawFullPNList = ViewWindow.theFullPNListClipBoard
         self.initialize()
-        print 'paste :',
-        print self.theRawFullPNList
+        #print 'paste :',
+        #print self.theRawFullPNList
 
 
     # overwrite in subclass if needed
     def addFullPNList(self, a ):
         self.theRawFullPNList.extend( ViewWindow.theFullPNListClipBoard )
-        print 'add : ',
-        print self.theRawFullPNList
+        #print 'add : ',
+        #print self.theRawFullPNList
 
 if __name__ == "__main__":
     def mainLoop():

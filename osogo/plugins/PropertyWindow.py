@@ -52,7 +52,7 @@ class PropertyWindow(PluginWindow):
         self.theSelected = ''
         
         aNameFullPN = convertFullIDToFullPN( self.theFullID() ,'Name' )
-        print createFullPNString( aNameFullPN )
+        #print createFullPNString( aNameFullPN )
         aNameList = list( self.theSession.theSimulator.getProperty( createFullPNString( aNameFullPN ) ) )
         
 #        self.theClassName = aNameList[0]
@@ -152,7 +152,7 @@ class PropertyWindow(PluginWindow):
         aSelectedItem = self.theList[data1]
         aFullPN = None
 
-        print aSelectedItem
+        #print aSelectedItem
         try:
             aFullPropertyName = createFullPN( aSelectedItem[2] )
         except ValueError:

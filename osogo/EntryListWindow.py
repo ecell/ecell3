@@ -88,7 +88,7 @@ class EntryListWindow(Window):
         aPrimitiveTypeString = aSelectedTypeMenuItem.get_data( 'LABEL' )
 
         aSystemFullID = aSelectedSystemLeafMap[0].get_data( 'FULLID' )
-        print aSystemFullID
+        #print aSystemFullID
         self.theEntryList.clear_items( 0,-1 )
 
         if aPrimitiveTypeString == 'All':
