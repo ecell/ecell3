@@ -7,20 +7,26 @@ PROTECTED_AUX = '''
   Connection S0;
   Connection C0;
   Connection C1;
+  Real v; // declare member variable
+  Int a; // declare member variable
+  Real time; // declare member variable
 '''
 
 defineMethod( 'initialize', '''
   S0 = getConnection( "S0" );
   C0 = getConnection( "C0" );
   C1 = getConnection( "C1" );
+  v = 0; // initialize member variable
+  a = 0; // initialize member variable
+  time = 0; // initialize member variable
 ''' )
 
 defineMethod( 'process', '''
   const Real S( S0.getVariable()->getConcentration() );
   const Real E2( C1.getVariable()->getConcentration() );
-  Real v( 0 ); // removed static 
-  Int a( 0 ); // removed static 
-  Real time( 0 ); // removed static 
+  // Real v( 0 ); // removed static 
+  // Int a( 0 ); // removed static 
+  // Real time( 0 ); // removed static 
 
   if(E2 >= 1)
   {
