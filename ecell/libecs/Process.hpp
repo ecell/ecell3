@@ -378,12 +378,14 @@ namespace libecs
     }
 
     /**
-       Unset all the products' isAccessor() bit.
+       Unset all the product species' isAccessor() bit.
+
+       Product species here means VariableReferences those have positive 
+       non-zero coefficients.
 
        As a result these becomes write-only VariableReferences.
 
        This method is typically called in initialize() of subclasses.
-
        This method should be called before getVariableReference().
 
        This is a convenient method.

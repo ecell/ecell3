@@ -13,8 +13,6 @@ libecs itself are coverd by GPL.
 ecell/libecs/ includes some files from Loki C++ library by 
              Andrei Alexandrescu (http://www.moderncppdesign.com/).
              The license for Loki is MIT license.
-             (The files are: AssocVector.h, SmallObj.*, Singleton.*, Threads.h)
-
 
 
 =========================================================================
