@@ -22,6 +22,7 @@
   <!ENTITY writing-em SYSTEM "writing-em.xml">
   <!ENTITY writing-dm SYSTEM "writing-dm.xml">
   <!ENTITY writing-ecs SYSTEM "writing-ecs.xml">
+  <!ENTITY inside-ecell SYSTEM "inside-ecell.xml">
   <!ENTITY python-basics SYSTEM "python-basics.xml">
   <!ENTITY cpp-basics SYSTEM "cpp-basics.xml">
 ]>
@@ -262,6 +263,7 @@
   &writing-dm;
   &writing-ecs;
 
+  &inside-ecell;
 
   <!-- ============= Bugs ================================== -->
   <!-- This section is optional and is commented out by default. 
