@@ -92,7 +92,7 @@ class Session:
 
 
             if aFullPath == '/':
-                aFullPn = 'SYSTEM::/:' + aName
+                aFullPn = 'System::/:' + aName
                 
             else:
                 anId    = aFullPathList[-1]
@@ -100,7 +100,7 @@ class Session:
                 aPath = string.join( aFullPathList, '/' )
                 if aPath == '':
                     aPath = '/'
-                aFullPn = 'SYSTEM' + ':' + aPath + ':' + anId + ':' + aName
+                aFullPn = 'System' + ':' + aPath + ':' + anId + ':' + aName
 
                 self.theSimulator.setProperty( aFullPn, aValueList )
             
