@@ -65,6 +65,11 @@ EOT_USAGE
 }
 
 
+######################################################
+
+
+## check commandline
+
 # at least one argument is required
 if [ -z $1 ] ;  then
 	help
@@ -76,6 +81,8 @@ if [ "$1" = "-h" -o "$1" = "--help" ] ; then
 	exit 0
 fi
 
+## set names and variables
+
 SRC=$1 ; shift
 CXXCOMPILEFLAGS="$CXXFLAGS $*"
 CLASSNAME=`$BASENAME $SRC $CXXSUFFIX`
@@ -83,6 +90,9 @@ OBJ=$CLASSNAME.o
 LOBJ=$CLASSNAME.lo
 LAOBJ=$CLASSNAME.la
 SOBJ=$CLASSNAME$SHLEXT
+
+
+## main routine
 
 compile
 link

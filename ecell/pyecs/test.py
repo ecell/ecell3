@@ -26,7 +26,7 @@ s.createEntity('Substance','Substance:/:B','substance B')
 s.createEntity('Substance','Substance:/:C','substance C')
 
 print 'make reactors...'
-s.createEntity('ConstantParameterReactor','Reactor:/:RC1','constant reactor')
+s.createEntity('ConstantActivityReactor','Reactor:/:RC1','constant reactor')
 
 print 'set Substance:/:A Quantity = 30'
 s.setProperty( 'Substance:/:A', 'Quantity', (30,) )
