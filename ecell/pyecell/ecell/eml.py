@@ -35,12 +35,9 @@ class Eml:
         if aFileObject is None:
             aStringData = '<?xml version="1.0" ?><eml><stepperlist/></eml>'
         else:
-            aFileObject.readlines()
             aStringData = string.join( string.join( aFileObject.readlines(), '' ).split( '\n' ), '' )
 
-
         self.__theDocument = minidom.parseString( aStringData )
-
 
 
     def asString( self ):
