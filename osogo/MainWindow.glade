@@ -477,6 +477,7 @@
 
 			  <child>
 			    <widget class="GtkVBox" id="vbox58">
+			      <property name="border_width">2</property>
 			      <property name="visible">True</property>
 			      <property name="homogeneous">False</property>
 			      <property name="spacing">0</property>
@@ -651,7 +652,7 @@
 
 				  <child>
 				    <widget class="GtkButton" id="entitylist_button">
-				      <property name="width_request">115</property>
+				      <property name="width_request">122</property>
 				      <property name="height_request">30</property>
 				      <property name="visible">True</property>
 				      <property name="can_focus">True</property>
@@ -673,7 +674,7 @@
 
 					      <child>
 						<widget class="GtkImage" id="image346">
-						  <property name="width_request">23</property>
+						  <property name="width_request">30</property>
 						  <property name="height_request">28</property>
 						  <property name="visible">True</property>
 						  <property name="pixbuf">icon_entity.png</property>
@@ -729,7 +730,7 @@
 
 				  <child>
 				    <widget class="GtkToggleButton" id="logger_button">
-				      <property name="width_request">53</property>
+				      <property name="width_request">122</property>
 				      <property name="height_request">30</property>
 				      <property name="visible">True</property>
 				      <property name="can_focus">True</property>
@@ -753,7 +754,7 @@
 
 					      <child>
 						<widget class="GtkImage" id="image347">
-						  <property name="width_request">25</property>
+						  <property name="width_request">30</property>
 						  <property name="visible">True</property>
 						  <property name="pixbuf">icon_logger.png</property>
 						  <property name="xalign">0.5</property>
@@ -821,7 +822,7 @@
 
 				  <child>
 				    <widget class="GtkToggleButton" id="message_togglebutton">
-				      <property name="width_request">115</property>
+				      <property name="width_request">122</property>
 				      <property name="height_request">30</property>
 				      <property name="visible">True</property>
 				      <property name="can_focus">True</property>
@@ -845,7 +846,7 @@
 
 					      <child>
 						<widget class="GtkImage" id="image348">
-						  <property name="width_request">28</property>
+						  <property name="width_request">30</property>
 						  <property name="visible">True</property>
 						  <property name="pixbuf">icon_message.png</property>
 						  <property name="xalign">0.5</property>
@@ -900,7 +901,7 @@
 
 				  <child>
 				    <widget class="GtkToggleButton" id="stepper_button">
-				      <property name="width_request">95</property>
+				      <property name="width_request">122</property>
 				      <property name="height_request">30</property>
 				      <property name="visible">True</property>
 				      <property name="can_focus">True</property>
@@ -924,7 +925,7 @@
 
 					      <child>
 						<widget class="GtkImage" id="image349">
-						  <property name="width_request">28</property>
+						  <property name="width_request">30</property>
 						  <property name="visible">True</property>
 						  <property name="pixbuf">icon_stepper.png</property>
 						  <property name="xalign">0.5</property>
