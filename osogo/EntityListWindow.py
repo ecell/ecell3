@@ -60,7 +60,7 @@ class EntityListWindow(OsogoWindow):
 
 		self.theTypeMenu = self.theTypeOptionMenu.get_menu()
 		self.theTypeMenu.connect( 'selection-done',\
-					  self.updateEntityList )
+					  self.updateSystemSelection )
 
 		aTypeMenuItemMap = self.theTypeMenu.get_children()
 		aTypeMenuItemMap[0].set_data( 'LABEL', 'Variable' )
@@ -144,7 +144,7 @@ class EntityListWindow(OsogoWindow):
 
 		self.updateEntityList( aSelectedSystemIter )
 
-#		self.selectSystem( aSelectedSystemIter )
+		#		self.selectSystem( aSelectedSystemIter )
 
 
 	def updateEntityList( self, aSelectedSystemIter ):
