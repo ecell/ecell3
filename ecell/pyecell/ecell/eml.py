@@ -81,7 +81,7 @@ class Eml:
 
         for anElement in self.__theDocument.firstChild.childNodes:
             if anElement.nodeName == 'stepper' and \
-                   anElement.getAttribute( 'id' )    == anID:
+                   anElement.getAttribute( 'id' ) == anID:
 
                 anElement.removeChild( aChildElement )
     
@@ -542,21 +542,16 @@ def convertSystemFullID2SystemID( aSystemFullID ):
     aSystemFullID : ex) System:/CELL:CYTOPLASM
     return -> aSystemID [string] : ex) /CELL/CYTOPLASM
     """
-    aParsedSystemFullID = aSystemFullID.split( ':' )
+    _dummy, aSystemPath, anID = aSystemFullID.split( ':' )
 
-    aPathToSystem   = aParsedSystemFullID[1]
-    aSystemSimpleID = aParsedSystemFullID[2]
+    if( anID == '/' ):
+        return '/'
 
-    if( aSystemSimpleID == '/' ):
-        aSystemID = '/'
-
-    elif( aPathToSystem == '/' ):
-        aSystemID = '/' +aSystemSimpleID
+    elif( aSystemPath == '/' ):
+        return '/' + anID
 
     else:
-        aSystemID = aPathToSystem + '/' +aSystemSimpleID
-
-    return aSystemID
+        return aSystemPath + '/' + anID
 
 
 def convertSystemID2SystemFullID( aSystemID ):
