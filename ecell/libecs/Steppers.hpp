@@ -236,7 +236,6 @@ namespace libecs
     RealVector theK7;
 
     RealVector theMidVelocityBuffer;
-    RealVector theErrorEstimate;
 
     bool theInterrupted;
   };
