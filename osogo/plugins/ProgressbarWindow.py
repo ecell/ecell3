@@ -127,17 +127,23 @@ class ProgressbarWindow(PluginWindow):
         else :
             aPositiveFlag = 1
 
-        if value == 0 :
-            aMultiplier = 0
-            aBarLength = 0
+#        if value == 0 :
+#            aMultiplier = 0
+#            aBarLength = 0
 
-        else :
-            if self['auto_button'].get_active() :
-                aMultiplier = (int)(Numeric.log10(value))
-                self.pull = aMultiplier+2
+#        else :
+        if self['auto_button'].get_active() :
+            if value == 0 :
+                aMultiplier = 2
             else :
-                aMultiplier = self.pull-2
+                aMultiplier = (int)(Numeric.log10(value))
+            self.pull = aMultiplier+2
+        else :
+            aMultiplier = self.pull-2
 
+        if value == 0:
+            aBarLength = 0
+        else :
             aBarLength = (Numeric.log10(value)+1-aMultiplier)*10/3
 
         return  aBarLength, aMultiplier, aPositiveFlag
