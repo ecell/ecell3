@@ -15,7 +15,6 @@ and one reaction(MichaelisUniUniProcess).
 
 README:                    This file
 simple.em:                 Model file(em file) for this model
-simple.eml:                Model file(eml file) for this model
 MichaelisUniUniProcess.dm: Process file(dm file) for this model
 
 
