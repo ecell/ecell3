@@ -1,4 +1,4 @@
-from sbml import *
+from libsbml import *
 
 #---Other functions are using this 'sub'funtion in this file.---
 def sub( fun , indata ):
@@ -17,39 +17,50 @@ def sub( fun , indata ):
 def getCompartment( aSBMLmodel ):
     " [[ Id , Name , SpatialDimension , Size , Volume , Unit , Ouside , Constant ]] "
     LIST = []
-    if Model_getCompartment( aSBMLmodel , 0 ):
-        NumCompartment = Model_getNumCompartments( aSBMLmodel )
-        for Num in range( NumCompartment ):
-            ListOfCompartment = []
-            aCompartment = Model_getCompartment( aSBMLmodel , Num )
-            
-            anId = sub( Compartment_getId , aCompartment )
-            aName = sub( Compartment_getName , aCompartment )
-            aSpatialDimension = Compartment_getSpatialDimensions( aCompartment )
-            if Compartment_isSetSize( aCompartment ):
-                aSize = sub( Compartment_getSize , aCompartment )
-            else:
-                aSize = "Unknown"
+    theList = aSBMLmodel.getListOfCompartments()
+    #if Model_getCompartment( aSBMLmodel , 0 ):
+        
+    NumCompartment = theList.getNumItems()
+        
+    for Num in range( NumCompartment ):
+        ListOfCompartment = []
+            #aCompartment = Model_getCompartment( aSBMLmodel , Num )
 
-            if Compartment_isSetVolume( aCompartment ):
-                aVolume = sub( Compartment_getVolume , aCompartment )
-            else:
-                aVoluem = "Unknown"
-                
-            anUnit = sub( Compartment_getUnits , aCompartment )
-            anOutside = sub( Compartment_getOutside , aCompartment )
-            aConstant = Compartment_getConstant( aCompartment )
+        anId = theList[Num].getId()
+            #anId = sub( Compartment_getId , aCompartment )
+        aName = theList[Num].getName()
+            #aName = sub( Compartment_getName , aCompartment )
+        aSpatialDimension = theList[Num].getSpatialDimensions()
+            #aSpatialDimension = Compartment_getSpatialDimensions( aCompartment )
+        if theList[Num].isSetSize():
+            aSize = theList[Num].getSize()
+                #aSize = sub( Compartment_getSize , aCompartment )
+        else:
+            aSize = "Unknown"
 
-            ListOfCompartment.append( anId )
-            ListOfCompartment.append( aName )
-            ListOfCompartment.append( aSpatialDimension )
-            ListOfCompartment.append( aSize )
-            ListOfCompartment.append( aVolume )
-            ListOfCompartment.append( anUnit )
-            ListOfCompartment.append( anOutside )
-            ListOfCompartment.append( aConstant )
+        if theList[Num].isSetVolume():
+            aVolume = theList[Num].getVolume()
+                #aVolume = sub( Compartment_getVolume , aCompartment )
+        else:
+            aVolume = "Unknown"
 
-            LIST.append( ListOfCompartment )
+        anUnit = theList[Num].getUnits()
+            #anUnit = sub( Compartment_getUnits , aCompartment )
+        anOutside = theList[Num].getOutside()
+            #anOutside = sub( Compartment_getOutside , aCompartment )
+        aConstant = theList[Num].getConstant()
+            #aConstant = Compartment_getConstant( aCompartment )
+
+        ListOfCompartment.append( anId )
+        ListOfCompartment.append( aName )
+        ListOfCompartment.append( aSpatialDimension )
+        ListOfCompartment.append( aSize )
+        ListOfCompartment.append( aVolume )
+        ListOfCompartment.append( anUnit )
+        ListOfCompartment.append( anOutside )
+        ListOfCompartment.append( aConstant )
+
+        LIST.append( ListOfCompartment )
 
     return LIST
 
@@ -57,39 +68,39 @@ def getCompartment( aSBMLmodel ):
 def getEvent( aSBMLmodel ):
     " [[ Id , Name , StringTrigger , StringDelay , TimeUnit , [[ VariableAssignment , StringAssignment ]] ]] "
     LIST = []
-    if Model_getEvent( aSBMLmodel , 0 ):
-        NumEvent = Model_getNumEvents( aSBMLmodel )
+    if aSBMLmodel.getEvent(0):
+        NumEvent = aSBMLmodel.getNumEvents()
         for Num_Ev in range( NumEvent ):
             ListOfEvent = []
             
-            anEvent = Model_getEvent( aSBMLmodel , Num_Ev )
+            anEvent = aSBMLmodel.getEvent( Num_Ev )
             
-            anId_Ev = sub( Event_getId , anEvent )
-            aName_Ev = sub( Event_getName , anEvent )
+            anId_Ev = anEvent.getId()
+            aName_Ev = anEvent.getName()
             
-            anASTNode_Ev_Tr = sub( Event_getTrigger , anEvent )
-            aString_Ev_Tr = sub( SBML_formulaToString , anASTNode_Ev_Tr )
+            anASTNode_Ev_Tr = anEvent.getTrigger()
+            aString_Ev_Tr = sub( formulaToString , anASTNode_Ev_Tr )
             
-            anASTNode_Ev_De = sub( Event_getDelay , anEvent )
-            aString_Ev_De = sub( SBML_formulaToString , anASTNode_Ev_Tr )
+            anASTNode_Ev_De = anEvent.getDelay()
+            aString_Ev_De = sub( formulaToString , anASTNode_Ev_Tr )
             
-            aTimeUnit_Ev = sub( Event_getTimeUnits , anEvent )
+            aTimeUnit_Ev = anEvent.getTimeUnits()
             
             ListOfEventAssignments = []
-            if Event_getEventAssignment( anEvent , 0 ):
-                NumEventAssignment = Event_getNumEventAssignments( anEvent )
-                for Num_Ev_Ass in range( NumEventAssignment ):
+            if anEvent.getEventAssignment(0):
+                NumEventAssignment = anEvent.getNumEventAssignments()
+                for Num_Ev_As in range( NumEventAssignment ):
                     ListOfEventAssignment = []
                     
-                    anEventAssignment = Event_getEventAssignment( anEvent , Num_Ev_Ass )
+                    anEventAssignment = anEvent.getEventAssignment( Num_Ev_As )
                     
-                    aVariable_Ev_Ass = sub( EventAssignment_getVariable , anEventAssignment )
+                    aVariable_Ev_As = anEventAssignment.getVariable()
                     
-                    anASTNode_Ev_Ass = sub( EventAssignment_getMath , anEventAssignment )
-                    aString_Ev_Ass = sub( SBML_formulaToString , anASTNode_Ev_Ass )
+                    anASTNode_Ev_As = anEventAssignment.getMath()
+                    aString_Ev_As = sub( formulaToString , anASTNode_Ev_As )
                     
-                    ListOfEventAssignment.append( aVariable_Ev_Ass )
-                    ListOfEventAssignment.append( aString_Ev_Ass )
+                    ListOfEventAssignment.append( aVariable_Ev_As )
+                    ListOfEventAssignment.append( aString_Ev_As )
                     
                     ListOfEventAssignments.append( ListOfEventAssignment )
 
@@ -108,18 +119,18 @@ def getEvent( aSBMLmodel ):
 def getFunctionDefinition( aSBMLmodel ):
     " [[ Id , Name , String ]] "
     LIST = []
-    if Model_getFunctionDefinition( aSBMLmodel , 0 ):
-        NumFunctionDefinition = Model_getNumFunctionDefinitions( aSBMLmodel )
+    if aSBMLmodel.getFunctionDefinition(0):
+        NumFunctionDefinition = aSBMLmodel.getNumFunctionDefinitions()
         for Num_FD in range( NumFunctionDefinition ):
             ListOfFunctionDefinition = []
 
-            aFunctionDefinition = Model_getFunctionDefinition( aSBMLmodel , Num_FD )
+            aFunctionDefinition = aSBMLmodel.getFunctionDefinition( Num_FD )
 
-            anId_FD = sub( FunctionDefinition_getId , aFunctionDefinition )
-            aName_FD = sub( FunctionDefinition_getName , aFunctionDefinition )
+            anId_FD = aFunctionDefinition.getId()
+            aName_FD = aFunctionDefinition.getName()
 
-            anASTNode_FD = sub( FunctionDefinition_getMath , aFunctionDefinition )
-            aString_FD = sub( SBML_formulaToString , anASTNode_FD )
+            anASTNode_FD = aFunctionDefinition.getMath()
+            aString_FD = sub( formulaToString , anASTNode_FD )
 
             ListOfFunctionDefinition.append( anId_FD )
             ListOfFunctionDefinition.append( aName_FD )
@@ -132,23 +143,23 @@ def getFunctionDefinition( aSBMLmodel ):
 def getParameter( aSBMLmodel ):
     " [[ Id , Name , Value , Unit , Constant ]] "
     LIST = []
-    if Model_getParameter( aSBMLmodel , 0 ):
-        NumParameter = Model_getNumParameters( aSBMLmodel )
+    if aSBMLmodel.getParameter(0):
+        NumParameter = aSBMLmodel.getNumParameters()
         for Num_Pa in range( NumParameter ):
             ListOfParameter = []
 
-            aParameter = Model_getParameter( aSBMLmodel , Num_Pa )
+            aParameter = aSBMLmodel.getParameter( Num_Pa )
 
-            anId_Pa = sub( Parameter_getId , aParameter )
-            aName_Pa = sub( Parameter_getName , aParameter )
+            anId_Pa = aParameter.getId()
+            aName_Pa = aParameter.getName()
             
-            if Parameter_isSetValue( aParameter ):
-                aValue_Pa = Parameter_getValue( aParameter )
+            if aParameter.isSetValue():
+                aValue_Pa = aParameter.getValue()
             else:
                 "Unknown"
                 
-            anUnit_Pa = sub( Parameter_getUnits  , aParameter )
-            aConstant_Pa = sub( Parameter_getConstant , aParameter )
+            anUnit_Pa = aParameter.getUnits()
+            aConstant_Pa = aParameter.getConstant()
 
             ListOfParameter.append( anId_Pa )
             ListOfParameter.append( aName_Pa )
@@ -161,43 +172,50 @@ def getParameter( aSBMLmodel ):
     return LIST
 
 
-def getReaction( aSBMLmodel ):
+def getReaction( aSBMLmodel, aSBMLDocument ):
     " [[ Id , Name , [ Formula , String , TimeUnit , SubstanceUnit , [[ ParameterId , ParameterName , ParameterValue , ParameterUnit , ParameterConstant ]] ] , Reversible , Fast , [[ ReactantSpecies , ( ReactantStoichiometry , ReactantStoichiometryMath ) , ReactantDenominator  ]] , [[  ProductSpecies , ( ProductStoichiometry , ProductStoichiometryMath ) , ProductDenominator ]] , [[ ModifierSpecies ]] ]] "
     LIST = []
-    if Model_getReaction( aSBMLmodel , 0 ):
-        NumReaction = Model_getNumReactions( aSBMLmodel )
+    if aSBMLmodel.getReaction(0):
+        NumReaction = aSBMLmodel.getNumReactions()
         for Num in range( NumReaction ):
             ListOfReaction = []
-            aReaction = Model_getReaction( aSBMLmodel , Num )
+            aReaction = aSBMLmodel.getReaction( Num )
 
-            anId = sub( Reaction_getId , aReaction )
-            aName = sub( Reaction_getName , aReaction )
+            anId = aReaction.getId()
+            aName =aReaction.getName()
 
 #----------KineticLaw----------------------------------
-            aKineticLaw = sub( Reaction_getKineticLaw , aReaction )
+            aKineticLaw = aReaction.getKineticLaw()
+#            anASTNode = libsbml.ASTNode()
             ListOfKineticLaw = []
             if aKineticLaw != []:
-            
-                aFormula_KL = sub( KineticLaw_getFormula , aKineticLaw )
 
-                anASTNode_KL = sub( KineticLaw_getMath , aKineticLaw )
-                aString_KL = sub( SBML_formulaToString , anASTNode_KL )
+                aFormula_KL = aKineticLaw.getFormula()
 
-                aTimeUnit_KL = sub( KineticLaw_getTimeUnits , aKineticLaw )
-                aSubstanceUnit_KL = sub( KineticLaw_getSubstanceUnits , aKineticLaw )
+                aMath = []
+                if( aSBMLDocument.getLevel() == 1 ):
+                    aMath.append( '' )
+                else:
+                    anASTNode_KL = aKineticLaw.getMath()
+                    aMath.append( formulaToString( anASTNode_KL ) )
+
+                aString_KL = aMath
+                    
+                aTimeUnit_KL = aKineticLaw.getTimeUnits()
+                aSubstanceUnit_KL = aKineticLaw.getSubstanceUnits()
             
-                if KineticLaw_getParameter( aKineticLaw , 0 ) :
+                if aKineticLaw.getParameter(0):
                     ListOfParameters = []
-                    NumParameter_KL = KineticLaw_getNumParameters( aKineticLaw )
+                    NumParameter_KL = aKineticLaw.getNumParameters()
                     for NumPara in range( NumParameter_KL ):
                         ListOfParameter = []
-                        aParameter_KL = KineticLaw_getParameter( aKineticLaw , NumPara )
+                        aParameter = aKineticLaw.getParameter( NumPara )
 
-                        anId_KL_P = sub( Parameter_getId , aParameter_KL )
-                        aName_KL_P = sub( Parameter_getName , aParameter_KL )
-                        aValue_KL_P = str( Parameter_getValue( aParameter_KL ) )
-                        aUnit_KL_P = sub( Parameter_getUnits , aParameter_KL )
-                        aConstant_KL_P = sub( Parameter_getConstant , aParameter_KL )
+                        anId_KL_P = aParameter.getId()
+                        aName_KL_P = aParameter.getName()
+                        aValue_KL_P = str( aParameter.getValue() )
+                        aUnit_KL_P = aParameter.getUnits()
+                        aConstant_KL_P = aParameter.getConstant()
 
                         ListOfParameter.append( anId_KL_P )
                         ListOfParameter.append( aName_KL_P )
@@ -218,25 +236,28 @@ def getReaction( aSBMLmodel ):
 #---------------------------------------------------------
 
 
-            aReversible = sub( Reaction_getReversible , aReaction )
-            aFast = sub( Reaction_getFast , aReaction )
+            aReversible = aReaction.getReversible()
+            aFast = aReaction.getFast()
 
 
             ListOfReactants = []
-            if Reaction_getReactant( aReaction , 0 ):
-                NumReactant = Reaction_getNumReactants( aReaction )
+            if aReaction.getReactant(0):
+                NumReactant = aReaction.getNumReactants()
                 for NumR in range( NumReactant ):
                     ListOfReactant = []
 
-                    aSpeciesReference_Reactant = Reaction_getReactant( aReaction , NumR )
+                    aSpeciesReference= aReaction.getReactant( NumR )
 
-                    aSpecies_R = sub( SpeciesReference_getSpecies , aSpeciesReference_Reactant )
-                    aStoichiometry_R = sub( SpeciesReference_getStoichiometry , aSpeciesReference_Reactant )
+                    aSpecies_R = aSpeciesReference.getSpecies()
+                    aStoichiometry_R = aSpeciesReference.getStoichiometry()
 
-                    anASTNode_R = sub( SpeciesReference_getStoichiometryMath , aSpeciesReference_Reactant )
-                    aString_R = sub( SBML_formulaToString , anASTNode_R )
+                    if aSpeciesReference.isSetStoichiometryMath():
+                        anASTNode_R = aSpeciesReference.getStoichiometryMath()
+                        aString_R = sub( formulaToString , anASTNode_R )
+                    else:
+                        aString_R = []
 
-                    aDenominator_R = sub( SpeciesReference_getDenominator , aSpeciesReference_Reactant )
+                    aDenominator_R = aSpeciesReference.getDenominator()
 
                     ListOfReactant.append( aSpecies_R )
 
@@ -256,20 +277,23 @@ def getReaction( aSBMLmodel ):
 
 
             ListOfProducts = []
-            if Reaction_getProduct( aReaction , 0 ):
-                NumProduct = Reaction_getNumProducts( aReaction )
+            if aReaction.getProduct(0):
+                NumProduct = aReaction.getNumProducts()
                 for NumP in range( NumProduct ):
                     ListOfProduct = []
 
-                    aSpeciesReference_Product = Reaction_getProduct( aReaction , NumP )
+                    aSpeciesReference = aReaction.getProduct( NumP )
 
-                    aSpecies_P = sub( SpeciesReference_getSpecies , aSpeciesReference_Product )
-                    aStoichiometry_P = sub( SpeciesReference_getStoichiometry , aSpeciesReference_Product )
-                    
-                    anASTNode_P = sub( SpeciesReference_getStoichiometryMath , aSpeciesReference_Product )
-                    aString_P = sub( SBML_formulaToString , anASTNode_P )
+                    aSpecies_P = aSpeciesReference.getSpecies()
+                    aStoichiometry_P = aSpeciesReference.getStoichiometry()
 
-                    aDenominator_P = sub( SpeciesReference_getDenominator , aSpeciesReference_Product )
+                    if aSpeciesReference.isSetStoichiometryMath():
+                        anASTNode_P = aSpeciesReference.getStoichiometryMath()
+                        aString_P = sub( formulaToString , anASTNode_P )
+                    else:
+                        aString_P = []
+
+                    aDenominator_P = aSpeciesReference.getDenominator()
 
                     ListOfProduct.append( aSpecies_P )
 
@@ -289,12 +313,12 @@ def getReaction( aSBMLmodel ):
 
 
             ListOfModifiers = []
-            if Reaction_getModifier( aReaction , 0 ):
-                NumModifier = Reaction_getNumModifiers( aReaction )
+            if aReaction.getModifier(0):
+                NumModifier = aReaction.getNumModifiers()
                 for NumM in range( NumModifier ):
-                    aModifierSpeciesReference = Reaction_getModifier( aReaction , NumM )
+                    aSpeciesReference = aReaction.getModifier( NumM )
 
-                    aSpecies_M = sub( ModifierSpeciesReference_getSpecies , aModifierSpeciesReference )
+                    aSpecies_M = aSpeciesReference.getSpecies()
                     ListOfModifiers.append( aSpecies_M )
 
             ListOfReaction.append( anId )
@@ -313,12 +337,12 @@ def getReaction( aSBMLmodel ):
 def getRule( aSBMLmodel ):
     " [[ Formula ]] "
     LIST = []
-    if Model_getRule( aSBMLmodel , 0 ):
-        NumRule = Model_getNumRules( aSBMLmodel )
+    if aSBMLmodel.getRule(0):
+        NumRule = aSBMLmodel.getNumRules()
         for Num in range( NumRule ):
-            aRule = Model_getRule( aSBMLmodel , Num )
+            aRule = aSBMLmodel.getRule( Num )
             #'Model_getAssignmentRule() was not found   
-            aFormula = sub( Rule_getFormula , aRule )
+            aFormula = aRule.getFormula()
 
             LIST.append( aFormula )
 
@@ -328,33 +352,33 @@ def getRule( aSBMLmodel ):
 def getSpecies( aSBMLmodel ):
     " [[ Id , Name , Compartment , InitialAmount , InitialConcentration , SubstanceUnit , SpatialSizeUnit , Unit , HasOnlySubstanceUnit , BoundaryCondition , Charge , Constant ]] "
     LIST = []
-    if Model_getSpecies( aSBMLmodel , 0 ):
-        NumSpecies = Model_getNumSpecies( aSBMLmodel )
+    if aSBMLmodel.getSpecies(0):
+        NumSpecies = aSBMLmodel.getNumSpecies()
         for Num in range( NumSpecies ):
             ListOfSpecies = []
-            aSpecies = Model_getSpecies( aSBMLmodel , Num )
+            aSpecies = aSBMLmodel.getSpecies( Num )
 
-            anId_Sp = sub( Species_getId , aSpecies )
-            aName_Sp = sub( Species_getName ,aSpecies )
-            aCompartment_Sp = sub( Species_getCompartment, aSpecies )
+            anId_Sp = aSpecies.getId()
+            aName_Sp = aSpecies.getName()
+            aCompartment_Sp = aSpecies.getCompartment()
 
-            if Species_isSetInitialAmount( aSpecies ):
-                anInitialAmount_Sp = Species_getInitialAmount( aSpecies )
+            if aSpecies.isSetInitialAmount():
+                anInitialAmount_Sp = aSpecies.getInitialAmount()
             else:
                 anInitialAmount_Sp = "Unknown"
 
-            if Species_isSetInitialConcentration( aSpecies ):
-                anInitialConcentration_Sp = Species_getInitialConcentration( aSpecies )
+            if aSpecies.isSetInitialConcentration():
+                anInitialConcentration_Sp = aSpecies.getInitialConcentration()
             else:
                 anInitialConcentration_Sp = "Unknown"
                 
-            aSubstanceUnit_Sp = sub( Species_getSubstanceUnits , aSpecies )
-            aSpatialSizeUnit_Sp = sub( Species_getSpatialSizeUnits , aSpecies )
-            anUnit_Sp = sub( Species_getUnits , aSpecies )
-            aHasOnlySubstanceUnit_Sp = Species_getHasOnlySubstanceUnits( aSpecies )
-            aBoundaryCondition_Sp = Species_getBoundaryCondition( aSpecies )
-            aCharge_Sp = sub( Species_getCharge , aSpecies )
-            aConstant_Sp = Species_getConstant( aSpecies )
+            aSubstanceUnit_Sp = aSpecies.getSubstanceUnits()
+            aSpatialSizeUnit_Sp = aSpecies.getSpatialSizeUnits()
+            anUnit_Sp = aSpecies.getUnits()
+            aHasOnlySubstanceUnit_Sp = aSpecies.getHasOnlySubstanceUnits()
+            aBoundaryCondition_Sp = aSpecies.getBoundaryCondition()
+            aCharge_Sp = aSpecies.getCharge()
+            aConstant_Sp = aSpecies.getConstant()
 
 
             ListOfSpecies.append( anId_Sp )
@@ -378,30 +402,30 @@ def getSpecies( aSBMLmodel ):
 def getUnitDefinition( aSBMLmodel ):
     " [[ Id , Name , [[ Kind , Exponent , Scale , Multiplier , Offset ]] ]] "
     LIST = []
-    if Model_getUnitDefinition( aSBMLmodel , 0 ):
-        NumUnitDefinition = Model_getNumUnitDefinitions( aSBMLmodel )
+    if aSBMLmodel.getUnitDefinition(0):
+        NumUnitDefinition = aSBMLmodel.getNumUnitDefinitions()
         for Num1 in range( NumUnitDefinition ):
             ListOfUnitDefinition = []
 
-            anUnitDefinition = Model_getUnitDefinition( aSBMLmodel , Num1 )
+            anUnitDefinition = aSBMLmodel.getUnitDefinition( Num1 )
 
-            anId = sub( UnitDefinition_getId , anUnitDefinition )
-            aName = sub( UnitDefinition_getName , anUnitDefinition )
+            anId = anUnitDefinition.getId()
+            aName = anUnitDefinition.getName()
 
             ListOfUnits = []
-            if UnitDefinition_getUnit( anUnitDefinition , 0 ):
-                NumUnit = UnitDefinition_getNumUnits( anUnitDefinition )
+            if anUnitDefinition.getUnit(0):
+                NumUnit = anUnitDefinition.getNumUnits()
                 for Num2 in range( NumUnit ):
                     ListOfUnit = []
-                    anUnit = UnitDefinition_getUnit( anUnitDefinition , Num2 )
+                    anUnit = anUnitDefinition.getUnit( Num2 )
 
-                    anUnitKind = sub( Unit_getKind , anUnit )
+                    anUnitKind = anUnit.getKind()
 
-                    aKind = sub( UnitKind_toString , anUnitKind )
-                    anExponent = sub( Unit_getExponent , anUnit )
-                    aScale = Unit_getScale( anUnit )
-                    aMultiplier = sub( Unit_getMultiplier , anUnit )
-                    anOffset = Unit_getOffset( anUnit )
+                    aKind = UnitKind_toString( anUnitKind )
+                    anExponent = anUnit.getExponent()
+                    aScale = anUnit.getScale()
+                    aMultiplier = anUnit.getMultiplier()
+                    anOffset = anUnit.getOffset()
 
                     ListOfUnit.append( aKind  )
                     ListOfUnit.append( anExponent )
