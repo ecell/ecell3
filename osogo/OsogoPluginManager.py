@@ -44,7 +44,8 @@ import imp
 import glob
 from ecell.ECS import *
 from config import *
-from Plugin import *
+#from Plugin import *
+from ecell.Plugin import *
 
 # ---------------------------------------------------------------
 # OsogoPluginManager -> PluginManager
@@ -104,6 +105,7 @@ class OsogoPluginManager(PluginManager):
 	# ---------------------------------------------------------------
 	def createInstance( self, classname, data, root=None, parent=None ):
 	
+
 		try:
 			try:
 				# gets one plugin from plugin map
@@ -120,11 +122,22 @@ class OsogoPluginManager(PluginManager):
 				self.theInterfaceWindow.addNewRecord( classname, data )
 
 			# creates instance
-			anInstance = aPlugin.createInstance( data, self, root, parent )
+			#anInstance = aPlugin.createInstance( self, data, self, root, parent )
 
-			# initialize session
-			self.theSession.theSimulator.initialize()
-			return anInstance
+			# Nothing is selected.
+			if len(data) == 0:
+				self.printMessage("Nothing is selected.")
+
+			else:
+
+				anInstance = aPlugin.createInstance( data, self, root, parent )
+
+				if root !='top_vbox':
+					anInstance.editTitle( self.theInterfaceWindow.theTitle )
+
+				# initialize session
+				self.theSession.theSimulator.initialize()
+				return anInstance
 
 		except:
 			aMessage  = '\n----------Error------------\n'
@@ -294,8 +307,10 @@ class OsogoPluginManager(PluginManager):
 	# ---------------------------------------------------------------
 	def editModuleTitile( self, anIndex, aTitle ):
 
+
 		try:
-			self.theInstanceList[ anIndex + 1 ].editTitle( aTitle )
+			#self.theInstanceList[ anIndex + 1 ].editTitle( aTitle )
+			WindowManager.editModuleTitle( self, anIndex, aTitle)
 		except:
 			aMessage  = '\n----------Error------------\n'
 			aMessage += 'ErroType[%s]\n'  %sys.exc_type
@@ -354,21 +369,15 @@ class OsogoPluginManager(PluginManager):
 	# ---------------------------------------------------------------
 	# printMessage
 	#   - sets message to MessageWindow
-	#   - If catch some exception from MessageWindow, 
-	#     then display the error message to stderror.
+	#
+	# aMessage( string or list or tuple) : message will be shown on
+	#                                      MessageWindow
 	#
 	# return -> None
 	# ---------------------------------------------------------------
-	def printMessage( self, aMessageString ):
+	def printMessage( self, aMessage ):
 
-		try:
-			self.theMessageWindow.printMessage(aMessageString)
-		except:
-			aMessage  = '----------Error------------\n'
-			aMessage += 'ErroType[%s]\n'  %sys.exc_type
-			aMessage += 'ErroValue[%s]\n' %sys.exc_value
-			traceback.print_exc()
-			print aMessage
+		self.theMessageWindow.printMessage(aMessage)
 
 	# end of printMessage
 
