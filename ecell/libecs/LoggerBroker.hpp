@@ -40,8 +40,6 @@
 namespace libecs
 {
 
-  DECLARE_MAP( const String, LoggerPtr, std::less<const String>, LoggerMap );
-  
   class LoggerBroker
   {
   public:
@@ -54,7 +52,39 @@ namespace libecs
     
     LoggerPtr getLogger( StringCref, StringCref );
     //    LoggerPtr getLogger( FQPICref );
+
+    class PairOfStrings
+    {
+    public:
+      PairOfStrings( StringCref first , StringCref second )
+	:
+	thePair( first, second )
+      {
+	;
+      }
+      
+      const std::pair<String, String>& getPair( void ) const
+      {
+	return thePair;
+      }
+
+      bool operator < ( const PairOfStrings& rhs ) const
+      {
+	if( rhs.getPair().first > this->getPair().first )
+	  {
+	    return true;
+	  }
+	return false;
+      }
+
+
+    private:
+      const std::pair<String, String> thePair;
+    };
     
+
+    DECLARE_MAP( const PairOfStrings, LoggerPtr, std::less<const PairOfStrings>, LoggerMap );
+    typedef std::pair<const PairOfStrings, LoggerPtr> PairInLoggerMap;
   protected:
     
     void appendLogger( StringCref, StringCref );
@@ -65,7 +95,7 @@ namespace libecs
   private:
     LoggerBroker( LoggerBrokerCref );
     LoggerBrokerRef operator=( const LoggerBroker& );
-    
+
     LoggerMap     theLoggerMap;
     RootSystemPtr theRootSystem;
     
@@ -74,3 +104,6 @@ namespace libecs
 } // namespace libecs
 
 #endif
+
+
+

@@ -38,13 +38,16 @@
 #include "FQPI.hpp"
 #include "RootSystem.hpp"
 #include "System.hpp"
+#include "Substance.hpp"
+#include "Reactor.hpp"
 
 namespace libecs
 {
 
   LoggerPtr LoggerBroker::getLogger( StringCref id_name, StringCref property_name )
   {
-    LoggerMap::iterator position( theLoggerMap.find( id_name ) );
+    const PairOfStrings p(id_name, property_name);
+    LoggerMap::iterator position( theLoggerMap.find( p ) );
     if( position != theLoggerMap.end() )
       {
 	return position->second;
@@ -52,7 +55,7 @@ namespace libecs
     else
       {
 	appendLogger( id_name, property_name );
-	position = theLoggerMap.find( id_name ); 
+	position = theLoggerMap.find( p );
 	return position->second;
       }
   }
@@ -63,21 +66,27 @@ namespace libecs
     String aSystemPathString( aFQPI.getSystemPathString() );
     SystemPtr aSystemPtr = theRootSystem->getSystem( aSystemPathString );
 
-    MessageInterfacePtr aMessageInterfacePtr = NULLPTR;
+    //    MessageInterfacePtr aMessageInterfacePtr = NULLPTR;
+    PropertyMapIterator pmitr( NULLPTR );
 
     switch( aFQPI.getPrimitiveType() )
       {
       case SUBSTANCE:
-	//aMessageInterfacePtr = aSystemPtr->getSubstance( aFQPI.getIdString() );
+	//	aMessageInterfacePtr = aSystemPtr->getSubstance( aFQPI.getIdString() );
+	pmitr = aSystemPtr->getSubstance( aFQPI.getIdString() )->getMessageSlot( property_name );
     	break;
       case REACTOR:
-	aMessageInterfacePtr = aSystemPtr->getReactor( aFQPI.getIdString() );
+	//	aMessageInterfacePtr = aSystemPtr->getReactor( aFQPI.getIdString() );
+	pmitr = aSystemPtr->getReactor( aFQPI.getIdString() )->getMessageSlot( property_name );
 	break;
       case SYSTEM:
 	break;
       }
-    PropertyMapIterator pmitr( aMessageInterfacePtr->getMessageSlot( property_name ) );
-    LoggerPtr aNewLoggerPtr = new Logger( *pmitr->second->getProxy() );
+    //    PropertyMapIterator pmitr( aMessageInterfacePtr->getMessageSlot( property_name ) );
+
+    const PairOfStrings p( fqpnstring, property_name );
+    //    theLoggerMap[ p ] = new Logger( *pmitr->second->getProxy() );
+    theLoggerMap.insert(PairInLoggerMap( p, new Logger( *pmitr->second->getProxy() ) ) );
   }
   
 
