@@ -146,4 +146,6 @@ void PythonProcessBase::initialize()
 
 }
 
+LIBECS_DM_INIT_STATIC( PythonProcessBase, Process );
+
 #endif /* __PYTHONPROCESSBASE_HPP */
