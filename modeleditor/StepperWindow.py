@@ -1,8 +1,8 @@
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #
-#		This file is part of E-CELL Model Editor package
+#       This file is part of E-CELL Model Editor package
 #
-#				Copyright (C) 1996-2003 Keio University
+#               Copyright (C) 1996-2003 Keio University
 #
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #
@@ -45,106 +45,106 @@ from Constants import *
 class StepperWindow(ListWindow):
 
 
-	def __init__( self, aModelEditor ):
-		"""
-		in: ModelEditor theModelEditor
-		returns nothing
-		"""
-		self.theModelEditor = aModelEditor
-		# init superclass
-		ListWindow.__init__( self, self.theModelEditor )
+    def __init__( self, aModelEditor ):
+        """
+        in: ModelEditor theModelEditor
+        returns nothing
+        """
+        self.theModelEditor = aModelEditor
+        # init superclass
+        ListWindow.__init__( self, self.theModelEditor )
 
 
 
-	def openWindow( self ):
-		"""
-		in: nothing
-		returns nothing
-		"""
-		# superclass openwindow
-		ListWindow.openWindow( self )
+    def openWindow( self ):
+        """
+        in: nothing
+        returns nothing
+        """
+        # superclass openwindow
+        ListWindow.openWindow( self )
 
-		# add stepperlist
-		self.theStepperList = StepperList( self, self['StepperListFrame'] )
+        # add stepperlist
+        self.theStepperList = StepperList( self, self['StepperListFrame'] )
 
-		# add stepperpropertylist
-		self.theStepperPropertyList = StepperEditor( self, self['PropertyListFrame'] )
+        # add stepperpropertylist
+        self.theStepperPropertyList = StepperEditor( self, self['PropertyListFrame'] )
 
-		# add signal handlers
-		# self.addHandlers({  })
-		self.theStepperList.update()
-		stepperList = self.theModelEditor.getModel().getStepperList()
-		if len(stepperList) == 0:
-			aStepperList = []
-		else:
-			aStepperList = [ stepperList[0] ]
-		self.selectStepper( aStepperList )
-
-
-
-
-	def updateEntityList ( self ):
-		if not self.exists():
-			return
-		self.theStepperList.update(  )
-
-		self.updatePropertyList( )
+        # add signal handlers
+        # self.addHandlers({  })
+        self.theStepperList.update()
+        stepperList = self.theModelEditor.getModel().getStepperList()
+        if len(stepperList) == 0:
+            aStepperList = []
+        else:
+            aStepperList = [ stepperList[0] ]
+        self.selectStepper( aStepperList )
 
 
 
-	def updatePropertyList ( self, anID = None ):
-		"""
-		in: anID ( system or stepper ) where changes happened
-		"""
-		
-		if not self.exists():
-			return
-		oldDisplayedID = self.theStepperPropertyList.getDisplayedStepper()
 
-		selectedIDs = self.theStepperList.getSelectedIDs()
-		if len( selectedIDs) != 1:
-			newDisplayedID =  None
-		else:
-			newDisplayedID = selectedIDs[0]
+    def updateEntityList ( self ):
+        if not self.exists():
+            return
+        self.theStepperList.update(  )
 
-		if oldDisplayedID != newDisplayedID or newDisplayedID == anID or anID == None:
-			self.theStepperPropertyList.setDisplayedStepper( newDisplayedID )
-
-
-	def setLastActiveComponent( self, aComponent ):
-		pass
-			
-
-	def update( self, aType = None, anID = None ):
-		# anID None means all for steppers
-		if aType == ME_STEPPER_TYPE:
-			if anID == None:
-				# update all
-				self.updateEntityList()
-			else:
-				self.updatePropertyList( anID )
-
-		elif aType in [ ME_SYSTEM_TYPE, ME_PROCESS_TYPE, None]:
-			self.updatePropertyList()
-		elif aType == ME_PROPERTY_TYPE:
-			self.updatePropertyList( anID )
-
-
-	def selectStepper( self, aStepperList ):
-		self.theStepperList.changeSelection( aStepperList )
-		self.theStepperList.selectByUser()
+        self.updatePropertyList( )
 
 
 
-	#############################
-	#      SIGNAL HANDLERS	    #
-	#############################
+    def updatePropertyList ( self, anID = None ):
+        """
+        in: anID ( system or stepper ) where changes happened
+        """
+        
+        if not self.exists():
+            return
+        oldDisplayedID = self.theStepperPropertyList.getDisplayedStepper()
 
-	def deleted( self, *args ):
-		ListWindow.deleted( self, *args )
-		self.theStepperList.close()
-		self.theStepperPropertyList.close()
-		self.theModelEditor.theMainWindow.update()
-		return gtk.TRUE
+        selectedIDs = self.theStepperList.getSelectedIDs()
+        if len( selectedIDs) != 1:
+            newDisplayedID =  None
+        else:
+            newDisplayedID = selectedIDs[0]
+
+        if oldDisplayedID != newDisplayedID or newDisplayedID == anID or anID == None:
+            self.theStepperPropertyList.setDisplayedStepper( newDisplayedID )
+
+
+    def setLastActiveComponent( self, aComponent ):
+        pass
+            
+
+    def update( self, aType = None, anID = None ):
+        # anID None means all for steppers
+        if aType == ME_STEPPER_TYPE:
+            if anID == None:
+                # update all
+                self.updateEntityList()
+            else:
+                self.updatePropertyList( anID )
+
+        elif aType in [ ME_SYSTEM_TYPE, ME_PROCESS_TYPE, None]:
+            self.updatePropertyList()
+        elif aType == ME_PROPERTY_TYPE:
+            self.updatePropertyList( anID )
+
+
+    def selectStepper( self, aStepperList ):
+        self.theStepperList.changeSelection( aStepperList )
+        self.theStepperList.selectByUser()
+
+
+
+    #############################
+    #      SIGNAL HANDLERS      #
+    #############################
+
+    def deleted( self, *args ):
+        ListWindow.deleted( self, *args )
+        self.theStepperList.close()
+        self.theStepperPropertyList.close()
+        self.theModelEditor.theMainWindow.update()
+        return gtk.TRUE
 
 

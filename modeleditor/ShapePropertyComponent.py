@@ -1,8 +1,8 @@
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #
-#		This file is part of E-CELL Model Editor package
+#       This file is part of E-CELL Model Editor package
 #
-#				Copyright (C) 1996-2003 Keio University
+#               Copyright (C) 1996-2003 Keio University
 #
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #
@@ -47,223 +47,223 @@ from SystemObject import *
 
 class ShapePropertyComponent(ViewComponent):
 
-	#######################
-	#    GENERAL CASES    #
-	#######################
+    #######################
+    #    GENERAL CASES    #
+    #######################
 
-	def __init__( self,anObjectEditorWindow,pointOfAttach ):
-		self.theObjectEditorWindow = anObjectEditorWindow
-		self.theModelEditor = self.theObjectEditorWindow.theModelEditor
-		
-		ViewComponent.__init__( self, pointOfAttach, 'attachment_frame', 'ShapePropertyComponent.glade' )
+    def __init__( self,anObjectEditorWindow,pointOfAttach ):
+        self.theObjectEditorWindow = anObjectEditorWindow
+        self.theModelEditor = self.theObjectEditorWindow.theModelEditor
+        
+        ViewComponent.__init__( self, pointOfAttach, 'attachment_frame', 'ShapePropertyComponent.glade' )
 
-		# the variables
-		
-		self.theShapeList=[]
-		self.theColor=None
-		self.theColorDialog=None
-		self.theDrawingArea=None
-		self.theColorList=['red', 'yellow', 'green', 'brown', 'blue', 'magenta',
+        # the variables
+        
+        self.theShapeList=[]
+        self.theColor=None
+        self.theColorDialog=None
+        self.theDrawingArea=None
+        self.theColorList=['red', 'yellow', 'green', 'brown', 'blue', 'magenta',
                  'darkgreen', 'bisque1']
-		self.theCombo=ViewComponent.getWidget(self,'shape_combo')
-		
-		self.theObject=None
-		self.theFullId=None
-		self.theFillColor=None
-		self.theOutlineColor=None
+        self.theCombo=ViewComponent.getWidget(self,'shape_combo')
+        
+        self.theObject=None
+        self.theFullId=None
+        self.theFillColor=None
+        self.theOutlineColor=None
 
-		# the handlers dictionary
-		self.addHandlers({ 
-			'on_EntityLabel_activate' : self.__EntityLabel_displayed,\
-			'on_EntityLabel_focus_out' : self.__EntityLabel_displayed,\
-			'on_ComboEntry_changed' : self.__ShapeType_displayed,\
-			'on_EntityWidth_activate' : self.__EntityWidth_displayed,\
-			'on_EntityWidth_focus_out' : self.__EntityWidth_displayed,\
-			'on_EntityHeight_activate' : self.__EntityHeight_displayed,\
-			'on_EntityHeight_focus_out' : self.__EntityHeight_displayed,\
-			'on_FillButton_clicked' : self.__ColorFillSelection_displayed,\
-			'on_OutlineButton_clicked' : self.__ColorOutSelection_displayed
-			})
-		
-		
+        # the handlers dictionary
+        self.addHandlers({ 
+            'on_EntityLabel_activate' : self.__EntityLabel_displayed,\
+            'on_EntityLabel_focus_out' : self.__EntityLabel_displayed,\
+            'on_ComboEntry_changed' : self.__ShapeType_displayed,\
+            'on_EntityWidth_activate' : self.__EntityWidth_displayed,\
+            'on_EntityWidth_focus_out' : self.__EntityWidth_displayed,\
+            'on_EntityHeight_activate' : self.__EntityHeight_displayed,\
+            'on_EntityHeight_focus_out' : self.__EntityHeight_displayed,\
+            'on_FillButton_clicked' : self.__ColorFillSelection_displayed,\
+            'on_OutlineButton_clicked' : self.__ColorOutSelection_displayed
+            })
+        
+        
 
-	#########################################
-	#    Signal Handlers                    #
-	#########################################
-	def __EntityLabel_displayed( self, *args ):
-		aShapeLabel=(ViewComponent.getWidget(self,'ent_label')).get_text()
-		self.newTuple[2]=aShapeLabel
-		aShapeLabel = ':'.join(self.newTuple)
-		self.__ShapeProperty_updated(OB_FULLID,aShapeLabel)
+    #########################################
+    #    Signal Handlers                    #
+    #########################################
+    def __EntityLabel_displayed( self, *args ):
+        aShapeLabel=(ViewComponent.getWidget(self,'ent_label')).get_text()
+        self.newTuple[2]=aShapeLabel
+        aShapeLabel = ':'.join(self.newTuple)
+        self.__ShapeProperty_updated(OB_FULLID,aShapeLabel)
 
-	def __EntityWidth_displayed( self, *args ):
-		aShapeWidth=(ViewComponent.getWidget(self,'ent_width')).get_text()
-		if self.checkNumeric(aShapeWidth):
-			self.__ShapeProperty_updated(OB_DIMENSION_X,float(aShapeWidth))
-		else:
-			self.updateShapeProperty()
+    def __EntityWidth_displayed( self, *args ):
+        aShapeWidth=(ViewComponent.getWidget(self,'ent_width')).get_text()
+        if self.checkNumeric(aShapeWidth):
+            self.__ShapeProperty_updated(OB_DIMENSION_X,float(aShapeWidth))
+        else:
+            self.updateShapeProperty()
 
-	def __EntityHeight_displayed( self, *args ):
-		aShapeHeight=(ViewComponent.getWidget(self,'ent_height')).get_text()
-		if self.checkNumeric(aShapeHeight):
-			self.__ShapeProperty_updated(OB_DIMENSION_Y,float(aShapeHeight))
-		else:
-			self.updateShapeProperty()
+    def __EntityHeight_displayed( self, *args ):
+        aShapeHeight=(ViewComponent.getWidget(self,'ent_height')).get_text()
+        if self.checkNumeric(aShapeHeight):
+            self.__ShapeProperty_updated(OB_DIMENSION_Y,float(aShapeHeight))
+        else:
+            self.updateShapeProperty()
 
-	def __ShapeType_displayed( self, *args ):
-		aComboEntryWidget=ViewComponent.getWidget(self,'combo_entry')
-		aShapeType=aComboEntryWidget.get_text()
-		self.__ShapeProperty_updated(OB_SHAPE_TYPE,aShapeType)
-		
-	def __ColorFillSelection_displayed( self,*args):
-		aDialog,aColorSel=self.setColorDialog()
-		response=aDialog.run()
-		if response==gtk.RESPONSE_OK:
-			aColor=aColorSel.get_current_color()
-			aDa=ViewComponent.getWidget(self,'da_fill')
-			aDa.modify_bg(gtk.STATE_NORMAL,aColor)
-			aDialog.destroy()
-			self.setHexadecimal(aColor,OB_FILL_COLOR)
-			self.__ShapeProperty_updated(OB_FILL_COLOR,self.theHex)
-		else:
-			aDialog.destroy()
-			
+    def __ShapeType_displayed( self, *args ):
+        aComboEntryWidget=ViewComponent.getWidget(self,'combo_entry')
+        aShapeType=aComboEntryWidget.get_text()
+        self.__ShapeProperty_updated(OB_SHAPE_TYPE,aShapeType)
+        
+    def __ColorFillSelection_displayed( self,*args):
+        aDialog,aColorSel=self.setColorDialog()
+        response=aDialog.run()
+        if response==gtk.RESPONSE_OK:
+            aColor=aColorSel.get_current_color()
+            aDa=ViewComponent.getWidget(self,'da_fill')
+            aDa.modify_bg(gtk.STATE_NORMAL,aColor)
+            aDialog.destroy()
+            self.setHexadecimal(aColor,OB_FILL_COLOR)
+            self.__ShapeProperty_updated(OB_FILL_COLOR,self.theHex)
+        else:
+            aDialog.destroy()
+            
 
-	def __ColorOutSelection_displayed( self,*args):
-		aDialog,aColorSel=self.setColorDialog()
-		response=aDialog.run()
-		if response==gtk.RESPONSE_OK:
-			aColor=aColorSel.get_current_color()
-			aDa=ViewComponent.getWidget(self,'da_out')
-			aDa.modify_bg(gtk.STATE_NORMAL,aColor)
-			aDialog.destroy()
-			self.setHexadecimal(aColor,OB_OUTLINE_COLOR)
-			self.__ShapeProperty_updated(OB_OUTLINE_COLOR,self.theHex)
-		else:
-			aDialog.destroy()
-	
-	def __ShapeProperty_updated(self, aKey,aNewValue):
-		self.theObjectEditorWindow.modifyObjectProperty(aKey,aNewValue)
-	
+    def __ColorOutSelection_displayed( self,*args):
+        aDialog,aColorSel=self.setColorDialog()
+        response=aDialog.run()
+        if response==gtk.RESPONSE_OK:
+            aColor=aColorSel.get_current_color()
+            aDa=ViewComponent.getWidget(self,'da_out')
+            aDa.modify_bg(gtk.STATE_NORMAL,aColor)
+            aDialog.destroy()
+            self.setHexadecimal(aColor,OB_OUTLINE_COLOR)
+            self.__ShapeProperty_updated(OB_OUTLINE_COLOR,self.theHex)
+        else:
+            aDialog.destroy()
+    
+    def __ShapeProperty_updated(self, aKey,aNewValue):
+        self.theObjectEditorWindow.modifyObjectProperty(aKey,aNewValue)
+    
 
-	def __ShapeProperty_displayed(self,*args):
-		keys=self.theShapeDic.keys()
-		keys.sort()
-		for aKey in keys:
-			self.theModelEditor.printMessage(aKey + ':' + str(self.theShapeDic[aKey]),ME_PLAINMESSAGE)
-			
-		self.theModelEditor.printMessage('',ME_PLAINMESSAGE)
-		
+    def __ShapeProperty_displayed(self,*args):
+        keys=self.theShapeDic.keys()
+        keys.sort()
+        for aKey in keys:
+            self.theModelEditor.printMessage(aKey + ':' + str(self.theShapeDic[aKey]),ME_PLAINMESSAGE)
+            
+        self.theModelEditor.printMessage('',ME_PLAINMESSAGE)
+        
 
-			
-	#########################################
-	#    Private methods		        #
-	#########################################
-
-
-	def setDisplayedShapeProperty(self ,anObject):
-		if anObject==None:
-			self.clearShapeProperty()
-			return
-		self.theObject=anObject
-		self.populateComboBox()
-		self.theFillColor=self.getColorObject(self.theObject.getProperty(OB_FILL_COLOR))
-		self.theOutlineColor=self.getColorObject(self.theObject.getProperty(OB_OUTLINE_COLOR))
-		self.updateShapeProperty()
+            
+    #########################################
+    #    Private methods                #
+    #########################################
 
 
-	def updateShapeProperty(self):
-		ViewComponent.getWidget(self,'combo_entry').set_sensitive(gtk.TRUE)
-		ViewComponent.getWidget(self,'FillButton').set_sensitive(gtk.TRUE)
-		ViewComponent.getWidget(self,'OutlineButton').set_sensitive(gtk.TRUE)
-		if self.theObject.getProperty(OB_HASFULLID):
-			self.theFullId=self.theObject.getProperty(OB_FULLID)
-			self.newTuple = self.theFullId.split(':')
-			label = self.theFullId.split(':')[2]
-			ViewComponent.getWidget(self,'ent_label').set_sensitive(gtk.FALSE)
-			ViewComponent.getWidget(self,'ent_width').set_sensitive(gtk.FALSE)
-			ViewComponent.getWidget(self,'ent_height').set_sensitive(gtk.FALSE)
-			
-		else:
-			label = ''
-			ViewComponent.getWidget(self,'ent_label').set_sensitive(gtk.TRUE)
-			ViewComponent.getWidget(self,'ent_width').set_sensitive(gtk.TRUE)
-			ViewComponent.getWidget(self,'ent_height').set_sensitive(gtk.TRUE)
-		
-		if self.theObject.getProperty(OB_TYPE) == OB_TYPE_SYSTEM:
-			ViewComponent.getWidget(self,'ent_width').set_sensitive(gtk.TRUE)
-			ViewComponent.getWidget(self,'ent_height').set_sensitive(gtk.TRUE)
-		
-		ViewComponent.getWidget(self,'ent_label').set_text(label )
-		ViewComponent.getWidget(self,'ent_height').set_text( str(self.theObject.getProperty( OB_DIMENSION_Y ) ))
-		ViewComponent.getWidget(self,'ent_width').set_text( str(self.theObject.getProperty( OB_DIMENSION_X )) )
-		
-		ViewComponent.getWidget(self,'da_fill').modify_bg(gtk.STATE_NORMAL,self.theFillColor)
-		ViewComponent.getWidget(self,'da_out').modify_bg(gtk.STATE_NORMAL,self.theOutlineColor)
-		
+    def setDisplayedShapeProperty(self ,anObject):
+        if anObject==None:
+            self.clearShapeProperty()
+            return
+        self.theObject=anObject
+        self.populateComboBox()
+        self.theFillColor=self.getColorObject(self.theObject.getProperty(OB_FILL_COLOR))
+        self.theOutlineColor=self.getColorObject(self.theObject.getProperty(OB_OUTLINE_COLOR))
+        self.updateShapeProperty()
 
-	def clearShapeProperty(self):
-		ViewComponent.getWidget(self,'ent_label').set_text('' )
-		ViewComponent.getWidget(self,'ent_height').set_text( '')
-		ViewComponent.getWidget(self,'ent_width').set_text('')
-		ViewComponent.getWidget(self,'combo_entry').set_sensitive(gtk.FALSE)
-		self.theFillColor=self.getColorObject([65535, 65535, 65535])
-		self.theOutlineColor=self.getColorObject([0,0,0])
-		ViewComponent.getWidget(self,'da_fill').modify_bg(gtk.STATE_NORMAL,self.theFillColor)
-		ViewComponent.getWidget(self,'da_out').modify_bg(gtk.STATE_NORMAL,self.theOutlineColor)
-		ViewComponent.getWidget(self,'FillButton').set_sensitive(gtk.FALSE)
-		ViewComponent.getWidget(self,'OutlineButton').set_sensitive(gtk.FALSE)
-		
 
-		
-	def populateComboBox(self):
-		# populate list item of combobox
-		if self.theObject.getProperty(OB_TYPE) == OB_TYPE_PROCESS:
-			self.theShapeList = self.theObject.getAvailableProcessShape()
-		if self.theObject.getProperty(OB_TYPE) == OB_TYPE_VARIABLE:
-			self.theShapeList = self.theObject.getAvailableVariableShape()
-		if self.theObject.getProperty(OB_TYPE) == OB_TYPE_SYSTEM:
-			self.theShapeList = self.theObject.getAvailableSystemShape()
-		if self.theObject.getProperty(OB_TYPE) == OB_TYPE_TEXT:
-			self.theShapeList = self.theObject.getAvailableTextShape()
-		if self.theObject.getProperty(OB_TYPE) == OB_TYPE_PROCESS:
-			pass
-		
-		
-		
-		self.theCombo.set_popdown_strings(self.theShapeList)
-		
+    def updateShapeProperty(self):
+        ViewComponent.getWidget(self,'combo_entry').set_sensitive(gtk.TRUE)
+        ViewComponent.getWidget(self,'FillButton').set_sensitive(gtk.TRUE)
+        ViewComponent.getWidget(self,'OutlineButton').set_sensitive(gtk.TRUE)
+        if self.theObject.getProperty(OB_HASFULLID):
+            self.theFullId=self.theObject.getProperty(OB_FULLID)
+            self.newTuple = self.theFullId.split(':')
+            label = self.theFullId.split(':')[2]
+            ViewComponent.getWidget(self,'ent_label').set_sensitive(gtk.FALSE)
+            ViewComponent.getWidget(self,'ent_width').set_sensitive(gtk.FALSE)
+            ViewComponent.getWidget(self,'ent_height').set_sensitive(gtk.FALSE)
+            
+        else:
+            label = ''
+            ViewComponent.getWidget(self,'ent_label').set_sensitive(gtk.TRUE)
+            ViewComponent.getWidget(self,'ent_width').set_sensitive(gtk.TRUE)
+            ViewComponent.getWidget(self,'ent_height').set_sensitive(gtk.TRUE)
+        
+        if self.theObject.getProperty(OB_TYPE) == OB_TYPE_SYSTEM:
+            ViewComponent.getWidget(self,'ent_width').set_sensitive(gtk.TRUE)
+            ViewComponent.getWidget(self,'ent_height').set_sensitive(gtk.TRUE)
+        
+        ViewComponent.getWidget(self,'ent_label').set_text(label )
+        ViewComponent.getWidget(self,'ent_height').set_text( str(self.theObject.getProperty( OB_DIMENSION_Y ) ))
+        ViewComponent.getWidget(self,'ent_width').set_text( str(self.theObject.getProperty( OB_DIMENSION_X )) )
+        
+        ViewComponent.getWidget(self,'da_fill').modify_bg(gtk.STATE_NORMAL,self.theFillColor)
+        ViewComponent.getWidget(self,'da_out').modify_bg(gtk.STATE_NORMAL,self.theOutlineColor)
+        
 
-	def setColorDialog( self, *args ):
-		aColor=gtk.gdk.color_parse(self.theColorList[randint (0, 3)])
-		aDialog=gtk.ColorSelectionDialog("Select Fill Color")
-		aColorSel=aDialog.colorsel
-		aColorSel.set_previous_color(aColor)
-		aColorSel.set_current_color(aColor)
-		aColorSel.set_has_palette(gtk.TRUE)
-		return[aDialog,aColorSel]
-		
-	def setHexadecimal(self,theColor,theColorMode ):
-		self.theRed=theColor.red
-		self.theGreen=theColor.green
-		self.theBlue=theColor.blue
-		self.theHex = [self.theRed,self.theGreen,self.theBlue]
-		
+    def clearShapeProperty(self):
+        ViewComponent.getWidget(self,'ent_label').set_text('' )
+        ViewComponent.getWidget(self,'ent_height').set_text( '')
+        ViewComponent.getWidget(self,'ent_width').set_text('')
+        ViewComponent.getWidget(self,'combo_entry').set_sensitive(gtk.FALSE)
+        self.theFillColor=self.getColorObject([65535, 65535, 65535])
+        self.theOutlineColor=self.getColorObject([0,0,0])
+        ViewComponent.getWidget(self,'da_fill').modify_bg(gtk.STATE_NORMAL,self.theFillColor)
+        ViewComponent.getWidget(self,'da_out').modify_bg(gtk.STATE_NORMAL,self.theOutlineColor)
+        ViewComponent.getWidget(self,'FillButton').set_sensitive(gtk.FALSE)
+        ViewComponent.getWidget(self,'OutlineButton').set_sensitive(gtk.FALSE)
+        
 
-	def getColorObject(self, anRGB):
-		aColor=gtk.gdk.color_parse(self.theColorList[randint (0, 3)])
-		aColor.red= anRGB[0]
-		aColor.green= anRGB[1]
-		aColor.blue= anRGB[2]
-		return aColor
-	
-	def checkNumeric(self, aNumber):
-		try:
-			eval(aNumber)
-			return True
-		except:
-			return False
-	
+        
+    def populateComboBox(self):
+        # populate list item of combobox
+        if self.theObject.getProperty(OB_TYPE) == OB_TYPE_PROCESS:
+            self.theShapeList = self.theObject.getAvailableProcessShape()
+        if self.theObject.getProperty(OB_TYPE) == OB_TYPE_VARIABLE:
+            self.theShapeList = self.theObject.getAvailableVariableShape()
+        if self.theObject.getProperty(OB_TYPE) == OB_TYPE_SYSTEM:
+            self.theShapeList = self.theObject.getAvailableSystemShape()
+        if self.theObject.getProperty(OB_TYPE) == OB_TYPE_TEXT:
+            self.theShapeList = self.theObject.getAvailableTextShape()
+        if self.theObject.getProperty(OB_TYPE) == OB_TYPE_PROCESS:
+            pass
+        
+        
+        
+        self.theCombo.set_popdown_strings(self.theShapeList)
+        
+
+    def setColorDialog( self, *args ):
+        aColor=gtk.gdk.color_parse(self.theColorList[randint (0, 3)])
+        aDialog=gtk.ColorSelectionDialog("Select Fill Color")
+        aColorSel=aDialog.colorsel
+        aColorSel.set_previous_color(aColor)
+        aColorSel.set_current_color(aColor)
+        aColorSel.set_has_palette(gtk.TRUE)
+        return[aDialog,aColorSel]
+        
+    def setHexadecimal(self,theColor,theColorMode ):
+        self.theRed=theColor.red
+        self.theGreen=theColor.green
+        self.theBlue=theColor.blue
+        self.theHex = [self.theRed,self.theGreen,self.theBlue]
+        
+
+    def getColorObject(self, anRGB):
+        aColor=gtk.gdk.color_parse(self.theColorList[randint (0, 3)])
+        aColor.red= anRGB[0]
+        aColor.green= anRGB[1]
+        aColor.blue= anRGB[2]
+        return aColor
+    
+    def checkNumeric(self, aNumber):
+        try:
+            eval(aNumber)
+            return True
+        except:
+            return False
+    
 
 
 

@@ -2,9 +2,9 @@
 
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #
-#		This file is part of E-CELL Model Editor package
+#       This file is part of E-CELL Model Editor package
 #
-#				Copyright (C) 1996-2003 Keio University
+#               Copyright (C) 1996-2003 Keio University
 #
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #
@@ -44,67 +44,67 @@ from ModelEditor import *
 class PopupMenu:
 
 
-	def __init__( self, aModelEditor ):
+    def __init__( self, aModelEditor ):
 
-		self.theModelEditor= aModelEditor
-
-
-	def open( self,  anEvent):
-		"""
-		in:	
-			anEvent that triggered popup of menu
-		"""
-
-		# create Menu
-		aMenu = gtk.Menu()
-
-		# create add, decide whether it can be made sensitive 
-		aComponent = self.theModelEditor.getLastUsedComponent()
-		menuList = aComponent.getMenuItems()
-		for menu in menuList:
-			aMenu.append( self.__createMenuItem( menu[0], menu[1] ) )
-		
-
-		aMenu.show_all()
-
-		aMenu.popup(None, None, None, anEvent.button, anEvent.time)
-	
-		self.theMenu = aMenu
+        self.theModelEditor= aModelEditor
 
 
+    def open( self,  anEvent):
+        """
+        in: 
+            anEvent that triggered popup of menu
+        """
 
-	def __button_pushed( self, *args ):
-		"""
-		signal handler for menuitems choosen
-		"""
-		aMenuItem = args[0]
-		
-		aName = aMenuItem.get_data( 'Name' )
+        # create Menu
+        aMenu = gtk.Menu()
 
-		self.theMenu.destroy()
+        # create add, decide whether it can be made sensitive 
+        aComponent = self.theModelEditor.getLastUsedComponent()
+        menuList = aComponent.getMenuItems()
+        for menu in menuList:
+            aMenu.append( self.__createMenuItem( menu[0], menu[1] ) )
+        
 
-		self.theModelEditor.getLastUsedComponent().applyMenuItem(aName )
+        aMenu.show_all()
+
+        aMenu.popup(None, None, None, anEvent.button, anEvent.time)
+    
+        self.theMenu = aMenu
 
 
 
-	def __createMenuItem( self, aName, isSensitive ):
-		"""
-		in: 	str aName of menuitem
-			bool isSensitive
-		"""
-		if isSensitive == None:
-			return
-		aMenuItem = gtk.MenuItem(aName)
-		
-		if isSensitive:
-	
-			# attach signal handler
-			aMenuItem.connect( 'activate', self.__button_pushed )
-			aMenuItem.set_data( 'Name', aName )
-		else:
-			
-			# set insensitive
-			aMenuItem.set_sensitive( gtk.FALSE )
+    def __button_pushed( self, *args ):
+        """
+        signal handler for menuitems choosen
+        """
+        aMenuItem = args[0]
+        
+        aName = aMenuItem.get_data( 'Name' )
 
-		return aMenuItem
+        self.theMenu.destroy()
+
+        self.theModelEditor.getLastUsedComponent().applyMenuItem(aName )
+
+
+
+    def __createMenuItem( self, aName, isSensitive ):
+        """
+        in:     str aName of menuitem
+            bool isSensitive
+        """
+        if isSensitive == None:
+            return
+        aMenuItem = gtk.MenuItem(aName)
+        
+        if isSensitive:
+    
+            # attach signal handler
+            aMenuItem.connect( 'activate', self.__button_pushed )
+            aMenuItem.set_data( 'Name', aName )
+        else:
+            
+            # set insensitive
+            aMenuItem.set_sensitive( gtk.FALSE )
+
+        return aMenuItem
 

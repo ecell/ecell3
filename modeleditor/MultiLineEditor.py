@@ -2,9 +2,9 @@
 
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #
-#		This file is part of E-CELL Model Editor package
+#       This file is part of E-CELL Model Editor package
 #
-#				Copyright (C) 1996-2003 Keio University
+#               Copyright (C) 1996-2003 Keio University
 #
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #
@@ -45,12 +45,12 @@ from ViewComponent import *
 
 class MultiLineEditor(ViewComponent):
 
-	#######################
-	#    GENERAL CASES    #
-	#######################
+    #######################
+    #    GENERAL CASES    #
+    #######################
 
-	def __init__( self, aParentWindow, pointOfAttach ):
-	
-		# call superclass
-		ViewComponent.__init__( self,  aParentWindow, pointOfAttach, 'attachment_box' )
+    def __init__( self, aParentWindow, pointOfAttach ):
+    
+        # call superclass
+        ViewComponent.__init__( self,  aParentWindow, pointOfAttach, 'attachment_box' )
 

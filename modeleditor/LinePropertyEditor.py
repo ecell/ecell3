@@ -1,8 +1,8 @@
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #
-#		This file is part of E-CELL Model Editor package
+#       This file is part of E-CELL Model Editor package
 #
-#				Copyright (C) 1996-2003 Keio University
+#               Copyright (C) 1996-2003 Keio University
 #
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #
@@ -44,61 +44,61 @@ import string
 class LinePropertyEditor( ListWindow ):
 
 
-	def __init__( self, theModelEditor ):
+    def __init__( self, theModelEditor ):
                
-		"""
-		in: ModelEditor theModelEditor
-		returns nothing
-		"""
-		self.theModelEditor=theModelEditor
-		# init superclass
-		ListWindow.__init__( self, theModelEditor )
+        """
+        in: ModelEditor theModelEditor
+        returns nothing
+        """
+        self.theModelEditor=theModelEditor
+        # init superclass
+        ListWindow.__init__( self, theModelEditor )
 
 
-	def openWindow( self ):
-		"""
-		in: nothing
-		returns nothing
-		"""
+    def openWindow( self ):
+        """
+        in: nothing
+        returns nothing
+        """
 
-		# superclass openwindow
-		ListWindow.openWindow( self )
+        # superclass openwindow
+        ListWindow.openWindow( self )
 
-		# add signal handlers
-
-
-		self.addHandlers({ 
-				'on_CreateButton_clicked' : self.__create_layout,\
-				'on_DeleteButton_clicked' : self.__delete_layout,\
-				'on_CopyButton_clicked' : self.__copy_layout,\
-				'on_ShowButton_clicked' : self.__show_layout,\
-				'on_btnSet_clicked'	: self.__set_properties,\
-				 })
+        # add signal handlers
 
 
-        def deleted( self, *args ):
-		
-		ListWindow.deleted( self, args )
-		self.theModelEditor.toggleOpenLayoutWindow(False)
+        self.addHandlers({ 
+                'on_CreateButton_clicked' : self.__create_layout,\
+                'on_DeleteButton_clicked' : self.__delete_layout,\
+                'on_CopyButton_clicked' : self.__copy_layout,\
+                'on_ShowButton_clicked' : self.__show_layout,\
+                'on_btnSet_clicked' : self.__set_properties,\
+                 })
 
-	def __create_layout( self, *args ):
-		#pass
-		self.theModelEditor.signalHandlerCreate()
 
-	def __delete_layout( self, *args ):
-		#pass
-		self.theModelEditor.signalHandlerDelete()
+    def deleted( self, *args ):
+        
+        ListWindow.deleted( self, args )
+        self.theModelEditor.toggleOpenLayoutWindow(False)
 
-	def __copy_layout( self, *args ):
-		#pass
-		self.theModelEditor.signalHandlerCopy()
+    def __create_layout( self, *args ):
+        #pass
+        self.theModelEditor.signalHandlerCreate()
 
-	def __show_layout( self, *args ):
-		#pass
-		#self.theModelEditor.signalHandlerShow()
-		self.theModelEditor.createLinePropertyEditorWindow()
+    def __delete_layout( self, *args ):
+        #pass
+        self.theModelEditor.signalHandlerDelete()
 
-	def __set_properties( self, *args):
-		self.theModelEditor.displayLineProperties("Line Properties ...")
+    def __copy_layout( self, *args ):
+        #pass
+        self.theModelEditor.signalHandlerCopy()
+
+    def __show_layout( self, *args ):
+        #pass
+        #self.theModelEditor.signalHandlerShow()
+        self.theModelEditor.createLinePropertyEditorWindow()
+
+    def __set_properties( self, *args):
+        self.theModelEditor.displayLineProperties("Line Properties ...")
 
 

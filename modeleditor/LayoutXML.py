@@ -5,7 +5,7 @@ LXML_DOC_STRING = '<sbml xmlns="http://www.sbml.org/sbml/level2" level="2" versi
       xmlns:sl2="http://projects.eml.org/bcb/sbml/level2"\
       xsi:schemaLocation="http://projects.eml.org/bcb/sbml/level2 \
                http://projects.eml.org/bcb/sbml/level2/layout2.xsd">\
-		<model></model><annotation></annotation></sbml>'
+        <model></model><annotation></annotation></sbml>'
 
 LXML_LAYOUTLIST = 'sl2:listOfLayouts'
 LXML_LAYOUT = 'sl2:layout'
@@ -23,46 +23,46 @@ LXML_CURVESEGMENT="sl2:curveSegment"
 
 class LayoutXML:
 
-	def __init__( self, aText=None ):
-		if aText==None:
-			self.theDocument = minidom.parseString(DOC_STRING)
-		else:
-			self.theDocument = minidom.parseString( aText)
+    def __init__( self, aText=None ):
+        if aText==None:
+            self.theDocument = minidom.parseString(DOC_STRING)
+        else:
+            self.theDocument = minidom.parseString( aText)
 
 
-	def getEmlName( self ):
-		pass
+    def getEmlName( self ):
+        pass
 
 
-	def setEmlName( self, aName ):
-		pass
+    def setEmlName( self, aName ):
+        pass
 
 
-	def getLayoutList( self ):
-		pass
+    def getLayoutList( self ):
+        pass
 
 
-	def createLayout( self, aLayoutName ):
-		pass
+    def createLayout( self, aLayoutName ):
+        pass
 
 
-	def getLayoutProperty( self, aLayoutName, aPropertyName):
-		pass
+    def getLayoutProperty( self, aLayoutName, aPropertyName):
+        pass
 
 
-	def setLayoutProperty( self, aLayoutName, aPropertyName, aPropertyValue ):
-		pass
+    def setLayoutProperty( self, aLayoutName, aPropertyName, aPropertyValue ):
+        pass
 
-	def createObject( self, aLayoutName, aObjectName, aObjectType='SHAPE'):
-		pass
+    def createObject( self, aLayoutName, aObjectName, aObjectType='SHAPE'):
+        pass
 
-	def getObjectList( self, aLayoutName, aObjectType='SHAPE'):
-		pass
+    def getObjectList( self, aLayoutName, aObjectType='SHAPE'):
+        pass
 
 
-	def getObjectProperty( self, aLayoutName, aObjectName, aPropertyName, aObjectType ='SHAPE'):
-		pass
+    def getObjectProperty( self, aLayoutName, aObjectName, aPropertyName, aObjectType ='SHAPE'):
+        pass
 
-	def setObjectProperty( self, aLayoutName, aObjectName, aPropertyName, aPropertyValue, aObjectType ='SHAPE'):
-		pass
+    def setObjectProperty( self, aLayoutName, aObjectName, aPropertyName, aPropertyValue, aObjectType ='SHAPE'):
+        pass
 

@@ -14,321 +14,321 @@ from types import *
 
 class LayoutEml:
 
-	
-	def __init__( self, aFileObject=None ):
-		"""read EML file and make domtree"""
+    
+    def __init__( self, aFileObject=None ):
+        """read EML file and make domtree"""
 
-		if aFileObject is None:
-			aStringData = '<?xml version="1.0" ?><leml></leml>'
-		else:
-			aStringData = string.join( string.join( aFileObject.readlines(), '' ).split( '\n' ), '' )
+        if aFileObject is None:
+            aStringData = '<?xml version="1.0" ?><leml></leml>'
+        else:
+            aStringData = string.join( string.join( aFileObject.readlines(), '' ).split( '\n' ), '' )
 
-		# minidom.parseString() is much faster than minidom.parse().. why?
-		self.__theDocument = minidom.parseString( aStringData )
-#		self.__clearCache()
-		self.__reconstructCache()
+        # minidom.parseString() is much faster than minidom.parse().. why?
+        self.__theDocument = minidom.parseString( aStringData )
+#       self.__clearCache()
+        self.__reconstructCache()
 
-	def destroy( self ):
-		self.__theDocument.unlink()
+    def destroy( self ):
+        self.__theDocument.unlink()
 
-	def asString( self ):
-		"""return domtree as string"""
+    def asString( self ):
+        """return domtree as string"""
 
-		return self.__theDocument.toprettyxml(indent="", newl="\n")
+        return self.__theDocument.toprettyxml(indent="", newl="\n")
 
 
-	def save( self, anOutputFile ):
-		"""save domtree as an EML file"""
-		
-		anEmlString = self.asString()
-		
-		anOutputFileObject = open( anOutputFile, 'w' )
-		anOutputFileObject.write( anEmlString )
+    def save( self, anOutputFile ):
+        """save domtree as an EML file"""
+        
+        anEmlString = self.asString()
+        
+        anOutputFileObject = open( anOutputFile, 'w' )
+        anOutputFileObject.write( anEmlString )
 
 
 
-	##---------------------------------------------
-	## Methods for LAYOUT
-	##---------------------------------------------
+    ##---------------------------------------------
+    ## Methods for LAYOUT
+    ##---------------------------------------------
 
-	def createLayout( self, aName ):
-		"""create a layout"""
-		aLayoutElement = self.__createElement( 'layout' )
-		aLayoutElement.setAttribute( 'name', aName )
-		self.__theDocument.documentElement.childNodes.append( aLayoutElement )
-		self.__addToCache( aLayoutElement, aName )
+    def createLayout( self, aName ):
+        """create a layout"""
+        aLayoutElement = self.__createElement( 'layout' )
+        aLayoutElement.setAttribute( 'name', aName )
+        self.__theDocument.documentElement.childNodes.append( aLayoutElement )
+        self.__addToCache( aLayoutElement, aName )
 
 
-	def getLayoutList( self ):
+    def getLayoutList( self ):
 
-		return self.__layoutCache.keys()
+        return self.__layoutCache.keys()
 
-	def getListTest(self):
-		return self.__layoutCache
-	def getLayoutPropertyList( self, aLayoutName ):
+    def getListTest(self):
+        return self.__layoutCache
+    def getLayoutPropertyList( self, aLayoutName ):
 
-		aLayoutNode = self.__getLayoutNode( aLayoutName )
-		aPropertyList = []
+        aLayoutNode = self.__getLayoutNode( aLayoutName )
+        aPropertyList = []
 
-		for aChildNode in aLayoutNode.childNodes:
+        for aChildNode in aLayoutNode.childNodes:
 
-			if aChildNode.nodeName == 'property':
+            if aChildNode.nodeName == 'property':
 
-				aPropertyNode = aChildNode
-				aPropertyName = aPropertyNode.getAttribute( 'name' )
-				aPropertyList.append( str( aPropertyName ) )
+                aPropertyNode = aChildNode
+                aPropertyName = aPropertyNode.getAttribute( 'name' )
+                aPropertyList.append( str( aPropertyName ) )
 
-		return aPropertyList
+        return aPropertyList
 
 
 
-	def getLayoutProperty( self, aLayoutName, aPropertyName ):
+    def getLayoutProperty( self, aLayoutName, aPropertyName ):
 
-		aValueList = None
+        aValueList = None
 
-		aLayoutNode = self.__getLayoutNode( aLayoutName )
-		for aPropertyNode in aLayoutNode.childNodes:
+        aLayoutNode = self.__getLayoutNode( aLayoutName )
+        for aPropertyNode in aLayoutNode.childNodes:
 
-			if aPropertyNode.nodeName == 'property':
+            if aPropertyNode.nodeName == 'property':
 
-				if aPropertyNode.getAttribute( 'name' ) == aPropertyName:
+                if aPropertyNode.getAttribute( 'name' ) == aPropertyName:
 
-					aValueList = self.__createValueList( aPropertyNode )
-		if aValueList == None:
-			raise "No %s property in layout %s"%(aPropertyName, aLayoutName )
-		return aValueList[0]
+                    aValueList = self.__createValueList( aPropertyNode )
+        if aValueList == None:
+            raise "No %s property in layout %s"%(aPropertyName, aLayoutName )
+        return aValueList[0]
 
 
-	def setLayoutProperty( self, aLayoutName, aPropertyName, aValue ):
-		# what if a property with the same name already exist?
-		aPropertyElement = self.__createPropertyNode( aPropertyName, aValue )
-		aLayoutNode = self.__getLayoutNode( aLayoutName )
-		aLayoutNode.appendChild( aPropertyElement )
+    def setLayoutProperty( self, aLayoutName, aPropertyName, aValue ):
+        # what if a property with the same name already exist?
+        aPropertyElement = self.__createPropertyNode( aPropertyName, aValue )
+        aLayoutNode = self.__getLayoutNode( aLayoutName )
+        aLayoutNode.appendChild( aPropertyElement )
 
 
-	def __getLayoutNode( self, aLayoutName ):
-		"""private"""
-		
-		return self.__findInCache( aLayoutName )
+    def __getLayoutNode( self, aLayoutName ):
+        """private"""
+        
+        return self.__findInCache( aLayoutName )
 
 
 
-	##---------------------------------------------
-	## Methods for OBJECTS 
-	##---------------------------------------------
+    ##---------------------------------------------
+    ## Methods for OBJECTS 
+    ##---------------------------------------------
 
-	def createObject( self, aType, aLayoutName, anObjectID, parentID = 'layout' ):
-		# find parent
-		aParentNode = self.__findInCache( aLayoutName, parentID )
-		anObjectElement = self.__createElement( aType.lower() )
-		anObjectElement.setAttribute( 'id', anObjectID )
-		aParentNode.appendChild( anObjectElement )
-		self.__addToCache( anObjectElement, aLayoutName, anObjectID )
+    def createObject( self, aType, aLayoutName, anObjectID, parentID = 'layout' ):
+        # find parent
+        aParentNode = self.__findInCache( aLayoutName, parentID )
+        anObjectElement = self.__createElement( aType.lower() )
+        anObjectElement.setAttribute( 'id', anObjectID )
+        aParentNode.appendChild( anObjectElement )
+        self.__addToCache( anObjectElement, aLayoutName, anObjectID )
 
 
 
-	def setObjectProperty( self, aLayoutName, anObjectID, aPropertyName, aValueList ):
-		# reject objects
-		if type( aValueList ) == type( self ):
-			return
+    def setObjectProperty( self, aLayoutName, anObjectID, aPropertyName, aValueList ):
+        # reject objects
+        if type( aValueList ) == type( self ):
+            return
 
-		anObjectPropertyElement = self.__createPropertyNode( aPropertyName,\
-														aValueList )
+        anObjectPropertyElement = self.__createPropertyNode( aPropertyName,\
+                                                        aValueList )
 
-		aTargetNode = self.__getObjectNode( aLayoutName, anObjectID )
-		aTargetNode.appendChild( anObjectPropertyElement )
+        aTargetNode = self.__getObjectNode( aLayoutName, anObjectID )
+        aTargetNode.appendChild( anObjectPropertyElement )
 
 
 
-	def getObjectList( self, anObjectType, aLayoutName, aParentID = 'layout' ):
+    def getObjectList( self, anObjectType, aLayoutName, aParentID = 'layout' ):
 
-		anObjectType = anObjectType.lower()
+        anObjectType = anObjectType.lower()
 
-		anObjectList = []
-		aParentNode = self.__findInCache( aLayoutName, aParentID )
-		
-		for aNode in aParentNode.childNodes:
-			if aNode.nodeName == anObjectType:
-				anObjectList.append( str( aNode.getAttribute( 'id' ) ) )
+        anObjectList = []
+        aParentNode = self.__findInCache( aLayoutName, aParentID )
+        
+        for aNode in aParentNode.childNodes:
+            if aNode.nodeName == anObjectType:
+                anObjectList.append( str( aNode.getAttribute( 'id' ) ) )
 
-		return anObjectList
+        return anObjectList
 
 
 
-	def getObjectPropertyList( self, aLayoutName, anObjectID ):
+    def getObjectPropertyList( self, aLayoutName, anObjectID ):
 
-		anObjectNode = self.__getObjectNode( aLayoutName, anObjectID )
-		anObjectPropertyList = []
-		
-		for aChildNode in anObjectNode.childNodes:
-			if aChildNode.nodeName == 'property':
+        anObjectNode = self.__getObjectNode( aLayoutName, anObjectID )
+        anObjectPropertyList = []
+        
+        for aChildNode in anObjectNode.childNodes:
+            if aChildNode.nodeName == 'property':
 
-				anObjectPropertyList.append( str( aChildNode.getAttribute( 'name' ) ) )
+                anObjectPropertyList.append( str( aChildNode.getAttribute( 'name' ) ) )
 
-		return anObjectPropertyList
+        return anObjectPropertyList
 
 
 
-	def getObjectProperty( self, aLayoutName, anObjectID, aPropertyName ):
-		aPropertyNode = self.__getObjectPropertyNode( aLayoutName, anObjectID, aPropertyName )
-		
-		return self.__createValueList( aPropertyNode )[0]
+    def getObjectProperty( self, aLayoutName, anObjectID, aPropertyName ):
+        aPropertyNode = self.__getObjectPropertyNode( aLayoutName, anObjectID, aPropertyName )
+        
+        return self.__createValueList( aPropertyNode )[0]
 
 
 
 
-	def __getObjectNode( self, aLayoutName, anObjectID ):
+    def __getObjectNode( self, aLayoutName, anObjectID ):
 
-		# first look up the cache
-		return self.__findInCache( aLayoutName, anObjectID )
+        # first look up the cache
+        return self.__findInCache( aLayoutName, anObjectID )
 
 
-	def __getObjectPropertyNode( self, aLayoutName, anObjectID, aPropertyName ):
+    def __getObjectPropertyNode( self, aLayoutName, anObjectID, aPropertyName ):
 
-		anObjectNode = self.__getObjectNode( aLayoutName, anObjectID )
+        anObjectNode = self.__getObjectNode( aLayoutName, anObjectID )
 
-		# what if multiple propety elements with the same name exist?
-		for aChildNode in anObjectNode.childNodes:
+        # what if multiple propety elements with the same name exist?
+        for aChildNode in anObjectNode.childNodes:
 
-			if aChildNode.nodeName == 'property' and \
-				   aChildNode.getAttribute( 'name' ) == aPropertyName:
+            if aChildNode.nodeName == 'property' and \
+                   aChildNode.getAttribute( 'name' ) == aPropertyName:
 
-				return aChildNode
+                return aChildNode
 
 
 
-	##-------------------------------------------
-	## Cache manipulations
-	##-------------------------------------------
+    ##-------------------------------------------
+    ## Cache manipulations
+    ##-------------------------------------------
 
-	def __findInCache( self, aLayoutName, anObjectID = None ):
+    def __findInCache( self, aLayoutName, anObjectID = None ):
 
-		if anObjectID == None:
-			return self.__layoutCache[ aLayoutName ][ 'layout' ]
-		else:
-			return self.__layoutCache[ aLayoutName ][anObjectID ]
+        if anObjectID == None:
+            return self.__layoutCache[ aLayoutName ][ 'layout' ]
+        else:
+            return self.__layoutCache[ aLayoutName ][anObjectID ]
 
 
-	def __addToCache( self, aNode, aLayoutName, anObjectID = None ):
-		if anObjectID == None:
-			self.__layoutCache[ aLayoutName ] = {}
-			self.__layoutCache[ aLayoutName ][ 'layout' ] = aNode
-		else:
-			self.__layoutCache[ aLayoutName ][ anObjectID ] = aNode
+    def __addToCache( self, aNode, aLayoutName, anObjectID = None ):
+        if anObjectID == None:
+            self.__layoutCache[ aLayoutName ] = {}
+            self.__layoutCache[ aLayoutName ][ 'layout' ] = aNode
+        else:
+            self.__layoutCache[ aLayoutName ][ anObjectID ] = aNode
 
 
-	def __processNode( self, aNode, aLayoutName ):
-		
-		for aChildNode in aNode.childNodes:
-			
-			# check if ChildNode is system, process, variable, connection, text
+    def __processNode( self, aNode, aLayoutName ):
+        
+        for aChildNode in aNode.childNodes:
+            
+            # check if ChildNode is system, process, variable, connection, text
 
-			if aChildNode.nodeName in ("system", "process","variable","connection","text"):
-				
-				self.__addToCache( aChildNode, aLayoutName, aChildNode.getAttribute( 'id'))
-				# if it is system, call self recursively
-				if aChildNode.nodeName == "system":
-					self.__processNode( aChildNode, aLayoutName)	
-					
+            if aChildNode.nodeName in ("system", "process","variable","connection","text"):
+                
+                self.__addToCache( aChildNode, aLayoutName, aChildNode.getAttribute( 'id'))
+                # if it is system, call self recursively
+                if aChildNode.nodeName == "system":
+                    self.__processNode( aChildNode, aLayoutName)    
+                    
 
-	def __clearCache( self ):
+    def __clearCache( self ):
 
-		self.__layoutCache = {}
+        self.__layoutCache = {}
 
 
-	def __reconstructCache( self ):
+    def __reconstructCache( self ):
 
-		self.__clearCache()
-		for aLayoutNode in self.__theDocument.firstChild.childNodes:
-			aLayoutName = aLayoutNode.getAttribute( 'name' )
-			self.__addToCache( aLayoutNode, aLayoutName )
-			self.__processNode( aLayoutNode, aLayoutName )
+        self.__clearCache()
+        for aLayoutNode in self.__theDocument.firstChild.childNodes:
+            aLayoutName = aLayoutNode.getAttribute( 'name' )
+            self.__addToCache( aLayoutNode, aLayoutName )
+            self.__processNode( aLayoutNode, aLayoutName )
 
 
 
-	##---------------------------------------------
-	## Methods for Methods
-	##---------------------------------------------
+    ##---------------------------------------------
+    ## Methods for Methods
+    ##---------------------------------------------
 
-	def __createElement( self, aTagName ):
-		"""make an element"""
-		return self.__theDocument.createElement( aTagName )
+    def __createElement( self, aTagName ):
+        """make an element"""
+        return self.__theDocument.createElement( aTagName )
 
 
-	def __createPropertyNode( self, aPropertyName, aValueList ):
-		aValueList = [ aValueList ]
-		aValueList = self.__convertPropertyValueList( aValueList )
-		aPropertyElement = self.__createElement( 'property' )
-		aPropertyElement.setAttribute( 'name', aPropertyName )
+    def __createPropertyNode( self, aPropertyName, aValueList ):
+        aValueList = [ aValueList ]
+        aValueList = self.__convertPropertyValueList( aValueList )
+        aPropertyElement = self.__createElement( 'property' )
+        aPropertyElement.setAttribute( 'name', aPropertyName )
 
-		map( aPropertyElement.appendChild,\
-			 map( self.__createValueNode, aValueList ) )
+        map( aPropertyElement.appendChild,\
+             map( self.__createValueNode, aValueList ) )
 
-		return aPropertyElement
+        return aPropertyElement
 
 
-	def __createValueNode( self, aValue ):
+    def __createValueNode( self, aValue ):
 
-		aValueNode = self.__createElement( 'value' )
-		if type( aValue ) in ( types.TupleType, types.ListType ):	# vector value
+        aValueNode = self.__createElement( 'value' )
+        if type( aValue ) in ( types.TupleType, types.ListType ):   # vector value
 
-			map( aValueNode.appendChild,\
-				 map( self.__createValueNode, aValue ) )
+            map( aValueNode.appendChild,\
+                 map( self.__createValueNode, aValue ) )
 
-		else:		# scaler value
+        else:       # scaler value
 
-			aNormalizedValue =  string.replace( aValue, '\n', '#x0A' )
-			aValueData = self.__theDocument.createTextNode( aNormalizedValue )
-			aValueNode.appendChild( aValueData )
+            aNormalizedValue =  string.replace( aValue, '\n', '#x0A' )
+            aValueData = self.__theDocument.createTextNode( aNormalizedValue )
+            aValueNode.appendChild( aValueData )
 
 
-		return aValueNode
+        return aValueNode
 
 
-	def __createValueList( self, aValueNode ):
-		aNode = aValueNode.firstChild
-		if aNode ==None:
-			return 
-		aNodeType = aNode.nodeType
-		
+    def __createValueList( self, aValueNode ):
+        aNode = aValueNode.firstChild
+        if aNode ==None:
+            return 
+        aNodeType = aNode.nodeType
+        
 
-		if aNodeType == aValueNode.TEXT_NODE:
+        if aNodeType == aValueNode.TEXT_NODE:
 
-			aValue = string.replace( str( aNode.nodeValue ), '#x0A', '\n')
-			try:
-				aValue = int (aValue )
-			except:
-				try:
-					aValue = float( aValue)
-				except:
-					pass
+            aValue = string.replace( str( aNode.nodeValue ), '#x0A', '\n')
+            try:
+                aValue = int (aValue )
+            except:
+                try:
+                    aValue = float( aValue)
+                except:
+                    pass
 
-			return aValue
+            return aValue
 
-		elif aNodeType == aValueNode.ELEMENT_NODE:
+        elif aNodeType == aValueNode.ELEMENT_NODE:
 
-			return map( self.__createValueList, aValueNode.childNodes )
+            return map( self.__createValueList, aValueNode.childNodes )
 
-		else:
-			raise "unexpected error."
+        else:
+            raise "unexpected error."
 
 
-	def __convertPropertyValueList( self, aValueList ):
+    def __convertPropertyValueList( self, aValueList ):
 
-		aList = list()
-#		if type( aValueList ) not in [ type( () ), type( [] ) ]:
-#			return [ str(aValueList) ]
+        aList = list()
+#       if type( aValueList ) not in [ type( () ), type( [] ) ]:
+#           return [ str(aValueList) ]
 
-		for aValueListNode in aValueList:
+        for aValueListNode in aValueList:
 
-			if type( aValueListNode ) in ( type([]), type( () ) ):
+            if type( aValueListNode ) in ( type([]), type( () ) ):
 
-				aConvertedList = self.__convertPropertyValueList( aValueListNode )
-				aList.append( aConvertedList )
-			else:
-				aList.append( str(aValueListNode ) )
+                aConvertedList = self.__convertPropertyValueList( aValueListNode )
+                aList.append( aConvertedList )
+            else:
+                aList.append( str(aValueListNode ) )
 
-		return aList
+        return aList
 
 
 
@@ -678,9 +678,9 @@ class Eml:
         self.__entityNodeCache = {}
 
     def __destroyCache( self ):
-		for aNode in self.__entityNodeCache.values():
-		    aNode= None
-		self.__clearCache()
+        for aNode in self.__entityNodeCache.values():
+            aNode= None
+        self.__clearCache()
 
     def __reconstructCache( self ):
 

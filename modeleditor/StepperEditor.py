@@ -2,9 +2,9 @@
 
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #
-#		This file is part of E-CELL Model Editor package
+#       This file is part of E-CELL Model Editor package
 #
-#				Copyright (C) 1996-2003 Keio University
+#               Copyright (C) 1996-2003 Keio University
 #
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #
@@ -46,220 +46,220 @@ from StepperCommand import *
 
 class StepperEditor(ViewComponent):
 
-	#######################
-	#    GENERAL CASES    #
-	#######################
+    #######################
+    #    GENERAL CASES    #
+    #######################
 
-	def __init__( self, aParentWindow, pointOfAttach ):
+    def __init__( self, aParentWindow, pointOfAttach ):
 
-		# call superclass
-		ViewComponent.__init__( self,  pointOfAttach, 'attachment_box' , 'ObjectEditor.glade' )
-		self.theParentWindow = aParentWindow
-		self.updateInProgress = False
-		self.theInfoBuffer = gtk.TextBuffer()
-		self.theDescriptionBuffer = gtk.TextBuffer()
-		self['classname_desc'].set_buffer( self.theDescriptionBuffer )
-		self['user_info'].set_buffer( self.theInfoBuffer )
+        # call superclass
+        ViewComponent.__init__( self,  pointOfAttach, 'attachment_box' , 'ObjectEditor.glade' )
+        self.theParentWindow = aParentWindow
+        self.updateInProgress = False
+        self.theInfoBuffer = gtk.TextBuffer()
+        self.theDescriptionBuffer = gtk.TextBuffer()
+        self['classname_desc'].set_buffer( self.theDescriptionBuffer )
+        self['user_info'].set_buffer( self.theInfoBuffer )
 
-		# add handlers
-		self.addHandlers({
-				'on_combo-entry_changed' : self.__change_class, \
-				'on_editor_notebook_switch_page' : self.__select_page,
-				'on_ID_entry_editing_done' : self.__change_name,
-				'on_user_info_move_focus' : self.__change_info
-				})
-		
+        # add handlers
+        self.addHandlers({
+                'on_combo-entry_changed' : self.__change_class, \
+                'on_editor_notebook_switch_page' : self.__select_page,
+                'on_ID_entry_editing_done' : self.__change_name,
+                'on_user_info_move_focus' : self.__change_info
+                })
+        
 
-		# initate Editors
-		self.thePropertyList = PropertyList( self.theParentWindow, self['PropertyListFrame'] )
-			
-		self['vbox4'].remove( self['hbox3'] ) 
-		#self['hbox3'] = None
+        # initate Editors
+        self.thePropertyList = PropertyList( self.theParentWindow, self['PropertyListFrame'] )
+            
+        self['vbox4'].remove( self['hbox3'] ) 
+        #self['hbox3'] = None
 
-		# make sensitive change class button for process
-		self['class_combo'].set_sensitive( gtk.TRUE )
+        # make sensitive change class button for process
+        self['class_combo'].set_sensitive( gtk.TRUE )
 
-		self.theModelEditor = self.theParentWindow.theModelEditor
-		self.setDisplayedStepper( None )
-
-
-
-	def close( self ):
-		"""
-		closes subcomponenets
-		"""
-		self.thePropertyList.close()
-		ViewComponent.close(self)
-
-
-	def getDisplayedStepper( self ):
-		"""
-		returns displayed Stepper
-		"""
-		return self.theDisplayedStepper
-
-
-	def update ( self ):
-		"""
-		"""
-
-		# update Name
-		self.updateEditor()
-
-		# update propertyeditor
-
-		self.thePropertyList.update()
+        self.theModelEditor = self.theParentWindow.theModelEditor
+        self.setDisplayedStepper( None )
 
 
 
-	def updateEditor( self ):
-		self.updateInProgress = True
-		editableFlag = gtk.FALSE
-		if self.theDisplayedStepper != None:
-			editableFlag = gtk.TRUE
-		self['ID_entry'].set_sensitive ( editableFlag )
-		self['user_info'].set_sensitive( editableFlag )		
-
-		if self.theDisplayedStepper !=None:
-			nameText = self.theDisplayedStepper
-		else:
-			nameText = ''
-		self['ID_entry'].set_text( nameText )
-		# delete class list from combo
-		self['class_combo'].entry.set_text('')
-		self['class_combo'].set_popdown_strings([''])
-		self['class_combo'].set_sensitive( gtk.FALSE )
-		self['class_combo'].set_data( 'selection', '' )
-		descText = ''
-
-		if self.theDisplayedStepper != None:
-			self['class_combo'].set_sensitive( gtk.TRUE )
-
-			# get class list
-			classStore = copyValue ( self.theModelEditor.getDMInfo().getClassList( ME_STEPPER_TYPE) )
-
-		
-			# get actual class
-
-			actualclass = self.theModelEditor.getModel().getStepperClassName( self.theDisplayedStepper )
-			self['class_combo'].set_popdown_strings(classStore)
-		
-			# select class
-			self['class_combo'].entry.set_text( actualclass )
-
-			self['class_combo'].set_data( 'selection', actualclass )
-			descText = self.theModelEditor.getDMInfo().getClassInfo( actualclass, DM_DESCRIPTION )
-
-		self.__setDescriptionText( descText )
+    def close( self ):
+        """
+        closes subcomponenets
+        """
+        self.thePropertyList.close()
+        ViewComponent.close(self)
 
 
-		infoText = ''
-		if self.theDisplayedStepper != None:
-			infoText = self.theModelEditor.getModel().getStepperInfo( self.theDisplayedStepper)
-		self.__setInfoText( infoText )
-		self.updateInProgress = False
+    def getDisplayedStepper( self ):
+        """
+        returns displayed Stepper
+        """
+        return self.theDisplayedStepper
+
+
+    def update ( self ):
+        """
+        """
+
+        # update Name
+        self.updateEditor()
+
+        # update propertyeditor
+
+        self.thePropertyList.update()
 
 
 
-	def setDisplayedStepper ( self, selectedID ):
-		"""
-		"""
+    def updateEditor( self ):
+        self.updateInProgress = True
+        editableFlag = gtk.FALSE
+        if self.theDisplayedStepper != None:
+            editableFlag = gtk.TRUE
+        self['ID_entry'].set_sensitive ( editableFlag )
+        self['user_info'].set_sensitive( editableFlag )     
 
-		self.theDisplayedStepper = selectedID 
+        if self.theDisplayedStepper !=None:
+            nameText = self.theDisplayedStepper
+        else:
+            nameText = ''
+        self['ID_entry'].set_text( nameText )
+        # delete class list from combo
+        self['class_combo'].entry.set_text('')
+        self['class_combo'].set_popdown_strings([''])
+        self['class_combo'].set_sensitive( gtk.FALSE )
+        self['class_combo'].set_data( 'selection', '' )
+        descText = ''
 
-		# sets displayed Stepper for Property Editor
-		self.thePropertyList.setDisplayedEntity(ME_STEPPER_TYPE,  self.theDisplayedStepper )
-		self.updateEditor()
+        if self.theDisplayedStepper != None:
+            self['class_combo'].set_sensitive( gtk.TRUE )
 
+            # get class list
+            classStore = copyValue ( self.theModelEditor.getDMInfo().getClassList( ME_STEPPER_TYPE) )
 
-	def addLayoutEditor( self, aLayoutEditor ):
-		pass
+        
+            # get actual class
 
+            actualclass = self.theModelEditor.getModel().getStepperClassName( self.theDisplayedStepper )
+            self['class_combo'].set_popdown_strings(classStore)
+        
+            # select class
+            self['class_combo'].entry.set_text( actualclass )
 
-	def changeClass( self, newClass ):
-		currentClass = self.theModelEditor.getModel().getStepperClassName( self.theDisplayedStepper )
-		if currentClass == newClass:
-			return
-		aCommand = ChangeStepperClass( self.theModelEditor, newClass, self.theDisplayedStepper )
-		self.theModelEditor.doCommandList( [ aCommand ] )
+            self['class_combo'].set_data( 'selection', actualclass )
+            descText = self.theModelEditor.getDMInfo().getClassInfo( actualclass, DM_DESCRIPTION )
 
-
-	def changeName ( self, newName ):
-
-		aCommand = RenameStepper( self.theModelEditor, self.theDisplayedStepper, newName )
-		if aCommand.isExecutable:
-			self.theDisplayedStepper = newName
-			self.noActivate = True
-			self.theModelEditor.doCommandList ( [ aCommand ] )
-			self.noActivate = False
-			self.theParentWindow.selectStepper( [newName ] )
-		else:
-			self.theModelEditor.printMessage( "%s cannot be renamed to %s"%(self.theDisplayedStepper, newName ), ME_ERROR )
-			self.updateEditor()
-
-
-	def changeInfo( self, newInfo ):
-		oldInfo = self.theModelEditor.getModel().getStepperInfo( self.theDisplayedStepper )
-		if oldInfo == newInfo:
-			return
-		aCommand = SetStepperInfo( self.theModelEditor, self.theDisplayedStepper, newInfo )
-		self.theModelEditor.doCommandList( [ aCommand ] )
+        self.__setDescriptionText( descText )
 
 
-
-	#########################################
-	#    Private methods/Signal Handlers    #
-	#########################################
-
-
-	
-	def __change_class( self, *args ):
-		"""
-		called when class is to be changed
-		"""
-		if args[0].get_text() == '':
-			return
-		if self.updateInProgress:
-			return
-		newClass = self['class_combo'].entry.get_text()
-
-		self.changeClass( newClass )
+        infoText = ''
+        if self.theDisplayedStepper != None:
+            infoText = self.theModelEditor.getModel().getStepperInfo( self.theDisplayedStepper)
+        self.__setInfoText( infoText )
+        self.updateInProgress = False
 
 
 
-	def __select_page( self, *args ):
-		"""
-		called when editor pages are selected
-		"""
-		pass
+    def setDisplayedStepper ( self, selectedID ):
+        """
+        """
+
+        self.theDisplayedStepper = selectedID 
+
+        # sets displayed Stepper for Property Editor
+        self.thePropertyList.setDisplayedEntity(ME_STEPPER_TYPE,  self.theDisplayedStepper )
+        self.updateEditor()
 
 
-	def __change_name ( self, *args ):
-		
-		if self.updateInProgress:
-			return
-
-		newName = self['ID_entry'].get_text()
-		self.changeName( newName )
+    def addLayoutEditor( self, aLayoutEditor ):
+        pass
 
 
-	def __change_info( self, *args ):
-		if self.updateInProgress:
-			return
-		newInfo = self.__getInfoText()
-		self.changeInfo( newInfo )
+    def changeClass( self, newClass ):
+        currentClass = self.theModelEditor.getModel().getStepperClassName( self.theDisplayedStepper )
+        if currentClass == newClass:
+            return
+        aCommand = ChangeStepperClass( self.theModelEditor, newClass, self.theDisplayedStepper )
+        self.theModelEditor.doCommandList( [ aCommand ] )
 
 
-	def __setDescriptionText( self, textString ):
-		self.theDescriptionBuffer.set_text( textString )
+    def changeName ( self, newName ):
+
+        aCommand = RenameStepper( self.theModelEditor, self.theDisplayedStepper, newName )
+        if aCommand.isExecutable:
+            self.theDisplayedStepper = newName
+            self.noActivate = True
+            self.theModelEditor.doCommandList ( [ aCommand ] )
+            self.noActivate = False
+            self.theParentWindow.selectStepper( [newName ] )
+        else:
+            self.theModelEditor.printMessage( "%s cannot be renamed to %s"%(self.theDisplayedStepper, newName ), ME_ERROR )
+            self.updateEditor()
 
 
-	def __getInfoText( self ):
-		endIter = self.theInfoBuffer.get_end_iter()
-		startIter = self.theInfoBuffer.get_start_iter()
-		return self.theInfoBuffer.get_text( startIter, endIter, gtk.TRUE )
+    def changeInfo( self, newInfo ):
+        oldInfo = self.theModelEditor.getModel().getStepperInfo( self.theDisplayedStepper )
+        if oldInfo == newInfo:
+            return
+        aCommand = SetStepperInfo( self.theModelEditor, self.theDisplayedStepper, newInfo )
+        self.theModelEditor.doCommandList( [ aCommand ] )
 
 
-	def __setInfoText( self, textString ):
-		self.theInfoBuffer.set_text( textString )
+
+    #########################################
+    #    Private methods/Signal Handlers    #
+    #########################################
+
+
+    
+    def __change_class( self, *args ):
+        """
+        called when class is to be changed
+        """
+        if args[0].get_text() == '':
+            return
+        if self.updateInProgress:
+            return
+        newClass = self['class_combo'].entry.get_text()
+
+        self.changeClass( newClass )
+
+
+
+    def __select_page( self, *args ):
+        """
+        called when editor pages are selected
+        """
+        pass
+
+
+    def __change_name ( self, *args ):
+        
+        if self.updateInProgress:
+            return
+
+        newName = self['ID_entry'].get_text()
+        self.changeName( newName )
+
+
+    def __change_info( self, *args ):
+        if self.updateInProgress:
+            return
+        newInfo = self.__getInfoText()
+        self.changeInfo( newInfo )
+
+
+    def __setDescriptionText( self, textString ):
+        self.theDescriptionBuffer.set_text( textString )
+
+
+    def __getInfoText( self ):
+        endIter = self.theInfoBuffer.get_end_iter()
+        startIter = self.theInfoBuffer.get_start_iter()
+        return self.theInfoBuffer.get_text( startIter, endIter, gtk.TRUE )
+
+
+    def __setInfoText( self, textString ):
+        self.theInfoBuffer.set_text( textString )
 

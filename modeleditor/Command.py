@@ -3,152 +3,152 @@ from Utils import *
 
 class Command:
 
-	ARG_NO = 0
-	def __init__(self, aReceiver, *args):
-		"""
-		checks and stores arguments 	
-		after a buffer is passed to a Command, it shouldnt be 
-		changed by other classes
-		"""
-		self.theArgs = copyValue( args)
-		self.theReceiver = aReceiver
-		self.executed = False
-		self.theReverseCommandList = None
-		self.doMultiplex = True
+    ARG_NO = 0
+    def __init__(self, aReceiver, *args):
+        """
+        checks and stores arguments     
+        after a buffer is passed to a Command, it shouldnt be 
+        changed by other classes
+        """
+        self.theArgs = copyValue( args)
+        self.theReceiver = aReceiver
+        self.executed = False
+        self.theReverseCommandList = None
+        self.doMultiplex = True
 
-	def reset( self ):
-		self.executed = False
-		self.theReverseCommandList = None
-	
+    def reset( self ):
+        self.executed = False
+        self.theReverseCommandList = None
+    
 
-	def execute(self):
-		"""
-		executes stored command
-		can only be executed once
-		returns True if successful
-		returns False if command is non executable
-		"""
-		
-		if self.isExecutable() and not self.isExecuted():
+    def execute(self):
+        """
+        executes stored command
+        can only be executed once
+        returns True if successful
+        returns False if command is non executable
+        """
+        
+        if self.isExecutable() and not self.isExecuted():
 
-			self.createReverseCommand()
-			if self.do():
-				self.executed = True
-			else:
-				raise Exception("%s command failed.\n Arguments: %s"%(self.__class__.__name__, self.theArgs) )
-				self.theReverseCommandList = None
-		else:
-			raise Exception("%s command argumentcheck failed. Cannot execute.\n Arguments: %s"%(self.__class__.__name__, self.theArgs) )
-
-
-
-	def isExecuted(self):
-		return self.executed
+            self.createReverseCommand()
+            if self.do():
+                self.executed = True
+            else:
+                raise Exception("%s command failed.\n Arguments: %s"%(self.__class__.__name__, self.theArgs) )
+                self.theReverseCommandList = None
+        else:
+            raise Exception("%s command argumentcheck failed. Cannot execute.\n Arguments: %s"%(self.__class__.__name__, self.theArgs) )
 
 
 
-	def isExecutable(self):
-		return  self.checkArgs()
+    def isExecuted(self):
+        return self.executed
 
 
-	def getReverseCommandList(self):
-		"""
-		creates and returns a reverse commandlist with Buffers
-		can only be called after execution
-		"""
-		return self.theReverseCommandList
+
+    def isExecutable(self):
+        return  self.checkArgs()
 
 
-	def checkArgs( self ):
-		"""
-		return True if self.Args are valid for this command
-		"""
-
-		if len(self.theArgs) != self.ARGS_NO :
-
-			return False
-		return True
+    def getReverseCommandList(self):
+        """
+        creates and returns a reverse commandlist with Buffers
+        can only be called after execution
+        """
+        return self.theReverseCommandList
 
 
-	def do(self):
-		"""
-		perform command
-		return True if successful
-		"""
-		return True
+    def checkArgs( self ):
+        """
+        return True if self.Args are valid for this command
+        """
 
-	def createReverseCommand(self):
-		"""
-		create  reverse command instance(s) and store it in a list as follows:
-		"""
-		self.theReverseCommandList = [ Command( self.theReceiver, [] ) ]
+        if len(self.theArgs) != self.ARGS_NO :
 
-	def getAffectedObject( self ):
-		if self.executed:
-			return self.getAffected()
-		else:
-			return ( None, None )
-
-	
-	def getSecondAffectedObject( self ):
-		if self.executed:
-			return self.getAffected2()
-		else:
-			return ( None, None )
+            return False
+        return True
 
 
-	def getAffected( self ):
-		return ( None, None )
+    def do(self):
+        """
+        perform command
+        return True if successful
+        """
+        return True
 
-	def getAffected2( self ):
-		return ( None, None )
-	
-	def doNotMultiplexReverse( self ):
-		if type(self.theReverseCommandList) == type([]):
-			for aReverseCmd in self.theReverseCommandList:
-				if type(aReverseCmd) != type(self):
-					continue
-				aReverseCmd.doNotMultiplex()
-				
-	def doNotMultiplex( self ):
-		self.doMultiplex = False
-		
+    def createReverseCommand(self):
+        """
+        create  reverse command instance(s) and store it in a list as follows:
+        """
+        self.theReverseCommandList = [ Command( self.theReceiver, [] ) ]
+
+    def getAffectedObject( self ):
+        if self.executed:
+            return self.getAffected()
+        else:
+            return ( None, None )
+
+    
+    def getSecondAffectedObject( self ):
+        if self.executed:
+            return self.getAffected2()
+        else:
+            return ( None, None )
+
+
+    def getAffected( self ):
+        return ( None, None )
+
+    def getAffected2( self ):
+        return ( None, None )
+    
+    def doNotMultiplexReverse( self ):
+        if type(self.theReverseCommandList) == type([]):
+            for aReverseCmd in self.theReverseCommandList:
+                if type(aReverseCmd) != type(self):
+                    continue
+                aReverseCmd.doNotMultiplex()
+                
+    def doNotMultiplex( self ):
+        self.doMultiplex = False
+        
 
 class ModelCommand( Command ):
 
-	"""
-	contains the command name and the buffer needed to execute it
-	can execute the command which can be:
-	"""
+    """
+    contains the command name and the buffer needed to execute it
+    can execute the command which can be:
+    """
 
-	def checkArgs( self ):
+    def checkArgs( self ):
 
-		if not Command.checkArgs(self):
-			return False
+        if not Command.checkArgs(self):
+            return False
 
-		if type( self.theReceiver) == type(self):
+        if type( self.theReceiver) == type(self):
 
-			if self.theReceiver.__class__.__name__ == 'ModelEditor':
-
-
-				self.theModel = self.theReceiver.getModel()
-				self.theBufferFactory = BufferFactory ( self.theModel )
-				self.theBufferPaster = BufferPaster ( self.theModel )
-
-				return True
-
-		return False
+            if self.theReceiver.__class__.__name__ == 'ModelEditor':
 
 
+                self.theModel = self.theReceiver.getModel()
+                self.theBufferFactory = BufferFactory ( self.theModel )
+                self.theBufferPaster = BufferPaster ( self.theModel )
 
-	def isFullPNExist( self, aFullPN ):
+                return True
 
-		# first check whether FullID exists
-		aFullID = getFullID( aFullPN )
-		if not self.theModel.isEntityExist(aFullID ):
-			return False
-		propertyList = self.theModel.getEntityPropertyList( aFullID )
-		if getPropertyName( aFullPN ) not in propertyList:
-			return False
-		return True
+        return False
+
+
+
+    def isFullPNExist( self, aFullPN ):
+
+        # first check whether FullID exists
+        aFullID = getFullID( aFullPN )
+        if not self.theModel.isEntityExist(aFullID ):
+            return False
+        propertyList = self.theModel.getEntityPropertyList( aFullID )
+        if getPropertyName( aFullPN ) not in propertyList:
+            return False
+        return True
 

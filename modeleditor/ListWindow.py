@@ -7,154 +7,154 @@ from Window import *
 
 
 class ListWindow(Window):
-	"""EditorWindow
-	- manages existance status.
-	- destroys window when 'delede_event' is catched.
-	"""
+    """EditorWindow
+    - manages existance status.
+    - destroys window when 'delede_event' is catched.
+    """
 
-	# ========================================================================
-	def __init__( self, aModelEditor , aGladeFile=None ):
-		"""constructor
-		aModelEditor  -- a reference to ModelEditor (ModelEditor)
-		aGladeFile   -- a glade file name (str)
-		"""
+    # ========================================================================
+    def __init__( self, aModelEditor , aGladeFile=None ):
+        """constructor
+        aModelEditor  -- a reference to ModelEditor (ModelEditor)
+        aGladeFile   -- a glade file name (str)
+        """
 
-		# calls superclass's constructor
-		Window.__init__( self, aGladeFile, aRoot=None )
+        # calls superclass's constructor
+        Window.__init__( self, aGladeFile, aRoot=None )
 
-		# saves a reference to Session
-		self.theModelEditor = aModelEditor
+        # saves a reference to Session
+        self.theModelEditor = aModelEditor
 
-		# initializes exist flag
-		self.__theExist = False
-
-
-
-	# ========================================================================
-	def exists( self ):
-		"""Returns TRUE:When glade file is loaded and does not deleted.
-		        False:When glade file is not loaded yet or already deleted.
-		"""
-
-		return self.__theExist
+        # initializes exist flag
+        self.__theExist = False
 
 
 
-	# ========================================================================
-	def present( self ):
-		"""moves this window to the top of desktop.
-		When glade file is not loaded yet or already deleted, does nothing.
-		Returns None
-		"""
+    # ========================================================================
+    def exists( self ):
+        """Returns TRUE:When glade file is loaded and does not deleted.
+                False:When glade file is not loaded yet or already deleted.
+        """
 
-	
-		# When glade file is not loaded yet or already deleted, does nothing
-		# calla present() method of Window widget of this window.
-		if self.exists():
-
-			self[self.__class__.__name__].present()
-
-	# ========================================================================
-	def iconify( self ):
-		"""moves this window to the taskbar.
-		When glade file is not loaded yet or already deleted, does nothing.
-		Returns None
-		"""
-
-	
-		# When glade file is not loaded yet or already deleted, does nothing
-		# calls iconify() method of Window widget of this window.
-		if self.exists():
-
-			self[self.__class__.__name__].iconify()
-
-	# ========================================================================
-	def move( self, xpos, ypos ):
-		"""moves this window on the desktop to (xpos,ypos).
-		When glade file is not loaded yet or already deleted, does nothing.
-		Returns None
-		"""
-
-	
-		# When glade file is not loaded yet or already deleted, does nothing
-		# calls move(x,y) method of Window widget of this window.
-		if self.exists():
-
-			self[self.__class__.__name__].move( xpos, ypos)
-
-	# ========================================================================
-	def resize( self, width, heigth ):
-		"""resizes this window according to width and heigth.
-		When glade file is not loaded yet or already deleted, does nothing.
-		Returns None
-		"""
-
-	
-		# When glade file is not loaded yet or already deleted, does nothing
-		# calls resize(width,heigth) method of Window widget of this window.
-		if self.exists():
-
-			self[self.__class__.__name__].resize( width, heigth)
-
-	# ========================================================================
-	def deleted( self, *arg ):
-		""" 
-		Destroys window instances and all contained widgets
-		destroy all reference to widgets before calling this (e.g. listcomponents)
-		Returns TRUE
-		"""
-
-		# destroys this window
-		self.close()
-
-		# does not widgets
-		return gtk.TRUE
+        return self.__theExist
 
 
 
-	# ========================================================================
-	def openWindow( self ):
-		"""overwrite super class's method
-		When glade file is not loaded yet or already deleted, calls superclass's
-		openWindow() method and connects 'delete_event' and self.delete() method.
-		Returns None
-		"""
+    # ========================================================================
+    def present( self ):
+        """moves this window to the top of desktop.
+        When glade file is not loaded yet or already deleted, does nothing.
+        Returns None
+        """
 
-		# when glade file is not loaded yet or already deleted.
-		if self.__theExist == False:
+    
+        # When glade file is not loaded yet or already deleted, does nothing
+        # calla present() method of Window widget of this window.
+        if self.exists():
 
-			# sets __theExist flag is TRUE
-			self.__theExist = True
+            self[self.__class__.__name__].present()
 
-			# calls superclass's method 
-			Window.openWindow(self)
+    # ========================================================================
+    def iconify( self ):
+        """moves this window to the taskbar.
+        When glade file is not loaded yet or already deleted, does nothing.
+        Returns None
+        """
 
-			# connects 'delete_event' and self.delete() method.
-			
-			self[self.__class__.__name__].show_all()
-			self[self.__class__.__name__].connect('delete_event',self.deleted)
+    
+        # When glade file is not loaded yet or already deleted, does nothing
+        # calls iconify() method of Window widget of this window.
+        if self.exists():
+
+            self[self.__class__.__name__].iconify()
+
+    # ========================================================================
+    def move( self, xpos, ypos ):
+        """moves this window on the desktop to (xpos,ypos).
+        When glade file is not loaded yet or already deleted, does nothing.
+        Returns None
+        """
+
+    
+        # When glade file is not loaded yet or already deleted, does nothing
+        # calls move(x,y) method of Window widget of this window.
+        if self.exists():
+
+            self[self.__class__.__name__].move( xpos, ypos)
+
+    # ========================================================================
+    def resize( self, width, heigth ):
+        """resizes this window according to width and heigth.
+        When glade file is not loaded yet or already deleted, does nothing.
+        Returns None
+        """
+
+    
+        # When glade file is not loaded yet or already deleted, does nothing
+        # calls resize(width,heigth) method of Window widget of this window.
+        if self.exists():
+
+            self[self.__class__.__name__].resize( width, heigth)
+
+    # ========================================================================
+    def deleted( self, *arg ):
+        """ 
+        Destroys window instances and all contained widgets
+        destroy all reference to widgets before calling this (e.g. listcomponents)
+        Returns TRUE
+        """
+
+        # destroys this window
+        self.close()
+
+        # does not widgets
+        return gtk.TRUE
 
 
 
-	# ========================================================================
-	def update( self ):
-		"""
-		Returns None
-		"""
+    # ========================================================================
+    def openWindow( self ):
+        """overwrite super class's method
+        When glade file is not loaded yet or already deleted, calls superclass's
+        openWindow() method and connects 'delete_event' and self.delete() method.
+        Returns None
+        """
 
-		pass
+        # when glade file is not loaded yet or already deleted.
+        if self.__theExist == False:
 
-	# ========================================================================
-	def close ( self ):
-		""" destroys Widgets and sets __theExist FALSE """
-		if self.exists():
-			if self.theModelEditor.getLastUsedComponent() != None:
-				if self.theModelEditor.getLastUsedComponent().getParentWindow() == self:
-					self.theModelEditor.setLastUsedComponent( None )
-			self[self.__class__.__name__].destroy()
-			self.__theExist = False
-			self.widgets = None
-			
+            # sets __theExist flag is TRUE
+            self.__theExist = True
+
+            # calls superclass's method 
+            Window.openWindow(self)
+
+            # connects 'delete_event' and self.delete() method.
+            
+            self[self.__class__.__name__].show_all()
+            self[self.__class__.__name__].connect('delete_event',self.deleted)
+
+
+
+    # ========================================================================
+    def update( self ):
+        """
+        Returns None
+        """
+
+        pass
+
+    # ========================================================================
+    def close ( self ):
+        """ destroys Widgets and sets __theExist FALSE """
+        if self.exists():
+            if self.theModelEditor.getLastUsedComponent() != None:
+                if self.theModelEditor.getLastUsedComponent().getParentWindow() == self:
+                    self.theModelEditor.setLastUsedComponent( None )
+            self[self.__class__.__name__].destroy()
+            self.__theExist = False
+            self.widgets = None
+            
 # end of OsogoWindow
 
 

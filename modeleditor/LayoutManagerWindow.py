@@ -1,8 +1,8 @@
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #
-#		This file is part of E-CELL Model Editor package
+#       This file is part of E-CELL Model Editor package
 #
-#				Copyright (C) 1996-2003 Keio University
+#               Copyright (C) 1996-2003 Keio University
 #
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #
@@ -43,199 +43,199 @@ from LayoutCommand import *
 class LayoutManagerWindow( ListWindow ):
 
 
-	def __init__( self, theModelEditor ):
-	             
-		"""
-		in: ModelEditor theModelEditor
-		returns nothing
-		"""
-		self.theModelEditor=theModelEditor
-		# init superclass
-		ListWindow.__init__( self, theModelEditor )
+    def __init__( self, theModelEditor ):
+                 
+        """
+        in: ModelEditor theModelEditor
+        returns nothing
+        """
+        self.theModelEditor=theModelEditor
+        # init superclass
+        ListWindow.__init__( self, theModelEditor )
 
-		# the variable
-		self.theLayoutManager=self.theModelEditor.theLayoutManager
-		self.theTreeView=None 
-		self.theSelectedLayout=None
-                self.deletebtn=None
-		self.showbtn=None
-		self.copybtn=None
-
-
-	def openWindow( self ):
-		"""
-		in: nothing
-		returns nothing
-		"""
-
-		# superclass openwindow
-		ListWindow.openWindow( self )
-
-		self.theTreeView=ListWindow.getWidget(self,'treeview')
-	
-		#set up ListStore model
-		self.theListStore=gtk.ListStore(gobject.TYPE_STRING)
-		self.theTreeView.set_model(self.theListStore)
-
-		# add column
-		renderer=gtk.CellRendererText()
-		renderer.set_property('editable','True')
-                renderer.connect('edited',self.__name_edited)
-		column = gtk.TreeViewColumn("Layout Name", renderer, text=0)
-		self.theTreeView.append_column(column)
-
-		# set up the variables
-		self.theListSelection = self.theTreeView.get_selection()
-		#self.theListSelection.connect("changed", self.__show_selected_layout)
-		self.theListSelection.connect("changed", self.__set_selected_layout)
-		
-
-		# add signal handlers
-		self.addHandlers({ 
-				'on_CreateButton_clicked' : self.__create_layout,\
-				'on_DeleteButton_clicked' : self.__delete_layout,\
-				'on_CopyButton_clicked' : self.__copy_layout,\
-				'on_ShowButton_clicked' : self.__show_layout,\
-				 })
-		
-		self.deletebtn=self.getWidget('DeleteButton')
-		self.copybtn=self.getWidget('CopyButton')
-		self.showbtn=self.getWidget('ShowButton')
-		self.isSensitive=False
-
-		# show list of available layout, if any
-		self.__show_all_layout()
-	
-
-	def move( self, xpos, ypos ):
-		ListWindow.move(self,xpos,ypos)
-	
-	def deleted( self, *args ):
-		ListWindow.deleted( self, args )
-		self.theModelEditor.toggleOpenLayoutWindow(False)
-	
-	def update ( self ):
-		self.theListStore.clear()
-		self.__show_all_layout()
-	
-	#def rename (self,newName,anIter):
-		"""
-		if self.theSelectedLayout==newName:
-			return
-		else:
-			# FIRST CHECK WHETHER NEWNAME IS UNIQUE OR NOT IF NOT UNIQUE SET IT BACK TO ORIGINAL ONE AND DONT RENAME
-			if self.theLayoutManager.doesLayoutExist(newName)
-			# INSTEAD OF ALL THIS NONSENSE BELLOW A SIMPLE COMMAND SHOULD BE ISSUED			
-			aPathwayEditorList=self.theModelEditor.thePathwayEditorList
-			for aPathwayEditor in aPathwayEditorList:
-				if aPathwayEditor.theLayout.getName()==self.theSelectedLayout:
-					self.theLayoutManager.renameLayout( self.theSelectedLayout, newName )
-		self.update()
-		"""
-	def rename (self,newName):
-		if self.theLayoutManager.doesLayoutExist(newName):
-			self.update()
-			return
-		else:
-			aCommand = RenameLayout( self.theLayoutManager, self.theSelectedLayout, newName )
-			self.theModelEditor.doCommandList( [ aCommand ] )
-
-	def setButton(self,aValue):
-		if aValue:
-			self.deletebtn.set_sensitive(gtk.TRUE)
-			self.copybtn.set_sensitive(gtk.TRUE)
-			self.showbtn.set_sensitive(gtk.TRUE)
-			self.isSensitive=True
-		else:
-			self.deletebtn.set_sensitive(gtk.FALSE)
-			self.copybtn.set_sensitive(gtk.FALSE)
-			self.showbtn.set_sensitive(gtk.FALSE)
-			self.isSensitive=False
-		
-	#################################
-	#	SIGNAL HANDLERS		#
-	#################################
-
-	def __create_layout( self, *args ):
-		layoutName = self.theLayoutManager.getUniqueLayoutName()
-		aCommand = CreateLayout( self.theLayoutManager, layoutName, False )
-		self.theModelEditor.doCommandList( [ aCommand ] )
+        # the variable
+        self.theLayoutManager=self.theModelEditor.theLayoutManager
+        self.theTreeView=None 
+        self.theSelectedLayout=None
+        self.deletebtn=None
+        self.showbtn=None
+        self.copybtn=None
 
 
-	def __delete_layout( self, *args ):
-		(aListStore, anIter)=self.theListSelection.get_selected()
-		if anIter:
-			# delete Layout
-			if self.theLayoutManager.doesLayoutExist(self.theSelectedLayout):
-				aCommand = DeleteLayout( self.theLayoutManager, self.theSelectedLayout)
-				self.theModelEditor.doCommandList( [ aCommand ] )
+    def openWindow( self ):
+        """
+        in: nothing
+        returns nothing
+        """
 
-			# delete from TreeView
-		#	aPath=aListStore.get_path(anIter)
+        # superclass openwindow
+        ListWindow.openWindow( self )
 
-		#	aListStore.remove(anIter)
-		#	self.theListSelection.select_path(aPath)
+        self.theTreeView=ListWindow.getWidget(self,'treeview')
+    
+        #set up ListStore model
+        self.theListStore=gtk.ListStore(gobject.TYPE_STRING)
+        self.theTreeView.set_model(self.theListStore)
 
-			# if user removed the last entry, try to select the last item
-		#	if not self.theListSelection.path_is_selected(aPath):
-		#		aRow=aPath[0]-1
-		#		if aRow>=0:
-		#			self.theListSelection.select_path((aRow,))
-			
+        # add column
+        renderer=gtk.CellRendererText()
+        renderer.set_property('editable','True')
+        renderer.connect('edited',self.__name_edited)
+        column = gtk.TreeViewColumn("Layout Name", renderer, text=0)
+        self.theTreeView.append_column(column)
 
-	def __copy_layout( self, *args ):
-		if self.theLayoutManager.doesLayoutExist(self.theSelectedLayout):
-			aCommand = CloneLayout( self.theLayoutManager, self.theSelectedLayout)
-			self.theModelEditor.doCommandList( [ aCommand ] )
+        # set up the variables
+        self.theListSelection = self.theTreeView.get_selection()
+        #self.theListSelection.connect("changed", self.__show_selected_layout)
+        self.theListSelection.connect("changed", self.__set_selected_layout)
+        
 
-		
-	def __show_layout( self, *args ):
-		if self.theLayoutManager.doesLayoutExist(self.theSelectedLayout):
-			self.theLayoutManager.showLayout(self.theSelectedLayout)
+        # add signal handlers
+        self.addHandlers({ 
+                'on_CreateButton_clicked' : self.__create_layout,\
+                'on_DeleteButton_clicked' : self.__delete_layout,\
+                'on_CopyButton_clicked' : self.__copy_layout,\
+                'on_ShowButton_clicked' : self.__show_layout,\
+                 })
+        
+        self.deletebtn=self.getWidget('DeleteButton')
+        self.copybtn=self.getWidget('CopyButton')
+        self.showbtn=self.getWidget('ShowButton')
+        self.isSensitive=False
 
-	def __show_all_layout( self, *args ):
-		aLayoutNameList=self.theLayoutManager.getLayoutNameList()
-		aLayoutNameList.sort()
-		self.setButton(False)
-		for aLayoutName in aLayoutNameList:
-			anIter=self.theListStore.append()
-			self.theListStore.set_value(anIter,0,aLayoutName)
-			#if self.theSelectedLayout==aLayoutName:
-			#	self.theListSelection.select_iter(anIter)
-			
+        # show list of available layout, if any
+        self.__show_all_layout()
+    
 
-	def __show_selected_layout(self, *args):
-		(aListStore, anIter)=self.theListSelection.get_selected()
-		if anIter!=None:
-			aLayoutName= aListStore.get_value(anIter,0)
-			self.theSelectedLayout=aLayoutName
-			# bring the associated PathwayEditorWindow to view
-			aPathwayEditorList=self.theModelEditor.thePathwayEditorList
-			for aPathwayEditor in aPathwayEditorList:
-				if aPathwayEditor.theLayout.getName()==aLayoutName:
-					if aPathwayEditor.exists():
-						aPathwayEditor.present()
+    def move( self, xpos, ypos ):
+        ListWindow.move(self,xpos,ypos)
+    
+    def deleted( self, *args ):
+        ListWindow.deleted( self, args )
+        self.theModelEditor.toggleOpenLayoutWindow(False)
+    
+    def update ( self ):
+        self.theListStore.clear()
+        self.__show_all_layout()
+    
+    #def rename (self,newName,anIter):
+        """
+        if self.theSelectedLayout==newName:
+            return
+        else:
+            # FIRST CHECK WHETHER NEWNAME IS UNIQUE OR NOT IF NOT UNIQUE SET IT BACK TO ORIGINAL ONE AND DONT RENAME
+            if self.theLayoutManager.doesLayoutExist(newName)
+            # INSTEAD OF ALL THIS NONSENSE BELLOW A SIMPLE COMMAND SHOULD BE ISSUED         
+            aPathwayEditorList=self.theModelEditor.thePathwayEditorList
+            for aPathwayEditor in aPathwayEditorList:
+                if aPathwayEditor.theLayout.getName()==self.theSelectedLayout:
+                    self.theLayoutManager.renameLayout( self.theSelectedLayout, newName )
+        self.update()
+        """
+    def rename (self,newName):
+        if self.theLayoutManager.doesLayoutExist(newName):
+            self.update()
+            return
+        else:
+            aCommand = RenameLayout( self.theLayoutManager, self.theSelectedLayout, newName )
+            self.theModelEditor.doCommandList( [ aCommand ] )
 
-	def __set_selected_layout(self, *args):
-		(aListStore, anIter)=self.theListSelection.get_selected()
-		if anIter!=None:
-			aLayoutName= aListStore.get_value(anIter,0)
-			self.theSelectedLayout=aLayoutName
-			if not self.isSensitive:
-				self.setButton(True)
-								
+    def setButton(self,aValue):
+        if aValue:
+            self.deletebtn.set_sensitive(gtk.TRUE)
+            self.copybtn.set_sensitive(gtk.TRUE)
+            self.showbtn.set_sensitive(gtk.TRUE)
+            self.isSensitive=True
+        else:
+            self.deletebtn.set_sensitive(gtk.FALSE)
+            self.copybtn.set_sensitive(gtk.FALSE)
+            self.showbtn.set_sensitive(gtk.FALSE)
+            self.isSensitive=False
+        
+    #################################
+    #   SIGNAL HANDLERS     #
+    #################################
 
-	def __name_edited(self,*args):
-		'''
-		args[0]=gtk.CellRenderer
-		args[1]=path
-		args[2]=new String
-		'''
-		newName=args[2]
-		aPath=args[1]
-		anIter=self.theListStore.get_iter_from_string(aPath)
-		if len(newName)>0:
-			#self.rename(newName,anIter)
-			self.rename(newName)
-		else:
-			self.update()
+    def __create_layout( self, *args ):
+        layoutName = self.theLayoutManager.getUniqueLayoutName()
+        aCommand = CreateLayout( self.theLayoutManager, layoutName, False )
+        self.theModelEditor.doCommandList( [ aCommand ] )
+
+
+    def __delete_layout( self, *args ):
+        (aListStore, anIter)=self.theListSelection.get_selected()
+        if anIter:
+            # delete Layout
+            if self.theLayoutManager.doesLayoutExist(self.theSelectedLayout):
+                aCommand = DeleteLayout( self.theLayoutManager, self.theSelectedLayout)
+                self.theModelEditor.doCommandList( [ aCommand ] )
+
+            # delete from TreeView
+        #   aPath=aListStore.get_path(anIter)
+
+        #   aListStore.remove(anIter)
+        #   self.theListSelection.select_path(aPath)
+
+            # if user removed the last entry, try to select the last item
+        #   if not self.theListSelection.path_is_selected(aPath):
+        #       aRow=aPath[0]-1
+        #       if aRow>=0:
+        #           self.theListSelection.select_path((aRow,))
+            
+
+    def __copy_layout( self, *args ):
+        if self.theLayoutManager.doesLayoutExist(self.theSelectedLayout):
+            aCommand = CloneLayout( self.theLayoutManager, self.theSelectedLayout)
+            self.theModelEditor.doCommandList( [ aCommand ] )
+
+        
+    def __show_layout( self, *args ):
+        if self.theLayoutManager.doesLayoutExist(self.theSelectedLayout):
+            self.theLayoutManager.showLayout(self.theSelectedLayout)
+
+    def __show_all_layout( self, *args ):
+        aLayoutNameList=self.theLayoutManager.getLayoutNameList()
+        aLayoutNameList.sort()
+        self.setButton(False)
+        for aLayoutName in aLayoutNameList:
+            anIter=self.theListStore.append()
+            self.theListStore.set_value(anIter,0,aLayoutName)
+            #if self.theSelectedLayout==aLayoutName:
+            #   self.theListSelection.select_iter(anIter)
+            
+
+    def __show_selected_layout(self, *args):
+        (aListStore, anIter)=self.theListSelection.get_selected()
+        if anIter!=None:
+            aLayoutName= aListStore.get_value(anIter,0)
+            self.theSelectedLayout=aLayoutName
+            # bring the associated PathwayEditorWindow to view
+            aPathwayEditorList=self.theModelEditor.thePathwayEditorList
+            for aPathwayEditor in aPathwayEditorList:
+                if aPathwayEditor.theLayout.getName()==aLayoutName:
+                    if aPathwayEditor.exists():
+                        aPathwayEditor.present()
+
+    def __set_selected_layout(self, *args):
+        (aListStore, anIter)=self.theListSelection.get_selected()
+        if anIter!=None:
+            aLayoutName= aListStore.get_value(anIter,0)
+            self.theSelectedLayout=aLayoutName
+            if not self.isSensitive:
+                self.setButton(True)
+                                
+
+    def __name_edited(self,*args):
+        '''
+        args[0]=gtk.CellRenderer
+        args[1]=path
+        args[2]=new String
+        '''
+        newName=args[2]
+        aPath=args[1]
+        anIter=self.theListStore.get_iter_from_string(aPath)
+        if len(newName)>0:
+            #self.rename(newName,anIter)
+            self.rename(newName)
+        else:
+            self.update()
