@@ -74,9 +74,9 @@ namespace libecs
   {
     BOOST_STATIC_ASSERT( ( boost::is_same<String,GIVEN>::value ||
 			   boost::is_same<String,NEW>::value ) );
+
     return boost::lexical_cast<NEW>( aValue );
   }
-
 
 
   ///@internal
@@ -86,20 +86,20 @@ namespace libecs
     return stringCast<String,GIVEN>( aValue );
   }
 
-#define __STRINGCAST_SPECIALIZATION( NEW, GIVEN )\
+#define __STRINGCAST_SPECIALIZATION_DECL( NEW, GIVEN )\
   template<> const NEW stringCast<NEW,GIVEN>( const GIVEN& )
 
-  __STRINGCAST_SPECIALIZATION( String, Real );
-  __STRINGCAST_SPECIALIZATION( String, HighReal );
-  __STRINGCAST_SPECIALIZATION( String, Integer );
-  __STRINGCAST_SPECIALIZATION( String, UnsignedInteger );
-  __STRINGCAST_SPECIALIZATION( Real, String );
-  __STRINGCAST_SPECIALIZATION( HighReal, String );
-  __STRINGCAST_SPECIALIZATION( Integer, String );
-  __STRINGCAST_SPECIALIZATION( UnsignedInteger, String );
-  // __STRINGCAST_SPECIALIZATION( String, String );
+  __STRINGCAST_SPECIALIZATION_DECL( String, Real );
+  __STRINGCAST_SPECIALIZATION_DECL( String, HighReal );
+  __STRINGCAST_SPECIALIZATION_DECL( String, Integer );
+  __STRINGCAST_SPECIALIZATION_DECL( String, UnsignedInteger );
+  __STRINGCAST_SPECIALIZATION_DECL( Real, String );
+  __STRINGCAST_SPECIALIZATION_DECL( HighReal, String );
+  __STRINGCAST_SPECIALIZATION_DECL( Integer, String );
+  __STRINGCAST_SPECIALIZATION_DECL( UnsignedInteger, String );
+  // __STRINGCAST_SPECIALIZATION_DECL( String, String );
 
-#undef __STRINGCAST_SPECIALIZATION
+#undef __STRINGCAST_SPECIALIZATION_DECL
 
 
 

@@ -50,13 +50,63 @@ namespace libecs
 #endif
   __STRINGCAST_SPECIALIZATION_DEF( String, Integer );
   __STRINGCAST_SPECIALIZATION_DEF( String, UnsignedInteger );
+
+  __STRINGCAST_SPECIALIZATION_DEF( Integer, String );
+  __STRINGCAST_SPECIALIZATION_DEF( UnsignedInteger, String );
+  // __STRINGCAST_SPECIALIZATION_DEF( String, String );
+
+
+  // boost::lexical_cast does not convert Inf and NaN.
+  // Specialization here for <Real,String> does this job.
+
+  /* original:
   __STRINGCAST_SPECIALIZATION_DEF( Real, String );
 #if !defined( HIGHREAL_IS_REAL )
   __STRINGCAST_SPECIALIZATION_DEF( HighReal, String );
 #endif
-  __STRINGCAST_SPECIALIZATION_DEF( Integer, String );
-  __STRINGCAST_SPECIALIZATION_DEF( UnsignedInteger, String );
-  // __STRINGCAST_SPECIALIZATION_DEF( String, String );
+  */
+
+  template< typename T >
+  const Real stringToFloat( StringCref aValue )
+  {
+    try
+      {
+	return boost::lexical_cast<Real>( aValue );
+      }
+    catch( const boost::bad_lexical_cast& )
+      {
+	String aCaseless( aValue );
+	std::transform( aCaseless.begin(), aCaseless.end(), 
+			aCaseless.begin(), 
+			tolower );
+	
+	if( aCaseless == "inf" || aCaseless == "infinity" )
+	  {
+	    return std::numeric_limits<Real>::infinity();
+	  }
+	else if( aCaseless.substr( 0, 3 ) == "nan" )
+	  {
+	    return std::numeric_limits<Real>::quiet_NaN();
+	  }
+
+	throw;
+      }
+  }
+
+  template<>
+  const Real stringCast<Real,String>( StringCref aValue )
+  {
+    return stringToFloat<Real>( aValue );
+  }
+
+#if !defined( HIGHREAL_IS_REAL )
+  template<>
+  const HighReal stringCast<HighReal,String>( StringCref aValue )
+  {
+    return stringToFloat<HighReal>( aValue );
+  }
+#endif
+
 
 #undef __STRINGCAST_SPECIALIZATION_DEF
 
