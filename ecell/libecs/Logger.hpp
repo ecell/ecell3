@@ -67,6 +67,10 @@ namespace libecs
   {
 
 
+
+
+  public:
+
 #if defined(STLDATAPOINTVECTOR)
     DECLARE_TYPE( StlDataPointVector, DataPointVector );
 #endif /* END OF STLDATAPOINTVECTOR */
@@ -74,10 +78,6 @@ namespace libecs
 #if defined(VVECTOR)
     DECLARE_TYPE( VVector, DataPointVector );
 #endif /* END OF VVECTOR */ 
-
-
-
-  public:
 
     typedef DataPointVector::Containee containee_type;
     typedef DataPointVector::const_iterator const_iterator;
