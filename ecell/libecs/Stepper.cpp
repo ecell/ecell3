@@ -295,12 +295,6 @@ namespace libecs
 				      &SRMStepper::getSubstanceCache ) );
 
     registerSlot( getPropertySlotMaker()->
-		  createPropertySlot( "SRMSubstanceCache", *this,
-				      Type2Type<PolymorphVectorRCPtr>(),
-				      NULLPTR,
-				      &SRMStepper::getSRMSubstanceCache ) );
-
-    registerSlot( getPropertySlotMaker()->
 		  createPropertySlot( "ReactorCache", *this,
 				      Type2Type<PolymorphVectorRCPtr>(),
 				      NULLPTR,
@@ -322,7 +316,6 @@ namespace libecs
     //      {
 
     theSubstanceCache.update( theSystemVector );
-    theSRMSubstanceCache.update( theSystemVector );
     
     theReactorCache.update( theSystemVector );
     std::sort( theReactorCache.begin(), theReactorCache.end(),
@@ -374,7 +367,7 @@ namespace libecs
     //
     // Substance::turn()
     //
-    FOR_ALL( SRMSubstanceCache, theSRMSubstanceCache, turn );    
+    FOR_ALL( SubstanceCache, theSubstanceCache, turn );    
   }
 
   inline void SRMStepper::integrate()
@@ -410,10 +403,16 @@ namespace libecs
   void SRMStepper::distributeIntegrator( Integrator::AllocatorFuncPtr
 					 anAllocator )
   {
-    for( SRMSubstanceCache::const_iterator s( theSRMSubstanceCache.begin() );
-	 s != theSRMSubstanceCache.end() ; ++s )
+    for( SubstanceCache::const_iterator s( theSubstanceCache.begin() );
+	 s != theSubstanceCache.end() ; ++s )
       {
-	(* anAllocator )(**s);
+	SRMSubstancePtr 
+	  aSRMSubstancePtr( dynamic_cast<SRMSubstancePtr>( *s ) );
+
+	if( aSRMSubstancePtr != NULLPTR )
+	  {
+	    (* anAllocator )(*aSRMSubstancePtr);
+	  }
       }
   }
 

@@ -203,6 +203,11 @@ namespace libecs
       theProxyInput = 0.0;
     }
 
+    virtual void turn()
+    {
+      theVelocity = 0.0;
+    }
+
     virtual void integrate()
     {
       theQuantity += theVelocity;
@@ -256,6 +261,11 @@ namespace libecs
     virtual void addVelocity( RealCref aVelocity ) 
     {
       theVelocity += aVelocity; 
+    }
+
+    const Real getProxyInput() const
+    {
+      return theProxyInput;
     }
 
     void addProxyInput( RealCref aValue )

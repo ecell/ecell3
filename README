@@ -41,7 +41,6 @@ doc/         --> Documentations
 
 (Below are third-party packages)
 
-PyCXX/       --> C++ wrapper of Python C API
 korandom/    --> Package for random number generation
 libltdl/     --> Libtool's dynamic module loader library
 

@@ -49,7 +49,7 @@ NOTE: If you get this package via cvs, use ./autogen.sh instead of
 
   == Compilers ==
 
-  We've tested with gcc-3.1.
+  We've tested with gcc-3.1 and gcc-3.2.
 
 
   == Note for RedHat 7.3 users ==
@@ -103,7 +103,7 @@ NOTE: If you get this package via cvs, use ./autogen.sh instead of
      You may have to extract Boost tarball at the same directory of 
      E-CELL3 source code and should rename the package name to boost.
 
-     % gunzip <boost_all.tar.gz | tar xvf -
+     % gzip -dc boost_all.tar.gz | tar xvf -
      % mv boost_1_28_0 boost
 
   I recommend http://www.freshmeat.net for finding the latest URLs for the

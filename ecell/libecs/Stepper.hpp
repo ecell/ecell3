@@ -431,7 +431,6 @@ namespace libecs
   public:
 
     typedef EntityCache<Substance> SubstanceCache;
-    typedef EntityCache<Substance,SRMSubstance> SRMSubstanceCache;
     typedef EntityCache<Reactor,SRMReactor> ReactorCache;
     //    typedef EntityCache<Reactor,Reactor> ReactorCache;
 
@@ -457,19 +456,6 @@ namespace libecs
       
       for( SubstanceCache::const_iterator i( theSubstanceCache.begin() );
 	   i != theSubstanceCache.end() ; ++i )
-	{
-	  aVectorPtr->push_back( (*i)->getID() );
-	}
-
-      return aVectorPtr;
-    }
-
-    const PolymorphVectorRCPtr getSRMSubstanceCache() const
-    {
-      PolymorphVectorRCPtr aVectorPtr( new PolymorphVector );
-      
-      for( SRMSubstanceCache::const_iterator i( theSRMSubstanceCache.begin() );
-	   i != theSRMSubstanceCache.end() ; ++i )
 	{
 	  aVectorPtr->push_back( (*i)->getID() );
 	}
@@ -512,7 +498,6 @@ namespace libecs
     Integrator::AllocatorFuncPtr theIntegratorAllocator;
 
     SubstanceCache        theSubstanceCache;
-    SRMSubstanceCache     theSRMSubstanceCache;
     ReactorCache          theReactorCache;
     ReactorCache          theRuleReactorCache;
 

@@ -99,6 +99,13 @@ namespace libecs
 				      &PlainSubstance::setFixed,
 				      &PlainSubstance::getFixed ) );
 
+
+    registerSlot( getPropertySlotMaker()->
+		  createPropertySlot( "ProxyInput",*this,
+				      Type2Type<Real>(),
+				      NULLPTR,
+				      &PlainSubstance::getProxyInput ) );
+
   }
 
 
@@ -242,9 +249,9 @@ namespace libecs
 
 	theAccumulator->accumulate();
   
-	if( theQuantity < 0 ) 
+	if( theQuantity < 0.0 ) 
 	  {
-	    theQuantity = 0;
+	    theQuantity = 0.0;
 	    //FIXME:       throw LTZ();
 	  }
       }
