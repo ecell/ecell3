@@ -111,7 +111,7 @@ class EmParser( GenericParser ):
 		'''
 		stmts ::= stmt stmts
 		'''
-		return AST( Token( 'stmts' ), ( args[0], args[1][0] ) )
+		return AST( Token( 'stmts' ), args )
 
 	def p_stmts_2( self, args ):
 		'''
@@ -135,20 +135,20 @@ class EmParser( GenericParser ):
 		'''
 		stepper_stmt ::= Stepper object_decl stepper_def
 		'''
-		return AST( args[0], args )
+		return AST( Token( 'stepper_stmt' ), args )
 
 	def p_system_stmt ( self, args ):
                 '''
 		system_stmt ::= System object_decl system_def
 		'''
-		return AST ( args[0], args )
+		return AST( Token( 'system_stmt' ), args )
 
 	def p_entity_other_stmt ( self, args ):
                 '''
 		entity_other_stmt ::= Substance object_decl entity_other_def
 		entity_other_stmt ::= Reactor object_decl entity_other_def
 		'''
-		return AST ( args[0], ( args[1], args[2] ) )
+		return AST ( Token( 'entity_other_stmt' ), args )
 
 	# object declarations
 
@@ -184,7 +184,7 @@ class EmParser( GenericParser ):
 		'''
 		propertylist ::= property propertylist
 		'''
-		return AST ( Token('propertylist'), ( args[0], args[1][0] ) )
+		return AST ( Token('propertylist'), args )
 
 	def p_propertylist_single( self, args ):
 		'''
@@ -202,7 +202,7 @@ class EmParser( GenericParser ):
 		'''
 		property ::= name valuelist ;
 		'''
-		return AST( Token('token'), args[:1] )
+		return AST( Token('property'), args[:2] )
 
 
 
@@ -212,7 +212,7 @@ class EmParser( GenericParser ):
 		'''
 		property_entity_list ::= property_entity property_entity_list
 		'''
-		return AST( Token( 'property_entity_list' ), ( args[0], args[1][0] ) )
+		return AST( Token( 'property_entity_list' ), args )
 
 	def p_property_entity_single( self, args ):
 		'''
@@ -240,7 +240,7 @@ class EmParser( GenericParser ):
 		'''
 		valuelist ::= value valuelist
 		'''
-		return AST( Token( 'valuelist' ), ( args[0], args[1][0] ) )
+		return AST( Token( 'valuelist' ), args )
 
 	def p_valuelist_single( self, args ):
 		'''
@@ -271,38 +271,53 @@ class EmParser( GenericParser ):
 
 
 
-class Interpret(GenericASTTraversal):
-	def __init__( self, ast ):
-		GenericASTTraversal.__init__( self, ast )
+def flatten_nodetree( node ):
+	aList = []
+
+	if node == None or len( node ) == 0:
+		return aList
+
+	aList.append( node[0] )
+
+	while len( node ) > 1:
+		node = node[1]
+		aList.append( node[0] )
 		
-		# eml stack
-		self.queue = []
+	return aList
+
+def flatten_propertytree( node ):
+	return flatten_nodetree( node )
+	
+
+
+class Interpret(GenericASTTraversal):
+	def __init__( self, ast, eml ):
+		GenericASTTraversal.__init__( self, ast )
+		self.eml = eml
+		
 		self.postorder()
 
-		ast.value = self.queue
-#		print ast.value
-
 	def n_stepper_stmt( self, node ):
-		node.value = node.attr
-		if node[1] != None and node[1].type != 'name':
-			aList = [node.value] + node[1].value
-			self.queue.append(aList)
+		aClassname = node[1][0].attr
+		anID = node[1][1].attr
+		print aClassname, anID
 
-		if node[1] != None:
-			aList = [node.value] + node[1].value
-			self.queue.append(aList)
 
-	def n_Reactor( self, node):
-		node.value = node.attr
-		if node[1] != None:
-			aList = [node.value] + node[1].value
-			self.queue.append(aList)
+		self.eml.createStepper( aClassname, anID )
 		
-	def n_Substance( self, node):
-		node.value = node.attr
-		if node[1] != None:
-			aList = [node.value] + node[1].value
-			self.queue.append(aList)
+		aPropertyList = []
+		aPropertyNodeList = flatten_nodetree( node[2][0] )
+		for i in aPropertyNodeList:
+			aPropertyName = i[0].attr
+			aValueNodeList = flatten_propertytree( i[1] )
+
+			aValueList = []
+			for j in aValueNodeList:
+				aValueList.append( j[0][0].attr )
+			print aPropertyName, aValueList
+
+			
+		
 		
 	def default( self, node):
 		pass
@@ -322,28 +337,7 @@ def convertEm2Eml( anEmFileObject , mode='' ):
 	if mode == 'debug':print 'AST:', anAst
 
 	# Generating
-	anInterpreter = Interpret( anAst )
-	aQueueList = sortSystemID(anInterpreter.queue)
-	if mode == 'debug':print aQueueList
-
-	for part in aQueueList:
-		(aType, aClass, anID, aPropertyList) = part[0], part[1], part[2], part[3:]
-		aFullID = convert2FullID(anEml, aType,  anID)
-		if aType == 'Stepper':
-			anEml.createStepper(aClass, aFullID)
-			if mode == 'debug':print "createStepper(%s, %s)" % (aClass, aFullID)
-			continue
-		else:
-			anEml.createEntity(aClass, aFullID)
-			if mode == 'debug':print "createEntity(%s, %s)" % (aClass, aFullID)
-
-		for i in aPropertyList:
-			for j in i:
-				(aPropertyName, aValueList) = j[0], j[1]
-				if mode == 'debug':print "\tsetEntityProperty(%s, %s, %s)" % (aFullID, aPropertyName, aValueList)
-				anEml.setEntityProperty(aFullID, aPropertyName, aValueList)
-
-
+	anInterpreter = Interpret( anAst, anEml )
 
 	aString = anEml.asString()
 	    
@@ -365,19 +359,6 @@ def convert2FullID( anEml, aType, aSystemID ):
 	    
 	return anID
     
-def sortSystemID( aList ):
-	aSortList  = []
-	aLowList   = []
-	aHightList = []
-	for i in aList:
-                aType = i[0]
-		if aType == 'System' or aType == 'Stepper':
-			aHightList.append(i)
-		else:
-			aLowList.append(i)
-		aSortList = aHightList + aLowList
-	    
-	return aSortList
     
 def usage():
 	sys.stderr.write("""\
