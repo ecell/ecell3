@@ -1,105 +1,97 @@
 <?xml version="1.0"?>
 <eml>
-<model>
 
-<metadata>
+<info>
 <modelname>simple</modelname>
 <author>Ryosuke Suzuki</author>
 <created>2002/04/15</created>
-<lastsaved>2002/04/15</lastsaved>
-</metadata>
+<lastsaved>2002/07/19</lastsaved>
+</info>
 
-<!-- ##### PROPERTY LIST ##### -->
 
-<!-- for System -->
-<property fullid="System::/" name="Volume">
+<stepperlist>
+<stepper class="Euler1SRMStepper" id="SRM_01" />
+</stepperlist>
+
+
+<!-- ROOT -->
+<system class="" stepper="SRM_01" id="/" name="Environment">
+<property name="Volume">
 <value number="0">0.000000000000001</value>
 </property>
+</system>
 
-<property fullid="System:/:CELL" name="Volume">
+
+
+<!-- CELL -->
+<system class="" stepper="SRM_01" id="/CELL" name="Cell">
+<property name="Volume">
 <value number="0">unknown</value>
 </property>
+</system>
 
-<property fullid="System:/CELL:CYTOPLASM" name="Volume">
+
+
+
+<!-- CYTOPLASM -->
+<system class="" stepper="SRM_01" id="/CELL/CYTOPLASM" name="Cytoplasm">
+
+<property name="Volume">
 <value number="0">1e-18</value>
 </property>
 
-<property fullid="System:/CELL/CYTOPLASM:MEMBRANE" name="Volume">
-<value number="0">1e-16</value>
-</property>
 
-
-
-<!-- for Substance -->
-<property fullid="Substance:/CELL/CYTOPLASM:S" name="Quantity">
+<substance class="SRMSubstance" id="S" name="substance S">
+<property name="Quantity">
 <value number="0">1000000</value>
 </property>
+</substance>
 
-<property fullid="Substance:/CELL/CYTOPLASM:P" name="Quantity">
+
+<substance class="SRMSubstance" id="P" name="substance P">
+<property name="Quantity">
 <value number="0">0</value>
 </property>
+</substance>
 
-<property fullid="Substance:/CELL/CYTOPLASM:E" name="Quantity">
+
+
+<substance class="SRMSubstance" id="E" name="substance E">
+<property name="Quantity">
 <value number="0">1000</value>
 </property>
+</substance>
 
 
-<!-- for REACTOR E -->
-<property fullid="Reactor:/CELL/CYTOPLASM:E" name="Reactant">
+<reactor class="MichaelisUniUniReactor" id="E" name="E">
+<property name="Reactant">
 <value number="0">S0</value>
 <value number="1">Substance:/CELL/CYTOPLASM:S</value>
 <value number="2">-1</value>
 </property>
 
-<property fullid="Reactor:/CELL/CYTOPLASM:E" name="Reactant">
+<property name="Reactant">
 <value number="0">P0</value>
 <value number="1">Substance:/CELL/CYTOPLASM:P</value>
 <value number="2">1</value>
 </property>
 
-<property fullid="Reactor:/CELL/CYTOPLASM:E" name="Reactant">
+<property name="Reactant">
 <value number="0">C0</value>
 <value number="1">Substance:/CELL/CYTOPLASM:E</value>
 <value number="2">0</value>
 </property>
 
-<property fullid="Reactor:/CELL/CYTOPLASM:E" name="KmS">
+<property name="KmS">
 <value number="0">1</value>
 </property>
 
-<property fullid="Reactor:/CELL/CYTOPLASM:E" name="KcF">
+<property name="KcF">
 <value number="0">10</value>
 </property>
 
-
-<!-- _____property list fin._____ -->
-
-
-<stepperlist class="Euler1SRMStepper" id="SRM_01"/>
-
-<system stepper="SRM_01" id="/" name="Environment">
-<subsystem id="CELL" />
-</system>
-
-<system stepper="SRM_01" id="CELL" name="Cell">
-<subsystem id="CYTOPLASM" />
-</system>
-
-<system stepper="SRM_01" id="CYTOPLASM" name="Cytoplasm">
-<subsystem id="MEMBRANE" />
-
-<substance id="S" name="substance S" />
-<substance id="P" name="substance P" />
-<substance id="E" name="substance E" />
-
-<reactor class="MichaelisUniUniReactor"
-	 id="E"
-	 name="E"
-	 />
+</reactor>
 </system>
 
 
-<system stepper="SRM_01" id="MEMBRANE" name="Membrane" />
-
-</model>
 </eml>
