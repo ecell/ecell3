@@ -144,11 +144,7 @@ namespace libecs
       return 2;
     }
    
-    DataPointRef operator = ( LongDataPointCref )
-    {
-      setTime( aLongDataPoint.getTime() );
-      setValue ( aLongDataPoint.getValue() );
-    }
+    DataPointRef operator= ( LongDataPointCref aLongDataPoint );
 
   protected:
 
@@ -284,7 +280,6 @@ namespace libecs
     Real theMax;
 
   };
-
 
 
   class DataPointAggregator

@@ -36,6 +36,13 @@
 namespace libecs
 {
   
+
+  DataPointRef DataPoint::operator= ( LongDataPointCref aLongDataPoint )
+  {
+    setTime( aLongDataPoint.getTime() );
+    setValue ( aLongDataPoint.getValue() );
+  }
+
   
   DataPointAggregator::DataPointAggregator()
     :
