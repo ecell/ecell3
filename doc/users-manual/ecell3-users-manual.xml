@@ -25,8 +25,13 @@
   <!ENTITY writing-dm SYSTEM "writing-dm.xml">
   <!ENTITY writing-ecs SYSTEM "writing-ecs.xml">
   <!ENTITY inside-ecell SYSTEM "inside-ecell.xml">
+
+  <!ENTITY empy-manual SYSTEM "empy-manual.xml">
+
+<!--
   <!ENTITY python-basics SYSTEM "python-basics.xml">
   <!ENTITY cpp-basics SYSTEM "cpp-basics.xml">
+-->
 
 <!-- API tables -->
 
@@ -182,9 +187,12 @@
 
   <!-- appendices -->
 
+<!--
   &python-basics;
   &cpp-basics;
+-->
 
+  &empy-manual;
 
   <index>
     
