@@ -59,6 +59,7 @@ SYSTEM_PROXY = 'SystemProxy'
 SESSION_PROXY = 'SessionProxy'
 
 DEFAULT_TMP_DIRECTORY = 'tmp'
+DEFAULT_ENVIRONMENT = 'Local'
 
 
 

@@ -49,35 +49,42 @@ from ecell.Util import *
 
 class SessionManager:
 	'''SessionManager class
+	Provide API to execute multiple jobs concurrently.
+	You can access SessionProxy directory to control each job.
 	'''
 
-	def __exit(self):
-		'''When SessionManager exits, this method is called 
+	def __exit( self ):
+		'''When SessionManager exits, this method is called.
+		In this method, delete tmp root directory.
+		Running jobs will be deleted from each SessionProxy instance.
+		This method should be substituded to sys.exitfunc.
 		'''
 
-		# remove the temporary directory
-		if os.access( self.getTmpRootDir(), os.W_OK ):
-			shutil.rmtree( self.getTmpRootDir() )
+		if self.__theTmpRemoval == True:
+			# remove the temporary directory
+			if os.access( self.getTmpRootDir(), os.W_OK ):
+				shutil.rmtree( self.getTmpRootDir() )
+		pass
 
 
 	def __init__( self, modulepath ):
-		'''constructor
+		'''Constructor
+		Initialize parameters
 		modulepath(str) -- a module path
 		'''
+
+		# exit functions
 		sys.exitfunc = self.__exit
 
 		# set module path
 		self.__theModulePath = modulepath
-
 
 		# initialize parameters
 		self.theEsm = ''
 		self.__theSystemProxyDict = None
 		self.__theSessionProxyDict = {}
 		self.__theMessageMethod = self.__plainMessageMethod
-		self.__theEss = None
 
-		#----------------------------------
 		self.__theConcurrency = None
 		self.__theTmpRootDir = DEFAULT_TMP_DIRECTORY
 		self.__theTmpDir = None
@@ -88,20 +95,29 @@ class SessionManager:
 		self.__theUpdateInterval = 1
 		self.__theGlobalRunTimeout = 0
 
+		self.__theTmpRemoval = True
+
+		# Set up default temporary directory
+		# Temporary directory is created in run method.
 		self.setTmpRootDir( DEFAULT_TMP_DIRECTORY )
-		self.setEnvironment('Local')
+
+		# Set up default environment
+		self.setEnvironment( DEFAULT_ENVIRONMENT )
 
 
 
-	def setEnvironment(self, anEnvironment ):
-		'''set environment parameter
-		anEnvironment(str) -- Local,SMP,SGE,Globus,etc.
+	def setEnvironment( self, environment ):
+		'''Set environment parameter.
+		Try to import the module whole name is environment + SystemProxy
+		For example, if the 'environment' is Local, try to LocalSystemProxy
+		and call constroctor of it.
+
+		environment(str) -- Local,SMP,SGE,Globus,etc.
 		Return None
 		'''
-		#print anEnvironment
 
 		# create system proxy instance
-		aSystemProxyName = anEnvironment + SYSTEM_PROXY
+		aSystemProxyName = environment + SYSTEM_PROXY
 
 		# find module
 		aFilePoint, aPath, self.__theDescription = imp.find_module( aSystemProxyName, \
@@ -121,9 +137,9 @@ class SessionManager:
 
 
 
+	def getEnvironment( self ):
+		'''Return current environment parameter as str.
 
-	def getEnvironment(self):
-		'''return current environment parameter
 		Return str : 'Local','SMP','SGE','Globus', etc.
 		'''
 
@@ -135,8 +151,9 @@ class SessionManager:
 
 
 
-	def setConcurrency(self,number):
-		'''set the number of jobs to be runned concurrently
+	def setConcurrency( self, number ):
+		'''Set the number of jobs to be runned concurrently.
+
 		number(int) -- the number of concurrent jobs
 		Return None 
 		'''
@@ -145,8 +162,9 @@ class SessionManager:
 		self.__theConcurrency = number
 
 
-	def getConcurrency(self):
-		'''return the number of jobs to be runned concurrently
+	def getConcurrency( self ):
+		'''Return the number of jobs to be runned concurrently.
+
 		Return int : the number of concurrent jobs
 		'''
 
@@ -157,8 +175,9 @@ class SessionManager:
 		return self.__theConcurrency 
 
 
-	def getDefaultConcurrency(self):
-		'''return the default number of jobs seto be runned concurrently
+	def getDefaultConcurrency( self ):
+		'''Return the default number of jobs seto be runned concurrently.
+
 		Return int : the default number of concurrency
 		'''
 
@@ -167,10 +186,15 @@ class SessionManager:
 
 
 
-	def setTmpRootDir(self,tmprootdir):
-		'''set setemporary root directory
-		tmprootdir(str) -- a set temporary root directory
-		default is 'tmp'
+	def setTmpRootDir( self, tmprootdir ):
+		'''Set temporary root directory.
+		When run method is called, tmprootdir is created on current working 
+		directory.  Then, below 'tmp' directory, the directory whose name 
+		is same as pid of this process is also created.
+		For example, if tmprootdir is 'work' and pid is 12345, './work/12345'
+		is created whtn run method is called.
+
+		tmprootdir(str) -- a temporary root directory to be set. default is 'tmp'
 		Return None
 		'''
 
@@ -184,48 +208,87 @@ class SessionManager:
 		                              os.getpid())
 
 
+	def getTmpRootDir( self ):
+		'''Return the temporary root directory
+		See setTmpRootDir about the detail of temporary root directory
 
-	def getTmpRootDir(self):
-		'''return setemporary root directory
-		Return str : a setemporaty root directory
+		Return str : temporaty root directory
 		'''
 
 		# return setmp root directory
 		return self.__theTmpRootDir
 
 
-	def getTmpDir(self):
-		'''return setemporary directory
-		Temporary directory is created below setemporary root directory.
-		Directory is named as pid.
 
-		Return str : a setemporaty directory
+	def getTmpDir( self ):
+		'''Return setemporary directory
+		Temporary directory is created below temporary root directory,
+		and named pid of this process.
+		See setTmpRootDir about the detail of temporary directory
+		For example, if tmprootdir is 'work' and pid is 12345, 
+		this method returns './work/12345'.
+		
+		Return str : a temporaty directory
 		'''
 
-		# sets setmp directory
+		# return temporary directory
 		return self.__theTmpDir
 
+	
+	def setTmpDirRemoval( self, deleteflag ):
+		'''Set a removal flag of tmp directory.
+
+		deleteflag(boolean)  --  True  : delete tmp and tmp root directory,
+                                         when destructor is called.
+		                         False : tmp and tmp root directory is not
+		                                 deleted when destructor is called.
+		                         True is set as default.
+		Return None
+		'''
+
+		# save deleteflat to instance attribute
+		self.__theTmpRemoval = deleteflag
 
 
-	def setRetryLimit(self, retrylimit):
-		'''set a limit of retry number
-		retrycount(int) -- a retry of retry number
+	def getTmpDirRemoval( self ):
+		'''Return the removal flag of tmp directory.
+
+		Return boolean : True  : delete tmp and tmp root directory,
+                                 when destructor is called.
+		                 False : tmp and tmp root directory is not
+		                         deleted when destructor is called.
+		'''
+
+		# return delete flag of tmp directory
+		return self.__theTmpRemoval 
+
+
+	def setRetryLimit( self, retrylimit ):
+		'''Set a limit of retry number
+
+		retrylimit(int) -- a retry of retry number
 		Return None
 		'''
 		
-		#print "tReatyMaxCount %s" %retrycount
-		SessionProxy.setRetryMaxCount(retrycount)
+		# call a class method of SessionProxy.
+		SessionProxy.setRetryMaxCount(retrylimit)
 
 
 	def loadScript(self, esmfile, parameters={} ):
-		'''loads and run script file ( ESM file )
+		'''Load script file ( ESM file )
+
 		esm(str) -- an esm file name
-		parameters -- a parameter seto be set seto esm file
+		parameters(dict) -- a parameter to be set to esm file
 		Return None
 		'''
 
+		# save an esm file name to an instance attribute.
 		self.theEsm = esmfile
+
+		# create a context
 		aContext = self.__createScriptContext( parameters )
+
+		# execute esm file
 		execfile( esmfile, aContext )
             
 
@@ -233,9 +296,9 @@ class SessionManager:
 		'''registers a new job
 		scriptfile(str)            -- script file name
 		interpreter(str)           -- interpreter name seto run script
-		argument(str)              -- argument seto be set seto script
+		argument(str)              -- argument set be set seto script
 		extrafilelist(list of str) -- list of extra file name
-		timeout(int)               -- set time out (sec.). When setimeout=0, no limit is set.
+		timeout(int)               -- set time out (sec.). When setimeout<=0, no limit is set.
 		return int : job id
 		'''
 
@@ -290,8 +353,9 @@ class SessionManager:
 
 
 
-	def clearJob(self,jobid):
-		'''removes job directory and SessionProxy
+	def clearJob( self, jobid ):
+		'''Remove the job directory and the SessionProxy related to the jobid.
+
 		jobid(int) -- job id
 		When job id <= 0, clears all jobs
 		return None
@@ -310,131 +374,142 @@ class SessionManager:
 
 
 
-	def clearQueuedJobs(self):
-		'''removes queued jobs
+	def clearQueuedJobs( self ):
+		'''remove queued jobs
+
 		Return None
 		'''
 
+		# delete SessionProxy instance whose status is QUEUED
 		for aSessionProxy in self.__theSessionProxyDict.values():
 			if aSessionProxy.getStatus() == QUEUED:
 				del self.__theSessionProxyDict[aSessionProxy.getJobID()]
 
 
 
-	def clearRunningJobs(self):
-		'''removes running jobs
+	def clearRunningJobs( self ):
+		'''remove running jobs
+
 		Return None
 		'''
 
-		# stops running jobs
+		# stop running jobs
 		self.stopRunningJobs()
 
-		# deletes sethem
+		# delete SessionProxy instance whose status is RUN
 		for aSessionProxy in self.__theSessionProxyDict.values():
 			if aSessionProxy.getStatus() == RUN:
 				del self.__theSessionProxyDict[aSessionProxy.getJobID()]
 
 
 
-	def clearErrorJobs(self):
-		'''removes error jobs
+	def clearErrorJobs( self ):
+		'''remove error jobs
+
 		Return None
 		'''
 
-		# deletes error jobs
+		# delete SessionProxy instance whose status is ERROR
 		for aSessionProxy in self.__theSessionProxyDict.values():
 			if aSessionProxy.getStatus() == ERROR:
 				del self.__theSessionProxyDict[aSessionProxy.getJobID()]
 
 
 
-	def clearFinishedJobs(self):
-		'''removes finished jobs
+	def clearFinishedJobs( self ):
+		'''remove finished jobs
+
 		Return None
 		'''
 
-		# deleted finished jobs
+		# delete SessionProxy instance whose status is FINISHED
 		for aSessionProxy in self.__theSessionProxyDict.values():
 			if aSessionProxy.getStatus() == FINISHED:
 				del self.__theSessionProxyDict[aSessionProxy.getJobID()]
 
 
 
-	def update(self):
-		'''updates jobs status
+	def update( self ):
+		'''updates all jobs' status
+		This method calls merely SystemProxy's update method.
+
 		Return None
 		'''
 
-		# calls SystemProxy's update method
+		# call SystemProxy's update method
 		self.__theSystemProxy.update()
 
 
 
-	def getQueuedJobList(self):
-		'''return sethe list of queued job 
-		Return list of SessionProxy
+	def getQueuedJobList( self ):
+		'''Return the list of queued job.
+
+		Return list : the list of SessionProxy
 		'''
 
 		# initializes a job list
 		aJobList = []
 
-		# When sethe status is QUEUED, appends it.
+		# When the status is QUEUED, append it.
 		for aSessionProxy in self.__theSessionProxyDict.values():
 			if aSessionProxy.getStatus() == QUEUED:
 				aJobList.append(aSessionProxy)
 
-		# return sethe job list
+		# return the job list
 		return aJobList
 
 
 
-	def getRunningJobList(self):
-		'''return sethe list of running job 
-		Return list of SessionProxy
+	def getRunningJobList( self ):
+		'''Return the list of running job. 
+
+		Return list : the list of SessionProxy
 		'''
 
-		# initializes a job list
+		# initialize a job list
 		aJobList = []
 
-		# When sethe status is RUN, appends it.
+		# When sethe status is RUN, append it.
 		for aSessionProxy in self.__theSessionProxyDict.values():
 			if aSessionProxy.getStatus() == RUN:
 				aJobList.append(aSessionProxy)
 
-		# return sethe job list
+		# return the job list
 		return aJobList
 
 
-	def getErrorJobList(self):
-		'''return sethe list of error job 
-		Return list of SessionProxy
+	def getErrorJobList( self ):
+		'''Return the list of error job 
+
+		Return list : the list of SessionProxy
 		'''
 
-		# initializes a job list
+		# initialize a job list
 		aJobList = []
 
-		# When sethe status is ERROR, appends it.
+		# When the status is ERROR, append it.
 		for aSessionProxy in self.__theSessionProxyDict.values():
 			if aSessionProxy.getStatus() == ERROR:
 				aJobList.append(aSessionProxy)
 
-		# return sethe job list
+		# return the job list
 		return aJobList
 
 
 
-	def getFinishedJobList(self):
-		'''return sethe list of finished job 
-		Return list of SessionProxy
+	def getFinishedJobList( self ):
+		'''Return the list of finished job. 
+
+		Return list : list of SessionProxy
 		'''
 
-		# sets up job list
+		# initialize a job list
 		aJobList = []
 
 		# checks sethe status of SessionProxy
 		for aSessionProxy in self.__theSessionProxyDict.values():
 
-			# when sethe status is FINISHED, append it seto job list
+			# when sethe status is FINISHED, append it.
 			if aSessionProxy.getStatus() == FINISHED:
 				aJobList.append(aSessionProxy)
 
@@ -443,9 +518,10 @@ class SessionManager:
 
 
 
-	def isFinished(self):
-		'''checks running jobs exists
-		When sethe number of jobs who status is QUEUED or RUN = 0, return True.
+	def isFinished( self ):
+		'''Check all jobs are finished or not.
+		When the number of jobs whose status is QUEUED or RUN = 0, return True.
+
 		Return boolean 
 		'''
 
@@ -459,9 +535,10 @@ class SessionManager:
 		return True
 
 
-	def isError(self):
-		'''checks running jobs exists
-		When sethe number of jobs who status is ERROR > 0, return True.
+	def isError( self ):
+		'''Check the existance of error job.
+		When the number of jobs whose status is ERROR > 0, return True.
+
 		Return boolean 
 		'''
 
@@ -470,13 +547,14 @@ class SessionManager:
 			if aSessionProxy.getStatus() == ERROR:
 				return True
 
-		# If not, return Fal.
-		return Fal
+		# If not, return False.
+		return False
 
 
-	def isRunning(self):
-		'''checks running jobs exists
+	def isRunning( self ):
+		'''Check the existance of running job.
 		When sethe number of jobs who status is RUN > 0, return True.
+
 		Return boolean 
 		'''
 
@@ -486,12 +564,15 @@ class SessionManager:
 				return True
 
 		# If not, return Fal.
-		return Fal
+		return False
 
 
 
-	def __timeout(self,signum,frame):
-		'''When run method reaches setimeout, sethis method is called
+	def __timeout( self, signum, frame ):
+		'''When run method reaches setimeout, this method is called.
+		In this method, stop method is called.
+
+		Return None
 		'''
 
 		# stop all jobs
@@ -499,106 +580,150 @@ class SessionManager:
 
 
 
-	def setUpdateInterval(self, interval=1):
-		'''set update interval
+	def setUpdateInterval( self, interval=1 ):
+		'''Set an update interval.
+		When the argument block is True, update method of SystemProxy
+		is called in the update interval time.
+		When the argument block is False, the update interval time
+		is not used.
+
+		interval(int) -- an interval time (sec.). default is 1.
 		Return None
 		'''
+
+		# save interval to instance attribute
 		self.__theUpdateInterval = interval
 
 
 
-	def getUpdateInterval(self):
-		'''retunrn update interval
-		Return int : interval
+	def getUpdateInterval( self ):
+		'''Return the update interval.
+		Update interval is used in run method.
+		See setUpdateInterval about the detail of update interval
+
+		Return int : interval time (sec.)
 		'''
+
+		# return the update interval
 		return self.__theUpdateInterval 
 
 
 
-	def setGlobalRunTimeout(self, timeout=0):
-		'''set a time out of run method
-		timeout = 0 : no limit
+	def setGlobalRunTimeout( self, timeout=0 ):
+		'''Set a timeout of run method.
+		When the time of run method reach the timeout,
+		stop method is called. Then running jobs and queued jobs 
+		are finished compulsorily and their status become ERROR.
+
+		timeout(int) -- a timeout of run method (sec.) 
+		                if timeout<=0, no limit is set. Default is 0.
 		Return None
 		'''
+
+		# save timeout to instance attribute
 		self.__theGlobalRunTimeout = timeout
 
 
 
-	def getGlobalRunTimeout(self):
-		'''get a time out of run method
-		Return None
+	def getGlobalRunTimeout( self ):
+		'''Return the timeout of run method.
+		See setGlobalRunTimeout about the detail of timeout
+
+		Return int : the timeout of run method (sec.)
 		'''
+
+		# return the timeout
 		return self.__theGlobalRunTimeout 
 
 
 
-	#def run(self,number=0,block=True,updateinterval=1,timeout=0):
-	#def run(self,number=0,block=True,timeout=0):
-	def run(self,block=True):
-		'''run
+	def run( self, block=True ):
+		'''Execute the QUEUED jobs.
+		The RUNNING or FINISHED jobs are not executed by this method.
+
+		When block is True, this method waits until all jobs are finished.
+		While some jobs are running, call update method at the intervals of
+		updateinterval that is speficed setUpdateInterval.
+		When the global run timeout > 0 is set through setGlobalRunTimeout
+		and the running time of this method reaches it, stop method is
+		called and this method is finished compulsorily.
+
+		When block is False, you have to call update method by yourself.
+		If update method does not be called, not only the status of all jobs
+		are not changed but also queued jobs never be executed.
+
+		block(boolean) -- True: This method waits until all jobs are finished.
+		                  False: This method does not wait.
 		Return : None
 		'''
 
-		# sets setime out
+		# set timeout
 		signal.signal(signal.SIGALRM, self.__timeout)
 		signal.alarm(self.__theGlobalRunTimeout )
 
 
 		# -----------------------------------------------
-		# sets up 
+		# set up 
 		# -----------------------------------------------
-		# creates setmp root dir
+		# create a tmp root dir
 		if os.path.isdir( self.__theTmpRootDir ) == False:
 			os.mkdir(self.__theTmpRootDir)
 
 
-		# creates setmp directory.
-		os.mkdir(self.__theTmpDir)
+		# create a tmp directory.
+		if os.path.isdir(self.__theTmpDir) == False:
+			os.mkdir(self.__theTmpDir)
 		
 
-		# creates job directories and copies sources
+		# create job directories and copies sources
 		for aSessionProxy in self.__theSessionProxyDict.values():
 
-			# -----------------------
-			# sets up job directory
-			# -----------------------
+			if aSessionProxy.getStatus() == FINISHED:
+				continue
 
-			# creates job directory name
+			# -----------------------
+			# set up job directory
+			# -----------------------
+			# create job directory name
 			aJobDirectoryName = "%s%s%s" %(self.__theTmpDir,
 		  	                               os.sep,
 		   	                               aSessionProxy.getJobID())
 
 		
-			# creates job directory 
-			os.mkdir(aJobDirectoryName)
+			# create job directory 
+			if os.path.isdir(aJobDirectoryName) == False:
+				os.mkdir(aJobDirectoryName)
 
 			# -----------------------
-			# sets up script
+			# set up script
 			# -----------------------
 
-			# creates dist filename
+			# create dist filename
 			aDstFileName = "%s%s%s" %(aJobDirectoryName,
 		  	                          os.sep,
 			                          os.path.basename(aSessionProxy.getScriptFileName()) )
 
-			# copies script
+			# copie script
 			shutil.copyfile( aSessionProxy.getScriptFileName(), aDstFileName )
-			
+
 			# -----------------------
 			# sets up extra files
 			# -----------------------
-			#print aSessionProxy.getExtraFileList()
-
 			for anExtraFile in aSessionProxy.getExtraFileList():
 
 				# creates dist filename
-
 				aDstFileName = "%s%s%s" %(aJobDirectoryName,
 		  		                          os.sep, 
 				                          os.path.basename(anExtraFile)) 
 
-				shutil.copyfile( anExtraFile ,aDstFileName )
-				#print aDstFileName
+				# copy a directory
+				if os.path.isdir( anExtraFile ) == True:
+					shutil.copytree( anExtraFile ,aDstFileName )
+
+				# copy a file
+				else:
+					shutil.copyfile( anExtraFile ,aDstFileName )
+
 
 
 		# -----------------------------------------------
@@ -609,7 +734,6 @@ class SessionManager:
 
 			while( True ):
 
-
 				# updates status of all SessionProxy
 				self.update()
 
@@ -618,15 +742,17 @@ class SessionManager:
 					break
 
 				# sleeps for update interval
-				#time.sleep(updateinterval)
 				time.sleep(self.__theUpdateInterval)
 
 
 
-	def stop(self,jobid=0):
-		'''stops job
+	def stop( self, jobid=0 ):
+		'''stop jobs.
+		Change the statuses of QUEUED or RUNNING jobs to ERROR.
+		About FINISHED jobs, do nothing.
+
 		jobid(int) -- job id
-		When jobid=0, stop all jobs
+		              When jobid<=0, stop all jobs
 		Return None
 		'''
 
@@ -642,8 +768,10 @@ class SessionManager:
 
 
 
-	def stopRunningJobs(self):
-		'''stops running jobs
+	def stopRunningJobs( self ):
+		'''Stop running jobs.
+		Change all statuses of RUNNING jobs to ERROR.
+
 		Return None
 		'''
 
@@ -653,11 +781,16 @@ class SessionManager:
 
 
 
-	def getSessionProxy(self,jobid=0):
-		'''return sethe reference of SessionProxy
+	def getSessionProxy( self, jobid=0 ):
+		'''Return an instance of SessionProxy or dict of jobids.
+		and instances of SessionProxy.
+
 		jobid(int) -- job id
-		When jobid is 0, return list of SessionProxy
-		Return SessionProxy or list of SessionProxy
+		              When jobid<=0, return dict of SessionProxy
+
+		Return SessionProxy or dict of SessionProxy
+		A key of the dict of SessionProxy is jobid(int).
+		and a value of it is an instance of SessionProxy.
 		'''
 
 		# return SessionProxy
@@ -670,23 +803,24 @@ class SessionManager:
 
 
 
-	def setStdoutFileName(self,stdout):
-		'''set sethe standard output file
+	def setStdoutFileName( self, stdout ):
+		'''Set the standard output file.
 
-		stdout(str of file) -- sethe file name or file object seto be wrote
+		stdout(str of file) -- sethe file name or file object 
+		                       default is 'stdout'
 
 		Return None
-		[Note]: default is 'stdout'
 		'''
 
-		# sets standard output
+		# set standard output
 		SessionProxy.setStdoutFileName(stdout)
 
 
 
-	def getStdoutFileName(self):
-		'''return sethe standard output file
-		stdout(str of file) -- sethe file name or file object seto be wrote
+	def getStdoutFileName( self ):
+		'''Return sethe standard output file.
+
+		stdout(str of file) -- sethe file name or file object.
 		Return str or file : standard output
 		'''
 
@@ -695,20 +829,23 @@ class SessionManager:
 
 
 
-	def setStderrFileName(self,stderror):
-		'''sets sethe standard error file
-		stderror(str of file) -- sethe file name or file object seto be wrote
+	def setStderrFileName( self, stderror ):
+		'''Set the standard error file.
+
+		stderr(str of file) -- sethe file name or file object
+		                       default is 'stderr'
 		Return None
 		'''
 
-		# sets standard error 
+		# set standard error 
 		SessionProxy.setStderrFileName(stderror)
 
 
 
-	def getStderrFileName(self):
-		'''return sethe standard error file
-		stderror(str of file) -- sethe file name or file object seto be wrote
+	def getStderrFileName( self ):
+		'''Return the standard error file.
+
+		stderror(str of file) -- the file name or file object
 		Return str or file : standard error 
 		'''
 
@@ -717,12 +854,15 @@ class SessionManager:
 
 
 
-	def getJobDirectory(self,jobid):
-		'''return sethe job directory name
+	def getJobDirectory( self, jobid ):
+		'''Return the job directory name
+
 		jobid(int) -- job id
-		Return str : sethe path of job directory
+
+		Return str : the path of the job directory
 		'''
 
+		# return the path of the job directory
 		return self.__theSessionProxyDict[jobid].getJobDirectory()
 
 
@@ -788,7 +928,7 @@ class SessionManager:
 	class _session_prompt:
 
 		def __init__( self, anEsm ):
-			self.__theEsm = anEsm
+			self.theEsm = anEsm
 
 		def __str__( self ):
 

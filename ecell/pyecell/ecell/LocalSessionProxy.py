@@ -31,6 +31,7 @@ E-CELL Project, Lab. for Bioinformatics, Keio University.
 import sys
 import string
 import os
+import popen2
 
 from ecell.Util import *
 from SessionProxy import *
@@ -42,19 +43,19 @@ class LocalSessionProxy(SessionProxy):
 
 
 	def __init__(self):
-		'''constructor
+		'''Constructor
 		'''
 
-		# calls superclass's constructor
+		# call superclass's constructor
 		SessionProxy.__init__(self)
 
-		# initializes parameter
+		# initialize parameter
 		self.__theSubProcess = None
 
 
 
 	def retry(self):
-		'''retrys
+		'''retry
 		Return None
 		'''
 
@@ -64,36 +65,36 @@ class LocalSessionProxy(SessionProxy):
 			aPid = self.__theSubProcess.pid
 			os.kill(aPid,1)
 
-		# runs again.
+		# run again.
 		self.run()
 
 
 
 	def run(self):
-		'''runs process
+		'''run this process
 		Return None
 		'''
 
 		# --------------------------------
-		# sets up
+		# set up
 		# --------------------------------
-		# calls super class's method
+		# call super class's method
 		SessionProxy.run(self)
 
-		# checks status
+		# check status
 		if self.getStatus() == FINISHED or self.getStatus() == ERROR:
 			return None
 
-		# saves current directory
+		# save current directory
 		aCwd = os.getcwd()
 
-		# changes directory to job directory
+		# change directory to job directory
 		os.chdir( self.getJobDirectory() )
 
 		# --------------------------------
-		# executes script
+		# execute script
 		# --------------------------------
-		# creates context
+		# create context
 		#print str(self.getSessionArgument())
 		if self.getInterpreter() == ECELL3_SESSION:
 			aContext = "%s -e %s --parameters=\"%s\"" %(ECELL3_SESSION,
@@ -105,25 +106,21 @@ class LocalSessionProxy(SessionProxy):
 		                            os.path.basename(self.getScriptFileName()),
 		                            self.getArgument())
 
-		#sys.exit(0)
 
-		# executes the context
-		import popen2
-		#aStdin, aStdout, aStderr = popen2.popen3( aContext )
-
+		# execute the context
 		self.__theSubProcess = popen2.Popen3( aContext, capturestderr=True )
 
-		# gets back previous directory
+		# get back previous directory
 		os.chdir( aCwd )
 
 
 
 	def update( self ):
-		'''updates jobs's status
+		'''update jobs's status
 		Return None
 		'''
 
-		# calls super class's method
+		# call super class's method
 		SessionProxy.update(self)
 
 
@@ -133,7 +130,7 @@ class LocalSessionProxy(SessionProxy):
 
 		#print "jobid %s---->(%s)" %(self.getJobID(),self.__theSubProcess.poll())
 
-		# checks the running status 
+		# check the running status 
 		if self.__theSubProcess.poll() == -1:
 
 			# when this job if running, do nothing
@@ -145,35 +142,35 @@ class LocalSessionProxy(SessionProxy):
 		aStderr = self.__theSubProcess.childerr
 
 		# --------------------------------
-		# writes outputs to file
+		# write an output to file
 		# --------------------------------
 
-		# writes stdout file 
+		# write a stdout file 
 		aStdoutFile = "%s%s%s" %( self.getJobDirectory(),
 		                          os.sep,
 		                          self.getStdoutFileName() )
 		
-		shutil.copyfileobj(aStdout,open(aStdoutFile,'w'))
+		shutil.copyfileobj(aStdout,open(aStdoutFile,'a'))
 
 
-		# writes stdout file 
+		# write a stderr file 
 		aStderrFile = "%s%s%s" %( self.getJobDirectory(),
 		                          os.sep,
 		                          self.getStderrFileName() )
-		shutil.copyfileobj(aStderr,open(aStderrFile,'w'))
+		shutil.copyfileobj(aStderr,open(aStderrFile,'a'))
 
 		# --------------------------------
-		# checks status
+		# check status
 		# --------------------------------
 		
-		# checks the file size of standard error file
-		# when the file size is 0, sets status as FINISHED
+		# check the file size of standard error file
+		# when the file size is 0, set status as FINISHED
 		if os.stat(aStderrFile)[6] == 0L:
 
 			# sets finished status
 			self.setStatus(FINISHED) 
 		
-		# when the file size is 0, sets status as ERROR
+		# when the file size is 0, set status as ERROR
 		else:
 
 			# sets error status
@@ -182,7 +179,7 @@ class LocalSessionProxy(SessionProxy):
 
 
 	def stop(self):
-		'''stops the job
+		'''stop this job
 		Return None
 		'''
 
@@ -191,7 +188,7 @@ class LocalSessionProxy(SessionProxy):
 			#print "stop %s " %aPid
 			os.kill(aPid,1)
 
-		# sets error status
+		# set error status
 		self.setStatus(ERROR) 
 
 

@@ -62,41 +62,41 @@ class SessionProxy:
 	# -----------------
 
 	def __getNextJobID(cls):
-		'''returns next job ID 
+		'''Return next job ID.
 		Return int : job ID
 		[Note]:private method, the first job id is 1
 		'''
 
-		# counts up jod id
+		# count up jod id
 		SessionProxy.__theJobID += 1
 
-		# returns job id
+		# return job id
 		return SessionProxy.__theJobID
 
 
 	def setStdoutFileName(cls, stdout):
-		'''sets standard output
+		'''Set an standard output.
 		stdout(str or file) -- file name or file object to be wrote
 		Return None
 		[Note] default stdout is 'stdout'
 		'''
 
-		# sets stdout
+		# set stdout
 		SessionProxy.__theStdout = stdout
 
 
 	def getStdoutFileName(cls):
-		'''returns standard output
+		'''Return the standard output.
 		Return str or file -- standard output
 		[Note] default stdout is 'stdout'
 		'''
 
-		# returns stdout
+		# return stdout
 		return SessionProxy.__theStdout
 
 
 	def setStderrFileName(cls, stderror):
-		'''sets standard error
+		'''Set a standard error.
 		stdout(str or file) -- file name or file object to be wrote
 		Return None
 		[Note] default stderr is 'stderr'
@@ -106,7 +106,7 @@ class SessionProxy:
 
 
 	def getStderrFileName(cls):
-		'''returns standard error
+		'''Return standard error.
 		Return str or file -- standard error
 		[Note] default stderr is 'stderr'
 		'''
@@ -115,7 +115,7 @@ class SessionProxy:
 
 
 	def setRetryMaxCount(cls, count):
-		'''sets retry max count
+		'''Set retry max count.
 		When count < 0, count is set as 0
 		count(int) -- retry max count
 		Return None
@@ -128,7 +128,7 @@ class SessionProxy:
 		SessionProxy.__theRetryMaxCount = count
 
 
-	# registers class methods
+	# register class methods
 	__getNextJobID = classmethod(__getNextJobID)
 	setStdoutFileName = classmethod(setStdoutFileName)
 	getStdoutFileName = classmethod(getStdoutFileName)
@@ -143,16 +143,16 @@ class SessionProxy:
 
 	def __init__(self):
 		'''Constructor
-		job id is set.
-		status is set as QUEUED
+		a job id is set.
+		a status is set as QUEUED
 		all attributes are initialized.
 		'''
 
-		# sets job id
+		# set job id
 		self.__theJobID = SessionProxy.__getNextJobID()
 
 
-		# sets status as QUEUED
+		# set status as QUEUED
 		self.__theStatus = QUEUED
 
 
@@ -170,11 +170,11 @@ class SessionProxy:
 
 
 	def __del__(self):
-		'''when destractor is called, deletes the job directory.
+		'''When destractor is called, deletes the job directory.
 		Return None
 		'''
 
-		# removes job directory
+		# remove job directory
 		self.clearJobDirectory()
 
 		# destractor is called automatically after this method
@@ -182,38 +182,38 @@ class SessionProxy:
 
 
 	def getJobID(self):
-		'''returns job id
+		'''Return the job id
 		Return int : job id
 		''' 
 
-		# returns the job id
+		# return the job id
 		return self.__theJobID 
 
 
 
 	def setScriptFileName(self,scriptfilename):
-		'''sets script file name
+		'''Set a script file name.
 		scriptfilename(str) -- a script file name
 		Return None
 		''' 
 
-		# sets the script file name
+		# Set the script file name.
 		self.__theScriptFileName = scriptfilename
 
 
 
 	def getScriptFileName(self):
-		'''returns script file name
+		'''return the script file name
 		Return str : script file name
 		''' 
 
-		# returns the script file name
+		# Return the script file name
 		return self.__theScriptFileName 
 
 
 
 	def setInterpreter(self,interpreter):
-		'''sets interpreter
+		'''Set an interpreter.
 		interpreter(str) -- an interpreter
 		Return None
 		'''
@@ -225,108 +225,109 @@ class SessionProxy:
 		except IOError:
 			aPath = interpreter
 
-		# sets the interpreter
+		# set the interpreter
 		self.__theInterpreter = os.path.abspath( aPath )
 
 
 	def getInterpreter(self):
-		'''returns interpreter
+		'''Return the interpreter.
 		Return str : interpreter
 		''' 
 
-		# returns the interpreter
+		# return the interpreter
 		return self.__theInterpreter 
 
 
 
 	def setArgument(self,argument):
-		'''sets argument
+		'''Set an argument.
 		argument(str) -- an argument to be set to script
 		Return None
 		''' 
 
-		# sets the argument
+		# set the argument
 		self.__theArgument = argument
 
 
 
 	def getArgument(self):
-		'''returns argument
+		'''Return the argument.
 		Return None
 		''' 
 
-		# returns the artument
+		# return the artument
 		return self.__theArgument 
 
 
 
 	def setSessionArgument(self,argument):
-		'''sets argument to session
+		'''Set an argument to session.
 		argument(dict)  -- argument to be set to session
 		Return None
 		''' 
 
-		# sets session argument
-		self.__theSessionArgument = re.sub(':\s*',':',argument)
+		# set session argument
+		#self.__theSessionArgument = re.sub(':\s*',':',argument)
+		self.__theSessionArgument = re.sub(',\s*', ',', re.sub(':\s*',':',str(argument)))
 
 
 
 	def getSessionArgument(self):
-		'''returns argument of session
+		'''Returns the argument of session.
 		Return str : argument of session
 		''' 
 
-		# returns the session argument
+		# return the session argument
 		return self.__theSessionArgument 
 
 
 
 	def setExtraFileList(self,extrafilelist):
-		'''sets extra file list
+		'''Set an extra file list.
 		extrafilelist(list of str)  -- extra file list
 		Return None
 		''' 
 
-		# sets the extra file list
+		# set the extra file list
 		self.__theExtraFileList = extrafilelist
 
 
 
 	def getExtraFileList(self):
-		'''returns extra file list
+		'''Returns the extra file list.
 		Return list of str : extra file list
 		''' 
 
-		# returns the extra file list
+		# return the extra file list
 		return self.__theExtraFileList 
 
 
 
 	def setTimeout(self,timeout):
-		'''sets timeout
+		'''Set a timeout.
 		When timeout is 0, no limit is set.
 		timeout(int) -- time out (sec.)
 		Return None
 		'''
 
-		# sets time out
+		# set a timeout
 		self.__theTimeout = timeout
 
 
 
 	def getTimeout(self):
-		'''returns timeout
+		'''Return the timeout.
 		Return int : time out (sec.)
 		'''
 
-		# returns the time out
+		# return the time out
 		return self.__theTimeout 
 
 
 
 	def retry(self):
 		'''ABSTRACT : This method must be overwrote in subclass
-		retries job
+		retry job
 		Return None
 		raise NotImplementedError
 		'''
@@ -340,20 +341,20 @@ class SessionProxy:
 
 
 	def run(self):
-		'''runs process
+		'''run process
 		Return None
-		[Note] This method must be called from the first of run method of sub class.
+		[Note] This method must be called from the run method of sub class.
 		'''
 
-		# sets status
+		# set a status
 		self.setStatus(RUN)
 
 		# -----------------------------
-		# checks the retry count
+		# check the retry count
 		# -----------------------------
 
 		# When status is RUN, and retry count is over max retry count,
-		# sets ERROR status and does nothing.
+		# set ERROR status and does nothing.
 		if self.getStatus() == RUN:
 		
 			if self.getRetryMaxCount() != 0:
@@ -362,42 +363,42 @@ class SessionProxy:
 					return None
 
 		# -----------------------------
-		# runs
+		# run
 		# -----------------------------
 
-		# counts up retry counter
+		# count up retry counter
 		self.__theRetryCount += 1
 
 
-		# saves current time
+		# save current time
 		self.__theStartTime = time.time()
 
 
 
 	def update(self):
-		'''updates status
+		'''update status
 		Return None
 		[Note] This method must be called from the first of run method of sub class.
 		'''
 
 		# When the status is RUN, and running time is > timeout,
-		# calls retry method of sub class
+		# call retry method of sub class
 		if self.__theStatus == RUN:
 
-			# When the timeout is set as 0, does not retry.
+			# When the timeout is set as 0, do not retry.
 			if self.__theTimeout != 0:
 
-				# checks the running time
+				# check the running time
 				if time.time() - self.__theStartTime > self.__theTimeout:
 
-					# calls retyr method of sub class
+					# call retyr method of sub class
 					self.retry()
 
 
 
 	def stop(self):
 		'''ABSTRACT : This method must be overwrote in subclass
-		stops job
+		stop job
 		Return None
 		raise NotImplementedError
 		'''
@@ -411,66 +412,66 @@ class SessionProxy:
 
 
 	def setStatus(self,status):
-		'''sets status 
+		'''Set a status.
 		aStatus(int) -- QUEUED,RUN,ERROR, or FINISHED
 		Return None
 		'''
 
-		# sets the status
+		# set a status
 		self.__theStatus = status
 
 
 
 	def getStatus(self):
-		'''returns status 
+		'''Return the status.
 		Return int : QUEUED,RUN,ERROR, or FINISHED
 		'''
 
-		# returns the status
+		# return the status
 		return self.__theStatus
 
 
 
 	def getRetryCount(self):
-		'''returns retry count
+		'''Returns the retry count.
 		Return int : retry count
 		'''
 
-		# returns the retry count
+		# return the retry count
 		return self.__theRetryCount
 
 
 
 	def getRetryMaxCount(self):
-		'''retunrs retry max count
+		'''Return the retry max count.
 		Return int : retry max count
 		'''
 
-		# returns the retry max count
+		# return the retry max count
 		return self.__theRetryMaxCount 
 
 
 	def setJobDirectory(self,jobdirectory):
-		'''sets job directory
+		'''Set a job directory.
 		jobdirectory(str) -- job directory
 		Return None
 		'''
 
-		# saves job directory
+		# save job directory
 		self.__theJobDirectory = jobdirectory
 
 
 	def getJobDirectory(self):
-		'''returns job directory
+		'''Return job directory.
 		Return str : job directory
 		'''
 
-		# returns job directory
+		# return job directory
 		return self.__theJobDirectory
 
 
 	def clearJobDirectory(self):
-		'''removes job directory if there is.
+		'''Remove job directory if there is.
 		Return None
 		'''
 
@@ -478,7 +479,7 @@ class SessionProxy:
 		if os.path.isdir( self.__theJobDirectory ):
 			shutil.rmtree(self.__theJobDirectory)
 
-		# if not, does nothing
+		# if not, do nothing
 		else:
 			pass
 

@@ -145,7 +145,7 @@ class SGESystemProxy(SystemProxy):
 				# considered to be finished
 				if aStatusDict.has_key(str(aSGEJobID)) == False:
 
-					aSessionProxy.setStatus('FINISHED')
+					aSessionProxy.setStatus(FINISHED)
 
 				# When job is running,
 				else:
@@ -199,6 +199,7 @@ class SGESystemProxy(SystemProxy):
 		#	print " aJobID = %s aStatus = %s" %(aJobID,aStatus)
 
 
+	# end of def update
 
 
 
