@@ -1,6 +1,0 @@
-#!/bin/sh
-MEPATH=@prefix@/lib/modeleditor
-export PYTHONPATH="${MEPATH}:${PYTHONPATH}"
-
-ecell3-python ${MEPATH}/opengui.py $@
-
