@@ -354,18 +354,6 @@ class LoggerWindow(OsogoWindow):
 	# end of theSelectedPropertyName
 
 
-	# ---------------------------------------------------------------
-	# Selects PropertyName
-	# return -> None
-	# ---------------------------------------------------------------
-#	def selectPropertyName( self ):
-#		aCList = self['loggerWindow_clist']
-#
-#		for aRowNumber in aCList.selection:
-#			aPropertyName = aCList.get_text(aRowNumber,0)
-#
-	# end of selectPropertyName
-
 
 	# ---------------------------------------------------------------
 	# Updates
@@ -373,9 +361,9 @@ class LoggerWindow(OsogoWindow):
 	# ---------------------------------------------------------------
 	def update( self ):
 
-		#		if self.isShown == gtk.TRUE:
-		#			self.theEntryList.clear()
-#		return True
+		if self.isShown == gtk.FALSE:
+			return None
+
 		self.theFullPNList = self.theSession.getLoggerList()
 		self.theList = []
 

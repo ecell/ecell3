@@ -148,7 +148,7 @@ class MainWindow(OsogoWindow):
 		# creates LoggerWindow
 		# -------------------------------------
 		self.theLoggerWindow = LoggerWindow.LoggerWindow( self.theSession , self )
-		self.theLoggerWindow.openWindow()
+		#self.theLoggerWindow.openWindow()
 
 		# -------------------------------------
 		# creates InterfaceWindow
@@ -1205,102 +1205,6 @@ class MainWindow(OsogoWindow):
 
 	# end of openPreference
 
-
-	# ---------------------------------------------------------------
-	# initializePaletteWindow
-	#
-	#
-	# return -> None
-	# This method is throwable exception.
-	# ---------------------------------------------------------------
-	#def initializePaletteWindow( self ):
-
-	#	self.thePaletteWindow = PaletteWindow.PaletteWindow( self )
-	#	self.thePaletteWindow.setPluginList( self.thePluginManager.thePluginMap )
-
-	# end of initializePaletteWindow
-
-
-
-	# ---------------------------------------------------------------
-	# togglePaletteWindowByMenu
-	#   - called when palette menu is toggled.
-	#   - sets the "isShown" attribute.
-	#   - calls togglePalleteWindow
-	#
-	# *objects : dammy objects 
-	#
-	# return -> None
-	# This method is throwable exception.
-	# ---------------------------------------------------------------
-	#def togglePaletteWindowByMenu( self, button_obj ) :
-
-	#	self.thePaletteWindow.isShown = self['palette_window_menu'].active 
-	#	self.togglePaletteWindow()
-
-	# end of togglePaletteWindowByMenu
-
-
-	# ---------------------------------------------------------------
-	# togglePaletteWindowByButton
-	#   - called when palette button is toggled.
-	#   - sets the "isShown" attribute.
-	#   - calls togglePalleteWindow
-	#
-	# *objects : dammy objects 
-	#
-	# return -> None
-	# This method is throwable exception.
-	# ---------------------------------------------------------------
-	#def togglePaletteWindowByButton( self, button_obj ) :
-
-	#	self.thePaletteWindow.isShown = self['palette_togglebutton'].get_active()
-	#	self.togglePaletteWindow()
-
-	# end of togglePaletteWindowByButton
-
-
-	# ---------------------------------------------------------------
-	# togglePaletteWindow
-	#
-	# button_obj : button
-	#
-	# return -> None
-	# This method is throwable exception.
-	# ---------------------------------------------------------------
-#	def togglePaletteWindow( self ) :
-#
-#		# ------------------------------------------------------
-#		# button is toggled to active 
-#		# ------------------------------------------------------
-#		if self.thePaletteWindow.isShown == TRUE:
-#
-#			if self.thePaletteWindow.getExist() == 0:
-#				self.initializePaletteWindow()
-#			else:
-#				pass	
-#
-#			self.thePaletteWindow.hide()
-#			self.thePaletteWindow.show_all()
-#
-#			self['palette_togglebutton'].set_active(TRUE)
-#			self['palette_window_menu'].set_active(TRUE)
-#
-#		# ------------------------------------------------------
-#		# button is toggled to non-active
-#		# ------------------------------------------------------
-#		else:
-#			if self.thePaletteWindow.getExist() == 0:
-#				pass
-#			else:
-#				self.thePaletteWindow.hide()
-#
-#			self['palette_togglebutton'].set_active(FALSE)
-#			self['palette_window_menu'].set_active(FALSE)
-#        
-#	# end of togglePaletteWindow
-
-
 	# ---------------------------------------------------------------
 	# toggleInterfaceWindowByMenu
 	#   - called when interface menu is toggled.
@@ -1490,17 +1394,6 @@ class MainWindow(OsogoWindow):
 			else:
 				self['interface_togglebutton'].set_active(FALSE)
 				self['interface_window_menu'].set_active(FALSE)
-
-			#if self.theStepperChecker:
-
-				# if palette button pressed
-				#if self['palette_togglebutton'].get_active():
-				#	if self.thePaletteWindow.isShown == TRUE :
-				#		self['palette_togglebutton'].set_active(TRUE)
-				#		self['palette_window_menu'].set_active(TRUE)
-				#	else:
-				#		self['palette_togglebutton'].set_active(FALSE)
-				#		self['palette_window_menu'].set_active(FALSE)
 
 			# entity window
 			# detects the destroyed EntityWindows, and delete them from

@@ -193,11 +193,10 @@ class PropertyWindow(OsogoPluginWindow):
 			# updates each widget
 			# Type, ID, Path, Classname
 			# -----------------------------------------------
-			self['entry_TYPE'].set_text( ENTITYTYPE_STRING_LIST[self.theFullID()[TYPE]] \
-			                             + ' : ' + anEntityStub.getClassname() )
-			self['entry_ID'].set_text( self.theFullID()[ID] )
-			self['entry_PATH'].set_text( str( self.theFullID()[SYSTEMPATH] ) )
-			self['entry_NAME'].set_text( anEntityStub.getProperty( 'Name' ) )
+			self['entry_type'].set_text( ENTITYTYPE_STRING_LIST[self.theFullID()[TYPE]] )
+			self['entry_classname'].set_text( anEntityStub.getClassname() )
+			self['entry_id'].set_text( self.theFullID()[ID] )
+			self['entry_path'].set_text( str( self.theFullID()[SYSTEMPATH] ) )
 
 			# saves properties to buffer
 			for aProperty in anEntityStub.getPropertyList():

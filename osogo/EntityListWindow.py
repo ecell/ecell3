@@ -55,29 +55,10 @@ class EntityListWindow(OsogoWindow):
 		                    'on_create_button_clicked'     : self.createPluginWindow,\
 				    } )
 
-		#self.thePaletteWindow = aMainWindow.thePaletteWindow
-
-		# initialize widgets
-		#self.theTypeMenu = self.theTypeOptionMenu.get_menu()
-		#self.theTypeMenu.connect( 'selection-done',\
-		#			  self.updateSystemSelection )
-
-		#aTypeMenuItemMap = self.theTypeMenu.get_children()
-		#aTypeMenuItemMap[0].set_data( 'LABEL', 'Variable' )
-		#aTypeMenuItemMap[1].set_data( 'LABEL', 'Process' )
-		#aTypeMenuItemMap[2].set_data( 'LABEL', 'All' )
-
-		#self.theSystemTree.show()
-		#self.theEntityList.show()
-
 		#self.displayed_depth=-1
 		
 		self.theSysTreeStore=gtk.TreeStore( gobject.TYPE_STRING )
 		self['system_tree'].set_model(self.theSysTreeStore)
-				    
-		#self.theEntityListStore=gtk.ListStore( gobject.TYPE_STRING )
-		#self.theEntityList.get_selection().set_mode( gtk.SELECTION_MULTIPLE )
-		#self.theEntityList.set_model( self.theEntityListStore )
 		
 		# ------------------------------------------
 		# setup system tree
@@ -169,15 +150,19 @@ class EntityListWindow(OsogoWindow):
 	# ---------------------------------------------------------------
 	def constructTree( self, aParentTree, aSystemFullID ):
 
-		newlabel = aSystemFullID[ID] 
-		iter  = self.theSysTreeStore.append( aParentTree )
+		#print "-------------------------------------------------"
 
-		self.theSysTreeStore.set_value( iter, 0, newlabel )
+		aNewlabel = aSystemFullID[ID] 
+		#print "aNewlabel = [%s]" %aNewlabel
+
+		iter  = self.theSysTreeStore.append( aParentTree )
+		self.theSysTreeStore.set_value( iter, 0, aNewlabel )
 		key = str( self.theSysTreeStore.get_path( iter ) )
 		self.theSysTreeStore.set_data( key, aSystemFullID )
 		    
 		aSystemListFullPN = convertFullIDToFullPN( aSystemFullID, 'SystemList' ) 
-		aSystemList = self.theMainWindow.theSession.theSimulator.getEntityProperty( createFullPNString( aSystemListFullPN ) )
+		#print " systemlistfullpn = [%s] " %str(aSystemListFullPN)
+		aSystemList = self.theSession.theSimulator.getEntityProperty( createFullPNString( aSystemListFullPN ) )
 		aSystemListLength = len( aSystemList )
 
 		if  aSystemListLength != 0:
@@ -187,6 +172,9 @@ class EntityListWindow(OsogoWindow):
 				aNewSystemFullID = ( SYSTEM, aSystemPath, aSystemID )
 				self.constructTree( iter, aNewSystemFullID )
 
+				if aSystemListLength <= 5:
+					aPath = self.theSysTreeStore.get_path( iter )
+					self['system_tree'].expand_row( aPath, gtk.FALSE )
 
 	def updateSystemSelection( self, obj=None ):
 		aSelectedSystemIter = self['system_tree'].get_selection().get_selected()[1]
