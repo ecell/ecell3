@@ -1,8 +1,67 @@
 #!@SHELL@
 
+
+PROGRAM=@PROGRAM@
+VERSION=@VERSION@
+
 prefix=@prefix@
 exec_prefix=@exec_prefix@
 export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:@libdir@"
 export PYTHONPATH="@pythondir@:${PYTHONPATH}"
 
-exec @PYTHON@ $*
+PYTHON=@PYTHON@
+#GDB=@GDB@
+GDB=gdb
+
+# internal variables. DO NOT EDIT BELOW
+OPTS="dh"
+LONGOPTS=\
+"debug,help"
+unset DEBUG HELP
+
+ecell3_usage() 
+{
+cat << EOT_USAGE
+echo $PROGRAM $VERSION
+
+Invoke python interpreter ready to import E-CELL module.
+('import ecs' to load the module.)
+
+Usage:
+        `basename $0` [OPTIONS]     --> invoke the python interpreter
+        `basename $0` -d|--debug    --> invoke the python interpreter with gdb
+        `basename $0` -h|--help     --> print this message
+
+EOT_USAGE
+}
+
+
+#
+# parse commandline options
+#
+TEMP=`getopt -o $OPTS --long $LONGOPTS -n "$0" -- "$@"`
+if [ $? != 0 ] ; then echo "getopt error..." >&2 ; exit 1 ; fi
+eval set -- "$TEMP"
+
+while true ; do
+        case "$1" in
+		-d|--debug) DEBUG=yes ; shift ;;
+		-h|--help) HELP=yes ; shift ;;
+                --) shift ; break ;;
+                *) echo "Internal error!"; exit 1 ;;
+        esac
+done
+
+
+if [ $HELP ] ; then
+    ecell3_usage
+    exit 0
+fi
+
+if [ $DEBUG ] ; then
+    exec $GDB $PYTHON $*
+else
+    exec $PYTHON $*
+fi
+
+
