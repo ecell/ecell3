@@ -6,15 +6,33 @@ from PluginWindow import *
 from ecssupport import *
 import GTK
 
-class SubstanceWindow(PluginWindow):
+class SubstanceWindow( PluginWindow ):
 
     def __init__( self, dirname,  data, pluginmanager, root=None ):
         
-        # 0 : not fixed  1: fixed
-        self.theFixFlug = 0
-
         PluginWindow.__init__( self, dirname, data, pluginmanager, root )
 
+        self.openWindow()
+        PluginWindow.initialize( self, root )
+        self.initialize()
+
+        if len( self.theFullPNList() ) > 1:
+            i = 1
+            preFullID = self.theFullID()
+            aClassName = self.__class__.__name__
+            while i < len( self.theFullPNList() ):
+                aFullID = self.theFullIDList()[i]
+                if aFullID != preFullID:
+                    self.thePluginManager.createInstance( aClassName, (self.theFullPNList()[i],), root)
+                preFullID = aFullID
+                i = i + 1
+
+        
+    def initialize( self ):
+
+        # 0 : not fixed  1: fixed
+        self.theFixFlag = 0
+        
         self['toolbar1'].set_style( GTK.TOOLBAR_ICONS )
         self['toolbar1'].set_button_relief( GTK.RELIEF_HALF )
         self['toolbar2'].set_style( GTK.TOOLBAR_ICONS )
@@ -33,93 +51,75 @@ class SubstanceWindow(PluginWindow):
                              'input_concentration': self.inputConcentration
                              } )
 
-        self.initialize()
-        
-    def initialize( self ):
-        
-        self.theFPNQuantity = tuple( convertFullIDToFullPN( self.theFullID(), 'Quantity' ) )
-        self.theFPNConcentration = tuple(convertFullIDToFullPN( self.theFullID(), 'Concentration' ))
+        self.theQtyFPN = convertFullIDToFullPN( self.theFullID(), 'Quantity' )
+        self.theConcFPN = convertFullIDToFullPN( self.theFullID(), 'Concentration' )
 
-        self.theType = str( self.theFullID()[TYPE] )
-        self.theID   = str( self.theFullID()[ID] )
-        self.thePath = str( self.theFullID()[SYSTEMPATH] )
-        
         aFullIDString = createFullIDString( self.theFullID() )
         self["id_label"].set_text( aFullIDString )
 
         self.update()
 
+
     def update( self ):
 
-        self.theQuantity = self.theDriver.getProperty( self.theFPNQuantity )[0]
-        self['Quantity_entry'].set_text( str( self.theQuantity ) )
-
-        self.theConcentration = self.theDriver.getProperty( self.theFPNConcentration )[0]
-        self['Concentration_entry'].set_text( str( self.theConcentration ) )
+        self.theQtyValue = self.getValue( self.theQtyFPN )
+        self.theConcValue = self.getValue( self.theConcFPN )
+        self['Quantity_entry'].set_text( str( self.theQtyValue ) )
+        self['Concentration_entry'].set_text( str( self.theConcValue ) )
     
+
     def fix_mode( self, a ) :
 
-        self.theFixFlug = 1 - self.theFixFlug
-        if self.theFixFlug == 0:
-            print 'not fixed'
+        self.theFixFlag = 1 - self.theFixFlag
+        if self.theFixFlag == 0:
+            self.theSession.printMessage( "not fixed\n" )
         else:
-            print 'fixed'
+            self.theSession.printMessage( "fixed\n" )
+
 
     def inputQuantity( self, obj ):
 
-        aNumberString = obj.get_text()
-        self.theQuantity = string.atof( aNumberString )
-        self.changeQuantity()
+        self.theQtyValue = string.atof( obj.get_text() )
+        self.setValue( self.theQtyFPN, self.theQtyValue )
+
 
     def inputConcentration( self, obj ):
         
-        aNumberString = obj.get_text()
-        self.theConcentration = string.atof( aNumberString )
-        self.changeConcentration()
-    
+        self.theConcValue = string.atof( obj.get_text() )
+        self.setValue( self.theConcFPN, self.theConcValue )
+
+
     def increaseQuantity( self, button_object ):
 
-        self.theQuantity *= 2.0
-        self[ "Quantity_entry" ].set_text( str( self.theQuantity ) )
-        self.changeQuantity()
+        if self.getValue( self.theQtyFPN ):
+           self.theQtyValue *= 2.0
+        else:
+           self.theQtyValue = 1.0
 
-    def increaseConcentration( self, button_object ):
+        self.setValue( self.theQtyFPN, self.theQtyValue )
 
-        self.theConcentration *= 2.0
-        self[ "Concentration_entry" ].set_text( str( self.theConcentration ) )
-        self.changeConcentration()
 
     def decreaseQuantity( self, button_object ):
 
-        self.theQuantity *= 0.5
-        self[ "Quantity_entry" ].set_text( str( self.theQuantity ) )
-        self.changeQuantity()
+        self.theQtyValue *= 0.5
+        self.setValue( self.theQtyFPN, self.theQtyValue )
+
+
+    def increaseConcentration( self, button_object ):
+
+        self.theConcValue *= 2.0
+        self.setValue( self.theConcFPN, self.theConcValue )
+
 
     def decreaseConcentration( self, button_object ):
 
-        self.theConcentration *= 0.5
-        self[ "Concentration_entry" ].set_text( str( self.theConcentration ) )
-        self.changeConcentration()
+        self.theConcValue *= 0.5
+        self.setValue( self.theConcFPN, self.theConcValue )
 
-    def changeQuantity( self ):
-        
-        value = (self.theQuantity,)
-        self.theDriver.setProperty( self.theFPNQuantity, value )
-        self.thePluginManager.updateAllPluginWindow()
-        print self.theDriver.getProperty( self.theFPNQuantity )
-
-    def changeConcentration( self ):
-        
-        value = (self.theConcentration,)
-        self.theDriver.setProperty( self.theFPNConcentration, value )
-        self.thePluginManager.updateAllPluginWindow()
-        print self.theDriver.getProperty( self.theFPNConcentration )
 
 def mainLoop():
     # FIXME: should be a custom function
     gtk.mainloop()
-
-
 
 if __name__ == "__main__":
 

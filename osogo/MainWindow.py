@@ -23,23 +23,25 @@ class MainWindow(Window):
 
     def __init__( self ):
 
+        Window.__init__( self )
+
         #### create Message Window ####
         self.theMessageWindow = MessageWindow.MessageWindow()
         self.theMessageWindowWindow = self.theMessageWindow[ 'message_window' ]
         self.theMessageWindowWindow.hide()
 
-        self.theSession = Session.GuiSession( self.theMessageWindow )
+        self.theTmpSessionRecordFilename = 'TmpSessionRecord.py'
+        self.thePreSessionRecordFilename = 'preSessionRecord.py'
+
+        self.theSession = Session.OsogoSession( self.theMessageWindow, self.theTmpSessionRecordFilename )
 
         self.theDriver = self.theSession.theDriver
-        self.theSimulator = self.theDriver.theSimulator
         self.theModelInterpreter = self.theSession.theModelInterpreter
 
         self.theUpdateInterval = 100
         self.theStepSize = 1
         self.theStepType = 0
-        # 0: sec   1: step
-
-        Window.__init__( self )
+        self.theRunningFlag = 0
 
         self.theHandlerMap = \
             { 'load_rule_menu_activate'              : self.openRuleFileSelection ,
@@ -108,6 +110,7 @@ class MainWindow(Window):
     def loadRule( self, button_obj ) :
         aFileName = self.theRuleFileSelection.get_filename()
         self.theRuleFileSelection.hide()
+        self.theSession.printMessage( 'load rule file %s\n' % aFileName )
         aGlobalNameMap = { 'aMainWindow' : self }
         execfile(aFileName, aGlobalNameMap)
         self.theModelInterpreter.load( self.theCellModelObject )
@@ -120,8 +123,10 @@ class MainWindow(Window):
     def loadScript( self, button_obj ):
         aFileName = self.theScriptFileSelection.get_filename()
         self.theScriptFileSelection.hide()
-        aGlobalNameMap = { self : self }
+        self.theSession.printMessage( 'load script file %s\n' % aFileName )
+        aGlobalNameMap = { 'aMainWindow' : self }
         execfile(aFileName, aGlobalNameMap)
+        self.update()
         
     ###### Save Cell State As ######
     def openSaveCellStateFileSelection( self, obj ) :
@@ -132,28 +137,31 @@ class MainWindow(Window):
     ###### Exit ######
     def exit( self, obj ):
         mainQuit()
-
+        os.rename(self.theTmpSessionRecordFilename, self.thePreSessionRecordFilename)
+        
     def startSimulation( self, a ) :
-        self.printMessage( "Start\n" )
+        self.theRunningFlag = 1
+        self.theSession.printMessage( "Start\n" )
         self.theTimer = gtk.timeout_add(self.theUpdateInterval, self.updateByTimeOut, 0)
-        self.theSimulator.run()
+        self.theSession.run()
         self.removeTimeOut()
 
     def stopSimulation( self, a ) :
-        self.printMessage( "Stop\n" )
-        self.theSimulator.stop()
-        self.removeTimeOut()
-        self.update()
+        if self.theRunningFlag:
+            self.theRunningFlag = 0
+            self.theSession.stop()
+            self.theSession.printMessage( "Stop\n" )
+            self.removeTimeOut()
+            self.update()
 
     def stepSimulation( self, a ) : 
-        self.printMessage( "Step\n" )
+        self.theSession.printMessage( "Step\n" )
         self['step_combo_entry'].set_text( str( self.theStepSize ) )
         self.theTimer = gtk.timeout_add( self.theUpdateInterval, self.updateByTimeOut, 0 )
         if self.theStepType == 0:
-            self.theSimulator.run( self.theStepSize )
+            self.theSession.run( self.theStepSize )
         else:
-            for i in range( int ( self.theStepSize ) ):
-                self.theSimulator.step()
+            self.theSession.step( self.theStepSize )
         self.removeTimeOut()
         self.update()
 
@@ -175,7 +183,6 @@ class MainWindow(Window):
         gtk.timeout_remove( self.theTimer )
 
     def update( self ):
-
         aTime = self.theDriver.getProperty( ( SYSTEM, '/', '/', 'CurrentTime') ) 
         self.theCurrentTime = aTime[0]
         self['time_entry'].set_text( str( self.theCurrentTime ) )
@@ -194,8 +201,6 @@ class MainWindow(Window):
         else :
             self.theMessageWindowWindow.hide()
 
-    def printMessage( self, aMessageString ):
-        self.theMessageWindow.printMessage( aMessageString )
 
 
 ##########################################################################
@@ -216,6 +221,13 @@ class MainWindow(Window):
     def openPreferences( self ) : pass
     def openAbout( self ) : pass
     #### these method is not supported in summer GUI project
+
+
+
+
+
+
+
 
 
 

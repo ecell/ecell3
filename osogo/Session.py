@@ -5,52 +5,52 @@ import ModelInterpreter
 
 class Session:
 
-    def __init__( self ):
+    def __init__( self, srfilename ):
 
-        self.theDriver = Driver.SimpleDriver()
-        self.theSimulator = self.theDriver.theSimulator
+        self.theDriver = Driver.StandardDriver( srfilename )
         self.theModelInterpreter = ModelInterpreter.ModelInterpreter( self.theDriver )
+
+    def run( self , time='' ):
+        self.theDriver.run( time )
+
+    def stop( self ):
+        self.theDriver.stop()
+
+    def step( self, num='' ):
+        self.theDriver.step( num )
+
+    def getLoggerList( self ):
+        return self.theDriver.getLoggerList()
+
+    def getLogger( self, fullpn ):
+        return self.theDriver.getLogger( fullpn )
 
     def printMessage( self, message ):
         print message
 
-    def run( self , time='' ):
-        if not time:
-            self.theSimulator.run()
-        else:
-            self.theSimulator.run( time )
-
-    def stop( self ):
-        self.theSimulator.stop()
-
-    def step( self, num='' ):
-        if not num:
-            self.theSimulator.step()
-        else:
-            for i in range(num):
-                self.theSimulator.step()
 
 class SingleSession( Session ):
 
-    def __init__(self):
+    def __init__(self, srfilename ):
 
-        Session.__init__( self )
-        self.condition = 0
-
+        Session.__init__( self, srfilename )
+        self.theCondition = 0
 
     def evaluate(self):
 
         pass
 
 
-class GuiSession( SingleSession ):
+class OsogoSession( SingleSession ):
 
-    def __init__(self, aMessageWindow):
+    def __init__(self, aMessageWindow, srfilename):
 
-        SingleSession.__init__( self )
+        self.theDriver = Driver.OsogoDriver( srfilename )
+        self.theModelInterpreter = ModelInterpreter.ModelInterpreter( self.theDriver )
         self.theMessageWindow = aMessageWindow
 
     def printMessage( self, aMessageString ):
+
         self.theMessageWindow.printMessage( aMessageString )
 
 

@@ -30,10 +30,10 @@ class PluginModule:
 
 
     def createInstance( self, data, pluginmanager, root=None, parent=None ):
+
         aConstructor = self.theModule.__dict__[self.theName]
         anArgumentTuple = ( self.theDirectoryName,  data, pluginmanager, root )
         return apply( aConstructor, anArgumentTuple )
-        
 
 
 class PluginManager:
@@ -42,18 +42,22 @@ class PluginManager:
         self.thePluginMap = {}
         self.theInstanceList = []
         self.theSession = session
-
+        self.theDriver = self.theSession.theDriver
+        
     def createInstance( self, classname, data, root=None, parent=None ):
         try:
             aPlugin = self.thePluginMap[ classname ]
         except KeyError:
             self.loadModule( classname )
 
+        if root !='top_vbox':
+            self.theDriver.record( 'aPluginManager.createInstance( \'%s\', %s )' % (classname, data) )
 
         anInstance = aPlugin.createInstance( data, self, root, parent )
         self.appendInstance( anInstance )
-
+        self.theDriver.initialize()
         return anInstance
+
 
     def loadModule( self, classname ):
         aPlugin = PluginModule( classname )
@@ -67,18 +71,6 @@ class PluginManager:
                 if( os.path.isfile( aModulePath + '.py' ) ):
                     aModuleName = os.path.basename( aModulePath )
                     self.loadModule( aModuleName )
-
-    def printMessage( self, aMessageString ):
-        self.theMainWindow.printMessage( aMessageString )
-
-    def printProperty( self, fullpn ):
-        self.theMainWindow.printProperty( fullpn )
-    
-    def printAllProperties( self, fullid ):
-        self.theMainWindow.printAllProperties( fullid )
-
-    def printList( self, primitivetype, systempath, list ):
-        self.theMainWindow.printList( primitive, systempath, list )
 
     def updateAllPluginWindow( self ):
         for anInstance in self.theInstanceList:

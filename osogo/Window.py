@@ -10,25 +10,31 @@ import GDK
 import libglade
 
 
-
 class Window:
 
     def __init__( self, gladefile=None, root=None ):
 
+        self.theGladeFile = gladefile
+        self.theRoot = root
+
+        self.openWindow()
+
+    def openWindow( self ):
+
         # load GLADEFILE_PATH/CLASSNAME.glade by default
-        if gladefile == None:
-            gladefile = GLADEFILE_PATH
-            gladefile += '/' + self.__class__.__name__ + ".glade"
+        if self.theGladeFile == None:
+            self.theGladeFile = GLADEFILE_PATH
+            self.theGladeFile += '/' + self.__class__.__name__ + ".glade"
         else:
-            if os.path.isabs(gladefile) :
+            if os.path.isabs( self.theGladeFile) :
                 pass
             else:
-                gladefile = GLADEFILE_PATH + '/' + gladefile
+                self.theGladeFile = GLADEFILE_PATH + '/' + self.theGladeFile
 
-        if os.access( os.path.join( GLADEFILE_PATH, gladefile ), os.R_OK ):
-            self.widgets = libglade.GladeXML( filename=gladefile, root=root )
+        if os.access( os.path.join( GLADEFILE_PATH, self.theGladeFile ), os.R_OK ):
+            self.widgets = libglade.GladeXML( filename=self.theGladeFile, root=self.theRoot )
         else:
-            raise IOError( "can't read %s." % gladefile )
+            raise IOError( "can't read %s." % self.theGladeFile )
 
     def addHandlers( self, handlers ):
         self.widgets.signal_autoconnect( handlers )
@@ -41,6 +47,13 @@ class Window:
 
     def __getitem__( self, key ):
         return self.widgets.get_widget( key )
+
+
+
+
+
+
+
 
 
 

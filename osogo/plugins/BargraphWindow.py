@@ -2,24 +2,34 @@
 
 import string
 
-### for test
-import sys
-sys.path.append('.')
-import Plugin
-### for test
-
 from PluginWindow import *
 from ecssupport import *
 
 import Numeric
 import GTK
 
-class BargraphWindow(PluginWindow):
+class BargraphWindow( PluginWindow ):
     
     def __init__( self, dirname, data, pluginmanager, root=None ):
 
         PluginWindow.__init__( self, dirname, data, pluginmanager, root )
-        
+
+        if self.theDriver.isNumber( self.theFullPN() ):
+
+            self.openWindow()
+            PluginWindow.initialize( self, root )
+            self.initialize()
+
+        else:
+            self.theSession.printMessage( "not numerical data\n" )
+
+        if len( self.theFullPNList() ) > 1:
+            aClassName = self.__class__.__name__
+            self.thePluginManager.createInstance( aClassName, self.theFullPNList()[1:], root )
+
+
+    def initialize( self ):
+    
         self['toolbar5'].set_style( GTK.TOOLBAR_ICONS )
         self['toolbar6'].set_style( GTK.TOOLBAR_ICONS )
         self['toolbar5'].set_button_relief( GTK.RELIEF_HALF )
@@ -41,18 +51,12 @@ class BargraphWindow(PluginWindow):
         
         self.theIDEntry = self.getWidget( "property_id_label" )
         self.theMultiplier1Entry = self.getWidget("multiplier1_label")
-        
-    def initialize( self ):
-
-        self.theSelected = ''
-        
-        self.theType = str( self.theFullID()[TYPE] )
-        self.theID   = str( self.theFullID()[ID] )
-        self.thePath = str( self.theFullID()[SYSTEMPATH] )
 
         self.update()
-        
+
+
     def update( self ):
+        
         aString = str( self.theFullPN()[ID] )
         aString += ':\n' + str( self.theFullPN()[PROPERTY] )        
         self.theIDEntry.set_text  ( aString )
@@ -73,11 +77,15 @@ class BargraphWindow(PluginWindow):
         self.theMultiplier1Entry.set_text(str(int(self.theMultiplier-1)))
         self['multiplier_entry'].set_text(str(int(self.theMultiplier+2)))
 
+
     def updateByAuto( self, value ):
+
         self.theAutoChangeFlag = 1
         self.update()
 
+
     def updateByAddbutton( self , obj ):
+
         self['auto_button'].set_active( 0 )
         aNumberString =  self['multiplier_entry'].get_text()
         aNumber = string.atof( aNumberString )
@@ -87,10 +95,9 @@ class BargraphWindow(PluginWindow):
         self.theAutoChangeFlag = 0
         self.update()
 
+
     def updateBySubtractbutton( self,obj ):
-#        if self.theAutoChangeFlag :
-#            pass
-#        else :
+
         self['auto_button'].set_active( 0 )
 
         aNumberString =  self['multiplier_entry'].get_text()
@@ -100,6 +107,7 @@ class BargraphWindow(PluginWindow):
 
         self.theAutoChangeFlag = 0
         self.update()
+
 
     def updateByTextentry(self, obj):
 
@@ -116,10 +124,14 @@ class BargraphWindow(PluginWindow):
         self.theAutoChangeFlag = 0
         self.update()
 
+
     def updateByAutoButton(self, autobutton):
+
         self.update()
 
+
     def calculateBarLength( self, value ):
+
         if value < 0 :
             value = - value
             aPositiveFlag = -1
@@ -142,15 +154,6 @@ class BargraphWindow(PluginWindow):
 
         return  aBarLength, aMultiplier, aPositiveFlag
                 
-    ####### for test #############################
-    #def changeValueFromEntryWindow( self, obj, a):
-    #    
-    #    aValueString = obj.get_text()
-    #    aValue = string.atof( aValueString )
-    #    print aValue
-    #    self.changeValue( aValue )
-    #
-    #############################################
 
     def changeValue( self, value ):
         self.updateByAuto( value )

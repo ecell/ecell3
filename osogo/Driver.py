@@ -2,6 +2,7 @@
 
 import ecs
 import gtk
+import types
 
 from ecssupport import *
 
@@ -12,45 +13,66 @@ class Driver:
         self.theSimulator = ecs.Simulator()
         self.theSimulator.setPendingEventChecker( gtk.events_pending )
         self.theSimulator.setEventHandler( gtk.mainiteration )
+        self.initialize()
+
+    def run( self , time='' ):
+
+        if not time:
+            self.theSimulator.run()
+        else:
+            self.theSimulator.run( time )
+
+    def stop( self ):
+
+        self.theSimulator.stop()
+
+    def step( self, num='' ):
+
+        if not num:
+            self.theSimulator.step()
+        else:
+            for i in range(num):
+                self.theSimulator.step()
 
     def initialize( self ):
+
         self.theSimulator.initialize()
 
     def createEntity( self, type, fullid, name ):
+
         self.theSimulator.createEntity( type, fullid, name )
 
     def getProperty( self, fullpn ):
+
         return self.theSimulator.getProperty(fullpn)
 
     def setProperty( self, fullpn, value ):
+
         self.theSimulator.setProperty(fullpn, value)
 
     def getLoggerList( self ):
+
         return self.theSimulator.getLoggerList()
 
     def getLogger( self, fullpn ):
-        logger = self.theSimulator.getLogger( fullpn )
-#        logger = Logger( fullpn )
-        return logger
+
+        return self.theSimulator.getLogger( fullpn )
 
     def setPendingEventChecker( self, event ):
+
         self.theSimulator.setPendingEventChecker( event )
 
     def setEventHandler( self, event ):
+
         self.theSimulator.setEventHandler(event )
 
     def printProperty( self, fullpn ):
+
         value = self.theSimulator.getProperty( fullpn )
         print fullpn, '\t=\t', value
 
-#    def printProperty( self, fullpn ):
-#        if fullpn[3] == 'ActivityPerSecond':
-#            value = ' ... failed to print'
-#        else:
-#            value = self.theSimulator.getProperty( fullpn )
-#        print fullpn, '\t=\t', value
-
     def printAllProperties( self, fullid ):
+
         plistfullpn = convertFullIDToFullPN( fullid, 'PropertyList' )
         properties = self.theSimulator.getProperty( plistfullpn )
         for property in properties:
@@ -66,82 +88,115 @@ class Driver:
             self.printAllProperties( ( primitivetype, systempath, i ) )
 
     def getCurrentTime( self ):
+
         time = self.theSimulator.getProperty( (SYSTEM, '/', '/', 'CurrentTime' ) )
         return time[0]
 
+    def isNumber( self, aFullPN ):
 
-class SimpleDriver( Driver ):
+        aValue = self.getProperty( aFullPN )
+        if type( aValue[0] ) is types.IntType:
+            return 1
+        elif type( aValue[0] ) is types.FloatType:
+            return 1
+        else:
+            return 0
 
-    pass
 
-class Logger:
+class SessionRecorder:
 
-    def __init__( self, fpn ):
-        self.theLogger = ecs.getLogger( fpn )
+    def __init__( self, filename ):
 
-    def getStartTime( self ):
-        return self.theLogger.getStartTime()
+        self.theOutput = open(filename, 'w')
+        
+    def record( self, string ):
 
-    def getEndTime( self ):
-        return self.theLogger.getEndTime()
+        self.theOutput.write( string )
+        self.theOutput.write( "\n" )
 
-    def getData( self, start=0, end=0, interval=0 ):
-        return self.theLogger.getData( start, end, interval )
+    def __dell__( self ):
 
-class LoggerTest( Logger ):
+        self.theOutput.close()
+    
 
-    def getStartTime( self ):
-        return 0
 
-    def getEndTime( self ):
-        return 100
+class StandardDriver( Driver, SessionRecorder ):
 
-    def getData( self, start=0, end=0, interval=0 ):
-        array = ((0, 0), (1, 20), (2, 30), (3, 35), (4, 40), (5, 15), (6, 10), (7, 15))
-        return array
+    def __init__( self, srfilename ):
+
+        SessionRecorder.__init__( self, srfilename )
+        Driver.__init__( self )
+
+    def run( self , time='' ):
+
+        if not time:
+            self.theStartTime = self.getCurrentTime()
+            self.theSimulator.run()
+        else:
+            self.theSimulator.run( time )
+            self.record( 'aSession.run( %f )' % time )
+
+    def stop( self ):
+
+        self.theSimulator.stop()
+        aRunTime = self.getCurrentTime() - self.theStartTime
+        self.record( 'aSession.run( %f )' % aRunTime )
+
+    def step( self, num = 1 ):
+
+        for i in range(num):
+            self.theSimulator.step()
+        self.record( 'for i in range( %d ):' % num )
+        self.record( '    aSession.step()' )
+
+    def initialize( self ):
+
+        self.theSimulator.initialize()
+
+    def createEntity( self, type, fullid, name ):
+
+        self.theSimulator.createEntity( type, fullid, name )
+        self.record( 'aDriver.createEntity( \'%s\', %s, \'%s\' )' % (type, fullid, name) )
+
+    def setProperty( self, fullpn, value ):
+
+        self.theSimulator.setProperty(fullpn, value)
+        self.record( 'aDriver.setProperty( %s, %s )' % (fullpn, value) )
+        
+    def getLogger( self, fullpn ):
+
+        return self.theSimulator.getLogger( fullpn )
+        self.record( 'aDriver.setLogger( %s )' % fullpn )
+
+    def setPendingEventChecker( self, event ):
+
+        self.theSimulator.setPendingEventChecker( event )
+        
+    def setEventHandler( self, event ):
+
+        self.theSimulator.setEventHandler( event )
+
+
+class OsogoDriver( StandardDriver ):
+
+    def __init__( self, srfilename ):
+
+        StandardDriver.__init__( self, srfilename )
+        self.record('aSession = aMainWindow.theSession')
+        self.record('aDriver = aSession.theDriver')
+        self.record('aPluginManager = aMainWindow.thePluginManager')
+        self.record('#--------------------------------------------------')
+
 
 if __name__ == "__main__":
 
-    class MainWindow:
-
-        def __init__( self ):
-            self.theSimulator = simulator()
-
-
-    class Simulator:
-
-        def __init__( self ):
-
-            self.dic={('Substance', '/CELL/CYTOPLASM', 'ATP','Quantity') : (1950,),}
-
-        def initialize( self ):
-            pass
-
-        def getProperty( self, fpn ):
-            return self.dic[fpn]
-
-        def setProperty( self, fpn, value ):
-            self.dic[fpn] = value
-
-        def getLogger( self, fpn ):
-            logger = Logger( fpn )
-            return logger
-
-        def getLoggerList( self ):
-            fpnlist = ((SUBSTANCE, '/CELL/CYTOPLASM', 'ATP', 'Quantity'),
-                       (SUBSTANCE, '/CELL/CYTOPLASM', 'ADP', 'Quantity'),
-                       (SUBSTANCE, '/CELL/CYTOPLASM', 'AMP', 'Quantity'))
-            return fpnlist
-
-
     aDriver = Driver()
 
-    print aDriver.getProperty(('Substance', '/CELL/CYTOPLASM', 'ATP','Quantity'))
-    aDriver.setProperty(('Substance', '/CELL/CYTOPLASM', 'ATP','Quantity'), (2000,))
-    print aDriver.getProperty(('Substance', '/CELL/CYTOPLASM', 'ATP','Quantity'))
 
-    for aLoggerFpn in  aDriver.getLoggerList():
-        aLogger = aDriver.getLogger( aLoggerFpn )
-        print aLogger.getStartTime()
-        print aLogger.getEndTime()
+
+
+
+
+
+
 

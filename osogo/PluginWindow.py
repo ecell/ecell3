@@ -3,7 +3,6 @@ import os
 from config import *
 from ViewWindow import *
 
-from types import *
 
 class PluginWindow(ViewWindow):
     '''
@@ -14,43 +13,60 @@ class PluginWindow(ViewWindow):
     theFullID()           : FullID1
     '''
 
-    def __init__( self, dirname,  data, pluginmanager, root=None ):
-        aClassName = self.__class__.__name__
-        aGladeFileName = os.path.join( dirname , aClassName + ".glade" )
-        ViewWindow.__init__( self, aGladeFileName, data, root )
+    def __init__( self, dirname, data, pluginmanager, root=None ):
+
+        self.theClassName = self.__class__.__name__
+        aGladeFileName = os.path.join( dirname , self.theClassName + ".glade" )
+        ViewWindow.__init__( self, aGladeFileName, root )
 
         self.thePluginManager = pluginmanager
-        self.theDriver = self.thePluginManager.theSession.theDriver
+        self.theSession = self.thePluginManager.theSession 
+        self.theDriver = self.theSession.theDriver
         self.theRawFullPNList = data
+
+
+    def initialize( self, root=None ):
+
         aMenuWindow = Window( 'PluginWindowPopupMenu.glade', root='menu' )
         self.thePopupMenu = aMenuWindow['menu']
         if root != None:
-            aClassName = root
-        self[aClassName].connect( 'button_press_event', self.popupMenu )
+            self.theClassName = root
+            self[self.theClassName].connect( 'button_press_event', self.popupMenu )
 
-        aMenuWindow.addHandlers( { 'copy_fullpnlist'  : self.copyFullPNList,
-                                   'paste_fullpnlist' : self.pasteFullPNList,
-                                   'add_fullpnlist'   : self.addFPNList
-                                   } )
+            aMenuWindow.addHandlers( { 'copy_fullpnlist'  : self.copyFullPNList,
+                                       'paste_fullpnlist' : self.pasteFullPNList,
+                                       'add_fullpnlist'   : self.addFullPNList
+                                       } )
 
-    def  popupMenu( self, widget, aEvent ):
+
+    def popupMenu( self, widget, aEvent ):
+
         if aEvent.button == 3:
             self.thePopupMenu.popup( None, None, None, 1, 0 )
 
 
     def theFullPNList( self ):
+
         return map( self.supplementFullPN, self.theRawFullPNList )
 
+
     def theFullIDList( self ):
+
         return map( convertFullPNToFullID, self.theRawFullPNList )
 
+
     def theFullPN( self ):
+
         return self.supplementFullPN( self.theRawFullPNList[0] )
 
+
     def theFullID( self ):
+
         return convertFullPNToFullID( self.theFullPN() )
 
+
     def supplementFullPN( self, aFullPN ):
+
         if aFullPN[PROPERTY] != '' :
             return aFullPN
         else :
@@ -64,7 +80,9 @@ class PluginWindow(ViewWindow):
                                                 aPropertyName )
             return aNewFullPN
 
+
     def theAttributeMap( self ):
+
         aMap = {}
         for aFullPN in self.theRawFullPNList:
             aFullID = convertFullPNToFullID( aFullPN )
@@ -79,24 +97,32 @@ class PluginWindow(ViewWindow):
                 aMap[ aPropertyFullPN ] = aAttributeList[ num ]
                 num += 1
         return aMap
+
         
     def getAttribute( self, aFullPN ):
+
         aMap = self.theAttributeMap()
         if aMap.has_key( aFullPN ):
             return aMap[ aFullPN ]
         else:
             return 99
 
-    def isNumber( self, aFullPN ):
-        aValue = self.theDriver.getProperty( aFullPN )
-        if type( aValue[0] ) is IntType:
-            return 1
-        elif type( aValue[0] ) is FloatType:
-            return 1
+
+    def getValue( self, fullpn ):
+
+        aValueList = self.theDriver.getProperty( fullpn )
+        return aValueList[0]
+
+
+    def setValue( self, fullpn, value ):
+
+        if self.getAttribute( fullpn ) == 3:
+            aValueList = ( value, )
+            self.theDriver.setProperty( fullpn, aValueList )
+            self.thePluginManager.updateAllPluginWindow()
         else:
-            return 0
-
-
+            aFullPNString = createFullPNString( fullpn )
+            self.theSession.printMessage('%s is not settable\n' % aFullPNString )
 
 
 
