@@ -11,6 +11,8 @@ ConfirmWindow.py\
 DataGenerator.py\
 EntityListWindow.glade\
 EntityListWindow.py\
+FullPNQueue.py\
+FullPNQueue.glade\
 InterfaceWindow.py\
 InterfaceWindow.glade\
 LoggerWindow.glade\

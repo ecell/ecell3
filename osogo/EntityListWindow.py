@@ -2,6 +2,7 @@
 
 from OsogoWindow import *
 from PluginInstanceSelection import *
+from FullPNQueue import *
 
 import gtk
 from ecell.ecssupport import *
@@ -107,14 +108,22 @@ class EntityListWindow(OsogoWindow):
         else:
 
             self.__initializeSystemTree()
+            self.reconstructSystemTree()
+
             self.__initializeProcessTree()
             self.__initializeVariableTree()
+            aFullPN = convertFullIDToFullPN( createFullID ( 'System::/' ) )
+            self.theQueue = FullPNQueue( self["navigator_area"] , [ aFullPN ] )
+            self.theQueue.registerCallback( self.doSelection )
+
 
             self.__initializePluginWindowOptionMenu()
+                    
             self.__initializePropertyWindow()
             self.__initializePopupMenu()
 
-            self.reset()
+#            self.reset()
+            
 
         # --------------------------------------------
         # initialize buffer
@@ -125,53 +134,10 @@ class EntityListWindow(OsogoWindow):
         # --------------------------------------------
         # initialize Add to Board button
         # --------------------------------------------
-        #self.checkBoardExists()
         self.CloseOrder = False
 
-    def setSession( self, session ):
-        self.theSession = session
-        self.thePluginManager = session.thePluginManager
-
-        self['search_button'].set_sensitive(1)
-        self['view_button'].set_sensitive(1)
-        self['search_entry'].set_sensitive(1)
-        self['plugin_optionmenu'].set_sensitive(1)
-
-        self.__initializeSystemTree()
-        self.__initializeProcessTree()
-        self.__initializeVariableTree()
-
-        self.__initializePluginWindowOptionMenu()
-        self.__initializePropertyWindow()
-        self.__initializePopupMenu()
-
-
-        # --------------------------------------------
-        # initialize system tree
-        # --------------------------------------------
-        # set up system tree
-        self.systemTree.get_model().clear()
-
-        # create root ID
-        self.reset()
-
-        # --------------------------------------------
-        # initialize buffer
-        # --------------------------------------------
-        self.theSelectedEntityList = []
-        self.theSelectedPluginInstanceList = []
-
-        # --------------------------------------------
-        # initialize Add to Board buttons
-        # --------------------------------------------
-        #self.checkBoardExists()
-        self.CloseOrder = False
-
-    def checkBoardExists( self ):
-        if self.theSession.getWindow('BoardWindow').exists():
-            self['add_to_board'].set_sensitive(TRUE)
-        else:
-            self['add_to_board'].set_sensitive(FALSE)
+    def getQueue( self ):
+        return self.theQueue
 
 
     def deleted( self, *arg ):
@@ -200,6 +166,7 @@ class EntityListWindow(OsogoWindow):
         # set 'delete_event' uneffective
         return TRUE
 
+
     def __initializeSystemTree( self ):
         """initialize SystemTree
         """
@@ -218,6 +185,7 @@ class EntityListWindow(OsogoWindow):
         self.systemTree.set_model( treeStore )
 
         self.processTree.set_search_column( 0 )
+
 
     def __initializeProcessTree( self ):
         """initialize ProcessTree
@@ -251,6 +219,7 @@ class EntityListWindow(OsogoWindow):
 
         model = gtk.ListStore( *columnTypeList )
         self.processTree.set_model( model )
+
 
     def __initializeVariableTree( self ):
         """initializes VariableTree
@@ -521,11 +490,11 @@ class EntityListWindow(OsogoWindow):
             self.thePopupMenu.popup(None,None,None,anEvent.button,anEvent.time)
 
 
-    def reset( self ):
-
-        self.reconstructSystemTree()
-        self.reconstructLists()
-        self.update()
+#    def reset( self ):
+#
+#        self.reconstructSystemTree()
+#        self.reconstructLists()
+#        self.update()
 
 
     def update( self ):
@@ -583,7 +552,6 @@ class EntityListWindow(OsogoWindow):
 
 
     def reconstructLists( self ):
-        
         selectedSystemList = self.getSelectedSystemList()
         if len( selectedSystemList ) == 0:
             return
@@ -661,6 +629,29 @@ class EntityListWindow(OsogoWindow):
             entityStore.set_data( iterString, fullIDString )
 
 
+    def doSelection( self, aFullPNList ):
+        self.doSelectSystem( aFullPNList )        
+        self.doSelectProcess( aFullPNList )
+        self.doSelectVariable( aFullPNList )
+
+    
+    def doSelectSystem( self, aFullPNList ):
+#        pass
+#        systemFullID = self.getSelectedSystemList()[0]
+#        targetFullID = convertFullPNToFullID( aFullPNList[0] )
+#        if createFullIDString( systemFullID ) != createFullIDString( targetFullID ):
+        # if needed
+            #doselection
+            
+#            systemStore = self.systemTree.get_model()
+            
+        self.reconstructLists()
+    
+    def doSelectProcess( self, aFullPNList ):
+        pass
+    
+    def doSelectVariable( self, aFullPNList ):
+        pass
 
 
     def selectSystem( self, obj ):
@@ -669,9 +660,10 @@ class EntityListWindow(OsogoWindow):
         systemFullID = self.getSelectedSystemList()[0]
 
         fullPN = convertFullIDToFullPN( systemFullID )
-        self.thePropertyWindow.setRawFullPNList( [ fullPN ] )
 
-        self.reconstructLists()
+        self.theQueue.pushFullPNList( [ fullPN ] )
+
+
 
 
     def getSelectedSystemList( self ):

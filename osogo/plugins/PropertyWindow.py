@@ -3,6 +3,7 @@
 #from string import *
 from OsogoPluginWindow import *
 from VariableReferenceEditor import *
+from FullPNQueue import *
 
 # column index of clist
 PROPERTY_COL  = 0
@@ -40,9 +41,7 @@ class PropertyWindow(OsogoPluginWindow):
         OsogoPluginWindow.__init__( self, aDirName, aData,
                                    aPluginManager, rootWidget=rootWidget )
         self.theStatusBarWidget = None
-        self.theParent = None
-        self.backwardQueue = []
-        self.forwardQueue = []
+
     # end of __init__
 
     def setParent ( self, aParent ):
@@ -59,7 +58,14 @@ class PropertyWindow(OsogoPluginWindow):
         # initializes buffer
         self.thePreFullID = None
         self.thePrePropertyMap = {}
+        if self.theParent == None:
+            self.theQueue = FullPNQueue( self['navigator_area'], self.theRawFullPNList )
+    
+        else:
+            self.theQueue = self.theParent.getQueue()
 
+        self.theQueue.registerCallback( self.setRawFullPNList )
+       
         # initializes ListStore
         self.theListStore=gtk.ListStore(
                         PROPERTY_COL_TYPE,
@@ -131,8 +137,6 @@ class PropertyWindow(OsogoPluginWindow):
 
         # registers myself to PluginManager
         self.thePluginManager.appendInstance( self ) 
-        self['backbutton'].connect( "clicked", self.__goBack )
-        self['forwardbutton'].connect( "clicked", self.__goForward )
         
 
 
@@ -214,23 +218,11 @@ class PropertyWindow(OsogoPluginWindow):
 
         # When aRawFullPNList is changed, updates its and call self.update().
         else:
-            self.backwardQueue.append( self.__copyList ( self.theRawFullPNList  ) )
-            self.forwardQueue = []
             OsogoPluginWindow.setRawFullPNList( self, aRawFullPNList )
             self.update()
 
        
     # end of setRawFullPNList
-
-    def __copyList( self, aList ):
-        newList = []
-        for anItem in aList:
-            if type( anItem ) in [type( [] ) , type( () ) ]:
-                newList.append( anItem )
-            else:
-                newList.append( self.__copyList( anItem ) )
-        return newList
-
 
     # ---------------------------------------------------------------
     # update (overwrite the method of superclass)
@@ -319,7 +311,7 @@ class PropertyWindow(OsogoPluginWindow):
             elif self.theFullID()[TYPE] == SYSTEM:
                 self.__deleteVariableReferenceListTab()
                 self.__updateSystem()
-            self.__updateNavigatorButtons()
+
         
 
 
@@ -654,7 +646,7 @@ class PropertyWindow(OsogoPluginWindow):
         else:
             aFrame = gtk.Frame()
             aFrame.show()
-            aLabel = gtk.Label("VariableReferenceList")
+            aLabel = gtk.Label("Variable References")
             aLabel.show()
             self.theNoteBook.append_page(  aFrame, aLabel )
             self.theVarrefTabNumber = 2
@@ -664,41 +656,14 @@ class PropertyWindow(OsogoPluginWindow):
     def __deleteVariableReferenceListTab( self ):
         if self.theVarrefTabNumber  == -1:
             return
+        curPage = self.theNoteBook.get_current_page()
+        if  curPage == self.theVarrefTabNumber:
+            curPage = 0
+
         self.theNoteBook.remove_page( self.theVarrefTabNumber )
-        self.theNoteBook.set_current_page(0)
+        self.theNoteBook.set_current_page( curPage )
         self.theVarrefTabNumber  = -1
         self.theVarrefEditor = None
-        
-    def __goBack(self, *args):
-        if len( self.backwardQueue ) == 0:
-            return
-        rawFullPNList = self.backwardQueue.pop()
-        self.forwardQueue.append( self.__copyList( self.theRawFullPNList ) )
-        OsogoPluginWindow.setRawFullPNList( self, rawFullPNList )
-        self.update( True )
-
-        
-    def __goForward( self, *args ):
-        if len( self.forwardQueue ) == 0:
-            return
-        rawFullPNList = self.forwardQueue.pop()
-        self.backwardQueue.append( self.__copyList( self.theRawFullPNList ) )
-        OsogoPluginWindow.setRawFullPNList( self, rawFullPNList )
-        self.update( True )
-
-        
-    def __updateNavigatorButtons( self ):
-        if len( self.backwardQueue ) == 0:
-            backFlag = gtk.FALSE
-        else:
-            backFlag = gtk.TRUE
-        if len( self.forwardQueue ) == 0:
-            forFlag = gtk.FALSE
-        else:
-            forFlag = gtk.TRUE
-        self['forwardbutton'].set_sensitive( forFlag )
-        self['backbutton'].set_sensitive( backFlag )
-        
 
 
 # ----------------------------------------------------------

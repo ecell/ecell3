@@ -207,7 +207,7 @@ class VariableReferenceEditor:
     def __openAction ( self, *args ):
         aFullIDString = args[1]
         theFullPNList =  [convertFullIDToFullPN( createFullID( aFullIDString ) )]  
-        self.theParent.setRawFullPNList( theFullPNList )
+        self.theParent.theQueue.pushFullPNList( theFullPNList )
         self.theParent.update( True )
     
     
