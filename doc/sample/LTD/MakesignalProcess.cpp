@@ -28,6 +28,7 @@ LIBECS_DM_CLASS( MakesignalProcess, Process )
 
   MakesignalProcess()
     :
+    theLastTime( 0.0 ),
     Impulse( 0.0 ),
     Interval( 1.0 ),
     Duration( 0.0 ),
