@@ -29,12 +29,12 @@ class PropertyWindow(PluginWindow):
 
         self.theSelected = ''
         
-        self.theFullID = convertToFullID( self.theFPNs[0] )
-        self.theType = str( self.theFullID[TYPE] )
+        self.theFullID = FullPropertyNameToFullID( self.theFPNs[0] )
+        self.theType = PrimitiveTypeStringList[ self.theFullID[TYPE] ]
         self.theID   = str( self.theFullID[ID] )
         self.thePath = str( self.theFullID[SYSTEMPATH] )
-        aFullPropertyName = convertToFullPropertyName( self.theFullID,
-                                                       'ClassName' )
+        aFullPropertyName = FullIDToFullPropertyName( self.theFullID,
+                                                      'ClassName' )
         aList = self.theSimulator.getProperty( aFullPropertyName )
         self.theClassName  = aList[0]
         self.theTypeEntry.set_text( self.theType  )
@@ -57,8 +57,8 @@ class PropertyWindow(PluginWindow):
 
         self.theList = []
 
-        aFullPropertyName = convertToFullPropertyName( self.theFullID,
-                                                       'PropertyList' )
+        aFullPropertyName = FullIDToFullPropertyName( self.theFullID,
+                                                      'PropertyList' )
         aPropertyList =\
         list( self.theSimulator.getProperty( aFullPropertyName ) )
 
@@ -69,8 +69,8 @@ class PropertyWindow(PluginWindow):
 
         for aProperty in aPropertyList:
 
-            aFullPropertyName = convertToFullPropertyName( self.theFullID,
-                                                           aProperty )
+            aFullPropertyName = FullIDToFullPropertyName( self.theFullID,
+                                                          aProperty )
             aValueList = self.theSimulator.getProperty( aFullPropertyName ) 
 
             aLength = len( aValueList )
@@ -85,7 +85,7 @@ class PropertyWindow(PluginWindow):
                 for aValue in aValueList :
                     aList = [ aProperty, '', aValue ]
                     aList = map( str, aList )
-                    self.theList.append( aList)
+                    self.theList.append( aList )
 
     def select_property(self, obj, data1, data2, data3):
 
@@ -94,14 +94,14 @@ class PropertyWindow(PluginWindow):
 
         print aSelectedItem
         try:
-            aFullPropertyName = parseFullPropertyName( aSelectedItem[2] )
+            aFullPropertyName = FullPropertyName( aSelectedItem[2] )
         except ValueError:
             pass
 
         if not aFullPropertyName:
             try:
-                aFullID = parseFullID( aSelectedItem[2] )
-                aFullPropertyName = convertToFullPropertyName( aFullID )
+                aFullID = FullID( aSelectedItem[2] )
+                aFullPropertyName = FullIDToFullPropertyName( aFullID )
             except ValueError:
                 pass
             
@@ -141,7 +141,7 @@ if __name__ == "__main__":
         def getProperty( self, fpn ):
             return simulator.dic[fpn[PROPERTY]]
     
-    fpn = parseFullPropertyName('Reactor:/CELL/CYTOPLASM:MichaMen:PropertyName')
+    fpn = FullPropertyName('Reactor:/CELL/CYTOPLASM:MichaMen:PropertyName')
 
 
 

@@ -191,7 +191,7 @@ class MainWindow(Window):
             if aButton.get_active() :
                 aSelectedID = id
 
-        aFullPN = ('Substance', '/CELL/CYTOPLASM', aSelectedID, 'Quantity')
+        aFullPN = (SUBSTANCE, '/CELL/CYTOPLASM', aSelectedID, 'Quantity' )
         aFullPNList = ( aFullPN, )
 
         self.thePluginManager.createInstance( aPluginName, self.theSimulator, aFullPNList)
@@ -359,15 +359,15 @@ class simulator :
             for x in aSystemList[1:] :
                 aSystem = aSystem[ x ]
             
-        if fpn[TYPE] == 'Substance' :
+        if fpn[TYPE] == SUBSTANCE :
             aSubstance = aSystem[fpn[ID]]
             return aSubstance[fpn[PROPERTY]]
 
-        elif fpn[TYPE] == 'Reactor' :
+        elif fpn[TYPE] == REACTOR :
             aReactor = aSystem[fpn[ID]]
             return aReactor[fpn[PROPERTY]]
 
-        elif fpn[TYPE] == 'System' :
+        elif fpn[TYPE] == SYSTEM :
             return aSystem[fpn[PROPERTY]]
     
     def setProperty( self, fpn, arg_list ):
@@ -380,21 +380,21 @@ class simulator :
             for x in aSystemList[1:] :
                 aSystem = aSystem[ x ]
             
-        if fpn[TYPE] == 'Substance' :
+        if fpn[TYPE] == SUBSTANCE :
             aSubstance = aSystem[fpn[ID]]
             aSubstance[fpn[PROPERTY]] = arg_list
             print arg_list ,
             print ' is set to ' ,
             print fpn[PROPERTY]
 
-        elif fpn[TYPE] == 'Reactor' :
+        elif fpn[TYPE] == REACTOR :
             aReactor = aSystem[fpn[ID]]
             aReactor[fpn[PROPERTY]] = arg_list
             print arg_list ,
             print ' is set to ' ,
             print fpn[PROPERTY]
 
-        elif fpn[TYPE] == 'System' :
+        elif fpn[TYPE] == SYSTEM :
             aSystem[fpn[PROPERTY]] = arg_list
             print arg_list ,
             print ' is set to ' ,

@@ -23,8 +23,8 @@ class NumericWindow( PluginWindow ):
         self.theFPN = fpn
         self.theID = str( self.theFPN[ID] )
 #        self.theProperty = str( self.theFPN[PROPERTY] )
-#        self.theFullID = convertToFullID( self.theFPN )
-#        aFullIDString = constructFullIDString(self.theFullID)
+#        self.theFullID = FullPropertyNameToFullID( self.theFPN )
+#        aFullIDString = FullIDString(self.theFullID)
         
         self["id_label"].set_text( self.theID )
         value = self.theSimulator.getProperty( self.theFPN )

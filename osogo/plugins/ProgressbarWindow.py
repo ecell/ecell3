@@ -33,7 +33,7 @@ class ProgressbarWindow(PluginWindow):
 
         self.theSelected = ''
         
-        self.theFullID = convertToFullID( self.theFPN )
+        self.theFullID = FullPropertyNameToFullID( self.theFPN )
         self.theType = str( self.theFullID[TYPE] )
         self.theID   = str( self.theFullID[ID] )
         self.thePath = str( self.theFullID[SYSTEMPATH] )

@@ -14,35 +14,62 @@ SYSTEMPATH = 1
 ID         = 2
 PROPERTY   = 3
 
+# Primitive type numbers
+ENTITY     = 1
+SUBSTANCE  = 2
+REACTOR    = 3
+SYSTEM     = 4
+
+PrimitiveTypeStringList =\
+( 'NONE', 'Entity', 'Substance', 'Reactor', 'System' )
+
+PrimitiveTypeDictionary =\
+{
+    'Entity'   : ENTITY,
+    'Substance': SUBSTANCE,
+    'Reactor'  : REACTOR,
+    'System'   : SYSTEM
+}    
 
 
-def parseFullID( fullidstring ):
+def FullID( fullidstring ):
 
-    aFullID = tuple( string.split( fullidstring, ':' ) )
+    aFullID = string.split( fullidstring, ':' )
+    try:
+        aFullID[0] = PrimitiveTypeDictionary[aFullID[0]]
+    except IndexError:
+        raise ValueError( "Invalid PrimitiveType string (%s)." % aFullID[0] )
     validateFullID( aFullID )
-    return  aFullID
+    return  tuple( aFullID )
 
 
-def parseFullPropertyName( fullpropertynamestring ):
+def FullPropertyName( fullpropertynamestring ):
 
-    aFullPropertyName = tuple( string.split( fullpropertynamestring, ':' ) )
+    aFullPropertyName = string.split( fullpropertynamestring, ':' )
+    try:
+        aFullPropertyName[0] = PrimitiveTypeDictionary[aFullPropertyName[0]]
+    except IndexError:
+        raise ValueError( "Invalid PrimitiveType string (%s)." %\
+                          aFullPropertyName[0] )
     validateFullPropertyName( aFullPropertyName )
     return tuple( aFullPropertyName )
 
 
-def constructFullIDString( fullid ):
+def FullIDString( fullid ):
 
     validateFullID( fullid )
-    return string.join( fullid, ':' )
+    aTypeString = PrimitiveTypeStringList[int(fullid[0])]
+    return aTypeString + ':' + string.join( fullid[1:], ':' )
 
 
-def constructFullPropertyNameString( fullpropertyname ):
+def FullPropertyNameString( fullpropertyname ):
 
     validateFullPropertyName( fullpropertyname )
-    return string.join( fullpropertyname, ':' )
+    aTypeString = PrimitiveTypeStringList[fullpropertyname[0]]
+    return aTypeString + ':' + string.join( fullpropertyname[1:], ':' )
 
 
-def convertToFullPropertyName( fullid, property='' ):
+def FullIDToFullPropertyName( fullid, property='' ):
 
     validateFullID( fullid )
     # must be deep copy
@@ -50,7 +77,7 @@ def convertToFullPropertyName( fullid, property='' ):
     return fullpropertyname
 
 
-def convertToFullID( fullpropertyname ):
+def FullPropertyNameToFullID( fullpropertyname ):
 
     validateFullPropertyName( fullpropertyname )
     fullid = tuple( fullpropertyname[:3] )
@@ -76,19 +103,19 @@ def validateFullPropertyName( fullpropertyname ):
 
 if __name__ == "__main__":
     
-    fullid  = parseFullID( 'System:/CELL/CYTOPLASM:MT0' )
+    fullid  = FullID( 'System:/CELL/CYTOPLASM:MT0' )
     print fullid
 
-    fullproperty =  parseFullPropertyName(
+    fullproperty = FullPropertyName(
         'System:/CELL/CYTOPLASM:MT0:activity' )
     print fullproperty
 
-    fullidstring = constructFullIDString( fullid )
+    fullidstring = FullIDString( fullid )
     print fullidstring
 
-    fullpropertystring = constructFullPropertyNameString( fullproperty )
+    fullpropertystring = FullPropertyNameString( fullproperty )
     print fullpropertystring
 
-    print convertToFullPropertyName( fullid )
+    print FullIDToFullPropertyName( fullid )
 
-    print convertToFullID( fullproperty )
+    print FullPropertyNameToFullID( fullproperty )
