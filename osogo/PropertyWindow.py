@@ -40,9 +40,10 @@ class MainWindow(Window):
         self.addHandlers( self.theHandlerMap)
         
         self.thePropertyClist = self.getWidget( "clist1" )
-        self.theIDEntry = self.getWidget( "entry1" )
-        self.thePathEntry = self.getWidget( "entry2" )
-        self.theNameEntry = self.getWidget( "entry3" )
+        self.theTypeEntry = self.getWidget( "entry_TYPE" )
+        self.theIDEntry = self.getWidget( "entry_ID" )
+        self.thePathEntry = self.getWidget( "entry_PATH" )
+        self.theNameEntry = self.getWidget( "entry_NAME" )
 
 
         
@@ -54,12 +55,14 @@ class MainWindow(Window):
               
     def update( self ):
         aPropertyList = list( tmpget( 'PropertyList' ) )
+        bPropertyList = testdic['Name'][0]
         #        aFQPP = list( FQPP )
         
         # remove keyword
         aPropertyList = aPropertyList[1:] 
         # remove PropertyList itself
         aPropertyList.remove( 'PropertyList' )
+        aPropertyList.remove( 'Name' )
         
         self.thePropertyClist.clear()
         #        self.thePropertyListA.clear()
@@ -71,17 +74,18 @@ class MainWindow(Window):
         
 #        aFQPP = getFQPP()
 
-        
+        self.theTypeEntry.set_text(toString(FQPPList.getType()))
         self.theIDEntry.set_text(toString(FQPPList.getID()))
         self.thePathEntry.set_text(toString(FQPPList.getSystemPath()))
-        self.theNameEntry.set_text(aName)
+        self.theNameEntry.set_text(bPropertyList)
 
         
-        
+
         for x in aPropertyList:
             aValueList = tmpget( x )
             #            aName = aValueList[0]
             #            aValueList = aValueList[1:]
+
             aValueList = map( toString, aValueList )
             
             self.thePropertyClist.append( aValueList )
@@ -110,15 +114,25 @@ def main():
 #this data should be written in an other file.
 #the beginning of data area
     
-testdic={ 'PropertyList': ('PropertyList', 'A','B','C'),
+testdic={'PropertyList': ('PropertyList', 'Name', 'A','B','C','Substrate','Product'),
+          'Name': ('MichaelisMentenReactor', ),
           'A': ('aaa', ) ,
           'B': (1.04E-3, ) ,
-          'C': (41, )
+          'C': (41, ),
+          'Substrate': ('Substance:/CELL/CYTOPLASM/ ATP',
+                        'Substance:/CELL/CYTOPLASM/ ADP',
+                        'Substance:/CELL/CYTOPLASM/ AMP',
+                        ),
+
+          'Product': ('Substance:/CELL/CYTOPLASM/ GLU',
+                      'Substance:/CELL/CYTOPLASM/ LAC',
+                       'Substance:/CELL/CYTOPLASM/ PYR',
+                      )
           } 
 
 #FQPPList = ['MichaMen','/CELL/CYTOPLASM','MichaelisMentenReactor']
 FQPPList = propertyname.FullPropertyName('Reactor:/CELL/CYTOPLASM:MichaMen:PropertyName')
-aName = 'MichaelisMentenReactor'
+
 
 
 #the ending of data area
