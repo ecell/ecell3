@@ -37,7 +37,11 @@
 
 #include <string>
 //#include <ltdl.h>
-#include <dlfcn.h>
+#if defined(__BORLANDC__) || defined(__WINDOWS__) || defined(__MINGW32__)
+ #include <windows.h>
+#else
+ #include <dlfcn.h>
+#endif
 
 
 /// doc needed
