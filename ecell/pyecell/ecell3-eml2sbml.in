@@ -13,6 +13,7 @@ import sets
 from ecell.ecssupport import *
 from ecell.eml import *
 from ecell.expressionparser import *
+from ecell.SbmlFunctions import *
 
 import libsbml
 
@@ -21,19 +22,6 @@ def getCurrentCompartment( aSystemPath ):
 
     aLastSlash = string.rindex( aSystemPath, '/' )
     return aSystemPath[aLastSlash+1:]
-
-
-#def getInnerCompartment( aSystemPath ):
-#
-#    aLastSlash = string.rindex( aSystemPath, '/' )
-#    if( aLastSlash == 0 ):
-#        return aSystemPath[aLastSlash+1:]
-#    else:
-#        tmpSystemPath = aSystemPath[:aLastSlash]
-#        aLastSlash = string.rindex( tmpSystemPath, '/' )
-#        return tmpSystemPath[aLastSlash+1:]
-
-
 
 
 # --------------------------------------------------------
@@ -87,10 +75,15 @@ def getVariableReferenceId( aVariableReference, aCurrentSystem ):
         aSpeciesReferencePath = string.replace\
         ( aVariableReference[aFirstColon+2:aLastColon], '/', '__' )
 
-    aLastUnderBar = string.rindex( aSpeciesReferencePath, '__' )
-
     aVariableID = aVariableReference[aLastColon+1:]
-    aSystem = aSpeciesReferencePath[aLastUnderBar+2:]
+
+    if( aSpeciesReferencePath.count( '__' ) == 0 ):
+
+	aSystem = aSpeciesReferencePath
+
+    else:
+        aLastUnderBar = string.rindex( aSpeciesReferencePath, '__' )
+        aSystem = aSpeciesReferencePath[aLastUnderBar+2:]
 
 
     if ( aSpeciesReferencePath != '' ):   # Root system
@@ -227,7 +220,7 @@ def createEntity( anEml, aSBMLModel, aFullID, anOptional='' ):
                 # set Constant 
                 elif ( aPropertyName == "Fixed" ):
                     aParameter.setConstant\
-                    ( int( anEml.getEntityProperty( aFullPN ) ) )
+                    ( int( anEml.getEntityProperty( aFullPN )[0] ) )
 
                 else:
                     print "unexpected error in Parameter"
@@ -235,7 +228,7 @@ def createEntity( anEml, aSBMLModel, aFullID, anOptional='' ):
 
         else:
             
-            if( aFullID[2] != "SIZE" and aFullID[2] != "DIMENSIONS" ):
+            if( aFullID[2] != "SIZE" and aFullID[2] != "Dimensions" ):
 
                 # create Species object
                 aSpecies = aSBMLModel.createSpecies()
@@ -657,10 +650,11 @@ def createEntity( anEml, aSBMLModel, aFullID, anOptional='' ):
 
             # create Compartment object
             aCompartment = aSBMLModel.createCompartment()
-        
+            aCompartmentID = ''
+
             # set ID ROOT System and Other System
-            if( aFullID[2] == '' ):      
-                aCompartmentID = 'default' # Root system
+            if( aFullID[2] == '' ):
+ 	        aCompartmentID = 'default' # Root system
             else:
                 if( ( aFullID[2] in ID_Namespace ) == False ):
                     aCompartmentID = aFullID[2]
@@ -678,7 +672,7 @@ def createEntity( anEml, aSBMLModel, aFullID, anOptional='' ):
                 aCompartment.setName( aCompartmentID )
             elif( aSBMLLevel == '2' ):
                 aCompartment.setId( aCompartmentID )
-                    
+                        
 
                     
             aSystemPath = aFullID[1] + aFullID[2] 
@@ -711,7 +705,7 @@ def createEntity( anEml, aSBMLModel, aFullID, anOptional='' ):
                                 int( anEml.getEntityProperty( aFullPN )[0] ) )
 
                 # set Dimensions of Compartment
-                elif( anID == "DIMENSIONS" ):
+                elif( anID == "Dimensions" ):
 
                     aFullPN = "Variable:" + aSystemPath + ':' + anID + ":Value"
 
@@ -765,50 +759,100 @@ def createModel( anEml, aSBMLModel, aSystemPath='/' ):
 
 
 
-def initialize( aSBMLModel ):
+def setEssentialEntity( aSBMLModel ):
 
     # -------------------
     #  set N_A Parameter
     # -------------------
 
-    # create Parameter object
-    aParameter = aSBMLModel.createParameter()
+    isAbogadroNumber = False
 
-    # set Parameter Id
     if( aSBMLLevel == '1' ):
-        aParameter.setName( 'N_A' )
+        for aParameter in getParameter( aSBMLModel ):
+            if( aParameter[1] == 'N_A' ):
+                isAbogadroNumber = True
+
+        if not( isAbogadroNumber ):
+            # create Parameter object
+            aParameter = aSBMLModel.createParameter()
+
+            # set Parameter Name
+            aParameter.setName( 'N_A' )
+            
+            # set Parameter Value
+            aParameter.setValue( float( 6.0221367e+23 ) )
+            
+            # set Parameter Constant
+            aParameter.setConstant( int( 1 ) )
+
     if( aSBMLLevel == '2' ):
-        aParameter.setId( 'N_A' )
-        
-    # set Parameter Value
-    aParameter.setValue( float( 6.0221367e+23 ) )
-    
-    # set Parameter Constant
-    aParameter.setConstant( int( 1 ) )
-    
+        for aParameter in getParameter( aSBMLModel ):
+            if( aParameter[0] == 'N_A' ):
+                isAbogadroNumber = True
+
+        if not( isAbogadroNumber ):
+            # create Parameter object
+            aParameter = aSBMLModel.createParameter()
+
+            # set Parameter ID
+            aParameter.setId( 'N_A' )
+            
+            # set Parameter Value
+            aParameter.setValue( float( 6.0221367e+23 ) )
+            
+            # set Parameter Constant
+            aParameter.setConstant( int( 1 ) )
+
 
     # ------------
     # set EmptySet
     # ------------
-    
-    # create Species object
-    aSpecies = aSBMLModel.createSpecies()
-    
-    # set Species Id
-    if( aSBMLLevel == '1' ):
-        aSpecies.setName( 'EmptySet' )
-    elif( aSBMLLevel == '2' ):
-        aSpecies.setId( 'EmptySet' )
-    
-    # set Species Compartment
-    aSpecies.setCompartment( 'default' )
-    
-    # set Species Amount
-    aSpecies.setInitialAmount( float( 0 ) )
-    
-    # set Species Constant
-    aSpecies.setConstant( int( 1 ) )    
 
+    isEmptySet = False
+
+    if( aSBMLLevel == '1' ):
+        for aSpecies in getSpecies( aSBMLModel ):
+            if( aSpecies[1] == 'EmptySet' ):
+                isEmptySet = True
+    
+        if not( isEmptySet ):
+            # create Species object
+            aSpecies = aSBMLModel.createSpecies()
+    
+            # set Species Name
+            aSpecies.setName( 'EmptySet' )
+
+            # set Species Compartment
+            aSpecies.setCompartment( 'default' )
+            
+            # set Species Amount
+            aSpecies.setInitialAmount( float( 0 ) )
+            
+            # set Species Constant
+            aSpecies.setConstant( int( 1 ) )    
+
+
+    if( aSBMLLevel == '2' ):
+        for aSpecies in getSpecies( aSBMLModel ):
+
+            if( aSpecies[0] == 'EmptySet' ):
+                isEmptySet = True
+    
+        if not( isEmptySet ):
+            # create Species object
+            aSpecies = aSBMLModel.createSpecies()
+    
+            # set Species Id
+            aSpecies.setId( 'EmptySet' )
+
+            # set Species Compartment
+            aSpecies.setCompartment( 'default' )
+            
+            # set Species Amount
+            aSpecies.setInitialAmount( float( 0 ) )
+            
+            # set Species Constant
+            aSpecies.setConstant( int( 1 ) )    
     
 
 # --------
@@ -923,13 +967,13 @@ Options:
     aSBMLDocument.setLevel( int( aSBMLLevel ) )
     aSBMLDocument.setVersion( int( aSBMLVersion ) )
 
-    # initialize SBML model
-    initialize( aSBMLModel )
-
     #  SBML Model
     aSBMLModel.setId( aBaseName )
 
     createModel( anEml, aSBMLModel )
+
+    # set abogadro number and EmptySet to SBML model
+    setEssentialEntity( aSBMLModel )
 
     aSbmlString = libsbml.writeSBMLToString( aSBMLDocument )
     

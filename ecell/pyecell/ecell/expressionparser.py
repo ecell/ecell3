@@ -297,7 +297,11 @@ def isID_Namespace( aVariableID ):
 
 def getVariableID( aVariableID, aPath, aType ):
 
-    aLastSlash = string.rindex( aPath, '/' )
+    if( aPath.count('/') == 0 ):
+        aSystem = aPath
+    else:
+        aLastSlash = string.rindex( aPath, '/' )
+        aSystem = aPath[aLastSlash+1:]
 
     # in case of Compartment
     if( aVariableID == 'SIZE' ): 
@@ -311,7 +315,7 @@ def getVariableID( aVariableID, aPath, aType ):
 
                 return 'default__' + string.replace( aPath, '/', '__' )
             else:                                    
-                return aPath[aLastSlash+1:]
+                return aSystem
 
     # in case of Species
     else:
@@ -329,8 +333,6 @@ def getVariableID( aVariableID, aPath, aType ):
                 
                 aVariableID = string.replace( aPath, '/', '__' ) + '__' +\
                               aVariableID
-
-            aSystem = aPath[aLastSlash+1:]
 
 
     if( aType == 'Value' ):

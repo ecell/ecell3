@@ -152,24 +152,31 @@ class SBML_Model:
 
     def getPath( self, aCompartmentID ):
 
+        if( aCompartmentID == 'default' ):
+            return '/'
+        
         if ( self.Level == 1 ):
             for aCompartment in self.CompartmentList:
                 if ( aCompartment[1] == aCompartmentID ):
-                    if ( aCompartment[6] == '' ):
+                    if ( aCompartment[6] == '' or\
+                         aCompartment[6] == 'default' ):
                         aPath = '/' + aCompartmentID
                         return aPath
                     else:
-                        aPath = self.getPath( aCompartment[6] ) + '/' + aCompartmentID
+                        aPath = self.getPath( aCompartment[6] ) + '/' +\
+                                aCompartmentID
                         return aPath
 
         elif( self.Level == 2 ):
             for aCompartment in self.CompartmentList:
                 if( aCompartment[0] == aCompartmentID ):
-                    if ( aCompartment[6] == '' ):
+                    if ( aCompartment[6] == '' or\
+                         aCompartment[6] == 'default' ):
                         aPath = '/' + aCompartmentID
                         return aPath
                     else:
-                        aPath = self.getPath( aCompartment[6] ) + '/' + aCompartmentID
+                        aPath = self.getPath( aCompartment[6] ) + '/' +\
+                                aCompartmentID
                         return aPath
 
         else:

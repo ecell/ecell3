@@ -41,7 +41,7 @@ def convertSBML2EML( aSBMLString ):
     aSystemFullID='System::/'
     anEml.createEntity( 'System', aSystemFullID )
     anEml.setEntityProperty( aSystemFullID, 'StepperID', ['DE'] )
-    anEml.setEntityProperty( aSystemFullID, 'Name', ['Root System'] )
+    anEml.setEntityProperty( aSystemFullID, 'Name', ['Default'] )
 
 
 
@@ -55,14 +55,17 @@ def convertSBML2EML( aSBMLString ):
             aPath = theModel.getPath( aCompartment[1] )
         elif ( theModel.Level == 2 ):
             aPath = theModel.getPath( aCompartment[0] )           
-	    
+        
         # setFullID
-        aSystemFullID = theCompartment.getCompartmentID( aCompartment )
-        anEml.createEntity( 'System', aSystemFullID )
+        if( aPath == '/' ):
+            aSystemFullID = 'System::/'
+        else:
+            aSystemFullID = theCompartment.getCompartmentID( aCompartment )
+            anEml.createEntity( 'System', aSystemFullID )
 
 
-        # setStepper 
-        anEml.setEntityProperty( aSystemFullID, 'StepperID', ['DE'] )
+            # setStepper 
+            anEml.setEntityProperty( aSystemFullID, 'StepperID', ['DE'] )
 
 
         # setName( default = [] )
