@@ -5,11 +5,11 @@ import string
 ### for test
 import sys
 sys.path.append('.')
+import Plugin
 ### for test
 
 from PluginWindow import *
 from ecssupport import *
-import Plugin
 
 import Numeric
 
