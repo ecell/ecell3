@@ -27,8 +27,9 @@ import time
 anInputfilename = sys.argv[1] # assign the name of the rd file to anInputfilename
 anInputfile = open( anInputfilename, 'r' )
 
-anOutputfilename = anInputfilename[:-10] + 'Process.dm'
-anOutputfile = open( anOutputfilename, 'w' )
+#anOutputfilename = string.replace(anInputfilename, 'Reactor', 'Process') #'classname'.dm?
+#anOutputfilename = string.replace(anInputfilename, '\.rd', '\.dm')
+#anOutputfilename = anInputfilename[:-10] + 'Process.dm'
 
 aText = anInputfile.read() # assign aText with the contents of the rd file
 
@@ -378,6 +379,9 @@ anEditedTextDictionary['REACT'] = string.replace(anEditedTextDictionary['REACT']
 
 ##########end editing
 ##########begin writing
+
+anOutputfilename = anEditedTextDictionary['CLASSNAME'] + '.dm'
+anOutputfile = open( anOutputfilename, 'w' )
 
 anOutputfile.write("# This has been created using the 'rd2dm' program\n" + "# From: " + anInputfilename + ", Time: " + time.asctime( time.localtime() ) + "\n\n")
 
