@@ -59,22 +59,22 @@ class PropertyWindow(OsogoPluginWindow):
 		aNameFullPN = convertFullIDToFullPN( self.theFullID() ,'Name' )
 
 		aNameList = list( self.theSession.theSimulator.getProperty( createFullPNString( aNameFullPN ) ) )
-        
 
 		aClassName = aNameList[0]
 		self.theType =ENTITYTYPE_STRING_LIST[ self.theFullID()[TYPE] ]
 		self.theID   = str( self.theFullID()[ID] )
 		self.thePath = str( self.theFullID()[SYSTEMPATH] )
-		aClassNameFullPN = convertFullIDToFullPN( self.theFullID(),
-		                                          'ClassName' )
+		aClassNameFullPN = convertFullIDToFullPN( self.theFullID(), 'ClassName' )
+		aNameFullPN = convertFullIDToFullPN( self.theFullID(), 'Name' )
 
 		aClassName = self.theSession.theSimulator.getProperty( createFullPNString( aClassNameFullPN ) )
+		aName = self.theSession.theSimulator.getProperty( createFullPNString( aNameFullPN ) )
 
 
 		self.theTypeEntry.set_text( self.theType + ' : ' + aClassName )
 		self.theIDEntry.set_text  ( self.theID )
 		self.thePathEntry.set_text( self.thePath )
-		self.theClassNameEntry.set_text( aClassName )
+		self.theClassNameEntry.set_text( aName )
 
 		self.update()
 
@@ -105,7 +105,6 @@ class PropertyWindow(OsogoPluginWindow):
 		self.prevFullID = convertFullPNToFullID( aPropertyListFullPN )        
 		aPropertyList = self.theSession.theSimulator.getProperty( createFullPNString( aPropertyListFullPN ) )
 
-
 		for aProperty in aPropertyList: # for (1)
 			Set = -1
 			aGet = -1
@@ -122,9 +121,11 @@ class PropertyWindow(OsogoPluginWindow):
 
 			if (aProperty == 'ClassName'):
 
-				aFullPN = convertFullIDToFullPN( self.theFullID(), aProperty )
-				aValueList = self.theSession.theSimulator.getProperty( createFullPNString( aFullPN ) )
+				#aFullPN = convertFullIDToFullPN( self.theFullID(), aProperty )
+				#aValueList = self.theSession.theSimulator.getProperty( createFullPNString( aFullPN ) )
 
+				#print aValueList
+				pass
 
 			elif (aProperty == 'PropertyList'):
 				pass
