@@ -5,7 +5,7 @@
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN" 
 [
   <!ENTITY legal SYSTEM "legal.xml">
-  <!ENTITY appversion "3.1.91">
+  <!ENTITY appversion "3.1.94">
   <!ENTITY manrevision "0.0">
   <!ENTITY date "Nov 2002">
   <!ENTITY app "<application>E-Cell Simulation Environment</application>">
@@ -37,6 +37,7 @@
 
   <!ENTITY session-class-api SYSTEM "session-class-api.xml">
   <!ENTITY objectstubs-api SYSTEM "objectstubs-api.xml">
+  <!ENTITY ecddatafile-api SYSTEM "ecddatafile-api.xml">
 
 ]>
 <!-- 

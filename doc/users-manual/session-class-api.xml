@@ -35,7 +35,7 @@
 <synopsis><methodname>loadModel</methodname>( <parameter>file</parameter> )
 </synopsis></entry>
 
-	<entry>None</entry>
+	<entry><constant>None</constant></entry>
       </row>
 
       <row>
@@ -55,7 +55,7 @@
 <synopsis><methodname>loadScript</methodname>( <parameter>filename</parameter> )
 </synopsis></entry>
 
-	<entry>None</entry>
+	<entry><constant>None</constant></entry>
       </row>
 
       <row>
@@ -79,7 +79,7 @@ recursively.
 <synopsis><methodname>message</methodname>( <parameter>message</parameter> )
 </synopsis></entry>
 
-	<entry>None</entry>
+	<entry><constant>None</constant></entry>
       </row>
       <row>
 	<entry namest="c1" nameend='c2' rowsep='1'>
@@ -100,7 +100,7 @@ its message printing widget.</para></entry>
 <synopsis><methodname>setMessageMethod</methodname>( <parameter>method</parameter> )
 </synopsis></entry>
 
-	<entry>None</entry>
+	<entry><constant>None</constant></entry>
       </row>
 
       <row>
@@ -167,7 +167,7 @@ which takes just one string parameter.</para>
 </synopsis>
             </entry>
 
-	<entry>None</entry>
+	<entry><constant>None</constant></entry>
 
       </row>
       <row>
@@ -203,7 +203,7 @@ which takes just one string parameter.</para>
 <synopsis><methodname>setEventChecker</methodname>( <parameter>eventchecker</parameter> )
 </synopsis></entry>
 
-	<entry>None</entry>
+	<entry><constant>None</constant></entry>
       </row>
 
       <row>
@@ -246,7 +246,7 @@ called.</para></entry>
 <synopsis><methodname>setEventCheckInterval</methodname>( <parameter>n</parameter> )
 </synopsis></entry>
 
-	<entry>None</entry>
+	<entry><constant>None</constant></entry>
       </row>
 
       <row>
@@ -263,7 +263,7 @@ called.</para></entry>
 <synopsis><methodname>setEventHandler</methodname>( <parameter>eventhandler</parameter> )
 </synopsis></entry>
 
-	<entry>None</entry>
+	<entry><constant>None</constant></entry>
       </row>
 
       <row>
@@ -280,7 +280,7 @@ called.</para></entry>
 <synopsis><methodname>step</methodname>( <optional><parameter>numsteps</parameter></optional> )
 </synopsis></entry>
 
-	<entry>None</entry>
+	<entry><constant>None</constant></entry>
       </row>
 
       <row>
@@ -297,7 +297,7 @@ steps that number.</para>
 	<entry namest='c1' nameend='c1' align='left'>
 <synopsis><methodname>stop</methodname>()</synopsis></entry>
 
-	<entry>None</entry>
+	<entry><constant>None</constant></entry>
       </row>
 
       <row>
@@ -316,7 +316,7 @@ steps that number.</para>
 	<entry namest='c1' nameend='c1' align='left'>
 <synopsis><methodname>initialize</methodname>()</synopsis></entry>
 
-	<entry>None</entry>
+	<entry><constant>None</constant></entry>
       </row>
 
       <row>

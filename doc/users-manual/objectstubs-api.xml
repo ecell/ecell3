@@ -35,7 +35,7 @@
 <synopsis><methodname>create</methodname>()
 </synopsis></entry>
 
-	<entry>None</entry>
+	<entry><constant>None</constant></entry>
       </row>
 
       <row>
@@ -71,7 +71,7 @@
 <synopsis><methodname>getName</methodname>()
 </synopsis></entry>
 
-	<entry>None</entry>
+	<entry><constant>None</constant></entry>
       </row>
       <row>
 	<entry namest="c1" nameend='c2' rowsep='1'>
@@ -196,7 +196,7 @@ This method is used to get the list of all the properties of the
 <synopsis><methodname>setProperty</methodname>( <parameter>propertyname</parameter>, <parameter>value</parameter> )
 </synopsis></entry>
 
-	<entry>None</entry>
+	<entry><constant>None</constant></entry>
       </row>
 
       <row>
@@ -380,7 +380,7 @@ Usually these two times are the same.</para>
 <synopsis><methodname>setMinimumInterval</methodname>( <parameter>interval</parameter> )
 </synopsis></entry>
 
-	<entry>None</entry>
+	<entry><constant>None</constant></entry>
       </row>
 
       <row>

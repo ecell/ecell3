@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="US-ASCII"?>
+
+<table pgwide='1' tocentry='1' frame='bottom' rowsep='0'>
+  <title><classname>ECDDataFile</classname> class method list</title>
+  
+  <tgroup cols="2">
+    <colspec colwidth='3*' colnum='1' colname='c1'/>
+    <colspec colnum='2' colname='c2'/>
+    <thead>
+      <row rowsep='1'>
+	<entry namest="c1" nameend='c1'><emphasis><classname>ECDDataFile</classname> methods.</emphasis></entry>
+      </row>
+
+      <row>
+	<entry>Synopsis</entry>
+	<entry>Return</entry>
+      </row>
+      <row>
+	<entry namest='c1' nameend='c2' align='left' rowsep='1'>Description</entry>	  </row>
+    </thead>
+    
+    <tbody>
+
+      <!-- constructor -->
+
+      <row>
+	<entry namest='c1' nameend='c1' align='left'>
+<synopsis><methodname>ECDDataFile</methodname>( <parameter>data</parameter> = <constant>None</constant>)
+</synopsis></entry>
+
+	<entry><constant>None</constant></entry>
+      </row>
+
+      <row>
+	<entry namest="c1" nameend='c2' rowsep='1'>
+<para>Constructor.  <parameter>data</parameter> must be a rank-2
+<type>array</type> object of <productname>Numeric Python</productname>
+or an equivalent object.  If <parameter>data</parameter> is not given,
+an empty matrix ([[]]) is set.</para>
+            </entry>
+      </row>
+
+      <!-- getData -->
+      <row>
+	<entry namest='c1' nameend='c1' align='left'>
+<synopsis><methodname>getData</methodname>()
+</synopsis></entry>
+
+	<entry>An <type>array</type></entry>
+      </row>
+
+      <row>
+	<entry namest="c1" nameend='c2' rowsep='1'>
+<para>
+This method returns the data as a rank-2 <type>array</type> of
+<productname>Numeric Python</productname>.
+</para>
+            </entry>
+      </row>
+
+      <!-- getDataName -->
+      <row>
+	<entry namest='c1' nameend='c1' align='left'>
+<synopsis><methodname>getDataName</methodname>()
+</synopsis></entry>
+
+	<entry>A <type>string</type></entry>
+      </row>
+
+      <row>
+	<entry namest="c1" nameend='c2' rowsep='1'>
+<para>
+This method returns a name of the data.  The default value of the name is
+an empty string ('').
+</para>
+            </entry>
+      </row>
+
+      <!-- getFileName -->
+      <row>
+	<entry namest='c1' nameend='c1' align='left'>
+<synopsis><methodname>getFileName</methodname>()
+</synopsis></entry>
+
+	<entry>A <type>string</type></entry>
+      </row>
+
+      <row>
+	<entry namest="c1" nameend='c2' rowsep='1'>
+<para>
+If either loading or saving of the data is succeeded, this method returns
+the name of the file the data is loaded from or saved to.  Otherwise this
+method returns an empty string ('').
+</para>
+            </entry>
+      </row>
+
+
+      <!-- getLabel -->
+      <row>
+	<entry namest='c1' nameend='c1' align='left'>
+<synopsis><methodname>getLabel</methodname>()
+</synopsis></entry>
+
+	<entry>A <type>tuple</type></entry>
+      </row>
+
+      <row>
+	<entry namest="c1" nameend='c2' rowsep='1'>
+<para>
+Thie method returns the list of axes names as a <type>tuple</type> containing
+<type>string</type> objects.  The default value is <constant>( 't', 'value', 'avg', 'min', 'max' )</constant>.
+</para>
+            </entry>
+      </row>
+
+      <!-- getNote -->
+      <row>
+	<entry namest='c1' nameend='c1' align='left'>
+<synopsis><methodname>getNote</methodname>()
+</synopsis></entry>
+
+	<entry>A <type>string</type></entry>
+      </row>
+
+      <row>
+	<entry namest="c1" nameend='c2' rowsep='1'>
+<para>
+This method returns a note field of this
+<classname>ECDDataFile</classname> object. The return value is either
+a single line or a multiline <type>string</type> object.
+</para>
+            </entry>
+      </row>
+
+      <!-- load -->
+      <row>
+	<entry namest='c1' nameend='c1' align='left'>
+<synopsis><methodname>load</methodname>( <parameter>filename</parameter> )
+</synopsis></entry>
+	<entry><constant>None</constant></entry>
+      </row>
+
+      <row>
+	<entry namest="c1" nameend='c2' rowsep='1'>
+<para>
+This method loads data from a file <parameter>filename</parameter>.  
+</para>
+            </entry>
+      </row>
+
+      <!-- save -->
+      <row>
+	<entry namest='c1' nameend='c1' align='left'>
+<synopsis><methodname>save</methodname>( <parameter>filename</parameter> )
+</synopsis></entry>
+
+	<entry><constant>None</constant></entry>
+      </row>
+
+      <row>
+	<entry namest="c1" nameend='c2' rowsep='1'>
+<para>
+This method saves the data to a file <parameter>filename</parameter>.
+</para>
+            </entry>
+      </row>
+
+      <!-- setData -->
+      <row>
+	<entry namest='c1' nameend='c1' align='left'>
+<synopsis><methodname>setData</methodname>( <parameter>data</parameter> )
+</synopsis></entry>
+
+	<entry><constant>None</constant></entry>
+      </row>
+
+      <row>
+	<entry namest="c1" nameend='c2' rowsep='1'>
+<para>
+This method replaces data of this <classname>ECDDataFile</classname>
+object by <parameter>data</parameter>.  <parameter>data</parameter>
+must be a rank-2 <type>array</type> of <productname>Numeric
+Python</productname> or an equivalent object.
+</para>
+            </entry>
+      </row>
+
+      <!-- setDataName -->
+      <row>
+	<entry namest='c1' nameend='c1' align='left'>
+<synopsis><methodname>setDataName</methodname>( <parameter>name</parameter> )
+</synopsis></entry>
+
+	<entry><constant>None</constant></entry>
+      </row>
+
+      <row>
+	<entry namest="c1" nameend='c2' rowsep='1'>
+<para>
+This method sets the name of this data.  <parameter>name</parameter> must be a <type>string</type> without a newline.
+</para>
+            </entry>
+      </row>
+
+      <!-- setLabel -->
+      <row>
+	<entry namest='c1' nameend='c1' align='left'>
+<synopsis><methodname>setLabel</methodname>( <parameter>labels</parameter>)
+</synopsis></entry>
+
+	<entry><constant>None</constant></entry>
+      </row>
+
+      <row>
+	<entry namest="c1" nameend='c2' rowsep='1'>
+<para>
+This method names axes of the data.  <parameter>labels</parameter>
+must be a <productname>Python</productname> <type>Sequence</type>
+containing the name of the axes as <type>string</type>s.
+</para>
+            </entry>
+      </row>
+
+      <!-- setNote -->
+      <row>
+	<entry namest='c1' nameend='c1' align='left'>
+<synopsis><methodname>setNote</methodname>( <parameter>note</parameter> )
+</synopsis></entry>
+
+	<entry><constant>None</constant></entry>
+      </row>
+
+      <row>
+	<entry namest="c1" nameend='c2' rowsep='1'>
+<para>
+This method sets the note field of this
+<classname>ECDDataFile</classname> object.
+<parameter>note</parameter> must be a <type>string</type> object.  It
+can be either a single- or multi-line.
+</para>
+            </entry>
+      </row>
+
+
+
+
+    </tbody>
+
+  </tgroup>
+</table>
+
+
+<!--
+Local Variables:
+mode: sgml
+sgml-parent-document: ("writing-ecs.xml" "sect2" "table")
+End:
+-->

@@ -24,12 +24,15 @@
   <sect1>
     <title>What is &ecell Session Script?</title>
 
-    <para>need description here.</para>
+    <para>&ecell Session Script (ESS) is a
+<productname>Python</productname> script which is loaded by a &ecell
+<classname>Session</classname> object.</para>
+
+    <para>ESS is used to automate a single run of a simulation session.</para>
+
+    <para>ESS script usually has an extension '<filename>.py</filename>'.</para>
 
   </sect1>
-
-
-  
 
 
   <sect1>
@@ -66,7 +69,7 @@
 
       <cmdsynopsis>
 	<command>ecell3-session</command>
-	<arg><replaceable>file.ess</replaceable></arg>
+	<arg><replaceable>file.py</replaceable></arg>
       </cmdsynopsis>
 
       
@@ -75,17 +78,20 @@
 	
 
 	<para>
-	To execute a <acronym>ESS</acronym> file, type the following
+	To execute an <acronym>ESS</acronym> file, type the following
 	command at the shell prompt:
 
         <screen>
-          <prompt>$</prompt> <userinput><command>ecell3-session</command> <replaceable>filename.ess</replaceable>
+          <prompt>$</prompt> <userinput><command>ecell3-session</command> <optional>-f model.eml</optional> <optional>-e</optional> <replaceable>ess.py</replaceable>
           </userinput>
         </screen>
 
-        <command>ecell3-session</command> command loads the
-        <acronym>ESS</acronym> file and runs a single simulation
-        session as described in the file.
+        <command>ecell3-session</command> command creates a simulation
+session object and executes the <acronym>ESS</acronym> file
+<filename>ess.py</filename>.  <optional>-e</optional> can be omitted.
+Optionally, if the <optional>-f model.eml</optional> is given, the
+<acronym>EML</acronym> file <filename>model.eml</filename> is loaded
+before executing the <acronym>ESS</acronym>.
       </para>
 
       </sect3>
@@ -94,10 +100,9 @@
 	<title>In interactive mode</title>
 
 	<para>To run the <command>ecell3-session</command> in
-	interactive mode, invoke the command without the filename
-	argument.
+	interactive mode, invoke the command without an <acronym>ESS</acronym>.
 
-        <screen><prompt>$</prompt> <userinput><command>ecell3-session</command></userinput>
+        <screen><prompt>$</prompt> <userinput><command>ecell3-session</command> <optional>-f model.eml</optional></userinput>
 ecell3-session [ for E-Cell SE Version 3, on Python Version 2.2.1 ]
 Copyright (C) 1996-2002 Keio University.
 Written by Kouichi Takahashi <email>shafi@e-cell.org</email>
@@ -105,13 +110,30 @@ Written by Kouichi Takahashi <email>shafi@e-cell.org</email>
         </screen>
         
         The banner and the prompt shown here may vary according to the
-        version you are using.
+        version you are using.  If the option <optional>-f model.eml</optional>
+is given, the <acronym>EML</acronym> file <filename>model.eml</filename> is loaded before prompting.
 </para>
       </sect3>
 
       <sect3>
 	<title>Giving parameters to the script</title>
-	<para>not implemented yet</para>
+
+	<para>Optionally parameters can be given to an
+	<acronym>ESS</acronym>. Given parameters can be accessible
+	from the <acronym>ESS</acronym> script as global
+	variables (see the next section).</para>
+
+	<para>To give the <acronym>ESS</acronym> parameters from the
+	<command>ecell3-session</command> command, use either
+	<option>-D</option> or <option>--parameters</option>
+	option.
+        <screen>
+          <prompt>$</prompt> <userinput><command>ecell3-session</command> <option>-D</option><replaceable>NAME1</replaceable>=<replaceable>VALUE1</replaceable> <option>-D</option><replaceable>NAME2</replaceable>=<replaceable>VALUE2</replaceable>...</userinput>
+          <prompt>$</prompt> <userinput><command>ecell3-session</command> <option>--parameters="</option>{'<replaceable>NAME1</replaceable>':<replaceable>VALUE1</replaceable>,'<replaceable>NAME2</replaceable>':<replaceable>VALUE2</replaceable>,...}"</userinput>
+        </screen>
+Both ways, <option>-D</option> or <option>--parameters</option>, can be mixed.
+</para>
+	<para></para>
       </sect3>
 
 
@@ -120,7 +142,9 @@ Written by Kouichi Takahashi <email>shafi@e-cell.org</email>
     <sect2>
       <title>Loading <acronym>ESS</acronym> from Osogo Session Monitor</title>
 
-      <para>need explanation here, or just say see osogo's manual?</para>
+      <para><command>gecell</command> accepts <option>-e</option> and <option>-f</option> options of <command>ecell3-session</command> command.</para>
+
+      <para>To load an <acronym>ESS</acronym> from GUI, use <guimenu>File</guimenu>-><guimenuitem>loadScript</guimenuitem> menu item.</para>
 
     </sect2>
 
@@ -128,7 +152,7 @@ Written by Kouichi Takahashi <email>shafi@e-cell.org</email>
     <sect2>
       <title>Using SessionManager</title>
 
-      <para>need description here.</para>
+      <para>(a separate chapter?)</para>
 
     </sect2>
 
@@ -422,8 +446,8 @@ else:
 
 	<para>Similarly, <classname>StepperStub</classname> objects
 	and <classname>LoggerStub</classname> objects can be retrieved
-	with a <emphasis>StepperID</emphasis> or a
-	<emphasis>FullPN</emphasis>.</para>
+	with a <emphasis>StepperID</emphasis> and a
+	<emphasis>FullPN</emphasis>, respectively.</para>
 
 	<informalexample>
 	  <programlisting><varname>aStepperStub</varname> = createStepperStub( <replaceable>'STEPPER_01'</replaceable> )</programlisting> 
@@ -545,14 +569,98 @@ or equivalently,
 
       </sect3>
 
-
       <sect3>
 	<title>Getting <classname>Logger</classname> data</title>
 
-	<para></para>
+	<para>To get the logged data from a <classname>LoggerStub</classname>,
+ use <methodname>getData</methodname>() method.</para>
+
+	<para><methodname>getData</methodname>() method has three forms according to requested range and resolution of the data:
+<itemizedlist>
+	    <listitem>
+	      <para>getData()</para>
+	      <para>Get the whole data.</para>
+	    </listitem>
+	    <listitem>
+	      <para>getData( <parameter>starttime</parameter> <optional>, <parameter>endtime</parameter></optional> )</para>
+	      <para>Get a slice of the data from <parameter>starttime</parameter> to <parameter>endtime</parameter>.</para>
+	    </listitem>
+	    <listitem>
+	      <para>getData( <parameter>starttime</parameter>, <parameter>endtime</parameter>, <parameter>interval</parameter> )</para>
+	      <para>Get a slice of the data from <parameter>starttime</parameter> to <parameter>endtime</parameter>.  This omits data points if a time interval between two datapoints is smaller than <parameter>interval</parameter>.  This is not suitable for scientific data analysis, but optimized for speed.</para>
+	    </listitem>
+	  </itemizedlist>
+	<methodname>getData</methodname>() method returns a
+	rank-2 <classname>array</classname> object of <productname>Numeric
+	Python</productname> module.  The <type>array</type> has
+	either one of the following forms:
+<informalexample>
+	    <programlisting>[ [ time value average min max ]
+  [ time value average min max ]
+... ] </programlisting>
+	  </informalexample>
+or
+<informalexample>
+	    <programlisting>[ [ time value ]
+  [ time value ]
+... ] </programlisting>
+	  </informalexample>
+The first five-tuple data format has five values in a single datapoint:
+
+<itemizedlist>
+	    <listitem>
+	      <para>time</para>
+	      <para>The time of the data point.</para>
+	    </listitem>
+	    <listitem>
+	      <para>value</para>
+	      <para>The value at the time point.</para>
+	    </listitem>
+	    <listitem>
+	      <para>average</para>
+	      <para>The time-weighted average of the value after the last data point to the time of this data point.</para>
+	    </listitem>
+	    <listitem>
+	      <para>min</para>
+	      <para>The minimum value after the last data point to the time of this data point.</para>
+	    </listitem>
+	    <listitem>
+	      <para>max</para>
+	      <para>The maximum value after the last data point to the time of this data point.</para>
+	    </listitem>
+	  </itemizedlist>
+The two-tuple data format has only time and value.
+</para>
+
+
+
+
+	<para>To know the start time, the end time, and the size of
+the logged data before getting data, use
+<methodname>getStartTime</methodname>(),
+<methodname>getEndTime</methodname>(), and
+<methodname>getSize</methodname>() methods of
+<classname>LoggerStub</classname>.  <methodname>getSize</methodname>() returns the number of data points stored in the <classname>Logger</classname>.</para>
+
+
       </sect3>
 
-
+      <sect3>
+	<title>Getting and changing logging interval</title>
+	<para>Logging interval of a <classname>Logger</classname> can
+	be checked and changed by using
+	<methodname>getMinimumInterval</methodname>() and
+	<methodname>setMinimumInterval</methodname>(
+	<parameter>interval</parameter> ) methods of
+	<classname>LoggerStub</classname>.
+	<parameter>interval</parameter> must be a zero or positive
+	number in second.  If <parameter>interval</parameter> is a non-zero
+	positive number, the <classname>Logger</classname> skips
+	logging if a simulation step occurs before
+	<parameter>interval</parameter> second past the last logging
+	time point.  If <parameter>interval</parameter> is zero, the
+	Logger logs at every simulation step.</para>
+      </sect3>
 
       <sect3>
 	<title>An Example usage of an <classname>EntityStub</classname></title>
@@ -589,15 +697,211 @@ message( 'Stopped at %s.' % getCurrentTime() )
     </sect2>
 
     <sect2>
-      <title>Saving and handling data files</title>
-
-      <para></para>
+      <title>Handling data files</title>
 
       <sect3>
-	<title>Saving <classname>Logger</classname> data</title>
+	<title>About <acronym>ECD</acronym> file</title>
 
-	<para>Howtos about <classname>ECDDataFile</classname> should
-	come here.</para>
+	<para>&ecell SE uses <acronym>ECD</acronym> (E-Cell Data) file
+format to store simulation results. <acronym>ECD</acronym> is a plain
+text file, and easily handled by user-written and third-party data
+processing and plotting software such as
+<productname>gnuplot</productname>.</para>
+
+
+	<para><classname>ecell.ECDDataFile</classname> class can be
+used to save and load <acronym>ECD</acronym> files.</para>
+
+      </sect3>
+
+      <sect3>
+	<title>Saving and loading data</title>
+	
+	<para>To save data to an <acronym>ECD</acronym> file, say, <filename>datafile.ecd</filename>, instantiate the <classname>ECDDataFile</classname> object and use <methodname>save</methodname>() method.
+	<informalexample>
+	  <programlisting>import ecell
+aDataFile = ecell.ECDDataFile( DATA )
+aDataFile.save( 'datafile.ecd' )
+</programlisting>
+	  </informalexample>
+          here <varname>DATA</varname> is a rank-2 <type>array</type> of <productname>Numeric Python</productname> or an equivalent object.
+ </para>
+
+	<para>Load the <acronym>ECD</acronym> file is also straightforward.
+<informalexample>
+	    <programlisting>aDataFile = ecell.ECDDataFile()
+aDataFile.load( 'datafile.ecd' )
+DATA = aDataFile.getData()</programlisting>
+	  </informalexample>
+The <methodname>getData</methodname>() method extracts the data from the <classname>ECDDataFile</classname> object as an <type>array</type>.
+</para>
+
+      </sect3>
+
+      <sect3>
+	<title><acronym>ECD</acronym> header information</title>
+	<para>In addition to the data itself, an <acronym>ECD</acronym> file can hold some information in its header.
+<itemizedlist>
+	    <listitem>
+	      <para>Data name</para>
+	      <para>The name of data.  Setting a <emphasis>FullPN</emphasis> may be a good idea.  Use <methodname>setDataName</methodname>( <parameter>name</parameter> ) and <methodname>getDataName</methodname>() methods to set and get this field.</para>
+	    </listitem>
+	    <listitem>
+	      <para>Label</para> <para>This field is used to name axes
+	      of the data. Use <methodname>setLabel</methodname>(
+	      <parameter>labels</parameter> ) and
+	      <methodname>getLabel</methodname>() methods.  These
+	      methods takes and returns a
+	      <productname>Python</productname> <type>tuple</type>,
+	      and stored in the file as a space-separated list. The default value of this field is: <constant>( 't', 'value', 'avg', 'min', 'max' )</constant>.</para>
+	    </listitem>
+	    <listitem>
+	      <para>Note</para>
+	      <para>This is a free-format field.  This can be multi-line.  Use <methodname>setNote</methodname>( <parameter>note</parameter> ) and <methodname>getNote</methodname>().</para>
+	    </listitem>
+	  </itemizedlist>
+</para>
+
+	<para>The header information is stored in the file like this.
+<programlisting>
+#DATA:
+#SIZE: 5 1010
+#LABEL: t       value   avg     min     max
+#NOTE:
+#
+#----------------------
+0 0.1 0.1 0.1 0.1
+...
+</programlisting>
+Each line of the header is headed by a sharp (#) character.  The
+<constant>'#SIZE:'</constant> line is automatically set when saved to
+show size of the data.  This field is ignored in loading.  The header
+ends with <constant>'#----...'</constant>.
+</para>
+
+      </sect3>
+
+      <sect3>
+	<title>Using <acronym>ECD</acronym> outside &ecell SE</title>
+
+	<para>For most cases <productname>Numeric Python</productname>
+	will offer any necessary functionality for scientific data
+	processing.  However, using some external software can enhance
+	the usability.</para>
+
+	<para><acronym>ECD</acronym> files can be used as input to any
+	software which supports white space-separated text format, and
+	treats lines with heading sharps (#) as comments.</para>
+
+	<para><productname>GNU gnuplot</productname> is a scientific
+	presentation-quality plotting software with a sophisticated
+	interactive command system.  To plot an <acronym>ECD</acronym>
+	file from <productname>gnuplot</productname>, just use
+	<command>plot</command> command. For example, this draws a
+	time-value 2D-graph:
+<informalexample>
+	    <screen><prompt>gnuplot> </prompt><userinput>plot 'datafile.ecd' with lines</userinput>
+</screen>
+	  </informalexample>
+	    Use <command>using</command> modifier to specify which column to use for the plotting. The following example makes a time-average 2D-plot.
+<informalexample>
+	    <screen><prompt>gnuplot> </prompt><userinput>plot 'datafile.ecd' using 1:3 with lines</userinput>
+</screen>
+	  </informalexample>
+</para>
+	<para>Another OpenSource software useful for data processing is GNU <productname>Octave</productname>.  Loading an <acronym>ECD</acronym> from <productname>Octave</productname> is also simplest.
+<informalexample>
+	    <screen><prompt>octave:1></prompt> <userinput>load datafile.ecd</userinput></screen>
+	  </informalexample>
+Now the data is stored in a variable with the same name as the file without extension (<varname>datafile</varname>) as an matrix.
+<informalexample>
+	    <screen><prompt>octave:2> </prompt><userinput>mean(datafile)</userinput>
+<computeroutput>ans =
+ 
+   5.0663  51.7158  51.7158  51.2396  52.2386</computeroutput>
+</screen>
+	  </informalexample>
+</para>
+
+      </sect3>
+
+    </sect2>
+
+    <sect2>
+      <title>Other methods</title>
+      <sect3>
+	<title>Getting version numbers</title>
+
+	<para><methodname>getLibECSVersion</methodname>() method of
+	<classname>ecell.ecs</classname> module gives the version of
+	the C++ backend library
+	(libecs) as a string. <methodname>getLibECSVersionInfo</methodname>()
+	method of the module gives the version as a
+	<productname>Python</productname> <type>tuple</type>.  The
+	<type>tuple</type> contains three numbers in this order: (
+	<parameter>MAJOR_VERSION</parameter>,
+	<parameter>MINOR_VERSION</parameter>,
+	<parameter>MICRO_VERSION</parameter> )</para>
+
+	<informalexample>
+	  <screen><prompt>ecell3-session>>> </prompt><userinput>import ecell</userinput>
+<prompt>ecell3-session>>> </prompt><userinput>ecell.ecs.getLibECSVersion()</userinput>
+<computeroutput>'3.2.0'</computeroutput>
+<prompt>ecell3-session>>> </prompt><userinput>ecell.ecs.getLibECSVersionInfo()</userinput>
+<computeroutput>(3, 2, 0)</computeroutput>
+</screen>
+	</informalexample>
+
+      </sect3>
+
+      <sect3>
+	<title><acronym>DM</acronym> loading-related methods</title>
+
+	<para>The search path of <acronym>DM</acronym> files can be
+	specified and retrieved by using
+	<methodname>setDMSearchPath</methodname>() and
+	<methodname>getDMSearchPath</methodname>() methods.  These
+	methods gets and returns a colon (:) separated list of
+	directory names.  The search path can also be specified by
+	using an environment variable. See the previous section for
+	more about <acronym>DM</acronym>search path.</para>
+
+	<informalexample>
+	  <screen><prompt>ecell3-session>>> </prompt><userinput>import ecell</userinput>
+<prompt>ecell3-session>>> </prompt><userinput>ecell.ecs.setDMSearchPath( '~/dm:~/test/dm' )</userinput>
+<prompt>ecell3-session>>> </prompt><userinput>ecell.ecs.getDMSearchPath()</userinput>
+<computeroutput>'~/dm:~/test/dm'</computeroutput>
+</screen>
+	</informalexample>
+
+	<para>A list of built-in and already loaded
+	<acronym>DM</acronym> classes can be gotten with
+	<methodname>getDMInfo</methodname>() method of
+	<classname>ecell.ecs.Simulator</classname> class.  The
+	<classname>Simulator</classname> instance is available to
+	<classname>Session</classname> as a
+	<varname>theSimulator</varname> variable.  The method returns
+	a nested <productname>Python</productname> <type>tuple</type>
+	in the form of ( ( TYPE1, CLASSNAME1, PATH1 ), ( TYPE2,
+	CLASSNAME2, PATH2 ), ... ).  TYPE is one of
+	<constant>'Process'</constant>,
+	<constant>'Variable'</constant>,
+	<constant>'System'</constant>, or
+	<constant>'Stepper'</constant>.  CLASSNAME is the class name
+	of the <acronym>DM</acronym>.  PATH is the directory from
+	which the <acronym>DM</acronym> is loaded.  PATH is an empty
+	string ('') if it is a built-in class.</para>
+
+	<informalexample>
+	  <screen>
+<prompt>ecell3-session>>> </prompt><userinput>theSimulator.getDMInfo()</userinput>
+<computeroutput>(('Process', 'GillespieProcess', '/usr/lib/ecell/3.2/GillespieProcess.so'), 
+('Stepper', 'DiscreteTimeStepper', ''), 
+('Stepper', 'NRStepper', '/usr/lib/ecell/3.2/NRStepper.so'), ... )</computeroutput>
+</screen>
+	</informalexample>
+
+
       </sect3>
     </sect2>
 
@@ -606,18 +910,18 @@ message( 'Stopped at %s.' % getCurrentTime() )
 
 
   <sect1>
-    <title>List of commonly used methods in ESS</title>
+    <title>&ecell Python library API</title>
 
-    <para>This section provides full lists of methods implemented in
-      classes in &ecell Python library which are commonly used in ESS.
+    <para>This section provides a list of some commonly used 
+      classes in &ecell Python library and their APIs.
       </para>
 
 
     <sect2>
-      <title><classname>Session</classname> class</title>
+      <title>Method list of <classname>Session</classname> class</title>
 
-      <para>Methods of <classname>Session</classname> class can be
-      devided into the following five groups.</para>
+      <para>Methods of <classname>Session</classname> class has
+      the following five groups.</para>
 
       <itemizedlist>
 	<listitem>
@@ -644,7 +948,7 @@ message( 'Stopped at %s.' % getCurrentTime() )
     </sect2>
 
     <sect2>
-      <title><classname>ObjectStub</classname> classes</title>
+      <title>Method list of <classname>ObjectStub</classname> classes</title>
 
 
       <para>There are three subclasses of <classname>ObjectStub</classname>
@@ -668,6 +972,13 @@ message( 'Stopped at %s.' % getCurrentTime() )
 
       &objectstubs-api
 
+    </sect2>
+
+    <sect2>
+      <title>Method list of <classname>ECDDataFile</classname> class</title>
+      <para><classname>ECDDataFile</classname> class has the following set of methods.</para>
+
+      &ecddatafile-api
     </sect2>
 
 
