@@ -11,6 +11,7 @@ from script import simulator
 import ecs
 
 import PaletteWindow
+import EntryListWindow
 
 import string
 
@@ -137,7 +138,9 @@ class MainWindow(Window):
     def stopSimulation( self, a ) : pass
     def stepSimulation( self, a ) : pass
 
-    def createNewEntryList( self, a ) : pass
+    def createNewEntryList( self, button_obj ) :
+        aEntryList = EntryListWindow.EntryListWindow( self.theSimulator )
+    
     def createNewLoggerList( self, a ) : pass
 
     ###### Toggle Palette Window ######
