@@ -13,10 +13,8 @@ if OS_WIN32
   LIBPYTHON = -lpython@PYTHON_WIN_VERSION@
   winrootdir = ${prefix}
   winroot_SCRIPTS=\
-  windows/ecell3-python.bat\
-  windows/ecell3-console.bat\
   windows/ecell3-inno.iss\
-  windows/ecell3-console.ico
+  ../../osogo/ecell.ico
 else
   bin_SCRIPTS =\
   ecell3-python
