@@ -365,6 +365,7 @@ typedef const mytype & mytype ## Cref;
   DECLARE_TYPE( long double, HighReal );
 #else
   DECLARE_TYPE( double, HighReal );
+  #define HIGHREAL_IS_REAL 1
 #endif /* defined( HAVE_LONG_DOUBLE ) */
   typedef Param<HighReal>::type HighRealParam;
     

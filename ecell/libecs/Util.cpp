@@ -45,11 +45,15 @@ namespace libecs
   } //
 
   __STRINGCAST_SPECIALIZATION_DEF( String, Real );
+#if !defined( HIGHREAL_IS_REAL )
   __STRINGCAST_SPECIALIZATION_DEF( String, HighReal );
+#endif
   __STRINGCAST_SPECIALIZATION_DEF( String, Integer );
   __STRINGCAST_SPECIALIZATION_DEF( String, UnsignedInteger );
   __STRINGCAST_SPECIALIZATION_DEF( Real, String );
+#if !defined( HIGHREAL_IS_REAL )
   __STRINGCAST_SPECIALIZATION_DEF( HighReal, String );
+#endif
   __STRINGCAST_SPECIALIZATION_DEF( Integer, String );
   __STRINGCAST_SPECIALIZATION_DEF( UnsignedInteger, String );
   // __STRINGCAST_SPECIALIZATION_DEF( String, String );
