@@ -286,7 +286,16 @@ def flatten_nodetree( node ):
 	return aList
 
 def flatten_propertytree( node ):
-	return flatten_nodetree( node )
+	anNodeList = flatten_nodetree( node )
+	aList = []
+
+	for i in anNodeList:
+		if i[0].type == 'vectorvalue':
+			aList.append( flatten_propertytree( i[0][0] ) )
+		else:
+			aList.append( i[0][0].attr )
+
+	return aList
 	
 
 
@@ -313,9 +322,10 @@ class Interpret(GenericASTTraversal):
 
 			aValueList = []
 			for j in aValueNodeList:
-				aValueList.append( j[0][0].attr )
+				aValueList.append( j )
 			print aPropertyName, aValueList
-
+			# self.eml.setStepperProperty( anID, aPropertyName,
+			# aValueList )
 			
 		
 		
