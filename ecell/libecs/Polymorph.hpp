@@ -28,10 +28,8 @@
 // E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
 
-#ifndef ___POLYMORPH_HPP
-#define ___POLYMORPH_HPP
-
-#include <assert.h>
+#ifndef __POLYMORPH_HPP
+#define __POLYMORPH_HPP
 
 #include "libecs.hpp"
 #include "convertTo.hpp"
@@ -40,7 +38,7 @@
 namespace libecs
 {
 
-  /** @addtogroup uvariable The Polymorph.
+  /** @addtogroup polymorph The Polymorph.
    The Polymorph
 
    @ingroup libecs
@@ -49,14 +47,14 @@ namespace libecs
 
   /** @file */
   
-  DECLARE_CLASS( PolymorphData );
+  DECLARE_CLASS( PolymorphValue );
 
-  class PolymorphData
+  class PolymorphValue
   {
 
   public:
 
-    virtual ~PolymorphData();
+    virtual ~PolymorphValue();
 
     virtual const String asString()        const = 0;
     virtual const Real   asReal()          const = 0;
@@ -69,12 +67,12 @@ namespace libecs
       DefaultSpecializationInhibited();
     }
 
-    virtual PolymorphDataPtr createClone() const = 0;
+    virtual PolymorphValuePtr createClone() const = 0;
 
   protected:
   
-    PolymorphData( PolymorphDataCref ) {}
-    PolymorphData() {}
+    PolymorphValue( PolymorphValueCref ) {}
+    PolymorphValue() {}
 
   private:
 
@@ -84,25 +82,25 @@ namespace libecs
 
 
   template <>
-  inline const String PolymorphData::as() const
+  inline const String PolymorphValue::as() const
   {
     return asString();
   }
 
   template <>
-  inline const Real PolymorphData::as() const
+  inline const Real PolymorphValue::as() const
   {
     return asReal();
   }
 
   template <>
-  inline const Int PolymorphData::as() const
+  inline const Int PolymorphValue::as() const
   {
     return asInt();
   }
 
   template <>
-  inline const PolymorphVector PolymorphData::as() const
+  inline const PolymorphVector PolymorphValue::as() const
   {
     return asPolymorphVector();
   }
@@ -110,49 +108,49 @@ namespace libecs
 
 
   template< typename T >
-  class ConcretePolymorphData 
+  class ConcretePolymorphValue 
     : 
-    public PolymorphData
+    public PolymorphValue
   {
   
   public:
 
-    ConcretePolymorphData( StringCref  aValue ) 
+    ConcretePolymorphValue( StringCref  aValue ) 
       :
       theValue( convertTo<T>( aValue ) )
     {
       ; // do nothing
     }
 
-    ConcretePolymorphData( RealCref aValue ) 
+    ConcretePolymorphValue( RealCref aValue ) 
       :
       theValue( convertTo<T>( aValue ) )
     {
       ; // do nothing
     }
 
-    ConcretePolymorphData( IntCref  aValue )
+    ConcretePolymorphValue( IntCref  aValue )
       :
       theValue( convertTo<T>( aValue ) )
     {
       ; // do nothing
     }
 
-    ConcretePolymorphData( PolymorphVectorCref aValue )
+    ConcretePolymorphValue( PolymorphVectorCref aValue )
       :
       theValue( convertTo<T>( aValue ) )
     {
       ; // do nothing
     }
 
-    ConcretePolymorphData( PolymorphDataCref aValue )
+    ConcretePolymorphValue( PolymorphValueCref aValue )
       :
       theValue( aValue.as<T>() )
     {
       ; // do nothing
     }
 
-    virtual ~ConcretePolymorphData()
+    virtual ~ConcretePolymorphValue()
     {
       ; // do nothing
     }
@@ -167,9 +165,9 @@ namespace libecs
     virtual const PolymorphVector asPolymorphVector() const
     { return convertTo<PolymorphVector>( theValue ); }
 
-    virtual PolymorphDataPtr createClone() const
+    virtual PolymorphValuePtr createClone() const
     {
-      return new ConcretePolymorphData<T>( *this );
+      return new ConcretePolymorphValue<T>( *this );
     }
 
   private:
@@ -178,25 +176,25 @@ namespace libecs
 
   };
 
-  class PolymorphNoneData 
+  class PolymorphNoneValue 
     : 
-    public PolymorphData
+    public PolymorphValue
   {
 
   public: 
 
-    PolymorphNoneData() {}
+    PolymorphNoneValue() {}
 
-    virtual ~PolymorphNoneData();
+    virtual ~PolymorphNoneValue();
 
     virtual const String asString() const;
     virtual const Real   asReal() const   { return 0.0; }
     virtual const Int    asInt() const    { return 0; }
     virtual const PolymorphVector asPolymorphVector() const;
   
-    virtual PolymorphDataPtr createClone() const
+    virtual PolymorphValuePtr createClone() const
     {
-      return new PolymorphNoneData;
+      return new PolymorphNoneValue;
     }
 
   };
@@ -220,57 +218,57 @@ namespace libecs
   
     Polymorph()
       :
-      theData( new PolymorphNoneData )
+      theValue( new PolymorphNoneValue )
     {
       ; // do nothing
     }
 
     Polymorph( StringCref  aValue ) 
       :
-      theData( new ConcretePolymorphData<String>( aValue ) )
+      theValue( new ConcretePolymorphValue<String>( aValue ) )
     {
       ; // do nothing
     }
   
     Polymorph( RealCref aValue )      
       :
-      theData( new ConcretePolymorphData<Real>( aValue ) )
+      theValue( new ConcretePolymorphValue<Real>( aValue ) )
     {
       ; // do nothing
     }
 
     Polymorph( IntCref aValue )      
       :
-      theData( new ConcretePolymorphData<Int>( aValue ) )
+      theValue( new ConcretePolymorphValue<Int>( aValue ) )
     {
       ; // do nothing
     }
 
     Polymorph( PolymorphVectorCref aValue )
       :
-      theData( new ConcretePolymorphData<PolymorphVector>( aValue ) )
+      theValue( new ConcretePolymorphValue<PolymorphVector>( aValue ) )
     {
       ; // do nothing
     }
 
     Polymorph( PolymorphCref aValue )
       :
-      theData( aValue.createDataClone() )
+      theValue( aValue.createValueClone() )
     {
       ; // do nothing
     }
 
     ~Polymorph()
     {
-      delete theData;
+      delete theValue;
     }
 
     PolymorphCref operator=( PolymorphCref rhs )
     {
       if( this != &rhs )
 	{
-	  delete theData;
-	  theData = rhs.createDataClone();
+	  delete theValue;
+	  theValue = rhs.createValueClone();
 	}
     
       return *this;
@@ -278,22 +276,22 @@ namespace libecs
 
     const String asString() const
     { 
-      return theData->asString(); 
+      return theValue->asString(); 
     }
 
     const Real  asReal() const
     { 
-      return theData->asReal(); 
+      return theValue->asReal(); 
     }
   
     const Int    asInt() const
     { 
-      return theData->asInt();
+      return theValue->asInt();
     }
 
     const PolymorphVector asPolymorphVector() const
     { 
-      return theData->asPolymorphVector();
+      return theValue->asPolymorphVector();
     }
 
     template< typename T >
@@ -329,14 +327,14 @@ namespace libecs
 
   protected:
 
-    PolymorphDataPtr createDataClone() const
+    PolymorphValuePtr createValueClone() const
     {
-      return theData->createClone();
+      return theValue->createClone();
     }
 
   protected:
 
-    PolymorphDataPtr theData;
+    PolymorphValuePtr theValue;
 
   };
 
@@ -470,7 +468,7 @@ namespace libecs
     
 
 
-  // @} // uvariable
+  // @} // polymorph
 
 } // namespace libecs
 

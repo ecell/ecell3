@@ -37,22 +37,22 @@
 
 namespace libecs
 {
-  PolymorphData::~PolymorphData()
+  PolymorphValue::~PolymorphValue()
   {
     ; // do nothing
   }
 
-  PolymorphNoneData::~PolymorphNoneData()
+  PolymorphNoneValue::~PolymorphNoneValue()
   {
     ; // do nothing
   }
 
-  const PolymorphVector PolymorphNoneData::asPolymorphVector() const
+  const PolymorphVector PolymorphNoneValue::asPolymorphVector() const
   { 
     return PolymorphVector(); 
   }
 
-  const String PolymorphNoneData::asString() const
+  const String PolymorphNoneValue::asString() const
   { 
     static String aNoneString;
     return aNoneString;
@@ -60,24 +60,24 @@ namespace libecs
 
   const Polymorph::Type Polymorph::getType() const
   {
-    if( typeid( *theData) == typeid( ConcretePolymorphData<Real> ) )
+    if( typeid( *theValue) == typeid( ConcretePolymorphValue<Real> ) )
       {
 	return REAL;
       }
-    else if( typeid( *theData) == typeid( ConcretePolymorphData<Int> ) )
+    else if( typeid( *theValue) == typeid( ConcretePolymorphValue<Int> ) )
       {
 	return INT;
       }
-    else if( typeid( *theData) == typeid( ConcretePolymorphData<String> ) )
+    else if( typeid( *theValue) == typeid( ConcretePolymorphValue<String> ) )
       {
 	return STRING;
       }
-    else if( typeid( *theData) == 
-	     typeid( ConcretePolymorphData<PolymorphVector> ) )
+    else if( typeid( *theValue) == 
+	     typeid( ConcretePolymorphValue<PolymorphVector> ) )
       {
 	return POLYMORPH_VECTOR;
       }
-    else if( typeid( *theData ) == typeid( PolymorphNoneData ) )
+    else if( typeid( *theValue ) == typeid( PolymorphNoneValue ) )
       {
 	return NONE;
       }
@@ -88,35 +88,35 @@ namespace libecs
 
   void Polymorph::changeType( const Type aType )
   {
-    PolymorphDataPtr aPolymorphDataPtr( NULLPTR );
+    PolymorphValuePtr aPolymorphValuePtr( NULLPTR );
 
     switch( aType )
       {
       case REAL:
-	aPolymorphDataPtr = 
-	  new ConcretePolymorphData<Real>( theData->asReal() );
+	aPolymorphValuePtr = 
+	  new ConcretePolymorphValue<Real>( theValue->asReal() );
 	break;
       case INT:
-	aPolymorphDataPtr = 
-	  new ConcretePolymorphData<Int>( theData->asInt() );
+	aPolymorphValuePtr = 
+	  new ConcretePolymorphValue<Int>( theValue->asInt() );
 	break;
       case STRING:
-	aPolymorphDataPtr = 
-	  new ConcretePolymorphData<Int>( theData->asString() );
+	aPolymorphValuePtr = 
+	  new ConcretePolymorphValue<Int>( theValue->asString() );
 	break;
       case POLYMORPH_VECTOR:
-	aPolymorphDataPtr = 
-	  new ConcretePolymorphData<Int>( theData->asPolymorphVector() );
+	aPolymorphValuePtr = 
+	  new ConcretePolymorphValue<Int>( theValue->asPolymorphVector() );
 	break;
       case NONE:
-	aPolymorphDataPtr = new PolymorphNoneData();
+	aPolymorphValuePtr = new PolymorphNoneValue();
 	break;
       default:
 	NEVER_GET_HERE;
       }
 
-    delete theData;
-    theData = aPolymorphDataPtr;
+    delete theValue;
+    theValue = aPolymorphValuePtr;
   }
 
 
