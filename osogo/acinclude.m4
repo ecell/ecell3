@@ -10,7 +10,11 @@ AC_CACHE_VAL(py_cv_mod_$py_mod_var, [
 ifelse([$2],[], [prog="
 import sys
 try:
-        import $1
+	modulename = '$1'
+	if modulename.find( 'gtk') == 0:
+		import pygtk
+		pygtk.require('2.0')
+    	import $1
 except ImportError:
         sys.exit(1)
 except:
