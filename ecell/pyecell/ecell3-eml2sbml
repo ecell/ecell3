@@ -1,0 +1,598 @@
+#!/usr/bin/env ecell3-python
+
+# Eml to Sbml converter
+
+import sys
+import string
+import os
+import time
+import getopt
+import types
+import re
+import parser
+import token
+import symbol
+
+
+from ecell.ecssupport import *
+from ecell.eml import *
+
+import libsbml
+
+
+def getCurrentCompartment( aSystemPath ):
+
+    aLastSlash = string.rindex( aSystemPath, '/' )
+    return aSystemPath[aLastSlash+1:]
+
+
+#def getInnerCompartment( aSystemPath ):
+#
+#    aLastSlash = string.rindex( aSystemPath, '/' )
+#    if( aLastSlash == 0 ):
+#        return aSystemPath[aLastSlash+1:]
+#    else:
+#        tmpSystemPath = aSystemPath[:aLastSlash]
+#        aLastSlash = string.rindex( tmpSystemPath, '/' )
+#        return tmpSystemPath[aLastSlash+1:]
+
+
+# -----------------------------------
+# convert the number to the Mole Unit
+# -----------------------------------
+
+def convertToMoleUnit( aValue ):
+
+    return float( aValue ) /  6.0221367e+23  # N_A 
+
+
+# --------------------------------------------
+# convert the E-Cell Expression to SBML format
+# --------------------------------------------
+
+def convertExpression( aExpression ):
+
+    return aExpression
+
+
+
+#    if ( aNumChildren == 2 ):
+#        convertExpression( ASTNode_getLeftChild( aASTNode ) )
+#        convertExpression( ASTNode_getRightChild( aASTNode ) )
+
+#    elif ( aNumChildren == 1 ):
+#        convertExpression( ASTNode_getLeftChild( aASTNode ) )#
+
+#    elif ( aNumChildren == 0 ):
+#        if ( ASTNode_isNumber( aASTNode ) == 1 ):
+#            pass
+#        else:
+#            print ASTNode_getName( aASTNode )
+
+#    return aASTNode
+
+
+# -------------------------------
+# return the VariableReference ID
+# -------------------------------
+
+def getVariableReferenceId( aVariableReference, aReactionPath ):
+    
+    aFastColon = string.index( aVariableReference, ':' )
+    aLastColon = string.rindex( aVariableReference, ':' )
+
+    # set Species Id to Reactant object
+    if ( aVariableReference[aFastColon+1:aLastColon] == '.' ):
+        aSpeciesReferencePath = string.replace( aReactionPath[1:], '/', '_' )
+        
+    else:
+        aSpeciesReferencePath = string.replace( aVariableReference[aFastColon+2:aLastColon], '/', '_' )
+        
+        
+    return  aSpeciesReferencePath + '_' + aVariableReference[aLastColon+1:]
+
+                            
+
+# ----------------------------------------------------------
+# create Compartment, Species, Parameter and Reaction object
+# ----------------------------------------------------------
+
+def createEntity( anEml, aSBMLModel, aFullID, anOptional='' ):
+
+    aFullIDString = createFullIDString( aFullID )
+    aType = ENTITYTYPE_STRING_LIST[ aFullID[ TYPE ] ]
+    aClass = anEml.getEntityClass( aFullIDString )
+
+    # ----------------------------------
+    # make the Species and the Parameter
+    # ----------------------------------
+
+    if ( aFullID[TYPE] == VARIABLE ):
+
+        aPropertyNameList = anEml.getEntityPropertyList( aFullIDString )
+        aCurrentCompartment = getCurrentCompartment( aFullID[1] )
+
+        if( aCurrentCompartment == "SBMLParameter" ):
+
+            # create Parameter object
+            aParameter = aSBMLModel.createParameter()
+
+            # set Parameter ID
+            aParameter.setId( aFullID[2] )
+
+            # set Parameter Name, Value and Constant
+            for aPropertyName in aPropertyNameList:
+                
+                aFullPN = aFullIDString + ':' + aPropertyName
+
+                # set Parameter Name
+                if ( aPropertyName == "Name" ):
+                    aParameter.setName( anEml.getEntityProperty( aFullPN ) )
+
+                # set Parameter Value
+                elif ( aPropertyName == "Value" ):
+                    aParameter.setValue( anEml.getEntityProperty( aFullPN ) )
+
+                # set Constant 
+                elif ( aPropertyName == "Fixed" ):
+                    aParameter.setConstant( int( anEml.getEntityProperty( aFullPN ) ) )
+
+                else:
+                    print "unexpected error in Parameter"
+                    sys.exit(1)
+
+        else:
+            
+            if( aFullID[2] != "SIZE" and aFullID[2] != "DIMENSIONS" ):
+
+                # create Species object
+                aSpecies = aSBMLModel.createSpecies()
+
+                # set Species ID
+                aSpeciesID = string.replace( aFullID[1][1:], '/', '_' ) + '_' + aFullID[2]
+                aSpecies.setId( aSpeciesID )
+
+                # set Compartment of Species
+#                if( aCurrentCompartment == ''):
+#                    pass
+#                else:                    
+#                    aSpecies.setCompartment( aCurrentCompartment )
+
+
+                # set Species Name, Value and Constant
+                for aPropertyName in aPropertyNameList:
+
+                    aFullPN = aFullIDString + ':' + aPropertyName
+
+                    # set Species Name
+                    if ( aPropertyName == "Name" ):
+                        
+                        aSpecies.setName(
+                            anEml.getEntityProperty( aFullPN )[0] )
+
+                    # set Species Value
+                    elif ( aPropertyName == "Value" ):
+                        
+                        aMolarValue = convertToMoleUnit(
+                            anEml.getEntityProperty( aFullPN )[0] )
+
+                        aSpecies.setInitialConcentration( aMolarValue )
+
+                    # set Species Constant
+                    elif ( aPropertyName == "Fixed" ):
+                        
+                        aSpecies.setConstant(
+                            int( anEml.getEntityProperty( aFullPN )[0] ) )
+
+                    else:
+                        print "unexpected error in Species"
+                        sys.exit(1)
+                    
+
+
+    # ------------------------
+    # make the Reaction object
+    # ------------------------
+    
+    elif ( aFullID[TYPE] == PROCESS ):
+
+        aPropertyNameList = anEml.getEntityPropertyList( aFullIDString )
+
+        # create Parameter object
+        aReaction = aSBMLModel.createReaction()
+
+        # create KineticLaw Object
+        aKineticLaw = aSBMLModel.createKineticLaw()
+
+        # set Reaction ID
+        aReaction.setId( aFullID[2] )
+
+	for aPropertyName in aPropertyNameList:
+
+            aFullPN = aFullIDString + ':' + aPropertyName
+
+            # set Name property ( Name )
+	    if ( aPropertyName == "Name" ):
+                
+                # set Reaction Name
+		aReaction.setName( anEml.getEntityProperty( aFullPN )[0] )
+
+            # set Expression property ( KineticLaw Formula )
+            elif ( aPropertyName == "Expression"):
+                
+                # convert Expression of the ECELL format to SBML kineticLaw formula 
+                #aExpression = convertExpression( anEml.getEntityProperty( aFullPN )[0] )
+                print aFullID[2],''' : Sorry!!! Expression converter is not developed yet.'''
+
+                # set KineticLaw Formula
+                aKineticLaw.setFormula( 'unSet' )
+                
+
+            # set VariableReference property ( SpeciesReference )
+            elif ( aPropertyName == "VariableReferenceList" ):
+
+                # make a flag. Because SBML model is defined both Product and Reactant
+                # This flag is required in order to judge whether the Product and the
+                # Reactant are defined
+
+                aReactantFlag = False
+                aProductFlag = False
+
+                for aVariableReference in anEml.getEntityProperty( aFullPN ):
+
+                    if ( len( aVariableReference ) >= 3 ):
+
+                        # --------------------------------
+                        # add Reactants to Reaction object
+                        # --------------------------------
+                        
+                        if ( float( aVariableReference[2] ) < 0 ):
+
+                            # change the Reactant Flag
+                            aReactantFlag = True
+                            
+                            # create Reactant object
+                            aReactant = aSBMLModel.createReactant()
+
+                            # set Species Id to Reactant object
+                            aSpeciesReferenceId = getSpeciesReferenceId( aVariableReference[1], aFullID[1] )
+
+                            aReactant.setSpecies( aSpeciesReferenceId )
+
+
+                            # set Stoichiometry 
+                            aReactant.setStoichiometry(
+                                -( float( aVariableReference[2] ) ) )
+
+
+                        # -------------------------------
+                        # add Products to Reaction object
+                        # -------------------------------
+                        
+                        elif ( float( aVariableReference[2] ) > 0 ):
+
+                            # change the Product Flag
+                            aProductFlag = True
+
+                            # create Product object
+                            aProduct = aSBMLModel.createProduct()
+                            
+                            # set Species Id
+                            aSpeciesReferenceId = getVariableReferenceId( aVariableReference[1], aFullID[1] )
+                            
+                            aProduct.setSpecies( aSpeciesReferenceId )
+
+                            # set Stoichiometry
+                            aProduct.setStoichiometry(
+                                float( aVariableReference[2] ) )
+
+
+                        # --------------------------------
+                        # add Modifiers to Reaction object
+                        # --------------------------------
+                        
+                        else:
+                            # create Modifier object
+                            aModifier = aSBMLModel.createModifier()
+
+                            # set Species Id to Modifier object
+                            aVariableReferenceId = getVariableReferenceId( aVariableReference[1], aFullID[1] )
+
+                            aModifier.setSpecies( aVariableReferenceId )
+
+                            
+                    # if there isn't the stoichiometry
+                    elif ( len( aVariableReference ) == 2 ):
+
+                        # create Modifier object
+                        aModifier = aSBMLModel.createModifier()
+
+                        # set Species Id to Modifier object
+                        aVariableReferenceId = getVariableReferenceId( aVariableReference[1], aFullID[1] )
+
+                        aModifier.setSpecies( aVariableReferenceId )
+
+
+
+                if ( aReactantFlag == False or aProductFlag == False ):
+
+                    # set EmptySet Species, because if it didn't define,
+                    # Reactant or Product can not be defined.
+                    
+                    if ( aReactantFlag == False ):
+
+                        # create Reactant object
+                        aReactant = aSBMLModel.createReactant()
+
+                        # set Species Id to Reactant object
+                        aReactant.setSpecies( 'EmptySet' )
+
+                        # set Stoichiometry 
+                        aReactant.setStoichiometry( 0 )
+                        
+
+                    elif( aProductFlag == False ):
+
+                        # create Product object
+                        aProduct = aSBMLModel.createProduct()
+                            
+                        # set Species Id
+                        aProduct.setSpecies( 'EmptySet' )
+
+                        # set Stoichiometry
+                        aProduct.setStoichiometry( 0 )
+
+
+            # These properties are not defined in SBML Lv2
+            elif ( aPropertyName == "Priority" or
+                   aPropertyName == "Activity" or
+                   aPropertyName == "IsContinuous" or
+                   aPropertyName == "StepperID" ):
+
+                pass
+
+            else:
+                
+                # create Parameter Object (Local)
+                aParameter = aSBMLModel.createKineticLawParameter()
+                
+                # set Parameter ID
+                aParameter.setId( aPropertyName )
+
+                # set Parameter Value
+                aParameter.setValue(
+                  float ( anEml.getEntityProperty( aFullPN )[0] ) )
+                
+
+        # add KineticLaw Object to Reaction Object
+        aReaction.setKineticLaw( aKineticLaw )
+
+
+    # --------------------
+    # make the Compartment 
+    # --------------------
+
+    elif ( aFullID[TYPE] == SYSTEM ):
+
+        # create Compartment object
+        aCompartment = aSBMLModel.createCompartment()
+
+        if ( aFullID[2] != 'SBMLParameter' ):
+
+            # set ID ROOT System and Other System
+            if ( aFullID[2] == '' ):
+                aCompartment.setId( "ROOT" )
+            else:
+                aCompartment.setId( aFullID[2] )
+
+            aSystemPath = aFullID[1] + aFullID[2] 
+
+            for anID in anEml.getEntityList( 'Variable', aSystemPath ):
+
+                # set Size and constant of Compartment
+                if( anID == "SIZE" ):
+                    
+                    tmpPropertyList = anEml.getEntityPropertyList("Variable:" +
+                                                                  aSystemPath +
+                                                                  ":SIZE" )
+
+                    for aProperty in tmpPropertyList:
+                    
+                        if ( aProperty == "Value" ):
+                        
+                            aFullPN = "Variable:" + aSystemPath + ':' +anID + ':' + aProperty
+                
+                            aCompartment.setSize(
+                                float( anEml.getEntityProperty( aFullPN )[0] ) )
+
+                        elif ( aProperty == "Fixed" ):
+
+                            aFullPN = "Variable:" + aSystemPath + ':' +anID + ':' + aProperty
+
+                            aCompartment.setConstant(
+                                int( anEml.getEntityProperty( aFullPN )[0] ) )
+
+                # set Dimensions of Compartment
+                elif( anID == "DIMENSIONS" ):
+
+                    aFullPN = "Variable:" + aSystemPath + ':' + anID + ":Value"
+
+                    aCompartment.setSpatialDimensions(
+                        int( anEml.getEntityProperty( aFullPN )[0] ) )
+
+            # set Outside element of Compartment
+            if( aFullID[1] == '/' ):
+                if( aFullID[2] != '' ):
+                    aCompartment.setOutside( "ROOT" )
+                    
+            else:
+                aLastSlash = string.rindex( aFullID[1], '/' )
+
+                aCompartment.setOutside(
+                    getCurrentCompartment( aFullID[1][:aLastSlash] ) )
+
+
+
+
+def createModel( anEml, aSBMLModel, aSystemPath='/' ):
+
+    # set Species
+    for anID in anEml.getEntityList( 'Variable', aSystemPath ):
+
+        aFullID = ( VARIABLE, aSystemPath, anID )
+        createEntity( anEml, aSBMLModel, aFullID )
+
+    # set Reaction
+    for anID in anEml.getEntityList( 'Process', aSystemPath ):
+
+        aFullID = ( PROCESS, aSystemPath, anID )
+        createEntity( anEml, aSBMLModel, aFullID )
+
+    # set System
+    if aSystemPath == '':
+        aFullID = ( SYSTEM, '', '/' )
+    else:
+        aLastSlash = string.rindex( aSystemPath, '/' )
+        aPath = aSystemPath[:aLastSlash+1]
+        anID = aSystemPath[aLastSlash+1:]
+
+        aFullID = ( SYSTEM, aPath, anID )
+
+    createEntity( anEml, aSBMLModel, aFullID )
+
+    # create SubSystem by iterating calling createModel
+    for aSystem in anEml.getEntityList( 'System', aSystemPath ):
+        aSubSystemPath = joinSystemPath( aSystemPath, aSystem )
+        createModel( anEml, aSBMLModel, aSubSystemPath )
+
+
+
+# --------
+#   Main
+# --------
+
+if __name__ == '__main__':
+
+
+    def usage():
+        aProgramName = os.path.basename( sys.argv[0] )
+
+        print '''
+%s -- convert eml to em
+        
+Usage:
+        %s [-h] [-f] [-o outfile] infile
+
+        
+Options:
+        -h or --help    :  Print this message.
+        -f or --force   :  Force overwrite even if outfile already exists.
+        -o or --outfile=:  Specify output file name.  '-' means stdout.
+        
+''' % ( aProgramName, aProgramName )
+
+
+
+    # commandline processing
+    try:
+        opts, args = getopt.getopt( sys.argv[1:], "hfo:",
+                                    ["help","force", "outfile="] )
+    except getopt.GetoptError:
+        usage()
+        sys.exit( 1 )
+
+    aSbmlFileName = None
+    aForceFlag = 0
+
+    for anOption, anArg in opts:
+        if anOption in ( "-h", '--help' ):
+            usage()
+            sys.exit( 0 )
+
+        if anOption in ( "-f", '--force' ):
+            aForceFlag = 1            
+
+        if anOption in ( "-o", "--outfile" ):
+            aSbmlFileName = anArg
+            
+    if len( args ) == 0:
+        sys.stderr.write( "No input file.\n" )
+        sys.exit( 1 )
+
+    anEmlFileName = args[0]
+
+    anEmlFile = open( anEmlFileName )
+    anEml = Eml( anEmlFile )
+    anEmlFile.close()
+
+    aBaseName = os.path.basename( anEmlFileName )
+    aBaseName, anExt = os.path.splitext( aBaseName )
+
+    if aSbmlFileName == None:
+        if anExt == '.eml' or anExt == '.xml':
+            anExt = '.xml'
+        else:
+            anExt += '.xml'
+
+        aSbmlFileName = aBaseName + anExt
+
+    if aSbmlFileName == '-':
+        aSbmlFile = sys.stdout
+	print aSbmlFile
+    else:
+        if os.path.isfile( aSbmlFileName ) and aForceFlag == 0:
+            sys.stderr.write( "Output file %s exists. Use -f to overwrite.\n"
+                              % aSbmlFileName )
+            sys.exit( 1 )
+
+        aSbmlFile = open( aSbmlFileName, 'w' )
+            
+
+
+
+    aBuffer = '''
+# -----  created by ecell3-eml2sbml(SBML Exporter)  -------
+# from file: %s, date: %s
+#
+
+''' % ( anEmlFileName, time.asctime( time.localtime() ) )
+
+
+# ------------------------------
+#       eml2sbml main  
+# ------------------------------
+
+    #  SBML Document
+    aSBMLDocument = libsbml.SBMLDocument()
+    aSBMLModel = aSBMLDocument.createModel()
+    aSBMLDocument.setLevel( 2 )
+    aSBMLDocument.setVersion( 1 )
+
+    # ------------
+    # set EmptySet
+    # ------------
+    
+    # create Species object
+    aSpecies = aSBMLModel.createSpecies()
+    
+    # set Species Id
+    aSpecies.setId( 'EmptySet' )
+    
+    # set Species Amount
+    aSpecies.setInitialAmount( float( 0 ) )
+    
+    # set Species Constant
+    aSpecies.setConstant( int( 1 ) )
+    
+
+    #  SBML Model
+    aSBMLModel.setId( aBaseName )
+
+    createModel( anEml, aSBMLModel )
+
+    aWriteSBML = libsbml.writeSBML( aSBMLDocument, aSbmlFileName )
+
+    if ( aWriteSBML ):
+        pass
+    else:
+        raise IOError," failed to write the SBML file"
