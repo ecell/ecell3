@@ -130,6 +130,8 @@ public:\
 #define INHERIT_PROPERTIES( BASECLASS )\
     BASECLASS::initializeProperties( Type2Type<TT>() )
 
+#define NOMETHOD NULLPTR
+
 #define PROPERTYSLOT( TYPE, NAME, SETMETHOD, GETMETHOD )\
   PropertyInterface<TT>::registerPropertySlot( # NAME,\
          new ConcretePropertySlot<TT,TYPE>( SETMETHOD, GETMETHOD ) );

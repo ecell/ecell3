@@ -82,12 +82,21 @@ namespace libecs
 	PROPERTYSLOT_GET_NO_LOAD_SAVE( Real, TotalVelocity );
 
 	PROPERTYSLOT_NO_LOAD_SAVE( Real, Velocity,
-				   NULLPTR,
+				   NOMETHOD,
 				   &Variable::getVelocity );
 	//				   &Variable::addVelocity, 
 
-	PROPERTYSLOT_GET_NO_LOAD_SAVE( Real, MolarConc );
-	PROPERTYSLOT_GET_NO_LOAD_SAVE( Real, NumberConc );
+	PROPERTYSLOT_LOAD_SAVE( Real, MolarConc,
+				&Variable::setMolarConc,
+				&Variable::getMolarConc,
+				&Variable::setMolarConc,
+				NOMETHOD );
+
+	PROPERTYSLOT_LOAD_SAVE( Real, NumberConc,
+				&Variable::setNumberConc,
+				&Variable::getNumberConc,
+				&Variable::setNumberConc,
+				NOMETHOD );
       }
 
     class IsIntegrationNeeded
@@ -343,6 +352,17 @@ namespace libecs
     }
 
     /**
+       Set the molar concentration of this Variable.
+
+       @param value Concentration in M [mol/L].
+    */
+
+    SET_METHOD( Real, MolarConc )
+    {
+      setNumberConc( value * N_A );
+    }
+
+    /**
        Returns the number concentration of this Variable.
 
        Unlike getMolarConc, this method just returns value / size.
@@ -352,27 +372,28 @@ namespace libecs
 
     GET_METHOD( Real, NumberConc )
     {
-      return getValue() / 
-	getSuperSystem()->getSizeVariable()->getValue();
+      return getValue() / getSizeOfSuperSystem();
 
-      // This does not use
-      //   getSuperSystem()->getSize()
-      // because otherwise it is impossible to inline this operation.
+      // This uses getSizeOfSuperSystem() private method instead of
+      // getSuperSystem()->getSize() because otherwise it is 
+      // impossible to inline this.
     }
-
 
     /**
-       Returns the molar concentration of this Variable.
+       Set the number concentration of this Variable.
 
-       @note this method will be deprecated before version 3.2.
-
-       @return Concentration in M (mol/L).
+       @param value concentration in [number/L].
     */
 
-    GET_METHOD( Real, Concentration )
+    SET_METHOD( Real, NumberConc )
     {
-      return getMolarConc();
+      setValue( value * getSizeOfSuperSystem() );
+
+      // This uses getSizeOfSuperSystem() private method instead of
+      // getSuperSystem()->getSize() because otherwise it is 
+      // impossible to inline this.
     }
+
 
     void registerProxy( VariableProxyPtr const anVariableProxy );
     //    void removeProxy( VariableProxyPtr const anVariableProxy );
@@ -381,6 +402,14 @@ namespace libecs
   protected:
 
     void clearVariableProxyVector();
+
+
+  private:
+
+    const Real getSizeOfSuperSystem() const
+      {
+	return getSuperSystem()->getSizeVariable()->getValue();
+      }
 
   protected:
 
