@@ -122,8 +122,6 @@ class Session:
         
         for aStepperProperty in aStepperPropertyList:
 
-            print 'DEBUG:', aStepperProperty ##DebugMessage
-
             self.theSimulator.setProperty( str( aStepperProperty[ 'FullPn' ] ), \
                                            aStepperProperty[ 'StepperId' ] )
 
