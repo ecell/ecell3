@@ -621,7 +621,7 @@ namespace libecs
   {
     UnsignedInt aSeed( 0 );
     
-    if( value == "DEFAULT" )
+    if( value == "TIME" )
       {
 	aSeed = static_cast<UnsignedInt>( time( NULLPTR ) );
       }
