@@ -25,13 +25,13 @@ def usage():
 	print '''
 %s -- convert em to eml
 
-Usage: %s [-h] [-f] [-o outfile] infile
-       default automatic rename mode (*.em -> *.eml) 
+Usage: %s [-h] [-o outfile] [-p emlfile] infile
+       default automatic rename and overwrite mode (*.em -> *.eml) 
 
 Options:
         -h or --help       :  Print this message.
-        -f or --force      :  Force overwrite even if outfile already exists.
         -o or --outfile=   :  Specify output file name.  '-' means stdout.
+	-p or --patch=     :  Patch source eml file
         -E or --preprocess :  Preprocessing only. implies -o -.
 ''' % ( aProgramName, aProgramName )
 	
@@ -40,15 +40,16 @@ Options:
 def main():
 
 	try:
-		opts , args = getopt.getopt( sys.argv[1:] , 'DEhfo:',
-					     ["help", "force", "outfile=",
+		opts , args = getopt.getopt( sys.argv[1:] , 'DEho:p:',
+					     ["help", "force=", "outfile=",
 					      "preprocess"])
 	except:
 		usage()
 		sys.exit(1)
 
 	anEmlFileName = None
-	aForceFlag = 0
+	aForceFlag = 1 # Default Automatic overwrite mode
+	aPatchFlag = 0
 	debug = 0
 	preprocessing_only = 0
 	for anOption, anArg in opts:
@@ -61,10 +62,17 @@ def main():
 			
 		if anOption in ( "-o", '--outfile'):
 		        anEmlFileName = anArg
+			
+		if anOption in ( "-p", '--patch'):
+			aPatchFlag = 1
+			aSrcEmlFileName = anArg
+			aSrcEmlFile = open( aSrcEmlFileName, 'r' )
+			aSrcEml = ecell.eml.Eml( aSrcEmlFile)
 
 		if anOption in ( "-E", '--preprocess'):
 			preprocessing_only = 1
                         anEmlFileName = '-'			
+
 
         if len( args ) == 0:
 		sys.stderr.write( "No input file.\n" )
@@ -101,7 +109,11 @@ def main():
 		anEmlFile.close()
 		sys.exit(0)
 
-	anEmlObject = ecell.emparser.convertEm2Eml( aTempFile, debug )
+	if aPatchFlag:
+		anEmlObject = ecell.emparser.patchEm2Eml( aSrcEml, aTempFile, debug )
+	else:
+		anEmlObject = ecell.emparser.convertEm2Eml( aTempFile, debug )
+		
 	aTempFile.close()
 	del aPreprocessor
 
@@ -110,6 +122,16 @@ def main():
         if anEmlFileName == '-':
 		print aString
 	else:
+		# Default automatic overwrite mode
+		if os.path.isfile(anEmlFileName) and aForceFlag:
+			pass
+		
+		elif not os.path.isfile(anEmlFileName):
+			pass
+		else:
+			sys.stderr.write( "Exist same output file name. For overwrite this , use -f or --force option.\n" )
+			sys.exit( 1 )
+			
 		anEmlFile = open(anEmlFileName, 'w')
 		anEmlFile.write(aString)
 		anEmlFile.close()
