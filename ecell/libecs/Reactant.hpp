@@ -48,13 +48,6 @@ public:
 
   SubstanceRef getSubstance() const { return theSubstance; }
   int getCoefficient() const { return theCoefficient; }
-  Float getConcentration() const 
-  { return theSubstance.getConcentration(); }
-  Float getQuantity() const { return theSubstance.getQuantity(); }
-  Float getActivity() const { return theSubstance.getActivity(); }
-  Float getVelocity() const { return theSubstance.getVelocity(); }
-  void addVelocity( Float v ) const { theSubstance.addVelocity( v ); }
-  void setQuantity( Float q ) const { theSubstance.setQuantity( q ); }
 
 private:
 
