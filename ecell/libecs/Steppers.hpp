@@ -234,6 +234,8 @@ namespace libecs
     virtual void initialize();
     virtual bool calculate();
 
+    virtual void interrupt( StepperPtr const aCaller );
+
     virtual const Int getOrder() const { return 5; }
 
     virtual StringLiteral getClassName() const
@@ -264,7 +266,9 @@ namespace libecs
 
     RealVector theMidVelocityBuffer;
     RealVector theErrorEstimate;
+    RealVector theNextK1;
 
+    bool theInterrupted;
   };
 
 } // namespace libecs

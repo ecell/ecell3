@@ -634,6 +634,8 @@ namespace libecs
 
 
   DormandPrince547MStepper::DormandPrince547MStepper()
+    :
+    theInterrupted( true )
   {
     ; // do nothing
   }
@@ -654,6 +656,9 @@ namespace libecs
 
     theMidVelocityBuffer.resize( aSize );
     theErrorEstimate.resize( aSize );
+    theNextK1.resize( aSize );
+
+    theInterrupted = true;
   }
 
   bool DormandPrince547MStepper::calculate()
@@ -668,27 +673,62 @@ namespace libecs
     const Real aCurrentTime( getCurrentTime() );
 
     // ========= 1 ===========
-    process();
 
-    for( UnsignedInt c( 0 ); c < aSize; ++c )
+    // we can't reuse theNextK1 for theK1,
+    // untill developing non-caller interruption
+
+    //    if ( theInterrupted )
+    if ( 1 )
       {
-	VariablePtr const aVariable( theVariableVector[ c ] );
+	process();
+
+	for( UnsignedInt c( 0 ); c < aSize; ++c )
+	  {
+	    VariablePtr const aVariable( theVariableVector[ c ] );
 	
-	// get k1
-	theK1[ c ] = aVariable->getVelocity();
+	    // get k1
+	    theK1[ c ] = aVariable->getVelocity();
+	    
+	    aVariable->loadValue( theK1[ c ] * ( 1.0 / 5.0 )
+				  * getStepInterval()
+				  + theValueBuffer[ c ] );
 
-	aVariable->loadValue( theK1[ c ] * ( 1.0 / 5.0 ) * getStepInterval()
-			      + theValueBuffer[ c ] );
+	    // k1 * 35/384 for Yn+1
+	    theVelocityBuffer[ c ] = theK1[ c ] * ( 35.0 / 384.0 );
+	    // k1 * 5179/57600 for ~Yn+1
+	    theErrorEstimate[ c ] = theK1[ c ] * ( 5179.0 / 57600.0 );
+	    // k1 * 5783653/57600000 for Yn+.5
+	    theMidVelocityBuffer[ c ] = theK1[ c ] 
+	      * ( 5783653.0 / 57600000.0 );
 
-	// k1 * 35/384 for Yn+1
-	theVelocityBuffer[ c ] = theK1[ c ] * ( 35.0 / 384.0 );
-	// k1 * 5179/57600 for ~Yn+1
-	theErrorEstimate[ c ] = theK1[ c ] * ( 5179.0 / 57600.0 );
-	// k1 * 5783653/57600000 for Yn+.5
-	theMidVelocityBuffer[ c ] = theK1[ c ] * ( 5783653.0 / 57600000.0 );
+	    // clear velocity
+	    aVariable->setVelocity( 0.0 );
+	  }
+      }
+    else
+      {
+	for( UnsignedInt c( 0 ); c < aSize; ++c )
+	  {
+	    VariablePtr const aVariable( theVariableVector[ c ] );
+	
+	    // get k1
+	    theK1[ c ] = theNextK1[ c ];
+	    
+	    aVariable->loadValue( theK1[ c ] * ( 1.0 / 5.0 )
+				  * getStepInterval()
+				  + theValueBuffer[ c ] );
 
-	// clear velocity
-	aVariable->setVelocity( 0.0 );
+	    // k1 * 35/384 for Yn+1
+	    theVelocityBuffer[ c ] = theK1[ c ] * ( 35.0 / 384.0 );
+	    // k1 * 5179/57600 for ~Yn+1
+	    theErrorEstimate[ c ] = theK1[ c ] * ( 5179.0 / 57600.0 );
+	    // k1 * 5783653/57600000 for Yn+.5
+	    theMidVelocityBuffer[ c ] = theK1[ c ] 
+	      * ( 5783653.0 / 57600000.0 );
+
+	    // clear velocity
+	    aVariable->setVelocity( 0.0 );
+	  }	
       }
 
     // ========= 2 ===========
@@ -842,9 +882,9 @@ namespace libecs
     setCurrentTime( aCurrentTime + getStepInterval() );
     process();
 
+    // evaluate error
     Real maxError( 0.0 );
 	
-    // restore theValueBuffer
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
 	VariablePtr const aVariable( theVariableVector[ c ] );
@@ -870,27 +910,51 @@ namespace libecs
 	    maxError = anError;
 	  }
 	
-	// restore x (original value)
-	aVariable->loadValue( theValueBuffer[ c ] );
-	
-	/// O(h^6)
-	aVariable->setVelocity( theVelocityBuffer[ c ] );
+	aVariable->loadValue( theValueBuffer[ c ] 
+			      + theVelocityBuffer[ c ]
+			      * getStepInterval() );
+	aVariable->setVelocity( 0.0 );
       }
 
     setMaxErrorRatio( maxError );
 
-    // reset the stepper current time
-    setCurrentTime( aCurrentTime );
-
     if( maxError > 1.1 )
       {
+	// reset the stepper current time
+	setCurrentTime( aCurrentTime );
 	reset();
+
 	return false;
+      }
+
+    // ========= 8 ===========
+    //    setCurrentTime( aCurrentTime + getStepInterval() );
+    theInterrupted = false;
+    process();
+
+    // restore theValueBuffer
+    for( UnsignedInt c( 0 ); c < aSize; ++c )
+      {
+	VariablePtr const aVariable( theVariableVector[ c ] );
+	
+	// get K1 at next step
+	theNextK1[ c ] = aVariable->getVelocity();
+
+	// restore x (original value)
+	aVariable->loadValue( theValueBuffer[ c ] );
+
+	/// O(h^6)
+	aVariable->setVelocity( theVelocityBuffer[ c ] );
       }
 
     return true;
   }
 
+  void DormandPrince547MStepper::interrupt( StepperPtr aCaller )
+  {
+    theInterrupted = true;
+    AdaptiveDifferentialStepper::interrupt( aCaller );
+  }
 
 } // namespace libecs
 
