@@ -45,9 +45,12 @@
  *::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
  *	$Id$
  :	$Log$
+ :	Revision 1.7  2003/08/09 07:02:59  satyanandavel
+ :	correction of a typo
+ :
  :	Revision 1.6  2003/08/08 13:40:07  satyanandavel
  :	Added support for native windows compilation using MinGW
- :
+ :	
  :	Revision 1.5  2002/10/11 15:51:32  shafi
  :	rename: Connection -> VariableReference
  :	
@@ -196,7 +199,7 @@ int	osif_is_dir(const char *__name)
 	} else {
 		return 0;
 	}
-#elif
+#else
 	struct stat statbuf;
 	if (stat(__name, &statbuf) ==0
 	    && (S_ISDIR ( statbuf.st_mode))) { // gabor
