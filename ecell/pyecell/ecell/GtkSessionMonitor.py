@@ -382,7 +382,7 @@ class GtkSessionMonitor(Session):
 		# checks whether file exists
 		aFilename=aPath+os.sep+'osogo.ini'
 		if not os.path.isfile( aFilename ):
-			self.message('There is no osogo.ini file in this directory.\n Falling back to system defauls.\n')
+			# self.message('There is no osogo.ini file in this directory.\n Falling back to system defauls.\n')
 			return None
 
 	    # tries to read file
