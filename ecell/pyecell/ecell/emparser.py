@@ -170,7 +170,7 @@ def t_name(t):
 
 def t_quotedstring(t):
 	r' "(^"|.)*" | \'(^\'|.)*\' '
-	t.value = Token( 'quotedstring', t.value )
+	t.value = Token( 'quotedstring', t.value[1:-1] )
 	return t
 
 def t_control(t):
