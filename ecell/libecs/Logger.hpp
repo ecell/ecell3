@@ -6,7 +6,7 @@
 
  */
 
-#include "datapoint.hpp"
+#include "DataPoint.hpp"
 
 template <class T, class V> class DataPoint;
 template <class T, class V> class Logger;
@@ -35,9 +35,9 @@ public:
 typedef Object* ObjectPtr; // FIXME : temp 
 
 
-#if defined(STL_DATAPOINTVECTOR)
-#include "stl_datapointvector.hpp"
-#endif /* END OF STL_DATAPOINTVECTOR */
+#if defined(STLDATAPOINTVECTOR)
+#include "StlDataPointVector.hpp"
+#endif /* END OF STLDATAPOINTVECTOR */
 
 
 
@@ -49,9 +49,9 @@ template <class T, class V>
 class Logger
 {
 public:
-#if defined(STL_DATAPOINTVECTOR)
+#if defined(STLDATAPOINTVECTOR)
   typedef StlDataPointVector<T,V> DataPointVector;
-#endif /* END OF STL_DATAPOINTVECTOR */
+#endif /* END OF STLDATAPOINTVECTOR */
 
 #if defined(VVECTOR)
   typedef VVector DataPointVector;

@@ -63,6 +63,17 @@ public:
   }
 
 
+  bool operator>(const DataPoint& second)
+  {
+    if(this->getTime() > second.getTime())
+      {
+	return true;
+      }
+    return false;
+    
+  }
+
+
   //
   // Accessors
   //

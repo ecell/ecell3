@@ -7,7 +7,7 @@
  */
 
 #if !defined(__DATAPOINT_HPP)
-#include "datapoint.hpp"
+#include "DataPoint.hpp"
 #endif
 
 

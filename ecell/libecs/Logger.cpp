@@ -3,7 +3,7 @@
  */
 
 #if !defined(__LOGGER_HPP)
-#include "logger.hpp"
+#include "Logger.hpp"
 #endif
 
 
@@ -101,8 +101,8 @@ void Logger<T, V>::appendData(const containee_type& dp )
 
 #include <stdio.h>
 #include <iostream>
-#include "datapoint.cpp"
-#include "stl_datapointvector.cpp"
+#include "DataPoint.cpp"
+#include "StlDataPointVector.cpp"
 typedef double Float;
 
 const Float& func(void)

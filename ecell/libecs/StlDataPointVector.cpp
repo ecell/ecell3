@@ -7,7 +7,7 @@
  */
 
 #if !defined(__DATAPOINT_HPP)
-#include "stl_datapointvector.hpp"
+#include "StlDataPointVector.hpp"
 #endif
 
 #include <algorithm>
