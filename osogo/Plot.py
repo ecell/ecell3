@@ -171,33 +171,17 @@ class Plot:
 	    self.xticks_no=ticks
 	    self.drawline("pen", self.yaxis_x,self.xaxis_y,
 			    self.yaxis_x+self.xaxislength,self.xaxis_y)
-#	    self.xticks_step=self.plotarea[2]/float(ticks)
-#	    for t in range(ticks):
-#		x=round((t+1)*self.xticks_step)+self.origo[0]
 	    
 	def drawyaxis(self,ticks):
 	    self.yticks_no=ticks
 	    self.drawline("pen", self.yaxis_x,self.xaxis_y-self.yaxislength,
 			    self.yaxis_x,self.xaxis_y)
-#	    self.yticks_step=self.plotarea[3]/float(ticks)
-#	    for t in range(ticks):
-#		y=self.origo[1]-round((t+1)*self.yticks_step)
 	    
 	def drawpoint_on_plot(self, aFullPNString,x,y):
 	    #uses raw plot coordinates!
 	    self.pm.draw_point(self.GCFullPNMap[aFullPNString],x,y)
 	    self.theWidget.queue_draw_area(x,y,1,1)
     	
-#    	def gc_entry(self,aFullPNString):
-#	    self.saved_gc_color=self.gc.foreground
-#	    if self.ColorFullPNMap.has_key(aFullPNString):
-#		self.gc.foreground=self.RawColorFullPNMap[aFullPNString]
-#		return 1
-#	    else:
-#		return 0
-	    
-#	def gc_leave(self):    
-#	    self.gc.foreground=self.saved_gc_color
 	    
 	def drawline(self, aFullPNString,x0,y0,x1,y1):
 	    #uses raw plot coordinates!	    
@@ -450,7 +434,7 @@ class TracerPlot(Plot):
 	    self.zoomlevel=0
 	    self.zoombuffer=[]
 	    self.zoomkeypressed=False
-
+	    self.button_timestamp=None
 	    self.theOwner=owner
 	    #initializes variables
 	    self.xframe_when_rescaling=0.5
@@ -462,7 +446,7 @@ class TracerPlot(Plot):
 	    self.zerovalue=1e-50 #very small amount to substitute 0 in log scale calculations
 	    # stripinterval/pixel
 	    self.requires_scale=gtk.TRUE
-	     
+	    self.size_status='maximized'
 	    #initialize data buffers
 	    self.data_stack={} #key:FullPNString, value: DataBuffer[[x0,y0],[x1,y1],[x2,y2]]}	
 	    self.lastx={}
@@ -485,6 +469,9 @@ class TracerPlot(Plot):
 	    self.reprint_ylabels()	    
 	    self.setstrip=False
 	    
+	def maximize(self):
+		self.theOwner.maximize()
+
 	def convertx_to_plot(self,x):
 	    return round((x-self.xframe[0])/float(self.pixelwidth))+self.origo[0]
 	    
@@ -759,6 +746,10 @@ class TracerPlot(Plot):
 	    button=event.button
 	    #if button is 1
 	    if button==1:
+		tstamp=event.get_time()
+		if self.button_timestamp==tstamp and self.size_status=='minimized':
+			self.maximize()
+		self.button_timestamp=tstamp			
 		if self.strip_mode=='history':
 		#check that mode is history 
 		    self.zoomkeypressed=True
@@ -1089,4 +1080,5 @@ class TracerPlot(Plot):
 	    self.drawall()
 	    return pixbuf
 
-		
+	def minimize(self):
+		self.size_status='minimized'		

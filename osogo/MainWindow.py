@@ -38,7 +38,6 @@ from OsogoWindow import *
 
 from main import *
 from OsogoPluginManager import *
-GNOME_INSTALLED='no'
 if GNOME_INSTALLED=='yes':
     import gnome.ui
 

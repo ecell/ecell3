@@ -42,6 +42,8 @@ from os import *
 from ecell.ecssupport import *
 import ConfirmWindow
 
+from Numeric import *
+
 FORWARD=0
 DOWN=1
 
@@ -113,8 +115,8 @@ class BoardWindow(OsogoWindow):
 
 		r,c = self.__getNextPosition()
 		self.__appendPluginFrame( aPluginFrame, r, c )
-		self['board_table'].show_all()
-
+		aPluginFrame.show_all()
+		self.updatePositions()
 
 	def deletePluginWindow( self, *arg ):
 		if self.theSelectedPluginFrame != None:
@@ -193,6 +195,8 @@ class BoardWindow(OsogoWindow):
 	def __initializePosition( self ):
 		self.theRow = -1
 		self.theCol = -1
+		self.theWidth = 0
+		self.theHeigth = 0
 
 	def changeTableSize( self, *arg ):
 		self.changeAlignment()
@@ -210,19 +214,62 @@ class BoardWindow(OsogoWindow):
 			self.theRowSize = aSize
 			self.theColSize = -1
 
+
 	def updatePositions( self, *arg ):
 		anElementList = []
+		arequisitionList = []
 		for anElement in self['board_table'].get_children():
 			anElementList.insert( 0, anElement )
 			self['board_table'].remove( anElement )
 
+		print "Colsize",self.theColSize
+		print "Rowsize",self.theRowSize
+		print "length", len(anElementList)
+
+		#calculate dimensions
+		if self.theRowSize == -1:
+			__rowsize = ceil( len( anElementList ) / self.theColSize ) 
+			__colsize = self.theColSize
+		else:
+			__rowsize = self.theRowSize
+			__colsize = ceil( len(anElementList ) / self.theRowSize )
+
+		print __rowsize, __colsize
+
+		#init requisitionlist
+ 		for i in range(0 , __rowsize*__colsize - 1):
+			aRecqusitionList.append(None)
+		
 		self.__initializePosition()
 		
 		for anElement in anElementList:
 			r,c = self.__getNextPosition()
 			self.__appendPluginFrame( anElement, r, c )
+			arequisitionList[r * __rowsize + c ] = anElement.get_child_requisition()
 		
-		self['board_table'].show_all()
+		print arequisitionList
+
+		#shrink to fit
+		theTableHeight = 0
+		theTableWidth = 0
+		for r in range (0, __rowsize):
+			theRowHeight = 0
+			theRowWidth = 0
+			for c in range (0, __colsize):
+				arequisition = arequisitionList[ r * __rowsize + c ]
+				if arequisition == None:
+					break
+				theRowWidth += arequisition[0]
+				theRowHeight = max ( theRowheight, arequisition[1] )
+			theTableHeight += theRowHeight
+			theTableWidth = max ( theTableWidth, theRowWidth)
+		self['board_table'].set_size_request( theTableWidth , theTableHeight )
+
+		#calculate window dimensions
+		__hboxrequisition = self['hbox1'].get_child_requisition()
+		theTableHeight +=__hboxrequisition[1]
+		theTableWidth = max ( theTableWidth, __hboxrequisition[0] )
+		self['BoardWindow'].resize( theTableWidth, theTableHeight )		
 
 	def changeAlignment( self, *arg ):
 		# --------------------------------------------
@@ -256,6 +303,10 @@ class BoardWindow(OsogoWindow):
 
 		self.theMainWindow.thePluginManager.editInstanceTitle( aTitle, aNewTitle )
 		self.theMainWindow.updateFundamentalWindows()
+
+
+	def shrink_to_fit(self):
+		self.updatePositions()
 
 	# end of editTitle
 
