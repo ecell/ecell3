@@ -68,7 +68,8 @@ namespace libecs
 
   protected:
     
-    void appendLogger( FullPNCref );
+    LoggerPtr createLogger( FullPNCref fpn );
+    void appendLogger( LoggerPtr );
     
   private:
 

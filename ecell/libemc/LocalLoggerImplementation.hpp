@@ -69,7 +69,7 @@ namespace libemc
 
   private:
 
-    const libecs::Logger theLogger;
+    libecs::LoggerCref theLogger;
     
   };
 

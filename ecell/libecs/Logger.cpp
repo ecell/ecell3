@@ -29,6 +29,7 @@
 //
 
 
+#include "PropertyInterface.hpp"
 
 /*
 
@@ -38,50 +39,27 @@
 #include "Logger.hpp"
 #endif
 
+
+
 namespace libecs
 {
 
-  // Default Constructor
-
-  Logger::Logger( void )
-    :
-    theMinimumInterval( 0.0 ),
-    theCurrentInterval( 0.0 )
-  {
-    ;
-  } 
-
   // Constructor
 
-  /*
-  Logger::Logger( const ProxyPropertySlot& aPropertySlot )
+  Logger::Logger( AbstractPropertySlotCref aPropertySlot )
     :
-    //    thePropertySlot( aPropertySlot ),
+    thePropertySlot( aPropertySlot ),
     theMinimumInterval( 0.0 ),
     theCurrentInterval( 0.0 )
   {
     ; // do nothing
   } 
-  */
-  
-  // Copy Constructor
-  
-  Logger::Logger( LoggerCref logger )
-    :
-    theDataPointVector( logger.getDataPointVector() ),
-    //    thePropertySlot( logger.getPropertySlot() ),
-    theMinimumInterval( logger.getMinInterval() ),
-    theCurrentInterval( logger.getCurrentInterval() )
-  {
-    ; // do nothing
-  }
-  
   
   // Destructor
   
   Logger::~Logger( void )
   {
-    ; // do nothing
+    delete &thePropertySlot;
   }
   
   
@@ -104,25 +82,26 @@ namespace libecs
   
   //
   
-  Logger::DataPointVectorCref Logger::getData( RealCref start,
-					       RealCref end ) const
+  Logger::DataPointVectorCref Logger::getData( RealCref aStartTime,
+					       RealCref anEndTime ) const
   {
-    const_iterator itr_1 = theDataPointVector.begin();
-    const_iterator itr_2 = theDataPointVector.end();
+    const_iterator itr_1( theDataPointVector.begin() );
+    const_iterator itr_2( theDataPointVector.end() );
     
     
-    const_iterator startItr = theDataPointVector.binary_search( itr_1,
-								itr_2,
-								start );
-    const_iterator endItr = theDataPointVector.binary_search( itr_1,
-							      itr_2,
-							      end );
-    const_iterator i = startItr;
+    const_iterator 
+      aStartIterator( theDataPointVector.binary_search( itr_1,
+						       itr_2,
+						       aStartTime ) );
+    const_iterator 
+      anEndIterator( theDataPointVector.binary_search( itr_1,
+						     itr_2,
+						     anEndTime ) );
     DataPointVectorPtr aNewDataPointVectorPtr( new DataPointVector() );
-    while( i != endItr )
+    while( aStartIterator != anEndIterator )
       {
-	aNewDataPointVectorPtr->push( **i );
-	i++;
+	aNewDataPointVectorPtr->push( **aStartIterator );
+	aStartIterator++;
       }
     
     return *aNewDataPointVectorPtr;
@@ -132,31 +111,33 @@ namespace libecs
   //
   
   
-  Logger::DataPointVectorCref Logger::getData( RealCref first,
-					       RealCref last,
-					       RealCref interval ) const
+  Logger::DataPointVectorCref Logger::getData( RealCref aStartTime,
+					       RealCref anEndTime,
+					       RealCref anInterval ) const
   {
     
     DataPointVectorPtr aDataPointVectorPtr( new DataPointVector() );
     
-    const_iterator itr_1 = theDataPointVector.begin();
-    const_iterator itr_2 = theDataPointVector.end();
+    const_iterator aFirstIterator( binary_search( theDataPointVector.begin(),
+						  theDataPointVector.end(),
+						  aStartTime ) );
+
+    const_iterator aLastIterator( binary_search( aFirstIterator,
+						 theDataPointVector.end(),
+						 anEndTime ) );
+
     
-    const_iterator firstItr = binary_search( itr_1, itr_2, first );
-    const_iterator lastItr  = binary_search( itr_1, itr_2, last );
-    
-    const_iterator i = firstItr;
-    Real aTime( first );
-    while( aTime < (*lastItr)->getTime() ) // FIXME
+    Real aTime( aStartTime );
+    Real aLastTime( (*aLastIterator)->getTime() );
+    while( aTime <  aLastTime ) // FIXME
       {
-	const_iterator n = 
-	  theDataPointVector.binary_search( i,
-					    lastItr,
-					    aTime + interval
-					    );
-	aDataPointVectorPtr->push( **n );
-	aTime = (*n)->getTime();
-	i = n;
+	const_iterator 
+	  anIterator( theDataPointVector.binary_search( aFirstIterator,
+							aLastIterator,
+							aTime + anInterval ) );
+	aDataPointVectorPtr->push( **anIterator );
+	aTime = (*anIterator)->getTime();
+	aFirstIterator = anIterator;
       }
     
     return *aDataPointVectorPtr;
@@ -165,11 +146,12 @@ namespace libecs
   
   //
   
-  void Logger::appendData(const containee_type& dp )
+  void Logger::appendData( const containee_type& aDataPoint )
   {
-    theCurrentInterval = dp.getTime() - theDataPointVector.back()->getTime();
-    theDataPointVector.push( dp );
-    if(theMinimumInterval < theCurrentInterval )
+    theCurrentInterval = 
+      aDataPoint.getTime() - theDataPointVector.back()->getTime();
+    theDataPointVector.push( aDataPoint );
+    if( theMinimumInterval < theCurrentInterval )
       {
 	theMinimumInterval = theCurrentInterval; 
       }
@@ -178,10 +160,10 @@ namespace libecs
   
   //
   
-  void Logger::appendData( RealCref t, UConstantCref v )
+  void Logger::appendData( RealCref aTime, UConstantCref aValue )
   {
-    theCurrentInterval = t - theDataPointVector.back()->getTime();
-    theDataPointVector.push( t, v );
+    theCurrentInterval = aTime - theDataPointVector.back()->getTime();
+    theDataPointVector.push( aTime, aValue );
     if(theMinimumInterval < theCurrentInterval )
       {
 	theMinimumInterval = theCurrentInterval; 

@@ -50,11 +50,10 @@ namespace libecs
 
   const Message PropertyInterface::getPropertyList( StringCref keyword )
   {
-    UConstantVectorRCPtr 
-      aPropertyVectorPtr( new UConstantVector );// thePropertyMap.size() ) );
+    UConstantVectorRCPtr aPropertyVectorPtr( new UConstantVector );
     aPropertyVectorPtr->reserve( thePropertyMap.size() );
 
-    for( PropertyMapConstIterator i = thePropertyMap.begin() ; 
+    for( PropertyMapConstIterator i( thePropertyMap.begin() ); 
 	 i != thePropertyMap.end() ; ++i )
       {
 	aPropertyVectorPtr->push_back( i->first );
@@ -68,7 +67,7 @@ namespace libecs
     UConstantVectorRCPtr aPropertyAttributesVector( new UConstantVector );
     aPropertyAttributesVector->reserve( thePropertyMap.size() );
 
-    for( PropertyMapConstIterator i = thePropertyMap.begin() ; 
+    for( PropertyMapConstIterator i( thePropertyMap.begin() ); 
 	 i != thePropertyMap.end() ; ++i )
       {
 	Int anAttributeFlag( 0 );
@@ -96,7 +95,7 @@ namespace libecs
 
   PropertyInterface::~PropertyInterface()
   {
-    for( PropertyMapIterator i = thePropertyMap.begin() ; 
+    for( PropertyMapIterator i( thePropertyMap.begin() ); 
 	 i != thePropertyMap.end() ; ++i )
       {
 	delete i->second;
@@ -104,7 +103,7 @@ namespace libecs
   }
 
   void PropertyInterface::appendSlot( StringCref keyword, 
-				     AbstractPropertySlot* func )
+				      AbstractPropertySlot* func )
   {
     if( thePropertyMap.find( keyword ) != thePropertyMap.end() )
       {
@@ -112,6 +111,7 @@ namespace libecs
 	delete thePropertyMap[ keyword ];
 	thePropertyMap.erase( keyword );
       }
+
     thePropertyMap[ keyword ] = func;
   }
 
@@ -123,6 +123,7 @@ namespace libecs
 		      className() + String( ":no slot for keyword [" ) +
 		      keyword + String( "] found.\n" ) );
       }
+
     delete thePropertyMap[ keyword ];
     thePropertyMap.erase( keyword );
   }

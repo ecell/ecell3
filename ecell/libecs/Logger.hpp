@@ -50,10 +50,6 @@
 namespace libecs
 {
 
-  class DataPoint;
-  class Logger;
-  class ProxyPropertySlot;
-
   /**
    
    */
@@ -70,28 +66,19 @@ namespace libecs
     typedef DataPointVector::size_type size_type;
 
 
-  
   public:
 
-    /**
-       Default constructor
-    */
-  
-    Logger( void );
+    //Logger( void ) {}
+
 
     /**
        Constructor
+
     */
   
-    //    Logger( const ProxyPropertySlot& );
-  
-    /**
-       Copy constructor
-    */
-  
-    Logger( LoggerCref );
+    Logger( AbstractPropertySlotCref aPropertySlot );
 
-
+  
     /// Destructor
 
     ~Logger( void );
@@ -119,6 +106,11 @@ namespace libecs
 				 RealCref interval ) const;
 
 
+
+    StringCref getName() const
+    {
+      return theName;
+    }
 
     /**
 
@@ -167,12 +159,12 @@ namespace libecs
     /**
 
 
-    const ProxyPropertySlot& getPropertySlot( void ) const
+    AbstractPropertySlotCref getPropertySlot( void ) const
     {
-      return thePropertySlot;
+      return thePropertySlotProxy;
     }
-  
      */
+  
   
     /**
 
@@ -198,6 +190,9 @@ namespace libecs
 
   private:
 
+    // no copy constructor
+  
+    Logger( LoggerCref );
 
     /// Assignment operator is hidden
   
@@ -206,11 +201,8 @@ namespace libecs
 
 
 
-  private:
-  
-
     //
-    // Protected and Private data members follow
+    // Protected and Private data members
     //
 
 
@@ -218,10 +210,11 @@ namespace libecs
 
     /// Data members
 
+    AbstractPropertySlotCref    thePropertySlot;
     DataPointVector             theDataPointVector;
-    //    const ProxyPropertySlot      thePropertySlot;
     Real                        theMinimumInterval;
     Real                        theCurrentInterval;
+    String                      theName;
 
   };
 

@@ -76,6 +76,7 @@ namespace libecs
   DECLARE_CLASS( SystemMaker );
   DECLARE_CLASS( Message );
   DECLARE_CLASS( AbstractPropertySlot );
+  DECLARE_CLASS( PropertySlotProxy );
   DECLARE_CLASS( PropertyInterface );
   DECLARE_CLASS( UConstant );
   DECLARE_CLASS( LoggerBroker );

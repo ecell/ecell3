@@ -37,13 +37,13 @@ namespace libemc
 
   using namespace libecs;
 
-  LocalLoggerImplementation::
-  LocalLoggerImplementation( void )
-    :
-    theLogger( Logger() ) 
-  {
-    ; // do nothing
-  }
+  //  LocalLoggerImplementation::
+  //  LocalLoggerImplementation( void )
+  //    :
+  //    theLogger( Logger() ) 
+  //  {
+  //    ; // do nothing
+  //  }
 
   LocalLoggerImplementation::
   LocalLoggerImplementation( LoggerCptr lptr )

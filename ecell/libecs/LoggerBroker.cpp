@@ -61,13 +61,11 @@ namespace libecs
       }
     else
       {
-	appendLogger( fpn );
-	aLoggerMapIterator = theLoggerMap.find( fpn );
-	return aLoggerMapIterator->second;
+	return createLogger( fpn );
       }
   }
 
-  void LoggerBroker::appendLogger( FullPNCref fpn )
+  LoggerPtr LoggerBroker::createLogger( FullPNCref fpn )
   {
     EntityPtr anEntityPtr( theRootSystem.getEntity( fpn.getFullID() ) );
 
@@ -76,9 +74,17 @@ namespace libecs
     PropertyMapIterator 
       aPropertyMapIterator( anEntityPtr->getPropertySlot( aPropertyName ) );
 
-    LoggerPtr aLoggerPtr( new Logger );
-    aPropertyMapIterator->second->getProxy()->setLogger( aLoggerPtr );
-    theLoggerMap[fpn] = aLoggerPtr;
+    LoggerPtr aLoggerPtr( new Logger( *aPropertyMapIterator->second ) );
+    //    aPropertyMapIterator->second->getProxy()->setLogger( aLoggerPtr );
+
+    appendLogger( aLoggerPtr );
+
+    return aLoggerPtr;
+  }
+
+  void LoggerBroker::appendLogger( LoggerPtr logger )
+  {
+    theLoggerMap[logger->getName()] = logger;
   }
   
 

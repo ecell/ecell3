@@ -68,31 +68,36 @@ namespace libecs
     virtual const bool isGetable() const = 0;
 
     virtual void operator()( MessageCref message ) 
-    { set( message ); }
-    virtual const Message operator()( StringCref keyword ) 
-    { return get(keyword); }
+    { 
+      set( message ); 
+    }
 
-    virtual ProxyPropertySlot* getProxy( void ) = 0;
+    virtual const Message operator()( StringCref keyword ) 
+    { 
+      return get(keyword); 
+    }
+
+    virtual PropertySlotProxyPtr createProxy( void ) = 0;
 
   };
 
 
-  class ProxyPropertySlot
+  class PropertySlotProxy
   {
     
   public:
       
-    ProxyPropertySlot( AbstractPropertySlotPtr aPropertySlot )
+    PropertySlotProxy( AbstractPropertySlotPtr aPropertySlot )
       :
       thePropertySlot( aPropertySlot ),
       theLogger( NULLPTR )
     {
-      ;
+      ; // do nothing
     }
 
     // copy constructor
     
-    ProxyPropertySlot( ProxyPropertySlot& rhs )
+    PropertySlotProxy( PropertySlotProxyRef rhs )
       :
       thePropertySlot( rhs.thePropertySlot ),
       theLogger( rhs.theLogger )
@@ -102,7 +107,7 @@ namespace libecs
 
     // copy constructor 
 
-    ProxyPropertySlot( const ProxyPropertySlot& rhs )
+    PropertySlotProxy( PropertySlotProxyCref rhs )
       :
       thePropertySlot( rhs.thePropertySlot ),
       theLogger( rhs.theLogger )
@@ -124,7 +129,7 @@ namespace libecs
     }
 
 
-    bool operator!=( const ProxyPropertySlot& rhs ) const
+    bool operator!=( PropertySlotProxyCref rhs ) const
     {
       if( rhs.thePropertySlot != this->thePropertySlot )
 	{
@@ -136,12 +141,12 @@ namespace libecs
       
   private:
       
-    ProxyPropertySlot( void );
+    PropertySlotProxy( void );
       
   private:    
 
     AbstractPropertySlotPtr   thePropertySlot;
-    LoggerPtr                theLogger;
+    LoggerPtr                 theLogger;
     
     
     
@@ -158,28 +163,28 @@ namespace libecs
 
 
   template<class T>
-  class PropertySlot : public AbstractPropertySlot
+  class PropertySlot
+    : 
+    public AbstractPropertySlot
   {
 
   public:
 
-    typedef void ( T::* SetMessageFunc )( MessageCref );
-    typedef const Message ( T::* GetMessageFunc )( StringCref );
+    typedef void ( T::* SetPropertyFuncPtr )( MessageCref );
+    typedef const Message ( T::* GetPropertyFuncPtr )( StringCref );
 
   public:
 
-    PropertySlot( T& object, const SetMessageFunc setmethod,
-		 const GetMessageFunc getmethod )
+    PropertySlot( T& object, const SetPropertyFuncPtr setmethod,
+		  const GetPropertyFuncPtr getmethod )
       : 
       theObject( object ), 
       theSetMethod( setmethod ), 
-      theGetMethod( getmethod ),
-      theProxy( this )
+      theGetMethod( getmethod )
     {
       ; // do nothing
     }
   
-
     virtual const bool isSetable() const
     {
       return theSetMethod != NULLPTR;
@@ -194,42 +199,34 @@ namespace libecs
     {
       if( ! isSetable() )
 	{
-	  //FIXME: throw an exception
-	  return;
+	  throw AttributeError( "[" + theName + "] is not settable." );
 	}
 
       ( theObject.*theSetMethod )( message );
-      
-      if( theProxy != NULL )
-      	{
-	  //	  Message m = get("nothing");
-	  //	  theProxy.update( m.getBody() );
-	} 
     }
 
     virtual const Message get( StringCref keyword ) 
     {
       if( ! isGetable() )
 	{
-	  //FIXME: throw an exception
-	  return Message( keyword );
+	  throw AttributeError( "[" + theName + "] is not gettable." );
 	}
 
-      return ( ( theObject.*theGetMethod )( keyword ));
+      return ( ( theObject.*theGetMethod )( keyword ) );
     }
 
-    virtual ProxyPropertySlot* getProxy( void )
+    virtual PropertySlotProxyPtr createProxy( void )
     {
-      return new ProxyPropertySlot( theProxy );
+      return new PropertySlotProxy( this );
     }
 
 
   private:
 
-    T&                   theObject;
-    ProxyPropertySlot     theProxy;
-    const SetMessageFunc theSetMethod;
-    const GetMessageFunc theGetMethod;
+    T&                       theObject;
+    const SetPropertyFuncPtr theSetMethod;
+    const GetPropertyFuncPtr theGetMethod;
+    String                   theName;
   };
 
 
@@ -288,13 +285,13 @@ namespace libecs
     PropertyMap thePropertyMap;
 
   };
-
+  
 
 #define makePropertySlot( KEY, CLASS, OBJ, SETMETHOD, GETMETHOD )\
 appendSlot( KEY, new PropertySlot< CLASS >\
-	   ( OBJ, static_cast< PropertySlot< CLASS >::SetMessageFunc >\
+	   ( OBJ, static_cast< PropertySlot< CLASS >::SetPropertyFuncPtr >\
 	    ( SETMETHOD ),\
-	    static_cast< PropertySlot< CLASS >::GetMessageFunc >\
+	    static_cast< PropertySlot< CLASS >::GetPropertyFuncPtr >\
 	    ( GETMETHOD ) ) )
 
 

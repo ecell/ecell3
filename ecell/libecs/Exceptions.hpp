@@ -81,11 +81,12 @@ public:\
   DEFINE_EXCEPTION( NotFound,              Exception);
   DEFINE_EXCEPTION( CantOpen,              Exception); 
   DEFINE_EXCEPTION( BadID,                 Exception); 
-  DEFINE_EXCEPTION( MessageException,      Exception);
+  DEFINE_EXCEPTION( PropertyException,     Exception);
   DEFINE_EXCEPTION( CallbackFailed,        Exception);
-  DEFINE_EXCEPTION( BadMessage,            MessageException); 
-  DEFINE_EXCEPTION( NoMethod,              MessageException);
-  DEFINE_EXCEPTION( NoSlot,                MessageException);
+  DEFINE_EXCEPTION( BadMessage,            PropertyException); 
+  DEFINE_EXCEPTION( NoMethod,              PropertyException);
+  DEFINE_EXCEPTION( NoSlot,                PropertyException);
+  DEFINE_EXCEPTION( AttributeError,        PropertyException);
   DEFINE_EXCEPTION( InvalidPrimitiveType,  Exception);
 
 
