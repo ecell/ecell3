@@ -461,6 +461,7 @@ class Preprocessor:
 		# set hooks
 		#
 		pseudo.addHook( 'after_include', self.afterIncludeHook )
+		pseudo.addHook( 'before_include', self.beforeIncludeHook )
 		pseudo.addHook( 'after_expand', self.needLineControl )
 		pseudo.addHook( 'after_evaluate', self.needLineControl )
 		pseudo.addHook( 'after_execute', self.needLineControl )
