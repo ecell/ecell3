@@ -67,6 +67,16 @@ namespace libemc
 	     libecs::RealCref end,
 	     libecs::RealCref interval ) const;
 
+    libecs::RealCref getStartTime() const
+    {
+      return theLogger.getStartTime();
+    }
+
+    libecs::RealCref getEndTime() const
+    {
+      return theLogger.getEndTime();
+    }
+
   private:
 
     libecs::LoggerCref theLogger;

@@ -63,6 +63,9 @@ namespace libemc
 	     libecs::RealCref end,
 	     libecs::RealCref interval ) const = 0;
 
+    virtual libecs::RealCref getStartTime() const = 0;
+    virtual libecs::RealCref getEndTime() const = 0;
+
   };
 
 

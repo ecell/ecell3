@@ -73,6 +73,8 @@ public:
   static void init_type();
 
   Object getData( const Tuple& args );
+  Object getStartTime( const Tuple& args );
+  Object getEndTime( const Tuple& args );
 
 private:
 

@@ -30,6 +30,7 @@
 
 
 #include "PyLogger.hpp"
+#include "PyEcs.hpp"
 
 using libecs::Real;
 
@@ -40,10 +41,13 @@ void PyLogger::init_type()
   behaviors().doc("Logger Python class");
 
   add_varargs_method( "getData", &PyLogger::getData );
+  add_varargs_method( "getStartTime", &PyLogger::getStartTime );
+  add_varargs_method( "getEndTime", &PyLogger::getEndTime );
 }
 
 Object PyLogger::getData( const Py::Tuple& args )
 {
+  //ECS_TRY;
   args.verify_length( 0, 3 );
   libecs::Logger::DataPointVectorCptr aDataPointVector( NULLPTR );
   switch( args.length() )
@@ -70,6 +74,7 @@ Object PyLogger::getData( const Py::Tuple& args )
 
     default:
       throw Py::IndexError ( "Unexpected number of arguments." );
+
     }
 
 
@@ -84,5 +89,33 @@ Object PyLogger::getData( const Py::Tuple& args )
     }
   
   return *aPyTupleReturned;
+
+  //ECS_CATCH;
 }
+
+Object PyLogger::getStartTime( const Py::Tuple& args )
+{
+  //ECS_TRY;
+  args.verify_length( 0 );
+
+  Py::Float* aPyFloatReturned = new Py::Float( EmcLogger::getStartTime() );
+
+  return *aPyFloatReturned;
+
+  //ECS_CATCH;
+}
+
+Object PyLogger::getEndTime( const Py::Tuple& args )
+{
+  //ECS_TRY;
+  args.verify_length( 0 );
+
+  Py::Float* aPyFloatReturned = new Py::Float( EmcLogger::getEndTime() );
+
+  return *aPyFloatReturned;
+
+  //ECS_CATCH;
+}
+
+
 

@@ -115,8 +115,8 @@ namespace libemc
 	    libecs::StringCref    id,
 	    libecs::StringCref    propertyname )
   {
-    return theLoggerBroker.getLogger( FullPN( type, 
-					      systempath,
+    return theLoggerBroker.getLogger( FullPN( type,
+					      SystemPath(systempath),
 					      id,
 					      propertyname ) );
   }

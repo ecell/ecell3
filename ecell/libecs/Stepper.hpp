@@ -207,6 +207,8 @@ namespace libecs
     virtual void sync() = 0;
     virtual void push() = 0;
 
+    virtual void registerPropertySlot( PropertySlotPtr ) = 0;
+
     virtual void distributeIntegrator( IntegratorAllocatorPtr );
 
     virtual const char* const className() const  { return "Stepper"; }
@@ -336,6 +338,11 @@ namespace libecs
     static StepperPtr instance() { return new SlaveStepper; }
 
     virtual const char* const className() const  { return "SlaveStepper"; }
+
+    void registerPropertySlot( PropertySlotPtr propertyslot )
+    {
+      theMaster->registerPropertySlot( propertyslot );
+    }
 
   private:
 

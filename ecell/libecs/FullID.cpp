@@ -285,6 +285,7 @@ main()
       cout << aFullID3.getString() << endl;
 
       cout << "\n::::::::::" << endl;
+      //      FullPN aFullPN( 1,aFullID.getSystemPath(),"/", "PNAME" );
 
       FullPN 
 	aFullPN( "       \t  \n  Substance:/A/B:S:PNAME   \t   \n" );

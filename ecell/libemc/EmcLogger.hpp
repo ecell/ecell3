@@ -78,6 +78,16 @@ namespace libemc
       theLoggerImplementation = new LocalLoggerImplementation( lptr );
     }
 
+    libecs::RealCref getStartTime() const
+    {
+      return theLoggerImplementation->getStartTime();
+    }
+
+    libecs::RealCref getEndTime() const
+    {
+      return theLoggerImplementation->getEndTime();
+    }
+
   private:
 
     LoggerImplementation* theLoggerImplementation;

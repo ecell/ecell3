@@ -79,6 +79,10 @@ namespace libecs
 
     appendLogger( aLoggerPtr );
 
+
+    anEntityPtr->getSuperSystem()
+      ->getStepper()->registerPropertySlot( aPropertyMapIterator->second );
+
     return aLoggerPtr;
   }
 
