@@ -1,5 +1,4 @@
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-//
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::://
 //        This file is part of E-CELL Simulation Environment package
 //
 //                Copyright (C) 2000-2001 Keio University
@@ -93,6 +92,7 @@ namespace libecs
 	theEndTime = anEndTime;
       }
   
+    Real theMaxSize ( thePhysicalLogger.size() );  
     DataPointVectorIterator 
       range( static_cast<DataPointVectorIterator>
 	     ( ( theEndTime - theStartTime ) / anInterval ) + 1 );
@@ -115,16 +115,18 @@ namespace libecs
     Real interval( 0.0 );
     Real dptime( aDataPoint.getTime() );
     DataInterval aDataInterval;
-    
+    thePhysicalLogger.getItem( current_item, &aDataPoint );
     PhysicalLoggerIterator it;
     while( counter < range )
       {
 	aDataInterval.beginNewInterval();
+	
         do 
 	{
 	  if ( dptime <= rcounter ) 
 	    {
 	      thePhysicalLogger.getItem( current_item , &aDataPoint );
+	      ++current_item;	
 	      dptime=aDataPoint.getTime();
 	    }
 
@@ -138,14 +140,18 @@ namespace libecs
 	    }
 
 	  aDataInterval.aggregatePoint( aDataPoint, interval );
-	  ++current_item;	
-          rcounter += interval;
+	    rcounter += interval;
 
-        } while ( rcounter < rtarget );
+        } while ( ( rcounter < rtarget ) && ( theMaxSize>=current_item ) );
 
         ( *aDataPointVector )[counter] = aDataInterval.getDataPoint();
 	rtarget += anInterval;
+	if ( rtarget > theEndTime )
+	{
+	    rtarget = theEndTime;	
+	}
 	++counter;
+	
       }
 
     return DataPointVectorRCPtr( aDataPointVector );

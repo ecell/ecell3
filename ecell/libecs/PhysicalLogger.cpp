@@ -56,7 +56,7 @@ namespace libecs
 	i_end=start;
       }
 
-    while( i_start < ( i_end - 1 ) )
+    while( ( i_start + 1 ) < i_end )
       {
 	if ( theVector[ iterator ].getTime() < time )
 	  {
