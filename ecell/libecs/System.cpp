@@ -63,68 +63,70 @@ void System::makeSlots()
 
 const Message System::getSystemList( StringCref keyword )
 {
-  String listString;
+  UniversalVariableVector aVector;
 
   for( SystemListIterator i = getFirstSystemIterator() ;
        i != getLastSystemIterator() ; ++i )
     {
-      listString += i->second->getId();
-      listString += ' ';
+      aVector.push_back( UniversalVariable( i->second->getId() ) );
     }
 
-  return Message( keyword, listString );
+  return Message( keyword, aVector );
 }
 
 const Message System::getSubstanceList( StringCref keyword )
 {
-  String listString;
+  UniversalVariableVector aVector;
 
   for( SubstanceListIterator i = getFirstSubstanceIterator() ;
        i != getLastSubstanceIterator() ; ++i )
     {
-      listString += i->second->getId();
-      listString += ' ';
+      aVector.push_back( UniversalVariable( i->second->getId() ) );
     }
 
-  return Message( keyword, listString );
+  return Message( keyword, aVector );
 }
 
 const Message System::getReactorList( StringCref keyword )
 {
-  String listString;
+  UniversalVariableVector aVector;
 
   for( ReactorListIterator i = getFirstReactorIterator() ;
        i != getLastReactorIterator() ; ++i )
     {
-      listString += i->second->getId();
-      listString += ' ';
+      aVector.push_back( UniversalVariable( i->second->getId() ) );
     }
 
-  return Message( keyword, listString );
+  return Message( keyword, aVector );
 }
 
 
 void System::setStepper( const Message& message )
 {
-  setStepper( message.getBody() );
+  //FIXME: range check
+  setStepper( message[0].asString() );
 }
 
 const Message System::getStepper( StringCref keyword )
 {
-  return Message( keyword, getStepper()->className() );
+  return Message( keyword, 
+		  UniversalVariable( getStepper()->className() ) );
 }
 
 void System::setVolumeIndex( const Message& message )
 {
-  setVolumeIndex( FQID( message.getBody() ) );
+  //FIXME: range check
+  setVolumeIndex( FQID( message[0].asString() ) );
 }
 
 const Message System::getVolumeIndex( StringCref keyword )
 {
-  if( !getVolumeIndex() )
-    return Message( keyword, "" );
+  if( getVolumeIndex() == NULLPTR )
+    {
+      return Message( keyword );
+    }
 
-  return Message( keyword, getVolumeIndex()->getFqid() );
+  return Message( keyword, UniversalVariable( getVolumeIndex()->getFqid() ) );
 }
 
 
@@ -179,31 +181,22 @@ void System::setVolumeIndex( FQIDCref volumeindex )
 
 void System::initialize()
 {
-  if( theStepper == NULL )
+  if( theStepper == NULLPTR )
     {
       //FIXME: make this default user customizable
       setStepper( "Euler1Stepper" );
     }
 
   try{
-    if( theVolumeIndexName != NULL )
+    if( theVolumeIndexName != NULLPTR )
       {
 	FQID fqid( *theVolumeIndexName );
-	//FIXME: recursive search needed
 	theVolumeIndex = theRootSystem->getReactor( fqid );
-	//FIXME: *theMessageWindow << getFqid() << ": volume index is [" 
-	//FIXME: 	  << _volumeIndex->getFqid() << "].\n";
-
-      }
-    else
-      {
-	//FIXME: *theMessageWindow << getFqid() << ": no volume index is specified.\n"; 
       }
   }
   catch( NotFound )
     {
-      //FIXME: *theMessageWindow << getFqid() << ": volume index [" 
-	//FIXME: << _volumeIndexName->fqidString() << "] not found.\n";
+      //FIXME: what to do in this case?
     }
 
   delete theVolumeIndexName;
@@ -367,7 +360,8 @@ void System::addSystem( SystemPtr system )
 
 }
 
-SystemPtr System::getSystem( SystemPathCref systempath ) throw( NotFound )
+SystemPtr System::getSystem( SystemPathCref systempath ) 
+  throw( BadID, NotFound )
 {
   SystemPtr  aSystem = getSystem( systempath.first() );
   SystemPath anNext  = systempath.next();

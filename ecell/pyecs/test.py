@@ -7,14 +7,20 @@ s = ecs.Simulator()
 
 print 'makePrimitive()...'
 s.makePrimitive('Substance','Substance:/:A','substance A')
+s.makePrimitive('Substance','Substance:/:B','substance B')
+s.makePrimitive('Substance','Substance:/:C','substance C')
 
-s.makePrimitive('ConstantParameterReactor','Reactor:/:RC1','constant')
+#s.makePrimitive('ConstantParameterReactor','Reactor:/:RC1','constant')
 
 print 'sendMessage()...'
-s.sendMessage( 'Substance:/:A', 'quantity', '30' )
+s.sendMessage( 'Substance:/:A', 'quantity', (30,) )
 
 print 'initialize()...'
 s.initialize()
+
+print 'substance list...'
+tuple = s.getMessage( 'System:/:/', 'substanceList' )
+print 'got key=%s body=%s' % (tuple[0], tuple[1])
 
 print 'getMessage()...'
 tuple = s.getMessage( 'Substance:/:A', 'id' )
@@ -25,7 +31,7 @@ tuple = s.getMessage( 'Substance:/:A', 'quantity' )
 print 'got key=%s body=%s' % (tuple[0], tuple[1])
 
 print 'sendMessage()...'
-s.sendMessage( 'Substance:/:A', 'quantity', '0' )
+s.sendMessage( 'Substance:/:A', 'quantity', (0,) )
 
 
 print 'getMessage()...'
@@ -33,11 +39,7 @@ tuple = s.getMessage( 'Substance:/:A', 'quantity' )
 print 'got key=%s body=%s' % (tuple[0], tuple[1])
 
 print 'id...'
-tuple = s.getMessage( 'System:/:CELL', 'id' )
-print 'got key=%s body=%s' % (tuple[0], tuple[1])
-
-print 'substance list...'
-tuple = s.getMessage( 'System:/:/', 'substanceList' )
+tuple = s.getMessage( 'System:/:/', 'id' )
 print 'got key=%s body=%s' % (tuple[0], tuple[1])
 
 #print 'getMessage()...'

@@ -127,8 +127,16 @@ public:
 
   virtual void initialize();
 
-  Float getDeltaT();
-  int getBaseClock() { return theBaseClock; }
+  Float StepperLeader::getDeltaT()
+  {
+    return theStepInterval;
+  }
+
+  int getBaseClock() 
+  { 
+    return theBaseClock; 
+  }
+
   void step();
   virtual void clear();
   virtual void react();
@@ -150,6 +158,8 @@ private:
 
   int theUpdateDepth;
   int theBaseClock;
+
+  Float theStepInterval;
 
   static int DEFAULT_UPDATE_DEPTH;
 

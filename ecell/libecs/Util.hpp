@@ -30,6 +30,9 @@
 
 #ifndef ___UTIL_H___
 #define ___UTIL_H___
+#include <stdlib.h>
+#include <strstream.h>
+
 #include "Defs.hpp"
 #include "korandom/korandom.h"
 
@@ -74,13 +77,43 @@ inline int lcm( int a, int b )
 int table_lookup( StringCref str, const char** table );
 
 /** 
-    universal String -> object converter.
+    Universal String -> object converter.
     Float and Int specializations are defined in Util.cpp.
     Conversion to the other classes are conducted using 
     istrstream.
  */
 
-template<class T> T stringTo( StringCref str );
+template <class T> 
+const T stringTo( StringCref str )
+{
+  istrstream ist( str.c_str() );
+  T aT;
+  ist >> aT;
+  return aT;
+}
+
+// specializations
+template<> const Float stringTo<Float>( StringCref str );
+template<> const Int   stringTo<Int>( StringCref str );
+template<> const UnsignedInt  stringTo<UnsignedInt>( StringCref str );
+
+/**
+   Any to String converter function template.
+   Using ostrstream by default. A specialization for Float type
+   with precision( FLOAT_DIG ) is also defined.
+*/
+
+template <class T> const String toString( const T& t )
+{
+  ostrstream os;
+  os << t;
+  os << ends;
+  return os.str();
+}
+
+// specialization 
+template<> const String toString<Float>( const Float& f );
+
 
 /**
    extract a filename from a path string

@@ -33,62 +33,91 @@
 
 #include "libecs.hpp"
 
-
-class UniversalVariable
-{
-
-public:
-  
-  UniversalVariable( StringCref  string ) {}
-  UniversalVariable( const Float f )      {}   
-  UniversalVariable( const Int   i )      {}
-  UniversalVariable( const Uint  ui )     {}       
+DECLARE_CLASS( UniversalVariableData );
+DECLARE_CLASS( UniversalVariableStringData );
+DECLARE_CLASS( UniversalVariableFloatData );
+DECLARE_CLASS( UniversalVariableIntData );
 
 
-  virtual const String asString() = 0;
-  virtual const Float  asFloat()  = 0;
-  virtual const Int    asInt()    = 0;
-  virtual const Uint   asUint()   = 0;
 
-};
-
-
-template <class T>
-class UniversalVariableInstance : public UniversalVariable
+class UniversalVariableData
 {
 
 public:
 
-  virtual const String asString(){}
-  virtual const Float  asFloat() {}
-  virtual const Int    asInt()   {}  
-  virtual const Uint   asUint()  {} 
-
-};
-
-
-// specialization classes
-
-template<> 
-class UniversalVariableInstance<String>
-{
-  
-public:
-
-  UniversalVariableInstance( StringCref  string ) 
-    : 
-    theString( string ) 
+  virtual ~UniversalVariableData()
   {
     ; // do nothing
   }
-  UniversalVariableInstance( const Float f );
-  UniversalVariableInstance( const Int   i );
-  UniversalVariableInstance( const Uint  ui );
 
-  StringCref asString() { return theString; }
-  const Float  asFloat();
-  const Int    asInt();
-  const Uint   asUint();
+  virtual const String asString() const = 0;
+  virtual const Float  asFloat()  const = 0;
+  virtual const Int    asInt()    const = 0;
+
+  virtual const bool isString() const 
+  {
+    return false;
+  }
+
+  virtual const bool isFloat() const
+  {
+    return false;
+  }
+
+  virtual const bool isInt() const
+  {
+    return false;
+  }
+
+  virtual UniversalVariableDataPtr createClone() const = 0;
+
+protected:
+  
+  UniversalVariableData( UniversalVariableDataCref ) {}
+  UniversalVariableData() {}
+
+private:
+
+  UniversalVariableCref operator= ( UniversalVariableCref );
+
+};
+
+
+class UniversalVariableStringData : public UniversalVariableData
+{
+  
+public:
+
+  UniversalVariableStringData( StringCref  str ) 
+    : 
+    theString( str ) 
+  {
+    ; // do nothing
+  }
+  
+  UniversalVariableStringData( const Float f );
+  UniversalVariableStringData( const Int   i );
+
+  UniversalVariableStringData( UniversalVariableDataCref uvi )
+    :
+    theString( uvi.asString() )
+  {
+    ; // do nothing
+  }
+
+  const String asString() const { return theString; }
+  const Float  asFloat() const;
+  const Int    asInt() const;
+
+  virtual const bool isString() const
+  {
+    return true;
+  }
+
+  virtual UniversalVariableDataPtr createClone() const
+  {
+    return new UniversalVariableStringData( *this );
+  }
 
 private:
 
@@ -96,39 +125,40 @@ private:
 
 };
 
-template<> class UniversalVariableInstance<Float>
+class UniversalVariableFloatData : public UniversalVariableData
 {
 
 public:
 
-  UniversalVariableInstance( StringCref string );
-  UniversalVariableInstance( const Float      f ) 
+  UniversalVariableFloatData( StringCref str );
+  UniversalVariableFloatData( const Float      f ) 
     : 
     theFloat( f ) 
   {
     ; // do nothing
   }
 
-  UniversalVariableInstance( const Int        i ) 
+  UniversalVariableFloatData( const Int        i ) 
     : 
     theFloat( static_cast<Float>( i ) )
   {
     ; // do nothing
   }
 
-  UniversalVariableInstance( const Uint       ui )
-    : 
-    theFloat( static_cast<Float>( ui ) )
+  const String asString() const;
+  const Float  asFloat() const { return theFloat; }
+  // FIXME: range check
+  const Int    asInt() const { return static_cast<Int>( theFloat ); }
+
+  virtual const bool isFloat() const
   {
-    ; // do nothing
+    return true;
   }
 
-  const String asString();
-  FloatCref    asFloat() { return theFloat; }
-  // FIXME: range check
-  const Int    asInt()   { return static_cast<Int>( theFloat ); }
-  // FIXME: range check
-  const Uint   asUint()  { return static_cast<Uint>( theFloat ); }
+  virtual UniversalVariableDataPtr createClone() const
+  {
+    return new UniversalVariableFloatData( *this );
+  }
 
 private:
 
@@ -136,26 +166,33 @@ private:
 
 };
 
-template<> class UniversalVariableInstance<Int>
+class UniversalVariableIntData : public UniversalVariableData
 {
 
 public:
 
-  UniversalVariableInstance( StringCref string );
-  UniversalVariableInstance( const Float      f );
-  UniversalVariableInstance( const Int        i ) 
+  UniversalVariableIntData( StringCref str );
+  UniversalVariableIntData( const Float      f );
+  UniversalVariableIntData( const Int        i ) 
     : 
     theInt( i ) 
   {
     ; // do nothing
   }
-  UniversalVariableInstance( const Uint       ui );
 
-  const String asString();
-  const Float  asFloat()  { return static_cast<Float>( theInt ); }
-  IntCref      asInt()    { return theInt; }
-  // FIXME: range check
-  const Uint   asUint()   { return static_cast<Uint>( theInt ); }
+  const String asString() const;
+  const Float  asFloat() const { return static_cast<Float>( theInt ); }
+  const Int    asInt() const   { return theInt; }
+  
+  virtual const bool isInt() const
+  {
+    return true;
+  }
+
+  virtual UniversalVariableDataPtr createClone() const
+  {
+    return new UniversalVariableIntData( *this );
+  }
 
 private:
 
@@ -163,25 +200,103 @@ private:
 
 };
 
-template<> class UniversalVariableInstance<Uint>
+
+
+class UniversalVariable
 {
 
 public:
+  
+  UniversalVariable( StringCref  string ) 
+    //    :
+    //    theData( new UniversalVariableStringData( string ) )
+  {
+    theData = new UniversalVariableStringData( string );
+    ; // do nothing
+  }
+  
+  UniversalVariable( const Float f )      
+    :
+    theData( new UniversalVariableFloatData( f ) )
+  {
+    ; // do nothing
+  }
 
-  UniversalVariableInstance( StringCref string );
-  UniversalVariableInstance( const Float      f );
-  UniversalVariableInstance( const Int        i );
-  UniversalVariableInstance( const Uint       ui ) : theUint( ui ) {}
+  UniversalVariable( const Int   i )      
+    :
+    theData( new UniversalVariableIntData( i ) )
+  {
+    ; // do nothing
+  }
 
-  const String asString();
-  const Float  asFloat(){ return static_cast<Float>( theUint ); }
-  // FIXME: range check
-  const Int    asInt()  { return static_cast<Int>( theUint ); }
-  UintCref     asUint() { return theUint; }
+  UniversalVariable( UniversalVariableCref uv )
+    :
+    theData( uv.createDataClone() )
+  {
+    ; // do nothing
+  }
+
+  virtual ~UniversalVariable()
+  {
+    delete theData;
+  }
+
+  UniversalVariableCref operator= ( UniversalVariableCref rhs )
+  {
+    if( this != &rhs )
+      {
+	delete theData;
+	theData = rhs.createDataClone();
+      }
+    
+    return *this;
+  }
+
+  const String asString() const
+  { 
+    return theData->asString(); 
+  }
+
+  const Float  asFloat() const
+  { 
+    assert( theData );
+    return theData->asFloat(); 
+  }
+  
+  const Int    asInt() const
+  { 
+    return theData->asInt();
+  }
+
+  const bool isString() const
+  { 
+    return theData->isString();
+  }
+
+  const bool isFloat() const
+  {
+    return theData->isFloat();
+  }
+
+  const bool isInt() const
+  { 
+    return theData->isInt(); 
+  }
+
+protected:
+
+  UniversalVariableDataPtr createDataClone() const
+  {
+    theData->createClone();
+  }
 
 private:
 
-  Uint theUint;
+  UniversalVariable();
+
+private:
+
+  UniversalVariableDataPtr theData;
 
 };
 

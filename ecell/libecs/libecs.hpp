@@ -32,6 +32,8 @@
 #define __KOYURUGI_H
 #include "Defs.hpp"
 
+// classes
+
 DECLARE_CLASS( System );
 DECLARE_CLASS( AccumulatorMaker );
 DECLARE_CLASS( Accumulator );
@@ -70,7 +72,10 @@ DECLARE_CLASS( System );
 DECLARE_CLASS( isRegularReactorItem );
 DECLARE_CLASS( SystemMaker );
 DECLARE_CLASS( Message );
+DECLARE_CLASS( AbstractMessageSlot )
+DECLARE_CLASS( MessageSlot )
 DECLARE_CLASS( MessageInterface );
+DECLARE_CLASS( UniversalVariable );
 
 
 // exceptions

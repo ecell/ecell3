@@ -33,34 +33,40 @@
 #include <string>
 
 #include "libecs.hpp"
-#include "Exceptions.hpp"
-#include "StringList.hpp"
-#include "Defs.hpp"
+#include "Defs.hpp" 
 
-DECLARE_CLASS( Message )
-DECLARE_CLASS( AbstractMessageSlot )
-DECLARE_CLASS( MessageSlot )
-DECLARE_CLASS( MessageInterface )
+#include "Exceptions.hpp"
+#include "UniversalVariable.hpp"
+
+#include <vector>
+DECLARE_VECTOR( UniversalVariable, UniversalVariableVector );
+
 
   /**
-     A string data packet for communication among C++ objects.
+     A data packet for communication among C++ objects consisting
+     of a keyword and a body. The body is a list of UniversalVariables.
 
      @see MessageInterface
      @see AbstractMessageSlot
    */
-class Message : private StringPair
+class Message
 {
 
 public:
 
-  Message( StringCref keyword, StringCref body ); 
-  Message( StringCref keyword, const Float f );
-  Message( StringCref keyword, const Int i );
-  Message( StringCref message ); 
+  Message( StringCref keyword )
+    :
+    theKeyword( keyword )
+  {
+    ; // do nothing
+  }
+
+  Message( StringCref keyword, UniversalVariableVectorCref uvl ); 
+  Message( StringCref keyword, UniversalVariableCref uv ); 
 
   // copy procedures
   Message( MessageCref message );
-  Message& operator=( MessageCref );
+  MessageRef operator=( MessageCref );
   
   virtual ~Message();
 
@@ -70,29 +76,35 @@ public:
     @return keyword string.
     @see body()
    */
-  StringCref getKeyword() const { return first; }
+  StringCref getKeyword() const { return theKeyword; }
 
   /**
-    Returns body string of this Message.
-
-    @return body string.
-    @see keyword()
+    @return 
    */
-  StringCref getBody() const { return second; }
+  UniversalVariableVectorRef getBody()
+  {
+    return theBody;
+  }
 
-  /**
-    Returns nth field of body string using FIELD_SEPARATOR as delimiter.  
+  UniversalVariableVectorCref getBody() const
+  {
+    return theBody;
+  }
 
-    @return nth field of body string.
-    @see FIELD_SEPARATOR
-   */
-  const String getBody( int n ) const;
+  UniversalVariableRef operator[]( int i )
+  {
+    return theBody.operator[]( i );
+  }
 
-  /**
-     return keyword + ' ' + body for debug.
-   */
-  const String dump() const { return first + ' ' + second; }
+  UniversalVariableCref operator[]( int i ) const
+  {
+    return theBody.operator[]( i );
+  }
 
+private:
+
+  String theKeyword;
+  UniversalVariableVector theBody;
 
 };
 
@@ -162,7 +174,7 @@ public:
       if( theGetMethod == NULLPTR )
 	{
 	  //FIXME: throw an exception
-	  return Message( keyword, "" );
+	  return Message( keyword );
 	}
       return ( ( theObject.*theGetMethod )( keyword ));
     }

@@ -38,7 +38,7 @@
 
 // system constants
 
-const int RANDOM_NUMBER_BUFFER_SIZE(65535);
+const int RANDOM_NUMBER_BUFFER_SIZE( 65535 );
 
 
 // CoreLinux++ compatibility
@@ -48,14 +48,14 @@ const int RANDOM_NUMBER_BUFFER_SIZE(65535);
 
 // replace CORELINUX from macro names
 
-#define DECLARE_LIST        corelinux::CORELINUX_LIST      
-#define DECLARE_VECTOR      corelinux::CORELINUX_VECTOR    
-#define DECLARE_MAP         corelinux::CORELINUX_MAP       
-#define DECLARE_MULTIMAP    corelinux::CORELINUX_MULTIMAP  
-#define DECLARE_SET         corelinux::CORELINUX_SET       
-#define DECLARE_MULTISET    corelinux::CORELINUX_MULTISET  
-#define DECLARE_QUEUE       corelinux::CORELINUX_QUEUE     
-#define DECLARE_STACK       corelinux::CORELINUX_STACK     
+#define DECLARE_LIST        CORELINUX_LIST
+#define DECLARE_VECTOR      CORELINUX_VECTOR
+#define DECLARE_MAP         CORELINUX_MAP       
+#define DECLARE_MULTIMAP    CORELINUX_MULTIMAP  
+#define DECLARE_SET         CORELINUX_SET       
+#define DECLARE_MULTISET    CORELINUX_MULTISET  
+#define DECLARE_QUEUE       CORELINUX_QUEUE     
+#define DECLARE_STACK       CORELINUX_STACK     
 
 
 
@@ -72,7 +72,7 @@ DECLARE_TYPE( string, String );
 
 // FIXME: use numeric_limits
 DECLARE_TYPE( int64_t, Int );
-DECLARE_TYPE( uint64_t, Uint );
+DECLARE_TYPE( uint64_t, UnsignedInt );
 const int INT_SIZE( sizeof( Int ) );
 
 DECLARE_TYPE( double, Float );
@@ -86,12 +86,6 @@ DECLARE_TYPE( Float, Concentration );
 const Float N_A = 6.0221367e+23;
 
 const int NOMATCH = -1;
-
-#define ATOF( str ) atof( str )
-#define ATOI( str ) atoi( str )
-
-
-
 
 #endif /* ___DEFS_H___ */
 

@@ -44,8 +44,6 @@ String Substance::USER_DEFAULT_ACCUMULATOR_NAME
 
 void Substance::makeSlots()
 {
-  MessageSlot( "id",Substance,*this,NULL,
-	       &Substance::getId );
   MessageSlot( "quantity",Substance,*this,&Substance::setQuantity,
 	      &Substance::getQuantity );
   MessageSlot( "accumulator",Substance,*this,&Substance::setAccumulator,
@@ -54,7 +52,9 @@ void Substance::makeSlots()
 
 void Substance::setQuantity( MessageCref message )
 {
-  Float aQuantity = stringTo<Float>( message.getBody() );
+  // FIXME: range check
+
+  Float aQuantity = message[0].asFloat();
 
   if( theAccumulator )
     {
@@ -69,7 +69,9 @@ void Substance::setQuantity( MessageCref message )
 
 void Substance::setAccumulator( MessageCref message )
 {
-  setAccumulator( message.getBody() );
+  // FIXME: range check
+
+  setAccumulator( message[0].asString() );
 }
 
 const Message Substance::getQuantity( StringCref keyword )
@@ -83,11 +85,12 @@ const Message Substance::getAccumulator( StringCref keyword )
   static String aKeyword( "accumulator" );
   if( theAccumulator )
     {
-      return Message( aKeyword, theAccumulator->className() );
+      return Message( aKeyword, 
+		      UniversalVariable( theAccumulator->className() ) );
     }
   else
     {
-      return Message( aKeyword, "" );
+      return Message( aKeyword );
     }
 }
 

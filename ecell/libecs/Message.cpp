@@ -28,92 +28,52 @@
 // E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
 
-#include <strstream>
 #include "Message.hpp"
-#include "StringList.hpp"
+#include "UniversalVariable.hpp"
 
 ////////////////////// Message
 
-Message::Message( StringCref keyword, StringCref body ) 
-  :
-  StringPair( keyword, body ) 
+Message::Message( StringCref keyword, UniversalVariableVectorCref uvl)
+  : 
+  theKeyword( keyword ),
+  theBody( uvl )
 {
   ; // do nothing
-
 }
 
-Message::Message( StringCref message ) 
+Message::Message( StringCref keyword, UniversalVariableCref uv )
+  :
+  theKeyword( keyword )
 {
-  String::size_type j = message.find( FIELD_SEPARATOR );
-  if( j != String::npos )
-    {
-      first = message.substr( 0, j );
-      String::size_type k = message.find_first_not_of( FIELD_SEPARATOR, j );
-      second = message.substr( k, String::npos );
-    }
-  else
-    {
-      first = message;
-      second = "";
-    }
+  theBody.push_back( uv );
 }
 
-Message::Message( StringCref keyword, const Float f )
-{
-  first = keyword;
-  ostrstream os;
-  os.precision( FLOAT_DIG );
-  os << f;
-  os << ends;  // by naota on 29. Nov. 1999
-  second = os.str();
-}
-
-Message::Message( StringCref keyword, const Int i )
-{
-  first = keyword;
-  ostrstream os;
-  os << i;
-  os << ends;  // by naota on 29. Nov. 1999
-  second = os.str();
-}
-
+// FIXME: shallow or deep copy?
 Message::Message( MessageCref message )
   :
-  StringPair( message.getKeyword(), message.getBody() )
+  theKeyword( message.getKeyword() ),
+  theBody( message.getBody() )
 {
   ; // do nothing
 }
 
+// FIXME: shallow or deep copy?
 Message& Message::operator=( MessageCref rhs )
 {
   if( this != &rhs )
     {
-      first = rhs.getKeyword();
-      second = rhs.getBody();
+      theKeyword = rhs.getKeyword();
+      theBody = rhs.getBody();
     }
 
   return *this;
 }
 
+// FIXME: is this ok?
 Message::~Message()
 {
   ; // do nothing
 }
-
-const String Message::getBody( int n ) const
-{
-  String::size_type pos( 0 );
-  while( n != 0 )
-    {
-      pos = second.find( FIELD_SEPARATOR, pos );
-      if( pos == String::npos )
-	return "";
-      ++pos;
-      --n;
-    }
-  return second.substr( pos, second.find( FIELD_SEPARATOR ) - pos );
-}
-
 
 
 /*

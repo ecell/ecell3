@@ -1,3 +1,34 @@
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+//
+//        This file is part of E-CELL Simulation Environment package
+//
+//                Copyright (C) 1996-2001 Keio University
+//
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+//
+//
+// E-CELL is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public
+// License as published by the Free Software Foundation; either
+// version 2 of the License, or (at your option) any later version.
+// 
+// E-CELL is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+// See the GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public
+// License along with E-CELL -- see the file COPYING.
+// If not, write to the Free Software Foundation, Inc.,
+// 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+// 
+//END_HEADER
+//
+// written by Kouichi Takahashi <shafi@e-cell.org> at
+// E-CELL Project, Institute for Advanced Biosciences, Keio University.
+//
+
+
 #include <string>
 
 #include "libecs.hpp"
@@ -56,11 +87,11 @@ Object PySimulator::makePrimitive( const Tuple& args )
   ECS_TRY;
 
   args.verify_length( 3 );
-  const string classname( static_cast<Py::String>( args[0] ) );
-  const FQPI fqpi( static_cast<Py::String>( args[1] ) );
-  const string name( static_cast<Py::String>( args[2] ) );
+  const string aClassname( static_cast<Py::String>( args[0] ) );
+  const FQPI aFqpi( static_cast<Py::String>( args[1] ) );
+  const string aName( static_cast<Py::String>( args[2] ) );
 
-  Simulator::makePrimitive( classname, fqpi, name );
+  Simulator::makePrimitive( aClassname, aFqpi, aName );
 
   return Py::Object();
 
@@ -72,11 +103,21 @@ Object PySimulator::sendMessage( const Tuple& args )
   ECS_TRY;
 
   args.verify_length( 3 );
-  const string fqpi( static_cast<Py::String>( args[0] ) );
-  const string propertyname( static_cast<Py::String>( args[1] ) );
-  const string message( static_cast<Py::String>( args[2] ) );
+  const string aFqpi( static_cast<Py::String>( args[0] ) );
+  const string aMessageKeyword( static_cast<Py::String>( args[1] ) );
+
+  const Tuple aMessageSequence( static_cast<Py::Sequence>( args[2] ) );
   
-  Simulator::sendMessage( FQPI( fqpi ), Message( propertyname, message ) );
+  UniversalVariableVector aMessageBody;
+  for( Py::Tuple::const_iterator i = aMessageSequence.begin() ;
+       i != aMessageSequence.end() ; ++i )
+    {
+      aMessageBody.push_back( UniversalVariable( (*i).as_string() ) );
+    }
+
+  const Message aMessage( aMessageKeyword, aMessageBody );
+
+  Simulator::sendMessage( FQPI( aFqpi ), aMessage );
 
   return Object();
 
@@ -93,10 +134,39 @@ Object PySimulator::getMessage( const Tuple& args )
   const string aPropertyName( static_cast<Py::String>( args[1] ) );
 
   Message aMessage( Simulator::getMessage( aFqpi, aPropertyName ) );
+  int aMessageSize = aMessage.getBody().size();
+
+  Tuple aBodyTuple( aMessageSize );
+
+  for( int i = 0 ; i < aMessageSize ; ++i )
+    {
+      UniversalVariableCref aUniversalVariable( aMessage.getBody()[i] );
+      Py::Object anObject;
+      if( aUniversalVariable.isFloat() )
+	{
+	  anObject = Py::Float( aUniversalVariable.asFloat() );
+	}
+      else if( aUniversalVariable.isInt() )
+	{
+	  anObject = Py::Int( aUniversalVariable.asInt() );
+	}
+      else if( aUniversalVariable.isString() )
+	{
+	  anObject = Py::String( aUniversalVariable.asString() );
+	}
+      else
+	{
+	  assert( 0 );
+	  ; //FIXME: assert: NEVER_GET_HERE
+	}
+
+      aBodyTuple[i] = anObject;
+    }
+
   Tuple aTuple( 2 );
   aTuple[0] = static_cast<Py::String>( aMessage.getKeyword() );
-  aTuple[1] = static_cast<Py::String>( aMessage.getBody() );
-
+  aTuple[1] = aBodyTuple;
+    
   return aTuple;
 
   ECS_CATCH;

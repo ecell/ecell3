@@ -127,8 +127,6 @@ typedef void * VoidPtr;
 
 // from List.hpp
 
-namespace corelinux
-{
   /**
      STL list template. This macro generates all
      the type references and pointers for the collection and
@@ -147,13 +145,10 @@ namespace corelinux
       typedef name::reverse_iterator name ## Riterator;         \
       typedef name::reverse_iterator& name ## RiteratorRef;     \
       typedef name::reverse_iterator* name ## RiteratorPtr
-}
 
 
 // from Vector.hpp
 
-namespace corelinux
-{
   /**
      STL vector template. This macro generates all
      the type references and pointers for the collection and
@@ -173,13 +168,9 @@ namespace corelinux
    typedef name::reverse_iterator& name ## RiteratorRef;       \
    typedef name::reverse_iterator* name ## RiteratorPtr
 
-}
-
 
 // from Set.hpp
 
-namespace corelinux
-{
   /**
      STL set template. This macro generates all
      the type references and pointers for the collection and
@@ -228,14 +219,10 @@ namespace corelinux
       typedef name::reverse_iterator& name ## RiteratorRef;                   \
       typedef name::reverse_iterator* name ## RiteratorPtr
 
-}
-
 
 // from Map.hpp
 
 
-namespace corelinux
-{
   /**
      STL map template. This macro generates all
      the type references and pointers for the collection and
@@ -287,12 +274,9 @@ namespace corelinux
       typedef name::reverse_iterator& name ## RiteratorRef;        \
       typedef name::reverse_iterator* name ## RiteratorPtr
 
-}
 
 // from Queue.hpp
 
-namespace corelinux
-{ 
   /**
      STL queue template. This macro generates all
      the type references and pointers for the collection and
@@ -312,12 +296,9 @@ namespace corelinux
       typedef name::reverse_iterator& name ## RiteratorRef;    \
       typedef name::reverse_iterator* name ## RiteratorPtr
 
-}
 
 // from Stack.hpp
 
-namespace corelinux
-{
   /**
      STL stack template. This macro generates all
      the type references and pointers for the collection and
@@ -328,4 +309,3 @@ namespace corelinux
 #define CORELINUX_STACK( type, name )                                 \
       DECLARE_TYPE(stack<type>,name)                                   
 
-}

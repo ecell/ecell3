@@ -33,39 +33,66 @@
 #include "UniversalVariable.hpp"
 
 
-UniversalVariableInstance<String>::UniversalVariableInstance( const Float f )
+UniversalVariableStringData::
+UniversalVariableStringData( const Float f )
   :
   theString( toString<Float>( f ) )
 {
   ; // do nothing
 }
 
-UniversalVariableInstance<String>::UniversalVariableInstance( const Int i )
+UniversalVariableStringData::UniversalVariableStringData( const Int i )
   :
   theString( toString<Int>( i ) )
 {
   ; // do nothing
 }
 
-UniversalVariableInstance<String>::UniversalVariableInstance( const Uint ui )
+const Float UniversalVariableStringData::asFloat() const
+{
+  return stringTo<Float>( theString );
+}
+
+const Int UniversalVariableStringData::asInt() const
+{
+  return stringTo<Int>( theString );
+}
+
+
+UniversalVariableFloatData::
+UniversalVariableFloatData( StringCref str )
   :
-  theString( toString<Uint>( ui ) )
+  theFloat( stringTo<Float>( str ) )
+{
+  ; // do nothing
+}
+
+const String UniversalVariableFloatData::asString() const
+{
+  return toString<Float>( theFloat );
+}
+
+UniversalVariableIntData::
+UniversalVariableIntData( StringCref str )
+  :
+  theInt( stringTo<Int>( str ) )
+{
+  ; // do nothing
+}
+
+UniversalVariableIntData::
+UniversalVariableIntData( const Float f )
+  :
+  // FIXME: range check?
+  theInt( static_cast<Int>( f ) )
 {
   ; // do nothing
 }
 
 
-const String UniversalVariableInstance<Float>::asString()
-{
-  return toString<Float>( theFloat );
-}
-
-const String UniversalVariableInstance<Int>::asString()
+const String UniversalVariableIntData::asString() const
 {
   return toString<Int>( theInt );
 }
 
-const String UniversalVariableInstance<Uint>::asString()
-{
-  return toString<Uint>( theUint );
-}
+

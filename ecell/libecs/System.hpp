@@ -39,14 +39,9 @@
 
 // Tree data structures used for entry lists
 // for_each performance is very important. other container type?
-typedef map<const String,SubstancePtr> SubstanceList;
-typedef map<const String,ReactorPtr>   ReactorList;
-typedef map<const String,SystemPtr>    SystemList;
-
-// Iterator types  
-typedef SubstanceList::iterator           SubstanceListIterator;
-typedef ReactorList::iterator             ReactorListIterator;
-typedef SystemList::iterator              SystemListIterator;
+DECLARE_MAP( const String, SubstancePtr, less<const String>, SubstanceList );
+DECLARE_MAP( const String, ReactorPtr,   less<const String>, ReactorList );
+DECLARE_MAP( const String, SystemPtr,    less<const String>, SystemList );
 
 typedef SystemPtr (*SystemAllocatorFunc)();
 
@@ -312,7 +307,8 @@ public:
     @return An pointer to a System object in this or subsystems of this
     System object pointed by @a systempath
     */
-  virtual SystemPtr getSystem( SystemPathCref systempath ) throw( NotFound ); 
+  virtual SystemPtr getSystem( SystemPathCref systempath ) 
+    throw( BadID, NotFound ); 
 
 
 public: // message interfaces

@@ -28,8 +28,6 @@
 // E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
 
-#include <string.h>
-#include <strstream>
 #include <time.h>
 
 #include "Exceptions.hpp"
@@ -56,28 +54,31 @@ int table_lookup( StringCref str, const char** table )
   throw NotFound( __PRETTY_FUNCTION__ );
 }
 
-template <class T> 
-T stringTo( StringCref str )
+template<> const Float stringTo<Float>( StringCref str )
 {
-  istrstream ist( str.c_str() );
-  T aT;
-  ist >> aT;
-  return aT;
+  // FIXME: error check, throw exception
+  return strtod( str.c_str(), NULL );
 }
 
-template<> Float stringTo<Float>( StringCref str )
+template<> const Int stringTo<Int>( StringCref str )
 {
-  return ATOF( str.c_str() );
+  // FIXME: error check, throw exception
+  return strtol( str.c_str(), NULL, 10 );
 }
 
-template<> Int stringTo<Int>( StringCref str )
+template<> const UnsignedInt stringTo<UnsignedInt>( StringCref str )
 {
-  return ATOI( str.c_str() );
+  // FIXME: error check, throw exception
+  return strtoul( str.c_str(), NULL, 10 );
 }
 
-template<> Uint stringTo<Uint>( StringCref str )
-{
-  return ATOI( str.c_str() );
+template<> const String toString<Float>( const Float& f )
+{ 
+  ostrstream os;
+  os.precision( FLOAT_DIG );
+  os << f;
+  os << ends;
+  return os.str();
 }
 
 string basenameOf( StringCref str, String::size_type maxlength )

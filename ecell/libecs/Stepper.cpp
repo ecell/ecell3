@@ -120,6 +120,7 @@ void MasterStepper::registerSlaves(System* system)
 
 Float MasterStepper::getDeltaT()
 {
+  // FIXME: should be return theDeltaT
   return getOwner()->getRootSystem()->getStepperLeader().getDeltaT();
 }
 
@@ -131,7 +132,8 @@ int StepperLeader::DEFAULT_UPDATE_DEPTH(1);
 StepperLeader::StepperLeader() 
   : 
   theUpdateDepth( DEFAULT_UPDATE_DEPTH ),
-  theBaseClock( 1 )
+  theBaseClock( 1 ),
+  theStepInterval( 0.001 )
 {
   ; // do nothing
 }
@@ -140,13 +142,6 @@ void StepperLeader::setBaseClock( int clock )
 {
   theBaseClock = clock;
 }
-
-Float StepperLeader::getDeltaT()
-{
-  //FIXME: 
-  // return theTimeManager->stepInterval();
-}
-
 
 void StepperLeader::registerMasterStepper( MasterStepperPtr newone )
 {

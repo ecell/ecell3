@@ -117,13 +117,13 @@ const Message MessageInterface::get( StringCref keyword ) throw( NoSlot )
     {
       //      *theMessageWindow << className() << ": Callback has failed (keyword = [" 
       //	<< keyword << "]):\n\t" << e.message() << "\n";
-      return Message( keyword, "" );
+      return Message( keyword );
     }
   catch(...)
     {
       //      *theMessageWindow << __PRETTY_FUNCTION__ << ": " 
       //	<< "callback has failed.(keyword = [" << keyword << "])\n";
-      return Message( keyword, "" );
+      return Message( keyword );
     }
 }
 

@@ -77,6 +77,8 @@ public:
 
   const Message getId( StringCref keyword );
 
+  const Message getName( StringCref keyword );
+
   /**
     @return entryname of this Entity.
    */

@@ -51,13 +51,20 @@ Entity::~Entity()
 
 void Entity::makeSlots()
 {
-  MessageSlot( "id", Entity, *this, NULL, &Entity::getId );
+  MessageSlot( "id", Entity, *this, NULL, &Entity::getId);
+  MessageSlot( "name", Entity, *this, NULL, &Entity::getName);
 }
 
 const Message Entity::getId( StringCref keyword )
 {
   static String aKeyword( "id" );
-  return Message( aKeyword, getId() );
+  return Message( aKeyword, UniversalVariable( getId() ) );
+}
+
+const Message Entity::getName( StringCref keyword )
+{
+  static String aKeyword( "name" );
+  return Message( aKeyword, UniversalVariable( getName() ) );
 }
 
 Float Entity::getActivity() 
@@ -90,7 +97,7 @@ const String Entity::getFqpi() const
 
 const String Entity::getSystemPath() const
 {
-  if( !getSuperSystem() )
+  if( getSuperSystem() == NULLPTR )
     {
       return "";
     }

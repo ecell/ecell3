@@ -92,7 +92,7 @@ SystemPtr RootSystem::getSystem( SystemPathCref systempath )
   return getSystem( systempath.getSystemPathString() );
 }
 
-SystemPtr RootSystem::getSystem( StringCref id ) throw( NotFound, BadID )
+SystemPtr RootSystem::getSystem( StringCref id ) throw( NotFound )
 {
   // the root System(this!) is requested.
   if( id == "/" )

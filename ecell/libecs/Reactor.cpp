@@ -50,60 +50,66 @@ void Reactor::makeSlots()
 
 void Reactor::setSubstrate( MessageCref message )
 {
-  appendSubstrate( message.getBody( 0 ), 
-		   stringTo<Int>( message.getBody( 1 ) ) );
+  //FIXME: range check
+  appendSubstrate( message[0].asString(), message[1].asInt() );
 }
 
 void Reactor::setProduct( MessageCref message )
 {
-  appendProduct( message.getBody( 0 ),
-		 stringTo<Int>( message.getBody( 1 ) ) );
+  //FIXME: range check
+  appendSubstrate( message[0].asString(), message[1].asInt() );
 }
 
 void Reactor::setCatalyst( MessageCref message )
 {
-  appendCatalyst( message.getBody( 0 ),
-		  stringTo<Int>( message.getBody( 1 ) ) );
+  //FIXME: range check
+  appendSubstrate( message[0].asString(), message[1].asInt() );
 }
 
 void Reactor::setEffector( MessageCref message )
 {
-  appendEffector( message.getBody( 0 ),
-		  stringTo<Int>( message.getBody( 1 ) ) );
+  //FIXME: range check
+  appendSubstrate( message[0].asString(), message[1].asInt() );
 }
 
 void Reactor::setInitialActivity( MessageCref message )
 {
-  setInitialActivity( stringTo<Float>( message.getBody() ) );
+  setInitialActivity( message[0].asFloat() );
 }
 
 const Message getSubstrate( StringCref )
 {
   static String aKeyword( "Substrate" );
-  return Message( aKeyword, "not implemented yet" );
+
+  // FIXME: implement this
+  return Message( aKeyword );
 }
 
 const Message getProduct( StringCref )
 {
   static String aKeyword( "Product" );
-  return Message( aKeyword, "not implemented yet" );
+  return Message( aKeyword );
 }
 
 const Message getCatalyst( StringCref )
 {
   static String aKeyword( "Catalyst" );
-  return Message( aKeyword, "not implemented yet" );
+
+  // FIXME: implement this
+  return Message( aKeyword );
 }
 
 const Message getEffector( StringCref )
 {
   static String aKeyword( "Effector" );
-  return Message( aKeyword, "not implemented yet" );
+
+  // FIXME: implement this
+  return Message( aKeyword );
 }
 
 const Message Reactor::getInitialActivity( StringCref keyword )
 {
-  return Message( keyword, theInitialActivity );
+  return Message( keyword, UniversalVariable( theInitialActivity ) );
 }
 
 void Reactor::appendSubstrate( FQIDCref fqid, int coefficient )
