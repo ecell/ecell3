@@ -68,7 +68,10 @@ class MainWindow(Window):
         #self.theEntryListWindow = EntryListWindow.EntryListWindow( self )
         #self.theEntryListWindowWindow = self.theEntryListWindow[ 'entry_list_window' ]
 
+        self.theEntryChecker = 0
         self.theStepperChecker = 0
+        self.theLoadModelChecker = 0
+        
         self.theUpdateInterval = 150
         self.theStepSize = 1
         self.theStepType = 0
@@ -133,6 +136,7 @@ class MainWindow(Window):
 
     def loadRule( self, button_obj ) :
         self.theStepperChecker = 1
+        self.theLoadModelChecker = 1
         aFileName = self.theRuleFileSelection.get_filename()
         self.theRuleFileSelection.hide()
         self.theSession.printMessage( 'loading rule file %s\n' % aFileName )
@@ -149,6 +153,7 @@ class MainWindow(Window):
         
     def loadScript( self, button_obj ):
         self.theStepperChecker = 1
+        self.theLoadModelChecker = 1
         aFileName = self.theScriptFileSelection.get_filename()
         self.theScriptFileSelection.hide()
         self.theSession.printMessage( 'loading script file %s\n' % aFileName )
@@ -160,40 +165,44 @@ class MainWindow(Window):
     def openSaveCellStateFileSelection( self, obj ) :
         self.theSaveFileSelection.show_all()
 
-    def saveCellState ( self, button_obj ) : pass
+    def saveCellState ( self, button_obj ) :
+        pass
 
     ###### Exit ######
     def exit( self, obj ):
         mainQuit()
         
     def startSimulation( self, a ) :
-        self.theRunningFlag = 1
-        self.theSession.printMessage( "Start\n" )
-        self.theTimer = gtk.timeout_add(self.theUpdateInterval, self.updateByTimeOut, 0)
-        self.theLoggerWindow.update()
-        self.theSession.run()
-        self.removeTimeOut()
+        if self.theLoadModelChecker == 1:
+            self.theRunningFlag = 1
+            self.theSession.printMessage( "Start\n" )
+            self.theTimer = gtk.timeout_add(self.theUpdateInterval, self.updateByTimeOut, 0)
+            self.theLoggerWindow.update()
+            self.theSession.run()
+            self.removeTimeOut()
 
     def stopSimulation( self, a ) :
-        if self.theRunningFlag:
-            self.theRunningFlag = 0
-            self.theSession.stop()
-            self.theSession.printMessage( "Stop\n" )
+        if self.theLoadModelChecker == 1:
+            if self.theRunningFlag:
+                self.theRunningFlag = 0
+                self.theSession.stop()
+                self.theSession.printMessage( "Stop\n" )
+                self.removeTimeOut()
+                self.update()
+                self.theLoggerWindow.update()
+
+    def stepSimulation( self, a ) : 
+        if self.theLoadModelChecker == 1:
+            self.theSession.printMessage( "Step\n" )
+            self['step_combo_entry'].set_text( str( self.theStepSize ) )
+            self.theTimer = gtk.timeout_add( self.theUpdateInterval, self.updateByTimeOut, 0 )
+            if self.theStepType == 0:
+                self.theSession.run( self.theStepSize )
+            else:
+                self.theSession.step( self.theStepSize )
             self.removeTimeOut()
             self.update()
             self.theLoggerWindow.update()
-
-    def stepSimulation( self, a ) : 
-        self.theSession.printMessage( "Step\n" )
-        self['step_combo_entry'].set_text( str( self.theStepSize ) )
-        self.theTimer = gtk.timeout_add( self.theUpdateInterval, self.updateByTimeOut, 0 )
-        if self.theStepType == 0:
-            self.theSession.run( self.theStepSize )
-        else:
-            self.theSession.step( self.theStepSize )
-        self.removeTimeOut()
-        self.update()
-        self.theLoggerWindow.update()
 
     def changeStepType ( self, a ):
         self.theStepType = 1 - self.theStepType
@@ -220,13 +229,13 @@ class MainWindow(Window):
         
     
     def toggleEntryList( self, button_obj ):
-
-        if self.theStepperChecker == 1:
+        #fix me: this part is Root System's bug.
+        if self.theStepperChecker == 1 and self.theEntryChecker == 0:
             self.theEntryListWindow = EntryListWindow.EntryListWindow( self )
             self.theEntryListWindowWindow = self.theEntryListWindow[ 'entry_list_window' ]
-        else:
-            pass
-        if self.theStepperChecker == 1:
+            self.theEntryChecker = 1
+        
+        if self.theEntryChecker == 1:
             if button_obj.get_active() :
                 self.theEntryListWindowWindow.show_all()
                 self.theEntryListWindow.update()
