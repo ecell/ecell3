@@ -187,6 +187,8 @@ public:
   virtual void initialize()
   {
     Process::initialize();
+    declareUnidirectional();
+
 
     theNRStepper = dynamic_cast<NRStepperPtr>( getStepper() );
     if( theNRStepper == NULLPTR )
