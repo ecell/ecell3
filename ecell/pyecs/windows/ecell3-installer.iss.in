@@ -25,8 +25,8 @@
 #define Version       '@VERSION@'
 #define PythonVersion '@PYTHON_VERSION@'
 #define GtkVersion    '2.4'
-#define PythonSetup   'Python-2.3.4.exe'
-#define GtkSetup      'gtk-win32-aio-2.4-rc6.exe'
+#define PythonSetup   'python-2.4.msi'
+#define GtkSetup      'gtk-win32-2.4.10-rc1.exe'
 #define Pythondll     'python@PYTHON_WIN_VERSION@.dll'
 #define Libpython     'libpython@PYTHON_WIN_VERSION@.a'
 #define LicenseFile   'COPYING'
@@ -54,8 +54,8 @@ UninstallDisplayName=E-Cell Simulation Environment {#Version}
 ChangesAssociations=yes
 OutputBaseFilename=ecell-{#Version}{#Filename}.{#Arch}
 OutputDir=.
-Compression=none
-;Compression=lzma/ultra
+;Compression=none
+Compression=lzma/ultra
 WizardSmallImageFile=installer_header.bmp
 WizardImageFile=installer_intro.bmp
 WizardImageStretch=no
@@ -90,11 +90,13 @@ Source: ..\runtime\{#Arch}\9.gsl\*.*; DestDir: {app}; Flags: recursesubdirs igno
 Source: ..\runtime\{#Arch}\10.libart_lgpl\*.*; DestDir: {app}; Flags: recursesubdirs ignoreversion
 Source: ..\runtime\{#Arch}\11.libgnomecanvas\*.*; DestDir: {app}; Flags: recursesubdirs ignoreversion
 Source: ..\runtime\{#Arch}\12.ecell3-samples\*.*; DestDir: {app}; Flags: recursesubdirs ignoreversion
+Source: ..\runtime\{#Arch}\13.xerces-c\*.*; DestDir: {app}; Flags: recursesubdirs ignoreversion
 
 ;Python modules used by E-Cell
 Source: ..\pythonModules\1.Numeric\*.*; DestDir: {app}; Flags: recursesubdirs ignoreversion
 Source: ..\pythonModules\{#Arch}\2.pygtk\*.*; DestDir: {app}; Flags: recursesubdirs ignoreversion
 Source: ..\pythonModules\{#Arch}\3.gnome-python\*.*; DestDir: {app}; Flags: recursesubdirs ignoreversion
+Source: ..\pythonModules\{#Arch}\4.libsbml\*.*; DestDir: {app}; Flags: recursesubdirs ignoreversion
 
 ;Gtk libraries
 Source: ..\gtk\lighthouse\gtkrc; DestDir: {code:GetGtkDir}\share\themes\Default\gtk-2.0; Flags: ignoreversion; Components: themes\lighthouse
@@ -340,13 +342,19 @@ function isGtkExists(): Boolean;
 var
   InsVersion: String;
   MinVersion: String;
+  i         : Integer;
 begin
   MinVersion := GTK_VERSION
   Result := False;
   { Check if GTK has been installed, if it meets a minimum version, and if libglib-2.0-0.dll exists }
   if RegQueryStringValue(HKLM, 'Software\GTK\2.0', 'Version', InsVersion) then begin
-    if ( StrToInt(StrGet(InsVersion,1)) > StrToInt(StrGet(MinVersion,1)) ) or (
-     ( StrToInt(StrGet(InsVersion,1)) = StrToInt(StrGet(MinVersion,1)) ) and ( StrToInt(StrGet(InsVersion,3)) >= StrToInt(StrGet(MinVersion,3)) ) ) then begin
+    { For situations when InsVersion is aio-2.4 instead of just 2.4 }
+    i := 1;
+    while StrToIntDef(StrGet(InsVersion,i), 800) = 800 do begin
+      i := i + 1
+    end;
+    if ( StrToInt(StrGet(InsVersion,i)) > StrToInt(StrGet(MinVersion,1)) ) or (
+      ( StrToInt(StrGet(InsVersion,i)) = StrToInt(StrGet(MinVersion,1)) ) and ( StrToInt(StrGet(InsVersion,i+2)) >= StrToInt(StrGet(MinVersion,3)) ) ) then begin
       RegQueryStringValue(HKLM, 'Software\GTK\2.0', 'Path', GtkDir)
       Result := FileExists(GtkDir + '\bin\libglib-2.0-0.dll');
     end;
@@ -429,7 +437,7 @@ begin
             LicenseMemo.UseRichEdit := True;
             LicenseMemo.RTFText := EcellLicense;
 
-            Next := ScriptDlgPageProcessCustom();
+            Next := ScriptDlgPageProcessCustom(LicenseMemo);
             NextOk := Next;
           end;
         1:
@@ -482,13 +490,13 @@ begin
             CheckListBox.Flat := True;
             CheckListBox.Top := CompLabel.Top + CompLabel.Height + 10;
             CheckListBox.Width := WizardForm.ScriptDlgPanel.Width;
-            CheckListBox.ExtendedSelect := True;
+            {CheckListBox.ExtendedSelect := True;}
             CheckListBox.Parent := WizardForm.ScriptDlgPanel;
 
-            PythonCheck := CheckListBox.AddCheckBox('Python version ' + PYTHON_VERSION + PythonRequired, '', 0, not PythonExists, False, True, nil);
-            GtkCheck := CheckListBox.AddCheckBox('GTK version ' + GTK_VERSION + GtkRequired, '', 0, not GtkExists, False, True, nil);
+            PythonCheck := CheckListBox.AddCheckBox('Python version ' + PYTHON_VERSION + PythonRequired, '', 0, not PythonExists, True, False, True, nil);
+            GtkCheck := CheckListBox.AddCheckBox('GTK version ' + GTK_VERSION + GtkRequired, '', 0, not GtkExists, True, False, True, nil);
 
-            Next := ScriptDlgPageProcessCustom();
+            Next := ScriptDlgPageProcessCustom(CheckListBox);
 
             if Next then begin
               if isFullInstall then begin
