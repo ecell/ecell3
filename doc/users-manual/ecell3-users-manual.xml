@@ -4,9 +4,9 @@
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN" 
 [
   <!ENTITY legal SYSTEM "legal.xml">
-  <!ENTITY appversion "3.1.99">
+  <!ENTITY appversion "3.1.100">
   <!ENTITY manrevision "0.1">
-  <!ENTITY date "Oct. 10, 2003">
+  <!ENTITY date "Dec. 18, 2003">
   <!ENTITY app "<application>E-Cell Simulation Environment</application>">
   <!ENTITY ecell "<productname>E-Cell</productname>">
   <!-- Information about the entities
@@ -81,13 +81,13 @@
   <!ENTITY Integer "<type>Integer</type>">
   <!ENTITY StringType "<type>String</type>">
 
-  <!ENTITY EntityType "<wordasword>EntityType</wordasword>">
-  <!ENTITY FullID "<wordasword>FullID</wordasword>">
-  <!ENTITY FullPN "<wordasword>FullPN</wordasword>">
-  <!ENTITY EntityID "<wordasword>Entity ID</wordasword>">
-  <!ENTITY StepperID "<wordasword>Stepper ID</wordasword>">
-  <!ENTITY SystemPath "<wordasword>SystemPath</wordasword>">
-  <!ENTITY VariableReference "<wordasword>VariableReference</wordasword>">
+  <!ENTITY EntityType "EntityType">
+  <!ENTITY FullID "FullID">
+  <!ENTITY FullPN "FullPN">
+  <!ENTITY EntityID "Entity ID">
+  <!ENTITY StepperID "Stepper ID">
+  <!ENTITY SystemPath "SystemPath">
+  <!ENTITY VariableReference "VariableReference">
 
   <!ENTITY ecell3-python "<command>ecell3-python</command>">
   <!ENTITY ecell3-session "<command>ecell3-session</command>">

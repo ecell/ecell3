@@ -1317,7 +1317,7 @@ System System( / )
            system provides <classname>DiscreteEventStepper</classname>
            and <classname>DiscreteEventProcess</classname> classes for
            discrete-event modeling.  In addition to the ordinary
-           firing method (<methodname>process()</methodname> method)
+           firing method (<methodname>fire()</methodname> method)
            of the base &Process; class, the
            <classname>DiscreteEventProcess</classname> defines a
            method to calculate <emphasis>when</emphasis> is the next
@@ -1354,10 +1354,10 @@ System System( / )
            fires all of its &Process; objects every milli-second.
            <classname>DiscreteTimeStepper</classname> is discrete time
            because it does not have time between steps; it ignores a
-           signal from other &Stepper; (<emphasis>&Stepper;
+           signal from other &Stepper; objects (<emphasis>&Stepper;
            interruption</emphasis>) that notifies a change of system
            state (values of &Variable; objects) that may affect its
-           &Process; objects.  Such change is reflected in the next
+           &Process; objects.  Such a change is reflected in the next
            step.
             </para>
       </sect3>
@@ -1366,7 +1366,7 @@ System System( / )
 	<title>PassiveStepper</title>
 
 	<para>Another class of discrete &Stepper; is
-	<classname>PassiveStepper</classname>.  This can be partially
+	<classname>PassiveStepper</classname>.  This can partially be 
 	seen as a <classname>DiscreteTimeStepper</classname> with
 	an infinite <property>StepInterval</property>, but there is a
 	difference.  Unlike
@@ -1414,18 +1414,338 @@ System System( / )
       <title>Types of continuous object classes</title>
 
       <sect3>
-	<title>Classes for ordinary differential equations</title>
+	<title>Steppers for differential systems</title>
 
-	<para>Continuous &Process; and &Stepper; objects are usually used
-       to model differential systems: a set of differential equations.</para>
+	<para>&ecell; supports both Ordinary Differential Equation
+(ODE) and Differential-Algebraic Equation (DAE) models, and has
+&Stepper; classes for each type of formalisms.</para>
 
-	<para>FIXME: more here.</para>
+	<para>If your model is a system of ODEs, then in this version
+of the software (version 3.1.100) the recommended choice is
+<classname>ODE45Stepper</classname>.  A current drawback of this
+&Stepper; is that it is not good at solving stiff systems.  In near
+future, a high-performance replacement of this,
+<classname>ODEStepper</classname>, will be included.</para>
+
+	<para>For DAE models, use <classname>DAEStepper</classname>.
+         The model must form a valid index-1 DAE system.  When a DAE
+         &Stepper; detects one or more discrete &Process; objects, it
+         assumes that these are <emphasis>algebraic
+         &Process;</emphasis> objects.  Thus, all discrete &Process;
+         objects in a DAE &Stepper; must be algebraic.  See below for
+         algebraic &Process;.</para>
+
+	<note>
+	  <title>DAE &Stepper; objects can be used for ODE systems</title>
+
+	  <para>
+	  Because it can be viewed that ODE is a special case of DAE
+	  problems which does not have a algebraic equations, but only
+	  differential equations, a DAE &Stepper; can be used to run
+	  an ODE model.  However, ODE Steppers are specialized for ODE
+	  problems, in terms of both the selection of integration
+	  algorithms and implementation issues, and generally use of
+	  an ODE &Stepper; benefits in performance when the model is a
+	  system of ODEs.</para>
+	</note>
+
+	<para>These ODE/DAE &Stepper; classes have some common
+	property slots for user-specifiable parameters.  Here is a partial list
+of some of those:
+
+<itemizedlist>
+	    <listitem>
+	      <para><property>Tolerance</property></para> 
+
+	      <para>An error tolerance in local truncation error.  Giving
+	      this smaller numbers requires the &Stepper; to take
+	      smaller step sizes, and slows down the simulation.
+	      Greater numbers results in faster run with
+	      sacrifice of accuracy.  A typical number is 1e-6.</para>
+	    </listitem>
+
+	    <listitem>
+	      <para><property>MinStepInterval</property> / <property>MaxStepInterval</property></para>
+
+	      <para>Minimum and maximum limits in step size.  These limits
+	      preceeds the <property>Tolerance</property> property
+	      above.</para>
+
+	      <para>These properties can also be useful to completely
+	      disable the adaptive step size control mechanism: set
+	      the same number to both of the property slots.</para>
+	    </listitem>
+	  </itemizedlist>
+</para>
+
       </sect3>
 
       <sect3>
-	<title>Special purpose continuous object classes</title>
+	<title>Processes for ordinary differential equations</title>
 
-	<para>FIXME: incomplete.  essyns, gma, s-system</para>
+
+	<para>The system has some continuous &Process; classes by
+         default.  For example,
+         <classname>MassActionFluxProcess</classname> calculates a
+         reaction rate according to the law of mass action.
+         <classname>ExpressionFluxProcess</classname> allows users to
+         describe any rate equations.   Some enzyme kinetics rate
+         laws are also available.  
+
+<itemizedlist>
+	    <listitem>
+	      <para><classname>MassActionFluxProcess</classname></para>
+
+	      <para>This is a &Process; class for mass-action.  This class
+	      calculates a flux rate according to the irreversible
+	      mass-action.  Use a property <property>k</property> to
+	      specify a rate constant.</para>
+	    </listitem>
+
+	    <listitem>
+	      <para><classname>ExpressionFluxProcess</classname></para>
+
+	      <para><property>Expression</property> property of this
+	      class accepts a plain text rate expression.   The expression
+              must be evaluated to give a flux rate in [ number / second ].
+              (Note that this is a number per second, not concentration per
+               second.)</para>
+
+	      <para>The list below shows available elements in the
+	      <property>Expression</property> property.  The set of
+	      available arithmetic operators and mathematical
+	      functions are equivalent to SBML level 2.
+
+<itemizedlist>
+		  <listitem>
+		    <para>Constants</para>
+		    <para>Numbers (e.g. 10, 10.33, 1.33e-5), 
+<constant>true</constant>,
+<constant>false</constant> (equivalent to zero),
+<constant>pi</constant> (Pi),
+<constant>NaN</constant> (Not-a-Number),
+<constant>INF</constant> (Infinity),
+<constant>N_A</constant> (Avogadro's number),
+<constant>exp</constant> (the base of natural logarithms).</para>
+		  </listitem>
+
+		  <listitem>
+		    <para>Arithmetic operators</para>
+		    <para>
+<literal>+</literal>,
+<literal>-</literal>,
+<literal>*</literal>,
+<literal>/</literal>,
+<literal>^</literal> (power; this can equivalently written as <literal>pow( x, y )</literal>).
+</para>
+		  </listitem>
+
+		  <listitem>
+		    <para>Built-in functions</para>
+		    <para>
+<function>abs</function>, <function>ceil</function>,
+<function>exp</function>, *<function>fact</function>,
+<function>floor</function>, <function>log</function>,
+<function>log10</function>, <function>pow</function>
+<function>sqrt</function>, *<function>sec</function>,
+<function>sin</function>, <function>cos</function>,
+<function>tan</function>, <function>sinh</function>,
+<function>cosh</function>, <function>tanh</function>,
+<function>coth</function>, *<function>csch</function>,
+*<function>sech</function>, *<function>asin</function>,
+*<function>acos</function>, *<function>atan</function>,
+*<function>asec</function>, *<function>acsc</function>,
+*<function>acot</function>, *<function>asinh</function>,
+*<function>acosh</function>, *<function>atanh</function>,
+*<function>asech</function>, *<function>acsch</function>,
+*<function>acoth</function>.  (Functions with astarisk '*' are
+currently not available on the Windows version.)
+</para>
+		    <para>All functions but <function>pow</function> are unary functions. <function>pow</function> is a binary function.</para>
+		  </listitem>
+
+		  <listitem>
+		    <para>Properties</para>
+
+		    <para><classname>ExpressionFluxProcess</classname>
+		    accepts arbitrary name properties in the model,
+		    and those properties can be used in the
+		    expression.  For example, if you set
+		    <property>Km</property> in the model, it can be
+		    used in the expression.</para>
+		  </listitem>
+
+		  <listitem>
+		    <para>Objects</para>
+		    <itemizedlist>
+		      <listitem>
+			<para><varname>self</varname></para>
+			<para>This &Process; object itself.  This has
+			the following attribute:
+<itemizedlist>
+			    <listitem>
+			      <para><methodname>getSuperSystem</methodname>()</para>
+			      <para>This method gets the super system
+			      of this &Process;.  See below for the
+			      attributes of &System; objects.</para>
+			    </listitem>
+			  </itemizedlist>
+
+</para>
+		      </listitem>
+		      <listitem>
+			<para>&VariableReference;</para>
+
+			<para>&VariableReference; instances given in
+			the <property>VariableReferenceList</property>
+			property of this &Process; can be used in the
+			expression.  Each instance has the following 
+                        attributes:
+<itemizedlist>
+			    <listitem>
+			      <para>MolarConc</para>
+			    </listitem>
+			    <listitem>
+			      <para>NumberConc</para>
+			    </listitem>
+			    <listitem>
+			      <para>Value</para>
+			    </listitem>
+			    <listitem>
+			      <para>TotalVelocity</para>
+			    </listitem>
+			    <listitem>
+			      <para>Velocity</para>
+			    </listitem>
+			  </itemizedlist>
+
+
+</para>
+		      </listitem>
+
+		      <listitem>
+			<para>&System;</para>
+
+			<para>A &System; object has the following two
+			attributes.
+<itemizedlist>
+			    <listitem>
+			      <para><property>Size</property></para>
+			      <para>The size of the &System;</para>
+			    </listitem>
+			    <listitem>
+			      <para><property>SizeN_A</property></para>
+			      <para>Equivalent to <literal>Size * N_A</literal>.</para>
+			    </listitem>
+			  </itemizedlist>
+
+</para>
+
+		      </listitem>
+		    </itemizedlist>
+		  </listitem>
+
+
+		</itemizedlist>
+</para>
+
+	    </listitem>
+
+	    <listitem>
+	      <para>Some enzyme kinetics classes (Michaelis-Menten type)</para>
+
+	      <para>See the standard dynamic module library reference
+	      for availability of some enzyme kinetics &Process;
+	      classes.</para>
+	    </listitem>
+
+	    <listitem>
+	      <para><classname>PythonFluxProcess</classname> / <classname>PythonProcess</classname></para>
+
+	      <para><classname>PythonProcess</classname> and
+	      <classname>PythonFluxProcess</classname> allows users to
+	      script a &Process; object in full Python
+	      syntax.</para>
+
+	      <para></para>
+
+	    </listitem>
+
+	  </itemizedlist>
+
+</para>
+
+	<para>For more complicated computations, new classes can be
+         defined in C++.  See the chapter 6.</para>
+      </sect3>
+
+      <sect3>
+	<title>Algebraic Process</title>
+
+	<para>In principle, continuous &Process; objects must be
+	connected with continuous &Stepper; instances, and a discrete
+	&Stepper; is assumed to take only discrete &Process;
+	objects.   However, there are some exceptions.  One of such is
+        the <emphasis>algebraic processes</emphasis>.
+	Strangely enough, in DAE simulations, seemingly discrete
+         algebraic equations are solved continuously in conjunction with
+         other differential equations.</para>
+
+	<para>Algebraic equations in &ecell; has the following form:
+         <programlisting>0 = g( t, x )</programlisting>
+         where t is the time and x is a vector of variable references.
+        </para>
+
+	<para>The DAE solver system of &ecell; uses
+         <property>Activity</property> property of &Process; objects
+         to represent the value of the algebraic function <literal>g(
+         t, x, z )</literal>.  An algebraic &Process; must change values
+         of &Variable; objects explicitly.  The DAE &Stepper; does this
+         job of finding a point where the equation <literal>g()</literal>
+         holds.</para>
+
+         <para>When modeling, be careful about coefficients of
+          &VariableReference;s of an algebraic &Process;.  In most
+          cases, simply set unities. The solver respects these
+          numbers when solving the system.  For example, if the
+          coefficient of <varname>A</varname> is zero, it does not
+          change the variable when trying to find the solution, while
+          it is used in the calculation of the equation.</para>
+
+	<para>As a means of describing algebraic equations,
+	<classname>ExpressionAlgebraicProcess</classname> is available.
+	The usage is the same as <classname>ExpressionFluxProcess</classname>,
+        except that the evaluation of its expression is interpreted as the
+        value of the algebraic function <literal>g()</literal>.</para>
+
+	<para>C++ and Python scripting of algebraic &Process;
+         instances are of course possible.  Call
+         <methodname>setActivity</methodname>() method to set the
+         value of the equation instead of
+         <methodname>setFlux</methodname>() in the case of flux
+         &Process objects.</para>
+
+
+      </sect3>
+
+      <sect3>
+	<title>Power-law (S-System and GMA) object classes</title>
+
+	<para>The system supports S-System and GMA simulations by
+	using ESSYNS algorithm.  Use a pair of
+	<classname>ESSYNSStepper</classname>, and either
+	<classname>SSystemProcess</classname> or
+	<classname>GMAProcess</classname>.  Use
+	<property>SSystemMatrix</property> or
+	<property>GMAMatrix</property> property to set the
+	parameters.</para>
+
+	<para>A sample model under the directory
+	<filename>doc/sample/ssystem/</filename> gives an example
+	usage.</para>
+
+	<para>These modules are still under development. More
+	descriptions to come....</para>
 
       </sect3>
 
