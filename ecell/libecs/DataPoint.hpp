@@ -135,7 +135,8 @@ namespace libecs
        @return V constant reference
     */
     
-    UVariableCref getValue( void ) const
+    //    UVariableCref getValue( void ) const
+    RealCref getValue( void ) const
     {
       return theValue;
     }
@@ -168,7 +169,8 @@ namespace libecs
     /// The internal value
     
     Real theTime;
-    UVariable theValue;
+    //    UVariable theValue;
+    Real theValue;
     
   };
   

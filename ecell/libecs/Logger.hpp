@@ -149,9 +149,9 @@ namespace libecs
 
      */
 
-    void appendData( const containee_type& );
-
-    void appendData( RealCref t, UVariableCref v );
+    //    void appendData( const containee_type& );
+    //    void appendData( RealCref t, UVariableCref v );
+    void appendData( RealCref t, RealCref v );
 
 
   protected:

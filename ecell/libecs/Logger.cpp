@@ -146,6 +146,7 @@ namespace libecs
   
   //
   
+#if 0
   void Logger::appendData( const containee_type& aDataPoint )
   {
     theCurrentInterval = 
@@ -169,7 +170,18 @@ namespace libecs
 	theMinimumInterval = theCurrentInterval; 
       }
   }
+#endif /* 0 */
   
+
+  void Logger::appendData( RealCref aTime, RealCref aValue )
+  {
+    theCurrentInterval = aTime - theDataPointVector.back()->getTime();
+    theDataPointVector.push( aTime, aValue );
+    if(theMinimumInterval < theCurrentInterval )
+      {
+	theMinimumInterval = theCurrentInterval; 
+      }
+  }
   
   //
   

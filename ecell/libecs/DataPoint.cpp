@@ -53,7 +53,7 @@ namespace libecs
   DataPoint::DataPoint( RealCref t, UVariableCref v )
     :
     theTime( t ),
-    theValue( v )
+    theValue( v.asReal() )
   { 
     ; // do nothing
   }
@@ -62,7 +62,7 @@ namespace libecs
   DataPoint::DataPoint( RealCref t, RealCref v )
     :
     theTime( t ),
-    theValue( UVariable( v ) )
+    theValue( v )
   { 
     ; // do nothing
   }

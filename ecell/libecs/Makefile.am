@@ -19,6 +19,7 @@ Util.cpp\
 UVariable.cpp\
 FullID.cpp\
 Message.cpp\
+PropertySlot.cpp\
 PropertyInterface.cpp\
 AccumulatorMaker.cpp\
 ReactorMaker.cpp\
@@ -46,6 +47,7 @@ Defs.hpp\
 UVariable.hpp\
 FullID.hpp\
 Message.hpp\
+PropertySlot.hpp\
 PropertyInterface.hpp\
 AccumulatorMaker.hpp\
 ReactorMaker.hpp\
