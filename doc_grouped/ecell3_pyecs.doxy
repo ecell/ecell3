@@ -304,7 +304,8 @@ WARN_LOGFILE           =
 # directories like "/usr/src/myproject". Separate the files or directories 
 # with spaces.
 
-INPUT                  = ../ecell/pyecs 
+INPUT                  = ../ecell/pyecs \
+                         index_pyecs.tmpl
 
 # If the value of the INPUT tag contains directories, you can use the 
 # FILE_PATTERNS tag to specify one or more wildcard pattern (like *.cpp 
