@@ -276,7 +276,7 @@ class Session:
 
             for aProperty in aPropertyList:
                 
-                aValue = anEml.getStepperProperty( aProperty )
+                aValue = anEml.getStepperProperty( aStepper, aProperty )
                 self.theSimulator.setStepperProperty( aStepper,\
                                                       aProperty,\
                                                       aValue )
