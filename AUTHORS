@@ -1,0 +1,40 @@
+$Id$
+
+
+E-CELL Simulation Environment Version 3 authors
+
+
+== Architect ==
+
+* Kouichi Takahashi <shafi@e-cell.org>
+
+
+== libecs, libemc & pyecs ==
+
+* Kouichi Takahashi
+* Masayuki Okayama
+* Eiichiro Adachi 
+* Masaaki Kawata
+
+
+== dmtool ==
+
+* Kouichi Takahashi
+* Tomoya Kitayama
+
+
+== osogo (gecell) ==
+
+* Yusuke Saito
+* Yuki Fujita
+* Kenta Hashimoto
+* Yoshiya Matsubara
+* Kouichi Takahashi
+
+
+== Documentation ==
+
+* Chris Pickett
+* Kouichi Takahashi
+
+

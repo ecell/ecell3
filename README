@@ -1,22 +1,93 @@
-Release notes for E-Cell version 3.0a by Chris Pickett (incomplete - 
-documentation only)
+$Id$
 
-Documentation:
+      Release notes for E-CELL Simulation Environement Version 3
+                                        Kouichi Takahashi <shafi@e-cell.org>
 
-To generate documentation of the E-Cell source, you need doxygen.  You can get 
-it at:
 
-http://www.stack.nl/~dimitri/doxygen/
 
-Read the installation instructions, make sure to get GraphViz.  To generate
-documentation type '% make doc'.  Browsable html is in '~/ecell3/doc/html/' and
-latex source is in 'ecell3/doc/latex/'.  Point your browser to
-'~/ecell3/doc/html/index.html' to browse the html files.  To compile the latex
-source, type '% make' in '~/ecell3/doc/latex/'.  This generates 'refman.dvi'.
-To create a PostScript file type '% make ps'.  '% make ps_2on1'.  '% make pdf'
-and '% make pdf_2on1' generate pdf files instead.
+== About ==
 
-Edit ECell3.doxy to configure the documentation generated.  Currently, the
-internals as well as the API are visible in the output.
+E-CELL is a generic software package for cellular modeling and simulation.  
 
-The documentation is currently incomplete.
+
+
+
+
+== Files and directories ==
+
+README:    This file
+INSTALL:   Installation instruction
+ChangeLog: Automatically generated cvs log 
+NEWS:      Project log
+COPYING:   License
+AUTHORS:   List of authors
+
+
+
+ecell/       --> Core portion of E-CELL SE 3, or Hekkoro
+ecell/libecs --> Koyurugi: A class library for cell modeling and simulation
+                           (E-CELL3's core of the core)
+ecell/libemc --> E-CELL Micro Core (EMC): A C++ API of Koyurugi
+ecell/pyecs  --> A python binding of the EMC
+
+osogo/       --> Osogo GUI session monitor (gecell)
+
+dmtool/      --> A C++ class library for dynamic loading of object classes
+
+doc/         --> Documentations 
+                 (including an automatically generated reference manual)
+
+
+(Below are third-party packages)
+
+PyCXX/       --> A C++ wrapper of Python C API
+korandom/    --> Random number generator package
+libltdl/     --> libtool's dynamic module loader library
+
+
+
+
+== Code names ==
+
+
+  Hekkoro  -- is a code name of E-CELL SE Version 3 (libecs, libemc & pyecs)
+  Koyurugi -- is a code name of libecs class library
+  Osogo    -- is a code name of a GUI Session monitor (gecell)
+
+  (Serizawa -- was a code name of E-CELL 1)
+
+
+
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+//
+//        This file is part of E-CELL Simulation Environment package
+//
+//                Copyright (C) 1996-2002 Keio University
+//
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+//
+//
+// E-CELL is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public
+// License as published by the Free Software Foundation; either
+// version 2 of the License, or (at your option) any later version.
+// 
+// E-CELL is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+// See the GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public
+// License along with E-CELL -- see the file COPYING.
+// If not, write to the Free Software Foundation, Inc.,
+// 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+// 
+//END_HEADER
+//
+// written by Kouichi Takahashi <shafi@e-cell.org> for
+// E-CELL Project, Lab. for Bioinformatics, 
+// Institute for Advanced Biosciences, Keio University.
+//
+
