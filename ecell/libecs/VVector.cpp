@@ -45,9 +45,12 @@
  *::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
  *	$Id$
  :	$Log$
+ :	Revision 1.7  2003/09/27 13:01:23  bgabor
+ :	Windows compatibility fix.
+ :
  :	Revision 1.6  2003/09/27 12:39:15  satyanandavel
  :	more compatibility issues in Windows
- :
+ :	
  :	Revision 1.5  2003/09/22 04:28:43  bgabor
  :	Fixed a serious undefined reference to my_open_to_read bug in VVector.
  :	
@@ -121,6 +124,8 @@ int vvectorbase::_serialNumber = 0;
 char const *vvectorbase::_defaultDirectory = NULL;
 int vvectorbase::_directoryPriority = 999;
 std::vector<char const *> vvectorbase::_tmp_name;
+std::vector<int> _file_desc_read;
+std::vector<int> _file_desc_write;
 bool vvectorbase::_atexitSet = false;
 vvectorbase::cbfp_t vvectorbase::_cb_error = NULL;
 vvectorbase::cbfp_t vvectorbase::_cb_full = NULL;
@@ -228,9 +233,30 @@ void vvectorbase::setTmpDir(char const * const dirname, int priority)
 void vvectorbase::removeTmpFile()
 {
   std::vector<char const *>::iterator iii;
+   
+#ifndef OPEN_WHEN_ACCESS
+  std::vector<int>::iterator ii;
+  for (ii = _file_desc_read.begin(); ii != _file_desc_read.end(); ii++) {
+
+	if (0 <= *ii) {
+		close(*ii);
+		printf("fdr closed\n");
+	}
+}
+
+  for (ii = _file_desc_write.begin(); ii != _file_desc_write.end(); ii++) {
+
+	if (0 <= *ii) {
+		close(*ii);
+		printf("fdrw closed\n");
+	}
+}
+#endif /* OPEN_WHEN_ACCESS */	
+
+
   for (iii = _tmp_name.begin(); iii != _tmp_name.end(); iii++) {
-      printf("atexit called\n");      
-//    unlinkfile();
+
+	unlink (*iii);
  }
 }
 

@@ -45,9 +45,12 @@
  *::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
  *	$Id$
  :	$Log$
+ :	Revision 1.10  2003/09/27 13:00:58  bgabor
+ :	Windows compatibility fix.
+ :
  :	Revision 1.9  2003/09/27 12:39:15  satyanandavel
  :	more compatibility issues in Windows
- :
+ :	
  :	Revision 1.8  2003/09/22 04:28:44  bgabor
  :	Fixed a serious undefined reference to my_open_to_read bug in VVector.
  :	
@@ -142,6 +145,9 @@ private:
   static int _directoryPriority;
 
   static std::vector<char const *> _tmp_name;
+  static std::vector<int> _file_desc_read;
+  static std::vector<int> _file_desc_write;
+
   static bool _atexitSet;
   static cbfp_t _cb_full;
   static cbfp_t _cb_error;
