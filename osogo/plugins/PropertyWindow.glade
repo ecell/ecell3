@@ -276,6 +276,7 @@
 			  <property name="active">False</property>
 			  <property name="inconsistent">False</property>
 			  <property name="draw_indicator">True</property>
+			  <signal name="toggled" handler="on_checkViewAll_toggled" last_modification_time="Thu, 22 Jul 2004 11:25:13 GMT"/>
 			</widget>
 			<packing>
 			  <property name="padding">4</property>

@@ -19,6 +19,8 @@ VALUE_COL_TYPE=gobject.TYPE_STRING
 GETABLE_COL_TYPE=gobject.TYPE_BOOLEAN
 SETTABLE_COL_TYPE=gobject.TYPE_BOOLEAN
 
+DISCARD_LIST=[ 'Name', 'Priority', 'StepperID', 'IsContinuous' ]
+
 
 class PropertyWindow(OsogoPluginWindow):
 
@@ -28,11 +30,11 @@ class PropertyWindow(OsogoPluginWindow):
     # return -> None
     # This method is throwable exception.
     # ---------------------------------------------------------------
-    def __init__( self, aDirName, aData, aPluginManager, aRoot=None ):
+    def __init__( self, aDirName, aData, aPluginManager, rootWidget=None ):
 
         # calls superclass's constructor
         OsogoPluginWindow.__init__( self, aDirName, aData,
-                                   aPluginManager, aRoot )
+                                   aPluginManager, rootWidget=rootWidget )
         self.theStatusBarWidget = None
         self.theParent = None
     # end of __init__
@@ -45,6 +47,9 @@ class PropertyWindow(OsogoPluginWindow):
         #self.openWindow()
         OsogoPluginWindow.openWindow(self)
         
+        # add handers
+        self.addHandlers( { 'on_checkViewAll_toggled' : self.updateViewAllProperties } )
+
         # initializes buffer
         self.thePreFullID = None
         self.thePrePropertyMap = {}
@@ -94,6 +99,10 @@ class PropertyWindow(OsogoPluginWindow):
         # set notebook page to Property tab
         self['notebookProperty'].set_current_page( 1 )
 
+        # set default as not to view all properties
+        self['checkViewAll'].set_active( False )
+        self.theDiscardList = DISCARD_LIST
+
         if self.theRawFullPNList == ():
             return
         
@@ -104,7 +113,7 @@ class PropertyWindow(OsogoPluginWindow):
         self.update(True)
 
         #if ( len( self.theFullPNList() ) > 1 ) and ( aRoot != 'top_vbox' ):
-        if ( len( self.theFullPNList() ) > 1 ) and ( aRoot !=
+        if ( len( self.theFullPNList() ) > 1 ) and ( rootWidget !=
                                                     'EntityWindow' ):
             self.thePreFullID = self.theFullID()
             aClassName = self.__class__.__name__
@@ -252,16 +261,12 @@ class PropertyWindow(OsogoPluginWindow):
             anEntityType = ENTITYTYPE_STRING_LIST[self.theFullID()[TYPE]]
             anID = self.theFullID()[ID]
             aSystemPath = str( self.theFullID()[SYSTEMPATH] )
-    #        if anEntityType == 'System':
-    #            self['notebookProperty'].hide_page( 2 )
-    #       elif anEntityType == 'Process':
-    #           self['notebookProperty'].show_page( 2 )
             
             self['labelEntityType'].set_text( anEntityType + ' Property' )
             self['entry_classname'].set_text( anEntityStub.getClassname() )
             self['entry_id'].set_text( anID )
             self['entry_path'].set_text( aSystemPath  )
-
+            
             if aSystemPath != '/' and anID != '/':
                 anID = '/' + anID
             self['entryFullID'].set_text( aSystemPath + anID )
@@ -300,8 +305,7 @@ class PropertyWindow(OsogoPluginWindow):
         aSelectedProperty = self.theListStore.get_value( anIter, PROPERTY_COL )
         self.theSelectedFullPN = convertFullIDToFullPN( self.theFullID(),
                                                        aSelectedProperty )
-        if self.thePreFullID == self.theFullID():
-            self.__updateValue( aNewValue, anIter, VALUE_COL )
+        self.__updateValue( aNewValue, anIter, VALUE_COL )
 
     
     # ---------------------------------------------------------------
@@ -313,7 +317,6 @@ class PropertyWindow(OsogoPluginWindow):
     def __updatePropertyList( self ):
 
         self.theList = []
-        #anEntityStub = EntityStub( self.theSession.theSimulator, createFullIDString(self.theFullID()) )
         aPropertyList = self.thePrePropertyMap.keys()
 
         # do nothing for following properties
@@ -322,21 +325,22 @@ class PropertyWindow(OsogoPluginWindow):
             aPropertyList.remove( 'Name' )
         except:
             pass
-        
+
         for aPropertyName in aPropertyList: # for (1)
-            aProperty = self.thePrePropertyMap[aPropertyName]
-            anAttribute = aProperty[1]
+            if aPropertyName not in self.theDiscardList:
+                aProperty = self.thePrePropertyMap[aPropertyName]
+                anAttribute = aProperty[1]
 
-            # When the getable attribute is false, value is ''
-            if anAttribute[GETABLE] == FALSE:
-                aValue = ''
-            else:
-                aValue = str( aProperty[0] )
+                # When the getable attribute is false, value is ''
+                if anAttribute[GETABLE] == FALSE:
+                    aValue = ''
+                else:
+                    aValue = str( aProperty[0] )
 
-            aValueString = str( aValue )
-            aList = [ aPropertyName, aValueString, anAttribute[GETABLE],
-                     anAttribute[SETTABLE] ]
-            self.theList.append( aList )
+                aValueString = str( aValue )
+                aList = [ aPropertyName, aValueString, anAttribute[GETABLE],
+                         anAttribute[SETTABLE] ]
+                self.theList.append( aList )
 
         self.theListStore.clear()
 
@@ -526,7 +530,16 @@ class PropertyWindow(OsogoPluginWindow):
         self.thePluginManager.createInstance( aPluginWindowName, aRawFullPN )
 
     # end of createNewPluginWindow
-   
+
+    def updateViewAllProperties( self, *anObject ):
+        isViewAll = self['checkViewAll'].get_active()
+        if isViewAll:
+            self.theDiscardList = []
+            self.__updatePropertyList()
+        else:
+            self.theDiscardList = DISCARD_LIST 
+            self.__updatePropertyList()
+
 
 # ----------------------------------------------------------
 # PropertyWindowPopupMenu -> gtk.Menu
