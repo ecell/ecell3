@@ -67,7 +67,7 @@ class OsogoWindow(Window):
 		self.theSession = aSession
 
 		# initializes exist flag
-		self.__theExist = FALSE
+		self.__theExist = False
 
 
 

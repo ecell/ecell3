@@ -64,12 +64,8 @@ class MainWindow(OsogoWindow):
 	"""MainWindow
 	"""
 
-	# ==========================================================================
 	def __init__( self, aSession ):
-		"""Constructor 
-		- calls super class's constructor
-		- calls openWindow
-		"""
+
 	
 		# calls super class's constructor
 		OsogoWindow.__init__( self, self, 'MainWindow.glade' )
@@ -78,14 +74,11 @@ class MainWindow(OsogoWindow):
 		# stores pointer to Session
 		# -------------------------------------
 		self.theSession = aSession
+		self.theMessageWindow = MessageWindow.MessageWindow()
+		self.theSession.setMessageMethod( self.__printMessage )
 
-	# end of init
 
-	# ==========================================================================
 	def openWindow( self ):
-		"""override superclass's method
-		Returns None
-		"""
 
 		# calls superclass's method
 		OsogoWindow.openWindow(self)
@@ -95,61 +88,66 @@ class MainWindow(OsogoWindow):
 		# -------------------------------------
 		# creates MessageWindow 
 		# -------------------------------------
-		self.__theMessageWindow = MessageWindow.MessageWindow( self['textview1'] ) 
-		self.__theMessageWindow.openWindow()
-		self.__MessageWindow_attached = TRUE
-		self.theSession.setMessageMethod( self.__printMessage )
-
-		#get and setresizewindowminimumsize
+		self.theMessageWindow.openWindow()
+                self.theMessageWindow['vbox1'].reparent( self['messagearea'] )
+                self['messagearea'].add(self.theMessageWindow['vbox1']                    )
+                
 		self.__expose(None,None)
-		self.__MWminimalSize=self.__MWactualSize[:]
-		self['scrolledwindow1'].set_size_request(\
-		    self.__MWminimalSize[0],self.__MWminimalSize[1])
-		self['handlebox24'].connect('child-attached',self.__MWChildAttached)
-		self['handlebox24'].connect('child-detached',self.__MWChildDetached)
-		
+		messageWindowSize=self.theMessageWindow.getActualSize()
+		self.theMessageWindow['scrolledwindow1'].set_size_request(\
+		    messageWindowSize[0], messageWindowSize[1] )
+                self['messagehandlebox'].connect('child-attached',\
+                                            self.__MessageWindowAttached)
+                self['messagehandlebox'].connect('child-detached',\
+                                            self.__MessageWindowDetached)
 
 
 		# -------------------------------------
-		# appends signal handlers
+		# append signal handlers
 		# -------------------------------------
 		self.theHandlerMap =  { 
 		    # menu
-			'load_model_menu_activate'             : self.__openFileSelection ,
-			'load_script_menu_activate'            : self.__openFileSelection ,
-			'save_model_menu_activate'             : self.__openFileSelection ,
-			'exit_menu_activate'                   : self.__deleted ,
-			'message_window_menu_activate'         : self.__toggleMessageWindow ,
-			'interface_window_menu_activate'       : self.__displayWindow ,
-			'create_new_entity_list_menu_activate' : self.__createEntityListWindow ,
-			'logger_window_menu_activate'          : self.__displayWindow ,
-			'stepper_window_menu_activate'         : self.__displayWindow ,
-			'board_window_menu_activate'           : self.__displayWindow ,
-			#'preferences_menu_activate'            : self.openPreferences ,
-			'about_menu_activate'                  : self.__displayAbout ,
-
-			# toolbars
-			'start_button_clicked'                 : self.__startSimulation ,
-			'stop_button_clicked'                  : self.__stopSimulation ,
-			'step_button_clicked'                  : self.__stepSimulation ,
-
-			'on_sec_step_entry_activate'           : self.__setStepSizeOrSec ,
-
-			'on_entitylist_button_clicked'         : self.__createEntityListWindow ,
-			'on_logger_button_toggled'             : self.__displayWindow,
-			'on_message_togglebutton_toggled'      : self.__toggleMessageWindow ,
-			'on_stepper_button_toggled'            : self.__displayWindow,
-			'on_interface_button_toggled'          : self.__displayWindow,
-			'on_board_button_toggled'              : self.__displayWindow,
-			'logo_button_clicked'                  : self.__displayAbout,
-			'on_scrolledwindow1_expose_event'		: self.__expose,
-			'on_logging_policy1_activate'			: self.__openLogPolicy
-		}
+                    'load_model_menu_activate'    : self.__openFileSelection,
+                    'load_script_menu_activate'   : self.__openFileSelection,
+                    'save_model_menu_activate'    : self.__openFileSelection,
+                    'exit_menu_activate'          : self.__deleted,
+                    'message_window_menu_activate': self.__toggleMessageWindow,
+                    'interface_window_menu_activate'
+                    : self.__displayWindow ,
+                    'create_new_entity_list_menu_activate'
+                    : self.__createEntityListWindow ,
+                    'logger_window_menu_activate' : self.__displayWindow,
+                    'stepper_window_menu_activate': self.__displayWindow,
+                    'board_window_menu_activate'  : self.__displayWindow,
+                    #'preferences_menu_activate'   : self.openPreferences,
+                    'about_menu_activate'         : self.__displayAbout,
+                    
+                    # toolbars
+                    'start_button_clicked'        : self.__startSimulation,
+                    'stop_button_clicked'         : self.__stopSimulation,
+                    'step_button_clicked'         : self.__stepSimulation,
+                    
+                    'on_sec_step_entry_activate'  : self.__setStepSizeOrSec,
+                    
+                    'on_entitylist_button_clicked'
+                    : self.__createEntityListWindow,
+                    'on_logger_button_toggled'    : self.__displayWindow,
+                    'on_message_togglebutton_toggled'
+                    : self.__toggleMessageWindow,
+                    'on_stepper_button_toggled'   : self.__displayWindow,
+                    'on_interface_button_toggled' : self.__displayWindow,
+                    'on_board_button_toggled'     : self.__displayWindow,
+                    'logo_button_clicked'         : self.__displayAbout,
+                    'on_scrolledwindow1_expose_event'
+                    : self.__expose,
+                    'on_logging_policy1_activate' : self.__openLogPolicy
+                    }
+                
 		self.addHandlers( self.theHandlerMap )
                 self.setIconList(
-			os.environ['OSOGOPATH'] + os.sep + "ecell.png",
-			os.environ['OSOGOPATH'] + os.sep + "ecell32.png")
-
+                    os.environ['OSOGOPATH'] + os.sep + "ecell.png",
+                    os.environ['OSOGOPATH'] + os.sep + "ecell32.png" )
+                
 
 		self.__setMenuAndButtonsStatus( FALSE )
 		#self.theSession.updateFundamentalWindows()
@@ -176,21 +174,13 @@ class MainWindow(OsogoWindow):
 		self.openAboutSessionMonitor = False 
 		self.update()
 		
-	# ==========================================================================
 	def __expose( self, *arg ):
 		"""expose
 		Return None
 		"""
+                pass
 
-	    # gets actual dimensions of scrolledwindow1 if it is displayed
-	    # and attached
 
-		if self.__MessageWindow_attached and self.__theMessageWindow.isShown:
-			alloc_rect=self['scrolledwindow1'].get_allocation()
-			self.__MWactualSize=[alloc_rect[2],alloc_rect[3]]
-		
-
-	# ==========================================================================
 	def __resizeVertically( self, msg_height ): #gets messagebox height
 		"""__resizeVertically
 		Return None
@@ -209,7 +199,6 @@ class MainWindow(OsogoWindow):
 		self['MainWindow'].resize(window_width,window_height)
 	
 
-	# ==========================================================================
 	def __setMenuAndButtonsStatus( self, aDataLoadedStatus ):
 		"""sets initial widgets status
 		aDataLoadedStatus  -- the status of loading data
@@ -243,13 +232,15 @@ class MainWindow(OsogoWindow):
 
 
 
-
-	# ==========================================================================
 	def __openFileSelection( self, *arg ) :
 		"""checks argument and calls self.openFileSelection() method.
-		arg[0]  ---  self['load_model_menu'] / self['load_script_menu'] / self['save_model_menu']
+		arg[0]  ---  self['load_model_menu'] /
+                self['load_script_menu'] /
+                self['save_model_menu']
+
 		Return None
-		[Note]:When the FileSelection is already displayed, moves it to the top of desctop.
+		[Note]: When the FileSelection is already displayed,
+                moves it to the top of desktop.
 		"""
 
 		# checks the length of argument, but this is verbose
@@ -269,8 +260,7 @@ class MainWindow(OsogoWindow):
 			self.openFileSelection('Save','Model')
 
 
-	# ==========================================================================
-	def openFileSelection( self, aType, aTarget ) :
+        def openFileSelection( self, aType, aTarget ) :
 		"""displays FileSelection 
 		aType     ---  'Load'/'Save' (str)
 		aTarget   ---  'Model'/'Script' (str)
@@ -321,7 +311,6 @@ class MainWindow(OsogoWindow):
 			self.theFileSelection.show_all()
 
 
-	# ==========================================================================
 	def __deleteFileSelection( self, *arg ):
 		"""deletes FileSelection
 		Return None
@@ -333,7 +322,6 @@ class MainWindow(OsogoWindow):
 			self.theFileSelection = None
 
 
-	# ==========================================================================
 	def __loadData( self, *arg ) :
 		"""loads model or script file
 		arg[0]    ---   ok button of FileSelection
@@ -376,7 +364,6 @@ class MainWindow(OsogoWindow):
 			if self.exists():
 				if self['message_togglebutton'].get_active() == FALSE:
 					self['message_togglebutton'].set_active(TRUE)
-					#self.__toggleMessageWindow( self['message_togglebutton'] ) 
 
 			# displays confirm window
 			aMessage = 'Can\'t load [%s]\nSee MessageWindow for details.' %aFileName
@@ -393,9 +380,6 @@ class MainWindow(OsogoWindow):
 		self.update()
 		self.theSession.updateFundamentalWindows()
 
-	# end of loadModel
-
-	# ==========================================================================
 	def __saveModel( self, *arg ) :
 
 		# gets file name
@@ -429,7 +413,7 @@ class MainWindow(OsogoWindow):
 			# expants message window, when it is folded.
 			if self['message_togglebutton'].get_active() == FALSE:
 				self['message_togglebutton'].set_active(TRUE)
-				#self.__toggleMessageWindow( self['message_togglebutton'] ) 
+
 
 			# displays confirm window
 			aMessage = 'Can\'t save [%s]\nSee MessageWindow for details.' %aFileName
@@ -445,10 +429,7 @@ class MainWindow(OsogoWindow):
 		self.updateButtons()
 		self.theSession.updateFundamentalWindows()
 
-	# end of loadModel
 
-
-	# ==========================================================================
 	def __deleted( self, *arg ):
 		"""When delete_event happens or exit menu is selected, 
 		this method is called.
@@ -479,7 +460,7 @@ class MainWindow(OsogoWindow):
 		self.theSession.QuitGUI()
 		return gtk.TRUE
 
-	# ==========================================================================
+
 	def close( self ):
 		""" restores message method and closes window """
 
@@ -487,7 +468,6 @@ class MainWindow(OsogoWindow):
 		OsogoWindow.close( self )
 
 
-	# ==========================================================================
 	def __startSimulation( self, *arg ) :
 		"""starts simulation
 		arg[0]  ---  stop button (gtk.Button)
@@ -495,13 +475,11 @@ class MainWindow(OsogoWindow):
 		"""
 		self.theSession.run()
 
-	# ==========================================================================
 	def startSimulation( self ) :
 		""" starts simulation """
 		self.__startSimulation( self, None )
 
 
-	# ==========================================================================
 	def __stopSimulation( self, *arg  ) :
 		"""stops simulation
 		arg[0]  ---  stop button (gtk.Button)
@@ -509,12 +487,10 @@ class MainWindow(OsogoWindow):
 		"""
 		self.theSession.stop()
 
-	# ==========================================================================
 	def stopSimulation( self ) :
 		""" stops simulation """
 		self.__stopSimulation( self, None )
 
-	# ==========================================================================
 	def __stepSimulation( self, *arg  ) : 
 		"""steps simulation
 		arg[0]  ---  stop button (gtk.Button)
@@ -527,13 +503,11 @@ class MainWindow(OsogoWindow):
 		else:
 			self.theSession.step( self.getStepSize() )
 
-	# ==========================================================================
 	def stepSimulation( self ) :
 		""" steps simulation """
 		self.__stepSimulation( self, None )
 
 
-	# ==========================================================================
 	def getStepType( self ):
 		""" returns state of sec radiobutton
 			gtk.TRUE: seconds
@@ -541,7 +515,6 @@ class MainWindow(OsogoWindow):
 		"""
 		return self['sec_radiobutton'].get_active()
 
-	# ==========================================================================
 	def setStepType( self, aState ):
 		""" sets Step Type radiobutton state 
 			values for aState
@@ -554,20 +527,17 @@ class MainWindow(OsogoWindow):
 			self['sec_radiobutton'].set_active( gtk.FALSE )
 
 
-	# ==========================================================================
 	def getStepSize( self ):
 		""" returns user or script specifid step size """
 		self.__setStepSizeOrSec( self, None )
 	
 		return self.theStepSizeOrSec
 
-	# ==========================================================================
 	def setStepSize( self, num ):
 		""" sets Stepsize entry box to num """
 		self['sec_step_entry'].set_text( str (num) )
 		self.__setStepSizeOrSec( self, None )
 
-	# ==========================================================================
 	def __setStepSizeOrSec( self, *arg ):
 
 		# gets the inputerd characters from the GtkEntry. 
@@ -617,7 +587,6 @@ class MainWindow(OsogoWindow):
 				self.theStepSizeOrSec=aNewValue
 			
 
-	# ==========================================================================
 	def update( self ):
 		"""updates this window 
 		Returns None
@@ -638,7 +607,6 @@ class MainWindow(OsogoWindow):
 			self.updateButtons()
         
 
-	# ==========================================================================
 	def updateButtons( self ):
 		""" updates Buttons and menus with 
 		latest FundamentalWindow status
@@ -694,7 +662,6 @@ class MainWindow(OsogoWindow):
 
 		self.__button_update = False
 
-	# ==========================================================================
 	def __openLogPolicy( self, *arg):
 		"""
 		signal handler to logging policy is called
@@ -708,7 +675,6 @@ class MainWindow(OsogoWindow):
 			# save logpolicy
 			self.theSession.setLogPolicyParameters( newLogPolicy )
 
-	# ==========================================================================
 	def __displayWindow( self, *arg ):
 		"""This method is called, when the menu or buttons on MainWindow is pressed.
 		arg[0]   ---  menu or button
@@ -750,19 +716,17 @@ class MainWindow(OsogoWindow):
 
 
 
-	# ==========================================================================
 	def hideMessageWindow( self ):
+		self[ 'messagehandlebox' ].hide()
 		self['message_togglebutton'].set_active(gtk.FALSE)
-		#self.__toggleMessageWindow( self['message_togglebutton'] ) 
 
 
-	# ==========================================================================
 	def showMessageWindow( self ):
+		self[ 'messagehandlebox' ].show()
 		self['message_togglebutton'].set_active(gtk.TRUE)
-		#self.__toggleMessageWindow( self['message_togglebutton'] ) 
 
-	# ==========================================================================
-	def __toggleMessageWindow( self, *arg ) :
+
+        def __toggleMessageWindow( self, *arg ) :
 		"""expands or folds MessageWindow
 		arg[0]   ---  self['message_togglebutton'] or self['message_window_menu']
 		Returns None
@@ -772,55 +736,44 @@ class MainWindow(OsogoWindow):
 
 		# checks the length of argument, but this is verbose
 		if len(arg) < 1 :
-			return None
+                    return None
 
-		# When Message is required to be expanded.
+                # show
 		if arg[0].get_active() == TRUE:
 			self.theMessageWindowVisible = True
-			self['handlebox24'].show()
-			if self.__MessageWindow_attached:
-				self.__resizeVertically(self.__MWactualSize[1])
-			else:
-				self.__resizeVertically(0)
-
-		# When Message is required to be folded.
+			self.showMessageWindow() 
+                        self.__resizeVertically(self.theMessageWindow.getActualSize()[1])
+                # hide
 		else:
 			self.theMessageWindowVisible = False
-			# hide handlebox, resize window
-			self['handlebox24'].hide()
+			self.hideMessageWindow() 
 			self.__resizeVertically(0)
+
 		self.updateButtons()
 
 
+        def __MessageWindowAttached(self,obj,obj2):
+               """
+               This handler is called when the MessageWindow is attached
+               to the MainWindow.
+               """
 
-	# ==========================================================================
-	def __MWChildAttached(self,obj,obj2):
-		"""__MWChildAttached
-		called when MessageBox is reatached to MainWindow
-		must resize msgbox scrolledwindow to minimal size
-		and the Mainwindow to extended size
-		"""
+               self.theMessageWindow.updateSize()
 
-		self['scrolledwindow1'].set_size_request(\
-		                        self.__MWminimalSize[0], self.__MWminimalSize[1])
-		self.__resizeVertically(self.__MWactualSize[1])
-		self.__MessageWindow_attached=TRUE
+               self.__resizeVertically(\
+                   self.theMessageWindow.getActualSize()[1] )
 
-	    
-	# ==========================================================================
-	def __MWChildDetached(self,obj,obj2):
-		"""__MWChildDetached
-		called when MessageBox is detached from MainWindow
-		must resize msgbox scrolledwindow to actual size
-		and the Mainwindow to minimalsize
-		"""
+        def __MessageWindowDetached(self,obj,obj2):
+               """
+               This handler is called when the MessageWindow is dettached
+               from the MainWindow.
+               """
 
-		self['scrolledwindow1'].set_size_request(self.__MWactualSize[0], self.__MWactualSize[1])
-		self.__resizeVertically(0)
-		self.__MessageWindow_attached=FALSE
-	        
+               self.theMessageWindow.updateSize()
+               
+               self.__resizeVertically(0)
 
-	# ==========================================================================
+
 	def __displayAbout ( self, *args ):
 		# show about information
 		self.createAboutSessionMonitor()
@@ -835,7 +788,6 @@ class MainWindow(OsogoWindow):
 
 
 
-	# ==========================================================================
 	def openPreferences( self, *arg ):
 		"""display the preference window
 		arg[0]   ---  self['preferences_menu']
@@ -848,7 +800,6 @@ class MainWindow(OsogoWindow):
 		aDialog = ConfirmWindow(OK_MODE,aMessage,'Sorry!')
 
 
-	# ==========================================================================
 	def __printMessage( self, aMessage ):
 		"""prints message on MessageWindow
 		aMessage   ---  a message (str or list)
@@ -856,13 +807,11 @@ class MainWindow(OsogoWindow):
 		"""
 
 		# prints message on MessageWindow
-		self.__theMessageWindow.printMessage( aMessage )
+		self.theMessageWindow.printMessage( aMessage )
 
-	# ==========================================================================
 	def __createEntityListWindow( self, *arg ):
 		self.theSession.createEntityListWindow( )
 
-	# ========================================================================
 	def deleted( self, *arg ):
 		""" When 'delete_event' signal is chatcked( for example, [X] button is clicked ),
 		delete this window.
@@ -872,6 +821,6 @@ class MainWindow(OsogoWindow):
 
 
 
-# end of MainWindow
+
 
 

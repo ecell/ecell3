@@ -36,10 +36,6 @@ board.glade\
 config.py\
 main.py\
 opengui.py\
-A-sample-rule.py\
-B-sample-rule.py\
-samplerule.py\
-sample-script.py\
 ecell.png\
 ecell32.png\
 ecell_large.png\

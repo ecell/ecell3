@@ -1,11 +1,9 @@
 #!/usr/bin/env python
-
-
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #
 #        This file is part of E-CELL Session Monitor package
 #
-#                Copyright (C) 1996-2002 Keio University
+#                Copyright (C) 2001-2004 Keio University
 #
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #
@@ -38,91 +36,74 @@
 
 import string
 from OsogoWindow import *
-from gtk import *
-
-# ---------------------------------------------------------------
-# MessageWindow -> OsogoWindow
-#   - manages MessageWindow
-# ---------------------------------------------------------------
-class MessageWindow:
-
-	# ---------------------------------------------------------------
-	# Constructor
-	#
-	# return -> None
-	# This method is throwable exception.
-	# ---------------------------------------------------------------
-	def __init__( self, theMessageBox ):
-
-		#OsogoWindow.__init__( self )
-#		OsogoWindow.__init__( self, aMainWindow )
-		#OsogoWindow.openWindow(self)
-		#self.printMessage('')
-		self.theMessageBufferList=gtk.TextBuffer(None)
-		self.theMessageBox=theMessageBox			
-	# end of __init__
+import gtk
 
 
-	# ---------------------------------------------------------------
-	# PrintMessage
-	#
-	# aMessage(string or list or touple)
-	#
-	# return -> None
-	# This method is throwable exception.
-	# ---------------------------------------------------------------
-	def printMessage( self, aMessage ):
+class MessageWindow( Window ):
+	'''
+	MessageWindow
+	'''
 
-		# -------------------------------------------------------
-		# If messge is list or touple, then print out each line.
-		# -------------------------------------------------------
-		iter = self.theMessageBufferList.get_iter_at_mark ( self.EndMark )
+	def __init__( self ):
 
-		if type(aMessage) == list:  
+		Window.__init__( self )
+		#		OsogoWindow.openWindow( self )
+		self.isShown = False
+		self.messageBuffer = gtk.TextBuffer(None)
+		self.__updateEndMark()
+#		self.printMessage('')
+
+
+	def printMessage( self, message ):
+		'''
+		This method appends a message at the end of the message area.
+
+		message can be a string, a string list or a string tuple.
+		'''
+
+		# join the strings if it is a list
+		if type( message ) == list or type( message ) == tuple:  
 			
-			# If first string is not '\n', add it.
-			if len(aMessage)>0:
-				if string.find(aMessage[0],'\n') != 0:
-					aMessage[0] = '\n' + aMessage[0]
-
 			# print message list
-			for aLine in aMessage:
-				aString = str( aLine )
-				self.theMessageBufferList.insert( iter, aString, len(aString) )
+			messageString = message.join()
+
+		else:  # anything else is stringified.
+			messageString = str( message )
 
 
-		# -------------------------------------------------------
-		# If message is not list or touple, then print out row data.
-		# -------------------------------------------------------
-		else: 
-			aString = str( aMessage )
-			if string.find(aString,'\n') != 0:
-				aString = '\n' + aString
-			self.theMessageBufferList.insert( iter, aString ,len(aString) )
+		if len( messageString ) > 0 and messageString[0] != '\n':
+			messageString = '\n' + messageString
 		
-		self.theMessageBox.scroll_to_mark(self.EndMark,0)
+		iter = self.messageBuffer.get_iter_at_mark( self.endMark )
+		self.messageBuffer.insert( iter, messageString,\
+					   len( messageString ) )
 
+		if self.isShown:
+			self.messageBox.scroll_to_mark( self.endMark, 0 )
 
-	# end of printMessage
-
-
-	# ---------------------------------------------------------------
-	# openWindow
-	#
-	# return -> None
-	# This method is throwable exception.
-	# ---------------------------------------------------------------
 	def openWindow( self ):
 
-		self.isShown=gtk.TRUE
-#		OsogoWindow.openWindow( self )
-#		self.printMessage( self.theMessageBufferList )
-#		self.theMessageBufferList = []
-		self.theMessageBox.set_buffer(self.theMessageBufferList)
-		EndIter=self.theMessageBufferList.get_end_iter()
-		self.EndMark=self.theMessageBufferList.create_mark('EM',EndIter,gtk.FALSE)
-		
-	# end of openWindow
+		self.isShown=True
+		Window.openWindow( self )
+		self.messageBox = self[ 'textview1' ]
+		self.messageBox.set_buffer(self.messageBuffer)
+		self.__updateEndMark()
+
+
+	def getActualSize( self ):
+
+		allocation = self['scrolledwindow1'].get_allocation()
+		return allocation[2], allocation[3]
+	
+	def updateSize( self ):
+		currentSize = self.getActualSize()
+		self['scrolledwindow1'].set_size_request(\
+			currentSize[0], currentSize[1] )
+
+	def __updateEndMark( self ):
+
+		endIter=self.messageBuffer.get_end_iter()
+		self.endMark=self.messageBuffer.create_mark( 'EM', endIter, gtk.FALSE )
 
 
 if __name__ == "__main__":
@@ -131,7 +112,7 @@ if __name__ == "__main__":
 		gtk.mainloop()
 
 	def main():
-		aWindow = MessageWindow( 'MessageWindow.glade' )
+		aWindow = MessageWindow()
 		mainLoop()
 
 	main()
