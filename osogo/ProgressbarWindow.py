@@ -82,7 +82,7 @@ def main():
     FQPI = systemPath + ':' + ID  
 #    propertyName = 'quantity'
     propertyValue = 50.0000
-    aWindow = MainWindow( 'progressbar.glade' )
+    aWindow = MainWindow( 'ProgressbarWindow.glade' )
     aWindow.addHandler( 'gtk_main_quit', mainQuit )
     aWindow.setValue("progressbar1", propertyValue)
     aWindow.setText("label1",ID)  
