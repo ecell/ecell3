@@ -18,7 +18,7 @@ public:
   SimulatorImplementation() {}
   virtual ~SimulatorImplementation() {}
 
-  virtual RootSystemPtr getRootSystemPtr() = 0;
+  virtual RootSystemRef getRootSystem() = 0;
 
   virtual void makePrimitive( StringCref classname, 
 			      FQPICref fqpi, 

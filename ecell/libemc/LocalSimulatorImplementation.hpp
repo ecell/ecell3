@@ -15,7 +15,7 @@ public:
   LocalSimulatorImplementation();
   virtual ~LocalSimulatorImplementation() {}
 
-  RootSystemPtr getRootSystemPtr() { return theRootSystem; }
+  RootSystemRef getRootSystem() { return theRootSystem; }
 
   void makePrimitive( StringCref classname, 
 		      FQPICref fqpi, 
@@ -30,27 +30,8 @@ public:
 
 private:
 
-  RootSystemPtr       theRootSystem;
-
-  SubstanceMakerPtr   theSubstanceMaker;
-  ReactorMakerPtr     theReactorMaker;
-  SystemMakerPtr      theSystemMaker;
-  StepperMakerPtr     theStepper;
-  AccumulatorMakerPtr theAccumulator;
+  RootSystem     theRootSystem;
 
 };   //end of class LocalSimulatorImplementation
 
 #endif   /* ___LOCAL_SIMULATOR_IMPLEMENTATION_H___ */
-
-
-
-
-
-
-
-
-
-
-
-
-
