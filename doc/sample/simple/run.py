@@ -11,7 +11,7 @@ S = createEntityStub( 'Variable:/:S' )
 # print some values
 message( 't= \t%s' % getCurrentTime() )
 message( 'S:Value= \t%s' % S.getProperty( 'Value' ) )
-message( 'S:Concentration= \t%s' % S.getProperty( 'Concentration' ) )
+message( 'S:MolarConc= \t%s' % S.getProperty( 'MolarConc' ) )
 # run
 duration = 1000
 message( '\n' )
@@ -22,7 +22,7 @@ run( duration )
 # print results
 message( 't= \t%s' % getCurrentTime() )
 message( 'S:Value= \t%s' % S.getProperty( 'Value' ) )
-message( 'S:Concentration= \t%s' % S.getProperty( 'Concentration' ) )
+message( 'S:MolarConc= \t%s' % S.getProperty( 'MolarConc' ) )
 
 message( '\n' )
 
