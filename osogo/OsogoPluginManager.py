@@ -166,6 +166,7 @@ class OsogoPluginManager(PluginManager):
         """updates all plugin windows
         Returns None
         """
+        self.theDataGenerator.update()
 
         # updates all plugin windows
         PluginManager.updateAllPluginWindow(self)

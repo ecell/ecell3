@@ -115,12 +115,13 @@ class TracerWindow( OsogoPluginWindow ):
         self['entry1'].set_text( str(self.thePlotInstance.getStripInterval()) )
         self['entry1'].connect( 'activate', self.stripIntervalChangedEnter )
         self['entry1'].connect( 'focus_out_event', self.stripIntervalChanged )
-        
+
         if not self.isStandAlone():
             self.minimize()
 
 
         self.thePluginManager.appendInstance( self )
+
         self.showHistory()               
 
 
@@ -211,6 +212,7 @@ class TracerWindow( OsogoPluginWindow ):
         #checks that newpn has logger if mode is history
         #calls superclass
         pass_flag = 0
+
         if self.theSession.getParameter('log_all_traces'):
             for aFullPN in aFullPNList:
                 aFullPNString = createFullPNString( aFullPN )
@@ -224,7 +226,6 @@ class TracerWindow( OsogoPluginWindow ):
                     pass_flag = 1
             if pass_flag==1:
                 return -1
-
 
         pass_list = []
         for aFullPN in aFullPNList: 
@@ -241,7 +242,6 @@ class TracerWindow( OsogoPluginWindow ):
                     pass_list.append( aFullPNString )
                 else:
                     self.theSession.message('%s cannot be displayed, because it is not numeric\n' % aFullPNString)
-
         added_list = self.thePlotInstance.addTrace( pass_list )
         self.addTraceToList( added_list )
         #self.checkHistoryButton()
@@ -493,8 +493,8 @@ class TracerWindow( OsogoPluginWindow ):
             aMessage = "Cannot create new logger, because simulation is running.\n"
             aMessage += "Please stop simulation if you want to create a logger" 
             aDialog = ConfirmWindow(OK_MODE,aMessage,'Warning!')
-            return False
-        return True
+            return True
+        return False
 
 
 #----------------------------------------------

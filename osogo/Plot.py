@@ -8,6 +8,7 @@ import re
 from string import *
 from math import *
 import operator
+from DataGenerator import *
 
 from ecell.ecssupport import *
 
@@ -17,11 +18,6 @@ from ecell.ecssupport import *
 #changes screen, handles color allocation when adding/removing traces
 #clears plot areas on request, sets tityle
 
-DP_TIME = 0
-DP_VALUE = 1
-DP_AVG = 2
-DP_MAX = 4
-DP_MIN = 3
 
 PLOT_VALUE_AXIS = "Value"
 PLOT_TIME_AXIS = "Time"
@@ -246,14 +242,17 @@ class Axis:
                 sign1 = sign( mantissa1 )
                 mantissa0 = abs( mantissa0 )
                 mantissa1 = abs( mantissa1 )
-                if mantissa1 <= 1.0:
-                    mantissa1 = 1.0
-                elif mantissa1 <= 2.0:
-                    mantissa1 = 2.0
-                elif mantissa1 <= 5.0:
-                    mantissa1 = 5.0
+                if self.theFrame[1] <  0:
+                    mantissa1 = 0.0
                 else:
-                    mantissa1 = 10.0
+                    if mantissa1 <= 1.0:
+                        mantissa1 = 1.0
+                    elif mantissa1 <= 2.0:
+                        mantissa1 = 2.0
+                    elif mantissa1 <= 5.0:
+                        mantissa1 = 5.0
+                    else:
+                        mantissa1 = 10.0
                     
                 self.theTickNumber = self.theMaxTicks
                 halfTicks = int( self.theMaxTicks / 2 )
@@ -354,12 +353,13 @@ class Axis:
         
         if self.theScaleType == SCALE_LINEAR:
             self.thePixelSize = float( self.theFrame[1] - self.theFrame[0] ) / self.theLength
+
         else:
             self.thePixelSize  =float( log10( self.theFrame[1] ) - log10( self.theFrame[0] ) ) / self.theLength
          #reprint_ylabels
          #self.reprintLabels()
         return 0
-
+        
 
 
     def setScaleType( self, aScaleType ):
@@ -931,17 +931,18 @@ class Plot:
 
 
     def getDataSeriesList( self ):
-
         return self.theSeriesMap.values()
+        
         
     def getDataSeries( self, aFullPNString ):
         return self.theSeriesMap[ aFullPNString ]
 
+
     def getDataSeriesNames( self ):
         return self.theSeriesMap.keys()
         
+        
     def addTrace( self, aFPNStringList ):
-
         return_list = []
         for aFullPNString in aFPNStringList:
             #checks whether there's room for new traces
@@ -993,14 +994,14 @@ class Plot:
         
 
     def requestDataSlice( self, aStart, anEnd ):
-        self.theOwner.requestDataSlice( aStart, anEnd, self.getRequiredTimeResolution()  )
+        self.theOwner.requestDataSlice( aStart, anEnd, ( anEnd - aStart ) / ( self.theXAxis.theLength*2) )
 
     def requestNewData ( self ):
         self.theOwner.requestNewData( self.getRequiredTimeResolution() )
 
 
     def getRequiredTimeResolution( self ):
-        return ( self.theXAxis.theFrame[1] - self.theXAxis.theFrame[0] ) / self.theXAxis.theLength * 2
+        return ( self.theXAxis.theFrame[1] - self.theXAxis.theFrame[0] ) / (self.theXAxis.theLength * 2)
         
     def doConnectPoints( self, aBool ):
         self.doesConnectPoints = aBool
