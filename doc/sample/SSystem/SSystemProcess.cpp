@@ -15,7 +15,6 @@
 #include "ecell3_dm.hpp"
 
 #define ECELL3_DM_TYPE Process
-#define ECELL3_DM_CLASSNAME SSystemProcess
 
 USE_LIBECS;
 
@@ -232,7 +231,7 @@ void ECELL3_DM_CLASSNAME::process()
     {
       if( (*i).getVariable()->getValue() <= 0 )
 	{
-	  THROW_EXCEPTION( AttributeError, "Error:in SSystemPProcess::process().log() in 0.");
+	  THROW_EXCEPTION( ValueError, "Error:in SSystemPProcess::process().log() in 0.");
 	}
 
       gsl_matrix_set(theY, anIndex, 0, 
