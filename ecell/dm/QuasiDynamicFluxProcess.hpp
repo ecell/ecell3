@@ -20,12 +20,10 @@ LIBECS_DM_CLASS( QuasiDynamicFluxProcess, Process )
   LIBECS_DM_OBJECT( QuasiDynamicFluxProcess, Process )
     {
       INHERIT_PROPERTIES( Process );
-      PROPERTYSLOT_SET_GET( Integer, Irreversible );
     }
 
   QuasiDynamicFluxProcess()
     :
-    Irreversible( 0 )
     {
       ; // do nothing
     }
@@ -35,7 +33,6 @@ LIBECS_DM_CLASS( QuasiDynamicFluxProcess, Process )
       ; // do nothing
     }
   
-  SIMPLE_SET_GET_METHOD( Integer, Irreversible );
 
   virtual void initialize()
     {
@@ -49,8 +46,6 @@ LIBECS_DM_CLASS( QuasiDynamicFluxProcess, Process )
   }
   
  protected:
-
-  Integer Irreversible;
 
 };
 

@@ -50,9 +50,6 @@ set FluxDistributuinStepper's ID.
 -VariableReferenceList
 set VariableReferenceList that show Flux Information in Static part.
 
--Irreversible
-set 1, if this Process is Ireeversible. default 0.
-
 
 === Files and directories ===
 

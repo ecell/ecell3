@@ -54,7 +54,8 @@ LIBECS_DM_CLASS( FluxDistributionProcess, Process )
 	value.push_back( KnownProcessList[i] );
       }
     return  value;
-  }  
+  }
+
   SET_METHOD( Polymorph, UnknownProcessList )
   {
     UnknownProcessList.clear();
@@ -117,7 +118,6 @@ using namespace libecs;
 FluxDistributionProcess::FluxDistributionProcess()
   :
   theMatrixSize( 0 ),
-  theIrreversibleFlag( false ),
   theKnownMatrix( NULLPTR ),
   theUnknownMatrix( NULLPTR ),
   theInverseMatrix( NULLPTR ),
@@ -320,19 +320,6 @@ void FluxDistributionProcess::initialize()
     }
   
   //
-  // check Irreversible
-  //
-
-  theIrreversibleFlag = false;
-  for( Integer i( 0 ); i < UnknownProcessList.size(); i++ )
-    {
-      if( theUnknownProcessPtrVector[i]->getIrreversible() )
-	{
-	  theIrreversibleFlag = true;
-	}
-    }
-  
-  //
   // generate KnownProcess Matrix
   //
 
@@ -379,52 +366,6 @@ void FluxDistributionProcess::fire()
   
   gsl_blas_dgemv( CblasNoTrans, 1.0, theSolutionMatrix, 
 		  theKnownVelocityVector, 0.0, theSolutionVector );
-
-  if ( theIrreversibleFlag )
-    {
-      bool aFlag( false );
-      std::vector<Integer> aVector;
-      for( Integer i( 0 ); i < theUnknownProcessPtrVector.size(); ++i )
-	{
-	  if( ( theUnknownProcessPtrVector[i]->getIrreversible() ) &&
-	      ( gsl_vector_get(theSolutionVector, i) < 0 ) )
-	    {
-	      aFlag = true;
-	      aVector.push_back(i);
-	    }
-	}		    
-      
-      if( aFlag )
-	{
-	  
-	  if( theTmpUnknownMatrix != NULLPTR )
-	    { 
-	      gsl_matrix_free( theTmpUnknownMatrix );
-	    }
-	  
-	  gsl_matrix_memcpy( theTmpUnknownMatrix, theUnknownMatrix );
-	  for( Integer i( 0 ); i < aVector.size(); ++i )
-	    {
-	      for( Integer j( 0 ); j < theMatrixSize; ++j )
-		{
-		  gsl_matrix_set( theTmpUnknownMatrix, j, aVector[i], 0 );
-		}
-	    }
-	  
-	  if( theTmpInverseMatrix != NULLPTR )
-	    { 
-	      gsl_matrix_free( theTmpInverseMatrix );
-	    }
-	  
-	  theTmpInverseMatrix = generateInverse( theTmpUnknownMatrix,
-						 theMatrixSize );    
-	  gsl_blas_dgemm( CblasNoTrans, CblasNoTrans, -1.0, 
-			  theTmpInverseMatrix, 
-			  theKnownMatrix, 0.0, theSolutionMatrix );
-	  gsl_blas_dgemv( CblasNoTrans, 1.0, theSolutionMatrix, 
-			  theKnownVelocityVector, 0.0, theSolutionVector );
-	}	
-    }
 
   for( Integer i( 0 ); i < theUnknownProcessPtrVector.size(); ++i )
     {

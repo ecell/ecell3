@@ -45,9 +45,7 @@
 # -VariableReferenceList
 # set VariableReferenceList that show Flux Information in Static part.
 #
-# -Irreversible
-# set 1, if this Process is Ireeversible. default 0.
-#
+
 
 Stepper FluxDistributionStepper( FD )
 {
@@ -192,7 +190,6 @@ System System( /CELL/CYTOPLASM )
                 VariableReferenceList   [ S0 :.:C -1 ]
                                         [ P0 :.:D 1 ];
 	}
-
 
         Process QuasiDynamicFluxProcess( E_CE )
         {
