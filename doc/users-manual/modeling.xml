@@ -1237,10 +1237,57 @@ System System( / )
     <para>Some basics on usage of ODE Steppers, NRStepper (Gillespie), DiscreteTimeStepper and SlaveStepper should come here.</para>
 
 
-    <sect2>
-      <title>A Trivial Reaction System</title>
 
-      <para>At the very first, let us start with the simplest possible
+    <sect2>
+      <title>Running the model</title>
+
+      <para>All the examples in this section can be run by the
+      following procedure.
+
+<orderedlist>
+	  <listitem>
+	    <para>Create and save the model file (for example,
+	      <filename>simple-gillespie.em</filename>) with a text
+	      editor.</para>
+	  </listitem>
+
+	  <listitem>
+	    <para>Convert the &EM; file to an &EML file by
+	      <command>ecell3-em2eml</command> command.
+
+<screen><prompt>$</prompt> <userinput>ecell3-em2eml simple-gillespie.em</userinput></screen>
+</para>
+	  </listitem>
+
+	  <listitem>
+	    <para>Run it in the GUI mode by
+	      <command>gecell</command> command.
+
+<screen><prompt>$</prompt> <userinput>gecell -f simple-gillespie.eml</userinput></screen>
+
+            or, in the script mode with <command>ecell3-session</command> command (see the following chapter):
+
+<screen><prompt>$</prompt> <userinput>ecell3-session -f simple-gillespie.eml</userinput></screen>
+</para>
+	  </listitem>
+	</orderedlist>
+</para>
+    </sect2>
+
+
+
+
+    <sect2>
+      <title>Using Gillespie algorithm</title>
+
+      <para>&app; comes with a set of classes for simulations using
+       Gillespie's stochastic algorithm.</para>
+
+
+      <sect3>
+	<title>A Trivial Reaction System</title>
+	
+	<para>At the very first, let us start with the simplest possible
       stable system of elementary reactions, which has two variables
       (in this case the numbers of molecules of molecular species) and
       a couple of elementary reaction processes.  Because elementary reactions
@@ -1258,17 +1305,13 @@ S1            S2
       of <literal>S1</literal> and <literal>S2</literal> are 1000 and 0,
       respectively.  Because rate constants are the same, the system has
       a steady state at <literal>S1 == S2 == 500</literal>.</para>
+	
+      </sect3>
 
-    </sect2>
 
-    <sect2>
-      <title>Using Gillespie algorithm</title>
-
-      <para>&app; comes with a set of classes for simulations using
-       Gillespie's stochastic algorithm.</para>
 
       <sect3>
-	<title>Specifying Gibson's Next Reaction method</title>
+	<title>Specifying the Next Reaction method</title>
 
 	<para><classname>NRStepper</classname> class implements Gibson's
          efficient variation of the Gillespie algorithm, or the Next
@@ -1309,8 +1352,8 @@ S1            S2
 	<title>Defining the variables</title>
 
 	<para>Now define the main variables <literal>S1</literal> and
-         <literal>S2</literal>.  Use '<property>Value</property> properties
-         of the objects to set initial values.
+         <literal>S2</literal>.  Use '<property>Value</property>' properties
+         of the objects to set the initial values.
 
 <programlisting>System System( / )
 {
@@ -1341,18 +1384,47 @@ S1            S2
       with the <classname>NRStepper</classname> to simulate elementary
       reactions.</para>
 
-	<para>Two different types of properties, <property>k</property>
-      and <property>VariableReferenceList</property>, must be set for
-      each of the <classname>GillespieProcess</classname> object.
-      <property>k</property> is the rate constant parameter in [1/sec].
-      <property>VariableReferenceList</property> property is </para>
+	<para>Two different types of properties,
+      <property>k</property> and
+      <property>VariableReferenceList</property>, must be set for each
+      of the <classname>GillespieProcess</classname> object.
+      <property>k</property> is the rate constant parameter in [1/sec]
+      if the reaction is first-order, or [1/sec/M] if it is a
+      second-order reaction.  Set
+      <property>VariableReferenceList</property> properties so that
+      <literal>P1</literal> consumes <literal>S1</literal> and produce
+      <literal>S2</literal>, and <literal>P2</literal> uses
+      <literal>S2</literal> to create <literal>S1</literal>.</para>
 
 
+	<programlisting>
+System System( / )
+{
+    # ...
+
+    Process GillespieProcess( P1 )              # the reaction S1 --> S2
+    {
+        VariableReferenceList   [ S Variable:.:S1 -1 ]
+                                [ P Variable:.:S2 1 ];
+        k       1.0;                            # the rate constant
+    }
+
+    Process GillespieProcess( P2 )              # the reaction S2 --> S1
+    {
+        VariableReferenceList   [ S Variable:.:S2 -1 ]
+                                [ P Variable:.:S1 1 ];
+        k       1.0;
+    }
+}
+</programlisting>
       </sect3>
 
 
       <sect3>
 	<title>Putting them together</title>
+
+	<para>Here is the complete &EM; of the model that really works.</para>
+
 	<example>
 	  <title>The simplest Gillespie-Gibson model</title>
 	  <programlisting>Stepper NRStepper( NR1 )
@@ -1363,11 +1435,6 @@ S1            S2
 System System( / )
 {
     StepperID       NR1;
-
-    Variable Variable( SIZE )    # the size (volume) of this compartment
-    {
-        Value   1e-18;
-    }
 
     Variable Variable( S1 )
     {
@@ -1395,63 +1462,100 @@ System System( / )
 }
 </programlisting>
 	</example>
+
       </sect3>
+
 
     </sect2>
 
     <sect2>
       <title>Using Deterministic Differential Equations</title>
-      <para></para>
 
-      <example>
-	<title>A simple mass-action model</title>
-	<programlisting>
-# A simple ODE mass-action model
+      <para>The previous section described how to create a model that
+       runs with the stochastic Gillespie's algorithm.  &ecell; is a
+       multi-algorithm simulator, and different algorithms can be used
+       to run the model.  This section explains a way to use a
+       deterministic differential equation solver to run a system
+       of simple mass-action reactions.</para>
 
+
+      <sect3>
+	<title>Choosing Stepper and Process classes</title>
+
+	<para>In the current version, we recommend
+         <classname>ODE45Stepper</classname> class as a
+         general-purpose &Stepper; for differential equation systems.
+         This &Stepper; implements an adaptive stepsize fourth order
+         numerical integration algorithm for ordinary differential
+         equations (ODE) with fifth-order error control.  </para>
+
+	<para><classname>MassActionFluxProcess</classname> is the
+         continuous differential equation conterpart of the
+         discrete-event <classname>GillespieProcess</classname>.
+         </para>
+
+      </sect3>
+
+      <sect3>
+	<title>Converting the model</title>
+
+	<para>Converting the trivial reaction system model for
+         Gillespie to use differential equations is very easy; just
+         replace <classname>NRStepper</classname> with
+         <classname>ODE45Stepper</classname>, and change the classname of 
+         <classname>GillespieProcess</classname> to
+         <classname>MassActionFluxProcess</classname>.</para>
+
+	<para>The following is the model of the trivial model that
+         runs on the differential equation
+         <classname>ODE45Stepper</classname>.</para>
+
+	<example>
+	  <title>A simple deterministic mass-action model</title>
+	  <programlisting>
 Stepper ODE45Stepper( ODE1 )
 {
-	# no property
+    # no property
 }
 
 System System( / )
 {
-	StepperID	ODE1;
+    StepperID       ODE1;
 
-	Variable Variable( S1 )
-	{
-		Value	1000;
-	}
-	
-	Variable Variable( S2 )
-	{
-		Value	0;
-	}
-	
-	Process MassActionFluxProcess( P1 )
-	{
-		VariableReferenceList	[ S0 Variable:.:S1 -1 ]
-				        [ P0 Variable:.:S2 1 ];
-		k	1.0;
-	}
+    Variable Variable( S1 )
+    {
+        Value   1000;
+    }
+        
+    Variable Variable( S2 )
+    {
+        Value   0;
+    }
+        
+    Process MassActionFluxProcess( P1 )
+    {
+        VariableReferenceList   [ S0 Variable:.:S1 -1 ]
+                                [ P0 Variable:.:S2 1 ];
+        k       1.0;
+    }
 
-	Process MassActionProcess( P2 )
-	{
-		VariableReferenceList	[ S0 Variable:.:S2 -1 ]
- 				        [ P0 Variable:.:S1 1 ];
-		k	1.0;
-	}
-	
+    Process MassActionProcess( P2 )
+    {
+        VariableReferenceList   [ S0 Variable:.:S2 -1 ]
+                                [ P0 Variable:.:S1 1 ];
+        k       1.0;
+    }
 }
 </programlisting>
       </example>
 
+      </sect3>
 
-<!--
+      <!--
 Incidentally, in this particular trivial model,
-         volume of the compartment does not affect the behavior of the
+      volume of the compartment does not affect the behavior of the
          model because all the reactions are first-order.
       -->
-
 
     </sect2>
 
