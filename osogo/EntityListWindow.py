@@ -170,8 +170,9 @@ class EntityListWindow(OsogoWindow):
             self.thePluginInstanceSelection.deleted()
             self.thePluginInstanceSelection = None
 
-        self.theSession.deleteEntityListWindow( self )
-        OsogoWindow.close(self)
+        if self.theSession != None:
+            self.theSession.deleteEntityListWindow( self )
+            OsogoWindow.close(self)
 
     def deletePluginInstanceSelection( self, *arg ):
         """sets 'delete_event' as 'hide_event'

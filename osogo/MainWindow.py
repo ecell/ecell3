@@ -707,7 +707,6 @@ class MainWindow(OsogoWindow):
 				return gtk.TRUE		
 
 		self.setStopState()
-		self.theEntityListWindow.close()
 
 		self.close()
 
