@@ -1,0 +1,185 @@
+<?xml version="1.0"?>
+<GTK-Interface>
+
+<project>
+  <name>InterfaceWindow</name>
+  <program_name>interfacewindow</program_name>
+  <directory></directory>
+  <source_directory>src</source_directory>
+  <pixmaps_directory>pixmaps</pixmaps_directory>
+  <language>C</language>
+  <gnome_support>True</gnome_support>
+  <gettext_support>True</gettext_support>
+</project>
+
+<widget>
+  <class>GtkWindow</class>
+  <name>interface_window</name>
+  <width>520</width>
+  <height>260</height>
+  <title>Interface Window</title>
+  <type>GTK_WINDOW_TOPLEVEL</type>
+  <position>GTK_WIN_POS_NONE</position>
+  <modal>False</modal>
+  <allow_shrink>False</allow_shrink>
+  <allow_grow>True</allow_grow>
+  <auto_shrink>False</auto_shrink>
+
+  <widget>
+    <class>GtkFixed</class>
+    <name>fixed1</name>
+
+    <widget>
+      <class>GtkButton</class>
+      <name>ShowButton</name>
+      <x>280</x>
+      <y>216</y>
+      <width>72</width>
+      <height>24</height>
+      <can_focus>True</can_focus>
+      <signal>
+	<name>clicked</name>
+	<handler>ShowButton_clicked</handler>
+	<last_modification_time>Tue, 26 Feb 2002 07:43:02 GMT</last_modification_time>
+      </signal>
+      <label>Show</label>
+      <relief>GTK_RELIEF_NORMAL</relief>
+    </widget>
+
+    <widget>
+      <class>GtkEntry</class>
+      <name>SelectedTitle</name>
+      <x>72</x>
+      <y>216</y>
+      <width>192</width>
+      <height>22</height>
+      <can_focus>True</can_focus>
+      <editable>True</editable>
+      <text_visible>True</text_visible>
+      <text_max_length>0</text_max_length>
+      <text></text>
+    </widget>
+
+    <widget>
+      <class>GtkButton</class>
+      <name>SaveButton</name>
+      <x>360</x>
+      <y>216</y>
+      <width>72</width>
+      <height>24</height>
+      <can_focus>True</can_focus>
+      <signal>
+	<name>clicked</name>
+	<handler>SaveButton_clicked</handler>
+	<last_modification_time>Tue, 26 Feb 2002 07:43:17 GMT</last_modification_time>
+      </signal>
+      <label>Save Title</label>
+      <relief>GTK_RELIEF_NORMAL</relief>
+    </widget>
+
+    <widget>
+      <class>GtkButton</class>
+      <name>DeleteButton</name>
+      <x>440</x>
+      <y>216</y>
+      <width>72</width>
+      <height>24</height>
+      <can_focus>True</can_focus>
+      <signal>
+	<name>clicked</name>
+	<handler>DeleteButton_clicked</handler>
+	<last_modification_time>Tue, 26 Feb 2002 07:43:52 GMT</last_modification_time>
+      </signal>
+      <label>Delete</label>
+      <relief>GTK_RELIEF_NORMAL</relief>
+    </widget>
+
+    <widget>
+      <class>GtkLabel</class>
+      <name>label4</name>
+      <x>8</x>
+      <y>216</y>
+      <width>64</width>
+      <height>16</height>
+      <label>Selected:</label>
+      <justify>GTK_JUSTIFY_CENTER</justify>
+      <wrap>False</wrap>
+      <xalign>0.5</xalign>
+      <yalign>0.5</yalign>
+      <xpad>0</xpad>
+      <ypad>0</ypad>
+    </widget>
+
+    <widget>
+      <class>GtkScrolledWindow</class>
+      <name>scrolledwindow1</name>
+      <x>16</x>
+      <y>8</y>
+      <width>496</width>
+      <height>200</height>
+      <hscrollbar_policy>GTK_POLICY_ALWAYS</hscrollbar_policy>
+      <vscrollbar_policy>GTK_POLICY_ALWAYS</vscrollbar_policy>
+      <hupdate_policy>GTK_UPDATE_CONTINUOUS</hupdate_policy>
+      <vupdate_policy>GTK_UPDATE_CONTINUOUS</vupdate_policy>
+
+      <widget>
+	<class>GtkCList</class>
+	<name>InterfaceCList</name>
+	<width>504</width>
+	<height>300</height>
+	<can_focus>True</can_focus>
+	<signal>
+	  <name>select_row</name>
+	  <handler>interfacelist_select_row</handler>
+	  <last_modification_time>Tue, 26 Feb 2002 07:15:39 GMT</last_modification_time>
+	</signal>
+	<columns>3</columns>
+	<column_widths>128,108,80</column_widths>
+	<selection_mode>GTK_SELECTION_SINGLE</selection_mode>
+	<show_titles>True</show_titles>
+	<shadow_type>GTK_SHADOW_IN</shadow_type>
+
+	<widget>
+	  <class>GtkLabel</class>
+	  <child_name>CList:title</child_name>
+	  <name>Title</name>
+	  <label>Title</label>
+	  <justify>GTK_JUSTIFY_CENTER</justify>
+	  <wrap>False</wrap>
+	  <xalign>0.5</xalign>
+	  <yalign>0.5</yalign>
+	  <xpad>0</xpad>
+	  <ypad>0</ypad>
+	</widget>
+
+	<widget>
+	  <class>GtkLabel</class>
+	  <child_name>CList:title</child_name>
+	  <name>Type</name>
+	  <label>Type</label>
+	  <justify>GTK_JUSTIFY_CENTER</justify>
+	  <wrap>False</wrap>
+	  <xalign>0.5</xalign>
+	  <yalign>0.5</yalign>
+	  <xpad>0</xpad>
+	  <ypad>0</ypad>
+	</widget>
+
+	<widget>
+	  <class>GtkLabel</class>
+	  <child_name>CList:title</child_name>
+	  <name>Contents</name>
+	  <label>Contents</label>
+	  <justify>GTK_JUSTIFY_CENTER</justify>
+	  <wrap>False</wrap>
+	  <xalign>0.5</xalign>
+	  <yalign>0.5</yalign>
+	  <xpad>0</xpad>
+	  <ypad>0</ypad>
+	</widget>
+      </widget>
+    </widget>
+  </widget>
+</widget>
+
+</GTK-Interface>
