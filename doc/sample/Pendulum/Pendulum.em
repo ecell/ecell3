@@ -5,7 +5,8 @@
 # the coordinate (X, Y), the velocity (U, V), and T represents the tension
 #
 
-Stepper FixedDAE1Stepper( DAES1 )
+#Stepper FixedDAE1Stepper( DAES1 )
+Stepper DAEStepper( DAES1 )
 {
 	# ; no property
 }
