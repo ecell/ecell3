@@ -127,7 +127,7 @@ namespace libecs
   }
 
 
-  void Stepper::setParameters( UVariableVectorCref aParameterList )
+  void Stepper::setParameterList( UVariableVectorCref aParameterList )
   {
     const UVariableVector::size_type aSize( aParameterList.size() );
 

@@ -63,7 +63,7 @@ namespace libecs
   }
 
 
-  LoggerPtr LoggerBroker::getLogger( FullPNCref fpn )
+  LoggerPtr LoggerBroker::getLogger( FullPNCref aFullID, RealCref anInterval )
   {
     LoggerMapIterator aLoggerMapIterator( theLoggerMap.find( fpn ) );
     if( aLoggerMapIterator != theLoggerMap.end() )
