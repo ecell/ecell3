@@ -143,8 +143,6 @@ LIBECS_DM_CLASS( FluxDistributionProcess, Process )
 
 LIBECS_DM_INIT( FluxDistributionProcess, Process );
 
-using namespace libecs;
-
 FluxDistributionProcess::FluxDistributionProcess()
   :
   theMatrixSize( 0 ),

@@ -28,8 +28,8 @@
 // E-Cell Project, Institute for Advanced Biosciences, Keio University.
 //
 
-#ifndef __FIXEDODE1_HPP
-#define __FIXEDODE1_HPP
+#ifndef __FIXEDODE1STEPPER_HPP
+#define __FIXEDODE1STEPPER_HPP
 
 
 #include "libecs/DifferentialStepper.hpp"
@@ -57,4 +57,4 @@ protected:
 
 };
 
-#endif /* __FIXEDODE1_HPP */
+#endif /* __FIXEDODE1STEPPER_HPP */

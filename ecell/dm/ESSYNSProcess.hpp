@@ -6,53 +6,51 @@
 #include "libecs.hpp"
 #include "Process.hpp"
 
-namespace libecs
+USE_LIBECS;
+
+
+LIBECS_DM_CLASS( ESSYNSProcess, Process )
 {
-
-  DECLARE_VECTOR( Real, RealVector );
-
-  LIBECS_DM_CLASS( ESSYNSProcess, Process )
-  {
   
-  public:
+ public:
 
-    LIBECS_DM_OBJECT_ABSTRACT( ESSYNSProcess )
+  DECLARE_VECTOR( libecs::Real, RealVector );
+
+
+  LIBECS_DM_OBJECT_ABSTRACT( ESSYNSProcess )
     {
       INHERIT_PROPERTIES( Process );  
     }
   
-    ESSYNSProcess()
-      {
-	;
-      }
+  ESSYNSProcess()
+    {
+      ;
+    }
 
-    virtual ~ESSYNSProcess()
-      {
-	;
-      }
+  virtual ~ESSYNSProcess()
+    {
+      ;
+    }
 
-    virtual void initialize()
-      {
-	Process::initialize();
-      }
+  virtual void initialize()
+    {
+      Process::initialize();
+    }
     
-    virtual void fire()
-      {
-	;
-      }
+  virtual void fire()
+    {
+      ;
+    }
     
-    virtual const std::vector<RealVector>& getESSYNSMatrix() = 0;
+  virtual const std::vector<RealVector>& getESSYNSMatrix() = 0;
 
-    virtual GET_METHOD( Integer, SystemSize ) = 0;
+  virtual GET_METHOD( Integer, SystemSize ) = 0;
     
-  protected:
+ protected:
 
-  };
+};
 
-  LIBECS_DM_INIT_STATIC( ESSYNSProcess, Process );
-
-
-} // namespace libecs
+LIBECS_DM_INIT_STATIC( ESSYNSProcess, Process );
 
 
 #endif /* __ESSYNSPROCESS_HPP */

@@ -37,101 +37,96 @@
 
 LIBECS_DM_INIT( ESSYNSStepper, Stepper );
 
-namespace libecs
+void ESSYNSStepper::initialize()
 {
-
-  void ESSYNSStepper::initialize()
-  {
-    AdaptiveDifferentialStepper::initialize();
+  AdaptiveDifferentialStepper::initialize();
  
-    // the number of write variables
-    const VariableVector::size_type aSize( getReadOnlyVariableOffset() );
-    theK1.resize( aSize );
+  // the number of write variables
+  const VariableVector::size_type aSize( getReadOnlyVariableOffset() );
+  theK1.resize( aSize );
 
-    // initialize()
+  // initialize()
 
-    if( theProcessVector.size() == 1 )
-      {
-	theESSYNSProcessPtr = DynamicCaster<ESSYNSProcessPtr,ProcessPtr>()( theProcessVector[ 0 ]);
+  if( theProcessVector.size() == 1 )
+    {
+      theESSYNSProcessPtr = DynamicCaster<ESSYNSProcessPtr,ProcessPtr>()( theProcessVector[ 0 ]);
 	
-	theSystemSize = theESSYNSProcessPtr->getSystemSize();
-      }
-    else
-      {
-	THROW_EXCEPTION( InitializationFailed, 
-			 "Error:in ESYYNSStepper::initialize() " );
-      }
+      theSystemSize = theESSYNSProcessPtr->getSystemSize();
+    }
+  else
+    {
+      THROW_EXCEPTION( InitializationFailed, 
+		       "Error:in ESYYNSStepper::initialize() " );
+    }
 
-    theTaylorOrder = getOrder();
+  theTaylorOrder = getOrder();
 
-    theESSYNSMatrix.resize(theSystemSize+1);
-    RealVector tmp;
-    tmp.resize(theTaylorOrder+1);
+  theESSYNSMatrix.resize(theSystemSize+1);
+  RealVector tmp;
+  tmp.resize(theTaylorOrder+1);
 
-    for(int i( 0 ); i < theSystemSize; i++)
+  for(int i( 0 ); i < theSystemSize; i++)
     {
       theESSYNSMatrix[i] = tmp;
     }
 
-    theIndexVector.resize( theSystemSize );
-    VariableReferenceVectorCref aVariableReferenceVectorCref
-      ( theESSYNSProcessPtr->getVariableReferenceVector() );
+  theIndexVector.resize( theSystemSize );
+  VariableReferenceVectorCref aVariableReferenceVectorCref
+    ( theESSYNSProcessPtr->getVariableReferenceVector() );
 
-    for ( VariableReferenceVector::size_type c( theESSYNSProcessPtr->getPositiveVariableReferenceOffset() ); c < theSystemSize; c++  )
-      {
-	VariableReferenceCref aVariableReferenceCref( aVariableReferenceVectorCref[ c ] );
-	const VariablePtr aVariablePtr( aVariableReferenceCref.getVariable() );
+  for ( VariableReferenceVector::size_type c( theESSYNSProcessPtr->getPositiveVariableReferenceOffset() ); c < theSystemSize; c++  )
+    {
+      VariableReferenceCref aVariableReferenceCref( aVariableReferenceVectorCref[ c ] );
+      const VariablePtr aVariablePtr( aVariableReferenceCref.getVariable() );
 
-	theIndexVector[ c ] = getVariableIndex( aVariablePtr );
-      }
+      theIndexVector[ c ] = getVariableIndex( aVariablePtr );
+    }
 
-    /* for( int i( 1 ); i < theSystemSize+1; i++)
-      {
-	std::cout<< (theESSYNSMatrix[i-1])[0] << std::endl;
-      }
-    */
-  }
+  /* for( int i( 1 ); i < theSystemSize+1; i++)
+     {
+     std::cout<< (theESSYNSMatrix[i-1])[0] << std::endl;
+     }
+  */
+}
 
-  bool ESSYNSStepper::calculate()
-  {
-    const VariableVector::size_type aSize( getReadOnlyVariableOffset() );
+bool ESSYNSStepper::calculate()
+{
+  const VariableVector::size_type aSize( getReadOnlyVariableOffset() );
 
-    Real aCurrentTime( getCurrentTime() );
-    Real aStepInterval( getStepInterval() );
+  Real aCurrentTime( getCurrentTime() );
+  Real aStepInterval( getStepInterval() );
 
-    // write step() function
+  // write step() function
   
-    theESSYNSMatrix = theESSYNSProcessPtr->getESSYNSMatrix();
+  theESSYNSMatrix = theESSYNSProcessPtr->getESSYNSMatrix();
 
-    //integrate
-    for( int i( 1 ); i < theSystemSize+1; i++ )
-      {
-	Real aY( 0.0 ); //reset aY 
-	for( int m( 1 ); m <= theTaylorOrder; m++ )
-	  {
-	    aY += ((theESSYNSMatrix[i-1])[m] *
-		   gsl_sf_pow_int( aStepInterval, m ) / gsl_sf_fact( m ));
-	  }
-	(theESSYNSMatrix[i-1])[0] += aY;
-	//std::cout<< (theESSYNSMatrix[i-1])[0] <<std::endl;
-      }
+  //integrate
+  for( int i( 1 ); i < theSystemSize+1; i++ )
+    {
+      Real aY( 0.0 ); //reset aY 
+      for( int m( 1 ); m <= theTaylorOrder; m++ )
+	{
+	  aY += ((theESSYNSMatrix[i-1])[m] *
+		 gsl_sf_pow_int( aStepInterval, m ) / gsl_sf_fact( m ));
+	}
+      (theESSYNSMatrix[i-1])[0] += aY;
+      //std::cout<< (theESSYNSMatrix[i-1])[0] <<std::endl;
+    }
     
-    //set value
-    for( int c( 0 ); c < aSize; ++c )
-      {
-	const VariableVector::size_type anIndex( theIndexVector[ c ] );
-	VariablePtr const aVariable( theVariableVector[ anIndex ] );
+  //set value
+  for( int c( 0 ); c < aSize; ++c )
+    {
+      const VariableVector::size_type anIndex( theIndexVector[ c ] );
+      VariablePtr const aVariable( theVariableVector[ anIndex ] );
 	
-	const Real aVelocity( ( exp( (theESSYNSMatrix[c])[0] ) - ( aVariable->getValue() ) ) / aStepInterval );
+      const Real aVelocity( ( exp( (theESSYNSMatrix[c])[0] ) - ( aVariable->getValue() ) ) / aStepInterval );
 		     
-	theVelocityBuffer[ anIndex ] = aVelocity;
-	aVariable->setVelocity( aVelocity );
+      theVelocityBuffer[ anIndex ] = aVelocity;
+      aVariable->setVelocity( aVelocity );
 
-	theK1[ anIndex ] = aVelocity;
-      }
+      theK1[ anIndex ] = aVelocity;
+    }
 
-    return true;
-  }
+  return true;
+}
  
- 
-}//namespace libecs 

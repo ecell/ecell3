@@ -34,61 +34,57 @@
 
 LIBECS_DM_INIT( FixedODE1Stepper, Stepper );
 
-namespace libecs
+FixedODE1Stepper::FixedODE1Stepper()
 {
-
-  FixedODE1Stepper::FixedODE1Stepper()
-  {
-    ; // do nothing
-  }
-	    
-  FixedODE1Stepper::~FixedODE1Stepper()
-  {
-    ; // do nothing
-  }
-
-  void FixedODE1Stepper::step()
-  {
-    const VariableVector::size_type aSize( getReadOnlyVariableOffset() );
-
-    clearVariables();
-
-    setStepInterval( getNextStepInterval() );
-
-    fireProcesses();
-
-    for( VariableVector::size_type c( 0 ); c < aSize; ++c )
-      {
-	VariablePtr const aVariable( theVariableVector[ c ] );
-
-	theVelocityBuffer[ c ] = aVariable->getVelocity();
-      }
-
-    /**
-       avoid negative value
-
-    FOR_ALL( VariableVector, theVariableVector )
-      {
-	while ( (*i)->checkRange( getStepInterval() ) == false )
-	  {
-	    //FIXME:
-	    setStepInterval( getStepInterval() * 0.5 );
-	  }
-      }
-    */
-
-    /**
-    if ( getStepInterval() < getTolerableStepInterval() )
-      {
-  	setNextStepInterval( getStepInterval() * 2.0 );
-      }
-    else 
-      {
-	setNextStepInterval( getStepInterval() );
-      }
-    */
-
-    setNextStepInterval( getTolerableStepInterval() );
-  }
-
+  ; // do nothing
 }
+	    
+FixedODE1Stepper::~FixedODE1Stepper()
+{
+  ; // do nothing
+}
+
+void FixedODE1Stepper::step()
+{
+  const VariableVector::size_type aSize( getReadOnlyVariableOffset() );
+
+  clearVariables();
+
+  setStepInterval( getNextStepInterval() );
+
+  fireProcesses();
+
+  for( VariableVector::size_type c( 0 ); c < aSize; ++c )
+    {
+      VariablePtr const aVariable( theVariableVector[ c ] );
+
+      theVelocityBuffer[ c ] = aVariable->getVelocity();
+    }
+
+  /**
+     avoid negative value
+
+     FOR_ALL( VariableVector, theVariableVector )
+     {
+     while ( (*i)->checkRange( getStepInterval() ) == false )
+     {
+     //FIXME:
+     setStepInterval( getStepInterval() * 0.5 );
+     }
+     }
+  */
+
+  /**
+     if ( getStepInterval() < getTolerableStepInterval() )
+     {
+     setNextStepInterval( getStepInterval() * 2.0 );
+     }
+     else 
+     {
+     setNextStepInterval( getStepInterval() );
+     }
+  */
+
+  setNextStepInterval( getTolerableStepInterval() );
+}
+
