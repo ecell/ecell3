@@ -45,9 +45,12 @@
  *::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
  *	$Id$
  :	$Log$
+ :	Revision 1.2  2003/03/01 02:43:51  shafi
+ :	changed envvar name: ECSTMPDIR to VVECTORTMPDIR, changed default vvector dir: /var/tmp to /tmp
+ :
  :	Revision 1.1  2002/04/30 11:21:53  shafi
  :	gabor's vvector logger patch + modifications by shafi
- :
+ :	
  :	Revision 1.8  2001/10/21 15:27:49  ishikawa
  :	Warn and exit if temprary directory not exist.
  :	
@@ -129,7 +132,7 @@ static void checkDiskFull(char const * const path, int mustCheck)
 vvectorbase::vvectorbase()
 {
   if (_defaultDirectory == NULL) {
-    char const *envVal = getenv("ECSTMPDIR");
+    char const *envVal = getenv("VVECTORTMPDIR");
     if (envVal != NULL) {
       _defaultDirectory = strdup(envVal);
       _directoryPriority = 3;
@@ -137,7 +140,7 @@ vvectorbase::vvectorbase()
 #ifdef	_Windows
       _defaultDirectory = strdup("c:/temp");
 #else
-      _defaultDirectory = strdup("/var/tmp");
+      _defaultDirectory = strdup("/tmp");
 #endif	/* _Windows */
       _directoryPriority = 4;
     }
