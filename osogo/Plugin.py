@@ -1,4 +1,40 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
+
+#::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+#
+#        This file is part of E-CELL Session Monitor package
+#
+#                Copyright (C) 1996-2002 Keio University
+#
+#::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+#
+#
+# E-CELL is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public
+# License as published by the Free Software Foundation; either
+# version 2 of the License, or (at your option) any later version.
+#
+# E-CELL is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+# See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public
+# License along with E-CELL -- see the file COPYING.
+# If not, write to the Free Software Foundation, Inc.,
+# 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+#
+#END_HEADER
+#
+#'Design: Kenta Hashimoto <kem@e-cell.org>',
+#'Design and application Framework: Kouichi Takahashi <shafi@e-cell.org>',
+#'Programming: Yuki Fujita',
+#             'Yoshiya Matsubara',
+# 'Yuusuke Saito'
+#
+# modified by Masahiro Sugimoto <sugi@bioinformatics.org> at
+# E-CELL Project, Lab. for Bioinformatics, Keio University.
+#
 
 import sys
 import os
@@ -7,107 +43,257 @@ import glob
 from ecell.ECS import *
 from config import *
 
+
+# ---------------------------------------------------------------
+# PluginModule 
+#   - creates an instance of plugin module
+# ---------------------------------------------------------------
 class PluginModule:
 
-    def __init__( self, name, path=PLUGIN_PATH ):
+
+	# ---------------------------------------------------------------
+	# Constructor
+	#   - loads module file
+	#
+	# aModuleName : module name
+	# aModulePath : module path
+	# return -> None
+	# This method is throwable exception.
+	# ---------------------------------------------------------------
+	def __init__( self, aModuleName, aModulePath=PLUGIN_PATH ):
 	
-        self.theName = name
+		self.theName = aModuleName
 
-        aFp, aPath, self.theDescription\
-             = imp.find_module( self.theName, PLUGIN_PATH )
+		aFp, aPath, self.theDescription\
+			= imp.find_module( self.theName, PLUGIN_PATH )
+			#= imp.find_module( self.theName, aModulePath )
 
-        self.theDirectoryName = os.path.dirname( aPath )
+		self.theDirectoryName = os.path.dirname( aPath )
 
-        try:
-            self.theModule = imp.load_module( self.theName, aFp, aPath, self.theDescription )
-        finally:
-            # close fp even in exception
-            if aFp:
-                aFp.close()
+		try:
+			self.theModule = imp.load_module( self.theName, aFp, aPath, self.theDescription )
+		finally:
+			# close fp even in exception
+			if aFp:
+				aFp.close()
+
+	# end of __init__
 
 
-    def createInstance( self, data, pluginmanager, root=None, parent=None ):
+	# ---------------------------------------------------------------
+	# createInstance
+	# Creates instance of module
+	#
+	# aData          : module name
+	# aPluginManager : plugin namager
+	# aRoot          : None or 'menu'
+	# aParent        : parent window
+	# return -> the result of apply function
+	# This method is throwable exception.
+	# ---------------------------------------------------------------
+	def createInstance( self, aData, aPluginManager, aRoot=None, aParent=None ):
 
-        aConstructor = self.theModule.__dict__[self.theName]
-        anArgumentTuple = ( self.theDirectoryName,  data, pluginmanager, root )
-        return apply( aConstructor, anArgumentTuple )
+		aConstructor = self.theModule.__dict__[self.theName]
+		anArgumentTuple = ( self.theDirectoryName,  aData, aPluginManager, aRoot )
+		return apply( aConstructor, anArgumentTuple )
 	
+	# end of createInstance
 
 
+# end of PluginModule
+
+# ---------------------------------------------------------------
+# PluginManager 
+#   - manages all plugin modules
+# ---------------------------------------------------------------
 class PluginManager:
 
-    def __init__( self, session, loggerwindow, interfacewindow ):
 
-        self.thePluginMap = {}
-        self.theInstanceList = []
-        self.theSession = session
-        self.theLoggerWindow = loggerwindow
-	self.theInterfaceWindow = interfacewindow
+	#def __init__( self, session, loggerwindow, interfacewindow ):
+	# ---------------------------------------------------------------
+	# Constructor
+	#  - initializes pluginmap and instancelist
+	#
+	# ---------------------------------------------------------------
+	def __init__( self ):
+
+		self.thePluginMap = {}
+		self.theInstanceList = []
+		#self.theSession = session
+		#self.theLoggerWindow = loggerwindow
+		#self.theInterfaceWindow = interfacewindow
+
+	# end of __init__
         
-    def createInstance( self, classname, data, root=None, parent=None ):
+
+	# ---------------------------------------------------------------
+	# Creates instance of module
+	#
+	# aClassName     : class name
+	# aData          : data 
+	# aRoot          : None or 'menu' or 'top_vbox'
+	# aParent        : parent window
+	# return -> one instance
+	# This method is throwable exception.
+	# ---------------------------------------------------------------
+	def createInstance( self, classname, data, root=None, parent=None ):
 	
-        try:
-            aPlugin = self.thePluginMap[ classname ]
+		try:
+			aPlugin = self.thePluginMap[ classname ]
 	    
-        except KeyError:
-            self.loadModule( classname )
+		except KeyError:
+			self.loadModule( classname )
 
-        if root !='top_vbox':
-#            self.theSession.theSimulator.record( 'aPluginManager.createInstance( \'%s\', %s )' % (classname, data) )
-	    self.theInterfaceWindow.addNewRecord( classname, data )
+		#if root !='top_vbox':
+		#self.theInterfaceWindow.addNewRecord( classname, data )
 	
-        anInstance = aPlugin.createInstance( data, self, root, parent )
-        self.theSession.theSimulator.initialize()
-        return anInstance
+		anInstance = aPlugin.createInstance( data, self, root, parent )
+		#self.theSession.theSimulator.initialize()
+		return anInstance
+
+	# end of createInstance
 
 
-    def loadModule( self, classname ):
+	# ---------------------------------------------------------------
+	# loadModule
+	#   - loads a module
+	#
+	# aClassName     : class name
+	# return -> None 
+	# ---------------------------------------------------------------
+	def loadModule( self, aClassname ):
+
+		aPlugin = PluginModule( aClassname )
+		self.thePluginMap[ aClassname ] = aPlugin
+
+	# end of loadModule
+
+
+	# ---------------------------------------------------------------
+	# loadAll
+	#   - loads all modules
+	#
+	# return -> None 
+	# ---------------------------------------------------------------
+	def loadAll( self ):
 	
-        aPlugin = PluginModule( classname )
-        self.thePluginMap[ classname ] = aPlugin
+		for aPath in PLUGIN_PATH:
+			aFileList = glob.glob( os.path.join( aPath, '*.glade' ) )
+			for aFile in aFileList:
+				aModulePath = os.path.splitext( aFile )[0]
+				if( os.path.isfile( aModulePath + '.py' ) ):
+					aModuleName = os.path.basename( aModulePath )
+					self.loadModule( aModuleName )
+					#self.theInterfaceWindow.thePluginWindowsNoDict[ aModuleName[ : -6 ] ] = 0
 
-    def loadAll( self ):
+
+	# ---------------------------------------------------------------
+	# updateAllPluginWindow
+	#   - updates all plugin window
+	#
+	# return -> None 
+	# ---------------------------------------------------------------
+	def updateAllPluginWindow( self ):
 	
-        for aPath in PLUGIN_PATH:
-            aFileList = glob.glob( os.path.join( aPath, '*.glade' ) )
-            for aFile in aFileList:
-                aModulePath = os.path.splitext( aFile )[0]
-                if( os.path.isfile( aModulePath + '.py' ) ):
-                    aModuleName = os.path.basename( aModulePath )
-                    self.loadModule( aModuleName )
-                    self.theInterfaceWindow.thePluginWindowsNoDict[ aModuleName[ : -6 ] ] = 0
+		for anInstance in self.theInstanceList:
+			anInstance.update()
 
-    def updateAllPluginWindow( self ):
-	
-        for anInstance in self.theInstanceList:
-            anInstance.update()
+	# end of updateAllPluginWindow
 
-    def appendInstance( self, instance ):
+
+	# ---------------------------------------------------------------
+	# appendInstance
+	#   - appends an instance to instance list
+	#
+	# aInstance     : an instance
+	# return -> None 
+	# ---------------------------------------------------------------
+	def appendInstance( self, instance ):
+
+		self.theInstanceList.append( instance )
+
+	# end of appendInstance
+
+
+	# ---------------------------------------------------------------
+	# removeInstance
+	#   - removes an instance from instance list
+	#
+	# anInstance     : an instance
+	# return -> None 
+	# This method is throwable exception. (ValueError)
+	# ---------------------------------------------------------------
+	def removeInstance( self, anInstance ):
         
-        self.theInstanceList.append( instance )
-	
-    def removeInstance( self, instance ):
-        
-        self.theInstanceList.remove( instance )
+		self.theInstanceList.remove( anInstance )
 
-    def updateLoggerWindow( self ):
-        
-        self.theLoggerWindow.update()
-	
-    def showPlugin( self, num, obj ):
+	# end of removeInstance
 
-        anInstance = self.theInstanceList[ num + 1 ]
-	anInstance.getWidget( anInstance.__class__.__name__ ).hide()	
-	anInstance.getWidget( anInstance.__class__.__name__ ).show_all()
-
-    def getModule( self, aNum, aTitle ):
-        
-	self.theInstanceList[ aNum + 1 ].editTitle( aTitle )
 	
-    def deleteModule( self, num, obj ):
+	# ---------------------------------------------------------------
+	# showPlugin
+	#   - shows plugin window
+	#
+	# anIndex       : an index of module
+	# *Objects     : dammy elements of argument
+	# aInstance     : an instance
+	# return -> None 
+	# This method is throwable exception. (IndexError)
+	# ---------------------------------------------------------------
+	def showPlugin( self, anIndex, *Objects ):
+
+		anInstance = self.theInstanceList[ anIndex + 1 ]
+		anInstance.getWidget( anInstance.__class__.__name__ ).hide()	
+		anInstance.getWidget( anInstance.__class__.__name__ ).show_all()
+
+	# end of showPlugin
+
+
+	# ---------------------------------------------------------------
+	# editModuleTitle
+	#   - edits module title
+	#
+	# anIndex    : index of instance
+	# aTitle     : title of instance
+	# return -> None 
+	# This method is throwable exception. (IndexError)
+	# ---------------------------------------------------------------
+	def editModuleTitile( self, anIndex, aTitle ):
         
-	anInstance = self.theInstanceList[ num + 1 ]
-	anInstance.getWidget( anInstance.__class__.__name__ ).destroy()
+		self.theInstanceList[ anIndex + 1 ].editTitle( aTitle )
+	
+	# end of getModule
+
+
+	# ---------------------------------------------------------------
+	# deleteModule
+	#   - deletes a module
+	#
+	# anIndex     : index of instance
+	# *Object     : dammy elements of argument
+	# return -> None 
+	# This method is throwable exception. (IndexError)
+	# ---------------------------------------------------------------
+	def deleteModule( self, anIndex, *Objects ):
+
+		#anInstance = self.theInstanceList[ num + 1 ]
+		anInstance = self.theInstanceList[ anIndex + 1 ]
+		anInstance.getWidget( anInstance.__class__.__name__ ).destroy()
+
+	# end of deleteModule
+
+
+# end of PluginManager
         
 if __name__ == "__main__":
     pass
+
+
+
+
+
+
+
+
+
+
