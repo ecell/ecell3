@@ -33,6 +33,10 @@ ecell/pyecell--> Python E-Cell library
 
 osogo/       --> GUI session monitor (gecell)
 
+modeleditor/ --> GUI model editor (ecell3-modeleditor)
+
+toollauncher/--> GUI tool launcher 
+
 dmtool/      --> C++ class library for dynamic loading of object classes
 
 doc/         --> Documentations 

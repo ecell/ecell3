@@ -39,37 +39,29 @@ NOTE: If you get this package via cvs, use ./autogen.sh instead of
 
   == Operating Systems ==
 
-  Starting from version 3.1.2, the primary target of ecell3 
-  is RedHat Linux 9.
+  Starting from version 3.1.100, the primary target of ecell3 
+  is Fedora Core 1.
 
-  We've tested with RedHat Linux 9 on i386 platform.
+  We've tested with Fedora Core 1 on i386 platform.
 
 
   == Compilers ==
 
-  We've tested with gcc-3.2.
+  We've tested with gcc-3.3.2.
 
 
-  == Note for RedHat 9 users ==
+  == Note for Fedora Core 1 users ==
 
-  If you are using RedHat Linux 9, you need some additional packages to 
+  If you are using Fedora Core 1, you need some additional packages to 
   successfully build and run E-Cell 3.
 
-  1. Numeric Python for python2.  (Version 22.0 or later)
+  1. Numeric Python for python2.  (Version 23.0 or later)
        http://numpy.sf.net
 
      Get RPM files, or build it from tarball.
 
 
-  2. GNU Scientific Library.  (Version 1.1 or later)
-       http://sources.redhat.com/gsl
-
-     This is provided as optional packages of RedHat 9.
-     Find gsl-*.rpm and gsl-devel*.rpm files in the distribution 
-     or the redhat ftp mirror.
-     
-
-  3. Boost C++ Libraries.  (Version 1.29 or later)
+  2. Boost C++ Libraries.  (Version 1.31 or later)
        http://www.boost.org
 
 
@@ -106,14 +98,14 @@ NOTE: If you get this package via cvs, use ./autogen.sh instead of
    (where {PREFIX} is the prefix specified in step 1 of 'Install'. 
     The default is /usr/local.)
 
-      holly:~/test$ ecell3-session
-      ecell3-session [ for E-Cell SE Version 3, on Python Version 2.2.1 ]
-      Copyright (C) 1996-2002 Keio University.
-      Written by Kouichi Takahashi <shafi@e-cell.org>
+      [foo@bar simple]$ ecell3-session
+      ecell3-session [ E-Cell SE Version 3.1.102, on Python Version 2.2.3 ]
+      Copyright (C) 1996-2004 Keio University.
+      Send feedback to Kouichi Takahashi <shafi@e-cell.org>
       ecell3-session>>> loadModel( 'simple.eml' )
       <simple.eml, t=0>>> run( 10 )
-      <simple.eml, t=10.0023>>> (press Ctrl+d to exit)
-      holly:~/test$ 
+      <simple.eml, t=10.001>>> (press Ctrl+d to exit)
+      [foo@bar simple]$
 
 
 
