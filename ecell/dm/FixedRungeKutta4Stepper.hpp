@@ -49,7 +49,7 @@ public:
 
   LIBECS_DM_OBJECT( FixedRungeKutta4Stepper, Stepper )
     {
-      INHERIT_PROPERTIES( DiffernetialStepper );
+      INHERIT_PROPERTIES( DifferentialStepper );
     }
 
   FixedRungeKutta4Stepper( void );
