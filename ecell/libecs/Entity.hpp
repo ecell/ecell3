@@ -145,13 +145,6 @@ namespace libecs
     virtual StringLiteral getClassName() const { return "Entity"; }
 
 
-
-    //    const UVariableVectorRCPtr getClassName();
-    //    const UVariableVectorRCPtr getID();
-    //    const UVariableVectorRCPtr getFullID();
-    //    const UVariableVectorRCPtr getName();
-
-
   protected:
 
     virtual void makeSlots();

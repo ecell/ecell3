@@ -170,7 +170,8 @@ namespace libecs
 
   void Reactor::appendSubstrate( FullIDCref fullid, int coefficient )
   {
-    SystemPtr aSystem( getRootSystem()->getSystem( fullid.getSystemPath() ) );
+    SystemPtr aRootSystem( getRootSystem() );
+    SystemPtr aSystem( aRootSystem->getSystem( fullid.getSystemPath() ) );
     SubstancePtr aSubstance( aSystem->getSubstance( fullid.getID() ) );
 
     appendSubstrate( *aSubstance, coefficient );
@@ -178,15 +179,17 @@ namespace libecs
 
   void Reactor::appendProduct( FullIDCref fullid, int coefficient )
   {
-    SystemPtr aSystem( getRootSystem()->getSystem( fullid.getSystemPath() ) );
+    SystemPtr aRootSystem( getRootSystem() );
+    SystemPtr aSystem( aRootSystem->getSystem( fullid.getSystemPath() ) );
     SubstancePtr aSubstance( aSystem->getSubstance( fullid.getID() ) );
   
     appendProduct( *aSubstance, coefficient );
   }
 
-  void Reactor::appendCatalyst( FullIDCref fullid,int coefficient)
+  void Reactor::appendCatalyst( FullIDCref fullid, int coefficient)
   {
-    SystemPtr aSystem( getRootSystem()->getSystem( fullid.getSystemPath() ) );
+    SystemPtr aRootSystem( getRootSystem() );
+    SystemPtr aSystem( aRootSystem->getSystem( fullid.getSystemPath() ) );
     SubstancePtr aSubstance( aSystem->getSubstance( fullid.getID() ) );
   
     appendCatalyst( *aSubstance, coefficient );
@@ -194,7 +197,8 @@ namespace libecs
 
   void Reactor::appendEffector( FullIDCref fullid, int coefficient )
   {
-    SystemPtr aSystem( getRootSystem()->getSystem( fullid.getSystemPath() ) );
+    SystemPtr aRootSystem( getRootSystem() );
+    SystemPtr aSystem( aRootSystem->getSystem( fullid.getSystemPath() ) );
     SubstancePtr aSubstance( aSystem->getSubstance( fullid.getID() ) );
   
     appendEffector( *aSubstance, coefficient );

@@ -173,27 +173,8 @@ namespace libecs
 			 getStepperMaker().make( classname ) );
     aStepper->setOwner( this );
 
-    /* depricated -- StepperLeader does scan for masters
-    MasterStepperPtr 
-      aMasterStepper( dynamic_cast<MasterStepperPtr>( aStepper ) );
-    if( aMasterStepper != NULLPTR )
-      {
-	getRootSystem()->getStepperLeader().
-	  registerMasterStepper( aMasterStepper );
-      }
-    */
-
     theStepper = aStepper;
-    /*
-    if( theStepper == NULLPTR )
-      {
-	//FIXME: make this default user customizable
-	setStepperClass( "Euler1Stepper" );
-      }
-    */
     theStepper->initialize();
-
-
   }
 
   void System::setStepInterval( const Real aStepInterval )
@@ -213,7 +194,7 @@ namespace libecs
 
   void System::initialize()
   {
-    if(theStepper == NULLPTR )
+    if( theStepper == NULLPTR )
       {
 	setStepperClass("SlaveStepper");
       }

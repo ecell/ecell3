@@ -62,7 +62,6 @@ namespace libecs
     ~SystemPath() {}
 
     const String getString() const;
-    operator const String()  const  { return getString(); }
 
     bool isAbsolute() const
     {
@@ -183,7 +182,6 @@ namespace libecs
     bool isValid() const;
 
     const String getString() const;
-    operator const String()  const  { return getString(); }
 
     bool operator<( FullIDCref rhs ) const
     {
@@ -331,7 +329,6 @@ namespace libecs
     }
 
     const String getString() const;
-    operator const String()  const  { return getString(); }
 
     bool isValid() const;
 

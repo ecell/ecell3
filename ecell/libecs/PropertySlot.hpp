@@ -242,7 +242,8 @@ namespace libecs
     {
       if( ! isSetable() )
 	{
-	  throw AttributeError( "[" + theName + "] is not settable." );
+	  throw AttributeError( __PRETTY_FUNCTION__,
+				"[" + theName + "] is not settable." );
 	}
 
       ( theObject.*theSetUVariableVectorMethod )( message );
@@ -252,7 +253,8 @@ namespace libecs
     {
       if( ! isGetable() )
 	{
-	  throw AttributeError( "[" + theName + "] is not gettable." );
+	  throw AttributeError( __PRETTY_FUNCTION__,
+				"[" + theName + "] is not gettable." );
 	}
 
       return ( ( theObject.*theGetUVariableVectorMethod )() );
@@ -321,7 +323,8 @@ namespace libecs
     {
       if( ! isSetable() )
 	{
-	  throw AttributeError( "[" + theName + "] is not settable." );
+	  throw AttributeError( __PRETTY_FUNCTION__,
+				"[" + theName + "] is not settable." );
 	}
       
       ( theObject.*theSetRealMethod )( real );
@@ -331,7 +334,8 @@ namespace libecs
     {
       if( ! isGetable() )
 	{
-	  throw AttributeError( "[" + theName + "] is not gettable." );
+	  throw AttributeError( __PRETTY_FUNCTION__,
+				"[" + theName + "] is not gettable." );
 	}
       
       return ( ( theObject.*theGetRealMethod )() );
@@ -393,7 +397,8 @@ namespace libecs
     {
       if( ! isSetable() )
 	{
-	  throw AttributeError( "[" + theName + "] is not settable." );
+	  throw AttributeError( __PRETTY_FUNCTION__,
+				"[" + theName + "] is not settable." );
 	}
 
       ( theObject.*theSetStringMethod )( string );
@@ -403,7 +408,8 @@ namespace libecs
     {
       if( ! isGetable() )
 	{
-	  throw AttributeError( "[" + theName + "] is not gettable." );
+	  throw AttributeError( __PRETTY_FUNCTION__,
+				"[" + theName + "] is not gettable." );
 	}
 
       return ( ( theObject.*theGetStringMethod )() );
