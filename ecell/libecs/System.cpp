@@ -218,18 +218,17 @@ namespace libecs
 
   SystemPtr System::getSystem( StringCref anID ) 
   {
-    SystemMapConstIterator i( getSystemMap().find( anID ) );
-    if( i == getSystemMap().end() )
+    if( anID[0] == '.' )
       {
-	if( anID == "." )
+	const UnsignedInt anIDSize( anID.size() );
+
+	if( anIDSize == 1 ) // == "."
 	  {
 	    return this;
 	  }
-	
-	if( anID == ".." )
+	else if( anID[1] == '.' && anIDSize == 2 ) // == ".."
 	  {
-	    SystemPtr const aSuperSystem( getSuperSystem() );
-	    if( aSuperSystem == this )
+	    if( isRootSystem() )
 	      {
 		THROW_EXCEPTION( NotFound,
 				 "[" + getFullID().getString() + 
@@ -237,14 +236,19 @@ namespace libecs
 				 "') from a root system." );
 	      }
 	    
-	    return aSuperSystem;
+	    return getSuperSystem();
 	  }
+      }
 
+    SystemMapConstIterator i( getSystemMap().find( anID ) );
+    if( i == getSystemMap().end() )
+      {
 	THROW_EXCEPTION( NotFound,
 			 "[" + getFullID().getString() + 
 			 "]: System [" + anID + 
 			 "] not found in this System." );
       }
+
     return i->second;
   }
 

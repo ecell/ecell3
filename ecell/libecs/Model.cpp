@@ -170,10 +170,10 @@ namespace libecs
 	anEntity = aSystem->getVariable( aFullID.getID() );
 	break;
       case EntityType::PROCESS:
-	anEntity = aSystem->getProcess(   aFullID.getID() );
+	anEntity = aSystem->getProcess(  aFullID.getID() );
 	break;
       case EntityType::SYSTEM:
-	anEntity = aSystem->getSystem(    aFullID.getID() );
+	anEntity = aSystem->getSystem(   aFullID.getID() );
 	break;
       default:
 	THROW_EXCEPTION( InvalidEntityType,

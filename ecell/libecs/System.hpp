@@ -165,8 +165,14 @@ namespace libecs
        Find a System pointed by the given SystemPath relative to
        this System.
        
+       If aSystemPath is empty, this method returns this System.
+
+       If aSystemPath is absolute ( starts with '/' ), this method
+       calls getSystem() of the Model object, and returns the result.
+
        This method throws NotFound exception if it is not found.
 
+       @param aSystemPath A SystemPath object.
        @return a borrowed pointer to a System object pointed by aSystemPath.
     */
 
@@ -178,7 +184,14 @@ namespace libecs
        
        This method throws NotFound exception if it is not found.
 
-       @return a borrowed pointer to a System object in this System whose ID is id.
+       Unlike getSystem( SystemPath ) method, this method searches only
+       within this System.  In the other words this method doesn't 
+       conduct a recursive search.
+
+       @param anID An ID string of a System.
+
+       @return a borrowed pointer to a System object in this System
+       whose ID is anID.
     */
 
     SystemPtr getSystem( StringCref id );
@@ -213,11 +226,21 @@ namespace libecs
 
     virtual void registerSystem( SystemPtr aSystem );
 
+    /**
+       Check if this is a root System.
+
+
+       @return true if this is a Root System, false otherwise.
+    */
 
     bool isRootSystem() const
     {
       return ( getSuperSystem() == this );
     }
+
+    /**
+       @see Entity::getSystePath()
+    */
 
     virtual const SystemPath getSystemPath() const;
 
