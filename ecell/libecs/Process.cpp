@@ -170,7 +170,7 @@ namespace libecs
     const FullID aFullID( aValue[1].asString() );
     Int          aCoefficient( 0 );
     
-    SystemPtr aSystem( getModel()->getSystem( aFullID.getSystemPath() ) );
+    SystemPtr aSystem( getSuperSystem()->getSystem( aFullID.getSystemPath() ) );
     VariablePtr aVariable( aSystem->getVariable( aFullID.getID() ) );
     
     if( aVectorSize >= 3 )

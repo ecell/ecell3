@@ -30,9 +30,9 @@ System System( / )
 	
 	Process MichaelisUniUniProcess( E )
 	{
-		VariableReferenceList	[ S0 Variable:/:S -1 ]
- 					 [ P0 Variable:/:P 1 ]
-					 [ C0 Variable:/:E 0 ];
+		VariableReferenceList	[ S0 Variable:.:S -1 ]
+ 					 [ P0 Variable:.:P 1 ]
+					 [ C0 Variable:.:E 0 ];
 		KmS	1;
 		KcF	10;
 	}

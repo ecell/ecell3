@@ -125,39 +125,20 @@ namespace libecs
 
   SystemPtr Model::getSystem( SystemPathCref aSystemPath ) const
   {
-    SystemPtr aSystem( getRootSystem() );
     SystemPath aSystemPathCopy( aSystemPath );
 
-
     // 1. "" (empty) means Model itself, which is invalid for this method.
-    // 2. Not absolute is invalid.
-    // (not absolute implies not empty.)
-    if( aSystemPathCopy.isAbsolute() && ! aSystemPathCopy.empty() )
-      {
-	aSystemPathCopy.pop_front();
-      }
-    else
+    // 2. Not absolute is invalid (not absolute implies not empty).
+    if( ( ! aSystemPathCopy.isAbsolute() ) || aSystemPathCopy.empty() )
       {
 	THROW_EXCEPTION( BadSystemPath, 
 			 "[" + aSystemPath.getString() +
 			 "] is not an absolute SystemPath." );
       }
 
-    // root system
-    if( aSystemPathCopy.size() == 0 )
-      {
-	return aSystem;
-      }
+    aSystemPathCopy.pop_front();
 
-    // looping is faster than recursive search
-    while( ! aSystemPathCopy.empty() )
-      {
-	aSystem = aSystem->getSystem( aSystemPathCopy.front() );
-	aSystemPathCopy.pop_front();
-      }
-
-
-    return aSystem;  
+    return getRootSystem()->getSystem( aSystemPathCopy );
   }
 
 

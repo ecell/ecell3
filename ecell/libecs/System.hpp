@@ -134,7 +134,7 @@ namespace libecs
 
     virtual ProcessMapCref   getProcessMap() const = 0;
 
-    virtual SystemMapCref    getSystemMap() const
+    SystemMapCref    getSystemMap() const
     {
       return theSystemMap;
     }
@@ -159,17 +159,29 @@ namespace libecs
        @return a borrowed pointer to a Variable object in this System named @a id.
     */
 
-    VariablePtr getVariable( StringCref id );
+    VariablePtr getVariable( StringCref aSystemPath );
 
     /**
-       Find a System with given id in this System. 
+       Find a System pointed by the given SystemPath relative to
+       this System.
+       
+       This method throws NotFound exception if it is not found.
+
+       @return a borrowed pointer to a System object pointed by aSystemPath.
+    */
+
+    SystemPtr getSystem( SystemPathCref anID );
+
+
+    /**
+       Find a System with a given id in this System. 
        
        This method throws NotFound exception if it is not found.
 
        @return a borrowed pointer to a System object in this System whose ID is id.
     */
 
-    virtual SystemPtr getSystem( StringCref id );
+    SystemPtr getSystem( StringCref id );
 
 
     /**

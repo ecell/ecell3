@@ -195,11 +195,51 @@ namespace libecs
     notifyChangeOfEntityList();
   }
 
+  SystemPtr System::getSystem( SystemPathCref aSystemPath ) 
+  {
+    if( aSystemPath.empty() )
+      {
+	return this;
+      }
+    
+    if( aSystemPath.isAbsolute() )
+      {
+	return getModel()->getSystem( aSystemPath );
+      }
+
+    SystemPtr const aNextSystem( getSystem( aSystemPath.front() ) );
+
+    SystemPath aSystemPathCopy( aSystemPath );
+    aSystemPathCopy.pop_front();
+
+    return aNextSystem->getSystem( aSystemPathCopy );
+  }
+    
+
   SystemPtr System::getSystem( StringCref anID ) 
   {
     SystemMapConstIterator i( getSystemMap().find( anID ) );
     if( i == getSystemMap().end() )
       {
+	if( anID == "." )
+	  {
+	    return this;
+	  }
+	
+	if( anID == ".." )
+	  {
+	    SystemPtr const aSuperSystem( getSuperSystem() );
+	    if( aSuperSystem == this )
+	      {
+		THROW_EXCEPTION( NotFound,
+				 "[" + getFullID().getString() + 
+				 "]: cannot get a super system ('" + anID +
+				 "') from a root system." );
+	      }
+	    
+	    return aSuperSystem;
+	  }
+
 	THROW_EXCEPTION( NotFound,
 			 "[" + getFullID().getString() + 
 			 "]: System [" + anID + 

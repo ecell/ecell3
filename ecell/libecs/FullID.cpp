@@ -232,11 +232,14 @@ namespace libecs
 
 #ifdef TEST_FULLID
 
+#include <iostream>
+
 using namespace libecs;
+using namespace std;
 
 main()
 {
-  SystemPath aSystemPath( "   \t  /A/BB/CCC//DDDD/EEEEEE    \t \n  " );
+  SystemPath aSystemPath( "   \t  /A/BB/CCC/../DDDD/EEEEEE    \t \n  " );
   cout << aSystemPath.getString() << endl;
 
   SystemPath aSystemPath2( aSystemPath );
