@@ -45,9 +45,12 @@
  *::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
  *	$Id$
  :	$Log$
+ :	Revision 1.11  2003/09/28 06:17:23  satyanandavel
+ :	MinGW version 3 already defines ssize_t
+ :
  :	Revision 1.10  2003/09/27 13:00:58  bgabor
  :	Windows compatibility fix.
- :
+ :	
  :	Revision 1.9  2003/09/27 12:39:15  satyanandavel
  :	more compatibility issues in Windows
  :	
@@ -107,7 +110,7 @@
 #endif	/* compiler dependent part */
 
 
-#if defined(__BORLANDC__) || defined(__WINDOWS__) || defined(__MINGW32__)
+#if defined(__BORLANDC__)
 typedef int ssize_t;
 #endif /* __BORLANDC__ */
 
