@@ -36,7 +36,7 @@ Reactor.cpp\
 StepperMaker.cpp\
 SystemMaker.cpp\
 DataPoint.cpp\
-StlDataPointVector.cpp\
+DataPointStlVector.cpp\
 Logger.cpp\
 LoggerBroker.cpp
 
@@ -64,7 +64,7 @@ Reactor.hpp\
 StepperMaker.hpp\
 SystemMaker.hpp\
 DataPoint.hpp\
-StlDataPointVector.hpp\
+DataPointStlVector.hpp\
 Logger.hpp\
 LoggerBroker.hpp\
 Exceptions.hpp\
