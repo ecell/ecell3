@@ -579,6 +579,7 @@ namespace libecs
 	  NEGATIVE,
 	  EXPONENT,
 	  FACTOR,
+	  POWER,
 	  TERM,
 	  EXPRESSION,
 	  VARIABLE,
@@ -679,10 +680,12 @@ namespace libecs
 	    |   identifier
 	    |   negative;
 	
-	  term        =  factor >>
-	    *( ( rootNode( ch_p('*') ) >> factor )
-	       |  ( rootNode( ch_p('/') ) >> factor )
-	       |  ( rootNode( ch_p('^') ) >> factor ) );
+	  power = factor >> *( rootNode( ch_p('^') ) >> factor );
+
+	  term        =  power >>
+	    *( ( rootNode( ch_p('*') ) >> power )
+	       |  ( rootNode( ch_p('/') ) >> power )
+	       |  ( rootNode( ch_p('^') ) >> power ) );
 	
 
 	  expression  =  term >>
@@ -694,6 +697,7 @@ namespace libecs
 	rule<ScannerT, parser_context, parser_tag<CALL_FUNC1> >   call_func;
 	rule<ScannerT, parser_context, parser_tag<EXPRESSION> >   expression;
 	rule<ScannerT, parser_context, parser_tag<TERM> >         term;
+	rule<ScannerT, parser_context, parser_tag<POWER> >        power;
 	rule<ScannerT, parser_context, parser_tag<FACTOR> >       factor;
 	rule<ScannerT, parser_context, parser_tag<FLOATING> >     floating;
 	rule<ScannerT, parser_context, parser_tag<EXPONENT> >     exponent;
@@ -745,29 +749,19 @@ namespace libecs
 	return theExpression;
       }
 
-    void defaultSetProperty( StringCref aPropertyName,
+    virtual void defaultSetProperty( StringCref aPropertyName,
 			     PolymorphCref aValue)
       {
-	if( getClassName() == "ExpressionFluxProcess" || 
-	    getClassName() == "ExpressionAlgebraicProcess" )
+	thePropertyMap[ aPropertyName ] = aValue.asReal();
+	
+	for( InstructionVectorConstIterator i( theCompiledCode.begin() );
+	     i != theCompiledCode.end(); ++i )
 	  {
-	    thePropertyMap[ aPropertyName ] = aValue.asReal();
-	    
-	    for( InstructionVectorConstIterator i( theCompiledCode.begin() );
-		 i != theCompiledCode.end(); ++i )
-	      {
-		(*i)->initialize();
-	      }
-	    //	    ( static_cast<PropertiedClass*>( this ) )
-	    //->setProperty( aPropertyName, aValue );
+	    (*i)->initialize();
 	  }
-	else
-	  THROW_EXCEPTION( NoSlot,
-			   getClassName() +
-			   String( ": No Property slot [" ) + aPropertyName +
-			   "] found.  Set property failed." );
       } 
     
+
     virtual void initialize()
       {
 	Compiler theCompiler;
@@ -1307,6 +1301,67 @@ namespace libecs
 
     
 	/**
+	   Power Grammar compile
+	*/
+
+      case CompileGrammar::POWER :
+
+	assert(i->children.size() == 2);
+
+	if( ( i->children.begin()->value.id() == CompileGrammar::INTEGER ||
+	      i->children.begin()->value.id() == CompileGrammar::FLOATING ) && 
+	    ( ( i->children.begin()+1 )->value.id() == CompileGrammar::INTEGER
+	      ||
+	      ( i->children.begin()+1 )->value.id() == CompileGrammar::FLOATING
+	      ) )
+	  {
+	    for( container_iterator = i->children.begin()->value.begin();
+		 container_iterator != i->children.begin()->value.end();
+		 ++container_iterator )
+	      {
+		str_child1 += *container_iterator;
+	      }
+
+	    for( container_iterator = ( i->children.begin()+1 )->value.begin();
+		 container_iterator != ( i->children.begin()+1 )->value.end();
+		 ++container_iterator )
+	      {
+		str_child2 += *container_iterator;
+	      }
+
+	    n1 = stringTo<Real>( str_child1.c_str() );
+	    n2 = stringTo<Real>( str_child2.c_str() );	  
+
+	    ++theStackSize;
+
+	    if( *i->value.begin() == '^' )
+	      {
+		theCode.push_back( new PUSH( pow( n1, n2 ) ) ); 
+	      }
+	    else
+	      THROW_EXCEPTION( NoSlot, String( " unexpected error " ) );
+
+	    return;
+	  }
+	else
+	  {
+	    compileTree( i->children.begin(), theCode );
+	    compileTree( i->children.begin()+1, theCode );
+	    
+	    if( *i->value.begin() == '^' )
+	      {
+		theCode.push_back( new POW() );
+	      }
+	    else
+	      THROW_EXCEPTION( NoSlot, String( " unexpected error " ) );
+
+	    return;
+	  }
+
+	return;
+      
+
+	/**
 	   Term Grammar compile
 	*/
 
@@ -1348,14 +1403,6 @@ namespace libecs
 	      {
 		theCode.push_back( new PUSH( n1 / n2 ) ); 
 	      }
-	    else if (*i->value.begin() == '^')
-	      {
-		theCode.push_back( new PUSH( pow( n1, n2 ) ) ); 
-	      }
-	    else if (*i->value.begin() == 'e' || 'E')
-	      {
-		theCode.push_back( new PUSH( n1 * pow( 10, n2 ) ) );
-	      }
 	    else
 	      THROW_EXCEPTION( NoSlot, String( "Fatal: Unexpected error." ) );
 
@@ -1374,10 +1421,6 @@ namespace libecs
 	    else if (*i->value.begin() == '/')
 	      {
 		theCode.push_back( new DIV() );
-	      }
-	    else if (*i->value.begin() == '^')
-	      {
-		theCode.push_back( new POW() );
 	      }
 	    else
 	      THROW_EXCEPTION( NoSlot, String( "Fatal: Unexpected error." ) );
