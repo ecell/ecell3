@@ -77,19 +77,19 @@ namespace libecs
   void Reactor::setAppendProduct( MessageCref message )
   {
     //FIXME: range check
-    appendSubstrate( message[0].asString(), message[1].asInt() );
+    appendProduct( message[0].asString(), message[1].asInt() );
   }
 
   void Reactor::setAppendCatalyst( MessageCref message )
   {
     //FIXME: range check
-    appendSubstrate( message[0].asString(), message[1].asInt() );
+    appendCatalyst( message[0].asString(), message[1].asInt() );
   }
 
   void Reactor::setAppendEffector( MessageCref message )
   {
     //FIXME: range check
-    appendSubstrate( message[0].asString(), message[1].asInt() );
+    appendEffector( message[0].asString(), message[1].asInt() );
   }
 
   void Reactor::setSubstrateList( MessageCref message )
@@ -176,32 +176,36 @@ namespace libecs
 
   void Reactor::appendSubstrate( FQIDCref fqid, int coefficient )
   {
-    SubstancePtr aSubstance( getSuperSystem()->getRootSystem()->
-			     getSubstance( fqid ) );
+    SystemPtr aSystem = getSuperSystem()->getRootSystem()->
+      getSystem( SystemPath( fqid ) );
+    SubstancePtr aSubstance( aSystem->getSubstance( fqid.getIdString() ) );
 
     appendSubstrate( *aSubstance, coefficient );
   }
 
   void Reactor::appendProduct( FQIDCref fqid, int coefficient )
   {
-    SubstancePtr aSubstance( getSuperSystem()->getRootSystem()->
-			     getSubstance( fqid ) );
+    SystemPtr aSystem = getSuperSystem()->getRootSystem()->
+      getSystem( SystemPath( fqid ) );
+    SubstancePtr aSubstance( aSystem->getSubstance( fqid.getIdString() ) );
   
     appendProduct( *aSubstance, coefficient );
   }
 
   void Reactor::appendCatalyst( FQIDCref fqid,int coefficient)
   {
-    SubstancePtr aSubstance( getSuperSystem()->getRootSystem()->
-			     getSubstance( fqid ) );
+    SystemPtr aSystem = getSuperSystem()->getRootSystem()->
+      getSystem( SystemPath( fqid ) );
+    SubstancePtr aSubstance( aSystem->getSubstance( fqid.getIdString() ) );
   
     appendCatalyst( *aSubstance, coefficient );
   }
 
   void Reactor::appendEffector( FQIDCref fqid, int coefficient )
   {
-    SubstancePtr aSubstance( getSuperSystem()->getRootSystem()->
-			     getSubstance( fqid ) );
+    SystemPtr aSystem = getSuperSystem()->getRootSystem()->
+      getSystem( SystemPath( fqid ) );
+    SubstancePtr aSubstance( aSystem->getSubstance( fqid.getIdString() ) );
   
     appendEffector( *aSubstance, coefficient );
   }
@@ -209,7 +213,8 @@ namespace libecs
   void Reactor::setInitialActivity( Real activity )
   {
     theInitialActivity = activity;
-    theActivity= activity * 
+
+    theActivity= theInitialActivity * 
       getSuperSystem()->getStepper()->getDeltaT();
   }
 
@@ -223,6 +228,32 @@ namespace libecs
     makeSlots();
   }
 
+  Reactor::~Reactor()
+  {
+    // delete all Reactants
+    for( ReactantVectorConstIterator i = theSubstrateList.begin() ;
+	 i != theSubstrateList.end() ; ++i )
+      {
+	delete *i;
+      }
+    for( ReactantVectorConstIterator i = theProductList.begin() ;
+	 i != theProductList.end() ; ++i )
+      {
+	delete *i;
+      }
+    for( ReactantVectorConstIterator i = theCatalystList.begin() ;
+	 i != theCatalystList.end() ; ++i )
+      {
+	delete *i;
+      }
+    for( ReactantVectorConstIterator i = theEffectorList.begin() ;
+	 i != theEffectorList.end() ; ++i )
+      {
+	delete *i;
+      }
+  }
+
+
   const String Reactor::getFqpi() const
   {
     return PrimitiveTypeStringOf( *this ) + ":" + getFqid();
@@ -231,25 +262,25 @@ namespace libecs
   void Reactor::appendSubstrate( SubstanceRef substrate, int coefficient )
   {
     ReactantPtr reactant = new Reactant( substrate, coefficient );
-    theSubstrateList.insert( theSubstrateList.end(), reactant );
+    theSubstrateList.push_back( reactant );
   }
 
   void Reactor::appendProduct( SubstanceRef product, int coefficient )
   {
     ReactantPtr reactant = new Reactant( product, coefficient );
-    theProductList.insert( theProductList.end(), reactant );
+    theProductList.push_back( reactant );
   }
 
   void Reactor::appendCatalyst( SubstanceRef catalyst, int coefficient )
   {
     ReactantPtr reactant = new Reactant( catalyst, coefficient );
-    theCatalystList.insert( theCatalystList.end(), reactant );
+    theCatalystList.push_back( reactant );
   }
 
   void Reactor::appendEffector( SubstanceRef effector, int coefficient )
   {
     ReactantPtr reactant = new Reactant( effector, coefficient );
-    theEffectorList.insert( theEffectorList.end(), reactant );
+    theEffectorList.push_back( reactant );
   }
 
   Reactor::Condition Reactor::condition( Condition condition )

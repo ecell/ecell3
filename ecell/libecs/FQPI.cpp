@@ -109,6 +109,14 @@ namespace libecs
     standardize();
   }
 
+  FQID::FQID( FQIDCref fqid ) 
+    : 
+    SystemPath( SystemPath( fqid ) ),
+    theId( fqid.getIdString() )
+  {
+    standardize();
+  }
+
   const String FQID::IdOf( StringCref fqid )
   {
     String::size_type aBorder = fqid.find( ':' );

@@ -73,12 +73,8 @@ namespace libecs
 
   void MasterStepper::initialize()
   {
-    // FIXME: is this multiple-time-initialization-proof?
-
+    // FIXME: is this multiple-time-initialization-proof? 
     Stepper::initialize();
-
-    getOwner()->getRootSystem()->
-      getStepperLeader().appendMasterStepper( this );
 
     registerSlaves( theOwner );
 
@@ -185,7 +181,7 @@ namespace libecs
     ; // do nothing
   }
 
-  void StepperLeader::appendMasterStepper( MasterStepperPtr newone )
+  void StepperLeader::registerMasterStepper( MasterStepperPtr newone )
   {
     theMasterStepperVector.push_back( newone );
   }

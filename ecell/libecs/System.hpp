@@ -312,18 +312,25 @@ namespace libecs
     */
     virtual SystemPtr getSystem( SystemPathCref systempath ) ;
 
+    Real getActivityPerSecond();
 
-  public: // message interfaces
+    Real getDeltaT() const;
 
-    void setStepperClass( MessageCref message );
+
+  public: // message slots
+
+    void setStepper( MessageCref message );
     void setVolumeIndex( MessageCref message );
 
-    const Message getStepperClass( StringCref keyword );
+    const Message getStepper( StringCref keyword );
     const Message getVolumeIndex( StringCref keyword );
 
     const Message getSystemList( StringCref keyword );
     const Message getSubstanceList( StringCref keyword );
     const Message getReactorList( StringCref keyword );
+
+    const Message getVolume( StringCref keyword );
+    const Message getDeltaT( StringCref keyword );
 
   protected:
 
@@ -331,7 +338,6 @@ namespace libecs
 
   protected:
 
-    FQIDPtr    theVolumeIndexName;
     ReactorPtr theVolumeIndex;
     StepperPtr theStepper;
 

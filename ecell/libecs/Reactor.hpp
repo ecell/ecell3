@@ -169,7 +169,7 @@ namespace libecs
   public:
 
     Reactor();
-    virtual ~Reactor() { }	
+    virtual ~Reactor();
 
     const String getFqpi() const;
 

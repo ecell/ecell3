@@ -55,10 +55,16 @@ namespace libecs
     MessageSlot( "ReactorList", System, *this,
 		 NULLPTR, &System::getReactorList );
 
-    MessageSlot( "StepperClass", System, *this,
-		 &System::setStepperClass, &System::getStepperClass );
+    MessageSlot( "Stepper", System, *this,
+		 &System::setStepper, &System::getStepper );
     MessageSlot( "VolumeIndex", System, *this,
 		 &System::setVolumeIndex, &System::getVolumeIndex );
+
+    MessageSlot( "Volume", System, *this,
+		 NULLPTR, &System::getVolume );
+
+    MessageSlot( "DeltaT", System, *this,
+		 NULLPTR, &System::getDeltaT );
   }
 
 
@@ -104,13 +110,13 @@ namespace libecs
   }
 
 
-  void System::setStepperClass( const Message& message )
+  void System::setStepper( const Message& message )
   {
     //FIXME: range check
     setStepper( message[0].asString() );
   }
 
-  const Message System::getStepperClass( StringCref keyword )
+  const Message System::getStepper( StringCref keyword )
   {
     return Message( keyword, 
 		    UniversalVariable( getStepper()->className() ) );
@@ -133,12 +139,23 @@ namespace libecs
 		    UniversalVariable( getVolumeIndex()->getFqid() ) );
   }
 
+  const Message System::getVolume( StringCref keyword )
+  {
+    return Message( keyword, 
+		    UniversalVariable( getVolume() ) ) ;
+  }
+
+  const Message System::getDeltaT( StringCref keyword )
+  {
+    return Message( keyword, 
+		    UniversalVariable( getDeltaT() ) ) ;
+  }
+
 
 
 
   System::System()
     :
-    theVolumeIndexName( NULLPTR ),
     theVolumeIndex( NULLPTR ),
     theStepper( NULLPTR ),
     theRootSystem( NULLPTR )
@@ -150,7 +167,6 @@ namespace libecs
   System::~System()
   {
     delete theStepper;
-    delete theVolumeIndexName;
   }
 
   void System::setSuperSystem( SystemPtr const supersystem )
@@ -170,6 +186,14 @@ namespace libecs
     aStepper = getRootSystem()->getStepperMaker().make( classname );
     aStepper->setOwner( this );
 
+    MasterStepperPtr aMasterStepper( NULLPTR );
+    if( ( aMasterStepper = dynamic_cast<MasterStepperPtr>(aStepper) ) 
+	!= NULLPTR )
+      {
+	getRootSystem()->getStepperLeader().
+	  registerMasterStepper( aMasterStepper );
+      }
+
     theStepper = aStepper;
   }
 
@@ -178,9 +202,15 @@ namespace libecs
     return theVolumeIndex->getActivityPerSecond();
   }
 
+  Real System::getDeltaT() const
+  {
+    return theStepper->getDeltaT();
+  }
+
   void System::setVolumeIndex( FQIDCref volumeindex )
   {
-    theVolumeIndexName = new FQID( volumeindex );
+    SystemPtr aSystem = theRootSystem->getSystem( SystemPath( volumeindex ) );
+    theVolumeIndex = aSystem->getReactor( volumeindex.getIdString() );
   }
 
   void System::initialize()
@@ -191,20 +221,7 @@ namespace libecs
 	setStepper( "Euler1Stepper" );
       }
 
-    try{
-      if( theVolumeIndexName != NULLPTR )
-	{
-	  FQID fqid( *theVolumeIndexName );
-	  theVolumeIndex = theRootSystem->getReactor( fqid );
-	}
-    }
-    catch( NotFound )
-      {
-	//FIXME: what to do in this case?
-      }
-
-    delete theVolumeIndexName;
-    theVolumeIndexName = NULLPTR;
+    theStepper->initialize();
 
     //
     // Substance::initialize()
@@ -301,8 +318,6 @@ namespace libecs
 
   void System::registerReactor( ReactorPtr reactor )
   {
-    assert(reactor);
-
     if( containsReactor( reactor->getId() ) )
       {
 	delete reactor;
@@ -388,6 +403,10 @@ namespace libecs
     return i->second;
   }
 
+  Real System::getActivityPerSecond()
+  {
+    return getActivity() / getStepper()->getDeltaT();
+  }
 
 } // namespace libecs
 

@@ -62,7 +62,7 @@ namespace libecs
     StepperLeader();
     virtual ~StepperLeader() {}
 
-    void appendMasterStepper( MasterStepperPtr newstepper );
+    void registerMasterStepper( MasterStepperPtr newstepper );
 
     static void setDefaultUpdateDepth( int d ) { DEFAULT_UPDATE_DEPTH = d; }
     static int getDefaultUpdateDepth()         { return DEFAULT_UPDATE_DEPTH; }
@@ -126,7 +126,6 @@ namespace libecs
     virtual void initialize();
 
     virtual Real getDeltaT() = 0;
-    virtual bool isMasterStepper() const { return false; }
 
     virtual void clear() = 0;
     virtual void react() = 0;
@@ -156,7 +155,7 @@ namespace libecs
     virtual void transit();
     virtual void postern();
 
-    void setdeltaT( Real dt ) { theDeltaT = dt; }
+    void setDeltaT( Real dt ) { theDeltaT = dt; }
 
     virtual ~MasterStepper() {}
 
@@ -168,8 +167,6 @@ namespace libecs
 
     virtual void distributeIntegrator( IntegratorAllocator );
     void registerSlaves( SystemPtr );
-
-    virtual bool isMasterStepper() const { return true; }
 
     virtual const char* const className() const  { return "MasterStepper"; }
 
