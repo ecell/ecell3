@@ -76,6 +76,7 @@ class StepperWindow(OsogoWindow):
 		self.theSelectedStepperID = None  # selected stepperID (str)
 		self.theFirstPropertyIter = {}    # key:iter(TreeIter)  value:None
 		self.theSelectedPath = {}         # key:aStepperID(str)  value:Path
+		self.thePropertyMap = {}
 
 
 	# ==========================================================================
@@ -177,10 +178,12 @@ class StepperWindow(OsogoWindow):
 		if self.theSelectedStepperID != None and aStepperID == self.theSelectedStepperID:
 			return None
 		self.theSelectedStepperID = aStepperID
-
+		self.thePropertyMap = {}
 		# aStepperStub is selected StepperStub of selected stepper
 		aStepperStub = StepperStub( self.theSession.theSimulator, aStepperID )
 
+
+		
 		# updates property list
 		aPropertyModel=self['property_list'].get_model()
 		aPropertyModel.clear()
@@ -191,6 +194,7 @@ class StepperWindow(OsogoWindow):
 		# value
 		aClassName = aStepperStub.getClassname( )
 		aList.append( str(aClassName) )
+		self.thePropertyMap[ 'ClassName'] = str( aClassName )
 
 		# gettable and settable
 		aList.append( decodeAttribute( TRUE ) )   # gettable is '+'
@@ -216,8 +220,10 @@ class StepperWindow(OsogoWindow):
 			# value
 			if anAttribute[GETABLE] == 0:
 				continue
+			aValue = aStepperStub.getProperty( aProperty )
+			self.thePropertyMap[ aProperty ] = aValue
 
-			aValueString = str( aStepperStub.getProperty( aProperty ) )
+			aValueString = str( aValue )
 			# second element
 			aList.append( shortenString( aValueString,\
 						     MAX_STRING_NUMBER) )  
@@ -492,11 +498,12 @@ class StepperWindow(OsogoWindow):
 			if iter == None:
 				break
 			aProperty = self['property_list'].get_model().get_value(iter,0)
-			if aStepperStub.getPropertyAttributes( aProperty )[GETABLE]:
-				aValue = str( aStepperStub.getProperty( aProperty ) )
-			else:
-				aValue = ''
-			self['property_list'].get_model().set_value(iter,1,aValue)
+			if type ( self.thePropertyMap[ aProperty ] ) != type( () ):
+				if aStepperStub.getPropertyAttributes( aProperty )[GETABLE]:
+					aValue = str( aStepperStub.getProperty( aProperty ) )
+				else:
+					aValue = ''
+				self['property_list'].get_model().set_value(iter,1,aValue)
 
 		# updates text
 		self.__selectProperty()
