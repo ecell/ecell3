@@ -20,7 +20,7 @@
   <position>GTK_WIN_POS_NONE</position>
   <modal>False</modal>
   <allow_shrink>False</allow_shrink>
-  <allow_grow>False</allow_grow>
+  <allow_grow>True</allow_grow>
   <auto_shrink>False</auto_shrink>
 
   <widget>
@@ -416,7 +416,7 @@
 	      <name>hbox12</name>
 	      <border_width>2</border_width>
 	      <homogeneous>False</homogeneous>
-	      <spacing>2</spacing>
+	      <spacing>0</spacing>
 
 	      <widget>
 		<class>GtkToolbar</class>
@@ -438,6 +438,8 @@
 		  <class>GtkButton</class>
 		  <child_name>Toolbar:button</child_name>
 		  <name>button71</name>
+		  <width>31</width>
+		  <height>42</height>
 		  <label>Start</label>
 		  <stock_pixmap>GNOME_STOCK_PIXMAP_FORWARD</stock_pixmap>
 		</widget>
@@ -446,16 +448,90 @@
 		  <class>GtkButton</class>
 		  <child_name>Toolbar:button</child_name>
 		  <name>button72</name>
+		  <width>35</width>
+		  <height>42</height>
 		  <label>Stop</label>
 		  <stock_pixmap>GNOME_STOCK_PIXMAP_STOP</stock_pixmap>
 		</widget>
+	      </widget>
+
+	      <widget>
+		<class>GtkFrame</class>
+		<name>frame1</name>
+		<border_width>2</border_width>
+		<label_xalign>0</label_xalign>
+		<shadow_type>GTK_SHADOW_ETCHED_IN</shadow_type>
+		<child>
+		  <padding>2</padding>
+		  <expand>False</expand>
+		  <fill>False</fill>
+		</child>
 
 		<widget>
-		  <class>GtkButton</class>
-		  <child_name>Toolbar:button</child_name>
-		  <name>button73</name>
-		  <label>Step</label>
-		  <stock_pixmap>GNOME_STOCK_PIXMAP_LAST</stock_pixmap>
+		  <class>GtkHBox</class>
+		  <name>hbox14</name>
+		  <border_width>2</border_width>
+		  <homogeneous>False</homogeneous>
+		  <spacing>0</spacing>
+
+		  <widget>
+		    <class>GtkToolbar</class>
+		    <name>toolbar26</name>
+		    <orientation>GTK_ORIENTATION_HORIZONTAL</orientation>
+		    <type>GTK_TOOLBAR_BOTH</type>
+		    <space_size>5</space_size>
+		    <space_style>GTK_TOOLBAR_SPACE_EMPTY</space_style>
+		    <relief>GTK_RELIEF_NONE</relief>
+		    <tooltips>True</tooltips>
+		    <child>
+		      <padding>0</padding>
+		      <expand>False</expand>
+		      <fill>False</fill>
+		    </child>
+
+		    <widget>
+		      <class>GtkButton</class>
+		      <child_name>Toolbar:button</child_name>
+		      <name>button132</name>
+		      <width>35</width>
+		      <height>42</height>
+		      <label>Step</label>
+		      <stock_pixmap>GNOME_STOCK_PIXMAP_LAST</stock_pixmap>
+		    </widget>
+		  </widget>
+
+		  <widget>
+		    <class>GtkCombo</class>
+		    <name>combo1</name>
+		    <width>69</width>
+		    <value_in_list>False</value_in_list>
+		    <ok_if_empty>True</ok_if_empty>
+		    <case_sensitive>False</case_sensitive>
+		    <use_arrows>True</use_arrows>
+		    <use_arrows_always>False</use_arrows_always>
+		    <items>1
+10
+100
+1000
+</items>
+		    <child>
+		      <padding>0</padding>
+		      <expand>False</expand>
+		      <fill>False</fill>
+		      <pack>GTK_PACK_END</pack>
+		    </child>
+
+		    <widget>
+		      <class>GtkEntry</class>
+		      <child_name>GtkCombo:entry</child_name>
+		      <name>combo-entry1</name>
+		      <can_focus>True</can_focus>
+		      <editable>True</editable>
+		      <text_visible>True</text_visible>
+		      <text_max_length>0</text_max_length>
+		      <text>1</text>
+		    </widget>
+		  </widget>
 		</widget>
 	      </widget>
 
@@ -472,10 +548,11 @@
 	      <widget>
 		<class>GtkVBox</class>
 		<name>vbox57</name>
+		<border_width>2</border_width>
 		<homogeneous>False</homogeneous>
 		<spacing>0</spacing>
 		<child>
-		  <padding>2</padding>
+		  <padding>0</padding>
 		  <expand>True</expand>
 		  <fill>True</fill>
 		</child>
@@ -507,7 +584,7 @@
 		  <text_max_length>1</text_max_length>
 		  <text></text>
 		  <child>
-		    <padding>2</padding>
+		    <padding>3</padding>
 		    <expand>False</expand>
 		    <fill>False</fill>
 		  </child>
@@ -518,56 +595,7 @@
 
 	  <widget>
 	    <class>GtkHandleBox</class>
-	    <name>handlebox20</name>
-	    <shadow_type>GTK_SHADOW_OUT</shadow_type>
-	    <handle_position>GTK_POS_LEFT</handle_position>
-	    <snap_edge>GTK_POS_TOP</snap_edge>
-	    <child>
-	      <padding>0</padding>
-	      <expand>False</expand>
-	      <fill>True</fill>
-	    </child>
-
-	    <widget>
-	      <class>GtkToolbar</class>
-	      <name>toolbar17</name>
-	      <border_width>2</border_width>
-	      <orientation>GTK_ORIENTATION_HORIZONTAL</orientation>
-	      <type>GTK_TOOLBAR_BOTH</type>
-	      <space_size>5</space_size>
-	      <space_style>GTK_TOOLBAR_SPACE_LINE</space_style>
-	      <relief>GTK_RELIEF_NONE</relief>
-	      <tooltips>True</tooltips>
-
-	      <widget>
-		<class>GtkButton</class>
-		<child_name>Toolbar:button</child_name>
-		<name>button74</name>
-		<label>Copy</label>
-		<stock_pixmap>GNOME_STOCK_PIXMAP_COPY</stock_pixmap>
-	      </widget>
-
-	      <widget>
-		<class>GtkButton</class>
-		<child_name>Toolbar:button</child_name>
-		<name>button75</name>
-		<label>Cut</label>
-		<stock_pixmap>GNOME_STOCK_PIXMAP_CUT</stock_pixmap>
-	      </widget>
-
-	      <widget>
-		<class>GtkButton</class>
-		<child_name>Toolbar:button</child_name>
-		<name>button76</name>
-		<label>Paste</label>
-		<stock_pixmap>GNOME_STOCK_PIXMAP_PASTE</stock_pixmap>
-	      </widget>
-	    </widget>
-	  </widget>
-
-	  <widget>
-	    <class>GtkHandleBox</class>
-	    <name>handlebox21</name>
+	    <name>handlebox23</name>
 	    <shadow_type>GTK_SHADOW_OUT</shadow_type>
 	    <handle_position>GTK_POS_LEFT</handle_position>
 	    <snap_edge>GTK_POS_TOP</snap_edge>
@@ -579,8 +607,7 @@
 
 	    <widget>
 	      <class>GtkToolbar</class>
-	      <name>toolbar19</name>
-	      <border_width>2</border_width>
+	      <name>toolbar27</name>
 	      <orientation>GTK_ORIENTATION_HORIZONTAL</orientation>
 	      <type>GTK_TOOLBAR_BOTH</type>
 	      <space_size>5</space_size>
@@ -591,7 +618,8 @@
 	      <widget>
 		<class>GtkButton</class>
 		<child_name>Toolbar:button</child_name>
-		<name>button103</name>
+		<name>button133</name>
+		<width>60</width>
 		<label>Entry</label>
 		<stock_pixmap>GNOME_STOCK_PIXMAP_TEXT_BULLETED_LIST</stock_pixmap>
 	      </widget>
@@ -599,25 +627,48 @@
 	      <widget>
 		<class>GtkButton</class>
 		<child_name>Toolbar:button</child_name>
-		<name>button117</name>
+		<name>button134</name>
+		<width>60</width>
 		<label>Logger</label>
 		<stock_pixmap>GNOME_STOCK_PIXMAP_ADD</stock_pixmap>
 	      </widget>
 
 	      <widget>
-		<class>GtkButton</class>
-		<child_name>Toolbar:button</child_name>
-		<name>button116</name>
-		<label>Interface</label>
-		<stock_pixmap>GNOME_STOCK_PIXMAP_COLORSELECTOR</stock_pixmap>
+		<class>GtkVSeparator</class>
+		<name>vseparator5</name>
+		<height>40</height>
 	      </widget>
 
 	      <widget>
-		<class>GtkButton</class>
+		<class>GtkToggleButton</class>
 		<child_name>Toolbar:button</child_name>
-		<name>button115</name>
-		<label>Board</label>
-		<stock_pixmap>GNOME_STOCK_PIXMAP_TABLE_FILL</stock_pixmap>
+		<name>togglebutton4</name>
+		<width>60</width>
+		<label>Palette</label>
+		<stock_pixmap>GNOME_STOCK_PIXMAP_COLORSELECTOR</stock_pixmap>
+		<active>False</active>
+	      </widget>
+
+	      <widget>
+		<class>GtkToggleButton</class>
+		<child_name>Toolbar:button</child_name>
+		<name>togglebutton5</name>
+		<width>60</width>
+		<height>42</height>
+		<label>Message</label>
+		<stock_pixmap>GNOME_STOCK_PIXMAP_ALIGN_JUSTIFY</stock_pixmap>
+		<active>False</active>
+	      </widget>
+
+	      <widget>
+		<class>GtkToggleButton</class>
+		<child_name>Toolbar:button</child_name>
+		<name>togglebutton6</name>
+		<width>60</width>
+		<height>42</height>
+		<label>Interface</label>
+		<stock_pixmap>GNOME_STOCK_PIXMAP_INDEX</stock_pixmap>
+		<active>False</active>
 	      </widget>
 	    </widget>
 	  </widget>
