@@ -61,6 +61,50 @@ AC_HEADER_STDC
 AC_CHECK_HEADERS(fcntl.h unistd.h)
 AC_CHECK_HEADERS(stl.h)
 
+EXT_GUESS="../../../.. ../../.. ../.. ../ ./ $prefix/"
+
+if test "$DMTOOL_DIR" = "" ; then
+        AC_MSG_CHECKING( for dmtool dir)
+        ac_cv_dmtool_dir="no"
+        for ac_dir in $EXT_GUESS ; do
+                if test -d $ac_dir/dmtool ; then
+                        ac_cv_dmtool_dir=`(cd $ac_dir ; pwd)`
+			DMTOOL_DIR=$ac_cv_dmtool_dir
+                fi
+        done
+
+	if test "$DMTOOL_DIR" = "" ; then	
+		AC_MSG_ERROR("dmtool not found.")
+	fi
+
+        AC_MSG_RESULT($ac_cv_dmtool_dir)
+        DMTOOL_DIR=$ac_cv_dmtool_dir
+        DMTOOL_INCLUDE=$ac_cv_dmtool_dir/dmtool/include
+fi
+AC_SUBST(DMTOOL_INCLUDE)
+
+if test "$KORANDOM_DIR" = "" ; then
+        AC_MSG_CHECKING( for korandom dir)
+        ac_cv_korandom_dir="no"
+        for ac_dir in $EXT_GUESS ; do
+                if test -d $ac_dir/korandom ; then
+                        ac_cv_korandom_dir=`(cd $ac_dir ; pwd)`
+			KORANDOM_DIR=$ac_cv_korandom_dir
+                fi
+        done
+
+	if test "$KORANDOM_DIR" = "" ; then	
+		AC_MSG_ERROR("korandom not found.")
+	fi
+
+        AC_MSG_RESULT($ac_cv_korandom_dir)
+        KORANDOM_DIR=$ac_cv_korandom_dir
+        KORANDOM_INCLUDE=$ac_cv_korandom_dir
+fi
+AC_SUBST(KORANDOM_INCLUDE)
+
+
+
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_LANG_SAVE
 dnl AC_C_CONST
@@ -69,6 +113,7 @@ AC_TYPE_OFF_T
 AC_TYPE_SIZE_T
 AC_TYPE_SIGNAL
 AC_STRUCT_ST_RDEV
+AC_C_LONG_DOUBLE
 AC_LANG_RESTORE
 
 ICE_CXX_PRETTY_FUNCTION
