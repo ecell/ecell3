@@ -6,6 +6,7 @@ import gtk
 import gnome.ui
 import GDK
 import libglade
+import propertyname
 
 
 
@@ -39,9 +40,9 @@ class MainWindow(Window):
         self.addHandlers( self.theHandlerMap)
         
         self.thePropertyClist = self.getWidget( "clist1" )
-        self.thePropertyListA = self.getWidget( "entry2" )
-        self.thePropertyListB = self.getWidget( "list8" )
-        self.thePropertyListC = self.getWidget( "list9" )
+        self.theIDEntry = self.getWidget( "entry1" )
+        self.thePathEntry = self.getWidget( "entry2" )
+        self.theNameEntry = self.getWidget( "entry3" )
 
 
         
@@ -67,12 +68,15 @@ class MainWindow(Window):
 
         
         #        print FQPPList[0]
-        asan = getFQPP()
-        self.thePropertyListA.set_text(asan[0])
-        #print asan[1]
-        #        self.thePropertyListA.append( asan[0] )
-        #        self.thePropertyListB.append( FQPPdic[1] )
-        #        self.thePropertyListC.append( FQPPdic[2] )
+        
+#        aFQPP = getFQPP()
+
+        
+        self.theIDEntry.set_text(toString(FQPPList.getID()))
+        self.thePathEntry.set_text(toString(FQPPList.getSystemPath()))
+        self.theNameEntry.set_text(aName)
+
+        
         
         for x in aPropertyList:
             aValueList = tmpget( x )
@@ -102,10 +106,23 @@ def main():
     aMainWindow.addHandler( 'gtk_main_quit', mainQuit )    
     aMainWindow.update()
     mainLoop()
+
+#this data should be written in an other file.
+#the beginning of data area
     
 testdic={ 'PropertyList': ('PropertyList', 'A','B','C'),
-          'A': ('aaa', ) ,'B': (1.04E-3, ) ,'C': (41, )} 
-FQPPList = ['MichaMen','/CELL/CYTOPLASM','MichaelisMentenReactor']
+          'A': ('aaa', ) ,
+          'B': (1.04E-3, ) ,
+          'C': (41, )
+          } 
+
+#FQPPList = ['MichaMen','/CELL/CYTOPLASM','MichaelisMentenReactor']
+FQPPList = propertyname.FullPropertyName('Reactor:/CELL/CYTOPLASM:MichaMen:PropertyName')
+aName = 'MichaelisMentenReactor'
+
+
+#the ending of data area
+
 
 def getFQPP():
     return FQPPList
@@ -117,5 +134,3 @@ def tmpget( name ):
 if __name__ == "__main__":
 
     main()
-
-
