@@ -257,9 +257,9 @@ namespace libecs
       {
 	VariablePtr const aVariable( theVariableVector[ c ] );
 
-	const Real aTolerance( fabs( aVariable->getValue() ) 
-			       * theRelativeEpsilon
-			       + theAbsoluteEpsilon );
+	const Real aTolerance( FMA( fabs( aVariable->getValue() ),
+				    theRelativeEpsilon,
+				    theAbsoluteEpsilon ) );
 
 	const Real aVelocity( fabs( theVelocityBuffer[ c ] ) );
 
@@ -275,7 +275,7 @@ namespace libecs
     if ( maxError < 0.5 )
       {
 	Real aNewStepInterval( getStepInterval() 
-			       * pow(maxError , -1.0 / ( getOrder() + 1 ) )
+			       * pow( maxError , -1.0 / ( getOrder() + 1 ) )
 			       * safety );
 
 	//	Real aNewStepInterval( getStepInterval() * 2.0 );

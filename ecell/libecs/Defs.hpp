@@ -168,6 +168,21 @@ namespace libecs
   const Real N_A( 6.0221367e+23 );
 
 
+  // functions
+
+#if defined( FP_FAST_FMA )
+  inline const Real FMA( const Real a, const Real b, const Real c )
+  {
+    return ::fma( a, b, c );
+  }
+#else
+  inline const Real FMA( const Real a, const Real b, const Real c )
+  {
+    return a * b + c;
+  }
+#endif /* defined( FP_FAST_FMA ) */
+
+
   // MACROS
 
 #if 0
