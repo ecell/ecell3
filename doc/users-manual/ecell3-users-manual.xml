@@ -5,7 +5,7 @@
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN" 
 [
   <!ENTITY legal SYSTEM "legal.xml">
-  <!ENTITY appversion "3.1.97">
+  <!ENTITY appversion "3.1.99">
   <!ENTITY manrevision "0.0">
   <!ENTITY date "Nov 2002">
   <!ENTITY app "<application>E-Cell Simulation Environment</application>">
