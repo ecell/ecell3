@@ -542,6 +542,7 @@ class Session:
             else:
                 anEml.createEntity( aClassName, aFullID )
             
+
     def __saveProperty( self, anEml, aSystemPath='' ):
         # the default of aSystemPath is empty because
         # unlike __loadEntity() this starts with the root system
@@ -563,6 +564,7 @@ class Session:
         for aSystem in aSubSystemList:
             aSubSystemPath = joinSystemPath( aSystemPath, aSystem )
             self.__saveProperty( anEml, aSubSystemPath )
+
 
     def __savePropertyList( self, anEml, anEntityTypeString,\
                             aSystemPath, anIDList ):
