@@ -10,7 +10,7 @@
 
 
 <stepperlist>
-<stepper class="Euler1SRMStepper" id="SRM_01" />
+<stepper class="Euler1Stepper" id="SRM_01" />
 </stepperlist>
 
 
