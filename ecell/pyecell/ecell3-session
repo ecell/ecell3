@@ -149,23 +149,14 @@ def main():
                 aParameters[aKeyString] = anEvaluatedArg[aKeyString]
                 
             
-
-    if anEssFile and anEmlFile:
-        print "Warning: Do not use -e and -f at same time."
-        usage()
-        sys.exit(0)
-
-    
     aSimulator = ecell.ecs.Simulator()
     aSession = ecell.Session( aSimulator )
 
+    if anEmlFile:
+        aSession.loadModel(anEmlFile)
+
     if anEssFile:
         aSession.loadScript( anEssFile, aParameters )
-
-    elif anEmlFile:
-        aSession.loadModel(anEmlFile)
-        aSession.interact( aParameters )
-
     else:
         aSession.interact( aParameters )
          
