@@ -595,7 +595,7 @@ namespace libecs
   void Stepper::process()
   {
     std::for_each( theProcessVector.begin(), theProcessVector.end(),
-		   std::mem_fun( &Process::process ) );
+    		   std::mem_fun( &Process::process ) );
   }
 
 

@@ -175,7 +175,7 @@ namespace libecs
 
     void setValue( RealCref aValue )
     { 
-      if( ! getFixed() ) 
+      if( ! isFixed() ) 
 	{
 	  loadValue( aValue ); 
 	}
@@ -243,8 +243,15 @@ namespace libecs
 
 
     // wrappers to expose is/setFixed as PropertySlots 
-    void setFixed( IntCref aValue );
-    const Int getFixed() const;
+    void setFixed( IntCref aValue )
+    { 
+      theFixed = static_cast<bool>( aValue );
+    }
+
+    const Int getFixed() const
+    { 
+      return theFixed;
+    }
 
 
     /**

@@ -103,17 +103,6 @@ namespace libecs
   }
 
 
-  void Variable::setFixed( IntCref aValue )
-  { 
-    theFixed = static_cast<bool>( aValue );
-  }
-
-
-  const Int Variable::getFixed() const                         
-  { 
-    return theFixed;
-  }
-
   void Variable::registerProxy( VariableProxyPtr const anVariableProxyPtr )
   {
     theVariableProxyVector.push_back( anVariableProxyPtr );
