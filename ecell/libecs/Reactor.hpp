@@ -77,7 +77,7 @@ namespace libecs
 
   public: 
 
-    // MessageInterfaces
+    // PropertyInterfaces
 
     void setAppendSubstrate( MessageCref message );
     void setAppendProduct( MessageCref message );

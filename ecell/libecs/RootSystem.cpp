@@ -44,7 +44,7 @@ namespace libecs
 
   void RootSystem::makeSlots()
   {
-    makeMessageSlot( "CurrentTime", RootSystem, *this,
+    makePropertySlot( "CurrentTime", RootSystem, *this,
 		 NULLPTR, &RootSystem::getCurrentTime );
   }
   

@@ -28,7 +28,7 @@
 // E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
 
-#include "libecs/MessageInterface.hpp"
+#include "libecs/PropertyInterface.hpp"
 
 #include "LocalLoggerImplementation.hpp"
 

@@ -71,8 +71,8 @@ namespace libecs
   DECLARE_CLASS( isRegularReactorItem );
   DECLARE_CLASS( SystemMaker );
   DECLARE_CLASS( Message );
-  DECLARE_CLASS( AbstractMessageSlot );
-  DECLARE_CLASS( MessageInterface );
+  DECLARE_CLASS( AbstractPropertySlot );
+  DECLARE_CLASS( PropertyInterface );
   DECLARE_CLASS( UConstant );
   DECLARE_CLASS( LoggerBroker );
   DECLARE_CLASS( Logger );

@@ -50,22 +50,22 @@ namespace libecs
 
   void System::makeSlots()
   {
-    makeMessageSlot( "SystemList", System, *this,
+    makePropertySlot( "SystemList", System, *this,
 		 NULLPTR, &System::getSystemList );
-    makeMessageSlot( "SubstanceList", System, *this,
+    makePropertySlot( "SubstanceList", System, *this,
 		 NULLPTR, &System::getSubstanceList );
-    makeMessageSlot( "ReactorList", System, *this,
+    makePropertySlot( "ReactorList", System, *this,
 		 NULLPTR, &System::getReactorList );
 
-    makeMessageSlot( "Stepper", System, *this,
+    makePropertySlot( "Stepper", System, *this,
 		 &System::setStepper, &System::getStepper );
-    makeMessageSlot( "VolumeIndex", System, *this,
+    makePropertySlot( "VolumeIndex", System, *this,
 		 &System::setVolumeIndex, &System::getVolumeIndex );
 
-    makeMessageSlot( "Volume", System, *this,
+    makePropertySlot( "Volume", System, *this,
 		 NULLPTR, &System::getVolume );
 
-    makeMessageSlot( "DeltaT", System, *this,
+    makePropertySlot( "DeltaT", System, *this,
 		 NULLPTR, &System::getDeltaT );
   }
 

@@ -31,24 +31,24 @@
 // E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
 
-#include "MessageInterface.hpp"
+#include "PropertyInterface.hpp"
 
 
 namespace libecs
 {
 
-  ///////////////////////////// MessageInterface
+  ///////////////////////////// PropertyInterface
 
-  void MessageInterface::makeSlots()
+  void PropertyInterface::makeSlots()
   {
-    makeMessageSlot( "PropertyList",MessageInterface,*this,NULLPTR,
-		     &MessageInterface::getPropertyList);
-    makeMessageSlot( "PropertyAttributes",MessageInterface,*this,NULLPTR,
-		     &MessageInterface::getPropertyAttributes);
+    makePropertySlot( "PropertyList",PropertyInterface,*this,NULLPTR,
+		     &PropertyInterface::getPropertyList);
+    makePropertySlot( "PropertyAttributes",PropertyInterface,*this,NULLPTR,
+		     &PropertyInterface::getPropertyAttributes);
 
   }
 
-  const Message MessageInterface::getPropertyList( StringCref keyword )
+  const Message PropertyInterface::getPropertyList( StringCref keyword )
   {
     UConstantVector aPropertyList;
 
@@ -61,7 +61,7 @@ namespace libecs
     return Message( keyword, aPropertyList );
   }
 
-  const Message MessageInterface::getPropertyAttributes( StringCref keyword )
+  const Message PropertyInterface::getPropertyAttributes( StringCref keyword )
   {
     UConstantVector aPropertyList;
 
@@ -86,12 +86,12 @@ namespace libecs
     return Message( keyword, aPropertyList );
   }
 
-  MessageInterface::MessageInterface()
+  PropertyInterface::PropertyInterface()
   {
     makeSlots();
   }
 
-  MessageInterface::~MessageInterface()
+  PropertyInterface::~PropertyInterface()
   {
     for( PropertyMapIterator i = thePropertyMap.begin() ; 
 	 i != thePropertyMap.end() ; ++i )
@@ -100,8 +100,8 @@ namespace libecs
       }
   }
 
-  void MessageInterface::appendSlot( StringCref keyword, 
-				     AbstractMessageSlot* func )
+  void PropertyInterface::appendSlot( StringCref keyword, 
+				     AbstractPropertySlot* func )
   {
     if( thePropertyMap.find( keyword ) != thePropertyMap.end() )
       {
@@ -112,7 +112,7 @@ namespace libecs
     thePropertyMap[ keyword ] = func;
   }
 
-  void MessageInterface::deleteSlot( StringCref keyword )
+  void PropertyInterface::deleteSlot( StringCref keyword )
   {
     if( thePropertyMap.find( keyword ) == thePropertyMap.end() )
       {
@@ -124,7 +124,7 @@ namespace libecs
     thePropertyMap.erase( keyword );
   }
 
-  void MessageInterface::set( MessageCref message ) 
+  void PropertyInterface::set( MessageCref message ) 
   {
     PropertyMapIterator sm( thePropertyMap.find( message.getKeyword() ) );
 
@@ -138,7 +138,7 @@ namespace libecs
     sm->second->set( message );
   }
 
-  const Message MessageInterface::get( StringCref keyword ) 
+  const Message PropertyInterface::get( StringCref keyword ) 
   {
     PropertyMapIterator sm( thePropertyMap.find( keyword ) );
 

@@ -48,9 +48,9 @@ namespace libecs
 
   void Substance::makeSlots()
   {
-    makeMessageSlot( "Quantity",Substance,*this,&Substance::setQuantity,
+    makePropertySlot( "Quantity",Substance,*this,&Substance::setQuantity,
 		 &Substance::getQuantity );
-    makeMessageSlot( "AccumulatorClass",Substance,*this,
+    makePropertySlot( "AccumulatorClass",Substance,*this,
 		 &Substance::setAccumulatorClass,
 		 &Substance::getAccumulatorClass );
   }

@@ -54,9 +54,9 @@ namespace libecs
   // Constructor
 
   /*
-  Logger::Logger( const ProxyMessageSlot& aMessageSlot )
+  Logger::Logger( const ProxyPropertySlot& aPropertySlot )
     :
-    //    theMessageSlot( aMessageSlot ),
+    //    thePropertySlot( aPropertySlot ),
     theMinimumInterval( 0.0 ),
     theCurrentInterval( 0.0 )
   {
@@ -69,7 +69,7 @@ namespace libecs
   Logger::Logger( LoggerCref logger )
     :
     theDataPointVector( logger.getDataPointVector() ),
-    //    theMessageSlot( logger.getMessageSlot() ),
+    //    thePropertySlot( logger.getPropertySlot() ),
     theMinimumInterval( logger.getMinInterval() ),
     theCurrentInterval( logger.getCurrentInterval() )
   {

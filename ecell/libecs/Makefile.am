@@ -17,7 +17,7 @@ Util.cpp\
 UVariable.cpp\
 FullID.cpp\
 Message.cpp\
-MessageInterface.cpp\
+PropertyInterface.cpp\
 AccumulatorMaker.cpp\
 ReactorMaker.cpp\
 Substance.cpp\
@@ -44,7 +44,7 @@ Defs.hpp\
 UVariable.hpp\
 FullID.hpp\
 Message.hpp\
-MessageInterface.hpp\
+PropertyInterface.hpp\
 AccumulatorMaker.hpp\
 ReactorMaker.hpp\
 Substance.hpp\

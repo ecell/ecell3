@@ -47,8 +47,8 @@ namespace libecs
      A data packet for communication among C++ objects consisting
      of a keyword and a body. The body is a list of UConstants.
 
-     @see MessageInterface
-     @see AbstractMessageSlot
+     @see PropertyInterface
+     @see AbstractPropertySlot
   */
   class Message
   {

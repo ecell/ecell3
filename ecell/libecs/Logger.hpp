@@ -40,7 +40,7 @@
  */
 
 #include "DataPoint.hpp"
-//#include "MessageInterface.hpp"
+//#include "PropertyInterface.hpp"
 #include "UVariable.hpp"
 
 //#if defined(STLDATAPOINTVECTOR)
@@ -52,7 +52,7 @@ namespace libecs
 
   class DataPoint;
   class Logger;
-  class ProxyMessageSlot;
+  class ProxyPropertySlot;
 
   /**
    
@@ -83,7 +83,7 @@ namespace libecs
        Constructor
     */
   
-    //    Logger( const ProxyMessageSlot& );
+    //    Logger( const ProxyPropertySlot& );
   
     /**
        Copy constructor
@@ -167,9 +167,9 @@ namespace libecs
     /**
 
 
-    const ProxyMessageSlot& getMessageSlot( void ) const
+    const ProxyPropertySlot& getPropertySlot( void ) const
     {
-      return theMessageSlot;
+      return thePropertySlot;
     }
   
      */
@@ -219,7 +219,7 @@ namespace libecs
     /// Data members
 
     DataPointVector             theDataPointVector;
-    //    const ProxyMessageSlot      theMessageSlot;
+    //    const ProxyPropertySlot      thePropertySlot;
     Real                        theMinimumInterval;
     Real                        theCurrentInterval;
 

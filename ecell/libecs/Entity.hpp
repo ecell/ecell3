@@ -31,7 +31,7 @@
 #ifndef ___ENTITY_H___
 #define ___ENTITY_H___
 #include "libecs.hpp"
-#include "MessageInterface.hpp"
+#include "PropertyInterface.hpp"
 
 
 namespace libecs
@@ -39,11 +39,11 @@ namespace libecs
 
   /**
      Entity class is a base class for all components in the cell model.
-     Entity is-a MessageInterface. 
+     Entity is-a PropertyInterface. 
 
   */
 
-  class Entity : public MessageInterface
+  class Entity : public PropertyInterface
   {
 
   public:

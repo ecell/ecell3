@@ -33,7 +33,7 @@
 
 #include "LoggerBroker.hpp"
 #include "Logger.hpp"
-#include "MessageInterface.hpp"
+#include "PropertyInterface.hpp"
 #include "PrimitiveType.hpp"
 #include "FullID.hpp"
 #include "RootSystem.hpp"
@@ -67,7 +67,7 @@ namespace libecs
     String aPropertyName( fpn.getPropertyName() );
 
     PropertyMapIterator 
-      aPropertyMapIterator( anEntityPtr->getMessageSlot( aPropertyName ) );
+      aPropertyMapIterator( anEntityPtr->getPropertySlot( aPropertyName ) );
 
     LoggerPtr aLoggerPtr = new Logger();
     aPropertyMapIterator->second->getProxy()->setLogger( aLoggerPtr );

@@ -53,13 +53,13 @@ namespace libecs
 
   void Entity::makeSlots()
   {
-    makeMessageSlot( "ClassName", Entity, *this, NULLPTR, &Entity::getClassName );
-    makeMessageSlot( "ID", Entity, *this, NULLPTR, &Entity::getID );
-    makeMessageSlot( "FullID", Entity, *this, NULLPTR, &Entity::getFullID );
+    makePropertySlot( "ClassName", Entity, *this, NULLPTR, &Entity::getClassName );
+    makePropertySlot( "ID", Entity, *this, NULLPTR, &Entity::getID );
+    makePropertySlot( "FullID", Entity, *this, NULLPTR, &Entity::getFullID );
     
-    makeMessageSlot( "Name", Entity, *this, NULLPTR, &Entity::getName );
-    makeMessageSlot( "Activity", Entity, *this, NULLPTR, &Entity::getActivity );
-    makeMessageSlot( "ActivityPerSecond", Entity, *this, NULLPTR, 
+    makePropertySlot( "Name", Entity, *this, NULLPTR, &Entity::getName );
+    makePropertySlot( "Activity", Entity, *this, NULLPTR, &Entity::getActivity );
+    makePropertySlot( "ActivityPerSecond", Entity, *this, NULLPTR, 
 		     &Entity::getActivityPerSecond );
   }
 

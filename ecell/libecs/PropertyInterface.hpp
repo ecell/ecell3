@@ -28,8 +28,8 @@
 // E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
 
-#ifndef __MESSAGEINTERFACE_HPP
-#define __MESSAGEINTERFACE_HPP
+#ifndef __PROPERTYINTERFACE_HPP
+#define __PROPERTYINTERFACE_HPP
 
 #include <map>
 
@@ -42,23 +42,23 @@
 namespace libecs
 {
 
-  DECLARE_CLASS( AbstractMessageSlot );
+  DECLARE_CLASS( AbstractPropertySlot );
 
-  DECLARE_MAP( const String, AbstractMessageSlotPtr, 
+  DECLARE_MAP( const String, AbstractPropertySlotPtr, 
 	       less<const String>, PropertyMap );
 
   class Logger;
-  class ProxyMessageSlot;
+  class ProxyPropertySlot;
 
 
   /**
-     A base class for MessageSlot class.
+     A base class for PropertySlot class.
 
-     @see MessageSlot
-     @see MessageInterface
+     @see PropertySlot
+     @see PropertyInterface
      @see Message
   */
-  class AbstractMessageSlot
+  class AbstractPropertySlot
   {
 
   public:
@@ -74,19 +74,19 @@ namespace libecs
     virtual const Message operator()( StringCref keyword ) 
     { return get(keyword); }
 
-    virtual ProxyMessageSlot* getProxy( void ) = 0;
+    virtual ProxyPropertySlot* getProxy( void ) = 0;
 
   };
 
 
-  class ProxyMessageSlot
+  class ProxyPropertySlot
   {
     
   public:
       
-    ProxyMessageSlot( AbstractMessageSlotPtr aMessageSlot )
+    ProxyPropertySlot( AbstractPropertySlotPtr aPropertySlot )
       :
-      theMessageSlot( aMessageSlot ),
+      thePropertySlot( aPropertySlot ),
       theLogger( NULLPTR )
     {
       ;
@@ -94,9 +94,9 @@ namespace libecs
 
     // copy constructor
     
-    ProxyMessageSlot( ProxyMessageSlot& rhs )
+    ProxyPropertySlot( ProxyPropertySlot& rhs )
       :
-      theMessageSlot( rhs.theMessageSlot ),
+      thePropertySlot( rhs.thePropertySlot ),
       theLogger( rhs.theLogger )
     {
       ;
@@ -104,9 +104,9 @@ namespace libecs
 
     // copy constructor 
 
-    ProxyMessageSlot( const ProxyMessageSlot& rhs )
+    ProxyPropertySlot( const ProxyPropertySlot& rhs )
       :
-      theMessageSlot( rhs.theMessageSlot ),
+      thePropertySlot( rhs.thePropertySlot ),
       theLogger( rhs.theLogger )
     {
       ;
@@ -126,9 +126,9 @@ namespace libecs
     }
 
 
-    bool operator!=( const ProxyMessageSlot& rhs ) const
+    bool operator!=( const ProxyPropertySlot& rhs ) const
     {
-      if( rhs.theMessageSlot != this->theMessageSlot )
+      if( rhs.thePropertySlot != this->thePropertySlot )
 	{
 	  return true;
 	}
@@ -138,11 +138,11 @@ namespace libecs
       
   private:
       
-    ProxyMessageSlot( void );
+    ProxyPropertySlot( void );
       
   private:    
 
-    AbstractMessageSlotPtr   theMessageSlot;
+    AbstractPropertySlotPtr   thePropertySlot;
     LoggerPtr                theLogger;
     
     
@@ -154,13 +154,13 @@ namespace libecs
      Calls callback methods for getting and sending Message objects.
 
      @see Message
-     @see MessageInterface
-     @see AbstractMessageSlot
+     @see PropertyInterface
+     @see AbstractPropertySlot
   */
 
 
   template<class T>
-  class MessageSlot : public AbstractMessageSlot
+  class PropertySlot : public AbstractPropertySlot
   {
 
   public:
@@ -170,7 +170,7 @@ namespace libecs
 
   public:
 
-    MessageSlot( T& object, const SetMessageFunc setmethod,
+    PropertySlot( T& object, const SetMessageFunc setmethod,
 		 const GetMessageFunc getmethod )
       : 
       theObject( object ), 
@@ -220,16 +220,16 @@ namespace libecs
       return ( ( theObject.*theGetMethod )( keyword ));
     }
 
-    virtual ProxyMessageSlot* getProxy( void )
+    virtual ProxyPropertySlot* getProxy( void )
     {
-      return new ProxyMessageSlot( theProxy );
+      return new ProxyPropertySlot( theProxy );
     }
 
 
   private:
 
     T&                   theObject;
-    ProxyMessageSlot     theProxy;
+    ProxyPropertySlot     theProxy;
     const SetMessageFunc theSetMethod;
     const GetMessageFunc theGetMethod;
   };
@@ -239,17 +239,17 @@ namespace libecs
   /**
      Common base class for classes which receive Messages.
 
-     NOTE:  Subclasses of MessageInterface MUST call their own makeSlots(),
+     NOTE:  Subclasses of PropertyInterface MUST call their own makeSlots(),
      if any, to make their slots in their constructors.
      (virtual functions won't work in constructors)
 
      FIXME: class-static slots?
 
      @see Message
-     @see MessageSlot
+     @see PropertySlot
   */
 
-  class MessageInterface
+  class PropertyInterface
   {
   public:
 
@@ -260,20 +260,20 @@ namespace libecs
       };
 
 
-    MessageInterface();
-    virtual ~MessageInterface();
+    PropertyInterface();
+    virtual ~PropertyInterface();
 
     void set( MessageCref );
     const Message get( StringCref );
 
-    PropertyMapIterator getMessageSlot( StringCref property )
+    PropertyMapIterator getPropertySlot( StringCref property )
     {
       return thePropertyMap.find( property );
     }
 
     virtual void makeSlots();
 
-    virtual const char* const className() const { return "MessageInterface"; }
+    virtual const char* const className() const { return "PropertyInterface"; }
 
   public: // message slots
 
@@ -282,7 +282,7 @@ namespace libecs
 
   protected:
 
-    void appendSlot( StringCref keyword, AbstractMessageSlotPtr );
+    void appendSlot( StringCref keyword, AbstractPropertySlotPtr );
     void deleteSlot( StringCref keyword );
 
   private:
@@ -292,17 +292,17 @@ namespace libecs
   };
 
 
-#define makeMessageSlot( KEY, CLASS, OBJ, SETMETHOD, GETMETHOD )\
-appendSlot( KEY, new MessageSlot< CLASS >\
-	   ( OBJ, static_cast< MessageSlot< CLASS >::SetMessageFunc >\
+#define makePropertySlot( KEY, CLASS, OBJ, SETMETHOD, GETMETHOD )\
+appendSlot( KEY, new PropertySlot< CLASS >\
+	   ( OBJ, static_cast< PropertySlot< CLASS >::SetMessageFunc >\
 	    ( SETMETHOD ),\
-	    static_cast< MessageSlot< CLASS >::GetMessageFunc >\
+	    static_cast< PropertySlot< CLASS >::GetMessageFunc >\
 	    ( GETMETHOD ) ) )
 
 
 } // namespace libecs
 
-#endif /* __MESSAGEINTERFACE_HPP */
+#endif /* __PROPERTYINTERFACE_HPP */
 
 /*
   Do not modify
