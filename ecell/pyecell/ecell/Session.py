@@ -72,10 +72,12 @@ class Session:
             anId   = aTargetStepper[1]
 
             ## TemporarySample ---------------------------------------
-            aPrintClass = "Session.theSimulator.createStepper('" + aClass + "',"
-            aPrintId     = "'" + anId + "')"
-            print aPrintClass, aPrintId ## Temporary
+            #aPrintClass = "self.theSimulator.createStepper('" + aClass + "',"
+            #aPrintId     = "'" + anId + "')"
+            #print aPrintClass, aPrintId ## Temporary
             ## -------------------------------------------------------
+
+            self.theSimulator.createStepper( aClass, anId )
 
 
         
@@ -101,10 +103,11 @@ class Session:
                 aFullPn = 'SYSTEM' + ':' + aPath + ':' + anId + ':' + aName
             
             ## TemporarySample ---------------------------------------
-            aPrintFullId = "Session.theSimulator.setProperty('" + aFullPn + "',"
-            print aPrintFullId, aValueList, ")"
+            #aPrintFullId = "self.theSimulator.setProperty('" + aFullPn + "',"
+            #print aPrintFullId, aValueList, ")"
             ##-------------------------------------------------------
 
+            self.theSimulator.setProperty( aFullPn, aValueList )
 
 
     def loadEntity( self ):
@@ -132,17 +135,16 @@ class Session:
 
             aFullId = aType + ':' + aPath + ':' + anId
 
-            # self.theDriver.createEntity( aType, aFullId, aName )
-            
 
             ## TemporarySample ---------------------------------------
-            aPrintFullId = "Session.theSimulator.createEntity('" + aType + "',"
-            aPrintType   = "'" + aFullId + "',"
-            aPrintName   = "'" + aName + "')"
-            print aPrintFullId, aPrintType, aPrintName ## Temporary
+            #aPrintFullId = "self.theSimulator.createEntity('" + aType + "',"
+            #aPrintType   = "'" + aFullId + "',"
+            #aPrintName   = "'" + aName + "')"
+            #print aPrintFullId, aPrintType, aPrintName ## Temporary
             ## -------------------------------------------------------
 
-
+            self.theSimulator.createEntity( aType, aFullId, aName )
+            
 
     def loadProperty( self ):
         """Property loader"""
@@ -151,13 +153,13 @@ class Session:
             aFullPn = aTargetProperty[0]
             aValue  = aTargetProperty[1]
 
-            #self.theDriver.setProperty( aFullPn, aValue )
-
             
             ## TemporarySample ---------------------------------
-            aPrintFullPn = "Session.theSimulator.setProperty('" + aFullPn + "',"
-            print aPrintFullPn, aValue, ')'
+            #aPrintFullPn = "self.theSimulator.setProperty('" + aFullPn + "',"
+            #print aPrintFullPn, aValue, ')'
             ## -------------------------------------------------
+
+            self.theSimulator.setProperty( aFullPn, aValue )
 
 
 
