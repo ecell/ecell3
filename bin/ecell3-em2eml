@@ -5,8 +5,8 @@ A program for converting .em file to EML.
 This program is part of E-Cell Simulation Environment Version 3.
 """
 
-__program__ = 'em2eml'
-__version__ = '0.5'
+__program__ = 'ecell3-em2eml'
+__version__ = '0.1'
 __author__ = 'Kentarou Takahashi and Kouichi Takahashi <shafi@e-cell.org>'
 __copyright__ = 'Copyright (C) 2002-2003 Keio University'
 __license__ = 'GPL'
@@ -41,7 +41,7 @@ def main():
 
 	try:
 		opts , args = getopt.getopt( sys.argv[1:] , 'DEho:p:',
-					     ["help", "force=", "outfile=",
+					     ["help", "outfile=",
 					      "preprocess"])
 	except:
 		usage()
@@ -86,6 +86,11 @@ def main():
 		anEmFile = open( anEmFileName, 'r' )
 	aBaseName = os.path.basename( anEmFileName )
 	aBaseName, anExt = os.path.splitext( aBaseName )
+
+	# <infile> check mode
+	if anExt == '.eml':
+		sys.stderr.write( "input file not .em file.\n" )
+		sys.exit( 1 )
 
 	if anEmlFileName == None:
 		if anExt == '.em':
