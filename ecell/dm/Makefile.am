@@ -45,12 +45,14 @@ FluxDistributionStepper.cpp\
 FluxDistributionProcess.cpp\
 QuasiDynamicFluxProcess.cpp\
 PythonFluxProcess.cpp\
-PythonProcess.cpp
+PythonProcess.cpp\
+ExpressionFluxProcess.cpp
 
 DMH = CashKarp45Stepper.hpp\
 PythonFluxProcess.hpp\
 PythonProcess.hpp\
 PythonProcessBase.hpp\
+ExpressionProcessBase.hpp\
 FixedODE1Stepper.hpp\
 FixedDAE1Stepper.hpp\
 FixedRungeKutta4Stepper.hpp\
