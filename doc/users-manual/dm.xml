@@ -216,7 +216,7 @@ LIBECS_DM_INIT( <parameter>CLASSNAME</parameter>, <parameter>DMTYPE</parameter> 
 
 	      <para>A real number.  Usually implemented as a double
 	      precision floating point number.  It is a 64-bit float
-	      on a Linux/IA32/gcc platform.</para>
+	      on Linux/IA32/gcc platform.</para>
 	    </listitem>
 	    <listitem>
 	      <para><type>Integer</type></para>
@@ -281,7 +281,7 @@ LIBECS_DM_INIT( <parameter>CLASSNAME</parameter>, <parameter>DMTYPE</parameter> 
 	</itemizedlist>
 
        For example, <type>RealCref</type> is equivalent to write
-       <type>const Real&amp;</type>.  Using these typedefs are recommended.</para>
+       <type>const Real&amp;</type>.  Using these typedefs is recommended.</para>
 
        <para>
        To declare a new type, use <function>DECLARE_TYPE</function>

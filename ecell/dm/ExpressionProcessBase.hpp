@@ -507,7 +507,8 @@ namespace libecs
 	  }
 	else
 	  {
-	    THROW_EXCEPTION( UnexpectedError, "Input string parse error" );
+	    THROW_EXCEPTION( UnexpectedError, 
+			     "Parse error in the expression." );
 	  }
 	
 	return aCode;
@@ -733,8 +734,8 @@ namespace libecs
 	else
 	  THROW_EXCEPTION( NoSlot,
 			   getClassName() +
-			   String( ": No Property slot found by name [" )
-			   + aPropertyName + "].  Set property failed." );
+			   String( ": No Property slot [" ) + aPropertyName +
+			   "] found.  Set property failed." );
       } 
     
     virtual void initialize()
@@ -957,7 +958,7 @@ namespace libecs
 		else
 		  {
 		    THROW_EXCEPTION( NoSlot, 
-				     str + String( " : No Function " ) );
+				     str + String( " : No such function." ) );
 		  }
 	      }
 	    else
@@ -972,7 +973,7 @@ namespace libecs
 		else
 		  {
 		    THROW_EXCEPTION( NoSlot, 
-				     str + String( " : No Function " ) );
+				     str + String( " : No such function." ) );
 		  }
 	      }
 	  }
@@ -992,14 +993,14 @@ namespace libecs
 	    else
 	      {
 		THROW_EXCEPTION( NoSlot, 
-				 str + String( " : No Function " ) );
+				 str + String( " : No such function." ) );
 	      }
 	  }
 	else
 	  {
 	  THROW_EXCEPTION( NoSlot,
 			   str + 
-			   String(" : No Function or isn't mounted") );
+			   String(" : No such function.") );
 	  }
 
 	return;
@@ -1059,7 +1060,7 @@ namespace libecs
 		THROW_EXCEPTION( NoSlot,
 				 str_child3 + 
 				 String
-				 (" : No System method or isn't mounted") );
+				 (" : No such System attribute.") );
 	      }
 	  }
 	else
@@ -1067,7 +1068,7 @@ namespace libecs
 	    THROW_EXCEPTION( NoSlot,
 			     str_child2 + 
 			     String
-			     ( " : No Process method or isn't mounted" ) );
+			     ( " : No such Process attribute." ) );
 	  }
 	return;
 	
@@ -1146,7 +1147,7 @@ namespace libecs
 	      ( NoSlot,
 		str_child2 + 
 		String
-		( " : No VariableReferencePtr method or isn't mounted" ) ); 
+		( " : No such VariableReference attribute." ) ); 
 	  }
 	return;
 	
@@ -1188,7 +1189,7 @@ namespace libecs
 	else
 	  {
 	    THROW_EXCEPTION( NoSlot,
-			     str + String( " : No Property slot " ) );
+			     str + String( " : No such Property slot." ) );
 	  }
 	
 	return;
@@ -1278,7 +1279,7 @@ namespace libecs
 		theCode.push_back( new PUSH( n1 * pow( 10, n2 ) ) );
 	      }
 	    else
-	      THROW_EXCEPTION( NoSlot, String( " unexpected error " ) );
+	      THROW_EXCEPTION( NoSlot, String( "Fatal: Unexpected error." ) );
 
 	    return;
 	  }
@@ -1301,7 +1302,7 @@ namespace libecs
 		theCode.push_back( new POW() );
 	      }
 	    else
-	      THROW_EXCEPTION( NoSlot, String( " unexpected error " ) );
+	      THROW_EXCEPTION( NoSlot, String( "Fatal: Unexpected error." ) );
 
 	    return;
 	  }
@@ -1353,7 +1354,7 @@ namespace libecs
 		theCode.push_back( new PUSH( n1 - n2 ) );
 	      }
 	    else
-	      THROW_EXCEPTION( NoSlot, String( " unexpected error " ) );
+	      THROW_EXCEPTION( NoSlot, String( "Fatal: Unexpected error." ) );
 	  }
 	else
 	  {
@@ -1369,14 +1370,14 @@ namespace libecs
 		theCode.push_back( new SUB() );
 	      }
 	    else
-	      THROW_EXCEPTION( NoSlot, String( " unexpected error " ) );
+	      THROW_EXCEPTION( NoSlot, String( "Fatal: Unexpected error." ) );
 	  }
 
 	return;
 	
 
       default :
-	THROW_EXCEPTION( NoSlot, String( " unexpected error " ) );
+	THROW_EXCEPTION( NoSlot, String( "Fatal: Unexpected error." ) );
 	
 	return;
       }

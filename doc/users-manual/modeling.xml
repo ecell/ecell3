@@ -2127,10 +2127,10 @@ Process ExpressionFluxProcess( P )
 	<para>The DAE solver system of &ecell; uses
          <property>Activity</property> property of &Process; objects
          to represent the value of the algebraic function <literal>g(
-         t, x )</literal>.  An algebraic &Process; must change values
-         of &Variable; objects explicitly.  The DAE &Stepper; does this
-         job of finding a point where the equation <literal>g()</literal>
-         holds.</para>
+         t, x )</literal>.  An algebraic &Process; must
+         <emphasis>not</emphasis> change values of &Variable; objects
+         explicitly.  The DAE &Stepper; does this job of finding a
+         point where the equation <literal>g()</literal> holds.</para>
 
          <para>When modeling, be careful about coefficients of
           &VariableReference;s of an algebraic &Process;.  In most
