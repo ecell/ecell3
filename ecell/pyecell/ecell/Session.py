@@ -46,7 +46,7 @@ class Session:
         self.thePrintMethod( message )
 
     def loadModel( self, aModel ):
-        self.__thePreModel = aPreModel
+        self.__thePreModel = aModel
 
         self.loadEntity()
         self.loadStepper()
