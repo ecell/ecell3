@@ -30,12 +30,15 @@
 
 #ifndef ___STEPPER_H___
 #define ___STEPPER_H___
+#include <list>
+#include <map>
+
 #include "libecs.hpp"
 
 typedef IntegratorPtr ( *IntegratorAllocator_ )( Substance& );
 DECLARE_TYPE( IntegratorAllocator_, IntegratorAllocator );
 
-typedef Stepper (* StepperAllocatorFunc )();
+typedef StepperPtr (* StepperAllocatorFunc )();
 
 
 class Stepper
@@ -127,7 +130,7 @@ public:
 
   virtual void initialize();
 
-  Real StepperLeader::getDeltaT()
+  Real getDeltaT()
   {
     return theStepInterval;
   }

@@ -43,8 +43,8 @@ const Message MessageInterface::getPropertyList( StringCref keyword )
 {
   UniversalVariableVector aPropertyList;
 
-  for( SlotMapConstIterator i = theSlotMap.begin() ; 
-       i != theSlotMap.end() ; ++i )
+  for( PropertyMapConstIterator i = thePropertyMap.begin() ; 
+       i != thePropertyMap.end() ; ++i )
     {
       aPropertyList.push_back( UniversalVariable( i->first ) );
     }
@@ -59,7 +59,7 @@ MessageInterface::MessageInterface()
 
 MessageInterface::~MessageInterface()
 {
-  for( SlotMapIterator i = theSlotMap.begin() ; i != theSlotMap.end() ; ++i )
+  for( PropertyMapIterator i = thePropertyMap.begin() ; i != thePropertyMap.end() ; ++i )
     {
       delete i->second;
     }
@@ -68,33 +68,33 @@ MessageInterface::~MessageInterface()
 void MessageInterface::appendSlot( StringCref keyword, 
 				   AbstractMessageCallback* func )
 {
-  if( theSlotMap.find( keyword ) != theSlotMap.end() )
+  if( thePropertyMap.find( keyword ) != thePropertyMap.end() )
     {
       //      *theMessageWindow << "MessageSlot: appendSlot(): slot for keyword [" 
       //	<< keyword << "] already exists. Taking later one.\n";
-      delete theSlotMap[ keyword ];
-      theSlotMap.erase( keyword );
+      delete thePropertyMap[ keyword ];
+      thePropertyMap.erase( keyword );
     }
-  theSlotMap[ keyword ] = func;
+  thePropertyMap[ keyword ] = func;
 }
 
 void MessageInterface::deleteSlot( StringCref keyword )
 {
-  if( theSlotMap.find( keyword ) == theSlotMap.end() )
+  if( thePropertyMap.find( keyword ) == thePropertyMap.end() )
     {
       //      *theMessageWindow << "MessageSlot: deleteSlot(): no slot for keyword [" 
       //	<< keyword << "] found.\n";
       return;
     }
-  delete theSlotMap[ keyword ];
-  theSlotMap.erase( keyword );
+  delete thePropertyMap[ keyword ];
+  thePropertyMap.erase( keyword );
 }
 
 void MessageInterface::set( MessageCref message ) 
 {
-  SlotMapIterator sm( theSlotMap.find( message.getKeyword() ) );
+  PropertyMapIterator sm( thePropertyMap.find( message.getKeyword() ) );
 
-  if( sm == theSlotMap.end() )
+  if( sm == thePropertyMap.end() )
     {
       throw NoSlot(__PRETTY_FUNCTION__,
 		   className() + String(": got a Message (keyword = [")
@@ -106,9 +106,9 @@ void MessageInterface::set( MessageCref message )
 
 const Message MessageInterface::get( StringCref keyword ) 
 {
-  SlotMapIterator sm( theSlotMap.find( keyword ) );
+  PropertyMapIterator sm( thePropertyMap.find( keyword ) );
 
-  if( sm == theSlotMap.end() )
+  if( sm == thePropertyMap.end() )
     {
       throw NoSlot( __PRETTY_FUNCTION__, className()
 		    + String( ": got a request for Message (keyword = [" )

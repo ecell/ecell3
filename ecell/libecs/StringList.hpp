@@ -30,7 +30,9 @@
 
 #ifndef __STRINGLIST_H___
 #define __STRINGLIST_H___
-#include <stl.h>
+
+#include <vector>
+
 #include "Defs.hpp"
 
 class StringList : public vector<String>
@@ -50,7 +52,7 @@ protected:
 };
 
 
-#endif __STRINGLIST_H___
+#endif /* __STRINGLIST_H___ */
 
 
 /*

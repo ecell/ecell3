@@ -31,8 +31,8 @@
 #ifndef ___REACTOR_H___
 #define ___REACTOR_H___
 
-#include <climits>
-#include <stl.h>
+// #include <climits>
+#include <vector>
 
 #include "libecs.hpp"
 #include "Entity.hpp"

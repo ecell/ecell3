@@ -151,8 +151,8 @@ protected:
 private:
 
   // hide them
-  Entity( EntityRef ) {}
-  EntityRef operator=( EntityRef ) {}
+  Entity( EntityRef );
+  EntityRef operator=( EntityRef );
 
 private:
 

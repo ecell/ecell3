@@ -37,9 +37,9 @@
 #include "FQPI.hpp"
 
 // instantiate primitive lists.
-template SubstanceList;
-template ReactorList;
-template SystemList;
+//template SubstanceList;
+//template ReactorList;
+//template SystemList;
 
 /////////////////////// System
 

@@ -31,14 +31,17 @@
 #ifndef __MESSAGEINTERFACE_HPP
 #define __MESSAGEINTERFACE_HPP
 
+#include <map>
+
 #include "libecs.hpp"
 
 #include "Message.hpp"
 
 DECLARE_CLASS( AbstractMessageCallback );
 
-DECLARE_MAP( const String, AbstractMessageCallbackPtr, less<const String>,
-	     SlotMap );
+DECLARE_MAP( const String, AbstractMessageCallbackPtr, 
+	     std::less<const String>, PropertyMap );
+
 
 /**
    A base class for MessageCallback class.
@@ -156,7 +159,7 @@ protected:
 
 private:
 
-  SlotMap theSlotMap;
+  PropertyMap thePropertyMap;
 
 };
 
@@ -167,6 +170,7 @@ appendSlot( KEY, new MessageCallback< CLASS >\
 	    ( SETMETHOD ),\
 	    static_cast< MessageCallback< CLASS >::GetMessageFunc >\
 	    ( GETMETHOD ) ) )
+
 
 #endif /* __MESSAGEINTERFACE_HPP */
 

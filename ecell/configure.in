@@ -70,9 +70,11 @@ AC_CHECK_HEADERS(fcntl.h unistd.h)
 dnl
 dnl stl
 dnl
-AC_CHECK_HEADER(stl.h,,
-	AC_MSG_ERROR([stl.h not found.])
-)
+dnl AC_CHECK_HEADER(stl.h,,
+dnl 	AC_MSG_ERROR([stl.h not found.])
+dnl )
+AC_CHECK_HEADERS(math,,)
+AC_CHECK_HEADERS(cmath,,)
 dnl
 dnl
 EXT_GUESS="../../../.. ../../.. ../.. ../ ./ $prefix/ /usr /usr/local"

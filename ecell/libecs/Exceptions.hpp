@@ -36,7 +36,7 @@
 #include "Defs.hpp"
 
 /// Base exception class
-class Exception : public exception
+class Exception /* : public exception */
 {
 public:
   Exception( StringCref method, StringCref message = "" )

@@ -33,8 +33,20 @@
 #define ___DEFS_H___
 #include <stdint.h>
 #include <float.h>
-#include <stl.h>
+#include <string>
 #include "config.h"
+
+
+// cmath
+
+#if defined( HAVE_CMATH )
+#include <cmath>
+#elif defined( HAVE_MATH )
+#include <math>
+#else
+#error "either math or cmath header is needed."
+#endif /* HAVE_CMATH */
+
 
 // system constants
 
@@ -50,13 +62,12 @@ const int RANDOM_NUMBER_BUFFER_SIZE( 65535 );
 
 #define DECLARE_LIST        CORELINUX_LIST
 #define DECLARE_VECTOR      CORELINUX_VECTOR
-#define DECLARE_MAP         CORELINUX_MAP       
+#define DECLARE_MAP         CORELINUX_MAP
 #define DECLARE_MULTIMAP    CORELINUX_MULTIMAP  
 #define DECLARE_SET         CORELINUX_SET       
 #define DECLARE_MULTISET    CORELINUX_MULTISET  
 #define DECLARE_QUEUE       CORELINUX_QUEUE     
 #define DECLARE_STACK       CORELINUX_STACK     
-
 
 
 // String
@@ -80,6 +91,14 @@ const int FLOAT_DIG( DBL_DIG );
 const Real N_A = 6.0221367e+23;
 
 const int NOMATCH = -1;
+
+
+// MACROS
+
+#ifndef HAVE_PRETTY_FUNCTION
+#define __PRETTY_FUNCTION__ ""
+#endif
+
 
 #endif /* ___DEFS_H___ */
 

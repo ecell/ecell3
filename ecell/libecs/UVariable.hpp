@@ -31,6 +31,8 @@
 #ifndef ___UNIVERSALVARIABLE_H___
 #define ___UNIVERSALVARIABLE_H___
 
+#include <assert.h>
+
 #include "libecs.hpp"
 
 DECLARE_CLASS( UniversalVariableData );
@@ -287,7 +289,7 @@ protected:
 
   UniversalVariableDataPtr createDataClone() const
   {
-    theData->createClone();
+    return theData->createClone();
   }
 
 private:
