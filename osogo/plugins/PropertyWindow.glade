@@ -296,11 +296,16 @@
 
 	  <widget>
 	    <class>GtkCList</class>
-	    <name>clist1</name>
+	    <name>property_clist</name>
 	    <can_focus>True</can_focus>
+	    <signal>
+	      <name>select_row</name>
+	      <handler>property_clist_select_row</handler>
+	      <last_modification_time>Wed, 12 Sep 2001 01:54:47 GMT</last_modification_time>
+	    </signal>
 	    <columns>4</columns>
 	    <column_widths>126,15,241,80</column_widths>
-	    <selection_mode>GTK_SELECTION_SINGLE</selection_mode>
+	    <selection_mode>GTK_SELECTION_EXTENDED</selection_mode>
 	    <show_titles>True</show_titles>
 	    <shadow_type>GTK_SHADOW_IN</shadow_type>
 
@@ -393,9 +398,9 @@
 	  <can_default>True</can_default>
 	  <can_focus>True</can_focus>
 	  <signal>
-	    <name>pressed</name>
-	    <handler>show_button_pressed</handler>
-	    <last_modification_time>Tue, 14 Aug 2001 08:17:04 GMT</last_modification_time>
+	    <name>clicked</name>
+	    <handler>show_button_clicked</handler>
+	    <last_modification_time>Wed, 12 Sep 2001 01:51:19 GMT</last_modification_time>
 	  </signal>
 	  <label>button1</label>
 	</widget>
