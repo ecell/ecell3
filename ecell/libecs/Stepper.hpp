@@ -371,15 +371,10 @@ namespace libecs
 	    {
 	      BasePtr aBasePtr( (*j).second );
 
-	      try
+	      DerivedPtr aDerivedPtr( dynamic_cast<DerivedPtr>( aBasePtr ) );
+	      if( aDerivedPtr != NULLPTR )
 		{
-		  DerivedPtr 
-		    aDerivedPtr( dynamic_cast<DerivedPtr>( aBasePtr ) );
 		  push_back( aDerivedPtr );
-		}
-	      catch( const std::bad_cast& )
-		{
-		  ; // do nothing
 		}
 	    }
 
