@@ -118,26 +118,30 @@ class SGESessionProxy(SessionProxy):
 		anArgment = ''
 		if self.getInterpreter() == ECELL3_SESSION:
 
-			# write temporary script
-			anArgument = "--parameters=\"%s\"" %str(self.getSessionArgument())
-			aScriptContext = "#!%s\nuname -a\n%s -e %s %s\n exit $?" \
-			                  %(os.getenv('SHELL'),
-			                    ECELL3_SESSION,
-			                    self.getScriptFileName(),
-			                    anArgument)
+			#checks the SHELL environment
+			if self.getDM_PATH() != "":
+				
+				aSHELLName = '/bin/sh'
+					
+				# write environment variable
+				aDM_PATH = "ECELL3_DM_PATH=%s %s -e %s"%(self.getDM_PATH(),
+									 ECELL3_SESSION,
+									 self.getScriptFileName())
+
+				anArgument = "--parameters=\"%s\"" %str(self.getSessionArgument())
+				aScriptContext = "#!%s\nuname -a\n%s %s\nexit $?"%(aSHELLName,
+										   aDM_PATH,
+										   anArgument)
+						   
 			open( self.__theTmpScriptFileName, 'w' ).write( aScriptContext )
 
 
 			# create context to be thrown by qsub
-			aContext = "%s -cwd -S %s -o %s -e %s %s" \
-			                                                 %(QSUB,
-			                                                 os.getenv('SHELL'),
-					                                         self.getStdoutFileName(),
-					                                         self.getStderrFileName(),
-		                                                     self.__theTmpScriptFileName)
-
-
-
+			aContext = "%s -cwd -S %s -o %s -e %s %s"%(QSUB,
+								   aSHELLName,
+								   self.getStdoutFileName(),
+								   self.getStderrFileName(),
+								   self.__theTmpScriptFileName)
 		else:
 			anArgument = str(self.getArgument())
 			aContext = "%s -cwd -S %s -o %s -e %s %s %s" %(QSUB,

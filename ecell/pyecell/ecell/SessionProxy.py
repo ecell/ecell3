@@ -114,6 +114,22 @@ class SessionProxy:
 		return SessionProxy.__theStderror
 
 
+	def setDM_PATH(cls,aPath):
+		'''Set a DM_PATH in SGE environment.
+		aPath(str) -- str is directory name
+		Return None
+		'''
+
+		SessionProxy.__theSelfDirPath = aPath
+
+	def getDM_PATH(cls):
+		'''Return a DM_PATH
+		Return str -- str is directory name
+		'''
+		return SessionProxy.__theSelfDirPath 
+
+	
+
 	def setRetryMaxCount(cls, count):
 		'''Set retry max count.
 		When count < 0, count is set as 0
@@ -134,6 +150,8 @@ class SessionProxy:
 	getStdoutFileName = classmethod(getStdoutFileName)
 	setStderrFileName = classmethod(setStderrFileName)
 	getStderrFileName = classmethod(getStderrFileName)
+	setDM_PATH = classmethod(setDM_PATH)
+	getDM_PATH = classmethod(getDM_PATH)
 	setRetryMaxCount = classmethod(setRetryMaxCount)
 
 

@@ -88,10 +88,9 @@ class SessionManager:
 		self.__theConcurrency = None
 		self.__theTmpRootDir = DEFAULT_TMP_DIRECTORY
 		self.__theTmpDir = None
-
+		DEFAULT_ENVIRONMENT = 'Local'
 		self.__theFinishedJobRemovableFlag = True
 		self.__theErroRemovableJobFlag = True
-
 		self.__theUpdateInterval = 1
 		self.__theGlobalRunTimeout = 0
 
@@ -103,8 +102,6 @@ class SessionManager:
 
 		# Set up default environment
 		self.setEnvironment( DEFAULT_ENVIRONMENT )
-
-
 
 	def setEnvironment( self, environment ):
 		'''Set environment parameter.
@@ -176,15 +173,13 @@ class SessionManager:
 
 
 	def getDefaultConcurrency( self ):
-		'''Return the default number of jobs seto be runned concurrently.
+		'''Return the default number of jobs to be runned concurrently.
 
 		Return int : the default number of concurrency
 		'''
 
 		# return the default number of concurrency
 		return self.__theSystemProxy.getDefaultConcurrency()
-
-
 
 	def setTmpRootDir( self, tmprootdir ):
 		'''Set temporary root directory.
@@ -198,11 +193,11 @@ class SessionManager:
 		Return None
 		'''
 
-		# sets setmp root directory
+		# sets tmp root directory
 		self.__theTmpRootDir = tmprootdir
 
 
-		# sets setmp directory name
+		# sets tmp directory name
 		self.__theTmpDir = "%s%s%s" %(self.__theTmpRootDir,
 		                              os.sep,
 		                              os.getpid())
@@ -215,13 +210,13 @@ class SessionManager:
 		Return str : temporaty root directory
 		'''
 
-		# return setmp root directory
+		# return tmp root directory
 		return self.__theTmpRootDir
 
 
 
 	def getTmpDir( self ):
-		'''Return setemporary directory
+		'''Return temporary directory
 		Temporary directory is created below temporary root directory,
 		and named pid of this process.
 		See setTmpRootDir about the detail of temporary directory
@@ -292,13 +287,13 @@ class SessionManager:
 		execfile( esmfile, aContext )
             
 
-	def registerJob(self, scriptfile, interpreter, argument='', extrafilelist=[], setimeout=0 ):
+	def registerJob(self, scriptfile, interpreter, argument='', extrafilelist=[], timeout=0 ):
 		'''registers a new job
 		scriptfile(str)            -- script file name
-		interpreter(str)           -- interpreter name seto run script
-		argument(str)              -- argument set be set seto script
+		interpreter(str)           -- interpreter name to run script
+		argument(str)              -- argument set be set to script
 		extrafilelist(list of str) -- list of extra file name
-		timeout(int)               -- set time out (sec.). When setimeout<=0, no limit is set.
+		timeout(int)               -- set time out (sec.). When timeout<=0, no limit is set.
 		return int : job id
 		'''
 
@@ -308,7 +303,7 @@ class SessionManager:
 		aSessionProxy.setInterpreter( interpreter )
 		aSessionProxy.setArgument( argument )
 		aSessionProxy.setExtraFileList( extrafilelist )
-		aSessionProxy.setTimeout( setimeout )
+		aSessionProxy.setTimeout( timeout )
 
 
 		# creates job directory name
@@ -323,12 +318,13 @@ class SessionManager:
 
 
 
-	def registerEcellSession(self, ess, argument={}, extrafilelist=[], setimeout=0 ):
+	def registerEcellSession(self, ess, argument={}, extrafilelist=[], dmpath="", timeout=0):
 		'''registers a new Ecell Session
 		ess(str)                   -- ess file name
-		argument(dict)             -- argument seto be set seto script
+		argument(dict)             -- argument to be set seto script
 		extrafilelist(list of str) -- list of extra file name
-		timeout(int)               -- set time out (sec.). When setimeout=0, no limit is set.
+		dmpath(str)            -- set the ECELL3_DM_PATH
+		timeout(int)               -- set time out (sec.). When timeout=0, no limit is set.
 		return int : job id
 		'''
 
@@ -338,8 +334,8 @@ class SessionManager:
 		aSessionProxy.setInterpreter( ECELL3_SESSION )
 		aSessionProxy.setSessionArgument( argument )
 		aSessionProxy.setExtraFileList( extrafilelist )
-		aSessionProxy.setTimeout( setimeout )
-
+		aSessionProxy.setDM_PATH(dmpath)
+		aSessionProxy.setTimeout( timeout )
 
 		# creates job directory name
 		aJobDirectoryName = "%s%s%s" %(self.__theTmpDir,
@@ -469,7 +465,7 @@ class SessionManager:
 		# initialize a job list
 		aJobList = []
 
-		# When sethe status is RUN, append it.
+		# When the status is RUN, append it.
 		for aSessionProxy in self.__theSessionProxyDict.values():
 			if aSessionProxy.getStatus() == RUN:
 				aJobList.append(aSessionProxy)
@@ -506,10 +502,10 @@ class SessionManager:
 		# initialize a job list
 		aJobList = []
 
-		# checks sethe status of SessionProxy
+		# checks the status of SessionProxy
 		for aSessionProxy in self.__theSessionProxyDict.values():
 
-			# when sethe status is FINISHED, append it.
+			# when the status is FINISHED, append it.
 			if aSessionProxy.getStatus() == FINISHED:
 				aJobList.append(aSessionProxy)
 
@@ -525,7 +521,7 @@ class SessionManager:
 		Return boolean 
 		'''
 
-		# If sethere is job who status is QUEUED or RUN, return False
+		# If there is job who status is QUEUED or RUN, return False
 		for aSessionProxy in self.__theSessionProxyDict.values():
 			if aSessionProxy.getStatus() == QUEUED or\
 			   aSessionProxy.getStatus() == RUN:
@@ -542,7 +538,7 @@ class SessionManager:
 		Return boolean 
 		'''
 
-		# If sethere is job who status is ERROR, return True.
+		# If there is job who status is ERROR, return True.
 		for aSessionProxy in self.__theSessionProxyDict.values():
 			if aSessionProxy.getStatus() == ERROR:
 				return True
@@ -553,12 +549,12 @@ class SessionManager:
 
 	def isRunning( self ):
 		'''Check the existance of running job.
-		When sethe number of jobs who status is RUN > 0, return True.
+		When the number of jobs who status is RUN > 0, return True.
 
 		Return boolean 
 		'''
 
-		# If sethere is job who status is RUN, return True.
+		# If there is job who status is RUN, return True.
 		for aSessionProxy in self.__theSessionProxyDict.values():
 			if aSessionProxy.getStatus() == RUN:
 				return True
@@ -569,7 +565,7 @@ class SessionManager:
 
 
 	def __timeout( self, signum, frame ):
-		'''When run method reaches setimeout, this method is called.
+		'''When run method reaches timeout, this method is called.
 		In this method, stop method is called.
 
 		Return None
@@ -806,7 +802,7 @@ class SessionManager:
 	def setStdoutFileName( self, stdout ):
 		'''Set the standard output file.
 
-		stdout(str of file) -- sethe file name or file object 
+		stdout(str of file) -- the file name or file object 
 		                       default is 'stdout'
 
 		Return None
@@ -818,9 +814,9 @@ class SessionManager:
 
 
 	def getStdoutFileName( self ):
-		'''Return sethe standard output file.
+		'''Return the standard output file.
 
-		stdout(str of file) -- sethe file name or file object.
+		stdout(str of file) -- the file name or file object.
 		Return str or file : standard output
 		'''
 
@@ -832,7 +828,7 @@ class SessionManager:
 	def setStderrFileName( self, stderror ):
 		'''Set the standard error file.
 
-		stderr(str of file) -- sethe file name or file object
+		stderr(str of file) -- the file name or file object
 		                       default is 'stderr'
 		Return None
 		'''
@@ -851,7 +847,6 @@ class SessionManager:
 
 		# return standard error 
 		return SessionProxy.getStderrFileName()
-
 
 
 	def getJobDirectory( self, jobid ):

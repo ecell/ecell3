@@ -97,15 +97,22 @@ class LocalSessionProxy(SessionProxy):
 		# create context
 		#print str(self.getSessionArgument())
 		if self.getInterpreter() == ECELL3_SESSION:
-			aContext = "%s -e %s --parameters=\"%s\"" %(ECELL3_SESSION,
-		                            os.path.basename(self.getScriptFileName()),
-		                            str(self.getSessionArgument()))
-			#print aContext
+			
+			if self.getDM_PATH != "":
+				
+				aContext = "ECELL3_DM_PATH=%s %s -e %s --parameters=\"%s\"" %(self.getDM_PATH(),
+									     ECELL3_SESSION,
+									     os.path.basename(self.getScriptFileName()),
+									     str(self.getSessionArgument()))
+			else:
+				aContext = "%s -e %s --parameters=\"%s\""%(ECELL3_SESSION,
+									   os.path.basename(self.getScriptFileName()),
+									   str(self.getSessionArgument()))
+			# print aContext
 		else:
 			aContext = "%s %s %s" %(self.getInterpreter(),
 		                            os.path.basename(self.getScriptFileName()),
 		                            self.getArgument())
-
 
 		# execute the context
 		self.__theSubProcess = popen2.Popen3( aContext, capturestderr=True )
