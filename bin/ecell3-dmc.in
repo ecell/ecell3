@@ -13,7 +13,7 @@ prefix=@prefix@
 exec_prefix=@prefix@
 
 BINDIR="${exec_prefix}/bin"
-STDLIBDIR="${exec_prefix}/lib"
+STDLIBDIR="-L${exec_prefix}/lib"
 
 ECELL_INCLUDE="${prefix}/include/ecell"
 LIBECS_INCLUDE="${ECELL_INCLUDE}/libecs"
