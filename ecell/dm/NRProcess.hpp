@@ -92,20 +92,21 @@ public:
     Real aMultiplicity( roundValue( theVariableReferenceVector[0].
 				    getValue() ) );
 
-    // a loop over substrates.  coeff is either -1 or -2.
-    if( getZeroVariableReferenceOffset() == 2 ) // two substrates
+    if( getOrder() == 1 )   // one substrate, first order.
       {
+	; // do nothing
+      }
+    else if( getZeroVariableReferenceOffset() == 2 ) // 2 substrates, 2nd order
+      {  
 	aMultiplicity *= roundValue( theVariableReferenceVector[1].
 				     getValue() );
       }
-    else if( getOrder() == 2 )   // just one substrate, and order == 2
+    else // one substrate, second order (coeff == -2)
       {
-	// what if the number of molecules == 1 or 0 ?
 	aMultiplicity *= ( aMultiplicity - 1.0 );
       }
-    // else, just one substrate, order == 1. do nothing in this case.
 
-
+    // this method never return a negative number
     return aMultiplicity;
   }
 
@@ -140,7 +141,6 @@ public:
 	  }
 
 	++s;
-
       } 
 
     return aMinValue;
@@ -154,24 +154,24 @@ public:
   {
     const Real aMu( getMu() );
 
-    if( aMu == 0.0 )
+    // this if is unnecessary: getMultiplicity() always gives >= 0.0
+    //if( aMu < 0.0 )
+    //      {
+    //	THROW_EXCEPTION( SimulationError, "Negative Mu value." );
+    //      }
+
+    if( aMu > 0.0 )
+      {
+	theStepInterval = - log( u ) / aMu;
+
+	if( getOrder() == 2 )
+	  {
+	    theStepInterval *= getSuperSystem()->getVolume() * N_A;
+	  }
+      }
+    else // aMu == 0.0 (or aMu < 0.0 but this won't happen)
       {
 	theStepInterval = std::numeric_limits<Real>::max();
-	return;
-      }
-
-    // make sure getMultiplicity() gives always > 0.0, and
-    // this if can be eliminated.
-    if( aMu < 0.0 )
-      {
-	THROW_EXCEPTION( SimulationError, "Negative Mu value." );
-      }
-
-    theStepInterval = - log( u ) / aMu;
-
-    if( getOrder() == 2 )
-      {
-	theStepInterval *= getSuperSystem()->getVolume() * N_A;
       }
   }
 
@@ -277,7 +277,6 @@ void NRProcess::calculateOrder()
 	  THROW_EXCEPTION( InitializationFailed,
 			   "[" + getFullID().getString() + 
 			   "]: Zero stoichiometry is not allowed." );
-
 	}
 
 	
@@ -288,8 +287,9 @@ void NRProcess::calculateOrder()
 	}
     }
 
-  assert( theOrder == 1 || theOrder == 2 );
 
+  // this is checked in initialize()
+  // assert( theOrder == 1 || theOrder == 2 );
 }
 
 
