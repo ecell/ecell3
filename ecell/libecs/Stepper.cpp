@@ -795,6 +795,14 @@ namespace libecs
 			 NULLPTR,
 			 &AdaptiveDifferentialStepper::getMaxErrorRatio );
 
+    DEFINE_PROPERTYSLOT( "AbsoluteEpsilon", Real,
+			 &AdaptiveDifferentialStepper::setAbsoluteEpsilon,
+			 &AdaptiveDifferentialStepper::getAbsoluteEpsilon );
+
+    DEFINE_PROPERTYSLOT( "RelativeEpsilon", Real,
+			 &AdaptiveDifferentialStepper::setRelativeEpsilon,
+			 &AdaptiveDifferentialStepper::getRelativeEpsilon );
+
     DEFINE_PROPERTYSLOT( "Order", Int, 
 			 NULLPTR,
 			 &AdaptiveDifferentialStepper::getOrder );
@@ -806,6 +814,8 @@ namespace libecs
     theAbsoluteToleranceFactor( 1.0 ),
     theStateToleranceFactor( 1.0 ),
     theDerivativeToleranceFactor( 1.0 ),
+    theAbsoluteEpsilon( 0.1 ),
+    theRelativeEpsilon( 0.1 ),
     safety( 0.9 ),
     theMaxErrorRatio( 1.0 )
   {
@@ -826,20 +836,32 @@ namespace libecs
 
     while( !calculate() )
       {
-	// shrink it if the error exceeds 110%
-	setStepInterval( getStepInterval() 
-			 * pow( getMaxErrorRatio(), -1.0 / getOrder() ) 
-			 * safety );
+	const Real
+	  anExpectedStepInterval( getStepInterval() 
+				  * pow( getMaxErrorRatio(),
+					 -1.0 / getOrder() ) 
+				  * safety );
 
-	//	setStepInterval( getStepInterval() * 0.5 );
+	  if ( anExpectedStepInterval > getMinInterval() )
+	    {
+	      // shrink it if the error exceeds 110%
+	      setStepInterval( anExpectedStepInterval );
+	      
+	      //	setStepInterval( getStepInterval() * 0.5 );
 
-	//	std::cerr << "s " << getCurrentTime() 
-	//		  << ' ' << getStepInterval()
-	//		  << std::endl;
+	      //	std::cerr << "s " << getCurrentTime() 
+	      //		  << ' ' << getStepInterval()
+	      //		  << std::endl;
+	    }
+	  else
+	    {
+	      setStepInterval( getMinInterval() );
+
+	      // this must return false
+	      calculate();
+	      break;
+	    }
       }
-
-    const Real theAbsoluteEpsilon( 0.1 );
-    const Real theRelativeEpsilon( 0.1 );
 
     const Real anAdaptedStepInterval( getStepInterval() );
     const UnsignedInt aSize( getReadOnlyVariableOffset() );
@@ -858,6 +880,16 @@ namespace libecs
 	  }
       }
 
+    if ( anAdaptedStepInterval > getStepInterval() )
+      {
+	reset();
+
+	if ( !calculate() )
+	  {
+	    ; // this should not be called
+	  }
+      }
+
     const Real maxError( getMaxErrorRatio() );
 
     // grow it if error is 50% less than desired
@@ -866,6 +898,7 @@ namespace libecs
 	Real aNewStepInterval( getStepInterval() 
 			       * pow(maxError , -1.0 / ( getOrder() + 1 ) )
 			       * safety );
+
 	//	Real aNewStepInterval( getStepInterval() * 2.0 );
 
 	//	std::cerr << "g " << getCurrentTime() << ' ' 

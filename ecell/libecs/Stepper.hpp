@@ -718,6 +718,30 @@ namespace libecs
       return theMaxErrorRatio;
     }
 
+    /**
+       check difference in one step
+    */
+
+    void setAbsoluteEpsilon( RealCref aValue )
+    {
+      theAbsoluteEpsilon = aValue;
+    }
+
+    const Real getAbsoluteEpsilon() const
+    {
+      return theAbsoluteEpsilon;
+    }
+
+    void setRelativeEpsilon( RealCref aValue )
+    {
+      theRelativeEpsilon = aValue;
+    }
+
+    const Real getRelativeEpsilon() const
+    {
+      return theRelativeEpsilon;
+    }
+
     virtual const Int getOrder() const { return 1; }
 
     void makeSlots();
@@ -752,6 +776,9 @@ namespace libecs
     Real theAbsoluteToleranceFactor;
     Real theStateToleranceFactor;
     Real theDerivativeToleranceFactor;
+
+    Real theAbsoluteEpsilon;
+    Real theRelativeEpsilon;
 
     Real theMaxErrorRatio;
   };
