@@ -549,6 +549,10 @@ namespace libecs
     clear();
     processNormal();
 
+
+    //FIXME: temporary workaround to a bug. should be removed.
+    setNextStepInterval( getStepInterval() );
+
     updateVelocityBuffer();
   }
 
@@ -680,8 +684,8 @@ namespace libecs
     clear();
 
     // don't expect too much from euler
-    const Real eps_abs( 1.0e-5 );
-    const Real eps_rel( 1.0e-5 );
+    const Real eps_abs( 1.0e-6 );
+    const Real eps_rel( 1.0e-6 );
     const Real a_y( 1.0 );
     const Real a_dydt( 1.0 );
 
@@ -742,11 +746,11 @@ namespace libecs
 		// shrink it if the error exceeds 110%
 		if( delta_max > 1.1 )
 		  {
-		    //               	    setStepInterval( getStepInterval() * 0.5 );
-      		    setStepInterval( getStepInterval() * pow(delta_max, -1.0) *  safety );
+		    setStepInterval( getStepInterval() * 0.5 );
+		    //      		    setStepInterval( getStepInterval() * pow(delta_max, -1.0) *  safety );
 
-		    //		    std::cerr << "s " << getCurrentTime() << ' ' 
-		    //		     << getStepInterval() << std::endl;
+		    //		    		    std::cerr << "s " << getCurrentTime() << ' ' 
+		    //		    		     << getStepInterval() << std::endl;
 
 		    reset();
 		    continue;
@@ -759,11 +763,11 @@ namespace libecs
 	  }
 
 
-	if( delta_max <= 0.5 )
+	if( delta_max < 0.5 )
 	  {
 	    // grow it if error is 50% less than desired
-	    //    	    aStepInterval = getStepInterval() * 2.0;
-    	    aStepInterval = getStepInterval() * pow(delta_max, -0.5) * safety;
+	    aStepInterval = getStepInterval() * 2.0;
+	    //    	    aStepInterval = getStepInterval() * pow(delta_max, -0.5) * safety;
 
 	    const Real aMaxInterval( getMaxInterval() );
 	    if( aStepInterval >= aMaxInterval )
@@ -771,8 +775,8 @@ namespace libecs
 		aStepInterval = aMaxInterval;
 	      }
 
-	    //	    std::cerr << "g " << getCurrentTime() << ' ' 
-	    //		      << aStepInterval << std::endl;
+	    //	    	    std::cerr << "g " << getCurrentTime() << ' ' 
+	    //	    		      << aStepInterval << std::endl;
 
 	    setNextStepInterval( aStepInterval );
 	  }
@@ -808,18 +812,19 @@ namespace libecs
 
   void Midpoint2Stepper::step()
   {
+    const UnsignedInt aSize( theVariableCache.size() );
+
+    const Real eps_abs( 1.0e-6 );
+    const Real eps_rel( 1.0e-7 );
+    const Real a_y( 1.0 );
+    const Real a_dydt( 1.0 );
+
+    const Real safety( 0.9 );
+
     Real maxError( 0.0 );
     Real desiredError, tmpError;
     Real aStepInterval;
 
-    const UnsignedInt aSize( theVariableCache.size() );
-
-    const Real eps_rel( 1.0e-8 );
-    const Real eps_abs( 1.0e-6 );
-    const Real a_y( 0.0 );
-    const Real a_dydt( 0.0 );
-
-    //    const Real safety( 0.9 );
 
     // integrate phase first
     integrate();
@@ -850,7 +855,7 @@ namespace libecs
 
 	    // restore k1/2 + x
 	    aVariable->loadValue( theK1[ c ] * .5  * getStepInterval()
-				      + theValueBuffer[ c ] );
+				  + theValueBuffer[ c ] );
 
 	    // k1 * for ~Yn+1
 	    theErrorEstimate[ c ] = theK1[ c ];
@@ -896,22 +901,30 @@ namespace libecs
 	    theErrorEstimate[ c ] += aVelocity;
 	    theErrorEstimate[ c ] /= 6.0;
 
-//  	    desiredError = eps_rel * ( a_y * fabs(theValueBuffer[ c ]) + a_dydt * getStepInterval() * fabs(theVelocityBuffer[ c ]) ) + eps_abs;
-//  	    tmpError = fabs(theVelocityBuffer[ c ] - theErrorEstimate[ c ]) / desiredError;
+  	    desiredError = eps_rel * 
+	      ( a_y * fabs(theValueBuffer[ c ]) 
+		+ a_dydt * getStepInterval() * 
+		fabs(theVelocityBuffer[ c ]) ) + eps_abs;
+  	    tmpError = fabs(theVelocityBuffer[ c ] - theErrorEstimate[ c ]) / desiredError;
 	    
-//  	    if( tmpError > maxError )
-//  	      {
-//  		maxError = tmpError;
+  	    if( tmpError > maxError )
+  	      {
+  		maxError = tmpError;
 		
-//  		if( maxError > 1.1 )
-//  		  {
-//  		    // shrink it if the error exceeds 110%
-//  		    setStepInterval( getStepInterval() * pow(maxError , -0.5) *  safety );
+  		if( maxError > 1.1 )
+  		  {
+  		    // shrink it if the error exceeds 110%
+		    //  		    setStepInterval( getStepInterval() * pow(maxError , -0.5) *  safety );
 
-//  		    reset();
-//  		    continue;
-//  		  }
-//  	      }
+  		    setStepInterval( getStepInterval() * .5 );
+
+		    //		    		    std::cerr << "s " << getCurrentTime() << ' ' 
+		    //		    		     << getStepInterval() << std::endl;
+
+  		    reset();
+  		    continue;
+  		  }
+  	      }
 
 	    // restore x (original value)
 	    aVariable->loadValue( theValueBuffer[ c ] );
@@ -921,19 +934,25 @@ namespace libecs
 	  }
 
 	// grow it if error is 50% less than desired
-//  	if (maxError <= 0.5)
-//  	  {
-//  	    aStepInterval = getStepInterval() * pow(maxError , -1.0/3.0) * safety;
-//  	    if( aStepInterval >= getUserMaxInterval() )
-//  	      {
-//  		aStepInterval = getStepInterval();
-//  	      }
+  	if (maxError <= 0.5)
+  	  {
+	    //  	    aStepInterval = getStepInterval() * pow(maxError , -1.0/3.0) * safety;
 
-//  	    setNextStepInterval( aStepInterval );
-//  	  }
-//  	else setNextStepInterval( getStepInterval() );
+  	    aStepInterval = getStepInterval() * 2;
+  	    if( aStepInterval >= getUserMaxInterval() )
+  	      {
+  		aStepInterval = getStepInterval();
+  	      }
 
-	setNextStepInterval( getStepInterval() );
+
+	    //		    		    std::cerr << "g " << getCurrentTime() << ' ' 
+	    //		    		     << getStepInterval() << std::endl;
+  	    setNextStepInterval( aStepInterval );
+  	  }
+  	else 
+	  {
+	    setNextStepInterval( getStepInterval() );
+	  }
 
 	break;
       }
@@ -976,8 +995,8 @@ namespace libecs
 
     const Real eps_rel( 1.0e-8 );
     const Real eps_abs( 1.0e-10 );
-    const Real a_y( 0.0 );
-    const Real a_dydt( 0.0 );
+    const Real a_y( 1.0 );
+    const Real a_dydt( 1.0 );
     const Real safety( 0.9 );
 
     // integrate phase first
@@ -1141,23 +1160,23 @@ namespace libecs
 	    // k6 * 1/4 for ~Yn+1
 	    theErrorEstimate[ c ] += theK6[ c ] * .25;
 
-	    //  	    desiredError = eps_rel * ( a_y * fabs(theValueBuffer[ c ]) + a_dydt * getStepInterval() * fabs(theVelocityBuffer[ c ]) ) + eps_abs;
-	    //  	    tmpError = fabs(theVelocityBuffer[ c ] - theErrorEstimate[ c ]) / desiredError;
+	    desiredError = eps_rel * ( a_y * fabs(theValueBuffer[ c ]) + a_dydt * getStepInterval() * fabs(theVelocityBuffer[ c ]) ) + eps_abs;
+	    tmpError = fabs(theVelocityBuffer[ c ] - theErrorEstimate[ c ]) / desiredError;
 	    
-	    //  	    if( tmpError > maxError )
-	    //  	      {
-	    //  		maxError = tmpError;
+	    if( tmpError > maxError )
+	      {
+		maxError = tmpError;
 		
-	    //  		if( maxError > 1.1 )
-	    //  		  {
-	    //  		    // shrink it if the error exceeds 110%
-	    //  		    setStepInterval( getStepInterval() * pow(maxError , -0.20) *  safety );
+		if( maxError > 1.1 )
+		  {
+		    // shrink it if the error exceeds 110%
+		    setStepInterval( getStepInterval() * pow(maxError , -0.20) *  safety );
 
 	    //    		    printf("Error: %e\nInterval: %lf\n", theVelocityBuffer[ c ]-theErrorEstimate[ c ], getStepInterval());
-	    //  		    reset();
-	    //  		    continue;
-	    //  		  }
-	    //  	      }
+		    reset();
+		    continue;
+		  }
+	      }
 
 	    // restore x (original value)
 	    aVariable->loadValue( theValueBuffer[ c ] );
@@ -1167,22 +1186,24 @@ namespace libecs
 	  }
 
 	// grow it if error is 50% less than desired
-	//  	if (maxError <= 0.5)
-	//  	  {
-	//  	    aStepInterval = getStepInterval() * pow(maxError , -0.25) * safety;
-
-	//  	    if( aStepInterval >= getUserMaxInterval() )
-	//  	      {
-	//  		aStepInterval = getStepInterval();
-	//  	      }
-
-	//  	    printf("Error: %e\nInterval: %lf\n", maxError, aStepInterval);
+	if (maxError <= 0.5)
+	  {
+	    aStepInterval = getStepInterval() * pow(maxError , -0.25) * safety;
 	    
-	//  	    setNextStepInterval( aStepInterval );
-	//  	  }
-	//  	else setNextStepInterval( getStepInterval() );
+	    if( aStepInterval >= getUserMaxInterval() )
+	      {
+		aStepInterval = getStepInterval();
+	      }
+	    
+	    //  	    printf("Error: %e\nInterval: %lf\n", maxError, aStepInterval);
+	    
+	    setNextStepInterval( aStepInterval );
+	  }
+	else 
+	  {
+	    setNextStepInterval( getStepInterval() );
+	  }
 	
-	setNextStepInterval( getStepInterval() );
 
 	break;
       }

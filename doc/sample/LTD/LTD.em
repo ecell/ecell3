@@ -3,7 +3,9 @@
 # from file: LTD.eml, date: Mon Oct 14 19:51:27 2002
 #
 
-Stepper Euler1Stepper( SRM_01 )
+#Stepper Euler1Stepper( SRM_01 )
+#Stepper Midpoint2Stepper( SRM_01 )
+Stepper FixedRungeKutta4Stepper( SRM_01 )
 {
 	# no property
 }
