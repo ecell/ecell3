@@ -31,11 +31,12 @@
 #if !defined(__PHYSICALLOGGER_HPP)
 #define __PHYSICALLOGGER_HPP
 
+#include "libecs.hpp"
+
 #include "Exceptions.hpp"
 #include "VVector.h"
 #include "DataPoint.hpp"
 
-#include "libecs.hpp"
 #include "DataPointVector.hpp"
 
 namespace libecs

@@ -27,7 +27,6 @@
 // written by Gabor Bereczki <gabor.bereczki@talk21.com>
 //
 
-#include "config.h" 
 #include "PhysicalLogger.hpp"
 
 namespace libecs
@@ -126,7 +125,6 @@ namespace libecs
       }
     PhysicalLoggerIterator iterator( i_start );
     PhysicalLoggerIterator return_value( i_start );
-
 	
     do
       {

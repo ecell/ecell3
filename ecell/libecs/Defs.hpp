@@ -38,7 +38,7 @@
 #include <list>
 #include <vector>
 
-#include "config.h"
+#include "ecell/config.h"
 
 #include "CoreLinuxCompatibility.hpp"
 #include "AssocVector.h"

@@ -32,7 +32,6 @@
 #define __EXCEPTIONS_HPP
 #include <stdexcept>
 
-#include "config.h"
 #include "Defs.hpp"
 
 
