@@ -14,15 +14,23 @@ def usage():
     print '''
 %s -- invoke ecell3 python intract mode or run ess file
 
-Usage: %s [-h] [-f emlfile] [-e essfile]
+Usage:
 
+       %s [-f] [-f emlfile]          : load model and invoke ecell3 intract mode
+       %s [essfile] [-e essfile]     : run ess file
+       %s                            : invoke ecell3 intract mode
+       %s [-h]                       : Print this message
+       
 Options:
         -e or --exec=[.ess file]  :  load script (.ess) file
         -f or --file=[.eml file]  :  load model (.eml) file
-        -h or --help              :  Print this message.
+        --parameters [parameters] :  Set session parameters
+				     parameters eaxmple : '{ NAME1: VALUE1, NAME2:VALUE2,...}' 
+	-DNAME=VALUE 		  :  Set session parameters
+	-h or --help              :  Print this message.
 
         Do not use -e and -f at same time.
-'''% ( aProgramName, aProgramName )
+'''% ( aProgramName, aProgramName, aProgramName, aProgramName, aProgramName )
 
 def main():
 
@@ -31,6 +39,7 @@ def main():
     # -------------------------------------
     anEmlFile = None
     anEssFile = None
+    anEmlFlag = 0
     
     if len( sys.argv ) == 2:	
         if not (sys.argv[1])[0] == "-":
@@ -44,7 +53,7 @@ def main():
     # gets options
     # -------------------------------------
     try:
-        opts , args = getopt.getopt( sys.argv[1:] , 'he:f:',
+        opts , args = getopt.getopt( sys.argv[1:] , 'he:ff:',
                                      ["help", "exec=", "file="])
     except:
         usage()
@@ -54,7 +63,7 @@ def main():
     # checks argument
     # -------------------------------------
     for anOption, anArg in opts:
-        print anOption ,anArg
+
         # prints help message
         if anOption in ( "-h", '--help' ):
             usage()
@@ -62,14 +71,21 @@ def main():
             
         # executes script file (.ess)
         if anOption in ( "-e", '--exec'):
-            anEssFile = anArg
+            if not anArg:
+                print "Warning: not specify ess file"
+                usage()
+		sys.exit(0)
+	    anEssFile = anArg
             
         # load model file (.eml)
         if anOption in ( "-f", '--file' ):
-            anEmlFile = anArg
-        
+            if not anArg:
+                print "Warning: not specify eml file"
+                usage()
+		sys.exit(0)
+            anEmlFile = anArg            
             
-        
+            
     if anEssFile and anEmlFile:
         print "Warning: Do not use -e and -f at same time."
         usage()
@@ -83,12 +99,13 @@ def main():
 
     if anEssFile:
         aSession.loadScript( anEssFile, aParameters )
+
     elif anEmlFile:
         aSession.loadModel(anEmlFile)
         aSession.interact( aParameters )
+
     else:
         aSession.interact( aParameters )
          
-
 if __name__ == '__main__':
 	main()
