@@ -100,6 +100,16 @@ def validateFullPropertyName( fullpropertyname ):
             "FullPropertyName has 4 fields. ( %d given )" % aLength )
 
 
+def createSystemPathFromFullID( aSystemFullID ):
+    if aSystemFullID[SYSTEMPATH] == '/':
+        if aSystemFullID[ID] == '/':
+            aNewSystemPath = '/'
+        else:
+            aNewSystemPath = '/' + aSystemFullID[ID]
+    else:
+        aNewSystemPath = aSystemFullID[SYSTEMPATH] + '/' +\
+                         aSystemFullID[ID]
+    return aNewSystemPath
 
 if __name__ == "__main__":
     
@@ -119,3 +129,10 @@ if __name__ == "__main__":
     print FullIDToFullPropertyName( fullid )
 
     print FullPropertyNameToFullID( fullproperty )
+
+    systemfullid1  = FullID( 'System:/:CELL' )
+    systemfullid2  = FullID( 'System:/CELL:CYTOPLASM' )
+    systemfullid3  = FullID( 'System:/:/' )
+    print createSystemPathFromFullID( systemfullid1 )
+    print createSystemPathFromFullID( systemfullid2 )
+    print createSystemPathFromFullID( systemfullid3 )
