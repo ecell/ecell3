@@ -97,10 +97,6 @@ AssocVector.h\
 FluxProcess.hpp
 
 
-bin_SCRIPTS =\
-emtool
-
-
 all-local: libecs.so
 
 libecs.so: libecs.la
