@@ -145,6 +145,15 @@ namespace libecs
       return theScheduler.getCurrentTime();
     }
 
+    /**
+       Creates a new Entity object and register it in an appropriate System
+       in  the Model.
+
+       @param aClassname
+       @param aClassType
+    */
+
+    PolymorphMapCref getClassInfo( StringCref aClassType, StringCref aClassname );
 
     /**
        Creates a new Entity object and register it in an appropriate System

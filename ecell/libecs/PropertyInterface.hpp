@@ -37,6 +37,8 @@
 #include "PropertySlot.hpp"
 #include "PropertySlotProxy.hpp"
 
+#define PROPERTY_FIELD  "Property__"
+#define PROPERTYLIST_FIELD  "PropertyList"
 
 namespace libecs
 {
@@ -104,9 +106,6 @@ namespace libecs
     public PropertyInterfaceBase
   {
 
-  private:
-	static const char* PROPERTY_FIELD; 
-	static const char* PROPERTYLIST_FIELD;
   public:
 
     typedef PropertySlot<T> PropertySlot_;
@@ -117,8 +116,6 @@ namespace libecs
 
     PropertyInterface()
     {
-	  PROPERTY_FIELD = "Property__";
-	  PROPERTYLIST_FIELD = "PropertyList";
 	  theInfoMap[ String( PROPERTYLIST_FIELD )] = Polymorph( PolymorphVector() ) ;
       T::initializePropertyInterface( Type2Type<T>() );
     }
@@ -503,6 +500,9 @@ namespace libecs
   // when the class is specialized (in LIBECS_DM_INIT_STATIC()).
   template< class T > class libecs::PropertyInterface< T>::PropertySlotMap
   libecs::PropertyInterface< T>::thePropertySlotMap;
+   template< class T > class libecs::PolymorphMap
+  libecs::PropertyInterface< T>::theInfoMap;
+ 
 
 
   /*@}*/

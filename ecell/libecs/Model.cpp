@@ -38,7 +38,12 @@
 #include "SystemStepper.hpp"
 
 #include "Model.hpp"
+#define STEPPERTYPE_NAME "Stepper"
+#define SYSTEMTYPE_NAME "System"
+#define PROCESSTYPE_NAME "Process"
+#define VARIABLETYPE_NAME "Variable"
 
+#include <stdio.h>
 
 namespace libecs
 {
@@ -89,6 +94,37 @@ namespace libecs
   }
 
 
+  PolymorphMapCref Model::getClassInfo( StringCref aClassType, StringCref aClassname )
+  {
+	const void* (*InfoPtrFunc)();
+    
+     
+	if ( aClassType == VARIABLETYPE_NAME )
+	  {
+		InfoPtrFunc = getVariableMaker().getModule( aClassname).getInfoLoader();
+	  }
+	else if (aClassType ==  PROCESSTYPE_NAME )
+	  {
+		InfoPtrFunc = getProcessMaker().getModule( aClassname).getInfoLoader();
+	  }
+	else if ( aClassType == SYSTEMTYPE_NAME )
+	  {
+		InfoPtrFunc = getSystemMaker().getModule( aClassname).getInfoLoader();
+	  }
+	else if ( aClassType == STEPPERTYPE_NAME )
+	  {
+		InfoPtrFunc = getStepperMaker().getModule( aClassname).getInfoLoader();
+	  }
+
+    else 
+	  {
+		THROW_EXCEPTION( InvalidEntityType,
+						 "bad ClassType specified." );
+	  }
+	return *(reinterpret_cast<const PolymorphMap*>( InfoPtrFunc() ) );
+  }
+
+
   void Model::createEntity( StringCref aClassname,
 			    FullIDCref aFullID )
   {
@@ -114,12 +150,13 @@ namespace libecs
 	aProcessPtr = getProcessMaker().make( aClassname );
 	aProcessPtr->setID( aFullID.getID() );
 	aContainerSystemPtr->registerProcess( aProcessPtr );
+
 	break;
       case EntityType::SYSTEM:
-	aSystemPtr = getSystemMaker().make( aClassname );
-	aSystemPtr->setID( aFullID.getID() );
-	aSystemPtr->setModel( this );
-	aContainerSystemPtr->registerSystem( aSystemPtr );
+		aSystemPtr = getSystemMaker().make( aClassname );
+		aSystemPtr->setID( aFullID.getID() );
+		aSystemPtr->setModel( this );
+		aContainerSystemPtr->registerSystem( aSystemPtr );
 	break;
 
       default:
@@ -127,6 +164,7 @@ namespace libecs
 			 "bad EntityType specified." );
 
       }
+	
 
   }
 
@@ -302,7 +340,10 @@ namespace libecs
     theSystemStepperPtr->initialize();
 
   }
+  PolymorphMapCref getClassInfo( StringCref aClassName )
+  {
 
+  }
 
 } // namespace libecs
 
