@@ -76,7 +76,7 @@ namespace libemc
       theLoggerImplementation = 
 	new LocalLoggerImplementation( aMessageSlotClass );
     }
-
+    /*
     void update( void )
     {
       theLoggerImplementation->update();
@@ -86,6 +86,7 @@ namespace libemc
     {
       theLoggerImplementation->update( datapoint );
     }
+    */
  
 
   private:

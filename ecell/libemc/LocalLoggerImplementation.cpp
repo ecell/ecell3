@@ -38,9 +38,9 @@ namespace libemc
   using namespace libecs;
 
   LocalLoggerImplementation::
-  LocalLoggerImplementation( MessageSlotObject aMessageSlotClassCptr )
+  LocalLoggerImplementation( MessageSlotObject aMessageSlot )
     :
-    theLogger( Logger( aMessageSlotClassCptr ) ) 
+    theLogger( Logger( aMessageSlot ) ) 
   {
     ; // do nothing
   }
@@ -50,6 +50,7 @@ namespace libemc
     ;
   }
 
+  /*
   void LocalLoggerImplementation::update( )
   {
     theLogger.update( );
@@ -60,6 +61,7 @@ namespace libemc
   {
     theLogger.update( datapoint );
   }
+  */
 
   Logger::DataPointVectorCref
   LocalLoggerImplementation::getData( libecs::RealCref start,

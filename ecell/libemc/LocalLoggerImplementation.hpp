@@ -39,7 +39,7 @@
 namespace libemc
 {
 
-  typedef libecs::AbstractMessageSlotCptr MessageSlotObject;
+  typedef libecs::AbstractMessageSlotPtr MessageSlotObject;
 
   class LocalLoggerImplementation
     :
@@ -63,9 +63,12 @@ namespace libemc
 	     libecs::RealCref end,
 	     libecs::RealCref interval ) const;
 
+
+    /*
     void update( void );
 
     void update( libecs::Logger::containee_type& datapoint );
+    */
 
   private:
 

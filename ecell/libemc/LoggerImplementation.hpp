@@ -63,10 +63,12 @@ namespace libemc
 	     libecs::RealCref end,
 	     libecs::RealCref interval ) const = 0;
 
+    /*
     virtual void update( void ) = 0;
 
     // FIXME temporary
     virtual void update( libecs::Logger::containee_type& datapoint ) = 0;  
+    */
 
 
   };
