@@ -54,11 +54,10 @@ class DataGenerator:
         '''
         dataList = zeros( (0,5) )
         xAxis = aDataSeries.getXAxis()
+        fullPNString = aDataSeries.getFullPNString()
+        currentTime = self.__theSession.theSimulator.getCurrentTime()
 
         if xAxis == "Time":
-
-            fullPNString = aDataSeries.getFullPNString()
-            currentTime = self.__theSession.theSimulator.getCurrentTime()
 
             if not self.hasLogger( fullPNString ):
                 currentValue = self.__theSession.theSimulator.getEntityProperty( fullPNString )
@@ -81,10 +80,19 @@ class DataGenerator:
             if ( size == 0 ):
                 dataList = zeros( (0,5) )
         
-            self.lastTime = currentTime
+
         else: #xaxis is fullpn, so this dataseries is used for phase plotting
-            pass
+
+            x = self.__theSession.theSimulator.getEntityProperty( xAxis )
+            y = self.__theSession.theSimulator.getEntityProperty( fullPNString )
+            dataList = zeros( (1,5) )
+            dataList[0][0] = x
+            dataList[0][1] = y
+            dataList[0][2] = y
+            dataList[0][3] = y
+            dataList[0][4] = y
             # do interpolation here
+        self.lastTime = currentTime
         aDataSeries.addPoints( dataList )
 
     # end of requestNewData
@@ -110,6 +118,7 @@ class DataGenerator:
                 dataList = self.__theSession.theSimulator.getLoggerData( fullPNString, aStartTime, anEndTime,   requiredResolution )
         else:
             pass
+            return
             # do interpolation on X axis
 
         aDataSeries.replacePoints( dataList )
@@ -135,6 +144,7 @@ class DataGenerator:
                 dataList = self.__theSession.theSimulator.getLoggerData( fullPNString, startX, endX, requiredResolution )
         else:
             pass
+            return
             # do Xaxis interpolation here for phase plotting
 
         aDataSeries.replacePoints( dataList )

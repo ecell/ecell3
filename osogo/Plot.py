@@ -627,12 +627,12 @@ class DataSeries:
             dy = abs( lasty - y )
         else:
             dy = 0
-        if ( dx<2 and dy<2 ) and self.thePlot.getConnectPoints():
+        if ( dx<2 and dy<2 ) or not self.thePlot.getConnectPoints():
             #draw just a point
             if cur_point_within_frame:
                 self.thePlot.drawpoint_on_plot( self.getColor() ,x, y )
 
-        else:
+        elif self.thePlot.getConnectPoints():
             #draw line
             x0 = lastx
             y0 = lasty
@@ -845,16 +845,17 @@ class Plot:
             self.theSeriesMap[ aFullPNString ].switchOff()
             self.doesConnectPoints = False
         self.theXAxis.setFullPNString( aFullPNString )
+       # take this out if phase plotting history is supported in datagenerator
+        if aFullPNString != TIME_AXIS:
+            self.setStripMode( MODE_STRIP )
 
         if self.theZoomLevel == 0:
             #if mode is history and zoom level 0, set xframes
             self.requestData( )
-
         else: #just get data from loggers
-            self.requestData( )
-            #self.requestDataSlice( self.theXAxis.theFrame[0], self.theXAxis.theFrame[1] )
+            self.requestDataSlice( self.theXAxis.theFrame[0], self.theXAxis.theFrame[1] )
         self.totalRedraw()
-
+ 
 
     def changeScale(self, anOrientation, aScaleType ):
         #change variable
@@ -881,6 +882,7 @@ class Plot:
             return
         self.requestNewData()
         self.getRanges()
+
         redrawFlag = False
         if self.theYAxis.isOutOfFrame( self.theRanges[0], self.theRanges[1] ):
             self.theYAxis.reframe()
@@ -888,11 +890,12 @@ class Plot:
             redrawFlag = True
         if self.theXAxis.isOutOfFrame( self.theRanges[2], self.theRanges[3] ):
             redrawFlag = True
-            if self.theStripMode == MODE_STRIP and self.theXAxis.getType() == PLOT_TIME_AXIS:
-                # delete half of the old data
-                self.shiftPlot()
-            else:
-                self.requestData()
+            if self.theXAxis.getType() == PLOT_TIME_AXIS:
+                if self.theStripMode == MODE_STRIP:
+                    # delete half of the old data
+                    self.shiftPlot()
+                else:
+                    self.requestData()
             self.theXAxis.reframe()
 
             self.theXAxis.draw()
@@ -1194,14 +1197,15 @@ class Plot:
         xToggle.connect( "activate", self.__toggleXAxis )
         yToggle = gtk.MenuItem ( "Toggle Y axis" )
         yToggle.connect( "activate", self.__toggleYAxis )
-
-        if self.theStripMode == MODE_STRIP:
-            toggleStrip = gtk.MenuItem("History mode")
-        else:
-            toggleStrip = gtk.MenuItem( "Strip mode" )
-        toggleStrip.connect( "activate", self.__toggleStripMode )
-        theMenu.append( toggleStrip )
-        theMenu.append( gtk.SeparatorMenuItem() )   
+        #take this condition out if phase plotting works for history
+        if self.theXAxis.getFullPNString() == TIME_AXIS:
+            if self.theStripMode == MODE_STRIP:
+                toggleStrip = gtk.MenuItem("History mode")
+            else:
+                toggleStrip = gtk.MenuItem( "Strip mode" )
+            toggleStrip.connect( "activate", self.__toggleStripMode )
+            theMenu.append( toggleStrip )
+            theMenu.append( gtk.SeparatorMenuItem() )   
         theMenu.append( xToggle )
         theMenu.append( yToggle )
         theMenu.append( gtk.SeparatorMenuItem() )

@@ -363,11 +363,12 @@ class TracerWindow( OsogoPluginWindow ):
         """
         if theFullPN != "Time":
             if theFullPN not in self.thePlotInstance.getDataSeriesNames():
+                print "not in", theFullPN, self.thePlotInstance.getDataSeriesNames()
                 return
 
         self.thePlotInstance.setXAxis( theFullPN )
         #switch off trace
-        anIter=self.theListStore.get_iter_first(  )
+        anIter=self.theListStore.get_iter_first( )
         while True:
             if anIter == None:
                 return None
@@ -533,14 +534,19 @@ class TracerWindow( OsogoPluginWindow ):
         # user menu: remove trace, log all, save data,edit policy, hide ui, change color
             selectedList = self.getSelected()
             allHasLogger = True
+            xAxisSelected = False
+            xAxis = self.thePlotInstance.getXAxisFullPNString()
             for aSelection in selectedList:
                 if not self.hasLogger( aSelection[0] ):
                     allHasLogger = False
-                    break
+                if aSelection[0] == xAxis:
+                    xAxisSelected = True
+                
 
             theMenu = gtk.Menu()
             listCount = len( self.displayedFullPNStringList )
-            if len( selectedList ) > 0 and listCount - len(selectedList )  > 0:
+            if len( selectedList ) > 0 and listCount - len(selectedList )  > 0 and not xAxisSelected:
+            
                 removeItem = gtk.MenuItem( "Remove" )
                 removeItem.connect( "activate", self.removeTraceAction )
                 theMenu.append( removeItem )

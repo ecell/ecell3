@@ -393,9 +393,6 @@ class LoggerWindow(OsogoWindow):
 				    0, aValue[0],\
 				    1, str(aValue[1]),\
 				    2, str(aValue[2]) )
-				
-	
-	# update
 
 
 
@@ -418,7 +415,7 @@ class LoggerWindow(OsogoWindow):
 
 	# end of poppuMenu
 
-
+	# ==============================================================================
 	def editPolicy( self, *args ):
 		if len(self.aSelectedPropertyNameList) == 1:
 		# get loggerpolicy
@@ -432,7 +429,7 @@ class LoggerWindow(OsogoWindow):
 		for aFullPN in self.aSelectedPropertyNameList:
 			aLoggerStub = self.theSession.createLoggerStub( aFullPN )
 			aLoggerStub.setLoggerPolicy( newLogPolicy )
-		
+
 
 	# ==============================================================================
 	def saveDataFile( self, aFullPN, aDirectory = None, anInterval = None, aStartTime = None, anEndTime = None, fileType = 'ecd' ):
