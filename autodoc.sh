@@ -2,7 +2,7 @@
 
 WORKDIR=/tmp/autodoc.$$
 
-TARGETDIR=/home/shafi/test/html
+TARGETDIR=.
 
 CVS="cvs -z3"
 unset CVS_RSH
