@@ -182,47 +182,50 @@ namespace libecs
 
 		theDataAggregators[0].beginNextPoint();
 
+		theLastTime = aTime;
+
 	}
 
-	theLastTime = aTime;
+
   
   }
 
 
-	void Logger::aggregate( DataPointLong dpl, int log_no )
+   void Logger::aggregate( DataPointLong dpl, int log_no )
 	{
 
 	DataPointLong dpl_aggd;
 
 	if (log_no == _LOGGER_MAX_PHYSICAL_LOGGERS) { return;}
 
-	PhysicalLoggerIterator psize = thePhysicalLoggers[log_no]->size();
+	PhysicalLoggerIterator psize = thePhysicalLoggers[log_no - 1]->size();
 
 	//aggregate
 	
 	theDataAggregators[log_no].aggregate( dpl );
 
 	// if psize is turning point
-	if ((psize%_LOGGER_DIVIDE_STEP)==0)
+	if ((psize%_LOGGER_DIVIDE_STEP)==1)
 	{
-	//getdata
-	dpl_aggd = theDataAggregators[log_no].getData();
 
-	//store
-	thePhysicalLoggers[0]->push( dpl_aggd );
+		//getdata
+		dpl_aggd = theDataAggregators[log_no].getData();
+
+		//store
+		thePhysicalLoggers[log_no]->push( dpl_aggd );
 
 
-	//aggregate highlevel
-	aggregate( dpl_aggd, log_no + 1 );
+		//aggregate highlevel
+		aggregate( dpl_aggd, log_no + 1 );
 
-	//beginnextpoint
-	theDataAggregators[log_no].beginNextPoint();
+		//beginnextpoint
+		theDataAggregators[log_no].beginNextPoint();
 
 
 	}
 
 
-}
+   }
 
 
   void Logger::flush()
