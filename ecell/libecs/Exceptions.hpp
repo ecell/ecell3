@@ -28,8 +28,8 @@
 // E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
 
-#ifndef ___EXCEPTIONS_H___
-#define ___EXCEPTIONS_H___
+#ifndef __EXCEPTIONS_HPP
+#define __EXCEPTIONS_HPP
 #include <stdexcept>
 
 #include "config.h"
@@ -66,9 +66,12 @@ if( ! ( EXPRESSION ) )\
 
   /// Base exception class
   class Exception 
-    : public std::exception 
+    : 
+    public std::exception 
   {
+
   public:
+
     Exception( StringCref method, StringCref message = "" )
       : 
       theMethod( method ), 
@@ -155,7 +158,7 @@ public:\
 
 } // namespace libecs
 
-#endif /* ___EXCEPTIONS_H___ */
+#endif /* __EXCEPTIONS_HPP */
 
 
 /*

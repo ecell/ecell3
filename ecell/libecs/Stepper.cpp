@@ -33,11 +33,12 @@
 #include <limits>
 
 #include "Substance.hpp"
-#include "Integrators.hpp"
-#include "Model.hpp"
-#include "Util.hpp"
+#include "Reactor.hpp"
 #include "FullID.hpp"
 #include "PropertySlotMaker.hpp"
+
+// to be removed (for SRM)
+#include "Integrators.hpp"
 
 #include "Stepper.hpp"
 

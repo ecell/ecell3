@@ -213,7 +213,9 @@ namespace libecs
 
   StepperPtr Model::getStepper( StringCref anID )
   {
+
     StepperMapIterator i( theStepperMap.find( anID ) );
+
     if( i == theStepperMap.end() )
       {
 	THROW_EXCEPTION( NotFound, 

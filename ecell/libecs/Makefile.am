@@ -51,6 +51,7 @@ libecsdir=${pkgincludedir}/libecs
 libecs_HEADERS=\
 libecs.hpp\
 Defs.hpp\
+convertTo.hpp\
 Polymorph.hpp\
 FullID.hpp\
 PropertySlot.hpp\
@@ -84,6 +85,7 @@ RCPtr.hpp\
 Reactant.hpp\
 DynamicPriorityQueue.hpp\
 AssocVector.h
+
 
 bin_SCRIPTS =\
 emtool

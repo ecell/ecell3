@@ -92,12 +92,12 @@ namespace libecs
   /**
      Any to String converter function template.
      Using ostringstream by default. A specialization for Real type
-     with precision( FLOAT_DIG ) is also defined.
+     is also defined.
   */
 
   // FIXME: should be a static function object? to reduce initialization cost
 
-  template <typename T> const String toString( const T& t )
+  template <typename T> inline const String toString( const T& t )
   {
     std::ostringstream os;
     os << t;
@@ -136,9 +136,7 @@ namespace libecs
   template <class Sequence>
   void checkSequenceSize( const Sequence& aSequence, 
 			  const typename Sequence::size_type aMin, 
-			  const typename Sequence::size_type aMax = 
-			  std::numeric_limits<typename Sequence::size_type>
-			  ::max() )
+			  const typename Sequence::size_type aMax )
   {
     const typename Sequence::size_type aSize( aSequence.size() );
     if( aSize < aMin || aSize > aMax )
@@ -147,6 +145,27 @@ namespace libecs
 			 "Size of the sequence must be within [ " 
 			 + toString( aMin ) + ", " + toString( aMax )
 			 + " ] ( " + toString( aSize ) + " given)." );
+      }
+  }
+
+  /**
+     Check if aSequence's size() is at least aMin.
+
+     If not, throw a RangeError exception.
+
+  */
+
+  template <class Sequence>
+  void checkSequenceSize( const Sequence& aSequence, 
+			  const typename Sequence::size_type aMin )
+  {
+    const typename Sequence::size_type aSize( aSequence.size() );
+    if( aSize < aMin )
+      {
+	THROW_EXCEPTION( RangeError,
+			 "Size of the sequence must be at least " 
+			 + toString( aMin ) + 
+			 + " ( " + toString( aSize ) + " given)." );
       }
   }
 

@@ -35,7 +35,6 @@
 #include "libecs.hpp"
 
 #include "Entity.hpp"
-#include "Reactor.hpp"
 
 namespace libecs
 {

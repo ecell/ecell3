@@ -37,6 +37,7 @@
 #include "libecs.hpp"
 #include "Util.hpp"
 #include "PropertyInterface.hpp"
+#include "convertTo.hpp"
 
 #include "Polymorph.hpp"
 
@@ -51,110 +52,6 @@ namespace libecs
   */
 
   /** @file */
-
-  template< typename FromType, typename ToType >
-  ToType convertTo( const FromType& aValue )
-  {
-    convertTo( aValue, Type2Type< ToType >() );
-  }
-
-  template< typename FromType, typename ToType >
-  ToType convertTo( const FromType& aValue, Type2Type<ToType> )
-  {
-    DefaultSpecializationInhibited();
-    //#warning "unexpected default specialization of convertTo()"
-    //    return ToType( aValue );
-  }
-
-
-  // to PolymorphVectorRCPtr
-
-  // identity
-
-  template<>
-  inline const PolymorphVectorRCPtr 
-  convertTo( PolymorphVectorRCPtrCref aValue, 
-	     Type2Type< const PolymorphVectorRCPtr > )
-  {
-    return aValue;
-  }
-
-  // from Real
-  template<>
-  inline const PolymorphVectorRCPtr 
-  convertTo( RealCref aValue,
-	     Type2Type< const PolymorphVectorRCPtr > )
-  {
-    PolymorphVectorRCPtr aVector( new PolymorphVector );
-    aVector->push_back( aValue );
-    return aVector;
-  }
-
-  // from String
-  template<>
-  inline const PolymorphVectorRCPtr 
-  convertTo( StringCref aValue,
-	     Type2Type< const PolymorphVectorRCPtr > )
-  {
-    PolymorphVectorRCPtr aVectorPtr( new PolymorphVector );
-    aVectorPtr->push_back( aValue );
-    return aVectorPtr;
-  }
-
-  // to String
-
-  // identity
-  template<>
-  inline const String
-  convertTo( StringCref aValue,
-	     Type2Type< const String > )
-  {
-    return aValue;
-  }
-
-
-
-  template<>
-  inline const String convertTo( PolymorphVectorRCPtrCref aValue,
-				 Type2Type< const String > )
-  {
-    return (*aValue)[0].asString();
-  }
-
-  template<>
-  inline const String convertTo( RealCref aValue,
-				 Type2Type< const String > )
-  {
-    return toString( aValue );
-  }
-
-
-  // to Real
-
-
-  // identity
-  template<>
-  inline const Real
-  convertTo( RealCref aValue,
-	     Type2Type< const Real > )
-  {
-    return aValue;
-  }
-
-  template<>
-  inline const Real convertTo( PolymorphVectorRCPtrCref aValue,
-			       Type2Type< const Real > )
-  {
-    return (*aValue)[0].asReal();
-  }
-    
-  template<>
-  inline const Real convertTo( StringCref aValue,
-			       Type2Type< const Real > )
-  {
-    return stringTo< Real >( aValue );
-  }
-
 
   DECLARE_VECTOR( ProxyPropertySlotPtr, ProxyPropertySlotVector );
 
@@ -230,14 +127,14 @@ namespace libecs
     void updateLogger();
 
 
-    template < typename TYPE >
-    inline void set( TYPE aValue )
+    template < typename Type >
+    inline void set( const Type& aValue )
     {
       DefaultSpecializationInhibited();
     }
 
-    template < typename TYPE >
-    inline TYPE get()
+    template < typename Type >
+    inline const Type get() const
     {
       DefaultSpecializationInhibited();
     }
@@ -269,19 +166,19 @@ namespace libecs
   }
 
   template <>
-  inline const PolymorphVectorRCPtr PropertySlot::get()
+  inline const PolymorphVectorRCPtr PropertySlot::get() const
   {
     return getPolymorphVectorRCPtr();
   }
 
   template <>
-  inline const String PropertySlot::get()
+  inline const String PropertySlot::get() const
   {
     return getString();
   }
 
   template <>
-  inline const Real PropertySlot::get()
+  inline const Real PropertySlot::get() const
   {
     return getReal();
   }
@@ -403,7 +300,7 @@ namespace libecs
 
     virtual const PolymorphVectorRCPtr getPolymorphVectorRCPtr() const
     {
-      return getImpl< const PolymorphVectorRCPtr >();
+      return getImpl<PolymorphVectorRCPtr>();
     }
 
     virtual void setReal( RealCref aValue )
@@ -413,7 +310,7 @@ namespace libecs
 
     virtual const Real getReal() const
     {
-      return getImpl< const Real >();
+      return getImpl<Real>();
     }
 
     virtual void setString( StringCref aValue )
@@ -423,7 +320,7 @@ namespace libecs
 
     virtual const String getString() const
     {
-      return getImpl< const String >();
+      return getImpl<String>();
     }
 
     virtual void sync()
@@ -445,17 +342,17 @@ namespace libecs
 
   protected:
 
-    template < typename TYPE >
-    inline void setImpl( TYPE aValue )
+    template < typename Type >
+    inline void setImpl( const Type& aValue )
     {
       setIsSet();
-      theCachedValue = convertTo( aValue, Type2Type<const SlotType>() );
+      theCachedValue = convertTo<SlotType>( aValue );
     }
 
-    template < typename TYPE >
-    inline TYPE getImpl() const
+    template < typename Type >
+    inline const Type getImpl() const
     {
-      return convertTo( theOriginalValue, Type2Type<TYPE>() );
+      return convertTo<Type>( theOriginalValue );
     }
 
   private:
@@ -540,7 +437,7 @@ namespace libecs
 
     virtual const PolymorphVectorRCPtr getPolymorphVectorRCPtr() const
     {
-      return getImpl< const PolymorphVectorRCPtr >();
+      return getImpl<PolymorphVectorRCPtr>();
     }
 
     virtual void setReal( RealCref aValue )
@@ -550,7 +447,7 @@ namespace libecs
 
     virtual const Real getReal() const
     {
-      return getImpl< const Real >();
+      return getImpl<Real>();
     }
 
     virtual void setString( StringCref aValue )
@@ -560,7 +457,7 @@ namespace libecs
 
     virtual const String getString() const
     {
-      return getImpl< const String >();
+      return getImpl<String>();
     }
 
     virtual void sync()
@@ -573,7 +470,7 @@ namespace libecs
 	  // get the value only if the proxy has a value set.
 	  if( aProxySlotPtr->isSet() )
 	    {
-	      callSetMethod( aProxySlotPtr->PropertySlot::get<GetType>() );
+	      callSetMethod( aProxySlotPtr->PropertySlot::get<SlotType>() );
 	      aProxySlotPtr->clearIsSet();
 	    }
 	}
@@ -586,7 +483,7 @@ namespace libecs
 	{
 	  ProxySlotPtr aProxySlotPtr( *i );
 
-	  aProxySlotPtr->setOriginalValue( getImpl<GetType>() );
+	  aProxySlotPtr->setOriginalValue( getImpl<SlotType>() );
 	}
     }
 
@@ -627,16 +524,16 @@ namespace libecs
       return ( ( theObject.*theGetMethodPtr )() );
     }
 
-    template < typename TYPE >
-    inline void setImpl( TYPE aValue )
+    template < typename Type >
+    inline void setImpl( Type aValue )
     {
-      callSetMethod( convertTo( aValue, Type2Type< SetType >() ) );
+      callSetMethod( convertTo<SlotType>( aValue ) );
     }
 
-    template < typename TYPE >
-    inline TYPE getImpl() const
+    template < typename Type >
+    inline const Type getImpl() const
     {
-      return convertTo( callGetMethod(), Type2Type< TYPE >() );
+      return convertTo<Type>( callGetMethod() );
     }
 
   protected:
@@ -666,8 +563,9 @@ namespace libecs
 
     typedef ConcretePropertySlot<T,SlotType_> ConcreteSlot;
 
-    typedef typename ConcreteSlot::GetType GetType;
-    typedef typename ConcreteSlot::SetType SetType;
+    typedef typename ConcreteSlot::SlotType SlotType;
+    typedef typename ConcreteSlot::GetType  GetType;
+    typedef typename ConcreteSlot::SetType  SetType;
 
     typedef typename ConcreteSlot::GetMethodPtr GetMethodPtr;
     typedef typename ConcreteSlot::SetMethodPtr SetMethodPtr;
@@ -705,7 +603,7 @@ namespace libecs
 	  // get the value only if the proxy has a value set.
 	  if( aProxySlotPtr->isSet() )
 	    {
-	      callSyncMethod( aProxySlotPtr->PropertySlot::get<GetType>() );
+	      callSyncMethod( aProxySlotPtr->PropertySlot::get<SlotType>() );
 	      aProxySlotPtr->clearIsSet();
 	    }
 	}

@@ -32,6 +32,7 @@
 
 #include "Util.hpp"
 #include "Exceptions.hpp"
+#include "convertTo.hpp"
 
 #include "Polymorph.hpp"
 
@@ -40,44 +41,49 @@ namespace libecs
 
   PolymorphStringData::PolymorphStringData( RealCref f )
     :
-    theString( toString<Real>( f ) )
+    theValue( convertTo<String>( f ) )
   {
     ; // do nothing
   }
 
   PolymorphStringData::PolymorphStringData( IntCref i )
     :
-    theString( toString<Int>( i ) )
+    theValue( convertTo<String>( i ) )
   {
     ; // do nothing
   }
 
   const Real PolymorphStringData::asReal() const
   {
-    return stringTo<Real>( theString );
+    return convertTo<Real>( theValue );
   }
 
   const Int PolymorphStringData::asInt() const
   {
-    return stringTo<Int>( theString );
+    return convertTo<Int>( theValue );
   }
 
 
   PolymorphRealData::PolymorphRealData( StringCref str )
     :
-    theReal( stringTo<Real>( str ) )
+    theValue( convertTo<Real>( str ) )
   {
     ; // do nothing
   }
 
   const String PolymorphRealData::asString() const
   {
-    return toString<Real>( theReal );
+    return convertTo<String>( theValue );
+  }
+
+  const Int PolymorphRealData::asInt() const 
+  { 
+    return convertTo<Int>( theValue ); 
   }
 
   PolymorphIntData::PolymorphIntData( StringCref str )
     :
-    theInt( stringTo<Int>( str ) )
+    theValue( convertTo<Int>( str ) )
   {
     ; // do nothing
   }
@@ -85,7 +91,7 @@ namespace libecs
   PolymorphIntData::PolymorphIntData( RealCref f )
     :
     // FIXME: range check?
-    theInt( static_cast<Int>( f ) )
+    theValue( convertTo<Int>( f ) )
   {
     ; // do nothing
   }
@@ -93,9 +99,13 @@ namespace libecs
 
   const String PolymorphIntData::asString() const
   {
-    return toString<Int>( theInt );
+    return convertTo<String>( theValue );
   }
 
+  const Real PolymorphIntData::asReal() const 
+  { 
+    return convertTo<Real>( theValue ); 
+  }
 
   const Polymorph::Type Polymorph::getType() const
   {

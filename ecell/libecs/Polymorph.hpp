@@ -35,7 +35,6 @@
 
 #include "libecs.hpp"
 
-
 namespace libecs
 {
 
@@ -65,9 +64,9 @@ namespace libecs
       ; // do nothing
     }
 
-    virtual const String asString() const = 0;
-    virtual const Real   asReal()  const = 0;
-    virtual const Int    asInt()    const = 0;
+    virtual const String asString()        const = 0;
+    virtual const Real   asReal()          const = 0;
+    virtual const Int    asInt()           const = 0;
 
     virtual PolymorphDataPtr createClone() const = 0;
 
@@ -92,7 +91,7 @@ namespace libecs
 
     PolymorphStringData( StringCref  str ) 
       : 
-      theString( str ) 
+      theValue( str ) 
     {
       ; // do nothing
     }
@@ -102,14 +101,14 @@ namespace libecs
 
     PolymorphStringData( PolymorphDataCref uvi )
       :
-      theString( uvi.asString() )
+      theValue( uvi.asString() )
     {
       ; // do nothing
     }
 
-    virtual const String asString() const { return theString; }
-    virtual const Real   asReal() const;
-    virtual const Int    asInt() const;
+    virtual const String asString() const { return theValue; }
+    virtual const Real   asReal()   const;
+    virtual const Int    asInt()    const;
 
     virtual PolymorphDataPtr createClone() const
     {
@@ -118,7 +117,7 @@ namespace libecs
 
   private:
 
-    String theString;
+    String theValue;
 
   };
 
@@ -132,22 +131,21 @@ namespace libecs
     PolymorphRealData( StringCref str );
     PolymorphRealData( RealCref   f ) 
       : 
-      theReal( f ) 
+      theValue( f ) 
     {
       ; // do nothing
     }
 
     PolymorphRealData( IntCref    i ) 
       : 
-      theReal( static_cast<Real>( i ) )
+      theValue( static_cast<Real>( i ) )
     {
       ; // do nothing
     }
 
     virtual const String asString() const;
-    virtual const Real   asReal() const { return theReal; }
-    // FIXME: range check
-    virtual const Int    asInt() const { return static_cast<Int>( theReal ); }
+    virtual const Real   asReal() const    { return theValue; }
+    virtual const Int    asInt() const;
 
     virtual PolymorphDataPtr createClone() const
     {
@@ -156,7 +154,7 @@ namespace libecs
 
   private:
 
-    Real theReal;
+    Real theValue;
 
   };
 
@@ -171,14 +169,14 @@ namespace libecs
     PolymorphIntData( RealCref   f );
     PolymorphIntData( IntCref    i ) 
       : 
-      theInt( i ) 
+      theValue( i ) 
     {
       ; // do nothing
     }
 
     virtual const String asString() const;
-    virtual const Real   asReal() const { return static_cast<Real>( theInt ); }
-    virtual const Int    asInt()  const { return theInt; }
+    virtual const Real   asReal() const;
+    virtual const Int    asInt()  const { return theValue; }
   
     virtual PolymorphDataPtr createClone() const
     {
@@ -187,7 +185,7 @@ namespace libecs
 
   private:
 
-    Int theInt;
+    Int theValue;
 
   };
 
@@ -225,10 +223,10 @@ namespace libecs
 
     enum Type
       {
-	NONE   = 0,
-	REAL   = 1,
-	INT    = 2,
-	STRING = 3
+	NONE,
+	REAL, 
+	INT,  
+	STRING
       };
 
   
@@ -267,7 +265,6 @@ namespace libecs
       ; // do nothing
     }
 
-    //    virtual ~Polymorph()
     ~Polymorph()
     {
       delete theData;
