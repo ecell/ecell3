@@ -9,6 +9,8 @@
   <property name="type">GTK_WINDOW_TOPLEVEL</property>
   <property name="window_position">GTK_WIN_POS_NONE</property>
   <property name="modal">False</property>
+  <property name="default_width">550</property>
+  <property name="default_height">400</property>
   <property name="resizable">True</property>
   <property name="destroy_with_parent">False</property>
 
@@ -105,7 +107,52 @@
 
 		  <child>
 		    <widget class="GtkFixed" id="fixed1">
+		      <property name="width_request">88</property>
+		      <property name="height_request">48</property>
 		      <property name="visible">True</property>
+
+		      <child>
+			<widget class="GtkOptionMenu" id="type_optionmenu">
+			  <property name="width_request">80</property>
+			  <property name="height_request">21</property>
+			  <property name="visible">True</property>
+			  <property name="can_focus">True</property>
+			  <property name="history">0</property>
+
+			  <child>
+			    <widget class="GtkMenu" id="menu1">
+
+			      <child>
+				<widget class="GtkMenuItem" id="variable1">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">Variable</property>
+				  <property name="use_underline">True</property>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkMenuItem" id="process1">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">Process</property>
+				  <property name="use_underline">True</property>
+				</widget>
+			      </child>
+
+			      <child>
+				<widget class="GtkMenuItem" id="all1">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">All</property>
+				  <property name="use_underline">True</property>
+				</widget>
+			      </child>
+			    </widget>
+			  </child>
+			</widget>
+			<packing>
+			  <property name="x">8</property>
+			  <property name="y">0</property>
+			</packing>
+		      </child>
 
 		      <child>
 			<widget class="GtkLabel" id="label4">
@@ -125,65 +172,13 @@
 			</widget>
 			<packing>
 			  <property name="x">8</property>
-			  <property name="y">32</property>
-			</packing>
-		      </child>
-
-		      <child>
-			<widget class="GtkOptionMenu" id="type_optionmenu">
-			  <property name="width_request">80</property>
-			  <property name="height_request">21</property>
-			  <property name="visible">True</property>
-			  <property name="can_focus">True</property>
-			  <property name="history">0</property>
-
-			  <child>
-			    <widget class="GtkMenu" id="menu1">
-
-			      <child>
-				<widget class="GtkMenuItem" id="variable1">
-				  <property name="visible">True</property>
-				  <property name="label" translatable="yes">Variable</property>
-				  <property name="use_underline">True</property>
-<!--
-				  <signal name="activate" handler="on_variable1_activate" last_modification_time="Sun, 20 Oct 2002 13:11:07 GMT"/>
--->
-				</widget>
-			      </child>
-
-			      <child>
-				<widget class="GtkMenuItem" id="process1">
-				  <property name="visible">True</property>
-				  <property name="label" translatable="yes">Process</property>
-				  <property name="use_underline">True</property>
-<!--
-				  <signal name="activate" handler="on_process1_activate" last_modification_time="Sun, 20 Oct 2002 13:11:07 GMT"/>
--->
-				</widget>
-			      </child>
-
-			      <child>
-				<widget class="GtkMenuItem" id="all1">
-				  <property name="visible">True</property>
-				  <property name="label" translatable="yes">All</property>
-				  <property name="use_underline">True</property>
-<!--
-				  <signal name="activate" handler="on_all1_activate" last_modification_time="Sun, 20 Oct 2002 13:11:07 GMT"/>
--->
-				</widget>
-			      </child>
-			    </widget>
-			  </child>
-			</widget>
-			<packing>
-			  <property name="x">8</property>
-			  <property name="y">0</property>
+			  <property name="y">28</property>
 			</packing>
 		      </child>
 		    </widget>
 		    <packing>
 		      <property name="padding">0</property>
-		      <property name="expand">True</property>
+		      <property name="expand">False</property>
 		      <property name="fill">True</property>
 		    </packing>
 		  </child>
