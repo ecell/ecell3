@@ -18,6 +18,7 @@ Base* ObjectAllocator()
     &ObjectAllocator<TYPE,CLASSNAME>;\
     const char* __DM_CLASSNAME = #CLASSNAME;\
     const char* __DM_TYPE = #TYPE;\
+    const void *(*GetClassInfo)() = &CLASSNAME::getClassInfoPtr;\
   } // 
 
 

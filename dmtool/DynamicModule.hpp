@@ -28,7 +28,7 @@
 // 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 // 
 //END_HEADER
-
+#include <stdio.h>
 
 #ifndef __DYNAMICMODULE_HPP
 #define __DYNAMICMODULE_HPP
@@ -47,7 +47,7 @@
 /// doc needed
 
 #define SimpleAllocator( BASE ) BASE* (*)()
-
+typedef const void*(*InfoLoaderType)();
 
 /**
    Exception class for dmtool.
@@ -94,7 +94,7 @@ class DynamicModuleBase
 
 public:		
 
-  DynamicModuleBase( const std::string& Modulename, DMAllocator Allocator );
+  DynamicModuleBase( const std::string& Modulename, DMAllocator Allocator, InfoLoaderType InfoLoader );
 
   const std::string& getModuleName() const
   {
@@ -111,10 +111,16 @@ public:
     return this->theAllocator;
   }
 
+  const InfoLoaderType& getInfoLoader() const
+  {
+	return this->theInfoLoader;
+  }
+
 protected:
 
   std::string theModuleName;
   DMAllocator theAllocator;
+  InfoLoaderType theInfoLoader;
 
 };
 
@@ -146,6 +152,8 @@ public:
    The shared object must have followings:
      - T* CreateObject()       - which returns a new object.
    and
+     - void* GetClassInfo()    - which must be reinterpreted to PolymorphMap in libecs, sorry, 
+	 maybe later a pure string version should be implemented
      - a full set of symbols needed to instantiate and use the class.
 */
 
@@ -186,10 +194,11 @@ addClass( new DynamicModule< BASE, DERIVED, ALLOC >( #DERIVED ) )
 template < class Base, class DMAllocator >
 DynamicModuleBase< Base, DMAllocator >::
 DynamicModuleBase( const std::string& modulename,
-		   DMAllocator allocator )
+		   DMAllocator allocator, InfoLoaderType infoLoader )
   : 
   theModuleName( modulename ),
-  theAllocator( allocator )
+  theAllocator( allocator ),
+  theInfoLoader( infoLoader )
 {
   ; // do nothing
 }
@@ -198,7 +207,7 @@ template < class Base, class Derived, class DMAllocator >
 DynamicModule< Base, Derived, DMAllocator >::
 DynamicModule( const std::string& modulename )
   : 
-  DynamicModuleBase<Base,DMAllocator>( modulename, &Derived::createInstance )
+  DynamicModuleBase<Base,DMAllocator>( modulename, &Derived::createInstance, &Derived::getClassInfoPtr )
 {
   
   ; // do nothing
@@ -208,12 +217,11 @@ template < class Base, class DMAllocator >
 SharedDynamicModule< Base, DMAllocator >::
 SharedDynamicModule( const std::string& classname )
   :
-  DynamicModuleBase<Base,DMAllocator>( classname, NULL ), 
+  DynamicModuleBase<Base,DMAllocator>( classname, NULL, NULL ), 
   theHandle( NULL )
 {
   std::string filename( classname );
   this->theHandle = lt_dlopenext( filename.c_str() );
-
   if( this->theHandle == NULL ) 
     {
       throw DMException( "Failed to find or load a DM [" + classname + 
@@ -224,6 +232,14 @@ SharedDynamicModule( const std::string& classname )
     *((DMAllocator*)( lt_dlsym( this->theHandle, "CreateObject" ) ));
 
   if( this->theAllocator == NULL )
+    {
+      throw DMException( "[" + getFileName() + "] is not a valid DM file: "
+			  + lt_dlerror() );  
+    }
+  this->theInfoLoader = 
+    *((InfoLoaderType*)( lt_dlsym( this->theHandle, "GetClassInfo" ) ));
+
+  if( this->theInfoLoader == NULL )
     {
       throw DMException( "[" + getFileName() + "] is not a valid DM file: "
 			  + lt_dlerror() );  

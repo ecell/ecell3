@@ -43,7 +43,7 @@
 /// doc needed
 
 #define DynamicModuleEntry( T )\
-addClass( new Module( std::string( #T ), &T::createInstance ) );
+addClass( new Module( std::string( #T ), &T::createInstance, &T::getClassInfoPtr ) );
 
 /**
    A base class for ModuleMakers
@@ -135,6 +135,8 @@ public:
 
   virtual T* make( const std::string& aClassname );
 
+  virtual const Module& getModule( const std::string& aClassname );
+
 
   /**
      Add a class to the subclass list.
@@ -184,6 +186,18 @@ public:
 
   SharedModuleMaker();
   virtual ~SharedModuleMaker();
+
+  virtual const SharedModule& getModule( const std::string& aClassName )
+  {
+	if( this->theModuleMap.find( aClassName ) == this->theModuleMap.end() )
+	  {
+		loadModule( aClassName );
+	  }
+	
+	return *((SharedModule*) this->theModuleMap[ aClassName ]);
+
+
+  }
 
 protected:
 
@@ -253,6 +267,8 @@ void StaticModuleMaker<T,DMAllocator>::addClass( Module* dm )
 }
 
 
+
+
 template<class T,class DMAllocator>
 DMAllocator StaticModuleMaker<T,DMAllocator>::
 getAllocator( const std::string& aClassname )
@@ -289,6 +305,7 @@ SharedModuleMaker<T,DMAllocator>::~SharedModuleMaker()
       exit( 1 );
     }
 }
+
 
 template<class T,class DMAllocator>
 DMAllocator SharedModuleMaker<T,DMAllocator>::
@@ -333,7 +350,8 @@ SharedModuleMaker<T,DMAllocator>::loadModule( const std::string& aClassname )
   try 
     {
       aSharedModule = new SharedModule( aClassname );
-      addClass( aSharedModule );
+      addClass
+( aSharedModule );
     }
   catch ( const DMException& )
     {
