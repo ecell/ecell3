@@ -1032,7 +1032,7 @@ System CompartmentSystem( /CELL/CYTOPLASM )
 	}
 	
 
-	Process MakesignalPProcess( ADD )
+	Process MakesignalProcess( ADD )
 	{
 		Name	add;
 		StepperID DT_1;	
@@ -1045,7 +1045,7 @@ System CompartmentSystem( /CELL/CYTOPLASM )
 	}
 
 
-	Process MakesignalPProcess( ADDCa )
+	Process MakesignalProcess( ADDCa )
 	{
 		Name	addCa;
 		StepperID DT_1;	
@@ -1057,7 +1057,7 @@ System CompartmentSystem( /CELL/CYTOPLASM )
 		VariableReferenceList	[ P0 Variable:.:Ca 1 ];
 	}
 
-	Process MakesignalPProcess( ADDGlu )
+	Process MakesignalProcess( ADDGlu )
 	{
 		Name	addGlu;
 		StepperID DT_1;	
