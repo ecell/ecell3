@@ -72,21 +72,21 @@ namespace libemc
 	aSubstancePtr = getRootSystem().getSubstanceMaker().make( classname );
 	aSubstancePtr->setId( fqpi.getIdString() );
 	aSubstancePtr->setName( name );
-	aTargetSystem->addSubstance( aSubstancePtr );
+	aTargetSystem->registerSubstance( aSubstancePtr );
 	break;
 
       case REACTOR:
 	aReactorPtr = getRootSystem().getReactorMaker().make( classname );
 	aReactorPtr->setId( fqpi.getIdString() );
 	aReactorPtr->setName( name );
-	aTargetSystem->addReactor( aReactorPtr );
+	aTargetSystem->registerReactor( aReactorPtr );
 	break;
 
       case SYSTEM:
 	aSystemPtr = getRootSystem().getSystemMaker().make( classname );
 	aSystemPtr->setId( fqpi.getIdString() );
 	aSystemPtr->setName( name );
-	aTargetSystem->addSystem( aSystemPtr );
+	aTargetSystem->registerSystem( aSystemPtr );
 	break;
 
       case NONE:

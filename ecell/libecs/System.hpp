@@ -42,9 +42,9 @@ namespace libecs
 
   // Tree data structures used for entry lists
   // for_each performance is very important. other or hybrid container type?
-  DECLARE_MAP( const String, SubstancePtr, less<const String>, SubstanceList );
-  DECLARE_MAP( const String, ReactorPtr,   less<const String>, ReactorList );
-  DECLARE_MAP( const String, SystemPtr,    less<const String>, SystemList );
+  DECLARE_MAP( const String, SubstancePtr, less<const String>, SubstanceMap );
+  DECLARE_MAP( const String, ReactorPtr,   less<const String>, ReactorMap );
+  DECLARE_MAP( const String, SystemPtr,    less<const String>, SystemMap );
 
   typedef SystemPtr (*SystemAllocatorFunc)();
 
@@ -139,32 +139,32 @@ namespace libecs
     virtual Real getVolume();
 
     /**
-       Add a Reactor object in this RSystem.
+       Register a Reactor object in this System.
     */
-    void addReactor( ReactorPtr const newone );
+    void registerReactor( ReactorPtr const newone );
   
     /**
        @return true: if this System contains a Reactor whose name is @a id.
     */
     bool containsReactor( StringCref id )
     {
-      return ( getReactorIterator( id ) != theReactorList.end() ) 
+      return ( getReactorIterator( id ) != theReactorMap.end() ) 
 	? true : false;
     }
 
     /**
        @return An iterator which points to the first Reactor in this System.
     */
-    ReactorListIterator getFirstReactorIterator()
+    ReactorMapIterator getFirstReactorIterator()
     {
-      return theReactorList.begin();
+      return theReactorMap.begin();
     }
 
     /**
        @return An iterator which points to the first regular Reactor
        (i.e. not posterior Reactor) in this System.
     */
-    ReactorListIterator getFirstRegularReactorIterator() const
+    ReactorMapIterator getFirstRegularReactorIterator() const
     {
       return theFirstRegularReactorIterator;
     }
@@ -172,17 +172,17 @@ namespace libecs
     /**
        @return An iterator which points to the last Reactor in this System.
     */
-    ReactorListIterator getLastReactorIterator() 
+    ReactorMapIterator getLastReactorIterator() 
     { 
-      return theReactorList.end();
+      return theReactorMap.end();
     }
 
     /**
        @return An iterator which points to a Reactor whose name is @a id.
     */
-    ReactorListIterator getReactorIterator( StringCref id )
+    ReactorMapIterator getReactorIterator( StringCref id )
     {
-      return theReactorList.find( id );
+      return theReactorMap.find( id );
     }
 
     /**
@@ -190,7 +190,7 @@ namespace libecs
     */
     int getNumberOfReactors() const
     {
-      return theReactorList.size();
+      return theReactorMap.size();
     }
 
     /**
@@ -202,32 +202,32 @@ namespace libecs
     ReactorPtr getReactor( StringCref id ) ;
 
     /**
-       Add a Substance object in this System.
+       Register a Substance object in this System.
     */
-    void addSubstance( SubstancePtr id );
+    void registerSubstance( SubstancePtr id );
   
     /**
        @return An iterator which points to the first Substance in this System.
     */
-    SubstanceListIterator getFirstSubstanceIterator()
+    SubstanceMapIterator getFirstSubstanceIterator()
     {
-      return theSubstanceList.begin();
+      return theSubstanceMap.begin();
     }
 
     /**
        @return An iterator which points to the last Substance in this System.
     */
-    SubstanceListIterator getLastSubstanceIterator()
+    SubstanceMapIterator getLastSubstanceIterator()
     {
-      return theSubstanceList.end();
+      return theSubstanceMap.end();
     }
 
     /**
        @return An iterator which points to a Substance whose name is @a id.
     */
-    SubstanceListIterator getSubstanceIterator( StringCref id )
+    SubstanceMapIterator getSubstanceIterator( StringCref id )
     {
-      return theSubstanceList.find( id );
+      return theSubstanceMap.find( id );
     }
 
     /**
@@ -235,7 +235,7 @@ namespace libecs
     */
     bool containsSubstance( StringCref id )
     {
-      return ( getSubstanceIterator( id ) != theSubstanceList.end() ) ?
+      return ( getSubstanceIterator( id ) != theSubstanceMap.end() ) ?
 	true : false;
     }
 
@@ -244,7 +244,7 @@ namespace libecs
     */
     int getNumberOfSubstances() const
     {
-      return theSubstanceList.size();
+      return theSubstanceMap.size();
     }
 
     /**
@@ -253,32 +253,32 @@ namespace libecs
     SubstancePtr getSubstance( StringCref id );
 
     /**
-       Add a System object in this System
+       Register a System object in this System
     */
-    void addSystem( SystemPtr );
+    void registerSystem( SystemPtr );
 
     /**
        @return An iterator which points to the first System in this System.
     */
-    SystemListIterator getFirstSystemIterator()
+    SystemMapIterator getFirstSystemIterator()
     {
-      return theSubsystemList.begin();
+      return theSubsystemMap.begin();
     }
 
     /**
        @return An iterator which points to the last System in this System.
     */
-    SystemListIterator getLastSystemIterator()
+    SystemMapIterator getLastSystemIterator()
     {
-      return theSubsystemList.end();
+      return theSubsystemMap.end();
     }
 
     /**
        @return An iterator which points to a System whose name is @a id.
     */
-    SystemListIterator getSystemIterator( StringCref id )
+    SystemMapIterator getSystemIterator( StringCref id )
     {
-      return theSubsystemList.find( id );
+      return theSubsystemMap.find( id );
     }
 
     /**
@@ -286,7 +286,7 @@ namespace libecs
     */
     bool containsSystem( StringCref id )
     {
-      return ( getSystemIterator( id ) != theSubsystemList.end() ) ? 
+      return ( getSystemIterator( id ) != theSubsystemMap.end() ) ? 
 	true : false;
     }
 
@@ -295,7 +295,7 @@ namespace libecs
     */
     int getNumberOfSystems() const
     {
-      return theSubsystemList.size();
+      return theSubsystemMap.size();
     }
 
     /**
@@ -335,13 +335,13 @@ namespace libecs
     ReactorPtr theVolumeIndex;
     StepperPtr theStepper;
 
-    ReactorListIterator theFirstRegularReactorIterator;
+    ReactorMapIterator theFirstRegularReactorIterator;
 
   private:
 
-    ReactorList   theReactorList;
-    SubstanceList theSubstanceList;
-    SystemList    theSubsystemList;
+    ReactorMap   theReactorMap;
+    SubstanceMap theSubstanceMap;
+    SystemMap    theSubsystemMap;
 
     RootSystemPtr theRootSystem;
 
@@ -349,13 +349,13 @@ namespace libecs
 
   /**
   Equivalent to Reactor::isRegularReactor except that
-  this function object takes a reference to a ReactorList::value_type.
+  this function object takes a reference to a ReactorMap::value_type.
   */
   class System::isRegularReactorItem
-    : public unary_function< const ReactorList::value_type,bool >
+    : public unary_function< const ReactorMap::value_type,bool >
   {
   public:
-    bool operator()( const ReactorList::value_type r ) const
+    bool operator()( const ReactorMap::value_type r ) const
     {
       return Reactor::isRegularReactor::isRegularName( ( r.second )->getId() );
     }

@@ -48,7 +48,7 @@ namespace libecs
   {
     assert( theOwner );
   
-    for( SubstanceListIterator s = theOwner->getFirstSubstanceIterator();
+    for( SubstanceMapIterator s = theOwner->getFirstSubstanceIterator();
 	 s != theOwner->getLastSubstanceIterator() ; ++s)
       {
 	(*allocator)(*(s->second));
@@ -104,7 +104,7 @@ namespace libecs
 
   void MasterStepper::registerSlaves(System* system)
   {
-    for( SystemListIterator s = theOwner->getFirstSystemIterator() ;
+    for( SystemMapIterator s = theOwner->getFirstSystemIterator() ;
 	 s != theOwner->getLastSystemIterator() ; ++s )
       {
 	SystemPtr aSystemPtr = s->second;

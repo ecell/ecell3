@@ -68,7 +68,7 @@ namespace libecs
   {
     UniversalVariableVector aVector;
 
-    for( SystemListIterator i = getFirstSystemIterator() ;
+    for( SystemMapIterator i = getFirstSystemIterator() ;
 	 i != getLastSystemIterator() ; ++i )
       {
 	aVector.push_back( UniversalVariable( i->second->getId() ) );
@@ -81,7 +81,7 @@ namespace libecs
   {
     UniversalVariableVector aVector;
 
-    for( SubstanceListIterator i = getFirstSubstanceIterator() ;
+    for( SubstanceMapIterator i = getFirstSubstanceIterator() ;
 	 i != getLastSubstanceIterator() ; ++i )
       {
 	aVector.push_back( UniversalVariable( i->second->getId() ) );
@@ -94,7 +94,7 @@ namespace libecs
   {
     UniversalVariableVector aVector;
 
-    for( ReactorListIterator i = getFirstReactorIterator() ;
+    for( ReactorMapIterator i = getFirstReactorIterator() ;
 	 i != getLastReactorIterator() ; ++i )
       {
 	aVector.push_back( UniversalVariable( i->second->getId() ) );
@@ -209,7 +209,7 @@ namespace libecs
     //
     // Substance::initialize()
     //
-    for( SubstanceListIterator i = getFirstSubstanceIterator() ; 
+    for( SubstanceMapIterator i = getFirstSubstanceIterator() ; 
 	 i != getLastSubstanceIterator() ; ++i )
       {
 	i->second->initialize();
@@ -218,7 +218,7 @@ namespace libecs
     //
     // Reactor::initialize()
     //
-    for( ReactorListIterator i = getFirstReactorIterator() ;
+    for( ReactorMapIterator i = getFirstReactorIterator() ;
 	 i != getLastReactorIterator() ; ++i )
       {
 	i->second->initialize();
@@ -231,7 +231,7 @@ namespace libecs
     //
     // System::initialize()
     //
-    for( SystemListIterator i = getFirstSystemIterator();
+    for( SystemMapIterator i = getFirstSystemIterator();
 	 i != getLastSystemIterator(); ++i )
       {
 	i->second->initialize();
@@ -243,7 +243,7 @@ namespace libecs
     //
     // Substance::clear()
     //
-    for( SubstanceListIterator i = getFirstSubstanceIterator() ; 
+    for( SubstanceMapIterator i = getFirstSubstanceIterator() ; 
 	 i != getLastSubstanceIterator() ; ++i )
       {
 	i->second->clear();
@@ -252,7 +252,7 @@ namespace libecs
 
   void System::react()
   {
-    for( ReactorListIterator i = getFirstRegularReactorIterator() ; 
+    for( ReactorMapIterator i = getFirstRegularReactorIterator() ; 
 	 i != getLastReactorIterator() ; ++i )
       {
 	i->second->react();
@@ -261,7 +261,7 @@ namespace libecs
 
   void System::turn()
   {
-    for( SubstanceListIterator i = getFirstSubstanceIterator() ; 
+    for( SubstanceMapIterator i = getFirstSubstanceIterator() ; 
 	 i != getLastSubstanceIterator() ; ++i )
       {
 	i->second->turn();
@@ -270,13 +270,13 @@ namespace libecs
 
   void System::transit()
   {
-    for( ReactorListIterator i = getFirstRegularReactorIterator() ; 
+    for( ReactorMapIterator i = getFirstRegularReactorIterator() ; 
 	 i != getLastReactorIterator() ; ++i )
       {
 	i->second->transit();
       }
 
-    for( SubstanceListIterator i = getFirstSubstanceIterator() ;
+    for( SubstanceMapIterator i = getFirstSubstanceIterator() ;
 	 i != getLastSubstanceIterator() ; ++i )
       {
 	i->second->transit();
@@ -285,21 +285,21 @@ namespace libecs
 
   void System::postern()
   {
-    for( ReactorListIterator i = getFirstReactorIterator() ; 
+    for( ReactorMapIterator i = getFirstReactorIterator() ; 
 	 i != getFirstRegularReactorIterator() ; ++i )
       {
 	i->second->react();
       }
 
     // update activity of posterior reactors by buffered values 
-    for( ReactorListIterator i = getFirstReactorIterator() ; 
+    for( ReactorMapIterator i = getFirstReactorIterator() ; 
 	 i != getFirstRegularReactorIterator() ; ++i )
       {
 	i->second->transit();
       }
   }
 
-  void System::addReactor( ReactorPtr reactor )
+  void System::registerReactor( ReactorPtr reactor )
   {
     assert(reactor);
 
@@ -310,13 +310,13 @@ namespace libecs
 	return;
       }
 
-    theReactorList[ reactor->getId() ] = reactor;
+    theReactorMap[ reactor->getId() ] = reactor;
     reactor->setSuperSystem( this );
   }
 
   ReactorPtr System::getReactor( StringCref id ) 
   {
-    ReactorListIterator i = getReactorIterator( id );
+    ReactorMapIterator i = getReactorIterator( id );
     if( i == getLastReactorIterator() )
       {
 	throw NotFound( __PRETTY_FUNCTION__, "[" + getFqid() + 
@@ -325,7 +325,7 @@ namespace libecs
     return i->second;
   }
 
-  void System::addSubstance( SubstancePtr newone )
+  void System::registerSubstance( SubstancePtr newone )
   {
     if( containsSubstance( newone->getId() ) )
       {
@@ -333,13 +333,13 @@ namespace libecs
 	//FIXME: throw exception
 	return;
       }
-    theSubstanceList[ newone->getId() ] = newone;
+    theSubstanceMap[ newone->getId() ] = newone;
     newone->setSuperSystem( this );
   }
 
   SubstancePtr System::getSubstance( StringCref id ) 
   {
-    SubstanceListIterator i = getSubstanceIterator( id );
+    SubstanceMapIterator i = getSubstanceIterator( id );
     if( i == getLastSubstanceIterator() )
       {
 	throw NotFound(__PRETTY_FUNCTION__, "[" + getFqid() + 
@@ -350,7 +350,7 @@ namespace libecs
   }
 
 
-  void System::addSystem( SystemPtr system )
+  void System::registerSystem( SystemPtr system )
   {
     if( containsSystem( system->getId() ) )
       {
@@ -359,7 +359,7 @@ namespace libecs
 	return;
       }
 
-    theSubsystemList[ system->getId() ] = system;
+    theSubsystemMap[ system->getId() ] = system;
     system->setSuperSystem( this );
 
   }
@@ -379,7 +379,7 @@ namespace libecs
 
   SystemPtr System::getSystem( StringCref id ) 
   {
-    SystemListIterator i = getSystemIterator( id );
+    SystemMapIterator i = getSystemIterator( id );
     if( i == getLastSystemIterator() )
       {
 	throw NotFound(__PRETTY_FUNCTION__, "[" + getFqid() + 
