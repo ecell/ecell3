@@ -60,13 +60,13 @@ namespace libecs
     
     registerSlot( getPropertySlotMaker()->
 		  createPropertySlot( "PropertyList",*this,
-				      Type2Type<PolymorphVectorRCPtr>(),
+				      Type2Type<Polymorph>(),
 				      NULLPTR,
 				      &PropertyInterface::getPropertyList ) );
     
     registerSlot( getPropertySlotMaker()->
 		  createPropertySlot( "PropertyAttributes",*this,
-				      Type2Type<PolymorphVectorRCPtr>(),
+				      Type2Type<Polymorph>(),
 				      NULLPTR,
 				      &PropertyInterface::getPropertyAttributes 
 				      ) );
@@ -74,24 +74,24 @@ namespace libecs
 
   }
 
-  const PolymorphVectorRCPtr PropertyInterface::getPropertyList() const
+  const Polymorph PropertyInterface::getPropertyList() const
   {
-    PolymorphVectorRCPtr aPropertyVectorPtr( new PolymorphVector );
-    aPropertyVectorPtr->reserve( thePropertySlotMap.size() );
+    PolymorphVector aVector;
+    aVector.reserve( thePropertySlotMap.size() );
 
     for( PropertySlotMapConstIterator i( thePropertySlotMap.begin() ); 
 	 i != thePropertySlotMap.end() ; ++i )
       {
-	aPropertyVectorPtr->push_back( i->first );
+	aVector.push_back( i->first );
       }
 
-    return aPropertyVectorPtr;
+    return aVector;
   }
 
-  const PolymorphVectorRCPtr PropertyInterface::getPropertyAttributes() const
+  const Polymorph PropertyInterface::getPropertyAttributes() const
   {
-    PolymorphVectorRCPtr aPropertyAttributesVector( new PolymorphVector );
-    aPropertyAttributesVector->reserve( thePropertySlotMap.size() );
+    PolymorphVector aVector;
+    aVector.reserve( thePropertySlotMap.size() );
 
     for( PropertySlotMapConstIterator i( thePropertySlotMap.begin() ); 
 	 i != thePropertySlotMap.end() ; ++i )
@@ -108,10 +108,10 @@ namespace libecs
 	    anAttributeFlag |= GETABLE;
 	  }
 
-	aPropertyAttributesVector->push_back( anAttributeFlag );
+	aVector.push_back( anAttributeFlag );
       }
 
-    return aPropertyAttributesVector;
+    return aVector;
   }
 
   PropertyInterface::PropertyInterface()
@@ -155,7 +155,7 @@ namespace libecs
   }
 
   void PropertyInterface::setProperty( StringCref aPropertyName, 
-				       PolymorphVectorRCPtrCref aValue )
+				       PolymorphCref aValue )
   {
     PropertySlotMapConstIterator 
       aPropertySlotMapIterator( thePropertySlotMap.find( aPropertyName ) );
@@ -168,10 +168,10 @@ namespace libecs
 			 + aPropertyName + "].  Set property failed." );
       }
 
-    aPropertySlotMapIterator->second->setPolymorphVectorRCPtr( aValue );
+    aPropertySlotMapIterator->second->setPolymorph( aValue );
   }
 
-  const PolymorphVectorRCPtr 
+  const Polymorph
   PropertyInterface::getProperty( StringCref aPropertyName ) const
   {
     PropertySlotMapConstIterator 
@@ -185,7 +185,7 @@ namespace libecs
 			 + aPropertyName + "].  Get property failed." );
       }
 
-    return aPropertySlotMapIterator->second->getPolymorphVectorRCPtr();
+    return aPropertySlotMapIterator->second->getPolymorph();
   }
 
 

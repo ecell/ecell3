@@ -89,12 +89,11 @@ namespace libecs
        NoSlot exception if not.
 
        @param aPropertyName a name of the property.
-       @param aValue the value to set as a PolymorphVectorRCPtr.
+       @param aValue the value to set as a PolymorphVector.
        @throw NoSlot 
     */
 
-    void setProperty( StringCref aPropertyName, 
-		      PolymorphVectorRCPtrCref aValue );
+    void setProperty( StringCref aPropertyName, PolymorphCref aValue );
 
     /**
        Get a property value from this object via a PropertySlot.
@@ -103,11 +102,11 @@ namespace libecs
        NoSlot exception if not.
 
        @param aPropertyName a name of the property.
-       @return the value as a PolymorphVectorRCPtr.
+       @return the value as a PolymorphVector.
        @throw NoSlot
     */
 
-    const PolymorphVectorRCPtr getProperty( StringCref aPropertyName ) const;
+    const Polymorph getProperty( StringCref aPropertyName ) const;
 
 
     /**
@@ -145,8 +144,8 @@ namespace libecs
     */
     //@{
 
-    const PolymorphVectorRCPtr getPropertyList() const;
-    const PolymorphVectorRCPtr getPropertyAttributes() const;
+    const Polymorph getPropertyList() const;
+    const Polymorph getPropertyAttributes() const;
 
     //@}
 

@@ -220,6 +220,26 @@ namespace libecs
     { (*i).second-> METHOD (); }
 
 
+
+
+  template< typename T >
+  inline const T nullValue()
+  {
+    return 0;
+  }
+
+  template<>
+  inline const Real nullValue()
+  {
+    return 0.0;
+  }
+
+  template<>
+  inline const String nullValue()
+  {
+    return String();
+  }
+
   //@}
 
 } // namespace libecs

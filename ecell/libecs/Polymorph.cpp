@@ -32,101 +32,71 @@
 
 #include "Util.hpp"
 #include "Exceptions.hpp"
-#include "convertTo.hpp"
 
 #include "Polymorph.hpp"
 
 namespace libecs
 {
 
-  PolymorphStringData::PolymorphStringData( RealCref f )
-    :
-    theValue( convertTo<String>( f ) )
-  {
-    ; // do nothing
-  }
-
-  PolymorphStringData::PolymorphStringData( IntCref i )
-    :
-    theValue( convertTo<String>( i ) )
-  {
-    ; // do nothing
-  }
-
-  const Real PolymorphStringData::asReal() const
-  {
-    return convertTo<Real>( theValue );
-  }
-
-  const Int PolymorphStringData::asInt() const
-  {
-    return convertTo<Int>( theValue );
-  }
-
-
-  PolymorphRealData::PolymorphRealData( StringCref str )
-    :
-    theValue( convertTo<Real>( str ) )
-  {
-    ; // do nothing
-  }
-
-  const String PolymorphRealData::asString() const
-  {
-    return convertTo<String>( theValue );
-  }
-
-  const Int PolymorphRealData::asInt() const 
-  { 
-    return convertTo<Int>( theValue ); 
-  }
-
-  PolymorphIntData::PolymorphIntData( StringCref str )
-    :
-    theValue( convertTo<Int>( str ) )
-  {
-    ; // do nothing
-  }
-
-  PolymorphIntData::PolymorphIntData( RealCref f )
-    :
-    // FIXME: range check?
-    theValue( convertTo<Int>( f ) )
-  {
-    ; // do nothing
-  }
-
-
-  const String PolymorphIntData::asString() const
-  {
-    return convertTo<String>( theValue );
-  }
-
-  const Real PolymorphIntData::asReal() const 
-  { 
-    return convertTo<Real>( theValue ); 
-  }
-
   const Polymorph::Type Polymorph::getType() const
   {
-    if( typeid( *theData) == typeid( PolymorphRealData ) )
+    if( typeid( *theData) == typeid( ConcretePolymorphData<Real> ) )
       {
 	return REAL;
       }
-    else if( typeid( *theData ) == typeid( PolymorphIntData ) )
+    else if( typeid( *theData) == typeid( ConcretePolymorphData<Int> ) )
       {
 	return INT;
       }
-    else if( typeid( *theData ) == typeid( PolymorphStringData ) )
+    else if( typeid( *theData) == typeid( ConcretePolymorphData<String> ) )
       {
 	return STRING;
+      }
+    else if( typeid( *theData) == 
+	     typeid( ConcretePolymorphData<PolymorphVector> ) )
+      {
+	return POLYMORPH_VECTOR;
       }
     else if( typeid( *theData ) == typeid( PolymorphNoneData ) )
       {
 	return NONE;
       }
     
-    THROW_EXCEPTION( UnexpectedError, "NEVER_GET_HERE" );
+    NEVER_GET_HERE;
+  }
+
+
+  void Polymorph::changeType( const Type aType )
+  {
+    PolymorphDataPtr aPolymorphDataPtr( NULLPTR );
+
+    switch( aType )
+      {
+      case REAL:
+	aPolymorphDataPtr = 
+	  new ConcretePolymorphData<Real>( theData->asReal() );
+	break;
+      case INT:
+	aPolymorphDataPtr = 
+	  new ConcretePolymorphData<Int>( theData->asInt() );
+	break;
+      case STRING:
+	aPolymorphDataPtr = 
+	  new ConcretePolymorphData<Int>( theData->asString() );
+	break;
+      case POLYMORPH_VECTOR:
+	aPolymorphDataPtr = 
+	  new ConcretePolymorphData<Int>( theData->asPolymorphVector() );
+	break;
+      case NONE:
+	aPolymorphDataPtr = new PolymorphNoneData();
+	break;
+      default:
+	NEVER_GET_HERE;
+      }
+
+    delete theData;
+    theData = aPolymorphDataPtr;
   }
 
 

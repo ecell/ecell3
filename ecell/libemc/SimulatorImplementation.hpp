@@ -97,32 +97,31 @@ namespace libemc
     virtual ~SimulatorImplementation() {}
 
 
-    virtual void createStepper( libecs::StringCref          aClassname,
-				libecs::StringCref          anId ) = 0;
+    virtual void createStepper( libecs::StringCref         aClassname,
+				libecs::StringCref         anId ) = 0;
 
-    virtual void setStepperProperty( libecs::StringCref            aStepperID,
-				     libecs::StringCref            aPropertyName,
-				     libecs::PolymorphVectorCref   aValue ) = 0;
+    virtual void setStepperProperty( libecs::StringCref    aStepperID,
+				     libecs::StringCref    aPropertyName,
+				     libecs::PolymorphCref aValue ) = 0;
 
-    virtual const libecs::PolymorphVectorRCPtr
+    virtual const libecs::Polymorph
     getStepperProperty( libecs::StringCref aStepperID,
 		 libecs::StringCref aPropertyName ) = 0;
 
-    virtual void createEntity( libecs::StringCref           aClassname, 
-			       libecs::StringCref           aFullIDString,
-			       libecs::StringCref           aName ) = 0;
+    virtual void createEntity( libecs::StringCref   aClassname, 
+			       libecs::StringCref   aFullIDString,
+			       libecs::StringCref   aName ) = 0;
 
 
-    virtual void setProperty( libecs::StringCref            aFullPNString,
-			      libecs::PolymorphVectorCref   aData ) = 0;
+    virtual void setProperty( libecs::StringCref    aFullPNString,
+			      libecs::PolymorphCref aValue ) = 0;
 
 
 
-    virtual const libecs::PolymorphVectorRCPtr
+    virtual const libecs::Polymorph
     getProperty( libecs::StringCref aFullPNString ) = 0;
 
-    virtual EmcLogger
-    getLogger( libecs::StringCref aFullPNString ) = 0;
+    virtual EmcLogger getLogger( libecs::StringCref aFullPNString ) = 0;
 
     virtual void step() = 0;
 

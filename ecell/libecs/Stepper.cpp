@@ -63,7 +63,7 @@ namespace libecs
 
     registerSlot( getPropertySlotMaker()->
 		  createPropertySlot( "SystemList", *this,
-				      Type2Type<PolymorphVectorRCPtr>(),
+				      Type2Type<Polymorph>(),
 				      NULLPTR,
 				      &Stepper::getSystemList ) );
 
@@ -111,7 +111,7 @@ namespace libecs
 
     registerSlot( getPropertySlotMaker()->
 		  createPropertySlot( "StepIntervalConstraint", *this,
-				      Type2Type<PolymorphVectorRCPtr>(),
+				      Type2Type<Polymorph>(),
 				      &Stepper::setStepIntervalConstraint,
 				      &Stepper::getStepIntervalConstraint ) );
 
@@ -137,10 +137,10 @@ namespace libecs
   }
 
 
-  const PolymorphVectorRCPtr Stepper::getSystemList() const
+  const Polymorph Stepper::getSystemList() const
   {
-    PolymorphVectorRCPtr aVectorRCPtr( new PolymorphVector );
-    aVectorRCPtr->reserve( theSystemVector.size() );
+    PolymorphVector aVector;
+    aVector.reserve( theSystemVector.size() );
 
     for( SystemVectorConstIterator i( getSystemVector().begin() );
 	 i != getSystemVector().end() ; ++i )
@@ -149,10 +149,10 @@ namespace libecs
 	FullIDCref aFullID( aSystemPtr->getFullID() );
 	const String aFullIDString( aFullID.getString() );
 
-	aVectorRCPtr->push_back( aFullIDString );
+	aVector.push_back( aFullIDString );
       }
 
-    return aVectorRCPtr;
+    return aVector;
   }
 
 
@@ -203,31 +203,35 @@ namespace libecs
     calculateStepsPerSecond();
   }
 
-  void Stepper::setStepIntervalConstraint( PolymorphVectorRCPtrCref aValue )
+  void Stepper::setStepIntervalConstraint( PolymorphCref aValue )
   {
-    checkSequenceSize( *aValue, 2 );
+    PolymorphVector aVector( aValue.asPolymorphVector() );
+    checkSequenceSize( aVector, 2 );
 
     const StepperPtr aStepperPtr( getModel()->
-				  getStepper( (*aValue)[0].asString() ) );
-    const Real aFactor( (*aValue)[1].asReal() );
+				  getStepper( aVector[0].asString() ) );
+    const Real aFactor( aVector[1].asReal() );
 
     setStepIntervalConstraint( aStepperPtr, aFactor );
   }
 
-  const PolymorphVectorRCPtr Stepper::getStepIntervalConstraint() const
+  const Polymorph Stepper::getStepIntervalConstraint() const
   {
-    PolymorphVectorRCPtr aVectorRCPtr( new PolymorphVector );
-    aVectorRCPtr->reserve( theStepIntervalConstraintMap.size() * 2 );
+    PolymorphVector aVector;
+    aVector.reserve( theStepIntervalConstraintMap.size() );
 
     for( StepIntervalConstraintMapConstIterator 
 	   i( theStepIntervalConstraintMap.begin() ); 
 	      i != theStepIntervalConstraintMap.end() ; ++i )
       {
-	aVectorRCPtr->push_back( (*i).first->getID() );
-	aVectorRCPtr->push_back( (*i).second );
+	PolymorphVector anInnerVector;
+	anInnerVector.push_back( (*i).first->getID() );
+	anInnerVector.push_back( (*i).second );
+
+	aVector.push_back( anInnerVector );
       }
 
-    return aVectorRCPtr;
+    return aVector;
   }
 
   void Stepper::setStepIntervalConstraint( StepperPtr aStepperPtr,
@@ -290,23 +294,66 @@ namespace libecs
   {
     registerSlot( getPropertySlotMaker()->
 		  createPropertySlot( "SubstanceCache", *this,
-				      Type2Type<PolymorphVectorRCPtr>(),
+				      Type2Type<Polymorph>(),
 				      NULLPTR,
 				      &SRMStepper::getSubstanceCache ) );
 
     registerSlot( getPropertySlotMaker()->
 		  createPropertySlot( "ReactorCache", *this,
-				      Type2Type<PolymorphVectorRCPtr>(),
+				      Type2Type<Polymorph>(),
 				      NULLPTR,
 				      &SRMStepper::getReactorCache ) );
 
     registerSlot( getPropertySlotMaker()->
 		  createPropertySlot( "RuleReactorCache", *this,
-				      Type2Type<PolymorphVectorRCPtr>(),
+				      Type2Type<Polymorph>(),
 				      NULLPTR,
 				      &SRMStepper::getRuleReactorCache ) );
   }
 
+
+  const Polymorph SRMStepper::getSubstanceCache() const
+  {
+    PolymorphVector aVector;
+    aVector.reserve( theSubstanceCache.size() );
+    
+    for( SubstanceCache::const_iterator i( theSubstanceCache.begin() );
+	 i != theSubstanceCache.end() ; ++i )
+      {
+	aVector.push_back( (*i)->getID() );
+      }
+    
+    return aVector;
+  }
+  
+  const Polymorph SRMStepper::getReactorCache() const
+  {
+    PolymorphVector aVector;
+    aVector.reserve( theReactorCache.size() );
+    
+    for( ReactorCache::const_iterator i( theReactorCache.begin() );
+	 i != theReactorCache.end() ; ++i )
+      {
+	aVector.push_back( (*i)->getID() );
+      }
+    
+    return aVector;
+  }
+  
+  const Polymorph SRMStepper::getRuleReactorCache() const
+  {
+    PolymorphVector aVector;
+    aVector.reserve( theReactorCache.size() );
+    
+    for( ReactorCache::const_iterator i( theRuleReactorCache.begin() );
+	 i != theRuleReactorCache.end() ; ++i )
+      {
+	aVector.push_back( (*i)->getID() );
+      }
+    
+    return aVector;
+  }
+  
 
   void SRMStepper::initialize()
   {

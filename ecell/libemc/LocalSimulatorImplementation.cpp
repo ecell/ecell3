@@ -68,16 +68,14 @@ namespace libemc
   void LocalSimulatorImplementation::
   setStepperProperty( libecs::StringCref          aStepperID,
 		      libecs::StringCref          aPropertyName,
-		      libecs::PolymorphVectorCref aValue )
+		      libecs::PolymorphCref aValue )
   {
     StepperPtr aStepperPtr( getModel().getStepper( aStepperID ) );
     
-    aStepperPtr->
-      setProperty( aPropertyName,
-		   PolymorphVectorRCPtr( new PolymorphVector( aValue ) ) );
+    aStepperPtr->setProperty( aPropertyName, aValue );
   }
 
-  const libecs::PolymorphVectorRCPtr
+  const libecs::Polymorph
   LocalSimulatorImplementation::
   getStepperProperty( libecs::StringCref aStepperID,
 		      libecs::StringCref aPropertyName )
@@ -96,18 +94,16 @@ namespace libemc
   }
     
   void LocalSimulatorImplementation::
-  setProperty( StringCref aFullPNString, PolymorphVectorCref aData )
+  setProperty( StringCref aFullPNString, PolymorphCref aValue )
   {
     FullPN aFullPN( aFullPNString );
     EntityPtr anEntityPtr( getModel().getEntity( aFullPN.getFullID() ) );
 
-    anEntityPtr->
-      setProperty( aFullPN.getPropertyName(), 
-		   PolymorphVectorRCPtr( new PolymorphVector( aData ) ) );
+    anEntityPtr->setProperty( aFullPN.getPropertyName(), aValue );
   }
 
 
-  const PolymorphVectorRCPtr
+  const Polymorph
   LocalSimulatorImplementation::getProperty( StringCref aFullPNString )
   {
     FullPN aFullPN( aFullPNString );

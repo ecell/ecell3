@@ -55,27 +55,27 @@ namespace libemc
     LocalSimulatorImplementation();
     virtual ~LocalSimulatorImplementation();
 
-    virtual void createStepper( libecs::StringCref          aClassname,
-				libecs::StringCref          anId );
+    virtual void createStepper( libecs::StringCref         aClassname,
+				libecs::StringCref         anId );
 
 
-    virtual void setStepperProperty( libecs::StringCref          aStepperID,
-				     libecs::StringCref          aPropertyName,
-				     libecs::PolymorphVectorCref aValue );
+    virtual void setStepperProperty( libecs::StringCref    aStepperID,
+				     libecs::StringCref    aPropertyName,
+				     libecs::PolymorphCref aValue );
 
-    virtual const libecs::PolymorphVectorRCPtr
+    virtual const libecs::Polymorph
     getStepperProperty( libecs::StringCref aStepperID,
 			libecs::StringCref aPropertyName );
 
 
-    virtual void createEntity( libecs::StringCref           aClassname, 
-			       libecs::StringCref           aFullIDString,
-			       libecs::StringCref           aName );
+    virtual void createEntity( libecs::StringCref          aClassname, 
+			       libecs::StringCref          aFullIDString,
+			       libecs::StringCref          aName );
 
-    virtual void setProperty( libecs::StringCref            aFullPNString,
-			      libecs::PolymorphVectorCref   aData );
+    virtual void setProperty( libecs::StringCref           aFullPNString,
+			      libecs::PolymorphCref        aValue );
 
-    virtual const libecs::PolymorphVectorRCPtr
+    virtual const libecs::Polymorph
     getProperty( libecs::StringCref aFullPNString );
 
     virtual EmcLogger getLogger( libecs::StringCref aFullPNString );

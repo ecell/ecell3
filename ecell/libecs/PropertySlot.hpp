@@ -81,8 +81,8 @@ namespace libecs
       ; // do nothing
     }
 
-    virtual void setPolymorphVectorRCPtr( PolymorphVectorRCPtrCref ) = 0;
-    virtual const PolymorphVectorRCPtr getPolymorphVectorRCPtr() const = 0;
+    virtual void setPolymorph( PolymorphCref ) = 0;
+    virtual const Polymorph getPolymorph() const = 0;
     
     virtual void setReal( RealCref real ) = 0;
     virtual const Real getReal() const = 0;
@@ -148,9 +148,9 @@ namespace libecs
 
 
   template <>
-  inline void PropertySlot::set( PolymorphVectorRCPtrCref aValue )
+  inline void PropertySlot::set( PolymorphCref aValue )
   {
-    setPolymorphVectorRCPtr( aValue );
+    setPolymorph( aValue );
   }
 
   template <>
@@ -166,9 +166,9 @@ namespace libecs
   }
 
   template <>
-  inline const PolymorphVectorRCPtr PropertySlot::get() const
+  inline const Polymorph PropertySlot::get() const
   {
-    return getPolymorphVectorRCPtr();
+    return getPolymorph();
   }
 
   template <>
@@ -279,9 +279,8 @@ namespace libecs
     ConcreteProxyPropertySlot( PropertySlotRef aPropertySlot )
       :
       ProxyPropertySlot( aPropertySlot ),
-      // FIXME: should be something like null_value<SlotType>
-      theOriginalValue( 0 ),
-      theCachedValue( 0 )
+      theOriginalValue( nullValue<SlotType>() ),
+      theCachedValue( nullValue<SlotType>() )
     {
       ; // do nothing
     }
@@ -293,14 +292,14 @@ namespace libecs
 
 
 
-    virtual void setPolymorphVectorRCPtr( PolymorphVectorRCPtrCref aValue )
+    virtual void setPolymorph( PolymorphCref aValue )
     {
       setImpl( aValue );
     }
 
-    virtual const PolymorphVectorRCPtr getPolymorphVectorRCPtr() const
+    virtual const Polymorph getPolymorph() const
     {
-      return getImpl<PolymorphVectorRCPtr>();
+      return getImpl<Polymorph>();
     }
 
     virtual void setReal( RealCref aValue )
@@ -430,14 +429,14 @@ namespace libecs
 
     }
 
-    virtual void setPolymorphVectorRCPtr( PolymorphVectorRCPtrCref aValue )
+    virtual void setPolymorph( PolymorphCref aValue )
     {
       setImpl( aValue );
     }
 
-    virtual const PolymorphVectorRCPtr getPolymorphVectorRCPtr() const
+    virtual const Polymorph getPolymorph() const
     {
-      return getImpl<PolymorphVectorRCPtr>();
+      return getImpl<Polymorph>();
     }
 
     virtual void setReal( RealCref aValue )

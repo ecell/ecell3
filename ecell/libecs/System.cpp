@@ -52,19 +52,19 @@ namespace libecs
 
     registerSlot( getPropertySlotMaker()->
 		  createPropertySlot( "SystemList", *this,
-				      Type2Type<PolymorphVectorRCPtr>(),
+				      Type2Type<Polymorph>(),
 				      NULLPTR,
 				      &System::getSystemList ) );
 
     registerSlot( getPropertySlotMaker()->
 		  createPropertySlot( "SubstanceList", *this,
-				      Type2Type<PolymorphVectorRCPtr>(),
+				      Type2Type<Polymorph>(),
 				      NULLPTR,
 				      &System::getSubstanceList ) );
 
     registerSlot( getPropertySlotMaker()->
 		  createPropertySlot( "ReactorList", *this,
-				      Type2Type<PolymorphVectorRCPtr>(),
+				      Type2Type<Polymorph>(),
 				      NULLPTR,
 				      &System::getReactorList ) );
 
@@ -84,46 +84,46 @@ namespace libecs
 
   // Property slots
 
-  const PolymorphVectorRCPtr System::getSystemList() const
+  const Polymorph System::getSystemList() const
   {
-    PolymorphVectorRCPtr aVectorPtr( new PolymorphVector );
-    aVectorPtr->reserve( getSystemMap().size() );
+    PolymorphVector aVector;
+    aVector.reserve( getSystemMap().size() );
 
     for( SystemMapConstIterator i = getSystemMap().begin() ;
 	 i != getSystemMap().end() ; ++i )
       {
-	aVectorPtr->push_back( i->second->getID() );
+	aVector.push_back( i->second->getID() );
       }
 
-    return aVectorPtr;
+    return aVector;
   }
 
-  const PolymorphVectorRCPtr System::getSubstanceList() const
+  const Polymorph System::getSubstanceList() const
   {
-    PolymorphVectorRCPtr aVectorPtr( new PolymorphVector );
-    aVectorPtr->reserve( getSubstanceMap().size() );
+    PolymorphVector aVector;
+    aVector.reserve( getSubstanceMap().size() );
 
     for( SubstanceMapConstIterator i( getSubstanceMap().begin() );
 	 i != getSubstanceMap().end() ; ++i )
       {
-	aVectorPtr->push_back( i->second->getID() );
+	aVector.push_back( i->second->getID() );
       }
 
-    return aVectorPtr;
+    return aVector;
   }
 
-  const PolymorphVectorRCPtr System::getReactorList() const
+  const Polymorph System::getReactorList() const
   {
-    PolymorphVectorRCPtr aVectorPtr( new PolymorphVector );
-    aVectorPtr->reserve( getReactorMap().size() );
+    PolymorphVector aVector;
+    aVector.reserve( getReactorMap().size() );
 
     for( ReactorMapConstIterator i( getReactorMap().begin() );
 	 i != getReactorMap().end() ; ++i )
       {
-	aVectorPtr->push_back( i->second->getID() );
+	aVector.push_back( i->second->getID() );
       }
 
-    return aVectorPtr;
+    return aVector;
   }
 
 
@@ -279,7 +279,7 @@ namespace libecs
   {
     registerSlot( getPropertySlotMaker()->
 		  createPropertySlot( "ReactorList", *this,
-				      Type2Type<PolymorphVectorRCPtr>(),
+				      Type2Type<Polymorph>(),
 				      NULLPTR,
 				      &System::getReactorList ) );
   }
@@ -341,7 +341,7 @@ namespace libecs
   {
     registerSlot( getPropertySlotMaker()->
 		  createPropertySlot( "SubstanceList", *this,
-				      Type2Type<PolymorphVectorRCPtr>(),
+				      Type2Type<Polymorph>(),
 				      NULLPTR,
 				      &System::getSubstanceList ) );
 

@@ -356,11 +356,11 @@ namespace libecs
 
     const Real getMaxInterval() const;
 
-    void setStepIntervalConstraint( PolymorphVectorRCPtrCref aValue );
+    void setStepIntervalConstraint( PolymorphCref aValue );
 
     void setStepIntervalConstraint( StepperPtr aStepperPtr, RealCref aFactor );
 
-    const PolymorphVectorRCPtr getStepIntervalConstraint() const;
+    const Polymorph getStepIntervalConstraint() const;
 
 
     bool operator<( StepperCref rhs )
@@ -382,7 +382,7 @@ namespace libecs
     virtual StringLiteral getClassName() const  { return "Stepper"; }
 
 
-    const PolymorphVectorRCPtr getSystemList() const;
+    const Polymorph getSystemList() const;
 
 
   protected:
@@ -450,44 +450,9 @@ namespace libecs
     virtual void initialize();
 
 
-    const PolymorphVectorRCPtr getSubstanceCache() const
-    {
-      PolymorphVectorRCPtr aVectorPtr( new PolymorphVector );
-      
-      for( SubstanceCache::const_iterator i( theSubstanceCache.begin() );
-	   i != theSubstanceCache.end() ; ++i )
-	{
-	  aVectorPtr->push_back( (*i)->getID() );
-	}
-
-      return aVectorPtr;
-    }
-
-    const PolymorphVectorRCPtr getReactorCache() const
-    {
-      PolymorphVectorRCPtr aVectorPtr( new PolymorphVector );
-      
-      for( ReactorCache::const_iterator i( theReactorCache.begin() );
-	   i != theReactorCache.end() ; ++i )
-	{
-	  aVectorPtr->push_back( (*i)->getID() );
-	}
-
-      return aVectorPtr;
-    }
-
-    const PolymorphVectorRCPtr getRuleReactorCache() const
-    {
-      PolymorphVectorRCPtr aVectorPtr( new PolymorphVector );
-      
-      for( ReactorCache::const_iterator i( theRuleReactorCache.begin() );
-	   i != theRuleReactorCache.end() ; ++i )
-	{
-	  aVectorPtr->push_back( (*i)->getID() );
-	}
-
-      return aVectorPtr;
-    }
+    const Polymorph getSubstanceCache() const;
+    const Polymorph getReactorCache() const;
+    const Polymorph getRuleReactorCache() const;
 
 
     virtual StringLiteral getClassName() const  { return "SRMStepper"; }

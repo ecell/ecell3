@@ -34,7 +34,7 @@
 #include "libecs.hpp"
 #include "Util.hpp"
 
-#include "Polymorph.hpp"
+//#include "Polymorph.hpp"
 
 namespace libecs
 {
@@ -56,56 +56,13 @@ namespace libecs
   template< typename ToType, typename FromType >
   const ToType convertTo( const FromType& aValue, Type2Type<ToType> )
   {
-    DefaultSpecializationInhibited();
+    return static_cast<ToType>( aValue );
+    //    DefaultSpecializationInhibited();
   }
 
 
   // specializations
 
-  // to PolymorphVectorRCPtr
-
-  // identity
-
-  template<>
-  inline const PolymorphVectorRCPtr 
-  convertTo( PolymorphVectorRCPtrCref aValue, 
-	     Type2Type< PolymorphVectorRCPtr > )
-  {
-    return aValue;
-  }
-
-  // from Real
-  template<>
-  inline const PolymorphVectorRCPtr 
-  convertTo( RealCref aValue,
-	     Type2Type< PolymorphVectorRCPtr > )
-  {
-    PolymorphVectorRCPtr aVector( new PolymorphVector );
-    aVector->push_back( aValue );
-    return aVector;
-  }
-
-  // from String
-  template<>
-  inline const PolymorphVectorRCPtr 
-  convertTo( StringCref aValue,
-	     Type2Type< PolymorphVectorRCPtr > )
-  {
-    PolymorphVectorRCPtr aVectorPtr( new PolymorphVector );
-    aVectorPtr->push_back( aValue );
-    return aVectorPtr;
-  }
-
-  // from Int
-  template<>
-  inline const PolymorphVectorRCPtr 
-  convertTo( IntCref aValue,
-	     Type2Type< PolymorphVectorRCPtr > )
-  {
-    PolymorphVectorRCPtr aVectorPtr( new PolymorphVector );
-    aVectorPtr->push_back( aValue );
-    return aVectorPtr;
-  }
 
   // to String
 
@@ -116,16 +73,6 @@ namespace libecs
 	     Type2Type< String > )
   {
     return aValue;
-  }
-
-
-
-  template<>
-  inline const String convertTo( PolymorphVectorRCPtrCref aValue,
-				 Type2Type< String > )
-  {
-    checkSequenceSize( *aValue, 1 );
-    return (*aValue)[0].asString();
   }
 
   template<>
@@ -156,14 +103,6 @@ namespace libecs
   }
 
   template<>
-  inline const Real convertTo( PolymorphVectorRCPtrCref aValue,
-			       Type2Type< Real > )
-  {
-    checkSequenceSize( *aValue, 1 );
-    return (*aValue)[0].asReal();
-  }
-    
-  template<>
   inline const Real convertTo( StringCref aValue,
 			       Type2Type< Real > )
   {
@@ -191,14 +130,6 @@ namespace libecs
     return aValue;
   }
 
-  template<>
-  inline const Int convertTo( PolymorphVectorRCPtrCref aValue,
-			      Type2Type< Int > )
-  {
-    checkSequenceSize( *aValue, 1 );
-    return (*aValue)[0].asInt();
-  }
-    
   template<>
   inline const Int convertTo( RealCref aValue,
 			      Type2Type< Int > )

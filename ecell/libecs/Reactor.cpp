@@ -46,13 +46,13 @@ namespace libecs
   {
     registerSlot( getPropertySlotMaker()->
 		  createPropertySlot( "Reactant", *this, 
-				      Type2Type<PolymorphVectorRCPtr>(),
+				      Type2Type<Polymorph>(),
 				      &Reactor::setReactant,
 				      NULLPTR ) );
 
     registerSlot( getPropertySlotMaker()->
 		  createPropertySlot( "ReactantList", *this, 
-				      Type2Type<PolymorphVectorRCPtr>(),
+				      Type2Type<Polymorph>(),
 				      NULLPTR,
 				      &Reactor::getReactantList ) );
 
@@ -74,27 +74,26 @@ namespace libecs
     return getActivity() * getStepper()->getStepsPerSecond();
   }
 
-  void Reactor::setReactant( PolymorphVectorRCPtrCref aValue )
+  void Reactor::setReactant( PolymorphCref aValue )
   {
-    checkSequenceSize( *aValue, 3 );
+    PolymorphVector aVector( aValue.asPolymorphVector() );
+    checkSequenceSize( aVector, 3 );
 
-    registerReactant( (*aValue)[0].asString(), 
-		      FullID( (*aValue)[1].asString() ), 
-		      (*aValue)[2].asInt() );
+    registerReactant( aVector[0].asString(), FullID( aVector[1].asString() ), 
+		      aVector[2].asInt() );
   }
 
-  const PolymorphVectorRCPtr Reactor::getReactantList() const
+  const Polymorph Reactor::getReactantList() const
   {
-    PolymorphVectorRCPtr aVectorPtr( new PolymorphVector );
-    aVectorPtr->reserve( theReactantMap.size() );
+    PolymorphVector aVector( theReactantMap.size() );
   
     for( ReactantMapConstIterator i( theReactantMap.begin() );
 	 i != theReactantMap.end() ; ++i )
       {
-	aVectorPtr->push_back( i->second.getSubstance()->getFullID().getString() );
+	aVector.push_back( i->second.getSubstance()->getFullID().getString() );
       }
 
-    return aVectorPtr;
+    return aVector;
   }
 
   void Reactor::registerReactant( StringCref aName, FullIDCref aFullID, 

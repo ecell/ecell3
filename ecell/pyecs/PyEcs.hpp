@@ -108,20 +108,29 @@ BOOST_PYTHON_BEGIN_CONVERSION_NAMESPACE
 
 
 //
+// PolymorphVector convertion functions
+//
+
+static const libecs::PolymorphVector ref_to_PolymorphVector( const ref& aRef );
+static PyObject* 
+PolymorphVector_to_python( libecs::PolymorphVectorCref aVector );
+
+
+
+//
 // Polymorph
 //
 
-libecs::Polymorph from_python( PyObject* aPyObjectPtr,
-			       type<libecs::Polymorph> )
+const libecs::Polymorph from_python( PyObject* aPyObjectPtr,
+				     type<libecs::Polymorph> )
 {
-  libecs::Polymorph aPolymorph;
-
   if( PyFloat_Check( aPyObjectPtr ) )
     {
       libecs::Real aReal( BOOST_PYTHON_CONVERSION::
 			  from_python( aPyObjectPtr,
 				       type<libecs::Real>() ) );
-      aPolymorph = aReal;
+
+      return aReal;
     }
   else if( PyInt_Check( aPyObjectPtr ) )
     {
@@ -129,7 +138,20 @@ libecs::Polymorph from_python( PyObject* aPyObjectPtr,
 			 from_python( aPyObjectPtr,
 				      type<long int>()) );
       //					  type<libecs::Int>()) );
-      aPolymorph = anInt;
+
+      return anInt;
+    }
+  else if( PyList_Check( aPyObjectPtr ) )
+    {
+      ref aRef = make_ref( PyList_AsTuple( aPyObjectPtr ) );
+
+      return ref_to_PolymorphVector( aRef );
+    }      
+  else if ( PyTuple_Check( aPyObjectPtr ) )
+    {
+      ref aRef = make_ref( aPyObjectPtr );
+
+      return ref_to_PolymorphVector( aRef );
     }
   else if( PyString_Check( aPyObjectPtr ) )
     {
@@ -137,20 +159,21 @@ libecs::Polymorph from_python( PyObject* aPyObjectPtr,
 	aString( BOOST_PYTHON_CONVERSION::
 		 from_python( aPyObjectPtr,
 			      type<libecs::String>() ) );
-      aPolymorph = aString;
-    }
-  else
-    {
-      // convert with repr() ?
-      
-      PyErr_SetString( PyExc_TypeError, 
-		       "Unacceptable type of an object in the tuple." );
-      throw_argument_error();
-      
+
+      return aString;
     }
 
-  // here I expect named return value optimization
-  return aPolymorph;
+
+  // convertion is failed. ( convert with repr() ? )
+  PyErr_SetString( PyExc_TypeError, 
+		   "Unacceptable type of an object in the tuple." );
+  throw_argument_error();
+}
+
+inline const libecs::Polymorph from_python( PyObject* aPyObjectPtr,
+				     type<libecs::PolymorphCref> )
+{
+  return from_python( aPyObjectPtr, type<libecs::Polymorph>() );
 }
 
 PyObject* to_python( libecs::PolymorphCref aPolymorph )
@@ -167,6 +190,10 @@ PyObject* to_python( libecs::PolymorphCref aPolymorph )
       aPyObjectPtr = BOOST_PYTHON_CONVERSION::
 	to_python( boost::numeric_cast<long int>( aPolymorph.asInt() ) );
       break;
+    case libecs::Polymorph::POLYMORPH_VECTOR :
+      aPyObjectPtr = 
+	PolymorphVector_to_python( aPolymorph.asPolymorphVector() );
+      break;
     case libecs::Polymorph::STRING :
     case libecs::Polymorph::NONE :
     default: // should this default be an error?
@@ -182,81 +209,6 @@ PyObject* to_python( libecs::PolymorphCref aPolymorph )
 PyObject* to_python( libecs::PolymorphCptr aPolymorphPtr )
 {
   to_python( aPolymorphPtr );
-}
-
-
-
-//
-// PolymorphVector
-//
-
-libecs::PolymorphVector from_python( PyObject* aPyObjectPtr, 
-				     type<libecs::PolymorphVector> )
-{
-  ref aRef;
-
-  if ( PyTuple_Check( aPyObjectPtr ) )
-    {
-      aRef = make_ref( aPyObjectPtr );
-    }
-  else if( PyList_Check( aPyObjectPtr ) )
-    {
-      aRef = make_ref( PyList_AsTuple( aPyObjectPtr ) );
-    }
-  else
-    {
-      PyErr_SetString( PyExc_TypeError, 
-		       "This method only takes tuple or list." );
-      throw_argument_error();
-    }
-  
-  tuple aPyTuple( aRef );
-
-  std::size_t aSize( aPyTuple.size() );
-
-  libecs::PolymorphVector aVector;
-  aVector.reserve( aSize );
-
-  for ( std::size_t i( 0 ); i < aSize; ++i )
-    {
-      ref anItemRef( aPyTuple[i] );
-      PyObject* aPyObjectPtr( anItemRef.get() ); 
-
-      aVector.push_back( from_python( aPyObjectPtr, 
-				      type<libecs::Polymorph>() ) );
-    }
-
-  return aVector;
-}
-
-libecs::PolymorphVector from_python( PyObject* aPyObjectPtr, 
-				     type<libecs::PolymorphVectorCref> )
-{
-  return from_python( aPyObjectPtr, type<libecs::PolymorphVector>() );
-}
-
-PyObject* to_python( libecs::PolymorphVectorCref aVector )
-{
-  libecs::PolymorphVector::size_type aSize( aVector.size() );
-  
-  tuple aPyTuple( aSize );
-
-  for( size_t i( 0 ) ; i < aSize ; ++i )
-    {
-      aPyTuple.set_item( i, BOOST_PYTHON_CONVERSION::to_python( aVector[i] ) );
-    }
-
-  return to_python( aPyTuple.get() );
-}
-
-PyObject* to_python( libecs::PolymorphVectorCptr aVectorCptr )
-{
-  return to_python( *aVectorCptr );
-}
-
-PyObject* to_python( libecs::PolymorphVectorRCPtr aVectorRCPtr )
-{
-  return to_python( *aVectorRCPtr );
 }
 
 

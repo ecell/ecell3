@@ -28,12 +28,14 @@
 // E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
 
-#ifndef ___UNIVERSALVARIABLE_H___
-#define ___UNIVERSALVARIABLE_H___
+#ifndef ___POLYMORPH_HPP
+#define ___POLYMORPH_HPP
 
 #include <assert.h>
 
 #include "libecs.hpp"
+#include "convertTo.hpp"
+#include "Util.hpp"
 
 namespace libecs
 {
@@ -48,11 +50,6 @@ namespace libecs
   /** @file */
   
   DECLARE_CLASS( PolymorphData );
-  DECLARE_CLASS( PolymorphStringData );
-  DECLARE_CLASS( PolymorphRealData );
-  DECLARE_CLASS( PolymorphIntData );
-
-
 
   class PolymorphData
   {
@@ -67,6 +64,13 @@ namespace libecs
     virtual const String asString()        const = 0;
     virtual const Real   asReal()          const = 0;
     virtual const Int    asInt()           const = 0;
+    virtual const PolymorphVector asPolymorphVector() const = 0;
+
+    template< typename T >
+    const T as() const
+    {
+      DefaultSpecializationInhibited();
+    }
 
     virtual PolymorphDataPtr createClone() const = 0;
 
@@ -82,110 +86,98 @@ namespace libecs
   };
 
 
-  class PolymorphStringData 
+  template <>
+  inline const String PolymorphData::as() const
+  {
+    return asString();
+  }
+
+  template <>
+  inline const Real PolymorphData::as() const
+  {
+    return asReal();
+  }
+
+  template <>
+  inline const Int PolymorphData::as() const
+  {
+    return asInt();
+  }
+
+  template <>
+  inline const PolymorphVector PolymorphData::as() const
+  {
+    return asPolymorphVector();
+  }
+
+
+
+  template< typename T >
+  class ConcretePolymorphData 
     : 
     public PolymorphData
   {
   
   public:
 
-    PolymorphStringData( StringCref  str ) 
-      : 
-      theValue( str ) 
-    {
-      ; // do nothing
-    }
-  
-    PolymorphStringData( RealCref f );
-    PolymorphStringData( IntCref  i );
-
-    PolymorphStringData( PolymorphDataCref uvi )
+    ConcretePolymorphData( StringCref  aValue ) 
       :
-      theValue( uvi.asString() )
+      theValue( convertTo<T>( aValue ) )
     {
       ; // do nothing
     }
 
-    virtual const String asString() const { return theValue; }
-    virtual const Real   asReal()   const;
-    virtual const Int    asInt()    const;
-
-    virtual PolymorphDataPtr createClone() const
-    {
-      return new PolymorphStringData( *this );
-    }
-
-  private:
-
-    String theValue;
-
-  };
-
-  class PolymorphRealData 
-    : 
-    public PolymorphData
-  {
-
-  public:
-
-    PolymorphRealData( StringCref str );
-    PolymorphRealData( RealCref   f ) 
-      : 
-      theValue( f ) 
+    ConcretePolymorphData( RealCref aValue ) 
+      :
+      theValue( convertTo<T>( aValue ) )
     {
       ; // do nothing
     }
 
-    PolymorphRealData( IntCref    i ) 
-      : 
-      theValue( static_cast<Real>( i ) )
+    ConcretePolymorphData( IntCref  aValue )
+      :
+      theValue( convertTo<T>( aValue ) )
     {
       ; // do nothing
     }
 
-    virtual const String asString() const;
-    virtual const Real   asReal() const    { return theValue; }
-    virtual const Int    asInt() const;
-
-    virtual PolymorphDataPtr createClone() const
-    {
-      return new PolymorphRealData( *this );
-    }
-
-  private:
-
-    Real theValue;
-
-  };
-
-  class PolymorphIntData 
-    : 
-    public PolymorphData
-  {
-
-  public:
-
-    PolymorphIntData( StringCref str );
-    PolymorphIntData( RealCref   f );
-    PolymorphIntData( IntCref    i ) 
-      : 
-      theValue( i ) 
+    ConcretePolymorphData( PolymorphVectorCref aValue )
+      :
+      theValue( convertTo<T>( aValue ) )
     {
       ; // do nothing
     }
 
-    virtual const String asString() const;
-    virtual const Real   asReal() const;
-    virtual const Int    asInt()  const { return theValue; }
+    ConcretePolymorphData( PolymorphDataCref aValue )
+      :
+      theValue( aValue.as<T>() )
+    {
+      ; // do nothing
+    }
+
+    virtual ~ConcretePolymorphData()
+    {
+      ; // do nothing
+    }
   
+    virtual const String asString() const 
+    { 
+      return convertTo<String>( theValue ); 
+    }
+
+    virtual const Real   asReal()  const { return convertTo<Real>( theValue );}
+    virtual const Int    asInt()   const { return convertTo<Int>( theValue ); }
+    virtual const PolymorphVector asPolymorphVector() const
+    { return convertTo<PolymorphVector>( theValue ); }
+
     virtual PolymorphDataPtr createClone() const
     {
-      return new PolymorphIntData( *this );
+      return new ConcretePolymorphData<T>( *this );
     }
 
   private:
 
-    Int theValue;
+    T theValue;
 
   };
 
@@ -198,6 +190,10 @@ namespace libecs
 
     PolymorphNoneData() {}
 
+    virtual ~PolymorphNoneData()
+    {
+      ; // do nothing
+    }
 
     virtual const String asString() const 
     { 
@@ -206,6 +202,10 @@ namespace libecs
     }
     virtual const Real   asReal() const   { return 0.0; }
     virtual const Int    asInt() const    { return 0; }
+    virtual const PolymorphVector asPolymorphVector() const 
+    { 
+      return PolymorphVector(); 
+    }
   
     virtual PolymorphDataPtr createClone() const
     {
@@ -226,7 +226,8 @@ namespace libecs
 	NONE,
 	REAL, 
 	INT,  
-	STRING
+	STRING,
+	POLYMORPH_VECTOR
       };
 
   
@@ -237,30 +238,37 @@ namespace libecs
       ; // do nothing
     }
 
-    Polymorph( StringCref  string ) 
+    Polymorph( StringCref  aValue ) 
       :
-      theData( new PolymorphStringData( string ) )
+      theData( new ConcretePolymorphData<String>( aValue ) )
     {
       ; // do nothing
     }
   
-    Polymorph( RealCref f )      
+    Polymorph( RealCref aValue )      
       :
-      theData( new PolymorphRealData( f ) )
+      theData( new ConcretePolymorphData<Real>( aValue ) )
     {
       ; // do nothing
     }
 
-    Polymorph( IntCref  i )      
+    Polymorph( IntCref aValue )      
       :
-      theData( new PolymorphIntData( i ) )
+      theData( new ConcretePolymorphData<Int>( aValue ) )
     {
       ; // do nothing
     }
 
-    Polymorph( PolymorphCref uv )
+    Polymorph( PolymorphVectorCref aValue )
       :
-      theData( uv.createDataClone() )
+      theData( new ConcretePolymorphData<PolymorphVector>( aValue ) )
+    {
+      ; // do nothing
+    }
+
+    Polymorph( PolymorphCref aValue )
+      :
+      theData( aValue.createDataClone() )
     {
       ; // do nothing
     }
@@ -296,7 +304,41 @@ namespace libecs
       return theData->asInt();
     }
 
+    const PolymorphVector asPolymorphVector() const
+    { 
+      return theData->asPolymorphVector();
+    }
+
+    template< typename T >
+    const T as() const
+    {
+      DefaultSpecializationInhibited();
+    }
+
     const Type getType() const;
+
+    void changeType( const Type aType );
+
+
+    operator String() const
+    {
+      return asString();
+    }
+
+    operator Real() const
+    {
+      return asReal();
+    }
+
+    operator Int() const
+    {
+      return asInt();
+    }
+
+    operator PolymorphVector() const
+    {
+      return asPolymorphVector();
+    }
 
   protected:
 
@@ -311,8 +353,139 @@ namespace libecs
 
   };
 
+
+  template <>
+  inline const String Polymorph::as() const
+  {
+    return asString();
+  }
+
+  template <>
+  inline const Real Polymorph::as() const
+  {
+    return asReal();
+  }
+
+  template <>
+  inline const Int Polymorph::as() const
+  {
+    return asInt();
+  }
+
+  template <>
+  inline const PolymorphVector Polymorph::as() const
+  {
+    return asPolymorphVector();
+  }
+
+
+
+  //
+  // nullValue() specialization for Polymorph. See Util.hpp
+  //
+
+  template<>
+  inline const Polymorph nullValue()
+  {
+    return Polymorph();
+  }
+
+
+
+
+  //
+  // Below are convertTo template function specializations for Polymorph class.
+  // Mainly for PolymorphVector classes
+  //
+
+  // to Polymorph object
+
+
+  // identity
+
+  template<>
+  inline const Polymorph convertTo( PolymorphCref aValue, 
+				    Type2Type< Polymorph > )
+  {
+    return aValue;
+  }
+
+  // from Real
+
+  template<>
+  inline const Polymorph convertTo( RealCref aValue, 
+				    Type2Type< Polymorph > )
+  {
+    return Polymorph( aValue );
+  }
+
+
+
+  // to PolymorphVector object
+
+  // identity
+
+  template<>
+  inline const PolymorphVector 
+  convertTo( PolymorphVectorCref aValue, 
+	     Type2Type< PolymorphVector > )
+  {
+    return aValue;
+  }
+
+  // from Real
+  template<>
+  inline const PolymorphVector 
+  convertTo( RealCref aValue,
+	     Type2Type< PolymorphVector > )
+  {
+    return PolymorphVector( 1, aValue );
+  }
+
+  // from String
+  template<>
+  inline const PolymorphVector 
+  convertTo( StringCref aValue,
+	     Type2Type< PolymorphVector > )
+  {
+    return PolymorphVector( 1, aValue );
+  }
+
+  // from Int
+  template<>
+  inline const PolymorphVector 
+  convertTo( IntCref aValue, Type2Type< PolymorphVector > )
+  {
+    return PolymorphVector( 1, aValue );
+  }
+
+  template<>
+  inline const String convertTo( PolymorphVectorCref aValue,
+				 Type2Type< String > )
+  {
+    checkSequenceSize( aValue, 1 );
+    return aValue[0].asString();
+  }
+
+  template<>
+  inline const Real convertTo( PolymorphVectorCref aValue, Type2Type< Real > )
+  {
+    checkSequenceSize( aValue, 1 );
+    return aValue[0].asReal();
+  }
+    
+  template<>
+  inline const Int convertTo( PolymorphVectorCref aValue, Type2Type< Int > )
+  {
+    checkSequenceSize( aValue, 1 );
+    return aValue[0].asInt();
+  }
+    
+
+
   // @} // uvariable
 
 } // namespace libecs
 
-#endif /* ___UNIVERSALVARIABLE_H___ */
+
+#endif /* __POLYMORPH_HPP */

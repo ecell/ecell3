@@ -10,7 +10,46 @@
 
 #include "PyEcs.hpp"
 
+BOOST_PYTHON_BEGIN_CONVERSION_NAMESPACE
 
+const libecs::PolymorphVector ref_to_PolymorphVector( const ref& aRef )
+{
+  tuple aPyTuple( aRef );
+
+  std::size_t aSize( aPyTuple.size() );
+
+  libecs::PolymorphVector aVector;
+  aVector.reserve( aSize );
+      
+  for ( std::size_t i( 0 ); i < aSize; ++i )
+    {
+      ref anItemRef( aPyTuple[i] );
+      PyObject* aPyObjectPtr( anItemRef.get() ); 
+      
+      aVector.push_back( from_python( aPyObjectPtr, 
+				      type<libecs::Polymorph>() ) );
+    }
+
+  return aVector;
+}
+
+static PyObject* 
+PolymorphVector_to_python( libecs::PolymorphVectorCref aVector )
+{
+  libecs::PolymorphVector::size_type aSize( aVector.size() );
+  
+  tuple aPyTuple( aSize );
+
+  for( size_t i( 0 ) ; i < aSize ; ++i )
+    {
+      aPyTuple.set_item( i, BOOST_PYTHON_CONVERSION::to_python( aVector[i] ) );
+    }
+
+  return to_python( aPyTuple.get() );
+}
+
+
+BOOST_PYTHON_END_CONVERSION_NAMESPACE
 
 
 BOOST_PYTHON_MODULE_INIT(_ecs)

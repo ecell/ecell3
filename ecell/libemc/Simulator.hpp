@@ -86,12 +86,12 @@ namespace libemc
        Set a property value of an Stepper.
 
        @param aStepperID    the Stepper ID.
-       @param aValue        the value to set as a PolymorphVector.
+       @param aValue        the value to set as a Polymorph.
     */
 
     void setStepperProperty( libecs::StringCref          aStepperID,
 			     libecs::StringCref          aPropertyName,
-			     libecs::PolymorphVectorCref aValue )
+			     libecs::PolymorphCref aValue )
     {
       theSimulatorImplementation->setStepperProperty( aStepperID,
 						      aPropertyName,
@@ -104,10 +104,10 @@ namespace libemc
        @param aStepperID the Stepper ID.
        @param aPropertyName the name of the property.
        @return the property value as a reference counted pointor of a 
-       PolymorphVector.
+       Polymorph.
     */
 
-    const libecs::PolymorphVectorRCPtr
+    const libecs::Polymorph
     getStepperProperty( libecs::StringCref aStepperID,
 			libecs::StringCref aPropertyName )
     {
@@ -136,11 +136,11 @@ namespace libemc
        Set a property value of an Entity.
 
        @param aFullPNString a FullPN of the Property to set as a String.
-       @param aValue        the value to set as a PolymorphVector.
+       @param aValue        the value to set as a Polymorph.
     */
 
     void setProperty( libecs::StringCref            aFullPNString,
-		      libecs::PolymorphVectorCref   aValue )
+		      libecs::PolymorphCref   aValue )
     {
       theSimulatorImplementation->setProperty( aFullPNString,
 					       aValue );
@@ -151,10 +151,10 @@ namespace libemc
 
        @param aFullPNString a FullPN of the property as a String.
        @return the property value as a reference counted pointor of a 
-       PolymorphVector
+       Polymorph
     */
 
-    const libecs::PolymorphVectorRCPtr
+    const libecs::Polymorph
     getProperty( libecs::StringCref aFullPNString )
     {
       return theSimulatorImplementation->getProperty( aFullPNString );

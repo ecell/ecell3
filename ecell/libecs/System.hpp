@@ -221,9 +221,9 @@ namespace libecs
 
   public: // property slots
 
-    const PolymorphVectorRCPtr getSystemList() const;
-    const PolymorphVectorRCPtr getSubstanceList() const;
-    const PolymorphVectorRCPtr getReactorList() const;
+    const Polymorph getSystemList() const;
+    const Polymorph getSubstanceList() const;
+    const Polymorph getReactorList() const;
 
   protected:
 
