@@ -378,7 +378,7 @@ class MainWindow(OsogoWindow):
 		try:
 			aFileName = self.theScriptFileSelection.get_filename()
 			self.theScriptFileSelection.hide()
-			self.theSession.printMessage( 'loading script file %s\n' % aFileName )
+			self.theSession.message( 'loading script file %s\n' % aFileName )
 			aGlobalNameMap = { 'theMainWindow' : self }
 			execfile( aFileName, aGlobalNameMap )
 			self.update()
@@ -488,7 +488,7 @@ class MainWindow(OsogoWindow):
 			# this can fail if the simulator is not ready
 			self.theSession.theSimulator.initialize()
 
-			self.theSession.printMessage( "Start\n" )
+			self.theSession.message( "Start\n" )
 			self.theTimer = gtk.timeout_add(self.theUpdateInterval, self.updateByTimeOut, 0)
 			self.theLoggerWindow.update()
 			self.theSession.run()
@@ -518,7 +518,7 @@ class MainWindow(OsogoWindow):
 		try:
 			if self.theRunningFlag:
 				self.theSession.stop()
-				self.theSession.printMessage( "Stop\n" )
+				self.theSession.message( "Stop\n" )
 				self.removeTimeOut()
 				self.update()
 				self.updateFundamentalWindows()
