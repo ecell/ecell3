@@ -9,7 +9,7 @@ DM_SRC_DIR =  ${prefix}/share/${PACKAGE}/${VERSION}/DM
 BOOST_DIR=@BOOST_DIR@
 PYTHON_INCLUDES=@PYTHON_INCLUDES@
 
-DMS = MassActionProcess.cpp\
+DMS = MassActionFluxProcess.cpp\
 CatalyzedMassActionFluxProcess.cpp\
 MichaelisUniUniProcess.cpp\
 MichaelisUniUniReversibleProcess.cpp\
