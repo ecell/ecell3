@@ -1,0 +1,21 @@
+%Id: README,v 1.0 2002/10/13 16:57 yoyo Exp %
+
+
+
+=== About ===
+
+Long-term depression (LTD) in cerebellar Purkinje cells (PCs) is a candidate mechanism for the molecular and cellular basis of motor learning and motor coordination (Ito, 1989).
+
+To build a computational model of LTD, we first constructed a kinetic simulation model using GENESIS/kinetikit (Kuroda et al., 2001). LTD at parallel fiber (PF)-PCs synapses is induced by a conjunctive stimulation of PF and climbing fiber (CF) synapses.
+
+Since the main final step in the induction is considered to be the long-term stable phosphorylation of the AMPA receptor, the final output of the simulation was set as the phosphorylation state of the AMPA receptor. We reproduced Kuroda's result in our E-Cell system.
+
+The essential initial step in the LTD induction is the overlapping of the large elevation in intracellular calcium concentration caused by CF input-evoked depolarization, and the activation of postsynaptic glutamate receptors at PF synapses.
+
+However, in our improved simulation using the E-Cell system, we suceeded in constructing a model of AMPA receptor phosphorylation, where the AMPA receptor is stimulated by CF synapses only. A large elevation in calcium concentration caused by influx induces the activation of neuronal nitric oxide (NO) synthetase, and activated NO/cGMP pathways give rise to the stable phosphorylation of AMPA receptors through protein kinase G. Stable activation of this signal cascade, evoked by the stimulation of only CF synapses, may phosphorylate AMPA receptors.
+
+
+
+=== Files and directories ==
+
+README:     This file
