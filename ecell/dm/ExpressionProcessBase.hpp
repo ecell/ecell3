@@ -181,7 +181,7 @@ LIBECS_DM_CLASS( ExpressionProcessBase, Process )
       ExpressionCompiler theCompiler( this, &( getPropertyMap() ) );
 
       theCompiledCode.clear();
-      theCompiledCode = theCompiler.compileExpression( this, theExpression );
+      theCompiledCode = theCompiler.compileExpression( theExpression );
 
       //	theVirtualMachine.resize( theCompiler.getStackSize() );
     }

@@ -433,9 +433,8 @@ public:
   typedef char const*         iterator_t;
   typedef tree_match<iterator_t> parse_tree_match_t;
   typedef parse_tree_match_t::tree_iterator TreeIterator;
-  //DECLARE_CLASS( TreeIterator );
     
-  const Code compileExpression( ProcessPtr aProcess, StringCref anExpression );
+  const Code compileExpression( StringCref anExpression );
     
 protected:
 
@@ -465,14 +464,17 @@ protected:
 				 SystemPtr aSystemPtr,
 				 StringCref aMethodName );
 
+
 private:
     
   static void fillMap();
 
-  void compileTree( TreeIterator const& aTreeIterator, CodeRef aCode );  
+  void compileTree( TreeIterator const& aTreeIterator, CodeRef aCode );    
   void compileSystemProperty
   ( TreeIterator const& aTreeIterator, CodeRef aCode,
     SystemPtr aSystemPtr, const String aMethodName );
+
+  void throw_exception( String type, String aString );
 
 private:
     
@@ -558,9 +560,8 @@ DEFINE_OPCODE2INSTRUCTION( OBJECT_METHOD_REAL );
 DEFINE_OPCODE2INSTRUCTION( RET );
 
 
-
 const ExpressionCompiler::Code 
-ExpressionCompiler::compileExpression( ProcessPtr aProcess, StringCref anExpression )
+ExpressionCompiler::compileExpression( StringCref anExpression )
 {
   Code aCode;
   CompileGrammar aGrammer;
@@ -572,8 +573,8 @@ ExpressionCompiler::compileExpression( ProcessPtr aProcess, StringCref anExpress
     {
       THROW_EXCEPTION( UnexpectedError, 
 		       "Expression is empty\nClass : " +
-		       std::string( aProcess->getClassName() ) +
-		       "\nID : " + std::string( aProcess->getID() ) );
+		       String( theProcessPtr->getClassName() ) +
+		       "\nProcessID : " + String( theProcessPtr->getID() ) );
     }
   
   else
@@ -581,7 +582,7 @@ ExpressionCompiler::compileExpression( ProcessPtr aProcess, StringCref anExpress
       if( info.full )
 	{
 	  compileTree( info.trees.begin(), aCode );
-	  
+
 	  // place RET at the tail.
 	  appendInstruction( aCode, Instruction<RET>() );
 	}
@@ -589,9 +590,10 @@ ExpressionCompiler::compileExpression( ProcessPtr aProcess, StringCref anExpress
 	{
 	  THROW_EXCEPTION( UnexpectedError,			   
 			   "Parse error in the expression.\nExpression : "
-			   + anExpression
-			   + "\nClass : " + std::string( aProcess->getClassName() )
-			   + "\nID : " + std::string( aProcess->getID() ) );	  
+			   + anExpression + "\nClass : " 
+			   + String( theProcessPtr->getClassName() )
+			   + "\nProcessID : " 
+			   + String( theProcessPtr->getID() ) );
 	}
     }
       
@@ -662,6 +664,7 @@ void ExpressionCompiler::fillMap()
 
 }
 
+
 #define APPEND_OBJECT_METHOD_REAL( OBJECT, CLASSNAME, METHODNAME )\
 	appendInstruction\
 	  ( aCode, \
@@ -686,7 +689,6 @@ appendVariableReferenceMethodInstruction( Code& aCode,
 					  aVariableReference,
 					  StringCref aMethodName )
 {
-
 
   if( aMethodName == "MolarConc" )
     {
@@ -729,7 +731,7 @@ appendVariableReferenceMethodInstruction( Code& aCode,
     {
       THROW_EXCEPTION
 	( NotFound,
-	  "ExpressionCompiler: VariableReference attribute [" +
+	  "VariableReference attribute [" +
 	  aMethodName + "] not found." ); 
     }
 
@@ -754,7 +756,7 @@ appendSystemMethodInstruction( Code& aCode,
     {
       THROW_EXCEPTION
 	( NotFound,
-	  "ExpressionCompiler: System attribute [" +
+	  "System attribute [" +
 	  aMethodName + "] not found." ); 
     }
 
@@ -765,7 +767,27 @@ appendSystemMethodInstruction( Code& aCode,
 
 
 
-
+void 
+ExpressionCompiler::throw_exception( String anExceptionType, 
+				     String anExceptionString )
+{
+  if( anExceptionType == "UnexpeptedError" )
+    {
+      THROW_EXCEPTION( UnexpectedError, anExceptionString );
+    }
+  else if( anExceptionType == "NoSlot" )
+    {
+      THROW_EXCEPTION( NoSlot, anExceptionString );
+    }
+  else if( anExceptionType == "NotFound" )
+    {
+      THROW_EXCEPTION( NotFound, anExceptionString );
+    }
+  else
+    {
+      THROW_EXCEPTION( UnexpectedError, anExceptionString );
+    }
+}
 
 /**
    This function is ExpressionCompiler subclass member function.
@@ -874,7 +896,6 @@ void ExpressionCompiler::compileTree
 
     case CompileGrammar::CALL_FUNC :
       {
-
 	Integer aChildTreeSize( aTreeIterator->children.size() );
 	  
 	const String aFunctionString( aTreeIterator->value.begin(),
@@ -883,10 +904,12 @@ void ExpressionCompiler::compileTree
 
 	assert( aChildTreeSize != 0 );
 
+	FunctionMap1Iterator aFunctionMap1Iterator;
+	FunctionMap2Iterator aFunctionMap2Iterator;
+
+
 	if( aChildTreeSize == 1 )
 	  {
-	    FunctionMap1Iterator aFunctionMap1Iterator;
-
 	    aFunctionMap1Iterator = 
 	      theFunctionMap1.find( aFunctionString );
 		
@@ -913,9 +936,25 @@ void ExpressionCompiler::compileTree
 		  }
 		else
 		  {
-		    THROW_EXCEPTION( NoSlot, 
-				     aFunctionString +
-				     String( " : No such function." ) );
+		    aFunctionMap2Iterator = 
+		      theFunctionMap2.find( aFunctionString );
+
+		    if( aFunctionMap2Iterator != theFunctionMap2.end() )
+		      {
+			ExpressionCompiler::throw_exception
+			  ( "UnexpectedError",
+			    "[ " + aFunctionString + 
+			    " ] function. Too few arguments\nProcessID : "
+			    + theProcessPtr->getID() );
+		      }
+		    else
+		      {
+			ExpressionCompiler::throw_exception
+			  ( "NoSlot",
+			    "[ " + aFunctionString +
+			    String( " ] : No such function." ) +
+			    "\nProcessID : " + theProcessPtr->getID() );
+		      }
 		  }
 	      }
 	    else
@@ -930,16 +969,31 @@ void ExpressionCompiler::compileTree
 		  }
 		else
 		  {
-		    THROW_EXCEPTION( NoSlot, 
-				     aFunctionString +
-				     String( " : No such function." ) );
+		    aFunctionMap2Iterator = 
+		      theFunctionMap2.find( aFunctionString );
+
+		    if( aFunctionMap2Iterator != theFunctionMap2.end() )
+		      {
+			ExpressionCompiler::throw_exception
+			  ( "UnexpectedError",
+			    "[ " + aFunctionString + 
+			    " ] function. Too few arguments\nProcessID : "
+			    + theProcessPtr->getID() );
+		      }
+		    else
+		      {
+			ExpressionCompiler::throw_exception
+			  ( "NoSlot",
+			    "[ " + aFunctionString +
+			    String( " ] : No such function." ) +
+			    "\nProcessID : " + theProcessPtr->getID() );
+		      }
 		  }
 	      }
 	  }
-
+	
 	else if( aChildTreeSize == 2 )
 	  {
-
 	    TreeIterator const& 
 	      aChildTreeIterator( aTreeIterator->children.begin() );
 
@@ -947,8 +1001,6 @@ void ExpressionCompiler::compileTree
 	    compileTree( aChildTreeIterator+1, aCode );
 		
 	      
-	    FunctionMap2Iterator aFunctionMap2Iterator;
-
 	    aFunctionMap2Iterator =
 	      theFunctionMap2.find( aFunctionString );
 		
@@ -960,16 +1012,35 @@ void ExpressionCompiler::compileTree
 	      }
 	    else
 	      {
-		THROW_EXCEPTION( NoSlot, 
-				 aFunctionString +
-				 String( " : No such function." ) );
+		aFunctionMap1Iterator = 
+		  theFunctionMap1.find( aFunctionString );
+
+		if( aFunctionMap1Iterator != theFunctionMap1.end() )
+		  {
+		    ExpressionCompiler::throw_exception
+		      (	"UnexpectedError",
+			"[ " + aFunctionString + 
+			" ] function. Too many arguments\nProcessID : " +
+			theProcessPtr->getID() );
+		  }
+		else
+		  {
+		    ExpressionCompiler::throw_exception
+		      ( "NotFound", 
+			"[ " + aFunctionString +
+			String( " ] : No such function." ) +
+			"\nProcessID : " +
+			theProcessPtr->getID() );
+		  }
 	      }
 	  }
 
 	else
 	  {
-	    THROW_EXCEPTION( UnexpectedError,
-			     " : Too many arguments" );
+	    ExpressionCompiler::throw_exception
+	      ( "UnexpectedError",
+		" : Too many arguments\nProcessID : " +
+		theProcessPtr->getID() );
 	  }
 
 	return;
@@ -1006,6 +1077,7 @@ void ExpressionCompiler::compileTree
 				   aSystemPtr,
 				   aMethodName );
 	  }
+
 	else // VariableReference Class
 	  {
 	    VariableReferenceCref
@@ -1099,9 +1171,11 @@ void ExpressionCompiler::compileTree
 
 	else
 	  {
-	    THROW_EXCEPTION( NoSlot,
-			     anIdentifierString +
-			     String( " : No such Property slot." ) );
+	    ExpressionCompiler::throw_exception
+	      ( "NotFound",
+		"[ " + anIdentifierString +
+		" ] No such Property slot.\nProcessID : "
+		+ theProcessPtr->getID() );
 	  }
 	
 	return;      
@@ -1186,9 +1260,12 @@ void ExpressionCompiler::compileTree
 	      }
 
 	    else
-
-	      THROW_EXCEPTION( UnexpectedError,
-			       String( "Invalid operation" ) );
+	      {
+		ExpressionCompiler::throw_exception
+		  ( "UnexpectedError",
+		    String( "Invalid operation" ) +
+		    "\nProcessID : " + theProcessPtr->getID() );
+	      }
 
 	    return;
 	  }
@@ -1205,9 +1282,12 @@ void ExpressionCompiler::compileTree
 	      }
 
 	    else
-
-	      THROW_EXCEPTION( UnexpectedError,
-			       String( "Invalud operation" ) );
+	      {
+		ExpressionCompiler::throw_exception
+		  ( "UnexpectedError",
+		    String( "Invalud operation" ) +
+		    "\nProcessID : " + theProcessPtr->getID() );
+	      }
 
 	    return;
 	  }
@@ -1264,8 +1344,12 @@ void ExpressionCompiler::compileTree
 	      }
 
 	    else
-	      THROW_EXCEPTION( UnexpectedError,
-			       String( "Invalid operation" ) );
+	      {
+		ExpressionCompiler::throw_exception
+		  ( "UnexpectedError",
+		    String( "Invalid operation" ) +
+		    "\nProcessID : " + theProcessPtr->getID() );
+	      }
 
 	    return;
 	  }
@@ -1285,8 +1369,12 @@ void ExpressionCompiler::compileTree
 	      }
 
 	    else
-	      THROW_EXCEPTION( UnexpectedError,
-			       String( "Invalid operation" ) );
+	      {
+		ExpressionCompiler::throw_exception
+		  ( "UnexpectedError",
+		    String( "Invalid operation" ) +
+		    "\nProcessID : " + theProcessPtr->getID() );
+	      }
 
 	    return;
 	  }
@@ -1341,8 +1429,12 @@ void ExpressionCompiler::compileTree
 	      }
 
 	    else
-	      THROW_EXCEPTION( UnexpectedError,
-			       String( "Invalid operation" ) );
+	      {
+		ExpressionCompiler::throw_exception
+		  ( "UnexpectedError",
+		    String( "Invalid operation" ) +
+		    "\nProcessID : " + theProcessPtr->getID() );
+	      }
 	  }
 	else
 	  {
@@ -1361,18 +1453,26 @@ void ExpressionCompiler::compileTree
 	      }
 
 	    else
-	      THROW_EXCEPTION( UnexpectedError,
-			       String( "Invalid operation" ) );
+	      {
+		ExpressionCompiler::throw_exception
+		  ( "UnexpectedError",
+		    String( "Invalid operation" ) +
+		    "\nProcessID : " + theProcessPtr->getID() );
+	      }
 	  }
-
+	
 	return;
 
       }
 	
     default :
-      THROW_EXCEPTION( UnexpectedError, String( "No such syntax" ) );
+      {
+	ExpressionCompiler::throw_exception
+	  ( "UnexpectedError", 
+	    "syntax error.\nProcessID : " + theProcessPtr->getID() );
 	
-      return;
+	return;
+      }
     }
 }
 
@@ -1406,10 +1506,14 @@ void ExpressionCompiler::compileSystemProperty
     }
   else
     {
-      THROW_EXCEPTION( UnexpectedError,
-		       String( "System function parse error" ) );
+      ExpressionCompiler::throw_exception
+	( "UnexpectedError",
+	  String( "System function parse error" ) +
+	  "\nProcessID : " + theProcessPtr->getID() );
     }
 }
+
+
 
 // this should be moved to .cpp
   
