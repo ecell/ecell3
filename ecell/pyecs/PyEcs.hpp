@@ -58,7 +58,7 @@ private:
 
 };   //end of class PyEcs
 
-extern "C" void initecs();
+extern "C" void init_ecs();
 
 
 

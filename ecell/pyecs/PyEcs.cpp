@@ -48,7 +48,7 @@ using namespace libecs;
 
 PyEcs::PyEcs()
   :
-  Py::ExtensionModule<PyEcs>( "ecs" )
+  Py::ExtensionModule<PyEcs>( "_ecs" )
 {
   PySimulator::init_type();
   PyLogger::init_type();
@@ -59,7 +59,7 @@ PyEcs::PyEcs()
   //		      &PyEcs::createLogger, 
   //		      "Logger( type = \"Local\" )" );
     
-  initialize();
+  initialize( "E-CELL Core System" );
 }
 
 Object PyEcs::createSimulator( const Tuple& args )
@@ -74,10 +74,11 @@ Object PyEcs::createLogger( const Py::Tuple& args )
   return asObject( aPyLogger );
 }
 
-void initecs()
+void init_ecs()
 {
-  static PyEcs* ecs = new PyEcs();
+  static PyEcs* _ecs = new PyEcs();
 }
+
 
 
 

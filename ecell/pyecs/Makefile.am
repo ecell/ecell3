@@ -6,6 +6,8 @@ INCLTDL=@INCLTDL@
 LIBLTDL=@LIBLTDL@
 PYTHON_INCLUDES=@PYTHON_INCLUDES@
 
+ecellpyexecdir=$(pyexecdir)/ecell
+
 CXXSRCDIR=../../PyCXX/Src
 CXXINCLUDE=-I../../PyCXX -I../../boost
 
@@ -16,7 +18,6 @@ KORANDOM_DIR=@KORANDOM_DIR@
 LIBKORANDOM=$(KORANDOM_DIR)/korandom/libkorandom.la
 LIBEMC=$(ECELLDIR)/libemc/libemc.la 
 LIBECS=$(ECELLDIR)/libecs/libecs.la
-
 
 CFLAGS=${CXXFLAGS}
 
@@ -29,7 +30,11 @@ cxxsupport.cxx
 $(CXXSRC):
 	cp -f ${CXXSRCDIR}/$@ .
 
-pyexec_LTLIBRARIES=ecs.la
+
+#FIXME: _ecs.la cannot be used with automake-1.4.
+
+ecellpyexec_LTLIBRARIES = ecs.la
+
 ecs_la_SOURCES=\
 PyUVariable.cpp\
 PyEcs.cpp\
@@ -47,13 +52,19 @@ ecs_la_LDFLAGS=-module -export-dynamic -avoid-version
 
 ecs_la_LIBADD= $(LIBEMC) $(LIBECS) $(LIBKORANDOM) -lstdc++ $(LIBLTDL)
 
-all-local: _ecs.so
+all-local: ecs.so
 
-_ecs.so: ecs.la 
-	ln -sf .libs/ecs.so ./_ecs.so
+#FIXME: should be removed after ecs.la is renamed to _ecs.la
+install-exec-local:
+	mv -f $(ecellpyexecdir)/ecs.so $(ecellpyexecdir)/_ecs.so
+	mv -f $(ecellpyexecdir)/ecs.la $(ecellpyexecdir)/_ecs.la
+
+
+ecs.so: ecs.la 
+	ln -sf .libs/ecs.so ./ecs.so
 
 clean-local:
-	rm -f _ecs.so
+	rm -f ecs.so
 	rm -f $(CXXSRC)
 
 pyecsdir=${pkgincludedir}/pyecs
