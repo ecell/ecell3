@@ -119,7 +119,8 @@ CURRENTDIR=$(pwd)
 
 SRC=$1 ;shift
 
-CLASSNAME=`basename $SRC`
+CLASSNAME=$( echo $SRC | cut -d'.' -f1 ) 
+
 CXXCOMPILEFLAGS="-D_ECELL3_DM_CLASSNAME=$CLASSNAME $*"
 
 #copy dmfile to ETTMPDIR
