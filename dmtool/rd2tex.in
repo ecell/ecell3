@@ -6,15 +6,19 @@
 #                                                                            #
 #      written by Yusuke Saito at Keio University Bioinformatics lab.        #
 #                                                                            #
-#      Copyright 1998-1999 by Yusuke Saito (t96406ys@sfc.keio.ac.jp)         #
+#      Copyright 1998-1999 by Yusuke Saito (zhaiteng@e-cell.org)             #
 #                          All Rights Reserved                               #
 #                                                                            #
 ##############################################################################
 
 # if you want to set default directory, please modfy here.
 $output_directory = ".";
-$default_template_directory = "@REACTOR_TEMPLATE_DIR@";
+#$default_template_directory = "@REACTOR_TEMPLATE_DIR@";
+$default_template_directory = "/home/zhaiteng/RD/template";
 
+$verbose = 0;
+
+&init;
 &search_template;
 &filename;
 &option;
@@ -26,6 +30,24 @@ $default_template_directory = "@REACTOR_TEMPLATE_DIR@";
 &close_tex;
 
 ##############################################################################
+
+sub init{
+
+    if($#ARGV==-1){
+        &help;
+        exit;
+    }
+    
+    $verbose = 0;
+    
+    sub message{
+        if($verbose){
+            print "$_[0]\n";
+        }
+    }
+
+}
+
 sub search_template{
     if (-e 'template') {
 	if (-d 'template') {
@@ -74,6 +96,10 @@ sub option{
 		@ARGV2 = ($ARGV[1]);		
 	    }
 	}
+        elsif($ARGV[$i] eq "-v"){
+            $ARGV2[$i] =  "";
+            $verbose = 1;
+        }
     }
     for($i=0;$i<=$#ARGV2;$i++){
         if(length($ARGV2[$i])){
@@ -81,13 +107,13 @@ sub option{
             $k++;
         }
     }
-    print "template_directory: $template_directory\n";
-    print "output_directory: $output_directory\n";
+    &message("template_directory: $template_directory");
+    &message("output_directory: $output_directory");
 }
 
 sub help{
-    print "\n<rd2tex version 1\.1>\n";
-    print "written by Yusuke Saito \(t96406ys\@sfc\.keio\.ac\.jp\)\n\n";   
+    print "\n<rd2tex version 2\.0>\n";
+    print "written by Yusuke Saito \(zhaiteng\@e-cell.org\)\n\n";   
     print "usage: rd2tex filename1\.rd filename2\.rd \.\.\.\n\n"; 
     print "option:   -s             does not change filename.\n";
     print "          -d output_directory\n";
@@ -99,21 +125,19 @@ sub help{
 sub open_tex{
     open(TEX,">$output_directory/$tex")
 	|| die("$tex: can't open\n");
-    print "\n";
-    print "writing $tex.\n";
-    print "\n";
+    &message("writing $tex.");
 }
 
 sub open_template{
     open (TEMPLATE,"$template_directory/$template") 
 	|| die("$template: can't open\n");
-    print "loading $template.\n\n";
+    &message("loading $template.");
 }
 
 sub write_header{
     open(HEADER,"$template_directory/$header")
 	|| die("$header: can't open\n");
-    print "loading $header.\n";
+    &message("loading $header.");
     
     while(<HEADER>){
 	print TEX "$_";
@@ -129,13 +153,12 @@ sub write_rd{
 	}
 	
     if(! &readrd($rdfile)){
-	warn("skipping $rdfile...\n");
+	message("skipping $rdfile...");
     }
 	
 	undef %map;
 	undef %property;
 	seek (TEMPLATE,0,0);
-	print "\n";
     }
 }
 
@@ -151,7 +174,7 @@ sub readrd
 	return 1;
     }
 
-    print "loading $rdfile.\n";
+    &message("loading $rdfile.");
 
     $prekey = "__UNDEFINED__";
     $keynum = 0;
@@ -208,7 +231,7 @@ sub readrd
 
     close(RD);
                   
-    print "loaded $keynum keys from $rdfile.\n";
+    &message("loaded $keynum keys from $rdfile.");
                                   #counting the number of loaded keyword
 
     $para_num = 1;    
@@ -259,7 +282,7 @@ sub readrd
 sub write_footer{
     open(FOOTER,"$template_directory/$footer")
 	|| die("$footer: can't open\n");    
-    print "loading $footer.\n";
+    &message("loading $footer.");
     
     while(<FOOTER>){
 	print TEX "$_";
