@@ -31,6 +31,8 @@
 #ifndef ___PYECS_H___
 #define ___PYECS_H___
 
+#include <exception>
+
 #include "CXX/Extensions.hxx"
 
 class PyEcs
@@ -51,6 +53,27 @@ private:
 };   //end of class PyEcs
 
 extern "C" void initecs();
+
+
+
+#define ECS_TRY try {
+
+#define ECS_CATCH\
+    }\
+  catch( ::ExceptionCref e )\
+    {\
+      throw Py::Exception( e.message() );\
+    }\
+  catch( const std::exception& e)\
+    {\
+      throw Py::SystemError( std::string( "E-CELL internal error: " )\
+			     + std::string( e.what() ) );\
+    }\
+  catch( ... ) \
+    {\
+      throw Py::SystemError( "E-CELL internal error (unexpected)." );\
+    }
+
 
 #endif   /* ___PYECS_H___ */
 

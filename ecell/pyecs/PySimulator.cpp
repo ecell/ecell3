@@ -29,35 +29,17 @@
 //
 
 
-#include <string>
-
 #include "libecs/libecs.hpp"
 #include "libecs/FQPI.hpp"
 #include "libecs/Message.hpp"
 
-#include "PySimulator.hpp"
+#include "PyEcs.hpp"
 #include "PyLogger.hpp"
+
+#include "PySimulator.hpp"
 
 using namespace libemc;
 using namespace libecs;
-
-#define ECS_TRY try {
-
-#define ECS_CATCH\
-    }\
-  catch( ::ExceptionCref e )\
-    {\
-      throw Py::Exception( e.message() );\
-    }\
-  catch( const ::exception& e)\
-    {\
-      throw Py::SystemError( std::string("E-CELL internal error: ")\
-			     + e.what() );\
-    }\
-  catch( ... ) \
-    {\
-      throw Py::SystemError( "E-CELL internal error." );\
-    }
 
 PySimulator::PySimulator()
 {
@@ -70,10 +52,10 @@ void PySimulator::init_type()
   behaviors().doc("E-CELL Python class");
 
   add_varargs_method( "createEntity", &PySimulator::createEntity );
-  add_varargs_method( "setProperty",   &PySimulator::setProperty );
-  add_varargs_method( "getProperty",    &PySimulator::getProperty );
-  add_varargs_method( "step",          &PySimulator::step );
-  add_varargs_method( "initialize",    &PySimulator::initialize );
+  add_varargs_method( "setProperty",  &PySimulator::setProperty );
+  add_varargs_method( "getProperty",  &PySimulator::getProperty );
+  add_varargs_method( "step",         &PySimulator::step );
+  add_varargs_method( "initialize",   &PySimulator::initialize );
   add_varargs_method( "getLogger",    &PySimulator::getLogger );
 }
 
@@ -108,8 +90,8 @@ Object PySimulator::setProperty( const Py::Tuple& args )
   ECS_TRY;
 
   args.verify_length( 3 );
-  const string aFqpi( static_cast<Py::String>( args[0] ) );
-  const string aMessageKeyword( static_cast<Py::String>( args[1] ) );
+  const String aFqpi( static_cast<Py::String>( args[0] ) );
+  const String aMessageKeyword( static_cast<Py::String>( args[1] ) );
 
   const Py::Tuple aMessageSequence( static_cast<Py::Sequence>( args[2] ) );
   
@@ -136,7 +118,7 @@ Object PySimulator::getProperty( const Py::Tuple& args )
   args.verify_length( 2 );
   
   const FQPI aFqpi( static_cast<Py::String>( args[0] ) );
-  const string aPropertyName( static_cast<Py::String>( args[1] ) );
+  const String aPropertyName( static_cast<Py::String>( args[1] ) );
 
   Message aMessage( Simulator::getProperty( aFqpi, aPropertyName ) );
   int aMessageSize = aMessage.getBody().size();
