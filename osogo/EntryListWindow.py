@@ -25,6 +25,7 @@ class EntryListWindow(Window):
                             'entry_list_selection_changed' : self.selectEntity
                             } )
 
+
         self.theMainWindow = aMainWindow
         self.theSimulator = aMainWindow.theSimulator
         self.thePaletteWindow = aMainWindow.thePaletteWindow
@@ -44,9 +45,22 @@ class EntryListWindow(Window):
         self.theSystemTree.show()
         self.theEntryList.show()
 
+        aPManager = self.theMainWindow.thePluginManager
+        self.thePropertyWindow = aPManager.createInstance( 'PropertyWindow',
+                                                           self.theSimulator,
+                                                           () )
+        aPropertyWindowTopVBox = self.thePropertyWindow['top_vbox']
+        aPropertyWindowTopVBox.unparent()
+        self['property_frame'].add( aPropertyWindowTopVBox )
+        self.thePropertyWindow['window'].hide()
+        
+        self.update()
+
+    def update( self ):
         aRootSystemFullID = getFullID( 'System:/:/' )
         self.constructTree( self.theSystemTree, aRootSystemFullID )
-
+        self.updateEntryList()
+            
     def constructTree( self, aParentTree, aSystemFullID ):
         aLeaf = gtk.GtkTreeItem( label=aSystemFullID[ID] )
         aLeaf.set_data( 'FULLID', aSystemFullID )
@@ -61,16 +75,19 @@ class EntryListWindow(Window):
             aLeaf.expand()
 
             for aSystemID in aSystemList:
-                aSystemPath = self.createSystemPathFromFullID( aSystemFullID )
+                aSystemPath = createSystemPathFromFullID( aSystemFullID )
                 aNewSystemFullID = ( SYSTEM, aSystemPath, aSystemID )
                 self.constructTree( aTree, aNewSystemFullID )
 
-    def updateEntryList( self, obj ):
+    def updateEntryList( self, obj=None ):
 
+        aSelectedSystemLeafMap = self.theSystemTree.get_selection()
+        if aSelectedSystemLeafMap == [] :
+            return
+        
         aSelectedTypeMenuItem = self.theTypeMenu.get_active()
         aEntityTypeString = aSelectedTypeMenuItem.get_data( 'LABEL' )
 
-        aSelectedSystemLeafMap = self.theSystemTree.get_selection()
         aSystemFullID = aSelectedSystemLeafMap[0].get_data( 'FULLID' )
 
         self.theEntryList.clear_items( 0,-1 )
@@ -93,22 +110,29 @@ class EntryListWindow(Window):
             elif aEntityTypeString == 'Reactor':
                 aEntityType = REACTOR
 
-            aSystemPath = self.createSystemPathFromFullID( aSystemFullID )
+            aSystemPath = createSystemPathFromFullID( aSystemFullID )
 
 #            aEntityFullPN = ( aEntityType, aSystemPath, aEntityID, '' )
             aEntityFullPN = ( aEntityType, aSystemPath, aEntityID, 'Quantity' )
 
             aListItem.set_data( 'FULLPN', aEntityFullPN)
+            aFullPNList = ( aEntityFullPN, )
+
             self.theEntryList.add( aListItem )
             aListItem.show()
 
     def selectEntity( self, aEntryList ):
         aSelectedEntityListItemList = aEntryList.get_selection()
 
+        if len(aSelectedEntityListItemList) == 0 :
+            return
+
         self.theSelectedFullPNList = []
         for aEntityListItem in aSelectedEntityListItemList:
             aEntityFullPN = aEntityListItem.get_data( 'FULLPN' )
             self.theSelectedFullPNList.append( aEntityFullPN )
+
+        self.thePropertyWindow.setFullPNList( self.theSelectedFullPNList )
 
         self.updateStatusBar()
 
@@ -118,25 +142,13 @@ class EntryListWindow(Window):
             aStatusString += getFullPNString( aFullPN )
             aStatusString += ', '
         self.theStatusBar.push( 1, aStatusString )
-        
-    def openNewPluginWindow( self, button_obj ) :
-        
+
+    def openNewPluginWindow( self, obj ) :
         aPluginName = self.thePaletteWindow.getSelectedPluginName()
-
-        print self.theSelectedFullPNList
-        self.theMainWindow.thePluginManager.createInstance( aPluginName,
-                   self.theSimulator, self.theSelectedFullPNList )
-
-    def createSystemPathFromFullID( self, aSystemFullID ):
-        if aSystemFullID[SYSTEMPATH] == '/':
-            if aSystemFullID[ID] == '/':
-                aNewSystemPath = '/'
-            else:
-                aNewSystemPath = '/' + aSystemFullID[ID]
-        else:
-            aNewSystemPath = aSystemFullID[SYSTEMPATH] + '/' +\
-                             aSystemFullID[ID]
-        return aNewSystemPath
+        aPluginManager = self.theMainWindow.thePluginManager
+        aPluginManager.createInstance( aPluginName,
+                                       self.theSimulator,
+                                       self.theSelectedFullPNList )
 
 def mainQuit( obj, data ):
     gtk.mainquit()
