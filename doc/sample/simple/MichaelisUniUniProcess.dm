@@ -12,7 +12,7 @@ defineMethod( 'initialize', '''
   C0 = getConnection( "C0" );
 ''' )
 
-defineMethod( 'react', '''
+defineMethod( 'process', '''
   Real velocity( KcF );
 
   velocity *= C0.getVariable()->getValue();

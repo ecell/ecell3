@@ -10,7 +10,7 @@ defineMethod( 'initialize', '''
   C0 = getConnection( "C0" );
 ''' )
 
-defineMethod( 'react', '''
+defineMethod( 'process', '''
   Real E( C0.getVariable()->getConcentration() );
 
   Real V( V1 * E );

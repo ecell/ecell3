@@ -61,7 +61,7 @@ namespace libecs
       Process::initialize();
     }
 
-    virtual void react()
+    virtual void process()
     {
       ; // do nothing
     }

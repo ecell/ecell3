@@ -12,7 +12,7 @@ defineMethod( 'initialize', '''
   P0 = getConnection( "P0" );
 ''' )
 
-defineMethod( 'react', '''
+defineMethod( 'process', '''
   const Real E1( C0.getVariable()->getConcentration() ); // const?
   Real V( Bck2 * E1);
   V *= N_A * getSuperSystem()->getVolume();

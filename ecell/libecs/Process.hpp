@@ -96,7 +96,7 @@ namespace libecs
 
     virtual void initialize();
     
-    virtual void react() = 0;
+    virtual void process() = 0;
     
     
     /**

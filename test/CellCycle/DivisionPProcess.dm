@@ -18,7 +18,7 @@ defineMethod( 'initialize', '''
   prev = 0;
 ''' )
 
-defineMethod( 'react', '''
+defineMethod( 'process', '''
   //  static Real prev( 0 ); better to remove static if this process is used only once in the model
   int counter = 0; // for debugging purposes!!!
   Real D( 1.026/m - 32 );

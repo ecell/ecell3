@@ -428,12 +428,12 @@ namespace libecs
     //FOR_ALL( ,, clear );
   }
 
-  inline void Stepper::react()
+  inline void Stepper::process()
   {
     //
-    // Process::react()
+    // Process::process()
     //
-    FOR_ALL( ProcessCache, theProcessCache, react );
+    FOR_ALL( ProcessCache, theProcessCache, process );
 
   }
 
@@ -520,7 +520,7 @@ namespace libecs
     slave();
     log();
     clear();
-    react();
+    process();
 
     updateVelocityBuffer();
   }
@@ -546,7 +546,7 @@ namespace libecs
     clear();
 
     // ========= 1 ===========
-    react();
+    process();
 
     const UnsignedInt aSize( theVariableCache.size() );
     for( UnsignedInt c( 0 ); c < aSize; ++c )
@@ -567,7 +567,7 @@ namespace libecs
       }
 
     // ========= 2 ===========
-    react();
+    process();
 
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
@@ -586,7 +586,7 @@ namespace libecs
 
 
     // ========= 3 ===========
-    react();
+    process();
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
 	VariablePtr const aVariable( theVariableCache[ c ] );
@@ -603,7 +603,7 @@ namespace libecs
 
 
     // ========= 4 ===========
-    react();
+    process();
 
     // restore theValueBuffer
     for( UnsignedInt c( 0 ); c < aSize; ++c )
@@ -666,7 +666,7 @@ namespace libecs
       {
 
 	// ========= 1 ===========
-	react();
+	process();
 
 	for( UnsignedInt c( 0 ); c < aSize; ++c )
 	  {
@@ -682,7 +682,7 @@ namespace libecs
 	  }
 
 	// ========= 2 ===========
-	react();
+	process();
 
 	delta_max = 0.0;
 
@@ -795,7 +795,7 @@ namespace libecs
       {
 
 	// ========= 1 ===========
-	react();
+	process();
 
 	for( UnsignedInt c( 0 ); c < aSize; ++c )
 	  {
@@ -816,7 +816,7 @@ namespace libecs
 	  }
 
 	// ========= 2 ===========
-	react();
+	process();
 
 	for( UnsignedInt c( 0 ); c < aSize; ++c )
 	  {
@@ -837,7 +837,7 @@ namespace libecs
 	  }
 	
 	// ========= 3 ===========
-	react();
+	process();
 	
 	maxError = 0.0;
 
@@ -952,7 +952,7 @@ namespace libecs
       {
 
 	// ========= 1 ===========
-	react();
+	process();
 
 	for( UnsignedInt c( 0 ); c < aSize; ++c )
 	  {
@@ -975,7 +975,7 @@ namespace libecs
 	  }
 
 	// ========= 2 ===========
-	react();
+	process();
 
 	for( UnsignedInt c( 0 ); c < aSize; ++c )
 	  {
@@ -999,7 +999,7 @@ namespace libecs
 	  }
 	
 	// ========= 3 ===========
-	react();
+	process();
 	
 	for( UnsignedInt c( 0 ); c < aSize; ++c )
 	  {
@@ -1024,7 +1024,7 @@ namespace libecs
 	  }
 	
 	// ========= 4 ===========
-	react();
+	process();
 	
 	for( UnsignedInt c( 0 ); c < aSize; ++c )
 	  {
@@ -1051,7 +1051,7 @@ namespace libecs
 	
 	
 	// ========= 5 ===========
-	react();
+	process();
 	
 	for( UnsignedInt c( 0 ); c < aSize; ++c )
 	  {
@@ -1078,7 +1078,7 @@ namespace libecs
 	  }
 		
 	// ========= 6 ===========
-	react();
+	process();
 	
 	maxError = 0.0;
 

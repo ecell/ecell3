@@ -11,7 +11,7 @@ defineMethod( 'initialize', '''
 //
 ''' )
 
-defineMethod( 'react', '''
+defineMethod( 'process', '''
 //  _value = getSuperSystem()->getStepper()->getStepInterval();
   _value = getStepper()->getStepInterval();
   setActivity( _value );

@@ -28,8 +28,8 @@
 // E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
 
-#ifndef __REACTANT_H___
-#define __REACTANT_H___
+#ifndef __CONNECTION_HPP
+#define __CONNECTION_HPP
 
 #include "libecs.hpp"
 
@@ -81,4 +81,4 @@ namespace libecs
 
 } // namespace libecs
 
-#endif /* __REACTANT_H___ */
+#endif /* __CONNECTION_HPP */

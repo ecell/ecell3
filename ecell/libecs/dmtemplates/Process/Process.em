@@ -32,7 +32,7 @@ namespace libecs
 
 @(PUBLIC_AUX)
     
-    virtual void react();
+    virtual void process();
     virtual void initialize();
     
     static ProcessPtr createInstance() 
@@ -95,9 +95,9 @@ void @(CLASSNAME)::initialize()
 
 }
 
-void @(CLASSNAME)::react()
+void @(CLASSNAME)::process()
 {
-@{methodDefs('react')}
+@{methodDefs('process')}
 }
 
 #endif

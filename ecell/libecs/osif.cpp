@@ -45,9 +45,12 @@
  *::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
  *	$Id$
  :	$Log$
- :	Revision 1.3  2002/10/03 08:19:06  shafi
- :	removed korandom, renamings Reactor -> Process, Substance -> Variable, Reactant -> Connection, Quantity -> Value, Stoichiometry -> Coefficient
+ :	Revision 1.4  2002/10/03 08:40:40  shafi
+ :	react -> process, REACTANT -> CONNECTION
  :
+ :	Revision 1.3  2002/10/03 08:19:06  shafi
+ :	removed korandom, renamings Process -> Process, Variable -> Variable, Connection -> Connection, Value -> Value, Coefficient -> Coefficient
+ :	
  :	Revision 1.2  2002/06/23 14:45:10  shafi
  :	added ProxyPropertySlot. deprecated UpdatePolicy for ConcretePropertySlot. added NEVER_GET_HERE macro.
  :	

@@ -67,7 +67,7 @@ namespace libecs
     virtual ~Integrator() {}
 
     /**
-       how many react->turn steps does needed in a single integration cycle  
+       how many process->turn steps does needed in a single integration cycle  
     */
 
     virtual int getNumberOfSteps() = 0;

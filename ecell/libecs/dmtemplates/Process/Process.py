@@ -1,8 +1,8 @@
 import string
 METHOD_LIST={}
 INCLUDE_FILES=[]
-REACTANT_SLOTS=[]
-ALL_REACTANT_SLOTS=[]
+CONNECTION_SLOTS=[]
+ALL_CONNECTION_SLOTS=[]
 PUBLIC_AUX = ''
 PROTECTED_AUX = ''
 PRIVATE_AUX= ''
@@ -31,21 +31,21 @@ def createpropertyslots():
               % (i[1],i[0],CLASSNAME,i[1],CLASSNAME,i[1])
 
 def connectionpropertyslotvariabledecls():
-    for i in REACTANT_SLOTS:
+    for i in CONNECTION_SLOTS:
         print '    PropertySlotPtr %s_%s;' % (i[0],i[1])
-    for i in ALL_REACTANT_SLOTS:
+    for i in ALL_CONNECTION_SLOTS:
         print '    std::vector<PropertySlotPtr> Connection_%s;' % i
 
 def getpropertyslotofconnection():
-    for i in REACTANT_SLOTS:
+    for i in CONNECTION_SLOTS:
         print '  %s_%s = getPropertySlotOfConnection( "%s", "%s" );' \
             % (i[0],i[1],i[0],i[1])
 
 def allconnectionslotsinit():
-    if len( ALL_REACTANT_SLOTS ) == 0:
+    if len( ALL_CONNECTION_SLOTS ) == 0:
         return
 
-    for i in ALL_REACTANT_SLOTS:
+    for i in ALL_CONNECTION_SLOTS:
         print 'Connection_%s.clear();' % i
 
     print ''
@@ -54,7 +54,7 @@ def allconnectionslotsinit():
     {
       VariablePtr aVariable( s->second.getVariable() );
     '''
-    for i in ALL_REACTANT_SLOTS:
+    for i in ALL_CONNECTION_SLOTS:
         print 'Connection_%s.push_back( aVariable->getPropertySlot( "%s", this ) );' % (i,i)
     print '}'
 

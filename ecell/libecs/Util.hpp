@@ -181,7 +181,7 @@ namespace libecs
     public:
       inline void operator() ( T*& object ) const
       {
-        object->react();
+        object->process();
       }
     };
   

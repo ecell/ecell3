@@ -13,7 +13,7 @@ defineMethod( 'initialize', '''
   C0 = getConnection( "C0" );
 ''' )
 
-defineMethod( 'react', '''
+defineMethod( 'process', '''
   const Real S( S0.getVariable()->getConcentration() );
   const Real E1( C0.getVariable()->getConcentration() );
   Real v( k1 + k2 * E1 );

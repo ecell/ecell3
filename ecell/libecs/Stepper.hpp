@@ -135,7 +135,7 @@ namespace libecs
     void log();
     void slave();
     void clear();
-    void react();
+    void process();
 
     void reset();
 

@@ -17,7 +17,7 @@ defineMethod( 'initialize', '''
   C2 = getConnection( "C2" );
 ''' )
 
-defineMethod( 'react', '''
+defineMethod( 'process', '''
   const Real E0( C0.getVariable()->getConcentration() ); // const?
   const Real E1( C1.getVariable()->getConcentration() ); // const?
   const Real E2( C2.getVariable()->getConcentration() ); // const?
