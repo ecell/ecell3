@@ -72,47 +72,39 @@ public:
     return theOrder;
   }
 
+  static const Real roundValue( RealCref aValue )
+  {
+    if( aValue >= 0.0 )
+      {
+	return floor( aValue );
+      }
+    else if( aValue > -1.0 ) // if it is -1.0 < > 0.0 round to zero. 
+      {                      // this is necessary in hybrid simulation.
+	return 0.0;
+      }
+    else // <= -1.0
+      {
+	THROW_EXCEPTION( SimulationError, "Variable value <= -1.0" );
+      }
+  }
+
 
   GET_METHOD( Real, Multiplicity )
   {
-    Real aMultiplicity( 1.0 );
+    Real aMultiplicity( roundValue( theVariableReferenceVector[0].
+				    getValue() ) );
 
     // a loop over substrates.  coeff is either -1 or -2.
-    for( VariableReferenceVectorConstIterator 
-	   s( theVariableReferenceVector.begin() );
-	 s != theZeroVariableReferenceIterator ; ++s )
+    if( getZeroVariableReferenceOffset() == 2 ) // two substrates
       {
-	VariableReference aVariableReference( *s );
-	const Int aCoefficient( abs( aVariableReference.getCoefficient() ) );
-	Real aValue( aVariableReference.getValue() );
-
-	if( aValue >= 0.0 )
-	  {
-	    aValue = floor( aValue );
-	  }
-	else if( aValue > -1.0 ) // if it is -1.0 < > 0.0 round to zero. 
-	  {                      // this is necessary in hybrid simulation.
-	     aValue = 0.0;
-	  }
-	else // <= -1.0
-	  {
-	    THROW_EXCEPTION( SimulationError, "Variable value <= -1.0" );
-	  }
-
-
-	if( aCoefficient == -1 )
-	  {
-            aMultiplicity *= aValue;
-	  }
-	else  // aCoefficient == -2
-	  {
-            aMultiplicity *= aValue * ( aValue - 1 );
-	  }
-
+	aMultiplicity *= roundValue( theVariableReferenceVector[1].
+				     getValue() );
       }
-
-    //      std::cerr << getID() << ": multiplicity: " << aMultiplicity << "\n"<< std::endl;
-
+    else if( getOrder() == 2 )   // just one substrate, and order == 2
+      {
+	aMultiplicity *= ( aMultiplicity - 1.0 );
+      }
+    // else, just one substrate, order == 1. do nothing in this case.
 
 
     return aMultiplicity;
