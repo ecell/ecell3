@@ -25,7 +25,7 @@ import yacc
 
 tokens = (
     'COMMA','COLON','NAME','NUMBER',
-    'PLUS','MINUS','TIMES','DIVIDE',
+    'PLUS','MINUS','TIMES','DIVIDE','POWER',
     'LPAREN','RPAREN',
     )
 
@@ -36,6 +36,7 @@ t_PLUS    = r'\+'
 t_MINUS   = r'\-'
 t_TIMES   = r'\*'
 t_DIVIDE  = r'\/'
+t_POWER   = r'\^'
 t_LPAREN  = r'\('
 t_RPAREN  = r'\)'
 t_NAME    = r'[a-zA-Z_][a-zA-Z0-9_]*'
@@ -66,6 +67,7 @@ def t_error(t):
 precedence = (
     ('left','PLUS','MINUS'),
     ('left','TIMES','DIVIDE'),
+    ('left','POWER'),
     ('right','UMINUS'),
     )
 
@@ -81,7 +83,8 @@ def p_expression_binop(t):
     '''expression : expression PLUS expression
                   | expression MINUS expression
                   | expression TIMES expression
-                  | expression DIVIDE expression'''
+                  | expression DIVIDE expression
+                  | expression POWER expression'''
 #    print "binop"
     t[0] = str( t[1] + t[2] + t[3] )
 

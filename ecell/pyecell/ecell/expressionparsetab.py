@@ -4,9 +4,9 @@
 
 _lr_method = 'SLR'
 
-_lr_signature = '\xe2\xf3\x12\xdfO2\xfcmw;\x91\x18\x885\x9c\xdb'
+_lr_signature = '\x13j\x16\x8d\xa33"w|h\x11)h;\x1a\x86'
 
-_lr_action_items = {'RPAREN':([31,23,9,1,24,17,2,25,11,26,12,19,3,27,20,4,21,29,22,32,],[-16,-7,-8,-10,-2,-6,-12,-5,-19,-3,23,-18,-11,-4,29,-9,-14,-17,-15,-13,]),'DIVIDE':([29,26,25,17,2,24,9,1,7,31,23,32,21,4,3,27,12,19,],[-17,14,-5,-6,-12,14,-8,-10,14,-16,-7,14,14,-9,-11,-4,14,-18,]),'NAME':([13,30,15,6,28,14,16,8,0,11,10,],[2,2,2,2,31,2,2,2,2,2,19,]),'NUMBER':([14,30,15,13,11,6,8,0,16,],[3,3,3,3,3,3,3,3,3,]),'TIMES':([32,29,17,4,3,27,21,12,19,26,25,2,24,9,1,7,31,23,],[16,-17,-6,-9,-11,-4,16,16,-18,16,-5,-12,16,-8,-10,16,-16,-7,]),'PLUS':([23,31,7,1,9,2,17,25,19,24,12,27,3,26,4,21,29,32,],[-7,-16,13,-10,-8,-12,-6,-5,-18,-2,13,-4,-11,-3,-9,13,-17,13,]),'LPAREN':([6,15,30,14,13,19,11,2,16,0,8,],[6,6,6,6,6,11,6,11,6,6,6,]),'COLON':([17,25,2,3,11,26,23,31,1,9,24,21,29,22,27,32,19,20,4,],[-6,-5,-12,-11,-19,-3,-7,-16,-10,-8,-2,-14,-17,-15,-4,-13,-18,30,-9,]),'COMMA':([29,2,18,],[-17,10,28,]),'MINUS':([7,23,0,31,8,24,1,16,9,2,17,26,11,27,3,19,12,25,4,13,29,21,14,32,6,15,30,],[15,-7,8,-16,8,-2,-10,8,-8,-12,-6,-3,8,-4,-11,-18,15,-5,-9,8,-17,15,8,15,8,8,8,]),'$':([31,23,7,25,9,1,17,2,24,26,19,3,27,4,5,29,],[-16,-7,-1,-5,-8,-10,-6,-12,-2,-3,-18,-11,-4,-9,0,-17,]),}
+_lr_action_items = {'DIVIDE':([26,25,2,24,9,1,7,31,18,27,33,29,22,4,34,28,20,3,12,],[-6,-5,-13,-8,-9,-11,13,-18,-7,-4,-17,13,13,-10,13,13,-19,-12,13,]),'RPAREN':([31,23,9,1,24,34,33,2,25,18,11,26,12,3,27,20,4,28,21,29,22,],[-18,-16,-9,-11,-8,-14,-17,-13,-5,-7,-20,-6,24,-12,-4,-19,-10,-2,31,-3,-15,]),'NAME':([13,30,15,6,32,14,16,8,0,11,10,17,],[2,33,2,2,2,2,2,2,2,2,20,2,]),'POWER':([31,7,9,24,2,25,18,34,26,33,12,3,1,20,4,28,29,27,22,],[-18,14,-9,-8,-13,14,-7,14,-6,-17,14,-12,-11,-19,-10,14,14,14,14,]),'NUMBER':([14,32,15,13,17,11,6,8,0,16,],[3,3,3,3,3,3,3,3,3,3,]),'TIMES':([22,29,4,28,20,3,27,12,26,18,25,2,24,9,1,7,33,34,31,],[15,15,-10,15,-19,-12,-4,15,-6,-7,-5,-13,-8,-9,-11,15,-17,15,-18,]),'COLON':([33,25,2,3,18,11,26,23,31,1,9,24,34,21,29,22,27,28,20,4,],[-17,-5,-13,-12,-7,-20,-6,-16,-18,-11,-9,-8,-14,32,-3,-15,-4,-2,-19,-10,]),'LPAREN':([32,6,15,14,20,13,11,2,17,16,0,8,],[6,6,6,6,11,6,6,11,6,6,6,6,]),'PLUS':([31,33,7,1,9,24,34,28,2,25,18,22,12,27,3,26,20,4,29,],[-18,-17,16,-11,-9,-8,16,-2,-13,-5,-7,16,16,-4,-12,-6,-19,-10,-3,]),'COMMA':([19,2,31,],[30,10,-18,]),'MINUS':([33,7,0,31,8,34,24,1,16,9,25,2,26,17,18,11,27,3,12,28,4,20,13,29,14,32,6,22,15,],[-17,17,8,-18,8,17,-8,-11,8,-9,-5,-13,-6,8,-7,8,-4,-12,17,-2,-10,-19,8,-3,8,8,8,17,8,]),'$':([31,7,25,33,9,1,2,18,24,3,27,20,4,28,5,26,29,],[-18,-1,-5,-17,-9,-11,-13,-7,-8,-12,-4,-19,-10,-2,0,-6,-3,]),}
 
 _lr_action = { }
 for _k, _v in _lr_action_items.items():
@@ -14,7 +14,7 @@ for _k, _v in _lr_action_items.items():
        _lr_action[(_x,_k)] = _y
 del _lr_action_items
 
-_lr_goto_items = {'Function':([8,10,14,0,30,16,11,13,15,6,],[1,18,1,1,1,1,1,1,1,1,]),'System_Function':([8,14,0,6,30,11,16,13,15,],[9,9,9,9,9,9,9,9,9,]),'VariableReference':([13,11,30,15,6,16,8,0,14,],[4,4,4,4,4,4,4,4,4,]),'arguments':([11,],[20,]),'statement':([0,],[5,]),'expression':([15,13,16,11,30,6,8,0,14,],[26,24,27,21,32,12,17,7,25,]),'empty':([11,],[22,]),}
+_lr_goto_items = {'Function':([8,10,17,14,0,16,11,13,15,6,32,],[1,19,1,1,1,1,1,1,1,1,1,]),'System_Function':([8,17,14,0,6,32,11,16,13,15,],[9,9,9,9,9,9,9,9,9,9,]),'VariableReference':([13,11,15,6,16,32,17,8,0,14,],[4,4,4,4,4,4,4,4,4,4,]),'arguments':([11,],[21,]),'statement':([0,],[5,]),'expression':([15,13,16,11,6,8,0,14,32,17,],[27,25,28,22,12,18,7,26,34,29,]),'empty':([11,],[23,]),}
 
 _lr_goto = { }
 for _k, _v in _lr_goto_items.items():
@@ -23,23 +23,24 @@ for _k, _v in _lr_goto_items.items():
 del _lr_goto_items
 _lr_productions = [
   ("S'",1,None,None,None),
-  ('statement',1,'p_statement_expr','expressionparser.py',77),
-  ('expression',3,'p_expression_binop','expressionparser.py',81),
-  ('expression',3,'p_expression_binop','expressionparser.py',82),
+  ('statement',1,'p_statement_expr','expressionparser.py',79),
   ('expression',3,'p_expression_binop','expressionparser.py',83),
   ('expression',3,'p_expression_binop','expressionparser.py',84),
-  ('expression',2,'p_expression_uminus','expressionparser.py',89),
-  ('expression',3,'p_expression_group','expressionparser.py',94),
-  ('expression',1,'p_expression_factor','expressionparser.py',99),
-  ('expression',1,'p_expression_factor','expressionparser.py',100),
-  ('expression',1,'p_expression_factor','expressionparser.py',101),
+  ('expression',3,'p_expression_binop','expressionparser.py',85),
+  ('expression',3,'p_expression_binop','expressionparser.py',86),
+  ('expression',3,'p_expression_binop','expressionparser.py',87),
+  ('expression',2,'p_expression_uminus','expressionparser.py',92),
+  ('expression',3,'p_expression_group','expressionparser.py',97),
   ('expression',1,'p_expression_factor','expressionparser.py',102),
   ('expression',1,'p_expression_factor','expressionparser.py',103),
-  ('arguments',3,'p_expression_arguments','expressionparser.py',108),
-  ('arguments',1,'p_expression_arguments','expressionparser.py',109),
-  ('arguments',1,'p_expression_arguments','expressionparser.py',110),
-  ('System_Function',5,'p_expression_system_function','expressionparser.py',118),
-  ('Function',4,'p_expression_function','expressionparser.py',187),
-  ('VariableReference',3,'p_expression_variablereference','expressionparser.py',193),
-  ('empty',0,'p_empty','expressionparser.py',305),
+  ('expression',1,'p_expression_factor','expressionparser.py',104),
+  ('expression',1,'p_expression_factor','expressionparser.py',105),
+  ('expression',1,'p_expression_factor','expressionparser.py',106),
+  ('arguments',3,'p_expression_arguments','expressionparser.py',111),
+  ('arguments',1,'p_expression_arguments','expressionparser.py',112),
+  ('arguments',1,'p_expression_arguments','expressionparser.py',113),
+  ('System_Function',5,'p_expression_system_function','expressionparser.py',121),
+  ('Function',4,'p_expression_function','expressionparser.py',190),
+  ('VariableReference',3,'p_expression_variablereference','expressionparser.py',201),
+  ('empty',0,'p_empty','expressionparser.py',274),
 ]
