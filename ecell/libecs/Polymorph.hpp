@@ -165,6 +165,9 @@ namespace libecs
 
   };
 
+
+
+
   class PolymorphNoneValue 
     : 
     public PolymorphValue
@@ -370,61 +373,67 @@ namespace libecs
 
 
   //
-  // Below are convertTo template function specializations for Polymorph class.
-  // Mainly for PolymorphVector classes
+  // convertTo template specializations for PolymorphVector.
   //
 
-  // to PolymorphVector object
+  // identity
+  template<>
+  class convertTo_< PolymorphVector, PolymorphVector >
+  {
+  public:
+    const PolymorphVector operator()( const PolymorphVector& aValue )
+    {
+      return aValue;
+    }
+  };
 
-  // from Real
-  template<>
-  inline const PolymorphVector 
-  convertTo( RealCref aValue,
-	     Type2Type< PolymorphVector > )
-  {
-    return PolymorphVector( 1, aValue );
-  }
+  // to PolymorphVector
 
-  // from String
-  template<>
-  inline const PolymorphVector 
-  convertTo( StringCref aValue,
-	     Type2Type< PolymorphVector > )
+  template< typename FromType >
+  class convertTo_< PolymorphVector, FromType >
   {
-    return PolymorphVector( 1, aValue );
-  }
+  public:
+    const PolymorphVector operator()( const FromType& aValue )
+    {
+      return PolymorphVector( 1, aValue );
+    }
+  };
 
-  // from Integer
+  // override <T,String> case defined in convertTo.hpp
   template<>
-  inline const PolymorphVector 
-  convertTo( IntegerCref aValue, Type2Type< PolymorphVector > )
+  class convertTo_< PolymorphVector, String >
   {
-    return PolymorphVector( 1, aValue );
-  }
+  public:
+    const PolymorphVector operator()( const String& aValue )
+    {
+      return PolymorphVector( 1, aValue );
+    }
+  };
 
-  template<>
-  inline const String convertTo( PolymorphVectorCref aValue,
-				 Type2Type< String > )
-  {
-    checkSequenceSize( aValue, 1 );
-    return aValue[0].asString();
-  }
 
-  template<>
-  inline const Real convertTo( PolymorphVectorCref aValue, Type2Type< Real > )
+  // from PolymorphVector 
+  template< typename ToType >
+  class convertTo_< ToType, PolymorphVector >
   {
-    checkSequenceSize( aValue, 1 );
-    return aValue[0].asReal();
-  }
-    
+  public:
+    const ToType operator()( PolymorphVectorCref aValue )
+    {
+      checkSequenceSize( aValue, 1 );
+      return static_cast<Polymorph>(aValue[0]).as<ToType>();
+    }
+  };
+
+  // override <String,T> case defined in convertTo.hpp
   template<>
-  inline const Integer convertTo( PolymorphVectorCref aValue, 
-				  Type2Type< Integer > )
+  class convertTo_< String, PolymorphVector >
   {
-    checkSequenceSize( aValue, 1 );
-    return aValue[0].asInteger();
-  }
-    
+  public:
+    const String operator()( PolymorphVectorCref aValue )
+    {
+      checkSequenceSize( aValue, 1 );
+      return static_cast<Polymorph>(aValue[0]).as<String>();
+    }
+  };
 
 
   // @} // polymorph

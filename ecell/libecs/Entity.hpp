@@ -28,8 +28,8 @@
 // E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
 
-#ifndef ___ENTITY_H___
-#define ___ENTITY_H___
+#ifndef __ENTITY_HPP
+#define __ENTITY_HPP
 
 #include "libecs.hpp"
 #include "EntityType.hpp"
@@ -160,7 +160,7 @@ namespace libecs
     */
 
     SET_METHOD( String, Name )
-    { 
+    {
       theName = value;
     }
 
@@ -227,7 +227,7 @@ namespace libecs
 
 } // namespace libecs
 
-#endif /*  ___ENTITY_H___ */
+#endif /*  __ENTITY_HPP */
 
 /*
   Do not modify

@@ -489,7 +489,7 @@ namespace libemc
       {
 	THROW_EXCEPTION( libecs::Exception,
 			 "run( l ): l must be > 0.0. (" + 
-			 libecs::toString( aDuration ) + " given.)" );
+			 libecs::stringCast( aDuration ) + " given.)" );
       }
 
     getModel().initialize();

@@ -880,7 +880,7 @@ namespace libecs
 	    str += *container_iterator;
 	  }
 	
-	n = stringTo<Real>( str.c_str() );
+	n = stringCast<Real>( str );
     
 	++theStackSize;
 	theCode.push_back( new PUSH( n ) );
@@ -903,7 +903,7 @@ namespace libecs
 	    str += *container_iterator;
 	  }
 
-	n = stringTo<Real>( str.c_str() );
+	n = stringCast<Real>( str );
 	
 	++theStackSize;
 	theCode.push_back( new PUSH( n ) );
@@ -933,13 +933,13 @@ namespace libecs
 	    str_child2 += *container_iterator;
 	  }
 
-	n1 = stringTo<Real>( str_child1.c_str() );
+	n1 = stringCast<Real>( str_child1 );
 
 	++theStackSize;
 	
 	if( str_child2 != "-")
 	  {
-	    n2 = stringTo<Real>( str_child2.c_str() );
+	    n2 = stringCast<Real>( str_child2 );
 	
 	    theCode.push_back( new PUSH( n1 * pow(10, n2) ) );
 	  }
@@ -952,7 +952,7 @@ namespace libecs
 		str_child3 += *container_iterator;
 	      }
 
-	    n2 = stringTo<Real>( str_child3.c_str() );
+	    n2 = stringCast<Real>( str_child3 );
 	    theCode.push_back( new PUSH( n1 * pow(10, -n2) ) );
 	  }
 
@@ -989,7 +989,7 @@ namespace libecs
 		    str_child1 += *container_iterator;
 		  }
 
-		n = stringTo<Real>( str_child1.c_str() );
+		n = stringCast<Real>( str_child1 );
 		
 		if( theFunctionMap1Iterator != theFunctionMap1.end() )
 		  {
@@ -1283,7 +1283,7 @@ namespace libecs
 	    str_child1 += *container_iterator;
 	  }
 
-	n = stringTo<Real>( str_child1.c_str() );
+	n = stringCast<Real>( str_child1 );
 
 	if( i->children.begin()->value.id() == CompileGrammar::INTEGER ||
 	    i->children.begin()->value.id() == CompileGrammar::FLOATING  )
@@ -1329,8 +1329,8 @@ namespace libecs
 		str_child2 += *container_iterator;
 	      }
 
-	    n1 = stringTo<Real>( str_child1.c_str() );
-	    n2 = stringTo<Real>( str_child2.c_str() );	  
+	    n1 = stringCast<Real>( str_child1 );
+	    n2 = stringCast<Real>( str_child2 );	  
 
 	    ++theStackSize;
 
@@ -1390,8 +1390,8 @@ namespace libecs
 		str_child2 += *container_iterator;
 	      }
 
-	    n1 = stringTo<Real>( str_child1.c_str() );
-	    n2 = stringTo<Real>( str_child2.c_str() );	  
+	    n1 = stringCast<Real>( str_child1 );
+	    n2 = stringCast<Real>( str_child2 );	  
 
 	    ++theStackSize;
 
@@ -1461,8 +1461,8 @@ namespace libecs
 		str_child2 += *container_iterator;
 	      }
 
-	    n1 = stringTo<Real>( str_child1.c_str() );
-	    n2 = stringTo<Real>( str_child2.c_str() );	  
+	    n1 = stringCast<Real>( str_child1 );
+	    n2 = stringCast<Real>( str_child2 );	  
 
 	    ++theStackSize;
 

@@ -37,6 +37,7 @@
 
 namespace libecs
 {
+
   PolymorphValue::~PolymorphValue()
   {
     ; // do nothing

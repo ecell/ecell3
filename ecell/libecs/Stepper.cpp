@@ -614,7 +614,7 @@ namespace libecs
       }
     else
       {
-	aSeed = stringTo<UnsignedInteger>( value );
+	aSeed = stringCast<UnsignedInteger>( value );
       }
 
     gsl_rng_set( getRng(), aSeed );

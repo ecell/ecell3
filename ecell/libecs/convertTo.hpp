@@ -31,6 +31,10 @@
 #ifndef __CONVERTTO_HPP
 #define __CONVERTTO_HPP
 
+#include <boost/static_assert.hpp>
+#include <boost/type_traits.hpp>
+#include <boost/mpl/if.hpp>
+
 #include "libecs.hpp"
 #include "Util.hpp"
 
@@ -44,73 +48,104 @@ namespace libecs
   @{
   */
 
+
+
+  template< typename ToType, typename FromType >
+  class convertTo_
+  {
+  public:
+    inline const ToType operator()( const FromType& aValue )
+    {
+      // strategy:
+      // (1) if both of ToType and FromType are arithmetic, use numeric_cast.
+      // (2) otherwise, just try static_cast.
+
+      typedef typename boost::mpl::if_c<
+	boost::is_arithmetic<FromType>::value &&
+	boost::is_arithmetic<ToType>::value,
+	NumericCaster<ToType,FromType>,
+	StaticCaster<ToType,FromType>
+	>::type
+	Converter;
+      
+      return Converter()( aValue );
+    }
+  };
+
+
+  // convertTo_ specializations
+
+
+  // for String
+
+  // from String
+
+  template< typename ToType >
+  class convertTo_< ToType, String >
+  {
+  public:
+    inline const ToType operator()( StringCref aValue )
+    {
+      // strategy:
+      // (1) if ToType is arithmetic, use LexicalCaster.
+      // (2) otherwise try static casting.
+
+      typedef typename boost::mpl::if_< 
+	boost::is_arithmetic< ToType >,
+	LexicalCaster< ToType, String >,     // is arithmetic
+	StaticCaster< ToType, String >       // is not
+	>::type
+	Converter;
+
+      return Converter()( aValue );
+    }
+  };
+  
+  // to String
+
+  template< typename FromType >
+  class convertTo_< String, FromType >
+  {
+  public:
+    inline const String operator()( const FromType& aValue )
+    {
+      // strategy:
+      // (1) if FromType is arithmetic, use LexicalCaster.
+      // (2) otherwise try static casting.
+
+      typedef typename boost::mpl::if_< 
+	boost::is_arithmetic< FromType >,
+	LexicalCaster< String, FromType >,
+	StaticCaster< String, FromType >
+	>::type
+	Converter;
+
+      return Converter()( aValue );
+    }
+  };
+
+
+  template<>
+  class convertTo_< String, String >
+  {
+  public:
+    inline const String operator()( const String& aValue )
+    {
+      return aValue;
+    }
+  };
+
+
+
+  //
+  // convertTo template function
+  //
   template< typename ToType, typename FromType >
   inline const ToType convertTo( const FromType& aValue )
   {
-    return convertTo( aValue, Type2Type<ToType>() );
+    return convertTo_<ToType,FromType>()( aValue );
   }
 
-  template< typename ToType, typename FromType >
-  const ToType convertTo( const FromType& aValue, Type2Type<ToType> )
-  {
-    return static_cast<ToType>( aValue );
-    // DefaultSpecializationProhibited();
-  }
-
-
-  // specializations
-
-
-  // to String
-
-  template<>
-  inline const String convertTo( RealCref aValue,
-				 Type2Type< String > )
-  {
-    return toString( aValue );
-  }
-
-  template<>
-  inline const String convertTo( IntegerCref aValue,
-				 Type2Type< String > )
-  {
-    return toString( aValue );
-  }
-
-
-  // to Real
-
-  template<>
-  inline const Real convertTo( StringCref aValue,
-			       Type2Type< Real > )
-  {
-    return stringTo< Real >( aValue );
-  }
-
-  template<>
-  inline const Real convertTo( IntegerCref aValue,
-			       Type2Type< Real > )
-  {
-    return static_cast< const Real >( aValue );
-  }
-
-
-
-  // to Integer
-
-  template<>
-  inline const Integer convertTo( RealCref aValue,
-			      Type2Type< Integer > )
-  {
-    return static_cast< const Integer >( aValue );
-  }
-
-  template<>
-  inline const Integer convertTo( StringCref aValue,
-				  Type2Type< Integer > )
-  {
-    return stringTo< Integer >( aValue );
-  }
 
 
 }

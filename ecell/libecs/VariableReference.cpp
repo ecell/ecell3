@@ -55,7 +55,7 @@ namespace libecs
   {
     if( isEllipsisName() )
       {
-	return stringTo<Integer>( theName.substr( 3 ) );
+	return stringCast<Integer>( theName.substr( 3 ) );
       }
     else
       {

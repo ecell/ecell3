@@ -36,6 +36,9 @@
 #include <limits>
 
 #include <boost/lexical_cast.hpp>
+#include <boost/cast.hpp>
+#include <boost/static_assert.hpp>
+#include <boost/type_traits.hpp>
 
 #include "libecs.hpp"
 #include "Exceptions.hpp"
@@ -52,43 +55,53 @@ namespace libecs
 
   /** @file */
 
-  
   /** 
-      Universal String -> object converter.
-      Real and Int specializations are defined in Util.cpp.
-      Conversion to the other classes are conducted using 
-      istrstream.
+      A universal to String / from String converter.
+
+      Two usages:
+      - stringCast( VALUE )        -- convert VALUE to a string.
+      - stringCast<TYPE>( STRING ) -- convert STRING to a TYPE object.
+
+      This is a thin wrapper over boost::lexical_cast.
+      This stringCast template function has some specializations for
+      common numeric types such as Real and Integer are defined, and
+      use of this instead of boost::lexical_cast for those types
+      can reduce resulting binary size.
   */
 
-  // FIXME: should be a static function object? to reduce initialization cost
-
-  template <typename T> 
-  const T stringTo( StringCref str )
+  template< typename NEW, typename GIVEN >
+  const NEW stringCast( const GIVEN& aValue )
   {
-    return boost::lexical_cast<T>( str );
+    BOOST_STATIC_ASSERT( ( boost::is_same<String,GIVEN>::value ||
+			   boost::is_same<String,NEW>::value ) );
+    return boost::lexical_cast<NEW>( aValue );
   }
 
-  /// Specializations of stringTo
-  template<> const Real stringTo<Real>( StringCref str );
-  template<> const Integer stringTo<Integer>( StringCref str );
-  template<> const UnsignedInteger stringTo<UnsignedInteger>( StringCref str );
 
-  /**
-     Any to String converter function template.
-     Using ostringstream by default. A specialization for Real type
-     is also defined.
-  */
 
-  template <typename T> inline const String toString( const T& t )
+  ///@internal
+  template< typename GIVEN >
+  const String stringCast( const GIVEN& aValue )
   {
-    return boost::lexical_cast<String>( t );
+    return stringCast<String,GIVEN>( aValue );
   }
 
-  /// Specializations, mainly for the sake of binary size.
-  template <> const String toString( const Real& t );
-  template <> const String toString( const Integer& t );
-  template <> const String toString( const UnsignedInteger& t );
-  template <> const String toString( const String& t );
+#define __STRINGCAST_SPECIALIZATION( NEW, GIVEN )\
+  template<> const NEW stringCast<NEW,GIVEN>( const GIVEN& )
+
+  __STRINGCAST_SPECIALIZATION( String, Real );
+  __STRINGCAST_SPECIALIZATION( String, HighReal );
+  __STRINGCAST_SPECIALIZATION( String, Integer );
+  __STRINGCAST_SPECIALIZATION( String, UnsignedInteger );
+  __STRINGCAST_SPECIALIZATION( Real, String );
+  __STRINGCAST_SPECIALIZATION( HighReal, String );
+  __STRINGCAST_SPECIALIZATION( Integer, String );
+  __STRINGCAST_SPECIALIZATION( UnsignedInteger, String );
+  // __STRINGCAST_SPECIALIZATION( String, String );
+
+#undef __STRINGCAST_SPECIALIZATION
+
+
 
   /**
      Erase white space characters ( ' ', '\t', and '\n' ) from a string
@@ -181,6 +194,8 @@ namespace libecs
   /**
      For each 'second' member of element in a sequence, call a given method.
 
+     @note This will be deprecated.  Use select2nd instead.
+
      @arg SEQCLASS the classname of the STL sequence. 
      @arg SEQ the STL sequence.
      @arg METHOD the name of the method.
@@ -213,6 +228,18 @@ namespace libecs
     return String();
   }
 
+  template< class NEW, class GIVEN >
+  class StaticCaster
+    :
+    std::unary_function< GIVEN, NEW >
+  {
+  public:
+    inline NEW operator()( const GIVEN& aValue )
+    {
+      BOOST_STATIC_ASSERT( ( boost::is_convertible<GIVEN,NEW>::value ) );
+      return static_cast<NEW>( aValue );
+    }
+  };
 
   template< class NEW, class GIVEN >
   class DynamicCaster
@@ -220,7 +247,7 @@ namespace libecs
     std::unary_function< GIVEN, NEW >
   {
   public:
-    NEW operator()( GIVEN aPtr )
+    NEW operator()( const GIVEN& aPtr )
     {
       NEW aNew( dynamic_cast<NEW>( aPtr ) );
       if( aNew != NULLPTR )
@@ -233,6 +260,35 @@ namespace libecs
 	}
     }
   };
+
+  template< class NEW, class GIVEN >
+  class LexicalCaster
+    :
+    std::unary_function< GIVEN, NEW >
+  {
+  public:
+    const NEW operator()( const GIVEN& aValue )
+    {
+      return stringCast<NEW>( aValue );
+    }
+  };
+
+
+
+
+  template< class NEW, class GIVEN >
+  class NumericCaster
+    :
+    std::unary_function< GIVEN, NEW >
+  {
+  public:
+    inline NEW operator()( GIVEN aValue )
+    {
+      return boost::numeric_cast<NEW>( aValue );
+    }
+  };
+
+
 
   /**
      These functions are prepared for ExpressionFluxProcess

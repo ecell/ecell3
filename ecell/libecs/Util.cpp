@@ -38,44 +38,24 @@
 namespace libecs
 {
 
-
-  template<> const Real stringTo<Real>( StringCref str )
-  {
-    // FIXME: error check, throw exception
-    return strtod( str.c_str(), NULLPTR );
+#define __STRINGCAST_SPECIALIZATION_DEF( NEW, GIVEN )\
+  template<> const NEW stringCast<NEW,GIVEN>( const GIVEN& aValue )\
+  {\
+    return boost::lexical_cast<NEW>( aValue );\
   }
 
-  template<> const Integer stringTo<Integer>( StringCref str )
-  {
-    // FIXME: error check, throw exception
-    return strtol( str.c_str(), NULLPTR, 10 );
-  }
+  __STRINGCAST_SPECIALIZATION_DEF( String, Real );
+  __STRINGCAST_SPECIALIZATION_DEF( String, HighReal );
+  __STRINGCAST_SPECIALIZATION_DEF( String, Integer );
+  __STRINGCAST_SPECIALIZATION_DEF( String, UnsignedInteger );
+  __STRINGCAST_SPECIALIZATION_DEF( Real, String );
+  __STRINGCAST_SPECIALIZATION_DEF( HighReal, String );
+  __STRINGCAST_SPECIALIZATION_DEF( Integer, String );
+  __STRINGCAST_SPECIALIZATION_DEF( UnsignedInteger, String );
+  // __STRINGCAST_SPECIALIZATION_DEF( String, String );
 
-  template<> const UnsignedInteger stringTo<UnsignedInteger>( StringCref str )
-  {
-    // FIXME: error check, throw exception
-    return strtoul( str.c_str(), NULLPTR, 10 );
-  }
+#undef __STRINGCAST_SPECIALIZATION_DEF
 
-  template <> inline const String toString( const Real& t )
-  {
-    return boost::lexical_cast<String>( t );
-  }
-
-  template <> inline const String toString( const Integer& t )
-  {
-    return boost::lexical_cast<String>( t );
-  }
-
-  template <> inline const String toString( const UnsignedInteger& t )
-  {
-    return boost::lexical_cast<String>( t );
-  }
-
-  template <> inline const String toString( const String& t )
-  {
-    return t;
-  }
 
   void eraseWhiteSpaces( StringRef str )
   {
@@ -95,16 +75,16 @@ namespace libecs
   {
     THROW_EXCEPTION( RangeError,
 		     "Size of the sequence must be within [ " 
-		     + toString( aMin ) + ", " + toString( aMax )
-		     + " ] ( " + toString( aSize ) + " given)." );
+		     + stringCast( aMin ) + ", " + stringCast( aMax )
+		     + " ] ( " + stringCast( aSize ) + " given)." );
   }
 
   void throwSequenceSizeError( const int aSize, const int aMin )
   {
     THROW_EXCEPTION( RangeError,
 		     "Size of the sequence must be at least " 
-		     + toString( aMin ) + 
-		     + " ( " + toString( aSize ) + " given)." );
+		     + stringCast( aMin ) + 
+		     + " ( " + stringCast( aSize ) + " given)." );
   }
 
 
