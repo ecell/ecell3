@@ -35,7 +35,7 @@ char const AccumulatorMaker_C_rcsid[] = "$Id$";
 
 
 
-#include "ecscore/AccumulatorMaker.h"
+#include "Koyurugi/AccumulatorMaker.h"
 
 
 

@@ -35,7 +35,7 @@ char const Primitive_C_rcsid[] = "$Id$";
 
 
 
-#include "ecscore/Primitive.h"
+#include "Koyurugi/Primitive.h"
 
 
 

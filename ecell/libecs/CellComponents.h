@@ -36,9 +36,9 @@
 
 #ifndef ___CELLCOMPONENTS_H___
 #define ___CELLCOMPONENTS_H___
-#include "ecscore/System.h"
-#include "ecscore/Substance.h"
-#include "ecscore/Reactor.h"
+#include "Koyurugi/System.h"
+#include "Koyurugi/Substance.h"
+#include "Koyurugi/Reactor.h"
 
 class RootSystem;
 

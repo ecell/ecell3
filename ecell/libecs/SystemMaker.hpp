@@ -37,8 +37,8 @@
 #ifndef ___SYSTEMMAKER_H___
 #define ___SYSTEMMAKER_H___
 #include <stl.h>
-#include "ecscore/System.h"
-#include "ecscore/StepperMaker.h"
+#include "Koyurugi/System.h"
+#include "Koyurugi/StepperMaker.h"
 #include "util/ModuleMaker.h"
 
 

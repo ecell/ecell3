@@ -37,7 +37,7 @@
 #ifndef ___STEPPER_H___
 #define ___STEPPER_H___
 #include <stl.h>
-#include "include/Defs.h"
+#include "Koyurugi/Defs.h"
 
 class System;
 class Integrator;

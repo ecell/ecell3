@@ -36,7 +36,7 @@ char const FQPN_C_rcsid[] = "$Id$";
 
 
 #include <string>
-#include "ecscore/FQPN.h"
+#include "Koyurugi/FQPN.h"
 
 
 ///////////////////////  SystemPath

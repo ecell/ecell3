@@ -40,10 +40,10 @@
 #include <stl.h>
 #include <string.h>
 
-#include "ecscore/Entity.h"
-#include "ecscore/Primitive.h"
-#include "ecell/Exceptions.h"
-#include "ecscore/FQPN.h"
+#include "Koyurugi/Entity.h"
+#include "Koyurugi/Primitive.h"
+#include "Koyurugi/Exceptions.h"
+#include "Koyurugi/FQPN.h"
 
 class Gene;
 class Genome;
@@ -510,7 +510,7 @@ public:
 
 
 
-#include "ecscore/Reactor.h"
+#include "Koyurugi/Reactor.h"
 /*!
   Equivalent to Reactor::isRegularReactor except that
   this function object takes a reference to a ReactorList::value_type.

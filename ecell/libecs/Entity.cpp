@@ -35,12 +35,12 @@ char const Entity_C_rcsid[] = "$Id$";
 
 
 
-#include "ecscore/Entity.h"
+#include "Koyurugi/Entity.h"
 #include "ecell/MessageWindow.h"
-#include "ecscore/System.h"
-#include "ecscore/FQPN.h"
-#include "ecscore/RootSystem.h"
-#include "ecscore/Stepper.h"
+#include "Koyurugi/System.h"
+#include "Koyurugi/FQPN.h"
+#include "Koyurugi/RootSystem.h"
+#include "Koyurugi/Stepper.h"
 
 
 Entity::Entity()

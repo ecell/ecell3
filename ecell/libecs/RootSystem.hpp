@@ -38,8 +38,8 @@
 #define ___ROOTSYSTEM_H___
 #include <stl.h>
 #include <fstream.h>
-#include "ecscore/System.h"
-#include "ecscore/Primitive.h"
+#include "Koyurugi/System.h"
+#include "Koyurugi/Primitive.h"
 //#include "CDS.h"
 
 class Cell;

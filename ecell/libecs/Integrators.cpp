@@ -35,7 +35,7 @@ char const Integrators_C_rcsid[] = "$Id$";
 
 
 
-#include "ecscore/Integrators.h"
+#include "Koyurugi/Integrators.h"
 
 
 ////////////////////////////// Integrator

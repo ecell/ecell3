@@ -37,12 +37,12 @@ char const Stepper_C_rcsid[] = "$Id$";
 
 #include <exception>
 #include <typeinfo>
-#include "ecscore/Stepper.h"
-#include "ecscore/SystemMaker.h"
+#include "Koyurugi/Stepper.h"
+#include "Koyurugi/SystemMaker.h"
 #include "ecell/TimeManager.h"
 #include "util/Util.h"
-#include "ecscore/Integrators.h"
-#include "ecscore/RootSystem.h"
+#include "Koyurugi/Integrators.h"
+#include "Koyurugi/RootSystem.h"
 
 
 

@@ -37,7 +37,7 @@
 #ifndef ___STEPPERMAKER_H___
 #define ___STEPPERMAKER_H___
 #include <stl.h>
-#include "ecscore/Stepper.h"
+#include "Koyurugi/Stepper.h"
 #include "util/ModuleMaker.h"
 
 class StepperMaker : public MultiClassModuleMaker<Stepper>

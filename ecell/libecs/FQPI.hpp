@@ -38,8 +38,8 @@
 #define ___FQPN_H___
 #include <string>
 
-#include "ecell/Exceptions.h"
-#include "ecscore/Primitive.h"
+#include "Koyurugi/Exceptions.h"
+#include "Koyurugi/Primitive.h"
 
 /*! 
   SystemPath 

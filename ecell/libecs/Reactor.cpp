@@ -36,12 +36,12 @@ char const Reactor_C_rcsid[] = "$Id$";
 
 
 #include "ecell/MessageWindow.h"
-#include "ecscore/Reactant.h"
-#include "ecscore/RootSystem.h"
-#include "ecscore/Stepper.h"
-#include "ecscore/FQPN.h"
+#include "Koyurugi/Reactant.h"
+#include "Koyurugi/RootSystem.h"
+#include "Koyurugi/Stepper.h"
+#include "Koyurugi/FQPN.h"
 
-#include "ecscore/Reactor.h"
+#include "Koyurugi/Reactor.h"
 
 Reactor::Condition Reactor::_globalCondition;// = Reactor::Condition::Good;
 const char* Reactor::LIGAND_STRING_TABLE[] = {"substrate","product","catalyst"

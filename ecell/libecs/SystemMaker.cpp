@@ -35,8 +35,8 @@ char const SystemMaker_C_rcsid[] = "$Id$";
 
 
 
-#include "ecscore/SystemMaker.h"
-#include "ecscore/RootSystem.h"
+#include "Koyurugi/SystemMaker.h"
+#include "Koyurugi/RootSystem.h"
 
 
 ////////////////////// SystemMaker

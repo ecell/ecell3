@@ -36,11 +36,11 @@ char const ReactorMaker_C_rcsid[] = "$Id$";
 
 
 #include <stdlib.h>
-#include "ecscore/ReactorMaker.h"
+#include "Koyurugi/ReactorMaker.h"
 #include "ecell/Serizawa.h"
-#include "ecscore/RootSystem.h"
+#include "Koyurugi/RootSystem.h"
 #include "util/Message.h"
-#include "include/Defs.h"
+#include "Koyurugi/Defs.h"
 
 //template string;
 //template DynamicModule<Reactor,ReactorAllocatorFunc>;

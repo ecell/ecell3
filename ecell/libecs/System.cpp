@@ -35,14 +35,14 @@ char const System_C_rcsid[] = "$Id$";
 
 
 
-#include "ecscore/System.h"
-#include "ecscore/Reactor.h"
-#include "ecscore/CellComponents.h"
+#include "Koyurugi/System.h"
+#include "Koyurugi/Reactor.h"
+#include "Koyurugi/CellComponents.h"
 #include "ecell/MessageWindow.h"
-#include "ecscore/RootSystem.h"
-#include "ecscore/Stepper.h"
-#include "ecscore/StepperMaker.h"
-#include "ecscore/FQPN.h"
+#include "Koyurugi/RootSystem.h"
+#include "Koyurugi/Stepper.h"
+#include "Koyurugi/StepperMaker.h"
+#include "Koyurugi/FQPN.h"
 
 // instantiate primitive lists.
 template SubstanceList;

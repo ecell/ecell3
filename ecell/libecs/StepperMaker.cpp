@@ -35,7 +35,7 @@ char const StepperMaker_C_rcsid[] = "$Id$";
 
 
 
-#include "ecscore/StepperMaker.h"
+#include "Koyurugi/StepperMaker.h"
 
 
 

@@ -38,7 +38,7 @@
 #define ___SUBSTANCEMAKER_H___
 #include "util/ModuleMaker.h"
 
-#include "ecscore/Substance.h"
+#include "Koyurugi/Substance.h"
 
 //class Substance;
 

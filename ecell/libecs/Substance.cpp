@@ -35,13 +35,13 @@ char const Substance_C_rcsid[] = "$Id$";
 
 
 
-#include "ecscore/Substance.h"
-#include "ecscore/Integrators.h"
-#include "ecscore/System.h"
-#include "ecscore/RootSystem.h"
+#include "Koyurugi/Substance.h"
+#include "Koyurugi/Integrators.h"
+#include "Koyurugi/System.h"
+#include "Koyurugi/RootSystem.h"
 #include "util/Util.h"
-#include "ecscore/Accumulators.h"
-#include "ecscore/AccumulatorMaker.h"
+#include "Koyurugi/Accumulators.h"
+#include "Koyurugi/AccumulatorMaker.h"
 #include "ecell/MessageWindow.h"
 
 

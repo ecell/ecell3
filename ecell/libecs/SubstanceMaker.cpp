@@ -35,7 +35,7 @@ char const SubstanceMaker_C_rcsid[] = "$Id$";
 
 
 
-#include "ecscore/SubstanceMaker.h"
+#include "Koyurugi/SubstanceMaker.h"
 
 void SubstanceMaker::makeClassList()
 {
