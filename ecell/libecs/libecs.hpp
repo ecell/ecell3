@@ -32,7 +32,6 @@
 #define __KOYURUGI_H
 #include "Defs.hpp"
 
-
 namespace libecs
 {
 

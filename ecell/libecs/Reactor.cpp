@@ -94,22 +94,22 @@ namespace libecs
 
   void Reactor::setSubstrateList( MessageCref message )
   {
-    cerr << "not implemented yet." << endl;
+    //    cerr << "not implemented yet." << endl;
   }
 
   void Reactor::setProductList( MessageCref message )
   {
-    cerr << "not implemented yet." << endl;
+    //    cerr << "not implemented yet." << endl;
   }
 
   void Reactor::setEffectorList( MessageCref message )
   {
-    cerr << "not implemented yet." << endl;
+    //    cerr << "not implemented yet." << endl;
   }
 
   void Reactor::setCatalystList( MessageCref message )
   {
-    cerr << "not implemented yet." << endl;
+    //    cerr << "not implemented yet." << endl;
   }
 
   const Message Reactor::getSubstrateList( StringCref keyword )
@@ -209,7 +209,6 @@ namespace libecs
   void Reactor::setInitialActivity( Real activity )
   {
     theInitialActivity = activity;
-    // FIXME: take delta T from supersystem
     theActivity= activity * 
       getSuperSystem()->getStepper()->getDeltaT();
   }

@@ -31,7 +31,7 @@
 #ifndef ___UTIL_H___
 #define ___UTIL_H___
 #include <stdlib.h>
-#include <strstream.h>
+#include <sstream>
 
 #include "Defs.hpp"
 #include "korandom/korandom.h"
@@ -86,35 +86,43 @@ namespace libecs
       istrstream.
   */
 
+  // FIXME: should be a static function object? to reduce initialization cost
+
   template <class T> 
   const T stringTo( StringCref str )
   {
-    istrstream ist( str.c_str() );
+    istringstream ist( str.c_str() );
     T aT;
     ist >> aT;
     return aT;
   }
 
-  // specializations
+  /// A specialization of stringTo for Real
   template<> const Real stringTo<Real>( StringCref str );
+
+  /// A specialization of stringTo for Int
   template<> const Int   stringTo<Int>( StringCref str );
+
+  /// A specialization of stringTo for UnsignedInt
   template<> const UnsignedInt  stringTo<UnsignedInt>( StringCref str );
 
   /**
      Any to String converter function template.
-     Using ostrstream by default. A specialization for Real type
+     Using ostringstream by default. A specialization for Real type
      with precision( FLOAT_DIG ) is also defined.
   */
 
+  // FIXME: should be a static function object? to reduce initialization cost
+
   template <class T> const String toString( const T& t )
   {
-    ostrstream os;
+    ostringstream os;
     os << t;
     os << ends;
     return os.str();
   }
 
-  // specialization 
+  /// A specialization of toString for Real
   template<> const String toString<Real>( const Real& f );
 
 

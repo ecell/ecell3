@@ -20,9 +20,10 @@ libemc_la_SOURCES=\
 Simulator.cpp\
 SimulatorImplementation.cpp\
 LocalSimulatorImplementation.cpp\
-EmcLogger.cpp\
 LocalLoggerImplementation.cpp\
 LoggerImplementation.cpp
+
+#EmcLogger.cpp\
 
 libemcdir=${pkginclude}/libemc
 libemc_HEADERS=\

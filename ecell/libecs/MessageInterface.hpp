@@ -43,7 +43,7 @@ namespace libecs
   DECLARE_CLASS( AbstractMessageCallback );
 
   DECLARE_MAP( const String, AbstractMessageCallbackPtr, 
-	       std::less<const String>, PropertyMap );
+	       less<const String>, PropertyMap );
 
 
   /**

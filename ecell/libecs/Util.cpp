@@ -77,14 +77,14 @@ namespace libecs
 
   template<> const String toString<Real>( const Real& f )
   { 
-    ostrstream os;
+    ostringstream os;
     os.precision( REAL_DIG );
     os << f;
     os << ends;
     return os.str();
   }
 
-  string basenameOf( StringCref str, String::size_type maxlength )
+  String basenameOf( StringCref str, String::size_type maxlength )
   {
     String::size_type s = str.rfind( '/' );
     if( s == String::npos )

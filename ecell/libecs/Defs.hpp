@@ -38,11 +38,10 @@
 
 #include "CoreLinuxCompatibility.hpp"
 
+//FIXME: shold be removed
+using namespace std;
 
-namespace libecs
-{
-
-  // cmath
+// cmath
 
 #if defined( HAVE_CMATH )
 #include <cmath>
@@ -52,6 +51,8 @@ namespace libecs
 #error "either math or cmath header is needed."
 #endif /* HAVE_CMATH */
 
+namespace libecs
+{
 
   // system constants
 
