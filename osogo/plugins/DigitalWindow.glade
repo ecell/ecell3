@@ -104,6 +104,7 @@ Property</label>
 	<widget>
 	  <class>GtkEntry</class>
 	  <name>value_frame</name>
+	  <can_focus>True</can_focus>
 	  <signal>
 	    <name>activate</name>
 	    <handler>input_value</handler>

@@ -8,66 +8,78 @@ from ecssupport import *
 
 class LoggerWindow(Window):
 
-    def __init__( self, session ):
+    def __init__( self, session, aMainWindow ):
 
         Window.__init__( self, 'LoggerWindow.glade' )
         
         self.theSession = session
-        self.theEntryList = self['clist3']
-        self.theEntryList.connect( 'select_row', self.selectPropertyName )
+        self.theEntryList = self['loggerWindow_clist']
+        self.theEntryList.connect( 'select_row', self.selectPropertyNameByClick )
+     #   self.theEntryList.connect( 'unselect_row', self.selectPropertyNameByClick )
         self.theList = []
         self.initialize()
-        self.addHandlers( { 'on_button121_clicked' : self.saveAllData, 
+        self.addHandlers( { 'on_Now_button_clicked' : self.saveAllData, 
                             'on_exit_activate' : self.closeWindow } )
-        self.theSelectedFullPNList = self.theFullPNList
-
+        self.theMainWindow = aMainWindow
+        
 
     def initialize( self ):
 
         self.update()
         
 
-    def saveAllData( self, obj ):
+    def saveAllData( self, obj):
+        aSelectedFullPNList = self.selectPropertyName()
+        
+        if self["every_checkbutton"].get_active():
+               interval = self["every_spinbutton"].get_text()
 
-        if self["checkbutton26"].get_active():
-               interval = self["spinbutton8"].get_text()
-               print interval
-
-        k=0
-
-        for fpn in self.theSelectedFullPNList :
-            aLogger = self.theMainWindow.theDriver.getLogger( fpn )
+        for fullPNString in aSelectedFullPNList :
+            fullpn=createFullPN(fullPNString)
+            aLogger = self.theMainWindow.theDriver.getLogger( fullpn )
             start= aLogger.getStartTime()
             end  = aLogger.getEndTime()
 
-            if self["checkbutton25"].get_active():
-               start= end = self["spinbutton7"].get_text()
-            data = aLogger.getLoggerData(start,end,interval=0)
-
+            if self["at_checkbutton"].get_active():
+               start= end = self["at_spinbutton"].get_text()
+     #      The code that currently implemented by Logger is the one of the bottom.    
+     #      data = aLogger.getData(start,end,interval = None )
+            data = aLogger.getData()
+            filename=string.split(fullPNString,'/')
+            filename=filename[-1]
+            filename=string.split(filename,':')
+            filename=filename[0] + '_' + filename[1] + '_' + filename [-1]
+            output= open("%s.ecd"%filename,  "w")
+         
             for i in xrange(len(data)):
                 test = data[i]
-                print test[0],test[1],start,end
                 x = str(test[0]) 
                 y = str(test[1])
-                afpnlist = self.theMainWindow.theDriver.getLoggerList()
-                j=afpnlist[k][2]
-                print j
-                output = open('%s.ecd'%j,'a')
+  
                 output.writelines("%s\t%s\n" %(x,y))
-            k=k+1
 
+            output.close()
 
-    def selectPropertyName( self, aClist, row, column, event_obj ):
+    def selectPropertyName( self ):
+        aCList = self['loggerWindow_clist']
+        selectedFullPNList = []
 
-        self.theSelectedFullPNList = []
-
-        if  self["radiobutton18"].get_active():
-            for aRowNumber in aClist.selection:
-                aPropertyName = aClist.get_text(aRowNumber,0)   
-                self.theSelectedFullPNList.append(aPropertyName)
+        if  self["Selected_radiobutton"].get_active():
+            for aRowNumber in aCList.selection:
+                   
+                aPropertyName = aCList.get_text(aRowNumber,0)
+                
+                selectedFullPNList.append( aPropertyName )
         else:
-            self.theSelectedFullPNList = self.theFullPNList
+                selectedFullPNList = self.theFullPNList
 
+                
+    
+
+        return  selectedFullPNList
+
+    def selectPropertyNameByClick( self, aCList, row, column, event_obj ):
+        return self.selectPropertyName()
 
     def update( self ):
 

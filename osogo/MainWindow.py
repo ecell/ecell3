@@ -40,7 +40,7 @@ class MainWindow(Window):
         self.theDriver = self.theSession.theDriver
         self.theModelInterpreter = self.theSession.theModelInterpreter
  
-        self.theLoggerWindow = LoggerWindow.LoggerWindow( self.theSession )
+        self.theLoggerWindow = LoggerWindow.LoggerWindow( self.theSession , self )
         self.theLoggerWindowWindow = self.theLoggerWindow[ 'logger_window' ]
 #        self.theLoggerWindowWindow.hide()
 
