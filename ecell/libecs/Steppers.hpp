@@ -160,6 +160,43 @@ namespace libecs
 
   };
 
+  class DormandPrince547MStepper
+    : 
+    public DifferentialStepper
+  {
+
+  public:
+
+    DormandPrince547MStepper();
+    virtual ~DormandPrince547MStepper() {}
+
+    static StepperPtr createInstance() { return new DormandPrince547MStepper; }
+
+    virtual void initialize();
+    virtual void step();
+ 
+    bool calculate();
+
+    virtual StringLiteral getClassName() const
+    { 
+      return "DormandPrince547MStepper";
+    }
+
+
+  protected:
+
+    RealVector theK1;
+    RealVector theK2;
+    RealVector theK3;
+    RealVector theK4;
+    RealVector theK5;
+    RealVector theK6;
+    RealVector theK7;
+
+    RealVector theErrorEstimate;
+
+  };
+
 } // namespace libecs
 
 

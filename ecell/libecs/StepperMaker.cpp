@@ -51,6 +51,7 @@ namespace libecs
     NewStepperModule( FixedRungeKutta4Stepper );
     NewStepperModule( Midpoint2Stepper );
     NewStepperModule( CashKarp4Stepper );
+    NewStepperModule( DormandPrince547MStepper );
   }
 
 

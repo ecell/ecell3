@@ -592,9 +592,9 @@ namespace libecs
 		     + theValueBuffer[ c ] );
 	    
 	// k2 * 0 for Yn+1 (do nothing)
-	//	    theVelocityBuffer[ c ] = theK2[ c ] * 0;
+	//	    theVelocityBuffer[ c ] += theK2[ c ] * 0;
 	// k2 * 0 for ~Yn+1 (do nothing)
-	//	    theErrorEstimate[ c ] = theK2[ c ] * 0;
+	//	    theErrorEstimate[ c ] += theK2[ c ] * 0;
 	    
 	// clear velocity
 	aVariable->setVelocity( 0 );
@@ -748,6 +748,295 @@ namespace libecs
 	setNextStepInterval( aNewStepInterval );
       }
     else 
+      {
+	setNextStepInterval( getStepInterval() );
+      }
+
+    return 1;
+  }
+
+
+  ////////////////////////// DormandPrince547MStepper
+
+
+  DormandPrince547MStepper::DormandPrince547MStepper()
+  {
+    ; // do nothing
+  }
+
+  void DormandPrince547MStepper::initialize()
+  {
+    DifferentialStepper::initialize();
+
+    const UnsignedInt aSize( theWriteVariableVector.size() );
+
+    theK1.resize( aSize );
+    theK2.resize( aSize );
+    theK3.resize( aSize );
+    theK4.resize( aSize );
+    theK5.resize( aSize );
+    theK6.resize( aSize );
+    theK7.resize( aSize );
+
+    theErrorEstimate.resize( aSize );
+  }
+
+  void DormandPrince547MStepper::step()
+  {
+    integrate();
+
+    processNegative();
+
+    log();
+    clear();
+
+    setStepInterval( getNextStepInterval() );
+
+    while( !calculate() )
+      {
+	; // do nothing
+      }
+  }
+
+  bool DormandPrince547MStepper::calculate()
+  {
+    const UnsignedInt aSize( theWriteVariableVector.size() );
+
+    // don't expect too much from euler
+    const Real eps_abs( getTolerance() );
+    const Real eps_rel( getRelativeTolerance() * eps_abs );
+    const Real a_y( getStateScalingFactor() );
+    const Real a_dydt( getDerivativeScalingFactor() );
+
+    // ========= 1 ===========
+    processNormal();
+
+    for( UnsignedInt c( 0 ); c < aSize; ++c )
+      {
+	VariablePtr const aVariable( theWriteVariableVector[ c ] );
+	
+	// get k1
+	theK1[ c ] = aVariable->getVelocity();
+
+	aVariable->loadValue( theK1[ c ] * ( 1.0 / 5.0 ) * getStepInterval()
+			      + theValueBuffer[ c ] );
+
+	// k1 * 35/384 for Yn+1
+	theVelocityBuffer[ c ] = theK1[ c ] * ( 35.0 / 384.0 );
+	// k1 * 5179/57600 for ~Yn+1
+	theErrorEstimate[ c ] = theK1[ c ] * ( 5179.0 / 57600.0 );
+
+	// clear velocity
+	aVariable->setVelocity( 0 );
+      }
+
+    // ========= 2 ===========
+    processNormal();
+
+    for( UnsignedInt c( 0 ); c < aSize; ++c )
+      {
+	VariablePtr const aVariable( theWriteVariableVector[ c ] );
+	
+	// get k2
+	theK2[ c ] = aVariable->getVelocity();
+
+	aVariable->loadValue( ( theK1[ c ] * ( 3.0 / 40.0 ) 
+				+ theK2[ c ] * ( 9.0 / 40.0 ) )
+			      * getStepInterval()
+			      + theValueBuffer[ c ] );
+
+	// k2 * 0 for Yn+1 (do nothing)
+	//	    theVelocityBuffer[ c ] += theK2[ c ] * 0;
+	// k2 * 0 for ~Yn+1 (do nothing)
+	//	    theErrorEstimate[ c ] += theK2[ c ] * 0;
+
+	// clear velocity
+	aVariable->setVelocity( 0 );
+      }
+
+
+    // ========= 3 ===========
+    processNormal();
+
+    for( UnsignedInt c( 0 ); c < aSize; ++c )
+      {
+	VariablePtr const aVariable( theWriteVariableVector[ c ] );
+	
+	// get k3
+	theK3[ c ] = aVariable->getVelocity();
+
+	aVariable->loadValue( ( theK1[ c ] * ( 44.0 / 45.0 ) 
+				- theK2[ c ] * ( 56.0 / 15.0 )
+				+ theK3[ c ] * ( 32.0 / 9.0 ) )
+			      * getStepInterval()
+			      + theValueBuffer[ c ] );
+
+	// k3 * 500/1113 for Yn+1
+	theVelocityBuffer[ c ] += theK3[ c ] * ( 500.0 / 1113.0 );
+	// k3 * 7571/16695 for ~Yn+1
+	theErrorEstimate[ c ] += theK3[ c ] * ( 7571.0 / 16695.0 );
+
+	// clear velocity
+	aVariable->setVelocity( 0 );
+      }
+
+
+    // ========= 4 ===========
+    processNormal();
+
+    for( UnsignedInt c( 0 ); c < aSize; ++c )
+      {
+	VariablePtr const aVariable( theWriteVariableVector[ c ] );
+	
+	// get k4
+	theK4[ c ] = aVariable->getVelocity();
+
+	aVariable->loadValue( ( theK1[ c ] * ( 19372.0 / 6561.0 ) 
+				- theK2[ c ] * ( 25360.0 / 2187.0 )
+				+ theK3[ c ] * ( 64448.0 / 6561.0 )
+				- theK4[ c ] * ( 212.0 / 729.0 ) )
+			      * getStepInterval()
+			      + theValueBuffer[ c ] );
+
+	// k4 * 125/192 for Yn+1
+	theVelocityBuffer[ c ] += theK4[ c ] * ( 125.0 / 192.0 );
+	// k4 * 393/640 for ~Yn+1
+	theErrorEstimate[ c ] += theK4[ c ] * ( 393.0 / 640.0 );
+
+	// clear velocity
+	aVariable->setVelocity( 0 );
+      }
+
+    // ========= 5 ===========
+    processNormal();
+
+    for( UnsignedInt c( 0 ); c < aSize; ++c )
+      {
+	VariablePtr const aVariable( theWriteVariableVector[ c ] );
+	
+	// get k5
+	theK5[ c ] = aVariable->getVelocity();
+
+	aVariable->loadValue( ( theK1[ c ] * ( 9017.0 / 3168.0 ) 
+				- theK2[ c ] * ( 355.0 / 33.0 )
+				+ theK3[ c ] * ( 46732.0 / 5247.0 )
+				+ theK4[ c ] * ( 49.0 / 176.0 )
+				- theK5[ c ] * ( 5103.0 / 18656.0 ) )
+			      * getStepInterval()
+			      + theValueBuffer[ c ] );
+
+	// k5 * -2187/6784 for Yn+1
+	theVelocityBuffer[ c ] += theK5[ c ] * ( -2187.0 / 6784.0 );
+	// k5 * -92097/339200 for ~Yn+1
+	theErrorEstimate[ c ] += theK5[ c ] * ( -92097.0 / 339200.0 );
+
+	// clear velocity
+	aVariable->setVelocity( 0 );
+      }
+
+    // ========= 6 ===========
+    processNormal();
+
+    for( UnsignedInt c( 0 ); c < aSize; ++c )
+      {
+	VariablePtr const aVariable( theWriteVariableVector[ c ] );
+	
+	// get k6
+	theK6[ c ] = aVariable->getVelocity();
+
+	aVariable->loadValue( ( theK1[ c ] * ( 35.0 / 384.0 ) 
+				+ theK2[ c ] * 0.0
+				+ theK3[ c ] * ( 500.0 / 1113.0 )
+				+ theK4[ c ] * ( 125.0 / 192.0 )
+				- theK5[ c ] * ( 2187.0 / 6784.0 )
+				+ theK6[ c ] * ( 11.0 / 84.0 ) )
+			      * getStepInterval()
+			      + theValueBuffer[ c ] );
+
+	// k6 * 11/84 for Yn+1
+	theVelocityBuffer[ c ] += theK6[ c ] * ( 11.0 / 84.0 );
+	// k6 * 187/2100 for ~Yn+1
+	theErrorEstimate[ c ] += theK6[ c ] * ( 187.0 / 2100.0 );
+
+	// clear velocity
+	aVariable->setVelocity( 0 );
+      }
+
+    // ========= 7 ===========
+    processNormal();
+
+    Real maxError( 0.0 );
+	
+    // restore theValueBuffer
+    for( UnsignedInt c( 0 ); c < aSize; ++c )
+      {
+	VariablePtr const aVariable( theWriteVariableVector[ c ] );
+
+	// get k7
+	theK7[ c ] = aVariable->getVelocity();
+
+	// k7 * 1/40 for ~Yn+1
+	theErrorEstimate[ c ] += theK7[ c ] * ( 1.0 / 40.0 );
+
+	const Real 
+	  aTolerance( eps_rel * 
+		      ( a_y * fabs( theValueBuffer[ c ] ) 
+			+ a_dydt * fabs( theVelocityBuffer[ c ] ) )
+		      + eps_abs );
+
+	const Real
+	  anError( fabs( ( theVelocityBuffer[ c ] 
+			   - theErrorEstimate[ c ] ) / aTolerance ) );
+
+	if( anError > maxError )
+	  {
+	    maxError = anError;
+	    
+	    if( maxError > 1.1 )
+	      {
+		// shrink it if the error exceeds 110%
+		//		    setStepInterval( getStepInterval() 
+		//				     * pow(maxError, -0.2)
+		//				     *  safety );
+		
+		setStepInterval( getStepInterval() * 0.5 );
+		
+		//		    std::cerr << "s " << getCurrentTime() 
+		//			      << ' ' << getStepInterval() 
+		//			      << std::endl;
+		
+		reset();
+
+		return 0;
+	      }
+	  }
+	
+	// restore x (original value)
+	aVariable->loadValue( theValueBuffer[ c ] );
+	
+	/// O(h^6)
+	aVariable->setVelocity( theVelocityBuffer[ c ] );
+      }
+    
+    if( maxError < 0.5 )
+      {
+	// grow it if error is 50% less than desired
+	//	    Real aNewStepInterval( getStepInterval() * 2.0 );
+	
+	Real aNewStepInterval( getStepInterval() 
+			       * pow(maxError, -0.2) * safety );
+	
+	if( aNewStepInterval >= getUserMaxInterval() )
+	  {
+	    aNewStepInterval = getStepInterval();
+	  }
+	
+	//	    	    std::cerr << "g " << getCurrentTime() << ' ' 
+	//	    		      << aStepInterval << std::endl;
+	
+	setNextStepInterval( aNewStepInterval );
+      }
+    else
       {
 	setNextStepInterval( getStepInterval() );
       }
