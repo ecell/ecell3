@@ -25,82 +25,77 @@ class EntityListWindow(OsogoWindow):
 	# ---------------------------------------------------------------
 	def __init__( self, aMainWindow ):
 
-		# initializes parameters
+		# initialize parameters
 		self.theSelectedFullPNList = []
 
-		# calls constructor of super class
+		# call constructor of super class
 		OsogoWindow.__init__( self, aMainWindow )
 		OsogoWindow.openWindow( self )
 
 
-		# creates popupmenu
-		self.thePopupMenu = PopupMenu( aMainWindow.thePluginManager, self )
-		# adds handers
-		self.addHandlers( { 'show_button_clicked'           : self.openNewPluginWindow,
-		                    'system_tree_cursor_changed' : self.updateEntityList,
-		                    'entity_list_cursor_changed'  : self.selectEntity,
-		                    'tree_button_press_event'    : self.popupMenu,
-		                    'list_button_press_event'    : self.popupMenu,
-		                     } )
+		# create popupmenu
+		self.thePopupMenu = PopupMenu( aMainWindow.thePluginManager,\
+					       self )
+		# add handers
+		self.addHandlers( { 'show_button_clicked' :\
+				    self.openNewPluginWindow,\
+		                    'system_tree_cursor_changed' :\
+				    self.updateSystemSelection,\
+		                    'entity_list_cursor_changed' :\
+				    self.selectEntity,\
+		                    'system_tree_button_press_event'    :\
+				    self.popupMenu,\
+		                    'entity_list_button_press_event'    :\
+				    self.popupMenu\
+				    } )
 
 
-		#self.theMainWindow = aMainWindow
 		self.thePaletteWindow = aMainWindow.thePaletteWindow
 
-		# initialize widget
+		# initialize widgets
 		self.theSystemTree = self.getWidget( 'system_tree' )
 		self.theEntityList = self.getWidget( 'entity_list' )
 		self.theTypeOptionMenu = self.getWidget( 'type_optionmenu' )
 		self.theStatusBar = self.getWidget( 'statusbar' )
 
 		self.theTypeMenu = self.theTypeOptionMenu.get_menu()
-		self.theTypeMenu.connect( 'selection-done', self.updateEntityList)
+		self.theTypeMenu.connect( 'selection-done',\
+					  self.updateEntityList )
 
-		aTypeMenuItemMap = self.theTypeMenu.children()
+		aTypeMenuItemMap = self.theTypeMenu.get_children()
 		aTypeMenuItemMap[0].set_data( 'LABEL', 'Variable' )
 		aTypeMenuItemMap[1].set_data( 'LABEL', 'Process' )
 		aTypeMenuItemMap[2].set_data( 'LABEL', 'All' )
 
 		self.theSystemTree.show()
 		self.theEntityList.show()
-		#initialize treestore arbitrarily for 17 levels    
-		self.max_depth=16
+
 		self.displayed_depth=-1
 		
-		self.theSysTreeStore=gtk.TreeStore(gobject.TYPE_STRING,
-    				    gobject.TYPE_STRING,
-    				    gobject.TYPE_STRING,
-    				    gobject.TYPE_STRING,
-    				    gobject.TYPE_STRING,
-    				    gobject.TYPE_STRING,
-    				    gobject.TYPE_STRING,
-    				    gobject.TYPE_STRING,
-    				    gobject.TYPE_STRING,
-    				    gobject.TYPE_STRING,
-    				    gobject.TYPE_STRING,
-    				    gobject.TYPE_STRING,
-    				    gobject.TYPE_STRING,
-    				    gobject.TYPE_STRING,
-    				    gobject.TYPE_STRING,
-    				    gobject.TYPE_STRING,
-    				    gobject.TYPE_STRING)
-				    
-		self.theEntityListStore=gtk.ListStore(gobject.TYPE_STRING)
+		self.theSysTreeStore=gtk.TreeStore( gobject.TYPE_STRING )
 		self.theSystemTree.set_model(self.theSysTreeStore)
-		self.theEntityList.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
-		self.theEntityList.set_model(self.theEntityListStore)
-		for depth in range(0,self.max_depth):
-		    column=gtk.TreeViewColumn('',gtk.CellRendererText(),text=depth)
-		    column.set_visible(gtk.TRUE)
-		    self.theSystemTree.append_column(column)
+				    
+		self.theEntityListStore=gtk.ListStore( gobject.TYPE_STRING )
+		self.theEntityList.get_selection().set_mode( gtk.SELECTION_MULTIPLE )
+		self.theEntityList.set_model( self.theEntityListStore )
+		
+		column=gtk.TreeViewColumn( 'System Tree',
+					   gtk.CellRendererText(),
+					   text=0 )
+		column.set_visible( gtk.TRUE )
+		self.theSystemTree.append_column(column)
 
-		column=gtk.TreeViewColumn('',gtk.CellRendererText(),text=0)
+		column = gtk.TreeViewColumn( 'Entity List',
+					     gtk.CellRendererText(),
+					     text=0 )
 		self.theEntityList.append_column(column)
+
 		aPManager = self.theMainWindow.thePluginManager
-		self.thePropertyWindow = aPManager.createInstance( 'PropertyWindow', [(4, '', '/', '')],'top_vbox' ) 
+		self.thePropertyWindow = aPManager.createInstance( 'PropertyWindow', [(4, '', '/', '')], 'top_vbox' ) 
 		aPropertyWindowTopVBox = self.thePropertyWindow['top_vbox']
 		self['property_frame'].add( aPropertyWindowTopVBox )
 		self.thePropertyWindow['property_clist'].connect( 'select_cursor_row', self.selectPropertyName )
+
 		self.theSysTreeStore.clear()
 		aRootSystemFullID = createFullID( 'System::/' )
 		self.constructTree( None, aRootSystemFullID )
@@ -110,89 +105,81 @@ class EntityListWindow(OsogoWindow):
 	def update( self ):
 		self.theEntityListStore.clear()
 
-		self.updateEntityList()
+		self.updateSystemSelection()
 		self.thePropertyWindow.update()
 
             
 	def constructTree( self, aParentTree, aSystemFullID ):
-		newlabel=aSystemFullID[ID] 
-#		aLeaf.set_data( 'FULLID', aSystemFullID )
-#		aLeaf.connect( 'select', self.selectSystem )
+		newlabel = aSystemFullID[ID] 
 	 
-		iter=self.theSysTreeStore.append ( aParentTree )
-		depth=self.theSysTreeStore.iter_depth ( iter )
+		iter  = self.theSysTreeStore.append( aParentTree )
+#		depth = self.theSysTreeStore.iter_depth ( iter )
 
-		self.theSysTreeStore.set_value(iter,depth,newlabel)
-		key=str(self.theSysTreeStore.get_path(iter))
-		self.theSysTreeStore.set_data(key,aSystemFullID )
-#		aLeaf.show()
-#		if depth>self.displayed_depth:
-		    #display new depth
-#		    self.displayed_depth+=1
-#		column=gtk.TreeViewColumn('',gtk.CellRendererText(),text=depth)
-#		if depth<self.max_depth:
-#			self.theSystemTree.append_column(column)
+		self.theSysTreeStore.set_value( iter, 0, newlabel )
+		key = str( self.theSysTreeStore.get_path( iter ) )
+		self.theSysTreeStore.set_data( key, aSystemFullID )
 		    
 		aSystemListFullPN = convertFullIDToFullPN( aSystemFullID, 'SystemList' ) 
 		aSystemList = self.theMainWindow.theSession.theSimulator.getEntityProperty( createFullPNString( aSystemListFullPN ) )
-		if aSystemList != ():
-#			aTree = gtk.Tree()
-#			aLeaf.set_subtree( aTree )
-#			aLeaf.expand()
+		
+		aSystemListLength = len( aSystemList )
+
+		if  aSystemListLength != 0:
 
 			for aSystemID in aSystemList:
 				aSystemPath = createSystemPathFromFullID( aSystemFullID )
 				aNewSystemFullID = ( SYSTEM, aSystemPath, aSystemID )
 				self.constructTree( iter, aNewSystemFullID )
 
-	def updateEntityList( self, obj=None ):
+			if aSystemListLength <= 5:
+				aPath = self.theSysTreeStore.get_path( iter )
+				self.theSystemTree.expand_row( aPath,
+							       gtk.FALSE )
+
+
+	def updateSystemSelection( self, obj=None ):
 		aSelectedSystemIter = self.theSystemTree.get_selection().get_selected()[1]
-		if aSelectedSystemIter == None :
+		if aSelectedSystemIter == None:
 			return
+
+		self.updateEntityList( aSelectedSystemIter )
+
+#		self.selectSystem( aSelectedSystemIter )
+
+
+	def updateEntityList( self, aSelectedSystemIter ):
+
 		aSelectedTypeMenuItem = self.theTypeMenu.get_active()
-		#aPrimitiveTypeString = aSelectedTypeMenuItem.get_data( 'LABEL' )
 		aEntityTypeString = aSelectedTypeMenuItem.get_data( 'LABEL' )
 		key=str(self.theSysTreeStore.get_path(aSelectedSystemIter))
     		aSystemFullID = self.theSysTreeStore.get_data( key )
-		self.theEntityListStore.clear(  )
-		#if aPrimitiveTypeString == 'All':
+		self.theEntityListStore.clear()
 		if aEntityTypeString == 'All':
 			self.listEntity( 'Variable', aSystemFullID )
 			self.listEntity( 'Process', aSystemFullID )
 		else:
-			#self.listEntity( aPrimitiveTypeString, aSystemFullID )
 			self.listEntity( aEntityTypeString, aSystemFullID )
 
-	#def listEntity( self, aPrimitiveTypeString, aSystemFullID ):
 	def listEntity( self, aEntityTypeString, aSystemFullID ):
-		#aListPN = aPrimitiveTypeString + 'List'
+
 		aListPN = aEntityTypeString + 'List'
 		aListFullPN = convertFullIDToFullPN( aSystemFullID, aListPN ) 
 		aEntityList = self.theMainWindow.theSession.theSimulator.getEntityProperty( createFullPNString( aListFullPN ) )
 		
-		for aEntityID in aEntityList:
+		if aEntityTypeString == 'Variable':
+			aEntityType = VARIABLE
+		elif aEntityTypeString == 'Process':
+			aEntityType = PROCESS
+
+		for anEntityID in aEntityList:
 			iter = self.theEntityListStore.append()
-			self.theEntityListStore.set_value(iter,0,aEntityID)
+			self.theEntityListStore.set_value(iter,0,anEntityID)
             
-			#if aPrimitiveTypeString == 'Variable':
-			if aEntityTypeString == 'Variable':
-				#aPrimitiveType = VARIABLE
-				aEntityType = VARIABLE
-			#elif aPrimitiveTypeString == 'Process':
-			elif aEntityTypeString == 'Process':
-				aEntityType = PROCESS
-
 			aSystemPath = createSystemPathFromFullID( aSystemFullID )
+			aEntityFullPN = ( aEntityType, aSystemPath, anEntityID, '' )
 
-			#aEntityFullPN = ( aPrimitiveType, aSystemPath, aEntityID, '' )
-			aEntityFullPN = ( aEntityType, aSystemPath, aEntityID, '' )
-#            aEntityFullPN = ( aPrimitiveType, aSystemPath, aEntityID, 'Value' )
-
-			self.theEntityListStore.set_data( aEntityID, aEntityFullPN)
-#            aFullPNList = ( aEntityFullPN, )
-
-#			self.theEntityList.add( aListItem )
-#			aListItem.show()
+			self.theEntityListStore.set_data( anEntityID, aEntityFullPN )
+			print self.theEntityListStore.get_value(iter,0)
 
 	def selectEntity( self, aEntityList ):
 		self.theSelectedFullPNList = []
@@ -219,14 +206,14 @@ class EntityListWindow(OsogoWindow):
 			self.theSelectedFullPNList.append( aFullPN )
 		self.updateStatusBar()
         
-#	def selectSystem( self, aTreeItemObj ):
-#		aFullID = aTreeItemObj.get_data('FULLID')
-#		aFullPN = convertFullIDToFullPN( aFullID )
-#		self.theSelectedFullPNList = [ aFullPN ]
-
-#		self.thePropertyWindow.theRawFullPNList = self.theSelectedFullPNList
-#		self.thePropertyWindow.setFullPNList()
-#		self.updateStatusBar()
+	def selectSystem( self, iter ):
+		key = str( self.theSysTreeStore.get_path( iter ) )
+		aFullID = self.theSysTreeStore.get_data( key )
+		aFullPN = convertFullIDToFullPN( aFullID )
+		self.theSelectedFullPNList = [ aFullPN ]
+		self.thePropertyWindow.theRawFullPNList = self.theSelectedFullPNList
+		self.thePropertyWindow.setFullPNList()
+		self.updateStatusBar()
 
 	def updateStatusBar( self ):
 		aStatusString = 'Selected: '

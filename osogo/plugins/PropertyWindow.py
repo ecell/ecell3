@@ -65,9 +65,9 @@ class PropertyWindow(OsogoPluginWindow):
 		self.thePropertyCList.append_column(column)
 		column=gtk.TreeViewColumn("Value",renderer,text=VALUE_COL)
 		self.thePropertyCList.append_column(column)
-		column=gtk.TreeViewColumn("Gettable",renderer,text=GETABLE_COL)
+		column=gtk.TreeViewColumn("Get",renderer,text=GETABLE_COL)
 		self.thePropertyCList.append_column(column)
-		column=gtk.TreeViewColumn("Settable",renderer,text=SETTABLE_COL)
+		column=gtk.TreeViewColumn("Set",renderer,text=SETTABLE_COL)
 		self.thePropertyCList.append_column(column)
 		
 		
