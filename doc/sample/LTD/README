@@ -46,14 +46,14 @@ LTD.em:     Model file(em file) for this model
 
 1. (If necessary) Convert the .em file to .eml file.
 
-   % em2eml LTD.em
+   % ecell3-em2eml LTD.em
    % ls LTD.eml
    LTD.eml
 
 
 2. Compile .dm files.
 
-   Run emtool -a for each .dm file.
+   Run ecell3-dmc for each .cpp file.
 
    % ecell3-dmc ...cpp
 
