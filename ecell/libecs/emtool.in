@@ -151,9 +151,6 @@ if [ $DO_ALL ] ; then
 	exit 0
     fi
     
-    run_command "cp $inputfile $ETTMPDIR"
-    run_command "pushd $ETTMPDIR"
-    
     if [ $DO_TEMPLATE ] ; then 
 	if [ $DO_MUNCH ] ; then 
 	    run_command "$DMGEN $CLASS -d $inputfile -t $templatefile -m $munchfile"
@@ -168,14 +165,13 @@ if [ $DO_ALL ] ; then
         fi
     fi    
 
-    run_command "popd"
-
     if [ $DO_INCLUDE ] ; then 
 	run_command "$DMCOMPILE $base.cpp -I $includefile -I $ECELL_INCLUDE -I $EMTOOL_INCLUDE -I . -I .." 
     else
 	run_command "$DMCOMPILE $base.cpp -I $ECELL_INCLUDE -I $EMTOOL_INCLUDE -I . -I .." 
     fi
 
+    run_command rm $base.cpp
     echo "generate $base.so"
 fi
 

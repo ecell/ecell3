@@ -1,16 +1,16 @@
 #!/bin/sh
 
 
-prefix=@prefix@
-exec_prefix=@exec_prefix@
-libdir=@libdir@
+prefix=/home/tomo/wrk/local
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
 
 
-CXX=@CXX@
-CXXFLAGS="@CXXFLAGS@"
+CXX=c++
+CXXFLAGS="-g -O2"
 LDADD=-lstdc++
-SHLEXT=@LTDL_SHLIB_EXT@
-BASENAME=@BASENAME@
+SHLEXT=.so
+BASENAME=basename
 CXXSUFFIX=".cpp"
 
 VERBOSE=1

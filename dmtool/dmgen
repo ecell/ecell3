@@ -1,364 +1,89 @@
-#!/usr/bin/python
-##::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-##
-##        This file is part of E-CELL Simulation Environment package
-##
-##                Copyright (C) 2000 - 2001 E-CELL Project
-##
-##::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-##
-##
-## dmtool is free software; you can redistribute it and/or
-## modify it under the terms of the GNU General Public
-## License as published by the Free Software Foundation; either
-## version 2 of the License, or (at your option) any later version.
-## 
-## dmtool is distributed in the hope that it will be useful,
-## but WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-## See the GNU General Public License for more details.
-## 
-## You should have received a copy of the GNU General Public
-## License along with dmtool -- see the file COPYING.
-## If not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-## 
-##END_HEADER
-##
-## written by Yusuke Saito <zhaiteng@e-cell.org> and
-##            Kouichi Takahashi <shafi@e-cell.org> at
-## E-CELL Project, Institute for Advanced Biosciences, Keio University
-##
-
-## standard module ##
-
-import sys
-import re
-import string
-import os
-import glob
-
-class DmFile:
-      
-      commentRegex = re.compile( r'^\#' )
-      nlRegex      = re.compile( r'^\n' )
-      patternRegex = re.compile( r'([\@\%])(\w+):\s*(.*)' )
-
-      def __init__( self, infilename ):
-            self.dic = {}
-            self.keynum = {}
-            self.property = {}
-            self.out = ''
-            self.prekey = ''
-            self.read( infilename )
-
-      def read( self, infile ):
-            self.file = infile
-            try:
-                  fp = open( self.file, 'r' )
-            except:	
-                  print self.file, ": file not found."
-                  sys.exit( 1 )
-            while 1:
-                  line = fp.readline()
-
-                  # End of file
-                  if not line:
-                        break
-
-                  # skip comment or empty line
-                  if DmFile.commentRegex.match( line )\
-                     or DmFile.nlRegex.match( line ):
-                        continue
-                  match = DmFile.patternRegex.match( line )               
-                  if not match:
-                        self.dic[self.prekey] = self.dic[self.prekey] + line
-                        continue
-
-                  type  = match.group( 1 )                  
-                  key   = match.group( 2 )                                    
-                  value = match.group( 3 )
-                  
-                  if key == self.prekey:                  
-                        self.keynum[key] = self.keynum[key] + 1
-                  else:
-                        self.keynum[key] = 0
-                        self.property[key] = {}
-                  
-                  # get it!
-                  self.dic[key] = value
-
-                  # array type                   
-                  if type == "%":
-                        list = string.splitfields( value, "," )
-                        self.property[key][self.keynum[key]] = list
-                  self.prekey = key
-
-class DmTemplate:
-
-      regex1 = re.compile( r'\#\(\@(\w+)\)' )
-      regex2 = re.compile( r'\#\(\%(.+)\)' )
-      regex3 = re.compile( r'\#\(\&(\w+:\w+)\)' )
-
-      def __init__( self, templatedir ):
-            self.templatedir = templatedir
-      
-      def setDmFile( self, dmfile ):
-            self.dmfile = dmfile
-
-      def write( self, dmfile, mastertemplate, outfile ):
-
-            try:
-                  fp = open( outfile, 'w' )
-            except:
-                  print "Couldn't write " + outfile + "."
-                  sys.exit( 1 )
-            buffer = self.generate( mastertemplate )
-
-            # flush the buffer
-            fp.write( buffer )
-            fp.close()
-
-      def generate( self, keyname , no = 0):
-
-            buffer = ''
-            template_file = self.templatedir + '/' + keyname
-
-            try:
-                  tp = open( template_file, 'r' )
-            except:
-                  print "template " + template_file + ": not found."
-                  sys.exit( 1 )
-
-            while 1:
-                  line = tp.readline()
-                  
-                  if not line:
-                        break
-
-                  if DmTemplate.regex1.search( line ):
-                        line = self.sub( line , no)  
-                        buffer = buffer + line
-                        continue
-                  match = DmTemplate.regex2.search( line )
-                  if match:
-                        name = match.group( 1 )
-                        line = ''
-                        key = string.split( name , ':' )
-                        for i in range (len(self.dmfile.property[key[1]])): 
-                              line =  line + self.generate( key[0] , i)
-                        buffer = buffer + line
-                        continue
-                        
-
-                  if DmTemplate.regex3.search( line ):
-                        line = self.sub( line ,no )
-                        buffer = buffer + line                        
-                        continue
-                  
-                  buffer = buffer + line
-
-            return buffer
-
-      def sub( self, line ,no = 0):
-            buffer = ''
-            while 1:
-
-                  flg = 0
-
-                  match = DmTemplate.regex1.search( line )
-                  if match:
-                        key = match.group( 1 )
-                        if not self.dmfile.dic.has_key( key ):
-                              print "Keyword " + key + " not found."
-                              sys.exit( 1 )
-                        line = string.replace(line ,'#(@'+key+')',
-                                              self.dmfile.dic[key])
-                        flg = 1
-            
-                  match = DmTemplate.regex2.search( line )      
-                  if match:
-                        line = ''
-                        flg = 1
-
-                  match = DmTemplate.regex3.search( line )
-                  if match:
-                        key = match.group( 1 )
-			subkey = string.split(key , ':')
-			if not self.dmfile.dic.has_key( subkey[0] ):
-                              print "Keyword " + key + " not found."
-                              sys.exit( 1 )			
-			
-			if subkey[1] == 'c':
-			      subname = string.strip(
-                                    self.dmfile.property[subkey[0]][no][1] )
-		              subname = self.checkParameterType( subname )
-			else:
-			      subname = string.strip(self.dmfile.property[subkey[0]][no][string.atoi(subkey[1])] )
-                        
-			line = string.replace( line , '#(&'+key+')', subname)
-                        flg = 1
-
-                  if flg == 0:
-                        buffer = line
-                        break
-
-            return buffer
-	             
-      def checkParameterType( self, type):      
-	
-	    if type == 'Int':
-		  type = '0'
-		  
-	    elif type == 'Float':
-                  type = '0.0'
-
-	    elif type == 'Real':
-     	          type = '0.0'
-                        
-	    elif type == 'String':	
-	          type = ' /'/' '
-
-	    else:
-		print "type"+' is not defined.'
-
-	    return type
-
-if __name__ == "__main__":
-      
-      #import getopt
-      
-      def printHelp():
-            print sys.argv[0], \
-                  """[-h] [-d outdir] [-o outprefix] [-t templatedir]"""\
-                  """infile"""
-
-      outprefix = ''
-      outdir = '.'
-      templatedir = '/usr/share/dm/templates/reactor'
-
-      masterprefix = 'reactor'
-
-      #try:
-            #opts, pargs = getopt.getopt( sys.argv[1:],'ho:t:d:' )
-      #except getopt.GetoptError, e:
-            #print e
-            #sys.exit( 1 )
-
-      #print opts
-      #for opt, arg in opts:
-            #if opt == '-h':
-                  #printHelp()
-                  #sys.exit( 0 )
-            #elif opt == '-d':
-                  #outdir = arg
-            #elif opt == '-o':
-                  #outprefix = arg                  
-            #elif opt == '-t':
-                  #templatedir = arg
-                  #print arg
-            #else:
-                  #print "invalid option:", opt
-                  #sys.exit( 1 )
-      if sys.argv[2] = '-t':
-            templatedir = sys.argv[3]
-      else:
-            print "Usage :dmgen [dmfilename] -t [templatedir]"
-            sys.exit(0)
-      infilename = pargs[0]
-      
-      if infilename == '':
-            printHelp()
-            sys.exit( 1 )
-      
-      dmfile = DmFile( infilename )
-      
-      dmtemplate = DmTemplate( templatedir )
-      dmtemplate.setDmFile( dmfile )
-
-      # mastertemplates = templatedir/MASTER.*
-
-      mastertemplates = templatedir + "/" + masterprefix + ".*"
-
-      os.path.expanduser( mastertemplates )
-      os.path.expandvars( mastertemplates )
-      mastertemplates = glob.glob( mastertemplates )
-      
-      if len( mastertemplates ) == 0:
-            print "no template found in [" + templatedir + "]."
-            sys.exit( 1 )
-
-      # generate file for each master template
-
-      filename = string.split( infilename , '.')     
-
-      if outprefix == '':
-            outprefix = filename[0]
-
-      for template in mastertemplates:
-            
-            templatesparts = string.split( template , '/')             
-            dmname = string.split( templatesparts[-1], '.')
-            outfile = outdir + '/' + outprefix + '.' + dmname[-2]   
-            print outfile
-            dmtemplate.write( dmfile, os.path.basename( template ), outfile )
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+#!/bin/sh
+#
+# dmgen --- a program to docify dynamic module in 
+#           E-CELL Simulation Environment Version 3
+#
+# author:  Tomoya Kitayama <tomo@e-cell.org>
+#
+
+PACKAGE=dmtool
+VERSION=3.0.4
+
+prefix=/home/tomo/wrk/local
+exec_prefix=/home/tomo/wrk/local
+pythondir=${prefix}/lib/python2.2/site-packages
+
+SHAREDIR="${prefix}/share/ecell/3.0.4/template"
+BINDIR="${exec_prefix}/bin"
+MUNCHBIN="${pythondir}/ecell/munch.py"
+TMPLDIR="${prefix}/share/ecell/3.0.4/template"
+
+MUNCHSUFFIX=".mu"
+TMPLSUFFIX=".tmpl"
+
+
+help() 
+{
+cat << EOT_HELP
+
+Usage:
+	`basename $0` <classname> [OPTIONS] files...
+	`basename $0` -h|--help
+Options:
+	-d|--dmfilename)    Specify dmfile
+	-t|--template)      Specify template file
+        -m|--munch)         Specify munch file
+	-h|--help)          Print this massage
+EOT_HELP
+}
+
+#at least one argument is required
+
+if [ -z $1 ] ;then 
+    $1
+    help;
+    echo $1
+    exit 1
+fi
+
+# print help message
+ 
+if [ "$1" = "-h" -o "$1" = "--help" ] ; then
+    help
+    exit 0
+fi
+
+# get dynamic module class
+CLASS=$1
+shift
+
+while [ -n "$(echo $1 | grep '-')" ]; do
+    case "$1" in
+	-d|--dmfile) DMFILE=$2 ; shift 2 ;;
+	-t|--template) DO_TEMPLATE=yes ; TEMPLATEFILE=$2 ; shift 2 ;;
+	-m|--munch) DO_MUNCH=yes ; MUNCHFILE=$2 ; shift 2 ;;
+	-h|--help) help ; exit 0 ;;
+	*) echo "Invalid Option! " ; help ; exit 1 ;;
+    esac
+done
+
+# munch command
+
+base=`basename $DMFILE .dm`
+
+if [ $DO_TEMPLATE ] ; then 
+    TMPLFILE="${TEMPLATEFILE}"
+else
+    TMPLFILE="${TMPLDIR}/${CLASS}/${CLASS}${TMPLSUFFIX}"
+fi
+
+if [ $DO_MUNCH ] ; then 
+    MUNCHFILE="${MUNCHFILE}"
+else
+    MUNCHFILE="${TMPLDIR}/${CLASS}/${CLASS}${MUNCHSUFFIX}"
+fi
+
+python $MUNCHBIN $MUNCHFILE $DMFILE $TMPLFILE > $base.cpp
+
+exit 0
 
