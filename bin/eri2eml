@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env ecell3
 
 # $Id$
 # Eri to Eml converter
@@ -146,7 +146,7 @@ Options:
                 if ( aSystemID == '/ENVIRONMENT'):
                     aSystemFullID = 'System::/'    # /ENVIRONMENT set as the RootSystem
                 else:
-                    aSystemFullID = anEml.convertSystemID2SystemFullID( aSystemID )
+                    aSystemFullID = convertSystemID2SystemFullID( aSystemID )
                 anEriChunk = anEriLine[4].split()
 #                print anEriChunk[1:]
                 anEml.setEntityProperty( aSystemFullID, 'Volume', anEriChunk[1:] )
