@@ -27,5 +27,10 @@ defineMethod( 'process', '''
   F /= b + sqrt(x);
 
   F *= getSuperSystem()->getVolume() * N_A;
+  if( F < 0 )
+  {
+    F = 0;
+  }
+
   P0.getVariable()->setValue(F);
 ''' )
