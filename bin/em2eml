@@ -1,5 +1,17 @@
 #!/usr/bin/env python2
 
+"""
+A program for converting .em file to EML.
+This program is part of E-Cell Simulation Environment Version 3.
+"""
+
+__program__ = 'em2eml'
+__version__ = '0.3'
+__author__ = 'Kentarou Takahashi and Kouichi Takahashi <shafi@e-cell.org>'
+__copyright__ = 'Copyright (C) 2002 Keio University'
+__license__ = 'GPL'
+
+
 import sys
 import os
 import string 
