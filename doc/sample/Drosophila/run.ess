@@ -1,4 +1,4 @@
-loadModel( 'droTest.eml' )
+loadModel( 'Drosophila.eml' )
 
 a = createEntityStub( 'Variable:/CELL/CYTOPLASM:P0' )
 #s = createStepperStub( 'DE' )
