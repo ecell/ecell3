@@ -114,6 +114,8 @@ public:\
   DEFINE_EXCEPTION( CantOpen,              Exception); 
   DEFINE_EXCEPTION( CallbackFailed,        Exception);
   DEFINE_EXCEPTION( AssertionFailed,       Exception);
+  DEFINE_EXCEPTION( RangeError,            Exception);
+  DEFINE_EXCEPTION( AlreadyExist,          Exception);
 
   // simulation errors
   DEFINE_EXCEPTION( InitializationFailed,  Exception);

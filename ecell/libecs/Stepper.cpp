@@ -238,8 +238,7 @@ namespace libecs
   {
     StepperWithEntityCache::initialize();
 
-    //FIXME: memory leak!!
-    distributeIntegrator( IntegratorAllocator( theIntegratorAllocator ) );
+    distributeIntegrator( theIntegratorAllocator );
   }
 
   void SRMStepper::distributeIntegrator( IntegratorAllocator allocator )

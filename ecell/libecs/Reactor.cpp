@@ -59,7 +59,8 @@ namespace libecs
 
   void Reactor::setReactant( UVariableVectorRCPtrCref aMessage )
   {
-    //FIXME: range check
+    checkSequenceSize( *aMessage, 3 );
+
     registerReactant( (*aMessage)[0].asString(), 
 		      FullID( (*aMessage)[1].asString() ), 
 		      (*aMessage)[2].asInt() );

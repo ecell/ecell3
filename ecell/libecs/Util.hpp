@@ -33,8 +33,11 @@
 #include <stdlib.h>
 #include <sstream>
 #include <functional>
+#include <limits>
 
 #include "Defs.hpp"
+#include "Exceptions.hpp"
+
 #include "korandom/korandom.h"
 
 namespace libecs
@@ -118,6 +121,31 @@ namespace libecs
   };
 
 
+  /**
+     Check if aSequence's size() is within [ aMin, aMax ].  
+
+     If not, throw a RangeError exception.
+
+  */
+
+  template <class Sequence>
+  void checkSequenceSize( const Sequence& aSequence, 
+			  const typename Sequence::size_type aMin, 
+			  const typename Sequence::size_type aMax = 
+			  std::numeric_limits<typename Sequence::size_type>
+			  ::max() )
+  {
+    const typename Sequence::size_type aSize( aSequence.size() );
+    if( aSize < aMin || aSize > aMax )
+      {
+	THROW_EXCEPTION( RangeError,
+			 "Size of the sequence must be within [ " 
+			 + toString( aMin ) + ", " + toString( aMax )
+			 + " ] ( " + toString( aSize ) + " given)." );
+      }
+  }
+
+
 
   /**
      For each element of a sequence, call a given method.
@@ -155,6 +183,12 @@ namespace libecs
        i != (SEQ) .end() ; ++i )\
     { (*i)-> METHOD (); }
 
+
+  /**
+     For each 'second' member of element in a sequence, call a given method.
+     
+     \sa FOR_ALL
+  */
 
 #define FOR_ALL_SECOND( SEQCLASS, SEQ, METHOD )\
   for( SEQCLASS ## ConstIterator i( (SEQ) .begin() ) ;\

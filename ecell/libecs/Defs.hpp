@@ -118,18 +118,15 @@ namespace libecs
 
   // Numeric types
 
-  // FIXME: use numeric_limits
-  //  DECLARE_TYPE( int64_t, Int );
-  //  DECLARE_TYPE( uint64_t, UnsignedInt );
-  //  const int INT_SIZE( sizeof( Int ) );
-
   DECLARE_TYPE( long int, Int );
   DECLARE_TYPE( unsigned long int, UnsignedInt );
 
-  DECLARE_TYPE( corelinux::Real, Real );
+  // these can cause problem when used as template parameters
+  //  DECLARE_TYPE( int64_t, Int );
+  //  DECLARE_TYPE( uint64_t, UnsignedInt );
 
-  // FIXME: not portable
-  const int REAL_DIG( DBL_DIG );
+  DECLARE_TYPE( double, Real );
+
 
   //! Avogadro number. 
   const Real N_A( 6.0221367e+23 );

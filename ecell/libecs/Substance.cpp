@@ -62,7 +62,7 @@ namespace libecs
 
   void Substance::setAccumulatorClass( UVariableVectorRCPtrCref aMessage )
   {
-    // FIXME: range check
+    checkSequenceSize( *aMessage, 1 );
 
     setAccumulator( (*aMessage)[0].asString() );
   }
@@ -102,28 +102,9 @@ namespace libecs
 
   void Substance::setAccumulator( StringCref anAccumulatorClassname )
   {
-    try {
-      AccumulatorPtr aAccumulatorPtr( getModel()->getAccumulatorMaker()
-				      .make( anAccumulatorClassname ) );
-      setAccumulator( aAccumulatorPtr );
-
-      if( anAccumulatorClassname != userDefaultAccumulatorName() )
-	{
-	  //FIXME:    *theMessageWindow << "[" << fqpi() 
-	  //FIXME: << "]: accumulator is changed to: " << classname << ".\n";
-	}
-    }
-    catch( Exception& e )
-      {
-	//FIXME:     *theMessageWindow << "[" << fqpi() << "]:\n" << e.message();
-	// warn if theAccumulator is already set
-	if( theAccumulator != NULLPTR )   
-	  {
-	    //FIXME: *theMessageWindow << "[" << fqpi() << 
-	    //FIXME: "]: falling back to :" << theAccumulator->className() 
-	    //FIXME: << ".\n";
-	  }
-      }
+    AccumulatorPtr aAccumulatorPtr( getModel()->getAccumulatorMaker()
+				    .make( anAccumulatorClassname ) );
+    setAccumulator( aAccumulatorPtr );
   }
 
   void Substance::setAccumulator( AccumulatorPtr anAccumulator )
@@ -190,13 +171,6 @@ namespace libecs
 	  }
       }
   }
-
-  //FIXME: inline this
-  //  void Substance::updateConcentration()
-  //  {
-  //    theConcentration = 
-  //      getSuperSystem()->calculateConcentration( theQuantity );
-  //  }
 
 
 } // namespace libecs

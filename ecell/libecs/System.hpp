@@ -139,7 +139,11 @@ namespace libecs
 
     /**
        Register a Reactor object in this System.
+
+       This method steals ownership of the given pointer, and deletes
+       it if there is an error.
     */
+
     void registerReactor( ReactorPtr aReactor );
   
     /**
@@ -152,6 +156,9 @@ namespace libecs
 
     /**
        Register a Substance object in this System.
+
+       This method steals ownership of the given pointer, and deletes
+       it if there is an error.
     */
     void registerSubstance( SubstancePtr aSubstance );
   
@@ -162,7 +169,10 @@ namespace libecs
     SubstancePtr getSubstance( StringCref id );
 
     /**
-       Register a System object in this System
+       Register a System object in this System.
+
+       This method steals ownership of the given pointer, and deletes
+       it if there is an error.
     */
     void registerSystem( SystemPtr aSystem );
 

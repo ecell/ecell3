@@ -46,7 +46,6 @@ namespace libecs
    * @{ 
    */ 
   
-  // FIXME: contain instances, not pointers
   DECLARE_ASSOCVECTOR( String, Reactant, std::less< const String >, 
 		       ReactantMap  );
 

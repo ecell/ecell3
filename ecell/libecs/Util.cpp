@@ -28,6 +28,7 @@
 // E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
 
+#include <limits>
 #include <time.h>
 
 #include "Exceptions.hpp"
@@ -65,7 +66,7 @@ namespace libecs
   template<> const String toString<Real>( RealCref f )
   { 
     std::ostringstream os;
-    os.precision( REAL_DIG );
+    os.precision( std::numeric_limits<Real>::digits10 );
     os << f;
     os << std::ends;
     return os.str();

@@ -115,7 +115,8 @@ namespace libecs
 
   void System::setStepperID( UVariableVectorRCPtrCref aMessage )
   {
-    //FIXME: range check
+    checkSequenceSize( *aMessage, 1 );
+
     setStepperID( (*aMessage)[0].asString() );
   }
 
@@ -224,14 +225,18 @@ namespace libecs
 
   void System::registerReactor( ReactorPtr aReactor )
   {
-    if( getReactorMap().find( aReactor->getID() ) != getReactorMap().end() )
+    const String anID( aReactor->getID() );
+
+    if( getReactorMap().find( anID ) != getReactorMap().end() )
       {
 	delete aReactor;
-	//FIXME: throw exception
-	return;
+
+	THROW_EXCEPTION( AlreadyExist, 
+			 "[" + getFullID().getString() + 
+			 "]: Reactor [" + anID + "] already exist." );
       }
 
-    theReactorMap[ aReactor->getID() ] = aReactor;
+    theReactorMap[ anID ] = aReactor;
     aReactor->setSuperSystem( this );
     aReactor->setModel( getModel() );
 
@@ -255,15 +260,18 @@ namespace libecs
 
   void System::registerSubstance( SubstancePtr aSubstance )
   {
-    if( getSubstanceMap().find( aSubstance->getID() ) 
-	!= getSubstanceMap().end() )
+    const String anID( aSubstance->getID() );
+
+    if( getSubstanceMap().find( anID ) != getSubstanceMap().end() )
       {
 	delete aSubstance;
-	//FIXME: throw exception
-	return;
+
+	THROW_EXCEPTION( AlreadyExist, 
+			 "[" + getFullID().getString() + 
+			 "]: Substance [" + anID + "] already exist." );
       }
 
-    theSubstanceMap[ aSubstance->getID() ] = aSubstance;
+    theSubstanceMap[ anID ] = aSubstance;
     aSubstance->setSuperSystem( this );
     aSubstance->setModel( getModel() );
 
@@ -287,14 +295,18 @@ namespace libecs
 
   void System::registerSystem( SystemPtr aSystem )
   {
-    if( getSystemMap().find( aSystem->getID() ) != getSystemMap().end() )
+    const String anID( aSystem->getID() );
+
+    if( getSystemMap().find( anID ) != getSystemMap().end() )
       {
 	delete aSystem;
-	//FIXME: throw exception
-	return;
+
+	THROW_EXCEPTION( AlreadyExist, 
+			 "[" + getFullID().getString() + 
+			 "]: System [" + anID + "] already exist." );
       }
 
-    theSystemMap[ aSystem->getID() ] = aSystem;
+    theSystemMap[ anID ] = aSystem;
     aSystem->setSuperSystem( this );
     aSystem->setModel( getModel() );
 

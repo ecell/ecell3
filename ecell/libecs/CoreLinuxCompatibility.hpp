@@ -111,13 +111,6 @@ typedef const mytype & mytype ## Cref;
 
   // from Types.hpp
 
-
-  // *******************************************
-  // Floating Point.
-  // *******************************************
-
-  DECLARE_TYPE( double, Real );
-   
   // *******************************************
   // Define the void pointer type.
   // *******************************************
