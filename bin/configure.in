@@ -7,7 +7,6 @@ dnl Checks for programs.
 dnl AC_PROG_CC
 
 dnl Checks for libraries.
-AC_PROG_LIBTOOL
 AC_PROG_CXX
 
 dnl Checks for header files.
