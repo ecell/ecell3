@@ -37,6 +37,13 @@
 namespace libecs
 {
 
+  DECLARE_CLASS( SimpleAccumulator );
+  DECLARE_CLASS( RoundDownAccumulator );
+  DECLARE_CLASS( RoundOffAccumulator );
+  DECLARE_CLASS( ReserveAccumulator );
+  DECLARE_CLASS( MonteCarloAccumulator );
+
+
   class Accumulator
   {
 

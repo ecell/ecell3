@@ -52,23 +52,33 @@ namespace libemc
 
     virtual libecs::RootSystemRef getRootSystem() = 0;
 
-    virtual void createEntity( libecs::StringCref classname, 
-			       libecs::FQPICref   fqpi, 
-			       libecs::StringCref name ) = 0;
+    virtual void createEntity( libecs::StringCref    classname, 
+			       libecs::PrimitiveType type,
+			       libecs::StringCref    systempath,
+			       libecs::StringCref    id,
+			       libecs::StringCref    name ) = 0;
 
-    virtual void setProperty( libecs::FQPICref    fqpi, 
-			      libecs::MessageCref message ) = 0;
+    virtual void setProperty( libecs::PrimitiveType       type,
+			      libecs::StringCref          systempath,
+			      libecs::StringCref          id,
+			      libecs::StringCref          propertyname,
+			      libecs::UVariableVectorCref data ) = 0;
 
-    virtual const libecs::Message 
-    getProperty( libecs::FQPICref   fqpi, 
-		 libecs::StringCref propertyName ) = 0;
+    virtual const libecs::UVariableVector 
+    getProperty( libecs::PrimitiveType type,
+		 libecs::StringCref    systempath,
+		 libecs::StringCref    id,
+		 libecs::StringCref    propertyname ) = 0;
 
     virtual void step() = 0;
 
     virtual void initialize() = 0;
 
-    virtual libecs::LoggerCptr getLogger( libecs::StringCref,
-					  libecs::StringCref ) = 0;
+    virtual libecs::LoggerCptr 
+    getLogger( libecs::PrimitiveType type,
+	       libecs::StringCref    systempath,
+	       libecs::StringCref    id,
+	       libecs::StringCref    propertyname ) = 0;
 
   };   //end of class Simulator
 

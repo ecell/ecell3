@@ -58,7 +58,6 @@ public:
   Object step( const Tuple& args );
   Object initialize( const Tuple& args );
   Object getLogger( const Tuple& args );
-  Object setLogger( const Tuple& args );
 
 };
 

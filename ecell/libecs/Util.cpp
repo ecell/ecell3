@@ -110,15 +110,28 @@ namespace libecs
     return str.substr( s, l );
   }
 
+  void eraseWhiteSpaces( StringRef str )
+  {
+    String::size_type p( 0 );
+    while( ( p = str.find_first_of( " \t\n", p ) ) != String::npos )
+      {
+	str.erase( p, 1 );
+      }
+  }
+
 
 } // namespace libecs
 
 
 #ifdef UTIL_TEST
 
+using namespace libecs;
+
 main()
 {
-
+  String str( "  \t  a bcde f\tghi\n\t jkl\n \tmnopq     \n   \t " );
+  eraseWhiteSpaces( str );
+  cerr << '[' << str << ']' << endl;
 
 }
 

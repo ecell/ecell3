@@ -34,12 +34,15 @@
 #include <stdint.h>
 #include <float.h>
 #include <string>
+#include <list>
+#include <vector>
+
 #include "config.h"
 
 #include "CoreLinuxCompatibility.hpp"
 
 //FIXME: shold be removed
-using namespace std;
+//using namespace std;
 
 // cmath
 
@@ -80,6 +83,8 @@ namespace libecs
 
   DECLARE_TYPE( std::string, String );
 
+  DECLARE_LIST  ( String, StringList );
+  DECLARE_VECTOR( String, StringVector );
 
   // Numeric types
 

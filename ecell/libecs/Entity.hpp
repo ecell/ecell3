@@ -73,25 +73,17 @@ namespace libecs
 
        @param entryname entryname of this Entry.
     */
-    void setId( StringCref id ) 
+    void setID( StringCref id ) 
     { 
-      theId = id; 
+      theID = id; 
     }
-
-
-    const Message getClassName( StringCref keyword );
-    const Message getId( StringCref keyword );
-    const Message getSystemPath( StringCref keyword );
-    const Message getName( StringCref keyword );
-    const Message getActivity( StringCref keyword );
-    const Message getActivityPerSecond( StringCref keyword );
 
     /**
        @return entryname of this Entity.
     */
-    StringCref getId() const 
+    StringCref getID() const 
     { 
-      return theId; 
+      return theID; 
     }
 
     /**
@@ -113,19 +105,10 @@ namespace libecs
     }
 
     /**
-       @return SystemPath of this Entity.
+       @return FullID of this Entity.
     */
-    const String getSystemPath() const;
-
-    /**
-       @return FQID (Fully Qualified ID) of this Entity.
-    */
-    const String getFqid() const;
-
-    /**
-       @return FQPI (Fully Qualified Primitive ID) of this Entity.
-    */
-    const String getFqpi() const;
+    // FIXME:
+    const FullID getFullID() const;
 
     /**
        Returns activity value (per delta-T) of this Entity.
@@ -148,6 +131,15 @@ namespace libecs
 
     virtual const char* const getClassName() const { return "Entity"; }
 
+
+
+    const Message getClassName( StringCref keyword );
+    const Message getId( StringCref keyword );
+    const Message getName( StringCref keyword );
+    const Message getActivity( StringCref keyword );
+    const Message getActivityPerSecond( StringCref keyword );
+
+
   protected:
 
     virtual void makeSlots();
@@ -161,8 +153,8 @@ namespace libecs
   private:
 
     SystemPtr theSuperSystem;
-    String theId;
-    String theName;
+    String    theID;
+    String    theName;
   };
  
 

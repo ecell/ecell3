@@ -49,9 +49,7 @@ namespace libecs
 
     int check();
 
-    SystemPtr getSystem( SystemPathCref systempath );
-
-    SystemPtr getSystem( StringCref id ) ;
+    virtual SystemPtr getSystem( StringCref id );
 
     virtual void initialize();
 

@@ -42,6 +42,9 @@
 namespace libecs
 {
 
+  DECLARE_CLASS( Euler1Stepper );
+  DECLARE_CLASS( RungeKutta4Stepper );
+
 
   typedef IntegratorPtr ( *IntegratorAllocator_ )( SubstanceRef );
   DECLARE_TYPE( IntegratorAllocator_, IntegratorAllocator );

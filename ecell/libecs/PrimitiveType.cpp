@@ -37,7 +37,33 @@
 namespace libecs
 {
 
-  const String PrimitiveTypeStringOf( PrimitiveType type )
+  PrimitiveType PrimitiveTypeOf( StringCref typestring )
+  {
+    if( typestring == PrimitiveTypeStringOfSubstance() )
+      {
+	return SUBSTANCE;
+      }
+    else if( typestring == PrimitiveTypeStringOfReactor() )
+      {
+	return REACTOR;
+      }
+    else if( typestring == PrimitiveTypeStringOfSystem() )
+      {
+	return SYSTEM;
+      }
+    else if( typestring == PrimitiveTypeStringOfEntity() )
+      {
+	return ENTITY;
+      }
+    else
+      {
+	throw InvalidPrimitiveType( __PRETTY_FUNCTION__, 
+				    "can't convert typestring [" + typestring
+				    + "] to PrimitiveType." );
+      }
+  }
+
+  StringCref PrimitiveTypeStringOf( PrimitiveType type )
   {
     switch( type )
       {
@@ -51,65 +77,9 @@ namespace libecs
 	return PrimitiveTypeStringOfEntity();
       default:
 	throw InvalidPrimitiveType( __PRETTY_FUNCTION__, 
-				    "can't create PrimitiveTypeString." );
+				    "unexpected PrimitiveType::Type." );
       }
-
-    //FIXME: NEVER_GET_HERE
-    assert( 0 );
-    return "";
   }
-
-  const String PrimitiveTypeStringOf( StringCref fqpi )
-  {
-    String::size_type aBorder( fqpi.find( ':' ) );
-
-    if( aBorder == String::npos )
-      {
-	throw BadID( __PRETTY_FUNCTION__,
-		     "no \':\' found in \"" + fqpi + "\"." );
-      }
-    if( fqpi.find( ':', aBorder + 1 ) == String::npos )
-      {
-	throw BadID( __PRETTY_FUNCTION__,
-		     "not enough \':\'s found in \"" + fqpi + "\"." );
-      }
-  
-    String aTypeString( fqpi.substr( 0, aBorder ) );
-
-    return aTypeString;
-  }
-
-  PrimitiveType PrimitiveTypeOf( StringCref typestring )
-  {
-    PrimitiveType aType;
-
-    if( typestring == PrimitiveTypeStringOfSubstance() )
-      {
-	aType = SUBSTANCE;
-      }
-    else if( typestring == PrimitiveTypeStringOfReactor() )
-      {
-	aType = REACTOR;
-      }
-    else if( typestring == PrimitiveTypeStringOfSystem() )
-      {
-	aType = SYSTEM;
-      }
-    else if( typestring == PrimitiveTypeStringOfEntity() )
-      {
-	aType = ENTITY;
-      }
-    else
-      {
-	throw InvalidPrimitiveType( __PRETTY_FUNCTION__, 
-				    "can't convert typestring [" + typestring
-				    + "] to PrimitiveType." );
-      }
-
-    return aType;
-  }
-
-
 
 } // namespace libecs
 

@@ -57,23 +57,8 @@ namespace libecs
     }
 
     virtual const String asString() const = 0;
-    virtual const Real  asReal()  const = 0;
+    virtual const Real   asReal()  const = 0;
     virtual const Int    asInt()    const = 0;
-
-    virtual const bool isString() const 
-    {
-      return false;
-    }
-
-    virtual const bool isReal() const
-    {
-      return false;
-    }
-
-    virtual const bool isInt() const
-    {
-      return false;
-    }
 
     virtual UVariableDataPtr createClone() const = 0;
 
@@ -111,14 +96,9 @@ namespace libecs
       ; // do nothing
     }
 
-    const String asString() const { return theString; }
-    const Real  asReal() const;
-    const Int    asInt() const;
-
-    virtual const bool isString() const
-    {
-      return true;
-    }
+    virtual const String asString() const { return theString; }
+    virtual const Real  asReal() const;
+    virtual const Int    asInt() const;
 
     virtual UVariableDataPtr createClone() const
     {
@@ -151,15 +131,10 @@ namespace libecs
       ; // do nothing
     }
 
-    const String asString() const;
-    const Real  asReal() const { return theReal; }
+    virtual const String asString() const;
+    virtual const Real  asReal() const { return theReal; }
     // FIXME: range check
-    const Int    asInt() const { return static_cast<Int>( theReal ); }
-
-    virtual const bool isReal() const
-    {
-      return true;
-    }
+    virtual const Int    asInt() const { return static_cast<Int>( theReal ); }
 
     virtual UVariableDataPtr createClone() const
     {
@@ -186,15 +161,10 @@ namespace libecs
       ; // do nothing
     }
 
-    const String asString() const;
-    const Real  asReal() const { return static_cast<Real>( theInt ); }
-    const Int    asInt() const   { return theInt; }
+    virtual const String asString() const;
+    virtual const Real   asReal() const { return static_cast<Real>( theInt ); }
+    virtual const Int    asInt() const   { return theInt; }
   
-    virtual const bool isInt() const
-    {
-      return true;
-    }
-
     virtual UVariableDataPtr createClone() const
     {
       return new UVariableIntData( *this );
@@ -206,38 +176,81 @@ namespace libecs
 
   };
 
+  class UVariableNoneData : public UVariableData
+  {
+
+  public: 
+
+    UVariableNoneData() {}
+
+
+    virtual const String asString() const 
+    { 
+      static String aNoneString;
+      return aNoneString;
+    }
+    virtual const Real   asReal() const   { return 0.0; }
+    virtual const Int    asInt() const    { return 0; }
+  
+    virtual UVariableDataPtr createClone() const
+    {
+      return new UVariableNoneData;
+    }
+
+  };
+
 
 
   class UVariable
   {
 
   public:
+
+    enum Type
+      {
+	NONE   = 0,
+	REAL   = 1,
+	INT    = 2,
+	STRING = 3
+      };
+
   
-    UVariable( StringCref  string ) 
-      //    :
-      //    theData( new UVariableStringData( string ) )
+    UVariable()
+      :
+      theData( new UVariableNoneData ),
+      theType( NONE )
     {
-      theData = new UVariableStringData( string );
+      ; // do nothing
+    }
+
+    UVariable( StringCref  string ) 
+      :
+      theData( new UVariableStringData( string ) ),
+      theType( STRING )
+    {
       ; // do nothing
     }
   
     UVariable( const Real f )      
       :
-      theData( new UVariableRealData( f ) )
+      theData( new UVariableRealData( f ) ),
+      theType( REAL )
     {
       ; // do nothing
     }
 
     UVariable( const Int   i )      
       :
-      theData( new UVariableIntData( i ) )
+      theData( new UVariableIntData( i ) ),
+      theType( INT )
     {
       ; // do nothing
     }
 
     UVariable( UVariableCref uv )
       :
-      theData( uv.createDataClone() )
+      theData( uv.createDataClone() ),
+      theType( uv.getType() )
     {
       ; // do nothing
     }
@@ -253,6 +266,7 @@ namespace libecs
 	{
 	  delete theData;
 	  theData = rhs.createDataClone();
+	  theType = rhs.getType();
 	}
     
       return *this;
@@ -265,7 +279,6 @@ namespace libecs
 
     const Real  asReal() const
     { 
-      assert( theData );
       return theData->asReal(); 
     }
   
@@ -274,19 +287,9 @@ namespace libecs
       return theData->asInt();
     }
 
-    const bool isString() const
-    { 
-      return theData->isString();
-    }
-
-    const bool isReal() const
+    const Type getType() const
     {
-      return theData->isReal();
-    }
-
-    const bool isInt() const
-    { 
-      return theData->isInt(); 
+      return theType;
     }
 
   protected:
@@ -298,11 +301,8 @@ namespace libecs
 
   private:
 
-    UVariable();
-
-  private:
-
     UVariableDataPtr theData;
+    Type             theType;
 
   };
 

@@ -155,10 +155,10 @@ namespace libecs
     theAccumulator->update();
   }
 
-  const String Substance::getFqpi() const
-  {
-    return PrimitiveTypeStringOf( *this ) + ":" + getFqid();
-  }
+  //  const String Substance::getFullID() const
+  //  {
+    //FIXME:
+  //  }
 
 
   void Substance::initialize()

@@ -132,6 +132,10 @@ namespace libecs
 
   String basenameOf( StringCref str, String::size_type maxlength = 0 );
 
+  /**
+     Erase white space characters ( ' ', '\t', and '\n' ) from a string
+  */
+  void eraseWhiteSpaces( StringRef str );
 
   /**
      reversed order compare

@@ -48,24 +48,42 @@ namespace libemc
     Simulator();
     virtual ~Simulator() {}
 
-    void createEntity( libecs::StringCref classname, 
-		       libecs::FQPICref   fqpi,
-		       libecs::StringCref name )
+    void createEntity( libecs::StringCref    classname, 
+		       libecs::PrimitiveType type,
+		       libecs::StringCref    systempath,
+		       libecs::StringCref    id,
+		       libecs::StringCref    name )
     {
-      theSimulatorImplementation->createEntity( classname, fqpi, name );
+      theSimulatorImplementation->createEntity( classname, 
+						type,
+						systempath,
+						id,
+						name );
     }
 
-    void setProperty( libecs::FQPICref    fqpi, 
-		      libecs::MessageCref message )
+    void setProperty( libecs::PrimitiveType       type,
+		      libecs::StringCref          systempath,
+		      libecs::StringCref          id,
+		      libecs::StringCref          propertyname,
+		      libecs::UVariableVectorCref data )
     {
-      theSimulatorImplementation->setProperty( fqpi, message );
+      theSimulatorImplementation->setProperty( type,
+					       systempath,
+					       id,
+					       propertyname,
+					       data );
     }
 
-
-    const libecs::Message getProperty( libecs::FQPICref   fqpi, 
-				       libecs::StringCref propertyName )
+    const libecs::UVariableVector 
+    getProperty( libecs::PrimitiveType type,
+		 libecs::StringCref    systempath,
+		 libecs::StringCref    id,
+		 libecs::StringCref    propertyname )
     {
-      return theSimulatorImplementation->getProperty( fqpi, propertyName ); 
+      return theSimulatorImplementation->getProperty( type,
+						      systempath,
+						      id,
+						      propertyname );
     }
 
     void step()
@@ -78,12 +96,16 @@ namespace libemc
       theSimulatorImplementation->initialize();
     }
 
-    libecs::LoggerCptr getLogger( libecs::StringCref id_name,
-				       libecs::StringCref propertyname )
+    libecs::LoggerCptr getLogger(  libecs::PrimitiveType type,
+				   libecs::StringCref    systempath,
+				   libecs::StringCref    id,
+				   libecs::StringCref    propertyname )
     {
-      return theSimulatorImplementation->getLogger( id_name, propertyname );
+      return theSimulatorImplementation->getLogger( type,
+						    systempath,
+						    id,
+						    propertyname );
     }
-
 
   private:
 

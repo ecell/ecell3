@@ -33,24 +33,20 @@
 
 #include "libecs.hpp"
 
-
 namespace libecs
 {
 
   enum PrimitiveType
-  {
-    ENTITY    = 1,
-    SUBSTANCE = 2,
-    REACTOR   = 3,
-    SYSTEM    = 4,
-    NONE      = 0
-  };
+    {
+      ENTITY    = 1,
+      SUBSTANCE = 2,
+      REACTOR   = 3,
+      SYSTEM    = 4
+    };
 
-  // public utility functions
+  StringCref PrimitiveTypeStringOf( PrimitiveType type );
+
   PrimitiveType PrimitiveTypeOf( StringCref typestring );
-  const String  PrimitiveTypeStringOf( PrimitiveType type );
-  const String  PrimitiveTypeStringOf( StringCref fqpistring );
-
 
   inline StringCref  PrimitiveTypeStringOfEntity()
   {
@@ -76,27 +72,25 @@ namespace libecs
     return aString;
   }
 
-
   inline StringCref  PrimitiveTypeStringOf( EntityCref )
   {
     return PrimitiveTypeStringOfEntity();
   }
-
+  
   inline StringCref  PrimitiveTypeStringOf( ReactorCref ) 
   {
     return PrimitiveTypeStringOfReactor();
   }
-
+  
   inline StringCref  PrimitiveTypeStringOf( SubstanceCref )
   {
     return PrimitiveTypeStringOfSubstance();
   }
-
+  
   inline StringCref  PrimitiveTypeStringOf( SystemCref )
   {
     return PrimitiveTypeStringOfSystem();
   }
-
 
 } // namespace libecs
 

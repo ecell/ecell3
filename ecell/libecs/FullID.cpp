@@ -59,8 +59,7 @@ namespace libecs
      // absolute path ( start with '/' )
     if( aFieldEnd == 0 )
        {
-	 //	 push_back( String( 1, DELIMITER ) );
-	 push_back( "/" );
+	 push_back( String( 1, DELIMITER ) );
 	 ++aFieldStart;
 	 aFieldEnd = aString.find_first_of( DELIMITER, aFieldStart );
 
@@ -70,17 +69,16 @@ namespace libecs
 	   }
        }
 
-    while( 1 )
+    push_back( aString.substr( aFieldStart, 
+			       aFieldEnd - aFieldStart ) );
+
+    while( aFieldEnd != String::npos  )
       {
-	push_back( aString.substr( aFieldStart, 
-				   aFieldEnd - aFieldStart ) );
-	
-	if( aFieldEnd == String::npos )
-	  {
-	    return;
-	  }
 	aFieldStart = aFieldEnd + 1;
 	aFieldEnd = aString.find_first_of( DELIMITER, aFieldStart );
+
+	push_back( aString.substr( aFieldStart, 
+				   aFieldEnd - aFieldStart ) );
       }
 
   }

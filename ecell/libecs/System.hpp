@@ -60,7 +60,7 @@ namespace libecs
     System();
     virtual ~System();
 
-    const String getFqpi() const;
+    const String getFullID() const;
 
     virtual void initialize();
 
@@ -106,7 +106,7 @@ namespace libecs
        @return A pointer to a Stepper object that this System has or
        NULL pointer if it is not set.
     */
-    StepperPtr getStepper() { return theStepper; }
+    StepperPtr getStepper() const { return theStepper; }
 
     /**
        Instantiate a Stepper object of @a classname using theRootSystem's
@@ -123,12 +123,12 @@ namespace libecs
 
        @param fqen FQID of a VolumeIndex Reactor for this System.
     */
-    void setVolumeIndex( const FQID& fqen );
+    void setVolumeIndex( FullIDCref fullid );
 
     /**
        @return a pointer to the VolumeIndex Reactor of this System.
     */
-    ReactorPtr getVolumeIndex() { return theVolumeIndex; }
+    ReactorPtr getVolumeIndex() const { return theVolumeIndex; }
 
     /**
        Volume of a System is calculated by activity() of
@@ -301,16 +301,23 @@ namespace libecs
     /**
        @return An pointer to a System object in this System whose ID is id.
     */
-    virtual SystemPtr getSystem( StringCref id ) ;
+    virtual SystemPtr getSystem( StringCref id );
 
     /**
        This method finds recursively a System object pointed by
-       @a systempath.
+       @a SystemPath
 
        @return An pointer to a System object in this or subsystems of this
-       System object pointed by @a systempath
+       System object pointed by @a SystemPath
     */
-    virtual SystemPtr getSystem( SystemPathCref systempath ) ;
+    virtual SystemPtr getSystem( SystemPathCref systempath );
+
+    virtual EntityPtr getEntity( FullIDCref fullid );
+
+    virtual void createEntity( StringCref classname,
+			       FullIDCref fullid,
+			       StringCref name );
+
 
     Real getActivityPerSecond();
 
@@ -363,7 +370,7 @@ namespace libecs
   public:
     bool operator()( const ReactorMap::value_type r ) const
     {
-      return Reactor::isRegularReactor::isRegularName( ( r.second )->getId() );
+      return Reactor::isRegularReactor::isRegularName( ( r.second )->getID() );
     }
   };
 

@@ -35,6 +35,7 @@
 #include <map>
 
 #include "libecs.hpp"
+#include "FullID.hpp"
 #include "Logger.hpp"
 
 namespace libecs
@@ -50,51 +51,22 @@ namespace libecs
       ; // do nothing
     }
     
-    LoggerPtr getLogger( StringCref, StringCref );
-    //    LoggerPtr getLogger( FQPICref );
+    LoggerPtr getLogger( FullPropertyNameCref fpn );
 
-    class PairOfStrings
-    {
-    public:
-      PairOfStrings( StringCref first , StringCref second )
-	:
-	thePair( first, second )
-      {
-	;
-      }
-      
-      const std::pair<String, String>& getPair( void ) const
-      {
-	return thePair;
-      }
+    DECLARE_MAP( const FullPropertyName, 
+		 LoggerPtr, std::less<const FullPropertyName>, LoggerMap );
 
-      bool operator < ( const PairOfStrings& rhs ) const
-      {
-	if( rhs.getPair().first > this->getPair().first )
-	  {
-	    return true;
-	  }
-	return false;
-      }
-
-
-    private:
-      const std::pair<String, String> thePair;
-    };
-    
-
-    DECLARE_MAP( const PairOfStrings, LoggerPtr, std::less<const PairOfStrings>, LoggerMap );
-    typedef std::pair<const PairOfStrings, LoggerPtr> PairInLoggerMap;
   protected:
     
-    void appendLogger( StringCref, StringCref );
-    //    void appendLogger( FQPICref );
-    
+    void appendLogger( FullPropertyNameCref );
     
     
   private:
+
     LoggerBroker( LoggerBrokerCref );
     LoggerBrokerRef operator=( const LoggerBroker& );
+
+  private:
 
     LoggerMap     theLoggerMap;
     RootSystemPtr theRootSystem;

@@ -49,25 +49,36 @@ namespace libemc
     LocalSimulatorImplementation();
     virtual ~LocalSimulatorImplementation();
 
-    libecs::RootSystemRef getRootSystem() { return theRootSystem; }
+    libecs::RootSystemRef   getRootSystem() { return theRootSystem; }
     libecs::LoggerBrokerRef getLoggerBroker() { return theLoggerBroker; }
 
-    void createEntity( libecs::StringCref classname, 
-		       libecs::FQPICref fqpi, 
-		       libecs::StringCref name );
 
-    void setProperty( libecs::FQPICref fqpi, 
-		      libecs::MessageCref message );
+    virtual void createEntity( libecs::StringCref    classname, 
+			       libecs::PrimitiveType type,
+			       libecs::StringCref    systempath,
+			       libecs::StringCref    id,
+			       libecs::StringCref    name );
 
-    const libecs::Message getProperty( libecs::FQPICref fqpi,
-				       libecs::StringCref propertyName );
+    virtual void setProperty( libecs::PrimitiveType       type,
+			      libecs::StringCref          systempath,
+			      libecs::StringCref          id,
+			      libecs::StringCref          propertyname,
+			      libecs::UVariableVectorCref data );
+
+    virtual const libecs::UVariableVector 
+    getProperty( libecs::PrimitiveType type,
+		 libecs::StringCref    systempath,
+		 libecs::StringCref    id,
+		 libecs::StringCref    propertyname );
 
     void step();
 
     void initialize();
 
-    libecs::LoggerCptr getLogger( libecs::StringCref id_name,
-				  libecs::StringCref propertyname );
+    virtual libecs::LoggerCptr getLogger( libecs::PrimitiveType type,
+					  libecs::StringCref    systempath,
+					  libecs::StringCref    id,
+					  libecs::StringCref    propertyname );
 
   private:
 

@@ -28,12 +28,15 @@
 // E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
 
-#ifndef __KOYURUGI_H
-#define __KOYURUGI_H
+#ifndef __LIBECS_HPP
+#define __LIBECS_HPP
 #include "Defs.hpp"
 
 namespace libecs
 {
+
+
+  // Declarations to be exported
 
 
   // classes
@@ -41,11 +44,6 @@ namespace libecs
   DECLARE_CLASS( System );
   DECLARE_CLASS( AccumulatorMaker );
   DECLARE_CLASS( Accumulator );
-  DECLARE_CLASS( SimpleAccumulator );
-  DECLARE_CLASS( RoundDownAccumulator );
-  DECLARE_CLASS( RoundOffAccumulator );
-  DECLARE_CLASS( ReserveAccumulator );
-  DECLARE_CLASS( MonteCarloAccumulator );
   DECLARE_CLASS( Environment );
   DECLARE_CLASS( Monolithic );
   DECLARE_CLASS( Cytoplasm );
@@ -53,11 +51,9 @@ namespace libecs
   DECLARE_CLASS( Cell );
   DECLARE_CLASS( Entity );
   DECLARE_CLASS( SystemPath );
-  DECLARE_CLASS( FQID );
-  DECLARE_CLASS( FQPI );
+  DECLARE_CLASS( FullID );
+  DECLARE_CLASS( FullPropertyName );
   DECLARE_CLASS( Integrator );
-  DECLARE_CLASS( Euler1Integrator );
-  DECLARE_CLASS( RungeKutta4Integrator );
   DECLARE_CLASS( Reactant );
   DECLARE_CLASS( Reactor );
   DECLARE_CLASS( isRegularReactor );
@@ -67,8 +63,6 @@ namespace libecs
   DECLARE_CLASS( MasterStepper );
   DECLARE_CLASS( StepperLeader );
   DECLARE_CLASS( SlaveStepper );
-  DECLARE_CLASS( Euler1Stepper );
-  DECLARE_CLASS( RungeKutta4Stepper );
   DECLARE_CLASS( StepperMaker );
   DECLARE_CLASS( Substance );
   DECLARE_CLASS( SubstanceMaker );
@@ -82,6 +76,11 @@ namespace libecs
   DECLARE_CLASS( LoggerBroker );
   DECLARE_CLASS( Logger );
   DECLARE_CLASS( DataPoint );
+
+  // containers
+
+  DECLARE_VECTOR( UVariable, UVariableVector );
+
 
   // exceptions
 
@@ -102,7 +101,11 @@ namespace libecs
 } // namespace libecs
 
 
-#endif // __KOYURUGI_H
+// this is here to avoid inter-dependency problem
+#include "PrimitiveType.hpp"
+
+
+#endif // __LIBECS_HPP
 
 
 /*

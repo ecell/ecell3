@@ -37,6 +37,10 @@
 namespace libecs
 {
 
+  DECLARE_CLASS( Euler1Integrator );
+  DECLARE_CLASS( RungeKutta4Integrator );
+
+
   class Integrator
   {
 

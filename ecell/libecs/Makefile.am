@@ -15,11 +15,10 @@ libecs_la_LIBADD= ${LIBLTDL} -lstdc++
 libecs_la_SOURCES=\
 Util.cpp\
 UVariable.cpp\
-StringList.cpp\
+FullID.cpp\
 Message.cpp\
 MessageInterface.cpp\
 AccumulatorMaker.cpp\
-FQPI.cpp\
 ReactorMaker.cpp\
 Substance.cpp\
 Accumulators.cpp\
@@ -43,11 +42,10 @@ libecs_HEADERS=\
 libecs.hpp\
 Defs.hpp\
 UVariable.hpp\
-StringList.hpp\
+FullID.hpp\
 Message.hpp\
 MessageInterface.hpp\
 AccumulatorMaker.hpp\
-FQPI.hpp\
 ReactorMaker.hpp\
 Substance.hpp\
 Accumulators.hpp\

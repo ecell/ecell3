@@ -33,11 +33,13 @@
 #include "System.hpp"
 #include "Reactor.hpp"
 #include "RootSystem.hpp"
+#include "SubstanceMaker.hpp"
+#include "ReactorMaker.hpp"
+#include "SystemMaker.hpp"
 #include "Substance.hpp"
 #include "Stepper.hpp"
 #include "StepperMaker.hpp"
-#include "FQPI.hpp"
-
+#include "FullID.hpp"
 
 
 namespace libecs
@@ -77,7 +79,7 @@ namespace libecs
     for( SystemMapIterator i = getFirstSystemIterator() ;
 	 i != getLastSystemIterator() ; ++i )
       {
-	aVector.push_back( UVariable( i->second->getId() ) );
+	aVector.push_back( UVariable( i->second->getID() ) );
       }
 
     return Message( keyword, aVector );
@@ -90,7 +92,7 @@ namespace libecs
     for( SubstanceMapIterator i = getFirstSubstanceIterator() ;
 	 i != getLastSubstanceIterator() ; ++i )
       {
-	aVector.push_back( UVariable( i->second->getId() ) );
+	aVector.push_back( UVariable( i->second->getID() ) );
       }
 
     return Message( keyword, aVector );
@@ -103,7 +105,7 @@ namespace libecs
     for( ReactorMapIterator i = getFirstReactorIterator() ;
 	 i != getLastReactorIterator() ; ++i )
       {
-	aVector.push_back( UVariable( i->second->getId() ) );
+	aVector.push_back( UVariable( i->second->getID() ) );
       }
 
     return Message( keyword, aVector );
@@ -125,7 +127,7 @@ namespace libecs
   void System::setVolumeIndex( const Message& message )
   {
     //FIXME: range check
-    setVolumeIndex( FQID( message[0].asString() ) );
+    setVolumeIndex( FullID( message[0].asString() ) );
   }
 
   const Message System::getVolumeIndex( StringCref keyword )
@@ -136,7 +138,7 @@ namespace libecs
       }
 
     return Message( keyword, 
-		    UVariable( getVolumeIndex()->getFqid() ) );
+		    UVariable( getVolumeIndex()->getFullID().getString() ) );
   }
 
   const Message System::getVolume( StringCref keyword )
@@ -175,9 +177,9 @@ namespace libecs
     theRootSystem = getSuperSystem()->getRootSystem();
   }
 
-  const String System::getFqpi() const
+  const String System::getFullID() const
   {
-    return PrimitiveTypeStringOf( *this ) + ":" + getFqid();
+    //    return PrimitiveTypeStringOf( *this ) + ":" + getFqid();
   }
 
   void System::setStepper( StringCref classname )
@@ -207,10 +209,10 @@ namespace libecs
     return theStepper->getDeltaT();
   }
 
-  void System::setVolumeIndex( FQIDCref volumeindex )
+  void System::setVolumeIndex( FullIDCref volumeindex )
   {
     SystemPtr aSystem = theRootSystem->getSystem( SystemPath( volumeindex ) );
-    theVolumeIndex = aSystem->getReactor( volumeindex.getIdString() );
+    theVolumeIndex = aSystem->getReactor( volumeindex.getID() );
   }
 
   void System::initialize()
@@ -318,14 +320,14 @@ namespace libecs
 
   void System::registerReactor( ReactorPtr reactor )
   {
-    if( containsReactor( reactor->getId() ) )
+    if( containsReactor( reactor->getID() ) )
       {
 	delete reactor;
 	//FIXME: throw exception
 	return;
       }
 
-    theReactorMap[ reactor->getId() ] = reactor;
+    theReactorMap[ reactor->getID() ] = reactor;
     reactor->setSuperSystem( this );
   }
 
@@ -334,7 +336,7 @@ namespace libecs
     ReactorMapIterator i = getReactorIterator( id );
     if( i == getLastReactorIterator() )
       {
-	throw NotFound( __PRETTY_FUNCTION__, "[" + getFqid() + 
+	throw NotFound( __PRETTY_FUNCTION__, "[" + getFullID() + 
 			"]: Reactor [" + id + "] not found in this System." );
       }
     return i->second;
@@ -342,13 +344,13 @@ namespace libecs
 
   void System::registerSubstance( SubstancePtr newone )
   {
-    if( containsSubstance( newone->getId() ) )
+    if( containsSubstance( newone->getID() ) )
       {
 	delete newone;
 	//FIXME: throw exception
 	return;
       }
-    theSubstanceMap[ newone->getId() ] = newone;
+    theSubstanceMap[ newone->getID() ] = newone;
     newone->setSuperSystem( this );
   }
 
@@ -357,7 +359,7 @@ namespace libecs
     SubstanceMapIterator i = getSubstanceIterator( id );
     if( i == getLastSubstanceIterator() )
       {
-	throw NotFound(__PRETTY_FUNCTION__, "[" + getFqid() + 
+	throw NotFound(__PRETTY_FUNCTION__, "[" + getFullID() + 
 		       "]: Substance [" + id + "] not found in this System.");
       }
 
@@ -367,29 +369,33 @@ namespace libecs
 
   void System::registerSystem( SystemPtr system )
   {
-    if( containsSystem( system->getId() ) )
+    if( containsSystem( system->getID() ) )
       {
 	delete system;
 	//FIXME: throw exception
 	return;
       }
 
-    theSubsystemMap[ system->getId() ] = system;
+    theSubsystemMap[ system->getID() ] = system;
     system->setSuperSystem( this );
 
   }
 
-  SystemPtr System::getSystem( SystemPathCref systempath ) 
+  SystemPtr System::getSystem( SystemPathCref systempath )
   {
-    SystemPtr  aSystem = getSystem( systempath.first() );
-    SystemPath anNext  = systempath.next();
+    assert( !systempath.empty() );
+    SystemPath aSystemPath( systempath );
+    SystemPtr aSystem( this );
 
-    if( anNext.getString() != "" ) // not a leaf
+    // looping is faster than recursive search
+    do
       {
-	aSystem = aSystem->getSystem( anNext );
+	aSystem = aSystem->getSystem( aSystemPath.front() );
+	aSystemPath.pop_front();
       }
-  
-    return aSystem;
+    while( ! aSystemPath.empty() );
+
+    return aSystem;  
   }
 
   SystemPtr System::getSystem( StringCref id ) 
@@ -397,11 +403,77 @@ namespace libecs
     SystemMapIterator i = getSystemIterator( id );
     if( i == getLastSystemIterator() )
       {
-	throw NotFound(__PRETTY_FUNCTION__, "[" + getFqid() + 
+	throw NotFound(__PRETTY_FUNCTION__, "[" + getFullID() + 
 		       "]: System [" + id + "] not found in this System.");
       }
     return i->second;
   }
+
+  EntityPtr System::getEntity( FullIDCref fullid )
+  {
+    SystemPtr aSystem ( getSystem( fullid.getSystemPath() ) );
+
+    EntityPtr anEntityPtr;
+
+    switch( fullid.getPrimitiveType() )
+      {
+      case SUBSTANCE:
+	anEntityPtr = aSystem->getSubstance( fullid.getID() );
+	break;
+      case REACTOR:
+	anEntityPtr = aSystem->getReactor( fullid.getID() );
+	break;
+      case SYSTEM:
+	anEntityPtr = aSystem->getSystem( fullid.getID() );
+	break;
+      default:
+	throw InvalidPrimitiveType( __PRETTY_FUNCTION__, 
+				    "bad PrimitiveType specified." );
+      }
+
+    return anEntityPtr;
+  }
+
+
+  void System::createEntity( StringCref classname,
+			     FullIDCref fullid, 
+			     StringCref name )
+  {
+    SystemPtr aSystem ( getSystem( fullid.getSystemPath() ) );
+			      
+    ReactorPtr   aReactorPtr;
+    SystemPtr    aSystemPtr;
+    SubstancePtr aSubstancePtr;
+
+    switch( fullid.getPrimitiveType() )
+      {
+      case SUBSTANCE:
+	aSubstancePtr = getRootSystem()->getSubstanceMaker().make( classname );
+	aSubstancePtr->setID( fullid.getID() );
+	aSubstancePtr->setName( name );
+	aSystem->registerSubstance( aSubstancePtr );
+	break;
+      case REACTOR:
+	aReactorPtr = getRootSystem()->getReactorMaker().make( classname );
+	aReactorPtr->setID( fullid.getID() );
+	aReactorPtr->setName( name );
+	aSystem->registerReactor( aReactorPtr );
+	break;
+      case SYSTEM:
+	aSystemPtr = getRootSystem()->getSystemMaker().make( classname );
+	aSystemPtr->setID( fullid.getID() );
+	aSystemPtr->setName( name );
+	aSystem->registerSystem( aSystemPtr );
+	break;
+
+      default:
+	throw InvalidPrimitiveType( __PRETTY_FUNCTION__, 
+				    "bad PrimitiveType specified." );
+
+      }
+
+  }
+
 
   Real System::getActivityPerSecond()
   {

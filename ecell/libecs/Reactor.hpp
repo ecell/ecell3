@@ -71,7 +71,7 @@ namespace libecs
       }
       bool operator() ( ReactorCptr r ) const
       {
-	return isRegularName( r->getId() );
+	return isRegularName( r->getID() );
       }
     };
 
@@ -99,10 +99,10 @@ namespace libecs
     const Message getInitialActivity( StringCref keyword );
 
 
-    void appendSubstrate( FQIDCref fqen, int coefficient );
-    void appendProduct( FQIDCref fqen, int coefficient );
-    void appendCatalyst( FQIDCref fqen, int coefficient );
-    void appendEffector( FQIDCref fqen, int coefficient );
+    void appendSubstrate( FullIDCref fullid, int coefficient );
+    void appendProduct  ( FullIDCref fullid, int coefficient );
+    void appendCatalyst ( FullIDCref fullid, int coefficient );
+    void appendEffector ( FullIDCref fullid, int coefficient );
     void setInitialActivity( Real activity );
 
     /**
@@ -171,7 +171,7 @@ namespace libecs
     Reactor();
     virtual ~Reactor();
 
-    const String getFqpi() const;
+    const FullID getFullID() const;
 
     virtual void initialize();
     virtual void react() = 0;

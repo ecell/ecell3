@@ -32,7 +32,7 @@
 #include "Reactant.hpp"
 #include "RootSystem.hpp"
 #include "Stepper.hpp"
-#include "FQPI.hpp"
+#include "FullID.hpp"
 #include "Substance.hpp"
 
 #include "Reactor.hpp"
@@ -119,7 +119,7 @@ namespace libecs
     for( ReactantVectorConstIterator i = theSubstrateList.begin() ;
 	 i != theSubstrateList.end() ; ++i )
       {
-	aList.push_back( (*i)->getSubstance().getFqid() );
+	aList.push_back( (*i)->getSubstance().getFullID().getString() );
       }
 
     return Message( keyword, aList );
@@ -132,7 +132,7 @@ namespace libecs
     for( ReactantVectorConstIterator i = theProductList.begin() ;
 	 i != theProductList.end() ; ++i )
       {
-	aList.push_back( (*i)->getSubstance().getFqid() );
+	aList.push_back( (*i)->getSubstance().getFullID().getString() );
       }
 
     return Message( keyword, aList );
@@ -145,7 +145,7 @@ namespace libecs
     for( ReactantVectorConstIterator i = theEffectorList.begin() ;
 	 i != theEffectorList.end() ; ++i )
       {
-	aList.push_back( (*i)->getSubstance().getFqid() );
+	aList.push_back( (*i)->getSubstance().getFullID().getString() );
       }
 
     return Message( keyword, aList );
@@ -158,7 +158,7 @@ namespace libecs
     for( ReactantVectorConstIterator i = theCatalystList.begin() ;
 	 i != theCatalystList.end() ; ++i )
       {
-	aList.push_back( (*i)->getSubstance().getFqid() );
+	aList.push_back( (*i)->getSubstance().getFullID().getString() );
       }
 
     return Message( keyword, aList );
@@ -174,38 +174,38 @@ namespace libecs
     return Message( keyword, UVariable( theInitialActivity ) );
   }
 
-  void Reactor::appendSubstrate( FQIDCref fqid, int coefficient )
+  void Reactor::appendSubstrate( FullIDCref fullid, int coefficient )
   {
     SystemPtr aSystem = getSuperSystem()->getRootSystem()->
-      getSystem( SystemPath( fqid ) );
-    SubstancePtr aSubstance( aSystem->getSubstance( fqid.getIdString() ) );
+      getSystem( SystemPath( fullid ) );
+    SubstancePtr aSubstance( aSystem->getSubstance( fullid.getString() ) );
 
     appendSubstrate( *aSubstance, coefficient );
   }
 
-  void Reactor::appendProduct( FQIDCref fqid, int coefficient )
+  void Reactor::appendProduct( FullIDCref fullid, int coefficient )
   {
     SystemPtr aSystem = getSuperSystem()->getRootSystem()->
-      getSystem( SystemPath( fqid ) );
-    SubstancePtr aSubstance( aSystem->getSubstance( fqid.getIdString() ) );
+      getSystem( SystemPath( fullid ) );
+    SubstancePtr aSubstance( aSystem->getSubstance( fullid.getString() ) );
   
     appendProduct( *aSubstance, coefficient );
   }
 
-  void Reactor::appendCatalyst( FQIDCref fqid,int coefficient)
+  void Reactor::appendCatalyst( FullIDCref fullid,int coefficient)
   {
     SystemPtr aSystem = getSuperSystem()->getRootSystem()->
-      getSystem( SystemPath( fqid ) );
-    SubstancePtr aSubstance( aSystem->getSubstance( fqid.getIdString() ) );
+      getSystem( SystemPath( fullid ) );
+    SubstancePtr aSubstance( aSystem->getSubstance( fullid.getString() ) );
   
     appendCatalyst( *aSubstance, coefficient );
   }
 
-  void Reactor::appendEffector( FQIDCref fqid, int coefficient )
+  void Reactor::appendEffector( FullIDCref fullid, int coefficient )
   {
     SystemPtr aSystem = getSuperSystem()->getRootSystem()->
-      getSystem( SystemPath( fqid ) );
-    SubstancePtr aSubstance( aSystem->getSubstance( fqid.getIdString() ) );
+      getSystem( SystemPath( fullid ) );
+    SubstancePtr aSubstance( aSystem->getSubstance( fullid.getString() ) );
   
     appendEffector( *aSubstance, coefficient );
   }
@@ -254,9 +254,9 @@ namespace libecs
   }
 
 
-  const String Reactor::getFqpi() const
+  const FullID Reactor::getFullID() const
   {
-    return PrimitiveTypeStringOf( *this ) + ":" + getFqid();
+    //    return PrimitiveTypeStringOf( *this ) + ":" + getFullID();
   }
 
   void Reactor::appendSubstrate( SubstanceRef substrate, int coefficient )

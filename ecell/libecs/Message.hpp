@@ -43,10 +43,6 @@
 namespace libecs
 {
 
-
-  DECLARE_VECTOR( UVariable, UVariableVector );
-
-
   /**
      A data packet for communication among C++ objects consisting
      of a keyword and a body. The body is a list of UVariables.

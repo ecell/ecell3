@@ -30,7 +30,7 @@
 
 #include "Entity.hpp"
 #include "System.hpp"
-#include "FQPI.hpp"
+#include "FullID.hpp"
 #include "Stepper.hpp"
 
 namespace libecs
@@ -39,7 +39,7 @@ namespace libecs
   Entity::Entity()
     : 
     theSuperSystem( NULLPTR ),
-    theId( "" ),
+    theID( "" ),
     theName( "" ) 
   {
     makeSlots();
@@ -55,7 +55,6 @@ namespace libecs
   {
     makeMessageSlot( "ClassName", Entity, *this, NULLPTR, &Entity::getClassName );
     makeMessageSlot( "Id", Entity, *this, NULLPTR, &Entity::getId );
-    makeMessageSlot( "SystemPath", Entity, *this, NULLPTR, &Entity::getSystemPath );
     makeMessageSlot( "Name", Entity, *this, NULLPTR, &Entity::getName );
     makeMessageSlot( "Activity", Entity, *this, NULLPTR, &Entity::getActivity );
     makeMessageSlot( "ActivityPerSecond", Entity, *this, NULLPTR, 
@@ -69,12 +68,7 @@ namespace libecs
 
   const Message Entity::getId( StringCref keyword )
   {
-    return Message( keyword, UVariable( getId() ) );
-  }
-
-  const Message Entity::getSystemPath( StringCref keyword )
-  {
-    return Message( keyword, UVariable( getSystemPath() ) );
+    return Message( keyword, UVariable( getID() ) );
   }
 
   const Message Entity::getName( StringCref keyword )
@@ -102,46 +96,10 @@ namespace libecs
     return ( getActivity()  / getSuperSystem()->getStepper()->getDeltaT() );
   }
 
-  const String Entity::getFqid() const
-  {
-    String aFqid = getSystemPath();
-    if( aFqid != "" )
-      {
-	aFqid += ":";
-      }
-    aFqid += getId();
-
-    return aFqid;
-  }
-
-  const String Entity::getFqpi() const
-  {
-    //FIXME: slow? use virtual methods
-    return PrimitiveTypeStringOf( *this ) + ":" + getFqid();
-  }
-
-  const String Entity::getSystemPath() const
-  {
-    if( getSuperSystem() == NULLPTR )
-      {
-	return "";
-      }
-
-    String aSystemPath = getSuperSystem()->getSystemPath(); 
-
-    if( aSystemPath != "" )
-      {
-	if( aSystemPath != "/" )
-	  {
-	    aSystemPath += SystemPath::DELIMITER;
-	  }
-      }
-
-    //FIXME: suspicious
-    aSystemPath += getSuperSystem()->getId();
-
-    return aSystemPath;
-  }
+  //  const FullID Entity::getFullID() const
+  //  {
+  //    return FullID( ENTITY, getSystemPath(), getID() );
+  //  }
 
 
 } // namespace libecs

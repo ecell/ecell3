@@ -34,7 +34,7 @@
 #include "StepperMaker.hpp"
 #include "Stepper.hpp"
 #include "AccumulatorMaker.hpp"
-#include "FQPI.hpp"
+#include "FullID.hpp"
 
 #include "RootSystem.hpp"
 
@@ -60,7 +60,7 @@ namespace libecs
   {
     makeSlots();
 
-    setId( "/" );
+    setID( "/" );
     setName( "The RootSystem" );
     setRootSystem( this );
   }
@@ -98,19 +98,7 @@ namespace libecs
     return status;
   }
 
-  SystemPtr RootSystem::getSystem( SystemPathCref systempath ) 
-  {
-    if( systempath.first() != "/" )
-      {
-	throw BadID( __PRETTY_FUNCTION__,
-		     "Fully qualified system path must start with '/'. ([" + 
-		     systempath.getString() + "].");
-      }
-
-    return getSystem( systempath.getSystemPathString() );
-  }
-
-  SystemPtr RootSystem::getSystem( StringCref id ) 
+  SystemPtr RootSystem::getSystem( StringCref id )
   {
     // the root System(this!) is requested.
     if( id == "/" )

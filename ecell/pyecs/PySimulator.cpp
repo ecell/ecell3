@@ -30,7 +30,7 @@
 
 
 #include "libecs/libecs.hpp"
-#include "libecs/FQPI.hpp"
+#include "libecs/FullID.hpp"
 #include "libecs/Message.hpp"
 
 #include "PyEcs.hpp"
@@ -74,11 +74,19 @@ Object PySimulator::createEntity( const Py::Tuple& args )
   ECS_TRY;
 
   args.verify_length( 3 );
-  const String aClassname( static_cast<Py::String>( args[0] ) );
-  const FQPI aFqpi( static_cast<Py::String>( args[1] ) );
-  const String aName( static_cast<Py::String>( args[2] ) );
 
-  Simulator::createEntity( aClassname, aFqpi, aName );
+  const Py::Sequence& aFullID( args[1] );
+  aFullID.verify_length( 3 );
+
+  const String aClassname ( static_cast<Py::String>( args[0] ) );
+  const String aTypeString( static_cast<Py::String>( aFullID[0] ) );
+  const String aPath      ( static_cast<Py::String>( aFullID[1] ) );
+  const String anID       ( static_cast<Py::String>( aFullID[2] ) );
+  const String aName      ( static_cast<Py::String>( args[2] ) );
+
+  PrimitiveType aType = PrimitiveTypeOf( aTypeString );
+
+  Simulator::createEntity( aClassname, aType, aPath, anID, aName );
 
   return Py::Object();
 
@@ -89,22 +97,29 @@ Object PySimulator::setProperty( const Py::Tuple& args )
 {
   ECS_TRY;
 
-  args.verify_length( 3 );
-  const String aFqpi( static_cast<Py::String>( args[0] ) );
-  const String aMessageKeyword( static_cast<Py::String>( args[1] ) );
+  args.verify_length( 2 );
 
-  const Py::Tuple aMessageSequence( static_cast<Py::Sequence>( args[2] ) );
+  const Py::Sequence& aFullPropertyName( args[0] );
+  aFullPropertyName.verify_length( 4 );
+
+  const String aTypeString( static_cast<Py::String>( aFullPropertyName[0] ) );
+  const String aPath      ( static_cast<Py::String>( aFullPropertyName[1] ) );
+  const String anID       ( static_cast<Py::String>( aFullPropertyName[2] ) );
+  const String aPropertyName 
+    ( static_cast<Py::String>( aFullPropertyName[3] ) );
+
+  PrimitiveType aType = PrimitiveTypeOf( aTypeString );
+
+  const Py::Tuple aMessageSequence( static_cast<Py::Sequence>( args[1] ) );
   
-  UVariableVector aMessageBody;
+  UVariableVector aMessageBody( aMessageSequence.size() );
   for( Py::Tuple::const_iterator i = aMessageSequence.begin() ;
        i != aMessageSequence.end() ; ++i )
     {
       aMessageBody.push_back( UVariable( (*i).as_string() ) );
     }
 
-  const Message aMessage( aMessageKeyword, aMessageBody );
-
-  Simulator::setProperty( FQPI( aFqpi ), aMessage );
+  Simulator::setProperty( aType, aPath, anID, aPropertyName, aMessageBody );
 
   return Py::Object();
 
@@ -115,35 +130,49 @@ Object PySimulator::getProperty( const Py::Tuple& args )
 {
   ECS_TRY;
 
-  args.verify_length( 2 );
+  args.verify_length( 1 );
   
-  const FQPI aFqpi( static_cast<Py::String>( args[0] ) );
-  const String aPropertyName( static_cast<Py::String>( args[1] ) );
+  const Py::Sequence& aFullPropertyName( args[0] );
+  aFullPropertyName.verify_length( 4 );
 
-  Message aMessage( Simulator::getProperty( aFqpi, aPropertyName ) );
-  int aMessageSize = aMessage.getBody().size();
+  const String aTypeString( static_cast<Py::String>( aFullPropertyName[0] ) );
+  const String aPath      ( static_cast<Py::String>( aFullPropertyName[1] ) );
+  const String anID       ( static_cast<Py::String>( aFullPropertyName[2] ) );
+  const String aPropertyName
+    ( static_cast<Py::String>( aFullPropertyName[3] ) );
 
-  Py::Tuple aTuple( aMessageSize );
+  PrimitiveType aType = PrimitiveTypeOf( aTypeString );
 
-  for( int i = 0 ; i < aMessageSize ; ++i )
+  UVariableVector aVector( Simulator::getProperty( aType,
+						   aPath,
+						   anID,
+						   aPropertyName ) );
+
+  UVariableVector::size_type aSize( aVector.size() );
+
+  Py::Tuple aTuple( aSize );
+
+  for( UVariableVector::size_type i( 0 ) ; i < aSize ; ++i )
     {
-      UVariableCref aUVariable( aMessage.getBody()[i] );
+      UVariableCref aUVariable( aVector[i] );
       Py::Object anObject;
-      if( aUVariable.isReal() )
+
+      switch( aUVariable.getType() )
 	{
+	case UVariable::REAL:
 	  anObject = Py::Float( aUVariable.asReal() );
-	}
-      else if( aUVariable.isInt() )
-	{
-	  anObject = 
-	    Py::Int( static_cast<long int>( aUVariable.asInt() ) );
-	}
-      else if( aUVariable.isString() )
-	{
+	  break;
+
+	case UVariable::INT:
+	  anObject = Py::Int( static_cast<long int>( aUVariable.asInt() ) );
+	  break;
+
+	case UVariable::STRING:
+	case UVariable::NONE:
 	  anObject = Py::String( aUVariable.asString() );
-	}
-      else
-	{
+	  break;
+
+	default:
 	  assert( 0 );
 	  ; //FIXME: assert: NEVER_GET_HERE
 	}
@@ -173,12 +202,23 @@ Object PySimulator::initialize( const Py::Tuple& )
 Object PySimulator::getLogger( const Py::Tuple& args )
 {
   ECS_TRY;
-  args.verify_length( 2 );
-  
-  const String aId( static_cast<Py::String>( args[0] ) );
-  const String aPropertyName( static_cast<Py::String>( args[1] ) );
+  args.verify_length( 1 );
 
-  const Logger* aLogger = Simulator::getLogger( aId, aPropertyName );
+  const Py::Sequence& aFullPropertyName( args[0] );
+  aFullPropertyName.verify_length( 4 );
+
+  const String aTypeString( static_cast<Py::String>( aFullPropertyName[0] ) );
+  const String aPath      ( static_cast<Py::String>( aFullPropertyName[1] ) );
+  const String anID       ( static_cast<Py::String>( aFullPropertyName[2] ) );
+  const String aPropertyName
+    ( static_cast<Py::String>( aFullPropertyName[3] ) );
+
+  PrimitiveType aType = PrimitiveTypeOf( aTypeString );
+
+  const Logger* aLogger( Simulator::getLogger( aType,
+					    aPath,
+					    anID,
+					    aPropertyName ) );
 
   PyLogger* aPyLogger = new PyLogger( aLogger );
 
@@ -186,24 +226,4 @@ Object PySimulator::getLogger( const Py::Tuple& args )
 
   ECS_CATCH;
 }
-
-Object PySimulator::setLogger( const Py::Tuple& args )
-{
-  ECS_TRY;
-  args.verify_length( 3 );
-  
-  const String aId( static_cast<Py::String>( args[0] ) );
-  const String aPropertyName( static_cast<Py::String>( args[1] ) );
-  //  const Logger* aLogger = Simulator::getLogger( aId, aPropertyName );
-
-  //  PyLogger* aPyLogger = new PyLogger( aLogger );
-
-  //  return asObject( aPyLogger );
-  return Object();
-
-  ECS_CATCH;
-}
-
-
-
 

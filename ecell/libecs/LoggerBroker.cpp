@@ -35,7 +35,7 @@
 #include "Logger.hpp"
 #include "MessageInterface.hpp"
 #include "PrimitiveType.hpp"
-#include "FQPI.hpp"
+#include "FullID.hpp"
 #include "RootSystem.hpp"
 #include "System.hpp"
 #include "Substance.hpp"
@@ -45,47 +45,52 @@
 namespace libecs
 {
 
-  LoggerPtr LoggerBroker::getLogger( StringCref id_name, StringCref property_name )
+  LoggerPtr LoggerBroker::getLogger( FullPropertyNameCref fpn )
   {
-    const PairOfStrings p(id_name, property_name);
-    LoggerMap::iterator position( theLoggerMap.find( p ) );
-    if( position != theLoggerMap.end() )
+    LoggerMapIterator aLoggerMapIterator( theLoggerMap.find( fpn ) );
+    if( aLoggerMapIterator != theLoggerMap.end() )
       {
-	return position->second;
+	return aLoggerMapIterator->second;
       }
     else
       {
-	appendLogger( id_name, property_name );
-	position = theLoggerMap.find( p );
-	return position->second;
+	appendLogger( fpn );
+	aLoggerMapIterator = theLoggerMap.find( fpn );
+	return aLoggerMapIterator->second;
       }
   }
 
-  void LoggerBroker::appendLogger( StringCref fqpnstring, StringCref property_name )
+  void LoggerBroker::appendLogger( FullPropertyNameCref fpn )
   {
-    FQPI aFQPI( fqpnstring );
-    String aSystemPathString( aFQPI.getSystemPathString() );
-    SystemPtr aSystemPtr = theRootSystem->getSystem( aSystemPathString );
+    SystemPtr aSystemPtr = theRootSystem->getSystem( fpn.getSystemPath() );
 
-    PropertyMapIterator pmitr( NULLPTR );
+    PropertyMapIterator aPropertyMapIterator( NULLPTR );
 
-    switch( aFQPI.getPrimitiveType() )
+    String anID( fpn.getID() );
+    String aPropertyName( fpn.getPropertyName() );
+
+    switch( fpn.getPrimitiveType() )
       {
       case SUBSTANCE:
-	pmitr = aSystemPtr->getSubstance( aFQPI.getIdString() )->getMessageSlot( property_name );
+	aPropertyMapIterator = aSystemPtr->getSubstance( anID )->
+	  getMessageSlot( aPropertyName );
     	break;
       case REACTOR:
-	pmitr = aSystemPtr->getReactor( aFQPI.getIdString() )->getMessageSlot( property_name );
+	aPropertyMapIterator = aSystemPtr->getReactor( anID )->
+	  getMessageSlot( aPropertyName );
 	break;
       case SYSTEM:
-	pmitr = aSystemPtr->getSystem( aFQPI.getIdString() )->getMessageSlot( property_name );
+	aPropertyMapIterator = aSystemPtr->getSystem( anID )->
+	  getMessageSlot( aPropertyName );
 	break;
+      default:
+	throw BadID( __PRETTY_FUNCTION__,
+		     "Bad primitive type" );
       }
 
-    LoggerPtr lptr = new Logger();
-    pmitr->second->getProxy()->setLogger( lptr );
-    const PairOfStrings p( fqpnstring, property_name );
-    theLoggerMap.insert(PairInLoggerMap( p, lptr ) );
+    LoggerPtr aLoggerPtr = new Logger();
+    aPropertyMapIterator->second->getProxy()->setLogger( aLoggerPtr );
+    theLoggerMap[fpn] = aLoggerPtr;
   }
   
 

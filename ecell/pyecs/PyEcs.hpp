@@ -60,7 +60,7 @@ extern "C" void initecs();
 
 #define ECS_CATCH\
     }\
-  catch( ::ExceptionCref e )\
+  catch( libecs::ExceptionCref e )\
     {\
       throw Py::Exception( e.message() );\
     }\
@@ -68,6 +68,10 @@ extern "C" void initecs();
     {\
       throw Py::SystemError( std::string( "E-CELL internal error: " )\
 			     + std::string( e.what() ) );\
+    }\
+  catch( Py::Exception& )\
+    {\
+      throw;\
     }\
   catch( ... ) \
     {\

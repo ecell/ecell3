@@ -31,11 +31,7 @@
 
 #include "libecs/libecs.hpp"
 #include "libecs/Message.hpp"
-#include "libecs/FQPI.hpp"
 #include "libecs/RootSystem.hpp"
-#include "libecs/SubstanceMaker.hpp"
-#include "libecs/ReactorMaker.hpp"
-#include "libecs/SystemMaker.hpp"
 #include "libecs/Stepper.hpp"
 #include "libecs/LoggerBroker.hpp"
 
@@ -60,116 +56,43 @@ namespace libemc
     delete &theLoggerBroker;
   }
 
-  void LocalSimulatorImplementation::createEntity( StringCref classname,
-						   FQPICref fqpi, 
-						   StringCref name )
+
+  void LocalSimulatorImplementation::createEntity( StringCref    classname, 
+						   PrimitiveType type,
+						   StringCref    systempath,
+						   StringCref    id,
+						   StringCref    name )
   {
-    PrimitiveType aType = fqpi.getPrimitiveType();
-    SystemPtr aTargetSystem = getRootSystem().getSystem( fqpi );
-
-    SubstancePtr aSubstancePtr;
-    ReactorPtr   aReactorPtr;
-    SystemPtr    aSystemPtr;
-
-    switch( aType )
-      {
-
-      case SUBSTANCE:
-	aSubstancePtr = getRootSystem().getSubstanceMaker().make( classname );
-	aSubstancePtr->setId( fqpi.getIdString() );
-	aSubstancePtr->setName( name );
-	aTargetSystem->registerSubstance( aSubstancePtr );
-	break;
-
-      case REACTOR:
-	aReactorPtr = getRootSystem().getReactorMaker().make( classname );
-	aReactorPtr->setId( fqpi.getIdString() );
-	aReactorPtr->setName( name );
-	aTargetSystem->registerReactor( aReactorPtr );
-	break;
-
-      case SYSTEM:
-	aSystemPtr = getRootSystem().getSystemMaker().make( classname );
-	aSystemPtr->setId( fqpi.getIdString() );
-	aSystemPtr->setName( name );
-	aTargetSystem->registerSystem( aSystemPtr );
-	break;
-
-      case NONE:
-      default:
-	throw InvalidPrimitiveType( __PRETTY_FUNCTION__, 
-				    "bad PrimitiveType specified." );
-
-      }
-
+    getRootSystem().createEntity( classname, 
+				  FullID( type, systempath, id ),
+				  name );
+				  
+						     
   }
-
-  void LocalSimulatorImplementation::setProperty( FQPICref fqpi, 
-						  MessageCref message)
+    
+  void LocalSimulatorImplementation::setProperty( PrimitiveType type,
+						  StringCref    systempath,
+						  StringCref    id,
+						  StringCref    property,
+						  UVariableVectorCref data )
   {
-    PrimitiveType aType = fqpi.getPrimitiveType();
-    SystemPtr aSystem = getRootSystem().getSystem( SystemPath(fqpi) );
-
-    EntityPtr anEntityPtr;
-
-    switch( aType )
-      {
-
-      case SUBSTANCE:
-	anEntityPtr = aSystem->getSubstance( fqpi.getIdString() );
-	break;
-
-      case REACTOR:
-	anEntityPtr = aSystem->getReactor( fqpi.getIdString() );
-	break;
-
-      case SYSTEM:
-	anEntityPtr = aSystem->getSystem( fqpi.getIdString() );
-	break;
-
-      case NONE:
-      default:
-	throw InvalidPrimitiveType( __PRETTY_FUNCTION__, 
-				    "bad PrimitiveType specified." );
-
-      }
-
-    anEntityPtr->set( message );
+    EntityPtr anEntityPtr( getRootSystem().getEntity( FullID( type, 
+							      systempath, 
+							      id ) ) );
+    anEntityPtr->set( Message( property, data ) );
   }
 
 
-  const Message LocalSimulatorImplementation::
-  getProperty( FQPICref fqpi,
-	       StringCref propertyName )
+  const UVariableVector 
+  LocalSimulatorImplementation::getProperty( PrimitiveType type,
+					     StringCref    systempath,
+					     StringCref    id,
+					     StringCref    propertyname )
   {
-    PrimitiveType aType = fqpi.getPrimitiveType();
-    SystemPtr aSystem = getRootSystem().getSystem( fqpi );
-
-    EntityPtr anEntityPtr;
-
-    switch( aType )
-      {
-
-      case SUBSTANCE:
-	anEntityPtr = aSystem->getSubstance( fqpi.getIdString() );
-	break;
-
-      case REACTOR:
-	anEntityPtr = aSystem->getReactor( fqpi.getIdString() );
-	break;
-
-      case SYSTEM:
-	anEntityPtr = aSystem->getSystem( fqpi.getIdString() );
-	break;
-
-      case NONE:
-      default:
-	throw InvalidPrimitiveType( __PRETTY_FUNCTION__, 
-				    "bad PrimitiveType specified." );
-
-      }
-
-    return anEntityPtr->get( propertyName );
+    EntityPtr anEntityPtr( getRootSystem().getEntity( FullID( type, 
+							      systempath, 
+							      id ) ) );
+    return anEntityPtr->get( propertyname ).getBody();
   }
 
 
@@ -184,10 +107,15 @@ namespace libemc
   }
 
   LoggerCptr LocalSimulatorImplementation::
-  getLogger( StringCref id_name,
-	     StringCref propertyname )
+  getLogger(libecs::PrimitiveType type,
+	    libecs::StringCref    systempath,
+	    libecs::StringCref    id,
+	    libecs::StringCref    propertyname )
   {
-    return theLoggerBroker.getLogger( id_name, propertyname );
+    return theLoggerBroker.getLogger( FullPropertyName( type, 
+							systempath,
+							id,
+							propertyname ) );
   }
 
 
