@@ -123,7 +123,6 @@ namespace libecs
     */
 
     void log();
-    void slave();
     void clear();
     void process();
     void processNegative();
@@ -228,32 +227,6 @@ namespace libecs
       theModel = aModel;
     }
 
-    /**
-       Set slave stepper by a stepper ID string.
-
-       If an empty string is given, this method unsets the slave stepper.
-    */
-
-    void setSlaveStepperID( StringCref aStepperID );
-
-    /**
-       Get an ID string of the slave stepper.
-
-       @return an ID string of the slave stepper.
-    */
-
-    const String getSlaveStepperID() const;
-
-    void setSlaveStepper( StepperPtr aStepperPtr )
-    {
-      theSlaveStepper = aStepperPtr;
-    }
-
-    StepperPtr getSlaveStepper() const
-    {
-      return theSlaveStepper;
-    }
-
     void setUserMinInterval( RealCref aValue )
     {
       theUserMinInterval = aValue;
@@ -345,7 +318,6 @@ namespace libecs
 
     String              theID;
 
-    StepperPtr          theSlaveStepper;
   };
 
 

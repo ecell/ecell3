@@ -51,7 +51,6 @@ namespace libecs
     const UnsignedInt aSize( theWriteVariableVector.size() );
 
     integrate();
-    slave();
 
     processNegative();
     log();
@@ -98,8 +97,6 @@ namespace libecs
   {
     // integrate phase first
     integrate();
-
-    slave();
 
     processNegative();
 
@@ -200,7 +197,6 @@ namespace libecs
   void Euler1Stepper::step()
   {
     integrate();
-    slave();
 
     processNegative();
 
@@ -351,8 +347,6 @@ namespace libecs
   {
     // integrate phase first
     integrate();
-
-    slave();
 
     processNegative();
 
@@ -533,8 +527,6 @@ namespace libecs
   {
     // integrate phase first
     integrate();
-
-    slave();
 
     processNegative();
 

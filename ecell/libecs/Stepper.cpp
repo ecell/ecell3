@@ -107,12 +107,6 @@ namespace libecs
 				      &Stepper::getStepIntervalConstraint ) );
 
     registerSlot( getPropertySlotMaker()->
-		  createPropertySlot( "SlaveStepper", *this,
-				      Type2Type<String>(),
-				      &Stepper::setSlaveStepperID,
-				      &Stepper::getSlaveStepperID ) );
-
-    registerSlot( getPropertySlotMaker()->
 		  createPropertySlot( "ReadVariableList", *this,
 				      Type2Type<Polymorph>(),
 				      NULLPTR,
@@ -139,8 +133,7 @@ namespace libecs
     theCurrentTime( 0.0 ),
     theStepInterval( 0.001 ),
     theUserMinInterval( std::numeric_limits<Real>::min() * 10 ),
-    theUserMaxInterval( std::numeric_limits<Real>::max() * .1 ),
-    theSlaveStepper( NULLPTR )
+    theUserMaxInterval( std::numeric_limits<Real>::max() * .1 )
   {
     makeSlots();
   }
@@ -300,30 +293,6 @@ namespace libecs
     theLoggedPropertySlotVector.push_back( aPropertySlotPtr );
   }
 
-  void Stepper::setSlaveStepperID( StringCref aStepperID )
-  {
-    if( aStepperID == "" )
-      {
-	setSlaveStepper( NULLPTR );
-      }
-    else
-      {
-	setSlaveStepper( getModel()->getStepper( aStepperID ) );
-      }
-  }
-
-  const String Stepper::getSlaveStepperID() const
-  {
-    StepperPtr aStepperPtr( getSlaveStepper() );
-    if( aStepperPtr == NULLPTR )
-      {
-	return String();
-      }
-    else
-      {
-	return aStepperPtr->getID();
-      }
-  }
 
   void Stepper::setStepIntervalConstraint( PolymorphCref aValue )
   {
@@ -511,16 +480,6 @@ namespace libecs
       }
   }
 
-  void Stepper::slave()
-  {
-    // call slave
-    StepperPtr aSlaveStepperPtr( getSlaveStepper() );
-    if( aSlaveStepperPtr != NULLPTR )
-      {
-	aSlaveStepperPtr->step();
-	aSlaveStepperPtr->setCurrentTime( getCurrentTime() );
-      }
-  }
 
   void Stepper::reset()
   {
