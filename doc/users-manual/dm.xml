@@ -852,11 +852,11 @@ on an object, the last is taken.</para>
 	      property methods; all of set method, get method, load
 	      method ans save method can be specified independently.
 	      If the <parameter>LOAD_METHOD</parameter> is
-	      <literal>NULLPTR</literal>, it is said to be not
+	      <literal>NOMETHOD</literal>, it is said to be not
 	      <emphasis>loadable</emphasis>, and it is not
 	      <emphasis>savable</emphasis> if
 	      <parameter>SAVE_METHOD</parameter> is
-	      <literal>NULLPTR</literal>.</para>
+	      <literal>NOMETHOD</literal>.</para>
 	    </listitem>
 
 	    <listitem>
@@ -867,10 +867,10 @@ on an object, the last is taken.</para>
 	      section, but this sets both
 	      <parameter>LOAD_METHOD</parameter> and
 	      <parameter>SAVE_METHOD</parameter> to
-	      <literal>NULLPTR</literal>.</para>
+	      <literal>NOMETHOD</literal>.</para>
 
 	      <para>That is, this macro is equivalent to writing:
-<programlisting><function>PROPERTYSLOT_LOAD_SAVE( <parameter>NAME</parameter>, <parameter>TYPE</parameter>, <parameter>SET_METHOD</parameter>, <parameter>GET_METHOD</parameter>, NULLPTR, NULLPTR )</function></programlisting>
+<programlisting><function>PROPERTYSLOT_LOAD_SAVE( <parameter>NAME</parameter>, <parameter>TYPE</parameter>, <parameter>SET_METHOD</parameter>, <parameter>GET_METHOD</parameter>, NOMETHOD, NOMETHOD )</function></programlisting>
 </para>
 	    </listitem>
 
