@@ -290,7 +290,7 @@ class Axis:
             
                 if rangesMin <= 0 or rangesMax <= 0:
                     self.theParent.theOwner.theSession.message("non positive value in data, fallback to linear scale!\n")
-                    self.changeScale( self.theOrientation, SCALE_LINEAR )
+                    self.theParent.changeScale( self.theOrientation, SCALE_LINEAR )
                     return
                 
                 self.theFrame[1] = pow( 10, ceil( log10( rangesMax ) ) )
@@ -1139,17 +1139,68 @@ class Plot:
             #create self.x0, y0
         #if button is 3 and zoomlevel>0
         elif button==3:
-            if self.theZoomLevel > 0 and self.convertPlotCoordinates != None:
-                self.zoomOut()
-            else:
-                self.showMenu()
+            self.showMenu()
             #call zoomOut
 
     def showMenu( self ):
         theMenu = gtk.Menu()
-        
-# plot menus : hide/show gui, toggle strip mode, togle axis
-        pass
+        if self.isGUIShown:
+            guiMenuItem = gtk.MenuItem( "Hide GUI" )
+            guiMenuItem.connect ( "activate", self.__minimize_action )
+        else:
+            guiMenuItem = gtk.MenuItem( "Show GUI" )
+            guiMenuItem.connect ( "activate", self.__maximize_action )
+            
+        xToggle = gtk.MenuItem ( "toggle X axis" )
+        xToggle.connect( "activate", self.__toggleXAxis )
+        yToggle = gtk.MenuItem ( "toggle Y axis" )
+        yToggle.connect( "activate", self.__toggleYAxis )
+        if self.theStripMode == MODE_STRIP:
+            toggleStrip = gtk.MenuItem("history mode")
+        else:
+            toggleStrip = gtk.MenuItem( "strip mode" )
+        toggleStrip.connect( "activate", self.__toggleStripMode )
+        theMenu.append( toggleStrip )
+        theMenu.append( xToggle )
+        theMenu.append( yToggle )
+        theMenu.append( guiMenuItem )
+        if self.theZoomLevel > 0:
+            zoomUt = gtk.MenuItem( "zoom out" )
+            zoomUt.connect ("activate", self.__zoomOut )
+            theMenu.append( zoomUt )
+        theMenu.show_all()
+        theMenu.popup( None, None, None, 1, 0 )
+
+    def __zoomOut( self, *args ):
+        self.zoomOut()
+
+
+    def __toggleStripMode( self, *args ):
+        if self.theStripMode == MODE_STRIP:
+            self.setStripMode( MODE_HISTORY )
+        else:
+            self.setStripMode( MODE_STRIP )
+
+
+    def __toggleXAxis( self, *args ):
+        if self.theXAxis.theScaleType == SCALE_LINEAR:
+            self.changeScale( PLOT_HORIZONTAL_AXIS, SCALE_LOG10) 
+        else:
+            self.changeScale( PLOT_HORIZONTAL_AXIS, SCALE_LINEAR )
+
+            
+    def __toggleYAxis( self, *args ):
+        if self.theYAxis.theScaleType == SCALE_LINEAR:
+            self.changeScale( PLOT_VERTICAL_AXIS, SCALE_LOG10) 
+        else:
+            self.changeScale( PLOT_VERTICAL_AXIS, SCALE_LINEAR )
+            
+
+    def __minimize_action( self, *args ):
+        self.minimize()
+
+    def __maximize_action( self, *args ):
+        self.maximize()
 
     def showPersistentCoordinates( self, x, y ):
         self.displayCoordinates( x, y, self.persistentCoordArea )
