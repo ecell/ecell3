@@ -4,7 +4,13 @@
 
 === About ===
 
+This is a model of the oscillating Drosophila period protein(PER),
+to be run on E-Cell Simulation Environment Version 3.
+This model is based on the model introduced in the following publication.
 
+A.Goldbeter, 
+"A model for circadian oscillations in the Drosophila period protein(PER)"
+Proc R Soc Lond B Biol Sci, Vol.261:319-324, Sep 1995.
 
 === Files and directories ===
 
