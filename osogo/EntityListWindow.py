@@ -831,7 +831,7 @@ class EntityListWindow(OsogoWindow):
         Returns None
         """
 
-        self.thePropertyWindow.clearStatusBar()
+#        self.thePropertyWindow.clearStatusBar()
 
         if len(obj) == 0:
             return None
@@ -871,7 +871,7 @@ class EntityListWindow(OsogoWindow):
         """
 
         # clear status bar
-        self.thePropertyWindow.clearStatusBar()
+#        self.thePropertyWindow.clearStatusBar()
 
         if len(obj) == 0:
             return None
@@ -1010,7 +1010,7 @@ class EntityListWindow(OsogoWindow):
         """add plugin window to board
         """
 
-        self.thePropertyWindow.clearStatusBar()
+#        self.thePropertyWindow.clearStatusBar()
 
         if len(arg) == 0:
             return None
@@ -1050,7 +1050,7 @@ class EntityListWindow(OsogoWindow):
         """
 
         # clear status bar
-        self.thePropertyWindow.clearStatusBar()
+#        self.thePropertyWindow.clearStatusBar()
 
         # gets selected RawFullPNList
         aSelectedRawFullPNList = self.__getSelectedRawFullPNList()
