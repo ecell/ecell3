@@ -47,7 +47,7 @@ LIBECS_DM_CLASS( MakesignalProcess, Process )
       P0 = getVariableReference( "P0" );
     }
 
-  void process()
+  void fire()
   {
     if( theLastTime < 0.0 )
       {

@@ -34,7 +34,7 @@ namespace libecs
 	Process::initialize();
       }
     
-    virtual void process()
+    virtual void fire()
       {
 	;
       }

@@ -77,7 +77,7 @@ namespace libecs
     virtual void initialize();
 
     /**
-       This method calls process() method of all Processes.
+       This method calls fire() method of all Processes.
     */
 
     virtual void step();

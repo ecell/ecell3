@@ -37,7 +37,7 @@ LIBECS_DM_CLASS( ConstantFluxProcess, ContinuousProcess )
 		     ( &VariableReference::setIsAccessor ), false ) );
   }  
 
-  virtual void process()
+  virtual void fire()
   {
     // constant flux
     setFlux( k );

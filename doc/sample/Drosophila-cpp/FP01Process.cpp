@@ -25,7 +25,7 @@ LIBECS_DM_CLASS( FP01Process, ContinuousProcess )
   //void setKm( RealCref value ) { Km = value; }
   //const Real getKm() const { return Km; }
 
-  virtual void process()
+  virtual void fire()
     {
       Real E( C0.getMolarConc() );
       Real V( Km * E );

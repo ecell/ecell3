@@ -244,7 +244,7 @@ LIBECS_DM_CLASS( BisectionRapidEquilibriumProcess, Process )
       return optimizeVelocity( aVelocity, aWidth , aDiff );
     }
   
-  virtual void process()
+  virtual void fire()
     {
       Real aVelocity = getInitialVelocity();
 

@@ -43,7 +43,7 @@ LIBECS_DM_CLASS( QuasiDynamicFluxProcess, Process )
       declareUnidirectional();
     }
 
-  virtual void process()
+  virtual void fire()
   {
     ; // do nothing
   }

@@ -152,7 +152,7 @@ namespace libecs
     StepperEventCref anEvent( thePriorityQueue.top() );
 
     DiscreteEventProcessPtr const aMuProcess( anEvent.getProcess() );
-    aMuProcess->process();
+    aMuProcess->fire();
     theLastProcess = aMuProcess;
 
     const Real aCurrentTime( getCurrentTime() );

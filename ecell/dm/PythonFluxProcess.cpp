@@ -40,7 +40,7 @@ USE_LIBECS;
 LIBECS_DM_INIT( PythonFluxProcess, Process );
 
   
-void PythonFluxProcess::process()
+void PythonFluxProcess::fire()
 {
   python::handle<> 
     aHandle( PyEval_EvalCode( reinterpret_cast<PyCodeObject*>

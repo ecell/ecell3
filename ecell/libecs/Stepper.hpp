@@ -293,7 +293,7 @@ namespace libecs
 
     void log();
     void clear();
-    void process();
+    void fire();
 
     virtual void reset();
     

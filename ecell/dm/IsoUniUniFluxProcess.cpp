@@ -47,7 +47,7 @@ LIBECS_DM_CLASS( IsoUniUniFluxProcess, ContinuousProcess )
       C0 = getVariableReference( "C0" );  
     }
 
-  virtual void process()
+  virtual void fire()
     {
       Real S( S0.getMolarConc() );
       Real P( P0.getMolarConc() );

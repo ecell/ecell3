@@ -55,7 +55,7 @@ namespace libecs
     const Real aCurrentTime( getCurrentTime() );
 
     // ========= 1 ===========
-    process();
+    fire();
 
     const UnsignedInt aSize( getReadOnlyVariableOffset() );
     for( UnsignedInt c( 0 ); c < aSize; ++c )
@@ -77,7 +77,7 @@ namespace libecs
 
     // ========= 2 ===========
     setCurrentTime( aCurrentTime + getStepInterval()*0.5 );
-    process();
+    fire();
 
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
@@ -97,7 +97,7 @@ namespace libecs
 
     // ========= 3 ===========
     //    setCurrentTime( aCurrentTime + getStepInterval()*0.5 );
-    process();
+    fire();
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
 	VariablePtr const aVariable( theVariableVector[ c ] );
@@ -115,7 +115,7 @@ namespace libecs
 
     // ========= 4 ===========
     setCurrentTime( aCurrentTime + getStepInterval() );
-    process();
+    fire();
 
     // restore theValueBuffer
     for( UnsignedInt c( 0 ); c < aSize; ++c )

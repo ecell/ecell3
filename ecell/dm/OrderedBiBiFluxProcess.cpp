@@ -66,7 +66,7 @@ LIBECS_DM_CLASS( OrderedBiBiFluxProcess, ContinuousProcess )
       C0 = getVariableReference( "C0" );
     }
 
-  virtual void process()
+  virtual void fire()
     {
       Real S0Concentration = S0.getMolarConc();
       Real S1Concentration = S1.getMolarConc();

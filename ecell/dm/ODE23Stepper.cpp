@@ -69,7 +69,7 @@ namespace libecs
     const Real aCurrentTime( getCurrentTime() );
 
     // ========= 1 ===========
-    process();
+    fire();
 
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
@@ -89,7 +89,7 @@ namespace libecs
 
     // ========= 2 ===========
     setCurrentTime( aCurrentTime + getStepInterval() );
-    process();
+    fire();
 
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
@@ -109,7 +109,7 @@ namespace libecs
 	
     // ========= 3 ===========
     setCurrentTime( aCurrentTime + getStepInterval()*0.5 );
-    process();
+    fire();
 	
     Real maxError( 0.0 );
 

@@ -40,7 +40,7 @@ LIBECS_DM_CLASS( RapidEquilibriumProcess, Process )
       theOriginalKeq = value;
     }
 
-  void process();
+  void fire();
 
   void initialize()
     {
@@ -74,7 +74,7 @@ LIBECS_DM_CLASS( RapidEquilibriumProcess, Process )
 LIBECS_DM_INIT( RapidEquilibriumProcess, Process );
 
 
-void RapidEquilibriumProcess::process()
+void RapidEquilibriumProcess::fire()
 {
  
   Real d( 0 );

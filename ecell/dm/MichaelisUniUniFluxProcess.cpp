@@ -48,7 +48,7 @@ LIBECS_DM_CLASS( MichaelisUniUniFluxProcess, ContinuousProcess )
       C0 = getVariableReference( "C0" );  
     }
 
-  virtual void process()
+  virtual void fire()
     {
       const Real S( S0.getMolarConc() );
       const Real P( P0.getMolarConc() );

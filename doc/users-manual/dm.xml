@@ -963,7 +963,7 @@ bypassing the &PropertySlot;, (2) dynamically-bound access via a
 
 
       <para>To define a new &Process; class, 
-      at least <methodname>process()</methodname> and 
+      at least <methodname>fire()</methodname> and 
       <methodname>initialize()</methodname> methods must be defined.
       </para>
 
@@ -1004,7 +1004,7 @@ LIBECS_DM_CLASS( SimpleProcess, Process )
       S0 = getVariableReference( "S0" );
     }
 
-  virtual void process()
+  virtual void fire()
     {
       setFlux( k * S0.getConcentration() );
     }

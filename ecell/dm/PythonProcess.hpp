@@ -114,7 +114,7 @@ public:
   }
 
   virtual void initialize();
-  virtual void process();
+  virtual void fire();
 
 
 protected:

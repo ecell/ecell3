@@ -132,7 +132,7 @@ namespace libecs
 
     virtual void initialize();
     
-    virtual void process() = 0;
+    virtual void fire() = 0;
     
 
     /**
@@ -189,7 +189,7 @@ namespace libecs
        Set a priority value of this Process.
 
        The priority is an Int value which is used to determine the
-       order of call to Process::process() method in Stepper.
+       order of call to Process::fire() method in Stepper.
 
        @param aValue the priority value as an Int.
        @see Stepper

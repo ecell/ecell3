@@ -28,7 +28,7 @@ LIBECS_DM_CLASS( FP03Process, ContinuousProcess )
   //void setK2( RealCref value ) { K2 = value; }
   //const Real getK2() const { return K2; }
 
-  virtual void process()
+  virtual void fire()
     {
       Real E( C0.getMolarConc() );
       

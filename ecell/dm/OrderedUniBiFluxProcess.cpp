@@ -56,7 +56,7 @@ LIBECS_DM_CLASS( OrderedUniBiFluxProcess, ContinuousProcess )
       Keq_Inv = 1.0 / Keq;
     }
 
-  virtual void process()
+  virtual void fire()
     {
       Real S0Concentration = S0.getMolarConc();
       Real P0Concentration = P0.getMolarConc();

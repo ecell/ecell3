@@ -83,7 +83,7 @@ LIBECS_DM_CLASS( DecayFluxProcess, ContinuousProcess )
       S0 = getVariableReference( "S0" );
     }
 
-  virtual void process()
+  virtual void fire()
     {
       Real velocity( k );
 

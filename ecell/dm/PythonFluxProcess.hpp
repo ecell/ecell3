@@ -83,7 +83,7 @@ public:
     return theExpression;
   }
 
-  virtual void process();
+  virtual void fire();
 
 protected:
 

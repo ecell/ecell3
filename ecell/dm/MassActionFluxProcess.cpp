@@ -29,7 +29,7 @@ LIBECS_DM_CLASS( MassActionFluxProcess, ContinuousProcess )
   
   SIMPLE_SET_GET_METHOD( Real, k );
   
-  virtual void process()
+  virtual void fire()
   {
     
     Real velocity( k * N_A );

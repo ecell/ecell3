@@ -49,7 +49,7 @@ LIBECS_DM_CLASS( GMAProcess, ESSYNSProcess )
       return GMASystemMatrix;
     }
   
-  void process()
+  void fire()
     {
       ;
     }

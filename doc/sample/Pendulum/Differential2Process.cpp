@@ -31,7 +31,7 @@ LIBECS_DM_CLASS( Differential2Process, ContinuousProcess )
       C1 = getVariableReference( "C1" );
     }
 
-  virtual void process()
+  virtual void fire()
     {
       Real aVelocity( c );
 

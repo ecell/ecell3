@@ -58,7 +58,7 @@ namespace libecs
 
   void DiscreteTimeStepper::step()
   {
-    process();
+    fire();
   }
 
 

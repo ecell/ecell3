@@ -97,7 +97,7 @@ namespace libecs
 	Process::initialize();
       }
     
-    // virtual void process();
+    // virtual void fire();
 
     virtual void updateStepInterval() = 0;
 

@@ -62,7 +62,7 @@ LIBECS_DM_CLASS( RandomBiUniProcess, ContinuousProcess )
       C_0 = getVariableReference( "C0" );
     }
 
-  virtual void process()
+  virtual void fire()
     {
       Real velocity( C_0.getValue() );
       

@@ -36,7 +36,7 @@ LIBECS_DM_CLASS( FP13Process, ContinuousProcess )
       C0 = getVariableReference( "C0" );
     }
   
-  virtual void process()
+  virtual void fire()
     {
       Real E( C0.getMolarConc() );
       

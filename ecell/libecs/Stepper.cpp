@@ -530,11 +530,11 @@ namespace libecs
 
   }
 
-  void Stepper::process()
+  void Stepper::fire()
   {
     FOR_ALL( ProcessVector, theProcessVector )
       {
-	(*i)->process();
+	(*i)->fire();
       }
   }
 

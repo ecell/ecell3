@@ -62,7 +62,7 @@ LIBECS_DM_CLASS( PingPongBiBiFluxProcess, ContinuousProcess )
       KcF_Keq_Inv = KcF / Keq;
     }
 
-  virtual void process()
+  virtual void fire()
     {
       Real S0Concentration = S0.getMolarConc();
       Real S1Concentration = S1.getMolarConc();

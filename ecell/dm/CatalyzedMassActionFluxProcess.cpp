@@ -38,7 +38,7 @@ LIBECS_DM_CLASS( CatalyzedMassActionProcess, Process )
       C0 = getVariableReference( "C0" );
     }
 
-  virtual void process()
+  virtual void fire()
     {
       Real velocity( k );
       velocity *= C0.getValue();

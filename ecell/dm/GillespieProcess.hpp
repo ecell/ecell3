@@ -105,7 +105,7 @@ LIBECS_DM_CLASS( GillespieProcess, DiscreteEventProcess )
 
   virtual void initialize();
 
-  virtual void process()
+  virtual void fire()
   {
     for( VariableReferenceVectorConstIterator 
 	   i( theVariableReferenceVector.begin() );

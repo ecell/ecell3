@@ -53,7 +53,7 @@ namespace libecs
 
     clear();
 
-    process();
+    fire();
 
     setStepInterval( getNextStepInterval() );
 

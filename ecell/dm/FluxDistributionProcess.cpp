@@ -77,7 +77,7 @@ LIBECS_DM_CLASS( FluxDistributionProcess, Process )
   SIMPLE_SET_GET_METHOD( Real, Epsilon );
 
   void initialize();  
-  void process();
+  void fire();
   
  protected:
 
@@ -321,7 +321,7 @@ void FluxDistributionProcess::initialize()
 
 }  
 
-void FluxDistributionProcess::process()
+void FluxDistributionProcess::fire()
 {
   for( Int i( 0 ); i < theKnownProcessPtrVector.size(); ++i )
     {

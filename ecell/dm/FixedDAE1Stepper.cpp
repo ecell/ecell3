@@ -240,10 +240,10 @@ namespace libecs
 
     setCurrentTime( aCurrentTime + aStepInterval );
 
-    // almost equal to call process()
+    // almost equal to call fire()
     for( UnsignedInt c( 0 ); c < aDiscreteProcessOffset; c++ )
       {
-	theProcessVector[ c ]->process();
+	theProcessVector[ c ]->fire();
 
 	for( UnsignedInt i( 0 ); i < theContinuousVariableVector.size(); i++ )
 	  {
@@ -286,7 +286,7 @@ namespace libecs
     for( UnsignedInt c( aDiscreteProcessOffset );
 	 c < theProcessVector.size(); c++ )
       {
-	theProcessVector[ c ]->process();
+	theProcessVector[ c ]->fire();
 
 	const Real anActivity( theProcessVector[ c ]->getActivity() );
 
@@ -330,7 +330,7 @@ namespace libecs
 
 	FOR_ALL( IntVector, theDependentProcessVector[ c ] )
 	  {
-	    theProcessVector[ (*i) ]->process();
+	    theProcessVector[ (*i) ]->fire();
 
 	    if ( aDiscreteProcessOffset > (*i) )
 	      {

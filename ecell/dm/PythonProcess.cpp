@@ -49,7 +49,7 @@ void PythonProcess::initialize()
   				       theLocalNamespace.ptr() ) );
 }
 
-void PythonProcess::process()
+void PythonProcess::fire()
 {
   python::handle<> a( PyEval_EvalCode( (PyCodeObject*)
 				       theCompiledProcessMethod.ptr(),

@@ -57,7 +57,7 @@ LIBECS_DM_CLASS( SSystemProcess, ESSYNSProcess )
       return SSystemMatrix;
     }
 
-  void process()
+  void fire()
     {
       ;
     }  
@@ -248,7 +248,7 @@ const std::vector<RealVector>& SSystemProcess::getESSYNSMatrix()
     {
       if( (*i).getVariable()->getValue() <= 0 )
 	{
-	  THROW_EXCEPTION( ValueError, "Error:in SSystemPProcess::process().log() in 0.");
+	  THROW_EXCEPTION( ValueError, "Error:in SSystemPProcess::fire().log() in 0.");
 	}
       (theY[anIndex])[0] =
 	gsl_sf_log( (*i).getVariable()->getValue() ) ;

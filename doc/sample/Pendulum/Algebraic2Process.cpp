@@ -29,7 +29,7 @@ LIBECS_DM_CLASS( Algebraic2Process, Process )
       C3 = getVariableReference( "C3" ); // T
     }
 
-  virtual void process()
+  virtual void fire()
     {
       setActivity( C1.getValue() * C1.getValue()
 		   + C2.getValue() * C2.getValue()
