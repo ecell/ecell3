@@ -202,13 +202,13 @@ namespace libemc
 
   private:
 
-    void runWithEvent( libecs::Real aDuration );
-    void runWithoutEvent( libecs::Real aDuration );
+    void runWithEvent( libecs::RealParam aDuration );
+    void runWithoutEvent( libecs::RealParam aDuration );
 
   private:
 
     bool                       theRunningFlag;
-    bool                       theMutatedFlag;
+    bool                       theUserInterferenceFlag;
 
     libecs::Integer            theEventCheckInterval;
 

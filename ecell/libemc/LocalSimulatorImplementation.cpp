@@ -54,7 +54,7 @@ namespace libemc
   LocalSimulatorImplementation::LocalSimulatorImplementation()
     :
     theRunningFlag( false ),
-    theMutatedFlag( true ),
+    theUserInterferenceFlag( true ),
     theEventCheckInterval( 20 ),
     theModel( *new Model ),
     theEventChecker(),
@@ -84,6 +84,7 @@ namespace libemc
 			 "Cannot create a Stepper while running." );
       }
 
+    theUserInterferenceFlag = true;
     getModel().createStepper( aClassname, anId );
   }
 
@@ -91,6 +92,8 @@ namespace libemc
   {
     THROW_EXCEPTION( libecs::NotImplemented,
 		     "deleteStepper() method is not supported yet." );
+
+    // theUserInterferenceFlag = true;
   }
 
   const libecs::Polymorph LocalSimulatorImplementation::getStepperList() const
@@ -135,7 +138,7 @@ namespace libemc
   {
     StepperPtr aStepperPtr( getModel().getStepper( aStepperID ) );
     
-    theMutatedFlag = true;
+    theUserInterferenceFlag = true;
     aStepperPtr->setProperty( aPropertyName, aValue );
   }
 
@@ -155,6 +158,7 @@ namespace libemc
   {
     StepperPtr aStepperPtr( getModel().getStepper( aStepperID ) );
     
+    theUserInterferenceFlag = true;
     aStepperPtr->loadProperty( aPropertyName, aValue );
   }
 
@@ -185,6 +189,7 @@ namespace libemc
 			 "Cannot create an Entity while running." );
       }
 
+    theUserInterferenceFlag = true;
     getModel().createEntity( aClassname, FullID( aFullIDString ) );
   }
 
@@ -192,6 +197,8 @@ namespace libemc
   {
     THROW_EXCEPTION( libecs::NotImplemented,
 		     "deleteEntity() method is not supported yet." );
+
+    // theUserInterferenceFlag = true;
   }
 
   const libecs::Polymorph LocalSimulatorImplementation::
@@ -259,7 +266,7 @@ namespace libemc
     FullPN aFullPN( aFullPNString );
     EntityPtr anEntityPtr( getModel().getEntity( aFullPN.getFullID() ) );
 
-    theMutatedFlag = true;
+    theUserInterferenceFlag = true;
     anEntityPtr->setProperty( aFullPN.getPropertyName(), aValue );
   }
 
@@ -279,6 +286,7 @@ namespace libemc
     FullPN aFullPN( aFullPNString );
     EntityPtr anEntityPtr( getModel().getEntity( aFullPN.getFullID() ) );
 
+    theUserInterferenceFlag = true;
     anEntityPtr->loadProperty( aFullPN.getPropertyName(), aValue );
   }
 
@@ -500,7 +508,9 @@ namespace libemc
   {
     getModel().initialize();
 
-    if( ! ( theEventChecker != NULLPTR && theEventHandler != NULLPTR ) )
+    if( ! ( typeid( *theEventChecker ) != 
+	    typeid( DefaultEventChecker ) && 
+	    theEventHandler.get() != NULLPTR ) )
       {
 	THROW_EXCEPTION( libecs::Exception,
 			 "Both EventChecker and EventHandler must be "
@@ -549,7 +559,8 @@ namespace libemc
     getModel().flushLoggers();
   }
 
-  void LocalSimulatorImplementation::runWithEvent( libecs::Real aDuration )
+  void LocalSimulatorImplementation::
+  runWithEvent( libecs::RealParam aDuration )
   {
     theRunningFlag = true;
 
@@ -577,7 +588,8 @@ namespace libemc
 
   }
 
-  void LocalSimulatorImplementation::runWithoutEvent( libecs::Real aDuration )
+  void LocalSimulatorImplementation::
+  runWithoutEvent( libecs::RealParam aDuration )
   {
     theRunningFlag = true;
 
