@@ -2,7 +2,7 @@ AUTOMAKE_OPTIONS = foreign
 
 winrootdir = ${prefix}
 winroot_SCRIPTS = \
-ecell3-python+gtk-installer.iss\
+ecell3-installer.iss\
 ecell3-installer.ico\
 installer_intro.bmp\
 installer_header.bmp
