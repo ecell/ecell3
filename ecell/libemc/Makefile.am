@@ -16,8 +16,8 @@ CXXFLAGS= @CXXFLAGS@ #-D_REENTRANT
 
 libemc_la_LDFLAGS= -version-info 2:0:0
 
-libemc_la_LIBADD= $(LIBECS) -lstdc++ 
-libemc_la_DEPENDENCIES=$(ECELLDIR)/libecs/libecs.la
+libemc_la_LIBADD=$(LIBECS) -lstdc++ 
+libemc_la_DEPENDENCIES=$(LIBECS)
 libemc_la_SOURCES=\
 libemc.cpp\
 Simulator.cpp\

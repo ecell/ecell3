@@ -21,9 +21,8 @@ CXXFLAGS=@CXXFLAGS@ ${BPLINCLUDE} ${ECELLINCLUDES} ${BPLCXXFLAGS}
 LIBECSDIR=$(ECELLDIR)/libecs
 LIBEMCDIR=$(ECELLDIR)/libemc
 
-LIBECS=-L$(LIBECSDIR) $(LIBECSDIR)/libecs.la
-LIBEMC=-L$(LIBEMCDIR) $(LIBEMCDIR)/libemc.la
-
+LIBECS=$(LIBECSDIR)/libecs.la
+LIBEMC=$(LIBEMCDIR)/libemc.la
 
 CFLAGS=${CXXFLAGS}
 
@@ -83,7 +82,10 @@ PyEcs.hpp
 
 _ecs_la_LDFLAGS=-module -export-dynamic -avoid-version
 
-_ecs_la_LIBADD= $(LIBEMC) $(LIBECS) -lstdc++ $(LIBLTDL)
+_ecs_la_LIBADD=$(LIBECS) $(LIBEMC) -lstdc++ $(LIBLTDL)
+
+_ecs_la_DEPENDENCIES=$(LIBECS) $(LIBEMC)
+
 
 all-local: _ecs.so
 
