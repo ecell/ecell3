@@ -1,0 +1,55 @@
+
+
+A simple and incomplete test for ecell3.
+
+
+1. make and install ecell3.
+
+   see ../INSTALL.
+
+2. build Reactor dynamic module plugin
+
+   % emtool reactor -c MichaelisUniUniReactor.cpp 
+   % ls *.so
+   MichaelisUniUniReactor.so
+
+3. run ecell3
+
+   The following command invokes ecell3, create Session instance, 
+   load simple.eml and run 1000 seconds.
+
+   % ecell3 testeml.py
+
+   An example of output is as following; 
+   Check Substance:/CELL/CYTOPLASM:S:Quantity is consumed.
+
+   create a simulation session instance
+   load Model
+   Current time =  0.0
+   Substance:/CELL/CYTOPLASM:S:Quantity    =       (1000000.0,)
+   Substance:/CELL/CYTOPLASM:P:Quantity    =       (0.0,)
+   Substance:/CELL/CYTOPLASM:E:Quantity    =       (1000.0,)
+   Current time =  1000.00099998
+   Reactor:/CELL/CYTOPLASM:E:ActivityPerSecond     =       (0.0,)
+   Substance:/CELL/CYTOPLASM:S:Quantity    =       (0.0,)
+   Substance:/CELL/CYTOPLASM:S:Concentration       =       (0.0,)
+   Substance:/CELL/CYTOPLASM:S:Activity    =       (0.0,)
+   Substance:/CELL/CYTOPLASM:S:Velocity    =       (-0.0,)
+   Substance:/CELL/CYTOPLASM:P:Quantity    =       (1000000.0,)
+
+
+4. Run gecell (osogo)
+
+   Invoke gecell command.
+
+   % gecell
+
+   (1) File -> loadModel
+   (2) select 'simple.eml'
+   (3) Push 'EntryList' toggle button on the MainWindow
+   (4) Push 'Palette' on the MainWindow
+   (5) Push 'Tracer' in the Palette window
+   (6) select CYTOPLASM in the system tree on the left of the EntryList window
+   (7) select substances E, P and S by drugging over these entries
+   (8) push 'start' button on the MainWindow
+
