@@ -11,7 +11,7 @@ lib_LTLIBRARIES = libemc.la
 
 CXXFLAGS= @CXXFLAGS@ #-D_REENTRANT
 
-libemc_la_LDFLAGS= -rpath ${libdir}
+libemc_la_LDFLAGS=
 
 #FIXME: specifing .libs is ugly
 libemc_la_LIBADD= -lstdc++ -L$(ECELLDIR)/libecs/.libs/ -lecs
