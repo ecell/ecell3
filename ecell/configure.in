@@ -249,11 +249,12 @@ AC_CONFIG_FILES([pyecs/ecell3-python], [chmod +x pyecs/ecell3-python])
 AC_CONFIG_FILES([Makefile
 		 libecs/Makefile
 		 libemc/Makefile
-		 pyecs/windows/ecell3-inno.iss
 		 pyecs/Makefile
+		 pyecs/windows/Makefile
+		 pyecs/windows/ecell3-inno.iss
+		 pyecs/windows/pathVariables
 		 pyecell/Makefile
 		 pyecell/ecell/Makefile
-		 dm/Makefile
-		 pyecell/ecell/gui_config.py])
+		 dm/Makefile])
 AC_OUTPUT
 

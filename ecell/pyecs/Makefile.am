@@ -9,12 +9,9 @@ PYTHON_INCLUDES=@PYTHON_INCLUDES@
 pkgpythondir=@pkgpythondir@
 
 if OS_WIN32
+  SUBDIRS = windows
   no_undefined = -no-undefined
   LIBPYTHON = -lpython@PYTHON_WIN_VERSION@
-  winrootdir = ${prefix}
-  winroot_SCRIPTS=\
-  windows/ecell3-inno.iss\
-  ../../osogo/ecell.ico
 else
   bin_SCRIPTS =\
   ecell3-python

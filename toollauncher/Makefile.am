@@ -19,10 +19,24 @@ ToolLauncherPreferences.py\
 AboutToolLauncher.py\
 Window.py\
 toollauncher.png\
-toollauncher_large.png\
-toollauncher.ico
+toollauncher_large.png
 
 EXTRA_DIST=${toollauncher_PYTHON}
 
-bin_SCRIPTS =\
+# Windows py2exe setup options, ignore for Unix based systems
+PY2EXE_SETUP = ../ecell/pyecs/windows/py2exeSetup
+WIN_ICON = toollauncher.ico
+PATH_VARIABLES = ../ecell/pyecs/windows/pathVariables
+
+BINS =\
 toollauncher
+
+EXE = ${BINS:=$(EXEEXT)}
+bin_SCRIPTS = ${EXE}
+
+%.exe : %
+	python $(PY2EXE_SETUP) --source=$< --icon=$(WIN_ICON) --merge=$(PATH_VARIABLES) --gui py2exe
+
+clean-local:
+	${RM} -rf build *.exe *.zip *.dll *.pyd
+

@@ -49,13 +49,25 @@ icon_message.png\
 icon_start.png\
 icon_step.png\
 icon_stepper.png\
-icon_stop.png\
-ecell.ico
+icon_stop.png
 
 
-bin_SCRIPTS =\
+EXTRA_DIST=${osogo_PYTHON}
+
+# Windows py2exe setup options, ignore for Unix based systems
+PY2EXE_SETUP = ../ecell/pyecs/windows/py2exeSetup
+WIN_ICON = ecell.ico
+PATH_VARIABLES = ../ecell/pyecs/windows/pathVariables
+
+BINS =\
 gecell
 
-EXTRA_DIST=${osogo_PYTHON}\
-${bin_SCRIPTS}
+EXE = ${BINS:=$(EXEEXT)}
+bin_SCRIPTS = ${EXE}
+
+%.exe : %
+	python $(PY2EXE_SETUP) --source=$< --icon=$(WIN_ICON) --merge=$(PATH_VARIABLES) --gui py2exe
+
+clean-local:
+	${RM} -rf build *.exe *.zip *.dll *.pyd
 

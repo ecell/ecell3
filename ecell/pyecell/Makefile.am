@@ -2,11 +2,23 @@ AUTOMAKE_OPTIONS = foreign # 1.5
 
 SUBDIRS = ecell
 
-bin_SCRIPTS =\
+# Windows py2exe setup options, ignore for Unix based systems
+PY2EXE_SETUP = ../pyecs/windows/py2exeSetup
+WIN_ICON = ../pyecs/windows/ecell3-console.ico
+PATH_VARIABLES = ../pyecs/windows/pathVariables
+
+BINS =\
 ecell3-session\
 ecell3-session-manager\
 gecell3-session\
 ecell3-sbml2eml
 
-EXTRA_DIST = $(bin_SCRIPTS)
+EXE = ${BINS:=$(EXEEXT)}
+bin_SCRIPTS = ${EXE}
+
+%.exe : %
+	python $(PY2EXE_SETUP) --source=$< --icon=$(WIN_ICON) --merge=$(PATH_VARIABLES) --console py2exe
+
+clean-local:
+	${RM} -rf build *.exe *.zip *.dll *.pyd
 

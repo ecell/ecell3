@@ -1,6 +1,4 @@
 AC_INIT(Window.py)
-
-                                                                                              
 AM_SANITY_CHECK
 AC_CANONICAL_HOST
 dnl
@@ -13,6 +11,7 @@ AM_CHECK_PYMOD(gtk,,,[AC_MSG_ERROR(could not find gtk module)])
 AM_CHECK_PYMOD(gtk.gdk,,,[AC_MSG_ERROR(could not find gtk.gdk module. perhaps pygtk2 is not installed)])
 AM_CHECK_PYMOD(gtk.glade,,,[AC_MSG_ERROR(could not find gtk.glade module. perhaps pygtk2-libglade is not installed)])
 dnl
+AC_PROG_CC
 AC_OUTPUT(
 Makefile
 misc/Makefile,

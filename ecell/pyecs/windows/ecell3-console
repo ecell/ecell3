@@ -1,0 +1,10 @@
+import os
+import sys
+
+pathSaved = os.environ['PATH']
+prefix = os.path.split(sys.prefix)[0] + os.sep
+os.environ['PATH'] = prefix + 'bin' + os.pathsep + prefix + 'lib' + os.pathsep \
+		+ prefix + 'python23' + os.pathsep +  os.environ['PATH']
+os.popen('start "E-Cell3 Console" /D' + prefix)
+os.environ['PATH'] = pathSaved
+

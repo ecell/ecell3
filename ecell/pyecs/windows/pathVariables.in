@@ -1,0 +1,32 @@
+# Global path environment variables used by E-Cell in MS-Windows
+# All variables should be declared in this file, and sourced (merged) from it 
+# Author: Satya Arjunan < satya@sfc.keio.ac.jp >
+
+import os
+import sys
+
+os.environ['PACKAGE'] = '@PACKAGE@'
+os.environ['VERSION'] = '@VERSION@'
+
+prefix = os.path.split(sys.prefix)[0]
+os.environ['ECELL3_PREFIX'] = prefix
+
+prefix = prefix + os.sep
+os.environ['OSOGOPATH'] = prefix + 'lib' + os.sep + 'osogo'
+os.environ['MEPATH'] = prefix + 'lib' + os.sep + 'modeleditor'
+os.environ['TLPATH'] = prefix + 'lib' + os.sep + 'toollauncher'
+os.environ['PYTHONDIR'] = prefix + 'python@PYTHON_WIN_VERSION@' + os.sep + \
+		'lib' + os.sep + \
+		'site-packages' # used by dmgen
+os.environ['LTDL_LIBRARY_PATH'] = prefix + 'lib' + os.sep + 'ecell' + \
+		os.sep + os.environ['VERSION']
+os.environ['PATH'] = prefix + 'bin' + os.pathsep + prefix + 'lib' + os.pathsep \
+		+ prefix + 'python@PYTHON_WIN_VERSION@' + os.pathsep + \
+		os.environ['PATH']
+os.environ['VVECTORTMPDIR'] = os.environ['TMP']		
+os.environ['PYTHONPATH'] = os.environ['PYTHONDIR']
+os.environ['BOOST_LIBRARIES'] = '-L' + prefix + 'lib' + ' -lboost_python'
+
+python_prefix = prefix + 'python@PYTHON_WIN_VERSION@' + os.sep
+sys.path = [ python_prefix, python_prefix + 'lib\\site-packages', python_prefix + 'lib\\site-packages\\Numeric', python_prefix + 'lib\\site-packages\\gtk-2.0', os.environ['OSOGOPATH'], python_prefix + 'DLLs', python_prefix + 'lib', python_prefix + 'lib\\plat-win', python_prefix + 'lib\\lib-tk' ]
+
