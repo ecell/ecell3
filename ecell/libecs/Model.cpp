@@ -49,9 +49,6 @@ namespace libecs
 
   Model::Model()
     : 
-    theCurrentTime( 0.0 ),
-    theStepperMap(),
-    theScheduleQueue(),
     theRootSystemPtr( NULL ),
     theLoggerBroker(     *new LoggerBroker( *this ) ),
     theStepperMaker(     *new StepperMaker          ),
@@ -64,6 +61,7 @@ namespace libecs
     theRootSystemPtr->setID( "/" );
     theRootSystemPtr->setName( "The Root System" );
     theRootSystemPtr->setModel( this );
+    // super system of the root system is itself.
     theRootSystemPtr->setSuperSystem( theRootSystemPtr );
   }
 
@@ -232,23 +230,8 @@ namespace libecs
     aStepper->setID( anID );
 
     theStepperMap.insert( std::make_pair( anID, aStepper ) );
-    theScheduleQueue.push( Event( getCurrentTime(), aStepper ) );
-  }
 
-
-  void Model::resetScheduleQueue()
-  {
-    //FIXME: slow! :  no theScheduleQueue.clear() ?
-    while( ! theScheduleQueue.empty() )
-      {
-	theScheduleQueue.pop();
-      }
-
-    for( StepperMapConstIterator i( theStepperMap.begin() );
-	 i != theStepperMap.end(); i++ )
-      {
-	theScheduleQueue.push( Event( getCurrentTime(), (*i).second ) );
-      }
+    theScheduler.registerEvent( Event( getCurrentTime(), aStepper ) );
   }
 
 
@@ -275,34 +258,7 @@ namespace libecs
 
     FOR_ALL_SECOND( StepperMap, theStepperMap, initialize );
 
-    theCurrentTime = ( theScheduleQueue.top() ).first;
   }
-
-
-  void Model::step()
-  {
-    EventCref aTopEvent( theScheduleQueue.top() );
-
-    StepperPtr aStepper( aTopEvent.second );
-
-    // three-phase progression of the step
-    // 1. sync:  synchronize with proxies of the PropertySlots
-    aStepper->sync();
-    // 2. step:  do the computation
-    aStepper->step();
-    // 3. push:  re-sync with the proxies, and push new values to Loggers
-    //           this need to be placed here after the event re-scheduling
-    //           so that Loggers get the new time
-    aStepper->push();
-
-    // schedule a new event
-    theScheduleQueue.changeTopKey( Event( aStepper->getCurrentTime(),
-					  aStepper ) );
-    // update theCurrentTime, which is scheduled time of the Event on the top
-    theCurrentTime = ( theScheduleQueue.top() ).first;
-
-  }
-
 
 
 } // namespace libecs

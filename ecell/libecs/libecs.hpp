@@ -71,7 +71,8 @@ namespace libecs
   DECLARE_CLASS( Stepper );
   DECLARE_CLASS( MasterStepper );
   DECLARE_CLASS( Model );
-  DECLARE_CLASS( SlaveStepper );
+  DECLARE_CLASS( Scheduler );
+  DECLARE_CLASS( Event );
   DECLARE_CLASS( StepperMaker );
   DECLARE_CLASS( Substance );
   DECLARE_CLASS( SubstanceMaker );
@@ -86,7 +87,7 @@ namespace libecs
   DECLARE_CLASS( Logger );
   DECLARE_CLASS( DataPoint );
   DECLARE_CLASS( DataPointVector );
-  DECLARE_CLASS( PhysicalLogger );
+
 
   // containers
 

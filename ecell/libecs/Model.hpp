@@ -32,12 +32,9 @@
 #define __MODEL_HPP
 
 #include <map>
+#include "libecs.hpp"
 
-//#include <queue>
-#include "DynamicPriorityQueue.hpp"
-
-#include "Stepper.hpp"
-
+#include "Scheduler.hpp"
 
 namespace libecs
 {
@@ -56,29 +53,10 @@ namespace libecs
   DECLARE_MAP( const String, StepperPtr, std::less< const String >,
 	       StepperMap ); 
 
-  typedef std::pair<Real,StepperPtr> RealStepperPtrPair;
-  DECLARE_TYPE( RealStepperPtrPair, Event );
-
-  //typedef std::priority_queue<Event,std::vector<Event>,std::greater<Event> >
-  //    EventPriorityQueue_less;
-  //  DECLARE_TYPE( EventPriorityQueue_less, ScheduleQueue );
-
-  typedef DynamicPriorityQueue<Event> EventDynamicPriorityQueue;
-  DECLARE_TYPE( EventDynamicPriorityQueue, ScheduleQueue );
-
-
   /**
      Model class represents a simulation model.
 
      Model has a list of Steppers and a pointer to the root system.
-
-     This also works as a global scheduler with a heap-tree based
-     priority queue.
-
-     In addition to theStepperMap, this class has theScheduleQueue.
-     theStepperMap stores all the Steppers in the model.  theScheduleQueue
-     is basically a priority queue used for scheduling, of which containee
-     is synchronized with the StepperMap by resetScheduleQueue() method.  
 
   */
 
@@ -102,13 +80,13 @@ namespace libecs
     /**
        Conduct a step of the simulation.
 
-       This method picks a Stepper on the top of theScheduleQueue,
-       calls sync(), step(), and push() of the Stepper, and
-       reschedules it on the queue.
-
+       @see Scheduler
     */
 
-    void step();
+    inline void step()
+    {
+      theScheduler.step();
+    }
 
 
     /**
@@ -117,9 +95,9 @@ namespace libecs
        @return time elasped since start of the simulation.
     */
 
-    const Real getCurrentTime() const
+    inline const Real getCurrentTime() const
     {
-      return theCurrentTime;
+      return theScheduler.getCurrentTime();
     }
 
 
@@ -254,31 +232,21 @@ namespace libecs
     void checkStepper( SystemCptr aSystem );
 
 
-    /**
-       This method clears the ScheduleQueue and reconstruct the queue
-       from the StepperMap.
-    */
-
-    void resetScheduleQueue();
-
   private:
-
-    Real                theCurrentTime;
-
-    StepperMap          theStepperMap;
-    ScheduleQueue       theScheduleQueue;
 
     SystemPtr           theRootSystemPtr;
 
+    StepperMap          theStepperMap;
+
+    Scheduler           theScheduler;
 
     LoggerBrokerRef     theLoggerBroker;
 
-    StepperMakerRef     theStepperMaker;
 
+    StepperMakerRef     theStepperMaker;
     SystemMakerRef      theSystemMaker;
     SubstanceMakerRef   theSubstanceMaker;
     ReactorMakerRef     theReactorMaker;
-
     AccumulatorMakerRef theAccumulatorMaker;
 
 

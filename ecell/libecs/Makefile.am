@@ -33,6 +33,7 @@ Integrators.cpp\
 SubstanceMaker.cpp\
 Stepper.cpp\
 Model.cpp\
+Scheduler.cpp\
 EntityType.cpp\
 System.cpp\
 Entity.cpp\
@@ -65,6 +66,7 @@ Integrators.hpp\
 SubstanceMaker.hpp\
 Stepper.hpp\
 Model.hpp\
+Scheduler.hpp\
 EntityType.hpp\
 System.hpp\
 Entity.hpp\

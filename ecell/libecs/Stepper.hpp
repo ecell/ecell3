@@ -68,9 +68,67 @@ namespace libecs
   DECLARE_VECTOR( PropertySlotPtr, PropertySlotVector );
 
 
+  template< class Base_, class Derived_ = Base_ >
+  class EntityCache
+    :
+    public std::vector<Derived_*>
+  {
+
+  public:
+
+    DECLARE_TYPE( Base_, Base );
+    DECLARE_TYPE( Derived_, Derived );
+
+    typedef std::vector<DerivedPtr> DerivedVector_;
+    DECLARE_TYPE( DerivedVector_, DerivedVector );
+
+    EntityCache()
+    {
+      ; // do nothing
+    }
+
+    ~EntityCache() {}
+
+
+    /**
+       Update the cache.
+
+    */
+
+    void update( SystemVectorCref aSystemVector )
+    {
+      clear();
+
+      for( SystemVectorConstIterator i( aSystemVector.begin() );
+	   i != aSystemVector.end() ; ++i )
+	{
+	  const SystemCptr aSystem( *i );
+
+	  typedef std::map<const String,BasePtr> BaseMap;
+	  
+	  for( typename BaseMap::const_iterator 
+		 j( aSystem->System::getMap<Base>().begin() );
+	       j != aSystem->System::getMap<Base>().end(); ++j )
+	    {
+	      BasePtr aBasePtr( (*j).second );
+
+	      DerivedPtr aDerivedPtr( dynamic_cast<DerivedPtr>( aBasePtr ) );
+	      if( aDerivedPtr != NULLPTR )
+		{
+		  push_back( aDerivedPtr );
+		}
+	    }
+
+	}
+
+    }
+
+  };
+
+
 
   /**
-     A Stepper class defines and governs computation unit in a model.
+     Stepper class defines and governs computation unit in a model.
 
 
 
@@ -313,69 +371,6 @@ namespace libecs
   };
 
 
-  template< class Base_, class Derived_ = Base_ >
-  class EntityCache
-    :
-    public std::vector<Derived_*>
-  {
-
-  public:
-
-    DECLARE_TYPE( Base_, Base );
-    DECLARE_TYPE( Derived_, Derived );
-
-
-    //    typedef std::map<const String, BasePtr> BaseMap_;
-    typedef std::vector<DerivedPtr> DerivedVector_;
-    //    DECLARE_TYPE( BaseMap_, BaseMap );
-    DECLARE_TYPE( DerivedVector_, DerivedVector );
-
-
-    //    typedef std::less<const String> StringLess;
-    //    DECLARE_MAP( const String, BasePtr, StringLess, BaseMap );
-
-    EntityCache()
-    {
-      ; // do nothing
-    }
-
-    ~EntityCache() {}
-
-
-    /**
-       Update the cache.
-
-    */
-
-    void update( SystemVectorCref aSystemVector )
-    {
-      clear();
-
-      for( SystemVectorConstIterator i( aSystemVector.begin() );
-	   i != aSystemVector.end() ; ++i )
-	{
-	  const SystemCptr aSystem( *i );
-
-	  typedef std::map<const String,BasePtr> BaseMap;
-	  
-	  for( typename BaseMap::const_iterator 
-		 j( aSystem->System::getMap<Base>().begin() );
-	       j != aSystem->System::getMap<Base>().end(); ++j )
-	    {
-	      BasePtr aBasePtr( (*j).second );
-
-	      DerivedPtr aDerivedPtr( dynamic_cast<DerivedPtr>( aBasePtr ) );
-	      if( aDerivedPtr != NULLPTR )
-		{
-		  push_back( aDerivedPtr );
-		}
-	    }
-
-	}
-
-    }
-
-  };
 
 
   DECLARE_CLASS( SRMSubstance );
