@@ -114,36 +114,71 @@ class SGESessionProxy(SessionProxy):
 		# --------------------------------
 		# create context
 
-		# argument
-		anArgment = ''
-		if self.getInterpreter() == ECELL3_SESSION:
 
-			#checks the SHELL environment
-			if self.getDM_PATH() != "":
-				
-				aSHELLName = '/bin/sh'
-					
-				# write environment variable
-				aDM_PATH = "ECELL3_DM_PATH=%s %s -e %s"%(self.getDM_PATH(),
-									 ECELL3_SESSION,
-									 self.getScriptFileName())
+		# --------------------------------------------------------------------------
+		# When the interpreter is E-Cell session
+		# --------------------------------------------------------------------------
+		if self.getInterpreter() == ECELL3_SESSION:  # if(1)
 
-				anArgument = "--parameters=\"%s\"" %str(self.getSessionArgument())
-				aScriptContext = "#!%s\nuname -a\n%s %s\nexit $?"%(aSHELLName,
-										   aDM_PATH,
-										   anArgument)
-						   
+			# create argument string
+			anArgument = "%s -e %s --parameters=\"%s\"" \
+			              %(ECELL3_SESSION,
+			                self.getScriptFileName(),
+			                str(self.getSessionArgument()))
+
+			# create script context
+			aScriptContext = "#!%s\nuname -a\n%s\nexit $?" \
+				                  %(os.getenv('SHELL'),
+				                    anArgument)
+
+			# write script file
 			open( self.__theTmpScriptFileName, 'w' ).write( aScriptContext )
 
 
-			# create context to be thrown by qsub
-			aContext = "%s -cwd -S %s -o %s -e %s %s"%(QSUB,
-								   aSHELLName,
-								   self.getStdoutFileName(),
-								   self.getStderrFileName(),
-								   self.__theTmpScriptFileName)
-		else:
+			# ----------------------------------------------------------------------
+			# When the DM_PATH is specified, insert the environment variable DM_PATH
+			# is added a context as below.
+			#
+			# qsub -v ECELL3_DM_PATH=xxx,yyy
+			#
+			# ----------------------------------------------------------------------
+			if self.getDM_PATH() != "": # if(2)
+
+				aContext = "%s -v ECELL3_DM_PATH=%s -cwd -S %s -o %s -e %s %s" \
+				            %(QSUB,
+							 self.getDM_PATH(),
+				             os.getenv('SHELL'),
+				             self.getStdoutFileName(),
+				             self.getStderrFileName(),
+				             self.__theTmpScriptFileName)
+				
+			
+			# ----------------------------------------------------------------------
+			# When the DM_PATH is not specified, do not use -v option of qsub.
+			# ----------------------------------------------------------------------
+			else:
+
+				aContext = "%s -cwd -S %s -o %s -e %s %s" \
+				            %(QSUB,
+				             os.getenv('SHELL'),
+				             self.getStdoutFileName(),
+				             self.getStderrFileName(),
+				             self.__theTmpScriptFileName)
+
+			# end of if(2)
+
+
+
+
+		# --------------------------------------------------------------------------
+		# When the interpreter is users' script.
+		# --------------------------------------------------------------------------
+		else: # if(1)
+
+			# convert argument into string
 			anArgument = str(self.getArgument())
+
+			# creates context
 			aContext = "%s -cwd -S %s -o %s -e %s %s %s" %(QSUB,
 		                                            self.getInterpreter(),
 					                                self.getStdoutFileName(),
@@ -151,13 +186,21 @@ class SGESessionProxy(SessionProxy):
 		                                            self.getScriptFileName(),
 		                                            anArgument)
 
+		# end of if(1)
 
+
+		# --------------------------------------------------------------------------
 		# execute the context
+		# --------------------------------------------------------------------------
 		self.__theSGEJobID = string.split(os.popen(aContext).readline())[2]
 		
 
+		# --------------------------------------------------------------------------
 		# get back previous directory
+		# --------------------------------------------------------------------------
 		os.chdir( aCwd )
+
+	# end of run
 
 
 
