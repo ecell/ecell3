@@ -17,10 +17,13 @@ import ecell.ECDDataFile
 #from ecell.ECS import *
 
 class Session:
+    'Session class'
+
 
     def __init__( self, aSimulator ):
+        'constructor'
 
-        self.theLogMethod = self.__plainLogMethod
+        self.thePrintMethod = self.__plainPrintMethod
         self.theSimulator = aSimulator
 
 
@@ -65,11 +68,20 @@ class Session:
     def saveModel( self ):
         pass
 
+    def setPrintMethod( self, aMethod ):
+        self.thePrintMethod = aMethod
+
+    def print( self, message ):
+        self.thePrintMethod( message )
+
     def setLogMethod( self, aMethod ):
-        self.theLogMethod = aMethod
+        print 'setLogMethod() is deprecated. use setPrintMethod instead.'
+        self.thePrintMethod = aMethod
 
     def log( self, message ):
-        self.theLogMethod( message )
+        print 'log() is deprecated. use print() instead'
+        self.thePrintMethod( message )
+
 
 
     #
@@ -102,10 +114,15 @@ class Session:
     def setEventHandler( self, event ):
         self.theSimulator.setEventHandler( event )
 
+    # no need to initialize explicitly in current version
+    def initialize( self ):
+        self.theSimulator.initialize()
+
 
     #
     # Stepper methods
     #
+
 
     def getStepperList():
         return self.theSimulator.getStepperList()
@@ -203,14 +220,14 @@ class Session:
         except:#(1)
             
             import sys
-            ## self.log( __name__ )
-            self.log( sys.exc_traceback )
+            ## self.print( __name__ )
+            self.print( sys.exc_traceback )
             aErrorMessage= "Error : could not save [%s] " %aFullPNString
-            self.log( aErrorMessage )
+            self.print( aErrorMessage )
             return None
 
         aDataFileManager.saveAll()         
-        self.log( "All files are saved." )
+        self.print( "All files are saved." )
 
 
 
@@ -218,7 +235,7 @@ class Session:
     # private methods
     #
 
-    def __plainLogMethod( self, aMessage ):
+    def __plainPrintMethod( self, aMessage ):
         print aMessage
 
 
@@ -268,7 +285,6 @@ class Session:
             aPropertyList = self.theEml.getEntityPropertyList( aFullID )
 
             self.__loadEntityPropertyList( aFullID, aPropertyList )
-
 
 
     def __loadEntityPropertyList( self, aFullID, aPropertyList ):

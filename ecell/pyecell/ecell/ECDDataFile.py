@@ -309,10 +309,11 @@ class ECDDataFile( DataFile ):
 	# return -> None
 	# This method is throwable exception.
 	# ------------------------------------------------------------------
-	def save( self ):
+	def save( self, aFileName = None ):
 
-		if( len(self.theFileName) == 0):
-			raise "Error : the length of filename is 0"
+		if aFilename is not None:
+			self.saveWithFileName( aFileName )
+			return
 
 		# open the file
 		aOutputFile = open(self.theFileName,'w')
