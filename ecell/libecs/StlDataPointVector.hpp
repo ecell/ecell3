@@ -39,10 +39,17 @@ public:
 
   ~StlDataPointVector(void);
 
+  reference operator[] (size_type sz)
+  {
+    return *(theContainer.begin() + sz);
+  }
+
+
   const_reference operator[] (size_type sz) const
   {
     return *(theContainer.begin() + sz);
   }
+
   
 
   bool empty() const
