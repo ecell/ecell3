@@ -1,4 +1,4 @@
-#!/usr/bin/env @prefix@ecell3-python
+#!/usr/bin/env @prefix@/bin/ecell3-python
 #
 # dmgen --  a program to docify dynamic module in 
 #           E-CELL Simulation Environment Version 3

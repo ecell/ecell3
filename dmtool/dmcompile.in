@@ -1,4 +1,4 @@
-#!/usr/bin/env @prefix@ecell3-python
+#!/usr/bin/env @prefix@/bin/ecell3-python
 
 import sys
 import os

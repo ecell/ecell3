@@ -1,4 +1,4 @@
-#!/usr/bin/env @prefix@ecell3-python
+#!/usr/bin/env @prefix@/bin/ecell3-python
 #
 # rd2dm.py --- A program for converting an rd file into a dm file.
 #
