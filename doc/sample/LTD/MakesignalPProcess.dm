@@ -9,14 +9,14 @@ PROTECTED_AUX ='''
   Int k;
 '''
 
-defineMethod('initialize','''
+defineMethod( 'initialize','''
   S0 = getVariableReference( "S0" );
   P0 = getVariableReference( "P0" );
   i = 0;
   k = 0;
 ''')
 
-defineMethod('react',
+defineMethod( 'process',
 '''
   Real p0( P0.getVariable()->getValue() );
 

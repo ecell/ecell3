@@ -18,7 +18,7 @@ defineMethod('initialize','''
   P0 = getVariableReference( "P0" );
 ''')
 
-defineMethod('react',
+defineMethod('process',
 '''
   const Real s0( S0.getVariable()->getValue() );
   const Real s1( S1.getVariable()->getValue() );
@@ -27,5 +27,5 @@ defineMethod('react',
 
   const Real p( s0 + s1 + s2 + s3 );
 
-  P0.getVarialbe()->setValue(p);
+  P0.getVariable()->setValue( p );
 ''')

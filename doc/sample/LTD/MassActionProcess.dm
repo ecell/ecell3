@@ -8,24 +8,26 @@ PROTECTED_AUX ='''
 defineMethod( 'initialize','''
 ''' )
 
-defineMethod( 'react',
+defineMethod( 'process',
 '''
   Real velocity( k * N_A );
   velocity *= getSuperSystem()->getVolume();
   
-  for( VariableReferenceListIterator i( theVariableReferenceList.begin() );
-       i != theVariableReferenceList.end(); ++i )
+
+  for( VariableReferenceVectorConstIterator 
+	s( theVariableReferenceVector.begin() );
+       s != theFirstZeroVariableReference; ++s )
     {
-      VariableReference aVariableReference( *i );
+      VariableReference aVariableReference( *s );
       Int aCoefficient( aVariableReference.getCoefficient() );
-      if( aCoefficient < 0 )
-        {
-          do{
-            aCoefficient++;
-            velocity *= aVariableReference.getVariable()->getConcentration();
-          } while( aCoefficient != 0 );
-        }
-     }
+
+      do {
+        aCoefficient++;
+        velocity *= aVariableReference.getVariable()->getConcentration();
+      } while( aCoefficient != 0 );
+
+    }
+
   setFlux(velocity);
 ''')
 
