@@ -27,11 +27,14 @@ def getPreviousInList(  aList, actualID ):
 
 
 class ModelWalker:
-    def __init__( self, aModel ):
+    def __init__( self, aModel  ):
         """ aModel can be any that complies the ecell3 Simulator API"""
+
         self.theModel = aModel
-        self.theTreeWalker = TreeWalker( self.theModel )
+        self.theTreeWalker = TreeWalker( aModel )
         self.reset()
+        
+        
         
     def moveTo( self, aFullID ):
         self.theActualID = list( aFullID )

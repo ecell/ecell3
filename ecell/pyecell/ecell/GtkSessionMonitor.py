@@ -1,9 +1,9 @@
 #! /usr/bin/env python
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #
-#        This file is part of E-Cell Session Monitor package
+#		This file is part of E-Cell Session Monitor package
 #
-#                Copyright (C) 2001-2004 Keio University
+#				Copyright (C) 2001-2004 Keio University
 #
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #
@@ -28,10 +28,10 @@
 #'Design: Kenta Hashimoto <kem@e-cell.org>',
 #'Design and application Framework: Kouichi Takahashi <shafi@e-cell.org>',
 #'Programming: Yuki Fujita',
-#             'Yoshiya Matsubara',
-#             'Yuusuke Saito'
-# 	      'Masahiro Sugimoto <sugi@bioinformatics.org>' 
-# 	      'Gabor Bereczki <gabor.bereczki@talk21.com>' at
+#			 'Yoshiya Matsubara',
+#			 'Yuusuke Saito'
+# 		  'Masahiro Sugimoto <sugi@bioinformatics.org>' 
+# 		  'Gabor Bereczki <gabor.bereczki@talk21.com>' at
 # E-Cell Project, Lab. for Bioinformatics, Keio University.
 #
 
@@ -41,6 +41,7 @@ import sys
 sys.path.append(GUI_OSOGO_PATH)
 import MainWindow  
 from ecell.Session import *
+from ecell.ModelWalker import *
 import gtk
 
 import EntityListWindow
@@ -69,6 +70,11 @@ class GtkSessionMonitor(Session):
 
 		#calls superclass
 		Session.__init__(self, aSimulator )
+
+		if aSimulator == None:
+			self.theModelWalker = None
+		else:
+			self.theModelWalker = ModelWalker( aSimulator )
 
 		# -------------------------------------
 		# reads defaults from osogo.ini 
@@ -106,10 +112,10 @@ class GtkSessionMonitor(Session):
 		self.theFundamentalWindows = {}
 
 		# creates fundamental windows
-		aLoggerWindow     = LoggerWindow.LoggerWindow(  self )
+		aLoggerWindow	 = LoggerWindow.LoggerWindow(  self )
 		anInterfaceWindow = InterfaceWindow.InterfaceWindow( self )
-		aStepperWindow    = StepperWindow.StepperWindow(  self )
-		aBoardWindow      = BoardWindow.BoardWindow(  self )
+		aStepperWindow	= StepperWindow.StepperWindow(  self )
+		aBoardWindow	  = BoardWindow.BoardWindow(  self )
 		aMainWindow	  = MainWindow.MainWindow( self ) 
 
 		# saves them to map
@@ -154,9 +160,9 @@ class GtkSessionMonitor(Session):
 	# ==========================================================================
 	def doesExist( self, aWindowName):
 		""" aWindowName: (str) name of Window
-		     returns gtk.TRUE if window is opened
-			     gtk.FALSE if window is not opened
-		     checks both plugin and fundamental windows 
+			 returns gtk.TRUE if window is opened
+				 gtk.FALSE if window is not opened
+			 checks both plugin and fundamental windows 
 		"""
 
 		# check fundamentalwindows
@@ -337,7 +343,7 @@ class GtkSessionMonitor(Session):
 		anEntityListWindow   ---  an instance of EntityListWindow(EntityListWindow)
 		Return None
 		[Note]: When the argument is not anEntityListWindow, throws exception.
-		        When this has not the reference to the argument, does nothing.
+				When this has not the reference to the argument, does nothing.
 		"""
 
 		# When the argument is not anEntityListWindow, throws exception.
@@ -424,7 +430,7 @@ class GtkSessionMonitor(Session):
 		argument may be a filename as well
 		"""
 
-	    # first delete every section apart from default
+		# first delete every section apart from default
 		for aSection in self.theConfigDB.sections():
 			self.theConfigDB.remove(aSection)
 
@@ -438,7 +444,7 @@ class GtkSessionMonitor(Session):
 			# self.message('There is no osogo.ini file in this directory.\n Falling back to system defauls.\n')
 			return None
 
-	    # tries to read file
+		# tries to read file
 
 		try:
 			self.message('Reading osogo.ini file from directory [%s]' %aPath)
@@ -551,7 +557,9 @@ class GtkSessionMonitor(Session):
 	#-------------------------------------------------------------------
 	def loadModel( self, aModel ):
 		#self.__readIni( aModel )
+
 		Session.loadModel( self, aModel )
+		self.theModelWalker = ModelWalker( self.theSimulator )
 
 	#-------------------------------------------------------------------
 	def saveModel( self , aModel ):
@@ -633,8 +641,8 @@ class GtkSessionMonitor(Session):
 
 		if num == None:
 			#set it to 1
-			    num = 1
-			    self.message( "Zero step value overridden to 1\n" )
+				num = 1
+				self.message( "Zero step value overridden to 1\n" )
 
 		try:
 			self.theRunningFlag = True
