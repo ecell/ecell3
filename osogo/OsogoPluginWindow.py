@@ -198,7 +198,6 @@ class OsogoPluginWindow(PluginWindow):
 	# This method throws exceptions.
 	# ---------------------------------------------------------------
 	def supplementFullPN( self, aFullPN ):
-
 		if aFullPN[PROPERTY] != '' :
 			return aFullPN
 		else :

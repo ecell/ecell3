@@ -59,6 +59,7 @@ class VariableReferenceEditor:
         self.theTreeView.append_column( columnName )
         self.theTreeView.append_column( columnFullID )
         self.theTreeView.append_column( columnCoef )
+        self.theTreeView.connect( "button-press-event", self.__buttonPressed )
         attachmentPoint.add( self.theTreeView )
         self.setDisplayedFullID ( self.theParent.theFullID() )
         
@@ -84,7 +85,8 @@ class VariableReferenceEditor:
             aFullID = aVariableReference[VARREF_FULLID]
             aCoef = aVariableReference[VARREF_COEF]
             anIter = self.theListStore.append(  )
-            self.theListStore.set( anIter, 0, aName, 1, aFullID, 2, aCoef, 3, gtk.TRUE )
+            # to make columns editable change gtk.FALSE to gtk.TRUE 
+            self.theListStore.set( anIter, 0, aName, 1, aFullID, 2, aCoef, 3, gtk.FALSE )
         
         
     def __setValue( self ):
@@ -135,30 +137,43 @@ class VariableReferenceEditor:
         self.__setValue()
         
     def __buttonPressed( self, *args ):
-        event = args[2]
-        if event.button == gtk.gdk._2BUTTON_PRESS:
+
+        event = args[1]
+        if event.type == gtk.gdk._2BUTTON_PRESS:
+            realFullID = self.__getRealFullID()
+            if realFullID != None:
+                self.__openAction( None, realFullID )
+        if event.button == 3:
             self.__popUpMenu()
             return gtk.TRUE
-            
-    def __popUpMenu(self ):
-        selectedIter = self.__getSelectedIter()
-        aMenu = gtk.Menu()
+
+    def __getRealFullID( self ):
         selectedFullID = self.__getSelectedFullID()
         if selectedFullID == None:
-            isFullIDReal = False
+            return None
         else:
-            isFullIDReal = self.__doesExistEntity( selectedFullID )
-            
+            realFullID = self.__getAbsoluteReference( selectedFullID )
+            isFullIDReal = self.__doesExistEntity( realFullID )
+            if isFullIDReal:
+                return realFullID
+            else:
+                return None
+
+
+    def __popUpMenu(self ):
+        selectedIter = self.__getSelectedIter()
+        realFullID = self.__getRealFullID()
+        aMenu = gtk.Menu()
         openItem = gtk.MenuItem( "Open" )
-        if isFullIDReal:
-            openItem.connect( "activate", self.__openAction, selectedFullID )
+        if realFullID != None:
+            openItem.connect( "activate", self.__openAction, realFullID )
         else:
             openItem.set_sensitive( gtk.FALSE )
         aMenu.append( openItem )
 
         openNewItem = gtk.MenuItem( "Open in new" )
-        if isFullIDReal:
-            openNewItem.connect( "activate", self.__openNewAction, selectedFullID )
+        if realFullID != None:
+            openNewItem.connect( "activate", self.__openNewAction, realFullID )
         else:
             openNewItem.set_sensitive( gtk.FALSE )
         aMenu.append( openNewItem )
@@ -166,26 +181,36 @@ class VariableReferenceEditor:
         
         addItem = gtk.MenuItem( "Add" )
         addItem.connect("activate", self.__addAction )
-        aMenu.append( addItem )
-        
+        # to add Add functionality uncomment it
+        #aMenu.append( addItem )
+
         deleteItem = gtk.MenuItem( "Delete" )
 
         if selectedIter != None:
-            deleteItem.connect( "activate", self.__deleteAction, anIter )
+            deleteItem.connect( "activate", self.__deleteAction, selectedIter )
         else:
             deleteItem.set_sensitive( gtk.FALSE )
-        aMenu.append( addItem )
+        # to add delete functionality uncomment it
+        #aMenu.append( deleteItem )
+        aMenu.show_all()
         aMenu.popup( None, None, None, 1, 0 )
-    
-    
-    def __openAction( self, *args ):
+
+
+    def __openNewAction( self, *args ):
         aFullIDString = args[1]
+
+        theFullPNList =  [convertFullIDToFullPN( createFullID( aFullIDString ) )]  
         self.theSession.thePluginManager.createInstance( "PropertyWindow", 
-                        [convertFullIDToFullPN( aFullIDString.split(':') )] )
-                        
-    def __openNewAction ( self, *args ):
-        pass
-        
+                       theFullPNList )
+
+
+    def __openAction ( self, *args ):
+        aFullIDString = args[1]
+        theFullPNList =  [convertFullIDToFullPN( createFullID( aFullIDString ) )]  
+        self.theParent.setRawFullPNList( theFullPNList )
+        self.theParent.update( True )
+    
+    
     def __addAction ( self, *args ):
         pass
         
@@ -204,7 +229,7 @@ class VariableReferenceEditor:
         
     
     def __getSelectedIter( self ):
-        anIter = self['theTreeView'].get_selection().get_selected()[1]
+        anIter = self.theTreeView.get_selection().get_selected()[1]
         return anIter
         
 
@@ -219,9 +244,11 @@ class VariableReferenceEditor:
 
 
     def __getAbsoluteReference( self, aVariableRef ):
-        if __self.isAbsoluteReference( aVariableRef ):
-            return aVariableRef
         aVariable = aVariableRef.split(':')
+
+        if self.__isAbsoluteReference( aVariableRef ):
+            aVariable [0] = "Variable"
+            return ":".join( aVariable)
         if aVariable[1][0] == '/':
             # absolute ref
             absolutePath = aVariable[1]
@@ -260,7 +287,7 @@ class VariableReferenceEditor:
     
     
     
-    def __isAbsoluteReference( aVariableRef ):
+    def __isAbsoluteReference(self, aVariableRef ):
         aList = aVariableRef.split(':')
         return aList[1][0] == '/'
     
