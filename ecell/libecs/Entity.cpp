@@ -75,6 +75,11 @@ namespace libecs
 
   const Message Entity::getFullID( StringCref keyword )
   {
+
+    return Message( keyword, UConstant( getFullID().getString() ) );
+
+
+#if 0
     FullID aFullID = getFullID();
     UConstantVector aVector( 3 );
 
@@ -83,6 +88,8 @@ namespace libecs
     aVector[2] = aFullID.getID();
 
     return Message( keyword, aVector );
+#endif /* 0 */
+
   }
 
   const Message Entity::getName( StringCref keyword )
