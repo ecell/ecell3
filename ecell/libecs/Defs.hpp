@@ -41,27 +41,49 @@
 const int RANDOM_NUMBER_BUFFER_SIZE(65535);
 
 
+// CoreLinux++ compatibility
+
+#include "CoreLinuxCompatibility.hpp"
+
+
+// replace CORELINUX from macro names
+
+#define DECLARE_LIST        corelinux::CORELINUX_LIST      
+#define DECLARE_VECTOR      corelinux::CORELINUX_VECTOR    
+#define DECLARE_MAP         corelinux::CORELINUX_MAP       
+#define DECLARE_MULTIMAP    corelinux::CORELINUX_MULTIMAP  
+#define DECLARE_SET         corelinux::CORELINUX_SET       
+#define DECLARE_MULTISET    corelinux::CORELINUX_MULTISET  
+#define DECLARE_QUEUE       corelinux::CORELINUX_QUEUE     
+#define DECLARE_STACK       corelinux::CORELINUX_STACK     
+
+
+
+// String
+
+#include <string>
+
+DECLARE_TYPE( string, String );
+
+
 // Numeric types
 
+// FIXME: Int -> Integer, Float -> Real
+
 // FIXME: use numeric_limits
-typedef int64_t Int;
-typedef uint64_t Uint;
-const int INT_SIZE=sizeof(int64_t);
+DECLARE_TYPE( int64_t, Int );
+DECLARE_TYPE( uint64_t, Uint );
+const int INT_SIZE( sizeof( Int ) );
 
-typedef double Float;
-typedef Float Mol;
-#define FLOAT_DIG DBL_DIG
-typedef Int Quantity;
-typedef Float Concentration;
+DECLARE_TYPE( double, Float );
+DECLARE_TYPE( double, Mol );
+const int FLOAT_DIG( DBL_DIG );
 
+DECLARE_TYPE( Int, Quantity );
+DECLARE_TYPE( Float, Concentration );
 
 //! Avogadro number. 
 const Float N_A = 6.0221367e+23;
-
-const char FIELD_SEPARATOR = ' ';
-const char GROUP_SEPARATOR = '\t';
-const char LINE_SEPARATOR = '\n';
-
 
 const int NOMATCH = -1;
 
@@ -69,35 +91,6 @@ const int NOMATCH = -1;
 #define ATOI( str ) atoi( str )
 
 
-
-
-// CoreLinux++ compatibility
-
-#define DECLARE_TYPE( mydecl, mytype )  \
-typedef mydecl         mytype;         \
-typedef mytype *       mytype ## Ptr;  \
-typedef const mytype * mytype ## Cptr; \
-typedef mytype &       mytype ## Ref;  \
-typedef const mytype & mytype ## Cref;
-
-
-#define DECLARE_CLASS( tag )            \
-   class   tag;                        \
-   typedef tag *       tag ## Ptr;     \
-   typedef const tag * tag ## Cptr;    \
-   typedef tag &       tag ## Ref;     \
-   typedef const tag & tag ## Cref;
-
-#define NULLPTR 0
-
-
-// String and StringPair
-
-#include <string>
-
-DECLARE_TYPE( string, String );
-typedef pair<String,String> StringPair_;
-DECLARE_TYPE( StringPair_, StringPair );
 
 
 #endif /* ___DEFS_H___ */
