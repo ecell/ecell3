@@ -28,8 +28,7 @@ SimulatorImplementation.cpp\
 LocalSimulatorImplementation.cpp\
 LocalLoggerImplementation.cpp\
 LoggerImplementation.cpp\
-EmcLogger.cpp\
-EmcDataPoint.cpp
+EmcLogger.cpp
 
 libemcdir=${pkgincludedir}/libemc
 libemc_HEADERS=\
@@ -37,7 +36,6 @@ LocalSimulatorImplementation.hpp\
 Simulator.hpp\
 SimulatorImplementation.hpp\
 SimulatorMaker.hpp\
-EmcDataPoint.hpp\
 EmcLogger.hpp\
 LocalLoggerImplementation.hpp\
 LoggerImplementation.hpp\
