@@ -13,13 +13,15 @@ using namespace libecs;
 
 extern "C"
 {
-  ReactorAllocatorFunc CreateObject =
+  Reactor::AllocatorFuncPtr CreateObject =
   &MichaelisUniUniReactor::createInstance;
 }  
 
 MichaelisUniUniReactor::MichaelisUniUniReactor()
 {
   makeSlots();
+  S0_Concentration = NULLPTR;
+  C0_Quantity = NULLPTR;
   KmS = 0.0;
   KcF = 0.0;
 }
@@ -62,18 +64,20 @@ void MichaelisUniUniReactor::initialize()
 {
   FluxReactor::initialize();
 
-  S0_Concentration = getPropertySlotOfReactant( "S0", "Concentration" );
-  C0_Quantity = getPropertySlotOfReactant( "C0", "Quantity" );
+  if( S0_Concentration == NULLPTR)
+    {
+      S0_Concentration = getPropertySlotOfReactant( "S0", "Concentration" );
+    }
+  if( C0_Quantity == NULLPTR)
+    {
+      C0_Quantity = getPropertySlotOfReactant( "C0", "Quantity" );
+    }
 
 }
 
 void MichaelisUniUniReactor::react()   
 {
   Real velocity( KcF );
-
-  //velocity *= getCatalyst(0)->getSubstance().getQuantity();
-  //  Real S = getSubstrate(0)->getSubstance().getConcentration();
-  
 
   velocity *= C0_Quantity->getReal();
   const Real S( S0_Concentration->getReal() );
@@ -83,7 +87,3 @@ void MichaelisUniUniReactor::react()
   process( velocity );
 }
 
-void MichaelisUniUniReactor::compute()   
-{
-
-}

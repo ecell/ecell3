@@ -68,11 +68,11 @@ namespace libecs
       else // create with a sync method.
 	{
 	  aPropertySlotPtr = 
-	    new ConcretePropertySlot<T,SlotType>( aName,
-						  anObject,
-						  aSetMethodPtr,
-						  aGetMethodPtr,
-						  aSyncMethodPtr );
+	    new ConcretePropertySlotWithSyncMethod<T,SlotType>( aName,
+								anObject,
+								aSetMethodPtr,
+								aGetMethodPtr,
+								aSyncMethodPtr );
 	}
 
       return aPropertySlotPtr;

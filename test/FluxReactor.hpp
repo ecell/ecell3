@@ -33,19 +33,19 @@ namespace libecs
     {
       Reactor::initialize();
 
-      theReactantQuantitySlotVector.clear();
-      theReactantVelocitySlotVector.clear();
-
-      for( ReactantMapIterator s( theReactantMap.begin() );
-	   s != theReactantMap.end() ; ++s )
+      if( theReactantQuantitySlotVector.size() == 0 )
 	{
-	  SubstancePtr aSubstance( s->second.getSubstance() );
-
-	  theReactantQuantitySlotVector.push_back( aSubstance->
-						   getPropertySlot( "Quantity", this ) );
-	  theReactantVelocitySlotVector.push_back( aSubstance->
-						   getPropertySlot( "Velocity", this ) );
-
+	  for( ReactantMapIterator s( theReactantMap.begin() );
+	       s != theReactantMap.end() ; ++s )
+	    {
+	      SubstancePtr aSubstance( s->second.getSubstance() );
+	      
+	      theReactantQuantitySlotVector.push_back( aSubstance->
+						       getPropertySlot( "Quantity", this ) );
+	      theReactantVelocitySlotVector.push_back( aSubstance->
+						       getPropertySlot( "Velocity", this ) );
+	      
+	    }
 	}
 
     }

@@ -1,0 +1,169 @@
+<?xml version="1.0"?>
+<eml>
+
+<info>
+<modelname>multi stepper test</modelname>
+<author>sha</author>
+<created>2002/07/29</created>
+<lastsaved>2002/07/29</lastsaved>
+</info>
+
+
+<stepperlist>
+<stepper class="Euler1SRMStepper" id="SRM_01" />
+<stepper class="RungeKutta4SRMStepper" id="SRM_02" />
+</stepperlist>
+
+
+<!-- ROOT -->
+<system class="System" stepper="SRM_02" id="/" name="Environment">
+<property name="Volume">
+<value number="0">0.000000000000001</value>
+</property>
+</system>
+
+
+
+<!-- CELL -->
+<system class="System" stepper="SRM_04" id="/CELL" name="Cell">
+<property name="Volume">
+<value number="0">unknown</value>
+</property>
+</system>
+
+
+
+
+<!-- CYTOPLASM -->
+<system class="System" id="/CELL/CYTOPLASM" name="Cytoplasm">
+
+
+<property name="StepperID">
+<value>SRM_01</value>
+</property>
+
+<property name="Volume">
+<value number="0">1e-18</value>
+</property>
+
+
+<substance class="SRMSubstance" id="S" name="substance S">
+<property name="Quantity">
+<value number="0">1000000</value>
+</property>
+</substance>
+
+
+<substance class="SRMSubstance" id="P" name="substance P">
+<property name="Quantity">
+<value number="0">0</value>
+</property>
+</substance>
+
+
+
+<substance class="SRMSubstance" id="E" name="substance E">
+<property name="Quantity">
+<value number="0">1000</value>
+</property>
+</substance>
+
+
+<reactor class="MichaelisUniUniReactor" id="E" name="E">
+<property name="Reactant">
+<value number="0">S0</value>
+<value number="1">Substance:/CELL/CYTOPLASM:S</value>
+<value number="2">-1</value>
+</property>
+
+<property name="Reactant">
+<value number="0">P0</value>
+<value number="1">Substance:/CELL/CYTOPLASM:P</value>
+<value number="2">1</value>
+</property>
+
+<property name="Reactant">
+<value number="0">C0</value>
+<value number="1">Substance:/CELL/CYTOPLASM:E</value>
+<value number="2">0</value>
+</property>
+
+<property name="KmS">
+<value number="0">1</value>
+</property>
+
+<property name="KcF">
+<value number="0">10</value>
+</property>
+
+</reactor>
+</system>
+
+
+<!-- CYTOPLASM 2 -->
+<system class="System" stepper="SRM_03" id="/CELL/CYTOPLASM2" name="Cytoplasm 2">
+
+<property name="StepperID">
+<value>SRM_02</value>
+</property>
+
+
+<property name="Volume">
+<value number="0">1e-18</value>
+</property>
+
+
+<substance class="SRMSubstance" id="S" name="substance S">
+<property name="Quantity">
+<value number="0">1000000</value>
+</property>
+</substance>
+
+
+<substance class="SRMSubstance" id="P" name="substance P">
+<property name="Quantity">
+<value number="0">0</value>
+</property>
+</substance>
+
+
+
+<substance class="SRMSubstance" id="E" name="substance E">
+<property name="Quantity">
+<value number="0">1000</value>
+</property>
+</substance>
+
+
+<reactor class="MichaelisUniUniReactor" id="E" name="E">
+<property name="Reactant">
+<value number="0">S0</value>
+<value number="1">Substance:/CELL/CYTOPLASM:S</value>
+<value number="2">-1</value>
+</property>
+
+<property name="Reactant">
+<value number="0">P0</value>
+<value number="1">Substance:/CELL/CYTOPLASM:P</value>
+<value number="2">1</value>
+</property>
+
+<property name="Reactant">
+<value number="0">C0</value>
+<value number="1">Substance:/CELL/CYTOPLASM2:E</value>
+<value number="2">0</value>
+</property>
+
+<property name="KmS">
+<value number="0">1</value>
+</property>
+
+<property name="KcF">
+<value number="0">10</value>
+</property>
+
+</reactor>
+</system>
+
+
+</eml>
