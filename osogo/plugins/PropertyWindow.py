@@ -19,7 +19,10 @@ VALUE_COL_TYPE=gobject.TYPE_STRING
 GETABLE_COL_TYPE=gobject.TYPE_BOOLEAN
 SETTABLE_COL_TYPE=gobject.TYPE_BOOLEAN
 
-DISCARD_LIST=[ 'Name', 'Priority', 'StepperID', 'IsContinuous' ]
+PROCESS_DISCARD_LIST=[]
+VARIABLE_DISCARD_LIST=[ 'MolarConc', 'NumberConc' ]
+SYSTEM_DISCARD_LIST=[]
+
 
 
 class PropertyWindow(OsogoPluginWindow):
@@ -65,29 +68,37 @@ class PropertyWindow(OsogoPluginWindow):
         
         renderer=gtk.CellRendererText()
         column=gtk.TreeViewColumn( "Property", renderer, text=PROPERTY_COL)
-        column.set_visible( gtk.TRUE )
-        column.set_resizable(gtk.TRUE)
+        column.set_visible( True )
+        column.set_resizable( True )
+        column.set_reorderable( True )
+        column.set_sort_column_id( PROPERTY_COL )
         self['theTreeView'].append_column(column)
 
         renderer = gtk.CellRendererText()
         renderer.connect('edited', self.__valueEdited)
         column=gtk.TreeViewColumn( "Value", renderer, text=VALUE_COL,
                                   editable=SETTABLE_COL )
-        column.set_visible( gtk.TRUE )
+        column.set_visible( True )
         column.set_sizing( 1 ) # auto sizing
         self['theTreeView'].append_column(column)
+        column.set_sort_column_id( VALUE_COL )
+        column.set_reorderable( True )
         self.theValueColumn = column
 
         renderer=gtk.CellRendererToggle()
         column=gtk.TreeViewColumn("Get",renderer, active=GETABLE_COL )
-        column.set_visible( gtk.TRUE )
-        column.set_resizable(gtk.TRUE)
+        column.set_visible( True )
+        column.set_resizable( True )
+        column.set_sort_column_id( GETABLE_COL )
+        column.set_reorderable( True )
         self['theTreeView'].append_column(column)
         
         renderer=gtk.CellRendererToggle()
         column=gtk.TreeViewColumn("Set",renderer, active=SETTABLE_COL )
-        column.set_visible( gtk.TRUE )
-        column.set_resizable(gtk.TRUE)
+        column.set_visible( True )
+        column.set_reorderable( True )
+        column.set_sort_column_id( SETTABLE_COL )
+        column.set_resizable( True )
         self['theTreeView'].append_column(column)
 
         # creates popu menu
@@ -96,15 +107,11 @@ class PropertyWindow(OsogoPluginWindow):
         # initializes statusbar
         self.theStatusBarWidget = self['statusbar']
 
-        # set notebook page to Property tab
-        self['notebookProperty'].set_current_page( 1 )
+        if self.theRawFullPNList == ():
+            return
 
         # set default as not to view all properties
         self['checkViewAll'].set_active( False )
-        self.theDiscardList = DISCARD_LIST
-
-        if self.theRawFullPNList == ():
-            return
         
         self.setIconList(
             os.environ['OSOGOPATH'] + os.sep + "ecell.png",
@@ -263,14 +270,13 @@ class PropertyWindow(OsogoPluginWindow):
             aSystemPath = str( self.theFullID()[SYSTEMPATH] )
             
             self['labelEntityType'].set_text( anEntityType + ' Property' )
-            self['entry_classname'].set_text( anEntityStub.getClassname() )
-            self['entry_id'].set_text( anID )
-            self['entry_path'].set_text( aSystemPath  )
+            self['entryClassName'].set_text( anEntityStub.getClassname() )
+            self['entryID'].set_text( anID )
+            self['entryPath'].set_text( aSystemPath  )
+            self['entryFullID'].set_text( string.join( [ anEntityType,
+                                                         aSystemPath,
+                                                         anID], ':' ) )
             
-            if aSystemPath != '/' and anID != '/':
-                anID = '/' + anID
-            self['entryFullID'].set_text( aSystemPath + anID )
-
             # saves properties to buffer
             self.thePrePropertyMap = {}
             for aProperty in anEntityStub.getPropertyList():
@@ -281,7 +287,17 @@ class PropertyWindow(OsogoPluginWindow):
                         anEntityStub.getPropertyAttributes(aProperty)
                 
             # updates PropertyListStore
-            self.__updatePropertyList()
+#            self.__updatePropertyList()
+
+            # update Summary tab for unique fields of each entity type
+            # update the respective Entity's PropertyList
+            self.__setDiscardList()
+            if self.theFullID()[TYPE] == PROCESS:
+                self.__updateProcess()
+            elif self.theFullID()[TYPE] == VARIABLE:
+                self.__updateVariable()
+            elif self.theFullID()[TYPE] == SYSTEM:
+                self.__updateSystem()
 
         # save current full id to previous full id.
         self.preFullID = self.theFullID()
@@ -291,31 +307,8 @@ class PropertyWindow(OsogoPluginWindow):
             self['statusbar'].push(1,'')
 
 
-
-    def __valueEdited( self, *args ):
-        """
-        args[0]: cellrenderer
-        args[1]: path
-        args[2]: newstring
-        """
-        
-        aNewValue = args[2]
-        aPath = args[1]
-        anIter = self.theListStore.get_iter_from_string( aPath )
-        aSelectedProperty = self.theListStore.get_value( anIter, PROPERTY_COL )
-        self.theSelectedFullPN = convertFullIDToFullPN( self.theFullID(),
-                                                       aSelectedProperty )
-        self.__updateValue( aNewValue, anIter, VALUE_COL )
-
-    
-    # ---------------------------------------------------------------
-    # __updatePropertyList
-    #
-    # return -> None
-    # This method is throwable exception.
-    # ---------------------------------------------------------------
+                
     def __updatePropertyList( self ):
-
         self.theList = []
         aPropertyList = self.thePrePropertyMap.keys()
 
@@ -337,13 +330,13 @@ class PropertyWindow(OsogoPluginWindow):
                 else:
                     aValue = str( aProperty[0] )
 
-                aValueString = str( aValue )
-                aList = [ aPropertyName, aValueString, anAttribute[GETABLE],
-                         anAttribute[SETTABLE] ]
-                self.theList.append( aList )
+                self.theList.append( [
+                                      aPropertyName,
+                                      aValue,
+                                      anAttribute[GETABLE],
+                                      anAttribute[SETTABLE] ] )
 
         self.theListStore.clear()
-
         for aValue in self.theList:
             iter=self.theListStore.append( )
             cntr=0
@@ -351,8 +344,100 @@ class PropertyWindow(OsogoPluginWindow):
                 self.theListStore.set_value(iter,cntr,valueitem)
                 cntr+=1
 
-    # end of __updatePropertyList
+    def __updateProcess( self ):
+        self.__updatePropertyList() 
+        aVariableReferenceList = self.thePrePropertyMap[
+                                       'VariableReferenceList'][0]
+        aPositiveCoeff = 0
+        aZeroCoeff = 0
+        aNegativeCoeff = 0
+        for aVariableReference in aVariableReferenceList:
+            if aVariableReference[2] == 0:
+                aZeroCoeff = aZeroCoeff + 1
+            elif aVariableReference[2] > 0:
+                aPositiveCoeff = aPositiveCoeff + 1
+            elif aVariableReference[2] < 0:
+                aNegativeCoeff = aNegativeCoeff + 1
 
+        self['label0'].set_text( 'Total Variable Refs' )
+        self['entry0'].set_text( str( len( aVariableReferenceList ) ) )
+        self['label1'].set_text( 'Positive Variable Refs')
+        self['entry1'].set_text( str( aPositiveCoeff ) )
+        self['label2'].set_text( 'Constant Variable Refs')
+        self['entry2'].set_text( str( aZeroCoeff ) )
+        
+        self['label3'].show()
+        self['label3'].set_text( 'Negative Variable Refs' )
+        self['entry3'].show()
+        self['entry3'].set_text( str( aNegativeCoeff ) )
+        
+
+    def __updateVariable( self ):
+        self.__updatePropertyList()
+        aMolarConc = str( self.thePrePropertyMap[ 'MolarConc' ][0] )
+        aValue = str( self.thePrePropertyMap[ 'Value' ][0] )
+        aNumberConc = str( self.thePrePropertyMap[ 'NumberConc' ][0] )
+
+        self['label0'].set_text( 'MolarConc' )
+        self['entry0'].set_text( aMolarConc )
+        self['label1'].set_text( 'Value')
+        self['entry1'].set_text( aValue )
+        self['label2'].set_text( 'NumberConc')
+        self['entry2'].set_text( aNumberConc )
+
+        self['label3'].hide()
+        self['entry3'].hide()
+
+    def __updateSystem( self ):
+        self.__updatePropertyList()
+        aSystemPath = createSystemPathFromFullID( self.theFullID() )
+        aProcessList = self.theSession.getEntityList( 'Process', aSystemPath )
+        aVariableList = self.theSession.getEntityList( 'Variable', aSystemPath )
+        aSystemList = self.theSession.getEntityList( 'System', aSystemPath ) 
+
+        self['label0'].set_text( 'Subsystems' ) 
+        self['entry0'].set_text( str( len( aSystemList ) ) )
+        self['label1'].set_text( 'Processes')
+        self['entry1'].set_text( str( len( aProcessList ) ) )
+        self['label2'].set_text( 'Variables' )
+        self['entry2'].set_text( str( len( aVariableList ) ) )
+        
+        self['label3'].hide()
+        self['entry3'].hide()
+
+    def updateViewAllProperties( self, *anObject ):
+        self.__setDiscardList()
+        self.__updatePropertyList()
+
+    def __setDiscardList( self ):
+        isViewAll = self['checkViewAll'].get_active()
+        if isViewAll:
+            self.theDiscardList = []
+        else:
+            if self.theFullID()[TYPE] == PROCESS:
+                self.theDiscardList = PROCESS_DISCARD_LIST 
+            elif self.theFullID()[TYPE] == VARIABLE:
+                self.theDiscardList = VARIABLE_DISCARD_LIST 
+            elif self.theFullID()[TYPE] == SYSTEM:
+                self.theDiscardList = SYSTEM_DISCARD_LIST 
+        
+
+    def __valueEdited( self, *args ):
+        """
+        args[0]: cellrenderer
+        args[1]: path
+        args[2]: newstring
+        """
+        
+        aNewValue = args[2]
+        aPath = args[1]
+        anIter = self.theListStore.get_iter_from_string( aPath )
+        aSelectedProperty = self.theListStore.get_value( anIter, PROPERTY_COL )
+        self.theSelectedFullPN = convertFullIDToFullPN( self.theFullID(),
+                                                       aSelectedProperty )
+        self.__updateValue( aNewValue, anIter, VALUE_COL )
+
+    
 
     # ---------------------------------------------------------------
     # updateValue
@@ -531,14 +616,6 @@ class PropertyWindow(OsogoPluginWindow):
 
     # end of createNewPluginWindow
 
-    def updateViewAllProperties( self, *anObject ):
-        isViewAll = self['checkViewAll'].get_active()
-        if isViewAll:
-            self.theDiscardList = []
-            self.__updatePropertyList()
-        else:
-            self.theDiscardList = DISCARD_LIST 
-            self.__updatePropertyList()
 
 
 # ----------------------------------------------------------
