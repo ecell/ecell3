@@ -28,8 +28,6 @@
 // E-Cell Project, Institute for Advanced Biosciences, Keio University.
 //
 
-#include <iostream>
-
 #include "Util.hpp"
 #include "StepperMaker.hpp"
 #include "VariableMaker.hpp"

@@ -29,8 +29,6 @@
 //
 
 #include <algorithm>
-#include <iostream>
-
 
 #include "FullID.hpp"
 #include "Model.hpp"
