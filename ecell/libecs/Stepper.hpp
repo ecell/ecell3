@@ -475,7 +475,6 @@ namespace libecs
   protected:
 
     RealValarray theK1;
-    RealValarray theErrorEstimate;
   };
 
 

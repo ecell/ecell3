@@ -3,7 +3,8 @@
 # from file: simple.eml, date: Sun Oct 13 05:59:45 2002
 #
 
-Stepper Euler1Stepper( SRM_01 )
+Stepper Midpoint2Stepper( SRM_01 )
+#Stepper FixedEuler1Stepper( SRM_01 )
 {
 	# no property
 }
