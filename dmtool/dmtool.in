@@ -33,11 +33,12 @@ INSUFFIX=".rd"
 SOSUFFIX=".so"
 
 # internal variables. DO NOT EDIT BELOW
-OPTS="vcd::fho:st:T:"
+OPTS="vcd::fho:st:T:I:"
 LONGOPTS=\
-"verbose,compile,docify::,force,help,outdir:,strip,templatedir:,tmpdir:,test"
+"verbose,compile,docify,docify=:,force,help,outdir=:,strip,templatedir=:,tmpdir=:,test,includedir=:"
 
 unset VERBOSE DO_COMPILE DO_DOCIFY DO_STRIP FORCE CLASS TEST_MODE
+INCLUDES=""
 DTTMPDIR="$TMPDIR/dmtool.$$"
 
 
@@ -62,13 +63,13 @@ Options:
 	-d[filename] or
   	  --docify[filename])	Make TeX documentation from input files.
 	-f or --force)		Proceed even if input is older than output.
-	-o [dir] or
-	  --outdir [dir])	Specify output directory.
-	-t or --templatedir)	Specify template directory.
+	-o or --outdir=)	Specify output directory.
+	-t or --templatedir=)	Specify template directory.
 				[default=$TEMPLATEDIR]
-	-T or --tmpdir)     	Specify temporary directory.
+	-T or --tmpdir=)     	Specify temporary directory.
 				[default=$TMPDIR]
 	--test)			Do nothing. Just print what will happen.
+	-I or --includedir=)	Specify include directory for compiler.
 	-v or --verbose)	Be verbose.
 	-h or --help)		Print this message.
 
@@ -136,17 +137,18 @@ while true ; do
 	case "$1" in
 		-v|--verbose) VERBOSE=yes ; shift ;;
 		-c|--compile) DO_COMPILE=yes ; shift ;;
-		-d|--docify) DO_DOCIFY=yes 
+		-d|--docify|docify=) DO_DOCIFY=yes 
 			case "$2" in
 				"") shift 2 ;;
 				*)  TEXOUT="$2" ; shift 2 ;;
 			esac ;;
 		-f|--force)  FORCE=yes ; shift ;;
-		-o|--outdir) OUTDIR=$2 ; shift 2 ;;
+		-o|--outdir=) OUTDIR=$2 ; shift 2 ;;
 		-s|--strip)  DO_STRIP=yes ; shift ;;
-		-t|--templatedir) TEMPLATEDIR=$2 ; shift ;;
-		-T|--tmpdir)      TMPDIR=$2 ; shift ;;
+		-t|--templatedir=) TEMPLATEDIR=$2 ; shift ;;
+		-T|--tmpdir=)      TMPDIR=$2 ; shift ;;
 		--test)		TEST_MODE=yes ; shift ;;
+		-I|--includedir=)  INCLUDES="$INCLUDES -I$2" ; shift ;;
 		-h|--help) help ; exit 0 ;;
 		--) shift ; break ;;
 		*) echo "Internal error!" ; exit 1 ;;
@@ -199,7 +201,7 @@ if [ $DO_COMPILE  ] ; then
 		fi
 
 		# compile
-		run_command "$CXX $CXXFLAGS -I$SHAREDIR/$CLASS/include $DTTMPDIR/$cppfile -o $DTTMPDIR/$sofile"
+		run_command "$CXX $CXXFLAGS -I$SHAREDIR/$CLASS/include $INCLUDES $DTTMPDIR/$cppfile -o $DTTMPDIR/$sofile"
 		if [ $? = 0 ] ; then
 			# move resulting so to OUTDIR
 			run_command $MV $DTTMPDIR/$sofile $OUTDIR
