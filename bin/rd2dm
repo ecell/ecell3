@@ -5,12 +5,10 @@
 # Author: Yohei Yamada <yoyo@e-cell.org>
 
 
-#TO-DOS, in order of importance, as of 09/24/02
-#-Fix the problem with $$ in 'EQUATION'
-#-Make 'DESCRIPTION' support multi-lines 
-#-Make 'BRIEF_DESCRIPTION' support multi-lines 
-#-Fix non-essential keys that are currently commented out (e.g. AUTHOR, DESCRIPTION)
-#-support both defined and undefined in AUTHOR, EMAIL, DATE, VERSION, BRIEF_DESCRIPTION, DESCRIPTION, EQUATION, PARAMETER
+#TO-DOS, in order of importance, as of 09/30/02
+#-Make this program comment out "#"
+#-Make the value of 'DESCRIPTION' support multi-lines 
+#-Make the value of 'BRIEF_DESCRIPTION' support multi-lines 
 #-Make this program support *.rd syntax (will be supported by shell?)
 
 import sys
@@ -348,6 +346,8 @@ anEditedTextDictionary['REACT'] = string.replace(anEditedTextDictionary['REACT']
 
 anEditedTextDictionary['REACT'] = string.replace(anEditedTextDictionary['REACT'], ')->quantity()','.getSubstance()->getQuantity()')
 anEditedTextDictionary['REACT'] = string.replace(anEditedTextDictionary['REACT'], ') -> quantity()','.getSubstance()->getQuantity()')
+anEditedTextDictionary['REACT'] = string.replace(anEditedTextDictionary['REACT'], ')->setQuantity','.getSubstance()->setQuantity')
+anEditedTextDictionary['REACT'] = string.replace(anEditedTextDictionary['REACT'], ') -> setQuantity','.getSubstance()->setQuantity')
 anEditedTextDictionary['REACT'] = string.replace(anEditedTextDictionary['REACT'], ')->concentration()','.getSubstance()->getConcentration()')
 anEditedTextDictionary['REACT'] = string.replace(anEditedTextDictionary['REACT'], ') -> concentration()','.getSubstance()->getConcentration()')
 
@@ -356,9 +356,8 @@ anEditedTextDictionary['REACT'] = string.replace(anEditedTextDictionary['REACT']
 anEditedTextDictionary['REACT'] = string.replace(anEditedTextDictionary['REACT'], 'stepper()','getStepper()')
 anEditedTextDictionary['REACT'] = string.replace(anEditedTextDictionary['REACT'], 'deltaT()','getStepInterval()')
 anEditedTextDictionary['REACT'] = string.replace(anEditedTextDictionary['REACT'], 'coefficient()','getStoichiometry()') # will probably change in the future
-anEditedTextDictionary['REACT'] = string.replace(anEditedTextDictionary['REACT'], ')->setQuantity','.getSubstance()->setQuantity')
-anEditedTextDictionary['REACT'] = string.replace(anEditedTextDictionary['REACT'], ') -> setQuantity','.getSubstance()->setQuantity')
 
+anEditedTextDictionary['REACT'] = string.replace(anEditedTextDictionary['REACT'], 'cout', 'std::cout')
 #anEditedTextDictionary['REACT'] = string.replace(anEditedTextDictionary['REACT'], '', '')
 #anEditedTextDictionary['REACT'] = string.replace(anEditedTextDictionary['REACT'], '//','#')
 #anEditedTextDictionary['REACT'] = string.replace(anEditedTextDictionary['REACT'], 'num(Substrate)','') # don't edit 'num(Substrate)'
@@ -392,8 +391,8 @@ anOutputfile.write(brief_description + '\n\n')
 description = "DESCRIPTION = " + "'" + str(anEditedTextDictionary['DESCRIPTION'] + "'")
 anOutputfile.write(description + '\n\n')
 
-#equation = "EQUATION = " + str(anEditedTextDictionary['EQUATION']) ## '$$' gets in the way
-#anOutputfile.write(equation + '\n\n')
+equation = "EQUATION = " + "'" + str(anEditedTextDictionary['EQUATION'] + "'") ## '$$' gets in the way
+anOutputfile.write(equation + '\n\n')
 
 properties = "PROPERTIES = " + str(anEditedTextDictionary['PROPERTIES'])
 anOutputfile.write(properties + '\n\n')
