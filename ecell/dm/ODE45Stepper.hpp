@@ -70,31 +70,77 @@ class ODE45Stepper
        Quartic (4th Order) Hermite interpolation
     */
 
-    const Real interpolate( RealCref anInterval )
+    inline static const Real interpolate( const Real k1,
+					  const Real k3__k1,
+					  const Real k1__k2_2,
+					  const Real k1_4k2k3__k4,
+					  const Real anInterval,
+					  const Real aStepIntervalInv )
     {
-      const Real theta( anInterval / theStepper.getOriginalStepInterval() );
-      
-      const Real k1 = theStepper.getK1()[ theIndex ];
-      const Real k2 = theStepper.getMidVelocityBuffer()[ theIndex ];
-      const Real k3 = theStepper.getVelocityBuffer()[ theIndex ];
-      const Real k4 = theStepper.getK7()[ theIndex ];
-      
-      return anInterval * ( k1 + theta
-			    * ( (theta - 0.5) * 2.0 * (k3 - k1)
-				+ (theta - 1.0) * 4.0 * (k1 - k2) 
-				+ (theta - 0.5) * (theta - 1.0) 
-				* 2.0 * (k4 - k1 - 4*k3 + 4*k2) ) );
+      const Real theta( anInterval * aStepIntervalInv );
+
+      const Real theta_0_5( theta - 0.5 );
+      const Real theta_1_0( theta - 1.0 );
+
+      return anInterval * ( k1 + ( theta + theta ) * 
+			    ( theta_0_5 * k3__k1
+			      + theta_1_0 * 
+			      ( k1__k2_2 - theta_0_5 * k1_4k2k3__k4 ) ) );
     }
    
     virtual const Real getDifference( RealCref aTime, RealCref anInterval )
     {
+      register const Real k1( theStepper.getK1()[ theIndex ] );
+      const Real k2( theStepper.getMidVelocityBuffer()[ theIndex ] );
+      const Real k3( theStepper.getVelocityBuffer()[ theIndex ] );
+      const Real k4( theStepper.getK7()[ theIndex ] );
+
+      register const Real 
+	aStepIntervalInv( 1.0 / theStepper.getOriginalStepInterval() );
+
+      register const Real k3__k1( k3 - k1 );
+      const Real k1__k2( k1 - k2 );
+      register const Real k1__k2_2( k1__k2 + k1__k2 );
+      const Real k2_k3( k2 + k3 );
+      const Real k2_k3_2( k2_k3 + k2_k3 );
+      register const Real k1_4k2k3__k4( ( k1 + k2_k3_2 + k2_k3_2 - k4 ) );
+
       const Real aTimeInterval( aTime - theStepper.getCurrentTime() );
 
-      const Real i1 = interpolate( aTimeInterval );
-      const Real i2 = interpolate( aTimeInterval - anInterval );
+      const Real i1( interpolate( k1, k3__k1, k1__k2_2, k1_4k2k3__k4,
+				  aTimeInterval, aStepIntervalInv ) );
+      const Real i2( interpolate( k1, k3__k1, k1__k2_2, k1_4k2k3__k4,
+				  ( aTimeInterval - anInterval ), 
+				  aStepIntervalInv ) );
 
       return ( i1 - i2 );
     }
+
+//     const Real interpolate( RealCref anInterval )
+//     {
+//       const Real theta( anInterval / theStepper.getOriginalStepInterval() );
+      
+//       const Real k1 = theStepper.getK1()[ theIndex ];
+//       const Real k2 = theStepper.getMidVelocityBuffer()[ theIndex ];
+//       const Real k3 = theStepper.getVelocityBuffer()[ theIndex ];
+//       const Real k4 = theStepper.getK7()[ theIndex ];
+      
+//       return anInterval * ( k1 + theta
+// 			    * ( (theta - 0.5) * 2.0 * (k3 - k1)
+// 				+ (theta - 1.0) * 4.0 * (k1 - k2) 
+// 				+ (theta - 0.5) * (theta - 1.0) 
+// 				* 2.0 * (k4 - k1 - 4*k3 + 4*k2) ) );
+//     }
+   
+//     virtual const Real getDifference( RealCref aTime, RealCref anInterval )
+//     {
+//       const Real aTimeInterval( aTime - theStepper.getCurrentTime() );
+
+//       const Real i1 = interpolate( aTimeInterval );
+//       const Real i2 = interpolate( aTimeInterval - anInterval );
+
+//       return ( i1 - i2 );
+//     }
 
   protected:
 
