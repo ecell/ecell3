@@ -3,9 +3,9 @@
 # from file: droTest.eml, date: Sun Oct 13 15:04:54 2002
 #
 
-#Stepper FixedODE1Stepper( DE )
+Stepper FixedODE1Stepper( DE )
 #Stepper ODE23Stepper( DE )
-Stepper ODE45Stepper( DE )
+#Stepper ODE45Stepper( DE )
 {
 	# no property
 }

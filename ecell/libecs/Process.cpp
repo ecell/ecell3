@@ -92,19 +92,63 @@ namespace libecs
 
   SAVE_METHOD_DEF( Polymorph, VariableReferenceList, Process )
   {
-    PolymorphVector aVector( getVariableReferenceList().asPolymorphVector() );
-
-    // convert back all variable reference ellipses to the default '_'.
-    for( PolymorphVectorIterator i( aVector.begin() ); 
-	 i != aVector.end(); ++i )
+    PolymorphVector aVector;
+    aVector.reserve( theVariableReferenceVector.size() );
+  
+    for( VariableReferenceVectorConstIterator 
+	   i( theVariableReferenceVector.begin() );
+	 i != theVariableReferenceVector.end() ; ++i )
       {
-	PolymorphVector anInnerVector( (*i).asPolymorphVector() );
+	PolymorphVector anInnerVector;
+	VariableReferenceCref aVariableReference( *i );
+
+	// (1) Variable reference name
+
+	// convert back all variable reference ellipses to the default '_'.
+	String aReferenceName( aVariableReference.getName() );
+
 	if( VariableReference::
-	    isEllipsisNameString( anInnerVector[0].asString() ) )
+	    isEllipsisNameString( aReferenceName ) )
 	  {
-	    anInnerVector[0] = Polymorph( VariableReference::DEFAULT_NAME );
-	    (*i) = anInnerVector;  // copy back
+	    aReferenceName = VariableReference::DEFAULT_NAME;
 	  }
+
+	anInnerVector.push_back( aReferenceName );
+
+	// (2) FullID
+
+	FullID aFullID( aVariableReference.getVariable()->getFullID() );
+	aFullID.setEntityType( EntityType::NONE );
+
+	anInnerVector.push_back( aFullID.getString() );
+
+	// (3) Coefficient and (4) IsAccessor
+	const Integer aCoefficient( aVariableReference.getCoefficient() );
+	const bool    anIsAccessorFlag( aVariableReference.isAccessor() );
+
+
+	// include both if IsAccessor is non-default (not true).
+	if( anIsAccessorFlag != true )
+	  {
+	    anInnerVector.push_back( aCoefficient );	    
+	    anInnerVector.
+	      push_back( static_cast<Integer>( anIsAccessorFlag ) );
+	  }
+	else
+	  {
+	    // output only the coefficient if IsAccessor has a 
+	    // default value, and the coefficient is non-default.
+	    if( aCoefficient != 0 )
+	      {
+		anInnerVector.push_back( aCoefficient );	    
+	      }
+	    else
+	      {
+		; // do nothing -- both are the default
+	      }
+	  }
+
+	aVector.push_back( anInnerVector );
       }
 
     return aVector;
