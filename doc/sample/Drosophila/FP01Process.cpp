@@ -7,8 +7,8 @@
 #include "Stepper.hpp"
 #include "Variable.hpp"
 #include "VariableProxy.hpp"
-
 #include "FluxProcess.hpp"
+
 #include "ecell3_dm.hpp"
 
 #define ECELL3_DM_TYPE Process
@@ -21,7 +21,7 @@ ECELL3_DM_CLASS
 {
   
   ECELL3_DM_OBJECT;
-  
+
  public:
 
    ECELL3_DM_CLASSNAME()

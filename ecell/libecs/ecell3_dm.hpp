@@ -87,4 +87,6 @@ CREATE_PROPERTYSLOT_GET    ( TYPE, NAME, ECELL3_DM_CLASSNAME )
 
 
 
+#else /* __ECELL3_DM_HPP */
+#    error "ecell3_dm.hpp is included twice.  This can be included only from .cpp files."
 #endif /* __ECELL3_DM_HPP */
