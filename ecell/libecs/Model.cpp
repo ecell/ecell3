@@ -35,7 +35,7 @@
 #include "SubstanceMaker.hpp"
 #include "ReactorMaker.hpp"
 #include "SystemMaker.hpp"
-#include "AccumulatorMaker.hpp"
+//#include "AccumulatorMaker.hpp"
 #include "LoggerBroker.hpp"
 #include "Stepper.hpp"
 
@@ -54,8 +54,8 @@ namespace libecs
     theStepperMaker(     *new StepperMaker          ),
     theSystemMaker(      *new SystemMaker           ),
     theSubstanceMaker(   *new SubstanceMaker        ),
-    theReactorMaker(     *new ReactorMaker          ),
-    theAccumulatorMaker( *new AccumulatorMaker      )
+    theReactorMaker(     *new ReactorMaker          )
+    //    ,theAccumulatorMaker( *new AccumulatorMaker      )
   {
     theRootSystemPtr = getSystemMaker().make( "System" );
     theRootSystemPtr->setModel( this );
@@ -68,7 +68,7 @@ namespace libecs
   Model::~Model()
   {
     delete theRootSystemPtr;
-    delete &theAccumulatorMaker;
+    //    delete &theAccumulatorMaker;
     delete &theReactorMaker;
     delete &theSubstanceMaker;
     delete &theSystemMaker;

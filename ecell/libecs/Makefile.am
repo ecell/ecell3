@@ -26,10 +26,8 @@ Polymorph.cpp\
 FullID.cpp\
 PropertySlot.cpp\
 PropertyInterface.cpp\
-AccumulatorMaker.cpp\
 ReactorMaker.cpp\
 Substance.cpp\
-Accumulators.cpp\
 SubstanceMaker.cpp\
 Stepper.cpp\
 Model.cpp\
@@ -48,6 +46,10 @@ Logger.cpp\
 PhysicalLogger.cpp\
 LoggerBroker.cpp
 
+#Accumulators.cpp\
+#AccumulatorMaker.cpp\
+
+
 libecsdir=${pkgincludedir}/libecs
 libecs_HEADERS=\
 libecs.hpp\
@@ -58,10 +60,8 @@ FullID.hpp\
 PropertySlot.hpp\
 PropertySlotMaker.hpp\
 PropertyInterface.hpp\
-AccumulatorMaker.hpp\
 ReactorMaker.hpp\
 Substance.hpp\
-Accumulators.hpp\
 SubstanceMaker.hpp\
 Stepper.hpp\
 Model.hpp\
@@ -88,6 +88,10 @@ RCPtr.hpp\
 Reactant.hpp\
 DynamicPriorityQueue.hpp\
 AssocVector.h
+
+#AccumulatorMaker.hpp\
+#Accumulators.hpp\
+
 
 
 bin_SCRIPTS =\

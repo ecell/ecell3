@@ -38,15 +38,14 @@ namespace libecs
 
   void SimpleAccumulator::accumulate()
   {
-    setQuantity( theSubstance->getQuantity() + 
-		 theSubstance->getVelocity() );
+    theSubstance->updateQuantity();
   }
 
   void RoundDownAccumulator::accumulate()
   {
-    theSubstance->setVelocity( floor( theSubstance->getVelocity() ) );
-    setQuantity( theSubstance->getQuantity() + 
-		 theSubstance->getVelocity() );
+    theSubstance->
+      setTotalVelocity( floor( theSubstance->calculateTotalVelocity() ) );
+    theSubstance->updateQuantity();
   }
 
   void RoundDownAccumulator::update()
@@ -56,9 +55,8 @@ namespace libecs
 
   void RoundOffAccumulator::accumulate()
   {
-    theSubstance->setVelocity( rint( theSubstance->getVelocity() ) );
-    setQuantity( theSubstance->getQuantity() + 
-		 theSubstance->getVelocity() );
+    theSubstance->setTotalVelocity( rint( theSubstance->calculateTotalVelocity() ) );
+    theSubstance->updateQuantity();
   }
 
   void RoundOffAccumulator::update()
@@ -68,13 +66,13 @@ namespace libecs
 
   void ReserveAccumulator::accumulate()
   {
-    Real aVelocity( theSubstance->getVelocity() );
+    Real aVelocity( theSubstance->calculateTotalVelocity() );
     aVelocity += theFraction;
     Real tmp;
     theFraction = modf( aVelocity, &tmp );
 
-    theSubstance->setVelocity( tmp );
-    setQuantity( theSubstance->getQuantity() + tmp );
+    theSubstance->setTotalVelocity( tmp );
+    theSubstance->updateQuantity();
   }
 
   Real ReserveAccumulator::save()
@@ -92,15 +90,15 @@ namespace libecs
   void MonteCarloAccumulator::accumulate()
   {
     Real aWhole;
-    Real aFraction = modf( theSubstance->getVelocity(), &aWhole );
+    Real aFraction = modf( theSubstance->calculateTotalVelocity(), &aWhole );
 
     if( theRandomNumberGenerator->toss( aFraction ) )
       {
 	++aWhole;
       }
 
-    theSubstance->setVelocity( aWhole );
-    setQuantity( theSubstance->getQuantity() + aWhole );
+    theSubstance->setTotalVelocity( aWhole );
+    theSubstance->updateQuantity();
   }
 
   void MonteCarloAccumulator::update()

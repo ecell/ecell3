@@ -57,8 +57,8 @@ namespace libecs
   // classes
 
   DECLARE_CLASS( System );
-  DECLARE_CLASS( AccumulatorMaker );
-  DECLARE_CLASS( Accumulator );
+  //  DECLARE_CLASS( AccumulatorMaker );
+  //  DECLARE_CLASS( Accumulator );
   DECLARE_CLASS( Entity );
   DECLARE_CLASS( EntityType );
   DECLARE_CLASS( SystemPath );

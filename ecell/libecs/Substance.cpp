@@ -30,11 +30,13 @@
 
 #include "Util.hpp"
 #include "System.hpp"
-#include "Accumulators.hpp"
-#include "AccumulatorMaker.hpp"
 #include "Model.hpp"
 #include "EntityType.hpp"
 #include "PropertySlotMaker.hpp"
+
+//#include "Accumulators.hpp"
+//#include "AccumulatorMaker.hpp"
+
 
 #include "Substance.hpp"
 
@@ -132,7 +134,9 @@ namespace libecs
   }
 
 
-    const String SRMSubstance::SYSTEM_DEFAULT_ACCUMULATOR_NAME = "ReserveAccumulator";
+#if 0
+
+  const String SRMSubstance::SYSTEM_DEFAULT_ACCUMULATOR_NAME = "ReserveAccumulator";
 
   //  const String SRMSubstance::SYSTEM_DEFAULT_ACCUMULATOR_NAME = "SimpleAccumulator";
 
@@ -230,6 +234,8 @@ namespace libecs
 				      &SRMSubstance::getAccumulatorClass ) );
 
   }
+
+#endif // 0
 
 
 } // namespace libecs

@@ -108,7 +108,8 @@ namespace libecs
 	}
     }
 
-    void updateQuantity( RealCref aTime )
+
+    const Real calculateTotalVelocity( RealCref aTime )
     {
       const Real aDeltaT( aTime - theLastTime );
 
@@ -119,7 +120,12 @@ namespace libecs
 	  aVelocitySum += **i;
 	}
 
-      theTotalVelocity = aVelocitySum * aDeltaT;
+      return aVelocitySum * aDeltaT;
+    }
+
+    void updateQuantity( RealCref aTime )
+    {
+      theTotalVelocity = calculateTotalVelocity( aTime );
 
       loadQuantity( getQuantity() + theTotalVelocity );
 
@@ -246,6 +252,9 @@ namespace libecs
   };
 
 
+
+#if 0 // unmaintained
+
   /**
      Substance class is used to represent state variables, such as
      amounts of molecular species in a compartment.
@@ -333,6 +342,8 @@ namespace libecs
     Real theFraction;
 
   };
+
+#endif // 0
 
   /*@}*/
 

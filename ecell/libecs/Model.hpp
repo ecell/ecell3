@@ -226,7 +226,7 @@ namespace libecs
 
     /// @internal
 
-    AccumulatorMakerRef getAccumulatorMaker() { return theAccumulatorMaker; }
+    //    AccumulatorMakerRef getAccumulatorMaker() { return theAccumulatorMaker; }
 
 
     StringLiteral getClassName() const  { return "Model"; }
@@ -261,7 +261,7 @@ namespace libecs
     SystemMakerRef      theSystemMaker;
     SubstanceMakerRef   theSubstanceMaker;
     ReactorMakerRef     theReactorMaker;
-    AccumulatorMakerRef theAccumulatorMaker;
+    //    AccumulatorMakerRef theAccumulatorMaker;
 
 
   };
