@@ -127,6 +127,10 @@ class EntityListWindow(OsogoWindow):
         if ( session != None ):
             self.theSession = session
             self.thePluginManager = session.thePluginManager
+            self['search_button'].set_sensitive(gtk.TRUE)
+            self['view_button'].set_sensitive(gtk.TRUE)
+            self['search_entry'].set_sensitive(gtk.TRUE)
+            self['plugin_optionmenu'].set_sensitive(gtk.TRUE)
 
         if ( self.theSession == None ):
             self['search_button'].set_sensitive(0)
