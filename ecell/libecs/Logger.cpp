@@ -71,7 +71,6 @@ namespace libecs
 			 "The minimum step and the minimum time interval "
 			 "must be positive numbers." );
       }
-
     theMinimumStep     = aMinimumStep;
     theMinimumInterval = aMinimumTimeInterval;
 
@@ -90,8 +89,8 @@ namespace libecs
 
     setLoggerPolicy( aParamList.asPolymorphVector()[ STEP_SIZE ].asInteger(),
 		     aParamList.asPolymorphVector()[ TIME_INTERVAL ].asReal(),
-		     aParamList.asPolymorphVector()[ MAX_SPACE ].asInteger(),
-		     aParamList.asPolymorphVector()[ END_POLICY ].asInteger() 
+		     aParamList.asPolymorphVector()[ END_POLICY ].asInteger(),
+		     aParamList.asPolymorphVector()[ MAX_SPACE ].asInteger()
 		     );
   }
 

@@ -45,9 +45,12 @@
  *::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
  *	$Id$
  :	$Log$
+ :	Revision 1.15  2004/07/29 03:52:02  bgabor
+ :	Fixing bug [ 994313 ] vvector should close files after read and write.
+ :
  :	Revision 1.14  2004/07/13 18:29:34  shafi
  :	extensive logger code cleanup. remaining things are: replace DataPointVector with boost::multi_array, and understand, reconsider and rename getData( s,e,i )
- :
+ :	
  :	Revision 1.13  2004/06/17 16:55:30  shafi
  :	copyright updates
  :	
@@ -198,8 +201,7 @@ vvectorbase::vvectorbase()
   if (!_atexitSet) {
     _atexitSet = true;
     if (atexit(removeTmpFile) != 0) {
-      fprintf(stderr, "atexit() fails.  errno=%d\n", errno);
-      cbError();
+        throw vvector_init_error();
     }
   }
 
@@ -217,11 +219,9 @@ void vvectorbase::unlinkfile()
 #ifndef OPEN_WHEN_ACCESS
   if (0 <= _fdr) {
     close(_fdr);
-    //		printf("fdr closed\n");
   }
   if (0 <= _fdw) {
     close(_fdw);
-    //		printf("fdrw closed\n");
   }
 #endif /* OPEN_WHEN_ACCESS */
   if (_file_name != NULL) {
@@ -264,7 +264,6 @@ void vvectorbase::removeTmpFile()
 
     if (0 <= *ii) {
       close(*ii);
-      //		printf("fdr closed\n");
     }
   }
 
@@ -272,7 +271,6 @@ void vvectorbase::removeTmpFile()
 
     if (0 <= *ii) {
       close(*ii);
-      //		printf("fdrw closed\n");
     }
   }
 #endif /* OPEN_WHEN_ACCESS */
@@ -304,11 +302,7 @@ void vvectorbase::initBase(char const * const dirname)
   }
 #endif
   if (osif_is_dir(pathname) == 0) {
-    THROW_EXCEPTION( libecs::Exception, "Directory doesn't exist.\n" );
-    /*
-      printf("Directory \"%s\" does not exist.\n", pathname);
-      exit(1);
-    */
+    throw vvector_init_error();
   }
   checkDiskFull(pathname, 1);
   sprintf(filename, "vvector-%ld-%04d",
@@ -316,28 +310,31 @@ void vvectorbase::initBase(char const * const dirname)
   strcat(pathname, filename);
   _file_name = strdup(pathname);
   _tmp_name.push_back(_file_name);
+
   _fdw = open(_file_name, O_WRONLY | O_CREAT | O_TRUNC | O_BINARY |O_LARGEFILE, 0600);
   _fdr = open(_file_name, O_RDONLY | O_BINARY | O_LARGEFILE );
+
+  if (_fdw < 0) 
+    {
+        throw vvector_init_error();
+    } 
+
+  if (_fdr < 0) 
+    {
+        throw vvector_init_error();
+    }
+
+ #ifndef OPEN_WHEN_ACCESS
   _file_desc_write.push_back(_fdr);
   _file_desc_write.push_back(_fdw);
-  if (_fdw < 0) {
-    THROW_EXCEPTION( libecs::Exception, "Opening file failed.\n" );
-    /*
-      fprintf(stderr, "open(\"%s\") failed in VVector.\n", _file_name);
-      cbError();
-      exit(1);
-    */
-  }
+ #endif /*OPEN_WHEN_ACCESS*/
 
-  if (_fdr < 0) {
-    THROW_EXCEPTION( libecs::Exception, "Opening file failed.\n" );
-    /*
-      fprintf(stderr, "open(\"%s\") failed in VVector err=%s.\n",
-      _file_name, strerror(errno));
-      cbError();
-      exit(1);
-    */
-  }
+ #ifdef OPEN_WHEN_ACCES
+ close(_fdw);
+ close(_fdr);
+ #endif /*OPEN_WHEN_ACCESS*/
+ 
+
 
 }
 
@@ -345,16 +342,16 @@ void vvectorbase::initBase(char const * const dirname)
 void vvectorbase::my_open_to_append()
 {
   checkDiskFull(_file_name, 0);
-  _fdw = open(_file_name, O_WRONLY | O_APPEND | O_BINARY |O_LARGEFILE);
-  if (_fdw < 0) {
-    THROW_EXCEPTION( libecs::Exception, "Opening file failed.\n" );
-    /*
-      fprintf(stderr, "open(\"%s\") failed in VVector err=%s.\n",
-      _file_name, strerror(errno));
-      cbError();
-      exit(1);
-    */
+  _fdw = open(_file_name, O_WRONLY | O_BINARY |O_LARGEFILE);
+  if (_fdw < 0) 
+   {
+      throw vvector_write_error();
   }
+  if ( lseek( _fdw, 0, SEEK_END ) == -1 )
+    {
+    my_close_write();
+       throw vvector_write_error();
+    }
 }
 
 
@@ -364,35 +361,32 @@ void vvectorbase::my_open_to_read(off_t offset)
     _fdr = open(_file_name, O_RDONLY | O_BINARY|O_LARGEFILE );
   }
   if (_fdr < 0) {
-    THROW_EXCEPTION( libecs::Exception, "Opening file failed.\n" );
-    /*
-      fprintf(stderr, "open(\"%s\") failed in VVector err=%s.\n",
-      _file_name, strerror(errno));
-      cbError();
-      exit(1);
-    */
+        throw vvector_read_error();
+
   }
   if (lseek(_fdr, offset, SEEK_SET) == static_cast<off_t>(-1)) {
-    THROW_EXCEPTION( libecs::Exception, "lseek in file failed.\n" );
-    /*    fprintf(stderr, "lseek(\"%s\") failed in VVector err=%s.\n",
-	  _file_name, strerror(errno));
-	  assert(0);*/
+        throw vvector_read_error();
+
   }
 }
 
-void vvectorbase::my_close()
+void vvectorbase::my_close_read()
 {
-  assert((0 <= _fdr)&&(0<=_fdw));
-  if ((close(_fdr) < 0)||(close(_fdw) < 0)) {
-    THROW_EXCEPTION( libecs::Exception, "Close of file failed.\n" );
-    /*
-      fprintf(stderr, "close(\"%s\") failed in VVector err=%s.\n",
-      _file_name, strerror(errno));
-      cbError();
-      exit(1);
-    */
+  assert (0 <= _fdr);
+  if (close(_fdr) < 0) {
+        throw vvector_read_error();
   }
   _fdr = -1;
+}
+
+void vvectorbase::my_close_write()
+{
+  assert (0<=_fdw);
+  if (close(_fdw) < 0) 
+    {
+        throw vvector_read_error();
+  }
+
   _fdw = -1;
 }
 
@@ -405,28 +399,12 @@ void vvectorbase::my_close()
   if (_cb_full != NULL) {
     (*_cb_full)();
   } else {
-    THROW_EXCEPTION( libecs::Exception, "Disk full, vvector cannot be created.\n");
-    /*
-      fprintf(stderr,
-      "vvector disk full --- return key to continue.\n");
-      getchar();
-    */
+        throw vvector_full();
+
   }
 }
 
 
-/* static */ void vvectorbase::cbError()
-{
-  if (_cb_full != NULL) {
-    (*_cb_full)();
-  } else {
-    THROW_EXCEPTION( libecs::Exception, "Error in vectrobase.\n");
-
-    /*		fprintf(stderr, "error in vvector.\n");
-		exit(1);
-    */
-  }
-}
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -462,7 +440,7 @@ typedef	vvector<test_data_t>	test_vector_t;
 int	main()
 {
   vvectorbase::setCBFull(&my_full_handler);
-  vvectorbase::setCBError(&my_error_handler);
+
   vvectorbase::margin(1024 * 100); // by K bytes
   vvectorbase::setTmpDir(".", 1); // top priority
 

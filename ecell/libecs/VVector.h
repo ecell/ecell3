@@ -45,9 +45,12 @@
  *::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
  *	$Id$
  :	$Log$
+ :	Revision 1.19  2004/07/29 03:52:02  bgabor
+ :	Fixing bug [ 994313 ] vvector should close files after read and write.
+ :
  :	Revision 1.18  2004/07/13 18:29:34  shafi
  :	extensive logger code cleanup. remaining things are: replace DataPointVector with boost::multi_array, and understand, reconsider and rename getData( s,e,i )
- :
+ :	
  :	Revision 1.17  2004/07/04 10:36:15  bgabor
  :	Code cleanup.
  :	
@@ -166,11 +169,49 @@ typedef int ssize_t;
 
 #include "Exceptions.hpp"
 
+#define OPEN_WHEN_ACCESS
 
 const unsigned int VVECTOR_READ_CACHE_SIZE = 2048;
 const unsigned int VVECTOR_WRITE_CACHE_SIZE = 2048;
 const unsigned int VVECTOR_READ_CACHE_INDEX_SIZE = 2;
 const unsigned int VVECTOR_WRITE_CACHE_INDEX_SIZE = 2;
+
+class vvector_full : public std::exception { 
+  public:
+
+   virtual char const* what() throw()
+        {
+            return "Total disk space or allocated space is full.\n";
+        } 
+    };
+
+class vvector_write_error : public std::exception { 
+  public:
+
+   virtual char const* what() throw()
+        {
+            return "I/O error while attempting to write on disk.\n";
+        } 
+    };
+
+class vvector_read_error : public std::exception { 
+  public:
+
+   virtual char const* what() throw()
+        {
+            return "I/O error while attempting to read from disk.\n";
+        } 
+    };
+
+
+class vvector_init_error : public std::exception { 
+  public:
+
+   virtual char const* what() throw()
+        {
+            return "VVector initialization error.\n";
+        } 
+    };
 
 class vvectorbase {
   // types
@@ -202,7 +243,8 @@ class vvectorbase {
   void initBase(char const * const dirname);
   void my_open_to_append();
   void my_open_to_read(off_t offset);
-  void my_close();
+  void my_close_read();
+  void my_close_write();
 
   // constructor, destructor
  public:
@@ -213,9 +255,7 @@ class vvectorbase {
   static void setTmpDir(char const * const dirname, int);
   static void removeTmpFile();
   static void setCBFull(cbfp_t __c) { _cb_full = __c; };
-  static void setCBError(cbfp_t __c) { _cb_error = __c; };
   static void cbFull();
-  static void cbError();
   static void margin(long __m) { _margin = __m; }; // by K bytes
 };
 
@@ -318,7 +358,7 @@ template<class T> void vvector<T>::push_back(const T & x)
   bool write_successful;
   if(VVECTOR_WRITE_CACHE_SIZE <= _cacheWNum)
     { 
-      THROW_EXCEPTION( libecs::Exception,  "Write() failed in VVector. \n");
+      throw vvector_write_error();
     }
     
   _cacheWV[_cacheWNum] = x;
@@ -342,19 +382,25 @@ template<class T> void vvector<T>::push_back(const T & x)
       // first try to append
       if (!size_fixed)
 	{
+	#ifdef OPEN_WHEN_ACCESS
+	   my_open_to_append();
+	#endif /*OPEN_WHEN_ACCESS*/
 	  red_bytes = write( _fdw, _cacheWV, sizeof(T) * VVECTOR_WRITE_CACHE_SIZE );
-	  write_successful = ( red_bytes == sizeof(T) * VVECTOR_WRITE_CACHE_SIZE );
+	#ifdef OPEN_WHEN_ACCESS
+	  my_close_write();
+    #endif /*OPEN_WHEN_ACCESS*/
 
+	  write_successful = ( red_bytes == sizeof(T) * VVECTOR_WRITE_CACHE_SIZE );
 	  if ( (!write_successful )  || ( _size == max_size ) )
 	    {
 	      if (end_policy == 0)
 		{
 		  if (_size>0)
 		    {
-		      THROW_EXCEPTION( libecs::Exception,  "Write() failed in VVector. Possibly disk or allocated space is full.\n");
+		      throw vvector_full();
 		    }
 		  else{
-		    THROW_EXCEPTION( libecs::Exception,  "Write() failed in VVector. Possibly IO or permission error.\n");
+		    throw vvector_write_error();
 		  }
 		}
 	      else 
@@ -371,15 +417,24 @@ template<class T> void vvector<T>::push_back(const T & x)
 	
       if (size_fixed){
 	//try to seek start offset
-	  
+    #ifdef OPEN_WHEN_ACCESS
+	  my_open_to_append();
+    #endif /*OPEN_WHEN_ACCESS*/
+
 	if (lseek(_fdw, static_cast<off_t>((start_offset) * sizeof(T)), SEEK_SET) == static_cast<off_t>(-1)) 
 	  {
-	    THROW_EXCEPTION( libecs::Exception, "Write() failed in VVector. Seek error.\n");
+	  my_close_write();
+	    throw vvector_write_error();
 	  }
-	if (write(_fdw, _cacheWV, sizeof(T) * VVECTOR_WRITE_CACHE_SIZE)
-	    != sizeof(T) * VVECTOR_WRITE_CACHE_SIZE) 
+
+    red_bytes = write(_fdw, _cacheWV, sizeof(T) * VVECTOR_WRITE_CACHE_SIZE);
+	#ifdef OPEN_WHEN_ACCESS
+	  my_close_write();
+    #endif /*OPEN_WHEN_ACCESS*/
+
+	if ( red_bytes != sizeof(T) * VVECTOR_WRITE_CACHE_SIZE) 
 	  {
-	    THROW_EXCEPTION( libecs::Exception,  "Write() failed in VVector. Possibly IO error.\n");
+	    throw vvector_write_error();
 	  }
 	start_offset += VVECTOR_WRITE_CACHE_SIZE;
 	if (start_offset >= _size)
@@ -403,37 +458,6 @@ template<class T>  T const & vvector<T>::operator [] (size_type i)
 
 template<class T>  T const & vvector<T>::at(size_type i)
 {
-  //  assert(i < _size);
-  /*
-  //check whether i is in range of _cacheRI[0],_cacheRI[1]
-  if ((i>=_cacheRI[0])&&(_cacheRI[1]>=i)){
-  //calculate i's position
-  return _cacheRV[i-_cacheRI[0]];
-  }
-  if ((i>=_cacheWI[0])&&(_cacheWI[1]>=i)){
-  //calculate i's position
-  return _cacheWV[i-_cacheWI[0]];
-  }
-  
-  my_open_to_read(static_cast<off_t>((i) * sizeof(T)));
-  size_type num_to_read = _size - i;
-  if (VVECTOR_READ_CACHE_SIZE < num_to_read) {
-  num_to_read = VVECTOR_READ_CACHE_SIZE;
-  }
-  ssize_t num_red = read(_fdr, _cacheRV, num_to_read * sizeof(T));
-  if (num_red < 0) {
-  fprintf(stderr, "read() failed in VVector. i=%ld, _size=%ld, n=%ld\n",
-  (long)i, (long)_size, (long)num_to_read);
-  cbError();
-  }
-  num_red /= sizeof(T);
-  _cacheRI[0]=i;
-  _cacheRI[1]=i+num_red-1;
-  
-  _buf = _cacheRV[0];
-  //  my_close();
-  return _buf;
-  */
 
   assert(i < _size);
   // read cache only makes sense when not fixed size
@@ -485,11 +509,15 @@ template<class T>  T const & vvector<T>::at(size_type i)
   else{
     phys_read_start=i2;
   }
-  my_open_to_read( off_t( phys_read_start * sizeof(T) ));
-
+   #ifdef OPEN_WHEN_ACCESS
+     my_open_to_read( off_t( phys_read_start * sizeof(T) ));
+    #endif /*OPEN_WHEN_ACCESS*/
   num_red = read(_fdr, _cacheRV, num_to_read * sizeof(T));
+   #ifdef OPEN_WHEN_ACCESS
+  my_close_read();
+    #endif /*OPEN_WHEN_ACCESS*/
   if (num_red < 0) {
-    THROW_EXCEPTION( libecs::Exception, "read() failed in VVector.\n");
+    throw vvector_read_error();
 
   }
   num_red /= sizeof(T);
