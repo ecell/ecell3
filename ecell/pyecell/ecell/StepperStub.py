@@ -212,7 +212,8 @@ class StepperStub( PropertyInterfaceStub ):
 	def getPropertyAttributes( self, aPropertyName ):
 	
 		return self.theSimulator.\
-		       getStepperPropertyAttributes( self.theID )
+		       getStepperPropertyAttributes( self.theID,\
+						     aPropertyName )
 
 
 	# end of getProperty

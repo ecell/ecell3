@@ -72,8 +72,7 @@ class EntityStub( PropertyInterfaceStub ):
 	def create( self, aClassname ):
 
 		self.theSimulator.createEntity( aClassname,
-		                                self.theFullIDString, 
-		                                self.theName )
+		                                self.theFullIDString ) 
 
 	# end of createEntity
 
@@ -84,7 +83,7 @@ class EntityStub( PropertyInterfaceStub ):
 	# This method can throw exceptions.
 	# ---------------------------------------------------------------
 
-	def delete( self, aClassname ):
+	def delete( self ):
 
 		self.theSimulator.deleteEntity( self.theFullIDString ) 
 
