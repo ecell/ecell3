@@ -111,6 +111,25 @@ def createSystemPathFromFullID( aSystemFullID ):
                          aSystemFullID[ID]
     return aNewSystemPath
 
+
+##########################################################################
+
+def printProperty( sim, fullpropertyname ):
+    value = sim.getProperty( fullpropertyname )
+    print fullpropertyname, '\t=\t', value
+
+def printAllProperties( sim, fullid ):
+    properties = sim.getProperty( fullid +  ('PropertyList',) )
+    for property in properties:
+        printProperty( sim, fullid + ( property, ) )
+
+def printList( sim, primitivetype, systempath,list ):
+    for i in list:
+        printAllProperties( sim, ( primitivetype, systempath, i ) )
+
+##########################################################################
+
+
 if __name__ == "__main__":
     
     fullid  = FullID( 'System:/CELL/CYTOPLASM:MT0' )
@@ -136,3 +155,14 @@ if __name__ == "__main__":
     print createSystemPathFromFullID( systemfullid1 )
     print createSystemPathFromFullID( systemfullid2 )
     print createSystemPathFromFullID( systemfullid3 )
+
+
+
+
+
+
+
+
+
+
+
