@@ -196,7 +196,7 @@ public:
 
      @return An pointer to a Reactor object in this System named @a id.
     */
-  ReactorPtr getReactor( StringCref id ) throw( NotFound );
+  ReactorPtr getReactor( StringCref id ) ;
 
   /**
     Add a Substance object in this System.
@@ -247,7 +247,7 @@ public:
   /**
     @return An pointer to a Substance object in this System named @a id.
     */
-  SubstancePtr getSubstance( StringCref id ) throw( NotFound );
+  SubstancePtr getSubstance( StringCref id );
 
   /**
     Add a System object in this System
@@ -298,7 +298,7 @@ public:
   /**
     @return An pointer to a System object in this System whose ID is id.
     */
-  virtual SystemPtr getSystem( StringCref id ) throw( NotFound );
+  virtual SystemPtr getSystem( StringCref id ) ;
 
   /**
     This method finds recursively a System object pointed by
@@ -307,16 +307,15 @@ public:
     @return An pointer to a System object in this or subsystems of this
     System object pointed by @a systempath
     */
-  virtual SystemPtr getSystem( SystemPathCref systempath ) 
-    throw( BadID, NotFound ); 
+  virtual SystemPtr getSystem( SystemPathCref systempath ) ;
 
 
 public: // message interfaces
 
-  void setStepper( MessageCref message );
+  void setStepperClass( MessageCref message );
   void setVolumeIndex( MessageCref message );
 
-  const Message getStepper( StringCref keyword );
+  const Message getStepperClass( StringCref keyword );
   const Message getVolumeIndex( StringCref keyword );
 
   const Message getSystemList( StringCref keyword );

@@ -45,16 +45,16 @@ template SystemList;
 
 void System::makeSlots()
 {
-  MessageSlot( "systemList", System, *this,
+  MessageSlot( "SystemList", System, *this,
 	       NULL, &System::getSystemList );
-  MessageSlot( "substanceList", System, *this,
+  MessageSlot( "SubstanceList", System, *this,
 	       NULL, &System::getSubstanceList );
-  MessageSlot( "reactorList", System, *this,
+  MessageSlot( "ReactorList", System, *this,
 	       NULL, &System::getReactorList );
 
-  MessageSlot( "stepper", System, *this,
-	       &System::setStepper, &System::getStepper );
-  MessageSlot( "volumeIndex", System, *this,
+  MessageSlot( "StepperClass", System, *this,
+	       &System::setStepperClass, &System::getStepperClass );
+  MessageSlot( "VolumeIndex", System, *this,
 	       &System::setVolumeIndex, &System::getVolumeIndex );
 }
 
@@ -101,13 +101,13 @@ const Message System::getReactorList( StringCref keyword )
 }
 
 
-void System::setStepper( const Message& message )
+void System::setStepperClass( const Message& message )
 {
   //FIXME: range check
   setStepper( message[0].asString() );
 }
 
-const Message System::getStepper( StringCref keyword )
+const Message System::getStepperClass( StringCref keyword )
 {
   return Message( keyword, 
 		  UniversalVariable( getStepper()->className() ) );
@@ -310,7 +310,7 @@ void System::addReactor( ReactorPtr reactor )
   reactor->setSuperSystem( this );
 }
 
-ReactorPtr System::getReactor( StringCref id ) throw( NotFound )
+ReactorPtr System::getReactor( StringCref id ) 
 {
   ReactorListIterator i = getReactorIterator( id );
   if( i == getLastReactorIterator() )
@@ -333,7 +333,7 @@ void System::addSubstance( SubstancePtr newone )
   newone->setSuperSystem( this );
 }
 
-SubstancePtr System::getSubstance( StringCref id ) throw( NotFound )
+SubstancePtr System::getSubstance( StringCref id ) 
 {
   SubstanceListIterator i = getSubstanceIterator( id );
   if( i == getLastSubstanceIterator() )
@@ -361,7 +361,6 @@ void System::addSystem( SystemPtr system )
 }
 
 SystemPtr System::getSystem( SystemPathCref systempath ) 
-  throw( BadID, NotFound )
 {
   SystemPtr  aSystem = getSystem( systempath.first() );
   SystemPath anNext  = systempath.next();
@@ -374,7 +373,7 @@ SystemPtr System::getSystem( SystemPathCref systempath )
   return aSystem;
 }
 
-SystemPtr System::getSystem( StringCref id ) throw( NotFound )
+SystemPtr System::getSystem( StringCref id ) 
 {
   SystemListIterator i = getSystemIterator( id );
   if( i == getLastSystemIterator() )
