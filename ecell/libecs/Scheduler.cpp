@@ -28,6 +28,8 @@
 // E-Cell Project, Institute for Advanced Biosciences, Keio University.
 //
 
+#include <cmath>
+
 #include "Stepper.hpp"
 
 #include "Model.hpp"
@@ -71,6 +73,14 @@ namespace libecs
     StepperPtr const aStepperPtr( aTopEvent.getStepper() );
 
     setCurrentTime( aCurrentTime );
+
+    // this check is necessary, but check the impact on performance
+    // before commenting out.
+    //    if( ! std::isfinite( aCurrentTime ) )
+    //      {
+    //	THROW_EXCEPTION( SimulationError, "Current time has reached [" 
+    //			 + stringCast( aCurrentTime ) + "].");
+    //      }
 
     aStepperPtr->integrate( aCurrentTime );
     aStepperPtr->step();

@@ -59,8 +59,10 @@ namespace libecs
     thePriority( 0 ),
     theCurrentTime( 0.0 ),
     theStepInterval( 0.001 ),
-    theMinStepInterval( std::numeric_limits<Real>::min() ),
-    theMaxStepInterval( std::numeric_limits<Real>::max() )
+    //    theMinStepInterval( std::numeric_limits<Real>::min() ),
+    //    theMaxStepInterval( std::numeric_limits<Real>::max() )
+    theMinStepInterval( 0.0 ),
+    theMaxStepInterval( std::numeric_limits<Real>::infinity() )
   {
     gsl_rng_env_setup();
 

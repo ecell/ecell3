@@ -95,16 +95,6 @@ namespace libecs
 				   &Variable::getNumberConc );
       }
 
-    class IsIntegrationNeeded
-    {
-    public:
-      bool operator()( VariablePtr aVariablePtr ) const
-      {
-	return aVariablePtr->isIntegrationNeeded();
-      }
-
-    };
-
 
     Variable();
     virtual ~Variable();
