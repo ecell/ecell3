@@ -113,11 +113,10 @@ public:
   const Real getTotalPropensity( )
     {
       Real anA0( 0.0 );
-      TauLeapProcessVector::size_type aTauLeapProcessVectorSize( theTauLeapProcessVector.size() );
-      for( TauLeapProcessVector::size_type i( 0 );
-	   i < aTauLeapProcessVectorSize; ++i )
+      for( std::vector<TauLeapProcessPtr>::iterator i( theTauLeapProcessVector.begin() ); 
+	   i != theTauLeapProcessVector.end(); ++i )
 	{
-	  anA0 += theTauLeapProcessVector[ i ]->getPropensity();
+	  anA0 += (*i)->getPropensity();
 	}
       return anA0;
     }
