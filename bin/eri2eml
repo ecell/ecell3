@@ -30,12 +30,8 @@ def appendUnderScore( aString ):
     else:
         return aString
 
-
 def replaceProhibitLetter( aString ):
-    firstChecked = string.replace( aString, '-', '_' )
-    secondChecked = string.replace( firstChecked, '+', '_')
-    thirdChecked = string.replace( secondChecked, '.', '_')
-    replacedString = string.replace(firstChecked , '!', '_' )    
+    replacedString = re.sub( r'[-+.,!]', '_', aString)
     return appendUnderScore( replacedString )
 
 
@@ -135,7 +131,7 @@ Options:
     anEml = Eml()
 
     anEml.createStepper( 'Euler1Stepper', 'SRM_01')
-#    print  replaceProhibitLetter("1,2testtest")
+
 
     for anEriLine in anEriStrings:
         if ( anEriLine[0] == 'SYSTEM' ):
