@@ -13,13 +13,14 @@ print 'create a Session'
 aSession = ecell.Session.Session( ecell.ecs.Simulator() )
 aSimulator = aSession.theSimulator
 
-aSimulator.createStepper( 'RungeKutta4SRMStepper', 'RK4_0', () )
-aSimulator.createStepper( 'RungeKutta4SRMStepper', 'RK4_1', () )
-aSimulator.createStepper( 'Euler1SRMStepper', 'E1_0', () )
+aSimulator.createStepper( 'RungeKutta4SRMStepper', 'RK4_0' )
+aSimulator.createStepper( 'RungeKutta4SRMStepper', 'RK4_1' )
+aSimulator.createStepper( 'Euler1SRMStepper', 'E1_0' )
 
 aSimulator.setProperty( 'System::/:StepperID', ('RK4_0',) )
 
-
+print aSimulator.getStepperProperty( 'RK4_0', 'StepInterval' )
+print aSimulator.getStepperProperty( 'RK4_0', 'SystemList' )
 
 print 'make substances...'
 aSimulator.createEntity( 'SRMSubstance', 'Substance:/:A', 'substance A' )
