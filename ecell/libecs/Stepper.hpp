@@ -51,7 +51,7 @@ public:
 
   virtual void initialize();
 
-  virtual Float getDeltaT() = 0;
+  virtual Real getDeltaT() = 0;
   virtual bool isMasterStepper() const { return false; }
 
   virtual void clear() = 0;
@@ -80,14 +80,14 @@ public:
   MasterStepper();
 
   void setPace( int pace ) { thePace = pace; }
-  void setdeltaT( Float dt ) { theDeltaT = dt; }
+  void setdeltaT( Real dt ) { theDeltaT = dt; }
 
   virtual ~MasterStepper() {}
 
   virtual int getNumberOfSteps() const { return 1; }
   int getPace() const { return thePace; }
 
-  virtual Float getDeltaT(); 
+  virtual Real getDeltaT(); 
   virtual void initialize();
 
   virtual void distributeIntegrator( IntegratorAllocator );
@@ -100,7 +100,7 @@ public:
 protected:
 
   int                 thePace;
-  Float               theDeltaT;
+  Real               theDeltaT;
   IntegratorAllocator theAllocator;
   SlaveStepperList    theSlavesList;
 
@@ -127,7 +127,7 @@ public:
 
   virtual void initialize();
 
-  Float StepperLeader::getDeltaT()
+  Real StepperLeader::getDeltaT()
   {
     return theStepInterval;
   }
@@ -159,7 +159,7 @@ private:
   int theUpdateDepth;
   int theBaseClock;
 
-  Float theStepInterval;
+  Real theStepInterval;
 
   static int DEFAULT_UPDATE_DEPTH;
 
@@ -215,7 +215,7 @@ public:
     theMaster = master; 
   }
 
-  Float getDeltaT() 
+  Real getDeltaT() 
   { 
     // Slaves are synchronous to their masters.
     return theMaster->getDeltaT(); 

@@ -162,7 +162,7 @@ const Message Reactor::getCatalystList( StringCref keyword )
 
 void Reactor::setInitialActivity( MessageCref message )
 {
-  setInitialActivity( message[0].asFloat() );
+  setInitialActivity( message[0].asReal() );
 }
 
 const Message Reactor::getInitialActivity( StringCref keyword )
@@ -202,7 +202,7 @@ void Reactor::appendEffector( FQIDCref fqid, int coefficient )
   appendEffector( *aSubstance, coefficient );
 }
 
-void Reactor::setInitialActivity( Float activity )
+void Reactor::setInitialActivity( Real activity )
 {
   theInitialActivity = activity;
   // FIXME: take delta T from supersystem
@@ -284,7 +284,7 @@ void Reactor::initialize()
 }
 
 
-Float Reactor::getActivity() 
+Real Reactor::getActivity() 
 {
   return theActivity;
 }

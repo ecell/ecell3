@@ -133,31 +133,31 @@ void Logger<T, V>::appendData(const containee_type& dp )
 #include "DataPoint.cpp"
 #include "StlDataPointVector.cpp"
 
-const Float& func(void)
+const Real& func(void)
 {
-  const Float* fp = new Float(3.14); 
+  const Real* fp = new Real(3.14); 
   return *fp;
 }
 
 main()
 {
 
-  Float f1 = 0.12;
-  Float f2 = 1.23;
-  Float f3 = 3.14;
-  Float f4 = 4.27;
-  Float f5 = 7.23;
+  Real f1 = 0.12;
+  Real f2 = 1.23;
+  Real f3 = 3.14;
+  Real f4 = 4.27;
+  Real f5 = 7.23;
   
-  DataPoint<Float,Float> d1 = DataPoint<Float,Float>(f1,f1);
-  DataPoint<Float,Float> d2 = DataPoint<Float,Float>(f2,f2);
-  DataPoint<Float,Float> d3 = DataPoint<Float,Float>(f3,f3);
-  DataPoint<Float,Float> d4 = DataPoint<Float,Float>(f4,f4);
-  DataPoint<Float,Float> d5 = DataPoint<Float,Float>(f5,f5);
+  DataPoint<Real,Real> d1 = DataPoint<Real,Real>(f1,f1);
+  DataPoint<Real,Real> d2 = DataPoint<Real,Real>(f2,f2);
+  DataPoint<Real,Real> d3 = DataPoint<Real,Real>(f3,f3);
+  DataPoint<Real,Real> d4 = DataPoint<Real,Real>(f4,f4);
+  DataPoint<Real,Real> d5 = DataPoint<Real,Real>(f5,f5);
 
   ObjectPtr op = new Object(&func);
 
 
-  Logger<Float,Float> lg = Logger<Float,Float>(op);
+  Logger<Real,Real> lg = Logger<Real,Real>(op);
   lg.update(d1);
   lg.update(d2);
   lg.update(d3);
@@ -165,7 +165,7 @@ main()
   lg.update(d5);
 
 
-  Logger<Float,Float> lg_clone = Logger<Float,Float>(lg);
+  Logger<Real,Real> lg_clone = Logger<Real,Real>(lg);
 
   //  printf("%p %p\n",&(lg.getDataPointVector()),&(lg_clone.getDataPointVector()));
 

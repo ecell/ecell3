@@ -62,7 +62,7 @@ public:
   /**
     @return the number of molecules.
    */
-  Float getQuantity() const                    
+  Real getQuantity() const                    
   { 
     return theQuantity; 
   }
@@ -134,7 +134,7 @@ public:
   /**
     @return current velocity value in (number of molecules)/(step)
    */
-  Float getVelocity() const
+  Real getVelocity() const
     { 
       return theVelocity; 
     }
@@ -142,7 +142,7 @@ public:
   /**
     @param v velocity in number of molecules to be added.
    */
-  void addVelocity( Float velocity ) 
+  void addVelocity( Real velocity ) 
   {
     theVelocity += velocity; 
   }
@@ -151,9 +151,9 @@ public:
     Returns activity value of a Substance object.
     The activity is current velocity.
     @see getActivityPerSecond
-    @return activity value of Substance in Float.
+    @return activity value of Substance in Real.
    */
-  Float getActivity();
+  Real getActivity();
 
   /**
     Set a quantity with no check. (i.e. isFixed() is ignored.)
@@ -162,7 +162,7 @@ public:
 
     @see setQuantity
    */
-  void loadQuantity( Float q );
+  void loadQuantity( Real q );
 
   /**
     This simply set the quantity of this Substance with check of isFixed().
@@ -170,7 +170,7 @@ public:
 
     @see isFixed
     */
-  void setQuantity(Float q)    
+  void setQuantity(Real q)    
   { 
     if( !isFixed() ) 
       {
@@ -182,7 +182,7 @@ public:
   /**
     Get a quantity via save() method of the Accumulator.
    */
-  Float saveQuantity();
+  Real saveQuantity();
 
 
   virtual const char* const getClassName() const { return "Substance"; }
@@ -217,7 +217,7 @@ protected:
 private:
 
   void calculateConcentration();
-  void mySetQuantity( Float q ) 
+  void mySetQuantity( Real q ) 
   { 
     theQuantity = q; 
     theConcentration = -1; 
@@ -237,9 +237,9 @@ private:
   AccumulatorPtr theAccumulator;
   IntegratorPtr theIntegrator;
 
-  Float theQuantity;
-  Float theFraction;
-  Float theVelocity;
+  Real theQuantity;
+  Real theFraction;
+  Real theVelocity;
 
   bool theFixed;
 

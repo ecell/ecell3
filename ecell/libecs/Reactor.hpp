@@ -101,7 +101,7 @@ public:
   void appendProduct( FQIDCref fqen, int coefficient );
   void appendCatalyst( FQIDCref fqen, int coefficient );
   void appendEffector( FQIDCref fqen, int coefficient );
-  void setInitialActivity( Float activity );
+  void setInitialActivity( Real activity );
 
   /**
     Reactor Condition enum is used by Reactor's self-diagnosis system.
@@ -135,14 +135,14 @@ public:
 
 private:
 
-  Float theInitialActivity;
-  Float theActivityBuffer;
+  Real theInitialActivity;
+  Real theActivityBuffer;
   Condition theCondition;
   static Condition theGlobalCondition;
 
 protected:
 
-  Float theActivity;
+  Real theActivity;
 
   void makeSlots();
 
@@ -160,7 +160,7 @@ protected:
     @param activity [number of molecule that this yields] / [deltaT].
     @see activity()
    */
-  void setActivity( Float activity ) { theActivityBuffer = activity; }
+  void setActivity( Real activity ) { theActivityBuffer = activity; }
   Condition condition( Condition );
   void warning( StringCref );
 
@@ -187,7 +187,7 @@ public:
     @return [the number of molecule that this yield] / [s].
     @see setActivity()
    */
-  virtual Float getActivity();
+  virtual Real getActivity();
 
   void appendSubstrate( SubstanceRef substrate, int coefficient );
   void appendProduct( SubstanceRef product, int coefficient );

@@ -122,7 +122,7 @@ void MasterStepper::registerSlaves(System* system)
     }
 }
 
-Float MasterStepper::getDeltaT()
+Real MasterStepper::getDeltaT()
 {
   // FIXME: should be return theDeltaT
   return getOwner()->getRootSystem()->getStepperLeader().getDeltaT();

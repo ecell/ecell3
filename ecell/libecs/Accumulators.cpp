@@ -62,29 +62,29 @@ void RoundOffAccumulator::update()
 
 void ReserveAccumulator::doit()
 {
-  Float tmp;
+  Real tmp;
   getVelocity() += theFraction;
   theFraction = modf( getVelocity(), &tmp );
   getQuantity() += tmp;
   getVelocity() = tmp;
 }
 
-Float ReserveAccumulator::save()
+Real ReserveAccumulator::save()
 {
   return getQuantity() + theFraction;
 }
 
 void ReserveAccumulator::update()
 {
-  Float tmp;
+  Real tmp;
   theFraction = modf( getQuantity(), &tmp );
   getQuantity() = tmp;
 }
 
 void MonteCarloAccumulator::doit()
 {
-  Float aWhole;
-  Float aFraction = modf( getVelocity(), &aWhole );
+  Real aWhole;
+  Real aFraction = modf( getVelocity(), &aWhole );
 
   if( theRandomNumberGenerator->toss( aFraction ) )
     {
@@ -96,8 +96,8 @@ void MonteCarloAccumulator::doit()
 
 void MonteCarloAccumulator::update()
 {
-  Float aWhole;
-  Float aFraction = modf( getQuantity(), &aWhole );
+  Real aWhole;
+  Real aFraction = modf( getQuantity(), &aWhole );
   if( theRandomNumberGenerator->toss( aFraction ) )
     {
       ++aWhole;

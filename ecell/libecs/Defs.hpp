@@ -68,22 +68,20 @@ DECLARE_TYPE( string, String );
 
 // Numeric types
 
-// FIXME: Int -> Integer, Float -> Real
-
 // FIXME: use numeric_limits
 DECLARE_TYPE( int64_t, Int );
 DECLARE_TYPE( uint64_t, UnsignedInt );
 const int INT_SIZE( sizeof( Int ) );
 
-DECLARE_TYPE( double, Float );
+DECLARE_TYPE( double, Real );
 DECLARE_TYPE( double, Mol );
 const int FLOAT_DIG( DBL_DIG );
 
 DECLARE_TYPE( Int, Quantity );
-DECLARE_TYPE( Float, Concentration );
+DECLARE_TYPE( Real, Concentration );
 
 //! Avogadro number. 
-const Float N_A = 6.0221367e+23;
+const Real N_A = 6.0221367e+23;
 
 const int NOMATCH = -1;
 

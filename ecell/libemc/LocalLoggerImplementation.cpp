@@ -35,7 +35,7 @@
 
 LocalLoggerImplementation::LocalLoggerImplementation( ObjectPtr optr )
   :
-  theFloatLogger( FloatLogger( optr ) ) 
+  theRealLogger( RealLogger( optr ) ) 
 {
   ; // do nothing
 }
@@ -47,24 +47,24 @@ LocalLoggerImplementation::~LocalLoggerImplementation( )
 
 void LocalLoggerImplementation::update( )
 {
-  theFloatLogger.update( );
+  theRealLogger.update( );
 }
 
 void
-LocalLoggerImplementation::update( FloatLogger::containee_type& datapoint )
+LocalLoggerImplementation::update( RealLogger::containee_type& datapoint )
 {
-  theFloatLogger.update( datapoint );
+  theRealLogger.update( datapoint );
 }
 
 
 /*
-void LocalLoggerImplementation::push( const FloatLogger::containee_type& x )
+void LocalLoggerImplementation::push( const RealLogger::containee_type& x )
 {
-  theFloatLogger.push( x );
+  theRealLogger.push( x );
 }
 
-void LocalLoggerImplementation::push( const Float& t, const Float& v )
+void LocalLoggerImplementation::push( const Real& t, const Real& v )
 {
-  theFloatLogger.push( t, v );
+  theRealLogger.push( t, v );
 } 
 */

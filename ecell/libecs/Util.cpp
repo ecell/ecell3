@@ -38,7 +38,7 @@ RandomNumberGenerator* theRandomNumberGenerator =
 new RandomNumberGenerator( 
 			  // FIXME: is this cast good?
 			  // should be reinterpret_cast or something?
-			  static_cast<Float>( time( NULLPTR ) ) ,
+			  static_cast<Real>( time( NULLPTR ) ) ,
 			  RANDOM_NUMBER_BUFFER_SIZE);
 
 int table_lookup( StringCref str, const char** table )
@@ -54,7 +54,7 @@ int table_lookup( StringCref str, const char** table )
   throw NotFound( __PRETTY_FUNCTION__ );
 }
 
-template<> const Float stringTo<Float>( StringCref str )
+template<> const Real stringTo<Real>( StringCref str )
 {
   // FIXME: error check, throw exception
   return strtod( str.c_str(), NULLPTR );
@@ -72,7 +72,7 @@ template<> const UnsignedInt stringTo<UnsignedInt>( StringCref str )
   return strtoul( str.c_str(), NULLPTR, 10 );
 }
 
-template<> const String toString<Float>( const Float& f )
+template<> const String toString<Real>( const Real& f )
 { 
   ostrstream os;
   os.precision( FLOAT_DIG );

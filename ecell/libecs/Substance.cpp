@@ -55,7 +55,7 @@ void Substance::setQuantity( MessageCref message )
 {
   // FIXME: range check
 
-  Float aQuantity = message[0].asFloat();
+  Real aQuantity = message[0].asReal();
 
   if( theAccumulator )
     {
@@ -175,18 +175,18 @@ void Substance::initialize()
     }
 }
 
-Float Substance::saveQuantity()
+Real Substance::saveQuantity()
 {
   return theAccumulator->save();
 }
 
-void Substance::loadQuantity( Float quantity )
+void Substance::loadQuantity( Real quantity )
 {
   mySetQuantity( quantity );
   theAccumulator->update();
 }
 
-Float Substance::getActivity()
+Real Substance::getActivity()
 {
   return getVelocity();
 }

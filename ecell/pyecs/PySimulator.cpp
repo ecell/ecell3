@@ -76,7 +76,7 @@ Object PySimulator::step( const Tuple& args )
 {
   ECS_TRY;
 
-  // Simulator::step();
+  Simulator::step();
   return Object();
 
   ECS_CATCH;
@@ -142,9 +142,9 @@ Object PySimulator::getMessage( const Tuple& args )
     {
       UniversalVariableCref aUniversalVariable( aMessage.getBody()[i] );
       Py::Object anObject;
-      if( aUniversalVariable.isFloat() )
+      if( aUniversalVariable.isReal() )
 	{
-	  anObject = Py::Float( aUniversalVariable.asFloat() );
+	  anObject = Py::Float( aUniversalVariable.asReal() );
 	}
       else if( aUniversalVariable.isInt() )
 	{

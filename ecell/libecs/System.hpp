@@ -133,7 +133,7 @@ public:
 
     @return Volume of this System. Unit is [L].
    */
-  virtual Float getVolume();
+  virtual Real getVolume();
 
   /**
     Add a Reactor object in this RSystem.

@@ -47,20 +47,20 @@ public:
   virtual int getNumberOfSteps() = 0;
 
   virtual void clear();
-  //  virtual Float velocity(Float v) = 0;
+  //  virtual Real velocity(Real v) = 0;
   virtual void turn() {}
   virtual void transit() = 0;
 
 protected:
 
-  void setQuantity( Float quantity ) { theSubstance.theQuantity = quantity; }
-  void setVelocity( Float velocity ) { theSubstance.theVelocity = velocity; }
+  void setQuantity( Real quantity ) { theSubstance.theQuantity = quantity; }
+  void setVelocity( Real velocity ) { theSubstance.theVelocity = velocity; }
 
 protected:
 
   SubstanceRef theSubstance;
   int          theStepCounter;
-  Float        theNumberOfMoleculesCache;
+  Real        theNumberOfMoleculesCache;
 
 };
 
@@ -73,7 +73,7 @@ public:
   virtual ~Euler1Integrator() {}
 
   virtual int getNumberOfSteps() { return 1; }
-  //  virtual Float velocity(Float );
+  //  virtual Real velocity(Real );
   virtual void turn();
   virtual void transit() {}
 };
@@ -92,7 +92,7 @@ public:
 
   virtual int getNumberOfSteps() { return 4; }
   virtual void clear();
-  //  virtual Float velocity( Float );
+  //  virtual Real velocity( Real );
   virtual void turn();
   virtual void transit();
 
@@ -108,8 +108,8 @@ private:
   static TurnFunc theTurnFuncs[4];
   TurnFuncPtr theTurnFuncPtr;
 
-  static const Float theOne6th;
-  Float theK[4];
+  static const Real theOne6th;
+  Real theK[4];
 
 };
 

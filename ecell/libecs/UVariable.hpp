@@ -35,7 +35,7 @@
 
 DECLARE_CLASS( UniversalVariableData );
 DECLARE_CLASS( UniversalVariableStringData );
-DECLARE_CLASS( UniversalVariableFloatData );
+DECLARE_CLASS( UniversalVariableRealData );
 DECLARE_CLASS( UniversalVariableIntData );
 
 
@@ -51,7 +51,7 @@ public:
   }
 
   virtual const String asString() const = 0;
-  virtual const Float  asFloat()  const = 0;
+  virtual const Real  asReal()  const = 0;
   virtual const Int    asInt()    const = 0;
 
   virtual const bool isString() const 
@@ -59,7 +59,7 @@ public:
     return false;
   }
 
-  virtual const bool isFloat() const
+  virtual const bool isReal() const
   {
     return false;
   }
@@ -95,7 +95,7 @@ public:
     ; // do nothing
   }
   
-  UniversalVariableStringData( const Float f );
+  UniversalVariableStringData( const Real f );
   UniversalVariableStringData( const Int   i );
 
   UniversalVariableStringData( UniversalVariableDataCref uvi )
@@ -106,7 +106,7 @@ public:
   }
 
   const String asString() const { return theString; }
-  const Float  asFloat() const;
+  const Real  asReal() const;
   const Int    asInt() const;
 
   virtual const bool isString() const
@@ -125,44 +125,44 @@ private:
 
 };
 
-class UniversalVariableFloatData : public UniversalVariableData
+class UniversalVariableRealData : public UniversalVariableData
 {
 
 public:
 
-  UniversalVariableFloatData( StringCref str );
-  UniversalVariableFloatData( const Float      f ) 
+  UniversalVariableRealData( StringCref str );
+  UniversalVariableRealData( const Real      f ) 
     : 
-    theFloat( f ) 
+    theReal( f ) 
   {
     ; // do nothing
   }
 
-  UniversalVariableFloatData( const Int        i ) 
+  UniversalVariableRealData( const Int        i ) 
     : 
-    theFloat( static_cast<Float>( i ) )
+    theReal( static_cast<Real>( i ) )
   {
     ; // do nothing
   }
 
   const String asString() const;
-  const Float  asFloat() const { return theFloat; }
+  const Real  asReal() const { return theReal; }
   // FIXME: range check
-  const Int    asInt() const { return static_cast<Int>( theFloat ); }
+  const Int    asInt() const { return static_cast<Int>( theReal ); }
 
-  virtual const bool isFloat() const
+  virtual const bool isReal() const
   {
     return true;
   }
 
   virtual UniversalVariableDataPtr createClone() const
   {
-    return new UniversalVariableFloatData( *this );
+    return new UniversalVariableRealData( *this );
   }
 
 private:
 
-  Float theFloat;
+  Real theReal;
 
 };
 
@@ -172,7 +172,7 @@ class UniversalVariableIntData : public UniversalVariableData
 public:
 
   UniversalVariableIntData( StringCref str );
-  UniversalVariableIntData( const Float      f );
+  UniversalVariableIntData( const Real      f );
   UniversalVariableIntData( const Int        i ) 
     : 
     theInt( i ) 
@@ -181,7 +181,7 @@ public:
   }
 
   const String asString() const;
-  const Float  asFloat() const { return static_cast<Float>( theInt ); }
+  const Real  asReal() const { return static_cast<Real>( theInt ); }
   const Int    asInt() const   { return theInt; }
   
   virtual const bool isInt() const
@@ -215,9 +215,9 @@ public:
     ; // do nothing
   }
   
-  UniversalVariable( const Float f )      
+  UniversalVariable( const Real f )      
     :
-    theData( new UniversalVariableFloatData( f ) )
+    theData( new UniversalVariableRealData( f ) )
   {
     ; // do nothing
   }
@@ -257,10 +257,10 @@ public:
     return theData->asString(); 
   }
 
-  const Float  asFloat() const
+  const Real  asReal() const
   { 
     assert( theData );
-    return theData->asFloat(); 
+    return theData->asReal(); 
   }
   
   const Int    asInt() const
@@ -273,9 +273,9 @@ public:
     return theData->isString();
   }
 
-  const bool isFloat() const
+  const bool isReal() const
   {
-    return theData->isFloat();
+    return theData->isReal();
   }
 
   const bool isInt() const

@@ -131,7 +131,7 @@ public:
     @return activity of this Entity
     @see getActivityPerSecond()
    */
-  virtual Float getActivity();
+  virtual Real getActivity();
 
   /**
     Returns activity value (per second).
@@ -140,7 +140,7 @@ public:
 
     @return activity of this Entity per second
    */
-  virtual Float getActivityPerSecond();
+  virtual Real getActivityPerSecond();
 
   virtual const char* const getClassName() const { return "Entity"; }
 

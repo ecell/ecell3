@@ -78,7 +78,7 @@ int table_lookup( StringCref str, const char** table );
 
 /** 
     Universal String -> object converter.
-    Float and Int specializations are defined in Util.cpp.
+    Real and Int specializations are defined in Util.cpp.
     Conversion to the other classes are conducted using 
     istrstream.
  */
@@ -93,13 +93,13 @@ const T stringTo( StringCref str )
 }
 
 // specializations
-template<> const Float stringTo<Float>( StringCref str );
+template<> const Real stringTo<Real>( StringCref str );
 template<> const Int   stringTo<Int>( StringCref str );
 template<> const UnsignedInt  stringTo<UnsignedInt>( StringCref str );
 
 /**
    Any to String converter function template.
-   Using ostrstream by default. A specialization for Float type
+   Using ostrstream by default. A specialization for Real type
    with precision( FLOAT_DIG ) is also defined.
 */
 
@@ -112,7 +112,7 @@ template <class T> const String toString( const T& t )
 }
 
 // specialization 
-template<> const String toString<Float>( const Float& f );
+template<> const String toString<Real>( const Real& f );
 
 
 /**

@@ -57,7 +57,7 @@ public:
     theSubstance = substance; 
   }
 
-  virtual Float save() 
+  virtual Real save() 
   { 
     return getQuantity(); 
   }
@@ -73,14 +73,14 @@ public:
 
 protected:
 
-  Float& getQuantity() 
+  Real& getQuantity() 
   { 
-    return const_cast<Float&>( theSubstance->theQuantity ); 
+    return const_cast<Real&>( theSubstance->theQuantity ); 
   }
 
-  Float& getVelocity() 
+  Real& getVelocity() 
   { 
-    return const_cast<Float&>( theSubstance->theVelocity ); 
+    return const_cast<Real&>( theSubstance->theVelocity ); 
   }
 
 protected:
@@ -161,7 +161,7 @@ public:
 
   static AccumulatorPtr instance() { return new ReserveAccumulator; }
 
-  virtual Float save();
+  virtual Real save();
   virtual void update();
   virtual void doit();
 
@@ -169,7 +169,7 @@ public:
 
 private:
 
-  Float theFraction;
+  Real theFraction;
 
 };
 

@@ -169,7 +169,7 @@ void System::setStepper( StringCref classname )
   theStepper = aStepper;
 }
 
-Float System::getVolume() 
+Real System::getVolume() 
 {
   return theVolumeIndex->getActivityPerSecond();
 }

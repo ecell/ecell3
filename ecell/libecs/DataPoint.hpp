@@ -13,7 +13,7 @@
  */
 
 
-// DECLARE_TYPE( DataPoint<Float,Float>, FloatDataPoint );
+// DECLARE_TYPE( DataPoint<Real,Real>, RealDataPoint );
 
 template <class T, class V>
 class DataPoint

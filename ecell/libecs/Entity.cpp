@@ -90,12 +90,12 @@ const Message Entity::getActivityPerSecond( StringCref keyword )
   return Message( keyword, UniversalVariable( getActivityPerSecond() ) );
 }
 
-Float Entity::getActivity() 
+Real Entity::getActivity() 
 {
   return 0;
 }
 
-Float Entity::getActivityPerSecond() 
+Real Entity::getActivityPerSecond() 
 {
   return ( getActivity()  / getSuperSystem()->getStepper()->getDeltaT() );
 }

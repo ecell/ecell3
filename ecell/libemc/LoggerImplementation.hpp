@@ -44,24 +44,24 @@ class LoggerImplementation
 
 public:
 
-  typedef Logger<Float,Float> FloatLogger;
+  typedef Logger<Real,Real> RealLogger;
 
   LoggerImplementation() {}
   virtual ~LoggerImplementation() {}
 
-  virtual FloatLogger::DataPointVector&
-  getData( const Float& first,
-	   const Float& last,
-	   const Float& interval ) const = 0;
+  virtual RealLogger::DataPointVector&
+  getData( const Real& first,
+	   const Real& last,
+	   const Real& interval ) const = 0;
 
   virtual void update( void ) = 0;
 
   // FIXME temporary
-  virtual void update( FloatLogger::containee_type& datapoint ) = 0;  
+  virtual void update( RealLogger::containee_type& datapoint ) = 0;  
 
-  //  virtual void push( const FloatLogger::containee_type& x ) = 0;
+  //  virtual void push( const RealLogger::containee_type& x ) = 0;
 
-  //  virtual void push( const Float& t, const Float& v ) = 0;
+  //  virtual void push( const Real& t, const Real& v ) = 0;
 
 
 };

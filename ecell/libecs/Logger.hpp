@@ -44,13 +44,13 @@
 template <class T, class V> class DataPoint;
 template <class T, class V> class Logger;
 
-typedef double Float;                          // FIXME :temp
-typedef const Float& (*const DataFuncCptr)( ); // FIXME:temp 
+typedef double Real;                          // FIXME :temp
+typedef const Real& (*const DataFuncCptr)( ); // FIXME:temp 
 
 typedef double Time;      // FIXME : temporary use
 typedef double ValueType; // FIXME : temporary use 
 
-typedef const Float& (*const funcptr)();
+typedef const Real& (*const funcptr)();
 
 DECLARE_CLASS( Object );
 

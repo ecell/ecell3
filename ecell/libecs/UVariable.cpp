@@ -34,9 +34,9 @@
 
 
 UniversalVariableStringData::
-UniversalVariableStringData( const Float f )
+UniversalVariableStringData( const Real f )
   :
-  theString( toString<Float>( f ) )
+  theString( toString<Real>( f ) )
 {
   ; // do nothing
 }
@@ -48,9 +48,9 @@ UniversalVariableStringData::UniversalVariableStringData( const Int i )
   ; // do nothing
 }
 
-const Float UniversalVariableStringData::asFloat() const
+const Real UniversalVariableStringData::asReal() const
 {
-  return stringTo<Float>( theString );
+  return stringTo<Real>( theString );
 }
 
 const Int UniversalVariableStringData::asInt() const
@@ -59,17 +59,17 @@ const Int UniversalVariableStringData::asInt() const
 }
 
 
-UniversalVariableFloatData::
-UniversalVariableFloatData( StringCref str )
+UniversalVariableRealData::
+UniversalVariableRealData( StringCref str )
   :
-  theFloat( stringTo<Float>( str ) )
+  theReal( stringTo<Real>( str ) )
 {
   ; // do nothing
 }
 
-const String UniversalVariableFloatData::asString() const
+const String UniversalVariableRealData::asString() const
 {
-  return toString<Float>( theFloat );
+  return toString<Real>( theReal );
 }
 
 UniversalVariableIntData::
@@ -81,7 +81,7 @@ UniversalVariableIntData( StringCref str )
 }
 
 UniversalVariableIntData::
-UniversalVariableIntData( const Float f )
+UniversalVariableIntData( const Real f )
   :
   // FIXME: range check?
   theInt( static_cast<Int>( f ) )

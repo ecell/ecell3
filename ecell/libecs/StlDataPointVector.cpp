@@ -75,20 +75,20 @@ binary_search(const_iterator first, const_iterator last, const T& val) const
 #include <iostream>
 #include "DataPoint.cpp"
 
-typedef double Float;
+typedef double Real;
 
 int main()
 {
-  DataPoint<Float,Float> dp1 = DataPoint<Float,Float>(3.14,3.14);
-  StlDataPointVector<Float,Float> dpvec = StlDataPointVector<Float,Float>(); 
+  DataPoint<Real,Real> dp1 = DataPoint<Real,Real>(3.14,3.14);
+  StlDataPointVector<Real,Real> dpvec = StlDataPointVector<Real,Real>(); 
   dpvec.push(0,0);
   dpvec.push(dp1);
   dpvec.push(3.15,3.0);
   dpvec.push(8.5,3.1);
   dpvec.push(100.45, 1.0);
-  StlDataPointVector<Float,Float> dpvec_clone = StlDataPointVector<Float,Float>(dpvec); 
+  StlDataPointVector<Real,Real> dpvec_clone = StlDataPointVector<Real,Real>(dpvec); 
   
-  StlDataPointVector<Float,Float>::iterator i;
+  StlDataPointVector<Real,Real>::iterator i;
   for(i=dpvec_clone.begin();i<dpvec_clone.end();i++)
     {
       printf("%p getTime = %f, getValue = %f\n",i,(*i)->getTime(),(*i)->getValue());

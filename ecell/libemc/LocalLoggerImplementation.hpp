@@ -46,21 +46,21 @@ public:
   LocalLoggerImplementation( ObjectPtr optr );
   virtual ~LocalLoggerImplementation( );
 
-  FloatLogger::DataPointVector& getData( const Float& first,
-					 const Float& last,
-					 const Float& interval ) const;
+  RealLogger::DataPointVector& getData( const Real& first,
+					 const Real& last,
+					 const Real& interval ) const;
 
   void update( void );
 
-  void update( FloatLogger::containee_type& datapoint );
+  void update( RealLogger::containee_type& datapoint );
 
-  //  void push( const FloatLogger::containee_type& x );
+  //  void push( const RealLogger::containee_type& x );
 
-  //  void push( const Float& t, const Float& v ); 
+  //  void push( const Real& t, const Real& v ); 
 
 private:
 
-  FloatLogger theFloatLogger;
+  RealLogger theRealLogger;
 					
 };
 

@@ -108,7 +108,7 @@ DECLARE_CLASS( Exception );
 // Floating Point.
 // *******************************************
 
-// DECLARE_TYPE( double, Real );
+DECLARE_TYPE( double, Real );
    
 // *******************************************
 // Define the void pointer type.

@@ -63,7 +63,7 @@ void Euler1Integrator::turn()
 
 ////////////////////////////// RungeKutta4Integrator
 
-const Float RungeKutta4Integrator::theOne6th = (Float)1.0 / (Float)6.0;
+const Real RungeKutta4Integrator::theOne6th = (Real)1.0 / (Real)6.0;
 
 RungeKutta4Integrator::TurnFunc RungeKutta4Integrator::theTurnFuncs[4] =
 {
@@ -120,12 +120,12 @@ void RungeKutta4Integrator::transit()
 {
   //// x(n+1) = x(n) + 1/6 * (k1 + k4 + 2 * (k2 + k3)) + O(h^5)
 
-  Float* k( &theK[0] );
+  Real* k( &theK[0] );
 
   // FIXME: prefetching here makes this faster on alpha?
 
   //                      k1  + (2 * k2)  + (2 * k3)  + k4
-  Float aResult = *k++;
+  Real aResult = *k++;
   aResult += *k;
   aResult += *k++;
   aResult += *k;
