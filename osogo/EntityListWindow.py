@@ -3,7 +3,6 @@
 from OsogoWindow import *
 from PluginInstanceSelection import *
 from FullPNQueue import *
-from ecell.ModelWalker import *
 
 import gtk
 from ecell.ecssupport import *
@@ -65,7 +64,7 @@ class EntityListWindow(OsogoWindow):
             self.thePluginManager = session.thePluginManager
 
         self.thePluginInstanceSelection = None
-        
+
         
 
     def openWindow( self ):
@@ -89,6 +88,8 @@ class EntityListWindow(OsogoWindow):
             'on_search_button_clicked': self.pushSearchButton,\
             'on_search_entry_key_press_event':\
             self.keypressOnSearchEntry,\
+            'on_clear_button_clicked': self.pushClearButton, 
+            'on_find_all_button_clicked': self.pushFindAllButton
             } )
 
         self.entitySelected = False
@@ -613,6 +614,7 @@ class EntityListWindow(OsogoWindow):
                 continue
 
             fullIDString = createFullIDString( fullID )
+
             stub = self.theSession.createEntityStub( fullIDString )
 
             valueList = []
@@ -625,7 +627,7 @@ class EntityListWindow(OsogoWindow):
                     elif title == 'Classname':
                         value = stub.getClassname()
                     elif title == 'Path':
-                        value = systemPath
+                        value =  fullID [SYSTEMPATH]
                     else:
                         raise "Unexpected error: invalid column title."
                 else:
@@ -1207,44 +1209,65 @@ class EntityListWindow(OsogoWindow):
         """
         searchString = self['search_entry'].get_text()
         # set modelwalker to current selection
-        aFullPNList = self.theQueue.getActualFullPNList()
-        if len(aFullPNList) == 0:
-            aFullID = [ SYSTEM, '', '/' ]
-        else:
-            aFullID = convertFullPNToFullID( aFullPNList[0] )
+        aFullPNList = []
 
-        self.theModelWalker.moveTo( aFullID )
-        aFullIDString = createFullIDString( aFullID )
+        modelWalker = self.theSession.theModelWalker
 
-        nextFullID = self.theModelWalker.getNextFullID()
-        while True:
-            if nextFullID == None:
-                self.theModelWalker.reset()
-                nextFullID = self.theModelWalker.getCurrentFullID()
-            if aFullIDString == createFullIDString( nextFullID ):
-                aDialog = ConfirmWindow( OK_MODE, 
-                                        "Search string %s not found."%searchString, 
-                                        "Search failed" )
-                return
-    
-            if nextFullID[ID].find( searchString ) != -1:
+        modelWalker.reset()
+        
+        nextFullID = modelWalker.getCurrentFullID()
+
+        while nextFullID != None:
+            if nextFullID[TYPE] == SYSTEM:
+                currentSystemID = nextFullID
+                currentSystemSelected = False
+                
+            elif not currentSystemSelected and nextFullID[ID].find( searchString ) != -1:
                 # select
-                newFullPNList = [ convertFullIDToFullPN( nextFullID ) ]
-                self.theQueue.pushFullPNList( newFullPNList )
-                return
-            nextFullID = self.theModelWalker.getNextFullID()
+                aFullPNList += [ convertFullIDToFullPN( currentSystemID ) ]
+                currentSystemSelected = True
+                
+            nextFullID = modelWalker.getNextFullID()
+            
 
+        if len( aFullPNList ) == 0:
+            aDialog = ConfirmWindow( OK_MODE, 
+                                    "Search string %s not found."%searchString, 
+                                    "Search failed" )
+            return
+        self.searchString = searchString
+        self.theQueue.pushFullPNList( aFullPNList )
+        self['search_button'].set_sensitive( gtk.FALSE)
+        self['find_all_button'].set_sensitive(gtk.FALSE )
+        self['clear_button'].set_sensitive(gtk.TRUE )
 
-    def pushSearchButton( self, *arg ):
-        self.filterSelectedSystems()
 
     def filterSelectedSystems( self ):
         self.searchString = self['search_entry'].get_text()
         self.reconstructLists()
 
 
+    def pushSearchButton( self, *arg ):
+        self.filterSelectedSystems()
+        self['search_button'].set_sensitive(gtk.FALSE )
+        self['clear_button'].set_sensitive(gtk.TRUE )
+
     def keypressOnSearchEntry( self, *arg ):
 
         if( arg[1].keyval == 65293 ):
 
             self.filterSelectedSystems()
+        else:
+            self['search_button'].set_sensitive(gtk.TRUE )
+            self['find_all_button'].set_sensitive(gtk.TRUE )
+
+    def pushFindAllButton( self, *args ):
+        self.searchEntity()
+        
+    def pushClearButton( self, *args ):
+        self['search_entry'].set_text('')
+        self['search_button'].set_sensitive( gtk.FALSE)
+        self['find_all_button'].set_sensitive(gtk.FALSE )
+        self['clear_button'].set_sensitive(gtk.FALSE )
+        self.filterSelectedSystems()
+        

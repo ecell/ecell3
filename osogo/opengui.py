@@ -104,6 +104,7 @@ def main():
 	# creates MainWindow instance
 	# -------------------------------------
 	aSession = ecell.GtkSessionMonitor.GtkSessionMonitor()
+	print "session created"
 
 	# -------------------------------------
 	# executes options
@@ -126,6 +127,7 @@ def main():
 		try:
 			aSession.loadModel( anEmlFile )
 		except:
+		
 			aSession.message(' can\'t load [%s]' %anEmlFile)
 			anErrorMessage = string.join( traceback.format_exception(sys.exc_type,sys.exc_value,sys.exc_traceback), '\n' )
 			aSession.message("-----------")

@@ -113,7 +113,7 @@ class MainWindow(OsogoWindow):
 		# -------------------------------------
 		self.theSession = aSession
 		self.theMessageWindow = MessageWindow.MessageWindow()
-		self.theSession.setMessageMethod( self.__printMessage )
+
 
 	def openWindow( self ):
 
@@ -130,18 +130,17 @@ class MainWindow(OsogoWindow):
 		self.SimulationButton = SimulationButton()
 		self['SimulationButton'].add( self.SimulationButton.getCurrentImage() )
 		self['SimulationButtonLabel'].set_text('Start')
-
 		# -------------------------------------
 		# creates MessageWindow 
 		# -------------------------------------
 		self.theMessageWindow.openWindow()
                 self['messagearea'].add(self.theMessageWindow['top_frame'])
                 
+		self.theSession.setMessageMethod( self.__printMessage )                
 		self.__expose(None,None)
 		messageWindowSize=self.theMessageWindow.getActualSize()
 		self.theMessageWindow['scrolledwindow1'].set_size_request(\
 		    messageWindowSize[0], messageWindowSize[1] )
-
 		# -------------------------------------
 		# append signal handlers
 		# -------------------------------------
@@ -187,7 +186,6 @@ class MainWindow(OsogoWindow):
                     os.environ['OSOGOPATH'] + os.sep + "ecell.png",
                     os.environ['OSOGOPATH'] + os.sep + "ecell32.png" )
                 
-
 		self.__setMenuAndButtonsStatus( FALSE )
 		#self.theSession.updateFundamentalWindows()
 
@@ -199,7 +197,6 @@ class MainWindow(OsogoWindow):
 		self.theMessageWindowVisible = True
 		self['message_togglebutton'].set_active(TRUE)
 		self['message_window_menu'].set_active(TRUE)
-
 
 		# display MainWindow
 		self[self.__class__.__name__].show_all()
@@ -213,16 +210,17 @@ class MainWindow(OsogoWindow):
 		# initializes AboutDialog reference
 		self.theAboutSessionMonitor = None
 		self.openAboutSessionMonitor = False 
+
 		self.update()
-
-
 
 		# -------------------------------------
 		# creates EntityListWindow 
 		# -------------------------------------
 
-                self.theEntityListWindow = self.theSession.createEntityListWindow( 'top_frame', self['statusbar'] )
-                self['entitylistarea'].add( self.theEntityListWindow['top_frame'] )
+		self.theEntityListWindow = self.theSession.createEntityListWindow( 'top_frame', self['statusbar'] )
+		self['entitylistarea'].add( self.theEntityListWindow['top_frame'] )
+
+        
 
 
 	def __expose( self, *arg ):
