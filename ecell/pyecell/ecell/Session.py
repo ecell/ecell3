@@ -156,7 +156,7 @@ class Session:
 
         # When the type doesn't match
         else:
-            raise TypeError, " The type of aModel must be string(file name) or file object "
+            raise TypeError, "The type of aModel must be string(file name) or file object "
 
     # end of saveModel
 
@@ -501,8 +501,9 @@ class Session:
                 # check get attribute 
                 if anAttributeList[3] != 0:
                                     
-                    aValue = self.theSimulator.saveStepperProperty( aStepper,
-                                                                    aProperty )
+                    aValue = self.theSimulator.\
+                             getStepperProperty( aStepper, aProperty )
+                        
                     #if aValue == '':
                     #    pass
                     

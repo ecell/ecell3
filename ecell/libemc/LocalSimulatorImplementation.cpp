@@ -264,7 +264,7 @@ namespace libemc
   {
     FullPN aFullPN( aFullPNString );
     EntityCptr anEntityPtr( getModel().getEntity( aFullPN.getFullID() ) );
-
+	
     return anEntityPtr->getProperty( aFullPN.getPropertyName() );
   }
 
@@ -308,27 +308,30 @@ namespace libemc
   void LocalSimulatorImplementation::
   createLogger( libecs::StringCref aFullPNString )
   {
-   libecs::PolymorphVector aVector;
-   aVector.push_back(Integer(1));
-   aVector.push_back(Real(0.0));
-   aVector.push_back(Integer(0));
-   aVector.push_back(Integer(0));
-	createLogger( aFullPNString, libecs::Polymorph(aVector) );
+    libecs::PolymorphVector aVector;
+    aVector.push_back(Integer(1));
+    aVector.push_back(Real(0.0));
+    aVector.push_back(Integer(0));
+    aVector.push_back(Integer(0));
+    createLogger( aFullPNString, libecs::Polymorph(aVector) );
   }
 
 
   void LocalSimulatorImplementation::
-  createLogger( libecs::StringCref aFullPNString , libecs::Polymorph aParamList )
+  createLogger( libecs::StringCref aFullPNString, libecs::Polymorph aParamList )
   {
     if( theRunningFlag )
       {
 	THROW_EXCEPTION( libecs::Exception, 
 			 "Cannot create a Logger while running." );
       }
-	if ( aParamList.getType() != libecs::Polymorph::POLYMORPH_VECTOR ){
+
+    if ( aParamList.getType() != libecs::Polymorph::POLYMORPH_VECTOR )
+      {
 	THROW_EXCEPTION( libecs::Exception,
-			"2nd argument of createLogger must be list of numbers!");
-		}
+			 "2nd argument of createLogger must be a list of numbers.");
+      }
+
     FullPN aFullPN( aFullPNString );
     getModel().getLoggerBroker().createLogger( aFullPN, aParamList.asPolymorphVector() );
   }
@@ -407,12 +410,13 @@ namespace libemc
 
   void LocalSimulatorImplementation::
   setLoggerPolicy( libecs::StringCref aFullPNString, 
-			    libecs::Polymorph aParamList )
+		   libecs::Polymorph aParamList )
   {
-	if ( aParamList.getType() != libecs::Polymorph::POLYMORPH_VECTOR ){
+    if ( aParamList.getType() != libecs::Polymorph::POLYMORPH_VECTOR )
+      {
 	THROW_EXCEPTION( libecs::Exception,
-			"2nd argument of setLoggerPolicy must be list of numbers!");
-		}
+			 "2nd parameter of logger policy must be a number list.");
+      }
 
     getLogger( aFullPNString )->setLoggerPolicy( aParamList );
   }
