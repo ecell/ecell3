@@ -15,7 +15,7 @@ class VariableWindow( OsogoPluginWindow ):
 	# ===============================================================================
 	def __init__( self, aDirName, aData, aPluginManager, aRoot=None ):
 		"""Constructor
-		[Note]:When the entity has not Value, Concentration and Fixed Property,
+		[Note]:When the entity has not Value, MolarConc and Fixed Property,
 		       throws exception (TypeError).
 		"""
         
@@ -29,19 +29,19 @@ class VariableWindow( OsogoPluginWindow ):
 
 		# initializes flags for validation of Property
 		aValueFlag = FALSE
-		aConcentrationFlag = FALSE
+		aMolarConcFlag = FALSE
 		aFixedFlag = FALSE
 
 		# --------------------------------------------------------------------
-		# [1] Checks this entity have Value, Concentration, Fixed property.
+		# [1] Checks this entity have Value, MolarConc, Fixed property.
 		# --------------------------------------------------------------------
 		
 		for aProperty in self.theStub.getPropertyList(): # for(1)
 		
 			if aProperty == 'Value':
 				aValueFlag = TRUE
-			elif aProperty == 'Concentration':
-				aConcentrationFlag = TRUE
+			elif aProperty == 'MolarConc':
+				aMolarConcFlag = TRUE
 			elif aProperty == 'Fixed':
 				aFixedFlag = TRUE
 		# end of for(1)
@@ -53,9 +53,9 @@ class VariableWindow( OsogoPluginWindow ):
 			aDialog = ConfirmWindow(OK_MODE, aMessage, 'Error!')
 			raise TypeError( aMessage )
 
-		# If this entity does not have 'Concentration', does not create instance 
-		if aConcentrationFlag == FALSE:
-			aMessage = "Error: %s does not have \"Concentration\" property" %self.theFullIDString
+		# If this entity does not have 'MolarConc', does not create instance 
+		if aMolarConcFlag == FALSE:
+			aMessage = "Error: %s does not have \"MolarConc\" property" %self.theFullIDString
 			#self.thePluginManager.printMessage( aMessage )
 			aDialog = ConfirmWindow(OK_MODE, aMessage, 'Error!')
 			raise TypeError( aMessage )
@@ -69,7 +69,7 @@ class VariableWindow( OsogoPluginWindow ):
 
 
 		# --------------------------------------------------------------------
-		#  [2] Checks Value and Concentration is Number
+		#  [2] Checks Value and MolarConc is Number
 		# --------------------------------------------------------------------
 
 		# If Value is not Number
@@ -81,11 +81,11 @@ class VariableWindow( OsogoPluginWindow ):
 			aDialog = ConfirmWindow(OK_MODE, aMessage, 'Error!')
 			raise TypeError( aMessage )
 
-		# If Concentration is not Number
-		if operator.isNumberType( self.theStub.getProperty('Concentration') ):
+		# If MolarConc is not Number
+		if operator.isNumberType( self.theStub.getProperty('MolarConc') ):
 			pass
 		else:
-			aMessage = "Error: \"Concentration\" property is not number" 
+			aMessage = "Error: \"MolarConc\" property is not number" 
 			#self.thePluginManager.printMessage( aMessage )
 			aDialog = ConfirmWindow(OK_MODE, aMessage, 'Error!')
 			raise TypeError( aMessage )
@@ -133,7 +133,7 @@ class VariableWindow( OsogoPluginWindow ):
 		self['value_spinbutton'].set_text( str(self.theStub.getProperty('Value')) )
 
 		# updates concentration entry
-		self['concentration_entry'].set_text( str(self.theStub.getProperty('Concentration')) )
+		self['concentration_entry'].set_text( str(self.theStub.getProperty('MolarConc')) )
 
 
 	# ===============================================================================

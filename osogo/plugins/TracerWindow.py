@@ -152,7 +152,8 @@ class TracerWindow( OsogoPluginWindow ):
 			    self.theSession.message("Logger created for "+fpn)
 		self.check_history_button()
 		self.thePluginManager.updateFundamentalWindows()
-			
+
+
 	def recache(self, aFullPNString, value_from, value_to, interval):
 		#it is called from the plotinstance
 		#returns as much data as it can
@@ -161,11 +162,18 @@ class TracerWindow( OsogoPluginWindow ):
 		    a=self.theSession.theSimulator.getLoggerData(aFullPNString,
 					value_from,
 					value_to,interval)
+		    dimension = shape(a)[1]
 		    for t in range(size(a,0)):
-			return_list.append([a[t,0],a[t,1]])
+			if dimension==2:
+				return_list.append([ a[t,0], a[t,1], a[t,1], a[t,1], a[t,1] ])
+
+			else:
+				return_list.append([ a[t,0], a[t,1], a[t,2], a[t,3], a[t,4] ])
 		
+
 		return return_list
 			
+
 	def haslogger(self, aFullPNString):
 		#called from the plotinstance
 		#to be implemeted, needs to call LoggerWindow or new
@@ -183,7 +191,8 @@ class TracerWindow( OsogoPluginWindow ):
 			history_button.set_sensitive(gtk.FALSE)
 			return None	
 	    history_button.set_sensitive(gtk.TRUE)      
-		
+
+
 	def getloggerstart(self,aFullPNString):
 		#called from the plotinstance
 		lstart=self.theSession.theSimulator.getLoggerStartTime(aFullPNString)
@@ -269,7 +278,7 @@ class TracerWindow( OsogoPluginWindow ):
 	def getlatestdata(self,fpn):
 	    value=self.theSession.theSimulator.getEntityProperty(fpn)
 	    time=self.theSession.theSimulator.getCurrentTime()
-	    return [time,value]
+	    return [time,value, value, value, value]
 	    
 	def check_remove_button(self):
 	    remove_button=self['button9']

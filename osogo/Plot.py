@@ -17,6 +17,11 @@ from ecell.ecssupport import *
 #changes screen, handles color allocation when adding/removing traces
 #clears plot areas on request, sets tityle
 
+DP_TIME = 0
+DP_VALUE = 1
+DP_AVG = 2
+DP_MAX = 3
+DP_MIN = 4
 
 class Plot:
 
@@ -106,7 +111,8 @@ class Plot:
 	    #initialize data buffers
 	    self.data_stack={} #key:FullPNString, value: DataBuffer[[x0,y0],[x1,y1],[x2,y2]]}	
 	    self.lastx={}
-	    self.lasty={}
+	    self.lastymin={}
+	    self.lastymax={}
 	    self.strip_mode='strip'
 	    self.zoomlevel=0    
 	    #set yframes
@@ -520,10 +526,10 @@ class Plot:
 		    xmax=0
 		    self.data_stack[fpn].append(points[fpn])
 
-		    if points[fpn][0]>self.xframe[1]: 
+		    if points[fpn][DP_TIME]>self.xframe[1]: 
 			shift_flag=True
-			if points[fpn][0]>xmax: xmax=points[fpn][0]
-		    if (points[fpn][1]>self.yframe[1] or points[fpn][1]<self.yframe[0])\
+			if points[fpn][DP_TIME]>xmax: xmax=points[fpn][DP_TIME]
+		    if (points[fpn][DP_MAX]>self.yframe[1] or points[fpn][DP_MIN]<self.yframe[0])\
 			and self.trace_onoff[fpn]==gtk.TRUE:
 			redraw_flag=True
 		if shift_flag:
@@ -534,18 +540,16 @@ class Plot:
 		    self.reframex()
 		    for fpn in self.data_list:
 			try:
-			    while self.data_stack[fpn][1][0]<self.xframe[0]:
+			    while self.data_stack[fpn][1][DP_TIME]<self.xframe[0]:
 				del self.data_stack[fpn][0]
 			except IndexError:
 			    pass #it's quite normal, that there is no data in frame, because simualtor is too fast
 		    realshift=round(shift/self.pixelwidth)
 		    if realshift>self.plotarea[2]: redraw_flag=True
 		if redraw_flag:
-		#if >yframe[1],<yframe[0], reframey, drawall
 		    self.reframey()
 		    self.drawall()
 		elif shift_flag:
-		#if >xframe[1],  shiftframe, remove bufferhead 
 		    #,adjust lastx, lasty,
 		    self.shiftplot(realshift)
 
@@ -570,8 +574,8 @@ class Plot:
 		    if databuffer==[]:
 			lasttime=self.xframe[0]
 		    else:
-			lasttime=databuffer[len(databuffer)-1][0]
-		    newdata=self.theOwner.recache(fpn,lasttime,points[fpn][0],self.pixelwidth/2)
+			lasttime=databuffer[len(databuffer)-1][DP_TIME]
+		    newdata=self.theOwner.recache(fpn,lasttime,points[fpn][DP_TIME],self.pixelwidth/2)
 	    #addbuffer all
 		    databuffer.extend(newdata)
 		    newdata_stack[fpn]=[]
@@ -580,9 +584,9 @@ class Plot:
 		#if >yframe[1] or<yframe[0], interrupt, addtrace[]
 		    if self.trace_onoff[fpn]==gtk.TRUE:
 			for dp in newdata:
-			    if dp[0]>self.xframe[1]:
+			    if dp[DP_TIME]>self.xframe[1]:
 				redraw_flag=True
-			    if dp[1]>self.yframe[1] or dp[1]<self.yframe[0]:
+			    if dp[DP_MAX]>self.yframe[1] or dp[DP_MIN]<self.yframe[0]:
 				redraw_flag=True
 		if redraw_flag:
 		    self.addtrace([])
@@ -602,8 +606,8 @@ class Plot:
 	    #adjust xframe
 	    self.xframe[1]=0
 	    for fpn in self.data_list:
-	        if pointmap[fpn][0]>self.xframe[1]:
-		    self.xframe[1]=pointmap[fpn][0]
+	        if pointmap[fpn][DP_TIME]>self.xframe[1]:
+		    self.xframe[1]=pointmap[fpn][DP_TIME]
 	    self.xframe[0]=floor(self.xframe[1]/self.stripinterval)*self.stripinterval
 	    if self.xframe[0]<0: self.xframe[0]=0
 	    self.xframe[1]=self.xframe[0]+self.stripinterval	
@@ -653,7 +657,7 @@ class Plot:
 	    #checks whether there's room for new traces
 	    #allocates a color
 		aFullPNString= add_item[0]
-		
+
 		pm=self.allocate_color(aFullPNString)
 		if pm!=None:
 		    self.FullPNMap[aFullPNString]=[add_item[2], self.getShortName(add_item[2])]
@@ -666,8 +670,8 @@ class Plot:
 
 		#adjust xframe
 		for add_item in add_list:
-		    if add_item[1][0]>self.xframe[1]:
-			self.xframe[1]=add_item[1][0]
+		    if add_item[1][DP_TIME]>self.xframe[1]:
+			self.xframe[1]=add_item[1][DP_TIME]
 			self.xframe[0]=self.xframe[1]-self.stripinterval*self.xframe_when_rescaling
 
 		if self.xframe[0]<0: self.xframe[0]=0
@@ -732,17 +736,17 @@ class Plot:
 		    a.extend(self.data_stack[fpn])
 	    #init values
 	    if len(a)>0:
-		self.minmax[0]=a[0][1] #minimum value of all
-		self.minmax[1]=a[0][1] #maximum value of all
+		self.minmax[0]=a[0][DP_MIN] #minimum value of all
+		self.minmax[1]=a[0][DP_MAX] #maximum value of all
 		self.minmax[2]=a[0][0] #minimum time of all
 		self.minmax[3]=a[0][0] #maximum time of all
 		for datapoint in a:
-		    if self.minmax[0]>datapoint[1]: self.minmax[0]=datapoint[1]
-		    if self.minmax[1]<datapoint[1]: self.minmax[1]=datapoint[1]
+		    if self.minmax[0]>datapoint[DP_MIN]: self.minmax[0]=datapoint[DP_MIN]
+		    if self.minmax[1]<datapoint[DP_MAX]: self.minmax[1]=datapoint[DP_MAX]
 		    if self.minmax[2]>datapoint[0]: self.minmax[2]=datapoint[0]
 		    if self.minmax[3]<datapoint[0]: self.minmax[3]=datapoint[0]
 	    	    if datapoint[1]>0:
-			if self.minmax[4]>datapoint[1]: self.minmax[4]=datapoint[1]
+			if self.minmax[4]>datapoint[DP_MIN]: self.minmax[4]=datapoint[DP_MIN]
 
 
 	def refresh_loggerstartendmap(self):
@@ -793,7 +797,7 @@ class Plot:
 			else:
 				self.minimize_action()
 		elif self.GUI_Button_Shown: 
-			print x,y
+
 			if x > self.gui_button_area[0] and x< (self.gui_button_area[0]+self.gui_button_area[2]) and\
 				y > self.gui_button_area[1] and y<(self.gui_button_area[3]+self.gui_button_area[1]):
 				self.maximize()
@@ -915,7 +919,7 @@ class Plot:
 				self.xframe[1]=self.xframe[0]+newinterval
 				databuffer=[]
 			    else:
-				while self.data_stack[fpn][0][0]<self.xframe[0]:
+				while self.data_stack[fpn][0][DP_TIME]<self.xframe[0]:
 				    del self.data_stack[fpn][0]
 		    self.reframey()
 
@@ -995,15 +999,31 @@ class Plot:
 	    #get databuffer, for each point draw
 	    databuffer=self.data_stack[aFullPNString][:]
 	    self.lastx[aFullPNString]=None	
-	    self.lasty[aFullPNString]=None
+	    self.lastymin[aFullPNString]=None
+	    self.lastymax[aFullPNString]=None
 	    for datapoint in databuffer:
 		self.drawpoint(aFullPNString, datapoint)
 	    fpn = aFullPNString
 
 
-	def withinframes(self,point):
-	    return point[0]<self.plotaread[2] and point[0]>self.plotaread[0] and\
-		   point[1]<=self.plotaread[3] and point[1]>=self.plotaread[1]
+
+	def drawminmax(self, fpn, x, ymax, ymin):
+		#first check x
+		if x<self.plotaread[0] or x>self.plotaread[2]:
+			return
+		#then check ymin<self.plotared[3], ymax>self.plotaread[1]
+		if ymax<self.plotaread[1] or ymin>self.plotaread[3]:
+			return
+
+		# adjust frames
+		if ymax>self.plotaread[3]:
+			ymax=self.plotaread[3]
+		if ymin<self.plotaread[1]:
+			ymin=self.plotaread[1]
+
+		# draw line
+		self.drawline(fpn, x,ymin, x,ymax)
+
 
 
 	def drawpoint(self, aFullPNString, datapoint):
@@ -1011,115 +1031,45 @@ class Plot:
 	    #convert to plot coordinates
 	    if self.trace_onoff[aFullPNString]==gtk.FALSE:
 		return 0
-	    x=self.convertx_to_plot(datapoint[0])
-	    y=self.converty_to_plot(datapoint[1])
-	    cur_point_within_frame=self.withinframes([x,y])
+	    x=self.convertx_to_plot(datapoint[DP_TIME])
+	    ymax=self.converty_to_plot(datapoint[DP_MAX])
+	    ymin=self.converty_to_plot(datapoint[DP_MIN])
+
 	    #getlastpoint, calculate change to the last
 	    lastx=self.lastx[aFullPNString]
-	    lasty=self.lasty[aFullPNString]
+	    lastymax=self.lastymax[aFullPNString]
+	    lastymin=self.lastymin[aFullPNString]
+
 	    self.lastx[aFullPNString]=x
-	    self.lasty[aFullPNString]=y
-	    last_point_within_frame=self.withinframes([lastx,lasty])
+	    self.lastymax[aFullPNString]=ymax
+	    self.lastymin[aFullPNString]=ymin
+
 	    if lastx!=None:
 		dx=abs(lastx-x)
-		dy=abs(lasty-y)
 	    else:
-		dx=0
-		dy=0
-	    if dx<2 and dy<2:
+		dx=1
+	    if dx<2:
 		#draw just a point
-		if cur_point_within_frame:
-		    self.drawpoint_on_plot(aFullPNString,x,y)
+	        self.drawminmax(aFullPNString,x,ymax, ymin)
+
 	    else:
-		#draw line    
-		if (not cur_point_within_frame) and (not last_point_within_frame):
-		    #if neither points are in frame do not draw line
-		    pass
-		else:
-		    #draw line
-		    x0=lastx
-		    y0=lasty
-		    x1=x
-		    y1=y
-		    if cur_point_within_frame and last_point_within_frame:
-		    #if both points are in frame no interpolation needed
-			pass
-		    else:
-			#either current or last point out of frame, do interpolation
-			
-#interpolation section begins - only in case lastpoint or current point is off limits
-			#there are 2 boundary cases x0=x1 and y0=y1
-			if x0==x1:
-			    #adjust y if necessary
-			    if y0<self.plotaread[1] and y1>=self.plotaread[1]:
-				y0=self.plotaread[1]
-			    if y0>self.plotaread[3] and y1<=self.plotaread[3]:
-				y0=self.plotaread[3]
+		#draw area
+		x0=lastx
+		ymax0=lastymax
+		ymin0=lastymin
+		x1=x
+		ymax1=ymax
+		ymin1=ymin
+		#mmax=(ymax1-ymax0)/dx
+		#mmin=(ymin1-ymin0)/dx
+		x=x0+1
+		while x<=x1:
+			#ymax=(x-x0)*mmax+ymax0
+			#ymin=(x-x0)*mmin+ymin0
+			self.drawminmax(aFullPNString, x, ymax, ymin)
+			x+=1
 
-			    if y1<self.plotaread[1] and y0>=self.plotaread[1]:
-				y1=self.plotaread[1]
-			    if y1>self.plotaread[3] and y0<=self.plotaread[3]:
-				y1=self.plotaread[3]
-	    
-			elif y0==y1:
-			    #adjust x values if necessary
-			    if x0<self.plotaread[0] and x1>=self.plotaread[0]:
-				x0=self.plotaread[0]
-			    if x0>self.plotaread[2] and x1<=self.plotaread[2]:
-				x0=self.plotaread[2]
 
-			    if x1<self.plotaread[0] and x0>=self.plotaread[0]:
-				x1=self.plotaread[0]
-			    if x1>self.plotaread[2] and x0<=self.plotaread[2]:
-				x1=self.plotaread[2]
-	    
-			else:
-
-    			    #create coordinate equations
-			    mx=float(y1-y0)/float(x1-x0)
-			    my=1/mx
-			    xi=x0
-			    yi=y0
-			    #check whether either point is out of plot area
-	    
-			    #if x0 is out then interpolate x=leftside, create new x0, y0
-			    if x0<self.plotaread[0]:
-				x0=self.plotaread[0]
-				y0=yi+round((x0-xi)*mx)
-			    #if y0 is still out, interpolate y=upper and lower side, 
-			    #whichever x0 is smaller, create new x0
-			    if y0<self.plotaread[1] or y0>self.plotaread[3]:
-				#upper side
-				y0=self.plotaread[1]
-				x0=xi+round((y0-yi)*my)
-				#lower side
-				y02=self.plotaread[3]
-				x02=xi+round((y02-yi)*my)
-				if x02<x0:
-				    x0=x02
-				    y0=y02
-			    #repeat it with x1 and y1, but compare to left side
-			    if x1>self.plotaread[2]:
-				x1=self.plotaread[2]
-				y1=yi+round((x1-xi)*mx)
-			    #if y0 is still out, interpolate y=upper and lower side, 
-			    #whichever x0 is smaller, create new x0
-			    if y1<self.plotaread[1] or y1>self.plotaread[3]:
-				#upper side
-				y1=self.plotaread[1]
-				x1=xi+round((y1-yi)*my)
-				#lower side
-				y12=self.plotaread[3]
-				x12=xi+round((y12-yi)*my)
-				if x12>x1:
-				    x1=x12
-				    y1=y12
-#interpolation section ends
-		    self.drawline(aFullPNString,x0,y0,x1,y1)
-		    
-		    #if change is 1 pixel in x or y direction drawpoint
-		    #else drawline
-		    #setlast
 	    
 	    
 	def reframex(self):
@@ -1141,6 +1091,7 @@ class Plot:
 		self.xticks_step=(self.xgrid[1]-self.xgrid[0])/self.xticks_no
 		self.pixelwidth=float(self.xframe[1]-self.xframe[0])/self.plotarea[2]
 		self.reprint_xlabels()
+
 
 	def toggle_trace(self,fpn):
 	    if self.trace_onoff.has_key(fpn):
