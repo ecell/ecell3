@@ -49,6 +49,19 @@ namespace libecs
 #define THROW_EXCEPTION( CLASS, MESSAGE )\
 throw CLASS( __PRETTY_FUNCTION__, MESSAGE )
 
+#if defined( DEBUG ) 
+#define DEBUG_EXCEPTION( EXPRESSION, CLASS, MESSAGE )\
+if( ! ( EXPRESSION ) )\
+{\
+  THROW_EXCEPTION( CLASS, "[ " + String( STR( EXPRESSION )  ) + " ]\n\t"\
+                   + MESSAGE );\
+}
+#else
+#define DEBUG_EXCEPTION( EXPRESSION, CLASS, MESSAGE ) ;
+#endif
+
+
+
   /// Base exception class
   class Exception 
     : public std::exception 
@@ -100,6 +113,7 @@ public:\
   DEFINE_EXCEPTION( NotFound,              Exception);
   DEFINE_EXCEPTION( CantOpen,              Exception); 
   DEFINE_EXCEPTION( CallbackFailed,        Exception);
+  DEFINE_EXCEPTION( AssertionFailed,       Exception);
 
   // simulation errors
   DEFINE_EXCEPTION( InitializationFailed,  Exception);

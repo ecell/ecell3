@@ -47,6 +47,10 @@
 #define DEBUG
 
 
+// stringifiers.  see preprocessor manual
+#define XSTR( S ) STR( S )
+#define STR( S ) #S
+
 
 // cmath
 
