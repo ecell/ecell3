@@ -110,6 +110,10 @@ class BoardWindow(OsogoWindow):
 		# call bas class
 		OsogoWindow.close( self )
 
+		for anEntityWindow in self.theSession.getWindow('EntityListWindow'):
+			anEntityWindow.checkBoardExists()
+
+
 
 	def displayScroll(self):
 		if self.theViewPort.get_child() == None:
