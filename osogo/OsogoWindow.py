@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #
@@ -42,6 +42,7 @@ import GDK
 import libglade
 
 from ecell.Window import *
+from ConfirmWindow import *
 
 
 # ---------------------------------------------------------------
@@ -58,8 +59,9 @@ class OsogoWindow(Window):
 	#
 	# return -> None
 	# ---------------------------------------------------------------
-	def __init__( self, aGladeFile=None, aRoot=None ):
+	def __init__( self, aMainWindow, aGladeFile=None, aRoot=None ):
 
+		self.theMainWindow = aMainWindow
 		self.theExist = 0
 		Window.__init__( self, aGladeFile, aRoot )
 
@@ -88,6 +90,10 @@ class OsogoWindow(Window):
 	def destroyWindow( self, *objects ):
 
 		self.theExist = 0
+		try:
+			self.theMainWindow.updateBasicWindows()
+		except:
+			pass
 
 	# end of destroyWindow
 
@@ -121,6 +127,9 @@ class OsogoWindow(Window):
 
 	# end of openWindow
 
+
+	def update( self ):
+		pass
 
 # end of OsogoWindow
 

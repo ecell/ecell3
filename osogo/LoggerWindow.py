@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #
@@ -37,9 +37,6 @@ from OsogoWindow import *
 from gtk import *
 from Numeric import *
 
-#from LoggerFactory import *     # This file should be moved proper directory.
-from ConfirmWindow import *
-
 from os import *
 
 from ecell.ecssupport import *
@@ -51,32 +48,31 @@ from ecell.ECDDataFile import *
 # This is LoggerWindow class .
 #
 # ---------------------------------------------------------------
-#class LoggerWindow(Window):
 class LoggerWindow(OsogoWindow):
 
 
 	# ---------------------------------------------------------------
 	# constructor
-	# session : the reference of session
+	# aSession : the reference of session
 	# aMainWindow : the reference of MainWindow
 	# ---------------------------------------------------------------
-	def __init__( self, session, aMainWindow ): 
+	def __init__( self, aSession, aMainWindow ): 
 
-		#Window.__init__( self, 'LoggerWindow.glade' )
-		OsogoWindow.__init__( self, 'LoggerWindow.glade' )
+		#OsogoWindow.__init__( self, 'LoggerWindow.glade', aMainWindow )
+		OsogoWindow.__init__( self, aMainWindow, 'LoggerWindow.glade' )
 		OsogoWindow.openWindow(self)
-		self.theMainWindow = aMainWindow
+		#self.theMainWindow = aMainWindow
 
-		self.theSession = session
+		self.theSession = aSession
 		self.theEntryList = self['loggerWindow_clist']
 		self.theList = []
 		self.initialize()
 		self.theDefaultSaveDirectory='Data'
 
+		self.thePopupMenu = PopupMenu( self )
+
 		# reset
 		self.resetAllValues()
-
-		#self.exist = 1
 
 		# ---------------------------------------------------------------
 		# Adds handlers
@@ -101,10 +97,8 @@ class LoggerWindow(OsogoWindow):
 				# window event
 		 		'on_exit_activate' : self.closeWindow,
 
-				# test
-				#'on_loggerWindow_destroy'  : self.destroy,
-				#'on_loggerWindow_delete_event'  : self.delete_event,
-				#'on_loggerWindow_destroy_event'  : self.destroy_event,
+				# popup
+				'button_press_event'  : self.popupMenu,
 
 			})
 
@@ -159,7 +153,6 @@ class LoggerWindow(OsogoWindow):
 	# return -> None
 	# ---------------------------------------------------------------
 	def closeParentWindow( self, obj ):
-		#aParentWindow = button_obj.get_parent_window()
 		aParentWindow = self.theSaveDirectorySelection.cancel_button.get_parent_window()
 		aParentWindow.hide()
 
@@ -441,6 +434,8 @@ class LoggerWindow(OsogoWindow):
 	# ---------------------------------------------------------------
 	def update( self ):
 
+		#print "LoggerWindow"
+
 		self.theFullPNList = self.theSession.getLoggerList()
 		self.theEntryList.clear()
 		self.theList = []
@@ -468,43 +463,97 @@ class LoggerWindow(OsogoWindow):
 	# ---------------------------------------------------------------
 	def closeWindow ( self, obj ):
 		#gtk.mainquit()
-		self['loggerWindow'].hide_all()
+		self[self.__class__.__name__].hide_all()
 
 	# closeWindow
 
+	# ---------------------------------------------------------------
+	# popupMenu
+	#   - show popup menu
+	#
+	# aWidget         : widget
+	# anEvent          : an event
+	# return -> None
+	# This method is throwable exception.
+	# ---------------------------------------------------------------
+	def popupMenu( self, aWidget, anEvent ):
 
-	#def destroy( self, *obj ):
-	#	print 'loggerWindow_Destroy'
+		if len(self.theSelectedPropertyName())!=0:
+			if anEvent.button == 3:
+				self.thePopupMenu.popup( None, None, None, 1, 0 )
 
-	#def delete_event( self, *obj ):
-	#	print 'loggerWindow_delete_event'
-
-	#def destroy_event( self, *obj ):
-	#	print 'self.loggerWindow_destroy_event'
-
-	#def aaa( self ):
-	#	print 'show_all ---------------------------s'
-#
-#		if self.exist == 1:
-#			print "ari"
-#			self['loggerWindow'].show_all()
-#		else:
-#			print "nashi"
-#			#self.__init__(self.theSession, self.theMainWindow)
-#			OsogoWindow.openWindow(self)
-
-#		#self.__init__(self.theSession, self.theMainWindow)
-#		#self['loggerWindow'].show_all()
-#		print 'show_all ---------------------------e'
+	# end of poppuMenu
 
 
-
-#'destroy' : self.loggerWindow_Destory ,
-#'delete_event' : self.loggerWindow_delete_event ,
-#'destroy_enevt' : self.loggerWindow_destory_event ,
-
+	def deleteItem( self, anObject ):
+		#print "deleteIetm -- s "
+		#print anObject
+		#for aSelectedFullPNString in self.theSelectedPropertyName():
+		#	print aSelectedFullPNString
+		#	self.theSession.getLoggerList().remove( aSelectedFullPNString )
+		#print "deleteIetm -- e "
+		pass
+			
 
 # end of LoggerWindow
+
+
+# ---------------------------------------------------------------
+# PopupMenu -> GtkMenu
+# ---------------------------------------------------------------
+class PopupMenu( GtkMenu ):
+
+	# ---------------------------------------------------------------
+	# Constructor
+	#
+	# aParent        : parent plugin window
+	# return -> None
+	# This method is throwable exception.
+	# ---------------------------------------------------------------
+	def __init__( self, aParent ):
+
+		# ------------------------------------------
+		# calls the constructor of super class
+		# ------------------------------------------
+		GtkMenu.__init__(self)
+
+		aMaxStringLength = 0
+		aMenuSize = 0
+
+		# ------------------------------------------
+		# sets arguments to instance valiables
+		# ------------------------------------------
+		self.theParent = aParent
+
+		# ------------------------------------------
+		# initializes menu item
+		# ------------------------------------------
+		self.theMenuItem = {}
+
+		self.theDeleteString = 'delete this item'
+		self.theMenuItem[self.theDeleteString]= GtkMenuItem(self.theDeleteString)
+		self.theMenuItem[self.theDeleteString].connect('activate', self.theParent.deleteItem )
+		self.theMenuItem[self.theDeleteString].set_name(self.theDeleteString)
+		self.append( self.theMenuItem[self.theDeleteString] )
+
+		self.theMenuItem[self.theDeleteString].set_sensitive(0)
+
+		aMaxStringLength = len(self.theDeleteString)
+
+		# ------------------------------------------
+		# caliculates size of menu and sets it to itself
+		# ------------------------------------------
+		self.theWidth = (aMaxStringLength+1)*8
+		self.theHeight = (aMenuSize+1)*21 + 3
+		self.set_usize( self.theWidth, self.theHeight )
+
+	def popup(self, pms, pmi, func, button, time):
+		GtkMenu.popup(self, pms, pmi, func, button, time)
+		self.show_all(self)
+
+
+# end of PopupMenu
+
 
 # ---------------------------------------------------------------
 # Test code

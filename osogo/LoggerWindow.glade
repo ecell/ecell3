@@ -17,6 +17,7 @@
   <name>LoggerWindow</name>
   <width>698</width>
   <height>335</height>
+  <events>GDK_BUTTON_PRESS_MASK</events>
   <signal>
     <name>destroy</name>
     <handler>destroy</handler>
@@ -133,6 +134,12 @@
 	<width>476</width>
 	<height>275</height>
 	<can_focus>True</can_focus>
+	<events>GDK_BUTTON_MOTION_MASK | GDK_BUTTON_PRESS_MASK</events>
+	<signal>
+	  <name>button_press_event</name>
+	  <handler>button_press_event</handler>
+	  <last_modification_time>Mon, 08 Jul 2002 16:29:03 GMT</last_modification_time>
+	</signal>
 	<columns>3</columns>
 	<column_widths>334,102,62</column_widths>
 	<selection_mode>GTK_SELECTION_EXTENDED</selection_mode>
@@ -292,6 +299,21 @@ binary
 		      <child_name>GtkCombo:entry</child_name>
 		      <name>datatype_combo</name>
 		      <can_focus>True</can_focus>
+		      <signal>
+			<name>copy_clipboard</name>
+			<handler>on_datatype_combo_copy_clipboard</handler>
+			<last_modification_time>Thu, 04 Jul 2002 08:27:52 GMT</last_modification_time>
+		      </signal>
+		      <signal>
+			<name>cut_clipboard</name>
+			<handler>on_datatype_combo_cut_clipboard</handler>
+			<last_modification_time>Thu, 04 Jul 2002 08:27:56 GMT</last_modification_time>
+		      </signal>
+		      <signal>
+			<name>paste_clipboard</name>
+			<handler>on_datatype_combo_paste_clipboard</handler>
+			<last_modification_time>Thu, 04 Jul 2002 08:28:03 GMT</last_modification_time>
+		      </signal>
 		      <editable>False</editable>
 		      <text_visible>True</text_visible>
 		      <text_max_length>0</text_max_length>
@@ -340,6 +362,21 @@ binary
 		    <class>GtkEntry</class>
 		    <name>directory_entry</name>
 		    <can_focus>True</can_focus>
+		    <signal>
+		      <name>copy_clipboard</name>
+		      <handler>on_directory_entry_copy_clipboard</handler>
+		      <last_modification_time>Thu, 04 Jul 2002 08:28:14 GMT</last_modification_time>
+		    </signal>
+		    <signal>
+		      <name>cut_clipboard</name>
+		      <handler>on_directory_entry_cut_clipboard</handler>
+		      <last_modification_time>Thu, 04 Jul 2002 08:28:18 GMT</last_modification_time>
+		    </signal>
+		    <signal>
+		      <name>paste_clipboard</name>
+		      <handler>on_directory_entry_paste_clipboard</handler>
+		      <last_modification_time>Thu, 04 Jul 2002 08:28:22 GMT</last_modification_time>
+		    </signal>
 		    <editable>True</editable>
 		    <text_visible>True</text_visible>
 		    <text_max_length>0</text_max_length>
@@ -567,6 +604,21 @@ binary
 			<class>GtkSpinButton</class>
 			<name>start_spinbutton</name>
 			<can_focus>True</can_focus>
+			<signal>
+			  <name>copy_clipboard</name>
+			  <handler>on_start_spinbutton_copy_clipboard</handler>
+			  <last_modification_time>Thu, 04 Jul 2002 08:32:37 GMT</last_modification_time>
+			</signal>
+			<signal>
+			  <name>cut_clipboard</name>
+			  <handler>on_start_spinbutton_cut_clipboard</handler>
+			  <last_modification_time>Thu, 04 Jul 2002 08:32:44 GMT</last_modification_time>
+			</signal>
+			<signal>
+			  <name>paste_clipboard</name>
+			  <handler>on_start_spinbutton_paste_clipboard</handler>
+			  <last_modification_time>Thu, 04 Jul 2002 08:32:51 GMT</last_modification_time>
+			</signal>
 			<climb_rate>1</climb_rate>
 			<digits>3</digits>
 			<numeric>True</numeric>
@@ -607,6 +659,21 @@ binary
 			<class>GtkSpinButton</class>
 			<name>end_spinbutton</name>
 			<can_focus>True</can_focus>
+			<signal>
+			  <name>copy_clipboard</name>
+			  <handler>on_end_spinbutton_copy_clipboard</handler>
+			  <last_modification_time>Thu, 04 Jul 2002 08:33:05 GMT</last_modification_time>
+			</signal>
+			<signal>
+			  <name>cut_clipboard</name>
+			  <handler>on_end_spinbutton_cut_clipboard</handler>
+			  <last_modification_time>Thu, 04 Jul 2002 08:33:09 GMT</last_modification_time>
+			</signal>
+			<signal>
+			  <name>paste_clipboard</name>
+			  <handler>on_end_spinbutton_paste_clipboard</handler>
+			  <last_modification_time>Thu, 04 Jul 2002 08:33:16 GMT</last_modification_time>
+			</signal>
 			<climb_rate>1</climb_rate>
 			<digits>1</digits>
 			<numeric>True</numeric>

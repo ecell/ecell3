@@ -30,7 +30,7 @@
 #'Design and application Framework: Kouichi Takahashi <shafi@e-cell.org>',
 #'Programming: Yuki Fujita',
 #             'Yoshiya Matsubara',
-#             'Yuusuke Saito'
+#             'Yuusuke Saito',
 #
 # modified by Masahiro Sugimoto <sugi@bioinformatics.org> at
 # E-CELL Project, Lab. for Bioinformatics, Keio University.
@@ -71,47 +71,56 @@ class OsogoPluginWindow(PluginWindow):
 	# return -> None
 	# This method is throwable exception.
 	# ---------------------------------------------------------------
-	def __init__( self, dirname, data, pluginmanager, root=None ):
+	def __init__( self, dirname, aData, pluginmanager, aRoot=None ):
 
 		self.theFullPNListClipBoard = []
+		self.theSelectedFullPNIndex = 0
 
-		#PluginWindow.__init__( self, dirname, data, pluginmanager, root )
-		PluginWindow.__init__( self, dirname, pluginmanager, root )
+		PluginWindow.__init__( self, dirname, pluginmanager, aRoot )
 		PluginWindow.openWindow( self )
 
-		self.theSession = self.thePluginManager.theSession 
-		self.theRawFullPNList = data
-		self.theTitle = pluginmanager.theInterfaceWindow.theTitle
-        	
+		self.theSession = self.thePluginManager.theMainWindow.theSession 
+		self.theRawFullPNList = aData
+
+		self.theTitle = self.__class__.__name__
+
+		if aRoot == None:
+			#self.thePopupMenu = OsogoMenu( pluginmanager, self )
+			#self.getWidget( self.theClassName ).connect( 'button_press_event', self.popupMenu )
+			self.getWidget( self.theClassName )['title'] = self.theTitle
 
 	# end of __init__
 
 
 	# ---------------------------------------------------------------
-	# initialize ( overrides PluginWindow )
-	#   - creates popup menu
+	# addPopupMenu
+	#   - creates instance of popup menu 
+	#   - registers singlal to show the popup menu
 	#
-	# aRoot          : root property
+	# aFullPNMode    : 1  appends FullPN  (default)
+	#                  0  doesn't append FullPN
+	# aPluginMode    : 1  appends PluginMenu (default)
+	#                  0  doesn't append PluginMenu
+	# aLoggerMode    : 1  appends 'add logger list' (default)
+	#                  0  doesn't append 'add logger list'
+	#
 	# return -> None
 	# This method is throwable exception.
 	# ---------------------------------------------------------------
-	def initialize( self, aRoot=None ):
+	def addPopupMenu( self, aFullPNMode=1, aPluginMode=1, aLoggerMode=1 ):
 
-		aMenuWindow = Window( 'PluginWindowPopupMenu.glade', aRoot='menu' )
-		self.thePopupMenu = aMenuWindow['menu']
+		# creates instance of popup menu 
+		self.thePopupMenu = OsogoPluginWindowPopupMenu( self.thePluginManager, self,
+		                                                aFullPNMode, aPluginMode, aLoggerMode )
 
-		if aRoot != None:
-			self.theClassName = aRoot
-			self[self.theClassName].connect( 'button_press_event', self.popupMenu )
-			aMenuWindow.addHandlers( { 'copy_fullpnlist'  : self.copyFullPNList,
-				'paste_fullpnlist' : self.pasteFullPNList,
-				'add_fullpnlist'   : self.addFullPNList
-				} )
-		#        else root !='top_vbox':
-		else:
-			self.getWidget( self.theClassName )['title'] = self.theTitle
+		# registers singlal to show the popup menu
+		self.getWidget( self.theClassName ).connect( 'button_press_event', self.popupMenu )
 
-	# end of initialize
+	# end of addPopupMenu
+
+
+	def getRawFullPNList( self ):
+		return self.theRawFullPNList 
 
 
 	# ---------------------------------------------------------------
@@ -168,7 +177,7 @@ class OsogoPluginWindow(PluginWindow):
 	# ---------------------------------------------------------------
 	def theFullPN( self ):
 
-		return self.supplementFullPN( self.theRawFullPNList[0] )
+		return self.supplementFullPN( self.theRawFullPNList[self.theSelectedFullPNIndex] )
 
 	# end of theFullPN
 
@@ -210,6 +219,7 @@ class OsogoPluginWindow(PluginWindow):
 			return aNewFullPN
 
 	# end of supplementFullPN
+
 
 	# ---------------------------------------------------------------
 	# theAttributeMap
@@ -266,10 +276,12 @@ class OsogoPluginWindow(PluginWindow):
 	# return -> attribute map 
 	# This method is throwable exception.
 	# ---------------------------------------------------------------
-	def getValue( self, aFullpn ):
+	def getValue( self, aFullPN ):
 
-		aValueList = self.theSession.theSimulator.getProperty( createFullPNString( aFullpn ) )
+		aValueList = self.theSession.theSimulator.getProperty( createFullPNString( aFullPN ) )
 		return aValueList[0]
+
+	# getValue
 
 
 	# ---------------------------------------------------------------
@@ -282,23 +294,22 @@ class OsogoPluginWindow(PluginWindow):
 	# return -> None
 	# This method is throwable exception.
 	# ---------------------------------------------------------------
-	def setValue( self, fullpn, aValue ):
+	def setValue( self, aFfullPN, aValue ):
 
-		if self.getAttribute( fullpn ) == 3:
-			#aValue = value
+		if self.getAttribute( aFullPN ) == 3:
 
 			aValueList = aValue
 
-			if type(value) != type((0,)):
+			if type(aValue) != type((0,)):
 				aValueList  = (aValueList,)
 
-			aValueList = (value,)
+			aValueList = (aValue,)
 
 			# the 2nd argument of theSimulator.setPropety must be tuple
-			self.theSession.theSimulator.setProperty( createFullPNString( fullpn ), aValueList )
+			self.theSession.theSimulator.setProperty( createFullPNString( aFullPN ), aValueList )
 			self.thePluginManager.updateAllPluginWindow()
 		else:
-			aFullPNString = createFullPNString( fullpn )
+			aFullPNString = createFullPNString( aFullPN )
 			self.theSession.printMessage('%s is not settable\n' % aFullPNString )
 
 	# end of setValue
@@ -307,7 +318,6 @@ class OsogoPluginWindow(PluginWindow):
 	# ---------------------------------------------------------------
 	# exit
 	#   - call exit method of superclass 
-	#   - clear the selected list of InterfaceWindow
 	#
 	# *objects  : dammy element of arguments
 	#
@@ -316,8 +326,8 @@ class OsogoPluginWindow(PluginWindow):
 	# ---------------------------------------------------------------
 	def exit( self, *objects ):
 
-		PluginWindow.exit(self, objects)
-		self.thePluginManager.theInterfaceWindow.theSelectedRow = -1
+		# call exit method of superclass 
+		PluginWindow.exit(self, *objects)
 
 	# end of exit
 
@@ -332,10 +342,8 @@ class OsogoPluginWindow(PluginWindow):
 	# This method is throwable exception.
 	# ---------------------------------------------------------------
 	def copyFullPNList(self, *objects ):
-		#ViewWindow.theFullPNListClipBoard = self.theRawFullPNList
+
 		self.theFullPNListClipBoard = self.theRawFullPNList
-		#print 'copy :',
-		#print ViewWindow.theFullPNListClipBoard
 
 	# end of copyFullPNList
 	
@@ -350,11 +358,9 @@ class OsogoPluginWindow(PluginWindow):
 	# This method is throwable exception.
 	# ---------------------------------------------------------------
 	def pasteFullPNList(self, *objects ):
-		#self.theRawFullPNList = ViewWindow.theFullPNListClipBoard
+
 		self.theRawFullPNList = self.theFullPNListClipBoard
 		self.initialize()
-		#print 'paste :',
-		#print self.theRawFullPNList
 
 	# end of pasteFullPNList
 
@@ -369,12 +375,179 @@ class OsogoPluginWindow(PluginWindow):
 	# This method is throwable exception.
 	# ---------------------------------------------------------------
 	def addFullPNList(self, *objects ):
-		#self.theRawFullPNList.extend( ViewWindow.theFullPNListClipBoard )
+
 		self.theRawFullPNList.extend( self.theFullPNListClipBoard )
-		#print 'add : ',
-		#print self.theRawFullPNList
 
 	# end of addFullPNList
 
+	# ---------------------------------------------------------------
+	# createLogger
+	#   - changes this instance to other plugin window
+	#
+	# anObject  :  the plugin window that this instance will change to
+	#
+	# return -> None
+	# This method is throwable exception.
+	# ---------------------------------------------------------------
+	def changePluginWindow( self, anObject ):
+
+		aPluginName = anObject.get_name()
+		self.thePluginManager.createInstance( aPluginName, self.getRawFullPNList() )
+		self.exit()
+
+	# end of changePluginWindow
+
+
+	# ---------------------------------------------------------------
+	# createLogger
+	#   - create Logger of theFullPN
+	#
+	# *objects : dammy objects
+	#
+	# return -> None
+	# This method is throwable exception.
+	# ---------------------------------------------------------------
+	def createLogger( self, *objects ):
+
+		self.theSession.getLogger( createFullPNString(self.theFullPN()) )
+		self.thePluginManager.updateBasicWindows()
+
+	# end of createLogger
+
+
+	# ---------------------------------------------------------------
+	# changeFullPN
+	#
+	# anObject : the FullID that this instance will show
+	#
+	# return -> None
+	# This method is throwable exception.
+	# ---------------------------------------------------------------
+	def changeFullPN( self, anObject ):
+
+		index = 0
+		for aFullPN in self.theFullPNList():
+			aFullPNString = createFullPNString( aFullPN )
+			if aFullPNString == anObject.get_name():
+				break
+			index = index + 1
+
+		self.theSelectedFullPNIndex = index
+
+		self.update()
+		self.thePluginManager.updateAllPluginWindow()
+		self.thePluginManager.updateBasicWindows()
+
+	# end of changeFullPN
+
 
 # end of OsogoPluginWindow
+
+
+# ----------------------------------------------------------
+# OsogoPluginPopupMenu -> GtkMenu
+#   - popup menu used by plugin menu
+# ----------------------------------------------------------
+class OsogoPluginWindowPopupMenu( GtkMenu ):
+
+	# ----------------------------------------------------------
+	# Constructor
+	#   - added PluginManager reference
+	#   - added OsogoPluginWindow reference
+	#   - acreates all menus
+	#
+	# aPluginManager : reference to PluginManager
+	# aParent        : aOsogoPluginWindow
+	# aFullPNMode    : 1  appends FullPN  (default)
+	#                  0  doesn't append FullPN
+	# aPluginMode    : 1  appends PluginMenu (default)
+	#                  0  doesn't append PluginMenu
+	# aLoggerMode    : 1  appends 'add logger list' (default)
+	#                  0  doesn't append 'add logger list'
+	#
+	# return -> None
+	# This method is throwabe exception.
+	# ----------------------------------------------------------
+	def __init__( self, aPluginManager, aParent, aFullPNMode=1, aPluginMode=1, aLoggerMode=1 ):
+
+		GtkMenu.__init__(self)
+
+		self.theLoggerString = "add logger list"
+
+		self.theParent = aParent
+		self.thePluginManager = aPluginManager
+		self.theMenuItem = {}
+
+		# ------------------------------------------
+		# adds FullPNString
+		# ------------------------------------------
+		# if appen FullPN Mode
+		if aFullPNMode == 1: 
+			for aFullPN in self.theParent.theFullPNList():
+
+				aFullPNString = createFullPNString( aFullPN )
+				self.theMenuItem[aFullPNString]= GtkMenuItem(aFullPNString)
+				self.theMenuItem[aFullPNString].connect('activate', self.theParent.changeFullPN )
+				self.theMenuItem[aFullPNString].set_name(aFullPNString)
+				self.append( self.theMenuItem[aFullPNString] )
+
+			self.append( gtk.GtkMenuItem() )
+
+		# ------------------------------------------
+		# adds plugin window
+		# ------------------------------------------
+		# if appen Plugin Mode
+		if aPluginMode == 1:
+			for aPluginMap in self.thePluginManager.thePluginMap.keys():
+				self.theMenuItem[aPluginMap]= GtkMenuItem(aPluginMap)
+				self.theMenuItem[aPluginMap].connect('activate', self.theParent.changePluginWindow )
+				self.theMenuItem[aPluginMap].set_name(aPluginMap)
+
+				self.append( self.theMenuItem[aPluginMap] )
+
+			self.append( gtk.GtkMenuItem() )
+
+		# ------------------------------------------
+		# adds creates logger
+		# ------------------------------------------
+		# if appen Logger Mode
+		if aLoggerMode == 1:
+			self.theMenuItem[self.theLoggerString]= GtkMenuItem(self.theLoggerString)
+			self.theMenuItem[self.theLoggerString].connect('activate', self.theParent.createLogger )
+			self.theMenuItem[self.theLoggerString].set_name(self.theLoggerString)
+			self.append( self.theMenuItem[self.theLoggerString] )
+
+
+	# end of __init__
+
+
+	# ---------------------------------------------------------------
+	# popup
+	#    - sets unsensitive following menus.
+	#         1) the parent's plugin menu 
+	#         2) the current FULLPN menu
+	#    - shows this popup memu
+	#
+	# return -> None
+	# This method is throwable exception.
+	# ---------------------------------------------------------------
+	def popup(self, pms, pmi, func, button, time):
+
+		# sets unsensitive following menus.
+		for key in self.theMenuItem:
+			if ( key == self.theParent.__class__.__name__ ) or ( key == createFullPNString(self.theParent.theFullPN()) ):
+				self.theMenuItem[key].set_sensitive(0)
+			else:
+				self.theMenuItem[key].set_sensitive(1)
+		
+		# shows this popup memu
+		GtkMenu.popup(self, pms, pmi, func, button, time)
+		self.show_all(self)
+
+	# end of poup
+
+
+# end of OsogoPluginWindowPopupMenu
+
+
+

@@ -57,6 +57,7 @@ from ecell.Plugin import *
 # ---------------------------------------------------------------
 class OsogoPluginManager(PluginManager):
 
+
 	# ---------------------------------------------------------------
 	# Constructor
 	#   - alls the constructor of superclass 
@@ -68,19 +69,18 @@ class OsogoPluginManager(PluginManager):
 	# aMessageWindow    : MessageWindow
 	# return -> None
 	# ---------------------------------------------------------------
-	def __init__( self, aSession, aLoggerWindow, anInterfaceWindow, 
-	              aMessageWindow  ):
+	def __init__( self, aMainWindow  ):
 
 		try:
-			#self.thePluginMap = {}
-			#self.theInstanceList = []
 
 			PluginManager.__init__(self)
 
-			self.theSession = aSession
-			self.theLoggerWindow = aLoggerWindow
-			self.theInterfaceWindow = anInterfaceWindow
-			self.theMessageWindow = aMessageWindow
+			self.theSession = aMainWindow.theSession
+			self.theMainWindow = aMainWindow
+
+			self.thePluginTitleDict = {}     # key is instance , value is title
+			self.thePluginWindowNumber = {}
+
 		except:
 			aMessage  = '\n----------Error------------\n'
 			aMessage += 'ErroType[%s]\n'  %sys.exc_type
@@ -103,26 +103,34 @@ class OsogoPluginManager(PluginManager):
 	# aParent           : parent window
 	# return -> one instance
 	# ---------------------------------------------------------------
-	def createInstance( self, classname, data, root=None, parent=None ):
+	def createInstance( self, aClassname, data, root=None, parent=None ):
 	
-
 		try:
-			try:
-				# gets one plugin from plugin map
-				aPlugin = self.thePluginMap[ classname ]
-	    
-				# If there is no plugin whose class is aClassName,
-				# then call loadModule method of this class.
-			except KeyError:
-				self.loadModule( classname )
 
-			# if the plugin module is not top module,
-			# then add record to InterfaceWindow
-			if root !='top_vbox':
-				self.theInterfaceWindow.addNewRecord( classname, data )
+			if self.thePluginMap.has_key( aClassname ):
+				pass
+			else:
+				self.loadModule( aClassname )
 
-			# creates instance
-			#anInstance = aPlugin.createInstance( self, data, self, root, parent )
+			aPlugin = self.thePluginMap[ aClassname ]
+
+			# -------------------------------------------------------
+			# If plugin window does not exist on EntryList,
+			# then creates new title and sets it to plugin window.
+			# -------------------------------------------------------
+			aTitle = ""
+			if root !='top_vbox':                # if(1)
+
+				aTitle = aClassname[:-6]
+
+				if self.thePluginWindowNumber.has_key( aClassname ):
+					self.thePluginWindowNumber[ aClassname ] += 1
+				else:
+					self.thePluginWindowNumber[ aClassname ] = 1
+
+				aTitle = "%s%d" %(aTitle,self.thePluginWindowNumber[ aClassname ])
+
+			# if(1)
 
 			# Nothing is selected.
 			if len(data) == 0:
@@ -132,18 +140,19 @@ class OsogoPluginManager(PluginManager):
 
 				anInstance = aPlugin.createInstance( data, self, root, parent )
 
-				if root !='top_vbox':
-					anInstance.editTitle( self.theInterfaceWindow.theTitle )
+				if root !='top_vbox':              
+					anInstance.editTitle( aTitle )
+					self.thePluginTitleDict[ anInstance ] = aTitle
+					self.theInstanceList.append( anInstance )
 
-				# initialize session
-				self.theSession.theSimulator.initialize()
+				# initializes session
+				self.theMainWindow.theSession.theSimulator.initialize()
+				self.updateBasicWindows()
 				return anInstance
 
+
 		except:
-			aMessage  = '\n----------Error------------\n'
-			aMessage += 'ErroType[%s]\n'  %sys.exc_type
-			aMessage += 'ErroValue[%s]\n' %sys.exc_value
-			traceback.print_exc()
+			aMessage = " Some error happens, can't create plugin window."
 			self.printMessage(aMessage)
 
 
@@ -159,14 +168,15 @@ class OsogoPluginManager(PluginManager):
 	# ---------------------------------------------------------------
 	def loadModule( self, aClassname ):
 	
-		try:
-			PluginManager.loadModule(self,aClassname)
-		except:
-			aMessage  = '\n----------Error------------\n'
-			aMessage += 'ErroType[%s]\n'  %sys.exc_type
-			aMessage += 'ErroValue[%s]\n' %sys.exc_value
-			traceback.print_exc()
-			self.printMessage(aMessage)
+		#try:
+		#print " OsogoPluginManager.loadModule %s " %aClassname
+		PluginManager.loadModule(self,aClassname)
+		#except:
+		#	aMessage  = '\n----------Error------------\n'
+		#	aMessage += 'ErroType[%s]\n'  %sys.exc_type
+		#	aMessage += 'ErroValue[%s]\n' %sys.exc_value
+		#	traceback.print_exc()
+		#	self.printMessage(aMessage)
 
 	# end of loadModule
 
@@ -180,7 +190,7 @@ class OsogoPluginManager(PluginManager):
 	# ---------------------------------------------------------------
 	def loadAll( self ):
 
-		try:
+		#try:
 			for aPath in PLUGIN_PATH:
 				aFileList = glob.glob( os.path.join( aPath, '*.glade' ) )
 				for aFile in aFileList:
@@ -188,13 +198,13 @@ class OsogoPluginManager(PluginManager):
 					if( os.path.isfile( aModulePath + '.py' ) ):
 						aModuleName = os.path.basename( aModulePath )
 						self.loadModule( aModuleName )
-						self.theInterfaceWindow.thePluginWindowsNoDict[ aModuleName[ : -6 ] ] = 0
-		except:
-			aMessage  = '\n----------Error------------\n'
-			aMessage += 'ErroType[%s]\n'  %sys.exc_type
-			aMessage += 'ErroValue[%s]\n' %sys.exc_value
-			traceback.print_exc()
-			self.printMessage(aMessage)
+						###self.theInterfaceWindow.thePluginWindowsNoDict[ aModuleName[ : -6 ] ] = 0
+		#except:
+		#	aMessage  = '\n----------Error------------\n'
+		#	aMessage += 'ErroType[%s]\n'  %sys.exc_type
+		#	aMessage += 'ErroValue[%s]\n' %sys.exc_value
+		#	traceback.print_exc()
+		#	self.printMessage(aMessage)
 
 	# end of loadAll
 
@@ -210,14 +220,14 @@ class OsogoPluginManager(PluginManager):
 	# ---------------------------------------------------------------
 	def updateAllPluginWindow( self ):
 
-		try:
+		#try:
 			PluginManager.updateAllPluginWindow(self)
-		except:
-			aMessage  = '\n----------Error------------\n'
-			aMessage += 'ErroType[%s]\n'  %sys.exc_type
-			aMessage += 'ErroValue[%s]\n' %sys.exc_value
-			traceback.print_exc()
-			self.printMessage(aMessage)
+		#except:
+		#	aMessage  = '\n----------Error------------\n'
+		#	aMessage += 'ErroType[%s]\n'  %sys.exc_type
+		#	aMessage += 'ErroValue[%s]\n' %sys.exc_value
+		#	traceback.print_exc()
+		#	self.printMessage(aMessage)
 
 	# end of updateAllPluginWindow
 
@@ -233,14 +243,21 @@ class OsogoPluginManager(PluginManager):
 	# ---------------------------------------------------------------
 	def appendInstance( self, anInstance ):
 
-		try:
-			PluginManager.appendInstance(self, anInstance)
-		except:
-			aMessage  = '\n----------Error------------\n'
-			aMessage += 'ErroType[%s]\n'  %sys.exc_type
-			aMessage += 'ErroValue[%s]\n' %sys.exc_value
-			traceback.print_exc()
-			self.printMessage(aMessage)
+		pass
+		#print ""
+		#print " anInstance = "
+		#print anInstance 
+
+		#try:
+		#PluginManager.appendInstance(self, anInstance)
+		#except:
+		#	aMessage  = '\n----------Error------------\n'
+		#	aMessage += 'ErroType[%s]\n'  %sys.exc_type
+		#	aMessage += 'ErroValue[%s]\n' %sys.exc_value
+		#	traceback.print_exc()
+		#	self.printMessage(aMessage)
+
+		#self.theMainWindow.update()
 
 	# end of appendInstance
 
@@ -257,14 +274,20 @@ class OsogoPluginManager(PluginManager):
 	# ---------------------------------------------------------------
 	def removeInstance( self, anInstance ):
 
-		try:
-			PluginManager.removeInstance(self, anInstance)
-		except:
-			aMessage  = '\n----------Error------------\n'
-			aMessage += 'ErroType[%s]\n'  %sys.exc_type
-			aMessage += 'ErroValue[%s]\n' %sys.exc_value
-			traceback.print_exc()
-			self.printMessage(aMessage)
+		#for Instance in self.theInstanceList:
+		#	print Instance.getTitle()
+
+		PluginManager.removeInstance(self, anInstance)
+
+		if self.thePluginTitleDict.has_key( anInstance ):
+			del self.thePluginTitleDict[ anInstance ] 
+		else:
+			pass
+
+		if anInstance != None:
+			anInstance[anInstance.__class__.__name__].destroy()
+
+		self.theMainWindow.updateBasicWindows()
 
 	# end of removeInstance
 
@@ -280,16 +303,19 @@ class OsogoPluginManager(PluginManager):
 	# return -> None
 	# This method is throwable exception. (IndexError)
 	# ---------------------------------------------------------------
-	def showPlugin( self, num, obj ):
+	#def showPlugin( self, num, obj ):
+	def showPlugin( self, aPluginInstance ):
 
-		try:
-			PluginManager.showPlugin(self, anIndex, *Objects)
-		except:
-			aMessage  = '\n----------Error------------\n'
-			aMessage += 'ErroType[%s]\n'  %sys.exc_type
-			aMessage += 'ErroValue[%s]\n' %sys.exc_value
-			aMessage += '%s' %traceback.print_exc()
-			self.printMessage(aMessage)
+		PluginManager.showPlugin(self, aPluginInstance)
+
+		#try:
+		#PluginManager.showPlugin(self, anIndex, *Objects)
+		#except:
+		#	aMessage  = '\n----------Error------------\n'
+		#	aMessage += 'ErroType[%s]\n'  %sys.exc_type
+		#	aMessage += 'ErroValue[%s]\n' %sys.exc_value
+		#	aMessage += '%s' %traceback.print_exc()
+		#	self.printMessage(aMessage)
 
 	# end of showPlugin
 
@@ -305,18 +331,20 @@ class OsogoPluginManager(PluginManager):
 	# return -> None
 	# This method is throwable exception. (IndexError)
 	# ---------------------------------------------------------------
-	def editModuleTitile( self, anIndex, aTitle ):
+	#def editModuleTitile( self, anIndex, aTitle ):
+	def editModuleTitile( self, aPluginInstance, aTitle ):
 
+		self.thePluginTitleDict[aPluginInstance] = aTitle
+		WindowManager.editModuleTitle( self, anIndex, aTitle)
 
-		try:
-			#self.theInstanceList[ anIndex + 1 ].editTitle( aTitle )
-			WindowManager.editModuleTitle( self, anIndex, aTitle)
-		except:
-			aMessage  = '\n----------Error------------\n'
-			aMessage += 'ErroType[%s]\n'  %sys.exc_type
-			aMessage += 'ErroValue[%s]\n' %sys.exc_value
-			traceback.print_exc()
-			self.printMessage(aMessage)
+		#try:
+			##self.theInstanceList[ anIndex + 1 ].editTitle( aTitle )
+		#except:
+		#	aMessage  = '\n----------Error------------\n'
+		#	aMessage += 'ErroType[%s]\n'  %sys.exc_type
+		#	aMessage += 'ErroValue[%s]\n' %sys.exc_value
+		#	traceback.print_exc()
+		#	self.printMessage(aMessage)
 
 	# end of getModule
 
@@ -334,15 +362,7 @@ class OsogoPluginManager(PluginManager):
 	# ---------------------------------------------------------------
 	def deleteModule( self, anIndex, *Objects ):
 
-		try:
-			anInstance = self.theInstanceList[ anIndex + 1 ]
-			anInstance.getWidget( anInstance.__class__.__name__ ).destroy()
-		except:
-			aMessage  = '----------Error------------\n'
-			aMessage += 'ErroType[%s]\n'  %sys.exc_type
-			aMessage += 'ErroValue[%s]\n' %sys.exc_value
-			traceback.print_exc()
-			self.printMessage(aMessage)
+		self.theMainWindow.update()
 
 	# end of deleteModule
 
@@ -353,16 +373,13 @@ class OsogoPluginManager(PluginManager):
 	#
 	# return -> None
 	# ---------------------------------------------------------------
-	def updateLoggerWindow( self ):
+	def updateBasicWindows( self ):
 
 		try:
-			self.theLoggerWindow.update()
+			self.theMainWindow.updateBasicWindows()
+			self.theMainWindow.update()
 		except:
-			aMessage  = '\n----------Error------------\n'
-			aMessage += 'ErroType[%s]\n'  %sys.exc_type
-			aMessage += 'ErroValue[%s]\n' %sys.exc_value
-			traceback.print_exc()
-			self.printMessage(aMessage)
+			pass
 
 	# end of updateLoggerWindow
 
@@ -377,7 +394,7 @@ class OsogoPluginManager(PluginManager):
 	# ---------------------------------------------------------------
 	def printMessage( self, aMessage ):
 
-		self.theMessageWindow.printMessage(aMessage)
+		self.theMainWindow.printMessage(aMessage)
 
 	# end of printMessage
 

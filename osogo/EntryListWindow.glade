@@ -414,10 +414,16 @@
 	    <widget>
 	      <class>GtkTree</class>
 	      <name>system_tree</name>
+	      <events>GDK_BUTTON3_MOTION_MASK | GDK_BUTTON_PRESS_MASK</events>
 	      <signal>
 		<name>selection_changed</name>
 		<handler>system_tree_selection_changed</handler>
 		<last_modification_time>Thu, 06 Sep 2001 07:01:00 GMT</last_modification_time>
+	      </signal>
+	      <signal>
+		<name>button_press_event</name>
+		<handler>tree_button_press_event</handler>
+		<last_modification_time>Tue, 09 Jul 2002 05:00:18 GMT</last_modification_time>
 	      </signal>
 	      <selection_mode>GTK_SELECTION_SINGLE</selection_mode>
 	      <view_mode>GTK_TREE_VIEW_LINE</view_mode>
@@ -531,55 +537,16 @@ All
 	      <widget>
 		<class>GtkList</class>
 		<name>entry_list</name>
+		<events>GDK_BUTTON_PRESS_MASK</events>
 		<signal>
 		  <name>selection_changed</name>
 		  <handler>entry_list_selection_changed</handler>
 		  <last_modification_time>Thu, 06 Sep 2001 07:30:51 GMT</last_modification_time>
 		</signal>
 		<signal>
-		  <name>drag_begin</name>
-		  <handler>on_entry_list_drag_begin</handler>
-		  <last_modification_time>Thu, 27 Jun 2002 06:05:41 GMT</last_modification_time>
-		</signal>
-		<signal>
-		  <name>drag_data_delete</name>
-		  <handler>on_entry_list_drag_data_delete</handler>
-		  <last_modification_time>Thu, 27 Jun 2002 06:19:14 GMT</last_modification_time>
-		</signal>
-		<signal>
-		  <name>drag_data_get</name>
-		  <handler>on_entry_list_drag_data_get</handler>
-		  <last_modification_time>Thu, 27 Jun 2002 06:19:24 GMT</last_modification_time>
-		</signal>
-		<signal>
-		  <name>drag_data_received</name>
-		  <handler>on_entry_list_drag_data_received</handler>
-		  <last_modification_time>Thu, 27 Jun 2002 06:19:31 GMT</last_modification_time>
-		</signal>
-		<signal>
-		  <name>drag_drop</name>
-		  <handler>on_entry_list_drag_drop</handler>
-		  <last_modification_time>Thu, 27 Jun 2002 06:19:49 GMT</last_modification_time>
-		</signal>
-		<signal>
-		  <name>drag_end</name>
-		  <handler>on_entry_list_drag_end</handler>
-		  <last_modification_time>Thu, 27 Jun 2002 06:20:00 GMT</last_modification_time>
-		</signal>
-		<signal>
-		  <name>drag_leave</name>
-		  <handler>on_entry_list_drag_leave</handler>
-		  <last_modification_time>Thu, 27 Jun 2002 06:20:15 GMT</last_modification_time>
-		</signal>
-		<signal>
-		  <name>drag_motion</name>
-		  <handler>on_entry_list_drag_motion</handler>
-		  <last_modification_time>Thu, 27 Jun 2002 06:20:30 GMT</last_modification_time>
-		</signal>
-		<signal>
 		  <name>button_press_event</name>
-		  <handler>on_entry_list_button_press_event</handler>
-		  <last_modification_time>Thu, 27 Jun 2002 06:45:25 GMT</last_modification_time>
+		  <handler>list_button_press_event</handler>
+		  <last_modification_time>Tue, 09 Jul 2002 05:00:09 GMT</last_modification_time>
 		</signal>
 		<selection_mode>GTK_SELECTION_EXTENDED</selection_mode>
 	      </widget>

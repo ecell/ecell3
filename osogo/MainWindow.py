@@ -73,7 +73,7 @@ AUTHORLIST  = [
     'Design and application Framework: Kouichi Takahashi <shafi@e-cell.org>',
     'Programming: Yuki Fujita',
     'Yoshiya Matsubara',
-    'Yuusuke Saito'
+    'Yuusuke Saito',
     'Masahiro Sugimoto <sugi@e-cell.org>'
     ]
 DESCRIPTION = 'Osogo is a simulation session monitoring module for E-CELL SE Version 3'
@@ -114,7 +114,7 @@ class MainWindow(OsogoWindow):
 		# -------------------------------------
 		# creates MessageWindow 
 		# -------------------------------------
-		self.theMessageWindow = MessageWindow.MessageWindow()
+		self.theMessageWindow = MessageWindow.MessageWindow( self )
 
 		# -------------------------------------
 		# creates Session
@@ -135,14 +135,16 @@ class MainWindow(OsogoWindow):
 		# -------------------------------------
 		# creates PluginManager
 		# -------------------------------------
-		self.thePluginManager = OsogoPluginManager( self.theSession, 
-		        self.theLoggerWindow, self.theInterfaceWindow, self.theMessageWindow )
+		#self.thePluginManager = OsogoPluginManager( self.theSession, 
+		#        self.theLoggerWindow, self.theInterfaceWindow, self.theMessageWindow )
+
+		self.thePluginManager = OsogoPluginManager( self )
 		self.thePluginManager.loadAll()
 
 		# -------------------------------------
 		# creates PaletteManager
 		# -------------------------------------
-		self.thePaletteWindow = PaletteWindow.PaletteWindow()
+		self.thePaletteWindow = PaletteWindow.PaletteWindow( self )
 		self.thePaletteWindow.setPluginList( self.thePluginManager.thePluginMap )
 
 		self.theEntryChecker = 0
@@ -154,7 +156,7 @@ class MainWindow(OsogoWindow):
 		self.theRunningFlag = 0
 
 		self.theHandlerMap = \
-			{ 'load_rule_menu_activate'              : self.openRuleFileSelection ,
+		  { 'load_rule_menu_activate'              : self.openRuleFileSelection ,
 			'load_script_menu_activate'            : self.openScriptFileSelection ,
 			'save_cell_state_menu_activate'        : self.saveCellStateToTheFile ,
 			'save_cell_state_as_menu_activate'     : self.openSaveCellStateFileSelection ,
@@ -166,16 +168,17 @@ class MainWindow(OsogoWindow):
 			'create_new_logger_list_menu_activate' : self.toggleLoggerWindow ,
 			'preferences_menu_activate'            : self.openPreferences ,
 			'about_menu_activate'                  : self.openAbout ,
-			'start_button_clicked'     : self.startSimulation ,
-			'stop_button_clicked'      : self.stopSimulation ,
-			'step_button_clicked'      : self.stepSimulation ,
-			'input_step_size'          : self.setStepSize ,
-			'step_sec_toggled'         : self.changeStepType ,
-			'entrylist_togglebutton_toggled'     : self.toggleEntryList ,
-			'logger_togglebutton_toggled'    : self.toggleLoggerWindow ,
-			'palette_togglebutton_toggled'   : self.togglePaletteWindow ,
-			'message_togglebutton_toggled'   : self.toggleMessageWindow ,
-			'interface_togglebutton_toggled' : self.toggleInterfaceListWindow ,
+			'start_button_clicked'                 : self.startSimulation ,
+			'stop_button_clicked'                  : self.stopSimulation ,
+			'step_button_clicked'                  : self.stepSimulation ,
+			'input_step_size'                      : self.setStepSize ,
+			'step_sec_toggled'                     : self.changeStepType ,
+			'entrylist_togglebutton_toggled'       : self.toggleEntryList ,
+			'logger_togglebutton_toggled'          : self.toggleLoggerWindow ,
+			'palette_togglebutton_toggled'         : self.togglePaletteWindow ,
+			'message_togglebutton_toggled'         : self.toggleMessageWindow ,
+			'interface_togglebutton_toggled'       : self.toggleInterfaceListWindow ,
+			'logo_button_clicked'                  : self.openAbout,
 		}
 		self.addHandlers( self.theHandlerMap )
 
@@ -183,18 +186,12 @@ class MainWindow(OsogoWindow):
 		# -------------------------------------
 		# create Script File Selection 
 		# -------------------------------------
-		self.theScriptFileSelection = gtk.GtkFileSelection( 'Select Script File' )
-		self.theScriptFileSelection.ok_button.connect('clicked', self.loadScript)
-		self.theScriptFileSelection.cancel_button.connect('clicked', self.closeParentWindow)
-		self.theScriptFileSelection.complete( '*.' + self.ScriptFileExtension )
+		#self.createScriptFileSelection()
 
 		# -------------------------------------
 		# create Rule File Selection 
 		# -------------------------------------
-		self.theRuleFileSelection = gtk.GtkFileSelection( 'Select Rule File' )
-		self.theRuleFileSelection.ok_button.connect('clicked', self.loadRule)
-		self.theRuleFileSelection.cancel_button.connect('clicked', self.closeParentWindow)
-		self.theRuleFileSelection.complete( '*.' + self.RuleFileExtension )
+		#self.createRuleFileSelection()
 
 		# -------------------------------------
 		# create Save Cell State File Selection 
@@ -214,7 +211,19 @@ class MainWindow(OsogoWindow):
 		
 		self.setInitialWidgetStatus()
 
+		self.updateBasicWindows()
+
 	# end of __init__
+
+
+	def setUnSensitiveMenu( self ):
+		self['message_window_menu'].set_sensitive(0)
+		self['interface_window_menu'].set_sensitive(0)
+		self['palette_window_menu'].set_sensitive(0)
+		self['create_new_entry_list_menu'].set_sensitive(0)
+		self['create_new_logger_list_menu'].set_sensitive(0)
+
+	# end of setUnSensitiveMenu
 
 
 	# ---------------------------------------------------------------
@@ -230,7 +239,10 @@ class MainWindow(OsogoWindow):
 		self['step_button'].set_sensitive(0)
 		self['entry_list'].set_sensitive(0)
 		self['palette_togglebutton'].set_sensitive(0)
+		self['palette_window_menu'].set_sensitive(0)
 		self['create_new_entry_list_menu'].set_sensitive(0)
+
+		self.setUnSensitiveMenu()
 
 	# end of setInitialWidgetStatus
 
@@ -261,6 +273,11 @@ class MainWindow(OsogoWindow):
 	# ---------------------------------------------------------------
 	def openRuleFileSelection( self, obj ) :
 
+		self.theRuleFileSelection = gtk.GtkFileSelection( 'Select Rule File' )
+		self.theRuleFileSelection.ok_button.connect('clicked', self.loadRule)
+		#self.theRuleFileSelection.connect('destroy', self.createRuleFileSelection)
+		self.theRuleFileSelection.cancel_button.connect('clicked', self.closeParentWindow)
+		self.theRuleFileSelection.complete( '*.' + self.RuleFileExtension )
 		self.theRuleFileSelection.show_all()
 
 	# end of openRuleFileSelection
@@ -275,8 +292,18 @@ class MainWindow(OsogoWindow):
 	# This method is throwable exception.
 	# ---------------------------------------------------------------
 	def loadRule( self, button_obj ) :
+
 		try:
 			aFileName = self.theRuleFileSelection.get_filename()
+
+			if os.path.isfile( aFileName ):
+				pass
+			else:
+				aMessage = ' Error ! No such file. \n[%s]' %aFileName
+				self.printMessage(aMessage)
+				aDialog = ConfirmWindow(0,aMessage,'Error!')
+				return None
+
 			self.theRuleFileSelection.hide()
 			self.theSession.printMessage( 'loading rule file %s\n' % aFileName)
 			aModelFile = open( aFileName )
@@ -284,11 +311,10 @@ class MainWindow(OsogoWindow):
 			aModelFile.close()
 			self.theSession.theSimulator.initialize()
 			self.update()
+			self.updateBasicWindows()
+
 		except:
-			import sys
-			import traceback
-			aErrorMessage = traceback.format_exception(sys.exc_type,sys.exc_value,sys.exc_traceback)
-			self.theMessageWindow.printMessage(aErrorMessage)
+			self.printMessage(' can\'t load [%s]' %aFileName)
 		else:
 			self.theStepperChecker = 1
 			self['start_button'].set_sensitive(1)
@@ -296,9 +322,11 @@ class MainWindow(OsogoWindow):
 			self['step_button'].set_sensitive(1)
 			self['entry_list'].set_sensitive(1)
 			self['palette_togglebutton'].set_sensitive(1)
+			self['palette_window_menu'].set_sensitive(1)
 			self['create_new_entry_list_menu'].set_sensitive(1)
 			self['load_rule_menu'].set_sensitive(0)
 			self['load_script_menu'].set_sensitive(0)
+			self.setUnSensitiveMenu()
 
 	# end of loadRule
 
@@ -313,7 +341,11 @@ class MainWindow(OsogoWindow):
 	# ---------------------------------------------------------------
 	def openScriptFileSelection( self, obj ) :
 
-		self.theScriptFileSelection.show_all()
+		self.theScriptFileSelection = gtk.GtkFileSelection( 'Select Script File' )
+		self.theScriptFileSelection.ok_button.connect('clicked', self.loadScript)
+		self.theScriptFileSelection.connect('destroy', self.createScriptFileSelection)
+		self.theScriptFileSelection.cancel_button.connect('clicked', self.closeParentWindow)
+		self.theScriptFileSelection.complete( '*.' + self.ScriptFileExtension )
         
 	# end of openScriptFileSelection
 
@@ -335,6 +367,7 @@ class MainWindow(OsogoWindow):
 			aGlobalNameMap = { 'theMainWindow' : self }
 			execfile( aFileName, aGlobalNameMap )
 			self.update()
+			self.updateBasicWindows()
 		except:
 			import sys
 			import traceback
@@ -350,6 +383,7 @@ class MainWindow(OsogoWindow):
 			self['create_new_entry_list_menu'].set_sensitive(1)
 			self['load_rule_menu'].set_sensitive(0)
 			self['load_script_menu'].set_sensitive(0)
+			self.setUnSensitiveMenu()
 
 	# end of loadScript
 
@@ -364,7 +398,11 @@ class MainWindow(OsogoWindow):
 	# ---------------------------------------------------------------
 	def openSaveCellStateFileSelection( self, obj ) :
 
-		self.theSaveFileSelection.show_all()
+		#self.theSaveFileSelection.show_all()
+		aMessage = ' Sorry ! Not implemented... [%s]\n' %'08/Jul/2002'
+		self.printMessage(aMessage)
+		aDialog = ConfirmWindow(0,aMessage,'Sorry!')
+		return None
 
 	# end of openSaveCellStateFileSelection
 
@@ -392,7 +430,15 @@ class MainWindow(OsogoWindow):
 	# This method is throwable exception.
 	# ---------------------------------------------------------------
 	def exit( self, obj ):
-		mainQuit()
+
+		aMessage = '\n Are you sure you want to quit? \n'
+		aDialog = ConfirmWindow(1,aMessage,'?')
+
+		try:
+			if aDialog.return_result() == 0:
+				mainQuit()
+		except:
+			pass
         
 	# end of exit
 
@@ -445,6 +491,7 @@ class MainWindow(OsogoWindow):
 				self.theSession.printMessage( "Stop\n" )
 				self.removeTimeOut()
 				self.update()
+				self.updateBasicWindows()
 				self.theLoggerWindow.update()
 
 		except:
@@ -455,6 +502,8 @@ class MainWindow(OsogoWindow):
 
 		else:
 			self.theRunningFlag = 0
+
+		self.updateBasicWindows()
 
 	# end of stopSimulation
 
@@ -481,6 +530,7 @@ class MainWindow(OsogoWindow):
 				self.theSession.step( self.theStepSize )
 			self.removeTimeOut()
 			self.update()
+			self.updateBasicWindows()
 			self.theLoggerWindow.update()
 
 		except:
@@ -519,12 +569,19 @@ class MainWindow(OsogoWindow):
 	# ---------------------------------------------------------------
 	def setStepSize( self, obj ):
 
-		aNumberString = obj.get_text()
+		try:
 
-		if len( aNumberString ):
-			self.theStepSize = string.atof( aNumberString )
-		else:
-			self.theStepSize = 1
+			aNumberString = obj.get_text()
+
+			if len( aNumberString ):
+				self.theStepSize = string.atof( aNumberString )
+			else:
+				self.theStepSize = 1
+
+		except:
+			aMessage = "[%s] can't be changed float number." %obj.get_text()
+			self.printMessage(aMessage)
+			aDialog = ConfirmWindow(0,aMessage,'Error!')
 
 	# end of setStepSize
 
@@ -539,6 +596,7 @@ class MainWindow(OsogoWindow):
 	# ---------------------------------------------------------------
 	def updateByTimeOut( self, obj ):
 
+		#self.update()
 		self.update()
 		self.theTimer = gtk.timeout_add( self.theUpdateInterval, self.updateByTimeOut, 0 )
 
@@ -553,6 +611,7 @@ class MainWindow(OsogoWindow):
 	# ---------------------------------------------------------------
 	def removeTimeOut( self ):
 
+
 		gtk.timeout_remove( self.theTimer )
 
 	# end of removeTimeOut
@@ -565,6 +624,7 @@ class MainWindow(OsogoWindow):
 	# This method is throwable exception.
 	# ---------------------------------------------------------------
 	def update( self ):
+
 
 		aTime = self.theSession.theSimulator.getCurrentTime()
 		self.theCurrentTime = aTime
@@ -613,6 +673,7 @@ class MainWindow(OsogoWindow):
 				# calls show method of Entry Window Widget.
 				# --------------------------------------------------
 				else:
+					self.theEntryListWindow['EntryListWindow'].hide()
 					self.theEntryListWindow['EntryListWindow'].show_all()
 
 			# ------------------------------------------------------
@@ -667,6 +728,7 @@ class MainWindow(OsogoWindow):
 			# calls show method of Logger Window Widget.
 			# --------------------------------------------------
 			else:
+				self.theLoggerWindow['LoggerWindow'].hide()
 				self.theLoggerWindow['LoggerWindow'].show_all()
 
 		# ------------------------------------------------------
@@ -719,6 +781,7 @@ class MainWindow(OsogoWindow):
 			# calls show method of Message Window Widget.
 			# --------------------------------------------------
 			else:
+				self.theMessageWindow['MessageWindow'].hide()
 				self.theMessageWindow['MessageWindow'].show_all()
 
 		# ------------------------------------------------------
@@ -779,6 +842,7 @@ class MainWindow(OsogoWindow):
 		aTabLabel = gtk.GtkLabel( 'warning' )
 		aPropertyBox.append_page( aLabel, aTabLabel )
 
+		aPropertyBox.hide()
 		aPropertyBox.show_all()
 
 	# end of openPreference
@@ -793,7 +857,7 @@ class MainWindow(OsogoWindow):
 	# ---------------------------------------------------------------
 	def initializePaletteWindow( self ):
 
-		self.thePaletteWindow = PaletteWindow.PaletteWindow()
+		self.thePaletteWindow = PaletteWindow.PaletteWindow( self )
 		self.thePaletteWindow.setPluginList( self.thePluginManager.thePluginMap )
 
 	# end of initializePaletteWindow
@@ -812,12 +876,11 @@ class MainWindow(OsogoWindow):
 		# button is toggled to active 
 		# ------------------------------------------------------
 		if button_obj.get_active():
-
 			if self.thePaletteWindow.getExist() == 0:
 				self.initializePaletteWindow()
 			else:
 				pass	
-
+			self.thePaletteWindow.hide()
 			self.thePaletteWindow.show_all()
 
 		# ------------------------------------------------------
@@ -861,6 +924,7 @@ class MainWindow(OsogoWindow):
 			# calls show method of Interface Window Widget.
 			# --------------------------------------------------
 			else:
+				self.theInterfaceWindow['InterfaceWindow'].hide()
 				self.theInterfaceWindow['InterfaceWindow'].show_all()
 
 		# ------------------------------------------------------
@@ -886,13 +950,110 @@ class MainWindow(OsogoWindow):
 
 
 	# ---------------------------------------------------------------
-	# saveCellStateToTheFile ( NOT IMPLEMENTED ON 27/Jul/2002)
+	# saveCellStateToTheFile ( NOT IMPLEMENTED ON 08/Jul/2002)
+	#
+	# *objects : dammy objects
 	#
 	# return -> None
 	# This method is throwable exception.
 	# ---------------------------------------------------------------
-	def saveCellStateToTheFile( self ):
-		pass
+	def saveCellStateToTheFile( self, *objects ):
+
+		aMessage = ' Sorry ! Not implemented... [%s]\n' %'08/Jul/2002'
+		self.printMessage(aMessage)
+		aDialog = ConfirmWindow(0,aMessage,'Sorry!')
+		return None
+
+	# end of saveCellStateToTheFile
+
+
+	# ---------------------------------------------------------------
+	# printMessage
+	#
+	# aMessage : message
+	#
+	# return -> None
+	# This method is throwable exception.
+	# ---------------------------------------------------------------
+	def printMessage( self, aMessage ):
+
+		self.theMessageWindow.printMessage( aMessage )
+
+	# end of printMessage
+
+
+	def updateBasicWindows( self ):
+
+		self.theMessageWindow.update()
+		self.theLoggerWindow.update()
+		self.theInterfaceWindow.update()
+
+		# -------------------------------------------
+		# checks button 
+		# -------------------------------------------
+		if self.getExist():
+
+			# checks message button
+			if self.theMessageWindow.theExist :
+				self['message_togglebutton'].set_active(1)
+			else:
+				self['message_togglebutton'].set_active(0)
+
+			# checks logger button
+			if self.theLoggerWindow.theExist :
+				self['logger_togglebutton'].set_active(1)
+			else:
+				self['logger_togglebutton'].set_active(0)
+
+			# checks interface button
+			if self.theInterfaceWindow.theExist :
+				self['interface_togglebutton'].set_active(1)
+			else:
+				self['interface_togglebutton'].set_active(0)
+
+			if self.theStepperChecker:
+
+				# if palette button pressed
+				if self['palette_togglebutton'].get_active():
+					if self.thePaletteWindow.getExist() :
+						pass
+					else:
+						self['palette_togglebutton'].set_active(0)
+
+				# if entrylist button pressed
+				if self['entry_list'].get_active():
+					try:
+						if self.theEntryListWindow.getExist():
+							pass
+						else:
+							self['entry_list'].set_active(0)
+					except:
+						pass
+
+	# end of updateBasicWindow
+
+
+	#def createScriptFileSelection( self, *objects ):
+
+	#	self.theScriptFileSelection = gtk.GtkFileSelection( 'Select Script File' )
+	#	self.theScriptFileSelection.ok_button.connect('clicked', self.loadScript)
+	#	self.theScriptFileSelection.connect('destroy', self.createScriptFileSelection)
+	#	self.theScriptFileSelection.cancel_button.connect('clicked', self.closeParentWindow)
+	#	self.theScriptFileSelection.complete( '*.' + self.ScriptFileExtension )
+
+	# end of createScriptFileSelection
+
+
+	#def createRuleFileSelection( self, *objects ):
+
+	#	self.theRuleFileSelection = gtk.GtkFileSelection( 'Select Rule File' )
+	#	self.theRuleFileSelection.ok_button.connect('clicked', self.loadRule)
+	#	self.theRuleFileSelection.connect('destroy', self.createRuleFileSelection)
+	#	self.theRuleFileSelection.cancel_button.connect('clicked', self.closeParentWindow)
+	#	self.theRuleFileSelection.complete( '*.' + self.RuleFileExtension )
+
+	# end of createRuleFileSelection
+
 
 
 # end of MainWindow

@@ -51,9 +51,10 @@ class MessageWindow(OsogoWindow):
 	# return -> None
 	# This method is throwable exception.
 	# ---------------------------------------------------------------
-	def __init__( self ):
+	def __init__( self, aMainWindow ):
 
-		OsogoWindow.__init__( self )
+		#OsogoWindow.__init__( self )
+		OsogoWindow.__init__( self, aMainWindow )
 		OsogoWindow.openWindow(self)
 		self.printMessage('')
 		self.theMessageBufferList=[]

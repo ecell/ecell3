@@ -58,10 +58,10 @@ class PaletteWindow(GtkWindow):
 	# return -> None
 	# This method is throwable exception.
 	# ---------------------------------------------------------------
-	def __init__( self ):
+	def __init__( self, aMainWindow ):
 
 		GtkWindow.__init__( self, WINDOW_TOPLEVEL )
-
+		self.theMainWindow = aMainWindow
 		self.theToolbar = GtkToolbar( ORIENTATION_VERTICAL, TOOLBAR_BOTH )
 		self.add( self.theToolbar )
 		self.set_data('toolbar', self.theToolbar)
@@ -142,8 +142,8 @@ class PaletteWindow(GtkWindow):
 	# This method is throwable exception.
 	# ---------------------------------------------------------------
 	def destroy( self, *objects ):
-		print 'destroy'
 		self.theExist = 0
+		self.theMainWindow.updateBasicWindows()
 
 	def getExist( self ):
 		return self.theExist
