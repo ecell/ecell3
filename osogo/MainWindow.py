@@ -127,7 +127,7 @@ class MainWindow(OsogoWindow):
 		
 		self.theMessageWindow = MessageWindow.MessageWindow( self['textview1'] ) 
 		self.theMessageWindow.openWindow()
-		self.MessageWindow_attached=gtk.TRUE
+		self.MessageWindow_attached=TRUE
 		#get and setresizewindowminimumsize
 		self.expose(None,None)
 		self.MW_minimal_size=self.MW_actual_size[:]
@@ -256,8 +256,8 @@ class MainWindow(OsogoWindow):
 	    self['MainWindow'].resize(window_width,window_heigth)
 	
 	def setUnSensitiveMenu( self ):
-		self['palette_window_menu'].set_sensitive(0)
-		self['create_new_entity_list_menu'].set_sensitive(0)
+		self['palette_window_menu'].set_sensitive(FALSE)
+		self['create_new_entity_list_menu'].set_sensitive(FALSE)
 
 	# end of setUnSensitiveMenu
 
@@ -270,14 +270,14 @@ class MainWindow(OsogoWindow):
 	# This method is throwable exception.
 	# ---------------------------------------------------------------
 	def setInitialWidgetStatus( self ):
-		self['start_button'].set_sensitive(0)
-		self['stop_button'].set_sensitive(0)
-		self['step_button'].set_sensitive(0)
-		self['entitylist'].set_sensitive(0)
-		self['palette_togglebutton'].set_sensitive(0)
-		self['palette_window_menu'].set_sensitive(0)
-		self['create_new_entity_list_menu'].set_sensitive(0)
-		self['save_model_menu'].set_sensitive(0)
+		self['start_button'].set_sensitive(FALSE)
+		self['stop_button'].set_sensitive(FALSE)
+		self['step_button'].set_sensitive(FALSE)
+		self['entitylist'].set_sensitive(FALSE)
+		self['palette_togglebutton'].set_sensitive(FALSE)
+		self['palette_window_menu'].set_sensitive(FALSE)
+		self['create_new_entity_list_menu'].set_sensitive(FALSE)
+		self['save_model_menu'].set_sensitive(FALSE)
 
 		self.setUnSensitiveMenu()
 
@@ -310,9 +310,9 @@ class MainWindow(OsogoWindow):
 		import sys
 		import traceback
 		self.printMessage(' error while executing ESS [%s]' %aFileName)
-		aErrorMessage = string.join( traceback.format_exception(sys.exc_type,sys.exc_value,sys.exc_traceback), '\n' )
+		anErrorMessage = string.join( traceback.format_exception(sys.exc_type,sys.exc_value,sys.exc_traceback), '\n' )
 		self.printMessage("-----------")
-		self.printMessage(aErrorMessage)
+		self.printMessage(anErrorMessage)
 		self.printMessage("-----------")
 	# ---------------------------------------------------------------
 	# tries to get a parameter from ConfigDB
@@ -363,7 +363,6 @@ class MainWindow(OsogoWindow):
 	# end of openLoadModelFileSelection
 
 
-
 	# ---------------------------------------------------------------
 	# __loadModel
 	#
@@ -397,23 +396,10 @@ class MainWindow(OsogoWindow):
 
 		except:
 			self.printMessage(' can\'t load [%s]' %aFileName)
-			aErrorMessage = string.join( traceback.format_exception(sys.exc_type,sys.exc_value,sys.exc_traceback), '\n' )
+			anErrorMessage = string.join( traceback.format_exception(sys.exc_type,sys.exc_value,sys.exc_traceback), '\n' )
 			self.printMessage("-----------")
-			self.printMessage(aErrorMessage)
+			self.printMessage(anErrorMessage)
 			self.printMessage("-----------")
-		else:
-			self.theStepperChecker = 1
-			self['start_button'].set_sensitive(1)
-			self['stop_button'].set_sensitive(1)
-			self['step_button'].set_sensitive(1)
-			self['entitylist'].set_sensitive(1)
-			self['palette_togglebutton'].set_sensitive(1)
-			self['palette_window_menu'].set_sensitive(1)
-			self['create_new_entity_list_menu'].set_sensitive(1)
-			self['load_rule_menu'].set_sensitive(0)
-			self['load_script_menu'].set_sensitive(0)
-			self['save_model_menu'].set_sensitive(1)
-			#self.setUnSensitiveMenu()
 
 	# end of loadModel
 
@@ -429,7 +415,7 @@ class MainWindow(OsogoWindow):
 	def openLoadScriptFileSelection( self, anObject ) :
 
 		self.theLoadScriptFileSelection = gtk.FileSelection( 'Select Script File' )
-		#self.theScriptFileSelection.set_modal(gtk.TRUE)
+		#self.theScriptFileSelection.set_modal(TRUE)
 		self.theLoadScriptFileSelection.ok_button.connect('clicked', self.loadScript)
 		self.theLoadScriptFileSelection.cancel_button.connect('clicked', self.closeParentWindow)
 		self.theLoadScriptFileSelection.complete( '*.' + SCRIPT_FILE_EXTENSION )
@@ -463,26 +449,26 @@ class MainWindow(OsogoWindow):
 			import sys
 			import traceback
 			self.printMessage(' error while executing ESS [%s]' %aFileName)
-			aErrorMessage = string.join( traceback.format_exception(sys.exc_type,sys.exc_value,sys.exc_traceback), '\n' )
+			anErrorMessage = string.join( traceback.format_exception(sys.exc_type,sys.exc_value,sys.exc_traceback), '\n' )
 			self.printMessage("-----------")
-			self.printMessage(aErrorMessage)
+			self.printMessage(anErrorMessage)
 			self.printMessage("-----------")
 		else:
 			self.read_ini( aFileName )
 			self.update()
 			self.updateFundamentalWindows()
 
-			self.theStepperChecker = 1
-			self['start_button'].set_sensitive(1)
-			self['stop_button'].set_sensitive(1)
-			self['step_button'].set_sensitive(1)
-			self['entitylist'].set_sensitive(1)
-			self['palette_togglebutton'].set_sensitive(1)
-			self['create_new_entity_list_menu'].set_sensitive(1)
-			self['load_rule_menu'].set_sensitive(0)
-			self['load_script_menu'].set_sensitive(0)
-			self['save_model_menu'].set_sensitive(1)
-			self.setUnSensitiveMenu()
+			#self.theStepperChecker = 1
+			#self['start_button'].set_sensitive(1)
+			#self['stop_button'].set_sensitive(1)
+			#self['step_button'].set_sensitive(1)
+			#self['entitylist'].set_sensitive(1)
+			#self['palette_togglebutton'].set_sensitive(1)
+			#self['create_new_entity_list_menu'].set_sensitive(1)
+			#self['load_rule_menu'].set_sensitive(0)
+			#self['load_script_menu'].set_sensitive(0)
+			#self['save_model_menu'].set_sensitive(1)
+			#self.setUnSensitiveMenu()
 
 	# end of loadScript
 
@@ -539,9 +525,9 @@ class MainWindow(OsogoWindow):
 
 		except:
 			self.printMessage(' can\'t save [%s]' %aFileName)
-			aErrorMessage = string.join( traceback.format_exception(sys.exc_type,sys.exc_value,sys.exc_traceback), '\n' )
+			anErrorMessage = string.join( traceback.format_exception(sys.exc_type,sys.exc_value,sys.exc_traceback), '\n' )
 			self.printMessage("-----------")
-			self.printMessage(aErrorMessage)
+			self.printMessage(anErrorMessage)
 			self.printMessage("-----------")
 			#self.setUnSensitiveMenu()
 
@@ -610,11 +596,9 @@ class MainWindow(OsogoWindow):
 		except:
 			import sys
 			import traceback
-			aErrorMessage = traceback.format_exception(sys.exc_type,sys.exc_value,sys.exc_traceback)
-			self.theMessageWindow.printMessage(aErrorMessage)
+			anErrorMessage = traceback.format_exception(sys.exc_type,sys.exc_value,sys.exc_traceback)
+			self.theMessageWindow.printMessage(anErrorMessage)
 			self.theRunningFlag = 0
-
-
 
 	# end of startSimulation
             
@@ -642,8 +626,8 @@ class MainWindow(OsogoWindow):
 		except:
 			import sys
 			import traceback
-			aErrorMessage = traceback.format_exception(sys.exc_type,sys.exc_value,sys.exc_traceback)
-			self.theMessageWindow.printMessage(aErrorMessage)
+			anErrorMessage = traceback.format_exception(sys.exc_type,sys.exc_value,sys.exc_traceback)
+			self.theMessageWindow.printMessage(anErrorMessage)
 
 		self.updateFundamentalWindows()
 
@@ -685,8 +669,8 @@ class MainWindow(OsogoWindow):
 		except:
 			import sys
 			import traceback
-			aErrorMessage = traceback.format_exception(sys.exc_type,sys.exc_value,sys.exc_traceback)
-			self.theMessageWindow.printMessage( aErrorMessage )
+			anErrorMessage = traceback.format_exception(sys.exc_type,sys.exc_value,sys.exc_traceback)
+			self.theMessageWindow.printMessage( anErrorMessage )
 			self.theRunningFlag = 0
 
 	# end of stepSimulation
@@ -903,7 +887,7 @@ class MainWindow(OsogoWindow):
 		# button is toggled to active 
 		# ------------------------------------------------------
 		#if button_obj.get_active() :
-		if self.theLoggerWindow.isShown == gtk.TRUE:
+		if self.theLoggerWindow.isShown == TRUE:
 
 			# --------------------------------------------------
 			# If instance of Logger Window Widget has destroyed,
@@ -922,8 +906,8 @@ class MainWindow(OsogoWindow):
 				self.theLoggerWindow['LoggerWindow'].hide()
 				self.theLoggerWindow['LoggerWindow'].show_all()
 
-			self['logger_togglebutton'].set_active(gtk.TRUE)
-			self['logger_window_menu'].set_active(gtk.TRUE)
+			self['logger_togglebutton'].set_active(TRUE)
+			self['logger_window_menu'].set_active(TRUE)
 
 		# ------------------------------------------------------
 		# button is toggled to non-active
@@ -944,8 +928,8 @@ class MainWindow(OsogoWindow):
 			else:
 				self.theLoggerWindow['LoggerWindow'].hide()
 
-			self['logger_togglebutton'].set_active(gtk.FALSE)
-			self['logger_window_menu'].set_active(gtk.FALSE)
+			self['logger_togglebutton'].set_active(FALSE)
+			self['logger_window_menu'].set_active(FALSE)
 
 	# end of toggleLoggerWindow
 
@@ -1002,7 +986,7 @@ class MainWindow(OsogoWindow):
 		# button is toggled to active 
 		# ------------------------------------------------------
 		#if button_obj.get_active() :
-		if self.theStepperWindow.isShown == gtk.TRUE:
+		if self.theStepperWindow.isShown == TRUE:
 
 			# --------------------------------------------------
 			# If instance of Stepper Window Widget has destroyed,
@@ -1022,8 +1006,8 @@ class MainWindow(OsogoWindow):
 				self.theStepperWindow['StepperWindow'].show_all()
 				self.theStepperWindow.update()
 
-			self['stepper_togglebutton'].set_active(gtk.TRUE)
-			self['stepper_window_menu'].set_active(gtk.TRUE)
+			self['stepper_togglebutton'].set_active(TRUE)
+			self['stepper_window_menu'].set_active(TRUE)
 
 		# ------------------------------------------------------
 		# button is toggled to non-active
@@ -1044,20 +1028,10 @@ class MainWindow(OsogoWindow):
 			else:
 				self.theStepperWindow['StepperWindow'].hide()
 
-			self['stepper_togglebutton'].set_active(gtk.FALSE)
-			self['stepper_window_menu'].set_active(gtk.FALSE)
+			self['stepper_togglebutton'].set_active(FALSE)
+			self['stepper_window_menu'].set_active(FALSE)
 
 	# end of toggleStepperWindow
-
-
-
-
-
-
-
-
-
-
 
 
 	# ---------------------------------------------------------------
@@ -1110,7 +1084,7 @@ class MainWindow(OsogoWindow):
 		# ------------------------------------------------------
 		# button or menu is toggled as active 
 		# ------------------------------------------------------
-		if self.theMessageWindow.isShown == gtk.FALSE:
+		if self.theMessageWindow.isShown == FALSE:
 
 			# --------------------------------------------------
 			# hide handlebox, resize window
@@ -1119,8 +1093,8 @@ class MainWindow(OsogoWindow):
 			self.resize_vertically(0)
 
 
-			self['message_togglebutton'].set_active(gtk.FALSE)
-			self['message_window_menu'].set_active(gtk.FALSE)
+			self['message_togglebutton'].set_active(FALSE)
+			self['message_window_menu'].set_active(FALSE)
 
 		# ------------------------------------------------------
 		# button or menu is toggled as non-active
@@ -1136,8 +1110,8 @@ class MainWindow(OsogoWindow):
 			else:
 			    self.resize_vertically(0)
 
-			self['message_togglebutton'].set_active(gtk.TRUE)
-			self['message_window_menu'].set_active(gtk.TRUE)
+			self['message_togglebutton'].set_active(TRUE)
+			self['message_window_menu'].set_active(TRUE)
 
 
 	# end of toggleMessageWindow
@@ -1153,7 +1127,7 @@ class MainWindow(OsogoWindow):
 	    self['scrolledwindow1'].set_size_request(self.MW_minimal_size[0],\
 		    self.MW_minimal_size[1])
 	    self.resize_vertically(self.MW_actual_size[1])
-	    self.MessageWindow_attached=gtk.TRUE
+	    self.MessageWindow_attached=TRUE
 
 	# ---------------------------------------------------------------
 	# MW_child_detached
@@ -1166,7 +1140,7 @@ class MainWindow(OsogoWindow):
 	    self['scrolledwindow1'].set_size_request(self.MW_actual_size[0],\
 		    self.MW_actual_size[1])
 	    self.resize_vertically(0)
-	    self.MessageWindow_attached=gtk.FALSE
+	    self.MessageWindow_attached=FALSE
 	        
 	# ---------------------------------------------------------------
 	# openAbout
@@ -1285,7 +1259,7 @@ class MainWindow(OsogoWindow):
 		# ------------------------------------------------------
 		# button is toggled to active 
 		# ------------------------------------------------------
-		if self.thePaletteWindow.isShown == gtk.TRUE:
+		if self.thePaletteWindow.isShown == TRUE:
 
 			if self.thePaletteWindow.getExist() == 0:
 				self.initializePaletteWindow()
@@ -1295,8 +1269,8 @@ class MainWindow(OsogoWindow):
 			self.thePaletteWindow.hide()
 			self.thePaletteWindow.show_all()
 
-			self['palette_togglebutton'].set_active(gtk.TRUE)
-			self['palette_window_menu'].set_active(gtk.TRUE)
+			self['palette_togglebutton'].set_active(TRUE)
+			self['palette_window_menu'].set_active(TRUE)
 
 		# ------------------------------------------------------
 		# button is toggled to non-active
@@ -1307,8 +1281,8 @@ class MainWindow(OsogoWindow):
 			else:
 				self.thePaletteWindow.hide()
 
-			self['palette_togglebutton'].set_active(gtk.FALSE)
-			self['palette_window_menu'].set_active(gtk.FALSE)
+			self['palette_togglebutton'].set_active(FALSE)
+			self['palette_window_menu'].set_active(FALSE)
         
 	# end of togglePaletteWindow
 
@@ -1364,7 +1338,7 @@ class MainWindow(OsogoWindow):
 		# ------------------------------------------------------
 		# button is toggled to active 
 		# ------------------------------------------------------
-		if self.theInterfaceWindow.isShown == gtk.TRUE:
+		if self.theInterfaceWindow.isShown == TRUE:
 
 			# --------------------------------------------------
 			# If instance of Interface Window Widget has destroyed,
@@ -1382,8 +1356,8 @@ class MainWindow(OsogoWindow):
 				self.theInterfaceWindow['InterfaceWindow'].hide()
 				self.theInterfaceWindow['InterfaceWindow'].show_all()
 
-			self['interface_togglebutton'].set_active(gtk.TRUE)
-			self['interface_window_menu'].set_active(gtk.TRUE)
+			self['interface_togglebutton'].set_active(TRUE)
+			self['interface_window_menu'].set_active(TRUE)
 
 		# ------------------------------------------------------
 		# button is toggled to non-active
@@ -1404,8 +1378,8 @@ class MainWindow(OsogoWindow):
 			else:
 				self.theInterfaceWindow['InterfaceWindow'].hide()
 
-			self['interface_togglebutton'].set_active(gtk.FALSE)
-			self['interface_window_menu'].set_active(gtk.FALSE)
+			self['interface_togglebutton'].set_active(FALSE)
+			self['interface_window_menu'].set_active(FALSE)
 
 	# end of toggleInterfaceListWindow
 
@@ -1465,54 +1439,54 @@ class MainWindow(OsogoWindow):
 		# -------------------------------------------
 		# checks buttons  ane menus
 		# -------------------------------------------
-		if self.getExist() == gtk.FALSE:
+		if self.getExist() == FALSE:
 			pass
 			#self.exit()
 		else:
 
 			# checks message button
-			if self.theMessageWindow.isShown == gtk.TRUE:
-				self['message_togglebutton'].set_active(gtk.TRUE)
-				self['message_window_menu'].set_active(gtk.TRUE)
+			if self.theMessageWindow.isShown == TRUE:
+				self['message_togglebutton'].set_active(TRUE)
+				self['message_window_menu'].set_active(TRUE)
 			else:
-				self['message_togglebutton'].set_active(gtk.FALSE)
-				self['message_window_menu'].set_active(gtk.FALSE)
+				self['message_togglebutton'].set_active(FALSE)
+				self['message_window_menu'].set_active(FALSE)
 
 			# checks logger button
-			if self.theLoggerWindow.isShown == gtk.TRUE:
-				self['logger_togglebutton'].set_active(gtk.TRUE)
-				self['logger_window_menu'].set_active(gtk.TRUE)
+			if self.theLoggerWindow.isShown == TRUE:
+				self['logger_togglebutton'].set_active(TRUE)
+				self['logger_window_menu'].set_active(TRUE)
 			else:
-				self['logger_togglebutton'].set_active(gtk.FALSE)
-				self['logger_window_menu'].set_active(gtk.FALSE)
+				self['logger_togglebutton'].set_active(FALSE)
+				self['logger_window_menu'].set_active(FALSE)
 
 			# checks stepper button
-			if self.theStepperWindow.isShown == gtk.TRUE:
-				self['stepper_togglebutton'].set_active(gtk.TRUE)
-				self['stepper_window_menu'].set_active(gtk.TRUE)
+			if self.theStepperWindow.isShown == TRUE:
+				self['stepper_togglebutton'].set_active(TRUE)
+				self['stepper_window_menu'].set_active(TRUE)
 			else:
-				self['stepper_togglebutton'].set_active(gtk.FALSE)
-				self['stepper_window_menu'].set_active(gtk.FALSE)
+				self['stepper_togglebutton'].set_active(FALSE)
+				self['stepper_window_menu'].set_active(FALSE)
 
 
 			# checks interface button
-			if self.theInterfaceWindow.isShown == gtk.TRUE :
-				self['interface_togglebutton'].set_active(gtk.TRUE)
-				self['interface_window_menu'].set_active(gtk.TRUE)
+			if self.theInterfaceWindow.isShown == TRUE :
+				self['interface_togglebutton'].set_active(TRUE)
+				self['interface_window_menu'].set_active(TRUE)
 			else:
-				self['interface_togglebutton'].set_active(gtk.FALSE)
-				self['interface_window_menu'].set_active(gtk.FALSE)
+				self['interface_togglebutton'].set_active(FALSE)
+				self['interface_window_menu'].set_active(FALSE)
 
 			if self.theStepperChecker:
 
 				# if palette button pressed
 				if self['palette_togglebutton'].get_active():
-					if self.thePaletteWindow.isShown == gtk.TRUE :
-						self['palette_togglebutton'].set_active(gtk.TRUE)
-						self['palette_window_menu'].set_active(gtk.TRUE)
+					if self.thePaletteWindow.isShown == TRUE :
+						self['palette_togglebutton'].set_active(TRUE)
+						self['palette_window_menu'].set_active(TRUE)
 					else:
-						self['palette_togglebutton'].set_active(gtk.FALSE)
-						self['palette_window_menu'].set_active(gtk.FALSE)
+						self['palette_togglebutton'].set_active(FALSE)
+						self['palette_window_menu'].set_active(FALSE)
 
 			# entity window
 			# detects the destroyed EntityWindows, and delete them from
@@ -1532,8 +1506,22 @@ class MainWindow(OsogoWindow):
 				del self.theEntityListWindowList[anIndex]
 
 
-	# end of updateFundamentalWindow
+		# When model file is loaded
+		if self.theSession.theModelName != "":
+			self.theStepperChecker = TRUE
 
+			self['start_button'].set_sensitive(TRUE)
+			self['stop_button'].set_sensitive(TRUE)
+			self['step_button'].set_sensitive(TRUE)
+			self['entitylist'].set_sensitive(TRUE)
+			self['palette_togglebutton'].set_sensitive(TRUE)
+			self['palette_window_menu'].set_sensitive(TRUE)
+			self['create_new_entity_list_menu'].set_sensitive(TRUE)
+			self['load_rule_menu'].set_sensitive(FALSE)
+			self['load_script_menu'].set_sensitive(FALSE)
+			self['save_model_menu'].set_sensitive(TRUE)
+
+	# end of updateFundamentalWindow
 
 
 # end of MainWindow
