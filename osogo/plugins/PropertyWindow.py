@@ -485,7 +485,11 @@ class PropertyWindow(OsogoPluginWindow):
         aSelectedProperty = self.theListStore.get_value( anIter, PROPERTY_COL )
         self.theSelectedFullPN = convertFullIDToFullPN( self.theFullID(),
                                                        aSelectedProperty )
-        self.__updateValue( aNewValue, anIter, VALUE_COL )
+        
+        # disable VariableReferenceList editing because of a bug when
+        # saving changes
+        if aSelectedProperty != 'VariableReferenceList':
+            self.__updateValue( aNewValue, anIter, VALUE_COL )
 
     
 
