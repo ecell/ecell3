@@ -15,7 +15,7 @@ Proc R Soc Lond B Biol Sci, Vol.261:319-324, Sep 1995.
 === Files and directories ===
 
 README:      This file
-droTest.em:  Model file(em file) for this model
+Drosophila.em:  Model file(em file) for this model
 *.cpp:        Process files(dm files) for this model
 
 
@@ -24,8 +24,8 @@ droTest.em:  Model file(em file) for this model
 
 1. (If necessary) Convert the .em file to .eml file.
 
-   % em2eml droTest.em
-   % ls droTest.eml
+   % ecell3-em2eml Drosophila.em
+   % ls Drosophila.eml
    droTest.eml
 
 
