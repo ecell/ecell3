@@ -4,6 +4,7 @@
 SUBDIRS = @ECELL_SUBDIR@
 
 EXTRA_DIST = autogen.sh\
+depcomp\
 test
 
 
@@ -42,15 +43,10 @@ doc-install:
 	rm -rf $(docdir)/*/CVS
 	rm -rf $(docdir)/*/*/CVS
 
-doc-all: doc-ps doc-pdf doc-html-archive
-
-doc-ps: doc
-	make -C ${DOXYGEN_DIR}/latex ps
-	cp ${DOXYGEN_DIR}/latex/refman.ps ${DOXYGEN_DIR}
-	make -C ${DOCBOOK_DIR} ps
+doc-all: doc-pdf doc-html-archive
 
 doc-pdf: doc
-	make -C ${DOXYGEN_DIR}/latex pdf
+	make -C ${DOXYGEN_DIR}/latex
 	cp ${DOXYGEN_DIR}/latex/refman.pdf ${DOXYGEN_DIR}
 	make -C ${DOCBOOK_DIR} pdf
 
