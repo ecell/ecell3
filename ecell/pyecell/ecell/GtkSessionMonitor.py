@@ -124,14 +124,10 @@ class GtkSessionMonitor(Session):
 		# -------------------------------------
 	
 		self.theMainWindow = aMainWindow
-	# ==========================================================================
-	def synchronize(self):
-		self.updateWindows()
-		while gtk.events_pending():
-			gtk.main_iteration_do()
+
 
 	# ==========================================================================
-	def GUI_interact(self):			#
+	def GUI_interact(self):	
 		"hands over controlto the user (gtk.mainloop())"
 
 		gtk.mainloop()
@@ -324,7 +320,8 @@ class GtkSessionMonitor(Session):
 		"""when time out, calls updates method()
 		Returns None
 		"""
-		self.updateWindows()
+		if not gtk.events_pending():
+			self.updateWindows()
 		self.theTimer = gtk.timeout_add( self.theUpdateInterval, self.__updateByTimeOut, 0 )
 
 
@@ -345,7 +342,7 @@ class GtkSessionMonitor(Session):
  	
 
 	# ==========================================================================
-	def setUpdateInterval(self, Secs):		#
+	def setUpdateInterval(self, Secs):
 		"plugins are refreshed every secs seconds"
 		self.theMainWindow.theUpdateInterval = Secs
 	
