@@ -135,9 +135,8 @@ LIBECS_DM_CLASS( FluxDistributionProcess, Process )
   ProcessVector theKnownProcessPtrVector;
   std::vector< QuasiDynamicFluxProcessPtr > theUnknownProcessPtrVector;
 
-  bool   theIrreversibleFlag;
-  Integer    theMatrixSize;
-  Real   Epsilon;
+  Integer theMatrixSize;
+  Real Epsilon;
 
 };
 
@@ -289,7 +288,9 @@ void FluxDistributionProcess::initialize()
   if( UnknownProcessList.size() > aVariableReferenceVector.size() )
     {
       theMatrixSize = UnknownProcessList.size();
-    }else{
+    }
+  else
+    {
       theMatrixSize = aVariableReferenceVector.size(); 
     }
 
@@ -387,7 +388,8 @@ void FluxDistributionProcess::initialize()
 
 void FluxDistributionProcess::fire()
 {
-  for( Integer i( 0 ); i < theKnownProcessPtrVector.size(); ++i )
+  ProcessVector::size_type aKnownProcessPtrVectorSize( theKnownProcessPtrVector.size() );
+  for( Integer i( 0 ); i < aKnownProcessPtrVectorSize; ++i )
     {
       gsl_vector_set( theKnownVelocityVector, i, theKnownProcessPtrVector[i]->getActivity() );
     }
@@ -395,7 +397,8 @@ void FluxDistributionProcess::fire()
   gsl_blas_dgemv( CblasNoTrans, 1.0, theSolutionMatrix, 
 		  theKnownVelocityVector, 0.0, theSolutionVector );
 
-  for( Integer i( 0 ); i < theUnknownProcessPtrVector.size(); ++i )
+  ProcessVector::size_type anUnknownProcessPtrVectorSize( theUnknownProcessPtrVector.size() );
+  for( Integer i( 0 ); i < anUnknownProcessPtrVectorSize; ++i )
     {
       theUnknownProcessPtrVector[i]->setFlux( gsl_vector_get( theSolutionVector, i ) ) ;
     }
