@@ -54,6 +54,12 @@ namespace libecs
     ; // do nothing
   }
 
+  DifferentialStepper::~DifferentialStepper()
+  {
+    ; // do nothing
+  }
+
+
   void DifferentialStepper::initialize()
   {
     Stepper::initialize();

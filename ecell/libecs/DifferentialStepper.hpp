@@ -105,7 +105,7 @@ namespace libecs
   public:
 
     DifferentialStepper();
-    virtual ~DifferentialStepper() {}
+    virtual ~DifferentialStepper();
 
     /**
        Override setStepInterval() for theTolerantStepInterval.
