@@ -9,12 +9,12 @@ __lastUpdate__ = '020911'
 __Memo__ = '\
 '
 
-__Todo__ = '\
-- How to use multi stepper? Only one stepper can be usable. [020708]\
-+ How to overwrite Property? Think about values. [020701] finished'
+__Todo__ = '''
+'''
 
 
-#------------------- window line ------------------------------------------------------------------#
+
+#------------------- window line ---------------------------------------------#
 
 from xml.dom import minidom
 

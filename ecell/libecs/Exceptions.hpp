@@ -113,7 +113,7 @@ public:\
   CLASSNAME( StringCref method, StringCref message = "" )\
     :  BASECLASS( method, message ) {}\
   virtual ~CLASSNAME() throw() {}\
-  virtual const char* const getClassName() const\
+  virtual StringLiteral getClassName() const\
     { return #CLASSNAME ; }\
 };\
 

@@ -45,6 +45,11 @@
 #include "System.hpp"
 
 
+
+
+
+
+
 namespace libecs
 {
 
@@ -56,9 +61,6 @@ namespace libecs
 
   DECLARE_TYPE( std::valarray<Real>, RealValarray );
 
-  DECLARE_CLASS( Euler1Stepper );
-  DECLARE_CLASS( RungeKutta4Stepper );
-  DECLARE_CLASS( AdaptiveStepsizeEuler1Stepper );
 
   /**
      Stepper class defines and governs computation unit in a model.
@@ -77,8 +79,8 @@ namespace libecs
     //    typedef std::pair<StepperPtr,Real> StepIntervalConstraint;
     //    DECLARE_VECTOR( StepIntervalConstraint, StepIntervalConstraintVector );
 
-    DECLARE_TYPE( VariableVector, VariableCache );
-    DECLARE_TYPE( ProcessVector, ProcessCache );
+    //    DECLARE_TYPE( VariableVector, VariableCache );
+    //    DECLARE_TYPE( ProcessVector,  ProcessCache );
 
     DECLARE_ASSOCVECTOR( StepperPtr, Real, std::less<StepperPtr>,
 			 StepIntervalConstraintMap );
@@ -136,6 +138,7 @@ namespace libecs
     void slave();
     void clear();
     void process();
+    void processNormal();
 
     void reset();
 
@@ -334,7 +337,7 @@ namespace libecs
       theCurrentTime = aTime;
     }
 
-    const UnsignedInt getVariableCacheIndex( VariablePtr aVariable );
+    const UnsignedInt findInVariableCache( VariablePtr aVariable );
 
     RealCptr getVelocityBufferElementPtr( UnsignedInt anIndex )
     {
@@ -357,8 +360,10 @@ namespace libecs
 
     StepIntervalConstraintMap theStepIntervalConstraintMap;
 
-    VariableCache        theVariableCache;
-    ProcessCache          theProcessCache;
+    VariableVector        theVariableCache;
+    ProcessVector         theProcessCache;
+
+    ProcessVectorConstIterator theFirstNormalProcess;
 
     RealValarray theValueBuffer;
     RealValarray theVelocityBuffer;
@@ -386,6 +391,47 @@ namespace libecs
   };
 
 
+  class FixedEuler1Stepper
+    :
+    public Stepper
+  {
+  public:
+    
+    FixedEuler1Stepper();
+    virtual ~FixedEuler1Stepper() {}
+    
+    virtual void step();
+
+
+    static StepperPtr createInstance() { return new FixedEuler1Stepper; }\
+    virtual StringLiteral getClassName() const \
+    { return "FixedEuler1Stepper" ; }\
+  };
+
+
+  class FixedRungeKutta4Stepper
+    : 
+    public Stepper
+  {
+
+  public:
+
+    FixedRungeKutta4Stepper();
+    virtual ~FixedRungeKutta4Stepper() {}
+
+    static StepperPtr createInstance() { return new FixedRungeKutta4Stepper; }
+
+    virtual void step();
+
+    virtual StringLiteral getClassName() const 
+    { return "FixedRungeKutta4Stepper"; }
+
+
+  protected:
+
+  };
+
+
   class Euler1Stepper
     :
     public Stepper
@@ -396,81 +442,41 @@ namespace libecs
     Euler1Stepper();
     virtual ~Euler1Stepper() {}
 
-    virtual void step();
-
     static StepperPtr createInstance() { return new Euler1Stepper; }
 
-    virtual StringLiteral getClassName() const  { return "Euler1Stepper"; }
- 
+    virtual void initialize();
+    virtual void step();
+
+    virtual StringLiteral getClassName() const { return "Euler1Stepper"; }
+
+  protected:
+
   };
 
-
-  class RungeKutta4Stepper
+  class Midpoint2Stepper
     : 
     public Stepper
   {
 
   public:
 
-    RungeKutta4Stepper();
-    virtual ~RungeKutta4Stepper() {}
+    Midpoint2Stepper();
+    virtual ~Midpoint2Stepper() {}
 
-    static StepperPtr createInstance() { return new RungeKutta4Stepper; }
-
-    virtual void step();
-
-    virtual StringLiteral getClassName() const 
-    { return "RungeKutta4Stepper"; }
-
-
-  protected:
-
-  };
-
-  class AdaptiveStepsizeEuler1Stepper
-    :
-    public Stepper
-  {
-
-  public:
-
-    AdaptiveStepsizeEuler1Stepper();
-    virtual ~AdaptiveStepsizeEuler1Stepper() {}
-
-    static StepperPtr createInstance() { return new AdaptiveStepsizeEuler1Stepper; }
-
-    virtual void initialize();
-    virtual void step();
-
-    virtual StringLiteral getClassName() const { return "AdaptiveStepsizeEuler1Stepper"; }
-
-  protected:
-
-  };
-
-  class AdaptiveStepsizeMidpoint2Stepper
-    : 
-    public Stepper
-  {
-
-  public:
-
-    AdaptiveStepsizeMidpoint2Stepper();
-    virtual ~AdaptiveStepsizeMidpoint2Stepper() {}
-
-    static StepperPtr createInstance() { return new AdaptiveStepsizeMidpoint2Stepper; }
+    static StepperPtr createInstance() { return new Midpoint2Stepper; }
 
     virtual void initialize();
     virtual void step();
 
     virtual StringLiteral getClassName() const 
-    { return "AdaptiveStepsizeMidpoint2Stepper"; }
+    { return "Midpoint2Stepper"; }
 
   protected:
 
     RealValarray theK1;
     RealValarray theErrorEstimate;
   };
+
 
   class CashKarp4Stepper
     : 

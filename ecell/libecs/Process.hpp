@@ -69,10 +69,36 @@ namespace libecs
     public:
       bool operator()( ProcessPtr aLhs, ProcessPtr aRhs ) const
       {
-	return ( aLhs->getPriority() < aRhs->getPriority() );
+	return compare( aLhs->getPriority(), aRhs->getPriority() );
       }
-    };
 
+      bool operator()( ProcessPtr aLhs, const Int aRhs ) const
+      {
+	return compare( aLhs->getPriority(), aRhs );
+      }
+
+      bool operator()( const Int aLhs, ProcessPtr aRhs ) const
+      {
+	return compare( aLhs, aRhs->getPriority() );
+      }
+
+    private:
+
+      // if statement can be faster than returning an expression directly
+      inline static bool compare( const Int aLhs, const Int aRhs )
+      {
+	if( aLhs < aRhs )
+	  {
+	    return true;
+	  }
+	else
+	  {
+	    return false;
+	  }
+      }
+
+
+    };
 
     /** 
 	A function type that returns a pointer to Process.  

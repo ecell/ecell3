@@ -105,8 +105,7 @@ namespace libecs
 	 i != theStepperVector.end(); ++i )
       {
 	StepperPtr aStepperPtr( *i );
-	const UnsignedInt anIndex( aStepperPtr->
-				   getVariableCacheIndex( this ) );
+	const UnsignedInt anIndex( aStepperPtr->findInVariableCache( this ) );
 	theVelocityVector.push_back( aStepperPtr->
 				     getVelocityBufferElementPtr( anIndex ) );
       }
