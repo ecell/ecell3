@@ -208,7 +208,7 @@ namespace libecs
 
     void addValue( const Real aValue ) const
     {
-      addValue( aValue );
+      theVariablePtr->addValue( aValue );
     }
 
     const Real getConcentration() const
