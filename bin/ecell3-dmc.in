@@ -40,6 +40,7 @@ cat << EOT_HELP
 
 ecell3-dmc options:
         --no-stdinclude          Don't set standard include file path.
+        --dmcompile              Specify dmcompile path.
         -v or --verbose   	 Be verbose.
         -h or --help		 Print this message.
 
@@ -97,6 +98,7 @@ fi
 while [ -n "$(echo $1 | grep '-')" ]; do
     case "$1" in
 	--no-stdinclude) NO_STDINCLUDE=yes ; shift ;;
+	--dmcompile) DMCOMPILE=$2 ; shift 2 ;;
 	-v|--verbose) VERBOSE=yes ; shift ;;
 	-h|--help) help ; exit 0 ;;
 	*) echo "Invarid Option! " ; help ; exit 1 ;;
