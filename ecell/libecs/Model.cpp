@@ -248,7 +248,7 @@ namespace libecs
     if( aSystem->getStepper() == NULLPTR )
       {
 	throw InitializationFailed( __PRETTY_FUNCTION__, 
-				    "No stepper is connected with System [" +
+				    "No stepper is connected with [" +
 				    aSystem->getFullID().getString() + "]." );
       }
 
@@ -263,7 +263,6 @@ namespace libecs
   void Model::initialize()
   {
     checkStepper( getRootSystem() );
-
 
     FOR_ALL_SECOND( StepperMap, theStepperMap, 
 		    initialize );
