@@ -32,6 +32,14 @@ print 'getMessage()...'
 tuple = s.getMessage( 'Substance:/:A', 'quantity' )
 print 'got key=%s body=%s' % (tuple[0], tuple[1])
 
+print 'id...'
+tuple = s.getMessage( 'System:/:CELL', 'id' )
+print 'got key=%s body=%s' % (tuple[0], tuple[1])
+
+print 'substance list...'
+tuple = s.getMessage( 'System:/:/', 'substanceList' )
+print 'got key=%s body=%s' % (tuple[0], tuple[1])
+
 #print 'getMessage()...'
 #tuple = s.getMessage( 'System:/:CELL', 'id' )
 #print 'got key=%s body=%s' % (tuple[0], tuple[1])
