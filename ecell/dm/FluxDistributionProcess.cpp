@@ -57,8 +57,11 @@ LIBECS_DM_CLASS( FluxDistributionProcess, Process )
   gsl_matrix* theKnownMatrix;
   gsl_matrix* theUnknownMatrix;
   gsl_matrix* theInverseMatrix;
+  gsl_matrix* theSolutionMatrix;
+
   gsl_matrix* theTmpInverseMatrix;
   gsl_matrix* theTmpUnknownMatrix;
+
 
   gsl_vector* theKnownVelocityVector;
   gsl_vector* theSolutionVector;
@@ -84,6 +87,7 @@ FluxDistributionProcess::FluxDistributionProcess()
   theKnownMatrix( NULLPTR ),
   theUnknownMatrix( NULLPTR ),
   theInverseMatrix( NULLPTR ),
+  theSolutionMatrix( NULLPTR ),
   theTmpInverseMatrix( NULLPTR ),
   theTmpUnknownMatrix( NULLPTR ),
   theKnownVelocityVector( NULLPTR ),
@@ -99,6 +103,7 @@ FluxDistributionProcess::~FluxDistributionProcess()
   gsl_matrix_free( theUnknownMatrix );
   gsl_matrix_free( theKnownMatrix );
   gsl_matrix_free( theInverseMatrix );
+  gsl_matrix_free( theSolutionMatrix );
   gsl_matrix_free( theTmpInverseMatrix );
   gsl_matrix_free( theTmpUnknownMatrix );
   gsl_vector_free( theKnownVelocityVector );
@@ -184,6 +189,7 @@ void FluxDistributionProcess::initialize()
       gsl_matrix_free( theUnknownMatrix );
       gsl_matrix_free( theKnownMatrix );
       gsl_matrix_free( theTmpInverseMatrix );
+      gsl_matrix_free( theSolutionMatrix );
       gsl_matrix_free( theTmpUnknownMatrix );
       
       gsl_vector_free( theKnownVelocityVector );
@@ -193,6 +199,16 @@ void FluxDistributionProcess::initialize()
   
   theUnknownMatrix = gsl_matrix_calloc( theMatrixSize, theMatrixSize );
   theKnownMatrix = gsl_matrix_calloc( theMatrixSize, KnownProcessList.asPolymorphVector().size() );
+
+  if( KnownProcessList.asPolymorphVector().size() < theMatrixSize )
+    {
+      theSolutionMatrix = gsl_matrix_calloc( theMatrixSize, KnownProcessList.asPolymorphVector().size() );    
+    }
+  else
+    {
+      theSolutionMatrix = gsl_matrix_calloc( theMatrixSize, theMatrixSize );
+    }
+
   theTmpInverseMatrix = gsl_matrix_calloc( theMatrixSize, theMatrixSize );
   theTmpUnknownMatrix = gsl_matrix_calloc( theMatrixSize, theMatrixSize );
   theKnownVelocityVector = gsl_vector_calloc( ( KnownProcessList.asPolymorphVector() ).size() );
@@ -266,6 +282,9 @@ void FluxDistributionProcess::initialize()
 
   theInverseMatrix = generateInverse( theUnknownMatrix , theMatrixSize );
   
+  gsl_blas_dgemm( CblasNoTrans, CblasNoTrans, -1.0, theInverseMatrix, 
+		  theKnownMatrix, 0.0, theSolutionMatrix );
+
 }  
 
 void FluxDistributionProcess::process()
@@ -276,12 +295,9 @@ void FluxDistributionProcess::process()
       gsl_vector_set( theKnownVelocityVector, i, theKnownProcessPtrVector[i]->getActivity() );
     }
   
-  gsl_blas_dgemv( CblasNoTrans, -1.0, theKnownMatrix, theKnownVelocityVector,
-		  0.0, theFluxVector );
-  
-  gsl_blas_dgemv( CblasNoTrans, 1.0, theInverseMatrix, theFluxVector, 0.0,
-		  theSolutionVector );
-  
+  gsl_blas_dgemv( CblasNoTrans, 1.0, theSolutionMatrix, 
+		  theKnownVelocityVector, 0.0, theSolutionVector );
+
   if ( theIrreversibleFlag )
     {
       bool aFlag( false );
@@ -310,10 +326,14 @@ void FluxDistributionProcess::process()
 	  
 	  theTmpInverseMatrix = generateInverse( theTmpUnknownMatrix,
 						 theMatrixSize );    
-	  gsl_blas_dgemv( CblasNoTrans, 1.0, theTmpInverseMatrix, theFluxVector, 0.0, theSolutionVector );
+	  gsl_blas_dgemm( CblasNoTrans, CblasNoTrans, -1.0, 
+			  theTmpInverseMatrix, 
+			  theKnownMatrix, 0.0, theSolutionMatrix );
+	  gsl_blas_dgemv( CblasNoTrans, 1.0, theSolutionMatrix, 
+			  theKnownVelocityVector, 0.0, theSolutionVector );
 	}	
     }
-  
+
   for( Int i( 0 ); i < ( UnknownProcessList.asPolymorphVector() ).size(); i++ )
     {
       theUnknownProcessPtrVector[i]->setFlux( gsl_vector_get( theSolutionVector, i ) ) ;
