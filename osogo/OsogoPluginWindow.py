@@ -352,15 +352,17 @@ class OsogoPluginWindow(PluginWindow):
 	# This method throws exceptions.
 	# ---------------------------------------------------------------
 	def createLogger( self, *objects ):
-
+		aLogPolicy = self.theSession.getLogPolicyParameters()
 		try:
 			for aFullPN in self.theFullPNList():
+
 				aFullPNString = createFullPNString(aFullPN)
 			
 				# creates loggerstub and call its create method.
 				aLoggerStub = self.theSession.createLoggerStub( aFullPNString )
 				if aLoggerStub.exists() == FALSE:
 					aLoggerStub.create()
+					aLoggerStub.setLoggerPolicy( aLogPolicy )
 
 		except:
 

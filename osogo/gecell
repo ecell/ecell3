@@ -8,5 +8,4 @@ OSOGOPATH = os.environ['OSOGOPATH']
 PYTHONPATH = os.environ['PYTHONPATH']
 os.environ['PYTHONPATH'] = OSOGOPATH + os.pathsep + PYTHONPATH
 
-os.popen('python' + ' ' + '\"' + OSOGOPATH + '\"' + os.sep + 'opengui.py' + ' \"' + string.join( sys.argv[1:], '\" \"' ) + '\"')
-
+os.system('python' + ' ' + '\"' + OSOGOPATH + '\"' + os.sep + 'opengui.py' + ' \"' + string.join( sys.argv[1:], '\" \"' ) + '\"')

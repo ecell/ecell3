@@ -44,6 +44,7 @@ from ecell.ecssupport import *
 
 from ecell.DataFileManager import *
 from ecell.ECDDataFile import *
+from LoggingPolicy import *
 
 # ---------------------------------------------------------------
 # This is LoggerWindow class .
@@ -125,9 +126,7 @@ class LoggerWindow(OsogoWindow):
 		 		#'on_exit_activate' : self.closeWindow,
 
 				# popup
-				'button_press_event'  : self.popupMenu,
-
-			})
+				'button_press_event'  : self.popupMenu		})
 
 
 	# end of openWindow
@@ -416,17 +415,25 @@ class LoggerWindow(OsogoWindow):
 			if anEvent.button == 3:
 				self.thePopupMenu.popup( None, None, None, 1, 0 )
 
+		return gtk.FALSE
+
 	# end of poppuMenu
 
 
-	def deleteItem( self, anObject ):
-		#print "deleteIetm -- s "
-		#print anObject
-		#for aSelectedFullPNString in self.theSelectedPropertyName():
-		#	print aSelectedFullPNString
-		#	self.theSession.getLoggerList().remove( aSelectedFullPNString )
-		#print "deleteIetm -- e "
-		pass
+	def editPolicy( self, *args ):
+		if len(self.aSelectedPropertyNameList) == 1:
+		# get loggerpolicy
+			aLoggerStub = self.theSession.createLoggerStub( self.aSelectedPropertyNameList[0] )
+			aLogPolicy = aLoggerStub.getLoggerPolicy()
+		else:
+			aLogPolicy = [0,0,0,0]
+		newLogPolicy = self.theSession.openLogPolicyWindow( aLogPolicy, "Set log policy for selected loggers" )
+		if newLogPolicy == None:
+			return
+		for aFullPN in self.aSelectedPropertyNameList:
+			aLoggerStub = self.theSession.createLoggerStub( aFullPN )
+			aLoggerStub.setLoggerPolicy( newLogPolicy )
+		
 
 	# ==============================================================================
 	def saveDataFile( self, aFullPN, aDirectory = None, anInterval = None, aStartTime = None, anEndTime = None, fileType = 'ecd' ):
@@ -588,7 +595,7 @@ class LoggerWindow(OsogoWindow):
 # PopupMenu -> gtk.Menu
 # ---------------------------------------------------------------
 class PopupMenu( gtk.Menu ):
-
+	EDIT_POLICY = 'edit policy'
 	# ---------------------------------------------------------------
 	# Constructor
 	#
@@ -616,26 +623,16 @@ class PopupMenu( gtk.Menu ):
 		# ------------------------------------------
 		self.theMenuItem = {}
 
-		self.theDeleteString = 'delete this item'
-		self.theMenuItem[self.theDeleteString]= gtk.MenuItem(self.theDeleteString)
-		self.theMenuItem[self.theDeleteString].connect('activate', self.theParent.deleteItem )
-		self.theMenuItem[self.theDeleteString].set_name(self.theDeleteString)
-		self.append( self.theMenuItem[self.theDeleteString] )
+		editPolicy = gtk.MenuItem(self.EDIT_POLICY)
+		editPolicy.connect('activate', self.theParent.editPolicy )
+		editPolicy.set_name(self.EDIT_POLICY)
+		self.append( editPolicy )
 
-		self.theMenuItem[self.theDeleteString].set_sensitive(0)
 
-		aMaxStringLength = len(self.theDeleteString)
-
-		# ------------------------------------------
-		# caliculates size of menu and sets it to itself
-		# ------------------------------------------
-		self.theWidth = (aMaxStringLength+1)*8
-		self.theHeight = (aMenuSize+1)*21 + 3
-		self.set_size_request( self.theWidth, self.theHeight )
 
 	def popup(self, pms, pmi, func, button, time):
 		gtk.Menu.popup(self, pms, pmi, func, button, time)
-		self.show_all(self)
+		self.show_all()
 
 
 # end of PopupMenu

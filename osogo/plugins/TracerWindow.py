@@ -151,15 +151,14 @@ class TracerWindow( OsogoPluginWindow ):
 		return True
 		
 	def create_logger(self,fpnlist):
-		LoggerMinimumInterval=float(self.theSession.getParameter('logger_min_interval'))
+		logPolicy = self.theSession.getLogPolicyParameters()
 		for fpn in fpnlist:
 		    if not self.haslogger(fpn):
 			try:
-			    self.theSession.theSimulator.createLogger(fpn)
+			    self.theSession.theSimulator.createLogger(fpn, logPolicy)
 			except:
 			    self.theSession.message('Error while creating logger\n logger for '+ fpn + ' not created\n')
 			else:
-			    self.theSession.theSimulator.setLoggerMinimumInterval(fpn,LoggerMinimumInterval)
 			    self.theSession.message("Logger created for "+fpn)
 		self.check_history_button()
 		self.thePluginManager.updateFundamentalWindows()

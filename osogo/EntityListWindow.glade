@@ -2,6 +2,7 @@
 <!DOCTYPE glade-interface SYSTEM "http://glade.gnome.org/glade-2.0.dtd">
 
 <glade-interface>
+<requires lib="gnome"/>
 
 <widget class="GtkWindow" id="EntityListWindow">
   <property name="visible">True</property>
@@ -12,9 +13,6 @@
   <property name="resizable">True</property>
   <property name="destroy_with_parent">False</property>
   <property name="icon">icon_entity.png</property>
-  <property name="skip_taskbar_hint">False</property>
-  <property name="skip_pager_hint">False</property>
-  <property name="type_hint">GDK_WINDOW_TYPE_HINT_NORMAL</property>
 
   <child>
     <widget class="GtkVBox" id="vbox58">
@@ -172,6 +170,7 @@
 	  <child>
 	    <widget class="GtkButton" id="logger_button">
 	      <property name="visible">True</property>
+	      <property name="sensitive">False</property>
 	      <property name="tooltip" translatable="yes">Create logger about your selected FullPN</property>
 	      <property name="can_focus">True</property>
 	      <property name="label" translatable="yes">Create Logger</property>

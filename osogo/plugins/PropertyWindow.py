@@ -32,8 +32,12 @@ class PropertyWindow(OsogoPluginWindow):
 		# calls superclass's constructor
 		OsogoPluginWindow.__init__( self, aDirName, aData, aPluginManager, aRoot )
 		self.theStatusBarWidget = None
-
+		self.theParent = None
 	# end of __init__
+
+	def setParent ( self, aParent ):
+		self.theParent = aParent
+
 
 	def openWindow( self ):
 		#self.openWindow()
@@ -41,7 +45,7 @@ class PropertyWindow(OsogoPluginWindow):
 		# sets handlers
 		self.addHandlers( { \
 		      # property tree
-		      'cursor_changed'                        : self.__selectProperty,
+		      'cursor_changed'                        : self.__selectProperty2,
 		      'on_property_clist_button_press_event'  : self.__popupMenu,
 		      # button
 		      'on_update_button_clicked'              : self.__updateValue })
@@ -81,7 +85,9 @@ class PropertyWindow(OsogoPluginWindow):
 
 		# initializes statusbar
 		self.theStatusBarWidget = self['statusbar']
-
+		self.theTextView = self['textview']
+		self.textBuffer = gtk.TextBuffer()
+		self.theTextView.set_buffer( self.textBuffer )
 		if self.theRawFullPNList == ():
 			return
                 self.setIconList(
@@ -310,6 +316,9 @@ class PropertyWindow(OsogoPluginWindow):
 			    self.thePropertyListStore.set_value(iter,cntr,valueitem)
 			    cntr+=1
 
+		self.textBuffer.set_text('')
+		self['textview'].set_sensitive( gtk.FALSE )
+
 	# end of __updatePropertyList
 
 
@@ -325,7 +334,7 @@ class PropertyWindow(OsogoPluginWindow):
 		# ------------------------------------
 		# gets inputted value from text field
 		# ------------------------------------
-		aValue = self['value_entry'].get_text()
+		aValue = self.textBuffer.get_text( self.textBuffer.get_start_iter(), self.textBuffer.get_end_iter())
 
 		# ------------------------------------
 		# gets selected number
@@ -374,6 +383,7 @@ class PropertyWindow(OsogoPluginWindow):
 					if self['statusbar'] != None:
 						self['statusbar'].push(1,anErrorMessage)
 					anErrorWindow = ConfirmWindow(OK_MODE,anErrorMessage,anErrorTitle)
+					self.textBuffer.set_text(str(aPreValue))
 					return None
 
 			# ------------------------------------
@@ -388,7 +398,7 @@ class PropertyWindow(OsogoPluginWindow):
 					import traceback
 					anErrorMessage = string.join( traceback.format_exception( \
 			    		sys.exc_type,sys.exc_value,sys.exc_traceback), '\n' )
-					self.theSession.message("-----An error happens.-----")
+					self.theSession.message("-----An error happened.-----")
 					self.theSession.message(anErrorMessage)
 					self.theSession.message("---------------------------")
 
@@ -398,6 +408,7 @@ class PropertyWindow(OsogoPluginWindow):
 					if self['statusbar'] != None:
 						self['statusbar'].push(1,anErrorMessage)
 					anErrorWindow = ConfirmWindow(OK_MODE,anErrorMessage,anErrorTitle)
+					self.textBuffer.set_text(str(aPreValue))
 					return None
 
 			# ------------------------------------
@@ -422,6 +433,7 @@ class PropertyWindow(OsogoPluginWindow):
 					if self['statusbar'] != None:
 						self['statusbar'].push(1,anErrorMessage)
 					anErrorWindow = ConfirmWindow(OK_MODE,anErrorMessage,anErrorTitle)
+					self.textBuffer.set_text(str(aPreValue))
 					return None
 
 
@@ -446,7 +458,7 @@ class PropertyWindow(OsogoPluginWindow):
 			if self['statusbar'] != None:
 				self['statusbar'].push(1,anErrorMessage)
 			anErrorWindow = ConfirmWindow(OK_MODE,anErrorMessage,anErrorTitle)
-
+			self.textBuffer.set_text(str(aPreValue))
 		else:
 
 			self.__updatePropertyList()
@@ -478,6 +490,8 @@ class PropertyWindow(OsogoPluginWindow):
 		# When selected row number is none, do nothing
 		if self.theSelectedIter == None:
 			self.theSelectedFullPN = ''
+			self['textview'].set_sensitive(FALSE)
+			self.textBuffer.set_text('')
 			return None
 
 		# ---------------------------
@@ -491,7 +505,7 @@ class PropertyWindow(OsogoPluginWindow):
 		# ---------------------------
 		anEntityStub = EntityStub( self.theSession.theSimulator, createFullIDString(self.theFullID()) )
 		aValue = anEntityStub.getProperty( aSelectedProperty )
-		self['value_entry'].set_text( str(aValue) )
+		self.textBuffer.set_text( str(aValue) )
 
 		# ---------------------------
 		# sets sensitive of value entry
@@ -500,12 +514,16 @@ class PropertyWindow(OsogoPluginWindow):
 		aSetable = self.thePropertyListStore.get_value(self.theSelectedIter,SETTABLE_COL)
 
 		if aSetable == decodeAttribute(TRUE):
-			self['value_entry'].set_sensitive(TRUE)
+			self['textview'].set_sensitive(TRUE)
 			self['update_button'].set_sensitive(TRUE)
 		else:
-			self['value_entry'].set_sensitive(FALSE)
+			self['textview'].set_sensitive(FALSE)
 			self['update_button'].set_sensitive(FALSE)
 
+	def __selectProperty2(self, anObject):
+		self.__selectProperty( anObject )
+		if self.theParent != None:
+			self.theParent.selectPropertyName()
 
 	# end of selectedProperty
 

@@ -7,7 +7,7 @@ import gtk
 from ecell.ecssupport import *
 import gobject
 
-
+import operator
 import string
 import copy
 
@@ -190,7 +190,7 @@ class EntityListWindow(OsogoWindow):
 
 		aPropertyWindowTopVBox = self.thePropertyWindow['top_frame']
 		self['property_area'].add( aPropertyWindowTopVBox )
-		self.thePropertyWindow['property_clist'].connect( 'select_cursor_row', self.selectPropertyName )
+		self.thePropertyWindow.setParent( self )
 
 
 	# ====================================================================
@@ -456,6 +456,7 @@ class EntityListWindow(OsogoWindow):
 
 			aFullPN =  convertFullIDToFullPN(aSystemFullID) 
 			self.thePropertyWindow.setRawFullPNList( [convertFullIDToFullPN(aSystemFullID)] )
+		self.checkCreateLoggerButton()
 
 	# ========================================================================
 	def updateEntityList( self, aSelectedSystemIter ):
@@ -470,6 +471,7 @@ class EntityListWindow(OsogoWindow):
 			self.listEntity( 'Process', aSystemFullID )
 		else:
 			self.listEntity( anEntityTypeString, aSystemFullID )
+
 
 	# ========================================================================
 	# create list of Entity tree
@@ -495,6 +497,25 @@ class EntityListWindow(OsogoWindow):
 		aSelection.selected_foreach(self.entity_select_func)
 		if len(self.theSelectedFullPNList)>0:
 			self.thePropertyWindow.setRawFullPNList( [self.theSelectedFullPNList[0]] )
+		self.checkCreateLoggerButton()
+
+	# ========================================================================
+	def	checkCreateLoggerButton(self):
+		isSensitive = gtk.FALSE
+		loggerList = self.theSession.getLoggerList()
+		rawList = self.__getSelectedRawFullPNList()
+		if rawList != None:
+			for aFullPN in rawList:
+				if aFullPN[3] == '':
+					aFullPN = self.thePropertyWindow.supplementFullPN( aFullPN )
+				aFullPNString = createFullPNString( aFullPN )
+				aValue = self.theSession.theSimulator.getEntityProperty( aFullPNString )
+				if not operator.isNumberType( aValue ):
+					continue
+				if aFullPNString not in loggerList:
+					isSensitive = gtk.TRUE
+					break
+		self['logger_button'].set_sensitive( isSensitive )
 
 	# ========================================================================
 	def entity_select_func(self,tree,path,iter):
@@ -678,12 +699,10 @@ class EntityListWindow(OsogoWindow):
 
 		if len(self.theSelectedFullPNList) == 0:
 			aSelectedSystemIter = self['system_tree'].get_selection().get_selected()[1]
-			if aSelectedSystemIter == None:
-				return None
-
-			key=str(self.theSysTreeStore.get_path(aSelectedSystemIter))
-			aSystemFullID = self.theSysTreeStore.get_data( key )
-			self.theSelectedFullPNList = [(aSystemFullID[0],aSystemFullID[1],aSystemFullID[2],'')]
+			if aSelectedSystemIter != None:
+				key=str(self.theSysTreeStore.get_path(aSelectedSystemIter))
+				aSystemFullID = self.theSysTreeStore.get_data( key )
+				self.theSelectedFullPNList = [(aSystemFullID[0],aSystemFullID[1],aSystemFullID[2],'')]
 
 
 		# -------------------------------------------------------------------
@@ -698,49 +717,49 @@ class EntityListWindow(OsogoWindow):
 		# with selected property
 		# ----------------------------------------------------------------
 		else:  # if(1)
+			return [self.thePropertyWindow.getSelectedFullPN()]
 
-			aSpecifiedProperty = self.thePropertyWindow.getSelectedFullPN()[PROPERTY]
-			# buffer list for FullPN that doen not have specified property aNoPropertyFullIDList = []
-			aSelectedFullPNListWithSpecified = []
-			aNoPropertyFullIDList = []
-
-			for aSelectedFullPN in self.theSelectedFullPNList:
-				aFullID = convertFullPNToFullID(aSelectedFullPN) 
-				aFullIDString = createFullIDString( aFullID )
-				anEntityStub = EntityStub(self.theSession.theSimulator,aFullIDString)
-				aPropertyExistsFlag = FALSE
-				for aProperty in anEntityStub.getPropertyList():
-					if aProperty == aSpecifiedProperty:
-						aFullPN = convertFullIDToFullPN( aFullID, aSpecifiedProperty )
-						aSelectedFullPNListWithSpecified.append( aFullPN )
-						aPropertyExistsFlag = TRUE
-						break
-				if aPropertyExistsFlag == FALSE:
-					aNoPropertyFullIDList.append( aFullIDString )
-
-			# When some selected Entity does not have specified property,
-			# shows confirmWindow and does not create plugin window.
-			if len(aNoPropertyFullIDList) != 0:
-
-				# creates message
-				aMessage = ''
-				# one entity
-				if len(aNoPropertyFullIDList) == 1:
-					aMessage += ' The following Entity does not have %s \n' %aSpecifiedProperty
-				# entities
-				else:
-					aMessage += ' The following Entities do not have %s \n' %aSpecifiedProperty
-
-				for aNoPropertyFullIDString in aNoPropertyFullIDList:
-					aMessage += aNoPropertyFullIDString + '\n'
-
-				# print message to message 
-				aDialog = ConfirmWindow(OK_MODE,aMessage,'Error!')
-				return None
-
-			# creates plugin window
-			#self.thePluginManager.createInstance( aPluginWindowType, aSelectedFullPNListWithSpecified )
-			return aSelectedFullPNListWithSpecified
+#			aSpecifiedProperty = self.thePropertyWindow.getSelectedFullPN()[PROPERTY]
+#			# buffer list for FullPN that doen not have specified property aNoPropertyFullIDList = []
+#			aSelectedFullPNListWithSpecified = []
+#			aNoPropertyFullIDList = []
+##			for aSelectedFullPN in self.theSelectedFullPNList:
+#				aFullID = convertFullPNToFullID(aSelectedFullPN) 
+#				aFullIDString = createFullIDString( aFullID )
+#				anEntityStub = EntityStub(self.theSession.theSimulator,aFullIDString)
+#				aPropertyExistsFlag = FALSE
+#				for aProperty in anEntityStub.getPropertyList():
+#					if aProperty == aSpecifiedProperty:
+#						aFullPN = convertFullIDToFullPN( aFullID, aSpecifiedProperty )
+#						aSelectedFullPNListWithSpecified.append( aFullPN )
+#						aPropertyExistsFlag = TRUE
+#						break
+#				if aPropertyExistsFlag == FALSE:
+#					aNoPropertyFullIDList.append( aFullIDString )
+#
+#			# When some selected Entity does not have specified property,
+#			# shows confirmWindow and does not create plugin window.
+#			if len(aNoPropertyFullIDList) != 0:
+#
+#				# creates message
+#				aMessage = ''
+#				# one entity
+#				if len(aNoPropertyFullIDList) == 1:
+#					aMessage += ' The following Entity does not have %s \n' %aSpecifiedProperty
+#				# entities
+#				else:
+#					aMessage += ' The following Entities do not have %s \n' %aSpecifiedProperty
+#
+#				for aNoPropertyFullIDString in aNoPropertyFullIDList:
+#					aMessage += aNoPropertyFullIDString + '\n'
+#
+#				# print message to message 
+#				aDialog = ConfirmWindow(OK_MODE,aMessage,'Error!')
+#				return None
+#
+#			# creates plugin window
+#			#self.thePluginManager.createInstance( aPluginWindowType, aSelectedFullPNListWithSpecified )
+#			return aSelectedFullPNListWithSpecified
 
 
 
@@ -766,7 +785,7 @@ class EntityListWindow(OsogoWindow):
 			aPluginWindowType = self['plugin_optionmenu'].get_children()[0].get()
 
 		else:
-			raise TypeErrir("%s must be gtk.MenuItem or gtk.Button" %str(type(arg[0])))
+			raise TypeError("%s must be gtk.MenuItem or gtk.Button" %str(type(arg[0])))
 
 		aSelectedRawFullPNList = self.__getSelectedRawFullPNList()
 
@@ -794,6 +813,7 @@ class EntityListWindow(OsogoWindow):
 		# gets selected RawFullPNList
 		aSelectedRawFullPNList = self.__getSelectedRawFullPNList()
 
+
 		# When no entity is selected, displays confirm window.
 		if len(aSelectedRawFullPNList) == 0:
 
@@ -813,20 +833,14 @@ class EntityListWindow(OsogoWindow):
 		else:
 			aMessage = 'Loggers were created.'
 		self.thePropertyWindow.showMessageOnStatusBar(aMessage)
+		self.checkCreateLoggerButton()
 
 
 	# ========================================================================
-	def selectPropertyName( self, aCList, row, column, event_obj ):
+	def selectPropertyName( self ):
 		"""selects property name
 		Returns None
 		"""
-
-		self.theSelectedFullPNList = []
-		for aRowNumber in aCList.selection:
-			aPropertyName =  aCList.get_text( aRowNumber, 0 )
-			aFullID = self.thePropertyWindow.theFullID()
-			aFullPN = convertFullIDToFullPN( aFullID, aPropertyName )
-			self.theSelectedFullPNList.append( aFullPN )
-
+		self.checkCreateLoggerButton()
 	# end of createLogger
 

@@ -142,7 +142,8 @@ class MainWindow(OsogoWindow):
 			'on_interface_button_toggled'          : self.__displayWindow,
 			'on_board_button_toggled'              : self.__displayWindow,
 			'logo_button_clicked'                  : self.__displayAbout,
-			'on_scrolledwindow1_expose_event'	: self.__expose
+			'on_scrolledwindow1_expose_event'		: self.__expose,
+			'on_logging_policy1_activate'			: self.__openLogPolicy
 		}
 		self.addHandlers( self.theHandlerMap )
                 self.setIconList(
@@ -385,7 +386,7 @@ class MainWindow(OsogoWindow):
 			aMessage = 'Can\'t load [%s]' %aFileName
 			self.theSession.message(aMessage)
 			anErrorMessage = string.join( traceback.format_exception(sys.exc_type,sys.exc_value, \
-					sys.	exc_traceback), '\n' )
+					sys.exc_traceback), '\n' )
 			self.theSession.message(anErrorMessage)
 
 
@@ -692,6 +693,20 @@ class MainWindow(OsogoWindow):
 
 
 		self.__button_update = False
+
+	# ==========================================================================
+	def __openLogPolicy( self, *arg):
+		"""
+		signal handler to logging policy is called
+		"""
+		# get default logging policy
+		aLogPolicy = self.theSession.getLogPolicyParameters()
+		
+		# open logpolicy window
+		newLogPolicy = self.theSession.openLogPolicyWindow( aLogPolicy, "Set default log policy" )
+		if newLogPolicy != None:
+			# save logpolicy
+			self.theSession.setLogPolicyParameters( newLogPolicy )
 
 	# ==========================================================================
 	def __displayWindow( self, *arg ):
