@@ -2,7 +2,7 @@
 
 
 from PluginWindow import *
-from ecssupport import *
+from ecell.ecssupport import *
 import GTK
 import operator
 

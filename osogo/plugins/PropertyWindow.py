@@ -3,7 +3,7 @@
 import string
 
 from PluginWindow import *
-from ecssupport import *
+from ecell.ecssupport import *
 
 class PropertyWindow(PluginWindow):
 

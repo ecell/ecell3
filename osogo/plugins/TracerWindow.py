@@ -9,7 +9,7 @@ import GTK
 import re
 import string
 from PluginWindow import *
-from ecssupport import *
+from ecell.ecssupport import *
 #from testTracerglade import *
 #from data1 import *
 
