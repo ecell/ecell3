@@ -1,0 +1,78 @@
+%Id: README,v 1.0 2003/09/02 17:34 tomo Exp %
+
+
+
+=== About ===
+
+This is a toy model of the Hybrid Dynamic/Static Simulation Algorithm ,
+to be run on E-Cell Simulation Environment Version 3.
+
+=== Usage ===
+
+When you use Hybrid Dynamic/Static Simulation Algorithm in your model,
+you need FluxDistributionStepper, FluxDistributionProcess,
+QuasiDynamicFluxProcess correctly.
+
+* FluxDistributionStepper
+
+When you use FluxDistributionStepper,
+FluxDistributionStepper does not need to set Properties.
+
+When Influx Process or efflux Process in Dynamic part write
+Variables in Static part, FluxDistributionStepper
+call Process in Static part.
+FluxDistributionStepper do not have StepInterval,
+call step() at interupt by Other Stepper, do not call step() by self.
+
+
+* FluxDistributionProcess
+
+When you use FluxDistributionProcess,
+FluxDIstributionProcess need to set follwing Properties.
+
+-StepperID
+set FluxDistributuinStepper's ID.
+-UnknownProcessList
+set a list of Process FullID that QuasiDynamicFluxProcess in Static Part.
+
+-KnownProcessList
+set a list of Process FullID that Influx Process
+or efflux Process in Dynamic part.
+
+-VariableReferenceList
+set a list of FullID that Variable concerned with UnknownProcessList and
+KnownProcessList. In Coefficient, set 1 in Static part , and set 0
+in DynamicPart.
+
+
+* QuasiDynamicFluxProcess
+
+When you use QuasiDynamicFluxProcess,
+QuasiDynamicFluxProcess need to set follwing Properties.
+
+-StepperID
+set FluxDistributuinStepper's ID.
+
+-VariableReferenceList
+set VariableReferenceList that show Flux Information in Static part.
+
+-Irreversible
+set 1, if this Process is Ireeversible. default 0.
+
+
+=== Files and directories ===
+
+README:      This file
+Toy_Hybrid.em:  Model file(em file) for this model
+
+=== Running this model ===
+
+1. (If necessary) Convert the .em file to .eml file.
+
+   % ecell3-em2eml Toy_Hybrid.em
+   % ls Toy_Hybrid.eml
+   Toy_Hybrid.eml
+
+2. Run gecell, File->loadModel and load the Toy_Hybrid.eml file.
+
+
