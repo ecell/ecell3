@@ -1,5 +1,19 @@
 #!/usr/bin/env ecell3-python
 
+
+"""
+A program for converting EML to EM.
+This program is part of E-Cell Simulation Environment Version 3.
+"""
+
+__program__ = 'ecell3-eml2em'
+__version__ = '0.1'
+__author__ = 'Kentarou Takahashi and Kouichi Takahashi <shafi@e-cell.org>'
+__copyright__ = 'Copyright (C) 2002-2004 Keio University'
+__license__ = 'GPL'
+
+
+
 import sys
 import string
 import os
@@ -11,32 +25,31 @@ import re
 from ecell.ecssupport import *
 from ecell.eml import *
 
-# taken from em2eml source code, slightly modified. ( put ^ and $ )
-NumberRe = re.compile( r'^[+-]?(\d+(\.\d*)?|\d*\.\d+)([eE][+-]?\d+)?$' )
-NameRe = re.compile( r'^[a-zA-Z_/][\w\:/\.]*$' )
-
-
-def stringify( aValue ):
-
-    # quote with '"'s if the value is neither a number or a simple name
-    # string defined in the EM file format.
-    aString = str( aValue )
-    
-    if NumberRe.match( aString ) is not None or \
-           NameRe.match( aString ) is not None:
-        return aString
-    else:
-        return '"' + aString + '"'
-
+# taken from emllib.
+NumberPattern = r'^[+-]?(\d+(\.\d*)?|\d*\.\d+)([eE][+-]?\d+)?$'
+UnquoteStringPattern = r'^[a-zA-Z_/\:][\w\:/\.]*$'
+QuoteRe = re.compile( NumberPattern + '|' + UnquoteStringPattern )
 
 def expandValueList( aValue, aLevel=0 ):
     aType = type( aValue )
 
-    # apply stringify() to scalar type
-    if aType != types.TupleType and aType != types.ListType:
-        return stringify( aValue )
+    # Three cases: (1) string, (2) other non-list types, and
+    #              (3) list (or tuple).
 
-    # recursively apply this method for nested lists
+    # (1) string.  Quote it if necessary.
+    if aType == types.StringType:
+        if QuoteRe.match( aValue ) is None:
+            return '"' + aValue + '"'
+        else:
+            return aValue
+        
+    # (2) other non-list types (such as numbers).  Simply stringify.
+    if aType != types.TupleType and aType != types.ListType:
+        return str( aValue )
+
+    # (3) list or tuple.
+    #     Recursively apply this method for nested lists.
+    
     aValue = map( expandValueList, aValue, (aLevel+1,) * len( aValue ) )
 
     aValueString = ''

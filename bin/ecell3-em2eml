@@ -1,7 +1,7 @@
 #!/usr/bin/env ecell3-python
 
 """
-A program for converting .em file to EML.
+A program for converting EM to EML.
 This program is part of E-Cell Simulation Environment Version 3.
 """
 
