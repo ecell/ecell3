@@ -211,8 +211,10 @@ namespace libecs
   protected:
 
     VariableReferenceVector theVariableReferenceVector;
-    VariableReferenceVectorConstIterator theFirstZeroVariableReference;
-    VariableReferenceVectorConstIterator theFirstPositiveVariableReference;
+
+    VariableReferenceVectorConstIterator theFirstZeroVariableReferenceIterator;
+    VariableReferenceVectorConstIterator 
+    theFirstPositiveVariableReferenceIterator;
 
   private:
 

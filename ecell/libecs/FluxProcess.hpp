@@ -51,14 +51,14 @@ namespace libecs
       // Increase or decrease variables.
       for( VariableReferenceVectorConstIterator 
 	     i( theVariableReferenceVector.begin() ); 
-	   i != theFirstZeroVariableReference ; ++i )
+	   i != theFirstZeroVariableReferenceIterator ; ++i )
 	{
 	  setVariableFlux( *i, aVelocity );
 	}
 
       // skip zero coefficients
       for( VariableReferenceVectorConstIterator 
-	     i( theFirstPositiveVariableReference );
+	     i( theFirstPositiveVariableReferenceIterator );
 	   i != theVariableReferenceVector.end() ; ++i )
 	{
 	  setVariableFlux( *i, aVelocity );

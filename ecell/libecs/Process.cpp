@@ -107,8 +107,9 @@ namespace libecs
 
   Process::Process() 
     :
-    theFirstZeroVariableReference( theVariableReferenceVector.end() ),
-    theFirstPositiveVariableReference( theVariableReferenceVector.end() ),
+    theFirstZeroVariableReferenceIterator( theVariableReferenceVector.end() ),
+    theFirstPositiveVariableReferenceIterator
+    ( theVariableReferenceVector.end() ),
     theActivity( 0.0 ),
     thePriority( 0 )
   {
@@ -184,10 +185,18 @@ namespace libecs
     VariableReference aVariableReference( aName, aVariable, aCoefficient );
     theVariableReferenceVector.push_back( aVariableReference );
 
-    // sort by coefficient
+
+    //FIXME: can the following be moved to initialize()?
+
+    // first sort by reference name
     std::sort( theVariableReferenceVector.begin(), 
-	       theVariableReferenceVector.end(), 
-	       VariableReference::CoefficientCompare() );
+		      theVariableReferenceVector.end(), 
+		      VariableReference::NameCompare() );
+
+    // then sort by coefficient, preserving the relative order by the names
+    std::stable_sort( theVariableReferenceVector.begin(), 
+		      theVariableReferenceVector.end(), 
+		      VariableReference::CoefficientCompare() );
 
     // find the first VariableReference whose coefficient is 0,
     // and the first VariableReference whose coefficient is positive.
@@ -199,15 +208,15 @@ namespace libecs
 				    VariableReference::CoefficientCompare()
 				    ) );
 
-    theFirstZeroVariableReference     = aZeroRange.first;
-    theFirstPositiveVariableReference = aZeroRange.second;
+    theFirstZeroVariableReferenceIterator     = aZeroRange.first;
+    theFirstPositiveVariableReferenceIterator = aZeroRange.second;
   }
 
 
   VariableReferenceVectorIterator 
   Process::findVariableReference( StringCref aName )
   {
-    // well this is a linear search.. but this won't be used in simulation.
+    // well this is a linear search.. but this won't be used during simulation.
     for( VariableReferenceVectorIterator 
 	   i( theVariableReferenceVector.begin() );
 	 i != theVariableReferenceVector.end(); ++i )

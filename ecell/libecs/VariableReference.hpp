@@ -91,6 +91,48 @@ namespace libecs
     };
 
 
+    class NameCompare
+    {
+    public:
+
+      bool operator()( VariableReferenceCref aLhs, 
+		       VariableReferenceCref aRhs ) const
+      {
+	return compare( aLhs.getName(), aRhs.getName() );
+      }
+
+      bool operator()( StringCref aLhs, 
+		       VariableReferenceCref aRhs ) const
+      {
+	return compare( aLhs, aRhs.getName() );
+      }
+
+      bool operator()( VariableReferenceCref aLhs, 
+		       StringCref aRhs ) const
+      {
+	return compare( aLhs.getName(), aRhs );
+      }
+
+
+    private:
+
+      // if statement can be faster than returning an expression directly
+      inline static bool compare( StringCref aLhs, StringCref aRhs )
+      {
+	if( aLhs < aRhs )
+	  {
+	    return true;
+	  }
+	else
+	  {
+	    return false;
+	  }
+      }
+
+
+    };
+
+
 
   public:
 
