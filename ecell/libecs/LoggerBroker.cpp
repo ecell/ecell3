@@ -51,11 +51,13 @@ namespace libecs
 
   LoggerBroker::~LoggerBroker()
   {
-    for( LoggerMapIterator i( theLoggerMap.begin() );
-	 i != theLoggerMap.end() ; ++i )
-      {
-	delete i->second;
-      }
+    FOR_ALL_SECOND( LoggerMap, theLoggerMap, ~Logger );
+  }
+
+
+  void LoggerBroker::flush()
+  {
+    FOR_ALL_SECOND( LoggerMap, theLoggerMap, flush );
   }
 
 
@@ -100,7 +102,7 @@ namespace libecs
     aNewLogger->flush();
 
     anEntityPtr->getSuperSystem()
-      ->getStepper()->registerPropertySlot( aPropertySlotMapIterator->second );
+      ->getStepper()->registerLoggedPropertySlot( aPropertySlotMapIterator->second );
 
     return aNewLogger;
   }

@@ -98,6 +98,7 @@ namespace libemc
   void LocalSimulatorImplementation::step()
   {
     getModel().step();  
+    getModel().flushLogger();
   }
 
   void LocalSimulatorImplementation::initialize()
@@ -155,7 +156,7 @@ namespace libemc
 	unsigned int i( 20 );
 	do 
 	  {
-	    step();
+	    getModel().step();
 
 	    --i;
 	  } while( i != 0 );
@@ -167,6 +168,7 @@ namespace libemc
 
       }	while( theRunningFlag );
 
+    getModel().flushLogger();
   }
 
   void LocalSimulatorImplementation::run( libecs::Real aDuration )
@@ -179,6 +181,8 @@ namespace libemc
       {
 	runWithoutEvent( aDuration );
       }
+
+    getModel().flushLogger();
   }
 
   void LocalSimulatorImplementation::runWithEvent( libecs::Real aDuration )
@@ -198,7 +202,7 @@ namespace libemc
 		break;
 	      }
 	    
-	    step();
+	    getModel().step();
 
 	    --i;
 	  } while( i != 0 );
@@ -227,7 +231,7 @@ namespace libemc
 	    return;  // the only exit
 	  }
 
-	step();
+	getModel().step();
 
       }	while( 1 );
 

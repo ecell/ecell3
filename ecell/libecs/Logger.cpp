@@ -180,10 +180,12 @@ namespace libecs
 
   void Logger::flush()
   {
-    // gabor? please.
-
-    // dummy.
-    thePhysicalLogger.push( theDataInterval.getDataPoint() );
+    //  prevent flushing it twice
+    if( theDataInterval.getInterval() != -1.0 ) 
+      {  
+	thePhysicalLogger.push( theDataInterval.getDataPoint() );
+	theDataInterval.beginNewInterval();
+      }
   }
 
   //

@@ -134,6 +134,8 @@ namespace libecs
 
     void initialize();
 
+    void flushLogger();
+
     const Real getCurrentTime() const
     {
       return theCurrentTime;

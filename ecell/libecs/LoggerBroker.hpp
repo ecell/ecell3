@@ -59,6 +59,7 @@ namespace libecs
     
     ~LoggerBroker();
 
+    void flush();
 
     LoggerPtr getLogger( FullPNCref fpn );
 

@@ -77,6 +77,13 @@ namespace libecs
     delete &theLoggerBroker;
   }
 
+
+  void Model::flushLogger()
+  {
+    theLoggerBroker.flush();
+  }
+
+
   void Model::createEntity( StringCref aClassname,
 			    FullIDCref aFullID,
 			    StringCref aName )
