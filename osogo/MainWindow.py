@@ -12,6 +12,7 @@ import ecs
 import MessageWindow
 import PaletteWindow
 import EntryListWindow
+import LoggerWindow
 
 import string
 
@@ -129,7 +130,8 @@ class MainWindow(Window):
     def createNewEntryList( self, button_obj ) :
         aEntryList = EntryListWindow.EntryListWindow( self )
     
-    def createNewLoggerList( self, a ) : pass
+    def createNewLoggerList( self, a ) :
+        aLoggerList = LoggerWindow.LoggerWindow( self )
 
     ###### Message Window ######
     def toggleMessageWindow( self, button_obj ) :
