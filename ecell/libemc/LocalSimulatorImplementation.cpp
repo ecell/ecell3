@@ -176,13 +176,16 @@ namespace libemc
 
     do
       {
-	if( theRootSystem.getStepperLeader().getCurrentTime() >= aStopTime )
-	  {
-	    break;
-	  }
-
 	for( int i = 0 ; i < 20 ; i++ )
 	  {
+
+	    if( theRootSystem.getStepperLeader().getCurrentTime() 
+		>= aStopTime )
+	      {
+		theRunningFlag = false;
+		break;
+	      }
+
 	    step();
 	  }
 
