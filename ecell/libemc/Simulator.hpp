@@ -36,6 +36,7 @@
 #include "libecs/Message.hpp"
 #include "libecs/PrimitiveType.hpp"
 
+#include "libemc.hpp"
 #include "SimulatorImplementation.hpp"
 
 namespace libemc
@@ -106,6 +107,26 @@ namespace libemc
 						    systempath,
 						    id,
 						    propertyname );
+    }
+
+    void run()
+    {
+      theSimulatorImplementation->run();
+    }
+
+    void stop()
+    {
+      theSimulatorImplementation->stop();
+    }
+
+    void setPendingEventChecker( PendingEventCheckerFuncPtr aPendingEventChecker )
+    {
+       theSimulatorImplementation->setPendingEventChecker( aPendingEventChecker );
+     }
+
+    void setEventHandler( EventHandlerFuncPtr anEventHandler )
+    {
+       theSimulatorImplementation->setEventHandler( anEventHandler );
     }
 
   private:

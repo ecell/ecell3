@@ -1,0 +1,422 @@
+# Generated automatically from Makefile.in by configure.
+# Makefile.in generated automatically by automake 1.4 from Makefile.am
+
+# Copyright (C) 1994, 1995-8, 1999 Free Software Foundation, Inc.
+# This Makefile.in is free software; the Free Software Foundation
+# gives unlimited permission to copy and/or distribute it,
+# with or without modifications, as long as this notice is preserved.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY, to the extent permitted by law; without
+# even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+# PARTICULAR PURPOSE.
+
+
+SHELL = /bin/sh
+
+srcdir = .
+top_srcdir = ..
+prefix = /usr/local
+exec_prefix = ${prefix}
+
+bindir = ${exec_prefix}/bin
+sbindir = ${exec_prefix}/sbin
+libexecdir = ${exec_prefix}/libexec
+datadir = ${prefix}/share
+sysconfdir = ${prefix}/etc
+sharedstatedir = ${prefix}/com
+localstatedir = ${prefix}/var
+infodir = ${prefix}/info
+mandir = ${prefix}/man
+includedir = ${prefix}/include
+oldincludedir = /usr/include
+
+DESTDIR =
+
+pkgdatadir = $(datadir)/ecell
+pkglibdir = $(libdir)/ecell
+pkgincludedir = $(includedir)/ecell
+
+top_builddir = ..
+
+ACLOCAL = aclocal
+AUTOCONF = autoconf
+AUTOMAKE = automake
+AUTOHEADER = autoheader
+
+INSTALL = /usr/bin/install -c
+INSTALL_PROGRAM = ${INSTALL} $(AM_INSTALL_PROGRAM_FLAGS)
+INSTALL_DATA = ${INSTALL} -m 644
+INSTALL_SCRIPT = ${INSTALL_PROGRAM}
+transform = s,x,x,
+
+NORMAL_INSTALL = :
+PRE_INSTALL = :
+POST_INSTALL = :
+NORMAL_UNINSTALL = :
+PRE_UNINSTALL = :
+POST_UNINSTALL = :
+host_alias = alphaev67-unknown-linux-gnu
+host_triplet = alphaev67-unknown-linux-gnu
+AS = @AS@
+BIG_TOC = @BIG_TOC@
+CC = gcc
+CONSERVE_SPACE = @CONSERVE_SPACE@
+CPP = gcc -E
+CPP_TRADITIONAL = @CPP_TRADITIONAL@
+CXX = c++
+CXXCPP = c++ -E
+CXXDEBUG = @CXXDEBUG@
+CXXDYNAMIC_BINDING = @CXXDYNAMIC_BINDING@
+CXXLIBS = @CXXLIBS@
+CXXOPT = @CXXOPT@
+CXXSTATIC_BINDING = @CXXSTATIC_BINDING@
+CXXSTUFF = @CXXSTUFF@
+CXXWARNINGS = @CXXWARNINGS@
+CXX_INCLUDE_DIR = @CXX_INCLUDE_DIR@
+CXX_LIB_DIR = @CXX_LIB_DIR@
+DLLTOOL = @DLLTOOL@
+DMTOOL_DIR = /home/masaaki/ecell3
+DMTOOL_INCLUDE_DIR = /home/masaaki/ecell3/dmtool
+ELIDE_CONSTRUCTORS = @ELIDE_CONSTRUCTORS@
+EMACS = @EMACS@
+EXTERNAL_TEMPLATES = @EXTERNAL_TEMPLATES@
+KORANDOM_DIR = /home/masaaki/ecell3
+LIBC = -lc
+LIBDL = -ldl
+LIBLTDL = ${top_builddir}/../libltdl/libltdlc.la
+LIBM = -lm
+LIBTOOL = $(SHELL) $(top_builddir)/libtool
+LN_S = ln -s
+MAKEINFO = makeinfo
+MINIMAL_TOC = @MINIMAL_TOC@
+NO_IMPLICIT_TEMPLATES = @NO_IMPLICIT_TEMPLATES@
+OBJDUMP = @OBJDUMP@
+PACKAGE = ecell
+PREFIX = /usr/local
+RANLIB = ranlib
+TRANSLATIONS = @TRANSLATIONS@
+TRIGRAPHS = @TRIGRAPHS@
+VERSION = 3.0
+WARN_EFFECTIVE_CXX = @WARN_EFFECTIVE_CXX@
+WARN_NO_EFFECTIVE_CXX = @WARN_NO_EFFECTIVE_CXX@
+WARN_NO_UNINITIALIZED = @WARN_NO_UNINITIALIZED@
+WARN_UNINITIALIZED = @WARN_UNINITIALIZED@
+XS_DEBUG_INFO = @XS_DEBUG_INFO@
+infodir = ${prefix}/info
+
+ECELLDIR = ..
+
+DMTOOL_INCLUDE = -I/home/masaaki/ecell3/dmtool
+KORANDOM_INCLUDE = -I/home/masaaki/ecell3
+INCLTDL = -I${top_srcdir}/../libltdl
+libdir = ${exec_prefix}/lib
+
+INCLUDES = -I..  ${DMTOOL_INCLUDE} ${INCLTDL}
+noinst_LTLIBRARIES = libemc.la
+
+CXXFLAGS = -g -O2 #-D_REENTRANT
+
+libemc_la_LDFLAGS = -rpath ${libdir}
+
+#FIXME: specifing .libs is ugly
+libemc_la_LIBADD = -lstdc++ -L$(ECELLDIR)/libecs/.libs/ -lecs
+libemc_la_DEPENDENCIES = $(ECELLDIR)/libecs/libecs.la
+libemc_la_SOURCES =  Simulator.cpp SimulatorImplementation.cpp LocalSimulatorImplementation.cpp LocalLoggerImplementation.cpp LoggerImplementation.cpp EmcLogger.cpp EmcDataPoint.cpp
+
+
+libemcdir = ${pkgincludedir}/libemc
+libemc_HEADERS =  LocalSimulatorImplementation.hpp Simulator.hpp SimulatorImplementation.hpp SimulatorMaker.hpp EmcDataPoint.hpp EmcLogger.hpp LocalLoggerImplementation.hpp LoggerImplementation.hpp
+
+mkinstalldirs = $(SHELL) $(top_srcdir)/../mkinstalldirs
+CONFIG_HEADER = ../config.h
+CONFIG_CLEAN_FILES = 
+LTLIBRARIES =  $(noinst_LTLIBRARIES)
+
+
+DEFS = -DHAVE_CONFIG_H -I. -I$(srcdir) -I..
+CPPFLAGS = 
+LDFLAGS = 
+LIBS = 
+X_CFLAGS = @X_CFLAGS@
+X_LIBS = @X_LIBS@
+X_EXTRA_LIBS = @X_EXTRA_LIBS@
+X_PRE_LIBS = @X_PRE_LIBS@
+libemc_la_OBJECTS =  Simulator.lo SimulatorImplementation.lo \
+LocalSimulatorImplementation.lo LocalLoggerImplementation.lo \
+LoggerImplementation.lo EmcLogger.lo EmcDataPoint.lo
+CXXCOMPILE = $(CXX) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
+LTCXXCOMPILE = $(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
+CXXLD = $(CXX)
+CXXLINK = $(LIBTOOL) --mode=link $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(LDFLAGS) -o $@
+HEADERS =  $(libemc_HEADERS)
+
+DIST_COMMON =  Makefile.am Makefile.in
+
+
+DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
+
+TAR = gtar
+GZIP_ENV = --best
+DEP_FILES =  .deps/EmcDataPoint.P .deps/EmcLogger.P \
+.deps/LocalLoggerImplementation.P .deps/LocalSimulatorImplementation.P \
+.deps/LoggerImplementation.P .deps/Simulator.P \
+.deps/SimulatorImplementation.P
+SOURCES = $(libemc_la_SOURCES)
+OBJECTS = $(libemc_la_OBJECTS)
+
+all: all-redirect
+.SUFFIXES:
+.SUFFIXES: .S .c .cpp .lo .o .s
+$(srcdir)/Makefile.in: Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) 
+	cd $(top_srcdir) && $(AUTOMAKE) --gnu libemc/Makefile
+
+Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status $(BUILT_SOURCES)
+	cd $(top_builddir) \
+	  && CONFIG_FILES=$(subdir)/$@ CONFIG_HEADERS= $(SHELL) ./config.status
+
+
+mostlyclean-noinstLTLIBRARIES:
+
+clean-noinstLTLIBRARIES:
+	-test -z "$(noinst_LTLIBRARIES)" || rm -f $(noinst_LTLIBRARIES)
+
+distclean-noinstLTLIBRARIES:
+
+maintainer-clean-noinstLTLIBRARIES:
+
+.s.o:
+	$(COMPILE) -c $<
+
+.S.o:
+	$(COMPILE) -c $<
+
+mostlyclean-compile:
+	-rm -f *.o core *.core
+
+clean-compile:
+
+distclean-compile:
+	-rm -f *.tab.c
+
+maintainer-clean-compile:
+
+.s.lo:
+	$(LIBTOOL) --mode=compile $(COMPILE) -c $<
+
+.S.lo:
+	$(LIBTOOL) --mode=compile $(COMPILE) -c $<
+
+mostlyclean-libtool:
+	-rm -f *.lo
+
+clean-libtool:
+	-rm -rf .libs _libs
+
+distclean-libtool:
+
+maintainer-clean-libtool:
+
+libemc.la: $(libemc_la_OBJECTS) $(libemc_la_DEPENDENCIES)
+	$(CXXLINK)  $(libemc_la_LDFLAGS) $(libemc_la_OBJECTS) $(libemc_la_LIBADD) $(LIBS)
+.cpp.o:
+	$(CXXCOMPILE) -c $<
+.cpp.lo:
+	$(LTCXXCOMPILE) -c $<
+
+install-libemcHEADERS: $(libemc_HEADERS)
+	@$(NORMAL_INSTALL)
+	$(mkinstalldirs) $(DESTDIR)$(libemcdir)
+	@list='$(libemc_HEADERS)'; for p in $$list; do \
+	  if test -f "$$p"; then d= ; else d="$(srcdir)/"; fi; \
+	  echo " $(INSTALL_DATA) $$d$$p $(DESTDIR)$(libemcdir)/$$p"; \
+	  $(INSTALL_DATA) $$d$$p $(DESTDIR)$(libemcdir)/$$p; \
+	done
+
+uninstall-libemcHEADERS:
+	@$(NORMAL_UNINSTALL)
+	list='$(libemc_HEADERS)'; for p in $$list; do \
+	  rm -f $(DESTDIR)$(libemcdir)/$$p; \
+	done
+
+tags: TAGS
+
+ID: $(HEADERS) $(SOURCES) $(LISP)
+	list='$(SOURCES) $(HEADERS)'; \
+	unique=`for i in $$list; do echo $$i; done | \
+	  awk '    { files[$$0] = 1; } \
+	       END { for (i in files) print i; }'`; \
+	here=`pwd` && cd $(srcdir) \
+	  && mkid -f$$here/ID $$unique $(LISP)
+
+TAGS:  $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) $(LISP)
+	tags=; \
+	here=`pwd`; \
+	list='$(SOURCES) $(HEADERS)'; \
+	unique=`for i in $$list; do echo $$i; done | \
+	  awk '    { files[$$0] = 1; } \
+	       END { for (i in files) print i; }'`; \
+	test -z "$(ETAGS_ARGS)$$unique$(LISP)$$tags" \
+	  || (cd $(srcdir) && etags $(ETAGS_ARGS) $$tags  $$unique $(LISP) -o $$here/TAGS)
+
+mostlyclean-tags:
+
+clean-tags:
+
+distclean-tags:
+	-rm -f TAGS ID
+
+maintainer-clean-tags:
+
+distdir = $(top_builddir)/$(PACKAGE)-$(VERSION)/$(subdir)
+
+subdir = libemc
+
+distdir: $(DISTFILES)
+	here=`cd $(top_builddir) && pwd`; \
+	top_distdir=`cd $(top_distdir) && pwd`; \
+	distdir=`cd $(distdir) && pwd`; \
+	cd $(top_srcdir) \
+	  && $(AUTOMAKE) --include-deps --build-dir=$$here --srcdir-name=$(top_srcdir) --output-dir=$$top_distdir --gnu libemc/Makefile
+	@for file in $(DISTFILES); do \
+	  d=$(srcdir); \
+	  if test -d $$d/$$file; then \
+	    cp -pr $$d/$$file $(distdir)/$$file; \
+	  else \
+	    test -f $(distdir)/$$file \
+	    || ln $$d/$$file $(distdir)/$$file 2> /dev/null \
+	    || cp -p $$d/$$file $(distdir)/$$file || :; \
+	  fi; \
+	done
+
+DEPS_MAGIC := $(shell mkdir .deps > /dev/null 2>&1 || :)
+
+-include $(DEP_FILES)
+
+mostlyclean-depend:
+
+clean-depend:
+
+distclean-depend:
+	-rm -rf .deps
+
+maintainer-clean-depend:
+
+%.o: %.c
+	@echo '$(COMPILE) -c $<'; \
+	$(COMPILE) -Wp,-MD,.deps/$(*F).pp -c $<
+	@-cp .deps/$(*F).pp .deps/$(*F).P; \
+	tr ' ' '\012' < .deps/$(*F).pp \
+	  | sed -e 's/^\\$$//' -e '/^$$/ d' -e '/:$$/ d' -e 's/$$/ :/' \
+	    >> .deps/$(*F).P; \
+	rm .deps/$(*F).pp
+
+%.lo: %.c
+	@echo '$(LTCOMPILE) -c $<'; \
+	$(LTCOMPILE) -Wp,-MD,.deps/$(*F).pp -c $<
+	@-sed -e 's/^\([^:]*\)\.o[ 	]*:/\1.lo \1.o :/' \
+	  < .deps/$(*F).pp > .deps/$(*F).P; \
+	tr ' ' '\012' < .deps/$(*F).pp \
+	  | sed -e 's/^\\$$//' -e '/^$$/ d' -e '/:$$/ d' -e 's/$$/ :/' \
+	    >> .deps/$(*F).P; \
+	rm -f .deps/$(*F).pp
+
+%.o: %.cpp
+	@echo '$(CXXCOMPILE) -c $<'; \
+	$(CXXCOMPILE) -Wp,-MD,.deps/$(*F).pp -c $<
+	@-cp .deps/$(*F).pp .deps/$(*F).P; \
+	tr ' ' '\012' < .deps/$(*F).pp \
+	  | sed -e 's/^\\$$//' -e '/^$$/ d' -e '/:$$/ d' -e 's/$$/ :/' \
+	    >> .deps/$(*F).P; \
+	rm .deps/$(*F).pp
+
+%.lo: %.cpp
+	@echo '$(LTCXXCOMPILE) -c $<'; \
+	$(LTCXXCOMPILE) -Wp,-MD,.deps/$(*F).pp -c $<
+	@-sed -e 's/^\([^:]*\)\.o[ 	]*:/\1.lo \1.o :/' \
+	  < .deps/$(*F).pp > .deps/$(*F).P; \
+	tr ' ' '\012' < .deps/$(*F).pp \
+	  | sed -e 's/^\\$$//' -e '/^$$/ d' -e '/:$$/ d' -e 's/$$/ :/' \
+	    >> .deps/$(*F).P; \
+	rm -f .deps/$(*F).pp
+info-am:
+info: info-am
+dvi-am:
+dvi: dvi-am
+check-am: all-am
+check: check-am
+installcheck-am:
+installcheck: installcheck-am
+install-exec-am:
+install-exec: install-exec-am
+
+install-data-am: install-libemcHEADERS
+install-data: install-data-am
+
+install-am: all-am
+	@$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am
+install: install-am
+uninstall-am: uninstall-libemcHEADERS
+uninstall: uninstall-am
+all-am: Makefile $(LTLIBRARIES) $(HEADERS)
+all-redirect: all-am
+install-strip:
+	$(MAKE) $(AM_MAKEFLAGS) AM_INSTALL_PROGRAM_FLAGS=-s install
+installdirs:
+	$(mkinstalldirs)  $(DESTDIR)$(libemcdir)
+
+
+mostlyclean-generic:
+
+clean-generic:
+
+distclean-generic:
+	-rm -f Makefile $(CONFIG_CLEAN_FILES)
+	-rm -f config.cache config.log stamp-h stamp-h[0-9]*
+
+maintainer-clean-generic:
+mostlyclean-am:  mostlyclean-noinstLTLIBRARIES mostlyclean-compile \
+		mostlyclean-libtool mostlyclean-tags mostlyclean-depend \
+		mostlyclean-generic
+
+mostlyclean: mostlyclean-am
+
+clean-am:  clean-noinstLTLIBRARIES clean-compile clean-libtool \
+		clean-tags clean-depend clean-generic mostlyclean-am
+
+clean: clean-am
+
+distclean-am:  distclean-noinstLTLIBRARIES distclean-compile \
+		distclean-libtool distclean-tags distclean-depend \
+		distclean-generic clean-am
+	-rm -f libtool
+
+distclean: distclean-am
+
+maintainer-clean-am:  maintainer-clean-noinstLTLIBRARIES \
+		maintainer-clean-compile maintainer-clean-libtool \
+		maintainer-clean-tags maintainer-clean-depend \
+		maintainer-clean-generic distclean-am
+	@echo "This command is intended for maintainers to use;"
+	@echo "it deletes files that may require special tools to rebuild."
+
+maintainer-clean: maintainer-clean-am
+
+.PHONY: mostlyclean-noinstLTLIBRARIES distclean-noinstLTLIBRARIES \
+clean-noinstLTLIBRARIES maintainer-clean-noinstLTLIBRARIES \
+mostlyclean-compile distclean-compile clean-compile \
+maintainer-clean-compile mostlyclean-libtool distclean-libtool \
+clean-libtool maintainer-clean-libtool uninstall-libemcHEADERS \
+install-libemcHEADERS tags mostlyclean-tags distclean-tags clean-tags \
+maintainer-clean-tags distdir mostlyclean-depend distclean-depend \
+clean-depend maintainer-clean-depend info-am info dvi-am dvi check \
+check-am installcheck-am installcheck install-exec-am install-exec \
+install-data-am install-data install-am install uninstall-am uninstall \
+all-redirect all-am all installdirs mostlyclean-generic \
+distclean-generic clean-generic maintainer-clean-generic clean \
+mostlyclean distclean maintainer-clean
+
+
+# Tell versions [3.59,3.63) of GNU make to not export all variables.
+# Otherwise a system limit (for SysV at least) may be exceeded.
+.NOEXPORT:

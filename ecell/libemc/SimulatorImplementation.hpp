@@ -35,9 +35,10 @@
 #include "libecs/libecs.hpp"
 #include "libecs/Message.hpp"
 
+#include "libemc.hpp"
+
 namespace libemc
 {
-
   /**
      Pure virtual base class (interface definition) of simulator
      implementation.
@@ -80,6 +81,14 @@ namespace libemc
 	       libecs::StringCref    systempath,
 	       libecs::StringCref    id,
 	       libecs::StringCref    propertyname ) = 0;
+
+    virtual void run() = 0;
+
+    virtual void stop() = 0;
+
+    virtual void setPendingEventChecker( PendingEventCheckerFuncPtr aPendingEventChecker ) = 0;
+
+    virtual void setEventHandler( EventHandlerFuncPtr anEventHandler ) = 0;
 
   };   //end of class Simulator
 

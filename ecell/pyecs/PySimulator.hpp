@@ -37,6 +37,7 @@
 #include "CXX/Extensions.hxx"
 
 using Py::Object;
+using Py::Callable;
 using Py::Tuple;
 using Py::PythonExtension;
 
@@ -58,7 +59,18 @@ public:
   Object step( const Tuple& args );
   Object initialize( const Tuple& args );
   Object getLogger( const Tuple& args );
+  Object run( const Py::Tuple& args );
+  Object stop( const Py::Tuple& args );
+  Object setPendingEventChecker( const Tuple& args );
+  Object setEventHandler( const Tuple& args );
 
+private:
+  static void callPendingEventChecker();
+  static void callEventHandler();  
+  static Callable* thePendingEventChecker;
+  static Callable* theEventHandler;
+  Object theTmpPendingEventChecker;
+  Object theTmpEventHandler;
 };
 
 #endif   /* __PYSIMULATOR_HPP */

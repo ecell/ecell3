@@ -42,6 +42,9 @@
 using namespace libemc;
 using namespace libecs;
 
+Callable* PySimulator::thePendingEventChecker;
+Callable* PySimulator::theEventHandler;
+
 PySimulator::PySimulator()
 {
   ; // do nothing
@@ -52,12 +55,16 @@ void PySimulator::init_type()
   behaviors().name("Simulator");
   behaviors().doc("E-CELL Python class");
 
-  add_varargs_method( "createEntity", &PySimulator::createEntity );
-  add_varargs_method( "setProperty",  &PySimulator::setProperty );
-  add_varargs_method( "getProperty",  &PySimulator::getProperty );
-  add_varargs_method( "step",         &PySimulator::step );
-  add_varargs_method( "initialize",   &PySimulator::initialize );
-  add_varargs_method( "getLogger",    &PySimulator::getLogger );
+  add_varargs_method( "createEntity",          &PySimulator::createEntity );
+  add_varargs_method( "setProperty",           &PySimulator::setProperty );
+  add_varargs_method( "getProperty",           &PySimulator::getProperty );
+  add_varargs_method( "step",                  &PySimulator::step );
+  add_varargs_method( "initialize",            &PySimulator::initialize );
+  add_varargs_method( "getLogger",             &PySimulator::getLogger );
+  add_varargs_method( "run",                   &PySimulator::run );
+  add_varargs_method( "stop",                  &PySimulator::stop );
+  add_varargs_method( "setPendingEventChecker",  &PySimulator::setPendingEventChecker );
+  add_varargs_method( "setEventHandler",       &PySimulator::setEventHandler );
 }
 
 Object PySimulator::step( const Py::Tuple& args )
@@ -105,7 +112,6 @@ Object PySimulator::setProperty( const Py::Tuple& args )
   const String aPath        ( static_cast<Py::String>( aFullPN[1] ) );
   const String anID         ( static_cast<Py::String>( aFullPN[2] ) );
   const String aPropertyName( static_cast<Py::String>( aFullPN[3] ) );
-
   const Py::Tuple aMessageSequence( static_cast<Py::Sequence>( args[1] ) );
   
   UConstantVector aMessageBody;
@@ -194,4 +200,87 @@ Object PySimulator::getLogger( const Py::Tuple& args )
 
   ECS_CATCH;
 }
+
+Object PySimulator::run( const Py::Tuple& args )
+{
+  ECS_TRY;
+
+  Simulator::run();
+
+  return Py::Object();
+
+  ECS_CATCH;
+}
+
+Object PySimulator::stop( const Py::Tuple& args )
+{
+  ECS_TRY;
+ 
+  Simulator::stop();
+
+  return Py::Object();
+
+  ECS_CATCH;
+}
+
+Object PySimulator::setPendingEventChecker( const Py::Tuple& args )
+{
+  ECS_TRY;
+
+  args.verify_length( 1 );
+
+  theTmpPendingEventChecker = static_cast<Py::Object>( args[0] );
+  thePendingEventChecker = static_cast<Py::Callable *>( &theTmpPendingEventChecker );
+  // *thePendingEventChecker = theTmpPendingEventChecker;
+
+  if( !thePendingEventChecker->isCallable() )
+    throw Py::TypeError("Object is not Callable type.");
+  
+  Simulator::setPendingEventChecker( (bool (*)())callPendingEventChecker );
+  
+  return Py::Object();
+
+  ECS_CATCH;
+}
+
+Object PySimulator::setEventHandler( const Py::Tuple& args )
+{
+  ECS_TRY;
+
+  args.verify_length( 1 );
+
+  theTmpEventHandler = static_cast<Py::Object>( args[0] );
+  theEventHandler = static_cast<Py::Callable *>( &theTmpEventHandler );
+  //  *theEventHandler = theTmpEventHandler;
+
+  if( !theEventHandler->isCallable() )
+    throw Py::TypeError("Object is not Callable type.");
+
+  Simulator::setEventHandler( (void (*)())callEventHandler );
+
+  return Py::Object();
+
+  ECS_CATCH;
+}
+
+void PySimulator::callPendingEventChecker()
+{
+  ECS_TRY;
+
+  thePendingEventChecker->apply();
+
+  ECS_CATCH; 
+}
+
+void PySimulator::callEventHandler()
+{
+  ECS_TRY;
+
+  theEventHandler->apply();
+
+  ECS_CATCH; 
+}
+
+
+
 

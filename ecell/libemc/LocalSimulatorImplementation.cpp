@@ -47,7 +47,8 @@ namespace libemc
     theRootSystem( *new RootSystem ),
     theLoggerBroker( *new LoggerBroker( theRootSystem ) )
   {
-    ;
+    thePendingEventChecker = PendingEventChecker;
+    theEventHandler = NULL;
   }
 
   LocalSimulatorImplementation::~LocalSimulatorImplementation()
@@ -116,8 +117,42 @@ namespace libemc
 					      propertyname ) );
   }
 
+  void LocalSimulatorImplementation::run()
+  {
+    theRunningFlag = true;
 
+    do
+      {
+	step();
 
+	while( (*thePendingEventChecker)() )
+	  {
+	    (*theEventHandler)();
+	  }
 
-} // namespace libemc
+      }	while( theRunningFlag );
+  }
+
+  void LocalSimulatorImplementation::stop()
+  {
+    theRunningFlag = false;
+  }
+
+  void LocalSimulatorImplementation::setPendingEventChecker( PendingEventCheckerFuncPtr aPendingEventChecker )
+  {
+    thePendingEventChecker = aPendingEventChecker;
+  }
+
+  void LocalSimulatorImplementation::setEventHandler( EventHandlerFuncPtr anEventHandler )
+  {
+    theEventHandler = anEventHandler;
+  }
+
+  bool LocalSimulatorImplementation::PendingEventChecker()
+  {
+    return false;
+  }
+
+} // namespace libemc,
+
 

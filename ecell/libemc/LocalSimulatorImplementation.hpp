@@ -34,6 +34,7 @@
 
 #include "libecs/libecs.hpp"
 
+#include "libemc.hpp"
 #include "SimulatorImplementation.hpp"
 
 namespace libemc
@@ -56,6 +57,7 @@ namespace libemc
     virtual void createEntity( libecs::StringCref    classname, 
 			       libecs::PrimitiveType type,
 			       libecs::StringCref    systempath,
+
 			       libecs::StringCref    id,
 			       libecs::StringCref    name );
 
@@ -80,10 +82,22 @@ namespace libemc
 					  libecs::StringCref    id,
 					  libecs::StringCref    propertyname );
 
-  private:
+    virtual void run();
 
-    libecs::RootSystemRef     theRootSystem;
-    libecs::LoggerBrokerRef   theLoggerBroker;
+    virtual void stop();
+
+    virtual void setPendingEventChecker( PendingEventCheckerFuncPtr aPendingEventChecker );
+
+    virtual void setEventHandler( EventHandlerFuncPtr anEventHandler );
+
+  private:
+    static bool PendingEventChecker();
+    libecs::RootSystemRef      theRootSystem;
+    libecs::LoggerBrokerRef    theLoggerBroker;
+    bool                       theRunningFlag;
+    PendingEventCheckerFuncPtr thePendingEventChecker;
+    EventHandlerFuncPtr        theEventHandler;
+
 
   };  
 

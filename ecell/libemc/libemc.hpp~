@@ -37,7 +37,7 @@
 namespace libemc
 {
 
-  typedef bool ( *PendingEventCheckerFuncPtr )();
+  typedef void ( *EventPendingFuncPtr )();
   typedef void ( *EventHandlerFuncPtr )();
 
 } // namespace libemc
