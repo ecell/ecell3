@@ -45,9 +45,12 @@
  *::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
  *	$Id$
  :	$Log$
+ :	Revision 1.9  2003/09/27 12:39:15  satyanandavel
+ :	more compatibility issues in Windows
+ :
  :	Revision 1.8  2003/09/22 04:28:44  bgabor
  :	Fixed a serious undefined reference to my_open_to_read bug in VVector.
- :
+ :	
  :	Revision 1.7  2003/08/08 13:13:09  satyanandavel
  :	Added support for MinGW to define type of ssize_t
  :	
@@ -149,6 +152,7 @@ protected:
   int _myNumber;
   char *_file_name;
   int _fdr,_fdw;
+  void unlinkfile();
 
 // protected methods
   void initBase(char const * const dirname);
@@ -363,9 +367,7 @@ template<class T>  T const & vvector<T>::at(size_type i)
 
 template<class T> void vvector<T>::clear()
 {
-  if (unlink(_file_name) != 0) {
-    fprintf(stderr, "unlink() failed in VVector.\n");
-  }
+    unlinkfile();
 }
 
 

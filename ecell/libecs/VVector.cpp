@@ -45,9 +45,12 @@
  *::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
  *	$Id$
  :	$Log$
+ :	Revision 1.6  2003/09/27 12:39:15  satyanandavel
+ :	more compatibility issues in Windows
+ :
  :	Revision 1.5  2003/09/22 04:28:43  bgabor
  :	Fixed a serious undefined reference to my_open_to_read bug in VVector.
- :
+ :	
  :	Revision 1.4  2003/07/20 06:05:35  bgabor
  :	
  :	added support for large files
@@ -151,9 +154,10 @@ vvectorbase::vvectorbase()
     if (envVal != NULL) {
       _defaultDirectory = strdup(envVal);
       _directoryPriority = 3;
-    } else {
+    } else 
+    {
 #ifdef	_Windows
-      _defaultDirectory = strdup("c:/temp");
+      _defaultDirectory = strdup("c:\\temp");
 #else
       _defaultDirectory = strdup("/tmp");
 #endif	/* _Windows */
@@ -175,19 +179,31 @@ vvectorbase::vvectorbase()
 
 vvectorbase::~vvectorbase()
 {
+unlinkfile();
+
+}
+
+void vvectorbase::unlinkfile()
+{
 #ifndef OPEN_WHEN_ACCESS
 	if (0 <= _fdr) {
 		close(_fdr);
+		printf("fdr closed\n");
 	}
 	if (0 <= _fdw) {
 		close(_fdw);
+		printf("fdrw closed\n");
 	}
 #endif /* OPEN_WHEN_ACCESS */
 	if (_file_name != NULL) {
-		unlink(_file_name);
+	if (unlink(_file_name) != 0) 
+		{
+    		fprintf(stderr, "unlink(%s) failed in VVector.\n", _file_name);
+  		}
+
 		free(_file_name);
 	}
-//	osif_direct_read_close();
+
 }
 
 
@@ -213,8 +229,9 @@ void vvectorbase::removeTmpFile()
 {
   std::vector<char const *>::iterator iii;
   for (iii = _tmp_name.begin(); iii != _tmp_name.end(); iii++) {
-    unlink(*iii);
-  }
+      printf("atexit called\n");      
+//    unlinkfile();
+ }
 }
 
 
@@ -227,11 +244,17 @@ void vvectorbase::initBase(char const * const dirname)
   } else {
     strcpy(pathname, _defaultDirectory);
   }
+#if defined(__BORLANDC__) || defined(__WINDOWS__) || defined(__MINGW32__)  
+  if (pathname[strlen(pathname) - 1] != '\\') {
+    strcat(pathname, "\\");
+  }
+#else
   if (pathname[strlen(pathname) - 1] != '/') {
     strcat(pathname, "/");
   }
+#endif  
   if (osif_is_dir(pathname) == 0) {
-    printf("Direcotry \"%s\" is not exist.\n", pathname);
+    printf("Directory \"%s\" does not exist.\n", pathname);
     exit(1);
   }
   checkDiskFull(pathname, 1);
