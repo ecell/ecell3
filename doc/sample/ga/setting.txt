@@ -14,7 +14,7 @@ EML FILES               = simple1.eml
                           simple2.eml
                           simple3.eml
 
-ESS FILE                = onerun.py
+ESS FILE                = runsession.py
 
 DIR KEY                 = _DATA_
 EXTRA DIRS              = Data1

@@ -24,9 +24,9 @@ Bioinformatics. 2003 Mar 22;19(5):643-50.
 
 README                      This file
 createsampledata.sh         The script file to generate sample input files
-ga.esm                      ESM file of GA
+ga.py                       EMS file of GA
 observable.py               ESS file to generate sample input time-courses
-onerun.py                   ESS file that is used by GA
+runsession.py               ESS file that is used by GA
 setting.txt:                Setting file for ga.esm
 simple1.em                  Model file (EM file) 
 simple2.em                  Model file (EM file) 
@@ -59,7 +59,7 @@ simple3.em                  Model file (EM file)
 
 3. Run ga.esm file.
 
-   % ecell3-session-manager ga.esm
+   % ecell3-session-manager ga.py
      GA on E-Cell3 ........ start 
      (12/12) .....[1]        1.03504734313
      (12/12) .....[2]        0.869721171408

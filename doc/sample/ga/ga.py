@@ -357,9 +357,10 @@ class RCGA:
 			# -----------------------------------------------------
 			for aJobID in self.theEliteIndividual.getJobList():
 				aSrcDir = getSessionProxy(aJobID).getJobDirectory()
+
 				aDstDir = "%s%s%s" %(self.theSetting['ELITE DIR'],\
 				                     os.sep,\
-				                     os.path.basename(aSrcDir))
+				                     os.path.basename(aSrcDir[:-len(os.sep)]))
 				shutil.copytree(aSrcDir,aDstDir)
 
 		# Second generation or after
@@ -397,7 +398,7 @@ class RCGA:
 					aSrcDir = getSessionProxy(aJobID).getJobDirectory()
 					aDstDir = "%s%s%s" %(self.theSetting['ELITE DIR'],\
 					                     os.sep,\
-					                     os.path.basename(aSrcDir))
+				                         os.path.basename(aSrcDir[:-len(os.sep)]))
 					shutil.copytree(aSrcDir,aDstDir)
 
 
@@ -1742,7 +1743,9 @@ class Setting(ConfigParser):
 			# -----------------------------------------------
 			if os.path.isdir(aDirList[anIndex]) == False:
 				aMessage = "%s: One of \"%s\" is set as \"%s\", but there is no such directory. \n" \
-			                   %(SETUP_ERROR,aKey,os.path.basename(aDirList[anIndex]))
+			                   %(SETUP_ERROR,
+			                     aKey,
+				                 os.path.basename(aDirList[anIndex][:-len(os.sep)]))
 				sys.stderr.write(aMessage)
 				aNGNumber += SET_UP_NG_RETURN
 
@@ -1753,7 +1756,9 @@ class Setting(ConfigParser):
 				# -----------------------------------------------
 				if os.access( aDirList[anIndex], os.R_OK + os.X_OK ) == False:
 					aMessage = "%s: \"%s\" is set as \"%s\", but it has no read and execute permission of the directory. \n" \
-			   	        %(SETUP_ERROR,aKey,os.path.basename(aDirList[anIndex]) )
+			   	        %(SETUP_ERROR,
+					      aKey,
+				          os.path.basename(aDirList[anIndex][:-len(os.sep)]) )
 					sys.stderr.write(aMessage)
 					aNGNumber += SET_UP_NG_RETURN
 	
