@@ -182,6 +182,13 @@ namespace libecs
       ; //do nothing
     }
 
+    DataPointCref getFinalDataPoint()
+    {
+      doPendingCalculations(); //calculate correct AVG 
+      return theDataPoint;
+    }
+
+
     DataPointCref getDataPoint() const
     {
       return theDataPoint;
@@ -189,6 +196,7 @@ namespace libecs
 
     DataPointRef getDataPoint()
     {
+
       return theDataPoint;
     }
 
@@ -236,16 +244,28 @@ namespace libecs
 	  theDataPoint.setAvg  ( aValue );
 	  theDataPoint.setMin  ( aValue );
 	  theDataPoint.setMax  ( aValue );
-	  theInterval = 0.0;    
+	  theInterval            = 0.0;
+	  theLastNonzeroInterval = theInterval;
+	  theLastNonzeroValue    = aValue;    
 	}
       else
 	{
 	  const Real aNewInterval( aTime - getTime() );
 
-	  theDataPoint.setAvg( getAvg() * theInterval + 
-			       aValue * aNewInterval );
-	  theInterval += aNewInterval;
-	  theDataPoint.setAvg( getAvg() / getInterval() );
+	  /*
+	    theDataPoint.setAvg( getAvg() * theInterval + 
+	    aValue * aNewInterval );
+	    theDataPoint.setAvg( getAvg() / getInterval() );
+	  */
+
+	  //if newinterval is nonzero, calculate previous AVG
+	  if ( aNewInterval > 0.0 )
+	    {
+	      doPendingCalculations();
+	      theLastNonzeroInterval = aNewInterval;
+	    }
+
+	  theLastNonzeroValue = aValue;
 
 	  if ( aValue < getMin() ) 
 	    { 
@@ -258,6 +278,8 @@ namespace libecs
 
 	  theDataPoint.setValue( aValue );
 	  theDataPoint.setTime( aTime );
+	  theInterval += aNewInterval;
+	  
 	}
     }
 
@@ -265,16 +287,13 @@ namespace libecs
     {
       if ( theInterval < 0 ) //the very first time data is added
 	{
-	  theDataPoint = aDataPoint;
-	  theInterval = anInterval;
+	  theDataPoint           = aDataPoint;
+	  theInterval            = anInterval;
+	  theLastNonzeroInterval = anInterval;
+	  theLastNonzeroValue    = aDataPoint.getAvg();
 	}
       else
 	{
-	  theDataPoint.setAvg( getAvg() * getInterval() + 
-			       aDataPoint.getAvg() * anInterval );
-	  theInterval += anInterval;
-	  theDataPoint.setAvg( getAvg() / getInterval() );
-	  
 	  if( aDataPoint.getMin() < getMin() ) 
 	    { 
 	      theDataPoint.setMin( aDataPoint.getMin() );
@@ -283,23 +302,56 @@ namespace libecs
 	    { 
 	      theDataPoint.setMax( aDataPoint.getMax() );
 	    }
-	  
+
+	  //call doPendingCalculations() if anInterval is nonzero
+	  if ( anInterval > 0 ) 
+	    {
+	      doPendingCalculations();
+	      theLastNonzeroInterval=anInterval;
+	    }
+
+	  theLastNonzeroValue=aDataPoint.getAvg();
 	  theDataPoint.setValue( aDataPoint.getValue() );
 	  theDataPoint.setTime( getTime() + anInterval );
+	  theInterval += anInterval;
 	}
     }
   
-    private:
+  private:
 
-      DataPoint theDataPoint;
-      Real      theInterval;
+    void doPendingCalculations()
+    {
+      // perform AVG calculations for last nonzero interval
+      // 1. last nonzero interval is nonzero, perform calculations normally
+      if ( ( theLastNonzeroInterval > 0 ) && ( getInterval() > 0 ) )
+	{
+	  theDataPoint.
+	    setAvg( getAvg() * ( getInterval() - theLastNonzeroInterval ) + 
+		    ( theLastNonzeroValue * theLastNonzeroInterval ) );
+	  theDataPoint.setAvg( getAvg() / ( getInterval() ) );
+	}
+      // 2. last nonzero interval is zero, total interval nonzero, 
+      //    AVG left unchg
+      
+      // 3. last nonzero interval is zero, total interval zero, AVG=VAL
+      if ( ( theLastNonzeroInterval == 0 ) && ( getInterval() == 0 ) )
+	{
+	  theDataPoint.setAvg ( theLastNonzeroValue );
+	}
+      
+    }
+    
+    DataPoint theDataPoint;
+    Real      theInterval;
+    Real 	theLastNonzeroInterval;
+    Real	theLastNonzeroValue;
 
-    };
+  };
 
 
   //@}
 
-  } // namespace libecs
+} // namespace libecs
 
 
 #endif /* __DATAPOINT_HPP */

@@ -42,7 +42,7 @@ namespace libecs
     :
     thePropertySlot( aPropertySlot ),
     theStepper( aStepper ),
-    theMinimumInterval( 0.1 ),
+    theMinimumInterval( 0.0 ),
     theLastTime( theStepper.getCurrentTime() - theMinimumInterval )
   {
     ; // do nothing
@@ -144,7 +144,7 @@ namespace libecs
 
         } while ( ( rcounter < rtarget ) && ( theMaxSize>=current_item ) );
 
-        ( *aDataPointVector )[counter] = aDataInterval.getDataPoint();
+        ( *aDataPointVector )[counter] = aDataInterval.getFinalDataPoint();
 	rtarget += anInterval;
 	if ( rtarget > theEndTime )
 	{
@@ -174,24 +174,27 @@ namespace libecs
     const Real aTime( theStepper.getCurrentTime() );
     const Real aCurrentInterval( aTime - theLastTime );
 
-    if( theMinimumInterval < aCurrentInterval )
+    if( theMinimumInterval <= aCurrentInterval )
       {
         theDataInterval.addPoint( aTime, aValue );
-        thePhysicalLogger.push( theDataInterval.getDataPoint() );
+        thePhysicalLogger.push( theDataInterval.getFinalDataPoint() );
 	theLastTime = aTime;
 	theDataInterval.beginNewInterval();
       }
-
+    
     theDataInterval.addPoint( aTime, aValue );
   }
 
 
   void Logger::flush()
   {
-    //  prevent flushing it twice
-    if( theDataInterval.getInterval() != -1.0 ) 
+    // prevent flushing it twice
+    // if min ingterval is zero there is no point in flushing
+
+    if ( ( theDataInterval.getInterval() != -1.0 ) && 
+	 ( theMinimumInterval > 0 ) )
       {  
-	thePhysicalLogger.push( theDataInterval.getDataPoint() );
+	thePhysicalLogger.push( theDataInterval.getFinalDataPoint() );
 	theDataInterval.beginNewInterval();
       }
   }
