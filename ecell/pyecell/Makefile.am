@@ -5,7 +5,8 @@ SUBDIRS = ecell
 bin_SCRIPTS =\
 ecell3-session\
 ecell3-session-manager\
-gecell3-session
+gecell3-session\
+ecell3-sbml2eml
 
 EXTRA_DIST = $(bin_SCRIPTS)
 

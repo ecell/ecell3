@@ -50,7 +50,9 @@ LocalSessionProxy.py\
 LocalSystemProxy.py\
 SGESessionProxy.py\
 SGESystemProxy.py\
-Util.py
+Util.py\
+SbmlFunctions.py\
+convertSBML2EML.py
 
 
 INCLUDES=-I. -I.. ${PYTHON_INCLUDES}
