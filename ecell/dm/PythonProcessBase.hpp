@@ -101,6 +101,24 @@ public:
 					       start ) ) );
   }
 
+  void defaultSetProperty( StringCref aPropertyName,
+			   PolymorphCref aValue )
+    {
+      if( getClassName() == "PythonProcess" ||
+	  getClassName() == "PythonFluxProcess" )
+	{
+	  theGlobalNamespace[ aPropertyName ] =
+	    python::object( python::handle<>( PyFloat_FromDouble( aValue ) ) );
+	}
+      else
+	{
+	  THROW_EXCEPTION( NoSlot,
+			   getClassName() +
+			   String( ": No PropertySlot found by name[" )
+			   + aPropertyName + "]. Set property failed." );
+	}
+    }
+
   virtual void initialize();
 
 protected:
@@ -115,7 +133,7 @@ void PythonProcessBase::initialize()
 {
   Process::initialize();
   
-  theGlobalNamespace.clear();
+  //  theGlobalNamespace.clear();
 
   for( VariableReferenceVectorConstIterator 
 	 i( getVariableReferenceVector().begin() );
