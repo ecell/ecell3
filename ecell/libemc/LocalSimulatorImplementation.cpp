@@ -144,7 +144,7 @@ namespace libemc
   {
     StepperCptr aStepperPtr( getModel().getStepper( aStepperID ) );
 
-    clean();
+    clearDirty();
 
     return aStepperPtr->getProperty( aPropertyName );
   }
@@ -166,7 +166,7 @@ namespace libemc
   {
     StepperCptr aStepperPtr( getModel().getStepper( aStepperID ) );
 
-    clean();
+    clearDirty();
 
     return aStepperPtr->saveProperty( aPropertyName );
   }
@@ -284,7 +284,7 @@ namespace libemc
     FullPN aFullPN( aFullPNString );
     EntityCptr anEntityPtr( getModel().getEntity( aFullPN.getFullID() ) );
 	
-    clean();
+    clearDirty();
 
     return anEntityPtr->getProperty( aFullPN.getPropertyName() );
   }
@@ -305,7 +305,7 @@ namespace libemc
     FullPN aFullPN( aFullPNString );
     EntityCptr anEntityPtr( getModel().getEntity( aFullPN.getFullID() ) );
 
-    clean();
+    clearDirty();
 
     return anEntityPtr->saveProperty( aFullPN.getPropertyName() );
   }
@@ -359,10 +359,12 @@ namespace libemc
 
     FullPN aFullPN( aFullPNString );
 
-    clean();
+    clearDirty();
 
     getModel().getLoggerBroker().
       createLogger( aFullPN, aParamList.asPolymorphVector() );
+
+    setDirty();
   }
 
   const Polymorph LocalSimulatorImplementation::getLoggerList() const

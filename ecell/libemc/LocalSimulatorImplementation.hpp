@@ -226,11 +226,11 @@ namespace libemc
 	      (*theEventHandler)();
 	    }	while( (*theEventChecker)() );
 	  
-	  clean();
+	  clearDirty();
 	}
     }
 
-    void clean() const
+    void clearDirty() const
     {
       if( isDirty() )
 	{
@@ -243,7 +243,7 @@ namespace libemc
 
     void start()
     {
-      clean();
+      clearDirty();
       theRunningFlag = true;
     }
 
