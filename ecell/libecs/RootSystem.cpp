@@ -58,12 +58,14 @@ namespace libecs
     theStepperMaker( *new StepperMaker ),
     theAccumulatorMaker( *new AccumulatorMaker )
   {
+    theStepperLeader.setRootSystem( this );
+
     makeSlots();
 
     setID( "/" );
     setName( "The RootSystem" );
     setRootSystem( this );
-    setStepperClass("Euler1Stepper" );
+    setStepperClass("Euler1SRMStepper" );
   }
 
   RootSystem::~RootSystem()
@@ -73,7 +75,6 @@ namespace libecs
     delete &theSystemMaker;
     delete &theSubstanceMaker;
     delete &theReactorMaker;
-    delete &theStepperLeader;
   }
 
 

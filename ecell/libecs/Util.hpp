@@ -149,6 +149,47 @@ namespace libecs
   };
 
 
+
+  /**
+     For each element of a sequence, call a given method.
+
+    There are several different implementations of this.  Actually
+    using macro is ugly.  But in core portions of libecs,
+    performance is very critical.  
+
+    I've examined assembler codes made by gcc 2.95 and found that
+    raw for loops result in the best codes.  The following function
+    objects + for_each approach was the second best and almost
+    equivalent to the raw loop except that for_each is a template
+    function and didn't be inlined by the compiler.
+
+    template <class T>
+    class DifferentiateCaller 
+    {
+    public:
+      inline void operator() ( T*& object ) const
+      {
+        object->differentiate();
+      }
+    };
+  
+    
+    for_each( theReactorVector.begin(), theReactorVector.end(), 
+  	      DifferentiateCaller<Reactor>() );
+
+
+    (Kouichi Takahashi)
+  */
+
+#define FOR_ALL( SEQCLASS, SEQ, METHOD )\
+  for( SEQCLASS ## ConstIterator i( (SEQ)##.begin() ) ;\
+       i != (SEQ)##.end() ; ++i )\
+    { (*i)-> ## METHOD ## (); }
+
+
+
+
+
 } // namespace libecs
 
 

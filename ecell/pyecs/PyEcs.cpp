@@ -46,8 +46,6 @@ using namespace libecs;
 // PyEcs class     //
 //-----------------// 
 
-#include <dlfcn.h>
-
 PyEcs::PyEcs()
   :
   Py::ExtensionModule<PyEcs>( "ecs" )

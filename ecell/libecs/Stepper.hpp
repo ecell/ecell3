@@ -30,8 +30,10 @@
 
 #ifndef ___STEPPER_H___
 #define ___STEPPER_H___
-#include <list>
+#include <queue>
 #include <map>
+#include <algorithm>
+#include <utility>
 
 #include "libecs.hpp"
 
@@ -44,144 +46,80 @@ namespace libecs
 
   DECLARE_CLASS( Euler1Stepper );
   DECLARE_CLASS( RungeKutta4Stepper );
-  //  DECLARE_CLASS( PropertySlotVectorImplementation );
+  DECLARE_CLASS( PropertySlotVectorImplementation );
+
+  DECLARE_VECTOR( SubstancePtr, SubstanceVector );
+  DECLARE_VECTOR( ReactorPtr,   ReactorVector );
+  DECLARE_VECTOR( SystemPtr,    SystemVector );
 
 
   typedef IntegratorPtr ( *IntegratorAllocator_ )( SubstanceRef );
   DECLARE_TYPE( IntegratorAllocator_, IntegratorAllocator );
 
-  typedef StepperPtr (* StepperAllocatorFunc )();
+  typedef StepperPtr (* StepperAllocator_ )();
+  DECLARE_TYPE( StepperAllocator_, StepperAllocator );
 
   DECLARE_VECTOR( StepperPtr, StepperVector );
-  //  DECLARE_VECTOR( SlaveStepperPtr, SlaveStepperVector );
-  //  DECLARE_VECTOR( MasterStepperPtr, MasterStepperVector );
+  DECLARE_VECTOR( SlaveStepperPtr, SlaveStepperVector );
+  DECLARE_VECTOR( MasterStepperPtr, MasterStepperVector );
 
   DECLARE_VECTOR( PropertySlotPtr, PropertySlotVector );
 
+  //  DECLARE_LIST( MasterStepperPtr, MasterStepperList )
+
+
+  typedef pair<Real,MasterStepperPtr> RealMasterStepperPtrPair;
+  DECLARE_TYPE( RealMasterStepperPtrPair, Event );
+  DECLARE_TYPE( priority_queue<Event>, ScheduleQueue );
 
   class StepperLeader
   {
+
+
+
 
   public:
 
     StepperLeader();
     virtual ~StepperLeader() {}
 
-    void registerMasterStepper( MasterStepperPtr newstepper );
-
-    static void setDefaultUpdateDepth( int d ) { DEFAULT_UPDATE_DEPTH = d; }
-    static int getDefaultUpdateDepth()         { return DEFAULT_UPDATE_DEPTH; }
-
-    void setUpdateDepth( int d ) { theUpdateDepth = d; }
-    int getUpdateDepth()         { return theUpdateDepth; }
-
     virtual void initialize();
-
-
-    // depricate: should be dynamically scheduled
-    void setStepInterval( RealCref interval )
-    {
-      theStepInterval = interval;
-      calculateStepsPerSecond();
-    }
-
-    void calculateStepsPerSecond()
-    {
-      theStepsPerSecond = 1 / theStepInterval;
-    }
-
-    // should be dynamically scheduled
-    RealCref getStepInterval() const
-    {
-      return theStepInterval;
-    }
-
-    RealCref getStepsPerSecond() const
-    {
-      return theStepsPerSecond;
-    }
 
     RealCref getCurrentTime() const
     {
       return theCurrentTime;
     }
 
-    void step();
-    virtual void clear();
-    virtual void differentiate();
-    virtual void integrate();
-    virtual void compute();
+    void setRootSystem( const RootSystemPtr aRootSystem)
+    {
+      theRootSystem = aRootSystem;
+    }
 
+    RootSystemPtr getRootSystem() const
+    {
+      return theRootSystem;
+    }
+
+    void step();
     void push();
+
 
     virtual const char* const className() const  { return "StepperLeader"; }
 
-  protected:
+  private:
 
-    StepperVector theMasterStepperVector;
+    void updateMasterStepperVector( SystemPtr aSystem );
+    void updateScheduleQueue();
 
   private:
 
-    int theUpdateDepth;
+    RootSystemPtr   theRootSystem;
+    Real            theCurrentTime;
 
-    Real theCurrentTime;
-
-    Real theStepInterval;
-    Real theStepsPerSecond;
-
-    static int DEFAULT_UPDATE_DEPTH;
+    MasterStepperVector   theMasterStepperVector;
+    ScheduleQueue   theScheduleQueue;
 
   };
-
-
-#if 0
-
-  // Implementation Class
-  class PropertySlotVectorImplementation
-  {
-  public:
-
-    PropertySlotVectorImplementation()
-      :
-      thePropertySlotVector( new PropertySlotVector )
-    {
-      ; // Do Nothing
-    }
-
-    PropertySlotVectorImplementation( PropertySlotVectorRef aPropertySlotVector )
-      :
-      thePropertySlotVector( &aPropertySlotVector )
-    {
-      ; // Do Nothing
-    }
-
-    virutual ~PropertySlotVectorImplementation()
-    {
-      delete thePropertySlotVector;
-    }
-
-    void appendPropertySlot( PropertySlotPtr aPropertySlot )
-    {
-      thePropertySlotVector.push_back( aPropertySlot );
-    }
-
-    void pushall()
-    {
-      for(PropertySlotVector::iterator i( thePropertySlotVector.begin() );
-	  i != thePropertySlotVector.end(); ++i )
-	{
-	  (*i)->push();
-	}
-    }
-
-  private:
-
-    PropertySlotVectorPtr thePropertySlotVector;
-
-  };
-
-#endif
-
 
 
 
@@ -201,57 +139,86 @@ namespace libecs
     virtual RealCref getStepInterval() const = 0;
     virtual RealCref getStepsPerSecond() const = 0;
 
-    virtual void clear() = 0;
-    virtual void differentiate() = 0;
-    virtual void turn() {}
-    virtual void integrate() = 0;
-    virtual void compute() = 0;
-    virtual void sync() = 0;
-    virtual void push() = 0;
+    void setMasterStepper( MasterStepperPtr aMasterStepper )
+    { 
+      theMasterStepper = aMasterStepper;
+    }
+
+    MasterStepperPtr getMasterStepper() const
+    {
+      return theMasterStepper;
+    }
+
+    virtual void sync() { }
+    virtual const Real step() { }
+    virtual void push() { }
 
     virtual void registerPropertySlot( PropertySlotPtr ) = 0;
-
-    virtual void distributeIntegrator( IntegratorAllocatorPtr );
 
     virtual const char* const className() const  { return "Stepper"; }
 
   protected:
 
-    SystemPtr theOwner;
+    SystemPtr        theOwner;
+    MasterStepperPtr theMasterStepper;
 
   };
 
-  class MasterStepper : public Stepper
+  class MasterStepper 
+    : 
+    public Stepper
   {
 
   public:
 
     MasterStepper();
-
-    virtual void clear();
-    virtual void differentiate();
-    virtual void integrate();
-    virtual void compute();
+    virtual ~MasterStepper() {}
 
     virtual void sync();
+    virtual const Real step() = 0;
     virtual void push();
 
     void setStepInterval( RealCref stepinterval );
     void calculateStepsPerSecond();
 
-    virtual RealCref getStepInterval() const; 
-    virtual RealCref getStepsPerSecond() const;
 
-    virtual ~MasterStepper() {}
+    virtual RealCref getStepInterval() const
+    {
+      return theStepInterval;
+    }
 
-    // FIXME: ambiguous name
-    virtual int getNumberOfSteps() const { return 1; }
+    virtual RealCref getStepsPerSecond() const
+    {
+      return theStepsPerSecond;
+    }
+
+    bool isEntityListChanged() const
+    {
+      return theEntityListChanged;
+    }
+
+    void setEntityListChanged()
+    {
+      theEntityListChanged = true;
+    }
+
+    void clearEntityListChanged()
+    {
+      theEntityListChanged = false;
+    }
 
     virtual void initialize();
 
-    virtual void distributeIntegrator( IntegratorAllocator );
+    SlaveStepperVectorCref getSlaveStepperVector() const
+    {
+      return theSlaveStepperVector;
+    }
+
+    void updateSlaveStepperVector( SystemPtr aStartSystemPtr );
+
     void registerSlaves( SystemPtr );
     void registerPropertySlot( PropertySlotPtr );
+
 
     virtual const char* const className() const  { return "MasterStepper"; }
 
@@ -261,14 +228,17 @@ namespace libecs
     Real                theStepsPerSecond;
 
     IntegratorAllocator theAllocator;
-    StepperVector       theSlaveStepperVector;
+    SlaveStepperVector  theSlaveStepperVector;
     PropertySlotVector  thePropertySlotVector;
 
+    bool                theEntityListChanged;
   };
 
 
 
-  class SlaveStepper : public Stepper
+  class SlaveStepper 
+    : 
+    public Stepper
   {
 
   public:
@@ -277,96 +247,145 @@ namespace libecs
     virtual ~SlaveStepper() {}
 
   
-    // virtual and inlined.
-    // this is for optimization in operations with SlaveStepperPtrs.
-    // (e.g. loops over SlaveStepperList in MasterStepper)
-    virtual void clear()
-    {
-      theOwner->clear();
-    }
-
-    virtual void differentiate()
-    {
-      theOwner->differentiate();
-    }
-
-    virtual void turn()
-    {
-      theOwner->turn();
-    }
-
-    virtual void integrate()
-    {
-      theOwner->integrate();
-    }
-
-    virtual void compute()
-    {
-      theOwner->compute();
-    }
-
-    virtual void sync()
-    {
-      ;
-    }
-
-    void push()
-    {
-      //      theMaster->push();
-      ;
-    }
-
     virtual void initialize()
     {
       Stepper::initialize();
     }
 
-    void setMaster( MasterStepperPtr master ) 
-    { 
-      theMaster = master; 
+    void setMasterStepper( MasterStepperPtr aMasterStepperPtr )
+    {
+      theMasterStepper = aMasterStepperPtr;
     }
 
-    RealCref getStepInterval() const
+    virtual RealCref getStepInterval() const
     { 
       // Slaves are synchronous to their masters.
-      return theMaster->getStepInterval(); 
+      return theMasterStepper->getStepInterval(); 
     }
 
-    RealCref getStepsPerSecond() const
+    virtual RealCref getStepsPerSecond() const
     { 
       // Slaves are synchronous to their masters.
-      return theMaster->getStepsPerSecond();
+      return theMasterStepper->getStepsPerSecond();
+    }
+    
+    void registerPropertySlot( PropertySlotPtr aPropertySlotPtr )
+    { 
+      theMasterStepper->registerPropertySlot( aPropertySlotPtr );
     }
 
     static StepperPtr instance() { return new SlaveStepper; }
 
     virtual const char* const className() const  { return "SlaveStepper"; }
 
-    void registerPropertySlot( PropertySlotPtr propertyslot )
-    {
-      theMaster->registerPropertySlot( propertyslot );
-    }
-
   private:
 
-    MasterStepperPtr theMaster;
+    MasterStepperPtr theMasterStepper;
 
   };
 
 
-  class Euler1Stepper : public MasterStepper
+  class MasterStepperWithEntityCache
+    : 
+    public MasterStepper
   {
 
   public:
 
-    Euler1Stepper();
-    virtual ~Euler1Stepper() {}
+    MasterStepperWithEntityCache()
+    {
+      ; // do nothing
+    }
 
-    static StepperPtr instance() { return new Euler1Stepper; }
+    ~MasterStepperWithEntityCache() {}
 
-    virtual int getNumberOfSteps() { return 1; }
 
-    virtual const char* const className() const  { return "Euler1Stepper"; }
+    virtual void initialize();
+
+    /**
+       Update the cache if any of the systems have any newly added 
+       or removed Entity.
+    */
+
+    void updateCacheWithCheck()
+    {
+      if( isEntityListChanged() )
+	{
+	  updateCache();
+	  clearEntityListChanged();
+	}
+    }
+
+    /**
+       Update the cache.
+    */
+
+    void updateCache();
+
+    void updateCacheWithSort();
+
+  protected:
+
+    SubstanceVector               theSubstanceCache;
+    ReactorVector                 theReactorCache;
+    SystemVector                  theSystemCache;
+
+  };
+
+
+  class SRMStepper 
+    : 
+    public MasterStepperWithEntityCache
+  {
+  public:
+
+    SRMStepper();
+    virtual ~SRMStepper() {}
+
+    virtual const Real step()
+    {
+      clear();
+      differentiate();
+      integrate();
+      compute();
+
+      return getStepInterval();
+    }
+
+    virtual void initialize();
+
+    virtual void clear();
+    virtual void differentiate();
+    virtual void turn();
+    virtual void integrate();
+    virtual void compute();
+
+    virtual const char* const className() const  { return "SRMStepper"; }
+ 
+
+  protected:
+
+    IntegratorAllocator theIntegratorAllocator;
+
+  private:
+
+    virtual void distributeIntegrator( IntegratorAllocator );
+
+  };
+
+  class Euler1SRMStepper
+    :
+    public SRMStepper
+  {
+
+  public:
+
+    Euler1SRMStepper();
+    virtual ~Euler1SRMStepper() {}
+
+    static StepperPtr instance() { return new Euler1SRMStepper; }
+
+    virtual const char* const className() const  { return "Euler1SRMStepper"; }
  
   protected:
 
@@ -375,22 +394,22 @@ namespace libecs
   };
 
 
-  class RungeKutta4Stepper : public MasterStepper
+  class RungeKutta4SRMStepper
+    : 
+    public SRMStepper
   {
 
   public:
 
-    RungeKutta4Stepper();
-    virtual ~RungeKutta4Stepper() {}
+    RungeKutta4SRMStepper();
+    virtual ~RungeKutta4SRMStepper() {}
 
-    static StepperPtr instance() { return new RungeKutta4Stepper; }
-
-    virtual int getNumberOfSteps() { return 4; }
+    static StepperPtr instance() { return new RungeKutta4SRMStepper; }
 
     virtual void differentiate();
 
     virtual const char* const className() const 
-    { return "RungeKutta4Stepper"; }
+    { return "RungeKutta4SRMStepper"; }
 
   private:
 

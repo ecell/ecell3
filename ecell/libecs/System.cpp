@@ -75,8 +75,8 @@ namespace libecs
     UVariableVectorRCPtr aVectorPtr( new UVariableVector );
     aVectorPtr->reserve( theSystemMap.size() );
 
-    for( SystemMapConstIterator i = getFirstSystemIterator() ;
-	 i != getLastSystemIterator() ; ++i )
+    for( SystemMapConstIterator i = getSystemMap().begin() ;
+	 i != getSystemMap().end() ; ++i )
       {
 	aVectorPtr->push_back( i->second->getID() );
       }
@@ -89,8 +89,8 @@ namespace libecs
     UVariableVectorRCPtr aVectorPtr( new UVariableVector );
     aVectorPtr->reserve( theSubstanceMap.size() );
 
-    for( SubstanceMapConstIterator i = getFirstSubstanceIterator() ;
-	 i != getLastSubstanceIterator() ; ++i )
+    for( SubstanceMapConstIterator i( getSubstanceMap().begin() );
+	 i != getSubstanceMap().end() ; ++i )
       {
 	aVectorPtr->push_back( i->second->getID() );
       }
@@ -103,8 +103,8 @@ namespace libecs
     UVariableVectorRCPtr aVectorPtr( new UVariableVector );
     aVectorPtr->reserve( theReactorMap.size() );
 
-    for( ReactorMapConstIterator i = getFirstReactorIterator() ;
-	 i != getLastReactorIterator() ; ++i )
+    for( ReactorMapConstIterator i( getReactorMap().begin() );
+	 i != getReactorMap().end() ; ++i )
       {
 	aVectorPtr->push_back( i->second->getID() );
       }
@@ -131,10 +131,11 @@ namespace libecs
     theVolume( 1 ),
     theVolumeBuffer( 1 ),
     theStepper( NULLPTR ),
-    theRootSystem( NULLPTR )
+    theRootSystem( NULLPTR ),
+    theEntityListChanged( false )
   {
     makeSlots();
-    theFirstRegularReactorIterator = theReactorMap.begin();
+    theFirstRegularReactorIterator = getReactorMap().begin();
   }
 
   System::~System()
@@ -172,6 +173,7 @@ namespace libecs
 			 getStepperMaker().make( classname ) );
     aStepper->setOwner( this );
 
+    /* depricated -- StepperLeader does scan for masters
     MasterStepperPtr 
       aMasterStepper( dynamic_cast<MasterStepperPtr>( aStepper ) );
     if( aMasterStepper != NULLPTR )
@@ -179,6 +181,7 @@ namespace libecs
 	getRootSystem()->getStepperLeader().
 	  registerMasterStepper( aMasterStepper );
       }
+    */
 
     theStepper = aStepper;
     /*
@@ -205,17 +208,16 @@ namespace libecs
 
   void System::initialize()
   {
-    /*
     if(theStepper == NULLPTR )
       {
 	setStepperClass("SlaveStepper");
       }
-    */
+
     //
     // Substance::initialize()
     //
-    for( SubstanceMapConstIterator i( getFirstSubstanceIterator() ); 
-	 i != getLastSubstanceIterator() ; ++i )
+    for( SubstanceMapConstIterator i( getSubstanceMap().begin() );
+	 i != getSubstanceMap().end() ; ++i )
       {
 	i->second->initialize();
       }
@@ -223,92 +225,29 @@ namespace libecs
     //
     // Reactor::initialize()
     //
-    for( ReactorMapConstIterator i( getFirstReactorIterator() );
-	 i != getLastReactorIterator() ; ++i )
+    for( ReactorMapConstIterator i( getReactorMap().begin() );
+	 i != getReactorMap().end() ; ++i )
       {
 	i->second->initialize();
       }
 
-    theFirstRegularReactorIterator = find_if( theReactorMap.begin(),
-					      theReactorMap.end(),
+    theFirstRegularReactorIterator = find_if( getReactorMap().begin(),
+					      getReactorMap().end(),
 					      isRegularReactorItem() );
 
     //
     // System::initialize()
     //
-    for( SystemMapConstIterator i( getFirstSystemIterator() );
-	 i != getLastSystemIterator(); ++i )
+    for( SystemMapConstIterator i( getSystemMap().begin() );
+	 i != getSystemMap().end() ; ++i )
       {
 	i->second->initialize();
       }
   }
 
-  void System::clear()
-  {
-    //
-    // Substance::clear()
-    //
-    for( SubstanceMapConstIterator i( getFirstSubstanceIterator() );
-	 i != getLastSubstanceIterator() ; ++i )
-      {
-	i->second->clear();
-      }
-  }
-
-  void System::differentiate()
-  {
-    for( ReactorMapConstIterator i( getFirstRegularReactorIterator() ); 
-	 i != getLastReactorIterator() ; ++i )
-      {
-	i->second->differentiate();
-      }
-  }
-
-  void System::turn()
-  {
-    for( SubstanceMapConstIterator i( getFirstSubstanceIterator() );
-	 i != getLastSubstanceIterator() ; ++i )
-      {
-	i->second->turn();
-      }
-  }
-
-  void System::integrate()
-  {
-    for( ReactorMapConstIterator i( getFirstRegularReactorIterator() ); 
-	 i != getLastReactorIterator() ; ++i )
-      {
-	i->second->integrate();
-      }
-
-    for( SubstanceMapConstIterator i( getFirstSubstanceIterator() );
-	 i != getLastSubstanceIterator() ; ++i )
-      {
-	i->second->integrate();
-      }
-
-    updateVolume();
-  }
-
-  void System::compute()
-  {
-    for( ReactorMapConstIterator i( getFirstReactorIterator() ); 
-	 i != getFirstRegularReactorIterator() ; ++i )
-      {
-	i->second->compute();
-      }
-
-    // update activity of posterior reactors by buffered values 
-    for( ReactorMapConstIterator i( getFirstReactorIterator() ); 
-	 i != getFirstRegularReactorIterator() ; ++i )
-      {
-	i->second->integrate();
-      }
-  }
-
   void System::registerReactor( ReactorPtr reactor )
   {
-    if( containsReactor( reactor->getID() ) )
+    if( getReactorMap().find( reactor->getID() ) != getReactorMap().end() )
       {
 	delete reactor;
 	//FIXME: throw exception
@@ -317,12 +256,14 @@ namespace libecs
 
     theReactorMap[ reactor->getID() ] = reactor;
     reactor->setSuperSystem( this );
+
+    notifyChangeOfEntityList();
   }
 
   ReactorPtr System::getReactor( StringCref id ) 
   {
-    ReactorMapIterator i( getReactorIterator( id ) );
-    if( i == getLastReactorIterator() )
+    ReactorMapConstIterator i( getReactorMap().find( id ) );
+    if( i == getReactorMap().end() )
       {
 	throw NotFound( __PRETTY_FUNCTION__, "[" + getFullID().getString() + 
 			"]: Reactor [" + id + "] not found in this System." );
@@ -332,7 +273,7 @@ namespace libecs
 
   void System::registerSubstance( SubstancePtr newone )
   {
-    if( containsSubstance( newone->getID() ) )
+    if( getSubstanceMap().find( newone->getID() ) != getSubstanceMap().end() )
       {
 	delete newone;
 	//FIXME: throw exception
@@ -340,12 +281,14 @@ namespace libecs
       }
     theSubstanceMap[ newone->getID() ] = newone;
     newone->setSuperSystem( this );
+
+    notifyChangeOfEntityList();
   }
 
   SubstancePtr System::getSubstance( StringCref id ) 
   {
-    SubstanceMapIterator i = getSubstanceIterator( id );
-    if( i == getLastSubstanceIterator() )
+    SubstanceMapConstIterator i( getSubstanceMap().find( id ) );
+    if( i == getSubstanceMap().end() )
       {
 	throw NotFound(__PRETTY_FUNCTION__, "[" + getFullID().getString() + 
 		       "]: Substance [" + id + "] not found in this System.");
@@ -357,7 +300,7 @@ namespace libecs
 
   void System::registerSystem( SystemPtr system )
   {
-    if( containsSystem( system->getID() ) )
+    if( getSystemMap().find( system->getID() ) != getSystemMap().end() )
       {
 	delete system;
 	//FIXME: throw exception
@@ -367,6 +310,7 @@ namespace libecs
     theSystemMap[ system->getID() ] = system;
     system->setSuperSystem( this );
 
+    notifyChangeOfEntityList();
   }
 
   SystemPtr System::getSystem( SystemPathCref systempath )
@@ -392,8 +336,8 @@ namespace libecs
 
   SystemPtr System::getSystem( StringCref id ) 
   {
-    SystemMapIterator i( getSystemIterator( id ) );
-    if( i == getLastSystemIterator() )
+    SystemMapConstIterator i( getSystemMap().find( id ) );
+    if( i == getSystemMap().end() )
       {
 	throw NotFound( __PRETTY_FUNCTION__, "[" + getFullID().getString() + 
 			"]: System [" + id + "] not found in this System." );
@@ -467,6 +411,12 @@ namespace libecs
   {
     return getActivity() * getStepper()->getStepsPerSecond();
   }
+
+  void System::notifyChangeOfEntityList()
+  {
+    //    getStepper()->getMasterStepper()->setEntityListChanged();
+  }
+
 
 } // namespace libecs
 

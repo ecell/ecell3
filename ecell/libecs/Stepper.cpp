@@ -34,8 +34,100 @@
 
 #include "Stepper.hpp"
 
+
 namespace libecs
 {
+
+
+  ////////////////////////// StepperLeader
+
+  StepperLeader::StepperLeader() 
+    : 
+    theCurrentTime( 0.0 ),
+    theRootSystem( NULL )
+  {
+    ; // do nothing
+  }
+
+
+  void StepperLeader::updateMasterStepperVector( SystemPtr aSystemPtr )
+  {
+
+    MasterStepperPtr aMasterStepper( dynamic_cast<MasterStepperPtr>
+				     ( aSystemPtr->getStepper() ) );
+
+    if( aMasterStepper != NULL )
+      {
+	theMasterStepperVector.push_back( aMasterStepper );
+      }
+
+    //FIXME: breadth-first search?
+    for( SystemMapConstIterator i( aSystemPtr->getSystemMap().begin() ) ;
+	 i != aSystemPtr->getSystemMap().end() ; ++i )
+      {
+	updateMasterStepperVector( i->second );
+      }
+
+
+  }
+
+  void StepperLeader::updateScheduleQueue()
+  {
+    //FIXME: slow! :  no theScheduleQueue.clear() ?
+    while( ! theScheduleQueue.empty() )
+      {
+	theScheduleQueue.pop();
+      }
+
+
+
+
+    for( MasterStepperVectorConstIterator i( theMasterStepperVector.begin() );
+	 i != theMasterStepperVector.end() ; i++)
+      {
+	theScheduleQueue.push( Event( theCurrentTime, (*i) ) );
+      }
+  }
+
+  void StepperLeader::initialize()
+  {
+    assert( theRootSystem != NULL );
+
+    theMasterStepperVector.clear();
+
+    updateMasterStepperVector( theRootSystem );
+    FOR_ALL( MasterStepperVector, theMasterStepperVector, 
+	     initialize );
+
+    updateScheduleQueue();
+
+    theCurrentTime = ( theScheduleQueue.top() ).first;
+  }
+
+
+  void StepperLeader::step()
+  {
+    EventCref aTopEvent( theScheduleQueue.top() );
+    MasterStepperPtr aMasterStepper( aTopEvent.second );
+
+    // the time must be memorized before the Event is deleted by push()
+    const Real aTopTime( aTopEvent.first );
+
+    aMasterStepper->sync();
+
+    const Real aStepSize( aMasterStepper->step() );
+
+    aMasterStepper->push();
+
+    //FIXME: change_top() is better than pop 'n' push
+    theScheduleQueue.pop();
+    theScheduleQueue.push( Event( aTopTime + aStepSize,
+				  aMasterStepper ) );
+
+    theCurrentTime = ( theScheduleQueue.top() ).first;
+  }
+
+
 
   ////////////////////////// Stepper
 
@@ -44,17 +136,6 @@ namespace libecs
     theOwner( NULLPTR )
   {
 
-  }
-
-  void Stepper::distributeIntegrator( IntegratorAllocator* allocator )
-  {
-    assert( theOwner );
-  
-    for( SubstanceMapConstIterator s = theOwner->getFirstSubstanceIterator();
-	 s != theOwner->getLastSubstanceIterator() ; ++s)
-      {
-	(*allocator)(*(s->second));
-      }
   }
 
   void Stepper::initialize()
@@ -67,11 +148,10 @@ namespace libecs
 
   MasterStepper::MasterStepper() 
     :
-    theStepInterval( 0.001 ),
-    theStepsPerSecond( 1000 ),
-    theAllocator( NULLPTR )
+    theStepInterval( 0.001 )
   {
-    ; // do nothing
+    setMasterStepper( this );
+    calculateStepsPerSecond();
   }
 
   void MasterStepper::initialize()
@@ -79,44 +159,35 @@ namespace libecs
     // FIXME: is this multiple-time-initialization-proof? 
     Stepper::initialize();
 
-    registerSlaves( theOwner );
+    updateSlaveStepperVector( theOwner );
 
-    distributeIntegrator( IntegratorAllocator( theAllocator ) );
-
-    for( StepperVectorIterator i( theSlaveStepperVector.begin() ); 
+    for( SlaveStepperVectorIterator i( theSlaveStepperVector.begin() ); 
 	 i != theSlaveStepperVector.end() ; ++i )
       {
+	(*i)->setMasterStepper( this );
 	(*i)->initialize();
       }
   }
 
-  void MasterStepper::distributeIntegrator( IntegratorAllocator allocator )
-  {
-    Stepper::distributeIntegrator( &allocator );
-    for( StepperVectorIterator i( theSlaveStepperVector.begin() ); 
-	 i != theSlaveStepperVector.end() ; ++i )
-      {
-	(*i)->distributeIntegrator( &allocator );
-      }
-  }
 
-
-  void MasterStepper::registerSlaves( SystemPtr system )
+  void MasterStepper::updateSlaveStepperVector( SystemPtr aStartSystemPtr )
   {
-    for( SystemMapConstIterator s( theOwner->getFirstSystemIterator() );
-	 s != theOwner->getLastSystemIterator() ; ++s )
+    theSlaveStepperVector.clear();
+
+    for( SystemMapConstIterator s( aStartSystemPtr->getSystemMap().begin() );
+	 s != aStartSystemPtr->getSystemMap().end() ; ++s )
       {
-	SystemPtr aSystemPtr( s->second );
+	SystemPtr aSlaveSystemPtr( s->second );
 
 	//FIXME: handle bad_cast
 	SlaveStepperPtr aSlaveStepperPtr( dynamic_cast< SlaveStepperPtr >
-					  ( aSystemPtr->getStepper() ) );
+					  ( aSlaveSystemPtr->getStepper() ) );
 
 	if( aSlaveStepperPtr != NULLPTR )
 	  {
 	    theSlaveStepperVector.push_back( aSlaveStepperPtr );
-	    aSlaveStepperPtr->setMaster( this );
-	    registerSlaves( aSystemPtr );
+	    aSlaveStepperPtr->setMasterStepper( this );
+	    updateSlaveStepperVector( aSlaveSystemPtr );
 	  }
       }
   }
@@ -138,63 +209,135 @@ namespace libecs
     theStepsPerSecond = 1 / getStepInterval();
   }
 
-  RealCref MasterStepper::getStepsPerSecond() const
-  {
-    return getOwner()->getRootSystem()->getStepperLeader().getStepsPerSecond();
-  }
-
-  RealCref MasterStepper::getStepInterval() const
-  {
-    return getOwner()->getRootSystem()->getStepperLeader().getStepInterval();
-  }
-
-  void MasterStepper::clear()
-  {
-    theOwner->clear();
-    for( StepperVectorIterator i( theSlaveStepperVector.begin() ); 
-	 i != theSlaveStepperVector.end() ; ++i )
-      {
-	(*i)->clear();
-      }
-  }
-
-  void MasterStepper::differentiate()
-  {  
-    theOwner->differentiate();
-    for( StepperVectorIterator i( theSlaveStepperVector.begin() ); 
-	 i != theSlaveStepperVector.end() ; ++i )
-      {
-	(*i)->differentiate();
-      }
-    theOwner->turn();
-    for( StepperVectorIterator i( theSlaveStepperVector.begin() ); 
-	 i != theSlaveStepperVector.end() ; ++i )
-      {
-	(*i)->turn();
-      }
-  }
-
-  void MasterStepper::integrate()
-  {
-    theOwner->integrate();
-    for( StepperVectorIterator i( theSlaveStepperVector.begin() ); 
-	 i != theSlaveStepperVector.end() ; ++i )
-      {
-	(*i)->integrate();
-      }
-  }
-
-  void MasterStepper::compute()
-  {
-    theOwner->compute();
-    for( StepperVectorIterator i( theSlaveStepperVector.begin() ); 
-	 i != theSlaveStepperVector.end() ; ++i )
-      {
-	(*i)->compute();
-      }
-  }
-
   void MasterStepper::sync()
+  {
+
+  }
+
+  void MasterStepper::push()
+  {
+
+  }
+
+  ////////////////////////// MasterStepperWithEntityCache
+
+  void MasterStepperWithEntityCache::initialize()
+  {
+    MasterStepper::initialize();
+    updateCacheWithCheck();
+  }
+
+  
+  void MasterStepperWithEntityCache::updateCache()
+  {
+    SystemPtr aMasterSystem( getOwner() );
+    theSystemCache.resize( getSlaveStepperVector().size() + 1 );
+    SystemVectorIterator aSystemCacheIterator( theSystemCache.begin() );
+    (*aSystemCacheIterator) = aMasterSystem;
+
+    SubstanceVector::size_type 
+      aSubstanceCacheSize( aMasterSystem->getSubstanceMap().size() );
+    ReactorVector::size_type   
+      aReactorCacheSize( aMasterSystem->getReactorMap().size() );
+
+    SlaveStepperVectorCref 
+      aSlaveStepperVector( getSlaveStepperVector() );
+    for( SlaveStepperVectorConstIterator i( aSlaveStepperVector.begin() ); 
+	 i != aSlaveStepperVector.end() ; ++i )
+      {
+	SystemPtr aSystem( (*i)->getOwner() );
+	aSubstanceCacheSize += aSystem->getSubstanceMap().size();
+	aReactorCacheSize += aSystem->getReactorMap().size();
+	*(++aSystemCacheIterator) = aSystem;
+      }
+
+    theSubstanceCache.resize( aSubstanceCacheSize );
+    theReactorCache.resize( aReactorCacheSize );
+
+    SubstanceVectorIterator 
+      aSubstanceVectorIterator( theSubstanceCache.begin() );
+    ReactorVectorIterator aReactorVectorIterator( theReactorCache.begin() );
+
+    for( SystemVectorConstIterator i( theSystemCache.begin() );
+	 i != theSystemCache.end() ; ++i )
+      {
+	aSubstanceVectorIterator =
+	  transform( aMasterSystem->getSubstanceMap().begin(), 
+		     aMasterSystem->getSubstanceMap().end(), 
+		     aSubstanceVectorIterator,
+		     select2nd<SubstanceMap::value_type>() );    
+
+	aReactorVectorIterator =
+	  transform( aMasterSystem->getReactorMap().begin(), 
+		     aMasterSystem->getReactorMap().end(), 
+		     aReactorVectorIterator,
+		     select2nd<ReactorMap::value_type>() );    
+      }
+
+  }
+
+
+  //FIXME: incomplete
+  void MasterStepperWithEntityCache::updateCacheWithSort()
+  {
+    SystemPtr aMasterSystem( getOwner() );
+    theSystemCache.resize( getSlaveStepperVector().size() + 1 );
+    SystemVectorIterator aSystemCacheIterator( theSystemCache.begin() );
+    (*aSystemCacheIterator) = aMasterSystem;
+
+    SubstanceVector::size_type 
+      aSubstanceCacheSize( aMasterSystem->getSubstanceMap().size() );
+    ReactorVector::size_type   
+      aReactorCacheSize( aMasterSystem->getReactorMap().size() );
+
+    SlaveStepperVectorCref 
+      aSlaveStepperVector( getSlaveStepperVector() );
+    for( SlaveStepperVectorConstIterator i( aSlaveStepperVector.begin() ); 
+	 i != aSlaveStepperVector.end() ; ++i )
+      {
+	SystemPtr aSystem( (*i)->getOwner() );
+	aSubstanceCacheSize += aSystem->getSubstanceMap().size();
+	aReactorCacheSize += aSystem->getReactorMap().size();
+	*(++aSystemCacheIterator) = aSystem;
+      }
+
+    theSubstanceCache.resize( aSubstanceCacheSize );
+    theReactorCache.resize( aReactorCacheSize );
+
+    SubstanceVectorIterator aSubstanceVectorIterator
+      ( theSubstanceCache.begin() );
+
+    ReactorVectorIterator aReactorVectorIterator
+      ( theReactorCache.begin() );
+
+    for( SystemVectorConstIterator i( theSystemCache.begin() );
+	 i != theSystemCache.end() ; ++i )
+      {
+	  
+	aSubstanceVectorIterator =
+	  transform( aMasterSystem->getSubstanceMap().begin(), 
+		     aMasterSystem->getSubstanceMap().end(), 
+		     aSubstanceVectorIterator,
+		     select2nd<SubstanceMap::value_type>() );    
+
+	aReactorVectorIterator =
+	  transform( aMasterSystem->getReactorMap().begin(), 
+		     aMasterSystem->getReactorMap().end(), 
+		     aReactorVectorIterator,
+		     select2nd<ReactorMap::value_type>() );    
+      }
+
+    //      theMaster->push();
+    ;
+  }
+
+
+
+  ////////////////////////// SRMStepper
+
+  SRMStepper::SRMStepper()
+    :
+    theIntegratorAllocator( NULLPTR )
   {
     for( PropertySlotVectorIterator i( thePropertySlotVector.begin() );
 	 i != thePropertySlotVector.end(); ++i )
@@ -203,140 +346,124 @@ namespace libecs
       }
   }
 
-  void MasterStepper::push()
+  void SRMStepper::clear()
   {
-    for( PropertySlotVectorIterator i( thePropertySlotVector.begin() );
-	 i != thePropertySlotVector.end() ; ++i )
-      {
-	(*i)->push( theOwner->getRootSystem()->getCurrentTime() );
-      }
+    //
+    // Substance::clear()
+    //
+    FOR_ALL( SubstanceVector, theSubstanceCache, clear );
   }
 
-  ////////////////////////// StepperLeader
 
-  int StepperLeader::DEFAULT_UPDATE_DEPTH(1);
 
-  StepperLeader::StepperLeader() 
-    : 
-    theUpdateDepth( DEFAULT_UPDATE_DEPTH ),
-    theCurrentTime( 0.0 ),
-    theStepInterval( 0.001 )
+  void SRMStepper::differentiate()
   {
-    calculateStepsPerSecond();
+    //
+    // Reactor::differentiate()
+    //
+    FOR_ALL( ReactorVector, theReactorCache, differentiate );
   }
 
-  void StepperLeader::registerMasterStepper( MasterStepperPtr newone )
+  void SRMStepper::turn()
   {
-    theMasterStepperVector.push_back( newone );
+    //
+    // Substance::turn()
+    //
+    FOR_ALL( SubstanceVector, theSubstanceCache, turn );
   }
 
-  void StepperLeader::initialize()
+  void SRMStepper::integrate()
   {
-    for( StepperVector::iterator i( theMasterStepperVector.begin() );
-	 i != theMasterStepperVector.end() ; i++)
-      {
-	(*i)->initialize();
-      }
-  }
+    //
+    // Reactor::integrate()
+    //
+    FOR_ALL( ReactorVector, theReactorCache, integrate );
 
-  void StepperLeader::step()
-  {
-    clear();
-    differentiate();
-    integrate();
-    compute();
 
+    //
+    // Substance::integrate()
+    //
+    FOR_ALL( SubstanceVector, theSubstanceCache, integrate );
+
+
+    //FIXME: should be removed
     push();
-    theCurrentTime += theStepInterval;
   }
 
-  void StepperLeader::clear()
+
+  void SRMStepper::compute()
   {
-    for( StepperVector::iterator i( theMasterStepperVector.begin() );
-	 i != theMasterStepperVector.end() ; ++i )
-      {
-	(*i)->clear();
-      }
+    //
+    // Reactor::compute()
+    //
+    FOR_ALL( ReactorVector, theReactorCache, compute );
+
+    //
+    // Reactor::integrate()
+    //
+    // update activity of reactors by buffered values 
+    FOR_ALL( ReactorVector, theReactorCache, integrate );
+
   }
 
-  void StepperLeader::differentiate()
+  void SRMStepper::initialize()
   {
-    for( StepperVector::iterator i( theMasterStepperVector.begin() );
-	 i != theMasterStepperVector.end(); i++ )
-      {
-	(*i)->differentiate();
-      }
-  }
-
-  void StepperLeader::integrate()
-  {
-    for( StepperVector::iterator i( theMasterStepperVector.begin() );
-	 i != theMasterStepperVector.end(); ++i )
-      {
-	(*i)->integrate();
-      }
-  }
-
-  void StepperLeader::compute()
-  {
-    for( StepperVector::iterator i( theMasterStepperVector.begin() );
-	 i != theMasterStepperVector.end(); ++i )
-      {
-	(*i)->compute();
-      }
+    MasterStepperWithEntityCache::initialize();
+    distributeIntegrator( IntegratorAllocator( theIntegratorAllocator ) );
   }
 
   void StepperLeader::push()
   {
-    for( StepperVector::iterator i( theMasterStepperVector.begin() );
+    for( MasterStepperVector::iterator i( theMasterStepperVector.begin() );
 	 i != theMasterStepperVector.end(); ++i )
       {
 	(*i)->push();
       }
   }
 
-
-#if 0
-  void StepperLeader::update()
+  void SRMStepper::distributeIntegrator( IntegratorAllocator allocator )
   {
-    for( int i( theUpdateDepth ) ; i > 0 ; --i )
+    for( SubstanceVectorConstIterator s( theSubstanceCache.begin() );
+	 s != theSubstanceCache.end() ; ++s )
       {
-	compute();
+	(*allocator)(**s);
       }
   }
-#endif /* 0 */
 
 
-  ////////////////////////// Euler1Stepper
 
-  Euler1Stepper::Euler1Stepper()
+  ////////////////////////// Euler1SRMStepper
+
+  Euler1SRMStepper::Euler1SRMStepper()
   {
-    theAllocator = IntegratorAllocator( &Euler1Stepper::newEuler1 );
+    theIntegratorAllocator =
+      IntegratorAllocator( &Euler1SRMStepper::newEuler1 );
   }
 
-  IntegratorPtr Euler1Stepper::newEuler1( SubstanceRef substance )
+  IntegratorPtr Euler1SRMStepper::newEuler1( SubstanceRef substance )
   {
     return new Euler1Integrator( substance );
   }
 
-  ////////////////////////// RungeKutta4Stepper
+  ////////////////////////// RungeKutta4SRMStepper
 
-  RungeKutta4Stepper::RungeKutta4Stepper()
+  RungeKutta4SRMStepper::RungeKutta4SRMStepper()
   {
-    theAllocator = IntegratorAllocator( &RungeKutta4Stepper::newRungeKutta4 ); 
+    theIntegratorAllocator = 
+      IntegratorAllocator( &RungeKutta4SRMStepper::newRungeKutta4 ); 
   }
 
-  IntegratorPtr RungeKutta4Stepper::newRungeKutta4( SubstanceRef substance )
+  IntegratorPtr RungeKutta4SRMStepper::newRungeKutta4( SubstanceRef substance )
   {
     return new RungeKutta4Integrator( substance );
   }
 
-  void RungeKutta4Stepper::differentiate()
+  void RungeKutta4SRMStepper::differentiate()
   {
-    MasterStepper::differentiate();
-    MasterStepper::differentiate();
-    MasterStepper::differentiate();
-    MasterStepper::differentiate();
+    SRMStepper::differentiate();
+    SRMStepper::differentiate();
+    SRMStepper::differentiate();
+    SRMStepper::differentiate();
   }
 
 } // namespace libecs

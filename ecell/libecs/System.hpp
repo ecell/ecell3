@@ -70,12 +70,6 @@ namespace libecs
 
     virtual void initialize();
 
-    virtual void clear();
-    virtual void differentiate();
-    virtual void turn(); 
-    virtual void integrate();
-    virtual void compute();
-
     virtual const char* const className() const { return "System"; }
 
     /**
@@ -140,61 +134,28 @@ namespace libecs
       theVolumeBuffer = volume;
     }
 
+
+    SubstanceMapCref getSubstanceMap() const
+    {
+      return theSubstanceMap;
+    }
+
+    ReactorMapCref getReactorMap() const
+    {
+      return theReactorMap;
+    }
+
+    SystemMapCref getSystemMap() const
+    {
+      return theSystemMap;
+    }
+
+
     /**
        Register a Reactor object in this System.
     */
     void registerReactor( ReactorPtr const newone );
   
-    /**
-       @return true: if this System contains a Reactor whose name is @a id.
-    */
-    bool containsReactor( StringCref id )
-    {
-      return ( getReactorIterator( id ) != theReactorMap.end() ) 
-	? true : false;
-    }
-
-    /**
-       @return An iterator which points to the first Reactor in this System.
-    */
-    ReactorMapConstIterator getFirstReactorIterator() const
-    {
-      return theReactorMap.begin();
-    }
-
-    /**
-       @return An iterator which points to the first regular Reactor
-       (i.e. not posterior Reactor) in this System.
-    */
-    ReactorMapConstIterator getFirstRegularReactorIterator() const
-    {
-      return theFirstRegularReactorIterator;
-    }
-
-    /**
-       @return An iterator which points to the last Reactor in this System.
-    */
-    ReactorMapConstIterator getLastReactorIterator() const
-    { 
-      return theReactorMap.end();
-    }
-
-    /**
-       @return An iterator which points to a Reactor whose name is @a id.
-    */
-    ReactorMapIterator getReactorIterator( StringCref id )
-    {
-      return theReactorMap.find( id );
-    }
-
-    /**
-       @return The number of Reactors in this object.
-    */
-    int getNumberOfReactors() const
-    {
-      return theReactorMap.size();
-    }
-
     /**
        Find a Reactor with given id. Unlike getReactorIterator(), this 
        throws NotFound exception if it is not found.
@@ -208,46 +169,6 @@ namespace libecs
     */
     void registerSubstance( SubstancePtr id );
   
-    /**
-       @return An iterator which points to the first Substance in this System.
-    */
-    SubstanceMapConstIterator getFirstSubstanceIterator() const
-    {
-      return theSubstanceMap.begin();
-    }
-
-    /**
-       @return An iterator which points to the last Substance in this System.
-    */
-    SubstanceMapConstIterator getLastSubstanceIterator() const
-    {
-      return theSubstanceMap.end();
-    }
-
-    /**
-       @return An iterator which points to a Substance whose name is @a id.
-    */
-    SubstanceMapIterator getSubstanceIterator( StringCref id )
-    {
-      return theSubstanceMap.find( id );
-    }
-
-    /**
-       @return true: if this System contains a Substance whose name is @a id.
-    */
-    bool containsSubstance( StringCref id )
-    {
-      return ( getSubstanceIterator( id ) != theSubstanceMap.end() ) ?
-	true : false;
-    }
-
-    /**
-       @return The number of Substances in this object.
-    */
-    int getNumberOfSubstances() const
-    {
-      return theSubstanceMap.size();
-    }
 
     /**
        @return An pointer to a Substance object in this System named @a id.
@@ -259,46 +180,6 @@ namespace libecs
     */
     void registerSystem( SystemPtr );
 
-    /**
-       @return An iterator which points to the first System in this System.
-    */
-    SystemMapConstIterator getFirstSystemIterator() const
-    {
-      return theSystemMap.begin();
-    }
-
-    /**
-       @return An iterator which points to the last System in this System.
-    */
-    SystemMapConstIterator getLastSystemIterator() const
-    {
-      return theSystemMap.end();
-    }
-
-    /**
-       @return An iterator which points to a System whose name is @a id.
-    */
-    SystemMapIterator getSystemIterator( StringCref id )
-    {
-      return theSystemMap.find( id );
-    }
-
-    /**
-       @return true: if this System contains a System whose name is @a id.
-    */
-    bool containsSystem( StringCref id )
-    {
-      return ( getSystemIterator( id ) != theSystemMap.end() ) ? 
-	true : false;
-    }
-
-    /**
-       @return The number of Systems in this object.
-    */
-    int getNumberOfSystems() const
-    {
-      return theSystemMap.size();
-    }
 
     /**
        @return An pointer to a System object in this System whose ID is id.
@@ -326,10 +207,12 @@ namespace libecs
     const Real getStepInterval() const;
     const Real getStepsPerSecond() const;
 
+    void notifyChangeOfEntityList();
+
 
     static SystemPtr instance() { return new System; }
 
-  public: // message slots
+  public: // property slots
 
     void setStepperClass( UVariableVectorCref message );
 
@@ -352,7 +235,7 @@ namespace libecs
 
     StepperPtr theStepper;
 
-    ReactorMapIterator theFirstRegularReactorIterator;
+    ReactorMapConstIterator theFirstRegularReactorIterator;
 
   private:
 
@@ -364,6 +247,8 @@ namespace libecs
     SystemMap    theSystemMap;
 
     RootSystemPtr theRootSystem;
+
+    bool         theEntityListChanged;
 
   };
 
