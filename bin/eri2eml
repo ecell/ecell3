@@ -29,53 +29,75 @@ for l in s:
 anEml = Eml()
 
 anEml.createStepper( 'Euler1Stepper', 'SRM_01')
+anEml.createEntity( 'System', 'System::/' )
 
-for aEriLine in test:
-    if ( aEriLine[0] == 'SYSTEM' ):
+for anEriLine in test:
+    if ( anEriLine[0] == 'SYSTEM' ):
 #        aSystemID = convertFQEN2SystemID( line[2] )
-        aSystemFullID = 'System:' +aEriLine[2]
+        aSystemFullID = 'System:' +anEriLine[2]
         anEml.createEntity( 'System', aSystemFullID )
+        anEml.setEntityProperty( aSystemFullID, 'StepperID', ['SRM_01'] )
+        anEml.setEntityProperty( aSystemFullID, 'Volume',) 
         
-    elif ( aEriLine[0] == 'SUBSTANCE' ):
-        aSystemFullID = 'Substance:' +aEriLine[2]
-        aEriChunk = aEriLine[4].split()
+    elif ( anEriLine[0] == 'SUBSTANCE' ):
+        aSystemFullID = 'Substance:' +anEriLine[2]
+        anEriChunk = anEriLine[4].split()
         anEml.createEntity( 'Substance', aSystemFullID )
-        anEml.setEntityProperty( aSystemFullID, aEriChunk[0], aEriChunk[1:] )
+        anEml.setEntityProperty( aSystemFullID, anEriChunk[0], anEriChunk[1:] )
         
-    elif ( aEriLine[0] == 'REACTOR' ):
-        aSystemFullID = 'Reactor:' +aEriLine[2]
-        anEml.createEntity( aEriLine[1], aSystemFullID )
-#        print aEriLine[4:]
+    elif ( anEriLine[0] == 'REACTOR' ):
+        aSystemFullID = 'Reactor:' +anEriLine[2]
+        anEml.createEntity( anEriLine[1], aSystemFullID )
+#        print anEriLine[4:]
         aSubstrateNumber = 0
         aProductNumber = 0
         aCatalystNumber = 0
         aEffectorNumber =0
         
-        for aEriChunk in aEriLine[4:]:
-            aEriChunkElement = aEriChunk.split()
-            if ( aEriChunkElement[0] == 'Substrate' ):
-#                aSystemFullID = 'Substance:' +aEriChunkElement[1]
+        for anEriChunk in anEriLine[4:]:
+            anEriChunkElement = anEriChunk.split()
+            if ( anEriChunkElement[0] == 'Substrate' ):
+#                aSystemFullID = 'Substance:' +anEriChunkElement[1]
 #                print aSystemFullID
                 aReactantList = []
                 aReactantList.append( 'S' + str(aSubstrateNumber) )
                 aSubstrateNumber = aSubstrateNumber + 1
-                aReactantList.append( 'Substance:' + aEriChunkElement[1])
-                aReactantList.append( -1 * int(aEriChunkElement[2]) )
-                anEml.setEntityProperty( aSystemFullID, 'ReactantList', aEriChunkElement )
-                print aReactantList
-                print aEriChunkElement[0]
-            elif ( aEriChunkElement[0] == 'Product' ):
-                print "test pro"
-            elif ( aEriChunkElement[0] == 'Catalyst' ):
-                print "test cata"
+                aReactantList.append( 'Substance:' + anEriChunkElement[1])
+                aReactantList.append( str(-1 * int(anEriChunkElement[2])) )
+                anEml.setEntityProperty( aSystemFullID, 'ReactantList', aReactantList )
+#                print aReactantList
+#                print anEriChunkElement[0]
+            elif ( anEriChunkElement[0] == 'Product' ):
+                aReactantList = []
+                aReactantList.append( 'P' + str(aProductNumber) )
+                aProductNumber = aProductNumber + 1
+                aReactantList.append( 'Substance:' + anEriChunkElement[1])
+                aReactantList.append( str(1 * int(anEriChunkElement[2])) )
+                anEml.setEntityProperty( aSystemFullID, 'ReactantList', aReactantList )
+            elif ( anEriChunkElement[0] == 'Catalyst' ):
+                aReactantList = []
+                aReactantList.append( 'C' + str(aCatalystNumber) )
+                aCatalystNumber = aCatalystNumber + 1
+                aReactantList.append( 'Substance:' + anEriChunkElement[1])
+                aReactantList.append( '0' )
+                anEml.setEntityProperty( aSystemFullID, 'ReactantList', aReactantList )
+            elif ( anEriChunkElement[0] == 'Effector' ):
+                aReactantList = []
+                aReactantList.append( 'E' + str(aEffectorNumber) )
+                aEffectorNumber = aEffectorNumber + 1
+                aReactantList.append( 'Substance:' + anEriChunkElement[1])
+                aReactantList.append( '0' )
+                anEml.setEntityProperty( aSystemFullID, 'ReactantList', aReactantList )
             else:
-                print "test parameter"
+#                print anEriChunkElement[0]
+#                print anEriChunkElement[1:]
+                anEml.setEntityProperty( aSystemFullID, anEriChunkElement[0], anEriChunkElement[1:] )
     else:
         pass
 
 anEml.save('test1.eml')
-a = anEml.asString()
+aString = anEml.asString()
 
-print a
+print aString
 
 
