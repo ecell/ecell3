@@ -76,7 +76,8 @@ class Session:
         # checks the type of aModel
 
         # if the type is EML instance
-        if type( aModel ) == type( eml.Eml ):
+        if type( aModel ) == type( eml.Eml ) or\
+               type( aModel ) == type( eml.Eml() ):
             anEml = aModel
             aModelName = '<eml.Eml>'  # what should this be?
 
@@ -97,9 +98,11 @@ class Session:
             raise TypeError, " The type of aModel must be EML instance, string(file name) or file object "
 	
 	# change directory to file's home directory
-	dirname = os.path.dirname( aModel )
-	if dirname != "":
-	    os.chdir( dirname )
+        if type( aModel ) == type( eml.Eml ) or\
+               type( aModel ) == type( eml.Eml() ):
+            dirname = os.path.dirname( aModel )
+            if dirname != "":
+                os.chdir( dirname )
 	
         # calls load methods
         self.__loadStepper( anEml )
