@@ -103,7 +103,7 @@ for anEriLine in test:
 #                    anEml.setEntityProperty( aSystemFullID, 'ReactantList', aReactantList )
                 elif ( anEriChunkElement[0] == 'Effector' ):
                     anEffectorList = []
-                    anEffectorList.append( 'E' + str(aEffectorNumber) )
+                    anEffectorList.append( 'E' + str(anEffectorNumber) )
                     anEffectorNumber = anEffectorNumber + 1
                     anEffectorList.append( 'Substance:' + anEriChunkElement[1])
                     anEffectorList.append( '0' )
