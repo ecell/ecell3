@@ -6,16 +6,14 @@ VERSION=@VERSION@
 
 prefix=@prefix@
 exec_prefix=${prefix}
-pythondir=@pythondir@
 
 export ECELL3_PREFIX=${prefix}
 export OSOGOPATH=${exec_prefix}/lib/osogo
 export MEPATH=${exec_prefix}/lib/modeleditor
 export TLPATH=${exec_prefix}/lib/toollauncher
+export PYTHONDIR=@pythondir@
 export LD_LIBRARY_PATH="${exec_prefix}/lib:${LD_LIBRARY_PATH}"
-export PYTHONPATH="$pythondir:${PYTHONPATH}"
-export PYTHON_INCLUDES="@PYTHON_INCLUDES@ @BOOST_INCLUDE@"
-export BOOST_LIBRARIES="@BOOST_LIB@ @BOOST_PYTHON_LIB@"
+export PYTHONPATH="$PYTHONDIR:${PYTHONPATH}"
 export LTDL_LIBRARY_PATH=".:${ECELL3_DM_PATH}:${prefix}/lib/ecell/${VERSION}:${LTDL_LIBRARY_PATH}"
 export VERSION=${VERSION}
 
@@ -71,7 +69,7 @@ Configurations:
         DEBUGGER        = $DEBUGGER
 	LD_LIBRARY_PATH = $LD_LIBRARY_PATH
 	prefix          = $prefix
-        pythondir       = $pythondir
+        pythondir       = $PYTHONDIR
 	ECELL3_DM_PATH  = $ECELL3_DM_PATH
 
         If the environment variable ECELL3_DM_PATH is set to a colon (:)
@@ -118,4 +116,5 @@ else
     $DEBUGGER --command=$TMPFILE $PYTHON
     rm -f $TMPFILE
 fi
+
 
