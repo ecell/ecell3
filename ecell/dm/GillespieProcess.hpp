@@ -165,7 +165,7 @@ protected:
   {
     const Real aValue( theVariableReferenceVector[0].getValue() );
 
-    if( aValue > 1.0 ) // there must be two or more molecules
+    if( aValue >= 2.0 ) // there must be two or more molecules
       {
 	return ( getSuperSystem()->getSizeVariable()->getValue() * N_A ) /
 	  ( k * aValue * ( aValue - 1.0 ) );
