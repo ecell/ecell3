@@ -251,7 +251,7 @@ class Session:
         aLoggerNameList = []
 
         if type( fullpn ) == str:
-            aLoggerNameList.append( aFullPNString )
+            aLoggerNameList.append( fullpn )
         elif not fullpn :
             aLoggerNameList = self.getLoggerList()
         elif type( fullpn ) == list: 
@@ -260,7 +260,7 @@ class Session:
             aLoggerNameList = fullpn
         else:
             self.mesage( fullpn +" is not suitable type.\nuse string or list or tuple" )
-            sys.exit(0)
+            return
             
         # -------------------------------------------------
         # Execute saving.
@@ -276,71 +276,72 @@ class Session:
         
         aFileIndex=0
 
-        try: #(1)
             
             # gets all list of selected property name
-            for aFullPNString in aLoggerNameList: #(2)
+        for aFullPNString in aLoggerNameList: #(2)
 
-                # -------------------------------------------------
-                # from [Variable:/CELL/CYTOPLASM:E:Value]
-                # to   [Variable_CELL_CYTOPLASM_E_Value]
-                # -------------------------------------------------
+            # -------------------------------------------------
+            # from [Variable:/CELL/CYTOPLASM:E:Value]
+            # to   [Variable_CELL_CYTOPLASM_E_Value]
+            # -------------------------------------------------
 
-                aRootIndex=find(aFullPNString,':/')
-                aFileName=aFullPNString[:aRootIndex]+aFullPNString[aRootIndex+1:]
-                aFileName=replace(aFileName,':','_')
-                aFileName=replace(aFileName,'/','_')
-                
-                aECDDataFile = ECDDataFile()
-                aECDDataFile.setFileName(aFileName)
-                
-                # -------------------------------------------------
-                # Gets logger
-                # -------------------------------------------------
-                # need check if the logger exists
-                aLoggerStub = self.createLoggerStub( aFullPNString )
-                if not aLoggerStub.exists():
-                    aErrorMessage='\nLogger doesn\'t exist.!\n'
-                    self.message( aErrorMessage )
-                    return None
-                aLoggerStartTime= aLoggerStub.getStartTime()
-                aLoggerEndTime= aLoggerStub.getEndTime()
-                if aStartTime == -1 or anEndTime == -1:
-                    # gets start time and end time from logger
+            aRootIndex=find(aFullPNString,':/')
+            aFileName=aFullPNString[:aRootIndex]+aFullPNString[aRootIndex+1:]
+            aFileName=replace(aFileName,':','_')
+            aFileName=replace(aFileName,'/','_')
+            
+            aECDDataFile = ECDDataFile()
+            aECDDataFile.setFileName(aFileName)
+            
+            # -------------------------------------------------
+            # Gets logger
+            # -------------------------------------------------
+            # need check if the logger exists
+            aLoggerStub = self.createLoggerStub( aFullPNString )
+            if not aLoggerStub.exists():
+                aErrorMessage='\nLogger doesn\'t exist.!\n'
+                self.message( aErrorMessage )
+                return None
+            aLoggerStartTime= aLoggerStub.getStartTime()
+            aLoggerEndTime= aLoggerStub.getEndTime()
+            if aStartTime == -1 or anEndTime == -1:
+                # gets start time and end time from logger
+                aStartTime = aLoggerStartTime
+                anEndTime = aLoggerEndTime
+            else:
+                # checks the value
+                if not ( aLoggerStartTime < aStartTime < aLoggerEndTime ):
                     aStartTime = aLoggerStartTime
+                if not ( aLoggerStartTime < anEndTime < aLoggerEndTime ):
                     anEndTime = aLoggerEndTime
-                else:
-                    # checks the value
-                    if not ( aLoggerStartTime < aStartTime < aLoggerEndTime ):
-                        aStartTime = aLoggerStartTime
-                    if not ( aLoggerStartTime < anEndTime < aLoggerEndTime ):
-                        anEndTime = aLoggerEndTime
 
-                # -------------------------------------------------
-                # gets the matrix data from logger.
-                # -------------------------------------------------
-                if anInterval == -1:
-                    # gets data with specifing interval 
-                    aMatrixData = aLoggerStub.getData( aStartTime, anEndTime )
-                else:
-                    # gets data without specifing interval 
-                    aMatrixData = aLoggerStub.getData( aStartTime, anEndTime, anInterval )
+            # -------------------------------------------------
+            # gets the matrix data from logger.
+            # -------------------------------------------------
+            if anInterval == -1:
+                # gets data with specifing interval 
+                aMatrixData = aLoggerStub.getData( aStartTime, anEndTime )
+            else:
+                # gets data without specifing interval 
+                aMatrixData = aLoggerStub.getData( aStartTime, anEndTime, anInterval )
 
-                    
-                # sets data name 
-                aECDDataFile.setDataName(aFullPNString)
-
-                # sets matrix data
-                aECDDataFile.setData(aMatrixData)
-
-                # -------------------------------------------------
-                # adds data file to data file manager
-                # -------------------------------------------------
-                aDataFileManager.getFileMap()[`aFileIndex`] = aECDDataFile
                 
-                aFileIndex = aFileIndex + 1
+            # sets data name 
+            aECDDataFile.setDataName(aFullPNString)
 
-                # for(2)
+            # sets matrix data
+            aECDDataFile.setData(aMatrixData)
+
+            # -------------------------------------------------
+            # adds data file to data file manager
+            # -------------------------------------------------
+            aDataFileManager.getFileMap()[`aFileIndex`] = aECDDataFile
+            
+            aFileIndex = aFileIndex + 1
+
+            # for(2)
+
+        try: #(1)
                 
             aDataFileManager.saveAll()
 
@@ -359,7 +360,7 @@ class Session:
                 
             aErrorMessage= "Error : could not save [%s] " %aFullPNString
             self.message( aErrorMessage )
-            sys.exit(0)
+
 
         else: # try(1)
             # -------------------------------------------------

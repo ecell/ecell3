@@ -183,7 +183,7 @@ class GtkSessionMonitor(Session):
 
 
 	# ==========================================================================
-	def openWindow( self, aWindowName ): 		#
+	def openWindow( self, aWindowName ): 
 		"""opens up window and returns aWindowname instance
 		aWindowName   ---  Window name (str)
 		Returns FundamentalWindow or EntityListWindow list
@@ -351,6 +351,7 @@ class GtkSessionMonitor(Session):
 			raise "(%s) must be EntityListWindow" %anEntityListWindow
 
 		# deletes the reference to the PropertyWindow instance on the EntityListWindow
+
 		self.thePluginManager.deletePropertyWindowOnEntityListWinsow( anEntityListWindow.thePropertyWindow )
 
 		# deletes the reference to the EntityListWindow instance
