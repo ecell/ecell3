@@ -40,7 +40,7 @@ os.environ['PYTHONPATH']=\
 	
 # BOOST_LIBRARIES is used by ecell3-dmc		
 os.environ['BOOST_LIBRARIES']=\
-	'-L' + os.path.join( prefix, 'lib' ) + ' -lboost_python'
+	'-L\"' + os.path.join( prefix, 'lib' ) + '\" -lboost_python'
 
 # Get installed Python prefix from Windows registry
 import _winreg

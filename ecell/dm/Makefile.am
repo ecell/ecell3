@@ -7,10 +7,8 @@ LTDL_SHLIB_EXT = @LTDL_SHLIB_EXT@
 
 if OS_WIN32
   ECELL3_DMC = ../../bin/ecell3-dmc.exe
-  DMCOMPILE = --dmcompile="../../dmtool"
 else
   ECELL3_DMC = ../pyecs/ecell3-python ../../bin/ecell3-dmc
-  DMCOMPILE = --dmcompile="../pyecs/ecell3-python ../../dmtool"
 endif
 
 DM_SO_DIR = ${prefix}/lib/${PACKAGE}/${VERSION}
@@ -118,7 +116,7 @@ dmsodir = ${DM_SO_DIR}
 dmso_DATA = ${SOS} ${DESCS}
 
 %$(LTDL_SHLIB_EXT) : %.cpp
-	${ECELL3_DMC} --verbose ${DMCOMPILE} --no-stdinclude --no-stdlibdir --ldflags="-L${top_srcdir}/libecs ${BOOST_LIB}" --cxxflags='-I${top_srcdir}/libecs -I${top_srcdir}/.. -I${top_srcdir} ${PYTHON_INCLUDES} ${BOOST_INCLUDE}' $< 
+	${ECELL3_DMC} --verbose --dmcompile="../../dmtool" --no-stdinclude --no-stdlibdir --ldflags="-L${top_srcdir}/libecs ${BOOST_LIB}" --cxxflags='-I${top_srcdir}/libecs -I${top_srcdir}/.. -I${top_srcdir} ${PYTHON_INCLUDES} ${BOOST_INCLUDE}' $< 
 
 clean-local:
 	${RM} -rf ${SOS}

@@ -60,12 +60,12 @@ def main():
     BOOST_LIBRARIES = os.environ['BOOST_LIBRARIES']
     exec_prefix = prefix
     BINDIR = exec_prefix + os.sep + 'bin'
-    STDLIBDIR = '-L' + exec_prefix + os.sep + 'lib'
+    STDLIBDIR = '-L\"' + exec_prefix + os.sep + 'lib\"'
     ECELL_INCLUDE = prefix + os.sep + 'include' + os.sep + 'ecell'
     LIBECS_INCLUDE = ECELL_INCLUDE + os.sep + 'libecs'
-    STDINCLUDE = '-I' + prefix + os.sep + 'include' + ' -I' + ECELL_INCLUDE + \
-                    ' ' + '-I' + LIBECS_INCLUDE 
-    DMCOMPILE = BINDIR + os.sep + 'dmcompile'
+    STDINCLUDE = '-I\"' + prefix + os.sep + 'include\"' + ' -I\"' + \
+                 ECELL_INCLUDE + '\" ' + '-I\"' + LIBECS_INCLUDE + '\"'
+    DMCOMPILE = 'dmcompile'
     SRC = None
 
 
@@ -78,7 +78,7 @@ def main():
                  "cxxflags=", "no-define-cxxflags=", "dmcompile="])
     except:
         help()
-        sys.exit(1)
+        sys.exit(1) 
         
     VERBOSE = False
     NO_STDINCLUDE = False
@@ -112,20 +112,20 @@ def main():
 
         # set ldflags
         if anOption == "--ldflags":
-            LDFLAGS = LDFLAGS + ' ' + os.path.normpath( anArg )
+            LDFLAGS = LDFLAGS + ' ' + anArg
 
         # set no-define-cxxflags
         if anOption == "--no-define-cxxflags":
             NO_DEFINE_CXXFLAGS = True
-            CXXFLAGS = os.path.normpath( anArg )
+            CXXFLAGS = anArg
 
         # set cxxflags
         if anOption == "--cxxflags":
-            CXXCOMPILEFLAGS = CXXFLAGS + ' ' + os.path.normpath( anArg )
+            CXXCOMPILEFLAGS = CXXFLAGS + ' ' + anArg
 
         # set cxxflags
         if anOption == "--dmcompile":
-            DMCOMPILE = os.path.normpath( anArg ) + os.sep + 'dmcompile'
+            DMCOMPILE = os.path.abspath( anArg + os.sep + 'dmcompile' )
 
     # check if source file is given
     if len( args ) < 1:
@@ -140,6 +140,7 @@ def main():
                    PYTHON_WIN_VERSION
     else:
         ADDFLAGS = ''
+	DMCOMPILE = 'python ' + DMCOMPILE
 
     # on MS-Windows, command line doesn't expand *.cpp automatically
     FILELIST = []
@@ -159,7 +160,7 @@ def main():
     if not NO_STDLIBDIR:
         LDFLAGS = LDFLAGS + ' ' + STDLIBDIR
         
-    LDFLAGS = LDFLAGS + ADDFLAGS + ' -lecs -lgsl ' + BOOST_LIBRARIES 
+    LDFLAGS = LDFLAGS + ADDFLAGS + ' -lecs -lgsl ' + BOOST_LIBRARIES
     os.environ['LDFLAGS'] = LDFLAGS
     
     if NO_DEFINE_CXXFLAGS:
@@ -169,15 +170,14 @@ def main():
         ext = os.path.basename(SRC)
         CLASSNAME, ext = os.path.splitext(ext)
         CLASSNAMEDEFINE = '-D_ECELL3_DM_CLASSNAME=' + CLASSNAME
-        cmdstr = '\"'+SRC + '\" \"' + INCLUDE + '\" \"' + CLASSNAMEDEFINE + \
-                 '\" \"' + CXXCOMPILEFLAGS+'\"'
+        cmdstr = '\"' + SRC + '\"' + ' ' + INCLUDE + ' \"' + CLASSNAMEDEFINE + \
+                '\" ' + CXXCOMPILEFLAGS
 
         if VERBOSE:
             cmdstr =  DMCOMPILE + ' -v ' + cmdstr
             print cmdstr
         else:
-            cmdstr =  DMCOMPILE + ' ' + cmdstr        
-
+            cmdstr =  DMCOMPILE + ' ' + cmdstr
 
         ret = os.system( cmdstr )
 

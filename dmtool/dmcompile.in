@@ -78,17 +78,20 @@ def main():
     OBJ = CLASSNAME + '.o'
     SOBJ = CLASSNAME + SHLEXT
     LDFLAGS =  os.environ.get('LDFLAGS','')
-    LDFLAGS = '-Wl,-rpath=' + libdir + ',-soname=' + SOBJ + ' ' + LDFLAGS 
-    if CXXFLAGS != '':
-	CXXCOMPILEFLAGS = CXXFLAGS + ' ' + string.join( args[1:] )
-    else:
-	CXXCOMPILEFLAGS = ORIG_CXXFLAGS + ' ' + string.join( args[1:] )
+    LDFLAGS = '-Wl,-rpath=\"' + libdir + '\",-soname=\"' + SOBJ + '\" ' + \
+              LDFLAGS 
+    ARGS = ' \"' + string.join( args[1:], '\" \"' ) + '\"'
 
-    if compile( CXX, CXXCOMPILEFLAGS, "\""+SRC+"\"" ) or not os.path.isfile( OBJ ):
+    if CXXFLAGS != '':
+	CXXCOMPILEFLAGS = CXXFLAGS + ARGS
+    else:
+	CXXCOMPILEFLAGS = ORIG_CXXFLAGS + ARGS
+
+    if compile( CXX, CXXCOMPILEFLAGS, "\"" + SRC + "\"" ) or not os.path.isfile( OBJ ):
 	msg( "Error: The compiler failed to create " + OBJ )
 	sys.exit(1)
 	
-    if link( CXX, OBJ, SOBJ, LDFLAGS ) or not os.path.isfile( SOBJ ):
+    if link( CXX, '\"' + OBJ + '\"' , '\"' + SOBJ + '\"', LDFLAGS ) or not os.path.isfile( SOBJ ):
 	msg( "Error: The compiler failed to create " + SOBJ )
 	sys.exit(1)
     
@@ -96,5 +99,4 @@ def main():
 
 if __name__ == '__main__':
 	main()
-	
 
