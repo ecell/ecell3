@@ -46,29 +46,21 @@ namespace libecs
 
   void Process::makeSlots()
   {
-    registerSlot( "VariableReferenceList", 
-		  getPropertySlotMaker()->
-		  createPropertySlot( *this, Type2Type<Polymorph>(),
-				      &Process::setVariableReferenceList,
-				      &Process::getVariableReferenceList ) );
+    DEFINE_PROPERTYSLOT( "VariableReferenceList", Polymorph,
+			 &Process::setVariableReferenceList,
+			 &Process::getVariableReferenceList );
 
-    registerSlot( "Activity",  
-		  getPropertySlotMaker()->
-		  createPropertySlot( *this, Type2Type<Real>(),
-				      &Process::setActivity,
-				      &Process::getActivity ) );
+    DEFINE_PROPERTYSLOT( "Activity",  Real,
+			 &Process::setActivity,
+			 &Process::getActivity );
 
-    registerSlot( "Priority",  
-		  getPropertySlotMaker()->
-		  createPropertySlot( *this, Type2Type<Int>(),
-				      &Process::setPriority,
-				      &Process::getPriority ) );
+    DEFINE_PROPERTYSLOT( "Priority",  Int,
+			 &Process::setPriority,
+			 &Process::getPriority );
 
-    registerSlot( "StepperID",  
-		  getPropertySlotMaker()->
-		  createPropertySlot( *this, Type2Type<String>(),
-				      &Process::setStepperID,
-				      &Process::getStepperID ) );
+    DEFINE_PROPERTYSLOT( "StepperID", String,
+			 &Process::setStepperID,
+			 &Process::getStepperID );
 
   }
 
