@@ -68,9 +68,37 @@
 // language syntax and optimizations that are not part of the standard
 // (such as ISO C++) are exploited.
 //
+// Defined macros:
+//
+// LIBECS_USE_PMF_CONVERSIONS 
+// If this macro is defined, conversions from pointer-to-member-functions 
+// to usual function pointers can be used.
+//
+//
+// LIBECS_LIKELY( EXP ), LIBECS_UNLIKELY( EXP )
+// This macro indicates the expression EXP is very (un)likely to be true,
+// and the branch based on this will be frequently (not) taken.
+// Typically used in if() statements.   Unless you are very sure,
+// it is a good idea to rely on the compiler and CPU's branch prediction
+// mechanisms and profile-based branch counters.
+// These macros does nothing when libecs does not support branch prediction
+// on the platform.
+//
+//
+// LIBECS_PREFETCH( ADDR, RW, LOCALITY )
+// This macro prefetches the content of memory at the address ADDR,
+// and refreshes the cache.   If RW is zero, the cache is prepared for
+// a read access, and one for a write access.  LOCALITY (0..3) indicates
+// the temporal locality of the access.   
+// These macros does nothing when libecs does not support prefetching
+// on the platform.
+
 #if defined( USE_COMPILER_EXTENSIONS )
 #  if defined( __GNUC__ )
-#    define USE_PMF_CONVERSIONS
+#    define LIBECS_USE_PMF_CONVERSIONS 1
+#    define LIBECS_LIKELY( EXP )       __builtin_expect( ( EXP ), 1 )
+#    define LIBECS_UNLIKELY( EXP )     __builtin_expect( ( EXP ), 0 )
+#    define LIBECS_PREFETCH            __builtin_prefetch
 #  endif /* defined( __GNUC__ ) */
 #endif /* defined( USE_COMPILER_EXTENSIONS ) */
 

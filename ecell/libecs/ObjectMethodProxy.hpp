@@ -54,11 +54,11 @@ public:
   template < class T, const RET (T::*TMethod)() const >
   static ObjectMethodProxy create( T* const anObject )
   {
-#if defined( USE_PMF_CONVERSIONS )
+#if defined( LIBECS_USE_PMF_CONVERSIONS )
     return ObjectMethodProxy( Invoker( anObject->*TMethod ), anObject );
-#else  /* defined( USE_PMF_CONVERSIONS ) */
+#else  /* defined( LIBECS_USE_PMF_CONVERSIONS ) */
     return ObjectMethodProxy( invoke<T,TMethod>, anObject );
-#endif /* defined( USE_PMF_CONVERSIONS ) */
+#endif /* defined( LIBECS_USE_PMF_CONVERSIONS ) */
   }
 
 private:

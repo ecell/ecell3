@@ -344,7 +344,8 @@ const Real ExpressionProcessBase::VirtualMachine::execute( CodeCref aCode )
 	    // many compilers it results in faster assembly, even if
 	    // additional check for invalid opcodes (the if below) is done.
 
-	    if( FETCH_OPCODE() != ExpressionCompiler::LOAD_REAL )
+	    if( LIBECS_UNLIKELY( FETCH_OPCODE() != 
+				 ExpressionCompiler::LOAD_REAL ) )
 	      {
 		THROW_EXCEPTION( UnexpectedError, "Invalid instruction." );
 	      }
