@@ -40,6 +40,7 @@ namespace libecs
     //    addClass( new Module( "Substance", PlainSubstance::createInstance ) );
 
     NewSubstanceModule( Substance );
+    NewSubstanceModule( PositiveSubstance );
     //    NewSubstanceModule( SRMSubstance );
   }
 

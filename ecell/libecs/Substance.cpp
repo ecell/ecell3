@@ -30,6 +30,7 @@
 
 #include "Util.hpp"
 #include "System.hpp"
+#include "FullID.hpp"
 #include "Model.hpp"
 #include "EntityType.hpp"
 #include "PropertySlotMaker.hpp"
@@ -132,6 +133,25 @@ namespace libecs
       }
 
   }
+
+
+  ///////////////////////// PositiveSubstance
+
+  void PositiveSubstance::integrate( RealCref aTime )
+  {
+    if( isFixed() == false )
+      {
+	updateQuantity( aTime );
+      }
+    
+    if( getQuantity() < 0 )
+      {
+	THROW_EXCEPTION( RangeError, "PositiveSubstance [" + 
+			 getFullID().getString() + 
+			 "]: negative quantity occured." );
+      }
+  }
+
 
 
 #if 0

@@ -109,10 +109,8 @@ namespace libecs
     }
 
 
-    const Real calculateTotalVelocity( RealCref aTime )
+    const Real calculateTotalVelocity() const
     {
-      const Real aDeltaT( aTime - theLastTime );
-
       Real aVelocitySum( 0.0 );
       for( RealPtrVectorConstIterator i( theVelocityVector.begin() ); 
 	   i != theVelocityVector.end(); ++i )
@@ -120,18 +118,40 @@ namespace libecs
 	  aVelocitySum += **i;
 	}
 
-      return aVelocitySum * aDeltaT;
+      return aVelocitySum;
     }
 
     void updateQuantity( RealCref aTime )
     {
-      theTotalVelocity = calculateTotalVelocity( aTime );
+      const Real aDeltaT( aTime - theLastTime );
 
-      loadQuantity( getQuantity() + theTotalVelocity );
+      theTotalVelocity = calculateTotalVelocity();
+      const Real aTotalVelocityPerDeltaT( theTotalVelocity * aDeltaT );
+
+      loadQuantity( getQuantity() + aTotalVelocityPerDeltaT );
 
       theLastTime = aTime;
     }
 
+
+    /**
+       Check if the current total velocity doesn't exceed value range of 
+       this object.
+
+
+       @return true -> if estimated quantity at the next step is
+       within the value range, false -> otherwise
+
+       @note Substance class itself doesn't have the value range, thus
+       this check always succeed.  Each subclass of Substance should override
+       this method if it has the range.
+    */
+
+    virtual const bool checkRange( RealCref aStepInterval ) const
+    {
+      // this class has no range limit, thus this check always success
+      return true;
+    }
 
     /**
        This simply set the quantity of this Substance if getFixed() is false.
@@ -250,6 +270,56 @@ namespace libecs
     bool theFixed;
 
   };
+
+
+
+  class PositiveSubstance
+    :
+    public Substance
+  {
+
+  public:
+
+
+    PositiveSubstance()
+    {
+      // do nothing
+    }
+
+    virtual ~PositiveSubstance()
+    {
+      // do nothing
+    }
+
+
+    /** 
+	integrate phase
+    */
+
+    virtual void integrate( RealCref aTime );
+
+    virtual const bool checkRange( RealCref aStepInterval ) const
+    {
+      const Real aPutativeVelocity( calculateTotalVelocity() * aStepInterval );
+      const Real aPutativeQuantity( getQuantity() + aPutativeVelocity );
+
+      if( aPutativeQuantity > 0 )
+	{
+	  return true;
+	}
+      else
+	{
+	  return false;
+	}
+    }
+
+    static SubstancePtr createInstance() { return new PositiveSubstance; }
+      
+    virtual StringLiteral getClassName() const { return "PositiveSubstance"; }
+
+  };
+
+
 
 
 
