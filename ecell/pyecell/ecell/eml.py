@@ -329,7 +329,8 @@ class EmlParser:
 
     def __init__( self, aFile ):
         """read EML file and make Document Object"""
-        self.__theDocument = minidom.parse( aFile )
+        self.__theFile = aFile
+        self.__theDocument = minidom.parse( self.__theFile )
 
 
     def parse( self ):
@@ -349,6 +350,19 @@ class EmlParser:
                       'stepper_system': aStepperSystemPreModel, \
                       'property': aPropertyPreModel, \
                       'entity': anEntityPreModel }
+
+
+
+        ## Temporary Path Convert for 3.0.0, refactor!!
+        aPathConverter = ConvertPath( self.__theFile )
+        aPathConverter.createPathList( 'None' )
+
+        for aTargetEntity in( aPreModel['entity'] ):
+            aTargetEntity[0] = aPathConverter.change( aTargetEntity[0] )
+        for aTargetStepperSystem in( aPreModel['stepper_system'] ):
+            aTargetStepperSystem[0] = aPathConverter.change( aTargetStepperSystem[0] )
+        ##-----------------------------------------------------------------------------
+
         return aPreModel
 
 
@@ -468,6 +482,7 @@ class ConvertPath:
     def change( self, anId ):
         """turn relative path to absolute path"""
 
+
         if anId == '/':
             aPath = '/'
             return aPath
@@ -481,9 +496,35 @@ class ConvertPath:
                         aPathList = aPedigree[0:i]
                         aPath     = string.join( aPathList, '/' )
                         aPath     = str( '/' + aPath )
-                    
+
                         return aPath
 
+
+
+    def createPathList( self, aChildName ):
+        """create absolute path list"""
+
+        if aChildName == 'None':
+            self.__thePedigree = []
+
+        self.createFillitationList()
+        
+        for aFillitation in( self.__theFillitationList ):
+
+
+            if aFillitation[1] == aChildName:
+                self.__thePedigree.append( aFillitation[1] )
+                
+                if not aFillitation[0] == '/':
+                    self.createPathList( aFillitation[0] )
+                    
+                else:
+                    del self.__thePedigree[0]
+                    self.__thePedigree.reverse()
+                    self.__thePedigreeList.append( self.__thePedigree )
+                    
+                    self.__thePedigree = [] ## initialization
+                    
 
 
     def createFillitationList( self ):
@@ -505,31 +546,6 @@ class ConvertPath:
 
 
 
-    def createPathList( self, aChildName ):
-        """create absolute path list"""
-
-        if aChildName == 'None':
-            self.__thePedigree = []
-
-        self.createFillitationList()
-
-        for aFillitation in( self.__theFillitationList ):
-
-            if aFillitation[1] == aChildName:
-                self.__thePedigree.append( aFillitation[1] )
-                
-                if not aFillitation[0] == '/':
-                    self.createPathList( aFillitation[0] )
-                    
-                else:
-                    #self.__thePedigree.append( '/' )
-                    del self.__thePedigree[0]
-                    self.__thePedigree.reverse()
-                    self.__thePedigreeList.append( self.__thePedigree )
-                    
-                    self.__thePedigree = [] ## initialization
-                    
-                    
                     
     def returnList( self ):
         """return all absolute path lists"""
