@@ -51,8 +51,9 @@ NRStepper::NRStepper()
   theTimeScale( 0.0 ),
   theTolerance( 0.0 )
 {
-  // unset the default MinStepInterval.  
+  // unset the default Min/MaxStepInterval.  
   setMinStepInterval( std::numeric_limits<Real>::min() );
+  setMaxStepInterval( std::numeric_limits<Real>::max() );
 
   CREATE_PROPERTYSLOT_GET    ( Real, TimeScale, NRStepper );
   CREATE_PROPERTYSLOT_SET_GET( Real, Tolerance, NRStepper );
