@@ -20,13 +20,13 @@ print '''
 #                                                               #
 #  simple*.eml    - EML file converted from simple*.em          #
 #  Data*%sS.ecd    - observable time-course of simple*.em        #
-#  Data*/P.ecd    - observable time-course of simple*.em        #
+#  Data*%sP.ecd    - observable time-course of simple*.em        #
 #                                                               #
 # [Note] If the path of ecell3-em2eml and ecell3-session is not #
 #       currect, this script could not be executed correctly.   #
 #                                                               #
 ################################################################# 
-''' %( os.sep )
+''' %( os.sep, os.sep )
 
 if os.path.isdir('Data1'):
 	print "deleting Data1..."
@@ -63,11 +63,11 @@ aCommand = 'ecell3-session -e observable.py --parameters=\"{\'_EML_\':\'simple1.
 print aCommand
 os.system(aCommand)
 
-aCommand = 'ecell3-session -e observable.py --parameters=\"{\'_EML_\':\'simple2.eml\',\'_KmS_\':12.0,\'_KcF_\':4.0,\'_Data_\':\'Data1\'}\"'
+aCommand = 'ecell3-session -e observable.py --parameters=\"{\'_EML_\':\'simple2.eml\',\'_KmS_\':12.0,\'_KcF_\':4.0,\'_Data_\':\'Data2\'}\"'
 print aCommand
 os.system(aCommand)
 
-aCommand = 'ecell3-session -e observable.py --parameters=\"{\'_EML_\':\'simple3.eml\',\'_KmS_\':12.0,\'_KcF_\':4.0,\'_Data_\':\'Data1\'}\"'
+aCommand = 'ecell3-session -e observable.py --parameters=\"{\'_EML_\':\'simple3.eml\',\'_KmS_\':12.0,\'_KcF_\':4.0,\'_Data_\':\'Data3\'}\"'
 print aCommand
 os.system(aCommand)
 
