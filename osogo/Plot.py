@@ -253,12 +253,16 @@ class Plot:
 	    if self.zoomlevel==0:
 		self.getminmax()
 		if self.minmax[0]==self.minmax[1]:
-		    self.minmax[1]=self.minmax[0]*2
+		    if self.minmax[0]==0:
+			self.minmax[1]=1
+		    else:
+			self.minmax[1]=self.minmax[0]*2
 		#calculate yframemin, max
 		if self.scale_type=='linear':
 		    yrange=(self.minmax[1]-self.minmax[0])/(self.yframemax_when_rescaling-self.yframemin_when_rescaling)
 		    self.yframe[1]=self.minmax[1]+(1-self.yframemax_when_rescaling)*yrange
 		    self.yframe[0]=self.minmax[0]-(self.yframemin_when_rescaling*yrange)
+		    if self.yframe[0]==self.yframe[1]:self.yframe[1]=self.yframe[0]
 		    exponent=pow(10,floor(log10(self.yframe[1]-self.yframe[0])))
 		    mantissa1=ceil(self.yframe[1]/exponent)
 		    mantissa0=floor(self.yframe[0]/exponent)
@@ -300,6 +304,7 @@ class Plot:
 	    else:
 		if self.scale_type=='linear':
 		    ticks=0
+		    if self.yframe[1]==self.yframe[0]:self.yframe[1]=self.yframe[0]+1
 		    exponent=pow(10,floor(log10(self.yframe[1]-self.yframe[0])))
 		    while ticks<5:
 			mantissa1=floor(self.yframe[1]/exponent)
@@ -319,17 +324,20 @@ class Plot:
 		
 		#scale is log
 		else:	
-		    self.ygrid[1]=pow(10,floor(log10(self.yframe[1])))
-		    self.ygrid[0]=pow(10,ceil(log10(self.yframe[0])))	    
-		    diff=int(log10(self.ygrid[1]/self.ygrid[0]))
-		    if diff==0:diff=1
-		    if diff<6:
-			self.yticks_no=diff
-			self.yticks_step=10
+		    if self.yframe[1]>0 and self.yframe[0]>0:
+			self.ygrid[1]=pow(10,floor(log10(self.yframe[1])))
+			self.ygrid[0]=pow(10,ceil(log10(self.yframe[0])))	    
+			diff=int(log10(self.ygrid[1]/self.ygrid[0]))
+			if diff==0:diff=1
+			if diff<6:
+			    self.yticks_no=diff
+			    self.yticks_step=10
+			else:
+			    self.yticks_no=5
+			    self.yticks_step=pow(10,ceil(diff/5))
 		    else:
-			self.yticks_no=5
-			self.yticks_step=pow(10,ceil(diff/5))
-				
+			self.theOwner.theSession.printMessage("negative value in range, falling back to linear scale")		
+			self.change_scale()
 	    self.reframey2()
 #	    self.yframe0max=self.yframe[0]+(self.yframe[1]-self.yframe[0])*self.yvaluemin_trigger_rescale
 #	    self.yframe1min=self.yframe[0]+(self.yframe[1]-self.yframe[0])*self.yvaluemax_trigger_rescale
@@ -599,7 +607,6 @@ class TracerPlot(Plot):
 		    fpn=add_item[0]
 		    newdatabuffer=self.data_stack[fpn]
 		    newdatabuffer.append(add_item[1]) #latest value
-
 		self.reframey()
 
 #		self.minmax()
@@ -891,6 +898,7 @@ class TracerPlot(Plot):
 	    
 	def reframex(self):
 		ticks=0
+		if self.xframe[0]==self.xframe[1]: self.xframe[1]=self.xframe[0]+100
 		exponent=pow(10,floor(log10(self.xframe[1]-self.xframe[0])))
 		while ticks < 3:
 			
