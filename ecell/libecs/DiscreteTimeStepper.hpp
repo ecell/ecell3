@@ -73,13 +73,32 @@ namespace libecs
     virtual ~DiscreteTimeStepper() {}
 
 
+    /**
+       This method calls process() method of all Processes.
+    */
+
     virtual void step();
+
+    /**
+       Do nothing.   This Stepper ignores interruption.
+    */
 
     virtual void interrupt( StepperPtr const aCaller )
     {
       ; // do nothing -- ignore interruption
     }
 
+
+    /**
+       TimeScale of this Stepper is always zero by default.
+
+       This behavior may be changed in subclasses.
+    */
+
+    virtual GET_METHOD( Real, TimeScale )
+    {
+      return 0.0;
+    }
 
   };
 

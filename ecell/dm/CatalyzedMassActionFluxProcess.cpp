@@ -54,7 +54,7 @@ ECELL3_DM_CLASS
 	  do
 	    {	   
 	      velocity *= aConcentration;
-	      --j;
+	      ++j;
 	    } while( j != 0 );
 	}
 
