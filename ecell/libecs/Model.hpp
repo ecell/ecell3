@@ -181,7 +181,7 @@ namespace libecs
 
 
     /**
-       Flush to the data in Loggers immediately.
+       Flush the data in all Loggers immediately.
 
        Usually Loggers record data with logging intervals.  This method
        orders every Logger to write the data immediately ignoring the

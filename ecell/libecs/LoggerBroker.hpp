@@ -59,15 +59,45 @@ namespace libecs
     
     ~LoggerBroker();
 
+
+    /**
+       Get or create a Logger for a PropertySlot.
+
+       This method first look for a Logger object which is logging
+       the specified PropertySlot, and if it is found, returns the
+       Logger.  If there is no Logger connected to the PropertySlot yet,
+       it creates and returns a new Logger.  
+
+       FIXME: doc for interval needed
+
+       \param aFullPN     a FullPN of the requested FullPN
+       \param anInterval  a logging interval
+       \return a borrowed pointer to the Logger
+       
+    */
+
+    LoggerPtr getLogger( FullPNCref aFullPN, RealCref anInterval = 0.0 );
+
+
+    /**
+       Flush the data in all the Loggers immediately.
+
+       Usually Loggers record data with logging intervals.  This method
+       orders every Logger to write the data immediately ignoring the
+       logging interval.
+    
+    */
+
     void flush();
 
-    LoggerPtr getLogger( FullPNCref fpn );
 
+    //FIXME: should be private
     LoggerMapCref getLoggerMap() const
     {
       return theLoggerMap;
     }
 
+    //FIXME: should be private
     ModelRef getModel() const
     {
       return theModel;
@@ -76,7 +106,6 @@ namespace libecs
   protected:
     
     LoggerPtr createLogger( FullPNCref fpn );
-    //    void appendLogger( LoggerPtr );
     
   private:
 
