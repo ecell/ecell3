@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 from Utils import *
 import gtk
 import gobject
@@ -27,46 +26,47 @@ class ConnectionObjectEditorWindow:
     def __init__( self, aModelEditor, aLayoutName, anObjectId ):
         """
         sets up a modal dialogwindow displaying 
-        the VariableReferenceEditor and the LineProperty
+        the MEVariableReferenceEditor and the LineProperty
              
         """ 
         self.theModelEditor = aModelEditor  
         
         # Create the Dialog
-        self.win = gtk.Dialog('ConnectionObject' , None)
-        self.win.connect("destroy",self.destroy)
+#        self.win = gtk.Dialog('ConnectionObject' , None)
+#        self.win.connect("destroy",self.destroy)
 
         # Sets size and position
-        self.win.set_border_width(2)
-        self.win.set_default_size(300,75)
-        self.win.set_position(gtk.WIN_POS_MOUSE)
+#        self.win.set_border_width(2)
+#        self.win.set_default_size(300,75)
+#        self.win.set_position(gtk.WIN_POS_MOUSE)
 
         # Sets title
-        self.win.set_title('ConnectionObjectEditor')
-        aPixbuf16 = gtk.gdk.pixbuf_new_from_file( os.environ['MEPATH'] +
-                                os.sep + "glade" + os.sep + "modeleditor.png")
-        aPixbuf32 = gtk.gdk.pixbuf_new_from_file( os.environ['MEPATH'] +
-                                os.sep + "glade" + os.sep + "modeleditor32.png")
-        self.win.set_icon_list(aPixbuf16, aPixbuf32)
-        
-        
+#        self.win.set_title('ConnectionObjectEditor')
+#        aPixbuf16 = gtk.gdk.pixbuf_new_from_file( os.environ['MEPATH'] +
+#                                os.sep + "glade" + os.sep + "modeleditor.png")
+#        aPixbuf32 = gtk.gdk.pixbuf_new_from_file( os.environ['MEPATH'] +
+#                                os.sep + "glade" + os.sep + "modeleditor32.png")
+#        self.win.set_icon_list(aPixbuf16, aPixbuf32)
+
+        self.theTopFrame = gtk.VBox()
         self.getTheObject(aLayoutName, anObjectId)
-        self.theComponent = VariableReferenceEditorComponent( self, self.win.vbox,self.theLayout,self.theObject)
+        self.theComponent = VariableReferenceEditorComponent( self, self.theTopFrame,self.theLayout,self.theObject)
         self.theComponent.setDisplayedVarRef(self.theLayout,self.theObject)
         
-        self.win.show_all()
+#        self.win.show_all()
         self.update()
-        self.theModelEditor.toggleConnObjectEditorWindow(True,self)
         
+    def bringToTop( self ):
+        self.theModelEditor.theMainWindow.setSmallWindow( self.theTopFrame )
+       
 
-        
 
     #########################################
     #    Private methods            #
     #########################################
 
     def setDisplayConnObjectEditorWindow(self,aLayoutName, anObjectId):
-        self.win.present()
+        self.bringToTop()
         self.getTheObject( aLayoutName, anObjectId)
         self.theComponent.setDisplayedVarRef(self.theLayout,self.theObject)
         self.update()
@@ -91,20 +91,15 @@ class ConnectionObjectEditorWindow:
 
 
     def update(self, aType = None, aFullID = None):
-
         self.theComponent.update()
-        
-        
-        
 
     # ==========================================================================
     def destroy( self, *arg ):
         """destroy dialog
         """
-        
-        self.win.destroy()
+        pass        
+#        self.win.destroy()
 
-        self.theModelEditor.toggleConnObjectEditorWindow(False,None)
         
 
         

@@ -27,9 +27,11 @@ class Buffer:
         """
         return self.__class__.__name__.replace('ListBuffer','')
     
-    def asText( self ):
+    def asEml( self ):
 
-        return "sorry not implemented"
+        return "<eml></eml>"
+        
+    
 
     
 
@@ -388,6 +390,8 @@ class SystemListBuffer( EntityListBuffer ):
 
 
     def getEntityList( self, anEntityType=None, aSystemPath=None ):
+        if self.theRootDir == '':
+            return []
         if anEntityType == None:
             return self.getEntityList( ME_SYSTEM_TYPE, self.theRootDir )
 

@@ -22,11 +22,8 @@ class Window:
         """
 
         self.theGladeFile = aGladeFile   # glade file name
-        #print self.theGladeFile
         self.theRoot = aRoot             # a root property
-        #print self.theRoot
         self.widgets = None              # widgets instance
-        #print self.widgets
         # Default title is classname of this class.
         self.theTitle = self.__class__.__name__
 

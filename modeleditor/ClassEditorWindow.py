@@ -37,12 +37,12 @@ import os
 import os.path
 import string
 
-from StepperEditor import *
-from StepperList import *
+from ClassEditor import *
+from ClassList import *
 from Constants import *
+from Utils import *
 
-
-class StepperWindow(ListWindow):
+class ClassEditorWindow(ListWindow):
 
 
     def __init__( self, aModelEditor,aRoot=None ):
@@ -51,10 +51,10 @@ class StepperWindow(ListWindow):
         returns nothing
         """
         self.theModelEditor = aModelEditor
-        self.aRoot=aRoot
+        #self.aRoot=aRoot
         # init superclass
-        ListWindow.__init__( self, self.theModelEditor,self.aRoot )
-
+        ListWindow.__init__( self, self.theModelEditor )
+        
 
 
     def openWindow( self ):
@@ -66,20 +66,20 @@ class StepperWindow(ListWindow):
         ListWindow.openWindow( self )
 
         # add stepperlist
-        self.theStepperList = StepperList( self, self['StepperListFrame'] )
+        self.theClassList = ClassList( self, self['ClassListFrame'] )
 
         # add stepperpropertylist
-        self.theStepperPropertyList = StepperEditor( self, self['PropertyListFrame'] )
+        self.theClassPropertyList = ClassEditor( self, self['ClassPropertyFrame'] )
 
         # add signal handlers
         # self.addHandlers({  })
-        self.theStepperList.update()
-        stepperList = self.theModelEditor.getModel().getStepperList()
-        if len(stepperList) == 0:
-            aStepperList = []
+        self.theClassList.update()
+        classList = self.theModelEditor.getModel().getStepperList()
+        if len(classList) == 0:
+            aClassList = []
         else:
-            aStepperList = [ stepperList[0] ]
-        self.selectStepper( aStepperList )
+            aClassList = [ classList[0] ]
+        self.selectStepper( aClassList )
 
 
 
@@ -87,7 +87,7 @@ class StepperWindow(ListWindow):
     def updateEntityList ( self ):
         if not self.exists():
             return
-        self.theStepperList.update(  )
+        self.theClassList.update(  )
 
         self.updatePropertyList( )
 
@@ -100,16 +100,16 @@ class StepperWindow(ListWindow):
         
         if not self.exists():
             return
-        oldDisplayedID = self.theStepperPropertyList.getDisplayedStepper()
+        oldDisplayedID = self.theClassPropertyList.getDisplayedStepper()
 
-        selectedIDs = self.theStepperList.getSelectedIDs()
+        selectedIDs = self.theClassList.getSelectedIDs()
         if len( selectedIDs) != 1:
             newDisplayedID =  None
         else:
             newDisplayedID = selectedIDs[0]
 
         if oldDisplayedID != newDisplayedID or newDisplayedID == anID or anID == None:
-            self.theStepperPropertyList.setDisplayedStepper( newDisplayedID )
+            self.theClassPropertyList.setDisplayedStepper( newDisplayedID )
 
 
     def setLastActiveComponent( self, aComponent ):
@@ -132,8 +132,8 @@ class StepperWindow(ListWindow):
 
 
     def selectStepper( self, aStepperList ):
-        self.theStepperList.changeSelection( aStepperList )
-        self.theStepperList.selectByUser()
+        self.theClassList.changeSelection( aStepperList )
+        self.theClassList.selectByUser()
 
 
 
@@ -143,8 +143,9 @@ class StepperWindow(ListWindow):
 
     def deleted( self, *args ):
         ListWindow.deleted( self, *args )
-        self.theStepperList.close()
-        self.theStepperPropertyList.close()
+        self.theClassList.close()
+        self.theClassPropertyList.close()
+        self.theModelEditor.theClassEditor = None
         self.theModelEditor.theMainWindow.update()
         return gtk.TRUE
 

@@ -30,6 +30,7 @@ class ComplexShape:
         self.outlinedragged=False
         self.objectdragged=False
         self.shapename=None
+        self.shift_press=False
         
 
     def show ( self ):
@@ -299,8 +300,9 @@ class ComplexShape:
             
 
 
-    def leftClick( self, shapeName, x, y ):
+    def leftClick( self, shapeName, x, y):
         # usually select
+        
         if self.getShapeDescriptor(shapeName)[SD_FUNCTION] == SD_SYSTEM_CANVAS:
             self.parentObject.addItem( x, y )
         else:
@@ -311,10 +313,15 @@ class ComplexShape:
             self.changeCursor( shapeName, x, y, True )
 
 
-    def rightClick ( self, shapeName, x, y, anEvent ):
+    def rightClick ( self, shapeName, x, y, anEvent, shift=False ):
         # usually show menu
-        self.parentObject.doSelect()
+        if not self.parentObject.isSelected:
+            self.parentObject.doSelect( shift )
         self.parentObject.showMenu(anEvent,x, y)
+
+    def SHIFT_leftClick ( self, shapeName, x, y):
+      
+        self.parentObject.doSelect( True )
 
         
     def mouseDrag( self, shapeName, deltax, deltay, origx, origy ):
@@ -397,9 +404,21 @@ class ComplexShape:
                 self.lastmousey = event.y
                 self.buttonpressed = True
 
-                self.leftClick( shapeName, event.x, event.y )
+                if event.state&gtk.gdk.SHIFT_MASK == gtk.gdk.SHIFT_MASK:
+                    self.shift_press = True
+                    self.SHIFT_leftClick( shapeName, event.x, event.y)
+
+                else: 
+                    self.shift_press = False
+                    self.leftClick( shapeName, event.x, event.y )
+
             elif event.button == 3:
-                self.rightClick(shapeName, event.x, event.y, event )
+                if event.state&gtk.gdk.SHIFT_MASK == gtk.gdk.SHIFT_MASK:
+                    self.shift_press = True
+                else: 
+                    self.shift_press = False
+
+                self.rightClick(shapeName, event.x, event.y, event, self.shift_press )
 
         elif event.type == gtk.gdk.BUTTON_RELEASE:
             if event.button == 1:

@@ -4,16 +4,20 @@ from ShapeDescriptor import *
 from LayoutCommand import *
 from Utils import *
 
+#from Process import *
+from ShapePluginManager import *
 
+OB_SHOW_LABEL=1
 
 class ProcessObject( EditorObject ):
     
     def __init__( self, aLayout, objectID, aFullID,  x,y, canvas= None ):
         EditorObject.__init__( self, aLayout, objectID,x, y, canvas )
+        self.thePropertyMap [ OB_FILL_COLOR ] = self.theLayout.graphUtils().getRRGByName("grey")
+
         self.thePropertyMap[ OB_HASFULLID ] = True
         self.thePropertyMap [ OB_FULLID ] = aFullID
 
-        self.thePropertyMap [ OB_SHAPE_TYPE ] = SHAPE_TYPE_PROCESS
         self.thePropertyMap [ OB_OUTLINE_WIDTH ] = 3
         self.thePropertyMap[ OB_TYPE ] = OB_TYPE_PROCESS
         self.thePropertyMap[ PR_CONNECTIONLIST ] = []
@@ -21,7 +25,8 @@ class ProcessObject( EditorObject ):
         self.thePropertyMap [ OB_LABEL ]=aFullID.split(':')[2]
         self.theLabel = self.thePropertyMap [ OB_LABEL ]
         self.thePropertyMap [ OB_MINLABEL ]=PRO_MINLABEL
-        aProcessSD = ProcessSD(self, self.getGraphUtils(), self.theLabel )
+        aProcessSD=EditorObject.getShapeDescriptor(self, self.getProperty( OB_SHAPE_TYPE ) )
+        #aProcessSD = ProcessSD(self, self.getGraphUtils(), self.theLabel )
         # first get text width and heigth
 
         reqWidth = aProcessSD.getRequiredWidth()
@@ -38,10 +43,8 @@ class ProcessObject( EditorObject ):
 
         self.connectionDragged = False
         aProcessSD.reCalculate()
-        self.theSD = aProcessSD
-        self.thePropertyMap[ OB_SHAPEDESCRIPTORLIST ] = aProcessSD
+        self.setShapeDescriptor( aProcessSD )
 
-        self.theProcessShapeList=['Rectangle']
 
 
     def registerConnection( self, aConnectionID ):
@@ -78,9 +81,15 @@ class ProcessObject( EditorObject ):
         # resize must be sum of deltas 
         self.thePropertyMap[ OB_DIMENSION_X ] += deltaleft + deltaright
         self.thePropertyMap[ OB_DIMENSION_Y ] += deltaup + deltadown 
-        #print 'process resize done'
         self.theShape.resize(deltaleft + deltaright,deltaup + deltadown )
 
+
+
+    def setShapeDescriptor( self, anSD ):
+        EditorObject.setShapeDescriptor( self, anSD )
+        for aConnectionID in self.thePropertyMap[ PR_CONNECTIONLIST]:
+            aConnectionObject = self.theLayout.getObject( aConnectionID )
+            aConnectionObject.reconnect()
         
 
     def buttonReleased( self ):
@@ -172,9 +181,9 @@ class ProcessObject( EditorObject ):
         return (x+xRing, y+yRing )
 
     def estLabelWidth(self,newLabel):
-        height,width=self.getGraphUtils().getTextDimensions(newLabel)
-        return width+2+9
-
+        #height,width=self.getGraphUtils().getTextDimensions(newLabel)
+        #return width+2+9
+        return self.theSD.estLabelWidth(newLabel)
 
 ##################################################################
     def labelChanged( self,aPropertyValue ):

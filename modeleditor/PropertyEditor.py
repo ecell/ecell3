@@ -10,7 +10,7 @@ import os.path
 from ModelEditor import *
 from ViewComponent import *
 from Constants import *
-from VariableReferenceEditor import *
+from MEVariableReferenceEditor import *
 from StepperChooser import *
 from MultiLineEditor import *
 from NestedListEditor import *
@@ -21,7 +21,7 @@ class PropertyEditor:
         """
         sets up a modal dialogwindow displaying 
         either a MultiLineEditor, NestedListEditor
-        VariableReferenceEditor or StepperChooser
+        MEVariableReferenceEditor or StepperChooser
         """
         self.theModelEditor = aParentWindow.theModelEditor
         self.theParentEntity = aParentWindow.theDisplayedEntity
@@ -48,7 +48,7 @@ class PropertyEditor:
         #aVbox = gtk.Vbox()
         #self.win.vbox.pack_start(aVbox)
         if self.thePropertyName == ME_PROCESS_VARREFLIST:
-            self.theComponent = VariableReferenceEditor( self, self.win.vbox )
+            self.theComponent = MEVariableReferenceEditor( self, self.win.vbox )
         elif aPropertyName == ME_STEPPERID:
             self.theComponent = StepperChooser( self, self.win.vbox )
         elif self.thePropertyType == DM_PROPERTY_MULTILINE:

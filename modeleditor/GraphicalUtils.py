@@ -14,7 +14,7 @@ class GraphicalUtils:
         self.theStyle = self.theGtkWindow.get_style()
         self.testCanvas = gnome.canvas.Canvas()
         self.testCanvasRoot = self.testCanvas.root()
-        self.testText=self.testCanvasRoot.add(gnome.canvas.CanvasText, text = 'Hello' )
+        self.testText=self.testCanvasRoot.add(gnome.canvas.CanvasText, text = 'Hello', font="Sans 9" )
 
         self.opMatrix= n.array(((0,0,1,0,-1,0,0,0),(-1,0,0,0,0,0,1,0),(0,0,0,1,0,-1,0,0),(0,-1,0,0,0,0,0,1)))
 

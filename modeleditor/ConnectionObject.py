@@ -17,6 +17,8 @@ class ConnectionObject( EditorObject ):
         self.thePropertyMap [ CO_LINEWIDTH ] = 3
         self.thePropertyMap[ OB_TYPE ] = OB_TYPE_CONNECTION
         self.thePropertyMap [ OB_FILL_COLOR ] = self.theLayout.graphUtils().getRRGByName("black")
+        self.thePropertyMap[ CO_CONTROL_POINTS ] = None
+
         #default dimensions
         # get label from processID
         processObj = self.theLayout.getObject( aProcessID )
@@ -38,11 +40,9 @@ class ConnectionObject( EditorObject ):
             self.thePropertyMap[ CO_DIRECTION1 ] = self.__getRingDirection( RING_TOP )
         else:
             self.thePropertyMap[ CO_PROCESS_ATTACHED ] = aProcessID
-            aProcessObj = self.theLayout.getObject( aProcessID )
+            aProcessObj = self.theLayout.getObject ( aProcessID )
             aProcessObj.registerConnection( objectID )
-            (x, y) = aProcessObj.getRingPosition( aProcessRing )
-            rsize = aProcessObj.getRingSize()
-            self.thePropertyMap[ CO_ENDPOINT1 ] = [ x +rsize/2, y+rsize/2 ]
+            self.thePropertyMap[ CO_ENDPOINT1 ] = self.getRingPosition( aProcessID, aProcessRing )
             self.thePropertyMap[ CO_ATTACHMENT1TYPE ] = OB_TYPE_PROCESS
             aProcessFullID = aProcessObj.getProperty( OB_FULLID )
             aModelEditor = self.theLayout.theLayoutManager.theModelEditor
@@ -61,22 +61,18 @@ class ConnectionObject( EditorObject ):
         else:
             self.thePropertyMap[ CO_VARIABLE_ATTACHED ] = aVariableID
             aVariableObj = self.theLayout.getObject( aVariableID )
-            (x, y) = aVariableObj.getRingPosition( aVariableRing )
-
-            ringsize =  aVariableObj.theSD.getRingSize()/2
-            self.thePropertyMap[ CO_ENDPOINT2 ] = [x + ringsize, y+ringsize]
+            self.thePropertyMap[ CO_ENDPOINT2 ] = self.getRingPosition( aVariableID, aVariableRing )
             self.thePropertyMap[ CO_ATTACHMENT2TYPE ] = OB_NOTHING
             self.thePropertyMap[ CO_DIRECTION2 ] = self.__getRingDirection( aVariableRing)
             self.thePropertyMap[ CO_ATTACHMENT2TYPE ] = OB_TYPE_VARIABLE
             aVariableObj.registerConnection( objectID )
         self.__defineArrowDirection()
 
-        
         aLineSD = StraightLineSD(self, self.getGraphUtils() )
 
         self.theSD = aLineSD
         self.thePropertyMap[ OB_SHAPEDESCRIPTORLIST ] = aLineSD
-        self.theConnectionArrowTypeList=['Straight','Cornered', 'Curved']
+        self.theConnectionArrowTypeList=['Straight','Cornered', 'Curved','MultiBezierCurve']
         self.theConnectionLineTypeList=['Normal', 'Bold', 'Dashed' ,'Dotted']
         self.hasBeenDragBefore = False
         #Attribute needed for redirectCon
@@ -94,7 +90,7 @@ class ConnectionObject( EditorObject ):
 
     def arrowheadDragged(self,shapeName, deltax, deltay, absx, absy):
         (offsetx, offsety ) = self.getAbsolutePosition()
-        x = absx- offsetx
+        x = absx - offsetx
         y = absy - offsety
 
         if self.theShape.getFirstDrag():
@@ -142,6 +138,12 @@ class ConnectionObject( EditorObject ):
                     aCommand = RedirectConnection( self.theLayout, self.theID, proID,None,processRing,None,None)
                     self.theLayout.passCommand( [aCommand] )
                     self.hasBeenDragBefore = False
+            '''
+            elif shapeName == SHAPE_TYPE_MULTIBCURVE_LINE:
+                self.getArrowType(SHAPE_TYPE_MULTIBPATH_LINE)
+                self.thePropertyMap[CO_CONTROL_POINTS] = theSD.theDescriptorList["MultiBezierCurve"][SD_SPECIFIC]
+            '''    
+                
                     
 
 
@@ -214,14 +216,30 @@ class ConnectionObject( EditorObject ):
 
 
     def reconnect( self ):
-        pass
+        aProcessID = self.getProperty( CO_PROCESS_ATTACHED )
+        aProcessRing = self.getProperty( CO_PROCESS_RING )
+        self.thePropertyMap[ CO_ENDPOINT1 ] = self.getRingPosition( aProcessID, aProcessRing )
+        aVariableID = self.getProperty( CO_VARIABLE_ATTACHED )
+        if aVariableID != None:
+            aVariableRing = self.getProperty( CO_VARIABLE_RING )        
+            self.thePropertyMap[ CO_ENDPOINT2 ] = self.getRingPosition( aVariableID, aVariableRing )
+        self.theShape.repaint()
+
+
+    def getRingPosition( self, anObjectID, aRing ):
+            anObj = self.theLayout.getObject( anObjectID )
+            (x, y) = anObj.getRingPosition( aRing )
+            rsize = anObj.getRingSize()
+            return [ x +rsize/2, y+rsize/2 ]
+
 
     def setProperty(self, aPropertyName, aPropertyValue):
         self.thePropertyMap[aPropertyName] = aPropertyValue
         if aPropertyName == OB_SHAPE_TYPE:
             if  self.theCanvas !=None:
                 self.theShape.delete()
-                self.getArrowType(aPropertyValue)
+            self.getArrowType(aPropertyValue) #hereeee
+            if  self.theCanvas !=None:
                 self.theShape.show()
         elif aPropertyName == CO_NAME:
             if  self.theCanvas !=None:
@@ -238,7 +256,11 @@ class ConnectionObject( EditorObject ):
             pass
         elif aPropertyName == CO_HASARROW2:
             pass
-        EditorObject.setProperty(self, aPropertyName, aPropertyValue)
+
+        # it should - gabor
+        elif aPropertyName == CO_CONTROL_POINTS:
+            if self.theCanvas != None:
+                self.theShape.repaint()
 
 
     def getAvailableArrowType(self):
@@ -255,8 +277,16 @@ class ConnectionObject( EditorObject ):
             aLineSD = corneredLineSD(self, self.getGraphUtils() )
         elif aShapeType == SHAPE_TYPE_CURVED_LINE:
             aLineSD = curvedLineSD(self, self.getGraphUtils() )
+        elif aShapeType == SHAPE_TYPE_MULTIBCURVE_LINE:
+            aLineSD = multiBcurveLineSD(self, self.getGraphUtils())
+            
         self.theSD = aLineSD
         self.thePropertyMap[ OB_SHAPEDESCRIPTORLIST ] = aLineSD
+
+        ####### cheCk
+        '''
+        self.thePropertyMap[CO_CONTROL_POINTS] = theSD.theDescriptorList["MultiBezierCurve"][SD_SPECIFIC]
+        '''
 
     def show( self ):
         self.theShape = ComplexLine( self, self.theCanvas )

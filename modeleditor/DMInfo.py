@@ -16,6 +16,9 @@ class DMInfo:
         self.theClass=None
         self.theProcessClassList = None
         self.theStepperClassList = None
+        self.theEditorClassList = None
+        self.loadDirName = os.getcwd()
+       
 
     # SECOND DO THIS
     def getClassList( self, aType ):
@@ -113,12 +116,81 @@ class DMInfo:
 
         elif anInfo == DM_PROPERTY_TYPE:
             return self.__getPropertyInfo(aProperty,anInfo)
-            
 
+    def setModelDirectory(self):
+        #to do
+        curdir='/usr/local/lib/ecell/3.1.102'
+       # for dirname in sys.path:
+        #    acandidate = os.path.join(dirname, aPath)
+        #    if matchFunc (acandidate):
+        #        return acandidate
+        #raise Error("Can't find file %s" %aPath)
+
+
+    def loadModule(self, directPathName=None):
+        #to do
+        self.setModelDirectory()
+        if os.path.isdir(directPathName):
+            self.loadDirName = directPathName.rstrip('/')
+            return
+        if not os.path.isfile( directPathName ):
+            self.printMessage("%s file cannot be found!"%aFileName, ME_ERROR )
+            return
+
+        self.theMainWindow.displayHourglass()
+
+        self.loadDirName = os.path.split( directPathName )[0]
+
+        if self.loadDirName != '':
+            os.chdir(self.loadDirName )
+        
+        aFileBaseName = os.path.basename(directPathName)
+        anExt = os.path.splitext(aFileBaseName)[1]
+
+        #try to load as .eml
+        if anExt == '.so':
+            if not self.loadEmlAndLeml(directPathName):
+                self.theMainWindow.resetCursor()
+                self.__createModel()
+                return
+            
+        # log to recent list
+        self.__addToRecentFileList( directPathName )
+        
+        self.theModuleFileName = directPathName
+
+        self.theModuleName = os.path.split( directPathName )[1]
+        self.moduleHasName = True
+        self.changesSaved = True
+        self.printMessage("Module %s loaded successfully."%directPathName )
+        self.updateWindows()
+
+
+    def printMessage( self, aMessageText, aType = ME_PLAINMESSAGE ):
+        """
+        Types:
+        confirmation
+        plain message
+        alert
+        """
+        if aType == ME_PLAINMESSAGE:
+            if self.theMainWindow.exists():
+                self.theMainWindow.displayMessage( aMessageText )
+            else:
+                print aMessage 
+        elif aType == ME_OKCANCEL:
+            msgWin = ConfirmWindow( OKCANCEL_MODE, aMessageText, 'Message')
+            return msgWin.return_result()
+        elif aType == ME_YESNO:
+            msgWin = ConfirmWindow( OKCANCEL_MODE, aMessageText, 'Message')
+            return msgWin.return_result()
+        elif aType == ME_WARNING:
+            msgWin = ConfirmWindow( OK_MODE, aMessageText, 'Warning!')
+        elif aType == ME_ERROR:
+            msgWin = ConfirmWindow( OK_MODE, aMessageText, 'ERROR!') 
     #-------------------------------------------------------------------------------------
     #
     #-------------------------------------------------------------------------------------
-
 
     def __getFullID( self, aClass):
         # get type
@@ -131,7 +203,6 @@ class DMInfo:
         elif aClass.endswith('Stepper'):
             aType = ME_STEPPER_TYPE
         else:
-            print  "%s classname is ambigouos"%aClass
             return None
 
         if aClass not in self.getClassList(aType):
@@ -327,4 +398,5 @@ def DMTypeCheck( aValue, aType ):
         return aValue
     else:
         return None
+
 

@@ -6,11 +6,13 @@ def copyValue ( aValue ):
     return copy of aValue (coverts tuples to list)
     """
     if type (aValue) == type (()) or type( aValue ) == type([]):
-        returnValue = []
+        returnValue = []        
         for anElement in aValue:
-            returnValue.append( copyValue( anElement ) )
+            returnValue.append( copyValue( anElement ) )             
+             
         return returnValue
     else:
+              
         return aValue
 
 def getFullIDType( aFullID ):
@@ -20,6 +22,7 @@ def getFullIDType( aFullID ):
 
 def getParentSystemOfFullID( aFullID ):
     return convertSysPathToSysID( aFullID.split(':')[1] )
+
 
 
 def convertSysIDToSysPath( aSystemFullID ):

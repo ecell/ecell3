@@ -16,6 +16,7 @@ class ModelStore:
         #self.theModelEditor = self.theParentWindow.theModelEditor
         self.__theModel = [] 
         self.__theStepper = {}
+        self.__thefilelist= {}
         self.__theEntity = {}
         self.__theDM = DMInfo()
         self.__theEntity[MS_SYSTEM_ROOT] = [ DM_SYSTEM_CLASS, None, None, [],  [], [], 'RootSystem' ]
@@ -46,10 +47,6 @@ class ModelStore:
             aStepperID = self.__getEntityProperty( anEntityID, ME_STEPPERID )[MS_PROPERTY_VALUE]
             if aStepperID == anID:
                 self.__registerEntityToStepper( anEntityID, aStepperID )
-
-
-
-
 
     def deleteStepper( self, anID ):
         """delete a stepper"""
@@ -324,7 +321,7 @@ class ModelStore:
         self.__theEntity[aFullID] = [ aClass, aPropertyList, aParentSystem, [],  [], [], 'A System' ]
 
         aFullPN = createFullPN( getParentSystemOfFullID(aFullID), 'StepperID')
-        
+       
 
         if anEntityType == ME_SYSTEM_TYPE:
             pass
@@ -356,9 +353,6 @@ class ModelStore:
                     aVariableFullID =  getAbsoluteReference( aProcessID, aVariableRef )
                     if aVariableFullID == aFullID:
                         self.__registerProcessToVariable( aProcessID, aVarrefProperty )
-
-
-        
 
 
     def deleteEntity( self, aFullID ):
@@ -430,13 +424,18 @@ class ModelStore:
         theEntityList = []
 
         allEntityFullID = self.__theEntity.keys()
+        
         for aFullID in allEntityFullID :
+            #print aFullID
             if aSystemPath == self.__getEntityPath( aFullID ) :
+                #print aSystemPath
                 if anEntityType == self.__getEntityType( aFullID ) :
+                    #print anEntityType
                     theEntityList.append( aFullID.split(':')[2] )
+                    #print theEntityList 
         return theEntityList
-
-
+        
+       
 
     def __registerEntityToStepper( self, aFullID, aStepperID ):
         if aStepperID in [None, '' ]:
@@ -742,6 +741,9 @@ class ModelStore:
 
     def getEntityType(self,aFullID):
         anEntityType =  self.__getEntityType(aFullID)
+
+    def getEntityPath(self,aFullID):
+        anEntityPath = self.__getEntityPath(aFullID)
 
     def getEntityPropertyType( self, aFullPN ):
         """ candidates are:

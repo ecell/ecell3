@@ -13,7 +13,11 @@ class ListWindow(Window):
     """
 
     # ========================================================================
+
+    
+
     def __init__( self, aModelEditor , aRoot=None,aGladeFile=None):
+
         """constructor
         aModelEditor  -- a reference to ModelEditor (ModelEditor)
         aGladeFile   -- a glade file name (str)
@@ -33,7 +37,7 @@ class ListWindow(Window):
         # initializes exist flag
         self.__theExist = False
 
-
+        #self.theRoot = aRoot
 
     # ========================================================================
     def exists( self ):
@@ -137,17 +141,20 @@ class ListWindow(Window):
 
         # when glade file is not loaded yet or already deleted.
         if self.__theExist == False:
-
             # sets __theExist flag is TRUE
             self.__theExist = True
-
             # calls superclass's method 
             Window.openWindow(self)
-
+            #self.theRoot='top_frame'
             # connects 'delete_event' and self.delete() method.
             
+
+            #self[self.__class__.__name__].show_all()
+            #self[self.__class__.__name__].connect('delete_event',self.deleted)
+
            # self[self.__class__.__name__].show_all()
            # self[self.__class__.__name__].connect('delete_event',self.deleted)
+
 
 
 

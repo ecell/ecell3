@@ -81,28 +81,37 @@ class EntityEditor(ViewComponent):
 
         # initate Editors
         self.thePropertyList = PropertyList(self.theParentWindow, self['PropertyListFrame'] )
+        aNoteBook=ViewComponent.getWidget(self,'editor_notebook')
+
         if self.theThirdFrame != None:
             #Add the ShapePropertyComponent
-            aNoteBook=ViewComponent.getWidget(self,'editor_notebook')
-            aShapeFrame=gtk.Frame()
+            aShapeFrame=gtk.VBox()
             aShapeFrame.show()
             aShapeLabel=gtk.Label('ShapeProperty')
             aShapeLabel.show()
             aNoteBook.append_page(aShapeFrame,aShapeLabel)
-        
             self.theShapeProperty = ShapePropertyComponent(self.theParentWindow, aShapeFrame )
+            self.thePropertyList.hideButtons()
+        else:
+            aNoteBook.set_tab_pos( gtk.POS_TOP )
+            classDesc = self['class_desc']
+            infoDesc = self['info_desc']
+            vertical = self['vertical_holder']
+            horizontal = self['horizontal_holder']
+            horizontal.remove( classDesc)
+            horizontal.remove( infoDesc )
+            vertical.pack_end( classDesc)
+            vertical.pack_end( infoDesc )
+            vertical.show_all()         
             
         
         # make sensitive change class button for process
         if self.theType == ME_PROCESS_TYPE:
             self['class_combo'].set_sensitive( gtk.TRUE )
-
-        
+                
         self.setDisplayedEntity( None )
                 
-             
-            
-        
+       
     def close( self ):
         """
         closes subcomponenets
@@ -122,7 +131,8 @@ class EntityEditor(ViewComponent):
         """
         """
         # update Name
-        self.updateEditor()
+        if self.theModelEditor.getMode() == ME_DESIGN_MODE:
+            self.updateEditor()
         if self.theDisplayedEntity != self.thePropertyList.getDisplayedEntity():
             self.thePropertyList.setDisplayedEntity( self.theDisplayedEntity)
         else:
@@ -182,14 +192,10 @@ class EntityEditor(ViewComponent):
         self['path_entry'].set_text( syspathText )
 
         infoText = ''
-
-        if self.theDisplayedEntity != None:
-            infoText = self.theModelEditor.getModel().getEntityInfo( self.theDisplayedEntity )
+        # FIXME, get this from DMINFO!
+        if self.theDisplayedEntity != None :
+            infoText = self.theModelEditor.theModelStore.getEntityInfo( self.theDisplayedEntity )
         self.__setInfoText( infoText )
-        
-        
-                
-        
         self.updateInProgress = False
 
 
@@ -279,8 +285,7 @@ class EntityEditor(ViewComponent):
             return
         newName = self['ID_entry'].get_text()
         self.changeName( newName )
-
-
+        
     def __change_info( self, *args ):
         if self.updateInProgress:
             return

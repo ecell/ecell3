@@ -1,4 +1,3 @@
-
 from ModelEditor import *
 from Layout import *
 from LayoutBufferFactory import *

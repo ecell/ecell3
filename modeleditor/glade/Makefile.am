@@ -5,21 +5,24 @@ modeleditorgladedir = ${pkglibdir}/glade
 modeleditorglade_DATA = \
 AboutModelEditor.glade\
 AutosaveWindow.glade\
+ClassEditor.glade\
+ClassEditorWindow.glade\
 ConnectionObjectEditorWindow.glade\
 DialogWindow.glade\
-EntityListWindow.glade\
+EntityListTab.glade\
 FullIDChooser.glade\
 LayoutManagerWindow.glade\
 LinePropertyComponent.glade\
 ListComponent.glade\
-MainWindow.glade\
+MEMainWindow.glade\
 MultiLineEditor.glade\
 NestedListEditor.glade\
+NewClassWindow.glade\
 ObjectEditor.glade\
 PathwayEditor.glade\
 ShapePropertyComponent.glade\
 StepperChooser.glade\
-StepperWindow.glade\
+StepperTab.glade\
 ValidateWindow.glade\
 VariableReferenceEditorComponent.glade\
 icon_custom.png\
@@ -38,7 +41,8 @@ icon_textbox.png\
 icon_variable.png\
 modeleditor.png\
 modeleditor32.png\
-modeleditor_large.png
+modeleditor_large.png\
+x.png
 
 
 EXTRA_DIST=${modeleditorglade_DATA}

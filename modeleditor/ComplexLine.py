@@ -20,6 +20,7 @@ class ComplexLine:
     def show ( self ):
         self.theRoot = self.parentObject.theCanvas.getRoot()
         self.shapeDescriptorList = self.parentObject.getProperty( OB_SHAPEDESCRIPTORLIST ).getDescriptorList()
+
         self.parentObject.getProperty( OB_SHAPEDESCRIPTORLIST ).reCalculate()
         self.__sortByZOrder( self.shapeDescriptorList )
         self.isSelected = False
@@ -91,18 +92,26 @@ class ComplexLine:
         aSpecific= aDescriptor[SD_SPECIFIC]
         # get pathdef
         pathdef= aSpecific[BPATH_PATHDEF]
-        pd=gnome.canvas.path_def_new(pathdef)
+
+        pd = gnome.canvas.path_def_new(pathdef)
 
         aGdkColor = self.getGdkColor( aDescriptor )
-        bpath=self.theRoot.add(gnome.canvas.CanvasBpath, width_units=3, 
-outline_color_gdk = aGdkColor )
+        #cheCk: 1starg > the Bpath, 2ndarg > Bpath width(def 3), 3rdarg > Color of Bpath(def black)
+        bpath = self.theRoot.add(gnome.canvas.CanvasBpath, width_units=3, 
+outline_color_gdk = aGdkColor)
         bpath.set_bpath(pd)
     
         self.addHandlers( bpath, aDescriptor[ SD_NAME ] )
         self.shapeMap[ aDescriptor[ SD_NAME ] ] = bpath
         
+    
+    #cheCk: createLine is in charge of the Simple Line, displaying it width, colour ..blabla..
+    #regardless of whether it is the arrowheads or the middle stuffs (MS), it creates all
+    #but, if the MS is a bpath (eg. curvedLineSD) it will overwrite the middle line, I THINK OLI
+    
     def createLine( self, aDescriptor ):
         lineSpec = aDescriptor[SD_SPECIFIC]
+ 
         
         ( X1, X2, Y1, Y2 ) = [lineSpec[0], lineSpec[2], lineSpec[1], lineSpec[3] ]
         
@@ -189,16 +198,16 @@ outline_color_gdk = aGdkColor )
         keys.sort(fn)
 
 
-    def leftClick( self, shapeName, x, y ):
+    def leftClick( self, shapeName, x, y, shift_pressed = False ):
         # usually select
-        self.parentObject.doSelect()
+        self.parentObject.doSelect( shift_pressed )
         if self.getShapeDescriptor(shapeName)[SD_FUNCTION] == SD_ARROWHEAD:
             self.changeCursor( shapeName, x, y, True )
 
 
-    def rightClick ( self, shapeName, x, y, anEvent ):
+    def rightClick ( self, shapeName, x, y, anEvent, shift ):
         # usually show menu
-        self.parentObject.doSelect()
+        self.parentObject.doSelect( shift)
         self.parentObject.showMenu( anEvent)
 
     def getFirstDrag(self):
@@ -210,7 +219,28 @@ outline_color_gdk = aGdkColor )
     def mouseDrag( self, shapeName, deltax, deltay, origx, origy ):
         # decide whether resize or move or draw arrow
         if self.getShapeDescriptor(shapeName)[SD_FUNCTION] == SD_MOVINGLINE:
-            pass
+            '''
+            if shapeName == SHAPE_TYPE_MULTIBCURVE_LINE:
+                self.parentObject.getArrowType(SHAPE_TYPE_MULTIBCURVE_LINE)
+                #Accessing BPATH_DEF now, the coords like above
+                bpathDefcheCk = self.parentObject.theSD.theDescriptorList[SHAPE_TYPE_MULTIBCURVE_LINE][SD_SPECIFIC][BPATH_PATHDEF]
+                self.parentObject.thePropertyMap[CO_CONTROL_POINTS] = bpathDefcheCk
+                
+              
+                
+                bpathDefcheCk[1][1] = deltax
+                bpathDefcheCk[1][2] = deltay
+                bpathDefcheCk[1][3] = deltax
+                bpathDefcheCk[1][4] = deltay
+                bpathDefcheCk[2][1] = deltax
+                bpathDefcheCk[2][2] = deltay
+                bpathDefcheCk[2][3] = deltax
+                bpathDefcheCk[2][4] = deltay
+              
+                #bpathDefcheCk[2][1,2,3,4] = [deltax,deltay,deltax,deltay]
+                
+   
+            '''
         elif self.getShapeDescriptor(shapeName)[SD_FUNCTION] == SD_ARROWHEAD:
             if not self.firstdrag:
                 self.firstdrag=True
@@ -253,14 +283,20 @@ outline_color_gdk = aGdkColor )
         item = args[0]
         shapeName = args[2]
         if event.type == gtk.gdk.BUTTON_PRESS:
+            if event.state&gtk.gdk.SHIFT_MASK == gtk.gdk.SHIFT_MASK:
+                shift_press = True
+            else:
+                shift_press = False
+
             if event.button == 1:
                 self.lastmousex = event.x
                 self.lastmousey = event.y
                 self.buttonpressed = True
 
-                self.leftClick( shapeName, event.x, event.y )
+                self.leftClick( shapeName, event.x, event.y, shift_press )
             elif event.button == 3:
-                self.rightClick(shapeName, event.x, event.y, event )
+
+                self.rightClick(shapeName, event.x, event.y, event, shift_press )
 
         elif event.type == gtk.gdk.BUTTON_RELEASE:
             if event.button == 1:

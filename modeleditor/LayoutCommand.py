@@ -251,11 +251,14 @@ class CreateObject(LayoutCommand):
         self.x = self.theArgs[ self.X ]
         self.y = self.theArgs[ self.Y ]
         self.theParentID = self.theArgs[ self.PARENT ].getID()
+        #print self.theParentID
+        #print self.theArgs
         return True
 
 
     def do(self):
         theParent = self.theReceiver.getObject( self.theParentID )
+        #print theParent
         self.theReceiver.createObject(self.objectID, self.theType, self.theFullID, self.x, self.y, theParent )
         return True
 
@@ -428,20 +431,34 @@ class PasteObject(LayoutCommand):
 
 
     def do(self):
-        theParent = self.theReceiver.getObject( self.theParentID )
-        self.theReceiver.theLayoutBufferPaster.pasteObjectBuffer( self.theReceiver, self.theBuffer, self.x, self.y, self.theParentID )
+        if self.theBuffer.__class__.__name__ == "MultiObjectBuffer":
+            self.theReceiver.theLayoutBufferPaster.pasteMultiObjectBuffer( self.theReceiver, self.theBuffer, self.x, self.y, self.theParentID )
+        else:
+            self.theReceiver.theLayoutBufferPaster.pasteObjectBuffer( self.theReceiver, self.theBuffer, self.x, self.y, self.theParentID )
         return True
 
 
     def createReverseCommand( self ):
-        
-        aType = self.theBuffer.getProperty( OB_TYPE )
-        
-        if self.theBuffer.getUndoFlag():
-            newID = self.theBuffer.getID()
+        self.theReverseCommandList = []
+        if self.theBuffer.__class__.__name__ == "MultiObjectBuffer":
+            for aSystemBufferName in self.theBuffer.getSystemObjectListBuffer().getObjectBufferList():
+                aSystemBuffer = self.theBuffer.getSystemObjectListBuffer().getObjectBuffer( aSystemBufferName )
+                self.__createReverseCommandForBuffer( aSystemBuffer )
+
+            for aBufferName in self.theBuffer.getObjectListBuffer().getObjectBufferList():
+                anObjectBuffer = self.theBuffer.getObjectListBuffer().getObjectBuffer( aBufferName )
+                self.__createReverseCommandForBuffer( anObjectBuffer )
+        else:
+            self.__createReverseCommandForBuffer( self.theBuffer )
+
+    def __createReverseCommandForBuffer( self, anObjectBuffer ):
+        aType = anObjectBuffer.getProperty( OB_TYPE )
+
+        if anObjectBuffer.getUndoFlag():
+            newID = anObjectBuffer.getID()
         else:
             newID = self.theReceiver.getUniqueObjectID( aType )
-        self.theReverseCommandList = [ DeleteObject( self.theReceiver,newID ) ]
+        self.theReverseCommandList += [ DeleteObject( self.theReceiver,newID ) ]
 
 
     def getAffected( self ):

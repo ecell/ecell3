@@ -162,8 +162,7 @@ class StepperList(ViewComponent):
     def selectByUser( self ):
 
         # get selected sysid
-        self.theSelection = copyValue( self.__getSelection() )
-
+        self.theSelection = copyValue( self.__getSelection() )       
         # update parentwindow propertylist
         self.theParentWindow.update()
 
@@ -181,6 +180,9 @@ class StepperList(ViewComponent):
 
 
     def cut ( self ):
+        if not self.theModelEditor.theRuntimeObject.checkState( ME_DESIGN_MODE ):
+            return
+
         # create command
         aCommand = CutStepperList( self.theParentWindow.theModelEditor, self.theSelection )
 
@@ -189,6 +191,9 @@ class StepperList(ViewComponent):
 
 
     def paste ( self ):
+        if not self.theModelEditor.theRuntimeObject.checkState( ME_DESIGN_MODE ):
+            return
+
         aCommandList = []
         aBuffer = self.theModelEditor.getCopyBuffer()
         if aBuffer.getType() == ME_PROPERTY_TYPE:
@@ -206,6 +211,8 @@ class StepperList(ViewComponent):
         # get unique name from modeleditor
         # change selection
         # call addnew in modeleditor
+        if not self.theModelEditor.theRuntimeObject.checkState( ME_DESIGN_MODE ):
+            return
 
         newClass = self.theModelEditor.getDefaultStepperClass()
 
@@ -222,6 +229,8 @@ class StepperList(ViewComponent):
         self.noActivate = False
 
     def delete ( self ):
+        if not self.theModelEditor.theRuntimeObject.checkState( ME_DESIGN_MODE ):
+            return
         aCommand = DeleteStepperList( self.theModelEditor, self.theSelection )
         
         self.theSelection = []
@@ -229,6 +238,8 @@ class StepperList(ViewComponent):
 
 
     def rename ( self, newName, anIter ):
+        if not self.theModelEditor.theRuntimeObject.checkState( ME_DESIGN_MODE ):
+            return
 
         # if nothing changed make nothing
         oldName = self.theListStore.get_value( anIter, 0 )
@@ -258,7 +269,7 @@ class StepperList(ViewComponent):
         if args[1].button == 3:
             self.theModelEditor.createPopupMenu( self, args[1] )
             return gtk.TRUE
-        
+
 
     def __cursor_changed( self, *args ):
         # when row is selected in list
@@ -269,7 +280,7 @@ class StepperList(ViewComponent):
         self.theParentWindow.setLastActiveComponent( self )
         self.selectByUser()
 
-        
+
 
     def __add_clicked( self, *args ):
         self.add_new()
@@ -280,8 +291,10 @@ class StepperList(ViewComponent):
         
 
     def __unselectRows( self ):
-        self.theListSelection.unselect_all()
-         
+
+         self.theListSelection.unselect_all()
+        
+
         
     def __buildList( self ):
         """
@@ -291,7 +304,7 @@ class StepperList(ViewComponent):
         self.theListSelection.unselect_all()
         self.theListStore.clear()
         anIDList = self.theModelEditor.getModel().getStepperList ( )
-
+        
         self.__addRows( anIDList )
         self.noActivate = False
         
@@ -319,7 +332,7 @@ class StepperList(ViewComponent):
             if aNameList.__contains__( aName ):
                 self.theListStore.remove( anIter )
             anIter = self.theListStore.iter_next( anIter )
-        
+
 
     def __getSelection( self ):
         """
@@ -364,7 +377,7 @@ class StepperList(ViewComponent):
                 if aNameList.__contains__( aName ):
                     self.theListSelection.select_iter( anIter )
                 anIter = self.theListStore.iter_next(anIter)
-        
+
 
     def __getIter( self, aName ):
         """
@@ -381,7 +394,7 @@ class StepperList(ViewComponent):
         self.theListSelection.selected_foreach( self.__foreachCallBack )
         return self.__thePathList
 
-        
+
     def __foreachCallBack( self, *args ):
         """
         args[0] TreModel
@@ -391,7 +404,7 @@ class StepperList(ViewComponent):
 
         self.__thePathList.append( args[1] )
 
-        
+
     def __cellEdited( self, *args ):
         """
         args[0]: cellrenderer

@@ -17,10 +17,13 @@ class EditorObject:
         self.theLayout = aLayout
         self.theID = objectID
         self.parentSystem = parentSystem
-        
+
         self.thePropertyMap = {}
+        self.thePropertyMap [ OB_SHAPE_TYPE ] = DEFAULT_SHAPE_NAME
         self.thePropertyMap[ OB_POS_X ] = x
         self.thePropertyMap[ OB_POS_Y ] = y
+        self.theModelEditor=self.theLayout.theLayoutManager.theModelEditor
+        self.ShapePluginManager=self.theModelEditor.getShapePluginManager()
         self.thePropertyMap[ OB_HASFULLID ] = False
 
         self.thePackingStrategy = PackingStrategy(self.theLayout)
@@ -46,7 +49,6 @@ class EditorObject:
         self.rn=None
         self.totalLabelWidth=0
         self.labelLimit=0
-        
         self.maxShiftMap={DIRECTION_LEFT:[0], DIRECTION_RIGHT:[2],DIRECTION_UP:[1],DIRECTION_DOWN:[3], 
                                   DIRECTION_BOTTOM_RIGHT:[2,3],DIRECTION_BOTTOM_LEFT:[0,3],DIRECTION_TOP_RIGHT:[2,1],   
                                   DIRECTION_TOP_LEFT:[0,1]}
@@ -60,9 +62,8 @@ class EditorObject:
         # deletes it from canvas
         pass
 
-    def doSelect( self ):
-        if not self.isSelected:
-            self.theLayout.selectRequest( self.theID )
+    def doSelect( self, shift_pressed = False ):
+        self.theLayout.selectRequest( self.theID, shift_pressed )
 
     
 
@@ -108,6 +109,15 @@ class EditorObject:
     def showLine(self):
         self.theLine = ComplexLine()
     
+       
+    
+    def getShapeDescriptor(self, aShapeName ):
+        graphUtils =  self.theLayout.graphUtils()
+        theLabel = self.getProperty( OB_LABEL )
+        aShapeType = self.getProperty( OB_TYPE )
+        return self.ShapePluginManager.createShapePlugin(aShapeType,aShapeName,self, graphUtils, theLabel)
+        
+
     def getProperty( self, aPropertyName ):
         
         if aPropertyName in self.thePropertyMap.keys():
@@ -130,6 +140,7 @@ class EditorObject:
 
     def setPropertyMap( self, aPropertyMap ):
         self.thePropertyMap = aPropertyMap
+    
 
     def getID( self ):
         return self.theID
@@ -140,6 +151,9 @@ class EditorObject:
             self.theSD.renameLabel(aPropertyValue)
         elif aPropertyName in ( OB_DIMENSION_X, OB_DIMENSION_Y ):
             self.theSD.reCalculate()
+        elif aPropertyName == OB_SHAPE_TYPE :
+            anSD = self.getShapeDescriptor( aPropertyValue )
+            self.setShapeDescriptor( anSD )
 
         if  self.theCanvas !=None:
             if aPropertyName == OB_LABEL:
@@ -151,6 +165,15 @@ class EditorObject:
             elif aPropertyName == OB_FILL_COLOR:
                 self.theShape.fillColorChanged()
 
+
+    def setShapeDescriptor( self, anSD ):
+
+        if self.theCanvas != None and self.theShape != None:
+            self.theShape.delete()
+        self.theSD = anSD
+        self.thePropertyMap[OB_SHAPEDESCRIPTORLIST]=self.theSD
+        if self.theCanvas != None:
+            self.theShape.show()
 
 
     def labelChanged( self,aPropertyValue ):
@@ -227,8 +250,9 @@ class EditorObject:
         self.theLayout.setProperty(LO_SCROLL_REGION,[scrollx,scrolly,scrollx2,scrolly2])
         self.theLayout.setProperty(OB_DIMENSION_X,scrollx2 - scrollx)
         self.theLayout.setProperty(OB_DIMENSION_Y,scrolly2 - scrolly)
-        self.theLayout.getCanvas().setSize(self.theLayout.getProperty(LO_SCROLL_REGION))
-        self.theLayout.getCanvas().scrollTo(dleft+dright,ddown+dup) 
+        if self.theLayout.getCanvas() != None:
+            self.theLayout.getCanvas().setSize(self.theLayout.getProperty(LO_SCROLL_REGION))
+            self.theLayout.getCanvas().scrollTo(dleft+dright,ddown+dup) 
 
     ###################################################################################################
     def objectDragged( self, deltax, deltay ):
@@ -376,7 +400,7 @@ class EditorObject:
     def showMenu( self, anEvent, x=None,y=None ):
         self.newObjectPosX =x
         self.newObjectPosY = y
-        menuDictList = self.getMenuItems()
+        menuDictList = self.getMenuItems()        
         aMenu = gtk.Menu()
         for i in range (len(menuDictList)):
             
@@ -387,9 +411,11 @@ class EditorObject:
             for aMenuName in aMenuDict.keys():
                 menuItem = gtk.MenuItem( aMenuName )
                 menuItem.connect( 'activate', aMenuDict[ aMenuName ] )
+                
                 if aMenuName =='undo':
                     
                     if not self.getModelEditor().canUndo() :
+                        
                         menuItem.set_sensitive(gtk.FALSE)
                 if aMenuName =='redo':
                     
@@ -426,8 +452,14 @@ class EditorObject:
                 
 
             aMenu.append( gtk.MenuItem() )
-            
-        
+        aFullPNList = []
+        for anObjectID in self.theLayout.theSelectedObjectIDList:
+            anObject = self.theLayout.getObject( anObjectID )
+            if anObject.getProperty( OB_HASFULLID):
+                aFullPNList.append(anObject.getProperty( OB_FULLID ) +':')
+        tracerSubMenu = self.getModelEditor().theRuntimeObject.createTracerSubmenu( aFullPNList )
+        aMenu.append( tracerSubMenu )
+
         self.theMenu = aMenu
         aMenu.show_all()
         aMenu.popup(None, None, None, anEvent.button, anEvent.time)
@@ -464,10 +496,7 @@ class EditorObject:
         if self.getProperty(OB_TYPE) != OB_TYPE_CONNECTION:
             menuDict3['extend label']=self.__extend_label
             menuDictList +=[menuDict3]
-        
-        
-    
-        
+
         return menuDictList
     
     
@@ -628,17 +657,15 @@ class EditorObject:
         return self.theLayout.theLayoutManager.theModelEditor
 
 
-
-
-
     def __test(self, *args ):
-        
         pass
 
     def __userDeleteObject( self, *args ):
-        self.theMenu.destroy()              
-        aCommand = DeleteObject( self.theLayout, self.theID )
-        self.theLayout.passCommand( [ aCommand ] )
+        aCommandList = []
+        self.theMenu.destroy()
+        for anObjectID in self.theLayout.theSelectedObjectIDList:
+            aCommandList += [ DeleteObject( self.theLayout, anObjectID ) ]
+        self.theLayout.passCommand( aCommandList )
 
         
         
@@ -646,10 +673,13 @@ class EditorObject:
 
         self.theMenu.destroy()
         aModelEditor = self.theLayout.theLayoutManager.theModelEditor
+        aCommandList = []
         if self.getProperty( OB_HASFULLID ):
-            aFullID = self.getProperty( OB_FULLID )
-            aCommand = DeleteEntityList( aModelEditor, [aFullID ] )
-            self.theLayout.passCommand( [ aCommand ] )
+
+            for anObjectID in self.theLayout.theSelectedObjectIDList:
+                anObject = self.theLayout.getObject( anObjectID )
+                aFullID  = anObject.getProperty( OB_FULLID )
+                aCommandList += [ DeleteEntityList( aModelEditor, [ aFullID ] ) ]
 
         elif self.getProperty( OB_TYPE )==OB_TYPE_CONNECTION:
             connObj = self.theLayout.getObject( self.theID )
@@ -664,9 +694,9 @@ class EditorObject:
                 if aVarref[ME_VARREF_NAME] == varreffName :
                     del aVarref
                     break
-            aCommand = ChangeEntityProperty( aModelEditor, fullPN, aVarReffList )
+            aCommandList = [ ChangeEntityProperty( aModelEditor, fullPN, aVarReffList ) ]
 
-            self.theLayout.passCommand( [ aCommand ] )
+        self.theLayout.passCommand(  aCommandList  )
             
             
 
@@ -679,30 +709,25 @@ class EditorObject:
         
     def __cut(self,*args):
         
-        if self.parentSystem.__class__.__name__ != 'Layout':
-            aLayoutManager = self.getModelEditor().theLayoutManager
-            self.LayoutBufferFactory =  LayoutBufferFactory(self.getModelEditor(), aLayoutManager)
-            self.aLayoutBuffer = self.LayoutBufferFactory.createObjectBuffer(self.theLayout.theName, self.theID)
-            self.getModelEditor().setCopyBuffer( self.aLayoutBuffer )
-        
-            aCommand = DeleteObject( self.theLayout, self.theID )
-            self.theLayout.passCommand( [ aCommand ] )
-
+        self.__copy( None )
+        self.__userDeleteEntity( None )
         
     def __copy(self,*args):
         
         if self.parentSystem.__class__.__name__ != 'Layout':
             aLayoutManager = self.getModelEditor().theLayoutManager
             self.LayoutBufferFactory =  LayoutBufferFactory(self.getModelEditor(), aLayoutManager)
-            self.aLayoutBuffer = self.LayoutBufferFactory.createObjectBuffer(self.theLayout.theName, self.theID)
+            self.aLayoutBuffer = self.LayoutBufferFactory.createMultiObjectBuffer(self.theLayout.theName, \
+                    self.theLayout.theSelectedObjectIDList )
             self.getModelEditor().setCopyBuffer(self.aLayoutBuffer )
-        
+
+
     def __paste(self,*args):
         self.pasteObject()
 
-    
+
     def __userCreateConnection(self,*args):
-        if self.getProperty(OB_TYPE)==OB_TYPE_PROCESS:
+        if self.getProperty(OB_TYPE) == OB_TYPE_PROCESS:
             if len(args) == 0:
                 return None
             if type( args[0] ) == gtk.MenuItem:
@@ -912,6 +937,8 @@ class EditorObject:
     def estLabelWidth(self,newLabel):
         pass
 
+    def getAvailableShapes( self ):
+        return self.ShapePluginManager.getShapeList(self.getProperty( OB_TYPE ) )
     
 
     def setLabelParam(self,totalWidth,limit):

@@ -11,9 +11,12 @@ class BufferFactory:
     def __init__(self, aModel):
         self.theModel = aModel
 
+    def createBufferListFromEml( self, anEml ):
+        return None
+
 
     def sortSystemIDs( self, aFullIDList ):
-        aFullIDList.sort( self.__cmpFunc )
+        aFullIDList.sort( self.__cmpFunc )        
         return aFullIDList
 
     def __cmpFunc( self, xID,yID):
@@ -36,7 +39,6 @@ class BufferFactory:
             for anID in aFullIDList:
                 self.addToSystemListBuffer( aBuffer, anID )
         return aBuffer
-
 
 
     def addToSystemListBuffer( self, aBuffer, aFullID ):

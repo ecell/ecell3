@@ -8,6 +8,10 @@ class LayoutBufferFactory:
         self.theLayoutManager = aLayoutManager
 
 
+    def createBufferFromEml( self, anEml ):
+        return None
+
+
     def createLayoutBuffer( self, aLayoutName ):
         aLayout = self.theLayoutManager.getLayout( aLayoutName )
         aLayoutBuffer = LayoutBuffer( aLayoutName )
@@ -25,10 +29,11 @@ class LayoutBufferFactory:
         # add them to systemlist buffer
         for systemObjectID in systemList:
             systemObject = aLayout.getObject( systemObjectID )
-            if systemObject.getParent() != aLayout:
+            if systemObject.getParent() != aLayout or systemObject.getProperty( OB_TYPE ) != ME_SYSTEM_TYPE:
                 continue
             systemBuffer = self.createObjectBuffer( aLayoutName, systemObjectID )
-            aLayoutBuffer.getSystemObjectListBuffer().addObjectBuffer( systemBuffer )
+            aLayoutBuffer.setRootBuffer( systemBuffer )
+            break
 
         # copy all connections
         #connectionList = aLayout.getObjectList( OB_TYPE_CONNECTION )
@@ -44,6 +49,43 @@ class LayoutBufferFactory:
         #   textBuffer = self.createObjectBuffer( textID )
         #   aLayoutBuffer.getTextObjectListBuffer().addObjectBuffer( textBuffer )
         return aLayoutBuffer
+
+
+    def createMultiObjectBuffer( self, aLayoutName, anObjectIDList ):
+        aMultiBuffer = MultiObjectBuffer()
+        aLayout = self.theLayoutManager.getLayout( aLayoutName )
+        topleftX = None
+        topleftY = None
+        bottomRightX = None
+        bottomRightY = None
+        for anObjectID in anObjectIDList:
+            
+            anObject = aLayout.getObject( anObjectID )
+            left = anObject.getProperty( OB_POS_X )
+            top = anObject.getProperty( OB_POS_Y )
+            right = left + anObject.getProperty( OB_DIMENSION_X )
+            bottom = top + anObject.getProperty( OB_DIMENSION_Y )
+            if ( left <= topleftX or topleftX == None ): 
+                topleftX = left
+            if ( top <= topleftY or topleftY == None ):
+                topleftY = top
+            if ( right <= bottomRightX or bottomRightX == None ): 
+                bottomRightX = right
+            if ( bottom <= bottomRightY or bottomRightY == None ):
+                bottomRightY = bottom
+
+            aType = anObject.getProperty( OB_TYPE )
+            aBuffer = self.createObjectBuffer( aLayoutName, anObjectID )
+            if aType == OB_TYPE_SYSTEM:
+                aMultiBuffer.getSystemObjectListBuffer().addObjectBuffer( aBuffer )
+            else:
+                aMultiBuffer.getObjectListBuffer().addObjectBuffer( aBuffer )
+
+        aMultiBuffer.getPropertyBuffer().createProperty( OB_POS_X , topleftX )
+        aMultiBuffer.getPropertyBuffer().createProperty( OB_POS_Y , topleftY )
+        aMultiBuffer.getPropertyBuffer().createProperty( OB_DIMENSION_X ,   bottomRightX - topleftX )
+        aMultiBuffer.getPropertyBuffer().createProperty( OB_DIMENSION_Y ,  bottomRightY - topleftY )
+        return aMultiBuffer
 
 
     def createObjectBuffer( self, aLayoutName, anObjectID ):
@@ -145,17 +187,41 @@ class LayoutBufferPaster:
         
 
         # paste systemlistbuffer
-        for aSystemBufferName in aBuffer.getSystemObjectListBuffer().getObjectBufferList():
-            aSystemBuffer = aBuffer.getSystemObjectListBuffer().getObjectBuffer( aSystemBufferName )
-            self.pasteObjectBuffer(aLayout, aSystemBuffer, None, None, None, translationList )
+
+        aSystemBuffer = aBuffer.getRootBuffer()
+        oldSystemRootID = aLayout.getProperty( LO_ROOT_SYSTEM )
+        aLayout.deleteObject( oldSystemRootID )
+
+        anObject = self.pasteObjectBuffer(aLayout, aSystemBuffer, None, None, None, translationList )
+
+        newRootID = anObject.getID()
+        aLayout.setProperty( LO_ROOT_SYSTEM, newRootID )
+        
 
         #self.__pasteObjectListBuffer( aBuffer.getTextObjectListBuffer(), aLayout, newName )
         #self.__pasteObjectListBuffer( aBuffer.getConnectionObjectListBuffer(), aLayout, newName )
 
+    def pasteMultiObjectBuffer( self, aLayout, aBuffer, x, y, theParentID ):
+        # get the topleft widget
+        offsetX = aBuffer.getPropertyBuffer().getProperty( OB_POS_X ) - x
+        offsetY = aBuffer.getPropertyBuffer().getProperty( OB_POS_Y ) - y
+        translationList = {}
+        pastedList = []
+        for aSystemBufferName in aBuffer.getSystemObjectListBuffer().getObjectBufferList():
+            aSystemBuffer = aBuffer.getSystemObjectListBuffer().getObjectBuffer( aSystemBufferName )
+            posX = aSystemBuffer.getPropertyBuffer().getProperty( OB_POS_X ) - offsetX
+            posY = aSystemBuffer.getPropertyBuffer().getProperty( OB_POS_Y ) - offsetY
+            
+            self.pasteObjectBuffer(aLayout, aSystemBuffer, posX  , posY, theParentID, translationList, pastedList )
+        for aBufferName in aBuffer.getObjectListBuffer().getObjectBufferList():
+            anObjectBuffer = aBuffer.getObjectListBuffer().getObjectBuffer( aBufferName )
+            posX = anObjectBuffer.getPropertyBuffer().getProperty( OB_POS_X ) - offsetX
+            posY = anObjectBuffer.getPropertyBuffer().getProperty( OB_POS_Y ) - offsetY
+
+            self.pasteObjectBuffer(aLayout, anObjectBuffer, posX, posY, theParentID, translationList, pastedList )
 
 
-
-    def pasteObjectBuffer( self, aLayout, aBuffer, x = None, y = None, theParentID = None, translationList = None):
+    def pasteObjectBuffer( self, aLayout, aBuffer, x = None, y = None, theParentID = None, translationList = None, pastedList = None):
         if translationList == None:
             translationList = {}
         # dont create connections and entities
@@ -175,12 +241,13 @@ class LayoutBufferPaster:
             else:
                 theParent = None
 
-            self.__pasteObjectBuffer( aLayout, aBuffer, x, y, theParent, translationList )
-            self.__pasteObjectConnections( aLayout, aBuffer, theParent, translationList, None )
+            anObject = self.__pasteObjectBuffer( aLayout, aBuffer, x, y, theParent, translationList )
+            self.__pasteObjectConnections( aLayout, aBuffer, theParent, translationList, pastedList )
+            return anObject
         else:
             self.__pasteConnectionObjectBuffer( aLayout, aBuffer, translationList )
+            
 
-        
 
     
     def __pasteObjectListBuffer( self, listBuffer, aParent, aLayoutName, translationList = None ):
@@ -195,6 +262,7 @@ class LayoutBufferPaster:
         
 
     def __pasteObjectBuffer( self, aLayout, aBuffer, x, y, theParent, translationList ):
+    
         aType = aBuffer.getProperty( OB_TYPE )
 
 
@@ -222,7 +290,6 @@ class LayoutBufferPaster:
         translationList[oldID] = newID
         aLayout.createObject( newID, aType, aFullID, x, y, theParent  )
         anObject = aLayout.getObject( newID )
-
         propertyList = aBuffer.getPropertyList()
         for aProperty in propertyList:
             if aProperty not in (OB_POS_X , OB_POS_Y, OB_FULLID):
@@ -344,19 +411,16 @@ class LayoutBufferPaster:
         # create new connection
         #aVarobj = aLayout.getObject( newVariableID )
         aLayout.createConnectionObject( newID, newProcessID, newVariableID,  processRing, variableRing, None, aVarrefName )
-        return newID
-
-#        conObject = aLayout.getObject( newID )
-        # set properties
-#        propertyList = conBuffer.getPropertyList()
-#        for aProperty in propertyList:
-            # endpoints should not be overwritten here
-#            if aProperty not in (CO_ENDPOINT1, CO_ENDPOINT2, CO_PROCESS_ATTACHED, CO_VARIABLE_ATTACHED):
-
-#                aValue = conBuffer.getProperty( aProperty )
-#                conObject.setProperty( aProperty, aValue )
-
-#           aProcessObj.getProperty(PR_CONNECTIONLIST).append(newID)
-                        
-
 #        return newID
+
+        conObject = aLayout.getObject( newID )
+        # set properties
+        propertyList = conBuffer.getPropertyList()
+        for aProperty in propertyList:
+            # endpoints should not be overwritten here
+            if aProperty not in (CO_ENDPOINT1, CO_ENDPOINT2, CO_PROCESS_ATTACHED, CO_VARIABLE_ATTACHED):
+
+                aValue = conBuffer.getProperty( aProperty )
+                conObject.setProperty( aProperty, aValue )
+
+        return newID

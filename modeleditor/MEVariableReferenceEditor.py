@@ -45,7 +45,7 @@ from ModelEditor import *
 from ViewComponent import *
 from FullIDBrowserWindow import *
 
-class VariableReferenceEditor(ViewComponent):
+class MEVariableReferenceEditor(ViewComponent):
     
     #######################
     #    GENERAL CASES    #

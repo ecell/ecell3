@@ -13,7 +13,7 @@ class ResizeableText:
         self.ppu=0
         #self.parentID=parentID
     
-        self.theCanvasText=self.theRoot.add( gnome.canvas.CanvasText, x=self.x, y=self.y, fill_color_gdk = self.fill, text = self.theText, anchor = self.anchor )
+        self.theCanvasText=self.theRoot.add( gnome.canvas.CanvasText, x=self.x, y=self.y, fill_color_gdk = self.fill, text = self.theText, anchor = self.anchor, font="Sans 9" )
 
         # register self to Pathway canvas   
         self.thePathwayCanvas.registerText(self, self.theText)
@@ -23,8 +23,8 @@ class ResizeableText:
     def resizeText(self):
         self.ppu=self.thePathwayCanvas.getZoomRatio()
         pgfd = self.theCanvasText.get_property("font-desc").copy()
-        pangosize =1024*self.ppu*10
-        pgfd.set_size( pangosize )
+        pangosize =1024*self.ppu*9
+        pgfd.set_size( int(pangosize) )
         self.theCanvasText.set_property('font-desc', pgfd )
 
     def renameText(self, newText):

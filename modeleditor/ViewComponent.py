@@ -50,8 +50,7 @@ class ViewComponent:
             raise IOError( "can't read %s." %self.theGladeFile )
         
         self.theRoot = self[anAttachment]  
-        #print pointOfAttach
-        #print self.theRoot
+
         pointOfAttach.add( self.theRoot )
         
 
@@ -140,6 +139,8 @@ class ViewComponent:
     def getMenuItems( self ):
 
         aMenu = []
+        
+        print aMenu
 
         aFlags = self.theModelEditor.getADCPFlags()
 
@@ -151,8 +152,8 @@ class ViewComponent:
 
         aMenu.append( [ "cut", aFlags[ME_DELETE_FLAG] and aFlags[ME_COPY_FLAG] ] )
 
-        aMenu.append( [ "paste", aFlags[ME_PASTE_FLAG] ] ) 
-
+        aMenu.append( [ "paste", aFlags[ME_PASTE_FLAG] ] )
+    
         return aMenu
 
     # ================================================================

@@ -60,9 +60,13 @@ class PopupMenu:
 
         # create add, decide whether it can be made sensitive 
         aComponent = self.theModelEditor.getLastUsedComponent()
+         
         menuList = aComponent.getMenuItems()
         for menu in menuList:
-            aMenu.append( self.__createMenuItem( menu[0], menu[1] ) )
+            if menu[0]==None:
+                aMenu.append( menu[1] )
+            else:
+                aMenu.append( self.__createMenuItem( menu[0], menu[1] ) )
         
 
         aMenu.show_all()
@@ -96,11 +100,13 @@ class PopupMenu:
             return
         aMenuItem = gtk.MenuItem(aName)
         
+             
         if isSensitive:
     
             # attach signal handler
             aMenuItem.connect( 'activate', self.__button_pushed )
             aMenuItem.set_data( 'Name', aName )
+            
         else:
             
             # set insensitive

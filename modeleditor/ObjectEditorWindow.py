@@ -69,26 +69,26 @@ class ObjectEditorWindow :
         self.frameBox=None # OB_HAS_FULLID=False
         
         # Create the Dialog
-        self.win = gtk.Dialog('Object Editor Window', None)
-        self.win.connect("destroy",self.destroy)
+#        self.win = gtk.Dialog('Object Editor Window', None)
+#        self.win.connect("destroy",self.destroy)
 
         # Sets size and position
-        self.win.set_border_width(2)
-        self.win.set_default_size(300,75)
-        self.win.set_position(gtk.WIN_POS_MOUSE)
+#        self.win.set_border_width(2)
+#        self.win.set_default_size(300,75)
+#        self.win.set_position(gtk.WIN_POS_MOUSE)
 
 
         # Sets title
-        self.win.set_title("ObjectEditor")
-        aPixbuf16 = gtk.gdk.pixbuf_new_from_file( os.environ['MEPATH'] +
-                                os.sep + "glade" + os.sep + "modeleditor.png")
-        aPixbuf32 = gtk.gdk.pixbuf_new_from_file( os.environ['MEPATH'] +
-                                os.sep + "glade" + os.sep + "modeleditor32.png")
-        self.win.set_icon_list(aPixbuf16, aPixbuf32)
+#        self.win.set_title("ObjectEditor")
+#        aPixbuf16 = gtk.gdk.pixbuf_new_from_file( os.environ['MEPATH'] +
+#                                os.sep + "glade" + os.sep + "modeleditor.png")
+#        aPixbuf32 = gtk.gdk.pixbuf_new_from_file( os.environ['MEPATH'] +
+#                                os.sep + "glade" + os.sep + "modeleditor32.png")
+#        self.win.set_icon_list(aPixbuf16, aPixbuf32)
 
         self.theComponent=None
         self.theShapeProperty=None
-        
+        self.theTopFrame = gtk.VBox()
         self.getTheObject(aLayoutName, anObjectId)
         self.theEntityType = self.theObject.getProperty(OB_TYPE)
         if self.theObject.getProperty(OB_HASFULLID):
@@ -97,26 +97,29 @@ class ObjectEditorWindow :
             self.attBox=self.getAttachmentBox()
             
         elif self.theObject.getProperty(OB_TYPE)== OB_TYPE_TEXT:
-            self.theShapeProperty=ShapePropertyComponent( self, self.win.vbox )
+            self.theShapeProperty=ShapePropertyComponent( self, self.theTopFrame )
             self.isFrameShow=True
             self.frameBox=self.getAttachmentFrame()
             
 
-        self.win.show_all()
+#        self.win.show_all()
 
         if self.theObject.getProperty(OB_HASFULLID):
             #self.theLastFullID = self.theObject.getProperty(OB_FULLID)
             self.selectEntity( [self.theObject] )
         self.update()
 
-        
-        self.theModelEditor.toggleObjectEditorWindow(True,self) 
+
+    def bringToTop( self ):
+        self.theModelEditor.theMainWindow.setSmallWindow( self.theTopFrame )
+
 
     def createComponent(self):
-        self.theComponent = EntityEditor( self, self.win.vbox,self.theEntityType,self )
+        self.theComponent = EntityEditor( self, self.theTopFrame,self.theEntityType,self )
         self.theComponent.setDisplayedEntity (self.theObject.getProperty(OB_FULLID))
         self.theShapeProperty=self.theComponent.theShapeProperty
         self.theComponent.update()
+        
         
 
     # ==========================================================================
@@ -128,8 +131,9 @@ class ObjectEditorWindow :
 
     # ==========================================================================
     def modifyObjectProperty(self,aPropertyName, aPropertyValue):
+        
         aCommand = None
-        if  aPropertyName == OB_OUTLINE_COLOR  or aPropertyName == OB_FILL_COLOR :
+        if  aPropertyName == OB_OUTLINE_COLOR  or aPropertyName == OB_FILL_COLOR or aPropertyName == OB_SHAPE_TYPE :
             # create command
             aCommand=SetObjectProperty(self.theLayout,self.theObjectId,aPropertyName, aPropertyValue )  
             if aCommand != None:
@@ -191,7 +195,7 @@ class ObjectEditorWindow :
         
     # ==========================================================================
     def getAttachmentBox(self):
-        childs=self.win.vbox.get_children()
+        childs=self.theTopFrame.get_children()
         for obj in childs:
             if obj.get_name()=='attachment_box':
                 return obj
@@ -207,7 +211,7 @@ class ObjectEditorWindow :
             self.isBoxShow=True
 
     def getAttachmentFrame(self):
-        childs=self.win.vbox.get_children()
+        childs=self.theTopFrame.get_children()
         for obj in childs:
             if obj.get_name()=='attachment_frame':
                 return obj
@@ -224,7 +228,7 @@ class ObjectEditorWindow :
     # ==========================================================================
 
     def setDisplayObjectEditorWindow(self,aLayoutName, anObjectId):
-        self.win.present()
+        self.bringToTop()
         self.getTheObject( aLayoutName, anObjectId)
         if self.theObject.getProperty(OB_HASFULLID):
             self.theLastFullID = self.theObject.getProperty(OB_FULLID)
@@ -244,7 +248,7 @@ class ObjectEditorWindow :
 
             # an OB_TYPE_TEXT is being clicked
             if self.frameBox==None:
-                self.theShapeProperty=ShapePropertyComponent( self, self.win.vbox )
+                self.theShapeProperty=ShapePropertyComponent( self, self.theTopFrame )
                 self.frameBox=self.getAttachmentFrame()
                 self.isFrameShow=True
             else:
@@ -279,7 +283,7 @@ class ObjectEditorWindow :
         self.updateShapeProperty()
 
 
-    
+
     def updatePropertyList ( self, aFullID = None ):
         """
         in: anID where changes happened
@@ -298,13 +302,15 @@ class ObjectEditorWindow :
         
 
     def updateShapeProperty(self):
+        if self.theModelEditor.getMode() != ME_DESIGN_MODE:
+            return
         self.theShapeProperty.setDisplayedShapeProperty(self.theObject)
 
     def selectEntity(self,anEntityList):
 
         if type(anEntityList) == type(""):
             return
-        self.win.present()
+        self.bringToTop()
         self.theLastObject = anEntityList[0]
         if self.theObject.getProperty(OB_HASFULLID):
             self.theLastFullID = self.theObject.getProperty(OB_FULLID)
@@ -325,11 +331,10 @@ class ObjectEditorWindow :
     def destroy( self, *arg ):
         """destroy dialog
         """
-        
-        self.win.destroy()
+        pass        
+#        self.win.destroy()
         
 
-        self.theModelEditor.toggleObjectEditorWindow(False,None)
         
         
 

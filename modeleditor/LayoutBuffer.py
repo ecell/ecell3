@@ -94,42 +94,44 @@ class SystemObjectBuffer(ObjectBuffer):
         self.theSystemObjectListBuffer.setUndoFlag( aValue )
         
 
-class LayoutBuffer:
+class MultiObjectBuffer( ObjectBuffer ):
 
-    def __init__( self, aLayoutName ):
-        self.theTextObjectListBuffer = ObjectListBuffer()
+
+    def __init__( self):
+        ObjectBuffer.__init__(self, None )
+        self.theObjectListBuffer = ObjectListBuffer()
         self.theSystemObjectListBuffer = ObjectListBuffer()
         self.theConnectionObjectListBuffer = ObjectListBuffer()
-        self.theName = aLayoutName
-        self.thePropertyBuffer = PropertyListBuffer()
-        self.undoFlag = False
-
-    def getName( self ):
-        #returns name of layout
-        return self.theName
 
 
     def getSystemObjectListBuffer( self ):
         return self.theSystemObjectListBuffer
 
 
-    def getTextObjectListBuffer( self ):
+    def getObjectListBuffer( self ):
         return self.theTextObjectListBuffer
 
 
-    def getConnectionObjectListBuffer ( self ):
-        return self.theConnectionObjectListBuffer
+    def getObjectListBuffer( self ):
+        return self.theObjectListBuffer
 
 
-    def getPropertyList( self ):
-        return self.thePropertyBuffer.getPropertyList()
 
-    def getProperty( self, aPropertyName ):
-        return self.thePropertyBuffer.getProperty( aPropertyName )
 
-    def getPropertyBuffer ( self ):
-        return self.thePropertyBuffer
+class LayoutBuffer( ObjectBuffer ):
 
-    def setUndoFlag( self, aValue):
-        self.undoFlag = aValue
-        self.theSystemObjectListBuffer.setUndoFlag( aValue )
+    def __init__( self, aLayoutName ):
+        ObjectBuffer.__init__(self, None)
+        self.theName = aLayoutName
+        self.theRootBuffer = None
+
+
+    def getName( self ):
+        #returns name of layout
+        return self.theName
+
+    def getRootBuffer( self ):
+        return self.theRootBuffer
+        
+    def setRootBuffer ( self, anObjectBuffer ):
+        self.theRootBuffer = anObjectBuffer

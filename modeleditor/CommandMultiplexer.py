@@ -191,10 +191,15 @@ class CommandMultiplexer:
                 else:
                     objectFullID = theObject.getProperty( OB_FULLID )
                     objectIter = self.theLayoutManager.createObjectIterator()
-                    objectIter.filterByFullID( aProcessFullID )
+                    
+                    objectIter.filterByFullID( objectFullID )
                     while True:
+                        
                         anObject = objectIter.getNextObject()
+                        if anObject == None:
+                            break
                         if anObject.getID() != chgdID:
+                            
                             chgCommand = SetObjectProperty( anObject.getLayout(), anObject.getID(), chgdProperty, chgdValue )
                             cmdList.append( chgCommand )
             # here comes the shaky part
@@ -262,22 +267,16 @@ class CommandMultiplexer:
             aParentID =aCmd.theArgs[aCmd.PARENTID]
             
             aParent = aLayout.getObject(aParentID)
-            objectType = aBuffer.getProperty ( OB_TYPE )
-            if objectType in [ OB_TYPE_PROCESS, OB_TYPE_VARIABLE, OB_TYPE_SYSTEM]:
-                objectFullID = aBuffer.getProperty( OB_FULLID )
-                parentFullID = aParent.getProperty( OB_FULLID )
-                # modify buffer fullid
-                # create it from parent 
-                parentSysPath = convertSysIDToSysPath( parentFullID )
-                fullIDList = objectFullID.split(':')
-                fullIDList[1] = parentSysPath
-                newFullID = ':'.join( fullIDList )
-                # if fullid exists do nothing
-                # else create new fullid
-                if not self.theModelEditor.getModel().isEntityExist( newFullID ):
-                    entityBuffer = aBuffer.getEntityBuffer()
-                    pasteCmd = PasteEntityList( self.theModelEditor, entityBuffer, parentSysPath )
-                    returnCmdList.insert( len( returnCmdList) - 1, pasteCmd )
+            if aBuffer.__class__.__name__ == "MultiObjectBuffer":
+                for aSystemBufferName in aBuffer.getSystemObjectListBuffer().getObjectBufferList():
+                    aSystemBuffer = aBuffer.getSystemObjectListBuffer().getObjectBuffer( aSystemBufferName )
+                    self.__pasteOneObjectBuffer( aSystemBuffer, aLayout, aParent, returnCmdList ) 
+                for aBufferName in aBuffer.getObjectListBuffer().getObjectBufferList():
+                    anObjectBuffer = aBuffer.getObjectListBuffer().getObjectBuffer( aBufferName )
+                    self.__pasteOneObjectBuffer( anObjectBuffer, aLayout, aParent, returnCmdList ) 
+
+            else:
+                    self.__pasteOneObjectBuffer( aBuffer, aLayout, aParent, returnCmdList ) 
 
         elif cmdType == "CreateConnection":
             foundFlag = False
@@ -514,7 +513,25 @@ class CommandMultiplexer:
             aCommand = ChangeEntityProperty( self.theModelEditor, aVarrefFullPN, aVarrefList )
             cmdList.append( aCommand )
         return cmdList
-                    
+
+
+    def __pasteOneObjectBuffer( self, aBuffer, aLayout, aParent, returnCmdList ):
+        objectType = aBuffer.getProperty ( OB_TYPE )
+        if objectType in [ OB_TYPE_PROCESS, OB_TYPE_VARIABLE, OB_TYPE_SYSTEM]:
+            objectFullID = aBuffer.getProperty( OB_FULLID )
+            parentFullID = aParent.getProperty( OB_FULLID )
+            # modify buffer fullid
+            # create it from parent 
+            parentSysPath = convertSysIDToSysPath( parentFullID )
+            fullIDList = objectFullID.split(':')
+            fullIDList[1] = parentSysPath
+            newFullID = ':'.join( fullIDList )
+            # if fullid exists do nothing
+            # else create new fullid
+            if not self.theModelEditor.getModel().isEntityExist( newFullID ):
+                entityBuffer = aBuffer.getEntityBuffer()
+                returnCmd = PasteEntityList( self.theModelEditor, entityBuffer, parentSysPath )
+                returnCmdList.insert( len( returnCmdList ) - 1, returnCmd )
 
 
     def __deleteObjectsByFullID( self, aFullID ):

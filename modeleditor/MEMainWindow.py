@@ -30,6 +30,7 @@
 # E-CELL Project, Lab. for Bioinformatics, Keio University.
 #
 from gtk import *
+import gtk.gdk
 from ListWindow import *
 import os
 import os.path
@@ -37,13 +38,17 @@ import string
 from Constants import *
 from LayoutCommand import *
 from PathwayEditor import * 
+from ConfirmWindow import *
+from Runtime import *
 import ModelEditor
 import webbrowser
+
+
         
-class MainWindow( ListWindow ):
+class MEMainWindow( ListWindow ):
 
     
-    def __init__( self, theModelEditor ):
+    def __init__( self, theModelEditor):
         
         """
         in: ModelEditor theModelEditor
@@ -51,15 +56,21 @@ class MainWindow( ListWindow ):
         """
         self.noOfStepper = 0
         self.noOfEntity = 0
+        self.noOfClass = 0
         self.lockTabs = False
         self.lockEntry = False
         #self.noOfPathway = 0
-        # init superclass
-        ListWindow.__init__( self, theModelEditor )
+        
+       # init superclass
 
-       
-               
-                
+        ListWindow.__init__( self, theModelEditor )
+        self.theModelEditor = theModelEditor
+        self.theRuntimeObject = self.theModelEditor.theRuntimeObject
+ 
+
+
+        
+
         
     def openWindow( self ):
         
@@ -96,71 +107,100 @@ class MainWindow( ListWindow ):
             'on_open_button_clicked' : self.__load_menu_clicked,\
             'on_save_button_clicked' : self.__save_menu_clicked,\
             'on_quit_button_clicked' : self.__quit_menu_clicked,\
-            'on_undo_button_clicked' :  self.__undo_activated,\
             'on_redo_button_clicked' : self.__redo_activated,\
+            'on_undo_button_clicked' : self.__undo_activated,\
+            'on_start_button_clicked' : self.__start_activated,\
+            'on_stop_button_clicked' : self.__stop_activated,\
+            'on_step_button_clicked' : self.__step_activated,\
             'on_StepperButton_clicked' : self.__stepper_window_activated,\
             'on_EntityButton_clicked' : self.__entity_window_activated,\
             'on_PathwayButton_clicked' : self.__pathway_editor_activated,\
             'on_LayoutButton_clicked' : self.__layout_window_activated,\
             'on_About_button_clicked' : self.__about_menu_clicked,\
             'on_scrolledwindow1_expose_event' : self.__scrollwindow_exposed,\
-            'on_DeleteLayoutButton_clicked': self.__DeleteLayoutButton_clicked,\
-            'on_combo-entry_changed': self.__on_combo_entry_changed,\
-            'on_CloneLayoutButton_clicked': self.__CloneLayoutButton_clicked
+            'on_layout_name_entry_changed': self.__on_combo_entry_changed,\
+            'on_ClassButton_clicked': self.__class_window_activated,\
+            'on_design_mode_clicked' : self.__design_mode_clicked,\
+            #'on_layout_name_entry_activate' : self.__rename_layout,
+            'on_layout_name_entry_editing_done' : self.__rename_layout,\
+            'on_run_mode_clicked' : self.__run_mode_clicked
             })
 
         self['ObjectWindow'].connect ( "switch-page", self.__changeNotebookTab )
-        self['MainWindow'].connect("delete-event", self.deleted)     
+        self['MEMainWindow'].connect("delete-event", self.deleted)     
         # set up message textbox buffer
+        self.theSmallWindow = self['handlebox24']
         self.theMessageBuffer = gtk.TextBuffer(None)
         self['textview1'].set_buffer(self.theMessageBuffer)
+        self.theMessageWindow = self['scrolledwindow1']
+        self.smallWindowAttachment = self.theMessageWindow
         endIter=self.theMessageBuffer.get_end_iter()
         self.endMark=self.theMessageBuffer.create_mark('EM',endIter,gtk.FALSE)
         self.setIconList( os.environ['MEPATH'] + os.sep + "glade" +
                      os.sep + "modeleditor.png", os.environ['MEPATH'] + os.sep
                      + "glade" + os.sep + "modeleditor32.png" )
- 
+                             
+        self['stop_button'].set_sensitive(gtk.FALSE)                           
+        self['entry5'].set_text(str(0.0))
+        self['entry4'].set_text(str(1))
+        
         # update 
-        self['MainWindow'].maximize()
+        self['MEMainWindow'].maximize()        
         self.update()
         
-
+        
+    def setSmallWindow( self, aFrame ):
+        if aFrame == self.smallWindowAttachment:
+            return
+        self.theSmallWindow.remove( self.smallWindowAttachment )
+        self.smallWindowAttachment = aFrame
+        self.theSmallWindow.add( aFrame )
+        aFrame.show_all()
     
-  
+    def restoreMessageWindow( self ):
+        self.setSmallWindow( self.theMessageWindow )
+    
+   
     def attachTab( self, aWindow, aType ):
         #if aWindow['top_frame'].parent == None:
         #    return
         
         topFrame = aWindow['top_frame']
-        
         aContainer = gtk.HBox()
-        aLabel = gtk.Label( aType )
+        if aType == "Pathway":
+            aLabel = aWindow.getLabelWidget()
+        else:
+            aLabel = gtk.Label( aType )
         aContainer.pack_start( aLabel )
-        aButton = gtk.Button( "x" )
+        aButton = gtk.Button()
+        newImg = gtk.Image()
+        anImg = self['imagex']
+        aPixbuf = anImg.get_pixbuf()
+        newPixbuf = aPixbuf.copy()
+        newImg.set_from_pixbuf( aPixbuf)
+        aButton.add(newImg )
         aContainer.pack_end( aButton )
         aButton.connect( "clicked", self.__closeTab, aWindow)
         self.lockTabs = True
+        #error occurred here
         self['ObjectWindow'].append_page( topFrame, aContainer)
-
         aContainer.expand = gtk.FALSE
         aContainer.fill = gtk.FALSE
         aContainer.show_all()
         topFrame.show_all()
         topFrame.set_data("ParentWindow",aWindow)
         self.lockTabs = False
-        """
-        if topFrame.get_data("ParentWindow") != None            
-        """
         self.presentTab(aWindow)
-         
-                       
-
-
+        self.restoreMessageWindow()
+        
+ 
     def detachTab( self, aWindow ):
         pageNumber = self['ObjectWindow'].page_num( aWindow['top_frame'] )
         self.lockTabs = True
         self['ObjectWindow'].remove_page( pageNumber )
         self.lockTabs = False
+        self.noOfClass=0
+        self.restoreMessageWindow()
         self.update()
     
     def presentTab( self, aWindow):
@@ -169,6 +209,7 @@ class MainWindow( ListWindow ):
         self['ObjectWindow'].set_current_page( pageNumber )
         self.lockTabs = False
         self.update()
+
 
         
     
@@ -214,13 +255,12 @@ class MainWindow( ListWindow ):
         """
 
 
-        if saveAsFlag or not self.theModelEditor.modelHasName:
+        if saveAsFlag or not self.theModelEditor.modelHasName or not self.theModelEditor.isNameConfirmed:
             aFileName = self.__getFileSelection( self.theModelEditor.saveDirName )
 
             # Convert All FileExtensions to Lower Case here
             if aFileName != None and aFileName != '':
                 aFileName = self.theModelEditor.filenameFormatter(aFileName)
-                aFileName = aFileName[:-4] + string.replace(aFileName[-4:], aFileName[-4:], string.lower(aFileName[-4:]))
                         
                 if os.path.splitext(aFileName)[0] == '': 
                     self.theModelEditor.printMessage("No FileName specified", ME_WARNING) 
@@ -231,9 +271,12 @@ class MainWindow( ListWindow ):
             return
 
         # call modeleditor savemodel
-       
-        self.theModelEditor.saveModel( aFileName )
 
+        if self.theModelEditor.changesSaved and aFileName == self.theModelEditor.theModelFileName:
+            return aFileName
+        self.theModelEditor.saveModel( aFileName )
+        if self.theModelEditor.changesSaved:
+            return aFileName
 
     def importModel ( self ):
         """
@@ -248,6 +291,7 @@ class MainWindow( ListWindow ):
         in: string or list of string aMessage
         returns nothing
         """
+        self.restoreMessageWindow()
         iter = self.theMessageBuffer.get_iter_at_mark( self.endMark )
         # writes string or list of strings to end of buffer
         if type(aMessage) == list:  
@@ -257,7 +301,7 @@ class MainWindow( ListWindow ):
                 if string.find(aMessage[0],'\n') != 0:
                     aMessage[0] = '\n' + aMessage[0]
 
-            # print message list
+
             for aLine in aMessage:
                 aString = str( aLine )
                 self.theMessageBuffer.insert( aString, len(aString), iter )
@@ -283,7 +327,6 @@ class MainWindow( ListWindow ):
 
         # update recent files menus
         recentList = self.theModelEditor.getRecentFileList()
-
         if len( recentList ) > 0:
             i = 1
             subMenu = gtk.Menu()
@@ -308,13 +351,13 @@ class MainWindow( ListWindow ):
             self['load_recent'].set_submenu( subMenu )
 
         # update title
-        if self['MainWindow'] != None:
+        if self['MEMainWindow'] != None:
             if self.theModelEditor.theModelName != '' :
                 aTitle = os.path.split ( self.theModelEditor.theModelName ) [1]
-                self['MainWindow'].set_title( aTitle )
+                self['MEMainWindow'].set_title( aTitle )
 
             else:
-                self['MainWindow'].set_title( 'ModelEditor')
+                self['MEMainWindow'].set_title( 'ModelEditor')
 
         # update undo, redo buttons, menus
         if self.theModelEditor.canUndo():
@@ -343,13 +386,12 @@ class MainWindow( ListWindow ):
         #update Layout Manager components
         curpage = self['ObjectWindow'].get_current_page()
         topFrame = self['ObjectWindow'].get_nth_page( curpage )
-        #print topFrame + ' is topFrame'
         choosenLayout = "Choose..."
         if topFrame != None:
             aWindow = topFrame.get_data("ParentWindow")
             if aWindow.__class__.__name__ == 'PathwayEditor':
                 choosenLayout = aWindow.getLayout().getName()
-                #print aWindow.getLayout().getName() + ' is the layout name'
+
         if choosenLayout != oldEntry:
             self['combo1'].entry.set_text( choosenLayout )            
         
@@ -383,7 +425,7 @@ class MainWindow( ListWindow ):
 
 
     def displayHourglass ( self ):        
-        gtkwindow = self['MainWindow']
+        gtkwindow = self['MEMainWindow']
         gdkwindow = gtkwindow.window
         cursor = gtk.gdk.Cursor( gtk.gdk.WATCH )
         gdkwindow.set_cursor( cursor )
@@ -391,7 +433,7 @@ class MainWindow( ListWindow ):
             gtk.main_iteration_do()
         
     def resetCursor ( self ):
-        gtkwindow = self['MainWindow']
+        gtkwindow = self['MEMainWindow']
         gdkwindow = gtkwindow.window
         cursor = gtk.gdk.Cursor( gtk.gdk.TOP_LEFT_ARROW )
         gdkwindow.set_cursor( cursor )
@@ -428,7 +470,7 @@ class MainWindow( ListWindow ):
         # make dialog modal
         aDialog.set_modal( gtk.TRUE )
 
-        # present dialog       self.changeCursor(CU_WATCH,event.x,event.y)  
+        # present dialog       
         retVal = aDialog.run()
 
         aFileName = aDialog.get_filename()
@@ -442,16 +484,34 @@ class MainWindow( ListWindow ):
 
             self.theModelEditor.printMessage("Please Enter a valid filename", ME_WARNING)
             return None
-        
+            
 
         return aFileName
 
+    def updateRunMode( self ):
+        if self.theModelEditor.getMode() == ME_RUN_MODE:
+            self['run_mode'].set_property("visible", gtk.TRUE )
+            self['design_mode'].set_property( "visible", gtk.FALSE )
+        else:
+            self['run_mode'].set_property("visible", gtk.FALSE )
+            self['design_mode'].set_property("visible", gtk.TRUE )
 
     #############################
     #      SIGNAL HANDLERS      #
     #############################
-
+    def __design_mode_clicked( self, *args ):
+        self.theRuntimeObject.checkState( ME_RUN_MODE )
     
+    
+    def __run_mode_clicked( self, *args ):
+        self.theRuntimeObject.checkState( ME_DESIGN_MODE )
+
+
+
+    def __gtk_button2_clicked(self,*arg):
+        self.aClassWidget.destroy() 
+        self.noOfClass = 0
+
     def __closeTab( self, *args ):
         #args[1].close()
         self.lockTabs = True
@@ -465,10 +525,11 @@ class MainWindow( ListWindow ):
 
             topFrame = self['ObjectWindow'].get_nth_page(args[2])
             aWindow = topFrame.get_data("ParentWindow")
-            #print str(aWindow) + ' is aWindow in change notebook tab'
+
             if aWindow != None:
 
                 self.presentTab(aWindow)
+            self.restoreMessageWindow()
             return gtk.TRUE
    
         #self.update()
@@ -508,6 +569,8 @@ class MainWindow( ListWindow ):
 
 
     def __quit_menu_clicked( self, *args ):
+        if self.theModelEditor.isRunning():
+            self.theModelEditor.theRuntimeObject.stop()
 
         self.theModelEditor.quitApplication()
 
@@ -518,10 +581,55 @@ class MainWindow( ListWindow ):
 
 
     def __redo_activated(self, *args):
-
         self.theModelEditor.redoCommandList()
 
+    def __start_activated(self, *args) :        
+        if self.theRuntimeObject.checkState(ME_RUN_MODE) == True:                    
+            self.theRuntimeObject.run()
+                          
+  
+    def __stop_activated(self, *args) :
+        self.theRuntimeObject.stop()
+            
+    def updateRunPanel( self ):
+        if self.theModelEditor.isRunning():
+            self['stop_button'].set_sensitive(gtk.TRUE)
+            self['start_button'].set_sensitive(gtk.FALSE)
+            self['step_button'].set_sensitive(gtk.FALSE)
+            self['entry5'].set_text(str(self.theRuntimeObject.getSimulationTime())[:10])       
+        else:
+            self['stop_button'].set_sensitive(gtk.FALSE)
+            self['start_button'].set_sensitive(gtk.TRUE)
+            self['step_button'].set_sensitive(gtk.TRUE)
 
+
+    def __step_activated(self, *args): 
+        text = self['entry4'].get_text()        
+        
+
+        if text == '' :
+            dialog = ConfirmWindow(0,"Please enter a value as stepsize.")
+            return
+
+        try:
+            aNum = float(text)
+        except:
+            dialog = ConfirmWindow(0,"Please enter a numeric value as step size")
+            return            
+        
+        if aNum <= 0:                  
+            dialog = ConfirmWindow(0,"Please enter a positive value as step size")
+            return
+         
+        if self['radiobuttonSec'].get_active() == gtk.TRUE:
+            if self.theRuntimeObject.checkState(ME_RUN_MODE) == True:
+                self.theRuntimeObject.run(aNum)
+                            
+        elif self['radiobuttonStep'].get_active() == gtk.TRUE:                                               
+            if self.theRuntimeObject.checkState(ME_RUN_MODE) == True:                                    
+                self.theRuntimeObject.step(aNum)
+                
+                    
 
     def __stepper_window_activated( self, *args ):
 
@@ -533,6 +641,11 @@ class MainWindow( ListWindow ):
 
         self.theModelEditor.createEntityWindow()
        
+
+    def __class_window_activated( self, *args ):
+
+        self.theModelEditor.createClassWindow()
+
 
     def __autosave_window_activated( self, *args ):
        
@@ -548,12 +661,12 @@ class MainWindow( ListWindow ):
 
 
     def __pathway_editor_activated( self, *args ):
-        
         layoutManager = self.theModelEditor.theLayoutManager
         layoutName = layoutManager.getUniqueLayoutName()
-        aCommand = CreateLayout( layoutManager, layoutName, True )
+        aCommand = CreateLayout( layoutManager, layoutName, True )  
         self.theModelEditor.doCommandList( [ aCommand ] )
-
+        
+            
 
         #self['combo1'].entry.set_text(layoutName)
         #self['combo1'].set_sensitive(gtk.TRUE)
@@ -571,13 +684,7 @@ class MainWindow( ListWindow ):
             else:   
                 layoutManager.showLayout(layoutName)
             
-      
-        
-    
-        
 
-
-    
     def __layout_window_activated( self, *args ):
 
         self.theModelEditor.createLayoutWindow()
@@ -610,29 +717,9 @@ class MainWindow( ListWindow ):
 
         pass
 
-    def __DeleteLayoutButton_clicked(self, *args):
-        layoutManager = self.theModelEditor.theLayoutManager
-        layoutName = self['combo1'].entry.get_text()    
+       
 
-        if layoutName == 'Choose...':
-            self.theModelEditor.printMessage("This is not a valid layout name", ME_WARNING)
-            return
+        
+    def __rename_layout( self, *args ):
+        print "editing done", args
  
-        aCommand = DeleteLayout( layoutManager, layoutName)
-        self.theModelEditor.doCommandList( [ aCommand ] )
-
-    
-    def __CloneLayoutButton_clicked(self, *args):
-        layoutManager = self.theModelEditor.theLayoutManager
-        layoutName = self['combo1'].entry.get_text()
-
-        if layoutName == 'Choose...':
-            self.theModelEditor.printMessage("This is not a valid layout name", ME_WARNING) 
-            return
-
-        aCommand = CloneLayout( layoutManager, layoutName)
-        self.theModelEditor.doCommandList( [ aCommand ] )
-        newLayoutName = "copyOf" + layoutName
-        self.theModelEditor.createPathwayEditor( layoutManager.getLayout( newLayoutName ) )
-        #self['combo1'].set_sensitive(gtk.TRUE)
-

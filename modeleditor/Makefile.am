@@ -1,15 +1,22 @@
 AUTOMAKE_OPTIONS = foreign
 
-SUBDIRS = glade doc
+SUBDIRS = glade doc plugin
 
 
 modeleditordir=${pkglibdir}
 modeleditor_PYTHON=\
 preferences.ini\
+ShapePluginManager.py\
 AboutModelEditor.py\
+AutoLayout.py\
 AutosaveWindow.py\
 Buffer.py\
 BufferFactory.py\
+ClassEditor.py\
+ClassList.py\
+ClassEditorWindow.py\
+ClassPropertyList.py\
+Clipboard.py\
 Command.py\
 CommandQueue.py\
 ComplexShape.py\
@@ -23,7 +30,7 @@ EditorObject.py\
 EntityCommand.py\
 EntityEditor.py\
 EntityList.py\
-EntityListWindow.py\
+EntityListTab.py\
 Error.py\
 FullIDBrowserWindow.py\
 Layout.py\
@@ -37,11 +44,12 @@ LayoutXML.py\
 LinePropertyEditor.py\
 LineDescriptor.py\
 ListWindow.py\
-MainWindow.py\
+MEMainWindow.py\
 ModelEditor.py\
 ModelStore.py\
 MultiLineEditor.py\
 NestedListEditor.py\
+NewClassWindow.py\
 ObjectEditorWindow.py\
 PathwayEditor.py\
 PopupMenu.py\
@@ -49,18 +57,19 @@ ProcessObject.py\
 PropertyEditor.py\
 PropertyList.py\
 ResizeableText.py\
+Runtime.py\
 ShapePropertyComponent.py\
 StepperChooser.py\
 StepperCommand.py\
 StepperEditor.py\
 StepperList.py\
-StepperWindow.py\
+StepperTab.py\
 SystemObject.py\
 SystemTree.py\
 TextObject.py\
 Utils.py\
 VariableObject.py\
-VariableReferenceEditor.py\
+MEVariableReferenceEditor.py\
 ViewComponent.py\
 Window.py\
 PathwayCanvas.py\
@@ -74,7 +83,6 @@ ShapePropertyComponent.py\
 ShapeDescriptor.py\
 ObjectEditorWindow.py\
 LinePropertyComponent.py\
-LayoutManagerWindow.py\
 GraphicalUtils.py\
 ConnectionObjectEditorWindow.py\
 ComplexShape.py

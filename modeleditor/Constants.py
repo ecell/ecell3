@@ -1,8 +1,16 @@
 
 from ConfirmWindow import *
 
+ME_DESIGN_MODE = "Design"
+ME_RUN_MODE = "Run"
+
 # Layout constants
 
+#Shape Plugin Constants
+SHAPE_PLUGIN_NAME='Default Shape'
+SHAPE_PLUGIN_TYPE='Default Type'
+SHAPE_PLUGIN_PATH=os.environ['MEPATH']
+DEFAULT_SHAPE_NAME='Default'
 
 # object types:
 LE_OBJECT_SYSTEM = 0
@@ -14,8 +22,9 @@ LE_OBJECT_CONNECTION = 5
 
 # Default Root System Stepper
 DE_DEFAULT_STEPPER_CLASS = 'ODE45Stepper'
-DE_DEFAULT_STEPPER_NAME = 'Default Stepper'
+DE_DEFAULT_STEPPER_NAME = 'Default_Stepper'
 
+#CL_PATH='ME_PATH'
 # ModelStore constants
 
 MS_STEPPER_CLASS = 0
@@ -154,8 +163,9 @@ ME_COPY_FLAG = 2
 ME_PASTE_FLAG = 3
 ME_EDIT_FLAG = 4
 ME_BROWSE_FLAG = 5
+ME_APPEND_FLAG = 6
 
-ME_FLAGS_NO = 6
+ME_FLAGS_NO = 7
 
 # varrefs
 ME_VARREF_FULLID = 1
@@ -195,7 +205,7 @@ OB_TYPE_SYSTEM = "System"
 OB_TYPE_TEXT = "Text"
 OB_TYPE_CONNECTION = "Connection"
 OB_NOTHING = "NOTHING"
-
+OB_SHOW_LABEL=1
 OB_MIN_WIDTH = 80
 OB_MIN_HEIGTH = 40
 
@@ -237,6 +247,7 @@ CO_ISRELATIVE = "Isrelative" # omitted
 # lower level connection properties
 CO_LINETYPE = "LineType"  # change linetype action
 CO_LINEWIDTH = "LineWidth" # change linewidth
+CO_CONTROL_POINTS = "ControlPoints"    
 CO_ENDPOINT1 = "Endpoint1" # omitted
 CO_ENDPOINT2 = "Endpoint2" # omitted
 CO_DIRECTION1 = "Direction1" #omitted
@@ -286,6 +297,7 @@ SHAPE_TYPE_CUSTOM = "Custom"
 SHAPE_TYPE_STRAIGHT_LINE = "Straight"
 SHAPE_TYPE_CORNERED_LINE = "Cornered"
 SHAPE_TYPE_CURVED_LINE = "Curved"
+SHAPE_TYPE_MULTIBCURVE_LINE = "MultiBezierCurve"
 
 # layout properties
 LO_SCROLL_REGION = "ScrollRegion" # list of int
@@ -352,14 +364,14 @@ SYS_MINHEIGHT=200
 SYS_MINLABEL=29
 
 # parameters for minimum VARIABLE_TYPE dimensions
-VAR_MINWIDTH=125
-VAR_MINHEIGHT=30
-VAR_MINLABEL=12
+VAR_MINWIDTH=10
+VAR_MINHEIGHT=10
+VAR_MINLABEL=5
 
 # parameters for minimum PROCESS_TYPE dimensions
-PRO_MINWIDTH=89
-PRO_MINHEIGHT=30
-PRO_MINLABEL=11
+PRO_MINWIDTH=10
+PRO_MINHEIGHT=10
+PRO_MINLABEL=5
 
 # parameters for minimum TEXT_TYPE dimensions
 TEXT_MINWIDTH=205
@@ -377,3 +389,6 @@ ARROWHEAD2 = "arrowhead2"
 EXTEND1 = "extendline1"
 EXTEND2 = "extendline2"
 ARROWHEAD_LENGTH = 10
+
+
+

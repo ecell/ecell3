@@ -69,7 +69,7 @@ class DeleteEntityList(ModelCommand):
 
         if not ModelCommand.checkArgs(self):
             return False
-        self.__theIDList = self.theArgs[ self.IDLIST ]
+        self.__theIDList = self.theArgs[ self.IDLIST ]        
         self.__theType = getFullIDType( self.__theIDList[0] )
         return True
         
@@ -77,7 +77,7 @@ class DeleteEntityList(ModelCommand):
     def do( self ):
         
 
-        sortedList = self.theBufferFactory.sortSystemIDs( self.__theIDList )
+        sortedList = self.theBufferFactory.sortSystemIDs( self.__theIDList )        
         self.theReverseCommandList = []
         self.theAffectedPath = None
         for anID in sortedList:
@@ -807,6 +807,7 @@ class SetEntityInfo(ModelCommand):
 
     def do( self ):
         self.theModel.setEntityInfo( self.__theID, self.__theStrings )
+        
         return True
 
 
@@ -816,6 +817,7 @@ class SetEntityInfo(ModelCommand):
 
 
     def getAffected( self ):
+       
         return (getFullIDType( self.__theID ), self.__theID )
 
 

@@ -136,7 +136,7 @@ class AutosaveWindow:
                 aDuration = [0,0]
                           
             else:
-              
+                #radiobutton(set_duration) is selected              
                 if self.ViewComponentObject['set_duration'].get_active() == gtk.TRUE:      
                     try:
                 

@@ -32,9 +32,11 @@
 # E-CELL Project, Lab. for Bioinformatics, Keio University.
 #
 
-
+from Config import *
 from Utils import *
 import gtk
+import gtk.gdk
+import gtk.glade
 import gobject
 
 import os
@@ -44,6 +46,12 @@ from ModelEditor import *
 from ViewComponent import *
 from Constants import *
 from EntityCommand import *
+from AutoLayout import *
+from PropertyList import *
+
+import ecell.GtkSessionMonitor
+
+#from Layout import *
 
 class EntityList(ViewComponent):
     
@@ -57,6 +65,9 @@ class EntityList(ViewComponent):
         # call superclass
         ViewComponent.__init__( self,  pointOfAttach,\
          'attachment_box', 'ListComponent.glade' )
+
+        #newFlag = self.applyMenuItem('generate layout')
+        #ViewComponent.getMenuItems()
 
         # set up liststore
         self.theListStore=gtk.ListStore( gobject.TYPE_STRING, gobject.TYPE_BOOLEAN )
@@ -75,21 +86,35 @@ class EntityList(ViewComponent):
         self['theTreeView'].set_headers_visible( gtk.FALSE )
         self.theModelEditor = self.theParentWindow.theModelEditor
         self.theModelStore = ModelStore()
-
+        
         # set up variables
         self.userSelect = True
         self.noActivate = False
         self.theType = anEntityType
         self.theFlags = [ True, True, True, True ]
-        self.theSelection = []
+        self.theSelection = []        
         self.theDisplayedSysID = None
         self.theSelectionTypeList = [ self.theType, ME_PROPERTY_TYPE ]
+                
         self['theTreeView'].connect('button-press-event' , self.__button_pressed )
         self['theTreeView'].connect('cursor-changed' , self.__cursor_changed )
-        self.addHandlers ( { 'on_Add_clicked' : self.__add_clicked,\
-                    'on_Delete_clicked' : self.__delete_clicked})
+        
+        self.addHandlers ( {'on_Add_clicked' : self.__add_clicked,\
+                            'on_Delete_clicked' : self.__delete_clicked
+                            })                           
+                    
 
+    def getMenuItems(self):
+        aMenu = ViewComponent.getMenuItems(self)
+        aFlags = self.getADCPFlags(self.theType)
+        
+        aMenu.append(["generateLayout", aFlags[ME_DELETE_FLAG]])
+        fullPNList = map( lambda x:x+':', self.getSelectedIDs() )
+        tracerMenu = self.theModelEditor.theRuntimeObject.createTracerSubmenu( fullPNList )
+        aMenu.append([None, tracerMenu ])
 
+        return aMenu        
+       
     def changeDisplayedType( self, aType ):
         self.theType = aType
         self.theSelectionTypeList = [ self.theType, ME_PROPERTY_TYPE ]
@@ -131,7 +156,9 @@ class EntityList(ViewComponent):
         """
         returns displayed syspath
         """
+               
         return self.theDisplayedSysID
+        #print theDisplayedSysID
 
     def setDisplayedSysID ( self, anID ):
         self.theDisplayedSysID = anID
@@ -154,6 +181,7 @@ class EntityList(ViewComponent):
         """
         returns list of selected IDs
         """
+        
         return copyValue( self.theSelection )
 
 
@@ -165,6 +193,7 @@ class EntityList(ViewComponent):
         # change self.theSelection
         # if cannot change select nothing
         self.theSelection = []
+        
         for anEntityID in anEntityIDList:
             if self.theModelEditor.getModel().isEntityExist( anEntityID ):
                 self.theSelection.append( anEntityID )
@@ -178,10 +207,12 @@ class EntityList(ViewComponent):
                 aNameList.append( aSelection.split(':')[2] )
 
             self.__selectRows( aNameList )
-
+        #print aNameList
+        #print self.theSelection
 
 
     def getADCPFlags( self, aType ):
+        
         self.theFlags[ ME_DELETE_FLAG ] = len( self.theSelection) > 0
         self.theFlags[ ME_COPY_FLAG ] = len( self.theSelection) > 0
         self.theFlags[ ME_PASTE_FLAG ] = aType in self.theSelectionTypeList
@@ -198,21 +229,30 @@ class EntityList(ViewComponent):
 
     def selectByUser( self ):
 
-        # get selected sysid
-        aNameList = copyValue( self.__getSelection() )
+        # get selected sysid       
+        aNameList = copyValue( self.__getSelection() )            
         aSelectionList = []
         
         aPath = convertSysIDToSysPath( self.theDisplayedSysID )
         
         for aName in aNameList:
-
+            
             aSelectionList.append( ':'.join( [ self.theType, aPath, aName ] ) )
 
-        self.theSelection = aSelectionList
-
+        #print the selected variables
+        self.theSelection = aSelectionList       
+        
+         
         # update parentwindow propertylist
-        self.theParentWindow.update()
-
+        #self.theParentWindow = EntityListWindow instance
+        self.theParentWindow.update()        
+        
+    def generateLayout(self):
+      
+        layoutName = self.theModelEditor.theLayoutManager.getUniqueLayoutName()
+        
+        self.theAutoLayout = AutoLayout(self.theModelEditor,layoutName,self.theSelection)
+        
 
     def copy( self ):
 
@@ -224,6 +264,8 @@ class EntityList(ViewComponent):
 
 
     def cut ( self ):
+        if not self.theModelEditor.theRuntimeObject.checkState( ME_DESIGN_MODE ):
+            return
         # create command
         aCommand = CutEntityList( self.theParentWindow.theModelEditor, self.theSelection )
 
@@ -233,6 +275,8 @@ class EntityList(ViewComponent):
 
 
     def paste ( self ):
+        if not self.theModelEditor.theRuntimeObject.checkState( ME_DESIGN_MODE ):
+            return
         aCommandList = []
         aBuffer = self.theModelEditor.getCopyBuffer()
 
@@ -251,12 +295,13 @@ class EntityList(ViewComponent):
 
 
     def add_new ( self ):
-
+        if not self.theModelEditor.theRuntimeObject.checkState( ME_DESIGN_MODE ):
+            return
         # get unique name from modeleditor
         # change selection
         # call addnew in modeleditor
         displayedPath = convertSysIDToSysPath( self.theDisplayedSysID )
-
+        
         if self.theType == ME_PROCESS_TYPE:
             newClass = self.theModelEditor.getDefaultProcessClass()
         elif self.theType == ME_VARIABLE_TYPE:
@@ -267,7 +312,8 @@ class EntityList(ViewComponent):
 
 
         aCommand = CreateEntity( self.theModelEditor,  newID, newClass )
-        self.theSelection = [ newID ]
+        self.selectByUser()
+        self.theSelection = [ newID ]        
         self.__unselectRows()
         self.theModelEditor.doCommandList ( [ aCommand ] )
 
@@ -280,14 +326,20 @@ class EntityList(ViewComponent):
         self.noActivate = False
 
     
+    
     def delete ( self ):
-        aCommand = DeleteEntityList( self.theModelEditor, self.theSelection )
+        if not self.theModelEditor.theRuntimeObject.checkState( ME_DESIGN_MODE ):
+            return
 
+        aCommand = DeleteEntityList( self.theModelEditor, self.theSelection )
+        
         self.theSelection = []
         self.theModelEditor.doCommandList ( [ aCommand ] )
 
 
     def rename ( self, newName, anIter ):
+        if not self.theModelEditor.theRuntimeObject.checkState( ME_DESIGN_MODE ):
+            return
 
         # if nothing changed make nothing
         #newSelection = self.__getSelection()
@@ -317,8 +369,28 @@ class EntityList(ViewComponent):
         else:
             self.theListStore.set_value( anIter, 0, oldName )
 
-
-
+############################added by lilan#####################################
+    def AppendTracertoBoard( self ):   
+             
+        fullIds= self.getSelectedIDs()
+                               
+        fullPNList = []
+        
+        for anItem in fullIds:          
+         
+            aPropertyName =[]            
+            aPropertyName = anItem.split(':' )                            
+            if aPropertyName[0] == 'Process':
+                PropertyValue = ':Activity'
+                string = anItem + PropertyValue 
+                fullPNList = fullPNList + [string] 
+            elif aPropertyName[0] == 'Variable':
+                PropertyValue = ':Value'
+                string = anItem + PropertyValue 
+                fullPNList = fullPNList + [string]          
+        
+        self.theModelEditor.theMainWindow.theRuntimeObject.createTracerWindow(fullPNList)
+        
 
     #########################################
     #    Private methods/Signal Handlers    #
@@ -327,6 +399,7 @@ class EntityList(ViewComponent):
 
     def __button_pressed( self, *args ):
         # when any button is pressed on list
+        #print "button pressed"
         self.theParentWindow.setLastActiveComponent( self )
         self.theModelEditor.setLastUsedComponent( self )
 
@@ -337,7 +410,7 @@ class EntityList(ViewComponent):
     
 
     def __cursor_changed( self, *args ):
-        # when row is selected in list
+        # when row is seleclickedcted in list
 
         if self.noActivate:
             return
@@ -353,8 +426,9 @@ class EntityList(ViewComponent):
     def __delete_clicked( self, *args ):
         self.delete()
 
-
+    
     def __unselectRows( self ):
+    
          self.theListSelection.unselect_all()
 
         
@@ -368,7 +442,7 @@ class EntityList(ViewComponent):
         aNameList = []
         if self.theDisplayedSysID != None:
             aNameList = self.theModelEditor.getModel().getEntityList ( self.theType, convertSysIDToSysPath( self.theDisplayedSysID ) )
-            #print'\n buildList',aNameList  
+          #  print'\n buildList',aNameList  
 
         self.__addRows( aNameList )
         
@@ -460,6 +534,7 @@ class EntityList(ViewComponent):
         """
         self.__thePathList = []
         self.theListSelection.selected_foreach( self.__foreachCallBack )
+        #self.__thePathList returns index of the items on the entityList        
         return self.__thePathList
 
 

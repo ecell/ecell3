@@ -42,7 +42,7 @@ from EntityEditor import *
 from Utils import *
 
 
-class EntityListWindow(ListWindow):
+class EntityListTab(ListWindow):
 
 
     def __init__( self, aModelEditor,aRoot=None ):
@@ -72,27 +72,32 @@ class EntityListWindow(ListWindow):
         
         ###############################################################################
         self.theEntityList = EntityList( self, self['EntityListFrame'], self.theEntityType )
+       
         self.theEntityEditorList = EntityEditor( self, self['EntityEditorFrame'], self.theEntityType )
-
+           
         # add signal handlers
         self.addHandlers({ 'on_variable1_activate' : self.__entitychooser_changed, 
-                'on_process1_activate' : self.__entitychooser_changed
+                            'on_process1_activate' : self.__entitychooser_changed
                 })
 
         self.theEntityList.changeDisplayedType( self.theEntityType )
 
-        self. selectEntity( [ME_ROOTID] )
+
+        self.selectEntity( [ME_ROOTID] )
+
 
         self.update()
-
-
-
+           
+        
     def setLastActiveComponent( self, aComponent ):
         self.theLastActiveComponent = aComponent
         self.updatePropertyList()
 
 
     def update( self, aType = None, aFullID = None ):
+        #if self.theModelEditor.getMode() == ME_RUN_MODE:
+        #    self.theEntityEditorList.thePropertyList.update()
+        #    return
         if aType == ME_SYSTEM_TYPE:
             self.updateSystemTree( aFullID )
         elif aType == ME_STEPPER_TYPE:
@@ -114,7 +119,7 @@ class EntityListWindow(ListWindow):
             
         elif aType in [ ME_PROCESS_TYPE, ME_VARIABLE_TYPE ]:
             displayedType = self.__getEntityType()
-            
+            self.theEntityList.aValue = self.theEntityEditorList.getaValue()
             if aType != displayedType:
                 
                 self.theEntityList.changeDisplayedType( aType )
@@ -122,11 +127,11 @@ class EntityListWindow(ListWindow):
             self.theLastActiveComponent = self.theEntityList 
         else:
             raise Exception("Wrong type to select %s"% aType )
-        self.theLastActiveComponent.changeSelection( anEntityList )
-        self.theLastActiveComponent.selectByUser( ) 
+        self.theLastActiveComponent.changeSelection( anEntityList )     
+            
+        self.theLastActiveComponent.selectByUser()
         
-
-
+        
 
     def updateSystemTree ( self, aSystemFullID = None ):
         """
@@ -195,9 +200,6 @@ class EntityListWindow(ListWindow):
 
             self.theEntityEditorList.update()
 
-            
-
-
     def changeEntityType( self ):
         self.theEntityType = self.__getEntityType()
         self.theEntityList.changeDisplayedType( self.theEntityType )
@@ -213,13 +215,15 @@ class EntityListWindow(ListWindow):
         self.theSystemTree.close()
         self.theEntityList.close()
         self.theEntityEditorList.close()
+        self.theModelEditor.theEntityListWindowList.remove( self )
         self.theModelEditor.updateWindows()
         return gtk.TRUE
 
 
     def __entitychooser_changed( self, *args ):
-        self.changeEntityType()
-
+    
+        self.changeEntityType()     
+      
 
     def __getEntityType( self ):
         """

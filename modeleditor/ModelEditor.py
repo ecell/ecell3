@@ -1,17 +1,20 @@
 
-from ecell.gui_config import *  # added by hiep
-import ConfigParser
 
+from ecell.gui_config import *  
+
+import ConfigParser
 
 import tempfile
 
+from Clipboard import *
+from ShapePluginManager import *
 from Constants import *
 import os
 import os.path
 import gtk
-from ConfirmWindow import *  # added by hiep
+from ConfirmWindow import *  
 from Command import *
-from CommandQueue import *
+from CommandQueue import * 
 from EntityCommand import *
 from StepperCommand import *
 import string
@@ -21,17 +24,15 @@ from ModelStore import *
 import time
 import AutosaveWindow
 
-from LayoutManagerWindow import *
-from MainWindow import *
-from StepperWindow import *
-from EntityListWindow import *
+from MEMainWindow import *
+from StepperTab import *
+from EntityListTab import *
+from ClassEditorWindow import *
 from DMInfo import *
 from PopupMenu import *
 from PathwayEditor import *
 from LayoutManager import *
 from AboutModelEditor import *
-
-import AutosaveWindow # added by hiep
 
 from CommandMultiplexer import *
 from ObjectEditorWindow import *
@@ -39,12 +40,19 @@ from ConnectionObjectEditorWindow import *
 from LayoutEml import *
 from GraphicalUtils import *
 
+
+
+from LayoutBufferFactory import *
+
 from Error import *
+
 import time
+
+
 RECENTFILELIST_FILENAME = '.modeleditor' + os.sep + '.recentlist'
 RECENTFILELIST_DIRNAME = '.modeleditor'
 RECENTFILELIST_MAXFILES = 10
-
+from Runtime import *
 
 class ModelEditor:
 
@@ -56,10 +64,15 @@ class ModelEditor:
     """
 
     def __init__( self, aFileName = None ):
-  
+        gtk.rc_parse_string( 'style "smallchar" { font_name="Sans 8"}\nwidget "MEMainWindow.top_frame.vbox10.vpaned1.handlebox24.*" style "smallchar"\n')
+        gtk.rc_parse_string('style "canvastext" {font_name="Sans Italic 10"}\n class "GnomeCanvasText" style "canvastext"\n')
+ 
+        self.theRuntimeObject = Runtime(self)
+
         self.theConfigDB=ConfigParser.ConfigParser()
         self.theIniFileName = GUI_HOMEDIR + os.sep + '.modeleditor' + os.sep + 'preferences.ini'
-
+        
+      
         GUI_ME_PATH = os.environ['MEPATH']
 
         theDefaultIniFileName = GUI_ME_PATH + os.sep + 'preferences.ini'
@@ -72,7 +85,7 @@ class ModelEditor:
         else:
             self.theConfigDB.read(self.theIniFileName)
 
-
+        self.theClipboard = Clipboard()        
         self.copyBuffer = None
 
         # set up load and save dir
@@ -90,49 +103,67 @@ class ModelEditor:
 
         self.__theModel = None
         self.theModelName = ''
+       # self.theModelText = os.system("gedit")
         self.theModelFileName = ''
-        self.theModelTmpFileName = ''
+
         self.operationCount=1
         
-
+        self.thePropertyName = []        
         self.theStepperWindowList = []
         self.theEntityListWindowList = []
         self.thePathwayEditorList = []
-        self.theLayoutManagerWindow=None 
+        self.theClassEditor = None
+        self.theResultsWindow = None
+
         self.theObjectEditorWindow = None
         self.theConnObjectEditorWindow = None
         self.theAboutModelEditorWindow = None
         self.theFullIDBrowser = None
         self.thePopupMenu = PopupMenu( self )
-        self.theMainWindow = MainWindow( self )
+        self.theMainWindow = MEMainWindow( self )
         self.changesSaved = True
+        self.modelHasName = False
         self.openAboutModelEditor = False
+        self.isNameConfirmed = False
+        self.executionTime = 0
+        self.executionSteps = 0
 
-        #self.openAutosaveWindow = False
-        #self.theAutosaveWindow = None
+        self.openAutosaveWindow = False
+        self.theAutosaveWindow = None
+        self.theModelStore = ModelStore()
+
+        self.theLayoutManager = LayoutManager( self )
+        self.theMultiplexer = CommandMultiplexer( self, self.theLayoutManager )
+        self.theUndoQueue = CommandQueue(MAX_REDOABLE_COMMAND)
+        self.theRedoQueue = CommandQueue(MAX_REDOABLE_COMMAND)
 
         # create untitled model
-        self.createNewModel()
 
+        self.theEntityType = ME_VARIABLE_TYPE        
         # set up windows
         self.theMainWindow.openWindow()
         self.theGraphicalUtils = GraphicalUtils( self.theMainWindow )
-        
+              
         # load file
         if aFileName != None:
-            self.loadModel( aFileName )
+            if not self.loadModel( aFileName ):
+                self.createNewModel()
         else:
-            layoutName = self.theLayoutManager.getUniqueLayoutName()
-            aCommand = CreateLayout( self.theLayoutManager, layoutName, True )
-            self.doCommandList( [ aCommand ] )
+            self.createNewModel()
+        self.changesSaved = True
 
 
+    def getShapePluginManager(self):
+        self.theShapePluginManager=ShapePluginManager()
+        if(self.theShapePluginManager !=None):
+            return self.theShapePluginManager
+       
     def quitApplication( self ):
         if not self.__closeModel():
             return False
         gtk.mainquit()
         return True
-
+   
     
     def createNewModel( self ):
         """ 
@@ -142,7 +173,8 @@ class ModelEditor:
         
        
         # create new Model
-        self.__createModel()
+        if not self.__createModel():
+            return False
         
 
         
@@ -151,15 +183,13 @@ class ModelEditor:
         newFullID = ':'.join( [ ME_VARIABLE_TYPE, '/', 'SIZE' ] )
         self.theModelStore.createEntity( ME_VARIABLE_TYPE, newFullID )
     
-
+        self.changesSaved = True
 
         self.updateWindows()
 
         # create default Pathway Editor
-        if self.theMainWindow.exists():
-            layoutName = self.theLayoutManager.getUniqueLayoutName()
-            aCommand = CreateLayout( self.theLayoutManager, layoutName, True )
-            self.doCommandList( [ aCommand ] )
+        self.__createPathwayWindow()
+        return True
 
 
     def validateModel( self ):
@@ -169,64 +199,62 @@ class ModelEditor:
 
            
 
-    def convertSbmlToEml(self, aFileName):
-        tmpFileBaseName = os.path.basename(aFileName)   
-        tmpFileName = os.path.splitext( tmpFileBaseName )[0]
-        tmpExt = os.path.splitext( tmpFileBaseName )[1]
+    def convertSbmlToEml(self, sbmlFileName):
+        tmpFileBaseName = os.path.basename(sbmlFileName)   
+        tmpFileName, tmpEx = os.path.splitext( tmpFileBaseName )
         
         #Output filename 
-        tmpaFileName = str(self.__getTmpDir()) + os.sep + tmpFileName + '.eml' 
-        
-        if string.lower(tmpExt) == '.sbml':
-            os.spawnlp( os.P_WAIT, 'ecell3-sbml2eml', 'ecell3-sbml2eml', '-o', tmpaFileName, aFileName )
-            return tmpaFileName        
+        tmpFileName = str(self.__getTmpDir()) + os.sep + tmpFileName + '.eml' 
+        os.system( 'ecell3-sbml2eml -o '+ tmpFileName + ' ' + sbmlFileName )
+        return tmpFileName
 
-    def convertEmlToSbml(self, aFileName):
-        tmpFileBaseName = os.path.basename(aFileName)
-        tmpExt = os.path.splitext( tmpFileBaseName )[1]
-        tmpaFileName = self.theModelTmpFileName
-       
-        if tmpExt == '.eml':
-            aFileName = aFileName[:-3] + string.replace(aFileName[-3:], 'eml','sbml')
-            os.spawnlp( os.P_WAIT, 'ecell3-eml2sbml', 'ecell3-eml2sbml', '-o', aFileName, tmpaFileName )
+
+    def convertEmlToSbml(self, emlFileName, sbmlFileName):
+        #emlName, tmpEx = os.path.splitext( emlFileName )
+        #sbmlFileName = emlName + ".sbml"
+        if os.path.exists( sbmlFileName ):
+            if self.printMessage("%s already exists. Do you want to replace it?"%aFileName ,ME_OKCANCEL) != ME_RESULT_OK:
+                return False
+        # create window
+        buttons = [ "Version 1\nLevel 1", "Version 1\nLevel 2", "Version 2" ]
+        filecontent = ["1\n1\n", "1\n2\n", "2\n"]
+        win = ConfirmWindow( CUSTOM_MODE, "Please choose SBML Version and Level!", "Choose SBML version", buttons )
+        result = win.return_result()
+        if result == CANCEL_PRESSED:
+            return False
+        
+        #write file
+        paramFileName = "__SBMLWriter__"
+        fd = open( paramFileName,'w' )
+        fd.write(filecontent[result] )
+        fd.close()
+        
+        os.system(  'ecell3-eml2sbml -o ' + sbmlFileName + ' ' + emlFileName + ' <' + paramFileName )
+        return True
         
     
-
-    def convertEmToEml(self, aFileName):
+    def convertEmToEml(self, emFileName):
         
         tmpFileBaseName = os.path.basename(aFileName)
-        tmpExt = os.path.splitext( tmpFileBaseName )[1]
-        tmpaFileName = str(self.__getTmpDir()) + os.sep + tmpFileBaseName + 'l'
-        
-        if tmpExt == '.em':
-            os.spawnlp( os.P_WAIT, 'ecell3-em2eml', 'ecell3-em2eml', '-o', tmpaFileName, aFileName )
-            return tmpaFileName
+        tmpFileName, tmpExt = os.path.splitext( tmpFileBaseName )
+        tmpFileName = str(self.__getTmpDir()) + os.sep + tmpFileName + '.eml'
+        os.system( 'ecell3-em2eml -o ' + tmpFileName +' '+ aFileName )
+        return tmpaFileName
 
     
-    def convertEmlToEm(self, aFileName):
-           
-        tmpFileBaseName = os.path.basename(aFileName)
-        tmpExt = os.path.splitext( tmpFileBaseName )[1]
-        tmpaFileName = self.theModelTmpFileName
-       
-        if tmpExt == '.eml':
-            aFileName = aFileName[:-3] + string.replace(aFileName[-3:], 'eml','em')
-
-            if os.path.exists(aFileName):
-                if self.printMessage("%s already exists. Do you want to replace it?"%aFileName ,ME_OKCANCEL) == ME_RESULT_OK:
-                    os.spawnlp( os.P_WAIT, 'ecell3-eml2em', 'ecell3-eml2em','-f', '-o', aFileName, tmpaFileName )
-                else:
-                    return False
-            else:
-                os.spawnlp( os.P_WAIT, 'ecell3-eml2em', 'ecell3-eml2em', '-o', aFileName, tmpaFileName )
+    def convertEmlToEm(self, emlFileName, emFileName ):
+        if os.path.exists( emFileName ):
+            if self.printMessage("%s already exists. Do you want to replace it?"%aFileName ,ME_OKCANCEL) != ME_RESULT_OK:
+                return False
+        os.system( 'ecell3-eml2em -o ' + emFileName + ' ' + emlFileName )
+        return True
 
 
 
 
 
     def loadEmlAndLeml(self, aFileName):
-        # create new model
-        self.__createModel()
+
 
         # tries to parse file
         try:
@@ -258,11 +286,12 @@ class ModelEditor:
             anErrorMessage = string.join( traceback.format_exception(sys.exc_type,sys.exc_value, \
                     sys.exc_traceback), '\n' )
             self.printMessage( anErrorMessage, ME_PLAINMESSAGE )
+            return False
         return True
 
 
     def saveEmlAndLeml(self, aFileName):
-
+        
         #aFileName = self.filenameFormatter(aFileName)
         anEml = Eml()
 
@@ -301,65 +330,98 @@ class ModelEditor:
         self.saveLayoutEml(os.path.split( aFileName ))
 
 
-    def loadModel ( self, aFileName = None ):
+    def __saveModelStoreAndLayout( self ):
+        self.__savedLayoutManager = self.theLayoutManager
+        self.__savedModelStore = self.theModelStore
+        self.__savedModelName = self.theModelName
+        self.__savedModelHasName = self.modelHasName
+        self.__savedChangesSaved = self.changesSaved
+
+        return
+        
+        
+    def __restoreModelStoreAndLayout( self ):
+        self.changesSaved = True
+        self.__createModel()
+        self.theModelStore = self.__savedModelStore
+        self.theLayoutManager = self.__savedLayoutManager
+        self.__createPathwayWindow()
+        self.theModelName = self.__savedModelName 
+        self.modelHasName = self.__savedModelHasName 
+        self.changesSaved = self.__savedChangesSaved 
+        self.__clearModelStoreAndLayoutSave()
+        self.updateWindows()
+        return
+
+    def __clearModelStoreAndLayoutSave( self ):
+        del self.__savedLayoutManager
+        del self.__savedModelStore
+        return
+
+
+    def loadModel ( self, aFileName ):
         """
         in: nothing
-        returns nothing
+        returns True if some model is loaded or restored, False if nothing happened
         """
-         
-        
+
         # check if it is dir or/and file
         if os.path.isdir( aFileName ):
-            self.loadDirName = aFileName.rstrip('/')
-            return
+            self.loadDirName = aFileName.rstrip( os.sep )
+            return False
         if not os.path.isfile( aFileName ):
             self.printMessage("%s file cannot be found!"%aFileName, ME_ERROR )
-            return
+            return False
+        self.__saveModelStoreAndLayout()
+
+        # create new model
+        if not self.__createModel():
+            return False
+
 
         self.theMainWindow.displayHourglass()
 
-        self.loadDirName = os.path.split( aFileName )[0]
+
 
         if self.loadDirName != '':
             os.chdir(self.loadDirName )
-        
-        aFileBaseName = os.path.basename(aFileName)
-        anExt = os.path.splitext(aFileBaseName)[1]
 
+        anExt = os.path.splitext(aFileName)[1].lower()
+        
         if anExt == '.em':
             aTmpFileName = self.convertEmToEml(aFileName)
             # aTmpFileName has .eml extension
             if not self.loadEmlAndLeml(aTmpFileName):
                 self.theMainWindow.resetCursor()
-                self.__createModel()
-                return
+                self.__restoreModelStoreAndLayout()
+                return True
                 
-            self.theModelTmpFileName = aTmpFileName
-            # Remove the model residing in /tmp
-            os.remove(self.theModelTmpFileName)
+             # Remove the model residing in /tmp
+            os.remove( aTmpFileName )
+            self.isNameConfirmed = False
 
-        elif anExt == '.sbml':
-            pass
-            """
+        elif anExt in ['.sbml', '.xml']:
             aTmpFileName = self.convertSbmlToEml(aFileName)
-            self.loadEmlAndLeml(aTmpFileName)
-            self.theModelTmpFileName = aTmpFileName
-            os.remove(self.theModelTmpFileName)
-            """ 
+            if not self.loadEmlAndLeml(aTmpFileName):
+                self.theMainWindow.resetCursor()
+                self.__restoreModelStoreAndLayout()
+                return True
+            os.remove( aTmpFileName )
+            self.isNameConfirmed = False
+
         #try to load as .eml
         else: #anExt == '.eml':
             if not self.loadEmlAndLeml(aFileName):
                 self.theMainWindow.resetCursor()
-                self.__createModel()
-                return
-            
+                self.__restoreModelStoreAndLayout()
+                return True
+            self.isNameConfirmed = True
+
+        self.loadDirName = os.path.split( aFileName )[0]            
         # log to recent list
         self.__addToRecentFileList( aFileName )
         
-        if anExt == '.em':
-            self.theModelFileName = aFileName + 'l'
-        else:
-            self.theModelFileName = aFileName
+        self.theModelFileName = aFileName
 
         self.theModelName = os.path.split( aFileName )[1]
         self.modelHasName = True
@@ -368,13 +430,20 @@ class ModelEditor:
         self.updateWindows()
        
         #self.theMainWindow['combo1'].set_popdown_strings(self.theLayoutManager.getLayoutNameList())
-
+        self.__createPathwayWindow( False )
         self.theMainWindow.resetCursor()
+        return True
+        
+        
+    def __createPathwayWindow( self, emptyFile = True ):
         aLayoutList = self.theLayoutManager.getLayoutNameList()
         if len( aLayoutList ) == 0:
-            layoutName = self.theLayoutManager.getUniqueLayoutName()
-            aCommand = CreateLayout( self.theLayoutManager, layoutName, True )
-            self.doCommandList( [ aCommand ] )
+            if emptyFile:
+                layoutName = self.theLayoutManager.getUniqueLayoutName()
+                aCommand = CreateLayout( self.theLayoutManager, layoutName, True )
+                self.doCommandList( [ aCommand ] )
+            else:
+                self.createEntityWindow()
         else:
             layoutName = aLayoutList[0]
             aLayout = self.theLayoutManager.getLayout( layoutName ) 
@@ -400,39 +469,44 @@ class ModelEditor:
         self.saveDirName = os.path.split( aFileName )[0]
 
         aFileBaseName = os.path.basename(aFileName)
-        anExt = os.path.splitext(aFileBaseName)[1]
+        anExt = os.path.splitext(aFileBaseName)[1].lower()
 
         if anExt == '.em':  
-            self.__setEmlModelTmpFileName(1,aFileName)
+            aTmpFileName = self.__getEmlTmpFileName( aFileName)
 
-            self.saveEmlAndLeml(self.theModelTmpFileName)
+            self.saveEmlAndLeml( aTmpFileName )
 
-            self.saveLayoutEml(os.path.split( aFileName ))
-
-            if self.convertEmlToEm(aFileName + 'l') == False:
-                os.remove(self.theModelTmpFileName)
-                os.remove(os.path.splitext(self.theModelTmpFileName)[0] + '.leml')
+            if self.convertEmlToEm( aTmpFileName, aFileName ) == False:
+                os.remove( aTmpFileName )
+                os.remove(os.path.splitext( aTmpFileName)[0] + '.leml')
                 self.theMainWindow.resetCursor()
                 return
         
-            self.printMessage("Some data may be lost in the 'leml' file in a '.em' saving process. (Changes Saved)", ME_WARNING)
-            os.remove(self.theModelTmpFileName)
-            os.remove(os.path.splitext(self.theModelTmpFileName)[0] + '.leml')
+            self.printMessage("Warnnig! Layouting information cannot be saved into .em format!", ME_WARNING)
+            os.remove( aTmpFileName )
+            os.remove(os.path.splitext( aTmpFileName)[0] + '.leml')
+            self.isNameConfirmed = False
 
-        elif anExt == '.sbml':
-            # Call self.__setEmlModelTmpFileName to set abs tmp path
-            # Call saveEmlAndLeml to save in abs tmp path (update)
-            #self.convertEmlToSbml()
-            # Prompt if there is already existing sbml file in dir 
-            # Use os.remove to delete the files use to update in /tmp
-            pass
+        elif anExt in  ['.sbml', '.xml']:
+            aTmpFileName = self.__getEmlTmpFileName( aFileName)
 
+            self.saveEmlAndLeml( aTmpFileName )
+            if self.convertEmlToSbml( aTmpFileName, aFileName ) == False:
+                os.remove( aTmpFileName )
+                os.remove(os.path.splitext( aTmpFileName)[0] + '.leml')
+                self.theMainWindow.resetCursor()
+                return
+            os.remove( aTmpFileName )
+            os.remove(os.path.splitext( aTmpFileName)[0] + '.leml')
+            self.isNameConfirmed = False
         else:
 
             self.saveEmlAndLeml(aFileName) 
-
+            
+        self.isNameConfirmed = True
         # log to recent list
         self.__addToRecentFileList ( aFileName )
+        self.isConverted = True
         self.theModelFileName = aFileName
         self.printMessage("Model %s saved successfully."%aFileName )
         self.theModelName = os.path.split( aFileName )[1]
@@ -444,22 +518,19 @@ class ModelEditor:
 
 
     def filenameFormatter(self, aFileName):
-        anExt = string.lower(os.path.splitext(aFileName)[1])
-        if anExt == '.sbml':
+        aName, anExt = os.path.splitext(aFileName) 
+        anExt = anExt.lower()
+        if anExt in ['.xml','.sbml', '.eml', '.em']:
             return aFileName
 
-        if anExt == '.leml':
-            aFileName = aFileName[:-5] + string.replace(os.path.splitext(aFileName)[1], os.path.splitext(aFileName)[1],'.eml')
-            return aFileName
-    
-        elif anExt == '.eml' or anExt =='.em':
-            return aFileName
-
+        elif anExt == '.leml':
+            return aName + ".eml"
         else:
-            aFileName = aFileName + '.eml'
-            return aFileName        
+            return aFileName + '.eml'
+
                     
-       
+    
+
     def lemlExist(self,fileName):
         if os.path.isfile(fileName):
             return True
@@ -644,7 +715,9 @@ class ModelEditor:
         return: nothing
         """
         # call close model
-        self.__closeModel()
+        if not self.__closeModel():
+            return False
+        return True
 
 
 
@@ -723,9 +796,12 @@ class ModelEditor:
 
 
     def getModel( self ):
-        return self.theModelStore
+        if self.getMode() == ME_DESIGN_MODE:
+            return self.theModelStore
+        else:
+            return self.theRuntimeObject.theSession.theSimulator
 
-
+   
 
     def printMessage( self, aMessageText, aType = ME_PLAINMESSAGE ):
         """
@@ -740,10 +816,10 @@ class ModelEditor:
             else:
                 print aMessage 
         elif aType == ME_OKCANCEL:
-            msgWin = ConfirmWindow( OKCANCEL_MODE, aMessageText, 'Message')
+            msgWin = ConfirmWindow( OKCANCEL_MODE, aMessageText, 'Message')            
             return msgWin.return_result()
         elif aType == ME_YESNO:
-            msgWin = ConfirmWindow( OKCANCEL_MODE, aMessageText, 'Message')
+            msgWin = ConfirmWindow( YESNO_MODE, aMessageText, 'Message')
             return msgWin.return_result()
         elif aType == ME_WARNING:
             msgWin = ConfirmWindow( OK_MODE, aMessageText, 'Warning!')
@@ -758,60 +834,62 @@ class ModelEditor:
 
 
     def doCommandList( self, aCommandList ):
-#        t=[["start", time.time()]]
-        
+
+#        t=[["start", time.time()]]      
+
         undoCommandList = []
         aCommandList = self.theMultiplexer.processCommandList( aCommandList )
+        # check if we are in design mode
+        if not self.theRuntimeObject.checkState( ME_DESIGN_MODE ):
+            return
+              
         for aCommand in aCommandList:
             # execute commands
-            aCommand.execute()
-#            t+=[["execute "+aCommand.__class__.__name__, time.time()]]
-            ( aType, anID ) = aCommand.getAffectedObject()
-            
-            self.updateWindows( aType, anID )
-            ( aType, anID ) = aCommand.getSecondAffectedObject()
-            if aType == None and anID == None:
-                pass
-            else:
+            if aCommand.isExecutable():
+                aCommand.execute()
+                ( aType, anID ) = aCommand.getAffectedObject()
+        
                 self.updateWindows( aType, anID )
-#                t+=[["updatewindows" + Type + " , " + anID, time.time()]]
-            # get undocommands
-            undoCommand = aCommand.getReverseCommandList()
-            
-            # put undocommands into undoqueue
-            if undoCommand != None:
-                undoCommandList.extend( undoCommand )
+                ( aType, anID ) = aCommand.getSecondAffectedObject()
+                if aType == None and anID == None:
+                    pass
+                else:
+                    self.updateWindows( aType, anID )
+                undoCommand = aCommand.getReverseCommandList()
+        
+                # put undocommands into undoqueue
+                if undoCommand != None:
+                    undoCommandList.extend( undoCommand )
 
-            # reset commands put commands into redoqueue
-            aCommand.reset()
-#            t+=[["reverse+reset", time.time() ]]
+                # reset commands put commands into redoqueue
+                aCommand.reset()
+
         if undoCommandList != []:
             self.theUndoQueue.push ( undoCommandList )
             self.theRedoQueue.push ( aCommandList )
             self.changesSaved = False
-            
-        self.theMainWindow.update()
-#        t+=[["Mainwindow update", time.time() ] ]
-        self.checkAutoSaveOption()
-#        t+=[["autosave", time.time() ]]
-#        t0=t[0][1]
 
-#        for anitem in t:
-#            print anitem[0], anitem[1]-t0
-#            t0=anitem[1]
-#        print
-            
+        self.theMainWindow.update()
+
+        self.checkAutoSaveOption()
+
+    def getMode(self):
+        return self.theRuntimeObject.theMode
+
 
     def autoSave(self, aFileName = 'AutoSaveUntitled'):
-        processId = os.getpid()
+        
+        processId = os.getpid()        
         #If user has loaded a file, theModelName shouldn't be empty
         if self.theModelName != '' or self.theModelName != None:
-            modelBaseName = os.path.splitext(self.theModelName)[0]
+            modelBaseName = os.path.splitext(self.theModelName)[0]            
             autoSaveName = str(os.getcwd()) + os.sep + modelBaseName +  ".sav.eml"
+            
         #Default save aFileName
         else:
             autoSaveName = str(os.getcwd()) + os.sep + aFileName +  ".sav.eml"
-
+        self.autoSaveName = autoSaveName
+           
         self.saveEmlAndLeml(autoSaveName)
 
         if self.theUpdateInterval != 0:
@@ -826,8 +904,14 @@ class ModelEditor:
         self.theUpdateInterval = self.getAutosavePreferences()[0] *1000
         byOperation = self.getAutosavePreferences()[1]
                
+
+        #if self.theUpdateInterval != 0:
+        #    self.autoSave(os.path.splitext(os.path.basename(self.theModelFileName))[0])
+
         if self.theUpdateInterval != 0 and self.theTimer == None:
-            self.autoSave(os.path.splitext(os.path.basename(self.theModelFileName))[0])
+            self.autoSave()
+
+
               
         if byOperation !=0 :        
             if self.operationCount == byOperation:
@@ -835,12 +919,6 @@ class ModelEditor:
                 self.autoSave()     
             elif self.operationCount < byOperation:
                 self.operationCount = self.operationCount +1
-
-
-        #self.autoSave(os.path.splitext(os.path.basename(self.theModelFileName))[0])
-        
-
-
 
     def canUndo( self ):
         if self.theUndoQueue == None:
@@ -858,58 +936,77 @@ class ModelEditor:
         self.theRedoQueue.moveback()
         cmdList = aCommandList[:]
         cmdList.reverse()
+        #############added by lilan
+        if not self.theRuntimeObject.checkState( ME_DESIGN_MODE ):
+            return
         for aCommand in cmdList:
             # execute commands
-            aCommand.execute()
-            ( aType, anID ) = aCommand.getAffectedObject()
-            self.updateWindows( aType, anID )
-            ( aType, anID ) = aCommand.getSecondAffectedObject()
-            if aType == None and anID == None:
-                pass
-            else:
+            if aCommand.isExecutable():
+                aCommand.execute()
+                ( aType, anID ) = aCommand.getAffectedObject()
                 self.updateWindows( aType, anID )
-
-            aCommand.reset()
+                ( aType, anID ) = aCommand.getSecondAffectedObject()
+                if aType == None and anID == None:
+                    pass
+                else:
+                    self.updateWindows( aType, anID )
+    
+                aCommand.reset()
         self.changesSaved = False
+
+         
 
 
     def redoCommandList( self ):
         aCommandList = self.theRedoQueue.moveforward()
         self.theUndoQueue.moveforward()
+        if not self.theRuntimeObject.checkState( ME_DESIGN_MODE ):
+            return
+
         for aCommand in aCommandList:
             # execute commands
-            #try:
-            aCommand.execute()
+            if aCommand.isExecutable():
+                aCommand.execute()
 
-            #except:
-            #   self.printMessage( 'Error in operation.', ME_ERROR )
-            #   anErrorMessage = string.join( traceback.format_exception(sys.exc_type,sys.exc_value, \
-            #       sys.exc_traceback), '\n' )
-            #   self.printMessage( anErrorMessage, ME_PLAINMESSAGE )
-
-            ( aType, anID ) = aCommand.getAffectedObject()
-            self.updateWindows( aType, anID )
-            ( aType, anID ) = aCommand.getSecondAffectedObject()
-            if aType == None and anID == None:
-                pass
-            else:
+                ( aType, anID ) = aCommand.getAffectedObject()
                 self.updateWindows( aType, anID )
+                ( aType, anID ) = aCommand.getSecondAffectedObject()
+                if aType == None and anID == None:
+                    pass
+                else:
+                    self.updateWindows( aType, anID )
 
-            aCommand.reset()
+                aCommand.reset()
         self.changesSaved = False
 
 
     def createStepperWindow( self ):
-        newWindow = StepperWindow(self,'top_frame' )  
+        newWindow = StepperTab(self,'top_frame' ) 
         newWindow.openWindow()
-        self.theMainWindow.attachTab( newWindow, "Stepper" )      
+        self.theMainWindow.attachTab( newWindow, "Stepper" )   
         self.theStepperWindowList.append( newWindow )
 
     def createEntityWindow( self ):
-        newWindow = EntityListWindow( self ,'top_frame' )
+        newWindow = EntityListTab( self ,'top_frame' )
         newWindow.openWindow()
-        self.theMainWindow.attachTab( newWindow,"EntityList" ) 
+        #self.theValue = newWindow.getValue()                           
+        self.theMainWindow.attachTab( newWindow,"EntityList" )        
         self.theEntityListWindowList.append( newWindow )
+   
+      
+    def createResultsWindow( self ):
+        newWindow = ResultsWindow( self.theRuntimeObject.getSession(), self  )
+        self.theMainWindow.attachTab( newWindow, "Results" )   
+        self.theResultsWindow = newWindow
+
+
+
+    def createClassWindow( self ):
+        if self.theClassEditor == None:
+            newWindow = ClassEditorWindow( self ,'top_frame')
+            newWindow.openWindow()
+            self.theMainWindow.attachTab(newWindow,"Class Editor") 
+            self.theClassEditorList.append( newWindow )
 
 
     def createPathwayEditor( self, aLayout ):
@@ -922,37 +1019,21 @@ class ModelEditor:
     def toggleOpenLayoutWindow(self,isOpen):
         self.openLayoutWindow=isOpen
 
-    def createLayoutWindow( self ):
-        if not self.openLayoutWindow:
-            newWindow = LayoutManagerWindow( self )
-            self.theLayoutManagerWindow=newWindow
-            newWindow.openWindow()
-            self.openLayoutWindow=True
-        else:       
-            self.theLayoutManagerWindow.present()
 
     def createObjectEditorWindow(self, aLayoutName, anObjectID ):
         if not self.openObjectEditorWindow:
-            ObjectEditorWindow(self, aLayoutName, anObjectID)
+            self.theObjectEditorWindow=ObjectEditorWindow(self, aLayoutName, anObjectID)
+            self.openObjectEditorWindow=True
         else:
             self.theObjectEditorWindow.setDisplayObjectEditorWindow( aLayoutName, anObjectID)
-        
-    def toggleObjectEditorWindow(self,isOpen,anObjectEditor):
-        self.theObjectEditorWindow=anObjectEditor
-        self.openObjectEditorWindow=isOpen
 
-    def deleteObjectEditorWindow( self ):
-        self.theObjectEditorWindow = None
 
     def createConnObjectEditorWindow(self, aLayoutName, anObjectID ):
         if not self.openConnObjectEditorWindow:
-            ConnectionObjectEditorWindow(self, aLayoutName, anObjectID)
+            self.theConnObjectEditorWindow=ConnectionObjectEditorWindow(self, aLayoutName, anObjectID)
+            self.openConnObjectEditorWindow=True
         else:
             self.theConnObjectEditorWindow.setDisplayConnObjectEditorWindow( aLayoutName, anObjectID)
-        
-    def toggleConnObjectEditorWindow(self,isOpen,aConnObjectEditor):
-        self.theConnObjectEditorWindow=aConnObjectEditor
-        self.openConnObjectEditorWindow=isOpen
 
 
     def createAboutModelEditor(self):
@@ -977,12 +1058,16 @@ class ModelEditor:
 
 
     def getCopyBuffer( self ):
+        if self.theClipboard.isClipboardChanged():
+            self.copyBuffer = self.theLayoutManager.theLayoutBufferFactory.\
+                        createBufferFromEml( self.theClipboard.pasteFromClipboard() )
         return self.copyBuffer
 
 
 
     def setCopyBuffer( self, aBuffer ):
         self.copyBuffer = aBuffer
+        self.theClipboard.copyToClipboard( aBuffer.asEml() )
 
 
 
@@ -1000,6 +1085,7 @@ class ModelEditor:
     def getADCPFlags( self ):
         if self.theLastComponent == None:
             return [ False, False, False, False ]
+            #return [ False, False, False, False, False ]
         else:
             if self.copyBuffer == None:
                 aType = None
@@ -1012,15 +1098,14 @@ class ModelEditor:
         self.theFullIDBrowser = aBrowser
 
 
-    def updateWindows( self, aType = None, anID = None ):
-        
+    def updateWindows( self, aType = None, anID = None ):        
         # aType None means nothing to be updated
         for aStepperWindow in self.theStepperWindowList:
             # anID None means all for steppers
             aStepperWindow.update( aType, anID )
 
         for anEntityWindow in self.theEntityListWindowList:
-            anEntityWindow.update( aType, anID )
+            anEntityWindow.update( aType, anID )           
         if self.theObjectEditorWindow!=None:
             self.theObjectEditorWindow.update(aType, anID)
         if self.theConnObjectEditorWindow!=None:
@@ -1035,18 +1120,24 @@ class ModelEditor:
             self.theFullIDBrowser.update( aType,anID )
         if self.theMainWindow.exists():
             self.theMainWindow.update()
-        #self.theLayoutManager.update( aType, anID )
-        if self.theLayoutManagerWindow!=None:
-            self.theLayoutManagerWindow.update()
         
+    def isRunning( self ):
+        aSession = self.theRuntimeObject.getSession()
+        if aSession != None:
+            return aSession.isRunning()
+
 
     def __closeModel( self ):
         """ 
         in: Nothing
         returns True if successful, False if not
         """
+        if self.isRunning():
+            self.theRuntimeObject.stop()
+
+        
         if not self.changesSaved:
-            if self.printMessage("Changes are not saved.\n Are you sure you want to close %s?"%self.theModelName,ME_OKCANCEL)  == ME_RESULT_CANCEL:
+            if self.printMessage("Changes are not saved.\n Are you sure you want to close %s?"%self.theModelName,ME_YESNO)  == ME_RESULT_CANCEL:
 
                 return False
 
@@ -1062,6 +1153,7 @@ class ModelEditor:
         self.changesSaved = True
         self.theLayoutManager = None
         self.__closeWindows()
+        self.theRuntimeObject.closeModel()
         #self.updateWindows()
         return True
 
@@ -1072,17 +1164,20 @@ class ModelEditor:
             aStepperWindow.close( )
         for anEntityWindow in self.theEntityListWindowList:
             anEntityWindow.close( )
-
         for aPathwayEditor in self.thePathwayEditorList:
             aPathwayEditor.close( )
+        if self.theClassEditor != None:
+            self.theClassEditor.deleted(None)
+        if self.theResultsWindow != None:
+            self.theResultsWindow.deleted( None )
+            
         if self.theConnObjectEditorWindow!=None:
             self.theConnObjectEditorWindow.destroy()
         if self.theObjectEditorWindow!=None:
             self.theObjectEditorWindow.destroy()
-        if self.theLayoutManagerWindow!=None:
-            self.theLayoutManagerWindow.close()
-            self.theLayoutManagerWindow=None
-            self.toggleOpenLayoutWindow(False)
+        if self.theResultsWindow != None:
+            self.theResultsWindow.deleted()
+            self.theResultsWindow = None
 
 
     def __createModel(self ):
@@ -1090,7 +1185,8 @@ class ModelEditor:
         in: nothing
         out nothing
         """
-        self.__closeModel()
+        if not self.__closeModel():
+            return False
         # create new model
         self.theModelStore = ModelStore()
 
@@ -1119,7 +1215,7 @@ class ModelEditor:
             gtk.timeout_remove(self.theTimer)
             self.theTimer = None
             
-
+        return True
 
 
 
@@ -1153,12 +1249,14 @@ class ModelEditor:
         in: string aFileName (including directory, starting from root)
         returns nothing
         """
+        # convert to absolute path
+        if os.path.split(aFileName)[0] == '':
+            aFileName = os.getcwd() + os.sep + aFileName
 
         # check wheter its already on list
-        for aFile in self.__theRecentFileList:
-            if aFile == aFileName:
-                return      
-
+        if aFileName in self.__theRecentFileList:
+            self.__theRecentFileList.remove(aFileName )
+            
         # insert new item as first
         self.__theRecentFileList.insert ( 0, aFileName )
 
@@ -1173,23 +1271,12 @@ class ModelEditor:
         tmpDirPath = tempfile.gettempdir()
         return tmpDirPath
 
-    def __setEmlModelTmpFileName(self, setType = None, aFileName = None):
-        """
-        Function: For saving as eml in /tmp, used later for conversion to em/sbml
-        in: setType
-            1 = for saving as em file to target dir, appending of 'l'
-            2 = for saving as sbml file to target dir, replace ext sbml to eml              
-        
-        """
-        
-        if aFileName != None:    
-            tmpFileBaseName = os.path.basename(aFileName)
-            tmpExt = os.path.splitext( tmpFileBaseName )[1]
-            if setType == 1:
-                tmpaFileName = str(self.__getTmpDir()) + os.sep + tmpFileBaseName + 'l'
-                self.theModelTmpFileName = tmpaFileName
-        else:
-            return
+    def __getEmlTmpFileName(self,  aFileName ):
+        tmpFileBaseName = os.path.basename(aFileName)
+        tmpName, tmpExt = os.path.splitext( tmpFileBaseName )
+        return tmpName + '.eml'
+
+
 
     def __getHomeDir( self ):
         """
@@ -1302,7 +1389,7 @@ class ModelEditor:
                                              
     def __loadEntity( self, anEml, aSystemPath='/' ):
 
-        aVariableList = anEml.getEntityList( DM_VARIABLE_CLASS, aSystemPath )
+        aVariableList = anEml.getEntityList( DM_VARIABLE_CLASS, aSystemPath )        
         aProcessList   = anEml.getEntityList( 'Process',   aSystemPath )
         aSubSystemList = anEml.getEntityList( 'System', aSystemPath )
 
@@ -1342,7 +1429,8 @@ class ModelEditor:
 
             aPropertyList = anEml.getEntityPropertyList( aFullID )
 
-            aFullPNList = map( lambda x: aFullID + ':' + x, aPropertyList ) 
+            aFullPNList = map( lambda x: aFullID + ':' + x, aPropertyList )
+            
             aValueList = map( anEml.getEntityProperty, aFullPNList )
             map( self.theModelStore.loadEntityProperty,
                  aFullPNList, aValueList )
@@ -1514,22 +1602,23 @@ class ModelEditor:
         if self.theConfigDB.has_section('autosave'):
             if self.theConfigDB.has_option('autosave',aParameter):
                 self.theConfigDB.set('autosave',aParameter, str(aValue))
-        #else:
+        else:
 
             # sets it in default
-        #    self.theConfigDB.set('DEFAULT',aParameter, str(aValue))
+            self.theConfigDB.set('DEFAULT',aParameter, str(aValue))
 
     def saveParameters( self ):
         """tries to save all parameters into a config file in home directory
         """
         self.theIniFolderName = GUI_HOMEDIR + os.sep + '.modeleditor' + os.sep
         if os.path.isdir(self.theIniFolderName):
-            fp = open( self.theIniFileName, 'w' )
-            self.theConfigDB.write( fp )
-        #except:
-         #   self.message("Couldnot save preferences into file %s.\n Please check permissions for home directory.\n"%self.theIniFileName)
+            try:
+                fp = open( self.theIniFileName, 'w' )
+                self.theConfigDB.write( fp )
+            except:
+                self.message("Couldnot save preferences into file %s.\n Please check permissions for home directory.\n"%self.theIniFileName)
         else:
-            os.spawnlp(os.P_WAIT,'mkdir','mkdir',self.theIniFolderName)
+            os.system('mkdir ' + self.theIniFolderName)
   
     def getParameter(self, aParameter):
         """tries to get a parameter from ConfigDB
@@ -1543,7 +1632,7 @@ class ModelEditor:
                 return self.theConfigDB.get('autosave',aParameter)
 
         # gets it from default
-        #return self.theConfigDB.get('DEFAULT',aParameter)
+        return self.theConfigDB.get('DEFAULT',aParameter)
 
 
    
@@ -1599,4 +1688,12 @@ class ModelEditor:
             self.message(' error while executing ini file [%s]' %aFileName)
             anErrorMessage = string.join( traceback.format_exception(sys.exc_type,sys.exc_value,sys.exc_traceback), '\n' )
             self.message(anErrorMessage)
+            
+ 
+         
 
+                    
+    
+    
+   
+    

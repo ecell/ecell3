@@ -36,10 +36,15 @@ import os
 # Constants for ConfirmWindow
 OK_MODE = 0
 OKCANCEL_MODE = 1
+YESNO_MODE = 2
+CUSTOM_MODE = 3
 
 # Constans for result
 OK_PRESSED = 0
 CANCEL_PRESSED = -1
+YES_PRESSED = OK_PRESSED
+NO_PRESSED = CANCEL_PRESSED
+
 
 class ConfirmWindow(gtk.Dialog):
     """This is confirm popup window class.
@@ -52,7 +57,7 @@ class ConfirmWindow(gtk.Dialog):
     """
 
     # ==========================================================================
-    def __init__(self, aMode, aMessage, aTitle='Confirm' ):
+    def __init__(self, aMode, aMessage, aTitle='Confirm', buttonList=[] ):
         """Constructor
         aMode    ---  mode number that is 0(OK) or 1(OK and Cancel).
         aMessage ---  the message that is displayed in the center
@@ -87,50 +92,45 @@ class ConfirmWindow(gtk.Dialog):
         aMessageLabel = gtk.Label(aMessage)
         self.win.vbox.pack_start(aMessageLabel)
         aMessageLabel.show()
-    
-        # appends ok button
-        ok_button = gtk.Button("  OK  ")
-        self.win.action_area.pack_start(ok_button,gtk.FALSE,gtk.FALSE,)
-        ok_button.set_flags(gtk.CAN_DEFAULT)
-        ok_button.grab_default()
-        ok_button.show()
-        ok_button.connect("clicked",self.oKButtonClicked)
-
-        # when ok mode 
-        if aMode == OK_MODE:
-            pass
-
-        # when ok cancel mode 
-        else:
-
-            # appends cancel button
-            cancel_button = gtk.Button(" Cancel ")
-            self.win.action_area.pack_start(cancel_button,gtk.FALSE,gtk.FALSE)
-            cancel_button.show()
-            cancel_button.connect("clicked",self.cancelButtonClicked)   
+        
+        # if custom mode:
+        bcounter = 0
+        if aMode == CUSTOM_MODE:
+            for aButtonName in buttonList:
+                self.addButton( aButtonName, bcounter, bcounter==0 )
+                bcounter += 1
+        elif aMode == OK_MODE:
+            self.addButton( "  OK  ", OK_PRESSED, True )
+        elif aMode == OKCANCEL_MODE:
+            self.addButton( "  OK  ", OK_PRESSED, True )
+            self.addButton( "Cancel", CANCEL_PRESSED, False )
+        elif aMode == YESNO_MODE:
+            self.addButton( "  Yes  ", YES_PRESSED, True )
+            self.addButton( "  No  ", NO_PRESSED, False )
 
         gtk.mainloop()
 
 
+    # ==========================================================================
+    def addButton( self, aName, aNumber, default= False ):
+        button = gtk.Button( aName )
+        self.win.action_area.pack_start( button,gtk.FALSE,gtk.FALSE,)
+        if default:
+            button.set_flags(gtk.CAN_DEFAULT)
+            button.grab_default()
+        button.show()
+        button.connect("clicked",self.buttonClicked, aNumber )
+    
 
     # ==========================================================================
-    def oKButtonClicked( self, *arg ):
+    def buttonClicked( self, *arg ):
         """If OK button clicked or the return pressed, this method is called.
         """
 
         # sets the return number
-        self.___num = OK_PRESSED
+        self.___num = arg[-1]
         self.destroy()
 
-
-    # ==========================================================================
-    def cancelButtonClicked( self, *arg ):
-        """If Cancel button clicked or the return pressed, this method is called.
-        """
-
-        # set the return number
-        self.___num = CANCEL_PRESSED
-        self.destroy()
     
 
     # ==========================================================================
@@ -154,6 +154,6 @@ class ConfirmWindow(gtk.Dialog):
 # ----------------------------------------------------
 if __name__=="__main__":
     c = ConfirmWindow(1,'hoge\n')
-    print c.return_result()
+
 
 

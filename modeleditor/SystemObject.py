@@ -1,9 +1,14 @@
-
 from EditorObject import *
 from Constants import *
 from ShapeDescriptor import *
 from LayoutCommand import *
 from Utils import *
+
+
+#from System import *
+
+
+
 
 class SystemObject(EditorObject):
 
@@ -13,7 +18,6 @@ class SystemObject(EditorObject):
         self.thePropertyMap[ OB_HASFULLID ] = True
         self.thePropertyMap [ OB_FULLID ] = aFullID
         self.theObjectMap = {}
-        self.thePropertyMap [ OB_SHAPE_TYPE ] = SHAPE_TYPE_SYSTEM
         self.thePropertyMap [ OB_OUTLINE_WIDTH ] = 3
         self.thePropertyMap[ OB_TYPE ] = OB_TYPE_SYSTEM
         self.thePropertyMap [ OB_DIMENSION_X ]=SYS_MINWIDTH
@@ -37,9 +41,8 @@ class SystemObject(EditorObject):
         self.thedleftorg=0
         self.thedrightorg=0
         
+        aSystemSD=EditorObject.getShapeDescriptor(self, self.getProperty( OB_SHAPE_TYPE ) )
         
-        aSystemSD = SystemSD(self, self.getGraphUtils(), self.theLabel )
-        # first get text width and heigth
         reqWidth = aSystemSD.getRequiredWidth()
         reqHeight = aSystemSD.getRequiredHeight()
         
@@ -71,17 +74,11 @@ class SystemObject(EditorObject):
             if largest==availspace/2:
                 diff=self.getProperty(OB_DIMENSION_X)-(x2-x)
                 self.thePropertyMap [ OB_DIMENSION_Y ]=y2-y+diff
-            
-            
-            
+        self.setShapeDescriptor( aSystemSD )
 
-        
-
-        self.theSD = aSystemSD
-        self.thePropertyMap[ OB_SHAPEDESCRIPTORLIST ] = aSystemSD
         self.thePropertyMap[ SY_INSIDE_DIMENSION_X  ] = aSystemSD.getInsideWidth()
         self.thePropertyMap[ SY_INSIDE_DIMENSION_Y  ] = aSystemSD.getInsideHeight()
-        self.theSystemShapeList=['Rectangle']
+
 
         
 
@@ -124,12 +121,13 @@ class SystemObject(EditorObject):
         for anID in self.theObjectMap.keys():
             self.theLayout.getObject( anID ).parentMoved( deltax, deltay )
 #|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||\
+
     def pasteObject(self):
         (offsetx, offsety ) = self.getAbsolutePosition()
         x = self.newObjectPosX - (self.theSD.insideX + offsetx )
         y = self.newObjectPosY - ( self.theSD.insideY + offsety )
         aBuffer = self.getModelEditor().getCopyBuffer()
-        aType = aBuffer.getProperty(OB_TYPE)
+        #aType = aBuffer.getProperty(OB_TYPE)
         x2 = x+aBuffer.getProperty(OB_DIMENSION_X)
         y2 = y+aBuffer.getProperty(OB_DIMENSION_Y)
         px2=self.getProperty(SY_INSIDE_DIMENSION_X)
@@ -151,18 +149,35 @@ class SystemObject(EditorObject):
     def canPaste(self):
         aBuffer = self.getModelEditor().getCopyBuffer()
         aType = aBuffer.getType()
+        aParentFullID = self.getProperty(OB_FULLID)
+        aSystemPath = convertSysIDToSysPath( aParentFullID )
+
         if aType == 'SystemObjectBuffer':
             self.setExistObjectFullIDList()
-            anObjName = aBuffer.getProperty( OB_FULLID ).split(':')[2]
-            aSystemPath = convertSysIDToSysPath(self.getProperty(OB_FULLID))
-            aFullID = ":".join( [OB_TYPE_SYSTEM, aSystemPath, anObjName ] )
-            if aFullID not in self.existobjectFullIDList:
-                return True
-            else:
-                return False
+            return self.canPasteOneSystemBuffer( aBuffer, aSystemPath )
+        elif aType == "MultiObjectBuffer":
+            self.setExistObjectFullIDList()
+            for aSystemBufferName in aBuffer.getSystemObjectListBuffer().getObjectBufferList():
+                aSystemBuffer = aBuffer.getSystemObjectListBuffer().getObjectBuffer( aSystemBufferName )
+                if not self.canPasteOneSystemBuffer( aSystemBuffer, aSystemPath ):
+                    return False
+                
+#            for aBufferName in aBuffer.getObjectListBuffer().getObjectBufferList():
+#                anObjectBuffer = aBuffer.getObjectListBuffer().getObjectBuffer( aBufferName )
+#                if not self.canPasteOneSystemBuffer( anObjectBuffer, aParentFullID ):
+#                    return False
+            return True
         else:
             return True
 
+
+    def canPasteOneSystemBuffer( self, aBuffer, aSystemPath ):
+        anObjName = aBuffer.getProperty( OB_FULLID ).split(':')[2]
+        aFullID = ":".join( [ME_SYSTEM_TYPE, aSystemPath, anObjName ] )
+        if not self.theModelEditor.getModel().isEntityExist( aFullID):
+            return True
+        else:
+            return False
         
 
     def resize( self ,  deltaup, deltadown, deltaleft, deltaright  ):
@@ -173,11 +188,13 @@ class SystemObject(EditorObject):
         self.thePropertyMap[ OB_DIMENSION_Y ] += deltaup + deltadown 
         self.thePropertyMap[ SY_INSIDE_DIMENSION_X ] += deltaleft + deltaright
         self.thePropertyMap[ SY_INSIDE_DIMENSION_Y ] += deltaup + deltadown 
-        self.theShape.resize( deltaleft + deltaright, deltaup + deltadown )
+        if self.theShape!= None:
+            self.theShape.resize( deltaleft + deltaright, deltaup + deltadown )
         if deltaleft!= 0 or deltaup !=0:
             self.move( -deltaleft, -deltaup )
         
     def setProperty(self, aPropertyName, aPropertyValue):
+       
         if  self.theCanvas !=None:
             if aPropertyName == OB_DIMENSION_X :
                 oldx = self.thePropertyMap[ OB_DIMENSION_X ]
@@ -188,6 +205,8 @@ class SystemObject(EditorObject):
                 oldy = self.thePropertyMap[ OB_DIMENSION_Y ]
                 deltadown = aPropertyValue - oldy
                 self.resize( 0,deltadown,0,0 )
+                return
+            if aPropertyName == OB_LABEL:
                 return
         EditorObject.setProperty(self, aPropertyName, aPropertyValue)
             
@@ -236,6 +255,7 @@ class SystemObject(EditorObject):
             availspace=self.getAvailSpace(x,y,x2,y2,rn)
             if availspace>0:
                 if (not self.isOverlap(x,y,x2,y2,rn) and self.isWithinParent(x,y,x2,y2,rpar)):
+                    
                     aCommand = CreateObject( self.theLayout, objectID, OB_TYPE_SYSTEM, aFullID, x, y, self )
                 else:
                     self.theShape.setCursor(CU_CROSS)
@@ -320,6 +340,7 @@ class SystemObject(EditorObject):
     #def isResizeOk(self,x,y)):
 
     def getCursorType( self, aFunction, x, y, buttonPressed ):
+
         maxposx=0;maxposy=0;maxnegx=0;maxnegy=0;maxpos=0;maxneg=0
         oneDirList=[DIRECTION_RIGHT,DIRECTION_UP,DIRECTION_DOWN,DIRECTION_LEFT]
         try:
@@ -686,7 +707,10 @@ class SystemObject(EditorObject):
             spacea=abs(mspace[posa])
             spaceb=abs(mspace[posb])
             return max(spacea,spaceb)
-        
 
+    ############################################### cheCk        
+    def getSystemObject(self):
+        return self
+    ###############################################
     
     

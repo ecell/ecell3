@@ -16,7 +16,7 @@
 #
 # E-CELL is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPvalueOSE.
 # See the GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public
@@ -38,6 +38,7 @@ import gobject
 
 import os
 import os.path
+import operator
 
 from PropertyEditor import *
 from ModelEditor import *
@@ -139,10 +140,11 @@ class PropertyList( ViewComponent ):
 
         self.addButton=self.getWidget('Add')
         self.delButton=self.getWidget('Delete')
-        self.update()
-
-
-
+        self.update()             
+        
+    def hideButtons( self ):
+        self['attachment_box'].remove( self['hbox1'] )
+        
     def close( self ):
         # dereference Liststore and other member gtk objects
         self.theListSelection = None
@@ -164,27 +166,31 @@ class PropertyList( ViewComponent ):
 
 
     def getPropertyValue( self, aName ):
+        try:
+            if self.theType == 'Stepper':
+                if self.theModelEditor.getModel().getStepperPropertyAttributes( self.theDisplayedEntity, aName )[MS_GETTABLE_FLAG]:
+                    return self.theModelEditor.getModel().getStepperProperty( self.theDisplayedEntity, aName )
+                else:
+                    return ''
+            elif self.theType == 'Entity':
+                fpn = self.theDisplayedEntity + ':' + aName
+                if self.theModelEditor.getModel().getEntityPropertyAttributes( fpn )[MS_GETTABLE_FLAG]:
 
-        if self.theType == 'Stepper':
-            if self.theModelEditor.getModel().getStepperPropertyAttributes( self.theDisplayedEntity, aName )[MS_GETTABLE_FLAG]:
-                return self.theModelEditor.getModel().getStepperProperty( self.theDisplayedEntity, aName )
+                    return self.theModelEditor.getModel().getEntityProperty( fpn )
+                else:
+                    return ''
             else:
-                return ''
-        elif self.theType == 'Entity':
-            #print''
-            #print 'getPropertyValue PropList'
-            fpn = self.theDisplayedEntity + ':' + aName
-            #print fpn,'fpn'
-            if self.theModelEditor.getModel().getEntityPropertyAttributes( fpn )[MS_GETTABLE_FLAG]:
-                return self.theModelEditor.getModel().getEntityProperty( fpn )
-            else:
-                return ''
-        else:
+                return None
+        except:
             return None
 
 
 
     def getPropertyType ( self, aName ):
+        #FIXME!
+        # this whole method should be rewritten using DMINFO!
+        if self.theModelEditor.getMode() == ME_RUN_MODE:
+            return DM_PROPERTY_STRING
         if self.theType == 'Stepper':
             return self.theModelEditor.getModel().getStepperPropertyType( self.theDisplayedEntity, aName )
         elif self.theType == 'Entity':
@@ -215,6 +221,8 @@ class PropertyList( ViewComponent ):
 
 
     def getPropertyDeleteable( self, aName ):
+        if self.theModelEditor.getMode() == ME_RUN_MODE:
+            return False
         if self.theType == 'Stepper':
             return self.theModelEditor.getModel().getStepperPropertyAttributes( self.theDisplayedEntity, aName )[ME_DELETEABLE_FLAG]
         elif self.theType == 'Entity':
@@ -249,12 +257,15 @@ class PropertyList( ViewComponent ):
         if self.theType == 'Stepper':
             return self.theModelEditor.getModel().getStepperPropertyList( self.theDisplayedEntity )
         elif self.theType == 'Entity':
+           
             return self.theModelEditor.getModel().getEntityPropertyList( self.theDisplayedEntity  )
         else:
             return []
 
-
     def canAddNewProperty( self ):
+        if self.theModelEditor.getMode() == ME_RUN_MODE:
+            return False
+
         if self.theType == 'Stepper':
             aClass = self.theModelEditor.getModel().getStepperClassName( self.theDisplayedEntity )
         elif self.theType == 'Entity':
@@ -268,17 +279,20 @@ class PropertyList( ViewComponent ):
             return False
 
 
-    def update( self ):
+    def update( self, mustRebuild = False ):
         """
         in:  None update without condition
         """
         # set button's sensitivity
+        if not mustRebuild and self.theModelEditor.getMode() == ME_RUN_MODE:
+            self.__updateList()
         if self.canAddNewProperty():
             self.addButton.set_sensitive(gtk.TRUE)
         else:
             self.addButton.set_sensitive(gtk.FALSE)
         self.delButton.set_sensitive(gtk.FALSE)
 
+        
         self.__buildList()
 
         # restore selection
@@ -310,6 +324,9 @@ class PropertyList( ViewComponent ):
         if editFlag :
             editFlag = self.getPropertySettable( self.theSelection[0] )
         aMenu.append( [ "edit", editFlag ]  )
+        if self.theType != "Stepper":
+            tracerMenu = self.theModelEditor.theRuntimeObject.createTracerSubmenu( self.getFullPNList() )
+            aMenu.append( [ None, tracerMenu ] )
         return aMenu
 
 
@@ -324,7 +341,7 @@ class PropertyList( ViewComponent ):
             self.theFlags = [True, True, True, True, True]
 
         #self.theSelection = []
-        self.update()
+        self.update( True )
 
     
 
@@ -343,40 +360,39 @@ class PropertyList( ViewComponent ):
         # change self.theSelection
         # if cannot change select nothing
         self.theSelection = []
-
         wholePropertyList = self.getPropertyList()
+               
         for aPropertyID in wholePropertyList:
-            if aPropertyID in aNameList:
-
+            if aPropertyID in aNameList: 
+                           
                 self.theSelection.append( aPropertyID )
-
+                 
         # change physically selected row if not user selected
         if not userSelect:
 
             self.__selectRows( self.theSelection )
-
-
-
+            
+             
     def restoreSelection( self ):
         # call changeselection with stored selection
 
         self.changeSelection( self.theSelection )
 
+    
 
-
-    def selectByUser( self ):
+    def selectByUser( self ):        
         # call changeselection
-
-        self.changeSelection( copyValue( self.__getSelection() ), True )
-
-
+        #change to PropertyList tab in EntityWindow      
+        self.changeSelection( copyValue( self.__getSelection() ), True ) 
+       
+                        
     def getFullPNList( self ):
         aFullPNList = []
         for aName in self.theSelection:
-            aFullPNList.append(self.theDisplayedEntity + ':' + aName )
+            aFullPNList.append(self.theDisplayedEntity + ':' + aName )     
         return aFullPNList
-        
-
+       
+    
 
     def copy( self ):
         if self.theType == 'Stepper':
@@ -407,14 +423,15 @@ self.theDisplayedEntity, self.theModelEditor.getCopyBuffer() )
             aCommand = PasteEntityPropertyList ( self.theModelEditor, self.theDisplayedEntity, self.theModelEditor.getCopyBuffer() )
         self.theModelEditor.doCommandList( [ aCommand ] )
 
-
-
+      
 
     def add_new ( self ):
 
         # get unique name from modeleditor
         # change selection
         # call addnew in modeleditor
+        if not self.theModelEditor.theRuntimeObject.checkState( ME_DESIGN_MODE ):
+            return
 
         aType = DM_PROPERTY_STRING
         aValue = ''
@@ -460,6 +477,8 @@ self.theDisplayedEntity, self.theSelection )
         #   if aSelection not in wholePropertyList:
         #       changedID = aSelection
         #       break
+        if not self.theModelEditor.theRuntimeObject.checkState( ME_DESIGN_MODE ):
+            return
         changedID = self.theListStore.get_value( anIter, 0 )
         if changedID == newName:
             return
@@ -488,9 +507,18 @@ self.theDisplayedEntity, self.theSelection )
         oldValue = self.getPropertyValue( aName )
         if str(oldValue) == str(newValue):
             return
-
-        
+        if self.theModelEditor.getMode() == ME_RUN_MODE:
+            #try:
+            if self.theType == "Stepper":
+                self.theModelEditor.getModel().setEntityProperty(self.theDisplayedEntity,aName,newValue )
+            else:
+                self.theModelEditor.getModel().setEntityProperty( self.theDisplayedEntity+':'+aName, newValue )
+            #except:
+            #    pass
+            self.update()
+            return
         if self.theType == 'Stepper':
+            
             aCommand = ChangeStepperProperty( self.theModelEditor, self.theDisplayedEntity, aName, newValue )
         else:
             fpn = self.theDisplayedEntity + ':' + aName
@@ -511,6 +539,8 @@ self.theDisplayedEntity, self.theSelection )
         if type is other open property editor
         get value and set property
         """
+        if self.theModelEditor.isRunning():
+            return
         aName = self.theSelection[0]
         if self.isEditable( aName ):
             self.__selectRows( [ aName ], gtk.FALSE, gtk.TRUE )
@@ -557,9 +587,9 @@ self.theDisplayedEntity, self.theSelection )
     def __button_pressed( self, *args ):
         self.__setDeleteButton()
         # when any button is pressed on list
-        self.theModelEditor.setLastUsedComponent( self )
+        self.theModelEditor.setLastUsedComponent( self )        
         if args[1].button == 3:
-            self.selectByUser()
+            self.selectByUser()            
             self.theModelEditor.createPopupMenu( self, args[1] )
             return gtk.TRUE
         
@@ -577,10 +607,8 @@ self.theDisplayedEntity, self.theSelection )
 
 
     def __add_clicked( self, *args ):
-        self.add_new()
-
-
-
+        self.add_new()       
+        
     def __delete_clicked( self, *args ):
         self.delete()
 
@@ -601,14 +629,18 @@ self.theDisplayedEntity, self.theSelection )
         for anID in self.getPropertyList():
             aValue = []
             aValue.append( anID )
-            aValue.append( self.getPropertyValue( anID ) )
-            aValue.append( self.getPropertySettable( anID ) )
-            aValue.append( self.getPropertyDeleteable( anID ) )
-            aValue.append( self.getPropertyDeleteable( anID ) and self.canAddNewProperty() )
-            aValue.append( self.isEditable( anID ) )
-            aValue.append( self.getPropertyLoadable( anID ) )
-            aValue.append( self.getPropertySaveable( anID ) )
-            aValue.append( self.getPropertyType( anID ))
+            propValue = self.getPropertyValue( anID )
+            if propValue != None:
+                aValue.append( propValue )
+                aValue.append( self.getPropertySettable( anID ) )
+                aValue.append( self.getPropertyDeleteable( anID ) )
+                aValue.append( self.getPropertyDeleteable( anID ) and self.canAddNewProperty() )
+                aValue.append( self.isEditable( anID ) )
+                aValue.append( self.getPropertyLoadable( anID ) )
+                aValue.append( self.getPropertySaveable( anID ) )
+                aValue.append( self.getPropertyType( anID ))
+            else:
+                aValue += [ "N/A", False, False, False, False, False, False, "N/A" ]
             '''
             if self.getPropertyChangeable( anID )==0:
                 aValue.append( 'black' )
@@ -720,6 +752,24 @@ self.theDisplayedEntity, self.theSelection )
             anIter = self.theListStore.iter_next( anIter )
         return anIter
         
+    def __updateList( self ):
+        # only in RUN MODE
+        anIter = self.theListStore.get_iter_first()
+        while anIter != None:
+            listName = self.theListStore.get_value (anIter, 0)
+            listValue = self.theListStore.get_value( anIter, 1)
+            try:
+                listValue = float( listValue )            
+            except:
+                pass
+            else:
+                fullPN = self.theDisplayedEntity + ':' + listName
+                newListValue = self.getPropertyValue( fullPN )
+                if newListValue == None:
+                    return
+                if listValue != newListValue:
+                    self.theListStore.set_value( anIter, 1, newListValue )
+            anIter = self.theListStore.iter_next( anIter )
 
     def __getSelectedRows( self ):
         """

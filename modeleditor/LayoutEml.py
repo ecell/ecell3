@@ -21,7 +21,7 @@ class LayoutEml:
         if aFileObject is None:
             aStringData = '<?xml version="1.0" ?><leml></leml>'
         else:
-            aStringData = string.join( string.join( aFileObject.readlines(), '' ).split( '\n' ), '' )
+            aStringData = string.join( map( string.strip, aFileObject.readlines() ), '' )
 
         # minidom.parseString() is much faster than minidom.parse().. why?
         self.__theDocument = minidom.parseString( aStringData )
@@ -334,7 +334,6 @@ class LayoutEml:
 
 
 class Eml:
-
     
     def __init__( self, aFileObject=None ):
         """read EML file and make domtree"""
@@ -342,7 +341,7 @@ class Eml:
         if aFileObject is None:
             aStringData = '<?xml version="1.0" ?><eml></eml>'
         else:
-            aStringData = string.join( string.join( aFileObject.readlines(), '' ).split( '\n' ), '' )
+            aStringData = string.join( map( string.strip, aFileObject.readlines() ), '' )
 
 
         # minidom.parseString() is much faster than minidom.parse().. why?
@@ -683,10 +682,13 @@ class Eml:
         self.__clearCache()
 
     def __reconstructCache( self ):
-
+        anEML = self.__theDocument.getElementsByTagName("eml")
+        if len(anEML) == 0:
+            raise("This is not an EML document!\n")
+            
         self.__clearCache()
-
-        for aSystemNode in self.__theDocument.firstChild.childNodes:
+        
+        for aSystemNode in anEML[0].childNodes:
             if aSystemNode.nodeName == 'system':
 
                 aSystemPath = aSystemNode.getAttribute( 'id' )

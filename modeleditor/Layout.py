@@ -7,6 +7,7 @@ from ProcessObject import *
 from VariableObject import *
 from TextObject import *
 from ConnectionObject import *
+import math
 import gnome.canvas 
 
 
@@ -32,12 +33,15 @@ class Layout:
         self.thePropertyMap[ LO_ZOOM_RATIO ] = default_zoomratio
         self.theCanvas = None
         self.thePathwayEditor = None
-        self.theSelectedObjectID = None
-
+        self.theSelectedObjectIDList = []
+        
+      
         # allways add root dir object
         anObjectID = self.getUniqueObjectID( ME_SYSTEM_TYPE )
         self.createObject( anObjectID, ME_SYSTEM_TYPE, ME_ROOTID, default_scrollregion[0], default_scrollregion[1], None )
         self.thePropertyMap[ LO_ROOT_SYSTEM ] = anObjectID
+        #print str(anObjectID) + ' is objectID'
+        #self.shift_press = False
         
     def update( self, aType = None, anID = None ):
         # i am not sure this is necessary
@@ -56,7 +60,6 @@ class Layout:
         return self.thePathwayEditor 
 
     def attachToCanvas( self, aCanvas ):
-        
         self.theCanvas = aCanvas
         self.thePathwayEditor = self.theCanvas.getParentWindow()
         self.theCanvas.setLayout( self )
@@ -84,7 +87,6 @@ class Layout:
         anObject.show()
         if anObject.getProperty( OB_TYPE ) == OB_TYPE_SYSTEM:
             objectList = anObject.getObjectList()
-            
             for anID in objectList:
                 self.__showObject( anID )
         
@@ -120,7 +122,21 @@ class Layout:
     def createObject( self, objectID, objectType, aFullID=None, x=None, y=None, parentSystem = None  ):
         # object must be within a system except for textboxes 
         # parentSystem object cannot be None, just for root
+        '''
+        print '.....................................................................'
+        print 'FROM CREATE OBJECT ..................................................'
+        print str(objectID) + ' is ObjectID'
+        print str(objectType) + ' is ObjectType'
+        '''    
+        #print str(aFullID) + ' is aFullID'
         
+        #   print str(parentSystem) + ' is parentSystem'
+        #if parentSystem != None:
+            #print parentSystem.getObjectList()
+        '''
+        print '.....................................................................'
+        print '.....................................................................'
+        '''
         if x == None and y == None:
             (x,y) = parentSystem.getEmptyPosition()
 
@@ -138,6 +154,7 @@ class Layout:
         elif objectType == OB_TYPE_SYSTEM:
             if parentSystem == None:
                 parentSystem = self
+                
             newObject = SystemObject( self, objectID, aFullID, x, y, parentSystem )
 
         elif objectType == OB_TYPE_TEXT:
@@ -152,17 +169,15 @@ class Layout:
             raise Exception("Object type %s does not exists"%objectType)
         
         self.theObjectMap[ objectID ] = newObject
-        
         if self.theCanvas!=None:
-
             newObject.setCanvas( self.theCanvas )
             newObject.show()
 
 
     def deleteObject( self, anObjectID ):
         #unselect
-        if self.theSelectedObjectID == anObjectID:
-            self.theSelectedObjectID = None
+        if  anObjectID in self.theSelectedObjectIDList:
+            self.theSelectedObjectIDList.remove( anObjectID )
         anObject = self.getObject( anObjectID )
         aParent = anObject.getParent()
         anObject.destroy()
@@ -228,7 +243,6 @@ class Layout:
     def resizeObject( self, anObjectID, deltaTop, deltaBottom, deltaLeft, deltaRight ):
         # inward movement negative, outward positive
         anObject = self.getObject( anObjectID )
-        
         anObject.resize( deltaTop, deltaBottom, deltaLeft, deltaRight )
 
 
@@ -321,35 +335,81 @@ class Layout:
     def registerObject( self, anObject ):
         self.theRootObject = anObject
 
+    
 
-    def selectRequest( self, objectID ):
-        if self.theSelectedObjectID != None:
-            self.getObject( self.theSelectedObjectID ).unselected()
-        self.theSelectedObjectID = objectID
-        self.getObject( self.theSelectedObjectID ).selected()
-        
-        if self.getObject( self.theSelectedObjectID ).getProperty(OB_TYPE) == OB_TYPE_CONNECTION:
-            if self.theLayoutManager.theModelEditor.openConnObjectEditorWindow:
-                self.theLayoutManager.theModelEditor.theConnObjectEditorWindow.setDisplayConnObjectEditorWindow( self.theName, objectID)
+    def selectRequest( self, objectID , shift_press = False ):
+        anObject = self.getObject( objectID )
+        if len( self.theSelectedObjectIDList ) == 0:
+            selectedType = None
         else:
-            if self.theLayoutManager.theModelEditor.openObjectEditorWindow:
-                self.theLayoutManager.theModelEditor.theObjectEditorWindow.setDisplayObjectEditorWindow( self.theName, objectID)
+            selectedType = self.getObject( self.theSelectedObjectIDList[0] ).getProperty( OB_TYPE )
+
+        objectType = self.getObject(objectID ).getProperty(OB_TYPE )
+            
+        selectedObjectID = objectID
+        multiSelectionAllowed = False
+        if shift_press == False:
+            #if shift_press == False: 
+            for anID in self.theSelectedObjectIDList:
+                self.getObject( anID ).unselected()
+            self.theSelectedObjectIDList = []
+        elif len( self.theSelectedObjectIDList ) > 0:
+            if selectedType == OB_TYPE_CONNECTION:
+                selectionSystemPath = None
+            else:
+                selectionSystemPath = self.getObject( self.theSelectedObjectIDList[0] ).getProperty( OB_FULLID ).split(':')[1]
+            if objectType == OB_TYPE_CONNECTION:
+                objectSystemPath  = None
+            else:
+                objectSystemPath = anObject.getProperty( OB_FULLID ).split(':')[1]
+            multiSelectionAllowed = ( selectionSystemPath == objectSystemPath )
+        else:
+            multiSelectionAllowed = True
+
+        if anObject.isSelected and shift_press:
+            self.theSelectedObjectIDList.remove( objectID )
+            anObject.unselected()
+            if len(self.theSelectedObjectIDList) == 0:
+                selectedObjectID = None
+            else:
+                selectedObjectID = self.theSelectedObjectIDList[-1]
+        else:        
+            if len(self.theSelectedObjectIDList)> 0:
+                if shift_press and multiSelectionAllowed :
+                    self.theSelectedObjectIDList += [objectID]
+                    anObject.selected()
+            else:
+                self.theSelectedObjectIDList += [objectID]
+                anObject.selected()
+        
+        if objectType == OB_TYPE_CONNECTION:
+            self.theLayoutManager.theModelEditor.createConnObjectEditorWindow( self.theName, selectedObjectID)
+        else:
+            self.theLayoutManager.theModelEditor.createObjectEditorWindow( self.theName, selectedObjectID)
+        
+        
         
     def checkConnection( self, x, y, checkFor ):
         objectIDList = self.getObjectList( checkFor )
         for anObjectID in objectIDList:
             anObject = self.theObjectMap[ anObjectID ]
             (objx1, objy1) = anObject.getAbsolutePosition()
-            if x< objx1 and y < objy1:
+            if x< objx1 or y < objy1:
                 continue
             objx2 = objx1 + anObject.getProperty( OB_DIMENSION_X )
             objy2 = objy1 + anObject.getProperty( OB_DIMENSION_Y )
 
-            if x > objx2 and y > objy2:
+            if x > objx2 or y > objy2:
                 continue
             rsize = anObject.getRingSize()
+            chosenRing = None
+            chosenDist = None
             for aRingName in [ RING_TOP, RING_BOTTOM, RING_LEFT, RING_RIGHT ]:
                 (rx, ry) = anObject.getRingPosition( aRingName )
-                if x>=rx and x<=rx+rsize and y>=ry and y<= ry+rsize:
-                    return ( anObjectID, aRingName )
+                distance = math.sqrt((rx-x)**2+(ry-y)**2)
+                if chosenDist == None or chosenDist>distance:
+                    chosenDist = distance
+                    chosenRing = aRingName
+                    
+            return ( anObjectID, chosenRing )
         return ( None, None )

@@ -155,7 +155,7 @@ class StepperEditor(ViewComponent):
 
         infoText = ''
         if self.theDisplayedStepper != None:
-            infoText = self.theModelEditor.getModel().getStepperInfo( self.theDisplayedStepper)
+            infoText = self.theModelEditor.theModelStore.getStepperInfo( self.theDisplayedStepper)
         self.__setInfoText( infoText )
         self.updateInProgress = False
 
@@ -199,7 +199,7 @@ class StepperEditor(ViewComponent):
 
 
     def changeInfo( self, newInfo ):
-        oldInfo = self.theModelEditor.getModel().getStepperInfo( self.theDisplayedStepper )
+        oldInfo = self.theModelEditor.theModelStore.getStepperInfo( self.theDisplayedStepper )
         if oldInfo == newInfo:
             return
         aCommand = SetStepperInfo( self.theModelEditor, self.theDisplayedStepper, newInfo )

@@ -41,6 +41,7 @@ from ModelEditor import *
 from ViewComponent import *
 from whrandom import randint
 from SystemObject import *
+from EditorObject import *
 
 
 
@@ -52,13 +53,14 @@ class ShapePropertyComponent(ViewComponent):
     #######################
 
     def __init__( self,anObjectEditorWindow,pointOfAttach ):
+        
         self.theObjectEditorWindow = anObjectEditorWindow
         self.theModelEditor = self.theObjectEditorWindow.theModelEditor
         
         ViewComponent.__init__( self, pointOfAttach, 'attachment_frame', 'ShapePropertyComponent.glade' )
-
-        # the variables
         
+        # the variables
+        self.ShapeName=''
         self.theShapeList=[]
         self.theColor=None
         self.theColorDialog=None
@@ -66,7 +68,7 @@ class ShapePropertyComponent(ViewComponent):
         self.theColorList=['red', 'yellow', 'green', 'brown', 'blue', 'magenta',
                  'darkgreen', 'bisque1']
         self.theCombo=ViewComponent.getWidget(self,'shape_combo')
-        
+        self.noUpdate=True
         self.theObject=None
         self.theFullId=None
         self.theFillColor=None
@@ -95,6 +97,8 @@ class ShapePropertyComponent(ViewComponent):
         self.newTuple[2]=aShapeLabel
         aShapeLabel = ':'.join(self.newTuple)
         self.__ShapeProperty_updated(OB_FULLID,aShapeLabel)
+        
+        
 
     def __EntityWidth_displayed( self, *args ):
         aShapeWidth=(ViewComponent.getWidget(self,'ent_width')).get_text()
@@ -102,18 +106,25 @@ class ShapePropertyComponent(ViewComponent):
             self.__ShapeProperty_updated(OB_DIMENSION_X,float(aShapeWidth))
         else:
             self.updateShapeProperty()
-
+        
     def __EntityHeight_displayed( self, *args ):
         aShapeHeight=(ViewComponent.getWidget(self,'ent_height')).get_text()
         if self.checkNumeric(aShapeHeight):
             self.__ShapeProperty_updated(OB_DIMENSION_Y,float(aShapeHeight))
         else:
             self.updateShapeProperty()
-
+        
     def __ShapeType_displayed( self, *args ):
+        if self.noUpdate:
+            return
         aComboEntryWidget=ViewComponent.getWidget(self,'combo_entry')
+        
         aShapeType=aComboEntryWidget.get_text()
+        if aShapeType == '':
+            return
         self.__ShapeProperty_updated(OB_SHAPE_TYPE,aShapeType)
+            
+        
         
     def __ColorFillSelection_displayed( self,*args):
         aDialog,aColorSel=self.setColorDialog()
@@ -143,8 +154,10 @@ class ShapePropertyComponent(ViewComponent):
             aDialog.destroy()
     
     def __ShapeProperty_updated(self, aKey,aNewValue):
+          
         self.theObjectEditorWindow.modifyObjectProperty(aKey,aNewValue)
-    
+        self.update=True
+        
 
     def __ShapeProperty_displayed(self,*args):
         keys=self.theShapeDic.keys()
@@ -154,13 +167,15 @@ class ShapePropertyComponent(ViewComponent):
             
         self.theModelEditor.printMessage('',ME_PLAINMESSAGE)
         
+        
 
             
     #########################################
     #    Private methods                #
     #########################################
 
-
+    
+        
     def setDisplayedShapeProperty(self ,anObject):
         if anObject==None:
             self.clearShapeProperty()
@@ -200,7 +215,7 @@ class ShapePropertyComponent(ViewComponent):
         
         ViewComponent.getWidget(self,'da_fill').modify_bg(gtk.STATE_NORMAL,self.theFillColor)
         ViewComponent.getWidget(self,'da_out').modify_bg(gtk.STATE_NORMAL,self.theOutlineColor)
-        
+
 
     def clearShapeProperty(self):
         ViewComponent.getWidget(self,'ent_label').set_text('' )
@@ -218,21 +233,18 @@ class ShapePropertyComponent(ViewComponent):
         
     def populateComboBox(self):
         # populate list item of combobox
-        if self.theObject.getProperty(OB_TYPE) == OB_TYPE_PROCESS:
-            self.theShapeList = self.theObject.getAvailableProcessShape()
-        if self.theObject.getProperty(OB_TYPE) == OB_TYPE_VARIABLE:
-            self.theShapeList = self.theObject.getAvailableVariableShape()
-        if self.theObject.getProperty(OB_TYPE) == OB_TYPE_SYSTEM:
-            self.theShapeList = self.theObject.getAvailableSystemShape()
-        if self.theObject.getProperty(OB_TYPE) == OB_TYPE_TEXT:
-            self.theShapeList = self.theObject.getAvailableTextShape()
-        if self.theObject.getProperty(OB_TYPE) == OB_TYPE_PROCESS:
-            pass
-        
-        
-        
-        self.theCombo.set_popdown_strings(self.theShapeList)
-        
+        aShapeList=self.theObject.getAvailableShapes()
+        for i in range ( len( aShapeList ) ):
+            if aShapeList[i] == self.theObject.getProperty(OB_SHAPE_TYPE):
+                temp = aShapeList[0]
+                aShapeList[0] = aShapeList[i]
+                aShapeList[i]=temp
+                break
+        self.noUpdate = True
+        self.theCombo.set_popdown_strings( aShapeList )
+        self.noUpdate = False
+
+         
 
     def setColorDialog( self, *args ):
         aColor=gtk.gdk.color_parse(self.theColorList[randint (0, 3)])

@@ -85,7 +85,6 @@ class ShapeDescriptor:
         pointsx= nu.dot( nu.take(self.thePointMatrix,(0,),1), coordsx )
         pointsy= nu.dot( nu.take(self.thePointMatrix,(1,),1), coordsy )
         points = nu.concatenate( (nu.reshape(pointsx,(length,1)), nu.reshape( pointsy,(length,1) ) ),1 )
-        
 
 
         for aShapeName in self.theDescriptorList.keys():

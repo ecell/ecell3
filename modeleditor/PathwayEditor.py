@@ -30,6 +30,7 @@
 # E-CELL Project, Lab. for Bioinformatics, Keio University.
 #
 import gtk
+import gtk.gdk
 import ModelEditor
 from ListWindow import *
 import os
@@ -38,18 +39,23 @@ import string
 from Constants import *
 from PathwayCanvas import *
 import gnome.canvas
+from LayoutCommand import *
 
 class PathwayEditor( ListWindow ):
 
 
+
     def __init__( self, theModelEditor, aLayout, aRoot=None ):
+
         """
         in: ModelEditor theModelEditor
         returns nothing
         """
 
         # init superclass
+
         ListWindow.__init__( self, theModelEditor ,aRoot)
+
         self.theLayout = aLayout
         self.theModelEditor = theModelEditor
         self.zoom=0.25
@@ -76,18 +82,30 @@ class PathwayEditor( ListWindow ):
                 'on_zoom_out_button_clicked' : self.__zoom_out,\
                 'on_zoom_to_fit_button_clicked' : self.__zoom_to_fit,\
                 'on_print_button_clicked' : self.__print,\
-                'on_layout_name_entry_activate' : self.__rename_layout,\
-                'on_layout_name_entry_editing_done' : self.__rename_layout,\
                 'on_selector_button_toggled' : self.__palette_toggled,\
                 'on_variable_button_toggled' : self.__palette_toggled, \
                 'on_system_button_toggled' : self.__palette_toggled,\
                 'on_process_button_toggled' : self.__palette_toggled,\
                 'on_text_button_toggled' : self.__palette_toggled,\
+                'on_layout_name_entry_activate' : self.__rename_layout,\
+                'on_layout_name_entry_editing_done' : self.__rename_layout,\
+                #'on_layout_name_entry_focus_out_event' : self.__rename_layout,
+                'on_delete_button_clicked': self.__DeleteLayoutButton_clicked,\
+                'on_clone_button_clicked': self.__CloneLayoutButton_clicked,\
                 'on_custom_button_toggled' : self.__palette_toggled,\
                 'on_search_entry_activate' : self.__search,\
+                'on_rename_button_clicked': self.__editLabel,\
                 'on_search_entry_editing_done' : self.__search })
-        self.update()
+                
+        self.theHBox = self['hbox7']
+        self.theLabel = self['layout_name_label'] 
+        self.theEntry = self['layout_name_entry'] 
+        self['top_frame'].remove(self.theHBox)
+        self.theHBox.remove( self.theEntry )
 
+                
+        self.update()
+        
         #get Palette Button Widgets
         
         selector = ListWindow.getWidget(self,'selector_button')
@@ -114,13 +132,15 @@ class PathwayEditor( ListWindow ):
         self.__PrevPaletteButton = None
         self.isFirst=True
 
+    def getLabelWidget( self ):
+        return self.theHBox
     
 
     def update( self, arg1 = None, arg2 = None):
         if not self.exists():
             return
-        self['layout_name_entry'].set_text( self.theLayout.getName() )
-        
+        self.theEntry.set_text( self.theLayout.getName() )
+        self.theLabel.set_text( self.theLayout.getName() )        
 
 
     def deleted( self, *args ):
@@ -152,9 +172,16 @@ class PathwayEditor( ListWindow ):
 
 
     ############################################################
-
     #Callback Handlers
     ############################################################
+    def __editLabel( self, *args ):
+        self.theHBox.remove( self.theLabel )
+        self.theHBox.pack_start( self.theEntry )
+        self.theEntry.show()
+        self.theEntry.grab_focus()
+        self['rename_button'].set_sensitive( gtk.FALSE )
+    
+    
     def __zoom_in( self, *args ):
         aZoomratio=self.thePathwayCanvas.getZoomRatio()
         aNewratio=aZoomratio+self.zoom
@@ -163,6 +190,30 @@ class PathwayEditor( ListWindow ):
             self.zoomout.set_sensitive(gtk.TRUE)
         if not self.zoomtofit.get_property('sensitive'):
             self.zoomtofit.set_sensitive(gtk.TRUE)
+
+        
+    def __rename_layout( self, *args ):
+        if len(self.theEntry.get_text())>0:
+            oldName = self.theLayout.getName()
+            newName = self.theEntry.get_text()
+            aCommand = RenameLayout( self.theLayout.theLayoutManager, oldName, newName )
+            if aCommand.isExecutable():
+                self.theModelEditor.doCommandList( [aCommand] )
+            else:
+                self.theEntry.set_text(oldName)
+                self.theLabel.set_text(oldName)
+            self.theHBox.remove( self.theEntry )
+            self.theHBox.pack_start( self.theLabel)
+            self.theLabel.show()
+            self['rename_button'].set_sensitive( gtk.TRUE )
+#            if self.theModelEditor.theLayoutManager.renameLayout(self.theLayout.getName(),self['layout_name_entry'].get_text()):
+#                self.theModelEditor.updateWindows()
+
+
+#            else:
+#                self['layout_name_entry'].set_text(self.theLayout.getName())
+#        else:
+#            self['layout_name_entry'].set_text(self.theLayout.getName())
 
 
     def __zoom_out( self, *args ):
@@ -187,14 +238,6 @@ class PathwayEditor( ListWindow ):
     def __print( self, *args ):
         self.theModelEditor.printMessage("Sorry, not implemented !", ME_ERROR )
 
-    def __rename_layout( self, *args ):
-        if len(self['layout_name_entry'].get_text())>0:
-            if self.theModelEditor.theLayoutManager.renameLayout(self.theLayout.getName(),self['layout_name_entry'].get_text()):
-                self.theModelEditor.updateWindows()
-            else:
-                self['layout_name_entry'].set_text(self.theLayout.getName())
-        else:
-            self['layout_name_entry'].set_text(self.theLayout.getName())
 
     def __palette_toggled( self, *args ):
         aButtonName=args[0].get_name().split('_')[0]
@@ -224,7 +267,28 @@ class PathwayEditor( ListWindow ):
     def __search( self, *args ):
         self.theModelEditor.printMessage("Sorry, not implemented !", ME_ERROR )
     
+    def __DeleteLayoutButton_clicked(self, *args):
+        layoutManager = self.theModelEditor.theLayoutManager
+        layoutName = self.theLayout.getName()   
+
+        if layoutName == 'Choose...':
+            self.theModelEditor.printMessage("This is not a valid layout name", ME_WARNING)
+            return
+ 
+        aCommand = DeleteLayout( layoutManager, layoutName)
+        self.theModelEditor.doCommandList( [ aCommand ] )
 
     
-        
-        
+    def __CloneLayoutButton_clicked(self, *args):
+        layoutManager = self.theModelEditor.theLayoutManager
+        layoutName = self.theLayout.getName()
+
+        if layoutName == 'Choose...':
+            self.theModelEditor.printMessage("This is not a valid layout name", ME_WARNING) 
+            return
+
+        aCommand = CloneLayout( layoutManager, layoutName)
+        self.theModelEditor.doCommandList( [ aCommand ] )
+        newLayoutName = "copyOf" + layoutName
+
+        self.theModelEditor.createPathwayEditor( layoutManager.getLayout( newLayoutName ) )

@@ -44,6 +44,7 @@ from ModelEditor import *
 from ViewComponent import *
 from Constants import *
 from EntityCommand import *
+from AutoLayout import *
 
 class SystemTree(ViewComponent):
     
@@ -90,6 +91,27 @@ class SystemTree(ViewComponent):
         self.addHandlers ( { 'on_Add_clicked' : self.__add_clicked,\
                     'on_Delete_clicked' : self.__delete_clicked})
 
+    def getMenuItems(self):        
+        aMenu = ViewComponent.getMenuItems(self)
+        aFlags = self.getADCPFlags(self.theSelectionTypeList)
+         
+        aMenu.append(["generateLayout", aFlags[ME_DELETE_FLAG] or self.theSelection[0] == MS_SYSTEM_ROOT])
+
+        fullPNList = map( lambda x:x+':', self.getSelectedIDs() )
+        tracerMenu = self.theModelEditor.theRuntimeObject.createTracerSubmenu( fullPNList )
+        aMenu.append([None, tracerMenu ])
+
+        return aMenu
+
+
+    def generateLayout(self):
+        #print self.theSelection
+
+        #self.theAutoLayout = AutoLayout()
+        layoutName = self.theModelEditor.theLayoutManager.getUniqueLayoutName()
+        #print layoutName
+        self.theAutoLayout = AutoLayout(self.theModelEditor,layoutName,self.theSelection)
+
 
     def getPasteableTypes( self ):
         return self.theSelectionTypeList
@@ -111,6 +133,7 @@ class SystemTree(ViewComponent):
 
 
     def getSelectedIDs( self ):
+        #print 'System ::/"                
         return copyValue( self.theSelection )
 
 
@@ -145,6 +168,7 @@ class SystemTree(ViewComponent):
             userSelect- True if user selected the row
         """
         # change 
+       
         self.theSelection = aSysIDList
 
         if not userSelect:
@@ -175,7 +199,7 @@ class SystemTree(ViewComponent):
 
 
     def getADCPFlags( self, aType ):
-        self.theFlags[ ME_PASTE_FLAG ] = aType in self.theSelectionTypeList
+        self.theFlags[ ME_PASTE_FLAG ] = aType in self.theSelectionTypeList        
         if len(self.theSelection) == 0:
             self.theFlags[ME_DELETE_FLAG] = False
         elif len(self.theSelection) == 1:
@@ -184,6 +208,7 @@ class SystemTree(ViewComponent):
                 self.theFlags[ME_COPY_FLAG ] = False
             else:
                 self.theFlags[ME_DELETE_FLAG] = True
+                self.theFlags[ME_COPY_FLAG ] = True
         else:
             self.theFlags[ME_DELETE_FLAG] = True
         return self.theFlags
@@ -218,6 +243,9 @@ class SystemTree(ViewComponent):
 
 
     def cut ( self ):
+        if not self.theModelEditor.theRuntimeObject.checkState( ME_DESIGN_MODE ):
+            return
+
         self.selectByUser()
 
         # create command
@@ -228,6 +256,9 @@ class SystemTree(ViewComponent):
         
 
     def paste ( self ):
+        if not self.theModelEditor.theRuntimeObject.checkState( ME_DESIGN_MODE ):
+            return
+
         self.selectByUser()
         aCommandList = []
         aBuffer = self.theModelEditor.getCopyBuffer()
@@ -244,6 +275,9 @@ class SystemTree(ViewComponent):
 
 
     def add_new ( self ):
+        if not self.theModelEditor.theRuntimeObject.checkState( ME_DESIGN_MODE ):
+            return
+
         self.selectByUser()
 
         # get unique name from modeleditor
@@ -267,6 +301,9 @@ class SystemTree(ViewComponent):
 
     
     def delete ( self ):
+        if not self.theModelEditor.theRuntimeObject.checkState( ME_DESIGN_MODE ):
+            return
+
         self.selectByUser()
 
         # root cannot be selected
@@ -282,6 +319,8 @@ class SystemTree(ViewComponent):
         
 
     def rename ( self, newName, anIter ):
+        if not self.theModelEditor.theRuntimeObject.checkState( ME_DESIGN_MODE ):
+            return
 
         # if nothing changed make nothing
         #newSelection = self.__getSelection()
@@ -367,7 +406,7 @@ class SystemTree(ViewComponent):
         parentSysPath = convertSysIDToSysPath ( fromSysID  )
         subSystemList = self.theParentWindow.theModelEditor.getModel().\
             getEntityList ( ME_SYSTEM_TYPE,  parentSysPath )
-
+        subSystemList = list( subSystemList )
         # call itself recursively
         subSystemList.sort( lambda x,y:(x>y)-(x<y) )
         for aSubSystem in subSystemList:
@@ -391,8 +430,9 @@ class SystemTree(ViewComponent):
         return_list = []
 
         for aPath in aPathList:
-            anIter = self.theSysTreeStore.get_iter( aPath )
+            anIter = self.theSysTreeStore.get_iter( aPath )            
             return_list.append( self.__getSysID( anIter ) )
+       
         return return_list
 
 
