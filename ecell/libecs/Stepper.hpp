@@ -190,15 +190,15 @@ private:
 };
 
 
-class Eular1Stepper : public MasterStepper
+class Euler1Stepper : public MasterStepper
 {
 
 public:
 
-  Eular1Stepper();
-  virtual ~Eular1Stepper() {}
+  Euler1Stepper();
+  virtual ~Euler1Stepper() {}
 
-  static Stepper* instance() { return new Eular1Stepper; }
+  static Stepper* instance() { return new Euler1Stepper; }
 
   virtual int getNumberOfSteps() { return 1; }
   virtual void clear();
@@ -208,11 +208,11 @@ public:
   virtual void postern();
   virtual void initialize();
 
-  virtual const char* const className() const  { return "Eular1Stepper"; }
+  virtual const char* const className() const  { return "Euler1Stepper"; }
 
 protected:
 
-  static IntegratorPtr newEular1( SubstanceRef substance );
+  static IntegratorPtr newEuler1( SubstanceRef substance );
 
 };
 

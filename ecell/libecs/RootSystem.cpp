@@ -34,7 +34,7 @@
 RootSystem::RootSystem() 
 {
   // FIXME: remove this.
-//  _stepper = new Eular1Stepper(this);
+//  _stepper = new Euler1Stepper(this);
 }
 
 RootSystem::~RootSystem()

@@ -64,13 +64,13 @@ protected:
 
 };
 
-class Eular1Integrator  : public Integrator
+class Euler1Integrator  : public Integrator
 {
 
 public:
 
-  Eular1Integrator( SubstanceRef ); 
-  virtual ~Eular1Integrator() {}
+  Euler1Integrator( SubstanceRef ); 
+  virtual ~Euler1Integrator() {}
 
   virtual int getNumberOfSteps() { return 1; }
   //  virtual Float velocity(Float );

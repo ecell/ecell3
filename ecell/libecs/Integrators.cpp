@@ -46,16 +46,16 @@ void Integrator::clear()
   theNumberOfMoleculesCache = theSubstance.getQuantity();
 }
 
-////////////////////////////// Eular1Integrator
+////////////////////////////// Euler1Integrator
 
-Eular1Integrator::Eular1Integrator( SubstanceRef substance ) 
+Euler1Integrator::Euler1Integrator( SubstanceRef substance ) 
   : 
   Integrator( substance )
 {
   ; // do nothing
 }
 
-void Eular1Integrator::turn()
+void Euler1Integrator::turn()
 {
   ++theStepCounter;
 }

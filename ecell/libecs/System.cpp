@@ -128,7 +128,7 @@ void System::initialize()
   if( theStepper == NULL )
     {
       //FIXME: make this default user customizable
-      setStepper( "Eular1Stepper" );
+      setStepper( "Euler1Stepper" );
     }
 
   try{

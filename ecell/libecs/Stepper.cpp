@@ -277,27 +277,27 @@ void SlaveStepper::postern()
 }
 
 
-////////////////////////// Eular1Stepper
+////////////////////////// Euler1Stepper
 
-Eular1Stepper::Eular1Stepper()
+Euler1Stepper::Euler1Stepper()
 {
-  theAllocator = IntegratorAllocator( &Eular1Stepper::newEular1 );
+  theAllocator = IntegratorAllocator( &Euler1Stepper::newEuler1 );
 }
 
-IntegratorPtr Eular1Stepper::newEular1( SubstanceRef substance )
+IntegratorPtr Euler1Stepper::newEuler1( SubstanceRef substance )
 {
-  return new Eular1Integrator( substance );
+  return new Euler1Integrator( substance );
 }
 
-void Eular1Stepper::initialize()
+void Euler1Stepper::initialize()
 {
   MasterStepper::initialize();
 }
 
-void Eular1Stepper::clear()
+void Euler1Stepper::clear()
 {
 #ifdef DEBUG_STEPPER
-  cerr << "Eular1Stepper: clear()" << endl;
+  cerr << "Euler1Stepper: clear()" << endl;
 #endif /* DEBUG_STEPPER */
   theOwner->clear();
   for( SlaveStepperListIterator i = theSlavesList.begin() ; 
@@ -307,10 +307,10 @@ void Eular1Stepper::clear()
     }
 }
 
-void Eular1Stepper::react()
+void Euler1Stepper::react()
 {  
 #ifdef DEBUG_STEPPER
-  cerr << "Eular1Stepper: react()" << endl;
+  cerr << "Euler1Stepper: react()" << endl;
 #endif /* DEBUG_STEPPER */
 
   theOwner->react();
@@ -330,10 +330,10 @@ void Eular1Stepper::react()
     }
 }
 
-void Eular1Stepper::transit()
+void Euler1Stepper::transit()
 {
 #ifdef DEBUG_STEPPER
-  cerr << "Eular1Stepper: transit()" << endl;
+  cerr << "Euler1Stepper: transit()" << endl;
 #endif /* DEBUG_STEPPER */
   theOwner->transit();
   for( SlaveStepperListIterator i = theSlavesList.begin() ; 
@@ -343,10 +343,10 @@ void Eular1Stepper::transit()
     }
 }
 
-void Eular1Stepper::postern()
+void Euler1Stepper::postern()
 {
 #ifdef DEBUG_STEPPER
-  cerr << "Eular1Stepper: transit()" << endl;
+  cerr << "Euler1Stepper: transit()" << endl;
 #endif /* DEBUG_STEPPER */
   theOwner->postern();
   for( SlaveStepperListIterator i = theSlavesList.begin() ; 
