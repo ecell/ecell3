@@ -72,6 +72,12 @@ namespace libemc
   createStepper( libecs::StringCref          aClassname, 
 		 libecs::StringCref          anId )
   {
+    if( theRunningFlag )
+      {
+	THROW_EXCEPTION( libecs::Exception, 
+			 "Cannot create a Stepper while running." );
+      }
+
     getModel().createStepper( aClassname, anId );
   }
 
@@ -146,6 +152,12 @@ namespace libemc
   void LocalSimulatorImplementation::createEntity( StringCref aClassname,
 						   StringCref aFullIDString )
   {
+    if( theRunningFlag )
+      {
+	THROW_EXCEPTION( libecs::Exception, 
+			 "Cannot create an Entity while running." );
+      }
+
     getModel().createEntity( aClassname, FullID( aFullIDString ) );
   }
 
@@ -254,6 +266,12 @@ namespace libemc
   void LocalSimulatorImplementation::
   createLogger( libecs::StringCref aFullPNString )
   {
+    if( theRunningFlag )
+      {
+	THROW_EXCEPTION( libecs::Exception, 
+			 "Cannot create a Logger while running." );
+      }
+
     FullPN aFullPN( aFullPNString );
     getModel().getLoggerBroker().createLogger( aFullPN );
   }
