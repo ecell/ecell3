@@ -18,6 +18,8 @@ CXXFLAGS= @CXXFLAGS@ # -D_REENTRANT
 libecs_la_LDFLAGS= -version-info 2:0:0 #-rpath ${libdir}
 libecs_la_LIBADD= ${LIBLTDL} ${GSL_LIBADD}
 libecs_la_SOURCES=\
+Singleton.cpp\
+SmallObj.cpp\
 Util.cpp\
 Polymorph.cpp\
 FullID.cpp\
@@ -54,6 +56,10 @@ Exceptions.cpp
 
 libecsdir=${pkgincludedir}/libecs
 libecs_HEADERS=\
+AssocVector.h\
+Singleton.h\
+SmallObj.h\
+Threads.h\
 libecs.hpp\
 Defs.hpp\
 convertTo.hpp\
@@ -93,7 +99,6 @@ CoreLinuxCompatibility.hpp\
 RCPtr.hpp\
 VariableReference.hpp\
 DynamicPriorityQueue.hpp\
-AssocVector.h\
 FluxProcess.hpp
 
 
