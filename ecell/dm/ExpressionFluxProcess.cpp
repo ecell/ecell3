@@ -25,8 +25,7 @@
 //END_HEADER
 //
 // authors:
-// Kouichi Takahashi <shafi@e-cell.org>
-// Nayuta Iwata
+//    Tatsuya Ishida
 //
 // E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
