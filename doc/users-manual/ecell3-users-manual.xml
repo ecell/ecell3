@@ -6,8 +6,8 @@
 [
   <!ENTITY legal SYSTEM "legal.xml">
   <!ENTITY appversion "3.1.99">
-  <!ENTITY manrevision "0.0">
-  <!ENTITY date "Oct 2003">
+  <!ENTITY manrevision "0.1">
+  <!ENTITY date "Oct. 10, 2003">
   <!ENTITY app "<application>E-Cell Simulation Environment</application>">
   <!ENTITY ecell "<productname>E-Cell</productname>">
   <!-- Information about the entities
@@ -123,7 +123,7 @@
   <!-- please do not change the id; for translations, change lang to -->
   <!-- appropriate code -->
   <bookinfo> 
-    <title>E-Cell Simulation Environment Version &appversion; User's Manual</title>       
+    <title>E-Cell Simulation Environment Version &appversion; User's Manual (Draft: &date;)</title>       
 
     <copyright> 
       <year>2002-2003</year> 
@@ -184,6 +184,7 @@
       </revision> 
     </revhistory> 
 -->
+
     <releaseinfo>This manual describes version &appversion; of E-Cell Simulation Environment.
     </releaseinfo> 
 
