@@ -118,21 +118,21 @@ class EntityStub( ObjectStub ):
 		return self.theSimulator.\
 		       getEntityPropertyList( self.theFullIDString )
 
-	# end of isExist
+	# end of getPropertyList
 
 
 	# ---------------------------------------------------------------
-	# isExist
+	# exists
 	#
 	# return -> exist:TRUE / not exist:FALSE
 	# This method can throw exceptions.
 	# ---------------------------------------------------------------
 
-	def isExist( self ):
+	def exists( self ):
 
 		return self.theSimulator.isEntityExist( self.theFullIDString )
 
-	# end of isExist
+	# end of exists
 
 	# ---------------------------------------------------------------
 	# setProperty

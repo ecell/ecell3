@@ -63,20 +63,21 @@ class ObjectStub:
 		import inspect
 		caller = inspect.getouterframes(inspect.currentframe())[0][3]
 		raise NotImplementedError(caller + ' must be implemented in subclass')
+
 	# ---------------------------------------------------------------
-	# isExist (abstract method)
+	# exists (abstract method)
 	#
 	# return -> exist:TRUE / not exist:FALSE
 	# This method can throw exceptions.
 	# ---------------------------------------------------------------
 
-	def isExist( self ):
+	def exists( self ):
 
 		import inspect
 		caller = inspect.getouterframes(inspect.currentframe())[0][3]
 		raise NotImplementedError(caller + ' must be implemented in subclass')
 
-	# end of isExist
+	# end of exists
 
 
 	# ---------------------------------------------------------------

@@ -297,7 +297,7 @@ class Session:
                 # -------------------------------------------------
                 # need check if the logger exists
                 aLoggerStub = self.createLoggerStub( aFullPNString )
-                if not aLoggerStub.isExist():
+                if not aLoggerStub.exists():
                     aErrorMessage='\nLogger doesn\'t exist.!\n'
                     self.message( aErrorMessage )
                     return None

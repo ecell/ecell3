@@ -94,13 +94,13 @@ class LoggerStub( ObjectStub ):
 
 
 	# ---------------------------------------------------------------
-	# isExist
+	# exists
 	#
 	# return -> exist:TRUE / not exist:FALSE
 	# This method can throw exceptions.
 	# ---------------------------------------------------------------
 
-	def isExist( self ):
+	def exists( self ):
 
 		# When the FullPN of this instance exists in 
 		# the FullPN list, returns TRUE
@@ -109,7 +109,7 @@ class LoggerStub( ObjectStub ):
 		else:
 			return FALSE
 
-	# end of isExist
+	# end of exists
 
 
 	# ---------------------------------------------------------------
@@ -122,17 +122,24 @@ class LoggerStub( ObjectStub ):
 	def getData( self, aStartTime=None, anEndTime=None, anInterval=None ):
 
 		if aStartTime == None:
-			return self.theSimulator.getLoggerData( self.theFullPNString )
-		elif anEndTime == None:
-			return self.getDataWithStartEnd( aStartTime,\
-							 self.getEndTime() )
-		elif anInterval == None:
-			return self.getDataWithStartEnd( aStartTime,\
-							 anEndTime )
+			aStartTime = self.getStartTime()
+
+		if anEndTime == None:
+			anEndTime = self.getEndTime()
+
+		if anInterval == None:
+
+			return self.theSimulator.getLoggerData( self.theFullPNString,
+			                                        aStartTime,
+			                                        anEndTime )
+
 		else:
-			return self.getDataWithStartEndInterval( aStartTime,\
-								 anEndTime,\
-								 anInterval )
+
+			return self.theSimulator.getLoggerData( self.theFullPNString,
+			                                        aStartTime,
+			                                        anEndTime,
+			                                        anInterval )
+			                                        
 
 	# end of getData
 
@@ -150,7 +157,7 @@ class LoggerStub( ObjectStub ):
 
 		return self.theSimulator.getLoggerData( self.theFullPNString, aStartTime, anEndTime )
 
-	# end of isExist
+	# end of getDataWithStartEnd
 
 
 	# ---------------------------------------------------------------

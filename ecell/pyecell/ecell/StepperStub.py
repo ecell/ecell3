@@ -91,20 +91,20 @@ class StepperStub( ObjectStub ):
 
 
 	# ---------------------------------------------------------------
-	# isExist
+	# exists
 	#
 	# return -> exist:TRUE / not exist:FALSE
 	# This method can throw exceptions.
 	# ---------------------------------------------------------------
 
-	def isExist( self ):
+	def exists( self ):
 
 		if self.theID in self.theSimulator.getStepperList():
 			return TRUE
 		else:
 			return FALSE
 
-	# end of isExist
+	# end of exists
 
 
 	# ---------------------------------------------------------------

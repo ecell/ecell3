@@ -359,7 +359,7 @@ class OsogoPluginWindow(PluginWindow):
 			
 				# creates loggerstub and call its create method.
 				aLoggerStub = self.theSession.createLoggerStub( aFullPNString )
-				if aLoggerStub.isExist() == FALSE:
+				if aLoggerStub.exists() == FALSE:
 					aLoggerStub.create()
 
 		except:
