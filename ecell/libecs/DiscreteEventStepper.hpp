@@ -134,6 +134,8 @@ namespace libecs
 
     virtual void interrupt( StepperPtr const aCaller );
 
+    virtual void log();
+
 
     SET_METHOD( Real, Tolerance )
       {

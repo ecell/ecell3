@@ -295,11 +295,13 @@ namespace libecs
     void integrate( RealParam aTime );
 
     /**
-       Update loggers.
+       Let the Loggers log data.
 
+       The default behavior is to call all the Loggers attached to
+       any Entities related to this Stepper.
     */
 
-    void log();
+    virtual void log();
     
     /**
        Register a System to this Stepper.
@@ -590,8 +592,6 @@ namespace libecs
     */
 
     void updateLoggerVector();
-
-
 
 
   protected:

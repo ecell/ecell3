@@ -32,6 +32,7 @@
 
 #include "FullID.hpp"
 #include "Model.hpp"
+#include "Logger.hpp"
 
 #include "DiscreteEventStepper.hpp"
 
@@ -221,6 +222,40 @@ namespace libecs
 
     getModel()->reschedule( this );
   }
+
+
+  void DiscreteEventStepper::log()
+  {
+    // call Logger::log() of Loggers that are attached to
+    // theLastProcess and Variables in its VariableReferenceVector.
+
+    const Real aCurrentTime( getCurrentTime() );
+
+    LoggerVectorCref aProcessLoggerVector( theLastProcess->getLoggerVector() );
+
+    FOR_ALL( LoggerVector, aProcessLoggerVector )
+      {
+	(*i)->log( aCurrentTime );
+      }
+
+    VariableReferenceVectorCref
+      aVariableReferenceVector( theLastProcess->getVariableReferenceVector() );
+
+    for( VariableReferenceVectorConstIterator 
+	   anIterator( aVariableReferenceVector.begin() );
+	 anIterator != aVariableReferenceVector.end(); ++anIterator )
+      {
+	const VariableCptr aVariablePtr( (*anIterator).getVariable() );
+	LoggerVectorCref aLoggerVector( aVariablePtr->getLoggerVector() );
+
+	FOR_ALL( LoggerVector, aLoggerVector )
+	  {
+	    (*i)->log( aCurrentTime );
+	  }
+      }
+
+  }
+
 
 
 } // namespace libecs
