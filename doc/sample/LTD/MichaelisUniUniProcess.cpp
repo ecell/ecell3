@@ -1,134 +1,62 @@
-#ifndef __MichaelisUniUniProcess_CPP
-#define __MichaelisUniUniProcess_CPP
-
-#include <iostream>
-
 #include "libecs.hpp"
+#include "Process.hpp"
+#include "Util.hpp"
+#include "PropertyInterface.hpp"
+#include "PropertySlotMaker.hpp"
 #include "System.hpp"
 #include "Stepper.hpp"
 #include "Variable.hpp"
-#include "Process.hpp"
-#include "Util.hpp"
-#include "PropertySlotMaker.hpp"
+#include "VariableProxy.hpp"
 
 #include "FluxProcess.hpp"
+#include "ecell3_dm.hpp"
 
+#define ECELL3_DM_TYPE Process
 
+USE_LIBECS;
 
-namespace libecs
+ECELL3_DM_CLASS
+  :  
+  public FluxProcess
 {
 
-  class MichaelisUniUniProcess
-    :  
-    public FluxProcess
-  {
+  ECELL3_DM_OBJECT;
   
-  public:
+ public:
 
-    MichaelisUniUniProcess();
-    ~MichaelisUniUniProcess();
-
-    void setKm( RealCref value ) { Km = value; }
-    const Real getKm() const { return Km; }
-    void setKcat( RealCref value ) { Kcat = value; }
-    const Real getKcat() const { return Kcat; }
-
-
-
-    
-    virtual void process();
-    virtual void initialize();
-    
-    static ProcessPtr createInstance() 
-    { 
-      return new MichaelisUniUniProcess;
+  ECELL3_DM_CLASSNAME()
+    {
+      ECELL3_CREATE_PROPERTYSLOT_SET_GET( Real, Km );
+      ECELL3_CREATE_PROPERTYSLOT_SET_GET( Real, Kcat );
     }
-   
-    StringLiteral getClassName() const { return "MichaelisUniUniProcess"; }
-
-
-  protected:
+  
+  SIMPLE_SET_GET_METHOD( Real, Km );
+  SIMPLE_SET_GET_METHOD( Real, Kcat );
     
-    void makeSlots();
+  virtual void initialize()
+    {
+      FluxProcess::initialize();
+      S0 = getVariableReference( "S0" );
+      C0 = getVariableReference( "C0" );  
+    }
 
-    Real Km;
-    Real Kcat;
+  virtual void process()
+    {
+      Real velocity( Kcat );
+      velocity *= C0.getValue();
+      const Real S( S0.getConcentration() );
+      velocity *= S;
+      velocity /= ( Km + S );
+      setFlux( velocity );
+    }
 
-
-
-
+ protected:
+  
+  Real Km;
+  Real Kcat;
   VariableReference S0;
   VariableReference C0;
-
-
-  private:
-
-
-
-  };
-
-}
-
-using namespace libecs;
-
-extern "C"
-{
-  Process::AllocatorFuncPtr CreateObject =
-  &MichaelisUniUniProcess::createInstance;
-}  
-
-MichaelisUniUniProcess::MichaelisUniUniProcess()
-{
-  makeSlots();
-    Km = 0.0;
-  Kcat = 0.0;
-
-}
-
-MichaelisUniUniProcess::~MichaelisUniUniProcess()
-{
-}
-
-void MichaelisUniUniProcess::makeSlots()
-{
-    DEFINE_PROPERTYSLOT( Real, Km, &MichaelisUniUniProcess::setKm, &MichaelisUniUniProcess::getKm );
-  DEFINE_PROPERTYSLOT( Real, Kcat, &MichaelisUniUniProcess::setKcat, &MichaelisUniUniProcess::getKcat );
-
-}
-
-
-void MichaelisUniUniProcess::initialize()
-{
-  FluxProcess::initialize();
-
   
-  
+};
 
-  #line 1 "MichaelisUniUniProcess::initialize() in <file:1 (MichaelisUniUniProcess.dm)>"
-
-
-  declareUnidirectional();
-
-  S0 = getVariableReference( "S0" );
-  C0 = getVariableReference( "C0" );
-
-
-
-
-}
-
-void MichaelisUniUniProcess::process()
-{
-#line 1 "MichaelisUniUniProcess::process() in <file:1 (MichaelisUniUniProcess.dm)>"
-
-
-  const Real S( S0.getConcentration() );
-  const Real E( C0.getValue() );
-  Real velocity( (Kcat * E * S /( Km + S)) );
-  setFlux( velocity );
-
-
-
-}
-
-#endif
+ECELL3_DM_INIT;
