@@ -4,7 +4,7 @@ import sys
 import os
 import imp
 import glob
-
+from ecell.ECS import *
 from config import *
 
 class PluginModule:
@@ -17,12 +17,9 @@ class PluginModule:
              = imp.find_module( self.theName, PLUGIN_PATH )
 
         self.theDirectoryName = os.path.dirname( aPath )
-        
+
         try:
-            self.theModule = imp.load_module( self.theName,
-                                              aFp,
-                                              aPath,
-                                              self.theDescription )
+            self.theModule = imp.load_module( self.theName, aFp, aPath, self.theDescription )
         finally:
             # close fp even in exception
             if aFp:
@@ -44,7 +41,6 @@ class PluginManager:
         self.thePluginMap = {}
         self.theInstanceList = []
         self.theSession = session
-        self.theDriver = self.theSession.theDriver
         self.theLoggerWindow = loggerwindow
 	self.theInterfaceWindow = interfacewindow
         
@@ -57,11 +53,11 @@ class PluginManager:
             self.loadModule( classname )
 
         if root !='top_vbox':
-            self.theDriver.record( 'aPluginManager.createInstance( \'%s\', %s )' % (classname, data) )
+            self.theSession.theSimulator.record( 'aPluginManager.createInstance( \'%s\', %s )' % (classname, data) )
 	    self.theInterfaceWindow.addNewRecord( classname, data )
 	
         anInstance = aPlugin.createInstance( data, self, root, parent )
-        self.theDriver.initialize()
+        self.theSession.theSimulator.initialize()
         return anInstance
 
 

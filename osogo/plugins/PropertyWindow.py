@@ -51,9 +51,9 @@ class PropertyWindow(PluginWindow):
 
         self.theSelected = ''
         
-        aNameFullPN = convertFullIDToFullPN( self.theFullID(),
-                                                      'Name' )
-        aNameList = list( self.theDriver.getProperty( aNameFullPN ) )
+        aNameFullPN = convertFullIDToFullPN( self.theFullID() ,'Name' )
+        print createFullPNString( aNameFullPN )
+        aNameList = list( self.theSession.theSimulator.getProperty( createFullPNString( aNameFullPN ) ) )
         
 #        self.theClassName = aNameList[0]
         aClassName = aNameList[0]
@@ -63,7 +63,7 @@ class PropertyWindow(PluginWindow):
         self.thePath = str( self.theFullID()[SYSTEMPATH] )
         aClassNameFullPN = convertFullIDToFullPN( self.theFullID(),
                                                   'ClassName' )
-        aList = self.theDriver.getProperty( aClassNameFullPN )
+        aList = self.theSession.theSimulator.getProperty( createFullPNString( aClassNameFullPN ) )
 
         self.theTypeEntry.set_text( self.theType  )
         self.theIDEntry.set_text  ( self.theID )
@@ -96,7 +96,7 @@ class PropertyWindow(PluginWindow):
         aPropertyListFullPN = convertFullIDToFullPN( self.theFullID(),
                                                      'PropertyList' )
         self.prevFullID = convertFullPNToFullID( aPropertyListFullPN )        
-        aPropertyList = self.theDriver.getProperty( aPropertyListFullPN )
+        aPropertyList = self.theSession.theSimulator.getProperty( createFullPNString( aPropertyListFullPN ) )
 
         for aProperty in aPropertyList:
             if (aProperty == 'ClassName'):
@@ -122,7 +122,7 @@ class PropertyWindow(PluginWindow):
                 set = aAttributeData[1]
                 
                 if aAttribute != 1:
-                    aValueList = self.theDriver.getProperty( aFullPN ) 
+                    aValueList = self.theSession.theSimulator.getProperty( createFullPNString( aFullPN ) )
                     aLength = len( aValueList )
                 
             

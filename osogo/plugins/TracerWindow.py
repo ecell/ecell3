@@ -27,7 +27,7 @@ class TracerWindow( PluginWindow ):
                     IDflag = 1
         
         if IDflag == 1:
-            if self.theDriver.isNumber(self.theFullPN()):
+            if self.theSession.theSimualtor.isNumber(self.theFullPN()):
                 self.openWindow()
                 self.thePluginManager.appendInstance( self )                    
                 PluginWindow.initialize( self, root )
@@ -39,7 +39,7 @@ class TracerWindow( PluginWindow ):
         else:
             aClassName = self.__class__.__name__
             for aFullPN in self.theFullPNList():
-                if self.theDriver.isNumber( aFullPN ):
+                if self.theSession.theSimulator.isNumber( aFullPN ):
                     a = self.thePluginManager.createInstance( aClassName, (aFullPN,), root)
                 else:
                     aFullPNString = createFullPNString( self.theFullPN() )     

@@ -14,7 +14,7 @@ class BargraphWindow( PluginWindow ):
 
         PluginWindow.__init__( self, dirname, data, pluginmanager, root )
 
-        if self.theDriver.isNumber( self.theFullPN() ):
+        if self.theSession.theSimulator.isNumber( self.theFullPN() ):
 
             self.openWindow()
             self.thePluginManager.appendInstance( self )   
@@ -63,7 +63,7 @@ class BargraphWindow( PluginWindow ):
         aString += ':\n' + str( self.theFullPN()[PROPERTY] )        
         self.theIDEntry.set_text  ( aString )
 
-        aValue = self.theDriver.getProperty( self.theFullPN() )
+        aValue = self.theSession.theSimulator.getProperty( createFullIDString( self.theFullPN() ) )
         value = aValue[0]
         self.theActualValue = value
         self.theBarLength , self.theMultiplier , self.thePositiveFlag \

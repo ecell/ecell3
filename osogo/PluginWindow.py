@@ -3,6 +3,7 @@ import os
 from config import *
 from ViewWindow import *
 from gtk import *
+from ecell.ECS import *
 
 class PluginWindow(ViewWindow):
     '''
@@ -21,7 +22,6 @@ class PluginWindow(ViewWindow):
 
         self.thePluginManager = pluginmanager
         self.theSession = self.thePluginManager.theSession 
-        self.theDriver = self.theSession.theDriver
         self.theRawFullPNList = data
         self.theTitle = pluginmanager.theInterfaceWindow.theTitle
         	
@@ -92,9 +92,9 @@ class PluginWindow(ViewWindow):
             aFullID = convertFullPNToFullID( aFullPN )
             aPropertyName = aFullPN[PROPERTY]
             aPropertyListFullPN = convertFullIDToFullPN( aFullID, 'PropertyList' )
-            aPropertyList = self.theDriver.getProperty( aPropertyListFullPN )
+            aPropertyList = self.theSession.theSimulator.getProperty( createFullPNString( aPropertyListFullPN ) )
             aAttributeListFullPN = convertFullIDToFullPN( aFullID, 'PropertyAttributes')
-            aAttributeList = self.theDriver.getProperty( aAttributeListFullPN )
+            aAttributeList = self.theSession.theSimulator.getProperty( createFullPNString( aAttributeListFullPN ) )
             num = 0
             for aProperty in aPropertyList:
                 aPropertyFullPN = convertFullIDToFullPN( aFullID, aProperty )
@@ -114,15 +114,15 @@ class PluginWindow(ViewWindow):
 
     def getValue( self, fullpn ):
 
-        aValueList = self.theDriver.getProperty( fullpn )
+        aValueList = self.theSession.theSimulator.getProperty( createFullIDString( fullpn ) )
         return aValueList[0]
 
 
     def setValue( self, fullpn, value ):
 
         if self.getAttribute( fullpn ) == 3:
-            aValueList = ( value, )
-            self.theDriver.setProperty( fullpn, aValueList )
+            aValue = value
+            self.theSession.theSimulator.setProperty( createFullIDString( fullpn ), aValue )
             self.thePluginManager.updateAllPluginWindow()
         else:
             aFullPNString = createFullPNString( fullpn )

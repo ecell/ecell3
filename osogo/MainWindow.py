@@ -21,6 +21,7 @@ import string
 import ecell.ecs
 import ecell.Session
 from ecell.ecssupport import *
+from ecell.ECS import *
 
 class MainWindow(Window):
 
@@ -31,20 +32,12 @@ class MainWindow(Window):
         #### create Message Window ####
         self.theMessageWindow = MessageWindow.MessageWindow()
         self.theMessageWindowWindow = self.theMessageWindow[ 'message_window' ]
-#        self.theMessageWindowWindow.hide()
 
-        self.theTmpSessionRecordFilename = 'TmpSessionRecord.py'
-        self.thePreSessionRecordFilename = 'preSessionRecord.py'
-
-
-        self.theSession = Session.OsogoSession( self.theMessageWindow,
-                                                self.theTmpSessionRecordFilename )
-        self.theDriver = self.theSession.theDriver
-        self.theModelInterpreter = self.theSession.theModelInterpreter
+        self.theSession = ecell.Session.Session( ecell.ecs.Simulator() )
+        self.theSession.setPrintMethod( self.theMessageWindow )
  
         self.theLoggerWindow = LoggerWindow.LoggerWindow( self.theSession , self )
         self.theLoggerWindowWindow = self.theLoggerWindow[ 'logger_window' ]
-#        self.theLoggerWindowWindow.hide()
 
 	self.theInterfaceWindow = InterfaceWindow.InterfaceWindow( self )
 	self.theInterfaceWindowWindow = self.theInterfaceWindow[ 'interface_window' ]
@@ -56,10 +49,10 @@ class MainWindow(Window):
         self.thePaletteWindow = PaletteWindow.PaletteWindow()
         self.thePaletteWindow.setPluginList( self.thePluginManager.thePluginMap )
 
-        self.theEntryListWindow = EntryListWindow.EntryListWindow( self )
-        self.theEntryListWindowWindow = self.theEntryListWindow[ 'entry_list_window' ]
-#        self.theEntryListWindowWindow.hide()
+        #self.theEntryListWindow = EntryListWindow.EntryListWindow( self )
+        #self.theEntryListWindowWindow = self.theEntryListWindow[ 'entry_list_window' ]
 
+        self.theStepperChacker = 0
         self.theUpdateInterval = 10
         self.theStepSize = 1
         self.theStepType = 0
@@ -110,8 +103,8 @@ class MainWindow(Window):
 
 
         ### initialize for run method ###
-        self.theDriver.setPendingEventChecker( gtk.events_pending )
-        self.theDriver.setEventHandler( gtk.mainiteration  )
+        self.theSession.theSimulator.setPendingEventChecker( gtk.events_pending )
+        self.theSession.theSimulator.setEventHandler( gtk.mainiteration  )
 
         self['ecell_logo_toolbar'].set_style( GTK.TOOLBAR_ICONS )
 
@@ -125,6 +118,7 @@ class MainWindow(Window):
         self.theRuleFileSelection.show_all()
 
     def loadRule( self, button_obj ) :
+        self.theStepperChacker = 1
         aFileName = self.theRuleFileSelection.get_filename()
         self.theRuleFileSelection.hide()
         self.theSession.printMessage( 'load rule file %s\n' % aFileName )
@@ -132,13 +126,14 @@ class MainWindow(Window):
         execfile(aFileName, aGlobalNameMap)
         self.theModelInterpreter.load( self.theCellModelObject )
         self.theEntryListWindow.update()
-        self.theDriver.initialize()
+        self.theSession.theSimulator.initialize()
 
     ###### Load Script ######
     def openScriptFileSelection( self, obj ) :
         self.theScriptFileSelection.show_all()
         
     def loadScript( self, button_obj ):
+        self.theStepperChacker = 1
         aFileName = self.theScriptFileSelection.get_filename()
         self.theScriptFileSelection.hide()
         self.theSession.printMessage( 'load script file %s\n' % aFileName )
@@ -204,7 +199,7 @@ class MainWindow(Window):
         gtk.timeout_remove( self.theTimer )
 
     def update( self ):
-        aTime = self.theDriver.getProperty( ( SYSTEM, '/', '/', 'CurrentTime') ) 
+        aTime = self.theSession.theSimulator.getCurrentTime()
         self.theCurrentTime = aTime[0]
         self['time_entry'].set_text( str( self.theCurrentTime ) )
         self.thePluginManager.updateAllPluginWindow()
@@ -212,12 +207,19 @@ class MainWindow(Window):
     
     def toggleEntryList( self, button_obj ):
 
-        if button_obj.get_active() :
-            self.theEntryListWindowWindow.show_all()
-            self.theEntryListWindow.update()
-        else :
-            self.theEntryListWindowWindow.hide()
-
+        if self.theStepperChacker == 1:
+            self.theEntryListWindow = EntryListWindow.EntryListWindow( self )
+            self.theEntryListWindowWindow = self.theEntryListWindow[ 'entry_list_window' ]
+        else:
+            pass
+        if self.theStepperChacker == 1:
+            if button_obj.get_active() :
+                self.theEntryListWindowWindow.show_all()
+                self.theEntryListWindow.update()
+            else :
+                self.theEntryListWindowWindow.hide()
+        
+        
 
     def toggleLoggerWindow( self, button_obj ):
 

@@ -23,7 +23,6 @@ class EntryListWindow(Window):
                             'entry_list_selection_changed'  : self.selectEntity } )
 
         self.theMainWindow = aMainWindow
-        self.theDriver = aMainWindow.theDriver
         self.thePaletteWindow = aMainWindow.thePaletteWindow
 
         self.theSystemTree = self.getWidget( 'system_tree' )
@@ -43,13 +42,13 @@ class EntryListWindow(Window):
 
         aPManager = self.theMainWindow.thePluginManager
         self.thePropertyWindow = aPManager.createInstance( 'PropertyWindow',
-                                                           [(4, '/', '/', '')],'top_vbox' )
+                                                           [(4, '', '/', '')],'top_vbox' )
 
 #        self.theSystemTree.select_item( -1 )
 
         aPropertyWindowTopVBox = self.thePropertyWindow['top_vbox']
         self['property_frame'].add( aPropertyWindowTopVBox )
-        self.thePropertyWindow['property_clist'].connect( 'select_row', self.selectPropertyName )
+        self.thePropertyWindow['propLerty_clist'].connect( 'select_row', self.selectPropertyName )
         
         self.update()
 
@@ -68,7 +67,7 @@ class EntryListWindow(Window):
         aLeaf.show()
 
         aSystemListFullPN = convertFullIDToFullPN( aSystemFullID, 'SystemList' ) 
-        aSystemList = self.theDriver.getProperty( aSystemListFullPN )
+        aSystemList = self.theSession.theSimulator.getProperty( createFullIDString(aSystemListFullPN))
         if aSystemList != ():
             aTree = gtk.GtkTree()
             aLeaf.set_subtree( aTree )
@@ -101,7 +100,7 @@ class EntryListWindow(Window):
     def listEntity( self, aEntityTypeString, aSystemFullID ):
         aListPN = aEntityTypeString + 'List'
         aListFullPN = convertFullIDToFullPN( aSystemFullID, aListPN ) 
-        aEntityList = self.theDriver.getProperty( aListFullPN )
+        aEntityList = self.theSession.theSimulator.getProperty( createFullIDString( aListFullPN ) )
         for aEntityID in aEntityList:
             aListItem = gtk.GtkListItem( aEntityID )
             
