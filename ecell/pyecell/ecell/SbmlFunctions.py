@@ -186,56 +186,65 @@ def getReaction( aSBMLmodel, aSBMLDocument ):
             aName =aReaction.getName()
 
 #----------KineticLaw----------------------------------
-            aKineticLaw = aReaction.getKineticLaw()
-#            anASTNode = libsbml.ASTNode()
-            ListOfKineticLaw = []
-            if aKineticLaw != []:
+            if aReaction.isSetKineticLaw():
 
-                aFormula_KL = aKineticLaw.getFormula()
+                aKineticLaw = aReaction.getKineticLaw()
+                #            anASTNode = libsbml.ASTNode()
+                ListOfKineticLaw = []
+                if aKineticLaw != []:
 
-                aMath = []
-                if( aSBMLDocument.getLevel() == 1 ):
-                    aMath.append( '' )
-                else:
-                    anASTNode_KL = aKineticLaw.getMath()
-                    aMath.append( libsbml.formulaToString( anASTNode_KL ) )
+                    if aKineticLaw.isSetFormula():
+                        aFormula_KL = aKineticLaw.getFormula()
+                    else:
+                        aFormula_KL = ''
+                  
+                    aMath = []
+                    if( aSBMLDocument.getLevel() == 1 ):
+                        aMath.append( '' )
+                    else:
+                        if aKineticLaw.isSetMath():
+                            anASTNode_KL = aKineticLaw.getMath()
+                            aMath.append( libsbml.formulaToString\
+                                          ( anASTNode_KL ) )
+                        else:
+                            aMath.append( '' )
 
-                aString_KL = aMath
+                    aString_KL = aMath
                     
-                aTimeUnit_KL = aKineticLaw.getTimeUnits()
-                aSubstanceUnit_KL = aKineticLaw.getSubstanceUnits()
+                    aTimeUnit_KL = aKineticLaw.getTimeUnits()
+                    aSubstanceUnit_KL = aKineticLaw.getSubstanceUnits()
             
-                if aKineticLaw.getParameter(0):
-                    ListOfParameters = []
-                    NumParameter_KL = aKineticLaw.getNumParameters()
-                    for NumPara in range( NumParameter_KL ):
-                        ListOfParameter = []
-                        aParameter = aKineticLaw.getParameter( NumPara )
+                    if aKineticLaw.getParameter(0):
+                        ListOfParameters = []
+                        NumParameter_KL = aKineticLaw.getNumParameters()
+                        for NumPara in range( NumParameter_KL ):
+                            ListOfParameter = []
+                            aParameter = aKineticLaw.getParameter( NumPara )
 
-                        anId_KL_P = aParameter.getId()
-                        aName_KL_P = aParameter.getName()
-                        aValue_KL_P = str( aParameter.getValue() )
-                        aUnit_KL_P = aParameter.getUnits()
-                        aConstant_KL_P = aParameter.getConstant()
+                            anId_KL_P = aParameter.getId()
+                            aName_KL_P = aParameter.getName()
+                            aValue_KL_P = str( aParameter.getValue() )
+                            aUnit_KL_P = aParameter.getUnits()
+                            aConstant_KL_P = aParameter.getConstant()
 
-                        ListOfParameter.append( anId_KL_P )
-                        ListOfParameter.append( aName_KL_P )
-                        ListOfParameter.append( aValue_KL_P )
-                        ListOfParameter.append( aUnit_KL_P )
-                        ListOfParameter.append( aConstant_KL_P )
+                            ListOfParameter.append( anId_KL_P )
+                            ListOfParameter.append( aName_KL_P )
+                            ListOfParameter.append( aValue_KL_P )
+                            ListOfParameter.append( aUnit_KL_P )
+                            ListOfParameter.append( aConstant_KL_P )
 
-                        ListOfParameters.append( ListOfParameter )
-                else:
-                    ListOfParameters = []
+                            ListOfParameters.append( ListOfParameter )
+                    else:
+                        ListOfParameters = []
 
-                anExpressionAnnotation = aKineticLaw.getAnnotation()
+                    anExpressionAnnotation = aKineticLaw.getAnnotation()
 
-                ListOfKineticLaw.append( aFormula_KL )
-                ListOfKineticLaw.append( aString_KL )
-                ListOfKineticLaw.append( aTimeUnit_KL )
-                ListOfKineticLaw.append( aSubstanceUnit_KL )
-                ListOfKineticLaw.append( ListOfParameters )
-                ListOfKineticLaw.append( anExpressionAnnotation )
+                    ListOfKineticLaw.append( aFormula_KL )
+                    ListOfKineticLaw.append( aString_KL )
+                    ListOfKineticLaw.append( aTimeUnit_KL )
+                    ListOfKineticLaw.append( aSubstanceUnit_KL )
+                    ListOfKineticLaw.append( ListOfParameters )
+                    ListOfKineticLaw.append( anExpressionAnnotation )
 
 #---------------------------------------------------------
 
