@@ -72,15 +72,8 @@ class PropertyWindow(PluginWindow):
 
         aPropertyListFullPN = convertFullIDToFullPN( self.theFullID(),
                                                      'PropertyList' )
-        aPropertyList =\
-               list( self.theSimulator.getProperty( aPropertyListFullPN ) )
+        aPropertyList = self.theSimulator.getProperty( aPropertyListFullPN )
 
-        aAttributeList = convertFullIDToFullPN(self.theFullID(),
-                                                  'PropertyAttributes')
-        aAttributeList =\
-        list(self.theSimulator.getProperty( aAttributeList ))
-        num = 0
- 
         for aProperty in aPropertyList:
             if (aProperty == 'ClassName'):
                 pass
@@ -117,8 +110,6 @@ class PropertyWindow(PluginWindow):
                         aList = [ aProperty, '', aValue , aAttribute]
                         aList = map( str, aList )
                         self.theList.append( aList )
-
-            num += 1
 
     def selectProperty(self, obj, data1, data2, data3):
 
