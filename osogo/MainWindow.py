@@ -131,6 +131,7 @@ class LogoAnimation:
         self.__currentImage = 0
         self.__running = False
 
+        self.extraCount = 0
         self.delay = 100
 
 
@@ -164,7 +165,13 @@ class LogoAnimation:
 
             if ( self.__currentImage == self.END_ROTATION ):
 
-                self.__currentImage = self.START_ROTATION
+                if( self.extraCount == 12 ):
+                    self.__currentImage = self.START_ROTATION
+                    self.extraCount = 0
+                else:
+                    self.__currentImage = self.END_ROTATION - 1
+                    self.extraCount += 1
+
 
             self.image.set_from_file( self.iconList[self.__currentImage] )
             self.__currentImage += 1
@@ -222,13 +229,15 @@ class MainWindow(OsogoWindow):
                 self.isStarted = False
                 self.timerVisible = False
                 self.theLastTime = 0
-                self.theLastRealTime = 0
+                self.theLastRealTime = 0                
+                self.updateCount = 0
 
                 # initialize Indicator
                 self.indicatorVisible = False
 
                 # create datetime instance for Timer
                 self.datetime = datetime.datetime(1970,1,1)
+
                 
 	def openWindow( self ):
 
@@ -380,13 +389,18 @@ class MainWindow(OsogoWindow):
                 self['timer_entry'].set_property( 'xalign', 1 )
                 self['timer_box'].hide()
 
+
+
+                #self['run_speed_entry'].modify_base( gtk.STATE_NORMAL,
+                #gtk.gdk.Color(61000,61000,61000,0) )
+                #self['run_speed_entry'].set_property('xalign', 1)
+
                 
                 # ---------------------
                 # initialize Indicator
                 # ---------------------
                 
                 self['indicator_box'].hide()
-
 
 
 	def __expose( self, *arg ):
@@ -881,22 +895,31 @@ class MainWindow(OsogoWindow):
 		self['time_entry'].set_text( str( self.theCurrentTime ) )
 		self['sec_step_entry'].set_text( str( self.theStepSizeOrSec ) )
 
+
                 if ( self.SimulationButton.getCurrentState() == 'run' and
                      self.timerVisible ):
                     self['timer_entry'].set_text( self.getCurrentTime( time.time() - self.startTime + self.tempTime ) )
 
 
+
+                    
                 if self.indicatorVisible:
-                    aRealTime = time.time()
-                    if ( aTime != self.theLastTime ):
-                        self['run_speed_scale'].set_value(
-                           math.log10( ( aTime - self.theLastTime ) /
-                                       ( aRealTime - self.theLastRealTime ) ) )
 
-                    self.theLastTime = aTime
-                    self.theLastRealTime = aRealTime
+                    if( self.updateCount == 0 ):
+                        self.theLastTime = self.theCurrentTime
+                        self.theLastRealTime = time.time()
 
+                    self.updateCount += 1
+                    if ( self.updateCount == 25 ):
+                        if ( aTime != self.theLastTime ):
+                            self['run_speed_label'].set_text(
+                                str( round( ( self.theCurrentTime - self.theLastTime ) /
+                                            ( time.time() - self.theLastRealTime ), 5 ) ) )
+                        
+
+                        self.updateCount = 0
                 
+
 		# when Model is already loaded.
 		if len(self.theSession.theModelName) > 0:
 			# updates status of menu and button 
@@ -1179,11 +1202,11 @@ class MainWindow(OsogoWindow):
 
             self['timer_entry'].set_text( "0 : 0 : 0" )
             self.tempTime = 0.0
-            self.isStarted = False
 
             if self.SimulationButton.getCurrentState() == 'run':
                 self.startTime = time.time()
             else:
+                self.isStarted = False
                 self.startTime = 0.0
 
         def __setAnimationSensitive( self, *arg ):
