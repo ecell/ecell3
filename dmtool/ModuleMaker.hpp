@@ -136,7 +136,7 @@ public:
   virtual T* make( const std::string& aClassname );
 
 
-  virtual const Module& getModule( const std::string& aClassName )
+  virtual const Module& getModule( const std::string& aClassName, bool forceReload )
   {
 	if( this->theModuleMap.find( aClassName ) == this->theModuleMap.end() )
 	  {
@@ -199,13 +199,22 @@ public:
   SharedModuleMaker();
   virtual ~SharedModuleMaker();
 
-  virtual const SharedModule& getModule( const std::string& aClassName )
+  virtual const SharedModule& getModule( const std::string& aClassName, bool forceReload )
   {
+
+    if ( forceReload ) 
+      {
+        typename StaticModuleMaker<T,DMAllocator>::ModuleMapIterator i ( this->theModuleMap.find( aClassName) );
+        if( i != this->theModuleMap.end() )
+          {
+            delete i->second;
+            this->theModuleMap.erase( i );
+          }
+    }
 	if( this->theModuleMap.find( aClassName ) == this->theModuleMap.end() )
 	  {
 		loadModule( aClassName );
 	  }
-	
 	return *((SharedModule*) this->theModuleMap[ aClassName ]);
 
 

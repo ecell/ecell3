@@ -28,7 +28,6 @@
 // 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 // 
 //END_HEADER
-#include <stdio.h>
 
 #ifndef __DYNAMICMODULE_HPP
 #define __DYNAMICMODULE_HPP
@@ -95,7 +94,8 @@ class DynamicModuleBase
 public:		
 
   DynamicModuleBase( const std::string& Modulename, DMAllocator Allocator, InfoLoaderType InfoLoader );
-
+  virtual ~DynamicModuleBase(){}
+  
   const std::string& getModuleName() const
   {
     return this->theModuleName;
@@ -138,7 +138,7 @@ class DynamicModule
 public:
 
   DynamicModule( const std::string& modulename );
-
+  virtual ~DynamicModule(){}
 };
 
 
@@ -165,7 +165,6 @@ public:
 
   SharedDynamicModule( const std::string& classname ); 
   virtual ~SharedDynamicModule();
-
   const std::string getFileName() const;
 
 private:
@@ -249,11 +248,15 @@ SharedDynamicModule( const std::string& classname )
 template < class Base, class DMAllocator >
 SharedDynamicModule<Base,DMAllocator>::~SharedDynamicModule()
 {
+
   if( this->theHandle != NULL )
     {
-      lt_dlclose( this->theHandle );
+            lt_dlclose( this->theHandle );
     }
+
 }
+
+
 
 template < class Base, class DMAllocator >
 const std::string SharedDynamicModule<Base,DMAllocator>::getFileName() const
