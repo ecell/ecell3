@@ -71,6 +71,9 @@ BOOST_PYTHON_MODULE( _ecs )
 {
   using namespace boost::python;
 
+  // without this it crashes when Logger::getData() is called. why?
+  import_array();
+
   // functions
 
   def( "getLibECSVersionInfo", &getLibECSVersionInfo );

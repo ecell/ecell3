@@ -81,7 +81,7 @@ BOOST_PYTHON_MODULE( _emc )
 {
   using namespace boost::python;
 
-  // pyecs uses Numeric module
+  // this module uses Numeric module
   import_array();
 
   signal( SIGSEGV, PyEcsSignalHandler );
