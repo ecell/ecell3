@@ -310,7 +310,7 @@ class GtkSessionMonitor(Session):
 		# when Model is already loaded.
 		if len(self.theModelName) > 0:
 			# creates new EntityListWindow instance
-			anEntityListWindow = EntityListWindow.EntityListWindow( self )
+			anEntityListWindow = EntityListWindow.EntityListWindow( self, rootWidget )
 			anEntityListWindow.openWindow()
 			
 			# saves the instance into map
@@ -320,7 +320,7 @@ class GtkSessionMonitor(Session):
 			self.updateFundamentalWindows()
 
 		else:
-			anEntityListWindow = EntityListWindow.EntityListWindow( None )
+			anEntityListWindow = EntityListWindow.EntityListWindow( None, rootWidget )
 			anEntityListWindow.openWindow()
 			
 			# saves the instance into map
