@@ -45,9 +45,12 @@
  *::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
  *	$Id$
  :	$Log$
+ :	Revision 1.2  2003/02/03 15:31:56  shafi
+ :	changed vvector cache sizes to 1024
+ :
  :	Revision 1.1  2002/04/30 11:21:53  shafi
  :	gabor's vvector logger patch + modifications by shafi
- :
+ :	
  :	Revision 1.6  2001/10/15 17:18:26  ishikawa
  :	improved program interface
  :	
@@ -82,8 +85,8 @@
 #ifdef __BORLANDC__
 typedef int ssize_t;
 #endif /* __BORLANDC__ */
-const unsigned int VVECTOR_READ_CACHE_SIZE = 40;
-const unsigned int VVECTOR_WRITE_CACHE_SIZE = 40;
+const unsigned int VVECTOR_READ_CACHE_SIZE = 1024;
+const unsigned int VVECTOR_WRITE_CACHE_SIZE = 1024;
 
 
 class vvectorbase {
