@@ -8,7 +8,7 @@ class NumericWindow( PluginWindow ):
 
     def __init__( self, dirname, sim, data, pluginmanager ):
 
-        PluginWindow.__init__( self, dirname, sim, data )
+        PluginWindow.__init__( self, dirname, sim, data, pluginmanager )
 
         self.addHandlers( { 'input_value'    :self.inputValue,
                             'increase_value' :self.increaseValue,
