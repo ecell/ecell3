@@ -2,6 +2,7 @@
 
 import sys
 import shutil
+import os
 
 message( "---- sample.esm ------------> start " )
 
@@ -10,14 +11,13 @@ message( "---- sample.esm ------------> start " )
 # -----------------------------------------------------
 
 # [1-1] set the environment parameter
-#setEnvironment('Local')
-setEnvironment('SGE')
+setEnvironment('Local')
+#setEnvironment('SGE')
 message( "current environment = %s " %getEnvironment() )
 message( "current concurrency = %s " %getConcurrency() )
-setTmpDirRemoval(False)
 
 # [1-2] set the temporary directory
-setTmpRootDir('./workingdir')
+setTmpRootDir('workingdir')
 message( "current temporary root dir = %s" %getTmpRootDir() )
 message( "current temporary dir = %s" %getTmpDir() )
 
@@ -56,21 +56,22 @@ message( "run --> end" )
 message( "copy files --> start" )
 
 # [4-1] copy output file and stdout file of first job 
-shutil.copy("%s/S.ecd"%getJobDirectory(aJob1), "S1.ecd")
-shutil.copy("%s/stdout.txt"%getJobDirectory(aJob1), "stdout1.txt")
+shutil.copy( getJobDirectory(aJob1) + os.sep + "S.ecd", "S1.ecd")
+shutil.copy( getJobDirectory(aJob1) + os.sep + "stdout.txt", "stdout1.txt")
 
 # [4-2] copy output file and stdout file of second job 
-shutil.copy("%s/S.ecd"%getJobDirectory(aJob2), "S2.ecd")
-shutil.copy("%s/stdout.txt"%getJobDirectory(aJob2), "stdout2.txt")
+shutil.copy( getJobDirectory(aJob1) + os.sep + "S.ecd", "S2.ecd")
+shutil.copy( getJobDirectory(aJob2) + os.sep + "stdout.txt", "stdout2.txt")
 
 # [4-3] copy output file and stdout file of third job 
-shutil.copy("%s/S.ecd"%getJobDirectory(aJob3), "S3.ecd")
-shutil.copy("%s/stdout.txt"%getJobDirectory(aJob3), "stdout3.txt")
+shutil.copy( getJobDirectory(aJob1) + os.sep + "S.ecd", "S3.ecd")
+shutil.copy( getJobDirectory(aJob3) + os.sep + "stdout.txt", "stdout3.txt")
 
 message( "copy files --> end" )
 
 message( "---- sample.esm ------------> end " )
 # end of sample.ecs
+
 
 
 
