@@ -62,15 +62,15 @@ work well with any simple continuous &Process; classes.</para>
 	    <para><classname>FixedODE1Stepper</classname></para>
 	    <para>A <classname>DifferentialStepper</classname> without
 	    adaptive stepsizing mechanism.  The solution of this
-	    &Stepper; is the first order.</para>
+	    &Stepper; is first order.</para>
 
 	    <para>This stepper calls
 	    <methodname>process</methodname>() method of each
 	    &Process; just once in a single
 	    step.</para>
 	    <para>Although this
-	    &Stepper; is not suitable for smooth
-	    continuous systems of differential equations, the simplicity
+	    &Stepper; is not suitable for high-accuracy solution of smooth
+	    continuous systems of differential equations, its simplicity
 	    of the algorithm is sometimes useful.</para>
 	  </listitem>
 	</itemizedlist>

@@ -1,4 +1,4 @@
-#!/usr/bin/env ecell3
+#!/usr/bin/env ecell3-python
 
 import sys
 import string

@@ -138,7 +138,7 @@ executing the &ESS;.
         <screen><prompt>$</prompt> <userinput>&ecell3-session; <optional>-f model.eml</optional></userinput>
 ecell3-session [ for E-Cell SE Version 3, on Python Version 2.2.1 ]
 Copyright (C) 1996-2002 Keio University.
-Written by Kouichi Takahashi <email>shafi@e-cell.org</email>
+Send feedback to Kouichi Takahashi <email>shafi@e-cell.org</email>
 <prompt>ecell3-session>>> </prompt>
         </screen>
         
@@ -1039,13 +1039,13 @@ Now the data is stored in a matrix variable with the same name as the file witho
       <title>How &ecell3-session; runs</title>
 
       <para>&ecell3-session; command runs on
-	&ecell3; interpreter command.
-	&ecell3; command is a thin wrapper to the
+	&ecell3-python; interpreter command.
+	&ecell3-python; command is a thin wrapper to the
 	&Python; interpreter.
-	&ecell3; command simply invokes a
+	&ecell3-python; command simply invokes a
 	&Python; interpreter command
 	specified at compile time.  Before executing
-	&Python;, &ecell3;
+	&Python;, &ecell3-python;
 	sets some environment variables to ensure that it can find
 	necessary &ecell &Python; extension
 	modules and the Standard &DM; Library. 
@@ -1055,14 +1055,14 @@ Now the data is stored in a matrix variable with the same name as the file witho
 	instantiate a <classname>ecell.Session</classname> object for
 	the simulator object.  </para>
 
-      <para>Thus basically &ecell3; is just a
+      <para>Thus basically &ecell3-python; is just a
 	&Python; interpreter, and frontend
 	components of &ecell SE run on this command.  To use
-	the &ecell Python Library from &ecell3;
+	the &ecell Python Library from &ecell3-python;
 	command, use <programlisting>import ecell</programlisting>
 	statement from the prompt:
 <informalexample>
-	  <screen><prompt>$ </prompt><userinput>ecell3</userinput> 
+	  <screen><prompt>$ </prompt><userinput>ecell3-python</userinput> 
 <computeroutput>Python 2.2.2 (#1, Feb 24 2003, 19:13:11)
 [GCC 3.2.2 20030222 (Red Hat Linux 3.2.2-4)] on linux2
 Type "help", "copyright", "credits" or "license" for more information.</computeroutput>
@@ -1071,7 +1071,7 @@ Type "help", "copyright", "credits" or "license" for more information.</computer
 </screen>
 	</informalexample>
 or, (on UNIX-like systems) execute a file starting with:
-<programlisting>#!/usr/bin/env ecell3
+<programlisting>#!/usr/bin/env ecell3-python
 import ecell
 [...]
 </programlisting> 
@@ -1085,12 +1085,12 @@ import ecell
       <title>Getting information about execution environment</title>
 
       <para>To get the current configuration of
-	&ecell3; command, invoke
-	&ecell3; command with a
+	&ecell3-python; command, invoke
+	&ecell3-python; command with a
 	<parameter>-h</parameter> option. This will print values of
 	some variables as well as usage of the command.
 <informalexample>
-	  <screen><prompt>$ </prompt><userinput>ecell3 -h</userinput>
+	  <screen><prompt>$ </prompt><userinput>ecell3-python -h</userinput>
 <computeroutput>[...]
 
 Configurations:
@@ -1116,12 +1116,12 @@ The '<computeroutput>PYTHON =</computeroutput>' line gives the path of the
     <sect2>
       <title>Debugging</title>
 
-      <para>To invoke &ecell3; command in debugging
+      <para>To invoke &ecell3-python; command in debugging
 	mode, set <envar>ECELL_DEBUG</envar> environment variable.
 	This runs the command on a debugger software.  If found,
 	<productname>GNU gdb</productname> is used as the
 	debugger. <envar>ECELL_DEBUG</envar> can be used for any
-	commands which run on &ecell3;, including
+	commands which run on &ecell3-python;, including
 	&ecell3-session; and
 	&gecell;.  For example, to run &ecell3-session; in debug mode on the shell prompt:
 <informalexample>
@@ -1165,14 +1165,14 @@ It automatically runs the program with the commandline options with '<parameter>
     <sect2>
       <title>Profiling</title>
 
-      <para>It is possible to run &ecell3; command
+      <para>It is possible to run &ecell3-python; command
 	in profiling mode, if the operating system has
 	<productname>GNU sprof</productname> command, and its C
 	library supports <envar>LD_PROFILE</envar> environmental
 	variable.  Currently it only supports per-shared object
 	profiling. (See GNU C Library Reference Manual)</para>
 
-      <para>To run &ecell3; in profiling mode, set
+      <para>To run &ecell3-python; in profiling mode, set
 	<envar>ECELL_PROFILE</envar> environment variable to
 	<emphasis>SONAME</emphasis> of the shared object.  SONAME of
 	a shared object file can be found by using

@@ -3,9 +3,10 @@
 prefix=@prefix@
 exec_prefix=@exec_prefix@
 bindir=@bindir@
+ecell3python=${bindir}/ecell3-python
 
 export OSOGOPATH=@libdir@/@PACKAGE@
 export PYTHONPATH="${OSOGOPATH}:${PYTHONPATH}"
 
-exec ${bindir}/ecell3 ${OSOGOPATH}/opengui.py $*
+exec ${ecell3python} ${OSOGOPATH}/opengui.py $*
 

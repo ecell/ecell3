@@ -98,5 +98,5 @@ clean-local:
 	rm -f $(BPLSRC)
 
 bin_SCRIPTS =\
-ecell3
+ecell3-python
 

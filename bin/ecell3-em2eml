@@ -1,4 +1,4 @@
-#!/usr/bin/env ecell3
+#!/usr/bin/env ecell3-python
 
 """
 A program for converting .em file to EML.

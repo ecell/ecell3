@@ -5,7 +5,7 @@
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN" 
 [
   <!ENTITY legal SYSTEM "legal.xml">
-  <!ENTITY appversion "3.1.96">
+  <!ENTITY appversion "3.1.97">
   <!ENTITY manrevision "0.0">
   <!ENTITY date "Nov 2002">
   <!ENTITY app "<application>E-Cell Simulation Environment</application>">
@@ -89,7 +89,7 @@
   <!ENTITY SystemPath "<wordasword>SystemPath</wordasword>">
   <!ENTITY VariableReference "<wordasword>VariableReference</wordasword>">
 
-  <!ENTITY ecell3 "<command>ecell3</command>">
+  <!ENTITY ecell3-python "<command>ecell3-python</command>">
   <!ENTITY ecell3-session "<command>ecell3-session</command>">
   <!ENTITY ecell3-em2eml "<command>ecell3-em2eml</command>">
   <!ENTITY ecell3-eml2em "<command>ecell3-eml2em</command>">

@@ -51,7 +51,7 @@ namespace libecs
   void Scheduler::registerStepper( StepperPtr aStepper )
   {
     Int anIndex( registerEvent( SchedulerEvent( aStepper->getCurrentTime(),
-				       aStepper ) ) );
+						aStepper ) ) );
 
     aStepper->setSchedulerIndex( anIndex );
   }
@@ -67,15 +67,15 @@ namespace libecs
   {
     SchedulerEventCref aTopEvent( theScheduleQueue.top() );
     const Time aCurrentTime( aTopEvent.getTime() );
-    const StepperPtr aStepperPtr( aTopEvent.getStepper() );
+    StepperPtr const aStepperPtr( aTopEvent.getStepper() );
 
     setCurrentTime( aCurrentTime );
  
     aStepperPtr->integrate( aCurrentTime );
     aStepperPtr->step();
+    aStepperPtr->dispatchInterruptions();
     aStepperPtr->log();
 
-    aStepperPtr->dispatchInterruptions();
 
     // Use higher precision for this procedure:
     const Time aStepInterval( aStepperPtr->getStepInterval() );
@@ -110,7 +110,8 @@ namespace libecs
     DEBUG_EXCEPTION( aScheduledTime + std::numeric_limits<Real>::epsilon()
 		     >= getCurrentTime(),
      		     SimulationError,
-     		     "Attempt to go past." );
+     		     "Attempt to go past by Stepper [" +
+		     aStepperPtr->getID() + "].");
 
     theScheduleQueue.changeOneKey( aStepperPtr->getSchedulerIndex(),
 				   SchedulerEvent( aScheduledTime, 
