@@ -39,7 +39,6 @@ phosphorylate AMPA receptors.
 
 README:     This file
 LTD.em:     Model file(em file) for this model
-LTD.eml:    Model file(eml file) for this model
 *.dm:       Process files(dm files) for this model
 
 
