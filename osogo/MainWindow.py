@@ -135,18 +135,26 @@ class MainWindow(Window):
         self.theRuleFileSelection.show_all()
 
     def loadRule( self, button_obj ) :
-        self.theStepperChecker = 1
-        self.theLoadModelChecker = 1
-        aFileName = self.theRuleFileSelection.get_filename()
-        self.theRuleFileSelection.hide()
-        self.theSession.printMessage( 'loading rule file %s\n' % aFileName )
-        aModelFile = open( aFileName )
-        self.theSession.loadModel( aModelFile )
-        aModelFile.close()
-#        self.theEntryListWindow.update()
-        self.theSession.theSimulator.initialize()
-        self.update()
-
+        if self.theLoadModelChecker == 0:
+            self.theStepperChecker = 1
+            self.theLoadModelChecker = 1
+            aFileName = self.theRuleFileSelection.get_filename()
+            self.theRuleFileSelection.hide()
+            self.theSession.printMessage( 'loading rule file %s\n' % aFileName)
+            aModelFile = open( aFileName )
+            self.theSession.loadModel( aModelFile )
+            aModelFile.close()
+            self.theSession.theSimulator.initialize()
+            self.update()
+        else:
+            self.theSession.theSimulator.initialize()
+            aFileName = self.theRuleFileSelection.get_filename()
+            self.theRuleFileSelection.hide()
+            self.theSession.printMessage( 'loading rule file %s\n' % aFileName)
+            aModelFile = open( aFileName )
+            self.theSession.loadModel( aModelFile )
+            aModelFile.close()
+            self.update()
     ###### Load Script ######
     def openScriptFileSelection( self, obj ) :
         self.theScriptFileSelection.show_all()
