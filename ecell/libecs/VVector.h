@@ -45,9 +45,12 @@
  *::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
  *	$Id$
  :	$Log$
+ :	Revision 1.12  2004/03/14 19:11:57  satyanandavel
+ :	sys/io.h is not available in IBM p650
+ :
  :	Revision 1.11  2003/09/28 06:17:23  satyanandavel
  :	MinGW version 3 already defines ssize_t
- :
+ :	
  :	Revision 1.10  2003/09/27 13:00:58  bgabor
  :	Windows compatibility fix.
  :	
@@ -124,11 +127,12 @@ typedef int ssize_t;
 #include <io.h>
 #elif	defined(__linux__)
 #include <unistd.h>
+#if 	!defined(__powerpc__)
 #include <sys/io.h>
+#endif
 #else
 #include <unistd.h>
-
-#endif
+#endif 
 
 
 
