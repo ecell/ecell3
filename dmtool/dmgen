@@ -31,11 +31,14 @@
 ##
 
 
+## standard module ##
+
 import sys
 import re
 import string
 import os
 import glob
+
 
 class DmFile:
       
@@ -53,15 +56,12 @@ class DmFile:
 
       def read( self, infile ):
             self.file = infile
-
             try:
                   fp = open( self.file, 'r' )
             except:	
                   print self.file, ": file not found."
                   sys.exit( 1 )
-
             while 1:
-
                   line = fp.readline()
 
                   # End of file
@@ -72,40 +72,37 @@ class DmFile:
                   if DmFile.commentRegex.match( line )\
                      or DmFile.nlRegex.match( line ):
                         continue
-
-                  match = DmFile.patternRegex.match( line )
+                  match = DmFile.patternRegex.match( line )               
                   if not match:
                         self.dic[self.prekey] = self.dic[self.prekey] + line
                         continue
 
-                  type  = match.group( 1 )
-                  key   = match.group( 2 )
+                  type  = match.group( 1 )                  
+                  key   = match.group( 2 )                                    
                   value = match.group( 3 )
-
-                  if key == self.prekey:
+                  
+                  if key == self.prekey:                  
                         self.keynum[key] = self.keynum[key] + 1
+                        #print key
                   else:
-                        self.keynum[key] = 1
-
+                        self.keynum[key] = 0
+                        #print key
+                        self.property[key] = {}
+                  
                   # get it!
                   self.dic[key] = value
 
-                  # array type 
+                  # array type                   
                   if type == "%":
                         list = string.splitfields( value, "," )
-                        n = 0
-                        for i in list:
-                              n = n+1
-                              self.property[key,self.keynum[key],n] = i
-
+                        self.property[key][self.keynum[key]] = list
                   self.prekey = key
-
 
 class DmTemplate:
 
       regex1 = re.compile( r'\#\(\@(\w+)\)' )
-      regex2 = re.compile( r'\#\(\$(\d+)\)' )
-      regex3 = re.compile( r'\#\(\%(\w+)\)' )
+      regex2 = re.compile( r'\#\(\%(.+)\)' )
+      regex3 = re.compile( r'\#\(\&(\w+:\w+)\)' )
 
       def __init__( self, templatedir ):
             self.templatedir = templatedir
@@ -114,90 +111,130 @@ class DmTemplate:
             self.dmfile = dmfile
 
       def write( self, dmfile, mastertemplate, outfile ):
-
             try:
                   fp = open( outfile, 'w' )
             except:
                   print "Couldn't write " + outfile + "."
                   sys.exit( 1 )
-
             buffer = self.generate( mastertemplate )
 
             # flush the buffer
             fp.write( buffer )
             fp.close()
 
-      def generate( self, key, no = 0 ):
+      def generate( self, keyname , no = 0):
             buffer = ''
-            template_file = self.templatedir + '/' + key
-
+            template_file = self.templatedir + '/' + keyname
             try:
                   tp = open( template_file, 'r' )
             except:
                   print "template " + template_file + ": not found."
                   sys.exit( 1 )
-
             while 1:
                   line = tp.readline()
+                  
                   if not line:
                         break
 
                   if DmTemplate.regex1.search( line ):
-                        line = self.sub( line )
+                        line = self.sub( line , no)                                                
                         buffer = buffer + line
                         continue
-                              
+
                   match = DmTemplate.regex2.search( line )
                   if match:
-                        keyno = match.group( 1 )
-                        value = self.dmfile.property[key,no+1,\
-                                                     string.atoi(keyno)]
-                        buffer = buffer + DmTemplate.regex2.sub( value, line )
+                        name = match.group( 1 )
+                        line = ''
+                        key = string.split( name , ':' )
+                        for i in range (len(self.dmfile.property[key[1]])): 
+                              line =  line + self.generate( key[0] , i)
+                        buffer = buffer + line
                         continue
+                        
+                  match = DmTemplate.regex3.search( line )
+                  if match:
+                                                
+                        line = self.sub( line ,no )
+                        buffer = buffer + line                        
+                        continue
+                  
+                  buffer = buffer + line
+            return buffer
+
+      def sub( self, line ,no = 0):
+            buffer = ''
+            while 1:
+
+                  flg = 0
+
+                  match = DmTemplate.regex1.search( line )
+                  if match:
+                        key = match.group( 1 )
+                        if not self.dmfile.dic.has_key( key ):
+                              print "Keyword " + key + " not found."
+                              sys.exit( 1 )
+                        line = string.replace( line , '#(@'+key+')', self.dmfile.dic[key])
+                        flg = 1
+            
+                  match = DmTemplate.regex2.search( line )
+                  if match:
+                        line = ''
+                        flg = 1
 
                   match = DmTemplate.regex3.search( line )
                   if match:
                         key = match.group( 1 )
-                        for i in range( self.dmfile.keynum[key] ):
-                              buffer = buffer + self.generate( key, i )
-                        continue
+			subkey = string.split(key , ':')
+			if not self.dmfile.dic.has_key( subkey[0] ):
+                              print "Keyword " + key + " not found."
+                              sys.exit( 1 )			
+			
+			if subkey[1] == 'c':
+                              
+			      subname = string.strip(self.dmfile.property[subkey[0]][no][1] )
+		              subname = self.checkParameterType( subname )
+			else:
+			      subname = string.strip(self.dmfile.property[subkey[0]][no][string.atoi(subkey[1])] )
+                        
+			line = string.replace( line , '#(&'+key+')', subname)
+                        flg = 1
 
-                  # regular line
-                  buffer = buffer + line
-
-
-            return buffer
-
-      def sub( self, line ):
-            buffer = ''
-            match = DmTemplate.regex1.search( line )
-            key = match.group( 1 )
-
-            if not self.dmfile.dic.has_key( key ):
-                  print "Keyword " + key + " not found."
-                  sys.exit( 1 )
-
-            buffer = DmTemplate.regex1.sub( self.dmfile.dic[key], line )
+                  if flg == 0:
+                        buffer = line
+                        break
 
             return buffer
+	             
 
+      def checkParameterType( self, type):      
+	
+	    if type == 'Int':
+		  type = '0'
+		  
+	    elif type == 'Float':
+     	          type = '0.0'
+	    
+	    elif type == 'String':	
+	          type = ' /'/' '
+	    else:
+		print type+' is not defined.'
 
+	    return type
 
 if __name__ == "__main__":
       
       import getopt
-
+      
       def printHelp():
             print sys.argv[0], \
                   """[-h] [-d outdir] [-o outprefix] [-t templatedir]"""\
                   """infile"""
 
-
+      outprefix = ''
       outdir = '.'
-      outprefix = 'out'
-      templatedir = './'
+      templatedir = './templates/reactor'
 
-      masterprefix = 'MASTER'
+      masterprefix = 'reactor'
 
       try:
             opts, pargs = getopt.getopt( sys.argv[1:],\
@@ -205,7 +242,7 @@ if __name__ == "__main__":
       except getopt.GetoptError, e:
             print e
             sys.exit( 1 )
-            
+
       for opt, arg in opts:
             if opt == '-h':
                   printHelp()
@@ -219,28 +256,101 @@ if __name__ == "__main__":
             else:
                   print "invalid option:", opt
                   sys.exit( 1 )
-
+      
       infilename = pargs[0]
+      
       if infilename == '':
             printHelp()
             sys.exit( 1 )
-                                    
+      
       dmfile = DmFile( infilename )
+      
       dmtemplate = DmTemplate( templatedir )
       dmtemplate.setDmFile( dmfile )
 
       # mastertemplates = templatedir/MASTER.*
+
       mastertemplates = templatedir + "/" + masterprefix + ".*"
+
       os.path.expanduser( mastertemplates )
       os.path.expandvars( mastertemplates )
       mastertemplates = glob.glob( mastertemplates )
-
+      
       if len( mastertemplates ) == 0:
-            print "no template found in [" + self.templatedir + "]."
+            print "no template found in [" + templatedir + "]."
             sys.exit( 1 )
 
       # generate file for each master template
+
+      filename = string.split( infilename , '.')     
+
+      if outprefix == '':
+            outprefix = filename[0]
+
       for template in mastertemplates:
-            prefix, ext = os.path.splitext( template )
-            outfile = outdir + '/' + outprefix + ext
+            
+            templatesparts = string.split( template , '/')             
+            dmname = string.split( templatesparts[-1], '.')
+            outfile = outdir + '/' + outprefix + '.' + dmname[-2]   
+            print outfile
             dmtemplate.write( dmfile, os.path.basename( template ), outfile )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
