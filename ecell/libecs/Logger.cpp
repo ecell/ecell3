@@ -163,7 +163,6 @@ namespace libecs
 
   void Logger::log( RealParam aTime )
   {
-    puts("l");
     ++theStepCounter;
 
     if( ( theStepCounter >= theMinimumStep ) 	 // step condition
