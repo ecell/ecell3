@@ -103,9 +103,8 @@ class EntityListWindow(OsogoWindow):
 
 
 	def update( self ):
-		self.theEntityListStore.clear()
-
-		self.updateSystemSelection()
+#		self.theEntityListStore.clear()
+#		self.updateSystemSelection()
 		self.thePropertyWindow.update()
 
             
@@ -113,7 +112,6 @@ class EntityListWindow(OsogoWindow):
 		newlabel = aSystemFullID[ID] 
 	 
 		iter  = self.theSysTreeStore.append( aParentTree )
-#		depth = self.theSysTreeStore.iter_depth ( iter )
 
 		self.theSysTreeStore.set_value( iter, 0, newlabel )
 		key = str( self.theSysTreeStore.get_path( iter ) )
@@ -144,7 +142,7 @@ class EntityListWindow(OsogoWindow):
 
 		self.updateEntityList( aSelectedSystemIter )
 
-		#		self.selectSystem( aSelectedSystemIter )
+		self.selectSystem( aSelectedSystemIter )
 
 
 	def updateEntityList( self, aSelectedSystemIter ):
