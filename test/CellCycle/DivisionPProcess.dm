@@ -19,7 +19,7 @@ defineMethod( 'initialize', '''
 ''' )
 
 defineMethod( 'process', '''
-  //  static Real prev( 0 ); better to remove static if this process is used only once in the model
+  Real prev( 0 ); // removed static 
   int counter = 0; // for debugging purposes!!!
   Real D( 1.026/m - 32 );
   Real f( exp(-m * D) );

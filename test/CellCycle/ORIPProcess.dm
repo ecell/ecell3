@@ -15,7 +15,7 @@ defineMethod( 'initialize', '''
 ''' )
 
 defineMethod( 'process', '''
-  static Real prev( 0 );
+  Real prev( 0 ); // removed static
 
   const Real E1( C0.getVariable()->getConcentration() ); // const?
   const Real E2( C1.getVariable()->getConcentration() ); // const?

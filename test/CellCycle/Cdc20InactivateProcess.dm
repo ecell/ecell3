@@ -18,9 +18,9 @@ defineMethod( 'initialize', '''
 defineMethod( 'process', '''
   const Real S( S0.getVariable()->getConcentration() );
   const Real E2( C1.getVariable()->getConcentration() );
-  static Real v( 0 ); // static
-  static Int a( 0 ); // static
-  static Real time( 0 ); // static
+  Real v( 0 ); // removed static 
+  Int a( 0 ); // removed static 
+  Real time( 0 ); // removed static 
 
   if(E2 >= 1)
   {
