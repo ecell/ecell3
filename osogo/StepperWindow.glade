@@ -29,6 +29,7 @@
 	  <child>
 	    <widget class="GtkFrame" id="StepperIDFrame">
 	      <property name="border_width">3</property>
+	      <property name="width_request">2</property>
 	      <property name="visible">True</property>
 	      <property name="label_xalign">0.03</property>
 	      <property name="label_yalign">0.5</property>
@@ -91,6 +92,8 @@
 	  <child>
 	    <widget class="GtkFrame" id="propertyFrame">
 	      <property name="border_width">3</property>
+	      <property name="width_request">243</property>
+	      <property name="height_request">104</property>
 	      <property name="visible">True</property>
 	      <property name="label_xalign">0.03</property>
 	      <property name="label_yalign">0.5</property>
@@ -106,6 +109,7 @@
 
 		  <child>
 		    <widget class="GtkTreeView" id="property_list">
+		      <property name="width_request">150</property>
 		      <property name="visible">True</property>
 		      <property name="can_focus">True</property>
 		      <property name="headers_visible">True</property>
@@ -195,9 +199,6 @@
 		  <property name="has_frame">True</property>
 		  <property name="invisible_char" translatable="yes">*</property>
 		  <property name="activates_default">False</property>
-		  <signal name="copy_clipboard" handler="on_value_entry_copy_clipboard"/>
-		  <signal name="cut_clipboard" handler="on_value_entry_cut_clipboard"/>
-		  <signal name="paste_clipboard" handler="on_value_entry_paste_clipboard"/>
 		</widget>
 		<packing>
 		  <property name="padding">20</property>
