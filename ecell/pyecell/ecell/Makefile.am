@@ -20,7 +20,7 @@ ObjectStub.py\
 DataFileManager.py\
 DataFile.py\
 ECDDataFile.py\
-ECS.py\
+ecs_constants.py\
 ecs.py\
 ecsinit.py\
 emc.py\

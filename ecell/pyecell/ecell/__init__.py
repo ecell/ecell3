@@ -11,7 +11,7 @@ __all__ = [ 'ECS',
  'DataFileManager', 
  'DataFile' ] 
 
-from ECS import *
+from ecs_constants import *
 from ECDDataFile import *
 from EntityStub import *
 from StepperStub import *

@@ -8,7 +8,7 @@ from LoggerStub import *
 from StepperStub import *
 
 import string
-from ECS import *
+from ecs_constants import *
 
 def createFullID( fullidstring ):
 

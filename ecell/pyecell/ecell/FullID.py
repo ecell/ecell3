@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 
-from ECS import *
+from ecs_constants import *
 
 import string
 import types

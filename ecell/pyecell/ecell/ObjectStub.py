@@ -33,7 +33,7 @@
 #
 
 
-from ECS import *
+from ecs_constants import *
 
 # ---------------------------------------------------------------
 # ObjectStub
