@@ -191,6 +191,7 @@ class MEMainWindow( ListWindow ):
         topFrame.set_data("ParentWindow",aWindow)
         self.lockTabs = False
         self.presentTab(aWindow)
+        self.theModelEditor.setupDNDDest( topFrame )
         self.restoreMessageWindow()
         
  

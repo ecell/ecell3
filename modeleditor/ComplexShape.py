@@ -20,6 +20,8 @@ class ComplexShape:
         self.shapeMap = {}
         self.lastmousex = 0
         self.lastmousey = 0
+        self.imageOrigins = {}
+        self.shapeLock = {}
         
         self.buttonpressed = False
         self.sumdeltax=0
@@ -67,7 +69,10 @@ class ComplexShape:
         
         for aShapeName in self.shapeMap.keys():
             self.shapeMap[ aShapeName ].destroy()
-        
+        self.theRoot.destroy()
+        self.shapeMap = {}
+        self.imageOrigins = {}
+        self.shapeLock = {}
         
 
     def selected( self ):
@@ -142,6 +147,8 @@ class ComplexShape:
                 self.resizeLine( aDescriptor )
             elif aDescriptor[SD_TYPE] == CV_BPATH:
                 self.resizeBpath( aDescriptor )
+            elif aDescriptor[SD_TYPE] == CV_IMG:
+                self.resizeImage( aDescriptor )
         
         
     def resizeBpath( self, aDescriptor ):
@@ -301,18 +308,39 @@ class ComplexShape:
 
         imgShape = self.theRoot.add( gnome.canvas.CanvasWidget, x=x1, y=y1, width = aWidth, height = aHeight, widget = eventBox )
         self.shapeMap[ aDescriptor[ SD_NAME ] ] = imgShape        
+        self.imageOrigins[ aDescriptor[ SD_NAME ] ] = [ x1, y1 ]
+        self.shapeLock [ aDescriptor[ SD_NAME ] ] = False
+
+
+    def resizeImage( self, aDescriptor ):
+        (x1, y1) = aDescriptor[SD_SPECIFIC][SPEC_POINTS]
+        aShape = self.shapeMap[ aDescriptor[ SD_NAME ] ]
+        (x1, y1) = aShape.w2i( x1, y1 )
+        aShape.set_property( 'x', x1 )
+        aShape.set_property( 'y', y1 )
         
 
     def img_event( self, *args ):
         item = args[0]
-        event = args[1]
-        groupx, groupy = self.theRoot.get_property("x") , self.theRoot.get_property("y")
-        allo = item.get_allocation()
-        (a,b,c,d,offsx, offsy)= self.theRoot.i2c_affine( (0,0,0,0,0,0))
+        event = ArtifitialEvent( args[1] )
+#        groupx, groupy = self.theRoot.get_property("x") , self.theRoot.get_property("y")
+#        allo = item.get_allocation()
+#        (a,b,c,d,offsx, offsy)= self.theRoot.i2c_affine( (0,0,0,0,0,0))
 
-        event.x, event.y = groupx - offsx + event.x+allo.x, groupy - offsy + event.y+allo.y
-        user_data = args[2]
-        self.rect_event( item, event, user_data )
+#        event.x, event.y = groupx - offsx + event.x+allo.x, groupy - offsy + event.y+allo.y
+        shapeName = args[2]
+        shape = self.shapeMap[ shapeName ]
+        origx, origy = self.imageOrigins[ shapeName ]
+        zerox, zeroy = shape.w2i( 0,0 )
+
+        relx, rely = shape.w2i( event.x, event.y )
+        pixx, pixxy, flags =self.theCanvas.getCanvas().bin_window.get_pointer( )
+        worldx, worldy = self.theCanvas.getCanvas().window_to_world( pixx,pixxy)
+        event.x =  worldx
+        event.y =  worldy
+
+
+        self.rect_event( item, event, shapeName )
         
     def enter_img( self, *args ):
         self.thePathwayCanvas.beyondcanvas = False
@@ -499,3 +527,13 @@ class ComplexShape:
 
 
         
+class ArtifitialEvent:
+    def __init__( self, anEvent ):
+        self.type = anEvent.type
+        self.x = anEvent.x
+        self.y = anEvent.y
+        self.state = anEvent.state
+        self.time = anEvent.time
+        if anEvent.type not in [ gtk.gdk.ENTER_NOTIFY, gtk.gdk.MOTION_NOTIFY ]:
+            self.button = anEvent.button
+            

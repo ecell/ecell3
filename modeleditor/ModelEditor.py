@@ -351,6 +351,7 @@ class ModelEditor:
         self.__savedLayoutManager = self.theLayoutManager
         self.__savedModelStore = self.theModelStore
         self.__savedModelName = self.theModelName
+        self.__savedModelFileName = self.theModelFileName
         self.__savedModelHasName = self.modelHasName
         self.__savedChangesSaved = self.changesSaved
         self.__cwd = os.getcwd()
@@ -365,6 +366,7 @@ class ModelEditor:
         self.theLayoutManager = self.__savedLayoutManager
         self.__createPathwayWindow()
         self.theModelName = self.__savedModelName 
+        self.theModelFileName = self.__savedModelFileName
         self.modelHasName = self.__savedModelHasName 
         self.changesSaved = self.__savedChangesSaved 
         self.__clearModelStoreAndLayoutSave()
@@ -751,7 +753,38 @@ class ModelEditor:
             return False
         return True
 
+    def setupDNDDest( self, aWidget ):
+        """
+        in: any widget will be set up DND destination for dropping propertyvalues
+        """
+        destTarget = [ ( DND_PROPERTYVALUELIST_TYPE, 0, 800 ) ]
+        aWidget.drag_dest_set( gtk.DEST_DEFAULT_ALL, destTarget, gtk.gdk.ACTION_COPY )
+        aWidget.connect("drag-data-received", self.__data_received )
+        
+    def __data_received( self, *args ):
+        # selection data is expecyed in a format of
+        # "modelfile1 resultfile1 fullpn1 value range_min range_max,modelfile2 resultfile2 fullpn2 value range_min range_max"
+        
+        selectionData = args[4]
+        selectionList = map(lambda x: x.split(" "), selectionData.data.split(",") )
+        for anEntry in selectionList:
+            fullPN = anEntry[2]
+            newValue = anEntry[3]
+            
+            if fullPN.split(":")[0] == ME_STEPPER_TYPE:
+                aCommand = ChangeStepperProperty( self, fullPN.split("")[1], fullPN.split(":")[0], newValue )
+            else:
+                aCommand = ChangeEntityProperty( self, fullPN, newValue )
 
+            if aCommand.isExecutable():
+                self.doCommandList( [ aCommand ] )
+                self.printMessage( "Property %s updated to %s."%(fullPN, newValue ), ME_PLAINMESSAGE )
+            else:
+                self.printMessage( "Illegal value or property doesnot exist for %s. Property was not updated!"%fullPN, ME_ERROR )
+
+        
+        
+    
 
     def getUniqueEntityName( self, aType, aSystemPath ):
         """
@@ -1180,6 +1213,7 @@ class ModelEditor:
 
         # set name 
         self.theModelName = ''
+        self.theModelFileName = ''
         self.theUndoQueue = None
         self.theRedoQueue = None
         self.changesSaved = True

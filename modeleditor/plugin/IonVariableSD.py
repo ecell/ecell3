@@ -27,13 +27,15 @@ class IonVariableSD( ShapeDescriptor):
                     RING_BOTTOM : [5,6],
                     RING_LEFT : [7,8],
                     RING_RIGHT : [9,10],
-                    "image" : [0]
+                    "image" : [5],
+                    "image2" : [9]
                     }
 
         self.theDescriptorList = {\
         #NAME, TYPE, FUNCTION, COLOR, Z, SPECIFIC, PROPERTIES 
 #        'frame' : ['frame', CV_ELL, SD_FILL, SD_FILL, 7, [ [], 1 ] ],
         "image" : ["image",CV_IMG, SD_FILL, SD_FILL, 3, [ [], "IonVariableSD.png" ] ],\
+        "image2" : ["image2",CV_IMG, SD_FILL, SD_FILL, 3, [ [], "IonVariableSD.png" ] ],\
         'text' : ['text', CV_TEXT, SD_FILL, SD_TEXT, 5, [ [], aLabel ] ],\
         RING_TOP : [RING_TOP, CV_RECT, SD_RING, SD_OUTLINE, 3, [ [],0 ] ],\
         RING_BOTTOM : [RING_BOTTOM, CV_RECT, SD_RING, SD_OUTLINE, 3, [ [], 0] ],\

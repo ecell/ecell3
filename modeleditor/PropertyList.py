@@ -72,6 +72,9 @@ class PropertyList( ViewComponent ):
                      gobject.TYPE_STRING,CHGD_PROP_IND_TYPE)
         self.theListStore.set_sort_column_id(9, gtk.SORT_ASCENDING)
         self['theTreeView'].set_model(self.theListStore)
+        sourceTargets = [ (DND_PROPERTYLIST_TYPE, 0, 800)]
+        self['theTreeView'].enable_model_drag_source( gtk.gdk.BUTTON1_MASK, sourceTargets, gtk.gdk.ACTION_COPY )
+        self['theTreeView'].connect("drag-data-get", self.__drag_data_get )
         self.noActivate = False
         renderer = gtk.CellRendererText()
         renderer.connect('edited', self.__nameEdited)
@@ -146,6 +149,23 @@ class PropertyList( ViewComponent ):
         self.addButton=self.getWidget('Add')
         self.delButton=self.getWidget('Delete')
         self.update()             
+        
+
+    def __drag_data_get( self, *args ):
+    	widget = args[0]
+    	data_sel = args[2]
+        filename = self.theModelEditor.theModelFileName 
+        resultfilename = filename + '.dat'
+        stringTupple = []
+        for aName in self.theSelection:
+            value = self.getPropertyValue( aName )
+            fullpn = self.theDisplayedEntity + ":" + aName
+            stringTupple.append( " ".join( [ filename, resultfilename, fullpn, str( value ), "0", "0" ] ) )
+        selectionValue = ",".join( stringTupple )
+
+    	data_sel.set( "text", 8, selectionValue )
+    	
+        
         
     def hideButtons( self ):
         self['attachment_box'].remove( self['hbox1'] )
