@@ -35,55 +35,55 @@
 namespace libecs
 {
 
-  UVariableStringData::
-  UVariableStringData( const Real f )
+  UConstantStringData::
+  UConstantStringData( const Real f )
     :
     theString( toString<Real>( f ) )
   {
     ; // do nothing
   }
 
-  UVariableStringData::UVariableStringData( const Int i )
+  UConstantStringData::UConstantStringData( const Int i )
     :
     theString( toString<Int>( i ) )
   {
     ; // do nothing
   }
 
-  const Real UVariableStringData::asReal() const
+  const Real UConstantStringData::asReal() const
   {
     return stringTo<Real>( theString );
   }
 
-  const Int UVariableStringData::asInt() const
+  const Int UConstantStringData::asInt() const
   {
     return stringTo<Int>( theString );
   }
 
 
-  UVariableRealData::
-  UVariableRealData( StringCref str )
+  UConstantRealData::
+  UConstantRealData( StringCref str )
     :
     theReal( stringTo<Real>( str ) )
   {
     ; // do nothing
   }
 
-  const String UVariableRealData::asString() const
+  const String UConstantRealData::asString() const
   {
     return toString<Real>( theReal );
   }
 
-  UVariableIntData::
-  UVariableIntData( StringCref str )
+  UConstantIntData::
+  UConstantIntData( StringCref str )
     :
     theInt( stringTo<Int>( str ) )
   {
     ; // do nothing
   }
 
-  UVariableIntData::
-  UVariableIntData( const Real f )
+  UConstantIntData::
+  UConstantIntData( const Real f )
     :
     // FIXME: range check?
     theInt( static_cast<Int>( f ) )
@@ -92,7 +92,7 @@ namespace libecs
   }
 
 
-  const String UVariableIntData::asString() const
+  const String UConstantIntData::asString() const
   {
     return toString<Int>( theInt );
   }

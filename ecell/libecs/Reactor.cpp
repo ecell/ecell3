@@ -114,7 +114,7 @@ namespace libecs
 
   const Message Reactor::getSubstrateList( StringCref keyword )
   {
-    UVariableVector aList;
+    UConstantVector aList;
   
     for( ReactantVectorConstIterator i = theSubstrateList.begin() ;
 	 i != theSubstrateList.end() ; ++i )
@@ -127,7 +127,7 @@ namespace libecs
 
   const Message Reactor::getProductList( StringCref keyword )
   {
-    UVariableVector aList;
+    UConstantVector aList;
   
     for( ReactantVectorConstIterator i = theProductList.begin() ;
 	 i != theProductList.end() ; ++i )
@@ -140,7 +140,7 @@ namespace libecs
 
   const Message Reactor::getEffectorList( StringCref keyword )
   {
-    UVariableVector aList;
+    UConstantVector aList;
   
     for( ReactantVectorConstIterator i = theEffectorList.begin() ;
 	 i != theEffectorList.end() ; ++i )
@@ -153,7 +153,7 @@ namespace libecs
 
   const Message Reactor::getCatalystList( StringCref keyword )
   {
-    UVariableVector aList;
+    UConstantVector aList;
   
     for( ReactantVectorConstIterator i = theCatalystList.begin() ;
 	 i != theCatalystList.end() ; ++i )
@@ -171,7 +171,7 @@ namespace libecs
 
   const Message Reactor::getInitialActivity( StringCref keyword )
   {
-    return Message( keyword, UVariable( theInitialActivity ) );
+    return Message( keyword, UConstant( theInitialActivity ) );
   }
 
   void Reactor::appendSubstrate( FullIDCref fullid, int coefficient )

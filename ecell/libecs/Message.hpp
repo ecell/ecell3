@@ -45,7 +45,7 @@ namespace libecs
 
   /**
      A data packet for communication among C++ objects consisting
-     of a keyword and a body. The body is a list of UVariables.
+     of a keyword and a body. The body is a list of UConstants.
 
      @see MessageInterface
      @see AbstractMessageSlot
@@ -62,8 +62,8 @@ namespace libecs
       ; // do nothing
     }
 
-    Message( StringCref keyword, UVariableVectorCref uvl ); 
-    Message( StringCref keyword, UVariableCref uv ); 
+    Message( StringCref keyword, UConstantVectorCref uvl ); 
+    Message( StringCref keyword, UConstantCref uv ); 
 
     // copy procedures
     Message( MessageCref message );
@@ -82,22 +82,22 @@ namespace libecs
     /**
        @return 
     */
-    UVariableVectorRef getBody()
+    UConstantVectorRef getBody()
     {
       return theBody;
     }
 
-    UVariableVectorCref getBody() const
+    UConstantVectorCref getBody() const
     {
       return theBody;
     }
 
-    UVariableRef operator[]( int i )
+    UConstantRef operator[]( int i )
     {
       return theBody.operator[]( i );
     }
 
-    UVariableCref operator[]( int i ) const
+    UConstantCref operator[]( int i ) const
     {
       return theBody.operator[]( i );
     }
@@ -105,7 +105,7 @@ namespace libecs
   private:
 
     String theKeyword;
-    UVariableVector theBody;
+    UConstantVector theBody;
 
   };
 

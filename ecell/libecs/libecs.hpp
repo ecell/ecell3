@@ -73,14 +73,14 @@ namespace libecs
   DECLARE_CLASS( Message );
   DECLARE_CLASS( AbstractMessageSlot );
   DECLARE_CLASS( MessageInterface );
-  DECLARE_CLASS( UVariable );
+  DECLARE_CLASS( UConstant );
   DECLARE_CLASS( LoggerBroker );
   DECLARE_CLASS( Logger );
   DECLARE_CLASS( DataPoint );
 
   // containers
 
-  DECLARE_VECTOR( UVariable, UVariableVector );
+  DECLARE_VECTOR( UConstant, UConstantVector );
 
 
   // exceptions

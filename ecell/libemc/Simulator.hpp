@@ -65,7 +65,7 @@ namespace libemc
 		      libecs::StringCref          systempath,
 		      libecs::StringCref          id,
 		      libecs::StringCref          propertyname,
-		      libecs::UVariableVectorCref data )
+		      libecs::UConstantVectorCref data )
     {
       theSimulatorImplementation->setProperty( type,
 					       systempath,
@@ -74,7 +74,7 @@ namespace libemc
 					       data );
     }
 
-    const libecs::UVariableVector 
+    const libecs::UConstantVector 
     getProperty( libecs::PrimitiveType type,
 		 libecs::StringCref    systempath,
 		 libecs::StringCref    id,

@@ -159,7 +159,7 @@ namespace libecs
 
     void appendData( const containee_type& );
 
-    void appendData( RealCref t, UVariableCref v );
+    void appendData( RealCref t, UConstantCref v );
 
 
   protected:

@@ -74,7 +74,7 @@ namespace libemc
 						  StringCref    systempath,
 						  StringCref    id,
 						  StringCref    property,
-						  UVariableVectorCref data )
+						  UConstantVectorCref data )
   {
     EntityPtr anEntityPtr( getRootSystem().getEntity( FullID( type, 
 							      systempath, 
@@ -83,7 +83,7 @@ namespace libemc
   }
 
 
-  const UVariableVector 
+  const UConstantVector 
   LocalSimulatorImplementation::getProperty( PrimitiveType type,
 					     StringCref    systempath,
 					     StringCref    id,

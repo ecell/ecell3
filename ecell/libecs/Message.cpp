@@ -37,7 +37,7 @@ namespace libecs
 
   ////////////////////// Message
 
-  Message::Message( StringCref keyword, UVariableVectorCref uvl)
+  Message::Message( StringCref keyword, UConstantVectorCref uvl)
     : 
     theKeyword( keyword ),
     theBody( uvl )
@@ -45,7 +45,7 @@ namespace libecs
     ; // do nothing
   }
 
-  Message::Message( StringCref keyword, UVariableCref uv )
+  Message::Message( StringCref keyword, UConstantCref uv )
     :
     theKeyword( keyword )
   {

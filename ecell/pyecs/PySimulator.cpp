@@ -108,11 +108,11 @@ Object PySimulator::setProperty( const Py::Tuple& args )
 
   const Py::Tuple aMessageSequence( static_cast<Py::Sequence>( args[1] ) );
   
-  UVariableVector aMessageBody( aMessageSequence.size() );
+  UConstantVector aMessageBody( aMessageSequence.size() );
   for( Py::Tuple::const_iterator i = aMessageSequence.begin() ;
        i != aMessageSequence.end() ; ++i )
     {
-      aMessageBody.push_back( UVariable( (*i).as_string() ) );
+      aMessageBody.push_back( UConstant( (*i).as_string() ) );
     }
 
   Simulator::setProperty( aType, aPath, anID, aPropertyName, aMessageBody );
@@ -137,33 +137,33 @@ Object PySimulator::getProperty( const Py::Tuple& args )
   const String aPropertyName
     ( static_cast<Py::String>( aFullPropertyName[3] ) );
 
-  UVariableVector aVector( Simulator::getProperty( aType,
+  UConstantVector aVector( Simulator::getProperty( aType,
 						   aPath,
 						   anID,
 						   aPropertyName ) );
 
-  UVariableVector::size_type aSize( aVector.size() );
+  UConstantVector::size_type aSize( aVector.size() );
 
   Py::Tuple aTuple( aSize );
 
-  for( UVariableVector::size_type i( 0 ) ; i < aSize ; ++i )
+  for( UConstantVector::size_type i( 0 ) ; i < aSize ; ++i )
     {
-      UVariableCref aUVariable( aVector[i] );
+      UConstantCref aUConstant( aVector[i] );
       Py::Object anObject;
 
-      switch( aUVariable.getType() )
+      switch( aUConstant.getType() )
 	{
-	case UVariable::REAL:
-	  anObject = Py::Float( aUVariable.asReal() );
+	case UConstant::REAL:
+	  anObject = Py::Float( aUConstant.asReal() );
 	  break;
 
-	case UVariable::INT:
-	  anObject = Py::Int( static_cast<long int>( aUVariable.asInt() ) );
+	case UConstant::INT:
+	  anObject = Py::Int( static_cast<long int>( aUConstant.asInt() ) );
 	  break;
 
-	case UVariable::STRING:
-	case UVariable::NONE:
-	  anObject = Py::String( aUVariable.asString() );
+	case UConstant::STRING:
+	case UConstant::NONE:
+	  anObject = Py::String( aUConstant.asString() );
 	  break;
 
 	default:

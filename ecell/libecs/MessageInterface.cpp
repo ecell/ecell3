@@ -50,12 +50,12 @@ namespace libecs
 
   const Message MessageInterface::getPropertyList( StringCref keyword )
   {
-    UVariableVector aPropertyList;
+    UConstantVector aPropertyList;
 
     for( PropertyMapConstIterator i = thePropertyMap.begin() ; 
 	 i != thePropertyMap.end() ; ++i )
       {
-	aPropertyList.push_back( UVariable( i->first ) );
+	aPropertyList.push_back( UConstant( i->first ) );
       }
 
     return Message( keyword, aPropertyList );
@@ -63,7 +63,7 @@ namespace libecs
 
   const Message MessageInterface::getPropertyAttributes( StringCref keyword )
   {
-    UVariableVector aPropertyList;
+    UConstantVector aPropertyList;
 
     for( PropertyMapConstIterator i = thePropertyMap.begin() ; 
 	 i != thePropertyMap.end() ; ++i )
@@ -80,7 +80,7 @@ namespace libecs
 	    anAttributeFlag |= GETABLE;
 	  }
 
-	aPropertyList.push_back( UVariable( anAttributeFlag ) );
+	aPropertyList.push_back( UConstant( anAttributeFlag ) );
       }
 
     return Message( keyword, aPropertyList );

@@ -65,18 +65,18 @@ namespace libecs
 
   const Message Entity::getClassName( StringCref keyword )
   {
-    return Message( keyword, UVariable( getClassName() ) );
+    return Message( keyword, UConstant( getClassName() ) );
   }
 
   const Message Entity::getID( StringCref keyword )
   {
-    return Message( keyword, UVariable( getID() ) );
+    return Message( keyword, UConstant( getID() ) );
   }
 
   const Message Entity::getFullID( StringCref keyword )
   {
     FullID aFullID = getFullID();
-    UVariableVector aVector( 3 );
+    UConstantVector aVector( 3 );
 
     aVector[0] = static_cast<Int>( aFullID.getPrimitiveType().getType() );
     aVector[1] = aFullID.getSystemPath().getString();
@@ -87,17 +87,17 @@ namespace libecs
 
   const Message Entity::getName( StringCref keyword )
   {
-    return Message( keyword, UVariable( getName() ) );
+    return Message( keyword, UConstant( getName() ) );
   }
 
   const Message Entity::getActivity( StringCref keyword )
   {
-    return Message( keyword, UVariable( getActivity() ) );
+    return Message( keyword, UConstant( getActivity() ) );
   }
 
   const Message Entity::getActivityPerSecond( StringCref keyword )
   {
-    return Message( keyword, UVariable( getActivityPerSecond() ) );
+    return Message( keyword, UConstant( getActivityPerSecond() ) );
   }
 
   Real Entity::getActivity() 

@@ -39,19 +39,19 @@
 namespace libecs
 {
 
-  DECLARE_CLASS( UVariableData );
-  DECLARE_CLASS( UVariableStringData );
-  DECLARE_CLASS( UVariableRealData );
-  DECLARE_CLASS( UVariableIntData );
+  DECLARE_CLASS( UConstantData );
+  DECLARE_CLASS( UConstantStringData );
+  DECLARE_CLASS( UConstantRealData );
+  DECLARE_CLASS( UConstantIntData );
 
 
 
-  class UVariableData
+  class UConstantData
   {
 
   public:
 
-    virtual ~UVariableData()
+    virtual ~UConstantData()
     {
       ; // do nothing
     }
@@ -60,36 +60,36 @@ namespace libecs
     virtual const Real   asReal()  const = 0;
     virtual const Int    asInt()    const = 0;
 
-    virtual UVariableDataPtr createClone() const = 0;
+    virtual UConstantDataPtr createClone() const = 0;
 
   protected:
   
-    UVariableData( UVariableDataCref ) {}
-    UVariableData() {}
+    UConstantData( UConstantDataCref ) {}
+    UConstantData() {}
 
   private:
 
-    UVariableCref operator= ( UVariableCref );
+    UConstantCref operator= ( UConstantCref );
 
   };
 
 
-  class UVariableStringData : public UVariableData
+  class UConstantStringData : public UConstantData
   {
   
   public:
 
-    UVariableStringData( StringCref  str ) 
+    UConstantStringData( StringCref  str ) 
       : 
       theString( str ) 
     {
       ; // do nothing
     }
   
-    UVariableStringData( const Real f );
-    UVariableStringData( const Int   i );
+    UConstantStringData( const Real f );
+    UConstantStringData( const Int   i );
 
-    UVariableStringData( UVariableDataCref uvi )
+    UConstantStringData( UConstantDataCref uvi )
       :
       theString( uvi.asString() )
     {
@@ -100,9 +100,9 @@ namespace libecs
     virtual const Real  asReal() const;
     virtual const Int    asInt() const;
 
-    virtual UVariableDataPtr createClone() const
+    virtual UConstantDataPtr createClone() const
     {
-      return new UVariableStringData( *this );
+      return new UConstantStringData( *this );
     }
 
   private:
@@ -111,20 +111,20 @@ namespace libecs
 
   };
 
-  class UVariableRealData : public UVariableData
+  class UConstantRealData : public UConstantData
   {
 
   public:
 
-    UVariableRealData( StringCref str );
-    UVariableRealData( const Real      f ) 
+    UConstantRealData( StringCref str );
+    UConstantRealData( const Real      f ) 
       : 
       theReal( f ) 
     {
       ; // do nothing
     }
 
-    UVariableRealData( const Int        i ) 
+    UConstantRealData( const Int        i ) 
       : 
       theReal( static_cast<Real>( i ) )
     {
@@ -136,9 +136,9 @@ namespace libecs
     // FIXME: range check
     virtual const Int    asInt() const { return static_cast<Int>( theReal ); }
 
-    virtual UVariableDataPtr createClone() const
+    virtual UConstantDataPtr createClone() const
     {
-      return new UVariableRealData( *this );
+      return new UConstantRealData( *this );
     }
 
   private:
@@ -147,14 +147,14 @@ namespace libecs
 
   };
 
-  class UVariableIntData : public UVariableData
+  class UConstantIntData : public UConstantData
   {
 
   public:
 
-    UVariableIntData( StringCref str );
-    UVariableIntData( const Real      f );
-    UVariableIntData( const Int        i ) 
+    UConstantIntData( StringCref str );
+    UConstantIntData( const Real      f );
+    UConstantIntData( const Int        i ) 
       : 
       theInt( i ) 
     {
@@ -165,9 +165,9 @@ namespace libecs
     virtual const Real   asReal() const { return static_cast<Real>( theInt ); }
     virtual const Int    asInt() const   { return theInt; }
   
-    virtual UVariableDataPtr createClone() const
+    virtual UConstantDataPtr createClone() const
     {
-      return new UVariableIntData( *this );
+      return new UConstantIntData( *this );
     }
 
   private:
@@ -176,12 +176,12 @@ namespace libecs
 
   };
 
-  class UVariableNoneData : public UVariableData
+  class UConstantNoneData : public UConstantData
   {
 
   public: 
 
-    UVariableNoneData() {}
+    UConstantNoneData() {}
 
 
     virtual const String asString() const 
@@ -192,16 +192,16 @@ namespace libecs
     virtual const Real   asReal() const   { return 0.0; }
     virtual const Int    asInt() const    { return 0; }
   
-    virtual UVariableDataPtr createClone() const
+    virtual UConstantDataPtr createClone() const
     {
-      return new UVariableNoneData;
+      return new UConstantNoneData;
     }
 
   };
 
 
 
-  class UVariable
+  class UConstant
   {
 
   public:
@@ -215,39 +215,39 @@ namespace libecs
       };
 
   
-    UVariable()
+    UConstant()
       :
-      theData( new UVariableNoneData ),
+      theData( new UConstantNoneData ),
       theType( NONE )
     {
       ; // do nothing
     }
 
-    UVariable( StringCref  string ) 
+    UConstant( StringCref  string ) 
       :
-      theData( new UVariableStringData( string ) ),
+      theData( new UConstantStringData( string ) ),
       theType( STRING )
     {
       ; // do nothing
     }
   
-    UVariable( const Real f )      
+    UConstant( const Real f )      
       :
-      theData( new UVariableRealData( f ) ),
+      theData( new UConstantRealData( f ) ),
       theType( REAL )
     {
       ; // do nothing
     }
 
-    UVariable( const Int   i )      
+    UConstant( const Int   i )      
       :
-      theData( new UVariableIntData( i ) ),
+      theData( new UConstantIntData( i ) ),
       theType( INT )
     {
       ; // do nothing
     }
 
-    UVariable( UVariableCref uv )
+    UConstant( UConstantCref uv )
       :
       theData( uv.createDataClone() ),
       theType( uv.getType() )
@@ -255,12 +255,12 @@ namespace libecs
       ; // do nothing
     }
 
-    virtual ~UVariable()
+    virtual ~UConstant()
     {
       delete theData;
     }
 
-    UVariableCref operator= ( UVariableCref rhs )
+    UConstantCref operator= ( UConstantCref rhs )
     {
       if( this != &rhs )
 	{
@@ -294,14 +294,14 @@ namespace libecs
 
   protected:
 
-    UVariableDataPtr createDataClone() const
+    UConstantDataPtr createDataClone() const
     {
       return theData->createClone();
     }
 
   private:
 
-    UVariableDataPtr theData;
+    UConstantDataPtr theData;
     Type             theType;
 
   };

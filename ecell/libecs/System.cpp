@@ -74,12 +74,12 @@ namespace libecs
 
   const Message System::getSystemList( StringCref keyword )
   {
-    UVariableVector aVector;
+    UConstantVector aVector;
 
     for( SystemMapIterator i = getFirstSystemIterator() ;
 	 i != getLastSystemIterator() ; ++i )
       {
-	aVector.push_back( UVariable( i->second->getID() ) );
+	aVector.push_back( UConstant( i->second->getID() ) );
       }
 
     return Message( keyword, aVector );
@@ -87,12 +87,12 @@ namespace libecs
 
   const Message System::getSubstanceList( StringCref keyword )
   {
-    UVariableVector aVector;
+    UConstantVector aVector;
 
     for( SubstanceMapIterator i = getFirstSubstanceIterator() ;
 	 i != getLastSubstanceIterator() ; ++i )
       {
-	aVector.push_back( UVariable( i->second->getID() ) );
+	aVector.push_back( UConstant( i->second->getID() ) );
       }
 
     return Message( keyword, aVector );
@@ -100,12 +100,12 @@ namespace libecs
 
   const Message System::getReactorList( StringCref keyword )
   {
-    UVariableVector aVector;
+    UConstantVector aVector;
 
     for( ReactorMapIterator i = getFirstReactorIterator() ;
 	 i != getLastReactorIterator() ; ++i )
       {
-	aVector.push_back( UVariable( i->second->getID() ) );
+	aVector.push_back( UConstant( i->second->getID() ) );
       }
 
     return Message( keyword, aVector );
@@ -121,7 +121,7 @@ namespace libecs
   const Message System::getStepper( StringCref keyword )
   {
     return Message( keyword, 
-		    UVariable( getStepper()->className() ) );
+		    UConstant( getStepper()->className() ) );
   }
 
   void System::setVolumeIndex( const Message& message )
@@ -138,7 +138,7 @@ namespace libecs
       }
 
     return Message( keyword, 
-		    UVariable( getVolumeIndex()->getFullID().getString() ) );
+		    UConstant( getVolumeIndex()->getFullID().getString() ) );
   }
 
   const Message System::getVolume( StringCref keyword )
@@ -146,7 +146,7 @@ namespace libecs
     if( haveVolumeIndex() )
       {
 	return Message( keyword, 
-			UVariable( getVolume() ) ) ;
+			UConstant( getVolume() ) ) ;
       }
     else
       {
@@ -157,7 +157,7 @@ namespace libecs
   const Message System::getDeltaT( StringCref keyword )
   {
     return Message( keyword, 
-		    UVariable( getDeltaT() ) ) ;
+		    UConstant( getDeltaT() ) ) ;
   }
 
 
