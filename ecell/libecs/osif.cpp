@@ -45,9 +45,12 @@
  *::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
  *	$Id$
  :	$Log$
+ :	Revision 1.8  2003/08/17 00:15:34  satyanandavel
+ :	update for gcc-3.3.1 in mingw
+ :
  :	Revision 1.7  2003/08/09 07:02:59  satyanandavel
  :	correction of a typo
- :
+ :	
  :	Revision 1.6  2003/08/08 13:40:07  satyanandavel
  :	Added support for native windows compilation using MinGW
  :	
@@ -101,8 +104,8 @@
 /* MS-Windows */
 #include <dos.h>
 #include <process.h>
-#include <objidl.h>
 #include <wtypes.h>
+#include <objidl.h>
 #include <winbase.h>
 #elif defined(__SVR4)
 /* assume SUN Solaris */
