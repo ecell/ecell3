@@ -101,14 +101,15 @@ class EntityListWindow(OsogoWindow):
 		aPropertyWindowTopVBox = self.thePropertyWindow['top_vbox']
 		self['property_frame'].add( aPropertyWindowTopVBox )
 		self.thePropertyWindow['property_clist'].connect( 'select_cursor_row', self.selectPropertyName )
+		self.theSysTreeStore.clear()
+		aRootSystemFullID = createFullID( 'System::/' )
+		self.constructTree( None, aRootSystemFullID )
 		self.update()
 
 
 	def update( self ):
-		self.theSysTreeStore.clear()
 		self.theEntityListStore.clear()
-		aRootSystemFullID = createFullID( 'System::/' )
-		self.constructTree( None, aRootSystemFullID )
+
 		self.updateEntityList()
 		self.thePropertyWindow.update()
 

@@ -35,8 +35,6 @@ class PlotterPluginWindow( OsogoPluginWindow ):
 		self.ListSelection.set_mode(gtk.SELECTION_MULTIPLE)
 		self.theWindow=self.getWidget(self.__class__.__name__)
 		#init plotter instance
-		if plot_type=='BarPlot':
-		    self.thePlotInstance=BarPlot(self,'linear',self.theWindow)
 		if plot_type=='TracerPlot':
 		    self.thePlotInstance=TracerPlot(self, 'linear',self.theWindow)
 		#attach plotterwidget to window
