@@ -74,8 +74,14 @@ class BoardWindow(OsogoWindow):
         self.theSession = aSession
     # end of the __init__
 
-    def openWindow(self):
-
+    def openWindow(self, aRootWidget = None, root = None):
+        if root == None:
+            self.theRoot = self
+        else:
+            self.theRoot = root
+        if aRootWidget !=None:
+            self.rootWidget = aRootWidget
+            self.setTopWidgetName( aRootWidget )
         OsogoWindow.openWindow( self )
 
         self.addHandlers({ \
@@ -139,7 +145,7 @@ class BoardWindow(OsogoWindow):
     def attachPluginWindow( self, aPluginWindowType, aRawFullPNList ):
 
         aButton = self.thePluginManager.createInstance( \
-            aPluginWindowType, aRawFullPNList, 'top_frame', self )
+            aPluginWindowType, aRawFullPNList, 'top_frame', self.theRoot )
         if aButton == None:
             return
         aTopFrame = aButton['top_frame']

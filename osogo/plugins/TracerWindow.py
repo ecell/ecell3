@@ -49,6 +49,11 @@ class TracerWindow( OsogoPluginWindow ):
 
         #self.openWindow()
         self.theListWindow = self['clist1']
+        self.theTopFrame = self['top_frame'] 
+        self.theVbox2= self['vbox2']
+        self.thePaned = self['vpaned1']
+        self.theDrawingArea = self['drawingarea1'] 
+        self.theEntry = self['entry1']
         self.theListStore = gtk.ListStore(gobject.TYPE_BOOLEAN,\
             gobject.TYPE_OBJECT, gobject.TYPE_BOOLEAN,\
             gobject.TYPE_BOOLEAN,
@@ -89,7 +94,7 @@ class TracerWindow( OsogoPluginWindow ):
         self.theWindow = self.getWidget( self.__class__.__name__ )
 
         #determine plotsize
-        self.thePlotWidget = self['drawingarea1']
+        self.thePlotWidget = self.theDrawingArea
 
         #init plotter instance
         self.thePlotInstance = Plot( self, self.getParent(), self.thePlotWidget )
@@ -112,9 +117,9 @@ class TracerWindow( OsogoPluginWindow ):
         self.addTraceToPlot( self.theFullPNList() )
 
         #sets stripinterval, disable history buttons
-        self['entry1'].set_text( str(self.thePlotInstance.getStripInterval()) )
-        self['entry1'].connect( 'activate', self.stripIntervalChangedEnter )
-        self['entry1'].connect( 'focus_out_event', self.stripIntervalChanged )
+        self.theEntry.set_text( str(self.thePlotInstance.getStripInterval()) )
+        self.theEntry.connect( 'activate', self.stripIntervalChangedEnter )
+        self.theEntry.connect( 'focus_out_event', self.stripIntervalChanged )
 
         if not self.isStandAlone():
             self.minimize()
@@ -323,12 +328,12 @@ class TracerWindow( OsogoPluginWindow ):
     
     # ========================================================================
     def maximize(self):
-        if self['top_frame'] != self['vbox2'].get_parent():
+        if self.theTopFrame!= self.theVbox2.get_parent():
             if self.isStandAlone():
                 self.__adjustWindowHeight(  - self.shiftWindow )
-            self['top_frame'].remove( self['drawingarea1'] )
-            self['vpaned1'].add( self['drawingarea1'] )
-            self['top_frame'].add( self['vbox2'] )
+            self.theTopFrame.remove( self.theDrawingArea )
+            self.thePaned.add( self.theDrawingArea )
+            self.theTopFrame.add( self.theVbox2 )
         
         self.thePlotInstance.showControl( gtk.TRUE )
 
@@ -337,17 +342,18 @@ class TracerWindow( OsogoPluginWindow ):
     def minimize(self):
 
         self.thePlotInstance.showControl( gtk.FALSE )
-        if self['top_frame'] == self['vbox2'].get_parent():
+        if self.theTopFrame== self.theVbox2.get_parent():
             if self.isStandAlone():
-                dividerPos = self['vpaned1'].get_position()
-                panedHeight = self['vpaned1'].get_allocation()[3]
+                dividerPos = self.thePaned.get_position()
+                panedHeight = self.thePaned.get_allocation()[3]
                 self.shiftWindow = panedHeight - dividerPos
 
-            self['top_frame'].remove( self['vbox2'] )
-            self['vpaned1'].remove( self['drawingarea1'] )
-            self['top_frame'].add( self['drawingarea1'] )
+            self.theTopFrame.remove( self.theVbox2 )
+            self.thePaned.remove( self.theDrawingArea )
+            self.theTopFrame.add( self.theDrawingArea )
             if self.isStandAlone():
                 self.__adjustWindowHeight(  self.shiftWindow )
+                
                 
     def __adjustWindowHeight ( self, deltaHeight ):
         aWindow = self.getParent()['TracerWindow']
@@ -400,7 +406,7 @@ class TracerWindow( OsogoPluginWindow ):
     # ========================================================================
     def setStripInterval( self, anInterval ):
         """ sets striptinterval of graph to anInterval """
-        self['entry1'].set_text( str( anInterval ) )
+        self.theEntry.set_text( str( anInterval ) )
         self.stripIntervalChanged(None, None )
     
 
@@ -527,10 +533,10 @@ class TracerWindow( OsogoPluginWindow ):
         #get new value
         #call plotterinstance
         try:
-            a = float( self['entry1'].get_text() )
+            a = float( self.theEntry.get_text() )
         except ValueError:
             self.theSession.message("Enter a valid number, please.")
-            self['entry1'].set_text( str( self.thePlotInstance.getstripinterval() ) )
+            self.theEntry.set_text( str( self.thePlotInstance.getstripinterval() ) )
         else:
             self.thePlotInstance.setStripInterval( a )
 

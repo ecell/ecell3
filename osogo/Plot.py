@@ -757,6 +757,7 @@ class Plot:
         self.theAvailableColors = ColorList[:]
 
         self.thePixmapDict={} #key is color, value pixmap
+
         self.theRoot=root[root.__class__.__name__]
 
         #creates widget

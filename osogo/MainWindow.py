@@ -39,9 +39,6 @@ from AboutSessionMonitor import *
 
 from main import *
 
-if GNOME_INSTALLED =='yes':
-    import gnome.ui
-
 
 import gtk
 import gobject
@@ -55,6 +52,9 @@ import os
 import math
 import time
 import datetime
+
+if GNOME_INSTALLED =='yes':
+    import gnome.ui
 
 #
 #import pyecell module

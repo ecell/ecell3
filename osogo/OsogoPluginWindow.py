@@ -404,7 +404,7 @@ class OsogoPluginWindow(PluginWindow):
 		""" returns True if plugin is in a separate window
 			False if it is on a BoardWindow
 		"""
-		return self.getParent().__class__.__name__[:5]!='Board'
+		return self.getParent().__class__.__name__.startswith( self.__class__.__name__)
 		
 
 
