@@ -48,6 +48,8 @@
   <!ENTITY DM "<acronym>DM</acronym>">
   <!ENTITY ESS "<acronym>ESS</acronym>">
 
+<!--
+
   <!ENTITY Entity "<classname>Entity</classname>">
   <!ENTITY Polymorph "<classname>Polymorph</classname>">
   <!ENTITY PolymorphVector "<classname>PolymorphVector</classname>">
@@ -66,6 +68,28 @@
   <!ENTITY LoggerStub "<classname>LoggerStub</classname>">
   <!ENTITY StepperStub "<classname>StepperStub</classname>">
   <!ENTITY Variable "<classname>Variable</classname>">
+-->
+
+
+  <!ENTITY Entity "Entity">
+  <!ENTITY Polymorph "Polymorph">
+  <!ENTITY PolymorphVector "PolymorphVector">
+  <!ENTITY Process "Process">
+  <!ENTITY PropertySlot "PropertySlot">
+  <!ENTITY PropertyInterface "PropertyInterface">
+  <!ENTITY System "System">
+  <!ENTITY Stepper "Stepper">
+  <!ENTITY Session "Session">
+  <!ENTITY SessionManager "SessionManager">
+  <!ENTITY Simulator "Simulator">
+  <!ENTITY String "String">
+  <!ENTITY Logger "Logger">
+  <!ENTITY ObjectStub "ObjectStub">
+  <!ENTITY EntityStub "EntityStub">
+  <!ENTITY LoggerStub "LoggerStub">
+  <!ENTITY StepperStub "StepperStub">
+  <!ENTITY Variable "Variable">
+
 
   <!ENTITY Osogo "<productname>Osogo Session Monitor</productname>">
   <!ENTITY Python "<productname>Python</productname>">

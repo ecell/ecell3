@@ -672,31 +672,13 @@ System CompartmentSystem( / )
 
       <para>The simplest way to script custom rate equations is to use
 <classname>ExpressionFluxProcess</classname>.   
-	      Below is an example of the basic
-	      Michaelis-Menten reaction programmed with the
-	      <classname>ExpressionFluxProcess</classname>.
 
-<example>
-		  <title>Michaelis-Menten reaction with ExpressionFluxProcess</title>
-		  <programlisting>
-Process ExpressionFluxProcess( P )
-{
-    Km    1.0;
-    Kcat  10;
-
-    Expression "E.Value * Kcat * S.MolarConc / ( S.MolarConc + Km )";
-
-    VariableReferenceList [ S :.:S -1 ] [ P :.:P 1 ] [ E :.:E 0 ];
-}</programlisting>
-		</example>
-
-
-    Here is another example taken from the Drosophila sample model.   
+    Here is an example taken from the Drosophila sample model.   
     In this expression, Size * N_A of the supersystem of the &Process;
     is used to keep the unit of the expression [ num / second ].
 <example>
-		  <title>A differential equation in the Drosophila model</title>
-		  <programlisting>
+	  <title>A differential equation in the Drosophila model</title>
+	  <programlisting>
 Process ExpressionFluxProcess( R_toy1 )
 {
     vs      0.76;
@@ -706,49 +688,37 @@ Process ExpressionFluxProcess( R_toy1 )
 
     VariableReferenceList   [ P0 :.:M 1 ] [ C0 :.:Pn 0 ];
 }</programlisting>
-		</example>
-
+	</example>
 </para>
+
+      <para>FIXME: some more examples</para>
+
     </sect2>
 
     <sect2>
       <title>Algebraic equations</title>
 
       <para>Use of <classname>ExpressionAlgebraicProcess</classname>
-      is the easiest method.  The following code describes an equation
-<programlisting>
-a * A + B = 10,  a = 1.5
-</programlisting>
-<example>
-	  <title>A simple algebraic equation using ExpressionAlgebraicProcess</title>
-	  <programlisting>
-Stepper DAEStepper( DAE1 ) {}
+      is the easiest method to describe algebraic equations.</para>
 
-Process ExpressionFluxProcess( P )
-{
-    StepperID DAE1;
-
-    a    1.5;
-
-    Expression "( a * A + B ) - 10";
-
-    VariableReferenceList [ A :.:A 1 ] [ B :.:B 1 ];
-}
-</programlisting>
-	</example>
-Be careful about the coefficients of the &VariableReference;s.  
+      <para>Be careful about the coefficients of the &VariableReference;s.  
 (Usually just set unities.)
 </para>
 
+      <para>FIXME: some more examples here</para>
+
     </sect2>
 
-
+    
     </sect1>
 
     <sect1>
       <title>Other Modeling Schemes</title>
 
+    <sect2>
+      <title>Discrete events</title>
       <para></para>
+    </sect2>
     </sect1>
 
 

@@ -28,7 +28,7 @@
     </para>
 
     <sect2>
-      <title>Types of the Objects</title>
+      <title>Types Of The Objects</title>
 
       <para>A simulation model of &app; consists of the following types of objects.
 <itemizedlist>
@@ -419,7 +419,7 @@ The &Entity; class has three subclasses:
      in &EM;.</para>
 
     <sect2>
-      <title>What is &EM;?</title>
+      <title>What Is &EM;?</title>
 
       <para>
       In &app;, the standard file format of model description and
@@ -465,7 +465,7 @@ The &Entity; class has three subclasses:
     </sect2>
 
     <sect2>
-      <title>&EM; at a Glance</title>
+      <title>&EM; At A Glance</title>
 
       <para>Before getting into the details of &EM; syntax, let's
       have a look at a tiny example. It's very simple, but you do not 
@@ -547,7 +547,7 @@ System System( / )
 
 
     <sect2>
-      <title>General Syntax of &EM;</title>
+      <title>General Syntax Of &EM;</title>
 
       <para>Basically an &EM; is (and thus an &EML; is) a list of just one
       type of directives: <emphasis>object instantiation</emphasis>.
@@ -682,7 +682,7 @@ as <classname>MassActionFluxProcess</classname>.</para>
     </sect2>
 
     <sect2>
-      <title>Macros and Preprocessing</title>
+      <title>Macros And Preprocessing</title>
 
       <para>Before converting to &EML;,
          <command>ecell3-em2eml</command> command invokes the &empy;
@@ -959,7 +959,7 @@ System System( /SUBSYSTEM/SUBSUBSYSTEM ) # SIZE == SIZE of the root system
     </sect2>
 
     <sect2>
-      <title>Variables and Processes</title>
+      <title>Variables And Processes</title>
 
       <para>A &System; statement has zero, one or more &Variable; and
 	&Process; statements in addition to its properties.
@@ -988,7 +988,7 @@ System System( / )
 
 
     <sect2>
-      <title>Connecting Steppers with Entity Objects</title>
+      <title>Connecting Steppers With Entity Objects</title>
 
       <para>Any &Process; and &Variable; object in the model must be
          connected with a &Stepper; by setting its
@@ -1032,7 +1032,7 @@ System System( / )  # connected to STEPPER0
     </sect2>
 
     <sect2>
-      <title>Connecting Variable Objects with Processes</title>
+      <title>Connecting Variable Objects With Processes</title>
 
       <para>A &Process; object changes values of &Variable;
          object(s) according to a certain procedure, such as the law
@@ -1219,7 +1219,7 @@ System System( / )
      Dynamic Module Library" for more info.</para>
 
     <sect2>
-      <title>Discrete or Continuous ?</title>
+      <title>Discrete Or Continuous ?</title>
 
       <para>&ecell; can model both discrete and continuous processes,
        and these can be mixed in simulation.  The system models
@@ -1252,32 +1252,6 @@ System System( / )
        related &Variable; objects when its &Stepper; requests to do so.
 </para>
 
-      </sect3>
-
-      <sect3>
-	<title>Continuous classes</title>
-
-	<para>On the other hand, a &Process; that calculates continuous
-       changes of &Variable; objects is called a <emphasis>continuous
-       &Process;</emphasis>, and is used in combination with a
-       <emphasis>continuous &Stepper;</emphasis>.  Continuous
-       &Process; objects simulate the phenomena that represents by
-       setting <emphasis>velocities</emphasis> of connected &Variable;
-       objects, rather than directly changing their values in the case
-       of discrete &Process; objects.  A continuous &Stepper;
-       integrates the values of &Variable; objects from the velocities
-       given by the continuous &Process; objects, and determines when
-       the velocities should be recalculated by the &Process; objects.
-       A typical application of continuous &Process; and &Stepper;
-       objects is to implement differential equations and differential
-       equation solvers, respectively, to form a simulation system
-       of the system of differential equations.</para>
-      </sect3>
-
-    </sect2>
-
-    <sect2>
-      <title>Types of discrete object classes</title>
 
       <para>There are two types of discrete &Process; / &Stepper;
        classes: discrete and discrete event.</para>
@@ -1337,8 +1311,66 @@ System System( / )
 	</listitem>
       </itemizedlist>
 
-      <para>Followings are some examples of discrete types of object
-      classes that the current version of &ecell; provides by default.</para>
+      </sect3>
+
+      <sect3>
+	<title>Continuous classes</title>
+
+	<para>On the other hand, a &Process; that calculates continuous
+       changes of &Variable; objects is called a <emphasis>continuous
+       &Process;</emphasis>, and is used in combination with a
+       <emphasis>continuous &Stepper;</emphasis>.  Continuous
+       &Process; objects simulate the phenomena that represents by
+       setting <emphasis>velocities</emphasis> of connected &Variable;
+       objects, rather than directly changing their values in the case
+       of discrete &Process; objects.  A continuous &Stepper;
+       integrates the values of &Variable; objects from the velocities
+       given by the continuous &Process; objects, and determines when
+       the velocities should be recalculated by the &Process; objects.
+       A typical application of continuous &Process; and &Stepper;
+       objects is to implement differential equations and differential
+       equation solvers, respectively, to form a simulation system
+       of the system of differential equations.</para>
+      </sect3>
+
+    </sect2>
+
+
+    <sect2>
+      <title>Some Available Discrete Classes</title>
+
+      <para>Followings are some available discrete classes.</para>
+
+
+      <sect3>
+	<title>NRStepper and GillespieProcess (Gillespie-Gibson pair)</title>
+
+	<para>An example of discrete-event simulation method
+           provided by &ecell; is a variant of Gillespie's stochastic
+           algorithm, the Next Reaction Method, or Gillespie-Gibson
+           algorithm.  <classname>NRStepper</classname> class
+           implements this algorithm.  When this &Stepper; is 
+           used in conjunction with <classname>GillespieProcess</classname>
+           objects, which is a
+           subclass of <classname>DiscreteEventProcess</classname> and
+           calculates a time of the next occurence of the reaction
+           using Gillespie's reaction probability equation and a
+           random number, &ecell; conducts
+           a Gillespie-Gibson stochastic simulation of elementary
+           chemical reactions.
+           In fact, the Next Reaction
+           Method is nothing but a standard discrete event simulation
+           algorithm, and <classname>NRStepper</classname> is just an
+           alias of the <classname>DiscreteEventStepper</classname> class.
+           </para>
+           
+	<para>Usage of this pair of classes of objects is simple: just
+         set the <property>StepperID</property>,
+         <property>VariableReferenceList</property> and the rate
+         constant property <property>k</property> of those
+         <classname>GillespieProcess</classname> objects.</para>
+      </sect3>
+
 
       <sect3>
 	<title>DiscreteTimeStepper</title>
@@ -1384,41 +1416,394 @@ System System( / )
       </sect3>
 
       <sect3>
-	<title>GillespieProcess and NRStepper (Gillespie-Gibson pair)</title>
+	<title>PythonProcess</title>
 
-	  <para>An example of discrete-event classes provided by
-           &ecell; is a pair of
-           <classname>GillespieProcess</classname> and
-           <classname>NRStepper</classname>.
-           <classname>GillespieProcess</classname>, which is a
-           subclass of <classname>DiscreteEventProcess</classname>,
-           calculates a time of the next occurence of the reaction
-           using Gillespie's reaction probability equation and a
-           random number.  When this class is used with a &Stepper;
-           (by setting a value of <property>StepperID</property>
-           property) that implements the Gibson's Next Reaction
-           Method, <classname>NRStepper</classname>, &ecell; conducts
-           a Gillespie-Gibson stochastic simulation of elementary
-           chemical reactions.  In fact,
-           <classname>NRStepper</classname> is an alias to
-           <classname>DiscreteEventStepper</classname>, because
-           Gillespie-Gibson method is actually a typical
-           discrete-event simulation. (See the next tutorial for
-           detailed usage of <classname>GillespieProcess</classname>
-           and <classname>NRStepper</classname>.)</para>
+	<para><classname>PythonProcess</classname> allows users to
+	  script a &Process; object in full &Python; syntax.</para>
+
+	<para><methodname>initialize</methodname>() and
+	<methodname>fire</methodname>() methods can be scripted with
+	<property>InitializeMethod</property> and
+	<property>FireMethod</property> properties, respectively.</para>
+
+	<para><classname>PythonProcess</classname> can be either
+	discrete or continuous.  This 'operation mode' can be specified
+        by setting <property>IsContinuous</property> property.  The default
+        is false (0), or discrete.   To switch to the continuous mode,
+        set 1 to the property:
+<programlisting>Process PythonProcess( PY1 )
+{
+    IsContinuous 1;
+}</programlisting>
+</para>
+	
+	<para>In addition to regular &Python; constructs, the
+         following objects, methods, and attributes are available in
+         both of the method properties
+         (<property>InitializeMethod</property> and
+         <property>FireMethod</property>):
+
+<itemizedlist>
+	    <listitem>
+	      <para>Properties</para>
+
+	      <para><classname>PythonProcess</classname> accepts
+	       arbitrary names of properties.  For example, the following
+               code creates two new properties.
+<programlisting>Process PythonProcess( PY1 )
+{
+    NewProperty "new property";
+    KK          3.0;
+}</programlisting>
+              These properties can be use in &Python; methods:
+<programlisting>Process PythonProcess( PY1 )
+{
+    # ... NewProperty and KK are set
+
+    InitializeMethod "print NewProperty";
+
+    FireMethod '''
+KK += 1.0
+print KK 
+''';
+}</programlisting>
+               A new property can also be created within &Python; methods.
+<programlisting>
+    InitializeMethod "A = 3.0"; # A is created
+    FireMethod "print A * 2";   # A can be used here
+</programlisting>
+             These properties are treated as a global variable.
+                </para>
+	    </listitem>
+
+	    <listitem>
+	      <para>Objects</para>
+	      <itemizedlist>
+		<listitem>
+		  <para><varname>self</varname></para>
+		  <para>This is the &Process; object itself.  This has
+			the following attributes:
+<itemizedlist>
+
+		      <listitem>
+			<para><property>Activity</property></para>
+
+			<para>The current value of
+			<property>Activity</property> property of this
+			&Process;.</para>
+		      </listitem>
+
+		      <listitem>
+			<para><methodname>addValue</methodname>(
+			<parameter>value</parameter> )</para>
+
+			<para>Add each &VariableReference; the
+			<parameter>value</parameter> multiplied by the
+			coefficient of the &VariableReference;.</para>
+
+			<para>Using this method implies that this
+                         &Process; is discrete.
+                         Check that <property>IsContinuous</property> property
+                         is false.</para>
+		      </listitem>
+
+		      <listitem>
+			<para><methodname>getSuperSystem</methodname>()</para>
+			<para>This method gets the super system
+			      of this &Process;.  See below for the
+			      attributes of &System; objects.</para>
+		      </listitem>
+
+		      <listitem>
+			<para><property>Priority</property></para>
+
+			<para>The <property>Priority</property> property
+                         of this &Process;.</para>
+		      </listitem>
+
+
+		      <listitem>
+			<para><methodname>setFlux</methodname>(
+			<parameter>value</parameter> )</para>
+
+			<para>Add each &VariableReference;'s velocity the
+			<parameter>value</parameter> multiplied by the
+			coefficient of the &VariableReference;.</para>
+
+			<para>Using this method implies that this
+                         &Process; is continuous.
+                         Check that <property>IsContinuous</property> property
+                         is true.</para>
+		      </listitem>
+		      
+		      <listitem>
+			<para><property>StepperID</property></para>
+
+			<para><property>StepperID</property> of this
+			&Process;.</para>
+		      </listitem>
+		    </itemizedlist>
+		  </para>
+		</listitem>
+
+		<listitem>
+		  <para>&VariableReference;</para>
+		  
+		  <para>&VariableReference; instances given in
+			the <property>VariableReferenceList</property>
+			property of this &Process; can be used in the
+			&Python; methods.  Each instance has the following 
+                        attributes:
+<itemizedlist>
+
+		      <listitem>
+			<para><methodname>addFlux</methodname>( <parameter>value</parameter> )</para>
+
+			<para>Multiply the
+			<parameter>value</parameter> by the
+			<property>Coefficient</property> of this
+			&VariableReference;, and add that to the
+			&Variable;'s
+			<property>velocity</property>.</para>
+		      </listitem>
+
+		      <listitem>
+			<para><methodname>addValue</methodname>( <parameter>value</parameter> )</para>
+
+			<para>Add the <parameter>value</parameter> to
+			the <property>Value</property> property of the
+			&Variable;.</para>
+		      </listitem>
+
+		      <listitem>
+			<para><methodname>addVelocity</methodname>( <parameter>value</parameter> )</para>
+
+			<para>Add the <parameter>value</parameter> to
+			the <property>Velocity</property> property of
+			the &Variable;.</para>
+		      </listitem>
+
+		      <listitem>
+			<para>Coefficient</para> <para>The
+			      coefficient of the &VariableReference;</para>
+		      </listitem>
+
+		      <listitem>
+			<para><methodname>getSuperSystem</methodname>()</para>
+
+			<para>Get the super system of the &Variable;.
+			A &System; object is returned.</para>
+		      </listitem>
+
+
+		      <listitem>
+			<para>MolarConc</para> 
+			<para>The concentration of the &Variable; in
+			      Molar [M].</para>
+		      </listitem>
+
+		      <listitem>
+			<para>Name</para>
+
+			<para>The name of the &VariableReference;.</para>
+		      </listitem>
+
+
+		      <listitem>
+			<para>NumberConc</para> <para>The
+			      concentration in number [ num / size of
+			      the &Variable;'s super system. ]</para>
+		      </listitem>
+
+		      <listitem>
+			<para>IsFixed</para>
+
+			<para>Zero if the <property>Fixed</property>
+			property of the &Variable; is false.
+			Otherwise a non-zero integer.</para>
+		      </listitem>
+
+		      <listitem>
+			<para>IsAccessor</para>
+
+			<para>Zero if the <property>IsAccessor</property>
+			flag of the &VariableReference; is false.
+			Otherwise a non-zero integer.</para>
+		      </listitem>
+
+		      <listitem>
+			<para>TotalVelocity</para>
+
+			<para>The total current velocity.
+			      Usually of no use.</para>
+		      </listitem>
+
+		      <listitem>
+			<para>Value</para>
+			<para>The value of the &Variable;</para>
+		      </listitem>
+
+
+		      <listitem>
+			<para>Velocity</para>
+
+			<para>The provisional velocity given by
+			      the currently stepping &Stepper;.
+			      Usually of no use.</para>
+		      </listitem>
+		    </itemizedlist>
+
+
+</para>
+		</listitem>
+
+		<listitem>
+		  <para>&System;</para>
+
+		  <para>A &System; object has the following
+			attributes.
+<itemizedlist>
+
+		      <listitem>
+			<para><methodname>getSuperSystem</methodname>()</para>
+
+			<para>Get the super system of the &System;.
+			 A &System; object is returned.</para>
+		      </listitem>
+
+
+		      <listitem>
+			<para><property>Size</property></para>
+			<para>The size of the &System;.</para>
+		      </listitem>
+
+		      <listitem>
+			<para><property>SizeN_A</property></para>
+			<para>Equivalent to <literal>Size *
+			N_A</literal>, where N_A is a Avogadro's
+			number.</para>
+		      </listitem>
+
+		      <listitem>
+			<para><property>StepperID</property></para>
+
+			<para>The <property>StepperID</property> of the &System;.</para>
+		      </listitem>
+
+
+		    </itemizedlist>
+
+</para>
+
+		</listitem>
+	      </itemizedlist>
+	    </listitem>
+
+	  </itemizedlist>
+
+</para>
+
+	<para>Here is an example uses of <classname>PythonProcess</classname>.
+<example>
+	    <title>An assignment rule by using PythonProcess</title>
+	    <programlisting>
+Process PythonProcess( PY1 )
+{
+    # IsContinuous 0; -- default
+    FireMethod "S1.Value = S2.Value + S3.Value";
+    VariableReferenceList [(S1)] [(S2)] [(S3)];
+}
+</programlisting>
+	  </example>
+
+</para>
+
+      </sect3>
+
+      <sect3>
+	<title>PythonEventProcess</title>
+
+	<para>This class enables users &Python; scripting of
+         time-events.  In addition to
+         <methodname>initialize</methodname>() and
+         <methodname>fire</methodname>(),
+         <methodname>updateStepInterval</methodname>() method can be
+         scripted with this class.  Use
+         <property>UpdateStepIntervalMethod</property> property to set
+         this.</para>
+
+	<para>In addition to those of
+         <classname>PythonProcess</classname>, the
+         <varname>self</varname> object of
+         <classname>PythonEventProcess</classname> has some more
+         attributes:
+
+<itemizedlist>
+	    <listitem>
+	      <para><property>StepInterval</property></para>
+
+	      <para>The most recent <property>StepInterval</property>
+	      calculated by the
+	      <methodname>updateStepInterval</methodname>()
+	      method.</para>
+	    </listitem>
+
+	    <listitem>
+	      <para><property>DependentProcessList</property></para>
+
+	      <para>This attribute holds a tuple of IDs of dependent
+	      &Process;es of this &Process;.</para>
+	    </listitem>
+	  </itemizedlist>
+</para>
+
+
+	<para>This class of objects must be used with a
+	<classname>DiscreteEventStepper</classname>.</para>
+
+	<para>This class is under development.</para>
+      </sect3>
+
+      <sect3>
+	<title>Other discrete classes</title>
+
+	<para>&Stepper; classes for explicit and implicit tau leaping
+	algorithms are under development.
+         </para>
+
+	<para>A flux-distribution method for hybrid dynamic/static
+         simulation of biochemical pathways is available with the
+         following classes:
+         <classname>FluxDistributionStepper</classname>,
+         <classname>FluxDistributionProcess</classname>,
+         <classname>QuasiDynamicFluxProcess</classname>.  Usage of
+         this scheme is to be described.</para>
       </sect3>
 
     </sect2>
 
+
+
     <sect2>
-      <title>Types of continuous object classes</title>
+      <title>Some Available Continuous Classes</title>
+
+      <para>&ecell; supports both Ordinary Differential Equation (ODE)
+       and Differential-Algebraic Equation (DAE) models, and has
+       &Stepper; classes for each type of formalisms.</para>
+
+      <para>Also, the system is shipped with some continuous &Process;
+       classes.  For example,
+       <classname>MassActionFluxProcess</classname> calculates a
+       reaction rate according to the law of mass action.
+       <classname>ExpressionFluxProcess</classname> allows users to
+       describe arbitrary rate equations in model files.
+       <classname>PythonProcess</classname> and
+       <classname>PythonFluxProcess</classname> are used to script
+       &Process; objects in &Python;. Some enzyme kinetics rate laws
+       are also available.</para>
 
       <sect3>
-	<title>Steppers for differential systems</title>
-
-	<para>&ecell; supports both Ordinary Differential Equation
-(ODE) and Differential-Algebraic Equation (DAE) models, and has
-&Stepper; classes for each type of formalisms.</para>
+	<title>Generic ordinary differential Steppers</title>
 
 	<para>If your model is a system of ODEs, then in this version
 of the software (version 3.1.100) the recommended choice is
@@ -1427,38 +1812,25 @@ of the software (version 3.1.100) the recommended choice is
 future, a high-performance replacement of this,
 <classname>ODEStepper</classname>, will be included.</para>
 
-	<para>For DAE models, use <classname>DAEStepper</classname>.
-         The model must form a valid index-1 DAE system.  When a DAE
-         &Stepper; detects one or more discrete &Process; objects, it
-         assumes that these are <emphasis>algebraic
-         &Process;</emphasis> objects.  Thus, all discrete &Process;
-         objects in a DAE &Stepper; must be algebraic.  See below for
-         algebraic &Process;.</para>
 
-	<note>
-	  <title>DAE &Stepper; objects can be used for ODE systems</title>
+	<para>Some other available ODE &Stepper; classes are
+	<classname>ODE23Stepper</classname>, which employes a lower
+	(the second) order integration algorithm, and
+	<classname>FixedODE1Stepper</classname> that implements the
+	simplest Euler algorithm without an adaptive step sizing
+	mechanism.</para>
 
-	  <para>
-	  Because it can be viewed that ODE is a special case of DAE
-	  problems which does not have a algebraic equations, but only
-	  differential equations, a DAE &Stepper; can be used to run
-	  an ODE model.  However, ODE Steppers are specialized for ODE
-	  problems, in terms of both the selection of integration
-	  algorithms and implementation issues, and generally use of
-	  an ODE &Stepper; benefits in performance when the model is a
-	  system of ODEs.</para>
-	</note>
-
-	<para>These ODE/DAE &Stepper; classes have some common
-	property slots for user-specifiable parameters.  Here is a partial list
-of some of those:
+	<para>These ODE &Stepper; classes except for the
+	<classname>FixedODE1Stepper</classname> have some common
+	property slots for user-specifiable parameters.  Here is a
+	partial list:
 
 <itemizedlist>
 	    <listitem>
 	      <para><property>Tolerance</property></para> 
 
 	      <para>An error tolerance in local truncation error.  Giving
-	      this smaller numbers requires the &Stepper; to take
+	      this smaller numbers forces the &Stepper; to take
 	      smaller step sizes, and slows down the simulation.
 	      Greater numbers results in faster run with
 	      sacrifice of accuracy.  A typical number is 1e-6.</para>
@@ -1478,43 +1850,54 @@ of some of those:
 	  </itemizedlist>
 </para>
 
+
       </sect3>
 
       <sect3>
-	<title>Processes for ordinary differential equations</title>
+	<title>MassActionFluxProcess</title>
+	
+	<para><classname>MassActionFluxProcess</classname> is a class
+	 of &Process; for simple mass-actions.  This class calculates
+	 a flux rate according to the irreversible mass-action.  Use a
+	 property <property>k</property> to specify a rate
+	 constant.</para>
 
+	</sect3>
 
-	<para>The system has some continuous &Process; classes by
-         default.  For example,
-         <classname>MassActionFluxProcess</classname> calculates a
-         reaction rate according to the law of mass action.
-         <classname>ExpressionFluxProcess</classname> allows users to
-         describe any rate equations.   Some enzyme kinetics rate
-         laws are also available.  
+      <sect3>
+	<title>ExpressionFluxProcess</title>
+	
+	<para><classname>ExpressionFluxProcess</classname> is designed
+         for easy and efficient representations of continuous flux
+         rate equations.</para>
 
-<itemizedlist>
-	    <listitem>
-	      <para><classname>MassActionFluxProcess</classname></para>
+	<para><property>Expression</property> property of this class
+	  accepts a plain text rate expression.  The expression must
+	  be evaluated to give a flux rate in [ number / second ].
+	  (Note that this is a number per second, not concentration
+	  per second.)  Here is an example use of
+	  <classname>ExpressionFluxProcess</classname>:
+<programlisting>
+Process ExpressionFluxProcess( P1 )
+{
+    k 0.1;
+    Expression "k * S.Value";
 
-	      <para>This is a &Process; class for mass-action.  This class
-	      calculates a flux rate according to the irreversible
-	      mass-action.  Use a property <property>k</property> to
-	      specify a rate constant.</para>
-	    </listitem>
+    VariableReferenceList [ S :.:S -1 ] [ P :.:P 1 ];
+}</programlisting>
 
-	    <listitem>
-	      <para><classname>ExpressionFluxProcess</classname></para>
+</para>
 
-	      <para><property>Expression</property> property of this
-	      class accepts a plain text rate expression.   The expression
-              must be evaluated to give a flux rate in [ number / second ].
-              (Note that this is a number per second, not concentration per
-               second.)</para>
+	<para>Compared to <classname>PythonProcess</classname> or
+         <classname>PythonFluxProcess</classname> below, it runs
+         significantly faster with sacrifice of some flexibility in
+         scripting.</para>
 
-	      <para>The list below shows available elements in the
-	      <property>Expression</property> property.  The set of
-	      available arithmetic operators and mathematical
-	      functions are equivalent to SBML level 2.
+	<para>The following shows elements those can be used in the
+	 <property>Expression</property> property.  The set of
+	  available arithmetic operators and mathematical
+	  functions are meant to be equivalent to SBML level 2, except
+          control structures.
 
 <itemizedlist>
 		  <listitem>
@@ -1532,11 +1915,9 @@ of some of those:
 		  <listitem>
 		    <para>Arithmetic operators</para>
 		    <para>
-<literal>+</literal>,
-<literal>-</literal>,
-<literal>*</literal>,
-<literal>/</literal>,
-<literal>^</literal> (power; this can equivalently written as <literal>pow( x, y )</literal>).
+<literal>+</literal>, <literal>-</literal>, <literal>*</literal>,
+<literal>/</literal>, <literal>^</literal> (power; this can
+equivalently be written as <literal>pow( x, y )</literal>).
 </para>
 		  </listitem>
 
@@ -1564,15 +1945,15 @@ currently not available on the Windows version.)
 		    <para>All functions but <function>pow</function> are unary functions. <function>pow</function> is a binary function.</para>
 		  </listitem>
 
-		  <listitem>
-		    <para>Properties</para>
+	    <listitem>
+	      <para>Properties</para>
 
-		    <para><classname>ExpressionFluxProcess</classname>
-		    accepts arbitrary name properties in the model,
-		    and those properties can be used in the
-		    expression.  For example, if you set
-		    <property>Km</property> in the model, it can be
-		    used in the expression.</para>
+	      <para>Similar to <classname>PythonProcess</classname>,
+		<classname>ExpressionFluxProcess</classname>
+		accepts arbitrary name properties in the model.
+                Unlike <classname>PythonProcess</classname>, however,
+                these properties of this class can hold only &Real; values.
+		 </para>
 		  </listitem>
 
 		  <listitem>
@@ -1581,13 +1962,11 @@ currently not available on the Windows version.)
 		      <listitem>
 			<para><varname>self</varname></para>
 			<para>This &Process; object itself.  This has
-			the following attribute:
+			the following attribute which is a sub set of
+			that of <classname>PythonProcess</classname>:
 <itemizedlist>
 			    <listitem>
 			      <para><methodname>getSuperSystem</methodname>()</para>
-			      <para>This method gets the super system
-			      of this &Process;.  See below for the
-			      attributes of &System; objects.</para>
 			    </listitem>
 			  </itemizedlist>
 
@@ -1600,16 +1979,17 @@ currently not available on the Windows version.)
 			the <property>VariableReferenceList</property>
 			property of this &Process; can be used in the
 			expression.  Each instance has the following 
-                        attributes:
+                        set of attributes, which is a sub set of
+                        that of <classname>PythonProcess</classname>:
 <itemizedlist>
 			    <listitem>
-			      <para>MolarConc</para>
+			      <para>Value</para>
+			    </listitem>
+			    <listitem>
+			      <para>MolarConc</para> 
 			    </listitem>
 			    <listitem>
 			      <para>NumberConc</para>
-			    </listitem>
-			    <listitem>
-			      <para>Value</para>
 			    </listitem>
 			    <listitem>
 			      <para>TotalVelocity</para>
@@ -1631,11 +2011,9 @@ currently not available on the Windows version.)
 <itemizedlist>
 			    <listitem>
 			      <para><property>Size</property></para>
-			      <para>The size of the &System;</para>
 			    </listitem>
 			    <listitem>
 			      <para><property>SizeN_A</property></para>
-			      <para>Equivalent to <literal>Size * N_A</literal>.</para>
 			    </listitem>
 			  </itemizedlist>
 
@@ -1649,38 +2027,88 @@ currently not available on the Windows version.)
 		</itemizedlist>
 </para>
 
-	    </listitem>
+	<para>Below is an example of the basic
+	      Michaelis-Menten reaction programmed with the
+	      <classname>ExpressionFluxProcess</classname>.
 
-	    <listitem>
-	      <para>Some enzyme kinetics classes (Michaelis-Menten type)</para>
+<example>
+		  <title>Michaelis-Menten reaction with ExpressionFluxProcess</title>
+		  <programlisting>
+Process ExpressionFluxProcess( P )
+{
+    Km    1.0;
+    Kcat  10;
+
+    Expression "E.Value * Kcat * S.MolarConc / ( S.MolarConc + Km )";
+
+    VariableReferenceList [ S :.:S -1 ] [ P :.:P 1 ] [ E :.:E 0 ];
+}</programlisting>
+		</example>
+</para>
+
+
+
+      </sect3>
+      
+
+      <sect3>
+	<title>Some pre-defined reaction rate classes</title>
 
 	      <para>See the standard dynamic module library reference
 	      for availability of some enzyme kinetics &Process;
 	      classes.</para>
-	    </listitem>
 
-	    <listitem>
-	      <para><classname>PythonFluxProcess</classname> / <classname>PythonProcess</classname></para>
-
-	      <para><classname>PythonProcess</classname> and
-	      <classname>PythonFluxProcess</classname> allows users to
-	      script a &Process; object in full Python
-	      syntax.</para>
-
-	      <para></para>
-
-	    </listitem>
-
-	  </itemizedlist>
-
-</para>
-
-	<para>For more complicated computations, new classes can be
-         defined in C++.  See the chapter 6.</para>
       </sect3>
 
       <sect3>
-	<title>Algebraic Process</title>
+	<title>PythonFluxProcess</title>
+	
+	<para><classname>PythonFluxProcess</classname> is almost the
+         same as <classname>PythonProcess</classname>, except that (1)
+         it takes just a &Python; expression (instead of statements)
+         to its <property>Expression</property> property, and (2)
+         similar to <classname>ExpressionFluxProcess</classname>, the
+         evaluated value of the expression is implicitly passed to the
+         <methodname>setFlux</methodname>() method.</para>
+      </sect3>
+
+
+      <sect3>
+	<title>Generic differential-algebraic Steppers</title>
+
+	<para>For DAE models, use <classname>DAEStepper</classname>.
+         The model must form a valid index-1 DAE system.  When a DAE
+         &Stepper; detects one or more discrete &Process; objects, it
+         assumes that these are <emphasis>algebraic
+         &Process;</emphasis> objects.  Thus, all discrete &Process;
+         objects in a DAE &Stepper; must be algebraic.  See below for
+         what is algebraic &Process;.</para>
+
+	<note>
+	  <title>DAE &Stepper; objects can be used for ODE systems</title>
+
+	  <para>
+	  Because it can be viewed that ODE is a special case of DAE
+	  problems which does not have a algebraic equations, but only
+	  differential equations, a DAE &Stepper; can be used to run
+	  an ODE model.  However, ODE Steppers are specialized for ODE
+	  problems, in terms of both the selection of integration
+	  algorithms and implementation issues, and generally use of
+	  an ODE &Stepper; benefits in performance when the model is a
+	  system of ODEs.</para>
+	</note>
+
+	<para>Those properties of ODE &Stepper; classes described above
+         (such as the <property>Tolerance</property> property)
+         are also available for DAE &Stepper; classes.</para>
+
+      </sect3>
+
+      <sect3>
+	<title>Algebraic Processes</title>
+
+	<para>This is a type of discrete &Process;, but placed here
+         because it is used with a DAE &Stepper;, which is continuous.</para>
 
 	<para>In principle, continuous &Process; objects must be
 	connected with continuous &Stepper; instances, and a discrete
@@ -1699,7 +2127,7 @@ currently not available on the Windows version.)
 	<para>The DAE solver system of &ecell; uses
          <property>Activity</property> property of &Process; objects
          to represent the value of the algebraic function <literal>g(
-         t, x, z )</literal>.  An algebraic &Process; must change values
+         t, x )</literal>.  An algebraic &Process; must change values
          of &Variable; objects explicitly.  The DAE &Stepper; does this
          job of finding a point where the equation <literal>g()</literal>
          holds.</para>
@@ -1718,26 +2146,67 @@ currently not available on the Windows version.)
         except that the evaluation of its expression is interpreted as the
         value of the algebraic function <literal>g()</literal>.</para>
 
-	<para>C++ and Python scripting of algebraic &Process;
-         instances are of course possible.  Call
+<para>The following examble describes an equation
+<programlisting>
+a * A + B = 10,  a = 1.5
+</programlisting>
+<example>
+	  <title>A simple algebraic equation using ExpressionAlgebraicProcess</title>
+	  <programlisting>
+Stepper DAEStepper( DAE1 ) {}
+
+Process ExpressionFluxProcess( P )
+{
+    StepperID DAE1;
+
+    a    1.5;
+
+    Expression "( a * A + B ) - 10";
+
+    VariableReferenceList [ A :.:A 1 ] [ B :.:B 1 ];
+}
+</programlisting>
+	  </example>
+</para>
+
+	<para>To use C++ or <classname>PythonProcess</classname> for
+         algebraic equations, call
          <methodname>setActivity</methodname>() method to set the
-         value of the equation instead of
-         <methodname>setFlux</methodname>() in the case of flux
-         &Process objects.</para>
+         value of the equation.   The following is an example with
+         a <classname>PythonProcess</classname>:
+
+<example>
+	  <title>A simple algebraic equation using PythonProcess</title>
+	  <programlisting>
+Process PythonProcess( PY )
+{
+    a    1.5;
+
+    FireMethod "self.setActivity( ( a * A + B ) - 10 )";
+
+    VariableReferenceList [ A :.:A 1 ] [ B :.:B 1 ];
+}
+</programlisting>
+	</example>
+
+</para>
 
 
       </sect3>
 
-      <sect3>
-	<title>Power-law (S-System and GMA) object classes</title>
 
-	<para>The system supports S-System and GMA simulations by
-	using ESSYNS algorithm.  Use a pair of
-	<classname>ESSYNSStepper</classname>, and either
-	<classname>SSystemProcess</classname> or
-	<classname>GMAProcess</classname>.  Use
+
+
+      <sect3>
+	<title>Power-law canonical DEs (S-System and GMA)</title>
+
+	<para><classname>ESSYNSStepper</classname> supports S-System and
+         GMA simulations by using the ESSYNS algorithm.  
+	A <classname>ESSYNSStepper</classname> must be connected 
+        with either a <classname>SSystemProcess</classname> or
+	a <classname>GMAProcess</classname>.  Use
 	<property>SSystemMatrix</property> or
-	<property>GMAMatrix</property> property to set the
+	<property>GMAMatrix</property> property to set the system
 	parameters.</para>
 
 	<para>A sample model under the directory
@@ -1748,6 +2217,8 @@ currently not available on the Windows version.)
 	descriptions to come....</para>
 
       </sect3>
+
+
 
     </sect2>
 
