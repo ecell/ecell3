@@ -48,21 +48,34 @@ def convertToMoleUnit( aValue ):
 
 def getVariableReferenceId( aVariableReference, aFullPath ):
 
-    aFastColon = string.index( aVariableReference, ':' )
+    aFirstColon = string.index( aVariableReference, ':' )
     aLastColon = string.rindex( aVariableReference, ':' )
 
     # set Species Id to Reactant object
-    if ( aVariableReference[aFastColon+1:aLastColon] == '.' ):
+    if ( aVariableReference[aFirstColon+1:aLastColon] == '.' ):
         aSpeciesReferencePath = string.replace( aFullPath[1:], '/', '__' )
         
     else:
-        aSpeciesReferencePath = string.replace( aVariableReference[aFastColon+2:aLastColon], '/', '__' )
+        aSpeciesReferencePath = string.replace( aVariableReference[aFirstColon+2:aLastColon], '/', '__' )
 
     if ( aSpeciesReferencePath != '' ):
         return  aSpeciesReferencePath + '__' + aVariableReference[aLastColon+1:]
     else:
         return aVariableReference[aLastColon+1:]
                             
+
+
+# --------------------------------------
+#  set Expression Annotation for ecell3
+# --------------------------------------
+
+def setExpressionAnnotation( aKineticLaw, anExpression ):
+
+    anExpressionAnnotation = '''<annotation xmlns:ecell="http://www.sbml.org/2001/ecell"><ecell:Expression>'''
+    anExpressionAnnotationEnd = "</ecell:Expression></annotation>"
+    
+    aKineticLaw.setAnnotation( anExpressionAnnotation + anExpression + anExpressionAnnotationEnd )
+
 
 # ------------------------------------------------------------
 #  create Compartment, Species, Parameter and Reaction object
@@ -90,7 +103,11 @@ def createEntity( anEml, aSBMLModel, aFullID, anOptional='' ):
             aParameter = aSBMLModel.createParameter()
 
             # set Parameter ID
-            aParameter.setId( aFullID[2] )
+            if( aSBMLLevel == '1' ):
+                aParameter.setName( aFullID[2] )
+
+            elif( aSBMLLevel == '2' ):
+                aParameter.setId( aFullID[2] )
 
             # set Parameter Name, Value and Constant
             for aPropertyName in aPropertyNameList:
@@ -99,8 +116,15 @@ def createEntity( anEml, aSBMLModel, aFullID, anOptional='' ):
 
                 # set Parameter Name
                 if ( aPropertyName == "Name" ):
-                    aParameter.setName( anEml.getEntityProperty( aFullPN ) )
 
+                    if( aSBMLLevel == '1' ):
+                        pass
+                    
+                    if( aSBMLLevel == '2' ):
+                        aParameter.setName
+                        ( anEml.getEntityProperty( aFullPN ) )
+
+                        
                 # set Parameter Value
                 elif ( aPropertyName == "Value" ):
                     aParameter.setValue( anEml.getEntityProperty( aFullPN ) )
@@ -126,7 +150,11 @@ def createEntity( anEml, aSBMLModel, aFullID, anOptional='' ):
                 else:
                     aSpeciesID = aFullID[2]
 
-                aSpecies.setId( aSpeciesID )
+                if( aSBMLLevel == '1' ):
+                    aSpecies.setName( aSpeciesID )
+                if( aSBMLLevel == '2' ):
+                    aSpecies.setId( aSpeciesID )
+
 
                 # set Compartment of Species
                 aSpecies.setCompartment( 'default' )
@@ -138,9 +166,13 @@ def createEntity( anEml, aSBMLModel, aFullID, anOptional='' ):
 
                     # set Species Name
                     if ( aPropertyName == "Name" ):
-                        
-                        aSpecies.setName(
-                            anEml.getEntityProperty( aFullPN )[0] )
+
+                        if( aSBMLLevel == '1' ):
+                            pass
+
+                        elif( aSBMLLevel == '2' ):
+                            aSpecies.setName
+                            ( anEml.getEntityProperty( aFullPN )[0] )
 
                     # set Species Value
                     elif ( aPropertyName == "Value" ):
@@ -171,7 +203,7 @@ def createEntity( anEml, aSBMLModel, aFullID, anOptional='' ):
 
         aPropertyNameList = anEml.getEntityPropertyList( aFullIDString )
 
-        aFastColon = string.index( aFullIDString, ':' )
+        aFirstColon = string.index( aFullIDString, ':' )
         aLastColon = string.rindex( aFullIDString, ':' )
 
         
@@ -179,14 +211,15 @@ def createEntity( anEml, aSBMLModel, aFullID, anOptional='' ):
         #  make Rule object
         # ------------------
 
-        if ( aFullIDString[aFastColon+1:aLastColon] == '/SBMLRule' ):
+        if ( aFullIDString[aFirstColon+1:aLastColon] == '/SBMLRule' ):
 
             # get Process Class
             aProcessClass = anEml.getEntityClass( aFullIDString )
-            aVariableReferenceList = anEml.getEntityProperty( aFullIDString + ':VariableReferenceList' )
-            anExpression = convertExpression( anEml.getEntityProperty( aFullIDString + ':Expression' )[0],
-                                              aVariableReferenceList,
-                                              aFullID[1] )
+            aVariableReferenceList =\
+            anEml.getEntityProperty( aFullIDString + ':VariableReferenceList' )
+            anExpression = convertExpression(anEml.getEntityProperty( aFullIDString + ':Expression' )[0],
+                                             aVariableReferenceList,
+                                             aFullID[1] )
 
 
 
@@ -265,7 +298,10 @@ def createEntity( anEml, aSBMLModel, aFullID, anOptional='' ):
             aKineticLaw = aSBMLModel.createKineticLaw()
 
             # set Reaction ID
-            aReaction.setId( aFullID[2] )
+            if( aSBMLLevel == '1' ):
+                aReaction.setName( aFullID[2] )
+            if( aSBMLLevel == '2' ):
+                aReaction.setId( aFullID[2] )
 
             for aPropertyName in aPropertyNameList:
                 
@@ -275,7 +311,12 @@ def createEntity( anEml, aSBMLModel, aFullID, anOptional='' ):
                 if ( aPropertyName == "Name" ):
                 
                     # set Reaction Name
-                    aReaction.setName( anEml.getEntityProperty( aFullPN )[0] )
+                    if( aSBMLLevel == '1' ):
+                        pass
+                    
+                    if( aSBMLLevel == '2' ):
+                        aReaction.setName
+                        ( anEml.getEntityProperty( aFullPN )[0] )
 
 
                 # set Expression property ( KineticLaw Formula )
@@ -284,10 +325,17 @@ def createEntity( anEml, aSBMLModel, aFullID, anOptional='' ):
                     # convert Expression of the ECELL format to
                     # SBML kineticLaw formula
 
-                    anExpression = convertExpression(
-                        anEml.getEntityProperty( aFullPN )[0],
-                        anEml.getEntityProperty( aFullIDString + ':VariableReferenceList' ),
-                        aFullID[1] )
+                    anExpression = anEml.getEntityProperty( aFullPN )[0]
+                    aVariableReference = anEml.getEntityProperty( aFullIDString + ':VariableReferenceList' )
+
+                    setExpressionAnnotation( aKineticLaw, anExpression )
+#                    setVariableReferenceAnnotation( aKineticLaw,
+ #                                                   aVariableReference )
+
+
+                    anExpression = convertExpression( anExpression,
+                                                      aVariableReference,
+                                                      aFullID[1] )
 
 
                     if( aFullID[1] == '/' ):
@@ -460,10 +508,19 @@ def createEntity( anEml, aSBMLModel, aFullID, anOptional='' ):
 
             # set ID ROOT System and Other System
             if ( aFullID[2] == '' ):
-                aCompartment.setId( "default" )
-            else:
-                aCompartment.setId( aFullID[2] )
 
+                if( aSBMLLevel == '1' ):
+                    aCompartment.setName( "default" )
+                elif( aSBMLLevel == '2' ):
+                    aCompartment.setId( "default" )
+            else:
+
+                if( aSBMLLevel == '1' ):
+                    aCompartment.setName( aFullID[2] )
+                elif( aSBMLLevel == '2' ):
+                    aCompartment.setId( aFullID[2] )
+
+                    
             aSystemPath = aFullID[1] + aFullID[2] 
 
             for anID in anEml.getEntityList( 'Variable', aSystemPath ):
@@ -481,8 +538,8 @@ def createEntity( anEml, aSBMLModel, aFullID, anOptional='' ):
                         
                             aFullPN = "Variable:" + aSystemPath + ':' +anID + ':' + aProperty
                 
-                            aCompartment.setSize(
-                                float( anEml.getEntityProperty( aFullPN )[0] ) )
+                            aCompartment.setSize\
+                            ( float( anEml.getEntityProperty( aFullPN )[0] ) )
 
                         elif ( aProperty == "Fixed" ):
 
@@ -556,8 +613,11 @@ def initialize( aSBMLModel ):
     aParameter = aSBMLModel.createParameter()
 
     # set Parameter Id
-    aParameter.setId( 'N_A' )
-
+    if( aSBMLLevel == '1' ):
+        aParameter.setName( 'N_A' )
+    if( aSBMLLevel == '2' ):
+        aParameter.setId( 'N_A' )
+        
     # set Parameter Value
     aParameter.setValue( float( 6.0221367e+23 ) )
     
@@ -573,7 +633,10 @@ def initialize( aSBMLModel ):
     aSpecies = aSBMLModel.createSpecies()
     
     # set Species Id
-    aSpecies.setId( 'EmptySet' )
+    if( aSBMLLevel == '1' ):
+        aSpecies.setName( 'EmptySet' )
+    elif( aSBMLLevel == '2' ):
+        aSpecies.setId( 'EmptySet' )
     
     # set Species Compartment
     aSpecies.setCompartment( 'default' )
@@ -668,13 +731,24 @@ Options:
             
 
 
+    global aSBMLLevel
 
-    aBuffer = '''
-# -----  created by ecell3-eml2sbml(SBML Exporter)  -------
-# from file: %s, date: %s
-#
+    aSBMLLevel = raw_input( "SBML Model Level? ( 1 or 2 ) : " )
 
-''' % ( anEmlFileName, time.asctime( time.localtime() ) )
+    if( aSBMLLevel == '1' ):
+
+        aSBMLVersion = raw_input( "SBML Model Version? ( 1 or 2 ) : " )
+
+        if( aSBMLVersion != '1' and aSBMLVersion != '2'):            
+        
+            raise IOError," Such SBML Version is not defined"
+
+        
+    elif( aSBMLLevel == '2' ):
+        aSBMLVersion = 1
+
+    else:
+        raise IOError," Such SBML Level is not defined"
 
 
 # ------------------------------
@@ -684,8 +758,8 @@ Options:
     #  SBML Document
     aSBMLDocument = libsbml.SBMLDocument()
     aSBMLModel = aSBMLDocument.createModel()
-    aSBMLDocument.setLevel( 2 )
-    aSBMLDocument.setVersion( 1 )
+    aSBMLDocument.setLevel( int( aSBMLLevel ) )
+    aSBMLDocument.setVersion( int( aSBMLVersion ) )
 
     # initialize SBML model
     initialize( aSBMLModel )
