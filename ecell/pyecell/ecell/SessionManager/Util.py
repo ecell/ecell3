@@ -64,7 +64,7 @@ DEFAULT_ENVIRONMENT = 'Local'
 
 # job status
 QUEUED 		= 0
-RUN			= 1
+RUN		= 1
 FINISHED 	= 2
 ERROR		= 3
 

@@ -12,6 +12,8 @@ pkgpythondir=@pkgpythondir@/SessionManager
 LIBS=  # do not need gsl and gslcblas linked
 
 pkgpython_PYTHON=\
+Globus2SessionProxy.py\
+Globus2SystemProxy.py\
 SessionManager.py\
 SessionProxy.py\
 SystemProxy.py\

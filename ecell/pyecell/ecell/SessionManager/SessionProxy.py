@@ -55,6 +55,7 @@ class SessionProxy:
 	__theStdout = DEFAULT_STDOUT
 	__theStderror = DEFAULT_STDERR
 	__theRetryMaxCount = 0
+	__theSystemProxy = None
 
 
 	# -----------------
@@ -127,7 +128,6 @@ class SessionProxy:
 		Return str -- str is directory name
 		'''
 		return SessionProxy.__theSelfDirPath 
-
 	
 
 	def setRetryMaxCount(cls, count):
@@ -144,6 +144,19 @@ class SessionProxy:
 		SessionProxy.__theRetryMaxCount = count
 
 
+	def setSystemProxy(cls, systemproxy):
+		'''Set SystemProxy
+		Return None
+		'''
+		SessionProxy.__theSystemProxy = systemproxy 
+
+	def getSystemProxy(cls):
+		'''Get SystemProxy
+		Return SystemProxy
+		'''
+		return SessionProxy.__theSystemProxy 
+
+
 	# register class methods
 	__getNextJobID = classmethod(__getNextJobID)
 	setStdoutFileName = classmethod(setStdoutFileName)
@@ -153,6 +166,8 @@ class SessionProxy:
 	setDM_PATH = classmethod(setDM_PATH)
 	getDM_PATH = classmethod(getDM_PATH)
 	setRetryMaxCount = classmethod(setRetryMaxCount)
+	setSystemProxy = classmethod(setSystemProxy)
+	getSystemProxy = classmethod(getSystemProxy)
 
 
 	# -----------------
