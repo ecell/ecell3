@@ -461,6 +461,7 @@ namespace libemc
 	
 	if( aCounter == 0 )
 	  {
+	    theRunningFlag = false;
 	    break;
 	  }
 
