@@ -421,6 +421,10 @@ class Preprocessor:
 		self.need_linecontrol = 0
 		self.file = file
 		self.filename = filename
+		self.interpreter = None
+
+	def __del__( self ):
+		self.shutdown()
 
 	def lineControl( self, interpreter, file, line ):
 		interpreter.write( '%%line %d %s\n' % ( line, file ) )
@@ -449,8 +453,8 @@ class Preprocessor:
 		# init
 		#
 		Output = StringIO.StringIO()
-		interpreter = em.Interpreter( output = Output )
-		pseudo = interpreter.pseudo
+		self.interpreter = em.Interpreter( output = Output )
+		pseudo = self.interpreter.pseudo
 		pseudo.flatten()
 
 		#
@@ -458,7 +462,7 @@ class Preprocessor:
 		#
 		pseudo.addHook( 'after_include', self.afterIncludeHook )
 		pseudo.addHook( 'after_expand', self.needLineControl )
-		# 'after_evaluate' may not work in a bug in empy2.0?
+		# 'after_evaluate' may not work by a bug in empy2.0?
 		pseudo.addHook( 'before_evaluate', self.needLineControl )
 		pseudo.addHook( 'after_execute', self.needLineControl )
 		pseudo.addHook( 'after_substitute', self.needLineControl )
@@ -471,19 +475,21 @@ class Preprocessor:
 		#
 
 		# write first line
-		self.lineControl( interpreter, self.filename, 1 )
+		self.lineControl( self.interpreter, self.filename, 1 )
 
 		if self.file is not None:
-			interpreter.wrap( interpreter.file,\
+			self.interpreter.wrap( self.interpreter.file,\
 					  ( self.file, self.filename ), 0, 1 )
 
-		interpreter.flush()
+		self.interpreter.flush()
 
-		OutputString = Output.getvalue()
+		return Output
 
-		interpreter.shutdown()
 
-		return OutputString
+	def shutdown( self ):
+		
+		self.interpreter.shutdown()
+
 
 
 def usage():
@@ -501,9 +507,9 @@ Options:
         -E or --preprocess :  Preprocessing only. implies -o -.
 ''' % ( aProgramName, aProgramName )
 	
-if __name__ == '__main__':
 
 
+def main():
 
 	try:
 		opts , args = getopt.getopt( sys.argv[1:] , 'DEhfo:',
@@ -557,9 +563,8 @@ if __name__ == '__main__':
 	if anEmlFileName == '-':
 		anEmlFile = sys.stdout
 
-	preprocessor = Preprocessor( anEmFile, anEmFileName )
-	aTempFile = StringIO.StringIO( preprocessor.preprocess() )
-	del preprocessor
+	aPreprocessor = Preprocessor( anEmFile, anEmFileName )
+	aTempFile = aPreprocessor.preprocess()
 
 	aTempFile.seek( 0 )
 
@@ -569,15 +574,20 @@ if __name__ == '__main__':
 		anEmlFile.close()
 		sys.exit(0)
 
-	anEmlObject = convertEm2Eml(aTempFile, debug)
+	anEmlObject = convertEm2Eml( aTempFile, debug )
 	aTempFile.close()
+	del aPreprocessor
 
 	aString = anEmlObject.asString()
 	
-        if anEmlFileName == '-' or debug !=0 :
+        if anEmlFileName == '-':
 		print aString
 	else:
 		anEmlFile = open(anEmlFileName, 'w')
 		anEmlFile.write(aString)
 		anEmlFile.close()
 		
+
+
+if __name__ == '__main__':
+	main()
