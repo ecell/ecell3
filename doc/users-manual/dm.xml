@@ -219,12 +219,12 @@ LIBECS_DM_INIT( <parameter>CLASSNAME</parameter>, <parameter>DMTYPE</parameter> 
 	      on a Linux/IA32/gcc platform.</para>
 	    </listitem>
 	    <listitem>
-	      <para><type>Int</type></para>
+	      <para><type>Integer</type></para>
 
 	      <para>A signed integer number.   This is a 64-bit <type>long int</type> on Linux/IA32/gcc.</para>
 	    </listitem>
 	    <listitem>
-	      <para><type>UnsignedInt</type></para>
+	      <para><type>UnsignedInteger</type></para>
 
 	      <para>An unsigned integer number. This is a 64-bit <type>unsigned long int</type> on Linux/IA32/gcc. </para>
 	    </listitem>
@@ -240,7 +240,7 @@ LIBECS_DM_INIT( <parameter>CLASSNAME</parameter>, <parameter>DMTYPE</parameter> 
 
 	      <para>&Polymorph; is a sort of
               universal type (actually a class) which can *become* and
-              *be made from* any of <type>Real</type>, <type>Int</type>,
+              *be made from* any of <type>Real</type>, <type>Integer</type>,
               <type>String</type>, and <type>PolymorphVector</type>,
               which is a mixed list of these three types of
               objects. See the next section for details.</para>
@@ -330,7 +330,7 @@ See the C++ standard library reference manual for more.</para>
 
 	<para>A &Polymorph; object can be
 	constructed from and converted to any of <type>Real</type>,
-	<type>Int</type>, <type>String</type>, types and
+	<type>Integer</type>, <type>String</type>, types and
 	&PolymorphVector; class.</para>
 	
       <sect3>
@@ -339,7 +339,7 @@ See the C++ standard library reference manual for more.</para>
 	<para>To construct a &Polymorph; object, simply call a constructor with a value:
 
 <programlisting>
-Polymorph anIntPolymorph( 1 );
+Polymorph anIntegerPolymorph( 1 );
 Polymorph aRealPolymorph( 3.1 );
 Polymorph aStringPolymorph( "2.13e2" );
 </programlisting>
@@ -357,13 +357,13 @@ Polymorph aRealPolymorph2( aRealPolymorph );
 	<para>The value of the &Polymorph;
 	objects can be retrieved in any type by using <methodname>as&lt;></methodname>() template method.
 <programlisting>
-anIntPolymorph.as&lt;Real>();    // == 1.0
+anIntegerPolymorph.as&lt;Real>();    // == 1.0
 aRealPolymorph.as&lt;String>(); // == "3.1"
-aStringPolymorph.as&lt;Int>();  // == 213
+aStringPolymorph.as&lt;Integer>();  // == 213
 </programlisting>
 
 <note>
-	    <para>If an overflow occurs when converting a very big <type>Real</type> value to <type>Int</type>, a <exceptionname>ValueError</exceptionname> exception?? is thrown.  (NOT IMPLEMENTED YET)</para>
+	    <para>If an overflow occurs when converting a very big <type>Real</type> value to <type>Integer</type>, a <exceptionname>ValueError</exceptionname> exception?? is thrown.  (NOT IMPLEMENTED YET)</para>
 	  </note>
 
 
@@ -453,7 +453,7 @@ aStringPolymorph.as&lt;Int>();  // == 213
 	      <para><type>Real</type></para>
 	    </listitem>
 	    <listitem>
-	      <para><type>Int</type></para>
+	      <para><type>Integer</type></para>
 	    </listitem>
 	    <listitem>
 	      <para><type>String</type></para>

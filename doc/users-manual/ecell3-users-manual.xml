@@ -79,7 +79,7 @@
   <!ENTITY int "<type>int</type>">
   <!ENTITY double "<type>double</type>">
   <!ENTITY Real "<type>Real</type>">
-  <!ENTITY Int "<type>Int</type>">
+  <!ENTITY Integer "<type>Integer</type>">
   <!ENTITY StringType "<type>String</type>">
 
   <!ENTITY EntityType "<wordasword>EntityType</wordasword>">

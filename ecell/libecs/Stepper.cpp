@@ -247,7 +247,8 @@ namespace libecs
   void Stepper::createVariableProxies()
   {
     // create VariableProxies.
-    for( UnsignedInt c( 0 );  c != theReadOnlyVariableOffset; ++c )
+    for( VariableVector::size_type c( 0 );  
+	 c != theReadOnlyVariableOffset; ++c )
       {
 	VariablePtr aVariablePtr( theVariableVector[ c ] );
 	aVariablePtr->registerProxy( createVariableProxy( aVariablePtr ) );
@@ -331,7 +332,8 @@ namespace libecs
 	//
 
 	// if one Variable in this::readlist appears in the target::write list
-	for( UnsignedInt c( 0 ); c != theReadOnlyVariableOffset; ++c )
+	for( VariableVector::size_type c( 0 ); 
+	     c != theReadOnlyVariableOffset; ++c )
 	  {
 	    VariablePtr const aVariablePtr( theVariableVector[ c ] );
 
@@ -464,7 +466,8 @@ namespace libecs
     PolymorphVector aVector;
     aVector.reserve( theVariableVector.size() );
 
-    for( UnsignedInt c( 0 ); c != theReadOnlyVariableOffset; ++c )
+    for( VariableVector::size_type c( 0 ); 
+	 c != theReadOnlyVariableOffset; ++c )
       {
 	aVector.push_back( theVariableVector[c]->getFullID().getString() );
       }
@@ -477,7 +480,7 @@ namespace libecs
     PolymorphVector aVector;
     aVector.reserve( theVariableVector.size() );
     
-    for( UnsignedInt c( theReadWriteVariableOffset ); 
+    for( VariableVector::size_type c( theReadWriteVariableOffset ); 
 	 c != theVariableVector.size(); ++c )
       {
 	aVector.push_back( theVariableVector[c]->getFullID().getString() );
@@ -500,7 +503,7 @@ namespace libecs
     return aVector;
   }
   
-  const UnsignedInt Stepper::getVariableIndex( VariableCptr const aVariable )
+  const VariableVector::size_type Stepper::getVariableIndex( VariableCptr const aVariable )
   {
     VariableVectorConstIterator
       anIterator( std::find( theVariableVector.begin(), 
@@ -516,8 +519,8 @@ namespace libecs
 
   void Stepper::clearVariables()
   {
-    const UnsignedInt aSize( theVariableVector.size() );
-    for( UnsignedInt c( 0 ); c < aSize; ++c )
+    const VariableVector::size_type aSize( theVariableVector.size() );
+    for( VariableVector::size_type c( 0 ); c < aSize; ++c )
       {
 	VariablePtr const aVariable( theVariableVector[ c ] );
 
@@ -566,7 +569,8 @@ namespace libecs
   void Stepper::reset()
   {
     // restore original values and clear velocity of all the *write* variables.
-    for( UnsignedInt c( 0 ); c < getReadOnlyVariableOffset(); ++c )
+    for( VariableVector::size_type c( 0 ); 
+	 c < getReadOnlyVariableOffset(); ++c )
       {
 	VariablePtr const aVariable( theVariableVector[ c ] );
 
@@ -593,14 +597,14 @@ namespace libecs
 
   SET_METHOD_DEF( String, RngSeed, Stepper )
   {
-    UnsignedInt aSeed( 0 );
+    UnsignedInteger aSeed( 0 );
     
     if( value == "TIME" )
       {
 	// Using just time() still gives the same seeds to Steppers
 	// in multi-stepper model.  Stepper index is added to prevent this.
-	aSeed = static_cast<UnsignedInt>( time( NULLPTR ) 
-					  + getSchedulerIndex() );
+	aSeed = static_cast<UnsignedInteger>( time( NULLPTR ) 
+					      + getSchedulerIndex() );
       }
     else if( value == "DEFAULT" )
       {
@@ -608,7 +612,7 @@ namespace libecs
       }
     else
       {
-	aSeed = stringTo<UnsignedInt>( value );
+	aSeed = stringTo<UnsignedInteger>( value );
       }
 
     gsl_rng_set( getRng(), aSeed );

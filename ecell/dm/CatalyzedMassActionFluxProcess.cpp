@@ -49,7 +49,7 @@ LIBECS_DM_CLASS( CatalyzedMassActionProcess, Process )
 	  VariableReferenceCref aVariableReference( *i );
 	  const Real aConcentration( aVariableReference.getMolarConc() );
 
-	  Int j( aVariableReference.getCoefficient() );
+	  Integer j( aVariableReference.getCoefficient() );
 	  do
 	    {	   
 	      velocity *= aConcentration;

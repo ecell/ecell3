@@ -35,7 +35,7 @@ namespace libecs
 {
 
 
-  PhysicalLogger::PhysicalLogger(Int aPointSize) 
+  PhysicalLogger::PhysicalLogger(int aPointSize) 
     : 
     PointSize(aPointSize),
     anEmptyDataPoint(),

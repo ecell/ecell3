@@ -149,12 +149,12 @@ namespace libemc
     virtual const libecs::Real 
     getLoggerMinimumInterval( libecs::StringCref aFullPNString ) const;
 
-    virtual const libecs::Int 
+    virtual const libecs::Integer 
     getLoggerSize( libecs::StringCref aFullPNString ) const;
 
     virtual const libecs::Polymorph getNextEvent() const;
 
-    virtual void step( const libecs::Int aNumSteps );
+    virtual void step( const libecs::Integer aNumSteps );
 
     virtual void initialize();
 
@@ -199,7 +199,7 @@ namespace libemc
     libecs::ModelRef           theModel;
 
     bool                       theRunningFlag;
-    libecs::Int                theEventCheckInterval;
+    libecs::Integer                theEventCheckInterval;
 
     EventCheckerRCPtr          theEventChecker;
     EventHandlerRCPtr          theEventHandler;

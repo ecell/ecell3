@@ -137,10 +137,10 @@ namespace libecs
 
     static const size_t getElementSize()
     {
-      return sizeof( Real);
+      return sizeof( Real );
     }
 
-    static const Int getElementNumber()
+    static const int getElementNumber()
     {
       return 2;
     }
@@ -282,7 +282,7 @@ namespace libecs
       return sizeof( Real);
     }
 
-    static const Int getElementNumber()
+    static const int getElementNumber()
     {
       return 5;
     }

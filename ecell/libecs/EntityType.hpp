@@ -65,7 +65,7 @@ namespace libecs
 
     EntityType( StringCref typestring );
 
-    EntityType( const Int number );
+    EntityType( const int number );
 
     EntityType( const Type type )
       :
@@ -106,9 +106,9 @@ namespace libecs
       return getType();
     }
 
-    //    operator const Int&() const
+    //    operator const int&() const
     //    {
-    //      return static_cast<const Int&>( getType() ); 
+    //      return static_cast<const int&>( getType() ); 
     //    }
 
     bool operator<( EntityTypeCref rhs ) const

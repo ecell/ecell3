@@ -22,7 +22,7 @@ LIBECS_DM_CLASS( GMAProcess, ESSYNSProcess )
     {
       INHERIT_PROPERTIES( Process );
    
-      PROPERTYSLOT_SET_GET( Int, Order );
+      PROPERTYSLOT_SET_GET( Integer, Order );
       PROPERTYSLOT_SET_GET( Polymorph, GMASystemMatrix );
     }
   
@@ -39,8 +39,8 @@ LIBECS_DM_CLASS( GMAProcess, ESSYNSProcess )
       ;
     }
 
-  SIMPLE_GET_METHOD( Int, Order );
-  void setOrder( IntCref aValue );
+  SIMPLE_GET_METHOD( Integer, Order );
+  void setOrder( IntegerCref aValue );
   
   void setGMASystemMatrix( PolymorphCref aValue );
 
@@ -56,7 +56,7 @@ LIBECS_DM_CLASS( GMAProcess, ESSYNSProcess )
 
   const std::vector<RealVector>& getESSYNSMatrix();
 
-  Int getSystemSize()
+  Integer getSystemSize()
   {
     return theSystemSize;
   }
@@ -68,9 +68,9 @@ LIBECS_DM_CLASS( GMAProcess, ESSYNSProcess )
   
  protected:
 
-  Int Order;
-  Int theSystemSize;
-  Int theLawSize;
+  Integer Order;
+  Integer theSystemSize;
+  Integer theLawSize;
 
   Polymorph GMASystemMatrix;
   
@@ -91,7 +91,7 @@ LIBECS_DM_CLASS( GMAProcess, ESSYNSProcess )
 
 LIBECS_DM_INIT( GMAProcess, Process );
 
-void GMAProcess::setOrder( IntCref aValue ) 
+void GMAProcess::setOrder( IntegerCref aValue ) 
 { 
   Order = aValue;
   
@@ -102,7 +102,7 @@ void GMAProcess::setOrder( IntCref aValue )
   // init Substance Vector
   theY.resize(theSystemSize+1);
   tmp.resize(Order+1);
-  for(Int i( 0 ); i < theLawSize; i++)
+  for(Integer i( 0 ); i < theLawSize; i++)
     {
       theY[i] = tmp;
     }
@@ -111,11 +111,11 @@ void GMAProcess::setOrder( IntCref aValue )
   theAlpha.resize(theLawSize);
   theG.resize( theLawSize);
   tmp.resize(theLawSize);
-  for(Int i( 0 ); i < theLawSize; i++)
+  for(Integer i( 0 ); i < theLawSize; i++)
     {
 
       theG[i].resize( theLawSize);
-      for(Int j( 0 ); j < theLawSize; j++)
+      for(Integer j( 0 ); j < theLawSize; j++)
 	{
 	  theG[i][j] = tmp;
 	}
@@ -127,11 +127,11 @@ void GMAProcess::setOrder( IntCref aValue )
   theAlphaBuffer.resize( theLawSize);
   theGBuffer.resize( theLawSize);
   tmp.resize(Order+1);
-  for(Int i( 0 ); i < theLawSize; i++)
+  for(Integer i( 0 ); i < theLawSize; i++)
     {
       theAlphaBuffer[i].resize( theLawSize );
       theGBuffer[i].resize( theLawSize );
-      for(Int j( 0 ); j < theLawSize; j++)
+      for(Integer j( 0 ); j < theLawSize; j++)
 	{
 	  theAlphaBuffer[i][j] = tmp;
 	  theGBuffer[i][j] = tmp;
@@ -140,7 +140,7 @@ void GMAProcess::setOrder( IntCref aValue )
 
   theFBuffer.resize( Order + 1);
   tmp.resize(Order);
-  for(Int i( 0 ); i < Order + 1; i++)
+  for(Integer i( 0 ); i < Order + 1; i++)
     {
       theFBuffer[i] = tmp;
     }  
@@ -159,7 +159,7 @@ void GMAProcess::setGMASystemMatrix( PolymorphCref aValue )
   theY.resize(theLawSize);
   RealVector tmp;
   tmp.resize(Order+1);
-  for(Int i( 0 ); i < theLawSize; i++)
+  for(Integer i( 0 ); i < theLawSize; i++)
     {
       theY[i] = tmp;
     }
@@ -168,13 +168,13 @@ void GMAProcess::setGMASystemMatrix( PolymorphCref aValue )
   theAlpha.resize( theLawSize );
   theG.resize( theLawSize);
   tmp.resize(theLawSize);
-  for(Int i( 0 ); i < theLawSize; i++)
+  for(Integer i( 0 ); i < theLawSize; i++)
     {
       theAlpha[i] = tmp;
       //      theG[i] = tmp;
       theG[i].resize( theLawSize );
 
-      for(Int j( 0 ); j < theLawSize; j++)
+      for(Integer j( 0 ); j < theLawSize; j++)
 	{
 	  theG[i][j] = tmp;
 	}
@@ -185,14 +185,14 @@ void GMAProcess::setGMASystemMatrix( PolymorphCref aValue )
   theGBuffer.resize( theLawSize);
   tmp.resize(Order+1);
 
-  for(Int i( 0 ); i < theLawSize; i++)
+  for(Integer i( 0 ); i < theLawSize; i++)
     {
       // theAlphaBuffer[i] = tmp;
       // theGBuffer[i] = tmp;
       theAlphaBuffer[i].resize( theLawSize );
       theGBuffer[i].resize( theLawSize );
 
-      for(Int j( 0 ); j < theLawSize; j++)
+      for(Integer j( 0 ); j < theLawSize; j++)
 	{
 	  theAlphaBuffer[i][j] = tmp;
 	  theGBuffer[i][j] = tmp;
@@ -201,15 +201,15 @@ void GMAProcess::setGMASystemMatrix( PolymorphCref aValue )
 
   theFBuffer.resize( Order + 1);
   tmp.resize(Order);
-  for(Int i( 0 ); i < Order + 1; i++)
+  for(Integer i( 0 ); i < Order + 1; i++)
     {
       theFBuffer[i] = tmp;
     }  
 
   // init Factorial matrix
-  for(Int m( 2 ) ; m < Order+1 ; m++)
+  for(Integer m( 2 ) ; m < Order+1 ; m++)
     {
-      for(Int q( 1 ); q < m ; q++)
+      for(Integer q( 1 ); q < m ; q++)
 	{
 	  const Real aFact( 1 / gsl_sf_fact(q-1) * gsl_sf_fact(m-q-1) * m * (m-1) );
 	  (theFBuffer[m])[q] = aFact;      
@@ -217,14 +217,14 @@ void GMAProcess::setGMASystemMatrix( PolymorphCref aValue )
     }
 
   // set Alpha, Beta, G, H 
-  for( Int i( 0 ); i < theSystemSize ; i++ )
+  for( Integer i( 0 ); i < theSystemSize ; i++ )
     {
 
-      for( Int j( 0 ); j < theSystemSize; j++ )	
+      for( Integer j( 0 ); j < theSystemSize; j++ )	
 	{
 	  theAlpha[i+1][j+1] = (aValueVector[i].asPolymorphVector())[j].asReal() ;	  
 	  //std::cout <<'A'<< theAlpha[i+1][j+1]<<std::endl;
-	  for (Int k( 0 ); k < theSystemSize; k++)
+	  for (Integer k( 0 ); k < theSystemSize; k++)
 	    {
 	      if( i == k )
 		{
@@ -246,7 +246,7 @@ void GMAProcess::setGMASystemMatrix( PolymorphCref aValue )
 const std::vector<RealVector>& GMAProcess::getESSYNSMatrix()
 {
   // get theY
-  Int anIndex( 0 );
+  Integer anIndex( 0 );
   
   for( VariableReferenceVectorConstIterator
 	 i ( thePositiveVariableReferenceIterator );
@@ -267,13 +267,13 @@ const std::vector<RealVector>& GMAProcess::getESSYNSMatrix()
   // differentiate first order
   Real aGt( 0.0 );  
   Real aAlpha( 0.0 );	 
-  for( Int i( 1 ); i < theLawSize; i++ )
+  for( Integer i( 1 ); i < theLawSize; i++ )
     {     
       (theY[i-1])[1] = 0;//reset theY
-      for( Int j( 1 ) ; j < theLawSize; j++ )
+      for( Integer j( 1 ) ; j < theLawSize; j++ )
 	{
 	  aGt = 0.0;//reset aGt
-	  for( Int k( 1 ) ; k < theLawSize ; k++ )
+	  for( Integer k( 1 ) ; k < theLawSize ; k++ )
 	    {
 	      aGt += ( (theG[i])[j][k] * (theY[k-1])[0] );
 	    }
@@ -287,21 +287,21 @@ const std::vector<RealVector>& GMAProcess::getESSYNSMatrix()
     }
 
   // differentiate second and/or more order
-  for( Int m( 2 ); m <= Order; m++ ) 
+  for( Integer m( 2 ); m <= Order; m++ ) 
     {
-      for( Int i( 1 ) ; i < theLawSize; i++ )
+      for( Integer i( 1 ) ; i < theLawSize; i++ )
        {  
-	 for( Int j( 1 ); j < theLawSize; j++ )
+	 for( Integer j( 1 ); j < theLawSize; j++ )
 	   {
 	     (theGBuffer[i])[j][m] = 0; //reset GBuffer	
 	     (theAlphaBuffer[i])[j][m] = 0; //reset ABuffer
 	     
-	     for( Int k( 1 ); k < theLawSize; k++ )
+	     for( Integer k( 1 ); k < theLawSize; k++ )
 	       {
 		 (theGBuffer[i])[j][m-1] += 
 		   ( (theG[i])[j][k] * (theY[k-1])[m-1] ); 
 	       }
-	     for( Int q( 1 );  q <= m-1; q++)
+	     for( Integer q( 1 );  q <= m-1; q++)
 	       {
 		 (theAlphaBuffer[i])[j][m] +=  
 		   ( (theFBuffer[m])[q]*
@@ -323,10 +323,10 @@ const std::vector<RealVector>& GMAProcess::getESSYNSMatrix()
 
   //integrate
   Real aY( 0.0 ); 
-  for( Int i( 1 ); i < theSystemSize+1; i++ )
+  for( Integer i( 1 ); i < theSystemSize+1; i++ )
     {
       aY = 0.0;//reset aY 
-      for( Int m( 1 ); m <= Order; m++ )
+      for( Integer m( 1 ); m <= Order; m++ )
         {
 	  aY += ((theY[i-1])[m] *
 		 gsl_sf_pow_int( aStepInterval, m ) / gsl_sf_fact( m ));

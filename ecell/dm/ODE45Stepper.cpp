@@ -53,7 +53,7 @@ namespace libecs
   {
     AdaptiveDifferentialStepper::initialize();
 
-    const UnsignedInt aSize( getReadOnlyVariableOffset() );
+    const VariableVector::size_type aSize( getReadOnlyVariableOffset() );
 
     theK1.resize( aSize );
     theK2.resize( aSize );
@@ -80,7 +80,7 @@ namespace libecs
 
   bool ODE45Stepper::calculate()
   {
-    const UnsignedInt aSize( getReadOnlyVariableOffset() );
+    const VariableVector::size_type aSize( getReadOnlyVariableOffset() );
 
     const Real eps_rel( getTolerance() );
     const Real eps_abs( getTolerance() * getAbsoluteToleranceFactor() );
@@ -97,7 +97,7 @@ namespace libecs
 	interIntegrate();
 	fireProcesses();
 
-	for( UnsignedInt c( 0 ); c < aSize; ++c )
+	for( VariableVector::size_type c( 0 ); c < aSize; ++c )
 	  {
 	    VariablePtr const aVariable( theVariableVector[ c ] );
 	
@@ -114,7 +114,7 @@ namespace libecs
       }
     else
       {
-	for( UnsignedInt c( 0 ); c < aSize; ++c )
+	for( VariableVector::size_type c( 0 ); c < aSize; ++c )
 	  {
 	    VariablePtr const aVariable( theVariableVector[ c ] );
 	
@@ -135,7 +135,7 @@ namespace libecs
     interIntegrate();
     fireProcesses();
 
-    for( UnsignedInt c( 0 ); c < aSize; ++c )
+    for( VariableVector::size_type c( 0 ); c < aSize; ++c )
       {
 	VariablePtr const aVariable( theVariableVector[ c ] );
 	
@@ -157,7 +157,7 @@ namespace libecs
     interIntegrate();
     fireProcesses();
 
-    for( UnsignedInt c( 0 ); c < aSize; ++c )
+    for( VariableVector::size_type c( 0 ); c < aSize; ++c )
       {
 	VariablePtr const aVariable( theVariableVector[ c ] );
 	
@@ -179,7 +179,7 @@ namespace libecs
     interIntegrate();
     fireProcesses();
 
-    for( UnsignedInt c( 0 ); c < aSize; ++c )
+    for( VariableVector::size_type c( 0 ); c < aSize; ++c )
       {
 	VariablePtr const aVariable( theVariableVector[ c ] );
 	
@@ -202,7 +202,7 @@ namespace libecs
     interIntegrate();
     fireProcesses();
 
-    for( UnsignedInt c( 0 ); c < aSize; ++c )
+    for( VariableVector::size_type c( 0 ); c < aSize; ++c )
       {
 	VariablePtr const aVariable( theVariableVector[ c ] );
 	
@@ -226,7 +226,7 @@ namespace libecs
     interIntegrate();
     fireProcesses();
 
-    for( UnsignedInt c( 0 ); c < aSize; ++c )
+    for( VariableVector::size_type c( 0 ); c < aSize; ++c )
       {
 	VariablePtr const aVariable( theVariableVector[ c ] );
 	
@@ -254,7 +254,7 @@ namespace libecs
     // evaluate error
     Real maxError( 0.0 );
 	
-    for( UnsignedInt c( 0 ); c < aSize; ++c )
+    for( VariableVector::size_type c( 0 ); c < aSize; ++c )
       {
 	VariablePtr const aVariable( theVariableVector[ c ] );
 

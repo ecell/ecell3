@@ -61,7 +61,7 @@ namespace libecs
     DECLARE_TYPE( Vector::size_type, iterator );
     DECLARE_TYPE( Vector::size_type, size_type );
 
-    PhysicalLogger(Int );
+    PhysicalLogger(int );
 
     virtual ~PhysicalLogger()
     {
@@ -131,7 +131,7 @@ namespace libecs
     // this mutable can be removed if vvector supports const operations
     mutable Vector theVector;
     mutable VectorLong theVectorLong;
-    Int PointSize;
+    Integer PointSize;
     
   };
 

@@ -56,9 +56,9 @@ namespace libecs
 
     virtual ~PolymorphValue();
 
-    virtual const String asString()        const = 0;
-    virtual const Real   asReal()          const = 0;
-    virtual const Int    asInt()           const = 0;
+    virtual const String  asString()        const = 0;
+    virtual const Real    asReal()          const = 0;
+    virtual const Integer asInteger()       const = 0;
     virtual const PolymorphVector asPolymorphVector() const = 0;
 
     template< typename T >
@@ -94,9 +94,9 @@ namespace libecs
   }
 
   template <>
-  inline const Int PolymorphValue::as() const
+  inline const Integer PolymorphValue::as() const
   {
-    return asInt();
+    return asInteger();
   }
 
   template <>
@@ -129,7 +129,7 @@ namespace libecs
       ; // do nothing
     }
 
-    ConcretePolymorphValue( IntCref  aValue )
+    ConcretePolymorphValue( IntegerCref  aValue )
       :
       theValue( convertTo<T>( aValue ) )
     {
@@ -160,10 +160,20 @@ namespace libecs
       return convertTo<String>( theValue ); 
     }
 
-    virtual const Real   asReal()  const { return convertTo<Real>( theValue );}
-    virtual const Int    asInt()   const { return convertTo<Int>( theValue ); }
+    virtual const Real    asReal()  const 
+    { 
+      return convertTo<Real>( theValue );
+    }
+
+    virtual const Integer asInteger()   const 
+    { 
+      return convertTo<Integer>( theValue ); 
+    }
+
     virtual const PolymorphVector asPolymorphVector() const
-    { return convertTo<PolymorphVector>( theValue ); }
+    { 
+      return convertTo<PolymorphVector>( theValue ); 
+    }
 
     virtual PolymorphValuePtr createClone() const
     {
@@ -187,9 +197,9 @@ namespace libecs
 
     virtual ~PolymorphNoneValue();
 
-    virtual const String asString() const;
-    virtual const Real   asReal() const   { return 0.0; }
-    virtual const Int    asInt() const    { return 0; }
+    virtual const String  asString() const;
+    virtual const Real    asReal() const       { return 0.0; }
+    virtual const Integer asInteger() const    { return 0; }
     virtual const PolymorphVector asPolymorphVector() const;
   
     virtual PolymorphValuePtr createClone() const
@@ -210,7 +220,7 @@ namespace libecs
       {
 	NONE,
 	REAL, 
-	INT,  
+	INTEGER,  
 	STRING,
 	POLYMORPH_VECTOR
       };
@@ -237,9 +247,9 @@ namespace libecs
       ; // do nothing
     }
 
-    Polymorph( IntCref aValue )      
+    Polymorph( IntegerCref aValue )      
       :
-      theValue( new ConcretePolymorphValue<Int>( aValue ) )
+      theValue( new ConcretePolymorphValue<Integer>( aValue ) )
     {
       ; // do nothing
     }
@@ -284,9 +294,9 @@ namespace libecs
       return theValue->asReal(); 
     }
   
-    const Int    asInt() const
+    const Integer asInteger() const
     { 
-      return theValue->asInt();
+      return theValue->asInteger();
     }
 
     const PolymorphVector asPolymorphVector() const
@@ -315,9 +325,9 @@ namespace libecs
       return asReal();
     }
 
-    operator Int() const
+    operator Integer() const
     {
-      return asInt();
+      return asInteger();
     }
 
     operator PolymorphVector() const
@@ -354,9 +364,9 @@ namespace libecs
   }
 
   template <>
-  inline const Int Polymorph::as() const
+  inline const Integer Polymorph::as() const
   {
-    return asInt();
+    return asInteger();
   }
 
   template <>
@@ -438,10 +448,10 @@ namespace libecs
     return PolymorphVector( 1, aValue );
   }
 
-  // from Int
+  // from Integer
   template<>
   inline const PolymorphVector 
-  convertTo( IntCref aValue, Type2Type< PolymorphVector > )
+  convertTo( IntegerCref aValue, Type2Type< PolymorphVector > )
   {
     return PolymorphVector( 1, aValue );
   }
@@ -462,10 +472,11 @@ namespace libecs
   }
     
   template<>
-  inline const Int convertTo( PolymorphVectorCref aValue, Type2Type< Int > )
+  inline const Integer convertTo( PolymorphVectorCref aValue, 
+				  Type2Type< Integer > )
   {
     checkSequenceSize( aValue, 1 );
-    return aValue[0].asInt();
+    return aValue[0].asInteger();
   }
     
 

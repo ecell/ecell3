@@ -59,7 +59,7 @@ namespace libecs
 
   ////////////////////////////// Logger
 //#   define _LOGGER_MAX_PHYSICAL_LOGGERS  5;
-//#   define Int _LOGGER_DIVIDE_STEP  100;
+//#   define int _LOGGER_DIVIDE_STEP  100;
 
 
 
@@ -73,7 +73,7 @@ namespace libecs
 	// init physicallogers, the first 2 element, the others five element ones
 	thePhysicalLoggers[0] = new PhysicalLogger(2);
 	theDataAggregators = new DataPointAggregator[_LOGGER_MAX_PHYSICAL_LOGGERS];
-	for (Int i=1;i<_LOGGER_MAX_PHYSICAL_LOGGERS;i++)
+	for (int i=1;i<_LOGGER_MAX_PHYSICAL_LOGGERS;i++)
 	{
 	   thePhysicalLoggers[i] = new PhysicalLogger(5);
 	}
@@ -81,7 +81,7 @@ namespace libecs
 
   Logger::~Logger()
   {
-	for (Int i=0;i<_LOGGER_MAX_PHYSICAL_LOGGERS;i++)
+	for (int i=0;i<_LOGGER_MAX_PHYSICAL_LOGGERS;i++)
 	{
 	   delete thePhysicalLoggers[i];
 	}
@@ -271,7 +271,7 @@ namespace libecs
 
 	
     //choose appropriate physlogger
-    Int log_no(_LOGGER_MAX_PHYSICAL_LOGGERS);
+    int log_no(_LOGGER_MAX_PHYSICAL_LOGGERS);
 
 // set up output vector
     DataPointVectorIterator 

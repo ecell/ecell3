@@ -55,7 +55,7 @@ LIBECS_DM_CLASS( CashKarp45Stepper, AdaptiveDifferentialStepper )
   virtual void initialize();
   virtual bool calculate();
 
-  virtual const Int getOrder() const { return 4; }
+  virtual const Integer getOrder() const { return 4; }
 
  protected:
 

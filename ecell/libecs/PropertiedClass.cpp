@@ -50,16 +50,16 @@ namespace libecs
     PolymorphVector aVector;
     
     // is setable?
-    aVector.push_back( static_cast<Int>( aPropertySlotPtr->isSetable() ) );
+    aVector.push_back( static_cast<Integer>( aPropertySlotPtr->isSetable() ) );
     
     // is getable?
-    aVector.push_back( static_cast<Int>( aPropertySlotPtr->isGetable() ) );
+    aVector.push_back( static_cast<Integer>( aPropertySlotPtr->isGetable() ) );
 
     // is getable?
-    aVector.push_back( static_cast<Int>( aPropertySlotPtr->isLoadable() ) );
+    aVector.push_back( static_cast<Integer>( aPropertySlotPtr->isLoadable() ) );
 
     // is getable?
-    aVector.push_back( static_cast<Int>( aPropertySlotPtr->isSavable() ) );
+    aVector.push_back( static_cast<Integer>( aPropertySlotPtr->isSavable() ) );
     
     return aVector;
   }
@@ -125,7 +125,7 @@ namespace libecs
   } //
 
   NULLSET_SPECIALIZATION_DEF( Real );
-  NULLSET_SPECIALIZATION_DEF( Int );
+  NULLSET_SPECIALIZATION_DEF( Integer );
   NULLSET_SPECIALIZATION_DEF( String );
   NULLSET_SPECIALIZATION_DEF( Polymorph );
 
@@ -136,7 +136,7 @@ namespace libecs
   } //
 
   NULLGET_SPECIALIZATION_DEF( Real );
-  NULLGET_SPECIALIZATION_DEF( Int );
+  NULLGET_SPECIALIZATION_DEF( Integer );
   NULLGET_SPECIALIZATION_DEF( String );
   NULLGET_SPECIALIZATION_DEF( Polymorph );
 

@@ -56,7 +56,7 @@ public:
   virtual void initialize();
   virtual bool calculate();
 
-  virtual const Int getOrder() const { return 2; }
+  virtual const Integer getOrder() const { return 2; }
 
 protected:
 

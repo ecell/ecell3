@@ -31,7 +31,7 @@ void GillespieProcess::calculateOrder()
        i != theVariableReferenceVector.end() ; ++i )
     {
       VariableReferenceCref aVariableReference( *i );
-      const Int aCoefficient( aVariableReference.getCoefficient() );
+      const Integer aCoefficient( aVariableReference.getCoefficient() );
 	
       // here assume aCoefficient != 0
       if( aCoefficient == 0 )

@@ -64,9 +64,9 @@ namespace libecs
       {
 	return REAL;
       }
-    else if( typeid( *theValue) == typeid( ConcretePolymorphValue<Int> ) )
+    else if( typeid( *theValue) == typeid( ConcretePolymorphValue<Integer> ) )
       {
-	return INT;
+	return INTEGER;
       }
     else if( typeid( *theValue) == typeid( ConcretePolymorphValue<String> ) )
       {
@@ -96,17 +96,17 @@ namespace libecs
 	aPolymorphValuePtr = 
 	  new ConcretePolymorphValue<Real>( theValue->asReal() );
 	break;
-      case INT:
+      case INTEGER:
 	aPolymorphValuePtr = 
-	  new ConcretePolymorphValue<Int>( theValue->asInt() );
+	  new ConcretePolymorphValue<Integer>( theValue->asInteger() );
 	break;
       case STRING:
 	aPolymorphValuePtr = 
-	  new ConcretePolymorphValue<Int>( theValue->asString() );
+	  new ConcretePolymorphValue<Integer>( theValue->asString() );
 	break;
       case POLYMORPH_VECTOR:
 	aPolymorphValuePtr = 
-	  new ConcretePolymorphValue<Int>( theValue->asPolymorphVector() );
+	  new ConcretePolymorphValue<Integer>( theValue->asPolymorphVector() );
 	break;
       case NONE:
 	aPolymorphValuePtr = new PolymorphNoneValue();

@@ -349,7 +349,7 @@ public:\
   template <> void PropertiedClass::nullSet<TYPE>( const TYPE& )
 
   NULLSET_SPECIALIZATION( Real );
-  NULLSET_SPECIALIZATION( Int );
+  NULLSET_SPECIALIZATION( Integer );
   NULLSET_SPECIALIZATION( String );
   NULLSET_SPECIALIZATION( Polymorph );
 
@@ -357,7 +357,7 @@ public:\
   template <> const TYPE PropertiedClass::nullGet<TYPE>() const
 
   NULLGET_SPECIALIZATION( Real );
-  NULLGET_SPECIALIZATION( Int );
+  NULLGET_SPECIALIZATION( Integer );
   NULLGET_SPECIALIZATION( String );
   NULLGET_SPECIALIZATION( Polymorph );
 

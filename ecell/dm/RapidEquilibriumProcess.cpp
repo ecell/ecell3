@@ -46,7 +46,7 @@ LIBECS_DM_CLASS( RapidEquilibriumProcess, Process )
     {
 
       Process::initialize();
-      Int d_Keq( 0 );
+      Integer d_Keq( 0 );
       for( VariableReferenceVectorConstIterator
 	     i ( theVariableReferenceVector.begin() );
            i != theZeroVariableReferenceIterator ; ++i )
@@ -78,18 +78,18 @@ void RapidEquilibriumProcess::fire()
 {
  
   Real d( 0 );
-  Int figure( 0 );
+  Integer figure( 0 );
   Real velocity( 0 );
   Real velocity_posi( 1 );
   Real velocity_nega( 1 );
-  Int least( 0 );
+  Integer least( 0 );
   Real Keq_qua( 1 );
   
   for( VariableReferenceVectorConstIterator
          i ( theVariableReferenceVector.begin() );
            i != theZeroVariableReferenceIterator ; ++i )
   {
-    for(Int j( 0 ); j < -(*i).getCoefficient(); j++ )
+    for(Integer j( 0 ); j < -(*i).getCoefficient(); j++ )
     {
       Keq_qua *= getSuperSystem()->getSize();
     }
@@ -100,7 +100,7 @@ void RapidEquilibriumProcess::fire()
        i ( thePositiveVariableReferenceIterator );
          i != theVariableReferenceVector.end() ; ++i )
   {
-    for(Int j( 0 ); j < (*i).getCoefficient(); j++ )
+    for(Integer j( 0 ); j < (*i).getCoefficient(); j++ )
     {
       Keq_qua *= getSuperSystem()->getSize();
     }
@@ -110,7 +110,7 @@ void RapidEquilibriumProcess::fire()
          i ( theVariableReferenceVector.begin() );
            i != theZeroVariableReferenceIterator ; ++i )
   {
-    for(Int j( 0 ); j < -(*i).getCoefficient(); j++ )
+    for(Integer j( 0 ); j < -(*i).getCoefficient(); j++ )
     {
       velocity_posi *= (*i).getValue();
     }
@@ -121,7 +121,7 @@ void RapidEquilibriumProcess::fire()
        i ( thePositiveVariableReferenceIterator );
          i != theVariableReferenceVector.end() ; ++i )
   {
-    for(Int j( 0 ); j < (*i).getCoefficient(); j++ )
+    for(Integer j( 0 ); j < (*i).getCoefficient(); j++ )
     {
       velocity_nega *= (*i).getValue();
     }
@@ -140,7 +140,7 @@ void RapidEquilibriumProcess::fire()
       }
     }
     
-    figure = (Int)log10( -(*least).getValue() / -(*least).getCoefficient() );
+    figure = (Integer)log10( -(*least).getValue() / -(*least).getCoefficient() );
     d = pow(10.0,figure);
     
     while(figure >= 0){
@@ -162,7 +162,7 @@ void RapidEquilibriumProcess::fire()
          i ( theVariableReferenceVector.begin() );
            i != theZeroVariableReferenceIterator ; ++i )
       {
-        for(Int j( 0 ); j < -(*i).getCoefficient(); j++ )
+        for(Integer j( 0 ); j < -(*i).getCoefficient(); j++ )
         {
           velocity_posi *= (*i).getValue() - ( velocity * -(*i).getCoefficient() );
         }
@@ -173,7 +173,7 @@ void RapidEquilibriumProcess::fire()
        i ( thePositiveVariableReferenceIterator );
          i != theVariableReferenceVector.end() ; ++i )
       {
-        for(Int j( 0 ); j < (*i).getCoefficient(); j++ )
+        for(Integer j( 0 ); j < (*i).getCoefficient(); j++ )
         {
           velocity_nega *= (*i).getValue() + ( velocity * (*i).getCoefficient() );
         }
@@ -205,7 +205,7 @@ void RapidEquilibriumProcess::fire()
          least = i;
        }
     }
-    figure = (Int)log10( (Real)(*least).getValue() / (*least).getCoefficient() );
+    figure = (Integer)log10( (Real)(*least).getValue() / (*least).getCoefficient() );
 
     d = pow(10.0,figure);
   
@@ -225,7 +225,7 @@ void RapidEquilibriumProcess::fire()
          i ( theVariableReferenceVector.begin() );
            i != theZeroVariableReferenceIterator ; ++i )
       {
-        for(Int j( 0 ); j < -(*i).getCoefficient(); j++ )
+        for(Integer j( 0 ); j < -(*i).getCoefficient(); j++ )
         {
           velocity_posi *= (*i).getValue() - ( velocity * -(*i).getCoefficient() );
         }
@@ -237,7 +237,7 @@ void RapidEquilibriumProcess::fire()
        i ( thePositiveVariableReferenceIterator );
          i != theVariableReferenceVector.end() ; ++i )
       {
-        for(Int j( 0 ); j < (*i).getCoefficient(); j++ )
+        for(Integer j( 0 ); j < (*i).getCoefficient(); j++ )
         {
           velocity_nega *= (*i).getValue() + ( velocity * (*i).getCoefficient() );
         }

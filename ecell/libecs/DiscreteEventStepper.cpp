@@ -124,7 +124,7 @@ namespace libecs
 
 	// warning: implementation dependent
 	// here we assume size() is the index of the newly pushed element
-	const Int anIndex( thePriorityQueue.size() );
+	const int anIndex( thePriorityQueue.size() );
 
 	anDiscreteEventProcessPtr->setIndex( anIndex );
 	anDiscreteEventProcessPtr->updateStepInterval();
@@ -169,7 +169,7 @@ namespace libecs
 	const Real aStepInterval( anAffectedProcess->getStepInterval() );
 	// aTime is time in the priority queue
 
-	Int anIndex( anAffectedProcess->getIndex() );
+	int anIndex( anAffectedProcess->getIndex() );
 	thePriorityQueue.
 	  changeOneKey( anIndex,
 			StepperEvent( aStepInterval + aCurrentTime,

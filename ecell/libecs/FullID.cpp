@@ -201,7 +201,7 @@ namespace libecs
 
     String::size_type aPosition( 0 );
 
-    for( Int i( 0 ) ; i < 3 ; ++i )
+    for( int i( 0 ) ; i < 3 ; ++i )
       {
 	aPosition = fullpropertynamestring.
 	  find_first_of( FullID::DELIMITER, aPosition );

@@ -49,7 +49,7 @@ namespace libecs
 
   void FixedODE1Stepper::step()
   {
-    const UnsignedInt aSize( getReadOnlyVariableOffset() );
+    const VariableVector::size_type aSize( getReadOnlyVariableOffset() );
 
     clearVariables();
 
@@ -57,7 +57,7 @@ namespace libecs
 
     setStepInterval( getNextStepInterval() );
 
-    for( UnsignedInt c( 0 ); c < aSize; ++c )
+    for( VariableVector::size_type c( 0 ); c < aSize; ++c )
       {
 	VariablePtr const aVariable( theVariableVector[ c ] );
 

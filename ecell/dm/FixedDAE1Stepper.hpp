@@ -37,7 +37,7 @@
 
 USE_LIBECS;
 
-DECLARE_VECTOR( Int, IntVector );
+DECLARE_VECTOR( int, IntVector );
 
 LIBECS_DM_CLASS( FixedDAE1Stepper, DifferentialStepper )
 {
@@ -94,8 +94,8 @@ public:
 
   void printJacobianMatrix()
   {
-    for ( UnsignedInt i( 0 ); i < theSystemSize; i++ )
-      for ( UnsignedInt j( 0 ); j < theSystemSize; j++ )
+    for ( UnsignedInteger i( 0 ); i < theSystemSize; i++ )
+      for ( UnsignedInteger j( 0 ); j < theSystemSize; j++ )
     	std::cout << "m(" << i << "," << j << ") = " 
     		  << gsl_matrix_get( theJacobianMatrix, i, j ) 
 		  << ":" << theVariableVector[ j ]->getID() << std::endl;
@@ -103,7 +103,7 @@ public:
 
 protected:
 
-  UnsignedInt     theSystemSize;
+  UnsignedInteger     theSystemSize;
   Real            thePerturbationRate;
   Real            theTolerance;
 

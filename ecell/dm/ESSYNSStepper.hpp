@@ -47,15 +47,15 @@ public:
   LIBECS_DM_OBJECT( ESSYNSStepper, Stepper )
     {
       INHERIT_PROPERTIES( AdaptiveDifferentialStepper );
-      PROPERTYSLOT_SET_GET( Int, TaylorOrder );
+      PROPERTYSLOT_SET_GET( Integer, TaylorOrder );
     }
 
-  GET_METHOD( Int, TaylorOrder )
+  GET_METHOD( Integer, TaylorOrder )
     {
       return theTaylorOrder;
     }
 
-  SET_METHOD( Int, TaylorOrder )
+  SET_METHOD( Integer, TaylorOrder )
     {
       theTaylorOrder = value;
     }
@@ -77,15 +77,15 @@ public:
   virtual bool calculate();
     
 
-  virtual Int const getOrder() const 
+  virtual Integer const getOrder() const 
     {
       return theTaylorOrder;
     }
 
 protected:
 
-  Int theSystemSize;
-  Int theTaylorOrder;
+  Integer theSystemSize;
+  Integer theTaylorOrder;
   ESSYNSProcessPtr   theESSYNSProcessPtr;
   std::vector<RealVector> theESSYNSMatrix;
 

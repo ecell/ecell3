@@ -78,7 +78,7 @@ namespace libecs
 	anInnerVector.push_back( aVariableReference.getCoefficient() );
 	// isAccessor
 	anInnerVector.
-	  push_back( static_cast<Int>( aVariableReference.isAccessor() ) );
+	  push_back( static_cast<Integer>( aVariableReference.isAccessor() ) );
 
 	aVector.push_back( anInnerVector );
       }
@@ -148,7 +148,7 @@ namespace libecs
   void Process::setVariableReference( PolymorphVectorCref aValue )
   {
 
-    UnsignedInt aVectorSize( aValue.size() );
+    UnsignedInteger aVectorSize( aValue.size() );
     
     // Require at least a VariableReference name.
     if( aVectorSize == 0 )
@@ -169,7 +169,7 @@ namespace libecs
 
     const String aFullIDString( aValue[1].asString() );
     const FullID aFullID( aValue[1].asString() );
-    Int          aCoefficient( 0 );
+    Integer      aCoefficient( 0 );
     
     // relative search; allow relative systempath
     SystemPtr aSystem( getSuperSystem()->
@@ -179,12 +179,13 @@ namespace libecs
     
     if( aVectorSize >= 3 )
       {
-	aCoefficient = aValue[2].asInt();
+	aCoefficient = aValue[2].asInteger();
       }
     
     if( aVectorSize >= 4 )
       {
-	const bool anIsAccessorFlag( static_cast<bool>( aValue[3].asInt() ) );
+	const bool anIsAccessorFlag( static_cast<bool>
+				     ( aValue[3].asInteger() ) );
 	registerVariableReference( aVariableReferenceName, aVariable,
 				   aCoefficient, anIsAccessorFlag );
       }
@@ -199,7 +200,7 @@ namespace libecs
 
   void Process::registerVariableReference( StringCref aName, 
 					   VariablePtr aVariable, 
-					   const Int aCoefficient,
+					   const Integer aCoefficient,
 					   const bool isAccessor )
   {
     VariableReference aVariableReference( aName, aVariable, aCoefficient );

@@ -37,7 +37,6 @@ GillespieProcess.cpp\
 NRStepper.cpp\
 FixedODE1Stepper.cpp\
 FixedDAE1Stepper.cpp\
-FixedRungeKutta4Stepper.cpp\
 ODE23Stepper.cpp\
 CashKarp45Stepper.cpp\
 ODE45Stepper.cpp\
@@ -60,7 +59,6 @@ PythonProcessBase.hpp\
 ExpressionProcessBase.hpp\
 FixedODE1Stepper.hpp\
 FixedDAE1Stepper.hpp\
-FixedRungeKutta4Stepper.hpp\
 GillespieProcess.hpp\
 NRStepper.hpp\
 ESSYNSStepper.hpp\

@@ -278,7 +278,7 @@ namespace libecs
   {
     if( anID[0] == '.' )
       {
-	const UnsignedInt anIDSize( anID.size() );
+	const int anIDSize( anID.size() );
 
 	if( anIDSize == 1 ) // == "."
 	  {

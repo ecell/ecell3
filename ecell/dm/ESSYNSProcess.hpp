@@ -41,7 +41,7 @@ namespace libecs
     
     virtual const std::vector<RealVector>& getESSYNSMatrix() = 0;
 
-    virtual Int getSystemSize() = 0;
+    virtual Integer getSystemSize() = 0;
     
   protected:
 

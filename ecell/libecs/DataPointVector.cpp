@@ -34,46 +34,47 @@
 
 namespace libecs
 {
-    DataPointVector::~DataPointVector()
-    {
-	if (PointSize==2)
-	{
-	      delete[] theRawArray;
-	}
-	else
-	{
-		delete[] theRawArrayLong;
-	}
-    }
-
-
-
-  DataPointVector::DataPointVector(DataPointVectorIterator aLength, Int aPointSize) 
-    :
-    theSize( aLength ),
-    PointSize(aPointSize)
+  DataPointVector::~DataPointVector()
   {
-   // init the appropriate array
-
-	if (PointSize == 2)
-	{
-		theRawArray = new DataPoint[ aLength ];
-	}
-	else
-	{
-		theRawArrayLong = new DataPointLong[ aLength ];
-	}
+    if( thePointSize==2 )
+      {
+	delete[] theRawArray;
+      }
+    else
+      {
+	delete[] theRawArrayLong;
+      }
   }
 
 
-   size_t DataPointVector::getElementSize() const
-    {
-	if (PointSize == 2)
-	{
-		return sizeof(DataPoint);
-	}
-      return sizeof(DataPointLong);
-    }
+
+  DataPointVector::DataPointVector( DataPointVectorIterator aLength, 
+				    int aPointSize ) 
+    :
+    theSize( aLength ),
+    thePointSize( aPointSize )
+  {
+    // init the appropriate array
+
+    if( thePointSize == 2 )
+      {
+	theRawArray = new DataPoint[ aLength ];
+      }
+    else
+      {
+	theRawArrayLong = new DataPointLong[ aLength ];
+      }
+  }
+
+
+  size_t DataPointVector::getElementSize() const
+  {
+    if( thePointSize == 2 )
+      {
+	return sizeof(DataPoint);
+      }
+    return sizeof(DataPointLong);
+  }
 
 
 
@@ -81,38 +82,38 @@ namespace libecs
 
   DataPointRef DataPointVector::asShort( DataPointVectorIterator aPosition )
   {
-	assert (PointSize == 2);
-	return theRawArray[ aPosition ];
+    assert (thePointSize == 2);
+    return theRawArray[ aPosition ];
   }
 
   DataPointCref 
   DataPointVector::asShort( DataPointVectorIterator aPosition ) const
   {
-	assert (PointSize == 2);
-	return theRawArray[ aPosition ];
+    assert (thePointSize == 2);
+    return theRawArray[ aPosition ];
   }
 
   DataPointLongRef DataPointVector::asLong( DataPointVectorIterator aPosition )
   {
-	assert (PointSize == 5);
-	return theRawArrayLong[ aPosition ];
+    assert (thePointSize == 5);
+    return theRawArrayLong[ aPosition ];
   }
 
 
   DataPointLongCref 
   DataPointVector::asLong( DataPointVectorIterator aPosition ) const
   {
-	assert (PointSize == 5);
-	return theRawArrayLong[ aPosition ];
+    assert (thePointSize == 5);
+    return theRawArrayLong[ aPosition ];
   }
 
 
   const void* DataPointVector::getRawArray() const
   {
-	if (PointSize == 2)
-	{
-	    return (void*) theRawArray;
-	}
+    if (thePointSize == 2)
+      {
+	return (void*) theRawArray;
+      }
     return (void*) theRawArrayLong;
 
   }

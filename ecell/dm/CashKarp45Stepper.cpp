@@ -52,7 +52,7 @@ namespace libecs
   {
     AdaptiveDifferentialStepper::initialize();
 
-    const UnsignedInt aSize( getReadOnlyVariableOffset() );
+    const VariableVector::size_type aSize( getReadOnlyVariableOffset() );
 
     theK1.resize( aSize );
     theK2.resize( aSize );
@@ -66,7 +66,7 @@ namespace libecs
 
   bool CashKarp45Stepper::calculate()
   {
-    const UnsignedInt aSize( getReadOnlyVariableOffset() );
+    const VariableVector::size_type aSize( getReadOnlyVariableOffset() );
 
     const Real eps_rel( getTolerance() );
     const Real eps_abs( getTolerance() * getAbsoluteToleranceFactor() );
@@ -78,7 +78,7 @@ namespace libecs
     // ========= 1 ===========
     fireProcesses();
 
-    for( UnsignedInt c( 0 ); c < aSize; ++c )
+    for( VariableVector::size_type c( 0 ); c < aSize; ++c )
       {
 	VariablePtr const aVariable( theVariableVector[ c ] );
 	    
@@ -102,7 +102,7 @@ namespace libecs
     setCurrentTime( aCurrentTime + getStepInterval()*0.2 );
     fireProcesses();
 
-    for( UnsignedInt c( 0 ); c < aSize; ++c )
+    for( VariableVector::size_type c( 0 ); c < aSize; ++c )
       {
 	VariablePtr const aVariable( theVariableVector[ c ] );
 	
@@ -127,7 +127,7 @@ namespace libecs
     setCurrentTime( aCurrentTime + getStepInterval()*0.3 );
     fireProcesses();
 	
-    for( UnsignedInt c( 0 ); c < aSize; ++c )
+    for( VariableVector::size_type c( 0 ); c < aSize; ++c )
       {
 	VariablePtr const aVariable( theVariableVector[ c ] );
 	
@@ -153,7 +153,7 @@ namespace libecs
     setCurrentTime( aCurrentTime + getStepInterval()*0.6 );
     fireProcesses();
     
-    for( UnsignedInt c( 0 ); c < aSize; ++c )
+    for( VariableVector::size_type c( 0 ); c < aSize; ++c )
       {
 	VariablePtr const aVariable( theVariableVector[ c ] );
 	
@@ -180,7 +180,7 @@ namespace libecs
     setCurrentTime( aCurrentTime + getStepInterval() );
     fireProcesses();
 	
-    for( UnsignedInt c( 0 ); c < aSize; ++c )
+    for( VariableVector::size_type c( 0 ); c < aSize; ++c )
       {
 	VariablePtr const aVariable( theVariableVector[ c ] );
 	
@@ -215,7 +215,7 @@ namespace libecs
     Real maxError( 0.0 );
     
     // restore theValueBuffer
-    for( UnsignedInt c( 0 ); c < aSize; ++c )
+    for( VariableVector::size_type c( 0 ); c < aSize; ++c )
       {
 	VariablePtr const aVariable( theVariableVector[ c ] );
 	

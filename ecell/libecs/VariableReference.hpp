@@ -64,14 +64,14 @@ namespace libecs
 	return compare( aLhs.getCoefficient(), aRhs.getCoefficient() );
       }
 
-      bool operator()( const Int aLhs, 
+      bool operator()( const Integer aLhs, 
 		       VariableReferenceCref aRhs ) const
       {
 	return compare( aLhs, aRhs.getCoefficient() );
       }
 
       bool operator()( VariableReferenceCref aLhs, 
-		       const Int aRhs ) const
+		       const Integer aRhs ) const
       {
 	return compare( aLhs.getCoefficient(), aRhs );
       }
@@ -79,7 +79,7 @@ namespace libecs
 
     private:
 
-      static const std::less<Int> compare;
+      static const std::less<Integer> compare;
 
     };
 
@@ -130,7 +130,7 @@ namespace libecs
 
     VariableReference( StringCref aName, 
 		       VariablePtr aVariablePtr, 
-		       const Int aCoefficient,
+		       const Integer aCoefficient,
 		       const bool anIsAccessor = true )  
       : 
       theName( aName ),
@@ -165,12 +165,12 @@ namespace libecs
       return theVariablePtr; 
     }
 
-    void setCoefficient( IntCref aCoefficient )
+    void setCoefficient( IntegerCref aCoefficient )
     {
       theCoefficient = aCoefficient;
     }
 
-    const Int getCoefficient() const 
+    const Integer getCoefficient() const 
     { 
       return theCoefficient; 
     }
@@ -274,7 +274,7 @@ namespace libecs
 
     String      theName;
     VariablePtr theVariablePtr;
-    Int         theCoefficient;
+    Integer     theCoefficient;
     bool        theIsAccessor;
 
   };

@@ -66,7 +66,7 @@ LIBECS_DM_CLASS( FluxDistributionStepper, DifferentialStepper )
       clearVariables();
       fireProcesses();
 
-      for( UnsignedInt c( 0 ); c < getReadOnlyVariableOffset(); ++c )
+      for( UnsignedInteger c( 0 ); c < getReadOnlyVariableOffset(); ++c )
 	{
 	  theVelocityBuffer[ c ] = theVariableVector[ c ]->getVelocity();
 	}

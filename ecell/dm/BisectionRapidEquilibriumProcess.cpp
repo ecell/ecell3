@@ -21,7 +21,7 @@ std::cout << "\t" << NAME << std::endl//
 std::cout << LINE << std::endl//
 
 #define CIN()\
-Int a;\
+Integer a;\
 std::cin >> a//
 // macro for debugging
 
@@ -97,7 +97,7 @@ LIBECS_DM_CLASS( BisectionRapidEquilibriumProcess, Process )
       Process::initialize();
       
       // set KeqConc
-      Int aDimention( 0 );
+      Integer aDimention( 0 );
       if( UnitKeq == String( "molecules" ) )
 	{
 	  for( EACH_VARIABLE_REFERENCE( anIter ) )
@@ -134,7 +134,7 @@ LIBECS_DM_CLASS( BisectionRapidEquilibriumProcess, Process )
       for( EACH_SUBSTRATE( aSubstrateIter ) )
 	{
 	  Real aConc( (*aSubstrateIter).getMolarConc() );
-	  Int aCoeff( -1 * (*aSubstrateIter).getCoefficient() );
+	  Integer aCoeff( -1 * (*aSubstrateIter).getCoefficient() );
 	  aConc -= aCoeff * aVelocity;
 	  aLeftSide *= pow( aConc , aCoeff );
 	}
@@ -143,7 +143,7 @@ LIBECS_DM_CLASS( BisectionRapidEquilibriumProcess, Process )
       for( EACH_PRODUCT( aProductIter ) )
 	{
 	  Real aConc( (*aProductIter).getMolarConc() );
-	  Int aCoeff( (*aProductIter).getCoefficient() );
+	  Integer aCoeff( (*aProductIter).getCoefficient() );
 	  aConc += aCoeff * aVelocity;
 	  aRightSide *= pow( aConc , aCoeff );
 	}
@@ -170,7 +170,7 @@ LIBECS_DM_CLASS( BisectionRapidEquilibriumProcess, Process )
   
   VariableReferencePtr getMinProductPtr()
     {
-      Int anIndex = getPositiveVariableReferenceOffset();
+      Integer anIndex = getPositiveVariableReferenceOffset();
 	VariableReferencePtr
 	aMinProductPtr( &theVariableReferenceVector[ anIndex ] );
       
@@ -262,7 +262,7 @@ LIBECS_DM_CLASS( BisectionRapidEquilibriumProcess, Process )
 	{
 	  VariableReferencePtr aVariableReferencePtr( &(*anIter) );
 	  Real aValue( aVariableReferencePtr->getValue() );
-	  Int aCoeff( aVariableReferencePtr->getCoefficient() );
+	  Integer aCoeff( aVariableReferencePtr->getCoefficient() );
 	  aVariableReferencePtr->setValue( aValue + ( aCoeff * aVelocity ) );
 	}
     }

@@ -96,8 +96,8 @@ namespace libecs
 
     protected:
 
-      DifferentialStepperRef theStepper;
-      UnsignedInt            theIndex;
+      DifferentialStepperRef    theStepper;
+      VariableVector::size_type theIndex;
 
     };
 
@@ -204,7 +204,7 @@ namespace libecs
 
 
 	PROPERTYSLOT_GET_NO_LOAD_SAVE( Real, MaxErrorRatio );
-	PROPERTYSLOT_GET_NO_LOAD_SAVE( Int,  Order );
+	PROPERTYSLOT_GET_NO_LOAD_SAVE( Integer,  Order );
       }
 
 
@@ -243,7 +243,7 @@ namespace libecs
     protected:
 
       AdaptiveDifferentialStepperRef theStepper;
-      UnsignedInt                    theIndex;
+      VariableVector::size_type      theIndex;
     };
 
   public:
@@ -333,7 +333,7 @@ namespace libecs
     }
 
 
-    virtual GET_METHOD( Int, Order )
+    virtual GET_METHOD( Integer, Order )
     { 
       return 1; 
     }

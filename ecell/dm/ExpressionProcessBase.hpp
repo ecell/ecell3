@@ -60,7 +60,7 @@ namespace libecs
 
     DECLARE_CLASS( Instruction );
     DECLARE_CLASS( Code );
-    DECLARE_VECTOR( Int, IntVector );
+    DECLARE_VECTOR( int, IntVector );
     DECLARE_VECTOR( Real, RealVector );
     DECLARE_VECTOR( InstructionPtr, InstructionVector );
 
@@ -445,7 +445,7 @@ namespace libecs
 	theExpressionProcessBasePtr = aExpressionProcessBasePtr;
       }
 
-      const Int getStackSize()
+      const int getStackSize()
       {
 	return theStackSize;
       }
@@ -493,7 +493,7 @@ namespace libecs
 
     private:
 
-      Int theStackSize;
+      int theStackSize;
       ProcessPtr theProcessPtr;
       ExpressionProcessBasePtr theExpressionProcessBasePtr;
 

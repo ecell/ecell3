@@ -160,12 +160,16 @@ namespace libecs
 
   // Numeric types
 
+  DECLARE_TYPE( long int, Integer );
+  DECLARE_TYPE( unsigned long int, UnsignedInteger );
+
+  // these types (Int and UnsignedInt are obsolete, and will be removed.)
   DECLARE_TYPE( long int, Int );
   DECLARE_TYPE( unsigned long int, UnsignedInt );
 
   // these can cause problem when used as template parameters
-  //  DECLARE_TYPE( int64_t, Int );
-  //  DECLARE_TYPE( uint64_t, UnsignedInt );
+  //  DECLARE_TYPE( int64_t, Integer );
+  //  DECLARE_TYPE( uint64_t, UnsignedInteger );
 
   DECLARE_TYPE( double, Real );
 

@@ -386,7 +386,7 @@ namespace libemc
   }
 
 
-  const libecs::Int LocalSimulatorImplementation::
+  const libecs::Integer LocalSimulatorImplementation::
   getLoggerSize( libecs::StringCref aFullPNString ) const
   {
     return getLogger( aFullPNString )->getSize();
@@ -404,13 +404,13 @@ namespace libemc
   }
 
 
-  void LocalSimulatorImplementation::step( const libecs::Int aNumSteps )
+  void LocalSimulatorImplementation::step( const libecs::Integer aNumSteps )
   {
     getModel().initialize();  
 
     theRunningFlag = true;
 
-    libecs::Int aCounter( aNumSteps );
+    libecs::Integer aCounter( aNumSteps );
     do
       {
 	getModel().step();

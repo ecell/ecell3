@@ -77,7 +77,7 @@ namespace libecs
 	//	PROPERTYSLOT_SET_GET( Real, MinLimit );
 	//	PROPERTYSLOT_SET_GET( Real, MaxLimit );
 
-	PROPERTYSLOT_SET_GET( Int,  Fixed );
+	PROPERTYSLOT_SET_GET( Integer,  Fixed );
 
 	PROPERTYSLOT_GET_NO_LOAD_SAVE( Real, TotalVelocity );
 
@@ -324,12 +324,12 @@ namespace libecs
 
 
     // wrappers to expose is/setFixed as PropertySlots 
-    SET_METHOD( Int, Fixed )
+    SET_METHOD( Integer, Fixed )
     { 
       theFixed = static_cast<bool>( value );
     }
 
-    GET_METHOD( Int, Fixed )
+    GET_METHOD( Integer, Fixed )
     { 
       return theFixed;
     }

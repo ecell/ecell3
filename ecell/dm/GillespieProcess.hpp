@@ -33,7 +33,7 @@ LIBECS_DM_CLASS( GillespieProcess, DiscreteEventProcess )
       PROPERTYSLOT_SET_GET( Real, k );
 
       PROPERTYSLOT_GET_NO_LOAD_SAVE( Real, Mu );
-      PROPERTYSLOT_GET_NO_LOAD_SAVE( Int,  Order );
+      PROPERTYSLOT_GET_NO_LOAD_SAVE( Integer,  Order );
     }
 
   
@@ -64,7 +64,7 @@ LIBECS_DM_CLASS( GillespieProcess, DiscreteEventProcess )
 
   // The order of the reaction, i.e. 1 for a unimolecular reaction.
 
-  GET_METHOD( Int, Order )
+  GET_METHOD( Integer, Order )
   {
     return theOrder;
   }
@@ -185,7 +185,7 @@ protected:
 
   Real k;    
 
-  Int theOrder;
+  Integer theOrder;
 
   RealMethodPtr theGetMultiplicityMethodPtr;
   RealMethodPtr theGetMinValueMethodPtr;

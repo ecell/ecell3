@@ -45,7 +45,7 @@ namespace libecs
     AdaptiveDifferentialStepper::initialize();
  
     // the number of write variables
-    const UnsignedInt aSize( getReadOnlyVariableOffset() );
+    const VariableVector::size_type aSize( getReadOnlyVariableOffset() );
     theK1.resize( aSize );
 
     // initialize()
@@ -67,12 +67,12 @@ namespace libecs
     theESSYNSMatrix.resize(theSystemSize+1);
     RealVector tmp;
     tmp.resize(theTaylorOrder+1);
-    for(Int i( 0 ); i < theSystemSize + 1; i++)
+    for(int i( 0 ); i < theSystemSize + 1; i++)
     {
       theESSYNSMatrix[i] = tmp;
     }
 
-    /* for( Int i( 1 ); i < theSystemSize+1; i++)
+    /* for( int i( 1 ); i < theSystemSize+1; i++)
       {
 	std::cout<< (theESSYNSMatrix[i-1])[0] << std::endl;
       }
@@ -81,7 +81,7 @@ namespace libecs
 
   bool ESSYNSStepper::calculate()
   {
-    const UnsignedInt aSize( getReadOnlyVariableOffset() );
+    const VariableVector::size_type aSize( getReadOnlyVariableOffset() );
 
     Real aCurrentTime( getCurrentTime() );
     Real aStepInterval( getStepInterval() );
@@ -92,10 +92,10 @@ namespace libecs
 
     //integrate
     Real aY( 0.0 ); 
-    for( Int i( 1 ); i < theSystemSize+1; i++ )
+    for( int i( 1 ); i < theSystemSize+1; i++ )
       {
 	aY = 0.0;//reset aY 
-	for( Int m( 1 ); m <= theTaylorOrder; m++ )
+	for( int m( 1 ); m <= theTaylorOrder; m++ )
 	  {
 	    aY += ((theESSYNSMatrix[i-1])[m] *
 		   gsl_sf_pow_int( aStepInterval, m ) / gsl_sf_fact( m ));
@@ -105,8 +105,8 @@ namespace libecs
       }
     
     //set value
-    Int anIndex( 0 );
-    for( UnsignedInt c( 0 ); c < aSize; ++c )
+    int anIndex( 0 );
+    for( int c( 0 ); c < aSize; ++c )
       {
 	VariablePtr const aVariable( theVariableVector[ c ] );
 	

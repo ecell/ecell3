@@ -67,7 +67,7 @@ namespace libecs
   {
     DifferentialStepper::initialize();
     
-    const UnsignedInt aSize( getReadOnlyVariableOffset() );
+    const VariableVector::size_type aSize( getReadOnlyVariableOffset() );
     if ( theSystemSize != aSize )
       {
 	checkDependency();
@@ -103,8 +103,8 @@ namespace libecs
 
   void FixedDAE1Stepper::checkDependency()
   {
-    const UnsignedInt aReadOnlyVariableOffset( getReadOnlyVariableOffset() );
-    const UnsignedInt aProcessNum( theProcessVector.size() );
+    const VariableVector::size_type aReadOnlyVariableOffset( getReadOnlyVariableOffset() );
+    const ProcessVector::size_type aProcessNum( theProcessVector.size() );
 
     theDependentProcessVector.clear();
     theDependentProcessVector.resize( aReadOnlyVariableOffset );
@@ -117,24 +117,27 @@ namespace libecs
     IntVectorConstIterator aWriteVariableIterator;
 
     ProcessVectorConstIterator anIterator( theProcessVector.begin() );
-    for( UnsignedInt c( 0 ); c < aProcessNum; c++ )
+    for( ProcessVector::size_type c( 0 ); c < aProcessNum; c++ )
       {
 	VariableReferenceVectorCref aVariableReferenceVector
 	  ( (*anIterator)->getVariableReferenceVector() );
 
-	const UnsignedInt aZeroVariableReferenceOffset
+	const VariableReferenceVector::size_type aZeroVariableReferenceOffset
 	  ( (*anIterator)->getZeroVariableReferenceOffset() );
-	const UnsignedInt aPositiveVariableReferenceOffset
+	const VariableReferenceVector::size_type
+	  aPositiveVariableReferenceOffset
 	  ( (*anIterator)->getPositiveVariableReferenceOffset() );
 
 	anIndexVector.clear();
-	for ( UnsignedInt i( aZeroVariableReferenceOffset );
+	for ( VariableReferenceVector::size_type 
+		i( aZeroVariableReferenceOffset );
 	      i != aPositiveVariableReferenceOffset; i++ )
 	  {
 	    VariablePtr const aVariable
 	      ( aVariableReferenceVector[ i ].getVariable() );
 
-	    const UnsignedInt anIndex( getVariableIndex( aVariable ) );
+	    const VariableVector::size_type 
+	      anIndex( getVariableIndex( aVariable ) );
 
 	    // std::binary_search?
 	    if ( std::find( theDependentProcessVector[ anIndex ].begin(),
@@ -146,10 +149,11 @@ namespace libecs
 	      }
 	  }
 
-	const UnsignedInt aNonZeroOffset( anIndexVector.size() );
+	const IntVector::size_type aNonZeroOffset( anIndexVector.size() );
 	const bool aContinuity( (*anIterator)->isContinuous() );
 
-	for( UnsignedInt i( 0 ); i < aVariableReferenceVector.size(); i++ )
+	for( VariableReferenceVector::size_type i( 0 ); 
+	     i < aVariableReferenceVector.size(); i++ )
 	  {
 	    if ( i == aZeroVariableReferenceOffset )
 	      {
@@ -163,7 +167,8 @@ namespace libecs
 	    VariablePtr const aVariable
 	      ( aVariableReferenceVector[ i ].getVariable() );
 
-	    const UnsignedInt anIndex( getVariableIndex( aVariable ) );
+	    const VariableVector::size_type 
+	      anIndex( getVariableIndex( aVariable ) );
 
 	    if ( aContinuity )
 	      {
@@ -187,10 +192,10 @@ namespace libecs
 
 	FOR_ALL( IntVector, anIndexVector )
 	  {
-	    for( UnsignedInt j( aNonZeroOffset );
+	    for( IntVector::size_type j( aNonZeroOffset );
 		 j != anIndexVector.size(); ++j )
 	      {
-		const UnsignedInt anIndex( anIndexVector[ j ] );
+		const int anIndex( anIndexVector[ j ] );
 		if ( std::find( theDependentVariableVector[ (*i) ].begin(),
 				theDependentVariableVector[ (*i) ].end(),
 				anIndex )
@@ -222,7 +227,7 @@ namespace libecs
 
   void FixedDAE1Stepper::resetVelocity()
   {
-    for( UnsignedInt c( 0 ); c < theVelocityBuffer.size(); c++ )
+    for( RealVector::size_type c( 0 ); c < theVelocityBuffer.size(); c++ )
       {
 	theVelocityBuffer[ c ] = 0.0;
 	theVariableVector[ c ]->clearVelocity();
@@ -234,20 +239,22 @@ namespace libecs
     const Real aCurrentTime( getCurrentTime() );
     const Real aStepInterval( getStepInterval() );
 
-    const UnsignedInt aDiscreteProcessOffset( getDiscreteProcessOffset() );
+    const ProcessVector::size_type 
+      aDiscreteProcessOffset( getDiscreteProcessOffset() );
 
     gsl_vector_set_zero( theVelocityVector );
 
     setCurrentTime( aCurrentTime + aStepInterval );
 
     // almost equal to call fire()
-    for( UnsignedInt c( 0 ); c < aDiscreteProcessOffset; c++ )
+    for( ProcessVector::size_type c( 0 ); c < aDiscreteProcessOffset; c++ )
       {
 	theProcessVector[ c ]->fire();
 
-	for( UnsignedInt i( 0 ); i < theContinuousVariableVector.size(); i++ )
+	for( IntVector::size_type i( 0 ); 
+	     i < theContinuousVariableVector.size(); i++ )
 	  {
-	    const UnsignedInt anIndex( theContinuousVariableVector[ i ] );
+	    const int anIndex( theContinuousVariableVector[ i ] );
 	    VariablePtr const aVariable( theVariableVector[ anIndex ] );
 
 	    theEachVelocityBuffer[ i * aDiscreteProcessOffset + c ]
@@ -265,9 +272,10 @@ namespace libecs
 	  }
       }
 
-    for( UnsignedInt i( 0 ); i < theContinuousVariableVector.size(); ++i )
+    for( IntVector::size_type i( 0 ); 
+	 i < theContinuousVariableVector.size(); ++i )
       {
-	const UnsignedInt anIndex( theContinuousVariableVector[ i ] );
+	const int anIndex( theContinuousVariableVector[ i ] );
 	const Real aVelocity( theVelocityBuffer[ anIndex ] * aStepInterval
 			      + theValueBuffer[ anIndex ]
 			      - theVariableVector[ anIndex ]->getValue() );
@@ -283,7 +291,7 @@ namespace libecs
 	theVariableVector[ anIndex ]->clearVelocity();
       }
 
-    for( UnsignedInt c( aDiscreteProcessOffset );
+    for( ProcessVector::size_type c( aDiscreteProcessOffset );
 	 c < theProcessVector.size(); c++ )
       {
 	theProcessVector[ c ]->fire();
@@ -312,8 +320,10 @@ namespace libecs
     const Real aCurrentTime( getCurrentTime() );
     const Real aStepInterval( getStepInterval() );
     const Real aPerturbation( thePerturbationRate * aStepInterval );
-    const UnsignedInt aReadOnlyVariableOffset( getReadOnlyVariableOffset() );
-    const UnsignedInt aDiscreteProcessOffset( getDiscreteProcessOffset() );
+    const VariableVector::size_type 
+      aReadOnlyVariableOffset( getReadOnlyVariableOffset() );
+    const ProcessVector::size_type
+      aDiscreteProcessOffset( getDiscreteProcessOffset() );
 
     Real aJacobian( 0.0 );
 
@@ -321,7 +331,7 @@ namespace libecs
 
     setCurrentTime( aCurrentTime + aStepInterval );
 
-    for( UnsignedInt c( 0 ); c < aReadOnlyVariableOffset; ++c )
+    for( VariableVector::size_type c( 0 ); c < aReadOnlyVariableOffset; ++c )
       {
 	VariablePtr const aVariable( theVariableVector[ c ] );
 	const Real aValue( aVariable->getValue() );
@@ -334,7 +344,7 @@ namespace libecs
 
 	    if ( aDiscreteProcessOffset > (*i) )
 	      {
-		for( UnsignedInt j( 0 );
+		for( IntVector::size_type j( 0 );
 		     j < theContinuousVariableVector.size(); ++j )
 		  {
 		    theVelocityBuffer[ theContinuousVariableVector[ j ] ]
@@ -354,10 +364,11 @@ namespace libecs
 	      }
 	  }
 
-	for( UnsignedInt i( 0 ); i < theContinuousVariableVector.size(); ++i )
+	for( IntVector::size_type i( 0 ); 
+	     i < theContinuousVariableVector.size(); ++i )
 	  {
 	    // this calculation already includes negative factor
-	    const UnsignedInt anIndex( theContinuousVariableVector[ i ] );
+	    const int anIndex( theContinuousVariableVector[ i ] );
 
 	    aJacobian = theVelocityBuffer[ anIndex ] 
 	      - theVariableVector[ anIndex ]->getVelocity();
@@ -373,9 +384,10 @@ namespace libecs
 	aVariable->loadValue( aValue );
       }
 
-    for ( UnsignedInt c( 0 ); c < theContinuousVariableVector.size(); c++ )
+    for ( IntVector::size_type c( 0 ); 
+	  c < theContinuousVariableVector.size(); c++ )
       {
-	const UnsignedInt anIndex( theContinuousVariableVector[ c ] );
+	const int anIndex( theContinuousVariableVector[ c ] );
 	aJacobian = gsl_matrix_get( theJacobianMatrix, c, anIndex );
 	gsl_matrix_set( theJacobianMatrix, c, anIndex, 1.0 + aJacobian );
       }
@@ -385,7 +397,8 @@ namespace libecs
 
   const Real FixedDAE1Stepper::solve()
   {
-    const UnsignedInt aReadOnlyVariableOffset( getReadOnlyVariableOffset() );
+    const VariableVector::size_type 
+      aReadOnlyVariableOffset( getReadOnlyVariableOffset() );
 
     int aSignNum;
     gsl_linalg_LU_decomp( theJacobianMatrix, thePermutation, &aSignNum );
@@ -394,7 +407,7 @@ namespace libecs
 
     Real anError( 0.0 );
     Real aTotalVelocity( 0.0 );
-    for( UnsignedInt c( 0 ); c < aReadOnlyVariableOffset; ++c )
+    for( VariableVector::size_type c( 0 ); c < aReadOnlyVariableOffset; ++c )
       {
  	VariablePtr const aVariable( theVariableVector[ c ] );
 	const Real aDifference( gsl_vector_get( theSolutionVector, c ) );
@@ -419,7 +432,7 @@ namespace libecs
     clearVariables();
 
     // Newton iteration
-    UnsignedInt anIterator( 0 );
+    int anIterator( 0 );
     while ( anIterator < 5 )
       {
 	resetVelocity();

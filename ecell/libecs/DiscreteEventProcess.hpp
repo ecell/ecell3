@@ -80,7 +80,7 @@ namespace libecs
 
     virtual ~DiscreteEventProcess();
 
-    SIMPLE_SET_GET_METHOD( Int, Index );
+    SIMPLE_SET_GET_METHOD( Integer, Index );
 
     GET_METHOD( Real, StepInterval )
       {
@@ -133,7 +133,7 @@ namespace libecs
 
     Real theStepInterval;
 
-    Int Index;
+    Integer Index;
 
   };
 

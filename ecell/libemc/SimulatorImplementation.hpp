@@ -158,12 +158,12 @@ namespace libemc
     virtual const libecs::Real 
     getLoggerMinimumInterval( libecs::StringCref aFullPNString ) const = 0;
 
-    virtual const libecs::Int 
+    virtual const libecs::Integer 
     getLoggerSize( libecs::StringCref aFullPNString ) const = 0;
 
     virtual const libecs::Polymorph getNextEvent() const = 0;
 
-    virtual void step( const libecs::Int aNumSteps ) = 0;
+    virtual void step( const libecs::Integer aNumSteps ) = 0;
 
     virtual void initialize() = 0;
 

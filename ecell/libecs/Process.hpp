@@ -70,11 +70,11 @@ namespace libecs
 	INHERIT_PROPERTIES( Entity );
 
 	PROPERTYSLOT_SET_GET( Polymorph, VariableReferenceList );
-	PROPERTYSLOT_SET_GET( Int,       Priority );
+	PROPERTYSLOT_SET_GET( Integer,       Priority );
 	PROPERTYSLOT_SET_GET( String,    StepperID );
 
 	PROPERTYSLOT_SET_GET_NO_LOAD_SAVE( Real,     Activity );
-	PROPERTYSLOT_GET_NO_LOAD_SAVE(     Int,      IsContinuous );
+	PROPERTYSLOT_GET_NO_LOAD_SAVE(     Integer,      IsContinuous );
       }
 
     /** 
@@ -91,12 +91,12 @@ namespace libecs
 	return compare( aLhs->getPriority(), aRhs->getPriority() );
       }
 
-      bool operator()( ProcessPtr aLhs, const Int aRhs ) const
+      bool operator()( ProcessPtr aLhs, const Integer aRhs ) const
       {
 	return compare( aLhs->getPriority(), aRhs );
       }
 
-      bool operator()( const Int aLhs, ProcessPtr aRhs ) const
+      bool operator()( const Integer aLhs, ProcessPtr aRhs ) const
       {
 	return compare( aLhs, aRhs->getPriority() );
       }
@@ -104,7 +104,7 @@ namespace libecs
     private:
 
       // if statement can be faster than returning an expression directly
-      inline static bool compare( const Int aLhs, const Int aRhs )
+      inline static bool compare( const Integer aLhs, const Integer aRhs )
       {
 	if( aLhs > aRhs )
 	  {
@@ -144,7 +144,7 @@ namespace libecs
       return false;
     }
     
-    GET_METHOD( Int, IsContinuous )
+    GET_METHOD( Integer, IsContinuous )
     {
       return isContinuous();
     }
@@ -188,14 +188,14 @@ namespace libecs
     /**
        Set a priority value of this Process.
 
-       The priority is an Int value which is used to determine the
+       The priority is an Integer value which is used to determine the
        order of call to Process::fire() method in Stepper.
 
-       @param aValue the priority value as an Int.
+       @param aValue the priority value as an Integer.
        @see Stepper
     */
 
-    SET_METHOD( Int, Priority )
+    SET_METHOD( Integer, Priority )
     {
       thePriority = value;
     }
@@ -204,7 +204,7 @@ namespace libecs
        @see setPriority()
     */
 
-    GET_METHOD( Int, Priority )
+    GET_METHOD( Integer, Priority )
     {
       return thePriority;
     }
@@ -254,12 +254,12 @@ namespace libecs
 
        @param aName name of the VariableReference. 
        @param aVariable a Pointer to the Variable.
-       @param aCoefficient an Int value of the coefficient.
+       @param aCoefficient an Integer value of the coefficient.
     */
 
     void registerVariableReference( StringCref aName, 
 				    VariablePtr aVariable, 
-				    const Int aCoefficient, 
+				    const Integer aCoefficient, 
 				    const bool isAccessor = true );
 
     /**
@@ -411,7 +411,7 @@ namespace libecs
     StepperPtr  theStepper;
 
     Real        theActivity;
-    Int         thePriority;
+    Integer     thePriority;
 
   };
 

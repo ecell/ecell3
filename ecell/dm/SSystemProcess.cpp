@@ -29,7 +29,7 @@ LIBECS_DM_CLASS( SSystemProcess, ESSYNSProcess )
     {
       INHERIT_PROPERTIES( ESSYNSProcess );
 
-      PROPERTYSLOT_SET_GET( Int, Order );
+      PROPERTYSLOT_SET_GET( Integer, Order );
       PROPERTYSLOT_SET_GET( Polymorph, SSystemMatrix );
     }
 
@@ -47,8 +47,8 @@ LIBECS_DM_CLASS( SSystemProcess, ESSYNSProcess )
       ;
     }
 
-  SIMPLE_GET_METHOD( Int, Order );
-  void setOrder( IntCref aValue );
+  SIMPLE_GET_METHOD( Integer, Order );
+  void setOrder( IntegerCref aValue );
   
   void setSSystemMatrix( PolymorphCref aValue );
 
@@ -64,7 +64,7 @@ LIBECS_DM_CLASS( SSystemProcess, ESSYNSProcess )
 
   const std::vector<RealVector>& getESSYNSMatrix();
   
-  Int getSystemSize()
+  Integer getSystemSize()
     {
       return theSystemSize;
     }
@@ -77,8 +77,8 @@ LIBECS_DM_CLASS( SSystemProcess, ESSYNSProcess )
    
  protected:
 
-  Int Order;
-  Int theSystemSize;
+  int Order;
+  int theSystemSize;
 
   Polymorph SSystemMatrix;
   
@@ -103,7 +103,7 @@ LIBECS_DM_CLASS( SSystemProcess, ESSYNSProcess )
 
 LIBECS_DM_INIT( SSystemProcess, Process );
 
-void SSystemProcess::setOrder( IntCref aValue ) 
+void SSystemProcess::setOrder( IntegerCref aValue ) 
 { 
   Order = aValue;
   
@@ -111,7 +111,7 @@ void SSystemProcess::setOrder( IntCref aValue )
   theY.resize(theSystemSize+1);
   RealVector tmp;
   tmp.resize(Order+1);
-  for(Int i( 0 ); i < theSystemSize + 1; i++)
+  for(int i( 0 ); i < theSystemSize + 1; i++)
     {
       theY[i] = tmp;
     }
@@ -122,7 +122,7 @@ void SSystemProcess::setOrder( IntCref aValue )
   theG.resize( theSystemSize + 1);
   theH.resize( theSystemSize + 1);
   tmp.resize(theSystemSize+1);
-  for(Int i( 0 ); i < theSystemSize + 1; i++)
+  for(int i( 0 ); i < theSystemSize + 1; i++)
     {
       theG[i] = tmp;
       theH[i] = tmp;
@@ -134,7 +134,7 @@ void SSystemProcess::setOrder( IntCref aValue )
   theGBuffer.resize( theSystemSize + 1);
   theHBuffer.resize( theSystemSize + 1);
   tmp.resize(Order+1);
-  for(Int i( 0 ); i < theSystemSize + 1; i++)
+  for(int i( 0 ); i < theSystemSize + 1; i++)
     {
       theAlphaBuffer[i] = tmp;
       theBetaBuffer[i] = tmp;
@@ -144,7 +144,7 @@ void SSystemProcess::setOrder( IntCref aValue )
 
   theFBuffer.resize( Order + 1);
   tmp.resize(Order);
-  for(Int i( 0 ); i < Order + 1; i++)
+  for(int i( 0 ); i < Order + 1; i++)
     {
       theFBuffer[i] = tmp;
     }  
@@ -161,7 +161,7 @@ void SSystemProcess::setSSystemMatrix( PolymorphCref aValue )
   theY.resize(theSystemSize+1);
   RealVector tmp;
   tmp.resize(Order+1);
-  for(Int i( 0 ); i < theSystemSize + 1; i++)
+  for(int i( 0 ); i < theSystemSize + 1; i++)
     {
       theY[i] = tmp;
     }
@@ -172,7 +172,7 @@ void SSystemProcess::setSSystemMatrix( PolymorphCref aValue )
   theG.resize( theSystemSize + 1);
   theH.resize( theSystemSize + 1);
   tmp.resize(theSystemSize+1);
-  for(Int i( 0 ); i < theSystemSize + 1; i++)
+  for(int i( 0 ); i < theSystemSize + 1; i++)
     {
       theG[i] = tmp;
       theH[i] = tmp;
@@ -185,7 +185,7 @@ void SSystemProcess::setSSystemMatrix( PolymorphCref aValue )
   theHBuffer.resize( theSystemSize + 1);
   tmp.resize(Order+1);
 
-  for(Int i( 0 ); i < theSystemSize + 1; i++)
+  for(int i( 0 ); i < theSystemSize + 1; i++)
     {
       theAlphaBuffer[i] = tmp;
       theBetaBuffer[i] = tmp;
@@ -195,15 +195,15 @@ void SSystemProcess::setSSystemMatrix( PolymorphCref aValue )
 
   theFBuffer.resize( Order + 1);
   tmp.resize(Order);
-  for(Int i( 0 ); i < Order + 1; i++)
+  for(int i( 0 ); i < Order + 1; i++)
     {
       theFBuffer[i] = tmp;
     }  
 
   // init Factorial matrix
-  for(Int m( 2 ) ; m < Order+1 ; m++)
+  for(int m( 2 ) ; m < Order+1 ; m++)
     {
-      for(Int q( 1 ); q < m ; q++)
+      for(int q( 1 ); q < m ; q++)
 	{
 	  const Real aFact( 1 / gsl_sf_fact(q-1) * gsl_sf_fact(m-q-1) * m * (m-1) );
 	  (theFBuffer[m])[q] = aFact;      
@@ -211,11 +211,11 @@ void SSystemProcess::setSSystemMatrix( PolymorphCref aValue )
     }
 
   // set Alpha, Beta, G, H 
-  for( Int i( 0 ); i < theSystemSize; i++ )
+  for( int i( 0 ); i < theSystemSize; i++ )
     {
       
       theAlpha[i+1] = (aValueVector[i].asPolymorphVector())[0].asReal() ;
-      for( Int j( 0 ); j < theSystemSize; j++ )	
+      for( int j( 0 ); j < theSystemSize; j++ )	
 	{
 	  if( i == j )
 	    {
@@ -226,7 +226,7 @@ void SSystemProcess::setSSystemMatrix( PolymorphCref aValue )
 	    }
 	}
       theBeta[i+1] = (aValueVector[i].asPolymorphVector())[1+theSystemSize].asReal() ;
-      for( Int j( 0 ); j < theSystemSize; j++ )	
+      for( int j( 0 ); j < theSystemSize; j++ )	
 	{
 	  if( i == j )
 	    {
@@ -241,7 +241,7 @@ void SSystemProcess::setSSystemMatrix( PolymorphCref aValue )
 const std::vector<RealVector>& SSystemProcess::getESSYNSMatrix()
 {
   //get theY
-  Int anIndex = 0;
+  int anIndex = 0;
   for( VariableReferenceVectorConstIterator
 	 i ( thePositiveVariableReferenceIterator );
        i != theVariableReferenceVector.end() ; ++i )
@@ -256,11 +256,11 @@ const std::vector<RealVector>& SSystemProcess::getESSYNSMatrix()
     }
   
   //differentiate first order
-  for(Int i( 1 ) ; i < theSystemSize+1 ; i++ )
+  for(int i( 1 ) ; i < theSystemSize+1 ; i++ )
     {
       Real aGt( 0.0 );
       Real aHt( 0.0 );
-      for(Int j( 1 ) ; j < theSystemSize+1 ; j++ )
+      for(int j( 1 ) ; j < theSystemSize+1 ; j++ )
         {
           aGt += (theG[i])[j] * (theY[j-1])[0];
           aHt += (theH[i])[j] * (theY[j-1])[0];
@@ -275,15 +275,15 @@ const std::vector<RealVector>& SSystemProcess::getESSYNSMatrix()
     }
  
   //differentiate second and/or more order
-  for( Int m( 2 ) ; m <= Order ; m++)
+  for( int m( 2 ) ; m <= Order ; m++)
    {
-     for(Int i( 1 ) ; i < theSystemSize+1 ; i++ )
+     for(int i( 1 ) ; i < theSystemSize+1 ; i++ )
        {
 	 
 	 (theGBuffer[i])[m-1] = 0;
 	 (theHBuffer[i])[m-1] = 0;
 	 
-	 for(Int j( 1 ) ; j < theSystemSize+1 ; j++ )
+	 for(int j( 1 ) ; j < theSystemSize+1 ; j++ )
 	   {
 	     const Real aY( (theY[j-1])[m-1] );
 	     const Real aG( (theGBuffer[i])[m-1] );
@@ -296,12 +296,12 @@ const std::vector<RealVector>& SSystemProcess::getESSYNSMatrix()
 	   }
        }
      
-     for(Int i( 1 ) ; i < theSystemSize+1 ; i++ )
+     for(int i( 1 ) ; i < theSystemSize+1 ; i++ )
        {
 	 (theAlphaBuffer[i])[m] = 0;
 	 (theBetaBuffer[i])[m] = 0;
 	 
-	 for(Int q( 1 );  0 > m-q ; q++)
+	 for(int q( 1 );  0 > m-q ; q++)
 	   {
 	     (theAlphaBuffer[i])[m] = 
 		             (theAlphaBuffer[i])[m] + 
@@ -326,11 +326,11 @@ const std::vector<RealVector>& SSystemProcess::getESSYNSMatrix()
  
   /*
  //integrate
- for( Int i( 1 ); i < theSystemSize+1; i++)
+ for( int i( 1 ); i < theSystemSize+1; i++)
    {
      
      Real aY( 0.0 );
-      for( Int m( 1 ); m <= Order ; m++)
+      for( int m( 1 ); m <= Order ; m++)
         {
 	  aY += (theY[i-1])[m] * 
 	    gsl_sf_pow_int(aStepInterval,m) / gsl_sf_fact(m);

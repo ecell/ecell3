@@ -45,13 +45,13 @@ namespace libecs
     return strtod( str.c_str(), NULLPTR );
   }
 
-  template<> const Int stringTo<Int>( StringCref str )
+  template<> const Integer stringTo<Integer>( StringCref str )
   {
     // FIXME: error check, throw exception
     return strtol( str.c_str(), NULLPTR, 10 );
   }
 
-  template<> const UnsignedInt stringTo<UnsignedInt>( StringCref str )
+  template<> const UnsignedInteger stringTo<UnsignedInteger>( StringCref str )
   {
     // FIXME: error check, throw exception
     return strtoul( str.c_str(), NULLPTR, 10 );
@@ -79,8 +79,8 @@ namespace libecs
       }
   }
 
-  void throwSequenceSizeError( const Int aSize, 
-			       const Int aMin, const Int aMax )
+  void throwSequenceSizeError( const int aSize, 
+			       const int aMin, const int aMax )
   {
     THROW_EXCEPTION( RangeError,
 		     "Size of the sequence must be within [ " 
@@ -88,7 +88,7 @@ namespace libecs
 		     + " ] ( " + toString( aSize ) + " given)." );
   }
 
-  void throwSequenceSizeError( const Int aSize, const Int aMin )
+  void throwSequenceSizeError( const int aSize, const int aMin )
   {
     THROW_EXCEPTION( RangeError,
 		     "Size of the sequence must be at least " 

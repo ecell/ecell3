@@ -101,7 +101,7 @@ namespace libecs
       }
   }
 
-  EntityType::EntityType( const Int number )
+  EntityType::EntityType( const int number )
     :
     theType( static_cast<const Type>( number ) )
   {

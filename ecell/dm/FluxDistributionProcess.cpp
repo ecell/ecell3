@@ -40,7 +40,7 @@ LIBECS_DM_CLASS( FluxDistributionProcess, Process )
   SET_METHOD( Polymorph, KnownProcessList )
   {
     KnownProcessList.clear();
-    for( Int i(0); i < value.asPolymorphVector().size(); ++i)
+    for( Integer i(0); i < value.asPolymorphVector().size(); ++i)
       {
 	KnownProcessList.push_back( value.asPolymorphVector()[i].asString() );
       }
@@ -49,7 +49,7 @@ LIBECS_DM_CLASS( FluxDistributionProcess, Process )
   GET_METHOD( Polymorph, KnownProcessList )
   {
     PolymorphVector value;
-    for( Int i(0); i < KnownProcessList.size(); ++i)
+    for( Integer i(0); i < KnownProcessList.size(); ++i)
       {
 	value.push_back( KnownProcessList[i] );
       }
@@ -58,7 +58,7 @@ LIBECS_DM_CLASS( FluxDistributionProcess, Process )
   SET_METHOD( Polymorph, UnknownProcessList )
   {
     UnknownProcessList.clear();
-    for( Int i(0); i < value.asPolymorphVector().size(); ++i)
+    for( Integer i(0); i < value.asPolymorphVector().size(); ++i)
       {
 	UnknownProcessList.push_back( value.asPolymorphVector()[i].asString() );
       }
@@ -67,7 +67,7 @@ LIBECS_DM_CLASS( FluxDistributionProcess, Process )
   GET_METHOD( Polymorph, UnknownProcessList )
   {
     PolymorphVector value;
-    for( Int i(0); i < UnknownProcessList.size(); ++i)
+    for( Integer i(0); i < UnknownProcessList.size(); ++i)
       {
 	value.push_back( UnknownProcessList[i] );
       }
@@ -82,7 +82,7 @@ LIBECS_DM_CLASS( FluxDistributionProcess, Process )
  protected:
 
   gsl_matrix* generateInverse( gsl_matrix *m_unknown, 
-			       Int matrix_size );
+			       Integer matrix_size );
 
  protected:
 
@@ -105,7 +105,7 @@ LIBECS_DM_CLASS( FluxDistributionProcess, Process )
   std::vector< QuasiDynamicFluxProcessPtr > theUnknownProcessPtrVector;
 
   bool   theIrreversibleFlag;
-  Int    theMatrixSize;
+  Integer    theMatrixSize;
   Real   Epsilon;
 
 };
@@ -146,7 +146,7 @@ FluxDistributionProcess::~FluxDistributionProcess()
 }
 
 gsl_matrix* FluxDistributionProcess::generateInverse(gsl_matrix *m_unknown, 
-						     Int matrix_size)
+						     Integer matrix_size)
 {      
   gsl_matrix *m_tmp1, *m_tmp2, *m_tmp3;
   gsl_matrix *inv;
@@ -200,10 +200,10 @@ void FluxDistributionProcess::initialize()
   // generate Variable Map
   //
 
-  std::map< VariablePtr, Int > aVariableMap;
+  std::map< VariablePtr, Integer > aVariableMap;
   std::vector< VariableReferenceVector >  aVariableVector;
 
-  for(Int i(0); i < UnknownProcessList.size(); i++ ) 
+  for(Integer i(0); i < UnknownProcessList.size(); i++ ) 
     {
       const FullID aFullID( UnknownProcessList[i] );
       
@@ -215,7 +215,7 @@ void FluxDistributionProcess::initialize()
       aVariableVector.push_back( aVector );
     }
   
-  for( Int i( 0 ); i < KnownProcessList.size(); i++ ) 
+  for( Integer i( 0 ); i < KnownProcessList.size(); i++ ) 
     {
       const FullID aFullID( KnownProcessList[i] );
       SystemPtr aSystem( getSuperSystem()->
@@ -228,12 +228,12 @@ void FluxDistributionProcess::initialize()
     }
   
   VariableReferenceVector aVariableReferenceVector;
-  for( Int i( 0 ); i < aVariableVector.size(); ++i )
+  for( Integer i( 0 ); i < aVariableVector.size(); ++i )
     {
-      for( Int j( 0 ); j < aVariableVector[i].size(); ++j )
+      for( Integer j( 0 ); j < aVariableVector[i].size(); ++j )
 	{
-	  Int aFlag( 1 );
-	  for( Int k( 0 ); k < aVariableReferenceVector.size(); ++k )
+	  Integer aFlag( 1 );
+	  for( Integer k( 0 ); k < aVariableReferenceVector.size(); ++k )
 	    {
 	      if( aVariableVector[i][j].getVariable() == aVariableReferenceVector[k].getVariable() )
 		{
@@ -249,9 +249,9 @@ void FluxDistributionProcess::initialize()
         }
     }
   
-  for(Int i( 0 ); i < aVariableReferenceVector.size(); i++ )
+  for(Integer i( 0 ); i < aVariableReferenceVector.size(); i++ )
     {
-      aVariableMap.insert( std::pair< VariablePtr, Int >( aVariableReferenceVector[i].getVariable(), i  ) );
+      aVariableMap.insert( std::pair< VariablePtr, Integer >( aVariableReferenceVector[i].getVariable(), i  ) );
     }
   
   //
@@ -302,7 +302,7 @@ void FluxDistributionProcess::initialize()
 
   theUnknownProcessPtrVector.clear();
   
-  for(Int i(0); i < UnknownProcessList.size(); i++ ) 
+  for(Integer i(0); i < UnknownProcessList.size(); i++ ) 
     {
       const FullID aFullID( UnknownProcessList[i] );
       
@@ -313,7 +313,7 @@ void FluxDistributionProcess::initialize()
 
       theUnknownProcessPtrVector.push_back( aProcess );
       VariableReferenceVector aVector( aProcess->getVariableReferenceVector());
-      for( Int j(0); j < aVector.size(); j++ )
+      for( Integer j(0); j < aVector.size(); j++ )
 	{
 	  gsl_matrix_set( theUnknownMatrix, aVariableMap.find( aVector[j].getVariable() )->second, i, aVector[j].getCoefficient() );
 	}
@@ -324,7 +324,7 @@ void FluxDistributionProcess::initialize()
   //
 
   theIrreversibleFlag = false;
-  for( Int i( 0 ); i < UnknownProcessList.size(); i++ )
+  for( Integer i( 0 ); i < UnknownProcessList.size(); i++ )
     {
       if( theUnknownProcessPtrVector[i]->getIrreversible() )
 	{
@@ -338,7 +338,7 @@ void FluxDistributionProcess::initialize()
 
   theKnownProcessPtrVector.clear();
   
-  for( Int i( 0 ); i < KnownProcessList.size(); i++ ) 
+  for( Integer i( 0 ); i < KnownProcessList.size(); i++ ) 
     {
       const FullID aFullID( KnownProcessList[i] );
       SystemPtr aSystem( getSuperSystem()->
@@ -348,7 +348,7 @@ void FluxDistributionProcess::initialize()
       theKnownProcessPtrVector.push_back( aProcess );
       VariableReferenceVector aVector( aProcess->getVariableReferenceVector() );
 
-      for( Int j(0); j < aVector.size(); j++ )
+      for( Integer j(0); j < aVector.size(); j++ )
 	{
 	  gsl_matrix_set( theKnownMatrix, aVariableMap.find( aVector[j].getVariable() )->second, i, aVector[j].getCoefficient());
 	}
@@ -372,7 +372,7 @@ void FluxDistributionProcess::initialize()
 
 void FluxDistributionProcess::fire()
 {
-  for( Int i( 0 ); i < theKnownProcessPtrVector.size(); ++i )
+  for( Integer i( 0 ); i < theKnownProcessPtrVector.size(); ++i )
     {
       gsl_vector_set( theKnownVelocityVector, i, theKnownProcessPtrVector[i]->getActivity() );
     }
@@ -383,8 +383,8 @@ void FluxDistributionProcess::fire()
   if ( theIrreversibleFlag )
     {
       bool aFlag( false );
-      std::vector<Int> aVector;
-      for( Int i( 0 ); i < theUnknownProcessPtrVector.size(); ++i )
+      std::vector<Integer> aVector;
+      for( Integer i( 0 ); i < theUnknownProcessPtrVector.size(); ++i )
 	{
 	  if( ( theUnknownProcessPtrVector[i]->getIrreversible() ) &&
 	      ( gsl_vector_get(theSolutionVector, i) < 0 ) )
@@ -403,9 +403,9 @@ void FluxDistributionProcess::fire()
 	    }
 	  
 	  gsl_matrix_memcpy( theTmpUnknownMatrix, theUnknownMatrix );
-	  for( Int i( 0 ); i < aVector.size(); ++i )
+	  for( Integer i( 0 ); i < aVector.size(); ++i )
 	    {
-	      for( Int j( 0 ); j < theMatrixSize; ++j )
+	      for( Integer j( 0 ); j < theMatrixSize; ++j )
 		{
 		  gsl_matrix_set( theTmpUnknownMatrix, j, aVector[i], 0 );
 		}
@@ -426,7 +426,7 @@ void FluxDistributionProcess::fire()
 	}	
     }
 
-  for( Int i( 0 ); i < theUnknownProcessPtrVector.size(); ++i )
+  for( Integer i( 0 ); i < theUnknownProcessPtrVector.size(); ++i )
     {
       theUnknownProcessPtrVector[i]->setFlux( gsl_vector_get( theSolutionVector, i ) ) ;
     }

@@ -83,7 +83,7 @@ namespace libecs
   }
 
   template<>
-  inline const String convertTo( IntCref aValue,
+  inline const String convertTo( IntegerCref aValue,
 				 Type2Type< String > )
   {
     return toString( aValue );
@@ -110,7 +110,7 @@ namespace libecs
   }
 
   template<>
-  inline const Real convertTo( IntCref aValue,
+  inline const Real convertTo( IntegerCref aValue,
 			       Type2Type< Real > )
   {
     return static_cast< const Real >( aValue );
@@ -118,30 +118,30 @@ namespace libecs
 
 
 
-  // to Int
+  // to Integer
 
 
   // identity
   template<>
-  inline const Int
-  convertTo( IntCref aValue,
-	     Type2Type< Int > )
+  inline const Integer
+  convertTo( IntegerCref aValue,
+	     Type2Type< Integer > )
   {
     return aValue;
   }
 
   template<>
-  inline const Int convertTo( RealCref aValue,
-			      Type2Type< Int > )
+  inline const Integer convertTo( RealCref aValue,
+			      Type2Type< Integer > )
   {
-    return static_cast< const Int >( aValue );
+    return static_cast< const Integer >( aValue );
   }
 
   template<>
-  inline const Int convertTo( StringCref aValue,
-			      Type2Type< Int > )
+  inline const Integer convertTo( StringCref aValue,
+				  Type2Type< Integer > )
   {
-    return stringTo< Int >( aValue );
+    return stringTo< Integer >( aValue );
   }
 
 

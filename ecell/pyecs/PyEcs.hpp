@@ -145,8 +145,8 @@ public:
       {
       case libecs::Polymorph::REAL :
 	return PyFloat_FromDouble( aPolymorph.asReal() );
-      case libecs::Polymorph::INT :
-	return PyInt_FromLong( aPolymorph.asInt() );
+      case libecs::Polymorph::INTEGER :
+	return PyInt_FromLong( aPolymorph.asInteger() );
       case libecs::Polymorph::POLYMORPH_VECTOR :
 	return PolymorphVector_to_PyTuple( aPolymorph.asPolymorphVector() );
       case libecs::Polymorph::STRING :

@@ -50,8 +50,9 @@ namespace libecs
  
   void Scheduler::registerStepper( StepperPtr aStepper )
   {
-    Int anIndex( registerEvent( SchedulerEvent( aStepper->getCurrentTime(),
-						aStepper ) ) );
+    const int anIndex( registerEvent( SchedulerEvent( aStepper->
+						      getCurrentTime(),
+						      aStepper ) ) );
 
     aStepper->setSchedulerIndex( anIndex );
   }

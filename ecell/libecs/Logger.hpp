@@ -145,7 +145,7 @@ namespace libecs
     Real getEndTime( void ) const;
 
 
-    const Int getSize() const
+    const int getSize() const
     {
       return thePhysicalLoggers[0]->size();
     }

@@ -47,7 +47,7 @@ public:
     {
       INHERIT_PROPERTIES( PythonProcessBase );
 
-      PROPERTYSLOT_SET_GET( Int, IsContinuous );
+      PROPERTYSLOT_SET_GET( Integer, IsContinuous );
       PROPERTYSLOT_SET_GET( String, ProcessMethod );
       PROPERTYSLOT_SET_GET( String, InitializeMethod );
     }
@@ -75,7 +75,7 @@ public:
     return theIsContinuous;
   }
 
-  SET_METHOD( Int, IsContinuous )
+  SET_METHOD( Integer, IsContinuous )
   {
     theIsContinuous = value;
   }

@@ -88,7 +88,8 @@ namespace libecs
 	  {
 	    VariableReferenceCref aVariableReference2( *j );
 	    VariableCptr const aVariable2( aVariableReference2.getVariable() );
-	    const Int aCoefficient2( aVariableReference2.getCoefficient() );
+	    const Integer
+	      aCoefficient2( aVariableReference2.getCoefficient() );
 	    
 	    if( aVariable1 == aVariable2 && aCoefficient2 < 0 )
 	      {

@@ -73,10 +73,10 @@ namespace libecs
   template<> const Real stringTo<Real>( StringCref str );
 
   /// A specialization of stringTo for Int
-  template<> const Int   stringTo<Int>( StringCref str );
+  template<> const Integer stringTo<Integer>( StringCref str );
 
   /// A specialization of stringTo for UnsignedInt
-  template<> const UnsignedInt  stringTo<UnsignedInt>( StringCref str );
+  template<> const UnsignedInteger stringTo<UnsignedInteger>( StringCref str );
 
   /**
      Any to String converter function template.
@@ -158,11 +158,11 @@ namespace libecs
 
 
   ///@internal
-  void throwSequenceSizeError( const Int aSize, 
-			       const Int aMin, const Int aMax );
+  void throwSequenceSizeError( const int aSize, 
+			       const int aMin, const int aMax );
 
   ///@internal
-  void throwSequenceSizeError( const Int aSize, const Int aMin );
+  void throwSequenceSizeError( const int aSize, const int aMin );
 
 
   /**

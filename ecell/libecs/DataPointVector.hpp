@@ -54,7 +54,7 @@ namespace libecs
 
   public:
 
-    DataPointVector( DataPointVectorIterator, Int );
+    DataPointVector( DataPointVectorIterator, int aPointSize );
 
     ~DataPointVector();
 
@@ -89,11 +89,11 @@ namespace libecs
 
     DataPointVectorIterator theSize;
 
-	Int PointSize;
+    Integer thePointSize;
     
     DataPoint* theRawArray;
 
-	DataPointLong* theRawArrayLong;
+    DataPointLong* theRawArrayLong;
 
   };
 

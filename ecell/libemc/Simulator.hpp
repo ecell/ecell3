@@ -489,7 +489,7 @@ namespace libemc
 	getLoggerMinimumInterval( aFullPNString );
     }
 
-    const libecs::Int getLoggerSize( libecs::StringCref aFullPNString ) const
+    const libecs::Integer getLoggerSize( libecs::StringCref aFullPNString ) const
     {
       return theSimulatorImplementation->getLoggerSize( aFullPNString );
     }
@@ -509,7 +509,7 @@ namespace libemc
 
     */
 
-    void step( const libecs::Int aNumSteps = 1 )
+    void step( const libecs::Integer aNumSteps = 1 )
     {
       theSimulatorImplementation->step( aNumSteps );
     }

@@ -40,7 +40,7 @@ LIBECS_DM_CLASS( MassActionFluxProcess, ContinuousProcess )
 	 s != theZeroVariableReferenceIterator; ++s )
       {
 	VariableReference aVariableReference( *s );
-	Int aCoefficient( aVariableReference.getCoefficient() );
+	Integer aCoefficient( aVariableReference.getCoefficient() );
 	do {
 	  ++aCoefficient;
 	  velocity *= aVariableReference.getMolarConc();

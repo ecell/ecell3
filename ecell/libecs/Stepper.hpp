@@ -81,7 +81,7 @@ namespace libecs
       {
 	INHERIT_PROPERTIES( PropertiedClass );
 	
-	PROPERTYSLOT_SET_GET( Int,       Priority );
+	PROPERTYSLOT_SET_GET( Integer,       Priority );
 	PROPERTYSLOT_SET_GET( Real,      StepInterval );
 	PROPERTYSLOT_SET_GET( Real,      MaxStepInterval );
 	PROPERTYSLOT_SET_GET( Real,      MinStepInterval );
@@ -111,12 +111,12 @@ namespace libecs
 	return compare( aLhs->getPriority(), aRhs->getPriority() );
       }
 
-      bool operator()( StepperPtr aLhs, const Int aRhs ) const
+      bool operator()( StepperPtr aLhs, const Integer aRhs ) const
       {
 	return compare( aLhs->getPriority(), aRhs );
       }
 
-      bool operator()( const Int aLhs, StepperPtr aRhs ) const
+      bool operator()( const Integer aLhs, StepperPtr aRhs ) const
       {
 	return compare( aLhs, aRhs->getPriority() );
       }
@@ -124,7 +124,7 @@ namespace libecs
     private:
 
       // if statement can be faster than returning an expression directly
-      inline static bool compare( const Int aLhs, const Int aRhs )
+      inline static bool compare( const Integer aLhs, const Integer aRhs )
       {
 	if( aLhs > aRhs )
 	  {
@@ -354,12 +354,12 @@ namespace libecs
       theModel = aModel;
     }
 
-    void setSchedulerIndex( IntCref anIndex )
+    void setSchedulerIndex( const int anIndex )
     {
       theSchedulerIndex = anIndex;
     }
 
-    const Int getSchedulerIndex() const
+    const int getSchedulerIndex() const
     {
       return theSchedulerIndex;
     }
@@ -376,7 +376,7 @@ namespace libecs
        @see Scheduler
     */
 
-    SET_METHOD( Int, Priority )
+    SET_METHOD( Integer, Priority )
     {
       thePriority = value;
     }
@@ -385,7 +385,7 @@ namespace libecs
        @see setPriority()
     */
 
-    GET_METHOD( Int, Priority )
+    GET_METHOD( Integer, Priority )
     {
       return thePriority;
     }
@@ -480,7 +480,8 @@ namespace libecs
     }
 
 
-    const UnsignedInt getVariableIndex( VariableCptr const aVariable );
+    const VariableVector::size_type 
+      getVariableIndex( VariableCptr const aVariable );
 
 
     virtual void dispatchInterruptions();
@@ -611,8 +612,9 @@ namespace libecs
     ModelPtr            theModel;
     
     // the index on the scheduler
-    Int                 theSchedulerIndex;
-    Int                 thePriority;
+    int                 theSchedulerIndex;
+
+    Integer             thePriority;
 
     Real                theCurrentTime;
 

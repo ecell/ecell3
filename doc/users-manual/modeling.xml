@@ -260,7 +260,7 @@ The &Entity; class has three subclasses:
 	      <para>(ex. <literal>3.33e+10</literal>, <literal>1.0</literal>)</para>
 	    </listitem>
 	    <listitem>
-	      <para>&Int; number</para>
+	      <para>&Integer; number</para>
 	      <para>(ex. <literal>3</literal>, <literal>100</literal>)</para>
 	    </listitem>
 	    <listitem>
@@ -289,7 +289,7 @@ The &Entity; class has three subclasses:
 	    <listitem>
 	      <para>List</para> 
 
-	      <para>The list can contain &Real;, &Int;, and
+	      <para>The list can contain &Real;, &Integer;, and
 	       &StringType; values. This list can also contain other
 	       lists, that is, the list can be nested.  A list must be
 	       surrounded by brackets (<literal>[</literal> and
@@ -323,7 +323,7 @@ The &Entity; class has three subclasses:
 <itemizedlist>
 	    <title>How property value type adaptation is conducted</title>
 	    <listitem>
-	      <para>From a numeric value (&Real; or &Int;)</para>
+	      <para>From a numeric value (&Real; or &Integer;)</para>
 	      <itemizedlist>
 		<listitem>
 		  <para>To a &StringType;</para> 
@@ -345,7 +345,7 @@ The &Entity; class has three subclasses:
 	      <para>From a &StringType;</para>
 	      <itemizedlist>
 		<listitem>
-		  <para>To a numeric value (&Real; or &Int;)</para> 
+		  <para>To a numeric value (&Real; or &Integer;)</para> 
 		  
 		  <para>The initial portion of the &StringType; is
                   converted to a numeric value.  The number can be
@@ -389,7 +389,7 @@ The &Entity; class has three subclasses:
 	    <title>Overflow and underflow when converting a property
 	    value</title> 
 
-	    <para>When converting from a &Real; number to an &Int;, or
+	    <para>When converting from a &Real; number to an &Integer;, or
 	    from a &StringType; to a numeric value, overflow and
 	    underflow can occur during the conversion.  In this case
 	    an exception (TYPE??) is raised when the backend object
@@ -637,7 +637,7 @@ as <classname>MassActionFluxProcess</classname>.</para>
 		<informalexample>
 		  <programlisting>Concentration 10.0;</programlisting></informalexample></para>
 
-	      <para>&Real;, &Int;, &StringType;, and List are
+	      <para>&Real;, &Integer;, &StringType;, and List are
 		allowed as property value types (See the Object Properties
 		section above).</para> 
 

@@ -86,39 +86,10 @@ namespace libecs
   }
 
 
-
-  #if 0
-  const bool DifferentialStepper::checkExternalError() const
-  {
-    const Real aSize( theValueVector.size() );
-    for( UnsignedInt c( 0 ); c < aSize; ++c )
-      {
-
-	// no!! theValueVector and theVariableVector holds completely
-	// different sets of Variables
-	const Real anOriginalValue( theValueVector[ c ] + 
-				    numeric_limit<Real>::epsilon() );
-
-	const Real aCurrentValue( theVariableVector[ c ]->getValue() );
-
-	const Real anRelativeError( fabs( aCurrentValue - anOriginalValue ) 
-				    / anOriginalValue );
-	if( anRelativeError <= aTolerance )
-	  {
-	    continue;
-	  }
-
-	return false;
-      }
-
-    return true;
-  }
-#endif /* 0 */
-
   void DifferentialStepper::resetAll()
   {
-    const UnsignedInt aSize( theVariableVector.size() );
-    for ( UnsignedInt c( 0 ); c < aSize; ++c )
+    const VariableVector::size_type aSize( theVariableVector.size() );
+    for( VariableVector::size_type c( aSize ); c < aSize; ++c )
       {
 	VariablePtr const aVariable( theVariableVector[ c ] );
 	aVariable->loadValue( theValueBuffer[ c ] );
@@ -129,7 +100,7 @@ namespace libecs
   {
     Real const aCurrentTime( getCurrentTime() );
 
-    for ( UnsignedInt c( theReadWriteVariableOffset );
+    for( VariableVector::size_type c( theReadWriteVariableOffset );
 	  c != theReadOnlyVariableOffset; ++c )
       {
 	VariablePtr const aVariable( theVariableVector[ c ] );
@@ -141,7 +112,7 @@ namespace libecs
 	//	std::cout << aValue << ":" << aVariable->calculateTempVelocitySum( aCurrentTime ) << std::endl;
       }
 
-    for ( UnsignedInt c( theReadOnlyVariableOffset );
+    for ( VariableVector::size_type c( theReadOnlyVariableOffset );
 	  c != theVariableVector.size(); ++c )
       {
 	VariablePtr const aVariable( theVariableVector[ c ] );
@@ -293,9 +264,9 @@ namespace libecs
     theStateFlag = true;
 
     const Real anAdaptedStepInterval( getStepInterval() );
-    const UnsignedInt aSize( getReadOnlyVariableOffset() );
+    const VariableVector::size_type aSize( getReadOnlyVariableOffset() );
 
-    for( UnsignedInt c( 0 ); c < aSize; ++c )
+    for( VariableVector::size_type c( 0 ); c < aSize; ++c )
       {
 	VariablePtr const aVariable( theVariableVector[ c ] );
 

@@ -138,7 +138,7 @@ LIBECS_DM_CLASS( ODE45Stepper, AdaptiveDifferentialStepper )
   protected:
 
     ODE45StepperRef theStepper;
-    UnsignedInt                 theIndex;
+    UnsignedInteger                 theIndex;
   };
 
 public:
@@ -158,7 +158,7 @@ public:
 
   virtual void interrupt( StepperPtr const aCaller );
 
-  virtual const Int getOrder() const { return 5; }
+  virtual const Integer getOrder() const { return 5; }
 
   virtual VariableProxyPtr createVariableProxy( VariablePtr aVariable )
   {
