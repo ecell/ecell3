@@ -1081,7 +1081,7 @@ class Plot:
 
     def clearPlotarea(self):
         self.drawBox( PLOTAREA_COLOR, self.thePlotArea[0] + 1, self.thePlotArea[1] + 1,
-                      self.thePlotArea[2] - 2, self.thePlotArea[3] -2 )
+                      self.thePlotArea[2] - 1, self.thePlotArea[3] -1 )
         
 
     def clearPlot(self):
