@@ -95,14 +95,16 @@ public:
 
   virtual bool operator()( void ) const
   {
-    PyObject* aPyObjectPtr( PyObject_CallFunction( thePyObject.ptr(), NULL ) );
+    // check signal
+    //    PyErr_CheckSignals();
 
+    // check event.
+    // this is faster than just 'return thePyObject()', unfortunately..
+    PyObject* aPyObjectPtr( PyObject_CallFunction( thePyObject.ptr(), NULL ) );
     const bool aResult( PyObject_IsTrue( aPyObjectPtr ) );
     Py_DECREF( aPyObjectPtr );
 
     return aResult;
-
-    // faster than just 'return thePyObject()', unfortunately..
   }
 
 };

@@ -202,14 +202,9 @@ SET_METHOD( TYPE, NAME )\
 SIMPLE_SET_METHOD( TYPE, NAME )\
 SIMPLE_GET_METHOD( TYPE, NAME )
 
-#define ECELL_DM_OBJECT\
- StringLiteral getClassname() { return XSTR( _ECELL_CLASSNAME ); }\
- static _ECELL_TYPE* createInstance() { return new _ECELL_CLASSNAME ; }
-
-
 #define LIBECS_DM_OBJECT( TYPE, CLASSNAME )\
 public:\
- StringLiteral getClassname() { return XSTR( CLASSNAME ); }\
+ virtual StringLiteral getClassName() const { return XSTR( CLASSNAME ); }\
  DM_OBJECT( TYPE, CLASSNAME )
 
 #define DEFINE_PROPERTYSLOT( TYPE, NAME, SETMETHOD, GETMETHOD )\
