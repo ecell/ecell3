@@ -20,8 +20,6 @@ def expandValueList( aValue, aLevel=0 ):
     # recursively apply this method for nested lists
     aValue = map( expandValueList, aValue, (aLevel+1,) * len( aValue ) )
 
-    print aValue
-
     aValueString = ''
 
     # don't use [] in uppermost level
