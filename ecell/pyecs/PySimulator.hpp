@@ -32,7 +32,8 @@
 #ifndef __PYSIMULATOR_HPP
 #define __PYSIMULATOR_HPP
 
-#include "emc/Simulator.hpp"
+#include "libemc/Simulator.hpp"
+
 #include "CXX/Extensions.hxx"
 
 using Py::Object;

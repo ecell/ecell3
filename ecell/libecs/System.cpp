@@ -72,12 +72,12 @@ namespace libecs
 
   const Message System::getSystemList( StringCref keyword )
   {
-    UniversalVariableVector aVector;
+    UVariableVector aVector;
 
     for( SystemMapIterator i = getFirstSystemIterator() ;
 	 i != getLastSystemIterator() ; ++i )
       {
-	aVector.push_back( UniversalVariable( i->second->getId() ) );
+	aVector.push_back( UVariable( i->second->getId() ) );
       }
 
     return Message( keyword, aVector );
@@ -85,12 +85,12 @@ namespace libecs
 
   const Message System::getSubstanceList( StringCref keyword )
   {
-    UniversalVariableVector aVector;
+    UVariableVector aVector;
 
     for( SubstanceMapIterator i = getFirstSubstanceIterator() ;
 	 i != getLastSubstanceIterator() ; ++i )
       {
-	aVector.push_back( UniversalVariable( i->second->getId() ) );
+	aVector.push_back( UVariable( i->second->getId() ) );
       }
 
     return Message( keyword, aVector );
@@ -98,12 +98,12 @@ namespace libecs
 
   const Message System::getReactorList( StringCref keyword )
   {
-    UniversalVariableVector aVector;
+    UVariableVector aVector;
 
     for( ReactorMapIterator i = getFirstReactorIterator() ;
 	 i != getLastReactorIterator() ; ++i )
       {
-	aVector.push_back( UniversalVariable( i->second->getId() ) );
+	aVector.push_back( UVariable( i->second->getId() ) );
       }
 
     return Message( keyword, aVector );
@@ -119,7 +119,7 @@ namespace libecs
   const Message System::getStepper( StringCref keyword )
   {
     return Message( keyword, 
-		    UniversalVariable( getStepper()->className() ) );
+		    UVariable( getStepper()->className() ) );
   }
 
   void System::setVolumeIndex( const Message& message )
@@ -136,19 +136,19 @@ namespace libecs
       }
 
     return Message( keyword, 
-		    UniversalVariable( getVolumeIndex()->getFqid() ) );
+		    UVariable( getVolumeIndex()->getFqid() ) );
   }
 
   const Message System::getVolume( StringCref keyword )
   {
     return Message( keyword, 
-		    UniversalVariable( getVolume() ) ) ;
+		    UVariable( getVolume() ) ) ;
   }
 
   const Message System::getDeltaT( StringCref keyword )
   {
     return Message( keyword, 
-		    UniversalVariable( getDeltaT() ) ) ;
+		    UVariable( getDeltaT() ) ) ;
   }
 
 

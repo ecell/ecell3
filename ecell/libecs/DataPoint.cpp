@@ -50,7 +50,7 @@ namespace libecs
   // Constructor that sets the
   // internal value
 
-  DataPoint::DataPoint( RealCref t, UniversalVariableCref v )
+  DataPoint::DataPoint( RealCref t, UVariableCref v )
     :
     theTime( t ),
     theValue( v )
@@ -62,7 +62,7 @@ namespace libecs
   DataPoint::DataPoint( RealCref t, RealCref v )
     :
     theTime( t ),
-    theValue( UniversalVariable( v ) )
+    theValue( UVariable( v ) )
   { 
     ; // do nothing
   }
@@ -102,7 +102,7 @@ namespace libecs
 
 #if defined(DATAPOINT_TEST)
 #include <stdio.h>
-#include "UniversalVariable.cpp"
+#include "UVariable.cpp"
 
 
 using namespace libecs;

@@ -39,19 +39,19 @@
 namespace libecs
 {
 
-  DECLARE_CLASS( UniversalVariableData );
-  DECLARE_CLASS( UniversalVariableStringData );
-  DECLARE_CLASS( UniversalVariableRealData );
-  DECLARE_CLASS( UniversalVariableIntData );
+  DECLARE_CLASS( UVariableData );
+  DECLARE_CLASS( UVariableStringData );
+  DECLARE_CLASS( UVariableRealData );
+  DECLARE_CLASS( UVariableIntData );
 
 
 
-  class UniversalVariableData
+  class UVariableData
   {
 
   public:
 
-    virtual ~UniversalVariableData()
+    virtual ~UVariableData()
     {
       ; // do nothing
     }
@@ -75,36 +75,36 @@ namespace libecs
       return false;
     }
 
-    virtual UniversalVariableDataPtr createClone() const = 0;
+    virtual UVariableDataPtr createClone() const = 0;
 
   protected:
   
-    UniversalVariableData( UniversalVariableDataCref ) {}
-    UniversalVariableData() {}
+    UVariableData( UVariableDataCref ) {}
+    UVariableData() {}
 
   private:
 
-    UniversalVariableCref operator= ( UniversalVariableCref );
+    UVariableCref operator= ( UVariableCref );
 
   };
 
 
-  class UniversalVariableStringData : public UniversalVariableData
+  class UVariableStringData : public UVariableData
   {
   
   public:
 
-    UniversalVariableStringData( StringCref  str ) 
+    UVariableStringData( StringCref  str ) 
       : 
       theString( str ) 
     {
       ; // do nothing
     }
   
-    UniversalVariableStringData( const Real f );
-    UniversalVariableStringData( const Int   i );
+    UVariableStringData( const Real f );
+    UVariableStringData( const Int   i );
 
-    UniversalVariableStringData( UniversalVariableDataCref uvi )
+    UVariableStringData( UVariableDataCref uvi )
       :
       theString( uvi.asString() )
     {
@@ -120,9 +120,9 @@ namespace libecs
       return true;
     }
 
-    virtual UniversalVariableDataPtr createClone() const
+    virtual UVariableDataPtr createClone() const
     {
-      return new UniversalVariableStringData( *this );
+      return new UVariableStringData( *this );
     }
 
   private:
@@ -131,20 +131,20 @@ namespace libecs
 
   };
 
-  class UniversalVariableRealData : public UniversalVariableData
+  class UVariableRealData : public UVariableData
   {
 
   public:
 
-    UniversalVariableRealData( StringCref str );
-    UniversalVariableRealData( const Real      f ) 
+    UVariableRealData( StringCref str );
+    UVariableRealData( const Real      f ) 
       : 
       theReal( f ) 
     {
       ; // do nothing
     }
 
-    UniversalVariableRealData( const Int        i ) 
+    UVariableRealData( const Int        i ) 
       : 
       theReal( static_cast<Real>( i ) )
     {
@@ -161,9 +161,9 @@ namespace libecs
       return true;
     }
 
-    virtual UniversalVariableDataPtr createClone() const
+    virtual UVariableDataPtr createClone() const
     {
-      return new UniversalVariableRealData( *this );
+      return new UVariableRealData( *this );
     }
 
   private:
@@ -172,14 +172,14 @@ namespace libecs
 
   };
 
-  class UniversalVariableIntData : public UniversalVariableData
+  class UVariableIntData : public UVariableData
   {
 
   public:
 
-    UniversalVariableIntData( StringCref str );
-    UniversalVariableIntData( const Real      f );
-    UniversalVariableIntData( const Int        i ) 
+    UVariableIntData( StringCref str );
+    UVariableIntData( const Real      f );
+    UVariableIntData( const Int        i ) 
       : 
       theInt( i ) 
     {
@@ -195,9 +195,9 @@ namespace libecs
       return true;
     }
 
-    virtual UniversalVariableDataPtr createClone() const
+    virtual UVariableDataPtr createClone() const
     {
-      return new UniversalVariableIntData( *this );
+      return new UVariableIntData( *this );
     }
 
   private:
@@ -208,46 +208,46 @@ namespace libecs
 
 
 
-  class UniversalVariable
+  class UVariable
   {
 
   public:
   
-    UniversalVariable( StringCref  string ) 
+    UVariable( StringCref  string ) 
       //    :
-      //    theData( new UniversalVariableStringData( string ) )
+      //    theData( new UVariableStringData( string ) )
     {
-      theData = new UniversalVariableStringData( string );
+      theData = new UVariableStringData( string );
       ; // do nothing
     }
   
-    UniversalVariable( const Real f )      
+    UVariable( const Real f )      
       :
-      theData( new UniversalVariableRealData( f ) )
+      theData( new UVariableRealData( f ) )
     {
       ; // do nothing
     }
 
-    UniversalVariable( const Int   i )      
+    UVariable( const Int   i )      
       :
-      theData( new UniversalVariableIntData( i ) )
+      theData( new UVariableIntData( i ) )
     {
       ; // do nothing
     }
 
-    UniversalVariable( UniversalVariableCref uv )
+    UVariable( UVariableCref uv )
       :
       theData( uv.createDataClone() )
     {
       ; // do nothing
     }
 
-    virtual ~UniversalVariable()
+    virtual ~UVariable()
     {
       delete theData;
     }
 
-    UniversalVariableCref operator= ( UniversalVariableCref rhs )
+    UVariableCref operator= ( UVariableCref rhs )
     {
       if( this != &rhs )
 	{
@@ -291,18 +291,18 @@ namespace libecs
 
   protected:
 
-    UniversalVariableDataPtr createDataClone() const
+    UVariableDataPtr createDataClone() const
     {
       return theData->createClone();
     }
 
   private:
 
-    UniversalVariable();
+    UVariable();
 
   private:
 
-    UniversalVariableDataPtr theData;
+    UVariableDataPtr theData;
 
   };
 

@@ -31,7 +31,7 @@
 #ifndef ___SYSTEMMAKER_H___
 #define ___SYSTEMMAKER_H___
 #include "System.hpp"
-#include "ModuleMaker.hpp"
+#include "dmtool/ModuleMaker.hpp"
 
 namespace libecs
 {

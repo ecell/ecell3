@@ -31,7 +31,7 @@
 #ifndef ___SUBSTANCEMAKER_H___
 #define ___SUBSTANCEMAKER_H___
 #include "Substance.hpp"
-#include "ModuleMaker.hpp"
+#include "dmtool/ModuleMaker.hpp"
 
 namespace libecs
 {

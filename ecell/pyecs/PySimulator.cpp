@@ -95,11 +95,11 @@ Object PySimulator::setProperty( const Py::Tuple& args )
 
   const Py::Tuple aMessageSequence( static_cast<Py::Sequence>( args[2] ) );
   
-  UniversalVariableVector aMessageBody;
+  UVariableVector aMessageBody;
   for( Py::Tuple::const_iterator i = aMessageSequence.begin() ;
        i != aMessageSequence.end() ; ++i )
     {
-      aMessageBody.push_back( UniversalVariable( (*i).as_string() ) );
+      aMessageBody.push_back( UVariable( (*i).as_string() ) );
     }
 
   const Message aMessage( aMessageKeyword, aMessageBody );
@@ -127,20 +127,20 @@ Object PySimulator::getProperty( const Py::Tuple& args )
 
   for( int i = 0 ; i < aMessageSize ; ++i )
     {
-      UniversalVariableCref aUniversalVariable( aMessage.getBody()[i] );
+      UVariableCref aUVariable( aMessage.getBody()[i] );
       Py::Object anObject;
-      if( aUniversalVariable.isReal() )
+      if( aUVariable.isReal() )
 	{
-	  anObject = Py::Float( aUniversalVariable.asReal() );
+	  anObject = Py::Float( aUVariable.asReal() );
 	}
-      else if( aUniversalVariable.isInt() )
+      else if( aUVariable.isInt() )
 	{
 	  anObject = 
-	    Py::Int( static_cast<long int>( aUniversalVariable.asInt() ) );
+	    Py::Int( static_cast<long int>( aUVariable.asInt() ) );
 	}
-      else if( aUniversalVariable.isString() )
+      else if( aUVariable.isString() )
 	{
-	  anObject = Py::String( aUniversalVariable.asString() );
+	  anObject = Py::String( aUVariable.asString() );
 	}
       else
 	{

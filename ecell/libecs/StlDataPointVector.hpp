@@ -136,7 +136,7 @@ namespace libecs
 
     void push( const Containee& );
 
-    void push( RealCref, UniversalVariableCref );
+    void push( RealCref, UVariableCref );
 
     const_iterator binary_search( const_iterator first,
 				  const_iterator last,

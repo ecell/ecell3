@@ -79,7 +79,7 @@ namespace libecs
   const Message RootSystem::getCurrentTime( StringCref keyword )
   {
     return Message( keyword, 
-		    UniversalVariable( theStepperLeader.getCurrentTime() ) );
+		    UVariable( theStepperLeader.getCurrentTime() ) );
   }
 
 

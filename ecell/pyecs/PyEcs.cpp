@@ -31,8 +31,9 @@
 #include <iostream>
 
 #include "libecs/libecs.hpp"
-#include "emc/Simulator.hpp"
-#include "emc/EmcLogger.hpp"
+
+#include "libemc/Simulator.hpp"
+#include "libemc/EmcLogger.hpp"
 
 #include "PySimulator.hpp"
 #include "PyLogger.hpp"

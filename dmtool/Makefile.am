@@ -4,7 +4,7 @@ AUTOMAKE_OPTIONS=foreign
 LTCONFIG = ../ltconfig
 DMLTMAIN = ../ltmain.sh
 
-SUBDIRS = include
+SUBDIRS = dmtool
 
 bin_SCRIPTS = dmtool dmgen dmcompile dmlibtool
 

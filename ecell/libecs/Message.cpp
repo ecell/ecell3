@@ -29,7 +29,7 @@
 //
 
 #include "Message.hpp"
-#include "UniversalVariable.hpp"
+#include "UVariable.hpp"
 
 
 namespace libecs
@@ -37,7 +37,7 @@ namespace libecs
 
   ////////////////////// Message
 
-  Message::Message( StringCref keyword, UniversalVariableVectorCref uvl)
+  Message::Message( StringCref keyword, UVariableVectorCref uvl)
     : 
     theKeyword( keyword ),
     theBody( uvl )
@@ -45,7 +45,7 @@ namespace libecs
     ; // do nothing
   }
 
-  Message::Message( StringCref keyword, UniversalVariableCref uv )
+  Message::Message( StringCref keyword, UVariableCref uv )
     :
     theKeyword( keyword )
   {

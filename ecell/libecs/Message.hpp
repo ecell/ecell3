@@ -36,7 +36,7 @@
 #include "Defs.hpp" 
 
 #include "Exceptions.hpp"
-#include "UniversalVariable.hpp"
+#include "UVariable.hpp"
 
 #include <vector>
 
@@ -44,12 +44,12 @@ namespace libecs
 {
 
 
-  DECLARE_VECTOR( UniversalVariable, UniversalVariableVector );
+  DECLARE_VECTOR( UVariable, UVariableVector );
 
 
   /**
      A data packet for communication among C++ objects consisting
-     of a keyword and a body. The body is a list of UniversalVariables.
+     of a keyword and a body. The body is a list of UVariables.
 
      @see MessageInterface
      @see AbstractMessageSlot
@@ -66,8 +66,8 @@ namespace libecs
       ; // do nothing
     }
 
-    Message( StringCref keyword, UniversalVariableVectorCref uvl ); 
-    Message( StringCref keyword, UniversalVariableCref uv ); 
+    Message( StringCref keyword, UVariableVectorCref uvl ); 
+    Message( StringCref keyword, UVariableCref uv ); 
 
     // copy procedures
     Message( MessageCref message );
@@ -86,22 +86,22 @@ namespace libecs
     /**
        @return 
     */
-    UniversalVariableVectorRef getBody()
+    UVariableVectorRef getBody()
     {
       return theBody;
     }
 
-    UniversalVariableVectorCref getBody() const
+    UVariableVectorCref getBody() const
     {
       return theBody;
     }
 
-    UniversalVariableRef operator[]( int i )
+    UVariableRef operator[]( int i )
     {
       return theBody.operator[]( i );
     }
 
-    UniversalVariableCref operator[]( int i ) const
+    UVariableCref operator[]( int i ) const
     {
       return theBody.operator[]( i );
     }
@@ -109,7 +109,7 @@ namespace libecs
   private:
 
     String theKeyword;
-    UniversalVariableVector theBody;
+    UVariableVector theBody;
 
   };
 

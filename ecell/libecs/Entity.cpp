@@ -64,32 +64,32 @@ namespace libecs
 
   const Message Entity::getClassName( StringCref keyword )
   {
-    return Message( keyword, UniversalVariable( getClassName() ) );
+    return Message( keyword, UVariable( getClassName() ) );
   }
 
   const Message Entity::getId( StringCref keyword )
   {
-    return Message( keyword, UniversalVariable( getId() ) );
+    return Message( keyword, UVariable( getId() ) );
   }
 
   const Message Entity::getSystemPath( StringCref keyword )
   {
-    return Message( keyword, UniversalVariable( getSystemPath() ) );
+    return Message( keyword, UVariable( getSystemPath() ) );
   }
 
   const Message Entity::getName( StringCref keyword )
   {
-    return Message( keyword, UniversalVariable( getName() ) );
+    return Message( keyword, UVariable( getName() ) );
   }
 
   const Message Entity::getActivity( StringCref keyword )
   {
-    return Message( keyword, UniversalVariable( getActivity() ) );
+    return Message( keyword, UVariable( getActivity() ) );
   }
 
   const Message Entity::getActivityPerSecond( StringCref keyword )
   {
-    return Message( keyword, UniversalVariable( getActivityPerSecond() ) );
+    return Message( keyword, UVariable( getActivityPerSecond() ) );
   }
 
   Real Entity::getActivity() 

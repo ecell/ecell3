@@ -31,7 +31,7 @@
 #if !defined( __PY_LOGGER_HPP )
 #define __PY_LOGGER_HPP
 
-#include "emc/EmcLogger.hpp"
+#include "libemc/EmcLogger.hpp"
 #include "CXX/Extensions.hxx"
 
 using namespace libemc;

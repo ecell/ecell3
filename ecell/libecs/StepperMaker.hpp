@@ -31,7 +31,7 @@
 #ifndef ___STEPPERMAKER_H___
 #define ___STEPPERMAKER_H___
 #include "Stepper.hpp"
-#include "ModuleMaker.hpp"
+#include "dmtool/ModuleMaker.hpp"
 
 namespace libecs
 {

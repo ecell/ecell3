@@ -31,7 +31,7 @@
 #ifndef ___REACTORMAKER_H___
 #define ___REACTORMAKER_H___
 #include "Reactor.hpp"
-#include "ModuleMaker.hpp"
+#include "dmtool/ModuleMaker.hpp"
 
 
 namespace libecs

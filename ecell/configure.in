@@ -98,7 +98,7 @@ if test "$DMTOOL_DIR" = "" ; then
 
         AC_MSG_RESULT($ac_cv_dmtool_dir)
         DMTOOL_DIR=$ac_cv_dmtool_dir
-        DMTOOL_INCLUDE_DIR=$ac_cv_dmtool_dir/dmtool/include
+        DMTOOL_INCLUDE_DIR=$ac_cv_dmtool_dir/dmtool
 fi
 AC_SUBST(DMTOOL_DIR)
 AC_SUBST(DMTOOL_INCLUDE_DIR)
@@ -157,7 +157,7 @@ AM_CONFIG_HEADER(config.h)
 AC_OUTPUT(
 Makefile 
 libecs/Makefile 
-emc/Makefile
+libemc/Makefile
 pyecs/Makefile
 )
 

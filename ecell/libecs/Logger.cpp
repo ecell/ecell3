@@ -178,7 +178,7 @@ namespace libecs
   
   //
   
-  void Logger::appendData( RealCref t, UniversalVariableCref v )
+  void Logger::appendData( RealCref t, UVariableCref v )
   {
     theCurrentInterval = t - theDataPointVector.back()->getTime();
     theDataPointVector.push( t, v );

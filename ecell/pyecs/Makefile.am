@@ -35,9 +35,9 @@ ecs_la_SOURCES=PyEcs.cpp PySimulator.cpp PyLogger.cpp $(CXXSRC)
 ecs_la_LDFLAGS=-module -export-dynamic -avoid-version -rpath /usr/local/lib
 
 #FIXME: specifing .libs is ugly
-#ecs_la_LIBADD= /usr/local/lib/libstdc++.a.2.10.0 -L$(ECELLDIR)/emc/.libs/ -lemc -L$(ECELLDIR)/libecs/.libs/ -lecs
-ecs_la_LIBADD= -lstdc++ -L$(ECELLDIR)/emc/.libs/ -lemc -L$(ECELLDIR)/libecs/.libs/ -lecs
-ecs_la_DEPENDENCIES= $(ECELLDIR)/emc/libemc.la $(ECELLDIR)/libecs/libecs.la $(LIBKORANDOM) ${LIBLTDL} 
+#ecs_la_LIBADD= /usr/local/lib/libstdc++.a.2.10.0 -L$(ECELLDIR)/libemc/.libs/ -lemc -L$(ECELLDIR)/libecs/.libs/ -lecs
+ecs_la_LIBADD= -lstdc++ -L$(ECELLDIR)/libemc/.libs/ -lemc -L$(ECELLDIR)/libecs/.libs/ -lecs
+ecs_la_DEPENDENCIES= $(ECELLDIR)/libemc/libemc.la $(ECELLDIR)/libecs/libecs.la $(LIBKORANDOM) ${LIBLTDL} 
 
 all-local: ecs.so
 

@@ -89,7 +89,7 @@ namespace libecs
     if( theAccumulator )
       {
 	return Message( keyword, 
-			UniversalVariable( theAccumulator->className() ) );
+			UVariable( theAccumulator->className() ) );
       }
     else
       {

@@ -129,7 +129,7 @@ namespace libecs
     }
     
     
-    void update( UniversalVariableCref v )
+    void update( UVariableCref v )
     {
       const Real temp(0.0);
       theLogger->appendData( temp, v );

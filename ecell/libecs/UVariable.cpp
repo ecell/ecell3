@@ -30,60 +30,60 @@
 
 #include "Util.hpp"
 
-#include "UniversalVariable.hpp"
+#include "UVariable.hpp"
 
 namespace libecs
 {
 
-  UniversalVariableStringData::
-  UniversalVariableStringData( const Real f )
+  UVariableStringData::
+  UVariableStringData( const Real f )
     :
     theString( toString<Real>( f ) )
   {
     ; // do nothing
   }
 
-  UniversalVariableStringData::UniversalVariableStringData( const Int i )
+  UVariableStringData::UVariableStringData( const Int i )
     :
     theString( toString<Int>( i ) )
   {
     ; // do nothing
   }
 
-  const Real UniversalVariableStringData::asReal() const
+  const Real UVariableStringData::asReal() const
   {
     return stringTo<Real>( theString );
   }
 
-  const Int UniversalVariableStringData::asInt() const
+  const Int UVariableStringData::asInt() const
   {
     return stringTo<Int>( theString );
   }
 
 
-  UniversalVariableRealData::
-  UniversalVariableRealData( StringCref str )
+  UVariableRealData::
+  UVariableRealData( StringCref str )
     :
     theReal( stringTo<Real>( str ) )
   {
     ; // do nothing
   }
 
-  const String UniversalVariableRealData::asString() const
+  const String UVariableRealData::asString() const
   {
     return toString<Real>( theReal );
   }
 
-  UniversalVariableIntData::
-  UniversalVariableIntData( StringCref str )
+  UVariableIntData::
+  UVariableIntData( StringCref str )
     :
     theInt( stringTo<Int>( str ) )
   {
     ; // do nothing
   }
 
-  UniversalVariableIntData::
-  UniversalVariableIntData( const Real f )
+  UVariableIntData::
+  UVariableIntData( const Real f )
     :
     // FIXME: range check?
     theInt( static_cast<Int>( f ) )
@@ -92,7 +92,7 @@ namespace libecs
   }
 
 
-  const String UniversalVariableIntData::asString() const
+  const String UVariableIntData::asString() const
   {
     return toString<Int>( theInt );
   }

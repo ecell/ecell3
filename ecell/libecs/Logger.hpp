@@ -41,7 +41,7 @@
 
 #include "DataPoint.hpp"
 //#include "MessageInterface.hpp"
-#include "UniversalVariable.hpp"
+#include "UVariable.hpp"
 
 //#if defined(STLDATAPOINTVECTOR)
 #include "StlDataPointVector.hpp"
@@ -159,7 +159,7 @@ namespace libecs
 
     void appendData( const containee_type& );
 
-    void appendData( RealCref t, UniversalVariableCref v );
+    void appendData( RealCref t, UVariableCref v );
 
 
   protected:

@@ -48,12 +48,12 @@ namespace libecs
 
   const Message MessageInterface::getPropertyList( StringCref keyword )
   {
-    UniversalVariableVector aPropertyList;
+    UVariableVector aPropertyList;
 
     for( PropertyMapConstIterator i = thePropertyMap.begin() ; 
 	 i != thePropertyMap.end() ; ++i )
       {
-	aPropertyList.push_back( UniversalVariable( i->first ) );
+	aPropertyList.push_back( UVariable( i->first ) );
       }
 
     return Message( keyword, aPropertyList );
