@@ -1,6 +1,6 @@
 AUTOMAKE_OPTIONS = foreign
 
-bin_PROGRAMS =\
+bin_SCRIPTS =\
 rd2dm\
 eri2eml\
 ecell3-dmc\

@@ -249,8 +249,6 @@ AC_CONFIG_FILES([pyecs/ecell3-python], [chmod +x pyecs/ecell3-python])
 AC_CONFIG_FILES([Makefile
 		 libecs/Makefile
 		 libemc/Makefile
-		 pyecs/windows/ecell3-python.bat
-		 pyecs/windows/ecell3-console.bat
 		 pyecs/windows/ecell3-inno.iss
 		 pyecs/Makefile
 		 pyecell/Makefile
