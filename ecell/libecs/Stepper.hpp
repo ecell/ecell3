@@ -237,14 +237,14 @@ namespace libecs
     void registerLoggedPropertySlot( PropertySlotPtr );
 
 
-    StringCref getName() const
+    StringCref getID() const
     {
-      return theName;
+      return theID;
     }
 
-    void setName( StringCref aName )
+    void setID( StringCref anID )
     {
-      theName = aName;
+      theID = anID;
     }
 
     void setMinInterval( RealCref aValue )
@@ -313,7 +313,7 @@ namespace libecs
     Real                theMinInterval;
     Real                theMaxInterval;
 
-    String              theName;
+    String              theID;
 
     bool                theEntityListChanged;
 

@@ -229,7 +229,7 @@ namespace libecs
 			     UVariableVectorCref aParameterList )
   {
     StepperPtr aStepper( getStepperMaker().make( aClassName ) );
-    aStepper->setName( anID );
+    aStepper->setID( anID );
     aStepper->setParameterList( aParameterList );
 
     theStepperMap.insert( std::make_pair( anID, aStepper ) );

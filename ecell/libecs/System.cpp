@@ -74,7 +74,7 @@ namespace libecs
 
     registerSlot( getPropertySlotMaker()->
 		  createPropertySlot( "StepperID", *this,
-				      Type2Type<UVariableVectorRCPtr>(),
+				      Type2Type<String>(),
 				      &System::setStepperID,
 				      &System::getStepperID ) );
 
@@ -137,23 +137,6 @@ namespace libecs
   }
 
 
-  void System::setStepperID( UVariableVectorRCPtrCref aValue )
-  {
-    checkSequenceSize( *aValue, 1 );
-
-    setStepperID( (*aValue)[0].asString() );
-  }
-
-  const UVariableVectorRCPtr System::getStepperID() const
-  {
-    UVariableVectorRCPtr aVector( new UVariableVector );
-    //    aVector->push_back( UVariable( getModel()->
-    //				   getStepper()->getClassName() ) );
-
-    aVector->push_back( UVariable( "NOT IMPLEMENTED YET" ) );
-    return aVector;
-  }
-
   System::System()
     :
     theVolume( 1.0 ),
@@ -194,6 +177,11 @@ namespace libecs
   {
     theStepper = getModel()->getStepper( anID );
     theStepper->registerSystem( this );
+  }
+
+  const String System::getStepperID() const
+  {
+    return getStepper()->getID();
   }
 
   void System::setStepInterval( RealCref aStepInterval )

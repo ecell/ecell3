@@ -100,6 +100,15 @@ namespace libecs
 
     void setStepperID( StringCref anID );
 
+
+    /**
+       Get an ID of the Stepper.
+
+       @return an ID of the Stepper as a String.
+    */
+
+    const String getStepperID() const;
+
     /**
        @return Volume of this System. Unit is [L].
     */
@@ -242,10 +251,6 @@ namespace libecs
     static SystemPtr createInstance() { return new System; }
 
   public: // property slots
-
-    void setStepperID( UVariableVectorRCPtrCref aMessage );
-
-    const UVariableVectorRCPtr getStepperID() const;
 
     const UVariableVectorRCPtr getSystemList() const;
     const UVariableVectorRCPtr getSubstanceList() const;

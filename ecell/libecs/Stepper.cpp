@@ -80,7 +80,7 @@ namespace libecs
       {
 	THROW_EXCEPTION( NotFound,
 			 getClassName() + String( ": " ) 
-			 + getName() + ": " + aSystem->getFullID().getString() 
+			 + getID() + ": " + aSystem->getFullID().getString() 
 			 + " not found in this stepper." );
       }
 
