@@ -65,13 +65,6 @@ public:
   const String getFqpi() const;
 
   /**
-    Add bias value in current step.
-    Usually used by Interfaces.
-    @param bias bias in Quantity.
-   */
-  void setBias( Quantity bias )                { theBias += bias; }
-
-  /**
     @return the number of molecules.
    */
   Float getQuantity() const                    { return theQuantity; }
@@ -117,7 +110,6 @@ public:
 
   /**
     Clear phase.
-    Add bias to current value and clear the bias by zero.
     Then call clear() of the integrator.
    */
   void clear();
@@ -223,8 +215,6 @@ private:
   Float theQuantity;
   Float theFraction;
   Float theVelocity;
-
-  Quantity theBias;
 
   bool theFixed;
 

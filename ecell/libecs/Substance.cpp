@@ -100,7 +100,6 @@ Substance::Substance()
   theQuantity( 0 ),  
   theFraction( 0 ),
   theVelocity( 0 ),
-  theBias( 0 ),
   theFixed( false ) ,
   theConcentration( -1 )
 {
@@ -229,8 +228,6 @@ void Substance::transit()
 
 void Substance::clear()
 { 
-  theQuantity += theBias; 
-  theBias = 0;
   theVelocity = 0; 
   theIntegrator->clear();
 }
