@@ -94,7 +94,7 @@ namespace libecs
 	theErrorEstimate[ c ] = theK1[ c ] * ( 2825.0 / 27648.0 );
 
 	// clear velocity
-	aVariable->setVelocity( 0.0 );
+	aVariable->clearVelocity();
       }
 
     // ========= 2 ===========
@@ -119,7 +119,7 @@ namespace libecs
 	//	    theErrorEstimate[ c ] += theK2[ c ] * 0;
 	    
 	// clear velocity
-	aVariable->setVelocity( 0.0 );
+	aVariable->clearVelocity();
       }
 	
     // ========= 3 ===========
@@ -145,7 +145,7 @@ namespace libecs
 	theErrorEstimate[ c ] += theK3[ c ] * ( 18575.0 / 48384.0 );
 	
 	// clear velocity
-	aVariable->setVelocity( 0.0 );
+	aVariable->clearVelocity();
       }
     
     // ========= 4 ===========
@@ -172,7 +172,7 @@ namespace libecs
 	theErrorEstimate[ c ] += theK4[ c ] * ( 13525.0 / 55296.0 );
 	    
 	// clear velocity
-	aVariable->setVelocity( 0.0 );
+	aVariable->clearVelocity();
       }
 		
     // ========= 5 ===========
@@ -204,7 +204,7 @@ namespace libecs
 	theErrorEstimate[ c ] += theK5[ c ] * ( 277.0 / 14336.0 );
 	    
 	// clear velocity
-	aVariable->setVelocity( 0.0 );
+	aVariable->clearVelocity();
       }
 
     // ========= 6 ===========

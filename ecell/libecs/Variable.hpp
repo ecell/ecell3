@@ -85,10 +85,10 @@ namespace libecs
 
 
     /**
-       Clear phase.
+       Clear theVelocity by zero.
     */
 
-    void clear()
+    void clearVelocity()
     { 
       theVelocity = 0.0; 
     }

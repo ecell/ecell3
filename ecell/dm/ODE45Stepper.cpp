@@ -108,7 +108,7 @@ namespace libecs
 				  + theValueBuffer[ c ] );
 
 	    // clear velocity
-	    aVariable->setVelocity( 0.0 );
+	    aVariable->clearVelocity();
 	  }
       }
     else
@@ -125,7 +125,7 @@ namespace libecs
 				  + theValueBuffer[ c ] );
 
 	    // clear velocity
-	    aVariable->setVelocity( 0.0 );
+	    aVariable->clearVelocity();
 	  }	
       }
 
@@ -146,7 +146,7 @@ namespace libecs
 			      + theValueBuffer[ c ] );
 
 	// clear velocity
-	aVariable->setVelocity( 0.0 );
+	aVariable->clearVelocity();
       }
 
 
@@ -168,7 +168,7 @@ namespace libecs
 			      + theValueBuffer[ c ] );
 
 	// clear velocity
-	aVariable->setVelocity( 0.0 );
+	aVariable->clearVelocity();
       }
 
     // ========= 4 ===========
@@ -190,7 +190,7 @@ namespace libecs
 			      + theValueBuffer[ c ] );
 
 	// clear velocity
-	aVariable->setVelocity( 0.0 );
+	aVariable->clearVelocity();
       }
 
     // ========= 5 ===========
@@ -213,7 +213,7 @@ namespace libecs
 			      + theValueBuffer[ c ] );
 
 	// clear velocity
-	aVariable->setVelocity( 0.0 );
+	aVariable->clearVelocity();
       }
 
     // ========= 6 ===========
@@ -237,7 +237,7 @@ namespace libecs
 			      + theValueBuffer[ c ] );
 
 	// clear velocity
-	aVariable->setVelocity( 0.0 );
+	aVariable->clearVelocity();
       }
 
     // ========= 7 ===========

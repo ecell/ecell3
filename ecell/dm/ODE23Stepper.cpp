@@ -84,7 +84,7 @@ namespace libecs
 			      + theValueBuffer[ c ] );
 
 	// clear velocity
-	aVariable->setVelocity( 0.0 );
+	aVariable->clearVelocity();
       }
 
     // ========= 2 ===========
@@ -104,7 +104,7 @@ namespace libecs
 			      + theValueBuffer[ c ] );
 	    
 	// clear velocity
-	aVariable->setVelocity( 0.0 );
+	aVariable->clearVelocity();
       }
 	
     // ========= 3 ===========

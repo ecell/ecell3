@@ -540,9 +540,6 @@ namespace libecs
 
   void Stepper::clear()
   {
-    //
-    // Variable::clear()
-    //
     const UnsignedInt aSize( theVariableVector.size() );
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
@@ -551,8 +548,7 @@ namespace libecs
 	// save original value values
 	theValueBuffer[ c ] = aVariable->getValue();
 
-	// clear phase is here!
-	aVariable->clear();
+	aVariable->clearVelocity();
       }
 
   }
@@ -589,7 +585,7 @@ namespace libecs
 
 	// restore x (original value) and clear velocity
 	aVariable->setValue( theValueBuffer[ c ] );
-	aVariable->setVelocity( 0.0 );
+	aVariable->clearVelocity();
       }
   }
 
