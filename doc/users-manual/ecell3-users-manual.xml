@@ -1,0 +1,681 @@
+<?xml version="1.0"?>
+
+<!-- "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd"  -->
+
+<!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN" 
+[
+  <!ENTITY legal SYSTEM "legal.xml">
+  <!ENTITY appversion "3.1.0">
+  <!ENTITY manrevision "0.0">
+  <!ENTITY date "Nov 2002">
+  <!ENTITY app "<application>E-Cell SimulationEnvironment Version 3</application>">
+  <!-- Information about the entities
+       The legal.xml file contains legal information, there is no need to edit the file. 
+       Use the appversion entity to specify the version of the application.
+       Use the manrevision entity to specify the revision number of this manual.
+       Use the date entity to specify the release date of this manual.
+       Use the app entity to specify the name of the application. -->
+]>
+<!-- 
+  This is a GNOME documentation template, designed by the GNOME
+  Documentation Project Team. Please use it for writing GNOME
+  documentation, making obvious changes. In particular, all the words
+  written in UPPERCASE (with the exception of GNOME) should be
+  replaced. As for "legalnotice", please leave the reference
+  unchanged.
+
+  Remember that this is a guide, rather than a perfect model to follow
+  slavishly. Make your manual logical and readable.  And don't forget
+  to remove these comments in your final documentation!  ;-)
+-->
+<!-- 
+      (Do not remove this comment block.)
+  Maintained by the GNOME Documentation Project
+  http://developer.gnome.org/projects/gdp
+  Template version: 2.0 beta
+  Template last modified Apr 11, 2002
+-->
+<!-- =============Document Header ============================= -->
+<article id="index" lang="en">
+<!-- please do not change the id; for translations, change lang to -->
+<!-- appropriate code -->
+  <articleinfo> 
+    <title>&app; Manual V&manrevision;</title>       
+
+    <copyright> 
+      <year>2002</year> 
+      <holder>Keio University</holder> 
+    </copyright> 
+
+<!-- An address can be added to the publisher information.  If a role is 
+     not specified, the publisher/author is the same for all versions of the 
+     document.  -->
+    <publisher> 
+      <publishername> E-Cell Project </publishername> 
+    </publisher> 
+
+   &legal;
+
+   <!-- This file  contains link to license for the documentation (GNU FDL), and 
+        other legal stuff such as "NO WARRANTY" statement. Please do not change 
+	any of this. -->
+
+    <authorgroup> 
+      <author> 
+		<firstname>Kouichi</firstname> 
+		<surname>Takahashi</surname> 
+		<affiliation> 
+	  		<orgname>E-Cell Project</orgname> 
+	  		<address> <email>shafi@e-cell.org</email> </address> 
+		</affiliation> 
+      </author> 
+      
+    </authorgroup>
+
+
+    <!-- According to GNU FDL, revision history is mandatory if you are -->
+    <!-- modifying/reusing someone else's document.  If not, you can omit it. -->
+    <!-- Remember to remove the &manrevision; entity from the revision entries other
+    -->
+    <!-- than the current revision. -->
+    <!-- The revision numbering system for GNOME manuals is as follows: -->
+    <!-- * the revision number consists of two components -->
+    <!-- * the first component of the revision number reflects the release version of the GNOME desktop. -->
+    <!-- * the second component of the revision number is a decimal unit that is incremented with each revision of the manual. -->
+    <!-- For example, if the GNOME desktop release is V2.x, the first version of the manual that -->
+    <!-- is written in that desktop timeframe is V2.0, the second version of the manual is V2.1, etc. -->
+    <!-- When the desktop release version changes to V3.x, the revision number of the manual changes -->
+    <!-- to V3.0, and so on. -->  
+
+    <revhistory>
+      <revision> 
+	<revnumber>E-Cell 3 Manual V&manrevision;</revnumber> 
+	<date>&date;</date> 
+	<revdescription> 
+	  <para role="author">Kouichi Takahashi
+	    	<email>shafi@e-cell.org</email>
+	  		</para>
+	  <para role="publisher">E-Cell Project</para>
+	</revdescription> 
+      </revision> 
+    </revhistory> 
+
+    <releaseinfo>This manual describes version &appversion; of E-Cell Simulation Environment.
+    </releaseinfo> 
+
+    <legalnotice> 
+      <title>Feedback</title> 
+      <para>To report a bug or make a suggestion regarding the &app; application or
+      this manual, send an email to <email>shafi@e-cell.org</email>. 
+      </para>
+      <!-- Translators may also add here feedback address for translations -->
+    </legalnotice> 
+  </articleinfo> 
+
+
+  <indexterm zone="index"> 
+    <primary>E-Cell Simulation Environment</primary> 
+  </indexterm> 
+  <indexterm zone="index"> 
+    <primary>E-Cell</primary> 
+  </indexterm>
+
+  <!-- ============= Document Body ============================= -->
+  <!-- ============= Introduction ============================== -->
+  <!-- Use the Introduction section to give a brief overview of what
+  the application is and what it does. -->
+  <sect1 id="ecell3-introduction"> 
+    <title>Introduction</title> 
+    <para>The &app; is a software environment for simulation of various
+cellular phenomena.
+    </para> 
+  </sect1>
+
+  <!-- =========== Getting Started ============================== -->
+  <!-- Use the Getting Started section to describe the steps required
+  to start the application and to describe the user interface components
+  of the application. If there is other information that it is important
+  for readers to know before they start using the application, you should
+  also include this information here. 
+  If the information about how to get started is very short, you can 
+  include it in the Introduction and omit this section. -->
+
+  <sect1 id="ecell3-getting-started"> 
+    <title>Getting Started</title> 
+
+    <sect2 id="ecell3-start">
+      <title>To Start &app;</title>
+      <para>You can start <application>&app;</application> either in 
+    scripting mode and GUI mode.
+    </para> 
+
+      <variablelist>
+    	<varlistentry>
+	  <term>Scripting mode</term>
+	  <listitem>
+	    <para>To start <application>&app;</application> 
+                in scripting mode, type the following command, 
+    		then press <keycap>Return</keycap>:</para>
+	    <para> 
+			<command>ecell3</command> 
+			<replaceable>[filename.py]</replaceable>
+    		</para> 
+	    <para>where  
+			<replaceable>filename.py</replaceable> 
+                        is the name of the python script file you
+			want to execute.  
+    		</para> 
+	  </listitem>
+    	</varlistentry>
+
+    	<varlistentry>
+	  <term>GUI mode</term>
+	  <listitem>
+	    <para>To start <application>&app;</application> 
+                in GUI mode, type the following command</para> 
+	    <para> 
+			<command>gecell &</command> 
+    		</para> 
+	  </listitem>
+    	</varlistentry>
+
+      </variablelist>
+    </sect2>
+
+  </sect1>
+
+  <!-- ================ Preparing Simulation ================================ -->
+
+  <sect1 id="prepare-simulation"> 
+    <title>Preparing Simulation</title> 
+
+    <para> To start the simulation, you need at least a model file in
+      EML format, and (optionally but usually) binary shared object
+      files (SO or .so) of the object classes appearing in the EML
+      file.  This section explains how to create these types of files
+      from more user-friendly formats (such as EM and DM).
+    </para>
+
+    <sect2>
+      <title>Converting EM to EML</title>
+      <para>
+        To convert EM (.em) files to EML (.eml) files,
+        type the following command.
+    		</para>
+      <para> 
+	<command>em2eml</command> 
+	<replaceable>filename.em</replaceable>
+      </para> 
+
+    </sect2>
+
+    <sect2>
+      <title>Compiling DM to make .so</title>
+      <para>
+        To make a DM (.dm) file compiled into a SO (.so) file,
+        type the following command.
+    		</para>
+      <para> 
+	<command>emtool</command> <option>-a</option>
+	<replaceable>filename.dm</replaceable>
+      </para> 
+
+
+      <note>
+	<para>When debugging the DM files users may want to check 
+	converted C++ source code (.cpp files).  Use <option>-g</option>
+	commandline option to command emtool program to stop after generating
+        and before compiling and deleting the source code.
+      </para> 
+      <para> 
+	<command>emtool</command> <option>-g</option>
+	<replaceable>filename.dm</replaceable>
+      </para>
+      </note>
+
+      <note>
+	<para>Sometimes advanced users may want to create SO files
+	directly from C++ source code files (.cpp files).  Use -c
+	commandline option to let emtool program interpret the input as
+        C++ source code, not DM scipt.
+      </para> 
+      <para> 
+	<command>emtool</command> <option>-c</option>
+	<replaceable>filename.cpp</replaceable>
+
+      </para>
+      </note>
+
+    </sect2>
+
+  </sect1>
+
+
+<!-- ================ Writing em ================================ -->
+
+  <sect1 id="write-em"> 
+    <title>Writing a Model File in .em format</title> 
+
+
+    <sect2>
+      <title>General rules</title>
+
+	  <para>
+	  The file suffix must be ".em". It is an abbreviation of
+	  "E-Cell Model"
+	  </para>
+
+    </sect2>
+
+    <sect2>
+      <title>general structure</title>
+
+      <programlisting>
+
+ObjectType [ClassName] ( ID )
+{ 
+        property_name1 property_value1 ;
+        property_name2 property_value2 ;
+        ...
+        property_namen property_valuen ;
+} 
+</programlisting>
+
+      <para>where <emphasis>ObjectType</emphasis> is one of:
+
+      <itemizedlist>
+	<listitem>
+	  <para><classname>Stepper</classname></para>
+	</listitem>
+
+	<listitem>
+	  <para><classname>Variable</classname></para>
+	</listitem>
+
+	<listitem>
+	  <para><classname>Process</classname></para>
+	</listitem>
+
+	<listitem>
+	  <para><classname>System</classname></para>
+	</listitem>
+      </itemizedlist>
+
+
+    </para>
+      
+      <para><emphasis>ID</emphasis> is
+      <classname>SystemPath</classname> for System definitions, and ID
+      string for other <emphasis>ObjectType</emphasis>s</para>
+
+      <para><emphasis>property_value</emphasis> can be one of 
+
+<itemizedlist>
+	  <listitem>
+	    <para>Real number (ex. 3.33e+10, 1.0)</para>
+	  </listitem>
+	  <listitem>
+	    <para>Int number  (ex. 3, 100)</para>
+	  </listitem>
+	  <listitem>
+	    <para>String (ex. C10:A)</para>
+	  </listitem>
+	  <listitem>
+	    <para>Quoted string (ex. "[EC35.3.33]+30")</para>
+	  </listitem>
+	  <listitem>
+	    <para>List of items consists of above types of elements.  This list
+can be nested. 
+(ex. [ A 10 [ 1 1.0 1e+10 ] ] )
+</para>
+	  </listitem>
+	</itemizedlist>
+
+
+</para>
+
+
+
+<example>
+	<title>simple 'Toy Pathway' model</title>
+
+	<programlisting>
+
+Stepper Euler1Stepper( SRM_01 ) 
+{ 
+        # no property 
+} 
+ 
+System System( / ) 
+{ 
+        StepperID       SRM_01; 
+        Volume  0.000000000000001; 
+} 
+ 
+System System( / ) 
+{ 
+        StepperID       SRM_01; 
+        Volume  0.000000000000001; 
+} 
+ 
+System System( /CELL ) 
+{ 
+        StepperID       SRM_01; 
+        Volume  unknown; 
+} 
+ 
+System System( /CELL/CYTOPLASM ) 
+{ 
+        StepperID       SRM_01; 
+        Volume  1e-18; 
+ 
+        Variable Variable( S ) 
+        { 
+                Value   1000000; 
+        } 
+ 
+        Variable Variable( P ) 
+        { 
+                Value   0; 
+        } 
+ 
+        Variable Variable( E ) 
+        { 
+                Value   1000; 
+        } 
+ 
+        Process MichaelisUniUniProcess( E ) 
+        { 
+                VariableReferenceList   [ S0 Variable:/CELL/CYTOPLASM:S -1 ]  
+                                        [ P0 Variable:/CELL/CYTOPLASM:P 1 ]  
+                                        [ C0 Variable:/CELL/CYTOPLASM:E 0 ]; 
+                KmS     1; 
+                KcF     10; 
+        } 
+ 
+} 
+ 
+#target /CELL/CYTOPLASM; 
+ 
+#/MT0  -> /MT0 
+#MT0   -> /CELL/CYTOPLASM/MT0 
+#Reatant S0 .:S -1; 
+#Reatant S0 ../CYTOPLASM1:S -1; 
+ 
+	</programlisting> 
+</example> 
+
+<example>
+	<title>Another example</title>
+
+
+	<programlisting>
+
+Stepper Euler1Stepper ( SRM_01 ) 
+{ 
+# no property 
+} 
+ 
+System CompartmentSystem ( / ) 
+{ 
+        Name "ENVIRONMENT"; 
+        Stepper SRM_01; 
+        Volume  1.0E-15; 
+} 
+ 
+System CompartmentSystem ( /CELL )  
+{ 
+        Name "CELL"; 
+        Stepper SRM_01; 
+        Volume  unknown; 
+} 
+ 
+System CompartmentSystem ( /CELL/CYTOPLASM ) 
+{ 
+        Name "CYTOPLASM"; 
+        Stepper SRM_01; 
+        Volume  1.0E-18; 
+ 
+        Substance Substance ( S ) 
+        { 
+                Name "S"; 
+                Quantity 1000000; 
+        } 
+ 
+        Substance Substance ( P ) 
+        { 
+                Name "P"; 
+                Quantity 0; 
+        } 
+ 
+        Substance Substance ( E ) 
+        { 
+                Name "E"; 
+                Quantity 1000; 
+        } 
+ 
+ 
+#/MT0  -> /MT0 
+#MT0   -> /CELL/CYTOPLASM/MT0 
+#Reatant S0 .:S -1; 
+#Reatant S0 ../CYTOPLASM1:S -1; 
+ 
+        Reactor MichaelisUniUniReactor ( R ) 
+        { 
+                Name "R"; 
+                VariableReferenceList [S0 S -1] 
+                                      [P0 P 1] 
+                                      [E0 ./E 0]; 
+ 
+                KmS 1; 
+                KcF 10; 
+        } 
+ 
+} 
+ 
+System System ( /CELL/MEMBRANE ) 
+{ 
+        Name "MEMBRANE"; 
+        Stepper SRM_01; 
+        Volume  unknown; 
+} 
+
+</programlisting>
+      </example>
+</sect2>
+
+
+
+
+  </sect1>
+
+  <!-- ============= Creating New Object Classes ============================= -->
+  <!-- Use this section to describe how to customize the application. -->
+  <sect1 id="create-new-class"> 
+    <title>Creating New Object Classes By Writing .dm files</title> 
+    <para>
+      This section describes how to define your object classes for use
+      in the simulation models by writing Dynamic Module definition
+      (DM or .dm) files.
+    </para>
+
+
+    <sect2>
+      <title>About Dynamic Modules</title>
+
+      <para> Subclasses of <classname>Process</classname>,
+         <classname>Variable</classname>,
+         <classname>System</classname> and
+         <classname>Stepper</classname> classes can be dynamically
+         loaded by the system.
+      </para>
+
+
+      <note>
+	<para>
+          Currently only subclasses of Process can be defined in form of
+          DM files.   For creating new classes for other base classes,
+          you have to write C++ source code directly.  This will be improved
+          in future versions.
+        </para>
+      </note>
+
+    </sect2>
+
+
+    <sect2>
+      <title>Defining a new Process class</title>
+
+      <para>
+
+      The DM files actually is a Python script in which variables are
+      set and some methods are called.  Variables/methods including
+      the following can be set/called.
+
+    <variablelist>
+    	<varlistentry>
+    		<term>CLASSNAME</term>
+	  <listitem>
+	    <para>The name of this class</para>
+	  </listitem>
+    	</varlistentry>
+
+    	<varlistentry>
+    		<term>BASECLASS</term>
+	  <listitem>
+	    <para>The name of the base class</para>
+	  </listitem>
+    	</varlistentry>
+
+    	<varlistentry>
+    		<term>PROPERTIES</term>
+	  <listitem>
+	    <para>The list of properties of this class.</para>
+	  </listitem>
+    	</varlistentry>
+
+
+    	<varlistentry>
+    		<term>defineMethod()</term>
+	  <listitem>
+	    <para>Defines a method such as <function>process</function> and
+            <function>initialize</function>.
+            </para>
+
+	    <para>Synopsis: defineMethod( 'methodname', '''definition''' )
+
+            </para>
+
+	  </listitem>
+    	</varlistentry>
+
+    	<varlistentry>
+    		<term>PUBLIC_AUX</term>
+	  <listitem>
+	    <para>The fragment of C++ code which is put in
+	    <emphasis>public</emphasis> field.</para>
+	  </listitem>
+    	</varlistentry>
+
+    	<varlistentry>
+    		<term>PROTECTED_AUX</term>
+	  <listitem>
+	    <para>The fragment of C++ code which is put in
+	    <emphasis>protected</emphasis> field.</para>
+	  </listitem>
+    	</varlistentry>
+
+    	<varlistentry>
+    		<term>PRIVATE_AUX</term>
+	  <listitem>
+	    <para>The fragment of C++ code which is put in
+	    <emphasis>private</emphasis> field.</para>
+	  </listitem>
+    	</varlistentry>
+
+
+      </variablelist>
+</para>
+
+
+    <sect3>
+      <title>Example: MichaelisUniUniProcess</title>
+
+    <example>
+      <title>MichaelisUniUniProcess.dm</title>
+      <programlisting>
+CLASSNAME = 'MichaelisUniUniProcess'
+BASECLASS = 'FluxProcess'
+PROPERTIES = [('Real','KmS',0.0), ('Real','KcF',0.0)]
+
+PROTECTED_AUX = '''
+  VariableReference S0;
+  VariableReference C0;
+'''
+
+defineMethod( 'initialize', '''
+  S0 = getVariableReference( "S0" );
+  C0 = getVariableReference( "C0" );
+''' )
+
+defineMethod( 'process', '''
+  Real velocity( KcF );
+
+  velocity *= C0.getVariable()->getValue();
+  const Real S( S0.getVariable()->getConcentration() );
+  velocity *= S;
+  velocity /= ( KmS + S );
+
+  setFlux( velocity );
+
+''' )
+</programlisting>
+    </example>
+
+      </sect3>
+
+    </sect2>
+
+  
+
+  </sect1>
+
+<!-- ============= Bugs ================================== -->
+<!-- This section is optional and is commented out by default. 
+     You can use it to describe known bugs and limitations of the 
+	  program if there are any - please be frank and list all
+     problems you know of. 
+  
+  <sect1 id="ecell3-bugs">
+  <title>Known Bugs and Limitations</title>
+  <para> </para>
+ </sect1>
+-->
+<!-- ============= About ================================== -->
+<!-- This section contains info about the program (not docs), such as
+      author's name(s), web page, license, feedback address. This
+      section is optional: primary place for this info is "About.." box of
+      the program. However, if you do wish to include this info in the
+      manual, this is the place to put it. Alternatively, you can put this information in the title page.-->
+  <sect1 id="myapp-about"> 
+    <title>About &app;</title> 
+    <para> &app; was written by Kouichi Takahashi 
+      (<email>shafi@e-cell.org</email>). To find more information about
+      &app;, please visit the 
+      <ulink url="http://www.e-cell.org" type="http">E-Cell Project Web
+	page</ulink>. </para>
+    <para>
+      To report a bug or make a suggestion regarding this application or
+      this manual, follow the directions in the webpage.
+<!--      <ulink url="ghelp:gnome-feedback"   type="help">document</ulink>.
+-->
+    </para>
+
+    <para> This program is distributed under the terms of slightly
+      modified version of the GNU General Public license version 2 as published
+      by the Free Software Foundation.  See the COPYING file distributed with
+      the package.  
+      </para>
+
+  </sect1> 
+</article>
