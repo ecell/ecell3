@@ -1,0 +1,90 @@
+#!/bin/sh
+
+
+CXX=@CXX@
+CXXFLAGS="@CXXFLAGS@"
+LDADD=-lstdc++
+SHLEXT=@LTDL_SHLIB_EXT@
+BASENAME=@BASENAME@
+
+DMLIBTOOL=dmlibtool
+
+CXXSUFFIX=".cpp"
+
+VERBOSE=1
+
+
+run_command()
+{
+	if [ $TEST_MODE ] ; then
+		echo $@
+	else
+		[ $VERBOSE ] && echo $@
+		$@
+	fi
+return $?
+}
+
+cleanup()
+{
+	run_command rm -rf .libs
+	run_command rm -f $LAOBJ $LOBJ $OBJ
+}
+
+move()
+{
+	run_command mv -f .libs/$SOBJ .
+}
+
+compile()
+{
+	run_command $DMLIBTOOL --mode=compile $CXX $CXXCOMPILEFLAGS -c $SRC
+#	run_command $CXX $CXXCOMPILEFLAGS -fPIC -c $SRC
+}
+
+link()
+{
+	run_command $DMLIBTOOL --mode=link $CXX -module -avoid-version\
+  		               -rpath /usr/lib $LOBJ -o $LAOBJ -L../ecell/libecs/.libs -lecs $LDADD
+
+#	run_command $CXX -shared $LOBJ -o $SOBJ -L../ecell/libecs/.libs -lecs
+}
+
+
+help()
+{
+cat << EOT_USAGE
+Compile dynamic module.
+
+Usage:
+	`$BASENAME $0` <source.cpp> [compile options]
+	`$BASENAME $0` -h|--help
+
+EOT_USAGE
+
+}
+
+
+# at least one argument is required
+if [ -z $1 ] ;  then
+	help
+	exit 1
+fi
+
+if [ "$1" = "-h" -o "$1" = "--help" ] ; then
+	help
+	exit 0
+fi
+
+SRC=$1 ; shift
+CXXCOMPILEFLAGS="$CXXFLAGS $*"
+CLASSNAME=`$BASENAME $SRC $CXXSUFFIX`
+OBJ=$CLASSNAME.o
+LOBJ=$CLASSNAME.lo
+LAOBJ=$CLASSNAME.la
+SOBJ=$CLASSNAME$SHLEXT
+
+compile
+link
+move
+cleanup

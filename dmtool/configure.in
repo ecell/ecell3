@@ -8,13 +8,47 @@ dnl
 AC_CANONICAL_SYSTEM
 AM_INIT_AUTOMAKE(dmtool,0.0)
 AC_PROG_MAKE_SET
+AC_CHECK_PROGS(BASENAME,basename)
+if test -z $BASENAME ; then
+  AC_MSG_ERROR([basename command not found.])
+fi
 dnl
+AC_PROG_CXX
+ 
+dnl
+AM_PROG_LIBTOOL
+dnl
+dnl
+dnl Read the libtool configuration
+rm -f conftest
+./libtool --config > conftest
+. ./conftest
+rm -f conftest
+dnl
+AC_CACHE_CHECK([which extension is used for shared libraries],
+  libltdl_cv_shlibext, [dnl
+(
+  last=
+  for spec in $library_names_spec; do
+    last="$spec"
+  done
+changequote(, )
+  echo "$last" | sed 's/\[.*\]//;s/^[^.]*//;s/\$.*$//;s/\.$//' > conftest
+changequote([, ])
+)
+libltdl_cv_shlibext=`cat conftest`
+rm -f conftest
+])
+if test -n "$libltdl_cv_shlibext"; then
+  LTDL_SHLIB_EXT=$libltdl_cv_shlibext
+  AC_SUBST(LTDL_SHLIB_EXT)
+fi
 dnl
 dnl
 dnl
 dnl
 dnl Create the top-level Makefile.
 dnl
-AC_OUTPUT(Makefile include/Makefile dmtool)
+AC_OUTPUT(Makefile include/Makefile dmtool dmcompile,chmod +x dmtool dmcompile)
 
 
