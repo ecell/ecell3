@@ -1,6 +1,7 @@
 #!/bin/bash
 #
-# dmgen --- 
+# dmgen --- a program to docify dynamic module in 
+#           E-CELL Simulation Environment Version 3
 #
 # author:  Tomoya Kitayama <tomo@e-cell.org>
 #
@@ -15,8 +16,8 @@ SHAREDIR="${prefix}/share/ecell/@VERSION@/template"
 BINDIR="${exec_prefix}/bin"
 ECELL_INCLUDE="${prefix}/include/ecell"
 MUNCHBIN="/home/tomo/wrk/munch/munch.py"
-TMPLDIR="/home/tomo/wrk/munch/dmtemplates/reactor"
-MUNCHDIR="/home/tomo/wrk/munch/dmtemplates/reactor"
+TMPLDIR="/home/tomo/wrk/ecell3/test/munch"
+MUNCHDIR="/home/tomo/wrk/ecell3/test/munch"
 
 MV="/bin/mv"
 RM="/bin/rm"
@@ -76,6 +77,9 @@ done
 MUNCHFILE="${MUNCHDIR}/${CLASS}${MUNCHSUFFIX}"
 TMPLFILE="${TMPLDIR}/${TMPLCLASS}${TMPLSUFFIX}"
 
-$MUNCHBIN $MUNCHFILE $DMFILE $TMPLFILE
+base=`basename $DMFILE .dm`
+
+$MUNCHBIN $MUNCHFILE $DMFILE $TMPLFILE > $base.cpp
+#echo "$MUNCHBIN $MUNCHFILE $DMFILE $TMPLFILE > $base.cpp"
 
 exit 0

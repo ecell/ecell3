@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 #emtool --- a program to compile and/or docify dynamic module in 
 #           E-CELL Simulation Environment Version 3
@@ -6,8 +6,8 @@
 # author:  Tomoya Kitayama <tomo@e-cell.org>
 #
 
-PACKAGE=ecell
-VERSION=3.0.0
+#PACKAGE=@PACKAGE@
+#VERSION=@VERSION@
 
 prefix=/home/tomo/wrk/test
 exec_prefix=/home/tomo/wrk/test
@@ -17,11 +17,12 @@ SHAREDIR="${prefix}/share/ecell/3.0.0/template"
 BINDIR="${exec_prefix}/bin"
 ECELL_INCLUDE="${prefix}/include/ecell"
 #EMTOOL_INCLUDE="${prefix}/share/ecell/3.0.0/templates/Reactor"
-CXX="c++"
+CXX="g++3"
 MV="/bin/mv"
 RM="/bin/rm"
 
-DMGEN="${exec_prefix}/bin/dmgen"
+#DMGEN="${exec_prefix}/bin/dmgen"
+DMGEN="/home/tomo/wrk/ecell3/test/munch/dmgen"
 DMCOMPILE="${exec_prefix}/bin/dmcompile"
 INSUFFIX=".dm"
 SOSUFFIX=".so"
@@ -84,7 +85,7 @@ interrupted()
 
 run_command()
 {
-	echo $@
+	#echo $@
 	$@
 	return $?
 }
@@ -112,13 +113,13 @@ shift
 
 TEMPLATEDIR="${prefix}/share/ecell/3.0.0/template/$CLASS"
 
-while true ; do
+while [ -n "$(echo $1 | grep '-')" ]; do
     case "$1" in
 	-a|--all) DO_ALL=yes ; shift ; break ;;
 	-g|--generate) DO_GENERATE=yes ; shift ; break ;;
 	-c|--compile) DO_COMPILE=yes ; shift ; break ;;
 	-h|--help) help ; exit 0 ;;
-	*) echo "Internal error! " ; help ; exit 1 ;;
+	*) echo "Invarid Option! " ; help ; exit 1 ;;
     esac
 done
 
@@ -140,7 +141,7 @@ if [ $DO_ALL ] ; then
     sofile=$base$SOSUFFIX
     
     if [ -f $sofile -a $sofile -nt $inputfile ] ; then
-	echo -n "$sofile is newer than &inputfile." 
+	echo -n "$sofile is newer than $inputfile " 
 	echo "skipping."
 	cleanup
 	exit 0
@@ -148,8 +149,7 @@ if [ $DO_ALL ] ; then
     
     run_command "cp $inputfile $ETTMPDIR"
     run_command "pushd $ETTMPDIR"
-    echo "$DMGEN $CLASS -d $inputfile > $base.cpp"
-    run_command "$DMGEN $CLASS -d $inputfile > $base.cpp"
+    run_command "$DMGEN $CLASS -d $inputfile"
     run_command "popd"
     run_command "$DMCOMPILE $base.cpp -I $ECELL_INCLUDE -I $EMTOOL_INCLUDE -I. -I.." 
 
@@ -165,14 +165,14 @@ if [ $DO_GENERATE ] ; then
     cppfile=$base$CPPSUFFIX
 
     if [ -f $cppfile -a $cppfile -nt $inputfile ] ; then
-	echo -n "$cppfile is newer than $inputfile." 
+	echo -n "$cppfile is newer than $inputfile " 
 	echo "skipping."
 	cleanup
 	exit 0
     fi
 
-    run_command "$DMGEN &CLASS -d $inputfile"
-    
+    run_command "$DMGEN $CLASS -d $inputfile"
+    echo "generate $base.cpp"
 fi
 
 #
