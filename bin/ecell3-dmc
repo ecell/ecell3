@@ -135,7 +135,7 @@ def main():
 	sys.exit(1)
 
     if os.name == 'nt':
-	ADDFLAGS = ' -Wl,--enable-runtime-pseudo-reloc -lpython22'
+	ADDFLAGS = ' -Wl,--enable-runtime-pseudo-reloc -lpython23'
 	FILELIST = glob.glob( args[0] )
     else:
 	ADDFLAGS = ''
