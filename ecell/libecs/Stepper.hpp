@@ -99,7 +99,7 @@ namespace libecs
       // if statement can be faster than returning an expression directly
       inline static bool compare( const Int aLhs, const Int aRhs )
       {
-	if( aLhs < aRhs )
+	if( aLhs > aRhs )
 	  {
 	    return true;
 	  }

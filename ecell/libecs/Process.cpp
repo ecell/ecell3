@@ -28,8 +28,6 @@
 // E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
 
-#include <iostream>
-
 #include "Util.hpp"
 #include "VariableReference.hpp"
 #include "Stepper.hpp"

@@ -48,6 +48,7 @@ Logger.cpp\
 PhysicalLogger.cpp\
 LoggerBroker.cpp
 
+
 libecsdir=${pkgincludedir}/libecs
 libecs_HEADERS=\
 libecs.hpp\

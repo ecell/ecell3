@@ -70,6 +70,12 @@ namespace libecs
 
   public:
 
+    /** 
+	Sort Processes in reversed order of 'Priority' values.
+	(Largest one first, smallest one last)
+	
+
+    */
     class PriorityCompare
     {
     public:
@@ -93,7 +99,7 @@ namespace libecs
       // if statement can be faster than returning an expression directly
       inline static bool compare( const Int aLhs, const Int aRhs )
       {
-	if( aLhs < aRhs )
+	if( aLhs > aRhs )
 	  {
 	    return true;
 	  }

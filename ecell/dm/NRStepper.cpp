@@ -125,15 +125,27 @@ void NRStepper::initialize()
 
       anNRProcessPtr->setIndex( anIndex );
       updateNRProcess( anNRProcessPtr );
-	
       thePriorityQueue.push( NREvent( anNRProcessPtr->getStepInterval()
-				      + aCurrentTime,
-				      anNRProcessPtr ) );
+      				      + aCurrentTime,
+      				      anNRProcessPtr ) );
     }
+
+  // here all the NRProcesses are updated, then set new
+  // step interval and reschedule this stepper.
+  // That means, this Stepper doesn't necessary steps immediately
+  // after initialize()
+  NREventCref aTopEvent( thePriorityQueue.top() );
+  const Real aNewTime( aTopEvent.getTime() );
+
+  setStepInterval( aNewTime - getCurrentTime() );
+  getModel()->reschedule( this );
 
 }
   
 
+// this doesn't necessary occur at the first step of the simulation,
+// and imediately after initialize(), because initialize() recalculates
+// all propensities and reschedules this stepper.
 void NRStepper::step()
 {
   NREventCref anEvent( thePriorityQueue.top() );

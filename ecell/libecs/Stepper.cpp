@@ -55,6 +55,7 @@ namespace libecs
     theReadOnlyVariableOffset( 0 ),
     theModel( NULLPTR ),
     theSchedulerIndex( -1 ),
+    thePriority( 0 ),
     theCurrentTime( 0.0 ),
     theStepInterval( 0.001 ),
     theOriginalStepInterval( 0.001 ),
@@ -63,6 +64,7 @@ namespace libecs
     theMinStepInterval( 1e-50 ),
     theMaxStepInterval( 1e+50 )
   {
+    CREATE_PROPERTYSLOT_SET_GET( Int,       Priority,             Stepper );
     CREATE_PROPERTYSLOT_GET    ( Real,      CurrentTime,          Stepper );
     CREATE_PROPERTYSLOT_SET_GET( Real,      StepInterval,         Stepper );
     CREATE_PROPERTYSLOT_SET_GET( Real,      OriginalStepInterval, Stepper );

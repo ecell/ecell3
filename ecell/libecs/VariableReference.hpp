@@ -53,6 +53,11 @@ namespace libecs
     {
     public:
 
+      CoefficientCompare()
+      {
+	; // do nothing
+      }
+
       bool operator()( VariableReferenceCref aLhs, 
 		       VariableReferenceCref aRhs ) const
       {
@@ -81,6 +86,11 @@ namespace libecs
     class NameCompare
     {
     public:
+
+      NameCompare()
+      {
+	; // do nothing
+      }
 
       bool operator()( VariableReferenceCref aLhs, 
 		       VariableReferenceCref aRhs ) const

@@ -107,9 +107,9 @@ namespace libecs
       aScheduledTime( static_cast<Time>( aStepperPtr->getCurrentTime() ) + 
 		      static_cast<Time>( aStepperPtr->getStepInterval() ) );
 
-    //    DEBUG_EXCEPTION( aScheduledTime >= getCurrentTime(),
-    //		     SimulationError,
-    //		     "Attempt to go past." );
+    DEBUG_EXCEPTION( aScheduledTime >= getCurrentTime(),
+    		     SimulationError,
+    		     "Attempt to go past." );
 
     theScheduleQueue.changeOneKey( aStepperPtr->getSchedulerIndex(),
 				   Event( aScheduledTime, aStepperPtr ) );

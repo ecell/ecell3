@@ -76,12 +76,50 @@ namespace libecs
 
     const bool operator< ( EventCref rhs ) const
     {
-      return theTime < rhs.theTime;
+      if( theTime > rhs.theTime )
+	{
+	  return false;
+	}
+      else if( theTime < rhs.theTime )
+	{
+	  return true;
+	}
+      else // theTime == rhs.theTime
+	{
+	  if( theStepperPtr->getPriority() >= 
+	      rhs.theStepperPtr->getPriority() )
+	    {
+	      return true;
+	    }
+	  else
+	    {
+	      return false;
+	    }
+	}
     }
 
     const bool operator!= ( EventCref rhs ) const
     {
-      return theTime != rhs.theTime;
+      if( theTime != rhs.theTime || theStepperPtr != rhs.theStepperPtr )
+	{
+	  return true;
+	}
+      else
+	{
+	  return false;
+	}
+      // theTime == rhs.theTime
+      /*
+      else if( theStepperPtr->getPriority() == 
+	       rhs.theStepperPtr->getPriority() )
+	{
+	  return false;
+	}
+      else
+	{
+	  return true;
+	}
+      */
     }
 
 
