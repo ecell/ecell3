@@ -28,7 +28,7 @@ simple.em:                  Model file(EM file) for this model
    simple.eml
 
 
-2. Run ecs file.
+2. Run esm file.
 
    % ecell3-session-manager sample.esm
 
