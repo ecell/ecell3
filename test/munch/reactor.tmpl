@@ -1,6 +1,14 @@
-@{cpplineno()}
+#ifndef __@(CLASSNAME)_CPP
+#define __@(CLASSNAME)_CPP
+
+#include <iostream>
 
 #include "libecs/libecs.hpp"
+#include "libecs/System.hpp"
+#include "libecs/Substance.hpp"
+#include "libecs/Util.hpp"
+#include "libecs/PropertySlotMaker.hpp"
+
 #include "@(BASECLASS).hpp"
 
 namespace libecs
@@ -17,11 +25,10 @@ namespace libecs
     ~@(CLASSNAME)();
 
 @{propertymethods()}
-
-@{methodDecls()}
-
+    
+    virtual void react();
     virtual void initialize();
-
+    
     static ReactorPtr createInstance() 
     { 
       return new @(CLASSNAME);
@@ -33,32 +40,19 @@ namespace libecs
   protected:
     
     void makeSlots();
-            
-@{propertyvariabledecls()}
 
+@{propertyvariabledecls()}
 @{reactantpropertyslotvariabledecls()}
 
   };
 
-
 }
-
-
-#include <iostream>
-
-#include "libecs/System.hpp"
-#include "libecs/Substance.hpp"
-#include "libecs/Util.hpp"
-
-
-//#include "MichaelisUniUniReactor.hpp"
-
 
 using namespace libecs;
 
 extern "C"
 {
-  ReactorAllocatorFunc CreateObject =
+  Reactor::AllocatorFuncPtr CreateObject =
   &@(CLASSNAME)::createInstance;
 }  
 
@@ -84,8 +78,7 @@ void @(CLASSNAME)::initialize()
 
 @{getpropertyslotofreactant()}
 
-
 }
 
-
 @{methodDefs('react')}
+#endif

@@ -12,20 +12,20 @@ def propertymethods():
 
 def propertyvariableinit():
     for i in PROPERTIES:
-        print '    %s = %s;' % (i[1],i[2])
+        print '  %s = %s;' % (i[1],i[2])
 
 def createpropertyslots():
     for i in PROPERTIES:
-	print 'createPropertySlot( "%s", *this, &%s::set%s, &%s::get%s );'\
-	    % (i[1],CLASSNAME,i[1],CLASSNAME,i[1])
+	print '  registerSlot( getPropertySlotMaker()->createPropertySlot( "%s",*this, Type2Type<Real>(),&%s::set%s, &%s::get%s ));'\
+              % (i[1],CLASSNAME,i[1],CLASSNAME,i[1])
 
 def reactantpropertyslotvariabledecls():
     for i in REACTANT_SLOTS:
-        print 'PropertySlotPtr %s_%s;' % (i[0],i[1])
+        print '    PropertySlotPtr %s_%s;' % (i[0],i[1])
 
 def getpropertyslotofreactant():
     for i in REACTANT_SLOTS:
-        print '%s_%s = getPropertySlotOfReactant( "%s", "%s" );' \
+        print '  %s_%s = getPropertySlotOfReactant( "%s", "%s" );' \
             % (i[0],i[1],i[0],i[1])
 
 def allreactantslotsinit():
@@ -51,7 +51,6 @@ def methodDecls():
 
 
 def methodDefs(name):
-    defineMethod(name,DIFFERENTIATE_METHOD)
     for i in METHODLIST:
 	print '''\
 void %s::%s()
@@ -60,13 +59,13 @@ void %s::%s()
 %s
 }
 '''  % ( CLASSNAME, i[0], i[2][1], i[2][0], i[1] )
-        cpplineno()
 
 def defineMethod( name, content ):
     filename = munch.identify()[0]
     lineno = munch.identify()[1] - len( string.split( content, '\n' ) ) + 1
     METHODLIST.append( ( name, content, ( filename, lineno ) ) )
+#    METHODLIST.append( ( name, content) )
 
 def cpplineno():
-    print '#line %s "%s"'  % (munch.identify()[1], munch.identify()[0] )
+    print '#line %s "%s"'  % (munch.identify(), munch.identify()[0] )
 }@
