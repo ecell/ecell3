@@ -21,7 +21,7 @@ from ecell.ECDDataFile import *
 BANNERSTRING =\
 '''ecell3-session [ E-Cell SE Version %s, on Python Version %d.%d.%d ]
 Copyright (C) 1996-2003 Keio University.
-Written by Kouichi Takahashi <shafi@e-cell.org>'''\
+Send feedback to Kouichi Takahashi <shafi@e-cell.org>'''\
 % ( ecell.ecs.getLibECSVersion(), sys.version_info[0], sys.version_info[1], sys.version_info[2] )
 
 
