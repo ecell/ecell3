@@ -51,7 +51,8 @@ SGESessionProxy.py\
 SGESystemProxy.py\
 Util.py\
 SbmlFunctions.py\
-convertSBML2EML.py
+convertSBML2EML.py\
+expressionparser.py
 
 
 INCLUDES=-I. -I.. ${PYTHON_INCLUDES}
