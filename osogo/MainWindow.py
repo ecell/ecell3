@@ -70,7 +70,6 @@ class MainWindow(Window):
 
         self.theEntryChecker = 0
         self.theStepperChecker = 0
-        self.theLoadModelChecker = 0
         
         self.theUpdateInterval = 150
         self.theStepSize = 1
@@ -135,33 +134,22 @@ class MainWindow(Window):
         self.theRuleFileSelection.show_all()
 
     def loadRule( self, button_obj ) :
-        if self.theLoadModelChecker == 0:
-            self.theStepperChecker = 1
-            self.theLoadModelChecker = 1
-            aFileName = self.theRuleFileSelection.get_filename()
-            self.theRuleFileSelection.hide()
-            self.theSession.printMessage( 'loading rule file %s\n' % aFileName)
-            aModelFile = open( aFileName )
-            self.theSession.loadModel( aModelFile )
-            aModelFile.close()
-            self.theSession.theSimulator.initialize()
-            self.update()
-        else:
-            self.theSession.theSimulator.initialize()
-            aFileName = self.theRuleFileSelection.get_filename()
-            self.theRuleFileSelection.hide()
-            self.theSession.printMessage( 'loading rule file %s\n' % aFileName)
-            aModelFile = open( aFileName )
-            self.theSession.loadModel( aModelFile )
-            aModelFile.close()
-            self.update()
+        self.theStepperChecker = 1
+        aFileName = self.theRuleFileSelection.get_filename()
+        self.theRuleFileSelection.hide()
+        self.theSession.printMessage( 'loading rule file %s\n' % aFileName)
+        aModelFile = open( aFileName )
+        self.theSession.loadModel( aModelFile )
+        aModelFile.close()
+        self.theSession.theSimulator.initialize()
+        self.update()
+
     ###### Load Script ######
     def openScriptFileSelection( self, obj ) :
         self.theScriptFileSelection.show_all()
         
     def loadScript( self, button_obj ):
         self.theStepperChecker = 1
-        self.theLoadModelChecker = 1
         aFileName = self.theScriptFileSelection.get_filename()
         self.theScriptFileSelection.hide()
         self.theSession.printMessage( 'loading script file %s\n' % aFileName )
@@ -181,42 +169,43 @@ class MainWindow(Window):
         mainQuit()
         
     def startSimulation( self, a ) :
-        if self.theLoadModelChecker == 1:
-            self.theRunningFlag = 1
-            self.theSession.printMessage( "Start\n" )
-            self.theTimer = gtk.timeout_add(self.theUpdateInterval, self.updateByTimeOut, 0)
-            self.theLoggerWindow.update()
-            self.theSession.run()
-            self.removeTimeOut()
-        else:
-            self.theSession.printMessage( 'WARNING:need load model or script!!\n' )
+
+        # this can fail if the simulator is not ready
+        self.theSession.theSimulator.initialize()
+
+        self.theRunningFlag = 1
+        self.theSession.printMessage( "Start\n" )
+        self.theTimer = gtk.timeout_add(self.theUpdateInterval, self.updateByTimeOut, 0)
+        self.theLoggerWindow.update()
+        self.theSession.run()
+        self.removeTimeOut()
+
             
     def stopSimulation( self, a ) :
-        if self.theLoadModelChecker == 1:
-            if self.theRunningFlag:
-                self.theRunningFlag = 0
-                self.theSession.stop()
-                self.theSession.printMessage( "Stop\n" )
-                self.removeTimeOut()
-                self.update()
-                self.theLoggerWindow.update()
-        else:
-            self.theSession.printMessage( 'WARNING:need load model or script!!\n' )
-        
-    def stepSimulation( self, a ) : 
-        if self.theLoadModelChecker == 1:
-            self.theSession.printMessage( "Step\n" )
-            self['step_combo_entry'].set_text( str( self.theStepSize ) )
-            self.theTimer = gtk.timeout_add( self.theUpdateInterval, self.updateByTimeOut, 0 )
-            if self.theStepType == 0:
-                self.theSession.run( self.theStepSize )
-            else:
-                self.theSession.step( self.theStepSize )
+        if self.theRunningFlag:
+            self.theRunningFlag = 0
+            self.theSession.stop()
+            self.theSession.printMessage( "Stop\n" )
             self.removeTimeOut()
             self.update()
             self.theLoggerWindow.update()
+
+        
+    def stepSimulation( self, a ) : 
+        # this can fail if the simulator is not ready
+        self.theSession.theSimulator.initialize()
+
+        self.theSession.printMessage( "Step\n" )
+        self['step_combo_entry'].set_text( str( self.theStepSize ) )
+        self.theTimer = gtk.timeout_add( self.theUpdateInterval, self.updateByTimeOut, 0 )
+        if self.theStepType == 0:
+            self.theSession.run( self.theStepSize )
         else:
-            self.theSession.printMessage( 'WARNING:need load model or script!!\n' )
+            self.theSession.step( self.theStepSize )
+        self.removeTimeOut()
+        self.update()
+        self.theLoggerWindow.update()
+
             
     def changeStepType ( self, a ):
         self.theStepType = 1 - self.theStepType
