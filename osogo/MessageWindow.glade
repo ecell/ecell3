@@ -12,7 +12,12 @@
 
 <widget>
   <class>GtkWindow</class>
-  <name>message_window</name>
+  <name>MessageWindow</name>
+  <signal>
+    <name>destroy</name>
+    <handler>destroy</handler>
+    <last_modification_time>Wed, 26 Jun 2002 15:32:44 GMT</last_modification_time>
+  </signal>
   <title>Message Window</title>
   <type>GTK_WINDOW_TOPLEVEL</type>
   <position>GTK_WIN_POS_NONE</position>

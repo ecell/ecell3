@@ -15,6 +15,11 @@
 <widget>
   <class>GtkWindow</class>
   <name>MainWindow</name>
+  <signal>
+    <name>destroy</name>
+    <handler>destroy</handler>
+    <last_modification_time>Wed, 26 Jun 2002 15:29:20 GMT</last_modification_time>
+  </signal>
   <title>Main Window</title>
   <type>GTK_WINDOW_TOPLEVEL</type>
   <position>GTK_WIN_POS_NONE</position>

@@ -14,9 +14,14 @@
 
 <widget>
   <class>GtkWindow</class>
-  <name>loggerWindow</name>
+  <name>LoggerWindow</name>
   <width>698</width>
   <height>335</height>
+  <signal>
+    <name>destroy</name>
+    <handler>destroy</handler>
+    <last_modification_time>Wed, 26 Jun 2002 15:31:57 GMT</last_modification_time>
+  </signal>
   <title>LoggerWindow</title>
   <type>GTK_WINDOW_TOPLEVEL</type>
   <position>GTK_WIN_POS_NONE</position>
@@ -570,7 +575,7 @@ binary
 			<wrap>False</wrap>
 			<value>0</value>
 			<lower>0</lower>
-			<upper>100</upper>
+			<upper>1e+07</upper>
 			<step>1</step>
 			<page>10</page>
 			<page_size>10</page_size>
@@ -608,9 +613,9 @@ binary
 			<update_policy>GTK_UPDATE_IF_VALID</update_policy>
 			<snap>False</snap>
 			<wrap>False</wrap>
-			<value>100</value>
+			<value>1000</value>
 			<lower>0</lower>
-			<upper>100</upper>
+			<upper>1e+07</upper>
 			<step>1</step>
 			<page>10</page>
 			<page_size>10</page_size>

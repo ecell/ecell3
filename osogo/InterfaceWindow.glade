@@ -14,9 +14,14 @@
 
 <widget>
   <class>GtkWindow</class>
-  <name>interface_window</name>
+  <name>InterfaceWindow</name>
   <width>520</width>
   <height>260</height>
+  <signal>
+    <name>destroy</name>
+    <handler>destroy</handler>
+    <last_modification_time>Wed, 26 Jun 2002 15:31:11 GMT</last_modification_time>
+  </signal>
   <title>Interface Window</title>
   <type>GTK_WINDOW_TOPLEVEL</type>
   <position>GTK_WIN_POS_NONE</position>
