@@ -44,6 +44,7 @@ if GNOME_INSTALLED =='yes':
 
 
 import gtk
+import gobject
 
 import MessageWindow
 
@@ -97,6 +98,104 @@ class SimulationButton:
                     self.image.set_from_file( self.startImage )
 
 
+class LogoAnimation:
+
+    def __init__( self ):
+
+
+        #self.image = []
+        
+        self.image = gtk.Image()
+        self.image.set_from_file( os.environ['OSOGOPATH'] + os.sep + "ecell32.png" )
+        self.image.show()
+
+        self.iconList = [ os.environ['OSOGOPATH'] + os.sep + "ecell3-1.png",
+                          os.environ['OSOGOPATH'] + os.sep + "ecell3-2.png",
+                          os.environ['OSOGOPATH'] + os.sep + "ecell3-3.png",
+                          os.environ['OSOGOPATH'] + os.sep + "ecell3-4.png",
+                          os.environ['OSOGOPATH'] + os.sep + "ecell3-5.png",
+                          os.environ['OSOGOPATH'] + os.sep + "ecell3-6.png",
+                          os.environ['OSOGOPATH'] + os.sep + "ecell3-7.png",
+                          os.environ['OSOGOPATH'] + os.sep + "ecell3-8.png",
+                          os.environ['OSOGOPATH'] + os.sep + "ecell32.png" ]
+
+        #for i in range( len( self.iconList ) ): 
+        #    self.image.append( gtk.Image() )
+        #    self.image[i].set_from_file( self.iconList[i] )
+
+        self.START_ROTATION = 0
+        self.END_ROTATION = len( self.iconList) - 1
+
+        self.__currentImage = 0
+        self.__running = False
+
+        self.delay = 100
+
+
+        #def setLogoWidget( self, aLogoAnimationWidget ):
+
+        #self.widget = aLogoAnimationWidget
+        #self.widget.add( self.image[self.START_ROTATION] )
+        #self.widget.add( self.image[self.END_ROTATION] )
+
+    def getImage( self ):
+
+        return self.image
+
+
+    def start( self ):
+
+        self.__currentImage = 0
+        self.__running = True
+
+        self.animate()
+
+
+    def stop( self ):
+
+        self.__running = False
+        
+
+    def animate( self ):
+        
+        if ( self.__running ):
+
+            if ( self.__currentImage == self.END_ROTATION ):
+
+                self.__currentImage = self.START_ROTATION
+
+            self.image.set_from_file( self.iconList[self.__currentImage] )
+            self.__currentImage += 1
+
+            gobject.timeout_add( self.delay, LogoAnimation.animate, self )
+
+            
+            #if ( self.__currentImage == self.END_ROTATION ):
+
+            #    self.widget.remove( self.image[self.__currentImage-1] )
+            #    self.__currentImage = self.START_ROTATION                
+                
+            #elif ( self.__currentImage == self.START_ROTATION ):
+
+            #    self.widget.remove( self.image[self.END_ROTATION] )
+            #    self.__currentImage += 1
+            #else:
+            #    self.widget.remove( self.image[self.__currentImage-1] )
+            #    self.__currentImage += 1
+
+            #print self.image[self.__currentImage]
+            #self.widget.add( self.image[self.__currentImage] )
+            #gobject.timeout_add( self.delay, LogoAnimation.animate, self )
+
+        else:
+            if ( self.__currentImage != self.END_ROTATION ):
+                #self.widget.add( self.image[self.__currentImage] )
+
+                self.image.set_from_file( self.iconList[self.__currentImage] )
+                self.__currentImage += 1
+                gobject.timeout_add( self.delay-50, LogoAnimation.animate, self )
+
+
 
 class MainWindow(OsogoWindow):
 	"""MainWindow
@@ -124,12 +223,20 @@ class MainWindow(OsogoWindow):
 		
 
 		# -------------------------------------
-		# creates SimulationButton
+		# create SimulationButton
 		# -------------------------------------
                 
 		self.SimulationButton = SimulationButton()
 		self['SimulationButton'].add( self.SimulationButton.getCurrentImage() )
 		self['SimulationButtonLabel'].set_text('Start')
+
+
+                # ---------------------------
+                # create logo button
+                # ---------------------------
+
+                self.logoAnimation = LogoAnimation()
+                self['logo_animation'].add( self.logoAnimation.getImage() )
 
 
                 # --------------------------
@@ -138,7 +245,17 @@ class MainWindow(OsogoWindow):
 
                 self['sec_step_entry'].set_property( 'xalign', 1 )
                 self['time_entry'].set_property( 'xalign', 1 )
+                self['time_entry'].modify_base( gtk.STATE_NORMAL,
+                                                gtk.gdk.Color(61000,61000,61000,0) )
+
+
+                # -----------------------
+                # initialize Toolbar
+                # -----------------------
                 
+		self['toolbar_menu'].set_active(TRUE)
+                self.theToolbarVisible = True
+
 
                 # ------------------------
                 # initialize Statusbar
@@ -222,7 +339,7 @@ class MainWindow(OsogoWindow):
 
 
 		self.theMessageWindowVisible = True
-		self['message_togglebutton'].set_active(TRUE)
+		( self['message_togglebutton'].get_child() ).set_active(TRUE)
 		self['message_window_menu'].set_active(TRUE)
 
 
@@ -249,24 +366,6 @@ class MainWindow(OsogoWindow):
                 self['entitylistarea'].add( self.theEntityListWindow['top_frame'] )
                 self.theEntityListWindowVisible = True
 		self['entitylist_window_menu'].set_active(TRUE)
-
-
-                # ------------------------
-                # hide Tool bar
-                # ------------------------
-                
-                # tool bar of default setting is "hide"
-                self['toolbar'].hide()
-                self.theToolbarVisible = False
-
-
-
-                # ------------------------
-                # set color in time entry
-                # ------------------------
-
-                self['time_entry'].modify_base( gtk.STATE_NORMAL,
-                                                gtk.gdk.Color(61000,61000,61000,0) )
 
 
 
@@ -325,7 +424,6 @@ class MainWindow(OsogoWindow):
 		self['board_window_menu'].set_sensitive(aDataLoadedStatus)
 		self['entity_list_menu'].set_sensitive(aDataLoadedStatus)
 		self['save_model_menu'].set_sensitive(aDataLoadedStatus)
-
 
 
 	def __openFileSelection( self, *arg ) :
@@ -573,6 +671,20 @@ class MainWindow(OsogoWindow):
 		OsogoWindow.close( self )
 
 
+        def setStartState( self ):
+
+            self.SimulationButton.setCurrentState( 'run' )
+            self['SimulationButtonLabel'].set_text('Stop')
+            self.logoAnimation.start()
+
+
+        def setStopState( self ):
+            
+            self.SimulationButton.setCurrentState( 'stop' )
+            self['SimulationButtonLabel'].set_text('Start')
+            self.logoAnimation.stop()
+
+                    
 	def __handleSimulation( self, *arg ) :
 		"""handles simulation
 		arg[0]  ---  simulation button (gtk.Button)
@@ -581,15 +693,15 @@ class MainWindow(OsogoWindow):
 
                 if ( self.SimulationButton.getCurrentState() == 'stop' ):
 
-                    self.SimulationButton.setCurrentState( 'run' )
-                    self['SimulationButtonLabel'].set_text('Stop')
+                    self.setStartState()
                     self.theSession.run()
+
 
                 elif ( self.SimulationButton.getCurrentState() == 'run' ):
 
-                    self.SimulationButton.setCurrentState( 'stop' )
-                    self['SimulationButtonLabel'].set_text('Start')
+                    self.setStopState()
                     self.theSession.stop()
+                
 
 
 	def handleSimulation( self ) :
@@ -605,9 +717,16 @@ class MainWindow(OsogoWindow):
 		if step measure is step than Session.step ()
 		"""
 		if self.getStepType():
-			self.theSession.run( self.getStepSize() )
+
+                    self.setStartState()                    
+                    self.theSession.run( self.getStepSize() )
+                    self.setStopState()
+                    
 		else:
-			self.theSession.step( self.getStepSize() )
+                    self.setStartState()                    
+                    self.theSession.step( self.getStepSize() )
+                    self.setStopState()
+
 
 	def stepSimulation( self ) :
 		""" steps simulation """
@@ -730,7 +849,7 @@ class MainWindow(OsogoWindow):
 		else:
 			flag = gtk.FALSE
 		self['board_window_menu'].set_active( flag )
-		self['board_button'].set_active(flag)
+		( self['board_button'].get_child() ).set_active(flag)
 
 		# Loggerwindow:
 		if self.theSession.doesExist('LoggerWindow' ):
@@ -738,7 +857,7 @@ class MainWindow(OsogoWindow):
 		else:
 			flag = gtk.FALSE
 		self['logger_window_menu'].set_active( flag )
-		self['logger_button'].set_active(flag)
+		( self['logger_button'].get_child() ).set_active(flag)
 			
 		# interface window:
 		if self.theSession.doesExist('InterfaceWindow' ):
@@ -746,7 +865,7 @@ class MainWindow(OsogoWindow):
 		else:
 			flag = gtk.FALSE
 		self['interface_window_menu'].set_active( flag )
-		self['interface_button'].set_active(flag)
+		( self['interface_button'].get_child() ).set_active(flag)
 
 		# stepperwindow:
 		if self.theSession.doesExist('StepperWindow' ):
@@ -754,7 +873,7 @@ class MainWindow(OsogoWindow):
 		else:
 			flag = gtk.FALSE
 		self['stepper_window_menu'].set_active( flag )
-		self['stepper_button'].set_active(flag)
+		( self['stepper_button'].get_child() ).set_active(flag)
 
 
 	
@@ -764,7 +883,7 @@ class MainWindow(OsogoWindow):
 		else:
 			flag = gtk.FALSE
 		self['message_window_menu'].set_active(flag)
-		self['message_togglebutton'].set_active( flag )
+		( self['message_togglebutton'].get_child() ).set_active( flag )
 
 
 		self.__button_update = False
@@ -787,10 +906,10 @@ class MainWindow(OsogoWindow):
             # show Tool bar
 
             if self.theToolbarVisible:
-                self['toolbar'].hide()
+                self['toolbar_handlebox'].hide()
                 self.theToolbarVisible = False
             else:
-                self['toolbar'].show()
+                self['toolbar_handlebox'].show()
                 self.theToolbarVisible = True
                 
 
@@ -849,12 +968,12 @@ class MainWindow(OsogoWindow):
 	def hideMessageWindow( self ):            
             
                 self[ 'messagehandlebox' ].hide()
-		self['message_togglebutton'].set_active(gtk.FALSE)
+		( self['message_togglebutton'].get_child() ).set_active(gtk.FALSE)
 
 
 	def showMessageWindow( self ):
 		self[ 'messagehandlebox' ].show()
-		self['message_togglebutton'].set_active(gtk.TRUE)
+		( self['message_togglebutton'].get_child() ).set_active(gtk.TRUE)
 
 
         def __toggleMessageWindow( self, *arg ) :
@@ -869,17 +988,21 @@ class MainWindow(OsogoWindow):
 		if len(arg) < 1 :
                     return None
 
+                if ( arg[0].get_name() != "message_window_menu" ):
+                    anObject = arg[0].get_child()
+                else:
+                    anObject = arg[0]
 
                 # show
-		if arg[0].get_active() == TRUE:
+                if anObject.get_active() == TRUE:
                     self.theMessageWindowVisible = True
                     self.showMessageWindow() 
                     self.__resizeVertically( self.theMessageWindow.getActualSize()[1] )
-                # hide
-		else:
+                    # hide
+                else:
                     self.theMessageWindowVisible = False
                     self.hideMessageWindow()
-
+                    
                     if self.theEntityListWindowVisible:
                         self.__resizeVertically( self['entitylistarea'].get_allocation()[3] )
                     else:
