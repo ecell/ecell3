@@ -116,13 +116,13 @@ class PropertyWindow(PluginWindow):
 
         print aSelectedItem
         try:
-            aFullPropertyName = getFullPN( aSelectedItem[2] )
+            aFullPropertyName = createFullPN( aSelectedItem[2] )
         except ValueError:
             pass
 
         if not aFullPropertyName:
             try:
-                aFullID = getFullID( aSelectedItem[2] )
+                aFullID = createFullID( aSelectedItem[2] )
                 aFullPN = convertFullIDToFullPN( aFullID )
             except ValueError:
                 pass

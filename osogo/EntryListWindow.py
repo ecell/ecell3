@@ -61,7 +61,7 @@ class EntryListWindow(Window):
         self.update()
 
     def update( self ):
-        aRootSystemFullID = getFullID( 'System:/:/' )
+        aRootSystemFullID = createFullID( 'System:/:/' )
         self.constructTree( self.theSystemTree, aRootSystemFullID )
         self.updateEntryList()
             
@@ -165,7 +165,7 @@ class EntryListWindow(Window):
     def updateStatusBar( self ):
         aStatusString = 'Selected: '
         for aFullPN in self.theSelectedFullPNList:
-            aStatusString += getFullPNString( aFullPN )
+            aStatusString += createFullPNString( aFullPN )
             aStatusString += ', '
         self.theStatusBar.push( 1, aStatusString )
 

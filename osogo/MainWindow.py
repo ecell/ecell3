@@ -188,7 +188,7 @@ class MainWindow(Window):
 
     def printProperty( self, fullpn ):
         value = self.theSimulator.getProperty( fullpn )
-        self.printMessage( getFullPNString( fullpn ) )
+        self.printMessage( createFullPNString( fullpn ) )
         self.printMessage( ' = ' )
         if len(value) == 1:
             self.printMessage( str(value[0]) )

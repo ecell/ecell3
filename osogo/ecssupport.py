@@ -32,7 +32,7 @@ PrimitiveTypeDictionary =\
 }    
 
 
-def getFullID( fullidstring ):
+def createFullID( fullidstring ):
 
     aFullID = string.split( fullidstring, ':' )
     try:
@@ -43,7 +43,7 @@ def getFullID( fullidstring ):
     return  tuple( aFullID )
 
 
-def getFullPN( fullpnstring ):
+def createFullPN( fullpnstring ):
 
     aFullPN = string.split( fullpnstring, ':' )
     try:
@@ -55,14 +55,14 @@ def getFullPN( fullpnstring ):
     return tuple( aFullPN )
 
 
-def getFullIDString( fullid ):
+def createFullIDString( fullid ):
 
     validateFullID( fullid )
     aTypeString = PrimitiveTypeString[int(fullid[0])]
     return aTypeString + ':' + string.join( fullid[1:], ':' )
 
 
-def getFullPNString( fullpn ):
+def createFullPNString( fullpn ):
 
     validateFullPN( fullpn )
     aTypeString = PrimitiveTypeString[fullpn[0]]
@@ -116,26 +116,26 @@ def createSystemPathFromFullID( aSystemFullID ):
 
 if __name__ == "__main__":
     
-    fullid  = getFullID( 'System:/CELL/CYTOPLASM:MT0' )
+    fullid  = createFullID( 'System:/CELL/CYTOPLASM:MT0' )
     print fullid
 
-    fullpn = getFullPN(
+    fullpn = createFullPN(
         'System:/CELL/CYTOPLASM:MT0:activity' )
     print fullpn
 
-    fullidstring = getFullIDString( fullid )
+    fullidstring = createFullIDString( fullid )
     print fullidstring
 
-    fullpnstring = getFullPNString( fullpn )
+    fullpnstring = createFullPNString( fullpn )
     print fullpnstring
 
     print convertFullIDToFullPN( fullid )
 
     print convertFullPNToFullID( fullpn )
 
-    systemfullid1  = getFullID( 'System:/:CELL' )
-    systemfullid2  = getFullID( 'System:/CELL:CYTOPLASM' )
-    systemfullid3  = getFullID( 'System:/:/' )
+    systemfullid1  = createFullID( 'System:/:CELL' )
+    systemfullid2  = createFullID( 'System:/CELL:CYTOPLASM' )
+    systemfullid3  = createFullID( 'System:/:/' )
     print createSystemPathFromFullID( systemfullid1 )
     print createSystemPathFromFullID( systemfullid2 )
     print createSystemPathFromFullID( systemfullid3 )

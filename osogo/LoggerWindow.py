@@ -23,7 +23,7 @@ class LoggerWindow(Window):
 
     def setEntryList( self ):
         for fpn in self.theFullPNList :
-            theFullPN = getFullPNString( fpn )
+            theFullPN = createFullPNString( fpn )
             aLogger = self.theMainWindow.theSimulator.getLogger( fpn )
             start = aLogger.getStartTime()
             end = aLogger.getEndTime()

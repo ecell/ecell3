@@ -44,7 +44,7 @@ class SubstanceWindow(PluginWindow):
         self.theID   = str( self.theFullID()[ID] )
         self.thePath = str( self.theFullID()[SYSTEMPATH] )
         
-        aFullIDString = getFullIDString( self.theFullID() )
+        aFullIDString = createFullIDString( self.theFullID() )
         self["id_label"].set_text( aFullIDString )
 
         self.update()
