@@ -24,9 +24,6 @@ Usage:
 Options:
         -e or --exec=[.ess file]  :  load script (.ess) file
         -f or --file=[.eml file]  :  load model (.eml) file
-        --parameters [parameters] :  Set session parameters
-				     parameters eaxmple : '{ NAME1: VALUE1, NAME2:VALUE2,...}' 
-	-DNAME=VALUE 		  :  Set session parameters
 	-h or --help              :  Print this message.
 
         Do not use -e and -f at same time.
