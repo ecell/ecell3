@@ -1,4 +1,4 @@
-
+SUBDIRS = dmtemplates
 DMTOOL_INCLUDE=-I@DMTOOL_INCLUDE_DIR@
 KORANDOM_DIR=@KORANDOM_DIR@
 KORANDOM_INCLUDE=-I${KORANDOM_DIR}
@@ -7,7 +7,7 @@ INCLTDL=@INCLTDL@
 LIBLTDL=@LIBLTDL@
 libdir=@libdir@
 
-INCLUDES = -I..  -I../.. -I../../boost ${KORANDOM_INCLUDE} ${DMTOOL_INCLUDE} ${INCLTDL}
+INCLUDES = -I..  -I../.. -I../include ${KORANDOM_INCLUDE} ${DMTOOL_INCLUDE} ${INCLTDL}
 lib_LTLIBRARIES = libecs.la
 
 CXXFLAGS= @CXXFLAGS@ # -D_REENTRANT
@@ -73,4 +73,6 @@ CoreLinuxCompatibility.hpp\
 RCPtr.hpp\
 Reactant.hpp
 
+bin_SCRIPTS =\
+emtool
 
