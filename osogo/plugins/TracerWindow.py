@@ -115,7 +115,7 @@ class TracerWindow( OsogoPluginWindow ):
         self['entry1'].set_text( str(self.thePlotInstance.getStripInterval()) )
         self['entry1'].connect( 'activate', self.stripIntervalChangedEnter )
         self['entry1'].connect( 'focus_out_event', self.stripIntervalChanged )
-
+        
         if not self.isStandAlone():
             self.minimize()
 
@@ -365,7 +365,6 @@ class TracerWindow( OsogoPluginWindow ):
         """
         if theFullPN != "Time":
             if theFullPN not in self.thePlotInstance.getDataSeriesNames():
-                print "not in", theFullPN, self.thePlotInstance.getDataSeriesNames()
                 return
 
         self.thePlotInstance.setXAxis( theFullPN )

@@ -94,7 +94,7 @@ class OsogoPluginManager(PluginManager):
         # -------------------------------------------------------
         title = ""
 
-        if rootWidget != None:
+        if parent.__class__.__name__ == 'EntityListWindow':
             pass
         else:
             title = classname[:-6]
@@ -111,7 +111,7 @@ class OsogoPluginManager(PluginManager):
 
         else:
             try:
-                instance = plugin.createInstance( data, self, rootWidget )
+                instance = plugin.createInstance( data, self, rootWidget, parent )
             except TypeError:
                 errorMessage = string.join( traceback.format_exception(sys.exc_type,sys.exc_value, \
                     sys.exc_traceback), '\n' )
@@ -122,7 +122,7 @@ class OsogoPluginManager(PluginManager):
 
             #try:
             if TRUE:
-                if rootWidget != None:
+                if parent.__class__.__name__ == 'EntityListWindow':
                     self.thePropertyWindowOnEntityListWindows[ instance ] = None
                 else:
                     instance.editTitle( title )

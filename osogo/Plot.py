@@ -315,6 +315,7 @@ class Axis:
                 if self.theFrame[1] == self.theFrame[0]:
                     self.theFrame[1]=self.theFrame[0] + 1
                 exponent = pow( 10, floor( log10( self.theFrame[1] - self.theFrame[0] ) ) )
+               
                 while ticks < self.theMaxTicks / 2:
                     mantissa1 = floor( self.theFrame[1] / exponent )
                     mantissa0 = ceil( self.theFrame[0] / exponent )
@@ -757,22 +758,23 @@ class Plot:
         self.theAvailableColors = ColorList[:]
 
         self.thePixmapDict={} #key is color, value pixmap
-        root = root[root.__class__.__name__]
-        self.theRoot=root
+        self.theRoot=root[root.__class__.__name__]
 
         #creates widget
         self.theWidget = aDrawingArea
-        
-        self.theWidget.unrealize()   
+
+        if self.theWidget.get_ancestor( gtk.Window) != None:
+            self.theWidget.unrealize()   
         #add buttonmasks to widget
         self.theWidget.set_events(gtk.gdk.EXPOSURE_MASK|gtk.gdk.BUTTON_PRESS_MASK|
                                     gtk.gdk.LEAVE_NOTIFY_MASK|gtk.gdk.POINTER_MOTION_MASK|
                                     gtk.gdk.BUTTON_RELEASE_MASK)
-        self.theWidget.realize()
+        if self.theWidget.get_ancestor( gtk.Window) != None:
+            self.theWidget.realize()
     
         anAllocation = self.theWidget.get_allocation()
-        self.thePlotWidth = anAllocation[2]
-        self.thePlotHeight = anAllocation[3]
+        self.thePlotWidth = max( anAllocation[2], PLOT_MINIMUM_WIDTH )
+        self.thePlotHeight = max( anAllocation[3], PLOT_MINIMUM_HEIGHT )
 
         self.theColorMap=self.theWidget.get_colormap()
         self.theGCColorMap[ PEN_COLOR ] = self.getGC( PEN_COLOR )
@@ -783,10 +785,10 @@ class Plot:
         self.theFont=gtk.gdk.font_from_description(self.theStyle.font_desc)
         self.theAscent=self.theFont.ascent
         self.theDescent=self.theFont.descent
-        self.thePixmapBuffer=gtk.gdk.Pixmap(root.window,self.thePlotWidth,self.thePlotHeight,-1)
-        self.theSecondaryBuffer=gtk.gdk.Pixmap(root.window,self.thePlotWidth,self.thePlotHeight,-1)
+        self.thePixmapBuffer=gtk.gdk.Pixmap(self.theRoot.window,self.thePlotWidth,self.thePlotHeight,-1)
+        self.theSecondaryBuffer=gtk.gdk.Pixmap(self.theRoot.window,self.thePlotWidth,self.thePlotHeight,-1)
 
-        newpm = gtk.gdk.Pixmap(root.window,10,10,-1)
+        newpm = gtk.gdk.Pixmap(self.theRoot.window,10,10,-1)
         for aColor in ColorList:
             newgc = self.getGC ( aColor )
             self.theGCColorMap[ aColor ] = newgc
