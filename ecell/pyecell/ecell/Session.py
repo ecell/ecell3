@@ -585,15 +585,22 @@ class Session:
                 if anAttributeList[3] != 0:
                     
                     aValue = self.theSimulator.saveEntityProperty(aFullPN)
+                    #print aValue
 
                     if aValue != '':
 
                         aValueList = list()
                         if type( aValue ) != tuple:
                             aValueList.append( str(aValue) )
+                            
+                        elif aValue == ():
+                            # exclude the empty tuple (ad-hoc, Jul. 21, 2004)
+                            break
+                        
                         else:
                             # ValueList convert into string for eml
                             aValueList = self.__convertPropertyValueList( aValue )
+
                             #aValueList = aValue
                             
                         anEml.setEntityProperty( aFullID, aProperty,
@@ -602,17 +609,29 @@ class Session:
     def __convertPropertyValueList( self, aValueList ):
        
         aList = list()
+        tmpList = list()
 
         for aValueListNode in aValueList:
 
             if type( aValueListNode ) == tuple:
+                # for recursive values
 
                 if type( aValueListNode[0] ) == tuple:
                     aConvertedList = self.__convertPropertyValueList( aValueListNode )
                 else:
                     aConvertedList = map(str, aValueListNode)
-
+                    
                 aList.append( aConvertedList )
+                
+            else:
+                # for the 1st level tuple (not for the recursive)
+                tmpList.append( aValueListNode )
+
+        if tmpList != []:
+            aList.append( tmpList )
+        else:
+            pass
+
 
         return aList
 
