@@ -28,7 +28,6 @@
 // E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
 
-
 #include "PropertyInterface.hpp"
 
 /*
@@ -81,7 +80,8 @@ namespace libecs
     DataPointVector aNewDataPointVector;
     while( aStartIterator != anEndIterator )
       {
-	cerr << UVariable((*aStartIterator)->getTime()).asString() << endl;
+	//  std::cerr << UVariable((*aStartIterator)->getTime()).asString() 
+	//		  << std::endl;
 	aNewDataPointVector.push( **aStartIterator );
 	++aStartIterator;
       }
