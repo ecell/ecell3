@@ -46,7 +46,6 @@ namespace libecs
   
   /**
      Entity class is a base class for all components in the cell model.
-     Entity is-a PropertyInterface. 
 
   */
 
@@ -60,46 +59,102 @@ namespace libecs
     Entity(); 
     virtual ~Entity();
 
+
     /**
-       Set supersystem pointer of this Entity.  
-       Usually no need to set this manually because a System object will 
-       do this when an Entity is installed to the System.
+       Get a System to which this Entity belongs.
 
-       @param supersystem a pointer to a System to which this object belongs.
+       \return a borrowed pointer to the super system.
     */
-    void setSuperSystem( SystemPtr const supersystem ) 
-    { 
-      theSuperSystem = supersystem; 
-    }
-
-    void setModel( ModelPtr const aModel )
-    {
-      theModel = aModel;
-    }
-
-    ModelPtr getModel() const
-    {
-      return theModel;
-    }
 
     SystemPtr getSuperSystem() const 
     {
       return theSuperSystem;
     }
 
+
+    /**
+       Get a FullID of this Entity.
+
+       \return a FullID of this Entity.
+    */
+
+    const FullID getFullID() const;
+
+
+    /**
+       Get PrimitiveType of this Entity.
+
+       This method is overridden in Substance, Reactor and System classes.
+
+       \return PrimitiveType of this Entity object.
+       \see PrimitiveType
+    */
+
+    virtual const PrimitiveType getPrimitiveType() const
+    {
+      return PrimitiveType( PrimitiveType::ENTITY );
+    }
+
+
+    /**
+       Get a Model object to which this Entity belongs.
+
+       \return a borrowed pointer to the Model.
+    */
+
+    ModelPtr getModel() const
+    {
+      return theModel;
+    }
+
+
+    /**
+       Get a SystemPath of this Entity.
+
+       \note The SystemPath doesn't include ID of this Entity even if 
+       this Entity is a System.
+
+       \return a SystemPath of this Entity.
+    */
+
+    virtual const SystemPath getSystemPath() const;
+
+    /**
+       Returns a pointer to a Stepper object that this Entity belongs.
+
+       The Stepper of an Entity is defined as a Stepper of a
+       supersystem of the Entity.  As a exception, a System has a
+       pointer to a Stepper as its member variable, thus this method
+       returns the variable in System class.
+
+       \return A pointer to a Stepper object that this Entity belongs or
+       NULLPTR if it is not set.
+    */
+
+    virtual StepperPtr getStepper() const;
+
+
+    /// \name Properties
+
+    //@{
+
     /**
        Set an identifier of this Entity.
 
-       @param entryname entryname of this Entry.
+       \param anID an id of this Entry.
     */
-    void setID( StringCref id ) 
+
+    void setID( StringCref anID ) 
     { 
       theID = id; 
     }
 
     /**
-       @return entryname of this Entity.
+       Get an id string of this Entity.
+
+       \return an id of this Entity.
     */
+
     const String getID() const
     { 
       return theID; 
@@ -108,87 +163,108 @@ namespace libecs
     /**
        Set name of this Entity.
 
-       @param name name of this Entity.
+       \param aName a name of this Entity.
     */
-    void setName( StringCref name ) 
+
+    void setName( StringCref aName ) 
     { 
       theName = name; 
     }
 
     /**
-       @return name of this Entity.
+       Get a name of this Entity.
+
+       \return a name of this Entity.
     */
+
     const String getName() const 
     { 
       return theName; 
     }
 
     /**
-       @return FullID of this Entity.
-    */
+       Get a FullID of this Entity as String.
 
-    const FullID getFullID() const;
+       \note Property name for this method is 'getFullID', not
+       'getFullIDString.'
+
+       \return a FullID string of this Entity.
+    */
 
     const String getFullIDString() const;
 
-    virtual const PrimitiveType getPrimitiveType() const
-    {
-      return PrimitiveType( PrimitiveType::ENTITY );
-    }
-
     /**
-       Returns SystemPath of this Entity.
+       Returns an activity value (per step interval) of this Entity.
 
-       The SystemPath doesn't include ID of this Entity even if 
-       this Entity is a System.
-    */
-
-    virtual const SystemPath getSystemPath() const;
-
-    /**
-       Returns activity value (per delta-T) of this Entity.
        Override this in subclasses.  If there is no overriding method,
-       this returns zero.
+       this method returns zero.
 
-       @return activity of this Entity
-       @see getActivityPerSecond()
+       FIXME: should be abstract
+
+       \return activity value per step interval of this Entity
+       \see getActivityPerSecond()
     */
+
     virtual const Real getActivity() const;
 
     /**
-       Set activity value (per delta-T) of this Entity.
+       Set an activity value (per step interval) of this Entity.
 
-       @return activity of this Entity
-       @see getActivityPerSecond()
+       Override this in subclasses.  If there is no overriding method,
+       this method does nothing.
+
+       FIXME: should be abstract
+
+       \param anActivity activity of this Entity
+       \see   getActivity(), getActivityPerSecond()
     */
-    virtual void setActivity( RealCref ) 
+
+    virtual void setActivity( RealCref anActivity ) 
     {
       ; // do nothing
     }
 
     /**
        Returns activity value (per second).
-       Default action of this method is to return getActivity() / delta-T,
-       but this can be changed in subclasses.
 
-       @return activity of this Entity per second
+       Default action of this method is to return getActivity() / step
+       interval, but this action can be changed in subclasses.
+
+       \return activity of this Entity per second
     */
+
     virtual const Real getActivityPerSecond() const;
 
+    //@}
+
+
     /**
-       Returns a pointer to a Stepper object that this Entity belongs.
+       \internal
 
-       The Stepper of an Entity is defined as a Stepper of a
-       supersystem of the Entity.
+       Set a supersystem of this Entity.  
 
-       This is overridden in System class because Stepper of a System is 
-       explicitly defined as a member variable, not as a supersystem's.
+       Usually no need to set this manually because a System object does
+       this when an Entity is added to the System.
 
-       @return A pointer to a Stepper object that this Entity belongs or
-       NULL pointer if it is not set.
+       \param supersystem a pointer to a System to which this object belongs.
     */
 
-    virtual StepperPtr getStepper() const;
+    void setSuperSystem( SystemPtr const supersystem ) 
+    { 
+      theSuperSystem = supersystem; 
+    }
+
+    /**
+       \internal
+    */
+
+    void setModel( ModelPtr const aModel )
+    {
+      theModel = aModel;
+    }
+
+
+    /// \internal
 
     virtual PropertySlotPtr getPropertySlot( StringCref aPropertyName, 
 					     EntityCptr aRequester );
