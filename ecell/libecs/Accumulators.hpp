@@ -73,7 +73,7 @@ namespace libecs
 
     virtual Real save() 
     { 
-      return getQuantity(); 
+      return theSubstance->getQuantity();
     }
 
     virtual void update() 
@@ -87,14 +87,9 @@ namespace libecs
 
   protected:
 
-    Real& getQuantity() 
-    { 
-      return const_cast<Real&>( theSubstance->theQuantity ); 
-    }
-
-    Real& getVelocity() 
-    { 
-      return const_cast<Real&>( theSubstance->theVelocity ); 
+    void setQuantity( const Real aQuantity )
+    {
+      theSubstance->accumulatorSetQuantity( aQuantity );
     }
 
   protected:

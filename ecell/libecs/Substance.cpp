@@ -133,7 +133,7 @@ namespace libecs
 
     theAccumulator = anAccumulator;
     theAccumulator->setOwner( this );
-    theAccumulator->update();
+    //    theAccumulator->update();
   }
 
   void Substance::initialize()
@@ -151,6 +151,7 @@ namespace libecs
 	setAccumulator( USER_DEFAULT_ACCUMULATOR_NAME );
       }
 
+    theAccumulator->update();
     updateConcentration();
   }
 

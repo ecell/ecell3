@@ -50,8 +50,14 @@ namespace libecs
 
   class Substance : public Entity
   {
-    //FIXME: don't use friend class :-/
+    //FIXME: for Accumulators:: to be deleted
     friend class Accumulator;
+    void accumulatorSetQuantity( const Real aQuantity )
+    {
+      theQuantity = aQuantity;
+      updateConcentration();
+    }
+
 
   public: // message slots
 
