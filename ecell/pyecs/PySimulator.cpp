@@ -117,16 +117,11 @@ Object PySimulator::createEntity( const Py::Tuple& args )
 
   args.verify_length( 3 );
 
-  const Py::Sequence& aFullID( args[1] );
-  aFullID.verify_length( 3 );
+   const String        aClassname ( static_cast<Py::String>( args[0] ) );
+   const String        aFullID    ( static_cast<Py::String>( args[1] ) );
+   const String        aName      ( static_cast<Py::String>( args[2] ) );
 
-  const String        aClassname ( static_cast<Py::String>( args[0] ) );
-  const PrimitiveType aType      ( static_cast<Py::Int>   ( aFullID[0] ) );
-  const String        aPath      ( static_cast<Py::String>( aFullID[1] ) );
-  const String        anID       ( static_cast<Py::String>( aFullID[2] ) );
-  const String        aName      ( static_cast<Py::String>( args[2] ) );
-
-  Simulator::createEntity( aClassname, aType, aPath, anID, aName );
+   Simulator::createEntity( aClassname, aFullID, aName );
 
   return Py::Object();
 
@@ -139,13 +134,7 @@ Object PySimulator::setProperty( const Py::Tuple& args )
 
   args.verify_length( 2 );
 
-  const Py::Sequence& aFullPN( args[0] );
-  aFullPN.verify_length( 4 );
-
-  const PrimitiveType aType ( static_cast<Py::Int>( aFullPN[0] ) );
-  const String aPath        ( static_cast<Py::String>( aFullPN[1] ) );
-  const String anID         ( static_cast<Py::String>( aFullPN[2] ) );
-  const String aPropertyName( static_cast<Py::String>( aFullPN[3] ) );
+  const String        aFullID    ( static_cast<Py::String>( args[0] ) );
   const Py::Tuple aMessageSequence( static_cast<Py::Sequence>( args[1] ) );
   
   UVariableVector aMessageBody;
@@ -155,7 +144,7 @@ Object PySimulator::setProperty( const Py::Tuple& args )
       aMessageBody.push_back( PyUVariable( *i ) );
     }
 
-  Simulator::setProperty( aType, aPath, anID, aPropertyName, aMessageBody );
+  Simulator::setProperty( aFullID, aMessageBody );
 
   return Py::Object();
 
@@ -168,18 +157,9 @@ Object PySimulator::getProperty( const Py::Tuple& args )
 
   args.verify_length( 1 );
   
-  const Py::Sequence& aFullPN( args[0] );
-  aFullPN.verify_length( 4 );
+  const String         aFullID   ( static_cast<Py::String>( args[0] ) );
 
-  const PrimitiveType aType    ( static_cast<Py::Int>( aFullPN[0] ) );
-  const String aPath        ( static_cast<Py::String>( aFullPN[1] ) );
-  const String anID         ( static_cast<Py::String>( aFullPN[2] ) );
-  const String aPropertyName( static_cast<Py::String>( aFullPN[3] ) );
-
-  UVariableVectorRCPtr aVectorPtr( Simulator::getProperty( aType,
-							   aPath,
-							   anID,
-							   aPropertyName ) );
+  UVariableVectorRCPtr aVectorPtr( Simulator::getProperty( aFullID ) );
 
   UVariableVector::size_type aSize( aVectorPtr->size() );
 
@@ -225,18 +205,9 @@ Object PySimulator::getLogger( const Py::Tuple& args )
   ECS_TRY;
   args.verify_length( 1 );
 
-  const Py::Sequence& aFullPN( args[0] );
-  aFullPN.verify_length( 4 );
+  const String        aFullID    ( static_cast<Py::String>( args[0] ) );
 
-  const PrimitiveType aType    ( static_cast<Py::Int>( aFullPN[0] ) );
-  const String aPath        ( static_cast<Py::String>( aFullPN[1] ) );
-  const String anID         ( static_cast<Py::String>( aFullPN[2] ) );
-  const String aPropertyName( static_cast<Py::String>( aFullPN[3] ) );
-
-  LoggerPtr aLogger( Simulator::getLogger( aType,
-					   aPath,
-					   anID,
-					   aPropertyName ) );
+  LoggerPtr aLogger( Simulator::getLogger( aFullID ) );
 
   PyLogger* aPyLogger( new PyLogger( aLogger ) );
 
@@ -358,7 +329,4 @@ void PySimulator::callEventHandler()
 {
   theEventHandler->apply( Py::Tuple() );
 }
-
-
-
 

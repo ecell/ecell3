@@ -218,7 +218,7 @@ namespace libecs
 
     /// Data members
 
-    PropertySlotPtr  thePropertySlot;
+    PropertySlotPtr      thePropertySlot;
     const GetCurrentTimeMethodType& theGetCurrentTimeMethod; 
     Real                 theMinimumInterval;
     Real                 theCurrentInterval;

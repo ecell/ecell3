@@ -1,18 +1,10 @@
 #!/usr/bin/env python
 
 
-# this is done in __init__.py
-# from ECS import *
+from ECS import *
 
 import string
 import types
-
-# FullPN field numbers
-TYPE       = 0
-SYSTEMPATH = 1
-ID         = 2
-PROPERTY   = 3
-
 
 class FullID( tuple ):
     def __init__( self , aSequence ):
@@ -135,6 +127,10 @@ def createFullPN( aValue ):
         return FullPN( aList )
 
 def createSystemPath( aValue ):
+    # empty system path
+    if aValue == '':
+        return SystemPath( () )
+
     aList = convertToSystemPathList( aValue )
     if not aList:
         raise TypeError( 'can not create SystemPath from %s type object'
@@ -177,6 +173,8 @@ def convertToSystemPathList( aValue ):
     else:
         if isinstance( aValue , str ):
             aList = string.split( aValue, '/' )
+            if aValue == '':
+                return []
 
             if aList[ 0 ] == '':
                 del( aList[ 0 ])
@@ -296,6 +294,11 @@ if __name__ == '__main__':
     print aRelativeSystemPath
     print aSystemPath.joinSystemPath( aRelativeSystemPath )
     
+    print
+    
+    aSystemPath = createSystemPath( '' )
+    print aSystemPath
+
     print
     
     print 'end'

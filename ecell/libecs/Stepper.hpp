@@ -195,10 +195,25 @@ namespace libecs
     }
 
     /**
-       Update the cache.
+       Update the caches.
+
+       SubstanceCache and ReactorCache are updated so that they contain
+       all Substances and Reactors in the Systems that are belong to this
+       Stepper.
     */
 
     void updateCache();
+
+
+    /**
+       Update the caches with sort.
+
+       SubstanceCache and ReactorCache are updated so that they contain
+       all Substances and Reactors in the Systems that are belong to this
+       Stepper.
+
+       Not fully implemented.
+    */
 
     void updateCacheWithSort();
 

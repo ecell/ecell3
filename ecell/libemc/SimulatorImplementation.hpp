@@ -58,27 +58,26 @@ namespace libemc
     SimulatorImplementation() {}
     virtual ~SimulatorImplementation() {}
 
-    virtual void createStepper( libecs::StringCref          classname, 
-				libecs::StringCref          id,
-				libecs::UVariableVectorCref data ) = 0;
 
-    virtual void createEntity( libecs::StringCref    classname, 
-			       libecs::PrimitiveType type,
-			       libecs::StringCref    systempath,
-			       libecs::StringCref    id,
-			       libecs::StringCref    name ) = 0;
+    virtual void createStepper( libecs::StringCref          aClassname,
+				libecs::StringCref          anId,
+				libecs::UVariableVectorCref aData ) = 0;
 
-    virtual void setProperty( libecs::PrimitiveType       type,
-			      libecs::StringCref          systempath,
-			      libecs::StringCref          id,
-			      libecs::StringCref          propertyname,
-			      libecs::UVariableVectorCref data ) = 0;
+    virtual void createEntity( libecs::StringCref           aClassname, 
+			       libecs::StringCref           aFullIDString,
+			       libecs::StringCref           aName ) = 0;
+
+
+    virtual void setProperty( libecs::StringCref            aFullPNString,
+			      libecs::UVariableVectorCref   aData ) = 0;
+
+
 
     virtual const libecs::UVariableVectorRCPtr
-    getProperty( libecs::PrimitiveType type,
-		 libecs::StringCref    systempath,
-		 libecs::StringCref    id,
-		 libecs::StringCref    propertyname ) = 0;
+    getProperty( libecs::StringCref aFullPNString ) = 0;
+
+    virtual libecs::LoggerPtr 
+    getLogger( libecs::StringCref aFullPNString ) = 0;
 
     virtual void step() = 0;
 
@@ -86,10 +85,7 @@ namespace libemc
 
     virtual const libecs::Real getCurrentTime() = 0;
 
-    virtual libecs::LoggerPtr getLogger( libecs::PrimitiveType type,
-					 libecs::StringCref    systempath,
-					 libecs::StringCref    id,
-					 libecs::StringCref propertyname ) = 0;
+
 
     virtual libecs::StringVectorRCPtr getLoggerList() = 0;
 

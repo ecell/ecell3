@@ -8,6 +8,12 @@
 SETABLE = 1 << 0   # == 1
 GETABLE = 1 << 1   # == 2
 
+# FullPN field numbers
+TYPE       = 0
+SYSTEMPATH = 1
+ID         = 2
+PROPERTY   = 3
+
 # Primitive type numbers
 ENTITY     = 1
 SUBSTANCE  = 2

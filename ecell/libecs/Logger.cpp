@@ -145,16 +145,16 @@ namespace libecs
   //
 
   StringCref Logger::getName() const
-    {
-      return thePropertySlot->getName();
-    }
+  {
+    return thePropertySlot->getName();
+  }
 
   
   //
   
   RealCref Logger::getStartTime( void ) const
   {
-    if(!theDataPointVector.empty())
+    if( ! theDataPointVector.empty() )
       {
 	return theDataPointVector.front().getTime();
       }
@@ -170,7 +170,7 @@ namespace libecs
   
   RealCref Logger::getEndTime( void ) const
   {
-    if(!theDataPointVector.empty())
+    if( ! theDataPointVector.empty() )
       {
 	return theDataPointVector.back().getTime();
       }

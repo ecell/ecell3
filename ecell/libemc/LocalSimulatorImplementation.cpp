@@ -58,49 +58,40 @@ namespace libemc
   }
 
   void LocalSimulatorImplementation::
-  createStepper( libecs::StringCref          classname, 
-		 libecs::StringCref          id,
-		 libecs::UVariableVectorCref data )
+  createStepper( libecs::StringCref          aClassname, 
+		 libecs::StringCref          anId,
+		 libecs::UVariableVectorCref aData )
   {
-    getModel().createStepper( classname, id, data );
+    getModel().createStepper( aClassname, anId, aData );
   }
 
-  void LocalSimulatorImplementation::createEntity( StringCref    classname, 
-						   PrimitiveType type,
-						   StringCref    systempath,
-						   StringCref    id,
-						   StringCref    name )
+  void LocalSimulatorImplementation::createEntity( StringCref aClassname,
+						   StringCref aFullIDString,
+						   StringCref aName )
   {
-    getModel().createEntity( classname, FullID( type, systempath, id ), name );
+    getModel().createEntity( aClassname, FullID( aFullIDString ), aName );
   }
     
-  void LocalSimulatorImplementation::setProperty( PrimitiveType type,
-						  StringCref    systempath,
-						  StringCref    id,
-						  StringCref    property,
-						  UVariableVectorCref data )
+  void LocalSimulatorImplementation::
+  setProperty( StringCref aFullPNString,
+	       UVariableVectorCref aData )
   {
-    EntityPtr anEntityPtr( getModel().getEntity( FullID( type, 
-							 systempath, 
-							 id ) ) );
+    FullPN aFullPN( aFullPNString );
+    EntityPtr anEntityPtr( getModel().getEntity( aFullPN.getFullID() ) );
+
     // this new does not cause memory leak since Message will get it as a RCPtr
-    anEntityPtr->setMessage( Message( property, 
-				      new UVariableVector( data ) ) );
+    anEntityPtr->setMessage( Message( aFullPN.getPropertyName(), 
+				      new UVariableVector( aData ) ) );
   }
 
 
   const UVariableVectorRCPtr
-  LocalSimulatorImplementation::getProperty( PrimitiveType type,
-					     StringCref    systempath,
-					     StringCref    id,
-					     StringCref    propertyname )
+  LocalSimulatorImplementation::getProperty( StringCref aFullPNString )
   {
-    EntityPtr anEntityPtr( getModel().getEntity( FullID( type, 
-							 systempath, 
-							 id ) ) );
-    return anEntityPtr->getMessage( propertyname ).getBody();
+    FullPN aFullPN( aFullPNString );
+    EntityPtr anEntityPtr( getModel().getEntity( aFullPN.getFullID() ) );
+    return anEntityPtr->getMessage( aFullPN.getPropertyName() ).getBody();
   }
-
 
   void LocalSimulatorImplementation::step()
   {
@@ -118,17 +109,11 @@ namespace libemc
   }
 
   LoggerPtr LocalSimulatorImplementation::
-  getLogger( libecs::PrimitiveType type,
-	     libecs::StringCref    systempathstring,
-	     libecs::StringCref    id,
-	     libecs::StringCref    propertyname )
+  getLogger( libecs::StringCref aFullPNString )
   {
-    SystemPath aSystemPath( systempathstring );
+    FullPN aFullPN( aFullPNString );
 
-    return getModel().getLoggerBroker().getLogger( FullPN( type,
-							   aSystemPath,
-							   id,
-							   propertyname ) );
+    return getModel().getLoggerBroker().getLogger( aFullPN );
   }
 
   StringVectorRCPtr LocalSimulatorImplementation::getLoggerList()

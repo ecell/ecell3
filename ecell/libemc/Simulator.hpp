@@ -56,50 +56,39 @@ namespace libemc
     Simulator();
     virtual ~Simulator() {}
 
-    void  createStepper( libecs::StringCref          classname, 
-			 libecs::StringCref          id,
-			 libecs::UVariableVectorCref data )
+    void createStepper( libecs::StringCref          aClassname,
+			libecs::StringCref          anId,
+			libecs::UVariableVectorCref aData )
     {
-      theSimulatorImplementation->createStepper( classname, id, data );
+      theSimulatorImplementation->createStepper( aClassname, anId, aData );
     }
 
 
-    void createEntity( libecs::StringCref    classname, 
-		       libecs::PrimitiveType type,
-		       libecs::StringCref    systempath,
-		       libecs::StringCref    id,
-		       libecs::StringCref    name )
+    void createEntity( libecs::StringCref           aClassname, 
+		       libecs::StringCref           aFullIDString,
+		       libecs::StringCref           aName )
     {
-      theSimulatorImplementation->createEntity( classname, 
-						type,
-						systempath,
-						id,
-						name );
+      theSimulatorImplementation->createEntity( aClassname,
+						aFullIDString,
+						aName );
     }
 
-    void setProperty( libecs::PrimitiveType       type,
-		      libecs::StringCref          systempath,
-		      libecs::StringCref          id,
-		      libecs::StringCref          propertyname,
-		      libecs::UVariableVectorCref data )
+    void setProperty( libecs::StringCref            aFullPNString,
+		      libecs::UVariableVectorCref   aData )
     {
-      theSimulatorImplementation->setProperty( type,
-					       systempath,
-					       id,
-					       propertyname,
-					       data );
+      theSimulatorImplementation->setProperty( aFullPNString,
+					       aData );
     }
 
     const libecs::UVariableVectorRCPtr
-    getProperty( libecs::PrimitiveType type,
-		 libecs::StringCref    systempath,
-		 libecs::StringCref    id,
-		 libecs::StringCref    propertyname )
+    getProperty( libecs::StringCref aFullPNString )
     {
-      return theSimulatorImplementation->getProperty( type,
-						      systempath,
-						      id,
-						      propertyname );
+      return theSimulatorImplementation->getProperty( aFullPNString );
+    }
+
+    libecs::LoggerPtr getLogger( libecs::StringCref aFullPNString )
+    {
+      return theSimulatorImplementation->getLogger( aFullPNString );
     }
 
     void step()
@@ -115,17 +104,6 @@ namespace libemc
     const libecs::Real getCurrentTime()
     {
       return theSimulatorImplementation->getCurrentTime();
-    }
-
-    libecs::LoggerPtr getLogger(  libecs::PrimitiveType type,
-				  libecs::StringCref    systempath,
-				  libecs::StringCref    id,
-				  libecs::StringCref    propertyname )
-    {
-      return theSimulatorImplementation->getLogger( type,
-						    systempath,
-						    id,
-						    propertyname );
     }
 
     libecs::StringVectorRCPtr getLoggerList()

@@ -55,43 +55,27 @@ namespace libemc
     LocalSimulatorImplementation();
     virtual ~LocalSimulatorImplementation();
 
-    libecs::ModelRef getModel() 
-    { 
-      return theModel; 
-    }
+    virtual void createStepper( libecs::StringCref          aClassname,
+				libecs::StringCref          anId,
+				libecs::UVariableVectorCref aData );
 
-    virtual void createStepper( libecs::StringCref          classname, 
-				libecs::StringCref          id,
-				libecs::UVariableVectorCref data );
+    virtual void createEntity( libecs::StringCref           aClassname, 
+			       libecs::StringCref           aFullIDString,
+			       libecs::StringCref           aName );
 
-    virtual void createEntity( libecs::StringCref    classname, 
-			       libecs::PrimitiveType type,
-			       libecs::StringCref    systempath,
-			       libecs::StringCref    id,
-			       libecs::StringCref    name );
-
-    virtual void setProperty( libecs::PrimitiveType       type,
-			      libecs::StringCref          systempath,
-			      libecs::StringCref          id,
-			      libecs::StringCref          propertyname,
-			      libecs::UVariableVectorCref data );
+    virtual void setProperty( libecs::StringCref            aFullPNString,
+			      libecs::UVariableVectorCref   aData );
 
     virtual const libecs::UVariableVectorRCPtr
-    getProperty( libecs::PrimitiveType type,
-		 libecs::StringCref    systempath,
-		 libecs::StringCref    id,
-		 libecs::StringCref    propertyname );
+    getProperty( libecs::StringCref aFullPNString );
+
+    virtual libecs::LoggerPtr getLogger( libecs::StringCref aFullPNString );
 
     void step();
 
     void initialize();
 
     virtual const libecs::Real getCurrentTime();
-
-    virtual libecs::LoggerPtr getLogger( libecs::PrimitiveType type,
-					 libecs::StringCref    systempath,
-					 libecs::StringCref    id,
-					 libecs::StringCref    propertyname );
 
     virtual libecs::StringVectorRCPtr getLoggerList();
 
@@ -107,6 +91,14 @@ namespace libemc
     void clearPendingEventChecker();
 
     virtual void setEventHandler( EventHandlerFuncPtr anEventHandler );
+
+
+  protected:
+
+    libecs::ModelRef getModel() 
+    { 
+      return theModel; 
+    }
 
   private:
 
