@@ -63,7 +63,7 @@ namespace libecs
 
   void Euler1Integrator::turn()
   {
-    ++theStepCounter;
+    //    ++theStepCounter;
   }
 
 

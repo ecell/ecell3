@@ -51,7 +51,6 @@ namespace libecs
   class Substance : public Entity
   {
     //FIXME: don't use friend class :-/
-    friend class Integrator;
     friend class Accumulator;
 
   public: // message slots
@@ -71,6 +70,11 @@ namespace libecs
       return PrimitiveType( PrimitiveType::SUBSTANCE );
     }
 
+
+    void setIntegrator( IntegratorPtr anIntegrator ) 
+    { 
+      theIntegrator = anIntegrator; 
+    }
 
     /**
        @return the number of molecules.
@@ -233,10 +237,7 @@ namespace libecs
 
     void setAccumulator( StringCref anAccumulatorClassname );
     void setAccumulator( AccumulatorPtr anAccumulator );
-    void setIntegrator( IntegratorPtr anIntegrator ) 
-    { 
-      theIntegrator = anIntegrator; 
-    }
+
 
     void makeSlots();
 
