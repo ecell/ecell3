@@ -77,16 +77,16 @@ The &Entity; class has three subclasses:
 
     </sect3>
 
-    <sect3>
-      <title>Stepper objects</title>
-
-      <para>A model must have one or more &Stepper; object(s).  Each
+      <sect3>
+	<title>Stepper objects</title>
+	
+	<para>A model must have one or more &Stepper; object(s).  Each
       &Process; and &System; object must be connected with a &Stepper;
       object in the same model.  In other words, &Stepper; objects in
       the model have non-overlapping sets of &Process; and &System;
       objects.</para>
-
-      <para>&Stepper; is a class which implement a specific simulation
+	
+	<para>&Stepper; is a class which implement a specific simulation
       algorithm.  If the model has more than one &Stepper; objects,
       the system conducts a multi-stepper
       simulation.  In addition to the lists of &Process; and &System;
@@ -94,9 +94,12 @@ The &Entity; class has three subclasses:
       be read or written by its &Process; objects.  It also has a time
       step interval as a positive real-number.  The system schedules
       &Stepper; objects according to the step intervals, and updates
-      the current time. When called by the system, a &Stepper; object
-      updates values of related &Variable; objects, calls zero, one or
-      more &Process; objects connected with the &Stepper; in an order
+      the current time.</para>
+	
+	<para>When called by the system, a &Stepper; object integrates
+      values of related &Variable; objects to the current time (if the
+      model has a differential component), calls zero, one or more
+      &Process; objects connected with the &Stepper; in an order
       determined by its implementation of the algorithm, and
       determines the next time step interval.  See the following
       chapters for details of the simulation procedure.</para>
@@ -117,7 +120,7 @@ The &Entity; class has three subclasses:
 	<title>ID (&EntityID; and &StepperID;)</title>
 
 	<para>Every &Entity; and &Stepper; object has an
-	<emphasis>ID</emphasis>.  An ID is a character string of
+	<emphasis>ID</emphasis>.  ID is a character string of
 	arbitrary length starting from an alphabet or '_' with
 	succeeding alphabet, '_', and numeric characters.  &app treats
 	IDs in a case-sensitive way.</para>
@@ -221,7 +224,7 @@ The &Entity; class has three subclasses:
 <programlisting><replaceable>EntityType</replaceable>:<replaceable>SystemPath</replaceable>:<replaceable>ID</replaceable>:<replaceable>property_name</replaceable></programlisting>
 </para>
 
-	<para>The following &FullPN; points to a
+	<para>The following &FullPN; points to 
 	'<property>Value</property>' property of the &Variable; object
 	<literal>Variable:/CELL:S</literal>.
 <informalexample>
@@ -239,7 +242,7 @@ The &Entity; class has three subclasses:
 
       <para>&Entity; and &Stepper; objects have
       <emphasis>properties</emphasis>.  A property is an attribute of a
-      certain object associated with a name, which can be get from and
+      certain object associated with a name.  Its value can be get from and
       set to the object.
       </para>
 
@@ -266,18 +269,18 @@ The &Entity; class has three subclasses:
 	      <para>&StringType; has two forms: quoted and not quoted.
 	    A quoted &StringType; can contain any
 	    <acronym>ASCII</acronym> characters except the quotation
-	    characters (' or ").  If a &StringType; is not quoted, it
-	    can start with an alphabet character or
-	    <literal>_</literal>, or <literal>/</literal>, and contain
-	    alphabets, numbers, <literal>_</literal>,
-	    <literal>/</literal> and <literal>:</literal>.</para>
+	    characters (' or ").  Quotations can be omitted if the
+	    string has a form of a valid object identifier
+	    (&EntityID;, &StepperID;, &SystemPath;, &FullID;, or
+	    &FullPN;).</para>
 
 	      <para>If the &StringType; is triple-quoted (by
-             <literal>'''</literal>s or <literal>"""</literal>), it
+             <literal>'''</literal> or <literal>"""</literal>), it
              can contain new-line characters.  (The current version still has
              some problems processing this.)</para>
 
-	      <para>(ex. <literal>C10_A</literal>, <literal>"It can
+	      <para>(ex. <literal>_C10_A</literal>,
+	      <literal>Process:/A/B:P1</literal>, <literal>"It can
 	      include spaces if double-quoted."</literal>,
 	      <literal>'single-quote is available too, if you want to
 	      use "double-quotes" inside.'</literal>)</para>
@@ -306,7 +309,7 @@ The &Entity; class has three subclasses:
 	<title>Dynamic type adaptation of property values</title>
 
 	<para>The system automatically convert the type of the
-         property value if it is different from what the objects in
+         property value if it is different from what the object in
          the simulator (such as &Process; and &Variable;) expects to
          get.  That is, the system does not necessary raise an error
          if the type of the given value differs from the type the
@@ -410,10 +413,10 @@ The &Entity; class has three subclasses:
      types of objects, and the objects have their properties.  The
      next thing to understand is how the simulation model is
      organized: the structure of the model.  But wait, learn the
-     syntax of the &ecell; model (&EM;) file before proceeding the
+     syntax of the &ecell; model (&EM;) file before proceeding to the
      next section would help you very much to understand the details
-     of the structure of the model, because most of the example codes uses
-     the syntax of &EM;.</para>
+     of the structure of the model, because most of the example codes are
+     in &EM;.</para>
 
     <sect2>
       <title>What is &EM;?</title>
@@ -443,8 +446,6 @@ The &Entity; class has three subclasses:
       <sect3>
 	<title>Why and when use &EM;?</title>
 
-	<para>&EM; files can be viewed as &EML; generator scripts.</para>
-
 	<para>Although <application>E-Cell Modeling
          Environment</application> (which is under development) will
          provide means of more sophisticated, scalable and intelligent
@@ -457,6 +458,8 @@ The &Entity; class has three subclasses:
          users.  In fact, this manual uses &EM; to illustrate how the
          model is constructed in &ecell;</para>
 
+	<para>&EM; files can be viewed as &EML; generator scripts.</para>
+
       </sect3>
 
     </sect2>
@@ -464,14 +467,14 @@ The &Entity; class has three subclasses:
     <sect2>
       <title>&EM; at a Glance</title>
 
-      <para>Before getting in to the details of &EM; syntax, let's
+      <para>Before getting into the details of &EM; syntax, let's
       have a look at a tiny example. It's very simple, but you do not 
-      need to understand everything right now.</para>
+      need to understand everything for the moment.</para>
 
       <example>
 	<title>A tiny &EM; example</title>
 	<programlisting linenumbering="numbered">
-Stepper ODE23Stepper( ODE_1 ) 
+Stepper ODE45Stepper( ODE_1 ) 
 { 
         # no property 
 } 
@@ -501,21 +504,23 @@ System System( / )
                 k     1.0; 
 
                 VariableReferenceList [ S0 :.:S -1 ] 
-                                      [ P0 :.:P 1 ]  ;
+                                      [ P0 :.:P 1 ];
         } 
  
 } 
 </programlisting>
       </example>
 
-      <para>In this example, the model has a &Stepper;
+      <para>This example is a model of a mass-action differential
+      equation. In this example, the model has a &Stepper;
       <literal>ODE_1</literal> of class
-      <classname>ODE23Stepper</classname>.  The model also has the
-      root system (<literal>/</literal>).  The root sytem has the
+      <classname>ODE45Stepper</classname>, which is a generic ordinary
+      differential equation solver.  The model also has the root
+      system (<literal>/</literal>).  The root sytem has the
       <property>StepperID</property> property, and four &Entity;
       objects, &Variable;s <literal>SIZE</literal>,
       <literal>S</literal> and <literal>P</literal>, and the &Process;
-      <literal>E</literal>.  <literal>SIZE</literal> is the special name
+      <literal>E</literal>.  <literal>SIZE</literal> is a special name
       of the &Variable;, that determines the size of the compartment.
       If the compartment is three-dimensional, it means the volume of
       the compartment in [L] (liter).  That value is used to calculate
@@ -525,15 +530,18 @@ System System( / )
       string without quotes (<literal>ODE_1</literal>). The initial
       value given to <property>Value</property> property of the
       &Variable; <literal>S</literal> is an integer number
-      <literal>10000</literal>.  <property>Name</property> property of
-      the &Process; <literal>E</literal> is the quoted string
-      <literal>"A mass action from S to P"</literal>, and
-      '<property>k</property>' of it is the real number
-      <literal>1.0</literal>.
+      <literal>10000</literal> (and this is automatically converted to
+      a real number <literal>10000.0</literal> when the &Variable;
+      gets it because the type of the <property>Value</property>
+      property is &Real;).  <property>Name</property> property of the
+      &Process; <literal>E</literal> is the quoted string <literal>"A
+      mass action from S to P"</literal>, and '<property>k</property>'
+      of it is the real number <literal>1.0</literal>.
       <property>VariableReferenceList</property> property of
       <literal>E</literal> is the list of two lists, which contain
       strings (such as <literal>S0</literal>), and numbers (such as
-      <literal>-1</literal>).</para>
+      <literal>-1</literal>).  The list contain relative &FullID;s
+      (such as <literal>:.:S</literal>) without quotes.</para>
 
     </sect2>
 
@@ -931,7 +939,19 @@ System System( /SUBSYSTEM/SUBSUBSYSTEM ) # SIZE == SIZE of the root system
 </programlisting>
 </para>
 
- 
+	<note>
+	  <title>SIZE must be a positive real number</title>
+	  <para>Behavior of the system when zero or negative number is
+	  set to SIZE is undefined.</para>
+	</note>
+
+	<note>
+	  <title>Unit of the size</title> <para>Currently, the unit of
+	  the SIZE is (10 cm)^<emphasis>d</emphasis>, where d is dimension
+	  of the &System;.  If d is 3, it is (10 cm)^3 == liter.  This
+	  specification is still under discussion, and is subject to
+	  change in future versions.</para>
+	</note>
       </sect3>
 
 
@@ -942,8 +962,7 @@ System System( /SUBSYSTEM/SUBSUBSYSTEM ) # SIZE == SIZE of the root system
       <title>Variables and Processes</title>
 
       <para>A &System; statement has zero, one or more &Variable; and
-	&Process; statements in addition to its properties.  Do not
-	put a &System; statement inside &System;.
+	&Process; statements in addition to its properties.
 
 <programlisting>
 System System( / )
@@ -961,9 +980,9 @@ System System( / )
     Process OtherProcess( Pm ) {}
 }
 </programlisting>
+
+      Do not put a &System; statement inside &System;.
 </para>
-
-
     </sect2>
 
 
@@ -1051,7 +1070,7 @@ System System( / )  # connected to STEPPER0
 
 	    <para>Currently, this reference name must be set for all
                &VariableReference;s, even if the &Process; does not
-               use it at all.
+               use the name at all.
                </para>
 
 	    <para>Lexical rule for this field is the same
@@ -1120,7 +1139,7 @@ System System( / )  # connected to STEPPER0
                of this field.</para>
 
             <para>Some &Process; objects automatically sets this
-               information, for example, if it knows it never changes
+               information, if it knows it never changes
                the value of the &Variable; of this
                &VariableReference;.  Care should be taken when you set
                this flag manually, because many &Process; classes do
@@ -1158,8 +1177,8 @@ System System( / )  # connected to STEPPER0
 	 <literal>P</literal>, taking <literal>E</literal> as the
 	 enzyme.  This class of &Process; requires to give the enzyme
 	 as a &VariableReference; of name <literal>ENZYME</literal>.
-	 All the &Variable; objects are in the root system. In &EM;
-	 files, <property>VariableReferenceList</property> of this
+	 All the &Variable; objects are in the root system. In &EM;,
+	 <property>VariableReferenceList</property> of this
 	 &Process; may appear like this:
 
 <programlisting>
@@ -1232,7 +1251,7 @@ System System( / )
   
 
   <sect1>
-    <title>Modeling Tutorial</title>
+    <title>A Small Modeling Tutorial</title>
     
     <para>Some basics on usage of ODE Steppers, NRStepper (Gillespie), DiscreteTimeStepper and SlaveStepper should come here.</para>
 
@@ -1390,11 +1409,13 @@ S1            S2
       of the <classname>GillespieProcess</classname> object.
       <property>k</property> is the rate constant parameter in [1/sec]
       if the reaction is first-order, or [1/sec/M] if it is a
-      second-order reaction.  Set
-      <property>VariableReferenceList</property> properties so that
-      <literal>P1</literal> consumes <literal>S1</literal> and produce
-      <literal>S2</literal>, and <literal>P2</literal> uses
-      <literal>S2</literal> to create <literal>S1</literal>.</para>
+      second-order reaction. (Don't forget to define
+      <literal>SIZE</literal> &Variable; if there is a second-order
+      reaction.)  Set <property>VariableReferenceList</property>
+      properties so that <literal>P1</literal> consumes
+      <literal>S1</literal> and produce <literal>S2</literal>, and
+      <literal>P2</literal> uses <literal>S2</literal> to create
+      <literal>S1</literal>.</para>
 
 
 	<programlisting>
@@ -1404,15 +1425,15 @@ System System( / )
 
     Process GillespieProcess( P1 )              # the reaction S1 --> S2
     {
-        VariableReferenceList   [ S Variable:.:S1 -1 ]
-                                [ P Variable:.:S2 1 ];
+        VariableReferenceList   [ S :.:S1 -1 ]
+                                [ P :.:S2 1 ];
         k       1.0;                            # the rate constant
     }
 
     Process GillespieProcess( P2 )              # the reaction S2 --> S1
     {
-        VariableReferenceList   [ S Variable:.:S2 -1 ]
-                                [ P Variable:.:S1 1 ];
+        VariableReferenceList   [ S :.:S2 -1 ]
+                                [ P :.:S1 1 ];
         k       1.0;
     }
 }
@@ -1448,15 +1469,15 @@ System System( / )
         
     Process GillespieProcess( P1 )              # the reaction S1 --> S2
     {
-        VariableReferenceList   [ S Variable:.:S1 -1 ]
-                                [ P Variable:.:S2 1 ];
+        VariableReferenceList   [ S :.:S1 -1 ]
+                                [ P :.:S2 1 ];
         k       1.0;                            # the rate constant
     }
 
     Process GillespieProcess( P2 )              # the reaction S2 --> S1
     {
-        VariableReferenceList   [ S Variable:.:S2 -1 ]
-                                [ P Variable:.:S1 1 ];
+        VariableReferenceList   [ S :.:S2 -1 ]
+                                [ P :.:S1 1 ];
         k       1.0;
     }
 }
@@ -1475,7 +1496,7 @@ System System( / )
        runs with the stochastic Gillespie's algorithm.  &ecell; is a
        multi-algorithm simulator, and different algorithms can be used
        to run the model.  This section explains a way to use a
-       deterministic differential equation solver to run a system
+       deterministic differential equation solver to run the system
        of simple mass-action reactions.</para>
 
 
@@ -1485,9 +1506,9 @@ System System( / )
 	<para>In the current version, we recommend
          <classname>ODE45Stepper</classname> class as a
          general-purpose &Stepper; for differential equation systems.
-         This &Stepper; implements an adaptive stepsize fourth order
-         numerical integration algorithm for ordinary differential
-         equations (ODE) with fifth-order error control.  </para>
+         This &Stepper; implements an explicit fourth order numerical
+         integration algorithm with a fifth-order error control.
+         </para>
 
 	<para><classname>MassActionFluxProcess</classname> is the
          continuous differential equation conterpart of the
@@ -1507,7 +1528,7 @@ System System( / )
          <classname>MassActionFluxProcess</classname>.</para>
 
 	<para>The following is the model of the trivial model that
-         runs on the differential equation
+         runs on the differential
          <classname>ODE45Stepper</classname>.</para>
 
 	<example>
@@ -1534,15 +1555,15 @@ System System( / )
         
     Process MassActionFluxProcess( P1 )
     {
-        VariableReferenceList   [ S0 Variable:.:S1 -1 ]
-                                [ P0 Variable:.:S2 1 ];
+        VariableReferenceList   [ S0 :.:S1 -1 ]
+                                [ P0 :.:S2 1 ];
         k       1.0;
     }
 
-    Process MassActionProcess( P2 )
+    Process MassActionFluxProcess( P2 )
     {
-        VariableReferenceList   [ S0 Variable:.:S2 -1 ]
-                                [ P0 Variable:.:S1 1 ];
+        VariableReferenceList   [ S0 :.:S2 -1 ]
+                                [ P0 :.:S1 1 ];
         k       1.0;
     }
 }
@@ -1559,6 +1580,318 @@ Incidentally, in this particular trivial model,
 
     </sect2>
 
+    <sect2>
+      <title>Making the Model Switchable Between Algorithms</title>
+
+      <para>Fortunately, at least as far as the model has only
+       elementary reactions, switching between these stochastic and
+       deterministic algorithms is just to switch between
+       <classname>NRStepper</classname>/<classname>GillespieProcess</classname>
+       pair and
+       <classname>ODE45Stepper</classname>/<classname>MassActionFluxProcess</classname>
+       pair of classnames.  Both &Process; classes takes the same property
+       '<property>k</property>' with the same unit.</para>
+
+      <para>Some use of &empy; macros makes the model generic.  In the
+       following example, setting the &Python; variable
+       <literal>TYPE</literal> to <literal>ODE</literal> makes it run
+       in deterministic differential equation mode, and setting
+       <literal>TYPE</literal> to <literal>NR</literal> turns it stochastic.
+
+      <example>
+	<title>simple-switchable.em</title>
+	  
+	<programlisting>
+@{ALGORITHM='ODE'}
+
+@{
+if ALGORITHM == 'ODE':
+    STEPPER='ODE45Stepper'
+    PROCESS='MassActionFluxProcess'
+elif ALGORITHM == 'NR':
+    STEPPER='NRStepper'
+    PROCESS='GillespieProcess'
+else:
+    raise 'unknown algorithm: %s' % ALGORITHM
+}
+
+Stepper @(STEPPER)( STEPPER1 )
+{
+    # no property
+}
+
+System System( / )
+{
+    StepperID       STEPPER1;
+
+    Variable Variable( S1 )
+    {
+        Value   1000;
+    }
+        
+    Variable Variable( S2 )
+    {
+        Value   0;
+    }
+        
+    Process @(PROCESS)( P1 )
+    {
+        VariableReferenceList   [ S0 :.:S1 -1 ]
+                                [ P0 :.:S2 1 ];
+        k       1.0;
+    }
+
+    Process @(PROCESS)( P2 )
+    {
+        VariableReferenceList   [ S0 :.:S2 -1 ]
+                                [ P0 :.:S1 1 ];
+        k       1.0;
+    }
+}
+</programlisting>
+</example>
+
+</para>
+
+    </sect2>
+
+    <sect2>
+      <title>A Simple Deterministic / Stochastic Composite Simulation</title>
+
+      <para>&ecell; can drive a model with multiple &Stepper; objects.
+       Each &Stepper; can implement different simulation algorithms,
+       and have different time scales.  This framework of
+       multi-algorithm, multi-timescale simulation is quite generic, and
+       virtually any combination of any number of different types of sub-models
+       is possible.  This section exemplifies a tiny model of coupled
+       ODE and Gillespie reactions.</para>
+
+      <sect3>
+	<title>A tiny multi-timescale reactions model</title>
+
+	<para>Consider this tiny model of four &Variable;s and six
+	reaction &Process;es:
+
+<literallayout class="monospaced">
+    -- P1 -->                   -- P4 -->
+S1            S2  -- P3 --> S3            S4
+^  <-- P2 --                   <-- P5 --  |
+|                                         |
+ \ _______________ P6 ____________________/
+</literallayout>
+
+        Although it may look complicated at first glance, this system 
+        consists of two instances of the 'trivial' system we have modeled
+        in the previous sections coupled together:
+
+<literallayout class="monospaced">
+Sub-model 1:
+    -- P1 -->
+S1            S2
+   <-- P2 -- 
+</literallayout>
+
+and
+
+<literallayout class="monospaced">
+Sub-model 2:
+    -- P4 -->
+S3            S4
+   <-- P5 -- 
+</literallayout>
+
+       These two sub-models are in turn coupled by reaction processes
+       <literal>P3</literal> and <literal>P6</literal>.  Because time
+       scales of <literal>P3</literal> and <literal>P6</literal> are
+       determined by <literal>S2</literal> and <literal>S4</literal>,
+       respectively, <literal>P3</literal> belongs to the sub-model 1,
+       and <literal>P6</literal> is a part of the sub-model 2.
+
+<literallayout class="monospaced">
+Sub-model 1:   S2  -- P3 --> S3
+               S1 <-- P6 --> S4  :Sub-model 2
+</literallayout>
+
+       Rate constants of the main reactions, <literal>P1</literal>,
+<literal>P2</literal>, <literal>P4</literal>, and
+<literal>P5</literal> are the same as the previous model:
+<literal>1.0</literal> [1/sec].  But the 'bridging' reactions are slower
+than the main reactions: <literal>1e-1</literal> for
+<literal>P3</literal> and <literal>1e-3</literal> for
+<literal>P6</literal>.   Consequently, sub-models 1 and 2 would have
+approximately <literal>1e-1 / 1e-3 == 1e-2</literal> times different
+steady-state levels.   Because the rate constants of the main reactions
+are the same, this implies time scale of both sub-models are different.
+</para>
+
+      </sect3>
+
+      <sect3>
+	<title>Writing model file</title>
+
+	<para>The following code implements the multi-time scale
+         model.  The first two lines specify algorithms to use for
+         those two parts of the model. <varname>ALGORITHM1</varname>
+         variable specifies the algorithm to use for the sub-model 1, and
+         <varname>ALGORITHM2</varname> is for the sub-model 2.  Values of 
+         these variables can either be <literal>'NR'</literal> or
+         <literal>'ODE'</literal>.</para>
+
+        <para>For example, to try pure-stochastic simulation,
+         set these variables like this:
+
+<programlisting>
+@{ALGORITHM1='NR'}
+@{ALGORITHM2='NR'}
+</programlisting>
+
+
+         Setting <varname>ALGORITHM1</varname> to <literal>'NR'</literal> and
+         <varname>ALGORITHM2</varname> to <literal>'ODE</literal> would be
+         an ideal configuration.  This runs a magnitute faster than
+         the pure-stochastic configuration.
+
+<programlisting>
+@{ALGORITHM1='NR'}
+@{ALGORITHM2='ODE'}
+</programlisting>
+ 
+        Also try pure-deterministic run.
+
+<programlisting>
+@{ALGORITHM1='ODE'}
+@{ALGORITHM2='ODE'}
+</programlisting>
+
+        In this particular model, this configuration runs very fast
+        because the system easily reaches the steady-state and
+        stiffness of the model is low.  However, this does not necessary
+        mean pure-ODE is always the fastest. Under some situations
+        NR/ODE composite simulation exceeds both pure-stochastic and 
+        pure-deterministic (reference?).</para>
+
+      <example>
+	<title>simple-switchable.em</title>
+	  
+	<programlisting>
+@{ALGORITHM1= ['NR' or 'ODE']}
+@{ALGORITHM2= ['NR' or 'ODE']}
+
+
+# a function to give appropriate class names.
+@{
+def getClassNamesByAlgorithm( anAlgorithm ):
+    if anAlgorithm == 'ODE':
+        return 'ODE45Stepper', 'MassActionFluxProcess'
+    elif anAlgorithm == 'NR':
+        return 'NRStepper', 'GillespieProcess'
+    else:
+        raise 'unknown algorithm: %s' % ALGORITHM1
+}
+
+# get classnames
+@{
+STEPPER1, PROCESS1 = getClassNamesByAlgorithm( ALGORITHM1 )
+STEPPER2, PROCESS2 = getClassNamesByAlgorithm( ALGORITHM2 )
+}
+
+# create appropriate steppers.
+# stepper ids are the same as the ALGORITHM.
+@('Stepper %s ( %s ) {}' % ( STEPPER1, ALGORITHM1 ))
+
+# if we have two different algorithms, one more stepper is needed.
+@(ALGORITHM1 != ALGORITHM2 ? 'Stepper %s( %s ) {}' % ( STEPPER2, ALGORITHM2 ))
+
+
+
+System CompartmentSystem( / )
+{
+    StepperID   @(ALGORITHM1);
+    
+    Variable Variable( SIZE )
+    {
+        Value   1e-18;
+    }
+    
+    Variable Variable( S1 )
+    {
+        Value   1000;
+    }
+    
+    Variable Variable( S2 )
+    {
+        Value   0;
+    }
+    
+    Variable Variable( S3 )
+    {
+        Value   1000000;
+    }
+    
+    Variable Variable( S4 )
+    {
+        Value   0;
+    }
+
+
+    Process @(PROCESS1)( P1 )
+    {
+        VariableReferenceList   [ S0 :.:S1 -1 ] [ P0 :.:S2 1 ];
+        k       1.0;
+    }
+
+    Process @(PROCESS1)( P2 )
+    {
+        VariableReferenceList   [ S0 :.:S2 -1 ] [ P0 :.:S1 1 ];
+        k       1.0;
+    }
+
+    Process @(PROCESS1)( P3 )
+    {
+        VariableReferenceList   [ S0 :.:S2 -1 ] [ P0 :.:S3 1 ];
+        k       1e-1;
+    }
+
+    Process @(PROCESS2)( P4 )
+    {
+        StepperID @(ALGORITHM2);
+
+        VariableReferenceList   [ S0 :.:S3 -1 ] [ P0 :.:S4 1 ];
+        k       1.0;
+    }
+
+    Process @(PROCESS2)( P5 )
+    {
+        StepperID @(ALGORITHM2);
+
+        VariableReferenceList   [ S0 :.:S4 -1 ] [ P0 :.:S3 1 ];
+        k       1.0;
+    }
+
+    Process @(PROCESS2)( P6 )
+    {
+        StepperID @(ALGORITHM2);
+
+        VariableReferenceList   [ S0 :.:S4 -1 ] [ P0 :.:S1 1 ];
+        k       1e-4;
+    }
+    
+}
+</programlisting>
+</example>
+
+
+      </sect3>
+
+
+    </sect2>
+
+    <sect2>
+      <title>Custom equations</title>
+
+
+      <para></para>
+    </sect2>
 
 
   </sect1>

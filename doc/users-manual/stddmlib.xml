@@ -31,11 +31,10 @@
 </para>
     
     <sect2>
-      <title><classname>DifferentialSteppers</classname></title>
+      <title>DifferentialSteppers</title>
 
       <sect3>
-	<title>General-purpose
-	<classname>DifferentialStepper</classname> classes</title>
+	<title>General-purpose DifferentialStepper classes</title>
 
       <para>The following &Stepper; classes implement general-purpose
 ordinary differential equation solvers.   Basically these classes must
@@ -78,6 +77,12 @@ work well with any simple continuous &Process; classes.</para>
 
       </sect3>
 
+      <sect3>
+	<title>S-System and GMA Steppers</title>
+
+	<para>FIXME: need description here.</para>
+      </sect3>
+
     </sect2>
 
     <sect2>
@@ -86,13 +91,85 @@ work well with any simple continuous &Process; classes.</para>
 
 <itemizedlist>
 	  <listitem>
-	    <para>NRStepper</para> <para>An implementation of
-	    Gillespie-Gibson algorithm with modification to enable
-	    multi-stepper simulations.</para>
+	    <para>DiscreteEventStepper</para> 
 
-	    <para>This &Stepper; should be used
-	    in combination with
-	    <classname>GillespieProcess</classname>.</para>
+	    <para>This &Stepper; is used to conduct discrete event
+	    simulations.  This &Stepper; should be used in combination
+	    with subclasses of
+	    <classname>DiscreteEventProcess</classname>.</para>
+
+            <para>This &Stepper; uses its &Process; objects as event
+	    generators.  The procedure of this &Stepper; for
+	    <methodname>initialize</methodname>() method is like this:
+
+<orderedlist>
+		<listitem>
+		  <para><methodname>updateStepInterval</methodname>() method of
+  	    its all <classname>DiscreteEventProcess</classname>
+	    objects.</para>
+		</listitem>
+
+		<listitem>
+		  <para>Find a &Process; with the least <emphasis>scheduled
+	    time</emphasis> (top process).  The scheduled time is
+	    calculated as: ( current time ) + (
+	    <property>StepInterval</property> of the process ).</para>
+		</listitem>
+
+		<listitem>
+		  <para>Reschedule itself to the scheduled time of the
+		  top process.</para>
+		</listitem>
+	      </orderedlist>
+
+            <methodname>step</methodname>() method of this &Stepper; is as
+             follows:
+
+<orderedlist>
+		<listitem>
+		  <para>Call <methodname>process</methodname>() method
+ 	         of the current top process.</para>
+		</listitem>
+
+		<listitem>
+		  <para>Calls
+	    <methodname>updateStepInterval</methodname>() method of
+	    the top process and all <emphasis>dependent
+	    processes</emphasis> of the top process, and update
+	    scheduled times for those processes to find the new top
+	    process.</para>
+		</listitem>
+
+		<listitem>
+		  <para>Lastly the &Stepper; reschedule itself to the
+	          scheduled time of the new top process.</para>
+		</listitem>
+	      </orderedlist>
+
+            The procedure for <methodname>interrupt</methodname>()
+            method of this class is the same as that for
+            <methodname>initialize</methodname>().
+             
+
+FIXME: need to explain about TimeScale property.
+
+	    </para>
+
+	  </listitem>
+
+	  <listitem>
+	    <para>NRStepper</para> 
+
+	    <para>This is an alias to the
+	    <classname>DiscreteEventStepper</classname>.
+            This class can be used as an implementation of
+	    Gillespie-Gibson algorithm.</para>
+
+	    <para>To conduct the Gillespie-Gibson simulation, use 
+             this class of &Stepper; in combination with
+	    <classname>GillespieProcess</classname> class.   
+            <classname>GillespieProcess</classname> is a subclass of
+            <classname>DiscreteEventProcess</classname>.</para>
 	  </listitem>
 	</itemizedlist>
 </para>
@@ -105,6 +182,44 @@ work well with any simple continuous &Process; classes.</para>
 <itemizedlist>
 	  <listitem>
 	    <para>DiscreteTimeStepper</para>
+
+	    <para>This &Stepper; steps with a fixed interval.  For
+             example, <property>StepInterval</property> property of
+             this &Stepper; is set to <literal>0.1</literal>, this
+             &Stepper; steps every 0.1 seconds.</para>
+
+	    <para>When this &Stepper; steps, it calls
+             <methodname>process</methodname>() of all of its
+             &Process; instances.  To change this behavior, create a
+             subclass.</para>
+
+	    <para>This &Stepper; ignores incoming interruptions from 
+             other &Stepper;s.</para>
+
+	  </listitem>
+	</itemizedlist>
+</para>
+
+    </sect2>
+
+    <sect2>
+      <title>PassiveStepper</title>
+
+      <para>
+<itemizedlist>
+	  <listitem>
+	    <para>PassiveStepper</para>
+
+	    <para>This &Stepper; never steps spontaneously (step
+             interval = infinity).  Instead, this &Stepper; steps upon
+             interruption.  In other words, this &Stepper; steps
+             everytime immediately after a dependent &Stepper; steps.</para>
+
+	    <para>When this &Stepper; steps, it calls
+             <methodname>process</methodname>() of all of its
+             &Process; instances.  To change this behavior, create a
+             subclass.</para>
+
 	  </listitem>
 	</itemizedlist>
 </para>
@@ -115,13 +230,13 @@ work well with any simple continuous &Process; classes.</para>
 
 
   <sect1>
-    <title>&Process; classes</title>
+    <title>Process classes</title>
 
     <sect2>
-      <title>Continuous &Process; classes</title>
+      <title>Continuous Process classes</title>
 
       <sect3>
-	<title>Differential equation-based &Process; classes</title>
+	<title>Differential equation-based Process classes</title>
 
 	<para>The following &Process; classes are straightforward
 	implementations of differential equations, and can be used
@@ -180,7 +295,7 @@ chemical and biochemical simulations.</para>
       </sect3>
 
       <sect3>
-	<title>Other continuous &Process; classes</title>
+	<title>Other continuous Process classes</title>
 
 	<itemizedlist>
 
@@ -197,7 +312,7 @@ chemical and biochemical simulations.</para>
     </sect2>
 
     <sect2>
-      <title>Discrete &Process; classes</title>
+      <title>Discrete Process classes</title>
 
       <itemizedlist>
 	<listitem>
@@ -218,7 +333,7 @@ such as <classname>NRStepper</classname>.</para>
 
 
     <sect2>
-      <title>Other &Process; classes</title>
+      <title>Other Process classes</title>
 
 
 	<itemizedlist>
@@ -232,7 +347,7 @@ such as <classname>NRStepper</classname>.</para>
 
 
   <sect1>
-    <title>&Variable; classes</title>
+    <title>Variable classes</title>
     <para>
 </para>
 

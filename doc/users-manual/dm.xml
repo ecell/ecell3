@@ -326,7 +326,7 @@ See the C++ standard library reference manual for more.</para>
     </sect2>
 
       <sect2>
-	<title>&Polymorph; class</title>
+	<title>Polymorph class</title>
 
 	<para>A &Polymorph; object can be
 	constructed from and converted to any of <type>Real</type>,
@@ -334,7 +334,7 @@ See the C++ standard library reference manual for more.</para>
 	&PolymorphVector; class.</para>
 	
       <sect3>
-	<title>Construct a &Polymorph;</title>
+	<title>Construct a Polymorph</title>
 
 	<para>To construct a &Polymorph; object, simply call a constructor with a value:
 
@@ -352,7 +352,7 @@ Polymorph aRealPolymorph2( aRealPolymorph );
       </sect3>
 
       <sect3>
-	<title>Getting a value of a &Polymorph;</title>
+	<title>Getting a value of a Polymorph</title>
 
 	<para>The value of the &Polymorph;
 	objects can be retrieved in any type by using <methodname>as&lt;></methodname>() template method.
@@ -372,7 +372,7 @@ aStringPolymorph.as&lt;Int>();  // == 213
       </sect3>
 
       <sect3>
-	<title>Examining and changing the type of &Polymorph;</title>
+	<title>Examining and changing the type of Polymorph</title>
 
 	<para><methodname>getType</methodname>(), <methodname>changeType</methodname>()</para>
 
@@ -380,7 +380,7 @@ aStringPolymorph.as&lt;Int>();  // == 213
 
 
       <sect3>
-	<title>&PolymorphVector;</title>
+	<title>PolymorphVector</title>
 
 	<para>&PolymorphVector; is a list of
 	&Polymorph; objects.</para>
@@ -415,7 +415,7 @@ aStringPolymorph.as&lt;Int>();  // == 213
     <title>PropertySlot</title>
 
     <sect2>
-      <title>What is &PropertySlot;</title>
+      <title>What is PropertySlot</title>
 
       <para>&PropertySlot; is a pair of methods to access (get) and
       mutate (set) an <emphasis>object property</emphasis>, associated
@@ -432,8 +432,7 @@ aStringPolymorph.as&lt;Int>();  // == 213
          inherit &PropertyInterface; common base class.</para>
 
       <sect3>
-	<title>What is 
-	&PropertySlot; for?</title>
+	<title>What is PropertySlot for?</title>
 
 	<para>&PropertySlot;s can be used from
 	model files (such as EM files) as a means of giving parameter
@@ -444,7 +443,7 @@ aStringPolymorph.as&lt;Int>();  // == 213
       </sect3>
 
       <sect3>
-	<title>Type of &PropertySlot;</title>
+	<title>Type of PropertySlot</title>
 
 	<para>A type of a &PropertySlot; is
 	any one of these four types:
@@ -469,7 +468,7 @@ aStringPolymorph.as&lt;Int>();  // == 213
     </sect2>
 
     <sect2>
-      <title>How to define a &PropertySlot;</title>
+      <title>How to define a PropertySlot</title>
 
       <para>To define a &PropertySlot; on an
       object class, you have to:
@@ -729,7 +728,7 @@ GET_METHOD( <parameter>NAME</parameter>, <parameter>TYPE</parameter> )
 
 
       <sect3>
-	<title>Registering &PropertySlot;s</title>
+	<title>Registering PropertySlots</title>
 	
 
 	<para>To register a &PropertySlot; on a class, one of these
@@ -796,7 +795,7 @@ and
 
 
 	    <listitem>
-	      <para><function>PROPERTYSLOT_GET( <parameter>NAME</parameter>, <parameter>TYPE</parameter>, <parameter>SET_METHOD</parameter>, <parameter>GET_METHOD</parameter> )</function></para>
+	      <para><function>PROPERTYSLOT( <parameter>NAME</parameter>, <parameter>TYPE</parameter>, <parameter>SET_METHOD</parameter>, <parameter>GET_METHOD</parameter> )</function></para>
 
 	      <para>If the name of either get or set method is
                different from the default format
@@ -830,11 +829,84 @@ on an object, the last is taken.</para>
 
 	</sect3>
 
+    <sect3>
+      <title>Load / save methods</title> 
+
+
+	<para>In addition to set and get methods, load and save
+         methods can be defined.  Load methods are called when the model
+         is loaded from the model file. Similarly, save methods are
+         called when the state of the model is saved to a file
+         by <methodname>saveModel</methodname>() method
+         of the simulator.</para>
+
+	<para>Unless otherwise specified, load and save methods default to
+         set and get methods.  This default definition can be changed
+         by using the following some macros.
+
+<itemizedlist>
+	    <listitem>
+	      <para><function>PROPERTYSLOT_LOAD_SAVE( <parameter>NAME</parameter>, <parameter>TYPE</parameter>, <parameter>SET_METHOD</parameter>, <parameter>GET_METHOD</parameter>, <parameter>LOAD_METHOD</parameter>, <parameter>SAVE_METHOD</parameter> )</function></para>
+
+	      <para>This macros is the most generic way to set the
+	      property methods; all of set method, get method, load
+	      method ans save method can be specified independently.
+	      If the <parameter>LOAD_METHOD</parameter> is
+	      <literal>NULLPTR</literal>, it is said to be not
+	      <emphasis>loadable</emphasis>, and it is not
+	      <emphasis>savable</emphasis> if
+	      <parameter>SAVE_METHOD</parameter> is
+	      <literal>NULLPTR</literal>.</para>
+	    </listitem>
+
+	    <listitem>
+	      <para><function>PROPERTYSLOT_NO_LOAD_SAVE( <parameter>NAME</parameter>, <parameter>TYPE</parameter>, <parameter>SET_METHOD</parameter>, <parameter>GET_METHOD</parameter> )</function></para>
+
+	      <para>Usage of this macro is the same as
+	      <function>PROPERTYSLOT</function> in the previous
+	      section, but this sets both
+	      <parameter>LOAD_METHOD</parameter> and
+	      <parameter>SAVE_METHOD</parameter> to
+	      <literal>NULLPTR</literal>.</para>
+
+	      <para>That is, this macro is equivalent to writing:
+<programlisting><function>PROPERTYSLOT_LOAD_SAVE( <parameter>NAME</parameter>, <parameter>TYPE</parameter>, <parameter>SET_METHOD</parameter>, <parameter>GET_METHOD</parameter>, NULLPTR, NULLPTR )</function></programlisting>
+</para>
+	    </listitem>
+
+	    <listitem>
+	      <para><function>PROPERTYSLOT_SET_GET_NO_LOAD_SAVE( <parameter>NAME</parameter>, <parameter>TYPE</parameter>, <parameter>SET_METHOD</parameter>, <parameter>GET_METHOD</parameter> )</function></para>
+
+	      <para><function>PROPERTYSLOT_SET_NO_LOAD_SAVE( <parameter>NAME</parameter>, <parameter>TYPE</parameter>, <parameter>SET_METHOD</parameter> )</function></para>
+
+	      <para><function>PROPERTYSLOT_GET_NO_LOAD_SAVE( <parameter>NAME</parameter>, <parameter>TYPE</parameter>, <parameter>GET_METHOD</parameter> )</function></para>
+
+	      <para>Usage of these macros are the same as:
+<function>PROPERTYSLOT_SET_GET</function>,
+<function>PROPERTYSLOT_SET</function>, and
+<function>PROPERTYSLOT_GET</function>, except that load and save methods are
+not set instead of default to set and get methods.
+</para>
+
+	    </listitem>
+	
+
+	  </itemizedlist>
+
+
+</para>
+
+
+    </sect3>
+
+
+
+
       <sect3>
-	<title>Inheriting properties of base classes</title>
+	<title>Inheriting properties of base class</title>
 
 	<para>In most cases you may also want to use properties of
-	base classes.  To inherit the baseclass properties, use
+	base class.  To inherit the baseclass properties, use
 	<function>INHERIT_PROPERTIES( <parameter>PROPERTY_BASECLASS</parameter>
 	)</function> macro.  This macro is usually placed before any property
 	definition macros (such as
@@ -875,47 +947,7 @@ on an object, the last is taken.</para>
 
 
     <sect2>
-      <title>Using &PropertySlot; From Model Files</title> 
-
-      <para>See the modeling chapter of this manual.</para>
-
-      <para>For example, the following &EM; file invokes the set
-method (<methodname>getFlux</methodname>()) of a
-<classname>HogeProcess</classname> &Process; with a new property value
-<parameter>10.0</parameter>, when this model is loaded by the
-simulation with <methodname>loadModel</methodname>() method.
-
-<programlisting>
-System CompartmentSystem( / )
-{
-        Process HogeProcess( P )
-        {
-                Flux 10.0;
-        }
-}
-</programlisting>
-</para>
-
-      <para>Similarly, get methods are called when the state of the
-model is saved to a file during the simulation by
-<methodname>saveModel</methodname>() method of the simulator.</para>
-
-      <note>
-	<title>Methods used to load/save simulation model</title>
-
-	<para>In future versions it may become possible to specify
-special load and save methods, in addition to usual set/get
-methods. This functionality is useful if (1) the usual set/get methods
-involve some special procedures that are meaningful only during the
-simulation, or (2) the property is setable/getable while it does not need
-to be loaded/saved from/to the model files.</para>
-      </note>
-
-
-    </sect2>
-
-    <sect2>
-      <title>Using &PropertySlot;s In Simulation</title>
+      <title>Using PropertySlots In Simulation</title>
 	
       <para>(1) Static direct access (using native C++ method)
 bypassing the &PropertySlot;, (2) dynamically-bound access via a
