@@ -116,6 +116,10 @@ AC_STRUCT_ST_RDEV
 AC_C_LONG_DOUBLE
 AC_LANG_RESTORE
 
+AC_CHECK_SIZEOF(int)
+AC_CHECK_SIZEOF(long)
+AC_CHECK_SIZEOF(long long)
+
 ICE_CXX_PRETTY_FUNCTION
 ICE_CXX_STD_EXCEPTIONS
 ICE_CXX_TYPEINFO
@@ -123,7 +127,8 @@ ICE_CXX_TYPEINFO
 dnl Checks for library functions.
 AC_TYPE_SIGNAL
 dnl AC_FUNC_VPRINTF
-AC_CHECK_FUNCS(mkdir select strdup strerror strtod uname)
+AC_CHECK_FUNCS(mkdir select strdup strerror strtod uname modf modfl)
+
 
 dnl Checks for library functions.
 AC_CHECK_FUNCS(strdup strstr)

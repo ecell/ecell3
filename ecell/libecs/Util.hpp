@@ -43,13 +43,11 @@
 
 /////////////// KoRandom random number generator
 
-#if defined(DOUBLE_FLOAT)        // Float is typedef'd as double
-typedef korandom_d_c  RandomNumberGenerator;
-#elif defined(LONG_DOUBLE_FLOAT) // Float is long double
+#if defined(HAVE_LONG_DOUBLE)        // Float is long double (see Defs.h)
 typedef korandom_ld_c RandomNumberGenerator; 
-#else                            // fail-safe
+#elif defined(LONG_DOUBLE_FLOAT) // Float is double
 typedef korandom_d_c  RandomNumberGenerator;
-#endif // DOUBLE_FLOAT
+#endif // HAVE_LONG_DOUBLE
 
 extern RandomNumberGenerator* theRandomNumberGenerator;
 

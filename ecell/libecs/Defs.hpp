@@ -43,54 +43,48 @@ const int RANDOM_NUMBER_BUFFER_SIZE(65535);
 //FIXME: const char* const REACTOR_SO_DIR= DM_SO_DIR "/reactor"; 
 
 // FIXME: use numeric_limits
-#if defined(sparc) && defined(__SVR4)
-// SPARC SUN Solaris
-#define QUANTITY_MAX LONG_LONG_MAX
-#define QUANTITY_MIN LONG_LONG_MIN
+#if SIZEOF_LONG_LONG >= 0
 typedef long long Int;
-typedef long double Float;
-typedef long double Mol;
-#if (defined(__GNUC__))
-#define FLOAT_DIG DBL_DIG
-#else // (defined(__GNUC__))
-#define FLOAT_DIG 15
-#endif // (defined(__GNUC__))
+const int INT_SIZE=SIZEOF_LONG_LONG;
+#else
+typedef long Int;
+const int INT_SIZE=SIZEOF_LONG;
+#endif
+
+//#define QUANTITY_MAX LONG_LONG_MAX
+//#define QUANTITY_MIN LONG_LONG_MIN
+
+#ifdef HAVE_LONG_DOUBLE
+  typedef long double Float;
+  typedef long double Mol;
+#  if (defined(__GNUC__))
+#    define FLOAT_DIG LDBL_DIG
+#  else // (defined(__GNUC__))
+#    define FLOAT_DIG 18  // expecting long double to be 96 bit numbers...
+#  endif // (defined(__GNUC__))
+#  define MODF modfl
+#else /* HAVE_LONG_DOUBLE */
+  typedef double Float;
+  typedef double Mol;
+#  if (defined(__GNUC__))
+#    define FLOAT_DIG DBL_DIG
+#  else // (defined(__GNUC__))
+#    define FLOAT_DIG 15
+#  endif // (defined(__GNUC__))
+#  define MODF modf
+#endif /* HAVE_LONG_DOUBLE */
+
+#if defined(sparc) && defined(__SVR4)
 #include <math.h>
+#undef MODF
 inline Float MODF(Float x, Float *y) {
   double frac_part, int_part;
   frac_part = modf(static_cast<double>(x), &int_part);
   *y = int_part;
   return frac_part;
 }
-#elif (defined(__linux__) && defined(__alpha__))
-// long = long long = double = long double = 64 bit
-#define QUANTITY_MAX LONG_MAX
-#define QUANTITY_MIN LONG_MIN
-typedef long Int;
-typedef double Float;
-typedef Float Mol;
-#define MODF modf
-#define DOUBLE_FLOAT
-#if (defined(__GNUC__))
-#define FLOAT_DIG DBL_DIG
-#else // (defined(__GNUC__))
-#define FLOAT_DIG 15
-#endif // (defined(__GNUC__))
-#else  
-// typedef Int as 64 bit integer, Float and Mol as long double.
-#define QUANTITY_MAX LONG_LONG_MAX
-#define QUANTITY_MIN LONG_LONG_MIN
-typedef int64_t Int;
-typedef long double Float;
-typedef long double Mol;
-#define MODF modfl
-#define LONG_DOUBLE_FLOAT
-#if (defined(__GNUC__))
-#define FLOAT_DIG LDBL_DIG
-#else // (defined(__GNUC__))
-#define FLOAT_DIG 18  // expecting long double to be 96 bit numbers...
-#endif // (defined(__GNUC__))
-#endif 
+#endif /* defined(sparc) && defined(__SVR4) */
+
 
 typedef Int Quantity;
 typedef Float Concentration;
