@@ -81,6 +81,17 @@ namespace libecs
     const Real aStepInterval( aStepperPtr->getStepInterval() );
     const Real aScheduledTime( aCurrentTime + aStepInterval );
 
+
+    // If the stepinterval is too small to proceed time,
+    // throw an exception.   
+    // Obviously time needs more precision. Possibly MP or 128-bit float.
+    if( aCurrentTime == aScheduledTime && aStepInterval > 0.0 )
+      {
+	THROW_EXCEPTION( SimulationError, 
+			 "Too small step interval given by Stepper [" +
+			 aStepperPtr->getID() + "]." );
+      }
+
     // schedule a new event
     theScheduleQueue.changeTopKey( Event( aScheduledTime, aStepperPtr ) );
    }
