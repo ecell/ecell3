@@ -8,7 +8,7 @@
   <property name="events">GDK_BUTTON_PRESS_MASK | GDK_KEY_PRESS_MASK</property>
   <property name="title" translatable="yes">VariableWindow</property>
   <property name="type">GTK_WINDOW_TOPLEVEL</property>
-  <property name="window_position">GTK_WIN_POS_NONE</property>
+  <property name="window_position">GTK_WIN_POS_MOUSE</property>
   <property name="modal">False</property>
   <property name="resizable">True</property>
   <property name="destroy_with_parent">False</property>
@@ -69,11 +69,12 @@
 		      <property name="climb_rate">1</property>
 		      <property name="digits">0</property>
 		      <property name="numeric">False</property>
-		      <property name="update_policy">GTK_UPDATE_ALWAYS</property>
+		      <property name="update_policy">GTK_UPDATE_IF_VALID</property>
 		      <property name="snap_to_ticks">False</property>
 		      <property name="wrap">False</property>
-		      <property name="adjustment">0 -1e-16 1e+16 1 10 10</property>
-		      <signal name="changed" handler="on_value_spinbutton_changed"/>
+		      <property name="adjustment">1 -1e-16 1e+16 1 20 20</property>
+		      <signal name="changed" handler="on_value_spinbutton_changed" last_modification_time="Fri, 11 Apr 2003 06:01:23 GMT"/>
+		      <signal name="activate" handler="on_value_spinbutton_activate" last_modification_time="Fri, 11 Apr 2003 05:32:40 GMT"/>
 		    </widget>
 		    <packing>
 		      <property name="padding">0</property>
@@ -171,7 +172,7 @@
 	  </child>
 
 	  <child>
-	    <widget class="GtkCheckButton" id="checkbox">
+	    <widget class="GtkCheckButton" id="fix_checkbox">
 	      <property name="border_width">2</property>
 	      <property name="visible">True</property>
 	      <property name="can_focus">True</property>
@@ -182,7 +183,7 @@ Fixed</property>
 	      <property name="active">False</property>
 	      <property name="inconsistent">False</property>
 	      <property name="draw_indicator">True</property>
-	      <signal name="toggled" handler="button_toggled"/>
+	      <signal name="toggled" handler="on_fix_checkbox_toggled" last_modification_time="Fri, 11 Apr 2003 05:34:13 GMT"/>
 	    </widget>
 	    <packing>
 	      <property name="padding">0</property>

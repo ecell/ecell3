@@ -296,7 +296,12 @@ class OsogoPluginManager(PluginManager):
 		Returns None
 		"""
 
-		PluginManager.showPlugin(self, aPluginInstance)
+		try:
+			PluginManager.showPlugin(self, aPluginInstance)
+
+		# When the specified instance exists on BoardWindow.
+		except AttributeError:
+			self.theMainWindow.getWindow('BoardWindow').present()
 
 
 	# ========================================================================

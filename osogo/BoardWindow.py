@@ -127,12 +127,16 @@ class BoardWindow(OsogoWindow):
 			self.updatePositions()
 
 	def deletePluginWindowByTitle( self, aTitle ):
-		for aPluginFrame in self['board_table'].get_children():
-			if self.thePluginMap[str(aPluginFrame)].getTitle() == aTitle:
-				self.theSelectedPluginFrame = aPluginFrame
-				self.deletePluginWindow()
-				self.updatePositions()
-				break
+		if self.exists() == TRUE:
+			for aPluginFrame in self['board_table'].get_children():
+				if self.thePluginMap[str(aPluginFrame)].getTitle() == aTitle:
+					self.theSelectedPluginFrame = aPluginFrame
+					self.deletePluginWindow()
+					self.updatePositions()
+					break
+		# When this window is not created, does nothing.
+		else:
+			pass
 
 	def __radioButtonToggled( self, *arg ):
 
