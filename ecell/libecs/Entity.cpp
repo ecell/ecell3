@@ -53,12 +53,12 @@ namespace libecs
 
   void Entity::makeSlots()
   {
-    MessageSlot( "ClassName", Entity, *this, NULLPTR, &Entity::getClassName );
-    MessageSlot( "Id", Entity, *this, NULLPTR, &Entity::getId );
-    MessageSlot( "SystemPath", Entity, *this, NULLPTR, &Entity::getSystemPath );
-    MessageSlot( "Name", Entity, *this, NULLPTR, &Entity::getName );
-    MessageSlot( "Activity", Entity, *this, NULLPTR, &Entity::getActivity );
-    MessageSlot( "ActivityPerSecond", Entity, *this, NULLPTR, 
+    makeMessageSlot( "ClassName", Entity, *this, NULLPTR, &Entity::getClassName );
+    makeMessageSlot( "Id", Entity, *this, NULLPTR, &Entity::getId );
+    makeMessageSlot( "SystemPath", Entity, *this, NULLPTR, &Entity::getSystemPath );
+    makeMessageSlot( "Name", Entity, *this, NULLPTR, &Entity::getName );
+    makeMessageSlot( "Activity", Entity, *this, NULLPTR, &Entity::getActivity );
+    makeMessageSlot( "ActivityPerSecond", Entity, *this, NULLPTR, 
 		 &Entity::getActivityPerSecond );
   }
 

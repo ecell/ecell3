@@ -48,15 +48,15 @@ namespace libecs
     theMinimumInterval( 0.0 ),
     theCurrentInterval( 0.0 )
   {
-    theMessageSlotClassCptr = 0;
+    theMessageSlotCptr = 0;
   } 
 
   // Constructor
 
 
-  Logger::Logger( AbstractMessageSlotClassCptr aMessageSlotClassPtr )
+  Logger::Logger( AbstractMessageSlotCptr aMessageSlotPtr )
     :
-    theMessageSlotClassCptr( aMessageSlotClassPtr ),
+    theMessageSlotCptr( aMessageSlotPtr ),
     theMinimumInterval( 0.0 ),
     theCurrentInterval( 0.0 )
   {
@@ -68,7 +68,7 @@ namespace libecs
   Logger::Logger( LoggerCref logger )
     :
     theDataPointVector( logger.getDataPointVector() ),
-    theMessageSlotClassCptr( logger.getMessageSlotClassCptr() ),
+    theMessageSlotCptr( logger.getMessageSlotCptr() ),
     theMinimumInterval( logger.getMinInterval() ),
     theCurrentInterval( logger.getCurrentInterval() )
   {

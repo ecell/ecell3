@@ -38,7 +38,7 @@ namespace libecs
 
   void MessageInterface::makeSlots()
   {
-    MessageSlot( "PropertyList",MessageInterface,*this,NULLPTR,
+    makeMessageSlot( "PropertyList",MessageInterface,*this,NULLPTR,
 		 &MessageInterface::getPropertyList);
 
   }
@@ -70,11 +70,11 @@ namespace libecs
   }
 
   void MessageInterface::appendSlot( StringCref keyword, 
-				     AbstractMessageSlotClass* func )
+				     AbstractMessageSlot* func )
   {
     if( thePropertyMap.find( keyword ) != thePropertyMap.end() )
       {
-	//      *theMessageWindow << "MessageSlot: appendSlot(): slot for keyword [" 
+	//      *theMessageWindow << "makeMessageSlot: appendSlot(): slot for keyword [" 
 	//	<< keyword << "] already exists. Taking later one.\n";
 	delete thePropertyMap[ keyword ];
 	thePropertyMap.erase( keyword );
@@ -86,7 +86,7 @@ namespace libecs
   {
     if( thePropertyMap.find( keyword ) == thePropertyMap.end() )
       {
-	//      *theMessageWindow << "MessageSlot: deleteSlot(): no slot for keyword [" 
+	//      *theMessageWindow << "makeMessageSlot: deleteSlot(): no slot for keyword [" 
 	//	<< keyword << "] found.\n";
 	return;
       }

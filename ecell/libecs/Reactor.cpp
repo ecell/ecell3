@@ -46,25 +46,25 @@ namespace libecs
   void Reactor::makeSlots()
   {
     //FIXME: get methods
-    MessageSlot( "AppendSubstrate",Reactor,*this,&Reactor::setAppendSubstrate,
+    makeMessageSlot( "AppendSubstrate",Reactor,*this,&Reactor::setAppendSubstrate,
 		 NULLPTR );
-    MessageSlot( "AppendProduct",Reactor,*this,&Reactor::setAppendProduct,
+    makeMessageSlot( "AppendProduct",Reactor,*this,&Reactor::setAppendProduct,
 		 NULLPTR );
-    MessageSlot( "AppendCatalyst",Reactor,*this,&Reactor::setAppendCatalyst,
+    makeMessageSlot( "AppendCatalyst",Reactor,*this,&Reactor::setAppendCatalyst,
 		 NULLPTR );
-    MessageSlot( "AppendEffector",Reactor,*this,&Reactor::setAppendEffector,
+    makeMessageSlot( "AppendEffector",Reactor,*this,&Reactor::setAppendEffector,
 		 NULLPTR );
 
-    MessageSlot( "SubstrateList",Reactor,*this,&Reactor::setSubstrateList,
+    makeMessageSlot( "SubstrateList",Reactor,*this,&Reactor::setSubstrateList,
 		 &Reactor::getSubstrateList);
-    MessageSlot( "ProductList",Reactor,*this,&Reactor::setProductList,
+    makeMessageSlot( "ProductList",Reactor,*this,&Reactor::setProductList,
 		 &Reactor::getProductList);
-    MessageSlot( "CatalystList",Reactor,*this,&Reactor::setCatalystList,
+    makeMessageSlot( "CatalystList",Reactor,*this,&Reactor::setCatalystList,
 		 &Reactor::getCatalystList);
-    MessageSlot( "EffectorList",Reactor,*this,&Reactor::setEffectorList,
+    makeMessageSlot( "EffectorList",Reactor,*this,&Reactor::setEffectorList,
 		 &Reactor::getEffectorList);
 
-    MessageSlot( "InitialActivity",Reactor,*this,&Reactor::setInitialActivity,
+    makeMessageSlot( "InitialActivity",Reactor,*this,&Reactor::setInitialActivity,
 		 &Reactor::getInitialActivity );
   }
 
