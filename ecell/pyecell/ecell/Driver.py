@@ -1,7 +1,6 @@
 #! /usr/bin/python
 
 import ecs
-import gtk
 import types
 
 from ecssupport import *
@@ -11,9 +10,6 @@ class Driver:
     def __init__( self ):
 
         self.theSimulator = ecs.Simulator()
-        self.theSimulator.setPendingEventChecker( gtk.events_pending )
-        self.theSimulator.setEventHandler( gtk.mainiteration )
-        self.initialize()
 
     def run( self , time='' ):
 
@@ -66,6 +62,15 @@ class Driver:
 
         self.theSimulator.setEventHandler(event )
 
+    def getCurrentTime( self ):
+
+        time = self.theSimulator.getProperty( (SYSTEM, '/', '/', 'CurrentTime' ) )
+        return time[0]
+
+
+# FIXME:
+# below are util functions. should be moved to other file
+
     def printProperty( self, fullpn ):
 
         value = self.theSimulator.getProperty( fullpn )
@@ -87,11 +92,6 @@ class Driver:
         for i in list:
             self.printAllProperties( ( primitivetype, systempath, i ) )
 
-    def getCurrentTime( self ):
-
-        time = self.theSimulator.getProperty( (SYSTEM, '/', '/', 'CurrentTime' ) )
-        return time[0]
-
     def isNumber( self, aFullPN ):
 
         aValue = self.getProperty( aFullPN )
@@ -103,29 +103,26 @@ class Driver:
             return 0
 
 
-class SessionRecorder:
+
+
+#FIXME: incomplete
+class RecordingDriver( Driver ):
 
     def __init__( self, filename ):
 
+        Driver.__init__( self )
         self.theOutput = open(filename, 'w')
+
+    def __del__( self ):
+
+        self.theOutput.close()
+
         
     def record( self, string ):
 
         self.theOutput.write( string )
         self.theOutput.write( "\n" )
 
-    def __dell__( self ):
-
-        self.theOutput.close()
-    
-
-
-class StandardDriver( Driver, SessionRecorder ):
-
-    def __init__( self, srfilename ):
-
-        SessionRecorder.__init__( self, srfilename )
-        Driver.__init__( self )
 
     def run( self , time='' ):
 
@@ -175,17 +172,6 @@ class StandardDriver( Driver, SessionRecorder ):
     def setEventHandler( self, event ):
 
         self.theSimulator.setEventHandler( event )
-
-
-class OsogoDriver( StandardDriver ):
-
-    def __init__( self, srfilename ):
-
-        StandardDriver.__init__( self, srfilename )
-        self.record('aSession = aMainWindow.theSession')
-        self.record('aDriver = aSession.theDriver')
-        self.record('aPluginManager = aMainWindow.thePluginManager')
-        self.record('#--------------------------------------------------')
 
 
 if __name__ == "__main__":

@@ -1,14 +1,14 @@
-#! /usr/bin/python
+#! /usr/bin/env python
 
 import Driver
 
 
 class Session:
 
-    def __init__( self, srfilename ):
+    def __init__( self, aDriver ):
 
-        self.theDriver = Driver.StandardDriver( srfilename )
-        self.theModelInterpreter = ModelInterpreter.ModelInterpreter( self.theDriver )
+        self.thePrintMethod = print
+        self.theDriver = aDriver
 
     def run( self , time='' ):
         self.theDriver.run( time )
@@ -25,9 +25,22 @@ class Session:
     def getLogger( self, fullpn ):
         return self.theDriver.getLogger( fullpn )
 
+    def setPrintMethod( self, aMethod ):
+        self.thePrintMethod = aMethod
+
     def printMessage( self, message ):
         print message
 
+    def loadModel( self, aModel ):
+        pass
+        
+    def saveModel( self ):
+        pass
+
+
+
+
+#FIXME: below are obsolete. should be removed.
 
 class SingleSession( Session ):
 
