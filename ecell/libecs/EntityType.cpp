@@ -63,28 +63,34 @@ namespace libecs
 
 
 
-  EntityType::EntityType( StringCref typestring )
+  EntityType::EntityType( StringCref aTypeString )
   {
-    if( typestring == EntityTypeStringOfVariable() )
+    // linear search may well work here;  n < 8.
+
+    if( aTypeString.empty() )
+      {
+	theType = NONE;
+      }
+    else if( aTypeString == EntityTypeStringOfVariable() )
       {
 	theType = VARIABLE;
       }
-    else if( typestring == EntityTypeStringOfProcess() )
+    else if( aTypeString == EntityTypeStringOfProcess() )
       {
 	theType = PROCESS;
       }
-    else if( typestring == EntityTypeStringOfSystem() )
+    else if( aTypeString == EntityTypeStringOfSystem() )
       {
 	theType = SYSTEM;
       }
-    else if( typestring == EntityTypeStringOfEntity() )
+    else if( aTypeString == EntityTypeStringOfEntity() )
       {
 	theType = ENTITY;
       }
     else
       {
 	THROW_EXCEPTION( InvalidEntityType,
-			 "can't convert typestring [" + typestring
+			 "Can not convert the typestring [" + aTypeString
 			 + "] to EntityType." );
       }
   }

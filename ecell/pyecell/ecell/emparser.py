@@ -30,20 +30,18 @@ reserved = (
 #    '(', ')', '{', '}', '[', ']'
 )
 
-# List of tlen names.
+# List of token names.
 tokens = reserved + (
 	'Stepper',
 	'System',
 	'Variable',
 	'Process',
 	'number',
-	'name',
+	'identifier',
+	'fullid',
+	'systempath',
 	'quotedstring',
 	'quotedstrings',
-	'control',
-	'comment',
-	'nl',
-	'whitespace',
 	# Delimeters ( ) [ ] { } ;
 	'LPAREN', 'RPAREN',
 	'LBRACKET', 'RBRACKET',
@@ -97,8 +95,16 @@ def t_number(t):
 	#t.value = Token( 'number', t.value )
 	return t
 
-def t_name(t):
-	r'[a-zA-Z_/][\w\:\/.]*'
+def t_fullid(t):
+	r'[a-zA-Z]*:[\w/\.]*:\w*'
+	return t
+
+def t_identifier(t):
+	r'[a-zA-Z_][a-zA-Z0-9_]*'
+	return t
+
+def t_systempath(t):
+	r'[a-zA-Z_/\.][\w/\.]*'
 	return t
 
 def t_quotedstrings(t):
@@ -112,7 +118,7 @@ def t_quotedstring(t):
 	return t
 
 def t_control(t):
-	r' \%line [^\n]*\n '
+	r' ^\%line [^\n]*\n '
 	seq = t.value.split()
 	t.lineno = int(seq[1])
 	t.lexer.filename = seq[2]
@@ -148,9 +154,10 @@ def t_error(t):
 
 # Parsing rules
 
+# may be wrong..
 precedence = (
-	('left', 'stmts', 'stmt' ),
-	('right', 'property', 'quotedstrings')
+	( 'right', 'Variable', 'Process', 'System', 'Stepper' ),
+	( 'left', 'identifier' )
 	)
 
 def p_stmts(t):
@@ -167,30 +174,31 @@ def p_stmt(t):
              | system_stmt
 	     | ecs
         '''
+
 	t[0] = t[1]
     
 def p_stepper_stmt(t):
 	'''
-	stepper_stmt : stepper_object_decl LBRACE propertylist RBRACE
+	stepper_stmt : stepper_decl LBRACE propertylist RBRACE
 	'''
 	t[0] = t[1], t[3]
     
 def p_system_stmt(t):
 	'''
-	system_stmt : system_object_decl LBRACE property_entity_list RBRACE
+	system_stmt : system_decl LBRACE property_entity_list RBRACE
 	'''
 	t[0] = t[1], t[3]
 
 def p_entity_other_stmt (t):
 	'''
-	entity_other_stmt : entity_other_object_decl LBRACE propertylist RBRACE
+	entity_other_stmt : entity_other_decl LBRACE propertylist RBRACE
         '''
 	t[0] = t[1], t[3]
 
 # ecs support
 def p_ecs(t):
 	'''
-	ecs : name valuelist SEMI
+	ecs : fullid valuelist SEMI
 	'''
 	aFullPN = createFullPN( t[1] )
 	aPropertyName = aFullPN[3]
@@ -216,6 +224,16 @@ def p_object_decl(t):
 	else:
 		t[0] = t[1], t[3]
 
+def p_system_object_decl(t):
+	'''
+	system_object_decl : name LPAREN systempath RPAREN 
+	                   | name LPAREN systempath RPAREN info
+	'''
+	if len(t.slice) == 6:
+		t[0] = t[1], t[3], t[5]
+	else:
+		t[0] = t[1], t[3]
+
 def p_info(t):
 	'''
 	info : quotedstrings
@@ -223,9 +241,9 @@ def p_info(t):
 	'''
 	t[0] = t[1]
 
-def p_stepper_object_decl(t):
+def p_stepper_decl(t):
 	'''
-	stepper_object_decl : Stepper object_decl
+	stepper_decl : Stepper object_decl
 	'''
 	t.type = t[1]
 	t.classname = t[2][0]
@@ -236,9 +254,9 @@ def p_stepper_object_decl(t):
 	
 	t[0] = t[1], t[2]
 	
-def p_system_object_decl(t):
+def p_system_decl(t):
 	'''
-	system_object_decl : System object_decl
+	system_decl : System system_object_decl
 	'''
 	t.type = t[1]
 	t.classname = t[2][0]
@@ -250,10 +268,10 @@ def p_system_object_decl(t):
 	
 	t[0] = t[1], t[2]
 	
-def p_entity_other_object_decl (t):
+def p_entity_other_decl (t):
 	'''
-	entity_other_object_decl : Variable object_decl
-                                 | Process object_decl
+	entity_other_decl : Variable object_decl
+                          | Process object_decl
         '''
 	t.type = t[1]
 	t.classname = t[2][0]
@@ -312,8 +330,8 @@ def p_property_entity(t):
 def p_value(t):
 	'''
 	value : quotedstring
-              | name
               | number
+	      | string
 	      | LBRACKET valuelist RBRACKET
 	      | quotedstrings
         '''
@@ -321,7 +339,7 @@ def p_value(t):
 		t[0] = t[2]
 	else:
 		t[0] = t[1]
-        
+
 def p_valuelist(t):
         '''
         valuelist : valuelist value
@@ -329,6 +347,25 @@ def p_valuelist(t):
         '''
 	t[0] =  createListleft( t )
 	
+
+def p_string(t):
+	'''
+	string : name
+	       | fullid
+	       | systempath
+        '''
+	t[0] = t[1]
+
+def p_name(t):
+	'''
+	name : identifier
+	     | Variable
+             | Process
+ 	     | System
+  	     | Stepper
+	'''
+	t[0] = t[1]
+
 def p_empty(t):
 	'''
 	empty :
@@ -386,7 +423,7 @@ def patchEm2Eml( anEmlObject, anEmFileObject, debug=0 ):
 	
 	# Build the lexer
 	aLexer = lex.lex(lextab="emlextab")
-
+	aLexer.filename = 'undefined'
         # Tokenizen test..
         #while debug == 1:
 			

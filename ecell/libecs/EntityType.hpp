@@ -56,8 +56,9 @@ namespace libecs
     
     enum Type
       {
+	NONE      = 0,
 	ENTITY    = 1,
-	VARIABLE = 2,
+	VARIABLE  = 2,
 	PROCESS   = 3,
 	SYSTEM    = 4
       };
@@ -82,8 +83,9 @@ namespace libecs
 
     EntityType()
       :
-      theType( ENTITY )
+      theType( NONE )
     {
+      ; // do nothing
     }
 
       

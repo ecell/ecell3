@@ -11,7 +11,7 @@ Stepper FixedODE1Stepper( DE1 )
 System CompartmentSystem( / )
 {
 	StepperID	DE1;
-
+	ariable Variable;
 	Variable Variable( SIZE )
 	{
 		Value	1e-18;
@@ -34,12 +34,13 @@ System CompartmentSystem( / )
 	
 	Process MichaelisUniUniProcess( E )
 	{
-		VariableReferenceList	[ S0 Variable:.:S -1 ]
- 					 [ P0 Variable:.:P 1 ]
-					 [ C0 Variable:.:E 0 ];
+		VariableReferenceList	[ S0 :.:S -1 ]
+ 					[ P0 :.:P 1 ]
+					[ C0 :.:E 0 ];
 		KmS	1;
 		KcF	10;
 	}
+
 	
 }
 
