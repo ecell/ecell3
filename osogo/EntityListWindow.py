@@ -3,6 +3,7 @@
 from OsogoWindow import *
 from PluginInstanceSelection import *
 from FullPNQueue import *
+from ecell.ModelWalker import *
 
 import gtk
 from ecell.ecssupport import *
@@ -64,6 +65,9 @@ class EntityListWindow(OsogoWindow):
             self.thePluginManager = session.thePluginManager
 
         self.thePluginInstanceSelection = None
+        
+        self.theModelWalker = ModelWalker( session.theSimulator )
+        
 
     def openWindow( self ):
 
@@ -83,7 +87,7 @@ class EntityListWindow(OsogoWindow):
             'on_variable_tree_button_press_event': self.popupMenu,\
             'on_process_tree_button_press_event': self.popupMenu,\
             # search 
-            'on_search_button_released': self.pushSearchButton,\
+            'on_search_button_clicked': self.pushSearchButton,\
             'on_search_entry_key_press_event':\
             self.keypressOnSearchEntry,\
             } )
@@ -1202,9 +1206,34 @@ class EntityListWindow(OsogoWindow):
         """search Entities
         Returns None
         """
-        self.searchString = self['search_entry'].get_text()
+        searchString = self['search_entry'].get_text()
+        # set modelwalker to current selection
+        aFullPNList = self.theQueue.getActualFullPNList()
+        if len(aFullPNList) == 0:
+            aFullID = [ SYSTEM, '', '/' ]
+        else:
+            aFullID = convertFullPNToFullID( aFullPNList[0] )
 
-        self.reconstructLists()
+        self.theModelWalker.moveTo( aFullID )
+        aFullIDString = createFullIDString( aFullID )
+
+        nextFullID = self.theModelWalker.getNextFullID()
+        while True:
+            if nextFullID == None:
+                self.theModelWalker.reset()
+                nextFullID = self.theModelWalker.getCurrentFullID()
+            if aFullIDString == createFullIDString( nextFullID ):
+                aDialog = ConfirmWindow( OK_MODE, 
+                                        "Search string %s not found."%searchString, 
+                                        "Search failed" )
+                return
+    
+            if nextFullID[ID].find( searchString ) != -1:
+                # select
+                newFullPNList = [ convertFullIDToFullPN( nextFullID ) ]
+                self.theQueue.pushFullPNList( newFullPNList )
+                return
+            nextFullID = self.theModelWalker.getNextFullID()
 
 
     def pushSearchButton( self, *arg ):
