@@ -29,7 +29,7 @@ defineMethod( 'process', '''
   const Real E( C0.getVariable()->getConcentration() ); // Clb2
 
   //std::cout << "prev:" << prev;
-  std::cout << ", E:" << E;
+  //std::cout << ", E:" << E;
 
   if(prev > 0.3 && E <= 0.3)
   {
