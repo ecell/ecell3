@@ -108,7 +108,7 @@ namespace libecs
     virtual void clear();
     virtual void react();
     virtual void transit();
-    virtual void postern();
+    virtual void compute();
 
     void update();
     virtual const char* const className() const  { return "StepperLeader"; }
@@ -152,7 +152,7 @@ namespace libecs
     virtual void react() = 0;
     virtual void turn() {}
     virtual void transit() = 0;
-    virtual void postern() = 0;
+    virtual void compute() = 0;
 
     virtual void distributeIntegrator( IntegratorAllocatorPtr );
 
@@ -174,7 +174,7 @@ namespace libecs
     virtual void clear();
     virtual void react();
     virtual void transit();
-    virtual void postern();
+    virtual void compute();
 
     void setStepInterval( RealCref stepinterval );
     void calculateStepsPerSecond();
@@ -238,9 +238,9 @@ namespace libecs
       theOwner->transit();
     }
 
-    virtual void postern()
+    virtual void compute()
     {
-      theOwner->postern();
+      theOwner->compute();
     }
 
     virtual void initialize()

@@ -71,7 +71,7 @@ namespace libecs
     virtual void react();
     virtual void turn(); 
     virtual void transit();
-    virtual void postern();
+    virtual void compute();
 
     virtual const char* const className() const { return "System"; }
 

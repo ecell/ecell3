@@ -282,7 +282,7 @@ namespace libecs
     updateVolume();
   }
 
-  void System::postern()
+  void System::compute()
   {
     for( ReactorMapConstIterator i( getFirstReactorIterator() ); 
 	 i != getFirstRegularReactorIterator() ; ++i )

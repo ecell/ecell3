@@ -178,13 +178,13 @@ namespace libecs
       }
   }
 
-  void MasterStepper::postern()
+  void MasterStepper::compute()
   {
-    theOwner->postern();
+    theOwner->compute();
     for( StepperVectorIterator i( theSlaveStepperVector.begin() ); 
 	 i != theSlaveStepperVector.end() ; ++i )
       {
-	(*i)->postern();
+	(*i)->compute();
       }
   }
 
@@ -220,7 +220,7 @@ namespace libecs
     clear();
     react();
     transit();
-    postern();
+    compute();
 
     theCurrentTime += theStepInterval;
   }
@@ -252,12 +252,12 @@ namespace libecs
       }
   }
 
-  void StepperLeader::postern()
+  void StepperLeader::compute()
   {
     for( StepperVector::iterator i( theMasterStepperVector.begin() );
 	 i != theMasterStepperVector.end(); ++i )
       {
-	(*i)->postern();
+	(*i)->compute();
       }
   }
 
@@ -268,7 +268,7 @@ namespace libecs
 	for ( StepperVector::iterator i( theMasterStepperVector.begin() );
 	     i != theMasterStepperVector.end(); ++i )
 	  {
-	    (*i)->postern();
+	    (*i)->compute();
 	  }
       }
   }
