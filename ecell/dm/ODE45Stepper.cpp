@@ -39,7 +39,8 @@ namespace libecs
 
   ODE45Stepper::ODE45Stepper()
     :
-    theInterrupted( true )
+    theInterrupted( true ),
+    theStiffness( 1.0 )
   {
     ; // do nothing
   }
@@ -211,12 +212,15 @@ namespace libecs
 	// get k5
 	theK5[ c ] = aVariable->getVelocity();
 
-	aVariable->loadValue( ( theK1[ c ] * ( 9017.0 / 3168.0 ) 
-				- theK2[ c ] * ( 355.0 / 33.0 )
-				+ theK3[ c ] * ( 46732.0 / 5247.0 )
-				+ theK4[ c ] * ( 49.0 / 176.0 )
-				- theK5[ c ] * ( 5103.0 / 18656.0 ) )
-			      * getStepInterval()
+	// temporarily set Y^6
+	theMidVelocityBuffer[ c ] 
+	  = theK1[ c ] * ( 9017.0 / 3168.0 ) 
+	  - theK2[ c ] * ( 355.0 / 33.0 )
+	  + theK3[ c ] * ( 46732.0 / 5247.0 )
+	  + theK4[ c ] * ( 49.0 / 176.0 )
+	  - theK5[ c ] * ( 5103.0 / 18656.0 );
+ 
+	aVariable->loadValue( theMidVelocityBuffer[ c ] * getStepInterval()
 			      + theValueBuffer[ c ] );
 
 	// clear velocity
@@ -224,6 +228,11 @@ namespace libecs
       }
 
     // ========= 6 ===========
+
+    // estimate stiffness
+    Real aDenominator( 0.0 );
+    Real aLipschitzConstant( 0.0 );
+
     setCurrentTime( aCurrentTime + getStepInterval() );
     interIntegrate();
     fireProcesses();
@@ -235,13 +244,19 @@ namespace libecs
 	// get k6
 	theK6[ c ] = aVariable->getVelocity();
 
-	aVariable->loadValue( ( theK1[ c ] * ( 35.0 / 384.0 ) 
-				// + theK2[ c ] * 0.0
-				+ theK3[ c ] * ( 500.0 / 1113.0 )
-				+ theK4[ c ] * ( 125.0 / 192.0 )
-				- theK5[ c ] * ( 2187.0 / 6784.0 )
-				+ theK6[ c ] * ( 11.0 / 84.0 ) )
-			      * getStepInterval()
+	theVelocityBuffer[ c ] 
+	  = theK1[ c ] * ( 35.0 / 384.0 )
+	  // + theK2[ c ] * 0.0
+	  + theK3[ c ] * ( 500.0 / 1113.0 )
+	  + theK4[ c ] * ( 125.0 / 192.0 )
+	  + theK5[ c ] * ( -2187.0 / 6784.0 )
+	  + theK6[ c ] * ( 11.0 / 84.0 );
+
+	aDenominator
+	  += ( theVelocityBuffer[ c ] - theMidVelocityBuffer[ c ] )
+	  * ( theVelocityBuffer[ c ] - theMidVelocityBuffer[ c ] );
+
+	aVariable->loadValue( theVelocityBuffer[ c ] * getStepInterval()
 			      + theValueBuffer[ c ] );
 
 	// clear velocity
@@ -255,7 +270,7 @@ namespace libecs
 
     // evaluate error
     Real maxError( 0.0 );
-	
+
     for( VariableVector::size_type c( 0 ); c < aSize; ++c )
       {
 	VariablePtr const aVariable( theVariableVector[ c ] );
@@ -278,12 +293,8 @@ namespace libecs
 // 				     + theK6[ c ] * ( 44.0 / 1575.0 )
 // 				     + theK7[ c ] * ( -1.0 / 60.0 ) );
 
-	theVelocityBuffer[ c ] 
-	  = theK1[ c ] * ( 35.0 / 384.0 )
-	  + theK3[ c ] * ( 500.0 / 1113.0 )
-	  + theK4[ c ] * ( 125.0 / 192.0 )
-	  + theK5[ c ] * ( -2187.0 / 6784.0 )
-	  + theK6[ c ] * ( 11.0 / 84.0 );
+	aLipschitzConstant 
+	  += ( theK7[ c ] - theK6[ c ] ) * ( theK7[ c ] - theK6[ c ] );
 
 	// calculate velocity for Xn+.5
 	theMidVelocityBuffer[ c ] 
@@ -308,6 +319,13 @@ namespace libecs
 	
 	aVariable->setVelocity( theVelocityBuffer[ c ] );
       }
+
+    aLipschitzConstant /= aDenominator;
+    aLipschitzConstant  = sqrt( aLipschitzConstant );
+    setStiffness( aLipschitzConstant / 3.3 );
+
+    //    std::cout << getCurrentTime() << "\t"
+    //	      << getStiffness() << std::endl;
 
     resetAll(); // reset all value
 

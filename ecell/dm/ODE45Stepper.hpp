@@ -148,6 +148,8 @@ public:
   LIBECS_DM_OBJECT( ODE45Stepper, Stepper )
     {
       INHERIT_PROPERTIES( AdaptiveDifferentialStepper );
+
+      PROPERTYSLOT_GET_NO_LOAD_SAVE( Real, Stiffness );
     }
 
   ODE45Stepper();
@@ -177,6 +179,16 @@ public:
     return theK7;
   }
 
+  GET_METHOD( Real, Stiffness )
+  {
+    return theStiffness;
+  }
+
+  SET_METHOD( Real, Stiffness )
+  {
+    theStiffness = value;
+  }
+
 protected:
 
   //    RealVector theK1;
@@ -190,6 +202,9 @@ protected:
   RealVector theMidVelocityBuffer;
 
   bool theInterrupted;
+
+  Real       theStiffness;
+
 };
 
 #endif /* __DORMANDPRINCE547M_HPP */
