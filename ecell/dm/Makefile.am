@@ -48,7 +48,9 @@ PythonFluxProcess.cpp\
 PythonProcess.cpp\
 ExpressionFluxProcess.cpp
 
-DMH = CashKarp45Stepper.hpp\
+DMH = \
+ESSYNSProcess.hpp\
+CashKarp45Stepper.hpp\
 PythonFluxProcess.hpp\
 PythonProcess.hpp\
 PythonProcessBase.hpp\

@@ -11,8 +11,6 @@
 
 #include "ESSYNSProcess.hpp"
 
-using namespace std;
-
 USE_LIBECS;
 
 LIBECS_DM_CLASS( GMAProcess, ESSYNSProcess )
@@ -56,7 +54,7 @@ LIBECS_DM_CLASS( GMAProcess, ESSYNSProcess )
       ;
     }
 
-  const vector<RealVector>& getESSYNSMatrix();
+  const std::vector<RealVector>& getESSYNSMatrix();
 
   Int getSystemSize()
   {
@@ -77,17 +75,17 @@ LIBECS_DM_CLASS( GMAProcess, ESSYNSProcess )
   Polymorph GMASystemMatrix;
   
   // State variables in log space
-  vector< RealVector > theY;
+  std::vector< RealVector > theY;
   
   // GMA-System vectors
-  vector< RealVector > theAlpha;
+  std::vector< RealVector > theAlpha;
 
-  vector< vector< RealVector > > theG;
+  std::vector< std::vector< RealVector > > theG;
   
   // tmp GMA-System vectors
-  vector< vector< RealVector > > theAlphaBuffer;
-  vector< vector< RealVector > > theGBuffer;
-  vector< RealVector > theFBuffer;
+  std::vector< std::vector< RealVector > > theAlphaBuffer;
+  std::vector< std::vector< RealVector > > theGBuffer;
+  std::vector< RealVector > theFBuffer;
   
 };
 
@@ -245,7 +243,7 @@ void GMAProcess::setGMASystemMatrix( PolymorphCref aValue )
     }
 }
 
-const vector<RealVector>& GMAProcess::getESSYNSMatrix()
+const std::vector<RealVector>& GMAProcess::getESSYNSMatrix()
 {
   // get theY
   Int anIndex( 0 );

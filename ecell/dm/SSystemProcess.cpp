@@ -15,8 +15,6 @@
 
 #include "ESSYNSProcess.hpp"
 
-using namespace std;
-
 USE_LIBECS;
 
 namespace libecs
@@ -64,7 +62,7 @@ LIBECS_DM_CLASS( SSystemProcess, ESSYNSProcess )
       ;
     }  
 
-  const vector<RealVector>& getESSYNSMatrix();
+  const std::vector<RealVector>& getESSYNSMatrix();
   
   Int getSystemSize()
     {
@@ -85,21 +83,21 @@ LIBECS_DM_CLASS( SSystemProcess, ESSYNSProcess )
   Polymorph SSystemMatrix;
   
   // State variables in log space
-  vector< RealVector > theY;
+  std::vector< RealVector > theY;
   
   // S-System vectors
   RealVector theAlpha;
   RealVector theBeta;
 
-  vector< RealVector > theG;
-  vector< RealVector > theH;
+  std::vector< RealVector > theG;
+  std::vector< RealVector > theH;
   
   // tmp S-System vectors
-  vector< RealVector > theAlphaBuffer;
-  vector< RealVector > theBetaBuffer;
-  vector< RealVector > theGBuffer;
-  vector< RealVector > theHBuffer;
-  vector< RealVector > theFBuffer;
+  std::vector< RealVector > theAlphaBuffer;
+  std::vector< RealVector > theBetaBuffer;
+  std::vector< RealVector > theGBuffer;
+  std::vector< RealVector > theHBuffer;
+  std::vector< RealVector > theFBuffer;
   
 };
 
@@ -240,7 +238,7 @@ void SSystemProcess::setSSystemMatrix( PolymorphCref aValue )
     }
 }
 
-const vector<RealVector>& SSystemProcess::getESSYNSMatrix()
+const std::vector<RealVector>& SSystemProcess::getESSYNSMatrix()
 {
   //get theY
   Int anIndex = 0;

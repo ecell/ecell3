@@ -4,14 +4,7 @@
 #include <vector>
 
 #include "libecs.hpp"
-#include "System.hpp"
-#include "Variable.hpp"
-#include "Stepper.hpp"
 #include "Process.hpp"
-#include "Util.hpp"
-#include "PropertyInterface.hpp"
-
-using namespace std;
 
 namespace libecs
 {
@@ -46,7 +39,7 @@ namespace libecs
 	;
       }
     
-    virtual const vector<RealVector>& getESSYNSMatrix() = 0;
+    virtual const std::vector<RealVector>& getESSYNSMatrix() = 0;
 
     virtual Int getSystemSize() = 0;
     
@@ -54,6 +47,7 @@ namespace libecs
 
   };
 
+  LIBECS_DM_INIT_STATIC( ESSYNSProcess, Process );
 }
 
 #endif /* __ESSYNSPROCESS_HPP */

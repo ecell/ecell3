@@ -87,7 +87,7 @@ protected:
   Int theSystemSize;
   Int theTaylorOrder;
   ESSYNSProcessPtr   theESSYNSProcessPtr;
-  vector<RealVector> theESSYNSMatrix;
+  std::vector<RealVector> theESSYNSMatrix;
 
 
   //  RealVector theK1;
