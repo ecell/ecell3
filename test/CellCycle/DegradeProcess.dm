@@ -15,6 +15,6 @@ defineMethod( 'process', '''
   Real S( S0.getVariable()->getConcentration() );
   Real V( kd * S * getSuperSystem()->getVolume() * N_A );
 
-  process( V );
+  setFlux( V );
 ''' )
 

@@ -15,5 +15,5 @@ defineMethod( 'process', '''
   Real V( vs * KI );
   V /= KI + (E * E * E);
   V *= 1E-018 * N_A;
-  process( V );
+  setFlux( V );
 ''' )

@@ -17,5 +17,5 @@ defineMethod( 'process', '''
   V /= K3 + E;
   V *= 1E-018 * N_A;
 
-  process( V );
+  setFlux( V );
 ''' )

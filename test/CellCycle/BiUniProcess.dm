@@ -20,7 +20,7 @@ defineMethod( 'process', '''
 
   V *= getSuperSystem()->getVolume() * N_A;
 
-  process( V );
+  setFlux( V );
 ''' )
 
 

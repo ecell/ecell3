@@ -40,6 +40,6 @@ defineMethod( 'process', '''
   V *= S0.getVariable()->getConcentration();
   V *= getSuperSystem()->getVolume() * N_A;
 
-  process( V );
+  setFlux( V );
 ''' )
 

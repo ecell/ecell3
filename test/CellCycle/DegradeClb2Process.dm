@@ -26,6 +26,6 @@ defineMethod( 'process', '''
   Real V( v * S );
   V *= getSuperSystem()->getVolume() * N_A;
 
-  process( V );
+  setFlux( V );
 ''' )
 

@@ -20,5 +20,5 @@ defineMethod( 'process', '''
   velocity *= S;
   velocity /= ( KmS + S );
 
-  process( velocity );
+  setFlux( velocity );
 ''' )

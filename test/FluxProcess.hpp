@@ -35,7 +35,7 @@ namespace libecs
 
     }
 
-    void process( RealCref velocity )
+    void setFlux( RealCref velocity )
     {
       Real aVelocity( velocity );
 
