@@ -160,7 +160,8 @@ namespace libecs
   DECLARE_TYPE( double, HighReal );
 #endif /* defined( HAVE_LONG_DOUBLE ) */
     
-  DECLARE_TYPE( HighReal, Time );
+  //  DECLARE_TYPE( HighReal, Time );
+  DECLARE_TYPE( Real, Time );
     
 
   //! Avogadro number. 
