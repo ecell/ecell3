@@ -33,13 +33,15 @@ class EntityListWindow(OsogoWindow):
 			      'Classname',\
 			      'Path' )
 
-	def __init__( self, aSession ):
+	def __init__( self, aSession, rootWidget ):
 		'''Constructor
 		aSession   --   a reference to GtkSessionMonitor
 		'''
 		
-		# call superclass's constructor 
-		OsogoWindow.__init__( self, aSession )
+		# calls superclass's constructor 
+		OsogoWindow.__init__( self, aSession, rootWidget=rootWidget )
+
+		self.theSession = aSession
 		
 		# initialize parameters
 		self.theSelectedFullPNList = []
@@ -325,12 +327,14 @@ class EntityListWindow(OsogoWindow):
 			aMenuItem.connect('activate', self.createPluginWindow )
 			aMenuItem.set_name( aPluginWindowType )
 			if aPluginWindowType == DEFAULT_WINDOW:
-				self['EntityPopupMenu'].prepend( aMenuItem )
+				pass
+#				self['EntityPopupMenu'].prepend( aMenuItem )
 			else:
-				self['EntityPopupMenu'].append( aMenuItem )
+				pass
+#				self['EntityPopupMenu'].append( aMenuItem )
 
 		# appends separator
-		self['EntityPopupMenu'].append( gtk.MenuItem() )
+#		self['EntityPopupMenu'].append( gtk.MenuItem() )
 
 		# ------------------------------------------
 		# menus for Logger
@@ -340,10 +344,10 @@ class EntityListWindow(OsogoWindow):
 		aMenuItem = gtk.MenuItem( aLogMenuString )
 		aMenuItem.connect('activate', self.createLogger )
 		aMenuItem.set_name( aLogMenuString )
-		self['EntityPopupMenu'].append( aMenuItem )
+#		self['EntityPopupMenu'].append( aMenuItem )
 
 		# appends separator
-		self['EntityPopupMenu'].append( gtk.MenuItem() )
+#		self['EntityPopupMenu'].append( gtk.MenuItem() )
 
 		# ------------------------------------------
 		# menus for Bord
@@ -364,11 +368,11 @@ class EntityListWindow(OsogoWindow):
 		aMenuItem = gtk.MenuItem( aMenuString )
 		aMenuItem.set_name( aLogMenuString )
 		aMenuItem.set_submenu( aSubMenu )
-		self['EntityPopupMenu'].append( aMenuItem )
+#		self['EntityPopupMenu'].append( aMenuItem )
 		self.theBoardMenu = aMenuItem
 
 		# appends separator
-		self['EntityPopupMenu'].append( gtk.MenuItem() )
+#		self['EntityPopupMenu'].append( gtk.MenuItem() )
 
 		# ------------------------------------------
 		# menus for submenu
