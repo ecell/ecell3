@@ -34,7 +34,6 @@ Plugin.py\
 util.py\
 eml.py\
 em.py\
-spark.py\
 TableIO.py\
 emparser.py\
 lex.py\
