@@ -148,8 +148,8 @@ if [ $DO_ALL ] ; then
     
     run_command "cp $inputfile $ETTMPDIR"
     run_command "pushd $ETTMPDIR"
-    echo "$DMGEN &CLASS -d $inputfile > $base.cpp"
-    run_command "$DMGEN &CLASS -d $inputfile > $base.cpp"
+    echo "$DMGEN $CLASS -d $inputfile > $base.cpp"
+    run_command "$DMGEN $CLASS -d $inputfile > $base.cpp"
     run_command "popd"
     run_command "$DMCOMPILE $base.cpp -I $ECELL_INCLUDE -I $EMTOOL_INCLUDE -I. -I.." 
 
