@@ -1,6 +1,6 @@
 
 # created by eml2em program
-# from file: tyson.eml, date: Tue Oct 15 01:53:02 2002
+# from file: tyson.eml, date: Wed Oct 16 21:22:08 2002
 #
 
 Stepper Euler1Stepper( SRM_01 )
@@ -37,117 +37,117 @@ System System( /CELL/CYTOPLASM )
 	StepperID	SRM_01;
 	Volume	1e-18;
 
-	Variable Variable( Cln2 )
+	Variable PositiveVariable( Cln2 )
 	{
 		Value	0;
 	}
 	
-	Variable Variable( Clb2 )
+	Variable PositiveVariable( Clb2 )
 	{
 		Value	828044;
 	}
 	
-	Variable Variable( Clb2t )
+	Variable PositiveVariable( Clb2t )
 	{
 		Value	828044;
 	}
 	
-	Variable Variable( Clb5 )
+	Variable PositiveVariable( Clb5 )
 	{
 		Value	48177;
 	}
 	
-	Variable Variable( Clb5t )
+	Variable PositiveVariable( Clb5t )
 	{
 		Value	48177;
 	}
 	
-	Variable Variable( Cln3 )
+	Variable PositiveVariable( Cln3 )
 	{
 		Value	0;
 	}
 	
-	Variable Variable( Sic1 )
+	Variable PositiveVariable( Sic1 )
 	{
 		Value	0;
 	}
 	
-	Variable Variable( Sic1t )
+	Variable PositiveVariable( Sic1t )
 	{
 		Value	0;
 	}
 	
-	Variable Variable( Swi5 )
+	Variable PositiveVariable( Swi5 )
 	{
 		Value	0;
 	}
 	
-	Variable Variable( Clb2Sic1 )
+	Variable PositiveVariable( Clb2Sic1 )
 	{
 		Value	0;
 	}
 	
-	Variable Variable( Clb5Sic1 )
+	Variable PositiveVariable( Clb5Sic1 )
 	{
 		Value	0;
 	}
 	
-	Variable Variable( SBF )
+	Variable PositiveVariable( SBF )
 	{
 		Value	0;
 	}
 	
-	Variable Variable( MBF )
+	Variable PositiveVariable( MBF )
 	{
 		Value	0;
 	}
 	
-	Variable Variable( Mcm1 )
+	Variable PositiveVariable( Mcm1 )
 	{
 		Value	566081;
 	}
 	
-	Variable Variable( mass )
+	Variable PositiveVariable( mass )
 	{
 		Value	903321;
 	}
 	
-	Variable Variable( Bck2 )
+	Variable PositiveVariable( Bck2 )
 	{
 		Value	0;
 	}
 	
-	Variable Variable( ORI )
+	Variable PositiveVariable( ORI )
 	{
 		Value	0;
 	}
 	
-	Variable Variable( BUD )
+	Variable PositiveVariable( BUD )
 	{
 		Value	0;
 	}
 	
-	Variable Variable( SPN )
+	Variable PositiveVariable( SPN )
 	{
 		Value	578125;
 	}
 	
-	Variable Variable( Hct1t )
+	Variable PositiveVariable( Hct1t )
 	{
 		Value	602214;
 	}
 	
-	Variable Variable( Hct1a )
+	Variable PositiveVariable( Hct1a )
 	{
 		Value	0;
 	}
 	
-	Variable Variable( Cdc20t )
+	Variable PositiveVariable( Cdc20t )
 	{
 		Value	481771;
 	}
 	
-	Variable Variable( Cdc20a )
+	Variable PositiveVariable( Cdc20a )
 	{
 		Value	46370;
 	}
@@ -194,14 +194,14 @@ System System( /CELL/CYTOPLASM )
 		k2	0.25;
 	}
 	
-	Process Bck2PProcess( !Bck )
+	Process Bck2PProcess( Bck )
 	{
 		Priority	-1;
 		VariableReferenceList	[ P0 Variable:/CELL/CYTOPLASM:Bck2 1 ] [ C0 Variable:/CELL/CYTOPLASM:mass 0 ];
 		Bck2	0.0027;
 	}
 	
-	Process Cln3PProcess( !Cln3cal )
+	Process Cln3PProcess( Cln3cal )
 	{
 		Priority	-1;
 		VariableReferenceList	[ P0 Variable:/CELL/CYTOPLASM:Cln3 1 ] [ C0 Variable:/CELL/CYTOPLASM:mass 0 ];
@@ -344,6 +344,7 @@ System System( /CELL/CYTOPLASM )
 	
 	Process Hct1InactivateProcess( Hct1ina )
 	{
+		Priority	1;
 		VariableReferenceList	[ S0 Variable:/CELL/CYTOPLASM:Hct1a -1 ] [ C0 Variable:/CELL/CYTOPLASM:Cln3 0 ] [ C1 Variable:/CELL/CYTOPLASM:Cln2 0 ] [ C2 Variable:/CELL/CYTOPLASM:Clb5 0 ] [ C3 Variable:/CELL/CYTOPLASM:Clb2 0 ];
 		k1	0;
 		k2	0.64;
@@ -391,7 +392,7 @@ System System( /CELL/CYTOPLASM )
 		kd	0.06;
 	}
 	
-	Process SBFcalcPProcess2( !SBF )
+	Process SBFcalcPProcess2( SBF )
 	{
 		Priority	-1;
 		VariableReferenceList	[ P0 Variable:/CELL/CYTOPLASM:SBF 1 ] [ C0 Variable:/CELL/CYTOPLASM:Cln2 0 ] [ C1 Variable:/CELL/CYTOPLASM:Cln3 0 ] [ C2 Variable:/CELL/CYTOPLASM:Bck2 0 ] [ C3 Variable:/CELL/CYTOPLASM:Clb5 0 ] [ C4 Variable:/CELL/CYTOPLASM:Clb2 0 ];
@@ -404,7 +405,7 @@ System System( /CELL/CYTOPLASM )
 		J2	0.01;
 	}
 	
-	Process SBFcalcPProcess2( !MBF )
+	Process SBFcalcPProcess2( MBF )
 	{
 		Priority	-1;
 		VariableReferenceList	[ P0 Variable:/CELL/CYTOPLASM:MBF 1 ] [ C0 Variable:/CELL/CYTOPLASM:Cln2 0 ] [ C1 Variable:/CELL/CYTOPLASM:Cln3 0 ] [ C2 Variable:/CELL/CYTOPLASM:Bck2 0 ] [ C3 Variable:/CELL/CYTOPLASM:Clb5 0 ] [ C4 Variable:/CELL/CYTOPLASM:Clb2 0 ];
@@ -417,7 +418,7 @@ System System( /CELL/CYTOPLASM )
 		J2	0.01;
 	}
 	
-	Process Mcm1calcPProcess( !Mcm1 )
+	Process Mcm1calcPProcess( Mcm1 )
 	{
 		Priority	-1;
 		VariableReferenceList	[ P0 Variable:/CELL/CYTOPLASM:Mcm1 1 ] [ C0 Variable:/CELL/CYTOPLASM:Clb2 0 ];
@@ -427,7 +428,7 @@ System System( /CELL/CYTOPLASM )
 		J2	1;
 	}
 	
-	Process Swi5calcPProcess2( !Swi5 )
+	Process Swi5calcPProcess2( Swi5 )
 	{
 		Priority	-1;
 		VariableReferenceList	[ P0 Variable:/CELL/CYTOPLASM:Swi5 1 ] [ C0 Variable:/CELL/CYTOPLASM:Cdc20a 0 ] [ C1 Variable:/CELL/CYTOPLASM:Clb2 0 ];
@@ -438,32 +439,32 @@ System System( /CELL/CYTOPLASM )
 		J2	0.1;
 	}
 	
-	Process DivisionPProcess( !divide )
+	Process DivisionPProcess( divide )
 	{
 		Priority	-1;
 		VariableReferenceList	[ C0 Variable:/CELL/CYTOPLASM:Clb2 0 ] [ P0 Variable:/CELL/CYTOPLASM:mass 1 ] [ P1 Variable:/CELL/CYTOPLASM:BUD 1 ] [ P2 Variable:/CELL/CYTOPLASM:SPN 1 ];
 		m	0.005776;
 	}
 	
-	Process ORIPProcess( !ORIP )
+	Process ORIPProcess( ORIP )
 	{
 		Priority	-1;
 		VariableReferenceList	[ C0 Variable:/CELL/CYTOPLASM:Clb2 0 ] [ C1 Variable:/CELL/CYTOPLASM:Clb5 0 ] [ P0 Variable:/CELL/CYTOPLASM:ORI 1 ];
 	}
 	
-	Process TotalPProcess( !clb2total2 )
+	Process TotalPProcess( clb2total2 )
 	{
 		Priority	-1;
 		VariableReferenceList	[ P0 Variable:/CELL/CYTOPLASM:Clb2 1 ] [ C0 Variable:/CELL/CYTOPLASM:Clb2t 0 ] [ C1 Variable:/CELL/CYTOPLASM:Clb2Sic1 0 ];
 	}
 	
-	Process TotalPProcess( !clb5total2 )
+	Process TotalPProcess( clb5total2 )
 	{
 		Priority	-1;
 		VariableReferenceList	[ P0 Variable:/CELL/CYTOPLASM:Clb5 1 ] [ C0 Variable:/CELL/CYTOPLASM:Clb5t 0 ] [ C1 Variable:/CELL/CYTOPLASM:Clb5Sic1 0 ];
 	}
 	
-	Process Sic1TotalPProcess( !sic1total2 )
+	Process Sic1TotalPProcess( sic1total2 )
 	{
 		Priority	-1;
 		VariableReferenceList	[ P0 Variable:/CELL/CYTOPLASM:Sic1 1 ] [ C0 Variable:/CELL/CYTOPLASM:Sic1t 0 ] [ C1 Variable:/CELL/CYTOPLASM:Clb2Sic1 0 ] [ C2 Variable:/CELL/CYTOPLASM:Clb5Sic1 0 ];
