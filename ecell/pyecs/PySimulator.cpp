@@ -73,6 +73,7 @@ void PySimulator::init_type()
   add_varargs_method( "getProperty",    &PySimulator::getProperty );
   add_varargs_method( "step",          &PySimulator::step );
   add_varargs_method( "initialize",    &PySimulator::initialize );
+  add_varargs_method( "getLogger",    &PySimulator::getLogger );
 }
 
 Object PySimulator::step( const Py::Tuple& args )
@@ -180,6 +181,25 @@ Object PySimulator::initialize( const Py::Tuple& )
   Simulator::initialize();
 
   return Object();
+
+  ECS_CATCH;
+}
+
+
+Object PySimulator::getLogger( const Py::Tuple& args )
+{
+  ECS_TRY;
+  args.verify_length( 2 );
+  
+  const String aId( static_cast<Py::String>( args[0] ) );
+  const String aPropertyName( static_cast<Py::String>( args[1] ) );
+
+  const Logger* aLogger = Simulator::getLogger( aId, aPropertyName );
+
+  PyLogger pl;
+  pl.setLogger( aLogger );
+
+  return asObject(&pl);
 
   ECS_CATCH;
 }

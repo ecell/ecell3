@@ -24,60 +24,73 @@
 // 
 //END_HEADER
 //
-// written by Kouichi Takahashi <shafi@e-cell.org> at
+// written by Masayuki Okayama <smash@e-cell.org> at
 // E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
 
 
-#ifndef __LOCALSIMULATORIMPLEMENTATION_HPP
-#define __LOCALSIMULATORIMPLEMENTATION_HPP
+#ifndef __EMC_DATAPOINT_HPP
+#define __EMC_DATAPOINT_HPP
+
+
 
 #include "libecs/libecs.hpp"
-
-#include "SimulatorImplementation.hpp"
+#include "libecs/Defs.hpp"
+#include "libecs/CoreLinuxCompatibility.hpp"
+#include "libecs/DataPoint.hpp"
 
 namespace libemc
 {
 
-  class LocalSimulatorImplementation
-    :
-    public SimulatorImplementation
-  {
+  using namespace libecs;
 
+  class EmcDataPoint
+  {
   public:
 
-    LocalSimulatorImplementation();
-    virtual ~LocalSimulatorImplementation();
+    EmcDataPoint( void )
+    {
+      ; // do nothing
+    }
 
-    libecs::RootSystemRef getRootSystem() { return theRootSystem; }
-    libecs::LoggerBrokerRef getLoggerBroker() { return theLoggerBroker; }
+    EmcDataPoint( const DataPoint& dp )
+      :
+      theDataPoint( &dp )
+    {
+      ; // do nothing
+    }
 
-    void createEntity( libecs::StringCref classname, 
-		       libecs::FQPICref fqpi, 
-		       libecs::StringCref name );
+    virtual ~EmcDataPoint()
+    {
+      ;
+    }
 
-    void setProperty( libecs::FQPICref fqpi, 
-		      libecs::MessageCref message );
+    void setDataPoint( const DataPoint& dp )
+    {
+      theDataPoint = &dp;
+    }
 
-    const libecs::Message getProperty( libecs::FQPICref fqpi,
-				       libecs::StringCref propertyName );
+    const double& getTime() const
+    {
+      return theDataPoint->getTime();
+    }
 
-    void step();
+    const UniversalVariable& getValue() const
+    {
+      return theDataPoint->getValue();
+    }
 
-    void initialize();
+    const DataPoint& getDataPoint() const
+    {
+      return *theDataPoint;
+    }
 
-    libecs::LoggerCptr getLogger( libecs::StringCref id_name,
-				  libecs::StringCref propertyname );
 
   private:
+    const DataPoint* theDataPoint;
+  };
 
-    libecs::RootSystemRef     theRootSystem;
-    libecs::LoggerBrokerRef   theLoggerBroker;
-
-  };  
-
-
-} // namespace libemc
+}
 
 
-#endif   /* __LOCALSIMULATORIMPLEMENTATION_HPP */
+#endif

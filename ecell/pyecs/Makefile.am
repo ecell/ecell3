@@ -31,7 +31,7 @@ clean-local:
 	rm -f ${CXXSRC}
 
 noinst_LTLIBRARIES=ecs.la
-ecs_la_SOURCES=PyEcs.cpp PySimulator.cpp $(CXXSRC) 
+ecs_la_SOURCES=PyEcs.cpp PySimulator.cpp PyLogger.cpp $(CXXSRC) 
 ecs_la_LDFLAGS=-module -export-dynamic -avoid-version -rpath /usr/local/lib
 
 #FIXME: specifing .libs is ugly
@@ -51,4 +51,5 @@ clean-local:
 pyecsdir=${pkgincludedir}/pyecs
 pyecs_HEADERS=\
 PyEcs.hpp\
-PySimulator.hpp
+PySimulator.hpp\
+PyLogger.hpp

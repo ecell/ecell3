@@ -78,6 +78,12 @@ namespace libemc
       theSimulatorImplementation->initialize();
     }
 
+    libecs::LoggerCptr getLogger( libecs::StringCref id_name,
+				       libecs::StringCref propertyname )
+    {
+      return theSimulatorImplementation->getLogger( id_name, propertyname );
+    }
+
 
   private:
 

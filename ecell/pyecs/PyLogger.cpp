@@ -31,15 +31,25 @@
 
 #include "PyLogger.hpp"
 
-PyLogger::PyLogger( void )
+void PyDataPoint::init_type()
 {
-  ; // do nothing
+  behaviors().name("DataPoint");
+  behaviors().doc("DataPoint Python class");
+
+  add_varargs_method( "getTime", &PyDataPoint::getTime );
+  add_varargs_method( "getValue", &PyDataPoint::getValue );
 }
 
-PyLogger::PyLogger( MessageSlotObject aMessageSlot )
+Object PyDataPoint::getTime( const Tuple& args )
 {
-  EmcLogger::setMessageSlotClass( aMessageSlot );
+  return Py::Float( EmcDataPoint::getTime() );
 }
+  
+Object PyDataPoint::getValue( const Tuple& args )
+{
+  return Py::Float( EmcDataPoint::getValue().asReal() );
+}
+  
 
 void PyLogger::init_type()
 {
@@ -47,31 +57,47 @@ void PyLogger::init_type()
   behaviors().doc("Logger Python class");
 
   add_varargs_method( "getData", &PyLogger::getData );
-  add_varargs_method( "setMessageSlotClass", &PyLogger::setMessageSlotClass );
-  add_varargs_method( "update", &PyLogger::update );
 }
 
 Object PyLogger::getData( const Py::Tuple& args )
 {
   args.verify_length( 0, 3 );
+  Py::List aPyList;
+  libecs::Logger::DataPointVectorCptr aDataPointVector( NULLPTR );
+  switch( args.length() )
+    {
+    case 0:
+      aDataPointVector = &EmcLogger::getData();
+      for(int i = 0; i < aDataPointVector->size(); i++ )
+	{
+	  aPyList.
+	    append( asObject( new PyDataPoint( *(*aDataPointVector)[i] )
+			      )
+		    );
+	}
+      break;
+    case 2:
+      aDataPointVector = &EmcLogger::getData();
+      for(int i = 0; i < aDataPointVector->size(); i++ )
+	{
+	  aPyList.
+	    append( asObject( new PyDataPoint( *(*aDataPointVector)[i] )
+			      )
+		    );
+	}
+      break;
+    case 3:
+      aDataPointVector = &EmcLogger::getData();
+      for(int i = 0; i < aDataPointVector->size(); i++ )
+	{
+	  aPyList.
+	    append( asObject( new PyDataPoint( *(*aDataPointVector)[i] )
+			      )
+		    );
+	}
+      break;
+    }
 
-  // FIXME
-
-  return Py::Object();
+  return Py::Tuple( aPyList );
 }
-
-Object PyLogger::setMessageSlotClass( const Py::Tuple& args )
-{
-  // FIXME
-
-  return Py::Object();
-}
-
-Object PyLogger::update( const Py::Tuple& )
-{
-
-  EmcLogger::update();
-  return Py::Object();
-}
-
 

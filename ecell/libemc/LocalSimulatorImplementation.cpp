@@ -37,6 +37,7 @@
 #include "libecs/ReactorMaker.hpp"
 #include "libecs/SystemMaker.hpp"
 #include "libecs/Stepper.hpp"
+#include "libecs/LoggerBroker.hpp"
 
 #include "LocalSimulatorImplementation.hpp"
 
@@ -47,14 +48,16 @@ namespace libemc
 
   LocalSimulatorImplementation::LocalSimulatorImplementation()
     :
-    theRootSystem( *new RootSystem )
+    theRootSystem( *new RootSystem ),
+    theLoggerBroker( *new LoggerBroker( &theRootSystem ) )
   {
-    ; // do nothing
+    ;
   }
 
   LocalSimulatorImplementation::~LocalSimulatorImplementation()
   {
     delete &theRootSystem;
+    delete &theLoggerBroker;
   }
 
   void LocalSimulatorImplementation::createEntity( StringCref classname,
@@ -179,6 +182,14 @@ namespace libemc
   {
     theRootSystem.initialize();
   }
+
+  LoggerCptr LocalSimulatorImplementation::
+  getLogger( StringCref id_name,
+	     StringCref propertyname )
+  {
+    return theLoggerBroker.getLogger( id_name, propertyname );
+  }
+
 
 
 

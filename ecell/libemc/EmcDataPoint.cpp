@@ -2,7 +2,7 @@
 //
 //        This file is part of E-CELL Simulation Environment package
 //
-//                Copyright (C) 2000-2001 Keio University
+//                Copyright (C) 1996-2000 Keio University
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
@@ -28,15 +28,4 @@
 // E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
 
-#include "libecs/MessageInterface.hpp"
-
-#include "EmcLogger.hpp"
-#include "LocalLoggerImplementation.hpp"
-
-namespace libemc
-{
-
-  //do nothing
-
-} // namespace libemc
-
+#include "EmcDataPoint.hpp"

@@ -34,6 +34,7 @@
 
 #include "emc/Simulator.hpp"
 #include "CXX/Extensions.hxx"
+#include "PyLogger.hpp"
 
 using Py::Object;
 using Py::Tuple;
@@ -56,6 +57,7 @@ public:
   Object getProperty( const Tuple& args );
   Object step( const Tuple& args );
   Object initialize( const Tuple& args );
+  Object getLogger( const Tuple& args );
 
 };
 

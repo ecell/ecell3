@@ -67,6 +67,9 @@ namespace libemc
 
     virtual void initialize() = 0;
 
+    virtual libecs::LoggerCptr getLogger( libecs::StringCref,
+					  libecs::StringCref ) = 0;
+
   };   //end of class Simulator
 
 

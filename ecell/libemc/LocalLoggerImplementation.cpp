@@ -38,30 +38,26 @@ namespace libemc
   using namespace libecs;
 
   LocalLoggerImplementation::
-  LocalLoggerImplementation( MessageSlotObject aMessageSlot )
+  LocalLoggerImplementation( void )
     :
-    theLogger( Logger( aMessageSlot ) ) 
+    theLogger( Logger() ) 
   {
     ; // do nothing
   }
+
+  LocalLoggerImplementation::
+  LocalLoggerImplementation( LoggerCptr lptr )
+    :
+    theLogger( *lptr ) 
+  {
+    ; // do nothing
+  }
+
 
   LocalLoggerImplementation::~LocalLoggerImplementation( )
   {
     ;
   }
-
-  /*
-  void LocalLoggerImplementation::update( )
-  {
-    theLogger.update( );
-  }
-
-  void
-  LocalLoggerImplementation::update( Logger::containee_type& datapoint )
-  {
-    theLogger.update( datapoint );
-  }
-  */
 
   Logger::DataPointVectorCref
   LocalLoggerImplementation::getData( libecs::RealCref start,

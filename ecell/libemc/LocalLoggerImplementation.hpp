@@ -33,13 +33,14 @@
 #define       __LOCAL_LOGGER_IMPLEMENTATION_HPP
 
 #include "libecs/libecs.hpp"
+#include "libecs/Logger.hpp"
 
 #include "LoggerImplementation.hpp"
 
 namespace libemc
 {
 
-  typedef libecs::AbstractMessageSlotPtr MessageSlotObject;
+  typedef libecs::LoggerCptr LoggerCptr;
 
   class LocalLoggerImplementation
     :
@@ -48,7 +49,10 @@ namespace libemc
 
   public:
 
-    LocalLoggerImplementation( MessageSlotObject );
+    LocalLoggerImplementation( void );
+
+    LocalLoggerImplementation( LoggerCptr );
+
     virtual ~LocalLoggerImplementation( );
 
     libecs::Logger::DataPointVectorCref
@@ -63,17 +67,10 @@ namespace libemc
 	     libecs::RealCref end,
 	     libecs::RealCref interval ) const;
 
-
-    /*
-    void update( void );
-
-    void update( libecs::Logger::containee_type& datapoint );
-    */
-
   private:
 
-    libecs::Logger theLogger;
-					
+    const libecs::Logger theLogger;
+    
   };
 
 

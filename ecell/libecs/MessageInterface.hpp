@@ -224,7 +224,7 @@ namespace libecs
       return ( ( theObject.*theGetMethod )( keyword ));
     }
 
-    ProxyMessageSlot* getProxy( void )
+    virtual ProxyMessageSlot* getProxy( void )
     {
       return new ProxyMessageSlot( theProxy );
     }

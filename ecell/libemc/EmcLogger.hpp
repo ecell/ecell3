@@ -46,11 +46,12 @@ namespace libemc
   public:
 
     EmcLogger( void )
+      :
+      theLoggerImplementation( NULLPTR )
     {
-      theLoggerImplementation = 0;
+      ; // do nothing
     }
 
-    EmcLogger( MessageSlotObject );
     virtual ~EmcLogger( ) { }
 
     libecs::Logger::DataPointVectorCref
@@ -71,23 +72,11 @@ namespace libemc
       return theLoggerImplementation->getData( start, end, interval );
     }
 
-    void setMessageSlotClass( MessageSlotObject aMessageSlotClass )
+    void setLogger( LoggerCptr lptr )
     {
-      theLoggerImplementation = 
-	new LocalLoggerImplementation( aMessageSlotClass );
+      delete theLoggerImplementation;
+      theLoggerImplementation = new LocalLoggerImplementation( lptr );
     }
-    /*
-    void update( void )
-    {
-      theLoggerImplementation->update();
-    }
-
-    void update( libecs::Logger::containee_type& datapoint )
-    {
-      theLoggerImplementation->update( datapoint );
-    }
-    */
- 
 
   private:
 

@@ -31,7 +31,8 @@
 #if !defined( __PY_LOGGER_HPP )
 #define __PY_LOGGER_HPP
 
-#include "EmcLogger.hpp"
+#include "emc/EmcLogger.hpp"
+#include "emc/EmcDataPoint.hpp"
 #include "CXX/Extensions.hxx"
 
 using namespace libemc;
@@ -39,6 +40,34 @@ using namespace libemc;
 using Py::Object;
 using Py::Tuple;
 using Py::PythonExtension;
+
+class PyDataPoint
+  :
+  public PythonExtension< PyDataPoint >,
+  public EmcDataPoint
+{
+
+public:
+  PyDataPoint( DataPointCref dp )
+  {
+    EmcDataPoint::setDataPoint( dp );
+  }
+
+  PyDataPoint( const PyDataPoint& pydp )
+  {
+    EmcDataPoint( pydp.getDataPoint() );
+  }
+
+  virtual ~PyDataPoint()
+  {
+    ; // do nothing
+  }
+
+  static void init_type();
+  Object getTime( const Tuple& args );
+  Object getValue( const Tuple& args );
+
+};
 
 class PyLogger
   :
@@ -48,15 +77,21 @@ class PyLogger
 
 public:
 
-  PyLogger();
-  PyLogger( MessageSlotObject );
+  PyLogger()
+  {
+    ; // do nothing
+  }
+
+  virtual ~PyLogger()
+  {
+    ; // do nothing
+  }
 
   static void init_type();
 
   Object getData( const Tuple& args );
-  Object setMessageSlotClass( const Tuple& args );
-  Object update( const Tuple& args );
-  
+
+private:
 
 };
 
