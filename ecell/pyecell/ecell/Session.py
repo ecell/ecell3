@@ -119,13 +119,8 @@ class Session:
     def stop( self ):
         self.theSimulator.stop()
 
-    def step( self, num=None ):
-        if not num:
-            self.theSimulator.step()
-        else:
-            # Simulator should support step( num )
-            for i in xrange(num):
-                self.theSimulator.step()
+    def step( self, num=1 ):
+        self.theSimulator.step( num )
 
     def getCurrentTime( self ):
         return self.theSimulator.getCurrentTime()

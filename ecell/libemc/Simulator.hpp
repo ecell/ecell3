@@ -445,9 +445,9 @@ namespace libemc
 
     */
 
-    void step()
+    void step( const libecs::Int aNumSteps = 1 )
     {
-      theSimulatorImplementation->step();
+      theSimulatorImplementation->step( aNumSteps );
     }
 
     /**
@@ -495,7 +495,7 @@ namespace libemc
        @param a duration of the simulation run.
     */
 
-    void run( libecs::Real aDuration )
+    void run( const libecs::Real aDuration )
     {
       theSimulatorImplementation->run( aDuration );
     }

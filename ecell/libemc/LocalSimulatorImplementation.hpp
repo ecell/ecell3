@@ -138,7 +138,7 @@ namespace libemc
     virtual const libecs::Int 
     getLoggerSize( libecs::StringCref aFullPNString ) const;
 
-    virtual void step();
+    virtual void step( const libecs::Int aNumSteps );
 
     virtual void initialize();
 
@@ -146,7 +146,7 @@ namespace libemc
 
     virtual void run();
 
-    virtual void run( libecs::Real aDuration );
+    virtual void run( const libecs::Real aDuration );
 
     virtual void stop();
 
@@ -181,6 +181,8 @@ namespace libemc
     libecs::ModelRef           theModel;
 
     bool                       theRunningFlag;
+    libecs::Int                theEventCheckInterval;
+
     EventCheckerRCPtr          theEventChecker;
     EventHandlerRCPtr          theEventHandler;
 

@@ -47,6 +47,7 @@ namespace libemc
     :
     theModel( *new Model ),
     theRunningFlag( false ),
+    theEventCheckInterval( 20 ),
     theEventChecker( NULLPTR ),
     theEventHandler( NULLPTR )
   {
@@ -320,10 +321,37 @@ namespace libemc
   }
 
 
-  void LocalSimulatorImplementation::step()
+  void LocalSimulatorImplementation::step( const libecs::Int aNumSteps )
   {
     getModel().initialize();  
-    getModel().step();  
+
+    theRunningFlag = true;
+
+    libecs::Int aCounter( aNumSteps );
+    do
+      {
+	getModel().step();
+	
+	--aCounter;
+	
+	if( aCounter == 0 )
+	  {
+	    break;
+	  }
+
+	if( aCounter % 20 == 0 )
+	  {
+	    while( (*theEventChecker)() )
+	      {
+		(*theEventHandler)();
+	      }
+	    if( ! theRunningFlag )
+	      {
+		break;
+	      }
+	  }
+      }	while( 1 );
+
     getModel().flushLogger();
   }
 
@@ -371,7 +399,7 @@ namespace libemc
     getModel().flushLogger();
   }
 
-  void LocalSimulatorImplementation::run( libecs::Real aDuration )
+  void LocalSimulatorImplementation::run( const libecs::Real aDuration )
   {
     getModel().initialize();
 
