@@ -3,6 +3,13 @@
 
 import string
 
+### for test
+import sys
+sys.path.append('.')
+import Plugin
+### for test
+
+
 from PluginWindow import *
 from ecssupport import *
 
@@ -46,7 +53,6 @@ class PropertyWindow(PluginWindow):
         
 
     def update( self ):
-
         self.updatePropertyList()
         self.thePropertyClist.clear()
         for aValue in self.theList:
@@ -62,30 +68,49 @@ class PropertyWindow(PluginWindow):
         aPropertyList =\
         list( self.theSimulator.getProperty( aFullPropertyName ) )
 
-        
-        # remove PropertyList and ClassName
-        aPropertyList.remove( 'PropertyList' )
-        aPropertyList.remove( 'ClassName' )
+        aAttributeList = FullIDToFullPropertyName(self.theFullID,
+                                                  'PropertyAttributes')
+        aAttributeList =\
+        list(self.theSimulator.getProperty( aAttributeList ))
+        num = 0
+ 
+        # remove PropertyList, PropertyAttributes and ClassName
+#        aPropertyList.remove( 'PropertyList' )
+#        aPropertyList.remove( 'ClassName' )
+#        aPropertyList.remove( 'PropertyAttributes')
 
         for aProperty in aPropertyList:
+            if (aProperty == 'ClassName'):
+                pass
+            elif (aProperty == 'PropertyList'):
+                pass
+            elif (aProperty == 'PropertyAttributes'):
+                pass
 
-            aFullPropertyName = FullIDToFullPropertyName( self.theFullID,
+            else :
+                
+                aFullPropertyName = FullIDToFullPropertyName( self.theFullID,
                                                           aProperty )
-            aValueList = self.theSimulator.getProperty( aFullPropertyName ) 
+            
+                aValueList = self.theSimulator.getProperty( aFullPropertyName ) 
+                aLength = len( aValueList )
+                aAttribute = aAttributeList[num]
+            
+                if  aLength > 1 :
+                    aNumber = 1
+                    for aValue in aValueList :
+                        aList = [ aProperty, aNumber, aValue , aAttribute]
+                        aList = map( str, aList )
+                        self.theList.append( aList ) 
+                        aNumber += 1
 
-            aLength = len( aValueList )
-            if  aLength > 1 :
-                aNumber = 1
-                for aValue in aValueList :
-                    aList = [ aProperty, aNumber, aValue ]
-                    aList = map( str, aList )
-                    self.theList.append( aList ) 
-                    aNumber += 1
-            else:
-                for aValue in aValueList :
-                    aList = [ aProperty, '', aValue ]
-                    aList = map( str, aList )
-                    self.theList.append( aList )
+                else:
+                    for aValue in aValueList :
+                        aList = [ aProperty, '', aValue , aAttribute]
+                        aList = map( str, aList )
+                        self.theList.append( aList )
+
+            num += 1
 
     def select_property(self, obj, data1, data2, data3):
 
@@ -135,7 +160,8 @@ if __name__ == "__main__":
              'Product': ('Substance:/CELL/CYTOPLASM:GLU',
                          'Substance:/CELL/CYTOPLASM:LAC',
                          'Substance:/CELL/CYTOPLASM:PYR',
-                         )
+                         ),
+             'PropertyAttributes' : ('1','2','3','4','5','6','7','8'),
              } 
 
         def getProperty( self, fpn ):
@@ -155,7 +181,8 @@ if __name__ == "__main__":
         gtk.mainloop()
 
     def main():
-        aPropertyWindow = PropertyWindow( 'plugins', simulator(), [fpn,] )
+        aPluginManager = Plugin.PluginManager()
+        aPropertyWindow = PropertyWindow( 'plugins', simulator(), [fpn,] ,aPluginManager)
         aPropertyWindow.addHandler( 'gtk_main_quit', mainQuit )
         aPropertyWindow.update()
 
