@@ -80,7 +80,8 @@ CoreLinuxCompatibility.hpp\
 RCPtr.hpp\
 VariableReference.hpp\
 DynamicPriorityQueue.hpp\
-AssocVector.h
+AssocVector.h\
+FluxProcess.hpp
 
 bin_SCRIPTS =\
 emtool
