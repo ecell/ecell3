@@ -233,8 +233,6 @@ namespace libecs
     //@}
 
 
-    void registerSlaves( SystemPtr );
-
     void registerPropertySlotWithProxy( PropertySlotPtr );
 
     void registerLoggedPropertySlot( PropertySlotPtr );

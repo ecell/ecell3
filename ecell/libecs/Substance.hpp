@@ -30,6 +30,8 @@
 
 #ifndef ___SUBSTANCE_H___
 #define ___SUBSTANCE_H___
+
+#include <iostream>
 #include "libecs.hpp"
 #include "EntityType.hpp"
 #include "Integrators.hpp"

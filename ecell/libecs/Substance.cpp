@@ -107,6 +107,7 @@ namespace libecs
     : 
     theQuantity( 0.0 ),  
     theVelocity( 0.0 ),
+    theProxyInput( 0.0 ),
     theFixed( false )
   {
     makeSlots();

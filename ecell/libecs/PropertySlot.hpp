@@ -321,7 +321,7 @@ namespace libecs
 
     virtual ProxyPropertySlotPtr createProxy()
     {
-      assert( 0 );
+      NEVER_GET_HERE;
     }
 
     bool isSet() const
@@ -331,7 +331,7 @@ namespace libecs
 
     void setIsSet()
     {
-      theIsSet = false;
+      theIsSet = true;
     }
 
     void clearIsSet()
@@ -524,9 +524,7 @@ namespace libecs
     // In this way ~ProxyPropertySlot can call PropertySlot's disconnectProxy.
     virtual void disconnectProxy( ProxyPropertySlotPtr aProxyPtr )
     {
-      std::remove( theProxyVector.begin(),
-		   theProxyVector.end(),
-		   aProxyPtr );
+      std::remove( theProxyVector.begin(), theProxyVector.end(), aProxyPtr );
 
       //      if( theProxyVector.empty() )
       //	{
@@ -719,12 +717,6 @@ namespace libecs
     inline void callSyncMethod( SetType aValue )    
     {
       ( theObject.*theSyncMethodPtr )( aValue );
-    }
-
-    template < typename TYPE >
-    inline void syncImpl( TYPE aValue )
-    {
-      callSyncMethod( convertTo( aValue, Type2Type< SetType >() ) );
     }
 
   protected:
