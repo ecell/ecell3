@@ -88,7 +88,7 @@ public:
   System();
   virtual ~System();
 
-  const String getFqpn() const;
+  const String getFqpi() const;
 
   virtual void initialize();
 
@@ -156,13 +156,13 @@ public:
   void setStepper( StringCref classname );
 
   /**
-    This method takes a FQIN of a Reactor as a VolumeIndex of this System.
-    The FQIN will be used to get a pointer to the VolumeIndex Reactor
+    This method takes a FQID of a Reactor as a VolumeIndex of this System.
+    The FQID will be used to get a pointer to the VolumeIndex Reactor
     in initialize().
 
-    @param fqen FQIN of a VolumeIndex Reactor for this System.
+    @param fqen FQID of a VolumeIndex Reactor for this System.
    */
-  void setVolumeIndex( const FQIN& fqen );
+  void setVolumeIndex( const FQID& fqen );
 
   /**
     @return a pointer to VolumeIndex Reactor of this System.
@@ -375,7 +375,7 @@ protected:
 
 protected:
 
-  FQINPtr theVolumeIndexName;
+  FQIDPtr theVolumeIndexName;
   ReactorPtr theVolumeIndex;
   StepperPtr theStepper;
 

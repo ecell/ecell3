@@ -30,7 +30,7 @@
 
 #include "Entity.hpp"
 #include "System.hpp"
-#include "FQPN.hpp"
+#include "FQPI.hpp"
 #include "RootSystem.hpp"
 #include "Stepper.hpp"
 
@@ -62,22 +62,22 @@ Float Entity::getActivityPerSecond()
   return ( getActivity()  / getSupersystem()->getStepper()->getDeltaT() );
 }
 
-const String Entity::getFqin() const
+const String Entity::getFqid() const
 {
-  String aFqin = getSystemPath();
-  if( aFqin != "" )
+  String aFqid = getSystemPath();
+  if( aFqid != "" )
     {
-      aFqin += ":";
+      aFqid += ":";
     }
-  aFqin += getId();
+  aFqid += getId();
 
-  return aFqin;
+  return aFqid;
 }
 
-const String Entity::getFqpn() const
+const String Entity::getFqpi() const
 {
   return Primitive::PrimitiveTypeString( Primitive::ENTITY ) + 
-    ":" + getFqin();
+    ":" + getFqid();
 }
 
 const String Entity::getSystemPath() const

@@ -84,10 +84,10 @@ public:
   void setEffector( MessageCref message );
   void setInitialActivity( MessageCref message );
 
-  void setSubstrate( FQINCref fqen, int coefficient );
-  void setProduct( FQINCref fqen, int coefficient );
-  void setCatalyst( FQINCref fqen, int coefficient );
-  void setEffector( FQINCref fqen, int coefficient );
+  void setSubstrate( FQIDCref fqen, int coefficient );
+  void setProduct( FQIDCref fqen, int coefficient );
+  void setCatalyst( FQIDCref fqen, int coefficient );
+  void setEffector( FQIDCref fqen, int coefficient );
   void setInitialActivity( Float activity );
 
   const Message getInitialActivity( StringCref keyword );
@@ -158,7 +158,7 @@ public:
   Reactor();
   virtual ~Reactor() { }	
 
-  const String getFqpn() const;
+  const String getFqpi() const;
 
   virtual void initialize();
   virtual void react() = 0;

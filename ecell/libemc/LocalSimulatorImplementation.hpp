@@ -18,24 +18,25 @@ public:
   RootSystemPtr getRootSystemPtr() { return theRootSystem; }
 
   void makePrimitive( StringCref classname, 
-		      FQPNCref fqpn, 
+		      FQPICref fqpn, 
 		      StringCref name );
 
-  void sendMessage( FQPNCref fqpn, 
+  void sendMessage( FQPICref fqpn, 
 		    MessageCref message);
 
-  Message getMessage( FQPNCref fqpn, StringCref propertyName );
+  Message getMessage( FQPICref fqpn, StringCref propertyName );
 
   void step();
 
 private:
 
-  RootSystem* theRootSystem;
-  SubstanceMaker* theSubstanceMaker;
-  ReactorMaker* theReactorMaker;
-  SystemMaker* SystemtheMaker;
-  Stepper* theStepper;
-  Accumulator* theAccumulator;
+  RootSystemPtr       theRootSystem;
+
+  SubstanceMakerPtr   theSubstanceMaker;
+  ReactorMakerPtr     theReactorMaker;
+  SystemMakerPtr      theSystemMaker;
+  StepperMakerPtr     theStepper;
+  AccumulatorMakerPtr theAccumulator;
 
 };   //end of class LocalSimulatorImplementation
 

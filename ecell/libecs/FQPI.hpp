@@ -28,8 +28,8 @@
 // E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
 
-#ifndef ___FQPN_H___
-#define ___FQPN_H___
+#ifndef ___FQPI_H___
+#define ___FQPI_H___
 #include <string>
 
 #include "Exceptions.hpp"
@@ -92,8 +92,8 @@ public:
 protected:
 
   /**
-    Standardize a SystemPath. (i.e. convert RQSN -> FQSN)
-    Reduce '..'s and remove trailing white spaces.
+    Standardize a SystemPath. 
+    Reduce '..'s and remove extra white spaces.
 
     @return reference to the systempath
     */
@@ -108,41 +108,42 @@ private:
 };
 
 /**
-  FQIN(Fully Qualified Id Name)
+  FQID(Fully Qualified entity ID)
 
-  The Entryname is a identifier (ID) of Entity objects.  Given a
-  Primitive type, one can identify unique Entity in a cell model with a
-  SystemPath and an id.  
+  The FQID is a identifier (ID) of Entity objects of certain Primitive
+  type.  Given a Primitive type, one can identify unique Entity in a
+  cell model with a SystemPath and an id.  
+
   @see SystemPath, Primitive 
 */
-class FQIN : public SystemPath
+class FQID : public SystemPath
 {
 public: // exceptions
 
-  class FQINException : public Exception
+  class FQIDException : public Exception
     { 
     public: 
-      FQINException( StringCref method, StringCref what )
+      FQIDException( StringCref method, StringCref what )
 	: Exception( method, what ) {} 
       const String what() const { return ""; }
     };
 
-  class BadFQIN : public FQINException
+  class BadFQID : public FQIDException
     { 
     public: 
-      BadFQIN( StringCref method, StringCref what ) 
-	: FQINException( method,what ) {} 
-      const String what() const { return "Bad FQIN"; }
+      BadFQID( StringCref method, StringCref what ) 
+	: FQIDException( method,what ) {} 
+      const String what() const { return "Bad FQID"; }
     };
 
 public:
 
-  FQIN( StringCref systemname, StringCref id );
-  FQIN( StringCref fqen );
-  virtual ~FQIN() {}
+  FQID( StringCref systemname, StringCref id );
+  FQID( StringCref fqen );
+  virtual ~FQID() {}
 
-  const String getFqin() const;
-  virtual const String getString() const { return getFqin(); }
+  const String getFqid() const;
+  virtual const String getString() const { return getFqid(); }
   StringCref getId() const { return theId; }
   virtual operator String() const { return getString(); }
 
@@ -156,47 +157,47 @@ private:
 };
 
 /**
-  FQPN (Fully Qualified Primitive Name).
+  FQPI (Fully Qualified Primitive Id).
 
-  One can identify an unique Entiy in a cell model with a FQPN.
-  The FQPN consists of FQIN and PrimitiveType.
+  One can identify an unique Entiy in a cell model with a FQPI.
+  The FQPI consists of FQID and PrimitiveType.
 
-  @see FQIN, PrimitiveType
+  @see FQID, PrimitiveType
 */
-class FQPN : public FQIN
+class FQPI : public FQID
 {
 
 public: // exceptions
 
-  class FQPNException : public Exception
+  class FQPIException : public Exception
     { 
     public: 
-      FQPNException( StringCref method, StringCref message ) 
+      FQPIException( StringCref method, StringCref message ) 
 	: Exception( method, message ) {} 
       const String what() const { return ""; }
     };
-  class BadFQPN : public FQPNException
+  class BadFQPI : public FQPIException
     { 
     public:
-      BadFQPN( StringCref method, StringCref message ) 
-	: FQPNException( method, message ) {} 
-      const String what() const { return "Bad FQPN."; }
+      BadFQPI( StringCref method, StringCref message ) 
+	: FQPIException( method, message ) {} 
+      const String what() const { return "Bad FQPI."; }
     };
 
 public:
 
-  FQPN( const Primitive::Type type, const FQIN& fqin );
-  FQPN( StringCref fqpn );
-  virtual ~FQPN() {}
+  FQPI( const Primitive::Type type, FQIDCref fqid );
+  FQPI( StringCref fqpi );
+  virtual ~FQPI() {}
   
-  const String getFqpn() const;
+  const String getFqpi() const;
   const Primitive::Type& getType() const { return theType; }
 
-  virtual const String getString() const { return getFqpn(); }
-  virtual operator String() const { return getString(); }
+  virtual const String getString() const { return getFqpi(); }
+  virtual operator const String() const { return getString(); }
 
-  static const String fqinOf( StringCref fqpn );
-  static Primitive::Type typeOf( StringCref fqpn );
+  static const String fqidOf( StringCref fqpi );
+  static Primitive::Type typeOf( StringCref fqpi );
 
 private:
 
@@ -204,7 +205,7 @@ private:
 
 };
 
-#endif /*  ___FQPN_H___ */
+#endif /*  ___FQPI_H___ */
 
 /*
   Do not modify

@@ -9,7 +9,7 @@ CXXFLAGS=-D_GNU_SOURCE -D_REENTRANT -D_THREAD_SAFE
 
 libecs_a_SOURCES =\
 AccumulatorMaker.cpp\
-FQPN.cpp\
+FQPI.cpp\
 ReactorMaker.cpp\
 Substance.cpp\
 Accumulators.cpp\

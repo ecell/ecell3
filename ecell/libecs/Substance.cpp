@@ -115,17 +115,17 @@ void Substance::setAccumulator( StringCref classname )
     if( classname != userDefaultAccumulatorName() )
       {
 	cerr << __PRETTY_FUNCTION__ << endl;
-	//FIXME:    *theMessageWindow << "[" << fqpn() 
+	//FIXME:    *theMessageWindow << "[" << fqpi() 
 	//FIXME: << "]: accumulator is changed to: " << classname << ".\n";
       }
   }
   catch( Exception& e )
     {
-      //FIXME:     *theMessageWindow << "[" << fqpn() << "]:\n" << e.message();
+      //FIXME:     *theMessageWindow << "[" << fqpi() << "]:\n" << e.message();
       // warn if theAccumulator is already set
       if( theAccumulator != NULL )   
        {
-	 //FIXME: *theMessageWindow << "[" << fqpn() << 
+	 //FIXME: *theMessageWindow << "[" << fqpi() << 
 	 //FIXME: "]: falling back to :" << theAccumulator->className() 
 	 //FIXME: << ".\n";
        }
@@ -141,10 +141,10 @@ void Substance::setAccumulator( AccumulatorPtr accumulator )
   theAccumulator->update();
 }
 
-const String Substance::getFqpn() const
+const String Substance::getFqpi() const
 {
   return Primitive::PrimitiveTypeString( Primitive::SUBSTANCE ) 
-    + ":" + getFqin();
+    + ":" + getFqid();
 }
 
 

@@ -36,7 +36,7 @@
 #include "Substance.hpp"
 #include "Stepper.hpp"
 #include "StepperMaker.hpp"
-#include "FQPN.hpp"
+#include "FQPI.hpp"
 
 // instantiate primitive lists.
 template SubstanceList;
@@ -69,9 +69,9 @@ System::~System()
   delete theVolumeIndexName;
 }
 
-const String System::getFqpn() const
+const String System::getFqpi() const
 {
-  return Primitive::PrimitiveTypeString( Primitive::SYSTEM ) + ":" + getFqin();
+  return Primitive::PrimitiveTypeString( Primitive::SYSTEM ) + ":" + getFqid();
 }
 
 void System::setStepper( const Message& message )
@@ -86,7 +86,7 @@ const Message System::getStepper( StringCref keyword )
 
 void System::setVolumeIndex( const Message& message )
 {
-  setVolumeIndex( FQIN( message.getBody() ) );
+  setVolumeIndex( FQID( message.getBody() ) );
 }
 
 const Message System::getVolumeIndex( StringCref keyword )
@@ -94,7 +94,7 @@ const Message System::getVolumeIndex( StringCref keyword )
   if( !getVolumeIndex() )
     return Message( keyword, "" );
 
-  return Message( keyword, getVolumeIndex()->getFqin() );
+  return Message( keyword, getVolumeIndex()->getFqid() );
 }
 
 void System::setStepper( StringCref classname )
@@ -111,9 +111,9 @@ Float System::getVolume()
   return theVolumeIndex->getActivityPerSecond();
 }
 
-void System::setVolumeIndex( FQINCref volumeindex )
+void System::setVolumeIndex( FQIDCref volumeindex )
 {
-  theVolumeIndexName = new FQIN( volumeindex );
+  theVolumeIndexName = new FQID( volumeindex );
 }
 
 Primitive System::getPrimitive( StringCref id, Primitive::Type type )
@@ -137,7 +137,7 @@ throw( InvalidPrimitiveType, NotFound )
     case Primitive::NONE:
     default:
 	throw InvalidPrimitiveType(__PRETTY_FUNCTION__,"[" 
-				   + getFqin() + "]: request type invalid.");
+				   + getFqid() + "]: request type invalid.");
     }
 
   return aPrimitive;
@@ -160,7 +160,7 @@ int System::getNumberOfPrimitives( Primitive::Type type )
     case Primitive::NONE:
     default:
 	throw InvalidPrimitiveType(__PRETTY_FUNCTION__,"[" 
-				   + getFqin() + "]: request type invalid");
+				   + getFqid() + "]: request type invalid");
     }
   return aNumber;
 }
@@ -205,7 +205,7 @@ void System::forAllPrimitives( Primitive::Type type, PrimitiveCallback cb,
     case Primitive::NONE:
     default:
 	throw InvalidPrimitiveType( __PRETTY_FUNCTION__,"[" 
-				    + getFqin() + "]: request type invalid" );
+				    + getFqid() + "]: request type invalid" );
     }
 } 
 
@@ -216,22 +216,22 @@ void System::initialize()
   try{
     if( theVolumeIndexName != NULL )
       {
-	FQPN fqpn( Primitive::REACTOR, *theVolumeIndexName );
-	Primitive aPrimitive( theRootSystem->getPrimitive( fqpn ) );
+	FQPI fqpi( Primitive::REACTOR, *theVolumeIndexName );
+	Primitive aPrimitive( theRootSystem->getPrimitive( fqpi ) );
 	theVolumeIndex = aPrimitive.reactor;
-	//FIXME: *theMessageWindow << getFqin() << ": volume index is [" 
-	//FIXME: 	  << _volumeIndex->getFqin() << "].\n";
+	//FIXME: *theMessageWindow << getFqid() << ": volume index is [" 
+	//FIXME: 	  << _volumeIndex->getFqid() << "].\n";
 
       }
     else
       {
-	//FIXME: *theMessageWindow << getFqin() << ": no volume index is specified.\n"; 
+	//FIXME: *theMessageWindow << getFqid() << ": no volume index is specified.\n"; 
       }
   }
   catch( NotFound )
     {
-      //FIXME: *theMessageWindow << getFqin() << ": volume index [" 
-	//FIXME: << _volumeIndexName->fqinString() << "] not found.\n";
+      //FIXME: *theMessageWindow << getFqid() << ": volume index [" 
+	//FIXME: << _volumeIndexName->fqidString() << "] not found.\n";
     }
 
   delete theVolumeIndexName;
@@ -353,7 +353,7 @@ ReactorPtr System::getReactor( StringCref id ) throw( NotFound )
   ReactorListIterator i = getReactorIterator( id );
   if( i == getLastReactorIterator() )
     {
-      throw NotFound( __PRETTY_FUNCTION__, "[" + getFqin() + 
+      throw NotFound( __PRETTY_FUNCTION__, "[" + getFqid() + 
 		      "]: Reactor [" + id + "] not found in this System." );
     }
   return i->second;
@@ -383,7 +383,7 @@ SubstancePtr System::getSubstance( StringCref id ) throw( NotFound )
   SubstanceListIterator i = getSubstanceIterator( id );
   if( i == getLastSubstanceIterator() )
     {
-      throw NotFound(__PRETTY_FUNCTION__, "[" + getFqin() + 
+      throw NotFound(__PRETTY_FUNCTION__, "[" + getFqid() + 
 		     "]: Substance [" + id + "] not found in this System.");
     }
 
@@ -425,7 +425,7 @@ SystemPtr System::getSystem( StringCref id ) throw(NotFound)
   SystemListIterator i = getSystemIterator( id );
   if( i == getLastSystemIterator() )
     {
-      throw NotFound(__PRETTY_FUNCTION__, "[" + getFqin() + 
+      throw NotFound(__PRETTY_FUNCTION__, "[" + getFqid() + 
 		     "]: System [" + id + "] not found in this System.");
     }
   return i->second;

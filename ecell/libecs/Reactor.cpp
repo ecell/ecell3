@@ -31,7 +31,7 @@
 #include "Reactant.hpp"
 #include "RootSystem.hpp"
 #include "Stepper.hpp"
-#include "FQPN.hpp"
+#include "FQPI.hpp"
 #include "Reactor.hpp"
 
 Reactor::Condition Reactor::theGlobalCondition;// = Reactor::Condition::Good;
@@ -85,34 +85,34 @@ const Message Reactor::getInitialActivity( StringCref keyword )
   return Message( keyword, theInitialActivity );
 }
 
-void Reactor::setSubstrate( FQINCref fqin, int coefficient )
+void Reactor::setSubstrate( FQIDCref fqid, int coefficient )
 {
-  FQPN fqpn( Primitive::SUBSTANCE, fqin );
-  Primitive aPrimitive = theRootSystem->getPrimitive( fqpn );
+  FQPI fqpi( Primitive::SUBSTANCE, fqid );
+  Primitive aPrimitive = theRootSystem->getPrimitive( fqpi );
   
   addSubstrate( *(aPrimitive.substance), coefficient );
 }
 
-void Reactor::setProduct( FQINCref fqin, int coefficient )
+void Reactor::setProduct( FQIDCref fqid, int coefficient )
 {
-  FQPN fqpn( Primitive::SUBSTANCE, fqin );
-  Primitive aPrimitive = theRootSystem->getPrimitive( fqpn );
+  FQPI fqpi( Primitive::SUBSTANCE, fqid );
+  Primitive aPrimitive = theRootSystem->getPrimitive( fqpi );
   
   addProduct( *(aPrimitive.substance), coefficient );
 }
 
-void Reactor::setCatalyst( FQINCref fqin,int coefficient)
+void Reactor::setCatalyst( FQIDCref fqid,int coefficient)
 {
-  FQPN fqpn( Primitive::SUBSTANCE, fqin );
-  Primitive aPrimitive = theRootSystem->getPrimitive( fqpn );
+  FQPI fqpi( Primitive::SUBSTANCE, fqid );
+  Primitive aPrimitive = theRootSystem->getPrimitive( fqpi );
   
   addCatalyst( *(aPrimitive.substance), coefficient );
 }
 
-void Reactor::setEffector( FQINCref fqin, int coefficient )
+void Reactor::setEffector( FQIDCref fqid, int coefficient )
 {
-  FQPN fqpn( Primitive::SUBSTANCE, fqin );
-  Primitive aPrimitive = theRootSystem->getPrimitive( fqpn );
+  FQPI fqpi( Primitive::SUBSTANCE, fqid );
+  Primitive aPrimitive = theRootSystem->getPrimitive( fqpi );
   
   addEffector( *(aPrimitive.substance), coefficient );
 }
@@ -134,10 +134,10 @@ Reactor::Reactor()
   makeSlots();
 }
 
-const String Reactor::getFqpn() const
+const String Reactor::getFqpi() const
 {
   return Primitive::PrimitiveTypeString( Primitive::REACTOR ) 
-    + ":" + getFqin();
+    + ":" + getFqid();
 }
 
 void Reactor::addSubstrate( SubstanceRef substrate, int coefficient )

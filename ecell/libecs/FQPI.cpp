@@ -29,7 +29,7 @@
 //
 
 #include <string>
-#include "FQPN.hpp"
+#include "FQPI.hpp"
 
 
 ///////////////////////  SystemPath
@@ -82,9 +82,9 @@ void SystemPath::standardize()
 }
 
 
-////////////////////////////////  FQIN
+////////////////////////////////  FQID
 
-FQIN::FQIN( StringCref systemname, StringCref id )
+FQID::FQID( StringCref systemname, StringCref id )
   :
   SystemPath( systemname ), 
   theId( id )
@@ -92,122 +92,122 @@ FQIN::FQIN( StringCref systemname, StringCref id )
   ; // do nothing
 }
 
-FQIN::FQIN( StringCref fqin ) 
+FQID::FQID( StringCref fqid ) 
   : 
-  SystemPath( SystemPathOf( fqin ) ),
-  theId( IdOf( fqin ) )
+  SystemPath( SystemPathOf( fqid ) ),
+  theId( IdOf( fqid ) )
 {
   standardize();
 }
 
-const String FQIN::IdOf( StringCref fqin )
+const String FQID::IdOf( StringCref fqid )
 {
-  String::size_type aBorder = fqin.find( ':' );
+  String::size_type aBorder = fqid.find( ':' );
 
   if( aBorder == String::npos )
     {
-      throw BadFQIN(__PRETTY_FUNCTION__,
-		    "no \':\' found in \"" + fqin + "\".");
+      throw BadFQID(__PRETTY_FUNCTION__,
+		    "no \':\' found in \"" + fqid + "\".");
     }
 
-  if( fqin.find( ':', aBorder + 1 ) != String::npos )
+  if( fqid.find( ':', aBorder + 1 ) != String::npos )
     {
-      throw BadFQIN(__PRETTY_FUNCTION__,
-		    "too many \':\'s in \"" + fqin + "\".");
+      throw BadFQID(__PRETTY_FUNCTION__,
+		    "too many \':\'s in \"" + fqid + "\".");
     }
 
-  return fqin.substr( aBorder + 1, String::npos );
+  return fqid.substr( aBorder + 1, String::npos );
 }
 
-const String FQIN::SystemPathOf( StringCref fqin )
+const String FQID::SystemPathOf( StringCref fqid )
 {
-  String::size_type aBorder = fqin.find( ':' );
+  String::size_type aBorder = fqid.find( ':' );
 
   if( aBorder == String::npos )
     {
-      throw BadFQIN( __PRETTY_FUNCTION__,
-		     "no \':\' found in \"" + fqin + "\"." );
+      throw BadFQID( __PRETTY_FUNCTION__,
+		     "no \':\' found in \"" + fqid + "\"." );
     }
 
-  if( fqin.find( ':', aBorder + 1 ) != String::npos )
+  if( fqid.find( ':', aBorder + 1 ) != String::npos )
     {
-      throw BadFQIN(__PRETTY_FUNCTION__,
-		    "to many \':\'s in \"" + fqin + "\".");
+      throw BadFQID(__PRETTY_FUNCTION__,
+		    "to many \':\'s in \"" + fqid + "\".");
     }
 
-  return fqin.substr( 0, aBorder );
+  return fqid.substr( 0, aBorder );
 }
 
 
-const String FQIN::getFqin() const
+const String FQID::getFqid() const
 {
   return ( SystemPath::getString() + ":" + getId() );
 }
 
 
-////////////////////////////////  FQPN
+////////////////////////////////  FQPI
 
-FQPN::FQPN( const Primitive::Type type, const FQIN& fqin )
+FQPI::FQPI( const Primitive::Type type, const FQID& fqid )
   :
-  FQIN( fqin ),
+  FQID( fqid ),
   theType( type )
 {
   ; // do nothing
 }
 
-FQPN::FQPN( StringCref fqpn )
-  : FQIN( fqinOf( fqpn ) ),
-  theType( typeOf( fqpn ) )
+FQPI::FQPI( StringCref fqpi )
+  : FQID( fqidOf( fqpi ) ),
+  theType( typeOf( fqpi ) )
 {
   ; // do nothing
 }
 
-const String FQPN::fqinOf( StringCref fqpn )
+const String FQPI::fqidOf( StringCref fqpi )
 {
-  String::size_type aBorder( fqpn.find(':') );
+  String::size_type aBorder( fqpi.find(':') );
 
   if( aBorder == String::npos )
     {
-      throw BadFQPN(__PRETTY_FUNCTION__,
-		    "no \':\' found in \"" + fqpn + "\".");
+      throw BadFQPI(__PRETTY_FUNCTION__,
+		    "no \':\' found in \"" + fqpi + "\".");
     }
-  if( fqpn.find( ':', aBorder + 1 ) == String::npos )
+  if( fqpi.find( ':', aBorder + 1 ) == String::npos )
     {
-      throw BadFQPN(__PRETTY_FUNCTION__,
-		    "no enough \':\'s found in \"" + fqpn + "\".");
+      throw BadFQPI(__PRETTY_FUNCTION__,
+		    "no enough \':\'s found in \"" + fqpi + "\".");
     }
 
-  return fqpn.substr( aBorder + 1, String::npos );
+  return fqpi.substr( aBorder + 1, String::npos );
 }
 
-Primitive::Type FQPN::typeOf( StringCref fqpn )
+Primitive::Type FQPI::typeOf( StringCref fqpi )
 {
-  String::size_type aBorder( fqpn.find(':') );
+  String::size_type aBorder( fqpi.find(':') );
 
   if( aBorder == String::npos )
     {
-      throw BadFQPN(__PRETTY_FUNCTION__,
-		    "no \':\' found in \"" + fqpn + "\".");
+      throw BadFQPI(__PRETTY_FUNCTION__,
+		    "no \':\' found in \"" + fqpi + "\".");
     }
-  if( fqpn.find( ':', aBorder + 1 ) == String::npos )
+  if( fqpi.find( ':', aBorder + 1 ) == String::npos )
     {
-      throw BadFQPN(__PRETTY_FUNCTION__,
-		    "no enough \':\'s found in \"" + fqpn + "\".");
+      throw BadFQPI(__PRETTY_FUNCTION__,
+		    "no enough \':\'s found in \"" + fqpi + "\".");
     }
   
-  String aTypeString = fqpn.substr( 0, aBorder );
+  String aTypeString = fqpi.substr( 0, aBorder );
 
   return Primitive::PrimitiveType( aTypeString );
 }
 
-const String FQPN::getFqpn() const 
+const String FQPI::getFqpi() const 
 {
   return Primitive::PrimitiveTypeString( theType ) 
-    + ':' + FQIN::getString();
+    + ':' + FQID::getString();
 }
 
 
-#ifdef TEST_FQPN
+#ifdef TEST_FQPI
 
 main()
 {
@@ -217,17 +217,17 @@ main()
   SystemPath aSystemPath2( "/A/../B" );
   cout << aSystemPath2.getString() << endl;
 
-  FQIN aFQIN( "/A/B:S" );
-  cout << aFQIN.getString() << endl;
-  cout << aFQIN.getSystemPath() << endl;
-  cout << aFQIN.getId() << endl;
+  FQID aFQID( "/A/B:S" );
+  cout << aFQID.getString() << endl;
+  cout << aFQID.getSystemPath() << endl;
+  cout << aFQID.getId() << endl;
 
-  FQPN aFQPN( "Substance:/A/B:S" );
-  cout << aFQPN.getString() << endl;
-  cout << Primitive::PrimitiveTypeString( aFQPN.getType() ) << endl;
-  cout << aFQPN.getSystemPath() << endl;
-  cout << aFQPN.getId() << endl;
-  cout << aFQPN.getFqin() << endl;
+  FQPI aFQPI( "Substance:/A/B:S" );
+  cout << aFQPI.getString() << endl;
+  cout << Primitive::PrimitiveTypeString( aFQPI.getType() ) << endl;
+  cout << aFQPI.getSystemPath() << endl;
+  cout << aFQPI.getId() << endl;
+  cout << aFQPI.getFqid() << endl;
 }
 
 

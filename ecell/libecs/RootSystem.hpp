@@ -56,7 +56,7 @@ public:
 
   SystemPtr getSystem( SystemPathCref systempath )
     throw( NotFound, MalformedSystemName );
-  Primitive getPrimitive( FQPNCref fqpn ) 
+  Primitive getPrimitive( FQPICref fqpi ) 
     throw( InvalidPrimitiveType, NotFound );
 
   virtual void initialize();

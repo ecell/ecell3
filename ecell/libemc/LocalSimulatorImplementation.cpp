@@ -1,4 +1,5 @@
 #include "util/Message.hpp"
+#include "libecs/FQPI.hpp"
 
 #include "LocalSimulatorImplementation.hpp"
 
@@ -9,20 +10,26 @@ LocalSimulatorImplementation::LocalSimulatorImplementation()
 }
 
 void LocalSimulatorImplementation::makePrimitive( StringCref classname,
-					     FQPNCref fqpn, 
-					     StringCref name )
+						  FQPICref fqpn, 
+						  StringCref name )
 {
+  cerr << classname << endl;
+  cerr << fqpn.getString() << endl;
+  cerr << name << endl;
+
 }
 
-void LocalSimulatorImplementation::sendMessage( FQPNCref fqpn, 
+void LocalSimulatorImplementation::sendMessage( FQPICref fqpn, 
 						MessageCref message)
 {
+  cerr << message.getKeyword() << endl;
 }
 
 
-Message LocalSimulatorImplementation::getMessage( FQPNCref fqpn,
-StringCref propertyName )
+Message LocalSimulatorImplementation::getMessage( FQPICref fqpn,
+						  StringCref propertyName )
 {
+  return Message( propertyName, "empty" );
 }
 
 

@@ -17,20 +17,20 @@ public:
   ~Simulator() {}
 
   void makePrimitive( StringCref classname, 
-		      FQPNCref fqpn,
+		      FQPICref fqpn,
 		      StringCref name )
   {
     theSimulatorImplementation->makePrimitive( classname, fqpn, name );
   }
 
-  void sendMessage( FQPNCref fqpn, 
+  void sendMessage( FQPICref fqpn, 
 		    MessageCref message )
   {
     theSimulatorImplementation->sendMessage( fqpn, message );
   }
 
 
-  Message getMessage( FQPNCref fqpn, 
+  Message getMessage( FQPICref fqpn, 
 		      StringCref propertyName )
   {
     theSimulatorImplementation->getMessage( fqpn, propertyName ); 

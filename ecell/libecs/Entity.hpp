@@ -92,14 +92,14 @@ public:
   const String getSystemPath() const;
 
   /**
-    @return FQIN (Fully Qualified ?????) of this Entity.
+    @return FQID (Fully Qualified ?????) of this Entity.
    */
-  const String getFqin() const;
+  const String getFqid() const;
 
   /**
-    @return FQPN (Fully Qualified ?????) of this Entity.
+    @return FQPI (Fully Qualified ?????) of this Entity.
    */
-  const String getFqpn() const;
+  const String getFqpi() const;
 
   /**
     Returns activity value of this Entity defined in subclasses.

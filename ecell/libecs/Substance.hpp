@@ -65,7 +65,7 @@ public:
 
   static SubstancePtr instance() {return new Substance;}
 
-  const String getFqpn() const;
+  const String getFqpi() const;
 
   /**
     Add bias value in current step.

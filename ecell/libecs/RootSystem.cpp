@@ -30,7 +30,7 @@
 
 #include "RootSystem.hpp"
 #include "Primitive.hpp"
-#include "FQPN.hpp"
+#include "FQPI.hpp"
 #include "SubstanceMaker.hpp"
 #include "ReactorMaker.hpp"
 #include "SystemMaker.hpp"
@@ -118,13 +118,13 @@ SystemPtr RootSystem::getSystem( SystemPathCref systempath )
   return System::getSystem( next );
 }
 
-Primitive RootSystem::getPrimitive( FQPNCref fqpn ) 
+Primitive RootSystem::getPrimitive( FQPICref fqpi ) 
   throw( InvalidPrimitiveType, NotFound )
 {
   // FIXME: handle exceptions
 
-  SystemPtr sys = getSystem( fqpn.SystemPath::getString() );
-  return sys->getPrimitive( fqpn.getId(), fqpn.getType() );
+  SystemPtr sys = getSystem( fqpi.SystemPath::getString() );
+  return sys->getPrimitive( fqpi.getId(), fqpi.getType() );
 }
 
 
