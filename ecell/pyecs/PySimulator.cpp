@@ -148,7 +148,7 @@ Object PySimulator::getProperty( const Tuple& args )
 	}
       else if( aUniversalVariable.isInt() )
 	{
-	  anObject = Py::Int( aUniversalVariable.asInt() );
+	  anObject = Py::Int( static_cast<long int>( aUniversalVariable.asInt() ) );
 	}
       else if( aUniversalVariable.isString() )
 	{
