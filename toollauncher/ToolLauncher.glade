@@ -736,7 +736,7 @@
                                               </packing>
                                             </child>
                                             <child>
-                                              <widget class="GtkEntry" id="model_path">
+                                                    <widget class="GtkEntry" id="import_file_path">
                                                 <property name="width_request">250</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">True</property>
@@ -760,7 +760,7 @@
                                                 <property name="layout_style">GTK_BUTTONBOX_START</property>
                                                 <property name="spacing">0</property>
                                                 <child>
-                                                  <widget class="GtkButton" id="model_path_button">
+                                                  <widget class="GtkButton" id="import_file_button">
                                                     <property name="border_width">4</property>
                                                     <property name="visible">True</property>
                                                     <property name="can_default">True</property>
@@ -768,7 +768,7 @@
                                                     <property name="label" translatable="yes">File ...</property>
                                                     <property name="use_underline">True</property>
                                                     <property name="relief">GTK_RELIEF_NORMAL</property>
-                                                    <signal name="clicked" handler="on_model_path_button_clicked" last_modification_time="Sun, 27 Aug 2003 14:22:56 GMT"/>
+                                                    <signal name="clicked" handler="on_import_file_button_clicked" last_modification_time="Sun, 27 Aug 2003 14:22:56 GMT"/>
                                                   </widget>
                                                 </child>
                                               </widget>
@@ -828,7 +828,7 @@
                                               </packing>
                                             </child>
                                             <child>
-                                              <widget class="GtkEntry" id="programs_path">
+                                              <widget class="GtkEntry" id="export_dir_path">
                                                 <property name="width_request">270</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">True</property>
@@ -852,7 +852,7 @@
                                                 <property name="layout_style">GTK_BUTTONBOX_START</property>
                                                 <property name="spacing">0</property>
                                                 <child>
-                                                  <widget class="GtkButton" id="programs_path_button">
+                                                  <widget class="GtkButton" id="export_dir_button">
                                                     <property name="border_width">4</property>
                                                     <property name="visible">True</property>
                                                     <property name="can_default">True</property>
@@ -860,7 +860,7 @@
                                                     <property name="label" translatable="yes">Folder ...</property>
                                                     <property name="use_underline">True</property>
                                                     <property name="relief">GTK_RELIEF_NORMAL</property>
-                                                    <signal name="clicked" handler="on_programs_path_button_clicked" last_modification_time="Sun, 27 Aug 2003 14:22:56 GMT"/>
+                                                    <signal name="clicked" handler="on_export_dir_button_clicked" last_modification_time="Sun, 27 Aug 2003 14:22:56 GMT"/>
                                                   </widget>
                                                 </child>
                                               </widget>

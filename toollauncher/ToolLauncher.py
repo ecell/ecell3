@@ -76,25 +76,25 @@ class ToolLauncher(ParentWindow):
 			self.assignPrefParameter('translate_em')
 			self.assignPrefParameter('auto_load_pref')
 			self.assignPrefParameter('editor_path')
-			self.assignPrefParameter('model_home')
-			self.assignPrefParameter('model_path')
-			self.assignPrefParameter('programs_path')
+			self.assignPrefParameter('models_path')
+			self.assignPrefParameter('current_model')
 		else:
 			self.thePref['save_em'] = '1'
 			self.thePref['save_eml'] = '1'
 			self.thePref['translate_em'] = '0'
 			self.thePref['auto_load_pref'] = '1'
 			if os.name == 'nt':
-				self.thePref['editor_path'] = os.environ['ProgramFiles'] + '\Windows NT\Accessories\wordpad.exe'
+				self.thePref['editor_path'] = os.path.join(
+					os.environ['SystemRoot'], 'system32', 'notepad.exe' )
 			else:
-				self.thePref['editor_path'] = 'gedit'
-                self.thePref['model_home'] = os.environ['ECELL3_PREFIX'] + os.sep + 'share' + os.sep + 'doc' + os.sep + 'ecell-' + os.environ['VERSION']
-                self.thePref['model_path'] = os.environ['ECELL3_PREFIX'] + os.sep + 'share' + os.sep + 'doc' + os.sep + 'ecell-' + os.environ['VERSION']
-                self.thePref['programs_path'] = os.environ['ECELL3_PREFIX'] + os.sep + 'bin'
-
+				self.thePref['editor_path'] = os.path.join( os.sep, 'usr', 'bin', 'gedit' )
+			# models_path is the base directory of model instances
+			self.thePref['models_path'] = os.path.join( os.environ['ECELL3_PREFIX'], 'share' )
+			# current_model is the name the current working model
+			self.thePref['current_model'] = 'ecell'
+			
 		
-	def openWindow( self 
- ):
+	def openWindow( self  ):
 		"""override parent class' method
 		Returns None
 		"""
@@ -105,15 +105,15 @@ class ToolLauncher(ParentWindow):
 			'exit_menu_activate'                    : self.__deleted ,
 			'refresh_menu_activate'                 : self.refreshMessage ,
 			'output_menu_activate'                  : self.selectFile ,
-			'about_menu_activate'                 : self.createAboutToolLauncher ,
+			'about_menu_activate'                   : self.createAboutToolLauncher ,
 
 			# buttons
 			'on_execute_button_clicked'             : self.executeTab ,
 			'on_em_file_select_button_clicked'      : self.selectFile ,
 			'on_eml_file_select_button_clicked'     : self.selectFile ,
 			'on_cpp_file_select_button_clicked'     : self.selectFile ,
-			'on_model_path_button_clicked'          : self.selectFile ,
-			'on_programs_path_button_clicked'       : self.selectFile ,
+			'on_import_file_button_clicked'	        : self.selectFile ,
+			'on_export_dir_button_clicked'          : self.selectFile ,
 			'on_em_file_edit_button_clicked'        : self.editEM ,
 			'on_eml_file_edit_button_clicked'       : self.editEML ,
 			'on_cpp_file_edit_button_clicked'       : self.editCpp ,
@@ -134,7 +134,7 @@ class ToolLauncher(ParentWindow):
 		self.openAboutToolLauncher = False 
 
 		self.update()
-		self.checkPref()
+		self.isPrefOK()
 
 
 	def savePreferences( self, *arg ):
@@ -148,9 +148,8 @@ class ToolLauncher(ParentWindow):
 		self.savePrefParameter( 'translate_em', self.thePref['translate_em'] )
 		self.savePrefParameter( 'auto_load_pref', self.thePref['auto_load_pref'] )
 		self.savePrefParameter( 'editor_path', self.thePref['editor_path'] )
-		self.savePrefParameter( 'model_path', self.thePref['model_path'] )
-		self.savePrefParameter( 'model_home', self.thePref['model_home'] )
-		self.savePrefParameter( 'programs_path', self.thePref['programs_path'] )
+		self.savePrefParameter( 'models_path', self.thePref['models_path'] )
+		self.savePrefParameter( 'current_model', self.thePref['current_model'] )
 		aFile = open( self.thePrefFile, 'w' )
 		self.theConfig.write( aFile )
 		aFile.close()
@@ -283,8 +282,11 @@ class ToolLauncher(ParentWindow):
 		if self.thePref['editor_path'] == "":
 			self.viewErrorMessage( "Please specify the editor path on the preference window." )
 		else:
-			cmdstr = '\"'+self.thePref['editor_path']+'\" '+fileName
-			msg = self.execute( cmdstr )
+			cmd = self.thePref['editor_path']
+			argList = []
+			argList.extend([ '\"' + cmd + '\"',
+					 '\"' + fileName + '\"' ])
+			msg = self.execute( cmd, argList )
 			if msg == 1:
 				errorMsg = "Please specify the editor path on the preference window."
 				self.printMessage( errorMsg )
@@ -308,9 +310,9 @@ class ToolLauncher(ParentWindow):
 
 
 	# ==========================================================================
-	def execute( self, cmdstr ):
+	def execute( self, cmd, argList ):
 
-		return os.system( cmdstr )
+		return os.spawnv( os.P_WAIT, cmd, argList )
 
 	# end of execute
 
@@ -362,23 +364,34 @@ class ToolLauncher(ParentWindow):
 		"""
 
 		if self.theFileSelectorDlg.get_title() == 'Select EM File':
-			self['em_file'].set_text( self.theFileSelectorDlg.get_filename() )
+                        fileName = self.theFileSelectorDlg.get_filename()
+                        if os.path.isfile( fileName ):
+                                self['em_file'].set_text( fileName )
 
 		elif self.theFileSelectorDlg.get_title() == 'Select EML File':
-			self['eml_file'].set_text( self.theFileSelectorDlg.get_filename() )
+                        fileName = self.theFileSelectorDlg.get_filename()
+                        if os.path.isfile( fileName ):
+                                self['eml_file'].set_text( fileName )
 
 		elif self.theFileSelectorDlg.get_title() == 'Select Cpp File':
-			self['cpp_file'].set_text( self.theFileSelectorDlg.get_filename() )
+                        fileName = self.theFileSelectorDlg.get_filename()
+                        if os.path.isfile( fileName ):
+                                self['cpp_file'].set_text( fileName )
 
-		elif self.theFileSelectorDlg.get_title() == 'Select Model Home Directory':
-			self['model_path'].set_text( self.theFileSelectorDlg.get_filename() )
+		elif self.theFileSelectorDlg.get_title() == 'Select Import Model Zip File':
+                        fileName = self.theFileSelectorDlg.get_filename()
+                        if os.path.isfile( fileName ):
+                                self['import_file_path'].set_text( fileName )
 
-		elif self.theFileSelectorDlg.get_title() == 'Select Conversion Programs Directory':
-			directoryName = os.path.dirname( self.theFileSelectorDlg.get_filename() )
-			self['programs_path'].set_text( directoryName )
+		elif self.theFileSelectorDlg.get_title() == 'Select Model Directory to be Exported':
+			dirName = self.theFileSelectorDlg.get_filename()
+                        if os.path.isdir( dirName ):
+                                self['export_dir_path'].set_text( dirName )
 
 		elif self.theFileSelectorDlg.get_title() == 'Select Output Message File':
-			self.outputMessage( self.theFileSelectorDlg.get_filename() )
+                        fileName = self.theFileSelectorDlg.get_filename()
+                        if os.path.isfile( fileName ):
+                                self.outputMessage( fileName() )
 
 		self.theFileSelectorDlg.hide( )
 
@@ -407,19 +420,19 @@ class ToolLauncher(ParentWindow):
 			self.theFileSelectorDlg.set_icon(iconPixbuf)
 
 
-		currentDir = os.getcwd()
-		if self.thePref['model_path'] != '':
-			if os.path.exists( self.thePref['model_path'] ) == False:
-#				self.theFileSelectorDlg.set_filename( os.path.join( self.thePref['ecell3_path'], self.thePref['model_home'], +os.sep ) )
-				self.theFileSelectorDlg.set_filename( self.thePref['ecell3_path']+self.thePref['model_home']+os.sep )
-			else:
-				self.theFileSelectorDlg.set_filename( self.thePref['model_path']+os.sep )
+                idealDir = os.path.join(
+                        self.thePref['models_path'],
+                        self.thePref['current_model'] )
+
+		if self.thePref['models_path'] != '':
+			if not os.path.isdir( self.thePref['models_path'] ):
+				self.theFileSelectorDlg.set_filename( self.thePref['ecell3_path']+os.sep )
+                        elif not os.path.isdir( idealDir ):
+                                self.theFileSelectorDlg.set_filename( self.thePref['models_path']+os.sep )
+                        else:
+                               self.theFileSelectorDlg.set_filename( idealDir+os.sep )                  
 		else:
-#			self.theFileSelectorDlg.set_filename( self.thePref['ecell3_path']+os.sep+ )
-			self.theFileSelectorDlg.set_filename( self.thePref['ecell3_path']+self.thePref['model_home']+os.sep )
-#			self.theFileSelectorDlg.set_filename( os.path.join( self.thePref['ecell3_path'], self.thePref['model_home'], +os.sep ) )
-
-
+			self.theFileSelectorDlg.set_filename( self.thePref['ecell3_path']+os.sep )
 
 
 		if arg[0] == self['em_file_select_button']:
@@ -428,10 +441,10 @@ class ToolLauncher(ParentWindow):
 			self.theFileSelectorDlg.set_title('Select EML File')
 		elif arg[0] == self['cpp_file_select_button']:
 			self.theFileSelectorDlg.set_title('Select Cpp File')
-		elif arg[0] == self['model_path_button']:
-			self.theFileSelectorDlg.set_title('Select Model Home Directory')
-		elif arg[0] == self['programs_path_button']:
-			self.theFileSelectorDlg.set_title('Select Conversion Programs Directory')
+		elif arg[0] == self['import_file_button']:
+			self.theFileSelectorDlg.set_title('Select Import Model Zip File')
+		elif arg[0] == self['export_dir_button']:
+			self.theFileSelectorDlg.set_title('Select Model Directory to be Exported')
 		elif arg[0] == self['output_menu']:
 			if self.theMessageWindow.getMessage() == "":
 				viewFlg = -1
@@ -469,10 +482,10 @@ class ToolLauncher(ParentWindow):
 	# ==========================================================================
 	def copyNewModel( self, symlinks=0):
 
-		newDir = self.thePref['model_path']+os.sep+self['new_model_name'].get_text()
+		newDir = self.thePref['models_path']+os.sep+self['new_model_name'].get_text()
 		copyClass = CopyDirectory( self, newDir )
 		copyClass.copyDirectory( )
-		self.thePref['model_path'] = newDir
+		self.thePref['models_path'], self.thePref['current_model'] = os.path.split( newDir )
 		self.savePreferences()
 
 	# end of copyNewModel
@@ -484,11 +497,8 @@ class ToolLauncher(ParentWindow):
 
 		# tries to compileCpp
 		try:
-			if self.thePref['programs_path'] == "":
-				self.viewErrorMessage( "Plase set the program path on the preference window." )
-			else:
-				compileCpp = CompileCpp( self )
-				compileCpp.compile( self['cpp_file'].get_text() )
+                        compileCpp = CompileCpp( self )
+                        compileCpp.compile( self['cpp_file'].get_text() )
 
 		# catch exceptions
 		except:
@@ -506,15 +516,15 @@ class ToolLauncher(ParentWindow):
 		try:
 
 			uncompressClass = ZipManager( self )
-			modelname = uncompressClass.uncompress( self['model_path'].get_text() )
-			self.thePref['model_path'] = self.thePref['model_home']+os.sep+modelname
+			self.thePref['current_model'] = uncompressClass.uncompress(
+                                        self['import_file_path'].get_text() )
 			self.savePreferences()
 
 		# catch exceptions
 		except:
 			anErrorMessage = string.join( traceback.format_exception(sys.exc_type,sys.exc_value,sys.exc_traceback), '\n' )
 			self.printMessage(anErrorMessage)
-			msg = "The model \""+self['programs_path'].get_text()+"\" cannot be imported."
+			msg = "The model \""+self['import_file_path'].get_text()+"\" cannot be imported."
 			self.viewErrorMessage( msg )
 			self.printMessage( msg )
 
@@ -528,13 +538,13 @@ class ToolLauncher(ParentWindow):
 		try:
 
 			compressClass = ZipManager( self )
-			compressClass.compress( self['programs_path'].get_text() )
+			compressClass.compress( self['export_dir_path'].get_text() )
 
 		# catch exceptions
 		except:
 			anErrorMessage = string.join( traceback.format_exception(sys.exc_type,sys.exc_value,sys.exc_traceback), '\n' )
 			self.printMessage(anErrorMessage)
-			msg = "The model \""+self['programs_path'].get_text()+"\" cannot be exported."
+			msg = "The model \""+self['export_dir_path'].get_text()+"\" cannot be exported."
 			self.printMessage( msg )
 			self.viewErrorMessage( msg )
 
@@ -563,7 +573,7 @@ class ToolLauncher(ParentWindow):
 		returnMsg = -1
 		if os.path.exists(fileName) != 0:
 			returnMsg = 1
-		elif os.path.exists( self.thePref['model_path']+os.sep+fileName ) != 0:
+		elif os.path.isfile( self.thePref['models_path']+os.sep+fileName ) != 0:
 			returnMsg = 2
 
 		return returnMsg
@@ -577,7 +587,7 @@ class ToolLauncher(ParentWindow):
 		returnMsg = -1
 		if os.path.isdir(dirName) != 0:
 			returnMsg = 1
-		elif os.path.isdir( self.thePref['model_path']+os.sep+dirName ) != 0:
+		elif os.path.isdir( self.thePref['models_path']+os.sep+dirName ) != 0:
 			returnMsg = 2
 
 		return returnMsg
@@ -586,20 +596,13 @@ class ToolLauncher(ParentWindow):
 
 
 	# ==========================================================================
-	def checkPref ( self ):
+	def isPrefOK ( self ):
 
-		 checkPref = Preferences( self )
-		 return checkPref.checkPreferencePash()
+                pref = Preferences( self )
+                return pref.isPrefOK()
 
-	# end of checkPref
+	# end of isPrefOK
 
-
-	# ==========================================================================
-	def setModelPath ( self, fileName ):
-
-		return self.thePref['model_path']+os.sep+fileName
-
-	# end of setFileName
 
 
 	# ==========================================================================
@@ -620,8 +623,10 @@ class ToolLauncher(ParentWindow):
 	# ==========================================================================
 	def getDefaultLogName( self ):
 
-		( modelPath, modelName ) = os.path.split( self.thePref['model_path'] )
-		return self.thePref['model_path']+os.sep+modelName+".log"
+		return os.path.join(
+                                self.thePref['models_path'],
+                                self.thePref['current_model'],
+                                self.thePref['current_model']+".log" )
 
 	# end of getDefaultLogName
 

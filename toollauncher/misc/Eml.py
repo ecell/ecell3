@@ -32,10 +32,7 @@ class Eml:
 	# ==========================================================================
 	def compileEM( self, emFile, emlFile ):
 
-		if self.theToolLauncher.thePref['programs_path'] == "":
-			msg = "Please specify the program path on the preference window."
-			self.printMessage( msg, msg )
-		elif self.checkExpension( emFile, "em" ) == False:
+		if self.checkExpension( emFile, "em" ) == False:
 			msg = "Please enter the appropriate EM file name."
 			self.printMessage( msg, msg )
 		else:
@@ -53,10 +50,7 @@ class Eml:
 	# ==========================================================================
 	def compileEML( self, emlFile, emFile ):
 
-		if self.theToolLauncher.thePref['programs_path'] == "":
-			msg = "Please specify the program path on the preference window."
-			self.printMessage( msg, msg )
-		elif self.checkExpension( emlFile, "eml" ) == False:
+		if self.checkExpension( emlFile, "eml" ) == False:
 			msg = "Please enter the appropriate EML file name."
 			self.printMessage( msg, msg )
 		else:
@@ -74,55 +68,29 @@ class Eml:
 	# ==========================================================================
 	def compile( self, file1, file2, programFile ):
 
-		compileFlg = 0
 		errorMsg = ""
 
-		flg = self.execute( file2, file1, programFile )
-		if flg == "0":
-			self.checkCompile( file1, file2 )
-
+		try:
+			
+			cmdstr = programFile+' -o \"'+file2+'\" \"'+file1+'\"'
+			TMPDIR = tempfile.gettempdir()
+			ret = self.execute( cmdstr+" > " + TMPDIR + os.sep + "eml.log 2> " + TMPDIR + os.sep + "emlError.log" )
+			self.checkCompile( ret, file1, file2)
+		except:
+			anErrorMessage = string.join( traceback.format_exception(sys.exc_type,sys.exc_value,sys.exc_traceback), '\n' )
+			self.printMessage(anErrorMessage, 
+			                  "Conversion from \""+file1+"\" to\n\""+file2+"\" has failed.")
+		
 		return errorMsg
 
 	# end of compile
 
-
 	# ==========================================================================
-	def execute( self, file1, file2, programFile ):
+	def execute( self, cmdstr ):
 
-		try:
-			programPath = self.getProgramPath( programFile )
-			if programPath == None:
-				msg = "\""+self.theToolLauncher.thePref['programs_path']+"\" does not exist.\nPlease enter the appropriate name of the directory."
-				self.printMessage( msg, msg )
-			else:
-				cmdstr = 'python '+'\"'+programPath+'\" -o \"'+file1+'\" \"'+file2+'\"'
-
-		                TMPDIR = tempfile.gettempdir()
-				self.theToolLauncher.execute( cmdstr+" > " + TMPDIR + os.sep + "eml.log 2> " + TMPDIR + os.sep + "emlError.log" )
-				return "0"
-
-		# catch exceptions
-		except:
-			anErrorMessage = string.join( traceback.format_exception(sys.exc_type,sys.exc_value,sys.exc_traceback), '\n' )
-			self.printMessage(anErrorMessage, 
-			                  "Conversion from \""+file2+"\" to\n\""+file1+"\" has failed.")
+		return os.system( cmdstr )
 
 	# end of execute
-
-
-	# ==========================================================================
-	def getProgramPath( self, programFile ):
-
-		if os.path.exists( self.theToolLauncher.thePref['programs_path'] ):
-			return self.theToolLauncher.thePref['programs_path']+os.sep+programFile
-		else:
-			if os.path.exists( self.theToolLauncher.thePref['ecell3_path']+os.sep+"bin" ):
-				return self.theToolLauncher.thePref['ecell3_path']+os.sep+"bin"+os.sep+programFile
-			else:
-				return None
-
-	# end of getProgramPath
-
 
 	# ==========================================================================
 	def errorMsgNotExistFile( self, fileName ):
@@ -150,21 +118,25 @@ class Eml:
 
 
 	# ==========================================================================
-	def checkCompile( self, file1, file2 ):
+	def checkCompile( self, ret, file1, file2 ):
 
                 TMPDIR = tempfile.gettempdir()
 		logfile = open( TMPDIR + os.sep + 'eml.log','r' )
 		logdata = logfile.read()
 		logfile.close()
+		errorfile = open( TMPDIR + os.sep + 'emlError.log','r' )
+		errordata = errorfile.read()
+		errorfile.close()
 		os.remove( TMPDIR + os.sep + 'eml.log' )
 		os.remove( TMPDIR + os.sep + 'emlError.log' )
 		errorMsg = re.search( 'error', logdata )
-		if errorMsg == None:
+		if ret == 0:
 			msg = "Conversion from \""+ file1+"\" to\n\""+file2+"\" was successful."
 			self.theToolLauncher.printMessage( msg )
 			self.theToolLauncher.viewErrorMessage( msg )
 		else:
 			self.theToolLauncher.printMessage( logdata )
+			self.theToolLauncher.printMessage( errordata )
 			msg = "Conversion from \""+ file1+"\" to\n\""+file2+"\" has failed."
 			self.theToolLauncher.printMessage( msg )
 			self.theToolLauncher.viewErrorMessage( msg )
@@ -209,8 +181,8 @@ class Eml:
 			self.theFileSetFlag = False
 			return compileFile
 		else:
-			if os.path.exists(os.path.join( self.getModelPath(), compileFile ) ):
-				compileFile = os.path.join( self.getModelPath(), compileFile )
+			if os.path.exists(os.path.join( self.getCurrentModelPath(), compileFile ) ):
+				compileFile = os.path.join( self.getCurrentModelPath(), compileFile )
 			else:
 				msg = "\""+compileFile+"\" does not exist. Please enter the appropriate name of the file."
 				self.printMessage( msg, msg )
@@ -227,7 +199,7 @@ class Eml:
 		( emPath, emName ) = os.path.split( emFile )
 		newFileName = -1
 		if emlFile == "":
-			newFileName = os.path.join( self.getModelPath(), emName+"l" )
+			newFileName = os.path.join( self.getCurrentModelPath(), emName+"l" )
 		else:
 			if os.path.exists( emlFile ):
 				if emlFile[-1] == os.sep:
@@ -243,18 +215,18 @@ class Eml:
 						self.printMessage( "\""+emlFile+ERROR_MSG2, "\""+emlFile+ERROR_MSG2 )
 						newFileName = -1
 			else:
-				if os.path.exists( os.path.join( self.getModelPath(), emlFile ) ):
+				if os.path.exists( os.path.join( self.getCurrentModelPath(), emlFile ) ):
 					if emlFile[-1] == os.sep:
-						newFileName = os.path.join( self.getModelPath(), emlFile )+emName+"l"
+						newFileName = os.path.join( self.getCurrentModelPath(), emlFile )+emName+"l"
 					else:
-						newFileName = os.path.join( self.getModelPath(), emlFile )
+						newFileName = os.path.join( self.getCurrentModelPath(), emlFile )
 				else:
 					( emlPath, emlName ) = os.path.split( emlFile )
-					if os.path.exists( os.path.join( self.getModelPath(), emlPath ) ):
+					if os.path.exists( os.path.join( self.getCurrentModelPath(), emlPath ) ):
 						if emlFile[-1] == os.sep:
-							newFileName = os.path.join( self.getModelPath(), emlFile )+emName+"l"
+							newFileName = os.path.join( self.getCurrentModelPath(), emlFile )+emName+"l"
 						else:
-							newFileName = os.path.join( self.getModelPath(), emlFile )
+							newFileName = os.path.join( self.getCurrentModelPath(), emlFile )
 					else:
 						msg = "\""+emlFile+ERROR_MSG3
 						self.printMessage( msg, msg )
@@ -272,7 +244,7 @@ class Eml:
 		newName = re.split( '[\W]+',emlName, 1)[0]
 		newFileName = -1
 		if emFile == "":
-			newFileName = os.path.join( self.getModelPath(), newName+EXTENSION_EM )
+			newFileName = os.path.join( self.getCurrentModelPath(), newName+EXTENSION_EM )
 		else:
 			if os.path.exists( emFile ):
 				if emFile[-1] == os.sep:
@@ -288,18 +260,18 @@ class Eml:
 						self.printMessage( "\""+emFile+ERROR_MSG2, "\""+emFile+ERROR_MSG2 )
 						newFileName = -1
 			else:
-				if os.path.exists( os.path.join( self.getModelPath(), emFile ) ):
+				if os.path.exists( os.path.join( self.getCurrentModelPath(), emFile ) ):
 					if emFile[-1] == os.sep:
-						newFileName = os.path.join( self.getModelPath(), emFile )+newName+EXTENSION_EM
+						newFileName = os.path.join( self.getCurrentModelPath(), emFile )+newName+EXTENSION_EM
 					else:
-						newFileName = os.path.join( self.getModelPath(), emFile )
+						newFileName = os.path.join( self.getCurrentModelPath(), emFile )
 				else:
 					( emPath, emName ) = os.path.split( emFile )
-					if os.path.exists( os.path.join( self.getModelPath(), emPath ) ):
+					if os.path.exists( os.path.join( self.getCurrentModelPath(), emPath ) ):
 						if emFile[-1] == os.sep:
-							newFileName = os.path.join( self.getModelPath(), emFile )+newName+EXTENSION_EM
+							newFileName = os.path.join( self.getCurrentModelPath(), emFile )+newName+EXTENSION_EM
 						else:
-							newFileName = os.path.join( self.getModelPath(), emFile )
+							newFileName = os.path.join( self.getCurrentModelPath(), emFile )
 					else:
 						msg = "\""+emFile+ERROR_MSG3
 						self.printMessage( msg, msg )
@@ -308,12 +280,12 @@ class Eml:
 
 
 	# ==========================================================================
-	def getModelPath( self ):
+	def getCurrentModelPath( self ):
 
 		pref = Preferences( self.theToolLauncher )
-		return pref.getModelPath()
+		return pref.getCurrentModelPath()
 
-	# end of getModelPath
+	# end of getCurrentModelPath
 
 
 	# ==========================================================================

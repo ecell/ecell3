@@ -12,17 +12,16 @@ import re
 import tempfile
 from Preferences import *
 
-MSG_IMPUT_PROGRAM_PATH      = "Please specify the program path on the preference window."
 MSG_NO_SUCH_CPPFILE         = "Process file does not exist."
 
 # ==========================================================================
 # CopyDirectory Class
-# Auther T.Itaba
+# Author T.Itaba
 # ==========================================================================
 class CompileCpp:
 
 	# ==========================================================================
-	# Constractor
+	# Constructor
 	# ==========================================================================
 	def __init__( self, aToolLauncher ):
 		"""Constructor 
@@ -35,46 +34,37 @@ class CompileCpp:
 	# ==========================================================================
 	def compile( self, src ):
 
-		if self.theToolLauncher.thePref['programs_path'] == "":
+                errorMsg = MSG_NO_SUCH_CPPFILE
+                programPath = self.getProgramPath()
+                if src == "":
+                        src = os.path.join(
+                                self.theToolLauncher.thePref['models_path'], self.theToolLauncher.thePref['current_model'] )
+                if os.path.exists(src):
+                        if os.path.isdir(src):
+                                srcList = os.listdir( src )
+                                for srcFile in srcList:
+                                        ( cpppath, cppfilename ) = os.path.split( srcFile )
+                                        if len(re.split( '[\W]+',cppfilename, 1)) == 2:
+                                                if re.split( '[\W]+',cppfilename, 1)[1] == 'cpp':
+                                                        errorMsg = ""
+                                                        msg = self.compileCpp( os.path.join( src, cppfilename ) )
+                                                        if msg != "":
+                                                                errorMsg = msg
+                        else:
+                                errorMsg = self.compileCpp( src )
 
-			self.printMessage( MSG_IMPUT_PROGRAM_PATH, MSG_IMPUT_PROGRAM_PATH )
+                        if errorMsg == "":
+                                msg = "Compilation of \""+src+"\" was successful."
+                        elif errorMsg == MSG_NO_SUCH_CPPFILE:
+                                msg = MSG_NO_SUCH_CPPFILE
+                        else:
+                                msg = "Compilation of \""+src+"\" has failed."
 
-		else:
+                        self.printMessage( "", msg )
 
-			errorMsg = MSG_NO_SUCH_CPPFILE
-			programPath = self.getProgramPath()
-			if programPath == -1:
-				msg = "Error!"
-				self.printMessage( msg, msg )
-			else:
-				if src == "":
-					src = self.theToolLauncher.thePref['model_path']+os.sep
-				if os.path.exists(src):
-					if os.path.isdir(src):
-						srcList = os.listdir( src )
-						for srcFile in srcList:
-							( cpppath, cppfilename ) = os.path.split( srcFile )
-							if len(re.split( '[\W]+',cppfilename, 1)) == 2:
-								if re.split( '[\W]+',cppfilename, 1)[1] == 'cpp':
-									errorMsg = ""
-									msg = self.compileCpp( os.path.join( src, cppfilename ) )
-									if msg != "":
-										errorMsg = msg
-					else:
-						errorMsg = self.compileCpp( src )
-
-					if errorMsg == "":
-						msg = "Compilation of \""+src+"\" was successful."
-					elif errorMsg == MSG_NO_SUCH_CPPFILE:
-						msg = MSG_NO_SUCH_CPPFILE
-					else:
-						msg = "Compilation of \""+src+"\" has failed."
-
-					self.printMessage( "", msg )
-
-				else:
-					msg = "\""+src+ "\" does not exist.\nPlease enter the appropriate name of the file."
-					self.printMessage( msg, msg )
+                else:
+                        msg = "\""+src+ "\" does not exist.\nPlease enter the appropriate name of the file."
+                        self.printMessage( msg, msg )
 
 	# end of putMessage
 
@@ -83,19 +73,20 @@ class CompileCpp:
 	def compileCpp( self, cppfilename ):
 
 		programpath = self.getProgramPath()
-		cmd = 'python \"'+programpath+'\" \"'+cppfilename+'\"'
+		cmd = programpath+' \"'+cppfilename+'\"'
 		defaultpath = os.getcwd()
 
-		if self.theToolLauncher.thePref['model_path'] == "":
-			os.chdir( self.theToolLauncher.thePref['ecell3_path']+os.sep+self.theToolLauncher.thePref['model_home'] )
+		if self.theToolLauncher.thePref['models_path'] == "":
+			os.chdir( self.theToolLauncher.thePref['ecell3_path']+os.sep+'share' )
 		else:
-			os.chdir( self.theToolLauncher.thePref['model_path'] )
+			os.chdir( os.path.join(
+				self.theToolLauncher.thePref['models_path'], self.theToolLauncher.thePref['current_model'] ) )
 
 		TMPDIR = tempfile.gettempdir()
-		os.system( cmd+" 2> " + TMPDIR + os.sep + "error.log > " + TMPDIR + os.sep + "cpp.log" )
+		ret = os.system( cmd+" 2> \"" + TMPDIR + os.sep + "error.log\" > \"" + TMPDIR + os.sep + "cpp.log\"" )
 		errorMsg = self.checkLog( )
 
-		if errorMsg != "":
+		if not ret == 0:
 			self.printMessage( errorMsg, "" )
 			msg = "Compilation of \""+cppfilename+"\" has failed."
 			
@@ -144,8 +135,10 @@ class CompileCpp:
 
 	# ==========================================================================
 	def getProgramPath( self ):
-		pref = Preferences( self.theToolLauncher )
-		programPath = pref.getProgramPath()+os.sep+'ecell3-dmc'
+		# don't use the full path of ecell3-dmc because E-Cell BINDIR is
+		# already in the $PATH. Full path with whitespaces will cause 
+		# problems on MS-Windows
+		programPath = 'ecell3-dmc'
 		return programPath
 	# end of getProgramPath
 

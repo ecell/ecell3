@@ -32,6 +32,7 @@ class ToolLauncherPreferences( ParentWindow ):
 		self.thePathSelectorDlg.connect('delete_event', self.__deleteFileSelection)
 		iconPixbuf = gtk.gdk.pixbuf_new_from_file(os.environ['TLPATH'] + os.sep + "toollauncher.png")
 		self.thePathSelectorDlg.set_icon(iconPixbuf)
+		self.defaultPref = Preferences( self.theToolLauncher )
 
 
 	def openWindow( self ):
@@ -43,9 +44,9 @@ class ToolLauncherPreferences( ParentWindow ):
 			'on_ok_button_clicked'              : self.onOK ,
 			'on_cancel_button_clicked'          : self.onCancel ,
 			'on_editor_path_button_clicked'	    : self.setPath ,
-			'on_model_path_button_clicked'	    : self.setPath ,
-			'on_programs_path_button_clicked'   : self.setPath ,
-			'on_revert_button_clicked'          : self.sevePref
+			'on_models_path_button_clicked'	    : self.setPath ,
+			'on_current_model_button_clicked'   : self.setPath ,
+			'on_revert_button_clicked'          : self.savePref
 		}
 		self.addHandlers( self.theHandlerMap )
 		self.theOpenFlag = "1"
@@ -56,11 +57,11 @@ class ToolLauncherPreferences( ParentWindow ):
 
 
 	# ==========================================================================
-	def sevePref( self, *arg ):
-		defaultPref = Preferences( self.theToolLauncher )
-		defaultPref.sevePrefernces()
-		self.openWindow()
-	# end of sevePref
+	def savePref( self, *arg ):
+		self.defaultPref.savePreferences()
+                self.__update()
+
+	# end of savePref
 
 
 	def updatePathSelection( self, *arg ):
@@ -69,13 +70,24 @@ class ToolLauncherPreferences( ParentWindow ):
 		"""
 
 		if self.thePathSelectorDlg.get_title() == 'Select Editor Path':
-			self['editor_path'].set_text( self.thePathSelectorDlg.get_filename() )
-		elif self.thePathSelectorDlg.get_title() == 'Select Model Home Directory':
-			directoryName = os.path.dirname( self.thePathSelectorDlg.get_filename() )
-			self['model_path'].set_text( directoryName )
-		elif self.thePathSelectorDlg.get_title() == 'Select Conversion Programs Directory':
-			directoryName = os.path.dirname( self.thePathSelectorDlg.get_filename() )
-			self['programs_path'].set_text( directoryName )
+                        fileName = self.thePathSelectorDlg.get_filename()
+                        if os.path.isfile( fileName ):
+                                self['editor_path'].set_text( fileName )
+			
+		elif self.thePathSelectorDlg.get_title() == 'Select Models Home Directory':
+                        dirName = self.thePathSelectorDlg.get_filename()
+                        if os.path.isdir( dirName ):
+                                self['models_path'].set_text( dirName )
+                                self['current_model'].set_text( '' )			
+			
+		elif self.thePathSelectorDlg.get_title() == 'Select Current Model Directory':
+                        dirName = self.thePathSelectorDlg.get_filename()
+                        if os.path.isdir( dirName ):
+                                modelBaseDir, modelName = os.path.split( 
+                                        self.thePathSelectorDlg.get_filename() )
+                                self['models_path'].set_text( modelBaseDir )
+                                self['current_model'].set_text( modelName )			
+			
 		self.thePathSelectorDlg.hide()
 
 
@@ -99,24 +111,46 @@ class ToolLauncherPreferences( ParentWindow ):
 			iconPixbuf = gtk.gdk.pixbuf_new_from_file(os.environ['TLPATH'] + os.sep + "toollauncher.png")
 			self.thePathSelectorDlg.set_icon(iconPixbuf)
 
-		self.thePathSelectorDlg.set_filename( self.theToolLauncher.thePref['ecell3_path']+os.sep )
 
 		if arg[0] == self['editor_path_button']:
+                        if os.path.isfile( self['editor_path'].get_text() ):
+                                self.thePathSelectorDlg.set_filename( os.path.dirname(
+                                        self['editor_path'].get_text()+os.sep ) )
+                        else:
+                                self.thePathSelectorDlg.set_filename(
+                                                self.theToolLauncher.thePref['ecell3_path']+os.sep )
 			self.thePathSelectorDlg.set_title('Select Editor Path')
-		elif arg[0] == self['model_path_button']:
-			self.thePathSelectorDlg.set_title('Select Model Home Directory')
-		elif arg[0] == self['programs_path_button']:
-			self.thePathSelectorDlg.set_title('Select Conversion Programs Directory')
+		elif arg[0] == self['models_path_button']:
+                        if os.path.isdir( self['models_path'].get_text() ):
+                                self.thePathSelectorDlg.set_filename(
+                                                self['models_path'].get_text()+os.sep )
+                        else:
+                                self.thePathSelectorDlg.set_filename(
+                                                self.theToolLauncher.thePref['ecell3_path']+os.sep )
+			self.thePathSelectorDlg.set_title('Select Models Home Directory')
+		elif arg[0] == self['current_model_button']:
+                        if os.path.isdir( self['models_path'].get_text() ):
+                                self.thePathSelectorDlg.set_filename(
+                                                self['models_path'].get_text()+os.sep )
+                        else:
+                                self.thePathSelectorDlg.set_filename(
+                                                self.theToolLauncher.thePref['ecell3_path']+os.sep )                        
+			self.thePathSelectorDlg.set_title('Select Current Model Directory')
 
 		self.thePathSelectorDlg.set_modal(True)
 		self.thePathSelectorDlg.activate()
 		self.thePathSelectorDlg.show_all()
-
+ 
 
 	def onOK( self, *arg ):
 	        """when ok button is clicked
 	        """
-		if self['save_em_checkbox'].get_active():
+                if self.isPrefOK():
+                        self.setToolLauncherPref()
+                        return self.__deleted( *arg )
+                        
+        def setToolLauncherPref( self, *arg ):
+      		if self['save_em_checkbox'].get_active():
 		    	self.theToolLauncher.thePref['save_em'] = '1'
 		else:
 		    	self.theToolLauncher.thePref['save_em'] = '0' 
@@ -127,13 +161,71 @@ class ToolLauncherPreferences( ParentWindow ):
 		    	self.theToolLauncher.thePref['save_eml'] = '0' 
 
 		self.theToolLauncher.thePref['editor_path'] = self['editor_path'].get_text()
-		self.theToolLauncher.thePref['model_path'] = self['model_path'].get_text()
-		self.theToolLauncher.thePref['model_home'] = self['model_path'].get_text()
-		self.theToolLauncher.thePref['programs_path'] = self['programs_path'].get_text()
+		self.theToolLauncher.thePref['models_path'] = self['models_path'].get_text()
+		self.theToolLauncher.thePref['current_model'] = self['current_model'].get_text()
 		self.theToolLauncher.savePreferences()
-		flg = self.theToolLauncher.checkPref()
-		if flg == 0:
-			return self.__deleted( *arg )
+
+	def isPrefOK( self ):
+
+                if not self.isEditorPathOK():
+                        return False
+                elif not self.isModelsPathOK():
+                        return False
+                elif not self.isCurrentModelOK():
+                        return False
+                else:
+                        return True
+
+	# end of isPrefOK
+
+
+	# ==========================================================================
+	def isEditorPathOK( self ):
+
+                if not os.path.isfile( self['editor_path'].get_text() ):
+                        errorMsg = "Please enter a valid path for your favorite text editor."
+			self.theToolLauncher.viewErrorMessage( errorMsg )
+                        return False 
+                else:
+                        return True
+
+	# end of isEditorPathOK
+
+
+	# ==========================================================================
+	def isModelsPathOK( self ):
+                
+                if self['models_path'].get_text() == '' or not os.path.isdir( self['models_path'].get_text() ):
+			errorMsg = "Please enter a valid base directory of the models that you will create."
+			self.theToolLauncher.viewErrorMessage( errorMsg )
+                        return False
+			
+		else:
+			return True
+
+	# end of isModelsPathOK
+
+
+	# ==========================================================================
+	def isCurrentModelOK( self ):
+
+                currentModelPath = os.path.join(
+                                self['models_path'].get_text(),
+                                self['current_model'].get_text() )
+                
+                if self['current_model'].get_text() == '':
+                        errorMsg = "Please enter a valid current model name."
+			self.theToolLauncher.viewErrorMessage( errorMsg )
+                        return False			
+                elif not os.path.isdir( currentModelPath ):
+                        errorMsg = "The directory " + currentModelPath + \
+                            " for current model does not exist.\n Please create it using the Folder... button."
+			self.theToolLauncher.viewErrorMessage( errorMsg )
+                        return False			
+		else:
+			return True
+
+	# end of isCurrentModelOK
 
 
 	def onCancel( self, *arg ):
@@ -156,8 +248,8 @@ class ToolLauncherPreferences( ParentWindow ):
 
 
 		self['editor_path'].set_text( self.theToolLauncher.thePref['editor_path'] )
-		self['model_path'].set_text( self.theToolLauncher.thePref['model_home'] )
-		self['programs_path'].set_text( self.theToolLauncher.thePref['programs_path'] )
+		self['models_path'].set_text( self.theToolLauncher.thePref['models_path'] )
+		self['current_model'].set_text( self.theToolLauncher.thePref['current_model'] )
 		self.update()
 
 
