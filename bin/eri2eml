@@ -132,17 +132,16 @@ Options:
 
     anEml.createStepper( 'Euler1Stepper', 'SRM_01')
 
+    aSystemFullID='System::/'
+    anEml.createEntity( 'System', aSystemFullID )
+    anEml.setEntityProperty( aSystemFullID, 'StepperID', ['SRM_01'] )
+    anEml.setEntityProperty( aSystemFullID, 'Name', ['Root System'] )
 
     for anEriLine in anEriStrings:
         if ( anEriLine[0] == 'SYSTEM' ):
-            if ( anEriLine[2] == '/:ENVIRONMENT' ):
-#                print anEriLine[2]
-                aSystemFullID = 'System::/'
-#                print aSystemFullID
-            else:
-#                aSystemID = replaceProhibitLetter( anEriLine[2] )
-#                print aSystemID
-                aSystemFullID = 'System:' +anEriLine[2]                
+#           aSystemID = replaceProhibitLetter( anEriLine[2] )
+#           print aSystemID
+            aSystemFullID = 'System:' +anEriLine[2]                
             anEml.createEntity( 'System', aSystemFullID )
             anEml.setEntityProperty( aSystemFullID, 'StepperID', ['SRM_01'] )
             anEml.setEntityProperty( aSystemFullID, 'Name', anEriLine[3:4] )
