@@ -7,7 +7,6 @@ from Plugin import *
 from gtk import *
 from ecssupport import *
 
-from script import simulator
 import ecs
 
 import PaletteWindow
