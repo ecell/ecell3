@@ -34,6 +34,8 @@ OrderedBiUniFluxProcess.cpp\
 OrderedUniBiFluxProcess.cpp\
 SSystemProcess.cpp\
 GillespieProcess.cpp\
+TauLeapProcess.cpp\
+TauLeapStepper.cpp\
 NRStepper.cpp\
 FixedODE1Stepper.cpp\
 FixedDAE1Stepper.cpp\
@@ -67,6 +69,8 @@ ODE23Stepper.hpp\
 DAEStepper.hpp\
 FluxDistributionStepper.hpp\
 QuasiDynamicFluxProcess.hpp\
+TauLeapProcess.hpp\
+TauLeapStepper.hpp\
 ODE45Stepper.hpp
 
 DESCS = \
