@@ -53,7 +53,7 @@ import _winreg
 # Get installed Python prefix from Windows registry
 try:
 	key = _winreg.OpenKey( _winreg.HKEY_LOCAL_MACHINE, \
-		r'Software\Python\PythonCore\%s' % (sys.winver) )
+		r'Software\Python\PythonCore\%d.%d' % (sys.version_info[0], sys.version_info[1]) )
 except:
 	print "Could not find Python in registry"
 	sys.exit(1)

@@ -140,7 +140,7 @@ def main():
         sys.exit(1)
 
     if os.name == 'nt':
-        PYTHON_WIN_VERSION = sys.winver.replace( '.', '' )
+        PYTHON_WIN_VERSION = ( '%d%d' )%( sys.version_info[:2] )
         ADDFLAGS = ' -Wl,--enable-runtime-pseudo-reloc -Wl,-s -lpython' + \
                    PYTHON_WIN_VERSION
     else:
