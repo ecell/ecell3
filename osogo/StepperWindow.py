@@ -129,53 +129,74 @@ class StepperWindow(OsogoWindow):
 
 		self.theSelectedStepperIDListItem = objects[1]
 
+	
+	
+
 		for theStepperIDListItem in self.theStepperIDListItems:
 			if theStepperIDListItem == objects[1]:
 				aStepperID = theStepperIDListItem.get_name()
 
 				self['property_list'].clear()
 
-				for aProperty in self.theSession.theSimulator.getStepperProperty( aStepperID, 
-				                                                                   'PropertyList' ):
+				aClassName = self.theSession.theSimulator.getStepperClassName( aStepperID )
+				aList = [ 'ClassName', ]
+				aList.append( '' )
+				aList.append( str(aClassName) )
+				aList.append( decodeAttribute( TRUE ) )
+				aList.append( decodeAttribute( FALSE ) )
+				self['property_list'].append( aList )
 
-					#print aProperty
+				for aProperty in self.theSession.theSimulator.getStepperPropertyList( aStepperID ):
 
-					if aProperty[PROPERTYNAME] == 'PropertyAttributes':
+					if aProperty == 'PropertyAttributes':
 						continue
 
-					elif aProperty[PROPERTYNAME] == 'PropertyList':
-						continue
+					elif aProperty == 'PropertyList': # This should be removed.
+						continue                  # This should be removed.
 
-					data =  self.theSession.theSimulator.getStepperProperty( aStepperID, 
-					                                                         aProperty[PROPERTYNAME] )
-	
+					elif aProperty == 'ClassName':    # This should be removed.
+						continue                  # This should be removed.
+
+					data =  self.theSession.theSimulator.getStepperProperty( aStepperID, aProperty )
+
 					# ---------------------------
-					# When data type is tuple
+					# When data type is scalar
 					# ---------------------------
 					if type(data) != type(()):
 
-						aList = [ aProperty[PROPERTYNAME] ]
+						#aList = [ aProperty[PROPERTYNAME] ]
+						aList = [ aProperty, ]
 						aList.append( '' )
 						aList.append( str(data) )
-						aList.append( decodeAttribute(aProperty[GETABLE]) )
-						aList.append( decodeAttribute(aProperty[SETABLE]) )
+
+						anAttribute = self.theSession.theSimulator.getStepperPropertyAttributes( aStepperID, aProperty )
+
+
+						aList.append( decodeAttribute(anAttribute[GETABLE]) )
+						aList.append( decodeAttribute(anAttribute[SETABLE]) )
 
 						self['property_list'].append( aList )
 
 					# ---------------------------
-					# When data type is scalar
+					# When data type is tuple
 					# ---------------------------
 					else:
 
 						aNumber = 0
 						for anElement in data:
 
-							aList = [ aProperty[PROPERTYNAME] ]
+							#aList = [ aProperty[PROPERTYNAME] ]
+							aList = [ aProperty ]
 
+							anAttribute = self.theSession.theSimulator.getStepperPropertyAttributes( aStepperID, aProperty )
 							aList.append( `aNumber` )
 							aList.append( str(anElement) )
-							aList.append( decodeAttribute(aProperty[GETABLE]) )
-							aList.append( decodeAttribute(aProperty[SETABLE]) )
+
+							aList.append( decodeAttribute(anAttribute[GETABLE]) )
+							aList.append( decodeAttribute(anAttribute[SETABLE]) )
+
+							#aList.append( decodeAttribute(aProperty[GETABLE]) )
+							#aList.append( decodeAttribute(aProperty[SETABLE]) )
 
 							self['property_list'].append( aList )
 
@@ -226,6 +247,8 @@ class StepperWindow(OsogoWindow):
 
 	# ---------------------------------------------------------------
 	# updateProprety
+	# This method doesn't deal with 'ClassName' is selected,
+	# but there is no case that this is called with selecting 'ClassName'.
 	#
 	# return -> None
 	# ---------------------------------------------------------------

@@ -251,25 +251,40 @@ class OsogoPluginWindow(PluginWindow):
 	def setValue( self, aFullPN, aValue ):
 
 		aFullID = convertFullPNToFullID( aFullPN )
-		aFullPNwithProperty = convertFullIDToFullPN( aFullID, 'PropertyList' )
-		aFullPNwithPropertyString = createFullPNString( aFullPNwithProperty )
-		aPropertyList = self.theSession.theSimulator.getEntityProperty( aFullPNwithPropertyString )
+		#aFullPNwithProperty = convertFullIDToFullPN( aFullID, 'PropertyList' )
+		#aFullPNwithPropertyString = createFullPNString( aFullPNwithProperty )
+		#aPropertyList = self.theSession.theSimulator.getEntityProperty( aFullPNwithPropertyString )
 
-		for aProperty in aPropertyList:
+		aPropertyList = self.theSession.theSimulator.getEntityPropertyList( createFullIDString( aFullID ) )
+
+		anAttribute = self.theSession.theSimulator.getEntityPropertyList( createFullPNString( aFullPN ) )
+
+		if anAttribute[SETABLE] == TRUE:
+			self.theSession.theSimulator.setEntityProperty( createFullPNString( aFullPN ), aValue )
+			return None
+		else:
+			aFullPNString = createFullPNString( aFullPN )
+			self.theSession.printMessage('%s is not settable\n' % aFullPNString )
+			return None
+	
+
+		#for aProperty in aPropertyList:
 			# if proprety matches and settable flag is true
-			if aProperty[0] == aFullPN[-1] :
-				if aProperty[1] == TRUE:
-					self.theSession.theSimulator.setEntityProperty( createFullPNString( aFullPN ), aValue )
-					self.thePluginManager.updateAllPluginWindow()
-					self.thePluginManager.updateFundamentalWindows()
-					return None
-				else:
-					aFullPNString = createFullPNString( aFullPN )
-					self.theSession.printMessage('%s is not settable\n' % aFullPNString )
-					return None
+			#if aProperty[0] == aFullPN[-1] :
+			#if aProperty == aFullPN[-1] :
+				#if aProperty[1] == TRUE:
+				#if aProperty[1] == TRUE:
+				#	self.theSession.theSimulator.setEntityProperty( createFullPNString( aFullPN ), aValue )
+				#	self.thePluginManager.updateAllPluginWindow()
+				#	self.thePluginManager.updateFundamentalWindows()
+				#	return None
+				#else:
+				#	aFullPNString = createFullPNString( aFullPN )
+				#	self.theSession.printMessage('%s is not settable\n' % aFullPNString )
+				#	return None
 
-		aFullPNString = createFullPNString( aFullPN )
-		self.theSession.printMessage('proprety of %s is wrong\n' %aFullPNString )
+		#aFullPNString = createFullPNString( aFullPN )
+		#self.theSession.printMessage('proprety of %s is wrong\n' %aFullPNString )
 
 
 	# end of setValue

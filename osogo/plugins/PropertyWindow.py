@@ -58,19 +58,15 @@ class PropertyWindow(OsogoPluginWindow):
         
 		aNameFullPN = convertFullIDToFullPN( self.theFullID() ,'Name' )
 
-		#aNameList = self.theSession.theSimulator.getEntityProperty( createFullPNString( aNameFullPN ) ) 
-		#aClassName = aNameList[0]
 		aClassName = self.theSession.theSimulator.getEntityProperty( createFullPNString( aNameFullPN ) ) 
 
 		self.theType =ENTITYTYPE_STRING_LIST[ self.theFullID()[TYPE] ]
 		self.theID   = str( self.theFullID()[ID] )
 		self.thePath = str( self.theFullID()[SYSTEMPATH] )
-		aClassNameFullPN = convertFullIDToFullPN( self.theFullID(), 'ClassName' )
-		aNameFullPN = convertFullIDToFullPN( self.theFullID(), 'Name' )
+		#aNameFullPN = convertFullIDToFullPN( self.theFullID(), 'Name' )
 
-		aClassName = self.theSession.theSimulator.getEntityProperty( createFullPNString( aClassNameFullPN ) )
+		aClassName = self.theSession.theSimulator.getEntityClassName( createFullIDString( self.theFullID() ) )
 		aName = self.theSession.theSimulator.getEntityProperty( createFullPNString( aNameFullPN ) )
-
 
 		self.theTypeEntry.set_text( self.theType + ' : ' + aClassName )
 		self.theIDEntry.set_text  ( self.theID )
@@ -100,20 +96,26 @@ class PropertyWindow(OsogoPluginWindow):
 
 		self.theList = []
 
-		aPropertyListFullPN = convertFullIDToFullPN( self.theFullID(),
-		                                             'PropertyList' )
-
-		self.prevFullID = convertFullPNToFullID( aPropertyListFullPN )        
-		aPropertyList = self.theSession.theSimulator.getEntityProperty( createFullPNString( aPropertyListFullPN ) )
+		aPropertyList = self.theSession.theSimulator.getEntityPropertyList( createFullIDString( self.theFullID() ) )
 
 		for aProperty in aPropertyList: # for (1)
+
+			if aProperty == 'PropertyList':  # This should be removed.
+				continue                 # This should be removed.
+			elif aProperty == 'ClassName':   # This should be removed.
+				continue                 # This should be removed.
+
 			Set = -1
 			aGet = -1
 
-			if type(aProperty) == type(()):  # if (2)
-				aSet = aProperty[1]
-				aGet = aProperty[2]
-				aProperty = aProperty[0]
+			aFullPN = convertFullIDToFullPN( self.theFullID(), aProperty )
+
+			aValue = self.theSession.theSimulator.getEntityProperty( createFullPNString( aFullPN ) )
+
+			anAttribute = self.theSession.theSimulator.getEntityPropertyAttributes( createFullPNString( aFullPN ) )
+
+			aSet = anAttribute[0]
+			aGet = anAttribute[1]
 
 			# end of if (2)
 
@@ -126,18 +128,18 @@ class PropertyWindow(OsogoPluginWindow):
 				#aValueList = self.theSession.theSimulator.getProperty( createFullPNString( aFullPN ) )
 
 				#print aValueList
-				pass
+				continue
 
 			elif (aProperty == 'PropertyList'):
-				pass
+				continue
 			elif (aProperty == 'PropertyAttributes'):
-				pass
+				continue
 			elif (aProperty == 'FullID'):
-				pass
+				continue
 			elif (aProperty == 'ID'):
-				pass
+				continue
 			elif (aProperty == 'Name'):
-				pass
+				continue
 			else :
                 
 				aFullPN = convertFullIDToFullPN( self.theFullID(), aProperty )

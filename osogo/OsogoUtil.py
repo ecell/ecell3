@@ -39,9 +39,8 @@ from ecell.ecssupport import *
 # Index of stepper's proprety
 # ----------------------------------------------------------------------
 
-PROPERTYNAME  = 0
-SETABLE       = 1
-GETABLE       = 2
+SETABLE       = 0
+GETABLE       = 1
 
 
 # ----------------------------------------------------------------------
