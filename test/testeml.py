@@ -1,3 +1,5 @@
+from Numeric import *
+
 import ecell.Session
 import ecell.ecs
 
@@ -16,11 +18,13 @@ aSession.loadModel( aFile )
 
 aFile.close()
 
+print 'init'
+aSimulator.initialize()
 
 aLogger1 = aSimulator.getLogger( 'Substance:/CELL/CYTOPLASM:S:Quantity'  )
 
 
-aSimulator.initialize()
+
 
 #printAllProperties( aSimulator, 'System::/' )
 #printAllProperties( aSimulator, 'System:/:CELL' )
@@ -44,6 +48,18 @@ printProperty( aSimulator, 'Substance:/CELL/CYTOPLASM:S:Activity' )
 printProperty( aSimulator, 'Substance:/CELL/CYTOPLASM:S:Velocity' )
 printProperty( aSimulator, 'Substance:/CELL/CYTOPLASM:P:Quantity' )
 
-#d = aLogger1.getData()
-#print len( d )
-#print d[0:100]
+
+print 'logger list:', aSimulator.getLoggerList()
+
+if aLogger1:
+#if 0:
+    print "Logger: name: %s, start: %s, end: %s, size: %s" %\
+          ( aLogger1.getName(),
+            aLogger1.getStartTime(), aLogger1.getEndTime(),\
+            aLogger1.getSize() )
+    print aLogger1.getData( 0, aLogger1.getEndTime() )[:5]
+    print aLogger1.getData( aLogger1.getEndTime() - 10 ,
+                            aLogger1.getEndTime() , .5 )[:5]
+    print aLogger1.getData()[-10:]
+
+
