@@ -208,11 +208,6 @@ namespace libecs
     SystemPtr theSuperSystem;
 
 
-    /// @internal
-
-    virtual StringLiteral getClassName() const { return "Entity"; }
-
-
     String    theID;
     String    theName;
   };

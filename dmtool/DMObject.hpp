@@ -13,4 +13,4 @@
 
 
 #define DM_BASECLASS( CLASSNAME )\
- typedef ProcessPtr (* AllocatorFuncPtr )()
+ typedef CLASSNAME * (* AllocatorFuncPtr )()
