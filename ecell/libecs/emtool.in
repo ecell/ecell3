@@ -29,7 +29,7 @@ SOSUFFIX=".so"
 CPPSUFFIX=".cpp"
 HPPSUFFIX=".hpp"
 
-unset DO_COMPILE DO_GENERATE DO_COMPILE
+unset DO_COMPILE DO_GENERATE DO_COMPILE FORCE
 
 TMPDIR="/tmp"
 ETTMPDIR="$TMPDIR/emtool.$$"
@@ -56,6 +56,7 @@ Options:
 	-a or --all)	        All dynamic module compile.
 	-g or --generate)       Generate dm to cpp/hpp source file.
 	-c or --compile)        Compile cpp to so file.
+#	-f or --force)          Disable modification time checks.
 	-h or --help)		Print this message.
 
 This program is part of E-CELL Simulation Environment Version 3.
@@ -117,6 +118,7 @@ while true ; do
 	-a|--all) DO_ALL=yes ; shift ; break ;;
 	-g|--generate) DO_GENERATE=yes ; shift ; break ;;
 	-c|--compile) DO_COMPILE=yes ; shift ; break ;;
+#	-f|--force) FORCE=yes ; shift ; break ;;
 	-h|--help) help ; exit 0 ;;
 	*) echo "Internal error! " ; help ; exit 1 ;;
     esac
@@ -183,12 +185,12 @@ if [ $DO_COMPILE  ] ; then
     base=`basename $inputfile .cpp`	     			
     sofile=$base$SOSUFFIX
 
-    if test -f $sofile && test $sofile -nt $inputfile ; then
-	echo "$sofile is newer than $inputfile..." 
-	echo "skipping..."
-	cleanup
-	exit 0
-    fi
+#    if test -f $sofile && test $sofile -nt $inputfile ; then
+#	echo "$sofile is newer than $inputfile..." 
+#	echo "skipping..."
+#	cleanup
+#	exit 0
+#    fi
 
     run_command "$DMCOMPILE $base.cpp -I $ECELL_INCLUDE -I $EMTOOL_INCLUDE -I . -I .." 
 
