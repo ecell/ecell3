@@ -53,14 +53,13 @@ class MainWindow(Window):
         # remove PropertyList itself
         aPropertyList.remove( 'PropertyList' )
 
-        thePropertyClist.clear()
+        self.thePropertyClist.clear()
 
         for x in aPropertyList:
             aValueList = tmpget( x )
             #            aName = aValueList[0]
             #            aValueList = aValueList[1:]
             aValueList = map( toString, aValueList )
-
 
             self.thePropertyClist.append( aValueList )
             print aValueList
@@ -69,8 +68,6 @@ class MainWindow(Window):
 def toString( object ):
     return str( object )
     
-    
-
 def mainQuit( obj, data ):
     print obj,data
     gtk.mainquit()
@@ -86,7 +83,7 @@ def main():
     mainLoop()
     
 testdic={ 'PropertyList': ('PropertyList', 'A','B','C'),
-          'A': ('aaa', 234) ,'B': (1.04E-3,33) ,'C': (41,'bb','aa',90) }
+          'A': ('aaa', ) ,'B': (1.04E-3, ) ,'C': (41, ) }
 
 def tmpget( name ):
     aList = list(testdic[name])
@@ -96,30 +93,3 @@ def tmpget( name ):
 if __name__ == "__main__":
 
     main()
-    
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
