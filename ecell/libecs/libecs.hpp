@@ -102,7 +102,7 @@ namespace libecs
   DECLARE_CLASS( ProcessMaker );
   DECLARE_CLASS( Stepper );
   DECLARE_CLASS( SystemStepper );
-  DECLARE_CLASS( VariableProxy );
+  DECLARE_CLASS( Interpolant );
   DECLARE_CLASS( Model );
   DECLARE_CLASS( Scheduler );
   DECLARE_CLASS( SchedulerEvent );

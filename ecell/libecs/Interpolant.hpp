@@ -36,7 +36,7 @@
 namespace libecs
 {
 
-  class VariableProxy
+  class Interpolant
   {
     friend class libecs::Stepper;
 
@@ -46,20 +46,20 @@ namespace libecs
     class VariablePtrCompare
     {
     public:
-      bool operator()( VariableProxyCptr const aLhs, 
-		       VariableProxyCptr const aRhs ) const
+      bool operator()( InterpolantCptr const aLhs, 
+		       InterpolantCptr const aRhs ) const
       {
 	return compare( aLhs->getVariable(), aRhs->getVariable() );
       }
 
-      bool operator()( VariableProxyCptr const aLhs,
+      bool operator()( InterpolantCptr const aLhs,
 		       VariableCptr const aRhs ) const
       {
 	return compare( aLhs->getVariable(), aRhs );
       }
 
       bool operator()( VariableCptr const aLhs, 
-		       VariableProxyCptr const aRhs ) const
+		       InterpolantCptr const aRhs ) const
       {
 	return compare( aLhs, aRhs->getVariable() );
       }
@@ -84,9 +84,9 @@ namespace libecs
     };
 
 
-    VariableProxy( VariablePtr const aVariable );
+    Interpolant( VariablePtr const aVariable );
 
-    virtual ~VariableProxy();
+    virtual ~Interpolant();
     
     virtual const Real getDifference( RealParam aTime, RealParam anInterval )
     {
@@ -105,7 +105,7 @@ namespace libecs
   };
 
 
-  DECLARE_VECTOR( VariableProxyPtr, VariableProxyVector );
+  DECLARE_VECTOR( InterpolantPtr, InterpolantVector );
 
 }
 

@@ -35,7 +35,7 @@
 
 #include "libecs.hpp"
 #include "Entity.hpp"
-#include "VariableProxy.hpp"
+#include "Interpolant.hpp"
 #include "System.hpp"
 
 
@@ -128,7 +128,7 @@ namespace libecs
 
     virtual const bool isIntegrationNeeded() const
     {
-      return ! theVariableProxyVector.empty();
+      return ! theInterpolantVector.empty();
     }
 
     /** 
@@ -324,8 +324,8 @@ namespace libecs
     }
 
 
-    void registerProxy( VariableProxyPtr const anVariableProxy );
-    //    void removeProxy( VariableProxyPtr const anVariableProxy );
+    void registerProxy( InterpolantPtr const anInterpolant );
+    //    void removeProxy( InterpolantPtr const anInterpolant );
 
 
   protected:
@@ -334,10 +334,10 @@ namespace libecs
 				     RealParam anInterval ) const
     {
       Real aVelocitySum( 0.0 );
-      FOR_ALL( VariableProxyVector, theVariableProxyVector )
+      FOR_ALL( InterpolantVector, theInterpolantVector )
 	{
-	  VariableProxyPtr const anVariableProxyPtr( *i );
-	  aVelocitySum += anVariableProxyPtr->getDifference( aCurrentTime,
+	  InterpolantPtr const anInterpolantPtr( *i );
+	  aVelocitySum += anInterpolantPtr->getDifference( aCurrentTime,
 							     anInterval );
 	}
 
@@ -367,7 +367,7 @@ namespace libecs
 
 
 
-    void clearVariableProxyVector();
+    void clearInterpolantVector();
 
   private:
 
@@ -386,7 +386,7 @@ namespace libecs
 
     Real theLastTime;
 
-    VariableProxyVector theVariableProxyVector;
+    InterpolantVector theInterpolantVector;
 
     bool theFixed;
   };

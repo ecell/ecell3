@@ -34,7 +34,7 @@
 
 // #include <iostream>
 
-#include "libecs/VariableProxy.hpp"
+#include "libecs/Interpolant.hpp"
 #include "libecs/DifferentialStepper.hpp"
 
 USE_LIBECS;
@@ -42,16 +42,16 @@ USE_LIBECS;
 LIBECS_DM_CLASS( ODE45Stepper, AdaptiveDifferentialStepper )
 {
 
-  class VariableProxy
+  class Interpolant
     :
-    public libecs::VariableProxy
+    public libecs::Interpolant
   {
   public:
 
-    VariableProxy( ODE45StepperRef aStepper, 
+    Interpolant( ODE45StepperRef aStepper, 
 		   VariablePtr const aVariablePtr )
       :
-      libecs::VariableProxy( aVariablePtr ),
+      libecs::Interpolant( aVariablePtr ),
       theStepper( aStepper ),
       theIndex( theStepper.getVariableIndex( aVariablePtr ) )
     {
@@ -161,10 +161,10 @@ public:
 
   virtual GET_METHOD( Integer, Order ) { return 5; }
 
-  virtual VariableProxyPtr createVariableProxy( VariablePtr aVariable )
+  virtual InterpolantPtr createInterpolant( VariablePtr aVariable )
   {
     return new 
-      ODE45Stepper::VariableProxy( *this, aVariable );
+      ODE45Stepper::Interpolant( *this, aVariable );
   }
 
   RealVectorCref getMidVelocityBuffer() const

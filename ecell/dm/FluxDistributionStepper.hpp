@@ -33,7 +33,7 @@
 
 #include "libecs/libecs.hpp"
 
-#include "libecs/VariableProxy.hpp"
+#include "libecs/Interpolant.hpp"
 #include "libecs/Stepper.hpp"
 #include "libecs/DifferentialStepper.hpp"
 

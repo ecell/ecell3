@@ -57,37 +57,37 @@ namespace libecs
 
   Variable::~Variable()
   {
-    clearVariableProxyVector();
+    clearInterpolantVector();
   }
 
 
   void Variable::initialize()
   {
-    clearVariableProxyVector();
+    clearInterpolantVector();
   }
 
-  void Variable::clearVariableProxyVector()
+  void Variable::clearInterpolantVector()
   {
-    for( VariableProxyVectorIterator i( theVariableProxyVector.begin() );
-	   i != theVariableProxyVector.end(); ++i )
+    for( InterpolantVectorIterator i( theInterpolantVector.begin() );
+	   i != theInterpolantVector.end(); ++i )
       {
 	delete (*i);
       }
 
-    theVariableProxyVector.clear();
+    theInterpolantVector.clear();
   }
 
 
-  void Variable::registerProxy( VariableProxyPtr const anVariableProxyPtr )
+  void Variable::registerProxy( InterpolantPtr const anInterpolantPtr )
   {
-    theVariableProxyVector.push_back( anVariableProxyPtr );
+    theInterpolantVector.push_back( anInterpolantPtr );
   }
 
-  //  void Variable::removeProxy( VariableProxyPtr const anVariableProxyPtr )
+  //  void Variable::removeProxy( InterpolantPtr const anInterpolantPtr )
   //  {
-  //    theVariableProxyVector.erase( std::remove( theVariableProxyVector.begin(),
-  //					       theVariableProxyVector.end(),
-  //					       anVariableProxyPtr ) );
+  //    theInterpolantVector.erase( std::remove( theInterpolantVector.begin(),
+  //					       theInterpolantVector.end(),
+  //					       anInterpolantPtr ) );
   //  }
 
 

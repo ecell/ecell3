@@ -44,15 +44,15 @@ LIBECS_DM_CLASS( ESSYNSStepper, AdaptiveDifferentialStepper )
 
  public:
 
-    class VariableProxy
+    class Interpolant
       :
-      public libecs::VariableProxy
+      public libecs::Interpolant
     {
     public:
-      VariableProxy( ESSYNSStepperRef aStepper, 
+      Interpolant( ESSYNSStepperRef aStepper, 
 		     VariablePtr const aVariablePtr )
 	:
-	libecs::VariableProxy( aVariablePtr ),
+	libecs::Interpolant( aVariablePtr ),
 	theStepper( aStepper ),
 	theIndex( theStepper.getVariableIndex( aVariablePtr ) )
       {
@@ -113,9 +113,9 @@ public:
       return theTaylorOrder;
     }
 
-  virtual VariableProxyPtr createVariableProxy( VariablePtr aVariable )
+  virtual InterpolantPtr createInterpolant( VariablePtr aVariable )
     {
-      return new ESSYNSStepper::VariableProxy( *this, aVariable );
+      return new ESSYNSStepper::Interpolant( *this, aVariable );
     }
 
 protected:

@@ -34,7 +34,7 @@
 
 #include "Util.hpp"
 #include "Variable.hpp"
-#include "VariableProxy.hpp"
+#include "Interpolant.hpp"
 #include "Process.hpp"
 #include "Model.hpp"
 #include "FullID.hpp"
@@ -83,7 +83,7 @@ namespace libecs
     //      {
 
     //
-    // Update theVariableVector.  This also calls updateVariableProxyVector.
+    // Update theVariableVector.  This also calls updateInterpolantVector.
     //
     updateVariableVector();
 
@@ -252,7 +252,7 @@ namespace libecs
 	 c != theReadOnlyVariableOffset; ++c )
       {
 	VariablePtr aVariablePtr( theVariableVector[ c ] );
-	aVariablePtr->registerProxy( createVariableProxy( aVariablePtr ) );
+	aVariablePtr->registerProxy( createInterpolant( aVariablePtr ) );
       }
   }
 

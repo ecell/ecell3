@@ -69,15 +69,15 @@ namespace libecs
 	PROPERTYSLOT_GET_NO_LOAD_SAVE( Real, NextStepInterval );
       }
 
-    class VariableProxy
+    class Interpolant
       :
-      public libecs::VariableProxy
+      public libecs::Interpolant
     {
     public:
-      VariableProxy( DifferentialStepperRef aStepper, 
+      Interpolant( DifferentialStepperRef aStepper, 
 		     VariablePtr const aVariablePtr )
 	:
-	libecs::VariableProxy( aVariablePtr ),
+	libecs::Interpolant( aVariablePtr ),
 	theStepper( aStepper ),
 	theIndex( theStepper.getVariableIndex( aVariablePtr ) )
       {
@@ -148,9 +148,9 @@ namespace libecs
       return theVelocityBuffer;
     }
 
-    virtual VariableProxyPtr createVariableProxy( VariablePtr aVariable )
+    virtual InterpolantPtr createInterpolant( VariablePtr aVariable )
     {
-      return new DifferentialStepper::VariableProxy( *this, aVariable );
+      return new DifferentialStepper::Interpolant( *this, aVariable );
     }
 
   protected:
@@ -202,16 +202,16 @@ namespace libecs
       }
 
 
-    class VariableProxy
+    class Interpolant
       :
-      public libecs::VariableProxy
+      public libecs::Interpolant
     {
     public:
 
-      VariableProxy( AdaptiveDifferentialStepperRef aStepper, 
+      Interpolant( AdaptiveDifferentialStepperRef aStepper, 
 		     VariablePtr const aVariablePtr )
 	:
-	libecs::VariableProxy( aVariablePtr ),
+	libecs::Interpolant( aVariablePtr ),
 	theStepper( aStepper ),
 	theIndex( theStepper.getVariableIndex( aVariablePtr ) )
       {
@@ -355,9 +355,9 @@ namespace libecs
       return theK1;
     }
 
-    virtual VariableProxyPtr createVariableProxy( VariablePtr aVariable )
+    virtual InterpolantPtr createInterpolant( VariablePtr aVariable )
     {
-      return new AdaptiveDifferentialStepper::VariableProxy( *this, aVariable );
+      return new AdaptiveDifferentialStepper::Interpolant( *this, aVariable );
     }
 
   protected:

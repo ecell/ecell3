@@ -30,13 +30,13 @@
 
 #include "Variable.hpp"
 
-#include "VariableProxy.hpp"
+#include "Interpolant.hpp"
 
 
 namespace libecs
 {
   
-  VariableProxy::VariableProxy( VariablePtr const aVariable )
+  Interpolant::Interpolant( VariablePtr const aVariable )
     :
     theVariable( aVariable )
   {
@@ -44,7 +44,7 @@ namespace libecs
   }
 
 
-  VariableProxy::~VariableProxy()
+  Interpolant::~Interpolant()
   {
     //    if( theVariable != NULLPTR )
     //      {

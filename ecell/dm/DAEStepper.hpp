@@ -42,16 +42,16 @@ LIBECS_DM_CLASS( DAEStepper, DifferentialStepper )
 
  public:
 
-  class VariableProxy
+  class Interpolant
     :
-    public libecs::VariableProxy
+    public libecs::Interpolant
   {
   public:
 
-    VariableProxy( DAEStepperRef aStepper, 
+    Interpolant( DAEStepperRef aStepper, 
 		   VariablePtr const aVariablePtr )
       :
-      libecs::VariableProxy( aVariablePtr ),
+      libecs::Interpolant( aVariablePtr ),
       theStepper( aStepper ),
       theIndex( theStepper.getVariableIndex( aVariablePtr ) )
     {
@@ -194,9 +194,9 @@ public:
       return theW;
     }
 
-  virtual VariableProxyPtr createVariableProxy( VariablePtr aVariable )
+  virtual InterpolantPtr createInterpolant( VariablePtr aVariable )
   {
-    return new DAEStepper::VariableProxy( *this, aVariable );
+    return new DAEStepper::Interpolant( *this, aVariable );
   }
 
 protected:

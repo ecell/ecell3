@@ -42,7 +42,7 @@
 
 #include "Util.hpp"
 #include "Polymorph.hpp"
-#include "VariableProxy.hpp"
+#include "Interpolant.hpp"
 #include "PropertyInterface.hpp"
 
 
@@ -526,9 +526,9 @@ namespace libecs
     void updateIntegratedVariableVector();
 
 
-    virtual VariableProxyPtr createVariableProxy( VariablePtr aVariablePtr )
+    virtual InterpolantPtr createInterpolant( VariablePtr aVariablePtr )
     {
-      return new VariableProxy( aVariablePtr );
+      return new Interpolant( aVariablePtr );
     }
 
     const gsl_rng* getRng() const
@@ -571,12 +571,12 @@ namespace libecs
 
 
     /**
-       Create VariableProxy objects and distribute the objects to 
+       Create Interpolant objects and distribute the objects to 
        write Variables.
 
-       Ownership of the VariableProxy objects are given away to the Variables.
+       Ownership of the Interpolant objects are given away to the Variables.
 
-       @see Variable::registerVariableProxy()
+       @see Variable::registerInterpolant()
     */
 
     void createVariableProxies();

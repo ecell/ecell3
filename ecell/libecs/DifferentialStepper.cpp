@@ -32,7 +32,7 @@
 
 #include "Util.hpp"
 #include "Variable.hpp"
-#include "VariableProxy.hpp"
+#include "Interpolant.hpp"
 #include "Process.hpp"
 #include "Model.hpp"
 

@@ -40,7 +40,7 @@ DifferentialStepper.cpp\
 DiscreteTimeStepper.cpp\
 DiscreteEventStepper.cpp\
 PassiveStepper.cpp\
-VariableProxy.cpp\
+Interpolant.cpp\
 Model.cpp\
 Scheduler.cpp\
 EntityType.cpp\
@@ -83,7 +83,7 @@ DifferentialStepper.hpp\
 DiscreteTimeStepper.hpp\
 DiscreteEventStepper.hpp\
 PassiveStepper.hpp\
-VariableProxy.hpp\
+Interpolant.hpp\
 Model.hpp\
 Scheduler.hpp\
 EntityType.hpp\
