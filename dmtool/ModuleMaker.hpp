@@ -135,7 +135,19 @@ public:
 
   virtual T* make( const std::string& aClassname );
 
-  virtual const Module& getModule( const std::string& aClassname );
+
+  virtual const Module& getModule( const std::string& aClassName )
+  {
+	if( this->theModuleMap.find( aClassName ) == this->theModuleMap.end() )
+	  {
+	      throw DMException( "Can't find static module [" + aClassName + "]." );
+
+	  }
+	
+	return  (*this->theModuleMap[ aClassName ]);
+
+
+  }
 
 
   /**
@@ -198,6 +210,7 @@ public:
 
 
   }
+
 
 protected:
 
