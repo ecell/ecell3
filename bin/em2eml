@@ -6,9 +6,9 @@ This program is part of E-Cell Simulation Environment Version 3.
 """
 
 __program__ = 'em2eml'
-__version__ = '0.3'
+__version__ = '0.4'
 __author__ = 'Kentarou Takahashi and Kouichi Takahashi <shafi@e-cell.org>'
-__copyright__ = 'Copyright (C) 2002 Keio University'
+__copyright__ = 'Copyright (C) 2002-2003 Keio University'
 __license__ = 'GPL'
 
 
@@ -377,6 +377,12 @@ def convertEm2Eml( anEmFileObject, debug=0 ):
 
 	# Parsing 
 	aParser = EmParser( AST )
+
+	# For SPARK 0.7, pickle makes complete state machine,
+  	# and unpickle makes it use faster makeSet_fast() method.
+	# this gives ~10-30% faster run.
+	aParser.__setstate__( aParser.__getstate__() )
+
 	anAst = aParser.parse( aTokenList )
 	if debug != 0:print 'AST:', anAst
 
