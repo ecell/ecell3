@@ -626,6 +626,39 @@ namespace libecs
 
 
   /**
+
+  */
+
+  class DiscreteEventStepper
+    :
+    public Stepper
+  {
+
+  public:
+
+    DiscreteEventStepper();
+    virtual ~DiscreteEventStepper() {}
+
+    // virtual void step();
+
+    //    virtual void interrupt( StepperPtr const aCaller )
+    //    {
+    //      ; // do nothing -- ignore interruption
+    //    }
+
+    virtual void dispatchInterruptions();
+
+    //    static StepperPtr createInstance() { return new DiscreteEventStepper; }
+
+    virtual StringLiteral getClassName() const 
+    { 
+      return "DiscreteEventStepper";
+    }
+
+  };
+
+
+  /**
      DiscreteTimeStepper has a fixed step interval.
      
      This stepper ignores incoming interruptions, but dispatches 
@@ -679,15 +712,24 @@ namespace libecs
 
   class SlaveStepper
     :
-    public DiscreteTimeStepper
+    public Stepper
   {
   public:
 
     SlaveStepper();
     ~SlaveStepper() {}
     
-    virtual void interrupt( StepperPtr const )
+    virtual void initialize();
+
+    virtual void step()
     {
+      process();
+    }
+
+    virtual void interrupt( StepperPtr const aCaller )
+    {
+      setCurrentTime( aCaller->getCurrentTime() );
+
       step();
     }
 

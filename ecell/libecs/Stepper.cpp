@@ -379,8 +379,8 @@ namespace libecs
   void Stepper::removeSystem( SystemPtr aSystemPtr )
   { 
     SystemVectorIterator i( find( theSystemVector.begin(), 
-				   theSystemVector.end(),
-				   aSystemPtr ) );
+				  theSystemVector.end(),
+				  aSystemPtr ) );
     
     if( i == theSystemVector.end() )
       {
@@ -767,9 +767,18 @@ namespace libecs
 
     // If the next step of this will occur *after* the caller,
     // reschedule this Stepper, as well as shrinking the next step size.
-    setStepInterval( aCallerCurrentTime + ( aCallerTimeScale * 0.5 ) );
+    setStepInterval( aCallerCurrentTime + ( aCallerTimeScale * 0.5 ) 
+		     - aCurrentTime );
 
     getModel()->reschedule( this );
+  }
+
+
+  //////////////////// DiscreteEventStepper
+
+  void DiscreteEventStepper::dispatchInterruptions()
+  {
+    Stepper::dispatchInterruptions();
   }
 
 
@@ -792,8 +801,17 @@ namespace libecs
   {
     // gcc3 doesn't currently support numeric_limits::infinity.
     // using max() instead.
-    setStepInterval( std::numeric_limits<Real>::max() );
-    setCurrentTime( std::numeric_limits<Real>::max() );
+    const Real anInfinity( std::numeric_limits<Real>::max() *
+			   std::numeric_limits<Real>::max() );
+    setStepInterval( anInfinity );
+  }
+
+  void SlaveStepper::initialize()
+  {
+    Stepper::initialize();
+
+    // Make sure this never scheduled by the scheduler.
+    getModel()->reschedule( this );
   }
 
 

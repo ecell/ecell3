@@ -33,17 +33,14 @@
 #include <vector>
 #include <algorithm>
 
-#include "Util.hpp"
+//#include "Util.hpp"
 
-using libecs::PtrGreater;
+template < class T >
+struct PtrGreater
+{
+  bool operator()( T x, T y ) const { return *y < *x; }
+};
 
-/*
- template < class T >
-  struct PtrGreater
-  {
-    bool operator()( T x, T y ) const { return *y < *x; }
-  };
-*/
 
 template < typename key_type >
 class DynamicPriorityQueue

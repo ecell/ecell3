@@ -51,8 +51,6 @@ namespace libecs
  
   void Scheduler::registerStepper( StepperPtr aStepper )
   {
-    // need check if this is a slave stepper
-
     Int anIndex( registerEvent( Event( aStepper->getCurrentTime(),
 				       aStepper ) ) );
 
@@ -61,12 +59,7 @@ namespace libecs
 
   void Scheduler::reset()
   {
-    //FIXME: slow! :  no theScheduleQueue.clear() ?
-    while( ! theScheduleQueue.empty() )
-      {
- 	theScheduleQueue.pop();
-      }
-
+    theScheduleQueue.clear();
     theCurrentTime = 0.0;
   }
 

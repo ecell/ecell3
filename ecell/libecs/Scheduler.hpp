@@ -181,7 +181,7 @@ namespace libecs
     IndexType registerEvent( EventCref anEvent )
     {
       theScheduleQueue.push( anEvent );
-      return theScheduleQueue.size();
+      return theScheduleQueue.size() - 1;
     }
 
   private:
