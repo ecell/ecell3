@@ -39,7 +39,7 @@ phosphorylate AMPA receptors.
 
 README:     This file
 LTD.em:     Model file(em file) for this model
-*.dm:       Process files(dm files) for this model
+*.cpp:      Process files(cpp files) for this model
 
 
 === Running this model ===
@@ -51,7 +51,7 @@ LTD.em:     Model file(em file) for this model
    LTD.eml
 
 
-2. Compile .dm files.
+2. Compile .cpp files.
 
    Run ecell3-dmc for each .cpp file.
 
