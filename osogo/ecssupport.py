@@ -18,16 +18,16 @@ PROPERTY   = 3
 
 def parseFullID( fullidstring ):
 
-    aList = string.split( fullidstring, ':' )
-    validateFullID( aList )
-    return aList
+    aFullID = tuple( string.split( fullidstring, ':' ) )
+    validateFullID( aFullID )
+    return  aFullID
 
 
 def parseFullPropertyName( fullpropertynamestring ):
 
-    aList = string.split( fullpropertynamestring, ':' )
-    validateFullPropertyName( aList )
-    return aList
+    aFullPropertyName = tuple( string.split( fullpropertynamestring, ':' ) )
+    validateFullPropertyName( aFullPropertyName )
+    return tuple( aFullPropertyName )
 
 
 def constructFullIDString( fullid ):
@@ -46,15 +46,14 @@ def convertToFullPropertyName( fullid, property='' ):
 
     validateFullID( fullid )
     # must be deep copy
-    fullpropertyname = list( fullid )
-    fullpropertyname.append( property )
+    fullpropertyname = tuple( fullid ) + (property,)
     return fullpropertyname
 
 
 def convertToFullID( fullpropertyname ):
 
     validateFullPropertyName( fullpropertyname )
-    fullid = fullpropertyname[:3]
+    fullid = tuple( fullpropertyname[:3] )
     return fullid
 
 
