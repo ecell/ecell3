@@ -78,24 +78,24 @@ DM_INIT( <parameter>DMTYPE</parameter>, <parameter>CLASSNAME</parameter> );
 
 
     <sect2>
-      <title>DM Type, Class name and Base class</title>
+      <title><parameter>DMTYPE</parameter>, <parameter>CLASSNAME</parameter> and <parameter>BASECLASS</parameter></title>
 
       <para>First of all you have to decide basic attributes of the
-    class you are going to define; such as a &DM; type, a class name,
-    and a base class.</para>
+    class you are going to define; such as a &DM; type (&Process;, &Variable, &System;, or &Stepper), a class name, and a base class.</para>
 
-      <sect3>
-	<title><parameter>DMTYPE</parameter></title>
+      <itemizedlist>
+	<listitem>
+	<para><parameter>DMTYPE</parameter></para>
 
 	<para><parameter>DMTYPE</parameter> is one of &DM; base classes
 	defined in &app; &Process;,
 	&Stepper;,
 	&Variable;, and
 	&System;.</para>
-      </sect3>
+	</listitem>
 
-      <sect3>
-	<title><parameter>CLASSNAME</parameter></title>
+	<listitem>
+	<para><parameter>CLASSNAME</parameter></para>
 
 	<para><parameter>CLASSNAME</parameter> is a name of the
 	object class.</para>
@@ -105,33 +105,32 @@ DM_INIT( <parameter>DMTYPE</parameter>, <parameter>CLASSNAME</parameter> );
 	going to define a new &Process; class and
 	want to name it <classname>Foo</classname>, the class name may
 	look like <classname>FooProcess</classname>.</para>
-      </sect3>
+	</listitem>
 
-      <sect3>
-	<title><parameter>BASECLASS</parameter></title>
+	<listitem>
+
+	<para><parameter>BASECLASS</parameter></para>
 
 	<para>The class your class inherits from.</para>
 
 	<para>This may or may not be the same as the <parameter>DMTYPE
 	</parameter>, depending on whether it is a direct
 	descendant of the &DM; base class.</para>
-      </sect3>
+	</listitem>
+
+      </itemizedlist>
 
     </sect2>
 
-
-
-
-
-      <sect2>
-	<title>Filename</title>
-	<para>
+    <sect2>
+      <title>Filename</title>
+      <para>
 	The name of the source file must be the same as the <parameter>CLASSNAME</parameter>
 	with a trailing '.cpp' suffix.  For example, if the <parameter>CLASSNAME</parameter>
 	is <classname>FooProcess</classname>, the file name must be
 	<filename>FooProcess.cpp</filename>.</para>
-
-	<para>The source code can be divided into header and source
+      
+      <para>The source code can be divided into header and source
 	files (such as <filename>FooProcess.hpp</filename> and
 	<filename>FooProcess.cpp</filename>), but at least the
 	<function>DM_INIT</function> macro must be placed in the source file
@@ -140,16 +139,17 @@ DM_INIT( <parameter>DMTYPE</parameter>, <parameter>CLASSNAME</parameter> );
 
 
       <sect2>
-	<title>Include files</title> <para>At least the
-	<productname>libecs</productname> header file
+	<title>Include Files</title> 
+
+      <para>At least the <productname>libecs</productname> header file
 	(<filename>libecs/libecs.hpp</filename>) and a header file of
-	the base class
-	(<filename>libecs/<parameter>BASECLASS</parameter>.hpp</filename>)
+	the base class (such as
+	<filename>libecs/<parameter>BASECLASS</parameter>.hpp</filename>)
 	must be included in the head of the file.</para>
       </sect2>
 
       <sect2>
-	<title>DM macros</title>
+	<title>DM Macros</title>
 
 	<para>You may notice that it is using three special macros:
     <function>USE_LIBECS</function>, <function>
@@ -185,7 +185,7 @@ DM_INIT( <parameter>DMTYPE</parameter>, <parameter>CLASSNAME</parameter> );
       </sect2>
 
       <sect2>
-	<title>Constructor and destructor</title> 
+	<title>Constructor And Destructor</title> 
 
 	<para>DM objects are always instantiated by calling the
 	constructor with no argument.  The destructor is defined virtual
@@ -194,7 +194,7 @@ DM_INIT( <parameter>DMTYPE</parameter>, <parameter>CLASSNAME</parameter> );
 
 
     <sect2>
-      <title>Types and declarations</title>
+      <title>Types And Declarations</title>
 
       <sect3>
 	<title>Basic types</title>
@@ -411,15 +411,19 @@ aStringPolymorph.as&lt;Int>();  // == 213
     <sect2>
       <title>What is &PropertySlot;</title>
 
+      <para>&PropertySlot; is a pair of methods to access (get) and
+      mutate (set) an <emphasis>object property</emphasis>, associated
+      with the name of the property.  Values of the object property
+      can either be stored in a member variable of the object, or
+      dynamically created when the methods are called.</para>
+
       <para>All of the four &DM; base classes,
          &Process;,
          &Variable;,
          &System; and
-         &Stepper; are
-         &PropertyInterface;s, which means that
-         these classes can hold a list of
-         &PropertySlot;s, or object
-         <emphasis>properties</emphasis>.</para>
+         &Stepper; can have a set of &PropertySlot;s, or object
+         <emphasis>properties</emphasis>.  In other words, these classes 
+         inherit &PropertyInterface; common base class.</para>
 
       <sect3>
 	<title>What is 
@@ -427,14 +431,14 @@ aStringPolymorph.as&lt;Int>();  // == 213
 
 	<para>&PropertySlot;s can be used from
 	model files (such as EM files) as a means of giving parameter
-	values to each objects in the simulation (such as
+	values to each objects in the simulation model (such as
 	&Entity; and
 	&Stepper; objects). It can also be ways
-	of dynamic inter-object communications during the simulation.</para>
+	of dynamic communications between objects during the simulation.</para>
       </sect3>
 
       <sect3>
-	<title>Types of &PropertySlot;</title>
+	<title>Type of &PropertySlot;</title>
 
 	<para>A type of a &PropertySlot; is
 	any one of these four types:
@@ -456,12 +460,33 @@ aStringPolymorph.as&lt;Int>();  // == 213
 </para>
 
       </sect3>
+    </sect2>
 
+    <sect2>
+      <title>How to define a &PropertySlot;</title>
+
+      <para>To define a &PropertySlot; on an
+      object class, you have to:
+<orderedlist>
+	  <listitem>
+	    <para>Define set and/or get method(s).</para>
+	  </listitem>
+
+	  <listitem>
+	    <para>If necessary, define a member variable to store
+	    the property value.</para>
+	  </listitem>
+
+	  <listitem>
+	    <para>Register the method(s) as a &PropertySlot;.</para>
+	  </listitem>
+	</orderedlist>
+</para>
 
       <sect3>
 	<title>Set method and get method</title>
 
-	<para>A &PropertySlot; can be viewed as a
+	<para>A &PropertySlot; is a
       pair of object methods, <emphasis>set method</emphasis> and
       <emphasis>get method</emphasis>, associated with a property
       name.  Either one of the methods can be ommited.  If there is a
@@ -470,78 +495,319 @@ aStringPolymorph.as&lt;Int>();  // == 213
       <emphasis>setable</emphasis>.  If there is a get method, it is
       <emphasis>getable.</emphasis></para>
 
-	<para>
-	To be recognized by the system as property methods, a set
-	method must have a signature of:
+	<para>A set method must have the following signature to be
+	recognized by the system.
 
 	<programlisting>void CLASS::* ( const T& )</programlisting>
 
-	and a get method must look like: 
+	And a get method must look like this: 
+
 <programlisting>const T	CLASS::* ( void ) const</programlisting> 
 
         where <type>T</type>
-	is a &PropertySlot; type and
+	is a property type and
 	<type>CLASS</type> is the object class that the
 	&PropertySlot; belongs to.
 </para>
 
+	<para>Don't worry, you don't need to memorize these prototypes.
+The following four macoros can be used to declare and define set/get methods
+of a specific type and a property name.
+
+<itemizedlist>
+	    <listitem>
+	      <para><function>SET_METHOD( <parameter>TYPE</parameter>, <parameter>NAME</parameter> )</function>
+</para>
+
+	      <itemizedlist>
+		<listitem>
+		  <para><emphasis>Expansion:</emphasis>
+<programlisting>void set<parameter>NAME</parameter>( const <parameter>TYPE</parameter>& value )</programlisting></para>
+		</listitem>
+
+		<listitem>
+		  <para><emphasis>Usage:</emphasis> <function>SET_METHOD</function> macro is
+	      used to declare or define a property set method, of which the property type is <parameter>TYPE</parameter> and the property name is <parameter>NAME</parameter>, in a
+	      class scope (class definition).  The given property
+	      value is available as the <varname>value</varname>
+	      argument variable.</para>
+		</listitem>
+
+		<listitem><para><emphasis>Example:</emphasis></para>
+		  <informalexample>
+		    <para>This code:
+<programlisting>class HogeProcess
+{
+  SET_METHOD( Real, Flux )
+  {
+    theFlux = value;
+  }
+
+  Real theFlux;
+};</programlisting>
+
+is expanded to the following valid C++ program.
+
+<programlisting>class HogeProcess
+{
+  void setFlux( const Real& value )
+  {
+    theFlux = value;
+  }
+
+  Real theFlux;
+};
+</programlisting>
+
+In this example, the given property value is stored in a member variable
+<varname>theFlux</varname>.
+</para>
+</informalexample>
+
+
+		</listitem>
+
+	      </itemizedlist>
+
+	    </listitem>
+	    <listitem>
+	      <para><function>GET_METHOD( <parameter>TYPE</parameter>, <parameter>NAME</parameter> )</function>
+</para>
+
+	      <itemizedlist>
+		<listitem>
+		  <para><emphasis>Expansion:</emphasis>
+<programlisting>const <parameter>TYPE</parameter> get<parameter>NAME</parameter>() const</programlisting></para>
+		</listitem>
+
+		<listitem>
+		  <para><emphasis>Usage:</emphasis>
+	      <function>GET_METHOD</function> macro is used to declare
+	      or define a property get method, of which the property
+	      type is <parameter>TYPE</parameter> and the property
+	      name is <parameter>NAME</parameter>, in a class scope
+	      (class definition).  Definition of the method must
+	      return the value of the property as a
+	      <parameter>TYPE</parameter> object.</para>
+		</listitem>
+
+		<listitem><para><emphasis>Example:</emphasis></para>
+		  <informalexample>
+		    <para>This code:
+<programlisting>class HogeProcess
+{
+  GET_METHOD( Real, Flux )
+  {
+    return theFlux;
+  }
+
+  Real theFlux;
+};</programlisting>
+
+is expanded to the following valid C++ program.
+
+<programlisting>class HogeProcess
+{
+  const Real getFlux() const
+  {
+    return theFlux;
+  }
+
+  Real theFlux;
+};
+</programlisting>
+</para>
+</informalexample>
+		</listitem>
+	      </itemizedlist>
+
+	    </listitem>
+
+	    <listitem>
+	      <para><function>SET_METHOD_DEF( <parameter>TYPE</parameter>, <parameter>NAME</parameter>, <parameter>CLASSNAME</parameter> )</function>
+</para>
+
+	      <itemizedlist>
+		<listitem>
+		  <para><emphasis>Expansion:</emphasis>
+<programlisting>void <parameter>CLASSNAME</parameter>::set<parameter>NAME</parameter>( const <parameter>TYPE</parameter>& value )</programlisting></para>
+		</listitem>
+		
+		<listitem>
+		  <para><emphasis>Usage:</emphasis>
+		  <function>SET_METHOD_DEF</function> macro is used to
+		  define a property set method outside class
+		  scope.</para>
+		</listitem>
+
+		<listitem>
+<para><emphasis>Example:</emphasis></para>
+		  <informalexample>
+		    <para><function>SET_METHOD_DEF</function> macro is usually
+used in conjunction with <function>SET_METHOD</function> macro.  For instance,
+the following code declares a property get method in the class scope by using 
+<function>SET_METHOD</function>, and defines the procedure of the method 
+after the class definition with <function>SET_METHOD_DEF</function>. 
+In this example, the method is virtual.
+
+<programlisting>class HogeProcess
+{
+  virtual SET_METHOD( Real, Flux );
+
+  Real theFlux;
+};
+
+SET_METHOD_DEF( Real, Flux, HogeProcess )
+{
+  return theFlux;  
+}
+</programlisting>
+</para>
+</informalexample>
+		</listitem>
+
+	      </itemizedlist>
+	      </listitem>
+	      
+	      <listitem>
+	      <para><function>GET_METHOD_DEF( <parameter>TYPE</parameter>, <parameter>NAME</parameter>, <parameter>CLASSNAME</parameter> )</function>
+</para>
+
+	      <itemizedlist>
+		<listitem>
+		  <para><emphasis>Expansion:</emphasis>
+<programlisting>const <parameter>TYPE</parameter> <parameter>CLASSNAME</parameter>::get<parameter>NAME</parameter>() const</programlisting></para>
+		</listitem>
+
+		<listitem>
+		  <para><emphasis>Usage:</emphasis>
+		  <function>GET_METHOD_DEF</function> macro is used to
+		  define a property get method outside class
+		  scope.</para>
+		</listitem>
+
+		<listitem>
+		  <para><emphasis>Example:</emphasis> See the example
+		  of <function>SET_METHOD_DEF</function> above.</para>
+		</listitem>
+	      </itemizedlist>
+
+	    </listitem>
+	  </itemizedlist>
+
+</para>
       </sect3>
 
-    </sect2>
 
-    <sect2>
-      <title>How to define a &PropertySlot;</title>
-
-      <para>To define a &PropertySlot; on a
-      object class, you have to:
-<orderedlist>
-	  <listitem>
-	    <para> create a &PropertySlot; in the constructor</para>
-	  </listitem>
-	  <listitem>
-	    <para>define set and/or get method(s)</para>
-	  </listitem>
-	  <listitem>
-	    <para>and optionally, define a member variable to store
-	    the property value.</para>
-	  </listitem>
-	</orderedlist>
-</para>
 
       <sect3>
-	<title>Creating a &PropertySlot;</title>
+	<title>Registering &PropertySlot;s</title>
 	
-	<para>To create a &PropertySlot;, use
-	<function>CREATE_PROPERTYSLOT</function> macro in the
-	constructor:
+	<para>To create a &PropertySlot; with both set and get methods, use
+	<function>CREATE_PROPERTYSLOT_SET_GET</function> macro in the
+	constructor or a method called when the object is constructed:
 
-        <programlisting>CREATE_PROPERTYSLOT( NAME, TYPE, </programlisting>
+        <programlisting>CREATE_PROPERTYSLOT_SET_GET( <parameter>NAME</parameter>, <parameter>TYPE</parameter>, <parameter>CLASSNAME</parameter> )</programlisting> 
 
+         where <parameter>NAME</parameter> is the name, and
+         <parameter>TYPE</parameter> is the type of the property, and
+         <parameter>CLASSNAME</parameter> is the name of the object
+         class on which the &PropertySlot; is being defined.  This
+         macro registers methods of the object class of which names
+         are set<parameter>NAME</parameter>() and
+         get<parameter>NAME</parameter> as set method and get method,
+         respectively.  Signatures of the methods must match with the
+         prototypes defined in the previous section.</para>
+
+	<para>If the &PropertySlot; has either set or get method, use 
+
+        <programlisting>CREATE_PROPERTYSLOT_SET( <parameter>NAME</parameter>, <parameter>TYPE</parameter>, <parameter>CLASSNAME</parameter> )</programlisting> 
+
+         if only the set method is to be defined, or 
+
+        <programlisting>CREATE_PROPERTYSLOT_GET( <parameter>NAME</parameter>, <parameter>TYPE</parameter>, <parameter>CLASSNAME</parameter> )</programlisting> 
+
+         if the &PropertySlot; is getable and not setable.
 </para>
+
+	<para>For example, this line of code
+
+<programlisting>CREATE_PROPERTYSLOT_SET_GET( Flux, Real, HogeProcess );</programlisting>
+         registers these methods
+
+<programlisting>void HogeProcess::setFlux( const Real& );</programlisting>
+
+and       
+
+<programlisting>const Real HogeProcess::getFlux() const;</programlisting>
+
+         as the set and get methods of '<property>Flux</property>'
+         property of the class <classname>HogeProcess</classname>,
+         respectively.
+</para>
+
+	<para>If the name of either get or set method is different
+         from the default format (set<parameter>NAME</parameter>() or
+         get<parameter>NAME</parameter>()), then use
+
+<programlisting>CREATE_PROPERTYSLOT( <parameter>NAME</parameter>, <parameter>TYPE</parameter>, <parameter>SET_METHOD</parameter>, <parameter>GET_METHOD</parameter>)</programlisting>
+
+         macro with explicitly specifying the pointers to the methods.
+         For example, the following use of the macro registers
+         <methodname>setFlux2</methodname>() and
+         <methodname>anotherGetMethod</methodname>() methods of
+         <property>Flux</property> property of the class
+         <classname>HogeProcess</classname>:
+
+<programlisting>
+CREATE_PROPERTYSLOT( Flux, Real, &amp;HogeProcess::setFlux2,
+                     &amp;HogeProcess::anotherGetMethod );</programlisting>
+</para>
+
 
 	<para>
-If &PropertySlot;s with the same name are created
-for an object, the later one overrides the former.</para>
+If more than one &PropertySlot;s with the same name are created
+on an object, the last is taken.</para>
       </sect3>
 
-      <sect3>
-	<title>Defining set / get methods</title>
 
-	<para></para>
+      <sect3>
+	<title>The simplest way to define property methods</title>
+
+	<para>If the property is both setable and getable, and is simply
+         stored in a member variable, use the following macro.
+
+	<programlisting>SIMPLE_SET_GET_METHOD( <parameter>NAME</parameter>, <parameter>TYPE</parameter> )</programlisting>
+
+        This assumes there is a variable with the same name as the 
+        property name (<parameter>NAME</parameter>), and expands to a
+        code that is equivalent to:
+
+<programlisting>SET_METHOD( <parameter>NAME</parameter>, <parameter>TYPE</parameter> )
+{
+  <parameter>NAME</parameter> = value;
+}
+
+GET_METHOD( <parameter>NAME</parameter>, <parameter>TYPE</parameter> )
+{
+  return <parameter>NAME</parameter>;
+}
+</programlisting>
+
+</para>
 
       </sect3>
 
       <sect3>
 	<title>Virtual functions and &PropertySlot;s</title>
 
-	<para>Virtual functions does not work for
-	&PropertySlot;.  The functions given as
-	set / get methods of &PropertySlot;s
-	work and are treated as non-virtual functions.  If you have two &DM;
-	classes A and B, and B inherits A with a virtual function
-	overridden, it's likely that you want to define
-	&PropertySlot;s of the same name for both
-	classes.</para>
+	<para>Virtual functions does not work for &PropertySlot;.  The
+	functions given as set / get methods of &PropertySlot;s work
+	and are treated as non-virtual functions.  If you have two
+	&DM; classes A and B, and B inherits A with a virtual function
+	overridden, you may want to define &PropertySlot;s of the same
+	name for both classes, and you get virtually the same result
+	as the virtual function.</para>
 
 	<note>
 	  <para>This can be easily understood if you remember
@@ -556,16 +822,54 @@ for an object, the later one overrides the former.</para>
 
     </sect2>
 
+
     <sect2>
-      <title>Using &PropertySlot;s from model
-      files</title> <para></para>
+      <title>Using &PropertySlot; From Model Files</title> 
+
+      <para>See the modeling chapter of this manual.</para>
+
+      <para>For example, the following &EM; file invokes the set
+method (<methodname>getFlux</methodname>()) of a
+<classname>HogeProcess</classname> &Process; with a new property value
+<parameter>10.0</parameter>, when this model is loaded by the
+simulation with <methodname>loadModel</methodname>() method.
+
+<programlisting>
+System CompartmentSystem( / )
+{
+        Process HogeProcess( P )
+        {
+                Flux 10.0;
+        }
+}
+</programlisting>
+</para>
+
+      <para>Similarly, get methods are called when the state of the
+model is saved to a file during the simulation by
+<methodname>saveModel</methodname>() method of the simulator.</para>
+
+      <note>
+	<title>Methods used to load/save simulation model</title>
+
+	<para>In future versions it may become possible to specify
+special load and save methods, in addition to usual set/get
+methods. This functionality is useful if (1) the usual set/get methods
+involve some special procedures that are meaningful only during the
+simulation, or (2) the property is setable/getable while it does not need
+to be loaded/saved from/to the model files.</para>
+      </note>
+
+
     </sect2>
 
     <sect2>
-      <title>Using &PropertySlot;s in the
-      simulation</title>
-
-      <para></para>
+      <title>Using &PropertySlot;s In Simulation</title>
+	
+      <para>(1) Static direct access (using native C++ method)
+bypassing the &PropertySlot;, (2) dynamically-bound access via a
+&PropertySlot; object, (3) dynamically-bound access via
+&PropertyInterface;.</para>
     </sect2>
 
   </sect1>
