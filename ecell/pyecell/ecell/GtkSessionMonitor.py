@@ -528,9 +528,9 @@ class GtkSessionMonitor(Session):
 		if num == None:
 			#set it to 1
 			    num = 1
+			    self.message( "Zero step value overridden to 1\n" )
 
 		try:
-			self.message( "Zero step value overridden to 1\n" )
 			self.theRunningFlag = 1
 			# this can fail if the simulator is not ready
 			self.theSimulator.initialize()
@@ -550,6 +550,9 @@ class GtkSessionMonitor(Session):
 
 		self.updateWindows()
 		#self._synchronize()
+
+	def isRunning(self):
+		return self.theRunningFlag
 
 	#-------------------------------------------------------------------
 	def getNextEvent( self ):
