@@ -24,6 +24,10 @@
 <value number="0">1e-18</value>
 </property>
 
+<property fullid="System:/CELL/CYTOPLASM:MEMBRANE" name="Volume">
+<value number="0">1e-16</value>
+</property>
+
 
 
 <!-- for Substance -->
