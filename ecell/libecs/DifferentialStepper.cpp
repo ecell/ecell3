@@ -106,7 +106,7 @@ namespace libecs
   }
 #endif /* 0 */
 
-  void DifferentialStepper::resetValue()
+  void DifferentialStepper::resetAll()
   {
     const UnsignedInt aSize( theVariableVector.size() );
     for ( UnsignedInt c( 0 ); c < aSize; ++c )
@@ -128,6 +128,8 @@ namespace libecs
 	const Real aValue( aVariable->getValue() );
 
 	aVariable->loadValue( aValue + aVariable->calculateTempVelocitySum( this, aCurrentTime ) );
+
+	//	std::cout << aValue << ":" << aVariable->calculateTempVelocitySum( this, aCurrentTime ) << std::endl;
       }
 
     for ( UnsignedInt c( theReadOnlyVariableOffset );
@@ -136,6 +138,8 @@ namespace libecs
 	VariablePtr const aVariable( theVariableVector[ c ] );
 
 	aVariable->loadValue( theValueBuffer[ c ] + aVariable->calculateTempVelocitySum( this, aCurrentTime ) );
+
+	//	std::cout << theValueBuffer[ c ] << ":" << aVariable->calculateTempVelocitySum( this, aCurrentTime ) << std::endl;
       }
   }
 
