@@ -170,7 +170,7 @@ def t_name(t):
 
 def t_quotedstring(t):
 	r' "(^"|.)*" '
-	t.value = Token( 'quotedstring', t.value )
+	t.value = Token( 'quotedstring', t.value[1:-1] )
 
 	return t
 
@@ -206,7 +206,7 @@ def t_default(t):
 
 # Error handling rule
 def t_error(t):
-	print "Illegal character '%s'" % t.value[0]
+	print "Illegal character '%s' at line %d." % ( t.value[0], t.lineno )
 	t.skip(1)
 
 # Parsing rules
@@ -235,6 +235,8 @@ def p_stepper_stmt(t):
 	'''
 	stepper_stmt : Stepper object_decl LBRACE propertylist RBRACE
 	'''
+	print t.slice
+
 	t[0] = createAst( 'stepper_stmt', t )
     
 def p_system_stmt(t):
@@ -317,7 +319,8 @@ def p_empty(t):
 	t[0] = None
 
 def p_error(t):
-	print "Syntax error at '%s'" % t.value
+	print "Syntax error at line %d. (near '%s')" % ( t.lineno, t.value )
+
 
 # Constract Ast tree
 def createAst( type, t):
