@@ -216,8 +216,11 @@ namespace libecs
   {
     StepperPtr aStepper( getStepperMaker().make( aClassName ) );
     aStepper->setName( anID );
+
     theStepperMap.insert( std::make_pair( anID, aStepper ) );
+    theScheduleQueue.push( Event( getCurrentTime(), aStepper ) );
   }
+
 
   void Model::resetScheduleQueue()
   {
@@ -227,8 +230,6 @@ namespace libecs
 	theScheduleQueue.pop();
       }
 
-    std::cerr  << theStepperMap.size() << std::endl;
-
     for( StepperMapConstIterator i( theStepperMap.begin() );
 	 i != theStepperMap.end(); i++ )
       {
@@ -236,13 +237,11 @@ namespace libecs
       }
   }
 
+
   void Model::initialize()
   {
     FOR_ALL_SECOND( StepperMap, theStepperMap, 
 		    initialize );
-
-    //FIXME: do not reset. just update.
-    resetScheduleQueue();
 
     theCurrentTime = ( theScheduleQueue.top() ).first;
   }
