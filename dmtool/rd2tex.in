@@ -13,8 +13,7 @@
 
 # if you want to set default directory, please modfy here.
 $output_directory = ".";
-#$default_template_directory = "@REACTOR_TEMPLATE_DIR@";
-$default_template_directory = "/home/zhaiteng/RD/template";
+$default_template_directory = "@DM_SHARE_DIR@/reactor/template";
 
 $verbose = 0;
 
