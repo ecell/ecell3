@@ -45,6 +45,7 @@ emparsetab.py\
 GtkSessionMonitor.py\
 gui_config.py\
 SbmlFunctions.py\
+convertEML2SBML.py\
 convertSBML2EML.py\
 convertSBMLFunctions.py\
 expressionlextab.py\
