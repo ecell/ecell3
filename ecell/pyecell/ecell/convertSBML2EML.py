@@ -11,8 +11,9 @@ from convertSBMLFunctions import *
 import libsbml
 
 
-def convertSBML2EML( aSBMLDocument ):
+def convertSBML2EML( aSBMLString ):
 
+    aSBMLDocument = libsbml.readSBMLFromString( aSBMLString )
     aSBMLModel = aSBMLDocument.getModel()
 
     theModel = SBML_Model( aSBMLDocument, aSBMLModel )

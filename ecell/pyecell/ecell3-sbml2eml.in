@@ -22,7 +22,6 @@ import types
 
 from ecell.eml import *
 from ecell.convertSBML2EML import *
-import libsbml
 
 
 if __name__ == '__main__':
@@ -77,7 +76,7 @@ Options:
     aSbmlFileName = args[0]
 
     aSbmlFile = open( aSbmlFileName )
-    aSbmlData = aSbmlFile.readlines()
+    aSbmlString = aSbmlFile.read()
     aSbmlFile.close()
 
     aBaseName = os.path.basename( aSbmlFileName )
@@ -93,11 +92,8 @@ Options:
 
     # ----------------    sbml2eml main    ------------------  
 
-    theSBMLReader = libsbml.SBMLReader()
-    aSBMLDocument = theSBMLReader.readSBML( aSbmlFileName )
-
     # convert SBML components into EML
-    anEml = convertSBML2EML( aSBMLDocument )
+    anEml = convertSBML2EML( aSbmlString )
 
     # save Eml File
     anEml.save( anEmlFileName )
