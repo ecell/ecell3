@@ -89,3 +89,8 @@ ecell3_dm.hpp
 bin_SCRIPTS =\
 emtool
 
+
+all-local: libecs.so
+
+libecs.so: libecs.la
+	ln -sf .libs/libecs.so ./libecs.so
