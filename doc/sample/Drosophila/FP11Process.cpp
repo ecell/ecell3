@@ -12,7 +12,6 @@
 #include "ecell3_dm.hpp"
 
 #define ECELL3_DM_TYPE Process
-#define ECELL3_DM_CLASSNAME FP11Process
 
 USE_LIBECS;
 
