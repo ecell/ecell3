@@ -385,7 +385,6 @@ class LoggerWindow(OsogoWindow):
 				end = str( aLoggerStub.getEndTime() )
 			aList = [ aFullPNString, start, end ]
 			self.theList.append( aList )
-
 		aModel = self.theEntryList.get_model()
 		aModel.clear()
 		for aValue in self.theList:

@@ -140,16 +140,16 @@ class LoggingPolicy(Window):
 
 	# ==========================================================================
 	def __depopulateDialog( self ):
-		aLoggingPolicy = [0,0,0,0]
+		aLoggingPolicy = [1,0,0,0]
 		if self['log_by_step'].get_active() == gtk.TRUE:
 			try:
 				num = self['step_entry'].get_text()
 				aLoggingPolicy[0] = int(num)
-				if aLoggingPolicy[0]<0:
+				if aLoggingPolicy[0]<1:
 					a=1/0
 				aLoggingPolicy[1] = 0
 			except:
-				self.theSession.openConfirmWindow( "Please enter valid non-negative integer for minimum step size", "Invalid number format", 0)
+				self.theSession.openConfirmWindow( "Please enter valid positive integer for minimum step size", "Invalid number format", 0)
 				return None
 		else:
 			try:
