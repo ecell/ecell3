@@ -46,7 +46,8 @@ namespace libecs
   DiscreteEventStepper::DiscreteEventStepper()
     :
     theTimeScale( 0.0 ),
-    theTolerance( 0.0 )
+    theTolerance( 0.0 ),
+    theLastProcess( NULLPTR )
   {
     ; // do nothing
   }
@@ -54,7 +55,14 @@ namespace libecs
 
   GET_METHOD_DEF( String, LastProcessName, DiscreteEventStepper )
   {
-    return theLastProcess->getFullID().getString();
+    if( theLastProcess != NULLPTR )
+      {
+	return theLastProcess->getFullID().getString();
+      }
+    else
+      {
+	return "";
+      }
   }
 
   void DiscreteEventStepper::initialize()

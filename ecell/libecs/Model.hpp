@@ -83,6 +83,8 @@ namespace libecs
        4. Construct Stepper interdependency graph 
           ( Stepper::updateDependentStepperVector() )
 
+
+       @throw InitializationFailed
     */
 
     void initialize();

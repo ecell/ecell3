@@ -176,14 +176,16 @@ void DynamicPriorityQueue<key_type>::goUp( index_type anIndex )
 
       key_type* const aPredKey( c[aPredecessor] );
 
-      if( aPredecessor == anIndex || comp( aKey, aPredKey ) )
+      if( aPredecessor != anIndex && comp( aPredKey, aKey ) )
+	{
+	  c[anIndex] = aPredKey;
+	  theIndices[ aPredKey - theFirstKeyPtr ] = anIndex;
+	  anIndex = aPredecessor;
+	}
+      else
 	{
 	  break;
 	}
-
-      c[anIndex] = aPredKey;
-      theIndices[ aPredKey - theFirstKeyPtr ] = anIndex;
-      anIndex = aPredecessor;
     }
 
   c[anIndex] = aKey;
@@ -216,17 +218,18 @@ void DynamicPriorityQueue< key_type >::goDown( index_type anIndex )
 
       // if the going down is finished, break.
       //      if( ! ( aSuccessor < size() && comp( aKey, aSuccKey ) ) )
-      if( aSuccessor >= size() || comp( aSuccKey, aKey ) )
+      if( aSuccessor < size() && comp( aKey, aSuccKey ) )
+	{
+	  // go up the successor
+	  c[anIndex] = aSuccKey;
+	  theIndices[ aSuccKey - theFirstKeyPtr ] = anIndex;
+
+	  anIndex = aSuccessor;
+	}
+      else
 	{
 	  break;
 	}
-
-
-      // go up the successor
-      c[anIndex] = aSuccKey;
-      theIndices[ aSuccKey - theFirstKeyPtr ] = anIndex;
-
-      anIndex = aSuccessor;
     }
 
   c[anIndex] = aKey;
