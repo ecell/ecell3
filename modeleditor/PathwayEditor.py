@@ -53,6 +53,12 @@ class PathwayEditor( ListWindow ):
 		self.theLayout = aLayout
 		self.theModelEditor = theModelEditor
 
+		# Sets the return PaletteButton value
+		self.__CurrPaletteButton = None
+		self.__OldPaletteButton = None
+
+		
+
 
 	def openWindow( self ):
 		"""
@@ -85,6 +91,19 @@ class PathwayEditor( ListWindow ):
 				'on_search_entry_editing_done' : self.__search })
 		self.update()
 
+		#get Palette Button Widgets
+		
+		selector = ListWindow.getWidget(self,'selector_button')
+		variable = ListWindow.getWidget(self,'variable_button')
+		process = ListWindow.getWidget(self,'process_button')
+		system = ListWindow.getWidget(self,'system_button')
+		custom = ListWindow.getWidget(self,'custom_button')
+		text = ListWindow.getWidget(self,'text_button')
+
+
+		self.thePaletteButtonDict={PE_SELECTOR: selector, PE_VARIABLE : variable ,PE_PROCESS: process, PE_SYSTEM : system, PE_CUSTOM : custom, PE_TEXT:text}
+
+		
 
 	def update( self, arg1 = None, arg2 = None):
 		if not self.exists():
@@ -100,9 +119,28 @@ class PathwayEditor( ListWindow ):
 	def getPathwayCanvas( self ):	
 		return self.thePathwayCanvas
 
+	def getPaletteButton(self):
+		return self.__CurrPaletteButton
+		 	
+	def unToggled(self):
+		if self.__OldPaletteButton !=None:
+			self.thePaletteButtonDict[self.__OldPaletteButton].set_active(gtk.FALSE)
+
+		keys=self.thePaletteButtonDict.keys()
+		keys.sort()
+		for aKey in keys:
+			if  self.thePaletteButtonDict[aKey].get_active():
+				self.__CurrPaletteButton = aKey
+		
 	def getLayout( self ):
 		return self.theLayout
 
+
+
+	############################################################
+
+	#Callback Handlers
+	############################################################
 	def __zoom_in( self, *args ):
 		pass
 
@@ -120,7 +158,14 @@ class PathwayEditor( ListWindow ):
 		pass
 
 	def __palette_toggled( self, *args ):
-		pass
+		self.__OldPaletteButton = self.__CurrPaletteButton
+		self.unToggled()
 
 	def __search( self, *args ):
 		pass
+
+	
+
+	
+		
+		

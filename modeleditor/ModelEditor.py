@@ -25,6 +25,8 @@ from LayoutManager import *
 from ecell.eml import *
 from CommandMultiplexer import *
 
+from ObjectEditorWindow import *
+
 
 RECENTFILELIST_FILENAME = '~/.modeleditor/.recentlist'
 RECENTFILELIST_DIRNAME = '~/.modeleditor'
@@ -59,7 +61,7 @@ class ModelEditor:
 		self.theStepperWindowList = []
 		self.theEntityListWindowList = []
 		self.thePathwayEditorList = []
-		self.theLayoutManagerWindowList = []
+		self.theLayoutManagerWindow=None 
 		
 		self.theFullIDBrowser = None
 		self.thePopupMenu = PopupMenu( self )
@@ -341,6 +343,7 @@ class ModelEditor:
 			aCommand.execute()
 
 			( aType, anID ) = aCommand.getAffectedObject()
+			
 			self.updateWindows( aType, anID )
 			( aType, anID ) = aCommand.getSecondAffectedObject()
 			if aType == None and anID == None:
@@ -505,6 +508,7 @@ class ModelEditor:
 
 
 	def updateWindows( self, aType = None, anID = None ):
+		print 'Model Editor updateWindow'
 		# aType None means nothing to be updated
 		for aStepperWindow in self.theStepperWindowList:
 			# anID None means all for steppers
@@ -519,7 +523,8 @@ class ModelEditor:
 		if self.theMainWindow.exists():
 			self.theMainWindow.update()
 		#self.theLayoutManager.update( aType, anID )
-
+		if self.theLayoutManagerWindow!=None:
+			self.theLayoutManagerWindow.update()
 
 	def __closeModel ( self ):
 		""" 
@@ -553,11 +558,7 @@ class ModelEditor:
 
 		for aPathwayEditor in self.thePathwayEditorList:
 			aPathwayEditor.close( )
-
-		for aLayoutManagerWindow in self.theLayoutManagerWindowList:
-			aLayoutManagerWindow.close( )
-                        
-
+		       
 
 	def __createModel (self ):
 		""" 

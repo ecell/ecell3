@@ -3,13 +3,13 @@ AUTOMAKE_OPTIONS = foreign
 modeleditorgladedir = ${pkglibdir}/glade
 
 modeleditorglade_DATA = \
-application_small.xpm\
+application_small.png\
 ConnectionObjectEditorWindow.glade\
 DialogWindow.glade\
 EntityListWindow.glade\
 FullIDChooser.glade\
-icon_entity.xpm\
-icon_stepper.xpm\
+icon_entity.png\
+icon_stepper.png\
 LayoutManagerWindow.glade\
 ListComponent.glade\
 MainWindow.glade\
@@ -17,7 +17,7 @@ MultiLineEditor.glade\
 NestedListEditor.glade\
 ObjectEditor.glade\
 PathwayEditor.glade\
-pathway.xpm\
+pathway.png\
 ShapePropertyComponent.glade\
 StepperChooser.glade\
 StepperWindow.glade\
@@ -28,8 +28,7 @@ custom.xpm\
 system.xpm\
 process.xpm\
 textbox.xpm\
-layoutmanager.xpm\
-layoutmanager.xpm\
+layoutmanager.png\
 VariableReferenceEditorComponent.glade\
 ShapePropertyComponent.glade\
 LinePropertyComponent.glade\

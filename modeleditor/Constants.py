@@ -197,6 +197,14 @@ SY_INSIDE_DIMENSION_X = "InsideDimensionX"
 SY_INSIDE_DIMENSION_Y = "InsideDimensionY"
 SY_PASTE_CONNECTIONLIST = "PasteConnectionList"
 
+# selector variable
+PE_SELECTOR = "Selector"
+PE_VARIABLE ="Variable"
+PE_PROCESS = "Process"
+PE_SYSTEM= "System"
+PE_CUSTOM = "Custom"
+PE_TEXT =  "Text"
+
 
 # local/global properties
 

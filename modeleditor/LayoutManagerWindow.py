@@ -32,19 +32,19 @@
 
 
 import gtk
-
+import gobject
 from ModelEditor import *
 from ListWindow import *
 import os
 import os.path
 import string
-
+from LayoutCommand import *
 
 class LayoutManagerWindow( ListWindow ):
 
 
 	def __init__( self, theModelEditor ):
-               
+	             
 		"""
 		in: ModelEditor theModelEditor
 		returns nothing
@@ -53,6 +53,9 @@ class LayoutManagerWindow( ListWindow ):
 		# init superclass
 		ListWindow.__init__( self, theModelEditor )
 
+		# the variable
+		self.theLayoutManager=self.theModelEditor.theLayoutManager
+		self.theTreeView=None 
 
 	def openWindow( self ):
 		"""
@@ -63,35 +66,67 @@ class LayoutManagerWindow( ListWindow ):
 		# superclass openwindow
 		ListWindow.openWindow( self )
 
+		self.theTreeView=ListWindow.getWidget(self,'treeview')
+	
+		#set up ListStore
+		self.theListStore=gtk.ListStore(gobject.TYPE_STRING)
+		self.theTreeView.set_model(self.theListStore)
+		renderer=gtk.CellRendererText()
+		column = gtk.TreeViewColumn("Layout Name", renderer, text=0)
+		self.theTreeView.append_column(column)
+
+		# set up the variables
+		self.theListSelection = self.theTreeView.get_selection()
+		self.theListSelection.connect("changed", self.__show_selected_layout)
+
 		# add signal handlers
-
-
 		self.addHandlers({ 
 				'on_CreateButton_clicked' : self.__create_layout,\
 				'on_DeleteButton_clicked' : self.__delete_layout,\
 				'on_CopyButton_clicked' : self.__copy_layout,\
 				'on_ShowButton_clicked' : self.__show_layout,\
 				 })
-
-
-	def move( self, xpos, ypos ):
-		ListWindow.move(self,xpos,ypos)
-
-
-        def deleted( self, *args ):
 		
+		# show list of available layout, if any
+		self.__show_all_layout()
+	
+	
+	def move( self, xpos, ypos ):
+			ListWindow.move(self,xpos,ypos)
+	
+	def deleted( self, *args ):
 		ListWindow.deleted( self, args )
 		self.theModelEditor.toggleOpenLayoutWindow(False)
+	
+	def update ( self ):
+		self.theListStore.clear()
+		self.__show_all_layout()
 
 	def __create_layout( self, *args ):
-		print 'Create Button pressed'
+		layoutManager = self.theModelEditor.theLayoutManager
+		layoutName = layoutManager.getUniqueLayoutName()
+		aCommand = CreateLayout( layoutManager, layoutName )
+		self.theModelEditor.doCommandList( [ aCommand ] )
+
 
 	def __delete_layout( self, *args ):
 		print 'Delete Button pressed'
 
 	def __copy_layout( self, *args ):
 		print 'Copy Button pressed'
+
 	def __show_layout( self, *args ):
 		print 'Show Button pressed' 
 
+	def __show_all_layout( self, *args ):
+		aLayoutNameList=self.theLayoutManager.getLayoutNameList()
+		aLayoutNameList.sort()
+		for aLayoutName in aLayoutNameList:
+			anIter=self.theListStore.append()
+			self.theListStore.set_value(anIter,0,aLayoutName)
 
+	def __show_selected_layout(self, *args):
+		(aListStore, anIter)=self.theListSelection.get_selected()
+		aLayoutName= aListStore.get_value(anIter,0,)
+		print "You selected %s"%aLayoutName
+		

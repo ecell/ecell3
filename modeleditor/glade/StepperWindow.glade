@@ -2,7 +2,6 @@
 <!DOCTYPE glade-interface SYSTEM "http://glade.gnome.org/glade-2.0.dtd">
 
 <glade-interface>
-<requires lib="gnome"/>
 
 <widget class="GtkWindow" id="StepperWindow">
   <property name="visible">True</property>
@@ -14,7 +13,7 @@
   <property name="default_height">504</property>
   <property name="resizable">True</property>
   <property name="destroy_with_parent">False</property>
-  <property name="icon">application_small.xpm</property>
+  <property name="icon">icon_stepper.png</property>
 
   <child>
     <widget class="GtkVBox" id="vbox1">
