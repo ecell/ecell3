@@ -499,9 +499,8 @@ namespace libecs
   // the PropertyInterface template class to be instantiated
   // when the class is specialized (in LIBECS_DM_INIT_STATIC()).
   template< class T > class libecs::PropertyInterface< T>::PropertySlotMap
-  libecs::PropertyInterface< T>::thePropertySlotMap;
-   template< class T > class libecs::PolymorphMap
-  libecs::PropertyInterface< T>::theInfoMap;
+    libecs::PropertyInterface< T>::thePropertySlotMap;
+  template< class T > class std::map<const String, Polymorph, std::less<const String> > libecs::PropertyInterface< T>::theInfoMap;
  
 
 
