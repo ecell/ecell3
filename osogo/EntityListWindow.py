@@ -496,7 +496,6 @@ class EntityListWindow(OsogoWindow):
 
 		aSelectedRawFullPNList = self.__getSelectedRawFullPNList()
 
-
 		self.thePropertyWindow.setRawFullPNList( aSelectedRawFullPNList )
 		self.thePluginManager.createInstance( aPluginWindowType, self.thePropertyWindow.theFullPNList() )
 
@@ -696,6 +695,8 @@ class EntityListWindow(OsogoWindow):
 
 	# ========================================================================
 	def addToBoard( self, *arg ):
+		"""add plugin window to board
+		"""
 
 		# checks the length of argument, but this is verbose
 		if len( arg ) < 1:
@@ -713,97 +714,33 @@ class EntityListWindow(OsogoWindow):
 		Returns None
 		"""
 
+		# clear status bar
 		self.thePropertyWindow.clearStatusBar()
 
-		# When no entity is selected, displays error message.
-		if len(self.theSelectedFullPNList) == 0:
+		# gets selected RawFullPNList
+		aSelectedRawFullPNList = self.__getSelectedRawFullPNList()
+
+		# When no entity is selected, displays confirm window.
+		if len(aSelectedRawFullPNList) == 0:
+
 			# print message to message 
 			aMessage = 'No Entity is selected.'
 			self.thePropertyWindow.showMessageOnStatusBar(aMessage)
-			#self.theMainWindow.printMessage(aMessage)
 			aDialog = ConfirmWindow(OK_MODE,aMessage,'Error!')
 			return None
 
-		# -------------------------------------------------------------------
-		# If no property is selected on PropertyWindow, create plugin Window
-		# with default property (aValue) 
-		# -------------------------------------------------------------------
-		if len( str(self.thePropertyWindow.getSelectedFullPN()) ) == 0:  # if(1)
-			self.thePropertyWindow.theRawFullPNList = self.theSelectedFullPNList
-			self.thePropertyWindow.createLogger()
+		# creates Logger using PropertyWindow
+		self.thePropertyWindow.setRawFullPNList( aSelectedRawFullPNList )
+		self.thePropertyWindow.createLogger()
 
-			# creates message
-			aMessage = ''
-			if len( self.thePropertyWindow.theRawFullPNList ) == 1:
-				aMessage = 'Logger is created'
-			else:
-				aMessage = 'Loggers are created'
-			self.thePropertyWindow.showMessageOnStatusBar(aMessage)
-			self.theMainWindow.printMessage(aMessage)
+		# display message on status bar
+		if len(aSelectedRawFullPNList) == 1:
+			aMessage = 'Logger was created.'
+		else:
+			aMessage = 'Loggers were created.'
+		self.thePropertyWindow.showMessageOnStatusBar(aMessage)
 
-		# ----------------------------------------------------------------
-		# If a property is selected on PropertyWindow, create plugin Window
-		# with selected property
-		# ----------------------------------------------------------------
-		else:  # if(1)
-
-			aSpecifiedProperty = self.thePropertyWindow.getSelectedFullPN()[PROPERTY]
-			# buffer list for FullPN that doen not have specified property
-			aNoPropertyFullIDList = []
-			aSelectedFullPNListWithSpecified = []
-
-			for aSelectedFullPN in self.theSelectedFullPNList:
-				aFullID = convertFullPNToFullID(aSelectedFullPN) 
-				aFullIDString = createFullIDString( aFullID )
-				aEntityStub = EntityStub(self.theSession.theSimulator,aFullIDString)
-				aPropertyExistsFlag = FALSE
-				for aProperty in aEntityStub.getPropertyList():
-					if aProperty == aSpecifiedProperty:
-						aFullPN = convertFullIDToFullPN( aFullID, aSpecifiedProperty )
-						aSelectedFullPNListWithSpecified.append( aFullPN )
-						aPropertyExistsFlag = TRUE
-						break
-				if aPropertyExistsFlag == FALSE:
-					aNoPropertyFullIDList.append( aFullIDString )
-
-			# When some selected Entity does not have specified property,
-			# shows confirmWindow and does not create plugin window.
-			if len(aNoPropertyFullIDList) != 0:
-
-				# creates message
-				aMessage = ''
-				# one entity
-				if len(aNoPropertyFullIDList) == 1:
-					aMessage += ' The following Entity does not have %s \n' %aSpecifiedProperty
-				# entities
-				else:
-					aMessage += ' The following Entities do not have %s \n' %aSpecifiedProperty
-
-				for aNoPropertyFullIDString in aNoPropertyFullIDList:
-					aMessage += aNoPropertyFullIDString + '\n'
-
-				# print message to message 
-				#self.theMainWindow.printMessage(aMessage)
-				aDialog = ConfirmWindow(OK_MODE,aMessage,'Error!')
-				self.theMainWindow.printMessage(aMessage)
-				return None
-
-			self.thePropertyWindow.theRawFullPNList = aSelectedFullPNListWithSpecified
-			self.thePropertyWindow.createLogger()
-
-			# creates message
-			aMessage = ''
-			if len( self.thePropertyWindow.theRawFullPNList ) == 1:
-				aMessage = 'Logger is created'
-			else:
-				aMessage = 'Loggers are created'
-			self.thePropertyWindow.showMessageOnStatusBar(aMessage)
-			self.theMainWindow.printMessage(aMessage)
-
-		# end of if(1)
-			
-	# end of openNewPluginWindow
-
+	# ========================================================================
 	def selectPropertyName( self, aCList, row, column, event_obj ):
 
 		self.theSelectedFullPNList = []

@@ -354,8 +354,13 @@ class OsogoPluginWindow(PluginWindow):
 	def createLogger( self, *objects ):
 
 		try:
-			# creates loggerstub and call its create method.
-			self.theSession.createLoggerStub( createFullPNString(self.theFullPN()) ).create()
+			for aFullPN in self.theFullPNList():
+				aFullPNString = createFullPNString(aFullPN)
+			
+				# creates loggerstub and call its create method.
+				aLoggerStub = self.theSession.createLoggerStub( aFullPNString )
+				if aLoggerStub.isExist() == FALSE:
+					aLoggerStub.create()
 
 		except:
 
