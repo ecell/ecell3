@@ -82,10 +82,12 @@ namespace libemc
 
     void initialize();
 
-    virtual libecs::LoggerCptr getLogger( libecs::PrimitiveType type,
-					  libecs::StringCref    systempath,
-					  libecs::StringCref    id,
-					  libecs::StringCref    propertyname );
+    virtual libecs::LoggerPtr getLogger( libecs::PrimitiveType type,
+					 libecs::StringCref    systempath,
+					 libecs::StringCref    id,
+					 libecs::StringCref    propertyname );
+
+    virtual libecs::StringVector getLoggerList();
 
     virtual void run();
 

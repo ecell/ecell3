@@ -98,15 +98,20 @@ namespace libemc
       theSimulatorImplementation->initialize();
     }
 
-    libecs::LoggerCptr getLogger(  libecs::PrimitiveType type,
-				   libecs::StringCref    systempath,
-				   libecs::StringCref    id,
-				   libecs::StringCref    propertyname )
+    libecs::LoggerPtr getLogger(  libecs::PrimitiveType type,
+				  libecs::StringCref    systempath,
+				  libecs::StringCref    id,
+				  libecs::StringCref    propertyname )
     {
       return theSimulatorImplementation->getLogger( type,
 						    systempath,
 						    id,
 						    propertyname );
+    }
+
+    libecs::StringVector getLoggerList()
+    {
+      return theSimulatorImplementation->getLoggerList();
     }
 
     void run()

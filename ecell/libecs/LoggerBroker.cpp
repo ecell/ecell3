@@ -31,19 +31,26 @@
 
 #include "libecs.hpp"
 
-#include "LoggerBroker.hpp"
 #include "Logger.hpp"
 #include "PropertyInterface.hpp"
-#include "PrimitiveType.hpp"
 #include "FullID.hpp"
 #include "RootSystem.hpp"
-#include "System.hpp"
-#include "Substance.hpp"
-#include "Reactor.hpp"
+
+#include "LoggerBroker.hpp"
 
 
 namespace libecs
 {
+
+  LoggerBroker::~LoggerBroker()
+  {
+    for( LoggerMapIterator i( theLoggerMap.begin() );
+	 i != theLoggerMap.end() ; ++i )
+      {
+	delete i->second;
+      }
+  }
+
 
   LoggerPtr LoggerBroker::getLogger( FullPNCref fpn )
   {
@@ -69,7 +76,7 @@ namespace libecs
     PropertyMapIterator 
       aPropertyMapIterator( anEntityPtr->getPropertySlot( aPropertyName ) );
 
-    LoggerPtr aLoggerPtr = new Logger();
+    LoggerPtr aLoggerPtr( new Logger );
     aPropertyMapIterator->second->getProxy()->setLogger( aLoggerPtr );
     theLoggerMap[fpn] = aLoggerPtr;
   }

@@ -28,6 +28,7 @@
 // E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
 
+#include <algorithm>
 
 #include "libecs/libecs.hpp"
 #include "libecs/Message.hpp"
@@ -107,7 +108,7 @@ namespace libemc
     theRootSystem.initialize();
   }
 
-  LoggerCptr LocalSimulatorImplementation::
+  LoggerPtr LocalSimulatorImplementation::
   getLogger(libecs::PrimitiveType type,
 	    libecs::StringCref    systempath,
 	    libecs::StringCref    id,
@@ -118,6 +119,23 @@ namespace libemc
 					      id,
 					      propertyname ) );
   }
+
+  StringVector LocalSimulatorImplementation::getLoggerList()
+  {
+    StringVector aLoggerList;
+    aLoggerList.reserve( theLoggerBroker.getLoggerMap().size() );
+
+    LoggerBroker::LoggerMapCref aLoggerMap( theLoggerBroker.getLoggerMap() );
+
+    for( LoggerBroker::LoggerMapConstIterator i( aLoggerMap.begin() );
+	 i != aLoggerMap.end(); ++i )
+      {
+	aLoggerList.push_back( i->first );
+      }
+
+    return aLoggerList;
+  }
+
 
   void LocalSimulatorImplementation::run()
   {

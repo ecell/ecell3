@@ -63,7 +63,8 @@ void PySimulator::init_type()
   add_varargs_method( "getLogger",             &PySimulator::getLogger );
   add_varargs_method( "run",                   &PySimulator::run );
   add_varargs_method( "stop",                  &PySimulator::stop );
-  add_varargs_method( "setPendingEventChecker",  &PySimulator::setPendingEventChecker );
+  add_varargs_method( "setPendingEventChecker",  
+		      &PySimulator::setPendingEventChecker );
   add_varargs_method( "setEventHandler",       &PySimulator::setEventHandler );
 }
 
@@ -188,14 +189,33 @@ Object PySimulator::getLogger( const Py::Tuple& args )
   const String anID         ( static_cast<Py::String>( aFullPN[2] ) );
   const String aPropertyName( static_cast<Py::String>( aFullPN[3] ) );
 
-  const Logger* aLogger( Simulator::getLogger( aType,
-					       aPath,
-					       anID,
-					       aPropertyName ) );
+  LoggerPtr aLogger( Simulator::getLogger( aType,
+					   aPath,
+					   anID,
+					   aPropertyName ) );
 
-  PyLogger* aPyLogger = new PyLogger( aLogger );
+  PyLogger* aPyLogger( new PyLogger( aLogger ) );
 
   return asObject( aPyLogger );
+
+  ECS_CATCH;
+}
+
+Object PySimulator::getLoggerList( const Py::Tuple& args )
+{
+  ECS_TRY;
+  args.verify_length( 0 );
+
+  libecs::StringVector aLoggerList( Simulator::getLoggerList() );
+
+  Py::Tuple aTuple( aLoggerList.size() );
+
+  for( StringVector::size_type i( 0 ) ; i < aLoggerList.size() ; ++i )
+    {
+      aTuple[i] = Py::String( aLoggerList[i] );
+    }
+
+  return aTuple;
 
   ECS_CATCH;
 }

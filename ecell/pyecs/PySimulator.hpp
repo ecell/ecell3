@@ -53,24 +53,27 @@ public:
 
   static void init_type();
 
-  Object createEntity( const Tuple& args );
-  Object setProperty( const Tuple& args );
-  Object getProperty( const Tuple& args );
-  Object step( const Tuple& args );
-  Object initialize( const Tuple& args );
-  Object getLogger( const Tuple& args );
-  Object run( const Py::Tuple& args );
-  Object stop( const Py::Tuple& args );
-  Object setPendingEventChecker( const Tuple& args );
-  Object setEventHandler( const Tuple& args );
+  Object createEntity           ( const Tuple& args );
+  Object setProperty            ( const Tuple& args );
+  Object getProperty            ( const Tuple& args );
+  Object step                   ( const Tuple& args );
+  Object initialize             ( const Tuple& args );
+  Object getLogger              ( const Tuple& args );
+  Object getLoggerList          ( const Tuple& args );
+  Object run                    ( const Tuple& args );
+  Object stop                   ( const Tuple& args );
+  Object setPendingEventChecker ( const Tuple& args );
+  Object setEventHandler        ( const Tuple& args );
 
 private:
+
   static void callPendingEventChecker();
   static void callEventHandler();  
   static Callable* thePendingEventChecker;
   static Callable* theEventHandler;
   Object theTmpPendingEventChecker;
   Object theTmpEventHandler;
+
 };
 
 #endif   /* __PYSIMULATOR_HPP */

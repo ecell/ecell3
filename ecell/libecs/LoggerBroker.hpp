@@ -43,7 +43,12 @@ namespace libecs
 
   class LoggerBroker
   {
+
   public:
+
+    DECLARE_MAP( const FullPN, 
+		 LoggerPtr, std::less<const FullPN>, LoggerMap );
+
     LoggerBroker( RootSystemRef aRootSystem )
       :
       theRootSystem( aRootSystem )
@@ -51,10 +56,15 @@ namespace libecs
       ; // do nothing
     }
     
+    ~LoggerBroker();
+
+
     LoggerPtr getLogger( FullPNCref fpn );
 
-    DECLARE_MAP( const FullPN, 
-		 LoggerPtr, std::less<const FullPN>, LoggerMap );
+    LoggerMapCref getLoggerMap() const
+    {
+      return theLoggerMap;
+    }
 
   protected:
     
@@ -62,6 +72,7 @@ namespace libecs
     
   private:
 
+    // prevent copy
     LoggerBroker( LoggerBrokerCref );
     LoggerBrokerRef operator=( const LoggerBroker& );
 
