@@ -501,7 +501,9 @@ class LoggerWindow(OsogoWindow):
 	def closeWindow ( self, obj ):
 		#gtk.mainquit()
 		self[self.__class__.__name__].hide_all()
-
+		self.isShown=gtk.FALSE
+		self.theMainWindow.toggleLoggerWindow()
+		
 	# closeWindow
 
 	# ---------------------------------------------------------------

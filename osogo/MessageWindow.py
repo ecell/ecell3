@@ -82,44 +82,21 @@ class MessageWindow:
 				if string.find(aMessage[0],'\n') != 0:
 					aMessage = '\n' + aMessage[0]
 
-			# --------------------------------------------------
-			# If instance of Message Window Widget has destroyed,
-			# save aMessage to theMessageBugger
-			# --------------------------------------------------
 			for aLine in aMessage:
 				aString = str( aMessage )
 				self.theMessageBufferList.insert_at_cursor( aString, len(aString) )
 
-			# --------------------------------------------------
-			# If instance of Message Window Widget has not destroyed,
-			# print out aMessage on theMessageBugger
-#			# --------------------------------------------------
-#			else:
-#				for aLine in aMessage:
-#					self["message_text_box"].forward_display_line( aLine )
 
 		# -------------------------------------------------------
 		# If message is not list or touple, then print out row data.
 		# -------------------------------------------------------
 		else: 
 			aString = str( aMessage )
-
 			if string.find(aString,'\n') != 0:
 				aString = '\n' + aString
-
-			# --------------------------------------------------
-			# If instance of Message Window Widget has destroyed,
-			# save aMessage to theMessageBugger
-			# --------------------------------------------------
-#			if OsogoWindow.getExist(self) == 0 :
-#				self.theMessageBufferList.append( aMessage )
-
-			# --------------------------------------------------
-			# If instance of Message Window Widget has not destroyed,
-			# print out aMessage on theMessageBugger
-			# --------------------------------------------------
-#			else:
 			self.theMessageBufferList.insert_at_cursor( aString ,len(aString) )
+		
+		self.theMessageBox.scroll_to_mark(self.EndMark,0)
 
 
 	# end of printMessage
@@ -138,7 +115,9 @@ class MessageWindow:
 #		self.printMessage( self.theMessageBufferList )
 #		self.theMessageBufferList = []
 		self.theMessageBox.set_buffer(self.theMessageBufferList)
-
+		EndIter=self.theMessageBufferList.get_end_iter()
+		self.EndMark=self.theMessageBufferList.create_mark('EM',EndIter,gtk.FALSE)
+		
 	# end of openWindow
 
 

@@ -9,7 +9,7 @@ import operator
 from PlotterPluginWindow import *
 from Plot import *
 from ecell.ecssupport import *
-LoggerMinimumInterval=0.000001
+#LoggerMinimumInterval=1
 
 class TracerWindow( PlotterPluginWindow ):
 
@@ -72,6 +72,7 @@ class TracerWindow( PlotterPluginWindow ):
 	    
 	def create_logger(self,fpnlist):
 #		selected_list=self.getselected()
+		LoggerMinimumInterval=float(self.theSession.theMainWindow.get_parameter('logger_min_interval'))
 		for fpn in fpnlist:
 		    if not self.haslogger(fpn):
 			self.theSession.theSimulator.createLogger(fpn)

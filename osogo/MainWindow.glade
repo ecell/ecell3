@@ -1220,7 +1220,6 @@
 
 		  <child>
 		    <widget class="GtkScrolledWindow" id="scrolledwindow1">
-		      <property name="width_request">120</property>
 		      <property name="visible">True</property>
 		      <property name="hscrollbar_policy">GTK_POLICY_NEVER</property>
 		      <property name="vscrollbar_policy">GTK_POLICY_ALWAYS</property>
@@ -1258,7 +1257,7 @@
 	      <child>
 		<widget class="GtkStatusbar" id="statusbar">
 		  <property name="visible">True</property>
-		  <property name="has_resize_grip">True</property>
+		  <property name="has_resize_grip">False</property>
 		</widget>
 		<packing>
 		  <property name="padding">0</property>

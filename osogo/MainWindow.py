@@ -54,7 +54,7 @@ import EntityListWindow
 import LoggerWindow
 import InterfaceWindow 
 import StepperWindow 
-
+import ConfigParser
 import string
 
 #
@@ -119,13 +119,27 @@ class MainWindow(OsogoWindow):
 	def openWindow( self ):
 
 		OsogoWindow.openWindow(self)
-		self['MainWindow'].connect('expose-event',self.expose)
+
+		# reads defaults from osogo.ini 
+		# -------------------------------------
+		self.theConfigDB=ConfigParser.ConfigParser()
+    		self.theConfigDB.read(OSOGO_PATH+os.sep+'osogo.ini')
+		
+		
 		# creates MessageWindow 
 		# -------------------------------------
 		
 		self.theMessageWindow = MessageWindow.MessageWindow( self['textview1'] ) 
 		self.theMessageWindow.openWindow()
-
+		self.MessageWindow_attached=gtk.TRUE
+		#get and setresizewindowminimumsize
+		self.expose(None,None)
+		self.MW_minimal_size=self.MW_actual_size[:]
+		self['scrolledwindow1'].set_size_request(\
+		    self.MW_minimal_size[0],self.MW_minimal_size[1])
+		self['handlebox24'].connect('child-attached',self.MW_child_attached)
+		self['handlebox24'].connect('child-detached',self.MW_child_detached)
+		
 		# -------------------------------------
 		# creates Session
 		# -------------------------------------
@@ -174,6 +188,7 @@ class MainWindow(OsogoWindow):
 
 
 		self.theEntityListWindowList = []
+		self['MainWindow'].connect('expose-event',self.expose)
 
 		self.theHandlerMap = \
 		  { 'load_rule_menu_activate'                  : self.openModelFileSelection ,
@@ -232,16 +247,25 @@ class MainWindow(OsogoWindow):
 		mainQuit()
 
 	def expose(self,obj,obj2):
-#	    print "obj1",obj
-#	    print "obj2",obj2
-#	    print "mainw",self['MainWindow'].get_child_requisition()
-#	    print "actual",self['MainWindow'].get_size()    
-#	    print "status",self['statusbar'].get_child_requisition()
-#	    print "menu",self['handlebox22'].get_child_requisition()
-#	    print "message",self['handlebox24'].get_child_requisition()
-#	    print "toolbar",self['hbox8'].get_child_requisition()
-	    pass
-	    
+	    #get actual dimensions of scrolledwindow1 if it is displayed
+	    #and attached
+	    if self.MessageWindow_attached and self.theMessageWindow.isShown:
+		alloc_rect=self['scrolledwindow1'].get_allocation()
+		self.MW_actual_size=[alloc_rect[2],alloc_rect[3]]
+		
+	def resize_vertically(self,msg_heigth): #gets messagebox heigth
+	    #get fix components heigth
+	    menu_heigth=self['handlebox22'].get_child_requisition()[1]
+	    toolbar_heigth=max(self['handlebox19'].get_child_requisition()[1],\
+		self['handlebox23'].get_child_requisition()[1],\
+		self['logo_button'].get_child_requisition()[1])
+	    statusbar_heigth=self['statusbar'].get_child_requisition()[1]
+	    #get window_width
+	    window_width=self['MainWindow'].get_size()[1]
+	    #resize
+	    window_heigth=menu_heigth+toolbar_heigth+statusbar_heigth+msg_heigth
+	    self['MainWindow'].resize(window_width,window_heigth)
+	
 	def setUnSensitiveMenu( self ):
 		self['palette_window_menu'].set_sensitive(0)
 		self['create_new_entity_list_menu'].set_sensitive(0)
@@ -269,7 +293,51 @@ class MainWindow(OsogoWindow):
 
 	# end of setInitialWidgetStatus
 
+	# ---------------------------------------------------------------
+	# read osogo.ini file
+	# an osogo.ini file may be in the given path
+	# that have an osogo section or others but no default
+	# argument may be a filename as well
+	# ---------------------------------------------------------------
+	def read_ini(self,aPath):
+	    #first delete every section apart from default
+	    for aSection in self.theConfigDB.sections():
+		self.theConfigDB.remove(aSection)
+	    #gets pathname
+	    if not os.path.isdir( aPath ):
+		aPath=os.path.dirname( aPath )
+	    #check whether file exists
+	    aFilename=aPath+os.sep+'osogo.ini'
+	    if not os.path.isfile( aFilename ):
+		self.printMessage('There is no osogo.ini file in this directory.\n Falling back to system defauls.\n')
+		return 0
+	    #try to read file
+	    try:
+		self.printMessage('Reading osogo.ini file from directory [%s]' %aPath)
+		self.theConfigDB.read( aFilename )
+	    #catch exceptions
+	    except:
+		import sys
+		import traceback
+		self.printMessage(' error while executing ESS [%s]' %aFileName)
+		aErrorMessage = string.join( traceback.format_exception(sys.exc_type,sys.exc_value,sys.exc_traceback), '\n' )
+		self.printMessage("-----------")
+		self.printMessage(aErrorMessage)
+		self.printMessage("-----------")
+	# ---------------------------------------------------------------
+	# tries to get a parameter from ConfigDB
+	# if the param is not present in either osogo or default section
+	# raises exception and quits
+	# ---------------------------------------------------------------
 
+	def get_parameter(self, aParameter):
+	    #first try to get it from osogo section
+	    if self.theConfigDB.has_section('osogo'):
+		if self.theConfigDB.has_option('osogo',aParameter):
+		    return self.theConfigDB.get('osogo',aParameter)
+	    #get it from default
+	    return self.theConfigDB.get('DEFAULT',aParameter)
+		    
 	# ---------------------------------------------------------------
 	# closeParentWindow
 	#
@@ -328,6 +396,7 @@ class MainWindow(OsogoWindow):
 				return None
 
 			self.theModelFileSelection.hide()
+			self.read_ini(aFileName)
 			self.theSession.message( 'loading rule file %s\n' % aFileName)
 			aModelFile = open( aFileName )
 			self.theSession.loadModel( aModelFile )
@@ -408,6 +477,7 @@ class MainWindow(OsogoWindow):
 			self.printMessage(aErrorMessage)
 			self.printMessage("-----------")
 		else:
+			self.read_ini( aFileName )
 			self.update()
 			self.updateFundamentalWindows()
 
@@ -1020,37 +1090,17 @@ class MainWindow(OsogoWindow):
 		# ------------------------------------------------------
 		# button or menu is toggled as active 
 		# ------------------------------------------------------
-		#if button_obj.get_active() :
-		#if MessageWindowWillBeShown == gtk.TRUE:
 		if self.theMessageWindow.isShown == gtk.FALSE:
 
 			# --------------------------------------------------
-			# If instance of Message Window Widget has destroyed,
-			# creates new instance of Message Window Widget.
+			# hide handlebox, resize window
 			# --------------------------------------------------
 			self['handlebox24'].hide()
-			dimensions=self['MainWindow'].get_size()
-			self.statusbar_req=self['statusbar'].get_child_requisition()
-			self.menubar_req=self['handlebox22'].get_child_requisition()
-			self.toolbar_req=self['hbox8'].get_child_requisition()
-			self.window_heigth_without_messagebox=self.statusbar_req[1]+\
-			    self.menubar_req[1]+self.toolbar_req[1]
-			self['MainWindow'].resize(dimensions[0],\
-			    self.window_heigth_without_messagebox)
-#			if ( self.theMessageWindow.getExist() == 0 ):
-#				self.theMessageWindow.openWindow()
+			self.resize_vertically(0)
 
 
-			# --------------------------------------------------
-			# If instance of Message Window Widget has not destroyed,
-			# calls show method of Message Window Widget.
-			# --------------------------------------------------
-#			else:
-#				self.theMessageWindow['MessageWindow'].hide()
-#				self.theMessageWindow['MessageWindow'].show_all()
-
-#			self['message_togglebutton'].set_active(gtk.FALSE)
-#			self['message_window_menu'].set_active(gtk.TRUE)
+			self['message_togglebutton'].set_active(gtk.FALSE)
+			self['message_window_menu'].set_active(gtk.FALSE)
 
 		# ------------------------------------------------------
 		# button or menu is toggled as non-active
@@ -1058,28 +1108,46 @@ class MainWindow(OsogoWindow):
 		else:
 
 			# --------------------------------------------------
-			# If instance of Message Window Widget has destroyed,
-			# does nothing.
+			# show handlebox, resize window			# 
 			# --------------------------------------------------
 			self['handlebox24'].show()
+			if self.MessageWindow_attached:
+			    self.resize_vertically(self.MW_actual_size[1])
+			else:
+			    self.resize_vertically(0)
 
-#			if ( self.theMessageWindow.getExist() == 0 ):
-#				pass
-
-			# --------------------------------------------------
-			# If instance of Message Window Widget has not destroyed,
-			# calls hide method of Message Window Widget.
-			# --------------------------------------------------
-#			else:
-#				self.theMessageWindow['MessageWindow'].hide()
-
-#			self['message_togglebutton'].set_active(gtk.FALSE)
-#			self['message_window_menu'].set_active(gtk.FALSE)
+			self['message_togglebutton'].set_active(gtk.TRUE)
+			self['message_window_menu'].set_active(gtk.TRUE)
 
 
 	# end of toggleMessageWindow
 
+	# ---------------------------------------------------------------
+	# MW_child_attached
+	# called when MessageBox is reatached to MainWindow
+	# must resize msgbox scrolledwindow to minimal size
+	# and the Mainwindow to extended size
+	# ---------------------------------------------------------------
+	
+	def MW_child_attached(self,obj,obj2):
+	    self['scrolledwindow1'].set_size_request(self.MW_minimal_size[0],\
+		    self.MW_minimal_size[1])
+	    self.resize_vertically(self.MW_actual_size[1])
+	    self.MessageWindow_attached=gtk.TRUE
 
+	# ---------------------------------------------------------------
+	# MW_child_detached
+	# called when MessageBox is detached from MainWindow
+	# must resize msgbox scrolledwindow to actual size
+	# and the Mainwindow to minimalsize
+	# ---------------------------------------------------------------
+	    
+	def MW_child_detached(self,obj,obj2):
+	    self['scrolledwindow1'].set_size_request(self.MW_actual_size[0],\
+		    self.MW_actual_size[1])
+	    self.resize_vertically(0)
+	    self.MessageWindow_attached=gtk.FALSE
+	        
 	# ---------------------------------------------------------------
 	# openAbout
 	#
