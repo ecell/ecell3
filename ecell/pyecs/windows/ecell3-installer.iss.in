@@ -12,6 +12,8 @@
 ;    Set Compression=lzma/ultra for releases.
 ; 5. Compile the script
 ; 6. The compiled installer will appear in the root directory of this script file
+;
+; For more information, please refer to: http://moin.e-cell.org/CreatingWindowsInstaller
 
 
 #define FullInstall
@@ -82,6 +84,7 @@ Source: ..\runtime\8.libart_lgpl\*.*; DestDir: {app}; Flags: recursesubdirs igno
 Source: ..\runtime\9.libgnomecanvas\*.*; DestDir: {app}; Flags: recursesubdirs ignoreversion
 Source: ..\runtime\10.msys-cp.find.grep.ls.mkdir.mv.rm\*.*; DestDir: {app}; Flags: recursesubdirs ignoreversion
 Source: ..\runtime\11.ecell3-samples\*.*; DestDir: {app}; Flags: recursesubdirs ignoreversion
+Source: ..\runtime\12.ecell3-docs\*.*; DestDir: {app}; Flags: recursesubdirs ignoreversion
 
 ;Python modules used by E-Cell
 Source: ..\pythonModules\1.pygtk\*.*; DestDir: {app}; Flags: recursesubdirs ignoreversion
@@ -161,7 +164,7 @@ Name: file\eml\gecell; Description: gecell (E-Cell Session Monitor); Types: full
 Name: file\eml\model_editor; Description: ecell3-model-editor (E-Cell Model Editor); Flags: exclusive
 Name: file\eml\eml2em; Description: ecell3-eml2em (EML to EM File Converter); Flags: exclusive
 Name: file\em; Description: .em; Types: full compact
-Name: file\em\em2eml; Description: ecell3-em2em (EM to EML File Converter)l; Types: full compact; Flags: exclusive
+Name: file\em\em2eml; Description: ecell3-em2em (EM to EML File Converter); Types: full compact; Flags: exclusive
 Name: file\ess; Description: .ess; Types: full compact
 Name: file\ess\session; Description: ecell3-session (E-Cell Session Scripting); Types: full compact; Flags: exclusive
 Name: file\esm; Description: .esm
@@ -266,6 +269,8 @@ begin
   case CurPage of
     wpFinished:
       begin
+        WizardForm.NextButton.Caption := 'Please Wait';
+        WizardForm.NextButton.Enabled := False;
         ExtractTemporaryFile(PEXPORTS_FILE);
         pexports := GetShortName( ExpandConstant('{tmp}') + '\' + PEXPORTS_FILE );
         dlltool := ExpandConstant('{app}') + '\bin\' + DLLTOOL_FILE;
@@ -277,6 +282,8 @@ begin
         InstExec(dlltool, '--dllname  ' + pythondll + ' --def python.def ' + '--output-lib ' + LIBPYTHON_FILE, libdir, True, False, SW_SHOWMINNOACTIVE, Dummy);
         if FileExists(pythondef) then
           DeleteFile(pythondef);
+        WizardForm.NextButton.Caption := 'Finish';
+        WizardForm.NextButton.Enabled := True;
       end;
   end;
 end;
@@ -547,5 +554,4 @@ function BackButtonClick(CurPage: Integer): Boolean;
 begin
   Result := ScriptDlgPages(CurPage, True);
 end;
-
 
