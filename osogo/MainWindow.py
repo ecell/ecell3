@@ -214,9 +214,13 @@ class MainWindow(OsogoWindow):
 			'interface_togglebutton_toggled'       : self.toggleInterfaceWindowByButton ,
 			'stepper_togglebutton_toggled'         : self.toggleStepperWindowByButton ,
 			'logo_button_clicked'                  : self.openAbout,
-			'destroy'                              : self.exitCompulsorily,
+			'delete_event'                         : self.exit
 		}
 		self.addHandlers( self.theHandlerMap )
+
+		#override on_delete_event
+		#aWin = self['MainWindow']
+		#aWin.connect("delete_event",self.exit)
 
 		# -------------------------------------
 		# initialize for run method 
@@ -231,9 +235,6 @@ class MainWindow(OsogoWindow):
 		self[self.__class__.__name__].show_all()
 
 	# end of __init__
-
-	def exitCompulsorily(self, *obj):
-		mainQuit()
 
 	def expose(self,obj,obj2):
 	    #get actual dimensions of scrolledwindow1 if it is displayed
@@ -458,18 +459,6 @@ class MainWindow(OsogoWindow):
 			self.update()
 			self.updateFundamentalWindows()
 
-			#self.theStepperChecker = 1
-			#self['start_button'].set_sensitive(1)
-			#self['stop_button'].set_sensitive(1)
-			#self['step_button'].set_sensitive(1)
-			#self['entitylist'].set_sensitive(1)
-			#self['palette_togglebutton'].set_sensitive(1)
-			#self['create_new_entity_list_menu'].set_sensitive(1)
-			#self['load_rule_menu'].set_sensitive(0)
-			#self['load_script_menu'].set_sensitive(0)
-			#self['save_model_menu'].set_sensitive(1)
-			#self.setUnSensitiveMenu()
-
 	# end of loadScript
 
 
@@ -537,33 +526,57 @@ class MainWindow(OsogoWindow):
 	# ---------------------------------------------------------------
 	# exit
 	#
-	# anObject:  dammy object
+	# *obj:  dammy object
 	#
 	# return -> None
 	# This method is throwable exception.
 	# ---------------------------------------------------------------
-	def exit( self, anObject=None ):
+	def exit( self, *obj ):
 
 		aMessage = 'Are you sure you want to quit?'
+		aTitle = 'Question'
 
+		# If simulation is running
 		if self.theRunningFlag == TRUE:
+
+			# stop simulation temporarily
 			self.stopSimulation()
 
-			aDialog = ConfirmWindow(1,aMessage,'exit ?')
-
-			if aDialog.return_result() == 0:
+			# If there is no logger data, exit this program.
+			if len(self.theSession.getLoggerList())==0:
 				mainQuit()
-			else:
-				self.startSimulation('')
 
+			else:
+
+				# Popup confirm window, and check user request
+				aDialog = ConfirmWindow(1,aMessage,aTitle)
+
+				# ok is pressed
+				if aDialog.return_result() == 0:
+					mainQuit()
+				# cancel is pressed
+				else:
+					self.startSimulation('')
+					return TRUE
+
+		# If simulation is not running
 		else:
 
-			aDialog = ConfirmWindow(1,aMessage,'?')
-
-			if aDialog.return_result() == 0:
+			# If there is no logger data, exit this program.
+			if len(self.theSession.getLoggerList())==0:
 				mainQuit()
 			else:
-				pass
+				# Popup confirm window, and check user request
+				aDialog = ConfirmWindow(1,aMessage,aTitle)
+
+				# ok is pressed
+				if aDialog.return_result() == 0:
+					mainQuit()
+				else:
+				# cancel is pressed
+					pass
+
+		return TRUE
         
 	# end of exit
 
