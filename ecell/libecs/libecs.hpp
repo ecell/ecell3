@@ -81,7 +81,7 @@ namespace libecs
   DECLARE_CLASS( ProxyPropertySlot );
   DECLARE_CLASS( PropertyInterface );
   DECLARE_CLASS( PropertySlotMaker );
-  DECLARE_CLASS( UVariable );
+  DECLARE_CLASS( Polymorph );
   DECLARE_CLASS( LoggerBroker );
   DECLARE_CLASS( Logger );
   DECLARE_CLASS( DataPoint );
@@ -90,7 +90,7 @@ namespace libecs
 
   // containers
 
-  DECLARE_VECTOR( UVariable, UVariableVector );
+  DECLARE_VECTOR( Polymorph, PolymorphVector );
 
 
   // exceptions
@@ -109,7 +109,7 @@ namespace libecs
 
   // reference counted pointer types
 
-  DECLARE_RCPTR( UVariableVector );
+  DECLARE_RCPTR( PolymorphVector );
   DECLARE_RCPTR( DataPointVector );
   
   /** @} */ 

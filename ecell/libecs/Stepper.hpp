@@ -39,7 +39,7 @@
 #include "libecs.hpp"
 
 #include "Util.hpp"
-#include "UVariable.hpp"
+#include "Polymorph.hpp"
 #include "PropertyInterface.hpp"
 #include "System.hpp"
 #include "Integrators.hpp"
@@ -116,12 +116,15 @@ namespace libecs
     void sync();
 
     /**
+       
+    Each subclass of Stepper defines this.
 
+    @note Subclass of Stepper must call this by Stepper::step() from
+    their step().
     */
 
-    void step() 
-    { 
-      compute();
+    virtual void step()
+    {
       theCurrentTime += getStepInterval();
     }
 
@@ -132,15 +135,6 @@ namespace libecs
     void push();
 
     
-    /**
-
-     @note each stepper class defines this
-
-    */
-
-    virtual void compute() = 0;
-
-
     /**
 
 
@@ -288,7 +282,7 @@ namespace libecs
     virtual StringLiteral getClassName() const  { return "Stepper"; }
 
 
-    const UVariableVectorRCPtr getSystemList() const;
+    const PolymorphVectorRCPtr getSystemList() const;
 
 
   protected:
@@ -398,13 +392,13 @@ namespace libecs
     SRMStepper();
     virtual ~SRMStepper() {}
 
-    virtual void compute()
+    virtual void step()
     {
       clear();
       react();
       integrate();
-      //???();
 
+      Stepper::step();
     }
 
     virtual void initialize();
@@ -412,7 +406,6 @@ namespace libecs
     virtual void clear();
     virtual void react();
     virtual void integrate();
-    //    virtual void ???();
 
     virtual StringLiteral getClassName() const  { return "SRMStepper"; }
  

@@ -39,8 +39,8 @@
 namespace libecs
 {
 
-  /** @addtogroup uvariable The UVariable.
-   The UVariable
+  /** @addtogroup uvariable The Polymorph.
+   The Polymorph
 
    @ingroup libecs
    @{ 
@@ -48,19 +48,19 @@ namespace libecs
 
   /** @file */
   
-  DECLARE_CLASS( UVariableData );
-  DECLARE_CLASS( UVariableStringData );
-  DECLARE_CLASS( UVariableRealData );
-  DECLARE_CLASS( UVariableIntData );
+  DECLARE_CLASS( PolymorphData );
+  DECLARE_CLASS( PolymorphStringData );
+  DECLARE_CLASS( PolymorphRealData );
+  DECLARE_CLASS( PolymorphIntData );
 
 
 
-  class UVariableData
+  class PolymorphData
   {
 
   public:
 
-    virtual ~UVariableData()
+    virtual ~PolymorphData()
     {
       ; // do nothing
     }
@@ -69,36 +69,38 @@ namespace libecs
     virtual const Real   asReal()  const = 0;
     virtual const Int    asInt()    const = 0;
 
-    virtual UVariableDataPtr createClone() const = 0;
+    virtual PolymorphDataPtr createClone() const = 0;
 
   protected:
   
-    UVariableData( UVariableDataCref ) {}
-    UVariableData() {}
+    PolymorphData( PolymorphDataCref ) {}
+    PolymorphData() {}
 
   private:
 
-    UVariableCref operator= ( UVariableCref );
+    PolymorphCref operator= ( PolymorphCref );
 
   };
 
 
-  class UVariableStringData : public UVariableData
+  class PolymorphStringData 
+    : 
+    public PolymorphData
   {
   
   public:
 
-    UVariableStringData( StringCref  str ) 
+    PolymorphStringData( StringCref  str ) 
       : 
       theString( str ) 
     {
       ; // do nothing
     }
   
-    UVariableStringData( const Real f );
-    UVariableStringData( const Int   i );
+    PolymorphStringData( RealCref f );
+    PolymorphStringData( IntCref  i );
 
-    UVariableStringData( UVariableDataCref uvi )
+    PolymorphStringData( PolymorphDataCref uvi )
       :
       theString( uvi.asString() )
     {
@@ -106,12 +108,12 @@ namespace libecs
     }
 
     virtual const String asString() const { return theString; }
-    virtual const Real  asReal() const;
+    virtual const Real   asReal() const;
     virtual const Int    asInt() const;
 
-    virtual UVariableDataPtr createClone() const
+    virtual PolymorphDataPtr createClone() const
     {
-      return new UVariableStringData( *this );
+      return new PolymorphStringData( *this );
     }
 
   private:
@@ -120,20 +122,22 @@ namespace libecs
 
   };
 
-  class UVariableRealData : public UVariableData
+  class PolymorphRealData 
+    : 
+    public PolymorphData
   {
 
   public:
 
-    UVariableRealData( StringCref str );
-    UVariableRealData( const Real      f ) 
+    PolymorphRealData( StringCref str );
+    PolymorphRealData( RealCref   f ) 
       : 
       theReal( f ) 
     {
       ; // do nothing
     }
 
-    UVariableRealData( const Int        i ) 
+    PolymorphRealData( IntCref    i ) 
       : 
       theReal( static_cast<Real>( i ) )
     {
@@ -141,13 +145,13 @@ namespace libecs
     }
 
     virtual const String asString() const;
-    virtual const Real  asReal() const { return theReal; }
+    virtual const Real   asReal() const { return theReal; }
     // FIXME: range check
     virtual const Int    asInt() const { return static_cast<Int>( theReal ); }
 
-    virtual UVariableDataPtr createClone() const
+    virtual PolymorphDataPtr createClone() const
     {
-      return new UVariableRealData( *this );
+      return new PolymorphRealData( *this );
     }
 
   private:
@@ -156,14 +160,16 @@ namespace libecs
 
   };
 
-  class UVariableIntData : public UVariableData
+  class PolymorphIntData 
+    : 
+    public PolymorphData
   {
 
   public:
 
-    UVariableIntData( StringCref str );
-    UVariableIntData( const Real      f );
-    UVariableIntData( const Int        i ) 
+    PolymorphIntData( StringCref str );
+    PolymorphIntData( RealCref   f );
+    PolymorphIntData( IntCref    i ) 
       : 
       theInt( i ) 
     {
@@ -172,11 +178,11 @@ namespace libecs
 
     virtual const String asString() const;
     virtual const Real   asReal() const { return static_cast<Real>( theInt ); }
-    virtual const Int    asInt() const   { return theInt; }
+    virtual const Int    asInt()  const { return theInt; }
   
-    virtual UVariableDataPtr createClone() const
+    virtual PolymorphDataPtr createClone() const
     {
-      return new UVariableIntData( *this );
+      return new PolymorphIntData( *this );
     }
 
   private:
@@ -185,12 +191,14 @@ namespace libecs
 
   };
 
-  class UVariableNoneData : public UVariableData
+  class PolymorphNoneData 
+    : 
+    public PolymorphData
   {
 
   public: 
 
-    UVariableNoneData() {}
+    PolymorphNoneData() {}
 
 
     virtual const String asString() const 
@@ -201,16 +209,16 @@ namespace libecs
     virtual const Real   asReal() const   { return 0.0; }
     virtual const Int    asInt() const    { return 0; }
   
-    virtual UVariableDataPtr createClone() const
+    virtual PolymorphDataPtr createClone() const
     {
-      return new UVariableNoneData;
+      return new PolymorphNoneData;
     }
 
   };
 
 
 
-  class UVariable
+  class Polymorph
   {
 
   public:
@@ -224,48 +232,48 @@ namespace libecs
       };
 
   
-    UVariable()
+    Polymorph()
       :
-      theData( new UVariableNoneData )
+      theData( new PolymorphNoneData )
     {
       ; // do nothing
     }
 
-    UVariable( StringCref  string ) 
+    Polymorph( StringCref  string ) 
       :
-      theData( new UVariableStringData( string ) )
+      theData( new PolymorphStringData( string ) )
     {
       ; // do nothing
     }
   
-    UVariable( const Real f )      
+    Polymorph( RealCref f )      
       :
-      theData( new UVariableRealData( f ) )
+      theData( new PolymorphRealData( f ) )
     {
       ; // do nothing
     }
 
-    UVariable( const Int   i )      
+    Polymorph( IntCref  i )      
       :
-      theData( new UVariableIntData( i ) )
+      theData( new PolymorphIntData( i ) )
     {
       ; // do nothing
     }
 
-    UVariable( UVariableCref uv )
+    Polymorph( PolymorphCref uv )
       :
       theData( uv.createDataClone() )
     {
       ; // do nothing
     }
 
-    //    virtual ~UVariable()
-    ~UVariable()
+    //    virtual ~Polymorph()
+    ~Polymorph()
     {
       delete theData;
     }
 
-    UVariableCref operator=( UVariableCref rhs )
+    PolymorphCref operator=( PolymorphCref rhs )
     {
       if( this != &rhs )
 	{
@@ -295,14 +303,14 @@ namespace libecs
 
   protected:
 
-    UVariableDataPtr createDataClone() const
+    PolymorphDataPtr createDataClone() const
     {
       return theData->createClone();
     }
 
   protected:
 
-    UVariableDataPtr theData;
+    PolymorphDataPtr theData;
 
   };
 

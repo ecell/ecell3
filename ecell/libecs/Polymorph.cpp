@@ -33,56 +33,56 @@
 #include "Util.hpp"
 #include "Exceptions.hpp"
 
-#include "UVariable.hpp"
+#include "Polymorph.hpp"
 
 namespace libecs
 {
 
-  UVariableStringData::UVariableStringData( const Real f )
+  PolymorphStringData::PolymorphStringData( RealCref f )
     :
     theString( toString<Real>( f ) )
   {
     ; // do nothing
   }
 
-  UVariableStringData::UVariableStringData( const Int i )
+  PolymorphStringData::PolymorphStringData( IntCref i )
     :
     theString( toString<Int>( i ) )
   {
     ; // do nothing
   }
 
-  const Real UVariableStringData::asReal() const
+  const Real PolymorphStringData::asReal() const
   {
     return stringTo<Real>( theString );
   }
 
-  const Int UVariableStringData::asInt() const
+  const Int PolymorphStringData::asInt() const
   {
     return stringTo<Int>( theString );
   }
 
 
-  UVariableRealData::UVariableRealData( StringCref str )
+  PolymorphRealData::PolymorphRealData( StringCref str )
     :
     theReal( stringTo<Real>( str ) )
   {
     ; // do nothing
   }
 
-  const String UVariableRealData::asString() const
+  const String PolymorphRealData::asString() const
   {
     return toString<Real>( theReal );
   }
 
-  UVariableIntData::UVariableIntData( StringCref str )
+  PolymorphIntData::PolymorphIntData( StringCref str )
     :
     theInt( stringTo<Int>( str ) )
   {
     ; // do nothing
   }
 
-  UVariableIntData::UVariableIntData( const Real f )
+  PolymorphIntData::PolymorphIntData( RealCref f )
     :
     // FIXME: range check?
     theInt( static_cast<Int>( f ) )
@@ -91,27 +91,27 @@ namespace libecs
   }
 
 
-  const String UVariableIntData::asString() const
+  const String PolymorphIntData::asString() const
   {
     return toString<Int>( theInt );
   }
 
 
-  const UVariable::Type UVariable::getType() const
+  const Polymorph::Type Polymorph::getType() const
   {
-    if( typeid( *theData) == typeid( UVariableRealData ) )
+    if( typeid( *theData) == typeid( PolymorphRealData ) )
       {
 	return REAL;
       }
-    else if( typeid( *theData ) == typeid( UVariableIntData ) )
+    else if( typeid( *theData ) == typeid( PolymorphIntData ) )
       {
 	return INT;
       }
-    else if( typeid( *theData ) == typeid( UVariableStringData ) )
+    else if( typeid( *theData ) == typeid( PolymorphStringData ) )
       {
 	return STRING;
       }
-    else if( typeid( *theData ) == typeid( UVariableNoneData ) )
+    else if( typeid( *theData ) == typeid( PolymorphNoneData ) )
       {
 	return NONE;
       }

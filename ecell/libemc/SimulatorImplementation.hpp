@@ -102,9 +102,9 @@ namespace libemc
 
     virtual void setStepperProperty( libecs::StringCref            aStepperID,
 				     libecs::StringCref            aPropertyName,
-				     libecs::UVariableVectorCref   aValue ) = 0;
+				     libecs::PolymorphVectorCref   aValue ) = 0;
 
-    virtual const libecs::UVariableVectorRCPtr
+    virtual const libecs::PolymorphVectorRCPtr
     getStepperProperty( libecs::StringCref aStepperID,
 		 libecs::StringCref aPropertyName ) = 0;
 
@@ -114,11 +114,11 @@ namespace libemc
 
 
     virtual void setProperty( libecs::StringCref            aFullPNString,
-			      libecs::UVariableVectorCref   aData ) = 0;
+			      libecs::PolymorphVectorCref   aData ) = 0;
 
 
 
-    virtual const libecs::UVariableVectorRCPtr
+    virtual const libecs::PolymorphVectorRCPtr
     getProperty( libecs::StringCref aFullPNString ) = 0;
 
     virtual EmcLogger

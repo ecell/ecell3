@@ -42,7 +42,13 @@ namespace libecs
 
   void SystemMaker::makeClassList()
   {
-    NewSystemModule( System );
+
+    //temporary workaround
+    addClass( new Module( "System", CompartmentSystem::createInstance ) );
+
+    NewSystemModule( VirtualSystem );
+    NewSystemModule( LogicalSystem );
+    NewSystemModule( CompartmentSystem );
   }
 
 } // namespace libecs

@@ -21,7 +21,7 @@ libecs_la_LDFLAGS= -version-info 0:1:0 #-rpath ${libdir}
 libecs_la_LIBADD= ${LIBLTDL} -L${KORANDOM_DIR}/korandom/ -lkorandom -lstdc++
 libecs_la_SOURCES=\
 Util.cpp\
-UVariable.cpp\
+Polymorph.cpp\
 FullID.cpp\
 PropertySlot.cpp\
 PropertyInterface.cpp\
@@ -51,7 +51,7 @@ libecsdir=${pkgincludedir}/libecs
 libecs_HEADERS=\
 libecs.hpp\
 Defs.hpp\
-UVariable.hpp\
+Polymorph.hpp\
 FullID.hpp\
 PropertySlot.hpp\
 PropertySlotMaker.hpp\

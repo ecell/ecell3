@@ -56,19 +56,19 @@ namespace libecs
 
     registerSlot( getPropertySlotMaker()->
 		  createPropertySlot( "SystemList", *this,
-				      Type2Type<UVariableVectorRCPtr>(),
+				      Type2Type<PolymorphVectorRCPtr>(),
 				      NULLPTR,
 				      &System::getSystemList ) );
 
     registerSlot( getPropertySlotMaker()->
 		  createPropertySlot( "SubstanceList", *this,
-				      Type2Type<UVariableVectorRCPtr>(),
+				      Type2Type<PolymorphVectorRCPtr>(),
 				      NULLPTR,
 				      &System::getSubstanceList ) );
 
     registerSlot( getPropertySlotMaker()->
 		  createPropertySlot( "ReactorList", *this,
-				      Type2Type<UVariableVectorRCPtr>(),
+				      Type2Type<PolymorphVectorRCPtr>(),
 				      NULLPTR,
 				      &System::getReactorList ) );
 
@@ -83,21 +83,15 @@ namespace libecs
 				      Type2Type<Real>(),
 				      &System::setVolume, 
 				      &System::getVolume ) );
-
-    registerSlot( getPropertySlotMaker()->
-		  createPropertySlot( "StepInterval", *this,
-				      Type2Type<Real>(),
-				      &System::setStepInterval, 
-				      &System::getStepInterval ) );
   }
 
 
   // Property slots
 
-  const UVariableVectorRCPtr System::getSystemList() const
+  const PolymorphVectorRCPtr System::getSystemList() const
   {
-    UVariableVectorRCPtr aVectorPtr( new UVariableVector );
-    aVectorPtr->reserve( theSystemMap.size() );
+    PolymorphVectorRCPtr aVectorPtr( new PolymorphVector );
+    aVectorPtr->reserve( getSystemMap().size() );
 
     for( SystemMapConstIterator i = getSystemMap().begin() ;
 	 i != getSystemMap().end() ; ++i )
@@ -108,10 +102,10 @@ namespace libecs
     return aVectorPtr;
   }
 
-  const UVariableVectorRCPtr System::getSubstanceList() const
+  const PolymorphVectorRCPtr System::getSubstanceList() const
   {
-    UVariableVectorRCPtr aVectorPtr( new UVariableVector );
-    aVectorPtr->reserve( theSubstanceMap.size() );
+    PolymorphVectorRCPtr aVectorPtr( new PolymorphVector );
+    aVectorPtr->reserve( getSubstanceMap().size() );
 
     for( SubstanceMapConstIterator i( getSubstanceMap().begin() );
 	 i != getSubstanceMap().end() ; ++i )
@@ -122,10 +116,10 @@ namespace libecs
     return aVectorPtr;
   }
 
-  const UVariableVectorRCPtr System::getReactorList() const
+  const PolymorphVectorRCPtr System::getReactorList() const
   {
-    UVariableVectorRCPtr aVectorPtr( new UVariableVector );
-    aVectorPtr->reserve( theReactorMap.size() );
+    PolymorphVectorRCPtr aVectorPtr( new PolymorphVector );
+    aVectorPtr->reserve( getReactorMap().size() );
 
     for( ReactorMapConstIterator i( getReactorMap().begin() );
 	 i != getReactorMap().end() ; ++i )
@@ -139,33 +133,16 @@ namespace libecs
 
   System::System()
     :
-    theVolume( 1.0 ),
-    theVolumeBuffer( theVolume ),
-    theConcentrationFactor( 0.0 ),
     theStepper( NULLPTR ),
     theEntityListChanged( false )
   {
     makeSlots();
-
-    updateConcentrationFactor();
   }
 
   System::~System()
   {
     getStepper()->removeSystem( this );
     
-    for( ReactorMapIterator i( theReactorMap.begin() );
-	 i != theReactorMap.end() ; ++i )
-      {
-	delete i->second;
-      }
-
-    for( SubstanceMapIterator i( theSubstanceMap.begin() );
-	 i != theSubstanceMap.end() ; ++i )
-      {
-	delete i->second;
-      }
-
     for( SystemMapIterator i( theSystemMap.begin() );
 	 i != theSystemMap.end() ; ++i )
       {
@@ -184,21 +161,6 @@ namespace libecs
     return getStepper()->getID();
   }
 
-  void System::setStepInterval( RealCref aStepInterval )
-  {
-    theStepper->setStepInterval( aStepInterval );
-  }
-
-  const Real System::getStepInterval() const
-  {
-    return theStepper->getStepInterval();
-  }
-
-  const Real System::getStepsPerSecond() const
-  {
-    return theStepper->getStepsPerSecond();
-  }
-
   void System::initialize()
   {
     if( theStepper == NULLPTR )
@@ -207,49 +169,16 @@ namespace libecs
 			 getFullID().getString() + ": Stepper not set." );
       }
 
-    //
-    // Substance::initialize()
-    //
-    for( SubstanceMapConstIterator i( getSubstanceMap().begin() );
-	 i != getSubstanceMap().end() ; ++i )
-      {
-	i->second->initialize();
-      }
+    // do not need to call subsystems' initialize() -- Stepper does this
 
-    //
-    // Reactor::initialize()
-    //
-    for( ReactorMapConstIterator i( getReactorMap().begin() );
-	 i != getReactorMap().end() ; ++i )
-      {
-	i->second->initialize();
-      }
-
-
-    // do not need to call subsystems' initialize()
-
-    updateConcentrationFactor();
   }
 
   void System::registerReactor( ReactorPtr aReactor )
   {
-    const String anID( aReactor->getID() );
-
-    if( getReactorMap().find( anID ) != getReactorMap().end() )
-      {
-	delete aReactor;
-
-	THROW_EXCEPTION( AlreadyExist, 
-			 "[" + getFullID().getString() + 
-			 "]: Reactor [" + anID + "] already exist." );
-      }
-
-    theReactorMap[ anID ] = aReactor;
-    aReactor->setSuperSystem( this );
-    aReactor->setModel( getModel() );
-
-    notifyChangeOfEntityList();
+    getSuperSystem()->registerReactor( aReactor );
   }
+
+
 
   ReactorPtr System::getReactor( StringCref anID ) 
   {
@@ -268,22 +197,7 @@ namespace libecs
 
   void System::registerSubstance( SubstancePtr aSubstance )
   {
-    const String anID( aSubstance->getID() );
-
-    if( getSubstanceMap().find( anID ) != getSubstanceMap().end() )
-      {
-	delete aSubstance;
-
-	THROW_EXCEPTION( AlreadyExist, 
-			 "[" + getFullID().getString() + 
-			 "]: Substance [" + anID + "] already exist." );
-      }
-
-    theSubstanceMap[ anID ] = aSubstance;
-    aSubstance->setSuperSystem( this );
-    aSubstance->setModel( getModel() );
-
-    notifyChangeOfEntityList();
+    getSuperSystem()->registerSubstance( aSubstance );
   }
 
   SubstancePtr System::getSubstance( StringCref anID ) 
@@ -335,11 +249,9 @@ namespace libecs
   }
 
 
-
-
   const Real System::getActivityPerSecond() const
   {
-    return getActivity() * getStepsPerSecond();
+    return getActivity() * getStepper()->getStepsPerSecond();
   }
 
   void System::notifyChangeOfEntityList()
@@ -357,6 +269,157 @@ namespace libecs
       {
 	return Entity::getSystemPath();
       }
+  }
+
+  VirtualSystem::VirtualSystem()
+  {
+    makeSlots();
+  }
+
+  VirtualSystem::~VirtualSystem()
+  {
+    for( ReactorMapIterator i( theReactorMap.begin() );
+	 i != theReactorMap.end() ; ++i )
+      {
+	delete i->second;
+      }
+
+  }
+
+  void VirtualSystem::makeSlots()
+  {
+    registerSlot( getPropertySlotMaker()->
+		  createPropertySlot( "ReactorList", *this,
+				      Type2Type<PolymorphVectorRCPtr>(),
+				      NULLPTR,
+				      &System::getReactorList ) );
+  }
+
+
+  void VirtualSystem::initialize()
+  {
+    System::initialize();
+
+    //
+    // Reactor::initialize()
+    //
+    for( ReactorMapConstIterator i( getReactorMap().begin() );
+	 i != getReactorMap().end() ; ++i )
+      {
+	i->second->initialize();
+      }
+
+  }
+
+
+  void VirtualSystem::registerReactor( ReactorPtr aReactor )
+  {
+    const String anID( aReactor->getID() );
+
+    if( getReactorMap().find( anID ) != getReactorMap().end() )
+      {
+	delete aReactor;
+
+	THROW_EXCEPTION( AlreadyExist, 
+			 "[" + getFullID().getString() + 
+			 "]: Reactor [" + anID + "] already exist." );
+      }
+
+    theReactorMap[ anID ] = aReactor;
+    aReactor->setSuperSystem( this );
+    aReactor->setModel( getModel() );
+
+    notifyChangeOfEntityList();
+  }
+
+
+
+  LogicalSystem::LogicalSystem()
+  {
+    makeSlots();
+  }
+
+  LogicalSystem::~LogicalSystem()
+  {
+    for( SubstanceMapIterator i( theSubstanceMap.begin() );
+	 i != theSubstanceMap.end() ; ++i )
+      {
+	delete i->second;
+      }
+  }
+
+
+  void LogicalSystem::makeSlots()
+  {
+    registerSlot( getPropertySlotMaker()->
+		  createPropertySlot( "SubstanceList", *this,
+				      Type2Type<PolymorphVectorRCPtr>(),
+				      NULLPTR,
+				      &System::getSubstanceList ) );
+
+  }
+
+  void LogicalSystem::initialize()
+  {
+    VirtualSystem::initialize();
+
+    //
+    // Substance::initialize()
+    //
+    for( SubstanceMapConstIterator i( getSubstanceMap().begin() );
+	 i != getSubstanceMap().end() ; ++i )
+      {
+	i->second->initialize();
+      }
+
+  }
+
+  void LogicalSystem::registerSubstance( SubstancePtr aSubstance )
+  {
+    const String anID( aSubstance->getID() );
+
+    if( getSubstanceMap().find( anID ) != getSubstanceMap().end() )
+      {
+	delete aSubstance;
+
+	THROW_EXCEPTION( AlreadyExist, 
+			 "[" + getFullID().getString() + 
+			 "]: Substance [" + anID + "] already exist." );
+      }
+
+    theSubstanceMap[ anID ] = aSubstance;
+    aSubstance->setSuperSystem( this );
+    aSubstance->setModel( getModel() );
+
+    notifyChangeOfEntityList();
+  }
+
+
+  CompartmentSystem::CompartmentSystem()
+    :
+    theVolume( 1.0 ),
+    theVolumeBuffer( theVolume )
+  {
+    makeSlots();
+  }
+
+  CompartmentSystem::~CompartmentSystem()
+  {
+    ; // do nothing
+  }
+
+  void CompartmentSystem::makeSlots()
+  {
+    registerSlot( getPropertySlotMaker()->
+		  createPropertySlot( "Volume", *this,
+				      Type2Type<Real>(),
+				      &System::setVolume, 
+				      &System::getVolume ) );
+  }
+
+  void CompartmentSystem::initialize()
+  {
+    LogicalSystem::initialize();
   }
 
 

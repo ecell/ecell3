@@ -162,7 +162,7 @@ namespace libecs
     }
 
 
-    void push( RealCref t, UVariableCref v )
+    void push( RealCref t, PolymorphCref v )
     {
       theContainer.push_back( Containee( t, v ) );
     }

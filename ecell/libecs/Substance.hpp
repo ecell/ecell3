@@ -91,9 +91,9 @@ namespace libecs
        Clear phase.
     */
 
-    virtual void clear() = 0;
+    //    virtual void clear() = 0;
 
-    virtual void integrate() = 0;
+    //    virtual void integrate() = 0;
 
 
     /**
@@ -118,7 +118,7 @@ namespace libecs
 
     const Real getConcentration() const
     {
-      return getQuantity() * getSuperSystem()->getConcentrationFactor();
+      return getQuantity() / ( getSuperSystem()->getVolume() * N_A );
     }
 
 

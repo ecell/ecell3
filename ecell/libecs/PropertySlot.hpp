@@ -38,7 +38,7 @@
 #include "Util.hpp"
 #include "PropertyInterface.hpp"
 
-#include "UVariable.hpp"
+#include "Polymorph.hpp"
 
 namespace libecs
 {
@@ -67,36 +67,36 @@ namespace libecs
   }
 
 
-  // to UVariableVectorRCPtr
+  // to PolymorphVectorRCPtr
 
   // identity
 
   template<>
-  inline const UVariableVectorRCPtr 
-  convertTo( UVariableVectorRCPtrCref aValue, 
-	     Type2Type< const UVariableVectorRCPtr > )
+  inline const PolymorphVectorRCPtr 
+  convertTo( PolymorphVectorRCPtrCref aValue, 
+	     Type2Type< const PolymorphVectorRCPtr > )
   {
     return aValue;
   }
 
   // from Real
   template<>
-  inline const UVariableVectorRCPtr 
+  inline const PolymorphVectorRCPtr 
   convertTo( RealCref aValue,
-	     Type2Type< const UVariableVectorRCPtr > )
+	     Type2Type< const PolymorphVectorRCPtr > )
   {
-    UVariableVectorRCPtr aVector( new UVariableVector );
+    PolymorphVectorRCPtr aVector( new PolymorphVector );
     aVector->push_back( aValue );
     return aVector;
   }
 
   // from String
   template<>
-  inline const UVariableVectorRCPtr 
+  inline const PolymorphVectorRCPtr 
   convertTo( StringCref aValue,
-	     Type2Type< const UVariableVectorRCPtr > )
+	     Type2Type< const PolymorphVectorRCPtr > )
   {
-    UVariableVectorRCPtr aVectorPtr( new UVariableVector );
+    PolymorphVectorRCPtr aVectorPtr( new PolymorphVector );
     aVectorPtr->push_back( aValue );
     return aVectorPtr;
   }
@@ -115,7 +115,7 @@ namespace libecs
 
 
   template<>
-  inline const String convertTo( UVariableVectorRCPtrCref aValue,
+  inline const String convertTo( PolymorphVectorRCPtrCref aValue,
 				 Type2Type< const String > )
   {
     return (*aValue)[0].asString();
@@ -142,7 +142,7 @@ namespace libecs
   }
 
   template<>
-  inline const Real convertTo( UVariableVectorRCPtrCref aValue,
+  inline const Real convertTo( PolymorphVectorRCPtrCref aValue,
 			       Type2Type< const Real > )
   {
     return (*aValue)[0].asReal();
@@ -184,8 +184,8 @@ namespace libecs
       ; // do nothing
     }
 
-    virtual void setUVariableVectorRCPtr( UVariableVectorRCPtrCref ) = 0;
-    virtual const UVariableVectorRCPtr getUVariableVectorRCPtr() const = 0;
+    virtual void setPolymorphVectorRCPtr( PolymorphVectorRCPtrCref ) = 0;
+    virtual const PolymorphVectorRCPtr getPolymorphVectorRCPtr() const = 0;
     
     virtual void setReal( RealCref real ) = 0;
     virtual const Real getReal() const = 0;
@@ -251,9 +251,9 @@ namespace libecs
 
 
   template <>
-  inline void PropertySlot::set( UVariableVectorRCPtrCref aValue )
+  inline void PropertySlot::set( PolymorphVectorRCPtrCref aValue )
   {
-    setUVariableVectorRCPtr( aValue );
+    setPolymorphVectorRCPtr( aValue );
   }
 
   template <>
@@ -269,9 +269,9 @@ namespace libecs
   }
 
   template <>
-  inline const UVariableVectorRCPtr PropertySlot::get()
+  inline const PolymorphVectorRCPtr PropertySlot::get()
   {
-    return getUVariableVectorRCPtr();
+    return getPolymorphVectorRCPtr();
   }
 
   template <>
@@ -396,14 +396,14 @@ namespace libecs
 
 
 
-    virtual void setUVariableVectorRCPtr( UVariableVectorRCPtrCref aValue )
+    virtual void setPolymorphVectorRCPtr( PolymorphVectorRCPtrCref aValue )
     {
       setImpl( aValue );
     }
 
-    virtual const UVariableVectorRCPtr getUVariableVectorRCPtr() const
+    virtual const PolymorphVectorRCPtr getPolymorphVectorRCPtr() const
     {
-      return getImpl< const UVariableVectorRCPtr >();
+      return getImpl< const PolymorphVectorRCPtr >();
     }
 
     virtual void setReal( RealCref aValue )
@@ -533,14 +533,14 @@ namespace libecs
 
     }
 
-    virtual void setUVariableVectorRCPtr( UVariableVectorRCPtrCref aValue )
+    virtual void setPolymorphVectorRCPtr( PolymorphVectorRCPtrCref aValue )
     {
       setImpl( aValue );
     }
 
-    virtual const UVariableVectorRCPtr getUVariableVectorRCPtr() const
+    virtual const PolymorphVectorRCPtr getPolymorphVectorRCPtr() const
     {
-      return getImpl< const UVariableVectorRCPtr >();
+      return getImpl< const PolymorphVectorRCPtr >();
     }
 
     virtual void setReal( RealCref aValue )

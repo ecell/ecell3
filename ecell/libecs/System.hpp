@@ -83,10 +83,7 @@ namespace libecs
 
     virtual void initialize();
 
-    virtual void integrate()
-    {
-      updateVolume();
-    }
+    virtual void integrate() = 0;
 
 
     /**
@@ -124,10 +121,7 @@ namespace libecs
        @return Volume of this System.
     */
 
-    virtual const Real getVolume() const
-    {
-      return theVolume;
-    }
+    virtual const Real getVolume() const = 0;
 
     /**
        Set a new volume of this System in [L] (liter).
@@ -137,15 +131,11 @@ namespace libecs
        @param aVolume the new volume value.
      */
 
-    virtual void setVolume( RealCref aVolume )
-    {
-      theVolumeBuffer = aVolume;
-    }
+    virtual void setVolume( RealCref aVolume ) = 0;
 
-    void updateVolume( )
+    virtual void updateVolume()
     {
-      theVolume = theVolumeBuffer;
-      updateConcentrationFactor();
+      ; // do nothing
     }
 
 
@@ -155,17 +145,11 @@ namespace libecs
       DEFAULT_SPECIALIZATION_INHIBITED();
     }
 
-    SubstanceMapCref getSubstanceMap() const
-    {
-      return theSubstanceMap;
-    }
+    virtual SubstanceMapCref getSubstanceMap() const = 0;
 
-    ReactorMapCref   getReactorMap() const
-    {
-      return theReactorMap;
-    }
+    virtual ReactorMapCref   getReactorMap() const = 0;
 
-    SystemMapCref    getSystemMap() const
+    virtual SystemMapCref    getSystemMap() const
     {
       return theSystemMap;
     }
@@ -210,7 +194,7 @@ namespace libecs
        it if there is an error.
     */
 
-    void registerReactor( ReactorPtr aReactor );
+    virtual void registerReactor( ReactorPtr aReactor );
   
 
     /**
@@ -220,7 +204,7 @@ namespace libecs
        it if there is an error.
     */
 
-    void registerSubstance( SubstancePtr aSubstance );
+    virtual void registerSubstance( SubstancePtr aSubstance );
   
 
     /**
@@ -230,7 +214,7 @@ namespace libecs
        it if there is an error.
     */
 
-    void registerSystem( SystemPtr aSystem );
+    virtual void registerSystem( SystemPtr aSystem );
 
 
     bool isRootSystem() const
@@ -241,64 +225,29 @@ namespace libecs
 
     const Real getActivityPerSecond() const;
 
-    virtual void setStepInterval( RealCref aStepInterval );
-    virtual const Real getStepInterval() const;
-    const Real getStepsPerSecond() const;
-
     virtual const SystemPath getSystemPath() const;
 
     void notifyChangeOfEntityList();
 
-    /**
-       This method returns 1 / ( volume * Avogadro's number ).
-
-       Quantity * getConcentrationFactor() forms 
-       concentration in M (molar).
-
-       When calculating the concentration, using this is faster
-       than getVolume() because the value is precalculated when
-       setConcentration() is called.
-
-    */
-
-    RealCref getConcentrationFactor() const
-    {
-      return theConcentrationFactor;
-    }
-
-
     virtual StringLiteral getClassName() const { return "System"; }
-    static SystemPtr createInstance() { return new System; }
+    //    static SystemPtr createInstance() { return new System; }
 
   public: // property slots
 
-    const UVariableVectorRCPtr getSystemList() const;
-    const UVariableVectorRCPtr getSubstanceList() const;
-    const UVariableVectorRCPtr getReactorList() const;
+    const PolymorphVectorRCPtr getSystemList() const;
+    const PolymorphVectorRCPtr getSubstanceList() const;
+    const PolymorphVectorRCPtr getReactorList() const;
 
   protected:
-
-    void updateConcentrationFactor() 
-    {
-      theConcentrationFactor = 1 / ( getVolume() * N_A );
-    }
 
     virtual void makeSlots();
 
   protected:
 
-    StepperPtr theStepper;
+    StepperPtr   theStepper;
 
   private:
 
-    Real theVolume;
-
-    Real theVolumeBuffer;
-
-    Real theConcentrationFactor;
-
-    ReactorMap   theReactorMap;
-    SubstanceMap theSubstanceMap;
     SystemMap    theSystemMap;
 
     bool         theEntityListChanged;
@@ -306,22 +255,187 @@ namespace libecs
   };
 
 
+  class VirtualSystem 
+    : 
+    public System
+  {
+
+  public:
+
+    VirtualSystem();
+    virtual ~VirtualSystem();
+
+    virtual void initialize();
+
+    virtual void integrate()
+    {
+      updateVolume();
+    }
+
+
+    /**
+       Get the volume of this System in [L] (liter).
+
+       @return Volume of this System.
+    */
+
+    virtual const Real getVolume() const
+    {
+      return getSuperSystem()->getVolume();
+    }
+
+    virtual void updateVolume()
+    {
+      getSuperSystem()->updateVolume();
+    }
+
+    virtual void registerReactor( ReactorPtr aReactor );
+
+    /**
+       Set a new volume of this System in [L] (liter).
+
+       The volume is updated at the beginning of the next step.
+
+       @param aVolume the new volume value.
+     */
+
+    virtual void setVolume( RealCref aVolume )
+    {
+      getSuperSystem()->setVolume( aVolume );
+    }
+
+    virtual SubstanceMapCref getSubstanceMap() const
+    {
+      return getSuperSystem()->getSubstanceMap();
+    }
+
+    virtual ReactorMapCref   getReactorMap() const
+    {
+      return theReactorMap;
+    }
+
+    virtual StringLiteral getClassName() const { return "VirtualSystem"; }
+    static SystemPtr createInstance() { return new VirtualSystem; }
+
+  protected:
+
+    virtual void makeSlots();
+
+  private:
+
+    ReactorMap   theReactorMap;
+
+  };
+
+
+  class LogicalSystem 
+    : 
+    public VirtualSystem
+  {
+
+  public:
+
+    LogicalSystem();
+    virtual ~LogicalSystem();
+
+    virtual void initialize();
+
+    virtual SubstanceMapCref getSubstanceMap() const
+    {
+      return theSubstanceMap;
+    }
+
+    virtual void registerSubstance( SubstancePtr aSubstance );
+
+    virtual StringLiteral getClassName() const { return "LogicalSystem"; }
+    static SystemPtr createInstance() { return new LogicalSystem; }
+
+  protected:
+
+    virtual void makeSlots();
+
+  private:
+
+    SubstanceMap theSubstanceMap;
+
+  };
+
+
+
+  class CompartmentSystem 
+    : 
+    public LogicalSystem
+  {
+
+  public:
+
+    CompartmentSystem();
+    virtual ~CompartmentSystem();
+
+    virtual void initialize();
+
+    virtual void integrate()
+    {
+      updateVolume();
+    }
+
+    virtual const Real getVolume() const
+    {
+      return theVolume;
+    }
+
+    /**
+       Set a new volume of this System in [L] (liter).
+
+       The volume is updated at the beginning of the next step.
+
+       @param aVolume the new volume value.
+     */
+
+    virtual void setVolume( RealCref aVolume )
+    {
+      theVolumeBuffer = aVolume;
+    }
+
+    virtual void updateVolume()
+    {
+      theVolume = theVolumeBuffer;
+    }
+
+    virtual StringLiteral getClassName() const { return "CompartmentSystem"; }
+    static SystemPtr createInstance() { return new CompartmentSystem; }
+ 
+ protected:
+
+    virtual void makeSlots();
+
+  private:
+
+    Real theVolume;
+
+    Real theVolumeBuffer;
+
+  };
+
+
+
+
   template <>
   inline const std::map<const String,SubstancePtr> System::getMap() const
   {
-    return theSubstanceMap;
+    return getSubstanceMap();
   }
 
   template <>
   inline const std::map<const String,ReactorPtr>   System::getMap() const
   {
-    return theReactorMap;
+    return getReactorMap();
   }
 
   template <>
   inline const std::map<const String,SystemPtr>    System::getMap() const
   {
-    return theSystemMap;
+    return getSystemMap();
   }
 
 

@@ -121,9 +121,9 @@ namespace libecs
     }
 
 
-    void setReactant( UVariableVectorRCPtrCref aValue );
+    void setReactant( PolymorphVectorRCPtrCref aValue );
 
-    const UVariableVectorRCPtr getReactantList() const;
+    const PolymorphVectorRCPtr getReactantList() const;
 
     void registerReactant( StringCref aName, FullIDCref aFullID,
 			   const Int aStoichiometry );

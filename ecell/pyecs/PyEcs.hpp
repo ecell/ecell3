@@ -9,7 +9,7 @@
 #include <Numeric/arrayobject.h>
 
 #include "libecs/libecs.hpp"
-#include "libecs/UVariable.hpp"
+#include "libecs/Polymorph.hpp"
 #include "libecs/DataPointVector.hpp"
 
 
@@ -108,20 +108,20 @@ BOOST_PYTHON_BEGIN_CONVERSION_NAMESPACE
 
 
 //
-// UVariable
+// Polymorph
 //
 
-libecs::UVariable from_python( PyObject* aPyObjectPtr,
-			       type<libecs::UVariable> )
+libecs::Polymorph from_python( PyObject* aPyObjectPtr,
+			       type<libecs::Polymorph> )
 {
-  libecs::UVariable aUVariable;
+  libecs::Polymorph aPolymorph;
 
   if( PyFloat_Check( aPyObjectPtr ) )
     {
       libecs::Real aReal( BOOST_PYTHON_CONVERSION::
 			  from_python( aPyObjectPtr,
 				       type<libecs::Real>() ) );
-      aUVariable = aReal;
+      aPolymorph = aReal;
     }
   else if( PyInt_Check( aPyObjectPtr ) )
     {
@@ -129,7 +129,7 @@ libecs::UVariable from_python( PyObject* aPyObjectPtr,
 			 from_python( aPyObjectPtr,
 				      type<long int>()) );
       //					  type<libecs::Int>()) );
-      aUVariable = anInt;
+      aPolymorph = anInt;
     }
   else if( PyString_Check( aPyObjectPtr ) )
     {
@@ -137,7 +137,7 @@ libecs::UVariable from_python( PyObject* aPyObjectPtr,
 	aString( BOOST_PYTHON_CONVERSION::
 		 from_python( aPyObjectPtr,
 			      type<libecs::String>() ) );
-      aUVariable = aString;
+      aPolymorph = aString;
     }
   else
     {
@@ -150,28 +150,28 @@ libecs::UVariable from_python( PyObject* aPyObjectPtr,
     }
 
   // here I expect named return value optimization
-  return aUVariable;
+  return aPolymorph;
 }
 
-PyObject* to_python( libecs::UVariableCref aUVariable )
+PyObject* to_python( libecs::PolymorphCref aPolymorph )
 {
   PyObject* aPyObjectPtr;
 
-  switch( aUVariable.getType() )
+  switch( aPolymorph.getType() )
     {
-    case libecs::UVariable::REAL :
-      aPyObjectPtr = BOOST_PYTHON_CONVERSION::to_python( aUVariable.asReal() );
+    case libecs::Polymorph::REAL :
+      aPyObjectPtr = BOOST_PYTHON_CONVERSION::to_python( aPolymorph.asReal() );
       break;
-    case libecs::UVariable::INT :
+    case libecs::Polymorph::INT :
       // FIXME: ugly cast... determine the type by autoconf?
       aPyObjectPtr = BOOST_PYTHON_CONVERSION::
-	to_python( boost::numeric_cast<long int>( aUVariable.asInt() ) );
+	to_python( boost::numeric_cast<long int>( aPolymorph.asInt() ) );
       break;
-    case libecs::UVariable::STRING :
-    case libecs::UVariable::NONE :
+    case libecs::Polymorph::STRING :
+    case libecs::Polymorph::NONE :
     default: // should this default be an error?
       aPyObjectPtr = BOOST_PYTHON_CONVERSION::
-	to_python( aUVariable.asString() );
+	to_python( aPolymorph.asString() );
       break;
     }
 
@@ -179,19 +179,19 @@ PyObject* to_python( libecs::UVariableCref aUVariable )
   return aPyObjectPtr;
 }
 
-PyObject* to_python( libecs::UVariableCptr aUVariablePtr )
+PyObject* to_python( libecs::PolymorphCptr aPolymorphPtr )
 {
-  to_python( aUVariablePtr );
+  to_python( aPolymorphPtr );
 }
 
 
 
 //
-// UVariableVector
+// PolymorphVector
 //
 
-libecs::UVariableVector from_python( PyObject* aPyObjectPtr, 
-				     type<libecs::UVariableVector> )
+libecs::PolymorphVector from_python( PyObject* aPyObjectPtr, 
+				     type<libecs::PolymorphVector> )
 {
   ref aRef;
 
@@ -214,7 +214,7 @@ libecs::UVariableVector from_python( PyObject* aPyObjectPtr,
 
   std::size_t aSize( aPyTuple.size() );
 
-  libecs::UVariableVector aVector;
+  libecs::PolymorphVector aVector;
   aVector.reserve( aSize );
 
   for ( std::size_t i( 0 ); i < aSize; ++i )
@@ -223,21 +223,21 @@ libecs::UVariableVector from_python( PyObject* aPyObjectPtr,
       PyObject* aPyObjectPtr( anItemRef.get() ); 
 
       aVector.push_back( from_python( aPyObjectPtr, 
-				      type<libecs::UVariable>() ) );
+				      type<libecs::Polymorph>() ) );
     }
 
   return aVector;
 }
 
-libecs::UVariableVector from_python( PyObject* aPyObjectPtr, 
-				     type<libecs::UVariableVectorCref> )
+libecs::PolymorphVector from_python( PyObject* aPyObjectPtr, 
+				     type<libecs::PolymorphVectorCref> )
 {
-  return from_python( aPyObjectPtr, type<libecs::UVariableVector>() );
+  return from_python( aPyObjectPtr, type<libecs::PolymorphVector>() );
 }
 
-PyObject* to_python( libecs::UVariableVectorCref aVector )
+PyObject* to_python( libecs::PolymorphVectorCref aVector )
 {
-  libecs::UVariableVector::size_type aSize( aVector.size() );
+  libecs::PolymorphVector::size_type aSize( aVector.size() );
   
   tuple aPyTuple( aSize );
 
@@ -249,12 +249,12 @@ PyObject* to_python( libecs::UVariableVectorCref aVector )
   return to_python( aPyTuple.get() );
 }
 
-PyObject* to_python( libecs::UVariableVectorCptr aVectorCptr )
+PyObject* to_python( libecs::PolymorphVectorCptr aVectorCptr )
 {
   return to_python( *aVectorCptr );
 }
 
-PyObject* to_python( libecs::UVariableVectorRCPtr aVectorRCPtr )
+PyObject* to_python( libecs::PolymorphVectorRCPtr aVectorRCPtr )
 {
   return to_python( *aVectorRCPtr );
 }

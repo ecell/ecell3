@@ -34,7 +34,7 @@
 #include "libecs.hpp"
 
 
-#include "UVariable.hpp"
+#include "Polymorph.hpp"
 
 namespace libecs
 {

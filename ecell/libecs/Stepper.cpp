@@ -60,7 +60,7 @@ namespace libecs
 
     registerSlot( getPropertySlotMaker()->
 		  createPropertySlot( "SystemList", *this,
-				      Type2Type<UVariableVectorRCPtr>(),
+				      Type2Type<PolymorphVectorRCPtr>(),
 				      NULLPTR,
 				      &Stepper::getSystemList ) );
 
@@ -115,9 +115,9 @@ namespace libecs
   }
 
 
-  const UVariableVectorRCPtr Stepper::getSystemList() const
+  const PolymorphVectorRCPtr Stepper::getSystemList() const
   {
-    UVariableVectorRCPtr aVectorPtr( new UVariableVector );
+    PolymorphVectorRCPtr aVectorPtr( new PolymorphVector );
     aVectorPtr->reserve( theSystemVector.size() );
 
     for( SystemVectorConstIterator i = getSystemVector().begin() ;

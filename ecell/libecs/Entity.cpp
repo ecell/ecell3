@@ -95,7 +95,7 @@ namespace libecs
 
   const Real Entity::getActivityPerSecond() const
   {
-    return getActivity() * getSuperSystem()->getStepsPerSecond();
+    return getActivity() * getStepper()->getStepsPerSecond();
   }
 
   const FullID Entity::getFullID() const

@@ -46,13 +46,13 @@ namespace libecs
   {
     registerSlot( getPropertySlotMaker()->
 		  createPropertySlot( "Reactant", *this, 
-				      Type2Type<UVariableVectorRCPtr>(),
+				      Type2Type<PolymorphVectorRCPtr>(),
 				      &Reactor::setReactant,
 				      NULLPTR ) );
 
     registerSlot( getPropertySlotMaker()->
 		  createPropertySlot( "ReactantList", *this, 
-				      Type2Type<UVariableVectorRCPtr>(),
+				      Type2Type<PolymorphVectorRCPtr>(),
 				      NULLPTR,
 				      &Reactor::getReactantList ) );
 
@@ -63,7 +63,7 @@ namespace libecs
 				      &Reactor::getActivity ) );
   }
 
-  void Reactor::setReactant( UVariableVectorRCPtrCref aValue )
+  void Reactor::setReactant( PolymorphVectorRCPtrCref aValue )
   {
     checkSequenceSize( *aValue, 3 );
 
@@ -72,9 +72,9 @@ namespace libecs
 		      (*aValue)[2].asInt() );
   }
 
-  const UVariableVectorRCPtr Reactor::getReactantList() const
+  const PolymorphVectorRCPtr Reactor::getReactantList() const
   {
-    UVariableVectorRCPtr aVectorPtr( new UVariableVector );
+    PolymorphVectorRCPtr aVectorPtr( new PolymorphVector );
     aVectorPtr->reserve( theReactantMap.size() );
   
     for( ReactantMapConstIterator i( theReactantMap.begin() );
