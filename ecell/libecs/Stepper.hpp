@@ -894,9 +894,11 @@ m
 
     virtual void interrupt( StepperPtr const aCaller )
     {
-      setCurrentTime( aCaller->getCurrentTime() );
+      //      setCurrentTime( aCaller->getCurrentTime() );
 
+      integrate( aCaller->getCurrentTime() );
       step();
+      log();
     }
 
     virtual SET_METHOD( Real, StepInterval )
