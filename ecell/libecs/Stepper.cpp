@@ -181,7 +181,7 @@ namespace libecs
 	     j != aVariableReferenceVector.end(); ++j )
 	  {
 	    VariableReferenceCref aNewVariableReference( *j );
-	    VariablePtr aVariablePtr( aNewVariableReference.getVariablePtr() );
+	    VariablePtr aVariablePtr( aNewVariableReference.getVariable() );
 
 	    PtrVariableReferenceMapIterator 
 	      anIterator( aPtrVariableReferenceMap.find( aVariablePtr ) );
@@ -236,7 +236,7 @@ namespace libecs
     std::transform( aVariableReferenceVector.begin(),
 		    aVariableReferenceVector.end(),
 		    std::back_inserter( theVariableVector ),
-		    std::mem_fun_ref( &VariableReference::getVariablePtr ) );
+		    std::mem_fun_ref( &VariableReference::getVariable ) );
 
     theFirstReadWriteVariableIterator = 
       theVariableVector.begin() + ( aFirstReadWriteVariableReferenceIterator 

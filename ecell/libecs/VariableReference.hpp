@@ -145,12 +145,12 @@ namespace libecs
       return theName; 
     }
 
-    void setVariablePtr( VariablePtr const aVariablePtr )
+    void setVariable( VariablePtr const aVariablePtr )
     {
       theVariablePtr = aVariablePtr;
     }
 
-    const VariablePtr getVariablePtr() const 
+    const VariablePtr getVariable() const 
     { 
       return theVariablePtr; 
     }
