@@ -256,6 +256,7 @@ private:
 	VARIABLE,
 	CALL_FUNC,
 	SYSTEM_FUNC,
+	SYSTEM_PROPERTY,
 	IDENTIFIER,
 	CONSTANT,
       };
@@ -277,18 +278,26 @@ private:
 	    discard_node_d[ ch_p('+') ] >> integer |
 	    integer );
 
-	negative    =	  rootNode( ch_p('-') ) >> factor; 
+	negative    =	rootNode( ch_p('-') ) >> factor; 
 
 	identifier  =   leafNode( alpha_p >> *( alnum_p | ch_p('_') ) );
 
 	variable    =   identifier >> rootNode( ch_p('.') ) >> identifier;
 	
-	system_func = identifier >> rootNode( ch_p('.') ) >>
-	  +( leafNode( +( alpha_p | ch_p('_') ) ) >>
+	/**system_func = identifier >> discard_node_d[ ch_p('.') ] >>
+	  +( rootNode( +( alpha_p | ch_p('_') ) ) >>
 	     discard_node_d[ ch_p('(') ] >>
 	     discard_node_d[ ch_p(')') ] >>
 	     discard_node_d[ ch_p('.') ] ) >>
-	  identifier;
+	     identifier;*/
+
+	system_func = identifier >> system_property >> rootNode( ch_p('.') ) >> identifier;
+
+	system_property = +( rootNode( ch_p('.') ) >>
+			     leafNode( +( alpha_p | ch_p('_') ) ) >>
+			     discard_node_d[ ch_p('(') ] >>
+			     discard_node_d[ ch_p(')') ] );
+      
 
 	///////////////////////////////////////////////////
 	//                                               //
@@ -366,8 +375,8 @@ private:
 
 	term        =  power >>
 	  *( ( rootNode( ch_p('*') ) >> power )
-	     |  ( rootNode( ch_p('/') ) >> power )
-	     |  ( rootNode( ch_p('^') ) >> power ) );
+	     |  ( rootNode( ch_p('/') ) >> power ) );
+	//|  ( rootNode( ch_p('^') ) >> power ) );
 	
 
 	expression  =  term >>
@@ -381,14 +390,16 @@ private:
       rule<ScannerT, PARSER_CONTEXT, parser_tag<TERM> >         term;
       rule<ScannerT, PARSER_CONTEXT, parser_tag<POWER> >        power;
       rule<ScannerT, PARSER_CONTEXT, parser_tag<FACTOR> >       factor;
-      rule<ScannerT, PARSER_CONTEXT, parser_tag<FLOAT> >     floating;
+      rule<ScannerT, PARSER_CONTEXT, parser_tag<FLOAT> >        floating;
       rule<ScannerT, PARSER_CONTEXT, parser_tag<EXPONENT> >     exponent;
       rule<ScannerT, PARSER_CONTEXT, parser_tag<INTEGER> >      integer;
       rule<ScannerT, PARSER_CONTEXT, parser_tag<NEGATIVE> >     negative;
       rule<ScannerT, PARSER_CONTEXT, parser_tag<GROUP> >        group;
       rule<ScannerT, PARSER_CONTEXT, parser_tag<IDENTIFIER> >   identifier;
       rule<ScannerT, PARSER_CONTEXT, parser_tag<CONSTANT> >     constant;
-      rule<ScannerT, PARSER_CONTEXT, parser_tag<SYSTEM_FUNC> > system_func;
+      rule<ScannerT, PARSER_CONTEXT, parser_tag<SYSTEM_FUNC> >  system_func;
+      rule<ScannerT, PARSER_CONTEXT, parser_tag<SYSTEM_PROPERTY> >
+      system_property;
 
       rule<ScannerT, PARSER_CONTEXT, parser_tag<EXPRESSION> > const&
       start() const { return expression; }
@@ -458,7 +469,10 @@ private:
     
   static void fillMap();
 
-  void compileTree( TreeIterator const&  i, CodeRef aCode );  
+  void compileTree( TreeIterator const& aTreeIterator, CodeRef aCode );  
+  void compileSystemProperty
+  ( TreeIterator const& aTreeIterator, CodeRef aCode,
+    SystemPtr aSystemPtr, const String aMethodName );
 
 private:
     
@@ -955,57 +969,46 @@ void ExpressionCompiler::compileTree
 
     case CompileGrammar::SYSTEM_FUNC :
       {
+	assert( aTreeIterator->children.size() >= 3 );
+	Integer aChildTreeSize( aTreeIterator->children.size() );
+
 	TreeIterator const& 
 	  aChildTreeIterator( aTreeIterator->children.begin() );
 
 	const String aClassString( aChildTreeIterator->value.begin(),
 				   aChildTreeIterator->value.end() );
 
-	const String
-	  aClassMethodString( ( aChildTreeIterator+1 )->value.begin(),
-			      ( aChildTreeIterator+1 )->value.end() );
-	  
-
 	assert( *aTreeIterator->value.begin() == '.' );
-	
 
 	if( aClassString == "self" )  // Process Class
 	  {
-	    if( aClassMethodString != "getSuperSystem" )
-	      {
-		THROW_EXCEPTION( NoSlot,
-				 aClassMethodString + 
-				 String
-				 ( " : No such Process method." ) );
-	      }
-
 	    SystemPtr aSystemPtr( theProcessPtr->getSuperSystem() );
 
-	    const String aMethodName( ( aChildTreeIterator+2 )->value.begin(),
-				      ( aChildTreeIterator+2 )->value.end() );
+	    const String aMethodName
+	      ( ( aChildTreeIterator+aChildTreeSize-1 )->value.begin(),
+		( aChildTreeIterator+aChildTreeSize-1 )->value.end() );
 	    
-	    appendSystemMethodInstruction( aCode, aSystemPtr, aMethodName );
-	  }		  		
+	    compileSystemProperty( aChildTreeIterator+1,
+				   aCode,
+				   aSystemPtr,
+				   aMethodName );
+	  }
 	else // VariableReference Class
 	  {
 	    VariableReferenceCref
 	      aVariableReference( theProcessPtr->
 				  getVariableReference( aClassString ) );
 	      
-	    if( aClassMethodString != "getSuperSystem" )
-	      {
-		THROW_EXCEPTION( NoSlot,
-				 aClassMethodString + 
-				 String( " : No such Process method." ) );
-	      }
-
 	    SystemPtr const aSystemPtr( aVariableReference.getSuperSystem() );
 
-	    const String aMethodName( ( aChildTreeIterator+2 )->value.begin(),
-				      ( aChildTreeIterator+2 )->value.end() );
+	    const String aMethodName
+	      ( ( aChildTreeIterator+aChildTreeSize-1 )->value.begin(),
+		( aChildTreeIterator+aChildTreeSize-1 )->value.end() );
 	    
-	    appendSystemMethodInstruction( aCode, aSystemPtr, aMethodName );
-
+	    compileSystemProperty( aChildTreeIterator+1,
+				   aCode,
+				   aSystemPtr,
+				   aMethodName );
 	  }
 	return;
       }
@@ -1360,6 +1363,40 @@ void ExpressionCompiler::compileTree
     }
 }
 
+
+void ExpressionCompiler::compileSystemProperty
+( TreeIterator const& aTreeIterator, CodeRef aCode,
+  SystemPtr aSystemPtr, const String aMethodName )
+{
+  TreeIterator const& 
+    aChildTreeIterator( aTreeIterator->children.begin() );
+  
+  const String aChildString( aChildTreeIterator->value.begin(),
+				   aChildTreeIterator->value.end() );
+
+  assert( *aTreeIterator->value.begin() == '.' );
+
+  if( aChildString == "getSuperSystem" )
+    {
+      appendSystemMethodInstruction( aCode, 
+				     aSystemPtr, 
+				     aMethodName );
+    }
+  else if( aChildString == "." )
+    {
+      SystemPtr theSystemPtr( aSystemPtr->getSuperSystem() );
+
+      compileSystemProperty( aChildTreeIterator,
+			     aCode,
+			     theSystemPtr,
+			     aMethodName );
+    }
+  else
+    {
+      THROW_EXCEPTION( UnexpectedError,
+		       String( "System function parse error" ) );
+    }
+}
 
 // this should be moved to .cpp
   
