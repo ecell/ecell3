@@ -9,6 +9,7 @@ import gobject
 
 import operator
 import string
+import re
 import copy
 
 # This parameter should be set by setting file.
@@ -53,8 +54,9 @@ class EntityListWindow(OsogoWindow):
 		                    'on_view_button_clicked'     : self.createPluginWindow,\
 				    'on_variable_tree_button_press_event' : self.popupMenu,\
 				    'on_process_tree_button_press_event' : self.popupMenu,\
-				    
-		                    #'unchi' : self.doubleClick,\
+				    # search 
+		                    'on_search_button_clicked' : self.searchID,\
+				    'on_search_entry_key_press_event' : self.pressEnter, \
 		                   } )
 
 
@@ -423,7 +425,7 @@ class EntityListWindow(OsogoWindow):
 		updates this window and property window
 		Returns None
 		"""
-
+		
 		# updates this window
 		OsogoWindow.update(self)
 
@@ -438,7 +440,6 @@ class EntityListWindow(OsogoWindow):
 
 	# ========================================================================
 	def constructTree( self, aParentTree, aSystemFullID ):
-
 
 		aNewlabel = aSystemFullID[ID] 
 
@@ -493,7 +494,7 @@ class EntityListWindow(OsogoWindow):
 		if aSelectedSystemIter == None:
 			return None
 
-		#self.updateEntityList( aSelectedSystemIter )
+		# self.updateEntityList( aSelectedSystemIter )
 		self.updateProcessList( aSelectedSystemIter )
 		self.updateVariableList( aSelectedSystemIter )
 
@@ -935,6 +936,86 @@ class EntityListWindow(OsogoWindow):
 		pass
 	# end of createLogger
 
+	# ========================================================================
+	def searchID( self, *arg ):
+		"""search ID from Selected System
+		Returns None
+		"""
+		aText = self["search_entry"].get_text()
+		key=str(self.theSysTreeStore.get_path(self.theSelectedSystemIter))
+		aSystemFullID = self.theSysTreeStore.get_data( key )
+		aSystemPath = createSystemPathFromFullID( aSystemFullID )
+		aProcessList = self.theSession.getEntityList( 'Process', aSystemPath )
+		aVariableList = self.theSession.getEntityList( 'Variable', aSystemPath )
 
+		aSearchedProcessList = []
+		aSearchedVariableList = []
+		for i in aProcessList:
+			if( string.find( i , aText ) != -1 ):
+				aSearchedProcessList.append( i )
+		for i in aVariableList:
+			if( string.find( i , aText ) != -1 ):
+				aSearchedVariableList.append( i )
 
+		self.theVariableStore.clear()
+		for anEntityID in aSearchedVariableList:
+			iter = self.theVariableStore.append()
+			self.theVariableStore.set_value(iter,0,anEntityID)
+			value = self.theSession.theSimulator.getEntityProperty( createFullPNString( ( VARIABLE, aSystemPath, anEntityID, 'Value' ) ) )
+			aEntityFullPN = ( VARIABLE, aSystemPath, anEntityID, '' )
+			self.theVariableStore.set_value(iter,1,str(value))
+			self.theVariableStore.set_data( anEntityID, aEntityFullPN )
 
+		self['variable_label'].set_text('Variable (' + str(len(aSearchedVariableList)) + ')' )
+		self.theProcessStore.clear()
+		for anEntityID in aSearchedProcessList:
+			iter = self.theProcessStore.append()
+			self.theProcessStore.set_value(iter,0,anEntityID)
+			activity = self.theSession.theSimulator.getEntityProperty( createFullPNString( ( PROCESS, aSystemPath, anEntityID, 'Activity' ) ) )
+			self.theProcessStore.set_value(iter,1,str(activity))
+			aEntityFullPN = ( PROCESS, aSystemPath, anEntityID, '' )
+			self.theProcessStore.set_data( anEntityID, aEntityFullPN )
+			
+		self['process_label'].set_text('Process (' +str(len(aSearchedProcessList)) + ')' )
+
+	# ========================================================================
+	def pressEnter( self, *arg ):
+
+		if( arg[1].keyval == 65293 ):
+			aText = self["search_entry"].get_text()
+			key=str(self.theSysTreeStore.get_path(self.theSelectedSystemIter))
+			aSystemFullID = self.theSysTreeStore.get_data( key )
+			aSystemPath = createSystemPathFromFullID( aSystemFullID )
+			aProcessList = self.theSession.getEntityList( 'Process', aSystemPath )
+			aVariableList = self.theSession.getEntityList( 'Variable', aSystemPath )
+
+			aSearchedProcessList = []
+			aSearchedVariableList = []
+			for i in aProcessList:
+				if( string.find( i , aText ) != -1 ):
+					aSearchedProcessList.append( i )
+			for i in aVariableList:
+				if( string.find( i , aText ) != -1 ):
+					aSearchedVariableList.append( i )
+
+			self.theVariableStore.clear()
+			for anEntityID in aSearchedVariableList:
+				iter = self.theVariableStore.append()
+				self.theVariableStore.set_value(iter,0,anEntityID)
+				value = self.theSession.theSimulator.getEntityProperty( createFullPNString( ( VARIABLE, aSystemPath, anEntityID, 'Value' ) ) )
+				aEntityFullPN = ( VARIABLE, aSystemPath, anEntityID, '' )
+				self.theVariableStore.set_value(iter,1,str(value))
+				self.theVariableStore.set_data( anEntityID, aEntityFullPN )
+
+			self['variable_label'].set_text('Variable (' + str(len(aSearchedVariableList)) + ')' )
+			self.theProcessStore.clear()
+			for anEntityID in aSearchedProcessList:
+				iter = self.theProcessStore.append()
+				self.theProcessStore.set_value(iter,0,anEntityID)
+				activity = self.theSession.theSimulator.getEntityProperty( createFullPNString( ( PROCESS, aSystemPath, anEntityID, 'Activity' ) ) )
+				self.theProcessStore.set_value(iter,1,str(activity))
+				aEntityFullPN = ( PROCESS, aSystemPath, anEntityID, '' )
+				self.theProcessStore.set_data( anEntityID, aEntityFullPN )
+				
+			self['process_label'].set_text('Process (' +str(len(aSearchedProcessList)) + ')' )
+			
