@@ -154,9 +154,10 @@ return reinterpret_cast<const void*>(&thePropertyInterface.getInfoMap());\
 #define CLASSINFO_FALSE 0
 
 #define METHODFLAG( METHODPTR, NULLVALUE ) \
- (  # METHODPTR  == # NULLVALUE ? CLASSINFO_TRUE : CLASSINFO_FALSE )
+ METHODFLAG2( METHODPTR, NULLVALUE )
 
-
+#define METHODFLAG2( METHODPTR, NULLVALUE ) \
+ ( # METHODPTR  == # NULLVALUE ? CLASSINFO_FALSE : CLASSINFO_TRUE )
   /**
 	 macro for setting class Info string
 	 Info is expected as PropertyName, Value both Strings
