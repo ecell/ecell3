@@ -83,7 +83,7 @@ namespace libecs
 	return theTime;
       }
 
-      DiscreteEventProcessPtr getProcess() const
+      DiscreteEventProcessPtr const getProcess() const
       {
 	return theProcess;
       }

@@ -147,14 +147,16 @@ changeOneKey( index_type aPosition, key_type aNewKey )
   //   if( *c[anIndex] != aNewKey )
   // because the new key is always assumed to be different.
 
-  if( comp( &aNewKey, c[anIndex] ) )
+  key_type* aCurrentKey( c[anIndex] );
+
+  if( comp( &aNewKey, aCurrentKey ) )
     {
-      *c[anIndex] = aNewKey;
+      *aCurrentKey = aNewKey;
       goDown( anIndex );
     }
   else
     {
-      *c[anIndex] = aNewKey;
+      *aCurrentKey = aNewKey;
       goUp( anIndex );
     }
 }
@@ -163,20 +165,24 @@ changeOneKey( index_type aPosition, key_type aNewKey )
 template < typename key_type >
 void DynamicPriorityQueue<key_type>::goUp( index_type anIndex )
 {
+  key_type* const aKey( c[anIndex] );
   index_type aPredecessor( anIndex );
-  key_type* aKey( c[anIndex] );
 
   while( 1 )
     {
       aPredecessor = ( aPredecessor - 1 ) / 2;
+      // with gcc 3.2, this form yields better assembly than:
+      // --aPredecessor /= 2;
 
-      if( aPredecessor == anIndex || ! comp( c[aPredecessor], aKey ) )
+      key_type* const aPredKey( c[aPredecessor] );
+
+      if( aPredecessor == anIndex || comp( aKey, aPredKey ) )
 	{
 	  break;
 	}
 
-      c[anIndex] = c[aPredecessor];
-      theIndices[ c[anIndex] - theFirstKeyPtr ] = anIndex;
+      c[anIndex] = aPredKey;
+      theIndices[ aPredKey - theFirstKeyPtr ] = anIndex;
       anIndex = aPredecessor;
     }
 
@@ -189,13 +195,16 @@ void DynamicPriorityQueue<key_type>::goUp( index_type anIndex )
 template < typename key_type >
 void DynamicPriorityQueue< key_type >::goDown( index_type anIndex )
 {
+  key_type* const aKey( c[anIndex] );
   index_type aSuccessor( anIndex );
-  key_type* aKey( c[anIndex] );
 
   while( 1 )
     {
       // find the next successor
-      aSuccessor = aSuccessor * 2 + 1;
+      aSuccessor *= 2;
+      ++aSuccessor;
+      // with gcc 3.2, this code results in better code than:
+      // aSuccessor = aSuccessor * 2 + 1;
 
       if( aSuccessor < size() - 1 && 
 	  comp( c[aSuccessor], c[ aSuccessor + 1 ] ) )
@@ -203,16 +212,20 @@ void DynamicPriorityQueue< key_type >::goDown( index_type anIndex )
 	  ++aSuccessor;
 	}
 
+      key_type* const aSuccKey( c[aSuccessor] );
+
       // if the going down is finished, break.
       //      if( ! ( aSuccessor < size() && comp( aKey, aSuccKey ) ) )
-      if( aSuccessor >= size() || ! comp( aKey, c[aSuccessor] ) )
+      if( aSuccessor >= size() || comp( aSuccKey, aKey ) )
 	{
 	  break;
 	}
 
+
       // go up the successor
-      c[anIndex] = c[aSuccessor];
-      theIndices[ c[aSuccessor] - theFirstKeyPtr ] = anIndex;
+      c[anIndex] = aSuccKey;
+      theIndices[ aSuccKey - theFirstKeyPtr ] = anIndex;
+
       anIndex = aSuccessor;
     }
 

@@ -55,7 +55,7 @@ int main()
   while( ! copy.empty() )
     {
 
-      //      std::cerr << copy.top() << std::endl;
+      std::cerr << copy.top() << std::endl;
       copy.pop();
 
     }
