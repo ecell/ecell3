@@ -38,6 +38,9 @@ FixedRungeKutta4Stepper.cpp\
 ODE23Stepper.cpp\
 CashKarp45Stepper.cpp\
 ODE45Stepper.cpp\
+FluxDistributionStepper.cpp\
+FluxDistributionProcess.cpp\
+QuasiDynamicFluxProcess.cpp\
 PythonFluxProcess.cpp\
 PythonProcess.cpp
 
@@ -51,6 +54,8 @@ FixedRungeKutta4Stepper.hpp\
 GillespieProcess.hpp\
 NRStepper.hpp\
 ODE23Stepper.hpp\
+FluxDistributionStepper.hpp\
+QuasiDynamicFluxProcess.hpp\
 ODE45Stepper.hpp
 
 
