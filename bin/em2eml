@@ -456,7 +456,7 @@ class Preprocessor:
 
 		if self.file is not None:
 			self.interpreter.wrap( self.interpreter.file,\
-					  ( self.file, self.filename ), 0, 1 )
+					  ( self.file, self.filename ) )
 
 		self.interpreter.flush()
 
