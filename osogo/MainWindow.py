@@ -138,11 +138,10 @@ class MainWindow(Window):
 
     def printProperty( self, fullpn ):
         value = self.theSimulator.getProperty( fullpn )
-        fullpnstring = getFullPNString(fullpn)
-        self.printMessage( fullpnstring )
+        self.printMessage( getFullPNString( fullpn ) )
         self.printMessage( ' = ' )
         self.printMessage( str(value[0]) )
-        self.theMessageWindow.printMessage( "\n" )
+        self.printMessage( "\n" )
     
     def printAllProperties( self, fullid ):
         properties = self.theSimulator.getProperty( fullid +  ('PropertyList',) )
