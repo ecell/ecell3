@@ -14,10 +14,10 @@ class MainWindow(Window):
         Window.__init__( self )
 
         self.theHandlerMap = \
-            { 'load_rule_menu_activate'              : self.loadRule ,
-              'load_script_menu_activate'            : self.loadScript ,
-              'load_cell_state_menu_activate'        : self.loadCellState ,
-              'save_cell_state__menu_activate'       : self.saveCellState ,
+            { 'load_rule_menu_activate'              : self.openRuleFileSelection ,
+              'load_script_menu_activate'            : self.openScriptFileSelection ,
+              'save_cell_state_menu_activate'        : self.saveCellStateToTheFile ,
+              'save_cell_state_as_menu_activate'     : self.openSaveCellStateFileSelection ,
               'exit_menu_activate'                   : self.exit ,
               'message_window_menu_activate'         : self.toggleMessageWindow ,
               'interface_window_menu_activate'       : self.toggleInterfaceListWindow ,
@@ -39,26 +39,49 @@ class MainWindow(Window):
 
         #### create Script File Selection ####
         self.theScriptFileSelection = gtk.GtkFileSelection( 'Select Script File' )
-        self.theScriptFileSelection.ok_button.connect('clicked', self.executeScript)
-        self.theScriptFileSelection.cancel_button.connect('clicked', self.cancelLoadingScript)
+        self.theScriptFileSelection.ok_button.connect('clicked', self.loadScript)
+        self.theScriptFileSelection.cancel_button.connect('clicked', self.closeParentWindow)
 
+        #### create Rule File Selection ####
+        self.theRuleFileSelection = gtk.GtkFileSelection( 'Select Rule File' )
+        self.theRuleFileSelection.ok_button.connect('clicked', self.loadRule)
+        self.theRuleFileSelection.cancel_button.connect('clicked', self.closeParentWindow)
+        
+        #### create Save Cell State File Selection ####
+        self.theSaveFileSelection = gtk.GtkFileSelection( 'Select Rule File for Saving' )
+        self.theSaveFileSelection.ok_button.connect('clicked', self.saveCellState)
+        self.theSaveFileSelection.cancel_button.connect('clicked', self.closeParentWindow)
+        
+        #### create Palette Window ####
         self.thePaletteWindow = PaletteWindow.PaletteWindow()
 
+
+    ###### window operation ####
+    def closeParentWindow( self, button_obj):
+        aParentWindow = button_obj.get_parent_window()
+        aParentWindow.hide()
+
     ###### Load Rule ######
-    def loadRule( self ) : pass
+    def openRuleFileSelection( self, obj ) :
+        self.theRuleFileSelection.show_all()
+
+    def loadRule( self, button_obj ) : pass
 
     ###### Load Script ######
-    def loadScript( self, obj ) :
+    def openScriptFileSelection( self, obj ) :
         self.theScriptFileSelection.show_all()
 
-    def executeScript( self, button_obj ):
+    def loadScript( self, button_obj ):
         aFileName = self.theScriptFileSelection.get_filename()
         self.theScriptFileSelection.hide()
         print aFileName
         execfile(aFileName)
         
-    def cancelLoadingScript( self, button_obj):
-        self.theScriptFileSelection.hide()
+    ###### Save Cell State As ######
+    def openSaveCellStateFileSelection( self, obj ) :
+        self.theSaveFileSelection.show_all()
+
+    def saveCellState ( self, button_obj ) : pass
 
     ###### Exit ######
     def exit( self, obj ):
@@ -78,12 +101,12 @@ class MainWindow(Window):
         else :
             self.thePaletteWindow.hide()
         
-    def toggleMessageWindow( self, a ) : pass
     def toggleInterfaceListWindow( self, a ) : pass
 
     #### these method is not supported in summer GUI project
+    def toggleMessageWindow( self, a ) : pass
     def loadCellState( self ) : pass
-    def saveCellState( self ) : pass
+    def saveCellStateToThe( self ) : pass
     def openPreferences( self ) : pass
     def openAbout( self ) : pass
     #### these method is not supported in summer GUI project

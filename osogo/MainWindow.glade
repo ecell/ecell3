@@ -83,28 +83,27 @@
 
 	    <widget>
 	      <class>GtkPixmapMenuItem</class>
-	      <name>load_cell_state_menu</name>
-	      <signal>
-		<name>activate</name>
-		<handler>load_cell_state_menu_activate</handler>
-		<last_modification_time>Wed, 15 Aug 2001 09:03:52 GMT</last_modification_time>
-	      </signal>
-	      <label>Load _Cell State ...</label>
-	      <right_justify>False</right_justify>
-	      <stock_icon>GNOME_STOCK_MENU_REVERT</stock_icon>
-	    </widget>
-
-	    <widget>
-	      <class>GtkPixmapMenuItem</class>
 	      <name>save_cell_state_menu</name>
 	      <signal>
 		<name>activate</name>
 		<handler>save_cell_state_menu_activate</handler>
 		<last_modification_time>Wed, 15 Aug 2001 09:04:31 GMT</last_modification_time>
 	      </signal>
-	      <label>_Save Cell State ...</label>
+	      <label>_Save Cell State</label>
 	      <right_justify>False</right_justify>
 	      <stock_icon>GNOME_STOCK_MENU_SAVE</stock_icon>
+	    </widget>
+
+	    <widget>
+	      <class>GtkMenuItem</class>
+	      <name>save_cell_state_as_menu</name>
+	      <signal>
+		<name>activate</name>
+		<handler>save_cell_state_as_menu_activate</handler>
+		<last_modification_time>Thu, 16 Aug 2001 09:51:57 GMT</last_modification_time>
+	      </signal>
+	      <label>Save Cell State _As ...</label>
+	      <right_justify>False</right_justify>
 	    </widget>
 
 	    <widget>
@@ -640,8 +639,8 @@
 	<widget>
 	  <class>GtkButton</class>
 	  <child_name>Toolbar:button</child_name>
-	  <name>ecell_logo_button</name>
-	  <label>button122</label>
+	  <name>button1</name>
+	  <label>button1</label>
 	  <icon>ecell.xpm</icon>
 	</widget>
       </widget>
