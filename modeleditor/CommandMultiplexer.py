@@ -13,6 +13,7 @@ class CommandMultiplexer:
 
 	def processCommandList( self, aCommandList ):
 		returnCmdList = []
+
 		for aCmd in aCommandList:
 			if aCmd.doMultiplex:
 				returnCmdList.extend(self.processCommand( aCmd ))
@@ -112,7 +113,7 @@ class CommandMultiplexer:
 						newClass = DM_VARIABLE_CLASS
 					elif objectType == ME_SYSTEM_TYPE:
 						newClass = DM_SYSTEM_CLASS
-
+					print "creating new entity", objectFullID
 					createCmd = CreateEntity( self.theModelEditor, objectFullID, newClass )
 					returnCmdList.append( createCmd )
 		elif cmdType == "SetObjectProperty":
@@ -350,6 +351,7 @@ class CommandMultiplexer:
 		for aCommand in returnCmdList:
 			aCommand.doNotMultiplex()
 			aCommand.doNotMultiplexReverse()
+		return returnCmdList
 
 
 	def __deleteObjectsByFullID( self, aFullID ):

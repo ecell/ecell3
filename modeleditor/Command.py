@@ -111,7 +111,7 @@ class Command:
 				aReverseCmd.doNotMultiplex()
 				
 	def doNotMultiplex( self ):
-		doMultiplex = False
+		self.doMultiplex = False
 		
 
 class ModelCommand( Command ):

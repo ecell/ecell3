@@ -23,12 +23,14 @@ class GraphicalUtils:
 		aGdkColor.red = rgbArray[0]
 		aGdkColor.green = rgbArray[1]
 		aGdkColor.blue = rgbArray[2]
-
+		return aGdkColor
 		
 
 	def getRRGByName( self, aColorName ):
 		gdkColor = self.getGdkColorByName( aColorName )
-		rgbArray = [ gdkColor.red, gdkColor.green, gdkColor.blue ]
+
+		return [ gdkColor.red, gdkColor.green, gdkColor.blue ]
+
 
 
 	def getTextDimensions( self, aText ):

@@ -20,6 +20,7 @@ class Layout:
 		self.thePropertyMap[ LO_SCROLL_REGION ] = default_scrollregion
 		self.thePropertyMap[ LO_ZOOM_RATIO ] = default_zoomratio
 		self.theCanvas = None
+		self.thePathwayEditor = None
 
 		# allways add root dir object
 		anObjectID = self.getUniqueObjectID( ME_SYSTEM_TYPE )
@@ -32,6 +33,7 @@ class Layout:
 
 	def attachToCanvas( self, aCanvas ):
 		self.theCanvas = aCanvas
+		self.thePathwayEditor = self.theCanvas.getParentWindow()
 		self.theCanvas.setLayout( self )
 		# set canvas scroll region
 		scrollRegion = self.getProperty( LO_SCROLL_REGION )
@@ -39,7 +41,7 @@ class Layout:
 		# set canvas ppu
 		ppu = self.getProperty( LO_ZOOM_RATIO )
 		self.theCanvas.setZoomRatio( ppu )
-		
+
 		# set canvas for objects and show objects
 		for objectID in self.theObjectMap.keys():
 			anObject = self.theObjectMap[ objectID ]
@@ -88,12 +90,14 @@ class Layout:
 			if parentSystem == None:
 				parentSystem = self
 			newObject = SystemObject( self, objectID, aFullID, x, y, parentSystem )
+
 		elif objectType == OB_TYPE_TEXT:
 			pass
 		elif objectType == OB_TYPE_CONNECTION:
 			pass
 		else:
 			raise Exception("Object type %s does not exists"%objectType)
+		self.theObjectMap[ objectID ] = newObject
 		if self.theCanvas!=None:
 			newObject.setCanvas( self.theCanvas )
 			newObject.show()
@@ -122,7 +126,7 @@ class Layout:
 	def setProperty( self, aPropertyName, aValue ):
 		pass
 
-	def getAbsolutePosition( self ):
+	def getAbsoluteInsidePosition( self ):
 		return ( 0, 0 )
 
 	def moveObject(self, anObjectID, newX, newY, newParent ):
@@ -200,3 +204,17 @@ class Layout:
 
 	def graphUtils( self ):
 		return self.theLayoutManager.theGraphicalUtils
+
+
+	def popupObjectEditor( self, anObjectID ):
+		pass
+
+	def getPaletteButton( self ):
+		LE_OBJECT_SYSTEM = 0
+		return LE_OBJECT_SYSTEM
+
+	def passCommand( self, aCommandList):
+		self.theLayoutManager.theModelEditor.doCommandList( aCommandList)
+
+	def registerObject( self, anObject ):
+		self.theRootObject = anObject

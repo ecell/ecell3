@@ -228,14 +228,14 @@ SD_PROPERTIES = 6
 
 
 #specific descriptors
-RECT_RELX = 0
-RECT_RELY = 1
-RECT_RELWIDTH = 2
-RECT_RELHEIGTH = 3
-RECT_ABSX = 4
-RECT_ABSY = 5
-RECT_ABSWIDTH = 6
-RECT_HEIGHT = 7
+RECT_RELX1 = 0
+RECT_RELY1 = 1
+RECT_RELX2 = 2
+RECT_RELY2 = 3
+RECT_ABSX1 = 4
+RECT_ABSY1 = 5
+RECT_ABSX2 = 6
+RECT_ABSY2 = 7
 
 LINE_POINTS = 0 # [ x1abs, x1rel, y1abs, y1rel,... ]
 LINE_WIDTH = 1
@@ -253,6 +253,7 @@ SD_FILL = 1
 SD_TEXT = 2
 SD_RING = 3 # initates connectionobject by mousedrag
 SD_NONE = 4 # does nothing by mousedrag
+SD_SYSTEM_CANVAS = 5
 
 
 #gnome canvasobjects:

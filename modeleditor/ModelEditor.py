@@ -23,6 +23,7 @@ from PopupMenu import *
 from PathwayEditor import *
 from LayoutManager import *
 from ecell.eml import *
+from CommandMultiplexer import *
 
 
 RECENTFILELIST_FILENAME = '~/.modeleditor/.recentlist'
@@ -64,6 +65,7 @@ class ModelEditor:
 		self.thePopupMenu = PopupMenu( self )
 		self.theMainWindow = MainWindow( self )
 		self.theLayoutManager = LayoutManager( self )
+		self.theMultiplexer = CommandMultiplexer( self, self.theLayoutManager )
 		self.changesSaved = True
 		self.openLayoutWindow = False
 		# create untitled model
@@ -231,9 +233,6 @@ class ModelEditor:
 		# get entitylist in system
 		anEntityNameList  = self.theModelStore.getEntityList( aType, aSystemPath )
 
-
-
-
 		# call getUniqueName
 		return self.__getUniqueName( aType, anEntityNameList )
 		
@@ -336,6 +335,7 @@ class ModelEditor:
 
 	def doCommandList( self, aCommandList ):
 		undoCommandList = []
+		aCommandList = self.theMultiplexer.processCommandList( aCommandList )
 		for aCommand in aCommandList:
 			# execute commands
 			aCommand.execute()

@@ -17,32 +17,32 @@ class EditorObject:
 		# default colors
 		self.thePropertyMap [ OB_OUTLINE_COLOR ] = self.theLayout.graphUtils().getRRGByName("black")
 		self.thePropertyMap [ OB_FILL_COLOR ] = self.theLayout.graphUtils().getRRGByName("white")
-		self.thePropertyMap [ OB_TEXT_COLOR ] = self.theLayout.graphUtils().getRRGByName("black")
-
+		self.thePropertyMap [ OB_TEXT_COLOR ] = self.theLayout.graphUtils().getRRGByName("blue")
 		# default outline
 		self.thePropertyMap [ OB_OUTLINE_WIDTH ] = 1
+		self.parentSystem.registerObject( self )
 
 
 
 	def destroy(self):
 		pass
 
-
-	def fillMoveBegin( self, deltaX, deltaY ):
+	def hide( self ):
+		# deletes it from canvas
 		pass
 
-
-	def outlineDragBegin( self, deltaX, deltaY ):
+	def doSelect( self ):
+		print "object selected"
 		pass
 
-
-	def connectionDragBegin( self, x, y ):
+	def showMenu( self ):
+		print "object rightclicked"
 		pass
-
 	
 
-	def getMenuItems( self ):
-		pass
+	def popupEditor( self ):
+		print "object doubleclicked"
+		self.theLayout.popupObjectEditor( self.theID )		
 
 
 	def setLimits( self, x0, y0, x1, y1 ):
@@ -54,6 +54,7 @@ class EditorObject:
 
 
 	def show( self ):
+
 		self.theShape = ComplexShape( self, self.theCanvas, self.thePropertyMap[ OB_POS_X ], self.thePropertyMap[ OB_POS_Y ], self.thePropertyMap[ OB_DIMENSION_X ], self.thePropertyMap[ OB_DIMENSION_Y ] )
 		self.theShape.show()
 
@@ -79,7 +80,7 @@ class EditorObject:
 
 
 	def getAbsolutePosition( self ):
-		( xpos, ypos ) = self.parentSystem.getAbsolutePosition()
+		( xpos, ypos ) = self.parentSystem.getAbsoluteInsidePosition()
 		return ( xpos + self.thePropertyMap[ OB_POS_X ], ypos + self.thePropertyMap[ OB_POS_Y ] )
 
 
@@ -96,16 +97,20 @@ class EditorObject:
 
 	def setPropertyMap( self, aPropertyMap ):
 		pass
-		
+
 	def getID( self ):
-		pass
+		return self.theID
 		
 	def getLayout( self ):
 		pass
 
 
 	def getParent( self ):
-		pass
+		return self.parentObject()
 
 	def getGraphUtils( self ):
 		return self.theLayout.graphUtils()
+
+	def getModelEditor( self ):
+		return self.theLayout.theLayoutManager.theModelEditor
+

@@ -1,6 +1,9 @@
 
 from EditorObject import *
 from Constants import *
+from ShapeDescriptor import *
+from LayoutCommand import *
+from Utils import *
 
 class SystemObject(EditorObject):
 
@@ -9,41 +12,30 @@ class SystemObject(EditorObject):
 		EditorObject.__init__( self, aLayout, objectID, x, y, parentSystem )
 		self.thePropertyMap[ OB_HASFULLID ] = True
 		self.thePropertyMap [ OB_FULLID ] = aFullID
-
+		self.theObjectMap = {}
 		self.thePropertyMap [ OB_SHAPE_TYPE ] = SHAPE_TYPE_SYSTEM
 
 		#default dimensions
 		self.thePropertyMap [ OB_DIMENSION_X ] = 200
 		self.thePropertyMap [ OB_DIMENSION_Y ] = 200
-		if parentSystem == None:
+		if parentSystem.__class__.__name__ == 'Layout':
 			layoutDims = self.theLayout.getProperty( LO_SCROLL_REGION )
-			self.thePropertyMap [ OB_DIMENSION_X ] = layoutDims[2] - layoutDims[0]
-			self.thePropertyMap [ OB_DIMENSION_Y ] = layoutDims[3] - layoutDims[1]
-
+			self.thePropertyMap [ OB_DIMENSION_X ] = layoutDims[2] - layoutDims[0]-1
+			self.thePropertyMap [ OB_DIMENSION_Y ] = layoutDims[3] - layoutDims[1]-1
+		self.thePropertyMap [ OB_OUTLINE_WIDTH ] = 3
 
 		# first get text width and heigth
-		self.theLabel = aFullID.split(':')[2]
-		(tx_height, tx_width) = self.getGraphUtils().getTextDimensions( self.theLabel )
-		self.theLabel = self.getGraphUtils().truncateTextToSize( self.theLabel, self.thePropertyMap [ OB_DIMENSION_X ] )
-		self.thePropertyMap[ SY_INSIDE_DIMENSION_X ] = self.thePropertyMap [ OB_DIMENSION_X ] - 4
-		self.thePropertyMap[ SY_INSIDE_DIMENSION_X ] = self.thePropertyMap [ OB_DIMENSION_X ] - 5 - tx_height
-		olw = self.thePropertyMap[ OB_OUTLINE_WIDTH ]
-		shapeDescriptorList = [\
-		#NAME,TYPE,FUNCTION, COLOR, Z, SPECIFIC, PROPERTIES  
-		['frame', CV_RECT, SD_OUTLINE, SD_OUTLINE, 5, [ 0, 0, 1, 1, 0, 0, 0, 0],{} ],\
-		['textarea',CV_RECT, SD_FILL, SD_FILL, 4, [ 0,0, 1, 0, olw, olw, -olw*2, tx_height], {} ],\
-		['labelline',CV_LINE,SD_FILL, SD_OUTLINE, 3, [ [ [ olw,0,tx_height+olw*2,0 ],[ -olw*2, 1, tx_height+olw*2,0] ], 1 ], {} ], \
-		['drawarea', CV_RECT, SD_FILL, SD_FILL, 4, [ 0,0, 1, 1, olw, tx_height+olw*2+1, -olw*2,-tx_height - olw ], {} ],\
-		['text', CV_TEXT, SD_FILL, SD_TEXT, 3, [ self.theLabel,  ], {} ] ]
-		self.thePropertyMap[ OB_SHAPEDESCRIPTORLIST ] = shapeDescriptorList
+		self.theLabel = aFullID
+		aSystemSD = SystemSD(self, self.getGraphUtils(), self.theLabel )
+		self.theSD = aSystemSD
+		self.thePropertyMap[ OB_SHAPEDESCRIPTORLIST ] = aSystemSD
+		self.thePropertyMap[ SY_INSIDE_DIMENSION_X  ] = aSystemSD.getInsideWidth()
+		self.thePropertyMap[ SY_INSIDE_DIMENSION_Y  ] = aSystemSD.getInsideHeight()
 
 
-	def addItem( self, aObject, x=None, y=None ):
-		pass
+	def registerObject( self, anObject ):
+		self.theObjectMap[anObject.getID()] = anObject
 
-
-	def getID( self ):
-		return self.theID
 
 
 	def resize( self , newWidth, newHeigth ):
@@ -58,15 +50,31 @@ class SystemObject(EditorObject):
 		#render to canvas
 		EditorObject.show( self )
 
-
+	def addItem( self, absx,absy ):
+		LE_OBJECT_SYSTEM = 0
+		(offsetx, offsety ) = self.getAbsolutePosition()
+		x = absx - (self.theSD.insideX + offsetx )
+		y = absy - ( self.theSD.insideY + offsety )
+		print "absolutre", x, y
+		print "relative", x, y
+		aSysPath = convertSysIDToSysPath( self.getProperty( OB_FULLID ) )
+		if self.theLayout.getPaletteButton() == LE_OBJECT_SYSTEM:
+			# create command
+			aName = self.getModelEditor().getUniqueEntityName ( ME_SYSTEM_TYPE, aSysPath )
+			aFullID = ':'.join( [ME_SYSTEM_TYPE, aSysPath, aName] )
+			objectID = self.theLayout.getUniqueObjectID( OB_TYPE_SYSTEM )
+			aCommand = CreateObject( self.theLayout, objectID, OB_TYPE_SYSTEM, aFullID, x, y, self )
+			
+		self.theLayout.passCommand( [aCommand] )
 
 	def getObjectList( self ):
 		# return IDs
-		pass
+		return self.theObjectMap.keys()
 		
 	def isWithinSystem( self, objectID ):
 		#returns true if is within system
 		pass
 		
-	def getAbsolouteInsidePosition( self ):
-		pass
+	def getAbsoluteInsidePosition( self ):
+		( x, y ) = self.getAbsolutePosition()
+		return ( x+ self.theSD.insideX, y+self.theSD.insideY )
