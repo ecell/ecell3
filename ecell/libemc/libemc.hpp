@@ -51,7 +51,6 @@ namespace libemc
 
   DECLARE_CLASS( Simulator );
   DECLARE_CLASS( SimulatorImplementation );
-  DECLARE_CLASS( EmcLogger );
 
   /** @} */ //end of libemc_module 
 

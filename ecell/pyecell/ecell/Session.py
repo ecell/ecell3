@@ -40,8 +40,9 @@ class Session:
             for i in range(num):
                 self.theSimulator.step()
 
-    def initialize( self ):
-        self.theSimulator.initialize()
+# no need to initialize explicitly
+#    def initialize( self ):
+#        self.theSimulator.initialize()
 
     def createLogger( self,fullpn ):
         #self.theSimulator.getLogger( fullpn )

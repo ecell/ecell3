@@ -59,8 +59,6 @@ BOOST_PYTHON_MODULE_INIT(_ecs)
 
   // PySimulator class
   python::class_builder<libemc::Simulator> aSimulatorClass( ecs, "Simulator" );
-  // PyLogger class
-  python::class_builder<libemc::EmcLogger> aLoggerClass( ecs, "Logger" );
 
   //
   // PySimulator Definitions
