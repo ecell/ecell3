@@ -446,7 +446,7 @@ System System( /CELL/CYTOPLASM )
 		VariableReferenceList	[ S0 :.:Ca_AA_PKC -1 ] [ P0 :.:N 1 ];
 	}
 	
-	Process MichaelisUniUniProcess( AMPAR_AMPAR_P1 )
+	Process MichaelisUniUniFluxProcess( AMPAR_AMPAR_P1 )
 	{
 		Name	AMPAR_AMPAR_P1;
 		KmS	0.0000035;
@@ -454,7 +454,7 @@ System System( /CELL/CYTOPLASM )
 		VariableReferenceList	[ S0 :.:AMPAR -1 ] [ P0 :.:AMPAR_P 1 ] [ C0 :.:Ca_DAG_PKC];
 	}
 	
-	Process MichaelisUniUniProcess( AMPAR_AMPAR_P2 )
+	Process MichaelisUniUniFluxProcess( AMPAR_AMPAR_P2 )
 	{
 		Name	AMPAR_AMPAR_P2;
 		KmS	0.0000035;
@@ -462,7 +462,7 @@ System System( /CELL/CYTOPLASM )
 		VariableReferenceList	[ S0 :.:AMPAR -1 ] [ P0 :.:AMPAR_P 1 ] [ C0 :.:DAG_AA_PKC];
 	}
 	
-	Process MichaelisUniUniProcess( AMPAR_AMPAR_P3 )
+	Process MichaelisUniUniFluxProcess( AMPAR_AMPAR_P3 )
 	{
 		Name	AMPAR_AMPAR_P3;
 		KmS	0.0000035;
@@ -470,7 +470,7 @@ System System( /CELL/CYTOPLASM )
 		VariableReferenceList	[ S0 :.:AMPAR -1 ] [ P0 :.:AMPAR_P 1 ] [ C0 :.:AA_PKC];
 	}
 	
-	Process MichaelisUniUniProcess( AMPAR_AMPAR_P4 )
+	Process MichaelisUniUniFluxProcess( AMPAR_AMPAR_P4 )
 	{
 		Name	AMPAR_AMPAR_P4;
 		KmS	0.0000035;
@@ -478,7 +478,7 @@ System System( /CELL/CYTOPLASM )
 		VariableReferenceList	[ S0 :.:AMPAR -1 ] [ P0 :.:AMPAR_P 1 ] [ C0 :.:Ca_AA_PKC];
 	}
 	
-	Process MichaelisUniUniProcess( AMPAR_P_AMPAR )
+	Process MichaelisUniUniFluxProcess( AMPAR_P_AMPAR )
 	{
 		Name	AMPAR_P_AMPAR;
 		KmS	0.00001565;
@@ -486,7 +486,7 @@ System System( /CELL/CYTOPLASM )
 		VariableReferenceList	[ S0 :.:AMPAR_P -1 ] [ P0 :.:AMPAR 1 ] [ C0 :.:PP2A];
 	}
 	
-	Process MichaelisUniUniProcess( Raf_Raf_P1 )
+	Process MichaelisUniUniFluxProcess( Raf_Raf_P1 )
 	{
 		Name	Raf_Raf_P1;
 		KmS	0.0000116;
@@ -494,7 +494,7 @@ System System( /CELL/CYTOPLASM )
 		VariableReferenceList	[ S0 :.:Raf -1 ] [ P0 :.:Raf_P 1 ] [ C0 :.:Ca_DAG_PKC];
 	}
 	
-	Process MichaelisUniUniProcess( Raf_Raf_P2 )
+	Process MichaelisUniUniFluxProcess( Raf_Raf_P2 )
 	{
 		Name	Raf_Raf_P2;
 		KmS	0.0000116;
@@ -502,7 +502,7 @@ System System( /CELL/CYTOPLASM )
 		VariableReferenceList	[ S0 :.:Raf -1 ] [ P0 :.:Raf_P 1 ] [ C0 :.:DAG_AA_PKC];
 	}
 	
-	Process MichaelisUniUniProcess( Raf_Raf_P3 )
+	Process MichaelisUniUniFluxProcess( Raf_Raf_P3 )
 	{
 		Name	Raf_Raf_P3;
 		KmS	0.0000116;
@@ -510,7 +510,7 @@ System System( /CELL/CYTOPLASM )
 		VariableReferenceList	[ S0 :.:Raf -1 ] [ P0 :.:Raf_P 1 ] [ C0 :.:AA_PKC];
 	}
 	
-	Process MichaelisUniUniProcess( Raf_Raf_P4 )
+	Process MichaelisUniUniFluxProcess( Raf_Raf_P4 )
 	{
 		Name	Raf_Raf_P4;
 		KmS	0.0000116;
@@ -539,7 +539,7 @@ System System( /CELL/CYTOPLASM )
 		VariableReferenceList	[ S0 :.:CRF -1 ] [ P0 :.:N 1 ];
 	}
 	
-	Process MichaelisUniUniProcess( Raf_Raf_P22 )
+	Process MichaelisUniUniFluxProcess( Raf_Raf_P22 )
 	{
 		Name	Raf_Raf_P22;
 		KmS	0.00002;
@@ -547,7 +547,7 @@ System System( /CELL/CYTOPLASM )
 		VariableReferenceList	[ S0 :.:Raf -1 ] [ P0 :.:Raf_P 1 ] [ C0 :.:CRHR_CRF];
 	}
 	
-	Process MichaelisUniUniProcess( Raf_Raf_P33 )
+	Process MichaelisUniUniFluxProcess( Raf_Raf_P33 )
 	{
 		Name	Raf_Raf_P33;
 		KmS	0.00003;
@@ -590,7 +590,7 @@ System System( /CELL/CYTOPLASM )
 		VariableReferenceList	[ S0 :.:NO_GC -1 ] [ P0 :.:GC 1 ] [ P1 :.:NO 1 ];
 	}
 	
-	Process MichaelisUniUniProcess( GTP_CGMP )
+	Process MichaelisUniUniFluxProcess( GTP_CGMP )
 	{
 		Name	GTP_CGMP;
 		KmS	0.000045;
@@ -598,7 +598,7 @@ System System( /CELL/CYTOPLASM )
 		VariableReferenceList	[ S0 :.:GTP -1 ] [ P0 :.:CGMP 1 ] [ C0 :.:NO_GC];
 	}
 	
-	Process MichaelisUniUniProcess( CGMP_GMP5 )
+	Process MichaelisUniUniFluxProcess( CGMP_GMP5 )
 	{
 		Name	CGMP_GMP5;
 		KmS	0.000002;
@@ -620,7 +620,7 @@ System System( /CELL/CYTOPLASM )
 		VariableReferenceList	[ S0 :.:cGMP_PKG -1 ] [ P0 :.:CGMP 1 ] [ P1 :.:PKG 1 ];
 	}
 	
-	Process MichaelisUniUniProcess( G_Sub_G_Sub_P )
+	Process MichaelisUniUniFluxProcess( G_Sub_G_Sub_P )
 	{
 		Name	G_Sub_G_Sub_P;
 		KmS	0.0000002;
@@ -650,7 +650,7 @@ System System( /CELL/CYTOPLASM )
 	}
 	
 	
-	Process MichaelisUniUniProcess( Raf_P_Raf )
+	Process MichaelisUniUniFluxProcess( Raf_P_Raf )
 	{
 		Name	Raf_P_Raf;
 		KmS	0.0000157;
@@ -658,7 +658,7 @@ System System( /CELL/CYTOPLASM )
 		VariableReferenceList	[ S0 :.:Raf_P -1 ] [ P0 :.:Raf 1 ] [ C0 :.:PP2A];
 	}
 	
-	Process MichaelisUniUniProcess( MEK_MEK_P )
+	Process MichaelisUniUniFluxProcess( MEK_MEK_P )
 	{
 		Name	MEK_MEK_P;
 		KmS	0.000000398;
@@ -666,7 +666,7 @@ System System( /CELL/CYTOPLASM )
 		VariableReferenceList	[ S0 :.:MEK -1 ] [ P0 :.:MEK_P 1 ] [ C0 :.:Raf_P];
 	}
 	
-	Process MichaelisUniUniProcess( MEK_P_MEK_PP )
+	Process MichaelisUniUniFluxProcess( MEK_P_MEK_PP )
 	{
 		Name	MEK_P_MEK_PP;
 		KmS	0.000000398;
@@ -674,7 +674,7 @@ System System( /CELL/CYTOPLASM )
 		VariableReferenceList	[ S0 :.:MEK_P -1 ] [ P0 :.:MEK_PP 1 ] [ C0 :.:Raf_P];
 	}
 	
-	Process MichaelisUniUniProcess( MEK_P_MEK )
+	Process MichaelisUniUniFluxProcess( MEK_P_MEK )
 	{
 		Name	MEK_P_MEK;
 		KmS	0.0000157;
@@ -682,7 +682,7 @@ System System( /CELL/CYTOPLASM )
 		VariableReferenceList	[ S0 :.:MEK_P -1 ] [ P0 :.:MEK 1 ] [ C0 :.:PP2A];
 	}
 	
-	Process MichaelisUniUniProcess( MEK_PP_MEK_P )
+	Process MichaelisUniUniFluxProcess( MEK_PP_MEK_P )
 	{
 		Name	MEK_PP_MEK_P;
 		KmS	0.0000157;
@@ -690,7 +690,7 @@ System System( /CELL/CYTOPLASM )
 		VariableReferenceList	[ S0 :.:MEK_PP -1 ] [ P0 :.:MEK_P 1 ] [ C0 :.:PP2A];
 	}
 	
-	Process MichaelisUniUniProcess( MAPK_MAPK_P )
+	Process MichaelisUniUniFluxProcess( MAPK_MAPK_P )
 	{
 		Name	MAPK_MAPK_P;
 		KmS	0.0000000463;
@@ -698,7 +698,7 @@ System System( /CELL/CYTOPLASM )
 		VariableReferenceList	[ S0 :.:MAPK _1 ] [ P0 :.:MAPK_P 1 ] [ C0 :.:MEK_PP];
 	}
 	
-	Process MichaelisUniUniProcess( MAPK_P_MAPK_PP )
+	Process MichaelisUniUniFluxProcess( MAPK_P_MAPK_PP )
 	{
 		Name	MAPK_P_MAPK_PP;
 		KmS	0.0000000463;
@@ -706,7 +706,7 @@ System System( /CELL/CYTOPLASM )
 		VariableReferenceList	[ S0 :.:MAPK_P -1 ] [ P0 :.:MAPK_PP 1 ] [ C0 :.:MEK_PP];
 	}
 	
-	Process MichaelisUniUniProcess( MAPK_P_MAPK )
+	Process MichaelisUniUniFluxProcess( MAPK_P_MAPK )
 	{
 		Name	MAPK_P_MAPK;
 		KmS	0.000000167;
@@ -714,7 +714,7 @@ System System( /CELL/CYTOPLASM )
 		VariableReferenceList	[ S0 :.:MAPK_P -1 ] [ P0 :.:MAPK 1 ] [ C0 :.:MKP1];
 	}
 	
-	Process MichaelisUniUniProcess( MAPK_PP_MAPK_P )
+	Process MichaelisUniUniFluxProcess( MAPK_PP_MAPK_P )
 	{
 		Name	MAPK_PP_MAPK_P;
 		KmS	0.000000167;
@@ -736,7 +736,7 @@ System System( /CELL/CYTOPLASM )
 		VariableReferenceList	[ S0 :.:Ca_PLA2 -1 ] [ P0 :.:PLA2 1 ] [ P1 :.:Ca 1 ];
 	}
 	
-	Process MichaelisUniUniProcess( APC_AA1 )
+	Process MichaelisUniUniFluxProcess( APC_AA1 )
 	{
 		Name	APC_AA1;
 		KmS	0.00002;
@@ -758,7 +758,7 @@ System System( /CELL/CYTOPLASM )
 		VariableReferenceList	[ S0 :.:DAG_Ca_PLA2 -1 ] [ P0 :.:Ca_PLA2 1 ] [ P1 :.:DAG 1 ];
 	}
 	
-	Process MichaelisUniUniProcess( APC_AA2 )
+	Process MichaelisUniUniFluxProcess( APC_AA2 )
 	{
 		Name	APC_AA2;
 		KmS	0.00002;
@@ -780,7 +780,7 @@ System System( /CELL/CYTOPLASM )
 		VariableReferenceList	[ S0 :.:PIP2_PLA2 -1 ] [ P0 :.:PLA2 1 ] [ P1 :.:PIP2 1 ];
 	}
 	
-	Process MichaelisUniUniProcess( APC_AA3 )
+	Process MichaelisUniUniFluxProcess( APC_AA3 )
 	{
 		Name	APC_AA3;
 		KmS	0.00002;
@@ -802,7 +802,7 @@ System System( /CELL/CYTOPLASM )
 		VariableReferenceList	[ S0 :.:Ca_PIP2_PLA2 -1 ] [ P0 :.:PIP2_PLA2 1 ] [ P1 :.:Ca 1 ];
 	}
 	
-	Process MichaelisUniUniProcess( APC_AA4 )
+	Process MichaelisUniUniFluxProcess( APC_AA4 )
 	{
 		Name	APC_AA4;
 		KmS	0.00002;
@@ -810,7 +810,7 @@ System System( /CELL/CYTOPLASM )
 		VariableReferenceList	[ S0 :.:APC -1 ] [ P0 :.:AA 1 ] [ C0 :.:Ca_PIP2_PLA2];
 	}
 	
-	Process MichaelisUniUniProcess( PLA2_PLA2_P )
+	Process MichaelisUniUniFluxProcess( PLA2_PLA2_P )
 	{
 		Name	PLA2_PLA2_P;
 		KmS	0.0000256;
@@ -818,7 +818,7 @@ System System( /CELL/CYTOPLASM )
 		VariableReferenceList	[ S0 :.:PLA2 -1 ] [ P0 :.:PLA2_P 1 ] [ C0 :.:MAPK_PP];
 	}
 	
-	Process MichaelisUniUniProcess( APC_AA5 )
+	Process MichaelisUniUniFluxProcess( APC_AA5 )
 	{
 		Name	APC_AA5;
 		KmS	0.00002;
@@ -967,7 +967,7 @@ System System( /CELL/CYTOPLASM )
 		VariableReferenceList	[ S0 :.:GTP_Ga_PLC -1 ] [ P0 :.:GTP_Ga 1 ] [ P1 :.:PLC 1 ];
 	}
 	
-	Process MichaelisUniUniProcess( PIP2_IP3 )
+	Process MichaelisUniUniFluxProcess( PIP2_IP3 )
 	{
 		Name	PIP2_IP3;
 		KmS	0.0000005;
@@ -975,7 +975,7 @@ System System( /CELL/CYTOPLASM )
 		VariableReferenceList	[ S0 :.:PIP2 -1 ] [ P0 :.:IP3 1 ] [ C0 :.:GTP_Ga_PLC];
 	}
 	
-	Process MichaelisUniUniProcess( PIP2_DAG )
+	Process MichaelisUniUniFluxProcess( PIP2_DAG )
 	{
 		Name	PIP2_DAG;
 		KmS    	0.0000005;
