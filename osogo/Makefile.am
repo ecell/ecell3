@@ -37,5 +37,7 @@ icon_step.xpm\
 icon_stop.xpm\
 icon_up.xpm
 
+EXTRA_DIST=${osogo_DATA}
+
 bin_SCRIPTS =\
 gecell

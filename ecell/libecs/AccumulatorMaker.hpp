@@ -31,7 +31,7 @@
 #ifndef ___ACCUMULATORMAKER_H___
 #define ___ACCUMULATORMAKER_H___
 
-#include "dmtool/dmtool/ModuleMaker.hpp"
+#include "dmtool/ModuleMaker.hpp"
 
 #include "Accumulators.hpp"
 

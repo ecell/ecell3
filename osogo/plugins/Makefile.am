@@ -22,3 +22,5 @@ icon_right_small.xpm\
 icon_up.xpm\
 icon_up_small.xpm
 
+EXTRA_DIST=${osogoplugins_DATA}
+
