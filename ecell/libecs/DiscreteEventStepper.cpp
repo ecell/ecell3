@@ -73,9 +73,17 @@ namespace libecs
     catch( const libecs::TypeError& )
       {
 	THROW_EXCEPTION( InitializationFailed,
-			 String( getClassName() ) + 
+			 getClassNameString() + 
 			 ": Only DiscreteEventProcesses are allowed to exist "
 			 "in this Stepper." );
+      }
+
+    if( theDiscreteEventProcessVector.empty() )
+      {
+	THROW_EXCEPTION( InitializationFailed,
+			 getClassNameString() + 
+			 ": at least one DiscreteEventProcess "
+			 "must be defined." )
       }
 
     // (1) check Process dependency

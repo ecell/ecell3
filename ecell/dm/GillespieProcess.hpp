@@ -2,19 +2,17 @@
 #define __GILLESPIEPROCESS_HPP
 
 #include <limits>
-#include <vector>
 
 #include <gsl/gsl_rng.h>
 
 #include <libecs/libecs.hpp>
 #include <libecs/DiscreteEventProcess.hpp>
 #include <libecs/Stepper.hpp>
-#include <libecs/FullID.hpp>
+
 
 USE_LIBECS;
 
 DECLARE_CLASS( GillespieProcess );
-DECLARE_VECTOR( GillespieProcessPtr, GillespieProcessVector );
 
 
 /***************************************************************************
@@ -37,7 +35,6 @@ LIBECS_DM_CLASS( GillespieProcess, DiscreteEventProcess )
       PROPERTYSLOT_GET_NO_LOAD_SAVE( Real, Mu );
       PROPERTYSLOT_GET_NO_LOAD_SAVE( Int,  Order );
     }
-
 
   
   GillespieProcess() 
@@ -160,7 +157,8 @@ protected:
     Real aMultiplicity( roundValue( theVariableReferenceVector[0].
 				    getValue() ) );
 
-    aMultiplicity *= ( aMultiplicity - 1.0 ) * 0.5;
+    aMultiplicity *= FMA( aMultiplicity, 0.5, - 0.5 );
+    // equivalent to:   ( aMultiplicity - 1.0 ) * 0.5
 
     return aMultiplicity;
   }
