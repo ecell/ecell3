@@ -58,7 +58,7 @@ public:
   {
 
     setInitializeMethod( "" );
-    setFiremethod( "" );
+    setFireMethod( "" );
 
     //FIXME: additional properties:
     // Unidirectional   -> call declareUnidirectional() in initialize()
@@ -80,21 +80,21 @@ public:
     theIsContinuous = value;
   }
 
-  SET_METHOD( String, Firemethod )
+  SET_METHOD( String, FireMethod )
   {
-    theFiremethod = value;
+    theFireMethod = value;
 
-    theCompiledFiremethod = compilePythonCode( theFiremethod,
+    theCompiledFireMethod = compilePythonCode( theFireMethod,
 						  getFullID().getString() +
-						  ":Firemethod",
+						  ":FireMethod",
 						  Py_file_input );
 
     // error check
   }
 
-  GET_METHOD( String, Firemethod )
+  GET_METHOD( String, FireMethod )
   {
-    return theFiremethod;
+    return theFireMethod;
   }
 
 
@@ -119,10 +119,10 @@ public:
 
 protected:
 
-  String    theFiremethod;
+  String    theFireMethod;
   String    theInitializeMethod;
 
-  python::object theCompiledFiremethod;
+  python::object theCompiledFireMethod;
   python::object theCompiledInitializeMethod;
 
   bool theIsContinuous;
