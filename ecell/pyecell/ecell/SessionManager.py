@@ -46,7 +46,6 @@ from ecell.SessionProxy import *
 from ecell.Util import *
 
 
-
 class SessionManager:
 	'''SessionManager class
 	Provide API to execute multiple jobs concurrently.
@@ -67,10 +66,12 @@ class SessionManager:
 		pass
 
 
-	def __init__( self, modulepath ):
+	def __init__( self, modulepath, concurrency, environment ):
 		'''Constructor
 		Initialize parameters
 		modulepath(str) -- a module path
+		concurrency(int) -- a concurrency
+		environment(str) -- an environment to be used
 		'''
 
 		# exit functions
@@ -85,10 +86,9 @@ class SessionManager:
 		self.__theSessionProxyDict = {}
 		self.__theMessageMethod = self.__plainMessageMethod
 
-		self.__theConcurrency = None
+		self.__theConcurrency = concurrency
 		self.__theTmpRootDir = DEFAULT_TMP_DIRECTORY
 		self.__theTmpDir = None
-		DEFAULT_ENVIRONMENT = 'Local'
 		self.__theFinishedJobRemovableFlag = True
 		self.__theErroRemovableJobFlag = True
 		self.__theUpdateInterval = 1
@@ -96,12 +96,13 @@ class SessionManager:
 
 		self.__theTmpRemovable = True
 
-		# Set up default temporary directory
+		# set default temporary directory
 		# Temporary directory is created in run method.
 		self.setTmpRootDir( DEFAULT_TMP_DIRECTORY )
 
-		# Set up default environment
-		self.setEnvironment( DEFAULT_ENVIRONMENT )
+		# let default environment
+		self.setEnvironment( environment )
+
 
 	def setEnvironment( self, environment ):
 		'''Set environment parameter.
@@ -302,6 +303,8 @@ class SessionManager:
 		aSessionProxy.setScriptFileName( scriptfile )
 		aSessionProxy.setInterpreter( interpreter )
 		aSessionProxy.setArgument( argument )
+		if type(extrafilelist) != list:
+			extrafilelist = [extrafilelist]
 		aSessionProxy.setExtraFileList( extrafilelist )
 		aSessionProxy.setTimeout( timeout )
 
@@ -333,6 +336,8 @@ class SessionManager:
 		aSessionProxy.setScriptFileName( ess )
 		aSessionProxy.setInterpreter( ECELL3_SESSION )
 		aSessionProxy.setSessionArgument( argument )
+		if type(extrafilelist) != list:
+			extrafilelist = [extrafilelist]
 		aSessionProxy.setExtraFileList( extrafilelist )
 		aSessionProxy.setDM_PATH(dmpath)
 		aSessionProxy.setTimeout( timeout )
