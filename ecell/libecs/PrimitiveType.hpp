@@ -48,10 +48,50 @@ const String  PrimitiveTypeStringOf( PrimitiveType type );
 const String  PrimitiveTypeStringOf( StringCref fqpistring );
 
 
-StringCref  PrimitiveTypeStringOf( EntityCref );
-StringCref  PrimitiveTypeStringOf( ReactorCref ); 
-StringCref  PrimitiveTypeStringOf( SubstanceCref );
-StringCref  PrimitiveTypeStringOf( SystemCref ); 
+inline StringCref  PrimitiveTypeStringOfEntity()
+{
+  const static String aString( "Entity" );
+  return aString;
+}
+
+inline StringCref  PrimitiveTypeStringOfReactor()
+{
+  const static String aString( "Reactor" );
+  return aString;
+}
+
+inline StringCref  PrimitiveTypeStringOfSubstance()
+{
+  const static String aString( "Substance" );
+  return aString;
+}
+
+inline StringCref  PrimitiveTypeStringOfSystem()
+{ 
+  const static String aString( "System" );
+  return aString;
+}
+
+
+inline StringCref  PrimitiveTypeStringOf( EntityCref )
+{
+  return PrimitiveTypeStringOfEntity();
+}
+
+inline StringCref  PrimitiveTypeStringOf( ReactorCref ) 
+{
+  return PrimitiveTypeStringOfReactor();
+}
+
+inline StringCref  PrimitiveTypeStringOf( SubstanceCref )
+{
+  return PrimitiveTypeStringOfSubstance();
+}
+
+inline StringCref  PrimitiveTypeStringOf( SystemCref )
+{
+  return PrimitiveTypeStringOfSystem();
+}
 
 
 #endif /* __PRIMITIVETYPE_HPP */

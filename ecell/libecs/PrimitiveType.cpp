@@ -28,33 +28,31 @@
 // E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
 
+#include <assert.h>
+
 #include "Exceptions.hpp"
 #include "PrimitiveType.hpp"
 
 const String PrimitiveTypeStringOf( PrimitiveType type )
 {
-  String aString;
-
   switch( type )
     {
     case SUBSTANCE:
-      aString = String( "Substance" );
-      break;
+      return PrimitiveTypeStringOfSubstance();
     case REACTOR:
-      aString = String( "Reactor" );
-      break;
+      return PrimitiveTypeStringOfReactor();
     case SYSTEM:
-      aString = String( "System" );
-      break;
+      return PrimitiveTypeStringOfSystem();
     case ENTITY:
-      aString = String( "Entity" );
-      break;
+      return PrimitiveTypeStringOfEntity();
     default:
       throw InvalidPrimitiveType( __PRETTY_FUNCTION__, 
 				  "can't create PrimitiveTypeString." );
     }
 
-  return aString;
+  //FIXME: NEVER_GET_HERE
+  assert( 0 );
+  return "";
 }
 
 const String PrimitiveTypeStringOf( StringCref fqpi )
@@ -81,19 +79,19 @@ PrimitiveType PrimitiveTypeOf( StringCref typestring )
 {
   PrimitiveType aType;
 
-  if( typestring == "Substance" )
+  if( typestring == PrimitiveTypeStringOfSubstance() )
     {
       aType = SUBSTANCE;
     }
-  else if( typestring == "Reactor" )
+  else if( typestring == PrimitiveTypeStringOfReactor() )
     {
       aType = REACTOR;
     }
-  else if( typestring == "System" )
+  else if( typestring == PrimitiveTypeStringOfSystem() )
     {
       aType = SYSTEM;
     }
-  else if( typestring == "Entity" )
+  else if( typestring == PrimitiveTypeStringOfEntity() )
     {
       aType = ENTITY;
     }
@@ -107,27 +105,4 @@ PrimitiveType PrimitiveTypeOf( StringCref typestring )
   return aType;
 }
 
-StringCref  PrimitiveTypeStringOf( EntityCref ) 
-{
-  const static String aString( "Entity" );
-  return aString;
-}
-
-StringCref  PrimitiveTypeStringOf( ReactorCref ) 
-{
-  const static String aString( "Reactor" );
-  return aString;
-}
-
-StringCref  PrimitiveTypeStringOf( SubstanceCref ) 
-{
-  const static String aString( "Substance" );
-  return aString;
-}
-
-StringCref  PrimitiveTypeStringOf( SystemCref ) 
-{
-  const static String aString( "System" );
-  return aString;
-}
 
