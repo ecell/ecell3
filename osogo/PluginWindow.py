@@ -14,17 +14,18 @@ class PluginWindow(ViewWindow):
     theFullID()           : FullID1
     '''
 
-    def __init__( self, dirname,  data, pluginmanager ):
+    def __init__( self, dirname,  data, pluginmanager, root=None ):
         aClassName = self.__class__.__name__
         aGladeFileName = os.path.join( dirname , aClassName + ".glade" )
-        ViewWindow.__init__( self, aGladeFileName, data )
+        ViewWindow.__init__( self, aGladeFileName, data, root )
 
         self.thePluginManager = pluginmanager
         self.theSimulator = self.thePluginManager.theMainWindow.theSimulator
         self.theRawFullPNList = data
-
         aMenuWindow = Window( 'PluginWindowPopupMenu.glade', root='menu' )
         self.thePopupMenu = aMenuWindow['menu']
+        if root != None:
+            aClassName = root
         self[aClassName].connect( 'button_press_event', self.popupMenu )
 
         aMenuWindow.addHandlers( { 'copy_fullpnlist'  : self.copyFullPNList,

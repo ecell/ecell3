@@ -8,12 +8,12 @@ import GTK
 
 class SubstanceWindow(PluginWindow):
 
-    def __init__( self, dirname,  data, pluginmanager ):
+    def __init__( self, dirname,  data, pluginmanager, root=None ):
         
         # 0 : not fixed  1: fixed
         self.theFixFlug = 0
 
-        PluginWindow.__init__( self, dirname, data, pluginmanager )
+        PluginWindow.__init__( self, dirname, data, pluginmanager, root )
 
         self['toolbar1'].set_style( GTK.TOOLBAR_ICONS )
         self['toolbar1'].set_button_relief( GTK.RELIEF_HALF )

@@ -10,8 +10,8 @@ class ViewWindow(Window):
 
     theFullPNListClipBoard = []
 
-    def __init__(self, gladefile, fpns):
-        Window.__init__( self, gladefile )
+    def __init__(self, gladefile, fpns, root=None):
+        Window.__init__( self, gladefile, root )
 
     def update( self ):
         pass
