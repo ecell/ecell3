@@ -25,7 +25,7 @@ class GillespieProcess
 
   LIBECS_DM_OBJECT( Process, GillespieProcess );
 
-  typedef const Real (GillespieProcess::* GetMultiplicityMethodPtr)() const;
+  typedef const Real (GillespieProcess::* RealMethodPtr)() const;
 
 public:
 
@@ -36,7 +36,8 @@ public:
     theStepInterval( 0.0 ),
     k( 0.0 ),
     Index( -1 ),
-    theGetMultiplicityMethodPtr( &GillespieProcess::getMultiplicity_Zero )
+    theGetMultiplicityMethodPtr( &GillespieProcess::getZero ),
+    theGetMinValueMethodPtr( &GillespieProcess::getZero )
   {
     CREATE_PROPERTYSLOT_SET_GET( Real, k,            GillespieProcess );
     CREATE_PROPERTYSLOT_GET    ( Real, Mu,           GillespieProcess );
@@ -53,7 +54,6 @@ public:
   {
     ; // do nothing
   }
-
 
 
   SIMPLE_SET_GET_METHOD( Real, k );
@@ -73,77 +73,14 @@ public:
     return theOrder;
   }
 
-  inline static const Real roundValue( RealCref aValue )
-  {
-    const Real aRoundedValue( trunc( aValue ) );
-
-    if( aRoundedValue < 0.0 )
-      {
-	THROW_EXCEPTION( SimulationError, "Variable value <= -1.0" );
-      }
-
-    return aRoundedValue;
-  }
-
-
-  const Real getMultiplicity_Zero() const
-  {
-    return 0.0;
-  }
-
-  const Real getMultiplicity_FirstOrder() const
-  {
-    return roundValue( theVariableReferenceVector[0].getValue() );
-  }
-
-  const Real getMultiplicity_SecondOrder_TwoSubstrates() const
-  {
-    Real aMultiplicity( roundValue( theVariableReferenceVector[0].
-				    getValue() ) );
-    aMultiplicity *= roundValue( theVariableReferenceVector[1].getValue() );
-
-    return aMultiplicity;
-  }
-
-  const Real getMultiplicity_SecondOrder_OneSubstrate() const
-  {
-    Real aMultiplicity( roundValue( theVariableReferenceVector[0].
-				    getValue() ) );
-
-    aMultiplicity *= ( aMultiplicity - 1.0 ) * 0.5;
-
-    return aMultiplicity;
-  }
-
-
   GET_METHOD( Real, StepInterval )
   {
     return theStepInterval;
   }
-    
 
   GET_METHOD( Real, MinValue )
   {
-    Real aMinValue( theVariableReferenceVector[0].getValue() );
-
-    if( getOrder() == 1 )   // one substrate, first order.
-      {
-	; // do nothing
-      }
-    else if( getZeroVariableReferenceOffset() == 2 ) // 2 substrates, 2nd order
-      {  
-	const Real aSecondValue( theVariableReferenceVector[1].getValue() );
-	if( aSecondValue < aMinValue )
-	  {
-	    aMinValue = aSecondValue;
-	  }
-      }
-    else // one substrate, second order (coeff == -2)
-      {
-	aMinValue *= 0.5;
-      }
-
-    return aMinValue;
+    return ( this->*theGetMinValueMethodPtr )();
   }
 
   const Polymorph getEffectListProperty() const;
@@ -170,7 +107,6 @@ public:
   }
 
 
-
   void calculateOrder();
 
 
@@ -188,12 +124,8 @@ public:
 			 "[" + getFullID().getString() + 
 			 "]: Only first or second order scheme is allowed." );
       }
-
-
   }
 
-
-      
   virtual void process()
   {
     for( VariableReferenceVectorConstIterator 
@@ -222,6 +154,77 @@ public:
 
 protected:
 
+
+  inline static const Real roundValue( RealCref aValue )
+  {
+    const Real aRoundedValue( trunc( aValue ) );
+
+    if( aRoundedValue < 0.0 )
+      {
+	THROW_EXCEPTION( SimulationError, "Variable value <= -1.0" );
+      }
+
+    return aRoundedValue;
+  }
+
+
+  const Real getZero() const
+  {
+    return 0.0;
+  }
+
+  const Real getMultiplicity_FirstOrder() const
+  {
+    return roundValue( theVariableReferenceVector[0].getValue() );
+  }
+
+  const Real getMultiplicity_SecondOrder_TwoSubstrates() const
+  {
+    Real aMultiplicity( roundValue( theVariableReferenceVector[0].
+				    getValue() ) );
+    aMultiplicity *= roundValue( theVariableReferenceVector[1].getValue() );
+
+    return aMultiplicity;
+  }
+
+  const Real getMultiplicity_SecondOrder_OneSubstrate() const
+  {
+    Real aMultiplicity( roundValue( theVariableReferenceVector[0].
+				    getValue() ) );
+
+    aMultiplicity *= ( aMultiplicity - 1.0 ) * 0.5;
+
+    return aMultiplicity;
+  }
+
+  const Real getMinValue_FirstOrder() const
+  {
+    return theVariableReferenceVector[0].getValue();
+  }
+
+  const Real getMinValue_SecondOrder_TwoSubstrates() const
+  {
+    const Real aFirstValue( theVariableReferenceVector[0].getValue() );
+    const Real aSecondValue( theVariableReferenceVector[1].getValue() );
+
+    if( aFirstValue < aSecondValue )
+      {
+	return aFirstValue;
+      }
+    else
+      {
+	return aSecondValue;
+      }
+  }
+
+  const Real getMinValue_SecondOrder_OneSubstrate() const
+  {
+    return theVariableReferenceVector[0].getValue() * 0.5;
+  }
+
+
+protected:
+
   GillespieProcessVector theEffectList;
 
   Int theOrder;
@@ -231,7 +234,8 @@ protected:
   Real k;    
   Int Index;
 
-  GetMultiplicityMethodPtr theGetMultiplicityMethodPtr;
+  RealMethodPtr theGetMultiplicityMethodPtr;
+  RealMethodPtr theGetMinValueMethodPtr;
 
 };
 
@@ -283,27 +287,32 @@ void GillespieProcess::calculateOrder()
 	}
     }
 
-  // set theGetMultiplicityMethodPtr
+  // set theGetMultiplicityMethodPtr and theGetMinValueMethodPtr
 
   if( getOrder() == 0 )   // no substrate
     {
-      theGetMultiplicityMethodPtr = 
-	&GillespieProcess::getMultiplicity_Zero;
+      theGetMultiplicityMethodPtr = &GillespieProcess::getZero;
+      theGetMinValueMethodPtr     = &GillespieProcess::getZero;
     }
   else if( getOrder() == 1 )   // one substrate, first order.
     {
       theGetMultiplicityMethodPtr = 
 	&GillespieProcess::getMultiplicity_FirstOrder;
+      theGetMinValueMethodPtr = &GillespieProcess::getMinValue_FirstOrder;
     }
   else if( getZeroVariableReferenceOffset() == 2 ) // 2 substrates, 2nd order
     {  
       theGetMultiplicityMethodPtr = 
 	&GillespieProcess::getMultiplicity_SecondOrder_TwoSubstrates;
+      theGetMinValueMethodPtr = 
+	&GillespieProcess::getMinValue_SecondOrder_TwoSubstrates;
     }
   else // one substrate, second order (coeff == -2)
     {
       theGetMultiplicityMethodPtr = 
 	&GillespieProcess::getMultiplicity_SecondOrder_OneSubstrate;
+      theGetMinValueMethodPtr = 
+	&GillespieProcess::getMinValue_SecondOrder_OneSubstrate;
     }
 
 }
