@@ -717,7 +717,8 @@ namespace libecs
     void defaultSetProperty( StringCref aPropertyName,
 			     PolymorphCref aValue)
       {
-	if( getClassName() == "ExpressionFluxProcess")
+	if( getClassName() == "ExpressionFluxProcess" || 
+	    getClassName() == "ExpressionAlgebraicProcess" )
 	  {
 	    thePropertyMap[ aPropertyName ] = aValue.asReal();
 	    
