@@ -106,21 +106,32 @@ class MainWindow(Window):
     def select_property(self,a,b,c,d):
         value = find_substance( self.MainValueList[b][2] )
         if value == -1 :
-
+            #            full=propertyname.getFullID()
             aProperty = self.aType + ' ' + self.aID + ' ' + self.aPath
-            aProperty = aProperty +  ' ' +self.MainValueList[b][0]
-            print aProperty
-
+            self.aProperty = aProperty +  ' ' +self.MainValueList[b][0]
+            #aProperty = full + full
+            return self.aProperty
         else:
-            print self.MainValueList[b][2]
+            self.aProperty = self.MainValueList[b][2]
+            return self.aProperty
     def showing(self,a):
-            print 'hello'
+            print self.aProperty 
 
-def find_substance( aValue ):                     
+def find_substance( aValue ) :                     
+
+    Sub_Sys_Rea = ['Substance','System','Reactor']
     aValue = toString( aValue )
-    result = string.find( aValue,'Substance' )
-    return result
+    
+    for x in Sub_Sys_Rea :
+        result = string.find( aValue,x )
+        if not result == -1 :
+            break
 
+    if result == -1:
+        return result
+    elif not result == -1:
+        return result
+    
 def toString( object ):
     return str( object )
     
