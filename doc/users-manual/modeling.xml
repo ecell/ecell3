@@ -1,13 +1,14 @@
   <!-- ================ Writing em ================================ -->
 
-  <chapter id="write-em"> 
-  <title>Writing a Model File in E-Cell Model format</title> 
+  <chapter id="modeling"> 
+  <title>Modeling with &ecell;</title> 
 
   <highlights>
     <para>By reading this chapter, you may get information about:</para>
     
     <simplelist>
-      <member>aaa</member>
+      <member>How an &ecell;'s simulation model is organized</member>
+      <member>How to create a model in a text EM format</member>
     </simplelist>
   </highlights>
 
@@ -21,7 +22,7 @@
       Although EML is an ideal means of integrating E-Cell with other
       software components such as GUI model editors and databases, it
       is very tedious for human users who want to write and edit their
-      models directly by text editors.  E-Cell Model (EM) is a file
+      models directly by a text editor.  E-Cell Model (EM) is a file
       format with programming language-like syntax and a powerful
       embedded <application>empy</application> preprocessor, which is
       designed to be productive and intuitive especially when handled

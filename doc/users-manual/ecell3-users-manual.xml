@@ -21,9 +21,9 @@
 <!-- chapters -->
   <!ENTITY intro SYSTEM "intro.xml">
   <!ENTITY running SYSTEM "running.xml">
-  <!ENTITY writing-em SYSTEM "writing-em.xml">
-  <!ENTITY writing-dm SYSTEM "writing-dm.xml">
-  <!ENTITY writing-ecs SYSTEM "writing-ecs.xml">
+  <!ENTITY modeling SYSTEM "modeling.xml">
+  <!ENTITY dm SYSTEM "dm.xml">
+  <!ENTITY scripting SYSTEM "scripting.xml">
   <!ENTITY stddmlib SYSTEM "stddmlib.xml">
   <!ENTITY inside-ecell SYSTEM "inside-ecell.xml">
 

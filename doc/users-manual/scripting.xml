@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="US-ASCII"?>
 
-<!-- ============= Automating Simulation Sessions with ESS ========== -->
-<chapter id="writing-ecs"> 
-  <title>Scripting Simulation Sessions</title> 
+<chapter id="scripting"> 
+  <title>Scripting &ecell;</title> 
 
   <highlights>
     <para>By reading this chapter, you can get information about the
