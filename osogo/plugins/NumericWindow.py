@@ -14,7 +14,7 @@ class NumericWindow( PluginWindow ):
                             'increase_value' :self.increaseValue,
                             'decrease_value' :self.decreaseValue } )
 
-        self.theFPN = data
+        self.theFPN = data[0]
         self.initInterface(self.theFPN)
         
 
@@ -94,7 +94,7 @@ if __name__ == "__main__":
         gtk.mainloop()
 
     def main():
-        aNumericWindow = NumericWindow( 'plugins', simulator(), fpn )
+        aNumericWindow = NumericWindow( 'plugins', simulator(), [fpn,] )
         aNumericWindow.addHandler( 'gtk_main_quit', mainQuit )
         aNumericWindow.update()
 
