@@ -137,7 +137,7 @@ void NRStepper::initialize()
   NREventCref aTopEvent( thePriorityQueue.top() );
   const Real aNewTime( aTopEvent.getTime() );
 
-  setStepInterval( aNewTime - getCurrentTime() );
+  setStepInterval( aNewTime - aCurrentTime );
   getModel()->reschedule( this );
 
 }

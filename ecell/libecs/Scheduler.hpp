@@ -74,6 +74,9 @@ namespace libecs
       return theStepperPtr;
     }
 
+    // this method is basically used in initializing and rescheduling 
+    // in the Scheduler to determine if
+    // goUp()/goDown (position change) is needed 
     const bool operator< ( EventCref rhs ) const
     {
       if( theTime > rhs.theTime )
@@ -84,10 +87,9 @@ namespace libecs
 	{
 	  return true;
 	}
-      else // theTime == rhs.theTime
-	{
-	  if( theStepperPtr->getPriority() >= 
-	      rhs.theStepperPtr->getPriority() )
+      else // if theTime == rhs.theTime,
+	{  // then higher priority comes first 
+	  if( theStepperPtr->getPriority() > rhs.theStepperPtr->getPriority() )
 	    {
 	      return true;
 	    }

@@ -252,10 +252,11 @@ namespace libecs
     // (3) construct stepper dependency graph
 
     // want select2nd<>...
+    const Real aCurrentTime( getCurrentTime() );
     for( StepperMapConstIterator i( theStepperMap.begin() );
 	 i != theStepperMap.end(); ++i )
       {
-	(*i).second->integrate( getCurrentTime() );
+	(*i).second->integrate( aCurrentTime );
       }
     FOR_ALL_SECOND( StepperMap, theStepperMap, initialize );
     FOR_ALL_SECOND( StepperMap, theStepperMap, updateDependentStepperVector );
