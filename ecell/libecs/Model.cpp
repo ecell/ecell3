@@ -81,6 +81,11 @@ namespace libecs
 			    FullIDCref aFullID,
 			    StringCref aName )
   {
+    if( aFullID.getSystemPath().empty() )
+      {
+	throw BadSystemPath( __PRETTY_FUNCTION__, "Empty SystemPath." );
+      }
+
     SystemPtr aContainerSystemPtr( getSystem( aFullID.getSystemPath() ) );
 
     ReactorPtr   aReactorPtr  ( NULLPTR );
@@ -127,7 +132,7 @@ namespace libecs
     // 1. "" (empty) means Model itself, which is invalid for this method.
     // 2. Not absolute is invalid.
     // (not absolute implies not empty.)
-    if( aSystemPathCopy.isAbsolute() )
+    if( aSystemPathCopy.isAbsolute() && ! aSystemPathCopy.empty() )
       {
 	aSystemPathCopy.pop_front();
       }
@@ -175,7 +180,7 @@ namespace libecs
 	  }
       }
 
-    SystemPtr aSystem ( getSystem( aFullID.getSystemPath() ) );
+    SystemPtr aSystem ( getSystem( aSystemPath ) );
 
     switch( aFullID.getPrimitiveType() )
       {
