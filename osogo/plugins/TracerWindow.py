@@ -18,7 +18,6 @@ class TracerWindow( PluginWindow ):
     def __init__( self, dirname, data, pluginmanager, root=None ):
 
 	PluginWindow.__init__( self, dirname, data, pluginmanager, root )
-
         IDflag = 1
         if len( self.theFullPNList() ) > 1:
             for aFullID in self.theFullIDList():
@@ -50,10 +49,15 @@ class TracerWindow( PluginWindow ):
     def initialize( self ):
         self.xaxis = None
         self.yaxis = None
+        self.scale = "linear"
         self.arg = 0
         self.step_size = 0
+        self.StartTime = 0
         self.theLoggerList = []
         self.theDataList = []
+        self.xList = []
+        self.yList = []
+        self.FullDataList = []
 
         self['toolbar1'].set_style(GTK.TOOLBAR_ICONS)
         self.addHandlers( { 'on_button9_clicked' : self.popInputWindow,
@@ -84,7 +88,7 @@ class TracerWindow( PluginWindow ):
         self.plot.hide_legends()
         self.canvas.add_plot(self.plot, 0.16, 0.05)
         self.theDataList = []
-        for num in [2,3,4,5,6,7,8]:
+        for num in range( 2,9 ):
             data = GtkPlotData()
             data.set_symbol(PLOT_SYMBOL_NONE, PLOT_SYMBOL_OPAQUE, 0, 0, self.getColor(num-2))
             data.set_line_attributes(PLOT_LINE_SOLID, 1, self.getColor(num-2))
@@ -95,7 +99,6 @@ class TracerWindow( PluginWindow ):
         self['frame8'].add(self.canvas)
 
         self.createLogger()
-
         self.plot.clip_data(TRUE)
 
         aWindowWidget.show_all()
@@ -117,7 +120,7 @@ class TracerWindow( PluginWindow ):
                           })
 
 #        self['togglebutton2'].set_mode(TRUE)
-        for num in [1,2,3,4,5,6,7]:
+        for num in range( 1,8 ):
             self['toolbar%i'%num].set_style(GTK.TOOLBAR_ICONS)
 
         self['entry1'].set_text( 'time' )
@@ -132,10 +135,12 @@ class TracerWindow( PluginWindow ):
 
         if obj.get_active():
             self.plot.set_yscale(PLOT_SCALE_LOG10)
+            self.scale = "log"
             self.plot.autoscale()
             
         else:
             self.plot.set_yscale(PLOT_SCALE_LINEAR)
+            self.scale = 'linear'
             self.plot.autoscale()
 
 
@@ -167,45 +172,154 @@ class TracerWindow( PluginWindow ):
     def updateLoggerDataList(self):
         self.LoggerDataList =[]
         for aLogger in self.theLoggerList:
-            self.LoggerDataList.append( aLogger.getData() )
+            aEndTime = aLogger.getEndTime()
+            self.LoggerDataList.append( aLogger.getData(self.StartTime, aEndTime, 1) )
+
+        self.StartTime = aEndTime
+#            print aLogger.getData()[0]
             
-        if self.LoggerDataList[0] != ():
-            self.datanumber = array(self.LoggerDataList[0]).shape[0]
-            self.step_size = int(self.datanumber/500)
+#        if self.LoggerDataList[0] != ():
+#            self.datanumber = array(self.LoggerDataList[0]).shape[0]
+#            self.step_size = int(self.datanumber/500)
+#        num = 0
+
+#        self.entry = {}
+#        while num < len(self.theLoggerList):
+#            if self.LoggerDataList[num] == ():
+#                pass
+#            else:
+#                self.LoggerDataList[num] = array( self.LoggerDataList[num])
+#                self.entry['X%s' % str(num+1)] = self.LoggerDataList[num]
+#            num += 1
+
+    def setStateList( self ):
+        aStateList = []
+        if self['togglebutton2'] == None:
+            aStateList = [0,0,0,0,0,0,0]
+        else:
+            for togglebuttonnum in range( 2,9 ):
+                togglebutton = 'togglebutton%i'%togglebuttonnum
+                aStateList.append(self[togglebutton].get_active())
+        return aStateList
+
+    def updateFullDataList( self ):
+        num = 0
+        FullDataList_prev = self.FullDataList
+        self.FullDataList = []
+        for LoggerData in self.LoggerDataList:
+            if len(FullDataList_prev) > num :
+                self.FullDataList.append( concatenate( (FullDataList_prev[num], array( LoggerData ))))
+            if num >= len(FullDataList_prev):
+                self.FullDataList.append( array(LoggerData) )
+                
+            num += 1
+
         num = 0
         self.entry = {}
         while num < len(self.theLoggerList):
             if self.LoggerDataList[num] == ():
                 pass
             else:
-                self.LoggerDataList[num] = array( self.LoggerDataList[num])
-                self.entry['X%s' % str(num+1)] = self.LoggerDataList[num][:,1][::self.step_size]
+                self.entry['X%s' % str(num+1)] = self.FullDataList[num]
+#just temporarily                
+                self.entry['time'] = self.FullDataList[0]
             num += 1
 
 
-    def update(self):
-        if self.arg % 10 == 0:
-            stateList = []
-            if self['togglebutton2'] == None:
-                stateList = [0,0,0,0,0,0,0]
-            else:
-                for togglebuttonnum in [2,3,4,5,6,7,8]:
-                    togglebutton = 'togglebutton%i'%togglebuttonnum
-                    stateList.append(self[togglebutton].get_active())
+
+    def update( self ):
+        if self.arg % 10 == 5:
+            theStateList = self.setStateList()
             self.updateLoggerDataList()
-
-
+            
             if self.LoggerDataList[0] == ():
                 pass
             else:
-                if self.xaxis == None:
-                    x = array(self.LoggerDataList)[0][:,0][::self.step_size]
-                elif self.xaxis == 'time':
-                    x = array(self.LoggerDataList)[0][:,0][::self.step_size]
-                else:
-                    x = eval(self.xaxis,self.entry)
+                self.updateFullDataList()
+                self.xList = []
+                self.yList = []
+                if self.xaxis == None or self.xaxis == 'time':
+                    if self.yaxis == None:
+                        for num in range(len(self.LoggerDataList)):
+                            self.xList.append(self.FullDataList[num][:,0])
+                            self.yList.append(self.FullDataList[num][:,1])
 
-            yList = []
+                    else:
+                        num = 2
+                        for yaxis in self.yaxis:
+                            if yaxis == '':
+                                self.xList.append (['None'])
+                                self.yList.append (['None'])
+                            else:
+## Must execute interpolation when the caluculated objects don't have the same step intervals
+## Now I assume they have the same step intervals                        
+                                
+                                try:
+                                    self.xList.append ( self.FullDataList[0][:,0] )    
+                                    self.yList.append ( eval(yaxis, self.entry)[:,1] )
+                                except NameError:
+                                    self.theSession.printMessage( "name '%s' is not defined \n" % yaxis )
+                                    self["entry%i"%num].set_text ('')
+                                    self.changeyaxis( self["entry%i"%num])
+                                    self.yList.append(['None'])
+                                except (SyntaxError,TypeError):
+                                    self.theSession.printMessage( "'%s' is SyntaxError or TypeError\n" % yaxis )
+                                    self["entry%i"%num].set_text ('')
+                                    self.changeyaxis( self["entry%i"%num])
+                                    self.yList.append(['None'])
+                            num += 1
+                                    
+
+                else:
+                    if self.yaxis == None:
+                        for num in range(len(self.LoggerDataList)):
+                            try :
+                                self.xList.append ( eval(self.xaxis, self.entry)[:,1] )
+                            except NameError:
+                                self.theSession.printMessage( "name '%s' is not defined \n" % self.xaxis )
+                                self["entry1"].set_text ('time')
+                                self.changexaxis( self["entry1"] )
+                                self.xList.append(self.FullDataList[0][:,0])
+                            except (SyntaxError,TypeError):
+                                self.theSession.printMessage( "'%s' is SyntaxError or TypeError\n" % self.xaxis )
+                                self["entry1"].set_text ('time')
+                                self.changexaxis( self["entry1"] )                                
+                                self.xList.append(self.FullDataList[0][:,0]) 
+                            self.yList.append ( self.FullDataList[num][:,1] )
+                    else:
+                        num = 2
+                        for yaxis in self.yaxis:
+                            if yaxis == '':
+                                self.xList.append (['None'])
+                                self.yList.append (['None'])
+                            else:
+                                try:
+                                    self.xList.append( eval(self.xaxis, self.entry)[:,1])
+                                except NameError:
+                                    self.theSession.printMessage( "name '%s' is not defined \n" % self.xaxis )
+                                    self["entry1"].set_text ('time')
+                                    self.changexaxis( self["entry1"] )                                    
+                                    self.xList.append(self.FullDataList[0][:,0])
+                                except (SyntaxError,TypeError):
+                                    self.theSession.printMessage( "'%s' is SyntaxError or TypeError\n" % self.xaxis )
+                                    self["entry1"].set_text ('time')
+                                    self.changexaxis( self["entry1"] )                                    
+                                    self.xList.append(self.FullDataList[0][:,0])                                    
+                                try:
+                                    self.yList.append( eval(yaxis, self.entry)[:,1])
+                                except NameError:
+                                    self.theSession.printMessage( "name '%s' is not defined \n" % yaxis )
+                                    self["entry%i"%num].set_text ('')
+                                    self.changeyaxis( self["entry%i"%num] )
+                                    self.yList.append(['None'])
+                                except (SyntaxError,TypeError):
+                                    self.theSession.printMessage( "'%s' is SyntaxError or TypeError \n" % yaxis )
+                                    self["entry%i"%num].set_text ('')
+                                    self.changeyaxis( self["entry%i"%num] )
+                                    self.yList.append(['None'])
+                            num += 1
+
+                        
             
             if self.yaxis == None:
                 num = 0
@@ -213,21 +327,36 @@ class TracerWindow( PluginWindow ):
                     if LoggerData == ():
                         pass
                     else:
-                        if stateList[num] == 1:
+                        if theStateList[num] == 1:
                             self.theDataList[num].set_points( None, None )
                         else:
-                            self.theDataList[num].set_points( x, array(LoggerData)[:,1][::self.step_size] )
+                            if self.scale == "log":
+                                if min(array(LoggerData)[:,1]) <= 0:
+                                    self.theSession.printMessage( "value is under 0, set yaxis to linear scale\n" )
+#                                    self['checkbutton1'].set_active(TRUE)
+                                    self.plot.set_yscale(PLOT_SCALE_LINEAR)
+                                    self.scale = "linear"
+                            self.theDataList[num].set_points( self.xList[num], self.yList[num] )
+                            
                     num += 1
 
             else:
                 num = 0
                 for yaxis in self.yaxis:
-                    if stateList[num] == 1:
+                    if theStateList[num] == 1:
                         self.theDataList[num].set_points(None,None)
                     elif yaxis == '':
                         self.theDataList[num].set_points(None,None)
                     else :
-                        self.theDataList[num].set_points(x,eval(yaxis,self.entry))
+                        if self.scale == 'log':
+                            if min(array(LoggerData)[:,1] ) <= 0:
+                                self.theSession.printMessage( "value is under 0, set yaxis to linear scale\n" )
+#                                self['checkbutton1'].set_active(TRUE)
+                                self.plot.set_yscale(PLOT_SCALE_LINEAR)
+                                self.scale = 'linear'
+                        self.theDataList[num].set_points(self.xList[num],self.yList[num])
+                        
+
                     num += 1
             
             self.plot.autoscale()
@@ -246,10 +375,12 @@ class TracerWindow( PluginWindow ):
     def changeyaxis(self, obj):
 
         self.yaxis = []
-        for num in [2,3,4,5,6,7,8]:
+        for num in range( 2,9 ):
             self.yaxis.append(self['entry%i'%num].get_text())
 
 
+
+#######test code###########
 
 if __name__ == '__main__':
     class simulator :
@@ -330,3 +461,4 @@ if __name__ == '__main__':
 
 
 
+ 
