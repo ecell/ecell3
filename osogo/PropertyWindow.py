@@ -32,8 +32,8 @@ class MainWindow(Window):
     
     def __init__( self, gladefile ):
         
-        self.theHandlerMap = {
-            }
+        self.theHandlerMap = {'input_row_pressed':self.select_property,
+                              'show_button_pressed':self.showing}
         
         Window.__init__( self, gladefile )
         
@@ -52,14 +52,19 @@ class MainWindow(Window):
     def update( self, aMainValueList, namePropertyList ):
         self.thePropertyClist.clear()
         
-        
-        self.theTypeEntry.set_text( toString( FQPPList.getType() ) )
-        self.theIDEntry.set_text( toString( FQPPList.getID() ) )
-        self.thePathEntry.set_text( toString( FQPPList.getSystemPath() ) )
+        self.aType = toString( FQPPList.getType() )
+        self.aID = toString( FQPPList.getID() )
+        self.aPath = toString( FQPPList.getSystemPath() )
+
+        self.theTypeEntry.set_text( self.aType  )
+        self.theIDEntry.set_text( self.aID )
+        self.thePathEntry.set_text( self.aPath )
         self.theNameEntry.set_text( namePropertyList )
+
         for a in aMainValueList:
             self.thePropertyClist.append( a )
 
+        return self.aType, self.aID, self.aPath 
 
         
     def makeValueList( self ):
@@ -91,15 +96,30 @@ class MainWindow(Window):
                     self.MainValueList.append( aSubstanceList ) 
                     r=r+1
                 
-                
             else:
                 for y in aValueList :
                     aParameterList = [ x,'',y ]
                     aParameterList = map( toString, aParameterList )
-                    self.MainValueList.append( aParameterList ) 
-                    
+                    self.MainValueList.append( aParameterList)
         return self.MainValueList, self.bPropertyList
-            
+
+    def select_property(self,a,b,c,d):
+        value = find_substance( self.MainValueList[b][2] )
+        if value == -1 :
+
+            aProperty = self.aType + ' ' + self.aID + ' ' + self.aPath
+            aProperty = aProperty +  ' ' +self.MainValueList[b][0]
+            print aProperty
+
+        else:
+            print self.MainValueList[b][2]
+    def showing(self,a):
+            print 'hello'
+
+def find_substance( aValue ):                     
+    aValue = toString( aValue )
+    result = string.find( aValue,'Substance' )
+    return result
 
 def toString( object ):
     return str( object )
