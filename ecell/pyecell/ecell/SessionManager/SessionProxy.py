@@ -207,12 +207,12 @@ class SessionProxy:
 		Return None
 		'''
 
-		pass
-		# Do not delete the related directory or files in this method.
-		# The deletion must be conducted by destractor of SessionManager 
-		# class. Because only SessionManager know whether a user wnats
-		# to delete job directories or not with the flag
-		# SessionManager.__theTmpRemovable.
+		# When the job has ERROR status, do not
+		# delete the job directory.
+		if self.getStatus() != ERROR:
+			self.clearJobDirectory()
+
+
 
 	def getJobID(self):
 		'''Return the job id
