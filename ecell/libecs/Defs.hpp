@@ -85,12 +85,12 @@ DECLARE_TYPE( uint64_t, UnsignedInt );
 const int INT_SIZE( sizeof( Int ) );
 
 DECLARE_TYPE( double, Real );
-const int FLOAT_DIG( DBL_DIG );
+const int REAL_DIG( DBL_DIG );
 
 //! Avogadro number. 
-const Real N_A = 6.0221367e+23;
+const Real N_A( 6.0221367e+23 );
 
-const int NOMATCH = -1;
+const int NOMATCH( -1 );
 
 
 // MACROS

@@ -75,7 +75,7 @@ template<> const UnsignedInt stringTo<UnsignedInt>( StringCref str )
 template<> const String toString<Real>( const Real& f )
 { 
   ostrstream os;
-  os.precision( FLOAT_DIG );
+  os.precision( REAL_DIG );
   os << f;
   os << ends;
   return os.str();
