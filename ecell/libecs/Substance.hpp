@@ -203,7 +203,6 @@ namespace libecs
 
 
     // wrappers to expose is/setFixed as PropertySlots 
-    //FIXME: should be Int
     void setFixed( IntCref aValue );
     const Int getFixed() const;
 
