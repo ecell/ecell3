@@ -589,6 +589,11 @@ Reactor
       <class>GtkButton</class>
       <name>button1</name>
       <can_focus>True</can_focus>
+      <signal>
+	<name>clicked</name>
+	<handler>gtk_main_quit</handler>
+	<last_modification_time>Mon, 13 Aug 2001 06:43:46 GMT</last_modification_time>
+      </signal>
       <label>quit(for test)</label>
       <child>
 	<padding>0</padding>
