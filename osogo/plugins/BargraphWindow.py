@@ -28,18 +28,18 @@ class BargraphWindow( OsogoPluginWindow ):
 			self['toolbar5'].set_button_relief( GTK.RELIEF_HALF )
 			self['toolbar6'].set_button_relief( GTK.RELIEF_HALF )        
         
-			self.pull = 0
-			self.thePositiveFlag = 1
-			self.theAutoChangeFlag = 1
-			self.theActualValue = 0
-			self.theBarLength = 0
-			self.theMultiplier = 0
+			self.pull = FALSE
+			self.thePositiveFlag = TRUE
+			self.theFixFlag = FALSE
+			self.theActualValue = FALSE
+			self.theBarLength = FALSE
+			self.theMultiplier = FALSE
         
 			self.addHandlers( { \
-		                   'on_add_button_clicked'      : self.updateByAddbutton,
-		                   'on_subtract_button_clicked' : self.updateBySubtractbutton,
+		                   'on_add_button_clicked'      : self.updateByIncrease,
+		                   'on_subtract_button_clicked' : self.updateByDecrease,
 		                   'multiplier_entry_activate'  : self.updateByTextentry,
-		                   'auto_button_toggled'        : self.updateByAutoButton ,
+		                   'fix_checkbutton_toggled'    : self.updateByFix ,
 		                   'window_exit'                : self.exit })
         
 			self.theIDEntry = self.getWidget( "property_id_label" )
@@ -57,31 +57,6 @@ class BargraphWindow( OsogoPluginWindow ):
 			self.addPopupMenu(0,1,1)
 
 
-	#def initialize( self ):
-    
-	#	self['toolbar5'].set_style( GTK.TOOLBAR_ICONS )
-	#	self['toolbar6'].set_style( GTK.TOOLBAR_ICONS )
-	#	self['toolbar5'].set_button_relief( GTK.RELIEF_HALF )
-	#	self['toolbar6'].set_button_relief( GTK.RELIEF_HALF )        
-        
-	#	self.pull = 0
-	#	self.thePositiveFlag = 1
-	#	self.theAutoChangeFlag = 1
-	#	self.theActualValue = 0
-	#	self.theBarLength = 0
-	#	self.theMultiplier = 0
-        
-	#	self.addHandlers( { \
-	#	                   'on_add_button_clicked'      : self.updateByAddbutton,
-	#	                   'on_subtract_button_clicked' : self.updateBySubtractbutton,
-	#	                   'multiplier_entry_activate'  : self.updateByTextentry,
-	#	                   'auto_button_toggled'        : self.updateByAutoButton ,
-	#	                   'window_exit'                : self.exit })
-        
-	#	self.theIDEntry = self.getWidget( "property_id_label" )
-	#	self.theMultiplier1Entry = self.getWidget("multiplier1_label")
-	#	self.update()
-
 
 	def update( self ):
         
@@ -91,67 +66,79 @@ class BargraphWindow( OsogoPluginWindow ):
 
 		aValue = self.theSession.theSimulator.getProperty( createFullPNString( self.theFullPN() ) )
 		
-
-		value = aValue
-		self.theActualValue = value
+		self.theActualValue = aValue
 		self.theBarLength , self.theMultiplier , self.thePositiveFlag \
-		                              = self.calculateBarLength( value )
+		                              = self.calculateBarLength( aValue )
 
-		aIndicator = (value / (float)(10**(self.theMultiplier))) \
+		aIndicator = (aValue / (float)(10**(self.theMultiplier))) \
 		                              * self.thePositiveFlag
 
 		self['progressbar'].set_value(int(self.theBarLength))
-		self['progressbar'].set_format_string(str(value))
+		self['progressbar'].set_format_string(str(aValue))
+
 
 		self.theMultiplier1Entry.set_text(str(int(self.theMultiplier-1)))
 		self['multiplier_entry'].set_text(str(int(self.theMultiplier+2)))
 
 
-	def updateByAuto( self, value ):
+	def updateByAuto( self, aValue ):
 
-		self.theAutoChangeFlag = 1
+		self.theFixFlag = 0
 		self.update()
 
 
-	def updateByAddbutton( self , obj ):
+	def updateByIncrease( self , obj ):
 
-		self['auto_button'].set_active( 0 )
+		self.theFixFlag = TRUE
+		self['fix_checkbutton'].set_active( TRUE )
 		aNumberString =  self['multiplier_entry'].get_text()
-		aNumber = string.atof( aNumberString )
+
+		try:
+			aNumber = string.atof( aNumberString )
+		except:
+			anErrorMessage = "Numeric charactor must be inputted!"
+			aWarningWindow = ConfirmWindow(OK_MODE,anErrorMessage,'Error !')
+			return None
+
 		aNumber = aNumber + 1
+
 		self.pull = aNumber
 
-		self.theAutoChangeFlag = 0
 		self.update()
 
 
-	def updateBySubtractbutton( self,obj ):
+	def updateByDecrease( self,obj ):
 
-		self['auto_button'].set_active( 0 )
+		self.theFixFlag = TRUE
+		self['fix_checkbutton'].set_active( TRUE )
 		aNumberString =  self['multiplier_entry'].get_text()
 		aNumber = string.atof( aNumberString )
 		aNumber = aNumber - 1
 		self.pull = aNumber
-		self.theAutoChangeFlag = 0
 		self.update()
 
 
 	def updateByTextentry(self, obj):
 
-		if self.theAutoChangeFlag :
-			pass
-		else :
-			self['auto_button'].set_active( 0 )
-
 		aNumberString = obj.get_text()
 
-		aNumber = string.atof( aNumberString )
+		self['fix_checkbutton'].set_active( TRUE )
+
+		try:
+			aNumber = string.atof( aNumberString )
+		except:
+			anErrorMessage = "Numeric charactor must be inputted!"
+			aWarningWindow = ConfirmWindow(OK_MODE,anErrorMessage,'Error !')
+			return None
+
+		self.theFixFlag = TRUE
+
 		self.pull = aNumber
-		self.theAutoChangeFlag = 0
 		self.update()
 
 
-	def updateByAutoButton(self, autobutton):
+	def updateByFix(self, autobutton):
+		self.theFixFlag = self['fix_checkbutton'].get_active()
 		self.update()
 
 
@@ -163,14 +150,17 @@ class BargraphWindow( OsogoPluginWindow ):
 		else :
 			aPositiveFlag = 1
 
-		if self['auto_button'].get_active() :
+		#if self['fix_checkbutton'].get_active() :
+		if self.theFixFlag == TRUE:
+
+			aMultiplier = self.pull-2
+		else :
+
 			if value == 0 :
 				aMultiplier = 2
 			else :
 				aMultiplier = (int)(Numeric.log10(value))
 			self.pull = aMultiplier+2
-		else :
-			aMultiplier = self.pull-2
 
 		if value == 0:
 			aBarLength = 0
