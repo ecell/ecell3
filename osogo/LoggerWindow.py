@@ -393,7 +393,7 @@ class LoggerWindow(OsogoWindow):
 				aECDDataFile.setDataName(aFullPNString)
 
 				# sets matrix data
-				aECDDataFile.setMatrixData(aMatrixData)
+				aECDDataFile.setData(aMatrixData)
 
 				# -------------------------------------------------
 				# adds data file to data file manager
