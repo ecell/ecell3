@@ -8,7 +8,7 @@
       in the simulation models.
       </para>
 
-    <para>This section also explains <classname>PropertySlot</classname>.</para>
+    <para>This section also explains &PropertySlot;.</para>
   </highlights>
   
   <sect1>
@@ -23,15 +23,15 @@
       efficient way of adding a new code or object class in terms of
       space and speed.</para>
 
-    <para>In &app, subclasses of <classname>Process</classname>,
-         <classname>Variable</classname>,
-         <classname>System</classname> and
-         <classname>Stepper</classname> classes can be dynamically
+    <para>In &app, subclasses of &Process;,
+         &Variable;,
+         &System; and
+         &Stepper; classes can be dynamically
          loaded by the system.
       </para>
 
-    <para>In addition to standard DMs distributed with &app,
-      user-defined DM files can be created from C++ source code files
+    <para>In addition to standard &DM;s distributed with &app,
+      user-defined &DM; files can be created from C++ source code files
       ('.cpp' files) with the <command>ecell3-dmc</command> command.
       The compiled files usually take a form of shared library ('.so')
       files.
@@ -48,13 +48,13 @@
 
 
 
-    <para>Here is a minimum template of a DM file, with which you
+    <para>Here is a minimum template of a &DM; file, with which you
     should feel familiar if you have a C++ experience. Replace
     <parameter>DMTYPE</parameter>, <parameter>CLASSNAME</parameter>, and
     <parameter>BASECLASS</parameter> according to your case.
 
     <example>
-      <title>CLASSNAME.cpp; a minimum DM source code template.</title>
+      <title>CLASSNAME.cpp; a minimum &DM; source code template.</title>
     <programlisting linenumbering="numbered">
 #include &lt;libecs/libecs.hpp>
 #include &lt;libecs/<parameter>BASECLASS</parameter>.hpp>
@@ -81,17 +81,17 @@ DM_INIT( <parameter>DMTYPE</parameter>, <parameter>CLASSNAME</parameter> );
       <title>DM Type, Class name and Base class</title>
 
       <para>First of all you have to decide basic attributes of the
-    class you are going to define; such as a DM type, a class name,
+    class you are going to define; such as a &DM; type, a class name,
     and a base class.</para>
 
       <sect3>
 	<title><parameter>DMTYPE</parameter></title>
 
-	<para><parameter>DMTYPE</parameter> is one of DM base classes
-	defined in &app; <classname>Process</classname>,
-	<classname>Stepper</classname>,
-	<classname>Variable</classname>, and
-	<classname>System</classname>.</para>
+	<para><parameter>DMTYPE</parameter> is one of &DM; base classes
+	defined in &app; &Process;,
+	&Stepper;,
+	&Variable;, and
+	&System;.</para>
       </sect3>
 
       <sect3>
@@ -102,7 +102,7 @@ DM_INIT( <parameter>DMTYPE</parameter>, <parameter>CLASSNAME</parameter> );
 
 	<para>This must be a valid C++ class name, and should end with the
 	<parameter>DMTYPE</parameter> name. For example, if you are
-	going to define a new <classname>Process</classname> class and
+	going to define a new &Process; class and
 	want to name it <classname>Foo</classname>, the class name may
 	look like <classname>FooProcess</classname>.</para>
       </sect3>
@@ -114,7 +114,7 @@ DM_INIT( <parameter>DMTYPE</parameter>, <parameter>CLASSNAME</parameter> );
 
 	<para>This may or may not be the same as the <parameter>DMTYPE
 	</parameter>, depending on whether it is a direct
-	descendant of the DM base class.</para>
+	descendant of the &DM; base class.</para>
       </sect3>
 
     </sect2>
@@ -164,7 +164,7 @@ DM_INIT( <parameter>DMTYPE</parameter>, <parameter>CLASSNAME</parameter> );
           <parameter>CLASSNAME</parameter> )</function> should be
           placed on the top of the class definition part (immediately
           after '{' of the class).  This macro declares that this is a
-          DM class.  This macro makes it dynamically instantiable, and
+          &DM; class.  This macro makes it dynamically instantiable, and
           automatically defines
           <methodname>getClassName</methodname>() method.  Note that
           this macro specifies public: field inside, and thus anything
@@ -176,7 +176,7 @@ DM_INIT( <parameter>DMTYPE</parameter>, <parameter>CLASSNAME</parameter> );
 
 	<para><function>DM_INIT( <parameter>DMTYPE</parameter>,
 	<parameter>CLASSNAME</parameter> )</function> exports the
-	class <parameter>CLASSNAME</parameter> as a DM class of type
+	class <parameter>CLASSNAME</parameter> as a &DM; class of type
 	<parameter>DMTYPE</parameter>.  This must come after the
 	definition (not just a declaration) of the class to be
 	exported with
@@ -223,16 +223,16 @@ DM_INIT( <parameter>DMTYPE</parameter>, <parameter>CLASSNAME</parameter> );
 	      <para>An unsigned integer number. This is 64-bit <type>unsigned long int</type> on Linux/IA32/gcc. </para>
 	    </listitem>
 	    <listitem>
-	      <para><classname>String</classname></para>
+	      <para>&String;</para>
 
 	      <para>A string equivalent to
 	    <classname>std::string</classname> class of the C++ standard
 	    library.</para>
 	    </listitem>
 	    <listitem>
-	      <para><classname>Polymorph</classname></para>
+	      <para>&Polymorph;</para>
 
-	      <para><classname>Polymorph</classname> is a sort of
+	      <para>&Polymorph; is a sort of
               universal type (actually a class) which can *become* and
               *made from* any of <type>Real</type>, <type>Int</type>,
               <type>String</type>, and <type>PolymorphVector</type>,
@@ -320,38 +320,38 @@ See the C++ standard library reference manual for more.</para>
     </sect2>
 
       <sect2>
-	<title><classname>Polymorph</classname> class</title>
+	<title>&Polymorph; class</title>
 
-	<para>A <classname>Polymorph</classname> object can be
+	<para>A &Polymorph; object can be
 	constructed from and converted to any of <type>Real</type>,
 	<type>Int</type>, <type>String</type>, types and
-	<classname>PolymorphVector</classname> class.</para>
+	&PolymorphVector; class.</para>
 	
       <sect3>
-	<title>Construct a <classname>Polymorph</classname></title>
+	<title>Construct a &Polymorph;</title>
 
-	<para>To construct a <classname>Polymorph</classname> object, simply call a constructor with a value:
+	<para>To construct a &Polymorph; object, simply call a constructor with a value:
 
 <programlisting>
-Polymorph aIntPolymorph( 1 );
+Polymorph anIntPolymorph( 1 );
 Polymorph aRealPolymorph( 3.1 );
 Polymorph aStringPolymorph( "2.13e2" );
 </programlisting>
 
-A <classname>Polymorph</classname> object can be constructed (or
-copied) from a <classname>Polymorph</classname>:
+A &Polymorph; object can be constructed (or
+copied) from a &Polymorph;:
 <programlisting>
 Polymorph aRealPolymorph2( aRealPolymorph );
 </programlisting></para>
       </sect3>
 
       <sect3>
-	<title>Getting a value of a <classname>Polymorph</classname></title>
+	<title>Getting a value of a &Polymorph;</title>
 
-	<para>The value of the <classname>Polymorph</classname>
+	<para>The value of the &Polymorph;
 	objects can be retrieved in any type by using <methodname>as&lt;></methodname>() template method.
 <programlisting>
-aIntPolymorph.as&lt;Real>();    // == 1.0
+anIntPolymorph.as&lt;Real>();    // == 1.0
 aRealPolymorph.as&lt;String>(); // == "3.1"
 aStringPolymorph.as&lt;Int>();  // == 213
 </programlisting>
@@ -366,7 +366,7 @@ aStringPolymorph.as&lt;Int>();  // == 213
       </sect3>
 
       <sect3>
-	<title>Examining and changing the type of <classname>Polymorph</classname></title>
+	<title>Examining and changing the type of &Polymorph;</title>
 
 	<para><methodname>getType</methodname>(), <methodname>changeType</methodname>()</para>
 
@@ -374,10 +374,10 @@ aStringPolymorph.as&lt;Int>();  // == 213
 
 
       <sect3>
-	<title><classname>PolymorphVector</classname></title>
+	<title>&PolymorphVector;</title>
 
-	<para><classname>PolymorphVector</classname> is a list of
-	<classname>Polymorph</classname> objects.</para>
+	<para>&PolymorphVector; is a list of
+	&Polymorph; objects.</para>
       </sect3>
 
       </sect2>
@@ -387,7 +387,7 @@ aStringPolymorph.as&lt;Int>();  // == 213
 	<title>Other C++ statements</title>
 
 	<para>The only limitation is the <function>DM_INIT</function>
-	macro, which exports a class as a DM class, can appear only
+	macro, which exports a class as a &DM; class, can appear only
 	once in a compilation unit which forms a single shared library
 	file.</para>
 
@@ -399,7 +399,7 @@ aStringPolymorph.as&lt;Int>();  // == 213
 
 	<para>Be careful, however, about namespace corruptions. You
           may want to use private C++ namespaces and static functiont
-          when a class or a function declared outside the DM class is
+          when a class or a function declared outside the &DM; class is
           needed.</para>
       </sect2>
 
@@ -409,34 +409,34 @@ aStringPolymorph.as&lt;Int>();  // == 213
     <title>PropertySlot</title>
 
     <sect2>
-      <title>What is <classname>PropertySlot</classname></title>
+      <title>What is &PropertySlot;</title>
 
-      <para>All of the four DM base classes,
-         <classname>Process</classname>,
-         <classname>Variable</classname>,
-         <classname>System</classname> and
-         <classname>Stepper</classname> are
-         <classname>PropertyInterface</classname>s, which means that
+      <para>All of the four &DM; base classes,
+         &Process;,
+         &Variable;,
+         &System; and
+         &Stepper; are
+         &PropertyInterface;s, which means that
          these classes can hold a list of
-         <classname>PropertySlot</classname>s, or object
+         &PropertySlot;s, or object
          <emphasis>properties</emphasis>.</para>
 
       <sect3>
 	<title>What is 
-	<classname>PropertySlot</classname> for?</title>
+	&PropertySlot; for?</title>
 
-	<para><classname>PropertySlot</classname>s can be used from
+	<para>&PropertySlot;s can be used from
 	model files (such as EM files) as a means of giving parameter
 	values to each objects in the simulation (such as
-	<classname>Entity</classname> and
-	<classname>Stepper</classname> objects). It can also be ways
+	&Entity; and
+	&Stepper; objects). It can also be ways
 	of dynamic inter-object communications during the simulation.</para>
       </sect3>
 
       <sect3>
-	<title>Types of <classname>PropertySlot</classname></title>
+	<title>Types of &PropertySlot;</title>
 
-	<para>A type of a <classname>PropertySlot</classname> is
+	<para>A type of a &PropertySlot; is
 	any one of these four types:
 
 <itemizedlist>
@@ -461,12 +461,12 @@ aStringPolymorph.as&lt;Int>();  // == 213
       <sect3>
 	<title>Set method and get method</title>
 
-	<para>A <classname>PropertySlot</classname> can be viewed as a
+	<para>A &PropertySlot; can be viewed as a
       pair of object methods, <emphasis>set method</emphasis> and
       <emphasis>get method</emphasis>, associated with a property
       name.  Either one of the methods can be ommited.  If there is a
-      set method defined for a <classname>PropertySlot</classname>,
-      the <classname>PropertySlot</classname> is said to be
+      set method defined for a &PropertySlot;,
+      the &PropertySlot; is said to be
       <emphasis>setable</emphasis>.  If there is a get method, it is
       <emphasis>getable.</emphasis></para>
 
@@ -480,9 +480,9 @@ aStringPolymorph.as&lt;Int>();  // == 213
 <programlisting>const T	CLASS::* ( void ) const</programlisting> 
 
         where <type>T</type>
-	is a <classname>PropertySlot</classname> type and
+	is a &PropertySlot; type and
 	<type>CLASS</type> is the object class that the
-	<classname>PropertySlot</classname> belongs to.
+	&PropertySlot; belongs to.
 </para>
 
       </sect3>
@@ -490,13 +490,13 @@ aStringPolymorph.as&lt;Int>();  // == 213
     </sect2>
 
     <sect2>
-      <title>How to define a <classname>PropertySlot</classname></title>
+      <title>How to define a &PropertySlot;</title>
 
-      <para>To define a <classname>PropertySlot</classname> on a
+      <para>To define a &PropertySlot; on a
       object class, you have to:
 <orderedlist>
 	  <listitem>
-	    <para> create a <classname>PropertySlot</classname> in the constructor</para>
+	    <para> create a &PropertySlot; in the constructor</para>
 	  </listitem>
 	  <listitem>
 	    <para>define set and/or get method(s)</para>
@@ -509,9 +509,9 @@ aStringPolymorph.as&lt;Int>();  // == 213
 </para>
 
       <sect3>
-	<title>Creating a <classname>PropertySlot</classname></title>
+	<title>Creating a &PropertySlot;</title>
 	
-	<para>To create a <classname>PropertySlot</classname>, use
+	<para>To create a &PropertySlot;, use
 	<function>CREATE_PROPERTYSLOT</function> macro in the
 	constructor:
 
@@ -520,7 +520,7 @@ aStringPolymorph.as&lt;Int>();  // == 213
 </para>
 
 	<para>
-If <classname>PropertySlot</classname>s with the same name are created
+If &PropertySlot;s with the same name are created
 for an object, the later one overrides the former.</para>
       </sect3>
 
@@ -532,20 +532,20 @@ for an object, the later one overrides the former.</para>
       </sect3>
 
       <sect3>
-	<title>Virtual functions and <classname>PropertySlot</classname>s</title>
+	<title>Virtual functions and &PropertySlot;s</title>
 
-	<para>Virtual functions doesn't work for
-	<classname>PropertySlot</classname>.  The functions given as
-	set / get methods of <classname>PropertySlot</classname>s
-	work and are treated as non-virtual functions.  If you have two DM
+	<para>Virtual functions does not work for
+	&PropertySlot;.  The functions given as
+	set / get methods of &PropertySlot;s
+	work and are treated as non-virtual functions.  If you have two &DM;
 	classes A and B, and B inherits A with a virtual function
 	overridden, it's likely that you want to define
-	<classname>PropertySlot</classname>s of the same name for both
+	&PropertySlot;s of the same name for both
 	classes.</para>
 
 	<note>
 	  <para>This can be easily understood if you remember
-            <classname>PropertySlot</classname>s are defined in
+            &PropertySlot;s are defined in
             constructors. In C++ objects are constructed in a
             bottom-up fashion, or from base to derived classes. Thus
             the constructors are called in the same order, and always
@@ -557,12 +557,12 @@ for an object, the later one overrides the former.</para>
     </sect2>
 
     <sect2>
-      <title>Using <classname>PropertySlot</classname>s from model
+      <title>Using &PropertySlot;s from model
       files</title> <para></para>
     </sect2>
 
     <sect2>
-      <title>Using <classname>PropertySlot</classname>s in the
+      <title>Using &PropertySlot;s in the
       simulation</title>
 
       <para></para>
@@ -575,7 +575,7 @@ for an object, the later one overrides the former.</para>
       <title>Defining a new Process class</title>
 
 
-      <para>To define a new <classname>Process</classname> class, 
+      <para>To define a new &Process; class, 
       at least <methodname>process()</methodname> and 
       <methodname>initialize()</methodname> methods must be defined.
       </para>

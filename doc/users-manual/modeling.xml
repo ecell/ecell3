@@ -8,7 +8,7 @@
     
     <simplelist>
       <member>How an &ecell;'s simulation model is organized</member>
-      <member>How to create a model in a text EM format</member>
+      <member>How to create a model in a text &EM; format</member>
     </simplelist>
   </highlights>
 
@@ -18,32 +18,32 @@
 
     <para>
       In &app, the standard file format of model description and
-      exchange is XML-based EML (E-Cell Model description Language).
-      Although EML is an ideal means of integrating E-Cell with other
+      exchange is XML-based &EML; (E-Cell Model description Language).
+      Although &EML; is an ideal means of integrating E-Cell with other
       software components such as GUI model editors and databases, it
       is very tedious for human users who want to write and edit their
-      models directly by a text editor.  E-Cell Model (EM) is a file
+      models directly by a text editor.  E-Cell Model (&EM;) is a file
       format with programming language-like syntax and a powerful
       embedded <application>empy</application> preprocessor, which is
       designed to be productive and intuitive especially when handled
       by the text editors and other text processing programs such as
       UNIX's <application>grep</application>,
       <application>diff</application> and
-      <application>cat</application>.  Semantics of EM and EML files
+      <application>cat</application>.  Semantics of &EM; and &EML; files
       are almost completely equivalent to each other, and going
       between these two formats is meant to be possible with no loss
       of information (some exceptions are comments and directions to
-      the preprocessor in EM).  The file suffix of EM files must be
+      the preprocessor in &EM;).  The file suffix of &EM; files must be
       ".em".
     </para>
 
     <para>Although <application>E-Cell Modeling
     Environment</application> will provide means of more sophisticate,
-    scalable and automated model construction on the basis of EML,
-    learning syntax and semantics of EM may help you get the idea of
+    scalable and automated model construction on the basis of &EML;,
+    learning syntax and semantics of &EM; may help you get the idea of
     how object model inside &ecell is organized and how it is driven
     to conduct simulations.  Furthermore, owing to the nature of plain
-    programming language-like syntax, EM can be used as a simple and
+    programming language-like syntax, &EM; can be used as a simple and
     intuitive tool to communicate with other &ecell users.</para>
 
 
@@ -54,7 +54,7 @@
     <title>Basic Concepts</title>
 
     <sect2>
-      <title><classname>Entity</classname> Objects for Cell Model Construction</title>
+      <title>&Entity; Objects for Cell Model Construction</title>
       <para></para>
 
     <sect3>
@@ -69,14 +69,14 @@
 
 
     <sect2>
-      <title><classname>Stepper</classname> Objects for Defining Simulation Procedures</title>
+      <title>&Stepper; Objects for Defining Simulation Procedures</title>
 
       <para></para>
     </sect2>
 
 
     <sect2>
-      <title>Properties of <classname>Entity</classname> and <classname>Stepper</classname> objects</title>
+      <title>Properties of &Entity; and &Stepper; objects</title>
 
 
       <para><emphasis>property_value</emphasis> can be one of  (this should be a table, not a list)
@@ -162,19 +162,19 @@ System [ClassName] ( SystemPath )
 
       <itemizedlist>
 	  <listitem>
-	    <para><classname>Stepper</classname></para>
+	    <para>&Stepper;</para>
 	  </listitem>
 
 	  <listitem>
-	    <para><classname>Variable</classname></para>
+	    <para>&Variable;</para>
 	  </listitem>
 
 	  <listitem>
-	    <para><classname>Process</classname></para>
+	    <para>&Process;</para>
 	  </listitem>
 
 	  <listitem>
-	    <para><classname>System</classname></para>
+	    <para>&System;</para>
 	  </listitem>
 	</itemizedlist>
 
@@ -182,7 +182,7 @@ System [ClassName] ( SystemPath )
     </para>
       
       <para><emphasis>ID</emphasis> is
-      <classname>SystemPath</classname> for System definitions, and ID
+      &SystemPath; for &System; definitions, and ID
       string for other <emphasis>ObjectType</emphasis>s</para>
 
 

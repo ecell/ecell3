@@ -40,6 +40,51 @@
   <!ENTITY objectstubs-api SYSTEM "objectstubs-api.xml">
   <!ENTITY ecddatafile-api SYSTEM "ecddatafile-api.xml">
 
+  <!-- other entities -->
+
+  <!ENTITY ECD "<acronym>ECD</acronym>">
+  <!ENTITY EML "<acronym>EML</acronym>">
+  <!ENTITY EM "<acronym>EM</acronym>">
+  <!ENTITY DM "<acronym>DM</acronym>">
+  <!ENTITY ESS "<acronym>ESS</acronym>">
+
+  <!ENTITY Entity "<classname>Entity</classname>">
+  <!ENTITY Polymorph "<classname>Polymorph</classname>">
+  <!ENTITY PolymorphVector "<classname>PolymorphVector</classname>">
+  <!ENTITY Process "<classname>Process</classname>">
+  <!ENTITY PropertySlot "<classname>PropertySlot</classname>">
+  <!ENTITY PropertyInterface "<classname>PropertyInterface</classname>">
+  <!ENTITY System "<classname>System</classname>">
+  <!ENTITY SystemPath "<classname>SystemPath</classname>">
+  <!ENTITY Stepper "<classname>Stepper</classname>">
+  <!ENTITY String "<classname>String</classname>">
+  <!ENTITY Session "<classname>Session</classname>">
+  <!ENTITY SessionManager "<classname>SessionManager</classname>">
+  <!ENTITY Simulator "<classname>Simulator</classname>">
+  <!ENTITY Logger "<classname>Logger</classname>">
+  <!ENTITY ObjectStub "<classname>ObjectStub</classname>">
+  <!ENTITY EntityStub "<classname>EntityStub</classname>">
+  <!ENTITY LoggerStub "<classname>LoggerStub</classname>">
+  <!ENTITY StepperStub "<classname>StepperStub</classname>">
+  <!ENTITY Variable "<classname>Variable</classname>">
+
+  <!ENTITY Osogo "<productname>Osogo Session Monitor</productname>">
+  <!ENTITY Python "<productname>Python</productname>">
+  <!ENTITY NumericPython "<productname>Numeric Python</productname>">
+
+  <!ENTITY tuple "<type>tuple</type>">
+  <!ENTITY string "<type>string</type>">
+  <!ENTITY array "<type>array</type>">
+  <!ENTITY float "<type>float</type>">
+  <!ENTITY int "<type>int</type>">
+  <!ENTITY double "<type>double</type>">
+
+  <!ENTITY ecell3 "<command>ecell3</command>">
+  <!ENTITY ecell3-session "<command>ecell3-session</command>">
+  <!ENTITY ecell3-em2eml "<command>ecell3-em2eml</command>">
+  <!ENTITY ecell3-eml2em "<command>ecell3-eml2em</command>">
+  <!ENTITY gecell "<command>gecell</command>">
+
 ]>
 <!-- 
   This is a GNOME documentation template, designed by the GNOME
@@ -144,9 +189,9 @@
   <!-- chapters -->
   &intro;
   &running;
-  &writing-em;
-  &writing-dm;
-  &writing-ecs;
+  &modeling;
+  &scripting;
+  &dm;
   &stddmlib;
   &inside-ecell;
 

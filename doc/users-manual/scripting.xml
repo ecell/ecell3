@@ -7,44 +7,42 @@
     <para>By reading this chapter, you can get information about the
     following items:
       <simplelist>
-	<member>What is &ecell Session Script (<acronym>ESS</acronym>).</member>
+	<member>What is &ecell Session Script (&ESS;).</member>
 
-	<member>How to run <acronym>ESS</acronym> in scripting mode.</member>
+	<member>How to run &ESS; in scripting mode.</member>
 
-	<member>How to use <acronym>ESS</acronym> in GUI mode.</member>
+	<member>How to use &ESS; in GUI mode.</member>
 
 	<member>How to automate a simulation run by writing an
-          <acronym>ESS</acronym> file.</member>
+          &ESS; file.</member>
 
-        <member>How to write frontend software components for &ecell in <productname>Python</productname>.</member>
+        <member>How to write frontend software components for &ecell in &Python;.</member>
 
       </simplelist>
 </para>
   </highlights>
 
   <sect1>
-    <title>What is &ecell Session Script?</title>
+    <title>What is &ecell; Session Script?</title>
 
     <para>An &ecell Session Script (ESS) is a
-<productname>Python</productname> script which is loaded by a 
-&ecell <classname>Session</classname> object.  A
-<classname>Session</classname> instance represents a single run of a
-simulation.</para>
+&Python; script which is loaded by a &ecell; &Session; object.  A
+&Session; instance represents a single run of a simulation.</para>
 
     <para>An ESS is used to automate a single run of a simulation session.
   A simple simulation run typically involves the following five stages:
 <orderedlist>
 	<listitem>
 	  <para>Loading a model file.</para>
-	  <para>Usually an <acronym>EML</acronym> file is loaded.</para>
+	  <para>Usually an &EML; file is loaded.</para>
 	</listitem>
 	<listitem>
 	  <para>Pre-simulation setup of the simulator.</para> <para>
 	  Simulator and model parameters, such as initial
-	  values of <classname>Variable</classname> objects and
-	  property values of <classname>Process</classname> objects,
+	  values of &Variable; objects and
+	  property values of &Process; objects,
 	  are set and/or altered.  Also, data
-	  <classname>Loggers</classname> may be created in this phase.</para>
+	  &Logger;s may be created in this phase.</para>
 	</listitem>
 	<listitem>
 	  <para>Running simulation.</para>
@@ -54,7 +52,7 @@ simulation.</para>
 	  <para>Post-simulation data processing.</para>
 	  <para>In this phase, the resulting state of the model after
 	  the simulation and the data logged by the
-	  <classname>Logger</classname> objects are examined.  The
+	  &Logger; objects are examined.  The
 	  simulation result may be numerically processed. If
 	  necessary, go back to the previous step and run the
 	  simulation for more seconds.</para>
@@ -75,7 +73,7 @@ simulation.</para>
   <sect1>
     <title>Running &ecell Session Script</title>
 
-    <para>There are three ways to execute <acronym>ESS</acronym>;
+    <para>There are three ways to execute &ESS;;
 
       <itemizedlist>
 	<listitem>
@@ -85,10 +83,10 @@ simulation.</para>
 	</listitem>
 	<listitem>
 	  <para>Load the script from frontend software such as
-	  <productname>Osogo Session Monitor</productname>.</para>
+	  &Osogo;.</para>
 	</listitem>
 	<listitem>
-	  <para>Use <classname>SessionManager</classname> to automate
+	  <para>Use &SessionManager; to automate
 	  the invokation of the simulation sessions itself.  This is
 	  usually used to write mathematical analysis scripts, such as
 	  parameter tuning, which involves multiple runs of the
@@ -99,10 +97,10 @@ simulation.</para>
     </para>
 
     <sect2>
-      <title>Running <acronym>ESS</acronym> in command line mode</title>
+      <title>Running &ESS; in command line mode</title>
 
-      <para>An <acronym>ESS</acronym> can be run by using
-      <command>ecell3-session</command> command either in
+      <para>An &ESS; can be run by using
+      &ecell3-session; command either in
       <emphasis>batch mode</emphasis> or in <emphasis>interactive
       mode</emphasis>.
       </para>
@@ -111,21 +109,21 @@ simulation.</para>
 	<title>Batch mode</title>
 
 	<para>
-	To execute an <acronym>ESS</acronym> file without user
+	To execute an &ESS; file without user
 	interaction, type the following command at the shell prompt:
 
         <screen>
-          <prompt>$</prompt> <userinput><command>ecell3-session</command> <optional>-f model.eml</optional> <optional>-e</optional> <replaceable>ess.py</replaceable>
+          <prompt>$</prompt> <userinput>&ecell3-session; <optional>-f model.eml</optional> <optional>-e</optional> <replaceable>ess.py</replaceable>
           </userinput>
         </screen>
 
-        <command>ecell3-session</command> command creates a simulation
-<classname>Session</classname> object and executes the
-<acronym>ESS</acronym> file <filename>ess.py</filename> on it.  The
+        &ecell3-session; command creates a simulation
+&Session; object and executes the
+&ESS; file <filename>ess.py</filename> on it.  The
 option <optional>-e</optional> can be omitted.  Optionally, if
-<optional>-f model.eml</optional> is given, the <acronym>EML</acronym>
+<optional>-f model.eml</optional> is given, the &EML;
 file <filename>model.eml</filename> is loaded immediately before
-executing the <acronym>ESS</acronym>.
+executing the &ESS;.
       </para>
 
       </sect3>
@@ -133,11 +131,11 @@ executing the <acronym>ESS</acronym>.
       <sect3>
 	<title>Interactive mode</title>
 
-	<para>To run the <command>ecell3-session</command> in
+	<para>To run the &ecell3-session; in
 	interactive mode, invoke the command without an
-	<acronym>ESS</acronym> file.
+	&ESS; file.
 
-        <screen><prompt>$</prompt> <userinput><command>ecell3-session</command> <optional>-f model.eml</optional></userinput>
+        <screen><prompt>$</prompt> <userinput>&ecell3-session; <optional>-f model.eml</optional></userinput>
 ecell3-session [ for E-Cell SE Version 3, on Python Version 2.2.1 ]
 Copyright (C) 1996-2002 Keio University.
 Written by Kouichi Takahashi <email>shafi@e-cell.org</email>
@@ -146,7 +144,7 @@ Written by Kouichi Takahashi <email>shafi@e-cell.org</email>
         
         The banner and the prompt shown here may vary according to the
         version you are using.  If the option <optional>-f model.eml</optional>
-is given, the <acronym>EML</acronym> file <filename>model.eml</filename> is loaded immediately before prompting.
+is given, the &EML; file <filename>model.eml</filename> is loaded immediately before prompting.
 </para>
       </sect3>
 
@@ -155,16 +153,16 @@ is given, the <acronym>EML</acronym> file <filename>model.eml</filename> is load
 
 	<para>Optionally <emphasis>session parameters</emphasis> can
 	be given to the script. Given session parameters can be
-	accessible from the <acronym>ESS</acronym> script as global
+	accessible from the &ESS; script as global
 	variables (see the following section).</para>
 
-	<para>To give the <acronym>ESS</acronym> parameters from the
-	<command>ecell3-session</command> command, use either
+	<para>To give the &ESS; parameters from the
+	&ecell3-session; command, use either
 	<option>-D</option> or <option>--parameters=</option>
 	option.
         <screen>
-          <prompt>$</prompt> <userinput><command>ecell3-session</command> <option>-D</option><replaceable>NAME1</replaceable>=<replaceable>VALUE1</replaceable> <option>-D</option><replaceable>NAME2</replaceable>=<replaceable>VALUE2</replaceable>...</userinput>
-          <prompt>$</prompt> <userinput><command>ecell3-session</command> <option>--parameters="</option>{'<replaceable>NAME1</replaceable>':<replaceable>VALUE1</replaceable>,'<replaceable>NAME2</replaceable>':<replaceable>VALUE2</replaceable>,...}"</userinput>
+          <prompt>$</prompt> <userinput>&ecell3-session; <option>-D</option><replaceable>NAME1</replaceable>=<replaceable>VALUE1</replaceable> <option>-D</option><replaceable>NAME2</replaceable>=<replaceable>VALUE2</replaceable>...</userinput>
+          <prompt>$</prompt> <userinput>&ecell3-session; <option>--parameters="</option>{'<replaceable>NAME1</replaceable>':<replaceable>VALUE1</replaceable>,'<replaceable>NAME2</replaceable>':<replaceable>VALUE2</replaceable>,...}"</userinput>
         </screen>
 Both ways, <option>-D</option> and <option>--parameters</option>, can be mixed.
 </para>
@@ -175,15 +173,15 @@ Both ways, <option>-D</option> and <option>--parameters</option>, can be mixed.
     </sect2>
 
     <sect2>
-      <title>Loading <acronym>ESS</acronym> from Osogo Session Monitor</title>
+      <title>Loading &ESS; from &Osogo;</title>
 
-      <para>To manually load an <acronym>ESS</acronym> file from the GUI, use
+      <para>To manually load an &ESS; file from the GUI, use
       <guimenu>File</guimenu>-><guimenuitem>loadScript</guimenuitem>
       menu button.</para>
 
-      <para><command>gecell</command> command accepts
+      <para>&gecell; command accepts
       <option>-e</option> and <option>-f</option> options in the same way as the
-      <command>ecell3-session</command> command.</para>
+      &ecell3-session; command.</para>
 
     </sect2>
 
@@ -200,8 +198,8 @@ Both ways, <option>-D</option> and <option>--parameters</option>, can be mixed.
   <sect1>
     <title>Writing &ecell Session Script</title>
 
-    <para>The syntax of <acronym>ESS</acronym> is a full set of
-    <productname>Python</productname> language with some convenient
+    <para>The syntax of &ESS; is a full set of
+    &Python; language with some convenient
     features.</para>
 
     <sect2>
@@ -210,19 +208,19 @@ Both ways, <option>-D</option> and <option>--parameters</option>, can be mixed.
       <sect3>
 	<title>General rules</title>
 
-      <para>In <acronym>ESS</acronym>, an instance of
-    <classname>Session</classname> is given, and any methods defined
+      <para>In &ESS;, an instance of
+    &Session; is given, and any methods defined
     in the class can be used as if it is defined in the global namespace.
     </para>
 
 	<para>For example, to run the simulation for 10 seconds, use
     <methodname>run</methodname> method of the
-    <classname>Session</classname> object.
+    &Session; object.
     <informalexample> 
 	  <programlisting>self.run( 10 )</programlisting>
 	</informalexample> 
     where <methodname>self.</methodname> points to the current
-    <classname>Session</classname> object given by the
+    &Session; object given by the
     system. Alternatively, you can use <varname>theSession</varname> 
     in place of the <varname>self</varname>.
     <informalexample> 
@@ -230,9 +228,9 @@ Both ways, <option>-D</option> and <option>--parameters</option>, can be mixed.
 	</informalexample> 
     </para>
 
-    <para>Unlike usual <productname>Python</productname> script, you
+    <para>Unlike usual &Python; script, you
     can omit the object on which the method is called if the method is for
-    the current <classname>Session</classname>.
+    the current &Session;.
     <informalexample>
 	<programlisting>run( 10 )</programlisting>
     </informalexample>
@@ -245,8 +243,8 @@ Both ways, <option>-D</option> and <option>--parameters</option>, can be mixed.
 	<title>Loading a model</title>
 
       <para>Let's try this in the interactive mode of the
-      <command>ecell3-session</command> command.  On the prompt of the
-      command, load an <acronym>EML</acronym> file by using
+      &ecell3-session; command.  On the prompt of the
+      command, load an &EML; file by using
       <methodname>loadModel</methodname>() method.
 
       <informalexample>
@@ -282,7 +280,7 @@ Both ways, <option>-D</option> and <option>--parameters</option>, can be mixed.
 
 	<note>
 	  <para>In above example you may notice that the first
-	  call of <methodname>step</methodname>() doesn't cause the
+	  call of <methodname>step</methodname>() does not cause the
 	  time to change.  The simulator updates the time at the
 	  beginning of the step, and calculates a tentative step size
 	  after that.  The initial value of the step size is zero.
@@ -348,14 +346,14 @@ Both ways, <option>-D</option> and <option>--parameters</option>, can be mixed.
 
 
       <sect3>
-	<title>An example of using <classname>Session</classname> methods</title>
+	<title>An example of using &Session; methods</title>
 
 	<para>Here is a tiny example of using
-	<classname>Session</classname> methods which loads a model,
+	&Session; methods which loads a model,
 	run a hundred seconds, and print a short message.
 
 <example>
-	    <title>A simple <acronym>ESS</acronym> example.</title>
+	    <title>A simple &ESS; example.</title>
 	    
 	    <programlisting linenumbering="numbered">loadModel( 'simple.eml' )
 run( 100 )
@@ -408,53 +406,53 @@ else:
 
 
     <sect2>
-      <title>Observing and Manipulating the Model with <classname>ObjectStub</classname>s</title>
+      <title>Observing and Manipulating the Model with &ObjectStub;s</title>
 
       <sect3>
-	<title>What is <classname>ObjectStub</classname>?</title>
+	<title>What is &ObjectStub;?</title>
 
-	<para><classname>ObjectStub</classname> is a proxy object in
+	<para>&ObjectStub; is a proxy object in
 	the frontend side of the system which corresponds to an
 	internal object in the simulator.  Any operations on the simulator's
 	internal objects should be done via the
-	<classname>ObjectStub</classname>.</para>
+	&ObjectStub;.</para>
 
 
 	<para>There are three types of
-	<classname>ObjectStub</classname>:
+	&ObjectStub;:
 <itemizedlist>
 	    <listitem>
-	      <para><classname>EntityStub</classname></para>
+	      <para>&EntityStub;</para>
 	    </listitem>
 	    <listitem>
-	      <para><classname>StepperStub</classname></para>
+	      <para>&StepperStub;</para>
 	    </listitem>
 	    <listitem>
-	      <para><classname>LoggerStub</classname></para>
+	      <para>&LoggerStub;</para>
 	    </listitem>
 	  </itemizedlist>
 
 	each correspond to
-	<classname>Entity</classname>, <classname>Stepper</classname>,
-	and <classname>Logger</classname> classes in the simulator,
+	&Entity;, &Stepper;,
+	and &Logger; classes in the simulator,
 	respectively.</para>
 
       </sect3>
 
 
       <sect3>
-	<title>Why <classname>ObjectStub</classname> is needed</title>
+	<title>Why &ObjectStub; is needed</title>
 
 
-	<para><classname>ObjectStub</classname> classes are actually
+	<para>&ObjectStub; classes are actually
 	thin wrappers over the
 	<classname>ecell.ecs.Simulator</classname> class of the E-Cell
 	Python Library, which provides object-oriented appearance to
 	the flat API of the class.  Although
-	<classname>Simulator</classname> object can be accessed
+	&Simulator; object can be accessed
 	directly via <varname>theSimulator</varname> property of
-	<classname>Session</classname> class, use of
-	<classname>ObjectStub</classname> is encouraged.</para>
+	&Session; class, use of
+	&ObjectStub; is encouraged.</para>
 
 	<para>This backend / frontend isolation is needed because
         lifetimes of backend objects are not the same as frontend
@@ -471,15 +469,15 @@ else:
 
 
       <sect3>
-	<title>Creating an <classname>ObjectStub</classname> from ID</title>
+	<title>Creating an &ObjectStub; from ID</title>
 
-	<para>To get an <classname>ObjectStub</classname> object,
+	<para>To get an &ObjectStub; object,
 	<methodname>createEntityStub</methodname>(),
 	<methodname>createStepperStub</methodname>(), and
 	<methodname>createLoggerStub</methodname>() methods of
-	<classname>Session</classname> class are used.</para>
+	&Session; class are used.</para>
 
-	<para>For example, to get an <classname>EntityStub</classname>,
+	<para>For example, to get an &EntityStub;,
 	call the <methodname>createEntityStub</methodname>() method
 	with a <emphasis>FullID</emphasis> string:</para>
 
@@ -487,8 +485,8 @@ else:
 	  <programlisting><varname>anADPStub</varname> = createEntityStub( <replaceable>'Variable:/CELL/MT1:ADP'</replaceable> )</programlisting>
 	</informalexample>
 
-	<para>Similarly, a <classname>StepperStub</classname> object
-	and a <classname>LoggerStub</classname> object can be retrieved
+	<para>Similarly, a &StepperStub; object
+	and a &LoggerStub; object can be retrieved
 	with a <emphasis>StepperID</emphasis> and a
 	<emphasis>FullPN</emphasis>, respectively.</para>
 
@@ -505,17 +503,17 @@ else:
       <sect3>
 	<title>Creating and checking existence of a backend object</title>
 
-	<para>Creating an <classname>ObjectStub</classname> doesn't
+	<para>Creating an &ObjectStub; does not
 	necessarily mean a corresponding object in the backend exists, or is
 	created.  In other words, creation of the
-	<classname>ObjectStub</classname> is purely a frontend
+	&ObjectStub; is purely a frontend
 	operation.  After creating an
-	<classname>ObjectStub</classname>, you may want to check if
+	&ObjectStub;, you may want to check if
 	the corresponding backend object exists, and/or to command the
 	backend to create the backend object.</para>
 
 	<para>To check if a corresponding object to an
-	<classname>ObjectStub</classname> exists in the simulator, use
+	&ObjectStub; exists in the simulator, use
 	<methodname>isExist</methodname>() method.  For example, the
 	following if statement checks if a Stepper whose ID is
 	<literal>STEPPER_01</literal> exists:
@@ -524,7 +522,7 @@ else:
 if aStepperStub.isExist():
     # it already exists
 else:
-    # it isn't created yet</programlisting>
+    # it is not created yet</programlisting>
 	  </informalexample>
 	</para>
 
@@ -538,18 +536,18 @@ else:
       </sect3>
 
       <sect3>
-	<title>Getting the name and a class name from an <classname>ObjectStub</classname></title>
+	<title>Getting the name and a class name from an &ObjectStub;</title>
 
 	<para>To get the name (or an ID) of an
-	<classname>ObjectStub</classname>, use
+	&ObjectStub;, use
 	<methodname>getName</methodname>() method.</para>
 
 	<para>To get the class name of an
-	<classname>EntityStub</classname> or a
-	<classname>StepperStub</classname>, call
+	&EntityStub; or a
+	&StepperStub;, call
 	<methodname>getClassName</methodname>() method.  This
 	operation is not applicable to
-	<classname>LoggerStub</classname>.</para>
+	&LoggerStub;.</para>
 
       </sect3>
 
@@ -559,16 +557,16 @@ else:
 	<title>Setting and getting properties</title>
 
 	<para>As described in the previous chapters,
-	<classname>Entity</classname> and
-	<classname>Stepper</classname> objects has
+	&Entity; and
+	&Stepper; objects has
 	<emphasis>properties</emphasis>.  This section describes how
 	to access the object properties via
-	<classname>ObjectStub</classname>s.  This section is not
-	applicable to <classname>LoggerStub</classname>s.</para>
+	&ObjectStub;s.  This section is not
+	applicable to &LoggerStub;s.</para>
 
 	<para>To get a property value from a backend object by using
-	an <classname>EntityStub</classname> or a
-	<classname>StepperStub</classname>, invoke
+	an &EntityStub; or a
+	&StepperStub;, invoke
 	<methodname>getProperty</methodname>() method or access an
 	object attribute with a
 	property name:
@@ -580,8 +578,8 @@ or equivalently,
 	  </informalexample></para>
 
 	<para>To set a new property value to an
-	<classname>Entity</classname> or a
-	<classname>Stepper</classname>, call
+	&Entity; or a
+	&Stepper;, call
 	<methodname>setProperty</methodname>() method or mutate an
 	object attribute with a	property name and the new value:
 <informalexample>
@@ -596,7 +594,7 @@ or equivalently,
 	<para>List of all the properties can be gotten by using
 	<methodname>getPropertyList</methodname> method, which returns
 	a list of property names as a Python
-	<type>tuple</type> containing string objects.
+	&tuple; containing string objects.
 <informalexample>
 	    <programlisting>aStub.getPropertyList()</programlisting>
 	  </informalexample>
@@ -606,7 +604,7 @@ or equivalently,
 	(accessible) or <emphasis>setable</emphasis> (mutable), call
 	<methodname>getPropertyAttribute</methodname>() with the name
 	of the property.  The method returns a Python
-	<type>tuple</type> whose first element is true if the property
+	&tuple; whose first element is true if the property
 	is setable, and the second element is true if it is getable.
 	Attempts to get a value from an inaccessible property and to
 	set a value to a immutable property result in
@@ -620,9 +618,9 @@ aStub.getPropertyAttribute( 'Activity' )[1] <lineannotation># <constant>true</co
       </sect3>
 
       <sect3>
-	<title>Getting <classname>Logger</classname> data</title>
+	<title>Getting &Logger; data</title>
 
-	<para>To get logged data from a <classname>LoggerStub</classname>,
+	<para>To get logged data from a &LoggerStub;,
  use <methodname>getData</methodname>() method.</para>
 
 	<para><methodname>getData</methodname>() method has three forms according to requested range and time resolution of the data:
@@ -653,8 +651,7 @@ aStub.getPropertyAttribute( 'Activity' )[1] <lineannotation># <constant>true</co
 	    </listitem>
 	  </itemizedlist>
 	<methodname>getData</methodname>() method returns a rank-2 (matrix)
-	<classname>array</classname> object of <productname>Numeric
-	Python</productname> module.  The <type>array</type> has
+	&array; object of &NumericPython; module.  The &array; has
 	either one of the following forms:
 <informalexample>
 	    <programlisting>[ [ time value average min max ]
@@ -702,38 +699,38 @@ the logged data before getting data, use
 <methodname>getStartTime</methodname>(),
 <methodname>getEndTime</methodname>(), and
 <methodname>getSize</methodname>() methods of
-<classname>LoggerStub</classname>.  <methodname>getSize</methodname>() returns the number of data points stored in the <classname>Logger</classname>.</para>
+&LoggerStub;.  <methodname>getSize</methodname>() returns the number of data points stored in the &Logger;.</para>
 
 
       </sect3>
 
       <sect3>
 	<title>Getting and changing logging interval</title>
-	<para>Logging interval of a <classname>Logger</classname> can
+	<para>Logging interval of a &Logger; can
 	be checked and changed by using
 	<methodname>getMinimumInterval</methodname>() and
 	<methodname>setMinimumInterval</methodname>(
 	<parameter>interval</parameter> ) methods of
-	<classname>LoggerStub</classname>.
+	&LoggerStub;.
 	<parameter>interval</parameter> must be a zero or positive
 	number in second.  If <parameter>interval</parameter> is a non-zero
-	positive number, the <classname>Logger</classname> skips
+	positive number, the &Logger; skips
 	logging if a simulation step occurs before
 	<parameter>interval</parameter> second past the last logging
 	time point.  If <parameter>interval</parameter> is zero, the
-	<classname>Logger</classname> logs at every simulation step.</para>
+	&Logger; logs at every simulation step.</para>
       </sect3>
 
       <sect3>
-	<title>An Example usage of an <classname>EntityStub</classname></title>
+	<title>An Example usage of an &EntityStub;</title>
 
 	<para>The following example loads an EML file, and prints the
-	value of ATP <classname>Variable</classname> in
-	<classname>System</classname> <constant>/CELL</constant> every
+	value of ATP &Variable; in
+	&System; <constant>/CELL</constant> every
 	10 seconds.  If the value is below 1000, it stops the simulation.
 </para>
 	<example>
-	  <title>An <acronym>ESS</acronym> to check ATP level every 10 seconds</title>
+	  <title>An &ESS; to check ATP level every 10 seconds</title>
 	  
 	  <programlisting linenumbering="numbered">loadModel( 'simple.eml' )
 
@@ -762,22 +759,22 @@ message( 'Stopped at %s.' % getCurrentTime() )
       <title>Handling Data Files</title>
 
       <sect3>
-	<title>About <acronym>ECD</acronym> file</title>
+	<title>About &ECD; file</title>
 
-	<para>&ecell SE uses <acronym>ECD</acronym> (E-Cell Data) file
-format to store simulation results. <acronym>ECD</acronym> is a plain
+	<para>&ecell SE uses &ECD; (E-Cell Data) file
+format to store simulation results. &ECD; is a plain
 text file, and easily handled by user-written and third-party data
 processing and plotting software such as
 <productname>gnuplot</productname>.</para>
 
-	<para>An <acronym>ECD</acronym> file can store a matrix of
+	<para>An &ECD; file can store a matrix of
 	floating-point numbers.</para>
 
 	<para><classname>ecell.ECDDataFile</classname> class can be
-used to save and load <acronym>ECD</acronym> files.  A
+used to save and load &ECD; files.  A
 <classname>ECDDataFile</classname> object takes and returns a rank-2
-<type>array</type> of <productname>NumericPython</productname>.  A
-'rank-2' <type>array</type> is a matrix, which means that
+&array; of &NumericPython;.  A
+'rank-2' &array; is a matrix, which means that
 <methodname>Numeric.rank( ARRAY )</methodname> and <methodname>len(
 Numeric.shape( ARRAY ) )</methodname> returns
 '<constant>2</constant>'.</para>
@@ -787,7 +784,7 @@ Numeric.shape( ARRAY ) )</methodname> returns
       <sect3>
 	<title>Saving and loading data</title>
 	
-	<para>To save data to an <acronym>ECD</acronym> file, say,
+	<para>To save data to an &ECD; file, say,
 	<filename>datafile.ecd</filename>, instantiate an
 	<classname>ECDDataFile</classname> object and use
 	<methodname>save</methodname>() method.
@@ -797,8 +794,8 @@ aDataFile = ecell.ECDDataFile( DATA )
 aDataFile.save( 'datafile.ecd' )
 </programlisting>
 	  </informalexample>
-          here <varname>DATA</varname> is a rank-2 <type>array</type>
-          of <productname>Numeric Python</productname> or an
+          here <varname>DATA</varname> is a rank-2 &array;
+          of &NumericPython; or an
           equivalent object.  The data can also be set by using
           <methodname>setData</methodname>() method after the
           instantiation.  If the data is already set, it is replaced.
@@ -809,20 +806,20 @@ aDataFile.save( 'datafile.ecd' )
 
  </para>
 
-	<para>Loading the <acronym>ECD</acronym> file is also straightforward.
+	<para>Loading the &ECD; file is also straightforward.
 <informalexample>
 	    <programlisting>aDataFile = ecell.ECDDataFile()
 aDataFile.load( 'datafile.ecd' )
 DATA = aDataFile.getData()</programlisting>
 	  </informalexample>
-The <methodname>getData</methodname>() method extracts the data from the <classname>ECDDataFile</classname> object as an <type>array</type>.
+The <methodname>getData</methodname>() method extracts the data from the <classname>ECDDataFile</classname> object as an &array;.
 </para>
 
       </sect3>
 
       <sect3>
-	<title><acronym>ECD</acronym> header information</title>
-	<para>In addition to the data itself, an <acronym>ECD</acronym> file can hold some information in its header.
+	<title>&ECD; header information</title>
+	<para>In addition to the data itself, an &ECD; file can hold some information in its header.
 <itemizedlist>
 	    <listitem>
 	      <para>Data name</para>
@@ -834,7 +831,7 @@ The <methodname>getData</methodname>() method extracts the data from the <classn
 	      <parameter>labels</parameter> ) and
 	      <methodname>getLabel</methodname>() methods.  These
 	      methods takes and returns a
-	      <productname>Python</productname> <type>tuple</type>,
+	      &Python; &tuple;,
 	      and stored in the file as a space-separated list. The default value of this field is: <constant>( 't', 'value', 'avg', 'min', 'max' )</constant>.</para>
 	    </listitem>
 	    <listitem>
@@ -867,20 +864,20 @@ ends with <constant>'#----...'</constant>.
       </sect3>
 
       <sect3>
-	<title>Using <acronym>ECD</acronym> outside &ecell SE</title>
+	<title>Using &ECD; outside &ecell SE</title>
 
-	<para>For most cases <productname>Numeric Python</productname>
+	<para>For most cases &NumericPython;
 	will offer any necessary functionality for scientific data
 	processing.  However, using some external software can enhance
 	the usability.</para>
 
-	<para><acronym>ECD</acronym> files can be used as input to any
+	<para>&ECD; files can be used as input to any
 	software which supports white space-separated text format, and
 	treats lines with heading sharps (#) as comments.</para>
 
 	<para><productname>GNU gnuplot</productname> is a scientific
 	presentation-quality plotting software with a sophisticated
-	interactive command system.  To plot an <acronym>ECD</acronym>
+	interactive command system.  To plot an &ECD;
 	file from <productname>gnuplot</productname>, just use
 	<command>plot</command> command. For example, this draws a
 	time-value 2D-graph:
@@ -894,7 +891,7 @@ ends with <constant>'#----...'</constant>.
 </screen>
 	  </informalexample>
 </para>
-	<para>Another OpenSource software useful for data processing is GNU <productname>Octave</productname>.  Loading an <acronym>ECD</acronym> from <productname>Octave</productname> is also simplest.
+	<para>Another OpenSource software useful for data processing is GNU <productname>Octave</productname>.  Loading an &ECD; from <productname>Octave</productname> is also simplest.
 <informalexample>
 	    <screen><prompt>octave:1></prompt> <userinput>load datafile.ecd</userinput></screen>
 	  </informalexample>
@@ -930,8 +927,8 @@ Now the data is stored in a matrix variable with the same name as the file witho
 	the C++ backend library
 	(libecs) as a string. <methodname>getLibECSVersionInfo</methodname>()
 	method of the module gives the version as a
-	<productname>Python</productname> <type>tuple</type>.  The
-	<type>tuple</type> contains three numbers in this order: (
+	&Python; &tuple;.  The
+	&tuple; contains three numbers in this order: (
 	<parameter>MAJOR_VERSION</parameter>,
 	<parameter>MINOR_VERSION</parameter>,
 	<parameter>MICRO_VERSION</parameter> )</para>
@@ -948,9 +945,9 @@ Now the data is stored in a matrix variable with the same name as the file witho
       </sect3>
 
       <sect3>
-	<title><acronym>DM</acronym> loading-related methods</title>
+	<title>&DM; loading-related methods</title>
 
-	<para>The search path of <acronym>DM</acronym> files can be
+	<para>The search path of &DM; files can be
 	specified and retrieved by using
 	<methodname>setDMSearchPath</methodname>() and
 	<methodname>getDMSearchPath</methodname>() methods.  These
@@ -958,7 +955,7 @@ Now the data is stored in a matrix variable with the same name as the file witho
 	directory names.  The search path can also be specified by
 	using <envar>ECELL3_DM_PATH</envar> environment
 	variable. See the previous section for more about
-	<acronym>DM</acronym>search path.</para>
+	&DM;search path.</para>
 
 	<informalexample>
 	  <screen><prompt>ecell3-session>>> </prompt><userinput>import ecell</userinput>
@@ -969,21 +966,21 @@ Now the data is stored in a matrix variable with the same name as the file witho
 	</informalexample>
 
 	<para>A list of built-in and already loaded
-	<acronym>DM</acronym> classes can be gotten with
+	&DM; classes can be gotten with
 	<methodname>getDMInfo</methodname>() method of
 	<classname>ecell.ecs.Simulator</classname> class.  The
-	<classname>Simulator</classname> instance is available to
-	<classname>Session</classname> as
+	&Simulator; instance is available to
+	&Session; as
 	<varname>theSimulator</varname> variable.  The method returns
-	a nested <productname>Python</productname> <type>tuple</type>
+	a nested &Python; &tuple;
 	in the form of ( ( TYPE1, CLASSNAME1, PATH1 ), ( TYPE2,
 	CLASSNAME2, PATH2 ), ... ).  TYPE is one of
 	<constant>'Process'</constant>,
 	<constant>'Variable'</constant>,
 	<constant>'System'</constant>, or
 	<constant>'Stepper'</constant>.  CLASSNAME is the class name
-	of the <acronym>DM</acronym>.  PATH is the directory from
-	which the <acronym>DM</acronym> is loaded.  PATH is an empty
+	of the &DM;.  PATH is the directory from
+	which the &DM; is loaded.  PATH is an empty
 	string (<constant>''</constant>) if it is a built-in class.</para>
 
 	<informalexample>
@@ -1006,29 +1003,29 @@ Now the data is stored in a matrix variable with the same name as the file witho
     <title>Advanced Topics</title>
 
     <sect2>
-      <title>How <command>ecell3-session</command> runs</title>
+      <title>How &ecell3-session; runs</title>
 
-      <para><command>ecell3-session</command> command runs on
-	<command>ecell3</command> interpreter command.
-	<command>ecell3</command> command is a thin wrapper to the
-	<productname>Python</productname> interpreter.
-	<command>ecell3</command> command simply invokes a
-	<productname>Python</productname> interpreter command
+      <para>&ecell3-session; command runs on
+	&ecell3; interpreter command.
+	&ecell3; command is a thin wrapper to the
+	&Python; interpreter.
+	&ecell3; command simply invokes a
+	&Python; interpreter command
 	specified at compile time.  Before executing
-	<productname>Python</productname>, <command>ecell3</command>
+	&Python;, &ecell3;
 	sets some environment variables to ensure that it can find
-	necessary &ecell <productname>Python</productname> extension
-	modules and the Standard <acronym>DM</acronym> Library. 
+	necessary &ecell &Python; extension
+	modules and the Standard &DM; Library. 
 	After processing the commandline options,
-	<command>ecell3-session</command> command creates an
+	&ecell3-session; command creates an
 	<classname>ecell.ecs.Simulator</classname> object, and then
 	instantiate a <classname>ecell.Session</classname> object for
 	the simulator object.  </para>
 
-      <para>Thus basically <command>ecell3</command> is just a
-	<productname>Python</productname> interpreter, and frontend
+      <para>Thus basically &ecell3; is just a
+	&Python; interpreter, and frontend
 	components to &ecell SE should run on this command.  To use
-	the &ecell Python Library from <command>ecell3</command>
+	the &ecell Python Library from &ecell3;
 	command, use <programlisting>import ecell</programlisting>
 	statement from the prompt:
 <informalexample>
@@ -1055,8 +1052,8 @@ import ecell
       <title>Getting information about execution environment</title>
 
       <para>To get the current configuration of
-	<command>ecell3</command> command, invoke
-	<command>ecell3</command> command with a
+	&ecell3; command, invoke
+	&ecell3; command with a
 	<parameter>-h</parameter> option. This will print values of
 	some variables as well as usage of the command.
 <informalexample>
@@ -1079,21 +1076,21 @@ Configurations:
 </computeroutput></screen>
 	</informalexample>
 The '<computeroutput>PYTHON =</computeroutput>' line gives the path of the
-<productname>Python</productname> interpreter to be used.
+&Python; interpreter to be used.
 </para>
     </sect2>
 
     <sect2>
       <title>Debugging</title>
 
-      <para>To invoke <command>ecell3</command> command in debugging
+      <para>To invoke &ecell3; command in debugging
 	mode, set <envar>ECELL_DEBUG</envar> environment variable.
 	This runs the command on a debugger software.  If found,
 	<productname>GNU gdb</productname> is used as the
 	debugger. <envar>ECELL_DEBUG</envar> can be used for any
-	commands run on <command>ecell3</command>, including
-	<command>ecell3-session</command> and
-	<command>gecell</command>.  For example, to run <command>ecell3-session</command> in debug mode on the shell prompt:
+	commands run on &ecell3;, including
+	&ecell3-session; and
+	&gecell;.  For example, to run &ecell3-session; in debug mode on the shell prompt:
 <informalexample>
 	  <screen><prompt>$ </prompt><userinput>ECELL_DEBUG=1 ecell3-session -f foo.eml</userinput>
 <computeroutput>gdb --command=/tmp/ecell3.0mlQyE /usr/bin/python
@@ -1127,7 +1124,7 @@ It automatically runs the program with the commandline options with '<parameter>
       <para><envar>ECELL_DEBUG</envar> runs
 	<productname>gdb</productname>, which is for debugging at the
 	level of lower level C++ code.  See
-	<productname>Python</productname> Library Reference Manual for
+	&Python; Library Reference Manual for
 	<productname>Python Debugger</productname>.</para>
     </sect2>
 
@@ -1135,14 +1132,14 @@ It automatically runs the program with the commandline options with '<parameter>
     <sect2>
       <title>Profiling</title>
 
-      <para>It is possible to run <command>ecell3</command> command
+      <para>It is possible to run &ecell3; command
 	in profiling mode, if the operating system has
 	<productname>GNU sprof</productname> command, and its C
 	library supports <envar>LD_PROFILE</envar> environmental
 	variable.  Currently it only supports per-shared object
 	profiling. (See GNU C Library Reference Manual)</para>
 
-      <para>To run <command>ecell3</command> in profiling mode, set
+      <para>To run &ecell3; in profiling mode, set
 	<envar>ECELL_PROFILE</envar> environment variable to
 	<emphasis>SONAME</emphasis> of the shared object.  SONAME of
 	a shared object file can be found by using
@@ -1180,9 +1177,9 @@ It automatically runs the program with the commandline options with '<parameter>
 
 
     <sect2>
-      <title>Method List of <classname>Session</classname> Class</title>
+      <title>Method List of &Session; Class</title>
 
-      <para>Methods of <classname>Session</classname> class has
+      <para>Methods of &Session; class has
       the following five groups.</para>
 
       <itemizedlist>
@@ -1210,20 +1207,20 @@ It automatically runs the program with the commandline options with '<parameter>
     </sect2>
 
     <sect2>
-      <title>Method List of <classname>ObjectStub</classname> Classes</title>
+      <title>Method List of &ObjectStub; Classes</title>
 
 
-      <para>There are three subclasses of <classname>ObjectStub</classname>
+      <para>There are three subclasses of &ObjectStub;
 </para>
       <itemizedlist>
 	<listitem>
-	  <para><classname>EntityStub</classname></para>
+	  <para>&EntityStub;</para>
 	</listitem>
 	<listitem>
-	  <para><classname>StepperStub</classname></para>
+	  <para>&StepperStub;</para>
 	</listitem>
 	<listitem>
-	  <para><classname>LoggerStub</classname></para>
+	  <para>&LoggerStub;</para>
 	</listitem>
       </itemizedlist>
 
