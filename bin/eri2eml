@@ -5,6 +5,7 @@
 
 import sys
 import string
+import re
 import os
 import time
 import getopt
@@ -22,10 +23,20 @@ from ecell.eml import *
 #        asystemID = aPathToSystem + '/' +aSystemSimpleID
 #    return aSystemID
 
+
+def appendUnderScore( aString ):
+    if ( re.match( r'^[0-9]', aString ) != None ):
+        return '_' + aString
+    else:
+        return aString
+
+
 def replaceProhibitLetter( aString ):
     firstChecked = string.replace( aString, '-', '_' )
-    replacedString = string.replace(firstChecked , '.', '_' )
-    return replacedString
+    secondChecked = string.replace( firstChecked, '+', '_')
+    thirdChecked = string.replace( secondChecked, '.', '_')
+    replacedString = string.replace(firstChecked , '!', '_' )    
+    return appendUnderScore( replacedString )
 
 
 if __name__ == '__main__':
@@ -124,6 +135,7 @@ Options:
     anEml = Eml()
 
     anEml.createStepper( 'Euler1Stepper', 'SRM_01')
+#    print  replaceProhibitLetter("1,2testtest")
 
     for anEriLine in anEriStrings:
         if ( anEriLine[0] == 'SYSTEM' ):
