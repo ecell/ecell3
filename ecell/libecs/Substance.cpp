@@ -89,7 +89,8 @@ namespace libecs
 		  createPropertySlot( "Velocity",*this,
 				      Type2Type<Real>(),
 				      &PlainSubstance::addVelocity,
-				      &PlainSubstance::getVelocity ) );
+				      &PlainSubstance::getVelocity,
+				      &PlainSubstance::addProxyInput ) );
 
 
     registerSlot( getPropertySlotMaker()->
@@ -214,14 +215,7 @@ namespace libecs
 	setAccumulatorClass( SYSTEM_DEFAULT_ACCUMULATOR_NAME );
       }
 
-    // if the user default is invalid fall back to the system default.
-    if( theAccumulator == NULLPTR )  
-      {               
-	setAccumulatorClass( SYSTEM_DEFAULT_ACCUMULATOR_NAME );
-      }
-
     theAccumulator->update();
-    
   }
 
 
