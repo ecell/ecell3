@@ -10,7 +10,7 @@ class MessageWindow(Window):
         self.printMessage('')
 
     def printMessage( self, aMessageString ):
-        self["message_text_box"].insert_text( aMessageString )
+        self["message_text_box"].insert_defaults( aMessageString )
 
 def mainLoop():
     gtk.mainloop()
