@@ -2,14 +2,20 @@
 
 import string
 import eml
-import sys        
+import sys
+import os
 
 from Numeric import *
+import ecell.Session
+import ecell.ecs
 
-from os import *
-from ecell.ecssupport import *
-from ecell.DataFileManager import *
-from ecell.ECDDataFile import *
+import ecell.ecssupport
+import ecell.DataFileManager
+import ecell.ECDDataFile
+
+from ecell.FullID import *
+from ecell.util import *
+from ecell.ECS import *
 
 class Session:
 
@@ -34,21 +40,31 @@ class Session:
             for i in range(num):
                 self.theSimulator.step()
 
+    def initialize( self ):
+        self.theSimulator.initialize()
+
     def createLogger( self,fullpn ):
-        self.theSimulator.createLogger( fullpn )
+        self.theSimulator.getLogger( fullpn )
+
+    def getLogger( self, fullpn ):
+        return self.theSimulator.getLogger( fullpn )
 
     def getLoggerList( self ):
         return self.theSimulator.getLoggerList()
 
-    def saveLoggerData( self, aFullPNString='', aStartTime=-1, aEndTime=-1, aInterval=-1, aSaveDirectory='./'):
+    def saveLoggerData( self, aFullPNString='', aStartTime=-1, aEndTime=-1, aInterval=-1, aSaveDirectory='./Data'):
 
+        try:
+            os.mkdir( aSaveDirectory )
         # creates instance datafilemanager
-        aDataFileManager = DataFileManager()
+        except:
+            print "\'" + aSaveDirectory + "\'" + " file exists."
+        aDataFileManager = ecell.DataFileManager.DataFileManager()
 
         # sets root directory to datafilemanager
         aDataFileManager.setRootDirectory(aSaveDirectory)
 
-        aFileIndex=0
+        aFileIndex = 0
 
         if aFullPNString=='':
             aLoggerNameList = self.getLoggerList()
@@ -56,6 +72,7 @@ class Session:
             aLoggerNameList = aFullPNString 
 
         try:#(1)
+            
             for aFullPNString in aLoggerNameList:
 
                 # ---------------------------------------------\----
@@ -63,9 +80,9 @@ class Session:
                 # from [Substance:/CELL/CYTOPLASM:E:Quantity]
                 # to   [CYTOPLASM-E-Quantity]
                 # ---------------------------------------------\----
-                aFileName=split(join(split(aFullPNString,':')[1:],'-'),'/')[-1]
+                aFileName=string.split(string.join(string.split(aFullPNString,':')[1:],'-'),'/')[-1]
                 
-                aECDDataFile = ECDDataFile()
+                aECDDataFile = ecell.ECDDataFile.ECDDataFile()
                 aECDDataFile.setFileName(aFileName)
                 aLogger = self.getLogger( aFullPNString )
                 
@@ -103,14 +120,14 @@ class Session:
         except:#(1)
             
             import sys
-            self.__plainPrintMethod( __name__ )
+            ## self.__plainPrintMethod( __name__ )
             self.__plainPrintMethod( sys.exc_traceback )
             aErrorMessage= "Error : could not save [%s] " %aFullPNString
             self.__plainPrintMethod( aErrorMessage )
             return None
 
         aDataFileManager.saveAll()         
-
+        print "All files are saved."
 
     def setPendingEventChecker( self, event ):
 
@@ -202,11 +219,11 @@ class Session:
         
         for aStepperProperty in aStepperPropertyList:
 
-            self.theSimulator.setEntityProperty( str( aStepperProperty[ 'FullPn' ] ), \
+            self.theSimulator.setProperty( str( aStepperProperty[ 'FullPn' ] ), \
                                            aStepperProperty[ 'StepperId' ] )
 
             ## Debug for Output -----------------------------------------------------------
-            #script = "self.theSimulator.setEntityProperty( '" + aStepperProperty[ 'FullPn' ] + "', " +\
+            #script = "self.theSimulator.setProperty( '" + aStepperProperty[ 'FullPn' ] + "', " +\
             #         str( aStepperProperty[ 'StepperId' ] ) + ')'
             #print script
             ##=============================================================================        
@@ -214,41 +231,19 @@ class Session:
 
 
     def __loadProperty( self ):
-        aPropertyList = self.theEml.getEntityPropertyList()
+        aPropertyList = self.theEml.getPropertyList()
         
         for aProperty in aPropertyList:
 
-            self.theSimulator.setEntityProperty( aProperty[ 'FullPn' ], \
+            self.theSimulator.setProperty( aProperty[ 'FullPn' ], \
                                            aProperty[ 'ValueList' ] )
 
             ## Debug for Output -----------------------------------------------------------
-            #script = "self.theSimulator.setEntityProperty( '" +str( aProperty[ 'FullPn' ] ) + "', " + \
+            #script = "self.theSimulator.setProperty( '" +str( aProperty[ 'FullPn' ] ) + "', " + \
             #         str( aProperty[ 'ValueList' ] ) + ')'
             #
             #print script
             ##=============================================================================
 
-
-
-
-
 if __name__ == "__main__":
-
-    import ecs
-
-    aSession = Session( ecs.Simulator() )
-    aSimulator = aSession.theSimulator
-    anEmlFileName = sys.argv[1]
-    anEcsFileName = sys.argv[2]
-
-    aFile = open( anEmlFileName )
-    
-    aSession.loadModel( aFile )
-    aFile.close()
-    
-    aSession.loadScript( anEcsFileName )
-
-
-
-
-
+    pass
