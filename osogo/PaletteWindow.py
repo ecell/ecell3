@@ -20,27 +20,36 @@ class PaletteWindow(GtkWindow):
 
             if re.search( '\.py$', aFileName ):
                 aModuleName = string.replace( aFileName, '.py', '' )
+                aButtonName = string.replace( aModuleName, 'Window', '' )
+                aPluginNameList.append( aModuleName )
+
+                aPixMap = GtkPixmap( self, "plugins/" + aModuleName + '.xpm' )
 
                 if aIndicator == 0:
                     aIndicator = 1
-
-                    aFirstButton = GtkRadioButton( label = aModuleName )
-                    aToolbar.append_widget( aFirstButton, '', '' )
-                    aPluginNameList.append( aModuleName )
+                    aFirstButtonObj = GtkRadioButton()
+                    aFirstButton = \
+                            aToolbar.append_element( TOOLBAR_CHILD_RADIOBUTTON,
+                                                 aFirstButtonObj, aButtonName,
+                                                 '', '', aPixMap, None )
                     self.set_data( aModuleName, aFirstButton )
-
                 else :
-                    aButton = GtkRadioButton( aFirstButton, label = aModuleName )
-                    aToolbar.append_widget( aButton, '', '' )
-                    aPluginNameList.append( aModuleName )
+                    aButtonObj = GtkRadioButton( aFirstButtonObj )
+                    aButton = \
+                            aToolbar.append_element( TOOLBAR_CHILD_RADIOBUTTON,
+                                                     aButtonObj, aButtonName,
+                                                     '', '', aPixMap, None )
                     self.set_data( aModuleName, aButton )
-
         self.set_data( 'plugin_list' , aPluginNameList )
+        aFirstButton.set_active( 1 )
 
     def getSelectedPluginName( self ):
         aPluginList = self.get_data( 'plugin_list' )
         for aPluginName in aPluginList :
             aButton = self.get_data( aPluginName )
+            print aPluginName
+            print aButton.get_active()
+            print
             if aButton.get_active() :
                 aSelectedPluginName = aPluginName
         return aSelectedPluginName
