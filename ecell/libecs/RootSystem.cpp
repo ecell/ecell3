@@ -40,22 +40,29 @@
 
 
 namespace libecs
-{
+{ 
 
+  void RootSystem::makeSlots()
+  {
+    MessageSlot( "CurrentTime", RootSystem, *this,
+		 NULLPTR, &RootSystem::getCurrentTime );
+  }
+  
 
   RootSystem::RootSystem() 
     :
-    theStepperLeader( *new StepperLeader ),
+    //    theStepperLeader( *new StepperLeader ),
     theReactorMaker( *new ReactorMaker ),
     theSubstanceMaker( *new SubstanceMaker ),
     theSystemMaker( *new SystemMaker ),
     theStepperMaker( *new StepperMaker ),
     theAccumulatorMaker( *new AccumulatorMaker )
   {
+    makeSlots();
+
     setId( "/" );
     setName( "The RootSystem" );
     setRootSystem( this );
-    //setSuperSystem( this );
   }
 
   RootSystem::~RootSystem()
@@ -67,6 +74,14 @@ namespace libecs
     delete &theReactorMaker;
     delete &theStepperLeader;
   }
+
+
+  const Message RootSystem::getCurrentTime( StringCref keyword )
+  {
+    return Message( keyword, 
+		    UniversalVariable( theStepperLeader.getCurrentTime() ) );
+  }
+
 
   void RootSystem::initialize()
   {

@@ -31,6 +31,7 @@
 #ifndef ___ROOTSYSTEM_H___
 #define ___ROOTSYSTEM_H___
 
+#include "Stepper.hpp"
 #include "System.hpp"
 
 namespace libecs
@@ -43,6 +44,8 @@ namespace libecs
 
     RootSystem();
     ~RootSystem();
+
+    void makeSlots();
 
     int check();
 
@@ -62,13 +65,17 @@ namespace libecs
 
     virtual const char* const className() const { return "RootSystem"; }
 
+  public: // message interfaces
+
+    const Message getCurrentTime( StringCref keyword );
+
   private:
 
     void install();
 
   private:
 
-    StepperLeaderRef    theStepperLeader;
+    StepperLeader       theStepperLeader;
 
     ReactorMakerRef     theReactorMaker;
     SubstanceMakerRef   theSubstanceMaker;

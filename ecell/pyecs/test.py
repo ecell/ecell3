@@ -49,4 +49,14 @@ print
 printAllProperties( s, 'Reactor:/:RC1' )
 print
 print 'step()...'
+printProperty( s, 'System:/:/', 'CurrentTime' )
+s.step()
+
+printProperty( s, 'System:/:/', 'CurrentTime' )
+s.step()
+
+printProperty( s, 'System:/:/', 'CurrentTime' )
+s.step()
+
+printProperty( s, 'System:/:/', 'CurrentTime' )
 s.step()

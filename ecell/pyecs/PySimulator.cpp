@@ -72,24 +72,24 @@ void PySimulator::init_type()
   add_varargs_method( "initialize",    &PySimulator::initialize );
 }
 
-Object PySimulator::step( const Tuple& args )
+Object PySimulator::step( const Py::Tuple& args )
 {
   ECS_TRY;
 
   Simulator::step();
-  return Object();
+  return Py::Object();
 
   ECS_CATCH;
 }
 
-Object PySimulator::createEntity( const Tuple& args )
+Object PySimulator::createEntity( const Py::Tuple& args )
 {
   ECS_TRY;
 
   args.verify_length( 3 );
-  const string aClassname( static_cast<Py::String>( args[0] ) );
+  const String aClassname( static_cast<Py::String>( args[0] ) );
   const FQPI aFqpi( static_cast<Py::String>( args[1] ) );
-  const string aName( static_cast<Py::String>( args[2] ) );
+  const String aName( static_cast<Py::String>( args[2] ) );
 
   Simulator::createEntity( aClassname, aFqpi, aName );
 
@@ -98,7 +98,7 @@ Object PySimulator::createEntity( const Tuple& args )
   ECS_CATCH;
 }
   
-Object PySimulator::setProperty( const Tuple& args )
+Object PySimulator::setProperty( const Py::Tuple& args )
 {
   ECS_TRY;
 
@@ -106,7 +106,7 @@ Object PySimulator::setProperty( const Tuple& args )
   const string aFqpi( static_cast<Py::String>( args[0] ) );
   const string aMessageKeyword( static_cast<Py::String>( args[1] ) );
 
-  const Tuple aMessageSequence( static_cast<Py::Sequence>( args[2] ) );
+  const Py::Tuple aMessageSequence( static_cast<Py::Sequence>( args[2] ) );
   
   UniversalVariableVector aMessageBody;
   for( Py::Tuple::const_iterator i = aMessageSequence.begin() ;
@@ -119,12 +119,12 @@ Object PySimulator::setProperty( const Tuple& args )
 
   Simulator::setProperty( FQPI( aFqpi ), aMessage );
 
-  return Object();
+  return Py::Object();
 
   ECS_CATCH;
 }
 
-Object PySimulator::getProperty( const Tuple& args )
+Object PySimulator::getProperty( const Py::Tuple& args )
 {
   ECS_TRY;
 
@@ -136,7 +136,7 @@ Object PySimulator::getProperty( const Tuple& args )
   Message aMessage( Simulator::getProperty( aFqpi, aPropertyName ) );
   int aMessageSize = aMessage.getBody().size();
 
-  Tuple aTuple( aMessageSize );
+  Py::Tuple aTuple( aMessageSize );
 
   for( int i = 0 ; i < aMessageSize ; ++i )
     {
@@ -148,7 +148,8 @@ Object PySimulator::getProperty( const Tuple& args )
 	}
       else if( aUniversalVariable.isInt() )
 	{
-	  anObject = Py::Int( static_cast<long int>( aUniversalVariable.asInt() ) );
+	  anObject = 
+	    Py::Int( static_cast<long int>( aUniversalVariable.asInt() ) );
 	}
       else if( aUniversalVariable.isString() )
 	{
@@ -169,7 +170,7 @@ Object PySimulator::getProperty( const Tuple& args )
 }
 
 
-Object PySimulator::initialize( const Tuple& )
+Object PySimulator::initialize( const Py::Tuple& )
 {
   ECS_TRY;
 
