@@ -3,6 +3,8 @@ import os
 from config import *
 from ViewWindow import *
 
+from types import *
+
 class PluginWindow(ViewWindow):
     '''
     self.theRawFullPNList : [ FullPN1, FullID2, FullPN3, , , ]
@@ -72,7 +74,14 @@ class PluginWindow(ViewWindow):
         else:
             return 99
 
-
+    def isNumber( self, aFullPN ):
+        aValue = self.theSimulator.getProperty( aFullPN )
+        if type( aValue[0] ) is IntType:
+            return 1
+        elif type( aValue[0] ) is FloatType:
+            return 1
+        else:
+            return 0
 
 
 

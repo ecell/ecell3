@@ -14,19 +14,17 @@ from ecssupport import *
 import Numeric
 import GTK
 
-
 class BargraphWindow(PluginWindow):
     
     def __init__( self, dirname, data, pluginmanager ):
 
         PluginWindow.__init__( self, dirname, data, pluginmanager )
-
-        #test
+        
         self['toolbar5'].set_style( GTK.TOOLBAR_ICONS )
         self['toolbar6'].set_style( GTK.TOOLBAR_ICONS )
         self['toolbar5'].set_button_relief( GTK.RELIEF_HALF )
         self['toolbar6'].set_button_relief( GTK.RELIEF_HALF )        
-
+        
         self.pull = 0
         self.thePositiveFlag = 1
         self.theAutoChangeFlag = 1
@@ -40,10 +38,10 @@ class BargraphWindow(PluginWindow):
             'multiplier_entry_activate' : self.updateByTextentry,
             'auto_button_toggled': self.updateByAutoButton ,
             })
-
+        
         self.theIDEntry = self.getWidget( "property_id_label" )
         self.theMultiplier1Entry = self.getWidget("multiplier1_label")
-
+        
     def initialize( self ):
 
         self.theSelected = ''
