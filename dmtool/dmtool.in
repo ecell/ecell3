@@ -12,21 +12,22 @@
 
 # variables substituted by ./configure script
 
-TEMPLATEDIR="@TEMPLATEDIR@"
-TMPDIR="@TMPDIR@"
+SHAREDIR="@DM_SHARE_DIR@"
+BINDIR="@PREFIX@/bin"
 
 CXX="@CXX@"
 MV="@MV@"
 RM="@RM@"
-INCLUDES="@INCLUDES@"
-DMFLAGS="@DMFLAGS@"
+DMFLAGS="@DM_CXXFLAGS@"
+SERIZAWADIR="@PREFIX@/src"
 
 # customizable variables. usually no need to edit
 
-RD2CH="rd2ch"
-RD2TEX="rd2tex"
+TMPDIR="/tmp"
+RD2CH="$BINDIR/rd2ch"
+RD2TEX="$BINDIR/rd2tex"
 OUTDIR="./"
-CXXFLAGS="$DMFLAGS $INCLUDES"
+CXXFLAGS="$DMFLAGS -I$SERIZAWADIR"
 TEXOUT="spec.tex"
 INSUFFIX=".rd"
 SOSUFFIX=".so"
@@ -79,12 +80,12 @@ EOT_HELP
 initialize()
 {
 	trap interrupted 2 9 15
-	echo mkdir $DTTMPDIR
+	run_command mkdir $DTTMPDIR
 }
 
 cleanup()
 {
-	echo rm -rf $DTTMPDIR
+	run_command $RM -rf $DTTMPDIR
 }
 
 interrupted()
@@ -100,7 +101,8 @@ run_command()
 	if [ $TEST_MODE ] ; then
 		echo $@
 	else
-		`$@`
+		echo $@
+		$@
 	fi
 }
 
@@ -150,14 +152,17 @@ while true ; do
 	esac
 done
 
+
 #
 # initialize
 #
 initialize
 
+
 #
 # drop files which do not end with $INSUFFIX
 #
+
 for file in $@ ; do
 	if [ `basename $file $INSUFFIX` != `basename $file` ] ; then
 		inputs="$inputs $file"
@@ -183,7 +188,7 @@ if [ $DO_COMPILE  ] ; then
 		fi
 
 		# make source files. (-> .[Ch])
-		run_command "$RD2CH -d $DTTMPDIR -t $TEMPLATEDIR/$CLASS $rdfile"
+		run_command "$RD2CH $rdfile -d $DTTMPDIR -t $SHAREDIR/$CLASS/template"
 		if [ $? ] ; then
 			:
 		else
@@ -193,7 +198,7 @@ if [ $DO_COMPILE  ] ; then
 		fi
 
 		# compile
-		run_command "$CXX $CXXFLAGS $DTTMPDIR/$cppfile -o $DTTMPDIR/$sofile"
+		run_command "$CXX $CXXFLAGS -I$SHAREDIR/$CLASS/include $DTTMPDIR/$cppfile -o $DTTMPDIR/$sofile"
 		if [ $? ] ; then
 			# move resulting so to OUTDIR
 			run_command $MV $DTTMPDIR/$sofile $OUTDIR
@@ -208,13 +213,14 @@ fi
 #
 # make tex file
 #
+
 if [ $DO_DOCIFY  ] ; then
 	echo $TEXOUT
 	run_command $RD2TEX $inputs -o $OUTDIR/$TEXOUT
 fi
 
-
 cleanup
+
 exit 0
 
 
