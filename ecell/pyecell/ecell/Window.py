@@ -39,158 +39,128 @@
 from config import *
 
 import os
-
 import gtk
 import gnome.ui
 import gtk.gdk
 import gtk.glade
 
 
-# ---------------------------------------------------------------
-# PluginModule
-#   - creates an instance of any module
-# ---------------------------------------------------------------
 class Window:
+	"""The super class of Window class.
+	[Note]:This class is not Window widget itself, but has widget instance.
+	"""
 
-
-	# ---------------------------------------------------------------
-	# Constructor
-	#   - sets glade file
-	#   - sets root property
-	#   - call openwindow method of this class
-	#
-	# aGladeFile : the name glade file
-	# aRoot      : root property
-	# return -> None
-	# This method is throwable exception.
-	# ---------------------------------------------------------------
+	# ==============================================================
 	def __init__( self, aGladeFile=None, aRoot=None ):
+		"""Constructor
+		aGladeFile  --  a glade file name (str:absolute path/relative path)
+		aRoot       --  a root property (str)
+		"""
 
-		self.theGladeFile = aGladeFile
-		self.theRoot = aRoot
-		self.theTitle = "self.__name__"
-		self.widgets = None
-		#self.openWindow()
+		self.theGladeFile = aGladeFile   # glade file name
+		self.theRoot = aRoot             # a root property
+		self.widgets = None              # widgets instance
 
-	# end of __init__
+		# Default title is classname of this class.
+		self.theTitle = self.__class__.__name__
 
 
-	# ---------------------------------------------------------------
-	# openWindow
-	#   - reads glade file
-	#
-	# return -> None
-	# This method is throwable exception.
-	# ---------------------------------------------------------------
+	# ==============================================================
 	def openWindow( self ):
+		"""loads Glade file
+		Returns None
+		[Note]:If IOError happens during reading Glade file,
+		       throws an exception.
+		"""
 
-		# load GLADEFILE_PATH/CLASSNAME.glade by default
+		# loads GLADEFILE_PATH/CLASSNAME.glade by default
 		if self.theGladeFile == None:
 			self.theGladeFile = GLADEFILE_PATH
 			self.theGladeFile += '/' + self.__class__.__name__ + ".glade"
 		else:
-			if os.path.isabs( self.theGladeFile) :
+
+			# When abusolute path
+			if os.path.isabs( self.theGladeFile ) :
 				pass
+			# When relative path
 			else:
 				self.theGladeFile = GLADEFILE_PATH + '/' + self.theGladeFile
 
+		# checks and loads glade file
 		if os.access( os.path.join( GLADEFILE_PATH, self.theGladeFile ), os.R_OK ):
 			self.widgets = gtk.glade.XML( self.theGladeFile, root=self.theRoot )
 		else:
-			raise IOError( "can't read %s." % self.theGladeFile )
+			raise IOError( "can't read %s." %self.theGladeFile )
 		
-	# end of openWindow
+
+	# ==============================================================
+	def addHandlers( self, aHandlers ):
+		"""sets handlers
+		aHandlers  --  a signal handler map (dict)
+		Returns None
+		"""
+
+		if type(aHandlers) != dict:
+			raise TypeError("%s must be dict." %str(aHandlers) )
+
+		self.widgets.signal_autoconnect( aHandlers )
 
 
-	# ---------------------------------------------------------------
-	# addHandlers
-	#   - sets some signal handers 
-	#
-	# handers      : signal handler dictionary
-	# return -> None
-	# This method is throwable exception.
-	# ---------------------------------------------------------------
-	def addHandlers( self, handlers ):
-
-		self.widgets.signal_autoconnect( handlers )
-	# end of addHandlers
-
-
-	# ---------------------------------------------------------------
-	# addHandler
-	#   - sets some signal handers 
-	#
-	# aName       : signal name
-	# aHander     : handler method 
-	# *args       : argments to be set to the hander
-	# return -> None
-	# This method is throwable exception.
-	# ---------------------------------------------------------------
-	def addHandler( self, aName, aHandler, *args ):
-
-		self.widgets.signal_connect( aName, aHandler, args )
-
-	# end of addHandler
-
-
-	# ---------------------------------------------------------------
-	# getWidget
-	#   - returns wiget specified by the key
-	#   ( __getitem__ has same function )
-	#
-	# aKey         : widget name
-	# return -> an widget
-	# This method is throwable exception.
-	# ---------------------------------------------------------------
-	def getWidget( self, aKey ):
-
-		#print " Window.getWidget"
-		return self.widgets.get_widget( aKey )
-
-	# end of getWidget
-
-
-	# ---------------------------------------------------------------
-	# __getitem__
-	#   - returns wiget specified by the key
-	#   ( getitemWidget has same function )
-	#
-	# aKey         : widget name
-	# return -> an widget
-	# This method is throwable exception.
-	# ---------------------------------------------------------------
+	# ==============================================================
 	def __getitem__( self, aKey ):
+		"""returns wiget specified by the key
+		aKey  --  a widget name (str)
+		Returns a widget (gtk.Widget)
+		[Note]:When this window has not the widget specified by the key,
+		       throws an exception.
+		"""
 
 		return self.widgets.get_widget( aKey )
 
-	# end of __getitem__
+
+	# ==============================================================
+	def getWidget( self, aKey ):
+		"""returns wiget specified by the key
+		aKey  --  a widget name (str)
+		Returns a widget (gtk.Widget)
+		[Note]:This method is same as __getitem__ method.
+		"""
+
+		return self[ aKey ]
 
 
-	# ---------------------------------------------------------------
-	# editTitle
-	#   - edits title of this window
-	#
-	# aTitle         : widget title
-	# return -> None
-	# This method is throwable exception.
-	# ---------------------------------------------------------------
+	# ==============================================================
 	def editTitle( self, aTitle ):
+		"""edits and saves title
+		aTitle  --  a title to save (str)
+		Returns None
+		"""
 
+		# save title
+		# Although self.theTitle looks verbose, self.getTitle() method
+		# returns self.theTitle. See the comment of getTitle() method
 		self.theTitle = aTitle
-		theWidget=self.getWidget( self.theClassName )
+
+		# get window widget ( The name of window widget is class name )
+		theWidget=self[ self.__class__.__name__ ]
+
+		# There are some cases theWidget is None.
+		#  - When this method is called after 'destroy' signal.
+		#  - When this window is attached other Window.
+		# In those cases, do not change title.
 		if theWidget!=None:
-		    self.theTitle = aTitle
-		    theWidget.set_title( self.theTitle)
+			theWidget.set_title( self.theTitle )
 
-	# end of editTitle
 
+	# ==============================================================
 	def getTitle( self ):
-	    theWidget=self.getWidget( self.theClassName)
-	    if theWidget==None:
-		theTitle='No Title'
-	    else:
-		theTitle=theWidget.get_title()
-	    return  theTitle
+		"""gets title of this Window
+		Returns a title (str)
+		[Note]: This method returs not the title of widget but self.theTitle.
+                Because when this method is called after 'destroy' signal,
+                all widgets are None.
+		"""
+		return self.theTitle
 
 
 # end of Window

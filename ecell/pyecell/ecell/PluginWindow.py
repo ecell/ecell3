@@ -44,84 +44,57 @@ import string
 import sys
 from ecell.ecssupport import *
 
-# ---------------------------------------------------------------
-# PluginWindow --> Window
-#   - has some plugin functions
-# ---------------------------------------------------------------
+
 class PluginWindow( Window ):
+	"""has some plugin functions
+	"""
 
-
-	# ---------------------------------------------------------------
-	# Constructor
-	#   - sets glade file
-	#   - sets root property
-	#   - call openwindow method of this class
-	#  
-	# In the constructor sub class, you have to call openWindow().
-	#
-	# aDirName       : directory name
-	# aPluginManager : reference to plugin manager
-	# aRoot          : root property
-	#
-	# return -> None
-	# This method is throwable exception.
-	# ---------------------------------------------------------------
+	# ==============================================================
 	def __init__( self, aDirname, aPluginManager, aRoot=None ):
+		"""Constructor
+		aDirname        -- a directory name (str:absolute path/relative path)
+		aPluginManager  -- a reference to PluginManager (an instance of PluginManager)
+		aRoot           -- a root property (str)
+		"""
 
-		self.theRoot = aRoot
-		self.theClassName = self.__class__.__name__
-		aGladeFileName = os.path.join( aDirname , self.theClassName + ".glade" )
+		# creates glade file name (str)
+		aGladeFile = os.path.join( aDirname , self.__class__.__name__ + ".glade" )
 
-		self.theGladeFile = aGladeFileName
-		self.thePluginManager = aPluginManager
+		# calls superclass's constructor
+		Window.__init__( self, aGladeFile, aRoot )
 
-	# end of __init__
+		self.thePluginManager = aPluginManager  # PluginManager
 
-
-	# ---------------------------------------------------------------
-	# openWindow
-	#   - call openwindow method of super class
-	#  
-	#
-	# aDirName       : directory name
-	# aPluginManager : reference to plugin manager
-	# aRoot          : root property
-	#
-	# return -> None
-	# This method is throwable exception.
-	# ---------------------------------------------------------------
+	# ==============================================================
 	def openWindow( self ):
+		"""openWindow
+		Returns None
+		"""
+
+		# calls superclass's method
 		Window.openWindow( self )
-		self.addHandlers( {'window_exit' : self.exit,} )
 
-	# end of openWindow
 
-	# ---------------------------------------------------------------
-	# update (abstract method )
-	#   - Sub class must override this method.
-	# ---------------------------------------------------------------
+	# ==============================================================
 	def update( self ):
+		"""(Abstract method)
+		update this window
+		Returns None
+		"""
 
 		import inspect
 		caller = inspect.getouterframes(inspect.currentframe())[0][3]
 		raise NotImplementedError(caller + 'must be implemented in subclass')
 
-	# end of update
 
-	# ---------------------------------------------------------------
-	# exit 
-	#   - remove this window from PluginManager
-	#
-	# *objects : dammy elements of argument
-	# return -> None
-	# This method is throwable exception.
-	# ---------------------------------------------------------------
-	def exit( self, *objects ):
+	# ==============================================================
+	def exit( self, *arg ):
+		"""remove this window from PluginManager
+		Returns None
+		"""
 
 		self.thePluginManager.removeInstance( self )
 	
-	# end of exit
-
 
 # end of PluginWindow
 
