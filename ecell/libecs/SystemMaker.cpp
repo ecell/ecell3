@@ -39,3 +39,7 @@ SystemMaker::SystemMaker()
   makeClassList();
 }
 
+void SystemMaker::makeClassList()
+{
+
+}

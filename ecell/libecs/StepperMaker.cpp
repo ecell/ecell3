@@ -38,3 +38,10 @@ StepperMaker::StepperMaker()
   makeClassList();
 }
 
+void StepperMaker::makeClassList()
+{
+  NewStepperModule(SlaveStepper);
+  NewStepperModule(Eular1Stepper);
+  NewStepperModule(RungeKutta4Stepper);
+}
+

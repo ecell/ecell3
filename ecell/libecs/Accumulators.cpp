@@ -33,15 +33,6 @@
 #include "Accumulators.hpp"
 #include "AccumulatorMaker.hpp"
 
-void AccumulatorMaker::makeClassList()
-{
-  NewAccumulatorModule( SimpleAccumulator );
-  NewAccumulatorModule( RoundDownAccumulator );
-  NewAccumulatorModule( RoundOffAccumulator );
-  NewAccumulatorModule( ReserveAccumulator );
-  NewAccumulatorModule( MonteCarloAccumulator );
-}
-
 void SimpleAccumulator::doit()
 {
   getQuantity() += getVelocity();

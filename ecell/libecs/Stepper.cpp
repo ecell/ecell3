@@ -36,13 +36,6 @@
 #include "RootSystem.hpp"
 
 
-void StepperMaker::makeClassList()
-{
-  NewStepperModule(SlaveStepper);
-  NewStepperModule(Eular1Stepper);
-  NewStepperModule(RungeKutta4Stepper);
-}
-
 ////////////////////////// Stepper
 
 Stepper::Stepper() : theOwner(NULL)

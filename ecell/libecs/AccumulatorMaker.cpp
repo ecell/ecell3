@@ -45,3 +45,12 @@ AccumulatorMaker::AccumulatorMaker()
   makeClassList();
 }
 
+
+void AccumulatorMaker::makeClassList()
+{
+  NewAccumulatorModule( SimpleAccumulator );
+  NewAccumulatorModule( RoundDownAccumulator );
+  NewAccumulatorModule( RoundOffAccumulator );
+  NewAccumulatorModule( ReserveAccumulator );
+  NewAccumulatorModule( MonteCarloAccumulator );
+}
