@@ -194,6 +194,7 @@ pyecs/ecell3
 pyecell/Makefile
 pyecell/ecell/Makefile
 dm/Makefile
+pyecell/ecell/gui_config.py
 ])
 AC_CONFIG_COMMANDS([default],[[chmod +x pyecs/ecell3 libecs/emtool
 ]],[[]])
