@@ -159,7 +159,13 @@ class DataGenerator:
                             newDataPoint = zeros( ( 5 ) )
                             newDataPoint[DP_TIME] = xPoint[DP_VALUE]
                             if yPoint1[DP_TIME] != aTime:
-                                yPoint2 = yWalker.findPrevious( aTime )
+                                while True:
+                                    yPoint2 = yWalker.getNext( )
+                                    if yPoint2 == 1:
+                                        break
+                                    if yPoint2[DP_TIME] > yPoint1[DP_TIME]:
+                                        break
+
                                 if yPoint2 == 1:
                                     break
                                 # interpolate
