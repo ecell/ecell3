@@ -40,7 +40,7 @@ namespace libecs
     :
     theVariable( aVariable )
   {
-    theVariable->registerStepper( this );
+    theVariable->registerProxy( this );
   }
 
 
@@ -49,9 +49,9 @@ namespace libecs
     ; // do nothing
   }
 
-  void VariableProxy::integrate()
+  void VariableProxy::integrate( const Real aTime )
   {
-    theVariable->integrate( this );
+    theVariable->integrate( aTime );
   }
 
 }

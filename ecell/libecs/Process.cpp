@@ -239,8 +239,8 @@ namespace libecs
 
     // find the first VariableReference whose coefficient is 0,
     // and the first VariableReference whose coefficient is positive.
-    std::pair<VariableReferenceVectorConstIterator,
-      VariableReferenceVectorConstIterator> 
+    std::pair<VariableReferenceVectorIterator,
+      VariableReferenceVectorIterator> 
       aZeroRange( std::equal_range( theVariableReferenceVector.begin(), 
 				    theVariableReferenceVector.end(), 
 				    0, 

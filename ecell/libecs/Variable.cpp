@@ -74,6 +74,7 @@ namespace libecs
     theValue( 0.0 ),  
     theVelocity( 0.0 ),
     theTotalVelocity( 0.0 ),
+    theLastTime( 0.0 ),
     theFixed( false )
   {
     makeSlots();
@@ -92,13 +93,6 @@ namespace libecs
 
   void Variable::clearVariableProxyVector()
   {
-    for( VariableProxyVectorIterator i( theVariableProxyVector.begin() );
-	 i != theVariableProxyVector.end(); ++i )
-      {
-	VariableProxyPtr anVariableProxyPtr( *i );
-	delete anVariableProxyPtr;
-      }
-
     theVariableProxyVector.clear();
   }
 
@@ -114,7 +108,7 @@ namespace libecs
     return theFixed;
   }
 
-  void Variable::registerStepper( VariableProxyPtr anVariableProxyPtr )
+  void Variable::registerProxy( VariableProxyPtr anVariableProxyPtr )
   {
     theVariableProxyVector.push_back( anVariableProxyPtr );
   }
@@ -122,9 +116,9 @@ namespace libecs
 
   ///////////////////////// PositiveVariable
 
-  void PositiveVariable::integrate( VariableProxyPtr anVariableProxy )
+  void PositiveVariable::integrate( RealCref aTime )
   {
-    Variable::integrate( anVariableProxy );
+    Variable::integrate( aTime );
 
     //    
     // Check if the value is in positive range.

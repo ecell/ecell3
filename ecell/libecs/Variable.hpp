@@ -102,15 +102,16 @@ namespace libecs
 	integrate phase
     */
 
-    virtual void integrate( VariableProxyPtr anVariableProxy )
+    virtual void integrate( RealCref aTime )
     {
       if( isFixed() == false )
 	{
-	  updateValue( anVariableProxy );
+	  updateValue( aTime );
 	}
     }
 
-    const Real calculateTotalVelocity( RealCref aCurrentTime ) const
+    const Real calculateVelocitySum( RealCref aCurrentTime, 
+				     RealCref anInterval ) const
     {
       Real aVelocitySum( 0.0 );
       for( VariableProxyVectorConstIterator 
@@ -118,21 +119,32 @@ namespace libecs
 	   i != theVariableProxyVector.end(); ++i )
 	{
 	  VariableProxyPtr const anVariableProxyPtr( *i );
-	  aVelocitySum += anVariableProxyPtr->getVelocity( aCurrentTime );
+	  aVelocitySum += anVariableProxyPtr->getDifference( aCurrentTime,
+							     anInterval );
 	}
 
       return aVelocitySum;
     }
 
-    void updateValue( VariableProxyPtr anVariableProxy )
+
+    void updateValue( RealCref aCurrentTime )
     {
-      const Real aTime( getModel()->getCurrentTime() );
+      const Real anInterval( aCurrentTime - theLastTime );
 
-      const Real aVelocity( anVariableProxy->getVelocity( aTime ) );
-      loadValue( getValue() + aVelocity );
+      if( anInterval == 0.0 )
+	{
+	  return;
+	}
 
-      //FIXME:
-      theTotalVelocity = calculateTotalVelocity( aTime ) - aVelocity;
+      const Real aVelocitySum( calculateVelocitySum( aCurrentTime,
+						     anInterval ) );
+
+      loadValue( getValue() + aVelocitySum );
+
+      // Give it in per second.
+      theTotalVelocity = aVelocitySum / anInterval;
+
+      theLastTime = aCurrentTime;
     }
 
 
@@ -169,19 +181,19 @@ namespace libecs
 	}
     }
 
-    virtual void loadValue( RealCref aValue )
+    void loadValue( RealCref aValue )
     {
       theValue = aValue;
     }
 
     const Real getValue() const
     { 
-      return theValue + theTotalVelocity; 
+      return theValue;
     }
 
     const Real saveValue() const
     {
-      return theValue;
+      return getValue();
     }
 
 
@@ -246,7 +258,7 @@ namespace libecs
       return getValue() / ( getSuperSystem()->getVolume() * N_A );
     }
 
-    void registerStepper( VariableProxyPtr anVariableProxy );
+    void registerProxy( VariableProxyPtr anVariableProxy );
 
     static VariablePtr createInstance() { return new Variable; }
 
@@ -261,9 +273,12 @@ namespace libecs
   protected:
 
     Real theValue;
+
     Real theVelocity;
 
     Real theTotalVelocity;
+
+    Real theLastTime;
 
     VariableProxyVector theVariableProxyVector;
 
@@ -299,14 +314,16 @@ namespace libecs
 	integrate phase
     */
 
-    virtual void integrate( VariableProxyPtr anVariableProxy );
+    virtual void integrate( RealCref aTime );
 
-    virtual const bool checkRange( RealCref aTime ) const
+    virtual const bool checkRange( RealCref anInterval ) const
     {
-      const Real aPutativeVelocity( calculateTotalVelocity( aTime ) );//* aStepInterval );
-      const Real aPutativeValue( getValue() + aPutativeVelocity );
+      const Real aPutativeValue( getValue() + 
+				 calculateVelocitySum( theLastTime 
+						       + anInterval,
+						       anInterval ) );
 
-      if( aPutativeValue >= 0 )
+      if( aPutativeValue >= 0.0 )
 	{
 	  return true;
 	}

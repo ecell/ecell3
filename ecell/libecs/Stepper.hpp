@@ -455,7 +455,7 @@ namespace libecs
     {
     public:
       VariableProxy( DifferentialStepperRef aStepper, 
-		    VariablePtr const aVariablePtr )
+		     VariablePtr const aVariablePtr )
 	:
 	libecs::VariableProxy( aVariablePtr ),
 	theStepper( aStepper ),
@@ -464,10 +464,11 @@ namespace libecs
 	; // do nothing
       }
 
-      virtual const Real getVelocity( RealCref aTime )
+      virtual const Real getDifference( RealCref aTime, RealCref anInterval )
       {
-	return theStepper.getVelocityBuffer()[ theIndex ]
-	  * ( aTime - theStepper.getCurrentTime() );
+	// First order interpolation.  This should be overridden in
+	// higher order DifferentialSteppers.
+	return theStepper.getVelocityBuffer()[ theIndex ] * anInterval;
       }
       
 
@@ -590,7 +591,7 @@ namespace libecs
 
     virtual VariableProxyPtr createVariableProxy( VariablePtr aVariable )
     {
-      return new VariableProxy( *this, aVariable );
+      return new DifferentialStepper::VariableProxy( *this, aVariable );
     }
 
     virtual StringLiteral getClassName() const 

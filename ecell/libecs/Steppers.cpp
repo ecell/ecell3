@@ -64,8 +64,7 @@ namespace libecs
 	theVelocityBuffer[ c ] = aVariable->getVelocity();
 
 	// avoid negative value
-	while( aVariable->checkRange( getCurrentTime() + getStepInterval() ) 
-	       == false )
+	while( aVariable->checkRange( getStepInterval() ) == false )
 	  {
 	    // don't use setStepInterval()
 	    loadStepInterval( getStepInterval() * 0.5 );

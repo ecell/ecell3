@@ -32,7 +32,7 @@
 #define __VARIABLEREFERENCE_HPP
 
 #include "libecs.hpp"
-
+#include "Variable.hpp"
 
 namespace libecs
 {
@@ -74,19 +74,7 @@ namespace libecs
 
     private:
 
-      // if statement can be faster than returning an expression directly
-      inline static bool compare( const Int aLhs, const Int aRhs )
-      {
-	if( aLhs < aRhs )
-	  {
-	    return true;
-	  }
-	else
-	  {
-	    return false;
-	  }
-      }
-
+      static const std::less<Int> compare;
 
     };
 
@@ -116,23 +104,9 @@ namespace libecs
 
     private:
 
-      // if statement can be faster than returning an expression directly
-      inline static bool compare( StringCref aLhs, StringCref aRhs )
-      {
-	if( aLhs < aRhs )
-	  {
-	    return true;
-	  }
-	else
-	  {
-	    return false;
-	  }
-      }
-
+      static const std::less<String> compare;
 
     };
-
-
 
   public:
 
@@ -148,7 +122,7 @@ namespace libecs
     VariableReference( StringCref aName, 
 		       VariablePtr aVariablePtr, 
 		       const Int aCoefficient,
-		       const bool anIsAccessor = true ) 
+		       const bool anIsAccessor = true )  
       : 
       theName( aName ),
       theVariablePtr( aVariablePtr ), 
@@ -170,12 +144,12 @@ namespace libecs
       return theName; 
     }
 
-    void setVariable( const VariablePtr aVariablePtr )
+    void setVariable( VariablePtr const aVariablePtr )
     {
       theVariablePtr = aVariablePtr;
     }
 
-    VariablePtr getVariable() const 
+    const VariablePtr getVariable() const 
     { 
       return theVariablePtr; 
     }
@@ -210,6 +184,11 @@ namespace libecs
     const bool isAccessor() const
     {
       return theIsAccessor;
+    }
+
+    void addFlux( const Real aVelocity )
+    {
+      theVariablePtr->addVelocity( aVelocity * theCoefficient );
     }
 
 

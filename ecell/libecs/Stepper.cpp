@@ -34,6 +34,7 @@
 
 #include "Util.hpp"
 #include "Variable.hpp"
+#include "VariableProxy.hpp"
 #include "Process.hpp"
 #include "Model.hpp"
 #include "FullID.hpp"
@@ -186,7 +187,6 @@ namespace libecs
     //           puto it into theReadVariableVector
     // (4) sort theReadVariableVector and theProxyVariableVector by 
     //     memory address.
-    theVariableProxyVector.clear();
     theReadVariableVector.clear();
     // for all the processs
 
@@ -236,6 +236,14 @@ namespace libecs
     std::sort( theReadVariableVector.begin(), theReadVariableVector.end() );
     std::sort( aVariableVector.begin(), aVariableVector.end() );
 
+
+    theVariableProxyVector.clear();
+    for( VariableProxyVectorIterator i( theVariableProxyVector.begin() );
+	 i != theVariableProxyVector.end(); ++i )
+      {
+	VariableProxyPtr anVariableProxyPtr( *i );
+	delete anVariableProxyPtr;
+      }
 
     // create VariableProxies.
     for( VariableVectorIterator i( aVariableVector.begin() );
@@ -602,7 +610,8 @@ namespace libecs
     //
     std::for_each( theVariableProxyVector.begin(),
 		   theVariableProxyVector.end(), 
-		   std::mem_fun( &VariableProxy::integrate ) );
+		   std::bind2nd( std::mem_fun( &VariableProxy::integrate ),
+				 getCurrentTime() ) );
   }
 
 

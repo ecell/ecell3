@@ -84,13 +84,11 @@ namespace libecs
     };
 
 
-
-
     VariableProxy( VariablePtr const aVariable );
 
     virtual ~VariableProxy();
     
-    virtual const Real getVelocity( RealCref aTime )
+    virtual const Real getDifference( RealCref aTime, RealCref anInterval )
     {
       return 0.0;
     }
@@ -100,7 +98,8 @@ namespace libecs
       return theVariable;
     }
 
-    void integrate();
+    //FIXME: should be inlined for performance
+    void integrate( const Real aTime );
 
 
   private:

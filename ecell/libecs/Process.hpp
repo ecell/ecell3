@@ -244,9 +244,8 @@ namespace libecs
 
     VariableReferenceVector theVariableReferenceVector;
 
-    VariableReferenceVectorConstIterator theFirstZeroVariableReferenceIterator;
-    VariableReferenceVectorConstIterator 
-    theFirstPositiveVariableReferenceIterator;
+    VariableReferenceVectorIterator theFirstZeroVariableReferenceIterator;
+    VariableReferenceVectorIterator theFirstPositiveVariableReferenceIterator;
 
   private:
 

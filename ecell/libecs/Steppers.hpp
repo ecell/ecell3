@@ -127,7 +127,7 @@ namespace libecs
     public:
 
       VariableProxy( Midpoint2StepperRef aStepper, 
-		    VariablePtr const aVariablePtr )
+		     VariablePtr const aVariablePtr )
 	:
 	libecs::VariableProxy( aVariablePtr ),
 	theStepper( aStepper ),
@@ -136,7 +136,8 @@ namespace libecs
 	; // do nothing
       }
 
-      virtual const Real getVelocity( RealCref aTime )
+      /* FIXME: should be updated
+      virtual const Real getDifference( RealCref aTime, RealCref anInterval )
       {
 	const Real theta( ( aTime - theStepper.getCurrentTime() )
 			  / theStepper.getStepInterval() );
@@ -147,7 +148,7 @@ namespace libecs
 	return ( k1 + ( k2 - k1 ) * theta )
 	  * ( aTime - theStepper.getCurrentTime() );
       }
-
+      */
 
     protected:
 
@@ -170,10 +171,10 @@ namespace libecs
 
     virtual StringLiteral getClassName() const { return "Midpoint2Stepper"; }
 
-    virtual VariableProxyPtr createVariableProxy( VariablePtr aVariable )
-    {
-      return new VariableProxy( *this, aVariable );
-    }
+    //    virtual VariableProxyPtr createVariableProxy( VariablePtr aVariable )
+    //    {
+    //      return new VariableProxy( *this, aVariable );
+    //    }
 
     RealVectorCref getK1() const
     {
@@ -235,7 +236,7 @@ namespace libecs
     public:
 
       VariableProxy( DormandPrince547MStepperRef aStepper, 
-		    VariablePtr const aVariablePtr )
+		     VariablePtr const aVariablePtr )
 	:
 	libecs::VariableProxy( aVariablePtr ),
 	theStepper( aStepper ),
@@ -244,7 +245,9 @@ namespace libecs
 	; // do nothing
       }
 
-      virtual const Real getVelocity( RealCref aTime )
+	/* FIXME: should be updated
+
+      virtual const Real getDifference( RealCref aTime, RealCref anInterval )
       {
 	const Real theta( ( aTime - theStepper.getCurrentTime() )
 			  / theStepper.getStepInterval() );
@@ -257,7 +260,7 @@ namespace libecs
 			+ ( 2*k1 + 2*k2 - 8*k3 ) * theta ) * theta )
 	  * ( aTime - theStepper.getCurrentTime() );
       }
-
+	  */
 
     protected:
 
@@ -282,10 +285,10 @@ namespace libecs
       return "DormandPrince547MStepper";
     }
 
-    virtual VariableProxyPtr createVariableProxy( VariablePtr aVariable )
-    {
-      return new VariableProxy( *this, aVariable );
-    }
+    //    virtual VariableProxyPtr createVariableProxy( VariablePtr aVariable )
+    //    {
+    //      return new VariableProxy( *this, aVariable );
+    //    }
 
     RealVectorCref getK1() const
     {

@@ -1,6 +1,9 @@
 #ifndef __FLUXPROCESS_HPP
 #define __FLUXPROCESS_HPP
 
+#include <functional>
+#include <algorithm>
+
 #include "libecs/libecs.hpp"
 #include "libecs/Process.hpp"
 #include "libecs/VariableReference.hpp"
@@ -29,41 +32,27 @@ namespace libecs
 
     StringLiteral getClassName() const { return "FluxProcess"; }
     
-    void initialize()
+    virtual void initialize()
     {
       Process::initialize();
     }
 
-    inline void setVariableFlux( VariableReferenceCref aVariableReference, 
-				 const Real aVelocity )
+    void setFlux( const Real aVelocity )
     {
-      const Int aCoefficient( aVariableReference.getCoefficient() );
-      aVariableReference.getVariable()->
-	addVelocity( aVelocity * aCoefficient );
-    }
-
-    void setFlux( RealCref velocity )
-    {
-      Real aVelocity( velocity );
-
       setActivity( aVelocity );
 
-      // Increase or decrease variables.
-      for( VariableReferenceVectorConstIterator 
-	     i( theVariableReferenceVector.begin() ); 
-	   i != theFirstZeroVariableReferenceIterator ; ++i )
-	{
-	  setVariableFlux( *i, aVelocity );
-	}
+       // Increase or decrease variables, skipping zero coefficients.
+      std::for_each( theVariableReferenceVector.begin(),
+		     theFirstZeroVariableReferenceIterator,
+		     std::bind2nd
+		     ( std::mem_fun_ref
+		       ( &VariableReference::addFlux ), aVelocity ) );
 
-      // skip zero coefficients
-      for( VariableReferenceVectorConstIterator 
-	     i( theFirstPositiveVariableReferenceIterator );
-	   i != theVariableReferenceVector.end() ; ++i )
-	{
-	  setVariableFlux( *i, aVelocity );
-	}
-      
+      std::for_each( theFirstPositiveVariableReferenceIterator,
+		     theVariableReferenceVector.end(),
+		     std::bind2nd
+		     ( std::mem_fun_ref
+		       ( &VariableReference::addFlux ), aVelocity ) );
     }
     
   };
