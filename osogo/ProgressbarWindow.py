@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 
 import string
 
@@ -6,7 +6,7 @@ import gtk
 import gnome.ui
 import GDK
 import libglade
-
+import Numeric
 
 
 class Window:
@@ -32,7 +32,9 @@ class MainWindow(Window):
 
     def __init__( self, gladefile ):
 
-        self.theHandlerMap = {'input':           self.input,
+        self.theHandlerMap = {
+                              'input1': self.input,
+                              'input2': self.input,
                               'button_press_event': self.button_press_event
                               }
 
@@ -48,25 +50,34 @@ class MainWindow(Window):
         obj = self.getWidget(name)
         obj.set_text(text)
 
-    def setValue( self, name ,value ):
+    def setValue2( self, name ,value ):
         obj = self.getWidget( name )
-        obj.set_value(value)
+        log = (int)(Numeric.log10(value))
+        obj.set_value(log)
+        self.keisan(value,log)
+
+    def keisan(self,value,log):
+        value = (int)(value / (float)(10**(log -1)))
+        self.theProgressBar = self.getWidget( "progressbar1" )
+        self.theProgressBar.set_value(value)
         
     def setLabel(self,name,text):
         obj = self.getWidget(name)
         obj.set_label(text)
 
+    def getPercentage(self,name,value):
+        obj = self.getWidget(name)
+        obj.set_value(value)
+        
     def input( self,obj ):
         aNumberString =  obj.get_text()
         aNumber = string.atof( aNumberString )
-        print aNumberString
+        self.theSpinButton = self.getWidget( "spinbutton1" )
+        self.theSpinButton.set_value( aNumber )
+        value = propertyValue1
+        self.keisan(value,aNumber)
 
 
-   
-
-#    def label1_enter_notify_event( self,obj ):
-#        print 'zhaiteng'
-        
 def mainQuit( obj, data ):
     print obj,data
     gtk.mainquit()
@@ -80,16 +91,15 @@ def main():
 #    ID = 'ATPase: Activity'
     ID = 'ATPase'
     FQPI = systemPath + ':' + ID  
-#    propertyName = 'quantity'
-    propertyValue = 50.0000
     aWindow = MainWindow( 'ProgressbarWindow.glade' )
     aWindow.addHandler( 'gtk_main_quit', mainQuit )
-    aWindow.setValue("progressbar1", propertyValue)
-    aWindow.setText("label1",ID)  
+    aWindow.setText("label1",ID)
+    aWindow.setValue2("spinbutton1",propertyValue1)
 #    aWindow.setLabel("frame1", propertyName)
     mainLoop()
 
 if __name__ == "__main__":
+    propertyValue1 = 750.0000
     main()
 
 
