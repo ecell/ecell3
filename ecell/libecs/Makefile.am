@@ -73,6 +73,7 @@ Util.hpp\
 CoreLinuxCompatibility.hpp\
 RCPtr.hpp\
 Reactant.hpp\
+DynamicPriorityQueue.hpp\
 AssocVector.h
 
 bin_SCRIPTS =\
