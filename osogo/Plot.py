@@ -65,6 +65,7 @@ def num_to_sci( num ):
     else:
         return str(num)[0:8]
 
+
 def sign( num ):
     if int( num ) == 0:
         return 0
@@ -86,7 +87,7 @@ class Axis:
         self.theFullPNString = "Time"
         self.setType( aType )
         self.theParent = aParent
-        
+
 
     def getFullPNString ( self ):
         return self.theFullPNString
@@ -97,7 +98,7 @@ class Axis:
             self.setType ( PLOT_TIME_AXIS )
         else:
             self.setType( PLOT_VALUE_AXIS )
-            
+
 
     def setType( self, aType ):
         self.theType = aType
@@ -112,8 +113,10 @@ class Axis:
             self.rescalingFrameMin = 0
             self.rescalingFrameMax = 0.5
 
+
     def getType ( self ):
         return self.theType
+
 
     def recalculateSize( self ):
         if self.theOrientation == PLOT_HORIZONTAL_AXIS:
@@ -121,22 +124,22 @@ class Axis:
             self.theBoundingBox =  [ 0, self.theParent.theOrigo[1] + 1, self.theParent.thePlotWidth, 
                                     10 + self.theParent.theAscent + self.theParent.theDescent ]
             self.theMaxTicks = int( self.theParent.thePlotWidth / 100 )
-            self.theMeasureLabelPosition = [ self.theParent.thePlotAreaBox[2] + 10, self.theParent.theOrigo[1] - 30 ]
+            self.theMeasureLabelPosition = [ self.theParent.thePlotAreaBox[2] , self.theBoundingBox[1] + self.theBoundingBox[3]-3 ]
         else:
             self.theLength = self.theParent.thePlotArea[3]
             self.theBoundingBox = [ 0, 0, self.theParent.theOrigo[0], self.theParent.theOrigo[1] + 5 ]
             self.theMaxTicks = int( self.theParent.thePlotHeight / 150 ) * 5
             self.theMeasureLabelPosition = [ self.theParent.theOrigo[0] - 50, 0 ]
 
+
     def clearLabelArea(self):
         self.theParent.drawBox( BACKGROUND_COLOR, self.theBoundingBox[0], self.theBoundingBox[1],
                                     self.theBoundingBox[2], self.theBoundingBox[3] )
-        
+
+
     def draw(self):
-        
         self.reprintLabels()
         self.drawMeasures()
-
 
 
     def printLabel( self, num ):
@@ -152,8 +155,8 @@ class Axis:
             y = self.convertNumToCoord( num )
             self.theParent.drawText( PEN_COLOR, x, y-7, text )
             self.theParent.drawLine( PEN_COLOR, self.theParent.theOrigo[0] - 5, y, self.theParent.theOrigo[0], y )
-            
-            
+
+
     def convertNumToCoord( self, aNumber ):
         if self.theScaleType == SCALE_LINEAR:
             relativeCoord = round( ( aNumber - self.theFrame[0] ) / float( self.thePixelSize ) )
@@ -166,7 +169,7 @@ class Axis:
             absoluteCoord = self.theParent.theOrigo[1] - relativeCoord
         return absoluteCoord
 
-            
+
     def convertCoordToNumber( self, aCoord ):
         if self.theOrientation == PLOT_HORIZONTAL_AXIS:
             relativeCoord = aCoord - self.theParent.theOrigo[0]
@@ -176,7 +179,7 @@ class Axis:
             aNumber = float( relativeCoord ) * self.thePixelSize + self.theFrame[0]
         else:
             aNumber = pow(10, float ( relativeCoord ) * self.thePixelSize ) * self.theFrame[0]
-        return aNumber            
+        return aNumber
 
 
     def reprintLabels(self):
@@ -192,10 +195,9 @@ class Axis:
             while tickvalue > self.theGrid[0]:
                 self.printLabel( tickvalue )
                 tickvalue=tickvalue / self.theTickStep
-            self.printLabel( self.theGrid[0] )          
-        
- 
-            
+            self.printLabel( self.theGrid[0] )
+
+
     def reframe( self ):  #no redraw!
         #get max and min from databuffers
         self.theParent.getRanges()
@@ -215,8 +217,8 @@ class Axis:
             if ( self.theFrame[1] + self.theFrame[0] ) / 2  < rangesMax:
                 self.theFrame[0] = rangesMax - self.theParent.theStripInterval / 2
                 self.theFrame[1] = self.theFrame[0] + self.theParent.theStripInterval
-         
-            
+
+
         if self.theParent.theZoomLevel == 0 and not isStripTimeAxis:
             if rangesMin == rangesMax:
                 if  rangesMin  == 0:
@@ -225,7 +227,7 @@ class Axis:
                 else:
                     rangesMax = rangesMin + abs( rangesMin )
                     rangesMin = rangesMin - abs( rangesMin )
-                        
+
             #calculate yframemin, max
             if self.theScaleType == SCALE_LINEAR:
                 aRange = ( rangesMax - rangesMin ) / \
@@ -253,7 +255,7 @@ class Axis:
                         mantissa1 = 5.0
                     else:
                         mantissa1 = 10.0
-                    
+
                 self.theTickNumber = self.theMaxTicks
                 halfTicks = int( self.theMaxTicks / 2 )
                 if self.theFrame[0] < 0:
@@ -265,20 +267,20 @@ class Axis:
                         mantissa0 = 5.0
                     else:
                         mantissa0 = 10.0
-                        
+
                 if mantissa1 > mantissa0:
                     lesser=mantissa0
                     bigger=mantissa1
                 else:
                     lesser=mantissa1
                     bigger=mantissa0
-                            
+
                 tick_step = bigger / halfTicks
                 lesser_step_no = ceil( lesser / tick_step )
                 lesser = tick_step * float( lesser_step_no )
                 lesser = int( lesser * 1000 ) / 1000.0
                 self.theTickNumber = halfTicks + lesser_step_no
-                
+
                 if mantissa0 < mantissa1:
                     mantissa0 = lesser
                 else:
@@ -287,12 +289,12 @@ class Axis:
                 self.theFrame[0] = sign0 * mantissa0 * exponent
                 self.theTickStep = ( self.theFrame[1] - self.theFrame[0] ) / self.theTickNumber
             else: #log10 scaling
-            
+
                 if rangesMin <= 0 or rangesMax <= 0:
                     self.theParent.theOwner.theSession.message("non positive value in data, fallback to linear scale!\n")
                     self.theParent.changeScale( self.theOrientation, SCALE_LINEAR )
                     return
-                
+
                 self.theFrame[1] = pow( 10, ceil( log10( rangesMax ) ) )
                 self.theFrame[0] = pow( 10, floor( log10( rangesMin ) ) )        
                 diff = int( log10( self.theFrame[1] / self.theFrame[0] ) )
@@ -304,7 +306,7 @@ class Axis:
                 else:
                     self.theTickNumber = self.theMaxTicks
                     self.theTickStep = pow( 10, ceil( diff / self.theTickNumber ) )
-                    
+
             self.theGrid[0] = self.theFrame[0]
             self.theGrid[1] = self.theFrame[1]
 
@@ -314,14 +316,14 @@ class Axis:
                 if self.theFrame[1] == self.theFrame[0]:
                     self.theFrame[1] = self.theFrame[0] + abs( self.theFrame[0] ) *.1 + 1 
                 exponent = pow( 10, floor( log10( self.theFrame[1] - self.theFrame[0] ) ) )
-               
+
                 while ticks < self.theMaxTicks / 2:
                     mantissa1 = floor( self.theFrame[1] / exponent )
                     mantissa0 = ceil( self.theFrame[0] / exponent )
                     ticks = mantissa1 - mantissa0
                     if ticks < self.theMaxTicks/2:
                         exponent=exponent/2
-                        
+
                     if ticks > self.theMaxTicks:
                         mantissa0 = ceil( mantissa0 / 2 ) * 2   
                         mantissa1 = floor( mantissa1 / 2 ) * 2
@@ -329,9 +331,9 @@ class Axis:
                 self.theTickNumber = ticks
                 self.theGrid[1] = mantissa1 * exponent
                 self.theGrid[0] = mantissa0 * exponent
-                                                
+
                 self.theTickStep = ( self.theGrid[1] - self.theGrid[0] ) / self.theTickNumber
-                
+
                 #scale is log
             else :   
                 if self.theFrame[1] > 0 and self.theFrame[0] > 0:
@@ -350,7 +352,7 @@ class Axis:
                     self.theParent.theOwner.theSession.message("non positive value in range, falling back to linear scale")
                     self.theParent.changeScale( self.theOrientation, SCALE_LINEAR )
                     return
-        
+
         if self.theScaleType == SCALE_LINEAR:
             self.thePixelSize = float( self.theFrame[1] - self.theFrame[0] ) / self.theLength
 
@@ -359,7 +361,6 @@ class Axis:
          #reprint_ylabels
          #self.reprintLabels()
         return 0
-        
 
 
     def setScaleType( self, aScaleType ):
@@ -371,14 +372,13 @@ class Axis:
     def getScaleType( self ):
         return self.theScaleType
 
-    
+
     def isOutOfFrame( self, aMin, aMax ):
         aRange = self.theFrame[1] - self.theFrame[0]
         return  ( aMin < self.theFrame[0] + aRange * self.rescaleTriggerMin )  or \
                   ( aMax > self.theFrame[0] + aRange * self.rescaleTriggerMax )
 
 
-     
 
     def findMeasure( self, aFullPNString ):
         anArray = aFullPNString.split(':')
@@ -390,7 +390,7 @@ class Axis:
                 aMeasure= aMeasureItem[2]
                 break
         return aMeasure
-        
+
 
     def drawMeasures ( self ):
         # xmes is sec
@@ -401,7 +401,7 @@ class Axis:
                 self.theMeasureLabel = "no trace"
             else:
                 self.theMeasureLabel = self.findMeasure( self.theFullPNString )
-                
+
         elif self.theParent.getSeriesCount() == 1:
             for aSeries in self.theParent.getDataSeriesList():
                 if aSeries.isOn():
@@ -412,23 +412,23 @@ class Axis:
 
         # add scale information
         scaleLabel = self.theScaleType + " scale"
-        if self.theOrientation == PLOT_VERTICAL_AXIS:
-            self.theMeasureLabel += "  " + scaleLabel
+        self.theMeasureLabel += "  " + scaleLabel
 
-     # delete x area
-        self.theParent.drawBox(BACKGROUND_COLOR, self.theMeasureLabelPosition[0], self.theMeasureLabelPosition[1], 140, 20)
-
-        # drawText xmes
-        self.theParent.drawText(PEN_COLOR, self.theMeasureLabelPosition[0], self.theMeasureLabelPosition[1],
-                    self.theMeasureLabel )
+        # delete x area
         if self.theOrientation == PLOT_HORIZONTAL_AXIS:
-            textHeight = self.theParent.theAscent + self.theParent.theDescent + 5
-            self.theParent.drawBox(BACKGROUND_COLOR, self.theMeasureLabelPosition[0], 
-                self.theMeasureLabelPosition[1] + textHeight, 100, 20)
-            self.theParent.drawText(PEN_COLOR, self.theMeasureLabelPosition[0], 
-                self.theMeasureLabelPosition[1] + textHeight , scaleLabel )
-        
-            
+            textLength = self.theParent.theFont.string_width( self.theMeasureLabel )
+            self.theParent.drawBox(BACKGROUND_COLOR, self.theMeasureLabelPosition[0] - 200, 
+                self.theMeasureLabelPosition[1], 200, 20)
+
+            self.theParent.drawText(PEN_COLOR, self.theMeasureLabelPosition[0] - textLength, 
+                self.theMeasureLabelPosition[1], self.theMeasureLabel )
+        else:
+            self.theParent.drawBox(BACKGROUND_COLOR, self.theMeasureLabelPosition[0], self.theMeasureLabelPosition[1], 140, 20)
+    
+            # drawText xmes
+            self.theParent.drawText(PEN_COLOR, self.theMeasureLabelPosition[0], self.theMeasureLabelPosition[1],
+                        self.theMeasureLabel )
+                
 
 
 class DataSeries:
@@ -499,6 +499,7 @@ class DataSeries:
         self.theNewData = nu.concatenate( (self.theNewData, newPoints) )
 
 
+
     def replacePoints( self, newPoints):
         """ replace all datapoints """
         self.reset()
@@ -564,7 +565,7 @@ class DataSeries:
             self.theLastYmin = ymin
             if x == lastx and y==lasty and ymax==lastymax and ymin==lastymin:
                 continue
-                #print x, y, ymax, ymin, datapoint[DP_TIME], datapoint[DP_VALUE], datapoint[DP_MAX], datapoint[DP_MIN]
+
             if self.thePlot.getDisplayMinMax():
                 self.drawMinMax( self.getColor(), x, ymax, ymin )
 
@@ -599,7 +600,7 @@ class DataSeries:
     def __adjustLimits( self, y0, y1, upLimit, downLimit ):
         if y0 < upLimit and y1 < upLimit:
             return None
-                    
+
         if y0 > downLimit  and y1 > downLimit:
             return None
 
@@ -613,7 +614,7 @@ class DataSeries:
         if y1 > downLimit:
             y1 = downLimit
         return [ y0, y1 ]
-    
+
 
     def drawPoint(self, aColor, x, y, lastx, lasty ):
         #get datapoint x y values
@@ -728,7 +729,7 @@ class DataSeries:
                 #interpolation section ends
             self.thePlot.drawLine( self.getColor(), x0, y0, x1, y1 )
 
-            
+
     def changeColor( self ):
         aColor = self.theColor
         self.theColor = ""
@@ -742,8 +743,6 @@ class DataSeries:
         self.setColor( newColor )
         self.thePlot.drawWholePlot()
 
-
-   
 
 class Plot:
 
@@ -832,7 +831,7 @@ class Plot:
         
     def getWidget( self ):
         return self.theWidget 
-        
+
     def getMaxTraces( self ):
         return len( ColorList )
 
@@ -852,7 +851,7 @@ class Plot:
         self.theXAxis.setFullPNString( aFullPNString )
        # take this out if phase plotting history is supported in datagenerator
         self.setStripMode( self.theStripMode )
- 
+
 
     def changeScale(self, anOrientation, aScaleType ):
         #change variable
@@ -866,7 +865,7 @@ class Plot:
             return
         anAxis.draw()
         self.drawWholePlot()
-        
+
 
     def totalRedraw( self ):
         self.clearPlot()
@@ -901,7 +900,7 @@ class Plot:
             self.drawWholePlot()
         else:
             self.drawNewPoints()
-            
+
     def drawNewPoints( self ):
         for aSeries in self.theSeriesMap.values():
             aSeries.drawNewPoints()
@@ -1002,11 +1001,12 @@ class Plot:
         self.theOwner.requestDataSlice( aStart, anEnd, ( anEnd - aStart ) / ( self.theXAxis.theLength*2) )
 
     def requestNewData ( self ):
-        self.theOwner.requestNewData( self.theXAxis.theLength * 2 )
+        self.theOwner.requestNewData( self.getRequiredTimeResolution() )
 
 
     def getRequiredTimeResolution( self ):
         return ( self.theXAxis.theFrame[1] - self.theXAxis.theFrame[0] ) / (self.theXAxis.theLength * 2)
+        
         
     def doConnectPoints( self, aBool ):
         self.doesConnectPoints = aBool
@@ -1032,9 +1032,9 @@ class Plot:
 
 
     def recalculateSize(self):
-        self.theOrigo=[70,self.thePlotHeight-30]
+        self.theOrigo=[70,self.thePlotHeight-35]
         self.thePlotArea=[self.theOrigo[0],30,\
-            self.thePlotWidth-60-self.theOrigo[0],\
+            self.thePlotWidth-20-self.theOrigo[0],\
             self.theOrigo[1]-30]
         self.thePlotAreaBox=[self.thePlotArea[0],self.thePlotArea[1],\
             self.thePlotArea[2]+self.thePlotArea[0],\
@@ -1047,7 +1047,6 @@ class Plot:
         self.theYAxis.recalculateSize()
 
 
-
     def expose(self, obj, event):
 
         obj.window.draw_drawable( self.thePixmapBuffer.new_gc(), self.thePixmapBuffer, event.area[0], event.area[1],
@@ -1055,7 +1054,6 @@ class Plot:
         # check for resize
         anAllocation = self.theWidget.get_allocation()
         self.resize( anAllocation[2], anAllocation[3] )
-
 
 
     def allocateColor( self ):             
@@ -1073,15 +1071,14 @@ class Plot:
             self.theAvailableColors.remove( aColor )
 
 
-
     def releaseColor(self, aColor ):
         #remove from colorlist
         for aSeries in self.theSeriesMap.values():
             if aSeries.getColor() == aColor:
                 return
         self.theAvailableColors.insert( 0, aColor )
-    
-        
+
+
     def clearPlotarea(self):
         self.drawBox( PLOTAREA_COLOR, self.thePlotArea[0] + 1, self.thePlotArea[1] + 1,
                       self.thePlotArea[2] - 2, self.thePlotArea[3] -2 )

@@ -76,11 +76,11 @@ class DataGenerator:
                 lastTime = dataList[ len( dataList) -1 ][0]
                 dataRange =  currentTime - lastTime 
 
-                requiredResolution = dataRange / dataPointWidth
-
+                requiredResolution = dataPointWidth
+                if (dataRange/ requiredResolution)>100:
+                    requiredResolution = dataRange/100
                 dataList = self.theLoggerAdapter.getData( fullPNString, 
                             lastTime, currentTime,requiredResolution )
-
                 
                 # I havent yet updated the new logger code from CVS, but isn't changed to getDigest?
                 
@@ -102,6 +102,7 @@ class DataGenerator:
             dataList[0][4] = y
             # do interpolation here
         self.lastTime = currentTime
+        
         aDataSeries.addPoints( dataList )
 
     # end of requestNewData
