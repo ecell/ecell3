@@ -734,7 +734,6 @@ void ODEStepper::stepRadauIIA()
   setTolerableStepInterval( aStepInterval );
   
   setSpectralRadius( calculateJacobianNorm() );
-  std::cout << getCurrentTime() << "\t" << getSpectralRadius() << std::endl;
  
   // theW will already be transformed to Z-form
 

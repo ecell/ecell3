@@ -336,8 +336,6 @@ bool ODE45Stepper::calculate()
   isInterrupted = false;
 
   setSpectralRadius( aSpectralRadius / aStepInterval );
-  if ( ++count % 1000 == 0 )
-    std::cout << getCurrentTime() << "\t" << getSpectralRadius() << std::endl;
 
   return true;
 }
