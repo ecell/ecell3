@@ -416,13 +416,12 @@ if __name__ == '__main__':
 
 	try:
 		opts , args = getopt.getopt( sys.argv[1:] , 'DEhfo:',
-					     ["help", "force", "outfile="])
+					     ["help", "outfile="])
 	except:
 		usage()
 		sys.exit(1)
 
 	anEmlFileName = None
-	aForceFlag = 0
 	debug = 0
 	preprocessing_only = 0
 	for anOption, anArg in opts:
@@ -433,9 +432,6 @@ if __name__ == '__main__':
 		if anOption in ( "-D", '--debug' ):
 			debug = 1
 			
-		if anOption in ( "-f", '--force' ):
-			aForceFlag = 1
-
 		if anOption in ( "-o", '--outfile'):
 		        anEmlFileName = anArg
 
@@ -464,15 +460,6 @@ if __name__ == '__main__':
 			anExt += '.eml'
 
 		anEmlFileName = aBaseName + anExt
-
-	if anEmlFileName == '-':
-		anEmlFile = sys.stdout
-	else:
-		if os.path.isfile( anEmlFileName ) and aForceFlag == 0:
-			sys.stderr.write( "Output file %s exists. Use -f to overwrite.\n"
-					  % anEmlFileName )
-			sys.exit( 1 )
-
 
 	aTempFileName = tempfile.mktemp()
 	em.invoke( ( "-o", aTempFileName, anEmFileName ) )
