@@ -89,8 +89,7 @@ class MainWindow(OsogoWindow):
 		# creates MessageWindow 
 		# -------------------------------------
 		self.theMessageWindow.openWindow()
-                self.theMessageWindow['vbox1'].reparent( self['messagearea'] )
-                self['messagearea'].add(self.theMessageWindow['vbox1']                    )
+                self['messagearea'].add(self.theMessageWindow['top_frame']                    )
                 
 		self.__expose(None,None)
 		messageWindowSize=self.theMessageWindow.getActualSize()

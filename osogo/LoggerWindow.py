@@ -713,7 +713,7 @@ if __name__ == "__main__":
 	def mainLoop():
 		# FIXME: should be a custom function
 
-		gtk.mainloop()
+		gtk.main()
 
 	def main():
 		aSession = Session()

@@ -244,7 +244,7 @@ if __name__ == "__main__":
 
 
 	def mainLoop():
-		gtk.mainloop()
+		gtk.main()
 
 	def main():
 			aWindow = InterfaceWindow( 'InterfaceWindow.glade' )

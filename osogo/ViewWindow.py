@@ -45,7 +45,7 @@ class ViewWindow( Window ):
 
 if __name__ == "__main__":
     def mainLoop():
-        gtk.mainloop()
+        gtk.main()
 
     def main():
         mainLoop()

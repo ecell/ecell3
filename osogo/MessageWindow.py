@@ -46,7 +46,7 @@ class MessageWindow( Window ):
 
 	def __init__( self ):
 
-		Window.__init__( self )
+		Window.__init__( self, aRoot='top_frame' )
 		#		OsogoWindow.openWindow( self )
 		self.isShown = False
 		self.messageBuffer = gtk.TextBuffer(None)
@@ -109,7 +109,7 @@ class MessageWindow( Window ):
 if __name__ == "__main__":
 
 	def mainLoop():
-		gtk.mainloop()
+		gtk.main()
 
 	def main():
 		aWindow = MessageWindow()

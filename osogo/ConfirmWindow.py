@@ -109,7 +109,7 @@ class ConfirmWindow(gtk.Dialog):
 			cancel_button.show()
 			cancel_button.connect("clicked",self.cancelButtonClicked)	
 
-		gtk.mainloop()
+		gtk.main()
 
 
 	# ==========================================================================

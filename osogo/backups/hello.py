@@ -38,7 +38,7 @@ class MainWindow(Window):
 
 def mainLoop():
     # FIXME: should be a custom function
-    gtk.mainloop()
+    gtk.main()
 
 def main():
     aWindow = MainWindow( 'hello.glade' )

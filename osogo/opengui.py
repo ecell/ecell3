@@ -28,7 +28,7 @@ def loadScript( aTupple ):
 	aSession = aTupple[0]
 	anEssFile = aTupple[1]
 
-	#loads script after mainloop has been called
+	#loads script after main has been called
 	try:
 		# load ane execute script file
 		aSession.loadScript( anEssFile )
@@ -157,7 +157,7 @@ def main():
 		aMainWindow = aSession.openWindow('MainWindow')
 
 	# -------------------------------------
-	# calls gtk.mainloop()
+	# calls gtk.main()
 	# -------------------------------------
 
 	aSession.GUI_interact()

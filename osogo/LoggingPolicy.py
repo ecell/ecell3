@@ -111,7 +111,7 @@ class LoggingPolicy(Window):
 			"on_log_by_secs_toggled" : self.__buttonChosen,
 			"on_log_by_step_toggled" : self.__buttonChosen } )
 
-		gtk.mainloop()
+		gtk.main()
 	# ==========================================================================
 	def __populateDialog( self, aLoggingPolicy ):
 		if aLoggingPolicy[0]>0:

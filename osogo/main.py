@@ -9,7 +9,7 @@ def mainQuit():
 
 def mainLoop():
     # FIXME: should be a custom function
-    gtk.mainloop()
+    gtk.main()
 
 
 

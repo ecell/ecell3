@@ -185,12 +185,12 @@ if __name__ == "__main__":
     fpn = ('Variable','/CELL/CYTOPLASM','ATP','Value')
 
     def mainQuit( obj, aData ):
-        gtk.mainquit()
+        gtk.main_quit()
         
     def mainLoop():
         # FIXME: should be a custom function
 
-        gtk.mainloop()
+        gtk.main()
 
     def main():
         aDigitalWindow = DigitalWindow( 'plugins', simulator(), [fpn,] )

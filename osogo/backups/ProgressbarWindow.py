@@ -205,11 +205,11 @@ if __name__ == "__main__":
 
     def mainQuit( obj, data ):
         print obj,data
-        gtk.mainquit()
+        gtk.main_quit()
 
     def mainLoop():
         # FIXME: should be a custom function
-        gtk.mainloop()
+        gtk.main()
 
     def main():
         aPluginManager = Plugin.PluginManager()
