@@ -53,12 +53,12 @@ namespace libecs
   class PhysicalLogger
   {
 
-    typedef vvector<DataPoint> Vectortype;
+    typedef vvector<DataPoint> Vector;
     
   public:
 
-    DECLARE_TYPE( Vectortype::size_type, iterator );
-    DECLARE_TYPE( Vectortype::size_type, size_type );
+    DECLARE_TYPE( Vector::size_type, iterator );
+    DECLARE_TYPE( Vector::size_type, size_type );
 
     PhysicalLogger();
 
@@ -74,16 +74,16 @@ namespace libecs
 
     iterator lower_bound( const iterator& start,
 			  const iterator& end,
-			  RealCref time );
+			  RealCref time ) const;
 
     iterator upper_bound( const iterator& start,
 			  const iterator& end,
-			  RealCref time );
+			  RealCref time ) const;
 
-    void getItem( const iterator&, DataPointPtr );
+    void getItem( const iterator&, DataPointPtr ) const;
 
     DataPointVectorRCPtr getVector( const iterator& start,
-				    const iterator& end );
+				    const iterator& end ) const;
 
     size_type size() const
     {
@@ -96,18 +96,21 @@ namespace libecs
       return ( size() == 0 );
     }
 
-    DataPoint front()
+    DataPoint front() const
     {
-      return theVector[ 0 ];
+      // this const_cast can be removed if vvector has (front() const).
+      PhysicalLogger* aNonConstThis( const_cast<PhysicalLogger*>( this ) );
+      return aNonConstThis->theVector[ 0 ];
     }
 
-    DataPoint back()
+    DataPoint back() const
     {
+      // this const_cast can be removed if vvector has (back() const).
+      PhysicalLogger* aNonConstThis( const_cast<PhysicalLogger*>( this ) );
       // danger!!  undefined behavior with vvector if size() == 0 - sha
       DEBUG_EXCEPTION( size() > 0, AssertionFailed, "" );
-      return theVector[ size() - 1 ];
+      return aNonConstThis->theVector[ size() - 1 ];
     }
-
 
     iterator begin() const
     {
@@ -127,7 +130,9 @@ namespace libecs
 
     iterator theCurrentPosition;
 
-    Vectortype theVector;
+
+    // this mutable can be removed if vvector supports const operations
+    mutable Vector theVector;
     
   };
 

@@ -58,7 +58,7 @@ class PropertyWindow(OsogoPluginWindow):
         
 		aNameFullPN = convertFullIDToFullPN( self.theFullID() ,'Name' )
 
-		aNameList = list( self.theSession.theSimulator.getProperty( createFullPNString( aNameFullPN ) ) )
+		aNameList = list( self.theSession.theSimulator.getEntityProperty( createFullPNString( aNameFullPN ) ) )
 
 		aClassName = aNameList[0]
 		self.theType =ENTITYTYPE_STRING_LIST[ self.theFullID()[TYPE] ]
@@ -67,8 +67,8 @@ class PropertyWindow(OsogoPluginWindow):
 		aClassNameFullPN = convertFullIDToFullPN( self.theFullID(), 'ClassName' )
 		aNameFullPN = convertFullIDToFullPN( self.theFullID(), 'Name' )
 
-		aClassName = self.theSession.theSimulator.getProperty( createFullPNString( aClassNameFullPN ) )
-		aName = self.theSession.theSimulator.getProperty( createFullPNString( aNameFullPN ) )
+		aClassName = self.theSession.theSimulator.getEntityProperty( createFullPNString( aClassNameFullPN ) )
+		aName = self.theSession.theSimulator.getEntityProperty( createFullPNString( aNameFullPN ) )
 
 
 		self.theTypeEntry.set_text( self.theType + ' : ' + aClassName )
@@ -103,7 +103,7 @@ class PropertyWindow(OsogoPluginWindow):
 		                                             'PropertyList' )
 
 		self.prevFullID = convertFullPNToFullID( aPropertyListFullPN )        
-		aPropertyList = self.theSession.theSimulator.getProperty( createFullPNString( aPropertyListFullPN ) )
+		aPropertyList = self.theSession.theSimulator.getEntityProperty( createFullPNString( aPropertyListFullPN ) )
 
 		for aProperty in aPropertyList: # for (1)
 			Set = -1
@@ -146,7 +146,7 @@ class PropertyWindow(OsogoPluginWindow):
                 
 				aFullPNString =  createFullPNString( aFullPN ) 
 
-				aValueList = self.theSession.theSimulator.getProperty( createFullPNString( aFullPN ) )
+				aValueList = self.theSession.theSimulator.getEntityProperty( createFullPNString( aFullPN ) )
 
 				aDisplayedFlag = 0
 				if type(aValueList) == type(()):
@@ -228,7 +228,7 @@ if __name__ == "__main__":
              'PropertyAttributes' : ('1','2','3','4','5','6','7','8'),
              } 
 
-        def getProperty( self, fpn ):
+        def getEntityProperty( self, fpn ):
             return simulator.dic[fpn[PROPERTY]]
     
     fpn = FullPropertyName('Reactor:/CELL/CYTOPLASM:MichaMen:PropertyName')

@@ -3,13 +3,13 @@
 
 def printProperty( s, fullpn ):
     
-    value = s.getProperty( fullpn )
+    value = s.getEntityProperty( fullpn )
     print fullpn, '\t=\t', value
 
 def printAllProperties( s, fullid ):
 
     plistfullpn = fullid + ':' + 'PropertyList'
-    properties = s.getProperty( plistfullpn )
+    properties = s.getEntityProperty( plistfullpn )
     for property in properties:
         fullpn = fullid + ':' + property[0]
         try:

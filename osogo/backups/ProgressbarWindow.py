@@ -50,11 +50,11 @@ class ProgressbarWindow(PluginWindow):
         aFullPropertyName = convertFullIDToFullPN(self.theFullID,
                                                   'PropertyList')
         aPropertyList =\
-        list( self.theSimulator.getProperty( aFullPropertyName ) )
+        list( self.theSimulator.getEntityProperty( aFullPropertyName ) )
         aAttributeList = convertFullIDToFullPN(self.theFullID,
                                                   'PropertyAttributes')
         aAttributeList =\
-        list(self.theSimulator.getProperty( aAttributeList ))
+        list(self.theSimulator.getEntityProperty( aAttributeList ))
         num = 0
 
         for aProperty in aPropertyList:
@@ -80,7 +80,7 @@ class ProgressbarWindow(PluginWindow):
     def update( self ):
         self.theIDEntry.set_text  ( self.theID )
         
-        aValue = self.theSimulator.getProperty( self.theFPN )
+        aValue = self.theSimulator.getEntityProperty( self.theFPN )
         value = aValue[0]
         self.theActualValue = value
         self.theBarLength , self.theMultiplier , self.thePositiveFlag \
@@ -194,10 +194,10 @@ if __name__ == "__main__":
 
         dic={('Substance','/CELL/CYTOPLASM','ATP','quantity') : (1950,),}
         
-        def getProperty( self, fpn ):
+        def getEntityProperty( self, fpn ):
             return simulator.dic[fpn]
         
-        def setProperty( self, fpn, value ):
+        def setEntityProperty( self, fpn, value ):
             simulator.dic[fpn] = value
 
 

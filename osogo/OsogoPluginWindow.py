@@ -231,7 +231,7 @@ class OsogoPluginWindow(PluginWindow):
 	# ---------------------------------------------------------------
 	def getValue( self, aFullPN ):
 
-		return self.theSession.theSimulator.getProperty( createFullPNString( aFullPN ) )
+		return self.theSession.theSimulator.getEntityProperty( createFullPNString( aFullPN ) )
 		#aValueList = self.theSession.theSimulator.getProperty( createFullPNString( aFullPN ) )
 		#return aValueList[0]
 
@@ -253,13 +253,13 @@ class OsogoPluginWindow(PluginWindow):
 		aFullID = convertFullPNToFullID( aFullPN )
 		aFullPNwithProperty = convertFullIDToFullPN( aFullID, 'PropertyList' )
 		aFullPNwithPropertyString = createFullPNString( aFullPNwithProperty )
-		aPropertyList = self.theSession.theSimulator.getProperty( aFullPNwithPropertyString )
+		aPropertyList = self.theSession.theSimulator.getEntityProperty( aFullPNwithPropertyString )
 
 		for aProperty in aPropertyList:
 			# if proprety matches and settable flag is true
 			if aProperty[0] == aFullPN[-1] :
 				if aProperty[1] == TRUE:
-					self.theSession.theSimulator.setProperty( createFullPNString( aFullPN ), aValue )
+					self.theSession.theSimulator.setEntityProperty( createFullPNString( aFullPN ), aValue )
 					self.thePluginManager.updateAllPluginWindow()
 					self.thePluginManager.updateFundamentalWindows()
 					return None

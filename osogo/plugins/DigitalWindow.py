@@ -28,7 +28,7 @@ class DigitalWindow( OsogoPluginWindow ):
 		#if type() self.theFullPN() 
 
 		aFullPNString = createFullPNString( self.theFullPN() )
-		aValue = self.theSession.theSimulator.getProperty( aFullPNString )
+		aValue = self.theSession.theSimulator.getEntityProperty( aFullPNString )
 
 
 		if operator.isNumberType( aValue ):
@@ -109,10 +109,10 @@ if __name__ == "__main__":
 
         dic={('Substance', '/CELL/CYTOPLASM', 'ATP','Quantity') : (1950,),}
 
-        def getProperty( self, fpn ):
+        def getEntityProperty( self, fpn ):
             return simulator.dic[fpn]
 
-        def setProperty( self, fpn, value ):
+        def setEntityProperty( self, fpn, value ):
             simulator.dic[fpn] = value
 
 

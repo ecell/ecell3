@@ -122,7 +122,7 @@ namespace libecs
        @return A borrowed pointer to an Entity specified by the FullID.
     */
 
-    EntityPtr getEntity( FullIDCref aFullID );
+    EntityPtr getEntity( FullIDCref aFullID ) const;
 
     /**
        This method finds a System object pointed by the SystemPath.  
@@ -133,7 +133,7 @@ namespace libecs
     */
 
 
-    SystemPtr getSystem( SystemPathCref aSystemPath );
+    SystemPtr getSystem( SystemPathCref aSystemPath ) const;
 
 
     /**
@@ -155,7 +155,7 @@ namespace libecs
        @return a borrowed pointer to the Stepper.
     */
 
-    StepperPtr getStepper( StringCref anID );
+    StepperPtr getStepper( StringCref anID ) const;
 
 
     /**
@@ -202,11 +202,10 @@ namespace libecs
        @return a borrowed pointer to the LoggerBroker.
     */
 
-    LoggerBrokerRef getLoggerBroker()
+    LoggerBrokerRef getLoggerBroker() const
     { 
       return theLoggerBroker; 
     }
-
 
     /// @internal
 

@@ -155,7 +155,7 @@ class simulator :
             }
 
 
-    def getProperty( self, fpn ):
+    def getEntityProperty( self, fpn ):
         aSystemList = string.split(fpn[SYSTEMPATH] , '/')
         aLength = len( aSystemList )
         if fpn[SYSTEMPATH] == '/':
@@ -181,7 +181,7 @@ class simulator :
             return aTargetSystem[fpn[PROPERTY]]
 
     
-    def setProperty( self, fpn, arg_list ):
+    def setEntityProperty( self, fpn, arg_list ):
         aSystemList = string.split(fpn[SYSTEMPATH] , '/')
         aLength = len( aSystemList )
         if aLength == 1 :

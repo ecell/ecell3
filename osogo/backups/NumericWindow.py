@@ -40,12 +40,12 @@ class NumericWindow( PluginWindow ):
         self.setValue( self.getValue() * 0.5 )
 
     def getValue( self ):
-        aValueList = self.theSimulator.getProperty( self.theFullPN() )
+        aValueList = self.theSimulator.getEntityProperty( self.theFullPN() )
         return aValueList[0]
 
     def setValue( self, aValue ):
         aValueList = ( aValue, )
-        self.theSimulator.setProperty( self.theFullPN(), aValueList )
+        self.theSimulator.setEntityProperty( self.theFullPN(), aValueList )
         self.thePluginManager.updateAllPluginWindow()
 
 ### test code
@@ -56,10 +56,10 @@ if __name__ == "__main__":
 
         dic={('Substance', '/CELL/CYTOPLASM', 'ATP','Quantity') : (1950,),}
 
-        def getProperty( self, fpn ):
+        def getEntityProperty( self, fpn ):
             return simulator.dic[fpn]
 
-        def setProperty( self, fpn, value ):
+        def setEntityProperty( self, fpn, value ):
             simulator.dic[fpn] = value
 
 

@@ -100,7 +100,7 @@ namespace libemc
     virtual void createStepper( libecs::StringCref         aClassname,
 				libecs::StringCref         anId ) = 0;
 
-    virtual const libecs::Polymorph getStepperList() = 0;
+    virtual const libecs::Polymorph getStepperList() const = 0;
 
     virtual void setStepperProperty( libecs::StringCref    aStepperID,
 				     libecs::StringCref    aPropertyName,
@@ -108,33 +108,56 @@ namespace libemc
 
     virtual const libecs::Polymorph
     getStepperProperty( libecs::StringCref aStepperID,
-		 libecs::StringCref aPropertyName ) = 0;
+			libecs::StringCref aPropertyName ) const = 0;
 
     virtual void createEntity( libecs::StringCref   aClassname, 
 			       libecs::StringCref   aFullIDString,
 			       libecs::StringCref   aName ) = 0;
 
-    virtual bool isEntityExist( libecs::StringCref  aFullIDString ) = 0;
+    virtual const bool 
+    isEntityExist( libecs::StringCref  aFullIDString ) const = 0;
 
-    virtual void setProperty( libecs::StringCref    aFullPNString,
-			      libecs::PolymorphCref aValue ) = 0;
-
-
+    virtual void setEntityProperty( libecs::StringCref    aFullPNString,
+				    libecs::PolymorphCref aValue ) = 0;
 
     virtual const libecs::Polymorph
-    getProperty( libecs::StringCref aFullPNString ) = 0;
+    getEntityProperty( libecs::StringCref aFullPNString ) const = 0;
 
-    virtual EmcLogger getLogger( libecs::StringCref aFullPNString ) = 0;
+
+    virtual void createLogger( libecs::StringCref aFullPNString ) = 0;
+
+    virtual const libecs::Polymorph getLoggerList() const = 0;
+
+    virtual const libecs::DataPointVectorRCPtr 
+    getLoggerData( libecs::StringCref aFullPNString ) const = 0;
+
+    virtual const libecs::DataPointVectorRCPtr
+    getLoggerData( libecs::StringCref aFullPNString, 
+		   libecs::RealCref aStartTime, 
+		   libecs::RealCref anEndTime ) const = 0;
+
+    virtual const libecs::DataPointVectorRCPtr
+    getLoggerData( libecs::StringCref aFullPNString,
+		   libecs::RealCref aStartTime, libecs::RealCref anEndTime, 
+		   libecs::RealCref interval ) const = 0;
+
+    virtual const libecs::Real 
+    getLoggerStartTime( libecs::StringCref aFullPNString ) const = 0;
+
+    virtual const libecs::Real 
+    getLoggerEndTime( libecs::StringCref aFullPNString ) const = 0;
+
+    virtual const libecs::Real 
+    getLoggerMinimumInterval( libecs::StringCref aFullPNString ) const = 0;
+
+    virtual const libecs::Int 
+    getLoggerSize( libecs::StringCref aFullPNString ) const = 0;
 
     virtual void step() = 0;
 
     virtual void initialize() = 0;
 
-    virtual const libecs::Real getCurrentTime() = 0;
-
-
-
-    virtual const libecs::Polymorph getLoggerList() = 0;
+    virtual const libecs::Real getCurrentTime() const = 0;
 
     virtual void run() = 0;
 

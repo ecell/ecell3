@@ -132,7 +132,7 @@ namespace libecs
 
 
 
-  SystemPtr Model::getSystem( SystemPathCref aSystemPath )
+  SystemPtr Model::getSystem( SystemPathCref aSystemPath ) const
   {
     SystemPtr aSystem( getRootSystem() );
     SystemPath aSystemPathCopy( aSystemPath );
@@ -170,7 +170,7 @@ namespace libecs
   }
 
 
-  EntityPtr Model::getEntity( FullIDCref aFullID )
+  EntityPtr Model::getEntity( FullIDCref aFullID ) const
   {
     EntityPtr anEntity( NULL );
     SystemPathCref aSystemPath( aFullID.getSystemPath() );
@@ -212,10 +212,9 @@ namespace libecs
   }
 
 
-  StepperPtr Model::getStepper( StringCref anID )
+  StepperPtr Model::getStepper( StringCref anID ) const
   {
-
-    StepperMapIterator i( theStepperMap.find( anID ) );
+    StepperMapConstIterator i( theStepperMap.find( anID ) );
 
     if( i == theStepperMap.end() )
       {

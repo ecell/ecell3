@@ -52,19 +52,16 @@ namespace libecs
   }
 
 
-  DataPointVectorRCPtr Logger::getData( void ) 
+  DataPointVectorRCPtr Logger::getData( void ) const
   {
-    theDataPointVector 
-      = thePhysicalLogger.getVector( thePhysicalLogger.begin(),
-				     thePhysicalLogger.end() );
-    
-    return theDataPointVector;
+    return thePhysicalLogger.getVector( thePhysicalLogger.begin(),
+					thePhysicalLogger.end() );
   }
 
   //
 
   DataPointVectorRCPtr Logger::getData( RealCref aStartTime,
-					RealCref anEndTime ) 
+					RealCref anEndTime ) const
   {
     PhysicalLoggerIterator 
       top( thePhysicalLogger.upper_bound( thePhysicalLogger.begin(),
@@ -76,9 +73,7 @@ namespace libecs
 					     top,
 					     aStartTime ) );
 
-    theDataPointVector = thePhysicalLogger.getVector( bottom, top );
-
-    return theDataPointVector;
+    return thePhysicalLogger.getVector( bottom, top );
   }
 
 
@@ -87,7 +82,7 @@ namespace libecs
 
   DataPointVectorRCPtr Logger::getData( RealCref aStartTime,
 					RealCref anEndTime,
-					RealCref anInterval ) 
+					RealCref anInterval ) const
   {
     Real theStartTime ( thePhysicalLogger.front().getTime() );
     Real theEndTime ( thePhysicalLogger.back().getTime() );
@@ -155,9 +150,7 @@ namespace libecs
 	++counter;
       }
 
-    theDataPointVector = aDataPointVector;
-
-    return theDataPointVector;
+    return DataPointVectorRCPtr( aDataPointVector );
   }
 
 
@@ -190,7 +183,7 @@ namespace libecs
 
   //
 
-  Real Logger::getStartTime( void ) 
+  Real Logger::getStartTime( void ) const
   {
     return thePhysicalLogger.front().getTime();
   }
@@ -198,7 +191,7 @@ namespace libecs
 
   //
 
-  Real Logger::getEndTime( void ) 
+  Real Logger::getEndTime( void ) const
   {
     return thePhysicalLogger.back().getTime();
   }

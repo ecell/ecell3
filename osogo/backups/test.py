@@ -3,11 +3,11 @@
 import ecs
 
 def printProperty( sim, fqpi, propertyname ):
-    value = sim.getProperty( fqpi, propertyname )
+    value = sim.getEntityProperty( fqpi, propertyname )
     print fqpi, '::', propertyname, '\t=\t', value
 
 def printAllProperties( sim, fqpi ):
-    properties = sim.getProperty( fqpi, 'PropertyList' )
+    properties = sim.getEntityProperty( fqpi, 'PropertyList' )
     for property in properties:
         printProperty( sim, fqpi, property )
 
@@ -29,12 +29,12 @@ print 'make reactors...'
 #s.createEntity('ConstantActivityReactor','Reactor:/:RC1','constant reactor')
 
 print 'set Substance:/:A Quantity = 30'
-s.setProperty( 'Substance:/:A', 'Quantity', (30,) )
+s.setEntityProperty( 'Substance:/:A', 'Quantity', (30,) )
 
 print 'initialize()...'
 s.initialize()
 
-substancelist = s.getProperty( 'System:/:/', 'SubstanceList' )
+substancelist = s.getEntityProperty( 'System:/:/', 'SubstanceList' )
 
 printList( s, 'Substance', '/' , substancelist )
 
@@ -42,7 +42,7 @@ print
 
 printProperty( s, 'Substance:/:A', 'Quantity' )
 print 'changing Quantity of Substance:/:A...'
-s.setProperty( 'Substance:/:A', 'Quantity', (1,) )
+s.setEntityProperty( 'Substance:/:A', 'Quantity', (1,) )
 printProperty( s, 'Substance:/:A', 'Quantity' )
 
 print

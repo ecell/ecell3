@@ -53,10 +53,10 @@ class RecordingSimulator( ecell.ecs.Simulator ):
         self.theSimulator.createEntity( type, fullid, name )
         self.record( 'aSimulator.createEntity( \'%s\', %s, \'%s\' )' % (type, fullid, name) )
 
-    def setProperty( self, fullpn, value ):
+    def setEntityProperty( self, fullpn, value ):
 
-        self.theSimulator.setProperty(fullpn, value)
-        self.record( 'aSimulator.setProperty( %s, %s )' % (fullpn, value) )
+        self.theSimulator.setEntityProperty(fullpn, value)
+        self.record( 'aSimulator.setEntityProperty( %s, %s )' % (fullpn, value) )
         
     def getLogger( self, fullpn ):
 

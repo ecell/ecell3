@@ -92,7 +92,7 @@ namespace libecs
 
     */
 
-    DataPointVectorRCPtr getData( void ) ;
+    DataPointVectorRCPtr getData( void ) const;
 
     /**
 
@@ -105,7 +105,7 @@ namespace libecs
     */
 
     DataPointVectorRCPtr getData( RealCref aStartTine,
-				  RealCref anEndTime ) ;
+				  RealCref anEndTime ) const;
 
     /**
     
@@ -113,7 +113,7 @@ namespace libecs
 
     DataPointVectorRCPtr getData( RealCref aStartTime,
 				  RealCref anEndTime, 
-				  RealCref anInterval ) ;
+				  RealCref anInterval ) const;
     
 
 
@@ -121,13 +121,13 @@ namespace libecs
 
     */
 
-    Real getStartTime( void ) ;
+    Real getStartTime( void ) const;
 
     /**
 
     */
 
-    Real getEndTime( void ) ;
+    Real getEndTime( void ) const;
 
 
     const Int getSize() const
@@ -201,7 +201,6 @@ namespace libecs
     StepperCref          theStepper;
     PropertySlotRef      thePropertySlot;
 
-    DataPointVectorRCPtr theDataPointVector;
     PhysicalLogger	 thePhysicalLogger;
     DataInterval	 theDataInterval;
     Real                 theLastTime;

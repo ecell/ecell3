@@ -63,21 +63,29 @@ namespace libecs
   }
 
 
-  LoggerPtr LoggerBroker::getLogger( FullPNCref aFullPN, RealCref anInterval )
+  LoggerPtr 
+  LoggerBroker::getLogger( FullPNCref aFullPN, RealCref anInterval ) const
   {
-    LoggerMapIterator aLoggerMapIterator( theLoggerMap.find( aFullPN ) );
-    if( aLoggerMapIterator != theLoggerMap.end() )
+    LoggerMapConstIterator aLoggerMapIterator( theLoggerMap.find( aFullPN ) );
+
+    if( aLoggerMapIterator == theLoggerMap.end() )
       {
-	return aLoggerMapIterator->second;
+	THROW_EXCEPTION( NotFound, "Logger [" + aFullPN.getString() 
+			 + "] not found." );
       }
-    else
-      {
-	return createLogger( aFullPN );
-      }
+
+    return aLoggerMapIterator->second;
   }
 
-  LoggerPtr LoggerBroker::createLogger( FullPNCref aFullPN )
+  LoggerPtr LoggerBroker::createLogger( FullPNCref aFullPN, 
+					RealCref anInterval )
   {
+    if( theLoggerMap.find( aFullPN ) != theLoggerMap.end() )
+      {
+	THROW_EXCEPTION( AlreadyExist, "Logger [" + aFullPN.getString()
+			 + "] already exist." );
+      }
+
     EntityPtr anEntityPtr( getModel().getEntity( aFullPN.getFullID() ) );
 
     const String aPropertyName( aFullPN.getPropertyName() );

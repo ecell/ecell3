@@ -130,10 +130,10 @@ if __name__ == "__main__":
     class simulator:        
         dic={('Substance','/CELL/CYTOPLASM','ATP','Quantity') : (1950,),
              ('Substance','/CELL/CYTOPLASM','ATP','Concentration') : (0.353,),}
-        def getProperty( self, fpn ):
+        def getEntityProperty( self, fpn ):
             return simulator.dic[fpn]
         
-        def setProperty( self, fpn, value ):
+        def setEntityProperty( self, fpn, value ):
             simulator.dic[fpn] = value
             
             

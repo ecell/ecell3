@@ -16,7 +16,7 @@ class BargraphWindow( OsogoPluginWindow ):
 		OsogoPluginWindow.__init__( self, dirname, data, pluginmanager, root )
 		self.theSession = pluginmanager.theSession
 		aFullPNString = createFullPNString( self.theFullPN() )
-		aValue = self.theSession.theSimulator.getProperty( aFullPNString )
+		aValue = self.theSession.theSimulator.getEntityProperty( aFullPNString )
 
 		#if operator.isNumberType( aValue[0] ):
 		if operator.isNumberType( aValue ):
@@ -57,14 +57,13 @@ class BargraphWindow( OsogoPluginWindow ):
 			self.addPopupMenu(0,1,1)
 
 
-
 	def update( self ):
         
 		aString = str( self.theFullPN()[ID] )
 		aString += ':\n' + str( self.theFullPN()[PROPERTY] )        
 		self.theIDEntry.set_text  ( aString )
 
-		aValue = self.theSession.theSimulator.getProperty( createFullPNString( self.theFullPN() ) )
+		aValue = self.theSession.theSimulator.getEntityProperty( createFullPNString( self.theFullPN() ) )
 		
 		self.theActualValue = aValue
 		self.theBarLength , self.theMultiplier , self.thePositiveFlag \
@@ -180,10 +179,10 @@ if __name__ == "__main__":
 
         dic={('Substance','/CELL/CYTOPLASM','ATP','quantity') : (1950,),}
         
-        def getProperty( self, fpn ):
+        def getEntityProperty( self, fpn ):
             return simulator.dic[fpn]
         
-        def setProperty( self, fpn, value ):
+        def setEntityProperty( self, fpn, value ):
             simulator.dic[fpn] = value
 
 

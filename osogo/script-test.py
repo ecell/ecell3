@@ -39,7 +39,7 @@ except:
     print 'cannot instantiate ConstantActivityReactor'
    
 #  print 'set Substance:/CELL/CYTOPLASM:ATP Quantity = 30'
-#  aMainWindow.theSimulator.setProperty( ( SUBSTANCE, '/CELL/CYTOPLASM', 'ATP', 'Quantity' ), (30,) )
+#  aMainWindow.theSimulator.setEntityProperty( ( SUBSTANCE, '/CELL/CYTOPLASM', 'ATP', 'Quantity' ), (30,) )
 
 print 'initialize()...'
 aMainWindow.theSimulator.initialize()

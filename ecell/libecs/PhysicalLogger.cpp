@@ -44,7 +44,7 @@ namespace libecs
   PhysicalLoggerIterator 
   PhysicalLogger::lower_bound( PhysicalLoggerIteratorCref start,
 			       PhysicalLoggerIteratorCref end,
-			       RealCref time )
+			       RealCref time ) const
   {
     PhysicalLoggerIterator iterator( ( start + end ) / 2 );
     PhysicalLoggerIterator i_start( start );
@@ -58,7 +58,9 @@ namespace libecs
 
     while( i_start < ( i_end - 1 ) )
       {
-	if ( theVector[ iterator ].getTime() < time )
+	// this can be removed if VVector's operator[] is a const method
+	Vector& aVector( const_cast<Vector&>( theVector ) );
+	if ( aVector[ iterator ].getTime() < time )
 	  {
 	    i_start = iterator;
 	  }
@@ -77,7 +79,7 @@ namespace libecs
   PhysicalLoggerIterator 
   PhysicalLogger::upper_bound( PhysicalLoggerIteratorCref start,
 			       PhysicalLoggerIteratorCref end,
-			       RealCref time )
+			       RealCref time ) const
 
   {
     PhysicalLoggerIterator result( lower_bound( start, end, time ) );
@@ -91,21 +93,21 @@ namespace libecs
   }
 
   void PhysicalLogger::getItem( PhysicalLoggerIteratorCref where,
-				DataPointPtr what )
-
+				DataPointPtr what ) const
   {
     PhysicalLoggerIterator awhere( where );
     if( where > theVector.size() )
       { 
 	awhere = theVector.size(); 
       }
-
-    *what = theVector [ awhere ];
+    
+    // this const_cast can be removed if vvector supports this const operation
+    *what = const_cast<Vector&>( theVector ) [ awhere ];
   }
 
   DataPointVectorRCPtr 
   PhysicalLogger::getVector( PhysicalLoggerIteratorCref start,
-			     PhysicalLoggerIteratorCref end )
+			     PhysicalLoggerIteratorCref end ) const
   {
     PhysicalLoggerIterator i_start ( start );
     PhysicalLoggerIterator i_end ( end );

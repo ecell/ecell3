@@ -205,11 +205,11 @@ class Session:
         
         for aStepperProperty in aStepperPropertyList:
 
-            self.theSimulator.setProperty( str( aStepperProperty[ 'FullPn' ] ), \
+            self.theSimulator.setEntityProperty( str( aStepperProperty[ 'FullPn' ] ), \
                                            aStepperProperty[ 'StepperId' ] )
 
             ## Debug for Output -----------------------------------------------------------
-            #script = "self.theSimulator.setProperty( '" + aStepperProperty[ 'FullPn' ] + "', " +\
+            #script = "self.theSimulator.setEntityProperty( '" + aStepperProperty[ 'FullPn' ] + "', " +\
             #         str( aStepperProperty[ 'StepperId' ] ) + ')'
             #print script
             ##=============================================================================        
@@ -217,15 +217,15 @@ class Session:
 
 
     def __loadProperty( self ):
-        aPropertyList = self.theEml.getPropertyList()
+        aPropertyList = self.theEml.getEntityPropertyList()
         
         for aProperty in aPropertyList:
 
-            self.theSimulator.setProperty( aProperty[ 'FullPn' ], \
+            self.theSimulator.setEntityProperty( aProperty[ 'FullPn' ], \
                                            aProperty[ 'ValueList' ] )
 
             ## Debug for Output -----------------------------------------------------------
-            #script = "self.theSimulator.setProperty( '" +str( aProperty[ 'FullPn' ] ) + "', " + \
+            #script = "self.theSimulator.setEntityProperty( '" +str( aProperty[ 'FullPn' ] ) + "', " + \
             #         str( aProperty[ 'ValueList' ] ) + ')'
             #
             #print script

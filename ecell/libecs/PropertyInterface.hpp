@@ -70,14 +70,6 @@ namespace libecs
   {
   public:
 
-    enum PropertyAttribute
-      {
-	SETABLE =    ( 1 << 0 ),
-	GETABLE =    ( 1 << 1 ),
-	CUMULATIVE = ( 1 << 2 )
-      };
-
-
     PropertyInterface();
     virtual ~PropertyInterface();
 

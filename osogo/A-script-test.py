@@ -11,8 +11,8 @@ aSimulator.createEntity( 'System', ( SYSTEM, '/CELL', 'CYTOPLASM' ), 'cytoplasm'
 aSimulator.createEntity( 'System', ( SYSTEM, '/CELL', 'MEMBRANE' ), 'membrane' )
 aSimulator.createEntity( 'System', ( SYSTEM, '/', 'ENVIRONMENT' ), 'environment' )
 
-# aSimulator.setProperty( ( SYSTEM, '/CELL', 'CYTOPLASM', 'VolumeIndex' ), (1234,) )
-# aSimulator.setProperty( ( SYSTEM, '/', 'ENVIRONMENT', 'VolumeIndex' ), (9876,) )
+# aSimulator.setEntityProperty( ( SYSTEM, '/CELL', 'CYTOPLASM', 'VolumeIndex' ), (1234,) )
+# aSimulator.setEntityProperty( ( SYSTEM, '/', 'ENVIRONMENT', 'VolumeIndex' ), (9876,) )
 
 aMainWindow.printMessage('make Substances...\n')
 
@@ -48,17 +48,17 @@ except:
  
 aMainWindow.printMessage("set Quantity...\n")
 
-aSimulator.setProperty( ( SUBSTANCE, '/CELL/CYTOPLASM', 'ATP', 'Quantity' ), (100,) )
-aSimulator.setProperty( ( SUBSTANCE, '/CELL/CYTOPLASM', 'ADP' , 'Quantity' ), (120,) )
-aSimulator.setProperty( ( SUBSTANCE, '/CELL/CYTOPLASM', 'AMP', 'Quantity' ), (140,) )
+aSimulator.setEntityProperty( ( SUBSTANCE, '/CELL/CYTOPLASM', 'ATP', 'Quantity' ), (100,) )
+aSimulator.setEntityProperty( ( SUBSTANCE, '/CELL/CYTOPLASM', 'ADP' , 'Quantity' ), (120,) )
+aSimulator.setEntityProperty( ( SUBSTANCE, '/CELL/CYTOPLASM', 'AMP', 'Quantity' ), (140,) )
 
-aSimulator.setProperty( ( SUBSTANCE, '/ENVIRONMENT', 'GLU', 'Quantity' ), (300,) )
-aSimulator.setProperty( ( SUBSTANCE, '/ENVIRONMENT', 'PYR', 'Quantity' ), (400,) )
-aSimulator.setProperty( ( SUBSTANCE, '/ENVIRONMENT', 'LCT', 'Quantity' ), (500,) )
+aSimulator.setEntityProperty( ( SUBSTANCE, '/ENVIRONMENT', 'GLU', 'Quantity' ), (300,) )
+aSimulator.setEntityProperty( ( SUBSTANCE, '/ENVIRONMENT', 'PYR', 'Quantity' ), (400,) )
+aSimulator.setEntityProperty( ( SUBSTANCE, '/ENVIRONMENT', 'LCT', 'Quantity' ), (500,) )
 
-aSimulator.setProperty( ( SUBSTANCE, '/CELL/MEMBRANE', 'CI', 'Quantity' ), (10,) )
-aSimulator.setProperty( ( SUBSTANCE, '/CELL/MEMBRANE', 'CII', 'Quantity' ), (20,) )
-aSimulator.setProperty( ( SUBSTANCE, '/CELL/MEMBRANE', 'CIII', 'Quantity' ), (30,) )
+aSimulator.setEntityProperty( ( SUBSTANCE, '/CELL/MEMBRANE', 'CI', 'Quantity' ), (10,) )
+aSimulator.setEntityProperty( ( SUBSTANCE, '/CELL/MEMBRANE', 'CII', 'Quantity' ), (20,) )
+aSimulator.setEntityProperty( ( SUBSTANCE, '/CELL/MEMBRANE', 'CIII', 'Quantity' ), (30,) )
 
 aMainWindow.printMessage("initialize()...\n")
 aSimulator.initialize()

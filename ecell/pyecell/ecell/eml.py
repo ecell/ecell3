@@ -221,7 +221,7 @@ class Eml:
     ## Methods for Property
     ##---------------------------------------------
     
-    def setProperty( self, aFullId, aName, aValueList ):
+    def setEntityProperty( self, aFullId, aName, aValueList ):
 
         #aPropertyExistence = self.checkPropertyExistence( aFullId )
         #if self.checkPropertyExistence( aFullId ):
@@ -363,7 +363,7 @@ class Eml:
         return anEntityList
 
 
-    def getPropertyList( self ):
+    def getEntityPropertyList( self ):
 
         aSystemPropertyList  = self.getSystemPropertyList()
         aSubstanceOrReactorPropertyList = self.getSubstanceOrReactorPropertyList()
@@ -555,7 +555,7 @@ class Eml:
 
 
 
-    def getPropertyElementsList( self ):
+    def getEntityPropertyElementsList( self ):
         aPropertyList = self.getElementsByTagName( 'Property' )
         return aPropertyList
 

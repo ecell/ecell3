@@ -8,10 +8,6 @@
 TRUE  = 1
 FALSE = 0
 
-# PropertyAttribute bit masks
-SETABLE = 1 << 0   # == 1
-GETABLE = 1 << 1   # == 2
-
 # FullPN field numbers
 TYPE       = 0
 SYSTEMPATH = 1

@@ -71,62 +71,71 @@ BOOST_PYTHON_MODULE_INIT(_ecs)
   //
 
   aSimulatorClass.def( python::constructor<>() );
+
+  // Entity-related methods
   aSimulatorClass.def( &libemc::Simulator::createEntity,   "createEntity" );
   aSimulatorClass.def( &libemc::Simulator::isEntityExist,  "isEntityExist" );
-  aSimulatorClass.def( &libemc::Simulator::setProperty,    "setProperty" );
-  aSimulatorClass.def( &libemc::Simulator::getProperty,    "getProperty" );
-  aSimulatorClass.def( &libemc::Simulator::createStepper,  "createStepper" );
+  aSimulatorClass.def( &libemc::Simulator::setEntityProperty,
+		       "setEntityProperty" );
+  aSimulatorClass.def( &libemc::Simulator::getEntityProperty, 
+		       "getEntityProperty" );
+
+  // Stepper-related methods
+  aSimulatorClass.def( &libemc::Simulator::createStepper,   "createStepper" );
   aSimulatorClass.def( &libemc::Simulator::getStepperList,  "getStepperList" );
   aSimulatorClass.def( &libemc::Simulator::setStepperProperty, 
 		       "setStepperProperty" );
   aSimulatorClass.def( &libemc::Simulator::getStepperProperty,
 		       "getStepperProperty" );
-  aSimulatorClass.def( &libemc::Simulator::getCurrentTime, "getCurrentTime" );
 
-  // to be removed
-  aSimulatorClass.def( &libemc::Simulator::getLogger,      "getLogger" );
 
+  // Logger-related methods
   aSimulatorClass.def( &libemc::Simulator::getLoggerList,  "getLoggerList" );  
+  aSimulatorClass.def( &libemc::Simulator::createLogger,  "createLogger" );  
+  aSimulatorClass.def( ( const libecs::DataPointVectorRCPtr 
+			 ( libemc::Simulator::* )( libecs::StringCref ) const )
+		       &libemc::Simulator::getLoggerData,
+		       "getLoggerData" );
+  aSimulatorClass.def( ( const libecs::DataPointVectorRCPtr 
+			 ( libemc::Simulator::* )( libecs::StringCref, 
+						   libecs::RealCref, 
+						   libecs::RealCref ) const )
+		       &libemc::Simulator::getLoggerData,
+		       "getLoggerData" );
+  aSimulatorClass.def( ( const libecs::DataPointVectorRCPtr
+			 ( libemc::Simulator::* )( libecs::StringCref, 
+						   libecs::RealCref, 
+						   libecs::RealCref, 
+						   libecs::RealCref ) const )
+		       &libemc::Simulator::getLoggerData, 
+		       "getLoggerData" );
+  aSimulatorClass.def( &libemc::Simulator::getLoggerStartTime,
+		       "getLoggerStartTime" );  
+  aSimulatorClass.def( &libemc::Simulator::getLoggerEndTime, 
+		       "getLoggerEndTime" );    
+  aSimulatorClass.def( &libemc::Simulator::getLoggerMinimumInterval, 
+		       "getLoggerMinimumInterval" );    
+  aSimulatorClass.def( &libemc::Simulator::getLoggerSize, "getLoggerSize" );
+
+
+
+  // Simulation-related methods
+  aSimulatorClass.def( &libemc::Simulator::getCurrentTime, "getCurrentTime" );
   aSimulatorClass.def( &libemc::Simulator::stop,           "stop" );
   aSimulatorClass.def( &libemc::Simulator::step,           "step" );
-  aSimulatorClass.def( &libemc::Simulator::initialize,     "initialize" );  
   aSimulatorClass.def( ( void ( libemc::Simulator::* )() )
 		       &libemc::Simulator::run,            "run" );
   aSimulatorClass.def( ( void( libemc::Simulator::* )( libecs::Real ) )
 		       &libemc::Simulator::run,            "run" );
+
   aSimulatorClass.def( &libemc::Simulator::setPendingEventChecker,
 		       "setPendingEventChecker" );
   aSimulatorClass.def( &libemc::Simulator::setEventHandler, 
 		       "setEventHandler" );
 
+  // usually no need to call this explicitly
+  aSimulatorClass.def( &libemc::Simulator::initialize,     "initialize" );  
 
-  //
-  // PyLogger definitions
-  //
-
-  //  no constructor
-  //  aPyLoggerClass.def( python::constructor<libecs::LoggerPtr>() );
-
-  aLoggerClass.def( ( const libecs::DataPointVectorRCPtr 
-		      ( libemc::EmcLogger::* )() )
-		    &libemc::EmcLogger::getData,
-		    "getData" );
-  aLoggerClass.def( ( const libecs::DataPointVectorRCPtr 
-		      ( libemc::EmcLogger::* )( libecs::RealCref, 
-						libecs::RealCref ) )
-		    &libemc::EmcLogger::getData,
-		    "getData" );
-  aLoggerClass.def( ( const libecs::DataPointVectorRCPtr
-		      ( libemc::EmcLogger::* )( libecs::RealCref, 
-						libecs::RealCref, 
-						libecs::RealCref ) )
-		    &libemc::EmcLogger::getData, 
-		    "getData" );
-  aLoggerClass.def( &libemc::EmcLogger::getStartTime, "getStartTime" );  
-  aLoggerClass.def( &libemc::EmcLogger::getEndTime,   "getEndTime" );    
-  aLoggerClass.def( &libemc::EmcLogger::getMinimumInterval,
-		    "getMinimumInterval" );    
-  aLoggerClass.def( &libemc::EmcLogger::getSize, "getSize" );
 
 }
 

@@ -56,20 +56,14 @@ namespace libecs
 		  createPropertySlot( "ClassName", *this, 
 				      Type2Type<String>(),
 				      NULLPTR,
-				      &PropertyInterface::getClassNameString ) );
+				      &PropertyInterface::
+				      getClassNameString ) );
     
     registerSlot( getPropertySlotMaker()->
 		  createPropertySlot( "PropertyList",*this,
 				      Type2Type<Polymorph>(),
 				      NULLPTR,
 				      &PropertyInterface::getPropertyList ) );
-    
-    registerSlot( getPropertySlotMaker()->
-		  createPropertySlot( "PropertyAttributes",*this,
-				      Type2Type<Polymorph>(),
-				      NULLPTR,
-				      &PropertyInterface::getPropertyAttributes 
-				      ) );
     
 
   }
@@ -97,32 +91,6 @@ namespace libecs
 				 ( aPropertySlotPtr->isGetable() ) );
 
 	aVector.push_back( anInnerVector );
-      }
-
-    return aVector;
-  }
-
-  const Polymorph PropertyInterface::getPropertyAttributes() const
-  {
-    PolymorphVector aVector;
-    aVector.reserve( thePropertySlotMap.size() );
-
-    for( PropertySlotMapConstIterator i( thePropertySlotMap.begin() ); 
-	 i != thePropertySlotMap.end() ; ++i )
-      {
-	Int anAttributeFlag( 0 );
-
-	if( i->second->isSetable() )
-	  {
-	    anAttributeFlag |= SETABLE;
-	  }
-
-	if( i->second->isGetable() )
-	  {
-	    anAttributeFlag |= GETABLE;
-	  }
-
-	aVector.push_back( anAttributeFlag );
       }
 
     return aVector;

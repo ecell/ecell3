@@ -65,7 +65,7 @@ namespace libemc
     getModel().createStepper( aClassname, anId );
   }
 
-  const libecs::Polymorph LocalSimulatorImplementation::getStepperList()
+  const libecs::Polymorph LocalSimulatorImplementation::getStepperList() const
   {
     StepperMapCref aStepperMap( getModel().getStepperMap() );
 
@@ -94,9 +94,9 @@ namespace libemc
   const libecs::Polymorph
   LocalSimulatorImplementation::
   getStepperProperty( libecs::StringCref aStepperID,
-		      libecs::StringCref aPropertyName )
+		      libecs::StringCref aPropertyName ) const
   {
-    StepperPtr aStepperPtr( getModel().getStepper( aStepperID ) );
+    StepperCptr aStepperPtr( getModel().getStepper( aStepperID ) );
 
     return aStepperPtr->getProperty( aPropertyName );
   }
@@ -109,8 +109,8 @@ namespace libemc
     getModel().createEntity( aClassname, FullID( aFullIDString ), aName );
   }
 
-  bool LocalSimulatorImplementation::
-  isEntityExist( libecs::StringCref aFullIDString )
+  const bool LocalSimulatorImplementation::
+  isEntityExist( libecs::StringCref aFullIDString ) const
   {
     try
       {
@@ -126,7 +126,7 @@ namespace libemc
 
 
   void LocalSimulatorImplementation::
-  setProperty( StringCref aFullPNString, PolymorphCref aValue )
+  setEntityProperty( StringCref aFullPNString, PolymorphCref aValue )
   {
     FullPN aFullPN( aFullPNString );
     EntityPtr anEntityPtr( getModel().getEntity( aFullPN.getFullID() ) );
@@ -135,42 +135,23 @@ namespace libemc
   }
 
 
-  const Polymorph
-  LocalSimulatorImplementation::getProperty( StringCref aFullPNString )
+  const Polymorph LocalSimulatorImplementation::
+  getEntityProperty( StringCref aFullPNString ) const
   {
     FullPN aFullPN( aFullPNString );
-    EntityPtr anEntityPtr( getModel().getEntity( aFullPN.getFullID() ) );
+    EntityCptr anEntityPtr( getModel().getEntity( aFullPN.getFullID() ) );
 
     return anEntityPtr->getProperty( aFullPN.getPropertyName() );
   }
 
-  void LocalSimulatorImplementation::step()
-  {
-    getModel().initialize();  
-    getModel().step();  
-    getModel().flushLogger();
-  }
-
-  void LocalSimulatorImplementation::initialize()
-  {
-    getModel().initialize();
-  }
-
-  const libecs::Real LocalSimulatorImplementation::getCurrentTime()
-  {
-    return getModel().getCurrentTime();
-  }
-
-  EmcLogger LocalSimulatorImplementation::
-  getLogger( libecs::StringCref aFullPNString )
+  void LocalSimulatorImplementation::
+  createLogger( libecs::StringCref aFullPNString )
   {
     FullPN aFullPN( aFullPNString );
-    LoggerPtr aLoggerPtr( getModel().getLoggerBroker().getLogger( aFullPN ) );
-
-    return EmcLogger( aLoggerPtr );
+    getModel().getLoggerBroker().createLogger( aFullPN );
   }
 
-  const Polymorph LocalSimulatorImplementation::getLoggerList()
+  const Polymorph LocalSimulatorImplementation::getLoggerList() const
   {
     PolymorphVector aLoggerList;
     aLoggerList.reserve( getModel().getLoggerBroker().getLoggerMap().size() );
@@ -186,6 +167,95 @@ namespace libemc
       }
 
     return aLoggerList;
+  }
+
+
+  const libecs::DataPointVectorRCPtr LocalSimulatorImplementation::
+  getLoggerData( libecs::StringCref aFullPNString ) const
+  {
+    LoggerCptr aLoggerPtr( getModel().getLoggerBroker().
+			   getLogger( aFullPNString ) );
+
+    return aLoggerPtr->getData();
+  }
+
+  const libecs::DataPointVectorRCPtr LocalSimulatorImplementation::
+  getLoggerData( libecs::StringCref aFullPNString, 
+		 libecs::RealCref aStartTime, 
+		 libecs::RealCref anEndTime ) const
+  {
+    LoggerCptr aLoggerPtr( getModel().getLoggerBroker().
+			   getLogger( aFullPNString ) );
+
+    return aLoggerPtr->getData( aStartTime, anEndTime );
+  }
+
+
+  const libecs::DataPointVectorRCPtr LocalSimulatorImplementation::
+  getLoggerData( libecs::StringCref aFullPNString, 
+		 libecs::RealCref aStartTime, 
+		 libecs::RealCref anEndTime,
+		 libecs::RealCref anInterval ) const
+  {
+    LoggerCptr aLoggerPtr( getModel().getLoggerBroker().
+			   getLogger( aFullPNString ) );
+
+    return aLoggerPtr->getData( aStartTime, anEndTime, anInterval );
+  }
+
+  const libecs::Real LocalSimulatorImplementation::
+  getLoggerStartTime( libecs::StringCref aFullPNString ) const
+  {
+    LoggerCptr aLoggerPtr( getModel().getLoggerBroker().
+			   getLogger( aFullPNString ) );
+
+    aLoggerPtr->getStartTime();
+  }
+
+  const libecs::Real LocalSimulatorImplementation::
+  getLoggerEndTime( libecs::StringCref aFullPNString ) const
+  {
+    LoggerCptr aLoggerPtr( getModel().getLoggerBroker().
+			   getLogger( aFullPNString ) );
+
+    aLoggerPtr->getEndTime();
+  }
+
+  const libecs::Real LocalSimulatorImplementation::
+  getLoggerMinimumInterval( libecs::StringCref aFullPNString ) const
+  {
+    LoggerCptr aLoggerPtr( getModel().getLoggerBroker().
+			   getLogger( aFullPNString ) );
+
+    aLoggerPtr->getMinimumInterval();
+  }
+
+
+  const libecs::Int LocalSimulatorImplementation::
+  getLoggerSize( libecs::StringCref aFullPNString ) const
+  {
+    LoggerCptr aLoggerPtr( getModel().getLoggerBroker().
+			   getLogger( aFullPNString ) );
+
+    aLoggerPtr->getSize();
+  }
+
+
+  void LocalSimulatorImplementation::step()
+  {
+    getModel().initialize();  
+    getModel().step();  
+    getModel().flushLogger();
+  }
+
+  void LocalSimulatorImplementation::initialize()
+  {
+    getModel().initialize();
+  }
+
+  const libecs::Real LocalSimulatorImplementation::getCurrentTime() const
+  {
+    return getModel().getCurrentTime();
   }
 
 

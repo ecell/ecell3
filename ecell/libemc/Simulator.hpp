@@ -92,7 +92,7 @@ namespace libemc
        @returh a list of Steppers.
     */
 
-    const libecs::Polymorph getStepperList()
+    const libecs::Polymorph getStepperList() const
     {
       return theSimulatorImplementation->getStepperList();
     }
@@ -125,7 +125,7 @@ namespace libemc
 
     const libecs::Polymorph
     getStepperProperty( libecs::StringCref aStepperID,
-			libecs::StringCref aPropertyName )
+			libecs::StringCref aPropertyName ) const
     {
       return theSimulatorImplementation->getStepperProperty( aStepperID,
 							     aPropertyName );
@@ -156,7 +156,7 @@ namespace libemc
        @return true if the Entity exists, false if not.
     */
 
-    bool isEntityExist( libecs::StringCref         aFullIDString )
+    const bool isEntityExist( libecs::StringCref         aFullIDString ) const
     {
       theSimulatorImplementation->isEntityExist( aFullIDString );
     }
@@ -168,11 +168,11 @@ namespace libemc
        @param aValue        the value to be set.
     */
 
-    void setProperty( libecs::StringCref            aFullPNString,
-		      libecs::PolymorphCref   aValue )
+    void setEntityProperty( libecs::StringCref      aFullPNString,
+			    libecs::PolymorphCref   aValue )
     {
-      theSimulatorImplementation->setProperty( aFullPNString,
-					       aValue );
+      theSimulatorImplementation->setEntityProperty( aFullPNString,
+						     aValue );
     }
 
     /**
@@ -183,13 +183,15 @@ namespace libemc
     */
 
     const libecs::Polymorph
-    getProperty( libecs::StringCref aFullPNString )
+    getEntityProperty( libecs::StringCref aFullPNString ) const
     {
-      return theSimulatorImplementation->getProperty( aFullPNString );
+      return theSimulatorImplementation->getEntityProperty( aFullPNString );
     }
 
     /**
-       Get or create a Logger.
+       Create a Logger.
+
+       If the Logger already exists, this method does nothing.
 
        @param aFullPNString a FullPN of the PropertySlot which the Logger is
        observing, as a String 
@@ -197,10 +199,72 @@ namespace libemc
        @return a borrowed pointer to the Logger
     */
 
-    EmcLogger getLogger( libecs::StringCref aFullPNString )
+    void createLogger( libecs::StringCref aFullPNString ) 
     {
-      return theSimulatorImplementation->getLogger( aFullPNString );
+      return theSimulatorImplementation->createLogger( aFullPNString );
     }
+
+
+    /**
+       List Loggers in the simulator.
+
+       @return a list of Loggers.
+    */
+
+    const libecs::Polymorph getLoggerList() const
+    {
+      return theSimulatorImplementation->getLoggerList();
+    }
+
+    const libecs::DataPointVectorRCPtr 
+    getLoggerData( libecs::StringCref aFullPNString ) const
+    {
+      return theSimulatorImplementation->getLoggerData( aFullPNString );
+    }
+
+    const libecs::DataPointVectorRCPtr
+    getLoggerData( libecs::StringCref aFullPNString, 
+		   libecs::RealCref aStartTime, 
+		   libecs::RealCref anEndTime ) const 
+    {
+      return theSimulatorImplementation->
+	getLoggerData( aFullPNString, aStartTime, anEndTime );
+    }
+
+    const libecs::DataPointVectorRCPtr
+    getLoggerData( libecs::StringCref aFullPNString,
+		   libecs::RealCref aStartTime, libecs::RealCref anEndTime,
+		   libecs::RealCref anInterval ) const
+    {
+      return theSimulatorImplementation->getLoggerData( aFullPNString,
+							aStartTime, anEndTime, 
+							anInterval );
+    }
+
+    const libecs::Real 
+    getLoggerStartTime( libecs::StringCref aFullPNString ) const 
+    {
+      return theSimulatorImplementation->getLoggerStartTime( aFullPNString );
+    }
+
+    const libecs::Real 
+    getLoggerEndTime( libecs::StringCref aFullPNString ) const
+    {
+      return theSimulatorImplementation->getLoggerEndTime( aFullPNString );
+    }
+
+    const libecs::Real 
+    getLoggerMinimumInterval( libecs::StringCref aFullPNString ) const
+    {
+      return theSimulatorImplementation->
+	getLoggerMinimumInterval( aFullPNString );
+    }
+
+    const libecs::Int getLoggerSize( libecs::StringCref aFullPNString ) const
+    {
+      return theSimulatorImplementation->getLoggerSize( aFullPNString );
+    }
+
 
     /**
        Conduct a step of the simulation.
@@ -231,20 +295,9 @@ namespace libemc
        @return current time of the simulator
     */
 
-    const libecs::Real getCurrentTime()
+    const libecs::Real getCurrentTime() const
     {
       return theSimulatorImplementation->getCurrentTime();
-    }
-
-    /**
-       List Loggers in the simulator.
-
-       @return a list of Loggers.
-    */
-
-    const libecs::Polymorph getLoggerList()
-    {
-      return theSimulatorImplementation->getLoggerList();
     }
 
     /**

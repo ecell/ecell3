@@ -38,7 +38,7 @@ class TracerWindow( OsogoPluginWindow ):
 
 
 		if IDflag == 1:
-			aValue = self.theSession.theSimulator.getProperty( aFullPNString )
+			aValue = self.theSession.theSimulator.getEntityProperty( aFullPNString )
 			#if operator.isNumberType( aValue[0] ):
 			if operator.isNumberType( aValue ):
 				self.thePluginManager.appendInstance( self )                    
@@ -402,10 +402,10 @@ if __name__ == '__main__':
         def __init__( self ):
             self.dic = {('Substance', '/CELL/CYTOPLASM', 'ATP','Quantity') : (1950,),}
 
-        def getProperty( self, fpn ):
+        def getEntityProperty( self, fpn ):
             return self.dic[fpn]
 
-        def setProperty( self, fpn, value ):
+        def setEntityProperty( self, fpn, value ):
             self.dic[fpn] = value
 
         def getLogger( self, fpn ):

@@ -596,10 +596,10 @@ if __name__ == "__main__":
 		def __init__( self ):
 			self.dic={('Substance', '/CELL/CYTOPLASM', 'ATP','Quantity') : (1950,),}
 
-		def getProperty( self, fpn ):
+		def getEntityProperty( self, fpn ):
 			return self.dic[fpn]
 
-		def setProperty( self, fpn, value ):
+		def setEntityProperty( self, fpn, value ):
 			self.dic[fpn] = value
 
 		def getLogger( self, fpn ):
