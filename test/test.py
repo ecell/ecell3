@@ -166,3 +166,70 @@ for x in stringList:
 #if  __name__ == "__main__":
 #    
 #    setResultFileList("result.ecd")
+
+
+############################################
+# added for logger
+print "\n\nstart to save log "
+
+# import library ECD file format 
+from ecell.ECDDataFile import *
+
+#print List
+
+# save data 
+# List is the FullPN list which has created by getLogger() method.
+# In this sample, List include three FullPNs,
+# Saving [Substance:/:A:Quantity] will be success.
+# Saving [Substance:/:B:Quantity] will be success.
+# Saving [Substance-/-B-Quantity] will be failure.
+
+for aFullPNString in List:
+    try:
+        #print aFullPNString
+
+        # creates save file name
+        # ex.  [Substance:/:A:Quantity] -> [A_Quantity]
+        aFileName=join( split(aFullPNString,':')[2:], '_' )
+        #print " aFileName = %s" %aFileName 
+
+        # ----------------------------------------------------
+        # If you want to specify the start time and end time, 
+        # uncomment out following lines.
+        #aStartTime = aSimulator.getLogger(aFullPNString).getStartTime()
+        #aEndTime = aSimulator.getLogger(aFullPNString).getEndTime()
+        #aMatrixData = aSimulator.getLogger(aFullPNString).getData( aStartTime, aEndTime )
+
+        # ----------------------------------------------------
+        # If you want to specify the start time, end time and 
+        # interval time, uncomment out following lines.
+        #aStartTime = aSimulator.getLogger(aFullPNString).getStartTime()
+        #aEndTime = aSimulator.getLogger(aFullPNString).getEndTime()
+        #anInterval = 10
+        #aMatrixData = aSimulator.getLogger(aFullPNString).getData( aStartTime, aEndTime, anInterval )
+
+        # ----------------------------------------------------
+        # If you want to get default dat, uncomment out followint line.
+        aMatrixData = aSimulator.getLogger(aFullPNString).getData()
+
+        # creates instance of ECD format file
+        anECDFile = ECDDataFile()
+
+        # sets some properties to ECD format file instance
+        anECDFile.setDataName(aFileName)
+        anECDFile.setLabel('test_data_label')
+        anECDFile.setNote('test_data_note')
+        anECDFile.setMatrixData( aMatrixData )
+        anECDFile.setFileName( aFileName )
+
+        # excutes saving file
+        anECDFile.save()
+
+    except:
+        print 'couldn\'t save [%s] data to [%s]' %(aFullPNString,aFileName)
+    else:
+        print 'saved [%s] data to [%s]' %(aFullPNString,aFileName)
+
+print "end of saving log "
+
+
