@@ -46,6 +46,7 @@ namespace libemc
     :
     theRootSystem( *new RootSystem ),
     theLoggerBroker( *new LoggerBroker( theRootSystem ) ),
+    theRunningFlag( false ),
     thePendingEventChecker( defaultPendingEventChecker ),
     theEventHandler( NULL )
   {
