@@ -19,49 +19,9 @@ import getopt
 import tempfile
 
 import ecell.eml
-from ecell.spark import *
 
 import lex
 import yacc
-
-class Token:
-	def __init__(self, type, attr=None, filename="?" , lineno='???'):
-                self.type = type
-                self.attr = attr
-		self.filename = filename
-                self.lineno = lineno
-		
-	def __cmp__(self, o):
-		return cmp(self.type, o)
-
-        def __repr__(self):
-                return str(self.type) + ':' + str(self.attr)
-	
-	def __getitem__(self,i):
-		raise IndexError
-
-	def __len__(self):
-		return 0
-
-	def info(self):
-		return "File " + repr(self.filename) + ", line " + repr(self.lineno)
-	def error(self):
-		print "Error token", self, "(", self.info(), ")"
-		raise SystemExit, 1
-
-class AST:
-	def __init__(self, type, kids=[]):
-		self.type = type
-		self._kids = kids
-		
-	def __getitem__(self, i):
-		return self._kids[i]
-
-	def __len__(self):
-		return len(self._kids)
-
-	def __repr__(self):
-                return str(self.type) + ':' + str(self._kids)
 
 # Reserved words
 reserved = (
@@ -89,6 +49,7 @@ tokens = reserved + (
 	'SEMI',
 	)
 
+filename = ''
 reserved_map = { }
 for r in reserved:
 	reserved_map['r'] = r
@@ -96,61 +57,50 @@ for r in reserved:
 def t_Stepper(t):
 	r' Stepper[\s|\t] '
 	t.value = string.strip( t.value )
-	t.value = Token( t.value, t.value )
 	return t
 
 def t_System(t):
 	r' System[\s|\t] '
 	t.value = string.strip( t.value )
-	t.value = Token( t.value, t.value )
 	return t
 
 def t_Process(t):
 	r' Process[\s|\t] '
 	t.value = string.strip( t.value )
-	t.value = Token( t.value, t.value )
 	return t
 
 def t_Variable(t):
 	r' Variable[\s|\t] '
 	t.value = string.strip( t.value )
-	t.value = Token( t.value, t.value )
 	return t
 
 # Delimeters
 def t_LPAREN(t):
 	r'\('
-	t.value = Token( t.value, t.value )
 	return t
 
 def t_RPAREN(t):
 	r'\)'
-	t.value = Token( t.value, t.value )
 	return t
 
 def t_LBRACKET(t):
 	r'\['
-	t.value = Token( t.value, t.value )
 	return t
 
 def t_RBRACKET(t):
 	r'\]'
-	t.value = Token( t.value, t.value )
 	return t
 
 def t_LBRACE(t):
 	r'\{'
-	t.value = Token( t.value, t.value )
 	return t
 
 def t_RBRACE(t):
 	r'\}'
-	t.value = Token( t.value, t.value )
 	return t
 
 def t_SEMI(t):
 	r';'
-	t.value = Token( t.value, t.value )
 	return t
 
 def t_number(t):
@@ -160,24 +110,23 @@ def t_number(t):
         #except ValueError:
         #     print "Line %d: Number %s is too large!" % (t.lineno,t.value)
         #	 t.value = 0
-	t.value = Token( 'number', t.value )
+	#t.value = Token( 'number', t.value )
 	return t
 
 def t_name(t):
 	r'[a-zA-Z_/][\w\:\/.]*'
-	t.value = Token( 'name', t.value )
 	return t
 
 def t_quotedstring(t):
 	r' "(^"|.)*" | \'(^\'|.)*\' '
-	t.value = Token( 'quotedstring', t.value[1:-1] )
+	t.value = t.value[1:-1]
 	return t
 
 def t_control(t):
 	r' \%line [^\n]*\n '
 	seq = string.split(t.value)
-	t.lineno = int( seq[1] )
-	t.filename = str( seq[2] )
+	t.lineno = int(seq[1])
+	t.lexer.filename = seq[2]
 
 def t_comment(t):
 	r' \# [^\n]* '
@@ -191,9 +140,9 @@ def t_whitespace(t):
 	r' [ |\t]+ '
 	pass
 
-def t_default(t):
-	r' .+ '
-	raise ValueError, "Unexpected error: unmatched input: %s, line %d." % ('', t.lineno)
+#def t_default(t):
+#	r' .+ '
+#	raise ValueError, "Unexpected error: unmatched input: %s, line %d." % (t.value, t.lineno)
 
 # Define a rule so we can track line numbers
 #def t_newline(t):
@@ -205,7 +154,7 @@ def t_default(t):
 
 # Error handling rule
 def t_error(t):
-	print "Illegal character '%s' at line %d." % ( t.value[0], t.lineno )
+	print "Illegal character '%s' at line %d in %s." % ( t.value[0], t.lineno , t.lexer.filename)
 	t.skip(1)
 
 # Parsing rules
@@ -218,9 +167,9 @@ precedence = (
 def p_stmts(t):
 	'''
         stmts : stmt stmts
-              | stmt
+
         '''
-	t[0] = createAst( 'stmts', t)
+	t[0] = createList( 'stmts', t)
 
 
 def p_stmt(t):
@@ -228,26 +177,26 @@ def p_stmt(t):
         stmt : stepper_stmt
              | system_stmt
         '''
-	t[0] = createAst( 'stmt', t )
+	t[0] = createList( 'stmt', t )
     
 def p_stepper_stmt(t):
 	'''
-	stepper_stmt : Stepper object_decl LBRACE propertylist RBRACE
+	stepper_stmt : stepper_object_decl LBRACE propertylist RBRACE
 	'''
-	t[0] = createAst( 'stepper_stmt', t )
+	t[0] = t[1], t[2], t[4]
     
 def p_system_stmt(t):
 	'''
-	system_stmt : System object_decl LBRACE property_entity_list RBRACE
+	system_stmt : system_object_decl LBRACE property_entity_list RBRACE
 	'''
-	t[0] = createAst( 'system_stmt', t )
+	t[0] = t[1], t[2], t[4]
 
 def p_entity_other_stmt (t):
 	'''
-	entity_other_stmt : Variable object_decl LBRACE propertylist RBRACE
-                          | Process object_decl LBRACE propertylist RBRACE
+	entity_other_stmt : entity_other_object_decl LBRACE propertylist RBRACE
         '''
-	t[0] = createAst ( 'entity_other_stmt', t )
+	t[4] = flatten_propertylist(t[4])
+	t[0] = t[1], t[2], t[4]
 
 # object declarations
 
@@ -255,7 +204,42 @@ def p_object_decl(t):
 	'''
 	object_decl : name LPAREN name RPAREN
 	'''
-	t[0] = createAst( 'object_decl', t )
+	t[0] = t[1], t[3]
+	
+def p_stepper_object_decl(t):
+	'''
+	stepper_object_decl : Stepper object_decl
+	'''
+	t.type = t[1]
+	t.classname = t[2][0]
+	t.id = t[2][1]
+	anEml.createStepper(t.classname, t.id)
+	t[0] = t[1], t[2]
+	
+def p_system_object_decl(t):
+	'''
+	system_object_decl : System object_decl
+	'''
+	t.type = t[1]
+	t.classname = t[2][0]
+	t.path      = t[2][1]
+	t.fullid = convert2FullID(t.type, t.path)
+	anEml.createEntity(t.classname, t.fullid)
+	
+	t[0] = t[1], t[2]
+	
+def p_entity_other_object_decl (t):
+	'''
+	entity_other_object_decl : Variable object_decl
+                                 | Process object_decl
+        '''
+	t.type = t[1]
+	t.classname = t[2][0]
+	t.id        = t.path + ':' + t[2][1]
+	t.fullid = convert2FullID(t.type, t.id)
+	anEml.createEntity(t.classname, t.fullid)
+	
+	t[0] = t[1], t[2]
 
 # property
 
@@ -265,13 +249,21 @@ def p_propertylist(t):
                  | property
                  | empty
     '''
-    t[0] = createAst( 'propertylist', t )
+
+    t[0] = createList( 'propertylist', t )
 
 def p_property(t):
 	'''
-	property : name valuelist SEMI
+	property : name value SEMI
 	'''
-	t[0] = createAst( 'property', t )
+	t[2] = flatten_nodelist(t[2])
+
+	if t.type == 'Stepper':
+		anEml.setStepperProperty(t.id, t[1], t[2])
+	else:
+		anEml.setEntityProperty(t.fullid, t[1], t[2])
+		
+	t[0] = t[1], t[2]
 
 # property or entity ( for System statement )
 
@@ -281,7 +273,7 @@ def p_property_entity_list(t):
                              | property_entity
                              | empty
         '''
-	t[0] =  createAst( 'property_entity_list', t )
+	t[0] =  createList( 'property_entity_list', t )
 
 
 def p_property_entity(t):
@@ -289,25 +281,38 @@ def p_property_entity(t):
 	property_entity : property
 	                | entity_other_stmt
         '''
-	t[0] = createAst( 'property_entity', t )
+	t[0] = createList( 'property_entity', t )
 
 # value
 
 def p_value(t):
 	'''
-	value : LBRACKET valuelist RBRACKET
-              | quotedstring
+	value : quotedstring
               | name
               | number
+	      | matrixlist
         '''
-	t[0] =  createAst( 'value', t )
+	t[0] =  createList( 'value', t )
         
 def p_valuelist(t):
         '''
         valuelist : value valuelist
                   | value
         '''
-	t[0] =  createAst( 'valuelist', t )
+	t[0] =  createList( 'valuelist', t )
+	
+def p_matrix(t):
+	'''
+	matrix : LBRACKET valuelist RBRACKET
+        '''
+	t[0] = flatten_nodetree(t[2])
+	
+def p_matrixlist(t):
+        '''
+        matrixlist : matrix matrixlist
+                   | matrix
+        '''
+	t[0] =  createList( 'matrixlist', t )
 
 def p_empty(t):
 	'''
@@ -316,30 +321,66 @@ def p_empty(t):
 	t[0] = None
 
 def p_error(t):
-	print "Syntax error at line %d. (near '%s')" % ( t.lineno, t.value )
-
-
-# Constract Ast tree
-def createAst( type, t):
+	print "Syntax error at line %d in %s. (near '%s')" % ( t.lineno, t.value )
+	yacc.errok()
+	
+# Constract List
+def createList( type, t):
 
 	length = len(t.slice) - 1
 
-	# for multi entity
 	if length != 1:
 		aList = []
 		i = 1
 		while i <= length:
 			aList.append( t[i] )
 			i = i + 1
-		return AST( type, aList )
+		return aList
 
-	# for empty value
 	elif t[1] == None:
-		return AST( type, [] )
+		return []
 
 	else:
-		return AST( type, [ t[1] ] )
+		return t[1]
+
+def flatten_propertylist( node ):
+
+	if node is None or len( node ) == 0:
+		return []
+
+        aList = list()
+	while len( node ) >= 1:
+
+		if len( node ) == 1 and type(node) != str:
+			break
+		elif type(node[0]) == str:
+			aList.append( node )
+			break
+		
+		else:
+			aList.append( node[0] )
+			node = node[1]
+			
+	return aList
 	
+def flatten_nodelist( node ):
+
+	if node is None or len( node ) == 0:
+		return []
+
+        aList = list()
+	while len( node ) >= 1:
+		if len( node ) == 1 and type(node) != str:
+			break
+		elif type(node[0]) == str:
+			aList.append( node )
+			break
+		
+		else:
+			aList.append( node[0] )
+			node = node[1]
+
+	return aList
 
 def flatten_nodetree( node ):
 
@@ -348,19 +389,25 @@ def flatten_nodetree( node ):
 
         aList = list()
 	while len( node ) >= 1:
-		aList.append( node[0] )
-		if len( node ) == 1:
+		if type(node) == str:
+			aList.append( node )
 			break
-		else:
-			node = node[1]
+		
+		elif len( node ) == 1 :
+			break
 
+		else:
+			aList.append( node[0] )
+			node = node[1]
+			
 	return aList
 
 
 def flatten_node( node ):
 	
 	if len( node ) == 1:	
-		return node[0].attr 
+		#return node[0].attr
+		return node[0]
 	else:
 		return flatten_propertytree( node[1] )
 
@@ -371,88 +418,22 @@ def flatten_propertytree( node ):
 	
 
 
-class Interpret(GenericASTTraversal):
-	def __init__( self, ast, eml ):
-		GenericASTTraversal.__init__( self, ast )
-		self.eml = eml
-
-		self.postorder()
-
-	def n_stepper_stmt( self, node ):
-		aClassname = node[1][0].attr
-		anID = node[1][2].attr
-
-		self.eml.createStepper( aClassname, anID )
-		
-		aPropertyNodeList = flatten_nodetree( node[3] )
-		for i in aPropertyNodeList:
-
-			aPropertyName = i[0].attr
-			aValueList = flatten_propertytree( i[1] )
-
-			self.eml.setStepperProperty( anID, aPropertyName,\
-						     aValueList )
-
-	def n_system_stmt( self, node ):
-		aType = node[0].attr
-		aClassname = node[1][0].attr
-		anID = node[1][2].attr
-
-		aFullID = convert2FullID( self.eml , aType, anID )
-		self.eml.createEntity( aClassname, aFullID )
-		
-		aPropertyNodeList = flatten_nodetree( node[3] )
-		for i in aPropertyNodeList:
-
-                        n = i[0]
-                        aPropertyName = n[0].attr
-
-			if aPropertyName in ( 'Variable', 'Process' ):
-				self.entity_other( n, anID )
-				continue
-			
-                        aValueList = flatten_propertytree( n[1] )
-
-			self.eml.setEntityProperty( aFullID, aPropertyName,\
-						    aValueList )
-		
-
-        def entity_other( self, node, path ):
-		aType = node[0].attr
-		aClassname = node[1][0].attr
-		anID = path + ':' + node[1][2].attr
-
-		aFullID = convert2FullID( self.eml , aType, anID )
-		self.eml.createEntity( aClassname, aFullID )
-		
-		aPropertyNodeList = flatten_nodetree( node[3] )
-		for i in aPropertyNodeList:
-
-			aPropertyName = i[0].attr
-			aValueList = flatten_propertytree( i[1] )
-
-			self.eml.setEntityProperty( aFullID, aPropertyName,\
-                                                    aValueList )
-
-            
-
-	def default( self, node ):
-		pass
 
 def initializePLY():
 	lextabname = "emlextab"
 	yacctabname = "emparsetab"
 
-	lex.lex(optimize=1, lextab=lextabname)
+	lex.lex(lextab=lextabname)
 	yacc.yacc(tabmodule=yacctabname)
 
 def convertEm2Eml( anEmFileObject, debug=0 ):
 
 	# initialize eml object
+	global anEml
 	anEml = ecell.eml.Eml()
 	
 	# Build the lexer
-	lex.lex(optimize=1, lextab="emlextab")
+	aLexer = lex.lex(lextab="emlextab")
 
         # Tokenizen test..
         #while debug == 1:
@@ -460,24 +441,28 @@ def convertEm2Eml( anEmFileObject, debug=0 ):
             # Give the lexer some input for test
         #    lex.input(anEmFileObject.read())
 
-        #    tok = lex.token( anEmFileObject.read() )
+        #   tok = aLexer.token( anEmFileObject.read() )
         #    if not tok: break      # No more input
         #    print tok
 
 	# Parsing
 	aParser = yacc.yacc(optimize=1, tabmodule="emparsetab")
-	anAst = aParser.parse( anEmFileObject.read() , debug=debug)
-
+	anAst = aParser.parse( anEmFileObject.read() ,lexer=aLexer ,debug=debug)
+	
+		
 	import pprint
 	if debug != 0:
-		print 'AST:', pprint.pprint(anAst)
-
-	# Generating
-	anInterpreter = Interpret( anAst, anEml )
-
+		print pprint.pprint(anAst)
+		
+	if anAst == None:
+		sys.exit(0)
+	
 	return anEml
 
-def convert2FullID( anEml, aType, aSystemID ):
+
+            
+		
+def convert2FullID( aType, aSystemID ):
 
         if aType == 'System':
 		#FIXME: convertSystemID2SystemFullID() will be deprecated
@@ -579,5 +564,6 @@ class Preprocessor:
 		self.interpreter.shutdown()
 
 
-
+if __name__ == '__main__':
+	initializePLY()
 
