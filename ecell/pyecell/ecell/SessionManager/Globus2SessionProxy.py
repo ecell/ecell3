@@ -35,11 +35,14 @@ import os
 from Util import *
 from SessionProxy import *
 
+GLOBUS_JOB_RUN='globus-job-run'
 GLOBUS_JOB_SUBMIT='globus-job-submit'
 GLOBUS_JOB_GET_STATUS='globus-job-status'
 GLOBUS_JOB_GET_OUTPUT='globus-job-get-output'
 GLOBUS_JOB_CLEAN='globus-job-clean'
 GLOBUS_URL_COPY='globus-url-copy'
+MKDIR='/bin/mkdir'
+RM='/bin/rm'
 
 class Globus2SessionProxy(SessionProxy):
 	'''Globus2SessionProxy class
@@ -64,10 +67,28 @@ class Globus2SessionProxy(SessionProxy):
 
 		self.__theCpu = None
 
+	# end of __init__
+
+
+	def __del__(self):
+
+		if self.__theCpu != self.getSystemProxy().getLocalHost():
+			aCwd = os.getcwd()
+			os.chdir( self.getJobDirectory() )
+			aCommand = "%s %s %s -rf %s" %(GLOBUS_JOB_RUN, self.__theCpu, RM, os.getcwd())
+			os.system(aCommand)
+			SessionProxy.__del__(self)
+			os.chdir( aCwd )
+
+	# end of __del__
+
+
 	def getContactString(self):
 		'''return job id 
 		'''
 		return self.__theContactString 
+
+	# end of getContactString
 
 
 	def retry(self):
@@ -77,8 +98,14 @@ class Globus2SessionProxy(SessionProxy):
 
 		# When the status is RUN, kill the sub process
 		if self.getStatus() == RUN:
-			#os.popen("qdel %s" %self.__theGlobus2JobID )
-			os.popen("qdel %s" %self.__theGlobus2JobID )
+			os.popen("%s %s" %(GLOBUS_JOB_CLEAN,self.__theGlobus2JobID) )
+
+			if self.__theCpu != self.getSystemProxy().getLocalHost():
+				aCwd = os.getcwd()
+				os.chdir( self.getJobDirectory() )
+				aCommand = "%s %s %s -rf %s" %(GLOBUS_JOB_RUN, self.__theCpu, RM, os.getcwd())
+				os.system(aCommand)
+				os.chdir( aCwd )
 
 		self.setStatus(QUEUED)
 	
@@ -86,6 +113,7 @@ class Globus2SessionProxy(SessionProxy):
 		# run again.
 		self.run()
 
+	# end of retry
 
 
 	def run(self):
@@ -113,6 +141,13 @@ class Globus2SessionProxy(SessionProxy):
 		os.chdir( self.getJobDirectory() )
 
 		# --------------------------------------------------------------------------
+		# create remote directory
+		# --------------------------------------------------------------------------
+		
+		aCommand = "%s %s %s -p %s" %(GLOBUS_JOB_RUN, self.__theCpu, MKDIR, os.getcwd())
+		os.system(aCommand)
+
+		# --------------------------------------------------------------------------
 		# transfer files using globus-url-copy
 		# --------------------------------------------------------------------------
 		aFiles = [self.getScriptFileName()] 
@@ -120,6 +155,7 @@ class Globus2SessionProxy(SessionProxy):
 			aFiles += self.getExtraFileList()
 			
 		#print aFiles
+		#sys.exit(1)
 
 		for aFile in aFiles:
 
@@ -128,6 +164,7 @@ class Globus2SessionProxy(SessionProxy):
 			aCommand = "%s %s %s" %(GLOBUS_URL_COPY, aLocalFile,aRemoteFile)
 			#print aCommand
 			os.system(aCommand)
+
 
 		# --------------------------------------------------------------------------
 		# When the interpreter is E-Cell session
@@ -148,16 +185,14 @@ class Globus2SessionProxy(SessionProxy):
 			# write script file
 			open( self.__theTmpScriptFileName, 'w' ).write( aScriptContext )
 
-
 			# -----------------------------------
 			# create a value of option -v of qsub
 			# -----------------------------------
-			aHyphenVOption = getEnvString()
+			#aHyphenVOption = getEnvString()
 
 			# when ECELL3_DM_PATH is set, append it to the -v option 
-			if self.getDM_PATH() != "": 
-				aHyphenVOption += ",ECELL3_DM_PATH=%s" %self.getDM_PATH()
-
+			#if self.getDM_PATH() != "": 
+			#	aHyphenVOption += ",ECELL3_DM_PATH=%s" %self.getDM_PATH()
 
 			# create a context
 			aContext = "%s %s -env PATH=$PATH -dir %s -s %s" %(
@@ -207,12 +242,26 @@ class Globus2SessionProxy(SessionProxy):
 
 
 	def setCpu( self, cpu ):
+		'''Set cpu name
+		cpu(str) -- the cpu on which the job will be conducted.
+
+		Return None
+		'''
 
 		self.__theCpu = cpu
 
+	# end of setCpu
+
+
 	def getCpu( self ):
+		'''Return cpu name
+		Return str : cpu name
+		'''
 
 		return self.__theCpu
+
+	# end of getCpu
+
 
 	def update( self ):
 		'''update jobs's status
@@ -263,6 +312,10 @@ class Globus2SessionProxy(SessionProxy):
 			open(aStderrFile,'w').write(string.join(aStderr,''))
 
 			# ------------------------------------------------------
+			#if self.__theCpu != self.getSystemProxy().getLocalHost():
+			#	aCommand = "%s %s %s -rf %s" %(GLOBUS_JOB_RUN, self.__theCpu, RM, os.getcwd())
+			#	os.system(aCommand)
+
 			os.chdir( aCwd )
 
 		#print STATUS[self.getStatus()]
@@ -279,6 +332,13 @@ class Globus2SessionProxy(SessionProxy):
 			aCommand = "%s %s" %(GLOBUS_JOB_CLEAN,\
 			                     self.__theContactString)
 			os.popen(aCommand)
+
+			#if self.__theCpu != self.getSystemProxy().getLocalHost():
+				#aCwd = os.getcwd()
+				#os.chdir( self.getJobDirectory() )
+				#aCommand = "%s %s %s -rf %s" %(GLOBUS_JOB_RUN, self.__theCpu, RM, os.getcwd())
+				#os.system(aCommand)
+				#os.chdir( aCwd )
 
 		# set error status
 		self.setStatus(ERROR) 

@@ -47,13 +47,14 @@ from SystemProxy import *
 
 GRID_PROXY_INIT = 'grid-proxy-init'
 GRID_INFO_SEARCH = 'grid-info-search'
+GLOBUS_JOB_RUN='globus-job-run'
 
 class Globus2SystemProxy(SystemProxy):
 	'''Globus2SystemProxy
 	'''
 
 	def __init__(self,sessionmanager):
-		'''constructor
+		'''Constructor
 		sessionmanager -- the reference to SessionManager
 		'''
 
@@ -72,11 +73,39 @@ class Globus2SystemProxy(SystemProxy):
 		# SessionProxy
 		Globus2SessionProxy.setSystemProxy(self)
 
+		sys.exitfunc = self.__exit
+
+
+	def __exit(self):
+		'''When Globus2SystemProxy exits, this method id called.
+		Remove tmp root directory on remote hosts.
+		'''
+
+		for aHost in self.__theHostList:
+
+			if aHost != self.getLocalHost():
+				aCommand = "%s %s %s -rf %s%s%s" \
+				            %(GLOBUS_JOB_RUN, aHost, RM, os.getcwd(),\
+				              os.sep, self.theSessionManager.getTmpRootDir() ) 
+				#print "delete %s" %aCommand
+				os.system(aCommand)
+
 
 	def setPassword( self, password ):
+		'''Set password for gate keeper
+		This must be called before gridProxyInit
+		password(str) -- passowrd of gate keeper
+		Return None
+		'''
+
 		self.__thePassword = password
 
+
 	def gridProxyInit( self ):
+		'''initialize gate keeper
+		Before calling this method, setPassword must be called.
+		Return None
+		'''
 
 		if self.__thePassword == None:
 			raise("Error: setPassword(password) must be called before this method.")
@@ -98,6 +127,10 @@ class Globus2SystemProxy(SystemProxy):
 
 
 	def setHosts( self, hostlist ):
+		'''Set host names on which the jobs will be conducted
+		hostlist(list of str) -- list of host name
+		Return None
+		'''
 
 		if type(hostlist) != list:
 			raise TypeError("hostlist must be a list of host name.")
@@ -122,6 +155,10 @@ class Globus2SystemProxy(SystemProxy):
 
 
 	def updateFreeCpuUsingMDS(self):
+		'''Update free cpu information using MDS.
+		The free cpu is defined that the MdsCpu Mds-Cpu-Free-1minX100 > 60.
+		Return None
+		'''
 
 		self.__theFreeCpuList = []
 
@@ -134,7 +171,7 @@ class Globus2SystemProxy(SystemProxy):
 			for aLine in aStdout.readlines():
 				#print "(%s)" %aLine[:-1]
 				if string.find(aLine,'Mds-Cpu-Free-1minX100') == 0:
-					#print "(%s)" %aLine[23:-1] 
+					#print "%s -> (%s)" %(aHost, aLine[23:-1] )
 					aFreeCpu = string.atoi( aLine[23:-1] )
 					#print "free cpu = %s" %aFreeCpu
 					if aFreeCpu > 60:
@@ -142,7 +179,12 @@ class Globus2SystemProxy(SystemProxy):
 					break
 
 	def getFreeCpuList(self):
+		'''Return free cpus
+		Return list of str : cpu names
+		'''
+
 		return self.__theFreeCpuList
+
 
 
 	def update(self):
@@ -183,7 +225,11 @@ class Globus2SystemProxy(SystemProxy):
 				# when the status is QUEUED
 				if aSessionProxy.getStatus() == QUEUED:
 
+					#print self.__theFreeCpuList
+
 					aFreeCpu = self.__theFreeCpuList[0]
+
+					#print "free cpu = %s " %aFreeCpu
 
 					aSessionProxy.setCpu(aFreeCpu)
 

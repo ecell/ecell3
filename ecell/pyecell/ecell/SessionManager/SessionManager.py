@@ -63,7 +63,10 @@ class SessionManager:
 			# remove the temporary directory
 			if os.access( self.getTmpRootDir(), os.W_OK ):
 				shutil.rmtree( self.getTmpRootDir() )
-		pass
+
+	
+		self.__theSessionProxyDict = None
+		self.__theSystemProxy = None
 
 
 	def __init__( self, modulepath, concurrency, environment ):
@@ -890,6 +893,10 @@ class SessionManager:
 		'''
 		return self.__theSessionProxyDict[jobid].getStderr()
 
+
+	def getSystemProxy( self ):
+
+		return self.__theSystemProxy
 
 	# -------------------------------------------------
 	# methods for intaractive mode

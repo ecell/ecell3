@@ -51,6 +51,10 @@ class SystemProxy:
 		'''
 
 		self.theSessionManager = sessionmanager
+		self.__theLocalHost = os.popen('hostname').readline()[:-1]
+
+	def getLocalHost(self):
+		return self.__theLocalHost
 
 
 	def getDefaultConcurrency(self):
@@ -94,7 +98,6 @@ class SystemProxy:
 		import inspect
 		caller = inspect.getouterframes(inspect.currentframe())[0][3]
 		raise NotImplementedError(caller + ' must be implemented in subclass')
-
 
 
 # end of class SystemProxy
