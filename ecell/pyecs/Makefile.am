@@ -5,8 +5,10 @@ DMTOOL_INCLUDE=-I@DMTOOL_INCLUDE_DIR@
 INCLTDL=@INCLTDL@
 
 #CXXSRCDIR=/usr/etc/CXX/
-CXXSRCDIR=/home/shafi/wrk/CXX/Src
-CXXINCLUDE=-I/home/shafi/wrk/CXX
+#CXXSRCDIR=/home/shafi/wrk/CXX/Src
+#CXXINCLUDE=-I/home/shafi/wrk/CXX
+CXXSRCDIR=../../PyCXX/Src
+CXXINCLUDE=-I../..//PyCXX
 PYTHONINCLUDE=-I/usr/include/python2.1 #-I@PYTHONINCLUDEDIR@
 #PYTHONINCLUDE=-I/usr/include/python1.5
 ECELLINCLUDES=-I${ECELLDIR} ${DMTOOL_INCLUDE} ${INCLTDL} ${PYTHONINCLUDE}
@@ -20,6 +22,7 @@ CFLAGS=${CXXFLAGS}
 #CXXOBJS=${CXXSRCDIR}/*.o
 
 CXXSRC=\
+IndirectPythonInterface.cxx\
 cxx_extensions.cxx\
 cxxextensions.c\
 cxxsupport.cxx
