@@ -173,7 +173,7 @@ class StepperWindow(OsogoWindow):
 
 
 						aList.append( decodeAttribute(anAttribute[GETABLE]) )
-						aList.append( decodeAttribute(anAttribute[SETABLE]) )
+						aList.append( decodeAttribute(anAttribute[SETTABLE]) )
 
 						self['property_list'].append( aList )
 
@@ -193,10 +193,10 @@ class StepperWindow(OsogoWindow):
 							aList.append( str(anElement) )
 
 							aList.append( decodeAttribute(anAttribute[GETABLE]) )
-							aList.append( decodeAttribute(anAttribute[SETABLE]) )
+							aList.append( decodeAttribute(anAttribute[SETTABLE]) )
 
 							#aList.append( decodeAttribute(aProperty[GETABLE]) )
-							#aList.append( decodeAttribute(aProperty[SETABLE]) )
+							#aList.append( decodeAttribute(aProperty[SETTABLE]) )
 
 							self['property_list'].append( aList )
 

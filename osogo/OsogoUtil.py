@@ -32,14 +32,14 @@
 # E-CELL Project, Lab. for Bioinformatics, Keio University.
 #
 
-
 from ecell.ecssupport import *
+import string
 
 # ----------------------------------------------------------------------
 # Index of stepper's proprety
 # ----------------------------------------------------------------------
 
-SETABLE       = 0
+SETTABLE       = 0
 GETABLE       = 1
 
 
@@ -62,8 +62,24 @@ def decodeAttribute(anAttribute):
 # end of decodeAttribute
 
 
+def convertStringToTuple(aString):
 
+	aString = aString[1:-1]
+	aList = string.split(aString,',')
 
+	for anIndex in range(0,len(aList)):
+		anElement = aList[anIndex]
+		anElement = string.strip(anElement)
+		try:
+			anElement = string.atoi(anElement)
+		except:
+			try:
+				anElement = string.atof(anElement)
+			except:
+				anElement = anElement[1:-1]
 
+		aList[anIndex] = anElement
+
+	return tuple(aList)
 
 
