@@ -89,17 +89,27 @@ namespace libecs
     typedef Real (*RealFunc1)( Real );
     typedef Real (*RealFunc2)( Real, Real );
 
-    enum Opcode
-      {
-	PUSH_REAL = 1  // Real
-	, PUSH_INTEGER // Integer
-	, PUSH_POINTER // Pointer
-	, NEG    // no arg
-	, ADD    // no arg
+    enum Opcode  // the order of items is optimized. don't change.
+      {   
+	ADD = 0  // no arg
 	, SUB    // no arg
 	, MUL    // no arg
 	, DIV    // no arg
 	, POW    // no arg
+	, NEG    // no arg
+	, HALT   // no arg
+	// Those instructions above are candidates of stack operations folding
+	// in the stack machine, and grouped here to optimize the switch().
+
+
+	//, CALL_FUNC0 // RealFunc0
+	, CALL_FUNC1 // RealFunc1
+	, CALL_FUNC2 // RealFunc2
+	, LOAD_REAL  // Real*
+	, PUSH_REAL  // Real
+	, VARREF_METHOD // VariableReferencePtr, VariableReferenceMethodPtr
+	, PUSH_INTEGER // Integer
+	, PUSH_POINTER // Pointer
 	, EQ     // no arg
 	, NEQ    // no arg
 	, GT     // no arg
@@ -110,19 +120,14 @@ namespace libecs
 	, OR     // no arg
 	, XOR    // no arg
 	, NOT    // no arg
-	, LOAD_REAL  // Real*
-	//, CALL_FUNC0 // RealFunc0
-	, CALL_FUNC1 // RealFunc1
-	, CALL_FUNC2 // RealFunc2
 	, SYSTEM_FUNC  // 
 	, PROCESS_METHOD // ProcessPtr, ProcessMethodPtr
-	, VARREF_METHOD // VariableReferencePtr, VariableReferenceMethodPtr
 	, SYSTEM_METHOD // SystemPtr, SystemMethodPtr
 	, VARREF_TO_SYSTEM_METHOD  // VariableReferenceSystemMethodPtr
 	, PROCESS_TO_SYSTEM_METHOD // ProcessMethodPtr
 	, SYSTEM_TO_REAL_METHOD // SystemMethodPtr
-	, HALT
 	, NOP
+	, END=NOP
 	// , CALL_OBJECT???
       };
 

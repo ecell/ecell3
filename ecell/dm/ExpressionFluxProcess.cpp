@@ -59,7 +59,7 @@ LIBECS_DM_CLASS( ExpressionFluxProcess, ExpressionProcessBase )
   
   virtual void fire()
     { 
-      setFlux( theStackMachine.execute( theCompiledCode ) );
+      setFlux( theVirtualMachine.execute( theCompiledCode ) );
     }
 
 };
