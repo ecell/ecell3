@@ -104,7 +104,6 @@ LoggerAdapter.hpp\
 LoggerBroker.hpp\
 Exceptions.hpp\
 Util.hpp\
-CoreLinuxCompatibility.hpp\
 RCPtr.hpp\
 VariableReference.hpp\
 DynamicPriorityQueue.hpp\
