@@ -133,8 +133,8 @@ namespace libecs
     theStepInterval( 0.001 ),
     theTolerantStepInterval( 0.001 ),
     theNextStepInterval( 0.001 ),
-    theUserMinInterval( 0.0 ),
-    theUserMaxInterval( std::numeric_limits<Real>::max() ),
+    theUserMinInterval( std::numeric_limits<Real>::min() * 10 ),
+    theUserMaxInterval( std::numeric_limits<Real>::max() * .1 ),
     theSlaveStepper( NULLPTR )
   {
     makeSlots();
