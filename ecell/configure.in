@@ -183,24 +183,30 @@ AC_ARG_WITH( boost-lib-dir,,
   [BOOST_LIB=])
 AC_SUBST(BOOST_LIB)
 
-dnl if test "$BOOST_DIR" = "" ; then
-dnl        AC_MSG_CHECKING( for boost dir )
-dnl        ac_cv_boost_dir="no"	
-dnl        for ac_dir in $EXT_GUESS ; do
-dnl                if test -d $ac_dir/boost ; then
-dnl                        ac_cv_boost_dir=`(cd $ac_dir/boost ; pwd)`
-dnl			BOOST_DIR=$ac_cv_boost_dir
-dnl                fi
-dnl        done
-dnl
-dnl	if test "$BOOST_DIR" = "" ; then	
-dnl		AC_MSG_ERROR("boost not found.")
-dnl	fi
-dnl
-dnl        AC_MSG_RESULT($ac_cv_boost_dir)
-dnl #        BOOST_DIR=$ac_cv_boost_dir
-dnl fi
-dnl AC_SUBST(BOOST_DIR)
+if test "$BOOST_INCLUDE" = "" ; then
+        AC_MSG_CHECKING( for boost include dir )
+        ac_cv_boost_dir=""	
+        for ac_dir in $EXT_GUESS ; do
+                if test -d $ac_dir/include/boost ; then
+                        ac_cv_boost_dir=`(cd $ac_dir/include ; pwd)`
+			BOOST_INCLUDE=$ac_cv_boost_dir
+                fi
+        done
+	if test "$BOOST_INCLUDE" = "" ; then	
+       		for ac_dir in $EXT_GUESS ; do
+                	if test -d $ac_dir/include/boost*/boost ; then
+                        	ac_cv_boost_dir=`(cd $ac_dir/include/boost* ; pwd)`
+				BOOST_INCLUDE=$ac_cv_boost_dir
+                	fi
+        	done
+	fi
+	if test "$BOOST_INCLUDE" = "" ; then	
+		AC_MSG_ERROR("boost not found.")
+	fi
+	BOOST_INCLUDE="-I$BOOST_INCLUDE"
+        AC_MSG_RESULT($ac_cv_boost_dir)
+fi
+AC_SUBST(BOOST_INCLUDE)
 
 AM_CHECK_PYTHON_HEADERS(,[AC_MSG_ERROR([])])
 
