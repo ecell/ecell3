@@ -26,6 +26,7 @@ import string
 try:
 	import os
 	import gtk
+	import gtk.gdk
 	import ConfigParser
 
 except KeyboardInterrupt:
@@ -50,6 +51,8 @@ class ToolLauncher(ParentWindow):
 		self.theFileSelectorDlg.cancel_button.connect('clicked', self.hideFileSelectorDlg)
 
 		self.theFileSelectorDlg.connect('delete_event', self.__deleteFileSelection)
+		iconPixbuf = gtk.gdk.pixbuf_new_from_file(os.environ['TLPATH'] + os.sep + "toollauncher.png")
+		self.theFileSelectorDlg.set_icon(iconPixbuf)
 
 		self.conversionDirection = 'em2eml'
 		self.theMessageBufferList=gtk.TextBuffer(None)
@@ -400,6 +403,8 @@ class ToolLauncher(ParentWindow):
 			self.theFileSelectorDlg.cancel_button.connect('clicked', self.hideFileSelectorDlg)
 
 			self.theFileSelectorDlg.connect('delete_event', self.__deleteFileSelection)
+			iconPixbuf = gtk.gdk.pixbuf_new_from_file(os.environ['TLPATH'] + os.sep + "toollauncher.png")
+			self.theFileSelectorDlg.set_icon(iconPixbuf)
 
 
 		currentDir = os.getcwd()

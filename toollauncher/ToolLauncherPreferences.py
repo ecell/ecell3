@@ -7,6 +7,7 @@
 from ParentWindow import *
 from Preferences import *
 import sys
+import gtk.gdk
 
 try:
 	import gtk
@@ -29,6 +30,8 @@ class ToolLauncherPreferences( ParentWindow ):
 		self.thePathSelectorDlg.ok_button.connect('clicked', self.updatePathSelection)
 		self.thePathSelectorDlg.cancel_button.connect('clicked', self.hidePathSelectorDlg)
 		self.thePathSelectorDlg.connect('delete_event', self.__deleteFileSelection)
+		iconPixbuf = gtk.gdk.pixbuf_new_from_file(os.environ['TLPATH'] + os.sep + "toollauncher.png")
+		self.thePathSelectorDlg.set_icon(iconPixbuf)
 
 
 	def openWindow( self ):
@@ -93,6 +96,8 @@ class ToolLauncherPreferences( ParentWindow ):
 			self.thePathSelectorDlg.ok_button.connect('clicked', self.updatePathSelection)
 			self.thePathSelectorDlg.cancel_button.connect('clicked', self.hidePathSelectorDlg)
 			self.thePathSelectorDlg.connect('delete_event', self.__deleteFileSelection)
+			iconPixbuf = gtk.gdk.pixbuf_new_from_file(os.environ['TLPATH'] + os.sep + "toollauncher.png")
+			self.thePathSelectorDlg.set_icon(iconPixbuf)
 
 		self.thePathSelectorDlg.set_filename( self.theToolLauncher.thePref['ecell3_path']+os.sep )
 
