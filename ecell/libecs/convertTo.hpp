@@ -51,7 +51,7 @@ namespace libecs
 
 
   template< typename ToType, typename FromType >
-  class convertTo_
+  class ConvertTo
   {
   public:
     inline const ToType operator()( const FromType& aValue )
@@ -73,7 +73,7 @@ namespace libecs
   };
 
 
-  // convertTo_ specializations
+  // ConvertTo specializations
 
 
   // for String
@@ -81,7 +81,7 @@ namespace libecs
   // from String
 
   template< typename ToType >
-  class convertTo_< ToType, String >
+  class ConvertTo< ToType, String >
   {
   public:
     inline const ToType operator()( StringCref aValue )
@@ -104,7 +104,7 @@ namespace libecs
   // to String
 
   template< typename FromType >
-  class convertTo_< String, FromType >
+  class ConvertTo< String, FromType >
   {
   public:
     inline const String operator()( const FromType& aValue )
@@ -126,7 +126,7 @@ namespace libecs
 
 
   template<>
-  class convertTo_< String, String >
+  class ConvertTo< String, String >
   {
   public:
     inline const String operator()( const String& aValue )
@@ -143,7 +143,7 @@ namespace libecs
   template< typename ToType, typename FromType >
   inline const ToType convertTo( const FromType& aValue )
   {
-    return convertTo_<ToType,FromType>()( aValue );
+    return ConvertTo<ToType,FromType>()( aValue );
   }
 
 

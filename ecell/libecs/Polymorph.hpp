@@ -378,7 +378,7 @@ namespace libecs
 
   // identity
   template<>
-  class convertTo_< PolymorphVector, PolymorphVector >
+  class ConvertTo< PolymorphVector, PolymorphVector >
   {
   public:
     const PolymorphVector operator()( const PolymorphVector& aValue )
@@ -390,7 +390,7 @@ namespace libecs
   // to PolymorphVector
 
   template< typename FromType >
-  class convertTo_< PolymorphVector, FromType >
+  class ConvertTo< PolymorphVector, FromType >
   {
   public:
     const PolymorphVector operator()( const FromType& aValue )
@@ -399,9 +399,9 @@ namespace libecs
     }
   };
 
-  // override <T,String> case defined in convertTo.hpp
+  // Override the <T,String> case defined in convertTo.hpp.
   template<>
-  class convertTo_< PolymorphVector, String >
+  class ConvertTo< PolymorphVector, String >
   {
   public:
     const PolymorphVector operator()( const String& aValue )
@@ -413,7 +413,7 @@ namespace libecs
 
   // from PolymorphVector 
   template< typename ToType >
-  class convertTo_< ToType, PolymorphVector >
+  class ConvertTo< ToType, PolymorphVector >
   {
   public:
     const ToType operator()( PolymorphVectorCref aValue )
@@ -423,9 +423,9 @@ namespace libecs
     }
   };
 
-  // override <String,T> case defined in convertTo.hpp
+  // Override the <String,T> case defined in convertTo.hpp.
   template<>
-  class convertTo_< String, PolymorphVector >
+  class ConvertTo< String, PolymorphVector >
   {
   public:
     const String operator()( PolymorphVectorCref aValue )
