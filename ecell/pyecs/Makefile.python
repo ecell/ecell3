@@ -1,0 +1,34 @@
+ECELLDIR=../..
+CXX=/usr/include/python1.6/CXX
+CXXO=/usr/etc/CXX
+PYLIB=/usr/include/python1.6
+ECELL_INCLUDE=-I$(ECELLDIR) -I$(ECELLDIR)/ecell -I$(ECELLDIR)/ecell/include -I$(ECELLDIR)/dmtool/include
+THREAD_OPTION=-D_REENTRANT -D_THREAD_SAFE -pthread  -g -O2 -D_GNU_SOURCE
+LIBUTIL=$(ECELLDIR)/ecell/util/libutil.a
+LIBECSCORE=$(ECELLDIR)/ecell/libecs/libecs.a
+LIBKORANDOM=$(ECELLDIR)/korandom/libkorandom.a
+
+G++ = /usr/local/bin/g++
+#G++ = /usr/bin/g++
+
+all:	PyEcs.so
+
+PyEcs.o:	PyEcs.hpp PyEcs.cpp 
+	$(G++) -I$(CXX) -I$(PYLIB) $(ECELL_INCLUDE) -c PyEcs.cpp
+
+PySimulator.o:	PySimulator.hpp PySimulator.cpp
+	$(G++) -I$(CXX) -I$(PYLIB) $(ECELL_INCLUDE) -c PySimulator.cpp
+
+
+PyEcs.so: PyEcs.o PySimulator.o 
+	$(G++) --shared $(CXXO)/*.o PySimulator.o PyEcs.o ../emc/libemc.a $(LIBECSCORE) $(LIBUTIL) $(LIBKORANDOM) -o ecs.so
+
+clean:
+	rm -f *.o *~ *.so core
+
+
+
+
+
+
+
