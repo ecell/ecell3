@@ -294,9 +294,9 @@ Object PySimulator::setEventHandler( const Py::Tuple& args )
 
 bool PySimulator::callPendingEventChecker()
 {
-  thePendingEventChecker->apply( Py::Tuple() );
+  Object anObject( thePendingEventChecker->apply( Py::Tuple() ) );
 
-  return thePendingEventChecker->isTrue();
+  return anObject.isTrue();
 }
 
 void PySimulator::callEventHandler()
