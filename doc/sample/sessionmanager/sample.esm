@@ -10,10 +10,11 @@ message( "---- sample.esm ------------> start " )
 # -----------------------------------------------------
 
 # [1-1] set the environment parameter
-setEnvironment('Local')
-#setEnvironment('SGE')
+#setEnvironment('Local')
+setEnvironment('SGE')
 message( "current environment = %s " %getEnvironment() )
 message( "current concurrency = %s " %getConcurrency() )
+setTmpDirRemoval(False)
 
 # [1-2] set the temporary directory
 setTmpRootDir('./workingdir')

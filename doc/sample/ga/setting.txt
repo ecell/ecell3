@@ -1,0 +1,57 @@
+[Fundamental]
+
+[Seed]
+RANDOM SEED             = 0
+
+[GA]
+MAX GENERATION          = 4
+POPULATION              = 4
+FINISH CONDITION        = 0.00005
+
+[Input file or directory]
+EML KEY                 = _EML_
+EML FILES               = simple1.eml
+                          simple2.eml
+                          simple3.eml
+
+ESS FILE                = onerun.py
+
+DIR KEY                 = _DATA_
+EXTRA DIRS              = Data1
+                          Data2
+                          Data3
+
+PARAMETERS              = _KmS_ 0.1 20.0 float
+                          _KcF_ 0.1 20.0 float
+
+
+[Temporary directory]
+TMP DIRECTORY           = work
+TMPDIR REMOVABLE        = True
+
+
+[Output files]
+ELITE FILE              = elite.txt
+ELITE DIR               = elite
+EVALUATED VALUE FILE    = value.txt
+EVALUATED VALUE GNUPLOT = value.gnu
+MUTATION VALUE FILE     = mutation.txt
+MUTATION VALUE GNUPLOT  = mutation.gnu
+
+[Environment]
+USE SGE                 = False
+MAX CPU                 = 1
+DURATION TIME           = 1
+RETRY MAX COUNT         = 3
+
+
+[Advanced]
+CODE                    = Real
+M                       = 3
+ETA PLUS                = 2.0
+ETA MINUS               = 0.0
+UPSILON                 = 1.2
+M0                      = 1.05
+K                       = 1.8
+MMAX                    = 50.0
+

@@ -1,0 +1,158 @@
+%Id: README,v 1.0 2003/09/29 17:02 sugi Exp %
+
+
+
+=== About ===
+
+This is a sample of Genetic Alghrithm (GA) written as an ESM script.
+
+In this  sample the parameters Process:/E:Kms and Process:/E:/KcF
+are estimated from observable time-courses of quantities S and P.
+To consider the generalization ability of estimated parameters
+two different data whose initial conditions is different are
+considered simultaneously as observable time-course.
+
+
+The algorithm of this sample is based on the following paper.
+
+Kikuchi S, Tominaga D, Arita M, Takahashi K, Tomita M.
+Dynamic modeling of genetic networks using genetic algorithm and S-system.
+Bioinformatics. 2003 Mar 22;19(5):643-50. 
+
+
+=== Files and directories ===
+
+README                      This file
+createsampledata.sh         The script file to generate sample input files
+ga.esm                      ESM file of GA
+observable.py               ESS file to generate sample input time-courses
+onerun.py                   ESS file that is used by GA
+setting.txt:                Setting file for ga.esm
+simple1.em                  Model file (EM file) 
+simple2.em                  Model file (EM file) 
+simple3.em                  Model file (EM file) 
+
+
+=== Running this script ===
+
+1. Run the script to generate input files
+
+   % ./createsampledata.sh
+
+   This script convert em file and execute observable.py.
+   The following files and directries are generated.
+
+   Data*/S.ecd
+   Data*/P.ecd
+   simple*.eml
+
+   (1, 2, and 3 is applied to *.)
+   Those simple*.eml model is same except for the initial quantities.
+   The dummy value is written to unknown parameters of KmS KcF.
+
+
+
+2. (If necessary) Modify setting.txt file.
+
+   Refer to the following cahpter for details.
+
+
+3. Run ga.esm file.
+
+   % ecell3-session-manager ga.esm
+     GA on E-Cell3 ........ start 
+     (12/12) .....[1]        1.03504734313
+     (12/12) .....[2]        0.869721171408
+     (12/12) .....[3]        0.746480699514
+     (12/12) .....[4]        0.711716319935
+     reached max generation
+     ----------------------------------------
+     |   Result                             |
+     ----------------------------------------
+     (Evaluated Value)       = 0.711716319935
+     _KmS_   = 7.45037005381
+     _KcF_   = 4.83779253249
+     job id = [37, 38, 39]
+
+
+   ga.esm tries to 'setting.txt' in current working directory.
+   If you'd like to use other setting file, do as below.
+
+   % ecell3-session-manager ga.esm -DSETTING=otherfile
+
+
+4. See results.
+
+   - The parameter sets of elite individual are written in 
+     elite.txt. The connected files to elite individual are
+     copied under elite directory. You can see the obserbable
+     time-course data and predicted ones using gnuplot like
+     as below.
+
+     % cd elite/37
+     % gnuplot gnuplot.dat
+
+   - The transitions of evaluated value or mutation ratio are
+     written in value.txt and mutation.txt respectivily.
+     You can see them using gnuplot as below.
+
+     % gnuplot value.gnu
+
+
+=== Detail of Setting File ===
+
+   The properties of ga.esm is written in setting.txt.
+   In the file, the format of items follows, 
+
+   KEY = VALUE
+
+   When multiple values are specified,
+
+   KEY = VALUE1
+         VALUE2
+         VALUE3
+
+   (example) 
+   TMP DIRECTORY           = work
+
+
+   Only the format of the value of PARAMETERS follows,
+
+   PARAMETERS = PARAMETER1 min max type
+                PARAMETER2 min max type
+                PARAMETER3 min max type
+
+   For example, the following lines specifies the 
+   
+   (example)
+   PARAMETERS              = _KmS_ 0.1 20.0 float
+                             _KcF_ 0.1 20.0 float
+
+
+=== Detail of ESS File ===
+
+   ga.esm requires ESS file to run E-Cell3 and evaluate
+   the given parameters. In this sample, onerun.py is
+   already prepared.
+   In this file, the following procedure should be
+   executed.
+
+   1. read model file (eml).
+   2. set parameters to the model.
+   3. run E-Cell.
+   4. evaluate the result.
+   5. written evaluated value to file.
+
+   When this script is executed by ga.esm, the following
+   items are replaced.
+
+   EML KEY     -> EML FILES
+   DIR KEY     -> EXTRA DIRS
+   PARAMETERS  -> value
+
+   And the evaluated value must be written as float value
+   in result.dat file. After this script is executed, 
+   ga.esm tries to read result.dat file.
+
+
+# end of README
