@@ -452,7 +452,7 @@ class MainWindow(OsogoWindow):
 		aMessage = 'Are you sure you want to quit?'
 
 		if self.theRunningFlag == TRUE:
-			self.stopSimulation('')
+			self.stopSimulation()
 
 			aDialog = ConfirmWindow(1,aMessage,'exit ?')
 
@@ -482,8 +482,10 @@ class MainWindow(OsogoWindow):
 	# ---------------------------------------------------------------
 	def startSimulation( self, obj ) :
 
-		try:
+		if self.theRunningFlag == 1:
+			return
 
+		try:
 			self.theRunningFlag = 1
 			# this can fail if the simulator is not ready
 			self.theSession.theSimulator.initialize()
@@ -492,17 +494,17 @@ class MainWindow(OsogoWindow):
 			self.theTimer = gtk.timeout_add(self.theUpdateInterval, self.updateByTimeOut, 0)
 			self.theLoggerWindow.update()
 			self.theSession.run()
+			self.theRunningFlag = 0
 			self.removeTimeOut()
 
 		except:
-			self.theRunningFlag = 0
 			import sys
 			import traceback
 			aErrorMessage = traceback.format_exception(sys.exc_type,sys.exc_value,sys.exc_traceback)
 			self.theMessageWindow.printMessage(aErrorMessage)
+			self.theRunningFlag = 0
 
-		else:
-			pass
+
 
 	# end of startSimulation
             
@@ -513,7 +515,7 @@ class MainWindow(OsogoWindow):
 	#
 	# return -> None
 	# ---------------------------------------------------------------
-	def stopSimulation( self, obj ) :
+	def stopSimulation( self, obj=None ) :
 
 		try:
 			if self.theRunningFlag:
@@ -523,15 +525,13 @@ class MainWindow(OsogoWindow):
 				self.update()
 				self.updateFundamentalWindows()
 				self.theLoggerWindow.update()
+				self.theRunningFlag = 0
 
 		except:
 			import sys
 			import traceback
 			aErrorMessage = traceback.format_exception(sys.exc_type,sys.exc_value,sys.exc_traceback)
 			self.theMessageWindow.printMessage(aErrorMessage)
-
-		else:
-			self.theRunningFlag = 0
 
 		self.updateFundamentalWindows()
 
@@ -547,9 +547,12 @@ class MainWindow(OsogoWindow):
 	# ---------------------------------------------------------------
 	def stepSimulation( self, obj ) : 
 
+		if self.theRunningFlag == 1:
+			return
+
 		try:
 
-
+			self.theRunningFlag = 1
 			# this can fail if the simulator is not ready
 			self.theSession.theSimulator.initialize()
 
@@ -557,9 +560,10 @@ class MainWindow(OsogoWindow):
 			self['step_combo_entry'].set_text( str( self.theStepSize ) )
 			self.theTimer = gtk.timeout_add( self.theUpdateInterval, self.updateByTimeOut, 0 )
 			if self.theStepType == 0:
-				self.theSession.run( self.theStepSize )
+				self.theSession.run( float( self.theStepSize ) )
 			else:
-				self.theSession.step( self.theStepSize )
+				self.theSession.step( int( self.theStepSize ) )
+			self.theRunningFlag = 0
 			self.removeTimeOut()
 			self.update()
 			self.updateFundamentalWindows()
@@ -571,9 +575,7 @@ class MainWindow(OsogoWindow):
 			import traceback
 			aErrorMessage = traceback.format_exception(sys.exc_type,sys.exc_value,sys.exc_traceback)
 			self.theMessageWindow.printMessage( aErrorMessage )
-
-		else:
-			pass
+			self.theRunningFlag = 0
 
 	# end of stepSimulation
 
@@ -1027,6 +1029,11 @@ class MainWindow(OsogoWindow):
 	# This method is throwable exception.
 	# ---------------------------------------------------------------
 	def openPreferences( self, button_obj ):
+
+		aPropertyBox = gnome.ui.GnomePropertyBox()
+		aLabel = gtk.Label( 'NOT IMPLEMENTED YET' )
+		aTabLabel = gtk.Label( 'warning' )
+		aPropertyBox.append_page( aLabel, aTabLabel )
 
 		#aPropertyBox = gnome.ui.GnomePropertyBox()
 		#aLabel = gtk.Label( 'NOT IMPLEMENTED YET' )
