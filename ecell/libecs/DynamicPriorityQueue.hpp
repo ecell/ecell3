@@ -76,6 +76,7 @@ public:
   void pop();
   void push( key_type aKey );
 
+
   bool empty() const
   {
     return ( size() == 0 );
@@ -85,6 +86,9 @@ public:
   {
     return theSize;
   }
+
+
+  void clear();
 
 private:
 
@@ -115,6 +119,19 @@ DynamicPriorityQueue< key_type >::DynamicPriorityQueue()
   theSize( 0 )
 {
   ; // do nothing
+}
+
+
+template < typename key_type >
+DynamicPriorityQueue< key_type >::clear()
+{
+  theIndices.clear();
+  c.clear();
+  v.clear();
+  
+  theSize = 0;
+  
+  theFirstKeyPtr = 0;
 }
 
 
@@ -204,7 +221,6 @@ void DynamicPriorityQueue< key_type >::pop()
   goDown( 0 );
 }
 
-
 template < typename key_type >
 void DynamicPriorityQueue< key_type >::push( key_type aKey )
 {
@@ -217,6 +233,9 @@ void DynamicPriorityQueue< key_type >::push( key_type aKey )
       c.resize( size() );
       v.resize( size() );
       theIndices.resize( size() );
+
+      v.push_back( aKey );
+
       theFirstKeyPtr = v.begin().base();
     
       for( index_type i( 0 ); i < size(); ++i )
