@@ -4,7 +4,6 @@ Version: 3.1.97
 Release: 1
 URL: http://www.e-cell.org
 Source0: %{name}-%{version}.tar.gz
-Source1: boost_all.tar.gz
 #License: GPL
 Group: Applications
 Copyright: E-Cell Project
@@ -25,7 +24,6 @@ E-Cell Simulation Environment (E-Cell SE) is a software package for cellular and
 %prep
 %setup 
 %setup -a 1
-mv boost_* boost
 
 CFLAGS="$RPM_OPT_FLAGS" ./configure --prefix=%{_prefix}
 
