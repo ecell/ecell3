@@ -453,7 +453,7 @@ class Eml:
 
         if aValueNode.firstChild.nodeType == minidom.Node.TEXT_NODE:
 
-            return aValueNode.firstChild.toxml()
+            return str( aValueNode.firstChild.toxml() )
 
         elif aValueNode.firstChild.nodeType == minidom.Node.ELEMENT_NODE:
 
