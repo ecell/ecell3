@@ -35,6 +35,8 @@
 #include "libecs/Stepper.hpp"
 #include "libecs/LoggerBroker.hpp"
 
+#include "EmcLogger.hpp"
+
 #include "LocalSimulatorImplementation.hpp"
 
 namespace libemc
@@ -46,10 +48,10 @@ namespace libemc
     :
     theModel( *new Model ),
     theRunningFlag( false ),
-    thePendingEventChecker( defaultPendingEventChecker ),
-    theEventHandler( NULL )
+    thePendingEventChecker( NULLPTR ),
+    theEventHandler( NULLPTR )
   {
-    ; // do nothing
+    clearPendingEventChecker();
   }
 
   LocalSimulatorImplementation::~LocalSimulatorImplementation()
@@ -108,12 +110,13 @@ namespace libemc
     return getModel().getCurrentTime();
   }
 
-  LoggerPtr LocalSimulatorImplementation::
+  EmcLogger LocalSimulatorImplementation::
   getLogger( libecs::StringCref aFullPNString )
   {
     FullPN aFullPN( aFullPNString );
+    LoggerPtr aLoggerPtr( getModel().getLoggerBroker().getLogger( aFullPN ) );
 
-    return getModel().getLoggerBroker().getLogger( aFullPN );
+    return EmcLogger( aLoggerPtr );
   }
 
   StringVectorRCPtr LocalSimulatorImplementation::getLoggerList()
@@ -149,11 +152,13 @@ namespace libemc
 
     do
       {
-
-	for( int i( 0 ) ; i < 20 ; i++ )
+	unsigned int i( 20 );
+	do 
 	  {
 	    step();
-	  }
+
+	    --i;
+	  } while( i != 0 );
 
 	while( (*thePendingEventChecker)() )
 	  {
@@ -180,20 +185,24 @@ namespace libemc
   {
     theRunningFlag = true;
 
-    libecs::Real aStopTime( getModel().getCurrentTime() + aDuration );
+    const libecs::Real aStopTime( getModel().getCurrentTime() + aDuration );
 
     do
       {
-	for( int i( 0 ) ; i < 20 ; i++ )
+	unsigned int i( 20 );
+	do
 	  {
-	    if( getModel().getCurrentTime() >= aStopTime )
+	    if( getModel().getCurrentTime() > aStopTime )
 	      {
 		theRunningFlag = false;
 		break;
 	      }
-
+	    
 	    step();
-	  }
+
+	    --i;
+	  } while( i != 0 );
+
 
 	while( (*thePendingEventChecker)() )
 	  {
@@ -208,22 +217,19 @@ namespace libemc
   {
     theRunningFlag = true;
 
-    libecs::Real aStopTime( getModel().getCurrentTime() + aDuration );
+    const libecs::Real aStopTime( getModel().getCurrentTime() + aDuration );
 
     do
       {
-	for( int i( 0 ) ; i < 20 ; i++ )
+	if( getModel().getCurrentTime() > aStopTime )
 	  {
-	    if( getModel().getCurrentTime() >= aStopTime )
-	      {
-		theRunningFlag = false;
-		break;
-	      }
-
-	    step();
+	    theRunningFlag = false;
+	    return;  // the only exit
 	  }
 
-      }	while( theRunningFlag );
+	step();
+
+      }	while( 1 );
 
   }
 
@@ -233,27 +239,23 @@ namespace libemc
   }
 
   void LocalSimulatorImplementation::
-  setPendingEventChecker( PendingEventCheckerFuncPtr aPendingEventChecker )
+  setPendingEventChecker( PendingEventCheckerPtr aPendingEventChecker )
   {
+    delete thePendingEventChecker;
     thePendingEventChecker = aPendingEventChecker;
   }
 
   void LocalSimulatorImplementation::
-  setEventHandler( EventHandlerFuncPtr anEventHandler )
+  setEventHandler( EventHandlerPtr anEventHandler )
   {
+    delete theEventHandler;
     theEventHandler = anEventHandler;
   }
 
   void LocalSimulatorImplementation::clearPendingEventChecker()
   {
-    thePendingEventChecker = defaultPendingEventChecker;
+    setPendingEventChecker( new DefaultPendingEventChecker() );
   }
-
-  bool LocalSimulatorImplementation::defaultPendingEventChecker()
-  {
-    return false;
-  }
-
 
 
 } // namespace libemc,

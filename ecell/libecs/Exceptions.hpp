@@ -50,12 +50,19 @@ namespace libecs
 throw CLASS( __PRETTY_FUNCTION__, MESSAGE )
 
   /// Base exception class
-  class Exception /* : public exception */
+  class Exception 
+    : public std::exception 
   {
   public:
     Exception( StringCref method, StringCref message = "" )
-      : theMethod( method ), theMessage( message ) {}
-    virtual ~Exception() {}
+      : 
+      theMethod( method ), 
+      theMessage( message ) 
+    {
+      ; // do nothing
+    }
+
+    virtual ~Exception() throw() {}
 
     virtual const String message() const 
     {
@@ -67,8 +74,8 @@ throw CLASS( __PRETTY_FUNCTION__, MESSAGE )
 #endif /* DEBUG */
     }
 
-    virtual const char* what() const { return theMessage.c_str(); }
-    virtual const char* const getClassName() const  {return "Exception";}
+    virtual const char* what() const throw() { return message().c_str(); }
+    virtual const char* const getClassName() const  { return "Exception"; }
 
   protected:
 
@@ -82,7 +89,7 @@ class CLASSNAME : public BASECLASS\
 public:\
   CLASSNAME( StringCref method, StringCref message = "" )\
     :  BASECLASS( method, message ) {}\
-  virtual ~CLASSNAME() {}\
+  virtual ~CLASSNAME() throw() {}\
   virtual const char* const getClassName() const\
     { return #CLASSNAME ; }\
 };\

@@ -261,7 +261,7 @@ namespace libecs
       delete theData;
     }
 
-    UVariableCref operator= ( UVariableCref rhs )
+    UVariableCref operator=( UVariableCref rhs )
     {
       if( this != &rhs )
 	{

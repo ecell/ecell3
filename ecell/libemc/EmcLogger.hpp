@@ -45,17 +45,16 @@ namespace libemc
 
   public:
 
-    EmcLogger( void )
+    EmcLogger( libecs::LoggerPtr aLoggerPtr )
       :
       theLoggerImplementation( NULLPTR )
     {
-      ; // do nothing
+      setLogger( aLoggerPtr );
     }
 
     virtual ~EmcLogger( ) { }
 
-    const libecs::DataPointVectorRCPtr
-    getData( void ) 
+    const libecs::DataPointVectorRCPtr getData( void ) 
     {
       return theLoggerImplementation->getData();
     }
@@ -67,7 +66,8 @@ namespace libemc
     }
 
     const libecs::DataPointVectorRCPtr
-    getData( libecs::RealCref start, libecs::RealCref end, libecs::RealCref interval ) 
+    getData( libecs::RealCref start, libecs::RealCref end, 
+	     libecs::RealCref interval ) 
     {
       return theLoggerImplementation->getData( start, end, interval );
     }
@@ -78,27 +78,50 @@ namespace libemc
       theLoggerImplementation = new LocalLoggerImplementation( lptr );
     }
 
-    libecs::RealCref getStartTime() 
+    const libecs::String getName() const
     {
-      theStartTime = theLoggerImplementation->getStartTime();
-      return theStartTime;
+      return theLoggerImplementation->getName();
     }
 
-    libecs::RealCref getEndTime() 
+    const libecs::Real getStartTime() 
     {
-      theEndTime = theLoggerImplementation->getEndTime();
-      return theEndTime;
+      return theLoggerImplementation->getStartTime();
     }
 
-    void appendData(libecs::RealCref aValue){
-    theLoggerImplementation->appendData(aValue);
+    const libecs::Real getEndTime() 
+    {
+      return theLoggerImplementation->getEndTime();
+    }
+
+    const libecs::Real getMinimumInterval( void ) const
+    {
+      return theLoggerImplementation->getMinimumInterval();
+    }
+
+    const libecs::Real getCurrentInterval( void ) const
+    {
+      return theLoggerImplementation->getCurrentInterval();
+    }
+
+    const libecs::Int getSize( void ) const
+    {
+      return theLoggerImplementation->getSize();
+    }
+
+    // for testing only
+    void appendData(libecs::RealCref aValue)
+    {
+      theLoggerImplementation->appendData(aValue);
     }
 
   private:
 
+    // hidden default constructor
+    EmcLogger();
+
+  private:
+
     LoggerImplementation* theLoggerImplementation;
-    libecs::Real theStartTime;
-    libecs::Real theEndTime;
   };
 
 

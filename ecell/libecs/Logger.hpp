@@ -121,11 +121,16 @@ namespace libecs
     Real getEndTime( void ) ;
 
 
+    const Int getSize() const
+    {
+      return thePhysicalLogger.size();
+    }
+
     /**
 
     */
 
-    RealCref getMinInterval( void ) const
+    RealCref getMinimumInterval( void ) const
     {
       return theMinimumInterval;
     }

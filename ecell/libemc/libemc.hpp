@@ -32,6 +32,8 @@
 #ifndef __LIBEMC_HPP
 #define __LIBEMC_HPP
 
+#include <functional>
+
 #include "libecs/libecs.hpp"
 
 namespace libemc
@@ -43,8 +45,12 @@ namespace libemc
    */ 
   
 
-  typedef bool ( *PendingEventCheckerFuncPtr )();
-  typedef void ( *EventHandlerFuncPtr )();
+  DECLARE_CLASS( PendingEventChecker );
+  DECLARE_CLASS( EventHandler );
+
+  DECLARE_CLASS( Simulator );
+  DECLARE_CLASS( SimulatorImplementation );
+  DECLARE_CLASS( EmcLogger );
 
   /** @} */ //end of libecs_module 
 

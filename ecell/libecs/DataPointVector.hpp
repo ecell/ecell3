@@ -63,21 +63,25 @@ namespace libecs
 
     DataPointCref operator[]( DataPointVectorIterator aPosition ) const;
 
-    DataPointVectorIterator getSize();
+    DataPointVectorIterator getSize() const
+    {
+      return theSize;
+    }
+
 
     size_t getElementSize() const;
 	
-    DataPointVectorIterator begin()
+    DataPointVectorIterator begin() const
     {
       return 0;
     }
 	
-    DataPointVectorIterator end()
+    DataPointVectorIterator end() const
     {
       return getSize();
     }
 	
-    void* getRawArray();
+    const void* getRawArray() const;
 
   private:
 

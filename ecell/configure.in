@@ -79,7 +79,7 @@ AC_CHECK_HEADERS(math,,)
 AC_CHECK_HEADERS(cmath,,)
 dnl
 dnl
-EXT_GUESS="../../../.. ../../.. ../.. ../ ./ $prefix/ /usr /usr/local"
+EXT_GUESS="../../../.. ../../.. ../.. ../ ./ $prefix /usr /usr/local /opt"
 dnl
 dnl
 dnl dmtool package
@@ -126,6 +126,29 @@ if test "$KORANDOM_DIR" = "" ; then
         KORANDOM_DIR=$ac_cv_korandom_dir
 fi
 AC_SUBST(KORANDOM_DIR)
+
+dnl
+dnl
+dnl boost package
+dnl
+if test "$BOOST_DIR" = "" ; then
+        AC_MSG_CHECKING( for boost dir )
+        ac_cv_boost_dir="no"
+        for ac_dir in $EXT_GUESS ; do
+                if test -d $ac_dir/boost ; then
+                        ac_cv_boost_dir=`(cd $ac_dir/boost ; pwd)`
+			BOOST_DIR=$ac_cv_boost_dir
+                fi
+        done
+
+	if test "$BOOST_DIR" = "" ; then	
+		AC_MSG_ERROR("boost not found.")
+	fi
+
+        AC_MSG_RESULT($ac_cv_boost_dir)
+#        BOOST_DIR=$ac_cv_boost_dir
+fi
+AC_SUBST(BOOST_DIR)
 
 AM_CHECK_PYTHON_HEADERS()
 

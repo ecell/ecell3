@@ -64,10 +64,14 @@ namespace libemc
 	     libecs::RealCref end,
 	     libecs::RealCref interval ) = 0;
 
-    virtual const libecs::Real getStartTime() = 0;
-    virtual const libecs::Real getEndTime() = 0;
+    virtual const libecs::String getName() const = 0;
+    virtual const libecs::Real   getStartTime() = 0;
+    virtual const libecs::Real   getEndTime() = 0;
+    virtual const libecs::Int    getSize() = 0;
+    virtual const libecs::Real   getMinimumInterval( void ) const = 0;
+    virtual const libecs::Real   getCurrentInterval( void ) const = 0;
+
     virtual const void appendData(libecs::RealCref aValue) = 0;
-//    virtual const libecs::Real getSize() = 0;
 
   };
 

@@ -37,6 +37,7 @@
 #include "libecs/PrimitiveType.hpp"
 
 #include "libemc.hpp"
+#include "EmcLogger.hpp"
 #include "SimulatorImplementation.hpp"
 
 namespace libemc
@@ -86,7 +87,7 @@ namespace libemc
       return theSimulatorImplementation->getProperty( aFullPNString );
     }
 
-    libecs::LoggerPtr getLogger( libecs::StringCref aFullPNString )
+    EmcLogger getLogger( libecs::StringCref aFullPNString )
     {
       return theSimulatorImplementation->getLogger( aFullPNString );
     }
@@ -126,14 +127,13 @@ namespace libemc
       theSimulatorImplementation->stop();
     }
 
-    void setPendingEventChecker( PendingEventCheckerFuncPtr 
-				 aPendingEventChecker )
+    void setPendingEventChecker( PendingEventCheckerPtr aPendingEventChecker )
     {
        theSimulatorImplementation->
 	 setPendingEventChecker( aPendingEventChecker );
      }
 
-    void setEventHandler( EventHandlerFuncPtr anEventHandler )
+    void setEventHandler( EventHandlerPtr anEventHandler )
     {
        theSimulatorImplementation->setEventHandler( anEventHandler );
     }

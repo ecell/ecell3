@@ -91,7 +91,7 @@ class Session:
             #print aPrintClass, aPrintId ## Temporary
             ## -------------------------------------------------------
 
-            self.theSimulator.createStepper( aClass, anId )
+            self.theSimulator.createStepper( aClass, anId, [] )
 
 
 

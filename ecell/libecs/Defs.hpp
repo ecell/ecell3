@@ -43,6 +43,11 @@
 #include "AssocVector.h"
 
 
+
+#define DEBUG
+
+
+
 // cmath
 
 #if defined( HAVE_CMATH )
@@ -110,9 +115,12 @@ namespace libecs
   // Numeric types
 
   // FIXME: use numeric_limits
-  DECLARE_TYPE( int64_t, Int );
-  DECLARE_TYPE( uint64_t, UnsignedInt );
-  const int INT_SIZE( sizeof( Int ) );
+  //  DECLARE_TYPE( int64_t, Int );
+  //  DECLARE_TYPE( uint64_t, UnsignedInt );
+  //  const int INT_SIZE( sizeof( Int ) );
+
+  DECLARE_TYPE( long int, Int );
+  DECLARE_TYPE( unsigned long int, UnsignedInt );
 
   DECLARE_TYPE( corelinux::Real, Real );
 

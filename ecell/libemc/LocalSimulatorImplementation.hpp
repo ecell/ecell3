@@ -69,7 +69,7 @@ namespace libemc
     virtual const libecs::UVariableVectorRCPtr
     getProperty( libecs::StringCref aFullPNString );
 
-    virtual libecs::LoggerPtr getLogger( libecs::StringCref aFullPNString );
+    virtual EmcLogger getLogger( libecs::StringCref aFullPNString );
 
     void step();
 
@@ -85,12 +85,12 @@ namespace libemc
 
     virtual void stop();
 
-    virtual void setPendingEventChecker( PendingEventCheckerFuncPtr
+    virtual void setPendingEventChecker( PendingEventCheckerPtr
 					 aPendingEventChecker );
 
     void clearPendingEventChecker();
 
-    virtual void setEventHandler( EventHandlerFuncPtr anEventHandler );
+    virtual void setEventHandler( EventHandlerPtr anEventHandler );
 
 
   protected:
@@ -105,16 +105,13 @@ namespace libemc
     void runWithEvent( libecs::Real aDuration );
     void runWithoutEvent( libecs::Real aDuration );
 
-    static bool defaultPendingEventChecker();
-
   private:
 
     libecs::ModelRef           theModel;
 
     bool                       theRunningFlag;
-    PendingEventCheckerFuncPtr thePendingEventChecker;
-    EventHandlerFuncPtr        theEventHandler;
-
+    PendingEventCheckerPtr     thePendingEventChecker;
+    EventHandlerPtr            theEventHandler;
 
   };  
 

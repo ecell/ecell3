@@ -1,90 +1,81 @@
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-//
-//        This file is part of E-CELL Simulation Environment package
-//
-//                Copyright (C) 1996-2002 Keio University
-//
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-//
-//
-// E-CELL is free software; you can redistribute it and/or
-// modify it under the terms of the GNU General Public
-// License as published by the Free Software Foundation; either
-// version 2 of the License, or (at your option) any later version.
-// 
-// E-CELL is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-// See the GNU General Public License for more details.
-// 
-// You should have received a copy of the GNU General Public
-// License along with E-CELL -- see the file COPYING.
-// If not, write to the Free Software Foundation, Inc.,
-// 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-// 
-//END_HEADER
-//
-// written by Kouichi Takahashi <shafi@e-cell.org> at
-// E-CELL Project, Institute for Advanced Biosciences, Keio University.
-//
+#include <boost/python/class_builder.hpp>
+#include <boost/python/cross_module.hpp>
 
-#include <iostream>
-
-#include "libecs/libecs.hpp"
-
+#include "libemc/libemc.hpp"
 #include "libemc/Simulator.hpp"
 #include "libemc/EmcLogger.hpp"
 
-#include "PySimulator.hpp"
-#include "PyLogger.hpp"
+//#include "PySimulator.hpp"
+//#include "PyLogger.hpp"
+
 #include "PyEcs.hpp"
 
-using namespace libemc;
-using namespace libecs;
 
-//-----------------//
-// PyEcs class     //
-//-----------------// 
 
-PyEcs::PyEcs()
-  :
-  Py::ExtensionModule<PyEcs>( "_ecs" )
+
+BOOST_PYTHON_MODULE_INIT(_ecs)
 {
-  PySimulator::init_type();
-  PyLogger::init_type();
-  add_varargs_method( "Simulator", 
-		      &PyEcs::createSimulator, 
-		      "Simulator( type = \"Local\" )" );
-  //  add_varargs_method( "Logger", 
-  //		      &PyEcs::createLogger, 
-  //		      "Logger( type = \"Local\" )" );
-    
-  initialize( "E-CELL Core System" );
+  
+  import_array();
+
+  python::module_builder ecs( "_ecs" );
+
+  // PySimulator class
+  python::class_builder<libemc::Simulator> aSimulatorClass( ecs, "Simulator" );
+  // PyLogger class
+  python::class_builder<libemc::EmcLogger> aLoggerClass( ecs, "Logger" );
+
+  //
+  // PySimulator Definitions
+  //
+  aSimulatorClass.def( python::constructor<>() );
+  aSimulatorClass.def( &libemc::Simulator::createEntity,   "createEntity" );
+  aSimulatorClass.def( &libemc::Simulator::setProperty,    "setProperty" );
+  aSimulatorClass.def( &libemc::Simulator::getProperty,    "getProperty" );
+  aSimulatorClass.def( &libemc::Simulator::createStepper,  "createStepper" );
+  aSimulatorClass.def( &libemc::Simulator::getCurrentTime, "getCurrentTime" );
+  aSimulatorClass.def( &libemc::Simulator::getLogger,      "getLogger" );
+  aSimulatorClass.def( &libemc::Simulator::getLoggerList,  "getLoggerList" );  
+  aSimulatorClass.def( &libemc::Simulator::stop,           "stop" );
+  aSimulatorClass.def( &libemc::Simulator::step,           "step" );
+  aSimulatorClass.def( &libemc::Simulator::initialize,     "initialize" );  
+  aSimulatorClass.def( ( void ( libemc::Simulator::* )() )
+		       &libemc::Simulator::run,            "run" );
+  aSimulatorClass.def( ( void( libemc::Simulator::* )( libecs::Real ) )
+		       &libemc::Simulator::run,            "run" );
+  aSimulatorClass.def( &libemc::Simulator::setPendingEventChecker,
+		       "setPendingEventChecker" );
+  aSimulatorClass.def( &libemc::Simulator::setEventHandler, 
+		       "setEventHandler" );
+
+
+  //
+  // PyLogger definitions
+  //
+  //  aPyLoggerClass.def( python::constructor<libecs::LoggerPtr>() );
+  aLoggerClass.def( ( const libecs::DataPointVectorRCPtr 
+		      ( libemc::EmcLogger::* )() )
+		      &libemc::EmcLogger::getData,
+		      "getData" );
+  aLoggerClass.def( ( const libecs::DataPointVectorRCPtr 
+		      ( libemc::EmcLogger::* )( libecs::RealCref, 
+						libecs::RealCref ) )
+		    &libemc::EmcLogger::getData,
+		    "getData" );
+  aLoggerClass.def( ( const libecs::DataPointVectorRCPtr
+		      ( libemc::EmcLogger::* )( libecs::RealCref, 
+						libecs::RealCref, 
+						libecs::RealCref ) )
+		    &libemc::EmcLogger::getData, 
+		    "getData" );
+  aLoggerClass.def( &libemc::EmcLogger::getName,      "getName" );  
+  aLoggerClass.def( &libemc::EmcLogger::getStartTime, "getStartTime" );  
+  aLoggerClass.def( &libemc::EmcLogger::getEndTime,   "getEndTime" );    
+  aLoggerClass.def( &libemc::EmcLogger::getMinimumInterval,
+		    "getMinimumInterval" );    
+  aLoggerClass.def( &libemc::EmcLogger::getCurrentInterval,
+		    "getCurrentInterval" );    
+  aLoggerClass.def( &libemc::EmcLogger::getSize, "getSize" );
+
 }
-
-Object PyEcs::createSimulator( const Tuple& args )
-{
-  PySimulator* aPySimulator = new PySimulator();
-  return asObject( aPySimulator );
-}
-
-Object PyEcs::createLogger( const Py::Tuple& args )
-{
-  PyLogger* aPyLogger = new PyLogger();
-  return asObject( aPyLogger );
-}
-
-void init_ecs()
-{
-  static PyEcs* _ecs = new PyEcs();
-}
-
-
-
-
-
-
-
-
-
 

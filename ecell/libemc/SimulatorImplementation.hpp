@@ -45,6 +45,45 @@ namespace libemc
    * @{ 
    */ 
   
+
+  class EventHandler
+    :
+    public std::unary_function<void,void> 
+  {
+  public:
+    EventHandler() {}
+    virtual ~EventHandler() {}
+
+    virtual void operator()( void ) const = 0;
+  };
+
+  class PendingEventChecker
+    :
+    public std::unary_function<bool,void>
+  {
+  public:
+    PendingEventChecker() {}
+    virtual ~PendingEventChecker() {}
+
+    virtual bool operator()( void ) const = 0;
+  };
+
+  class DefaultPendingEventChecker
+    :
+    public PendingEventChecker
+  {
+  public:
+    DefaultPendingEventChecker() {}
+    //    virtual ~DefaultPendingEventChecker() {}
+
+    virtual bool operator()( void ) const
+    {
+      return false;
+    }
+  };
+
+
+
   /**
      Pure virtual base class (interface definition) of simulator
      implementation.
@@ -76,7 +115,7 @@ namespace libemc
     virtual const libecs::UVariableVectorRCPtr
     getProperty( libecs::StringCref aFullPNString ) = 0;
 
-    virtual libecs::LoggerPtr 
+    virtual EmcLogger
     getLogger( libecs::StringCref aFullPNString ) = 0;
 
     virtual void step() = 0;
@@ -95,10 +134,10 @@ namespace libemc
 
     virtual void stop() = 0;
 
-    virtual void setPendingEventChecker( PendingEventCheckerFuncPtr 
+    virtual void setPendingEventChecker( PendingEventCheckerPtr 
 					 aPendingEventChecker ) = 0;
 
-    virtual void setEventHandler( EventHandlerFuncPtr anEventHandler ) = 0;
+    virtual void setEventHandler( EventHandlerPtr anEventHandler ) = 0;
 
   };   //end of class Simulator
 

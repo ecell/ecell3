@@ -55,17 +55,12 @@ namespace libecs
     return theRawArray[ aPosition ];
   }
 
-  DataPointVectorIterator DataPointVector::getSize()
-  {
-    return theSize;
-  }
-
   size_t DataPointVector::getElementSize() const
   {
     return theElementSize;
   }
 
-  void* DataPointVector::getRawArray()
+  const void* DataPointVector::getRawArray() const
   {
     return  (void*) theRawArray;
   }

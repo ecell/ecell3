@@ -54,29 +54,47 @@ namespace libemc
 
     virtual ~LocalLoggerImplementation( );
 
-    const libecs::DataPointVectorRCPtr
-    getData( void ) ;
+    virtual const libecs::DataPointVectorRCPtr getData( void );
 
-    const libecs::DataPointVectorRCPtr
-    getData( libecs::RealCref start,
-	     libecs::RealCref end ) ;
+    virtual const libecs::DataPointVectorRCPtr getData( libecs::RealCref start,
+							libecs::RealCref end );
 
-    const libecs::DataPointVectorRCPtr
+    virtual const libecs::DataPointVectorRCPtr 
     getData( libecs::RealCref start,
 	     libecs::RealCref end,
-	     libecs::RealCref interval ) ;
+	     libecs::RealCref interval );
 
-    const libecs::Real getStartTime() 
+    virtual const libecs::String getName() const
+    {
+      return theLogger.getName();
+    }
+
+    virtual const libecs::Real getStartTime() 
     {
       return theLogger.getStartTime();
     }
 
-    const libecs::Real getEndTime() 
+    virtual const libecs::Real getEndTime() 
     {
       return theLogger.getEndTime();
     }
 
-    const void appendData(libecs::RealCref aValue)
+    virtual const libecs::Int getSize()
+    {
+      return theLogger.getSize();
+    }
+
+    virtual const libecs::Real getMinimumInterval( void ) const
+    {
+      return theLogger.getMinimumInterval();
+    }
+
+    virtual const libecs::Real getCurrentInterval( void ) const
+    {
+      return theLogger.getCurrentInterval();
+    }
+
+    virtual const void appendData(libecs::RealCref aValue)
     {
         theLogger.appendData(aValue);
     }
