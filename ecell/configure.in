@@ -185,9 +185,6 @@ AC_CHECK_FUNCS(strdup strstr)
 
 AC_CONFIG_FILES([Makefile 
 libecs/Makefile
-libecs/emtool
-libecs/dmtemplates/Makefile
-libecs/dmtemplates/Process/Makefile
 libemc/Makefile
 pyecs/Makefile
 pyecs/ecell3

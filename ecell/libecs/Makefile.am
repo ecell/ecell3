@@ -1,6 +1,6 @@
 libdir=@libdir@
 
-SUBDIRS = dmtemplates
+SUBDIRS =
 
 GSL_LIBADD = -lgsl -lgslcblas
 DMTOOL_INCLUDE=-I@DMTOOL_INCLUDE_DIR@
