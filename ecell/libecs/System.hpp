@@ -46,7 +46,6 @@ namespace libecs
    */ 
   
   // Tree data structures used for entry lists
-  // for_each performance is very important. other or hybrid container type?
   DECLARE_MAP( const String, SubstancePtr, 
 	       std::less<const String>, SubstanceMap );
   DECLARE_MAP( const String, ReactorPtr,   
@@ -54,7 +53,6 @@ namespace libecs
   DECLARE_MAP( const String, SystemPtr,    
 	       std::less<const String>, SystemMap );
 
-  typedef SystemPtr (*SystemAllocatorFunc)();
 
   class System 
     : 
@@ -77,8 +75,6 @@ namespace libecs
 
     virtual void initialize();
 
-    virtual StringLiteral getClassName() const { return "System"; }
-
     /**
        Returns a pointer to a Stepper object that this System belongs.
 
@@ -100,11 +96,13 @@ namespace libecs
 
        @param classname Classname of the Stepper that this System may have.
     */
+
     void setStepperID( StringCref anID );
 
     /**
        @return Volume of this System. Unit is [L].
     */
+
     virtual const Real getVolume() const
     {
       return theVolume;
@@ -114,6 +112,7 @@ namespace libecs
        Set a new volume for this System. 
        Make the new volume effective from beginning of next time step.
      */
+
     virtual void setVolume( RealCref aVolume )
     {
       theVolume = aVolume;
@@ -126,15 +125,47 @@ namespace libecs
       return theSubstanceMap;
     }
 
-    ReactorMapCref getReactorMap() const
+    ReactorMapCref   getReactorMap() const
     {
       return theReactorMap;
     }
 
-    SystemMapCref getSystemMap() const
+    SystemMapCref    getSystemMap() const
     {
       return theSystemMap;
     }
+
+
+    /**
+       Find a Reactor with given id in this System.  
+       
+       This method throws NotFound exception if it is not found.
+
+       @return a borrowed pointer to a Reactor object in this System named @a id.
+    */
+
+    ReactorPtr getReactor( StringCref anID ) ;
+
+
+    /**
+       Find a Substance with given id in this System. 
+       
+       This method throws NotFound exception if it is not found.
+
+       @return a borrowed pointer to a Substance object in this System named @a id.
+    */
+
+    SubstancePtr getSubstance( StringCref id );
+
+    /**
+       Find a System with given id in this System. 
+       
+       This method throws NotFound exception if it is not found.
+
+       @return a borrowed pointer to a System object in this System whose ID is id.
+    */
+
+    virtual SystemPtr getSystem( StringCref id );
 
 
     /**
@@ -146,13 +177,6 @@ namespace libecs
 
     void registerReactor( ReactorPtr aReactor );
   
-    /**
-       Find a Reactor with given id. Unlike getReactorIterator(), this 
-       throws NotFound exception if it is not found.
-
-       @return An pointer to a Reactor object in this System named @a id.
-    */
-    ReactorPtr getReactor( StringCref anID ) ;
 
     /**
        Register a Substance object in this System.
@@ -160,13 +184,9 @@ namespace libecs
        This method steals ownership of the given pointer, and deletes
        it if there is an error.
     */
+
     void registerSubstance( SubstancePtr aSubstance );
   
-
-    /**
-       @return An pointer to a Substance object in this System named @a id.
-    */
-    SubstancePtr getSubstance( StringCref id );
 
     /**
        Register a System object in this System.
@@ -174,13 +194,9 @@ namespace libecs
        This method steals ownership of the given pointer, and deletes
        it if there is an error.
     */
+
     void registerSystem( SystemPtr aSystem );
 
-
-    /**
-       @return An pointer to a System object in this System whose ID is id.
-    */
-    virtual SystemPtr getSystem( StringCref id );
 
     bool isRootSystem() const
     {
@@ -198,18 +214,26 @@ namespace libecs
 
     void notifyChangeOfEntityList();
 
+    /**
+       This method returns 1 / ( volume * Avogadro's number ).
+
+       Quantity * getConcentrationFactor() forms 
+       concentration in M (molar).
+
+       When calculating the concentration, using this is faster
+       than getVolume() because the value is precalculated when
+       setConcentration() is called.
+
+    */
+
+    RealCref getConcentrationFactor() const
+    {
+      return theConcentrationFactor;
+    }
+
+
+    virtual StringLiteral getClassName() const { return "System"; }
     static SystemPtr createInstance() { return new System; }
-
-    void updateConcentrationFactor() 
-    {
-      theConcentrationFactor = 1 / ( theVolume * N_A );
-    }
-
-    const Real calculateConcentration( const Real aQuantity ) const
-    {
-      return aQuantity * theConcentrationFactor;
-    }
-
 
   public: // property slots
 
@@ -223,6 +247,11 @@ namespace libecs
 
   protected:
 
+    void updateConcentrationFactor() 
+    {
+      theConcentrationFactor = 1 / ( theVolume * N_A );
+    }
+
     virtual void makeSlots();
 
   protected:
@@ -235,7 +264,6 @@ namespace libecs
 
     Real theVolume;
 
-    // quantity * this variable forms concentration in M (molar)
     Real theConcentrationFactor;
 
     ReactorMap   theReactorMap;

@@ -56,7 +56,6 @@ namespace libecs
     void accumulatorSetQuantity( const Real aQuantity )
     {
       theQuantity = aQuantity;
-      updateConcentration();
     }
 
 
@@ -118,28 +117,14 @@ namespace libecs
     }
 
     /**
-       Returns a concentration if it have.
-       Invalid if haveConcentration() is false.
+       Returns the concentration of this Substance.
+
        @return Concentration in M (mol/L).
     */
 
     const Real getConcentration() const
     {
-      return theConcentration;
-    }
-
-    /**
-       Update theConcentration by theQuantity.
-
-       This method calculates the concentration with System's
-       calculateConcentration() method.
-
-    */
-
-    void updateConcentration()
-    {
-      theConcentration = 
-	getSuperSystem()->calculateConcentration( theQuantity );
+      return theQuantity * getSuperSystem()->getConcentrationFactor();
     }
 
     /**
@@ -287,8 +272,6 @@ namespace libecs
     Real theVelocity;
 
     bool theFixed;
-
-    Real theConcentration;
   };
 
   /** @} */ //end of libecs_module 

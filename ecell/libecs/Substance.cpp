@@ -102,8 +102,7 @@ namespace libecs
     theQuantity( 0 ),  
     theFraction( 0 ),
     theVelocity( 0 ),
-    theFixed( false ) ,
-    theConcentration( 0 )
+    theFixed( false ) 
   {
     makeSlots();
     // FIXME: use AccumulatorMaker
@@ -152,7 +151,6 @@ namespace libecs
 
     theAccumulator->update();
     
-    //    updateConcentration(); -- accumulator does this
   }
 
   const Real Substance::saveQuantity()
@@ -164,7 +162,6 @@ namespace libecs
   {
     theQuantity = aQuantity;
     theAccumulator->update();
-    updateConcentration();
   }
 
   const Real Substance::getActivity()
