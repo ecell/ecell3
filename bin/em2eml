@@ -1,10 +1,13 @@
 #!/usr/bin/env python2
 
-from ecell.spark import *
 import sys
 import string 
 import getopt
+import tempfile
+
 import ecell.eml
+from ecell.spark import *
+
 
 class Token:
 	def __init__(self, type, attr=None, filename="?" , lineno='???'):
@@ -51,51 +54,62 @@ class EmScanner( GenericScanner , object ):
 	def __init__( self ):
 		GenericScanner.__init__( self )
 
-	def tokenize( self, input ):
+	def tokenize( self, input, filename='???' ):
 		self.rv = []
 		self.lineno = 1
+		self.filename = filename
 #		GenericScanner.tokenize( self, input )
                 super (EmScanner, self).tokenize( input )
 		return self.rv
 
+	def createToken( self, type, attr=None ):
+		return Token( type, attr, self.filename, self.lineno )
+
 	def t_keywords( self, s ):
 		r' Reactor[\s\t] | Substance[\s\t] | Stepper[\s|\t] | System[\s\t] '
 		s = string.strip( s )
-		self.rv.append( Token( type=s, attr=s ) )
+		self.rv.append( self.createToken( s, s ) )
 
 	def t_symbols( self, s ):
   		r' [\;\{\}\(\)\,\[\]] '
-		self.rv.append( Token( type=s, attr=s ) )
+		self.rv.append( self.createToken( s, s ) )
 
 	def t_number( self, s ):
 		r' [+-]? ( \d+(\.\d*)? | \d*\.\d+ ) ([eE][+-]?\d+)? '
-		self.rv.append( Token( type='number', attr=s ) )
+		self.rv.append( self.createToken( 'number', s ) )
 
 	def t_name( self, s ):
 		r' [a-zA-Z_/][\w\:\/\.]* '
-		self.rv.append( Token( type='name', attr=s ) )
+		self.rv.append( self.createToken( 'name', s ) )
 
 	def t_quotedstring( self, s ):
 		r' "(^"|.)*" '
-		self.rv.append( Token( type='quotedstring', attr=s ) )
+		self.rv.append( self.createToken( 'quotedstring', s ) )
 		
+	def t_control( self, s ):
+		r' \% [^\n]* '
+		seq = s.split()
+		self.lineno = int( seq[1] )
+		self.filename = str( seq[2] )
+
+		print seq
+
 	def t_comment( self, s ):
 		r' \# [^\n]* '
 		pass
-#		self.rv.append( Token( type='comment', attr=s ) )
+#		self.rv.append( self.createToken( type='comment', attr=s ) )
 
 	def t_nl( self, s ):
 		r' \n '
 		self.lineno = self.lineno + 1
-		pass
     
 	def t_whitespace( self, s ):
-		r' [\s|\t]+ '
+		r' [ |\t]+ '
 		pass
 
         def t_default(self, s ):
-		r' . + '
-		raise ValueError, "Specification error: unmatched input: %s,line %d" % (`s`, self.lineno)
+		r' .+ '
+		raise ValueError, "Unexpected error: unmatched input: %s, line %d." % (self.filename, self.lineno)
 
 
 class EmParser( GenericParser ):
@@ -109,18 +123,14 @@ class EmParser( GenericParser ):
 		'''
 		return AST( Token( 'start' ), args )
 	
-	def p_stmts_1( self, args ):
+	def p_stmts( self, args ):
 		'''
 		stmts ::= stmt stmts
+		stmts ::= stmt
+		stmts ::=
 		'''
 		return AST( Token( 'stmts' ), args )
 
-	def p_stmts_2( self, args ):
-		'''
-		stmts ::= stmt
-		'''
-		return AST( Token( 'stmts' ), args )
-	
 	def p_stmt( self, args ):
 		'''
 		stmt ::= stepper_stmt
@@ -185,20 +195,10 @@ class EmParser( GenericParser ):
 	def p_propertylist( self, args ):
 		'''
 		propertylist ::= property propertylist
-		'''
-		return AST ( Token('propertylist'), args )
-
-	def p_propertylist_single( self, args ):
-		'''
 		propertylist ::= property
-		'''
-		return AST ( Token('propertylist'), args )
-
-	def p_propertylist_empty( self, args ):
-		'''
 		propertylist ::=
 		'''
-		return AST ( Token('propertylist') )
+		return AST ( Token('propertylist'), args )
 
 	def p_property( self, args ):
 		'''
@@ -213,20 +213,10 @@ class EmParser( GenericParser ):
 	def p_property_entity_list( self, args ):
 		'''
 		property_entity_list ::= property_entity property_entity_list
-		'''
-		return AST( Token( 'property_entity_list' ), args )
-
-	def p_property_entity_single( self, args ):
-		'''
 		property_entity_list ::= property_entity
-		'''
-		return AST( Token( 'property_entity_list' ), args )
-
-	def p_property_entity_list_empty( self, args ):
-		'''
 		property_entity_list ::=
 		'''
-		return AST( Token( 'property_entity_list' ) )
+		return AST( Token( 'property_entity_list' ), args )
 
 	def p_property_entity( self, args ):
 		'''
@@ -241,11 +231,6 @@ class EmParser( GenericParser ):
 	def p_valuelist( self, args ):
 		'''
 		valuelist ::= value valuelist
-		'''
-		return AST( Token( 'valuelist' ), args )
-
-	def p_valuelist_single( self, args ):
-		'''
 		valuelist ::= value
 		'''
 		return AST( Token( 'valuelist' ), args )
@@ -272,18 +257,25 @@ class EmParser( GenericParser ):
 		return AST( Token( 'vectorvalue' ), ( args[1], ) )
 
 
+	def error( self, token ):
+		sys.stderr.write( "Syntax error at or near token '%s', line %d of file %s.\n" % ( token.attr, token.lineno, token.filename ) )
+		raise SystemExit
+
 
 def flatten_nodetree( node ):
 	aList = []
 
-	if node == None or len( node ) == 0:
+	if node is None or len( node ) == 0:
 		return aList
 
 	aList.append( node[0] )
 
 	while len( node ) > 1:
 		node = node[1]
-		aList.append( node[0] )
+		if len( node ) is 0:
+			break
+		else:
+			aList.append( node[0] )
 		
 	return aList
 
@@ -318,11 +310,13 @@ class Interpret(GenericASTTraversal):
 		aPropertyNodeList = flatten_nodetree( node[2][0] )
 		for i in aPropertyNodeList:
 			aPropertyName = i[0].attr
+
 			aValueNodeList = flatten_propertytree( i[1] )
 
 			aValueList = []
 			for j in aValueNodeList:
 				aValueList.append( j )
+
 			self.eml.setStepperProperty( anID, aPropertyName,\
 						     aValueList )
 
@@ -361,12 +355,12 @@ class Interpret(GenericASTTraversal):
 		pass
 
 			
-def convertEm2Eml( anEmFileObject , mode='' ):
+def convertEm2Eml( anEmFileObject , aFileName= '???', mode='' ):
 	anEml = ecell.eml.Eml()
 
 	# Scanning
 	aScanner = EmScanner()
-	aTokenList = aScanner.tokenize( anEmFileObject.read() )
+	aTokenList = aScanner.tokenize( anEmFileObject.read(), aFileName )
 	if mode == 'debug':print aTokenList
 
 	# Parsing 
@@ -407,6 +401,10 @@ Valid options:
   -f      stdout mode
 """)
 if __name__ == '__main__':
+
+	import os
+	import ecell.em
+
 	try:
 		opts , args = getopt.getopt(sys.argv[1:] , 'fD')
 	except:
@@ -427,8 +425,18 @@ if __name__ == '__main__':
 		else:
 			anEmFilename = filename
 			anEmFile = open( anEmFilename, 'r')
-			
-	anEmlObject = convertEm2Eml(anEmFile, mode=mode)
+
+
+	aTempFileName = tempfile.mktemp()
+	ecell.em.invoke( ( "-o", aTempFileName, anEmFilename ) )
+
+	aTempFile = open( aTempFileName, 'r' )
+	
+	anEmlObject = convertEm2Eml(aTempFile, anEmFilename, mode=mode)
+
+	aTempFile.close()
+	os.unlink( aTempFileName )
+
 	aString = anEmlObject.asString()
 	
 	if mode == 'stdout' or mode == 'debug':
