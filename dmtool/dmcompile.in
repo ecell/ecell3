@@ -7,11 +7,18 @@ LDADD=-lstdc++
 SHLEXT=@LTDL_SHLIB_EXT@
 BASENAME=@BASENAME@
 
-DMLIBTOOL=dmlibtool
-
 CXXSUFFIX=".cpp"
 
 VERBOSE=1
+
+
+exit_if_failed()
+{
+    $@
+    if [ $? -ne 0 ] ; then
+	exit $?
+    fi
+}
 
 
 run_command()
@@ -38,16 +45,12 @@ move()
 
 compile()
 {
-	run_command $DMLIBTOOL --mode=compile $CXX $CXXCOMPILEFLAGS -c $SRC
-#	run_command $CXX $CXXCOMPILEFLAGS -fPIC -c $SRC
+	run_command $CXX $CXXCOMPILEFLAGS -fPIC -c $SRC
 }
 
 link()
 {
-	run_command $DMLIBTOOL --mode=link $CXX -module -avoid-version\
-  		               -rpath /usr/lib $LOBJ -o $LAOBJ -L../ecell/libecs/.libs -lecs $LDADD
-
-#	run_command $CXX -shared $LOBJ -o $SOBJ -L../ecell/libecs/.libs -lecs
+	run_command $CXX -shared $OBJ -o $SOBJ -lecs
 }
 
 
@@ -94,7 +97,7 @@ SOBJ=$CLASSNAME$SHLEXT
 
 ## main routine
 
-compile
-link
-move
+exit_if_failed compile
+exit_if_failed link
+#move
 cleanup
