@@ -35,6 +35,7 @@ ECELL3_DM_CLASS
 
   virtual void initialize()
     {
+      FluxProcess::initialize();
       C0 = getVariableReference( "C0" );
     }
 
