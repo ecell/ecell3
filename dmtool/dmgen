@@ -3,8 +3,7 @@
 ##
 ##        This file is part of E-CELL Simulation Environment package
 ##
-##                Copyright (C) 1996-2000 E-CELL Project
-##   Copyright (C) 1998-2000 Japan Science and Technology Corporation (JST)
+##                Copyright (C) 2000 - 2001 E-CELL Project
 ##
 ##::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 ##
@@ -26,53 +25,57 @@
 ## 
 ##END_HEADER
 ##
-## written by Yusuke Saito <zhaiteng@e-cell.org> at
-## E-CELL Project, Lab for Bioinformatics, Keio University
+## written by Yusuke Saito <zhaiteng@e-cell.org> and
+##            Kouichi Takahashi <shafi@e-cell.org> at
+## E-CELL Project, Institute for Advanced Biosciences, Keio University
 ##
+
 
 import sys
 import re
 import string
 import os
+import glob
 
 class DmFile:
       
-      def __init__(self):
+      def __init__( self, infilename ):
             self.dic = {}
             self.keynum = {}
             self.property = {}
             self.out = ''
             self.prekey = ''
+            self.read( infilename )
 
-      def read(self, infile):
+      def read( self, infile ):
             self.file = infile
+
             try:
-                  fp = open(self.file,'r')
+                  fp = open( self.file, 'r' )
             except:	
-                  print "Not found."
-                  sys.exit(1)
+                  print self.file, ": file not found."
+                  sys.exit( 1 )
+
             while 1:
 
                   line = fp.readline()
 
                   # End of file
-                  if not line: break
-
-                  # ??? MS-DOS?
-                  line = re.sub('\012','',line)	
+                  if not line:
+                        break
 
                   # skip comment or empty line
-                  if re.match('^\#',line) or re.match('^\n',line):
+                  if re.match( '^\#', line ) or re.match( '^\n', line ):
                         continue
 
-                  match = re.match("([\@\%])(\w+):\s*(.*)",line)
+                  match = re.match( "([\@\%])(\w+):\s*(.*)", line )
                   if not match:
                         self.dic[self.prekey] = self.dic[self.prekey] + line
                         continue
 
-                  type  = match.group(1)
-                  key   = match.group(2)
-                  value = match.group(3)
+                  type  = match.group( 1 )
+                  key   = match.group( 2 )
+                  value = match.group( 3 )
 
                   if key == self.prekey:
                         self.keynum[key] = self.keynum[key] + 1
@@ -84,7 +87,7 @@ class DmFile:
 
                   # array type 
                   if type == "%":
-                        list = string.splitfields(value,",")
+                        list = string.splitfields( value, "," )
                         n = 0
                         for i in list:
                               n = n+1
@@ -92,102 +95,140 @@ class DmFile:
 
                   self.prekey = key
 
+
 class DmTemplate:
 
-      def __init__( self, templatename ):
-            self.tdir = 'templates'
-            self.outdir = '.'
-            self.templatename = templatename
+      def __init__( self, templatedir ):
+            self.templatedir = templatedir
       
-      def search_template(self, pathname='templates'):
-            if pathname == 'templates':
-                  if os.path.isfile(pathname):
-                        print 'Please remove file ' + pathname + '.'
-                        sys.exit(1)
-                  elif os.path.isdir(pathname):
-                        self.tdir = './' + pathname
-            else:
-                  if os.path.isdir(pathname):
-                        self.tdir = pathname
-                  else:
-                        print 'No such directory:' + pathname
-                        sys.exit(1)
-
-      def output_directory(self, dir='.'):
-            if dir == '.':
-                  self.outdir = dir
-            else:
-                  if os.path.isdir(dir):
-                        self.outdir = dir
-                  else:
-                        print 'No such directory:' + dir
-                        sys.exit(1)
-
-      def write(self, dmfile, outfilename):
+      def setDmFile( self, dmfile ):
             self.dmfile = dmfile
 
-            outfile = self.outdir + '/' + outfilename
+      def write( self, dmfile, mastertemplate, outfile ):
+
             try:
-                  fp = open(outfile,'w')
+                  fp = open( outfile, 'w' )
             except:
-                  print outfile + ": Not found."
-                  sys.exit(1)
+                  print "Couldn't write " + outfile + "."
+                  sys.exit( 1 )
 
-            buffer = self.generate( self.templatename )
+            buffer = self.generate( mastertemplate )
 
-# flush the buffer
-            fp.write(buffer)
-# clean up
-            self.dmfile = None
+            # flush the buffer
+            fp.write( buffer )
+            fp.close()
 
-      def generate(self, key, no = 0):
+      def generate( self, key, no = 0 ):
             buffer = ''
-            template_file = self.tdir + '/' + key
+            template_file = self.templatedir + '/' + key
+
             try:
-                  tp = open(template_file,'r')
+                  tp = open( template_file, 'r' )
             except:
-                  print template_file + ": Not found."
-                  return ''
+                  print "template " + template_file + ": not found."
+                  sys.exit( 1 )
 
             while 1:
                   line = tp.readline()
-                  if not line: break
+                  if not line:
+                        break
 
-                  if re.search('\#\(\@\w+\)',line):
-                        line = self.sub(line)
-                  elif re.search('\#\(\$\d+\)',line):
-                        match = re.search('\#\(\$(\d+)\)',line)
-                        keyno = match.group(1)
-                        line = re.sub('\#\(\$\d+\)', self.dmfile.property[key,no+1,string.atoi(keyno)],line)
+                  if re.search( '\#\(\@\w+\)', line ):
+                        line = self.sub( line )
+                  elif re.search( '\#\(\$\d+\)', line ):
+                        match = re.search( '\#\(\$(\d+)\)', line )
+                        keyno = match.group( 1 )
+                        line = re.sub( '\#\(\$\d+\)',\
+                                       self.dmfile.property[key,no+1,\
+                                                            string.atoi(keyno)\
+                                                            ],\
+                                       line )
                   elif re.search( '\#\(\%\w+\)', line ):
-                        match = re.match('\#\(\%(\w+)\)', line )
-                        key = match.group(1)
+                        match = re.match( '\#\(\%(\w+)\)', line )
+                        key = match.group( 1 )
                         line = ''
-                        for i in range(self.dmfile.keynum[key]):
-                              line = line + self.generate(key,i)
+                        for i in range( self.dmfile.keynum[key] ):
+                              line = line + self.generate( key, i )
+
                   buffer = buffer + line
 
             return buffer
 
-      def sub(self, line):
+      def sub( self, line ):
             buffer = ''
-            match = re.search('\#\(\@(\w+)\)', line)
-            key = match.group(1)
-            if self.dmfile.dic.has_key(key):
-                  buffer = re.sub('\#\(\@\w+\)',self.dmfile.dic[key],line)
-            else:
+            match = re.search( '\#\(\@(\w+)\)', line )
+            key = match.group( 1 )
+
+            if not self.dmfile.dic.has_key( key ):
                   print "Keyword " + key + " not found."
+                  sys.exit( 1 )
+
+            buffer = re.sub( '\#\(\@\w+\)',\
+                             self.dmfile.dic[key],\
+                             line )
 
             return buffer
 
+
+
 if __name__ == "__main__":
       
-      filename = sys.argv[1]
-      sample_template = 'MASTER'
-      dmfile = DmFile()
-      dmfile.read(filename)
-      out_file = 'sample.C'
-      dmtemplate = DmTemplate(sample_template)
-      dmtemplate.search_template()
-      dmtemplate.output_directory()
-      dmtemplate.write(dmfile, out_file)
+      import getopt
+
+      def printHelp():
+            print sys.argv[0], \
+                  """[-h] [-d outdir] [-o outprefix] [-t templatedir]"""\
+                  """infile"""
+
+
+      outdir = '.'
+      outprefix = 'out'
+      templatedir = './'
+
+      masterprefix = 'MASTER'
+
+      try:
+            opts, pargs = getopt.getopt( sys.argv[1:],\
+                                         'ho:t:d:' )
+      except getopt.GetoptError, e:
+            print e
+            sys.exit( 1 )
+            
+      for opt, arg in opts:
+            if opt == '-h':
+                  printHelp()
+                  sys.exit( 0 )
+            elif opt == '-d':
+                  outdir = arg
+            elif opt == '-o':
+                  outprefix = arg                  
+            elif opt == '-t':
+                  templatedir = arg
+            else:
+                  print "invalid option:", opt
+                  sys.exit( 1 )
+
+      infilename = pargs[0]
+      if infilename == '':
+            printHelp()
+            sys.exit( 1 )
+                                    
+      dmfile = DmFile( infilename )
+      dmtemplate = DmTemplate( templatedir )
+      dmtemplate.setDmFile( dmfile )
+
+      # mastertemplates = templatedir/MASTER.*
+      mastertemplates = templatedir + "/" + masterprefix + ".*"
+      os.path.expanduser( mastertemplates )
+      os.path.expandvars( mastertemplates )
+      mastertemplates = glob.glob( mastertemplates )
+
+      if len( mastertemplates ) == 0:
+            print "no template found in [" + self.templatedir + "]."
+            sys.exit( 1 )
+
+      # generate file for each master template
+      for template in mastertemplates:
+            prefix, ext = os.path.splitext( template )
+            outfile = outdir + '/' + outprefix + ext
+            dmtemplate.write( dmfile, os.path.basename( template ), outfile )
