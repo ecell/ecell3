@@ -52,6 +52,8 @@
 #define STR( S ) #S
 
 
+#define USE_LIBECS using namespace libecs
+
 // cmath
 
 #if defined( HAVE_CMATH )

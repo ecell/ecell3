@@ -83,7 +83,8 @@ RCPtr.hpp\
 VariableReference.hpp\
 DynamicPriorityQueue.hpp\
 AssocVector.h\
-FluxProcess.hpp
+FluxProcess.hpp\
+ecell3_dm.hpp
 
 bin_SCRIPTS =\
 emtool
