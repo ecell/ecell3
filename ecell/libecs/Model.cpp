@@ -83,7 +83,7 @@ namespace libecs
   {
     if( aFullID.getSystemPath().empty() )
       {
-	throw BadSystemPath( __PRETTY_FUNCTION__, "Empty SystemPath." );
+	THROW_EXCEPTION( BadSystemPath, "Empty SystemPath." );
       }
 
     SystemPtr aContainerSystemPtr( getSystem( aFullID.getSystemPath() ) );
@@ -114,8 +114,8 @@ namespace libecs
 	break;
 
       default:
-	throw InvalidPrimitiveType( __PRETTY_FUNCTION__, 
-				    "bad PrimitiveType specified." );
+	THROW_EXCEPTION( InvalidPrimitiveType,
+			 "bad PrimitiveType specified." );
 
       }
 
@@ -138,9 +138,9 @@ namespace libecs
       }
     else
       {
-	throw BadSystemPath( __PRETTY_FUNCTION__, "[" + 
-			     aSystemPath.getString() +
-			     "] is not an absolute SystemPath." );
+	THROW_EXCEPTION( BadSystemPath, 
+			 "[" + aSystemPath.getString() +
+			 "] is not an absolute SystemPath." );
       }
 
     // root system
@@ -175,8 +175,9 @@ namespace libecs
 	  }
 	else
 	  {
-	    throw BadID( __PRETTY_FUNCTION__, "[" + aFullID.getString()
-			 + "] is an invalid FullID" );
+	    THROW_EXCEPTION( BadID, 
+			     "[" + aFullID.getString()
+			     + "] is an invalid FullID" );
 	  }
       }
 
@@ -194,8 +195,8 @@ namespace libecs
 	anEntity = aSystem->getSystem(    aFullID.getID() );
 	break;
       default:
-	throw InvalidPrimitiveType( __PRETTY_FUNCTION__, 
-				    "bad PrimitiveType specified." );
+	THROW_EXCEPTION( InvalidPrimitiveType,
+			 "bad PrimitiveType specified." );
       }
 
     return anEntity;
@@ -207,8 +208,8 @@ namespace libecs
     StepperMapIterator i( theStepperMap.find( anID ) );
     if( i == theStepperMap.end() )
       {
-	throw NotFound( __PRETTY_FUNCTION__, "Stepper [" + anID + 
-			"] not found in this model." );
+	THROW_EXCEPTION( NotFound, 
+			 "Stepper [" + anID + "] not found in this model." );
       }
 
     return (*i).second;
@@ -247,9 +248,9 @@ namespace libecs
   {
     if( aSystem->getStepper() == NULLPTR )
       {
-	throw InitializationFailed( __PRETTY_FUNCTION__, 
-				    "No stepper is connected with [" +
-				    aSystem->getFullID().getString() + "]." );
+	THROW_EXCEPTION( InitializationFailed,
+			 "No stepper is connected with [" +
+			 aSystem->getFullID().getString() + "]." );
       }
 
     for( SystemMapConstIterator i( aSystem->getSystemMap().begin() ) ;

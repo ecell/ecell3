@@ -120,10 +120,10 @@ namespace libecs
 
     if( anIterator == theReactantMap.end() )
       {
-	throw NotFound( __PRETTY_FUNCTION__, 
-			"[" + getFullID().getString() + 
-			"]: Reactant [" + aName + 
-			"] not found in this Reactor." );
+	THROW_EXCEPTION( NotFound,
+			 "[" + getFullID().getString() + 
+			 "]: Reactant [" + aName + 
+			 "] not found in this Reactor." );
       }
 
     return ( *anIterator ).second;

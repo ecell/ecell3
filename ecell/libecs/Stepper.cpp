@@ -71,9 +71,10 @@ namespace libecs
 
     if( i == theSystemVector.end() )
       {
-	throw NotFound( __PRETTY_FUNCTION__, getClassName() + String( ": " ) 
-			+ getName() + ": " + aSystem->getFullID().getString() +
-			" not found in this stepper." );
+	THROW_EXCEPTION( NotFound,
+			 getClassName() + String( ": " ) 
+			 + getName() + ": " + aSystem->getFullID().getString() 
+			 + " not found in this stepper." );
       }
 
     theSystemVector.erase( i );

@@ -57,9 +57,9 @@ namespace libecs
       }
     else
       {
-	throw InvalidPrimitiveType( __PRETTY_FUNCTION__, 
-				    "can't convert typestring [" + typestring
-				    + "] to PrimitiveType." );
+	THROW_EXCEPTION( InvalidPrimitiveType,
+			 "can't convert typestring [" + typestring
+			 + "] to PrimitiveType." );
       }
   }
 
@@ -69,8 +69,8 @@ namespace libecs
   {
     if( number > 4 || number <= 0 )
       {
-	throw InvalidPrimitiveType( __PRETTY_FUNCTION__, 
-				    "Invalid PrimitiveType number" );
+	THROW_EXCEPTION( InvalidPrimitiveType,
+			 "Invalid PrimitiveType number" );
       }
   }
 
@@ -87,8 +87,8 @@ namespace libecs
       case ENTITY:
 	return PrimitiveTypeStringOfEntity();
       default:
-	throw InvalidPrimitiveType( __PRETTY_FUNCTION__, 
-				    "unexpected PrimitiveType::Type." );
+	THROW_EXCEPTION( InvalidPrimitiveType,
+			 "unexpected PrimitiveType::Type." );
       }
   }
 

@@ -130,9 +130,9 @@ namespace libecs
   {
     if( thePropertySlotMap.find( keyword ) == thePropertySlotMap.end() )
       {
-	throw NoSlot( __PRETTY_FUNCTION__,
-		      getClassName() + String( ":no slot for keyword [" ) +
-		      keyword + String( "] found.\n" ) );
+	THROW_EXCEPTION( NoSlot,
+			 getClassName() + String( ":no slot for keyword [" ) +
+			 keyword + String( "] found.\n" ) );
       }
 
     delete thePropertySlotMap[ keyword ];
@@ -145,9 +145,10 @@ namespace libecs
 
     if( sm == thePropertySlotMap.end() )
       {
-	throw NoSlot( __PRETTY_FUNCTION__,
-		      getClassName() + String(": got a Message (keyword = [")
-		      + message.getKeyword() + "]) but no slot for it.");
+	THROW_EXCEPTION( NoSlot,
+			 getClassName() + 
+			 String(": got a Message (keyword = [")
+			 + message.getKeyword() + "]) but no slot for it.");
       }
 
     sm->second->setUVariableVectorRCPtr( message.getBody() );
@@ -159,9 +160,10 @@ namespace libecs
 
     if( sm == thePropertySlotMap.end() )
       {
-	throw NoSlot( __PRETTY_FUNCTION__, getClassName()
-		      + String( ": got a request for Message (keyword = [" )
-		      + keyword + "]) but no slot for it.\n" );
+	THROW_EXCEPTION( NoSlot, 
+			 getClassName()
+			 + String( ": got a request for Message (keyword = [" )
+			 + keyword + "]) but no slot for it.\n" );
       }
 
     return 

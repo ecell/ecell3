@@ -363,14 +363,12 @@ namespace libecs
 
     void callNullSetMethod( SetType )    
     {
-      throw AttributeError( __PRETTY_FUNCTION__,
-			    "Not setable." );
+      THROW_EXCEPTION( AttributeError, "Not setable." );
     }
 
     GetType callNullGetMethod() const
     {
-      throw AttributeError( __PRETTY_FUNCTION__,
-			    "Not getable." );
+      THROW_EXCEPTION( AttributeError, "Not getable." );
     }
 
   private:

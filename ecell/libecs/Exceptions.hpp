@@ -44,6 +44,11 @@ namespace libecs
    * @{ 
    */ 
   
+
+  /// A macro to throw an exception, with method name
+#define THROW_EXCEPTION( CLASS, MESSAGE )\
+throw CLASS( __PRETTY_FUNCTION__, MESSAGE )
+
   /// Base exception class
   class Exception /* : public exception */
   {

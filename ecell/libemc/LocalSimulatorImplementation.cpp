@@ -140,9 +140,9 @@ namespace libemc
   {
     if( ! ( thePendingEventChecker != NULLPTR && theEventHandler != NULLPTR ) )
       {
-	throw libecs::Exception( __PRETTY_FUNCTION__, 
-				 "Both EventChecker and EventHandler must be "
-				 "set before run without duration." ) ;
+	THROW_EXCEPTION( libecs::Exception,
+			 "Both EventChecker and EventHandler must be "
+			 "set before run without duration." ) ;
       }
 
     theRunningFlag = true;

@@ -84,7 +84,7 @@ namespace libecs
 
     if( aPropertySlotMapIterator == anEntityPtr->getPropertySlotMap().end() )
       {
-	throw NotFound( "not found" );
+	THROW_EXCEPTION( NotFound, "not found" );
       }
 
     //    aPropertyMapIterator->second->getProxy()->setLogger( aLoggerPtr );

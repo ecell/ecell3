@@ -190,9 +190,8 @@ namespace libecs
   {
     if( theStepper == NULLPTR )
       {
-	throw InitializationFailed( __PRETTY_FUNCTION__, 
-				    getFullID().getString() + 
-				    ": Stepper not set." );
+	THROW_EXCEPTION( InitializationFailed,
+			 getFullID().getString() + ": Stepper not set." );
       }
 
     //
@@ -245,9 +244,10 @@ namespace libecs
 
     if( i == getReactorMap().end() )
       {
-	throw NotFound( __PRETTY_FUNCTION__, "[" + getFullID().getString() + 
+	THROW_EXCEPTION( NotFound, 
+			 "[" + getFullID().getString() + 
 			"]: Reactor [" + anID + 
-			"] not found in this System." );
+			 "] not found in this System." );
       }
 
     return i->second;
@@ -275,9 +275,10 @@ namespace libecs
     SubstanceMapConstIterator i( getSubstanceMap().find( anID ) );
     if( i == getSubstanceMap().end() )
       {
-	throw NotFound(__PRETTY_FUNCTION__, "[" + getFullID().getString() + 
-		       "]: Substance [" + anID + 
-		       "] not found in this System.");
+	THROW_EXCEPTION( NotFound,
+			 "[" + getFullID().getString() + 
+			 "]: Substance [" + anID + 
+			 "] not found in this System.");
       }
 
     return i->second;
@@ -305,7 +306,8 @@ namespace libecs
     SystemMapConstIterator i( getSystemMap().find( anID ) );
     if( i == getSystemMap().end() )
       {
-	throw NotFound( __PRETTY_FUNCTION__, "[" + getFullID().getString() + 
+	THROW_EXCEPTION( NotFound,
+			 "[" + getFullID().getString() + 
 			"]: System [" + anID + "] not found in this System." );
       }
     return i->second;

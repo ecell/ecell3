@@ -134,8 +134,7 @@ namespace libecs
     // empty FullID string is invalid
     if( fullidstring == "" )
       {
-	throw BadID( __PRETTY_FUNCTION__,
-		     "Empty FullID string." );
+	THROW_EXCEPTION( BadID, "Empty FullID string." );
       }
 
     String aString( fullidstring );
@@ -147,8 +146,8 @@ namespace libecs
 							aFieldStart ) );
     if( aFieldEnd == String::npos )
       {
-	throw BadID( __PRETTY_FUNCTION__,
-		     "No ':' in the FullID string [" + aString + "]." );
+	THROW_EXCEPTION( BadID, 
+			 "No ':' in the FullID string [" + aString + "]." );
       }
 
     String aTypeString( aString.substr( aFieldStart, 
@@ -159,9 +158,9 @@ namespace libecs
     aFieldEnd = aString.find_first_of( DELIMITER, aFieldStart );
     if( aFieldEnd == String::npos )
       {
-	throw BadID( __PRETTY_FUNCTION__,
-		     "Only one ':' in the FullID string [" 
-		     + aString + "]." );
+	THROW_EXCEPTION( BadID, 
+			 "Only one ':' in the FullID string [" 
+			 + aString + "]." );
       }
 
     theSystemPath = 
@@ -208,9 +207,9 @@ namespace libecs
 	  find_first_of( FullID::DELIMITER, aPosition );
 	if( aPosition == String::npos ) 
 	  {
-	    throw BadID( __PRETTY_FUNCTION__, 
-			 "Not enough fields in FullPN string [" +
-			 fullpropertynamestring + "]." );
+	    THROW_EXCEPTION( BadID,
+			     "Not enough fields in FullPN string [" +
+			     fullpropertynamestring + "]." );
 	  }
 	++aPosition;
       }

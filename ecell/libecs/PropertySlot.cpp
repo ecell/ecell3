@@ -44,9 +44,9 @@ namespace libecs
   {
     if( isLogged() )
       {
-	throw UnexpectedError( __PRETTY_FUNCTION__,
-			       "PropertySlot [" + getName() + 
-			       "]: only one Logger can be connected." );
+	THROW_EXCEPTION( UnexpectedError,
+			 "PropertySlot [" + getName() + 
+			 "]: only one Logger can be connected." );
       }
 
     theLogger = logger;

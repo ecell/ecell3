@@ -116,8 +116,7 @@ namespace libecs
 	return NONE;
       }
     
-    // NEVER_GET_HERE
-    throw UnexpectedError( __PRETTY_FUNCTION__ + String( "NEVER_GET_HERE" ) );
+    THROW_EXCEPTION( UnexpectedError, "NEVER_GET_HERE" );
   }
 
 

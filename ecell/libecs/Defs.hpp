@@ -125,7 +125,7 @@ namespace libecs
 
   // MACROS
 
-#ifndef HAVE_PRETTY_FUNCTION
+#if !defined( HAVE_PRETTY_FUNCTION )
 #define __PRETTY_FUNCTION__ ""
 #endif
 
