@@ -90,7 +90,19 @@ class PropertyWindow(OsogoPluginWindow):
 		self.prevFullID = convertFullPNToFullID( aPropertyListFullPN )        
 		aPropertyList = self.theSession.theSimulator.getProperty( createFullPNString( aPropertyListFullPN ) )
 
-		for aProperty in aPropertyList:
+
+		for aProperty in aPropertyList: # for (1)
+			Set = -1
+			aGet = -1
+
+			if type(aProperty) == type(()):  # if (2)
+				aSet = aProperty[1]
+				aGet = aProperty[2]
+				aProperty = aProperty[0]
+
+			# end of if (2)
+
+
 			if (aProperty == 'ClassName'):
 				pass
 			elif (aProperty == 'PropertyList'):
@@ -105,36 +117,54 @@ class PropertyWindow(OsogoPluginWindow):
 				pass
 			else :
                 
-				aFullPN = convertFullIDToFullPN( self.theFullID(),
-                                                          aProperty )
+				aFullPN = convertFullIDToFullPN( self.theFullID(), aProperty )
 				aAttribute = self.getAttribute( aFullPN )
-				aAttributeData = self.decodeAttribute( aAttribute )
-				get = aAttributeData[0]
-				set = aAttributeData[1]
-                
-				if aAttribute != 1:
-					aValueList = self.theSession.theSimulator.getProperty( createFullPNString( aFullPN ) )
-					aLength = len( aValueList )
-                
-            
-					if  aLength > 1 :
-						aNumber = 1
-						for aValue in aValueList :
-							aList = [ aProperty, aNumber, aValue , get, set ]
-							aList = map( str, aList )
-							self.theList.append( aList ) 
-							aNumber += 1
 
-					else:
-						for aValue in aValueList :
-							aList = [ aProperty, '', aValue , get, set]
-							aList = map( str, aList )
-							self.theList.append( aList )
+				#aAttributeData = self.decodeAttribute( aAttribute )
+				#get = aAttributeData[0]
+				#set = aAttributeData[1]
+
+				set = self.decodeAttribute( aSet )
+				get = self.decodeAttribute( aGet )
+                
+				if aAttribute != 1: # for (3)
+
+					#aValueList = self.theSession.theSimulator.getProperty( createFullPNString( aFullPN ) )
+					aFullPNString =  createFullPNString( aFullPN ) 
+					#import sys
+					#sys.exit(0)
+					aValueList = self.theSession.theSimulator.getProperty( createFullPNString( aFullPN ) )
+					#aLength = len( aValueList )
+            
+					#if  aLength > 1 :
+					#	aNumber = 1
+					#	for aValue in aValueList :
+					#		aList = [ aProperty, aNumber, aValue , get, set ]
+					#		aList = map( str, aList )
+					#		self.theList.append( aList ) 
+					#		aNumber += 1
+
+					#else:
+					#	for aValue in aValueList :
+					#		aList = [ aProperty, '', aValue , get, set]
+					#		aList = map( str, aList )
+					#		self.theList.append( aList )
+
+					aList = [ aProperty, '', aValueList , get, set]
+					aList = map( str, aList )
+					self.theList.append( aList )
+
+				# end of if (3)
+
+			# end of if (2)
+
+		# end of (1)
 
 
 	def decodeAttribute(self, aAttribute):
 
-		data = {1 : ('-','+'),2 : ('+','-'),3 : ('+','+')}
+		#data = {1 : ('-','+'),2 : ('+','-'),3 : ('+','+')}
+		data = {0 : ('-'), 1 : ('+')}
 		return data[ aAttribute ]
 
 

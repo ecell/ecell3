@@ -39,7 +39,8 @@ class TracerWindow( OsogoPluginWindow ):
 
 		if IDflag == 1:
 			aValue = self.theSession.theSimulator.getProperty( aFullPNString )
-			if operator.isNumberType( aValue[0] ):
+			#if operator.isNumberType( aValue[0] ):
+			if operator.isNumberType( aValue ):
 				self.thePluginManager.appendInstance( self )                    
 				#self.initialize()
 				# ------------------------------------------------------

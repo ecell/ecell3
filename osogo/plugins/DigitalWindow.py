@@ -25,10 +25,14 @@ class DigitalWindow( OsogoPluginWindow ):
 		# calla constructor of superclass
 		OsogoPluginWindow.__init__( self, aDirName, aData, aPluginManager, aRoot )
         
+		#if type() self.theFullPN() 
+
 		aFullPNString = createFullPNString( self.theFullPN() )
 		aValue = self.theSession.theSimulator.getProperty( aFullPNString )
 
-		if operator.isNumberType( aValue[0] ):
+
+		if operator.isNumberType( aValue ):
+		#if operator.isNumberType( aValue[0] ):
 			self.thePluginManager.appendInstance( self )
 
 			# ----------------------------------------------------------------
