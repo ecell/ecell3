@@ -57,12 +57,14 @@ namespace libecs
     inline const ToType operator()( const FromType& aValue )
     {
       // strategy:
-      // (1) if both of ToType and FromType are arithmetic, use numeric_cast.
-      // (2) otherwise, just try static_cast.
+      // (1) if both of ToType and FromType are arithmetic, and
+      //     are not the same type, use NumericCaster.
+      // (2) otherwise, just try StaticCaster.
 
       typedef typename boost::mpl::if_c<
-	boost::is_arithmetic<FromType>::value &&
-	boost::is_arithmetic<ToType>::value,
+	( boost::is_arithmetic<FromType>::value &&
+	  boost::is_arithmetic<ToType>::value ) &&  // both are arithmetic, and
+	! boost::is_same<FromType,ToType>::value,   // not the same type.
 	NumericCaster<ToType,FromType>,
 	StaticCaster<ToType,FromType>
 	>::type
@@ -88,7 +90,7 @@ namespace libecs
     {
       // strategy:
       // (1) if ToType is arithmetic, use LexicalCaster.
-      // (2) otherwise try static casting.
+      // (2) otherwise try StaticCaster
 
       typedef typename boost::mpl::if_< 
 	boost::is_arithmetic< ToType >,
@@ -111,7 +113,7 @@ namespace libecs
     {
       // strategy:
       // (1) if FromType is arithmetic, use LexicalCaster.
-      // (2) otherwise try static casting.
+      // (2) otherwise try StaticCaster.
 
       typedef typename boost::mpl::if_< 
 	boost::is_arithmetic< FromType >,
