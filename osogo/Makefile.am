@@ -15,6 +15,7 @@ InterfaceWindow.glade\
 LoggerWindow.glade\
 LoggerWindow.py\
 LoggingPolicy.py\
+LoggingPolicy.glade\
 MainWindow.glade\
 MainWindow.py\
 MessageWindow.glade\
