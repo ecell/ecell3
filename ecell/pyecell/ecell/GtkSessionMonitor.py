@@ -326,7 +326,7 @@ class GtkSessionMonitor(Session):
 			self.updateFundamentalWindows()
 
 		else:
-			anEntityListWindow = EntityListWindow.EntityListWindow( None, rootWidget, aStatusBar )
+			anEntityListWindow = EntityListWindow.EntityListWindow( self, rootWidget, aStatusBar )
 
 			anEntityListWindow.openWindow()
 			
@@ -368,13 +368,14 @@ class GtkSessionMonitor(Session):
 			self.updateWindows()
 			if self.stuckRequests > 0:
 				self.stuckRequests -= 1
-			elif self.theUpdateInterval >300:
-				self.theUpdateInterval /=2
+			elif self.theUpdateInterval >=225:
+				self.theUpdateInterval /=1.5
 		else:
 			self.stuckRequests +=1
-			if self.stuckRequests >20:
-				self.theUpdateInterval *= 2
-		self.theTimer = gtk.timeout_add( self.theUpdateInterval, self.__updateByTimeOut, 0 )
+			if self.stuckRequests >6:
+				self.theUpdateInterval *= 1.5
+				self.stuckRequests = 3
+		self.theTimer = gtk.timeout_add( int(self.theUpdateInterval), self.__updateByTimeOut, 0 )
 
 
 	# ==========================================================================
