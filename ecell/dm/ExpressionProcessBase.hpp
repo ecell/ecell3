@@ -742,9 +742,9 @@ namespace libecs
 
 	if( str1 == "getSuperSystem" )
 	  {
-	    if( str2 == "getSize" )
+	    if( str2 == "Size" )
 	      aCode.push_back( new SYSTEM_METHOD( theProcessPtr, &libecs::Process::getSuperSystem, &libecs::System::getSize ) );
-	    else if( str2 == "getSizeN_A" )
+	    else if( str2 == "SizeN_A" )
 	      aCode.push_back( new SYSTEM_METHOD( theProcessPtr, &libecs::Process::getSuperSystem, &libecs::System::getSizeN_A ) );
 	    else
 	      THROW_EXCEPTION( NoSlot,

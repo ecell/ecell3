@@ -63,7 +63,7 @@ System System( /CELL/CYTOPLASM )
 		vs	0.76;
 		KI	1;
 
-		Expression "( (vs*KI) / (KI + (C0.MolarConc * C0.MolarConc * C0.MolarConc) ) * self.getSuperSystem().getSizeN_A )";
+		Expression "( (vs*KI) / (KI + (C0.MolarConc * C0.MolarConc * C0.MolarConc) ) * self.getSuperSystem().SizeN_A )";
 
 		VariableReferenceList	[ P0 Variable:.:M 1 ] [ C0 Variable:.:Pn 0 ];
 	}
@@ -73,7 +73,7 @@ System System( /CELL/CYTOPLASM )
 		vm	0.65;
 		Km	0.5;
 
-		Expression "( (-1 * vm * P0.MolarConc) / ( Km + P0.MolarConc) * self.getSuperSystem().getSizeN_A )";
+		Expression "( (-1 * vm * P0.MolarConc) / ( Km + P0.MolarConc) * self.getSuperSystem().SizeN_A )";
 
 		VariableReferenceList	[ P0 Variable:.:M 1 ];
 	}
@@ -82,7 +82,7 @@ System System( /CELL/CYTOPLASM )
 	{
 		Km	0.38;
 
-		Expression "( (Km * C0.MolarConc) * self.getSuperSystem().getSizeN_A )";
+		Expression "( (Km * C0.MolarConc) * self.getSuperSystem().SizeN_A )";
 
 		VariableReferenceList	[ P0 Variable:.:P0 1 ] [ C0 Variable:.:M 0 ];
 	}
@@ -92,7 +92,7 @@ System System( /CELL/CYTOPLASM )
 		V1	3.2;
 		K1	2;
 
-		Expression "( (-1 * V1 * C0.MolarConc) / (K1 + C0.MolarConc) * self.getSuperSystem().getSizeN_A )";
+		Expression "( (-1 * V1 * C0.MolarConc) / (K1 + C0.MolarConc) * self.getSuperSystem().SizeN_A )";
 
 		VariableReferenceList	[ P0 Variable:.:P0 1 ] [ C0 Variable:.:P0 0 ];
 	}
@@ -102,7 +102,7 @@ System System( /CELL/CYTOPLASM )
 		V2	1.58;
 		K2	2;
 
-		Expression "( (V2 * C0.MolarConc) / (K2 + C0.MolarConc) * self.getSuperSystem().getSizeN_A )";
+		Expression "( (V2 * C0.MolarConc) / (K2 + C0.MolarConc) * self.getSuperSystem().SizeN_A )";
 
 		VariableReferenceList	[ P0 Variable:.:P0 1 ] [ C0 Variable:.:P1 0 ];
 	}
@@ -112,7 +112,7 @@ System System( /CELL/CYTOPLASM )
 		V1	3.2;
 		K1	2;
 
-		Expression "( (V1 * C0.MolarConc) / (K1 + C0.MolarConc) * self.getSuperSystem().getSizeN_A )";
+		Expression "( (V1 * C0.MolarConc) / (K1 + C0.MolarConc) * self.getSuperSystem().SizeN_A )";
 
 		VariableReferenceList	[ P0 Variable:.:P1 1 ] [ C0 Variable:.:P0 0 ];
 	}
@@ -122,7 +122,7 @@ System System( /CELL/CYTOPLASM )
 		V2	1.58;
 		K2	2;
 
-		Expression "( (-1 * V2 * C0.MolarConc) / (K2 + C0.MolarConc) * self.getSuperSystem().getSizeN_A )";
+		Expression "( (-1 * V2 * C0.MolarConc) / (K2 + C0.MolarConc) * self.getSuperSystem().SizeN_A )";
 
 		VariableReferenceList	[ P0 Variable:.:P1 1 ] [ C0 Variable:.:P1 0 ];
 	}
@@ -132,7 +132,7 @@ System System( /CELL/CYTOPLASM )
 		V3	5;
 		K3	2;
 
-		Expression "( (-1 * V3 * C0.MolarConc) / (K3 + C0.MolarConc) * self.getSuperSystem().getSizeN_A )";
+		Expression "( (-1 * V3 * C0.MolarConc) / (K3 + C0.MolarConc) * self.getSuperSystem().SizeN_A )";
 
 		VariableReferenceList	[ P0 Variable:.:P1 1 ] [ C0 Variable:.:P1 0 ];
 	}
@@ -142,7 +142,7 @@ System System( /CELL/CYTOPLASM )
 		V4	2.5;
 		K4	2;
 
-		Expression "( (V4 * C0.MolarConc) / (K4 + C0.MolarConc) * self.getSuperSystem().getSizeN_A )";
+		Expression "( (V4 * C0.MolarConc) / (K4 + C0.MolarConc) * self.getSuperSystem().SizeN_A )";
 
 		VariableReferenceList	[ P0 Variable:.:P1 1 ] [ C0 Variable:.:P2 0 ];
 	}
@@ -152,7 +152,7 @@ System System( /CELL/CYTOPLASM )
 		V3	5;
 		K3	2;
 
-		Expression "( (V3 * C0.MolarConc) / (K3 + C0.MolarConc) * self.getSuperSystem().getSizeN_A )";
+		Expression "( (V3 * C0.MolarConc) / (K3 + C0.MolarConc) * self.getSuperSystem().SizeN_A )";
 
 		VariableReferenceList	[ P0 Variable:.:P2 1 ] [ C0 Variable:.:P1 0 ];
 	}
@@ -162,7 +162,7 @@ System System( /CELL/CYTOPLASM )
 		V4	2.5;
 		K4	2;
 
-		Expression "( (-1 * V4 * C0.MolarConc) / (K4 + C0.MolarConc) * self.getSuperSystem().getSizeN_A )";
+		Expression "( (-1 * V4 * C0.MolarConc) / (K4 + C0.MolarConc) * self.getSuperSystem().SizeN_A )";
 
 		VariableReferenceList	[ P0 Variable:.:P2 1 ] [ C0 Variable:.:P2 0 ];
 	}
@@ -171,7 +171,7 @@ System System( /CELL/CYTOPLASM )
 	{
 		k1	1.9;
 
-		Expression "( (-1 * k1 * C0.MolarConc) * self.getSuperSystem().getSizeN_A )";
+		Expression "( (-1 * k1 * C0.MolarConc) * self.getSuperSystem().SizeN_A )";
 
 		VariableReferenceList	[ P0 Variable:.:P2 1 ] [ C0 Variable:.:P2 0 ];
 	}
@@ -180,7 +180,7 @@ System System( /CELL/CYTOPLASM )
 	{
 		k2	1.3;
 
-		Expression "( (k2 * C0.MolarConc) * self.getSuperSystem().getSizeN_A )";
+		Expression "( (k2 * C0.MolarConc) * self.getSuperSystem().SizeN_A )";
 
 		VariableReferenceList	[ P0 Variable:.:P2 1 ] [ C0 Variable:.:Pn 0 ];
 	}
@@ -190,7 +190,7 @@ System System( /CELL/CYTOPLASM )
 		vd	0.95;
 		Kd	0.2;
 
-		Expression "( (-1 * vd * C0.MolarConc) / (Kd + C0.MolarConc) * self.getSuperSystem().getSizeN_A )";
+		Expression "( (-1 * vd * C0.MolarConc) / (Kd + C0.MolarConc) * self.getSuperSystem().SizeN_A )";
 
 		VariableReferenceList	[ P0 Variable:.:P2 1 ] [ C0 Variable:.:P2 0 ];
 	}
@@ -199,7 +199,7 @@ System System( /CELL/CYTOPLASM )
 	{
 		k1	1.9;
 
-		Expression "( (k1 * C0.MolarConc) * self.getSuperSystem().getSizeN_A )";
+		Expression "( (k1 * C0.MolarConc) * self.getSuperSystem().SizeN_A )";
 
 		VariableReferenceList	[ P0 Variable:.:Pn 1 ] [ C0 Variable:.:P2 0 ];
 	}
@@ -208,7 +208,7 @@ System System( /CELL/CYTOPLASM )
 	{
 		k2	1.3;
 
-		Expression "( (-1 * k2 * C0.MolarConc) * self.getSuperSystem().getSizeN_A )";
+		Expression "( (-1 * k2 * C0.MolarConc) * self.getSuperSystem().SizeN_A )";
 
 		VariableReferenceList	[ P0 Variable:.:Pn 1 ] [ C0 Variable:.:Pn 0 ];
 	}
