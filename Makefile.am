@@ -12,9 +12,7 @@ docdir = $(prefix)/share/doc/$(PACKAGE)-$(VERSION)
 
 install-data-hook:
 	$(mkinstalldirs) $(docdir)
-	$(MAKE) $(AM_MAKEFLAGS) doc doc-all
 	cp README NEWS COPYING INSTALL AUTHORS ChangeLog $(docdir)
-	(cd doc ; cp -r * $(docdir) )
 	rm -rf $(docdir)/CVS
 	rm -rf $(docdir)/*/CVS
 	rm -rf $(docdir)/*/*/CVS
@@ -36,6 +34,13 @@ DOCBOOK_DIR=doc/users-manual
 DOCBOOK_OUTFILE=${DOCBOOK_DIR}/ecell3-users-manual.html
 
 doc: ${DOXYGEN_OUTFILE} ${DOCBOOK_OUTFILE}
+
+doc-install:
+	$(MAKE) $(AM_MAKEFLAGS) doc doc-all
+	(cd doc ; cp -r * $(docdir) )
+	rm -rf $(docdir)/CVS
+	rm -rf $(docdir)/*/CVS
+	rm -rf $(docdir)/*/*/CVS
 
 doc-all: doc-ps doc-pdf doc-html-archive
 
