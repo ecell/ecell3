@@ -38,11 +38,25 @@
 #include "LoggerAdapter.hpp"
 #include "PhysicalLogger.hpp"
 #include "DataPointVector.hpp"
-#define _LOGGER_MAX_PHYSICAL_LOGGERS 5
-#define _LOGGER_DIVIDE_STEP 200
+
 
 namespace libecs
 {
+
+
+  
+  const Integer   _LOGGER_MAX_PHYSICAL_LOGGERS = 5;
+  const Integer   _LOGGER_DIVIDE_STEP = 200;
+  
+  // enumeration for logging policy
+  enum  
+    {
+      _STEP_SIZE,
+      _TIME_INTERVAL,
+      _END_POLICY,
+      _MAX_SPACE
+    };
+
 
 
   /** @addtogroup logging The Data Logging Module.
@@ -56,11 +70,15 @@ namespace libecs
   /** @file */
 
   /**
+
+  Logger module for logging and retrieving data runtime.
    
   */
 
   class Logger
   {
+
+
   public:
 
     typedef DataPointVectorIterator const_iterator;
@@ -82,20 +100,51 @@ namespace libecs
 
     ~Logger( void );
 
-	void setLoggerPolicy( PolymorphCref aParamList );
 
-	PolymorphCref getLoggerPolicy( void ){
+    /**
+    
+    Sets logging policy that is a vector of 4 numerical values. 
+    0 - minimum step size between logs
+    1 - minimum time interval between logs
+    2 - action to be taken when disk space runs out
+    3 - user set max disk space, if 0 nothing 
+    
 
-	return loggingPolicy;
-	}
+    */
+
+    void setLoggerPolicy( PolymorphCref aParamList );
+
+
+    /**
+
+    Returns logging policy vector.
+
+    */
+
+    PolymorphCref getLoggerPolicy( void )
+    {
+
+      return theLoggingPolicy;
+    }
+
+
+    /**
+
+      Log current value of logger FullPN
+
+    */
+
 
     void log( RealParam aTime )
+
     {
       appendData( aTime, theLoggerAdapter->getValue() );
     }
 
 
     /**
+
+    Returns contents of the whole logger.
 
     */
 
@@ -115,7 +164,8 @@ namespace libecs
 				  RealParam anEndTime ) const;
 
     /**
-    
+    Returns a summary of the data from aStartTime to anEndTime with at least 
+    intervals anInterval between data elements
     */
 
     DataPointVectorSharedPtr getData( RealParam aStartTime,
@@ -125,17 +175,20 @@ namespace libecs
 
 
     /**
-
+       Returns time of the first element  in Logger.
     */
 
     Real getStartTime( void ) const;
 
     /**
-
+       Returns time of the last element in Logger
     */
 
     Real getEndTime( void ) const;
 
+    /**
+      Returns size of logger
+    */
 
     const int getSize() const
     {
@@ -143,12 +196,13 @@ namespace libecs
     }
 
     /**
-
+       DEPRECATED - Use setLoggerPolicy 
     */
 
     void setMinimumInterval( RealParam anInterval );
 
     /**
+       DEPRECATED - Use getLoggerPolicy
 
     */
 
@@ -159,14 +213,15 @@ namespace libecs
 
 
     /**
-
+       Writes data (aTime, aValue ) onto the logger
     */
 
     void appendData( RealParam aTime, RealParam aValue );
 
 
     /**
-
+       Forces logger to write data even if mimimuminterval or
+       step count has not been exceeded.
     */
 
     void flush();
@@ -185,8 +240,8 @@ namespace libecs
 				  RealParam t ) 
     {
       return thePhysicalLoggers[0]->lower_bound( thePhysicalLoggers[0]->begin(), 
-    					    thePhysicalLoggers[0]->end(), 
-					    t );
+						 thePhysicalLoggers[0]->end(), 
+						 t );
     }
     
 
@@ -214,21 +269,17 @@ namespace libecs
     /// Data members
 
     //    PropertySlotRef      thePropertySlot;
-    LoggerAdapterPtr     theLoggerAdapter;
-
-    PhysicalLogger*	 thePhysicalLoggers[_LOGGER_MAX_PHYSICAL_LOGGERS];
-
     void aggregate( DataPointLong , int );
 
+    LoggerAdapterPtr     theLoggerAdapter;
+    PhysicalLogger*	 thePhysicalLoggers[_LOGGER_MAX_PHYSICAL_LOGGERS];
     DataPointAggregator* theDataAggregators;
     Real                 theLastTime;
-	const_iterator       theStepCounter;
-	Integer              theMinimumStep; //0-minimum step, 1 minimum time 3 end policy 4 max space available in kbytes
+    const_iterator       theStepCounter;
+    Integer              theMinimumStep; //0-minimum step, 1 minimum time 3 end policy 4 max space available in kbytes
     Real                 theMinimumInterval;
-
-	
-	Integer sizeArray[_LOGGER_MAX_PHYSICAL_LOGGERS];
-	Polymorph 			 loggingPolicy;
+    Integer              theSizeArray[_LOGGER_MAX_PHYSICAL_LOGGERS];
+    Polymorph	         theLoggingPolicy;
   };
 
 
