@@ -36,12 +36,12 @@
 namespace libecs
 {
 
-  void SimpleAccumulator::doit()
+  void SimpleAccumulator::accumulate()
   {
     getQuantity() += getVelocity();
   }
 
-  void RoundDownAccumulator::doit()
+  void RoundDownAccumulator::accumulate()
   {
     getVelocity() = floor( getVelocity() );
     getQuantity() += getVelocity();
@@ -52,7 +52,7 @@ namespace libecs
     getQuantity() = floor( getQuantity() );
   }
 
-  void RoundOffAccumulator::doit()
+  void RoundOffAccumulator::accumulate()
   {
     getVelocity() = rint( getVelocity() );
     getQuantity() += getVelocity();
@@ -63,7 +63,7 @@ namespace libecs
     getQuantity() = rint( getQuantity() );
   }
 
-  void ReserveAccumulator::doit()
+  void ReserveAccumulator::accumulate()
   {
     Real tmp;
     getVelocity() += theFraction;
@@ -84,7 +84,7 @@ namespace libecs
     getQuantity() = tmp;
   }
 
-  void MonteCarloAccumulator::doit()
+  void MonteCarloAccumulator::accumulate()
   {
     Real aWhole;
     Real aFraction = modf( getVelocity(), &aWhole );

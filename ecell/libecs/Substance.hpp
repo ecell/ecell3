@@ -133,10 +133,10 @@ namespace libecs
     void turn();
 
     /**
-       Transit phase.
+       integrate phase.
        Perform integration by a result calculated by integrator.
     */
-    void transit();
+    void integrate();
 
     /**
        @return current velocity value in (number of molecules)/(step)

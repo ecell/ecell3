@@ -76,7 +76,7 @@ namespace libecs
       ; // do nothing
     }
 
-    virtual void doit() = 0;
+    virtual void accumulate() = 0;
 
     virtual const char* const className() const { return "Accumulator"; }
 
@@ -110,7 +110,7 @@ namespace libecs
 
     static AccumulatorPtr instance() { return new SimpleAccumulator; }
 
-    virtual void doit();
+    virtual void accumulate();
 
     virtual const char* const className() const {return "SimpleAccumulator";}
 
@@ -129,7 +129,7 @@ namespace libecs
     static AccumulatorPtr instance() { return new RoundDownAccumulator; }
 
     virtual void update();
-    virtual void doit();
+    virtual void accumulate();
 
     virtual const char* const className() const 
     { return "RoundDownAccumulator"; }
@@ -149,7 +149,7 @@ namespace libecs
     static AccumulatorPtr instance() { return new RoundOffAccumulator; }
 
     virtual void update();
-    virtual void doit();
+    virtual void accumulate();
 
     virtual const char* const className() const
     { return "RoundOffAccumulator"; }
@@ -172,7 +172,7 @@ namespace libecs
 
     virtual Real save();
     virtual void update();
-    virtual void doit();
+    virtual void accumulate();
 
     virtual const char* const className() const {return "ReserveAccumulator";}
 
@@ -195,7 +195,7 @@ namespace libecs
     static AccumulatorPtr instance() { return new MonteCarloAccumulator; }
 
     virtual void update();
-    virtual void doit();
+    virtual void accumulate();
 
     virtual const char* const className() const 
     { return "MonteCarloAccumulator"; }

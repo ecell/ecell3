@@ -86,7 +86,10 @@ namespace libecs
   {
     System::initialize();
     getStepperLeader().initialize();
-    getStepperLeader().update();
+    
+    // NOTE: ecell1 called update() here, but ecell3 doesn't.
+    //       do this in initialize() of each Entity.
+    //    getStepperLeader().update();
   }
 
 

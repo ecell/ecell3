@@ -110,7 +110,6 @@ namespace libecs
     virtual void integrate();
     virtual void compute();
 
-    void update();
     virtual const char* const className() const  { return "StepperLeader"; }
 
   protected:
@@ -225,7 +224,7 @@ namespace libecs
 
     virtual void differentiate()
     {
-      theOwner->react();
+      theOwner->differentiate();
     }
 
     virtual void turn()
@@ -235,7 +234,7 @@ namespace libecs
 
     virtual void integrate()
     {
-      theOwner->transit();
+      theOwner->integrate();
     }
 
     virtual void compute()

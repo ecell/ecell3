@@ -57,7 +57,7 @@ namespace libecs
     virtual void clear();
     //  virtual Real velocity(Real v) = 0;
     virtual void turn() {}
-    virtual void transit() = 0;
+    virtual void integrate() = 0;
 
   protected:
 
@@ -83,7 +83,7 @@ namespace libecs
     virtual int getNumberOfSteps() { return 1; }
     //  virtual Real velocity(Real );
     virtual void turn();
-    virtual void transit() {}
+    virtual void integrate() {}
   };
 
   class RungeKutta4Integrator : public Integrator
@@ -102,7 +102,7 @@ namespace libecs
     virtual void clear();
     //  virtual Real velocity( Real );
     virtual void turn();
-    virtual void transit();
+    virtual void integrate();
 
   private:
 

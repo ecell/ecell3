@@ -71,9 +71,9 @@ namespace libecs
     virtual void initialize();
 
     virtual void clear();
-    virtual void react();
+    virtual void differentiate();
     virtual void turn(); 
-    virtual void transit();
+    virtual void integrate();
     virtual void compute();
 
     virtual const char* const className() const { return "System"; }

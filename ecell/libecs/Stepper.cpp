@@ -154,11 +154,11 @@ namespace libecs
 
   void MasterStepper::differentiate()
   {  
-    theOwner->react();
+    theOwner->differentiate();
     for( StepperVectorIterator i( theSlaveStepperVector.begin() ); 
 	 i != theSlaveStepperVector.end() ; ++i )
       {
-	(*i)->react();
+	(*i)->differentiate();
       }
     theOwner->turn();
     for( StepperVectorIterator i( theSlaveStepperVector.begin() ); 
@@ -170,11 +170,11 @@ namespace libecs
 
   void MasterStepper::integrate()
   {
-    theOwner->transit();
+    theOwner->integrate();
     for( StepperVectorIterator i( theSlaveStepperVector.begin() ); 
 	 i != theSlaveStepperVector.end() ; ++i )
       {
-	(*i)->transit();
+	(*i)->integrate();
       }
   }
 
@@ -239,7 +239,7 @@ namespace libecs
     for( StepperVector::iterator i( theMasterStepperVector.begin() );
 	 i != theMasterStepperVector.end(); i++ )
       {
-	(*i)->react();
+	(*i)->differentiate();
       }
   }
 
@@ -248,7 +248,7 @@ namespace libecs
     for( StepperVector::iterator i( theMasterStepperVector.begin() );
 	 i != theMasterStepperVector.end(); ++i )
       {
-	(*i)->transit();
+	(*i)->integrate();
       }
   }
 
@@ -261,17 +261,17 @@ namespace libecs
       }
   }
 
+
+#if 0
   void StepperLeader::update()
   {
     for( int i( theUpdateDepth ) ; i > 0 ; --i )
       {
-	for ( StepperVector::iterator i( theMasterStepperVector.begin() );
-	     i != theMasterStepperVector.end(); ++i )
-	  {
-	    (*i)->compute();
-	  }
+	compute();
       }
   }
+#endif /* 0 */
+
 
   ////////////////////////// Euler1Stepper
 
@@ -299,10 +299,10 @@ namespace libecs
 
   void RungeKutta4Stepper::differentiate()
   {
-    MasterStepper::react();
-    MasterStepper::react();
-    MasterStepper::react();
-    MasterStepper::react();
+    MasterStepper::differentiate();
+    MasterStepper::differentiate();
+    MasterStepper::differentiate();
+    MasterStepper::differentiate();
   }
 
 } // namespace libecs

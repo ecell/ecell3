@@ -120,7 +120,7 @@ namespace libecs
     setQuantity( theNumberOfMoleculesCache );
   }
 
-  void RungeKutta4Integrator::transit()
+  void RungeKutta4Integrator::integrate()
   {
     //// x(n+1) = x(n) + 1/6 * (k1 + k4 + 2 * (k2 + k3)) + O(h^5)
 

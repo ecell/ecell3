@@ -140,8 +140,9 @@ namespace libecs
     }
 
     virtual void initialize();
-    virtual void react() = 0;
-    virtual void transit() { theActivity = theActivityBuffer; }
+    virtual void differentiate() { }
+    virtual void integrate() { theActivity = theActivityBuffer; }
+    virtual void compute() { }
     Condition status() const { return theCondition; }
     void resetCondition() { theCondition = Good; }
 

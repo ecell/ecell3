@@ -195,15 +195,15 @@ namespace libecs
 
   //FIXME: the following methods should be inlined
 
-  void Substance::transit()
+  void Substance::integrate()
   { 
     theConcentration = -1;
 
     if( ! theFixed ) 
       {
-	theIntegrator->transit();
+	theIntegrator->integrate();
 
-	theAccumulator->doit();
+	theAccumulator->accumulate();
   
 	if( theQuantity < 0 ) 
 	  {

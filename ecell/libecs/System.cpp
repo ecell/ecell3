@@ -247,12 +247,12 @@ namespace libecs
       }
   }
 
-  void System::react()
+  void System::differentiate()
   {
     for( ReactorMapConstIterator i( getFirstRegularReactorIterator() ); 
 	 i != getLastReactorIterator() ; ++i )
       {
-	i->second->react();
+	i->second->differentiate();
       }
   }
 
@@ -265,18 +265,18 @@ namespace libecs
       }
   }
 
-  void System::transit()
+  void System::integrate()
   {
     for( ReactorMapConstIterator i( getFirstRegularReactorIterator() ); 
 	 i != getLastReactorIterator() ; ++i )
       {
-	i->second->transit();
+	i->second->integrate();
       }
 
     for( SubstanceMapConstIterator i( getFirstSubstanceIterator() );
 	 i != getLastSubstanceIterator() ; ++i )
       {
-	i->second->transit();
+	i->second->integrate();
       }
 
     updateVolume();
@@ -287,14 +287,14 @@ namespace libecs
     for( ReactorMapConstIterator i( getFirstReactorIterator() ); 
 	 i != getFirstRegularReactorIterator() ; ++i )
       {
-	i->second->react();
+	i->second->compute();
       }
 
     // update activity of posterior reactors by buffered values 
     for( ReactorMapConstIterator i( getFirstReactorIterator() ); 
 	 i != getFirstRegularReactorIterator() ; ++i )
       {
-	i->second->transit();
+	i->second->integrate();
       }
   }
 
