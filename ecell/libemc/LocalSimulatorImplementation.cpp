@@ -51,7 +51,7 @@ LocalSimulatorImplementation::~LocalSimulatorImplementation()
   delete &theRootSystem;
 }
 
-void LocalSimulatorImplementation::makePrimitive( StringCref classname,
+void LocalSimulatorImplementation::createEntity( StringCref classname,
 						  FQPICref fqpi, 
 						  StringCref name )
 {
@@ -95,7 +95,7 @@ void LocalSimulatorImplementation::makePrimitive( StringCref classname,
 
 }
 
-void LocalSimulatorImplementation::sendMessage( FQPICref fqpi, 
+void LocalSimulatorImplementation::setProperty( FQPICref fqpi, 
 						MessageCref message)
 {
   PrimitiveType aType = fqpi.getPrimitiveType();
@@ -130,7 +130,7 @@ void LocalSimulatorImplementation::sendMessage( FQPICref fqpi,
 
 
 const Message LocalSimulatorImplementation::
-getMessage( FQPICref fqpi,
+getProperty( FQPICref fqpi,
 	    StringCref propertyName )
 {
   PrimitiveType aType = fqpi.getPrimitiveType();

@@ -49,14 +49,14 @@ public:
 
   RootSystemRef getRootSystem() { return theRootSystem; }
 
-  void makePrimitive( StringCref classname, 
+  void createEntity( StringCref classname, 
 		      FQPICref fqpi, 
 		      StringCref name );
 
-  void sendMessage( FQPICref fqpi, 
+  void setProperty( FQPICref fqpi, 
 		    MessageCref message );
 
-  const Message getMessage( FQPICref fqpi, StringCref propertyName );
+  const Message getProperty( FQPICref fqpi, StringCref propertyName );
 
   void step();
 

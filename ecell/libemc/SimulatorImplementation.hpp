@@ -49,14 +49,14 @@ public:
 
   virtual RootSystemRef getRootSystem() = 0;
 
-  virtual void makePrimitive( StringCref classname, 
+  virtual void createEntity( StringCref classname, 
 			      FQPICref fqpi, 
 			      StringCref name ) = 0;
 
-  virtual void sendMessage( FQPICref fqpi, 
+  virtual void setProperty( FQPICref fqpi, 
 			    MessageCref message ) = 0;
 
-  virtual const Message getMessage( FQPICref fqpi, 
+  virtual const Message getProperty( FQPICref fqpi, 
 			      StringCref propertyName ) = 0;
   virtual void step() = 0;
 

@@ -46,24 +46,24 @@ public:
   Simulator();
   virtual ~Simulator() {}
 
-  void makePrimitive( StringCref classname, 
+  void createEntity( StringCref classname, 
 		      FQPICref fqpi,
 		      StringCref name )
   {
-    theSimulatorImplementation->makePrimitive( classname, fqpi, name );
+    theSimulatorImplementation->createEntity( classname, fqpi, name );
   }
 
-  void sendMessage( FQPICref fqpi, 
+  void setProperty( FQPICref fqpi, 
 		    MessageCref message )
   {
-    theSimulatorImplementation->sendMessage( fqpi, message );
+    theSimulatorImplementation->setProperty( fqpi, message );
   }
 
 
-  const Message getMessage( FQPICref fqpi, 
+  const Message getProperty( FQPICref fqpi, 
 		      StringCref propertyName )
   {
-    return theSimulatorImplementation->getMessage( fqpi, propertyName ); 
+    return theSimulatorImplementation->getProperty( fqpi, propertyName ); 
   }
 
   void step()

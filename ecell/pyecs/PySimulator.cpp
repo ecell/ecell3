@@ -65,9 +65,9 @@ void PySimulator::init_type()
   behaviors().name("Simulator");
   behaviors().doc("E-CELL Python class");
 
-  add_varargs_method( "makePrimitive", &PySimulator::makePrimitive );
-  add_varargs_method( "sendMessage",   &PySimulator::sendMessage );
-  add_varargs_method( "getMessage",    &PySimulator::getMessage );
+  add_varargs_method( "createEntity", &PySimulator::createEntity );
+  add_varargs_method( "setProperty",   &PySimulator::setProperty );
+  add_varargs_method( "getProperty",    &PySimulator::getProperty );
   add_varargs_method( "step",          &PySimulator::step );
   add_varargs_method( "initialize",    &PySimulator::initialize );
 }
@@ -82,7 +82,7 @@ Object PySimulator::step( const Tuple& args )
   ECS_CATCH;
 }
 
-Object PySimulator::makePrimitive( const Tuple& args )
+Object PySimulator::createEntity( const Tuple& args )
 {
   ECS_TRY;
 
@@ -91,14 +91,14 @@ Object PySimulator::makePrimitive( const Tuple& args )
   const FQPI aFqpi( static_cast<Py::String>( args[1] ) );
   const string aName( static_cast<Py::String>( args[2] ) );
 
-  Simulator::makePrimitive( aClassname, aFqpi, aName );
+  Simulator::createEntity( aClassname, aFqpi, aName );
 
   return Py::Object();
 
   ECS_CATCH;
 }
   
-Object PySimulator::sendMessage( const Tuple& args )
+Object PySimulator::setProperty( const Tuple& args )
 {
   ECS_TRY;
 
@@ -117,14 +117,14 @@ Object PySimulator::sendMessage( const Tuple& args )
 
   const Message aMessage( aMessageKeyword, aMessageBody );
 
-  Simulator::sendMessage( FQPI( aFqpi ), aMessage );
+  Simulator::setProperty( FQPI( aFqpi ), aMessage );
 
   return Object();
 
   ECS_CATCH;
 }
 
-Object PySimulator::getMessage( const Tuple& args )
+Object PySimulator::getProperty( const Tuple& args )
 {
   ECS_TRY;
 
@@ -133,7 +133,7 @@ Object PySimulator::getMessage( const Tuple& args )
   const FQPI aFqpi( static_cast<Py::String>( args[0] ) );
   const string aPropertyName( static_cast<Py::String>( args[1] ) );
 
-  Message aMessage( Simulator::getMessage( aFqpi, aPropertyName ) );
+  Message aMessage( Simulator::getProperty( aFqpi, aPropertyName ) );
   int aMessageSize = aMessage.getBody().size();
 
   Tuple aTuple( aMessageSize );

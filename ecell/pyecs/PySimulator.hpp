@@ -49,9 +49,9 @@ public:
 
   static void init_type();
 
-  Object makePrimitive( const Tuple& args );
-  Object sendMessage( const Tuple& args );
-  Object getMessage( const Tuple& args );
+  Object createEntity( const Tuple& args );
+  Object setProperty( const Tuple& args );
+  Object getProperty( const Tuple& args );
   Object step( const Tuple& args );
   Object initialize( const Tuple& args );
 
