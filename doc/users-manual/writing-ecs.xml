@@ -164,7 +164,7 @@
 
 
       <para>
-Write something about step(), print(), loadModel(), getCurrentTime() here.
+Write something about step(), message(), loadModel(), getCurrentTime() here.
 </para>
 
 
@@ -198,6 +198,40 @@ run( 100 )
 	<para>Explanation of backend/frontend isolation may come here.</para>
 
 	<para>ObjectStub, EntityStub, StepperStub, LoggerStub</para>
+
+      </sect3>
+
+
+      <sect3>
+	<title></title>
+
+	<para>The following example loads an EML file, and prints the
+	value of ATP <classname>Variable</classname> in
+	<classname>System</classname> <constant>/CELL</constant> every
+	10 seconds.  If the value is below 1000, it stops the simulation.
+</para>
+	<example>
+	  <title>An <acronym>ESS</acronym> to check ATP level every 10 seconds</title>
+	  
+	  <programlisting>
+loadModel( 'simple.eml' )
+
+ATP = createEntityStub( 'Variable:/CELL:ATP' )
+
+while 1:
+
+    ATPValue = ATP[ 'Value' ]
+
+    message( 'ATP value = %s' % ATPValue )
+
+    if ATPValue <= 1000:
+        break
+
+    run( 10 )
+
+message( 'Stopped at %s.' % getCurrentTime() )
+</programlisting>
+	</example>
 
       </sect3>
 

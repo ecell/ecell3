@@ -73,22 +73,22 @@ recursively.
 
 
 
-      <!-- print -->
+      <!-- message -->
       <row>
 	<entry namest='c1' nameend='c1' align='left'>
-<synopsis><methodname>print</methodname>( <parameter>message</parameter> )
+<synopsis><methodname>message</methodname>( <parameter>message</parameter> )
 </synopsis></entry>
 
 	<entry>None</entry>
       </row>
       <row>
 	<entry namest="c1" nameend='c2' rowsep='1'>
-<para>Print <parameter>message</parameter>.  By default the message is
+<para>Output <parameter>message</parameter>.  By default the message is
 printed to stdout.</para> 
 
 <para>The way the message is handled can be changed by using
-<methodname>setPrintMethod</methodname> method.  For example, GUI
-frontend software may give a new print method to steal the message for
+<methodname>setMessageMethod</methodname> method.  For example, GUI
+frontend software may give a method to steal the message for
 its message printing widget.</para></entry>
       </row>
 
@@ -97,7 +97,7 @@ its message printing widget.</para></entry>
 
       <row>
 	<entry namest='c1' nameend='c1' align='left'>
-<synopsis><methodname>setPrintMethod</methodname>( <parameter>method</parameter> )
+<synopsis><methodname>setMessageMethod</methodname>( <parameter>method</parameter> )
 </synopsis></entry>
 
 	<entry>None</entry>
@@ -106,13 +106,13 @@ its message printing widget.</para></entry>
       <row>
 	<entry namest="c1" nameend='c2' rowsep='1'>
 <para>This method changes what happens when
-<methodname>print</methodname> method is called.  
+<methodname>message</methodname> method is called.  
 </para>
 
 <para><parameter>method</parameter> must be a Python callable object
 which takes just one string parameter.</para>
 
-<para>See also: <methodname>print</methodname></para>
+<para>See also: <methodname>message</methodname></para>
             </entry>
       </row>
 
@@ -495,7 +495,7 @@ especially
 <para><varname>theMainWindow</varname> variable may exist when the
 <classname>Session</classname> is executed within <application>Osogo
 Session Monitor</application>.  This variable is optional, and it
-should check if this exists before using.
+should be checked if this exists before using.
 </para>
 
             </entry>

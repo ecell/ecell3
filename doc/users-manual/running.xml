@@ -8,30 +8,37 @@
   include it in the Introduction and omit this section. -->
 
   <chapter id="ecell3-getting-started"> 
-    <title>Getting Started</title> 
+  <title>Getting Started</title> 
 
-    <highlights>
-      <para>This chapter explains how to prepare files needed to
-       run the simulator, and how to run the simulation with &app;.</para>
-    </highlights>
+  <highlights>
+    <para>By reading this chapter, you can get information about the following 
+items.
+</para>
 
-    <sect1 id="prepare-simulation"> 
-      <title>Preparing Simulation</title> 
-      
-      <para> To start the simulation, you need at least these types of files:
+    <simplelist>
+      <member>how to prepare files needed to run the simulator</member>
+      <member>how to run the simulation with &app;.</member>
+    </simplelist>
+
+  </highlights>
+
+  <sect1 id="prepare-simulation"> 
+    <title>Preparing Simulation</title> 
+    
+    <para> To start the simulation, you need at least these types of files:
       <itemizedlist>
-	  <listitem>
-	    <para>A model file in EML format</para>
-	  </listitem>
-	  <listitem>
-	    <para>
+	<listitem>
+	  <para>A model file in EML format</para>
+	</listitem>
+	<listitem>
+	  <para>
               (optionally but usually) shared object files (.so in
               Linux operating system), if you are using special classes
               of object in the model file which is not provided by the system
               by default.
              </para>
-	  </listitem>
-	</itemizedlist>
+	</listitem>
+      </itemizedlist>
 
     </para>
     <para>
@@ -46,10 +53,8 @@
         To convert EM (.em) files to EML (.eml) files, type the
         following command.
       </para>
-      <para> 
-	<command>em2eml</command> 
-	<replaceable>filename.em</replaceable>
-      </para> 
+      <screen><command>em2eml</command> <replaceable>filename.em</replaceable>
+</screen>
 
     </sect2>
 
@@ -83,64 +88,71 @@
 	commandline option to let emtool program interpret the input as
         C++ source code, not DM scipt.
       </para> 
-	<para> 
-	<command>emtool</command> <option>-c</option>
-	<replaceable>filename.cpp</replaceable>
 
-      </para>
+	<screen>
+	<command>emtool</command> <option>-c</option> <replaceable>filename.cpp</replaceable>
+</screen>
       </note>
 
     </sect2>
-      
-      </sect1>
-    <sect1 id="ecell3-start">
-      <title>To Start &app;</title>
-      <para>You can start <application>&app;</application> either in 
+    
+  </sect1>
+
+  <sect1 id="ecell3-start">
+    <title>To Start &app;</title>
+    <para>You can start <application>&app;</application> either in 
     scripting mode and GUI mode.
     </para> 
 
-      <variablelist>
-    	<varlistentry>
-	  <term>Scripting mode</term>
-	  <listitem>
-	    <para>To start <application>&app;</application> 
-                in scripting mode, type the following command, 
-    		then press <keycap>Return</keycap>:</para>
-	    <para> 
-		<command>ecell3</command> <optional><parameter><replaceable>filename.py</replaceable></parameter></optional>
-    	    </para> 
-	    <para>where  
-			<replaceable>filename.py</replaceable> 
-                        is the name of the python script file you
-			want to execute.  
+    <sect2>
+      <title>GUI mode</title>
+
+	  <para>To start <application>&app;</application> 
+                in GUI mode, type the following command.</para> 
+
+      <screen><command>gecell</command> &</screen>
+
+      <para>This will invoke an instance of the simulator with
+      <application>Osogo Session Manager</application> as a GUI
+      frontend.</para>
+
+    </sect2>
+
+
+    <sect2>
+      <title>Scripting mode</title>
+
+	  <para>To start <application>&app;</application> in scripting
+                mode, type the following command, then press
+                <keycap>Return</keycap>:</para> 
+
+      <screen>
+                <command>ecell3-session</command> <optional><parameter><replaceable>filename.ess</replaceable></parameter></optional>
+
+</screen>
+
+      <para>where <replaceable>filename.ess</replaceable> is the name of
+                the Python script file you want to execute.
     		</para>
-	  <para>If <replaceable>filename.py</replaceable> is omitted,
-	  the interpreter starts up in interactive mode.</para>
-	  </listitem>
-    	</varlistentry>
+	  <para>If <replaceable>filename.ess</replaceable> is omitted,
+	  the interpreter starts up in interactive mode. (not
+	  implemented yet)</para>
 
-    	<varlistentry>
-	  <term>GUI mode</term>
-	  <listitem>
-	    <para>To start <application>&app;</application> 
-                in GUI mode, type the following command</para> 
-	    <para> 
-			<command>gecell &</command> 
-    		</para> 
-	  </listitem>
-    	</varlistentry>
+      <para>See chapter 5 about the scripting.</para>
 
-      </variablelist>
-    </sect1>
+    </sect2>
+    
 
-    <sect1>
-      <title>Other commands</title>
+  </sect1>
 
-      <para>eml2em, dmcompile, dmgen, eri2eml, rd2dm
+  <sect1>
+    <title>Other commands</title>
+
+    <para>eml2em, dmcompile, dmgen, eri2eml, rd2dm
 
       </para>
 
-    </sect1>
+  </sect1>
 
 
   </chapter>
