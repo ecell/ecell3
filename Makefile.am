@@ -10,3 +10,6 @@ dist-hook:
 	rm -rf $(distdir)/CVS
 	rm -rf $(distdir)/*/CVS
 	rm -rf $(distdir)/*/*/CVS
+
+doc:
+	doxygen ecell3.doxy
