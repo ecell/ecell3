@@ -1,0 +1,2714 @@
+<?xml version="1.0"?>
+<eml>
+
+<info>
+<modelname>LTDmodel</modelname>
+<author>Shiho Mori</author>
+<created>2002/08/29</created>
+<lastsaved>2002/09/22</lastsaved>
+</info>
+
+<stepperlist>
+<stepper class="Euler1Stepper" id="SRM_01" />
+</stepperlist>
+
+
+<!-- ROOT -->
+<system class="System" stepper="SRM_01" id="/" name="Environment">
+
+<property name="StepperID">
+<value>SRM_01</value>
+</property>
+
+<property name="Volume">
+<value>unknown</value>
+</property>
+</system>
+
+
+<!-- ENVIRONMENT -->
+<system class="System" stepper="SRM_01" id="/ENVIRONMENT" name="Culture Medium">
+
+<property name="StepperID">
+<value>SRM_01</value>
+</property>
+
+<property name="Volume">
+<value>0.00000000001</value>
+</property>
+</system>
+
+
+
+<!-- CELL -->
+<system class="System" stepper="SRM_01" id="/CELL" name="Cell">
+
+<property name="StepperID">
+<value>SRM_01</value>
+</property>
+
+<property name="Volume">
+<value>unknown</value>
+</property>
+</system>
+
+
+<!-- MEMBRANE -->
+<system class="System" stepper="SRM_01" id="/CELL/MEMBRANE" name="Membrane">
+
+<property name="StepperID">
+<value>SRM_01</value>
+</property>
+
+<property name="Volume">
+<value>0.000000000001</value>
+</property>
+</system>
+
+
+
+<!-- CYTOPLASM -->
+<system class="System" stepper="SRM_01" id="/CELL/CYTOPLASM" name="Cytoplasm">
+<property name="StepperID">
+<value>SRM_01</value>
+</property>
+<property name="Volume">
+<value>0.000000000001</value>
+</property>
+
+<!-- for SUBSTANCE -->
+<substance class="Substance" id="Ca_DAG_PKC" name="Ca_DAG_PKC">
+<property name="Quantity">
+<value>0</value>
+</property>
+</substance>
+
+<substance class="Substance" id="DAG_AA_PKC" name="DAG_AA_PKC">
+<property name="Quantity">
+<value>0</value>
+</property>
+</substance>
+
+<substance class="Substance" id="AA_PKC" name="AA_PKC">
+<property name="Quantity">
+<value>0</value>
+</property>
+</substance>
+
+<substance class="Substance" id="Ca_AA_PKC" name="Ca_AA_PKC">
+<property name="Quantity">
+<value>0</value>
+</property>
+</substance>
+
+<substance class="Substance" id="AMPAR" name="AMPAR">
+<property name="Quantity">
+<value>301107.0</value>
+</property>
+</substance>
+
+<substance class="Substance" id="AMPAR-P" name="AMPAR-P">
+<property name="Quantity">
+<value>0</value>
+</property>
+</substance>
+
+<substance class="Substance" id="PP2A" name="PP2A">
+<property name="Quantity">
+<value>1625977</value>
+</property>
+</substance>
+
+<substance class="Substance" id="Raf" name="Raf">
+<property name="Quantity">
+<value>301107.0</value>
+</property>
+</substance>
+
+<substance class="Substance" id="Raf-P" name="Raf-P">
+<property name="Quantity">
+<value>0</value>
+</property>
+</substance>
+
+<substance class="Substance" id="N" name="N">
+<property name="Quantity">
+<value>0</value>
+</property>
+</substance>
+
+<substance class="Substance" id="CRHR" name="CRHR">
+<property name="Quantity">
+<value>301107.0</value>
+</property>
+</substance>
+
+<substance class="Substance" id="CRF" name="CRF">
+<property name="Quantity">
+<value>60221.0</value>
+</property>
+</substance>
+
+<substance class="Substance" id="CRHR_CRF" name="CRHR_CRF">
+<property name="Quantity">
+<value>0</value>
+</property>
+</substance>
+
+<substance class="Substance" id="Lyn_activate" name="Lyn_activate">
+<property name="Quantity">
+<value>66244.0</value>
+</property>
+</substance>
+
+<substance class="Substance" id="AA" name="AA">
+<property name="Quantity">
+<value>0</value>
+</property>
+</substance>
+
+<substance class="Substance" id="APC" name="APC">
+<property name="Quantity">
+<value>18066410.0</value>
+</property>
+</substance>
+
+<substance class="Substance" id="GC" name="GC">
+<property name="Quantity">
+<value>1806641.0</value>
+</property>
+</substance>
+
+<substance class="Substance" id="NO" name="NO">
+<property name="Quantity">
+<value>0</value>
+</property>
+</substance>
+
+<substance class="Substance" id="NO_GC" name="NO_GC">
+<property name="Quantity">
+<value>0</value>
+</property>
+</substance>
+
+<substance class="Substance" id="5GMP" name="5GMP">
+<property name="Quantity">
+<value>0</value>
+</property>
+</substance>
+
+<substance class="Substance" id="GTP" name="GTP">
+<property name="Quantity">
+<value>6022137.0</value>
+</property>
+</substance>
+
+<substance class="Substance" id="CGMP" name="CGMP">
+<property name="Quantity">
+<value>0</value>
+</property>
+</substance>
+
+<substance class="Substance" id="PDE" name="PDE">
+<property name="Quantity">
+<value>3011068.0</value>
+</property>
+</substance>
+
+<substance class="Substance" id="PKG" name="PKG">
+<property name="Quantity">
+<value>1505534.0</value>
+</property>
+</substance>
+
+<substance class="Substance" id="cGMP_PKG" name="cGMP_PKG">
+<property name="Quantity">
+<value>0</value>
+</property>
+</substance>
+
+<substance class="Substance" id="G-Sub-P" name="G-Sub-P">
+<property name="Quantity">
+<value>0</value>
+</property>
+</substance>
+
+<substance class="Substance" id="G-Sub" name="G-Sub">
+<property name="Quantity">
+<value>6443686.0</value>
+</property>
+</substance>
+
+<substance class="Substance" id="PP2A_G-Sub-P" name="PP2A_G-Sub-P">
+<property name="Quantity">
+<value>0</value>
+</property>
+</substance>
+
+<substance class="Substance" id="MEK" name="MEK">
+<property name="Quantity">
+<value>301107.0</value>
+</property>
+</substance>
+
+<substance class="Substance" id="MEK-P" name="MEK-P">
+<property name="Quantity">
+<value>0</value>
+</property>
+</substance>
+
+<substance class="Substance" id="MEK-PP" name="MEK-PP">
+<property name="Quantity">
+<value>0</value>
+</property>
+</substance>
+
+<substance class="Substance" id="MAPK-P" name="MAPK-P">
+<property name="Quantity">
+<value>0</value>
+</property>
+</substance>
+
+<substance class="Substance" id="MAPK-PP" name="MAPK-PP">
+<property name="Quantity">
+<value>0</value>
+</property>
+</substance>
+
+<substance class="Substance" id="MAPK" name="MAPK">
+<property name="Quantity">
+<value>602214.0</value>
+</property>
+</substance>
+
+<substance class="Substance" id="MKP1" name="MKP1">
+<property name="Quantity">
+<value>1927.0</value>
+</property>
+</substance>
+
+<substance class="Substance" id="PLA2" name="PLA2">
+<property name="Quantity">
+<value>240885.0</value>
+</property>
+</substance>
+
+<substance class="Substance" id="Ca" name="Ca">
+<property name="Quantity">
+<value>0</value>
+</property>
+</substance>
+
+<substance class="Substance" id="Ca_PLA2" name="Ca_PLA2">
+<property name="Quantity">
+<value>0</value>
+</property>
+</substance>
+
+<substance class="Substance" id="DAG" name="DAG">
+<property name="Quantity">
+<value>0</value>
+</property>
+</substance>
+
+<substance class="Substance" id="DAG_Ca_PLA2" name="DAG_Ca_PLA2">
+<property name="Quantity">
+<value>0</value>
+</property>
+</substance>
+
+<substance class="Substance" id="PIP2" name="PIP2">
+<property name="Quantity">
+<value>6022137.0</value>
+</property>
+</substance>
+
+<substance class="Substance" id="PIP2_PLA2" name="PIP2_PLA2">
+<property name="Quantity">
+<value>0</value>
+</property>
+</substance>
+
+<substance class="Substance" id="Ca_PIP2_PLA2" name="Ca_PIP2_PLA2">
+<property name="Quantity">
+<value>0</value>
+</property>
+</substance>
+
+<substance class="Substance" id="PLA2-P" name="PLA2-P">
+<property name="Quantity">
+<value>0</value>
+</property>
+</substance>
+
+<substance class="Substance" id="PKC" name="PKC">
+<property name="Quantity">
+<value>602214.0</value>
+</property>
+</substance>
+
+<substance class="Substance" id="Ca_PKC" name="Ca_PKC">
+<property name="Quantity">
+<value>0</value>
+</property>
+</substance>
+
+<substance class="Substance" id="DAG_PKC" name="DAG_PKC">
+<property name="Quantity">
+<value>0</value>
+</property>
+</substance>
+
+<substance class="Substance" id="mGluR_Gq" name="mGluR_Gq">
+<property name="Quantity">
+<value>180664.0</value>
+</property>
+</substance>
+
+<substance class="Substance" id="Glu" name="Glu">
+<property name="Quantity">
+<value>0</value>
+</property>
+</substance>
+
+<substance class="Substance" id="Glu_mGluR_Gq" name="Glu_mGluR_Gq">
+<property name="Quantity">
+<value>0</value>
+</property>
+</substance>
+
+<substance class="Substance" id="GTP_Ga" name="GTP_Ga">
+<property name="Quantity">
+<value>0</value>
+</property>
+</substance>
+
+<substance class="Substance" id="GDP_Ga" name="GDP_Ga">
+<property name="Quantity">
+<value>0</value>
+</property>
+</substance>
+
+<substance class="Substance" id="Gbc" name="Gbc">
+<property name="Quantity">
+<value>0</value>
+</property>
+</substance>
+
+<substance class="Substance" id="Glu_mGluR" name="Glu_mGluR">
+<property name="Quantity">
+<value>0</value>
+</property>
+</substance>
+
+<substance class="Substance" id="GTP_Ga_PLC" name="GTP_Ga_PLC">
+<property name="Quantity">
+<value>0</value>
+</property>
+</substance>
+
+<substance class="Substance" id="PLC" name="PLC">
+<property name="Quantity">
+<value>481771.0</value>
+</property>
+</substance>
+
+<substance class="Substance" id="IP3" name="IP3">
+<property name="Quantity">
+<value>0</value>
+</property>
+</substance>
+
+<substance class="Substance" id="Gabc" name="Gabc">
+<property name="Quantity">
+<value>0</value>
+</property>
+</substance>
+
+<substance class="Substance" id="MgluR" name="MgluR">
+<property name="Quantity">
+<value>0</value>
+</property>
+</substance>
+
+<substance class="Substance" id="MAPKactive" name="MAPKactive">
+<property name="Quantity">
+<value>602214.0</value>
+</property>
+</substance>
+
+<substance class="Substance" id="PKCactive" name="PKCactive">
+<property name="Quantity">
+<value>0</value>
+</property>
+</substance>
+
+<!-- for REACTOR -->
+<!-- MassAction -->
+<reactor class="MassActionReactor" id="Ca_DAG_PKC-N" name="Ca_DAG_PKC-N">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:Ca_DAG_PKC</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:N</value>
+<value>1</value>
+</property>
+
+<property name="k">
+<value>0.004</value>
+</property>
+</reactor>
+
+
+<reactor class="MassActionReactor" id="DAG_AA_PKC-N" name="DAG_AA_PKC-N">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:DAG_AA_PKC</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:N</value>
+<value>1</value>
+</property>
+
+<property name="k">
+<value>0.004</value>
+</property>
+</reactor>
+
+
+<reactor class="MassActionReactor" id="AA_PKC-N" name="AA_PKC-N">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:AA_PKC</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:N</value>
+<value>1</value>
+</property>
+
+<property name="k">
+<value>0.004</value>
+</property>
+</reactor>
+
+
+<reactor class="MassActionReactor" id="Ca_AA_PKC-N" name="Ca_AA_PKC-N">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:Ca_AA_PKC</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:N</value>
+<value>1</value>
+</property>
+
+<property name="k">
+<value>0.004</value>
+</property>
+</reactor>
+
+
+<reactor class="MassActionReactor" id="CRHR-CRHR_CRF" name="CRHR-CRHR_CRF">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:CRHR</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>S1</value>
+<value>Substance:/CELL/CYTOPLASM:CRF</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:CRHR_CRF</value>
+<value>1</value>
+</property>
+
+<property name="k">
+<value>100000</value>
+</property>
+</reactor>
+
+
+<reactor class="MassActionReactor" id="CRHR_CRF-CRHR" name="CRHR_CRF-CRHR">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:CRHR_CRF</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:CRHR</value>
+<value>1</value>
+</property>
+
+<property name="Reactant">
+<value>P1</value>
+<value>Substance:/CELL/CYTOPLASM:CRF</value>
+<value>1</value>
+</property>
+
+<property name="k">
+<value>0.00001</value>
+</property>
+</reactor>
+
+
+<reactor class="MassActionReactor" id="DeCRF" name="DeCRF">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:CRF</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:N</value>
+<value>1</value>
+</property>
+
+<property name="k">
+<value>0.02</value>
+</property>
+</reactor>
+
+
+<reactor class="MassActionReactor" id="DeLyn_activate" name="DeLyn_activate">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:Lyn_activate</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:N</value>
+<value>1</value>
+</property>
+
+<property name="k">
+<value>0.001</value>
+</property>
+</reactor>
+
+
+<reactor class="MassActionReactor" id="AA-APC" name="AA-APC">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:AA</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:APC</value>
+<value>1</value>
+</property>
+
+<property name="k">
+<value>0.001</value>
+</property>
+</reactor>
+
+
+<reactor class="MassActionReactor" id="NO-N" name="NO-N">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:NO</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:N</value>
+<value>1</value>
+</property>
+
+<property name="k">
+<value>0.636</value>
+</property>
+</reactor>
+
+
+<reactor class="MassActionReactor" id="GC.NO-NO_GC" name="GC.NO-NO_GC">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:GC</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>S1</value>
+<value>Substance:/CELL/CYTOPLASM:NO</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:NO_GC</value>
+<value>1</value>
+</property>
+
+<property name="k">
+<value>3000000</value>
+</property>
+</reactor>
+
+
+<reactor class="MassActionReactor" id="NO_GC-GC.NO" name="NO_GC-GC.NO">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:NO_GC</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:GC</value>
+<value>1</value>
+</property>
+
+<property name="Reactant">
+<value>P1</value>
+<value>Substance:/CELL/CYTOPLASM:NO</value>
+<value>1</value>
+</property>
+
+<property name="k">
+<value>0.75</value>
+</property>
+</reactor>
+
+
+<reactor class="MassActionReactor" id="CGMP.PKG-cGMP_PKG" name="CGMP.PKG-cGMP_PKG">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:CGMP</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>S1</value>
+<value>Substance:/CELL/CYTOPLASM:PKG</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:cGMP_PKG</value>
+<value>1</value>
+</property>
+
+<property name="k">
+<value>100000</value>
+</property>
+</reactor>
+
+
+<reactor class="MassActionReactor" id="cGMP_PKG-CGMP.PKG" name="cGMP_PKG-CGMP.PKG">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:cGMP_PKG</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:CGMP</value>
+<value>1</value>
+</property>
+
+<property name="Reactant">
+<value>P1</value>
+<value>Substance:/CELL/CYTOPLASM:PKG</value>
+<value>1</value>
+</property>
+
+<property name="k">
+<value>0.005</value>
+</property>
+</reactor>
+
+
+<reactor class="MassActionReactor" id="G-Sub-P-G-Sub" name="G-Sub-P-G-Sub">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:G-Sub-P</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:G-Sub</value>
+<value>1</value>
+</property>
+
+<property name="k">
+<value>0.0001</value>
+</property>
+</reactor>
+
+
+<reactor class="MassActionReactor" id="G-Sub-P.PP2A-PP2A_G-Sub-P" name="G-Sub-P.PP2A-PP2A_G-Sub-P">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:G-Sub-P</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>S1</value>
+<value>Substance:/CELL/CYTOPLASM:PP2A</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:PP2A_G-Sub-P</value>
+<value>1</value>
+</property>
+
+<property name="k">
+<value>10000</value>
+</property>
+</reactor>
+
+
+<reactor class="MassActionReactor" id="PP2A_G-Sub-P" name="PP2A_G-Sub-P">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:PP2A_G-Sub-P</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:G-Sub-P</value>
+<value>1</value>
+</property>
+
+<property name="Reactant">
+<value>P1</value>
+<value>Substance:/CELL/CYTOPLASM:PP2A</value>
+<value>1</value>
+</property>
+
+<property name="k">
+<value>0.0027</value>
+</property>
+</reactor>
+
+
+<reactor class="MassActionReactor" id="PLA2-Ca_PLA2" name="PLA2-Ca_PLA2">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:PLA2</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>S1</value>
+<value>Substance:/CELL/CYTOPLASM:Ca</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:Ca_PLA2</value>
+<value>1</value>
+</property>
+
+<property name="k">
+<value>10</value>
+</property>
+</reactor>
+
+
+<reactor class="MassActionReactor" id="Ca_PLA2-PLA2" name="Ca_PLA2-PLA2">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:Ca_PLA2</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:PLA2</value>
+<value>1</value>
+</property>
+
+<property name="Reactant">
+<value>P1</value>
+<value>Substance:/CELL/CYTOPLASM:Ca</value>
+<value>1</value>
+</property>
+
+<property name="k">
+<value>0.000001</value>
+</property>
+</reactor>
+
+
+<reactor class="MassActionReactor" id="Ca_PLA2-DAG_Ca_PLA2" name="Ca_PLA2-DAG_Ca_PLA2">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:Ca_PLA2</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>S1</value>
+<value>Substance:/CELL/CYTOPLASM:DAG</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:DAG_Ca_PLA2</value>
+<value>1</value>
+</property>
+
+<property name="k">
+<value>100</value>
+</property>
+</reactor>
+
+
+<reactor class="MassActionReactor" id="DAG_Ca_PLA2-Ca_PLA2" name="DAG_Ca_PLA2-Ca_PLA2">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:DAG_Ca_PLA2</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:Ca_PLA2</value>
+<value>1</value>
+</property>
+
+<property name="Reactant">
+<value>P1</value>
+<value>Substance:/CELL/CYTOPLASM:DAG</value>
+<value>1</value>
+</property>
+
+<property name="k">
+<value>0.0002</value>
+</property>
+</reactor>
+
+
+<reactor class="MassActionReactor" id="PLA2-PIP2_PLA2" name="PLA2-PIP2-PLA2">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:PLA2</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>S1</value>
+<value>Substance:/CELL/CYTOPLASM:PIP2</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:PIP2_PLA2</value>
+<value>1</value>
+</property>
+
+<property name="k">
+<value>1.0</value>
+</property>
+</reactor>
+
+
+<reactor class="MassActionReactor" id="PIP2_PLA2-PLA2" name="PIP2_PLA2-PLA2">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:PIP2_PLA2</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:PLA2</value>
+<value>1</value>
+</property>
+
+<property name="Reactant">
+<value>P1</value>
+<value>Substance:/CELL/CYTOPLASM:PIP2</value>
+<value>1</value>
+</property>
+
+<property name="k">
+<value>0.0004</value>
+</property>
+</reactor>
+
+
+<reactor class="MassActionReactor" id="PIP2_PLA2-Ca_PIP2_PLA2" name="PIP2_PLA2-Ca_PIP2_PLA2">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:PIP2_PLA2</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>S1</value>
+<value>Substance:/CELL/CYTOPLASM:Ca</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:Ca_PIP2_PLA2</value>
+<value>1</value>
+</property>
+
+<property name="k">
+<value>12000</value>
+</property>
+</reactor>
+
+
+<reactor class="MassActionReactor" id="Ca_PIP2_PLA2-PIP2_PLA2" name="Ca_PIP2_PLA2-PIP2_PLA2">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:Ca_PIP2_PLA2</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:PIP2_PLA2</value>
+<value>1</value>
+</property>
+
+<property name="Reactant">
+<value>P1</value>
+<value>Substance:/CELL/CYTOPLASM:Ca</value>
+<value>1</value>
+</property>
+
+<property name="k">
+<value>0.012</value>
+</property>
+</reactor>
+
+
+<reactor class="MassActionReactor" id="PLA2-P-PLA2" name="PLA2-P-PLA2">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:PLA2-P</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:PLA2</value>
+<value>1</value>
+</property>
+
+<property name="k">
+<value>0.17</value>
+</property>
+</reactor>
+
+
+<reactor class="MassActionReactor" id="PKC-Ca_PKC" name="PKC-Ca_PKC">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:PKC</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>S1</value>
+<value>Substance:/CELL/CYTOPLASM:Ca</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:Ca_PKC</value>
+<value>1</value>
+</property>
+
+<property name="k">
+<value>100000</value>
+</property>
+</reactor>
+
+
+<reactor class="MassActionReactor" id="Ca_PKC-PKC" name="Ca_PKC-PKC">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:Ca_PKC</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:PKC</value>
+<value>1</value>
+</property>
+
+<property name="Reactant">
+<value>P1</value>
+<value>Substance:/CELL/CYTOPLASM:Ca</value>
+<value>1</value>
+</property>
+
+<property name="k">
+<value>1</value>
+</property>
+</reactor>
+
+
+<reactor class="MassActionReactor" id="Ca_PKC-Ca_DAG_PKC" name="Ca_PKC-Ca_DAG_PKC">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:Ca_PKC</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>S1</value>
+<value>Substance:/CELL/CYTOPLASM:DAG</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:Ca_DAG_PKC</value>
+<value>1</value>
+</property>
+
+<property name="k">
+<value>100000</value>
+</property>
+</reactor>
+
+
+<reactor class="MassActionReactor" id="Ca_DAG_PKC-Ca_PKC" name="Ca_DAG_PKC-Ca_PKC">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:Ca_DAG_PKC</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:Ca_PKC</value>
+<value>1</value>
+</property>
+
+<property name="Reactant">
+<value>P1</value>
+<value>Substance:/CELL/CYTOPLASM:DAG</value>
+<value>1</value>
+</property>
+
+<property name="k">
+<value>0.05</value>
+</property>
+</reactor>
+
+
+<reactor class="MassActionReactor" id="PKC-DAG_PKC" name="PKC-DAG_PKC">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:PKC</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>S1</value>
+<value>Substance:/CELL/CYTOPLASM:DAG</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:DAG_PKC</value>
+<value>1</value>
+</property>
+
+<property name="k">
+<value>500</value>
+</property>
+</reactor>
+
+
+<reactor class="MassActionReactor" id="DAG_PKC-PKC" name="DAG_PKC-PKC">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:DAG_PKC</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:PKC</value>
+<value>1</value>
+</property>
+
+<property name="Reactant">
+<value>P1</value>
+<value>Substance:/CELL/CYTOPLASM:DAG</value>
+<value>1</value>
+</property>
+
+<property name="k">
+<value>0.00025</value>
+</property>
+</reactor>
+
+
+<reactor class="MassActionReactor" id="DAG_PKC-DAG_AA_PKC" name="DAG_PKC-DAG_AA_PKC">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:DAG_PKC</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>S1</value>
+<value>Substance:/CELL/CYTOPLASM:AA</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:DAG_AA_PKC</value>
+<value>1</value>
+</property>
+
+<property name="k">
+<value>10</value>
+</property>
+</reactor>
+
+
+<reactor class="MassActionReactor" id="DAG_AA_PKC-DAG_PKC" name="DAG_AA_PKC-DAG_PKC">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:DAG_AA_PKC</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:DAG_PKC</value>
+<value>1</value>
+</property>
+
+<property name="Reactant">
+<value>P1</value>
+<value>Substance:/CELL/CYTOPLASM:AA</value>
+<value>1</value>
+</property>
+
+<property name="k">
+<value>0.0005</value>
+</property>
+</reactor>
+
+
+<reactor class="MassActionReactor" id="PKC-AA_PKC" name="PKC-AA_PKC">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:PKC</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>S1</value>
+<value>Substance:/CELL/CYTOPLASM:AA</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:AA_PKC</value>
+<value>1</value>
+</property>
+
+<property name="k">
+<value>100</value>
+</property>
+</reactor>
+
+
+<reactor class="MassActionReactor" id="AA_PKC-PKC" name="AA_PKC-PKC">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:AA_PKC</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:PKC</value>
+<value>1</value>
+</property>
+
+<property name="Reactant">
+<value>P1</value>
+<value>Substance:/CELL/CYTOPLASM:AA</value>
+<value>1</value>
+</property>
+
+<property name="k">
+<value>0.005</value>
+</property>
+</reactor>
+
+
+<reactor class="MassActionReactor" id="Ca_PKC-Ca_AA_PKC" name="Ca_PKC-Ca_AA_PKC">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:Ca_PKC</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>S1</value>
+<value>Substance:/CELL/CYTOPLASM:AA</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:Ca_AA_PKC</value>
+<value>1</value>
+</property>
+
+<property name="k">
+<value>1500</value>
+</property>
+</reactor>
+
+
+<reactor class="MassActionReactor" id="Ca_AA_PKC-Ca_PKC" name="Ca_AA_PKC-Ca_PKC">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:Ca_AA_PKC</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:AA</value>
+<value>1</value>
+</property>
+
+<property name="Reactant">
+<value>P1</value>
+<value>Substance:/CELL/CYTOPLASM:Ca_PKC</value>
+<value>1</value>
+</property>
+
+<property name="k">
+<value>0.075</value>
+</property>
+</reactor>
+
+
+<reactor class="MassActionReactor" id="mGluR_Gq-Glu_mGluR_Gq" name="mGluR_Gq-Glu_mGluR_Gq">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:mGluR_Gq</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>S1</value>
+<value>Substance:/CELL/CYTOPLASM:Glu</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:Glu_mGluR_Gq</value>
+<value>1</value>
+</property>
+
+<property name="k">
+<value>10000</value>
+</property>
+</reactor>
+
+
+<reactor class="MassActionReactor" id="Glu_mGluR_Gq-mGluR_Gq" name="Glu_mGluR_Gq-mGluR_Gq">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:Glu_mGluR_Gq</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:mGluR_Gq</value>
+<value>1</value>
+</property>
+
+<property name="Reactant">
+<value>P1</value>
+<value>Substance:/CELL/CYTOPLASM:Glu</value>
+<value>1</value>
+</property>
+
+<property name="k">
+<value>0.00006</value>
+</property>
+</reactor>
+
+
+<reactor class="MassActionReactor" id="Glu_mGluR_Gq-GTP_Gbc_Glu" name="Glu_mGluR_Gq-GTP_Gbc_Glu">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:Glu_mGluR_Gq</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:GTP_Ga</value>
+<value>1</value>
+</property>
+
+<property name="Reactant">
+<value>P1</value>
+<value>Substance:/CELL/CYTOPLASM:Gbc</value>
+<value>1</value>
+</property>
+
+<property name="Reactant">
+<value>P2</value>
+<value>Substance:/CELL/CYTOPLASM:Glu_mGluR</value>
+<value>1</value>
+</property>
+
+<property name="k">
+<value>0.1</value>
+</property>
+</reactor>
+
+
+<reactor class="MassActionReactor" id="GTP_Gbc_Glu-Glu_mGluR_Gq" name="GTP_Gbc_Glu-Glu_mGluR_Gq">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:GTP_Ga</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>S1</value>
+<value>Substance:/CELL/CYTOPLASM:Gbc</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>S2</value>
+<value>Substance:/CELL/CYTOPLASM:Glu_mGluR</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:Glu_mGluR_Gq</value>
+<value>1</value>
+</property>
+
+<property name="k">
+<value>0.0000000001</value>
+</property>
+</reactor>
+
+
+<reactor class="MassActionReactor" id="GTP_Ga-GDP_Ga" name="GTP_Ga-GDP_Ga">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:GTP_Ga</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:GDP_Ga</value>
+<value>1</value>
+</property>
+
+<property name="k">
+<value>0.1</value>
+</property>
+</reactor>
+
+
+<reactor class="MassActionReactor" id="GTP_Ga-GTP_Ga_PLC" name="GTP_Ga-GTP_Ga_PLC">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:GTP_Ga</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>S1</value>
+<value>Substance:/CELL/CYTOPLASM:PLC</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:GTP_Ga_PLC</value>
+<value>1</value>
+</property>
+
+<property name="k">
+<value>1000</value>
+</property>
+</reactor>
+
+
+<reactor class="MassActionReactor" id="GTP_Ga_PLC-GTP_Ga" name="GTP_Ga_PLC-GTP_Ga">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:GTP_Ga_PLC</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:GTP_Ga</value>
+<value>1</value>
+</property>
+
+<property name="Reactant">
+<value>P1</value>
+<value>Substance:/CELL/CYTOPLASM:PLC</value>
+<value>1</value>
+</property>
+
+<property name="k">
+<value>0.0000397</value>
+</property>
+</reactor>
+
+
+<reactor class="MassActionReactor" id="DeIP3" name="DeIP3">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:IP3</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:N</value>
+<value>1</value>
+</property>
+
+<property name="k">
+<value>10</value>
+</property>
+</reactor>
+
+
+<reactor class="MassActionReactor" id="GDP_Ga-Gabc" name="GDP_Ga-Gabc">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:GDP_Ga</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>S1</value>
+<value>Substance:/CELL/CYTOPLASM:Gbc</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:Gabc</value>
+<value>1</value>
+</property>
+
+<property name="k">
+<value>500</value>
+</property>
+</reactor>
+
+
+<reactor class="MassActionReactor" id="Gabc-GDP_Ga" name="Gabc-GDP_Ga">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:Gabc</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:GDP_Ga</value>
+<value>1</value>
+</property>
+
+<property name="Reactant">
+<value>P1</value>
+<value>Substance:/CELL/CYTOPLASM:Gbc</value>
+<value>1</value>
+</property>
+
+<property name="k">
+<value>0.0000005</value>
+</property>
+</reactor>
+
+
+<reactor class="MassActionReactor" id="Glu_mGluR-mGluR_Glu" name="Glu_mGluR-mGluR_Glu">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:Glu_mGluR</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:MgluR</value>
+<value>1</value>
+</property>
+
+<property name="Reactant">
+<value>P1</value>
+<value>Substance:/CELL/CYTOPLASM:Glu</value>
+<value>1</value>
+</property>
+
+<property name="k">
+<value>0.1</value>
+</property>
+</reactor>
+
+
+<reactor class="MassActionReactor" id="DeGlu" name="DeGlu">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:Glu</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:N</value>
+<value>1</value>
+</property>
+
+<property name="k">
+<value>0.001</value>
+</property>
+</reactor>
+
+
+<reactor class="MassActionReactor" id="MgluR-mGluR_Gq" name="MgluR-mGluR_Gq">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:MgluR</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>S1</value>
+<value>Substance:/CELL/CYTOPLASM:Gabc</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:mGluR_Gq</value>
+<value>1</value>
+</property>
+
+<property name="k">
+<value>1000</value>
+</property>
+</reactor>
+
+
+<reactor class="MassActionReactor" id="mGluR_Gq-MgluR" name="mGluR_Gq-MgluR">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:mGluR_Gq</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:MgluR</value>
+<value>1</value>
+</property>
+
+<property name="Reactant">
+<value>P1</value>
+<value>Substance:/CELL/CYTOPLASM:Gabc</value>
+<value>1</value>
+</property>
+
+<property name="k">
+<value>0.00167</value>
+</property>
+</reactor>
+
+
+<!-- MichaerisUniUni -->
+<reactor class="MichaelisUniUniReactor" id="AMPAR-AMPAR-P1" name="AMPAR-AMPAR-P1">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:AMPAR</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:AMPAR-P</value>
+<value>1</value>
+</property>
+
+<property name="Reactant">
+<value>C0</value>
+<value>Substance:/CELL/CYTOPLASM:Ca_DAG_PKC</value>
+<value>0</value>
+</property>
+
+<property name="Km">
+<value>0.0000035</value>
+</property>
+
+<property name="Kcat">
+<value>1.5</value>
+</property>
+</reactor>
+
+
+<reactor class="MichaelisUniUniReactor" id="AMPAR-AMPAR-P2" name="AMPAR-AMPAR-P2">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:AMPAR</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:AMPAR-P</value>
+<value>1</value>
+</property>
+
+<property name="Reactant">
+<value>C0</value>
+<value>Substance:/CELL/CYTOPLASM:DAG_AA_PKC</value>
+<value>0</value>
+</property>
+
+<property name="Km">
+<value>0.0000035</value>
+</property>
+
+<property name="Kcat">
+<value>1.5</value>
+</property>
+</reactor>
+
+
+<reactor class="MichaelisUniUniReactor" id="AMPAR-AMPAR-P3" name="AMPAR-AMPAR-P3">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:AMPAR</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:AMPAR-P</value>
+<value>1</value>
+</property>
+
+<property name="Reactant">
+<value>C0</value>
+<value>Substance:/CELL/CYTOPLASM:AA_PKC</value>
+<value>0</value>
+</property>
+
+<property name="Km">
+<value>0.0000035</value>
+</property>
+
+<property name="Kcat">
+<value>1.5</value>
+</property>
+</reactor>
+
+
+<reactor class="MichaelisUniUniReactor" id="AMPAR-AMPAR-P4" name="AMPAR-AMPAR-P4">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:AMPAR</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:AMPAR-P</value>
+<value>1</value>
+</property>
+
+<property name="Reactant">
+<value>C0</value>
+<value>Substance:/CELL/CYTOPLASM:Ca_AA_PKC</value>
+<value>0</value>
+</property>
+
+<property name="Km">
+<value>0.0000035</value>
+</property>
+
+<property name="Kcat">
+<value>1.5</value>
+</property>
+</reactor>
+
+
+<reactor class="MichaelisUniUniReactor" id="AMPAR-P-AMPAR" name="AMPAR-P-AMPAR">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:AMPAR-P</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:AMPAR</value>
+<value>1</value>
+</property>
+
+<property name="Reactant">
+<value>C0</value>
+<value>Substance:/CELL/CYTOPLASM:PP2A</value>
+<value>0</value>
+</property>
+
+<property name="Km">
+<value>0.00001565</value>
+</property>
+
+<property name="Kcat">
+<value>6</value>
+</property>
+</reactor>
+
+
+<reactor class="MichaelisUniUniReactor" id="Raf-Raf-P1" name="Raf-Raf-P1">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:Raf</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:Raf-P</value>
+<value>1</value>
+</property>
+
+<property name="Reactant">
+<value>C0</value>
+<value>Substance:/CELL/CYTOPLASM:Ca_DAG_PKC</value>
+<value>0</value>
+</property>
+
+<property name="Km">
+<value>0.0000116</value>
+</property>
+
+<property name="Kcat">
+<value number="0">0.0335</value>
+</property>
+</reactor>
+
+
+<reactor class="MichaelisUniUniReactor" id="Raf-Raf-P2" name="Raf-Raf-P2">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:Raf</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:Raf-P</value>
+<value>1</value>
+</property>
+
+<property name="Reactant">
+<value>C0</value>
+<value>Substance:/CELL/CYTOPLASM:DAG_AA_PKC</value>
+<value>0</value>
+</property>
+
+<property name="Km">
+<value>0.0000116</value>
+</property>
+
+<property name="Kcat">
+<value>0.0335</value>
+</property>
+</reactor>
+
+
+<reactor class="MichaelisUniUniReactor" id="Raf-Raf-P3" name="Raf-Raf-P3">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:Raf</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:Raf-P</value>
+<value>1</value>
+</property>
+
+<property name="Reactant">
+<value>C0</value>
+<value>Substance:/CELL/CYTOPLASM:AA_PKC</value>
+<value>0</value>
+</property>
+
+<property name="Km">
+<value>0.0000116</value>
+</property>
+
+<property name="Kcat">
+<value>0.0335</value>
+</property>
+</reactor>
+
+
+<reactor class="MichaelisUniUniReactor" id="Raf-Raf-P4" name="Raf-Raf-P4">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:Raf</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:Raf-P</value>
+<value>1</value>
+</property>
+
+<property name="Reactant">
+<value>C0</value>
+<value>Substance:/CELL/CYTOPLASM:Ca_AA_PKC</value>
+<value>0</value>
+</property>
+
+<property name="Km">
+<value>0.0000116</value>
+</property>
+
+<property name="Kcat">
+<value>0.0335</value>
+</property>
+</reactor>
+
+
+<reactor class="MichaelisUniUniReactor" id="Raf-Raf-P22" name="Raf-Raf-P22">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:Raf</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:Raf-P</value>
+<value>1</value>
+</property>
+
+<property name="Reactant">
+<value>C0</value>
+<value>Substance:/CELL/CYTOPLASM:CRHR_CRF</value>
+<value>0</value>
+</property>
+
+<property name="Km">
+<value>0.00002</value>
+</property>
+
+<property name="Kcat">
+<value>0.0025</value>
+</property>
+</reactor>
+
+
+<reactor class="MichaelisUniUniReactor" id="Raf-Raf-P33" name="Raf-Raf-P33">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:Raf</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:Raf-P</value>
+<value>1</value>
+</property>
+
+<property name="Reactant">
+<value>C0</value>
+<value>Substance:/CELL/CYTOPLASM:Lyn_activate</value>
+<value>0</value>
+</property>
+
+<property name="Km">
+<value>0.00003</value>
+</property>
+
+<property name="Kcat">
+<value>0.08</value>
+</property>
+</reactor>
+
+
+<reactor class="MichaelisUniUniReactor" id="GTP-CGMP" name="GTP-CGMP">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:GTP</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:CGMP</value>
+<value>1</value>
+</property>
+
+<property name="Reactant">
+<value>C0</value>
+<value>Substance:/CELL/CYTOPLASM:NO_GC</value>
+<value>0</value>
+</property>
+
+<property name="Km">
+<value>0.000045</value>
+</property>
+
+<property name="Kcat">
+<value>7.35</value>
+</property>
+</reactor>
+
+
+<reactor class="MichaelisUniUniReactor" id="CGMP-5GMP" name="CGMP-5GMP">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:CGMP</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:5GMP</value>
+<value>1</value>
+</property>
+
+<property name="Reactant">
+<value>C0</value>
+<value>Substance:/CELL/CYTOPLASM:PDE</value>
+<value>0</value>
+</property>
+
+<property name="Km">
+<value>0.000002</value>
+</property>
+
+<property name="Kcat">
+<value>3.87</value>
+</property>
+</reactor>
+
+
+<reactor class="MichaelisUniUniReactor" id="G-Sub-G-Sub-P" name="G-Sub-G-Sub-P">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:G-Sub</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:G-Sub-P</value>
+<value>1</value>
+</property>
+
+<property name="Reactant">
+<value>C0</value>
+<value>Substance:/CELL/CYTOPLASM:cGMP_PKG</value>
+<value>0</value>
+</property>
+
+<property name="Km">
+<value>0.0000002</value>
+</property>
+
+<property name="Kcat">
+<value>0.72</value>
+</property>
+</reactor>
+
+
+<reactor class="MichaelisUniUniReactor" id="Raf-P-Raf" name="Raf-P-Raf">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:Raf-P</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:Raf</value>
+<value>1</value>
+</property>
+
+<property name="Reactant">
+<value>C0</value>
+<value>Substance:/CELL/CYTOPLASM:PP2A</value>
+<value>0</value>
+</property>
+
+<property name="Km">
+<value>0.0000157</value>
+</property>
+
+<property name="Kcat">
+<value>6</value>
+</property>
+</reactor>
+
+
+<reactor class="MichaelisUniUniReactor" id="MEK-MEK-P" name="MEK-MEK-P">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:MEK</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:MEK-P</value>
+<value>1</value>
+</property>
+
+<property name="Reactant">
+<value>C0</value>
+<value>Substance:/CELL/CYTOPLASM:Raf-P</value>
+<value>0</value>
+</property>
+
+<property name="Km">
+<value>0.000000398</value>
+</property>
+
+<property name="Kcat">
+<value>0.105</value>
+</property>
+</reactor>
+
+
+<reactor class="MichaelisUniUniReactor" id="MEK-P-MEK-PP" name="MEK-P-MEK-PP">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:MEK-P</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:MEK-PP</value>
+<value>1</value>
+</property>
+
+<property name="Reactant">
+<value>C0</value>
+<value>Substance:/CELL/CYTOPLASM:Raf-P</value>
+<value>0</value>
+</property>
+
+<property name="Km">
+<value>0.000000398</value>
+</property>
+
+<property name="Kcat">
+<value>0.105</value>
+</property>
+</reactor>
+
+
+<reactor class="MichaelisUniUniReactor" id="MEK-P-MEK" name="MEK-P-MEK">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:MEK-P</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:MEK</value>
+<value>1</value>
+</property>
+
+<property name="Reactant">
+<value>C0</value>
+<value>Substance:/CELL/CYTOPLASM:PP2A</value>
+<value>0</value>
+</property>
+
+<property name="Km">
+<value>0.0000157</value>
+</property>
+
+<property name="Kcat">
+<value>6</value>
+</property>
+</reactor>
+
+
+<reactor class="MichaelisUniUniReactor" id="MEK-PP-MEK-P" name="MEK-PP-MEK-P">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:MEK-PP</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:MEK-P</value>
+<value>1</value>
+</property>
+
+<property name="Reactant">
+<value>C0</value>
+<value>Substance:/CELL/CYTOPLASM:PP2A</value>
+<value>0</value>
+</property>
+
+<property name="Km">
+<value>0.0000157</value>
+</property>
+
+<property name="Kcat">
+<value>6</value>
+</property>
+</reactor>
+
+
+<reactor class="MichaelisUniUniReactor" id="MAPK-MAPK-P" name="MAPK-MAPK-P">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:MAPK</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:MAPK-P</value>
+<value>1</value>
+</property>
+
+<property name="Reactant">
+<value>C0</value>
+<value>Substance:/CELL/CYTOPLASM:MEK-PP</value>
+<value>0</value>
+</property>
+
+<property name="Km">
+<value>0.0000000463</value>
+</property>
+
+<property name="Kcat">
+<value>0.15</value>
+</property>
+</reactor>
+
+
+<reactor class="MichaelisUniUniReactor" id="MAPK-P-MAPK-PP" name="MAPK-P-MAPK-PP">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:MAPK-P</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:MAPK-PP</value>
+<value>1</value>
+</property>
+
+<property name="Reactant">
+<value>C0</value>
+<value>Substance:/CELL/CYTOPLASM:MEK-PP</value>
+<value>0</value>
+</property>
+
+<property name="Km">
+<value>0.0000000463</value>
+</property>
+
+<property name="Kcat">
+<value>0.15</value>
+</property>
+</reactor>
+
+
+<reactor class="MichaelisUniUniReactor" id="MAPK-P-MAPK" name="MAPK-P-MAPK">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:MAPK-P</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:MAPK</value>
+<value>1</value>
+</property>
+
+<property name="Reactant">
+<value>C0</value>
+<value>Substance:/CELL/CYTOPLASM:MKP1</value>
+<value>0</value>
+</property>
+
+<property name="Km">
+<value>0.000000167</value>
+</property>
+
+<property name="Kcat">
+<value>1</value>
+</property>
+</reactor>
+
+
+<reactor class="MichaelisUniUniReactor" id="MAPK-PP-MAPK-P" name="MAPK-PP-MAPK-P">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:MAPK-PP</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:MAPK-P</value>
+<value>1</value>
+</property>
+
+<property name="Reactant">
+<value>C0</value>
+<value>Substance:/CELL/CYTOPLASM:MKP1</value>
+<value>0</value>
+</property>
+
+<property name="Km">
+<value>0.000000167</value>
+</property>
+
+<property name="Kcat">
+<value>1</value>
+</property>
+</reactor>
+
+
+<reactor class="MichaelisUniUniReactor" id="APC-AA1" name="APC-AA1">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:APC</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:AA</value>
+<value>1</value>
+</property>
+
+<property name="Reactant">
+<value>C0</value>
+<value>Substance:/CELL/CYTOPLASM:Ca_PLA2</value>
+<value>0</value>
+</property>
+
+<property name="Km">
+<value>0.00002</value>
+</property>
+
+<property name="Kcat">
+<value>54</value>
+</property>
+</reactor>
+
+
+<reactor class="MichaelisUniUniReactor" id="APC-AA2" name="APC-AA2">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:APC</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:AA</value>
+<value>1</value>
+</property>
+
+<property name="Reactant">
+<value>C0</value>
+<value>Substance:/CELL/CYTOPLASM:DAG_Ca_PLA2</value>
+<value>0</value>
+</property>
+
+<property name="Km">
+<value>0.00002</value>
+</property>
+
+<property name="Kcat">
+<value>60</value>
+</property>
+</reactor>
+
+
+<reactor class="MichaelisUniUniReactor" id="APC-AA3" name="APC-AA3">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:APC</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:AA</value>
+<value>1</value>
+</property>
+
+<property name="Reactant">
+<value>C0</value>
+<value>Substance:/CELL/CYTOPLASM:PIP2_PLA2</value>
+<value>0</value>
+</property>
+
+<property name="Km">
+<value>0.00002</value>
+</property>
+
+<property name="Kcat">
+<value>11.04</value>
+</property>
+</reactor>
+
+
+<reactor class="MichaelisUniUniReactor" id="APC-AA4" name="APC-AA4">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:APC</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:AA</value>
+<value>1</value>
+</property>
+
+<property name="Reactant">
+<value>C0</value>
+<value>Substance:/CELL/CYTOPLASM:Ca_PIP2_PLA2</value>
+<value>0</value>
+</property>
+
+<property name="Km">
+<value>0.00002</value>
+</property>
+
+<property name="Kcat">
+<value>36</value>
+</property>
+</reactor>
+
+
+<reactor class="MichaelisUniUniReactor" id="PLA2-PLA2-P" name="PLA2-PLA2-P">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:PLA2</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:PLA2-P</value>
+<value>1</value>
+</property>
+
+<property name="Reactant">
+<value>C0</value>
+<value>Substance:/CELL/CYTOPLASM:MAPK-PP</value>
+<value>0</value>
+</property>
+
+<property name="Km">
+<value>0.0000256</value>
+</property>
+
+<property name="Kcat">
+<value>20</value>
+</property>
+</reactor>
+
+
+<reactor class="MichaelisUniUniReactor" id="APC-AA5" name="APC-AA5">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:APC</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:AA</value>
+<value>1</value>
+</property>
+
+<property name="Reactant">
+<value>C0</value>
+<value>Substance:/CELL/CYTOPLASM:PLA2-P</value>
+<value>0</value>
+</property>
+
+<property name="Km">
+<value>0.00002</value>
+</property>
+
+<property name="Kcat">
+<value>120</value>
+</property>
+</reactor>
+
+
+<reactor class="MichaelisUniUniReactor" id="PIP2-IP3" name="PIP2-IP3">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:PIP2</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:IP3</value>
+<value>1</value>
+</property>
+
+<property name="Reactant">
+<value>C0</value>
+<value>Substance:/CELL/CYTOPLASM:GTP_Ga_PLC</value>
+<value>0</value>
+</property>
+
+<property name="Km">
+<value>0.0000005</value>
+</property>
+
+<property name="Kcat">
+<value>48</value>
+</property>
+</reactor>
+
+
+<reactor class="MichaelisUniUniReactor" id="PIP2-DAG" name="PIP2-DAG">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:PIP2</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:DAG</value>
+<value>1</value>
+</property>
+
+<property name="Reactant">
+<value>C0</value>
+<value>Substance:/CELL/CYTOPLASM:GTP_Ga_PLC</value>
+<value>0</value>
+</property>
+
+<property name="Km">
+<value>0.0000005</value>
+</property>
+
+<property name="Kcat">
+<value>48</value>
+</property>
+</reactor>
+
+
+<!-- MakesignalP -->
+<reactor class="MakesignalPReactor" id="!ADD" name="add">
+<property name="Priority">
+<value>-1</value>
+</property>
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:NO</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:NO</value>
+<value>1</value>
+</property>
+
+<property name="add">
+<value>0.000000012</value>
+</property>
+</reactor>
+
+
+<reactor class="MakesignalPReactor" id="!ADDCa" name="addCa">
+<property name="Priority">
+<value>-1</value>
+</property>
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:Ca</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:Ca</value>
+<value>1</value>
+</property>
+
+<property name="add">
+<value>0.00000055</value>
+</property>
+</reactor>
+
+
+<reactor class="MakesignalPReactor" id="!ADDGlu" name="addGlu">
+<property name="Priority">
+<value>-1</value>
+</property>
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:Glu</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:Glu</value>
+<value>1</value>
+</property>
+
+<property name="add">
+<value>0.0000012</value>
+</property>
+</reactor>
+
+<!-- MAPPReactor -->
+<reactor class="MAPPReactor" id="!MAPact" name="MAPact">
+<property name="Priority">
+<value>-1</value>
+</property>
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:MAPK-P</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>S1</value>
+<value>Substance:/CELL/CYTOPLASM:MAPK-PP</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:MAPKactive</value>
+<value>1</value>
+</property>
+</reactor>
+
+<!-- PKCactivePReactor -->
+<reactor class="PKCactivePReactor" id="!PKC_PKCactive" name="PKC_PKC-active">
+<property name="Priority">
+<value>-1</value>
+</property>
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:Ca_DAG_PKC</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>S1</value>
+<value>Substance:/CELL/CYTOPLASM:DAG_AA_PKC</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>S2</value>
+<value>Substance:/CELL/CYTOPLASM:AA_PKC</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>S3</value>
+<value>Substance:/CELL/CYTOPLASM:Ca_AA_PKC</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:PKCactive</value>
+<value>1</value>
+</property>
+</reactor>
+
+
+
+</system>
+
+
+
+</eml>
