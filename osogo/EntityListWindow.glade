@@ -20,20 +20,15 @@
   <property name="type_hint">GDK_WINDOW_TYPE_HINT_NORMAL</property>
 
   <child>
-<widget class="GtkMenu" id="EntityPopupMenu">
-</widget>
-  </child>
-
-
-
-
-
-  <child>
   <widget class="GtkVBox" id="top_frame">
   <property name="visible">True</property>
   <property name="homogeneous">False</property>
   <property name="spacing">0</property>
 
+  <child>
+    <widget class="GtkMenu" id="EntityPopupMenu">
+    </widget>
+  </child>
 
   <child>
     <widget class="GtkHPaned" id="hpaned7">
