@@ -36,11 +36,11 @@ class PropertyWindow(PluginWindow):
 
         self.theSelected = ''
         
-        self.theFullID = FullPropertyNameToFullID( self.theFPNs[0] )
+        self.theFullID = convertFullPNToFullID( self.theFPNs[0] )
         self.theType = PrimitiveTypeString[ self.theFullID[TYPE] ]
         self.theID   = str( self.theFullID[ID] )
         self.thePath = str( self.theFullID[SYSTEMPATH] )
-        aFullPropertyName = FullIDToFullPropertyName( self.theFullID,
+        aFullPropertyName = convertFullIDToFullPN( self.theFullID,
                                                       'ClassName' )
         aList = self.theSimulator.getProperty( aFullPropertyName )
         self.theClassName  = aList[0]
@@ -63,12 +63,12 @@ class PropertyWindow(PluginWindow):
 
         self.theList = []
 
-        aFullPropertyName = FullIDToFullPropertyName( self.theFullID,
+        aFullPropertyName = convertFullIDToFullPN( self.theFullID,
                                                       'PropertyList' )
         aPropertyList =\
         list( self.theSimulator.getProperty( aFullPropertyName ) )
 
-        aAttributeList = FullIDToFullPropertyName(self.theFullID,
+        aAttributeList = convertFullIDToFullPN(self.theFullID,
                                                   'PropertyAttributes')
         aAttributeList =\
         list(self.theSimulator.getProperty( aAttributeList ))
@@ -89,7 +89,7 @@ class PropertyWindow(PluginWindow):
 
             else :
                 
-                aFullPropertyName = FullIDToFullPropertyName( self.theFullID,
+                aFullPropertyName = convertFullIDToFullPN( self.theFullID,
                                                           aProperty )
             
                 aValueList = self.theSimulator.getProperty( aFullPropertyName ) 
@@ -119,14 +119,14 @@ class PropertyWindow(PluginWindow):
 
         print aSelectedItem
         try:
-            aFullPropertyName = FullPropertyName( aSelectedItem[2] )
+            aFullPropertyName = getFullPN( aSelectedItem[2] )
         except ValueError:
             pass
 
         if not aFullPropertyName:
             try:
-                aFullID = FullID( aSelectedItem[2] )
-                aFullPropertyName = FullIDToFullPropertyName( aFullID )
+                aFullID = getFullID( aSelectedItem[2] )
+                aFullPropertyName = convertFullIDToFullPN( aFullID )
             except ValueError:
                 pass
             

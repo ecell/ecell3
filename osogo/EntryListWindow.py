@@ -44,7 +44,7 @@ class EntryListWindow(Window):
         self.theSystemTree.show()
         self.theEntryList.show()
 
-        aRootSystemFullID = FullID( 'System:/:/' )
+        aRootSystemFullID = getFullID( 'System:/:/' )
         self.constructTree( self.theSystemTree, aRootSystemFullID )
 
     def constructTree( self, aParentTree, aSystemFullID ):
@@ -53,7 +53,7 @@ class EntryListWindow(Window):
         aParentTree.append( aLeaf )
         aLeaf.show()
 
-        aSystemListFullPN = FullIDToFullPropertyName( aSystemFullID, 'SystemList' ) 
+        aSystemListFullPN = convertFullIDToFullPN( aSystemFullID, 'SystemList' ) 
         aSystemList = self.theSimulator.getProperty( aSystemListFullPN )
         if aSystemList != ():
             aTree = gtk.GtkTree()
@@ -83,7 +83,7 @@ class EntryListWindow(Window):
 
     def listEntity( self, aEntityTypeString, aSystemFullID ):
         aListPN = aEntityTypeString + 'List'
-        aListFullPN = FullIDToFullPropertyName( aSystemFullID, aListPN ) 
+        aListFullPN = convertFullIDToFullPN( aSystemFullID, aListPN ) 
         aEntityList = self.theSimulator.getProperty( aListFullPN )
         for aEntityID in aEntityList:
             aListItem = gtk.GtkListItem( aEntityID )
@@ -115,7 +115,7 @@ class EntryListWindow(Window):
     def updateStatusBar( self ):
         aStatusString = 'Selected: '
         for aFullPN in self.theSelectedFullPNList:
-            aStatusString += FullPropertyNameString( aFullPN )
+            aStatusString += getFullPNString( aFullPN )
             aStatusString += ', '
         self.theStatusBar.push( 1, aStatusString )
         
