@@ -35,10 +35,14 @@
 #include <functional>
 #include <limits>
 
-// for boost-1.32.0 or later.
-#include <boost/numeric/conversion/cast.hpp>
-// use this instead for boost-1.31 or 1.30.
-// #include <boost/cast.hpp>
+#include <boost/version.hpp>
+
+#if BOOST_VERSION >= 103200  // for boost-1.32.0 or later.
+#    include <boost/numeric/conversion/cast.hpp>
+#else                        // use this instead for boost-1.31 or earlier.
+#    include <boost/cast.hpp>
+#endif
+
 
 #include <boost/lexical_cast.hpp>
 #include <boost/static_assert.hpp>
