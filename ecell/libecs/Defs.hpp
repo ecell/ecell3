@@ -63,7 +63,7 @@ const int RANDOM_NUMBER_BUFFER_SIZE( 65535 );
 
 #include <string>
 
-DECLARE_TYPE( string, String );
+DECLARE_TYPE( std::string, String );
 
 
 // Numeric types
@@ -74,11 +74,7 @@ DECLARE_TYPE( uint64_t, UnsignedInt );
 const int INT_SIZE( sizeof( Int ) );
 
 DECLARE_TYPE( double, Real );
-DECLARE_TYPE( double, Mol );
 const int FLOAT_DIG( DBL_DIG );
-
-DECLARE_TYPE( Int, Quantity );
-DECLARE_TYPE( Real, Concentration );
 
 //! Avogadro number. 
 const Real N_A = 6.0221367e+23;

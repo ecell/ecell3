@@ -97,7 +97,7 @@ public:
     Invalid if haveConcentration() is false.
     @return Concentration in M (mol/L).
    */
-  Concentration getConcentration() 
+  Real getConcentration() 
   {
     if ( theConcentration < 0 ) 
       {
@@ -243,7 +243,7 @@ private:
 
   bool theFixed;
 
-  Concentration theConcentration;
+  Real theConcentration;
 };
 
 #endif /* ___SUBSTANCE_H___ */
