@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 20010904//EN"
+"http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+<!-- Created with Sodipodi ("http://www.sodipodi.com/") -->
+<svg
+   id="svg548"
+   sodipodi:version="0.32"
+   width="210mm"
+   height="297mm"
+   sodipodi:docbase="/usr/local/src/me/modeleditor/glade/"
+   sodipodi:docname="/usr/local/src/me/modeleditor/glade/variable.svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink">
+  <defs
+     id="defs550" />
+  <sodipodi:namedview
+     id="base" />
+  <rect
+     style="font-size:12;fill:#808080;fill-rule:evenodd;stroke-width:1pt;fill-opacity:0;"
+     id="rect554"
+     width="29.999997"
+     height="30.000003"
+     x="371.621277"
+     y="518.750626" />
+  <rect
+     style="font-size:12;fill:#6f9edc;fill-rule:evenodd;stroke-width:1pt;"
+     id="rect562"
+     width="23.887146"
+     height="24.075245"
+     x="374.665680"
+     y="521.620117"
+     ry="12.0376225" />
+  <text
+     style="fill:black;stroke:none;font-family:Aharoni;font-style:normal;font-weight:normal;font-size:72;fill-opacity:1;stroke-opacity:1;stroke-width:1pt;stroke-linejoin:miter;stroke-linecap:butt;text-anchor:middle;writing-mode:lr;"
+     x="1223.02108"
+     y="1536.92845"
+     id="text561"
+     transform="scale(0.316110,0.354383)">
+    <tspan
+       x="1223.02112"
+       y="1536.92847"
+       sodipodi:role="line"
+       id="tspan566">
+V</tspan>
+  </text>
+</svg>
