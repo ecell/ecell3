@@ -2,3 +2,9 @@ Makefile.in
 Makefile
 .libs
 .deps
+*.lo
+*.la
+IndirectPythonInterface.cxx
+cxx_extensions.cxx
+cxxextensions.c
+cxxsupport.cxx

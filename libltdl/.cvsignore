@@ -11,3 +11,5 @@ stamp-h
 Makefile
 .libs
 config.cache
+*.lo
+*.la
