@@ -540,14 +540,17 @@ class SystemObject(EditorObject):
     def getAvailableSystemShape(self):
             return self.theSystemShapeList
 
-    def getLargestChildPosX(self):
-        childProp=[]
+    def getLargestChildPosXY(self):
+        childMaxX = 0
+        childMaxY = 0
         childs=self.getObjectList()
         for ch in childs:
             achild=self.getObject(ch)
-            childProp.append(achild.getProperty(OB_POS_X)+achild.getProperty(OB_DIMENSION_X))
-        childProp.sort()
-        return childProp[len(childProp)-1]
+            chx = achild.getProperty(OB_POS_X)+achild.getProperty(OB_DIMENSION_X)
+            chy = achild.getProperty(OB_POS_Y)+achild.getProperty(OB_DIMENSION_Y)
+            childMaxX = max( childMaxX, chx )
+            childMaxY = max( childMaxY, chy )
+        return childMaxX, childMaxY
         
     
     def createRnOut(self):

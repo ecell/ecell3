@@ -189,6 +189,10 @@ gtk.main()\n\
        
 
     def message( self, text):
+        if type(text) == type(""): 
+            if text.find("\n") == -1:
+                self.theModelEditor.printMessage( text, ME_STATUSBAR )
+                return          
         self.theModelEditor.printMessage( text )
      
     def isRunning( self ):

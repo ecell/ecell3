@@ -126,6 +126,7 @@ class MEMainWindow( ListWindow ):
             'on_run_mode_clicked' : self.__run_mode_clicked
             })
         self.noModeToggle = False
+        self.comboEntryHandlerID = self['layout_name_entry'].connect('changed', self.__on_combo_entry_changed )
         self['ObjectWindow'].connect ( "switch-page", self.__changeNotebookTab )
         self['MEMainWindow'].connect("delete-event", self.deleted)     
         # set up message textbox buffer
@@ -145,9 +146,13 @@ class MEMainWindow( ListWindow ):
         self['entry4'].set_text(str(1))
         
         # update 
-        self['MEMainWindow'].maximize()        
+        self['MEMainWindow'].maximize()
+        self.theStatusBar = self['statusbar']
+        self.contextID = self.theStatusBar.get_context_id( "ME" )
         self.update()
         
+    def printOnStatusbar( self, aText ):
+        self.theStatusBar.push( self.contextID, aText )
         
     def setSmallWindow( self, aFrame ):
         if aFrame == self.smallWindowAttachment:
@@ -552,6 +557,7 @@ class MEMainWindow( ListWindow ):
         #self.update()
   
     def deleted( self, *arg ):
+        self['layout_name_entry'].disconnect(self.comboEntryHandlerID )
         self.theModelEditor.quitApplication()
         return gtk.TRUE
 

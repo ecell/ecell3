@@ -120,25 +120,18 @@ class Layout:
     #           COMMANDS        #
     #########################################
 
+    def __checkCounter ( self, objectID ):
+        i=len(objectID) -1
+        while not objectID[:i].isalpha():
+            i-=1
+        oid = long(objectID[i:])
+        if oid> self.theCounter:
+            self.theCounter = oid
 
     def createObject( self, objectID, objectType, aFullID=None, x=None, y=None, parentSystem = None  ):
         # object must be within a system except for textboxes 
         # parentSystem object cannot be None, just for root
-        '''
-        print '.....................................................................'
-        print 'FROM CREATE OBJECT ..................................................'
-        print str(objectID) + ' is ObjectID'
-        print str(objectType) + ' is ObjectType'
-        '''    
-        #print str(aFullID) + ' is aFullID'
-        
-        #   print str(parentSystem) + ' is parentSystem'
-        #if parentSystem != None:
-            #print parentSystem.getObjectList()
-        '''
-        print '.....................................................................'
-        print '.....................................................................'
-        '''
+        self.__checkCounter( objectID )
         if x == None and y == None:
             (x,y) = parentSystem.getEmptyPosition()
 
@@ -250,6 +243,7 @@ class Layout:
 
 
     def createConnectionObject( self, anObjectID, aProcessObjectID = None, aVariableObjectID=None,  processRing=None, variableRing=None, direction = PROCESS_TO_VARIABLE, aVarrefName = None ):
+        self.__checkCounter( anObjectID )
         # if processobjectid or variableobjectid is None -> no change on their part
         # if process or variableID is the same as connection objectid, means that it should be left unattached
         # direction is omitted

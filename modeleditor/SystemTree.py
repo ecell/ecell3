@@ -107,9 +107,11 @@ class SystemTree(ViewComponent):
     def generateLayout(self):
         #print self.theSelection
 
-
+        if not self.theModelEditor.theRuntimeObject.checkState( ME_DESIGN_MODE ):
+            return
         layoutName = self.theModelEditor.theLayoutManager.getUniqueLayoutName()
         #print layoutName
+        
         self.theModelEditor.theMainWindow.displayHourglass()
         self.theAutoLayout = AutoLayout(self.theModelEditor,layoutName,self.theSelection)
         self.theModelEditor.theMainWindow.resetCursor()

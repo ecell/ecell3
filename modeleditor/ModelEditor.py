@@ -451,7 +451,7 @@ class ModelEditor:
         self.theModelName = os.path.split( aFileName )[1]
         self.modelHasName = True
         self.changesSaved = True
-        self.printMessage("Model %s loaded successfully."%aFileName )
+        self.printMessage("Model %s loaded successfully."%aFileName, ME_STATUSBAR )
         self.updateWindows()
        
 
@@ -539,7 +539,7 @@ class ModelEditor:
         self.__addToRecentFileList ( aFileName )
         self.isConverted = True
         self.theModelFileName = aFileName
-        self.printMessage("Model %s saved successfully."%aFileName )
+        self.printMessage("Model %s saved successfully."%aFileName, ME_STATUSBAR )
         self.theModelName = os.path.split( aFileName )[1]
         self.modelHasName = True
         self.changesSaved = True
@@ -764,21 +764,23 @@ class ModelEditor:
     def __data_received( self, *args ):
         # selection data is expecyed in a format of
         # "modelfile1 resultfile1 fullpn1 value range_min range_max,modelfile2 resultfile2 fullpn2 value range_min range_max"
-        
+        if not self.theRuntimeObject.changeToDesignMode():
+            self.printMessage( "Property values were not updated.", ME_WARNING )
+            return
         selectionData = args[4]
         selectionList = map(lambda x: x.split(" "), selectionData.data.split(",") )
         for anEntry in selectionList:
             fullPN = anEntry[2]
             newValue = anEntry[3]
             
-            if fullPN.split(":")[0] == ME_STEPPER_TYPE:
-                aCommand = ChangeStepperProperty( self, fullPN.split("")[1], fullPN.split(":")[0], newValue )
+            if len(fullPN.split(":")) == 2:
+                aCommand = ChangeStepperProperty( self, fullPN.split(":")[0], fullPN.split(":")[1], newValue )
             else:
                 aCommand = ChangeEntityProperty( self, fullPN, newValue )
 
             if aCommand.isExecutable():
                 self.doCommandList( [ aCommand ] )
-                self.printMessage( "Property %s updated to %s."%(fullPN, newValue ), ME_PLAINMESSAGE )
+                self.printMessage( "Property %s updated to %s."%(fullPN, newValue ), ME_STATUSBAR )
             else:
                 self.printMessage( "Illegal value or property doesnot exist for %s. Property was not updated!"%fullPN, ME_ERROR )
 
@@ -890,6 +892,12 @@ class ModelEditor:
             msgWin = ConfirmWindow( OK_MODE, aMessageText, 'Warning!')
         elif aType == ME_ERROR:
             msgWin = ConfirmWindow( OK_MODE, aMessageText, 'ERROR!')
+        elif aType == ME_STATUSBAR:
+            if self.theMainWindow.exists():
+                self.theMainWindow.printOnStatusbar( aMessageText )
+            else:
+                print aMessage
+                
 
     def createPopupMenu( self, aComponent, anEvent ):
         self.setLastUsedComponent( aComponent )

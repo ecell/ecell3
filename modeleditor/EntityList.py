@@ -250,7 +250,9 @@ class EntityList(ViewComponent):
 
                 
     def generateLayout(self):
-      
+        if not self.theModelEditor.theRuntimeObject.checkState( ME_DESIGN_MODE ):
+            return
+
         layoutName = self.theModelEditor.theLayoutManager.getUniqueLayoutName()
         self.theModelEditor.theMainWindow.displayHourglass()
         self.theAutoLayout = AutoLayout(self.theModelEditor,layoutName,self.theSelection, True)

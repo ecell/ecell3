@@ -156,17 +156,23 @@ class CommandMultiplexer:
                 newDimx, newDimy = self.theModelEditor.theShapePluginManager.getMinDims( theObject.getProperty( OB_TYPE), chgdValue, theObject.getGraphUtils(),newLabel )
 
                 oldDimx=theObject.getProperty(OB_DIMENSION_X)
+                oldDimy=theObject.getProperty(OB_DIMENSION_Y)
                 deltaWidth=newDimx-oldDimx
+                deltaHeight=newDimy-oldDimy
                 #no resize necessary for system child if newDimx is smaller
                 if aType==ME_SYSTEM_TYPE:
                     noChild=len(theObject.getObjectList())
                     if noChild>0:
-                        largestDim=theObject.getLargestChildPosX()
-                        if largestDim>newDimx:
-                            deltaWidth=largestDim-oldDimx
+                        largestDimX, largestDimY=theObject.getLargestChildPosXY()
+                        if largestDimX>newDimx:
+                            deltaWidth=largestDimX-oldDimx
+                        if largestDimY>newDimy:
+                            deltaHeight=largestDimY-oldDimy
                     if deltaWidth<0:
                         deltaWidth=0
-                resizeCommand = ResizeObject(theObject.getLayout(), chgdID,0, 0, 0, deltaWidth )
+                    if deltaHeight<0:
+                        deltaHeight = 0
+                resizeCommand = ResizeObject(theObject.getLayout(), chgdID,0, deltaHeight, 0, deltaWidth )
                 returnCmdList.append( resizeCommand )
                 
             if chgdProperty in GLOBALPROPERTYSET:

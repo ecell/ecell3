@@ -1139,8 +1139,7 @@
 					  <property name="has_frame">True</property>
 					  <property name="invisible_char" translatable="yes">*</property>
 					  <property name="activates_default">False</property>
-					  <signal name="editing_done" handler="on_layout_name_entry_editing_done" last_modification_time="Tue, 23 Nov 2004 03:51:45 GMT"/>
-					  <signal name="changed" handler="on_layout_name_entry_changed" last_modification_time="Tue, 23 Nov 2004 03:52:19 GMT"/>
+					  <signal name="editing_done" handler="on_layout_name_entry_changed" last_modification_time="Sun, 23 Jan 2005 10:29:06 GMT"/>
 					</widget>
 				      </child>
 
