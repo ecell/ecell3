@@ -17,6 +17,7 @@ class BargraphWindow( PluginWindow ):
         if self.theDriver.isNumber( self.theFullPN() ):
 
             self.openWindow()
+            self.thePluginManager.appendInstance( self )                    
             PluginWindow.initialize( self, root )
             self.initialize()
 

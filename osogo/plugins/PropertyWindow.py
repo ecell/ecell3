@@ -12,6 +12,7 @@ class PropertyWindow(PluginWindow):
         PluginWindow.__init__( self, dirname, data, pluginmanager, root )
 
         self.openWindow()
+        self.thePluginManager.appendInstance( self )        
         PluginWindow.initialize( self, root )
         self.initialize()
 

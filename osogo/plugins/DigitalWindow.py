@@ -11,10 +11,10 @@ class DigitalWindow( PluginWindow ):
     def __init__( self, dirname, data, pluginmanager, root=None ):
 
         PluginWindow.__init__( self, dirname, data, pluginmanager, root )
-        
         if self.theDriver.isNumber( self.theFullPN() ):
 
             self.openWindow()
+            self.thePluginManager.appendInstance( self )
             PluginWindow.initialize( self, root )
             self.initialize()
 
@@ -34,7 +34,8 @@ class DigitalWindow( PluginWindow ):
 
         self.addHandlers( { 'input_value'    :self.inputValue,
                             'increase_value' :self.increaseValue,
-                            'decrease_value' :self.decreaseValue } )
+                            'decrease_value' :self.decreaseValue,
+                            'test' :self.test} )
 
         aString = str( self.theFullPN()[ID] )
         aString += ':\n' + str( self.theFullPN()[PROPERTY] )
@@ -65,6 +66,8 @@ class DigitalWindow( PluginWindow ):
 
         self.setValue( self.theFullPN(), self.getValue( self.theFullPN() ) * 0.5 )
 
+    def test( self, obj ):
+        print 'you did it'
 
 ### test code
 

@@ -19,15 +19,35 @@ class TracerWindow( PluginWindow ):
 
 	PluginWindow.__init__( self, dirname, data, pluginmanager, root )
 
+        IDflag = 1
+        if len( self.theFullPNList() ) > 1:
+            for aFullID in self.theFullIDList():
+                if aFullID == self.theFullID():
+                    IDflag = 0
+                else:
+                    IDflag = 1
         
-
-        self.openWindow()
-        PluginWindow.initialize( self, root )
-        self.initialize()
-
+        if IDflag == 1:
+            if self.theDriver.isNumber(self.theFullPN()):
+                self.openWindow()
+                self.thePluginManager.appendInstance( self )                    
+                PluginWindow.initialize( self, root )
+                self.initialize()
+            else:
+                aFullPNString = createFullPNString( self.theFullPN() )
+                self.theSession.printMessage( "%s: not numerical data\n" % aFullPNString )                    
+                
+        else:
+            aClassName = self.__class__.__name__
+            for aFullPN in self.theFullPNList():
+                if self.theDriver.isNumber( aFullPN ):
+                    a = self.thePluginManager.createInstance( aClassName, (aFullPN,), root)
+                else:
+                    aFullPNString = createFullPNString( self.theFullPN() )     
+                    self.theSession.printMessage( "%s: not numerical data\n" % aFullPNString )                    
+            
 
     def initialize( self ):
-
         self.xaxis = None
         self.yaxis = None
         self.arg = 0
