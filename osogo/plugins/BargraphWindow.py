@@ -6,6 +6,7 @@ import gtk.gdk
 import re
 import string
 import operator
+import os
 from Plot import *
 from ecell.ecssupport import *
 from OsogoPluginWindow import *
@@ -96,7 +97,9 @@ class BargraphWindow( OsogoPluginWindow ):
 		self.ccFullPN=self.theFullPNList()[0]
 		nameFullPN=createFullPNString(self.ccFullPN)
 		self.textlabel.set_text(nameFullPN)
-
+                self.setIconList(
+			os.environ['OSOGOPATH'] + os.sep + "ecell.png",
+			os.environ['OSOGOPATH'] + os.sep + "ecell32.png")
 		self.update()
 
 	def update(self):

@@ -39,6 +39,7 @@ B-sample-rule.py\
 samplerule.py\
 sample-script.py\
 ecell.png\
+ecell32.png\
 ecell_large.png\
 icon_board.png\
 icon_ecell.png\

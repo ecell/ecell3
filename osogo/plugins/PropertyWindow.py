@@ -11,6 +11,7 @@ SETTABLE_COL  = 3
 
 import gobject
 import gtk
+import os
 
 PROPERTY_COL_TYPE=gobject.TYPE_STRING
 VALUE_COL_TYPE=gobject.TYPE_STRING
@@ -83,7 +84,9 @@ class PropertyWindow(OsogoPluginWindow):
 
 		if self.theRawFullPNList == ():
 			return
-
+                self.setIconList(
+			os.environ['OSOGOPATH'] + os.sep + "ecell.png",
+			os.environ['OSOGOPATH'] + os.sep + "ecell32.png")
 		#self.__setFullPNList()
 		self.update(True)
 

@@ -5,6 +5,7 @@ from OsogoPluginWindow import *
 from ecell.ecssupport import *
 import operator
 import ConfirmWindow
+import os
 
 # ------------------------------------------------------
 # DigitalWindow -> OsogoPluginWindow
@@ -62,7 +63,9 @@ class DigitalWindow( OsogoPluginWindow ):
 			self["value_frame"].set_editable( FALSE )
 			self["increase_button"].set_sensitive( FALSE )
 			self["decrease_button"].set_sensitive( FALSE )
-
+                self.setIconList(
+			os.environ['OSOGOPATH'] + os.sep + "ecell.png",
+			os.environ['OSOGOPATH'] + os.sep + "ecell32.png")
 		self.update()
 
 	# ------------------------------------------------------

@@ -44,12 +44,11 @@ class  AboutSessionMonitor:
 		self.win.vbox.pack_start( att_box )
 		# Sets title
 		self.win.set_title('About Session Monitor')
-		iconPixbuf = None
-		try:
-			iconPixbuf = gtk.gdk.pixbuf_new_from_file(os.environ['OSOGOPATH'] + os.sep + 'plugins' + os.sep + 'ecell.ico')
-		except:
-			pass
-		self.win.set_icon(iconPixbuf)
+		aPixbuf16 = gtk.gdk.pixbuf_new_from_file(
+                               os.environ['OSOGOPATH'] + os.sep + 'ecell.png')
+		aPixbuf32 = gtk.gdk.pixbuf_new_from_file(
+                               os.environ['OSOGOPATH'] + os.sep + 'ecell32.png')
+		self.win.set_icon_list(aPixbuf16, aPixbuf32)
 		widgets.get_widget("label1").set_markup("<b>E-Cell Session Monitor Version " + os.environ["VERSION"] + "</b>")
 		self.win.show_all()
 		

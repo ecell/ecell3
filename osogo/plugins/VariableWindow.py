@@ -2,6 +2,7 @@
 
 import string
 import operator
+import os
 
 from OsogoPluginWindow import *
 from ecell.ecssupport import *
@@ -115,7 +116,9 @@ class VariableWindow( OsogoPluginWindow ):
 
 		# sets FULLID to label 
 		self["id_label"].set_text( self.theFullIDString )
-
+                self.setIconList(
+			os.environ['OSOGOPATH'] + os.sep + "ecell.png",
+			os.environ['OSOGOPATH'] + os.sep + "ecell32.png")
 		# sets value to each entry and fix_checkbox
 		self.update()
 

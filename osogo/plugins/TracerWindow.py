@@ -12,6 +12,7 @@ from ecell.ecssupport import *
 import ConfirmWindow
 from OsogoPluginWindow import *
 from ConfirmWindow import *
+import os
 
 COL_LOG=2
 COL_PIX=1
@@ -106,6 +107,9 @@ class TracerWindow( OsogoPluginWindow ):
 		self.ListWindow.connect("button-press-event",self.button_pressed_on_list)
 		self['button12'].set_label('Log10 Scale')
 
+                self.setIconList(
+			os.environ['OSOGOPATH'] + os.sep + "ecell.png",
+			os.environ['OSOGOPATH'] + os.sep + "ecell32.png")
 
 		#addtrace to plot
 		self.addtrace_to_plot(self.theFullPNList())

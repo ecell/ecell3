@@ -145,7 +145,9 @@ class MainWindow(OsogoWindow):
 			'on_scrolledwindow1_expose_event'	: self.__expose
 		}
 		self.addHandlers( self.theHandlerMap )
-
+                self.setIconList(
+			os.environ['OSOGOPATH'] + os.sep + "ecell.png",
+			os.environ['OSOGOPATH'] + os.sep + "ecell32.png")
 
 
 		self.__setMenuAndButtonsStatus( FALSE )
@@ -286,9 +288,13 @@ class MainWindow(OsogoWindow):
 			# creates FileSelection
 			self.theFileSelection = gtk.FileSelection()
 			self.theFileSelection.connect('delete_event', self.__deleteFileSelection )
-			self.theFileSelection.cancel_button.connect('clicked', self.__deleteFileSelection)
-			iconPixbuf = gtk.gdk.pixbuf_new_from_file(os.environ['OSOGOPATH'] + os.sep + 'plugins' + os.sep + "ecell.ico")
-			self.theFileSelection.set_icon(iconPixbuf)
+			self.theFileSelection.cancel_button.connect('clicked', self.__deleteFileSelection) 
+                        aPixbuf16 = gtk.gdk.pixbuf_new_from_file(
+                              os.environ['OSOGOPATH'] + os.sep + 'ecell.png')
+                        aPixbuf32 = gtk.gdk.pixbuf_new_from_file(
+                              os.environ['OSOGOPATH'] + os.sep + 'ecell32.png')
+                        self.theFileSelection.set_icon_list(
+                                        aPixbuf16, aPixbuf32)
 
 			# when 'Load Model' is selected
 			if aType == 'Load' and aTarget == 'Model':
