@@ -64,6 +64,7 @@ class LoggerWindow(OsogoWindow):
 		self.theDefaultSaveDirectory='Data'
 		self.thePopupMenu = PopupMenu( self )
 		self.theList = []
+		self.theSimulator = self.theSession.theSimulator
 
 		# ---------------------------------------------------------------
 		# Creates save file selection
@@ -342,7 +343,7 @@ class LoggerWindow(OsogoWindow):
 				# Gets logger
 				# -------------------------------------------------
 #                               need check if the logger exists
-				aLoggerStub = LoggerStub( theSimulator, aFullPNString )
+				aLoggerStub = LoggerStub( self.theSimulator, aFullPNString )
 				if not aLoggerStub.isExist():
 					aErrorMessage='\nLogger doesn\'t exist.!\n'
 					aWarningWindow = ConfirmWindow(0,aErrorMessage)
