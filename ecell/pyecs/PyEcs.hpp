@@ -1,7 +1,7 @@
 #if ! defined( __PYECS_HPP )
 #define __PYECS_HPP
 
-// for ::memcpy()
+// for memcpy()
 #include <string.h>
 
 #include <boost/cast.hpp>
@@ -171,7 +171,7 @@ const libecs::Polymorph from_python( PyObject* aPyObjectPtr,
 }
 
 inline const libecs::Polymorph from_python( PyObject* aPyObjectPtr,
-				     type<libecs::PolymorphCref> )
+					    type<libecs::PolymorphCref> )
 {
   return from_python( aPyObjectPtr, type<libecs::Polymorph>() );
 }
@@ -230,9 +230,9 @@ PyObject* to_python( libecs::DataPointVectorCref aVector )
 				( PyArray_FromDims( 2, aDimensions, 
 						    PyArray_DOUBLE ) ) );
 
-  ::memcpy( anArrayObject->data, 
-	    aVector.getRawArray(),   
-	    aVector.getSize() * aVector.getElementSize() );
+  memcpy( anArrayObject->data, 
+	  aVector.getRawArray(),   
+	  aVector.getSize() * aVector.getElementSize() );
 
   return PyArray_Return( anArrayObject );
 }
