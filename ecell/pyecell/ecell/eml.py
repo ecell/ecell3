@@ -329,11 +329,12 @@ class Model:
 class EmlParser:
     """This class parses EML file to PreModel Object."""
 
-    def __init__( self, aFile ):
+    def __init__( self, aFileObject ):
         """read EML file and make Document Object"""
-        self.__theFile = aFile
 
-        aFileObject = open( aFile )
+
+        self.__theFileObject = aFileObject
+
         aFileList   = aFileObject.readlines()
         aStringData = string.join( string.join( aFileList, '' ).split( '\n' ), '' )
         self.__theDocument = minidom.parseString( aStringData )
@@ -361,7 +362,7 @@ class EmlParser:
 
 
         ## Temporary Path Convert for 3.0.0, refactor!!
-        aPathConverter = ConvertPath( self.__theFile )
+        aPathConverter = ConvertPath( self.__theDocument )
         aPathConverter.createPathList( 'None' )
         
         for aTargetEntity in( aPreModel['entity'] ):
@@ -494,13 +495,10 @@ class EmlParser:
 class ConvertPath:
     """convert relative path to absolute path"""
 
-    def __init__( self, anEmlFile ):
+    def __init__( self, aDocumentObject ):
         """initialize self.__thePedigreeList"""
-        aFileObject = open( anEmlFile )
-        aFileList   = aFileObject.readlines()
-        aStringData = string.join( string.join( aFileList, '' ).split( '\n' ), '' )
-        self.__theDocument = minidom.parseString( aStringData )
 
+        self.__theDocument = aDocumentObject
         self.__thePedigreeList = []
         
 
