@@ -339,7 +339,6 @@ class Interpret(GenericASTTraversal):
 		if path != '':
 			anID = path + ':' + anID
 
-		print aType, anID
 		aFullID = convert2FullID( self.eml , aType, anID)
 		self.eml.createEntity( aClassname, aFullID )
 		
