@@ -128,19 +128,31 @@ namespace libecs
     
     
     /**
-       Set activity variable.  This must be set at every turn and takes
-       [number of molecule that this process yields] / [deltaT].
-       However, public activity() method returns it as number of molecule
-       per a second, not per deltaT.
+       Set activity value.
 
-       @param activity [number of molecule that this yields] / [deltaT].
-       @see getActivity(), getActivityPerSecond()
+       Semantics of this property can be defined in each subclass of
+       Process.  Usually it is a turnover number if the Process represents a
+       chemical reaction.
+
+       If the value has time in its dimension, the unit should be [per
+       second], not [per step], to keep its meaning in
+       multi-stepper simulations.
+
+       @param anActivity An activity value to be set.
+       @see getActivity()
     */
 
     void setActivity( RealCref anActivity ) 
     { 
       theActivity = anActivity; 
     }
+
+    /**
+       Get activity value.
+
+       @see setActivity()
+       @return the activity value of this Process.
+    */
 
     const Real getActivity() const
     {
@@ -176,6 +188,7 @@ namespace libecs
     /**
        @return a const reference to the VariableReferenceVector
     */
+
     VariableReferenceVectorCref getVariableReferenceVector() const
     {
       return theVariableReferenceVector;

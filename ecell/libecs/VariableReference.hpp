@@ -96,35 +96,88 @@ namespace libecs
 
     VariableReference()
       :
-      theVariable( NULLPTR ),
-      theCoefficient( 0 )
+      theVariablePtr( NULLPTR ),
+      theCoefficient( 0 ),
+      theIsAccessor( true )
     {
       ; // do nothing
     }
 
     VariableReference( StringCref aName, 
 		       VariablePtr aVariablePtr, 
-		       const Int aCoefficient ) 
+		       const Int aCoefficient,
+		       const bool anIsAccessor = true ) 
       : 
       theName( aName ),
-      theVariable( aVariablePtr ), 
-      theCoefficient( aCoefficient )
+      theVariablePtr( aVariablePtr ), 
+      theCoefficient( aCoefficient ),
+      theIsAccessor( anIsAccessor )
     {
       ; // do nothing
     }
 
     ~VariableReference() {}
 
-    StringCref  getName() const { return theName; }
-    VariablePtr getVariable() const { return theVariable; }
-    const Int   getCoefficient() const { return theCoefficient; }
+    void setName( StringCref aName )
+    {
+      theName = aName;
+    }
+
+    StringCref getName() const 
+    { 
+      return theName; 
+    }
+
+    void setVariable( const VariablePtr aVariablePtr )
+    {
+      theVariablePtr = aVariablePtr;
+    }
+
+    VariablePtr getVariable() const 
+    { 
+      return theVariablePtr; 
+    }
+
+    void setCoeffieicnt( IntCref aCoefficient )
+    {
+      theCoefficient = aCoefficient;
+    }
+
+    const Int getCoefficient() const 
+    { 
+      return theCoefficient; 
+    }
+
+    const bool isMutator() const
+    {
+      if( theCoefficient == 0 )
+	{
+	  return false;
+	}
+      else
+	{
+	  return true;
+	}
+    }
+
+    void setIsAccessor( const bool anIsAccessor )
+    {
+      theIsAccessor = anIsAccessor;
+    }
+
+    const bool isAccessor() const
+    {
+      return theIsAccessor;
+    }
+
 
   private:
 
     String      theName;
-    VariablePtr theVariable;
+    VariablePtr theVariablePtr;
     Int         theCoefficient;
-    // bool mutable
+    bool        theIsAccessor;
+
   };
 
   //@}
