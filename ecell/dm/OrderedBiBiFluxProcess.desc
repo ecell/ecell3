@@ -24,5 +24,5 @@ KmS1,FLOAT,1.0,1111
 Name,STRING,"",1111
 Priority,INTEGER,0,1111
 StepperID,STRING,"",1111
-VariableReferenceListNESTED_LIST,[],1111
+VariableReferenceList,NESTED_LIST,[],1111
 END
