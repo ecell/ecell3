@@ -1,69 +1,41 @@
-<?xml version="1.0"?>
-<GTK-Interface>
+<?xml version="1.0" standalone="no"?> <!--*- mode: xml -*-->
+<!DOCTYPE glade-interface SYSTEM "http://glade.gnome.org/glade-2.0.dtd" >
 
-<project>
-  <directory></directory>
-  <source_directory>src</source_directory>
-  <pixmaps_directory>pixmaps</pixmaps_directory>
-  <language>C</language>
-  <gnome_support>True</gnome_support>
-  <gettext_support>True</gettext_support>
-</project>
+<glade-interface>
+  <widget class="GtkMenu" id="menu">
+    <property name="visible">yes</property>
 
-<widget>
-  <class>GtkMenu</class>
-  <name>menu</name>
+    <child>
+      <widget class="GtkMenuItem" id="copy_fullpnlist">
+        <property name="label" translatable="yes">Copy FullPropertyNameList</property>
+        <property name="visible">yes</property>
 
-  <widget>
-    <class>GtkMenuItem</class>
-    <name>copy_fullpnlist</name>
-    <accelerator>
-      <modifiers>GDK_CONTROL_MASK</modifiers>
-      <key>GDK_c</key>
-      <signal>activate</signal>
-    </accelerator>
-    <signal>
-      <name>activate</name>
-      <handler>copy_fullpnlist</handler>
-      <last_modification_time>Thu, 13 Sep 2001 09:49:24 GMT</last_modification_time>
-    </signal>
-    <label>Copy FullPropertyNameList</label>
-    <right_justify>False</right_justify>
+        <signal name="activate" handler="copy_fullpnlist" />
+
+        <accelerator key="c" modifiers="GDK_CONTROL_MASK" signal="activate" />
+      </widget>
+    </child>
+
+    <child>
+      <widget class="GtkMenuItem" id="paste_fullpnlist">
+        <property name="label" translatable="yes">Paste FullPropertyNameList</property>
+        <property name="visible">yes</property>
+
+        <signal name="activate" handler="paste_fullpnlist" />
+
+        <accelerator key="v" modifiers="GDK_CONTROL_MASK" signal="activate" />
+      </widget>
+    </child>
+
+    <child>
+      <widget class="GtkMenuItem" id="add_fullpnlist">
+        <property name="label" translatable="yes">Add FullPN to FullPNList</property>
+        <property name="visible">yes</property>
+
+        <signal name="activate" handler="add_fullpnlist" />
+
+        <accelerator key="v" modifiers="GDK_CONTROL_MASK | GDK_SHIFT_MASK" signal="activate" />
+      </widget>
+    </child>
   </widget>
-
-  <widget>
-    <class>GtkMenuItem</class>
-    <name>paste_fullpnlist</name>
-    <accelerator>
-      <modifiers>GDK_CONTROL_MASK</modifiers>
-      <key>GDK_v</key>
-      <signal>activate</signal>
-    </accelerator>
-    <signal>
-      <name>activate</name>
-      <handler>paste_fullpnlist</handler>
-      <last_modification_time>Thu, 13 Sep 2001 09:49:34 GMT</last_modification_time>
-    </signal>
-    <label>Paste FullPropertyNameList</label>
-    <right_justify>False</right_justify>
-  </widget>
-
-  <widget>
-    <class>GtkMenuItem</class>
-    <name>add_fullpnlist</name>
-    <accelerator>
-      <modifiers>GDK_CONTROL_MASK | GDK_SHIFT_MASK</modifiers>
-      <key>GDK_v</key>
-      <signal>activate</signal>
-    </accelerator>
-    <signal>
-      <name>activate</name>
-      <handler>add_fullpnlist</handler>
-      <last_modification_time>Thu, 13 Sep 2001 10:12:54 GMT</last_modification_time>
-    </signal>
-    <label>Add FullPN to FullPNList</label>
-    <right_justify>False</right_justify>
-  </widget>
-</widget>
-
-</GTK-Interface>
+</glade-interface>

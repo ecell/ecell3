@@ -2,9 +2,9 @@
 
 from OsogoWindow import *
 
-from gtk import *
+import gtk
 from ecell.ecssupport import *
-
+import gobject
 import MainWindow
 
 import string
@@ -35,11 +35,10 @@ class EntityListWindow(OsogoWindow):
 
 		# creates popupmenu
 		self.thePopupMenu = PopupMenu( aMainWindow.thePluginManager, self )
-
 		# adds handers
 		self.addHandlers( { 'show_button_clicked'           : self.openNewPluginWindow,
-		                    'system_tree_selection_changed' : self.updateEntityList,
-		                    'entity_list_selection_changed'  : self.selectEntity,
+		                    'system_tree_cursor_changed' : self.updateEntityList,
+		                    'entity_list_cursor_changed'  : self.selectEntity,
 		                    'tree_button_press_event'    : self.popupMenu,
 		                    'list_button_press_event'    : self.popupMenu,
 		                     } )
@@ -64,56 +63,97 @@ class EntityListWindow(OsogoWindow):
 
 		self.theSystemTree.show()
 		self.theEntityList.show()
+		#initialize treestore arbitrarily for 17 levels    
+		self.max_depth=16
+		self.displayed_depth=-1
+		
+		self.theSysTreeStore=gtk.TreeStore(gobject.TYPE_STRING,
+    				    gobject.TYPE_STRING,
+    				    gobject.TYPE_STRING,
+    				    gobject.TYPE_STRING,
+    				    gobject.TYPE_STRING,
+    				    gobject.TYPE_STRING,
+    				    gobject.TYPE_STRING,
+    				    gobject.TYPE_STRING,
+    				    gobject.TYPE_STRING,
+    				    gobject.TYPE_STRING,
+    				    gobject.TYPE_STRING,
+    				    gobject.TYPE_STRING,
+    				    gobject.TYPE_STRING,
+    				    gobject.TYPE_STRING,
+    				    gobject.TYPE_STRING,
+    				    gobject.TYPE_STRING,
+    				    gobject.TYPE_STRING)
+				    
+		self.theEntityListStore=gtk.ListStore(gobject.TYPE_STRING)
+		self.theSystemTree.set_model(self.theSysTreeStore)
+		self.theEntityList.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
+		self.theEntityList.set_model(self.theEntityListStore)
+		for depth in range(0,self.max_depth):
+		    column=gtk.TreeViewColumn('',gtk.CellRendererText(),text=depth)
+		    column.set_visible(gtk.TRUE)
+		    self.theSystemTree.append_column(column)
 
+		column=gtk.TreeViewColumn('',gtk.CellRendererText(),text=0)
+		self.theEntityList.append_column(column)
 		aPManager = self.theMainWindow.thePluginManager
 		self.thePropertyWindow = aPManager.createInstance( 'PropertyWindow', [(4, '', '/', '')],'top_vbox' ) 
 		aPropertyWindowTopVBox = self.thePropertyWindow['top_vbox']
 		self['property_frame'].add( aPropertyWindowTopVBox )
-		self.thePropertyWindow['property_clist'].connect( 'select_row', self.selectPropertyName )
+		self.thePropertyWindow['property_clist'].connect( 'select_cursor_row', self.selectPropertyName )
 		self.update()
 
 
 	def update( self ):
-		self.theSystemTree.clear_items(0, 999)
-		self.theEntityList.clear_items(0, 999)
+		self.theSysTreeStore.clear()
+		self.theEntityListStore.clear()
 		aRootSystemFullID = createFullID( 'System::/' )
-		self.constructTree( self.theSystemTree, aRootSystemFullID )
+		self.constructTree( None, aRootSystemFullID )
 		self.updateEntityList()
 		self.thePropertyWindow.update()
 
             
 	def constructTree( self, aParentTree, aSystemFullID ):
-		aLeaf = gtk.GtkTreeItem( label=aSystemFullID[ID] )
-		aLeaf.set_data( 'FULLID', aSystemFullID )
-		aLeaf.connect( 'select', self.selectSystem )
-		aParentTree.append( aLeaf )
-		aLeaf.show()
+		newlabel=aSystemFullID[ID] 
+#		aLeaf.set_data( 'FULLID', aSystemFullID )
+#		aLeaf.connect( 'select', self.selectSystem )
+	 
+		iter=self.theSysTreeStore.append ( aParentTree )
+		depth=self.theSysTreeStore.iter_depth ( iter )
 
+		self.theSysTreeStore.set_value(iter,depth,newlabel)
+		key=str(self.theSysTreeStore.get_path(iter))
+		self.theSysTreeStore.set_data(key,aSystemFullID )
+#		aLeaf.show()
+#		if depth>self.displayed_depth:
+		    #display new depth
+#		    self.displayed_depth+=1
+#		column=gtk.TreeViewColumn('',gtk.CellRendererText(),text=depth)
+#		if depth<self.max_depth:
+#			self.theSystemTree.append_column(column)
+		    
 		aSystemListFullPN = convertFullIDToFullPN( aSystemFullID, 'SystemList' ) 
 		aSystemList = self.theMainWindow.theSession.theSimulator.getEntityProperty( createFullPNString( aSystemListFullPN ) )
 		if aSystemList != ():
-			aTree = gtk.GtkTree()
-			aLeaf.set_subtree( aTree )
-			aLeaf.expand()
+#			aTree = gtk.Tree()
+#			aLeaf.set_subtree( aTree )
+#			aLeaf.expand()
 
 			for aSystemID in aSystemList:
 				aSystemPath = createSystemPathFromFullID( aSystemFullID )
 				aNewSystemFullID = ( SYSTEM, aSystemPath, aSystemID )
-				self.constructTree( aTree, aNewSystemFullID )
+				self.constructTree( iter, aNewSystemFullID )
 
 	def updateEntityList( self, obj=None ):
-
-		aSelectedSystemLeafMap = self.theSystemTree.get_selection()
-		if aSelectedSystemLeafMap == [] :
+		aSelectedSystemIter = self.theSystemTree.get_selection().get_selected()[1]
+		if aSelectedSystemIter == None :
 			return
-        
 		aSelectedTypeMenuItem = self.theTypeMenu.get_active()
 		#aPrimitiveTypeString = aSelectedTypeMenuItem.get_data( 'LABEL' )
 		aEntityTypeString = aSelectedTypeMenuItem.get_data( 'LABEL' )
-
-		aSystemFullID = aSelectedSystemLeafMap[0].get_data( 'FULLID' )
-		self.theEntityList.clear_items( 0,-1 )
-
+		key=str(self.theSysTreeStore.get_path(aSelectedSystemIter))
+    		aSystemFullID = self.theSysTreeStore.get_data( key )
+		self.theEntityListStore.clear(  )
 		#if aPrimitiveTypeString == 'All':
 		if aEntityTypeString == 'All':
 			self.listEntity( 'Variable', aSystemFullID )
@@ -128,9 +168,10 @@ class EntityListWindow(OsogoWindow):
 		aListPN = aEntityTypeString + 'List'
 		aListFullPN = convertFullIDToFullPN( aSystemFullID, aListPN ) 
 		aEntityList = self.theMainWindow.theSession.theSimulator.getEntityProperty( createFullPNString( aListFullPN ) )
-
+		
 		for aEntityID in aEntityList:
-			aListItem = gtk.GtkListItem( aEntityID )
+			iter = self.theEntityListStore.append()
+			self.theEntityListStore.set_value(iter,0,aEntityID)
             
 			#if aPrimitiveTypeString == 'Variable':
 			if aEntityTypeString == 'Variable':
@@ -146,28 +187,27 @@ class EntityListWindow(OsogoWindow):
 			aEntityFullPN = ( aEntityType, aSystemPath, aEntityID, '' )
 #            aEntityFullPN = ( aPrimitiveType, aSystemPath, aEntityID, 'Value' )
 
-			aListItem.set_data( 'FULLPN', aEntityFullPN)
+			self.theEntityListStore.set_data( aEntityID, aEntityFullPN)
 #            aFullPNList = ( aEntityFullPN, )
 
-			self.theEntityList.add( aListItem )
-			aListItem.show()
+#			self.theEntityList.add( aListItem )
+#			aListItem.show()
 
 	def selectEntity( self, aEntityList ):
-
-		aSelectedEntityListItemList = aEntityList.get_selection()
-
-		if len(aSelectedEntityListItemList) == 0 :
-			return
-
 		self.theSelectedFullPNList = []
-		for aEntityListItem in aSelectedEntityListItemList:
-			aEntityFullPN = aEntityListItem.get_data( 'FULLPN' )
-			self.theSelectedFullPNList.append( aEntityFullPN )
 
-		self.thePropertyWindow.theRawFullPNList = self.theSelectedFullPNList
-		self.thePropertyWindow.setFullPNList()
-		self.updateStatusBar()
-
+		aSelection = aEntityList.get_selection()
+		aSelection.selected_foreach(self.entity_select_func)
+		if len(self.theSelectedFullPNList)>0:
+		    self.thePropertyWindow.theRawFullPNList = self.theSelectedFullPNList
+		    self.thePropertyWindow.setFullPNList()
+		    self.updateStatusBar()
+		
+	def entity_select_func(self,tree,path,iter):
+		key=self.theEntityListStore.get_value(iter,0)
+		aEntityFullPN = self.theEntityListStore.get_data( key )
+		self.theSelectedFullPNList.append( aEntityFullPN )
+	
 	def selectPropertyName( self, aCList, row, column, event_obj ):
 
 		self.theSelectedFullPNList = []
@@ -178,14 +218,14 @@ class EntityListWindow(OsogoWindow):
 			self.theSelectedFullPNList.append( aFullPN )
 		self.updateStatusBar()
         
-	def selectSystem( self, aTreeItemObj ):
-		aFullID = aTreeItemObj.get_data('FULLID')
-		aFullPN = convertFullIDToFullPN( aFullID )
-		self.theSelectedFullPNList = [ aFullPN ]
+#	def selectSystem( self, aTreeItemObj ):
+#		aFullID = aTreeItemObj.get_data('FULLID')
+#		aFullPN = convertFullIDToFullPN( aFullID )
+#		self.theSelectedFullPNList = [ aFullPN ]
 
-		self.thePropertyWindow.theRawFullPNList = self.theSelectedFullPNList
-		self.thePropertyWindow.setFullPNList()
-		self.updateStatusBar()
+#		self.thePropertyWindow.theRawFullPNList = self.theSelectedFullPNList
+#		self.thePropertyWindow.setFullPNList()
+#		self.updateStatusBar()
 
 	def updateStatusBar( self ):
 		aStatusString = 'Selected: '
@@ -268,9 +308,9 @@ class EntityListWindow(OsogoWindow):
 
 
 # ---------------------------------------------------------------
-# PopupMenu -> GtkMenu
+# PopupMenu -> gtk.Menu
 # ---------------------------------------------------------------
-class PopupMenu( GtkMenu ):
+class PopupMenu( gtk.Menu ):
 
 	# ---------------------------------------------------------------
 	# Constructor
@@ -284,13 +324,13 @@ class PopupMenu( GtkMenu ):
 		# ------------------------------------------
 		# calls the constructor of super class
 		# ------------------------------------------
-		GtkMenu.__init__(self)
+		gtk.Menu.__init__(self)
 		self.theLoggerString = "add logger list"
 
 		# ------------------------------------------
 		# calls the constructor of super class
 		# ------------------------------------------
-		GtkMenu.__init__(self)
+		gtk.Menu.__init__(self)
 
 		# ------------------------------------------
 		# initializes the size of menu
@@ -313,19 +353,19 @@ class PopupMenu( GtkMenu ):
 		# adds all plugin window name to mete item
 		# ------------------------------------------
 		for aPluginMap in self.thePluginManager.thePluginMap.keys(): #(1)
-			self.theMenuItem[aPluginMap]= GtkMenuItem(aPluginMap)
+			self.theMenuItem[aPluginMap]= gtk.MenuItem(aPluginMap)
 			self.theMenuItem[aPluginMap].connect('activate', self.theParent.openNewPluginWindowByPopupMenu )
 			self.theMenuItem[aPluginMap].set_name(aPluginMap)
 			self.append( self.theMenuItem[aPluginMap] )
 			if aMaxStringLength < len(aPluginMap):
 				aMaxStringLength = len(aPluginMap)
 			aMenuSize += 1
-		self.append( gtk.GtkMenuItem() )
+		self.append( gtk.MenuItem() )
 
 		# ------------------------------------------
 		# adds creates logger
 		# ------------------------------------------
-		self.theMenuItem[self.theLoggerString]= GtkMenuItem(self.theLoggerString)
+		self.theMenuItem[self.theLoggerString]= gtk.MenuItem(self.theLoggerString)
 		self.theMenuItem[self.theLoggerString].connect('activate', self.theParent.createLogger )
 		self.theMenuItem[self.theLoggerString].set_name(self.theLoggerString)
 		self.append( self.theMenuItem[self.theLoggerString] )
@@ -340,8 +380,8 @@ class PopupMenu( GtkMenu ):
 	# end of __init__
 
 	def popup(self, pms, pmi, func, button, time):
-		GtkMenu.popup(self, pms, pmi, func, button, time)
-		self.show_all(self)
+		gtk.Menu.popup(self, pms, pmi, func, button, time)
+		self.show_all()
 	
 if __name__ == "__main__":
 

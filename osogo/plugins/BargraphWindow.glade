@@ -1,374 +1,141 @@
-<?xml version="1.0"?>
-<GTK-Interface>
+<?xml version="1.0" standalone="no"?> <!--*- mode: xml -*-->
+<!DOCTYPE glade-interface SYSTEM "http://glade.gnome.org/glade-2.0.dtd">
 
-<project>
-  <name>Progressbar</name>
-  <program_name>progressbar</program_name>
-  <directory></directory>
-  <source_directory>src</source_directory>
-  <pixmaps_directory>pixmaps</pixmaps_directory>
-  <language>C</language>
-  <gnome_support>True</gnome_support>
-  <gettext_support>True</gettext_support>
-</project>
+<glade-interface>
 
-<widget>
-  <class>GtkWindow</class>
-  <name>BargraphWindow</name>
-  <x>0</x>
-  <y>0</y>
-  <width>0</width>
-  <height>0</height>
-  <events>GDK_BUTTON_PRESS_MASK | GDK_KEY_PRESS_MASK</events>
-  <signal>
-    <name>destroy</name>
-    <handler>window_exit</handler>
-    <last_modification_time>Mon, 25 Feb 2002 02:07:54 GMT</last_modification_time>
-  </signal>
-  <signal>
-    <name>button_press_event</name>
-    <handler>button_press_event</handler>
-    <last_modification_time>Thu, 04 Jul 2002 11:39:07 GMT</last_modification_time>
-  </signal>
-  <title>BargraphWindow</title>
-  <type>GTK_WINDOW_TOPLEVEL</type>
-  <position>GTK_WIN_POS_NONE</position>
-  <modal>False</modal>
-  <allow_shrink>False</allow_shrink>
-  <allow_grow>True</allow_grow>
-  <auto_shrink>False</auto_shrink>
+<widget class="GtkWindow" id="BargraphWindow">
+  <property name="visible">True</property>
+  <property name="events">GDK_KEY_PRESS_MASK</property>
+  <property name="title" translatable="yes">BargraphWindow</property>
+  <property name="type">GTK_WINDOW_TOPLEVEL</property>
+  <property name="window_position">GTK_WIN_POS_NONE</property>
+  <property name="modal">False</property>
+  <property name="resizable">True</property>
+  <property name="destroy_with_parent">False</property>
+  <signal name="destroy" handler="window_exit"/>
+  <signal name="button_press_event" handler="button_press_event"/>
 
-  <widget>
-    <class>GtkHBox</class>
-    <name>hbox16</name>
-    <width>290</width>
-    <height>31</height>
-    <homogeneous>False</homogeneous>
-    <spacing>0</spacing>
+  <child>
+    <widget class="GtkHBox" id="hbox1">
+      <property name="visible">True</property>
+      <property name="homogeneous">False</property>
+      <property name="spacing">0</property>
 
-    <widget>
-      <class>GtkLabel</class>
-      <name>property_id_label</name>
-      <width>70</width>
-      <height>16</height>
-      <label>label1</label>
-      <justify>GTK_JUSTIFY_CENTER</justify>
-      <wrap>False</wrap>
-      <xalign>0.5</xalign>
-      <yalign>0.5</yalign>
-      <xpad>0</xpad>
-      <ypad>0</ypad>
       <child>
-	<padding>0</padding>
-	<expand>True</expand>
-	<fill>False</fill>
-      </child>
-    </widget>
+	<widget class="GtkFrame" id="frame8">
+	  <property name="visible">True</property>
+	  <property name="label_xalign">0</property>
+	  <property name="label_yalign">0.5</property>
+	  <property name="shadow_type">GTK_SHADOW_ETCHED_IN</property>
 
-    <widget>
-      <class>GtkVBox</class>
-      <name>vbox6</name>
-      <width>19</width>
-      <height>31</height>
-      <homogeneous>False</homogeneous>
-      <spacing>0</spacing>
-      <child>
-	<padding>0</padding>
-	<expand>False</expand>
-	<fill>True</fill>
-      </child>
-
-      <widget>
-	<class>GtkLabel</class>
-	<name>multiplier1_label</name>
-	<width>9</width>
-	<height>15</height>
-	<label>2</label>
-	<justify>GTK_JUSTIFY_CENTER</justify>
-	<wrap>False</wrap>
-	<xalign>0.56</xalign>
-	<yalign>0.45</yalign>
-	<xpad>8</xpad>
-	<ypad>0</ypad>
-	<child>
-	  <padding>0</padding>
-	  <expand>False</expand>
-	  <fill>False</fill>
-	</child>
-      </widget>
-
-      <widget>
-	<class>GtkToolbar</class>
-	<name>toolbar5</name>
-	<width>19</width>
-	<height>16</height>
-	<orientation>GTK_ORIENTATION_HORIZONTAL</orientation>
-	<type>GTK_TOOLBAR_ICONS</type>
-	<space_size>5</space_size>
-	<space_style>GTK_TOOLBAR_SPACE_EMPTY</space_style>
-	<relief>GTK_RELIEF_NORMAL</relief>
-	<tooltips>True</tooltips>
-	<child>
-	  <padding>0</padding>
-	  <expand>False</expand>
-	  <fill>False</fill>
-	</child>
-
-	<widget>
-	  <class>GtkButton</class>
-	  <child_name>Toolbar:button</child_name>
-	  <name>subtract_button</name>
-	  <width>19</width>
-	  <height>16</height>
-	  <tooltip>Shifts the minimum/maximum values by 1/10.</tooltip>
-	  <signal>
-	    <name>clicked</name>
-	    <handler>on_subtract_button_clicked</handler>
-	    <last_modification_time>Thu, 13 Sep 2001 02:13:04 GMT</last_modification_time>
-	  </signal>
-	  <label>button1</label>
-	  <icon>icon_left_small.xpm</icon>
-	</widget>
-      </widget>
-    </widget>
-
-    <widget>
-      <class>GtkVBox</class>
-      <name>vbox5</name>
-      <width>125</width>
-      <height>26</height>
-      <homogeneous>False</homogeneous>
-      <spacing>0</spacing>
-      <child>
-	<padding>0</padding>
-	<expand>False</expand>
-	<fill>False</fill>
-      </child>
-
-      <widget>
-	<class>GtkHBox</class>
-	<name>hbox20</name>
-	<width>85</width>
-	<height>8</height>
-	<homogeneous>False</homogeneous>
-	<spacing>0</spacing>
-	<child>
-	  <padding>0</padding>
-	  <expand>False</expand>
-	  <fill>False</fill>
-	</child>
-
-	<widget>
-	  <class>GtkHBox</class>
-	  <name>hbox21</name>
-	  <width>85</width>
-	  <height>8</height>
-	  <homogeneous>False</homogeneous>
-	  <spacing>0</spacing>
 	  <child>
-	    <padding>0</padding>
-	    <expand>True</expand>
-	    <fill>False</fill>
+	    <placeholder/>
+	  </child>
+	</widget>
+	<packing>
+	  <property name="padding">0</property>
+	  <property name="expand">True</property>
+	  <property name="fill">True</property>
+	</packing>
+      </child>
+
+      <child>
+	<widget class="GtkVBox" id="vbox19">
+	  <property name="visible">True</property>
+	  <property name="homogeneous">False</property>
+	  <property name="spacing">0</property>
+
+	  <child>
+	    <widget class="GtkScrolledWindow" id="scrolledwindow1">
+	      <property name="visible">True</property>
+	      <property name="hscrollbar_policy">GTK_POLICY_ALWAYS</property>
+	      <property name="vscrollbar_policy">GTK_POLICY_ALWAYS</property>
+	      <property name="shadow_type">GTK_SHADOW_IN</property>
+	      <property name="window_placement">GTK_CORNER_TOP_LEFT</property>
+
+	      <child>
+		<widget class="GtkTreeView" id="clist1">
+		  <property name="visible">True</property>
+		  <property name="can_focus">True</property>
+		  <property name="headers_visible">True</property>
+		  <property name="rules_hint">False</property>
+		  <property name="reorderable">False</property>
+		  <property name="enable_search">True</property>
+		</widget>
+	      </child>
+	    </widget>
+	    <packing>
+	      <property name="padding">0</property>
+	      <property name="expand">True</property>
+	      <property name="fill">True</property>
+	    </packing>
 	  </child>
 
-	  <widget>
-	    <class>GtkVSeparator</class>
-	    <name>vseparator14</name>
-	    <child>
-	      <padding>0</padding>
-	      <expand>True</expand>
-	      <fill>True</fill>
-	    </child>
-	  </widget>
-
-	  <widget>
-	    <class>GtkVSeparator</class>
-	    <name>vseparator15</name>
-	    <child>
-	      <padding>0</padding>
-	      <expand>True</expand>
-	      <fill>True</fill>
-	    </child>
-	  </widget>
-	</widget>
-      </widget>
-
-      <widget>
-	<class>GtkProgressBar</class>
-	<name>progressbar</name>
-	<width>125</width>
-	<height>20</height>
-	<value>0</value>
-	<lower>0</lower>
-	<upper>1000</upper>
-	<bar_style>GTK_PROGRESS_CONTINUOUS</bar_style>
-	<orientation>GTK_PROGRESS_LEFT_TO_RIGHT</orientation>
-	<activity_mode>False</activity_mode>
-	<show_text>True</show_text>
-	<format>%P %%</format>
-	<text_xalign>0.5</text_xalign>
-	<text_yalign>0.18</text_yalign>
-	<child>
-	  <padding>0</padding>
-	  <expand>False</expand>
-	  <fill>False</fill>
-	</child>
-      </widget>
-
-      <widget>
-	<class>GtkHBox</class>
-	<name>hbox22</name>
-	<width>85</width>
-	<height>1</height>
-	<homogeneous>False</homogeneous>
-	<spacing>0</spacing>
-	<child>
-	  <padding>0</padding>
-	  <expand>True</expand>
-	  <fill>True</fill>
-	</child>
-
-	<widget>
-	  <class>GtkHBox</class>
-	  <name>hbox23</name>
-	  <width>85</width>
-	  <height>1</height>
-	  <homogeneous>False</homogeneous>
-	  <spacing>0</spacing>
 	  <child>
-	    <padding>0</padding>
-	    <expand>True</expand>
-	    <fill>False</fill>
+	    <widget class="GtkFixed" id="fixed1">
+	      <property name="visible">True</property>
+
+	      <child>
+		<widget class="GtkHSeparator" id="hseparator1">
+		  <property name="width_request">0</property>
+		  <property name="height_request">0</property>
+		  <property name="visible">True</property>
+		</widget>
+		<packing>
+		  <property name="x">0</property>
+		  <property name="y">0</property>
+		</packing>
+	      </child>
+
+	      <child>
+		<widget class="GtkButton" id="button12">
+		  <property name="width_request">0</property>
+		  <property name="height_request">0</property>
+		  <property name="visible">True</property>
+		  <property name="can_focus">True</property>
+		  <property name="label" translatable="yes">Toggle scale</property>
+		  <property name="use_underline">True</property>
+		  <property name="relief">GTK_RELIEF_NORMAL</property>
+		  <signal name="clicked" handler="on_button12_clicked"/>
+		</widget>
+		<packing>
+		  <property name="x">8</property>
+		  <property name="y">8</property>
+		</packing>
+	      </child>
+
+	      <child>
+		<widget class="GtkButton" id="button9">
+		  <property name="width_request">0</property>
+		  <property name="height_request">0</property>
+		  <property name="visible">True</property>
+		  <property name="can_focus">True</property>
+		  <property name="label" translatable="yes">Remove Trace</property>
+		  <property name="use_underline">True</property>
+		  <property name="relief">GTK_RELIEF_NORMAL</property>
+		  <signal name="clicked" handler="on_button9_clicked"/>
+		</widget>
+		<packing>
+		  <property name="x">8</property>
+		  <property name="y">48</property>
+		</packing>
+	      </child>
+	    </widget>
+	    <packing>
+	      <property name="padding">0</property>
+	      <property name="expand">True</property>
+	      <property name="fill">True</property>
+	    </packing>
 	  </child>
-
-	  <widget>
-	    <class>GtkVSeparator</class>
-	    <name>vseparator16</name>
-	    <child>
-	      <padding>0</padding>
-	      <expand>True</expand>
-	      <fill>True</fill>
-	    </child>
-	  </widget>
-
-	  <widget>
-	    <class>GtkVSeparator</class>
-	    <name>vseparator17</name>
-	    <child>
-	      <padding>0</padding>
-	      <expand>True</expand>
-	      <fill>True</fill>
-	    </child>
-	  </widget>
 	</widget>
-      </widget>
-    </widget>
-
-    <widget>
-      <class>GtkVBox</class>
-      <name>vbox7</name>
-      <homogeneous>False</homogeneous>
-      <spacing>0</spacing>
-      <child>
-	<padding>0</padding>
-	<expand>False</expand>
-	<fill>True</fill>
-      </child>
-
-      <widget>
-	<class>GtkEntry</class>
-	<name>multiplier_entry</name>
-	<width>26</width>
-	<height>14</height>
-	<can_focus>True</can_focus>
-	<signal>
-	  <name>activate</name>
-	  <handler>multiplier_entry_activate</handler>
-	  <last_modification_time>Thu, 13 Sep 2001 02:14:30 GMT</last_modification_time>
-	</signal>
-	<editable>True</editable>
-	<text_visible>True</text_visible>
-	<text_max_length>0</text_max_length>
-	<text>5</text>
-	<child>
-	  <padding>0</padding>
-	  <expand>False</expand>
-	  <fill>False</fill>
-	</child>
-      </widget>
-
-      <widget>
-	<class>GtkToolbar</class>
-	<name>toolbar6</name>
-	<orientation>GTK_ORIENTATION_HORIZONTAL</orientation>
-	<type>GTK_TOOLBAR_ICONS</type>
-	<space_size>5</space_size>
-	<space_style>GTK_TOOLBAR_SPACE_EMPTY</space_style>
-	<relief>GTK_RELIEF_NORMAL</relief>
-	<tooltips>True</tooltips>
-	<child>
-	  <padding>0</padding>
-	  <expand>False</expand>
-	  <fill>False</fill>
-	</child>
-
-	<widget>
-	  <class>GtkButton</class>
-	  <child_name>Toolbar:button</child_name>
-	  <name>add_button</name>
-	  <width>19</width>
-	  <height>16</height>
-	  <tooltip>Shift the minimun/maximum values by 10.</tooltip>
-	  <signal>
-	    <name>clicked</name>
-	    <handler>on_add_button_clicked</handler>
-	    <last_modification_time>Thu, 13 Sep 2001 02:13:44 GMT</last_modification_time>
-	  </signal>
-	  <label>button2</label>
-	  <icon>icon_right_small.xpm</icon>
-	</widget>
-      </widget>
-    </widget>
-
-    <widget>
-      <class>GtkCheckButton</class>
-      <name>fix_checkbutton</name>
-      <width>17</width>
-      <height>24</height>
-      <tooltip>Fix the range of display</tooltip>
-      <can_focus>True</can_focus>
-      <signal>
-	<name>toggled</name>
-	<handler>fix_checkbutton_toggled</handler>
-	<last_modification_time>Fri, 13 Sep 2002 05:44:17 GMT</last_modification_time>
-      </signal>
-      <label></label>
-      <active>False</active>
-      <draw_indicator>True</draw_indicator>
-      <child>
-	<padding>0</padding>
-	<expand>False</expand>
-	<fill>False</fill>
+	<packing>
+	  <property name="padding">0</property>
+	  <property name="expand">True</property>
+	  <property name="fill">True</property>
+	</packing>
       </child>
     </widget>
-
-    <widget>
-      <class>GtkLabel</class>
-      <name>label1</name>
-      <label>Fix</label>
-      <justify>GTK_JUSTIFY_CENTER</justify>
-      <wrap>False</wrap>
-      <xalign>0.5</xalign>
-      <yalign>0.5</yalign>
-      <xpad>4</xpad>
-      <ypad>0</ypad>
-      <child>
-	<padding>0</padding>
-	<expand>False</expand>
-	<fill>False</fill>
-      </child>
-    </widget>
-  </widget>
+  </child>
 </widget>
 
-</GTK-Interface>
+</glade-interface>

@@ -1,207 +1,138 @@
-<?xml version="1.0"?>
-<GTK-Interface>
+<?xml version="1.0" standalone="no"?> <!--*- mode: xml -*-->
+<!DOCTYPE glade-interface SYSTEM "http://glade.gnome.org/glade-2.0.dtd">
 
-<project>
-  <name>Project7</name>
-  <program_name>project7</program_name>
-  <directory></directory>
-  <source_directory>src</source_directory>
-  <pixmaps_directory></pixmaps_directory>
-  <language>C</language>
-  <gnome_support>True</gnome_support>
-  <gettext_support>True</gettext_support>
-</project>
+<glade-interface>
 
-<widget>
-  <class>GtkWindow</class>
-  <name>DigitalWindow</name>
-  <can_focus>True</can_focus>
-  <events>GDK_BUTTON_PRESS_MASK</events>
-  <signal>
-    <name>destroy</name>
-    <handler>window_exit</handler>
-    <last_modification_time>Mon, 25 Feb 2002 02:10:41 GMT</last_modification_time>
-  </signal>
-  <signal>
-    <name>button_press_event</name>
-    <handler>button_press_event</handler>
-    <last_modification_time>Thu, 04 Jul 2002 11:00:04 GMT</last_modification_time>
-  </signal>
-  <title>DigitalWindow</title>
-  <type>GTK_WINDOW_TOPLEVEL</type>
-  <position>GTK_WIN_POS_NONE</position>
-  <modal>False</modal>
-  <allow_shrink>False</allow_shrink>
-  <allow_grow>True</allow_grow>
-  <auto_shrink>False</auto_shrink>
+<widget class="GtkWindow" id="DigitalWindow">
+  <property name="visible">True</property>
+  <property name="can_focus">True</property>
+  <property name="events">GDK_BUTTON_PRESS_MASK</property>
+  <property name="title" translatable="yes">DigitalWindow</property>
+  <property name="type">GTK_WINDOW_TOPLEVEL</property>
+  <property name="window_position">GTK_WIN_POS_NONE</property>
+  <property name="modal">False</property>
+  <property name="resizable">True</property>
+  <property name="destroy_with_parent">False</property>
+  <signal name="destroy" handler="window_exit"/>
+  <signal name="button_press_event" handler="button_press_event"/>
 
-  <widget>
-    <class>GtkHBox</class>
-    <name>hbox2</name>
-    <signal>
-      <name>button_press_event</name>
-      <handler>aaa</handler>
-      <last_modification_time>Thu, 04 Jul 2002 11:23:20 GMT</last_modification_time>
-    </signal>
-    <homogeneous>False</homogeneous>
-    <spacing>0</spacing>
+  <child>
+    <widget class="GtkHBox" id="hbox2">
+      <property name="visible">True</property>
+      <property name="homogeneous">False</property>
+      <property name="spacing">0</property>
+      <signal name="button_press_event" handler="aaa"/>
 
-    <widget>
-      <class>GtkLabel</class>
-      <name>id_label</name>
-      <width>66</width>
-      <signal>
-	<name>drag_data_received</name>
-	<handler>drag_data_received</handler>
-	<last_modification_time>Sat, 11 Aug 2001 16:04:34 GMT</last_modification_time>
-      </signal>
-      <signal>
-	<name>drag_motion</name>
-	<handler>drag_motion</handler>
-	<last_modification_time>Sat, 11 Aug 2001 16:05:07 GMT</last_modification_time>
-      </signal>
-      <signal>
-	<name>drag_leave</name>
-	<handler>drag_leave</handler>
-	<last_modification_time>Sat, 11 Aug 2001 16:05:18 GMT</last_modification_time>
-      </signal>
-      <signal>
-	<name>drag_drop</name>
-	<handler>drag_drop</handler>
-	<last_modification_time>Sat, 11 Aug 2001 16:05:42 GMT</last_modification_time>
-      </signal>
-      <signal>
-	<name>drag_data_get</name>
-	<handler>drag_data_get</handler>
-	<last_modification_time>Sat, 11 Aug 2001 16:06:17 GMT</last_modification_time>
-      </signal>
-      <signal>
-	<name>drag_data_delete</name>
-	<handler>drag_data_delete</handler>
-	<last_modification_time>Sat, 11 Aug 2001 16:06:25 GMT</last_modification_time>
-      </signal>
-      <label>ID
-Property</label>
-      <justify>GTK_JUSTIFY_RIGHT</justify>
-      <wrap>True</wrap>
-      <xalign>0.5</xalign>
-      <yalign>0.5</yalign>
-      <xpad>0</xpad>
-      <ypad>0</ypad>
       <child>
-	<padding>2</padding>
-	<expand>True</expand>
-	<fill>True</fill>
-      </child>
-    </widget>
-
-    <widget>
-      <class>GtkFrame</class>
-      <name>frame1</name>
-      <label_xalign>0</label_xalign>
-      <shadow_type>GTK_SHADOW_ETCHED_IN</shadow_type>
-      <child>
-	<padding>0</padding>
-	<expand>False</expand>
-	<fill>False</fill>
+	<widget class="GtkLabel" id="id_label">
+	  <property name="visible">True</property>
+	  <property name="label" translatable="yes">ID
+Property</property>
+	  <property name="use_underline">False</property>
+	  <property name="use_markup">False</property>
+	  <property name="justify">GTK_JUSTIFY_RIGHT</property>
+	  <property name="wrap">True</property>
+	  <property name="selectable">False</property>
+	  <property name="xalign">0.5</property>
+	  <property name="yalign">0.5</property>
+	  <property name="xpad">0</property>
+	  <property name="ypad">0</property>
+	  <signal name="drag_data_received" handler="drag_data_received"/>
+	  <signal name="drag_motion" handler="drag_motion"/>
+	  <signal name="drag_leave" handler="drag_leave"/>
+	  <signal name="drag_drop" handler="drag_drop"/>
+	  <signal name="drag_data_get" handler="drag_data_get"/>
+	  <signal name="drag_data_delete" handler="drag_data_delete"/>
+	</widget>
+	<packing>
+	  <property name="padding">2</property>
+	  <property name="expand">True</property>
+	  <property name="fill">True</property>
+	</packing>
       </child>
 
-      <widget>
-	<class>GtkHBox</class>
-	<name>hbox3</name>
-	<homogeneous>False</homogeneous>
-	<spacing>0</spacing>
+      <child>
+	<widget class="GtkFrame" id="frame1">
+	  <property name="visible">True</property>
+	  <property name="label_xalign">0</property>
+	  <property name="label_yalign">0.5</property>
+	  <property name="shadow_type">GTK_SHADOW_ETCHED_IN</property>
 
-	<widget>
-	  <class>GtkEntry</class>
-	  <name>value_frame</name>
-	  <can_focus>True</can_focus>
-	  <signal>
-	    <name>activate</name>
-	    <handler>input_value</handler>
-	    <last_modification_time>Wed, 15 Aug 2001 11:02:03 GMT</last_modification_time>
-	  </signal>
-	  <signal>
-	    <name>changed</name>
-	    <handler>on_entry1_changed</handler>
-	    <last_modification_time>Wed, 15 Aug 2001 09:04:21 GMT</last_modification_time>
-	  </signal>
-	  <signal>
-	    <name>copy_clipboard</name>
-	    <handler>on_value_frame_copy_clipboard</handler>
-	    <last_modification_time>Thu, 04 Jul 2002 08:35:22 GMT</last_modification_time>
-	  </signal>
-	  <signal>
-	    <name>cut_clipboard</name>
-	    <handler>on_value_frame_cut_clipboard</handler>
-	    <last_modification_time>Thu, 04 Jul 2002 08:35:26 GMT</last_modification_time>
-	  </signal>
-	  <signal>
-	    <name>paste_clipboard</name>
-	    <handler>on_value_frame_paste_clipboard</handler>
-	    <last_modification_time>Thu, 04 Jul 2002 08:35:33 GMT</last_modification_time>
-	  </signal>
-	  <editable>True</editable>
-	  <text_visible>True</text_visible>
-	  <text_max_length>0</text_max_length>
-	  <text></text>
 	  <child>
-	    <padding>0</padding>
-	    <expand>False</expand>
-	    <fill>False</fill>
+	    <widget class="GtkHBox" id="hbox3">
+	      <property name="visible">True</property>
+	      <property name="homogeneous">False</property>
+	      <property name="spacing">0</property>
+
+	      <child>
+		<widget class="GtkEntry" id="value_frame">
+		  <property name="visible">True</property>
+		  <property name="can_focus">True</property>
+		  <property name="editable">True</property>
+		  <property name="visibility">True</property>
+		  <property name="max_length">0</property>
+		  <property name="text" translatable="yes"></property>
+		  <property name="has_frame">True</property>
+		  <property name="invisible_char" translatable="yes">*</property>
+		  <property name="activates_default">False</property>
+		  <signal name="activate" handler="input_value"/>
+		  <signal name="changed" handler="on_entry1_changed"/>
+		  <signal name="copy_clipboard" handler="on_value_frame_copy_clipboard"/>
+		  <signal name="cut_clipboard" handler="on_value_frame_cut_clipboard"/>
+		  <signal name="paste_clipboard" handler="on_value_frame_paste_clipboard"/>
+		</widget>
+		<packing>
+		  <property name="padding">0</property>
+		  <property name="expand">False</property>
+		  <property name="fill">False</property>
+		</packing>
+	      </child>
+
+	      <child>
+		<widget class="GtkToolbar" id="toolbar5">
+		  <property name="visible">True</property>
+		  <property name="orientation">GTK_ORIENTATION_VERTICAL</property>
+		  <property name="toolbar_style">GTK_TOOLBAR_BOTH</property>
+		  <property name="tooltips">True</property>
+
+		  <child>
+		    <widget class="button" id="increase_button">
+		      <property name="visible">True</property>
+		      <property name="label" translatable="yes"></property>
+		      <property name="use_underline">True</property>
+		      <property name="stock_pixmap">gtk-go-up</property>
+		      <signal name="clicked" handler="increase_value"/>
+		    </widget>
+		  </child>
+
+		  <child>
+		    <widget class="button" id="decrease_button">
+		      <property name="visible">True</property>
+		      <property name="can_focus">True</property>
+		      <property name="label" translatable="yes"></property>
+		      <property name="use_underline">True</property>
+		      <property name="stock_pixmap">gtk-go-down</property>
+		      <signal name="clicked" handler="decrease_value"/>
+		    </widget>
+		  </child>
+		</widget>
+		<packing>
+		  <property name="padding">0</property>
+		  <property name="expand">False</property>
+		  <property name="fill">False</property>
+		</packing>
+	      </child>
+	    </widget>
 	  </child>
 	</widget>
-
-	<widget>
-	  <class>GtkToolbar</class>
-	  <name>toolbar5</name>
-	  <height>28</height>
-	  <orientation>GTK_ORIENTATION_VERTICAL</orientation>
-	  <type>GTK_TOOLBAR_ICONS</type>
-	  <space_size>0</space_size>
-	  <space_style>GTK_TOOLBAR_SPACE_EMPTY</space_style>
-	  <relief>GTK_RELIEF_HALF</relief>
-	  <tooltips>True</tooltips>
-	  <child>
-	    <padding>0</padding>
-	    <expand>False</expand>
-	    <fill>False</fill>
-	  </child>
-
-	  <widget>
-	    <class>GtkButton</class>
-	    <child_name>Toolbar:button</child_name>
-	    <name>increase_button</name>
-	    <width>16</width>
-	    <height>14</height>
-	    <signal>
-	      <name>clicked</name>
-	      <handler>increase_value</handler>
-	      <last_modification_time>Mon, 10 Sep 2001 06:31:44 GMT</last_modification_time>
-	    </signal>
-	    <label></label>
-	    <icon>icon_up_small.xpm</icon>
-	  </widget>
-
-	  <widget>
-	    <class>GtkButton</class>
-	    <child_name>Toolbar:button</child_name>
-	    <name>decrease_button</name>
-	    <width>16</width>
-	    <height>14</height>
-	    <can_focus>True</can_focus>
-	    <signal>
-	      <name>clicked</name>
-	      <handler>decrease_value</handler>
-	      <last_modification_time>Mon, 10 Sep 2001 06:30:56 GMT</last_modification_time>
-	    </signal>
-	    <label></label>
-	    <icon>icon_down_small.xpm</icon>
-	  </widget>
-	</widget>
-      </widget>
+	<packing>
+	  <property name="padding">0</property>
+	  <property name="expand">False</property>
+	  <property name="fill">False</property>
+	</packing>
+      </child>
     </widget>
-  </widget>
+  </child>
 </widget>
 
-</GTK-Interface>
+</glade-interface>

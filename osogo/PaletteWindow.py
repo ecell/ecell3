@@ -39,7 +39,7 @@
 from config import *
 
 from main import *
-from gtk import *
+import gtk
 import os
 import re
 import string
@@ -47,10 +47,10 @@ import string
 from OsogoWindow import *
 
 # ---------------------------------------------------------------
-# PaletteWindow -> GtkWindow
+# PaletteWindow -> gtk.Window
 #   - manages PaletteWindow
 # ---------------------------------------------------------------
-class PaletteWindow(GtkWindow,OsogoWindow):
+class PaletteWindow(gtk.Window,OsogoWindow):
 
 	# ---------------------------------------------------------------
 	# Constructor
@@ -62,14 +62,14 @@ class PaletteWindow(GtkWindow,OsogoWindow):
 	def __init__( self, aMainWindow ):
 
 		OsogoWindow.__init__( self, aMainWindow )
-		GtkWindow.__init__( self, WINDOW_TOPLEVEL )
+		gtk.Window.__init__( self, gtk.WINDOW_TOPLEVEL )
 		self.theMainWindow = aMainWindow
-		self.theToolbar = GtkToolbar( ORIENTATION_VERTICAL, TOOLBAR_BOTH )
+		self.theToolbar = gtk.Toolbar()# gtk.ORIENTATION_VERTICAL, gtk.TOOLBAR_BOTH )
 		self.add( self.theToolbar )
 		self.set_data('toolbar', self.theToolbar)
 		self.connect('destroy', self.destroy)
 		self.theExist = 1
-                self.signal_connect( 'destroy', self.destroyWindow )
+                self.connect( 'destroy', self.destroyWindow )
 
 
 	# end of __init__
@@ -96,23 +96,26 @@ class PaletteWindow(GtkWindow,OsogoWindow):
 			aButtonName = string.replace( aModuleName, 'Window', '' )
 			aPluginNameList.append( aModuleName )
 
-			aPixMap = GtkPixmap( self, os.path.join( aModule.theDirectoryName,\
+			aPixMap = gtk.Image()
+			aPixMap.set_from_file( os.path.join( aModule.theDirectoryName,\
 			                                                    aModuleName ) + '.xpm' )
 
 			if aIndicator == 0:
 				aIndicator = 1
-				aFirstButtonObj = GtkRadioButton()
-				aFirstButton = \
-				      self.theToolbar.append_element( TOOLBAR_CHILD_RADIOBUTTON,
-				                                      aFirstButtonObj, aButtonName,
-				 	                                  '', '', aPixMap, None )
+				aFirstButtonObj = gtk.RadioButton()
+				aFirstButton = self.theToolbar.append_element(\
+                                               gtk.TOOLBAR_CHILD_RADIOBUTTON,\
+					       aFirstButtonObj, aButtonName,\
+					       '', '', aPixMap, None, None )
+				
 				self.set_data( aModuleName, aFirstButton )
 			else :
-				aButtonObj = GtkRadioButton( aFirstButtonObj )
-				aButton = \
-				           self.theToolbar.append_element( TOOLBAR_CHILD_RADIOBUTTON,
-						                                  aButtonObj, aButtonName,
-							                              '', '', aPixMap, None )
+				aButtonObj = gtk.RadioButton( aFirstButtonObj )
+				aButton = self.theToolbar.append_element(\
+					gtk.TOOLBAR_CHILD_RADIOBUTTON,\
+					aButtonObj, aButtonName,\
+					'', '', aPixMap, None, None )
+				
 				self.set_data( aModuleName, aButton )
 
 			self.set_data( 'plugin_list' , aPluginNameList )

@@ -2,6 +2,7 @@
 
 from OsogoWindow import *
 from gtk import *
+import gobject
 from ecell.ecssupport import *
 from string import *
 
@@ -13,7 +14,7 @@ class InterfaceWindow( OsogoWindow ):
 	def __init__( self, aMainWindow ):
 
 		OsogoWindow.__init__( self, aMainWindow )
-		self.theSelectedRow = -1
+		self.theSelectedRow = None
 
 	# end of __init__
 
@@ -25,7 +26,19 @@ class InterfaceWindow( OsogoWindow ):
 	# -------------------------------------------------------------
 	def openWindow( self ):
 		OsogoWindow.openWindow(self)
-		self.theSelectedRow = -1
+
+		self.theInterfaceListWidget = self[ 'InterfaceCList' ]
+		aListStore = gtk.ListStore( gobject.TYPE_STRING,\
+					    gobject.TYPE_STRING,\
+					    gobject.TYPE_STRING )
+		self.theInterfaceListWidget.set_model( aListStore )
+		column=gtk.TreeViewColumn('Title',gtk.CellRendererText(),text=0)
+		self.theInterfaceListWidget.append_column(column)
+		column=gtk.TreeViewColumn('Class',gtk.CellRendererText(),text=1)
+		self.theInterfaceListWidget.append_column(column)
+		column=gtk.TreeViewColumn('FullPN',gtk.CellRendererText(),text=2)
+		self.theInterfaceListWidget.append_column(column)
+		self.theSelectedRow = None
 		self.addHandlers( { 'interfacelist_select_row' : self.rowSelected,
 		                    'ShowButton_clicked'       : self.showWindow,
 		                    'SaveButton_clicked'       : self.editTitle,
@@ -43,12 +56,13 @@ class InterfaceWindow( OsogoWindow ):
 	# -------------------------------------------------------------
 	def update( self ):
 	
-		if self.theExist != 0:
-			self[ 'InterfaceCList' ].clear()
+		aModel = self.theInterfaceListWidget.get_model()
+
+		#		if self.theExist != 0:
+		aModel.clear()
 
 		# gets
 		anInstanceList = self.theMainWindow.thePluginManager.theInstanceList
-
 		for anInstance in anInstanceList:
 			aTitle = anInstance.getTitle()
 			aClass =  anInstance.__class__.__name__
@@ -56,7 +70,12 @@ class InterfaceWindow( OsogoWindow ):
 			aList = ( aTitle , aClass , aFullPN )
 
 			if self.theExist != 0:
-				self['InterfaceCList'].append( aList )
+
+				anIter = aModel.append()
+				aModel.set( anIter,\
+					    0, aList[0],\
+					    1, aList[1],\
+					    2, aList[2] )
 
 	# end of update
 
@@ -71,7 +90,7 @@ class InterfaceWindow( OsogoWindow ):
 	def editTitle( self , obj ):
 		
 		# if no data is selected, show error message.
-		if self.theSelectedRow == -1:
+		if self.theSelectedRow == None:
 			anErrorMessage='\nNo data is selected.!\n'
 			self.theMainWindow.printMessage( anErrorMessage )
 			aWarningWindow = ConfirmWindow(0,anErrorMessage,"!")
@@ -89,7 +108,7 @@ class InterfaceWindow( OsogoWindow ):
 				aWarningWindow = ConfirmWindow(0,anErrorMessage,"!")
 				return None
 
-			aTitle =  self['InterfaceCList'].get_text( self.theSelectedRow ,0 )
+			aTitle =  self['InterfaceCList'].get_model().get_value( self.theSelectedRow ,0 )
 			aTitleDict = self.theMainWindow.thePluginManager.thePluginTitleDict
 
 			anInstanceList = self.theMainWindow.thePluginManager.theInstanceList
@@ -98,7 +117,7 @@ class InterfaceWindow( OsogoWindow ):
 					self.theMainWindow.thePluginManager.editModuleTitle( anInstance, aNewTitle )
 					break
 
-		self.theMainWindow.updateBasicWindows()
+		self.theMainWindow.updateFundamentalWindows()
 
 	# end of editTitle
 
@@ -110,10 +129,12 @@ class InterfaceWindow( OsogoWindow ):
 	# return -> None
 	# This method is throwable exception
 	# -------------------------------------------------------------
-	def rowSelected( self , obj , row , column , data3 ):
+	def rowSelected( self , obj ):
 
+		row=self['InterfaceCList'].get_selection().get_selected()[1]
 		self.theSelectedRow = row
-		aText =  self['InterfaceCList'].get_text( row,0 )
+		
+		aText =  self['InterfaceCList'].get_model().get_value( row,0 )
 		self[ "SelectedTitle" ].set_text( aText )
 
 
@@ -133,7 +154,7 @@ class InterfaceWindow( OsogoWindow ):
 		# -------------------------------------------
 
 		# if no data is selected, show error message.
-		if self.theSelectedRow == -1:
+		if self.theSelectedRow == None:
 			anErrorMessage='\nNo data is selected.!\n'
 			self.theMainWindow.printMessage( anErrorMessage )
 			aWarningWindow = ConfirmWindow(0,anErrorMessage,"!")
@@ -142,7 +163,7 @@ class InterfaceWindow( OsogoWindow ):
 		# if a data is selected, then remove it.
 		else:
 
-			aTitle =  self['InterfaceCList'].get_text( self.theSelectedRow ,0 )
+			aTitle =  self['InterfaceCList'].get_model().get_value( self.theSelectedRow ,0 )
 			aTitleDict = self.theMainWindow.thePluginManager.thePluginTitleDict
 
 			anInstanceList = self.theMainWindow.thePluginManager.theInstanceList
@@ -174,7 +195,7 @@ class InterfaceWindow( OsogoWindow ):
 		# -------------------------------------------
 
 		# if no data is selected, show error message.
-		if self.theSelectedRow == -1:
+		if self.theSelectedRow == None:
 			anErrorMessage='\nNo data is selected.!\n'
 			self.theMainWindow.printMessage( anErrorMessage )
 			aWarningWindow = ConfirmWindow(0,anErrorMessage,"!")
@@ -183,7 +204,7 @@ class InterfaceWindow( OsogoWindow ):
 		# if a data is selected, then remove it.
 		else:
 
-			aTitle =  self['InterfaceCList'].get_text( self.theSelectedRow ,0 )
+			aTitle =  self['InterfaceCList'].get_model().get_value( self.theSelectedRow ,0 )
 			aTitleDict = self.theMainWindow.thePluginManager.thePluginTitleDict
 
 			anInstanceList = self.theMainWindow.thePluginManager.theInstanceList
@@ -193,7 +214,7 @@ class InterfaceWindow( OsogoWindow ):
 					break
 
 			# clear select status
-			self.theSelectedRow = -1
+			self.theSelectedRow = None
 
 		# -------------------------------------------
 		# update list

@@ -1,639 +1,606 @@
-<?xml version="1.0"?>
-<GTK-Interface>
+<?xml version="1.0" standalone="no"?> <!--*- mode: xml -*-->
+<!DOCTYPE glade-interface SYSTEM "http://glade.gnome.org/glade-2.0.dtd" >
 
-<project>
-  <name>InputWindow</name>
-  <program_name>inputwindow</program_name>
-  <directory></directory>
-  <source_directory>src</source_directory>
-  <pixmaps_directory>pixmaps</pixmaps_directory>
-  <language>C</language>
-  <gnome_support>True</gnome_support>
-  <gettext_support>True</gettext_support>
-</project>
+<glade-interface>
+  <widget class="GtkWindow" id="InputWindow">
+    <property name="title" translatable="yes">InputWindow</property>
+    <property name="type">GTK_WINDOW_TOPLEVEL</property>
+    <property name="modal">no</property>
+    <property name="allow_shrink">no</property>
+    <property name="allow_grow">yes</property>
+    <property name="window-position">GTK_WIN_POS_NONE</property>
+    <property name="visible">yes</property>
 
-<widget>
-  <class>GtkWindow</class>
-  <name>InputWindow</name>
-  <title>InputWindow</title>
-  <type>GTK_WINDOW_TOPLEVEL</type>
-  <position>GTK_WIN_POS_NONE</position>
-  <modal>False</modal>
-  <allow_shrink>False</allow_shrink>
-  <allow_grow>True</allow_grow>
-  <auto_shrink>False</auto_shrink>
+    <child>
+      <widget class="GtkVBox" id="vbox2">
+        <property name="homogeneous">no</property>
+        <property name="spacing">0</property>
+        <property name="visible">yes</property>
 
-  <widget>
-    <class>GtkVBox</class>
-    <name>vbox2</name>
-    <homogeneous>False</homogeneous>
-    <spacing>0</spacing>
+        <child>
+          <widget class="GtkHBox" id="hbox1">
+            <property name="homogeneous">no</property>
+            <property name="spacing">0</property>
+            <property name="visible">yes</property>
 
-    <widget>
-      <class>GtkHBox</class>
-      <name>hbox1</name>
-      <homogeneous>False</homogeneous>
-      <spacing>0</spacing>
-      <child>
-	<padding>0</padding>
-	<expand>True</expand>
-	<fill>True</fill>
-      </child>
+            <child>
+              <widget class="GtkLabel" id="label2">
+                <property name="label" translatable="yes">X</property>
+                <property name="justify">GTK_JUSTIFY_LEFT</property>
+                <property name="wrap">no</property>
+                <property name="xalign">0.21</property>
+                <property name="yalign">0.5</property>
+                <property name="xpad">0</property>
+                <property name="ypad">0</property>
+                <property name="width-request">48</property>
+                <property name="visible">yes</property>
+              </widget>
+              <packing>
+                <property name="padding">0</property>
+                <property name="expand">no</property>
+                <property name="fill">no</property>
+              </packing>
+            </child>
 
-      <widget>
-	<class>GtkLabel</class>
-	<name>label2</name>
-	<width>48</width>
-	<label>X</label>
-	<justify>GTK_JUSTIFY_LEFT</justify>
-	<wrap>False</wrap>
-	<xalign>0.21</xalign>
-	<yalign>0.5</yalign>
-	<xpad>0</xpad>
-	<ypad>0</ypad>
-	<child>
-	  <padding>0</padding>
-	  <expand>False</expand>
-	  <fill>False</fill>
-	</child>
+            <child>
+              <widget class="GtkEntry" id="entry1">
+                <property name="can_focus">yes</property>
+                <property name="editable">yes</property>
+                <property name="text" translatable="yes"></property>
+                <property name="max-length">0</property>
+                <property name="visibility">yes</property>
+                <property name="visible">yes</property>
+
+                <signal name="activate" handler="entry1_activate" />
+              </widget>
+              <packing>
+                <property name="padding">1</property>
+                <property name="expand">yes</property>
+                <property name="fill">no</property>
+              </packing>
+            </child>
+          </widget>
+          <packing>
+            <property name="padding">0</property>
+            <property name="expand">yes</property>
+            <property name="fill">yes</property>
+          </packing>
+        </child>
+
+        <child>
+          <widget class="GtkHBox" id="hbox3">
+            <property name="homogeneous">no</property>
+            <property name="spacing">0</property>
+            <property name="visible">yes</property>
+
+            <child>
+              <widget class="GtkLabel" id="label3">
+                <property name="label" translatable="yes">Y</property>
+                <property name="justify">GTK_JUSTIFY_CENTER</property>
+                <property name="wrap">no</property>
+                <property name="xalign">0.5</property>
+                <property name="yalign">0.5</property>
+                <property name="xpad">0</property>
+                <property name="ypad">0</property>
+                <property name="width-request">25</property>
+                <property name="visible">yes</property>
+              </widget>
+              <packing>
+                <property name="padding">0</property>
+                <property name="expand">no</property>
+                <property name="fill">no</property>
+              </packing>
+            </child>
+
+            <child>
+              <widget class="GtkToolbar" id="toolbar1">
+                <property name="orientation">GTK_ORIENTATION_HORIZONTAL</property>
+                <property name="width-request">24</property>
+                <property name="height-request">24</property>
+                <property name="toolbar-style">GTK_TOOLBAR_ICONS</property>
+                <property name="visible">yes</property>
+
+                <child>
+                  <widget class="toggle" id="togglebutton2">
+                    <property name="label" translatable="yes"></property>
+                    <property name="icon">redsq.xpm</property>
+                    <property name="active">no</property>
+                    <property name="width-request">21</property>
+                    <property name="height-request">21</property>
+                    <property name="visible">yes</property>
+                  </widget>
+                </child>
+              </widget>
+              <packing>
+                <property name="padding">0</property>
+                <property name="expand">no</property>
+                <property name="fill">no</property>
+              </packing>
+            </child>
+
+            <child>
+              <widget class="GtkEntry" id="entry2">
+                <property name="can_focus">yes</property>
+                <property name="editable">yes</property>
+                <property name="text" translatable="yes"></property>
+                <property name="max-length">0</property>
+                <property name="visibility">yes</property>
+                <property name="visible">yes</property>
+
+                <signal name="activate" handler="entry2_activate" />
+              </widget>
+              <packing>
+                <property name="padding">0</property>
+                <property name="expand">yes</property>
+                <property name="fill">yes</property>
+              </packing>
+            </child>
+          </widget>
+          <packing>
+            <property name="padding">0</property>
+            <property name="expand">yes</property>
+            <property name="fill">yes</property>
+          </packing>
+        </child>
+
+        <child>
+          <widget class="GtkHBox" id="hbox4">
+            <property name="homogeneous">no</property>
+            <property name="spacing">0</property>
+            <property name="visible">yes</property>
+
+            <child>
+              <widget class="GtkLabel" id="label4">
+                <property name="label" translatable="yes"></property>
+                <property name="justify">GTK_JUSTIFY_CENTER</property>
+                <property name="wrap">no</property>
+                <property name="xalign">0.5</property>
+                <property name="yalign">0.5</property>
+                <property name="xpad">0</property>
+                <property name="ypad">0</property>
+                <property name="width-request">25</property>
+                <property name="visible">yes</property>
+              </widget>
+              <packing>
+                <property name="padding">0</property>
+                <property name="expand">no</property>
+                <property name="fill">no</property>
+              </packing>
+            </child>
+
+            <child>
+              <widget class="GtkToolbar" id="toolbar2">
+                <property name="orientation">GTK_ORIENTATION_HORIZONTAL</property>
+                <property name="width-request">24</property>
+                <property name="height-request">24</property>
+                <property name="toolbar-style">GTK_TOOLBAR_ICONS</property>
+                <property name="visible">yes</property>
+
+                <child>
+                  <widget class="toggle" id="togglebutton3">
+                    <property name="label" translatable="yes"></property>
+                    <property name="icon">bluesq.xpm</property>
+                    <property name="active">no</property>
+                    <property name="width-request">21</property>
+                    <property name="height-request">21</property>
+                    <property name="visible">yes</property>
+                  </widget>
+                </child>
+              </widget>
+              <packing>
+                <property name="padding">0</property>
+                <property name="expand">no</property>
+                <property name="fill">no</property>
+              </packing>
+            </child>
+
+            <child>
+              <widget class="GtkEntry" id="entry3">
+                <property name="can_focus">yes</property>
+                <property name="editable">yes</property>
+                <property name="text" translatable="yes"></property>
+                <property name="max-length">0</property>
+                <property name="visibility">yes</property>
+                <property name="visible">yes</property>
+
+                <signal name="activate" handler="entry3_activate" />
+              </widget>
+              <packing>
+                <property name="padding">0</property>
+                <property name="expand">yes</property>
+                <property name="fill">yes</property>
+              </packing>
+            </child>
+          </widget>
+          <packing>
+            <property name="padding">0</property>
+            <property name="expand">yes</property>
+            <property name="fill">yes</property>
+          </packing>
+        </child>
+
+        <child>
+          <widget class="GtkHBox" id="hbox5">
+            <property name="homogeneous">no</property>
+            <property name="spacing">0</property>
+            <property name="visible">yes</property>
+
+            <child>
+              <widget class="GtkLabel" id="label5">
+                <property name="label" translatable="yes"></property>
+                <property name="justify">GTK_JUSTIFY_CENTER</property>
+                <property name="wrap">no</property>
+                <property name="xalign">0.5</property>
+                <property name="yalign">0.5</property>
+                <property name="xpad">0</property>
+                <property name="ypad">0</property>
+                <property name="width-request">25</property>
+                <property name="visible">yes</property>
+              </widget>
+              <packing>
+                <property name="padding">0</property>
+                <property name="expand">no</property>
+                <property name="fill">no</property>
+              </packing>
+            </child>
+
+            <child>
+              <widget class="GtkToolbar" id="toolbar3">
+                <property name="orientation">GTK_ORIENTATION_HORIZONTAL</property>
+                <property name="width-request">24</property>
+                <property name="height-request">24</property>
+                <property name="toolbar-style">GTK_TOOLBAR_ICONS</property>
+                <property name="visible">yes</property>
+
+                <child>
+                  <widget class="toggle" id="togglebutton4">
+                    <property name="label" translatable="yes"></property>
+                    <property name="icon">orangesq.xpm</property>
+                    <property name="active">no</property>
+                    <property name="width-request">21</property>
+                    <property name="height-request">21</property>
+                    <property name="visible">yes</property>
+                  </widget>
+                </child>
+              </widget>
+              <packing>
+                <property name="padding">0</property>
+                <property name="expand">no</property>
+                <property name="fill">no</property>
+              </packing>
+            </child>
+
+            <child>
+              <widget class="GtkEntry" id="entry4">
+                <property name="can_focus">yes</property>
+                <property name="editable">yes</property>
+                <property name="text" translatable="yes"></property>
+                <property name="max-length">0</property>
+                <property name="visibility">yes</property>
+                <property name="visible">yes</property>
+
+                <signal name="activate" handler="entry4_activate" />
+              </widget>
+              <packing>
+                <property name="padding">0</property>
+                <property name="expand">yes</property>
+                <property name="fill">yes</property>
+              </packing>
+            </child>
+          </widget>
+          <packing>
+            <property name="padding">0</property>
+            <property name="expand">yes</property>
+            <property name="fill">yes</property>
+          </packing>
+        </child>
+
+        <child>
+          <widget class="GtkHBox" id="hbox6">
+            <property name="homogeneous">no</property>
+            <property name="spacing">0</property>
+            <property name="visible">yes</property>
+
+            <child>
+              <widget class="GtkLabel" id="label6">
+                <property name="label" translatable="yes"></property>
+                <property name="justify">GTK_JUSTIFY_CENTER</property>
+                <property name="wrap">no</property>
+                <property name="xalign">0.5</property>
+                <property name="yalign">0.5</property>
+                <property name="xpad">0</property>
+                <property name="ypad">0</property>
+                <property name="width-request">25</property>
+                <property name="visible">yes</property>
+              </widget>
+              <packing>
+                <property name="padding">0</property>
+                <property name="expand">no</property>
+                <property name="fill">no</property>
+              </packing>
+            </child>
+
+            <child>
+              <widget class="GtkToolbar" id="toolbar4">
+                <property name="orientation">GTK_ORIENTATION_HORIZONTAL</property>
+                <property name="width-request">24</property>
+                <property name="height-request">24</property>
+                <property name="toolbar-style">GTK_TOOLBAR_ICONS</property>
+                <property name="visible">yes</property>
+
+                <child>
+                  <widget class="toggle" id="togglebutton5">
+                    <property name="label" translatable="yes"></property>
+                    <property name="icon">greensq.xpm</property>
+                    <property name="active">no</property>
+                    <property name="width-request">21</property>
+                    <property name="height-request">21</property>
+                    <property name="visible">yes</property>
+                  </widget>
+                </child>
+              </widget>
+              <packing>
+                <property name="padding">0</property>
+                <property name="expand">no</property>
+                <property name="fill">no</property>
+              </packing>
+            </child>
+
+            <child>
+              <widget class="GtkEntry" id="entry5">
+                <property name="can_focus">yes</property>
+                <property name="editable">yes</property>
+                <property name="text" translatable="yes"></property>
+                <property name="max-length">0</property>
+                <property name="visibility">yes</property>
+                <property name="visible">yes</property>
+
+                <signal name="activate" handler="entry5_activate" />
+              </widget>
+              <packing>
+                <property name="padding">0</property>
+                <property name="expand">yes</property>
+                <property name="fill">yes</property>
+              </packing>
+            </child>
+          </widget>
+          <packing>
+            <property name="padding">0</property>
+            <property name="expand">yes</property>
+            <property name="fill">yes</property>
+          </packing>
+        </child>
+
+        <child>
+          <widget class="GtkHBox" id="hbox7">
+            <property name="homogeneous">no</property>
+            <property name="spacing">0</property>
+            <property name="visible">yes</property>
+
+            <child>
+              <widget class="GtkLabel" id="label7">
+                <property name="label" translatable="yes"></property>
+                <property name="justify">GTK_JUSTIFY_CENTER</property>
+                <property name="wrap">no</property>
+                <property name="xalign">0.5</property>
+                <property name="yalign">0.5</property>
+                <property name="xpad">0</property>
+                <property name="ypad">0</property>
+                <property name="width-request">25</property>
+                <property name="visible">yes</property>
+              </widget>
+              <packing>
+                <property name="padding">0</property>
+                <property name="expand">no</property>
+                <property name="fill">no</property>
+              </packing>
+            </child>
+
+            <child>
+              <widget class="GtkToolbar" id="toolbar5">
+                <property name="orientation">GTK_ORIENTATION_HORIZONTAL</property>
+                <property name="width-request">24</property>
+                <property name="height-request">24</property>
+                <property name="toolbar-style">GTK_TOOLBAR_ICONS</property>
+                <property name="visible">yes</property>
+
+                <child>
+                  <widget class="toggle" id="togglebutton6">
+                    <property name="label" translatable="yes">
+</property>
+                    <property name="icon">purplesq.xpm</property>
+                    <property name="active">no</property>
+                    <property name="width-request">21</property>
+                    <property name="height-request">21</property>
+                    <property name="visible">yes</property>
+                  </widget>
+                </child>
+              </widget>
+              <packing>
+                <property name="padding">0</property>
+                <property name="expand">no</property>
+                <property name="fill">no</property>
+              </packing>
+            </child>
+
+            <child>
+              <widget class="GtkEntry" id="entry6">
+                <property name="can_focus">yes</property>
+                <property name="editable">yes</property>
+                <property name="text" translatable="yes"></property>
+                <property name="max-length">0</property>
+                <property name="visibility">yes</property>
+                <property name="visible">yes</property>
+
+                <signal name="activate" handler="entry6_activate" />
+              </widget>
+              <packing>
+                <property name="padding">0</property>
+                <property name="expand">yes</property>
+                <property name="fill">yes</property>
+              </packing>
+            </child>
+          </widget>
+          <packing>
+            <property name="padding">0</property>
+            <property name="expand">yes</property>
+            <property name="fill">yes</property>
+          </packing>
+        </child>
+
+        <child>
+          <widget class="GtkHBox" id="hbox8">
+            <property name="homogeneous">no</property>
+            <property name="spacing">0</property>
+            <property name="visible">yes</property>
+
+            <child>
+              <widget class="GtkLabel" id="label8">
+                <property name="label" translatable="yes"></property>
+                <property name="justify">GTK_JUSTIFY_CENTER</property>
+                <property name="wrap">no</property>
+                <property name="xalign">0.5</property>
+                <property name="yalign">0.5</property>
+                <property name="xpad">0</property>
+                <property name="ypad">0</property>
+                <property name="width-request">25</property>
+                <property name="visible">yes</property>
+              </widget>
+              <packing>
+                <property name="padding">0</property>
+                <property name="expand">no</property>
+                <property name="fill">no</property>
+              </packing>
+            </child>
+
+            <child>
+              <widget class="GtkToolbar" id="toolbar6">
+                <property name="orientation">GTK_ORIENTATION_HORIZONTAL</property>
+                <property name="width-request">24</property>
+                <property name="height-request">24</property>
+                <property name="toolbar-style">GTK_TOOLBAR_ICONS</property>
+                <property name="visible">yes</property>
+
+                <child>
+                  <widget class="toggle" id="togglebutton7">
+                    <property name="label" translatable="yes">
+</property>
+                    <property name="icon">navysq.xpm</property>
+                    <property name="active">no</property>
+                    <property name="width-request">21</property>
+                    <property name="height-request">21</property>
+                    <property name="visible">yes</property>
+                  </widget>
+                </child>
+              </widget>
+              <packing>
+                <property name="padding">0</property>
+                <property name="expand">no</property>
+                <property name="fill">no</property>
+              </packing>
+            </child>
+
+            <child>
+              <widget class="GtkEntry" id="entry7">
+                <property name="can_focus">yes</property>
+                <property name="editable">yes</property>
+                <property name="text" translatable="yes"></property>
+                <property name="max-length">0</property>
+                <property name="visibility">yes</property>
+                <property name="visible">yes</property>
+
+                <signal name="activate" handler="entry7_activate" />
+              </widget>
+              <packing>
+                <property name="padding">0</property>
+                <property name="expand">yes</property>
+                <property name="fill">yes</property>
+              </packing>
+            </child>
+          </widget>
+          <packing>
+            <property name="padding">0</property>
+            <property name="expand">yes</property>
+            <property name="fill">yes</property>
+          </packing>
+        </child>
+
+        <child>
+          <widget class="GtkHBox" id="hbox9">
+            <property name="homogeneous">no</property>
+            <property name="spacing">0</property>
+            <property name="visible">yes</property>
+
+            <child>
+              <widget class="GtkLabel" id="label9">
+                <property name="label" translatable="yes"></property>
+                <property name="justify">GTK_JUSTIFY_CENTER</property>
+                <property name="wrap">no</property>
+                <property name="xalign">0.5</property>
+                <property name="yalign">0.5</property>
+                <property name="xpad">0</property>
+                <property name="ypad">0</property>
+                <property name="width-request">25</property>
+                <property name="visible">yes</property>
+              </widget>
+              <packing>
+                <property name="padding">0</property>
+                <property name="expand">no</property>
+                <property name="fill">no</property>
+              </packing>
+            </child>
+
+            <child>
+              <widget class="GtkToolbar" id="toolbar7">
+                <property name="orientation">GTK_ORIENTATION_HORIZONTAL</property>
+                <property name="width-request">24</property>
+                <property name="height-request">24</property>
+                <property name="toolbar-style">GTK_TOOLBAR_ICONS</property>
+                <property name="visible">yes</property>
+
+                <child>
+                  <widget class="toggle" id="togglebutton8">
+                    <property name="label" translatable="yes"></property>
+                    <property name="icon">brownsq.xpm</property>
+                    <property name="active">no</property>
+                    <property name="width-request">21</property>
+                    <property name="height-request">21</property>
+                    <property name="visible">yes</property>
+                  </widget>
+                </child>
+              </widget>
+              <packing>
+                <property name="padding">0</property>
+                <property name="expand">no</property>
+                <property name="fill">no</property>
+              </packing>
+            </child>
+
+            <child>
+              <widget class="GtkEntry" id="entry8">
+                <property name="can_focus">yes</property>
+                <property name="editable">yes</property>
+                <property name="text" translatable="yes"></property>
+                <property name="max-length">0</property>
+                <property name="visibility">yes</property>
+                <property name="visible">yes</property>
+
+                <signal name="activate" handler="entry8_activate" />
+              </widget>
+              <packing>
+                <property name="padding">0</property>
+                <property name="expand">yes</property>
+                <property name="fill">yes</property>
+              </packing>
+            </child>
+          </widget>
+          <packing>
+            <property name="padding">0</property>
+            <property name="expand">yes</property>
+            <property name="fill">yes</property>
+          </packing>
+        </child>
       </widget>
-
-      <widget>
-	<class>GtkEntry</class>
-	<name>entry1</name>
-	<can_focus>True</can_focus>
-	<signal>
-	  <name>activate</name>
-	  <handler>entry1_activate</handler>
-	  <last_modification_time>Wed, 19 Dec 2001 03:11:12 GMT</last_modification_time>
-	</signal>
-	<editable>True</editable>
-	<text_visible>True</text_visible>
-	<text_max_length>0</text_max_length>
-	<text></text>
-	<child>
-	  <padding>1</padding>
-	  <expand>True</expand>
-	  <fill>False</fill>
-	</child>
-      </widget>
-    </widget>
-
-    <widget>
-      <class>GtkHBox</class>
-      <name>hbox3</name>
-      <homogeneous>False</homogeneous>
-      <spacing>0</spacing>
-      <child>
-	<padding>0</padding>
-	<expand>True</expand>
-	<fill>True</fill>
-      </child>
-
-      <widget>
-	<class>GtkLabel</class>
-	<name>label3</name>
-	<width>25</width>
-	<label>Y</label>
-	<justify>GTK_JUSTIFY_CENTER</justify>
-	<wrap>False</wrap>
-	<xalign>0.5</xalign>
-	<yalign>0.5</yalign>
-	<xpad>0</xpad>
-	<ypad>0</ypad>
-	<child>
-	  <padding>0</padding>
-	  <expand>False</expand>
-	  <fill>False</fill>
-	</child>
-      </widget>
-
-      <widget>
-	<class>GtkToolbar</class>
-	<name>toolbar1</name>
-	<width>24</width>
-	<height>24</height>
-	<orientation>GTK_ORIENTATION_HORIZONTAL</orientation>
-	<type>GTK_TOOLBAR_ICONS</type>
-	<space_size>5</space_size>
-	<space_style>GTK_TOOLBAR_SPACE_EMPTY</space_style>
-	<relief>GTK_RELIEF_NORMAL</relief>
-	<tooltips>True</tooltips>
-	<child>
-	  <padding>0</padding>
-	  <expand>False</expand>
-	  <fill>False</fill>
-	</child>
-
-	<widget>
-	  <class>GtkToggleButton</class>
-	  <child_name>Toolbar:button</child_name>
-	  <name>togglebutton2</name>
-	  <width>21</width>
-	  <height>21</height>
-	  <label></label>
-	  <icon>redsq.xpm</icon>
-	  <active>False</active>
-	</widget>
-      </widget>
-
-      <widget>
-	<class>GtkEntry</class>
-	<name>entry2</name>
-	<can_focus>True</can_focus>
-	<signal>
-	  <name>activate</name>
-	  <handler>entry2_activate</handler>
-	  <last_modification_time>Wed, 19 Dec 2001 03:11:24 GMT</last_modification_time>
-	</signal>
-	<editable>True</editable>
-	<text_visible>True</text_visible>
-	<text_max_length>0</text_max_length>
-	<text></text>
-	<child>
-	  <padding>0</padding>
-	  <expand>True</expand>
-	  <fill>True</fill>
-	</child>
-      </widget>
-    </widget>
-
-    <widget>
-      <class>GtkHBox</class>
-      <name>hbox4</name>
-      <homogeneous>False</homogeneous>
-      <spacing>0</spacing>
-      <child>
-	<padding>0</padding>
-	<expand>True</expand>
-	<fill>True</fill>
-      </child>
-
-      <widget>
-	<class>GtkLabel</class>
-	<name>label4</name>
-	<width>25</width>
-	<label></label>
-	<justify>GTK_JUSTIFY_CENTER</justify>
-	<wrap>False</wrap>
-	<xalign>0.5</xalign>
-	<yalign>0.5</yalign>
-	<xpad>0</xpad>
-	<ypad>0</ypad>
-	<child>
-	  <padding>0</padding>
-	  <expand>False</expand>
-	  <fill>False</fill>
-	</child>
-      </widget>
-
-      <widget>
-	<class>GtkToolbar</class>
-	<name>toolbar2</name>
-	<width>24</width>
-	<height>24</height>
-	<orientation>GTK_ORIENTATION_HORIZONTAL</orientation>
-	<type>GTK_TOOLBAR_ICONS</type>
-	<space_size>5</space_size>
-	<space_style>GTK_TOOLBAR_SPACE_EMPTY</space_style>
-	<relief>GTK_RELIEF_NORMAL</relief>
-	<tooltips>True</tooltips>
-	<child>
-	  <padding>0</padding>
-	  <expand>False</expand>
-	  <fill>False</fill>
-	</child>
-
-	<widget>
-	  <class>GtkToggleButton</class>
-	  <child_name>Toolbar:button</child_name>
-	  <name>togglebutton3</name>
-	  <width>21</width>
-	  <height>21</height>
-	  <label></label>
-	  <icon>bluesq.xpm</icon>
-	  <active>False</active>
-	</widget>
-      </widget>
-
-      <widget>
-	<class>GtkEntry</class>
-	<name>entry3</name>
-	<can_focus>True</can_focus>
-	<signal>
-	  <name>activate</name>
-	  <handler>entry3_activate</handler>
-	  <last_modification_time>Wed, 19 Dec 2001 03:11:37 GMT</last_modification_time>
-	</signal>
-	<editable>True</editable>
-	<text_visible>True</text_visible>
-	<text_max_length>0</text_max_length>
-	<text></text>
-	<child>
-	  <padding>0</padding>
-	  <expand>True</expand>
-	  <fill>True</fill>
-	</child>
-      </widget>
-    </widget>
-
-    <widget>
-      <class>GtkHBox</class>
-      <name>hbox5</name>
-      <homogeneous>False</homogeneous>
-      <spacing>0</spacing>
-      <child>
-	<padding>0</padding>
-	<expand>True</expand>
-	<fill>True</fill>
-      </child>
-
-      <widget>
-	<class>GtkLabel</class>
-	<name>label5</name>
-	<width>25</width>
-	<label></label>
-	<justify>GTK_JUSTIFY_CENTER</justify>
-	<wrap>False</wrap>
-	<xalign>0.5</xalign>
-	<yalign>0.5</yalign>
-	<xpad>0</xpad>
-	<ypad>0</ypad>
-	<child>
-	  <padding>0</padding>
-	  <expand>False</expand>
-	  <fill>False</fill>
-	</child>
-      </widget>
-
-      <widget>
-	<class>GtkToolbar</class>
-	<name>toolbar3</name>
-	<width>24</width>
-	<height>24</height>
-	<orientation>GTK_ORIENTATION_HORIZONTAL</orientation>
-	<type>GTK_TOOLBAR_ICONS</type>
-	<space_size>5</space_size>
-	<space_style>GTK_TOOLBAR_SPACE_EMPTY</space_style>
-	<relief>GTK_RELIEF_NORMAL</relief>
-	<tooltips>True</tooltips>
-	<child>
-	  <padding>0</padding>
-	  <expand>False</expand>
-	  <fill>False</fill>
-	</child>
-
-	<widget>
-	  <class>GtkToggleButton</class>
-	  <child_name>Toolbar:button</child_name>
-	  <name>togglebutton4</name>
-	  <width>21</width>
-	  <height>21</height>
-	  <label></label>
-	  <icon>orangesq.xpm</icon>
-	  <active>False</active>
-	</widget>
-      </widget>
-
-      <widget>
-	<class>GtkEntry</class>
-	<name>entry4</name>
-	<can_focus>True</can_focus>
-	<signal>
-	  <name>activate</name>
-	  <handler>entry4_activate</handler>
-	  <last_modification_time>Wed, 16 Jan 2002 18:20:27 GMT</last_modification_time>
-	</signal>
-	<editable>True</editable>
-	<text_visible>True</text_visible>
-	<text_max_length>0</text_max_length>
-	<text></text>
-	<child>
-	  <padding>0</padding>
-	  <expand>True</expand>
-	  <fill>True</fill>
-	</child>
-      </widget>
-    </widget>
-
-    <widget>
-      <class>GtkHBox</class>
-      <name>hbox6</name>
-      <homogeneous>False</homogeneous>
-      <spacing>0</spacing>
-      <child>
-	<padding>0</padding>
-	<expand>True</expand>
-	<fill>True</fill>
-      </child>
-
-      <widget>
-	<class>GtkLabel</class>
-	<name>label6</name>
-	<width>25</width>
-	<label></label>
-	<justify>GTK_JUSTIFY_CENTER</justify>
-	<wrap>False</wrap>
-	<xalign>0.5</xalign>
-	<yalign>0.5</yalign>
-	<xpad>0</xpad>
-	<ypad>0</ypad>
-	<child>
-	  <padding>0</padding>
-	  <expand>False</expand>
-	  <fill>False</fill>
-	</child>
-      </widget>
-
-      <widget>
-	<class>GtkToolbar</class>
-	<name>toolbar4</name>
-	<width>24</width>
-	<height>24</height>
-	<orientation>GTK_ORIENTATION_HORIZONTAL</orientation>
-	<type>GTK_TOOLBAR_ICONS</type>
-	<space_size>5</space_size>
-	<space_style>GTK_TOOLBAR_SPACE_EMPTY</space_style>
-	<relief>GTK_RELIEF_NORMAL</relief>
-	<tooltips>True</tooltips>
-	<child>
-	  <padding>0</padding>
-	  <expand>False</expand>
-	  <fill>False</fill>
-	</child>
-
-	<widget>
-	  <class>GtkToggleButton</class>
-	  <child_name>Toolbar:button</child_name>
-	  <name>togglebutton5</name>
-	  <width>21</width>
-	  <height>21</height>
-	  <label></label>
-	  <icon>greensq.xpm</icon>
-	  <active>False</active>
-	</widget>
-      </widget>
-
-      <widget>
-	<class>GtkEntry</class>
-	<name>entry5</name>
-	<can_focus>True</can_focus>
-	<signal>
-	  <name>activate</name>
-	  <handler>entry5_activate</handler>
-	  <last_modification_time>Wed, 16 Jan 2002 18:20:41 GMT</last_modification_time>
-	</signal>
-	<editable>True</editable>
-	<text_visible>True</text_visible>
-	<text_max_length>0</text_max_length>
-	<text></text>
-	<child>
-	  <padding>0</padding>
-	  <expand>True</expand>
-	  <fill>True</fill>
-	</child>
-      </widget>
-    </widget>
-
-    <widget>
-      <class>GtkHBox</class>
-      <name>hbox7</name>
-      <homogeneous>False</homogeneous>
-      <spacing>0</spacing>
-      <child>
-	<padding>0</padding>
-	<expand>True</expand>
-	<fill>True</fill>
-      </child>
-
-      <widget>
-	<class>GtkLabel</class>
-	<name>label7</name>
-	<width>25</width>
-	<label></label>
-	<justify>GTK_JUSTIFY_CENTER</justify>
-	<wrap>False</wrap>
-	<xalign>0.5</xalign>
-	<yalign>0.5</yalign>
-	<xpad>0</xpad>
-	<ypad>0</ypad>
-	<child>
-	  <padding>0</padding>
-	  <expand>False</expand>
-	  <fill>False</fill>
-	</child>
-      </widget>
-
-      <widget>
-	<class>GtkToolbar</class>
-	<name>toolbar5</name>
-	<width>24</width>
-	<height>24</height>
-	<orientation>GTK_ORIENTATION_HORIZONTAL</orientation>
-	<type>GTK_TOOLBAR_ICONS</type>
-	<space_size>5</space_size>
-	<space_style>GTK_TOOLBAR_SPACE_EMPTY</space_style>
-	<relief>GTK_RELIEF_NORMAL</relief>
-	<tooltips>True</tooltips>
-	<child>
-	  <padding>0</padding>
-	  <expand>False</expand>
-	  <fill>False</fill>
-	</child>
-
-	<widget>
-	  <class>GtkToggleButton</class>
-	  <child_name>Toolbar:button</child_name>
-	  <name>togglebutton6</name>
-	  <width>21</width>
-	  <height>21</height>
-	  <label>
-</label>
-	  <icon>purplesq.xpm</icon>
-	  <active>False</active>
-	</widget>
-      </widget>
-
-      <widget>
-	<class>GtkEntry</class>
-	<name>entry6</name>
-	<can_focus>True</can_focus>
-	<signal>
-	  <name>activate</name>
-	  <handler>entry6_activate</handler>
-	  <last_modification_time>Wed, 16 Jan 2002 18:20:52 GMT</last_modification_time>
-	</signal>
-	<editable>True</editable>
-	<text_visible>True</text_visible>
-	<text_max_length>0</text_max_length>
-	<text></text>
-	<child>
-	  <padding>0</padding>
-	  <expand>True</expand>
-	  <fill>True</fill>
-	</child>
-      </widget>
-    </widget>
-
-    <widget>
-      <class>GtkHBox</class>
-      <name>hbox8</name>
-      <homogeneous>False</homogeneous>
-      <spacing>0</spacing>
-      <child>
-	<padding>0</padding>
-	<expand>True</expand>
-	<fill>True</fill>
-      </child>
-
-      <widget>
-	<class>GtkLabel</class>
-	<name>label8</name>
-	<width>25</width>
-	<label></label>
-	<justify>GTK_JUSTIFY_CENTER</justify>
-	<wrap>False</wrap>
-	<xalign>0.5</xalign>
-	<yalign>0.5</yalign>
-	<xpad>0</xpad>
-	<ypad>0</ypad>
-	<child>
-	  <padding>0</padding>
-	  <expand>False</expand>
-	  <fill>False</fill>
-	</child>
-      </widget>
-
-      <widget>
-	<class>GtkToolbar</class>
-	<name>toolbar6</name>
-	<width>24</width>
-	<height>24</height>
-	<orientation>GTK_ORIENTATION_HORIZONTAL</orientation>
-	<type>GTK_TOOLBAR_ICONS</type>
-	<space_size>5</space_size>
-	<space_style>GTK_TOOLBAR_SPACE_EMPTY</space_style>
-	<relief>GTK_RELIEF_NORMAL</relief>
-	<tooltips>True</tooltips>
-	<child>
-	  <padding>0</padding>
-	  <expand>False</expand>
-	  <fill>False</fill>
-	</child>
-
-	<widget>
-	  <class>GtkToggleButton</class>
-	  <child_name>Toolbar:button</child_name>
-	  <name>togglebutton7</name>
-	  <width>21</width>
-	  <height>21</height>
-	  <label>
-</label>
-	  <icon>navysq.xpm</icon>
-	  <active>False</active>
-	</widget>
-      </widget>
-
-      <widget>
-	<class>GtkEntry</class>
-	<name>entry7</name>
-	<can_focus>True</can_focus>
-	<signal>
-	  <name>activate</name>
-	  <handler>entry7_activate</handler>
-	  <last_modification_time>Wed, 16 Jan 2002 18:21:03 GMT</last_modification_time>
-	</signal>
-	<editable>True</editable>
-	<text_visible>True</text_visible>
-	<text_max_length>0</text_max_length>
-	<text></text>
-	<child>
-	  <padding>0</padding>
-	  <expand>True</expand>
-	  <fill>True</fill>
-	</child>
-      </widget>
-    </widget>
-
-    <widget>
-      <class>GtkHBox</class>
-      <name>hbox9</name>
-      <homogeneous>False</homogeneous>
-      <spacing>0</spacing>
-      <child>
-	<padding>0</padding>
-	<expand>True</expand>
-	<fill>True</fill>
-      </child>
-
-      <widget>
-	<class>GtkLabel</class>
-	<name>label9</name>
-	<width>25</width>
-	<label></label>
-	<justify>GTK_JUSTIFY_CENTER</justify>
-	<wrap>False</wrap>
-	<xalign>0.5</xalign>
-	<yalign>0.5</yalign>
-	<xpad>0</xpad>
-	<ypad>0</ypad>
-	<child>
-	  <padding>0</padding>
-	  <expand>False</expand>
-	  <fill>False</fill>
-	</child>
-      </widget>
-
-      <widget>
-	<class>GtkToolbar</class>
-	<name>toolbar7</name>
-	<width>24</width>
-	<height>24</height>
-	<orientation>GTK_ORIENTATION_HORIZONTAL</orientation>
-	<type>GTK_TOOLBAR_ICONS</type>
-	<space_size>5</space_size>
-	<space_style>GTK_TOOLBAR_SPACE_EMPTY</space_style>
-	<relief>GTK_RELIEF_NORMAL</relief>
-	<tooltips>True</tooltips>
-	<child>
-	  <padding>0</padding>
-	  <expand>False</expand>
-	  <fill>False</fill>
-	</child>
-
-	<widget>
-	  <class>GtkToggleButton</class>
-	  <child_name>Toolbar:button</child_name>
-	  <name>togglebutton8</name>
-	  <width>21</width>
-	  <height>21</height>
-	  <label></label>
-	  <icon>brownsq.xpm</icon>
-	  <active>False</active>
-	</widget>
-      </widget>
-
-      <widget>
-	<class>GtkEntry</class>
-	<name>entry8</name>
-	<can_focus>True</can_focus>
-	<signal>
-	  <name>activate</name>
-	  <handler>entry8_activate</handler>
-	  <last_modification_time>Wed, 16 Jan 2002 18:21:14 GMT</last_modification_time>
-	</signal>
-	<editable>True</editable>
-	<text_visible>True</text_visible>
-	<text_max_length>0</text_max_length>
-	<text></text>
-	<child>
-	  <padding>0</padding>
-	  <expand>True</expand>
-	  <fill>True</fill>
-	</child>
-      </widget>
-    </widget>
+    </child>
   </widget>
-</widget>
-
-</GTK-Interface>
+</glade-interface>

@@ -3,7 +3,6 @@
 
 from OsogoPluginWindow import *
 from ecell.ecssupport import *
-import GTK
 import operator
 
 # ------------------------------------------------------
@@ -39,8 +38,9 @@ class DigitalWindow( OsogoPluginWindow ):
 			self.thePluginManager.appendInstance( self )
 
 			# ----------------------------------------------------------------
-			self['toolbar5'].set_style( GTK.TOOLBAR_ICONS )
-			self['toolbar5'].set_button_relief( GTK.RELIEF_HALF )
+		#	self['toolbar5'].set_style( GTK.TOOLBAR_ICONS )
+			self['increase_button'].set_relief( gtk.RELIEF_HALF )
+			self['decrease_button'].set_relief( gtk.RELIEF_HALF )
 
 			self.addHandlers( { 'input_value'    :self.inputValue,
 		  	            'increase_value' :self.increaseValue,

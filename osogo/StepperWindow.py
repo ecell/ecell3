@@ -36,6 +36,7 @@ from OsogoUtil import *
 
 #from Window import *
 from OsogoWindow import *
+import gobject
 #from gtk import *
 #from Numeric import *
 
@@ -72,7 +73,7 @@ class StepperWindow(OsogoWindow):
 		self.theSession = aSession
 		self.theStepperIDList = ()
 		self.theStepperIDListItems = []
-		self.theSelectedRowOfPropertyList = -1
+		self.theSelectedRowOfPropertyList = None
 		self.theSelectedStepperIDListItem = None
 
 	# end of the __init__
@@ -81,6 +82,30 @@ class StepperWindow(OsogoWindow):
 	def openWindow(self):
 
 		OsogoWindow.openWindow(self)
+		self.theStepperIDListWidget = self[ 'stepper_id_list' ]
+		aListStore = gtk.ListStore( gobject.TYPE_STRING )
+		self.theStepperIDListWidget.set_model( aListStore )
+		column=gtk.TreeViewColumn('Stepper',gtk.CellRendererText(),text=0)
+		self.theStepperIDListWidget.append_column(column)
+
+		self.thePropertyList=self['property_list']
+		aPropertyModel=gtk.ListStore( gobject.TYPE_STRING,
+					 gobject.TYPE_STRING,
+					  gobject.TYPE_STRING,
+					   gobject.TYPE_STRING,
+					    gobject.TYPE_STRING)
+		self.thePropertyList.set_model(aPropertyModel)
+		column=gtk.TreeViewColumn('Property',gtk.CellRendererText(),text=0)
+		self.thePropertyList.append_column(column)
+		column=gtk.TreeViewColumn('Number',gtk.CellRendererText(),text=1)
+		self.thePropertyList.append_column(column)
+		column=gtk.TreeViewColumn('Value',gtk.CellRendererText(),text=2)
+		self.thePropertyList.append_column(column)
+		column=gtk.TreeViewColumn('Getable',gtk.CellRendererText(),text=3)
+		self.thePropertyList.append_column(column)
+		column=gtk.TreeViewColumn('Settable',gtk.CellRendererText(),text=4)
+		self.thePropertyList.append_column(column)
+		
 		self.initialize()
 
 		# ---------------------------------------------------------------
@@ -118,7 +143,7 @@ class StepperWindow(OsogoWindow):
 
 	# ---------------------------------------------------------------
 	# selectStepperID
-	# objects : ( stepper_id_list[GtkList], selected_item[GtkItem] )
+	# objects : ( stepper_id_list[List], selected_item[Item] )
 	#
 	# return -> None
 	# ---------------------------------------------------------------
@@ -127,16 +152,13 @@ class StepperWindow(OsogoWindow):
 		if self.isShown == gtk.FALSE:
 			return None
 
-		self.theSelectedStepperIDListItem = objects[1]
+		iter = self.theStepperIDListWidget.get_selection().get_selected()[1]
+		self.theSelectedStepperIDListItem = self.theStepperIDListWidget.get_model().get_value(iter,0)
+		for aStepperID in self.theStepperIDList:
+			if aStepperID == self.theSelectedStepperIDListItem:
 
-	
-	
-
-		for theStepperIDListItem in self.theStepperIDListItems:
-			if theStepperIDListItem == objects[1]:
-				aStepperID = theStepperIDListItem.get_name()
-
-				self['property_list'].clear()
+				PropertyModel=self['property_list'].get_model()
+				PropertyModel.clear()
 
 				aClassName = self.theSession.theSimulator.getStepperClassName( aStepperID )
 				aList = [ 'ClassName', ]
@@ -144,7 +166,10 @@ class StepperWindow(OsogoWindow):
 				aList.append( str(aClassName) )
 				aList.append( decodeAttribute( TRUE ) )
 				aList.append( decodeAttribute( FALSE ) )
-				self['property_list'].append( aList )
+				iter = PropertyModel.append( )
+				for i in range(0,5):
+			    	    PropertyModel.set_value(iter,i,aList[i])
+						    
 
 				for aProperty in self.theSession.theSimulator.getStepperPropertyList( aStepperID ):
 
@@ -174,8 +199,9 @@ class StepperWindow(OsogoWindow):
 
 						aList.append( decodeAttribute(anAttribute[GETABLE]) )
 						aList.append( decodeAttribute(anAttribute[SETTABLE]) )
-
-						self['property_list'].append( aList )
+						iter = PropertyModel.append( )
+						for i in range(0,5):
+			    			    PropertyModel.set_value(iter,i,aList[i])
 
 					# ---------------------------
 					# When data type is tuple
@@ -198,7 +224,10 @@ class StepperWindow(OsogoWindow):
 							#aList.append( decodeAttribute(aProperty[GETABLE]) )
 							#aList.append( decodeAttribute(aProperty[SETTABLE]) )
 
-							self['property_list'].append( aList )
+							iter = PropertyModel.append( )
+							for i in range(0,5):
+			    				    PropertyModel.set_value(iter,i,aList[i])
+
 
 							aNumber = aNumber + 1
 							
@@ -218,12 +247,13 @@ class StepperWindow(OsogoWindow):
 		# gets the number of selected row that is required in updateProprety
 		# method.
 		# ------------------------------------------------------------------
-		self.theSelectedRowOfPropertyList = objects[1]
+		self.theSelectedRowOfPropertyList = self.thePropertyList.get_selection().get_selected()[1]
 
 		# ------------------------------------------------------------------
 		# gets value from proprety_list
 		# ------------------------------------------------------------------
-		aValue = self['property_list'].get_text( objects[1], VALUE_INDEX )
+		aValue = self['property_list'].get_model().get_value(\
+			     self.theSelectedRowOfPropertyList, VALUE_INDEX )
 
 		# ------------------------------------------------------------------
 		# sets value to value_entry
@@ -234,7 +264,8 @@ class StepperWindow(OsogoWindow):
 		# when the selected property is settable, set sensitive value_entry
 		# when not, set unsensitive value_entry
 		# ------------------------------------------------------------------
-		if self['property_list'].get_text( objects[1], SET_INDEX ) == decodeAttribute(TRUE):
+		if self['property_list'].get_model().get_value(  self.theSelectedRowOfPropertyList, 
+							SET_INDEX ) == decodeAttribute(TRUE):
 			self['value_entry'].set_sensitive( gtk.TRUE )
 			self['update_button'].set_sensitive( gtk.TRUE )
 		else:
@@ -267,9 +298,9 @@ class StepperWindow(OsogoWindow):
 		# ---------------------------------------------------------------------------
 		# gets a number and property name from property list
 		# ---------------------------------------------------------------------------
-		aNumber = self['property_list'].get_text( self.theSelectedRowOfPropertyList,
+		aNumber = self['property_list'].get_model().get_value( self.theSelectedRowOfPropertyList,
 		                                          NUMBER_INDEX )
-		aPropertyName = self['property_list'].get_text( self.theSelectedRowOfPropertyList,
+		aPropertyName = self['property_list'].get_model().get_value( self.theSelectedRowOfPropertyList,
 		                                                PROPERTY_INDEX )
 
 		# ------------------------------------
@@ -281,7 +312,7 @@ class StepperWindow(OsogoWindow):
 			# converts value type
 			# ---------------------------------------------------------------------------
 			anOldValue = self.theSession.theSimulator.getStepperProperty( 
-			                              self.theSelectedStepperIDListItem.get_name(),
+			                              self.theSelectedStepperIDListItem,
 			                              aPropertyName )
 
 			try:
@@ -301,17 +332,17 @@ class StepperWindow(OsogoWindow):
 			# sets new value
 			# ---------------------------------------------------------------------------
 			try:
-				self.theSession.theSimulator.setStepperProperty( self.theSelectedStepperIDListItem.get_name(),
+				self.theSession.theSimulator.setStepperProperty( self.theSelectedStepperIDListItem,
 			    	                                             aPropertyName,
 			       	                                          aValue )
 			except:
 
 				import sys
 				import traceback
-				self.printMessage(' can\'t load [%s]' %aFileName)
+#				self.printMessage(' can\'t load [%s]' %aFileName)
 				aErrorMessage = \
 				  string.join( traceback.format_exception(sys.exc_type,sys.exc_value,sys.exc_traceback), '\n' )
-				self.theSession.printMessage( aErroeMessage )
+				self.theSession.message( aErrorMessage )
 
 				aErrorMessage = "Error : refer to the MessageWindow."
 				self['statusbar'].push(1,aErrorMessage)
@@ -326,7 +357,7 @@ class StepperWindow(OsogoWindow):
 			# converts value type
 			# ---------------------------------------------------------------------------
 			aValueTuple = self.theSession.theSimulator.getStepperProperty( 
-			                             self.theSelectedStepperIDListItem.get_name(),
+			                             self.theSelectedStepperIDListItem,
 			                             aPropertyName )
 
 			try:
@@ -362,17 +393,17 @@ class StepperWindow(OsogoWindow):
 			# sets new value
 			# ---------------------------------------------------------------------------
 			try:
-				self.theSession.theSimulator.setStepperProperty( self.theSelectedStepperIDListItem.get_name(),
+				self.theSession.theSimulator.setStepperProperty( self.theSelectedStepperIDListItem,
 			   	                                              aPropertyName,
 			   	                                              aNewValue )
 			except:
 
 				import sys
 				import traceback
-				self.printMessage(' can\'t load [%s]' %aFileName)
+#				self.printMessage(' can\'t load [%s]' %aFileName)
 				aErrorMessage = \
 				  string.join( traceback.format_exception(sys.exc_type,sys.exc_value,sys.exc_traceback), '\n' )
-				self.theSession.printMessage( aErroeMessage )
+				self.theSession.message( aErroeMessage )
 
 				aErrorMessage = "Error : refer to the MessageWindow."
 				self['statusbar'].push(1,aErrorMessage)
@@ -382,7 +413,7 @@ class StepperWindow(OsogoWindow):
 		# ---------------------------------------------------------------------------
 		# updates property_list
 		# ---------------------------------------------------------------------------
-		self.selectStepperID( self['stepper_id_list'], self.theSelectedStepperIDListItem )
+		self.selectStepperID( None)
 
 	# end of updateProprety
 
@@ -405,21 +436,16 @@ class StepperWindow(OsogoWindow):
 		# get new stepper list
 		self.theStepperIDList = self.theSession.theSimulator.getStepperList()
 
+                aModel = self.theStepperIDListWidget.get_model()
+
 		# when this window is shown, clear list
-		if self.isShown == gtk.TRUE:
-			self['stepper_id_list'].clear_items( 0, len(self.theStepperIDListItems) )
+		#		if self.isShown == gtk.TRUE:
+		#			aModel.clear()
 
-		self.theStepperIDListItems = []
-
-		for aStepperID in self.theStepperIDList:
-			aListItem = GtkListItem( aStepperID )
-			aListItem.set_name( aStepperID )
-			self.theStepperIDListItems.append( aListItem )
-
-		if self.isShown == gtk.TRUE:
-
-			if len(self.theStepperIDListItems) > 0:
-				self['stepper_id_list'].append_items( self.theStepperIDListItems )
+		aModel.clear()			
+		for aValue in self.theStepperIDList:
+			anIter = aModel.append()
+			aModel.set( anIter, 0, aValue )
 
 		self[self.__class__.__name__].show_all()
 
@@ -427,9 +453,10 @@ class StepperWindow(OsogoWindow):
 		# select first item.
 		# ----------------------------------------------------
 		if self.isShown == gtk.TRUE:
-			if len(self['stepper_id_list'].get_selection()) == 0:
-				if len(self.theStepperIDListItems) >= 1:
-					self['stepper_id_list'].select_item( 0 ) 
+			if self.theStepperIDListWidget.get_selection().get_selected() == None:
+				if len(self.theStepperIDList) >= 1:
+					self.theStepperIDListWidget.select_item( 0 ) 
+					self.selectStepperID(None)
 			
 
 	# end of update
@@ -444,7 +471,6 @@ class StepperWindow(OsogoWindow):
 		self[self.__class__.__name__].hide_all()
 
 	# end of closeWindow
-
 
 			
 

@@ -227,7 +227,7 @@ class OsogoPluginWindow(PluginWindow):
 			#return None
 		else:
 			aFullPNString = createFullPNString( aFullPN )
-			self.theSession.printMessage('%s is not settable' % aFullPNString )
+			self.theSession.message('%s is not settable' % aFullPNString )
 			#return None
 	
 	# end of setValue

@@ -4,7 +4,6 @@ import string
 
 from OsogoPluginWindow import *
 from ecell.ecssupport import *
-import GTK
 
 class VariableWindow( OsogoPluginWindow ):
 
@@ -65,9 +64,9 @@ class VariableWindow( OsogoPluginWindow ):
 	def fix_mode( self, a ) :
 		self.theFixFlag = 1 - self.theFixFlag
 		if self.theFixFlag == 0:
-			self.theSession.printMessage( "not fixed" )
+			self.theSession.message( "not fixed" )
 		else:
-			self.theSession.printMessage( "fixed" )
+			self.theSession.message( "fixed" )
 
 
 	#def inputValue( self, obj ):

@@ -258,7 +258,7 @@ class OsogoPluginManager(PluginManager):
 		#print anInstance 
 
 		#try:
-		#PluginManager.appendInstance(self, anInstance)
+#		PluginManager.appendInstance(self, anInstance)
 		#except:
 		#	aMessage  = '\n----------Error------------\n'
 		#	aMessage += 'ErroType[%s]\n'  %sys.exc_type

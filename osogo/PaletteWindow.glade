@@ -1,94 +1,66 @@
-<?xml version="1.0"?>
-<GTK-Interface>
+<?xml version="1.0" standalone="no"?> <!--*- mode: xml -*-->
+<!DOCTYPE glade-interface SYSTEM "http://glade.gnome.org/glade-2.0.dtd" >
 
-<project>
-  <name>EcellGUI</name>
-  <program_name>ecellgui</program_name>
-  <directory></directory>
-  <source_directory>src</source_directory>
-  <pixmaps_directory>pixmaps</pixmaps_directory>
-  <language>C</language>
-  <gnome_support>True</gnome_support>
-  <gettext_support>True</gettext_support>
-</project>
+<glade-interface>
+  <widget class="GtkWindow" id="Pallete Window">
+    <property name="title" translatable="yes">Pallete</property>
+    <property name="type">GTK_WINDOW_TOPLEVEL</property>
+    <property name="modal">no</property>
+    <property name="allow_shrink">no</property>
+    <property name="allow_grow">yes</property>
+    <property name="window-position">GTK_WIN_POS_NONE</property>
+    <property name="visible">yes</property>
 
-<widget>
-  <class>GtkWindow</class>
-  <name>Pallete Window</name>
-  <title>Pallete</title>
-  <type>GTK_WINDOW_TOPLEVEL</type>
-  <position>GTK_WIN_POS_NONE</position>
-  <modal>False</modal>
-  <allow_shrink>False</allow_shrink>
-  <allow_grow>True</allow_grow>
-  <auto_shrink>False</auto_shrink>
+    <child>
+      <widget class="GtkToolbar" id="toolbar20">
+        <property name="orientation">GTK_ORIENTATION_VERTICAL</property>
+        <property name="toolbar-style">GTK_TOOLBAR_BOTH</property>
+        <property name="visible">yes</property>
 
-  <widget>
-    <class>GtkToolbar</class>
-    <name>toolbar20</name>
-    <orientation>GTK_ORIENTATION_VERTICAL</orientation>
-    <type>GTK_TOOLBAR_BOTH</type>
-    <space_size>5</space_size>
-    <space_style>GTK_TOOLBAR_SPACE_EMPTY</space_style>
-    <relief>GTK_RELIEF_NORMAL</relief>
-    <tooltips>True</tooltips>
+        <child>
+          <widget class="radio" id="property_button">
+            <property name="label" translatable="yes">Property</property>
+            <property name="active">no</property>
+            <property name="stock_pixmap">gtk-find</property>
+            <property name="visible">yes</property>
 
-    <widget>
-      <class>GtkRadioButton</class>
-      <child_name>Toolbar:button</child_name>
-      <name>property_button</name>
-      <signal>
-	<name>toggled</name>
-	<handler>property_button_toggled</handler>
-	<last_modification_time>Wed, 15 Aug 2001 09:54:11 GMT</last_modification_time>
-      </signal>
-      <label>Property</label>
-      <stock_pixmap>GNOME_STOCK_PIXMAP_SEARCH</stock_pixmap>
-      <active>False</active>
-    </widget>
+            <signal name="toggled" handler="property_button_toggled" />
+          </widget>
+        </child>
 
-    <widget>
-      <class>GtkRadioButton</class>
-      <child_name>Toolbar:button</child_name>
-      <name>variable_button</name>
-      <signal>
-	<name>toggled</name>
-	<handler>variable_button_toggled</handler>
-	<last_modification_time>Wed, 15 Aug 2001 09:54:29 GMT</last_modification_time>
-      </signal>
-      <label>Variable</label>
-      <stock_pixmap>GNOME_STOCK_PIXMAP_UP</stock_pixmap>
-      <active>False</active>
-    </widget>
+        <child>
+          <widget class="radio" id="variable_button">
+            <property name="label" translatable="yes">Variable</property>
+            <property name="active">no</property>
+            <property name="stock_pixmap">gtk-go-up</property>
+            <property name="visible">yes</property>
 
-    <widget>
-      <class>GtkRadioButton</class>
-      <child_name>Toolbar:button</child_name>
-      <name>numeric_button</name>
-      <signal>
-	<name>toggled</name>
-	<handler>numeric_button_toggled</handler>
-	<last_modification_time>Wed, 15 Aug 2001 09:54:36 GMT</last_modification_time>
-      </signal>
-      <label>Numeric</label>
-      <stock_pixmap>GNOME_STOCK_PIXMAP_EXEC</stock_pixmap>
-      <active>False</active>
-    </widget>
+            <signal name="toggled" handler="variable_button_toggled" />
+          </widget>
+        </child>
 
-    <widget>
-      <class>GtkRadioButton</class>
-      <child_name>Toolbar:button</child_name>
-      <name>bargraph_button</name>
-      <signal>
-	<name>toggled</name>
-	<handler>bargraph_button_toggled</handler>
-	<last_modification_time>Wed, 15 Aug 2001 09:54:41 GMT</last_modification_time>
-      </signal>
-      <label>Bar Graph</label>
-      <stock_pixmap>GNOME_STOCK_PIXMAP_ALIGN_LEFT</stock_pixmap>
-      <active>False</active>
-    </widget>
+        <child>
+          <widget class="radio" id="numeric_button">
+            <property name="label" translatable="yes">Numeric</property>
+            <property name="active">no</property>
+            <property name="stock_pixmap">gtk-execute</property>
+            <property name="visible">yes</property>
+
+            <signal name="toggled" handler="numeric_button_toggled" />
+          </widget>
+        </child>
+
+        <child>
+          <widget class="radio" id="bargraph_button">
+            <property name="label" translatable="yes">Bar Graph</property>
+            <property name="active">no</property>
+            <property name="stock_pixmap">gtk-justify-left</property>
+            <property name="visible">yes</property>
+
+            <signal name="toggled" handler="bargraph_button_toggled" />
+          </widget>
+        </child>
+      </widget>
+    </child>
   </widget>
-</widget>
-
-</GTK-Interface>
+</glade-interface>

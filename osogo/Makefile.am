@@ -24,6 +24,8 @@ OsogoUtil.py\
 PaletteWindow.glade\
 PaletteWindow.py\
 PluginWindowPopupMenu.glade\
+PlotterPluginWindow.py\
+Plot.py\
 board.glade\
 config.py\
 ecell.xpm\

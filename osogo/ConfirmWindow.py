@@ -30,7 +30,8 @@
 # E-CELL Project, Lab. for Bioinformatics, Keio University.
 #
 
-from gtk import *
+#from gtk import *
+import gtk 
 
 # Constant for ConfirmWindow
 OK_MODE = 0
@@ -46,7 +47,7 @@ OKCANCEL_MODE = 1
 # If Cancel is clicked or close Window, return -1
 #
 # --------------------------------------------------------
-class ConfirmWindow(GtkDialog):
+class ConfirmWindow(gtk.Dialog):
 
 	# ----------------------------------------------------
 	# Constructor
@@ -61,27 +62,27 @@ class ConfirmWindow(GtkDialog):
 		self._num = -1
 
 		# Create the Dialog
-		self.win = GtkDialog()
+		self.win = gtk.Dialog()
 		self.win.connect("destroy",self.hide)
 		#self.win.connect("destroy",self.quit)
 
 		# Sets size and position
 		self.win.set_border_width(2)
 		self.win.set_default_size(300,75)
-		self.win.set_position(WIN_POS_MOUSE)
+		self.win.set_position(gtk.WIN_POS_MOUSE)
 		self.win.show()
 
 		# Sets title
 		self.win.set_title(aTitle)
 
 		# Sets message
-		aMessageLabel = GtkLabel(aMessage)
+		aMessageLabel = gtk.Label(aMessage)
 		self.win.vbox.pack_start(aMessageLabel)
 		aMessageLabel.show()
 	
-		ok_button = GtkButton("  OK  ")
-		self.win.action_area.pack_start(ok_button,FALSE,FALSE,)
-		ok_button.set_flags(CAN_DEFAULT)
+		ok_button = gtk.Button("  OK  ")
+		self.win.action_area.pack_start(ok_button,gtk.FALSE,gtk.FALSE,)
+		ok_button.set_flags(gtk.CAN_DEFAULT)
 		ok_button.grab_default()
 		ok_button.show()
 		ok_button.connect("clicked",self.OKButtonClicked)
@@ -89,12 +90,12 @@ class ConfirmWindow(GtkDialog):
 		if aMode == 0:
 			pass
 		else:
-			cancel_button = GtkButton(" Cancel ")
-			self.win.action_area.pack_start(cancel_button,FALSE,FALSE)
+			cancel_button = gtk.Button(" Cancel ")
+			self.win.action_area.pack_start(cancel_button,gtk.FALSE,gtk.FALSE)
 			cancel_button.show()
 			cancel_button.connect("clicked",self.CancelButtonClicked)	
 
-		mainloop()
+		gtk.mainloop()
 
 	# end of __init__
 
@@ -133,7 +134,7 @@ class ConfirmWindow(GtkDialog):
 	# ----------------------------------------------------
 	def quit( self, *obj ):
 		self.win.hide()
-		mainquit()
+		gtk.mainquit()
 
 	# end of quit
 

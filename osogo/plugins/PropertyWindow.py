@@ -9,6 +9,15 @@ NUMBER_COL    = 1
 VALUE_COL     = 2
 GETABLE_COL   = 3
 SETTABLE_COL  = 4
+import gobject
+import gtk
+PROPERTY_COL_TYPE=gobject.TYPE_STRING
+NUMBER_COL_TYPE=gobject.TYPE_STRING
+VALUE_COL_TYPE=gobject.TYPE_STRING
+GETABLE_COL_TYPE=gobject.TYPE_STRING
+SETTABLE_COL_TYPE=gobject.TYPE_STRING
+
+
 
 class PropertyWindow(OsogoPluginWindow):
 
@@ -24,14 +33,17 @@ class PropertyWindow(OsogoPluginWindow):
 
 		OsogoPluginWindow.__init__( self, aDirName, aData, aPluginManager, aRoot )
 		self.openWindow()
+		print self.getWidget("PropertyWindow")
+		print self.widgets
+		
 		self.thePluginManager.appendInstance( self ) 
 
-		self.addHandlers( { 'property_clist_select_row'             : self.selectProperty,
+		self.addHandlers( { 'cursor_changed'             : self.selectProperty,
 		                    'on_property_clist_button_press_event'  : self.popupMenu,
 		                    'on_update_button_pressed'              : self.updateValue,
 		                    'window_exit'	                        : self.exit } )
         
-		self.thePropertyClist     = self.getWidget( "property_clist" )
+		self.thePropertyCList     = self.getWidget( "property_clist" )
 		self.theTypeEntry         = self.getWidget( "entry_TYPE" )
 		self.theIDEntry           = self.getWidget( "entry_ID" )
 		self.thePathEntry         = self.getWidget( "entry_PATH" )
@@ -40,7 +52,26 @@ class PropertyWindow(OsogoPluginWindow):
 
 		self.theSelectedFullPNList = []
 		self.theSelectedRowNumber = -1
-
+		self.thePropertyListStore=gtk.ListStore(PROPERTY_COL_TYPE,
+					    NUMBER_COL_TYPE,
+					    VALUE_COL_TYPE,
+					    GETABLE_COL_TYPE,
+					    SETTABLE_COL_TYPE)
+		self.thePropertyCList.set_model(self.thePropertyListStore)
+		renderer=gtk.CellRendererText()
+		column=gtk.TreeViewColumn("Property",renderer,text=PROPERTY_COL)
+		self.thePropertyCList.append_column(column)
+		column=gtk.TreeViewColumn("Number",renderer,text=NUMBER_COL)
+		self.thePropertyCList.append_column(column)
+		column=gtk.TreeViewColumn("Value",renderer,text=VALUE_COL)
+		self.thePropertyCList.append_column(column)
+		column=gtk.TreeViewColumn("Gettable",renderer,text=GETABLE_COL)
+		self.thePropertyCList.append_column(column)
+		column=gtk.TreeViewColumn("Settable",renderer,text=SETTABLE_COL)
+		self.thePropertyCList.append_column(column)
+		
+		
+					
 		self.thePopupMenu =  PropertyWindowPopupMenu( self.thePluginManager, self )
 
 		if self.theRawFullPNList == ():
@@ -107,9 +138,13 @@ class PropertyWindow(OsogoPluginWindow):
 		# if current full id doesn't match previous full id,
 		# then rewrite all property of clist.
 		else:
-			self.thePropertyClist.clear()
+			self.thePropertyListStore.clear()
 			for aValue in self.theList:
-				self.thePropertyClist.append( aValue )
+				iter=self.thePropertyListStore.append( )
+				cntr=0
+				for valueitem in aValue:
+				    self.thePropertyListStore.set_value(iter,cntr,valueitem)
+				    cntr+=1
 
 		# save current full id to previous full id.
 		self.preFullID = self.theFullID()
@@ -167,7 +202,7 @@ class PropertyWindow(OsogoPluginWindow):
 					for aValue in aValueList :
 						#if type(aValue) == type(()):
 						#	aValue = aValue[0]
-						aList = [ aProperty, aNumber, aValue , aGetString, aSetString ]
+						aList = [aProperty, aNumber, aValue , aGetString, aSetString ]
 						aList = map( str, aList )
 						self.theList.append( aList ) 
 						aNumber += 1
@@ -179,9 +214,15 @@ class PropertyWindow(OsogoPluginWindow):
 				self.theList.append( aList )
 
 		row = 0
+#		for aValue in self.theList:
+#			self.thePropertyCList.set_text(row,2,aValue[2])
+#			row += 1
 		for aValue in self.theList:
-			self.thePropertyClist.set_text(row,2,aValue[2])
-			row += 1
+			iter=self.thePropertyListStore.append( )
+			cntr=0
+			for valueitem in aValue:
+			    self.thePropertyListStore.set_value(iter,cntr,valueitem)
+			    cntr+=1
 
 	# end of updatePropertyList
 
@@ -202,12 +243,12 @@ class PropertyWindow(OsogoPluginWindow):
 		# ------------------------------------
 		# gets selected number
 		# ------------------------------------
-		self.theSelectedRowNumber = self['property_clist'].selection[0]
+		self.theSelectedRowNumber = self.thePropertyCList.get_selection().get_selected()[1]
 
 		# ------------------------------------
 		# gets getable status
 		# ------------------------------------
-		aGetable = self['property_clist'].get_text(self.theSelectedRowNumber,GETABLE_COL)
+		aGetable = self.thePropertyListStore.get_value(self.theSelectedRowNumber,GETABLE_COL)
 
 		# ------------------------------------
 		# checks the type of inputted value 
@@ -228,9 +269,9 @@ class PropertyWindow(OsogoPluginWindow):
 					import traceback
 					anErrorMessage = string.join( traceback.format_exception( \
 			    		sys.exc_type,sys.exc_value,sys.exc_traceback), '\n' )
-					self.theSession.printMessage("-----An error happens.-----")
-					self.theSession.printMessage(anErrorMessage)
-					self.theSession.printMessage("---------------------------")
+					self.theSession.message("-----An error happens.-----")
+					self.theSession.message(anErrorMessage)
+					self.theSession.message("---------------------------")
 
 					# creates and display error message dialog.
 					anErrorMessage = "The inputted value must be integer!"
@@ -250,9 +291,9 @@ class PropertyWindow(OsogoPluginWindow):
 					import traceback
 					anErrorMessage = string.join( traceback.format_exception( \
 			    		sys.exc_type,sys.exc_value,sys.exc_traceback), '\n' )
-					self.theSession.printMessage("-----An error happens.-----")
-					self.theSession.printMessage(anErrorMessage)
-					self.theSession.printMessage("---------------------------")
+					self.theSession.message("-----An error happens.-----")
+					self.theSession.message(anErrorMessage)
+					self.theSession.message("---------------------------")
 
 					# creates and display error message dialog.
 					anErrorMessage = "The inputted value must be float!"
@@ -272,9 +313,9 @@ class PropertyWindow(OsogoPluginWindow):
 					import sys
 					import traceback
 					anErrorMessage = string.join( traceback.format_exception( sys.exc_type,sys.exc_value,sys.exc_traceback), '\n' )
-					self.theSession.printMessage("-----An error happens.-----")
-					self.theSession.printMessage(anErrorMessage)
-					self.theSession.printMessage("---------------------------")
+					self.theSession.message("-----An error happens.-----")
+					self.theSession.message(anErrorMessage)
+					self.theSession.message("---------------------------")
 
 					# creates and display error message dialog.
 					anErrorMessage = "The inputted value must be tuple!"
@@ -287,21 +328,21 @@ class PropertyWindow(OsogoPluginWindow):
 		# when the number column is not blank, reate tuple.
 		# ---------------------------------------------------
 		aPropertyValue = []
-		aNumber = self['property_clist'].get_text(self.theSelectedRowNumber,NUMBER_COL)
+		aNumber = self.thePropertyListStore.get_value(self.theSelectedRowNumber,NUMBER_COL)
 		if aNumber != '':
 
-			aSelectedProperty = self['property_clist'].get_text(self.theSelectedRowNumber,PROPERTY_COL)
+			aSelectedProperty = self.thePropertyListStore.get_value(self.theSelectedRowNumber,PROPERTY_COL)
 			#print "aSelectedProperty = %s" %aSelectedProperty
+			aRow=self.thePropertyListStore.get_iter_first()
+			while aRow!=None:
 
-			for aRow in range(0,self['property_clist'].rows):
-
-				if aSelectedProperty != self['property_clist'].get_text(aRow,PROPERTY_COL):
+				if aSelectedProperty != self.thePropertyListStore.get_value(aRow,PROPERTY_COL):
 					continue
 
 				if aRow == self.theSelectedRowNumber:
 					aPropertyValue.append( aValue )
 				else:
-					aCListValue = self['property_clist'].get_text(aRow,VALUE_COL) 
+					aCListValue = self.thePropertyListStore.get_value(aRow,VALUE_COL) 
 					aCListValue = convertStringToTuple( aCListValue )
 					aPropertyValue.append( aCListValue )
 
@@ -326,9 +367,9 @@ class PropertyWindow(OsogoPluginWindow):
 			import sys
 			import traceback
 			anErrorMessage = string.join( traceback.format_exception( sys.exc_type,sys.exc_value,sys.exc_traceback), '\n' )
-			self.theSession.printMessage("-----An error happens.-----")
-			self.theSession.printMessage(anErrorMessage)
-			self.theSession.printMessage("---------------------------")
+			self.theSession.message("-----An error happens.-----")
+			self.theSession.message(anErrorMessage)
+			self.theSession.message("---------------------------")
 
 			# creates and display error message dialog.
 			anErrorMessage = "An error happened!\nSee MessageWindow."
@@ -356,15 +397,14 @@ class PropertyWindow(OsogoPluginWindow):
 	# return -> None
 	# This method is throwable exception.
 	# ---------------------------------------------------------------
-	def selectProperty(self, anObject, aSelectedRow, anObject1, anObject2):
-
-		self.theSelectedRowNumber = self['property_clist'].selection[0]
+	def selectProperty(self, anObject):
+		self.theSelectedRowNumber = self.thePropertyCList.get_selection().get_selected()[1]
 		self.theSelectedFullPN = ''
 
 		# ---------------------------
 		# sets selected full pn
 		# ---------------------------
-		aProperty = self['property_clist'].get_text(self.theSelectedRowNumber,PROPERTY_COL)
+		aProperty = self.thePropertyListStore.get_value(self.theSelectedRowNumber,PROPERTY_COL)
 		aType = string.strip( string.split(self.theTypeEntry.get_text(),':')[0] )
 		anID = self.theIDEntry.get_text()
 		aPath = self.thePathEntry.get_text()
@@ -374,14 +414,14 @@ class PropertyWindow(OsogoPluginWindow):
 		# ---------------------------
 		# sets value
 		# ---------------------------
-		aValue = self.thePropertyClist.get_text(self.theSelectedRowNumber,VALUE_COL)
+		aValue = self.thePropertyListStore.get_value(self.theSelectedRowNumber,VALUE_COL)
 		self['value_entry'].set_text(aValue)
 
 		# ---------------------------
 		# sets sensitive
 		# ---------------------------
-		self.theSelectedRowNumber = self['property_clist'].selection[0]
-		aSetable = self['property_clist'].get_text(self.theSelectedRowNumber,SETTABLE_COL)
+		self.theSelectedRowNumber = self.thePropertyCList.get_selection().get_selected()[1]
+		aSetable = self.thePropertyListStore.get_value(self.theSelectedRowNumber,SETTABLE_COL)
 
 		if aSetable == decodeAttribute(TRUE):
 			self['value_entry'].set_sensitive(TRUE)
@@ -407,11 +447,11 @@ class PropertyWindow(OsogoPluginWindow):
 
 		if anEvent.button == 3:  # 3 means right
 
-			if len(self['property_clist'].selection) < 1:
+			if self['property_clist'].get_selection().get_selected()[1]==None :
 				return None
 
-			self.theSelectedRowNumber = self['property_clist'].selection[0]
-			aGetable = self['property_clist'].get_text(self.theSelectedRowNumber,GETABLE_COL)
+			self.theSelectedRowNumber = self['property_clist'].get_selection().get_selected()[1]
+			aGetable = self.thePropertyListStore.get_value(self.theSelectedRowNumber,GETABLE_COL)
 
 			if aGetable == decodeAttribute(TRUE):
 				self.thePopupMenu.popup( None, None, None, 1, 0 )
@@ -421,8 +461,8 @@ class PropertyWindow(OsogoPluginWindow):
 	def createNewPluginWindow( self, anObject ):
 
 		aPluginWindowName = anObject.get_name()
-		aRow = self.thePropertyClist.selection[0]
-		aProperty = self.thePropertyClist.get_text(aRow,PROPERTY_COL)
+		aRow = self.thePropertyCList.get_selection().get_selected()[1]
+		aProperty = self.thePropertyListStore.get_value(aRow,PROPERTY_COL)
 		aType = string.strip( string.split(self.theTypeEntry.get_text(),':')[0] )
 		anID = self.theIDEntry.get_text()
 		aPath = self.thePathEntry.get_text()
@@ -434,10 +474,10 @@ class PropertyWindow(OsogoPluginWindow):
    
 
 # ----------------------------------------------------------
-# PropertyWindowPopupMenu -> GtkMenu
+# PropertyWindowPopupMenu -> gtk.Menu
 #   - popup menu used by property window
 # ----------------------------------------------------------
-class PropertyWindowPopupMenu( GtkMenu ):
+class PropertyWindowPopupMenu( gtk.Menu ):
 
 	# ----------------------------------------------------------
 	# Constructor
@@ -453,7 +493,7 @@ class PropertyWindowPopupMenu( GtkMenu ):
 	# ----------------------------------------------------------
 	def __init__( self, aPluginManager, aParent ):
 
-		GtkMenu.__init__(self)
+		gtk.Menu.__init__(self)
 
 		self.theParent = aParent
 		self.thePluginManager = aPluginManager
@@ -463,12 +503,12 @@ class PropertyWindowPopupMenu( GtkMenu ):
 		# adds plugin window
 		# ------------------------------------------
 		for aPluginMap in self.thePluginManager.thePluginMap.keys():
-			self.theMenuItem[aPluginMap]= GtkMenuItem(aPluginMap)
+			self.theMenuItem[aPluginMap]= gtk.MenuItem(aPluginMap)
 			self.theMenuItem[aPluginMap].connect('activate', self.theParent.createNewPluginWindow )
 			self.theMenuItem[aPluginMap].set_name(aPluginMap)
 			self.append( self.theMenuItem[aPluginMap] )
 
-		#self.append( gtk.GtkMenuItem() )
+		#self.append( gtk.MenuItem() )
 
 
 	# end of __init__
@@ -484,8 +524,8 @@ class PropertyWindowPopupMenu( GtkMenu ):
 	def popup(self, pms, pmi, func, button, time):
 
 		# shows this popup memu
-		GtkMenu.popup(self, pms, pmi, func, button, time)
-		self.show_all(self)
+		gtk.Menu.popup(self, pms, pmi, func, button, time)
+		self.show_all()
 
 	# end of poup
 

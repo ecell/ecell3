@@ -1,204 +1,168 @@
-<?xml version="1.0"?>
-<GTK-Interface>
+<?xml version="1.0" standalone="no"?> <!--*- mode: xml -*-->
+<!DOCTYPE glade-interface SYSTEM "http://glade.gnome.org/glade-2.0.dtd" >
 
-<project>
-  <name>EcellGUI</name>
-  <program_name>ecellgui</program_name>
-  <directory></directory>
-  <source_directory>src</source_directory>
-  <pixmaps_directory>pixmaps</pixmaps_directory>
-  <language>C</language>
-  <gnome_support>True</gnome_support>
-  <gettext_support>True</gettext_support>
-</project>
+<glade-interface>
+  <widget class="GtkWindow" id="VariableWindow">
+    <property name="events">GDK_BUTTON_PRESS_MASK | GDK_KEY_PRESS_MASK</property>
+    <property name="title" translatable="yes">VariableWindow</property>
+    <property name="type">GTK_WINDOW_TOPLEVEL</property>
+    <property name="modal">no</property>
+    <property name="allow_shrink">no</property>
+    <property name="allow_grow">yes</property>
+    <property name="window-position">GTK_WIN_POS_NONE</property>
+    <property name="visible">yes</property>
 
-<widget>
-  <class>GtkWindow</class>
-  <name>VariableWindow</name>
-  <events>GDK_BUTTON_PRESS_MASK | GDK_KEY_PRESS_MASK</events>
-  <signal>
-    <name>destroy</name>
-    <handler>window_exit</handler>
-    <last_modification_time>Mon, 25 Feb 2002 09:36:51 GMT</last_modification_time>
-  </signal>
-  <signal>
-    <name>button_press_event</name>
-    <handler>button_press_event</handler>
-    <last_modification_time>Thu, 04 Jul 2002 11:40:41 GMT</last_modification_time>
-  </signal>
-  <title>VariableWindow</title>
-  <type>GTK_WINDOW_TOPLEVEL</type>
-  <position>GTK_WIN_POS_NONE</position>
-  <modal>False</modal>
-  <allow_shrink>False</allow_shrink>
-  <allow_grow>True</allow_grow>
-  <auto_shrink>False</auto_shrink>
+    <signal name="destroy" handler="window_exit" />
+    <signal name="button_press_event" handler="button_press_event" />
 
-  <widget>
-    <class>GtkVBox</class>
-    <name>vbox61</name>
-    <homogeneous>False</homogeneous>
-    <spacing>0</spacing>
+    <child>
+      <widget class="GtkVBox" id="vbox61">
+        <property name="homogeneous">no</property>
+        <property name="spacing">0</property>
+        <property name="visible">yes</property>
 
-    <widget>
-      <class>GtkLabel</class>
-      <name>id_label</name>
-      <label>/CELL/CYTOPLASM:ATP</label>
-      <justify>GTK_JUSTIFY_LEFT</justify>
-      <wrap>False</wrap>
-      <xalign>0.5</xalign>
-      <yalign>0.5</yalign>
-      <xpad>0</xpad>
-      <ypad>0</ypad>
-      <child>
-	<padding>0</padding>
-	<expand>False</expand>
-	<fill>False</fill>
-      </child>
-    </widget>
+        <child>
+          <widget class="GtkLabel" id="id_label">
+            <property name="label" translatable="yes">/CELL/CYTOPLASM:ATP</property>
+            <property name="justify">GTK_JUSTIFY_LEFT</property>
+            <property name="wrap">no</property>
+            <property name="xalign">0.5</property>
+            <property name="yalign">0.5</property>
+            <property name="xpad">0</property>
+            <property name="ypad">0</property>
+            <property name="visible">yes</property>
+          </widget>
+          <packing>
+            <property name="padding">0</property>
+            <property name="expand">no</property>
+            <property name="fill">no</property>
+          </packing>
+        </child>
 
-    <widget>
-      <class>GtkHBox</class>
-      <name>hbox74</name>
-      <homogeneous>False</homogeneous>
-      <spacing>0</spacing>
-      <child>
-	<padding>0</padding>
-	<expand>False</expand>
-	<fill>False</fill>
-      </child>
+        <child>
+          <widget class="GtkHBox" id="hbox74">
+            <property name="homogeneous">no</property>
+            <property name="spacing">0</property>
+            <property name="visible">yes</property>
 
-      <widget>
-	<class>GtkFrame</class>
-	<name>frame44</name>
-	<height>37</height>
-	<label>Value</label>
-	<label_xalign>0</label_xalign>
-	<shadow_type>GTK_SHADOW_ETCHED_IN</shadow_type>
-	<child>
-	  <padding>0</padding>
-	  <expand>False</expand>
-	  <fill>False</fill>
-	</child>
+            <child>
+              <widget class="GtkFrame" id="frame44">
+                <property name="label" translatable="yes">Value</property>
+                <property name="label_xalign">0</property>
+                <property name="height-request">37</property>
+                <property name="shadow">GTK_SHADOW_ETCHED_IN</property>
+                <property name="visible">yes</property>
 
-	<widget>
-	  <class>GtkHBox</class>
-	  <name>hbox75</name>
-	  <height>25</height>
-	  <homogeneous>False</homogeneous>
-	  <spacing>0</spacing>
+                <child>
+                  <widget class="GtkHBox" id="hbox75">
+                    <property name="homogeneous">no</property>
+                    <property name="spacing">0</property>
+                    <property name="height-request">25</property>
+                    <property name="visible">yes</property>
 
-	  <widget>
-	    <class>GtkSpinButton</class>
-	    <name>value_spinbutton</name>
-	    <width>178</width>
-	    <can_focus>True</can_focus>
-	    <events>GDK_BUTTON_PRESS_MASK | GDK_KEY_PRESS_MASK</events>
-	    <signal>
-	      <name>copy_clipboard</name>
-	      <handler>on_value_spinbutton_copy_clipboard</handler>
-	      <last_modification_time>Thu, 26 Sep 2002 02:00:22 GMT</last_modification_time>
-	    </signal>
-	    <signal>
-	      <name>cut_clipboard</name>
-	      <handler>on_value_spinbutton_cut_clipboard</handler>
-	      <last_modification_time>Thu, 26 Sep 2002 02:00:32 GMT</last_modification_time>
-	    </signal>
-	    <signal>
-	      <name>paste_clipboard</name>
-	      <handler>on_value_spinbutton_paste_clipboard</handler>
-	      <last_modification_time>Thu, 26 Sep 2002 02:00:38 GMT</last_modification_time>
-	    </signal>
-	    <signal>
-	      <name>changed</name>
-	      <handler>on_value_spinbutton_changed</handler>
-	      <last_modification_time>Thu, 26 Sep 2002 02:01:35 GMT</last_modification_time>
-	    </signal>
-	    <climb_rate>1</climb_rate>
-	    <digits>0</digits>
-	    <numeric>False</numeric>
-	    <update_policy>GTK_UPDATE_ALWAYS</update_policy>
-	    <snap>False</snap>
-	    <wrap>False</wrap>
-	    <value>0</value>
-	    <lower>0</lower>
-	    <upper>100000000</upper>
-	    <step>1</step>
-	    <page>10</page>
-	    <page_size>10</page_size>
-	    <child>
-	      <padding>0</padding>
-	      <expand>True</expand>
-	      <fill>True</fill>
-	    </child>
-	  </widget>
-	</widget>
+                    <child>
+                      <widget class="GtkSpinButton" id="value_spinbutton">
+                        <property name="can_focus">yes</property>
+                        <property name="events">GDK_BUTTON_PRESS_MASK | GDK_KEY_PRESS_MASK</property>
+                        <property name="climb_rate">1</property>
+                        <property name="digits">0</property>
+                        <property name="numeric">no</property>
+                        <property name="update_policy">GTK_UPDATE_ALWAYS</property>
+                        <property name="wrap">no</property>
+                        <property name="width-request">178</property>
+                        <property name="snap_to_ticks">no</property>
+                        <property name="visible">yes</property>
+                        <property name="adjustment">0 0 100000000 1 10 10</property>
+
+                        <signal name="copy_clipboard" handler="on_value_spinbutton_copy_clipboard" />
+                        <signal name="cut_clipboard" handler="on_value_spinbutton_cut_clipboard" />
+                        <signal name="paste_clipboard" handler="on_value_spinbutton_paste_clipboard" />
+                        <signal name="changed" handler="on_value_spinbutton_changed" />
+                      </widget>
+                      <packing>
+                        <property name="padding">0</property>
+                        <property name="expand">yes</property>
+                        <property name="fill">yes</property>
+                      </packing>
+                    </child>
+                  </widget>
+                </child>
+              </widget>
+              <packing>
+                <property name="padding">0</property>
+                <property name="expand">no</property>
+                <property name="fill">no</property>
+              </packing>
+            </child>
+
+            <child>
+              <widget class="GtkFrame" id="frame45">
+                <property name="label" translatable="yes">Concentration</property>
+                <property name="label_xalign">0</property>
+                <property name="height-request">54</property>
+                <property name="shadow">GTK_SHADOW_ETCHED_IN</property>
+                <property name="visible">yes</property>
+
+                <child>
+                  <widget class="GtkHBox" id="hbox76">
+                    <property name="homogeneous">no</property>
+                    <property name="spacing">0</property>
+                    <property name="height-request">25</property>
+                    <property name="visible">yes</property>
+
+                    <child>
+                      <widget class="GtkEntry" id="concentration_entry">
+                        <property name="can_focus">yes</property>
+                        <property name="editable">no</property>
+                        <property name="text" translatable="yes"></property>
+                        <property name="max-length">0</property>
+                        <property name="visibility">yes</property>
+                        <property name="visible">yes</property>
+
+                        <signal name="activate" handler="input_concentration" />
+                      </widget>
+                      <packing>
+                        <property name="padding">0</property>
+                        <property name="expand">yes</property>
+                        <property name="fill">yes</property>
+                      </packing>
+                    </child>
+                  </widget>
+                </child>
+              </widget>
+              <packing>
+                <property name="padding">0</property>
+                <property name="expand">no</property>
+                <property name="fill">no</property>
+              </packing>
+            </child>
+
+            <child>
+              <widget class="GtkCheckButton" id="checkbutton32">
+                <property name="border_width">2</property>
+                <property name="can_focus">yes</property>
+                <property name="label" translatable="yes">Value
+Fixed</property>
+                <property name="active">no</property>
+                <property name="draw_indicator">yes</property>
+                <property name="visible">yes</property>
+
+                <signal name="toggled" handler="button_toggled" />
+              </widget>
+              <packing>
+                <property name="padding">0</property>
+                <property name="expand">no</property>
+                <property name="fill">no</property>
+              </packing>
+            </child>
+          </widget>
+          <packing>
+            <property name="padding">0</property>
+            <property name="expand">no</property>
+            <property name="fill">no</property>
+          </packing>
+        </child>
       </widget>
-
-      <widget>
-	<class>GtkFrame</class>
-	<name>frame45</name>
-	<height>54</height>
-	<label>Concentration</label>
-	<label_xalign>0</label_xalign>
-	<shadow_type>GTK_SHADOW_ETCHED_IN</shadow_type>
-	<child>
-	  <padding>0</padding>
-	  <expand>False</expand>
-	  <fill>False</fill>
-	</child>
-
-	<widget>
-	  <class>GtkHBox</class>
-	  <name>hbox76</name>
-	  <height>25</height>
-	  <homogeneous>False</homogeneous>
-	  <spacing>0</spacing>
-
-	  <widget>
-	    <class>GtkEntry</class>
-	    <name>concentration_entry</name>
-	    <can_focus>True</can_focus>
-	    <signal>
-	      <name>activate</name>
-	      <handler>input_concentration</handler>
-	      <last_modification_time>Fri, 17 Aug 2001 08:43:55 GMT</last_modification_time>
-	    </signal>
-	    <editable>False</editable>
-	    <text_visible>True</text_visible>
-	    <text_max_length>0</text_max_length>
-	    <text></text>
-	    <child>
-	      <padding>0</padding>
-	      <expand>True</expand>
-	      <fill>True</fill>
-	    </child>
-	  </widget>
-	</widget>
-      </widget>
-
-      <widget>
-	<class>GtkCheckButton</class>
-	<name>checkbutton32</name>
-	<border_width>2</border_width>
-	<can_focus>True</can_focus>
-	<signal>
-	  <name>toggled</name>
-	  <handler>button_toggled</handler>
-	  <last_modification_time>Wed, 15 Aug 2001 08:29:14 GMT</last_modification_time>
-	</signal>
-	<label>Value
-Fixed</label>
-	<active>False</active>
-	<draw_indicator>True</draw_indicator>
-	<child>
-	  <padding>0</padding>
-	  <expand>False</expand>
-	  <fill>False</fill>
-	</child>
-      </widget>
-    </widget>
+    </child>
   </widget>
-</widget>
-
-</GTK-Interface>
+</glade-interface>

@@ -34,7 +34,8 @@
 
 #from Window import *
 from OsogoWindow import *
-from gtk import *
+import gobject
+import gtk
 from Numeric import *
 
 from os import *
@@ -69,7 +70,7 @@ class LoggerWindow(OsogoWindow):
 		# ---------------------------------------------------------------
 		# Creates save file selection
 		# ---------------------------------------------------------------
-		self.theSaveDirectorySelection = gtk.GtkFileSelection( 'Select Rule File' )
+		self.theSaveDirectorySelection = gtk.FileSelection( 'Select Rule File' )
 		self.theSaveDirectorySelection.ok_button.connect('clicked', self.changeSaveDirectory)
 		self.theSaveDirectorySelection.cancel_button.connect('clicked', self.closeParentWindow)
 
@@ -82,6 +83,20 @@ class LoggerWindow(OsogoWindow):
 		#self.theMainWindow = aMainWindow
 
 		self.theEntryList = self['loggerWindow_clist']
+
+		aListStore = gtk.ListStore( gobject.TYPE_STRING,\
+					    gobject.TYPE_STRING,\
+					    gobject.TYPE_STRING )
+
+
+		self.theEntryList.set_model( aListStore )
+		column=gtk.TreeViewColumn('FullPN',gtk.CellRendererText(),text=0)
+		self.theEntryList.append_column(column)
+		column=gtk.TreeViewColumn('Start',gtk.CellRendererText(),text=1)
+		self.theEntryList.append_column(column)
+		column=gtk.TreeViewColumn('End',gtk.CellRendererText(),text=2)
+		self.theEntryList.append_column(column)
+		self.theEntryList.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
 		self.initialize()
 
 		# reset
@@ -422,11 +437,14 @@ class LoggerWindow(OsogoWindow):
 	# return -> selected propertyname list
 	# ---------------------------------------------------------------
 	def theSelectedPropertyName( self ):
-		aSelectedPropertyNameList=[]
-		for aRowNumber in self["loggerWindow_clist"].selection:
-			aPropertyName = self["loggerWindow_clist"].get_text(aRowNumber,0)
+		self.aSelectedPropertyNameList=[]
+		selection=self['loggerWindow_clist'].get_selection()
+		selection.selected_foreach(self.selection_function)
+		return self.aSelectedPropertyNameList
+		
+	def selection_function(self,tree,path,iter):
+			aPropertyName = self["loggerWindow_clist"].get_model().get_value(iter,0)
 			aSelectedPropertyNameList.append(aPropertyName)
-		return aSelectedPropertyNameList
 
 	# end of theSelectedPropertyName
 
@@ -435,12 +453,12 @@ class LoggerWindow(OsogoWindow):
 	# Selects PropertyName
 	# return -> None
 	# ---------------------------------------------------------------
-	def selectPropertyName( self ):
-		aCList = self['loggerWindow_clist']
-
-		for aRowNumber in aCList.selection:
-			aPropertyName = aCList.get_text(aRowNumber,0)
-
+#	def selectPropertyName( self ):
+#		aCList = self['loggerWindow_clist']
+#
+#		for aRowNumber in aCList.selection:
+#			aPropertyName = aCList.get_text(aRowNumber,0)
+#
 	# end of selectPropertyName
 
 
@@ -450,9 +468,9 @@ class LoggerWindow(OsogoWindow):
 	# ---------------------------------------------------------------
 	def update( self ):
 
-		if self.isShown == gtk.TRUE:
-			self.theEntryList.clear()
-
+		#		if self.isShown == gtk.TRUE:
+		#			self.theEntryList.clear()
+		return True
 		self.theFullPNList = self.theSession.getLoggerList()
 		self.theList = []
 
@@ -467,8 +485,17 @@ class LoggerWindow(OsogoWindow):
 			aList = [ aFullPNString, start, end ]
 			self.theList.append( aList )
 
+
+
+		aModel = self.theEntryList.get_model()
+		aModel.clear()
 		for aValue in self.theList:
-			self.theEntryList.append( aValue )
+			anIter = aModel.append()
+			aModel.set( anIter,\
+				    0, aValue[0],\
+				    1, str(aValue[1]),\
+				    2, str(aValue[2]) )
+				
 	
 	# update
 
@@ -515,9 +542,9 @@ class LoggerWindow(OsogoWindow):
 
 
 # ---------------------------------------------------------------
-# PopupMenu -> GtkMenu
+# PopupMenu -> gtk.Menu
 # ---------------------------------------------------------------
-class PopupMenu( GtkMenu ):
+class PopupMenu( gtk.Menu ):
 
 	# ---------------------------------------------------------------
 	# Constructor
@@ -531,7 +558,7 @@ class PopupMenu( GtkMenu ):
 		# ------------------------------------------
 		# calls the constructor of super class
 		# ------------------------------------------
-		GtkMenu.__init__(self)
+		gtk.Menu.__init__(self)
 
 		aMaxStringLength = 0
 		aMenuSize = 0
@@ -547,7 +574,7 @@ class PopupMenu( GtkMenu ):
 		self.theMenuItem = {}
 
 		self.theDeleteString = 'delete this item'
-		self.theMenuItem[self.theDeleteString]= GtkMenuItem(self.theDeleteString)
+		self.theMenuItem[self.theDeleteString]= gtk.MenuItem(self.theDeleteString)
 		self.theMenuItem[self.theDeleteString].connect('activate', self.theParent.deleteItem )
 		self.theMenuItem[self.theDeleteString].set_name(self.theDeleteString)
 		self.append( self.theMenuItem[self.theDeleteString] )
@@ -561,10 +588,10 @@ class PopupMenu( GtkMenu ):
 		# ------------------------------------------
 		self.theWidth = (aMaxStringLength+1)*8
 		self.theHeight = (aMenuSize+1)*21 + 3
-		self.set_usize( self.theWidth, self.theHeight )
+		self.set_size_request( self.theWidth, self.theHeight )
 
 	def popup(self, pms, pmi, func, button, time):
-		GtkMenu.popup(self, pms, pmi, func, button, time)
+		gtk.Menu.popup(self, pms, pmi, func, button, time)
 		self.show_all(self)
 
 

@@ -46,7 +46,7 @@ from OsogoPluginManager import *
 
 import gnome.ui
 import gtk
-import GTK
+#import GTK
 
 import MessageWindow
 import PaletteWindow 
@@ -69,14 +69,16 @@ from ecell.ECS import *
 NAME        = 'gecell (Osogo)'
 VERSION     = '0.0'
 COPYRIGHT   = '(C) 2001-2002 Keio University'
-AUTHORLIST  = [
-    'Design: Kenta Hashimoto <kem@e-cell.org>',
+AUTHORLIST  =  [
+ 'Design: Kenta Hashimoto <kem@e-cell.org>',
     'Design and application Framework: Kouichi Takahashi <shafi@e-cell.org>',
     'Programming: Yuki Fujita',
     'Yoshiya Matsubara',
     'Yuusuke Saito',
-    'Masahiro Sugimoto <sugi@e-cell.org>'
+    'Masahiro Sugimoto <sugi@e-cell.org>',
+    'Gabor Bereczki <gabor.bereczki@axelero.hu>'
     ]
+    
 DESCRIPTION = 'Osogo is a simulation session monitoring module for E-CELL SE Version 3'
 
 
@@ -128,7 +130,7 @@ class MainWindow(OsogoWindow):
 		# creates Session
 		# -------------------------------------
 		self.theSession = ecell.Session.Session( ecell.ecs.Simulator() )
-		self.theSession.setPrintMethod( self.theMessageWindow.printMessage )
+		self.theSession.setMessageMethod( self.theMessageWindow.printMessage )
 
 		# -------------------------------------
 		# creates LoggerWindow
@@ -207,7 +209,7 @@ class MainWindow(OsogoWindow):
 		# -------------------------------------
 		# create Save Cell State File Selection 
 		# -------------------------------------
-		self.theSaveFileSelection = gtk.GtkFileSelection( 'Select Rule File for Saving' )
+		self.theSaveFileSelection = gtk.FileSelection( 'Select Rule File for Saving' )
 		self.theSaveFileSelection.ok_button.connect('clicked', self.saveCellState)
 		self.theSaveFileSelection.cancel_button.connect('clicked', self.closeParentWindow)
 		self.theSaveFileSelection.complete( '*.' + self.CellStateFileExtension )
@@ -217,7 +219,7 @@ class MainWindow(OsogoWindow):
 		# -------------------------------------
 		self.theSession.theSimulator.setEventChecker( gtk.events_pending )
 		self.theSession.theSimulator.setEventHandler( gtk.mainiteration  )
-		self['ecell_logo_toolbar'].set_style( GTK.TOOLBAR_ICONS )
+		self['ecell_logo_toolbar'].set_style( gtk.TOOLBAR_ICONS )
 		self.setInitialWidgetStatus()
 		self.updateFundamentalWindows()
 
@@ -281,7 +283,7 @@ class MainWindow(OsogoWindow):
 	# ---------------------------------------------------------------
 	def openRuleFileSelection( self, anObject ) :
 
-		self.theRuleFileSelection = gtk.GtkFileSelection( 'Select Rule File' )
+		self.theRuleFileSelection = gtk.FileSelection( 'Select Rule File' )
 		#self.theRuleFileSelection.set_modal(gtk.TRUE)
 		self.theRuleFileSelection.ok_button.connect('clicked', self.loadRule)
 		self.theRuleFileSelection.cancel_button.connect('clicked', self.closeParentWindow)
@@ -313,7 +315,7 @@ class MainWindow(OsogoWindow):
 				return None
 
 			self.theRuleFileSelection.hide()
-			self.theSession.printMessage( 'loading rule file %s\n' % aFileName)
+			self.theSession.message( 'loading rule file %s\n' % aFileName)
 			aModelFile = open( aFileName )
 			self.theSession.loadModel( aModelFile )
 			aModelFile.close()
@@ -353,7 +355,7 @@ class MainWindow(OsogoWindow):
 	# ---------------------------------------------------------------
 	def openScriptFileSelection( self, anObject ) :
 
-		self.theScriptFileSelection = gtk.GtkFileSelection( 'Select Script File' )
+		self.theScriptFileSelection = gtk.FileSelection( 'Select Script File' )
 		#self.theScriptFileSelection.set_modal(gtk.TRUE)
 		self.theScriptFileSelection.ok_button.connect('clicked', self.loadScript)
 		self.theScriptFileSelection.cancel_button.connect('clicked', self.closeParentWindow)
@@ -551,7 +553,7 @@ class MainWindow(OsogoWindow):
 			# this can fail if the simulator is not ready
 			self.theSession.theSimulator.initialize()
 
-			self.theSession.printMessage( "Step\n" )
+			self.theSession.message( "Step\n" )
 			self['step_combo_entry'].set_text( str( self.theStepSize ) )
 			self.theTimer = gtk.timeout_add( self.theUpdateInterval, self.updateByTimeOut, 0 )
 			if self.theStepType == 0:
@@ -568,7 +570,7 @@ class MainWindow(OsogoWindow):
 			import sys
 			import traceback
 			aErrorMessage = traceback.format_exception(sys.exc_type,sys.exc_value,sys.exc_traceback)
-			self.theMessageWindow.printMessage(aErrorMessage)
+			self.theMessageWindow.message(aErrorMessage)
 
 		else:
 			pass
@@ -1005,11 +1007,11 @@ class MainWindow(OsogoWindow):
 	# ---------------------------------------------------------------
 	def openAbout( self, button_obj ):
 
-		anAboutDialog = gnome.ui.GnomeAbout( NAME,
+		anAboutDialog = gnome.ui.About( NAME,
 		                                     VERSION,
 		                                     COPYRIGHT,
-		                                     AUTHORLIST,
-		                                     DESCRIPTION )
+						     DESCRIPTION,
+		                                     AUTHORLIST)
 		anAboutDialog.set_title( 'about osogo' )
 		anAboutDialog.show_all()
 
@@ -1027,8 +1029,8 @@ class MainWindow(OsogoWindow):
 	def openPreferences( self, button_obj ):
 
 		aPropertyBox = gnome.ui.GnomePropertyBox()
-		aLabel = gtk.GtkLabel( 'NOT IMPLEMENTED YET' )
-		aTabLabel = gtk.GtkLabel( 'warning' )
+		aLabel = gtk.Label( 'NOT IMPLEMENTED YET' )
+		aTabLabel = gtk.Label( 'warning' )
 		aPropertyBox.append_page( aLabel, aTabLabel )
 
 		aPropertyBox.hide()

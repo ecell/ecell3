@@ -38,8 +38,10 @@ import os
 
 import gtk
 import gnome.ui
-import GDK
-import libglade
+#import GDK
+import gtk.gdk
+#import libglade
+import gtk.glade
 
 from ecell.Window import *
 from ConfirmWindow import *
@@ -134,7 +136,7 @@ class OsogoWindow(Window):
 		self[self.__class__.__name__].show_all()
 
 		# sets signalhander
-		self[self.__class__.__name__].signal_connect('destroy',self.destroyWindow)
+		self[self.__class__.__name__].connect('destroy',self.destroyWindow)
 
 		# sets exist status 'exists'
 		self.theExist = gtk.TRUE

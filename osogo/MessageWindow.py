@@ -58,8 +58,8 @@ class MessageWindow(OsogoWindow):
 		OsogoWindow.__init__( self, aMainWindow )
 		#OsogoWindow.openWindow(self)
 		#self.printMessage('')
-		self.theMessageBufferList=[]
-
+		self.theMessageBufferList=gtk.TextBuffer(None)
+		
 	# end of __init__
 
 
@@ -77,7 +77,7 @@ class MessageWindow(OsogoWindow):
 		# If messge is list or touple, then print out each line.
 		# -------------------------------------------------------
 		if type(aMessage) == type([]) or type(aMessage) == type(()) :  
-
+			
 			if len(aMessage)>0:
 				if string.find(aMessage[0],'\n') != 0:
 					aMessage = '\n' + aMessage[0]
@@ -86,23 +86,22 @@ class MessageWindow(OsogoWindow):
 			# If instance of Message Window Widget has destroyed,
 			# save aMessage to theMessageBugger
 			# --------------------------------------------------
-			if OsogoWindow.getExist(self) == 0 :
-				for aLine in aMessage:
-					self.theMessageBufferList.append( aLine )
+			for aLine in aMessage:
+				self.theMessageBufferList.insert_at_cursor( aLine, len(aLine) )
 
 			# --------------------------------------------------
 			# If instance of Message Window Widget has not destroyed,
 			# print out aMessage on theMessageBugger
-			# --------------------------------------------------
-			else:
-				for aLine in aMessage:
-					self["message_text_box"].insert_defaults( aLine )
+#			# --------------------------------------------------
+#			else:
+#				for aLine in aMessage:
+#					self["message_text_box"].forward_display_line( aLine )
 
 		# -------------------------------------------------------
 		# If message is not list or touple, then print out row data.
 		# -------------------------------------------------------
 		else: 
-
+			
 			if string.find(aMessage,'\n') != 0:
 				aMessage = '\n' + aMessage
 
@@ -110,15 +109,15 @@ class MessageWindow(OsogoWindow):
 			# If instance of Message Window Widget has destroyed,
 			# save aMessage to theMessageBugger
 			# --------------------------------------------------
-			if OsogoWindow.getExist(self) == 0 :
-				self.theMessageBufferList.append( aMessage )
+#			if OsogoWindow.getExist(self) == 0 :
+#				self.theMessageBufferList.append( aMessage )
 
 			# --------------------------------------------------
 			# If instance of Message Window Widget has not destroyed,
 			# print out aMessage on theMessageBugger
 			# --------------------------------------------------
-			else:
-				self["message_text_box"].insert_defaults( aMessage )
+#			else:
+			self.theMessageBufferList.insert_at_cursor( aMessage ,len(aMessage) )
 
 
 	# end of printMessage
@@ -133,8 +132,9 @@ class MessageWindow(OsogoWindow):
 	def openWindow( self ):
 
 		OsogoWindow.openWindow( self )
-		self.printMessage( self.theMessageBufferList )
-		self.theMessageBufferList = []
+#		self.printMessage( self.theMessageBufferList )
+#		self.theMessageBufferList = []
+		self["message_text_box"].set_buffer(self.theMessageBufferList)
 
 	# end of openWindow
 
