@@ -83,7 +83,7 @@ class DMInfo:
         self.theSimulator = ecell._emc.Simulator()
         self.__dummiesList = {}
         self.__createDummies()
-        if os.uname()[0] in ["Linux", "Unix"]:
+        if os.name != "nt":
             self.theExtension = ".so"
         else:
             self.theExtension = ".dll"
@@ -269,7 +269,7 @@ class DMInfo:
         tf=open( testFileName , "w" )
         tf.write( testText%( aType, aName, mode) )
         tf.close()
-        os.system( "ecell3-session " + testFileName + " > " + resultFileName )
+        os.system( 'ecell3-session "' + testFileName + '" > "' + resultFileName + '"' )
         os.unlink( testFileName )
         rf=open( resultFileName , 'r' )
         result = rf.readlines()

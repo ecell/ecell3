@@ -182,7 +182,7 @@ class VariableObject( EditorObject ):
                 secondConnectCommand = CreateConnection( self.theLayout, secondID, procID, varID, ringSource, ringDest, PROCESS_TO_VARIABLE, secondVarrefName )
                 self.theLayout.passCommand( [firstConnectCommand] )
                 self.theLayout.passCommand( [secondConnectCommand] )
-
+                self.theLayout.selectRequest( varID )
                 
                 
                 

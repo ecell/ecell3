@@ -285,7 +285,7 @@ class AutoLayout:
         fd.write(text)
         fd.close()
         # process file
-        os.system("neato -Tdot " + outputFileName + " -o" + inputFileName )
+        os.system('neato -Tdot "' + outputFileName + '" -o"' + inputFileName + '"')
         #load input file
         try:
             fd = open( inputFileName, 'r')

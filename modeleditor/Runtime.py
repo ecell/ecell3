@@ -18,7 +18,10 @@ import ecell.ecssupport
 import time
 
 if os.name == 'nt':
-    import win32api
+    try:
+        import win32api
+    except:
+        pass
     ecell3_session_filename = "ecell3-session.exe"
 else:
     ecell3_session_filename = "ecell3-session"
@@ -39,11 +42,17 @@ class Runtime:
         self.changeToDesignMode( True )
         
     def createNewProcess( self, testPyFile ):
-        return os.spawnl( os.P_NOWAIT, ecell3_session_path, ecell3_session_path, testPyFile )
+        if os.name == 'nt':
+            return os.spawnl( os.P_NOWAIT, ecell3_session_path, '"' + ecell3_session_path + '"', '"' + testPyFile + '"' )
+        else:
+            return os.spawnl( os.P_NOWAIT, ecell3_session_path,  ecell3_session_path ,  testPyFile )
         
     def killProcess ( self, processID ):
         if os.name == 'nt':
-            win32api.TerminateProcess( processID,0 )
+            try:
+                win32api.TerminateProcess( processID,0 )
+            except:
+                pass
         else:
             os.kill( processID,9 )
         
@@ -65,14 +74,14 @@ class Runtime:
 list=[None, None]\n\
 delay=10\n\
 import gtk\n\
-fd=open('" + testOutFile + "','w');fd.write('started'+chr(10));fd.flush()\n\
+fd=open(r'" + testOutFile + "','w');fd.write('started'+chr(10));fd.flush()\n\
 def timerhandler():\n\
     fd.write('a');fd.flush()\n\
     list[0]=gtk.timeout_add(delay,timerhandler)\n\
 def mainfunction():\n\
     list[0]=gtk.timeout_add(delay, timerhandler)\n\
     try:\n\
-        loadModel('" + fileName + "')\n\
+        loadModel(r'" + fileName + "')\n\
     except:\n\
         pass\n\
     gtk.timeout_remove(list[0])\n\
@@ -107,8 +116,11 @@ gtk.main()\n\
             if len(a)>0:
                 startstr=a[0].strip()
         if startstr!="started":
-            os.remove( testOutFile )
-            os.remove( testPyFile )
+            try:
+                os.remove( testOutFile )
+                os.remove( testPyFile )
+            except:
+                pass
             return False
             
         # must load it!!!
@@ -126,8 +138,11 @@ gtk.main()\n\
         if len(a) > 2:
             self.preLoadSuccessful = True
         else:
-            os.remove( testOutFile )
-            os.remove( testPyFile )
+            try:
+                os.remove( testOutFile )
+                os.remove( testPyFile )
+            except:
+                pass
 
             self.killProcess( pid)            
             return False
@@ -139,8 +154,11 @@ gtk.main()\n\
             fd.close()
             if len(a)>3:
                 startstr=a[3].strip()
-        os.remove( testOutFile )
-        os.remove( testPyFile )
+        try:
+            os.remove( testOutFile )
+            os.remove( testPyFile )
+        except:
+            pass
 
 
         if len(a)<4:

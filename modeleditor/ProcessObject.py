@@ -109,6 +109,7 @@ class ProcessObject( EditorObject ):
                 # create totally new variable
                 if aCommand == None:
                     self.theShape.setCursor( CU_CROSS )
+                    variableID = None
                 else:
                     ringSource, ringDest = self.theLayout.thePackingStrategy.autoConnect( self.getID(), (endx+width/2, endy+height/2) )
                     newID = self.theLayout.getUniqueObjectID( OB_TYPE_CONNECTION )
@@ -117,6 +118,7 @@ class ProcessObject( EditorObject ):
                     connectCommand = CreateConnection( self.theLayout, newID, self.theID, aCommand.getID(), self.theRingCode, ringDest, PROCESS_TO_VARIABLE, newVarrefName )
                     self.theLayout.passCommand( [ aCommand] )
                     self.theLayout.passCommand( [ connectCommand ] )
+                    variableID = aCommand.getID()
             # create real line
             else:
                 # check for already existing varref
@@ -161,6 +163,8 @@ class ProcessObject( EditorObject ):
                     newVarrefName = self.__getNewVarrefID ()
                 aCommand = CreateConnection( self.theLayout, newID, self.theID, variableID, self.theRingCode, variableRing, PROCESS_TO_VARIABLE, newVarrefName )
                 self.theLayout.passCommand( [ aCommand ] )
+            if variableID != None:
+                self.theLayout.selectRequest( variableID )
             # newCon = self.theLayout.getObject( newID )
             # newCon.checkConnections()
             

@@ -103,7 +103,7 @@ class ModelEditor:
 
         self.__theModel = None
         self.theModelName = ''
-       # self.theModelText = os.system("gedit")
+
         self.theModelFileName = ''
 
         self.operationCount=1
@@ -206,7 +206,7 @@ class ModelEditor:
         
         #Output filename 
         tmpFileName = str(self.__getTmpDir()) + os.sep + tmpFileName + '.eml' 
-        os.system( 'ecell3-sbml2eml -o '+ tmpFileName + ' ' + sbmlFileName )
+        os.system( 'ecell3-sbml2eml -o "'+ tmpFileName + '" "' + sbmlFileName +'"' )
         return tmpFileName
 
 
@@ -230,7 +230,7 @@ class ModelEditor:
         fd.write(filecontent[result] )
         fd.close()
         
-        os.system(  'ecell3-eml2sbml -o ' + sbmlFileName + ' ' + emlFileName + ' <' + paramFileName )
+        os.system(  'ecell3-eml2sbml -o "' + sbmlFileName + '" "' + emlFileName + '" <"' + paramFileName + '"')
         return True
         
     
@@ -239,7 +239,7 @@ class ModelEditor:
         tmpFileBaseName = os.path.basename(emFileName)
         tmpFileName, tmpExt = os.path.splitext( tmpFileBaseName )
         tmpFileName = str(self.__getTmpDir()) + os.sep + tmpFileName + '.eml'
-        os.system( 'ecell3-em2eml -o ' + tmpFileName +' '+ emFileName )
+        os.system( 'ecell3-em2eml -o "' + tmpFileName +'" "'+ emFileName + '"')
         return tmpFileName
 
     
@@ -247,7 +247,7 @@ class ModelEditor:
         if os.path.exists( emFileName ):
             if self.printMessage("%s already exists. Do you want to replace it?"%aFileName ,ME_OKCANCEL) != ME_RESULT_OK:
                 return False
-        os.system( 'ecell3-eml2em -o ' + emFileName + ' ' + emlFileName )
+        os.system( 'ecell3-eml2em -o "' + emFileName + '" "' + emlFileName + '"')
         return True
 
 
