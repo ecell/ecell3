@@ -13,17 +13,17 @@
 // modify it under the terms of the GNU General Public
 // License as published by the Free Software Foundation; either
 // version 2 of the License, or (at your option) any later version.
-// 
+//
 // E-CELL is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 // See the GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public
 // License along with E-CELL -- see the file COPYING.
 // If not, write to the Free Software Foundation, Inc.,
 // 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-// 
+//
 //END_HEADER
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //	This file is a part of E-CELL2.
@@ -45,37 +45,40 @@
  *::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
  *	$Id$
  :	$Log$
+ :	Revision 1.10  2004/01/21 06:26:30  shafi
+ :	a fix from gabor, remove tmp files when exitting abnormally
+ :
  :	Revision 1.9  2003/09/27 13:41:07  bgabor
  :	Bugfix.
  :
  :	Revision 1.6  2003/09/27 12:39:15  satyanandavel
  :	more compatibility issues in Windows
- :	
+ :
  :	Revision 1.5  2003/09/22 04:28:43  bgabor
  :	Fixed a serious undefined reference to my_open_to_read bug in VVector.
- :	
+ :
  :	Revision 1.4  2003/07/20 06:05:35  bgabor
- :	
+ :
  :	added support for large files
- :	
+ :
  :	Revision 1.3  2003/03/18 09:06:36  shafi
  :	logger performance improvement by gabor
- :	
+ :
  :	Revision 1.2 2003/03/01 02:43:51  shafi
  :	changed envvar name: ECSTMPDIR to VVECTORTMPDIR, changed defult vvector dir: /var/tmp to /tmp
  :
  :	Revision 1.1  2002/04/30 11:21:53  shafi
  :	gabor's vvector logger patch + modifications by shafi
- :	
+ :
  :	Revision 1.8  2001/10/21 15:27:49  ishikawa
  :	Warn and exit if temprary directory not exist.
- :	
+ :
  :	Revision 1.7  2001/10/15 17:18:26  ishikawa
  :	improved program interface
- :	
+ :
  :	Revision 1.6  2001/07/23 23:04:22  naota
  :	Detailed error message.
- :	
+ :
  :	Revision 1.5  2001/03/23 18:51:17  naota
  :	comment for credit
  :
@@ -159,7 +162,7 @@ vvectorbase::vvectorbase()
     if (envVal != NULL) {
       _defaultDirectory = strdup(envVal);
       _directoryPriority = 3;
-    } else 
+    } else
     {
 #ifdef	_Windows
       _defaultDirectory = strdup("c:\\temp");
@@ -201,7 +204,7 @@ void vvectorbase::unlinkfile()
 	}
 #endif /* OPEN_WHEN_ACCESS */
 	if (_file_name != NULL) {
-	if (unlink(_file_name) != 0) 
+	if (unlink(_file_name) != 0)
 		{
     		fprintf(stderr, "unlink(%s) failed in VVector.\n", _file_name);
   		}
@@ -233,7 +236,7 @@ void vvectorbase::setTmpDir(char const * const dirname, int priority)
 void vvectorbase::removeTmpFile()
 {
   std::vector<char const *>::iterator iii;
-   
+
 #ifndef OPEN_WHEN_ACCESS
   std::vector<int>::iterator ii;
   for (ii = _file_desc_read.begin(); ii != _file_desc_read.end(); ii++) {
@@ -251,7 +254,7 @@ void vvectorbase::removeTmpFile()
 //		printf("fdrw closed\n");
 	}
 }
-#endif /* OPEN_WHEN_ACCESS */	
+#endif /* OPEN_WHEN_ACCESS */
 
 
   for (iii = _tmp_name.begin(); iii != _tmp_name.end(); iii++) {
@@ -270,7 +273,7 @@ void vvectorbase::initBase(char const * const dirname)
   } else {
     strcpy(pathname, _defaultDirectory);
   }
-#if defined(__BORLANDC__) || defined(__WINDOWS__) || defined(__MINGW32__)  
+#if defined(__BORLANDC__) || defined(__WINDOWS__) || defined(__MINGW32__)
   if (pathname[strlen(pathname) - 1] != '\\') {
     strcat(pathname, "\\");
   }
@@ -278,7 +281,7 @@ void vvectorbase::initBase(char const * const dirname)
   if (pathname[strlen(pathname) - 1] != '/') {
     strcat(pathname, "/");
   }
-#endif  
+#endif
   if (osif_is_dir(pathname) == 0) {
     printf("Directory \"%s\" does not exist.\n", pathname);
     exit(1);
@@ -375,7 +378,7 @@ void vvectorbase::my_close()
 		(*_cb_full)();
 	} else {
 		fprintf(stderr, "error in vvector.\n");
-		abort();
+		exit(1);
 	}
 }
 
