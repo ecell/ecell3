@@ -13,10 +13,10 @@ G++ = /usr/local/bin/g++
 all:	PyEcs.so
 
 PyEcs.o:	PyEcs.hpp PyEcs.cpp 
-	$(G++) -I$(CXX) -I$(PYLIB) $(ECELL_INCLUDE) -c PyEcs.cpp
+	$(G++) -g -I$(CXX) -I$(PYLIB) $(ECELL_INCLUDE) -c PyEcs.cpp
 
 PySimulator.o:	PySimulator.hpp PySimulator.cpp
-	$(G++) -I$(CXX) -I$(PYLIB) $(ECELL_INCLUDE) -c PySimulator.cpp
+	$(G++) -g -I$(CXX) -I$(PYLIB) $(ECELL_INCLUDE) -c PySimulator.cpp
 
 
 PyEcs.so: PyEcs.o PySimulator.o 
