@@ -43,6 +43,8 @@ namespace libecs
   {
     makeMessageSlot( "PropertyList",MessageInterface,*this,NULLPTR,
 		     &MessageInterface::getPropertyList);
+    makeMessageSlot( "PropertyAttributes",MessageInterface,*this,NULLPTR,
+		     &MessageInterface::getPropertyAttributes);
 
   }
 
@@ -59,6 +61,31 @@ namespace libecs
     return Message( keyword, aPropertyList );
   }
 
+  const Message MessageInterface::getPropertyAttributes( StringCref keyword )
+  {
+    UVariableVector aPropertyList;
+
+    for( PropertyMapConstIterator i = thePropertyMap.begin() ; 
+	 i != thePropertyMap.end() ; ++i )
+      {
+	Int anAttributeFlag( 0 );
+
+	if( i->second->isSetable() )
+	  {
+	    anAttributeFlag |= SETABLE;
+	  }
+
+	if( i->second->isGetable() )
+	  {
+	    anAttributeFlag |= GETABLE;
+	  }
+
+	aPropertyList.push_back( UVariable( anAttributeFlag ) );
+      }
+
+    return Message( keyword, aPropertyList );
+  }
+
   MessageInterface::MessageInterface()
   {
     makeSlots();
@@ -66,7 +93,8 @@ namespace libecs
 
   MessageInterface::~MessageInterface()
   {
-    for( PropertyMapIterator i = thePropertyMap.begin() ; i != thePropertyMap.end() ; ++i )
+    for( PropertyMapIterator i = thePropertyMap.begin() ; 
+	 i != thePropertyMap.end() ; ++i )
       {
 	delete i->second;
       }
@@ -77,8 +105,7 @@ namespace libecs
   {
     if( thePropertyMap.find( keyword ) != thePropertyMap.end() )
       {
-	//      *theMessageWindow << "makeMessageSlot: appendSlot(): slot for keyword [" 
-	//	<< keyword << "] already exists. Taking later one.\n";
+	// it already exists. take the latter one.
 	delete thePropertyMap[ keyword ];
 	thePropertyMap.erase( keyword );
       }
@@ -89,9 +116,9 @@ namespace libecs
   {
     if( thePropertyMap.find( keyword ) == thePropertyMap.end() )
       {
-	//      *theMessageWindow << "makeMessageSlot: deleteSlot(): no slot for keyword [" 
-	//	<< keyword << "] found.\n";
-	return;
+	throw NoSlot( __PRETTY_FUNCTION__,
+		      className() + String( ":no slot for keyword [" ) +
+		      keyword + String( "] found.\n" ) );
       }
     delete thePropertyMap[ keyword ];
     thePropertyMap.erase( keyword );

@@ -66,6 +66,8 @@ namespace libecs
     virtual void set( MessageCref message ) = 0;
     virtual const Message get( StringCref keyword ) = 0;
 
+    virtual const bool isSetable() const = 0;
+    virtual const bool isGetable() const = 0;
 
     virtual void operator()( MessageCref message ) 
     { set( message ); }
@@ -180,29 +182,41 @@ namespace libecs
     }
   
 
+    virtual const bool isSetable() const
+    {
+      return theSetMethod != NULLPTR;
+    }
+
+    virtual const bool isGetable() const
+    {
+      return theGetMethod != NULLPTR;
+    }
+
     virtual void set( MessageCref message )
     {
-      if( theSetMethod == NULLPTR )
+      if( ! isSetable() )
 	{
 	  //FIXME: throw an exception
 	  return;
 	}
+
       ( theObject.*theSetMethod )( message );
       
       if( theProxy != NULL )
       	{
-	  Message m = get("nothing");
+	  //	  Message m = get("nothing");
 	  //	  theProxy.update( m.getBody() );
 	} 
     }
 
     virtual const Message get( StringCref keyword ) 
     {
-      if( theGetMethod == NULLPTR )
+      if( ! isGetable() )
 	{
 	  //FIXME: throw an exception
 	  return Message( keyword );
 	}
+
       return ( ( theObject.*theGetMethod )( keyword ));
     }
 
@@ -239,6 +253,13 @@ namespace libecs
   {
   public:
 
+    enum PropertyAttribute
+      {
+	SETABLE = ( 1 << 0 ),
+	GETABLE = ( 1 << 1 )
+      };
+
+
     MessageInterface();
     virtual ~MessageInterface();
 
@@ -257,6 +278,7 @@ namespace libecs
   public: // message slots
 
     const Message getPropertyList( StringCref keyword );
+    const Message getPropertyAttributes( StringCref keyword );
 
   protected:
 
