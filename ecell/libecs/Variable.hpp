@@ -86,8 +86,8 @@ namespace libecs
 				   &Variable::getVelocity );
 	//				   &Variable::addVelocity, 
 
-	// Concentration can be saved, but cannot be loaded.
-	PROPERTYSLOT_GET_NO_LOAD_SAVE( Real, Concentration );
+	PROPERTYSLOT_GET_NO_LOAD_SAVE( Real, MolarConc );
+	PROPERTYSLOT_GET_NO_LOAD_SAVE( Real, NumberConc );
       }
 
     class IsIntegrationNeeded
@@ -308,14 +308,41 @@ namespace libecs
 
 
     /**
-       Returns the concentration of this Variable.
+       Returns the molar concentration of this Variable.
+
+       @return Concentration in M [mol/L].
+    */
+
+    GET_METHOD( Real, MolarConc )
+    {
+      return getValue() / ( getSuperSystem()->getSizeN_A() );
+    }
+
+    /**
+       Returns the number concentration of this Variable.
+
+       Unlike getMolarConc, this method just returns value / size.
+
+       @return Concentration in [number/L].
+    */
+
+    GET_METHOD( Real, NumberConc )
+    {
+      return getValue() / ( getSuperSystem()->getSize() );
+    }
+
+
+    /**
+       Returns the molar concentration of this Variable.
+
+       @note this method will be deprecated before version 3.2.
 
        @return Concentration in M (mol/L).
     */
 
     GET_METHOD( Real, Concentration )
     {
-      return getValue() / ( getSuperSystem()->getSizeN_A() );
+      return getMolarConc();
     }
 
     void registerProxy( VariableProxyPtr const anVariableProxy );

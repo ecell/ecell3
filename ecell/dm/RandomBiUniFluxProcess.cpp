@@ -63,9 +63,9 @@ LIBECS_DM_CLASS( RandomBiUniProcess, Process )
     {
       Real velocity( C_0.getValue() );
       
-      Real S0 = S_0.getConcentration();
-      Real S1 = S_1.getConcentration();
-      Real P = P_0.getConcentration();
+      Real S0 = S_0.getMolarConc();
+      Real S1 = S_1.getMolarConc();
+      Real P = P_0.getMolarConc();
       
       Real MP( k_1*k_2*k_5*(k_3-k_4)*P+k5*(k1*k_2*k3+k_1*k2*k4)*S0*S1-k_1*k_3*k4*k_5*S0*P-k_2*k3*k_4*k_5*S1*P+k1*k3*k4*k5*pow(S0,2)*S1+k2*k3*k4*k5*S0*pow(S1,2) );
       Real Den(k_1*k_2*(k_3+k_4+k5)+(k1*k_2*k_3+k1*k_2*k_4+k1*k_2*k5+k_1*k_3*k4+k_1*k4*k5)*S0+(k_1*k2*k_3+k_1*k2*k_4+k_1*k2*k5+k_2*k3*k_4+k_2*k3*k5)*S1+k_5*(k_1*k_2+k_1*k_4+k_2*k_3)*P+(k1*k_2*k3+k1*k3*k_4+k_1*k2*k4+k2*k_3*k4+k3*k4*k5)*S0*S1+k1*k4*(k_3+k5)*pow(S0,2)+k2*k3*(k_4+k5)*pow(S1,2)+k4*k_5*(k_1+k_3)*S0*P+k3*k_5*(k_2+k_4)*S1*P+k1*k3*k4*pow(S0,2)*S1+k2*k3*k4*S0*pow(S1,2)+k3*k4*k_5*S0*S1*P );

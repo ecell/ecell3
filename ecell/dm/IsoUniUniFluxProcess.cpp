@@ -51,9 +51,9 @@ LIBECS_DM_CLASS( IsoUniUniProcess, Process )
 
   virtual void process()
     {
-      Real S( S0.getConcentration() );
-      Real P( P0.getConcentration() );
-      Real velocity( KcF * C0.getConcentration() * 
+      Real S( S0.getMolarConc() );
+      Real P( P0.getMolarConc() );
+      Real velocity( KcF * C0.getMolarConc() * 
 	(S-P/Keq) / KmS * (1+P/KmP) + S * (1+P/KiiP) );
 
       setFlux( velocity );

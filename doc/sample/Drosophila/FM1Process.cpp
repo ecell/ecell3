@@ -42,7 +42,7 @@ LIBECS_DM_CLASS( FM1Process, Process )
 
     virtual void process()
       {
-	Real E( C0.getConcentration() );
+	Real E( C0.getMolarConc() );
 	Real V( vs * KI );
 	V /= KI + (E * E * E);
 	V *= 1E-018 * N_A;

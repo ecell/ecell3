@@ -37,7 +37,7 @@ LIBECS_DM_CLASS( FP21Process, Process )
     
   virtual void process()
     {
-      Real E( C0.getConcentration() );
+      Real E( C0.getMolarConc() );
       
       Real V( V3 * E );
       V /= K3 + E;

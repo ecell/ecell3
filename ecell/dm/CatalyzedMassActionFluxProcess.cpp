@@ -47,7 +47,7 @@ LIBECS_DM_CLASS( CatalyzedMassActionProcess, Process )
            i != theZeroVariableReferenceIterator ; ++i )
 	{
 	  VariableReferenceCref aVariableReference( *i );
-	  const Real aConcentration( aVariableReference.getConcentration() );
+	  const Real aConcentration( aVariableReference.getMolarConc() );
 
 	  Int j( aVariableReference.getCoefficient() );
 	  do

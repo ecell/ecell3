@@ -133,10 +133,14 @@ BOOST_PYTHON_MODULE( _ecs )
     // properties
     .add_property( "Coefficient",
 		   &VariableReference::getCoefficient )   // read-only
-    .add_property( "Concentration", 
-		   &VariableReference::getConcentration ) // read-only
-    .add_property( "Fixed",
-    		   &VariableReference::getVelocity )      // read-only
+    .add_property( "MolarConc", 
+		   &VariableReference::getMolarConc ) // read-only
+    .add_property( "Name", 
+		   &VariableReference::getName ) // read-only
+    .add_property( "NumberConc", 
+		   &VariableReference::getNumberConc ) // read-only
+    .add_property( "IsFixed",
+    		   &VariableReference::isFixed )      // read-only
     .add_property( "IsAccessor",
     		   &VariableReference::isAccessor )       // read-only
     .add_property( "TotalVelocity",

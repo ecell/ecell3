@@ -56,9 +56,9 @@ LIBECS_DM_CLASS( OrderedBiUniProcess, Process )
 
   virtual void process()
     {
-      Real S0Concentration = S0.getConcentration();
-      Real S1Concentration = S1.getConcentration();
-      Real P0Concentration = P0.getConcentration();
+      Real S0Concentration = S0.getMolarConc();
+      Real S1Concentration = S1.getMolarConc();
+      Real P0Concentration = P0.getMolarConc();
       
       Real Den( KcF * KmP + KcF * P0Concentration 
 		+ KcR * KmS0 * S1Concentration / Keq

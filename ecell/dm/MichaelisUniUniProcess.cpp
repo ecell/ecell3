@@ -45,7 +45,7 @@ LIBECS_DM_CLASS( MichaelisUniUniProcess, Process )
     {
       Real velocity( KcF );
       velocity *= C0.getValue();
-      const Real S( S0.getConcentration() );
+      const Real S( S0.getMolarConc() );
       velocity *= S;
       velocity /= ( KmS + S );
       setFlux( velocity );

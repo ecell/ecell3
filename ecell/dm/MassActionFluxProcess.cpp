@@ -46,7 +46,7 @@ LIBECS_DM_CLASS( MassActionFluxProcess, Process )
 	Int aCoefficient( aVariableReference.getCoefficient() );
 	do {
 	  ++aCoefficient;
-	  velocity *= aVariableReference.getConcentration();
+	  velocity *= aVariableReference.getMolarConc();
 	} while( aCoefficient != 0 );
 	
       }

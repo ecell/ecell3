@@ -150,7 +150,7 @@ namespace libecs
 
 
     // can there be unnamed VariableReferences?
-    StringCref getName() const 
+    const String getName() const 
     { 
       return theName; 
     }
@@ -221,9 +221,14 @@ namespace libecs
       theVariablePtr->addValue( aValue );
     }
 
-    const Real getConcentration() const
+    const Real getMolarConc() const
     {
-      return theVariablePtr->getConcentration();
+      return theVariablePtr->getMolarConc();
+    }
+
+    const Real getNumberConc() const
+    {
+      return theVariablePtr->getNumberConc();
     }
 
     const Real getTotalVelocity() const

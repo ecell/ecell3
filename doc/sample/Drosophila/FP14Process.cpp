@@ -38,7 +38,7 @@ LIBECS_DM_CLASS( FP14Process, Process )
     
   virtual void process()
     {
-      Real E( C0.getConcentration() );
+      Real E( C0.getMolarConc() );
       
       Real V( V4 * E );
       V /= K4 + E;

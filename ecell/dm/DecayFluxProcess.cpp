@@ -56,7 +56,7 @@ LIBECS_DM_CLASS( DecayProcess, Process )
       Real velocity( k * N_A );
       velocity *= getSuperSystem()->getSize();
 
-      velocity *= pow(S0.getConcentration(),S0.getCoefficient()*-1);
+      velocity *= pow(S0.getMolarConc(),S0.getCoefficient()*-1);
       setFlux( velocity );
     }
 

@@ -136,7 +136,7 @@ LIBECS_DM_CLASS( BisectionRapidEquilibriumProcess, Process )
       Real aLeftSide( KeqConc );
       for( EACH_SUBSTRATE( aSubstrateIter ) )
 	{
-	  Real aConc( (*aSubstrateIter).getConcentration() );
+	  Real aConc( (*aSubstrateIter).getMolarConc() );
 	  Int aCoeff( -1 * (*aSubstrateIter).getCoefficient() );
 	  aConc -= aCoeff * aVelocity;
 	  aLeftSide *= pow( aConc , aCoeff );
@@ -145,7 +145,7 @@ LIBECS_DM_CLASS( BisectionRapidEquilibriumProcess, Process )
       Real aRightSide( 1 );
       for( EACH_PRODUCT( aProductIter ) )
 	{
-	  Real aConc( (*aProductIter).getConcentration() );
+	  Real aConc( (*aProductIter).getMolarConc() );
 	  Int aCoeff( (*aProductIter).getCoefficient() );
 	  aConc += aCoeff * aVelocity;
 	  aRightSide *= pow( aConc , aCoeff );
@@ -157,12 +157,12 @@ LIBECS_DM_CLASS( BisectionRapidEquilibriumProcess, Process )
   VariableReferencePtr getMinSubstratePtr()
     {
       VariableReferencePtr aMinSubstratePtr( &(theVariableReferenceVector[0]));
-      Real aConc = theVariableReferenceVector[ 0 ].getConcentration();
+      Real aConc = theVariableReferenceVector[ 0 ].getMolarConc();
       Real aCoeff = theVariableReferenceVector[ 0 ].getCoefficient();
       Real aMin( aConc / aCoeff );
       for( EACH_SUBSTRATE( aSubstrateIter ) )
 	{
-	  Real aConc = (*aSubstrateIter).getConcentration();
+	  Real aConc = (*aSubstrateIter).getMolarConc();
 	  Real aCoeff = (*aSubstrateIter).getCoefficient();
 	  if( aMin <  aConc / aCoeff )
 	    aMin = aConc / aCoeff;
@@ -177,12 +177,12 @@ LIBECS_DM_CLASS( BisectionRapidEquilibriumProcess, Process )
 	VariableReferencePtr
 	aMinProductPtr( &theVariableReferenceVector[ anIndex ] );
       
-      Real aConc = theVariableReferenceVector[ anIndex ].getConcentration();
+      Real aConc = theVariableReferenceVector[ anIndex ].getMolarConc();
       Real aCoeff = theVariableReferenceVector[ anIndex ].getCoefficient();
       Real aMin( aConc / aCoeff );
       for( EACH_PRODUCT( aProductIter ) )
 	{
-	  Real aConc = (*aProductIter).getConcentration();
+	  Real aConc = (*aProductIter).getMolarConc();
 	  Real aCoeff = (*aProductIter).getCoefficient();
 	  if( aMin >  aConc / aCoeff )
 	    aMin = aConc / aCoeff;
@@ -207,7 +207,7 @@ LIBECS_DM_CLASS( BisectionRapidEquilibriumProcess, Process )
 	  else // opposite sign or first turn( theVelocityBuffer == 0 ).
 	    {
 	      VariableReferencePtr aMinSubstratePtr = getMinSubstratePtr();
-	      Real aConc = aMinSubstratePtr->getConcentration();
+	      Real aConc = aMinSubstratePtr->getMolarConc();
 	      Real aCoeff = aMinSubstratePtr->getCoefficient();
 	      return -1 * aConc / ( aCoeff * 2 );
 	    }
@@ -221,7 +221,7 @@ LIBECS_DM_CLASS( BisectionRapidEquilibriumProcess, Process )
 	  else // opposite sign or first turn( theVelocityBuffer == 0 ).
 	    {
 	      VariableReferencePtr aMinProductPtr = getMinProductPtr();
-	      Real aConc = aMinProductPtr->getConcentration();
+	      Real aConc = aMinProductPtr->getMolarConc();
 	      Real aCoeff = aMinProductPtr->getCoefficient();
 	      return -1 * aConc / ( aCoeff * 2 );
 	    }

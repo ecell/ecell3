@@ -52,8 +52,8 @@ LIBECS_DM_CLASS( MichaelisUniUniReversibleProcess, Process )
 
   virtual void process()
     {
-      const Real S( S0.getConcentration() );
-      const Real P( P0.getConcentration() );
+      const Real S( S0.getMolarConc() );
+      const Real P( P0.getMolarConc() );
 
       Real velocity( KcF * KmP * S );
       velocity -= KcR * KmS * P;

@@ -65,10 +65,10 @@ LIBECS_DM_CLASS( OrderedBiBiProcess, Process )
 
   virtual void process()
     {
-      Real S0Concentration = S0.getConcentration();
-      Real S1Concentration = S1.getConcentration();
-      Real P0Concentration = P0.getConcentration();
-      Real P1Concentration = P1.getConcentration();
+      Real S0Concentration = S0.getMolarConc();
+      Real S1Concentration = S1.getMolarConc();
+      Real P0Concentration = P0.getMolarConc();
+      Real P1Concentration = P1.getMolarConc();
       
       Real Denom( KcR * KiS0 * KmS1
 		  + KcR * KmS1 * S0Concentration + KcR * KmS0 
