@@ -44,7 +44,8 @@ import string
 import sys
 from ecell.ecssupport import *
 
-from PluginWindow import *
+#from PluginWindow import *
+from ecell.PluginWindow import *
 
 class OsogoPluginWindow(PluginWindow):
 
@@ -76,11 +77,13 @@ class OsogoPluginWindow(PluginWindow):
 
 		#PluginWindow.__init__( self, dirname, data, pluginmanager, root )
 		PluginWindow.__init__( self, dirname, pluginmanager, root )
+		PluginWindow.openWindow( self )
 
 		self.theSession = self.thePluginManager.theSession 
 		self.theRawFullPNList = data
 		self.theTitle = pluginmanager.theInterfaceWindow.theTitle
         	
+
 	# end of __init__
 
 
