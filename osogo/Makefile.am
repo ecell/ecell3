@@ -51,7 +51,10 @@ icon_step.xpm\
 icon_stop.xpm\
 icon_up.xpm
 
-EXTRA_DIST=${osogo_PYTHON}
 
 bin_SCRIPTS =\
 gecell
+
+EXTRA_DIST=${osogo_PYTHON}\
+${bin_SCRIPTS}
+
