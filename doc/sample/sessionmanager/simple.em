@@ -32,7 +32,7 @@ System System( / )
 		Value	1000;
 	}
 	
-	Process MichaelisUniUniFluxProcess( E )
+	Process TestProcess( E )
 	{
 		VariableReferenceList	[ S0 :.:S -1 ]
  					[ P0 :.:P 1 ]

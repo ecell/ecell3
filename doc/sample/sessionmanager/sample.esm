@@ -27,16 +27,25 @@ setStderrFileName('stderr.txt')
 
 
 # -----------------------------------------------------
-# [2] retuster jobs
+# [2] register jobs
 # -----------------------------------------------------
-# [2-1] set up
+# [2-1] set up environment
+# If you don't want to copy .so files to the temporary directory,
+# ECELL3_DM_PATH need to be set as absolute path.
 anEssFile = 'onerun.ess'
 anExtraFileList = ['simple.eml']
+aDmPath = os.path.abspath('.')
+
+# If not, ECELL3_DM_PATH need to be set as relative path.
+#anEssFile = 'onerun.ess'
+#anExtraFileList = ['simple.eml','TestProcess.so']
+#aDmPath = '.'
+
 
 # [2-2] register 3 sessions
-aJob1 = registerEcellSession(anEssFile,"{'value':100}",anExtraFileList )
-aJob2 = registerEcellSession(anEssFile,"{'value':200}",anExtraFileList )
-aJob3 = registerEcellSession(anEssFile,"{'value':300}",anExtraFileList )
+aJob1 = registerEcellSession(anEssFile,"{'value':100}",anExtraFileList,aDmPath )
+aJob2 = registerEcellSession(anEssFile,"{'value':200}",anExtraFileList,aDmPath )
+aJob3 = registerEcellSession(anEssFile,"{'value':300}",anExtraFileList,aDmPath )
 
 
 # -----------------------------------------------------
@@ -58,14 +67,17 @@ message( "copy files --> start" )
 # [4-1] copy output file and stdout file of first job 
 shutil.copy( getJobDirectory(aJob1) + os.sep + "S.ecd", "S1.ecd")
 shutil.copy( getJobDirectory(aJob1) + os.sep + "stdout.txt", "stdout1.txt")
+shutil.copy( getJobDirectory(aJob1) + os.sep + "stderr.txt", "stderr1.txt")
 
 # [4-2] copy output file and stdout file of second job 
 shutil.copy( getJobDirectory(aJob1) + os.sep + "S.ecd", "S2.ecd")
 shutil.copy( getJobDirectory(aJob2) + os.sep + "stdout.txt", "stdout2.txt")
+shutil.copy( getJobDirectory(aJob2) + os.sep + "stderr.txt", "stderr2.txt")
 
 # [4-3] copy output file and stdout file of third job 
 shutil.copy( getJobDirectory(aJob1) + os.sep + "S.ecd", "S3.ecd")
 shutil.copy( getJobDirectory(aJob3) + os.sep + "stdout.txt", "stdout3.txt")
+shutil.copy( getJobDirectory(aJob3) + os.sep + "stderr.txt", "stderr3.txt")
 
 message( "copy files --> end" )
 

@@ -13,6 +13,8 @@ including ESS files or other script files(sh,python,etc.).
 === Files and directories ===
 
 README:                     This file
+TestProcess.cpp             Process file whose contents are same as those of 
+                            MichaelisUniUniFluxProcess.cpp
 onerun.ess:                 ESS file which is loaded by a E-Cell session object.
 sample.esm:                 ESM file which is loaded by multiple E-Cell session
                             objects.
@@ -27,8 +29,13 @@ simple.em:                  Model file(EM file) for this model
    % ls simple.eml
    simple.eml
 
+2. Compile the .cpp file to .so file.
 
-2. Run esm file.
+   % ecell3-dmc TestProcess.cpp
+   % ls TestProcess.so
+   TestProcess.so
+
+3. Run esm file.
 
    % ecell3-session-manager sample.esm
 
