@@ -1,0 +1,28 @@
+AC_INIT(VariableReferenceEditor.py)
+
+AM_SANITY_CHECK
+AC_CANONICAL_HOST
+dnl
+AM_INIT_AUTOMAKE(modeleditor,0.1)
+AM_PATH_PYTHON(2.2)
+dnl
+AM_CHECK_PYMOD(pygtk,,,[AC_MSG_ERROR(could not find pygtk module)])
+AM_CHECK_PYMOD(gtk,,,[AC_MSG_ERROR(could not find gtk module)])
+AM_CHECK_PYMOD(gtk.gdk,,,[AC_MSG_ERROR(could not find gtk.gdk module. perhaps pygtk2 is not installed)])
+AM_CHECK_PYMOD(gtk.glade,,,[AC_MSG_ERROR(could not find gtk.glade module. perhaps pygtk2-libglade is not installed)])
+AM_CHECK_PYMOD(gnome.ui,,[AC_SUBST([GNOME_INSTALLED],yes)],[AC_SUBST([GNOME_INSTALLED],no)])
+AM_CHECK_PYMOD(Numeric,,,[AC_MSG_ERROR(could not find Numeric module)])
+dnl
+dm_dirs=$(ls -XF ${prefix}/lib/ecell/|grep 3.*/)
+for adir in ${dm_dirs}
+do
+ecell_dm_path="${prefix}/lib/ecell/${adir/\//}"
+done
+AC_SUBST(ecell_dm_path)
+AC_OUTPUT(
+Makefile
+Config.py
+glade/Makefile
+ecell3-me,
+chmod +x ecell3-me
+)
