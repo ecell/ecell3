@@ -11,7 +11,12 @@ MichaelisUniUniProcess.cpp\
 RapidEquilibriumProcess.cpp\
 SSystemProcess.cpp\
 NRProcess.cpp\
-NRStepper.cpp
+NRStepper.cpp\
+FixedEuler1Stepper.cpp\
+FixedRungeKutta4Stepper.cpp\
+Fehlberg23Stepper.cpp\
+CashKarp45Stepper.cpp\
+DormandPrince547MStepper.cpp
 
 EXTRA_DIST = ${DMS}
 dmdir = ${DM_DIR}
