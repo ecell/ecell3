@@ -39,6 +39,10 @@ import glob
 
 class DmFile:
       
+      commentRegex = re.compile( r'^\#' )
+      nlRegex      = re.compile( r'^\n' )
+      patternRegex = re.compile( r'([\@\%])(\w+):\s*(.*)' )
+
       def __init__( self, infilename ):
             self.dic = {}
             self.keynum = {}
@@ -65,10 +69,11 @@ class DmFile:
                         break
 
                   # skip comment or empty line
-                  if re.match( '^\#', line ) or re.match( '^\n', line ):
+                  if DmFile.commentRegex.match( line )\
+                     or DmFile.nlRegex.match( line ):
                         continue
 
-                  match = re.match( "([\@\%])(\w+):\s*(.*)", line )
+                  match = DmFile.patternRegex.match( line )
                   if not match:
                         self.dic[self.prekey] = self.dic[self.prekey] + line
                         continue
@@ -97,6 +102,10 @@ class DmFile:
 
 
 class DmTemplate:
+
+      regex1 = re.compile( r'\#\(\@(\w+)\)' )
+      regex2 = re.compile( r'\#\(\$(\d+)\)' )
+      regex3 = re.compile( r'\#\(\%(\w+)\)' )
 
       def __init__( self, templatedir ):
             self.templatedir = templatedir
@@ -133,39 +142,42 @@ class DmTemplate:
                   if not line:
                         break
 
-                  if re.search( '\#\(\@\w+\)', line ):
+                  if DmTemplate.regex1.search( line ):
                         line = self.sub( line )
-                  elif re.search( '\#\(\$\d+\)', line ):
-                        match = re.search( '\#\(\$(\d+)\)', line )
+                        buffer = buffer + line
+                        continue
+                              
+                  match = DmTemplate.regex2.search( line )
+                  if match:
                         keyno = match.group( 1 )
-                        line = re.sub( '\#\(\$\d+\)',\
-                                       self.dmfile.property[key,no+1,\
-                                                            string.atoi(keyno)\
-                                                            ],\
-                                       line )
-                  elif re.search( '\#\(\%\w+\)', line ):
-                        match = re.match( '\#\(\%(\w+)\)', line )
-                        key = match.group( 1 )
-                        line = ''
-                        for i in range( self.dmfile.keynum[key] ):
-                              line = line + self.generate( key, i )
+                        value = self.dmfile.property[key,no+1,\
+                                                     string.atoi(keyno)]
+                        buffer = buffer + DmTemplate.regex2.sub( value, line )
+                        continue
 
+                  match = DmTemplate.regex3.search( line )
+                  if match:
+                        key = match.group( 1 )
+                        for i in range( self.dmfile.keynum[key] ):
+                              buffer = buffer + self.generate( key, i )
+                        continue
+
+                  # regular line
                   buffer = buffer + line
+
 
             return buffer
 
       def sub( self, line ):
             buffer = ''
-            match = re.search( '\#\(\@(\w+)\)', line )
+            match = DmTemplate.regex1.search( line )
             key = match.group( 1 )
 
             if not self.dmfile.dic.has_key( key ):
                   print "Keyword " + key + " not found."
                   sys.exit( 1 )
 
-            buffer = re.sub( '\#\(\@\w+\)',\
-                             self.dmfile.dic[key],\
-                             line )
+            buffer = DmTemplate.regex1.sub( self.dmfile.dic[key], line )
 
             return buffer
 
