@@ -784,11 +784,245 @@ class EmlParser:
 
 
 #---------------------------------------------------------"""
-class PreModelValidator:
+class FileValidator:
+    """Level-1 validation for each file"""
 
-    def validate( self, aPreModel ):
-        print 'This method is "validate".'
 
-#    def changeSystemPath( self ):
-    
+    def __init__( self, aFileObject ):
+        aFileList   = aFileObject.readlines()
+        aStringData = string.join( string.join( aFileList, '' ).split( '\n' ), '' )
+        try:
+            self.__theDocument = minidom.parseString( aStringData )
+        except:
+            print 'FILE VALIDATION ERROR: cannot parse\n\n'
 
+        else:
+            self.checkProperty()
+            self.checkStepper()
+            self.checkSystem()
+
+
+
+
+###----------------------------------------------------------------------------------
+### Porperty Validation
+###__________________________________________________________________________________
+
+    def checkProperty( self ):
+        aModelNode = self.__theDocument.childNodes[0].childNodes[0]
+
+        aPropertyList = []
+        for aTargetChild in aModelNode.childNodes:
+            if aTargetChild.tagName == 'property':
+                aPropertyList.append( aTargetChild )
+
+
+        for aTargetProperty in aPropertyList:
+            aFullId = aTargetProperty.getAttribute( 'fullid' )
+            aName   = aTargetProperty.getAttribute( 'name' )
+            
+            aValueList = []
+            for aTargetChild in aTargetProperty.childNodes:
+                if aTargetChild.tagName == 'value':
+                    aValueList.append( aTargetChild )
+                elif aTargetChild.tagName == 'metadata':
+                    pass
+                else:
+                    self.showError( aTargetChild.tagName, 'There is an improper element.')
+
+
+
+            self.checkAttributeExistence( aTargetProperty.toxml(), 'fullid', aFullId )
+            self.checkAttributeExistence( aTargetProperty.toxml(), 'name', aName )
+            self.checkFullId( aFullId )
+            self.checkValueList( aValueList )
+                
+            if len( aValueList ) == 0:
+                self.showError( aTargetProperty.toxml(), 'Property element needs value elements.' )
+                
+
+
+###----------------------------------------------------------------------------------
+### Stepper Validation
+###__________________________________________________________________________________
+
+    def checkStepper( self ):
+        aModelNode = self.__theDocument.childNodes[0].childNodes[0]
+        
+        aStepperList = []
+        for aTargetChild in aModelNode.childNodes:
+            if aTargetChild.tagName == 'stepperlist':
+                aStepperList.append( aTargetChild )
+
+        for aTargetStepper in aStepperList:
+            aTargetClass = aTargetStepper.getAttribute( 'class' )
+            aTargetId    = aTargetStepper.getAttribute( 'id' )
+            
+            self.checkAttributeExistence( aTargetStepper.toxml(), 'class', aTargetClass )
+            self.checkAttributeExistence( aTargetStepper.toxml(), 'id', aTargetId )
+            
+
+
+
+###----------------------------------------------------------------------------------
+### System Validation
+###__________________________________________________________________________________
+
+    def checkSystem( self ):
+        aModelNode = self.__theDocument.childNodes[0].childNodes[0]
+        
+        aSystemList = []
+        for aTargetChild in aModelNode.childNodes:
+            if aTargetChild.tagName == 'system':
+                aSystemList.append( aTargetChild )
+
+
+        aSubsystemList = []
+        for aTargetSystem in aSystemList:
+            for aTargetChild in aTargetSystem.childNodes:
+                if aTargetChild.tagName == 'subsystem':
+                    aSubsystemList.append( aTargetChild )
+                    
+
+        ## check existence of attribute
+        for aTargetSystem in aSystemList:
+            aTargetStepper = aTargetSystem.getAttribute( 'stepper' )
+            aTargetId      = aTargetSystem.getAttribute( 'id' )
+            aTargetName    = aTargetSystem.getAttribute( 'name' )
+            
+            self.checkAttributeExistence( aTargetSystem.toxml(), 'stepper', aTargetStepper )
+            self.checkAttributeExistence( aTargetSystem.toxml(), 'id', aTargetId )
+            self.checkAttributeExistence( aTargetSystem.toxml(), 'name', aTargetName )
+
+            
+
+        ## Parents must know their children. ( check mother > child )
+        for aTargetSubsystem in aSubsystemList:
+            aSubsystemExistence = 0
+            aTargetSubsystemId = aTargetSubsystem.getAttribute( 'id' )
+
+            for aTargetSystem in aSystemList:
+                aTargetSystemId = aTargetSystem.getAttribute( 'id' )
+
+                if aTargetSubsystemId == aTargetSystemId:
+                    aSubsystemExistence = 1
+
+            if aSubsystemExistence == 0:
+                self.showError( aTargetSubsystem.toxml(), "This mother don't know her child." )
+            
+
+        ## Children must know their parents.( check child > mother )
+        for aTargetSystem in aSystemList:
+            aSystemExistence = 0
+            aTargetSystemId = aTargetSystem.getAttribute( 'id' )
+
+            for aTargetSubsystem in aSubsystemList:
+                aTargetSubsystemId = aTargetSubsystem.getAttribute( 'id' )
+                
+                if aTargetSystemId == aTargetSubsystemId:
+                    aSystemExistence = 1
+
+            if aSystemExistence == 0 and \
+               aTargetSystemId != '/':
+                self.showError( aTargetSystem.toxml(), "This child don't know his mother." )
+                
+
+
+        ## check attributes of Subsystem, Substance and Reactor
+        for aTargetSystem in aSystemList:
+            for aTargetChild in aTargetSystem.childNodes:
+                aTargetTagName = aTargetChild.tagName
+
+                if aTargetTagName   == 'subsystem':
+                    self.checkSubsystem( aTargetChild )
+
+                elif aTargetTagName == 'substance':
+                    self.checkSubstance( aTargetChild )
+
+                elif aTargetTagName == 'reactor':
+                    self.checkReactor( aTargetChild )
+
+
+
+    #----------------------------------------------------------------------------------
+    # For Porperty Validation
+    #__________________________________________________________________________________
+
+    def checkFullId( self, aFullId ):
+        aFullIdList = aFullId.split( ':' )
+
+
+        if len( aFullIdList ) != 3:
+            self.showError( aFullId, 'FullId must have 3 elements separated by semicolon.' )
+
+
+        if aFullIdList[0] != 'System'    and \
+           aFullIdList[0] != 'Substance' and \
+           aFullIdList[0] != 'Reactor':
+            self.showError\
+             ( aFullIdList[0], 'First element of fullId must be System, Substance or Reactor.' )
+
+
+
+    def checkValueList( self, aValueList ):
+        aNumValueList = len( aValueList )
+
+        aCounter = 0
+        for aTargetValue in aValueList:
+            aTargetNumber = aTargetValue.getAttribute( 'number' )
+            aTargetNumber = int( aTargetNumber )
+            
+            if aTargetNumber != aCounter:
+                self.showError( aTargetValue.toxml(), "The 'number' must be sequential number." )
+            aCounter = aCounter + 1
+
+
+        for aTargetValue in aValueList:
+            if len( aTargetValue.childNodes ) == 0 and \
+               aTargetValue.getAttribute( 'range' ) == '':
+                self.showError( aTargetValue.toxml(), 'Value element must have value or range.' )
+                
+                
+
+
+    #----------------------------------------------------------------------------------
+    # For System Validation
+    #__________________________________________________________________________________
+
+    def checkSubsystem( self, aTargetSubsystem ):
+        aTargetId = aTargetSubsystem.getAttribute( 'id' )
+        self.checkAttributeExistence( aTargetSubsystem.toxml(), 'id', aTargetId )
+        
+
+    def checkSubstance( self, aTargetSubstance ):
+        aTargetId   = aTargetSubstance.getAttribute( 'id' )
+        aTargetName = aTargetSubstance.getAttribute( 'name' )
+        self.checkAttributeExistence( aTargetSubstance.toxml(), 'id', aTargetId )
+        self.checkAttributeExistence( aTargetSubstance.toxml(), 'name', aTargetName )
+
+
+    def checkReactor( self, aTargetReactor ):
+        aTargetClass = aTargetReactor.getAttribute( 'class' )
+        aTargetId    = aTargetReactor.getAttribute( 'id' )
+        aTargetName  = aTargetReactor.getAttribute( 'name' )
+        self.checkAttributeExistence( aTargetReactor.toxml(), 'class', aTargetClass )
+        self.checkAttributeExistence( aTargetReactor.toxml(), 'id', aTargetId )
+        self.checkAttributeExistence( aTargetReactor.toxml(), 'name', aTargetName )
+
+                
+
+
+    #----------------------------------------------------------------------------------
+    # General Methods for Validation
+    #__________________________________________________________________________________
+                
+    def checkAttributeExistence( self, aTargetElement, aTargetAttributeName, aTargetAttribute ):
+        if aTargetAttribute == '':
+            aMessage = "This element needs '" + aTargetAttributeName + "' attribute."
+            self.showError( aTargetElement, aMessage )
+
+
+
+    def showError( self, anErrorPart, aMessage ):
+        print 'FILE VALIDATION ERROR:',aMessage,'->',anErrorPart
+        
