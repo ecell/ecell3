@@ -48,7 +48,7 @@ public:
       INHERIT_PROPERTIES( PythonProcessBase );
 
       PROPERTYSLOT_SET_GET( Integer, IsContinuous );
-      PROPERTYSLOT_SET_GET( String, ProcessMethod );
+      PROPERTYSLOT_SET_GET( String, FireMethod );
       PROPERTYSLOT_SET_GET( String, InitializeMethod );
     }
 
@@ -58,7 +58,7 @@ public:
   {
 
     setInitializeMethod( "" );
-    setProcessMethod( "" );
+    setFiremethod( "" );
 
     //FIXME: additional properties:
     // Unidirectional   -> call declareUnidirectional() in initialize()
@@ -80,21 +80,21 @@ public:
     theIsContinuous = value;
   }
 
-  SET_METHOD( String, ProcessMethod )
+  SET_METHOD( String, Firemethod )
   {
-    theProcessMethod = value;
+    theFiremethod = value;
 
-    theCompiledProcessMethod = compilePythonCode( theProcessMethod,
+    theCompiledFiremethod = compilePythonCode( theFiremethod,
 						  getFullID().getString() +
-						  ":ProcessMethod",
+						  ":Firemethod",
 						  Py_file_input );
 
     // error check
   }
 
-  GET_METHOD( String, ProcessMethod )
+  GET_METHOD( String, Firemethod )
   {
-    return theProcessMethod;
+    return theFiremethod;
   }
 
 
@@ -119,10 +119,10 @@ public:
 
 protected:
 
-  String    theProcessMethod;
+  String    theFiremethod;
   String    theInitializeMethod;
 
-  python::object theCompiledProcessMethod;
+  python::object theCompiledFiremethod;
   python::object theCompiledInitializeMethod;
 
   bool theIsContinuous;

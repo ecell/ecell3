@@ -52,7 +52,7 @@ void PythonProcess::initialize()
 void PythonProcess::fire()
 {
   python::handle<> a( PyEval_EvalCode( (PyCodeObject*)
-				       theCompiledProcessMethod.ptr(),
+				       theCompiledFireMethod.ptr(),
 				       theGlobalNamespace.ptr(), 
 				       theLocalNamespace.ptr() ) );
 }
