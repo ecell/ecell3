@@ -55,7 +55,7 @@ class EntryListWindow(Window):
         aPropertyWindowTopVBox = self.thePropertyWindow['top_vbox']
         aPropertyWindowTopVBox.unparent()
         self['property_frame'].add( aPropertyWindowTopVBox )
-        self.thePropertyWindow['window'].hide()
+        self.thePropertyWindow['PropertyWindow'].hide()
         self.thePropertyWindow['property_clist'].connect( 'select_row', self.selectPropertyName )
         
         self.update()
