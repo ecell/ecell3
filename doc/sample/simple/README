@@ -26,7 +26,7 @@ MichaelisUniUniProcess.dm: Process file(dm file) for this model
    The emtool program generates a Shared Object file(so file)
    from each corresponding Process file.
 
-   % emtool -a .MichaelisUniUniProcess.dm
+   % emtool -a MichaelisUniUniProcess.dm
 
 2) Execute gecell, the gui for E-Cell3.
 
