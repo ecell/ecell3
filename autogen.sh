@@ -54,7 +54,7 @@ case $CC in
 *xlc | *xlc\ * | *lcc | *lcc\ *) am_opt=--include-deps;;
 esac
 
-for dir in . #er2eri ss2er rdtools Serizawa
+for dir in . 
 do 
   echo processing $dir
   (cd $dir; \
@@ -67,6 +67,11 @@ done
 
 echo 
 echo "Now type 'make' to compile $PROJECT."
+
+
+
+
+
 
 
 
