@@ -41,6 +41,16 @@ class Eml:
         # minidom.parseString() is much faster than minidom.parse().. why?
         self.__theDocument = minidom.parseString( aStringData )
 
+        for aNode in self.__theDocument.childNodes:
+
+            if str( aNode.nodeName ) == '#comment':
+                self.__theComment = aNode.nodeValue
+            elif str( aNode.nodeName ) == 'eml':
+                self.__theEmlNode = aNode
+            else:
+                pass
+        
+
 #        self.__clearCache()
         self.__reconstructCache()
 
@@ -79,7 +89,7 @@ class Eml:
     def deleteStepper( self, anID ):
         """delete a stepper"""
 
-        for anElement in self.__theDocument.firstChild.childNodes:
+        for anElement in self.__theEmlNode.childNodes:
             if anElement.nodeName == 'stepper' and \
                    anElement.getAttribute( 'id' ) == anID:
 
@@ -223,13 +233,13 @@ class Eml:
         aType = aFullID.split( ':', 1 )[0]
 
         if aType == 'System':
-            for anElement in self.__theDocument.firstChild.childNodes:
+            for anElement in self.__theEmlNode.childNodes:
 
                 if convertSystemID2SystemFullID( anElement.getAttribute( 'id' ) ) == aFullID:
-                    self.__theDocument.firstChild.removeChild( anElement )
+                    self.__theEmlNode.removeChild( anElement )
 
         else:
-            for anElement in self.__theDocument.firstChild.childNodes:
+            for anElement in self.__theEmlNode.childNodes:
                 if anElement.nodeName == 'system':
                     if anElement.getAttribute( 'id' ) == aTargetEntity[ 'Path' ]:
 
@@ -253,8 +263,9 @@ class Eml:
 
 
     def getEntityClass( self, aFullID ):
+        
         anEntityNode = self.__getEntityNode( aFullID )
-
+ 
         return str( anEntityNode.getAttribute( 'class' ) )
         
         
@@ -293,7 +304,7 @@ class Eml:
 
             anEntityList = []
 
-            for aSystemNode in self.__theDocument.firstChild.childNodes:
+            for aSystemNode in self.__theEmlNode.childNodes:
                 if aSystemNode.nodeName == 'system' and \
                        aSystemNode.getAttribute( 'id' ) == aSystemPath:
                     
@@ -369,7 +380,7 @@ class Eml:
 
         self.__clearCache()
 
-        for aSystemNode in self.__theDocument.firstChild.childNodes:
+        for aSystemNode in self.__theEmlNode.childNodes:
             if aSystemNode.nodeName == 'system':
 
                 aSystemPath = aSystemNode.getAttribute( 'id' )
@@ -419,7 +430,7 @@ class Eml:
 
         # if '' is given, return the root system ('/')
         if aTargetPathLength == 1:
-            for aSystemNode in self.__theDocument.firstChild.childNodes:
+            for aSystemNode in self.__theEmlNode.childNodes:
                 if aSystemNode.nodeName == 'system' and \
                      aSystemNode.getAttribute( 'id' ) == '/':
                     return [ '/', ]
@@ -432,7 +443,7 @@ class Eml:
             aTargetPath = aTargetPath[:-1]
             aTargetPathLength -= 1
 
-        for aSystemNode in self.__theDocument.firstChild.childNodes:
+        for aSystemNode in self.__theEmlNode.childNodes:
             if aSystemNode.nodeName == 'system':
 
                 aSystemPath = str( aSystemNode.getAttribute( 'id' ) ).split( '/' )
@@ -484,11 +495,14 @@ class Eml:
         except:
             pass
 
-        for aSystemNode in self.__theDocument.firstChild.childNodes:
+        for aSystemNode in self.__theEmlNode.childNodes:
+            print aSystemNode
+
             if aSystemNode.nodeName == 'system' and \
                    str( aSystemNode.getAttribute( 'id' ) ) == aSystemPath:
                 self.__addToCache( aFullID, aSystemNode )
                 return aSystemNode
+
 
         raise "System [" + aFullID + "] not found."
 
