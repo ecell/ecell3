@@ -57,7 +57,17 @@ Config.py\
 CommandMultiplexer.py\
 PackingStrategy.py\
 ecell3-me\
-opengui.py
+opengui.py\
+VariableReferenceEditorComponent.py\
+ShapePropertyComponent.py\
+ShapeDescriptor.py\
+ObjectEditorWindow.py\
+LinePropertyComponent.py\
+LayoutManagerWindow.py\
+GraphicalUtils.py\
+ConnectionObjectEditorWindow.py\
+ComplexShape.py
+
 
 EXTRA_DIST=${modeleditor_PYTHON}
 

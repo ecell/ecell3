@@ -28,7 +28,13 @@ custom.xpm\
 system.xpm\
 process.xpm\
 textbox.xpm\
-layoutmanager.xpm
+layoutmanager.xpm\
+layoutmanager.xpm\
+VariableReferenceEditorComponent.glade\
+ShapePropertyComponent.glade\
+LinePropertyComponent.glade\
+LayoutManagerWindow.glade\
+ConnectionObjectEditorWindow.glade
 
 
 

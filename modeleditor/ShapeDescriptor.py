@@ -1,0 +1,5 @@
+
+class ShapeDescriptor:
+
+	
+	def get
