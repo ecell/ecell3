@@ -164,7 +164,10 @@ libecs/dmtemplates/Makefile
 libecs/dmtemplates/reactor/Makefile
 libemc/Makefile
 pyecs/Makefile
-pyecs/ecell3,
+pyecs/ecell3
+pyecell/Makefile
+pyecell/ecell/Makefile
+,
 chmod +x pyecs/ecell3
 )
 

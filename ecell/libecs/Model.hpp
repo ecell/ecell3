@@ -95,7 +95,10 @@ namespace libecs
 
 
   /**
-     Global scheduler with a heap-tree based priority queue.
+     
+
+     This also work as a global scheduler with a heap-tree based
+     priority queue.
 
      Model has two containers; theStepperMap and theScheduleQueue.
 

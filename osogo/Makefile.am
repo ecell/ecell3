@@ -24,12 +24,8 @@ Window.py\
 board.glade\
 config.py\
 ecell.xpm\
-ecssupport.py\
 main.py\
 opengui.py\
-Session.py\
-Driver.py\
-ModelInterpreter.py\
 A-sample-rule.py\
 B-sample-rule.py\
 samplerule.py\

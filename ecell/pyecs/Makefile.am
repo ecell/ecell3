@@ -47,13 +47,13 @@ ecs_la_LDFLAGS=-module -export-dynamic -avoid-version
 
 ecs_la_LIBADD= $(LIBEMC) $(LIBECS) $(LIBKORANDOM) -lstdc++ $(LIBLTDL)
 
-all-local: ecs.so
+all-local: _ecs.so
 
-ecs.so: ecs.la 
-	ln -sf .libs/ecs.so .
+_ecs.so: ecs.la 
+	ln -sf .libs/ecs.so ./_ecs.so
 
 clean-local:
-	rm -f ecs.so
+	rm -f _ecs.so
 	rm -f $(CXXSRC)
 
 pyecsdir=${pkgincludedir}/pyecs
