@@ -95,6 +95,8 @@ class EntityListWindow(OsogoWindow):
 		# initializes Add to Board button
 		# --------------------------------------------
 		self.checkBoardExists()
+		self.CloseOrder = False
+
 
 	def checkBoardExists( self ):
 		if self.theSession.getWindow('BoardWindow').exists():
@@ -104,13 +106,19 @@ class EntityListWindow(OsogoWindow):
 		
 
 	def deleted( self, *arg ):
+		self.close()
+
+
+	def close( self ):
+		if self.CloseOrder:
+			return
+		self.CloseOrder = True
 
 		if self.thePluginInstanceSelection != None:
 			self.thePluginInstanceSelection.deleted()
 			self.thePluginInstanceSelection = None
 		self.theSession.deleteEntityListWindow( self )
-
-		return FALSE
+		OsogoWindow.close(self)
 	
 	# ====================================================================
 	def deletePluginInstanceSelection( self, *arg ):
@@ -353,7 +361,6 @@ class EntityListWindow(OsogoWindow):
 				# creates submenu
 				aSubMenu = gtk.Menu()
 
-				#print aPluginInstance.theViewType 
 				# creaets menus of PluginWindow instances
 				aMenuItemFlag = FALSE
 				for aPluginInstance in self.thePluginManager.theInstanceList: 

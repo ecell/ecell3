@@ -635,6 +635,7 @@ class MainWindow(OsogoWindow):
 		aTime = self.theSession.theSimulator.getCurrentTime()
 		self.theCurrentTime = aTime
 		self['time_entry'].set_text( str( self.theCurrentTime ) )
+
 		self['sec_step_entry'].set_text( str( self.theStepSizeOrSec ) )
 		# when Model is already loaded.
 		if len(self.theSession.theModelName) > 0:

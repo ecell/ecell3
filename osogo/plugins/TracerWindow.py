@@ -177,7 +177,6 @@ class TracerWindow( OsogoPluginWindow ):
 			else:
 				return_list.append([ a[t,0], a[t,1], a[t,2], a[t,3], a[t,4] ])
 		
-
 		return return_list
 			
 
