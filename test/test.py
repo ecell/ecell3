@@ -10,7 +10,7 @@ from ecell.ECS import *
 from Numeric import *
 
 print 'create a Session'
-aSession = ecell.Session.Session( ecell.ecs.Simulator() )
+aSession = ecell.Session( ecell.ecs.Simulator() )
 aSimulator = aSession.theSimulator
 
 aSimulator.createStepper( 'RungeKutta4SRMStepper', 'RK4_0' )

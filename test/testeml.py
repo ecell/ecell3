@@ -10,7 +10,7 @@ from ecell.ECS import *
 from ecell.eml import *
 
 print 'create a simulation session instance'
-aSession = ecell.Session.Session( ecell.ecs.Simulator() )
+aSession = ecell.Session( ecell.ecs.Simulator() )
 aSimulator = aSession.theSimulator
 
 aFile = open( sys.argv[1] )

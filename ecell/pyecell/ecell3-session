@@ -19,7 +19,7 @@ aParameters = {}
 
 
 aSimulator = ecell.ecs.Simulator()
-aSession = ecell.Session.Session( aSimulator )
+aSession = ecell.Session( aSimulator )
 
 if anEssFileName:
 	aSession.loadScript( anEssFileName, aParameters )

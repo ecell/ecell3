@@ -39,8 +39,9 @@ return $?
 
 cleanup()
 {
-	run_command rm -rf .libs
-	run_command rm -f $LAOBJ $LOBJ $OBJ
+#	run_command rm -rf .libs
+#	run_command rm -f $LAOBJ $LOBJ $OBJ
+	run_command rm -f $OBJ
 }
 
 move()

@@ -139,7 +139,7 @@ class MainWindow(OsogoWindow):
 		# -------------------------------------
 		# creates Session
 		# -------------------------------------
-		self.theSession = ecell.Session.Session( ecell.ecs.Simulator() )
+		self.theSession = ecell.Session( ecell.ecs.Simulator() )
 		self.theSession.setMessageMethod( self.theMessageWindow.printMessage )
 		self.theSession.theMainWindow = self
 
