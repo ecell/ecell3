@@ -53,20 +53,11 @@ class Session:
 
 
     def loadModel( self, aFileObject ):
-        anEmlParser = eml.EmlParser( aFileObject )
-        self.__thePreModel = anEmlParser.parse()
+        self.__theEml = eml.Eml( aFileObject )
 
-
-        #print 'load stepper' ##DebugMessage
         self.loadStepper()
-        
-        #print 'load entity' ## has bugs
         self.loadEntity()
-
-        #print 'load system-stepper' ##DebugMessage
-        self.loadSystemStepper()
-
-        #print 'load property' ##DebugMessage
+        self.loadStepperProperty()
         self.loadProperty()
 
         
@@ -83,115 +74,83 @@ class Session:
 
 
 
-
     def loadStepper( self ):
         """stepper loader"""
 
-        for aTargetStepper in( self.__thePreModel[ 'stepper' ] ):
-            aClass = aTargetStepper[0]
-            anId   = aTargetStepper[1]
+        aStepperList = self.__theEml.getStepperList()
 
-            ## TemporarySample ---------------------------------------
-            #aPrintClass = "self.theSimulator.createStepper('" + aClass + "',"
-            #aPrintId     = "'" + anId + "')"
-            #print aPrintClass, aPrintId ## Temporary
-            ## -------------------------------------------------------
+        for aStepper in aStepperList:
 
-            self.theSimulator.createStepper( aClass, anId, [] )
+            self.theSimulator.createStepper( aStepper[ 'Class' ], \
+                                             aStepper[ 'Id' ] )
 
+            ## ERROR: don't use the third value ... why? (020719)
+            #self.theSimulator.createStepper( aStepper[ 'Class' ], \
+            #                                 aStepper[ 'Id' ], \
+            #                                 aStepper[ 'ValueList' ] )
+
+            ## Debug for Output --------------------------------------
+            #script = "self.theSimulator.createStepper( '" +\
+            #         aStepper[ 'Class' ] + "', '" +\
+            #         aStepper[ 'Id' ] + "', " +\
+            #         str( aStepper[ 'ValueList' ] ) + " )"
+            #print script
+            ## ========================================================
 
 
 
     def loadEntity( self ):
-        """Entity loader"""
 
-        for aTargetEntity in( self.__thePreModel[ 'entity' ] ):
+        anEntityList = self.__theEml.getEntityList()
 
-            aType = aTargetEntity[0]
-            aPath = aTargetEntity[1]
-            anId  = aTargetEntity[2]
-            aName = aTargetEntity[3]
+        for anEntity in anEntityList:
 
+            self.theSimulator.createEntity( anEntity[ 'Type' ], \
+                                            anEntity[ 'FullId' ], \
+                                            anEntity[ 'Name' ] )
 
-            ## need refactoring about PathConvert!! @300
-            if aType == 'System':
-                if aPath == '/':
-                    aPath = ''
-                else:
-                    aPathList = aPath.split( '/' )
-                    aLenPathList = len( aPathList )
-                    aPathList = aPathList[0:aLenPathList-1]
-                    aPath     = string.join( aPathList, '/' )
-                    if aPath == '':
-                        aPath = '/'
-            ## --------------------------------------------------
+            ## Debug for Output -----------------------------------------------------------
+            #script = "self.theSimulator.createEntity( '" + anEntity[ 'Type' ] + "', '" + \
+            #         anEntity[ 'FullId' ] + "', '" + anEntity[ 'Name' ]   + "' )"
+            #print script
+            ##=============================================================================
 
 
-            if not ( aType == 'System' or aType == 'Substance' ):
-                anEntityType = 'Reactor'
-                aFullId = anEntityType + ':' + aPath + ':' + anId
-            else:
-                aFullId = aType + ':' + aPath + ':' + anId
 
-
-            ## check!!
-            if not aPath == '':
-                #self.theSimulator.createEntity( aType, aFullId, aName )
-                
-                ##Temporary
-                #print 'printer:', aType, aFullId, aName
-                #print 'self.theSimulator.createEntity(', aType, ',', aFullId, ',', aName, ')'
-
-                self.theSimulator.createEntity( aType, aFullId, aName )
-
-
-    def loadSystemStepper( self ):
+    def loadStepperProperty( self ):
+        aStepperPropertyList = self.__theEml.getStepperPropertyList()
         
-        for aTargetStepperSystem in( self.__thePreModel[ 'stepper_system' ] ):
+        for aStepperProperty in aStepperPropertyList:
 
-            aFullPath = aTargetStepperSystem[0]
-            aFullPathList = aFullPath.split( '/' )
+            self.theSimulator.setProperty( str( aStepperProperty[ 'FullPn' ] ), \
+                                           aStepperProperty[ 'StepperList' ] )
 
-            aClass  = aTargetStepperSystem[1]
-            aValueList = [ aClass ]
-            aName = 'StepperID'
-
-
-            if aFullPath == '/':
-                aFullPn = 'System::/:' + aName
-                
-            else:
-                anId    = aFullPathList[-1]
-                aFullPathList.remove( aFullPathList[ len(aFullPathList) - 1 ] )
-                aPath = string.join( aFullPathList, '/' )
-                if aPath == '':
-                    aPath = '/'
-                aFullPn = 'System' + ':' + aPath + ':' + anId + ':' + aName
-
-            self.theSimulator.setProperty( aFullPn, aValueList )
-
-            ##Temporary
-            #print 'self.theSimulator.setProperty(', aFullPn, ',', aValueList, ')'
+            ## Debug for Output -----------------------------------------------------------
+            #script = "self.theSimulator.setProperty( '" + aStepperProperty[ 'FullPn' ] + "', " +\
+            #         str( aStepperProperty[ 'StepperList' ] ) + ')'
+            #print script
+            ##=============================================================================        
             
 
-
-
-            
 
     def loadProperty( self ):
-        """Property loader"""
+        aPropertyList = self.__theEml.getPropertyList()
         
-        for aTargetProperty in( self.__thePreModel[ 'property' ] ):
-            aFullPn = aTargetProperty[0]
-            aValue  = aTargetProperty[1]
+        for aProperty in aPropertyList:
 
-            
-            self.theSimulator.setProperty( aFullPn, aValue )
+            self.theSimulator.setProperty( aProperty[ 'FullPn' ], \
+                                           aProperty[ 'ValueList' ] )
 
-            ## TemporarySample ---------------------------------
-            #aPrintFullPn = "self.theSimulator.setProperty('" + aFullPn + "',"
-            #print aPrintFullPn, aValue, ')'
-            ## -------------------------------------------------
+            ## Debug for Output -----------------------------------------------------------
+            #script = "self.theSimulator.setProperty( '" +str( aProperty[ 'FullPn' ] ) + "', " + \
+            #         str( aProperty[ 'ValueList' ] ) + ')'
+            #
+            #print script
+            ##=============================================================================
+
+
+
+
 
 if __name__ == "__main__":
 
