@@ -71,6 +71,6 @@ Exceptions.hpp\
 Util.hpp\
 CoreLinuxCompatibility.hpp\
 RCPtr.hpp\
-Reactant.hpp\
-StringList.hpp
+Reactant.hpp
+
 
