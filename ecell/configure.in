@@ -60,23 +60,30 @@ rm -f conftest
 . ./conftest
 rm -f conftest
 dnl
-AC_CACHE_CHECK([which extension is used for shared libraries],
-  libltdl_cv_shlibext, [dnl
-(
-  last=
-  for spec in $library_names_spec; do
-    last="$spec"
-  done
-changequote(, )
-  echo "$last" | sed 's/\[.*\]//;s/^[^.]*//;s/\$.*$//;s/\.$//' > conftest
-changequote([, ])
-)
-libltdl_cv_shlibext=`cat conftest`
-rm -f conftest
-])
-if test -n "$libltdl_cv_shlibext"; then
-  LTDL_SHLIB_EXT=$libltdl_cv_shlibext
+dnl compatibility for libtool 1.5.x
+if test -n "$shrext"; then
+  LTDL_SHLIB_EXT=$shrext
   AC_SUBST(LTDL_SHLIB_EXT)
+dnl compatibility for libtool 1.4.x
+else
+  AC_CACHE_CHECK([which extension is used for shared libraries],
+    libltdl_cv_shlibext, [dnl
+  (
+    last=
+    for spec in $library_names_spec; do
+      last="$spec"
+    done
+  changequote(, )
+    echo "$last" | sed 's/\[.*\]//;s/^[^.]*//;s/\$.*$//;s/\.$//' > conftest
+  changequote([, ])
+  )
+  libltdl_cv_shlibext=`cat conftest`
+  rm -f conftest
+  ])
+  if test -n "$libltdl_cv_shlibext"; then
+    LTDL_SHLIB_EXT=$libltdl_cv_shlibext
+    AC_SUBST(LTDL_SHLIB_EXT)
+  fi
 fi
 
 
