@@ -52,7 +52,8 @@ import string
 import sys
 import traceback
 import os
-
+import math
+import time
 
 #
 #import pyecell module
@@ -207,13 +208,24 @@ class MainWindow(OsogoWindow):
 		# calls super class's constructor
 		OsogoWindow.__init__( self, self, 'MainWindow.glade' )
 
-		# -------------------------------------
+                # -------------------------------------
 		# stores pointer to Session
 		# -------------------------------------
 		self.theSession = aSession
 		self.theMessageWindow = MessageWindow.MessageWindow()
 
 
+                # initialize Real time
+                self.startTime = 0
+                self.tempTime = 0
+                self.isStarted = False
+                self.realtimeVisible = False
+                self.theLastTime = 0
+                self.theLastRealTime = 0
+
+                # initialize Indicator
+                self.indicatorVisible = False
+                
 	def openWindow( self ):
 
 		# calls superclass's method
@@ -237,7 +249,9 @@ class MainWindow(OsogoWindow):
 
                 self.logoAnimation = LogoAnimation()
                 self['logo_animation'].add( self.logoAnimation.getImage() )
-
+                self.logoMovable = True
+		self['logo_animation_menu'].set_active(TRUE)
+                
 
                 # --------------------------
                 # initialize time entry
@@ -303,6 +317,7 @@ class MainWindow(OsogoWindow):
                     'step_button_clicked'         : self.__stepSimulation,
                     
                     'on_sec_step_entry_activate'  : self.__setStepSizeOrSec,
+                    'on_real_time_clear_button_clicked' : self.__clearRealTime,
 
                     'on_load_model_button_clicked' : self.__openFileSelection,
                     'on_load_script_button_clicked' : self.__openFileSelection,
@@ -319,8 +334,13 @@ class MainWindow(OsogoWindow):
                     'logo_button_clicked'         : self.__displayAbout,
                     'on_scrolledwindow1_expose_event'
                     : self.__expose,
+
+                    # view
                     'on_toolbar_menu_activate'        : self.__displayToolbar,
-                    'on_statusbar_menu_activate'        : self.__displayStatusbar,
+                    'on_statusbar_menu_activate'      : self.__displayStatusbar,
+                    'on_run_speed_indicator_activate' : self.__displayIndicator,  
+                    'on_real_time_activate'   : self.__displayRealtime,
+                    'on_logo_animation_menu_activate' : self.__setAnimationSensitive,
                     'on_logging_policy1_activate' : self.__openLogPolicy
                     }
                 
@@ -368,6 +388,22 @@ class MainWindow(OsogoWindow):
 		self['entitylist_window_menu'].set_active(TRUE)
 
 
+                # --------------------
+                # set Real time entry
+                # --------------------
+                self['real_time_entry'].set_text( str( 0 ) )
+                self['real_time_entry'].modify_base( gtk.STATE_NORMAL,
+                                                gtk.gdk.Color(61000,61000,61000,0) )
+                self['real_time_entry'].set_property( 'xalign', 1 )
+                self['real_time_box'].hide()
+
+                
+                # ---------------------
+                # initialize Indicator
+                # ---------------------
+                
+                self['indicator_box'].hide()
+
 
 	def __expose( self, *arg ):
 		"""expose
@@ -403,6 +439,7 @@ class MainWindow(OsogoWindow):
 		# toolbar
 		self['simulation_button'].set_sensitive(aDataLoadedStatus)
 		self['step_button'].set_sensitive(aDataLoadedStatus)
+		self['real_time_clear_button'].set_sensitive(aDataLoadedStatus)
 		self['load_model_button'].set_sensitive(not aDataLoadedStatus)
 		self['load_script_button'].set_sensitive(not aDataLoadedStatus)
 		self['save_model_button'].set_sensitive(aDataLoadedStatus)
@@ -561,8 +598,8 @@ class MainWindow(OsogoWindow):
 
 			# expants message window, when it is folded.
 			if self.exists():
-				if self['message_togglebutton'].get_active() == FALSE:
-					self['message_togglebutton'].set_active(TRUE)
+				if ( self['message_togglebutton'].get_child() ).get_active() == FALSE:
+					( self['message_togglebutton'].get_child() ).set_active(TRUE)
 
 			# displays confirm window
 			aMessage = 'Can\'t load [%s]\nSee MessageWindow for details.' %aFileName
@@ -610,8 +647,8 @@ class MainWindow(OsogoWindow):
 		except:
 
 			# expants message window, when it is folded.
-			if self['message_togglebutton'].get_active() == FALSE:
-				self['message_togglebutton'].set_active(TRUE)
+			if ( self['message_togglebutton'].get_child() ).get_active() == FALSE:
+				( self['message_togglebutton'].get_child() ).set_active(TRUE)
 
 
 			# displays confirm window
@@ -675,16 +712,27 @@ class MainWindow(OsogoWindow):
 
             self.SimulationButton.setCurrentState( 'run' )
             self['SimulationButtonLabel'].set_text('Stop')
-            self.logoAnimation.start()
 
+            if self.logoMovable:
+                self.logoAnimation.start()
+
+            self.isStarted = True
+            self.startTime = time.time()
 
         def setStopState( self ):
             
             self.SimulationButton.setCurrentState( 'stop' )
             self['SimulationButtonLabel'].set_text('Start')
             self.logoAnimation.stop()
+            
+            self.setTempTime()
 
-                    
+
+        def setTempTime( self ):
+
+            self.tempTime = time.time() - self.startTime + self.tempTime
+
+
 	def __handleSimulation( self, *arg ) :
 		"""handles simulation
 		arg[0]  ---  simulation button (gtk.Button)
@@ -702,7 +750,6 @@ class MainWindow(OsogoWindow):
                     self.setStopState()
                     self.theSession.stop()
                 
-
 
 	def handleSimulation( self ) :
 		""" handles simulation """
@@ -725,6 +772,7 @@ class MainWindow(OsogoWindow):
 
                     else:                        
                         self.theSession.run( self.getStepSize() )
+                        self.setTempTime()
                     
 		else:
                     if( self.SimulationButton.getCurrentState() == "stop" ):
@@ -733,7 +781,8 @@ class MainWindow(OsogoWindow):
                         self.setStopState()
                     else:
                         self.theSession.step( self.getStepSize() )
-
+                        self.setTempTime()
+                        
                         
 	def stepSimulation( self ) :
 		""" steps simulation """
@@ -820,18 +869,37 @@ class MainWindow(OsogoWindow):
 				self.theStepSizeOrSec=aNewValue
 			
 
+        #def getTimeSubstruction( self, aTime1, aTime )
+
 	def update( self ):
 		"""updates this window 
 		Returns None
 		"""
 		if not self.exists():
 			return None
+                    
 		# updates time
 		aTime = self.theSession.theSimulator.getCurrentTime()
 		self.theCurrentTime = aTime
 		self['time_entry'].set_text( str( self.theCurrentTime ) )
-
 		self['sec_step_entry'].set_text( str( self.theStepSizeOrSec ) )
+
+                aRealTime = time.time()
+
+                if ( self.SimulationButton.getCurrentState() == 'run' and
+                     self.realtimeVisible ):
+                    self['real_time_entry'].set_text( str( round( aRealTime - self.startTime + self.tempTime, 2 ) ) )
+
+
+                if self.indicatorVisible:
+
+                    if ( aTime != self.theLastTime ):
+                        self['run_speed_scale'].set_value( math.log10( ( aTime - self.theLastTime ) / ( aRealTime - self.theLastRealTime ) ) )
+
+                    self.theLastTime = aTime
+                    self.theLastRealTime = aRealTime
+                               
+                
 		# when Model is already loaded.
 		if len(self.theSession.theModelName) > 0:
 			# updates status of menu and button 
@@ -910,7 +978,7 @@ class MainWindow(OsogoWindow):
 
 
         def __displayToolbar( self, *arg ):
-            # show Tool bar
+            # show Toolbar
 
             if self.theToolbarVisible:
                 self['toolbar_handlebox'].hide()
@@ -921,7 +989,7 @@ class MainWindow(OsogoWindow):
                 
 
         def __displayStatusbar( self, *arg ):
-            # show Tool bar
+            # show Statusbar
 
             if self.theStatusbarVisible:
                 self['statusbar'].hide()
@@ -930,7 +998,39 @@ class MainWindow(OsogoWindow):
                 self['statusbar'].show()
                 self.theStatusbarVisible = True
                 
+
+        def __displayIndicator( self, *arg ):
+            # show Indicator
+
+            if self.indicatorVisible:
+                self['indicator_box'].hide()
+                self.indicatorVisible = False
+            else:
+                self['indicator_box'].show()
+                self.indicatorVisible = True
+
+		self.theLastTime = self.theSession.theSimulator.getCurrentTime()
+
                 
+        def __displayRealtime( self, *arg ):
+            # show Indicator
+
+            if self.realtimeVisible:
+                self['real_time_box'].hide()
+                self.realtimeVisible = False
+            else:
+                self['real_time_box'].show()                
+                self.realtimeVisible = True
+
+                if ( self.isStarted == False ):
+                    self['real_time_entry'].set_text( str(0.0) )
+                else:
+                    if ( self.SimulationButton.getCurrentState() == 'stop' ):
+                        self['real_time_entry'].set_text( str( round( self.tempTime, 2 ) ) )
+                    else:
+                        self['real_time_entry'].set_text( str( round( time.time() - self.startTime + self.tempTime, 2 ) ) )
+
+
 	def __displayWindow( self, *arg ):
 		"""This method is called, when the menu or buttons on MainWindow is pressed.
 		arg[0]   ---  menu or button
@@ -1040,6 +1140,30 @@ class MainWindow(OsogoWindow):
 		# show about information
 		self.createAboutSessionMonitor()
 		
+
+        def __clearRealTime( self, *arg ):
+
+            self['real_time_entry'].set_text( str(0.0) )
+            self.tempTime = 0.0
+            self.isStarted = False
+
+            if self.SimulationButton.getCurrentState() == 'run':
+                self.startTime = time.time()
+            else:
+                self.startTime = 0.0
+
+        def __setAnimationSensitive( self, *arg ):
+
+            if self.logoMovable:
+                self.logoMovable = False
+                if self.SimulationButton.getCurrentState() == 'run':
+                    self.logoAnimation.stop()
+
+            else:
+                self.logoMovable = True
+                if self.SimulationButton.getCurrentState() == 'run':
+                    self.logoAnimation.start()
+                
 	def createAboutSessionMonitor(self):
 		if not self.openAboutSessionMonitor:
 			AboutSessionMonitor(self)
