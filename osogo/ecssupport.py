@@ -16,8 +16,8 @@ PROPERTY   = 3
 
 
 
-def parseFullID( fullid ):
-    aList = string.split( fullid, ':' )
+def parseFullID( fullidstring ):
+    aList = string.split( fullidstring, ':' )
     aLength = len( aList )
     if aLength != 3:
         raise ValueError(
@@ -25,8 +25,8 @@ def parseFullID( fullid ):
     return aList
 
 
-def parseFullPropertyName( fullpropertyname ):
-    aList = string.split( fullpropertyname, ':' )
+def parseFullPropertyName( fullpropertynamestring ):
+    aList = string.split( fullpropertynamestring, ':' )
     aLength = len( aList )
     if aLength != 4:
         raise ValueError(
@@ -34,20 +34,37 @@ def parseFullPropertyName( fullpropertyname ):
     return aList
 
 
-def constructFullID( words ):
-    aLength = len( words )
+def constructFullIDString( fullid ):
+    validateFullID( fullid )
+    return string.join( fullid, ':' )
+
+def constructFullPropertyNameString( fullpropertyname ):
+    validateFullPropertyName( fullpropertyname )
+    return string.join( fullpropertyname, ':' )
+
+def convertToFullPropertyName( fullid ):
+    validateFullID( fullid )
+    fullpropertyname = fullid
+    fullpropertyname.append( '' )
+    return fullpropertyname
+
+def convertToFullID( fullpropertyname ):
+    validateFullPropertyName( fullpropertyname )
+    fullid = fullpropertyname[:3]
+    return fullid
+
+
+def validateFullID( fullid ):
+    aLength = len( fullid )
     if aLength != 3:
         raise ValueError(
             "FullID has 3 fields. ( %d given )" % aLength )
-    return string.join( words, ':' )
 
-
-def constructFullPropertyName( words ):
-    aLength = len( words )
+def validateFullPropertyName( fullpropertyname ):
+    aLength = len( fullpropertyname )
     if aLength != 4:
         raise ValueError(
             "FullPropertyName has 4 fields. ( %d given )" % aLength )
-    return string.join( words, ':' )
 
 
 
@@ -65,3 +82,7 @@ if __name__ == "__main__":
 
     fullpropertystring = constructFullPropertyName( fullproperty )
     print fullpropertystring
+
+    print convertToFullPropertyName( fullid )
+
+    print convertToFullID( fullproperty )
