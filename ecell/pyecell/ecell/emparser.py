@@ -181,7 +181,7 @@ def p_system_stmt(t):
 	'''
 	t[0] = t[1], t[3]
 
-:def p_entity_other_stmt (t):
+def p_entity_other_stmt (t):
 	'''
 	entity_other_stmt : entity_other_object_decl LBRACE propertylist RBRACE
         '''
