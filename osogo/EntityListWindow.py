@@ -405,20 +405,21 @@ class EntityListWindow(OsogoWindow):
 		key = str( self.theSysTreeStore.get_path( iter ) )
 		self.theSysTreeStore.set_data( key, aSystemFullID )
 		    
-		aSystemListFullPN = convertFullIDToFullPN( aSystemFullID, 'SystemList' ) 
-		aSystemList = self.theSession.theSimulator.getEntityProperty( createFullPNString( aSystemListFullPN ) )
+		aSystemPath = createSystemPathFromFullID( aSystemFullID )
+		aSystemList = self.theSession.getEntityList( 'System',\
+							     aSystemPath )
 		aSystemListLength = len( aSystemList )
 
-		if  aSystemListLength != 0:
+		if  aSystemListLength == 0:
+			return
+		
+		for aSystemID in aSystemList:
+			aNewSystemFullID = ( SYSTEM, aSystemPath, aSystemID )
+			self.constructTree( iter, aNewSystemFullID )
 
-			for aSystemID in aSystemList:
-				aSystemPath = createSystemPathFromFullID( aSystemFullID )
-				aNewSystemFullID = ( SYSTEM, aSystemPath, aSystemID )
-				self.constructTree( iter, aNewSystemFullID )
-
-				if aSystemListLength <= 5:
-					aPath = self.theSysTreeStore.get_path( iter )
-					self['system_tree'].expand_row( aPath, gtk.FALSE )
+			if aSystemListLength <= 5:
+				aPath = self.theSysTreeStore.get_path( iter )
+				self['system_tree'].expand_row( aPath, gtk.FALSE )
 
 	# ========================================================================
 	def updateSystemSelection( self, obj=None ):
@@ -453,7 +454,9 @@ class EntityListWindow(OsogoWindow):
 	# create list of Entity tree
 	def listEntity( self, aEntityTypeString, aSystemFullID ):
 
-		aEntityList = self.theMainWindow.theSession.getEntityList( aEntityTypeString, createSystemPathFromFullID( aSystemFullID ) )
+		aSystemPath = createSystemPathFromFullID( aSystemFullID )
+
+		aEntityList = self.theMainWindow.theSession.getEntityList( aEntityTypeString, aSystemPath )
 
 		if aEntityTypeString == 'Variable':
 			aEntityType = VARIABLE
@@ -464,7 +467,6 @@ class EntityListWindow(OsogoWindow):
 			iter = self.theEntityListStore.append()
 			self.theEntityListStore.set_value(iter,0,anEntityID)
 
-			aSystemPath = createSystemPathFromFullID( aSystemFullID )
 			aEntityFullPN = ( aEntityType, aSystemPath, anEntityID, '' )
 			self.theEntityListStore.set_data( anEntityID, aEntityFullPN )
 

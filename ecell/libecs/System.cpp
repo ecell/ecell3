@@ -99,9 +99,9 @@ namespace libecs
     theModel( NULLPTR ),
     theEntityListChanged( false )
   {
-    CREATE_PROPERTYSLOT_GET    ( Polymorph, SystemList,   System );
-    CREATE_PROPERTYSLOT_GET    ( Polymorph, VariableList, System );
-    CREATE_PROPERTYSLOT_GET    ( Polymorph, ProcessList,  System );
+    //    CREATE_PROPERTYSLOT_GET    ( Polymorph, SystemList,   System );
+    //    CREATE_PROPERTYSLOT_GET    ( Polymorph, VariableList, System );
+    //    CREATE_PROPERTYSLOT_GET    ( Polymorph, ProcessList,  System );
     CREATE_PROPERTYSLOT_SET_GET( String,    StepperID,    System );
     CREATE_PROPERTYSLOT_SET_GET( Real,      Volume,       System );
   }
@@ -272,7 +272,7 @@ namespace libecs
 
   VirtualSystem::VirtualSystem()
   {
-    CREATE_PROPERTYSLOT_GET( Polymorph, ProcessList, VirtualSystem );
+    //    CREATE_PROPERTYSLOT_GET( Polymorph, ProcessList, VirtualSystem );
   }
 
   VirtualSystem::~VirtualSystem()
@@ -332,7 +332,7 @@ namespace libecs
 
   LogicalSystem::LogicalSystem()
   {
-    CREATE_PROPERTYSLOT_GET( Polymorph, VariableList, LogicalSystem );
+    //    CREATE_PROPERTYSLOT_GET( Polymorph, VariableList, LogicalSystem );
   }
 
   LogicalSystem::~LogicalSystem()
