@@ -9,9 +9,9 @@ from ecssupport import *
 class PropertyWindow(PluginWindow):
 
     
-    def __init__( self, dirname, sim, data ):
+    def __init__( self, dirname, sim, data, pluginmanager ):
         
-        PluginWindow.__init__( self, dirname, sim, data )
+        PluginWindow.__init__( self, dirname, sim, data, pluginmanager )
         
         self.addHandlers( { 'input_row_pressed'   : self.select_property,
                             'show_button_pressed' : self.show } )
