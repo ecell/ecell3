@@ -103,7 +103,7 @@ namespace libecs
       {
 	VariablePtr const aVariable( theVariableVector[ c ] );
 
-	aVariable->interIntegrate( aCurrentTime, theValueBuffer [ c ] );
+	aVariable->interIntegrate( aCurrentTime );
 	//	std::cout << aValue << ":" << aDifference << std::endl;
       }
 

@@ -155,7 +155,7 @@ namespace libecs
     @internal
     */
 
-    void interIntegrate( RealParam aCurrentTime, RealParam aBaseValue )
+    void interIntegrate( RealParam aCurrentTime )
       {
 	const Real anInterval( aCurrentTime - theLastTime );
 	
@@ -163,11 +163,7 @@ namespace libecs
 	  {
 	    Real aVelocitySum( calculateVelocitySum( aCurrentTime,
 						     anInterval ) );
-	    loadValue( aBaseValue + aVelocitySum );
-	  }
-	else
-	  {
-	    loadValue( aBaseValue );
+	    loadValue( getValue() + aVelocitySum );
 	  }
       }
 
