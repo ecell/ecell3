@@ -50,6 +50,7 @@ namespace libecs
 
     virtual const SystemPath getSystemPath() const;
     virtual SystemPtr getSystem( StringCref id );
+    //    virtual SystemPtr getSystem( SystemPathCref systempath );
 
     virtual void initialize();
 

@@ -60,8 +60,6 @@ namespace libecs
     System();
     virtual ~System();
 
-    const String getFullID() const;
-
     virtual const PrimitiveType getPrimitiveType() const
     {
       return PrimitiveType( PrimitiveType::REACTOR );
@@ -206,7 +204,7 @@ namespace libecs
 
     /**
        Find a Reactor with given id. Unlike getReactorIterator(), this 
-       throws System::NotFound exception if it is not found.
+       throws NotFound exception if it is not found.
 
        @return An pointer to a Reactor object in this System named @a id.
     */

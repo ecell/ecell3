@@ -66,7 +66,7 @@ namespace libecs
 
     bool isAbsolute() const
     {
-      return front()[0] == DELIMITER;
+      return ( ! empty() ) && ( front()[0] == DELIMITER );
     }
 
     bool isValid() const

@@ -184,11 +184,6 @@ namespace libecs
     theRootSystem = getSuperSystem()->getRootSystem();
   }
 
-  const String System::getFullID() const
-  {
-    //    return PrimitiveTypeStringOf( *this ) + ":" + getFqid();
-  }
-
   void System::setStepper( StringCref classname )
   {
     StepperPtr aStepper;
@@ -340,10 +335,10 @@ namespace libecs
 
   ReactorPtr System::getReactor( StringCref id ) 
   {
-    ReactorMapIterator i = getReactorIterator( id );
+    ReactorMapIterator i( getReactorIterator( id ) );
     if( i == getLastReactorIterator() )
       {
-	throw NotFound( __PRETTY_FUNCTION__, "[" + getFullID() + 
+	throw NotFound( __PRETTY_FUNCTION__, "[" + getFullID().getString() + 
 			"]: Reactor [" + id + "] not found in this System." );
       }
     return i->second;
@@ -366,7 +361,7 @@ namespace libecs
     SubstanceMapIterator i = getSubstanceIterator( id );
     if( i == getLastSubstanceIterator() )
       {
-	throw NotFound(__PRETTY_FUNCTION__, "[" + getFullID() + 
+	throw NotFound(__PRETTY_FUNCTION__, "[" + getFullID().getString() + 
 		       "]: Substance [" + id + "] not found in this System.");
       }
 
@@ -390,7 +385,15 @@ namespace libecs
 
   SystemPtr System::getSystem( SystemPathCref systempath )
   {
-    assert( !systempath.empty() );
+    if( systempath.empty() )
+      {
+	return this;
+      }
+    if( systempath.isAbsolute() )
+      {
+	return theRootSystem->getSystem( systempath );
+      }
+
     SystemPath aSystemPath( systempath );
     SystemPtr aSystem( this );
 
@@ -410,7 +413,7 @@ namespace libecs
     SystemMapIterator i = getSystemIterator( id );
     if( i == getLastSystemIterator() )
       {
-	throw NotFound(__PRETTY_FUNCTION__, "[" + getFullID() + 
+	throw NotFound(__PRETTY_FUNCTION__, "[" + getFullID().getString() + 
 		       "]: System [" + id + "] not found in this System.");
       }
     return i->second;

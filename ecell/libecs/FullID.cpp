@@ -42,7 +42,7 @@ namespace libecs
 
   void SystemPath::parse( StringCref systempathstring )
   {
-    if( systempathstring == "" )
+    if( systempathstring.empty() )
       {
 	return;
       }
@@ -94,18 +94,23 @@ namespace libecs
 	  {
 	    return "/";
 	  }
+	else
+	  {
+	    ; // do nothing
+	  }
       }
     else
       {
-	// isAbsolute() == false implies that it can be empty
-	if( i == end() )
+	// isAbsolute() == false implies that this can be empty
+	if( empty() )
 	  {
-	    return "";
+	    return aString;
 	  }
-
-	aString = *i;
+	else
+	  {
+	    aString = *i;
+	  }
       }
-
 
     ++i;
 
@@ -225,7 +230,7 @@ namespace libecs
 
 } // namespace libecs
 
-#ifdef TEST_FQPI
+#ifdef TEST_FULLID
 
 using namespace libecs;
 
@@ -306,7 +311,7 @@ main()
 }
 
 
-#endif
+#endif /* TEST_FULLID */
 
 
 /*
