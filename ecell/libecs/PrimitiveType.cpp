@@ -37,9 +37,6 @@ const String PrimitiveTypeStringOf( PrimitiveType type )
 
   switch( type )
     {
-    case ENTITY:
-      aString = String( "Entity" );
-      break;
     case SUBSTANCE:
       aString = String( "Substance" );
       break;
@@ -48,6 +45,9 @@ const String PrimitiveTypeStringOf( PrimitiveType type )
       break;
     case SYSTEM:
       aString = String( "System" );
+      break;
+    case ENTITY:
+      aString = String( "Entity" );
       break;
     default:
       throw InvalidPrimitiveType( __PRETTY_FUNCTION__, 
@@ -81,11 +81,7 @@ PrimitiveType PrimitiveTypeOf( StringCref typestring )
 {
   PrimitiveType aType;
 
-  if( typestring == "Entity" )
-    {
-      aType = ENTITY;
-    }
-  else if( typestring == "Substance" )
+  if( typestring == "Substance" )
     {
       aType = SUBSTANCE;
     }
@@ -96,6 +92,10 @@ PrimitiveType PrimitiveTypeOf( StringCref typestring )
   else if( typestring == "System" )
     {
       aType = SYSTEM;
+    }
+  else if( typestring == "Entity" )
+    {
+      aType = ENTITY;
     }
   else
     {
