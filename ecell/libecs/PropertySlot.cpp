@@ -31,13 +31,31 @@
 // E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
 
-#include "PropertySlot.hpp"
 #include "Logger.hpp"
+#include "Exceptions.hpp"
 
+#include "PropertySlot.hpp"
 
 
 namespace libecs
 {
+
+  void PropertySlot::connectLogger( LoggerPtr logger )
+  {
+    if( isLogged() )
+      {
+	throw UnexpectedError( __PRETTY_FUNCTION__,
+			       "PropertySlot [" + getName() + 
+			       "]: only one Logger can be connected." );
+      }
+
+    theLogger = logger;
+  }
+
+  void PropertySlot::disconnectLogger()
+  {
+    theLogger = NULLPTR;
+  }
 
   void PropertySlot::updateLogger()
   {

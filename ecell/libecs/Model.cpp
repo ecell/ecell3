@@ -264,8 +264,7 @@ namespace libecs
   {
     checkStepper( getRootSystem() );
 
-    FOR_ALL_SECOND( StepperMap, theStepperMap, 
-		    initialize );
+    FOR_ALL_SECOND( StepperMap, theStepperMap, initialize );
 
     theCurrentTime = ( theScheduleQueue.top() ).first;
   }
@@ -285,13 +284,9 @@ namespace libecs
     // 3. push:  re-sync with the proxies, and push new values to Loggers
     aStepper->push();
 
-
     // the time must be memorized before the Event is deleted by the pop
     const Real aTopTime( aTopEvent.first );
 
-    // equivalent to these two lines.
-    // theScheduleQueue.pop();
-    // theScheduleQueue.push( Event( aTopTime + aStepSize, aStepper ) );
     theScheduleQueue.changeTopKey( Event( aTopTime + aStepSize, aStepper ) );
 
     // update theCurrentTime, which is scheduled time of the Event on the top

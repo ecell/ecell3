@@ -72,15 +72,6 @@ namespace libecs
     theFraction = modf( aVelocity, &tmp );
     getVelocity() = tmp;
     getQuantity() += tmp;
-
-    /*
-    Real aVelocity( getVelocity() );
-    aVelocity += theFraction;
-    Real aWhole( floor( aVelocity ) );
-    theFraction = aWhole - aVelocity;
-    getVelocity() = aVelocity;
-    getQuantity() += aWhole;
-    */
   }
 
   Real ReserveAccumulator::save()

@@ -203,11 +203,13 @@ namespace libecs
 	{
 	  updateLogger();
 	}
-      //      updateProxy();
+      //      updateProxies();
     }
 
 
-    //    virtual PropertySlotProxyPtr createProxy( void ) = 0;
+    //    virtual PropertySlotProxyPtr createProxy( void );
+
+    
 
     StringCref getName() const
     {
@@ -219,15 +221,9 @@ namespace libecs
       return theLogger != NULLPTR;
     }
 
-    void connectLogger( LoggerPtr logger )
-    {
-      theLogger = logger;
-    }
+    void connectLogger( LoggerPtr logger );
 
-    void disconnectLogger()
-    {
-      theLogger = NULLPTR;
-    }
+    void disconnectLogger();
 
     LoggerCptr getLogger() const
     {
