@@ -113,7 +113,8 @@ class ModelEditor:
 			self.printMessage("%s file cannot be found!"%aFileName, ME_ERROR )
 			return
 		self.loadDirName = os.path.split( aFileName )[0]
-		os.chdir(self.loadDirName )
+		if self.loadDirName != '':
+			os.chdir(self.loadDirName )
 
 		# create new model
 		self.__createModel()
