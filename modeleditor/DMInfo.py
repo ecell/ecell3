@@ -44,12 +44,16 @@ class DMInfo:
 
 	def getClassInfoList( self, aClass ):
 		aFullID = self.__getFullID( aClass )
+		if aFullID == None:
+			return []
 		return [DM_DESCRIPTION, DM_PROPERTYLIST, DM_ACCEPTNEWPROPERTY]
 
 
 
 	def getClassInfo( self, aClass, anInfo ):
 		aFullID = self.__getFullID( aClass )
+		if aFullID ==None:
+			raise Exception("%s class doesnt have %s info"%(aClass, anInfo) )
 		if anInfo == DM_DESCRIPTION:
 			return "blahblah\n blah-blah"
 		elif anInfo == DM_PROPERTYLIST:
@@ -65,6 +69,9 @@ class DMInfo:
 
 	def getClassPropertyInfo( self, aClass, aProperty, anInfo ):
 		aFullID = self.__getFullID( aClass )
+		if aFullID ==None:
+			raise Exception("%s class doesnt have %s info"%(aClass, anInfo) )
+		
 		if anInfo == DM_PROPERTY_DEFAULTVALUE:
 			aType = self.getClassPropertyInfo( aClass, aProperty, DM_PROPERTY_TYPE )
 			if aType == DM_PROPERTY_STRING:
@@ -105,7 +112,7 @@ class DMInfo:
 	def __getFullID( self, aClass):
 
 		# get type
-		if aClass.endswith(DM_SYSTEM_CLASS):
+		if aClass.endswith('System'):
 			aType = ME_SYSTEM_TYPE
 		elif aClass.endswith(DM_VARIABLE_CLASS):
 			aType = ME_VARIABLE_TYPE
@@ -116,7 +123,8 @@ class DMInfo:
 				self.theSimulator.createStepper( aClass, aClass )
 			return aClass
 		else:
-			raise Exception("Class type unambiguous")
+			print  "%s classname is ambigouos"%aClass
+			return None
 
 		if aClass not in self.getClassList(aType):
 			raise Exception("Unknown class: %s"%aClass)
