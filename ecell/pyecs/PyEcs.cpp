@@ -113,11 +113,13 @@ BOOST_PYTHON_MODULE( _ecs )
 
     // Simulation-related methods
     .def( "getCurrentTime",              &Simulator::getCurrentTime )
+    .def( "getNextEvent",                &Simulator::getNextEvent )
     .def( "stop",                        &Simulator::stop )
     .def( "step", ( void ( Simulator::* )( void ) )       &Simulator::step )
     .def( "step", ( void ( Simulator::* )( const Int ) )  &Simulator::step )
     .def( "run",  ( void ( Simulator::* )() )             &Simulator::run )
     .def( "run",  ( void ( Simulator::* )( const Real ) ) &Simulator::run )
+    
     
     .def( "setEventChecker",             &Simulator::setEventChecker )
     .def( "setEventHandler",             &Simulator::setEventHandler )

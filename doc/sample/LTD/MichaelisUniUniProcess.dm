@@ -8,6 +8,9 @@ PROTECTED_AUX = '''
 '''
 
 defineMethod( 'initialize', '''
+
+  declareUnidirectional();
+
   S0 = getVariableReference( "S0" );
   C0 = getVariableReference( "C0" );
 ''' )

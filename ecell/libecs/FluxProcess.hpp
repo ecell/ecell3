@@ -41,7 +41,7 @@ namespace libecs
     {
       setActivity( aVelocity );
 
-       // Increase or decrease variables, skipping zero coefficients.
+      // Increase or decrease variables, skipping zero coefficients.
       std::for_each( theVariableReferenceVector.begin(),
 		     theFirstZeroVariableReferenceIterator,
 		     std::bind2nd
@@ -54,7 +54,28 @@ namespace libecs
 		     ( std::mem_fun_ref
 		       ( &VariableReference::addFlux ), aVelocity ) );
     }
-    
+
+    /**
+       Unset all the products' isAccessor() bit.
+
+       As a result these becomes write-only VariableReferences.
+
+       This method is typically called in initialize() of subclasses.
+
+       This method should be called before getVariableReference().
+
+    */
+
+    void declareUnidirectional()
+    {
+      std::for_each( theFirstPositiveVariableReferenceIterator,
+		     theVariableReferenceVector.end(),
+		     std::bind2nd
+		     ( std::mem_fun_ref
+		       ( &VariableReference::setIsAccessor ), false ) );
+    }
+
+
   };
 
 }

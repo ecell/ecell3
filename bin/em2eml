@@ -92,7 +92,7 @@ class EmScanner( GenericScanner , object ):
 		self.rv.append( self.createToken( 'number', s ) )
 
 	def t_name( self, s ):
-		r' [a-zA-Z_/][\w\:\/\.]* '
+		r' [a-zA-Z_/][\w\:\/]* '
 		self.rv.append( self.createToken( 'name', s ) )
 
 	def t_quotedstring( self, s ):

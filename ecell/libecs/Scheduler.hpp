@@ -146,6 +146,11 @@ namespace libecs
 
     void step();
 
+    EventCref getNextEvent() const
+    {
+      return theScheduleQueue.top();
+    }
+
 
     void reschedule( StepperPtr const aStepper );
 

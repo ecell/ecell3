@@ -1,9 +1,19 @@
 loadModel( 'LTD.eml' )
 
 
+
 for i in range( 10 ):
-	print getCurrentTime()
+	print getCurrentTime(), getNextEvent()
+
+#	try:
+#		s = createStepperStub( getNextEvent()[1] )
+#		print s.getProperty( 'StepInterval' )
+#		print s.getProperty( 'NextStepInterval' )
+#	except:
+#		pass
+
+
 	step()
 
 run( 10 )
-print getCurrentTime()
+

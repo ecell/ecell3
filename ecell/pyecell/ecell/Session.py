@@ -121,6 +121,9 @@ class Session:
     def step( self, num=1 ):
         self.theSimulator.step( num )
 
+    def getNextEvent( self ):
+        return self.theSimulator.getNextEvent()
+
     def getCurrentTime( self ):
         return self.theSimulator.getCurrentTime()
 

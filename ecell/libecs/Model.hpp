@@ -50,8 +50,8 @@ namespace libecs
   /** @file */
 
 
-  DECLARE_MAP( const String, StepperPtr, std::less< const String >,
-	       StepperMap ); 
+  DECLARE_ASSOCVECTOR( String, StepperPtr, std::less< const String >,
+		       StepperMap ); 
 
   /**
      Model class represents a simulation model.
@@ -98,6 +98,32 @@ namespace libecs
       theScheduler.step();
     }
 
+
+    /**
+       Get the next Stepper.
+
+     */
+
+    EventCref const getNextEvent() const
+    {
+      return theScheduler.getNextEvent();
+    }
+
+
+    /**
+       Reschedule a Stepper.
+
+       This method changes the next scheduled time of a Stepper on the
+       Scheduler.   
+
+       The next time is calculated as Stepper::CurrentTime +
+       Stepper::StepInterval.   
+
+       If the next time is less than Model::CurrentTime, this method
+       throws a SimulationError exception.
+
+       @param aStepperPtr a pointer to the Stepper to be rescheduled
+    */
 
     void reschedule( StepperPtr const aStepperPtr )
     {
@@ -236,13 +262,6 @@ namespace libecs
     /// @internal
 
     SystemMakerRef      getSystemMaker()      { return theSystemMaker; }
-
-    /// @internal
-
-    //    AccumulatorMakerRef getAccumulatorMaker() { return theAccumulatorMaker; }
-
-
-    StringLiteral getClassName() const  { return "Model"; }
 
 
   private:

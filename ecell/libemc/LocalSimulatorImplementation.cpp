@@ -160,6 +160,17 @@ namespace libemc
   {
     const libecs::EntityType anEntityType( anEntityTypeNumber );
     const libecs::SystemPath aSystemPath( aSystemPathString );
+
+    if( aSystemPath.size() == 0 )
+      {
+	PolymorphVector aVector;
+	if( anEntityType == libecs::EntityType::SYSTEM )
+	  {
+	    aVector.push_back( Polymorph( "/" ) );
+	  }
+	return aVector;
+      }
+
     const libecs::SystemPtr aSystemPtr( getModel().getSystem( aSystemPath ) );
 
     switch( anEntityType )
@@ -321,6 +332,17 @@ namespace libemc
   getLoggerSize( libecs::StringCref aFullPNString ) const
   {
     return getLogger( aFullPNString )->getSize();
+  }
+
+  const libecs::Polymorph LocalSimulatorImplementation::
+  getNextEvent() const
+  {
+    libecs::EventCref aNextEvent( getModel().getNextEvent() );
+
+    PolymorphVector aVector;
+    aVector.push_back( aNextEvent.getTime() );
+    aVector.push_back( aNextEvent.getStepper()->getID() );
+    return aVector;
   }
 
 

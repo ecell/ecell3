@@ -3,14 +3,12 @@ BASECLASS = 'FluxProcess'
 PROPERTIES = [('Real','add',0.0)]
 
 PROTECTED_AUX ='''
-  VariableReference S0;
   VariableReference P0;  
   Int i;
   Int k;
 '''
 
 defineMethod( 'initialize','''
-  S0 = getVariableReference( "S0" );
   P0 = getVariableReference( "P0" );
   i = 0;
   k = 0;

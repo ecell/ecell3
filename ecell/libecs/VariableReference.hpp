@@ -194,7 +194,7 @@ namespace libecs
 
     void setValue( const Real aValue )
     {
-      return theVariablePtr->setValue( aValue );
+      theVariablePtr->setValue( aValue );
     }
 
     const Real getConcentration() const
@@ -213,7 +213,7 @@ namespace libecs
       return theVariablePtr->getVelocity();
     }
 
-    // before try this consider using addFlux() below.
+    // before trying this consider addFlux() below.
     void addVelocity( const Real aValue ) const
     {
       theVariablePtr->addVelocity( aValue );

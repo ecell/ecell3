@@ -138,6 +138,8 @@ namespace libemc
     virtual const libecs::Int 
     getLoggerSize( libecs::StringCref aFullPNString ) const;
 
+    virtual const libecs::Polymorph getNextEvent() const;
+
     virtual void step( const libecs::Int aNumSteps );
 
     virtual void initialize();

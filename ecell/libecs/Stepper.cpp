@@ -691,6 +691,10 @@ namespace libecs
 			 &DifferentialStepper::initializeStepInterval,
 			 &DifferentialStepper::getStepInterval );
 
+    DEFINE_PROPERTYSLOT( "NextStepInterval", Real, 
+			 NULLPTR,
+			 &DifferentialStepper::getNextStepInterval );
+
     DEFINE_PROPERTYSLOT( "Tolerance", Real,
 			 &DifferentialStepper::setTolerance,
 			 &DifferentialStepper::getTolerance );
@@ -793,7 +797,7 @@ namespace libecs
 
     // If the next step of this occurs *before* the next step of the caller,
     // just shrink step size of this Stepper.
-    if( aNextStep < aCallerNextStep )
+    if( aNextStep <= aCallerNextStep )
       {
 	return;
       }

@@ -90,7 +90,7 @@ namespace libecs
 			       aStepperPtr->getStepInterval() );
 
     DEBUG_EXCEPTION( aScheduledTime >= getCurrentTime(),
-		     UnexpectedError,
+		     SimulationError,
 		     "Attempt to go past." );
 
     theScheduleQueue.changeOneKey( aStepperPtr->getSchedulerIndex(),

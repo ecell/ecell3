@@ -450,6 +450,11 @@ namespace libemc
       theSimulatorImplementation->step( aNumSteps );
     }
 
+    const libecs::Polymorph getNextEvent() const
+    {
+      return theSimulatorImplementation->getNextEvent();
+    }
+
     /**
        Initialize the simulator.
 

@@ -6,6 +6,9 @@ PROTECTED_AUX ='''
 '''
 
 defineMethod( 'initialize','''
+
+  declareUnidirectional();
+
 ''' )
 
 defineMethod( 'process',
@@ -22,7 +25,7 @@ defineMethod( 'process',
       Int aCoefficient( aVariableReference.getCoefficient() );
 
       do {
-        aCoefficient++;
+	++aCoefficient;
         velocity *= aVariableReference.getConcentration();
       } while( aCoefficient != 0 );
 

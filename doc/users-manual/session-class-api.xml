@@ -140,6 +140,26 @@ which takes just one string parameter.</para>
       </row>
 
 
+      <!-- getNextEvent -->
+
+      <row>
+	<entry namest='c1' nameend='c1' align='left'>
+<synopsis><methodname>getNextEvent</methodname>()
+</synopsis></entry>
+
+	<entry>A Python 2-<type>tuple</type> ( <type>float</type>, <type>string</type> )</entry>
+      </row>
+
+      <row>
+	<entry namest="c1" nameend='c2' rowsep='1'>
+<para>This method returns the next event structure as a Python 2-<type>tuple</type> consisting of a scheduled time and a StepperID.  The event will be processed in the next time <methodname>step</methodname>() or <methodname>run</methodname>() is called.</para>
+
+<para>The time is usually different from one that <methodname>getCurrentTime</methodname>() returns.   This method returns the scheduled time of the next event, while <methodname>getCurrentTime</methodname>() returns the time of the last event.  These methods can return the same number if more than one events are scheduled at the same point in time, of course.</para>
+
+            </entry>
+      </row>
+
+
       <!-- run -->
       <row>
 	<entry namest='c1' nameend='c1' align='left'>
