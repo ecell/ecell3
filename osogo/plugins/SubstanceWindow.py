@@ -13,27 +13,29 @@ class SubstanceWindow( OsogoPluginWindow ):
 		OsogoPluginWindow.__init__( self, dirname, data, pluginmanager, root )
 
 		self.thePluginManager.appendInstance( self )    
+		self.openWindow()
 		#self.initialize()
 		# ------------------------------------------------------------
 		# 0 : not fixed  1: fixed
 		self.theFixFlag = 0
         
-		self['toolbar1'].set_style( GTK.TOOLBAR_ICONS )
-		self['toolbar1'].set_button_relief( GTK.RELIEF_HALF )
-		self['toolbar2'].set_style( GTK.TOOLBAR_ICONS )
-		self['toolbar2'].set_button_relief( GTK.RELIEF_HALF )
-		self['toolbar3'].set_style( GTK.TOOLBAR_ICONS )
-		self['toolbar3'].set_button_relief( GTK.RELIEF_HALF )
-		self['toolbar4'].set_style( GTK.TOOLBAR_ICONS )
-		self['toolbar4'].set_button_relief( GTK.RELIEF_HALF )        
+		#self['toolbar1'].set_style( GTK.TOOLBAR_ICONS )
+		#self['toolbar1'].set_button_relief( GTK.RELIEF_HALF )
+		#self['toolbar2'].set_style( GTK.TOOLBAR_ICONS )
+		#self['toolbar2'].set_button_relief( GTK.RELIEF_HALF )
+		#self['toolbar3'].set_style( GTK.TOOLBAR_ICONS )
+		#self['toolbar3'].set_button_relief( GTK.RELIEF_HALF )
+		#self['toolbar4'].set_style( GTK.TOOLBAR_ICONS )
+		#self['toolbar4'].set_button_relief( GTK.RELIEF_HALF )        
         
 		self.addHandlers( {'button_toggled': self.fix_mode,
-		                   'qty_increase_pressed': self.increaseQuantity, 
-		                   'qty_decrease_pressed': self.decreaseQuantity,
-		                   'concentration_increase_pressed': self.increaseConcentration,
-		                   'concentration_decrease_pressed': self.decreaseConcentration,
-		                   'input_quantity': self.inputQuantity,
-		                   'input_concentration': self.inputConcentration,
+		                   #'qty_increase_pressed': self.increaseQuantity, 
+		                   #'qty_decrease_pressed': self.decreaseQuantity,
+		                    'on_quantity_spinbutton_changed' : self.changeQuantity,
+		                   #'concentration_increase_pressed': self.increaseConcentration,
+		                   #'concentration_decrease_pressed': self.decreaseConcentration,
+		                   #'input_quantity': self.inputQuantity,
+		                   #'input_concentration': self.inputConcentration,
 		                   'window_exit' : self.exit } )
 
 		self.theQtyFPN = convertFullIDToFullPN( self.theFullID(), 'Quantity' )
@@ -41,50 +43,48 @@ class SubstanceWindow( OsogoPluginWindow ):
 
 		aFullIDString = createFullIDString( self.theFullID() )
 		self["id_label"].set_text( aFullIDString )
+		self.theSession = pluginmanager.theSession
+		self.theQuantityChangedByTextField = FALSE
 
 		self.update()
 		# ------------------------------------------------------------
-
-		self.theSession = pluginmanager.theSession
-        
-		#if len( self.theFullPNList() ) > 1:
-		#	i = 1
-		#	preFullID = self.theFullID()
-		#	aClassName = self.__class__.__name__
-		#	while i < len( self.theFullPNList() ):
-		#		aFullID = self.theFullIDList()[i]
-		#		if aFullID != preFullID:
-		#			self.thePluginManager.createInstance( aClassName, (self.theFullPNList()[i],), root)
-		#		preFullID = aFullID
-		#		i = i + 1
-
-        
-		if len( self.theFullPNList() ) > 1:
-			self.addPopupMenu(1,1,1)
-		else:
-			self.addPopupMenu(0,1,1)
 
 
 	def update( self ):
 
 		self.theQtyValue = self.getValue( self.theQtyFPN )
 		self.theConcValue = self.getValue( self.theConcFPN )
-		self['Quantity_entry'].set_text( str( self.theQtyValue ) )
-		self['Concentration_entry'].set_text( str( self.theConcValue ) )
+
+		if self.theQuantityChangedByTextField == FALSE:
+			self['quantity_spinbutton'].set_text( str( self.theQtyValue ) )
+
+		self['concentration_entry'].set_text( str( self.theConcValue ) )
+		self.theQuantityChangedByTextField == FALSE
     
 
 	def fix_mode( self, a ) :
 		self.theFixFlag = 1 - self.theFixFlag
 		if self.theFixFlag == 0:
-			self.theSession.printMessage( "not fixed\n" )
+			self.theSession.printMessage( "not fixed" )
 		else:
-			self.theSession.printMessage( "fixed\n" )
+			self.theSession.printMessage( "fixed" )
 
 
-	def inputQuantity( self, obj ):
+	#def inputQuantity( self, obj ):
+	def changeQuantity( self, obj ):
 
-		self.theQtyValue = string.atof( obj.get_text() )
-		self.setValue( self.theQtyFPN, self.theQtyValue )
+		aText = obj.get_text()
+
+		string.strip(aText)
+
+		if aText == '':
+			return None
+		else:
+			self.theQtyValue = string.atof( aText )
+			self.theQuantityChangedByTextField = TRUE
+			self.setValue( self.theQtyFPN, self.theQtyValue )
+
+			self.thePluginManager.updateAllPluginWindow()
 
 
 	def inputConcentration( self, obj ):
