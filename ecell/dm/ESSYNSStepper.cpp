@@ -33,6 +33,8 @@
 #include "PropertyInterface.hpp"
 #include "ESSYNSStepper.hpp"
 
+#include <gsl/gsl_sf.h>
+
 LIBECS_DM_INIT( ESSYNSStepper, Stepper );
 
 namespace libecs
