@@ -107,7 +107,7 @@ const Message MessageInterface::get( StringCref keyword ) throw( NoSlot )
     {
       throw NoSlot( __PRETTY_FUNCTION__, className()
 		    + String( ": got a request for Message (keyword = [" )
-		    + keyword + "] but no slot for it.\n" );
+		    + keyword + "]) but no slot for it.\n" );
     }
 
   try {

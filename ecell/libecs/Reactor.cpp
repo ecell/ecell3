@@ -36,23 +36,15 @@
 #include "Reactor.hpp"
 
 Reactor::Condition Reactor::theGlobalCondition;// = Reactor::Condition::Good;
-const char* Reactor::LIGAND_STRING_TABLE[] = 
-{ 
-  "substrate", 
-    "product", 
-    "catalyst", 
-    "effector", 
-    NULL 
-    };
 
 void Reactor::makeSlots()
 {
   //FIXME: get methods
-  MessageSlot( "Substrate",Reactor,*this,&Reactor::setSubstrate,NULL );
-  MessageSlot( "Product",Reactor,*this,&Reactor::setProduct,NULL );
-  MessageSlot( "Catalyst",Reactor,*this,&Reactor::setCatalyst,NULL );
-  MessageSlot( "Effector",Reactor,*this,&Reactor::setEffector,NULL );
-  MessageSlot( "InitialActivity",Reactor,*this,&Reactor::setInitialActivity,
+  MessageSlot( "substrate",Reactor,*this,&Reactor::setSubstrate,NULL );
+  MessageSlot( "product",Reactor,*this,&Reactor::setProduct,NULL );
+  MessageSlot( "catalyst",Reactor,*this,&Reactor::setCatalyst,NULL );
+  MessageSlot( "effector",Reactor,*this,&Reactor::setEffector,NULL );
+  MessageSlot( "initialActivity",Reactor,*this,&Reactor::setInitialActivity,
 	       &Reactor::getInitialActivity );
 }
 

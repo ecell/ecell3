@@ -36,10 +36,8 @@
 
 /**
    Entity class is a base class for all components in the cell model.
-   Entity is-a MessageInterface. (i.e. It can accept Message objects
-   and requests for Messages.)
+   Entity is-a MessageInterface. 
 
-   It has entryname, name and supersystem as common properties.
 */
 class Entity : public MessageInterface
 {
@@ -57,33 +55,53 @@ public:
     @param supersystem a pointer to a System to which this object belongs.
    */
   virtual void setSuperSystem( SystemPtr const supersystem ) 
-   { theSuperSystem = supersystem; }
+   { 
+     theSuperSystem = supersystem; 
+   }
 
-  SystemPtr getSuperSystem() const {return theSuperSystem;}
+  SystemPtr getSuperSystem() const 
+  {
+    return theSuperSystem;
+  }
 
   /**
     Set an identifier of this Entity.
 
     @param entryname entryname of this Entry.
    */
-  void setId( StringCref id ) { theId = id; }
+  void setId( StringCref id ) 
+  { 
+    theId = id; 
+  }
+
+
+  const Message getId( StringCref keyword );
 
   /**
     @return entryname of this Entity.
    */
-  StringCref getId() const { return theId; }
+  StringCref getId() const 
+  { 
+    return theId; 
+  }
 
   /**
     Set name of this Entity.
 
     @param name name of this Entity.
    */
-  void setName( StringCref name ) { theName = name; }
+  void setName( StringCref name ) 
+  { 
+    theName = name; 
+  }
 
   /**
     @return name of this Entity.
    */
-  StringCref getName() const { return theName; }
+  StringCref getName() const 
+  { 
+    return theName; 
+  }
 
   /**
     @return SystemPath of this Entity.
@@ -101,11 +119,9 @@ public:
   const String getFqpi() const;
 
   /**
-    Returns activity value of this Entity defined in subclasses.
-    Thus this should be overrided to calculate and return activity value 
-    defined in each derived class. The time width used in this method
-    should be delta-T. In case activity per second is needed, use
-    getActivityPerSecond() method.
+    Returns activity value (per delta-T) of this Entity.
+    Override this in subclasses.  If there is no overriding method,
+    this returns zero.
 
     @return activity of this Entity
     @see getActivityPerSecond()
@@ -115,7 +131,7 @@ public:
   /**
     Returns activity value (per second).
     Default action of this method is to return getActivity() / delta-T,
-    but this action can be changed in subclasses.
+    but this can be changed in subclasses.
 
     @return activity of this Entity per second
    */

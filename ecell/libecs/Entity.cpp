@@ -52,7 +52,14 @@ Entity::~Entity()
 
 void Entity::makeSlots()
 {
-  ; // do nothing
+  MessageSlot( "id",Entity,*this,NULL,
+	       &Entity::getId );
+}
+
+const Message Entity::getId( StringCref keyword )
+{
+  static String aKeyword( "id" );
+  return Message( aKeyword, getId() );
 }
 
 Float Entity::getActivity() 

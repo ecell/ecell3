@@ -43,10 +43,12 @@ String Substance::USER_DEFAULT_ACCUMULATOR_NAME
 
 void Substance::makeSlots()
 {
-  MessageSlot("Quantity",Substance,*this,&Substance::setQuantity,
-	      &Substance::getQuantity);
-  MessageSlot("Accumulator",Substance,*this,&Substance::setAccumulator,
-	      &Substance::getAccumulator);
+  MessageSlot( "id",Substance,*this,NULL,
+	       &Substance::getId );
+  MessageSlot( "quantity",Substance,*this,&Substance::setQuantity,
+	      &Substance::getQuantity );
+  MessageSlot( "accumulator",Substance,*this,&Substance::setAccumulator,
+	       &Substance::getAccumulator );
 }
 
 void Substance::setQuantity( MessageCref message )
@@ -71,18 +73,20 @@ void Substance::setAccumulator( MessageCref message )
 
 const Message Substance::getQuantity( StringCref keyword )
 {
-  return Message( keyword, getQuantity() );
+  static String aKeyword( "quantity" );
+  return Message( aKeyword, getQuantity() );
 }
 
 const Message Substance::getAccumulator( StringCref keyword )
 {
+  static String aKeyword( "accumulator" );
   if( theAccumulator )
     {
-      return Message( keyword, theAccumulator->className() );
+      return Message( aKeyword, theAccumulator->className() );
     }
   else
     {
-      return Message( keyword, "" );
+      return Message( aKeyword, "" );
     }
 }
 

@@ -78,6 +78,18 @@ public:
   virtual const char* const className() const { return "System"; }
 
   /**
+     Set a pointer to the RootSystem.
+     Usually no need to use this because
+     setSuperSystem() will do this automatically.
+
+     @return the pointer to the RootSystem.
+  */
+  void setRootSystem( RootSystemPtr rootsystem ) 
+  { 
+    theRootSystem = rootsystem; 
+  }
+
+  /**
      Get a pointer to the RootSystem that this System belongs.
      Unlike other Primitive classes, System objects must the pointer
      to the RootSystem.

@@ -41,7 +41,7 @@ StepperMaker::StepperMaker()
 void StepperMaker::makeClassList()
 {
   NewStepperModule(SlaveStepper);
-  NewStepperModule(Eular1Stepper);
+  NewStepperModule(Euler1Stepper);
   NewStepperModule(RungeKutta4Stepper);
 }
 

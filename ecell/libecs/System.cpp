@@ -72,7 +72,7 @@ System::~System()
 
 void System::setSuperSystem( SystemPtr const supersystem )
 {
-  setSuperSystem( supersystem );
+  Entity::setSuperSystem( supersystem );
   theRootSystem = getSuperSystem()->getRootSystem();
 }
 

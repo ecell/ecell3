@@ -33,8 +33,8 @@
 
 RootSystem::RootSystem() 
 {
-  // FIXME: remove this.
-//  _stepper = new Euler1Stepper(this);
+  setRootSystem( this );
+  setSuperSystem( this );
 }
 
 RootSystem::~RootSystem()

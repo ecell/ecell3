@@ -36,7 +36,8 @@
 typedef IntegratorPtr ( *IntegratorAllocator_ )( Substance& );
 DECLARE_TYPE( IntegratorAllocator_, IntegratorAllocator );
 
-class MasterStepper;
+typedef Stepper (* StepperAllocatorFunc )();
+
 
 class Stepper
 {
@@ -69,16 +70,12 @@ protected:
 
 };
 
-typedef Stepper (* StepperAllocatorFunc )();
-
-
 class MasterStepper : public Stepper
 {
-  friend class SystemMaker;
 
 public:
 
-  typedef list< SlaveStepperPtr > SlaveStepperList;
+  typedef list<SlaveStepperPtr> SlaveStepperList;
   typedef SlaveStepperList::iterator SlaveStepperListIterator;
 
   MasterStepper();
@@ -103,31 +100,31 @@ public:
 
 protected:
 
-  int thePace;
-  Float theDeltaT;
+  int                 thePace;
+  Float               theDeltaT;
   IntegratorAllocator theAllocator;
-  SlaveStepperList theSlavesList;
+  SlaveStepperList    theSlavesList;
 
 };
 
 
-class StepperLeader : public Stepper
+class StepperLeader
 {
 
-  typedef multimap< int, MasterStepperPtr > MasterStepperMap;
+  typedef multimap<int,MasterStepperPtr> MasterStepperMap;
 
 public:
 
   StepperLeader();
   virtual ~StepperLeader() {}
 
-  void registerMasterStepper(MasterStepper* newstepper);
+  void registerMasterStepper( MasterStepperPtr newstepper );
 
-  static void setDefaultUpdateDepth(int d) { DEFAULT_UPDATE_DEPTH = d; }
-  static int getDefaultUpdateDepth()       { return DEFAULT_UPDATE_DEPTH; }
+  static void setDefaultUpdateDepth( int d ) { DEFAULT_UPDATE_DEPTH = d; }
+  static int getDefaultUpdateDepth()         { return DEFAULT_UPDATE_DEPTH; }
 
-  void setUpdateDepth(int d) { theUpdateDepth = d; }
-  int getUpdateDepth()       { return theUpdateDepth; }
+  void setUpdateDepth( int d ) { theUpdateDepth = d; }
+  int getUpdateDepth()         { return theUpdateDepth; }
 
   virtual void initialize();
 
@@ -160,27 +157,63 @@ private:
 };
 
 
+#include "System.hpp"
+
 class SlaveStepper : public Stepper
 {
 
 public:
 
-  SlaveStepper();
+  SlaveStepper() {}
   virtual ~SlaveStepper() {}
 
-  virtual void clear();
-  virtual void react();
-  virtual void turn();
-  virtual void transit();
-  virtual void postern();
-  virtual void initialize();
+  
+  // virtual and inlined.
+  // this is for optimization in operations with SlaveStepperPtrs.
+  // (e.g. loops over SlaveStepperList in MasterStepper)
+  virtual void clear()
+  {
+    theOwner->clear();
+  }
 
+  virtual void react()
+  {
+    theOwner->react();
+  }
 
-  void setMaster( MasterStepperPtr master ) { theMaster = master; }
+  virtual void turn()
+  {
+    theOwner->turn();
+  }
 
-  Float getDeltaT() { return theMaster->getDeltaT(); }
+  virtual void transit()
+  {
+    theOwner->transit();
+  }
+
+  virtual void postern()
+  {
+    theOwner->postern();
+  }
+
+  virtual void initialize()
+  {
+    Stepper::initialize();
+  }
+
+  void setMaster( MasterStepperPtr master ) 
+  { 
+    theMaster = master; 
+  }
+
+  Float getDeltaT() 
+  { 
+    // Slaves are synchronous to their masters.
+    return theMaster->getDeltaT(); 
+  }
 
   static StepperPtr instance() { return new SlaveStepper; }
+
   virtual const char* const className() const  { return "SlaveStepper"; }
 
 private:
@@ -198,7 +231,7 @@ public:
   Euler1Stepper();
   virtual ~Euler1Stepper() {}
 
-  static Stepper* instance() { return new Euler1Stepper; }
+  static StepperPtr instance() { return new Euler1Stepper; }
 
   virtual int getNumberOfSteps() { return 1; }
   virtual void clear();
@@ -209,7 +242,7 @@ public:
   virtual void initialize();
 
   virtual const char* const className() const  { return "Euler1Stepper"; }
-
+ 
 protected:
 
   static IntegratorPtr newEuler1( SubstanceRef substance );
@@ -228,21 +261,20 @@ public:
   static StepperPtr instance() { return new RungeKutta4Stepper; }
 
   virtual int getNumberOfSteps() { return 4; }
+
   virtual void clear();
   virtual void react();
-//  virtual void check();
   virtual void transit();
   virtual void postern();
 
   virtual void initialize();
 
 
-//  instance(RungeKuttaStepper);
-  virtual const char* const className() const  {return "RungeKuttaStepper";}
+  virtual const char* const className() const  { return "RungeKuttaStepper"; }
 
 protected:
 
-  static Integrator* newRungeKutta4(Substance& substance);
+  static IntegratorPtr newRungeKutta4( SubstanceRef substance );
 
 };
 

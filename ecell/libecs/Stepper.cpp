@@ -55,7 +55,7 @@ void Stepper::distributeIntegrator( IntegratorAllocator* allocator )
 
 void Stepper::initialize()
 {
-  // FIXME: use exception
+  // FIXME: use exception?
   assert( theOwner );
 }
 
@@ -66,13 +66,18 @@ MasterStepper::MasterStepper()
   thePace( 1 ),
   theAllocator( NULL )
 {
-  getOwner()->getRootSystem()->
-    getStepperLeader().registerMasterStepper( this );
+
 }
 
 void MasterStepper::initialize()
 {
+  // FIXME: is this multiple-time-initialization-proof?
+
   Stepper::initialize();
+
+  getOwner()->getRootSystem()->
+    getStepperLeader().registerMasterStepper( this );
+
   registerSlaves( theOwner );
 
   distributeIntegrator( IntegratorAllocator( theAllocator ) );
@@ -238,44 +243,6 @@ void StepperLeader::update()
 	}
     }
 }
-
-////////////////////////// SlaveStepper
-
-SlaveStepper::SlaveStepper()
-{
-
-}
-
-void SlaveStepper::initialize()
-{
-  Stepper::initialize();
-}
-
-void SlaveStepper::clear()
-{
-  theOwner->clear();
-}
-
-void SlaveStepper::react()
-{
-  theOwner->react();
-}
-
-void SlaveStepper::turn()
-{
-  theOwner->turn();
-}
-
-void SlaveStepper::transit()
-{
-  theOwner->transit();
-}
-
-void SlaveStepper::postern()
-{
-  theOwner->postern();
-}
-
 
 ////////////////////////// Euler1Stepper
 
