@@ -59,6 +59,12 @@ doc-clean:
 	rm -rf ${DOCBOOK_DIR}/ecell3-users-manual
 	rm -f *.dvi *.ps *.pdf
 
+strip:
+	strip ecell/dm/*.so
+	strip ecell/libecs/.libs/libecs.so
+	strip ecell/libemc/.libs/libemc.so
+	strip ecell/pyecs/.libs/_ecs.so
+
 
 ${DOXYGEN_OUTFILE}:
 	doxygen ecell3.doxy
