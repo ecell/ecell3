@@ -22,7 +22,7 @@ namespace libecs
     const Real getK() const { return K; }
 
     virtual void initialize();
-    virtual void differentiate();
+    virtual void react();
     virtual void compute();
 
     static ReactorPtr createInstance() 

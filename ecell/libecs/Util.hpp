@@ -171,7 +171,7 @@ namespace libecs
     public:
       inline void operator() ( T*& object ) const
       {
-        object->differentiate();
+        object->react();
       }
     };
   

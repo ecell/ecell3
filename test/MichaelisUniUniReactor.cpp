@@ -67,7 +67,7 @@ void MichaelisUniUniReactor::initialize()
 
 }
 
-void MichaelisUniUniReactor::differentiate()   
+void MichaelisUniUniReactor::react()   
 {
   Real velocity( KcF );
 

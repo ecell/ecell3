@@ -97,7 +97,9 @@ namespace libecs
 
   Reactor::Reactor() 
     :
-    theActivity( 0.0 )
+    theActivity( 0.0 ),
+    theActivityBuffer( theActivity )
+
   {
     makeSlots();
   }

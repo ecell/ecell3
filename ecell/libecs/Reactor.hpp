@@ -108,11 +108,13 @@ namespace libecs
 
     virtual void initialize();
 
-    virtual void differentiate() { }
+    virtual void react() = 0;
 
-    //    virtual void integrate() { }
+    virtual void integrate() 
+    { 
+      updateActivity();
+    }
 
-    virtual void compute() { }
 
     /**
        Set activity variable.  This must be set at every turn and takes
@@ -126,12 +128,17 @@ namespace libecs
 
     virtual void setActivity( RealCref anActivity ) 
     { 
-      theActivity = anActivity; 
+      theActivityBuffer = anActivity; 
     }
 
     virtual const Real getActivity() const
     {
       return theActivity;
+    }
+
+    void updateActivity()
+    {
+      theActivity = theActivityBuffer;
     }
 
     void registerReactant( StringCref aName, FullIDCref aFullID,
@@ -172,6 +179,8 @@ namespace libecs
   private:
 
     Real        theActivity;
+
+    Real        theActivityBuffer;
 
   };
 

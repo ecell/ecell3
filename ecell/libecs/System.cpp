@@ -140,6 +140,7 @@ namespace libecs
   System::System()
     :
     theVolume( 1.0 ),
+    theVolumeBuffer( theVolume ),
     theConcentrationFactor( 0.0 ),
     theStepper( NULLPTR ),
     theEntityListChanged( false )

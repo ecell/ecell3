@@ -396,7 +396,7 @@ namespace libecs
     virtual void compute()
     {
       clear();
-      differentiate();
+      react();
       integrate();
       //???();
 
@@ -405,7 +405,7 @@ namespace libecs
     virtual void initialize();
 
     virtual void clear();
-    virtual void differentiate();
+    virtual void react();
     virtual void integrate();
     //    virtual void ???();
 
@@ -458,7 +458,7 @@ namespace libecs
 
     static StepperPtr createInstance() { return new RungeKutta4SRMStepper; }
 
-    virtual void differentiate();
+    virtual void react();
 
     virtual StringLiteral getClassName() const 
     { return "RungeKutta4SRMStepper"; }

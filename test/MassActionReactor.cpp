@@ -59,7 +59,7 @@ void MassActionReactor::initialize()
     }
 }
 
-void MassActionReactor::differentiate()   
+void MassActionReactor::react()   
 {
   Real velocity( K * N_A );
 

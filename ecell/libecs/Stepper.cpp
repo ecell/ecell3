@@ -211,16 +211,26 @@ namespace libecs
     // Substance::clear()
     //
     FOR_ALL( SRMSubstanceCache, theSubstanceCache, clear );
+
+    //
+    // Reactor::clear() ?
+    //
+    //FOR_ALL( ,, clear );
+
+    //
+    // System::clear() ?
+    //
+    //FOR_ALL( ,, clear );
   }
 
 
 
-  void SRMStepper::differentiate()
+  void SRMStepper::react()
   {
     //
-    // Reactor::differentiate()
+    // Reactor::react()
     //
-    FOR_ALL( ReactorVector, theReactorCache, differentiate );
+    FOR_ALL( ReactorVector, theReactorCache, react );
 
     //
     // Substance::turn()
@@ -234,34 +244,20 @@ namespace libecs
     //
     // Reactor::integrate()
     //
-    //    FOR_ALL( ReactorVector, theReactorCache, integrate );
-
+    FOR_ALL( ReactorVector, theReactorCache, integrate );
 
     //
     // Substance::integrate()
     //
     FOR_ALL( SRMSubstanceCache, theSubstanceCache, integrate );
 
-  }
-
-
-#if 0
-  void SRMStepper::???()
-  {
     //
-    // Reactor::compute()
+    // System::integrate()
     //
-    FOR_ALL( ReactorVector, theReactorCache, compute );
-
-    //
-    // Reactor::integrate()
-    //
-    // update activity of reactors by buffered values 
-    //    FOR_ALL( ReactorVector, theReactorCache, integrate );
+    FOR_ALL( SystemVector, theSystemVector, integrate );
 
   }
 
-#endif /* 0 */
 
   void SRMStepper::initialize()
   {
@@ -315,12 +311,12 @@ namespace libecs
     return new RungeKutta4Integrator( substance );
   }
 
-  void RungeKutta4SRMStepper::differentiate()
+  void RungeKutta4SRMStepper::react()
   {
-    SRMStepper::differentiate();
-    SRMStepper::differentiate();
-    SRMStepper::differentiate();
-    SRMStepper::differentiate();
+    SRMStepper::react();
+    SRMStepper::react();
+    SRMStepper::react();
+    SRMStepper::react();
   }
 
 } // namespace libecs

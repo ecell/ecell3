@@ -53,9 +53,8 @@ print 'logger list:', aSimulator.getLoggerList()
 
 if aLogger1:
 #if 0:
-    print "Logger: name: %s, start: %s, end: %s, size: %s" %\
-          ( aLogger1.getName(),
-            aLogger1.getStartTime(), aLogger1.getEndTime(),\
+    print "Logger: start: %s, end: %s, size: %s" %\
+          ( aLogger1.getStartTime(), aLogger1.getEndTime(),\
             aLogger1.getSize() )
     print aLogger1.getData( 0, aLogger1.getEndTime() )[:5]
     print aLogger1.getData( aLogger1.getEndTime() - 10 ,

@@ -24,7 +24,7 @@ namespace libecs
     const Real getKcF() const { return KcF; }
 
     virtual void initialize();
-    virtual void differentiate();
+    virtual void react();
     virtual void compute();
 
     static ReactorPtr createInstance() 

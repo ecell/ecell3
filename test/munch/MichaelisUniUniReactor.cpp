@@ -103,7 +103,7 @@ C0_Quantity = getPropertySlotOfReactant( "C0", "Quantity" );
 }
 
 
-void MichaelisUniUniReactor::differentiate()
+void MichaelisUniUniReactor::react()
 {
 #line 83 "/home/tomo/wrk/munch/dmtemplates/reactor/reactor.tmpl"
 

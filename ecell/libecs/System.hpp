@@ -76,10 +76,14 @@ namespace libecs
 
     virtual void initialize();
 
-    /**
-       Returns a pointer to a Stepper object that this System belongs.
+    virtual void integrate()
+    {
+      updateVolume();
+    }
 
-       This overrides Entity::getStepper().
+
+    /**
+       Get a pointer to a Stepper object that this System belongs.
 
        @return A pointer to a Stepper object that this System belongs or
        NULL pointer if it is not set.
@@ -91,11 +95,9 @@ namespace libecs
     }
 
     /**
-       Instantiate a Stepper object of @a classname using theModel's
-       StepperMaker object.  Register the Stepper object as a stepper for 
-       this System.
+       Register the Stepper object as a stepper for this System by an ID.
 
-       @param classname Classname of the Stepper that this System may have.
+       @param anID Stepper ID.
     */
 
     void setStepperID( StringCref anID );
@@ -110,7 +112,9 @@ namespace libecs
     const String getStepperID() const;
 
     /**
-       @return Volume of this System. Unit is [L].
+       Get the volume of this System in [L] (liter).
+
+       @return Volume of this System.
     */
 
     virtual const Real getVolume() const
@@ -119,15 +123,24 @@ namespace libecs
     }
 
     /**
-       Set a new volume for this System. 
-       Make the new volume effective from beginning of next time step.
+       Set a new volume of this System in [L] (liter).
+
+       The volume is updated at the beginning of the next step.
+
+       @param aVolume the new volume value.
      */
 
     virtual void setVolume( RealCref aVolume )
     {
-      theVolume = aVolume;
+      theVolumeBuffer = aVolume;
+    }
+
+    void updateVolume( )
+    {
+      theVolume = theVolumeBuffer;
       updateConcentrationFactor();
     }
+
 
     template <class C>
     const std::map<const String,C*> getMap() const
@@ -260,7 +273,7 @@ namespace libecs
 
     void updateConcentrationFactor() 
     {
-      theConcentrationFactor = 1 / ( theVolume * N_A );
+      theConcentrationFactor = 1 / ( getVolume() * N_A );
     }
 
     virtual void makeSlots();
@@ -274,6 +287,8 @@ namespace libecs
   private:
 
     Real theVolume;
+
+    Real theVolumeBuffer;
 
     Real theConcentrationFactor;
 
