@@ -5,8 +5,7 @@
   {\
     TYPE::AllocatorFuncPtr CreateObject =\
     &CLASSNAME::createInstance;\
-  }\
-}
+  } // 
 
 
 #define DM_OBJECT( TYPE, CLASSNAME )\

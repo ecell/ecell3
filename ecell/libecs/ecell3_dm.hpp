@@ -31,17 +31,21 @@
 #ifndef __ECELL3_DM_HPP
 #define __ECELL3_DM_HPP
 
+#include "PropertySlotMaker.hpp"
 
-// these macros assume that ECELL3_DM_TYPE and ECELL3_DM_CLASSNAME macros
-// are already defined before use.
-//
-// ECELL3_DM_TYPE and ECELL3_DM_CLASSNAME macros must be defined 
-// *after* this file is included.
-//
-// if _ECELL3_DM_TYPE or _ECELL3_DM_CLASSNAME is defined *before*
-// including this file, it is used as a default value of
-// ECELL3_DM_TYPE or ECELL3_DM_CLASSNAME macro.
+/**
+   @file
 
+   Macros in this file assume that ECELL3_DM_TYPE and ECELL3_DM_CLASSNAME 
+   macros are already defined before use.
+   
+   ECELL3_DM_TYPE and ECELL3_DM_CLASSNAME macros must be defined 
+   *after* this file is included.
+   
+   if _ECELL3_DM_TYPE or _ECELL3_DM_CLASSNAME is defined *before*
+   including this file, it is used as a default value of
+   ECELL3_DM_TYPE or ECELL3_DM_CLASSNAME macro.
+*/
 
 #define ECELL3_DM_OBJECT\
  LIBECS_DM_OBJECT( ECELL3_DM_TYPE, ECELL3_DM_CLASSNAME )
