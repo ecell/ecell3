@@ -97,6 +97,7 @@ namespace libemc
 
   void LocalSimulatorImplementation::step()
   {
+    getModel().initialize();  
     getModel().step();  
     getModel().flushLogger();
   }
@@ -142,6 +143,8 @@ namespace libemc
 
   void LocalSimulatorImplementation::run()
   {
+    getModel().initialize();
+
     if( ! ( thePendingEventChecker != NULLPTR && theEventHandler != NULLPTR ) )
       {
 	THROW_EXCEPTION( libecs::Exception,
@@ -173,6 +176,8 @@ namespace libemc
 
   void LocalSimulatorImplementation::run( libecs::Real aDuration )
   {
+    getModel().initialize();
+
     if( thePendingEventChecker != NULLPTR && theEventHandler != NULLPTR )
       {
 	runWithEvent( aDuration );
