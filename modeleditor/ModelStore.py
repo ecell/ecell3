@@ -602,6 +602,7 @@ class ModelStore:
                     aSystemSize = self.__getSystemSize( aFullID )
                     aValueRef = self.__getEntityProperty( aFullID, MS_VARIABLE_VALUE )
                     aValueRef[MS_PROPERTY_VALUE] = AVOGADRO * aSystemSize * float(convertValue)
+                    aValueRef[MS_PROPERTY_FLAGS][MS_CHANGED_FLAG] = 1
                     
                     self.__recalculateConcentrations( aVariable, aSystemSize )
                 elif aPropertyName == MS_VARIABLE_NUMCONC:
@@ -609,6 +610,7 @@ class ModelStore:
                     aSystemSize = self.__getSystemSize( aFullID )
                     aValueRef = self.__getEntityProperty( aFullID, MS_VARIABLE_VALUE )
                     aValueRef[MS_PROPERTY_VALUE] =  aSystemSize * float(convertValue)
+                    aValueRef[MS_PROPERTY_FLAGS][MS_CHANGED_FLAG] = 1
                     self.__recalculateConcentrations( aVariable, aSystemSize )
                 elif aPropertyName == MS_VARIABLE_VALUE:
                     aVariable = self.__getEntity( aFullID )
@@ -627,12 +629,13 @@ class ModelStore:
         else:
             newMolarConc = 0.0
         aVariable[MS_ENTITY_PROPERTYLIST][MS_VARIABLE_MOLARCONC][MS_PROPERTY_VALUE] = newMolarConc
+        aVariable[MS_ENTITY_PROPERTYLIST][MS_VARIABLE_MOLARCONC][MS_PROPERTY_FLAGS][MS_CHANGED_FLAG] = 1
         if systemSize != 0.0:
             newNumberConc = aValue / systemSize
         else:
             newNumberConc = 0.0
         aVariable[MS_ENTITY_PROPERTYLIST][MS_VARIABLE_NUMCONC][MS_PROPERTY_VALUE] = newNumberConc
-        
+        aVariable[MS_ENTITY_PROPERTYLIST][MS_VARIABLE_NUMCONC][MS_PROPERTY_FLAGS][MS_CHANGED_FLAG] = 1
         
     def __getSystemSize( self, aFullID ):
         aTuple = aFullID.split(':')
