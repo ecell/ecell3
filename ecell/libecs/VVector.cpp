@@ -45,9 +45,12 @@
  *::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
  *	$Id$
  :	$Log$
+ :	Revision 1.4  2003/07/20 06:05:35  bgabor
+ :	added support for large files
+ :
  :	Revision 1.3  2003/03/18 09:06:36  shafi
  :	logger performance improvement by gabor
- :
+ :	
  :	Revision 1.2 2003/03/01 02:43:51  shafi
  :	changed envvar name: ECSTMPDIR to VVECTORTMPDIR, changed defult vvector dir: /var/tmp to /tmp
  :
@@ -100,6 +103,11 @@
 // Must be for UNIX.
 #define O_BINARY 0
 #endif /* O_BINARY */
+
+#ifndef O_LARGEFILE
+// Must be for UNIX.
+#define O_LARGEFILE 0
+#endif /* O_LARGEFILE */
 
 
 int vvectorbase::_serialNumber = 0;
@@ -157,7 +165,6 @@ vvectorbase::vvectorbase()
       cbError();
     }
   }
-//  osif_direct_read_init(_defaultDirectory);
 
 }
 
@@ -229,31 +236,27 @@ void vvectorbase::initBase(char const * const dirname)
   strcat(pathname, filename);
   _file_name = strdup(pathname);
   _tmp_name.push_back(_file_name);
-  _fdw = open(_file_name, O_WRONLY | O_CREAT | O_TRUNC | O_BINARY, 0600);
+  _fdw = open(_file_name, O_WRONLY | O_CREAT | O_TRUNC | O_BINARY |O_LARGEFILE, 0600);
   if (_fdw < 0) {
     fprintf(stderr, "open(\"%s\") failed in VVector.\n", _file_name);
     cbError();
     exit(1);
   }
-//  close(_fd);
-//    osif_direct_read_init(_file_name);
 
-//   my_open_to_read(0);
- _fdr = open(_file_name, O_RDONLY | O_BINARY );
+ _fdr = open(_file_name, O_RDONLY | O_BINARY | O_LARGEFILE );
   if (_fdr < 0) {
     fprintf(stderr, "open(\"%s\") failed in VVector err=%s.\n",
 	    _file_name, strerror(errno));
     cbError();
     exit(1);
   }
-//  _fdw = my_open_to_append();  
 }
 
 
 void vvectorbase::my_open_to_append()
 {
   checkDiskFull(_file_name, 0);
-  _fdw = open(_file_name, O_WRONLY | O_APPEND | O_BINARY);
+  _fdw = open(_file_name, O_WRONLY | O_APPEND | O_BINARY |O_LARGEFILE);
   if (_fdw < 0) {
     fprintf(stderr, "open(\"%s\") failed in VVector err=%s.\n",
 	    _file_name, strerror(errno));
@@ -266,7 +269,7 @@ void vvectorbase::my_open_to_append()
 void vvectorbase::my_open_to_read(off_t offset)
 {
 if (_fdr<0) {
- _fdr = open(_file_name, O_RDONLY | O_BINARY );
+ _fdr = open(_file_name, O_RDONLY | O_BINARY|O_LARGEFILE );
  }
   if (_fdr < 0) {
     fprintf(stderr, "open(\"%s\") failed in VVector err=%s.\n",
@@ -280,16 +283,6 @@ if (_fdr<0) {
     assert(0);
   }
 }
-
-//ssize_t vvectorbase::my_direct_read(void * buffer, size_t num_to_read, 
-//				off_t position)
-//    {
-//    return osif_direct_read(_file_name,buffer, num_to_read,position);
-//    }
-
-//long vvectorbase::get_logical_block_size(){
-//    return osif_get_logical_block_size();
-//}
 
 void vvectorbase::my_close()
 {
