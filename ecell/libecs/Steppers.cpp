@@ -300,10 +300,10 @@ namespace libecs
 	if( maxError < 0.5 )
 	  {
 	    // grow it if error is 50% less than desired
-	    Real aNewStepInterval( getStepInterval() * 2.0 );
+	    //	    Real aNewStepInterval( getStepInterval() * 2.0 );
 
-	    //	    Real aNewStepInterval( getStepInterval() 
-	    //				   * pow(maxError, -0.5) * safety );
+	    Real aNewStepInterval( getStepInterval() 
+				   * pow(maxError, -0.5) * safety );
 
 	    if( aNewStepInterval >= getUserMaxInterval() )
 	      {
@@ -471,11 +471,11 @@ namespace libecs
 	// grow it if error is 50% less than desired
   	if ( maxError < 0.5 )
   	  {
-	    //	    Real aNewStepInterval( getStepInterval()
-	    //				   * pow(maxError , -1.0/3.0)
-	    //				   * safety );
+	    Real aNewStepInterval( getStepInterval()
+				   * pow(maxError , -0.5)
+				   * safety );
+	    //  	    Real aNewStepInterval( getStepInterval() * 2.0 );
 
-  	    Real aNewStepInterval( getStepInterval() * 2.0 );
   	    if( aNewStepInterval >= getUserMaxInterval() )
   	      {
   		aNewStepInterval = getStepInterval();
@@ -709,8 +709,10 @@ namespace libecs
 		if( maxError > 1.1 )
 		  {
 		    // shrink it if the error exceeds 110%
-		    setStepInterval( getStepInterval() 
-				     * pow(maxError, -0.20) *  safety );
+		    //		    setStepInterval( getStepInterval() 
+		    //				     * pow(maxError, -0.20)
+		    //				     *  safety );
+		    setStepInterval( getStepInterval() * 0.5 );
 
 		    reset();
 		    continue;
