@@ -15,11 +15,11 @@ defineMethod( 'initialize','''
 
 defineMethod( 'process',
 '''
-  const Real s0( S0.getVariable()->getValue() );
-  const Real s1( S1.getVariable()->getValue() );
+  const Real s0( S0.getValue() );
+  const Real s1( S1.getValue() );
   
   const Real p( s0 + s1 );
   
-  P0.getVariable()->setValue( p );
+  P0.setValue( p );
 ''')
 

@@ -100,7 +100,7 @@ namespace libecs
 	// Tagname
 	anInnerVector.push_back( aVariableReference.getName() );
 	// FullID
-	anInnerVector.push_back( aVariableReference.getVariable()->
+	anInnerVector.push_back( aVariableReference.getVariablePtr()->
 				 getFullID().getString() );
 	// Coefficient
 	anInnerVector.push_back( aVariableReference.getCoefficient() );

@@ -11,7 +11,7 @@ defineMethod( 'initialize', '''
 ''' )
 
 defineMethod( 'process', '''
-  Real E( C0.getVariable()->getConcentration() );
+  Real E( C0.getConcentration() );
 
   Real V( k1 * E );
   V *= 1E-018 * N_A;

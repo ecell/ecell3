@@ -14,8 +14,8 @@ defineMethod( 'initialize', '''
 
 defineMethod( 'process', '''
 
-  const Real S( S0.getVariable()->getConcentration() );
-  const Real E( C0.getVariable()->getValue() );
+  const Real S( S0.getConcentration() );
+  const Real E( C0.getValue() );
   Real velocity( (Kcat * E * S /( Km + S)) );
   setFlux( velocity );
 ''' )

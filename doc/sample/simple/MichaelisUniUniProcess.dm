@@ -15,8 +15,8 @@ defineMethod( 'initialize', '''
 defineMethod( 'process', '''
   Real velocity( KcF );
 
-  velocity *= C0.getVariable()->getValue();
-  const Real S( S0.getVariable()->getConcentration() );
+  velocity *= C0.getValue();
+  const Real S( S0.getConcentration() );
   velocity *= S;
   velocity /= ( KmS + S );
 

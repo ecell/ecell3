@@ -23,7 +23,7 @@ defineMethod( 'process',
 
       do {
         aCoefficient++;
-        velocity *= aVariableReference.getVariable()->getConcentration();
+        velocity *= aVariableReference.getConcentration();
       } while( aCoefficient != 0 );
 
     }

@@ -18,7 +18,7 @@ defineMethod( 'initialize','''
 
 defineMethod( 'process',
 '''
-  Real p0( P0.getVariable()->getValue() );
+  Real p0( P0.getValue() );
 
   i += 1;
 
@@ -39,5 +39,5 @@ defineMethod( 'process',
       {
       p0 = 0.00000000000000000001 * getSuperSystem()->getVolume() * N_A;
       }					
-  P0.getVariable()->setValue(p0);
+  P0.setValue(p0);
 ''')

@@ -78,7 +78,6 @@ namespace libecs
 
     };
 
-
     class NameCompare
     {
     public:
@@ -139,17 +138,19 @@ namespace libecs
       theName = aName;
     }
 
+
+    // can there be unnamed VariableReferences?
     StringCref getName() const 
     { 
       return theName; 
     }
 
-    void setVariable( VariablePtr const aVariablePtr )
+    void setVariablePtr( VariablePtr const aVariablePtr )
     {
       theVariablePtr = aVariablePtr;
     }
 
-    const VariablePtr getVariable() const 
+    const VariablePtr getVariablePtr() const 
     { 
       return theVariablePtr; 
     }
@@ -185,6 +186,49 @@ namespace libecs
     {
       return theIsAccessor;
     }
+
+    const Real getValue() const
+    {
+      return theVariablePtr->getValue();
+    }
+
+    void setValue( const Real aValue )
+    {
+      return theVariablePtr->setValue( aValue );
+    }
+
+    const Real getConcentration() const
+    {
+      return theVariablePtr->getConcentration();
+    }
+
+    const Real getTotalVelocity() const
+    {
+      return theVariablePtr->getTotalVelocity();
+    }
+
+    // be careful.. you may mean getTotalVelocity(), not getVelocity()
+    const Real getVelocity() const
+    {
+      return theVariablePtr->getVelocity();
+    }
+
+    // before try this consider using addFlux() below.
+    void addVelocity( const Real aValue ) const
+    {
+      theVariablePtr->addVelocity( aValue );
+    }
+
+    const bool isFixed() const
+    {
+      return theVariablePtr->isFixed();
+    }
+
+    void setFixed( const bool aValue )
+    {
+      theVariablePtr->setFixed( aValue );
+    }
+
 
     void addFlux( const Real aVelocity )
     {
