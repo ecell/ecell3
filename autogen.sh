@@ -33,7 +33,7 @@ if [ ! -f ChangeLog ] ; then
     touch ChangeLog
 fi
 
-#libtoolize --ltdl
+libtoolize -c 
 
 
 if test -z "$*"; then
