@@ -9,6 +9,7 @@ import operator
 from PlotterPluginWindow import *
 from Plot import *
 from ecell.ecssupport import *
+LoggerMinimumInterval=0.01
 
 class TracerWindow( PlotterPluginWindow ):
 
@@ -70,7 +71,7 @@ class TracerWindow( PlotterPluginWindow ):
 		for fpn in selected_list:
 		    if not self.haslogger(fpn[0]):
 			self.theSession.theSimulator.createLogger(fpn[0])
-			self.theSession.theSimulator.setLoggerMinimumInterval(fpn[0],0.1)
+			self.theSession.theSimulator.setLoggerMinimumInterval(fpn[0],LoggerMinimumInterval)
 			self.theSession.message("Logger created for "+fpn[0])
 			
 	def recache(self, aFullPNString, value_from, value_to, interval):
@@ -130,11 +131,12 @@ class TracerWindow( PlotterPluginWindow ):
 		    self.theSession.message("Enter a valid number, please.")
 		    self['entry1'].set_text(str(self.thePlotInstance.getstripinterval()))
 		else:
-		    if a>1:
-			self.thePlotInstance.setstripinterval(int(a))
-		    else:
-			self.theSession.message("Enter a valid number, please.")
-			self['entry1'].set_text(str(self.thePlotInstance.getstripinterval()))
+			#                 if a>1:
+			self.thePlotInstance.setstripinterval(a)
+			#                 else:
+			#                     self.theSession.printMessage("Enter a valid number, please.")
+			#                     self['entry1'].set_text(str(self.thePlotInstance.getstripinterval()))
+
 			
 		
 ##

@@ -201,7 +201,7 @@ class Plot:
 	    self.theWidget.queue_draw()
 	    
 	def printxlabel(self, num):
-	    text=self.num_to_sci(int(num))
+	    text=self.num_to_sci(num)
 	    x=self.convertx_to_plot(num)
 	    y=self.xaxis_y+10
 	    self.drawtext("pen",x-self.font.string_width(str(text))/2,y,text)
@@ -423,7 +423,7 @@ class TracerPlot(Plot):
 	    #set yframes
 	    self.yframe=[0,1]
 	    self.ygrid=[0,1]
-	    self.xframe=[0,1000]
+	    self.xframe=[0.0,1000.0]
 	    self.xgrid=[0,1000]
 	    self.pixelwidth=float(self.xframe[1]-self.xframe[0])/self.plotarea[2]
 	    self.pixelheigth=float(self.yframe[1]-self.yframe[0])/self.plotarea[3]
@@ -490,7 +490,8 @@ class TracerPlot(Plot):
 		    #,adjust lastx, lasty,
 		    self.shiftplot(realshift)
 		    for fpn in self.data_list:
-			self.lastx[fpn]-=realshift
+			if self.lastx[fpn]!=None:
+			    self.lastx[fpn]-=realshift
 			self.drawpoint(fpn,points[fpn])
 		else:
 		    for fpn in self.data_list:
@@ -595,6 +596,7 @@ class TracerPlot(Plot):
 		    if add_item[1][0]>self.xframe[1]:
 			self.xframe[1]=add_item[1][0]
 			self.xframe[0]=self.xframe[1]-self.stripinterval*self.xframe_when_rescaling
+
 		if self.xframe[0]<0: self.xframe[0]=0
 		self.xframe[1]=self.xframe[0]+self.stripinterval	
 		#try to get whole data within given xframes		
@@ -804,7 +806,7 @@ class TracerPlot(Plot):
 	    self.stripinterval=newinterval
 	    if self.strip_mode=='strip':
 		oldinterval=self.xframe[1]-self.xframe[0]
-		shift=newinterval-oldinterval
+		shift=newinterval-float(oldinterval)
 		if shift<0:
 		    self.xframe[0]-=shift
 		    for fpn in self.data_list:
