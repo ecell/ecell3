@@ -736,6 +736,11 @@ namespace libecs
       return theK1;
     }
 
+    virtual VariableProxyPtr createVariableProxy( VariablePtr aVariable )
+    {
+      return new AdaptiveDifferentialStepper::VariableProxy( *this, aVariable );
+    }
+
   protected:
 
     Real safety;

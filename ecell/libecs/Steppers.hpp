@@ -134,12 +134,6 @@ namespace libecs
 
     virtual StringLiteral getClassName() const { return "Fehlberg23Stepper"; }
 
-    //    virtual VariableProxyPtr createVariableProxy( VariablePtr aVariable )
-    //    {
-    //      return new VariableProxy( *this, aVariable );
-    //    }
-
-
   protected:
 
     //    RealVector theK1;
