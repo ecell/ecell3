@@ -9,16 +9,14 @@ sys.path.append('.')
 import Plugin
 ### for test
 
-
 from PluginWindow import *
 from ecssupport import *
 
 class PropertyWindow(PluginWindow):
 
-    
-    def __init__( self, dirname, sim, data, pluginmanager ):
+    def __init__( self, dirname, data, pluginmanager ):
         
-        PluginWindow.__init__( self, dirname, sim, data, pluginmanager )
+        PluginWindow.__init__( self, dirname, data, pluginmanager )
         
         self.addHandlers( { 'input_row_pressed'   : self.selectProperty,
                             'show_button_pressed' : self.show } )

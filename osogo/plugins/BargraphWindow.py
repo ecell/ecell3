@@ -17,9 +17,9 @@ import GTK
 
 class BargraphWindow(PluginWindow):
     
-    def __init__( self, dirname, sim, data, pluginmanager ):
+    def __init__( self, dirname, data, pluginmanager ):
 
-        PluginWindow.__init__( self, dirname, sim, data, pluginmanager )
+        PluginWindow.__init__( self, dirname, data, pluginmanager )
 
         #test
         self['toolbar5'].set_style( GTK.TOOLBAR_ICONS )

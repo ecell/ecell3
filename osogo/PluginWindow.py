@@ -12,12 +12,13 @@ class PluginWindow(ViewWindow):
     theFullID()           : FullID1
     '''
 
-    def __init__( self, dirname, sim, data, pluginmanager ):
+    def __init__( self, dirname,  data, pluginmanager ):
         aGladeFileName = os.path.join( dirname ,
                                        self.__class__.__name__ + ".glade" )
-        ViewWindow.__init__( self, aGladeFileName, sim, data )
+        ViewWindow.__init__( self, aGladeFileName, data )
 
         self.thePluginManager = pluginmanager
+        self.theSimulator = self.thePluginManager.theMainWindow.theSimulator
         
         self.theRawFullPNList = data
 

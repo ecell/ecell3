@@ -7,9 +7,9 @@ import GTK
 
 class NumericWindow( PluginWindow ):
 
-    def __init__( self, dirname, sim, data, pluginmanager ):
+    def __init__( self, dirname,  data, pluginmanager ):
 
-        PluginWindow.__init__( self, dirname, sim, data, pluginmanager )
+        PluginWindow.__init__( self, dirname, data, pluginmanager )
 
         self['toolbar5'].set_style( GTK.TOOLBAR_ICONS )
         self['toolbar5'].set_button_relief( GTK.RELIEF_HALF )

@@ -46,7 +46,6 @@ class EntryListWindow(Window):
 
         aPManager = self.theMainWindow.thePluginManager
         self.thePropertyWindow = aPManager.createInstance( 'PropertyWindow',
-                                                           self.theSimulator,
                                                            () )
 #        aPropertyWindowTopVBox = self.thePropertyWindow['scrolledwindow1']
 #        aPropertyWindowVBox = self.thePropertyWindow['vbox2']
@@ -174,7 +173,6 @@ class EntryListWindow(Window):
         aPluginName = self.thePaletteWindow.getSelectedPluginName()
         aPluginManager = self.theMainWindow.thePluginManager
         aPluginManager.createInstance( aPluginName,
-                                       self.theSimulator,
                                        self.theSelectedFullPNList )
 
 def mainQuit( obj, data ):

@@ -10,11 +10,9 @@ class ViewWindow(Window):
 
     theClipBoard = ''
 
-    def __init__(self, gladefile, sim, fpns):
+    def __init__(self, gladefile, fpns):
         Window.__init__( self, gladefile )
 
-        self.theSimulator = sim
-        
         self.addHandlers(
             { 'copy_fqpps':            self.copyFPNs,
               'paste_fqpps':           self.pasteFPNs,

@@ -28,9 +28,9 @@ class PluginModule:
                 aFp.close()
 
 
-    def createInstance( self, sim, data, pluginmanager, parent=None ):
+    def createInstance( self, data, pluginmanager, parent=None ):
         aConstructor = self.theModule.__dict__[self.theName]
-        anArgumentTuple = ( self.theDirectoryName, sim , data, pluginmanager )
+        anArgumentTuple = ( self.theDirectoryName,  data, pluginmanager )
         return apply( aConstructor, anArgumentTuple )
         
 
@@ -42,14 +42,14 @@ class PluginManager:
         self.theInstanceList = []
         self.theMainWindow = aMainWindow
 
-    def createInstance( self, classname, sim, data, parent=None ):
+    def createInstance( self, classname, data, parent=None ):
         try:
             aPlugin = self.thePluginMap[ classname ]
         except KeyError:
             aPlugin = PluginModule( classname )
             self.thePluginMap[ classname ] = aPlugin
 
-        anInstance = aPlugin.createInstance( sim, data, self, parent )
+        anInstance = aPlugin.createInstance( data, self, parent )
         self.appendInstance( anInstance )
 
         return anInstance
