@@ -44,10 +44,9 @@ import ConfirmWindow
 
 # Constant value of this class
 PROPERTY_INDEX = 0
-NUMBER_INDEX = 1
-VALUE_INDEX = 2
-GET_INDEX = 3
-SET_INDEX = 4
+VALUE_INDEX = 1
+GET_INDEX = 2
+SET_INDEX = 3
 
 # ---------------------------------------------------------------
 # StepperWindow -> OsogoWindow
@@ -90,15 +89,17 @@ class StepperWindow(OsogoWindow):
 					   gobject.TYPE_STRING,
 					    gobject.TYPE_STRING)
 		self.thePropertyList.set_model(aPropertyModel)
-		column=gtk.TreeViewColumn('Property',gtk.CellRendererText(),text=0)
+		column=gtk.TreeViewColumn( 'Property',gtk.CellRendererText(),\
+					   text=PROPERTY_INDEX )
 		self.thePropertyList.append_column(column)
-		column=gtk.TreeViewColumn('Number',gtk.CellRendererText(),text=1)
+		column=gtk.TreeViewColumn( 'Value',gtk.CellRendererText(),\
+					   text=VALUE_INDEX )
 		self.thePropertyList.append_column(column)
-		column=gtk.TreeViewColumn('Value',gtk.CellRendererText(),text=2)
+		column=gtk.TreeViewColumn( 'Get',gtk.CellRendererText(),\
+					   text=GET_INDEX )
 		self.thePropertyList.append_column(column)
-		column=gtk.TreeViewColumn('Getable',gtk.CellRendererText(),text=3)
-		self.thePropertyList.append_column(column)
-		column=gtk.TreeViewColumn('Settable',gtk.CellRendererText(),text=4)
+		column=gtk.TreeViewColumn( 'Set',gtk.CellRendererText(),\
+					   text=SET_INDEX )
 		self.thePropertyList.append_column(column)
 		
 		self.initialize()
@@ -157,12 +158,11 @@ class StepperWindow(OsogoWindow):
 
 				aClassName = self.theSession.theSimulator.getStepperClassName( aStepperID )
 				aList = [ 'ClassName', ]
-				aList.append( '' )
 				aList.append( str(aClassName) )
 				aList.append( decodeAttribute( TRUE ) )
 				aList.append( decodeAttribute( FALSE ) )
 				iter = PropertyModel.append( )
-				for i in range(0,5):
+				for i in range(0,4):
 			    	    PropertyModel.set_value(iter,i,aList[i])
 						    
 
@@ -179,52 +179,25 @@ class StepperWindow(OsogoWindow):
 
 					data =  self.theSession.theSimulator.getStepperProperty( aStepperID, aProperty )
 
-					# ---------------------------
-					# When data type is scalar
-					# ---------------------------
-					if type(data) != type(()):
+					aList = [ aProperty, ]
 
-						#aList = [ aProperty[PROPERTYNAME] ]
-						aList = [ aProperty, ]
-						aList.append( '' )
-						aList.append( str(data) )
+					aDataString = str( data )
 
-						anAttribute = self.theSession.theSimulator.getStepperPropertyAttributes( aStepperID, aProperty )
+					if( len( aDataString ) > 20 ):
+						aDataString = aDataString[:20]\
+							      + '...'
 
+					aList.append( aDataString )
 
-						aList.append( decodeAttribute(anAttribute[GETABLE]) )
-						aList.append( decodeAttribute(anAttribute[SETTABLE]) )
-						iter = PropertyModel.append( )
-						for i in range(0,5):
-			    			    PropertyModel.set_value(iter,i,aList[i])
-
-					# ---------------------------
-					# When data type is tuple
-					# ---------------------------
-					else:
-
-						aNumber = 0
-						for anElement in data:
-
-							#aList = [ aProperty[PROPERTYNAME] ]
-							aList = [ aProperty ]
-
-							anAttribute = self.theSession.theSimulator.getStepperPropertyAttributes( aStepperID, aProperty )
-							aList.append( `aNumber` )
-							aList.append( str(anElement) )
-
-							aList.append( decodeAttribute(anAttribute[GETABLE]) )
-							aList.append( decodeAttribute(anAttribute[SETTABLE]) )
-
-							#aList.append( decodeAttribute(aProperty[GETABLE]) )
-							#aList.append( decodeAttribute(aProperty[SETTABLE]) )
-
-							iter = PropertyModel.append( )
-							for i in range(0,5):
-			    				    PropertyModel.set_value(iter,i,aList[i])
+					anAttribute = self.theSession.theSimulator.getStepperPropertyAttributes( aStepperID, aProperty )
 
 
-							aNumber = aNumber + 1
+					aList.append( decodeAttribute(anAttribute[GETABLE]) )
+					aList.append( decodeAttribute(anAttribute[SETTABLE]) )
+					iter = PropertyModel.append( )
+					for i in range(0,4):
+						PropertyModel.set_value(iter,i,aList[i])
+
 							
 
 	# ---------------------------------------------------------------
@@ -298,10 +271,8 @@ class StepperWindow(OsogoWindow):
 		aValue = self['value_entry'].get_text( )
 
 		# ---------------------------------------------------------------------------
-		# gets a number and property name from property list
+		# get a property name from property list
 		# ---------------------------------------------------------------------------
-		aNumber = self['property_list'].get_model().get_value( self.theSelectedRowOfPropertyList,
-		                                          NUMBER_INDEX )
 		aPropertyName = self['property_list'].get_model().get_value( self.theSelectedRowOfPropertyList,
 		                                                PROPERTY_INDEX )
 
