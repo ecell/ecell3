@@ -88,7 +88,7 @@ class EmScanner( GenericScanner , object ):
 		self.rv.append( self.createToken( s, s ) )
 
 	def t_number( self, s ):
-		r' [+-]? ( \d+(\.\d*)? | \d*\.\d+ ) ([eE][+-]?\d+)? '
+		r' [+-]?(\d+(\.\d*)?|\d*\.\d+)([eE][+-]?\d+)? '
 		self.rv.append( self.createToken( 'number', s ) )
 
 	def t_name( self, s ):
@@ -284,7 +284,7 @@ def flatten_nodetree( node ):
 
 	while len( node ) > 1:
 		node = node[1]
-		if len( node ) is 0:
+		if len( node ) == 0:
 			break
 		else:
 			aList.append( node[0] )
