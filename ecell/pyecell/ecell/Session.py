@@ -1,8 +1,15 @@
 #! /usr/bin/env python
+
 import string
 import eml
-import os
 import sys        
+
+from Numeric import *
+
+from os import *
+from ecell.ecssupport import *
+from ecell.DataFileManager import *
+from ecell.ECDDataFile import *
 
 class Session:
 
@@ -27,29 +34,114 @@ class Session:
             for i in range(num):
                 self.theSimulator.step()
 
-    def getLoggerList( self ):
-        return self.theSimulator.getLoggerList()
+    def createLogger( self,fullpn ):
+        self.theSimulator.getLogger( fullpn )
 
     def getLogger( self, fullpn ):
         return self.theSimulator.getLogger( fullpn )
+
+    def getLoggerList( self ):
+        return self.theSimulator.getLoggerList()
+
+    def saveLoggerData( self, aFullPNString='', aStartTime=-1, aEndTime=-1, aInterval=-1, aSaveDirectory='./'):
+
+        # creates instance datafilemanager
+        aDataFileManager = DataFileManager()
+
+        # sets root directory to datafilemanager
+        aDataFileManager.setRootDirectory(aSaveDirectory)
+
+        aFileIndex=0
+
+        if aFullPNString=='':
+            aLoggerNameList = self.getLoggerList()
+        else:
+            aLoggerNameList = aFullPNString 
+
+        try:#(1)
+            for aFullPNString in aLoggerNameList:
+
+                # ---------------------------------------------\----
+                # creates filename
+                # from [Substance:/CELL/CYTOPLASM:E:Quantity]
+                # to   [CYTOPLASM-E-Quantity]
+                # ---------------------------------------------\----
+                aFileName=split(join(split(aFullPNString,':')[1\:],'-'),'/')[-1]
+                
+                aECDDataFile = ECDDataFile()
+                aECDDataFile.setFileName(aFileName)
+                aLogger = self.getLogger( aFullPNString )
+                
+                if aStartTime == -1 or aEndTime == -1:
+                    # gets start time and end time from logger
+                    aStartTime= aLogger.getStartTime()
+                    aEndTime  = aLogger.getEndTime()
+                else:
+                    # checks the value
+                    if not (aLogger.getStartTime() < aStartTime < aLogger.getEndTime()):
+                        aStartTime = aLogger.getStartTime()
+                    if not (aLogger.getStartTime() < aEndTime < aLogger.getEndTime()):
+                        aEndTime = aLogger.getEndTime()
+
+                if aInterval == -1:
+                    # gets data with specifing interval
+                    aMatrixData = aLogger.getData(aStartTime,aEndTime)
+                else:
+                    # gets data without specifing interval
+                    aMatrixData = aLogger.getData(aStartTime,aEndTime,aInterval)
+
+                # sets data name
+                aECDDataFile.setDataName(aFullPNString)
+
+                # sets matrix data
+                aECDDataFile.setMatrixData(aMatrixData)
+
+                # -------------------------------------------------
+                # adds data file to data file manager
+                # -------------------------------------------------
+                aDataFileManager.getFileMap()[`aFileIndex`] = aECDDataFile
+
+                aFileIndex = aFileIndex + 1
+        
+        except:#(1)
+            
+            import sys
+            self.__plainPrintMethod( __name__ )
+            self.__plainPrintMethod( sys.exc_traceback )
+            aErrorMessage= "Error : could not save [%s] " %aFullPNString
+            self.__plainPrintMethod( aErrorMessage )
+            return None
+
+        aDataFileManager.saveAll()         
+
 
     def setPendingEventChecker( self, event ):
 
         self.theSimulator.setPendingEventChecker( event )
 
-    def setEventHandler( self, event ):
 
+    def setEventHandler( self, event ):
         self.theSimulator.setEventHandler( event )
 
-    def getCurrentTime( self ):
 
+    def getCurrentTime( self ):
         return self.theSimulator.getCurrentTime()
+
 
     def setPrintMethod( self, aMethod ):
         self.thePrintMethod = aMethod
 
+
     def printMessage( self, message ):
         self.thePrintMethod( message )
+
+
+    def loadScript( self, ecs ):
+        execfile(ecs)
+
+
+    def __plainPrintMethod( aMessage ):
+        print aMessage
 
 
     def loadModel( self, aFileObject ):
@@ -63,15 +155,6 @@ class Session:
         
     def saveModel( self ):
         pass
-
-    def loadScript( self, ecs ):
-        execfile(ecs)
-
-
-    def plainPrintMethod( aMessage ):
-        print aMessage
-
-
 
 
     def __loadStepper( self ):
