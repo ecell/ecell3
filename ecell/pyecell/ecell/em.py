@@ -7,7 +7,7 @@ A system for processing Python as markup embedded in text.
 """
 
 __program__ = 'empy'
-__version__ = '2.2.6'
+__version__ = '2.3'
 __url__ = 'http://www.alcyone.com/pyos/empy/'
 __author__ = 'Erik Max Francis <max@alcyone.com>'
 __copyright__ = 'Copyright (C) 2002 Erik Max Francis'
@@ -55,6 +55,153 @@ RAW_OPT = 'rawErrors' # raw errors?
 EXIT_OPT = 'exitOnError' # exit on error?
 FLATTEN_OPT = 'flatten' # flatten pseudomodule namespace?
 
+# Usage info.
+OPTION_INFO = [
+("-V --version", "Print version and exit"),
+("-h --help", "Print usage and exit"),
+("-H --extended-help", "Print extended usage and exit"),
+("-k --suppress-errors", "Do not exit on errors; continue interactively"),
+("-p --prefix=<char>", "Change prefix to something other than @"),
+("-f --flatten", "Flatten the members of pseudmodule to start"),
+("-r --raw-errors", "Show raw Python errors"),
+("-i --interactive", "Go into interactive mode after processing"),
+("-o --output=<filename>", "Specify file for output as write"),
+("-a --append=<filename>", "Specify file for output as append"),
+("-P --preprocess=<filename>", "Interpret EmPy file before main processing"),
+("-I --import=<modules>", "Import Python modules before processing"),
+("-D --define=<definition>", "Execute Python assignment statement"),
+("-E --execute=<statement>", "Execute Python statement before processing"),
+("-F --execute-file=<filename>", "Execute Python file before processing"),
+("-B --buffered-output", "Fully buffer output (even open), with -o or -a"),
+]
+
+EXPANSION_INFO = [
+("@# ... NL", "Comment; remove everything up to newline"),
+("@ WHITESPACE", "Remove following whitespace; line continuation"),
+("@\\ ESCAPE_CODE", "A C-style escape sequence"),
+("@@", "Literal @; @ is escaped (duplicated prefix)"),
+("@),, @], @}", "Literal close parentheses, brackets, braces"),
+("@( EXPRESSION )", "Evaluate expression and substitute with str"),
+("@( TEST ? THEN )", "If test is true, evaluate then"),
+("@( TEST ? THEN : ELSE )", "If test is true, evaluate then, otherwise else"),
+("@( TRY $ CATCH )", "Expand try expression, or catch if it raises"),
+("@ SIMPLE_EXPRESSION", "Evaluate simple expression and substitute;\n"
+                        "e.g., @x, @x.y, @f(a, b), @l[i], etc."),
+("@` EXPRESSION `", "Evaluate expression and substitute with repr"),
+("@: EXPRESSION : DUMMY :", "Evaluates to @:...:expansion:"),
+("@[ noop : IGNORED ]", "Contained material is ignored; block comment"),
+("@[ if E : CODE ]", "Expand code if expression is true"),
+("@[ while E : CODE ]", "Repeatedly expand code while expression is true"),
+("@[ for X in S : CODE ]", "Expand code for each element in sequence"),
+("@[ macro SIGNATURE : CODE ]", "Define a function as a recallable expansion"),
+("@{ STATEMENTS }", "Statements are executed for side effects"),
+("@%% KEY WHITESPACE VALUE NL", "Significator form of __KEY__ = VALUE"),
+]
+
+ESCAPE_INFO = [
+("@\\0", "NUL, null"),
+("@\\a", "BEL, bell"),
+("@\\b", "BS, backspace"),
+("@\\dDDD", "three-digital decimal code DDD"),
+("@\\e", "ESC, escape"),
+("@\\f", "FF, form feed"),
+("@\\h", "DEL, delete"),
+("@\\n", "LF, linefeed, newline"),
+("@\\oOOO", "three-digit octal code OOO"),
+("@\\qQQQQ", "four-digit quaternary code QQQQ"),
+("@\\r", "CR, carriage return"),
+("@\\s", "SP, space"),
+("@\\t", "HT, horizontal tab"),
+("@\\v", "VT, vertical tab"),
+("@\\xHH", "two-digit hexadecimal code HH"),
+("@\\z", "EOT, end of transmission"),
+]
+
+PSEUDOMODULE_INFO = [
+("VERSION", "String representing EmPy version"),
+("SIGNIFICATOR_RE_STRING", "Regular expression string matching significators"),
+("interpreter", "Currently-executing interpreter instance"),
+("argv", "The EmPy script name and command line arguments"),
+("args", "The command line arguments only"),
+("identify()", "Identify top context as name, line"),
+("setName(name)", "Set the name of the current context"),
+("setLine(line)", "Set the line number of the current context"),
+("atExit(callable)", "Invoke no-argument function at shutdown"),
+("getGlobals()", "Retrieve this interpreter's globals"),
+("setGlobals(dict)", "Set this interpreter's globals"),
+("updateGlobals(dict)", "Merge dictionary into interpreter's globals"),
+("clearGlobals()", "Start globals over anew"),
+("include(file, [loc])", "Include filename or file-like object"),
+("expand(string, [loc])", "Explicitly expand string and return"),
+("string(data, [name], [loc])", "Process string-like object"),
+("quote(string)", "Quote prefixes in provided string and return"),
+("flatten([keys])", "Flatten module contents into globals namespace"),
+("getPrefix()", "Get current prefix"),
+("setPrefix(char)", "Set new prefix"),
+("stopDiverting()", "Stop diverting; data now sent directly to output"),
+("createDiversion(name)", "Create a diversion but do not divert to it"),
+("retrieveDiversion(name)", "Retrieve the actual named diversion object"),
+("startDiversion(name)", "Start diverting to given diversion"),
+("playDiversion(name)", "Recall diversion and then eliminate it"),
+("replayDiversion(name)", "Recall diversion but retain it"),
+("purgeDiversion(name)", "Erase diversion"),
+("playAllDiversions()", "Stop diverting and play all diversions in order"),
+("replayAllDiversions()", "Stop diverting and replay all diversions"),
+("purgeAllDiversions()", "Stop diverting and purge all diversions"),
+("getFilter()", "Get current filter"),
+("resetFilter()", "Reset filter; no filtering"),
+("nullFilter()", "Install null filter"),
+("setFilter(filter)", "Install new filter or filter chain"),
+("enableHooks()", "Enable hooks (default)"),
+("disableHooks()", "Disable hook invocation"),
+("areHooksEnabled()", "Return whether or not hooks are enabled"),
+("getHooks(name)", "Get the list of hooks with name"),
+("clearHooks(name)", "Clear all hooks with name"),
+("clearAllHooks()", "Clear absolutely all hooks"),
+("addHook(name, hook, [i])", "Register hook with name (optionally insert)"),
+("removeHook(name, hook)", "Remove hook from name"),
+("invokeHook(name_, ...)", "Manually invoke hook with name"),
+("Filter", "The base class for custom filters"),
+("NullFilter", "A filter which never outputs anything"),
+("FunctionFilter", "A filter which calls a function"),
+("StringFilter", "A filter which uses a translation mapping"),
+("BufferedFilter", "A buffered filter (and base class)"),
+("SizeBufferedFilter", "A filter which buffers data into fixed chunks"),
+("LineBufferedFilter", "A filter which buffers by lines"),
+("MaximallyBufferedFilter", "A filter which buffers everything until close"),
+]
+
+HOOK_INFO = [
+("at_shutdown", "Interpreter is shutting down"),
+("at_handle", "Exception is being handled (not thrown)"),
+("before_include", "empy.include is starting to execute"),
+("after_include", "empy.include is finished executing"),
+("before_expand", "empy.expand is starting to execute"),
+("after_expand", "empy.expand is finished executing"),
+("at_quote", "empy.quote is executing"),
+("before_file", "A file-like object is about to be processed"),
+("after_file", "A file-like object is finished processing"),
+("before_string", "A standalone string is about to be processed"),
+("after_string", "A standalone string is finished processing"),
+("at_parse", "A parsing pass is being performed"),
+("before_evaluate", "A low-level evaluation is about to be done"),
+("after_evaluate", "A low-level evaluation has just finished"),
+("before_execute", "A low-level execution is about to be done"),
+("after_execute", "A low-level execution has just finished"),
+("before_substitute", "A @[...] substitution is about to be done"),
+("after_substitute", "A @[...] substitution has just finished"),
+("before_significate", "A significator is about to be processed"),
+("after_significate", "A significator has just finished processing"),
+]
+
+ENVIRONMENT_INFO = [
+("EMPY_OPTIONS", "Specified options will be included"),
+("EMPY_PREFIX", "Specify the default prefix: -p <value>"),
+("EMPY_FLATTEN", "Flatten empy pseudomodule if defined: -f"),
+("EMPY_RAW", "Show raw errors if defined: -r"),
+("EMPY_INTERACTIVE", "Enter interactive mode if defined: -i"),
+("EMPY_BUFFERED_OUTPUT", "Fully buffered output if defined: -B"),
+]
 
 class EmPyError(Exception):
     """The base class for all EmPy errors."""
@@ -130,6 +277,10 @@ class Stack:
         """Push an element onto the top of the stack."""
         self.data.append(object)
 
+    def filter(self, function):
+        """Filter the elements of the stack through the function."""
+        self.data = filter(function, self.data)
+
     def purge(self):
         """Purge the stack."""
         self.data = []
@@ -141,6 +292,11 @@ class Stack:
     def __nonzero__(self): return len(self.data) != 0
     def __len__(self): return len(self.data)
     def __getitem__(self, index): return self.data[-(index + 1)]
+
+    def __repr__(self):
+        return '<%s instance at 0x%x [%s]>' % \
+               (self.__class__, id(self), \
+                string.join(map(repr, self.data), ', '))
 
 
 class AbstractFile:
@@ -377,45 +533,85 @@ class Stream:
         self.currentDiversion = None
 
 
+class NullFile:
+
+    """A simple class that supports all the file-like object methods
+    but simply does nothing at all."""
+
+    def __init__(self): pass
+    def write(self, data): pass
+    def writelines(self, lines): pass
+    def flush(self): pass
+    def close(self): pass
+
+
+class UncloseableFile:
+
+    """A simple class which wraps around a delegate file-like object
+    and lets everything through except close calls."""
+
+    def __init__(self, delegate):
+        self.delegate = delegate
+
+    def write(self, data):
+        self.delegate.write(data)
+
+    def writelines(self, lines):
+        self.delegate.writelines(data)
+
+    def flush(self):
+        self.delegate.flush()
+
+    def close(self):
+        """Eat this one."""
+        pass
+
+
 class ProxyFile:
 
     """The proxy file object that is intended to take the place of
     sys.stdout.  The proxy can manage a stack of file objects it is
     writing to, and an underlying raw file object."""
 
-    def __init__(self, rawFile):
+    def __init__(self, bottom):
         self.stack = Stack()
-        self.raw = rawFile
-        self.current = rawFile
+        self.bottom = bottom
 
-    def push(self, file):
-        self.stack.push(file)
-        self.current = file
-
-    def pop(self):
-        result = self.stack.pop()
+    def current(self):
+        """Get the current stream to write to."""
         if self.stack:
-            self.current = self.stack[-1]
+            return self.stack[-1][1]
         else:
-            self.current = self.raw
-        return result
+            return self.bottom
 
-    def purge(self):
-        self.stack.purge()
+    def push(self, interpreter):
+        self.stack.push((interpreter, interpreter.stream()))
+
+    def pop(self, interpreter):
+        result = self.stack.pop()
+        assert interpreter is result[0]
+
+    def clear(self, interpreter):
+        self.stack.filter(lambda x, i=interpreter: x[0] is not i)
 
     def write(self, data):
-        self.current.write(data)
+        self.current().write(data)
 
     def writelines(self, lines):
-        self.current.writelines(lines)
+        self.current().writelines(lines)
 
     def flush(self):
-        self.current.flush()
+        self.current().flush()
 
     def close(self):
-        if self.current is not None:
-            self.current.close()
-            self.current = None
+        """Close the current file.  If the current file is the bottom, then
+        close it and dispose of it."""
+        current = self.current()
+        if current is self.bottom:
+            self.bottom = None
+        current.close()
+
+    def test(self): pass
 
 
 class Filter:
@@ -834,14 +1030,30 @@ class PseudoModule:
         context = self.interpreter.context()
         context.line = line
 
-    def clearGlobals(self, globals=None):
-        """Clear out the globals, optionally starting from a new
-        dictionary."""
-        self.interpreter.clear(globals)
-
     def atExit(self, callable):
         """Register a function to be called at exit."""
         self.interpreter.finals.append(callable)
+
+    # Globals manipulation.
+
+    def getGlobals(self):
+        """Retrieve the globals."""
+        return self.interpreter.globals
+
+    def setGlobals(self, globals):
+        """Set the globals to the specified dictionary."""
+        self.interpreter.globals = globals
+        self.interpreter.fix()
+
+    def updateGlobals(self, otherGlobals):
+        """Merge another mapping object into this interpreter's globals."""
+        self.interpreter.globals.update(otherGlobals)
+        self.interpreter.fix()
+
+    def clearGlobals(self):
+        """Clear out the globals with a brand new dictionary."""
+        self.interpreter.globals = None
+        self.interpreter.fix()
 
     # Hook support.
 
@@ -1086,7 +1298,7 @@ class Interpreter:
                  options=None, globals=None):
         # Set up the stream.
         if output is None:
-            output = sys.__stdout__
+            output = UncloseableFile(sys.__stdout__)
         self.output = output
         self.prefix = prefix
         if argv is None:
@@ -1104,10 +1316,9 @@ class Interpreter:
         self.streams = Stack()
         # Set up the pseudmodule.
         self.pseudo = PseudoModule(self)
-        # Now set up the globals, or stamp the pseudmodule into an existing
-        # dictionary if one is provided.
+        # Now set up the globals.
         self.globals = None
-        self.clear(globals)
+        self.fix()
         # Install a proxy stdout if one hasn't been already.
         self.installProxy()
         # Finally, reset the state of all the stacks.
@@ -1119,13 +1330,17 @@ class Interpreter:
     def __del__(self):
         self.shutdown()
 
-    def clear(self, globals=None):
+    def fix(self):
         """Reset the globals, stamping in the pseudomodule."""
-        if globals is None:
+        if self.globals is None:
             self.globals = {}
-        else:
-            self.globals = globals
-        self.globals[self.pseudo.__name__] = self.pseudo
+        # Make sure that there is no collision between two interpreters'
+        # globals.
+        pseudoName = self.pseudo.__name__
+        if self.globals.has_key(pseudoName):
+            if self.globals[pseudoName] is not self.pseudo:
+                raise EmPyError, "interpreter globals collision"
+        self.globals[pseudoName] = self.pseudo
 
     def shutdown(self):
         """Declare this interpreting session over; close the stream file
@@ -1170,9 +1385,9 @@ class Interpreter:
         self.contexts.purge()
         self.streams.purge()
         self.streams.push(Stream(self.output))
-        sys.stdout.purge()
+        sys.stdout.clear(self)
 
-    # Higher-level operaitons.
+    # Higher-level operations.
 
     def include(self, fileOrFilename, locals=None):
         """Do an include pass on a file or filename."""
@@ -1567,7 +1782,7 @@ class Interpreter:
 
     def evaluate(self, expression, locals=None):
         """Evaluate an expression."""
-        sys.stdout.push(self.stream())
+        sys.stdout.push(self)
         try:
             self.invoke('before_evaluate', \
                         expression=expression, locals=locals)
@@ -1578,7 +1793,7 @@ class Interpreter:
             self.invoke('after_evaluate')
             return result
         finally:
-            sys.stdout.pop()
+            sys.stdout.pop(self)
 
     def execute(self, statements, locals=None):
         """Execute a statement."""
@@ -1591,7 +1806,7 @@ class Interpreter:
         # leading or trailing whitespace.
         if string.find(statements, '\n') < 0:
             statements = string.strip(statements)
-        sys.stdout.push(self.stream())
+        sys.stdout.push(self)
         try:
             self.invoke('before_execute', \
                         statements=statements, locals=locals)
@@ -1601,12 +1816,12 @@ class Interpreter:
                 exec statements in self.globals
             self.invoke('after_execute')
         finally:
-            sys.stdout.pop()
+            sys.stdout.pop(self)
 
     def single(self, source, locals=None):
         """Execute an expression or statement, just as if it were
         entered into the Python interactive interpreter."""
-        sys.stdout.push(self.stream())
+        sys.stdout.push(self)
         try:
             self.invoke('before_single', \
                         source=source, locals=locals)
@@ -1617,7 +1832,7 @@ class Interpreter:
                 exec code in self.globals
             self.invoke('after_single')
         finally:
-            sys.stdout.pop()
+            sys.stdout.pop(self)
 
     def substitute(self, substitution, locals=None):
         """Do a command substitution."""
@@ -1685,7 +1900,7 @@ class Interpreter:
 
     def finalize(self):
         """Execute any remaining final routines."""
-        sys.stdout.push(self.stream())
+        sys.stdout.push(self)
         try:
             # Pop them off one at a time so they get executed in reverse
             # order and we remove them as they're executed in case something
@@ -1694,15 +1909,15 @@ class Interpreter:
                 final = self.finals.pop()
                 final()
         finally:
-            sys.stdout.pop()
+            sys.stdout.pop(self)
 
     # Hooks.
 
-    def invoke(self, hookName, **keywords):
+    def invoke(self, name_, **keywords):
         """Invoke the hook(s) associated with the hook name, should they
         exist."""
-        if self.hooksEnabled and self.hooks.has_key(hookName):
-            for hook in self.hooks[hookName]:
+        if self.hooksEnabled and self.hooks.has_key(name_):
+            for hook in self.hooks[name_]:
                 hook(self, keywords)
 
     # Error handling.
@@ -1729,8 +1944,16 @@ class Interpreter:
 
     def installProxy(self):
         """Install a proxy if necessary."""
+        # If stdout is the original, we'll replace it with a proxy object.
+        # Otherwise, invoke a simple test method to see if it behaves like
+        # a proxy.
         if sys.stdout is sys.__stdout__:
             sys.stdout = ProxyFile(sys.__stdout__)
+        else:
+            try:
+                sys.stdout.test()
+            except AttributeError:
+                raise EmPyError, "interpreter proxy collision"
 
 
 def environment(name, default=None):
@@ -1746,158 +1969,58 @@ def environment(name, default=None):
     else:
         return default
 
-def usage():
+def usage(verbose=True):
     """Print usage information."""
-    sys.stderr.write("""\
+    programName = sys.argv[0]
+    def warn(line=''):
+        sys.stderr.write("%s\n" % line)
+    def info(left, right):
+        if right.find('\n') >= 0:
+            for right in right.split('\n'):
+                sys.stderr.write("  %-28s %s\n" % (left, right))
+                left = ''
+        else:
+            sys.stderr.write("  %-28s %s\n" % (left, right))
+    warn("""\
 Usage: %s [options] [<filename, or '-' for stdin> [<argument>...]]
-Welcome to EmPy version %s.
-
-Valid options:
-  -V --version                 Print version and exit
-  -h --help                    Print usage and exit
-  -k --suppress-errors         Do not exit on errors; continue interactively
-  -p --prefix=<char>           Change prefix to something other than @
-  -f --flatten                 Flatten the members of pseudmodule to start
-  -r --raw-errors              Show raw Python errors
-  -i --interactive             Go into interactive mode after processing
-  -o --output=<filename>       Specify file for output as write
-  -a --append=<filename>       Specify file for output as append
-  -P --preprocess=<filename>   Interpret EmPy file before main processing
-  -I --import=<modules>        Import Python modules before processing
-  -D --define=<definition>     Execute Python assignment statement
-  -E --execute=<statement>     Execute Python statement before processing
-  -F --execute-file=<filename> Execute Python file before processing
-  -B --buffered-output         Fully buffer output (even open) with -o or -a
-
-The following expansions are supported (where @ is the prefix):
-  @# ... NL                    Comment; remove everything up to newline
-  @ WHITESPACE                 Remove following whitespace; line continuation
-  @\\ ESCAPE_CODE               A C-style escape sequence
-  @@                           Literal @; @ is escaped (duplicated prefix)
-  @), @], @}                   Literal close parentheses, brackets, braces
-  @( EXPRESSION )              Evaluate expression and substitute with str
-  @( TEST ? THEN )             If test is true, evaluate then
-  @( TEST ? THEN : ELSE )      If test is true, evaluate then, otherwise else
-  @( TRY $ CATCH )             Expand try expression, or catch if it raises
-  @ SIMPLE_EXPRESSION          Evaluate simple expression and substitute;
-                               e.g., @x, @x.y, @f(a, b), @l[i], etc.
-  @` EXPRESSION `              Evaluate expression and substitute with repr
-  @: EXPRESSION : DUMMY :      Evaluates to @:...:expansion:
-  @[ noop : IGNORED ]          Contained material is ignored; block comment
-  @[ if E : CODE ]             Expand code if expression is true
-  @[ while E : CODE ]          Repeatedly expand code while expression is true
-  @[ for X in S : CODE ]       Expand code for each element in sequence
-  @[ macro SIGNATURE : CODE ]  Define a function as a recallable expansion
-  @{ STATEMENTS }              Statements are executed for side effects
-  @%% KEY WHITESPACE VALUE NL   Significator form of __KEY__ = VALUE
-
-Valid escape sequences are:
-  @\\0                          NUL, null
-  @\\a                          BEL, bell
-  @\\b                          BS, backspace
-  @\\dDDD                       three-digital decimal code DDD
-  @\\e                          ESC, escape
-  @\\f                          FF, form feed
-  @\\h                          DEL, delete
-  @\\n                          LF, linefeed, newline
-  @\\oOOO                       three-digit octal code OOO
-  @\\qQQQQ                      four-digit quaternary code QQQQ
-  @\\r                          CR, carriage return
-  @\\s                          SP, space
-  @\\t                          HT, horizontal tab
-  @\\v                          VT, vertical tab
-  @\\xHH                        two-digit hexadecimal code HH
-  @\\z                          EOT, end of transmission
-  @\\^X                         control character ^X
-
-The %s pseudomodule contains the following attributes:
-  VERSION                      String representing EmPy version
-  SIGNIFICATOR_RE_STRING       Regular expression string matching significators
-  interpreter                  Currently-executing interpreter instance
-  argv                         The EmPy script name and command line arguments
-  args                         The command line arguments only
-  identify()                   Identify top context as name, line
-  setName(name)                Set the name of the current context
-  setLine(line)                Set the line number of the current context
-  clearGlobals([dict])         Reset the interpreter's globals dictionary
-  atExit(callable)             Invoke no-argument function at shutdown
-  include(file, [loc])         Include filename or file-like object
-  expand(string, [loc])        Explicitly expand string and return
-  string(data, [name], [loc])  Process string-like object
-  quote(string)                Quote prefixes in provided string and return
-  flatten([keys])              Flatten module contents into globals namespace
-  getPrefix()                  Get current prefix
-  setPrefix(char)              Set new prefix
-  stopDiverting()              Stop diverting; data now sent directly to output
-  createDiversion(name)        Create a diversion but do not divert to it
-  retrieveDiversion(name)      Retrieve the actual named diversion object
-  startDiversion(name)         Start diverting to given diversion
-  playDiversion(name)          Recall diversion and then eliminate it
-  replayDiversion(name)        Recall diversion but retain it
-  purgeDiversion(name)         Erase diversion
-  playAllDiversions()          Stop diverting and play all diversions in order
-  replayAllDiversions()        Stop diverting and replay all diversions
-  purgeAllDiversions()         Stop diverting and purge all diversions
-  getFilter()                  Get current filter
-  resetFilter()                Reset filter; no filtering
-  nullFilter()                 Install null filter
-  setFilter(filter)            Install new filter or filter chain
-  enableHooks()                Enable hooks (default)
-  disableHooks()               Disable hook invocation
-  areHooksEnabled()            Return whether or not hooks are enabled
-  getHooks(name)               Get the list of hooks with name
-  clearHooks(name)             Clear all hooks with name
-  clearAllHooks()              Clear absolutely all hooks
-  addHook(name, hook, [i])     Register hook with name (optionally insert)
-  removeHook(name, hook)       Remove hook from name
-  invokeHook(name_, ...)       Manually invoke hook with name
-  Filter                       The base class for custom filters
-  NullFilter                   A filter which never outputs anything
-  FunctionFilter               A filter which calls a function
-  StringFilter                 A filter which uses a translation mapping
-  BufferedFilter               A buffered filter (and base class)
-  SizeBufferedFilter           A filter which buffers data into fixed chunks
-  LineBufferedFilter           A filter which buffers by lines
-  MaximallyBufferedFilter      A filter which buffers everything until close
-
-The following hooks are supported:
-  at_shutdown                  Interpreter is shutting down
-  at_handle                    Exception is being handled (not thrown)
-  before_include               empy.include is starting to execute
-  after_include                empy.include is finished executing
-  before_expand                empy.expand is starting to execute
-  after_expand                 empy.expand is finished executing
-  at_quote                     empy.quote is executing
-  before_file                  A file-like object is about to be processed
-  after_file                   A file-like object is finished processing
-  before_string                A standalone string is about to be processed
-  after_string                 A standalone string is finished processing
-  at_parse                     A parsing pass is being performed
-  before_evaluate              A low-level evaluation is about to be done
-  after_evaluate               A low-level evaluation has just finished
-  before_execute               A low-level execution is about to be done
-  after_execute                A low-level execution has just finished
-  before_substitute            A @[...] substitution is about to be done
-  after_substitute             A @[...] substitution has just finished
-  before_significate           A significator is about to be processed
-  after_significate            A significator has just finished processing
-
-The following environment variables are recognized (with their command line
-equivalents shown):
-  EMPY_OPTIONS                 Specified options will be included
-  EMPY_PREFIX                  Specify the default prefix: -p <value>
-  EMPY_FLATTEN                 Flatten empy pseudomodule if defined: -f
-  EMPY_RAW                     Show raw errors if defined: -r
-  EMPY_INTERACTIVE             Enter interactive mode if defined: -i
-  EMPY_BUFFERED_OUTPUT         Fully buffered output if defined: -B
-
+Welcome to EmPy version %s.""" % (programName, __version__))
+    warn()
+    warn("Valid options:")
+    for left, right in OPTION_INFO:
+        info(left, right)
+    if verbose:
+        warn()
+        warn("The following expansions are supported:")
+        for left, right in EXPANSION_INFO:
+            info(left, right)
+        warn()
+        warn("Valid escape sequences are:")
+        for left, right in ESCAPE_INFO:
+            info(left, right)
+        warn()
+        warn("The %s pseudomodule contains the following attributes:" % \
+             INTERNAL_MODULE_NAME)
+        for left, right in PSEUDOMODULE_INFO:
+            info(left, right)
+        warn()
+        warn("The following hooks are supported:")
+        for left, right in HOOK_INFO:
+            info(left, right)
+        warn()
+        warn("The following environment variables are recognized:")
+        for left, right in ENVIRONMENT_INFO:
+            info(left, right)
+        warn()
+        warn("""\
 Notes: Whitespace immediately inside parentheses of @(...) are
 ignored.  Whitespace immediately inside braces of @{...} are ignored,
 unless ... spans multiple lines.  Use @{ ... }@ to suppress newline
 following expansion.  Simple expressions ignore trailing dots; `@x.'
 means `@(x).'.  A #! at the start of a file is treated as a @#
-comment.
-""" % (sys.argv[0], __version__, INTERNAL_MODULE_NAME))
+comment.""")
+    else:
+        warn()
+        warn("Type %s -H for more extensive help." % programName)
 
 def invoke(args):
     """Run a standalone instance of an EmPy interpeter."""
@@ -1915,13 +2038,16 @@ def invoke(args):
         _extraArguments = string.split(_extraArguments)
         args = _extraArguments + args
     # Parse the arguments.
-    pairs, remainder = getopt.getopt(args, 'Vhkp:frio:a:P:I:D:E:F:B', ['version', 'help', 'suppress-errors', 'prefix=', 'flatten', 'raw-errors', 'interactive', 'output=' 'append=', 'preprocess=', 'import=', 'define=', 'execute=', 'execute-file=', 'buffered-output'])
+    pairs, remainder = getopt.getopt(args, 'VhHkp:frio:a:P:I:D:E:F:B', ['version', 'help', 'extended-help', 'suppress-errors', 'prefix=', 'flatten', 'raw-errors', 'interactive', 'output=' 'append=', 'preprocess=', 'import=', 'define=', 'execute=', 'execute-file=', 'buffered-output'])
     for option, argument in pairs:
         if option in ('-V', '--version'):
             sys.stderr.write("%s version %s\n" % (__program__, __version__))
             return
         elif option in ('-h', '--help'):
-            usage()
+            usage(False)
+            return
+        elif option in ('-H', '--extended-help'):
+            usage(True)
             return
         elif option in ('-k', '--suppress-errors'):
             _options[EXIT_OPT] = False
