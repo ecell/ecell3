@@ -130,17 +130,6 @@ namespace libecs
 	return;
       }
 
-    // if all Variables didn't change its value more than 10%,
-    // ignore this interruption.
-
-    /*  !!! currently this is disabled
-
-    if( checkExternalError() )
-      {
-	return;
-      }
-    */
-	
     const Real aCurrentTime( getCurrentTime() );
     const Real aCallerCurrentTime( aCaller->getCurrentTime() );
 
@@ -157,30 +146,23 @@ namespace libecs
 	// of the caller, just shrink step size of this Stepper.
 	if( aNextStep <= aCallerNextStep )
 	  {
-	    //	    std::cerr << aCurrentTime << " return" << std::endl;
-
 	    return;
 	  }
-
-	//	std::cerr << aCurrentTime << " noreset" << std::endl;
 
 	
 	// If the next step of this will occur *after* the caller,
 	// reschedule this Stepper, as well as shrinking the next step size.
-	
 	//    setStepInterval( aCallerCurrentTime + ( aCallerTimeScale * 0.5 ) 
 	//		     - aCurrentTime );
       }
     else
       {
 	// reset step interval to the default
-	
-	//	std::cerr << aCurrentTime << " reset" << std::endl;
-
 	setNextStepInterval( 0.001 );
       }
       
     loadStepInterval( aCallerCurrentTime - aCurrentTime );
+
     getModel()->reschedule( this );
   }
 

@@ -112,7 +112,9 @@ namespace libecs
 		     >= getCurrentTime(),
      		     SimulationError,
      		     "Attempt to go past by Stepper [" +
-		     aStepperPtr->getID() + "].");
+		     aStepperPtr->getID() + "].  (Scheduled time = " +
+		     stringCast( aScheduledTime ) + ", current time = " 
+		     + stringCast( getCurrentTime() ) + ".)" );
 
     theScheduleQueue.changeOneKey( aStepperPtr->getSchedulerIndex(),
 				   SchedulerEvent( aScheduledTime, 

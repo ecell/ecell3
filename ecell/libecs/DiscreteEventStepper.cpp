@@ -29,6 +29,8 @@
 //
 
 #include <algorithm>
+#include <iostream>
+
 
 #include "FullID.hpp"
 #include "Model.hpp"
@@ -177,14 +179,16 @@ namespace libecs
 				      anAffectedProcess ) );
       }
 
-    StepperEventCref aTopEvent( thePriorityQueue.top() );
+    const StepperEvent aTopEvent( thePriorityQueue.top() );
     const Real aNextStepInterval( aTopEvent.getTime() - aCurrentTime );
-
     DiscreteEventProcessPtr const aNewTopProcess( aTopEvent.getProcess() );
 
     // Calculate new timescale.
-    // Some benchmark showed this doesn't affect performance.
-    theTimeScale = theTolerance * aNewTopProcess->getTimeScale();
+    // To prevent 0.0 * INF -> NaN from happening, simply set zero 
+    // if the tolerance is zero.  
+    // ( DiscreteEventProcess::getTimeScale() can return INF. )
+    theTimeScale = ( theTolerance == 0.0 ) ? 
+      0.0 : theTolerance * aNewTopProcess->getTimeScale();
 
     setStepInterval( aNextStepInterval );
   }
@@ -193,7 +197,7 @@ namespace libecs
   void DiscreteEventStepper::interrupt( StepperPtr const aCaller )
   {
     // update step intervals of all the DiscreteEventProcesses.
-    const Real aCurrentTime( aCaller->getCurrentTime() );
+    const Real aCallerCurrentTime( aCaller->getCurrentTime() );
     for( DiscreteEventProcessVector::const_iterator 
 	   i( theDiscreteEventProcessVector.begin() );
 	 i != theDiscreteEventProcessVector.end(); ++i )
@@ -206,7 +210,7 @@ namespace libecs
 
 	thePriorityQueue.
 	  changeOneKey( anDiscreteEventProcessPtr->getIndex(),
-			StepperEvent( aStepInterval + aCurrentTime,
+			StepperEvent( aStepInterval + aCallerCurrentTime,
 				      anDiscreteEventProcessPtr ) );
       }
 
@@ -215,7 +219,8 @@ namespace libecs
 
     // reschedule this Stepper to aNewStepInterval past current time of
     // the interruption caller.
-    setStepInterval( aNewTime - getCurrentTime() );
+    loadStepInterval( aNewTime - getCurrentTime() );
+
     getModel()->reschedule( this );
   }
 
