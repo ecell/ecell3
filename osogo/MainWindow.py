@@ -788,6 +788,7 @@ class MainWindow(OsogoWindow):
 
 			# creates new EntityListWindow instance
 			anEntityListWindow = EntityListWindow.EntityListWindow( self )
+			anEntityListWindow.openWindow()
 
 			# saves the instance into map
 			self.theEntityListInstanceMap[ anEntityListWindow ] = None

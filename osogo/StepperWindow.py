@@ -408,7 +408,7 @@ class StepperWindow(OsogoWindow):
 	# ---------------------------------------------------------------
 	def update( self ):
 
-		if self.getExist() == FALSE:
+		if self.exists() == FALSE:
 			return None
 
 		self['statusbar'].pop(1)

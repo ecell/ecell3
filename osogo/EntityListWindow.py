@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 from OsogoWindow import *
-from OsogoUtil import *
+from PluginInstanceSelection import *
 
 import gtk
 from ecell.ecssupport import *
@@ -24,16 +24,22 @@ class EntityListWindow(OsogoWindow):
 		aMainWindow   --   a reference to MainWindow (MainWindow)
 		"""
 
+		# calls superclass's constructor 
+		OsogoWindow.__init__( self, aMainWindow )
+
 		# initializes parameters
 		self.theSelectedFullPNList = []
 		self.thePluginManager = aMainWindow.thePluginManager
 		self.theSession = aMainWindow.theSession
 
-		# calls superclass's constructor 
-		OsogoWindow.__init__( self, aMainWindow )
+		self.thePluginInstanceSelection = None
+
+	def openWindow( self ):
 
 		# calls superclass's openWindow
 		OsogoWindow.openWindow( self )
+
+		#self.thePluginInstanceSelection = PluginInstanceSelection( self.theMainWindow, self )
 
 		# add handers
 		self.addHandlers( { 
@@ -50,8 +56,8 @@ class EntityListWindow(OsogoWindow):
 		                    'on_append_button_clicked'     : self.__openPluginInstanceSelectionWindow,\
 		                    'on_logger_button_clicked'     : self.createLogger,\
 		                    # plugin selection
-		                    'on_ok_button_plugin_selection_clicked'     : self.appendData,\
-		                    'on_cancel_button_plugin_selection_clicked'  : self.__closePluginInstanceSelectionWindow,\
+		                    #'on_ok_button_plugin_selection_clicked'     : self.appendData,\
+		                    #'on_cancel_button_plugin_selection_clicked'  : self.__closePluginInstanceSelectionWindow,\
 		                   } )
 
 		# calls initializes methods
@@ -62,13 +68,13 @@ class EntityListWindow(OsogoWindow):
 		self.__initializePopupMenu()
 
 		# --------------------------------------------
-		# initializes PluginWindowSelection
+		# initializes PluginInstanceSelection
 		# --------------------------------------------
-		self.__initializePluginInstanceSelectonWindow()
+		#self.__initializePluginInstanceSelectonWindow()
 		# at first this window should be hidden
-		self['PluginWindowSelection'].hide()
+		#self['PluginInstanceSelection'].hide()
 		# sets 'delete_event' as 'hide_event'
-		self['PluginWindowSelection'].connect("delete_event",self.deletePluginWindowSelection)
+		#self['PluginInstanceSelection'].connect("delete_event",self.deletePluginInstanceSelection)
 
 		# --------------------------------------------
 		# initializes system tree
@@ -88,16 +94,21 @@ class EntityListWindow(OsogoWindow):
 		self.theSelectedPluginInstanceList = []
 
 	def deleted( self, *arg ):
+
+		if self.thePluginInstanceSelection != None:
+			self.thePluginInstanceSelection.deleted()
+			self.thePluginInstanceSelection = None
 		self.theMainWindow.deleteEntityListWindow( self )
+
 		return FALSE
 	
 	# ====================================================================
-	def deletePluginWindowSelection( self, *arg ):
+	def deletePluginInstanceSelection( self, *arg ):
 		"""sets 'delete_event' as 'hide_event'
 		"""
 
 		# hides this window
-		self['PluginWindowSelection'].hide_all()
+		self['PluginInstanceSelection'].hide_all()
 
 		# sets 'delete_event' uneffective
 		return TRUE
@@ -236,21 +247,21 @@ class EntityListWindow(OsogoWindow):
 
 
 	# ====================================================================
-	def __initializePluginInstanceSelectonWindow( self ):
-		"""initializes PluginInstanceSelectionWindow
-		Returns None
-		"""
+	#def __initializePluginInstanceSelectonWindow( self ):
+	#	"""initializes PluginInstanceSelectionWindow
+	#	Returns None
+	#	"""
 
-		column = gtk.TreeViewColumn( 'Plugin List',
-					     gtk.CellRendererText(),
-					     text=0 )
-		self['plugin_tree'].append_column(column)
-		self.thePluginInstanceListStore=gtk.ListStore( gobject.TYPE_STRING )
-		self['plugin_tree'].get_selection().set_mode( gtk.SELECTION_MULTIPLE )
-		self['plugin_tree'].set_model( self.thePluginInstanceListStore )
-		column = gtk.TreeViewColumn( 'Plugin List',
-					     gtk.CellRendererText(),
-					     text=0 )
+	#	column = gtk.TreeViewColumn( 'Plugin List',
+	#				     gtk.CellRendererText(),
+	#				     text=0 )
+	#	self['plugin_tree'].append_column(column)
+	#	self.thePluginInstanceListStore=gtk.ListStore( gobject.TYPE_STRING )
+	#	self['plugin_tree'].get_selection().set_mode( gtk.SELECTION_MULTIPLE )
+	#	self['plugin_tree'].set_model( self.thePluginInstanceListStore )
+	#	column = gtk.TreeViewColumn( 'Plugin List',
+	#				     gtk.CellRendererText(),
+	#				     text=0 )
 
 	# ====================================================================
 	def __openPluginInstanceSelectionWindow( self, *arg ):
@@ -258,17 +269,26 @@ class EntityListWindow(OsogoWindow):
 		Returns None
 		"""
 
-		# updates list of PluginInstance
-		self.__updatePluginInstanceSelectionWindow()
+		if self.thePluginInstanceSelection != None:
+			self.thePluginInstanceSelection.present()
 
-		# displays it
-		self['PluginWindowSelection'].show_all()
-		# moves it to the top of desktop
-		self['PluginWindowSelection'].present()
+		else:
+
+			self.thePluginInstanceSelection = \
+			PluginInstanceSelection( self.theMainWindow, self )
+			self.thePluginInstanceSelection.openWindow()
+
+			# updates list of PluginInstance
+			self.thePluginInstanceSelection.update()
+
+			# displays it
+			#self['PluginInstanceSelection'].show_all()
+			# moves it to the top of desktop
+			#self['PluginInstanceSelection'].present()
 
 
 	# ====================================================================
-	def __updatePluginInstanceSelectionWindow( self ):
+	def __updatePluginInstanceSelectionWindow2( self ):
 		"""updates list of PluginInstanceSelectionWindow
 		Returns None
 		"""
@@ -284,12 +304,15 @@ class EntityListWindow(OsogoWindow):
 				self.thePluginInstanceListStore.set_data( aPluginInstanceTitle, aPluginInstanceTitle )
 
 	# ====================================================================
-	def __closePluginInstanceSelectionWindow( self, *arg ):
+	def closePluginInstanceSelectionWindow( self, *arg ):
 		"""closes PluginInstanceSelectionWindow
 		Returns None
 		"""
 
-		self['PluginWindowSelection'].hide_all()
+		if self.thePluginInstanceSelection != None:
+			#self.thePluginInstanceSelection['PluginInstanceSelection'].hide_all()
+			self.thePluginInstanceSelection.deleted()
+			self.thePluginInstanceSelection = None
 
 
 	# ====================================================================
@@ -362,10 +385,13 @@ class EntityListWindow(OsogoWindow):
 
 		# updates this window
 		OsogoWindow.update(self)
+
 		# updates property window
 		self.thePropertyWindow.update()
+
 		# update PluginInstanceSelectionWindow
-		self.__updatePluginInstanceSelectionWindow()
+		if self.thePluginInstanceSelection != None:
+			self.thePluginInstanceSelection.update()
 
 
 	# ========================================================================
@@ -462,10 +488,10 @@ class EntityListWindow(OsogoWindow):
 	# end of entity_select_func
 
 	# ========================================================================
-	def plugin_select_func(self,tree,path,iter):
-		key=self.thePluginInstanceListStore.get_value(iter,0)
-		aTitle = self.thePluginInstanceListStore.get_data( key )
-		self.theSelectedPluginInstanceList.append( aTitle )
+	#def plugin_select_func(self,tree,path,iter):
+	#	key=self.thePluginInstanceListStore.get_value(iter,0)
+	#	aTitle = self.thePluginInstanceListStore.get_data( key )
+	#	self.theSelectedPluginInstanceList.append( aTitle )
 
 
 	# ========================================================================
@@ -495,6 +521,14 @@ class EntityListWindow(OsogoWindow):
 			raise TypeErrir("%s must be gtk.MenuItem or gtk.Button" %str(type(obj[0])))
 
 		aSelectedRawFullPNList = self.__getSelectedRawFullPNList()
+
+		# When no FullPN is selected, displays error message.
+		if aSelectedRawFullPNList  == None or len( aSelectedRawFullPNList ) == 0:
+
+			aMessage = 'No entity is selected.'
+			aDialog = ConfirmWindow(OK_MODE,aMessage,'Error!')
+			self.thePropertyWindow.showMessageOnStatusBar(aMessage)
+			return FALSE
 
 		self.thePropertyWindow.setRawFullPNList( aSelectedRawFullPNList )
 		self.thePluginManager.createInstance( aPluginWindowType, self.thePropertyWindow.theFullPNList() )
@@ -557,13 +591,13 @@ class EntityListWindow(OsogoWindow):
 		elif type( obj[0] ) == gtk.Button:
 
 			self.theSelectedPluginInstanceList = []
-			selection=self['plugin_tree'].get_selection()
-			selection.selected_foreach(self.plugin_select_func)
+			selection=self.thePluginInstanceSelection['plugin_tree'].get_selection()
+			selection.selected_foreach(self.thePluginInstanceSelection.plugin_select_func)
 
 			# When no FullPN is selected, displays error message.
-			if len( self.__getSelectedRawFullPNList() ) == 0:
+			if self.__getSelectedRawFullPNList() == None or len( self.__getSelectedRawFullPNList() ) == 0:
+
 				aMessage = 'No entity is selected.'
-				#self.theMainWindow.printMessage(aMessage)
 				aDialog = ConfirmWindow(OK_MODE,aMessage,'Error!')
 				self.thePropertyWindow.showMessageOnStatusBar(aMessage)
 				return FALSE
@@ -572,7 +606,6 @@ class EntityListWindow(OsogoWindow):
 			if len(self.theSelectedPluginInstanceList) == 0:
 
 				aMessage = 'No Plugin Instance is selected.'
-				#self.theMainWindow.printMessage(aMessage)
 				aDialog = ConfirmWindow(OK_MODE,aMessage,'Error!')
 				self.thePropertyWindow.showMessageOnStatusBar(aMessage)
 				return FALSE
@@ -604,7 +637,8 @@ class EntityListWindow(OsogoWindow):
 				self.thePropertyWindow.showMessageOnStatusBar(aMessage)
 
 				# closes PluginInstanceSelectionWindow
-				self.__closePluginInstanceSelectionWindow()
+				#self.__closePluginInstanceSelectionWindow()
+				self.closePluginInstanceSelectionWindow()
 				return TRUE
 
 			# When no instance is appended
@@ -740,8 +774,12 @@ class EntityListWindow(OsogoWindow):
 			aMessage = 'Loggers were created.'
 		self.thePropertyWindow.showMessageOnStatusBar(aMessage)
 
+
 	# ========================================================================
 	def selectPropertyName( self, aCList, row, column, event_obj ):
+		"""selects property name
+		Returns None
+		"""
 
 		self.theSelectedFullPNList = []
 		for aRowNumber in aCList.selection:
@@ -751,5 +789,4 @@ class EntityListWindow(OsogoWindow):
 			self.theSelectedFullPNList.append( aFullPN )
 
 	# end of createLogger
-
 
