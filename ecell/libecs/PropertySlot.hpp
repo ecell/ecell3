@@ -54,9 +54,9 @@ namespace libecs
   template< typename FromType, typename ToType >
   ToType convertTo( const FromType& aValue, Type2Type<ToType> )
   {
-    //    DefaultSpecializationInhibited();
-#warning "unexpected default specialization of convertTo()"
-    return ToType( aValue );
+    DefaultSpecializationInhibited();
+    //#warning "unexpected default specialization of convertTo()"
+    //    return ToType( aValue );
   }
 
 
@@ -291,8 +291,9 @@ namespace libecs
 
     DECLARE_TYPE( SlotType_, SlotType );
 
-    typedef const SlotType GetType;
-    typedef SlotTypeCref SetType;
+    //???
+    typedef const SlotType, GetType;
+    typedef SlotTypeCref, SetType;
 
     typedef GetType ( T::* GetMethodPtr )() const;
     typedef void ( T::* SetMethodPtr )( SlotTypeCref );
