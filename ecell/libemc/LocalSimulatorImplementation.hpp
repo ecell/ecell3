@@ -13,18 +13,18 @@ class LocalSimulatorImplementation
 public:
 
   LocalSimulatorImplementation();
-  ~LocalSimulatorImplementation() {}
+  virtual ~LocalSimulatorImplementation() {}
 
   RootSystemPtr getRootSystemPtr() { return theRootSystem; }
 
   void makePrimitive( StringCref classname, 
-		      FQPICref fqpn, 
+		      FQPICref fqpi, 
 		      StringCref name );
 
-  void sendMessage( FQPICref fqpn, 
+  void sendMessage( FQPICref fqpi, 
 		    MessageCref message);
 
-  Message getMessage( FQPICref fqpn, StringCref propertyName );
+  Message getMessage( FQPICref fqpi, StringCref propertyName );
 
   void step();
 

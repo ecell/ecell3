@@ -1,3 +1,5 @@
+#include "LocalSimulatorImplementation.cpp"
+
 #include "Simulator.hpp"
 
 Simulator::Simulator()

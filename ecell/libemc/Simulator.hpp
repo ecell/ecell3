@@ -2,44 +2,49 @@
 #define ___SIMULATOR_H___
 
 #include "libecs/libecs.hpp"
+#include "util/Message.hpp"
 
-#include "LocalSimulatorImplementation.hpp"
+#include "SimulatorImplementation.hpp"
 
 
 class Simulator
 {
 
-  SimulatorImplementation* theSimulatorImplementation;
-
 public:
 
   Simulator();
-  ~Simulator() {}
+  virtual ~Simulator() {}
 
   void makePrimitive( StringCref classname, 
-		      FQPICref fqpn,
+		      FQPICref fqpi,
 		      StringCref name )
   {
-    theSimulatorImplementation->makePrimitive( classname, fqpn, name );
+    theSimulatorImplementation->makePrimitive( classname, fqpi, name );
   }
 
-  void sendMessage( FQPICref fqpn, 
+  void sendMessage( FQPICref fqpi, 
 		    MessageCref message )
   {
-    theSimulatorImplementation->sendMessage( fqpn, message );
+    theSimulatorImplementation->sendMessage( fqpi, message );
   }
 
 
-  Message getMessage( FQPICref fqpn, 
+  Message getMessage( FQPICref fqpi, 
 		      StringCref propertyName )
   {
-    theSimulatorImplementation->getMessage( fqpn, propertyName ); 
+    return theSimulatorImplementation->getMessage( fqpi, propertyName ); 
   }
 
   void step()
   {
     theSimulatorImplementation->step();
   }
+
+
+private:
+
+  SimulatorImplementation* theSimulatorImplementation;
+
 };
 
 #endif   /* ___SIMULATOR_H___ */

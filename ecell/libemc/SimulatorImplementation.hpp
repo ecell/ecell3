@@ -21,13 +21,13 @@ public:
   virtual RootSystemPtr getRootSystemPtr() = 0;
 
   virtual void makePrimitive( StringCref classname, 
-			      FQPICref fqpn, 
+			      FQPICref fqpi, 
 			      StringCref name ) = 0;
 
-  virtual void sendMessage( FQPICref fqpn, 
+  virtual void sendMessage( FQPICref fqpi, 
 			    MessageCref message ) = 0;
 
-  virtual Message getMessage( FQPICref fqpn, 
+  virtual Message getMessage( FQPICref fqpi, 
 			      StringCref propertyName ) = 0;
   virtual void step() = 0;
 

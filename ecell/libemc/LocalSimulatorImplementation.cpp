@@ -3,30 +3,30 @@
 
 #include "LocalSimulatorImplementation.hpp"
 
-RootSystem* theRootSystem = new RootSystem();
-
 LocalSimulatorImplementation::LocalSimulatorImplementation()
 {
+  ; // do nothing
 }
 
 void LocalSimulatorImplementation::makePrimitive( StringCref classname,
-						  FQPICref fqpn, 
+						  FQPICref fqpi, 
 						  StringCref name )
 {
   cerr << classname << endl;
-  cerr << fqpn.getString() << endl;
+  cerr << fqpi.getString() << endl;
   cerr << name << endl;
 
 }
 
-void LocalSimulatorImplementation::sendMessage( FQPICref fqpn, 
+void LocalSimulatorImplementation::sendMessage( FQPICref fqpi, 
 						MessageCref message)
 {
+  cerr << fqpi.getString() << endl;
   cerr << message.getKeyword() << endl;
 }
 
 
-Message LocalSimulatorImplementation::getMessage( FQPICref fqpn,
+Message LocalSimulatorImplementation::getMessage( FQPICref fqpi,
 						  StringCref propertyName )
 {
   return Message( propertyName, "empty" );
