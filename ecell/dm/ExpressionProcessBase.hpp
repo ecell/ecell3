@@ -419,8 +419,9 @@ const Real ExpressionProcessBase::VirtualMachine::execute( CodeCref aCode )
 	    // no need to do invalid instruction check here because
 	    // it will be done in the next cycle.
 
-	    ++aStackPtr;
-	    aStackPtr->theReal = bypass;
+            ++aStackPtr;
+            aStackPtr->theReal = bypass;
+
 	    break;
 	  }
 	}

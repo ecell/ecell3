@@ -23,10 +23,7 @@ DECLARE_CLASS( GillespieProcess );
 LIBECS_DM_CLASS( GillespieProcess, DiscreteEventProcess )
 {
   
-  typedef const Real (GillespieProcess::* RealMethodPtr)() const;
-
   typedef MethodProxy<GillespieProcess,Real> RealMethodProxy;
-  //  typedef const Real (*NewRealMethodPtr)(const GillespieProcess*);
   
  public:
   
@@ -45,10 +42,10 @@ LIBECS_DM_CLASS( GillespieProcess, DiscreteEventProcess )
     :
     theOrder( 0 ),
     k( 0.0 ),
-    //    theGetPropensity_RMethodPtr( &GillespieProcess::getInf ),
     theGetPropensity_RMethodPtr( RealMethodProxy::
 				 create<&GillespieProcess::getInf>() ),
-    theGetMinValueMethodPtr( &GillespieProcess::getZero )
+    theGetMinValueMethodPtr( RealMethodProxy::
+			     create<&GillespieProcess::getZero>() )
     {
       ; // do nothing
     }
@@ -69,7 +66,6 @@ LIBECS_DM_CLASS( GillespieProcess, DiscreteEventProcess )
 
   GET_METHOD( Real, Propensity_R )
   {
-    //    return ( this->*theGetPropensity_RMethodPtr )();
     return theGetPropensity_RMethodPtr( this );
   }
 
@@ -83,7 +79,7 @@ LIBECS_DM_CLASS( GillespieProcess, DiscreteEventProcess )
 
   virtual GET_METHOD( Real, TimeScale )
   {
-    return ( this->*theGetMinValueMethodPtr )() * getStepInterval();
+    return theGetMinValueMethodPtr( this ) * getStepInterval();
   }
 
 
@@ -95,7 +91,6 @@ LIBECS_DM_CLASS( GillespieProcess, DiscreteEventProcess )
 
 
   void calculateOrder();
-
 
   virtual void initialize();
 
@@ -133,8 +128,7 @@ protected:
 
   const Real getPropensity_R_FirstOrder() const
   {
-    const Real 
-      aMultiplicity( theVariableReferenceVector[0].getValue() );
+    const Real aMultiplicity( theVariableReferenceVector[0].getValue() );
 
     if( aMultiplicity > 0.0 )
       {
@@ -150,9 +144,8 @@ protected:
 
   const Real getPropensity_R_SecondOrder_TwoSubstrates() const
   {
-    const Real 
-      aMultiplicity( theVariableReferenceVector[0].getValue() *
-		     theVariableReferenceVector[1].getValue() );
+    const Real aMultiplicity( theVariableReferenceVector[0].getValue() *
+			      theVariableReferenceVector[1].getValue() );
 
     if( aMultiplicity > 0.0 )
       {
@@ -212,7 +205,7 @@ protected:
 
   RealMethodProxy theGetPropensity_RMethodPtr;
   
-  RealMethodPtr theGetMinValueMethodPtr;
+  RealMethodProxy theGetMinValueMethodPtr;
 
 };
 
