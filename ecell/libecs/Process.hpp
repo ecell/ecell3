@@ -82,6 +82,8 @@ namespace libecs
 	PROPERTYSLOT_SET_GET( String,    StepperID );
 
 	PROPERTYSLOT_SET_GET_NO_LOAD_SAVE( Real,     Activity );
+	PROPERTYSLOT_GET_NO_LOAD_SAVE( Real,     MolarActivity );
+
 	PROPERTYSLOT_GET_NO_LOAD_SAVE(     Integer,      IsContinuous );
       }
 
@@ -192,6 +194,11 @@ namespace libecs
     GET_METHOD( Polymorph, VariableReferenceList );
     SAVE_METHOD( Polymorph, VariableReferenceList );
 
+
+    GET_METHOD( Real, MolarActivity )
+    {
+      return theActivity / ( getSuperSystem()->getSize() * N_A );
+    }
 
 
     /**
