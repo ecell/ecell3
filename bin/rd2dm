@@ -6,6 +6,7 @@
 
 
 #TO-DOS, in order of importance, as of 09/30/02
+#-Improve assignment of anOutputfilename
 #-Reactor -> Process
 #-Substance -> Variable
 #-Reactant -> Connection -> VariableReference
@@ -13,8 +14,6 @@
 #-Stoichiometry -> coefficient
 #-react -> process
 #-FluxProcess::process( Real ) -> setFlux( Real )
-
-#-Make this program comment out "#" in 'react'
 #-Make this program allow multi-line 'DESCRIPTION' values
 #-Make this program allow multi-line 'BRIEF_DESCRIPTION' values
 #-Make this program support *.rd syntax (will be supported by shell?)
@@ -317,38 +316,38 @@ aNumberOfEffector = string.count(anEditedTextDictionary['REACT'], 'effector(')
 
 aProtectedAuxIndex = 0
 while aProtectedAuxIndex < aNumberOfSubstrate:
-	anEditedTextDictionary['PROTECTED_AUX'] = anEditedTextDictionary['PROTECTED_AUX'] + '\n' + '  ' + 'Connection S' + str(aProtectedAuxIndex) + ';'
+	anEditedTextDictionary['PROTECTED_AUX'] = anEditedTextDictionary['PROTECTED_AUX'] + '\n' + '  ' + 'VariableReference S' + str(aProtectedAuxIndex) + ';'
 	aProtectedAuxIndex = aProtectedAuxIndex + 1
 aProtectedAuxIndex = 0
 while aProtectedAuxIndex < aNumberOfProduct:
-	anEditedTextDictionary['PROTECTED_AUX'] = anEditedTextDictionary['PROTECTED_AUX'] + '\n' + '  ' + 'Connection P' + str(aProtectedAuxIndex) + ';'
+	anEditedTextDictionary['PROTECTED_AUX'] = anEditedTextDictionary['PROTECTED_AUX'] + '\n' + '  ' + 'VariableReference P' + str(aProtectedAuxIndex) + ';'
 	aProtectedAuxIndex = aProtectedAuxIndex + 1
 aProtectedAuxIndex = 0
 while aProtectedAuxIndex < aNumberOfCatalyst:
-	anEditedTextDictionary['PROTECTED_AUX'] = anEditedTextDictionary['PROTECTED_AUX'] + '\n' + '  ' + 'Connection C' + str(aProtectedAuxIndex) + ';'
+	anEditedTextDictionary['PROTECTED_AUX'] = anEditedTextDictionary['PROTECTED_AUX'] + '\n' + '  ' + 'VariableReference C' + str(aProtectedAuxIndex) + ';'
 	aProtectedAuxIndex = aProtectedAuxIndex + 1
 aProtectedAuxIndex = 0
 while aProtectedAuxIndex < aNumberOfEffector:
-	anEditedTextDictionary['PROTECTED_AUX'] = anEditedTextDictionary['PROTECTED_AUX'] + '\n' + '  ' + 'Connection E' + str(aProtectedAuxIndex) + ';'	
+	anEditedTextDictionary['PROTECTED_AUX'] = anEditedTextDictionary['PROTECTED_AUX'] + '\n' + '  ' + 'VariableReference E' + str(aProtectedAuxIndex) + ';'	
 	aProtectedAuxIndex = aProtectedAuxIndex + 1
 
 ###INITIALIZE
 
 anInitializeIndex = 0
 while anInitializeIndex < aNumberOfSubstrate:
-	anEditedTextDictionary['INITIALIZE'] = anEditedTextDictionary['INITIALIZE'] + '  S' + str(anInitializeIndex) + ' = getConnection( "S' + str(anInitializeIndex) + '" );\n'
+	anEditedTextDictionary['INITIALIZE'] = anEditedTextDictionary['INITIALIZE'] + '  S' + str(anInitializeIndex) + ' = getVariableReference( "S' + str(anInitializeIndex) + '" );\n'
 	anInitializeIndex = anInitializeIndex + 1
 anInitializeIndex = 0
 while anInitializeIndex < aNumberOfProduct:
-	anEditedTextDictionary['INITIALIZE'] = anEditedTextDictionary['INITIALIZE'] + '  P' + str(anInitializeIndex) + ' = getConnection( "P' + str(anInitializeIndex) + '" );\n'
+	anEditedTextDictionary['INITIALIZE'] = anEditedTextDictionary['INITIALIZE'] + '  P' + str(anInitializeIndex) + ' = getVariableReference( "P' + str(anInitializeIndex) + '" );\n'
 	anInitializeIndex = anInitializeIndex + 1
 anInitializeIndex = 0
 while anInitializeIndex < aNumberOfCatalyst:
-	anEditedTextDictionary['INITIALIZE'] = anEditedTextDictionary['INITIALIZE'] + '  C' + str(anInitializeIndex) + ' = getConnection( "C' + str(anInitializeIndex) + '" );\n'
+	anEditedTextDictionary['INITIALIZE'] = anEditedTextDictionary['INITIALIZE'] + '  C' + str(anInitializeIndex) + ' = getVariableReference( "C' + str(anInitializeIndex) + '" );\n'
 	anInitializeIndex = anInitializeIndex + 1
 anInitializeIndex = 0
 while anInitializeIndex < aNumberOfEffector:
-	anEditedTextDictionary['INITIALIZE'] = anEditedTextDictionary['INITIALIZE'] + '  E' + str(anInitializeIndex) + ' = getConnection( "E' + str(anInitializeIndex) + '" );\n'
+	anEditedTextDictionary['INITIALIZE'] = anEditedTextDictionary['INITIALIZE'] + '  E' + str(anInitializeIndex) + ' = getVariableReference( "E' + str(anInitializeIndex) + '" );\n'
 	anInitializeIndex = anInitializeIndex + 1
 	
 ###REACT
