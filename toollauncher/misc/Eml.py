@@ -8,6 +8,7 @@ import string
 import traceback
 import sys
 import re
+import tempfile
 from Preferences import *
 
 ERROR_MSG1 = "\" already exists. Please enter the appropriate name of the file."
@@ -96,7 +97,7 @@ class Eml:
 			else:
 				cmdstr = 'python '+'\"'+programPath+'\" -o \"'+file1+'\" \"'+file2+'\"'
 
-				TMPDIR = os.path.dirname( os.tempnam() )
+		                TMPDIR = tempfile.gettempdir()
 				self.theToolLauncher.execute( cmdstr+" > " + TMPDIR + os.sep + "eml.log 2> " + TMPDIR + os.sep + "emlError.log" )
 				return "0"
 
@@ -151,7 +152,7 @@ class Eml:
 	# ==========================================================================
 	def checkCompile( self, file1, file2 ):
 
-		TMPDIR = os.path.dirname( os.tempnam() )
+                TMPDIR = tempfile.gettempdir()
 		logfile = open( TMPDIR + os.sep + 'eml.log','r' )
 		logdata = logfile.read()
 		logfile.close()

@@ -9,6 +9,7 @@ import os
 import os.path
 import string
 import re
+import tempfile
 from Preferences import *
 
 MSG_IMPUT_PROGRAM_PATH      = "Please specify the program path on the preference window."
@@ -90,7 +91,7 @@ class CompileCpp:
 		else:
 			os.chdir( self.theToolLauncher.thePref['model_path'] )
 
-		TMPDIR = os.path.dirname( os.tempnam() )
+		TMPDIR = tempfile.gettempdir()
 		os.system( cmd+" 2> " + TMPDIR + os.sep + "error.log > " + TMPDIR + os.sep + "cpp.log" )
 		errorMsg = self.checkLog( )
 
@@ -113,7 +114,7 @@ class CompileCpp:
 	# ==========================================================================
 	def checkLog( self ):
 
-		TMPDIR = os.path.dirname( os.tempnam() )
+		TMPDIR = tempfile.gettempdir()
 		logdata = self.readSystemOut( TMPDIR + os.sep + "cpp.log" )
 		errorMsg = re.search( 'Error', logdata )
 
