@@ -47,7 +47,7 @@ class MainWindow(Window):
               }
         self.addHandlers( self.theHandlerMap )
 
-        self.thePluginManager = PluginManager()
+        self.thePluginManager = PluginManager( self )
 
         self.theCurrentTime = 0
 
@@ -116,10 +116,11 @@ class MainWindow(Window):
         self.printMessage( 'this function STOP is not supported.\n' )
 
     def stepSimulation( self, a ) : 
-        self.theCurrentTime += 1.0
+        self.theCurrentTime += 1
         self.printMessage( "step " )
         self.printMessage( str( self.theCurrentTime ) )
-
+        self.printMessage( "\n" )
+        
     def createNewEntryList( self, button_obj ) :
         aEntryList = EntryListWindow.EntryListWindow( self )
     

@@ -37,9 +37,10 @@ class PluginModule:
 
 class PluginManager:
 
-    def __init__( self ):
+    def __init__( self, aMainWindow ):
         self.thePluginMap = {}
         self.theInstanceList = []
+        self.theMainWindow = aMainWindow
 
     def createInstance( self, classname, sim, data, parent=None ):
         try:
@@ -52,6 +53,9 @@ class PluginManager:
         self.appendInstance( anInstance )
 
         return anInstance
+
+    def printMessage( self, aMessageString ):
+        self.theMainWindow.printMessage( aMessageString )
 
     def updateAllPluginWindow( self ):
         for anInstance in self.theInstanceList:
