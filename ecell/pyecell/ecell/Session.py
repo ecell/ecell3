@@ -53,12 +53,12 @@ class Session:
 
 
     def loadModel( self, aFileObject ):
-        self.__theEml = eml.Eml( aFileObject )
+        self.theEml = eml.Eml( aFileObject )
 
-        self.loadStepper()
-        self.loadEntity()
-        self.loadStepperProperty()
-        self.loadProperty()
+        self.__loadStepper()
+        self.__loadEntity()
+        self.__loadStepperProperty()
+        self.__loadProperty()
 
         
     def saveModel( self ):
@@ -74,10 +74,10 @@ class Session:
 
 
 
-    def loadStepper( self ):
+    def __loadStepper( self ):
         """stepper loader"""
 
-        aStepperList = self.__theEml.getStepperList()
+        aStepperList = self.theEml.getStepperList()
 
         for aStepper in aStepperList:
 
@@ -99,9 +99,9 @@ class Session:
 
 
 
-    def loadEntity( self ):
+    def __loadEntity( self ):
 
-        anEntityList = self.__theEml.getEntityList()
+        anEntityList = self.theEml.getEntityList()
 
         for anEntity in anEntityList:
 
@@ -117,8 +117,8 @@ class Session:
 
 
 
-    def loadStepperProperty( self ):
-        aStepperPropertyList = self.__theEml.getStepperPropertyList()
+    def __loadStepperProperty( self ):
+        aStepperPropertyList = self.theEml.getStepperPropertyList()
         
         for aStepperProperty in aStepperPropertyList:
 
@@ -133,8 +133,8 @@ class Session:
             
 
 
-    def loadProperty( self ):
-        aPropertyList = self.__theEml.getPropertyList()
+    def __loadProperty( self ):
+        aPropertyList = self.theEml.getPropertyList()
         
         for aProperty in aPropertyList:
 
