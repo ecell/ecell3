@@ -51,14 +51,14 @@ class Window:
 	"""
 
 	# ==============================================================
-	def __init__( self, aGladeFile=None, aRoot=None ):
+	def __init__( self, gladeFile=None, rootWidget=None ):
 		"""Constructor
-		aGladeFile  --  a glade file name (str:absolute path/relative path)
-		aRoot       --  a root property (str)
+		gladeFile  --  a glade file name (str:absolute path/relative path)
+		rootWidget --  a root widget (str or None)
 		"""
 
-		self.theGladeFile = aGladeFile   # glade file name
-		self.theRoot = aRoot             # a root property
+		self.gladeFile = gladeFile   # glade file name
+		self.rootWidget = rootWidget        # a root property
 		self.widgets = None              # widgets instance
 
 		# Default title is classname of this class.
@@ -77,32 +77,32 @@ class Window:
 		# ------------------------------------------------
 		# loads GLADEFILE_PATH/CLASSNAME.glade by default
 		# ------------------------------------------------
-		if self.theGladeFile == None:
-			self.theGladeFile = GLADEFILE_PATH
-			self.theGladeFile += os.sep + self.__class__.__name__ + ".glade"
+		if self.gladeFile == None:
+			self.gladeFile = GLADEFILE_PATH
+			self.gladeFile += os.sep + self.__class__.__name__ + ".glade"
 		else:
 
 			# ------------------------------------------------
 			# When abusolute path
 			# ------------------------------------------------
-			if os.path.isabs( self.theGladeFile ) :
+			if os.path.isabs( self.gladeFile ) :
 				pass
 			# ------------------------------------------------
 			# When relative path
 			# ------------------------------------------------
 			else:
-				self.theGladeFile = GLADEFILE_PATH + os.sep + self.theGladeFile
+				self.gladeFile = GLADEFILE_PATH + os.sep + self.gladeFile
 
 		# ------------------------------------------------
 		# checks and loads glade file
 		# ------------------------------------------------
-		if os.access( os.path.join( GLADEFILE_PATH, self.theGladeFile ), os.R_OK ):
-			if self.theRoot != None:
-				self.widgets = gtk.glade.XML( self.theGladeFile, root=self.theRoot )
+		if os.access( os.path.join( GLADEFILE_PATH, self.gladeFile ), os.R_OK ):
+			if self.rootWidget != None:
+				self.widgets = gtk.glade.XML( self.gladeFile, root= str( self.rootWidget ) )
 			else:
-				self.widgets = gtk.glade.XML( self.theGladeFile, root=None )
+				self.widgets = gtk.glade.XML( self.gladeFile, root= None )
 		else:
-			raise IOError( "can't read %s." %self.theGladeFile )
+			raise IOError( "can't read %s." %self.gladeFile )
 		
 
 	# ==============================================================
@@ -192,10 +192,10 @@ class Window:
 		"""Returns a Parent Window (Window)   # Not gtk.Window
 		"""
 
-		if self.theRoot == None:
+		if self.rootWidget == None:
 			return self
 		else:
-			return self.__getParent( self.theRoot )
+			return self.__getParent( self.rootWidget )
 
 
 	# ==============================================================
@@ -203,10 +203,10 @@ class Window:
 		"""Returns a Parent Window (Window)   # Not gtk.Window
 		"""
 
-		if arg[0].theRoot == None:
+		if arg[0].rootWidget == None:
 			return arg[0]
 		else:
-			return arg[0].__getParent( self.theRoot )
+			return arg[0].__getParent( self.rootWidget )
 
 
 	# ==============================================================

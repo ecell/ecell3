@@ -53,25 +53,23 @@ class OsogoWindow(Window):
 	- is iconized when 'delede_event' is catched.
 	"""
 
-	# ========================================================================
-	def __init__( self, aSession = None, aGladeFile=None ):
+	def __init__( self, session = None, gladeFile=None, rootWidget=None ):
 		"""constructor
 		aSession  -- a reference to Session (Session)
 		aGladeFile   -- a glade file name (str)
 		"""
 
 		# calls superclass's constructor
-		Window.__init__( self, aGladeFile, aRoot=None )
+		Window.__init__( self, gladeFile, rootWidget=rootWidget )
 
 		# saves a reference to Session
-		self.theSession = aSession
+		self.theSession = session
 
 		# initializes exist flag
 		self.__theExist = False
 
 
 
-	# ========================================================================
 	def exists( self ):
 		"""Returns TRUE:When glade file is loaded and does not deleted.
 		        FALSE:When glade file is not loaded yet or already deleted.
@@ -81,7 +79,6 @@ class OsogoWindow(Window):
 
 
 
-	# ========================================================================
 	def present( self ):
 		"""moves this window to the top of desktop.
 		When glade file is not loaded yet or already deleted, does nothing.
@@ -95,7 +92,6 @@ class OsogoWindow(Window):
 
 			self[self.__class__.__name__].present()
 
-	# ========================================================================
 	def iconify( self ):
 		"""moves this window to the taskbar.
 		When glade file is not loaded yet or already deleted, does nothing.
@@ -109,7 +105,6 @@ class OsogoWindow(Window):
 
 			self[self.__class__.__name__].iconify()
 
-	# ========================================================================
 	def move( self, xpos, ypos ):
 		"""moves this window on the desktop to (xpos,ypos).
 		When glade file is not loaded yet or already deleted, does nothing.
@@ -123,7 +118,6 @@ class OsogoWindow(Window):
 
 			self[self.__class__.__name__].move( xpos, ypos)
 
-	# ========================================================================
 	def resize( self, width, heigth ):
 		"""resizes this window according to width and heigth.
 		When glade file is not loaded yet or already deleted, does nothing.
@@ -137,7 +131,6 @@ class OsogoWindow(Window):
 
 			self[self.__class__.__name__].resize( width, heigth)
 
-	# ========================================================================
 	def deleted( self, *arg ):
 		""" When 'delete_event' signal is chatcked( for example, [X] button is clicked ),
 		iconize this window.
@@ -162,7 +155,6 @@ class OsogoWindow(Window):
 
 
 
-	# ========================================================================
 	def openWindow( self ):
 		"""overwrite super class's method
 		When glade file is not loaded yet or already deleted, calls superclass's
@@ -185,7 +177,6 @@ class OsogoWindow(Window):
 
 
 
-	# ========================================================================
 	def update( self ):
 		"""
 		Returns None
@@ -193,7 +184,6 @@ class OsogoWindow(Window):
 
 		pass
 
-	# ========================================================================
 	def close ( self ):
 		""" destroys Widgets and sets __theExist FALSE """
 		if self.exists():
@@ -202,6 +192,6 @@ class OsogoWindow(Window):
 			self.widgets = None
 			self.theSession.updateFundamentalWindows()
 
-# end of OsogoWindow
+
 
 

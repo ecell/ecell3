@@ -28,10 +28,10 @@ class TracerWindow( OsogoPluginWindow ):
 
 
 
-	def __init__( self, dirname, data, pluginmanager, root=None ):
+	def __init__( self, dirname, data, pluginmanager, rootWidget=None ):
 		#initializa variables:
 		#initiates OsogoPluginWindow
-		OsogoPluginWindow.__init__( self, dirname, data, pluginmanager, root )
+		OsogoPluginWindow.__init__( self, dirname, data, pluginmanager, rootWidget )
 		self.thePluginManager=pluginmanager
 		self.displayedFullPNStringList=[]		
 		self.theLoggerMap={}

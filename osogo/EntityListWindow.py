@@ -263,12 +263,11 @@ class EntityListWindow(OsogoWindow):
 	# ====================================================================
 	def __initializePropertyWindow( self ):
 
-		self.thePropertyWindow = \
-		self.thePluginManager.\
-		createInstance( 'PropertyWindow',\
-				[(SYSTEM, '', '/', '')],\
-				root = 'top_frame',\
-				parent = self ) 
+		self.thePropertyWindow= \
+		self.thePluginManager.createInstance( 'PropertyWindow',\
+						      [(SYSTEM, '', '/', '')],\
+						      rootWidget= 'top_frame',\
+						      parent= self ) 
 		self.thePropertyWindow.setStatusBar( self['statusbar'] )
 
 		aPropertyWindowTopVBox = self.thePropertyWindow['top_frame']

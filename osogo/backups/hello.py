@@ -9,8 +9,8 @@ import libglade
 
 class Window:
 
-    def __init__( self, gladefile=None, root=None ):
-        self.widgets = libglade.GladeXML( filename=gladefile, root=root )
+    def __init__( self, gladefile=None, rootWidget=None ):
+        self.widgets = libglade.GladeXML( filename=gladefile, rootWidget=root )
 
     def addHandlers( self, handlers ):
         self.widgets.signal_autoconnect( handlers )

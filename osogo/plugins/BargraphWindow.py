@@ -13,11 +13,11 @@ from OsogoPluginWindow import *
 
 class BargraphWindow( OsogoPluginWindow ):
 
-	def __init__( self, dirname, data, pluginmanager, root=None ):
+	def __init__( self, dirname, data, pluginmanager, rootWidget=None ):
 		#initializa variables:
 		#initiates window
 		OsogoPluginWindow.__init__(self, dirname, data, pluginmanager,\
-		    				root)
+					   rootWidget )
 		self.theSession=pluginmanager.theSession
 		self.BAR_WIDTH=150
 		self.BAR_HEIGTH=20
@@ -37,7 +37,7 @@ class BargraphWindow( OsogoPluginWindow ):
 		#self.openWindow()
 		#this should be removed:
 		#self.root = self[self.__class__.__name__]
-		#root=self.getWidget('BargraphWindow')
+		#rootWidget=self.getWidget('BargraphWindow')
 		#gets HandleBox
 		self.handlebox=self.getWidget('handlebox1')
 		self.drawingarea=self.getWidget('drawingarea1')
@@ -175,7 +175,7 @@ class BargraphWindow( OsogoPluginWindow ):
 		self.BAR_HEIGTH=new_heigth
 #		self.drawingarea.set_size_request(self.BAR_WIDTH,self.BAR_HEIGTH)
 #		del self.pm
-		#root=self.getWidget('BargraphWindow')
+		#rootWidget=self.getWidget('BargraphWindow')
 		aRootWindow=self.getParent()
 		root = aRootWindow[aRootWindow.__class__.__name__]
 		#self.pm=gtk.gdk.Pixmap(self.root.window,self.BAR_WIDTH,self.BAR_HEIGTH,-1)

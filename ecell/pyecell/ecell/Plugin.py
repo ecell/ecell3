@@ -84,17 +84,16 @@ class PluginModule:
 	# createInstance
 	# Creates instance of module
 	#
-	# aData          : module name
-	# aPluginManager : plugin namager
-	# aRoot          : None or 'menu'
-	# aParent        : parent window
+	# data          : module name
+	# pluginManager : plugin namager
+	# root          : None or 'menu'
 	# return -> the result of apply function
 	# This method is throwable exception.
 	# ---------------------------------------------------------------
-	def createInstance( self, aData, aPluginManager, aRoot=None ):
+	def createInstance( self, data, pluginManager, rootWidget=None ):
 
 		aConstructor = self.theModule.__dict__[self.theName]
-		anArgumentTuple = ( self.theDirectoryName,  aData, aPluginManager, aRoot )
+		anArgumentTuple = ( self.theDirectoryName,  data, pluginManager, rootWidget )
 		return apply( aConstructor, anArgumentTuple )
 	
 	# end of createInstance
@@ -124,14 +123,14 @@ class PluginManager:
 	# ---------------------------------------------------------------
 	# Creates instance of module
 	#
-	# aClassName     : class name
-	# aData          : data 
-	# aRoot          : None or 'menu' or 'top_vbox'
-	# aParent        : parent window
+	# classname     : class name
+	# data          : data 
+	# rootWidget    : None or the name of the root Widget
+	# parent        : parent window
 	# return -> one instance
 	# This method is throwable exception.
 	# ---------------------------------------------------------------
-	def createInstance( self, classname, data, root=None, parent=None ):
+	def createInstance( self, classname, data, rootWidget=None, parent=None ):
 	
 		try:
 			aPlugin = self.thePluginMap[ classname ]
@@ -139,7 +138,7 @@ class PluginManager:
 		except KeyError:
 			self.loadModule( classname )
 
-		anInstance = aPlugin.createInstance( data, self, root, parent )
+		anInstance = aPlugin.createInstance( data, self, rootWidget, parent )
 		return anInstance
 
 	# end of createInstance

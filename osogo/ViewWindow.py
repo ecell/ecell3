@@ -10,7 +10,7 @@ class ViewWindow( Window ):
 
     theFullPNListClipBoard = []
 
-    def __init__( self, gladefile=None, root=None ):
+    def __init__( self, gladefile=None, rootWidget=None ):
 
         self.theGladeFile = gladefile
         self.theRoot = root

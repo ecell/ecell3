@@ -67,30 +67,29 @@ class OsogoPluginWindow(PluginWindow):
 	# If the window displays multiple FullPN/FullID, theViewType is MULTIPLE
 	theViewType = SINGLE  # default
 
-	# ========================================================================
-	def __init__( self, aDirName, aData, aPluginManager, aRoot=None ):
+
+	def __init__( self, dirName, data, pluginManager, rootWidget=None ):
 		"""Constructor
-		aDirName        --  a directory name including plugin module
+		dirName        --  a directory name including plugin module
 		                    (str:absolute path/relative path)
-		aData           --  a RawFullPNList (RawFullPNList)
-		aPluginManager  --  a reference to PluginManager (PluginManager)
-		aRoot           --  a root property (str)
+		data           --  a RawFullPNList (RawFullPNList)
+		pluginManager  --  a reference to PluginManager (PluginManager)
+		rootWidget      --  a root widget (str or None)
 		"""
 
 		#self.theFullPNListClipBoard = []
 		self.theSelectedFullPNIndex = 0
 
 		# calls superclass's constructor
-		PluginWindow.__init__( self, aDirName, aPluginManager, aRoot )
+		PluginWindow.__init__( self, dirName, pluginManager, rootWidget )
 
 		self.theSession = self.thePluginManager.theSession 
-		self.theRawFullPNList = aData
+		self.theRawFullPNList = data
 
 		# sets default title
 		self.theTitle = self.__class__.__name__
 
 
-	# ========================================================================
 	def openWindow( self ):
 		"""overwrites superclass's method
 		Returns None
@@ -101,11 +100,12 @@ class OsogoPluginWindow(PluginWindow):
 		PluginWindow.openWindow( self )
 
 		# When this is top window, appends 'destroy' signal handler.
-		if self.theRoot == None:
+		#		if self.theRoot == None:
+		topWindow = self[self.__class__.__name__]
+		if topWindow != None:
 			self[self.__class__.__name__].connect('destroy',self.exit)
 
 
-	# ========================================================================
 	def setRawFullPNList( self, aRawFullPNList ):
 		"""sets RawFullPNList
 		aRawFullPNList  --  a RawFullPNList to be set (RawFullPNList)
@@ -115,7 +115,6 @@ class OsogoPluginWindow(PluginWindow):
 		self.theRawFullPNList = aRawFullPNList
 
 
-	# ========================================================================
 	def appendRawFullPNList( self, aRawFullPNList ):
 		"""appneds RawFullPNList
 		aRawFullPNList  --  a RawFullPNList to be appned (RawFullPNList)
