@@ -54,6 +54,7 @@ import traceback
 import os
 import math
 import time
+import datetime
 
 #
 #import pyecell module
@@ -194,7 +195,7 @@ class LogoAnimation:
 
                 self.image.set_from_file( self.iconList[self.__currentImage] )
                 self.__currentImage += 1
-                gobject.timeout_add( self.delay-50, LogoAnimation.animate, self )
+                gobject.timeout_add( 60, LogoAnimation.animate, self )
 
 
 
@@ -219,12 +220,15 @@ class MainWindow(OsogoWindow):
                 self.startTime = 0
                 self.tempTime = 0
                 self.isStarted = False
-                self.realtimeVisible = False
+                self.timerVisible = False
                 self.theLastTime = 0
                 self.theLastRealTime = 0
 
                 # initialize Indicator
                 self.indicatorVisible = False
+
+                # create datetime instance for Timer
+                self.datetime = datetime.datetime(1970,1,1)
                 
 	def openWindow( self ):
 
@@ -314,14 +318,13 @@ class MainWindow(OsogoWindow):
                     
                     # toolbars
                     'simulation_button_clicked'        : self.__handleSimulation,
-                    'step_button_clicked'         : self.__stepSimulation,
+                    'step_button_clicked'           : self.__stepSimulation,
                     
-                    'on_sec_step_entry_activate'  : self.__setStepSizeOrSec,
-                    'on_real_time_clear_button_clicked' : self.__clearRealTime,
-
-                    'on_load_model_button_clicked' : self.__openFileSelection,
+                    'on_sec_step_entry_activate'    : self.__setStepSizeOrSec,
+                    'on_timer_clear_button_clicked' : self.__clearTimer,
+                    'on_load_model_button_clicked'  : self.__openFileSelection,
                     'on_load_script_button_clicked' : self.__openFileSelection,
-                    'on_save_model_button_clicked' : self.__openFileSelection,
+                    'on_save_model_button_clicked'  : self.__openFileSelection,
                     
                     'on_entitylist_button_clicked'
                     : self.__createEntityListWindow,
@@ -332,6 +335,8 @@ class MainWindow(OsogoWindow):
                     'on_interface_button_toggled' : self.__displayWindow,
                     'on_board_button_toggled'     : self.__displayWindow,
                     'logo_button_clicked'         : self.__displayAbout,
+                    'on_timer_button_toggled'     : self.__displayTimer,
+                    'on_indicator_button_toggled' : self.__displayIndicator,
                     'on_scrolledwindow1_expose_event'
                     : self.__expose,
 
@@ -339,7 +344,7 @@ class MainWindow(OsogoWindow):
                     'on_toolbar_menu_activate'        : self.__displayToolbar,
                     'on_statusbar_menu_activate'      : self.__displayStatusbar,
                     'on_run_speed_indicator_activate' : self.__displayIndicator,  
-                    'on_real_time_activate'   : self.__displayRealtime,
+                    'on_timer_activate'               : self.__displayTimer,
                     'on_logo_animation_menu_activate' : self.__setAnimationSensitive,
                     'on_logging_policy1_activate' : self.__openLogPolicy
                     }
@@ -389,13 +394,13 @@ class MainWindow(OsogoWindow):
 
 
                 # --------------------
-                # set Real time entry
+                # set Timer entry
                 # --------------------
-                self['real_time_entry'].set_text( str( 0 ) )
-                self['real_time_entry'].modify_base( gtk.STATE_NORMAL,
+                self['timer_entry'].set_text( str( 0 ) )
+                self['timer_entry'].modify_base( gtk.STATE_NORMAL,
                                                 gtk.gdk.Color(61000,61000,61000,0) )
-                self['real_time_entry'].set_property( 'xalign', 1 )
-                self['real_time_box'].hide()
+                self['timer_entry'].set_property( 'xalign', 1 )
+                self['timer_box'].hide()
 
                 
                 # ---------------------
@@ -403,6 +408,7 @@ class MainWindow(OsogoWindow):
                 # ---------------------
                 
                 self['indicator_box'].hide()
+
 
 
 	def __expose( self, *arg ):
@@ -439,7 +445,7 @@ class MainWindow(OsogoWindow):
 		# toolbar
 		self['simulation_button'].set_sensitive(aDataLoadedStatus)
 		self['step_button'].set_sensitive(aDataLoadedStatus)
-		self['real_time_clear_button'].set_sensitive(aDataLoadedStatus)
+		self['timer_clear_button'].set_sensitive(aDataLoadedStatus)
 		self['load_model_button'].set_sensitive(not aDataLoadedStatus)
 		self['load_script_button'].set_sensitive(not aDataLoadedStatus)
 		self['save_model_button'].set_sensitive(aDataLoadedStatus)
@@ -591,7 +597,7 @@ class MainWindow(OsogoWindow):
 				self.theSession.loadScript( aFileName )
 
 			self.theSession.theSimulator.initialize()
-                        self.theEntityListWindow.setSession( self.theSession )
+                        self.theEntityListWindow.initializeComponents( self.theSession )
 
 
 		except:
@@ -884,21 +890,21 @@ class MainWindow(OsogoWindow):
 		self['time_entry'].set_text( str( self.theCurrentTime ) )
 		self['sec_step_entry'].set_text( str( self.theStepSizeOrSec ) )
 
-                aRealTime = time.time()
-
                 if ( self.SimulationButton.getCurrentState() == 'run' and
-                     self.realtimeVisible ):
-                    self['real_time_entry'].set_text( str( round( aRealTime - self.startTime + self.tempTime, 2 ) ) )
+                     self.timerVisible ):
+                    self['timer_entry'].set_text( self.getCurrentTime( time.time() - self.startTime + self.tempTime ) )
 
 
                 if self.indicatorVisible:
-
+                    aRealTime = time.time()
                     if ( aTime != self.theLastTime ):
-                        self['run_speed_scale'].set_value( math.log10( ( aTime - self.theLastTime ) / ( aRealTime - self.theLastRealTime ) ) )
+                        self['run_speed_scale'].set_value(
+                           math.log10( ( aTime - self.theLastTime ) /
+                                       ( aRealTime - self.theLastRealTime ) ) )
 
                     self.theLastTime = aTime
                     self.theLastRealTime = aRealTime
-                               
+
                 
 		# when Model is already loaded.
 		if len(self.theSession.theModelName) > 0:
@@ -906,7 +912,14 @@ class MainWindow(OsogoWindow):
 			self.__setMenuAndButtonsStatus( TRUE )
 
 			self.updateButtons()
-        
+
+
+        def getCurrentTime( self, aTime ):
+
+            theTime = self.datetime.fromtimestamp( aTime )
+
+            return str( theTime.hour-9 )+" : "+str( theTime.minute ) + " : " + str( theTime.second )
+
 
 	def updateButtons( self ):
 		""" updates Buttons and menus with 
@@ -983,10 +996,17 @@ class MainWindow(OsogoWindow):
             if self.theToolbarVisible:
                 self['toolbar_handlebox'].hide()
                 self.theToolbarVisible = False
+
+                if self.theMessageWindowVisible == False and \
+                   self.theEntityListWindowVisible == False:
+
+                       self.__resizeVertically( 0 )
+
             else:
                 self['toolbar_handlebox'].show()
                 self.theToolbarVisible = True
-                
+
+
 
         def __displayStatusbar( self, *arg ):
             # show Statusbar
@@ -994,6 +1014,12 @@ class MainWindow(OsogoWindow):
             if self.theStatusbarVisible:
                 self['statusbar'].hide()
                 self.theStatusbarVisible = False
+
+                if self.theMessageWindowVisible == False and \
+                   self.theEntityListWindowVisible == False:
+
+                       self.__resizeVertically( 0 )
+
             else:
                 self['statusbar'].show()
                 self.theStatusbarVisible = True
@@ -1004,31 +1030,48 @@ class MainWindow(OsogoWindow):
 
             if self.indicatorVisible:
                 self['indicator_box'].hide()
+                self.setIndicatorActive(False)
                 self.indicatorVisible = False
             else:
                 self['indicator_box'].show()
+                self.setIndicatorActive(True)
                 self.indicatorVisible = True
 
 		self.theLastTime = self.theSession.theSimulator.getCurrentTime()
 
                 
-        def __displayRealtime( self, *arg ):
+        def __displayTimer( self, *arg ):
             # show Indicator
 
-            if self.realtimeVisible:
-                self['real_time_box'].hide()
-                self.realtimeVisible = False
+            if self.timerVisible:
+                self['timer_box'].hide()
+                self.setTimerActive(False)
+                self.timerVisible = False
             else:
-                self['real_time_box'].show()                
-                self.realtimeVisible = True
+                self['timer_box'].show()                
+                self.setTimerActive(True)
+                self.timerVisible = True
+
 
                 if ( self.isStarted == False ):
-                    self['real_time_entry'].set_text( str(0.0) )
+                    self['timer_entry'].set_text( "0 : 0 : 0" )
                 else:
                     if ( self.SimulationButton.getCurrentState() == 'stop' ):
-                        self['real_time_entry'].set_text( str( round( self.tempTime, 2 ) ) )
+                        self['timer_entry'].set_text( self.getCurrentTime( self.tempTime ) )
                     else:
-                        self['real_time_entry'].set_text( str( round( time.time() - self.startTime + self.tempTime, 2 ) ) )
+                        self['timer_entry'].set_text( self.getCurrentTime( time.time() - self.startTime + self.tempTime ) )
+
+
+        def setIndicatorActive( self, isActive ): 
+
+            self['run_speed_indicator'].set_active(isActive)
+            ( self['indicator_button'].get_child() ).set_active(isActive)
+
+
+        def setTimerActive( self, isActive ): 
+
+            self['timer_menu'].set_active(isActive)
+            ( self['timer_button'].get_child() ).set_active(isActive)
 
 
 	def __displayWindow( self, *arg ):
@@ -1141,9 +1184,9 @@ class MainWindow(OsogoWindow):
 		self.createAboutSessionMonitor()
 		
 
-        def __clearRealTime( self, *arg ):
+        def __clearTimer( self, *arg ):
 
-            self['real_time_entry'].set_text( str(0.0) )
+            self['timer_entry'].set_text( "0 : 0 : 0" )
             self.tempTime = 0.0
             self.isStarted = False
 
