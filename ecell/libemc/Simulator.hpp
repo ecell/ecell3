@@ -51,8 +51,11 @@ namespace libemc
   /**
      The interface to the simulator.
 
-     Simulator class provides a unified interface to the libecs, 
+     Simulator class provides a unified API to the libecs, 
      C++ library for cell modeling and simulation.
+
+     Unlike libecs::Model class, this API does only involve standard
+     C++ types/classes, and doesn't involve classes defined in libecs.
      
      @see libecs
      @see Model
@@ -141,6 +144,19 @@ namespace libemc
       theSimulatorImplementation->createEntity( aClassname,
 						aFullIDString,
 						aName );
+    }
+
+
+    /**
+       Check if an Entity object specified by a FullID exists in the model.
+
+       @param aFullIDString a FullID string to be checked.
+       @return true if the Entity exists, false if not.
+    */
+
+    bool isEntityExist( libecs::StringCref         aFullIDString )
+    {
+      theSimulatorImplementation->isEntityExist( aFullIDString );
     }
 
     /**

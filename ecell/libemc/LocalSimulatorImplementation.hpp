@@ -73,6 +73,8 @@ namespace libemc
 			       libecs::StringCref          aFullIDString,
 			       libecs::StringCref          aName );
 
+    virtual bool isEntityExist( libecs::StringCref         aFullIDString );
+
     virtual void setProperty( libecs::StringCref           aFullPNString,
 			      libecs::PolymorphCref        aValue );
 

@@ -108,7 +108,23 @@ namespace libemc
   {
     getModel().createEntity( aClassname, FullID( aFullIDString ), aName );
   }
-    
+
+  bool LocalSimulatorImplementation::
+  isEntityExist( libecs::StringCref aFullIDString )
+  {
+    try
+      {
+	getModel().getEntity( FullID( aFullIDString ) );
+      }
+    catch( const libecs::NotFound& )
+      {
+	return false;
+      }
+
+    return true;
+  }
+
+
   void LocalSimulatorImplementation::
   setProperty( StringCref aFullPNString, PolymorphCref aValue )
   {

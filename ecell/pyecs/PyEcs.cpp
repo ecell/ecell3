@@ -72,6 +72,7 @@ BOOST_PYTHON_MODULE_INIT(_ecs)
 
   aSimulatorClass.def( python::constructor<>() );
   aSimulatorClass.def( &libemc::Simulator::createEntity,   "createEntity" );
+  aSimulatorClass.def( &libemc::Simulator::isEntityExist,  "isEntityExist" );
   aSimulatorClass.def( &libemc::Simulator::setProperty,    "setProperty" );
   aSimulatorClass.def( &libemc::Simulator::getProperty,    "getProperty" );
   aSimulatorClass.def( &libemc::Simulator::createStepper,  "createStepper" );
