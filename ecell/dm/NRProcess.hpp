@@ -100,6 +100,7 @@ public:
       }
     else if( getOrder() == 2 )   // just one substrate, and order == 2
       {
+	// what if the number of molecules == 1 or 0 ?
 	aMultiplicity *= ( aMultiplicity - 1.0 );
       }
     // else, just one substrate, order == 1. do nothing in this case.
@@ -159,20 +160,19 @@ public:
 	return;
       }
 
+    // make sure getMultiplicity() gives always > 0.0, and
+    // this if can be eliminated.
     if( aMu < 0.0 )
       {
 	THROW_EXCEPTION( SimulationError, "Negative Mu value." );
       }
 
-    Real aMuV( aMu );
+    theStepInterval = - log( u ) / aMu;
+
     if( getOrder() == 2 )
       {
-	aMuV /= getSuperSystem()->getVolume() * N_A;
+	theStepInterval *= getSuperSystem()->getVolume() * N_A;
       }
-
-    const Real a( - 1 / aMuV );
-
-    theStepInterval =  a * log( u );  // + getCurrentTime()
   }
 
 
