@@ -1,0 +1,140 @@
+#!/bin/sh
+#
+# ecell3-dmc  - a program to compile and/or docify dynamic module in 
+#               E-CELL Simulation Environment Version 3
+#
+# author: Tomoya Kitayama <tomo@e-cell.org>
+#
+
+PACKAGE=@PACKAGE@
+VERSION=@VERSION@
+
+CXX=@CXX@
+prefix=@prefix@
+exec_prefix=@prefix@
+
+BINDIR="${exec_prefix}/bin"
+STD_INCLUDE="${prefix}/include"
+ECELL_INCLUDE="${prefix}/include/ecell"
+LIBECS_INCLUDE="${ECELL_INCLUDE}/libecs"
+
+unset VERBOSE
+
+#TMPDIR="/tmp"
+#ETTMPDIR="$TMPDIR/ecell3-dmc.$$"
+
+usage() 
+{
+cat << EOT_USAGE
+
+Compile and/or dynamic module in
+E-CELL Simulation Environment Versin 3.
+
+Usage:
+	`basename $0` files... [ compiler options ]
+	`basename $0` -h|--help
+EOT_USAGE
+}
+
+help()
+{
+usage
+cat << EOT_HELP
+
+Options:
+        -v or --verbose   	 Be verbose.
+        -h or --help		 Print this message.
+
+This program is part of E-CELL Simulation Environment Version 3.
+Written by Tomoya Kitayama <tomo@e-cell.org>
+EOT_HELP
+}
+
+initialize()
+{
+	trap interrupted 2 9 15
+	#run_command mkdir $ETTMPDIR
+}
+
+cleanup()
+{
+	run_command rm -rf $ETTMPDIR
+}
+
+interrupted()
+{
+	echo "interrupted..."
+	trap '' 2 9 15
+	cleanup
+	exit 1
+}
+
+message()
+{
+    if [ $VERBOSE ] ; then
+	echo $@
+    fi
+}
+
+run_command()
+{
+    message $@
+
+    if [ $VERBOSE ] ; then
+	$@
+    else
+	$@ > /dev/null
+    fi
+}
+
+#at least one argument is required
+
+if [ -z $1 ] ;then 
+    help;
+    exit 1
+fi
+
+# print help message
+ 
+if [ "$1" = "-h" -o "$1" = "--help" ] ; then
+    help
+    exit 0
+fi
+
+while [ -n "$(echo $1 | grep '-')" ]; do
+    case "$1" in
+	-v|--verbose) VERBOSE=yes ; shift ;;
+	-h|--help) help ; exit 0 ;;
+	*) echo "Invarid Option! " ; help ; exit 1 ;;
+    esac
+done
+
+#
+#initialize & get filename
+#
+
+initialize
+
+CURRENTDIR=$(pwd)
+
+SRC=$1 ;shift
+
+CLASSNAME=`basename $SRC $CPPSUFFIX`
+CXXCOMPILEFLAGS="-D_ECELL3_DM_CLASSNAME=$CLASSNAME $*"
+
+#copy dmfile to ETTMPDIR
+
+#run_command "cp $SRC $ETTMPDIR" 
+#run_command "pushd $ETTMPDIR"     
+
+#
+#Compile
+#
+command_string="dmcompile $SRC -I $CURRENTDIR -I $ECELL_INCLUDE -I $LIBECS_INCLUDE -I $STD_INCLUDE -I . -I .. $CXXCOMPILEFLAGS"
+
+run_command $command_string
+unset commnad_string
+
+cleanup
+
+exit 0
