@@ -112,15 +112,15 @@ namespace libecs
     {
       const Real aDeltaT( aTime - theLastTime );
 
-      Real aVelocitySum( 0.0 ); // no initialization
-      RealPtrVectorConstIterator i( theVelocityVector.begin() ); 
-      while( i != theVelocityVector.end() )
+      Real aVelocitySum( 0.0 );
+      for( RealPtrVectorConstIterator i( theVelocityVector.begin() ); 
+	   i != theVelocityVector.end(); ++i )
 	{
 	  aVelocitySum += **i;
-	  ++i;
 	}
 
       theTotalVelocity = aVelocitySum * aDeltaT;
+
       loadQuantity( getQuantity() + theTotalVelocity );
 
       theLastTime = aTime;

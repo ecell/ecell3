@@ -54,8 +54,10 @@ namespace libemc
      Simulator class provides a unified API to the libecs, 
      C++ library for cell modeling and simulation.
 
-     Unlike libecs::Model class, this API does only involve standard
-     C++ types/classes, and doesn't involve classes defined in libecs.
+     Unlike libecs::Model class, this API does involve only standard
+     C++ types/classes, and doesn't depend on libecs classes.  An only
+     exception is Polymorph class, which is used in setting and getting 
+     property values of objects in the model.
      
      @see libecs
      @see Model
@@ -163,7 +165,7 @@ namespace libemc
        Set a property value of an Entity.
 
        @param aFullPNString a FullPN of the Property to set as a String.
-       @param aValue        the value to set as a Polymorph.
+       @param aValue        the value to be set.
     */
 
     void setProperty( libecs::StringCref            aFullPNString,
@@ -177,8 +179,7 @@ namespace libemc
        Get a value of a property from an Entity.
 
        @param aFullPNString a FullPN of the property as a String.
-       @return the property value as a reference counted pointor of a 
-       Polymorph
+       @return the property value.
     */
 
     const libecs::Polymorph
@@ -238,8 +239,7 @@ namespace libemc
     /**
        List Loggers in the simulator.
 
-       @return a list of Loggers in a reference counted pointer 
-       to a StringVector
+       @return a list of Loggers.
     */
 
     const libecs::Polymorph getLoggerList()
