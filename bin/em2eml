@@ -3,7 +3,6 @@
 from spark import *
 import sys , os ,string , getopt , tempfile
 import eml
-from eml import *
 
 class Token:
 	def __init__(self, type, attr=None, lineno='???'):
@@ -265,24 +264,28 @@ class Interpret(GenericASTTraversal):
 		
 	def n_Stepper( self, node ):
 		node.value = node.attr
-		if node.right != None:
-			self.queue.append(node.right.value)
+		if node.right != None and node.right.type != 'name':
+			aList = [node.value] + node.right.value
+			self.queue.append(aList)
 
 	def n_System( self, node):
 		node.value = node.attr
 		if node.right != None:
-			self.queue.append(node.right.value)
+			aList = [node.value] + node.right.value
+			self.queue.append(aList)
 
 	def n_Reactor( self, node):
 		node.value = node.attr
 		if node.right != None:
-			self.queue.append(node.right.value)
+			aList = [node.value] + node.right.value
+			self.queue.append(aList)
 		
 	def n_Substance( self, node):
 		node.value = node.attr
 		if node.right != None:
-			self.queue.append(node.right.value)
-			
+			aList = [node.value] + node.right.value
+			self.queue.append(aList)
+		
 	def n_Reactant( self, node):
 		node.value = node.attr
 		
@@ -297,7 +300,7 @@ class Interpret(GenericASTTraversal):
 			else:
 				aSystemID = node.right.left.left.value
                                 anID = aSystemID			
-			node.value = (aClass, anID, node.right.value)
+			node.value = [aClass, anID, node.right.value]
 
 		elif ( node.type == '{' ):
 			aSystemID = node.left.left.value
@@ -325,94 +328,81 @@ class Interpret(GenericASTTraversal):
 			node.value = node.attr
 			
 def convertEm2Eml( anEmFileObject , mode='' ):
-	    # template EmlFile generate
-	    tempFilename = tempfile.mktemp()
-	    tempFile = open(tempFilename, 'w')
-	    tempFile.write('<?xml version="1.0" ?><eml><stepperlist/></eml>')
-	    tempFile.close()
-	    anEml = eml.Eml( open(tempFilename) )
-	    anEml.entity   = []
-	    anEml.property = []
-	
-	    aScanner = EmScanner()
-	    aTokenList = aScanner.tokenize( anEmFileObject.read() )
-	    if mode == 'debug':print aTokenList
-	
-	    aParser = EmParser()
-	    anAst = aParser.parse( aTokenList )
-	    if mode == 'debug':print anAst
-	
-	    aInterpreter = Interpret( anAst )
-	    for part in aInterpreter.queue:
-		if part == 'SRM_01' or part[1] == 'SRM_01':
-	       	   pass
-		else:
-		   anElement = part[0], part[1]
-		   anEml.entity.append( anElement )
-		   propertyLists = part[1], part[2:]
-		   anEml.property.append( propertyLists )
-			
-		   anEml.entity = sortSystemID(anEml.entity)
-
-	    for i in anEml.entity:
-		(aClass, anID) = i
-		anID = convert2FullID(aClass, anID)
-		if aClass == 'System' or aClass == 'Substance' or aClass == 'Reactor':
-		    anEml.createEntity(aClass, anID)
-	    	    if mode == 'debug':print "createEntity(%s, %s)" % (aClass, anID)
-
-		else:
-		    anEml.createStepper(aClass, anID)
-	    	    if mode == 'debug':print "createStepper(%s, %s)" % (aClass, anID)
-
-	    for j in anEml.property:
-		(aFullID, aPropertyList) = j
-		for k in aPropertyList:
-		    for l in k:
-		        (aPropertyName, aValueList) = l[0], l[1:]
-		        anEml.setEntityProperty(anID, aPropertyName, aValueList)
-			if mode == 'debug':print "setEntityProperty(%s, %s, %s)" % (anID, aPropertyName, aValueList)
-	    aString = anEml.asString()
-	    
-	    os.unlink(tempFilename)
-
-	    return anEml
-
-def convert2FullID( aClass, aSystemID ):
 	# template EmlFile generate
 	tempFilename = tempfile.mktemp()
 	tempFile = open(tempFilename, 'w')
 	tempFile.write('<?xml version="1.0" ?><eml><stepperlist/></eml>')
 	tempFile.close()
 	anEml = eml.Eml( open(tempFilename) )
-	anEml.entity   = []
-	anEml.property = []
 
-        aFullID = anEml.convertSystemID2SystemFullID(aSystemID)
-        if aClass == 'System':
-	    anID = aFullID
-	elif aClass == 'Substance':
-	    anID = 'Substance:' + aSystemID
-	else:
-	    anID = 'Reactor:' + aSystemID
+	# Scanning
+	aScanner = EmScanner()
+	aTokenList = aScanner.tokenize( anEmFileObject.read() )
+	if mode == 'debug':print aTokenList
+
+	# Parsing 
+	aParser = EmParser()
+	anAst = aParser.parse( aTokenList )
+	if mode == 'debug':print 'AST:', anAst
+
+	# Generating
+	anInterpreter = Interpret( anAst )
+	aQueueList = sortSystemID(anInterpreter.queue)
+	if mode == 'debug':print aQueueList
+
+	for part in aQueueList:
+                (aType, aClass, anID, aPropertyList) = part[0], part[1], part[2], part[3:]
+		aFullID = convert2FullID(anEml, aType,  anID)
+		if aType == 'Stepper':
+			anEml.createStepper(aClass, aFullID)
+			if mode == 'debug':print "createStepper(%s, %s)" % (aClass, aFullID)
+			continue
+		else:
+			anEml.createEntity(aClass, aFullID)
+			if mode == 'debug':print "createEntity(%s, %s)" % (aClass, anID)
+
+		for i in aPropertyList:
+			for j in i:
+				(aPropertyName, aValueList) = j[0], j[1:]
+				anEml.setEntityProperty(aFullID, aPropertyName, aValueList)
+				if mode == 'debug':print "\tsetEntityProperty(%s, %s, %s)" % (aFullID, aPropertyName, aValueList)
+
+
+	aString = anEml.asString()
 	    
 	os.unlink(tempFilename)
 
+	return anEml
+
+def convert2FullID( anEml, aType, aSystemID ):
+
+        aFullID = anEml.convertSystemID2SystemFullID(aSystemID)
+        if aType == 'System':
+		anID = aFullID
+	elif aType == 'Substance':
+		anID = 'Substance:' + aSystemID
+	elif aType == 'Stepper':
+		anID = aSystemID
+	elif aType == 'Reactor':
+		anID = 'Reactor:' + aSystemID
+	else:
+		raise ValueError, 'Type Error %s %s %s' (aType, aClass, aSystemID)
+	    
 	return anID
     
 def sortSystemID( aList ):
-	    aSortList  = []
-	    aLowList   = []
-	    aHightList = []
-	    for i in aList:
-	        aClass = string.split(i[1], ':')[0]
-		if aClass == 'System':
-		   aHightList.append(i)
+	aSortList  = []
+	aLowList   = []
+	aHightList = []
+	for i in aList:
+                aType = i[0]
+		if aType == 'System' or aType == 'Stepper':
+			aHightList.append(i)
 		else:
-		   aLowList.append(i)
-	    aSortList = aHightList + aLowList
+			aLowList.append(i)
+		aSortList = aHightList + aLowList
 	    
-	    return aSortList
+	return aSortList
     
 def usage():
 	sys.stderr.write("""\
