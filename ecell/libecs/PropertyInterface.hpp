@@ -132,9 +132,9 @@ namespace libecs
 			ConcretePropertySlot<T,Real>::GetMethodPtr get )
     {
       appendSlot( new ConcretePropertySlot<T,Real>( name, 
-						object, 
-						set, 
-						get ) );
+						    object, 
+						    set, 
+						    get ) );
     }
 
     template<class T>
@@ -145,9 +145,9 @@ namespace libecs
 			ConcretePropertySlot<T,String>::GetMethodPtr get )
     {
       appendSlot( new ConcretePropertySlot<T,String>( name, 
-						  object, 
-						  set, 
-						  get ) );
+						      object, 
+						      set, 
+						      get ) );
     }
 
     void appendSlot( PropertySlotPtr );

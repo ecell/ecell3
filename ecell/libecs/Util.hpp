@@ -155,6 +155,12 @@ namespace libecs
        i != (SEQ) .end() ; ++i )\
     { (*i)-> METHOD (); }
 
+
+#define FOR_ALL_SECOND( SEQCLASS, SEQ, METHOD )\
+  for( SEQCLASS ## ConstIterator i( (SEQ) .begin() ) ;\
+       i != (SEQ) .end() ; ++i )\
+    { (*i).second-> METHOD (); }
+
   /** @} */ //end of libecs_module 
 
 } // namespace libecs

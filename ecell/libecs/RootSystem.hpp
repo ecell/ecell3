@@ -32,7 +32,7 @@
 #define ___ROOTSYSTEM_H___
 
 #include "Util.hpp"
-#include "Stepper.hpp"
+#include "StepperLeader.hpp"
 #include "System.hpp"
 
 
@@ -52,6 +52,7 @@ namespace libecs
     typedef Ret (T::* Method )( void ) const;
 
   public:
+
     VoidObjectMethod( T& anObject, Method aMethod )
       :
       theObject( anObject ),
@@ -87,6 +88,8 @@ namespace libecs
     void makeSlots();
 
 
+    void setCreateStepper( UVariableVectorRCPtrCref aMessage );
+
     virtual const SystemPath getSystemPath() const;
     virtual SystemPtr getSystem( StringCref id );
     //    virtual SystemPtr getSystem( SystemPathCref systempath );
@@ -98,7 +101,6 @@ namespace libecs
     ReactorMakerRef     getReactorMaker()     { return theReactorMaker; }
     SubstanceMakerRef   getSubstanceMaker()   { return theSubstanceMaker; }
     SystemMakerRef      getSystemMaker()      { return theSystemMaker; }
-    StepperMakerRef     getStepperMaker()     { return theStepperMaker; }
     AccumulatorMakerRef getAccumulatorMaker() { return theAccumulatorMaker; }
 
     const Real getCurrentTime() const;
@@ -113,7 +115,7 @@ namespace libecs
     ReactorMakerRef     theReactorMaker;
     SubstanceMakerRef   theSubstanceMaker;
     SystemMakerRef      theSystemMaker;
-    StepperMakerRef     theStepperMaker;
+
     AccumulatorMakerRef theAccumulatorMaker;
 
   };

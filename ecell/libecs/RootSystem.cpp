@@ -31,7 +31,6 @@
 #include "SubstanceMaker.hpp"
 #include "ReactorMaker.hpp"
 #include "SystemMaker.hpp"
-#include "StepperMaker.hpp"
 #include "Stepper.hpp"
 #include "AccumulatorMaker.hpp"
 #include "FullID.hpp"
@@ -46,37 +45,47 @@ namespace libecs
   {
     createPropertySlot( "CurrentTime", *this,
 			NULLPTR, &RootSystem::getCurrentTime );
+
+    createPropertySlot( "CreateStepper", *this,
+			&RootSystem::setCreateStepper, NULLPTR );
+    //			&RootSystem::getCreateStepper ); // dummy
   }
   
 
   RootSystem::RootSystem() 
     :
-    //    theStepperLeader( *new StepperLeader ),
+    theStepperLeader(),
     theReactorMaker( *new ReactorMaker ),
     theSubstanceMaker( *new SubstanceMaker ),
     theSystemMaker( *new SystemMaker ),
-    theStepperMaker( *new StepperMaker ),
     theAccumulatorMaker( *new AccumulatorMaker )
   {
-    theStepperLeader.setRootSystem( this );
-
     makeSlots();
 
     setID( "/" );
     setName( "The RootSystem" );
     setRootSystem( this );
-    setStepperClass("Euler1SRMStepper" );
+
+    theStepperLeader.createStepper( "_", "Euler1SRMStepper" );
+    setStepperID( "_" );
+
+
   }
 
   RootSystem::~RootSystem()
   {
     delete &theAccumulatorMaker;
-    delete &theStepperMaker;
     delete &theSystemMaker;
     delete &theSubstanceMaker;
     delete &theReactorMaker;
   }
 
+
+  void RootSystem::setCreateStepper( UVariableVectorRCPtrCref aMessage )
+  {
+    getStepperLeader().createStepper( (*aMessage)[0].asString(), 
+				      (*aMessage)[1].asString() );
+  }
 
   const Real RootSystem::getCurrentTime() const
   {
@@ -86,7 +95,7 @@ namespace libecs
 
   void RootSystem::initialize()
   {
-    System::initialize();
+    // FIXME:
     getStepperLeader().initialize();
     
     // NOTE: ecell1 called update() here, but ecell3 doesn't.

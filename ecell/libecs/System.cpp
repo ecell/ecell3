@@ -35,12 +35,12 @@
 #include "RootSystem.hpp"
 #include "SubstanceMaker.hpp"
 #include "ReactorMaker.hpp"
-#include "SystemMaker.hpp"
 #include "Substance.hpp"
 #include "Stepper.hpp"
 #include "StepperMaker.hpp"
 #include "FullID.hpp"
-
+#include "SystemMaker.hpp"
+#include "PropertyInterface.hpp"
 
 namespace libecs
 {
@@ -57,8 +57,8 @@ namespace libecs
     createPropertySlot( "ReactorList", *this,
 			NULLPTR, &System::getReactorList );
 
-    createPropertySlot( "StepperClass", *this,
-			&System::setStepperClass, &System::getStepperClass );
+    createPropertySlot( "StepperID", *this,
+			&System::setStepperID, &System::getStepperID );
 
     createPropertySlot( "Volume", *this,
 			&System::setVolume, &System::getVolume );
@@ -113,16 +113,19 @@ namespace libecs
   }
 
 
-  void System::setStepperClass( UVariableVectorRCPtrCref aMessage )
+  void System::setStepperID( UVariableVectorRCPtrCref aMessage )
   {
     //FIXME: range check
-    setStepperClass( (*aMessage)[0].asString() );
+    setStepperID( (*aMessage)[0].asString() );
   }
 
-  const UVariableVectorRCPtr System::getStepperClass() const
+  const UVariableVectorRCPtr System::getStepperID() const
   {
     UVariableVectorRCPtr aVector( new UVariableVector );
-    aVector->push_back( UVariable( getStepper()->getClassName() ) );
+    //    aVector->push_back( UVariable( getRootSystem()->getStepperLeader()->
+    //				   getStepper()->getClassName() ) );
+
+    aVector->push_back( UVariable( "NOT IMPLEMENTED YET" ) );
     return aVector;
   }
 
@@ -140,7 +143,7 @@ namespace libecs
 
   System::~System()
   {
-    delete theStepper;
+    getStepper()->disconnectSystem( this );
     
     for( ReactorMapIterator i( theReactorMap.begin() );
 	 i != theReactorMap.end() ; ++i )
@@ -167,13 +170,10 @@ namespace libecs
     theRootSystem = getSuperSystem()->getRootSystem();
   }
 
-  void System::setStepperClass( StringCref aClassname )
+  void System::setStepperID( StringCref anID )
   {
-    StepperPtr aStepper( getRootSystem()->
-			 getStepperMaker().make( aClassname ) );
-    aStepper->setOwner( this );
-
-    theStepper = aStepper;
+    theStepper = getRootSystem()->getStepperLeader().getStepper( anID );
+    theStepper->connectSystem( this );
     theStepper->initialize();
   }
 
@@ -198,7 +198,9 @@ namespace libecs
 
     if( theStepper == NULLPTR )
       {
-	setStepperClass("SlaveStepper");
+	throw InitializationFailed( __PRETTY_FUNCTION__, 
+				    getFullID().getString() + 
+				    ": Stepper not set." );
       }
 
     //
@@ -223,14 +225,7 @@ namespace libecs
 					      getReactorMap().end(),
 					      isRegularReactorItem() );
 
-    //
-    // System::initialize()
-    //
-    for( SystemMapConstIterator i( getSystemMap().begin() );
-	 i != getSystemMap().end() ; ++i )
-      {
-	i->second->initialize();
-      }
+    // do not need to call subsystems' initialize()
   }
 
   void System::registerReactor( ReactorPtr aReactor )

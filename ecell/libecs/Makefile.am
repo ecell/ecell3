@@ -30,6 +30,7 @@ Integrators.cpp\
 RootSystem.cpp\
 SubstanceMaker.cpp\
 Stepper.cpp\
+StepperLeader.cpp\
 PrimitiveType.cpp\
 System.cpp\
 Entity.cpp\
@@ -58,6 +59,7 @@ Integrators.hpp\
 RootSystem.hpp\
 SubstanceMaker.hpp\
 Stepper.hpp\
+StepperLeader.hpp\
 PrimitiveType.hpp\
 System.hpp\
 Entity.hpp\
@@ -72,7 +74,8 @@ Exceptions.hpp\
 Util.hpp\
 CoreLinuxCompatibility.hpp\
 RCPtr.hpp\
-Reactant.hpp
+Reactant.hpp\
+AssocVector.h
 
 bin_SCRIPTS =\
 emtool

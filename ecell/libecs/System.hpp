@@ -130,7 +130,7 @@ namespace libecs
 
        @param classname Classname of the Stepper that this System may have.
     */
-    void setStepperClass( StringCref aClassname );
+    void setStepperID( StringCref anID );
 
     /**
        @return Volume of this System. Unit is [L].
@@ -229,9 +229,9 @@ namespace libecs
 
   public: // property slots
 
-    void setStepperClass( UVariableVectorRCPtrCref aMessage );
+    void setStepperID( UVariableVectorRCPtrCref aMessage );
 
-    const UVariableVectorRCPtr getStepperClass() const;
+    const UVariableVectorRCPtr getStepperID() const;
 
     const UVariableVectorRCPtr getSystemList() const;
     const UVariableVectorRCPtr getSubstanceList() const;

@@ -30,7 +30,7 @@
 
 #ifndef ___STEPPER_H___
 #define ___STEPPER_H___
-#include <queue>
+
 #include <vector>
 #include <map>
 #include <algorithm>
@@ -57,8 +57,7 @@ namespace libecs
   DECLARE_VECTOR( SubstancePtr, SubstanceVector );
   DECLARE_VECTOR( ReactorPtr,   ReactorVector );
   DECLARE_VECTOR( SystemPtr,    SystemVector );
-
-
+  
   typedef IntegratorPtr ( *IntegratorAllocator_ )( SubstanceRef );
   DECLARE_TYPE( IntegratorAllocator_, IntegratorAllocator );
 
@@ -66,65 +65,8 @@ namespace libecs
   DECLARE_TYPE( StepperAllocator_, StepperAllocator );
 
   DECLARE_VECTOR( StepperPtr, StepperVector );
-  DECLARE_VECTOR( SlaveStepperPtr, SlaveStepperVector );
-  DECLARE_VECTOR( MasterStepperPtr, MasterStepperVector );
 
   DECLARE_VECTOR( PropertySlotPtr, PropertySlotVector );
-
-  //  DECLARE_LIST( MasterStepperPtr, MasterStepperList )
-
-
-  typedef std::pair<Real,MasterStepperPtr> RealMasterStepperPtrPair;
-  DECLARE_TYPE( RealMasterStepperPtrPair, Event );
-  typedef std::priority_queue<Event,std::vector<Event>,std::greater<Event> >
-  EventPriorityQueue_less;
-  DECLARE_TYPE( EventPriorityQueue_less, ScheduleQueue );
-
-  class StepperLeader
-  {
-
-  public:
-
-    StepperLeader();
-    virtual ~StepperLeader() {}
-
-    virtual void initialize();
-
-    RealCref getCurrentTime() const
-    {
-      return theCurrentTime;
-    }
-
-    void setRootSystem( const RootSystemPtr aRootSystem)
-    {
-      theRootSystem = aRootSystem;
-    }
-
-    RootSystemPtr getRootSystem() const
-    {
-      return theRootSystem;
-    }
-
-    void step();
-    void push();
-
-
-    virtual StringLiteral getClassName() const  { return "StepperLeader"; }
-
-  private:
-
-    void updateMasterStepperVector( SystemPtr aSystem );
-    void updateScheduleQueue();
-
-  private:
-
-    RootSystemPtr   theRootSystem;
-    Real            theCurrentTime;
-
-    MasterStepperVector   theMasterStepperVector;
-    ScheduleQueue   theScheduleQueue;
-
-  };
 
 
 
@@ -136,59 +78,14 @@ namespace libecs
     Stepper(); 
     virtual ~Stepper() {}
 
-    void setOwner( SystemPtr owner ) { theOwner = owner; }
-    SystemPtr getOwner() const { return theOwner; }
-
-    virtual void initialize();
-
-    virtual void setStepInterval( RealCref aStepInterval ) = 0;
-    virtual RealCref getStepInterval() const = 0;
-    virtual RealCref getStepsPerSecond() const = 0;
-
-    void setMasterStepper( MasterStepperPtr aMasterStepper )
-    { 
-      theMasterStepper = aMasterStepper;
-    }
-
-    MasterStepperPtr getMasterStepper() const
-    {
-      return theMasterStepper;
-    }
-
-    virtual void sync() { }
-    virtual const Real step() { }
-    virtual void push() { }
-
-    virtual void registerPropertySlot( PropertySlotPtr ) = 0;
-
-    virtual StringLiteral getClassName() const  { return "Stepper"; }
-
-  protected:
-
-    SystemPtr        theOwner;
-    MasterStepperPtr theMasterStepper;
-
-  };
-
-  class MasterStepper 
-    : 
-    public Stepper
-  {
-
-  public:
-
-    MasterStepper();
-    virtual ~MasterStepper() {}
-
-    virtual void sync();
-    virtual const Real step() = 0;
-    virtual void push();
+    void connectSystem( SystemPtr aSystem );
+    void disconnectSystem( SystemPtr aSystem );
 
     /**
 
-       This may be overridden in dynamically scheduled steppers.
+    This may be overridden in dynamically scheduled steppers.
 
-     */
+    */
 
     void setStepInterval( RealCref aStepInterval );
 
@@ -221,18 +118,31 @@ namespace libecs
 
     virtual void initialize();
 
-    SlaveStepperVectorCref getSlaveStepperVector() const
+    SystemVectorCref getSystemVector() const
     {
-      return theSlaveStepperVector;
+      return theSystemVector;
     }
-
-    void updateSlaveStepperVector();
 
     void registerSlaves( SystemPtr );
     void registerPropertySlot( PropertySlotPtr );
 
+    virtual void sync();
+    virtual const Real step() { }
+    virtual void push();
 
-    virtual StringLiteral getClassName() const  { return "MasterStepper"; }
+
+    StringCref getName() const
+    {
+      return theName;
+    }
+
+    void setName( StringCref aName )
+    {
+      theName = aName;
+    }
+
+    virtual StringLiteral getClassName() const  { return "Stepper"; }
+
 
   protected:
 
@@ -243,83 +153,29 @@ namespace libecs
     Real                theStepInterval;
     Real                theStepsPerSecond;
 
-    IntegratorAllocator theAllocator;
-    SlaveStepperVector  theSlaveStepperVector;
+    SystemVector        theSystemVector;
     PropertySlotVector  thePropertySlotVector;
 
+    String              theName;
+
     bool                theEntityListChanged;
+
   };
 
 
-
-  class SlaveStepper 
+  class StepperWithEntityCache
     : 
     public Stepper
   {
 
   public:
 
-    SlaveStepper() {}
-    virtual ~SlaveStepper() {}
-
-  
-    virtual void initialize()
-    {
-      Stepper::initialize();
-    }
-
-    void setMasterStepper( MasterStepperPtr aMasterStepperPtr )
-    {
-      theMasterStepper = aMasterStepperPtr;
-    }
-
-    void setStepInterval( RealCref aStepInterval )
-    {
-      // Slaves are synchronous to their masters.
-      theMasterStepper->setStepInterval( aStepInterval ); 
-    }
-
-    virtual RealCref getStepInterval() const
-    { 
-      // Slaves are synchronous to their masters.
-      return theMasterStepper->getStepInterval(); 
-    }
-
-    virtual RealCref getStepsPerSecond() const
-    { 
-      // Slaves are synchronous to their masters.
-      return theMasterStepper->getStepsPerSecond();
-    }
-    
-    void registerPropertySlot( PropertySlotPtr aPropertySlotPtr )
-    { 
-      theMasterStepper->registerPropertySlot( aPropertySlotPtr );
-    }
-
-    static StepperPtr createInstance() { return new SlaveStepper; }
-
-    virtual StringLiteral getClassName() const  { return "SlaveStepper"; }
-
-  private:
-
-    MasterStepperPtr theMasterStepper;
-
-  };
-
-
-  class MasterStepperWithEntityCache
-    : 
-    public MasterStepper
-  {
-
-  public:
-
-    MasterStepperWithEntityCache()
+    StepperWithEntityCache()
     {
       ; // do nothing
     }
 
-    ~MasterStepperWithEntityCache() {}
+    ~StepperWithEntityCache() {}
 
 
     virtual void initialize();
@@ -350,14 +206,12 @@ namespace libecs
 
     SubstanceVector               theSubstanceCache;
     ReactorVector                 theReactorCache;
-    SystemVector                  theSystemCache;
 
   };
 
-
   class SRMStepper 
     : 
-    public MasterStepperWithEntityCache
+    public StepperWithEntityCache
   {
   public:
 

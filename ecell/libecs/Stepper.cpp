@@ -34,6 +34,7 @@
 #include "Integrators.hpp"
 #include "RootSystem.hpp"
 #include "Util.hpp"
+#include "FullID.hpp"
 
 #include "Stepper.hpp"
 
@@ -42,235 +43,107 @@ namespace libecs
 {
 
 
-  ////////////////////////// StepperLeader
-
-  StepperLeader::StepperLeader() 
-    : 
-    theCurrentTime( 0.0 ),
-    theRootSystem( NULL )
-  {
-    ; // do nothing
-  }
-
-
-  void StepperLeader::updateMasterStepperVector( SystemPtr aSystemPtr )
-  {
-
-    MasterStepperPtr aMasterStepper( dynamic_cast<MasterStepperPtr>
-				     ( aSystemPtr->getStepper() ) );
-
-    if( aMasterStepper != NULL )
-      {
-	theMasterStepperVector.push_back( aMasterStepper );
-      }
-
-    //FIXME: breadth-first search?
-    for( SystemMapConstIterator i( aSystemPtr->getSystemMap().begin() ) ;
-	 i != aSystemPtr->getSystemMap().end() ; ++i )
-      {
-	updateMasterStepperVector( i->second );
-      }
-
-
-  }
-
-  void StepperLeader::updateScheduleQueue()
-  {
-    //FIXME: slow! :  no theScheduleQueue.clear() ?
-    while( ! theScheduleQueue.empty() )
-      {
-	theScheduleQueue.pop();
-      }
-
-
-
-
-    for( MasterStepperVectorConstIterator i( theMasterStepperVector.begin() );
-	 i != theMasterStepperVector.end() ; i++)
-      {
-	theScheduleQueue.push( Event( theCurrentTime, (*i) ) );
-      }
-  }
-
-  void StepperLeader::initialize()
-  {
-    assert( theRootSystem != NULL );
-
-    theMasterStepperVector.clear();
-
-    updateMasterStepperVector( theRootSystem );
-    FOR_ALL( MasterStepperVector, theMasterStepperVector, 
-	     initialize );
-
-    updateScheduleQueue();
-
-    theCurrentTime = ( theScheduleQueue.top() ).first;
-  }
-
-
-  void StepperLeader::step()
-  {
-    EventCref aTopEvent( theScheduleQueue.top() );
-
-    MasterStepperPtr aMasterStepper( aTopEvent.second );
-
-    // three-phase progression of the step
-    // 1. sync:  synchronize with proxies of the PropertySlots
-    aMasterStepper->sync();
-    // 2. step:  do the computation, returning a length of the time progression
-    const Real aStepSize( aMasterStepper->step() );
-    // 3. push:  re-sync with the proxies, and push new values to Loggers
-    aMasterStepper->push();
-
-
-    // the time must be memorized before the Event is deleted by the pop
-    const Real aTopTime( aTopEvent.first );
-
-    //FIXME: change_top() is better than pop 'n' push.
-    // If the ScheduleQueue holds pointers of Event, not instances,
-    // it would be more efficient in the current implementation because
-    // the instantiation below can be eliminated, but
-    // if there is the change_top(), benefits would be lesser...
-    theScheduleQueue.pop();
-    theScheduleQueue.push( Event( aTopTime + aStepSize, aMasterStepper ) );
-
-    // update theCurrentTime, which is scheduled time of the Event on the top
-    theCurrentTime = ( theScheduleQueue.top() ).first;
-  }
-
-
-
   ////////////////////////// Stepper
 
   Stepper::Stepper() 
-    : 
-    theOwner( NULLPTR )
+    :
+    theStepInterval( 0.001 )
   {
-
+    calculateStepsPerSecond();
   }
 
   void Stepper::initialize()
   {
-    // FIXME: use exception?
-    assert( theOwner );
-  }
-
-  ////////////////////////// MasterStepper
-
-  MasterStepper::MasterStepper() 
-    :
-    theStepInterval( 0.001 )
-  {
-    setMasterStepper( this );
-    calculateStepsPerSecond();
-  }
-
-  void MasterStepper::initialize()
-  {
-    // FIXME: is this multiple-time-initialization-proof? 
-    Stepper::initialize();
-
-    updateSlaveStepperVector();
-
-    for( SlaveStepperVectorIterator i( theSlaveStepperVector.begin() ); 
-	 i != theSlaveStepperVector.end() ; ++i )
+    for( SystemVectorConstIterator i( theSystemVector.begin() ); 
+	 i != theSystemVector.end() ; ++i )
       {
-	(*i)->setMasterStepper( this );
-	(*i)->initialize();
-      }
-  }
-
-
-  void MasterStepper::updateSlaveStepperVector()
-  {
-    theSlaveStepperVector.clear();
-
-    searchSlaves( theOwner );
-  }
-
-  void MasterStepper::searchSlaves( SystemPtr aStartSystemPtr )
-  {
-    for( SystemMapConstIterator s( aStartSystemPtr->getSystemMap().begin() );
-	 s != aStartSystemPtr->getSystemMap().end() ; ++s )
-      {
-	SystemPtr aSlaveSystemPtr( s->second );
-
-	//FIXME: handle bad_cast
-	SlaveStepperPtr aSlaveStepperPtr( dynamic_cast< SlaveStepperPtr >
-					  ( aSlaveSystemPtr->getStepper() ) );
-
-	if( aSlaveStepperPtr != NULLPTR )
+	//FIXME: workaround, should be eliminated
+	if( typeid( **i ) != typeid( RootSystem ) )
 	  {
-	    theSlaveStepperVector.push_back( aSlaveStepperPtr );
-	    aSlaveStepperPtr->setMasterStepper( this );
-	    searchSlaves( aSlaveSystemPtr );
+	    (*i)->initialize();
 	  }
       }
   }
 
 
-  void MasterStepper::registerPropertySlot( PropertySlotPtr propertyslot )
+  void Stepper::connectSystem( SystemPtr aSystem )
+  { 
+    theSystemVector.push_back( aSystem );
+
+  }
+
+  void Stepper::disconnectSystem( SystemPtr aSystem )
+  { 
+    SystemVectorIterator i( find( theSystemVector.begin(), 
+				  theSystemVector.end(),
+				  aSystem ) );
+
+    if( i == theSystemVector.end() )
+      {
+	throw NotFound( __PRETTY_FUNCTION__, getClassName() + String( ": " ) 
+			+ getName() + ": " + aSystem->getFullID().getString() +
+			" not found in this stepper." );
+      }
+
+    theSystemVector.erase( i );
+  }
+
+  void Stepper::registerPropertySlot( PropertySlotPtr propertyslot )
   {
     thePropertySlotVector.push_back( propertyslot );
   }
 
-  void MasterStepper::setStepInterval( RealCref aStepInterval )
+  void Stepper::setStepInterval( RealCref aStepInterval )
   {
     theStepInterval = aStepInterval;
     calculateStepsPerSecond();
   }
 
-  void MasterStepper::calculateStepsPerSecond() 
+  void Stepper::calculateStepsPerSecond() 
   {
     theStepsPerSecond = 1 / getStepInterval();
   }
 
-  void MasterStepper::sync()
+  void Stepper::sync()
   {
     FOR_ALL( PropertySlotVector, thePropertySlotVector, sync );
   }
 
-  void MasterStepper::push()
+  void Stepper::push()
   {
     FOR_ALL( PropertySlotVector, thePropertySlotVector, push );
   }
 
 
-  ////////////////////////// MasterStepperWithEntityCache
+  ////////////////////////// StepperWithEntityCache
 
-  void MasterStepperWithEntityCache::initialize()
+  void StepperWithEntityCache::initialize()
   {
-    MasterStepper::initialize();
+    Stepper::initialize();
     updateCache();
   }
 
   
-  void MasterStepperWithEntityCache::updateCache()
+  void StepperWithEntityCache::updateCache()
   {
-    // clear the caches
-    theSystemCache.clear();
     theSubstanceCache.clear();
     theReactorCache.clear();
 
-    theSystemCache.reserve( getSlaveStepperVector().size() + 1 );
-    theSystemCache.push_back( getOwner() );
-
-    for( SlaveStepperVectorConstIterator i( getSlaveStepperVector().begin() );
-	 i != getSlaveStepperVector().end() ; ++i )
+    for( SystemVectorConstIterator i( getSystemVector().begin() );
+	 i != getSystemVector().end() ; ++i )
       {
-	SystemPtr aSystem( (*i)->getOwner() );
-	theSystemCache.push_back( aSystem );
+	const SystemCptr aSystem( *i );
 
-	for( SubstanceMapConstIterator i( aSystem->getSubstanceMap().begin() );
-	     i != aSystem->getSubstanceMap().end(); ++i )
+	for( SubstanceMapConstIterator j( aSystem->getSubstanceMap().begin() );
+	     j != aSystem->getSubstanceMap().end(); ++j )
 	  {
-	    theSubstanceCache.push_back( (*i).second );
+	    theSubstanceCache.push_back( (*j).second );
 	  }
 
-	for( ReactorMapConstIterator i( aSystem->getReactorMap().begin() );
-	     i != aSystem->getReactorMap().end(); ++i )
+	for( ReactorMapConstIterator j( aSystem->getReactorMap().begin() );
+	     j != aSystem->getReactorMap().end(); ++j )
 	  {
-	    theReactorCache.push_back( (*i).second );
+	    theReactorCache.push_back( (*j).second );
 	  }
 
       }
@@ -279,11 +152,10 @@ namespace libecs
 
 
   //FIXME: incomplete
-  void MasterStepperWithEntityCache::updateCacheWithSort()
+  void StepperWithEntityCache::updateCacheWithSort()
   {
     updateCache();
   }
-
 
 
   ////////////////////////// SRMStepper
@@ -354,13 +226,10 @@ namespace libecs
 
   void SRMStepper::initialize()
   {
-    MasterStepperWithEntityCache::initialize();
-    distributeIntegrator( IntegratorAllocator( theIntegratorAllocator ) );
-  }
+    StepperWithEntityCache::initialize();
 
-  void StepperLeader::push()
-  {
-    FOR_ALL( MasterStepperVector, theMasterStepperVector, push );
+    //FIXME: memory leak!!
+    distributeIntegrator( IntegratorAllocator( theIntegratorAllocator ) );
   }
 
   void SRMStepper::distributeIntegrator( IntegratorAllocator allocator )

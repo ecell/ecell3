@@ -88,6 +88,7 @@ public:\
   DEFINE_EXCEPTION( BadID,                 Exception); 
   DEFINE_EXCEPTION( PropertyException,     Exception);
   DEFINE_EXCEPTION( CallbackFailed,        Exception);
+  DEFINE_EXCEPTION( InitializationFailed,  Exception);
   DEFINE_EXCEPTION( BadMessage,            PropertyException); 
   DEFINE_EXCEPTION( NoMethod,              PropertyException);
   DEFINE_EXCEPTION( NoSlot,                PropertyException);
