@@ -53,6 +53,10 @@ class PluginManager:
 
         return anInstance
 
+    def update( self ):
+        for anInstance in self.theInstanceList:
+            anInstance.update()
+
     def appendInstance( self, instance ):
         self.theInstanceList.append( instance )
 
