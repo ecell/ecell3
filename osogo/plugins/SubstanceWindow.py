@@ -38,8 +38,7 @@ class SubstanceWindow(PluginWindow):
         aFullIDString = constructFullIDString( self.theFullID )
         self["id_label"].set_text( aFullIDString )
 
-        qvalue = self.theSimulator.getProperty( self.theFPNQuantity )
-        self.theQuantity = qvalue[0]
+        self.theQuantity = self.theSimulator.getProperty( self.theFPNQuantity )[0]
         self['Quantity_entry'].set_text( str( self.theQuantity ) )
 
         self.theConcentration = self.theSimulator.getProperty( self.theFPNConcentration )[0]
@@ -114,8 +113,8 @@ def mainLoop():
 if __name__ == "__main__":
 
     class simulator:        
-        dic={('Substance','/CELL/CYTOPLASM','ATP','quantity') : (1950,),
-             ('Substance','/CELL/CYTOPLASM','ATP','concentration') : (0.353,),}
+        dic={('Substance','/CELL/CYTOPLASM','ATP','Quantity') : (1950,),
+             ('Substance','/CELL/CYTOPLASM','ATP','Concentration') : (0.353,),}
         def getProperty( self, fpn ):
             return simulator.dic[fpn]
         
