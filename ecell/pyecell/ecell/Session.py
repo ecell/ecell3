@@ -210,7 +210,6 @@ class Session:
         self.__loadEntityList( 'Reactor',   aSystemPath, aReactorList )
         self.__loadEntityList( 'System',    aSystemPath, aSubSystemList )
 
-        print aSubSystemList
         for aSystem in aSubSystemList:
             aSubSystemPath = joinSystemPath( aSystemPath, aSystem )
             self.__loadEntity( aSubSystemPath )
