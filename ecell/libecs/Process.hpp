@@ -73,7 +73,8 @@ namespace libecs
 	PROPERTYSLOT_SET_GET( Int,       Priority );
 	PROPERTYSLOT_SET_GET( String,    StepperID );
 
-	PROPERTYSLOT_SET_GET_NO_LOAD_SAVE( Real,      Activity );
+	PROPERTYSLOT_SET_GET_NO_LOAD_SAVE( Real,     Activity );
+	PROPERTYSLOT_GET_NO_LOAD_SAVE(     Int,      IsContinuous );
       }
 
     /** 
@@ -143,6 +144,11 @@ namespace libecs
       return false;
     }
     
+    GET_METHOD( Int, IsContinuous )
+    {
+      return isContinuous();
+    }
+
     /**
        Set activity value.
 
@@ -151,8 +157,7 @@ namespace libecs
        chemical reaction.
 
        If the value has time in its dimension, the unit should be [per
-       second], not [per step], to keep its meaning in
-       multi-stepper simulations.
+       second], not [per step].
 
        @param anActivity An activity value to be set.
        @see getActivity()

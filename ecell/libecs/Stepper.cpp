@@ -117,6 +117,14 @@ namespace libecs
     std::stable_sort( theProcessVector.begin(), theProcessVector.end(),
 		      Process::PriorityCompare() );
 
+    // partition by isContinuous().
+    ProcessVectorConstIterator aDiscreteProcessIterator
+      ( std::stable_partition( theProcessVector.begin(),
+			       theProcessVector.end(),
+			       std::mem_fun( &Process::isContinuous ) ) );
+
+    theDiscreteProcessOffset = 
+      aDiscreteProcessIterator - theProcessVector.begin();
   }
 
   void Stepper::updateVariableVector()

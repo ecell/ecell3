@@ -439,6 +439,11 @@ namespace libecs
       return theProcessVector;
     }
 
+    const ProcessVector::size_type getDiscreteProcessOffset() const
+    {
+      return theDiscreteProcessOffset;
+    }
+
     VariableVectorCref getVariableVector() const
     {
       return theVariableVector;
@@ -581,9 +586,10 @@ namespace libecs
 
     VariableVector            theIntegratedVariableVector;
 
-    ProcessVector         theProcessVector;
+    ProcessVector             theProcessVector;
+    ProcessVector::size_type  theDiscreteProcessOffset;
 
-    StepperVector         theDependentStepperVector;
+    StepperVector             theDependentStepperVector;
 
     RealVector theValueBuffer;
 
