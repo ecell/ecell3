@@ -20,13 +20,18 @@ Requires: boost-devel
 %description
 E-Cell Simulation Environment (E-Cell SE) is a software package for cellular and biochemical modeling and simulation. E-Cell attempts to provide a framework not only for analyzing metabolism, but also for higher-order cellular phenomena such as gen regulation networks, DNA replication and other occurences in the cell cycle.
 
+	
 %prep
 %setup 
 #%setup -a 1
 
 %patch0 -p1
 
-CFLAGS="$RPM_OPT_FLAGS" ./configure --prefix=%{_prefix}
+%ifarch i686
+CXXFLAGS="-O2 -mfpmath=sse -msse2 $RPM_OPT_FLAGS" ./configure --prefix=%{_prefix}
+%else
+CXXFLAGS="$RPM_OPT_FLAGS" ./configure --prefix=%{_prefix}
+%endif
 
 %build
 make
