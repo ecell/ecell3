@@ -51,15 +51,13 @@
 #define __NRSTEPPER_HPP
 
 //#include <iostream>
-#include <vector>
+//#include <vector>
 #include <algorithm>
 
 #include <gsl/gsl_rng.h>
 
-#include "libecs/libecs.hpp"
 #include "libecs/DynamicPriorityQueue.hpp"
-#include "libecs/Variable.hpp"
-#include "libecs/Stepper.hpp"
+#include "libecs/DiscreteEventStepper.hpp"
 
 #include "NRProcess.hpp"
 

@@ -34,7 +34,7 @@
 
 // #include <iostream>
 
-#include "libecs/Stepper.hpp"
+#include "libecs/DifferentialStepper.hpp"
 
 USE_LIBECS;
 

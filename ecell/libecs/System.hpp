@@ -28,8 +28,8 @@
 // E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
 
-#ifndef ___SYSTEM_H___
-#define ___SYSTEM_H___
+#ifndef ___SYSTEM_HPP
+#define ___SYSTEM_HPP
 #include <map>
 
 #include "libecs.hpp"
@@ -437,7 +437,7 @@ namespace libecs
 
 } // namespace libecs
 
-#endif /* ___SYSTEM_H___ */
+#endif /* __SYSTEM_HPP */
 
 
 /*

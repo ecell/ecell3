@@ -2,7 +2,7 @@
 //
 //        This file is part of E-CELL Simulation Environment package
 //
-//                Copyright (C) 2002 Keio University
+//                Copyright (C) 1996-2002 Keio University
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
@@ -28,49 +28,34 @@
 // E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
 
-#ifndef __CASHKARP45_HPP
-#define __CASHKARP45_HPP
+#include "DiscreteEventStepper.hpp"
 
 
-// #include <iostream>
-
-#include "libecs/DifferentialStepper.hpp"
-
-USE_LIBECS;
-
-// DECLARE_VECTOR( Real, RealVector );
-
-// DECLARE_CLASS( CashKarp45Stepper );
-
-class CashKarp45Stepper 
-  : 
-  public AdaptiveDifferentialStepper
+namespace libecs
 {
 
-  LIBECS_DM_OBJECT( Stepper, CashKarp45Stepper );
+  //////////////////// DiscreteEventStepper
 
-public:
+  DiscreteEventStepper::DiscreteEventStepper()
+  {
+    ; // do nothing
+  }
 
-  CashKarp45Stepper( void );
-  
-  virtual ~CashKarp45Stepper( void );
+  void DiscreteEventStepper::dispatchInterruptions()
+  {
+    Stepper::dispatchInterruptions();
+  }
 
-  virtual void initialize();
-  virtual bool calculate();
 
-  virtual const Int getOrder() const { return 4; }
 
-protected:
+} // namespace libecs
 
-  //  RealVector theK1;
-  RealVector theK2;
-  RealVector theK3;
-  RealVector theK4;
-  RealVector theK5;
-  RealVector theK6;
 
-  RealVector theErrorEstimate;
+/*
+  Do not modify
+  $Author$
+  $Revision$
+  $Date$
+  $Locker$
+*/
 
-};
-
-#endif /* __CASHKARP45_HPP */

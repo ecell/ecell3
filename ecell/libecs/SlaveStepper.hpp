@@ -28,28 +28,88 @@
 // E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
 
-#include "StepperMaker.hpp"
+#ifndef __SLAVESTEPPER_HPP
+#define __SLAVESTEPPER_HPP
 
-#include "DiscreteTimeStepper.hpp"
-#include "SlaveStepper.hpp"
+#include "libecs.hpp"
+
+#include "Stepper.hpp"
+
 
 namespace libecs
 {
 
+  /** @addtogroup stepper
+   *@{
+   */
 
-  ////////////////////// StepperMaker
- 
+  /** @file */
 
-  StepperMaker::StepperMaker()
+
+  /**
+     SlaveStepper steps only when triggered by incoming interruptions from
+     other Steppers.
+
+     This Stepper never dispatch interruptions to other Steppers.
+
+     The step interval of this Stepper is fixed to infinity -- which 
+     means that this doesn't step spontaneously.
+
+  */
+
+  class SlaveStepper
+    :
+    public Stepper
   {
-    makeClassList();
-  }
 
-  void StepperMaker::makeClassList()
-  {
-    NewStepperModule( DiscreteTimeStepper );
-    NewStepperModule( SlaveStepper );
-  }
+  public:
+
+    LIBECS_DM_OBJECT( Stepper, SlaveStepper );
+
+
+    SlaveStepper();
+    ~SlaveStepper() {}
+    
+    virtual void initialize();
+
+    virtual void step()
+    {
+      process();
+    }
+
+    virtual void interrupt( StepperPtr const aCaller )
+    {
+      //      setCurrentTime( aCaller->getCurrentTime() );
+
+      integrate( aCaller->getCurrentTime() );
+      step();
+      log();
+    }
+
+    virtual SET_METHOD( Real, StepInterval )
+    {
+      // skip range check
+      loadStepInterval( value );
+    }
+
+    virtual void dispatchInterruptions()
+    {
+      ; // do nothing
+    }
+
+  };
 
 
 } // namespace libecs
+
+#endif /* __SLAVESTEPPER_HPP */
+
+
+
+/*
+  Do not modify
+  $Author$
+  $Revision$
+  $Date$
+  $Locker$
+*/

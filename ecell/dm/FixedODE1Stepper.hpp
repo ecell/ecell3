@@ -34,13 +34,10 @@
 
 // #include <iostream>
 
-#include "libecs/Stepper.hpp"
+#include "libecs/DifferentialStepper.hpp"
 
 USE_LIBECS;
 
-// DECLARE_VECTOR( Real, RealVector );
-
-// DECLARE_CLASS( FixedEuler1Stepper );
 
 class FixedODE1Stepper 
   : 

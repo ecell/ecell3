@@ -35,7 +35,7 @@
 // #include <iostream>
 
 #include "libecs/VariableProxy.hpp"
-#include "libecs/Stepper.hpp"
+#include "libecs/DifferentialStepper.hpp"
 
 USE_LIBECS;
 

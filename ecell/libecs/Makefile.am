@@ -27,6 +27,10 @@ ProcessMaker.cpp\
 Variable.cpp\
 VariableMaker.cpp\
 Stepper.cpp\
+DifferentialStepper.cpp\
+DiscreteTimeStepper.cpp\
+DiscreteEventStepper.cpp\
+SlaveStepper.cpp\
 VariableProxy.cpp\
 Model.cpp\
 Scheduler.cpp\
@@ -58,6 +62,10 @@ ProcessMaker.hpp\
 Variable.hpp\
 VariableMaker.hpp\
 Stepper.hpp\
+DifferentialStepper.hpp\
+DiscreteTimeStepper.hpp\
+DiscreteEventStepper.hpp\
+SlaveStepper.hpp\
 VariableProxy.hpp\
 Model.hpp\
 Scheduler.hpp\
