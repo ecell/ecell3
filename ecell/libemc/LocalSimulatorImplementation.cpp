@@ -132,7 +132,8 @@ namespace libemc
     for( LoggerBroker::LoggerMapConstIterator i( aLoggerMap.begin() );
 	 i != aLoggerMap.end(); ++i )
       {
-	aLoggerListPtr->push_back( i->first );
+	FullPNCref aFullPN( i->first );
+	aLoggerListPtr->push_back( aFullPN.getString() );
       }
 
     return aLoggerListPtr;
@@ -141,8 +142,12 @@ namespace libemc
 
   void LocalSimulatorImplementation::run()
   {
-    assert( thePendingEventChecker != NULLPTR );
-    assert( theEventHandler != NULLPTR );
+    if( ! ( thePendingEventChecker != NULLPTR && theEventHandler != NULLPTR ) )
+      {
+	throw libecs::Exception( __PRETTY_FUNCTION__, 
+				 "Both EventChecker and EventHandler must be "
+				 "set before run without duration." ) ;
+      }
 
     theRunningFlag = true;
 
@@ -165,9 +170,18 @@ namespace libemc
 
   void LocalSimulatorImplementation::run( libecs::Real aDuration )
   {
-    assert( thePendingEventChecker != NULLPTR );
-    assert( theEventHandler != NULLPTR );
+    if( thePendingEventChecker != NULLPTR && theEventHandler != NULLPTR )
+      {
+	runWithEvent( aDuration );
+      }
+    else
+      {
+	runWithoutEvent( aDuration );
+      }
+  }
 
+  void LocalSimulatorImplementation::runWithEvent( libecs::Real aDuration )
+  {
     theRunningFlag = true;
 
     libecs::Real aStopTime( theRootSystem.getStepperLeader().getCurrentTime() 
@@ -191,6 +205,31 @@ namespace libemc
         {
 	  (*theEventHandler)();
 	}
+
+      }	while( theRunningFlag );
+
+  }
+
+  void LocalSimulatorImplementation::runWithoutEvent( libecs::Real aDuration )
+  {
+    theRunningFlag = true;
+
+    libecs::Real aStopTime( theRootSystem.getStepperLeader().getCurrentTime() 
+			    + aDuration );
+
+    do
+      {
+	for( int i( 0 ) ; i < 20 ; i++ )
+	  {
+	    if( theRootSystem.getStepperLeader().getCurrentTime() 
+		>= aStopTime )
+	      {
+		theRunningFlag = false;
+		break;
+	      }
+
+	    step();
+	  }
 
       }	while( theRunningFlag );
 

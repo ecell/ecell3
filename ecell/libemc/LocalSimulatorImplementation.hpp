@@ -104,6 +104,9 @@ namespace libemc
 
   private:
 
+    void runWithEvent( libecs::Real aDuration );
+    void runWithoutEvent( libecs::Real aDuration );
+
     static bool defaultPendingEventChecker();
 
   private:
