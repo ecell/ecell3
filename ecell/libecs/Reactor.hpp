@@ -177,6 +177,7 @@ namespace libecs
 
 
   DECLARE_CLASS( SRMReactor );
+  DECLARE_CLASS( RuleSRMReactor );
 
   class SRMReactor
     :
@@ -184,17 +185,6 @@ namespace libecs
   {
 
   public:
-
-    class IsRuleReactor
-      : 
-      public std::unary_function<SRMReactorPtr,bool>
-    {
-    public:
-      result_type operator()( const argument_type aReactorPtr ) const
-      {
-	return aReactorPtr->isRuleReactor();
-      }
-    };
 
     class PriorityCompare
     {
@@ -207,12 +197,6 @@ namespace libecs
 
     SRMReactor();
     virtual ~SRMReactor();
-
-    virtual const bool isRuleReactor() const
-    {
-      return false; 
-    }
-
 
     virtual void initialize();
 
@@ -239,6 +223,48 @@ namespace libecs
   private:
 
     Int         thePriority;
+
+  };
+
+
+
+  class RuleSRMReactor
+    :
+    public SRMReactor
+  {
+
+  public:
+
+    class IsRuleReactor
+      : 
+      public std::unary_function<SRMReactorPtr,bool>
+    {
+    public:
+      result_type operator()( const argument_type aReactorPtr ) const
+      {
+	if( dynamic_cast<RuleSRMReactorPtr> ( aReactorPtr ) != NULLPTR ) 
+	  {
+	    return true;
+	  }
+	else
+	  {
+	    return false;
+	  }
+      }
+    };
+
+
+
+    RuleSRMReactor()
+    {
+      ; // do nothing
+    }
+
+    virtual ~RuleSRMReactor()
+    {
+      ; // do nothing
+    }
+
 
   };
 

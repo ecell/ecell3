@@ -301,7 +301,7 @@ namespace libecs
     theRuleReactorCache.clear();
     std::remove_copy_if( theReactorCache.begin(), theReactorCache.end(),
 			 theRuleReactorCache.begin(), 
-			 std::not1( SRMReactor::IsRuleReactor() ) );
+			 std::not1( RuleSRMReactor::IsRuleReactor() ) );
 
     distributeIntegrator( theIntegratorAllocator );
 

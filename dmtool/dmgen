@@ -7,16 +7,16 @@
 #
 
 PACKAGE=dmtool
-VERSION=3.0.4
+VERSION=3.0.5
 
-prefix=/home/tomo/wrk/local
-exec_prefix=/home/tomo/wrk/local
+prefix=/home/shafi/test
+exec_prefix=/home/shafi/test
 pythondir=${prefix}/lib/python2.2/site-packages
 
-SHAREDIR="${prefix}/share/ecell/3.0.4/template"
+SHAREDIR="${prefix}/share/ecell/3.0.5/template"
 BINDIR="${exec_prefix}/bin"
 MUNCHBIN="${pythondir}/ecell/munch.py"
-TMPLDIR="${prefix}/share/ecell/3.0.4/template"
+TMPLDIR="${prefix}/share/ecell/3.0.5/template"
 
 MUNCHSUFFIX=".mu"
 TMPLSUFFIX=".tmpl"
