@@ -54,6 +54,6 @@ dnl
 dnl
 dnl Create the top-level Makefile.
 dnl
-AC_OUTPUT(Makefile dmtool dmcompile dmgen,chmod +x dmtool dmcompile dmgen)
+AC_OUTPUT(Makefile dmcompile dmgen,chmod +x dmcompile dmgen)
 
 
