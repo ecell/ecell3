@@ -45,7 +45,7 @@ namespace libecs
   void Substance::makeSlots()
   {
     registerSlot( getPropertySlotMaker()->
-		  createPropertySlot( "Concentration",*this,
+		  createPropertySlot( "Concentration", *this,
 				      Type2Type<Real>(),
 				      NULLPTR,
 				      &Substance::getConcentration ) );
@@ -68,6 +68,12 @@ namespace libecs
   {
 
   }
+
+  const Real Substance::getActivity()
+  {
+    return getVelocity();
+  }
+
 
 
 
@@ -113,7 +119,7 @@ namespace libecs
 
   void PlainSubstance::initialize()
   {
-
+    ; // do nothing
   }
 
 
@@ -121,12 +127,6 @@ namespace libecs
   {
     theQuantity = aQuantity;
   }
-
-  const Real PlainSubstance::getActivity()
-  {
-    return getVelocity();
-  }
-
 
   void PlainSubstance::setFixed( RealCref aValue )
   { 

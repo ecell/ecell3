@@ -70,9 +70,32 @@ namespace libecs
 
 
     /**
-       @return the number of molecules.
+       Initializes this substance. 
     */
+    virtual void initialize();
+
+
+    /**
+       Clear phase.
+    */
+
+    virtual void clear() = 0;
+
+    virtual void integrate() = 0;
+
+
+    /**
+       @return the quantity of this substance.
+    */
+
     virtual const Real getQuantity() const = 0;
+
+
+    /**
+       @param aQuantity the quantity of this substance.
+    */
+
+    virtual void setQuantity( RealCref aQuantity ) = 0;
 
 
     /**
@@ -86,11 +109,20 @@ namespace libecs
       return getQuantity() * getSuperSystem()->getConcentrationFactor();
     }
 
+
+    virtual void setVelocity( RealCref aVelocity );
+
     /**
-       Initializes this substance. 
-       Called at startup.
+       @return current velocity value in (number of molecules)/(step)
     */
-    virtual void initialize();
+
+    virtual const Real getVelocity() const;
+
+    /**
+       @param v velocity in number of molecules to be added.
+    */
+
+    virtual void addVelocity( RealCref aVelocity );
 
     /**
        Returns activity value of a Substance object.
@@ -99,9 +131,7 @@ namespace libecs
        @return activity value of Substance in Real.
     */
 
-    virtual const Real getActivity() = 0;
-
-    virtual void setQuantity( RealCref aQuantity ) = 0;
+    virtual const Real getActivity();
 
     virtual StringLiteral getClassName() const { return "Substance"; }
 
@@ -139,9 +169,9 @@ namespace libecs
     */
     virtual void initialize();
 
+
     /**
        Clear phase.
-       Then call clear() of the integrator.
     */
 
     virtual void clear()
@@ -149,35 +179,10 @@ namespace libecs
       theVelocity = 0.0; 
     }
 
-    virtual void setVelocity( RealCref aVelocity )
+    virtual void integrate()
     {
-      theVelocity = aVelocity;
+      theQuantity += theVelocity;
     }
-
-    /**
-       @return current velocity value in (number of molecules)/(step)
-    */
-    virtual const Real getVelocity() const
-    { 
-      return theVelocity; 
-    }
-
-    /**
-       @param v velocity in number of molecules to be added.
-    */
-    virtual void addVelocity( RealCref aVelocity ) 
-    {
-      theVelocity += aVelocity; 
-    }
-
-    /**
-       Returns activity value of a Substance object.
-       The activity is current velocity.
-       @see getActivityPerSecond
-       @return activity value of Substance in Real.
-    */
-
-    virtual const Real getActivity();
 
     /**
        Set a quantity with no check. (i.e. isFixed() is ignored.)
@@ -206,6 +211,28 @@ namespace libecs
 	}
     }
 
+    virtual void setVelocity( RealCref aVelocity )
+    {
+      theVelocity = aVelocity;
+    }
+
+    /**
+       @return current velocity value in (number of molecules)/(step)
+    */
+
+    virtual const Real getVelocity() const
+    { 
+      return theVelocity; 
+    }
+
+    /**
+       @param v velocity in number of molecules to be added.
+    */
+
+    virtual void addVelocity( RealCref aVelocity ) 
+    {
+      theVelocity += aVelocity; 
+    }
 
     /**
        Get a quantity via save() method of the Accumulator.
@@ -315,7 +342,7 @@ namespace libecs
        integrate phase.
        Perform integration by a result calculated by integrator.
     */
-    void integrate();
+    virtual void integrate();
 
     /**
        Set a quantity with no check. (i.e. isFixed() is ignored.)
