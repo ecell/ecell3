@@ -9,16 +9,18 @@ ToolLauncher.glade\
 ToolLauncherErrorMessage.glade\
 ToolLauncherOkCancel.glade\
 ToolLauncherPreferences.glade\
-ToolLauncherVersion.glade\
-launcher.ini\
+AboutToolLauncher.glade\
 config.py\
 ParentWindow.py\
 ToolLauncher.py\
 ToolLauncherErrorMessage.py\
 ToolLauncherOkCancel.py\
 ToolLauncherPreferences.py\
-ToolLauncherVersion.py\
-Window.py
+AboutToolLauncher.py\
+Window.py\
+toollauncher.png\
+toollauncher_large.png\
+toollauncher.ico
 
 EXTRA_DIST=${toollauncher_PYTHON}
 
