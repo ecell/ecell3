@@ -4,6 +4,8 @@ import string
 import eml
 import sys
 import os
+import time
+
 
 from Numeric import *
 import ecell.ecs
@@ -120,9 +122,18 @@ class Session:
 
         # if the type is string
         if type( aModel ) == str:
+
+            # add comment
+            aCurrentInfo = '''<!-- created by ecell.Session.saveModel
+ date: %s
+ currenttime: %s
+-->
+<eml>
+''' % ( time.asctime( time.localtime() ) , self.getCurrentTime() )
        	    aString = self.anEml.asString()
+            aBuffer = string.join( string.split(aString, '<eml>\n'), aCurrentInfo)
             aFileObject = open( aModel, 'w' )
-            aFileObject.write( aString )
+            aFileObject.write( aBuffer )
             aFileObject.close()
 
         # if the type is file object
@@ -560,21 +571,8 @@ class Session:
                 aValue = self.theSimulator.getEntityProperty(aFullPN)
                 anAttribute = self.theSimulator.getEntityPropertyAttributes(aFullPN)
 
-                #anExclusionList = ('Concentration',
-                #                   'Fixed',
-                #                   'FullID',
-                #                   'Name',
-                #                   'TotalVelocity',
-                #                   'Velocity',
-                #                   'Activity',
-                #                   'Priority',
-                #                   )
-                
                 if anAttribute[0] == 0:
                     pass
-                
-                #elif aProperty in anExclusionList:
-                #    pass
                 
                 elif aValue == '':
                     pass
