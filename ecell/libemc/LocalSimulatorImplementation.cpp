@@ -135,6 +135,7 @@ namespace libemc
   {
     StepperPtr aStepperPtr( getModel().getStepper( aStepperID ) );
     
+    theMutatedFlag = true;
     aStepperPtr->setProperty( aPropertyName, aValue );
   }
 
@@ -258,6 +259,7 @@ namespace libemc
     FullPN aFullPN( aFullPNString );
     EntityPtr anEntityPtr( getModel().getEntity( aFullPN.getFullID() ) );
 
+    theMutatedFlag = true;
     anEntityPtr->setProperty( aFullPN.getPropertyName(), aValue );
   }
 
@@ -427,7 +429,6 @@ namespace libemc
   const libecs::Polymorph LocalSimulatorImplementation::
   getLoggerPolicy( libecs::StringCref aFullPNString ) const
   {
-
     return getLogger( aFullPNString )->getLoggerPolicy();
   }
 
@@ -468,7 +469,7 @@ namespace libemc
 	    break;
 	  }
 
-	if( aCounter % 20 == 0 )
+	if( aCounter % theEventCheckInterval == 0 )
 	  {
 	    while( (*theEventChecker)() )
 	      {
@@ -510,7 +511,7 @@ namespace libemc
 
     do
       {
-	for( unsigned int i( 20 ); i != 0; --i )
+	for( unsigned int i( theEventCheckInterval ); i != 0; --i )
 	  {
 	    getModel().step();
 	  }
@@ -556,7 +557,7 @@ namespace libemc
 
     do
       {
-	for( unsigned int i( 20 ); i != 0; --i )
+	for( unsigned int i( theEventCheckInterval ); i != 0; --i )
 	  {
 	    if( getModel().getCurrentTime() > aStopTime )
 	      {
