@@ -51,7 +51,7 @@ namespace libecs
     :
     theNextStepInterval( 0.001 ),
     theTolerableStepInterval( 0.001 ),
-    theStateFlag( false )
+    theStateFlag( true )
   {
     ; // do nothing
   }
