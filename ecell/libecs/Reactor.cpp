@@ -33,6 +33,8 @@
 #include "RootSystem.hpp"
 #include "Stepper.hpp"
 #include "FQPI.hpp"
+#include "Substance.hpp"
+
 #include "Reactor.hpp"
 
 Reactor::Condition Reactor::theGlobalCondition;// = Reactor::Condition::Good;
@@ -40,71 +42,127 @@ Reactor::Condition Reactor::theGlobalCondition;// = Reactor::Condition::Good;
 void Reactor::makeSlots()
 {
   //FIXME: get methods
-  MessageSlot( "substrate",Reactor,*this,&Reactor::setSubstrate,NULL );
-  MessageSlot( "product",Reactor,*this,&Reactor::setProduct,NULL );
-  MessageSlot( "catalyst",Reactor,*this,&Reactor::setCatalyst,NULL );
-  MessageSlot( "effector",Reactor,*this,&Reactor::setEffector,NULL );
-  MessageSlot( "initialActivity",Reactor,*this,&Reactor::setInitialActivity,
+  MessageSlot( "AppendSubstrate",Reactor,*this,&Reactor::setAppendSubstrate,
+	       NULL );
+  MessageSlot( "AppendProduct",Reactor,*this,&Reactor::setAppendProduct,
+	       NULL );
+  MessageSlot( "AppendCatalyst",Reactor,*this,&Reactor::setAppendCatalyst,
+	       NULL );
+  MessageSlot( "AppendEffector",Reactor,*this,&Reactor::setAppendEffector,
+	       NULL );
+
+  MessageSlot( "SubstrateList",Reactor,*this,&Reactor::setSubstrateList,
+	       &Reactor::getSubstrateList);
+  MessageSlot( "ProductList",Reactor,*this,&Reactor::setProductList,
+	       &Reactor::getProductList);
+  MessageSlot( "CatalystList",Reactor,*this,&Reactor::setCatalystList,
+	       &Reactor::getCatalystList);
+  MessageSlot( "EffectorList",Reactor,*this,&Reactor::setEffectorList,
+	       &Reactor::getEffectorList);
+
+  MessageSlot( "InitialActivity",Reactor,*this,&Reactor::setInitialActivity,
 	       &Reactor::getInitialActivity );
 }
 
-void Reactor::setSubstrate( MessageCref message )
+void Reactor::setAppendSubstrate( MessageCref message )
 {
   //FIXME: range check
   appendSubstrate( message[0].asString(), message[1].asInt() );
 }
 
-void Reactor::setProduct( MessageCref message )
+void Reactor::setAppendProduct( MessageCref message )
 {
   //FIXME: range check
   appendSubstrate( message[0].asString(), message[1].asInt() );
 }
 
-void Reactor::setCatalyst( MessageCref message )
+void Reactor::setAppendCatalyst( MessageCref message )
 {
   //FIXME: range check
   appendSubstrate( message[0].asString(), message[1].asInt() );
 }
 
-void Reactor::setEffector( MessageCref message )
+void Reactor::setAppendEffector( MessageCref message )
 {
   //FIXME: range check
   appendSubstrate( message[0].asString(), message[1].asInt() );
+}
+
+void Reactor::setSubstrateList( MessageCref message )
+{
+  cerr << "not implemented yet." << endl;
+}
+
+void Reactor::setProductList( MessageCref message )
+{
+  cerr << "not implemented yet." << endl;
+}
+
+void Reactor::setEffectorList( MessageCref message )
+{
+  cerr << "not implemented yet." << endl;
+}
+
+void Reactor::setCatalystList( MessageCref message )
+{
+  cerr << "not implemented yet." << endl;
+}
+
+const Message Reactor::getSubstrateList( StringCref keyword )
+{
+  UniversalVariableVector aList;
+  
+  for( ReactantVectorConstIterator i = theSubstrateList.begin() ;
+       i != theSubstrateList.end() ; ++i )
+    {
+      aList.push_back( (*i)->getSubstance().getFqid() );
+    }
+
+  return Message( keyword, aList );
+}
+
+const Message Reactor::getProductList( StringCref keyword )
+{
+  UniversalVariableVector aList;
+  
+  for( ReactantVectorConstIterator i = theProductList.begin() ;
+       i != theProductList.end() ; ++i )
+    {
+      aList.push_back( (*i)->getSubstance().getFqid() );
+    }
+
+  return Message( keyword, aList );
+}
+
+const Message Reactor::getEffectorList( StringCref keyword )
+{
+  UniversalVariableVector aList;
+  
+  for( ReactantVectorConstIterator i = theEffectorList.begin() ;
+       i != theEffectorList.end() ; ++i )
+    {
+      aList.push_back( (*i)->getSubstance().getFqid() );
+    }
+
+  return Message( keyword, aList );
+}
+
+const Message Reactor::getCatalystList( StringCref keyword )
+{
+  UniversalVariableVector aList;
+  
+  for( ReactantVectorConstIterator i = theCatalystList.begin() ;
+       i != theCatalystList.end() ; ++i )
+    {
+      aList.push_back( (*i)->getSubstance().getFqid() );
+    }
+
+  return Message( keyword, aList );
 }
 
 void Reactor::setInitialActivity( MessageCref message )
 {
   setInitialActivity( message[0].asFloat() );
-}
-
-const Message getSubstrate( StringCref )
-{
-  static String aKeyword( "Substrate" );
-
-  // FIXME: implement this
-  return Message( aKeyword );
-}
-
-const Message getProduct( StringCref )
-{
-  static String aKeyword( "Product" );
-  return Message( aKeyword );
-}
-
-const Message getCatalyst( StringCref )
-{
-  static String aKeyword( "Catalyst" );
-
-  // FIXME: implement this
-  return Message( aKeyword );
-}
-
-const Message getEffector( StringCref )
-{
-  static String aKeyword( "Effector" );
-
-  // FIXME: implement this
-  return Message( aKeyword );
 }
 
 const Message Reactor::getInitialActivity( StringCref keyword )

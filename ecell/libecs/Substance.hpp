@@ -138,7 +138,7 @@ public:
     @return current velocity value in (number of molecules)/(step)
    */
   Float getVelocity() const
-    { return getVelocity(); }
+    { return theVelocity; }
 
   /**
     @param v velocity in number of molecules to be added.
@@ -176,6 +176,9 @@ public:
     Get a quantity via save() method of the Accumulator.
    */
   Float saveQuantity();
+
+
+  virtual const char* const getClassName() const { return "Substance"; }
 
   /**
      set a class name string of user default accumulator

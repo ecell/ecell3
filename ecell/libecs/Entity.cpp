@@ -51,12 +51,18 @@ Entity::~Entity()
 
 void Entity::makeSlots()
 {
-  MessageSlot( "Id", Entity, *this, NULL, &Entity::getId);
-  MessageSlot( "SystemPath", Entity, *this, NULL, &Entity::getSystemPath);
-  MessageSlot( "Name", Entity, *this, NULL, &Entity::getName);
-  MessageSlot( "Activity", Entity, *this, NULL, &Entity::getActivity);
+  MessageSlot( "ClassName", Entity, *this, NULL, &Entity::getClassName );
+  MessageSlot( "Id", Entity, *this, NULL, &Entity::getId );
+  MessageSlot( "SystemPath", Entity, *this, NULL, &Entity::getSystemPath );
+  MessageSlot( "Name", Entity, *this, NULL, &Entity::getName );
+  MessageSlot( "Activity", Entity, *this, NULL, &Entity::getActivity );
   MessageSlot( "ActivityPerSecond", Entity, *this, NULL, 
-	       &Entity::getActivityPerSecond);
+	       &Entity::getActivityPerSecond );
+}
+
+const Message Entity::getClassName( StringCref keyword )
+{
+  return Message( keyword, UniversalVariable( getClassName() ) );
 }
 
 const Message Entity::getId( StringCref keyword )

@@ -75,6 +75,7 @@ public:
   }
 
 
+  const Message getClassName( StringCref keyword );
   const Message getId( StringCref keyword );
   const Message getSystemPath( StringCref keyword );
   const Message getName( StringCref keyword );

@@ -37,8 +37,9 @@
 #include "libecs.hpp"
 #include "Entity.hpp"
 
-typedef vector<Reactant*> ReactantList;
-typedef vector<Reactant*>::iterator ReactantListIterator;
+
+// FIXME: contain instances, not pointers
+DECLARE_VECTOR( ReactantPtr, ReactantVector );
 
 /**
   Reactor class is used to represent chemical and other phenonema which 
@@ -76,16 +77,23 @@ public:
 
   // MessageInterfaces
 
-  void setSubstrate( MessageCref message );
-  void setProduct( MessageCref message );
-  void setCatalyst( MessageCref message );
-  void setEffector( MessageCref message );
+  void setAppendSubstrate( MessageCref message );
+  void setAppendProduct( MessageCref message );
+  void setAppendCatalyst( MessageCref message );
+  void setAppendEffector( MessageCref message );
+
+  void setSubstrateList( MessageCref message );
+  void setProductList( MessageCref message );
+  void setCatalystList( MessageCref message );
+  void setEffectorList( MessageCref message );
+
   void setInitialActivity( MessageCref message );
 
-  const Message getSubstrate( StringCref keyword );
-  const Message getProduct( StringCref keyword );
-  const Message getCatalyst( StringCref keyword );
-  const Message getEffector( StringCref keyword );
+  const Message getSubstrateList( StringCref keyword );
+  const Message getProductList( StringCref keyword );
+  const Message getCatalystList( StringCref keyword );
+  const Message getEffectorList( StringCref keyword );
+
   const Message getInitialActivity( StringCref keyword );
 
 
@@ -138,10 +146,10 @@ protected:
 
   void makeSlots();
 
-  ReactantList theSubstrateList; 
-  ReactantList theProductList;   
-  ReactantList theEffectorList;
-  ReactantList theCatalystList;
+  ReactantVector theSubstrateList; 
+  ReactantVector theProductList;   
+  ReactantVector theEffectorList;
+  ReactantVector theCatalystList;
 
   /**
     Set activity variable.  This must be set at every turn and takes

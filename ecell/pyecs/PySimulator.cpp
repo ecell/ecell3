@@ -136,7 +136,7 @@ Object PySimulator::getMessage( const Tuple& args )
   Message aMessage( Simulator::getMessage( aFqpi, aPropertyName ) );
   int aMessageSize = aMessage.getBody().size();
 
-  Tuple aBodyTuple( aMessageSize );
+  Tuple aTuple( aMessageSize );
 
   for( int i = 0 ; i < aMessageSize ; ++i )
     {
@@ -160,13 +160,9 @@ Object PySimulator::getMessage( const Tuple& args )
 	  ; //FIXME: assert: NEVER_GET_HERE
 	}
 
-      aBodyTuple[i] = anObject;
+      aTuple[i] = anObject;
     }
 
-  Tuple aTuple( 2 );
-  aTuple[0] = static_cast<Py::String>( aMessage.getKeyword() );
-  aTuple[1] = aBodyTuple;
-    
   return aTuple;
 
   ECS_CATCH;

@@ -31,7 +31,92 @@
 #ifndef __MESSAGEINTERFACE_HPP
 #define __MESSAGEINTERFACE_HPP
 
+#include "libecs.hpp"
+
 #include "Message.hpp"
+
+DECLARE_CLASS( AbstractMessageCallback );
+
+DECLARE_MAP( const String, AbstractMessageCallbackPtr, less<const String>,
+	     SlotMap );
+
+/**
+   A base class for MessageCallback class.
+
+   @see MessageCallback
+   @see MessageInterface
+   @see Message
+ */
+class AbstractMessageCallback
+{
+
+public:
+
+  virtual void set( MessageCref message ) = 0;
+  virtual const Message get( StringCref keyword ) = 0;
+
+  virtual void operator()( MessageCref message ) 
+    { set( message ); }
+  virtual const Message operator()( StringCref keyword ) 
+    { return get(keyword); }
+};
+
+
+/**
+   Calls callback methods for getting and sending Message objects.
+
+   @see Message
+   @see MessageInterface
+   @see AbstractMessageCallback
+ */
+template <class T>
+class MessageCallback : public AbstractMessageCallback
+{
+
+public:
+
+  typedef void ( T::* SetMessageFunc )( MessageCref );
+  typedef const Message ( T::* GetMessageFunc )( StringCref );
+
+public:
+
+  MessageCallback( T& object, const SetMessageFunc setmethod,
+		   const GetMessageFunc getmethod )
+    : 
+    theObject( object ), 
+    theSetMethod( setmethod ), 
+    theGetMethod( getmethod ) 
+    {
+      ; // do nothing
+    }
+  
+  virtual void set( MessageCref message ) 
+    {
+      if( theSetMethod == NULLPTR )
+	{
+	  //FIXME: throw an exception
+	  return;
+	}
+      ( theObject.*theSetMethod )( message );
+    }
+
+  virtual const Message get( StringCref keyword ) 
+    {
+      if( theGetMethod == NULLPTR )
+	{
+	  //FIXME: throw an exception
+	  return Message( keyword );
+	}
+      return ( ( theObject.*theGetMethod )( keyword ));
+    }
+
+private:
+
+  T& theObject;
+  const SetMessageFunc theSetMethod;
+  const GetMessageFunc theGetMethod;
+
+};
 
 /**
   Common base class for classes which receive Messages.
@@ -40,35 +125,33 @@
   if any, to make their slots in their constructors.
   (virtual functions won't work in constructors)
 
+  FIXME: class-static slots?
+
   @see Message
   @see MessageCallback
 */
 
 class MessageInterface
 {
-public:  
-
-  typedef map< const String, AbstractMessageCallback* > SlotMap;
-  typedef SlotMap::iterator SlotMapIterator;
-
 public:
 
   MessageInterface();
-
   virtual ~MessageInterface();
 
-  void set( MessageCref ) throw( NoSlot );
-  const Message get( StringCref ) throw( NoSlot );
+  void set( MessageCref );
+  const Message get( StringCref );
 
-  //  StringList slotListString();
-
-  virtual void makeSlots() = 0;
+  virtual void makeSlots();
 
   virtual const char* const className() const { return "MessageInterface"; }
 
+public: // message slots
+
+  const Message getPropertyList( StringCref keyword );
+
 protected:
 
-  void appendSlot( StringCref keyword, AbstractMessageCallback* );
+  void appendSlot( StringCref keyword, AbstractMessageCallbackPtr );
   void deleteSlot( StringCref keyword );
 
 private:

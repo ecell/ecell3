@@ -1,4 +1,6 @@
 
+ECELLDIR=..
+
 DMTOOL_INCLUDE=-I@DMTOOL_INCLUDE_DIR@
 KORANDOM_INCLUDE=-I@KORANDOM_DIR@
 INCLTDL=@INCLTDL@
@@ -7,10 +9,13 @@ libdir=@libdir@
 INCLUDES = -I..  -I../libecs ${KORANDOM_INCLUDE} ${DMTOOL_INCLUDE} ${INCLTDL}
 noinst_LTLIBRARIES = libemc.la
 
-CXXFLAGS= @CXXFLAGS@
+CXXFLAGS= @CXXFLAGS@ #-D_REENTRANT
 
 libemc_la_LDFLAGS= -rpath ${libdir}
-libemc_la_LIBADD= -lstdc++
+
+#FIXME: specifing .libs is ugly
+libemc_la_LIBADD= -lstdc++ -L$(ECELLDIR)/libecs/.libs/ -lecs
+libemc_la_DEPENDENCIES=$(ECELLDIR)/libecs/libecs.la
 libemc_la_SOURCES=\
 Simulator.cpp\
 SimulatorImplementation.cpp\

@@ -2,50 +2,51 @@
 
 import ecs
 
+def printProperty( sim, fqpi, propertyname ):
+    value = sim.getMessage( fqpi, propertyname )
+    print fqpi, '::', propertyname, '\t=\t', value
+
+def printAllProperties( sim, fqpi ):
+    properties = sim.getMessage( fqpi, 'PropertyList' )
+    for property in properties:
+        printProperty( sim, fqpi, property )
+
+def printList( sim, primitivetype, systempath,list ):
+    for i in list:
+        printAllProperties( sim, primitivetype + ':' + systempath + ':' + i )
+
+
+
 print 'create Simulator instance.'
 s = ecs.Simulator()
 
-print 'makePrimitive()...'
+print 'make substances...'
 s.makePrimitive('Substance','Substance:/:A','substance A')
 s.makePrimitive('Substance','Substance:/:B','substance B')
 s.makePrimitive('Substance','Substance:/:C','substance C')
 
-#s.makePrimitive('ConstantParameterReactor','Reactor:/:RC1','constant')
+print 'make reactors...'
+s.makePrimitive('ConstantParameterReactor','Reactor:/:RC1','constant reactor')
 
-print 'sendMessage()...'
-s.sendMessage( 'Substance:/:A', 'quantity', (30,) )
+print 'set Substance:/:A Quantity = 30'
+s.sendMessage( 'Substance:/:A', 'Quantity', (30,) )
 
 print 'initialize()...'
 s.initialize()
 
-print 'substance list...'
-tuple = s.getMessage( 'System:/:/', 'substanceList' )
-print 'got key=%s body=%s' % (tuple[0], tuple[1])
+substancelist = s.getMessage( 'System:/:/', 'SubstanceList' )
 
-print 'getMessage()...'
-tuple = s.getMessage( 'Substance:/:A', 'id' )
-print 'got key=%s body=%s' % (tuple[0], tuple[1])
+printList( s, 'Substance', '/' , substancelist )
 
-print 'getMessage()...'
-tuple = s.getMessage( 'Substance:/:A', 'quantity' )
-print 'got key=%s body=%s' % (tuple[0], tuple[1])
+print
 
-print 'sendMessage()...'
-s.sendMessage( 'Substance:/:A', 'quantity', (0,) )
+printProperty( s, 'Substance:/:A', 'Quantity' )
+print 'changing Quantity of Substance:/:A...'
+s.sendMessage( 'Substance:/:A', 'Quantity', (1,) )
+printProperty( s, 'Substance:/:A', 'Quantity' )
 
-
-print 'getMessage()...'
-tuple = s.getMessage( 'Substance:/:A', 'quantity' )
-print 'got key=%s body=%s' % (tuple[0], tuple[1])
-
-print 'id...'
-tuple = s.getMessage( 'System:/:/', 'id' )
-print 'got key=%s body=%s' % (tuple[0], tuple[1])
-
-#print 'getMessage()...'
-#tuple = s.getMessage( 'System:/:CELL', 'id' )
-#print 'got key=%s body=%s' % (tuple[0], tuple[1])
-
-
+print
+printAllProperties( s, 'Reactor:/:RC1' )
+print
 print 'step()...'
 s.step()

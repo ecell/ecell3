@@ -8,10 +8,10 @@ INCLTDL=@INCLTDL@
 #CXXSRCDIR=/usr/etc/CXX/
 CXXSRCDIR=/home/shafi/wrk/CXX/Src
 CXXINCLUDE=-I/home/shafi/wrk/CXX
-#PYTHONINCLUDE=-I/usr/include/python2.0 #-I@PYTHONINCLUDEDIR@
-PYTHONINCLUDE=-I/usr/include/python1.5
+PYTHONINCLUDE=-I/usr/local/include/python2.1 #-I@PYTHONINCLUDEDIR@
+#PYTHONINCLUDE=-I/usr/include/python1.5
 ECELLINCLUDES=-I${ECELLDIR} -I${ECELLDIR}/libecs -I${ECELLDIR}/emc ${KORANDOM_INCLUDE} ${DMTOOL_INCLUDE} ${INCLTDL} ${PYTHONINCLUDE}
-CXXFLAGS=@CXXFLAGS@ ${CXXINCLUDE} ${ECELLINCLUDES}
+CXXFLAGS=@CXXFLAGS@ ${CXXINCLUDE} ${ECELLINCLUDES} #-D_REENTRANT
 LIBLTDL=@LIBLTDL@
 
 LIBKORANDOM=../../korandom/libkorandom.la
@@ -34,8 +34,11 @@ clean-local:
 noinst_LTLIBRARIES=ecs.la
 ecs_la_SOURCES=PyEcs.cpp PySimulator.cpp $(CXXSRC) 
 ecs_la_LDFLAGS=-module -export-dynamic -avoid-version -rpath /usr/local/lib
-ecs_la_LIBADD= -lstdc++
-#$(ECELLDIR)/emc/libemc.la $(ECELLDIR)/libecs/libecs.la $(LIBKORANDOM) ${LIBLTDL} 
+
+#FIXME: specifing .libs is ugly
+#ecs_la_LIBADD= /usr/local/lib/libstdc++.a.2.10.0 -L$(ECELLDIR)/emc/.libs/ -lemc -L$(ECELLDIR)/libecs/.libs/ -lecs
+ecs_la_LIBADD= -lstdc++ -L$(ECELLDIR)/emc/.libs/ -lemc -L$(ECELLDIR)/libecs/.libs/ -lecs
+ecs_la_DEPENDENCIES= $(ECELLDIR)/emc/libemc.la $(ECELLDIR)/libecs/libecs.la $(LIBKORANDOM) ${LIBLTDL} 
 
 all-local: ecs.so
 
@@ -44,6 +47,7 @@ ecs.so: ecs.la
 
 clean-local:
 	rm -f ecs.so
+	rm -f $(CXXSRC)
 
 pyecsdir=${pkginclude}/pyecs
 pyecs_HEADERS=\

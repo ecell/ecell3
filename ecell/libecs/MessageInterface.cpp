@@ -32,9 +32,29 @@
 
 ///////////////////////////// MessageInterface
 
+void MessageInterface::makeSlots()
+{
+  MessageSlot( "PropertyList",MessageInterface,*this,NULL,
+	       &MessageInterface::getPropertyList);
+
+}
+
+const Message MessageInterface::getPropertyList( StringCref keyword )
+{
+  UniversalVariableVector aPropertyList;
+
+  for( SlotMapConstIterator i = theSlotMap.begin() ; 
+       i != theSlotMap.end() ; ++i )
+    {
+      aPropertyList.push_back( UniversalVariable( i->first ) );
+    }
+
+  return Message( keyword, aPropertyList );
+}
+
 MessageInterface::MessageInterface()
 {
-  ; // do nothing
+  makeSlots();
 }
 
 MessageInterface::~MessageInterface()
@@ -70,7 +90,7 @@ void MessageInterface::deleteSlot( StringCref keyword )
   theSlotMap.erase( keyword );
 }
 
-void MessageInterface::set( MessageCref message ) throw( NoSlot )
+void MessageInterface::set( MessageCref message ) 
 {
   SlotMapIterator sm( theSlotMap.find( message.getKeyword() ) );
 
@@ -81,25 +101,10 @@ void MessageInterface::set( MessageCref message ) throw( NoSlot )
 		   + message.getKeyword() + "]) but no slot for it.");
     }
 
-  try {
-    sm->second->set( message );
-  }
-  catch( ExceptionCref e )
-    {
-      //      *theMessageWindow << className() << ": Callback has failed (keyword = [" 
-      //	<< message.getKeyword() << "]):\n\t" << e.message() << "\n";
-      return;
-    }
-  catch( ... )
-    {
-      //      *theMessageWindow << __PRETTY_FUNCTION__ << ": " 
-      //<< "callback has failed.(keyword = [" << message.getKeyword() << "])\n";
-      return;
-    }
-
+  sm->second->set( message );
 }
 
-const Message MessageInterface::get( StringCref keyword ) throw( NoSlot )
+const Message MessageInterface::get( StringCref keyword ) 
 {
   SlotMapIterator sm( theSlotMap.find( keyword ) );
 
@@ -110,36 +115,8 @@ const Message MessageInterface::get( StringCref keyword ) throw( NoSlot )
 		    + keyword + "]) but no slot for it.\n" );
     }
 
-  try {
-    return sm->second->get( keyword );
-  }
-  catch(ExceptionCref e)
-    {
-      //      *theMessageWindow << className() << ": Callback has failed (keyword = [" 
-      //	<< keyword << "]):\n\t" << e.message() << "\n";
-      return Message( keyword );
-    }
-  catch(...)
-    {
-      //      *theMessageWindow << __PRETTY_FUNCTION__ << ": " 
-      //	<< "callback has failed.(keyword = [" << keyword << "])\n";
-      return Message( keyword );
-    }
+  return sm->second->get( keyword );
 }
-
-#if 0 
-StringList MessageInterface::slotListString()
-{
-  StringList sl;
-
-  for( SlotMapIterator i = theSlotMap.begin() ; i != theSlotMap.end() ; ++i )
-    {
-      sl.insert( sl.end(), i->first );
-    }
-
-  return sl;
-}
-#endif
 
 /*
   Do not modify
