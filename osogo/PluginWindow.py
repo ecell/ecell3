@@ -114,7 +114,7 @@ class PluginWindow(ViewWindow):
 
     def getValue( self, fullpn ):
 
-        aValueList = self.theSession.theSimulator.getProperty( createFullIDString( fullpn ) )
+        aValueList = self.theSession.theSimulator.getProperty( createFullPNString( fullpn ) )
         return aValueList[0]
 
 
@@ -122,7 +122,7 @@ class PluginWindow(ViewWindow):
 
         if self.getAttribute( fullpn ) == 3:
             aValue = value
-            self.theSession.theSimulator.setProperty( createFullIDString( fullpn ), aValue )
+            self.theSession.theSimulator.setProperty( createFullPNString( fullpn ), aValue )
             self.thePluginManager.updateAllPluginWindow()
         else:
             aFullPNString = createFullPNString( fullpn )

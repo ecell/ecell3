@@ -53,7 +53,7 @@ class PluginManager:
             self.loadModule( classname )
 
         if root !='top_vbox':
-            self.theSession.theSimulator.record( 'aPluginManager.createInstance( \'%s\', %s )' % (classname, data) )
+#            self.theSession.theSimulator.record( 'aPluginManager.createInstance( \'%s\', %s )' % (classname, data) )
 	    self.theInterfaceWindow.addNewRecord( classname, data )
 	
         anInstance = aPlugin.createInstance( data, self, root, parent )

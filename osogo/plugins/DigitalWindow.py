@@ -12,8 +12,10 @@ class DigitalWindow( PluginWindow ):
 	
         PluginWindow.__init__( self, dirname, data, pluginmanager, root )
         
-        aValue = self.theSimulator.getProperty( self.theFullPN() )
-        if operator.isNumberType( aValue ):
+        self.theSession = pluginmanager.theSession
+        aFullPNString = createFullPNString( self.theFullPN() )
+        aValue = self.theSession.theSimulator.getProperty( aFullPNString )
+        if operator.isNumberType( aValue[0] ):
 
             self.openWindow()
             self.thePluginManager.appendInstance( self )
@@ -21,7 +23,6 @@ class DigitalWindow( PluginWindow ):
             self.initialize()
 
         else:
-            aFullPNString = createFullPNString( self.theFullPN() )
             self.theSession.printMessage( "%s: not numerical data\n" % aFullPNString )
 
         if len( self.theFullPNList() ) > 1:

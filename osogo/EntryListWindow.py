@@ -48,14 +48,14 @@ class EntryListWindow(Window):
 
         aPropertyWindowTopVBox = self.thePropertyWindow['top_vbox']
         self['property_frame'].add( aPropertyWindowTopVBox )
-        self.thePropertyWindow['propLerty_clist'].connect( 'select_row', self.selectPropertyName )
+        self.thePropertyWindow['property_clist'].connect( 'select_row', self.selectPropertyName )
         
         self.update()
 
     def update( self ):
         self.theSystemTree.clear_items(0, 999)
         self.theEntryList.clear_items(0, 999)
-        aRootSystemFullID = createFullID( 'System:/:/' )
+        aRootSystemFullID = createFullID( 'System::/' )
         self.constructTree( self.theSystemTree, aRootSystemFullID )
         self.updateEntryList()
             
@@ -67,7 +67,7 @@ class EntryListWindow(Window):
         aLeaf.show()
 
         aSystemListFullPN = convertFullIDToFullPN( aSystemFullID, 'SystemList' ) 
-        aSystemList = self.theSession.theSimulator.getProperty( createFullIDString(aSystemListFullPN))
+        aSystemList = self.theMainWindow.theSession.theSimulator.getProperty( createFullPNString( aSystemListFullPN ) )
         if aSystemList != ():
             aTree = gtk.GtkTree()
             aLeaf.set_subtree( aTree )
@@ -85,34 +85,35 @@ class EntryListWindow(Window):
             return
         
         aSelectedTypeMenuItem = self.theTypeMenu.get_active()
-        aEntityTypeString = aSelectedTypeMenuItem.get_data( 'LABEL' )
+        aPrimitiveTypeString = aSelectedTypeMenuItem.get_data( 'LABEL' )
 
         aSystemFullID = aSelectedSystemLeafMap[0].get_data( 'FULLID' )
-
+        print aSystemFullID
         self.theEntryList.clear_items( 0,-1 )
 
-        if aEntityTypeString == 'All':
+        if aPrimitiveTypeString == 'All':
             self.listEntity( 'Substance', aSystemFullID )
             self.listEntity( 'Reactor', aSystemFullID )
         else:
-            self.listEntity( aEntityTypeString, aSystemFullID )
+            self.listEntity( aPrimitiveTypeString, aSystemFullID )
 
-    def listEntity( self, aEntityTypeString, aSystemFullID ):
-        aListPN = aEntityTypeString + 'List'
+    def listEntity( self, aPrimitiveTypeString, aSystemFullID ):
+        aListPN = aPrimitiveTypeString + 'List'
         aListFullPN = convertFullIDToFullPN( aSystemFullID, aListPN ) 
-        aEntityList = self.theSession.theSimulator.getProperty( createFullIDString( aListFullPN ) )
+        aEntityList = self.theMainWindow.theSession.theSimulator.getProperty( createFullPNString( aListFullPN ) )
+
         for aEntityID in aEntityList:
             aListItem = gtk.GtkListItem( aEntityID )
             
-            if aEntityTypeString == 'Substance':
-                aEntityType = SUBSTANCE
-            elif aEntityTypeString == 'Reactor':
-                aEntityType = REACTOR
+            if aPrimitiveTypeString == 'Substance':
+                aPrimitiveType = SUBSTANCE
+            elif aPrimitiveTypeString == 'Reactor':
+                aPrimitiveType = REACTOR
 
             aSystemPath = createSystemPathFromFullID( aSystemFullID )
 
-            aEntityFullPN = ( aEntityType, aSystemPath, aEntityID, '' )
-#            aEntityFullPN = ( aEntityType, aSystemPath, aEntityID, 'Quantity' )
+            aEntityFullPN = ( aPrimitiveType, aSystemPath, aEntityID, '' )
+#            aEntityFullPN = ( aPrimitiveType, aSystemPath, aEntityID, 'Quantity' )
 
             aListItem.set_data( 'FULLPN', aEntityFullPN)
 #            aFullPNList = ( aEntityFullPN, )

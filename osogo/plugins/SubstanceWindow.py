@@ -17,6 +17,8 @@ class SubstanceWindow( PluginWindow ):
         PluginWindow.initialize( self, root )
         self.initialize()
 
+        self.theSession = pluginmanager.theSession
+        
         if len( self.theFullPNList() ) > 1:
             i = 1
             preFullID = self.theFullID()

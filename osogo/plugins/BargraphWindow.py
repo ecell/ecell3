@@ -7,6 +7,7 @@ from ecell.ecssupport import *
 
 import Numeric
 import GTK
+import operator
 
 class BargraphWindow( PluginWindow ):
     
@@ -14,15 +15,17 @@ class BargraphWindow( PluginWindow ):
 
         PluginWindow.__init__( self, dirname, data, pluginmanager, root )
 
-        if self.theSession.theSimulator.isNumber( self.theFullPN() ):
+        self.theSession = pluginmanager.theSession
+        aFullPNString = createFullPNString( self.theFullPN() )
+        aValue = self.theSession.theSimulator.getProperty( aFullPNString )
 
+        if operator.isNumberType( aValue[0] ):
             self.openWindow()
             self.thePluginManager.appendInstance( self )   
             PluginWindow.initialize( self, root )
             self.initialize()
 
         else:
-            aFullPNString = createFullPNString( self.theFullPN() )
             self.theSession.printMessage( "%s: not numerical data\n" % aFullPNString )
 
         if len( self.theFullPNList() ) > 1:
@@ -63,7 +66,7 @@ class BargraphWindow( PluginWindow ):
         aString += ':\n' + str( self.theFullPN()[PROPERTY] )        
         self.theIDEntry.set_text  ( aString )
 
-        aValue = self.theSession.theSimulator.getProperty( createFullIDString( self.theFullPN() ) )
+        aValue = self.theSession.theSimulator.getProperty( createFullPNString( self.theFullPN() ) )
         value = aValue[0]
         self.theActualValue = value
         self.theBarLength , self.theMultiplier , self.thePositiveFlag \

@@ -8,6 +8,7 @@ import GDK
 import GTK
 import re
 import string
+import operator
 from PluginWindow import *
 from ecell.ecssupport import *
 #from testTracerglade import *
@@ -26,14 +27,16 @@ class TracerWindow( PluginWindow ):
                 else:
                     IDflag = 1
         
+        self.theSession = pluginmanager.theSession
+        aFullPNString = createFullPNString( self.theFullPN() )
         if IDflag == 1:
-            if self.theSession.theSimualtor.isNumber(self.theFullPN()):
+            aValue = self.theSession.theSimulator.getProperty( aFullPNString )
+            if operator.isNumberType( aValue[0] ):
                 self.openWindow()
                 self.thePluginManager.appendInstance( self )                    
                 PluginWindow.initialize( self, root )
                 self.initialize()
             else:
-                aFullPNString = createFullPNString( self.theFullPN() )
                 self.theSession.printMessage( "%s: not numerical data\n" % aFullPNString )                    
                 
         else:
@@ -149,7 +152,8 @@ class TracerWindow( PluginWindow ):
         n = 1
         for fpn in self.theFullPNList():
             ID = fpn[2]
-            self.theLoggerList.append(self.theSession.getLogger(fpn))
+            aFullPNString = createFullPNString( fpn )
+            self.theLoggerList.append(self.theSession.getLogger( aFullPNString ))
             label = "label%d"%(n)
             self[label].set_text(ID)
             n += 1

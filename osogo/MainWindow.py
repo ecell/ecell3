@@ -69,7 +69,7 @@ class MainWindow(Window):
         #self.theEntryListWindowWindow = self.theEntryListWindow[ 'entry_list_window' ]
 
         self.theStepperChecker = 0
-        self.theUpdateInterval = 10
+        self.theUpdateInterval = 150
         self.theStepSize = 1
         self.theStepType = 0
         self.theRunningFlag = 0
@@ -136,7 +136,9 @@ class MainWindow(Window):
         aFileName = self.theRuleFileSelection.get_filename()
         self.theRuleFileSelection.hide()
         self.theSession.printMessage( 'loading rule file %s\n' % aFileName )
-        self.theSession.loadModel( aFileName )
+        aModelFile = open( aFileName )
+        self.theSession.loadModel( aModelFile )
+        aModelFile.close()
 #        self.theEntryListWindow.update()
         self.theSession.theSimulator.initialize()
         self.update()
@@ -165,7 +167,7 @@ class MainWindow(Window):
         mainQuit()
         
     def startSimulation( self, a ) :
-        self.theSession.theRunningFlag = 1
+        self.theRunningFlag = 1
         self.theSession.printMessage( "Start\n" )
         self.theTimer = gtk.timeout_add(self.theUpdateInterval, self.updateByTimeOut, 0)
         self.theLoggerWindow.update()
@@ -173,8 +175,8 @@ class MainWindow(Window):
         self.removeTimeOut()
 
     def stopSimulation( self, a ) :
-        if self.theSession.theRunningFlag:
-            self.theSession.theRunningFlag = 0
+        if self.theRunningFlag:
+            self.theRunningFlag = 0
             self.theSession.stop()
             self.theSession.printMessage( "Stop\n" )
             self.removeTimeOut()
@@ -212,7 +214,7 @@ class MainWindow(Window):
 
     def update( self ):
         aTime = self.theSession.theSimulator.getCurrentTime()
-        self.theCurrentTime = aTime[0]
+        self.theCurrentTime = aTime
         self['time_entry'].set_text( str( self.theCurrentTime ) )
         self.thePluginManager.updateAllPluginWindow()
         
@@ -256,6 +258,7 @@ class MainWindow(Window):
                                              COPYRIGHT,
                                              AUTHORLIST,
                                              DESCRIPTION )
+        anAboutDialog.set_title( 'about osogo' )
         anAboutDialog.show_all()
 
 

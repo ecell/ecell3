@@ -20,8 +20,8 @@ class LoggerWindow(Window):
         self.initialize()
         self.addHandlers( { 'on_Now_button_clicked' : self.saveAllData, 
                             'on_exit_activate' : self.closeWindow } )
+
         self.theMainWindow = aMainWindow
-        
 
     def initialize( self ):
 
@@ -35,8 +35,7 @@ class LoggerWindow(Window):
                interval = self["every_spinbutton"].get_text()
 
         for fullPNString in aSelectedFullPNList :
-            fullpn=createFullPN(fullPNString)
-            aLogger = self.theMainWindow.theDriver.getLogger( fullpn )
+            aLogger = self.theSession.theSimulator.getLogger( aFullPNString )
             start= aLogger.getStartTime()
             end  = aLogger.getEndTime()
 
@@ -89,10 +88,9 @@ class LoggerWindow(Window):
         self.theList = []
 
         for aFullPNString in self.theFullPNList :
-            aFullPN = createFullPN( aFullPNString )
-            aLogger = self.theSession.getLogger( aFullPN )
+            aLogger = self.theSession.getLogger( aFullPNString )
             start = str( aLogger.getStartTime() )
-            if self.theSession.theRunningFlag:
+            if self.theMainWindow.theRunningFlag:
                 end = 'running'
             else:
                 end = str( aLogger.getEndTime() )
