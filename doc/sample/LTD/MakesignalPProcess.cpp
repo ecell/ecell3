@@ -49,17 +49,17 @@ ECELL3_DM_CLASS
 	Int ii( i % 10 );
 	if( ii == 0 )
 	  {
-	    p0 = add * getSuperSystem()->getVolume() * N_A;
+	    p0 = add * getSuperSystem()->getSizeN_A();
 	    k = k + 1;
 	  }
 	else
 	  {
-	    p0 = add * getSuperSystem()->getVolume() * N_A / (2 * ii);
+	    p0 = add * getSuperSystem()->getSizeN_A() / (2 * ii);
 	  }
       }
     else
       {
-	p0 = 0.00000000000000000001 * getSuperSystem()->getVolume() * N_A;
+	p0 = 0.00000000000000000001 * getSuperSystem()->getSizeN_A();
       }					
     P0.setValue(p0);
   }
