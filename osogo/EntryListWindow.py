@@ -17,110 +17,87 @@ class EntryListWindow(Window):
 
     def __init__( self, gladefile ):
 
+        self.theSimulator = MainWindow.simulator()
+        
         Window.__init__( self, gladefile )
-        self.addHandlers( {
-            # 'selection_changed': self.showList 
-            # 'select_child': self.showList
-            } )
+        self.addHandlers( { } )
 
-        self.theTree = self.getWidget( 'tree10' )
-        self.theList = self.getWidget( 'list1' )
-        self.theOptionMenu = self.getWidget( 'optionmenu3' )
+        self.theSystemTree = self.getWidget( 'system_tree' )
+        self.theEntryList = self.getWidget( 'entry_list' )
+        self.theTypeOptionMenu = self.getWidget( 'type_optionmenu' )
 
-    # def optionMenu
-        self.theOpmenu = 'Substance'
-        self.theMenu = gtk.GtkMenu()
+        self.theTypeMenu = self.theTypeOptionMenu.get_menu()
+        aTypeMenuItemMap = self.theTypeMenu.children()
+        aTypeMenuItemMap[0].connect( 'activate', self.changeEntityType, 'Substance' )
+        aTypeMenuItemMap[1].connect( 'activate', self.changeEntityType, 'Reactor' )
+        aTypeMenuItemMap[2].connect( 'activate', self.changeEntityType, 'All' )
 
-        ## option menu tmp ##
-        sText = 'Substance'
-        aMenuItem = gtk.GtkMenuItem( label=sText )
-        self.theMenu.append( aMenuItem )
-        aMenuItem.show()            
-        self.theOptionMenu.set_menu( self.theMenu )
-        aMenuItem.connect( 'activate', self.showListPre, sText )
+        self.theSelectedEntityType = 'Substance'
+        self.theSelectedSystemFullID = ''
+        self.theSelectedEntityID = []
 
-        rText = 'Reactor'
-        aMenuItem = gtk.GtkMenuItem( label=rText )
-        self.theMenu.append( aMenuItem )
-        aMenuItem.show()            
-        self.theOptionMenu.set_menu( self.theMenu )
-        aMenuItem.connect( 'activate', self.showListPre, rText )
+        self.theSystemTree.show()
+        self.theEntryList.show()
+
+        aRootSystemFullID = FullID( 'System:/:/' )
+        self.constructTree( self.theSystemTree, aRootSystemFullID )
+
+    def constructTree( self, aParentTree, aSystemFullID ):
+        aLeaf = gtk.GtkTreeItem( label=aSystemFullID[ID] )
+        aLeaf.connect( 'select', self.changeSystem, aSystemFullID )
+        aParentTree.append( aLeaf )
+        aLeaf.show()
+
+        aSystemListFullPN = FullIDToFullPropertyName( aSystemFullID, 'SystemList' ) 
+        aSystemList = self.theSimulator.getProperty( aSystemListFullPN )
+        if aSystemList != ():
+            aTree = gtk.GtkTree()
+            aLeaf.set_subtree( aTree )
+            aLeaf.expand()
+
+            for aSystemID in aSystemList:
+                if aSystemFullID[SYSTEMPATH] == '/':
+                    if aSystemFullID[ID] == '/':
+                        aNewSystemPath = '/'
+                    else:
+                        aNewSystemPath = '/' + aSystemFullID[ID]
+                else:
+                    aNewSystemPath = aSystemFullID[SYSTEMPATH] + '/' + aSystemFullID[ID]
+                aNewSystemFullID = ( SYSTEM, aNewSystemPath, aSystemID )
+                self.constructTree( aTree, aNewSystemFullID )
+
+    def changeEntityType( self, menu_item_obj, aEntityType):
+        self.theSelectedEntityType = aEntityType
+        self.updateEntryList( aEntityType=aEntityType )
+
+    def changeSystem( self, a, aSystemFullID):
+        self.theSelectedSystemFullID = aSystemFullID
+        self.updateEntryList( aSystemFullID=aSystemFullID )
+
+    def updateEntryList( self, aEntityType='default', aSystemFullID='default' ):
+        if aEntityType == 'default':
+            aEntityType = self.theSelectedEntityType
+        if aSystemFullID == 'default':
+            aSystemFullID = self.theSelectedSystemFullID
+
+        self.theEntryList.clear_items( 0,-1 )
+
+        if aEntityType == 'All':
+            self.listEntity( 'Substance', aSystemFullID )
+            self.listEntity( 'Reactor', aSystemFullID )
+        else:
+            self.listEntity( aEntityType, aSystemFullID )
+
+    def listEntity( self, aEntityType, aSystemFullID ):
+        aListPN = aEntityType + 'List'
+        aListFullPN = FullIDToFullPropertyName( aSystemFullID, aListPN ) 
+        aEntityList = self.theSimulator.getProperty( aListFullPN )
+        for aEntityID in aEntityList:
+            aListItem = gtk.GtkListItem( aEntityID )
+            self.theEntryList.add( aListItem )
+            aListItem.show()
 
 
-        s = MainWindow.simulator()
-        
-        self.initialize()
-
-        self.theTree.show()
-        self.theList.show()
-        self.theOptionMenu.show()
-
-    def initialize( self ):
-
-        s = MainWindow.simulator()
-
-        self.theRootTreeItem = gtk.GtkTreeItem( label='/')
-        self.theTree.append( self.theRootTreeItem )
-        self.theRootTreeItem.show()
-        self.theRootTreeItem.connect( 'select', self.showListTre, s.theRootSystem )
-
-        self.constructTree( self.theRootTreeItem, s.theRootSystem  )
-
-    def constructTree( self, parent, path ):
-
-        aList = self.toList( path )
-        if aList != ():
-            aSubTree = gtk.GtkTree()
-            parent.set_subtree( aSubTree )
-            parent.expand()
-
-            for x in aList:
-                self.aNewLeaf = gtk.GtkTreeItem( label=x )
-                aSubTree.append( self.aNewLeaf )
-                self.aNewLeaf.show()            
-                self.aNewLeaf.connect( 'select', self.showListTre, self.toList2(path,x) )
-                self.constructTree( self.aNewLeaf, self.toList2(path,x) )
-
-    def toList( self, path ):
-        aList = path['SystemList']
-        return aList
-
-    def toList2( self, path, itemname ):
-        abc = path[itemname]
-        return abc
-
-    def appendItem( self, item ):
-        self.aListItem = gtk.GtkListItem( item )
-        self.theList.add( self.aListItem )
-        self.aListItem.show()# exit
-
-    def appendItemList( self, list ):
-        for x in list:
-            self.appendItem( x )
-
-    def doList( self, list ):
-        self.theList.clear_items( 0,-1 )
-        self.appendItemList( list )
-
-    def showListPre( self, b, opmenu ):                   #OptionMenu activate
-        self.theB = b
-        self.theOpmenu = opmenu
-        self.showList( b, self.theSystemname, opmenu )
-
-    def showListTre( self, a, systemname ):               #TreeItem selected
-        self.theSystemname = systemname
-        self.theA = a
-        self.showList( a, systemname, self.theOpmenu )
-        
-    def showList( self, a, systemname, opmenu='substance' ):
-        if opmenu == 'Substance':
-            aListType = 'SubstanceList'
-        if opmenu == 'Reactor':
-            aListType = 'ReactorList'
-        aList = systemname[aListType]
-        # self.theA = a
-        # self.theSystemname = systemname
-        self.doList( aList )
 
 def mainQuit( obj, data ):
     gtk.mainquit()
