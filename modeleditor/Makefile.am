@@ -48,7 +48,6 @@ ModelEditor.py\
 ModelStore.py\
 MultiLineEditor.py\
 NestedListEditor.py\
-NewClassWindow.py\
 ObjectEditorWindow.py\
 PathwayEditor.py\
 PopupMenu.py\
