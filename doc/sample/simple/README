@@ -40,6 +40,11 @@ MichaelisUniUniProcess.dm: Process file(dm file) for this model
    % for i in *.dm ; do emtool -a $i ; done
    
 
-3. Run gecell, File->loadModel and load the simple.eml file.
+3. Run the model.
 
+   GUI mode:
+       gecell, File->loadModel and load the simple.eml file.
+
+   Script mode:
+       ecell3-session run-simple.ecs
 
