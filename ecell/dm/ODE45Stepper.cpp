@@ -284,7 +284,8 @@ namespace libecs
 				     + theK7[ c ] * ( -1.0 / 40.0 ) );
 
 	// calculate velocity for Xn+.5
-	theMidVelocityBuffer[ c ] = theK1[ c ] * ( 6025192743.0 / 30085553152 )
+	theMidVelocityBuffer[ c ] 
+	  = theK1[ c ] * ( 6025192743.0 / 30085553152.0 )
 	  + theK3[ c ] * ( 51252292925.0 / 65400821598.0 )
 	  + theK4[ c ] * ( -2691868925.0 / 45128329728.0 )
 	  + theK5[ c ] * ( 187940372067.0 / 1594534317056.0 )
