@@ -103,9 +103,6 @@ namespace libecs
 
   protected:
 
-    //FIXME:
-    virtual Real getCurrentTime() {return 0;}
-
   protected:
 
     String                   theName;

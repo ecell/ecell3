@@ -47,37 +47,6 @@ namespace libecs
   //FIXME: thread safe?
   extern RandomNumberGenerator* theRandomNumberGenerator; 
 
-  /**
-     least common multiple.
-  */
-
-  inline int lcm( int a, int b )
-  {
-    if( a > b )
-      {
-	int i;
-	for( i = 1; ( a * i ) % b ; ++i ) 
-	  {
-	    ; // do nothing
-	  }
-	return a * i;
-      }
-    else
-      {
-	int i;
-	for( i = 1 ; ( b * i ) % a ; ++i ) 
-	  {
-	    ; // do nothing
-	  }
-	return b * i;
-      }
-  }
-
-  /**
-     table lookup function.
-  */
-
-  int table_lookup( StringCref str, const char** table );
 
   /** 
       Universal String -> object converter.
@@ -123,14 +92,8 @@ namespace libecs
   }
 
   /// A specialization of toString for Real
-  template<> const String toString<Real>( const Real& f );
+  template<> const String toString<Real>( RealCref f );
 
-
-  /**
-     extract a filename from a path string
-  */
-
-  String basenameOf( StringCref str, String::size_type maxlength = 0 );
 
   /**
      Erase white space characters ( ' ', '\t', and '\n' ) from a string

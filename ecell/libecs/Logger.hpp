@@ -201,9 +201,11 @@ namespace libecs
     /// Data members
 
     PropertySlotCref            thePropertySlot;
-    DataPointVector             theDataPointVector;
+    
+
     Real                        theMinimumInterval;
     Real                        theCurrentInterval;
+    DataPointVector             theDataPointVector;
 
   };
 

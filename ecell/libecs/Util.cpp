@@ -44,19 +44,6 @@ namespace libecs
 			    static_cast<Real>( time( NULLPTR ) ) ,
 			    RANDOM_NUMBER_BUFFER_SIZE);
 
-  int table_lookup( StringCref str, const char** table )
-  {
-    for( int i = 0 ; table[i] != NULLPTR ; ++i )
-      {
-	if( str == String( table[ i ] ) )
-	  {
-	    return i;
-	  }
-      }
-
-    throw NotFound( __PRETTY_FUNCTION__ );
-  }
-
   template<> const Real stringTo<Real>( StringCref str )
   {
     // FIXME: error check, throw exception
@@ -75,7 +62,7 @@ namespace libecs
     return strtoul( str.c_str(), NULLPTR, 10 );
   }
 
-  template<> const String toString<Real>( const Real& f )
+  template<> const String toString<Real>( RealCref f )
   { 
     std::ostringstream os;
     os.precision( REAL_DIG );
@@ -84,38 +71,16 @@ namespace libecs
     return os.str();
   }
 
-  String basenameOf( StringCref str, String::size_type maxlength )
-  {
-    String::size_type s = str.rfind( '/' );
-    if( s == String::npos )
-      {
-	s = 0;
-      } 
-    else
-      {
-	s++;
-      }
-
-    String::size_type e = str.rfind( '.' );
-    if( e == String::npos )
-      {
-	e = str.size();
-      }
-
-    String::size_type l = e - s;
-    if( maxlength != 0 && maxlength < l ) 
-      {
-	l = maxlength;
-      }
-    return str.substr( s, l );
-  }
-
   void eraseWhiteSpaces( StringRef str )
   {
-    String::size_type p( 0 );
-    while( ( p = str.find_first_of( " \t\n", p ) ) != String::npos )
+    static const String aSpaceCharacters( " \t\n" );
+
+    String::size_type p( str.find_first_of( aSpaceCharacters ) );
+
+    while( p != String::npos )
       {
 	str.erase( p, 1 );
+	p = str.find_first_of( aSpaceCharacters, p );
       }
   }
 
@@ -125,6 +90,9 @@ namespace libecs
 
 #ifdef UTIL_TEST
 
+#include <iostream>
+
+using namespace std;
 using namespace libecs;
 
 main()
