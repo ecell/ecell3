@@ -95,7 +95,7 @@ class Eml:
 				self.printMessage( msg, msg )
 			else:
 				cmdstr = 'python '+'\"'+programPath+'\" -o \"'+file1+'\" \"'+file2+'\"'
-				self.theToolLauncher.execute( cmdstr+" > eml.log 2> emlError.log" )
+				self.theToolLauncher.execute( cmdstr+" > /tmp/eml.log 2> /tmp/emlError.log" )
 				return "0"
 
 		# catch exceptions
@@ -149,11 +149,11 @@ class Eml:
 	# ==========================================================================
 	def checkCompile( self, file1, file2 ):
 
-		logfile = open( 'eml.log','r' )
+		logfile = open( '/tmp/eml.log','r' )
 		logdata = logfile.read()
 		logfile.close()
-		os.remove( 'eml.log' )
-		os.remove( 'emlError.log' )
+		os.remove( '/tmp/eml.log' )
+		os.remove( '/tmp/emlError.log' )
 		errorMsg = re.search( 'error', logdata )
 		if errorMsg == None:
 			msg = "Conversion from \""+ file1+"\" to\n\""+file2+"\" was successful."
