@@ -4,7 +4,7 @@
 
 === About ===
 
-This is a sample of Genetic Alghrithm (GA) written as an ESM script.
+This is a sample of Genetic Algorithm (GA) written as an ESM script.
 
 In this  sample the parameters Process:/E:Kms and Process:/E:/KcF
 are estimated from observable time-courses of quantities S and P.
@@ -34,25 +34,27 @@ simple.em                   Model file (EM file)
 
 1. (If necessary) Modify setting.txt file.
 
-   Refer to the following cahpter for details.
+   Refer to the following chapter for details.
 
 
 3. Run ga.esm file.
 
      [%] ecell3-session-manager ga.py
      GA on E-Cell3 ........ start
-     (6/6) .....[1]  0.985788386581
-     (6/6) .....[2]  0.130706428151
-     (6/6) .....[3]  0.094226048664
-     (6/6) .....[4]  0.0567317324954
+     (10/10) .....[1]        0.235249363621
+     (10/10) .....[2]        0.0452879749744
+     (10/10) .....[3]        0.0452879749744
+     (10/10) .....[4]        0.0038009053269
      reached max generation
      ----------------------------------------
      |   Result                             |
      ----------------------------------------
-     (Evaluated Value)       = 0.0567317324954
-     _KmS_   = 13.0605221658
-     _KcF_   = 4.51648123432
-     job id = [22]
+     (Evaluated Value)       = 0.0038009053269
+     _KmS_   = 11.7246732589
+     _KcF_   = 3.92000748822
+     job id = [34]
+
+
 
    ga.esm tries to 'setting.txt' in current working directory.
    If you'd like to use other setting file, do as below.
@@ -64,15 +66,15 @@ simple.em                   Model file (EM file)
 
    - The parameter sets of elite individual are written in 
      elite.txt. The connected files to elite individual are
-     copied under elite directory. You can see the obserbable
+     copied under elite directory. You can see the observable
      time-course data and predicted ones using gnuplot like
      as below.
 
-     % cd elite/22
+     % cd elite/34
      % gnuplot gnuplot.dat
 
    - The transitions of evaluated value or mutation ratio are
-     written in value.txt and mutation.txt respectivily.
+     written in value.txt and mutation.txt respectively.
      You can see them using gnuplot as below.
 
      % gnuplot value.gnu
@@ -111,7 +113,7 @@ simple.em                   Model file (EM file)
 === Detail of ESS File ===
 
    ga.esm requires ESS file to run E-Cell3 and evaluate
-   the given parameters. In this sample, onerun.py is
+   the given parameters. In this sample, runsession.py is
    already prepared.
    In this file, the following procedure should be
    executed.
@@ -132,6 +134,25 @@ simple.em                   Model file (EM file)
    And the evaluated value must be written as float value
    in result.dat file. After this script is executed, 
    ga.esm tries to read result.dat file.
+
+
+=== Debugging ===
+
+   When you debug runsession.py, delete # in the following lines.
+   
+   ---- beginning of runsession.py ----
+   from ecell.ECDDataFile import *
+   import os
+
+   #_KmS_ = 0.2
+   #_KcF_ = 1.0
+   #_DATA_ = 'Data'
+   #_EML_ = 'simple.eml'
+   ------------------------------------
+
+   And execute the file with ecell3-session;
+
+   [%] ecell3-session runsession.py
 
 
 # end of README
