@@ -323,6 +323,10 @@ public: // message interfaces
   const Message getStepper( StringCref keyword );
   const Message getVolumeIndex( StringCref keyword );
 
+  const Message getSystemList( StringCref keyword );
+  const Message getSubstanceList( StringCref keyword );
+  const Message getReactorList( StringCref keyword );
+
 protected:
 
   virtual void makeSlots();

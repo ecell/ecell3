@@ -45,11 +45,90 @@ template SystemList;
 
 void System::makeSlots()
 {
-  MessageSlot( "Stepper", System, *this,
+  MessageSlot( "systemList", System, *this,
+	       NULL, &System::getSystemList );
+  MessageSlot( "substanceList", System, *this,
+	       NULL, &System::getSubstanceList );
+  MessageSlot( "reactorList", System, *this,
+	       NULL, &System::getReactorList );
+
+  MessageSlot( "stepper", System, *this,
 	       &System::setStepper, &System::getStepper );
-  MessageSlot( "VolumeIndex", System, *this,
+  MessageSlot( "volumeIndex", System, *this,
 	       &System::setVolumeIndex, &System::getVolumeIndex );
 }
+
+
+// Message slots
+
+const Message System::getSystemList( StringCref keyword )
+{
+  String listString;
+
+  for( SystemListIterator i = getFirstSystemIterator() ;
+       i != getLastSystemIterator() ; ++i )
+    {
+      listString += i->second->getId();
+      listString += ' ';
+    }
+
+  return Message( keyword, listString );
+}
+
+const Message System::getSubstanceList( StringCref keyword )
+{
+  String listString;
+
+  for( SubstanceListIterator i = getFirstSubstanceIterator() ;
+       i != getLastSubstanceIterator() ; ++i )
+    {
+      listString += i->second->getId();
+      listString += ' ';
+    }
+
+  return Message( keyword, listString );
+}
+
+const Message System::getReactorList( StringCref keyword )
+{
+  String listString;
+
+  for( ReactorListIterator i = getFirstReactorIterator() ;
+       i != getLastReactorIterator() ; ++i )
+    {
+      listString += i->second->getId();
+      listString += ' ';
+    }
+
+  return Message( keyword, listString );
+}
+
+
+void System::setStepper( const Message& message )
+{
+  setStepper( message.getBody() );
+}
+
+const Message System::getStepper( StringCref keyword )
+{
+  return Message( keyword, getStepper()->className() );
+}
+
+void System::setVolumeIndex( const Message& message )
+{
+  setVolumeIndex( FQID( message.getBody() ) );
+}
+
+const Message System::getVolumeIndex( StringCref keyword )
+{
+  if( !getVolumeIndex() )
+    return Message( keyword, "" );
+
+  return Message( keyword, getVolumeIndex()->getFqid() );
+}
+
+
+
 
 System::System()
   :
@@ -77,29 +156,6 @@ void System::setSuperSystem( SystemPtr const supersystem )
 const String System::getFqpi() const
 {
   return PrimitiveTypeStringOf( *this ) + ":" + getFqid();
-}
-
-void System::setStepper( const Message& message )
-{
-  setStepper( message.getBody() );
-}
-
-const Message System::getStepper( StringCref keyword )
-{
-  return Message( keyword, getStepper()->className() );
-}
-
-void System::setVolumeIndex( const Message& message )
-{
-  setVolumeIndex( FQID( message.getBody() ) );
-}
-
-const Message System::getVolumeIndex( StringCref keyword )
-{
-  if( !getVolumeIndex() )
-    return Message( keyword, "" );
-
-  return Message( keyword, getVolumeIndex()->getFqid() );
 }
 
 void System::setStepper( StringCref classname )
