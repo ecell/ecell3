@@ -113,10 +113,10 @@ namespace libecs
   }
 
 
-  void System::setStepperClass( UVariableVectorCref aMessage )
+  void System::setStepperClass( UVariableVectorRCPtrCref aMessage )
   {
     //FIXME: range check
-    setStepperClass( aMessage[0].asString() );
+    setStepperClass( (*aMessage)[0].asString() );
   }
 
   const UVariableVectorRCPtr System::getStepperClass() const

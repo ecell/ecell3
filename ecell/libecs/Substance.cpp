@@ -58,11 +58,11 @@ namespace libecs
 			&Substance::getAccumulatorClass );
   }
 
-  void Substance::setAccumulatorClass( UVariableVectorCref aMessage )
+  void Substance::setAccumulatorClass( UVariableVectorRCPtrCref aMessage )
   {
     // FIXME: range check
 
-    setAccumulator( aMessage[0].asString() );
+    setAccumulator( (*aMessage)[0].asString() );
   }
 
   const UVariableVectorRCPtr Substance::getAccumulatorClass() const

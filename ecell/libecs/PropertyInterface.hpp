@@ -43,7 +43,7 @@ namespace libecs
 {
 
   DECLARE_MAP( const String, PropertySlotPtr, 
-	       std::less<const String>, PropertyMap );
+	       std::less<const String>, PropertySlotMap );
 
   /**
      Common base class for classes which receive Messages.
@@ -76,9 +76,9 @@ namespace libecs
     void setMessage( MessageCref );
     const Message getMessage( StringCref ) const;
 
-    PropertyMapCref getPropertySlotMap() const 
+    PropertySlotMapCref getPropertySlotMap() const 
     {
-      return thePropertyMap;
+      return thePropertySlotMap;
     }
 
     virtual void makeSlots();
@@ -95,9 +95,9 @@ namespace libecs
 
     /**
 
-     createPropertySlot template method provides a standard way 
-     to create a new slot.  It is template so that it can accept methods
-     of class T (the template parameter class).
+    createPropertySlot template method provides a standard way 
+    to create a new slot.  It is template so that it can accept methods
+    of class T (the template parameter class).
 
     */
 
@@ -105,39 +105,39 @@ namespace libecs
     void
     createPropertySlot( StringCref name,
 			T& object,
-			ClassPropertySlot<T>::SetUVariableVectorMethodPtr set,
-			ClassPropertySlot<T>::GetUVariableVectorMethodPtr get )
+			ConcretePropertySlot<T,UVariableVectorRCPtr>::SetMethodPtr set,
+			ConcretePropertySlot<T,UVariableVectorRCPtr>::GetMethodPtr get )
     {
-      appendSlot( new UVariableVectorPropertySlot<T>( name, 
-						      object, 
-						      set, 
-						      get ) );
+      appendSlot( new ConcretePropertySlot<T,UVariableVectorRCPtr>( name, 
+								object, 
+								set, 
+								get ) );
     }
 
     template<class T>
     void
     createPropertySlot( StringCref name,
 			T& object,
-			ClassPropertySlot<T>::SetRealMethodPtr set,
-			ClassPropertySlot<T>::GetRealMethodPtr get )
+			ConcretePropertySlot<T,Real>::SetMethodPtr set,
+			ConcretePropertySlot<T,Real>::GetMethodPtr get )
     {
-      appendSlot( new RealPropertySlot<T>( name, 
-					   object, 
-					   set, 
-					   get ) );
+      appendSlot( new ConcretePropertySlot<T,Real>( name, 
+						object, 
+						set, 
+						get ) );
     }
 
     template<class T>
     void
     createPropertySlot( StringCref name,
 			T& object,
-			ClassPropertySlot<T>::SetStringMethodPtr set,
-			ClassPropertySlot<T>::GetStringMethodPtr get )
+			ConcretePropertySlot<T,String>::SetMethodPtr set,
+			ConcretePropertySlot<T,String>::GetMethodPtr get )
     {
-      appendSlot( new StringPropertySlot<T>( name, 
-					     object, 
-					     set, 
-					     get ) );
+      appendSlot( new ConcretePropertySlot<T,String>( name, 
+						  object, 
+						  set, 
+						  get ) );
     }
 
     void appendSlot( PropertySlotPtr );
@@ -145,7 +145,7 @@ namespace libecs
 
   private:
 
-    PropertyMap thePropertyMap;
+    PropertySlotMap thePropertySlotMap;
 
   };
   

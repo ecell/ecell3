@@ -66,46 +66,46 @@ namespace libecs
 			&Reactor::getInitialActivity );
   }
 
-  void Reactor::setAppendSubstrate( UVariableVectorCref aMessage )
+  void Reactor::setAppendSubstrate( UVariableVectorRCPtrCref aMessage )
   {
     //FIXME: range check
-    appendSubstrate( FullID( aMessage[0].asString() ), aMessage[1].asInt() );
+    appendSubstrate( FullID( (*aMessage)[0].asString() ), (*aMessage)[1].asInt() );
   }
 
-  void Reactor::setAppendProduct( UVariableVectorCref aMessage )
+  void Reactor::setAppendProduct( UVariableVectorRCPtrCref aMessage )
   {
     //FIXME: range check
-    appendProduct( FullID( aMessage[0].asString() ), aMessage[1].asInt() );
+    appendProduct( FullID( (*aMessage)[0].asString() ), (*aMessage)[1].asInt() );
   }
 
-  void Reactor::setAppendCatalyst( UVariableVectorCref aMessage )
+  void Reactor::setAppendCatalyst( UVariableVectorRCPtrCref aMessage )
   {
     //FIXME: range check
-    appendCatalyst( FullID( aMessage[0].asString() ), aMessage[1].asInt() );
+    appendCatalyst( FullID( (*aMessage)[0].asString() ), (*aMessage)[1].asInt() );
   }
 
-  void Reactor::setAppendEffector( UVariableVectorCref aMessage )
+  void Reactor::setAppendEffector( UVariableVectorRCPtrCref aMessage )
   {
     //FIXME: range check
-    appendEffector( FullID( aMessage[0].asString() ), aMessage[1].asInt() );
+    appendEffector( FullID( (*aMessage)[0].asString() ), (*aMessage)[1].asInt() );
   }
 
-  void Reactor::setSubstrateList( UVariableVectorCref aMessage )
+  void Reactor::setSubstrateList( UVariableVectorRCPtrCref aMessage )
   {
     //    cerr << "not implemented yet." << endl;
   }
 
-  void Reactor::setProductList( UVariableVectorCref aMessage )
+  void Reactor::setProductList( UVariableVectorRCPtrCref aMessage )
   {
     //    cerr << "not implemented yet." << endl;
   }
 
-  void Reactor::setEffectorList( UVariableVectorCref aMessage )
+  void Reactor::setEffectorList( UVariableVectorRCPtrCref aMessage )
   {
     //    cerr << "not implemented yet." << endl;
   }
 
-  void Reactor::setCatalystList( UVariableVectorCref aMessage )
+  void Reactor::setCatalystList( UVariableVectorRCPtrCref aMessage )
   {
     //    cerr << "not implemented yet." << endl;
   }

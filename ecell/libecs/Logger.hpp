@@ -72,7 +72,7 @@ namespace libecs
     */
   
     explicit Logger( const GetCurrentTimeMethodType& aGetCurrentTime,
-		     PropertySlotRef aPropertySlot );
+		     PropertySlotPtr aPropertySlot );
 
   
     /// Destructor
@@ -80,7 +80,7 @@ namespace libecs
     ~Logger( void )
     {
       // self purge
-      thePropertySlot.clearLogger();
+      thePropertySlot->disconnectLogger();
     }
 
 
@@ -212,7 +212,7 @@ namespace libecs
 
     /// Data members
 
-    PropertySlotRef      thePropertySlot;
+    PropertySlotPtr  thePropertySlot;
     const GetCurrentTimeMethodType& theGetCurrentTimeMethod; 
     Real                 theMinimumInterval;
     Real                 theCurrentInterval;

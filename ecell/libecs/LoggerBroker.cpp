@@ -79,11 +79,11 @@ namespace libecs
 
     String aPropertyName( fpn.getPropertyName() );
 
-    PropertyMapConstIterator 
-      aPropertyMapIterator( anEntityPtr->getPropertySlotMap().
+    PropertySlotMapConstIterator 
+      aPropertySlotMapIterator( anEntityPtr->getPropertySlotMap().
 			    find( aPropertyName ) );
 
-    if( aPropertyMapIterator == anEntityPtr->getPropertySlotMap().end() )
+    if( aPropertySlotMapIterator == anEntityPtr->getPropertySlotMap().end() )
       {
 	throw NotFound( "not found" );
       }
@@ -92,11 +92,11 @@ namespace libecs
 
     //    appendLogger( aLoggerPtr );
     theLoggerMap[fpn] = new Logger( theGetCurrentTimeMethod,
-				    *aPropertyMapIterator->second );
-    aPropertyMapIterator->second->setLogger(theLoggerMap[fpn]);
+				    aPropertySlotMapIterator->second );
+    aPropertySlotMapIterator->second->connectLogger(theLoggerMap[fpn]);
 
     anEntityPtr->getSuperSystem()
-      ->getStepper()->registerPropertySlot( aPropertyMapIterator->second );
+      ->getStepper()->registerPropertySlot( aPropertySlotMapIterator->second );
 
     return theLoggerMap[fpn];
   }

@@ -51,7 +51,7 @@ namespace libecs
 
   public: // message slots
 
-    void setAccumulatorClass( UVariableVectorCref aMessage );
+    void setAccumulatorClass( UVariableVectorRCPtrCref aMessage );
     const UVariableVectorRCPtr getAccumulatorClass() const;
 
   public:

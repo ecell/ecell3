@@ -216,7 +216,7 @@ namespace libecs
 
   public: // property slots
 
-    void setStepperClass( UVariableVectorCref aMessage );
+    void setStepperClass( UVariableVectorRCPtrCref aMessage );
 
     const UVariableVectorRCPtr getStepperClass() const;
 

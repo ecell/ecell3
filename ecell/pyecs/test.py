@@ -48,10 +48,9 @@ except:
     
 print 'set Substance:/:A Quantity = 30'
 s.setProperty( ( SUBSTANCE, '/', 'A', 'Quantity' ), (30,) )
+
 l = s.getLogger( ( SUBSTANCE, '/', 'A', 'Quantity') )
 #print l
-
-
 print dir(l)
 
 print 'initialize()...'
@@ -113,6 +112,4 @@ print len( d )
 
 d = l.getData( 0, 5,0.005 )
 print len( d )
-
-
 

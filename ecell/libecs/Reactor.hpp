@@ -81,15 +81,15 @@ namespace libecs
 
     // PropertyInterfaces
 
-    void setAppendSubstrate( UVariableVectorCref aMessage );
-    void setAppendProduct( UVariableVectorCref aMessage );
-    void setAppendCatalyst( UVariableVectorCref aMessage );
-    void setAppendEffector( UVariableVectorCref aMessage );
+    void setAppendSubstrate( UVariableVectorRCPtrCref aMessage );
+    void setAppendProduct( UVariableVectorRCPtrCref aMessage );
+    void setAppendCatalyst( UVariableVectorRCPtrCref aMessage );
+    void setAppendEffector( UVariableVectorRCPtrCref aMessage );
 
-    void setSubstrateList( UVariableVectorCref aMessage );
-    void setProductList( UVariableVectorCref aMessage );
-    void setCatalystList( UVariableVectorCref aMessage );
-    void setEffectorList( UVariableVectorCref aMessage );
+    void setSubstrateList( UVariableVectorRCPtrCref aMessage );
+    void setProductList( UVariableVectorRCPtrCref aMessage );
+    void setCatalystList( UVariableVectorRCPtrCref aMessage );
+    void setEffectorList( UVariableVectorRCPtrCref aMessage );
 
     const UVariableVectorRCPtr getSubstrateList() const;
     const UVariableVectorRCPtr getProductList() const;

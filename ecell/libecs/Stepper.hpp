@@ -78,9 +78,6 @@ namespace libecs
   class StepperLeader
   {
 
-
-
-
   public:
 
     StepperLeader();

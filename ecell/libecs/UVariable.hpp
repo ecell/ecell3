@@ -250,7 +250,8 @@ namespace libecs
       ; // do nothing
     }
 
-    virtual ~UVariable()
+    //    virtual ~UVariable()
+    ~UVariable()
     {
       delete theData;
     }

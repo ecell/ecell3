@@ -48,7 +48,7 @@ namespace libecs
   // Constructor
 
   Logger::Logger( const GetCurrentTimeMethodType& aGetCurrentTime,
-		  PropertySlotRef aPropertySlot )
+		  PropertySlotPtr aPropertySlot )
     :
     thePropertySlot( aPropertySlot ),
     theGetCurrentTimeMethod( aGetCurrentTime ),
@@ -146,7 +146,7 @@ namespace libecs
 
   StringCref Logger::getName() const
     {
-      return thePropertySlot.getName();
+      return thePropertySlot->getName();
     }
 
   

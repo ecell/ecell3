@@ -34,8 +34,121 @@
 #include "libecs.hpp"
 #include "Util.hpp"
 
+#include "UVariable.hpp"
+
+
+template <typename T>
+struct Type2Type
+{
+  typedef T OriginalType;
+};
+
+
 namespace libecs
 {
+
+  template< typename FromType, typename ToType >
+  ToType convertTo( const FromType& aValue )
+  {
+    convertTo( aValue, Type2Type< ToType >() );
+  }
+
+
+  template< typename FromType, typename ToType >
+  ToType convertTo( const FromType& aValue, Type2Type<ToType> )
+  {
+    DefaultSpecializationInhibited();
+  }
+
+  // to UVariableVectorRCPtr
+
+
+  // identity
+
+  template<>
+  inline const UVariableVectorRCPtr 
+  convertTo( UVariableVectorRCPtrCref aValue, 
+	     Type2Type< const UVariableVectorRCPtr > )
+  {
+    return aValue;
+  }
+
+  // from Real
+  template<>
+  inline const UVariableVectorRCPtr 
+  convertTo( RealCref aValue,
+	     Type2Type< const UVariableVectorRCPtr > )
+  {
+    UVariableVectorRCPtr aVector( new UVariableVector );
+    aVector->push_back( aValue );
+    return aVector;
+  }
+
+  // from String
+  template<>
+  inline const UVariableVectorRCPtr 
+  convertTo( StringCref aValue,
+	     Type2Type< const UVariableVectorRCPtr > )
+  {
+    UVariableVectorRCPtr aVectorPtr( new UVariableVector );
+    aVectorPtr->push_back( aValue );
+    return aVectorPtr;
+  }
+
+  // to String
+
+  // identity
+  template<>
+  inline const String
+  convertTo( StringCref aValue,
+	     Type2Type< const String > )
+  {
+    return aValue;
+  }
+
+
+
+  template<>
+  inline const String convertTo( UVariableVectorRCPtrCref aValue,
+				 Type2Type< const String > )
+  {
+    return (*aValue)[0].asString();
+  }
+
+  template<>
+  inline const String convertTo( RealCref aValue,
+				 Type2Type< const String > )
+  {
+    return toString( aValue );
+  }
+
+
+  // to Real
+
+
+  // identity
+  template<>
+  inline const Real
+  convertTo( RealCref aValue,
+	     Type2Type< const Real > )
+  {
+    return aValue;
+  }
+
+  template<>
+  inline const Real convertTo( UVariableVectorRCPtrCref aValue,
+			       Type2Type< const Real > )
+  {
+    return (*aValue)[0].asReal();
+  }
+    
+  template<>
+  inline const Real convertTo( StringCref aValue,
+			       Type2Type< const Real > )
+  {
+    return stringTo< Real >( aValue );
+  }
+
 
 #if 1
   DECLARE_CLASS(PropertySlotProxy);
@@ -43,30 +156,38 @@ namespace libecs
 #endif //0
 
   /**
-     A base class for PropertySlot classes.
+     Base class for PropertySlot classes.
 
      @see PropertyInterface
      @see Message
   */
 
+  //  class PropertySlotBase
   class PropertySlot
   {
 
   public:
 
-    PropertySlot( StringCref name )
+    //    PropertySlotBase( StringCref aName )
+    PropertySlot( StringCref aName )
       :
-      theName( name ),
+      theName( aName ),
       //      // FIXME: dummyLogger ?
       theLogger( NULLPTR )
     {
       ; // do nothing
     }
     
-    virtual void setUVariableVector( UVariableVectorCref ) = 0;
-    virtual UVariableVectorRCPtr getUVariableVector() const = 0;
+    //    virtual ~PropertySlotBase()
+    virtual ~PropertySlot()
+    {
+      ; // do nothing
+    }
+
+    virtual void setUVariableVectorRCPtr( UVariableVectorRCPtrCref ) = 0;
+    virtual const UVariableVectorRCPtr getUVariableVectorRCPtr() const = 0;
     
-    virtual void setReal( const Real real ) = 0;
+    virtual void setReal( RealCref real ) = 0;
     virtual const Real getReal() const = 0;
 
     virtual void setString( StringCref string ) = 0;
@@ -76,6 +197,17 @@ namespace libecs
     virtual const bool isGetable() const = 0;
 
     virtual void sync() = 0;
+
+
+    virtual void push()
+    {
+      if( isLogged() )
+	{
+	  updateLogger();
+	}
+      //      updateProxy();
+    }
+
 
     //    virtual PropertySlotProxyPtr createProxy( void ) = 0;
 
@@ -89,9 +221,14 @@ namespace libecs
       return theLogger != NULLPTR;
     }
 
-    void setLogger( LoggerPtr logger )
+    void connectLogger( LoggerPtr logger )
     {
       theLogger = logger;
+    }
+
+    void disconnectLogger()
+    {
+      theLogger = NULLPTR;
     }
 
     LoggerCptr getLogger() const
@@ -99,41 +236,371 @@ namespace libecs
       return theLogger;
     }
 
-    void clearLogger()
-    {
-      theLogger = NULLPTR;
-    }
-
-    void push()
-    {
-      if( isLogged() )
-	{
-	  updateLogger();
-	}
-      //      updateProxy();
-    }
-
     void updateLogger();
 
-  protected:
 
   protected:
 
     String                   theName;
     LoggerPtr                theLogger;
     PropertySlotProxyVector  theProxyVector;
-    
 
   };
 
 
-#if 1 
+
+
+  class FixPolicy
+  {
+
+
+  };
+
+
+  class CanBeFixed
+  {
+
+
+  };
+
+  class CannotBeFixed
+  {
+
+
+  };
+
+
+
+  /**
+
+  Determines when and how the property value is updated.
+  
+  Following three methods must be defined in subclass.
+  
+  GetType get() const
+  void set( SetType aValue )
+  void sync()
+  
+  */
+
+  template 
+  < 
+    class T,
+    typename SlotType_ 
+    >
+  class UpdatePolicy
+  {
+
+  public:
+
+
+    DECLARE_TYPE( SlotType_, SlotType );
+
+    typedef const SlotType, GetType;
+    typedef SlotTypeCref, SetType;
+
+    typedef GetType ( T::* GetMethodPtr )() const;
+    typedef void ( T::* SetMethodPtr )( SlotTypeCref );
+
+    typedef GetType ( UpdatePolicy::* CallGetMethodPtr )() const;
+    typedef void ( UpdatePolicy::* CallSetMethodPtr )( SetType );
+
+    UpdatePolicy( T& anObject,
+		      const SetMethodPtr aSetMethodPtr,
+		      const GetMethodPtr aGetMethodPtr )
+      :
+      theObject( anObject ),
+      theSetMethodPtr( aSetMethodPtr ),
+      theGetMethodPtr( aGetMethodPtr ),
+      theCallSetMethodPtr( &UpdatePolicy::callNullSetMethod ),
+      theCallGetMethodPtr( &UpdatePolicy::callNullGetMethod )
+    {
+      if( isSetable() )
+	{
+	  theCallSetMethodPtr = &UpdatePolicy::callSetMethodPtr;
+	}
+
+      if( isGetable() )
+	{
+	  theCallGetMethodPtr = &UpdatePolicy::callGetMethodPtr;
+	}
+    }
+
+    ~UpdatePolicy()
+    {
+      ; // do nothing
+    }
+
+    const bool isSetable() const
+    {
+      return theSetMethodPtr != NULLPTR;
+    }
+
+    const bool isGetable() const
+    {
+      return theGetMethodPtr != NULLPTR;
+    }
+
+
+  protected:
+
+    void callSetMethod( SetType aValue )
+    {
+      ( this->*theCallSetMethodPtr )( aValue );
+    }
+
+    GetType callGetMethod() const
+    {
+      return ( this->*theCallGetMethodPtr )();
+    }
+
+
+  private:
+
+    void callSetMethodPtr( SetType aValue )    
+    {
+      ( theObject.*theSetMethodPtr )( aValue );
+    }
+
+    GetType callGetMethodPtr() const
+    {
+      return ( ( theObject.*theGetMethodPtr )() );
+    }
+
+    void callNullSetMethod( SetType aValue )    
+    {
+      throw AttributeError( __PRETTY_FUNCTION__,
+			    "Not setable." );
+    }
+
+    GetType callNullGetMethod() const
+    {
+      throw AttributeError( __PRETTY_FUNCTION__,
+			    "Not getable." );
+    }
+
+  private:
+
+    T& theObject;
+    const SetMethodPtr theSetMethodPtr;
+    const GetMethodPtr theGetMethodPtr;
+
+    CallSetMethodPtr theCallSetMethodPtr;
+    CallGetMethodPtr theCallGetMethodPtr;
+
+  };
+
+
+
+  template
+  < 
+    class T,
+    typename SlotType_ 
+    >
+  class UpdateImmediately
+    : 
+    public UpdatePolicy< T, SlotType_ >
+  {
+
+  public:
+
+    UpdateImmediately( T& anObject,
+		       const SetMethodPtr aSetMethodPtr,
+		       const GetMethodPtr aGetMethodPtr )
+      : 
+      UpdatePolicy< T, SlotType_ >( anObject, 
+					aSetMethodPtr,
+					aGetMethodPtr )
+    {
+      ; // do nothing
+    }
+
+    ~UpdateImmediately()
+    {
+      ; // do nothing
+    }
+
+    void set( SetType aValue )
+    {
+      callSetMethod( aValue );
+    }
+
+    GetType get() const
+    {
+      return callGetMethod();
+    }
+
+    void sync()
+    {
+      ; // do nothing
+    }
+
+  };
+
+  template
+  < 
+    class T,
+    typename SlotType_ 
+    >
+  class UpdateAtSync
+    : 
+    public UpdatePolicy< T, SlotType_ >
+  {
+
+  public:
+
+    UpdateAtSync( T& anObject,
+		  const SetMethodPtr aSetMethodPtr,
+		  const GetMethodPtr aGetMethodPtr )
+      : 
+      UpdatePolicy< T, SlotType_ >( anObject, 
+					aSetMethodPtr,
+ 					aGetMethodPtr )
+    {
+      ; // do nothing
+    }
+
+    ~UpdateAtSync()
+    {
+      ; // do nothing
+    }
+
+    void set( SetType aValue )
+    {
+      theValue = aValue;
+    }
+
+    GetType get() const
+    {
+      return callGetMethod();
+    }
+
+    void sync()
+    {
+      return callSetMethod( theValue );
+    }
+
+  private:
+
+    SetType theValue;
+
+  };
+
+
+  template
+  < 
+    class T,
+    typename SlotType_,
+    template < class U, typename V > class UpdatePolicy_ = UpdateImmediately
+  >
+  class ConcretePropertySlot
+    :
+    //    public PropertySlotBase,
+    public PropertySlot,
+    public UpdatePolicy_< T, SlotType_ >
+  {
+
+  public:
+
+    typedef UpdatePolicy_< T, SlotType_ > UpdatePolicy;
+
+    DECLARE_TYPE( SlotType_, SlotType );
+    typedef typename UpdatePolicy::SetType SetType;
+    typedef typename UpdatePolicy::GetType GetType;
+    typedef typename UpdatePolicy::SetMethodPtr SetMethodPtr;
+    typedef typename UpdatePolicy::GetMethodPtr GetMethodPtr;
+
+
+    ConcretePropertySlot( StringCref aName, T& anObject, 
+			  const SetMethodPtr aSetMethodPtr,
+			  const GetMethodPtr aGetMethodPtr )
+      :
+      //      PropertySlotBase( aName ),
+      PropertySlot( aName ),
+      UpdatePolicy( anObject, aSetMethodPtr, aGetMethodPtr )
+    {
+      ; // do nothing
+    }
+
+    virtual ~ConcretePropertySlot()
+    {
+      ; // do nothing
+    }
+
+    virtual void setUVariableVectorRCPtr( UVariableVectorRCPtrCref aValue )
+    {
+      setImpl( aValue );
+    }
+
+    virtual const UVariableVectorRCPtr getUVariableVectorRCPtr() const
+    {
+      return getImpl< const UVariableVectorRCPtr >();
+    }
+
+    virtual void setReal( RealCref aValue )
+    {
+      setImpl( aValue );
+    }
+
+    virtual const Real getReal() const
+    {
+      return getImpl< const Real >();
+    }
+
+    virtual void setString( StringCref aValue )
+    {
+      setImpl( aValue );
+    }
+
+    virtual const String getString() const
+    {
+      return getImpl< const String >();
+    }
+
+    virtual void sync()
+    {
+      UpdatePolicy::sync();
+    }
+
+    virtual const bool isSetable() const
+    {
+      return UpdatePolicy::isSetable();
+    }
+
+    virtual const bool isGetable() const
+    {
+      return UpdatePolicy::isGetable();
+    }
+      
+
+  protected:
+
+    template < typename TYPE >
+    void setImpl( TYPE aValue )
+    {
+      UpdatePolicy::set( convertTo( aValue, Type2Type< SetType >() ) );
+      //      UpdatePolicy::set( convertTo< SetType >( aValue ) );
+    }
+
+    template < typename TYPE >
+    TYPE getImpl() const
+    {
+      return convertTo( UpdatePolicy::get(), Type2Type< TYPE >() );
+    }
+
+
+  };
+
+
+
+
+#if 0 
   class PropertySlotProxy
   {
     
   public:
       
-    PropertySlotProxy( PropertySlotPtr aPropertySlot )
+    PropertySlotProxy( PropertySlotBasePtr aPropertySlot )
       :
       thePropertySlot( aPropertySlot )
     {
@@ -179,406 +646,6 @@ namespace libecs
     
   };
 #endif // 0
-
-  template<class T>
-  class ClassPropertySlot
-    :
-    public PropertySlot
-  {
-
-    typedef void ( T::* SetUVariableVectorMethodPtr )( UVariableVectorCref );
-    typedef const UVariableVectorRCPtr 
-    ( T::* GetUVariableVectorMethodPtr )() const;
-    typedef void ( T::* SetRealMethodPtr )( RealCref );
-    typedef const Real ( T::* GetRealMethodPtr )() const;
-    typedef void ( T::* SetStringMethodPtr )( StringCref );
-    typedef const String ( T::* GetStringMethodPtr )() const;
-
-  public:
-
-    ClassPropertySlot( StringCref name, T& object );
-
-  protected:
-
-    T& theObject;
-
-  };
-
-  /**
-
-     @see UVariable
-     @see PropertyInterface
-     @see PropertySlot
-  */
-
-
-  template<class T>
-  class UVariableVectorPropertySlot
-    : 
-    public ClassPropertySlot<T>
-  {
-
-  public:
-
-    UVariableVectorPropertySlot( StringCref name, T& object, 
-				 const SetUVariableVectorMethodPtr setmethod,
-				 const GetUVariableVectorMethodPtr getmethod );
-
-    virtual void sync()
-    {
-      ;
-    }
-  
-    virtual const bool isSetable() const
-    {
-      return theSetUVariableVectorMethod != NULLPTR;
-    }
-
-    virtual const bool isGetable() const
-    {
-      return theGetUVariableVectorMethod != NULLPTR;
-    }
-
-    virtual void setUVariableVector( UVariableVectorCref message )
-    {
-      if( ! isSetable() )
-	{
-	  throw AttributeError( __PRETTY_FUNCTION__,
-				"[" + theName + "] is not settable." );
-	}
-
-      ( theObject.*theSetUVariableVectorMethod )( message );
-    }
-
-    virtual UVariableVectorRCPtr getUVariableVector() const
-    {
-      if( ! isGetable() )
-	{
-	  throw AttributeError( __PRETTY_FUNCTION__,
-				"[" + theName + "] is not gettable." );
-	}
-
-      return ( ( theObject.*theGetUVariableVectorMethod )() );
-    }
-
-    virtual void setReal( const Real real );
-
-    virtual const Real getReal() const;
-
-    virtual void setString( StringCref string );
-
-    virtual const String getString() const;
-
-    //    virtual PropertySlotProxyPtr createProxy( void )
-    //    {
-    //      return new PropertySlotProxy( this );
-    //    }
-
-  private:
-
-    const SetUVariableVectorMethodPtr theSetUVariableVectorMethod;
-    const GetUVariableVectorMethodPtr theGetUVariableVectorMethod;
-
-  };
-
-
-
-  /**
-
-     @see Message
-     @see PropertyInterface
-     @see PropertySlot
-  */
-
-
-  template<class T>
-  class RealPropertySlot
-    : 
-    public ClassPropertySlot<T>
-  {
-
-  public:
-
-  public:
-
-    RealPropertySlot( StringCref name, T& object, 
-		      const SetRealMethodPtr setmethod,
-		      const GetRealMethodPtr getmethod );
-
-    virtual void sync()
-    {
-      ;
-    }
-
-    virtual const bool isSetable() const
-    {
-     return theSetRealMethod != NULLPTR;
-    }
-
-    virtual const bool isGetable() const
-    {
-      return theGetRealMethod != NULLPTR;
-    }
-
-    virtual void setReal( const Real real )
-    {
-      if( ! isSetable() )
-	{
-	  throw AttributeError( __PRETTY_FUNCTION__,
-				"[" + theName + "] is not settable." );
-	}
-      
-      ( theObject.*theSetRealMethod )( real );
-    }
-
-    virtual const Real getReal() const
-    {
-      if( ! isGetable() )
-	{
-	  throw AttributeError( __PRETTY_FUNCTION__,
-				"[" + theName + "] is not gettable." );
-	}
-      
-      return ( ( theObject.*theGetRealMethod )() );
-    }
-
-    virtual void setUVariableVector( UVariableVectorCref uvector );
-
-    virtual UVariableVectorRCPtr getUVariableVector() const;
-
-    virtual void setString( StringCref string );
-
-    virtual const String getString() const;
-
-
-  private:
-
-    const SetRealMethodPtr    theSetRealMethod;
-    const GetRealMethodPtr    theGetRealMethod;
-
-  };
-
-
-  /**
-
-     @see Message
-     @see PropertyInterface
-     @see PropertySlot
-  */
-
-
-  template<class T>
-  class StringPropertySlot
-    : 
-    public ClassPropertySlot<T>
-  {
-
-  public:
-
-    StringPropertySlot( StringCref name, T& object, 
-			const SetStringMethodPtr setmethod,
-			const GetStringMethodPtr getmethod );
-
-    virtual void sync()
-    {
-      ;
-    }
-  
-    virtual const bool isSetable() const
-    {
-      return theSetStringMethod != NULLPTR;
-    }
-
-    virtual const bool isGetable() const
-    {
-      return theGetStringMethod != NULLPTR;
-    }
-
-    virtual void setString( StringCref string )
-    {
-      if( ! isSetable() )
-	{
-	  throw AttributeError( __PRETTY_FUNCTION__,
-				"[" + theName + "] is not settable." );
-	}
-
-      ( theObject.*theSetStringMethod )( string );
-    }
-
-    virtual const String getString() const
-    {
-      if( ! isGetable() )
-	{
-	  throw AttributeError( __PRETTY_FUNCTION__,
-				"[" + theName + "] is not gettable." );
-	}
-
-      return ( ( theObject.*theGetStringMethod )() );
-    }
-
-
-    virtual void setUVariableVector( UVariableVectorCref uvector );
-
-    virtual UVariableVectorRCPtr getUVariableVector() const;
-
-    virtual void setReal( const Real real );
-
-    virtual const Real getReal() const;
-
-
-
-  private:
-
-    const SetStringMethodPtr    theSetStringMethod;
-    const GetStringMethodPtr    theGetStringMethod;
-
-  };
-
-
-
-
-  //////////// implementation
-
-  ///////////////////////////// ClassPropertySlot
-
-  template< class T >
-  ClassPropertySlot<T>::ClassPropertySlot( StringCref name, T& object )
-    :
-    PropertySlot( name ),
-    theObject( object )
-  {
-    ; // do nothing
-  }
-  
-
-  ///////////////////////////// UVariableVectorPropertySlot
-
-  template< class T >
-  UVariableVectorPropertySlot<T>::
-  UVariableVectorPropertySlot( StringCref name, T& object, 
-			       const SetUVariableVectorMethodPtr setmethod,
-			       const GetUVariableVectorMethodPtr getmethod )
-    : 
-    ClassPropertySlot<T>( name, object ),
-    theSetUVariableVectorMethod( setmethod ), 
-    theGetUVariableVectorMethod( getmethod )
-  {
-    ; // do nothing
-  }
-
-  template< class T >
-  void UVariableVectorPropertySlot<T>::setReal( const Real real )
-  {
-    UVariableVector aVector;
-    aVector.push_back( real );
-    setUVariableVector( aVector );
-  }
-
-  template< class T >
-  const Real UVariableVectorPropertySlot<T>::getReal() const
-  {
-    UVariableVectorRCPtr aVectorPtr( getUVariableVector() );
-    return (*aVectorPtr)[0].asReal();
-  }
-
-  template< class T >
-  void UVariableVectorPropertySlot<T>::setString( StringCref string )
-  {
-    UVariableVector aVector;
-    aVector.push_back( string );
-    setUVariableVector( aVector );
-  }
-
-  template< class T >  
-  const String UVariableVectorPropertySlot<T>::getString() const
-  {
-    UVariableVectorRCPtr aVectorPtr( getUVariableVector() );
-    return (*aVectorPtr)[0].asString();
-  }
-
-  ///////////////////////////// RealPropertySlot
-
-  
-  template< class T >
-  RealPropertySlot<T>::RealPropertySlot( StringCref name, T& object, 
-					 const SetRealMethodPtr setmethod,
-					 const GetRealMethodPtr getmethod )
-    : 
-    ClassPropertySlot<T>( name, object ),
-    theSetRealMethod( setmethod ), 
-    theGetRealMethod( getmethod )
-  {
-    ; // do nothing
-  }
-
-  template<class T> 
-  void RealPropertySlot<T>::setUVariableVector( UVariableVectorCref uvector ) 
-  {
-    setReal( uvector[0].asReal() );
-  }
-  
-  template<class T> 
-  UVariableVectorRCPtr RealPropertySlot<T>::getUVariableVector() const
-  {
-    UVariableVectorRCPtr aVector( new UVariableVector );
-    aVector->push_back( UVariable( getReal() ) );
-    return aVector;
-  }
-
-  template<class T> 
-  void RealPropertySlot<T>::setString( StringCref string )
-  {
-    setReal( stringTo<Real>( string ) );
-  }
-
-  template<class T> 
-  const String RealPropertySlot<T>::getString() const
-  {
-    return toString( getReal() );
-  }
-
-  ///////////////////////////// StringPropertySlot
-
-
-  template< class T >
-  StringPropertySlot<T>::
-  StringPropertySlot( StringCref name, T& object, 
-		      const SetStringMethodPtr setmethod,
-		      const GetStringMethodPtr getmethod )
-    :
-    ClassPropertySlot<T>( name, object ),
-    theSetStringMethod( setmethod ), 
-    theGetStringMethod( getmethod )
-  {
-    ; // do nothing
-  }
-
-
-  template<class T> 
-  void StringPropertySlot<T>::setUVariableVector( UVariableVectorCref uvector )
-  {
-    setString( uvector[0].asString() );
-  }
-  
-  template<class T> 
-  UVariableVectorRCPtr StringPropertySlot<T>::getUVariableVector() const
-  {
-    UVariableVectorRCPtr aVector( new UVariableVector );
-    aVector->push_back( UVariable( getString() ) );
-    return aVector;
-  }
-
-  template<class T> 
-  void StringPropertySlot<T>::setReal( const Real real )
-  {
-    setString( toString( real ) );
-  }
-
-  template<class T> 
-  const Real StringPropertySlot<T>::getReal() const
-  {
-    return stringTo<Real>( getString() );
-  }
 
 
 }
