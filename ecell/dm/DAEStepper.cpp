@@ -395,9 +395,9 @@ namespace libecs
     const Real c2q( c3q * c2 );
     for ( VariableVector::size_type c( 0 ); c < aSize; ++c )
       {
-	const Real z1( c1q * ( theW[ c ] + ( c1q - c1 ) * ( theW[ c + aSize ] + ( c1q - c2 ) * theW[ c + aSize*2 ] ) ) );
-	const Real z2( c2q * ( theW[ c ] + ( c2q - c1 ) * ( theW[ c + aSize ] + ( c2q - c2 ) * theW[ c + aSize*2 ] ) ) );
-	const Real z3( c3q * ( theW[ c ] + ( c3q - c1 ) * ( theW[ c + aSize ] + ( c3q - c2 ) * theW[ c + aSize*2 ] ) ) );
+	const Real z1( c1q * ( theW[ c ] + ( c1q - c2 ) * ( theW[ c + aSize ] + ( c1q - c1 ) * theW[ c + aSize*2 ] ) ) );
+	const Real z2( c2q * ( theW[ c ] + ( c2q - c2 ) * ( theW[ c + aSize ] + ( c2q - c1 ) * theW[ c + aSize*2 ] ) ) );
+	const Real z3( c3q * ( theW[ c ] + ( c3q - c2 ) * ( theW[ c + aSize ] + ( c3q - c1 ) * theW[ c + aSize*2 ] ) ) );
 
 	theW[ c ] = 4.3255798900631553510 * z1
 	  + 0.33919925181580986954 * z2 + 0.54177053993587487119 * z3;
@@ -679,9 +679,21 @@ namespace libecs
 
     for ( VariableVector::size_type c( 0 ); c < aSize; c++ )
       {
-	theW[ c ] = theW[ c ] / c1;
-	theW[ c+aSize ] = ( theW[ c+aSize ] - c2*theW[ c ] ) / ( c2 - c1 );
-	theW[ c+aSize*2 ] = ( ( theW[ c+aSize*2 ] - theW[ c ] ) / ( 1 - c1 ) - theW[ c+aSize ] ) / ( 1 - c2 );
+	//	std::cout << "z : " << theW[c] << " : "<< theW[c+aSize] << " : " << theW[c+2*aSize] << std::endl;
+
+	const Real z2( theW[ c + aSize ] );
+	const Real z1( theW[ c ] );
+
+	theW[ c ] = ( z2 - theW[ c + aSize*2 ] ) / ( c2 - 1.0 );
+
+	const Real ak( ( z1 - z2 ) / ( c1 - c2 ) );
+	Real acont3 = z1 / c1;
+	acont3 = ( ak - acont3 ) / c2;
+
+	theW[ c+aSize ] = ( ak - theW[ c ] ) / ( c1 - 1.0 );
+	theW[ c+aSize*2 ] = theW[ c+aSize ] - acont3;
+
+	//	std::cout << theW[c] << " : "<< theW[c+aSize] << " : " << theW[c+2*aSize] << std::endl;
       }
 
     theStateFlag = true;
