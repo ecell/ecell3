@@ -342,7 +342,7 @@
 		    <last_modification_time>Wed, 15 Aug 2001 07:33:35 GMT</last_modification_time>
 		  </signal>
 		  <label>Start</label>
-		  <stock_pixmap>GNOME_STOCK_PIXMAP_FORWARD</stock_pixmap>
+		  <icon>icon_start.xpm</icon>
 		</widget>
 
 		<widget>
@@ -357,7 +357,7 @@
 		    <last_modification_time>Wed, 15 Aug 2001 07:33:56 GMT</last_modification_time>
 		  </signal>
 		  <label>Stop</label>
-		  <stock_pixmap>GNOME_STOCK_PIXMAP_STOP</stock_pixmap>
+		  <icon>icon_stop.xpm</icon>
 		</widget>
 	      </widget>
 
@@ -407,7 +407,7 @@
 			<last_modification_time>Wed, 15 Aug 2001 07:34:29 GMT</last_modification_time>
 		      </signal>
 		      <label>Step</label>
-		      <stock_pixmap>GNOME_STOCK_PIXMAP_LAST</stock_pixmap>
+		      <icon>icon_step.xpm</icon>
 		    </widget>
 		  </widget>
 
@@ -537,7 +537,7 @@
 		  <last_modification_time>Wed, 15 Aug 2001 07:39:45 GMT</last_modification_time>
 		</signal>
 		<label>Entry</label>
-		<stock_pixmap>GNOME_STOCK_PIXMAP_TEXT_BULLETED_LIST</stock_pixmap>
+		<icon>icon_entry.xpm</icon>
 	      </widget>
 
 	      <widget>
@@ -551,7 +551,7 @@
 		  <last_modification_time>Wed, 15 Aug 2001 07:39:51 GMT</last_modification_time>
 		</signal>
 		<label>Logger</label>
-		<stock_pixmap>GNOME_STOCK_PIXMAP_ADD</stock_pixmap>
+		<icon>icon_logger.xpm</icon>
 	      </widget>
 
 	      <widget>
@@ -571,7 +571,7 @@
 		  <last_modification_time>Wed, 15 Aug 2001 07:39:58 GMT</last_modification_time>
 		</signal>
 		<label>Palette</label>
-		<stock_pixmap>GNOME_STOCK_PIXMAP_COLORSELECTOR</stock_pixmap>
+		<icon>icon_palette.xpm</icon>
 		<active>False</active>
 	      </widget>
 
@@ -587,7 +587,7 @@
 		  <last_modification_time>Wed, 15 Aug 2001 07:40:05 GMT</last_modification_time>
 		</signal>
 		<label>Message</label>
-		<stock_pixmap>GNOME_STOCK_PIXMAP_ALIGN_JUSTIFY</stock_pixmap>
+		<icon>icon_message.xpm</icon>
 		<active>False</active>
 	      </widget>
 
@@ -603,7 +603,7 @@
 		  <last_modification_time>Wed, 15 Aug 2001 09:00:49 GMT</last_modification_time>
 		</signal>
 		<label>Interface</label>
-		<stock_pixmap>GNOME_STOCK_PIXMAP_INDEX</stock_pixmap>
+		<icon>icon_interface.xpm</icon>
 		<active>False</active>
 	      </widget>
 	    </widget>
