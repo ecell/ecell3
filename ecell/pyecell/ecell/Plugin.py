@@ -91,7 +91,7 @@ class PluginModule:
 	# return -> the result of apply function
 	# This method is throwable exception.
 	# ---------------------------------------------------------------
-	def createInstance( self, aData, aPluginManager, aRoot=None, aParent=None ):
+	def createInstance( self, aData, aPluginManager, aRoot=None ):
 
 		aConstructor = self.theModule.__dict__[self.theName]
 		anArgumentTuple = ( self.theDirectoryName,  aData, aPluginManager, aRoot )
@@ -139,11 +139,7 @@ class PluginManager:
 		except KeyError:
 			self.loadModule( classname )
 
-		#if root !='top_vbox':
-		#self.theInterfaceWindow.addNewRecord( classname, data )
-	
 		anInstance = aPlugin.createInstance( data, self, root, parent )
-		#self.theSession.theSimulator.initialize()
 		return anInstance
 
 	# end of createInstance
@@ -179,7 +175,6 @@ class PluginManager:
 				if( os.path.isfile( aModulePath + '.py' ) ):
 					aModuleName = os.path.basename( aModulePath )
 					self.loadModule( aModuleName )
-					#self.theInterfaceWindow.thePluginWindowsNoDict[ aModuleName[ : -6 ] ] = 0
 
 
 	# ---------------------------------------------------------------
@@ -207,7 +202,6 @@ class PluginManager:
 	def appendInstance( self, instance ):
 
 		self.theInstanceList.append( instance )
-	# end of appendInstance
 
 
 	# ---------------------------------------------------------------
@@ -240,8 +234,9 @@ class PluginManager:
 	# ---------------------------------------------------------------
 	def showPlugin( self, aPluginInstance ):
 
-		aPluginInstance[ aPluginInstance.__class__.__name__ ].hide()	
+		#aPluginInstance[ aPluginInstance.__class__.__name__ ].hide()	
 		aPluginInstance[ aPluginInstance.__class__.__name__ ].show_all()
+		aPluginInstance[ aPluginInstance.__class__.__name__ ].present()
 
 	# end of showPlugin
 

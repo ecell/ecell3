@@ -96,5 +96,19 @@ class PluginWindow( Window ):
 		self.thePluginManager.removeInstance( self )
 	
 
+#	def getParent( self ):
+#		if self.theRoot == None:
+			#return self[self.__class__.__name__]
+		#else:
+		#	return self.__getParent( self.theRoot )
+
+	#def __getParent( self, *obj ):
+
+	#	if self.theRoot == None:
+	#		return self[self.__class__.__name__]
+	#	else:
+	#		return self.__getParent( self.theRoot )
+
+
 # end of PluginWindow
 
