@@ -4,10 +4,26 @@
 SUBDIRS = @ECELL_SUBDIR@
 
 EXTRA_DIST = autogen.sh\
-doc\
 test
 
+
+docdir = $(prefix)/share/doc/$(PACKAGE)-$(VERSION)
+
+
+install-data-hook:
+	$(mkinstalldirs) $(docdir)
+	cp README NEWS COPYING INSTALL AUTHORS ChangeLog $(docdir)
+	(cd doc ; cp -r * $(docdir) )
+	rm -rf $(docdir)/CVS
+	rm -rf $(docdir)/*/CVS
+	rm -rf $(docdir)/*/*/CVS
+
+uninstall-hook:
+	rm -rf $(docdir)
+
+
 dist-hook:
+	cp -r doc $(distdir)
 	rm -rf $(distdir)/CVS
 	rm -rf $(distdir)/*/CVS
 	rm -rf $(distdir)/*/*/CVS
