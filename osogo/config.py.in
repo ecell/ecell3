@@ -7,5 +7,5 @@ GLADEFILE_PATH = OSOGO_PATH
 
 # where to look at when loading plug-ins
 PLUGIN_PATH = [ OSOGO_PATH + '/plugins', '.' ]
-
+GNOME_INSTALLED = '@GNOME_INSTALLED@'
 

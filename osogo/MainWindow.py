@@ -38,8 +38,10 @@ from OsogoWindow import *
 
 from main import *
 from OsogoPluginManager import *
+GNOME_INSTALLED='no'
+if GNOME_INSTALLED=='yes':
+    import gnome.ui
 
-import gnome.ui
 import gtk
 
 import MessageWindow
@@ -72,7 +74,7 @@ AUTHORLIST  =  [
     'Yoshiya Matsubara',
     'Yuusuke Saito',
     'Masahiro Sugimoto <sugi@e-cell.org>',
-    'Gabor Bereczki <gabor.bereczki@axelero.hu>'
+    'Gabor Bereczki <gabor.bereczki@talk21.com>'
     ]
     
 DESCRIPTION = 'Osogo is a simulation session monitoring module for E-CELL SE Version 3'
@@ -924,7 +926,11 @@ class MainWindow(OsogoWindow):
 
 		# when AboutDialog is not created yet
 		if self.theAboutDialog == None:
-			self.theAboutDialog = gnome.ui.About( NAME, VERSION, COPYRIGHT, \
+			if GNOME_INSTALLED=='yes':
+			    self.theAboutDialog = gnome.ui.About( NAME, VERSION, COPYRIGHT, \
+		                                          DESCRIPTION, AUTHORLIST)
+			else:
+			    self.theAboutDialog = OsogoAboutWindow( NAME, VERSION, COPYRIGHT, \
 		                                          DESCRIPTION, AUTHORLIST)
 			self.theAboutDialog.set_title( 'about osogo' )
 			self.theAboutDialog.show_all()
@@ -1031,6 +1037,41 @@ class MainWindow(OsogoWindow):
 
 # end of MainWindow
 
+# osogo about dialof class
 
+class OsogoAboutWindow(gtk.Dialog):
+	    """ popup window to display info about e-cell when gnome support is not
+	    present
+	    """
+	    def __init__(self, _name, _version, _copyright, _description,
+			    _authorlist):
+		    #init dialog
+		    gtk.Dialog.__init__(self)
+		    
+		    #add button and connect destroy signal
+		    OK_Button=gtk.Button("OK")
+		    OK_Button.connect("clicked",self.clicked)
+		    self.add_action_widget(OK_Button,1)
+		    #add name description, copyright, version as labels
+		    self.vbox.add(gtk.Label(_name))
+		    self.vbox.add(gtk.Label(_version))
+		    self.vbox.add(gtk.Label(_copyright))
+		    self.vbox.add(gtk.Label(_description))
+		    #add authorlist as a scrolled window
+		    
+		    Auth_Vbox=gtk.VBox()
+		    Auth_Vbox.add(gtk.Label("AUTHORS:"))
+		    for _author in _authorlist:
+			Auth_Vbox.add(gtk.Label(_author))
+		    Auth_List=gtk.ScrolledWindow()
+		    Auth_List.set_size_request(200,200)
+		    Auth_List.add_with_viewport(Auth_Vbox)
+		    self.vbox.add(Auth_List)
+		    
+	    def destroy(self):
+		gtk.Dialog.destroy(self)
 
-
+	    def clicked(self,button_obj):
+		self.destroy()
+		
+# end of osogo about dialof class
