@@ -321,7 +321,7 @@ class SessionManager:
 	def registerEcellSession(self, ess, argument={}, extrafilelist=[], dmpath="", timeout=0):
 		'''registers a new Ecell Session
 		ess(str)                   -- ess file name
-		argument(dict)             -- argument to be set seto script
+		argument(dict)             -- argument to be set to script
 		extrafilelist(list of str) -- list of extra file name
 		dmpath(str)            -- set the ECELL3_DM_PATH
 		timeout(int)               -- set time out (sec.). When timeout=0, no limit is set.
