@@ -10,12 +10,12 @@
       <simplelist>
 	<member>What is &ecell Session Script (<acronym>ESS</acronym>).</member>
 
-	<member>How to automate a simulation run by writing an
-          <acronym>ESS</acronym> file.</member>
-
-	<member>How to run &ecell in scripting mode.</member>
+	<member>How to run <acronym>ESS</acronym> in scripting mode.</member>
 
 	<member>How to use <acronym>ESS</acronym> in GUI mode.</member>
+
+	<member>How to automate a simulation run by writing an
+          <acronym>ESS</acronym> file.</member>
 
         <member>How to write frontend software components for &ecell in <productname>Python</productname>.</member>
 
@@ -27,8 +27,8 @@
     <title>What is &ecell Session Script?</title>
 
     <para>An &ecell Session Script (ESS) is a
-<productname>Python</productname> script which is loaded by a &ecell
-<classname>Session</classname> object.  A
+<productname>Python</productname> script which is loaded by a 
+&ecell <classname>Session</classname> object.  A
 <classname>Session</classname> instance represents a single run of a
 simulation.</para>
 
@@ -193,174 +193,6 @@ Both ways, <option>-D</option> and <option>--parameters</option>, can be mixed.
       <title>Using SessionManager</title>
 
       <para>(a separate chapter?)</para>
-
-    </sect2>
-
-    <sect2>
-      <title>Advanced Topics</title>
-
-      <sect3>
-	<title>How <command>ecell3-session</command> runs</title>
-
-	<para><command>ecell3-session</command> command runs on
-	<command>ecell3</command> interpreter command.
-	<command>ecell3</command> command is a thin wrapper to the
-	<productname>Python</productname> interpreter.
-	<command>ecell3</command> command simply invokes a
-	<productname>Python</productname> interpreter command
-	specified at compile time.  Before executing
-	<productname>Python</productname>, <command>ecell3</command>
-	sets some environment variables to ensure that it can find
-	necessary &ecell <productname>Python</productname> extension
-	modules and the Standard <acronym>DM</acronym> Library. 
-	After processing the commandline options,
-	<command>ecell3-session</command> command creates an
-	<classname>ecell.ecs.Simulator</classname> object, and then
-	instantiate a <classname>ecell.Session</classname> object for
-	the simulator object.  </para>
-
-	<para>Thus basically <command>ecell3</command> is just a
-	<productname>Python</productname> interpreter, and frontend
-	components to &ecell SE should run on this command.  To use
-	the &ecell Python Library from <command>ecell3</command>
-	command, use <programlisting>import ecell</programlisting>
-	statement from the prompt:
-<informalexample>
-	    <screen><prompt>$ </prompt><userinput>ecell3</userinput> 
-<computeroutput>Python 2.2.2 (#1, Feb 24 2003, 19:13:11)
-[GCC 3.2.2 20030222 (Red Hat Linux 3.2.2-4)] on linux2
-Type "help", "copyright", "credits" or "license" for more information.</computeroutput>
-<prompt>>>> </prompt><userinput>import ecell</userinput>
-<prompt>>>> </prompt>
-</screen>
-	  </informalexample>
-or, (on UNIX-like systems) execute a file starting with:
-<programlisting>#!/usr/bin/env ecell3
-import ecell
-[...]
-</programlisting> 
-	</para>
-
-
-      </sect3>
-
-
-      <sect3>
-	<title>Getting information about execution environment</title>
-
-	<para>To get the current configuration of
-	<command>ecell3</command> command, invoke
-	<command>ecell3</command> command with a
-	<parameter>-h</parameter> option. This will print values of
-	some variables as well as usage of the command.
-<informalexample>
-	    <screen><prompt>$ </prompt><userinput>ecell3 -h</userinput>
-<computeroutput>[...]
-
-Configurations:
- 
-        PACKAGE         = ecell
-        VERSION         = 3.2.0
-        PYTHON          = /usr/bin/python
-        PYTHONPATH      = /usr/lib/python2.2/site-packages:
-        DEBUGGER        = gdb
-        LD_LIBRARY_PATH = /usr/lib:
-        prefix          = /usr
-        pythondir       = /usr/lib/python2.2/site-packages
-        ECELL3_DM_PATH  =
-
-[...]
-</computeroutput></screen>
-	  </informalexample>
-The '<computeroutput>PYTHON =</computeroutput>' line gives the path of the
-<productname>Python</productname> interpreter to be used.
-</para>
-      </sect3>
-
-      <sect3>
-	<title>Debugging</title>
-
-	<para>To invoke <command>ecell3</command> command in debugging
-	mode, set <varname>ECELL_DEBUG</varname> environment variable.
-	This runs the command on a debugger software.  If found,
-	<productname>GNU gdb</productname> is used as the
-	debugger. <varname>ECELL_DEBUG</varname> can be used for any
-	commands run on <command>ecell3</command>, including
-	<command>ecell3-session</command> and
-	<command>gecell</command>.  For example, to run <command>ecell3-session</command> in debug mode on the shell prompt:
-<informalexample>
-	    <screen><prompt>$ </prompt><userinput>ECELL_DEBUG=1 ecell3-session -f foo.eml</userinput>
-<computeroutput>gdb --command=/tmp/ecell3.0mlQyE /usr/bin/python
-GNU gdb Red Hat Linux (5.3post-0.20021129.18rh)
-Copyright 2003 Free Software Foundation, Inc.
-GDB is free software, covered by the GNU General Public License, and you are
-welcome to change it and/or distribute copies of it under certain conditions.
-Type "show copying" to see the conditions.
-There is absolutely no warranty for GDB.  Type "show warranty" for details.
-This GDB was configured as "i386-redhat-linux-gnu"...
-[New Thread 1074178112 (LWP 7327)]
-ecell3-session [ E-Cell SE Version 3.2.0, on Python Version 2.2.2 ]
-Copyright (C) 1996-2003 Keio University.
-Send feedback to Kouichi Takahashi &lt;shafi@e-cell.org></computeroutput>
-<prompt>&lt;foo.eml, t=0>>> </prompt><userinput><keycombo action='simul'>
-  <keycap>Ctrl</keycap>
-  <keycap>C</keycap>
-</keycombo></userinput>
-<computeroutput>Program received signal SIGINT, Interrupt.
-[Switching to Thread 1074178112 (LWP 7327)]
-0xffffe002 in ?? ()</computeroutput>
-<prompt>(gdb)</prompt>
-</screen>
-	  </informalexample>
-It automatically runs the program with the commandline options with '<parameter>--command=</parameter>' option of <productname>gdb</productname>.  The <productname>gdb</productname> prompt appears when the program crashes or interrupted by the user by pressing <keycombo action='simul'>
-  <keycap>Ctrl</keycap>
-  <keycap>C</keycap>
-</keycombo>.
-</para>
-
-	<para><varname>ECELL_DEBUG</varname> runs
-	<productname>gdb</productname>, which is for debugging at the
-	level of lower level C++ code.  See
-	<productname>Python</productname> Library Reference Manual for
-	<productname>Python Debugger</productname>.</para>
-      </sect3>
-
-
-      <sect3>
-	<title>Profiling</title>
-
-	<para>It is possible to run <command>ecell3</command> command
-	in profiling mode, if the operating system has
-	<productname>GNU sprof</productname> command, and its C
-	library supports <varname>LD_PROFILE</varname> environmental
-	variable.  Currently it only supports per-shared object
-	profiling. (See GNU C Library Reference Manual)</para>
-
-	<para>To run <command>ecell3</command> in profiling mode, set
-	<varname>ECELL_PROFILE</varname> environment variable to
-	<emphasis>SONAME</emphasis> of the shared object.  SONAME of
-	a shared object file can be found by using
-	<productname>objdump</productname> command, with, for example,
-	<parameter>-p</parameter> option.</para>
-
-	<para>For example, the following commandline takes a
-	performance profile of Libecs:
-<informalexample>
-	    <screen><prompt>$ </prompt><userinput>ECELL_PROFILE=libecs.so.2 ecell3-session [...]</userinput></screen>
-	  </informalexample>
-        After running, it creates a profiling data file with a
-        filename <filename>SONAME.profile</filename> in the
-        <emphasis>current directory</emphasis>.  In this case, it is
-        <filename>libecs.so.2.profile</filename>.  The binary
-        profiling data can be converted to a text format by using
-        <command>sprof</command> command. For example:
-        <informalexample> <screen><prompt>$ </prompt><userinput>sprof
-        -p libecs.so.2</userinput></screen>
-	  </informalexample>
-</para>
-
-
-      </sect3>
 
     </sect2>
 
@@ -707,7 +539,7 @@ else:
       </sect3>
 
       <sect3>
-	<title>Getting the name and a class name of an <classname>ObjectStub</classname></title>
+	<title>Getting the name and a class name from an <classname>ObjectStub</classname></title>
 
 	<para>To get the name (or an ID) of an
 	<classname>ObjectStub</classname>, use
@@ -742,11 +574,10 @@ else:
 	object attribute with a
 	property name:
 <informalexample>
-	    <para>
-	    <programlisting>aValue = aStub.getProperty( 'Activity' )</programlisting>
+	    <programlisting>aValue = aStub.getProperty( 'Activity' )</programlisting></informalexample>
 or equivalently,
+<informalexample>
 	    <programlisting>aValue = aStub[ 'Activity' ]</programlisting>
-</para>
 	  </informalexample></para>
 
 	<para>To set a new property value to an
@@ -755,17 +586,22 @@ or equivalently,
 	<methodname>setProperty</methodname>() method or mutate an
 	object attribute with a	property name and the new value:
 <informalexample>
-	    <para>
 <programlisting>aStub.getProperty( 'Activity', aNewValue )</programlisting> 
+	  </informalexample>
 or equivalently, 
-<programlisting>aStub[ 'Activity' ] = aNewValue</programlisting> </para>
+<informalexample>
+<programlisting>aStub[ 'Activity' ] = aNewValue</programlisting>
 	  </informalexample>
 </para>
 
 	<para>List of all the properties can be gotten by using
 	<methodname>getPropertyList</methodname> method, which returns
 	a list of property names as a Python
-	<type>tuple</type>.</para>
+	<type>tuple</type> containing string objects.
+<informalexample>
+	    <programlisting>aStub.getPropertyList()</programlisting>
+	  </informalexample>
+</para>
 
 	<para>To know if a property is <emphasis>getable</emphasis>
 	(accessible) or <emphasis>setable</emphasis> (mutable), call
@@ -775,7 +611,12 @@ or equivalently,
 	is setable, and the second element is true if it is getable.
 	Attempts to get a value from an inaccessible property and to
 	set a value to a immutable property result in
-	exceptions.</para>
+	exceptions.
+<informalexample>
+	    <programlisting>aStub.getPropertyAttribute( 'Activity' )[0] <lineannotation># <constant>true</constant> if setable</lineannotation>
+aStub.getPropertyAttribute( 'Activity' )[1] <lineannotation># <constant>true</constant> if getable</lineannotation></programlisting>
+	  </informalexample>
+</para>
 
       </sect3>
 
@@ -812,7 +653,7 @@ or equivalently,
 	      for speed.</para>
 	    </listitem>
 	  </itemizedlist>
-	<methodname>getData</methodname>() method returns a rank-2
+	<methodname>getData</methodname>() method returns a rank-2 (matrix)
 	<classname>array</classname> object of <productname>Numeric
 	Python</productname> module.  The <type>array</type> has
 	either one of the following forms:
@@ -930,23 +771,43 @@ text file, and easily handled by user-written and third-party data
 processing and plotting software such as
 <productname>gnuplot</productname>.</para>
 
+	<para>An <acronym>ECD</acronym> file can store a matrix of
+	floating-point numbers.</para>
 
 	<para><classname>ecell.ECDDataFile</classname> class can be
-used to save and load <acronym>ECD</acronym> files.</para>
+used to save and load <acronym>ECD</acronym> files.  A
+<classname>ECDDataFile</classname> object takes and returns a rank-2
+<type>array</type> of <productname>NumericPython</productname>.  A
+'rank-2' <type>array</type> is a matrix, which means that
+<methodname>Numeric.rank( ARRAY )</methodname> and <methodname>len(
+Numeric.shape( ARRAY ) )</methodname> returns
+'<constant>2</constant>'.</para>
 
       </sect3>
 
       <sect3>
 	<title>Saving and loading data</title>
 	
-	<para>To save data to an <acronym>ECD</acronym> file, say, <filename>datafile.ecd</filename>, instantiate an <classname>ECDDataFile</classname> object and use <methodname>save</methodname>() method.
+	<para>To save data to an <acronym>ECD</acronym> file, say,
+	<filename>datafile.ecd</filename>, instantiate an
+	<classname>ECDDataFile</classname> object and use
+	<methodname>save</methodname>() method.
 	<informalexample>
 	  <programlisting>import ecell
 aDataFile = ecell.ECDDataFile( DATA )
 aDataFile.save( 'datafile.ecd' )
 </programlisting>
 	  </informalexample>
-          here <varname>DATA</varname> is a rank-2 <type>array</type> of <productname>Numeric Python</productname> or an equivalent object.
+          here <varname>DATA</varname> is a rank-2 <type>array</type>
+          of <productname>Numeric Python</productname> or an
+          equivalent object.  The data can also be set by using
+          <methodname>setData</methodname>() method after the
+          instantiation.  If the data is already set, it is replaced.
+<informalexample>
+	    <programlisting>aDataFile.setData( DATA )</programlisting>
+	  </informalexample>
+
+
  </para>
 
 	<para>Loading the <acronym>ECD</acronym> file is also straightforward.
@@ -1050,6 +911,14 @@ Now the data is stored in a matrix variable with the same name as the file witho
 
       </sect3>
 
+      <sect3>
+	<title>Binary format</title>
+
+	<para>Currently loading and saving of the binary file format
+	is not supported.</para>
+      </sect3>
+
+
     </sect2>
 
     <sect2>
@@ -1134,9 +1003,177 @@ Now the data is stored in a matrix variable with the same name as the file witho
 
   </sect1>
 
+  <sect1>
+    <title>Advanced Topics</title>
+
+    <sect2>
+      <title>How <command>ecell3-session</command> runs</title>
+
+      <para><command>ecell3-session</command> command runs on
+	<command>ecell3</command> interpreter command.
+	<command>ecell3</command> command is a thin wrapper to the
+	<productname>Python</productname> interpreter.
+	<command>ecell3</command> command simply invokes a
+	<productname>Python</productname> interpreter command
+	specified at compile time.  Before executing
+	<productname>Python</productname>, <command>ecell3</command>
+	sets some environment variables to ensure that it can find
+	necessary &ecell <productname>Python</productname> extension
+	modules and the Standard <acronym>DM</acronym> Library. 
+	After processing the commandline options,
+	<command>ecell3-session</command> command creates an
+	<classname>ecell.ecs.Simulator</classname> object, and then
+	instantiate a <classname>ecell.Session</classname> object for
+	the simulator object.  </para>
+
+      <para>Thus basically <command>ecell3</command> is just a
+	<productname>Python</productname> interpreter, and frontend
+	components to &ecell SE should run on this command.  To use
+	the &ecell Python Library from <command>ecell3</command>
+	command, use <programlisting>import ecell</programlisting>
+	statement from the prompt:
+<informalexample>
+	  <screen><prompt>$ </prompt><userinput>ecell3</userinput> 
+<computeroutput>Python 2.2.2 (#1, Feb 24 2003, 19:13:11)
+[GCC 3.2.2 20030222 (Red Hat Linux 3.2.2-4)] on linux2
+Type "help", "copyright", "credits" or "license" for more information.</computeroutput>
+<prompt>>>> </prompt><userinput>import ecell</userinput>
+<prompt>>>> </prompt>
+</screen>
+	</informalexample>
+or, (on UNIX-like systems) execute a file starting with:
+<programlisting>#!/usr/bin/env ecell3
+import ecell
+[...]
+</programlisting> 
+	</para>
+
+
+    </sect2>
+
+
+    <sect2>
+      <title>Getting information about execution environment</title>
+
+      <para>To get the current configuration of
+	<command>ecell3</command> command, invoke
+	<command>ecell3</command> command with a
+	<parameter>-h</parameter> option. This will print values of
+	some variables as well as usage of the command.
+<informalexample>
+	  <screen><prompt>$ </prompt><userinput>ecell3 -h</userinput>
+<computeroutput>[...]
+
+Configurations:
+ 
+        PACKAGE         = ecell
+        VERSION         = 3.2.0
+        PYTHON          = /usr/bin/python
+        PYTHONPATH      = /usr/lib/python2.2/site-packages:
+        DEBUGGER        = gdb
+        LD_LIBRARY_PATH = /usr/lib:
+        prefix          = /usr
+        pythondir       = /usr/lib/python2.2/site-packages
+        ECELL3_DM_PATH  =
+
+[...]
+</computeroutput></screen>
+	</informalexample>
+The '<computeroutput>PYTHON =</computeroutput>' line gives the path of the
+<productname>Python</productname> interpreter to be used.
+</para>
+    </sect2>
+
+    <sect2>
+      <title>Debugging</title>
+
+      <para>To invoke <command>ecell3</command> command in debugging
+	mode, set <varname>ECELL_DEBUG</varname> environment variable.
+	This runs the command on a debugger software.  If found,
+	<productname>GNU gdb</productname> is used as the
+	debugger. <varname>ECELL_DEBUG</varname> can be used for any
+	commands run on <command>ecell3</command>, including
+	<command>ecell3-session</command> and
+	<command>gecell</command>.  For example, to run <command>ecell3-session</command> in debug mode on the shell prompt:
+<informalexample>
+	  <screen><prompt>$ </prompt><userinput>ECELL_DEBUG=1 ecell3-session -f foo.eml</userinput>
+<computeroutput>gdb --command=/tmp/ecell3.0mlQyE /usr/bin/python
+GNU gdb Red Hat Linux (5.3post-0.20021129.18rh)
+Copyright 2003 Free Software Foundation, Inc.
+GDB is free software, covered by the GNU General Public License, and you are
+welcome to change it and/or distribute copies of it under certain conditions.
+Type "show copying" to see the conditions.
+There is absolutely no warranty for GDB.  Type "show warranty" for details.
+This GDB was configured as "i386-redhat-linux-gnu"...
+[New Thread 1074178112 (LWP 7327)]
+ecell3-session [ E-Cell SE Version 3.2.0, on Python Version 2.2.2 ]
+Copyright (C) 1996-2003 Keio University.
+Send feedback to Kouichi Takahashi &lt;shafi@e-cell.org></computeroutput>
+<prompt>&lt;foo.eml, t=0>>> </prompt><userinput><keycombo action='simul'>
+		<keycap>Ctrl</keycap>
+		<keycap>C</keycap>
+	      </keycombo></userinput>
+<computeroutput>Program received signal SIGINT, Interrupt.
+[Switching to Thread 1074178112 (LWP 7327)]
+0xffffe002 in ?? ()</computeroutput>
+<prompt>(gdb)</prompt>
+</screen>
+	</informalexample>
+It automatically runs the program with the commandline options with '<parameter>--command=</parameter>' option of <productname>gdb</productname>.  The <productname>gdb</productname> prompt appears when the program crashes or interrupted by the user by pressing <keycombo action='simul'>
+	  <keycap>Ctrl</keycap>
+	  <keycap>C</keycap>
+	</keycombo>.
+</para>
+
+      <para><varname>ECELL_DEBUG</varname> runs
+	<productname>gdb</productname>, which is for debugging at the
+	level of lower level C++ code.  See
+	<productname>Python</productname> Library Reference Manual for
+	<productname>Python Debugger</productname>.</para>
+    </sect2>
+
+
+    <sect2>
+      <title>Profiling</title>
+
+      <para>It is possible to run <command>ecell3</command> command
+	in profiling mode, if the operating system has
+	<productname>GNU sprof</productname> command, and its C
+	library supports <varname>LD_PROFILE</varname> environmental
+	variable.  Currently it only supports per-shared object
+	profiling. (See GNU C Library Reference Manual)</para>
+
+      <para>To run <command>ecell3</command> in profiling mode, set
+	<varname>ECELL_PROFILE</varname> environment variable to
+	<emphasis>SONAME</emphasis> of the shared object.  SONAME of
+	a shared object file can be found by using
+	<productname>objdump</productname> command, with, for example,
+	<parameter>-p</parameter> option.</para>
+
+      <para>For example, the following commandline takes a
+	performance profile of Libecs:
+<informalexample>
+	  <screen><prompt>$ </prompt><userinput>ECELL_PROFILE=libecs.so.2 ecell3-session [...]</userinput></screen>
+	</informalexample>
+        After running, it creates a profiling data file with a
+        filename <filename>SONAME.profile</filename> in the
+        <emphasis>current directory</emphasis>.  In this case, it is
+        <filename>libecs.so.2.profile</filename>.  The binary
+        profiling data can be converted to a text format by using
+        <command>sprof</command> command. For example:
+        <informalexample> <screen><prompt>$ </prompt><userinput>sprof -p libecs.so.2</userinput></screen>
+	</informalexample>
+</para>
+
+
+    </sect2>
+
+  </sect1>
+
+
 
   <sect1>
-    <title>&ecell Python library API</title>
+    <title>&ecell Python Library API</title>
 
     <para>This section provides a list of some commonly used 
       classes in &ecell Python library and their APIs.

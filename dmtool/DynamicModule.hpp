@@ -218,25 +218,16 @@ SharedDynamicModule( const std::string& classname )
 
   if( theHandle == NULL ) 
     {
-      //FIXME: Try again to look for Classname + ".so".
-      //       This is a workaround for buggy libltdl which don't look for
-      //       .so if there is *not* .la (as of libtool-1.4.2)....
-      //       May be this can be eliminated and simplified in the future...
-      filename += ".so";
-      theHandle = lt_dlopenext( filename.c_str() );
-
-      if( theHandle == NULL ) 
-	{
-	  throw DMException( "Shared object file for [" + classname + 
-			     "] not found." );
-	}
+      throw DMException( "Failed to find or load a DM [" + classname + 
+			 "]: " + lt_dlerror() );
     }
 
   theAllocator = *((DMAllocator*)( lt_dlsym( theHandle, "CreateObject" ) ));
 
   if( theAllocator == NULL )
     {
-      throw DMException( lt_dlerror() );  
+      throw DMException( "[" + getFileName() + "] is not a valid DM file: "
+			  + lt_dlerror() );  
     }
 }
 
