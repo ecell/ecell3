@@ -10,14 +10,11 @@ AM_INIT_AUTOMAKE(package, version, do-not-define)
 AC_PROG_MAKE_SET
 dnl
 dnl
-dnl assume korandom and dmtool packages are there
-ecell_have_korandom=true
-ecell_have_dmtool=true
 dnl
 AC_MSG_CHECKING([for packages to be configured and built])
 ecell_subdirs="ecell"
-test "$ecell_have_korandom" != true && ecell_subdirs="korandom $ecell_subdirs"
-test "$ecell_have_dmtool" != true && ecell_subdirs="dmtool $ecell_subdirs"
+ecell_subdirs="korandom $ecell_subdirs"
+ecell_subdirs="dmtool $ecell_subdirs"
 AC_MSG_RESULT($ecell_subdirs)
 AC_CONFIG_SUBDIRS($ecell_subdirs)
 dnl

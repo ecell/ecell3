@@ -54,7 +54,7 @@ case $CC in
 *xlc | *xlc\ * | *lcc | *lcc\ *) am_opt=--include-deps;;
 esac
 
-for dir in . ecell
+for dir in . korandom dmtool ecell
 do 
   echo processing $dir
   (cd $dir; \
