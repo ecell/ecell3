@@ -104,7 +104,7 @@ def t_identifier(t):
 	return t
 
 def t_systempath(t):
-	r'[a-zA-Z_/\.][\w/\.]*'
+	r'[a-zA-Z_/\.]+[\w/\.]*'
 	return t
 
 def t_quotedstrings(t):
@@ -118,13 +118,13 @@ def t_quotedstring(t):
 	return t
 
 def t_control(t):
-	r' ^\%line [^\n]*\n '
+	r' \%line\s[^\n]*\n '
 	seq = t.value.split()
 	t.lineno = int(seq[1])
 	t.lexer.filename = seq[2]
 
 def t_comment(t):
-	r' \# [^\n]* '
+	r' \#[^\n]* '
 	pass
 
 def t_nl(t):
