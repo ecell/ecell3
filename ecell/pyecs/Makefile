@@ -27,7 +27,7 @@ Simulator.o:	Simulator.hpp	Simulator.cpp
 	$(G++) $(ECELL_INCLUDE) $(THREAD_OPTION) -c Simulator.cpp
 
 PyEcs.so: PyEcs.o PySimulator.o Simulator.o SimulatorImplementation.o Makefile
-	$(G++) --shared $(CXXO)/*.o Simulator.o SimulatorImplementation.o PySimulator.o PyEcs.o $(LIBECSCORE) $(LIBKORANDOM) $(LIBUTIL) $(COMMON_CPP)/*.a -o ecs.so
+	$(G++) --shared $(CXXO)/*.o Simulator.o SimulatorImplementation.o PySimulator.o PyEcs.o $(COMMON_CPP)/*.a -o ecs.so
 
 clean:
 	rm -f *.o *~ *.so core

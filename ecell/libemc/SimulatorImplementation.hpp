@@ -1,8 +1,8 @@
 #ifndef ___SIMULATOR_IMPLEMENTATION_H___
 #define ___SIMULATOR_IMPLEMENTATION_H___
 
-#include "libecs/libecs.hpp"
-#include "util/Message.hpp"
+//#include "libecs/libecs.hpp"
+//#include "util/Message.hpp"
 
 class SimulatorImplementation
 {
@@ -11,16 +11,20 @@ public:
 
   SimulatorImplementation();
   ~SimulatorImplementation() {};
-  RootSystem* getRootSystemPtr() { return theRootSystem; }
+  //  RootSystem* getRootSystemPtr() { return theRootSystem; }
 
-  void makePrimitive( StringCref classname, FQPNCref fqpn, StringCref name );
-  void sendMessage( FQPNCref fqpn, MessageCref message );
-  Message getMessage( FQPNCref fqpn, StringCref propertyName );
+  //  void makePrimitive( StringCref classname, FQPNCref fqpn, StringCref name );
+  //  void sendMessage( FQPNCref fqpn, MessageCref message );
+  //  Message getMessage( FQPNCref fqpn, StringCref propertyName );
+
+  void makePrimitive();
+  void sendMessage();
+  void getMessage();
   void step();
 
 private:
 
-  RootSystem* theRootSystem;
+  //  RootSystem* theRootSystem;
 
 };   //end of class Simulator
 

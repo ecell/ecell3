@@ -16,10 +16,6 @@ public:
   static void init_type();
   
   Py::Object makeSimulator( const Py::Tuple& args );
-  Py::Object makePrimitive( const Py::Tuple& args );
-  Py::Object sendMessage( const Py::Tuple& args );
-  Py::Object getMessage( const Py::Tuple& args );
-  Py::Object step( const Py::Tuple& args );
 
 private:
 
