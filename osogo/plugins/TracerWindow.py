@@ -71,7 +71,7 @@ class TracerWindow( PlotterPluginWindow ):
 		    if not self.haslogger(fpn[0]):
 			self.theSession.theSimulator.createLogger(fpn[0])
 			self.theSession.theSimulator.setLoggerMinimumInterval(fpn[0],0.1)
-			self.theSession.printMessage("Logger created for "+fpn[0])
+			self.theSession.message("Logger created for "+fpn[0])
 			
 	def recache(self, aFullPNString, value_from, value_to, interval):
 		#it is called from the plotinstance
@@ -116,7 +116,7 @@ class TracerWindow( PlotterPluginWindow ):
 		    for aFullPN in aFullPNList:
 			aFullPNString= createFullPNString( aFullPN)
 			if not self.haslogger(aFullPNString):
-			    self.theSession.printMessage(aFullPNString+" doesn't have associated logger.")
+			    self.theSession.message(aFullPNString+" doesn't have associated logger.")
 			    pass_flag=1    		
 		if pass_flag==0: 
 		    PlotterPluginWindow.addtrace_to_plot(self,aFullPNList)    
