@@ -57,6 +57,7 @@ class LoggerStub( ObjectStub ):
 	def __init__( self, aSimulator, aFullPNString ):
 
 		ObjectStub.__init__( self, aSimulator )
+		self.theLoggingPolicy = None
 		
 		self.theFullPNString = aFullPNString
 
@@ -74,8 +75,12 @@ class LoggerStub( ObjectStub ):
 	# ---------------------------------------------------------------
 
 	def create( self ):
-
-		self.theSimulator.createLogger( self.theFullPNString )
+		if self.exists():
+			return
+		if self.theLoggingPolicy != None:
+			self.theSimulator.createLogger( self.theFullPNString, self.theLoggingPolicy )
+		else:
+			self.theSimulator.createLogger( self.theFullPNString )
 
 	# end of createLogger
 
@@ -271,7 +276,10 @@ class LoggerStub( ObjectStub ):
 	# ---------------------------------------------------------------
 
 	def setLoggerPolicy( self, aLoggingPolicy ):
-		return self.theSimulator.setLoggerPolicy( self.theFullPNString, aLoggingPolicy)
+		if self.exists():
+			self.theSimulator.setLoggerPolicy( self.theFullPNString, aLoggingPolicy)
+		else:
+			self.theLoggingPolicy = aLoggingPolicy
 
 	#end of setLoggerPolicy
 

@@ -88,8 +88,8 @@ namespace libecs
 		THROW_EXCEPTION( libecs::Exception, "Logger policy array should be 4 element long.\n" );
 }
 	loggingPolicy = aParamList;
-	theMinimumStep = static_cast<Integer>(loggingPolicy.asPolymorphVector()[0]);
-	theMinimumInterval = static_cast<Real>(loggingPolicy.asPolymorphVector()[1]);
+	theMinimumStep = loggingPolicy.asPolymorphVector()[0].asInteger();
+	theMinimumInterval = loggingPolicy.asPolymorphVector()[1].asReal();
 	phys_iterator theMaxSize(0);
 	//calculate maxsize from available Kbytes
 	if (loggingPolicy.asPolymorphVector()[3].asInteger()>0){
@@ -106,7 +106,7 @@ namespace libecs
 	for (int i=0;i<_LOGGER_MAX_PHYSICAL_LOGGERS;i++)
 	{
 	    thePhysicalLoggers[i]->setMaxSize( theMaxSize);
-	    thePhysicalLoggers[i]->setEndPolicy( loggingPolicy.asPolymorphVector()[2]);
+	    thePhysicalLoggers[i]->setEndPolicy( loggingPolicy.asPolymorphVector()[2].asInteger());
 		theMaxSize/=_LOGGER_DIVIDE_STEP;
 	}
 
@@ -174,6 +174,7 @@ namespace libecs
 
   void Logger::appendData( RealParam aTime, RealParam aValue )
   {
+
     const Real aCurrentInterval( aTime - theLastTime );
     DataPoint dp;
     DataPointLong dpl;
@@ -183,20 +184,27 @@ namespace libecs
     dp.setTime( aTime);
     dp.setValue( aValue);
     theDataAggregators[0].aggregate( dp ); 
+
 	if ((theMinimumStep>0)||(theMinimumInterval>=0)){
 
 	if (theMinimumStep>0){
 		theStepCounter++;
 
 		stepcondition = ( theStepCounter >= static_cast<const_iterator>(theMinimumStep) );
+
 		}
 	if (theMinimumInterval>0){
+
 		timecondition = ( theMinimumInterval <= aCurrentInterval );
+
 		}
 	logcondition=timecondition||stepcondition;
+
+
 	}
     if ( logcondition )
       {
+
 		//getdata
 		dpl=theDataAggregators[0].getData();
 
@@ -285,6 +293,7 @@ namespace libecs
 
   Real Logger::getEndTime( void ) const
   {
+
     return thePhysicalLoggers[0]->back().getTime();
   }
 

@@ -505,6 +505,8 @@ class GtkSessionMonitor(Session):
 		logPolicy.append ( float ( self.getParameter( 'logger_min_interval' ) ) )
 		logPolicy.append ( int( self.getParameter( 'end_policy' ) ) )
 		logPolicy.append ( int (self.getParameter( 'available_space' ) ) )
+		if logPolicy[0]<=0 and logPolicy[1]<=0:
+			logPolicy[0]=1
 		return logPolicy
 
 	#-------------------------------------------------------------------
