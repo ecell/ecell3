@@ -8,7 +8,6 @@
       in the simulation models.
       </para>
 
-    <para>This section also explains &PropertySlot;.</para>
   </highlights>
   
   <sect1>
@@ -63,13 +62,19 @@ USE_LIBECS;
 
 LIBECS_DM_CLASS( <parameter>CLASSNAME</parameter>, <parameter>BASECLASS</parameter> )
 {
-  LIBECS_DM_OBJECT( <parameter>CLASSNAME</parameter>, <parameter>DMTYPE</parameter> );
 public:
+
+  LIBECS_DM_OBJECT( <parameter>CLASSNAME</parameter>, <parameter>DMTYPE</parameter> )
+  {
+    // ( Property definition of this class comes here. )
+  }
+
+
   <parameter>CLASSNAME</parameter>() {}// A constructor without an argument
   <parameter>~CLASSNAME</parameter>() {}// A destructor
 };
 
-DM_INIT( <parameter>CLASSNAME</parameter>, <parameter>DMTYPE</parameter> );
+LIBECS_DM_INIT( <parameter>CLASSNAME</parameter>, <parameter>DMTYPE</parameter> );
 </programlisting>
     </example>
 </para>
@@ -131,7 +136,7 @@ DM_INIT( <parameter>CLASSNAME</parameter>, <parameter>DMTYPE</parameter> );
       <para>The source code can be divided into header and source
 	files (such as <filename>FooProcess.hpp</filename> and
 	<filename>FooProcess.cpp</filename>), but at least the
-	<function>DM_INIT</function> macro must be placed in the source file
+	<function>LIBECS_DM_INIT</function> macro must be placed in the source file
 	of the class (<filename>FooProcess.cpp</filename>).</para>
       </sect2>
 
@@ -149,16 +154,19 @@ DM_INIT( <parameter>CLASSNAME</parameter>, <parameter>DMTYPE</parameter> );
       <sect2>
 	<title>DM Macros</title>
 
-	<para>You may notice that it is using three special macros:
-    <function>USE_LIBECS</function>, <function>
-    LIBECS_DM_OBJECT</function>, and
-    <function>DM_INIT</function>.</para>
+	<para>You may notice that the template makes use of some
+    special macros: <function>USE_LIBECS</function>,
+    <function>LIBECS_DM_CLASS</function>,
+    <function>LIBECS_DM_OBJECT</function>, and
+    <function>LIBECS_DM_INIT</function>.</para>
 
 	<para><function>USE_LIBECS</function> declares use of
          <productname>libecs</productname> library, which is the core
          library of &app, in this file after the line.</para>
 
-	<para><function>LIBECS_DM_OBJECT( <parameter>DMTYPE</parameter>,
+      <para><function>LIBECS_DM_CLASS</function></para>
+
+      <para><function>LIBECS_DM_OBJECT( <parameter>DMTYPE</parameter>,
           <parameter>CLASSNAME</parameter> )</function> should be
           placed on the top of the class definition part (immediately
           after '{' of the class).  This macro declares that this is a
@@ -172,7 +180,7 @@ DM_INIT( <parameter>CLASSNAME</parameter>, <parameter>DMTYPE</parameter> );
           public:</programlisting>
 </para>
 
-	<para><function>DM_INIT( <parameter>DMTYPE</parameter>,
+	<para><function>LIBECS_DM_INIT( <parameter>DMTYPE</parameter>,
 	<parameter>CLASSNAME</parameter> )</function> exports the
 	class <parameter>CLASSNAME</parameter> as a &DM; class of type
 	<parameter>DMTYPE</parameter>.  This must come after the
@@ -694,86 +702,9 @@ SET_METHOD_DEF( Real, Flux, HogeProcess )
 	  </itemizedlist>
 
 </para>
-      </sect3>
 
-
-
-      <sect3>
-	<title>Registering &PropertySlot;s</title>
-	
-	<para>To create a &PropertySlot; with both set and get methods, use
-	<function>CREATE_PROPERTYSLOT_SET_GET</function> macro in the
-	constructor or a method called when the object is constructed:
-
-        <programlisting>CREATE_PROPERTYSLOT_SET_GET( <parameter>NAME</parameter>, <parameter>TYPE</parameter>, <parameter>CLASSNAME</parameter> )</programlisting> 
-
-         where <parameter>NAME</parameter> is the name, and
-         <parameter>TYPE</parameter> is the type of the property, and
-         <parameter>CLASSNAME</parameter> is the name of the object
-         class on which the &PropertySlot; is being defined.  This
-         macro registers methods of the object class of which names
-         are set<parameter>NAME</parameter>() and
-         get<parameter>NAME</parameter> as set method and get method,
-         respectively.  Signatures of the methods must match with the
-         prototypes defined in the previous section.</para>
-
-	<para>If the &PropertySlot; has either set or get method, use 
-
-        <programlisting>CREATE_PROPERTYSLOT_SET( <parameter>NAME</parameter>, <parameter>TYPE</parameter>, <parameter>CLASSNAME</parameter> )</programlisting> 
-
-         if only the set method is to be defined, or 
-
-        <programlisting>CREATE_PROPERTYSLOT_GET( <parameter>NAME</parameter>, <parameter>TYPE</parameter>, <parameter>CLASSNAME</parameter> )</programlisting> 
-
-         if the &PropertySlot; is getable and not setable.
-</para>
-
-	<para>For example, this line of code
-
-<programlisting>CREATE_PROPERTYSLOT_SET_GET( Flux, Real, HogeProcess );</programlisting>
-         registers these methods
-
-<programlisting>void HogeProcess::setFlux( const Real& );</programlisting>
-
-and       
-
-<programlisting>const Real HogeProcess::getFlux() const;</programlisting>
-
-         as the set and get methods of '<property>Flux</property>'
-         property of the class <classname>HogeProcess</classname>,
-         respectively.
-</para>
-
-	<para>If the name of either get or set method is different
-         from the default format (set<parameter>NAME</parameter>() or
-         get<parameter>NAME</parameter>()), then use
-
-<programlisting>CREATE_PROPERTYSLOT( <parameter>NAME</parameter>, <parameter>TYPE</parameter>, <parameter>SET_METHOD</parameter>, <parameter>GET_METHOD</parameter>)</programlisting>
-
-         macro with explicitly specifying the pointers to the methods.
-         For example, the following use of the macro registers
-         <methodname>setFlux2</methodname>() and
-         <methodname>anotherGetMethod</methodname>() methods of
-         <property>Flux</property> property of the class
-         <classname>HogeProcess</classname>:
-
-<programlisting>
-CREATE_PROPERTYSLOT( Flux, Real, &amp;HogeProcess::setFlux2,
-                     &amp;HogeProcess::anotherGetMethod );</programlisting>
-</para>
-
-
-	<para>
-If more than one &PropertySlot;s with the same name are created
-on an object, the last is taken.</para>
-      </sect3>
-
-
-      <sect3>
-	<title>The simplest way to define property methods</title>
-
-	<para>If the property is both setable and getable, and is simply
-         stored in a member variable, use the following macro.
+	<para>If the property is both setable and getable, and is
+         simply stored in a member variable, the following macro can be used.
 
 	<programlisting>SIMPLE_SET_GET_METHOD( <parameter>NAME</parameter>, <parameter>TYPE</parameter> )</programlisting>
 
@@ -796,27 +727,145 @@ GET_METHOD( <parameter>NAME</parameter>, <parameter>TYPE</parameter> )
 
       </sect3>
 
-      <sect3>
-	<title>Virtual functions and &PropertySlot;s</title>
 
-	<para>Virtual functions does not work for &PropertySlot;.  The
-	functions given as set / get methods of &PropertySlot;s work
-	and are treated as non-virtual functions.  If you have two
-	&DM; classes A and B, and B inherits A with a virtual function
-	overridden, you may want to define &PropertySlot;s of the same
-	name for both classes, and you get virtually the same result
-	as the virtual function.</para>
+      <sect3>
+	<title>Registering &PropertySlot;s</title>
+	
+
+	<para>To register a &PropertySlot; on a class, one of these
+	macros in the <function>LIBECS_DM_OBJECT</function>
+	macro of the target class:
+
+<itemizedlist>
+	    <listitem>
+	      <para><function>PROPERTYSLOT_SET_GET( <parameter>NAME</parameter>, <parameter>TYPE</parameter> )</function></para>
+	      
+	      <para>Use this if the property is both setable and
+	      getable, which means that the class defines both set
+	      method and get method.</para>
+
+	<para>For example, to define a property
+	'<property>Flux</property>' of type <type>Real</type> on the
+	<classname>HogeProcess</classname> class, write like this in
+	the public area of the class definition:
+
+        <programlisting>
+public:
+
+  LIBECS_DM_OBJECT( <parameter>HogeProcess</parameter>, <parameter>Process</parameter> )
+  {
+    PROPERTYSLOT_SET_GET( <parameter>Flux</parameter>, <parameter>Real</parameter> );
+  }</programlisting> 
+
+         This registers these methods:
+
+<programlisting>void HogeProcess::setFlux( const Real& );</programlisting>
+
+and       
+
+<programlisting>const Real HogeProcess::getFlux() const;</programlisting>
+
+         as the set and get methods of '<property>Flux</property>'
+         property of the class <classname>HogeProcess</classname>,
+         respectively.  Signatures of the methods must match with the
+         prototypes defined in the previous section.
+         <function>LIBECS_DM_OBJECT</function> can have any number of
+         properties.  It can also be empty.</para>
+
+
+	    </listitem>
+
+	    <listitem>
+	      <para><function>PROPERTYSLOT_SET( <parameter>NAME</parameter>, <parameter>TYPE</parameter> )</function></para>
+
+	      <para>This is almost the same as
+               <function>PROPERTYSLOT_SET_GET</function>, but this
+               does not register get method.  Use this if only a set
+               method is available.</para>
+	    </listitem>
+
+
+	    <listitem>
+	      <para><function>PROPERTYSLOT_GET( <parameter>NAME</parameter>, <parameter>TYPE</parameter> )</function></para>
+
+	      <para>This is almost the same as
+               <function>PROPERTYSLOT_SET_GET</function>, but this
+               does not register set method.  Use this if only a get
+               method is available.</para>
+	    </listitem>
+
+
+	    <listitem>
+	      <para><function>PROPERTYSLOT_GET( <parameter>NAME</parameter>, <parameter>TYPE</parameter>, <parameter>SET_METHOD</parameter>, <parameter>GET_METHOD</parameter> )</function></para>
+
+	      <para>If the name of either get or set method is
+               different from the default format
+               (set<parameter>NAME</parameter>() or
+               get<parameter>NAME</parameter>()), then use this macro
+               with explicitly specifying the pointers to the methods.</para>
+
+	      <para>For example, the following use of the macro registers
+               <methodname>setFlux2</methodname>() and
+               <methodname>anotherGetMethod</methodname>() methods of
+               <property>Flux</property> property of the class
+               <classname>HogeProcess</classname>:
+
+<programlisting>
+PROPERTYSLOT( Flux, Real, 
+              &amp;HogeProcess::setFlux2,
+              &amp;HogeProcess::anotherGetMethod );</programlisting>
+</para>
+
+	    </listitem>
+
+
+
+	  </itemizedlist>
+
+</para>
+
+	<para>
+If more than one &PropertySlot;s with the same name are created
+on an object, the last is taken.</para>
+
+	</sect3>
+
+      <sect3>
+	<title>Inheriting properties of base classes</title>
+
+	<para>In most cases you may also want to use properties of
+	base classes.  To inherit the baseclass properties, use
+	<function>INHERIT_PROPERTIES( <parameter>PROPERTY_BASECLASS</parameter>
+	)</function> macro.  This macro is usually placed before any property
+	definition macros (such as
+	<function>PROPERTY_SET_GET()</function>).
+
+        <programlisting>LIBECS_DM_OBJECT( <parameter>CLASSNAME</parameter>, <parameter>DMTYPE</parameter> )
+{
+  INHERIT_PROPERTIES( <parameter>PROPERTY_BASECLASS</parameter> );
+  
+  PROPERTYSLOT_SET_GET( <parameter>NAME</parameter>, <parameter>TYPE</parameter> );
+}</programlisting> 
+
+        Here <parameter>PROPERTY_BASECLASS</parameter> is usually the
+        same as <parameter>BASECLASS</parameter>.  An exception is
+        when the <parameter>BASECLASS</parameter> does not make use of
+        <function>LIBECS_DM_OBJECT()</function> macro.
+        In this case, choose the nearest baseclass in the class
+        hierarachy that uses <function>LIBECS_DM_OBJECT()</function>
+        for <parameter>PROPERTY_BASECLASS</parameter>.
+</para>
 
 	<note>
-	  <para>This can be easily understood if you remember
-            &PropertySlot;s are defined in
-            constructors. In C++ objects are constructed in a
-            bottom-up fashion, or from base to derived classes. Thus
-            the constructors are called in the same order, and always
-            the latest ones are taken.</para>
-	  </note>
+	  <title>Virtual functions and properties</title>
 
+	  <para>Virtual functions does not work for &PropertySlot;s.
+           However, you can get the same result if you redefine a
+           property after <function>INHERIT_PROPERTIES</function>
+           macro in a subclass.</para>
+	</note>
       </sect3>
+
 
     </sect2>
 
@@ -883,36 +932,39 @@ bypassing the &PropertySlot;, (2) dynamically-bound access via a
       </para>
 
 
-      <para>VariableReference, VariableReferenceVector, FluxProcess</para>
+      <para>VariableReference, VariableReferenceVector</para>
 
     <example>
-      <title>SimpleFluxProcess.cpp</title>
+      <title>SimpleProcess.cpp</title>
     <programlisting linenumbering="numbered">
 #include "libecs.hpp"
-#include "FluxProcess.hpp"
+#include "Process.hpp"
 #include "PropertySlotMaker.hpp"
 
 USE_LIBECS;
 
-class SimpleFluxProcess
-  :
-  public FluxProcess
+LIBECS_DM_CLASS( SimpleProcess, Process )
 {
-
-  LIBECS_DM_OBJECT( Process, SimpleFluxProcess );
 
  public:
 
-  SimpleFluxProcess()
+  LIBECS_DM_OBJECT( SimpleFluxProcess, Process )
     {
-      CREATE_PROPERTYSLOT_SET_GET( Real, k, SimpleFluxProcess );
+      PROPERTYSLOT_SET_GET( Real, k );
+    }
+
+  SimpleProcess()
+    :
+  k( 0.0 )
+    {
+      ; // do nothing
     }
 
   SIMPLE_SET_GET_METHOD( Real, k );
 
   virtual void initialize()
     {
-      FluxProcess::initialize();
+      Process::initialize();
       S0 = getVariableReference( "S0" );
     }
 
@@ -927,7 +979,7 @@ class SimpleFluxProcess
   VariableReference S0;
 };
 
-DM_INIT( Process, SimpleFluxProcess );
+LIBECS_DM_INIT( SimpleProcess, Process );
 </programlisting>
     </example>
 
