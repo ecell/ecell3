@@ -128,7 +128,7 @@ LT_BEGIN_C_DECLS
 #ifndef LT_SCOPE
 #  ifdef __WINDOWS__
 #    ifdef DLL_EXPORT		/* defined by libtool (if required) */
-#      define LT_SCOPE	__declspec(dllexport)
+#      define LT_SCOPE	extern
 #    endif
 #    ifdef LIBLTDL_DLL_IMPORT	/* define if linking with this dll */
 #      define LT_SCOPE	extern __declspec(dllimport)
