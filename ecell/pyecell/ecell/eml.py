@@ -17,6 +17,7 @@ __Todo__ = '\
 #------------------- window line ------------------------------------------------------------------#
 
 from xml.dom import minidom
+
 import string
 
 from types import *
@@ -447,33 +448,29 @@ class Eml:
         aFullID = createFullIDString( convertFullPNToFullID( aFullPN ) )
         anEntityPropertyNode = self.__getEntityPropertyNode( aFullID, aPropertyName )
 
-        anEntityPropertyValueList = []
+        aPropertyValueList = []
         for aChildNode in anEntityPropertyNode.childNodes:
 
             if aChildNode.tagName == 'value':
 
-                aValueNode = aChildNode
-
-                if aValueNode.firstChild.nodeType == 3:
-
-                    aValueData = aValueNode.firstChild.toxml()
-                    anEntityPropertyValueList.append( aValueData )
-
-                elif aValueNode.firstChild.nodeType == 1:
-
-                    aValueData = []
-
-                    for aValue in aValueNode.childNodes:
-                        aValueData.append( aValue.firstChild.toxml() )
-
-                    anEntityPropertyValueList.append( aValueData )
-
-
-        return anEntityPropertyValueList
+                aPropertyValueList.append( self.__createValueList( aChildNode ) )
+        return aPropertyValueList
                 
 
 
+    def __createValueList( self, aValueNode ):
+        if aValueNode.firstChild.nodeType == minidom.Node.TEXT_NODE:
 
+            return aValueNode.firstChild.toxml()
+
+        elif aValueNode.firstChild.nodeType == minidom.Node.ELEMENT_NODE:
+            
+            aValueList = []
+
+            for aChildNode in aValueNode.childNodes:
+                aValueList.append( self.__createValueList( aChildNode ) )
+
+            return aValueList
 
     def __getSystemList( self, anEntityType, aSystemPath ):
 
