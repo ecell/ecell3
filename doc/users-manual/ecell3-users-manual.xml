@@ -5,7 +5,7 @@
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN" 
 [
   <!ENTITY legal SYSTEM "legal.xml">
-  <!ENTITY appversion "3.1.0">
+  <!ENTITY appversion "3.1.91">
   <!ENTITY manrevision "0.0">
   <!ENTITY date "Nov 2002">
   <!ENTITY app "<application>E-Cell Simulation Environment</application>">
@@ -63,7 +63,7 @@
   <!-- please do not change the id; for translations, change lang to -->
   <!-- appropriate code -->
   <bookinfo> 
-    <title>&app; Manual V&manrevision;</title>       
+    <title>E-Cell Simulation Environment Version &appversion; User's Manual</title>       
 
     <copyright> 
       <year>2002-2003</year> 
@@ -110,6 +110,7 @@
     <!-- When the desktop release version changes to V3.x, the revision number of the manual changes -->
     <!-- to V3.0, and so on. -->  
 
+<!--
     <revhistory>
       <revision> 
 	<revnumber>E-Cell 3 Manual V&manrevision;</revnumber> 
@@ -122,7 +123,7 @@
 	</revdescription> 
       </revision> 
     </revhistory> 
-
+-->
     <releaseinfo>This manual describes version &appversion; of E-Cell Simulation Environment.
     </releaseinfo> 
 

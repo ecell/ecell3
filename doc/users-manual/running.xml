@@ -54,46 +54,57 @@ items.
         To convert EM (.em) files to EML (.eml) files, type the
         following command.
       </para>
-      <screen><command>em2eml</command> <replaceable>filename.em</replaceable>
-</screen>
+      <para><command>ecell3-em2eml</command> <replaceable>filename.em</replaceable></para>
 
     </sect2>
 
     <sect2>
       <title>Compiling DM to make .so</title>
-      <para>
-        To make a DM (.dm) file compiled into a SO (.so) file,
-        type the following command.
-    		</para>
-      <para> 
-	<command>emtool</command> <option>-a</option>
-	<replaceable>filename.dm</replaceable>
-      </para> 
 
+      <para>If you have your own DM classes which are not part of the
+standard DM library distributed with the package, you have to make
+source files compiled before use.</para>
 
-      <note>
-	<para>When debugging the DM files users may want to check 
-	converted C++ source code (.cpp files).  Use <option>-g</option>
-	commandline option to command emtool program to stop after generating
-        and before compiling and deleting the source code.
-      </para> 
-	<para> 
-	<command>emtool</command> <option>-g</option>
-	<replaceable>filename.dm</replaceable>
-      </para>
-      </note>
+      <para>Use <command>ecell3-dmc</command> command as a DM compiler.</para>
 
-      <note>
-	<para>Sometimes advanced users may want to create SO files
-	directly from C++ source code files (.cpp files).  Use -c
-	commandline option to let emtool program interpret the input as
-        C++ source code, not DM scipt.
-      </para> 
+      <para><command>ecell3-dmc</command> <option>[options]</option>
+<replaceable>filename.cpp</replaceable> <option>[compiler options]</option></para>
 
-	<screen>
-	<command>emtool</command> <option>-c</option> <replaceable>filename.cpp</replaceable>
-</screen>
-      </note>
+      <para>The arguments given before the file name (<option>[command
+      options]</option> are interpreted as options to the
+      <command>ecell3-dmc</command> command itself.</para>
+
+      <para>The arguments after the file name are passed to a backend
+      compiler (such as g++) as-is.  The backend compiler used is the
+      same as the one used to build the system itself.</para>
+
+      <para>To observe what the command actually does inside, enable
+      verbose mode by specifying <option>-v</option> option.</para>
+
+      <para>To get a full list of available
+      <command>ecell3-dmc</command> options, invoke the command with
+      <option>-h</option> option, and without the input file.  Here is
+the help message gotten by <command>ecedll3-dmc</command> <option>-h</option>.
+
+<literallayout class="monospaced">
+Compile dynamic modules for E-Cell Simulation Environment Versin 3.
+
+Usage:
+        ecell3-dmc [ ecell3-dmc options ] sourcefile [ compiler options ]
+        ecell3-dmc -h|--help
+
+ecell3-dmc options:
+        --no-stdinclude          Don't set standard include file path.
+        --no-stdlibdir           Don't set standard include file path.
+        --ldflags=[ldflags]      Specify options to the linker.
+        --cxxflags=[cxxflags]    Override the default compiler options.
+        --dmcompile=[path]       Specify dmcompile path.
+        -v or --verbose          Be verbose.
+        -h or --help             Print this message.
+</literallayout>
+
+</para>
+
 
     </sect2>
     
