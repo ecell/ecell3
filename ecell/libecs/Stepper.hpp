@@ -192,7 +192,8 @@ namespace libecs
 	  || aStepInterval <= getUserMinInterval() )
 	{
 	  // should use other exception?
-	  THROW_EXCEPTION( RangeError, "Stepper StepInterval: out of range." );
+	  THROW_EXCEPTION( RangeError, "Stepper StepInterval: out of range. ("
+			   + toString( aStepInterval ) + String( ")\n" ) );
 	}
 
       theStepInterval = aStepInterval;
@@ -347,7 +348,6 @@ namespace libecs
     virtual StringLiteral getClassName() const  { return "Stepper"; }
 
     const Polymorph getSystemList() const;
-
 
   protected:
 

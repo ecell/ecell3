@@ -398,7 +398,7 @@ namespace libecs
     return anIterator - theVariableCache.begin();
   }
 
-  inline void Stepper::clear()
+  void Stepper::clear()
   {
     //
     // Variable::clear()
@@ -429,7 +429,7 @@ namespace libecs
     //FOR_ALL( ,, clear );
   }
 
-  inline void Stepper::process()
+  void Stepper::process()
   {
     //
     // Process::process()
@@ -438,7 +438,7 @@ namespace libecs
 
   }
 
-  inline void Stepper::integrate()
+  void Stepper::integrate()
   {
     //
     // Variable::integrate()
@@ -453,7 +453,7 @@ namespace libecs
       }
   }
 
-  inline void Stepper::slave()
+  void Stepper::slave()
   {
     // call slave
     StepperPtr aSlaveStepperPtr( getSlaveStepper() );
@@ -464,7 +464,7 @@ namespace libecs
       }
   }
 
-  inline void Stepper::reset()
+  void Stepper::reset()
   {
     const UnsignedInt aSize( theVariableCache.size() );
     for( UnsignedInt c( 0 ); c < aSize; ++c )
@@ -480,7 +480,7 @@ namespace libecs
       }
   }
 
-  inline void Stepper::updateVelocityBuffer()
+  void Stepper::updateVelocityBuffer()
   {
     setStepInterval( getNextStepInterval() );
 
