@@ -43,27 +43,6 @@ class SystemPath {
 
 public:
 
-  static const char DELIMITER = '/';
-
-  // exceptions.
-
-  class SystemPathException : public Exception
-    { 
-    public: 
-      SystemPathException( StringCref method, StringCref what ) 
-	: Exception( method, what ) {} 
-      const String what() const { return ""; }
-    };
-  class BadSystemPath : public SystemPathException
-    { 
-    public: 
-      BadSystemPath( StringCref method, StringCref what ) 
-	: SystemPathException( method, what ) {} 
-      const String what() const { return "Bad SystemPath."; }
-    };
-
-public:
-
   SystemPath( StringCref systempath = "" );
   virtual ~SystemPath() {}
 
@@ -102,6 +81,10 @@ protected:
 
   SystemPath() {}
 
+public:
+
+  static const char DELIMITER = '/';
+
 private:
 
   const String theSystemPath;
@@ -119,23 +102,6 @@ private:
 */
 class FQID : public SystemPath
 {
-public: // exceptions
-
-  class FQIDException : public Exception
-    { 
-    public: 
-      FQIDException( StringCref method, StringCref what )
-	: Exception( method, what ) {} 
-      const String what() const { return ""; }
-    };
-
-  class BadFQID : public FQIDException
-    { 
-    public: 
-      BadFQID( StringCref method, StringCref what ) 
-	: FQIDException( method,what ) {} 
-      const String what() const { return "Bad FQID"; }
-    };
 
 public:
 
@@ -157,23 +123,6 @@ private:
 
 };
 
-class FQPIException : public Exception
-{ 
-public: 
-  FQPIException( StringCref method, StringCref message ) 
-    : Exception( method, message ) {} 
-  const String what() const { return ""; }
-};
-class BadFQPI : public FQPIException
-{ 
-public:
-  BadFQPI( StringCref method, StringCref message ) 
-    : FQPIException( method, message ) {} 
-  const String what() const { return "Bad FQPI."; }
-};
-
-
-
 /**
   FQPI (Fully Qualified Primitive Id).
 
@@ -188,7 +137,6 @@ class FQPI : public FQID
 public:
 
   static const String  fqidOf( StringCref fqpi );
-
 
   FQPI( const PrimitiveType type, FQIDCref fqid );
   FQPI( StringCref fqpi );

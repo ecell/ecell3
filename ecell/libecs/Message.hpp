@@ -33,6 +33,7 @@
 #include <string>
 #include <map>
 #include <vector>
+#include "libecs.hpp"
 #include "Exceptions.hpp"
 #include "StringList.hpp"
 #include "Defs.hpp"
@@ -50,21 +51,6 @@ DECLARE_CLASS( MessageInterface )
    */
 class Message : private StringPair
 {
-
-public: // exceptions
-
-  class MessageException : public Exception
-    {
-    public:
-      MessageException(StringCref method,StringCref what)
-	: Exception(method,what){}
-    };
-  class BadMessage : public MessageException
-    {
-    public:
-      BadMessage(StringCref method,StringCref what)
-	: MessageException(method,what){}
-    };
 
 public:
 
@@ -123,24 +109,6 @@ class AbstractMessageCallback
 {
 
 public:
-
-  // exceptions
-
-  class CallbackFailed : public Message::MessageException
-    {
-    public: 
-      CallbackFailed( StringCref method, StringCref message )
-	: MessageException( method, message ) {}
-      const String what() const { return "Callback has failed."; }
-    };
-
-  class NoMethod : public Message::MessageException
-    {
-    public: 
-      NoMethod( StringCref method, StringCref what )
-	: MessageException( method, what ) {}
-      const String what() const { return "No method registered for the slot"; }
-    };
 
   virtual void set( MessageCref message ) = 0;
   virtual const Message get( StringCref keyword ) = 0;

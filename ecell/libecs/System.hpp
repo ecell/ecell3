@@ -60,29 +60,6 @@ public:
 
   class isRegularReactorItem;
 
-  // exceptions
-
-  class SystemException : public Exception
-    {
-    public:
-      SystemException( StringCref method,StringCref message ) 
-	: Exception( method, message ) {}
-    };
-  class InvalidPrimitiveType : public SystemException
-    {
-    public:
-      InvalidPrimitiveType( StringCref method, StringCref message )
-	: SystemException( method, message ) {}
-      const String what() const { return "Invalid Primitive type requested"; }
-    };
-  class NotFound : public SystemException
-    {
-    public:
-      NotFound( StringCref method, StringCref message ) 
-	: SystemException( method, message ) {}
-      const String what() const { return "Couldn't find requested Primitive"; }
-    };
-
 public:
 
   System();

@@ -28,6 +28,7 @@
 // E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
 
+#include "Util.hpp"
 #include "Reactant.hpp"
 #include "RootSystem.hpp"
 #include "Stepper.hpp"

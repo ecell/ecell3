@@ -34,14 +34,6 @@
 #include "libecs.hpp"
 #include "Exceptions.hpp"
 
-class InvalidPrimitiveType : public Exception
-{
-public:
-  InvalidPrimitiveType( StringCref method, StringCref message ) 
-	: Exception( method, message ) {} 
-  const String what() const { return "Invalid PrimitiveType"; }
-};
-
 enum PrimitiveType
 {
   ENTITY    = 1,

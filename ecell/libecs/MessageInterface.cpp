@@ -70,15 +70,15 @@ void MessageInterface::deleteSlot( StringCref keyword )
   theSlotMap.erase( keyword );
 }
 
-void MessageInterface::set( MessageCref message ) throw( NoSuchSlot )
+void MessageInterface::set( MessageCref message ) throw( NoSlot )
 {
   SlotMapIterator sm( theSlotMap.find( message.getKeyword() ) );
 
   if( sm == theSlotMap.end() )
     {
-      throw NoSuchSlot(__PRETTY_FUNCTION__,
-		       className() + String(": got a Message (keyword = [")
-		       + message.getKeyword() + "]) but no slot for it.");
+      throw NoSlot(__PRETTY_FUNCTION__,
+		   className() + String(": got a Message (keyword = [")
+		   + message.getKeyword() + "]) but no slot for it.");
     }
 
   try {
@@ -99,15 +99,15 @@ void MessageInterface::set( MessageCref message ) throw( NoSuchSlot )
 
 }
 
-const Message MessageInterface::get( StringCref keyword ) throw( NoSuchSlot )
+const Message MessageInterface::get( StringCref keyword ) throw( NoSlot )
 {
   SlotMapIterator sm( theSlotMap.find( keyword ) );
 
   if( sm == theSlotMap.end() )
     {
-      throw NoSuchSlot( __PRETTY_FUNCTION__, className()
-			+ String( ": got a request for Message (keyword = [" )
-			+ keyword + "] but no slot for it.\n" );
+      throw NoSlot( __PRETTY_FUNCTION__, className()
+		    + String( ": got a request for Message (keyword = [" )
+		    + keyword + "] but no slot for it.\n" );
     }
 
   try {

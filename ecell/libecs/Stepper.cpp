@@ -28,9 +28,11 @@
 // E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
 
-#include "Stepper.hpp"
+#include "Util.hpp"
 #include "Integrators.hpp"
 #include "RootSystem.hpp"
+
+#include "Stepper.hpp"
 
 
 ////////////////////////// Stepper

@@ -70,6 +70,20 @@ DECLARE_CLASS( System );
 DECLARE_CLASS( isRegularReactorItem );
 DECLARE_CLASS( SystemMaker );
 
+
+// exceptions
+
+DECLARE_CLASS( Exception );
+DECLARE_CLASS( UnexpectedError );
+DECLARE_CLASS( CantOpenFile );
+DECLARE_CLASS( BadID );
+DECLARE_CLASS( MessageException );
+DECLARE_CLASS( BadMessage );
+DECLARE_CLASS( CallbackFailed );
+DECLARE_CLASS( NoMethod );
+DECLARE_CLASS( NoSlot );
+
+
 #endif // __KOYURUGI_H
 
 

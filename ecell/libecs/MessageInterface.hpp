@@ -50,24 +50,14 @@ public:
   typedef map< const String, AbstractMessageCallback* > SlotMap;
   typedef SlotMap::iterator SlotMapIterator;
 
-  // exceptions
-
-  class NoSuchSlot : public Message::MessageException
-    {
-    public: 
-      NoSuchSlot( StringCref method, StringCref what )
-	: MessageException( method, what ){}
-      const String what() const { return "No appropriate slot found"; }
-    };
-
 public:
 
   MessageInterface();
 
   virtual ~MessageInterface();
 
-  void set( MessageCref ) throw( NoSuchSlot );
-  const Message get( StringCref ) throw( NoSuchSlot );
+  void set( MessageCref ) throw( NoSlot );
+  const Message get( StringCref ) throw( NoSlot );
   StringList slotList();
 
   virtual void makeSlots() = 0;

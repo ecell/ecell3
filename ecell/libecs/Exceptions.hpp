@@ -30,35 +30,35 @@
 
 #ifndef ___EXCEPTIONS_H___
 #define ___EXCEPTIONS_H___
+#include <stdexcept>
+
 #include "config.h"
-#include <typeinfo>
 #include "Defs.hpp"
-#include "Util.hpp"
-
-DECLARE_CLASS( Exception );
-DECLARE_CLASS( UnexpectedError );
-DECLARE_CLASS( CantOpenFile );
-
 
 /// Base exception class
-class Exception 
+class Exception : public exception
 {
 public:
   Exception( StringCref method, StringCref message = "" )
     : theMethod( method ), theMessage( message ) {}
   virtual ~Exception() {}
 
-  virtual const String what() const 
+  virtual const char* what() const 
     { return "E-Cell Core System Standard Exception"; }
 
   virtual const String message() const 
     {
-      return String( className() ) + ": " + what() + ": \n\t"
-	      + theMessage + "\n";
+#ifdef DEBUG
+      return theMethod + ":\n" + 
+	String( getClassName() ) + ": " + what() + ": \n\t"
+	+ theMessage + "\n";
+#else
+      return String( getClassName() ) + ": " + what() + ": \n\t"
+	+ theMessage + "\n";
+#endif /* DEBUG */
     }
 
-  virtual const char* const className() const  {return "Exception";}
-//    {return decodeTypeName(typeid(*this)).c_str();}
+  virtual const char* const getClassName() const  {return "Exception";}
 
 protected:
 
@@ -66,41 +66,38 @@ protected:
   const String theMessage;
 };
 
+#define DEFINE_EXCEPTION( CLASSNAME, BASECLASS, WHAT )\
+class CLASSNAME : public BASECLASS\
+{\
+public:\
+  CLASSNAME( StringCref method, StringCref message = "" )\
+    :  BASECLASS( method, message ) {}\
+  virtual ~CLASSNAME() {}\
+  const char* what() const { return WHAT; }\
+  virtual const char* const getClassName() const\
+    { return #CLASSNAME ; }\
+};\
 
-class UnexpectedError : public Exception
-{
-
-public:
-
-  UnexpectedError( StringCref method, StringCref message = "" )
-    :  Exception( method, message ) {}
-  virtual ~UnexpectedError() {}
-
-  const String what() const { return "Unexpected error"; }
-  virtual const char* const className() const 
-    { return "UnexpectedError"; }
-};
-
-
-class CantOpenFile : public Exception
-{
-
-public:
-
-  CantOpenFile( StringCref method, StringCref message,
-		StringCref filename )
-    : Exception( method, message ), theFilename( filename ) {}
-  virtual ~CantOpenFile() {}
-
-  const String what() const { return "Can't open file [" + theFilename + "]"; }
-  virtual const char* const className() const 
-    { return "CantOpenFile"; }
-
-private:
-
-  const String theFilename;
-
-};
+DEFINE_EXCEPTION( UnexpectedError,       Exception, 
+		  "Unexpected error" );
+DEFINE_EXCEPTION( NotFound,              Exception,
+		  "Not found" );
+DEFINE_EXCEPTION( CantOpen,              Exception, 
+		  "Can't open file" );
+DEFINE_EXCEPTION( BadID,                 Exception, 
+		  "Bad ID" );
+DEFINE_EXCEPTION( MessageException,      Exception, 
+		  "Message Exception" );
+DEFINE_EXCEPTION( CallbackFailed,        Exception,
+		  "Callback has Failed" );
+DEFINE_EXCEPTION( BadMessage,            MessageException, 
+		  "Bad Message" );
+DEFINE_EXCEPTION( NoMethod,              MessageException, 
+		  "No method registered for the slot" );
+DEFINE_EXCEPTION( NoSlot,                MessageException, 
+		  "No slot found for the message" );
+DEFINE_EXCEPTION( InvalidPrimitiveType,  Exception,
+		  "Invalid PrimitiveType" );
 
 
 #endif /* ___EXCEPTIONS_H___ */

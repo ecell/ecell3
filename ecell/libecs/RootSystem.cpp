@@ -73,14 +73,14 @@ int RootSystem::check()
 }
 
 SystemPtr RootSystem::getSystem( SystemPathCref systempath ) 
-  throw( NotFound, MalformedSystemName )
+  throw( NotFound, BadID )
 {
   if( systempath.first() != "/" )
     {
-      throw MalformedSystemName( __PRETTY_FUNCTION__,
-				 "Fully qualified system path must" +
-				 String( "start with '/'. ([" ) + 
-				 systempath.getString() + "].");
+      throw BadID( __PRETTY_FUNCTION__,
+		   "Fully qualified system path must" +
+		   String( "start with '/'. ([" ) + 
+		   systempath.getString() + "].");
     }
    
   SystemPath next = systempath.next();

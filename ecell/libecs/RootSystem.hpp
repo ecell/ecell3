@@ -42,23 +42,13 @@ class RootSystem : public System
 
 public:
 
-  class MalformedSystemName : public NotFound
-    {
-    public:
-      MalformedSystemName( StringCref method, StringCref message ) 
-	: NotFound( method, message ) {}
-      const String what() const { return "Malformed system name."; }
-    };
-
-public:
-
   RootSystem();
   ~RootSystem();
 
   int check();
 
   SystemPtr getSystem( SystemPathCref systempath )
-    throw( NotFound, MalformedSystemName );
+    throw( NotFound, BadID );
   Entity getEntity( FQPICref fqpi ) 
     throw( InvalidPrimitiveType, NotFound );
 

@@ -106,14 +106,14 @@ const String FQID::IdOf( StringCref fqid )
 
   if( aBorder == String::npos )
     {
-      throw BadFQID(__PRETTY_FUNCTION__,
-		    "no \':\' found in \"" + fqid + "\".");
+      throw BadID(__PRETTY_FUNCTION__,
+		  "no \':\' found in FQID \"" + fqid + "\".");
     }
 
   if( fqid.find( ':', aBorder + 1 ) != String::npos )
     {
-      throw BadFQID(__PRETTY_FUNCTION__,
-		    "too many \':\'s in \"" + fqid + "\".");
+      throw BadID(__PRETTY_FUNCTION__,
+		    "too many \':\'s in FQID \"" + fqid + "\".");
     }
 
   return fqid.substr( aBorder + 1, String::npos );
@@ -125,14 +125,14 @@ const String FQID::SystemPathOf( StringCref fqid )
 
   if( aBorder == String::npos )
     {
-      throw BadFQID( __PRETTY_FUNCTION__,
-		     "no \':\' found in \"" + fqid + "\"." );
+      throw BadID( __PRETTY_FUNCTION__,
+		     "no \':\' found in FQID \"" + fqid + "\"." );
     }
 
   if( fqid.find( ':', aBorder + 1 ) != String::npos )
     {
-      throw BadFQID(__PRETTY_FUNCTION__,
-		    "to many \':\'s in \"" + fqid + "\".");
+      throw BadID(__PRETTY_FUNCTION__,
+		    "to many \':\'s in FQID \"" + fqid + "\".");
     }
 
   return fqid.substr( 0, aBorder );
@@ -170,13 +170,13 @@ const String FQPI::fqidOf( StringCref fqpi )
 
   if( aBorder == String::npos )
     {
-      throw BadFQPI( __PRETTY_FUNCTION__,
-		     "no \':\' found in \"" + fqpi + "\"." );
+      throw BadID( __PRETTY_FUNCTION__,
+		   "no \':\' found in FQPI \"" + fqpi + "\"." );
     }
   if( fqpi.find( ':', aBorder + 1 ) == String::npos )
     {
-      throw BadFQPI( __PRETTY_FUNCTION__,
-		     "no enough \':\'s found in \"" + fqpi + "\"." );
+      throw BadID( __PRETTY_FUNCTION__,
+		     "no enough \':\'s found in FQPI \"" + fqpi + "\"." );
     }
 
   return fqpi.substr( aBorder + 1, String::npos );

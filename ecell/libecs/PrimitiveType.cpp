@@ -65,13 +65,13 @@ const String PrimitiveTypeStringOf( StringCref fqpi )
 
   if( aBorder == String::npos )
     {
-      throw BadFQPI( __PRETTY_FUNCTION__,
-		     "no \':\' found in \"" + fqpi + "\"." );
+      throw BadID( __PRETTY_FUNCTION__,
+		   "no \':\' found in \"" + fqpi + "\"." );
     }
   if( fqpi.find( ':', aBorder + 1 ) == String::npos )
     {
-      throw BadFQPI( __PRETTY_FUNCTION__,
-		     "no enough \':\'s found in \"" + fqpi + "\"." );
+      throw BadID( __PRETTY_FUNCTION__,
+		   "no enough \':\'s found in \"" + fqpi + "\"." );
     }
   
   String aTypeString( fqpi.substr( 0, aBorder ) );
