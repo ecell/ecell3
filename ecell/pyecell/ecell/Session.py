@@ -49,15 +49,22 @@ class Session:
     def printMessage( self, message ):
         self.thePrintMethod( message )
 
+
     def loadModel( self, aFileObject ):
         anEmlParser = eml.EmlParser( aFileObject )
         self.__thePreModel = anEmlParser.parse()
-        
-        #self.__thePreModel = aModel
 
+
+        print 'load stepper' ##DebugMessage
         self.loadStepper()
+        
+        print 'load entity' ## has bugs
         self.loadEntity()
+
+        print 'load system-stepper' ##DebugMessage
         self.loadSystemStepper()
+
+        print 'load property' ##DebugMessage
         self.loadProperty()
 
         
@@ -93,13 +100,14 @@ class Session:
         """Entity loader"""
 
         for aTargetEntity in( self.__thePreModel[ 'entity' ] ):
+
             aType = aTargetEntity[0]
             aPath = aTargetEntity[1]
             anId  = aTargetEntity[2]
             aName = aTargetEntity[3]
 
 
-            ## need refactoring about PathConvert!!                
+            ## need refactoring about PathConvert!! @300
             if aType == 'System':
                 if aPath == '/':
                     aPath = ''
@@ -112,6 +120,7 @@ class Session:
                         aPath = '/'
             ## --------------------------------------------------
 
+
             if not ( aType == 'System' or aType == 'Substance' ):
                 anEntityType = 'Reactor'
                 aFullId = anEntityType + ':' + aPath + ':' + anId
@@ -119,14 +128,15 @@ class Session:
                 aFullId = aType + ':' + aPath + ':' + anId
 
 
-
             ## check!!
             if not aPath == '':
-                self.theSimulator.createEntity( aType, aFullId, aName )
-
+                #self.theSimulator.createEntity( aType, aFullId, aName )
+                
                 ##Temporary
+                #print 'printer:', aType, aFullId, aName
                 #print 'self.theSimulator.createEntity(', aType, ',', aFullId, ',', aName, ')'
-            
+
+                self.theSimulator.createEntity( aType, aFullId, aName )
 
 
     def loadSystemStepper( self ):
