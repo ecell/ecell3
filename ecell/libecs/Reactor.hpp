@@ -47,7 +47,8 @@ namespace libecs
    */ 
   
   // FIXME: contain instances, not pointers
-  DECLARE_VECTOR( ReactantPtr, ReactantVector );
+  DECLARE_ASSOCVECTOR( String, Reactant, std::less< const String >, 
+		       ReactantMap  );
 
   /**
      Reactor class is used to represent chemical and other phenonema which 
@@ -85,35 +86,17 @@ namespace libecs
 
   public: 
 
-    // PropertyInterfaces
+    // Property slots
 
-    void setAppendSubstrate( UVariableVectorRCPtrCref aMessage );
-    void setAppendProduct( UVariableVectorRCPtrCref aMessage );
-    void setAppendCatalyst( UVariableVectorRCPtrCref aMessage );
-    void setAppendEffector( UVariableVectorRCPtrCref aMessage );
+    void setReactant( UVariableVectorRCPtrCref aMessage );
 
-    void setSubstrateList( UVariableVectorRCPtrCref aMessage );
-    void setProductList( UVariableVectorRCPtrCref aMessage );
-    void setCatalystList( UVariableVectorRCPtrCref aMessage );
-    void setEffectorList( UVariableVectorRCPtrCref aMessage );
-
-    const UVariableVectorRCPtr getSubstrateList() const;
-    const UVariableVectorRCPtr getProductList() const;
-    const UVariableVectorRCPtr getCatalystList() const;
-    const UVariableVectorRCPtr getEffectorList() const;
-
-    void appendSubstrate( FullIDCref aFullID, IntCref aCoefficient );
-    void appendProduct  ( FullIDCref aFullID, IntCref aCoefficient );
-    void appendCatalyst ( FullIDCref aFullID, IntCref aCoefficient );
-    void appendEffector ( FullIDCref aFullID, IntCref aCoefficient );
+    const UVariableVectorRCPtr getReactantList() const;
 
 
   public:
 
     Reactor();
     virtual ~Reactor();
-
-    const FullID getFullID() const;
 
     virtual const PrimitiveType getPrimitiveType() const
     {
@@ -124,10 +107,7 @@ namespace libecs
 
     virtual void differentiate() { }
 
-    virtual void integrate() 
-    { 
-      theActivity = theActivityBuffer; 
-    }
+    //    virtual void integrate() { }
 
     virtual void compute() { }
 
@@ -138,11 +118,11 @@ namespace libecs
        per a second, not per deltaT.
 
        @param activity [number of molecule that this yields] / [deltaT].
-       @see activity()
+       @see getActivity(), getActivityPerSecond()
     */
     void setActivity( RealCref anActivity ) 
     { 
-      theActivityBuffer = anActivity; 
+      theActivity = anActivity; 
     }
 
     /**
@@ -155,6 +135,7 @@ namespace libecs
        @return [the number of molecule that this yield] / [s].
        @see setActivity()
     */
+
     virtual const Real getActivity() const
     {
       return theActivity;
@@ -167,84 +148,46 @@ namespace libecs
 
     void setInitialActivity( RealCref anActivity );
 
+    void registerReactant( StringCref aName, FullIDCref aFullID,
+			   const Int aStoichiometry );
 
-    void appendSubstrate( SubstanceRef aSubstrate, IntCref aCoefficient );
-    void appendProduct(   SubstanceRef aProduct,   IntCref aCoefficient );
-    void appendCatalyst(  SubstanceRef aCatalyst,  IntCref aCoefficient );
-    void appendEffector(  SubstanceRef anEffector, IntCref aCoefficient );
+    void registerReactant( StringCref aName, SubstancePtr aSubstance, 
+			   const Int aStoichiometry );
 
     /**
-       Returns a pointer to a Reactant of ith substrate.
-       FIXME: range check?
+       Get Reactant by tag name.
 
-       @return pointer to a Reactant of the substrate.
+       @param aReactantName
+       @return a Reactant
        @see Reactant
     */
-    ReactantPtr getSubstrate( Int i = 0 ) { return theSubstrateList[i]; }
 
-    /**
-       Returns a pointer to a Reactant of ith substrate.
+    Reactant getReactant( StringCref aReactantName );
 
-       @return pointer to a Reactant of the substrate.
-       @see substrate
-    */
-    ReactantPtr getProduct( Int i = 0 ) { return theProductList[i]; }
-
-    /**
-       Returns a pointer to Reactant of ith catalyst.
-
-       @return pointer to Reactant of the catalyst.
-       @see substrate
-    */
-    ReactantPtr getCatalyst( Int i = 0 ) { return theCatalystList[i]; }
-
-    /**
-       Returns a pointer to Reactant for ith effector.
-
-       @return pointer to Reactant of a effector.
-       @see substrate
-    */
-    ReactantPtr getEffector( Int i = 0 ) { return theEffectorList[i]; }
 
     /**
        @return the number of substrates.
     */
-    const Int getNumberOfSubstrates() const { return theSubstrateList.size(); }
-
-    /**
-       @return the number of products.
-    */
-    const Int getNumberOfProducts() const { return theProductList.size(); }
-
-    /**
-       @return the number of catalysts.
-    */
-
-    const Int getNumberOfCatalysts() const { return theCatalystList.size(); }
-
-    /**
-       @return the number of effectors.
-    */
-    const Int getNumberOfEffectors() const { return theEffectorList.size(); }
-
+    const Int getNumberOfReactants() const;
 
   protected:
+
+    // convenience inline methods for use in subclasses
+
+    PropertySlotPtr getPropertySlotOfReactant( StringCref aReactantName,
+					       StringCref aPropertyName );
 
     void makeSlots();
 
   protected:
 
-    Real theActivity;
+    ReactantMap theReactantMap;
 
-    ReactantVector theSubstrateList; 
-    ReactantVector theProductList;   
-    ReactantVector theEffectorList;
-    ReactantVector theCatalystList;
+    Real        theActivity;
 
   private:
 
     Real theInitialActivity;
-    Real theActivityBuffer;
 
   };
 

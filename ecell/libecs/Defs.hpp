@@ -40,6 +40,8 @@
 #include "config.h"
 
 #include "CoreLinuxCompatibility.hpp"
+#include "AssocVector.h"
+
 
 // cmath
 
@@ -78,6 +80,26 @@ namespace libecs
 #define DECLARE_QUEUE       CORELINUX_QUEUE     
 #define DECLARE_STACK       CORELINUX_STACK     
 
+  // from Loki
+
+  
+#define DECLARE_ASSOCVECTOR(key,value,comp,name)                             \
+      typedef ::Loki::AssocVector<key,value,comp > name;                      \
+      typedef name *       name ## Ptr;                            \
+      typedef const name * name ## Cptr;                           \
+      typedef name &       name ## Ref;                            \
+      typedef const name & name ## Cref;                           \
+      typedef name::iterator name ## Iterator;                     \
+      typedef name::iterator& name ## IteratorRef;                 \
+      typedef name::iterator* name ## IteratorPtr;                 \
+      typedef name::const_iterator name ## ConstIterator;          \
+      typedef name::const_iterator& name ## ConstIteratorRef;      \
+      typedef name::const_iterator* name ## ConstIteratorPtr;      \
+      typedef name::reverse_iterator name ## Riterator;            \
+      typedef name::reverse_iterator& name ## RiteratorRef;        \
+      typedef name::reverse_iterator* name ## RiteratorPtr
+   
+
 
   // String
 
@@ -106,6 +128,22 @@ namespace libecs
 #ifndef HAVE_PRETTY_FUNCTION
 #define __PRETTY_FUNCTION__ ""
 #endif
+
+
+  /**
+     Converts each type into a unique, insipid type.
+     Invocation Type2Type<T> where T is a type.
+     Defines the type OriginalType which maps back to T.
+     
+     taken from loki library.
+  */
+
+  template <typename T>
+  struct Type2Type
+  {
+    typedef T OriginalType;
+  };
+
 
   /** @} */ //end of libecs_module 
 

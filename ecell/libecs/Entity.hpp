@@ -147,6 +147,24 @@ namespace libecs
     */
     virtual const Real getActivityPerSecond() const;
 
+    /**
+       Returns a pointer to a Stepper object that this Entity belongs.
+
+       The Stepper of an Entity is defined as a Stepper of a
+       supersystem of the Entity.
+
+       This is overridden in System class because Stepper of a System is 
+       explicitly defined as a member variable, not as a supersystem's.
+
+       @return A pointer to a Stepper object that this Entity belongs or
+       NULL pointer if it is not set.
+    */
+
+    virtual StepperPtr getStepper() const;
+
+    virtual PropertySlotPtr getPropertySlot( StringCref aPropertyName, 
+					     EntityCptr aRequester );
+
     virtual StringLiteral getClassName() const { return "Entity"; }
 
 

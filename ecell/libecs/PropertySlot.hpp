@@ -37,13 +37,6 @@
 #include "UVariable.hpp"
 
 
-template <typename T>
-struct Type2Type
-{
-  typedef T OriginalType;
-};
-
-
 namespace libecs
 {
 
@@ -311,8 +304,8 @@ namespace libecs
     typedef void ( UpdatePolicy::* CallSetMethodPtr )( SetType );
 
     UpdatePolicy( T& anObject,
-		      const SetMethodPtr aSetMethodPtr,
-		      const GetMethodPtr aGetMethodPtr )
+		  const SetMethodPtr aSetMethodPtr,
+		  const GetMethodPtr aGetMethodPtr )
       :
       theObject( anObject ),
       theSetMethodPtr( aSetMethodPtr ),
@@ -372,7 +365,7 @@ namespace libecs
       return ( ( theObject.*theGetMethodPtr )() );
     }
 
-    void callNullSetMethod( SetType aValue )    
+    void callNullSetMethod( SetType )    
     {
       throw AttributeError( __PRETTY_FUNCTION__,
 			    "Not setable." );
@@ -588,7 +581,7 @@ namespace libecs
     }
 
     template < typename TYPE >
-    TYPE getImpl() const
+    inline TYPE getImpl() const
     {
       return convertTo( UpdatePolicy::get(), Type2Type< TYPE >() );
     }

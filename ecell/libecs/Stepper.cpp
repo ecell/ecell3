@@ -326,7 +326,7 @@ namespace libecs
     //
     // Reactor::integrate()
     //
-    FOR_ALL( ReactorVector, theReactorCache, integrate );
+    //    FOR_ALL( ReactorVector, theReactorCache, integrate );
 
 
     //
@@ -348,7 +348,7 @@ namespace libecs
     // Reactor::integrate()
     //
     // update activity of reactors by buffered values 
-    FOR_ALL( ReactorVector, theReactorCache, integrate );
+    //    FOR_ALL( ReactorVector, theReactorCache, integrate );
 
   }
 

@@ -86,6 +86,11 @@ namespace libecs
       return thePropertySlotMap;
     }
 
+    virtual PropertySlotPtr getPropertySlot( StringCref aPropertyName )
+    {
+      return thePropertySlotMap[ aPropertyName ];
+    }
+
     virtual void makeSlots();
 
     const String getClassNameString() const { return getClassName(); }

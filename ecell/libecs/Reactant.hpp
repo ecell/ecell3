@@ -48,23 +48,23 @@ namespace libecs
 
   public:
 
-    Reactant( SubstanceRef s, const Int c ) 
+    Reactant( SubstancePtr aSubstancePtr, const Int aStoichiometry ) 
       : 
-      theSubstance( s ), 
-      theCoefficient( c ) 
+      theSubstance( aSubstancePtr ), 
+      theStoichiometry( aStoichiometry )
     {
       ; // do nothing
     }
 
-    virtual ~Reactant() {}
+    ~Reactant() {}
 
-    SubstanceRef getSubstance() const { return theSubstance; }
-    const Int getCoefficient() const { return theCoefficient; }
+    SubstancePtr getSubstance() const { return theSubstance; }
+    const Int getStoichiometry() const { return theStoichiometry; }
 
   private:
 
-    SubstanceRef theSubstance;
-    int theCoefficient;
+    SubstancePtr theSubstance;
+    Int theStoichiometry;
 
   };
 

@@ -110,10 +110,18 @@ namespace libecs
     void setSuperSystem( SystemPtr aSystem );
 
     /**
-       @return A pointer to a Stepper object that this System has or
+       Returns a pointer to a Stepper object that this System belongs.
+
+       This overrides Entity::getStepper().
+
+       @return A pointer to a Stepper object that this System belongs or
        NULL pointer if it is not set.
     */
-    StepperPtr getStepper() const { return theStepper; }
+
+    virtual StepperPtr getStepper() const 
+    { 
+      return theStepper; 
+    }
 
     /**
        Instantiate a Stepper object of @a classname using theRootSystem's

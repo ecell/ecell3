@@ -44,163 +44,51 @@ namespace libecs
   void Reactor::makeSlots()
   {
     //FIXME: get methods
-    createPropertySlot( "AppendSubstrate",*this,&Reactor::setAppendSubstrate,
-			NULLPTR );
-    createPropertySlot( "AppendProduct",*this,&Reactor::setAppendProduct,
-			NULLPTR );
-    createPropertySlot( "AppendCatalyst",*this,&Reactor::setAppendCatalyst,
-			NULLPTR );
-    createPropertySlot( "AppendEffector",*this,&Reactor::setAppendEffector,
+    createPropertySlot( "Reactant", *this, 
+			&Reactor::setReactant,
 			NULLPTR );
 
-    createPropertySlot( "SubstrateList",*this,&Reactor::setSubstrateList,
-			&Reactor::getSubstrateList);
-    createPropertySlot( "ProductList",*this,&Reactor::setProductList,
-			&Reactor::getProductList);
-    createPropertySlot( "CatalystList",*this,&Reactor::setCatalystList,
-			&Reactor::getCatalystList);
-    createPropertySlot( "EffectorList",*this,&Reactor::setEffectorList,
-			&Reactor::getEffectorList);
+    createPropertySlot( "ReactantList", *this, 
+			NULLPTR,
+			&Reactor::getReactantList);
 
-    createPropertySlot( "InitialActivity",*this,&Reactor::setInitialActivity,
+    createPropertySlot( "InitialActivity", *this, 
+			&Reactor::setInitialActivity,
 			&Reactor::getInitialActivity );
   }
 
-  void Reactor::setAppendSubstrate( UVariableVectorRCPtrCref aMessage )
+  void Reactor::setReactant( UVariableVectorRCPtrCref aMessage )
   {
     //FIXME: range check
-    appendSubstrate( FullID( (*aMessage)[0].asString() ), (*aMessage)[1].asInt() );
+    registerReactant( (*aMessage)[0].asString(), 
+		      FullID( (*aMessage)[1].asString() ), 
+		      (*aMessage)[2].asInt() );
   }
 
-  void Reactor::setAppendProduct( UVariableVectorRCPtrCref aMessage )
-  {
-    //FIXME: range check
-    appendProduct( FullID( (*aMessage)[0].asString() ), (*aMessage)[1].asInt() );
-  }
-
-  void Reactor::setAppendCatalyst( UVariableVectorRCPtrCref aMessage )
-  {
-    //FIXME: range check
-    appendCatalyst( FullID( (*aMessage)[0].asString() ), (*aMessage)[1].asInt() );
-  }
-
-  void Reactor::setAppendEffector( UVariableVectorRCPtrCref aMessage )
-  {
-    //FIXME: range check
-    appendEffector( FullID( (*aMessage)[0].asString() ), (*aMessage)[1].asInt() );
-  }
-
-  void Reactor::setSubstrateList( UVariableVectorRCPtrCref aMessage )
-  {
-    //    cerr << "not implemented yet." << endl;
-  }
-
-  void Reactor::setProductList( UVariableVectorRCPtrCref aMessage )
-  {
-    //    cerr << "not implemented yet." << endl;
-  }
-
-  void Reactor::setEffectorList( UVariableVectorRCPtrCref aMessage )
-  {
-    //    cerr << "not implemented yet." << endl;
-  }
-
-  void Reactor::setCatalystList( UVariableVectorRCPtrCref aMessage )
-  {
-    //    cerr << "not implemented yet." << endl;
-  }
-
-  const UVariableVectorRCPtr Reactor::getSubstrateList() const
+  const UVariableVectorRCPtr Reactor::getReactantList() const
   {
     UVariableVectorRCPtr aVectorPtr( new UVariableVector );
-    aVectorPtr->reserve( theSubstrateList.size() );
+    aVectorPtr->reserve( theReactantMap.size() );
   
-    for( ReactantVectorConstIterator i( theSubstrateList.begin() );
-	 i != theSubstrateList.end() ; ++i )
+    for( ReactantMapConstIterator i( theReactantMap.begin() );
+	 i != theReactantMap.end() ; ++i )
       {
-	aVectorPtr->push_back( (*i)->getSubstance().getFullID().getString() );
+	aVectorPtr->push_back( i->second.getSubstance()->getFullID().getString() );
       }
 
     return aVectorPtr;
   }
 
-  const UVariableVectorRCPtr Reactor::getProductList() const
-  {
-    UVariableVectorRCPtr aVectorPtr( new UVariableVector );
-    aVectorPtr->reserve( theProductList.size() );
-  
-    for( ReactantVectorConstIterator i( theProductList.begin() );
-	 i != theProductList.end() ; ++i )
-      {
-	aVectorPtr->push_back( (*i)->getSubstance().getFullID().getString() );
-      }
-
-    return aVectorPtr;
-  }
-
-  const UVariableVectorRCPtr Reactor::getEffectorList() const
-  {
-    UVariableVectorRCPtr aVectorPtr( new UVariableVector );
-    aVectorPtr->reserve( theEffectorList.size() );
-  
-    for( ReactantVectorConstIterator i( theEffectorList.begin() );
-	 i != theEffectorList.end() ; ++i )
-      {
-	aVectorPtr->push_back( (*i)->getSubstance().getFullID().getString() );
-      }
-
-    return aVectorPtr;
-  }
-
-  const UVariableVectorRCPtr Reactor::getCatalystList() const
-  {
-    UVariableVectorRCPtr aVectorPtr( new UVariableVector );
-    aVectorPtr->reserve( theCatalystList.size() );
-  
-    for( ReactantVectorConstIterator i( theCatalystList.begin() );
-	 i != theCatalystList.end() ; ++i )
-      {
-	aVectorPtr->push_back( (*i)->getSubstance().getFullID().getString() );
-      }
-
-    return aVectorPtr;
-  }
-
-  void Reactor::appendSubstrate( FullIDCref aFullID, IntCref aCoefficient )
+  void Reactor::registerReactant( StringCref aName, FullIDCref aFullID, 
+				  const Int aStoichiometry )
   {
     SystemPtr aRootSystem( getRootSystem() );
     SystemPtr aSystem( aRootSystem->getSystem( aFullID.getSystemPath() ) );
     SubstancePtr aSubstance( aSystem->getSubstance( aFullID.getID() ) );
 
-    appendSubstrate( *aSubstance, aCoefficient );
+    registerReactant( aName, aSubstance, aStoichiometry );
   }
 
-  void Reactor::appendProduct( FullIDCref aFullID, IntCref aCoefficient )
-  {
-    SystemPtr aRootSystem( getRootSystem() );
-    SystemPtr aSystem( aRootSystem->getSystem( aFullID.getSystemPath() ) );
-    SubstancePtr aSubstance( aSystem->getSubstance( aFullID.getID() ) );
-  
-    appendProduct( *aSubstance, aCoefficient );
-  }
-
-  void Reactor::appendCatalyst( FullIDCref aFullID, IntCref aCoefficient)
-  {
-    SystemPtr aRootSystem( getRootSystem() );
-    SystemPtr aSystem( aRootSystem->getSystem( aFullID.getSystemPath() ) );
-    SubstancePtr aSubstance( aSystem->getSubstance( aFullID.getID() ) );
-  
-    appendCatalyst( *aSubstance, aCoefficient );
-  }
-
-  void Reactor::appendEffector( FullIDCref aFullID, IntCref aCoefficient )
-  {
-    SystemPtr aRootSystem( getRootSystem() );
-    SystemPtr aSystem( aRootSystem->getSystem( aFullID.getSystemPath() ) );
-    SubstancePtr aSubstance( aSystem->getSubstance( aFullID.getID() ) );
-  
-    appendEffector( *aSubstance, aCoefficient );
-  }
 
   void Reactor::setInitialActivity( RealCref anActivity )
   {
@@ -213,7 +101,6 @@ namespace libecs
   Reactor::Reactor() 
     :
     theInitialActivity( 0 ),
-    theActivityBuffer( 0 ),
     theActivity( 0 )
   {
     makeSlots();
@@ -222,59 +109,56 @@ namespace libecs
   Reactor::~Reactor()
   {
     // delete all Reactants
-    for( ReactantVectorConstIterator i( theSubstrateList.begin() );
-	 i != theSubstrateList.end() ; ++i )
-      {
-	delete *i;
-      }
-    for( ReactantVectorConstIterator i( theProductList.begin() );
-	 i != theProductList.end() ; ++i )
-      {
-	delete *i;
-      }
-    for( ReactantVectorConstIterator i( theCatalystList.begin() );
-	 i != theCatalystList.end() ; ++i )
-      {
-	delete *i;
-      }
-    for( ReactantVectorConstIterator i( theEffectorList.begin() );
-	 i != theEffectorList.end() ; ++i )
-      {
-	delete *i;
-      }
+    //    for( ReactantMapConstIterator i( theReactantMap.begin() );
+    //	 i != theReactantMap.end() ; ++i )
+    //      {
+    //	delete i->second;
+    //      }
   }
 
 
-  void Reactor::appendSubstrate( SubstanceRef aSubstrate, 
-				 IntCref aCoefficient )
+  void Reactor::registerReactant( StringCref aName, SubstancePtr aSubstance, 
+				  const Int aStoichiometry )
   {
-    ReactantPtr aReactantPtr( new Reactant( aSubstrate, aCoefficient ) );
-    theSubstrateList.push_back( aReactantPtr );
+    Reactant aReactant( aSubstance, aStoichiometry );
+    theReactantMap.insert( ReactantMap::value_type( aName, aReactant ) );
   }
 
-  void Reactor::appendProduct( SubstanceRef aProduct, IntCref aCoefficient )
+
+  Reactant Reactor::getReactant( StringCref aName )
   {
-    ReactantPtr aReactantPtr( new Reactant( aProduct, aCoefficient ) );
-    theProductList.push_back( aReactantPtr );
+    ReactantMapConstIterator anIterator( theReactantMap.find( aName ) );
+
+    if( anIterator == theReactantMap.end() )
+      {
+	throw NotFound( __PRETTY_FUNCTION__, 
+			"[" + getFullID().getString() + 
+			"]: Reactant [" + aName + 
+			"] not found in this Reactor." );
+      }
+
+    return ( *anIterator ).second;
   }
 
-  void Reactor::appendCatalyst( SubstanceRef aCatalyst, IntCref aCoefficient )
+  const Int Reactor::getNumberOfReactants() const
   {
-    ReactantPtr aReactantPtr( new Reactant( aCatalyst, aCoefficient ) );
-    theCatalystList.push_back( aReactantPtr );
+    return theReactantMap.size();
   }
-
-  void Reactor::appendEffector( SubstanceRef anEffector, IntCref aCoefficient )
-  {
-    ReactantPtr aReactantPtr( new Reactant( anEffector, aCoefficient ) );
-    theEffectorList.push_back( aReactantPtr );
-  }
-
 
   void Reactor::initialize()
   {
     ; // do nothing
   }
+
+  PropertySlotPtr 
+  Reactor::getPropertySlotOfReactant( StringCref aReactantName,
+				      StringCref aPropertyName )
+  {
+    return getReactant( aReactantName ).
+      getSubstance()->getPropertySlot( aPropertyName, this );
+  }
+
+
 
 
 } // namespace libecs

@@ -74,7 +74,7 @@ namespace libecs
 
   const Real Entity::getActivityPerSecond() const
   {
-    return getActivity() * getSuperSystem()->getStepper()->getStepsPerSecond();
+    return getActivity() * getSuperSystem()->getStepsPerSecond();
   }
 
   const FullID Entity::getFullID() const
@@ -93,6 +93,31 @@ namespace libecs
     SystemPath aSystemPath( aSystemPtr->getSystemPath() );
     aSystemPath.push_back( aSystemPtr->getID() );
     return aSystemPath;
+  }
+
+  StepperPtr Entity::getStepper() const
+  {
+    return getSuperSystem()->getStepper();
+  }
+
+  PropertySlotPtr Entity::getPropertySlot( StringCref aPropertyName,
+					   EntityCptr aRequester )
+  {
+    PropertySlotPtr aPropertySlotPtr( NULL );
+
+    //FIXME: Stepper::operator== not defined
+    if( aRequester->getStepper() == getStepper() )
+      {
+	aPropertySlotPtr = PropertyInterface::getPropertySlot( aPropertyName );
+      }
+    else
+      {
+	// create ProxyPropertySlot
+	//FIXME: not implemented
+	aPropertySlotPtr = PropertyInterface::getPropertySlot( aPropertyName );
+      }
+
+    return aPropertySlotPtr;
   }
 
 

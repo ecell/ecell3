@@ -251,12 +251,14 @@ namespace libecs
   ReactorPtr System::getReactor( StringCref anID ) 
   {
     ReactorMapConstIterator i( getReactorMap().find( anID ) );
+
     if( i == getReactorMap().end() )
       {
 	throw NotFound( __PRETTY_FUNCTION__, "[" + getFullID().getString() + 
 			"]: Reactor [" + anID + 
 			"] not found in this System." );
       }
+
     return i->second;
   }
 
@@ -269,6 +271,7 @@ namespace libecs
 	//FIXME: throw exception
 	return;
       }
+
     theSubstanceMap[ aSubstance->getID() ] = aSubstance;
     aSubstance->setSuperSystem( this );
 
@@ -402,7 +405,7 @@ namespace libecs
 
   const Real System::getActivityPerSecond() const
   {
-    return getActivity() * getStepper()->getStepsPerSecond();
+    return getActivity() * getStepsPerSecond();
   }
 
   void System::notifyChangeOfEntityList()
