@@ -169,7 +169,7 @@ def p_stmts(t):
         stmts : stmts stmt
 	      | stmt
         '''
-	t[0] = createList( 'stmts', t)
+	t[0] = createListleft( t )
 
 
 def p_stmt(t):
@@ -177,26 +177,25 @@ def p_stmt(t):
         stmt : stepper_stmt
              | system_stmt
         '''
-	t[0] = createList( 'stmt', t )
+	t[0] = t[1]
     
 def p_stepper_stmt(t):
 	'''
 	stepper_stmt : stepper_object_decl LBRACE propertylist RBRACE
 	'''
-	t[0] = t[1], t[2], t[4]
+	t[0] = t[1], t[3]
     
 def p_system_stmt(t):
 	'''
 	system_stmt : system_object_decl LBRACE property_entity_list RBRACE
 	'''
-	t[0] = t[1], t[2], t[4]
+	t[0] = t[1], t[3]
 
 def p_entity_other_stmt (t):
 	'''
 	entity_other_stmt : entity_other_object_decl LBRACE propertylist RBRACE
         '''
-	t[4] = flatten_propertylist(t[4])
-	t[0] = t[1], t[2], t[4]
+	t[0] = t[1], t[3]
 
 # object declarations
 
@@ -214,6 +213,7 @@ def p_stepper_object_decl(t):
 	t.classname = t[2][0]
 	t.id = t[2][1]
 	anEml.createStepper(t.classname, t.id)
+	
 	t[0] = t[1], t[2]
 	
 def p_system_object_decl(t):
@@ -245,17 +245,18 @@ def p_entity_other_object_decl (t):
 
 def p_propertylist(t):
 	'''
-	propertylist : property propertylist
+	propertylist : propertylist property
 	             | property
                      | empty
         '''
-	t[0] = createList( 'propertylist', t )
+	t[0] = createListleft( t )
 
 def p_property(t):
 	'''
 	property : name value SEMI
 	'''
-	t[2] = flatten_nodelist(t[2])
+	if type(t[2]) == str:
+		t[2] = [t[2]]
 
 	if t.type == 'Stepper':
 		anEml.setStepperProperty(t.id, t[1], t[2])
@@ -272,7 +273,7 @@ def p_property_entity_list(t):
                              | property_entity
                              | empty
         '''
-	t[0] =  createList( 'property_entity_list', t )
+	t[0] =  createListleft( t )
 
 
 def p_property_entity(t):
@@ -280,7 +281,7 @@ def p_property_entity(t):
 	property_entity : property
 	                | entity_other_stmt
         '''
-	t[0] = createList( 'property_entity', t )
+	t[0] = t[1]
 
 # value
 
@@ -291,28 +292,28 @@ def p_value(t):
               | number
 	      | matrixlist
         '''
-	t[0] =  createList( 'value', t )
+	t[0] = t[1]
         
 def p_valuelist(t):
         '''
-        valuelist : value valuelist
+        valuelist : valuelist value
                   | value
         '''
-	t[0] =  createList( 'valuelist', t )
+	t[0] =  createListleft( t )
 	
 def p_matrix(t):
 	'''
 	matrix : LBRACKET valuelist RBRACKET
         '''
-	t[0] = flatten_nodetree(t[2])
+	t[0] = t[2]
 	
 def p_matrixlist(t):
         '''
-        matrixlist : matrix matrixlist
+        matrixlist : matrixlist matrix
                    | matrix
         '''
-	t[0] =  createList( 'matrixlist', t )
-
+	t[0] =  createListleft( t )
+	
 def p_empty(t):
 	'''
 	empty :
@@ -324,98 +325,26 @@ def p_error(t):
 	yacc.errok()
 	
 # Constract List
-def createList( type, t):
+	
+def createListleft( t ):
 
-	length = len(t.slice) - 1
+	if hasattr(t, 'slice'):
+		length = len(t.slice) - 1
+	else:
+		return [t]
 
-	if length != 1:
-		aList = []
-		i = 1
-		while i <= length:
-			aList.append( t[i] )
-			i = i + 1
+	
+	if length == 2:
+		aList = t[1]
+			
+		aList.append( t[2] )
 		return aList
 
 	elif t[1] == None:
 		return []
 
 	else:
-		return t[1]
-
-def flatten_propertylist( node ):
-
-	if node is None or len( node ) == 0:
-		return []
-
-        aList = list()
-	while len( node ) >= 1:
-
-		if len( node ) == 1 and type(node) != str:
-			break
-		elif type(node[0]) == str:
-			aList.append( node )
-			break
-		
-		else:
-			aList.append( node[0] )
-			node = node[1]
-			
-	return aList
-	
-def flatten_nodelist( node ):
-
-	if node is None or len( node ) == 0:
-		return []
-
-        aList = list()
-	while len( node ) >= 1:
-		if len( node ) == 1 and type(node) != str:
-			break
-		elif type(node[0]) == str:
-			aList.append( node )
-			break
-		
-		else:
-			aList.append( node[0] )
-			node = node[1]
-
-	return aList
-
-def flatten_nodetree( node ):
-
-	if node is None or len( node ) == 0:
-		return []
-
-        aList = list()
-	while len( node ) >= 1:
-		if type(node) == str:
-			aList.append( node )
-			break
-		
-		elif len( node ) == 1 :
-			break
-
-		else:
-			aList.append( node[0] )
-			node = node[1]
-			
-	return aList
-
-
-def flatten_node( node ):
-	
-	if len( node ) == 1:	
-		#return node[0].attr
-		return node[0]
-	else:
-		return flatten_propertytree( node[1] )
-
-
-def flatten_propertytree( node ):
-
-	return map( flatten_node, flatten_nodetree( node ) )
-	
-
+		return [t[1]]
 
 
 def initializePLY():
