@@ -147,7 +147,11 @@ namespace libemc
 
     do
       {
-	step();
+
+	for( int i = 0 ; i < 20 ; i++ )
+	  {
+	    step();
+	  }
 
 	while( (*thePendingEventChecker)() )
         {
@@ -174,11 +178,13 @@ namespace libemc
       {
 	if( theRootSystem.getStepperLeader().getCurrentTime() >= aStopTime )
 	  {
-	    theRunningFlag = false;
 	    break;
 	  }
 
-	step();
+	for( int i = 0 ; i < 20 ; i++ )
+	  {
+	    step();
+	  }
 
 	while( (*thePendingEventChecker)() )
         {
