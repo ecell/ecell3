@@ -13,11 +13,13 @@
     <sect1>
       <title>About dynamic modules</title>
 
-      <para>Dynamic module is a class, especially C++ class, which
-      can be loaded and instantiated by the application.  &app uses
-      this mechanism to provide users a very efficient way of defining
-      and adding new classes to appear in simulation models without
-      recompiling the whole system.
+      <para>Dynamic module is a file containing an object class,
+      especially C++ class, which can be loaded and instantiated by
+      the application.  &app uses this mechanism to provide users a
+      way of defining and adding new classes to appear in simulation
+      models without recompiling the whole system.  Because the
+      classes are defined in forms of native codes, this is the most
+      efficient way in terms of space and speed.
       </para>
 
       <para>
@@ -41,7 +43,7 @@
 	<para>
           Currently only subclasses of Process can be defined in form of
           DM files.   For creating new classes for other base classes,
-          you have to write C++ source code directly.  This will be improved
+          C++ source code must be written directly.  This will be improved
           in future versions.
         </para>
       </note>
@@ -50,7 +52,7 @@
       <para>
 
       The DM files actually is a Python script in which variables are
-      set and some methods are called. 
+      set and some methods are called as usual. 
 </para>
 
 
@@ -58,72 +60,61 @@
       <para>
       Variables/methods in the following list can be set/called.
 </para>
-      <variablelist>
+
+
+      <itemizedlist>
 
 	<title>List of common variables and methods available in DM file</title>
-	<varlistentry>
-	  <term>CLASSNAME</term>
-	  
-	  <listitem>
-	    <para>The name of this class</para>
+      	  <listitem>
+	<para>CLASSNAME</para>
+	<para>The name of this class</para>
 	  </listitem>
-	</varlistentry>
 
-	<varlistentry>
-	  <term>BASECLASS</term>
-	  <listitem>
-	    <para>The name of the base class</para>
-	  </listitem>
-	</varlistentry>
+      
+      <listitem>
+	<para>BASECLASS</para>
+	<para>The name of the base class</para>
+      </listitem>
 
-	<varlistentry>
-	  <term>PROPERTIES</term>
-	  <listitem>
-	    <para>The list of properties of this class.</para>
-	  </listitem>
-	</varlistentry>
+      <listitem>
+	<para>PROPERTIES</para>
+	<para>The list of properties of this class.</para>
+      </listitem>
 
 
-	<varlistentry>
-	  <term>defineMethod()</term>
-	  <listitem>
-	    <para>Defines a method such as <methodname>process</methodname> and
+      
+      <listitem>
+	<para>defineMethod()</para>	
+	<para>Defines a method such as <methodname>process</methodname> and
             <methodname>initialize</methodname>.
             </para>
-
-	    <para>Synopsis: defineMethod( 'methodname', '''definition''' )
+	
+	<para>Synopsis: defineMethod( 'methodname', '''definition''' )
 
             </para>
-
-	  </listitem>
-	</varlistentry>
-
-	<varlistentry>
-	  <term>PUBLIC_AUX</term>
-	  <listitem>
-	    <para>The fragment of C++ code which is put in
+	
+      </listitem>
+      
+      <listitem>
+	<para>PUBLIC_AUX</para>
+	<para>The fragment of C++ code which is put in
 	    <emphasis>public</emphasis> field.</para>
-	  </listitem>
-	</varlistentry>
+      </listitem>
 
-	<varlistentry>
-	  <term>PROTECTED_AUX</term>
-	  <listitem>
-	    <para>The fragment of C++ code which is put in
+      <listitem>
+	<para>PROTECTED_AUX</para>
+	<para>The fragment of C++ code which is put in
 	    <emphasis>protected</emphasis> field.</para>
-	  </listitem>
-	</varlistentry>
+      </listitem>
 
-	<varlistentry>
-	  <term>PRIVATE_AUX</term>
-	  <listitem>
-	    <para>The fragment of C++ code which is put in
+
+      <listitem>
+	<para>PRIVATE_AUX</para>
+	<para>The fragment of C++ code which is put in
 	    <emphasis>private</emphasis> field.</para>
-	  </listitem>
-	</varlistentry>
+      </listitem>
 
-
-      </variablelist>
+      </itemizedlist>
 
 
     </sect1>

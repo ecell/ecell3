@@ -153,12 +153,25 @@ which takes just one string parameter.</para>
       <row>
 	<entry namest="c1" nameend='c2' rowsep='1'>
 	    <para>Run the simulation for <parameter>sec</parameter>
-	    seconds.</para> <para>If <parameter>sec</parameter> is
-	    omitted, this method will not return unless the event
-	    checker object is set by using
+	    seconds.</para> 
+
+            <para>When this method is called, internally the simulator
+            calls <methodname>step</methodname>() method repeatedly
+            until the equation
+            <literal>t<subscript>current</subscript> >
+            t<subscript>start</subscript> +
+            <parameter>sec</parameter></literal> holds.  That means,
+            the simulator stops immediately after the simulation step
+            in which the time exceeds the specified point, and the
+            time can be far after the point if all step sizes taken by
+            <classname>Stepper</classname>s in the model are long.
+            </para>
+
+            <para>If <parameter>sec</parameter> is omitted, this
+	    method will not return unless the <emphasis>event
+	    checker</emphasis> object is set by using
 	    <methodname>setEventChecker</methodname> and it returns
-	    true.</para> 
-            <para>See also:
+	    true.</para> <para>See also:
 	    <methodname>setEventChecker</methodname> and
 	    <methodname>setEventHandler</methodname></para></entry>
       </row>

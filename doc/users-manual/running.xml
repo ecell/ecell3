@@ -16,8 +16,9 @@ items.
 </para>
 
     <simplelist>
-      <member>how to prepare files needed to run the simulator</member>
-      <member>how to run the simulation with &app;.</member>
+      <member>What types of files are needed to run the simulator.</member>
+      <member>How to prepare the files to run the simulator.</member>
+      <member>How to run the simulation with &app;.</member>
     </simplelist>
 
   </highlights>

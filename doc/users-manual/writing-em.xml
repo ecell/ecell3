@@ -48,18 +48,73 @@
 
     </sect1>
 
+
+  <sect1>
+    <title>Basic Concepts</title>
+
+    <sect2>
+      <title><classname>Entity</classname> Objects for Cell Model Construction</title>
+      <para></para>
+
+    <sect3>
+      <title><emphasis>FullID</emphasis>, <emphasis>FullPN</emphasis>, and <emphasis>SystemPath</emphasis></title>
+
+      <para></para>
+
+    </sect3>
+
+
+    </sect2>
+
+
+    <sect2>
+      <title><classname>Stepper</classname> Objects for Defining Simulation Procedures</title>
+
+      <para></para>
+    </sect2>
+
+
+    <sect2>
+      <title>Properties of <classname>Entity</classname> and <classname>Stepper</classname> objects</title>
+
+
+      <para><emphasis>property_value</emphasis> can be one of  (this should be a table, not a list)
+
+<itemizedlist>
+	  <listitem>
+	    <para>Real number (ex. 3.33e+10, 1.0)</para>
+	  </listitem>
+	  <listitem>
+	    <para>Int number  (ex. 3, 100)</para>
+	  </listitem>
+	  <listitem>
+	    <para>String (ex. C10:A)</para>
+	  </listitem>
+	  <listitem>
+	    <para>Quoted string (ex. "[EC35.3.33]+30")</para>
+	  </listitem>
+	  <listitem>
+	    <para>List of items consists of above types of elements.  This list
+can be nested. 
+(ex. [ A 10 [ 1 1.0 1e+10 ] ] )
+</para>
+	  </listitem>
+	</itemizedlist>
+
+
+</para>
+
+    </sect2>
+
+</sect1>
+
+
     <sect1>
       <title>general structure</title>
     
 
     <para></para>
 
-    <sect2>
-      <title>FullID and FullPN</title> 
-
-      <para></para>
-
-    </sect2>
 
 
     <sect2>
@@ -129,31 +184,6 @@ System [ClassName] ( SystemPath )
       <classname>SystemPath</classname> for System definitions, and ID
       string for other <emphasis>ObjectType</emphasis>s</para>
 
-      <para><emphasis>property_value</emphasis> can be one of 
-
-<itemizedlist>
-	  <listitem>
-	    <para>Real number (ex. 3.33e+10, 1.0)</para>
-	  </listitem>
-	  <listitem>
-	    <para>Int number  (ex. 3, 100)</para>
-	  </listitem>
-	  <listitem>
-	    <para>String (ex. C10:A)</para>
-	  </listitem>
-	  <listitem>
-	    <para>Quoted string (ex. "[EC35.3.33]+30")</para>
-	  </listitem>
-	  <listitem>
-	    <para>List of items consists of above types of elements.  This list
-can be nested. 
-(ex. [ A 10 [ 1 1.0 1e+10 ] ] )
-</para>
-	  </listitem>
-	</itemizedlist>
-
-
-</para>
 
 
 

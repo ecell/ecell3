@@ -58,7 +58,7 @@
     </para>
 
     <sect2>
-      <title>Running the <acronym>ESS</acronym> in command line mode</title>
+      <title>Running <acronym>ESS</acronym> in command line mode</title>
 
       <para>To run a <acronym>ESS</acronym> in command line, use
       <command>ecell3-session</command> command.
@@ -241,17 +241,17 @@ Written by Kouichi Takahashi <email>shafi@e-cell.org</email>
 
 	<para>To execute the simulation for some seconds, call
 	<methodname>run</methodname> method with a duration in
-	seconds. (e.g. <methodname>run</methodname>(
+	seconds.  (e.g. <methodname>run</methodname>(
 	<constant>10</constant> ) for 10 seconds.)</para>
+
 
 	<note>
 	  <para>The system supports <methodname>run</methodname>
-	  without an argument to run forever, but only if both
+	  without an argument to run forever, only if both
 	  <emphasis>event checker</emphasis> and <emphasis>event
 	  handler</emphasis> are set.  If not, it raises an exception.
 	  See <methodname>setEventChecker</methodname>() in the method
 	  list of Session class below.
-
 	  </para>
 	</note>
 
@@ -289,7 +289,7 @@ Written by Kouichi Takahashi <email>shafi@e-cell.org</email>
 
 
       <sect3>
-	<title>Example</title>
+	<title>An Example of using <classname>Session</classname> methods</title>
 
 	<para>Here is a tiny example of using
 	<classname>Session</classname> methods which loads a model,
@@ -315,17 +315,35 @@ message( 'stopped at %f seconds.' % getCurrentTime() )
       <title>Getting Session parameters.</title>
 
       <para>Session parameters are given to ESS as global variables.
-      To check what parameters are given to ESS, use
-      <methodname>dir</methodname>() built-in function.  Session
+      Therefore usage of the Session parameters is very simple.  For
+      example, if you can assume a Session parameter
+      <varname>MODELFILE</varname> is given, just use it as a
+      variable:
+<informalexample>
+	  <programlisting>loadModel( MODELFILE )</programlisting>
+	</informalexample>
+      </para>
+
+      <para>To check what parameters are given to ESS, use
+      <methodname>dir</methodname>() or
+      <methodname>globals</methodname>() built-in functions.  Session
       parameters are listed as well as other available methods and
-      variables.</para>
+      variables.   To check if a certain ESS parameter or a global variable is given, write an if statement like this:
+<informalexample>
+	  <programlisting>if 'MODELFILE' in globals():
+    # MODELFILE is given
+else:
+    # not given</programlisting>
+	</informalexample>
+
+</para>
+
 
       <note>
 	<para>Currently there is no way to distinguish the Session
       parameters from other global variables from within ESS.</para>
       </note>
 
-      <para></para>
 
     </sect2>
 
@@ -336,17 +354,208 @@ message( 'stopped at %f seconds.' % getCurrentTime() )
       <sect3>
 	<title>What is <classname>ObjectStub</classname>?</title>
 
-	<para><classname>ObjectStub</classname> is a...</para>
+	<para><classname>ObjectStub</classname> is a proxy object in
+	the frontend side of the system which corresponds to an
+	internal object in the simulator.  Any operations on the simulator's
+	internal objects should be done via the
+	<classname>ObjectStub</classname>.</para>
 
-	<para>Explanation of backend/frontend isolation may come here.</para>
+	<para>This backend / frontend isolation is needed because
+        lifetimes of backend objects are not the same as frontend
+        object, nor are their state transitions are not necessarily
+        synchronous.  If the frontend directly manipulates the
+        internal objects of the simulator, consistence of the lifetime
+        and the state of the objects can easily be violated, which
+        must not happen, without some complicated and tricky software
+        mechanisms.</para>
 
-	<para>ObjectStub, EntityStub, StepperStub, LoggerStub</para>
+	<note>
+	  <para><classname>ObjectStub</classname> classes are actually
+	  thin wrappers over the
+	  <classname>ecell.ecs.Simulator</classname> class of the
+	  E-Cell Python Library, which provides object-oriented
+	  appearance to the flat API of the class.  Although
+	  <classname>Simulator</classname> object can be accessed
+	  directly via <varname>theSimulator</varname> property of
+	  <classname>Session</classname> class, </para>
+	</note>
+
+
+	<para>There are three types of
+	<classname>ObjectStub</classname>, namely
+<itemizedlist>
+	    <listitem>
+	      <para><classname>EntityStub</classname></para>
+	    </listitem>
+	    <listitem>
+	      <para><classname>StepperStub</classname></para>
+	    </listitem>
+	    <listitem>
+	      <para><classname>LoggerStub</classname></para>
+	    </listitem>
+	  </itemizedlist>
+
+	, each correspond to
+	<classname>Entity</classname>, <classname>Stepper</classname>,
+	and <classname>Logger</classname> classes in the simulator,
+	respectively.</para>
 
       </sect3>
 
 
       <sect3>
-	<title>Example</title>
+	<title>Creating <classname>ObjectStub</classname>s from IDs</title>
+
+	<para>To get the <classname>ObjectStub</classname> objects,
+	<methodname>createEntityStub</methodname>(),
+	<methodname>createStepperStub</methodname>(), and
+	<methodname>createLoggerStub</methodname>() methods of
+	<classname>Session</classname> class are used.</para>
+
+	<para>For example, to get a <classname>EntityStub</classname>,
+	call the <methodname>createEntityStub</methodname>() method
+	with a <emphasis>FullID</emphasis> string:</para>
+
+	<informalexample>
+	  <programlisting><varname>anADPStub</varname> = createEntityStub( <replaceable>'Variable:/CELL/MT1:ADP'</replaceable> )</programlisting>
+	</informalexample>
+
+	<para>Similarly, <classname>StepperStub</classname> objects
+	and <classname>LoggerStub</classname> objects can be retrieved
+	with a <emphasis>StepperID</emphasis> or a
+	<emphasis>FullPN</emphasis>.</para>
+
+	<informalexample>
+	  <programlisting><varname>aStepperStub</varname> = createStepperStub( <replaceable>'STEPPER_01'</replaceable> )</programlisting> 
+
+	  <programlisting><varname>aLoggerStub</varname> = createLoggerStub( <replaceable>'Variable:/CELL/MT1:GLUCOSE:Concentration' </replaceable> )</programlisting>
+	</informalexample>
+
+
+      </sect3>
+
+
+      <sect3>
+	<title>Creating and Checking Existence of Backend Objects</title>
+
+	<para>Creating an <classname>ObjectStub</classname> doesn't
+	mean a corresponding object in the backend exists, or is
+	created.  In the other words, creation of the
+	<classname>ObjectStub</classname> is purely a frontend
+	operation.  After creating an
+	<classname>ObjectStub</classname>, you may want to check if
+	the corresponding backend object exists, and/or to command the
+	backend to create the backend object.</para>
+
+	<para>To check if a corresponding object to an
+	<classname>ObjectStub</classname> exists in the simulator, use
+	<methodname>isExist</methodname>() method.  For example, the
+	following if statement checks if a Stepper whose ID is
+	<literal>STEPPER_01</literal> exists:
+<informalexample>
+	    <programlisting>aStepperStub = createStepperStub( 'STEPPER_01' )
+if aStepperStub.isExist():
+    # it already exists
+else:
+    # it isn't created yet</programlisting>
+	  </informalexample>
+	</para>
+
+	<para>To create the backend object, just call
+	<methodname>create</methodname>() method.
+<informalexample>
+	    <programlisting>aStepperStub = createStepperStub( 'STEPPER_01' )
+aStepperStub.create()<lineannotation># Stepper 'STEPPER_01' is created here</lineannotation>
+</programlisting>
+	  </informalexample></para>
+
+      </sect3>
+
+      <sect3>
+	<title>Getting the Name and a Class Name of an <classname>ObjectStub</classname></title>
+
+	<para>To get a name (or an ID) of an
+	<classname>ObjectStub</classname>, use
+	<methodname>getName</methodname>() method.</para>
+
+	<para>To get the class name of an
+	<classname>EntityStub</classname> or a
+	<classname>StepperStub</classname>, call
+	<methodname>getClassName</methodname>() method.  This
+	operation is not applicable to
+	<classname>LoggerStub</classname>.</para>
+
+      </sect3>
+
+
+
+      <sect3>
+	<title>Setting and Getting Properties</title>
+
+	<para>As described in the previous chapters,
+	<classname>Entity</classname> and
+	<classname>Stepper</classname> objects has
+	<emphasis>properties</emphasis>.  This section describes how
+	to access them by using <classname>ObjectStub</classname>s.
+	This section is not applicable to
+	<classname>LoggerStub</classname>s.</para>
+
+	<para>To get a property value from an object by using an
+	<classname>EntityStub</classname> or a
+	<classname>StepperStub</classname>, invoke
+	<methodname>getProperty</methodname>() method or access an
+	object attribute (via <methodname>__getitem__</methodname>
+	special method) with a property name:
+<informalexample>
+	    <para>
+	    <programlisting>aValue = aStub.getProperty( 'Activity' )</programlisting>
+or equivalently,
+	    <programlisting>aValue = aStub[ 'Activity' ]</programlisting>
+</para>
+	  </informalexample></para>
+
+	<para>To set a new property value to an
+	<classname>Entity</classname> or a
+	<classname>Stepper</classname>, call
+	<methodname>setProperty</methodname>() method or mutate an
+	object attribute (via <methodname>__setitem__</methodname>
+	special method) with a property name and the new value:
+<informalexample>
+	    <para>
+<programlisting>aStub.getProperty( 'Activity', aNewValue )</programlisting> 
+or equivalently, 
+<programlisting>aStub[ 'Activity' ] = aNewValue</programlisting> </para>
+	  </informalexample>
+</para>
+
+	<para>List of all the properties can be gotten by using
+	<methodname>getPropertyList</methodname> method, which returns
+	a list of property names as a Python
+	<type>tuple</type>.</para>
+
+	<para>To know if a property is getable (accessible) or setable
+	(mutable), call
+	<methodname>getPropertyAttribute</methodname>() with the name
+	of the property.  The method returns a Python
+	<type>tuple</type> whose first element is true if the property
+	is setable, and the second element is true if it is getable.
+	Attempts to get a value from an inaccessible property and to
+	set a value to a immutable property result in
+	exceptions.</para>
+
+      </sect3>
+
+
+      <sect3>
+	<title>Getting <classname>Logger</classname> data</title>
+
+	<para></para>
+      </sect3>
+
+
+
+      <sect3>
+	<title>An Example usage of an <classname>EntityStub</classname></title>
 
 	<para>The following example loads an EML file, and prints the
 	value of ATP <classname>Variable</classname> in
