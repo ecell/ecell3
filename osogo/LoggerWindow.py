@@ -90,10 +90,13 @@ class LoggerWindow(OsogoWindow):
 
 		self.theEntryList.set_model( aListStore )
 		column=gtk.TreeViewColumn('FullPN',gtk.CellRendererText(),text=0)
+		column.set_resizable(gtk.TRUE)
 		self.theEntryList.append_column(column)
 		column=gtk.TreeViewColumn('Start',gtk.CellRendererText(),text=1)
+		column.set_resizable(gtk.TRUE)
 		self.theEntryList.append_column(column)
 		column=gtk.TreeViewColumn('End',gtk.CellRendererText(),text=2)
+		column.set_resizable(gtk.TRUE)
 		self.theEntryList.append_column(column)
 		self.theEntryList.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
 		self.initialize()

@@ -9,8 +9,7 @@ import operator
 from PlotterPluginWindow import *
 from Plot import *
 from ecell.ecssupport import *
-BAR_WIDTH=150
-BAR_HEIGTH=20
+
 class BargraphWindow( OsogoPluginWindow ):
 
 	def __init__( self, dirname, data, pluginmanager, root=None ):
@@ -19,6 +18,8 @@ class BargraphWindow( OsogoPluginWindow ):
 		OsogoPluginWindow.__init__(self, dirname, data, pluginmanager,\
 		    				root)
 		self.theSession=pluginmanager.theSession
+		self.BAR_WIDTH=150
+		self.BAR_HEIGTH=20
 
 		#aFullPNString = createFullPNString( self.theFullPN() )
 		#aValue = self.theSession.theSimulator.getEntityProperty( aFullPNString )
@@ -34,6 +35,7 @@ class BargraphWindow( OsogoPluginWindow ):
 		OsogoPluginWindow.openWindow(self)
 		#self.openWindow()
 		#this should be removed:
+		#self.root = self[self.__class__.__name__]
 		root=self.getWidget('BargraphWindow')
 		#gets HandleBox
 		self.handlebox=self.getWidget('handlebox1')
@@ -42,12 +44,14 @@ class BargraphWindow( OsogoPluginWindow ):
 		self.textlabel=self.getWidget('label5')
 		self.arrow=self.getWidget('image1')
 		self.button=self.getWidget('togglebutton1')
+		self.drawingframe=self.getWidget('frame8')
 		self.buttonstate=1
 		self.button.set_active(self.buttonstate)
 		#sets callback for drawingarea
 		#sets up picturebuffer
+#		self.drawingarea.set_size_request(self.BAR_WIDTH,self.BAR_HEIGTH)
+
 		self.ColorMap=self.handlebox.get_colormap()
-		
 		#sets colorcodes, codetable
 		#codetable: list, range upper boundaries in ascendingorder, GDKColor codes
 		self.colored_ranges=[
@@ -67,23 +71,27 @@ class BargraphWindow( OsogoPluginWindow ):
 		self.lastscale=0
 		self.lastposition=0
 		#paint pixbuf according to lastvalue - draw everything to default
-		self.pm=gtk.gdk.Pixmap(root.window,BAR_WIDTH,BAR_HEIGTH,-1)
+		#self.pm=gtk.gdk.Pixmap(root.window,BAR_WIDTH,BAR_HEIGTH,-1)
+		self.pm=gtk.gdk.Pixmap(root.window,self.BAR_WIDTH,self.BAR_HEIGTH,-1)
 		
 		self.pm.draw_rectangle(self.colored_ranges[1][2],gtk.TRUE,0,0,
-			    BAR_WIDTH,BAR_HEIGTH)
+			    #BAR_WIDTH,BAR_HEIGTH)
+			    self.BAR_WIDTH,self.BAR_HEIGTH)
 
 		self.addHandlers({\
 		    'drawingarea1_expose_event':self.expose,
 		    'togglebutton1_toggled':self.press})
 
-		self.drawingarea.queue_draw_area(0,0,BAR_WIDTH, BAR_HEIGTH)			
+		self.drawingarea.queue_draw_area(0,0,self.BAR_WIDTH, self.BAR_HEIGTH)			
 		#calls update
 		#pluginmanager.appendInstance(self)
 		self.thePluginManager.appendInstance(self)
-		self.ccFullPN=convertFullIDToFullPN(self.theFullID(),
-		'Value')
-		nameFullPN=str(self.ccFullPN[SYSTEMPATH])+':'+\
-		    str(self.ccFullPN[ID])
+		#self.ccFullPN=convertFullIDToFullPN(self.theFullID(),
+		#'Value')
+		#nameFullPN=str(self.ccFullPN[SYSTEMPATH])+':'+\
+		#    str(self.ccFullPN[ID])
+		self.ccFullPN=self.theFullPNList()[0]
+		nameFullPN=createFullPNString(self.ccFullPN)
 		self.textlabel.set_text(nameFullPN)
 
 		self.update()
@@ -98,8 +106,8 @@ class BargraphWindow( OsogoPluginWindow ):
 	    if self.current_scale==0:
 	    #paint the whole area black, lastvalue, lastposition, lastscale=0
 		self.pm.draw_rectangle(self.colored_ranges[0][2],gtk.TRUE,0,0,
-			    BAR_WIDTH,BAR_HEIGTH)
-		self.drawingarea.queue_draw_area(0,0,BAR_WIDTH,BAR_HEIGTH)
+			    self.BAR_WIDTH,self.BAR_HEIGTH)
+		self.drawingarea.queue_draw_area(0,0,self.BAR_WIDTH,self.BAR_HEIGTH)
 		self.lastvalue=0
 		self.lastposition=0
 		self.lastscale=0
@@ -118,11 +126,11 @@ class BargraphWindow( OsogoPluginWindow ):
 		if self.lastscale!=self.current_scale:
 		    #draw painted area and draw grey area
 		    self.pm.draw_rectangle(self.colored_ranges[self.current_scale][2],
-			gtk.TRUE,0,0,self.current_position,BAR_HEIGTH)
+			gtk.TRUE,0,0,self.current_position,self.BAR_HEIGTH)
 		    self.pm.draw_rectangle(self.colored_ranges[1][2],gtk.TRUE,
-			self.current_position,0,BAR_WIDTH-self.current_position,
-			BAR_HEIGTH)
-		    self.drawingarea.queue_draw_area(0,0,BAR_WIDTH,BAR_HEIGTH)
+			self.current_position,0,self.BAR_WIDTH-self.current_position,
+			self.BAR_HEIGTH)
+		    self.drawingarea.queue_draw_area(0,0,self.BAR_WIDTH,self.BAR_HEIGTH)
 		else:	
 		#if not scalechange 
 		    if difference<0:
@@ -137,8 +145,8 @@ class BargraphWindow( OsogoPluginWindow ):
 		    #if difference ispositiv , paint with proper color
 		    else:
 			return True #do not draw if no changes
-		    self.pm.draw_rectangle(brush,gtk.TRUE,x0,0,width,BAR_HEIGTH)
-		    self.drawingarea.queue_draw_area(x0,0,width,BAR_HEIGTH) 
+		    self.pm.draw_rectangle(brush,gtk.TRUE,x0,0,width,self.BAR_HEIGTH)
+		    self.drawingarea.queue_draw_area(x0,0,width,self.BAR_HEIGTH) 
 		self.lastvalue=self.current_value
 		self.lastscale=self.current_scale
 		self.lastposition=self.current_position
@@ -147,11 +155,26 @@ class BargraphWindow( OsogoPluginWindow ):
 	def convert_value(self,aValue):
 	    if self.current_scale>1:
 		return round((aValue-self.colored_ranges[self.current_scale-1][0])/\
-		    self.colored_ranges[self.current_scale][0]*BAR_WIDTH)
+		    self.colored_ranges[self.current_scale][0]*self.BAR_WIDTH)
 	    else:
 		return 0
 		
 	def expose(self, obj, event):
+	    alloc_rect=self.drawingarea.get_allocation()
+	    new_width=alloc_rect[2]
+	    new_heigth=alloc_rect[3]
+	    if new_width!=self.BAR_WIDTH or new_heigth!=self.BAR_HEIGTH:
+		#needs resize
+		self.BAR_WIDTH=new_width
+		self.BAR_HEIGTH=new_heigth
+#		self.drawingarea.set_size_request(self.BAR_WIDTH,self.BAR_HEIGTH)
+#		del self.pm
+		root=self.getWidget('BargraphWindow')
+		#self.pm=gtk.gdk.Pixmap(self.root.window,self.BAR_WIDTH,self.BAR_HEIGTH,-1)
+		self.pm=gtk.gdk.Pixmap(root.window,self.BAR_WIDTH,self.BAR_HEIGTH,-1)
+		
+		self.lastscale=-2
+		self.update()
 	    obj.window.draw_drawable(self.pm.new_gc(),self.pm,event.area[0],event.area[1],
 				    event.area[0],event.area[1],event.area[2],event.area[3])
 	
@@ -173,3 +196,5 @@ class BargraphWindow( OsogoPluginWindow ):
 		for i in range(2,no_scales):
 		    if self.colored_ranges[i][0]>=value:
 			return i
+
+		

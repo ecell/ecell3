@@ -119,15 +119,30 @@ class Plot:
 	    if len(self.available_colors)>0:
 		#allocates a color
 		allocated_color=self.available_colors.pop()
-		self.ColorFullPNMap[aFullPNString]=allocated_color
-		newgc=self.pm.new_gc()
-		newgc.set_foreground(self.theColorMap.alloc_color(allocated_color))
-		self.GCFullPNMap[aFullPNString]=newgc
 		self.data_list.append(aFullPNString)
 		self.trace_onoff[aFullPNString]=gtk.TRUE
-		return self.pixmapmap[allocated_color]
+		return self.register_color(aFullPNString,allocated_color)
 	    else:
 		return None
+	
+	def register_color(self,fpn,color):
+	    	self.ColorFullPNMap[fpn]=color
+		newgc=self.pm.new_gc()
+		newgc.set_foreground(self.theColorMap.alloc_color(color))
+		self.GCFullPNMap[fpn]=newgc
+		return self.pixmapmap[color]
+
+	def remove_trace(self, FullPNStringList):
+	    #remove from colorlist
+	    for fpn in FullPNStringList:
+		self.deregister_color(fpn)
+		self.ColorFullPNMap[fpn]=None
+		self.GCFullPNMap[fpn]=None
+
+	def deregister_color(self, fpn):
+	    acolor=self.ColorFullPNMap[fpn]
+	    if not self.available_colors.__contains__(acolor):
+		self.available_colors.append(acolor)
 	    
 	    
 	def clearplotarea(self):
@@ -253,14 +268,6 @@ class Plot:
 	    pass
 	    
 	    
-	def remove_trace(self, FullPNStringList):
-	    #remove from colorlist
-	    for fpn in FullPNStringList:
-		acolor=self.ColorFullPNMap[fpn]
-		self.available_colors.append(acolor)
-		self.ColorFullPNMap[fpn]=None
-		self.GCFullPNMap[fpn]=None
-
 	def reframey(self):  #no redraw!
 	    #get max and min from databuffers
 	    if self.zoomlevel==0:
@@ -1054,4 +1061,16 @@ class TracerPlot(Plot):
 		return self.trace_onoff[fpn]
 	    else:
 		return gtk.FALSE
+
+	def change_trace_color(self,fpn):
+	    current_color=self.ColorFullPNMap[fpn]
+	    self.deregister_color(fpn)
+	    color_index=self.ColorList.index(current_color)
+	    color_index=color_index+1
+	    if color_index==len(self.ColorList):
+		color_index=0
+	    pixbuf=self.register_color(fpn,self.ColorList[color_index])
+	    self.drawall()
+	    return pixbuf
+
 		

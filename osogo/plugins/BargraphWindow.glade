@@ -10,7 +10,7 @@
   <property name="type">GTK_WINDOW_TOPLEVEL</property>
   <property name="window_position">GTK_WIN_POS_NONE</property>
   <property name="modal">False</property>
-  <property name="resizable">False</property>
+  <property name="resizable">True</property>
   <property name="destroy_with_parent">False</property>
   <property name="icon">icon_ecelllogo.xpm</property>
 
@@ -76,16 +76,14 @@
 		    </widget>
 		    <packing>
 		      <property name="padding">0</property>
-		      <property name="expand">False</property>
-		      <property name="fill">False</property>
+		      <property name="expand">True</property>
+		      <property name="fill">True</property>
 		    </packing>
 		  </child>
 
 		  <child>
 		    <widget class="GtkFrame" id="frame8">
 		      <property name="border_width">2</property>
-		      <property name="width_request">154</property>
-		      <property name="height_request">24</property>
 		      <property name="visible">True</property>
 		      <property name="label_xalign">0</property>
 		      <property name="label_yalign">0.5</property>
@@ -93,7 +91,6 @@
 
 		      <child>
 			<widget class="GtkDrawingArea" id="drawingarea1">
-			  <property name="width_request">150</property>
 			  <property name="height_request">20</property>
 			  <property name="visible">True</property>
 			  <signal name="expose_event" handler="drawingarea1_expose_event" last_modification_time="Sun, 24 Nov 2002 19:04:11 GMT"/>
@@ -110,12 +107,13 @@
 		  <child>
 		    <widget class="GtkLabel" id="label5">
 		      <property name="visible">True</property>
+		      <property name="can_focus">True</property>
 		      <property name="label" translatable="yes">label5</property>
 		      <property name="use_underline">False</property>
 		      <property name="use_markup">False</property>
-		      <property name="justify">GTK_JUSTIFY_RIGHT</property>
-		      <property name="wrap">False</property>
-		      <property name="selectable">False</property>
+		      <property name="justify">GTK_JUSTIFY_LEFT</property>
+		      <property name="wrap">True</property>
+		      <property name="selectable">True</property>
 		      <property name="xalign">0.5</property>
 		      <property name="yalign">0.5</property>
 		      <property name="xpad">0</property>
@@ -123,8 +121,8 @@
 		    </widget>
 		    <packing>
 		      <property name="padding">0</property>
-		      <property name="expand">False</property>
-		      <property name="fill">False</property>
+		      <property name="expand">True</property>
+		      <property name="fill">True</property>
 		    </packing>
 		  </child>
 		</widget>

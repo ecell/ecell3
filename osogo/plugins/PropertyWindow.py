@@ -63,12 +63,16 @@ class PropertyWindow(OsogoPluginWindow):
 		self['property_clist'].set_model(self.thePropertyListStore)
 		renderer=gtk.CellRendererText()
 		column=gtk.TreeViewColumn("Property",renderer,text=PROPERTY_COL)
+		column.set_resizable(gtk.TRUE)
 		self['property_clist'].append_column(column)
 		column=gtk.TreeViewColumn("Value",renderer,text=VALUE_COL)
+		column.set_resizable(gtk.TRUE)
 		self['property_clist'].append_column(column)
 		column=gtk.TreeViewColumn("Get",renderer,text=GETABLE_COL)
+		column.set_resizable(gtk.TRUE)
 		self['property_clist'].append_column(column)
 		column=gtk.TreeViewColumn("Set",renderer,text=SETTABLE_COL)
+		column.set_resizable(gtk.TRUE)
 		self['property_clist'].append_column(column)
 		
 		# creates popu menu

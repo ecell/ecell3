@@ -93,15 +93,19 @@ class StepperWindow(OsogoWindow):
 		self.thePropertyList.set_model(aPropertyModel)
 		column=gtk.TreeViewColumn( 'Property',gtk.CellRendererText(),\
 					   text=PROPERTY_INDEX )
+		column.set_resizable(gtk.TRUE)
 		self.thePropertyList.append_column(column)
 		column=gtk.TreeViewColumn( 'Value',gtk.CellRendererText(),\
 					   text=VALUE_INDEX )
+		column.set_resizable(gtk.TRUE)
 		self.thePropertyList.append_column(column)
 		column=gtk.TreeViewColumn( 'Get',gtk.CellRendererText(),\
 					   text=GET_INDEX )
+		column.set_resizable(gtk.TRUE)
 		self.thePropertyList.append_column(column)
 		column=gtk.TreeViewColumn( 'Set',gtk.CellRendererText(),\
 					   text=SET_INDEX )
+		column.set_resizable(gtk.TRUE)
 		self.thePropertyList.append_column(column)
 		
 		self.initialize()

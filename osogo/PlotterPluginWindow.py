@@ -59,6 +59,11 @@ class PlotterPluginWindow( OsogoPluginWindow ):
 		column2=gtk.TreeViewColumn('trace',gtk.CellRendererText(),text=COL_TXT)
 		column3=gtk.TreeViewColumn('lg',renderer,active=COL_LOG)
 		column4=gtk.TreeViewColumn('on',renderer4,active=COL_ON)
+		column1.set_resizable(gtk.TRUE)
+		column2.set_resizable(gtk.TRUE)
+		column3.set_resizable(gtk.TRUE)
+		column4.set_resizable(gtk.TRUE)
+		
 		self.ListWindow.append_column(column4)
 		self.ListWindow.append_column(column1)
 		self.ListWindow.append_column(column3)
@@ -82,6 +87,9 @@ class PlotterPluginWindow( OsogoPluginWindow ):
 		self.addHandlers({\
 		    'on_button9_clicked' : self.remove_trace,\
 		    'on_button12_clicked'  : self.change_scale})
+
+		self.ListWindow.connect("button-press-event",self.button_pressed_on_list)
+
 		self['button12'].set_label('Log10 Scale')
 
 		#init clist
@@ -221,6 +229,19 @@ class PlotterPluginWindow( OsogoPluginWindow ):
 		self.ListStore.set_value(iter,COL_PIX,added_item[1]) #set pixbuf
 		self.ListStore.set_value(iter,COL_TXT,added_item[0]) #set text
 		self.ListStore.set_value(iter,COL_ON,gtk.TRUE) #trace is on by default
+
+	def change_trace_color(self):
+	    selected_list=self.getselected()
+	    if len(selected_list)>0:
+		fpn=selected_list[0][0]
+		iter=selected_list[0][1]
+		pixbuf=self.thePlotInstance.change_trace_color(fpn)
+		self.ListStore.set_value(iter,COL_PIX,pixbuf)
+	
+	def button_pressed_on_list(self, aWidget, anEvent):
+	    if anEvent.button==3:
+		self.change_trace_color()
+	    
 	    
 	def remove_trace_from_list(self,aFullPNString):
 		print "remove_trace_from_list"

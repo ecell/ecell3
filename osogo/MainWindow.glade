@@ -519,7 +519,7 @@
 					      <property name="has_frame">True</property>
 					      <property name="invisible_char" translatable="yes">*</property>
 					      <property name="activates_default">False</property>
-					      <signal name="changed" handler="input_step_size"/>
+					      <signal name="changed" handler="input_step_size" last_modification_time="Sun, 30 Mar 2003 16:21:35 GMT"/>
 					    </widget>
 					  </child>
 

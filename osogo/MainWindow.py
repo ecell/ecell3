@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 
 
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -80,7 +79,6 @@ AUTHORLIST  =  [
     ]
     
 DESCRIPTION = 'Osogo is a simulation session monitoring module for E-CELL SE Version 3'
-
 
 # ---------------------------------------------------------------
 # MainWindow -> OsogoWindow
@@ -360,7 +358,7 @@ class MainWindow(OsogoWindow):
 		self.theModelFileSelection = gtk.FileSelection( 'Select Model File' )
 		self.theModelFileSelection.ok_button.connect('clicked', self.__loadModel)
 		self.theModelFileSelection.cancel_button.connect('clicked', self.closeParentWindow)
-		self.theModelFileSelection.complete( '*.' + MODEL_FILE_EXTENSION )
+		self.theModelFileSelection.complete( '*.'+ MODEL_FILE_EXTENSION )
 		self.theModelFileSelection.show_all()
 
 	# end of openLoadModelFileSelection
@@ -663,7 +661,9 @@ class MainWindow(OsogoWindow):
 			return
 
 		try:
-
+			if self.theStepSize==0:
+			    self.theStepSize=1
+			    self.theSession.message( "Zero step value overridden to 1\n" )
 			self.theRunningFlag = 1
 			# this can fail if the simulator is not ready
 			self.theSession.theSimulator.initialize()
@@ -702,7 +702,12 @@ class MainWindow(OsogoWindow):
 	def changeStepType ( self, anObject ):
 
 		self.theStepType = 1 - self.theStepType
-
+		if self.theStepType==1:
+		    self.theStepSize=int(self.theStepSize)
+		    if self.theStepSize==0:
+			self.theStepSize=1
+		    self['step_combo_entry'].set_text(str(self.theStepSize))
+				
 	# end of changeStepType
 
 
@@ -717,25 +722,21 @@ class MainWindow(OsogoWindow):
 	#         when Step button is pressed, this saved value is used.
 	# ---------------------------------------------------------------
 	def setStepSize( self, anObject ):
+	# If the inputed charactor is not numerical charactors,
+	# displays a confirm window and set 1.0 to the GtkEntry.
 
-		# If the inputed charactor is not numerical charactors,
-		# displays a confirm window and set 1.0 to the GtkEntry.
-		try:
-
-			# gets the inputerd characters from the GtkEntry. 
-			aNumberString = string.strip( anObject.get_text() )
-
-			if len( aNumberString ) == 0:
-				# When user delete all character on the GtkEntry,
+	# gets the inputerd characters from the GtkEntry. 
+	    aNumberString = string.strip( anObject.get_text() )
+	    aStepSize=None
+	    if len( aNumberString ) > 0:
+			# When user delete all character on the GtkEntry,
 				# does nothing and keep previous value.
-				pass
-			else:
-
-				# considers the case that character 'e' is included.
-
-				# for example, '4e'
+	
+		try:
+			# considers the case that character 'e' is included.
+			# for example, '4e'
 				if string.find(aNumberString, 'e') == len(aNumberString)-1:
-					return None
+				    return None
 
 				# for expample, '3e-' or '5e+'
 				if len(aNumberString) >= 2 and \
@@ -750,7 +751,7 @@ class MainWindow(OsogoWindow):
 					baseNumber =  aNumberString[:string.find(aNumberString,'e-')]
 					if len(baseNumber) == 0:
 						aNumberString = "1e-%s" %str( int(anIndexNumber) )
-					self.theStepSize = string.atof( aNumberString )
+					aStepSize = string.atof( aNumberString )
 
 				# for expample, '5e+6'
 				if string.find(aNumberString, 'e+') != -1:
@@ -759,13 +760,13 @@ class MainWindow(OsogoWindow):
 					baseNumber =  aNumberString[:string.find(aNumberString,'e+')]
 					if len(baseNumber) == 0:
 						aNumberString = "1e+%s" %str( int(anIndexNumber) )
-					self.theStepSize = string.atof( aNumberString )
+					aStepSize = string.atof( aNumberString )
 
 				else:
 					# When user input some character, tries to convert
 					# it to numerical value.
 					# following line is throwable except
-					self.theStepSize = string.atof( aNumberString )
+					aStepSize = string.atof( aNumberString )
 
 		except:
 			# displays a Confirm Window.
@@ -776,7 +777,26 @@ class MainWindow(OsogoWindow):
 
 			# set the previous value to GtkField.
 			anObject.set_text(str(self.theStepSize))
-
+		else:
+			    #check for numerical constraints
+			aMessage=""
+			if aStepSize<0:
+				aMessage+="Cannot accept negative value\n"
+			    			
+			if self.theStepType==1:
+				#step must be integer and > 0
+				if aStepSize!=int(aStepSize):
+				    aMessage+="Cannot accept Real value for step size\n"
+			
+			if aMessage!="":
+			    self.printMessage(aMessage)
+			    aDialog = ConfirmWindow(0,aMessage,'Error!')
+			    # set the previous value to GtkField.
+			    anObject.set_text(str(self.theStepSize))
+			else:
+			    self.theStepSize=aStepSize
+			
+			
 	# end of setStepSize
 
 
