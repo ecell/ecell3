@@ -695,7 +695,7 @@ System System( /CELL/CYTOPLASM )
 		Name	MAPK_MAPK_P;
 		KmS	0.0000000463;
 		KcF	0.15;
-		VariableReferenceList	[ S0 :.:MAPK _1 ] [ P0 :.:MAPK_P 1 ] [ C0 :.:MEK_PP];
+		VariableReferenceList	[ S0 :.:MAPK -1 ] [ P0 :.:MAPK_P 1 ] [ C0 :.:MEK_PP];
 	}
 	
 	Process MichaelisUniUniFluxProcess( MAPK_P_MAPK_PP )
@@ -1074,7 +1074,7 @@ System System( /CELL/CYTOPLASM )
 		Name	PKC_PKC_active;
 		StepperID PASSIVE_1;
 
-		ProcessMethod "P0.Value = R0.Value + R1.Value + R2.Value + R3.Value";	
+		FireMethod "P0.Value = R0.Value + R1.Value + R2.Value + R3.Value";	
 		VariableReferenceList	[ R0 :.:Ca_DAG_PKC 0 ] 
 					[ R1 :.:DAG_AA_PKC 0 ] 
 					[ R2 :.:AA_PKC 0 ] 
@@ -1087,7 +1087,7 @@ System System( /CELL/CYTOPLASM )
 		Name	MAPact;
 		StepperID PASSIVE_1;	
 
-		ProcessMethod "P0.Value = R0.Value + R1.Value";
+		FireMethod "P0.Value = R0.Value + R1.Value";
 
 		VariableReferenceList	[ R0 :.:MAPK_P 0 ] 
 					[ R1 :.:MAPK_PP 0 ]
