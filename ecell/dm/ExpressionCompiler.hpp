@@ -110,12 +110,12 @@ public:
       , NEG    // no arg
       //      , PUSH_POINTER // Pointer
       , PUSH_REAL   // Real
+      , LOAD_REAL  // Real*
       , OBJECT_METHOD_REAL //VariableReferencePtr, VariableReferenceMethodPtr
       , OBJECT_METHOD_INTEGER // VariableReferenceIntegerMethodPtr
 
       , RET   // no arg
-      , LOAD_REAL  // Real*
-      , END = LOAD_REAL
+      , END = RET
     };
 
 

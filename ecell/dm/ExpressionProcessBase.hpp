@@ -191,7 +191,9 @@ const Real ExpressionProcessBase::VirtualMachine::execute( CodeCref aCode )
 
 #define INCREMENT_PC( OPCODE )\
     aPC += sizeof( ExpressionCompiler::\
-                   Opcode2Instruction<ExpressionCompiler::OPCODE>::type ); //
+                   Opcode2Instruction<ExpressionCompiler::OPCODE>::type );\
+    LIBECS_PREFETCH( aPC, 0, 1 );
+ //
 
   //    std::cout << #OPCODE << std::endl;
 
@@ -209,41 +211,47 @@ const Real ExpressionProcessBase::VirtualMachine::execute( CodeCref aCode )
       switch ( FETCH_OPCODE() )
 	{
 
+#define SIMPLE_ARITHMETIC( OPCODE, OP )\
+	    ( aStackPtr - 1)->theReal OP##= aStackPtr->theReal;\
+	    INCREMENT_PC( OPCODE );\
+	    --aStackPtr
+
+	  /*
+            const Real aTopValue( aStackPtr->theReal );\
+	    INCREMENT_PC( OPCODE );\
+	    ( aStackPtr - 1 )->theReal OP##= aTopValue;\
+	    --aStackPtr;\
+	  */
+
 	case ExpressionCompiler::ADD:
 	  {
-	    ( aStackPtr - 1 )->theReal += aStackPtr->theReal;
-	    --aStackPtr;
+	    SIMPLE_ARITHMETIC( ADD, + );
 
-	    INCREMENT_PC( ADD );
 	    continue;
 	  }
 
 	case ExpressionCompiler::SUB:
 	  {
-	    ( aStackPtr - 1 )->theReal -= aStackPtr->theReal;
-	    --aStackPtr;
+	    SIMPLE_ARITHMETIC( SUB, - );
 
-	    INCREMENT_PC( SUB );
 	    continue;
 	  }
 
 	case ExpressionCompiler::MUL:
 	  {
-	    ( aStackPtr - 1 )->theReal *= aStackPtr->theReal;
-	    --aStackPtr;
+	    SIMPLE_ARITHMETIC( MUL, * );
 
-	    INCREMENT_PC( MUL );
 	    continue;
 	  }
 
 	case ExpressionCompiler::DIV:
 	  {
-	    ( aStackPtr - 1 )->theReal /= aStackPtr->theReal;
-	    --aStackPtr;
+	    SIMPLE_ARITHMETIC( DIV, / );
 
-	    INCREMENT_PC( DIV );
 	    continue;
 	  }
+
+#undef SIMPLE_ARITHMETIC
 
 	case ExpressionCompiler::CALL_FUNC2:
 	  {
@@ -313,6 +321,16 @@ const Real ExpressionProcessBase::VirtualMachine::execute( CodeCref aCode )
 	    goto bypass_real;
 	  }
 	    
+	case ExpressionCompiler::LOAD_REAL:
+	  {   
+	    DECODE_INSTRUCTION( LOAD_REAL );
+
+	    bypass = *( anInstruction->getOperand() );
+
+	    INCREMENT_PC( LOAD_REAL );
+	    goto bypass_real;
+	  }
+
 	case ExpressionCompiler::OBJECT_METHOD_REAL:
 	  {
 	    DECODE_INSTRUCTION( OBJECT_METHOD_REAL );
@@ -338,24 +356,9 @@ const Real ExpressionProcessBase::VirtualMachine::execute( CodeCref aCode )
 	    return aStackPtr->theReal;
 	  }
 
-	default:  // LOAD_REAL is here!!
+	default:
 	  {
-	    // LOAD_REAL is implemented here in default: case because with 
-	    // many compilers it results in faster assembly, even if
-	    // additional check for invalid opcodes (the if below) is done.
-
-	    if( LIBECS_UNLIKELY( FETCH_OPCODE() != 
-				 ExpressionCompiler::LOAD_REAL ) )
-	      {
-		THROW_EXCEPTION( UnexpectedError, "Invalid instruction." );
-	      }
-	      
-	    DECODE_INSTRUCTION( LOAD_REAL );
-
-	    bypass = *( anInstruction->getOperand() );
-
-	    INCREMENT_PC( LOAD_REAL );
-	    goto bypass_real;
+	    THROW_EXCEPTION( UnexpectedError, "Invalid instruction." );
 	  }
 
 	}
@@ -364,7 +367,9 @@ const Real ExpressionProcessBase::VirtualMachine::execute( CodeCref aCode )
 
     bypass_real:
 
-      switch( FETCH_OPCODE() )
+      // Fetch next opcode, and if it is the target of of the stackops folding,
+      // do it here.   If not (default case), start the next loop iteration.
+      switch( FETCH_OPCODE() ) 
 	{
 	case ExpressionCompiler::ADD:
 	  {
