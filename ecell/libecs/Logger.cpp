@@ -48,6 +48,11 @@ namespace libecs
 
   DataPointVectorRCPtr Logger::getData( void ) const
   {
+    if (thePhysicalLogger.empty())
+	{
+	return anEmptyVector();
+	}
+
     return thePhysicalLogger.getVector( thePhysicalLogger.begin(),
 					thePhysicalLogger.end() );
   }
@@ -57,6 +62,11 @@ namespace libecs
   DataPointVectorRCPtr Logger::getData( RealCref aStartTime,
 					RealCref anEndTime ) const
   {
+    if (thePhysicalLogger.empty())
+	{
+	return anEmptyVector();
+	}
+
     PhysicalLoggerIterator 
       top( thePhysicalLogger.upper_bound( thePhysicalLogger.begin(),
 					  thePhysicalLogger.end(), 
@@ -66,7 +76,6 @@ namespace libecs
       bottom( thePhysicalLogger.lower_bound( thePhysicalLogger.begin(),
 					     top,
 					     aStartTime ) );
-
     return thePhysicalLogger.getVector( bottom, top );
   }
 

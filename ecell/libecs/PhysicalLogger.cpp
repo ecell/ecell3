@@ -30,7 +30,6 @@
 #include "config.h" 
 #include "PhysicalLogger.hpp"
 
-
 namespace libecs
 {
 
@@ -83,7 +82,7 @@ namespace libecs
   {
     PhysicalLoggerIterator result( lower_bound( start, end, time ) );
 
-    if ( ( result < theVector.size() ) && ( result != time ) )
+    if ( ( result < size() - 1 ) && ( result != time ) )
       {
 	++result;
       }
@@ -129,11 +128,12 @@ namespace libecs
       {
 	aVector = new DataPointVector ( end - start + 1 );
 
-	while ( counter <= end )
+	do 
 	  {
 	    ( *aVector )[ counter - start ] = theVector [ counter ];
 	    ++counter;
 	  }
+	  while ( counter <= end );
       }
 
     return DataPointVectorRCPtr( aVector );
