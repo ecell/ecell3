@@ -1,30 +1,137 @@
 #!/usr/bin/env python
 
-from Window import *
+
+#::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+#
+#        This file is part of E-CELL Session Monitor package
+#
+#                Copyright (C) 1996-2002 Keio University
+#
+#::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+#
+#
+# E-CELL is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public
+# License as published by the Free Software Foundation; either
+# version 2 of the License, or (at your option) any later version.
+#
+# E-CELL is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+# See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public
+# License along with E-CELL -- see the file COPYING.
+# If not, write to the Free Software Foundation, Inc.,
+# 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+#
+#END_HEADER
+#
+#'Design: Kenta Hashimoto <kem@e-cell.org>',
+#'Design and application Framework: Kouichi Takahashi <shafi@e-cell.org>',
+#'Programming: Yuki Fujita',
+#             'Yoshiya Matsubara',
+#             'Yuusuke Saito'
+# modified by Masahiro Sugimoto <sugi@bioinformatics.org> at
+# E-CELL Project, Lab. for Bioinformatics, Keio University.
+#
+
+from OsogoWindow import *
 from gtk import *
 
-class MessageWindow(Window):
+# ---------------------------------------------------------------
+# MessageWindow -> OsogoWindow
+#   - manages MessageWindow
+# ---------------------------------------------------------------
+class MessageWindow(OsogoWindow):
 
-    def __init__( self ):
-        Window.__init__( self )
-        self.printMessage('')
+	# ---------------------------------------------------------------
+	# Constructor
+	#
+	# return -> None
+	# This method is throwable exception.
+	# ---------------------------------------------------------------
+	def __init__( self ):
 
-    def printMessage( self, aMessageString ):
-        self["message_text_box"].insert_defaults( aMessageString )
+		OsogoWindow.__init__( self )
+		OsogoWindow.openWindow(self)
+		self.printMessage('')
+		self.theMessageBufferList=[]
 
+	# end of __init__
+
+
+	# ---------------------------------------------------------------
+	# PrintMessage
+	#
+	# aMessage(string or list or touple)
+	#
+	# return -> None
+	# This method is throwable exception.
+	# ---------------------------------------------------------------
+	def printMessage( self, aMessage ):
+
+		# -------------------------------------------------------
+		# If messge is list or touple, then print out each line.
+		# -------------------------------------------------------
+		if type(aMessage) == type([]) or type(aMessage) == type(()) :  
+
+			# --------------------------------------------------
+			# If instance of Message Window Widget has destroyed,
+			# save aMessage to theMessageBugger
+			# --------------------------------------------------
+			if OsogoWindow.getExist(self) == 0 :
+				self.theMessageBufferList.append( aMessage )
+
+			# --------------------------------------------------
+			# If instance of Message Window Widget has not destroyed,
+			# print out aMessage on theMessageBugger
+			# --------------------------------------------------
+			else:
+				for aLine in aMessage:
+					self["message_text_box"].insert_defaults( aLine )
+
+		# -------------------------------------------------------
+		# If message is not list or touple, then print out row data.
+		# -------------------------------------------------------
+		else: 
+
+			# --------------------------------------------------
+			# If instance of Message Window Widget has destroyed,
+			# save aMessage to theMessageBugger
+			# --------------------------------------------------
+			if OsogoWindow.getExist(self) == 0 :
+				self.theMessageBufferList.append( aMessage )
+
+			# --------------------------------------------------
+			# If instance of Message Window Widget has not destroyed,
+			# print out aMessage on theMessageBugger
+			# --------------------------------------------------
+			else:
+				self["message_text_box"].insert_defaults( aMessage )
+
+
+	# end of printMessage
+
+
+	def openWindow( self ):
+		OsogoWindow.openWindow( self )
+		self.printMessage( self.theMessageBufferList )
+		self.theMessageBufferList = []
+
+	# end of openWindow
 
 
 if __name__ == "__main__":
 
-    def mainLoop():
-        gtk.mainloop()
+	def mainLoop():
+		gtk.mainloop()
 
-    def main():
-        aWindow = MessageWindow( 'EntryListWindow.glade' )
-        mainLoop()
+	def main():
+		aWindow = MessageWindow( 'MessageWindow.glade' )
+		mainLoop()
 
-
-    main()
+	main()
 
 
 
