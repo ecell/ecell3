@@ -236,6 +236,11 @@ namespace libecs
       return theStepper;
     }
 
+    ModelPtr getModel() const
+    {
+      return getSuperSystem()->getModel();
+    }
+
   protected:
 
     void makeSlots();

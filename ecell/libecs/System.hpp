@@ -216,6 +216,23 @@ namespace libecs
 
     virtual const SystemPath getSystemPath() const;
 
+
+    /**
+       Get a Model object to which this System belongs.
+
+       @return a borrowed pointer to the Model.
+    */
+
+    ModelPtr getModel() const
+    {
+      return theModel;
+    }
+
+    void setModel( ModelPtr const aModel )
+    {
+      theModel = aModel;
+    }
+
     void notifyChangeOfEntityList();
 
 
@@ -237,6 +254,8 @@ namespace libecs
     StepperPtr   theStepper;
 
   private:
+
+    ModelPtr  theModel;
 
     SystemMap    theSystemMap;
 
@@ -381,8 +400,6 @@ namespace libecs
   private:
 
     Real theVolume;
-
-    Real theVolumeBuffer;
 
   };
 

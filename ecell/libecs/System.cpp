@@ -130,6 +130,7 @@ namespace libecs
   System::System()
     :
     theStepper( NULLPTR ),
+    theModel( NULLPTR ),
     theEntityListChanged( false )
   {
     makeSlots();

@@ -102,13 +102,11 @@ namespace libecs
       case EntityType::VARIABLE:
 	aVariablePtr = getVariableMaker().make( aClassname );
 	aVariablePtr->setID( aFullID.getID() );
-	aVariablePtr->setModel( this );
 	aContainerSystemPtr->registerVariable( aVariablePtr );
 	break;
       case EntityType::PROCESS:
 	aProcessPtr = getProcessMaker().make( aClassname );
 	aProcessPtr->setID( aFullID.getID() );
-	aProcessPtr->setModel( this );
 	aContainerSystemPtr->registerProcess( aProcessPtr );
 	break;
       case EntityType::SYSTEM:

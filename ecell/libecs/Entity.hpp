@@ -105,16 +105,6 @@ namespace libecs
     }
 
 
-    /**
-       Get a Model object to which this Entity belongs.
-
-       @return a borrowed pointer to the Model.
-    */
-
-    ModelPtr getModel() const
-    {
-      return theModel;
-    }
 
 
     /**
@@ -207,10 +197,6 @@ namespace libecs
       theSuperSystem = supersystem; 
     }
 
-    void setModel( ModelPtr const aModel )
-    {
-      theModel = aModel;
-    }
 
 
     /// @internal
@@ -230,7 +216,6 @@ namespace libecs
 
   private:
 
-    ModelPtr  theModel;
     SystemPtr theSuperSystem;
     String    theID;
     String    theName;

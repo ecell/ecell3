@@ -40,7 +40,6 @@ namespace libecs
 
   Entity::Entity()
     : 
-    theModel( NULLPTR ),
     theSuperSystem( NULLPTR ),
     theID( "" ),
     theName( "" ) 
