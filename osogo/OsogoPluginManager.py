@@ -140,14 +140,18 @@ class OsogoPluginManager(PluginManager):
 
 				anInstance = aPlugin.createInstance( data, self, root, parent )
 
-				if root !='top_vbox':              
-					anInstance.editTitle( aTitle )
-					self.thePluginTitleDict[ anInstance ] = aTitle
-					self.theInstanceList.append( anInstance )
+				try:
+					if root !='top_vbox':              
+						anInstance.editTitle( aTitle )
+						self.thePluginTitleDict[ anInstance ] = aTitle
+						self.theInstanceList.append( anInstance )
 
-				# initializes session
-				self.theMainWindow.theSession.theSimulator.initialize()
-				self.updateFundamentalWindows()
+					# initializes session
+					self.theMainWindow.theSession.theSimulator.initialize()
+					self.updateFundamentalWindows()
+				except:
+					pass
+
 				return anInstance
 
 
@@ -220,14 +224,19 @@ class OsogoPluginManager(PluginManager):
 	# ---------------------------------------------------------------
 	def updateAllPluginWindow( self ):
 
+		#print "updateAllPluginWindow"
+
 		#try:
-			PluginManager.updateAllPluginWindow(self)
+		PluginManager.updateAllPluginWindow(self)
 		#except:
 		#	aMessage  = '\n----------Error------------\n'
 		#	aMessage += 'ErroType[%s]\n'  %sys.exc_type
 		#	aMessage += 'ErroValue[%s]\n' %sys.exc_value
 		#	traceback.print_exc()
 		#	self.printMessage(aMessage)
+
+		#self.theMainWindow.updateFundamentalWindows()
+		
 
 	# end of updateAllPluginWindow
 

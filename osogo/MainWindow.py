@@ -447,12 +447,12 @@ class MainWindow(OsogoWindow):
 	# ---------------------------------------------------------------
 	def exit( self, anObject=None ):
 
-		aMessage = '\n Are you sure you want to quit? \n'
+		aMessage = 'Are you sure you want to quit?'
 
 		if self.theRunningFlag == TRUE:
 			self.stopSimulation('')
 
-			aDialog = ConfirmWindow(1,aMessage,'?')
+			aDialog = ConfirmWindow(1,aMessage,'exit ?')
 
 			if aDialog.return_result() == 0:
 				mainQuit()
@@ -655,7 +655,7 @@ class MainWindow(OsogoWindow):
 	# ---------------------------------------------------------------
 	def update( self ):
 
-
+		#print "MainWindow.update"
 		aTime = self.theSession.theSimulator.getCurrentTime()
 		self.theCurrentTime = aTime
 		self['time_entry'].set_text( str( self.theCurrentTime ) )
@@ -1272,7 +1272,6 @@ class MainWindow(OsogoWindow):
 	# ---------------------------------------------------------------
 	def updateFundamentalWindows( self ):
 
-
 		# -------------------------------------------
 		# calls update method of each Window
 		# -------------------------------------------
@@ -1281,10 +1280,6 @@ class MainWindow(OsogoWindow):
 		self.theLoggerWindow.update()
 		self.theInterfaceWindow.update()
 		self.theStepperWindow.update()
-
-
-		for anEntityListWindow in self.theEntityListWindowList:
-			anEntityListWindow.update()
 
 		# -------------------------------------------
 		# checks buttons  ane menus
@@ -1338,9 +1333,33 @@ class MainWindow(OsogoWindow):
 						self['palette_togglebutton'].set_active(gtk.FALSE)
 						self['palette_window_menu'].set_active(gtk.FALSE)
 
+			# entity window
+			# detects the destroyed EntityWindows, and delete them from
+			# self.theEntityListWindow.
+			aDeleteIndexList = []
+			for anIndex in range(0,len(self.theEntityListWindowList)):
+				anEntityListWindow = self.theEntityListWindowList[anIndex]
+
+				if anEntityListWindow.getExist() == TRUE:
+					anEntityListWindow.update()
+				else:
+					aDeleteIndexList.append(anIndex)
+
+			aDeleteIndexList.sort()
+			aDeleteIndexList.reverse()
+			for anIndex in aDeleteIndexList:
+				del self.theEntityListWindowList[anIndex]
+
+
 	# end of updateFundamentalWindow
 
 
 
 # end of MainWindow
+
+
+
+
+
+
 

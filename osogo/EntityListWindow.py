@@ -153,6 +153,7 @@ class EntityListWindow(OsogoWindow):
 			aListItem.show()
 
 	def selectEntity( self, aEntityList ):
+
 		aSelectedEntityListItemList = aEntityList.get_selection()
 
 		if len(aSelectedEntityListItemList) == 0 :
@@ -201,9 +202,9 @@ class EntityListWindow(OsogoWindow):
 			aPluginManager.createInstance( aPluginName, self.theSelectedFullPNList )
 
 		except:
-			self.theMainWindow.printMessage(' Error: couldn\'t create plugin window')
+			self.theMainWindow.printMessage('Error: couldn\'t create plugin window')
 		else:
-			self.theMainWindow.printMessage(' create new plugin window ')
+			self.theMainWindow.printMessage('create new plugin window ')
 			
 	# end of openNewPluginWindow
 
@@ -221,15 +222,15 @@ class EntityListWindow(OsogoWindow):
 
 	def openNewPluginWindowByPopupMenu(self, anObject ):
 
-		try:
+		#try:
 
 			aPluginManager = self.theMainWindow.thePluginManager
 			aPluginManager.createInstance( anObject.get_name(), self.theSelectedFullPNList)
 
-		except:
-			self.theMainWindow.printMessage(' Error: couldn\'t create plugin window')
-		else:
-			self.theMainWindow.printMessage(' create new plugin window ')
+		#except:
+			#self.theMainWindow.printMessage('Error: couldn\'t create plugin window')
+		#else:
+			self.theMainWindow.printMessage('create new plugin window ')
 
 
 	# ---------------------------------------------------------------
