@@ -52,7 +52,7 @@ class MainWindow(Window):
         #    setName( self )
         
         
-        
+
     def update( self ):
         aPropertyList = list( tmpget( 'PropertyList' ) )
         bPropertyList = testdic['Name'][0]
@@ -82,52 +82,26 @@ class MainWindow(Window):
         
         
         
-       # for x in aPropertyList:
-           # if x=='Substrate' or x=='Product' :
-               # print x
-               # for y in x:
-                   # print y
-        #            aValueList = list( tmpget( y ) )
-                    #aValueList = tmpget( y )
-                    #aValueList = tmpget( x )
-                    #            aName = aValueList[0]
-                    #            aValueList = aValueList[1:]
-                    #            aValueList = map( toString, aValueList )
-                    #            self.thePropertyClist.append( aValueList) 
-                    #            print aValueList
-                    #else:
-                    # aValueList = tmpget( x )
-                    # aValueList = map( toString, aValueList )
-                    # self.thePropertyClist.append( aValueList )
-
         for x in aPropertyList:
-                   if x=='Substrate' or x=='Product' :
-                       print x
-                       for y in x:
-                           print y
-                           aValueList = list( tmpget( y ) )
-                           aValueList = tmpget( y )
-                           aValueList = tmpget( x )
-                    
-                           aName = aValueList[0]
-                           aValueList = aValueList[1:]
-                    
+            if x=='Substrate' or x=='Product' :
+                aValueList=tmpget(x)
+                for y in aValueList :
                     aValueList = map( toString, aValueList )
-                    
-                    self.thePropertyClist.append( aValueList) 
-                    
-                    
-                    print aValueList
-                    
-
-
+                    dValueList=[x,y]
+                    self.thePropertyClist.append( dValueList ) 
             else:
                 aValueList = tmpget( x )
                 aValueList = map( toString, aValueList )
-                    
                 self.thePropertyClist.append( aValueList )
-       
-
+                
+        #for x in aPropertyList:
+            #print x
+            #aValueList = list( tmpget( x ) )
+            #aValueList = map( toString, aValueList )
+            
+            #self.thePropertyClist.append( aValueList) 
+            
+            
 def toString( object ):
     return str( object )
     
