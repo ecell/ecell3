@@ -493,7 +493,10 @@ class StepperWindow(OsogoWindow):
 			if iter == None:
 				break
 			aProperty = self['property_list'].get_model().get_value(iter,0)
-			aValue = aStepperStub.getProperty( aProperty )
+			if aStepperStub.getAttributes()[GETABLE]:
+				aValue = str( aStepperStub.getProperty( aProperty ) )
+			else:
+				aValue = ''
 			self['property_list'].get_model().set_value(iter,1,aValue)
 
 		# updates text
