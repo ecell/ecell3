@@ -63,7 +63,7 @@ class PropertyWindow(OsogoPluginWindow):
 #        self.theClassName = aNameList[0]
         aClassName = aNameList[0]
 #        print 'Here', self.theClassName
-        self.theType = PRIMITIVETYPE_STRING_LIST[ self.theFullID()[TYPE] ]
+        self.theType = ENTITYTYPE_STRING_LIST[ self.theFullID()[TYPE] ]
         self.theID   = str( self.theFullID()[ID] )
         self.thePath = str( self.theFullID()[SYSTEMPATH] )
         aClassNameFullPN = convertFullIDToFullPN( self.theFullID(),

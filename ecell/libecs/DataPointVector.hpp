@@ -39,13 +39,13 @@
 namespace libecs
 {
 
-  /** @defgroup libecs_module The Libecs Module 
-   * This is the libecs module 
-   * @{ 
-   */ 
-
-
   DECLARE_TYPE( size_t, DataPointVectorIterator );
+
+
+  /**
+
+  \ingroup logging
+  */
 
   class DataPointVector
   {
@@ -92,8 +92,6 @@ namespace libecs
     DataPoint* theRawArray;
 
   };
-
-  /** @} */ //end of libecs_module 
 
 } // namespace libecs
 

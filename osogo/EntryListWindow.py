@@ -85,35 +85,35 @@ class EntryListWindow(Window):
             return
         
         aSelectedTypeMenuItem = self.theTypeMenu.get_active()
-        aPrimitiveTypeString = aSelectedTypeMenuItem.get_data( 'LABEL' )
+        aEntityTYpeString = aSelectedTypeMenuItem.get_data( 'LABEL' )
 
         aSystemFullID = aSelectedSystemLeafMap[0].get_data( 'FULLID' )
         #print aSystemFullID
         self.theEntryList.clear_items( 0,-1 )
 
-        if aPrimitiveTypeString == 'All':
+        if aEntityTYpeString == 'All':
             self.listEntity( 'Substance', aSystemFullID )
             self.listEntity( 'Reactor', aSystemFullID )
         else:
-            self.listEntity( aPrimitiveTypeString, aSystemFullID )
+            self.listEntity( aEntityTYpeString, aSystemFullID )
 
-    def listEntity( self, aPrimitiveTypeString, aSystemFullID ):
-        aListPN = aPrimitiveTypeString + 'List'
+    def listEntity( self, aEntityTYpeString, aSystemFullID ):
+        aListPN = aEntityTYpeString + 'List'
         aListFullPN = convertFullIDToFullPN( aSystemFullID, aListPN ) 
         aEntityList = self.theMainWindow.theSession.theSimulator.getProperty( createFullPNString( aListFullPN ) )
 
         for aEntityID in aEntityList:
             aListItem = gtk.GtkListItem( aEntityID )
             
-            if aPrimitiveTypeString == 'Substance':
-                aPrimitiveType = SUBSTANCE
-            elif aPrimitiveTypeString == 'Reactor':
-                aPrimitiveType = REACTOR
+            if aEntityTYpeString == 'Substance':
+                aEntityTYpe = SUBSTANCE
+            elif aEntityTYpeString == 'Reactor':
+                aEntityTYpe = REACTOR
 
             aSystemPath = createSystemPathFromFullID( aSystemFullID )
 
-            aEntityFullPN = ( aPrimitiveType, aSystemPath, aEntityID, '' )
-#            aEntityFullPN = ( aPrimitiveType, aSystemPath, aEntityID, 'Quantity' )
+            aEntityFullPN = ( aEntityTYpe, aSystemPath, aEntityID, '' )
+#            aEntityFullPN = ( aEntityTYpe, aSystemPath, aEntityID, 'Quantity' )
 
             aListItem.set_data( 'FULLPN', aEntityFullPN)
 #            aFullPNList = ( aEntityFullPN, )

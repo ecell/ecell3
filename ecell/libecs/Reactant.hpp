@@ -37,11 +37,10 @@
 namespace libecs
 {
 
-  /** @defgroup libecs_module The Libecs Module 
-   * This is the libecs module 
-   * @{ 
-   */ 
-  
+  /**
+
+  \ingroup entities
+  */
 
   class Reactant
   {
@@ -68,7 +67,6 @@ namespace libecs
 
   };
 
-  /** @} */ //end of libecs_module 
 
 } // namespace libecs
 

@@ -39,10 +39,10 @@
 namespace libecs
 {
 
-  /** @defgroup libecs_module The Libecs Module 
-   * This is the libecs module 
-   * @{ 
-   */ 
+  /** \defgroup exceptions The exceptions
+   * The exceptions.
+   * @{
+  */ 
   
 
   /// A macro to throw an exception, with method name
@@ -130,7 +130,7 @@ public:\
   // FullID errors
   DEFINE_EXCEPTION( BadID,                 Exception); 
   DEFINE_EXCEPTION( BadSystemPath,         BadID);
-  DEFINE_EXCEPTION( InvalidPrimitiveType,  BadID);
+  DEFINE_EXCEPTION( InvalidEntityType,  BadID);
 
 
 /**
@@ -145,7 +145,7 @@ public:\
 		       + ")." )
 
 
-  /** @} */ //end of libecs_module 
+  /** @} */ //end of exceptions module
 
 } // namespace libecs
 

@@ -31,64 +31,64 @@
 #include <assert.h>
 
 #include "Exceptions.hpp"
-#include "PrimitiveType.hpp"
+#include "EntityType.hpp"
 
 
 namespace libecs
 {
 
-  PrimitiveType::PrimitiveType( StringCref typestring )
+  EntityType::EntityType( StringCref typestring )
   {
-    if( typestring == PrimitiveTypeStringOfSubstance() )
+    if( typestring == EntityTypeStringOfSubstance() )
       {
 	theType = SUBSTANCE;
       }
-    else if( typestring == PrimitiveTypeStringOfReactor() )
+    else if( typestring == EntityTypeStringOfReactor() )
       {
 	theType = REACTOR;
       }
-    else if( typestring == PrimitiveTypeStringOfSystem() )
+    else if( typestring == EntityTypeStringOfSystem() )
       {
 	theType = SYSTEM;
       }
-    else if( typestring == PrimitiveTypeStringOfEntity() )
+    else if( typestring == EntityTypeStringOfEntity() )
       {
 	theType = ENTITY;
       }
     else
       {
-	THROW_EXCEPTION( InvalidPrimitiveType,
+	THROW_EXCEPTION( InvalidEntityType,
 			 "can't convert typestring [" + typestring
-			 + "] to PrimitiveType." );
+			 + "] to EntityType." );
       }
   }
 
-  PrimitiveType::PrimitiveType( const Int number )
+  EntityType::EntityType( const Int number )
     :
     theType( static_cast<const Type>( number ) )
   {
     if( number > 4 || number <= 0 )
       {
-	THROW_EXCEPTION( InvalidPrimitiveType,
-			 "Invalid PrimitiveType number" );
+	THROW_EXCEPTION( InvalidEntityType,
+			 "Invalid EntityType number" );
       }
   }
 
-  StringCref PrimitiveType::getString() const
+  StringCref EntityType::getString() const
   {
     switch( theType )
       {
       case SUBSTANCE:
-	return PrimitiveTypeStringOfSubstance();
+	return EntityTypeStringOfSubstance();
       case REACTOR:
-	return PrimitiveTypeStringOfReactor();
+	return EntityTypeStringOfReactor();
       case SYSTEM:
-	return PrimitiveTypeStringOfSystem();
+	return EntityTypeStringOfSystem();
       case ENTITY:
-	return PrimitiveTypeStringOfEntity();
+	return EntityTypeStringOfEntity();
       default:
-	THROW_EXCEPTION( InvalidPrimitiveType,
-			 "unexpected PrimitiveType::Type." );
+	THROW_EXCEPTION( InvalidEntityType,
+			 "unexpected EntityType::Type." );
       }
   }
 

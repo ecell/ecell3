@@ -42,10 +42,11 @@
 namespace libecs
 {
 
-  /** @defgroup libecs_module The Libecs Module 
-   * This is the libecs module 
-   * @{ 
-   */ 
+  /** \defgroup property The property module
+      The Property module.
+  */
+
+
   
   DECLARE_MAP( const String, PropertySlotPtr, 
 	       std::less<const String>, PropertySlotMap );
@@ -61,6 +62,8 @@ namespace libecs
 
      \see Message
      \see PropertySlot
+
+     \ingroup property
   */
 
   class PropertyInterface
@@ -185,8 +188,6 @@ namespace libecs
 
   };
   
-  /** @} */ //end of libecs_module 
-
 } // namespace libecs
 
 #endif /* __PROPERTYINTERFACE_HPP */

@@ -31,7 +31,7 @@
 #ifndef ___SUBSTANCE_H___
 #define ___SUBSTANCE_H___
 #include "libecs.hpp"
-#include "PrimitiveType.hpp"
+#include "EntityType.hpp"
 #include "Integrators.hpp"
 #include "Entity.hpp"
 #include "System.hpp"
@@ -40,13 +40,10 @@
 namespace libecs
 {
 
-  /** @defgroup libecs_module The Libecs Module 
-   * This is the libecs module 
-   * @{ 
-   */ 
-  
   /**
      Substance class is used to represent molecular species.
+
+     \ingroup entities
   */
 
   class Substance : public Entity
@@ -71,9 +68,9 @@ namespace libecs
 
     static SubstancePtr createInstance() { return new Substance; }
 
-    virtual const PrimitiveType getPrimitiveType() const
+    virtual const EntityType getEntityType() const
     {
-      return PrimitiveType( PrimitiveType::SUBSTANCE );
+      return EntityType( EntityType::SUBSTANCE );
     }
 
 
@@ -273,7 +270,6 @@ namespace libecs
     bool theFixed;
   };
 
-  /** @} */ //end of libecs_module 
 
 } // namespace libecs
 

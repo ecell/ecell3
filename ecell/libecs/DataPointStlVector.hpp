@@ -42,17 +42,15 @@
 namespace libecs
 {
 
-  /** @defgroup libecs_module The Libecs Module 
-   * This is the libecs module 
-   * @{ 
-   */ 
-  
-  /**
-
-   */
   DECLARE_CLASS(DataPointStlVector);
   DECLARE_TYPE(DataPoint,Containee);
   DECLARE_VECTOR(Containee,Container);
+
+
+  /**
+
+  \ingroup logging
+   */
 
   class DataPointStlVector
   {
@@ -192,8 +190,6 @@ namespace libecs
 
 
   };
-
-  /** @} */ //end of libecs_module 
 
 } // namespace libecs
 

@@ -33,20 +33,21 @@
 #include <string>
 
 #include "libecs.hpp"
-#include "PrimitiveType.hpp"
+#include "EntityType.hpp"
 
 
 namespace libecs
 {
 
-  /** @defgroup libecs_module The Libecs Module 
-   * This is the libecs module 
+  /** \defgroup identifier The Identifier Module.
+   * The identifier module.
    * @{ 
    */ 
   
   /** 
       SystemPath 
   */
+
   class SystemPath : public StringList
   {
 
@@ -105,31 +106,31 @@ namespace libecs
 
   /**
      FullID is an identifier of a unique Entiy in a cell model.
-     The FullID consists of a PrimitiveType, a SystemPath and an ID string.
+     The FullID consists of a EntityType, a SystemPath and an ID string.
 
-     @see PrimitiveType, SystemPath
+     @see EntityType, SystemPath
   */
   class FullID
   {
 
   public:
 
-    FullID( const PrimitiveType type,
+    FullID( const EntityType type,
 	    SystemPathCref systempath,
 	    StringCref id )
       :
-      thePrimitiveType( type ),
+      theEntityType( type ),
       theSystemPath( systempath ),
       theID( id )
     {
       ; // do nothing
     }
 
-    explicit FullID( const PrimitiveType type,
+    explicit FullID( const EntityType type,
 		     StringCref systempathstring,
 		     StringCref id )
       :
-      thePrimitiveType( type ),
+      theEntityType( type ),
       theSystemPath( systempathstring ),
       theID( id )
     {
@@ -143,7 +144,7 @@ namespace libecs
 
     FullID( FullIDCref fullid )
       :
-      thePrimitiveType( fullid.getPrimitiveType() ),
+      theEntityType( fullid.getEntityType() ),
       theSystemPath( fullid.getSystemPath() ),
       theID( fullid.getID() )
     {
@@ -153,9 +154,9 @@ namespace libecs
 
     ~FullID() {}
   
-    const PrimitiveType  getPrimitiveType() const 
+    const EntityType  getEntityType() const 
     { 
-      return thePrimitiveType; 
+      return theEntityType; 
     }
 
     const SystemPathCref getSystemPath()    const 
@@ -169,9 +170,9 @@ namespace libecs
     }
 
 
-    void setPrimitiveType( const PrimitiveType type )
+    void setEntityType( const EntityType type )
     {
-      thePrimitiveType = type;
+      theEntityType = type;
     }
 
     void setSystemPath( SystemPathCref systempath ) 
@@ -190,10 +191,10 @@ namespace libecs
 
     bool operator<( FullIDCref rhs ) const
     {
-      // first look at the PrimitiveType
-      if( getPrimitiveType() != rhs.getPrimitiveType() )
+      // first look at the EntityType
+      if( getEntityType() != rhs.getEntityType() )
 	{
-	  return getPrimitiveType() < rhs.getPrimitiveType();
+	  return getEntityType() < rhs.getEntityType();
 	}
 
       // then compare the SystemPaths
@@ -209,8 +210,8 @@ namespace libecs
 
     bool operator==( FullIDCref rhs ) const
     {
-      // first look at the PrimitiveType
-      if( getPrimitiveType() != rhs.getPrimitiveType() )
+      // first look at the EntityType
+      if( getEntityType() != rhs.getEntityType() )
 	{
 	  return false;
 	}
@@ -244,7 +245,7 @@ namespace libecs
 
   private:
 
-    PrimitiveType thePrimitiveType;
+    EntityType theEntityType;
     SystemPath    theSystemPath;
     String        theID;
 
@@ -255,7 +256,7 @@ namespace libecs
 
   public:
 
-    FullPN( const PrimitiveType type, 
+    FullPN( const EntityType type, 
 	    SystemPathCref systempath,
 	    StringCref id,
 	    StringCref propertyname )
@@ -295,9 +296,9 @@ namespace libecs
       return theFullID;
     }
 
-    const PrimitiveType  getPrimitiveType() const 
+    const EntityType  getEntityType() const 
     { 
-      return getFullID().getPrimitiveType(); 
+      return getFullID().getEntityType(); 
     }
 
     const SystemPathCref getSystemPath()    const
@@ -315,9 +316,9 @@ namespace libecs
       return thePropertyName;
     }
 
-    void setPrimitiveType( const PrimitiveType type )
+    void setEntityType( const EntityType type )
     {
-      theFullID.setPrimitiveType( type );
+      theFullID.setEntityType( type );
     }
 
     void setSystemPath( SystemPathCref systempath ) 
@@ -372,7 +373,7 @@ namespace libecs
 
   };
 
-  /** @} */ //end of libecs_module 
+  /** @} */ // identifier module
 
 } // namespace libecs
 

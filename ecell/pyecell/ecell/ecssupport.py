@@ -10,9 +10,9 @@ def createFullID( fullidstring ):
 
     aFullID = string.split( fullidstring, ':' )
     try:
-        aFullID[0] = PRIMITIVETYPE_DICT[aFullID[0]]
+        aFullID[0] = ENTITYTYPE_DICT[aFullID[0]]
     except IndexError:
-        raise ValueError( "Invalid PrimitiveType string (%s)." % aFullID[0] )
+        raise ValueError( "Invalid EntityTYpe string (%s)." % aFullID[0] )
     validateFullID( aFullID )
     return  tuple( aFullID )
 
@@ -21,9 +21,9 @@ def createFullPN( fullpnstring ):
 
     aFullPN = string.split( fullpnstring, ':' )
     try:
-        aFullPN[0] = PRIMITIVETYPE_DICT[aFullPN[0]]
+        aFullPN[0] = ENTITYTYPE_DICT[aFullPN[0]]
     except IndexError:
-        raise ValueError( "Invalid PrimitiveType string (%s)." %\
+        raise ValueError( "Invalid EntityTYpe string (%s)." %\
                           aFullPN[0] )
     validateFullPN( aFullPN )
     return tuple( aFullPN )
@@ -32,14 +32,14 @@ def createFullPN( fullpnstring ):
 def createFullIDString( fullid ):
 
     validateFullID( fullid )
-    aTypeString = PRIMITIVETYPE_STRING_LIST[int(fullid[0])]
+    aTypeString = ENTITYTYPE_STRING_LIST[int(fullid[0])]
     return aTypeString + ':' + string.join( fullid[1:], ':' )
 
 
 def createFullPNString( fullpn ):
 
     validateFullPN( fullpn )
-    aTypeString = PRIMITIVETYPE_STRING_LIST[fullpn[0]]
+    aTypeString = ENTITYTYPE_STRING_LIST[fullpn[0]]
     return aTypeString + ':' + string.join( fullpn[1:], ':' )
 
 

@@ -39,11 +39,10 @@
 namespace libecs
 {
 
-  /** @defgroup libecs_module The Libecs Module 
-   * This is the libecs module 
-   * @{ 
-   */ 
-  
+  /**
+
+  \ingroup logging 
+  */
 
   class DataPoint
   {
@@ -188,6 +187,13 @@ namespace libecs
 
   };
 
+
+  /**
+
+  \internal 
+
+  \ingroup logging
+  */
 
   class DataInterval 
   {

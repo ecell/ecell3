@@ -37,7 +37,7 @@
 namespace libecs
 {
 
-  /** @defgroup libecs_module The Libecs Module 
+  /* *defgroup libecs_module The Libecs Module 
    * This is the libecs module 
    * @{ 
    */ 

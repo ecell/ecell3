@@ -40,11 +40,6 @@
 namespace libecs
 {
 
-  /** @defgroup libecs_module The Libecs Module 
-   * This is the libecs module 
-   * @{ 
-   */ 
-  
   // Tree data structures used for entry lists
   DECLARE_MAP( const String, SubstancePtr, 
 	       std::less<const String>, SubstanceMap );
@@ -53,6 +48,11 @@ namespace libecs
   DECLARE_MAP( const String, SystemPtr,    
 	       std::less<const String>, SystemMap );
 
+
+  /**
+
+  \ingroup entities
+  */
 
   class System 
     : 
@@ -68,9 +68,9 @@ namespace libecs
     System();
     virtual ~System();
 
-    virtual const PrimitiveType getPrimitiveType() const
+    virtual const EntityType getEntityType() const
     {
-      return PrimitiveType( PrimitiveType::SYSTEM );
+      return EntityType( EntityType::SYSTEM );
     }
 
     virtual void initialize();

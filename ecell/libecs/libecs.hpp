@@ -37,7 +37,7 @@
 namespace libecs
 {
 
-  /** @defgroup libecs_module The Libecs Module 
+  /* *defgroup libecs_module The Libecs Module 
    * This is the libecs module 
    * @{ 
    */ 
@@ -58,7 +58,7 @@ namespace libecs
   DECLARE_CLASS( AccumulatorMaker );
   DECLARE_CLASS( Accumulator );
   DECLARE_CLASS( Entity );
-  DECLARE_CLASS( PrimitiveType );
+  DECLARE_CLASS( EntityType );
   DECLARE_CLASS( SystemPath );
   DECLARE_CLASS( FullID );
   DECLARE_CLASS( FullPN );
@@ -106,7 +106,7 @@ namespace libecs
   DECLARE_CLASS( BadMessage );
   DECLARE_CLASS( NoMethod );
   DECLARE_CLASS( NoSlot );
-  DECLARE_CLASS( InvalidPrimitiveType );
+  DECLARE_CLASS( InvalidEntityType );
 
 
 

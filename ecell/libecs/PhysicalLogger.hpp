@@ -41,11 +41,11 @@
 namespace libecs
 {
 
-  /** @defgroup libecs_module The Libecs Module 
-   * This is the libecs module 
-   * @{ 
-   */ 
-  
+
+  /**
+
+  \ingroup logging
+  */
 
   class PhysicalLogger
   {

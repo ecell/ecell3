@@ -41,18 +41,16 @@
 namespace libecs
 {
 
-  /** @defgroup libecs_module The Libecs Module 
-   * This is the libecs module 
-   * @{ 
-   */ 
-  
   DECLARE_ASSOCVECTOR( String, Reactant, std::less< const String >, 
 		       ReactantMap  );
 
   /**
      Reactor class is used to represent chemical and other phenonema which 
      may or may not result in change in quantity of one or more Substances.
+
+     \ingroup entities
   */
+
   class Reactor 
     : 
     public Entity
@@ -97,9 +95,9 @@ namespace libecs
     Reactor();
     virtual ~Reactor();
 
-    virtual const PrimitiveType getPrimitiveType() const
+    virtual const EntityType getEntityType() const
     {
-      return PrimitiveType( PrimitiveType::REACTOR );
+      return EntityType( EntityType::REACTOR );
     }
 
     virtual void initialize();
@@ -178,9 +176,9 @@ namespace libecs
       Every Reactor that instantiated by ReactorMaker must have
       a this type of function which returns a instance of that Reactor.
   */
+
   typedef ReactorPtr (*ReactorAllocatorFunc)();
 
-  /** @} */ //end of libecs_module \
 
 } // namespace libecs
 

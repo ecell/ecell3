@@ -17,8 +17,8 @@ class FullID( tuple ):
             raise ValueError( 'FullID has 3 fields. ( %d given )'
                               % len( aSequence ) )
 
-    def getPrimitiveTypeString( self ):
-        return PRIMITIVETYPE_STRING_LIST[ int( self[ TYPE ] ) ]
+    def getEntityTYpeString( self ):
+        return ENTITYTYPE_STRING_LIST[ int( self[ TYPE ] ) ]
 
     def getSystemPathString( self ):
         return self[ SYSTEMPATH ].getString()
@@ -33,7 +33,7 @@ class FullID( tuple ):
         return createFullPN( tuple( self[ : 3 ] ) + ( aPropertyName , ) )
 
     def getString( self ):
-        aTypeString = self.getPrimitiveTypeString()
+        aTypeString = self.getEntityTYpeString()
         aSystemPathString = self.getSystemPathString()
         return aTypeString + ':' + \
                aSystemPathString + ':' + \
@@ -44,7 +44,7 @@ class FullID( tuple ):
             return createSystemPath( self[ SYSTEMPATH ] + ( self[ ID ] , ) )
         else:
             raise TypeError( 'can not convert FullID of %s type entity'
-                             ' to SystemPath' % self.getPrimitiveTypeString() )
+                             ' to SystemPath' % self.getEntityTYpeString() )
 
     def getSuperSystemFullID( self ):
         return self[ SYSTEMPATH ].getFullID()
@@ -156,9 +156,9 @@ def convertToFullIDList( aValue ):
         if isinstance( aValue , str ):
             aList = string.split( aValue, ':' )
             try:
-                aList[ 0 ] = PRIMITIVETYPE_DICT[ aList[ 0 ] ]
+                aList[ 0 ] = ENTITYTYPE_DICT[ aList[ 0 ] ]
             except IndexError:
-                raise ValueError( 'Invalid PrimitiveType string (%s).'
+                raise ValueError( 'Invalid EntityTYpe string (%s).'
                                   % aList[ 0 ] )
             return aList
 

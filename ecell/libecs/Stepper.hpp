@@ -47,7 +47,7 @@
 namespace libecs
 {
 
-  /** @defgroup libecs_module The Libecs Module 
+  /* *defgroup libecs_module The Libecs Module 
    * This is the libecs module 
    * @{ 
    */ 
@@ -170,6 +170,15 @@ namespace libecs
     }
 
     /**
+
+    This may be overridden in dynamically scheduled steppers.
+
+    */
+
+    void setStepInterval( RealCref aStepInterval );
+
+
+    /**
        Get the step interval of this Stepper.
 
        The step interval is a length of time that this Stepper proceeded
@@ -280,14 +289,6 @@ namespace libecs
     {
       theCurrentTime = aTime;
     }
-
-    /**
-
-    This may be overridden in dynamically scheduled steppers.
-
-    */
-
-    void setStepInterval( RealCref aStepInterval );
 
     void calculateStepsPerSecond();
 

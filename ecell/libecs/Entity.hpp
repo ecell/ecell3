@@ -32,15 +32,15 @@
 #define ___ENTITY_H___
 
 #include "libecs.hpp"
-#include "PrimitiveType.hpp"
+#include "EntityType.hpp"
 #include "PropertyInterface.hpp"
 
 
 namespace libecs
 {
 
-  /** @defgroup libecs_module The Libecs Module 
-   * This is the libecs module 
+  /** \defgroup entities The Entities.
+   * Entities.
    * @{ 
    */ 
   
@@ -82,17 +82,17 @@ namespace libecs
 
 
     /**
-       Get PrimitiveType of this Entity.
+       Get EntityType of this Entity.
 
        This method is overridden in Substance, Reactor and System classes.
 
-       \return PrimitiveType of this Entity object.
-       \see PrimitiveType
+       \return EntityType of this Entity object.
+       \see EntityType
     */
 
-    virtual const PrimitiveType getPrimitiveType() const
+    virtual const EntityType getEntityType() const
     {
-      return PrimitiveType( PrimitiveType::ENTITY );
+      return EntityType( EntityType::ENTITY );
     }
 
 
@@ -290,7 +290,7 @@ namespace libecs
     String    theName;
   };
 
-  /** @} */ //end of libecs_module 
+  /** @} */ // entities
 
 } // namespace libecs
 

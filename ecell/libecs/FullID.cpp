@@ -152,7 +152,7 @@ namespace libecs
 
     String aTypeString( aString.substr( aFieldStart, 
 					aFieldEnd - aFieldStart ) );
-    thePrimitiveType = PrimitiveType( aTypeString );
+    theEntityType = EntityType( aTypeString );
     
     aFieldStart = aFieldEnd + 1;
     aFieldEnd = aString.find_first_of( DELIMITER, aFieldStart );
@@ -178,7 +178,7 @@ namespace libecs
 
   const String FullID::getString() const
   {
-    return thePrimitiveType.getString() + FullID::DELIMITER 
+    return theEntityType.getString() + FullID::DELIMITER 
       + theSystemPath.getString() + FullID::DELIMITER + theID;
   }
 
@@ -273,7 +273,7 @@ main()
     {
       FullID aFullID( "       \t  \n  Substance:/A/B:S   \t   \n" );
       cout << aFullID.getString() << endl;
-      cout << aFullID.getPrimitiveType() << endl;
+      cout << aFullID.getEntityType() << endl;
       cout << aFullID.getSystemPath().getString() << endl;
       cout << aFullID.getID() << endl;
       cout << aFullID.isValid() << endl;
@@ -292,7 +292,7 @@ main()
       FullPN 
 	aFullPN( "       \t  \n  Substance:/A/B:S:PNAME   \t   \n" );
       cout << aFullPN.getString() << endl;
-      cout << aFullPN.getPrimitiveType() << endl;
+      cout << aFullPN.getEntityType() << endl;
       cout << aFullPN.getSystemPath().getString() << endl;
       cout << aFullPN.getID() << endl;
       cout << aFullPN.getPropertyName() << endl;
@@ -314,7 +314,7 @@ main()
 
 }
 
-// g++ -I.. -I../.. FullID.cpp PrimitiveType.cpp Util.cpp -DTEST_FULLID ../../korandom/.libs/libkorandom.a 
+// g++ -I.. -I../.. FullID.cpp EntityType.cpp Util.cpp -DTEST_FULLID ../../korandom/.libs/libkorandom.a 
 
 #endif /* TEST_FULLID */
 

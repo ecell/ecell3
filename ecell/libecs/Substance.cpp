@@ -33,7 +33,7 @@
 #include "Accumulators.hpp"
 #include "AccumulatorMaker.hpp"
 #include "Model.hpp"
-#include "PrimitiveType.hpp"
+#include "EntityType.hpp"
 #include "PropertySlotMaker.hpp"
 
 #include "Substance.hpp"

@@ -100,21 +100,21 @@ namespace libecs
     SystemPtr    aSystemPtr   ( NULLPTR );
     SubstancePtr aSubstancePtr( NULLPTR );
 
-    switch( aFullID.getPrimitiveType() )
+    switch( aFullID.getEntityType() )
       {
-      case PrimitiveType::SUBSTANCE:
+      case EntityType::SUBSTANCE:
 	aSubstancePtr = getSubstanceMaker().make( aClassname );
 	aSubstancePtr->setID( aFullID.getID() );
 	aSubstancePtr->setName( aName );
 	aContainerSystemPtr->registerSubstance( aSubstancePtr );
 	break;
-      case PrimitiveType::REACTOR:
+      case EntityType::REACTOR:
 	aReactorPtr = getReactorMaker().make( aClassname );
 	aReactorPtr->setID( aFullID.getID() );
 	aReactorPtr->setName( aName );
 	aContainerSystemPtr->registerReactor( aReactorPtr );
 	break;
-      case PrimitiveType::SYSTEM:
+      case EntityType::SYSTEM:
 	aSystemPtr = getSystemMaker().make( aClassname );
 	aSystemPtr->setID( aFullID.getID() );
 	aSystemPtr->setName( aName );
@@ -122,8 +122,8 @@ namespace libecs
 	break;
 
       default:
-	THROW_EXCEPTION( InvalidPrimitiveType,
-			 "bad PrimitiveType specified." );
+	THROW_EXCEPTION( InvalidEntityType,
+			 "bad EntityType specified." );
 
       }
 
@@ -191,20 +191,20 @@ namespace libecs
 
     SystemPtr aSystem ( getSystem( aSystemPath ) );
 
-    switch( aFullID.getPrimitiveType() )
+    switch( aFullID.getEntityType() )
       {
-      case PrimitiveType::SUBSTANCE:
+      case EntityType::SUBSTANCE:
 	anEntity = aSystem->getSubstance( aFullID.getID() );
 	break;
-      case PrimitiveType::REACTOR:
+      case EntityType::REACTOR:
 	anEntity = aSystem->getReactor(   aFullID.getID() );
 	break;
-      case PrimitiveType::SYSTEM:
+      case EntityType::SYSTEM:
 	anEntity = aSystem->getSystem(    aFullID.getID() );
 	break;
       default:
-	THROW_EXCEPTION( InvalidPrimitiveType,
-			 "bad PrimitiveType specified." );
+	THROW_EXCEPTION( InvalidEntityType,
+			 "bad EntityType specified." );
       }
 
     return anEntity;

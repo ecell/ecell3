@@ -28,20 +28,21 @@
 // E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
 
-#ifndef __PRIMITIVETYPE_HPP 
-#define __PRIMITIVETYPE_HPP 
+#ifndef __ENTITYTYPE_HPP 
+#define __ENTITYTYPE_HPP 
 
 #include "libecs.hpp"
 
 namespace libecs
 {
 
-  /** @defgroup libecs_module The Libecs Module 
-   * This is the libecs module 
-   * @{ 
-   */ 
-  
-  class PrimitiveType
+
+  /**
+
+  \ingroup entities
+  */
+
+  class EntityType
   {
 
   public:
@@ -54,25 +55,25 @@ namespace libecs
 	SYSTEM    = 4
       };
 
-    PrimitiveType( StringCref typestring );
+    EntityType( StringCref typestring );
 
-    PrimitiveType( const Int number );
+    EntityType( const Int number );
 
-    PrimitiveType( const Type type )
+    EntityType( const Type type )
       :
       theType( type )
     {
       ; // do nothing
     }
 
-    PrimitiveType( PrimitiveTypeCref primitivetype )
+    EntityType( EntityTypeCref primitivetype )
       :
       theType( primitivetype.getType() )
     {
       ; // do nothing
     }
 
-    PrimitiveType()
+    EntityType()
       :
       theType( ENTITY )
     {
@@ -101,7 +102,7 @@ namespace libecs
     //      return static_cast<const Int&>( getType() ); 
     //    }
 
-    bool operator<( PrimitiveTypeCref rhs ) const
+    bool operator<( EntityTypeCref rhs ) const
     {
       return theType < rhs.getType();
     }
@@ -111,7 +112,7 @@ namespace libecs
       return theType < rhs;
     }
 
-    bool operator==( PrimitiveTypeCref rhs ) const
+    bool operator==( EntityTypeCref rhs ) const
     {
       return theType == rhs.getType();
     }
@@ -122,25 +123,25 @@ namespace libecs
     }
 
 
-    inline static StringCref  PrimitiveTypeStringOfEntity()
+    inline static StringCref  EntityTypeStringOfEntity()
     {
       const static String aString( "Entity" );
       return aString;
     }
 
-    inline static StringCref  PrimitiveTypeStringOfReactor()
+    inline static StringCref  EntityTypeStringOfReactor()
     {
       const static String aString( "Reactor" );
       return aString;
     }
     
-    inline static StringCref  PrimitiveTypeStringOfSubstance()
+    inline static StringCref  EntityTypeStringOfSubstance()
     {
       const static String aString( "Substance" );
       return aString;
     }
     
-    inline static StringCref  PrimitiveTypeStringOfSystem()
+    inline static StringCref  EntityTypeStringOfSystem()
     { 
       const static String aString( "System" );
       return aString;
@@ -152,9 +153,7 @@ namespace libecs
 
   };
 
-  /** @} */ //end of libecs_module 
-  
 } // namespace libecs
 
 
-#endif /* __PRIMITIVETYPE_HPP */
+#endif /* __ENTITYTYPE_HPP */

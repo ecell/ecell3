@@ -39,8 +39,8 @@
 namespace libecs
 {
 
-  /** @defgroup libecs_module The Libecs Module 
-   * This is the libecs module 
+  /** \defgroup uvariable The UVariable.
+   * The UVariable
    * @{ 
    */ 
   
@@ -302,7 +302,7 @@ namespace libecs
 
   };
 
-  /** @} */ //end of libecs_module 
+  // @} // uvariable
 
 } // namespace libecs
 

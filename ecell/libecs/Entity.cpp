@@ -100,7 +100,7 @@ namespace libecs
 
   const FullID Entity::getFullID() const
   {
-    return FullID( getPrimitiveType(), getSystemPath(), getID() );
+    return FullID( getEntityType(), getSystemPath(), getID() );
   }
 
   const String Entity::getFullIDString() const

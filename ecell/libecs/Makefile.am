@@ -34,7 +34,7 @@ Integrators.cpp\
 SubstanceMaker.cpp\
 Stepper.cpp\
 Model.cpp\
-PrimitiveType.cpp\
+EntityType.cpp\
 System.cpp\
 Entity.cpp\
 Reactor.cpp\
@@ -66,7 +66,7 @@ Integrators.hpp\
 SubstanceMaker.hpp\
 Stepper.hpp\
 Model.hpp\
-PrimitiveType.hpp\
+EntityType.hpp\
 System.hpp\
 Entity.hpp\
 Reactor.hpp\

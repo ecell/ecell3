@@ -34,7 +34,7 @@
 
 #include "libecs/libecs.hpp"
 #include "libecs/Message.hpp"
-#include "libecs/PrimitiveType.hpp"
+#include "libecs/EntityType.hpp"
 
 #include "libemc.hpp"
 #include "EmcLogger.hpp"

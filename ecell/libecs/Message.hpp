@@ -44,18 +44,16 @@
 namespace libecs
 {
 
-  /** @defgroup libecs_module The Libecs Module 
-   * This is the libecs module 
-   * @{ 
-   */ 
-  
   /**
      A data packet for communication among C++ objects consisting
      of a keyword and a body. The body is a list of UVariables.
 
-     @see PropertyInterface
-     @see PropertySlot
+     \see PropertyInterface
+     \see PropertySlot
+
+     \ingroup property
   */
+
   class Message
   {
 
@@ -111,7 +109,6 @@ namespace libecs
 
   };
 
-  /** @} */ //end of libecs_module 
 
 } // namespace libecs
 

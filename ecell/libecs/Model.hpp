@@ -42,8 +42,8 @@
 namespace libecs
 {
 
-  /** @defgroup libecs_module The Libecs Module 
-   * This is the libecs module 
+  /** \defgroup model The Model.
+   * The model.
    * @{ 
    */ 
 
@@ -284,7 +284,8 @@ namespace libecs
 
   };
 
-
+  
+  //@{ 
 
 } // namespace libecs
 

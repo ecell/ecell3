@@ -44,8 +44,8 @@ namespace libecs
 {
 
 
-  /** @defgroup libecs_module The Libecs Module 
-   * This is the libecs module 
+  /** \defgroup logging The Data Logging Module.
+   * The Data Logging Module.
    * @{ 
    */ 
 
@@ -204,7 +204,7 @@ namespace libecs
   };
 
 
-  /** @} */ //end of libecs_module 
+  /** @} */ // logging module
 
 } // namespace libecs
 
