@@ -132,8 +132,6 @@ namespace libecs
     theModel( NULLPTR ),
     theCurrentTime( 0.0 ),
     theStepInterval( 0.001 ),
-    theTolerantStepInterval( 0.001 ),
-    theNextStepInterval( 0.001 ),
     theUserMinInterval( std::numeric_limits<Real>::min() * 10 ),
     theUserMaxInterval( std::numeric_limits<Real>::max() * .1 ),
     theSlaveStepper( NULLPTR )
@@ -183,7 +181,6 @@ namespace libecs
       std::lower_bound( theProcessCache.begin(), theProcessCache.end(),	0,
 			Process::PriorityCompare() );
 
-
     //
     // Update theVariableCache
     //
@@ -221,7 +218,6 @@ namespace libecs
     
   }
 
-
   const Polymorph Stepper::getSystemList() const
   {
     PolymorphVector aVector;
@@ -239,7 +235,6 @@ namespace libecs
 
     return aVector;
   }
-
 
   void Stepper::registerSystem( SystemPtr aSystem )
   { 
@@ -366,8 +361,6 @@ namespace libecs
     FOR_ALL( PropertySlotVector, theLoggedPropertySlotVector, updateLogger );
   }
 
-
-
   const Polymorph Stepper::getVariableCache() const
   {
     PolymorphVector aVector;
@@ -396,7 +389,6 @@ namespace libecs
     return aVector;
   }
   
-
   const UnsignedInt Stepper::findInVariableCache( VariablePtr aVariable )
   {
     VariableVectorConstIterator
@@ -429,12 +421,12 @@ namespace libecs
     //
     // Process::clear() ?
     //
-    //FOR_ALL( ,, clear );
+    //    FOR_ALL( ,, clear );
       
     //
     // System::clear() ?
     //
-    //FOR_ALL( ,, clear );
+    //    FOR_ALL( ,, clear );
   }
 
   void Stepper::process()
@@ -450,7 +442,6 @@ namespace libecs
     std::for_each( theProcessCache.begin(), theFirstNormalProcess, 
 		   std::mem_fun( &Process::process ) );
   }
-
 
   void Stepper::processNormal()
   {
@@ -500,11 +491,49 @@ namespace libecs
       }
   }
 
-  void Stepper::updateVelocityBuffer()
+
+  ////////////////////////// DEStepper
+
+
+  DEStepper::DEStepper()
+    :
+    theTolerantStepInterval( 0.001 ),
+    theNextStepInterval( 0.001 )
   {
+    ; // do nothing
+  }
+
+  void DEStepper::initialize()
+  {
+    Stepper::initialize();
+
+    setNextStepInterval( getStepInterval() );
+  }
+
+
+  ////////////////////////// FixedEuler1Stepper
+
+
+  FixedEuler1Stepper::FixedEuler1Stepper()
+  {
+    ; // do nothing
+  }
+
+  void FixedEuler1Stepper::step()
+  {
+    const UnsignedInt aSize( theVariableCache.size() );
+
+    integrate();
+    slave();
+
+    processNegative();
+    log();
+
+    clear();
+    processNormal();
+
     setStepInterval( getNextStepInterval() );
 
-    const UnsignedInt aSize( theVariableCache.size() );
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
 	VariablePtr const aVariable( theVariableCache[ c ] );
@@ -515,7 +544,7 @@ namespace libecs
 	while( aVariable->checkRange( getStepInterval() ) == false )
 	  {
 	    // don't use setStepInterval()
-	    loadStepInterval( getStepInterval()*0.5 );
+	    loadStepInterval( getStepInterval() * 0.5 );
 	  }
       }
 
@@ -530,34 +559,8 @@ namespace libecs
   }
 
 
-
-  ////////////////////////// FixedEuler1Stepper
-
-  FixedEuler1Stepper::FixedEuler1Stepper()
-  {
-    ; // do nothing
-  }
-
-  void FixedEuler1Stepper::step()
-  {
-    integrate();
-    slave();
-
-    processNegative();
-    log();
-
-    clear();
-    processNormal();
-
-
-    //FIXME: temporary workaround to a bug. should be removed.
-    setNextStepInterval( getStepInterval() );
-
-    updateVelocityBuffer();
-  }
-
-
   ////////////////////////// FixedRungeKutta4Stepper
+
 
   FixedRungeKutta4Stepper::FixedRungeKutta4Stepper()
   {
@@ -617,7 +620,6 @@ namespace libecs
 	aVariable->setVelocity( 0 );
       }
 
-
     // ========= 3 ===========
     processNormal();
     for( UnsignedInt c( 0 ); c < aSize; ++c )
@@ -633,7 +635,6 @@ namespace libecs
 	// clear velocity
 	aVariable->setVelocity( 0 );
       }
-
 
     // ========= 4 ===========
     processNormal();
@@ -653,13 +654,11 @@ namespace libecs
 	theVelocityBuffer[ c ] *= ( 1.0 / 6.0 );
 	aVariable->setVelocity( theVelocityBuffer[ c ] );
       }
-    
-    // don't call updateVelocityBuffer() -- it is already updated by
-    // the algorithm.
   }
 
 
   ////////////////////////// Euler1Stepper
+
 
   Euler1Stepper::Euler1Stepper()
   {
@@ -668,20 +667,12 @@ namespace libecs
 
   void Euler1Stepper::initialize()
   {
-    Stepper::initialize();
-
-    //    setUserMaxInterval( 0.001 );
+    DEStepper::initialize();
   }
 
   void Euler1Stepper::step()
   {
-    integrate();
-    slave();
-
-    processNegative();
-
-    log();
-    clear();
+    const UnsignedInt aSize( theVariableCache.size() );
 
     // don't expect too much from euler
     const Real eps_abs( 1.0e-6 );
@@ -691,14 +682,15 @@ namespace libecs
 
     const Real safety( 0.9 );
 
-    const UnsignedInt aSize( theVariableCache.size() );
+    integrate();
+    slave();
+
+    processNegative();
+
+    log();
+    clear();
 
     setStepInterval( getNextStepInterval() );
-
-    Real delta, delta_max;
-    Real aTolerance, anError;
-    Real aStepInterval;
-
 
     while( 1 )
       {
@@ -710,20 +702,23 @@ namespace libecs
 	  {
 	    VariablePtr const aVariable( theVariableCache[ c ] );
 
-	    // get k1
 	    const Real aVelocity( aVariable->getVelocity() );
+
+	    // get k1
 	    theVelocityBuffer[ c ] = aVelocity;
 
-	    aVariable->loadValue( aVelocity * .5 * getStepInterval() 
-				  + theValueBuffer[ c ] );
+	    aVariable->loadValue( aVelocity * .5 * getStepInterval() + theValueBuffer[ c ] );
+
+	    // clear velocity
 	    aVariable->setVelocity( 0 );
 	  }
 
 	// ========= 2 ===========
 	processNormal();
 
-	delta_max = 0.0;
+	Real maxError( 0.0 );
 
+	// restore theValueBuffer
 	for( UnsignedInt c( 0 ); c < aSize; ++c )
 	  {
 	    VariablePtr const aVariable( theVariableCache[ c ] );
@@ -731,69 +726,68 @@ namespace libecs
 	    // get k2 = f(x+h/2, y+k1*h/2)
 	    const Real aVelocity( aVariable->getVelocity() );
 
-  	    aTolerance = 
-	      eps_abs + eps_rel * 
-	      ( a_y * fabs(theValueBuffer[ c ]) + 
-		a_dydt * fabs(theVelocityBuffer[ c ]) );
+	    // ( k1 + k2 ) / 2 for ~Yn+1
+	    const Real anErrorEstimate( ( theVelocityBuffer[ c ] + aVelocity ) * 0.5 );
 
-	    anError = theVelocityBuffer[ c ] - aVelocity;
-	    delta = fabs(anError / aTolerance);
+  	    const Real aTolerance( eps_rel * ( a_y * fabs( theValueBuffer[ c ] ) + a_dydt * fabs( theVelocityBuffer[ c ] ) + eps_abs ) );
 
-	    if( delta > delta_max )
+	    const Real anError( fabs( ( theVelocityBuffer[ c ] - anErrorEstimate ) / aTolerance ) );
+
+	    if( anError > maxError )
 	      {
-		delta_max = delta;
+		maxError = anError;
 		
-		// shrink it if the error exceeds 110%
-		if( delta_max > 1.1 )
+		if( maxError > 1.1 )
 		  {
-		    setStepInterval( getStepInterval() * 0.5 );
-		    //      		    setStepInterval( getStepInterval() * pow(delta_max, -1.0) *  safety );
+		    // shrink it if the error exceeds 110%
+		    //		    setStepInterval( getStepInterval() * pow(maxError, -1.0) *  safety );
 
-		    //		    		    std::cerr << "s " << getCurrentTime() << ' ' 
+		    setStepInterval( getStepInterval() * 0.5 );
+
+		    //		    std::cerr << "s " << getCurrentTime() << ' ' 
 		    //		    		     << getStepInterval() << std::endl;
 
 		    reset();
 		    continue;
 		  }
 	      }
-
-	    // restore x and dx/dt (original value)
+				 
+	    // restore x (original value)
 	    aVariable->loadValue( theValueBuffer[ c ] );
-	    aVariable->setVelocity( theVelocityBuffer[ c ] );
+				   
+	    /// x(n+1) = x(n) + k2 * aStepInterval + O(h^3)
+	    aVariable->setVelocity( anErrorEstimate );
 	  }
 
-
-	if( delta_max < 0.5 )
+	if( maxError < 0.5 )
 	  {
 	    // grow it if error is 50% less than desired
-	    aStepInterval = getStepInterval() * 2.0;
-	    //    	    aStepInterval = getStepInterval() * pow(delta_max, -0.5) * safety;
+	    Real aNewStepInterval( getStepInterval() * 2.0 );
 
-	    const Real aMaxInterval( getMaxInterval() );
-	    if( aStepInterval >= aMaxInterval )
+	    //    	    Real aNewStepInterval( getStepInterval() * pow(maxError, -0.5) * safety );
+
+	    if( aNewStepInterval >= getUserMaxInterval() )
 	      {
-		aStepInterval = aMaxInterval;
+		aNewStepInterval = getStepInterval();
 	      }
-
+		
 	    //	    	    std::cerr << "g " << getCurrentTime() << ' ' 
 	    //	    		      << aStepInterval << std::endl;
 
-	    setNextStepInterval( aStepInterval );
+	    setNextStepInterval( aNewStepInterval );
 	  }
 	else
 	  {
 	    setNextStepInterval( getStepInterval() );
 	  }
 
-	break;
+        break;
       }
-
-    // don't call updateVelocityBuffer() -- it is already updated by
-    // the algorithm.
   }
 
 
- ////////////////////////// Midpoint2Stepper
+  ////////////////////////// Midpoint2Stepper
+
 
   Midpoint2Stepper::Midpoint2Stepper()
   {
@@ -802,7 +796,7 @@ namespace libecs
 
   void Midpoint2Stepper::initialize()
   {
-    Stepper::initialize();
+    DEStepper::initialize();
 
     const UnsignedInt aSize( theVariableCache.size() );
 
@@ -848,9 +842,8 @@ namespace libecs
 	    const Real aVelocity( aVariable->getVelocity() );
 	    theK1[ c ] = aVelocity;
 
-	    // restore k1/2 + x
-	    aVariable->loadValue( aVelocity * .5  * getStepInterval()
-				  + theValueBuffer[ c ] );
+	    // restore k1
+	    aVariable->loadValue( aVelocity * getStepInterval() + theValueBuffer[ c ] );
 
 	    // clear velocity
 	    aVariable->setVelocity( 0.0 );
@@ -867,12 +860,9 @@ namespace libecs
 	    const Real aVelocity( aVariable->getVelocity() );
 	    theVelocityBuffer[ c ] = aVelocity;
 	    
-	    // restore -k1+ k2 * 2 + x
-	    aVariable->loadValue( ( aVelocity + aVelocity - theK1[ c ] )
-	    				  * getStepInterval()
-				  //	    aVariable->loadValue( ( ( aVelocity + theK1[ c ] )
-				  //				  * getStepInterval() ) * .5
-				  + theValueBuffer[ c ] );
+	    // restore (k1 + k2) / 2
+	    //	    aVariable->loadValue( ( aVelocity + aVelocity - theK1[ c ] ) * getStepInterval() + theValueBuffer[ c ] );
+	    aVariable->loadValue( ( aVelocity + theK1[ c ] ) * 0.25 * getStepInterval() + theValueBuffer[ c ] );
 	    
 	    // clear velocity
 	    aVariable->setVelocity( 0.0 );
@@ -890,17 +880,12 @@ namespace libecs
 
 	    const Real aVelocity( aVariable->getVelocity() );
 
-	    // ( k1 + k2 * 4 + k3 ) / 6 for ~Yn+1
-	    const Real anErrorEstimate( ( theK1[ c ] + 
-					  theVelocityBuffer[ c ]  * 4.0 +
-					  aVelocity ) * ( 1.0 / 6.0 ) );
+	    // ( k1 + k2 + k3 * 4 ) / 6 for ~Yn+1
+	    const Real anErrorEstimate( ( theK1[ c ] + theVelocityBuffer[ c ] + aVelocity * 4.0 ) * ( 1.0 / 6.0 ) );
 
-  	    const Real aTolerance( eps_rel * 
-				   ( a_y * fabs( theValueBuffer[ c ] ) + 
-				     a_dydt * fabs( theVelocityBuffer[ c ] ) ) 
-				     + eps_abs );
-  	    const Real anError( fabs( ( theVelocityBuffer[ c ] - 
-					anErrorEstimate )  / aTolerance ) );
+  	    const Real aTolerance( eps_rel * ( a_y * fabs( theValueBuffer[ c ] ) +  a_dydt * fabs( theVelocityBuffer[ c ] ) ) + eps_abs );
+
+  	    const Real anError( fabs( ( theVelocityBuffer[ c ] - anErrorEstimate )  / aTolerance ) );
 	    
   	    if( anError > maxError )
   	      {
@@ -909,9 +894,9 @@ namespace libecs
   		if( maxError > 1.1 )
   		  {
   		    // shrink it if the error exceeds 110%
-		    //  		    setStepInterval( getStepInterval() * pow(maxError , -0.5) *  safety );
+		    //		    setStepInterval( getStepInterval() * pow(maxError , -0.5) *  safety );
 
-  		    setStepInterval( getStepInterval() * .5 );
+  		    setStepInterval( getStepInterval() * 0.5 );
 
 		    //		    std::cerr << "s " << getCurrentTime() << ' ' 
 		    //			      << getStepInterval() << std::endl;
@@ -939,7 +924,6 @@ namespace libecs
   		aNewStepInterval = getStepInterval();
   	      }
 
-
 	    //	    std::cerr << "g " << getCurrentTime() << ' ' 
 	    //		      << getStepInterval() << std::endl;
   	    setNextStepInterval( aNewStepInterval );
@@ -951,13 +935,11 @@ namespace libecs
 
 	break;
       }
-
-    // don't call updateVelocityBuffer() -- it is already updated by
-    // the algorithm.
   }
 
 
   ////////////////////////// CashKarp4Stepper
+
 
   CashKarp4Stepper::CashKarp4Stepper()
   {
@@ -966,7 +948,7 @@ namespace libecs
 
   void CashKarp4Stepper::initialize()
   {
-    Stepper::initialize();
+    DEStepper::initialize();
 
     const UnsignedInt aSize( theVariableCache.size() );
 
@@ -982,16 +964,13 @@ namespace libecs
   
   void CashKarp4Stepper::step()
   {
-    Real maxError( 0.0 );
-    Real desiredError, tmpError;
-    Real aStepInterval;
-
     const UnsignedInt aSize( theVariableCache.size() );
 
-    const Real eps_rel( 1.0e-8 );
-    const Real eps_abs( 1.0e-10 );
+    const Real eps_rel( 1.0e-6 );
+    const Real eps_abs( 1.0e-6 );
     const Real a_y( 1.0 );
     const Real a_dydt( 1.0 );
+
     const Real safety( 0.9 );
 
     // integrate phase first
@@ -1049,10 +1028,9 @@ namespace libecs
 				  + theValueBuffer[ c ] );
 	    
 	    // k2 * 0 for Yn+1 (do nothing)
-	    //  	    theVelocityBuffer[ c ] = theK2[ c ] * 0;
+	    //	    theVelocityBuffer[ c ] = theK2[ c ] * 0;
 	    // k2 * 0 for ~Yn+1 (do nothing)
-	    //  	    theErrorEstimate[ c ] = theK2[ c ] * 0;
-	    
+	    //	    theErrorEstimate[ c ] = theK2[ c ] * 0;
 	    
 	    // clear velocity
 	    aVariable->setVelocity( 0 );
@@ -1077,7 +1055,6 @@ namespace libecs
 	    theVelocityBuffer[ c ] += theK3[ c ] * ( 250.0 / 621.0 );
 	    // k3 * 18575/48384 for ~Yn+1
 	    theErrorEstimate[ c ] += theK3[ c ] * ( 18575.0 / 48384.0 );
-	    
 	    
 	    // clear velocity
 	    aVariable->setVelocity( 0 );
@@ -1104,12 +1081,10 @@ namespace libecs
 	    // k4 * 13525/55296 for ~Yn+1
 	    theErrorEstimate[ c ] += theK4[ c ] * ( 13525.0 / 55296.0 );
 	    
-	    
 	    // clear velocity
 	    aVariable->setVelocity( 0 );
 	  }
-	
-	
+		
 	// ========= 5 ===========
 	processNormal();
 	
@@ -1129,10 +1104,9 @@ namespace libecs
 			 + theValueBuffer[ c ] );
 	    
 	    // k5 * 0 for Yn+1(do nothing)
-	    //  	    theVelocityBuffer[ c ] += theK5[ c ] * 0;
+	    //	    theVelocityBuffer[ c ] += theK5[ c ] * 0;
 	    // k5 * 277/14336 for ~Yn+1
 	    theErrorEstimate[ c ] += theK5[ c ] * ( 277.0 / 14336.0 );
-	    
 	    
 	    // clear velocity
 	    aVariable->setVelocity( 0 );
@@ -1141,7 +1115,7 @@ namespace libecs
 	// ========= 6 ===========
 	processNormal();
 	
-	maxError = 0.0;
+	Real maxError( 0.0 );
 
 	// restore theValueBuffer
 	for( UnsignedInt c( 0 ); c < aSize; ++c )
@@ -1155,19 +1129,19 @@ namespace libecs
 	    // k6 * 1/4 for ~Yn+1
 	    theErrorEstimate[ c ] += theK6[ c ] * .25;
 
-	    desiredError = eps_rel * ( a_y * fabs(theValueBuffer[ c ]) + a_dydt * fabs(theVelocityBuffer[ c ]) ) + eps_abs;
-	    tmpError = fabs(theVelocityBuffer[ c ] - theErrorEstimate[ c ]) / desiredError;
+	    const Real aTolerance( eps_rel * ( a_y * fabs( theValueBuffer[ c ] ) + a_dydt * fabs( theVelocityBuffer[ c ] ) ) + eps_abs );
 	    
-	    if( tmpError > maxError )
+	    const Real anError( fabs( ( theVelocityBuffer[ c ] - theErrorEstimate[ c ] ) / aTolerance ) );
+	    
+	    if( anError > maxError )
 	      {
-		maxError = tmpError;
+		maxError = anError;
 		
 		if( maxError > 1.1 )
 		  {
 		    // shrink it if the error exceeds 110%
 		    setStepInterval( getStepInterval() * pow(maxError , -0.20) *  safety );
 
-	    //    		    printf("Error: %e\nInterval: %lf\n", theVelocityBuffer[ c ]-theErrorEstimate[ c ], getStepInterval());
 		    reset();
 		    continue;
 		  }
@@ -1183,28 +1157,22 @@ namespace libecs
 	// grow it if error is 50% less than desired
 	if (maxError <= 0.5)
 	  {
-	    aStepInterval = getStepInterval() * pow(maxError , -0.25) * safety;
+	    Real aNewStepInterval( getStepInterval() * pow(maxError , -0.25) * safety );
 	    
-	    if( aStepInterval >= getUserMaxInterval() )
+	    if( aNewStepInterval >= getUserMaxInterval() )
 	      {
-		aStepInterval = getStepInterval();
+		aNewStepInterval = getStepInterval();
 	      }
-	    
-	    //  	    printf("Error: %e\nInterval: %lf\n", maxError, aStepInterval);
-	    
-	    setNextStepInterval( aStepInterval );
+	    	    
+	    setNextStepInterval( aNewStepInterval );
 	  }
 	else 
 	  {
 	    setNextStepInterval( getStepInterval() );
 	  }
 	
-
 	break;
       }
-
-    // don't call updateVelocityBuffer() -- it is already updated by
-    // the algorithm.
   }
 
 

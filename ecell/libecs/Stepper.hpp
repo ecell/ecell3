@@ -46,10 +46,6 @@
 
 
 
-
-
-
-
 namespace libecs
 {
 
@@ -64,7 +60,6 @@ namespace libecs
 
   /**
      Stepper class defines and governs computation unit in a model.
-
 
 
   */
@@ -94,7 +89,6 @@ namespace libecs
 
     typedef StepperPtr (* AllocatorFuncPtr )();
 
-
     Stepper(); 
     virtual ~Stepper() 
     {
@@ -111,27 +105,23 @@ namespace libecs
 
     /**
 
-
     */
 
     void sync();
 
-    /**
-       
-    Each subclass of Stepper defines this.
+    /**       
+       Each subclass of Stepper defines this.
 
-    @note Subclass of Stepper must call this by Stepper::calculate() from
-    their step().
+       @note Subclass of Stepper must call this by Stepper::calculate() from
+       their step().
     */
 
     virtual void step() = 0;
-
 
     void integrate();
 
     /**
        Update loggers.
-
     */
 
     void log();
@@ -142,25 +132,18 @@ namespace libecs
     void processNormal();
 
     void reset();
-
-    void updateVelocityBuffer();
     
     /**
-
-
        @param aSystem
     */
 
     void registerSystem( SystemPtr aSystem );
 
     /**
-
-
        @param aSystem
     */
 
     void removeSystem( SystemPtr aSystem );
-
 
     /**
        Get the current time of this Stepper.
@@ -176,21 +159,21 @@ namespace libecs
       return theCurrentTime;
     }
 
+    void setCurrentTime( RealCref aTime )
+    {
+      theCurrentTime = aTime;
+    }
 
     /**
-
-    This may be overridden in dynamically scheduled steppers.
-
+       This may be overridden in dynamically scheduled steppers.
     */
 
-    void setStepInterval( RealCref aStepInterval )
+    virtual void setStepInterval( RealCref aStepInterval )
     {
-      theTolerantStepInterval = aStepInterval;
-
       loadStepInterval( aStepInterval );
     }
 
-    virtual void loadStepInterval( RealCref aStepInterval )
+    void loadStepInterval( RealCref aStepInterval )
     {
       if( aStepInterval > getUserMaxInterval()
 	  || aStepInterval <= getUserMinInterval() )
@@ -201,11 +184,6 @@ namespace libecs
 	}
 
       theStepInterval = aStepInterval;
-    }
-
-    void setNextStepInterval( RealCref aStepInterval )
-    {
-      theNextStepInterval = aStepInterval;
     }
 
     /**
@@ -222,18 +200,7 @@ namespace libecs
       return theStepInterval;
     }
 
-    const Real getTolerantStepInterval() const
-    {
-      return theTolerantStepInterval;
-    }
-
-    const Real getNextStepInterval() const
-    {
-      return theNextStepInterval;
-    }
-
     void registerLoggedPropertySlot( PropertySlotPtr );
-
 
     const String getID() const
     {
@@ -250,7 +217,6 @@ namespace libecs
       return theModel;
     }
 
-
     /**
        @internal
     */
@@ -259,7 +225,6 @@ namespace libecs
     {
       theModel = aModel;
     }
-
 
     /**
        Set slave stepper by a stepper ID string.
@@ -286,7 +251,6 @@ namespace libecs
     {
       return theSlaveStepper;
     }
-
 
     void setUserMinInterval( RealCref aValue )
     {
@@ -321,21 +285,14 @@ namespace libecs
 
     const Polymorph getStepIntervalConstraint() const;
 
-
     bool operator<( StepperCref rhs )
     {
       return getCurrentTime() < rhs.getCurrentTime();
     }
 
-
     SystemVectorCref getSystemVector() const
     {
       return theSystemVector;
-    }
-
-    void setCurrentTime( RealCref aTime )
-    {
-      theCurrentTime = aTime;
     }
 
     const UnsignedInt findInVariableCache( VariablePtr aVariable );
@@ -347,7 +304,6 @@ namespace libecs
 
     const Polymorph getVariableCache() const;
     const Polymorph getProcessCache() const;
-
 
     virtual StringLiteral getClassName() const  { return "Stepper"; }
 
@@ -379,63 +335,110 @@ namespace libecs
     Real                theStepInterval;
     Real                theStepsPerSecond;
 
-    Real                theTolerantStepInterval;
-    Real                theNextStepInterval;
-
     Real                theUserMinInterval;
     Real                theUserMaxInterval;
 
     String              theID;
 
     StepperPtr          theSlaveStepper;
+  };
 
+
+  /**
+     DIFFERENTIAL EQUATION SOLVER
+
+
+  */
+
+  class DEStepper
+    :
+    public Stepper
+  {
+  public:
+
+    DEStepper();
+    virtual ~DEStepper() {}
+
+    virtual void setStepInterval( RealCref aStepInterval )
+    {
+      theTolerantStepInterval = aStepInterval;
+
+      loadStepInterval( aStepInterval );
+    }
+
+    void setNextStepInterval( RealCref aStepInterval )
+    {
+      theNextStepInterval = aStepInterval;
+    }
+
+    const Real getTolerantStepInterval() const
+    {
+      return theTolerantStepInterval;
+    }
+
+    const Real getNextStepInterval() const
+    {
+      return theNextStepInterval;
+    }
+
+    virtual void initialize();
+
+    virtual StringLiteral getClassName() const { return "DEStepper"; }
+
+
+  protected:
+
+
+  private:
+
+    Real                theTolerantStepInterval;
+    Real                theNextStepInterval;
   };
 
 
   class FixedEuler1Stepper
     :
-    public Stepper
+    public DEStepper
   {
   public:
     
     FixedEuler1Stepper();
     virtual ~FixedEuler1Stepper() {}
+
+    static StepperPtr createInstance() { return new FixedEuler1Stepper; }
     
     virtual void step();
 
+    virtual StringLiteral getClassName() const { return "FixedEuler1Stepper"; }
 
-    static StepperPtr createInstance() { return new FixedEuler1Stepper; }\
-    virtual StringLiteral getClassName() const \
-    { return "FixedEuler1Stepper" ; }\
+
+  protected:
   };
 
 
   class FixedRungeKutta4Stepper
     : 
-    public Stepper
+    public DEStepper
   {
 
   public:
 
     FixedRungeKutta4Stepper();
     virtual ~FixedRungeKutta4Stepper() {}
-
     static StepperPtr createInstance() { return new FixedRungeKutta4Stepper; }
 
     virtual void step();
 
-    virtual StringLiteral getClassName() const 
-    { return "FixedRungeKutta4Stepper"; }
+    virtual StringLiteral getClassName() const { return "FixedRungeKutta4Stepper"; }
 
 
   protected:
-
   };
 
 
   class Euler1Stepper
     :
-    public Stepper
+    public DEStepper
   {
 
   public:
@@ -450,13 +453,14 @@ namespace libecs
 
     virtual StringLiteral getClassName() const { return "Euler1Stepper"; }
 
-  protected:
 
+  protected:
   };
+
 
   class Midpoint2Stepper
     : 
-    public Stepper
+    public DEStepper
   {
 
   public:
@@ -469,8 +473,8 @@ namespace libecs
     virtual void initialize();
     virtual void step();
 
-    virtual StringLiteral getClassName() const 
-    { return "Midpoint2Stepper"; }
+    virtual StringLiteral getClassName() const { return "Midpoint2Stepper"; }
+
 
   protected:
 
@@ -480,7 +484,7 @@ namespace libecs
 
   class CashKarp4Stepper
     : 
-    public Stepper
+    public DEStepper
   {
 
   public:
@@ -493,8 +497,8 @@ namespace libecs
     virtual void initialize();
     virtual void step();
 
-    virtual StringLiteral getClassName() const 
-    { return "CashKarp4Stepper"; }
+    virtual StringLiteral getClassName() const { return "CashKarp4Stepper"; }
+
 
   protected:
 
