@@ -84,13 +84,18 @@ public:
   void setEffector( MessageCref message );
   void setInitialActivity( MessageCref message );
 
-  void setSubstrate( FQIDCref fqen, int coefficient );
-  void setProduct( FQIDCref fqen, int coefficient );
-  void setCatalyst( FQIDCref fqen, int coefficient );
-  void setEffector( FQIDCref fqen, int coefficient );
-  void setInitialActivity( Float activity );
-
+  const Message getSubstrate( StringCref keyword );
+  const Message getProduct( StringCref keyword );
+  const Message getCatalyst( StringCref keyword );
+  const Message getEffector( StringCref keyword );
   const Message getInitialActivity( StringCref keyword );
+
+
+  void appendSubstrate( FQIDCref fqen, int coefficient );
+  void appendProduct( FQIDCref fqen, int coefficient );
+  void appendCatalyst( FQIDCref fqen, int coefficient );
+  void appendEffector( FQIDCref fqen, int coefficient );
+  void setInitialActivity( Float activity );
 
   /**
     Reactor Condition enum is used by Reactor's self-diagnosis system.
@@ -178,10 +183,10 @@ public:
    */
   virtual Float getActivity();
 
-  void addSubstrate( Substance& substrate, int coefficient );
-  void addProduct( Substance& product, int coefficient );
-  void addCatalyst( Substance& catalyst, int coefficient );
-  void addEffector( Substance& effector, int coefficient );
+  void appendSubstrate( SubstanceRef substrate, int coefficient );
+  void appendProduct( SubstanceRef product, int coefficient );
+  void appendCatalyst( SubstanceRef catalyst, int coefficient );
+  void appendEffector( SubstanceRef effector, int coefficient );
 
   /**
     Returns a pointer to a Reactant of ith substrate.

@@ -32,8 +32,9 @@
 #define ___FQPI_H___
 #include <string>
 
+#include "libecs.hpp"
 #include "Exceptions.hpp"
-#include "Primitive.hpp"
+#include "PrimitiveType.hpp"
 
 /** 
   SystemPath 
@@ -156,6 +157,23 @@ private:
 
 };
 
+class FQPIException : public Exception
+{ 
+public: 
+  FQPIException( StringCref method, StringCref message ) 
+    : Exception( method, message ) {} 
+  const String what() const { return ""; }
+};
+class BadFQPI : public FQPIException
+{ 
+public:
+  BadFQPI( StringCref method, StringCref message ) 
+    : FQPIException( method, message ) {} 
+  const String what() const { return "Bad FQPI."; }
+};
+
+
+
 /**
   FQPI (Fully Qualified Primitive Id).
 
@@ -167,41 +185,24 @@ private:
 class FQPI : public FQID
 {
 
-public: // exceptions
-
-  class FQPIException : public Exception
-    { 
-    public: 
-      FQPIException( StringCref method, StringCref message ) 
-	: Exception( method, message ) {} 
-      const String what() const { return ""; }
-    };
-  class BadFQPI : public FQPIException
-    { 
-    public:
-      BadFQPI( StringCref method, StringCref message ) 
-	: FQPIException( method, message ) {} 
-      const String what() const { return "Bad FQPI."; }
-    };
-
 public:
 
-  FQPI( const Primitive::Type type, FQIDCref fqid );
+  static const String  fqidOf( StringCref fqpi );
+
+
+  FQPI( const PrimitiveType type, FQIDCref fqid );
   FQPI( StringCref fqpi );
   virtual ~FQPI() {}
   
   const String getFqpi() const;
-  const Primitive::Type& getType() const { return theType; }
+  const PrimitiveType getPrimitiveType() const { return thePrimitiveType; }
 
   virtual const String getString() const { return getFqpi(); }
   virtual operator const String() const { return getString(); }
 
-  static const String fqidOf( StringCref fqpi );
-  static Primitive::Type typeOf( StringCref fqpi );
-
 private:
 
-  Primitive::Type theType;
+  PrimitiveType thePrimitiveType;
 
 };
 

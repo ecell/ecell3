@@ -144,8 +144,7 @@ void Substance::setAccumulator( AccumulatorPtr accumulator )
 
 const String Substance::getFqpi() const
 {
-  return Primitive::PrimitiveTypeString( Primitive::SUBSTANCE ) 
-    + ":" + getFqid();
+  return PrimitiveTypeStringOf( *this ) + ":" + getFqid();
 }
 
 

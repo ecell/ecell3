@@ -78,7 +78,7 @@ void System::setSuperSystem( SystemPtr const supersystem )
 
 const String System::getFqpi() const
 {
-  return Primitive::PrimitiveTypeString( Primitive::SYSTEM ) + ":" + getFqid();
+  return PrimitiveTypeStringOf( *this ) + ":" + getFqid();
 }
 
 void System::setStepper( const Message& message )
@@ -123,12 +123,11 @@ void System::setVolumeIndex( FQIDCref volumeindex )
   theVolumeIndexName = new FQID( volumeindex );
 }
 
-Primitive System::getPrimitive( StringCref id, Primitive::Type type )
-throw( InvalidPrimitiveType, NotFound )
+#if 0
+Primitive System::getPrimitive( Primitive::Type type, StringCref id )
+  throw( InvalidPrimitiveType, NotFound )
 {
-  Primitive aPrimitive;
-
-  aPrimitive.type = type;
+  Primitive aPrimitive( type, NULLPTR );
 
   switch(type)
     {
@@ -152,7 +151,7 @@ throw( InvalidPrimitiveType, NotFound )
 
 int System::getNumberOfPrimitives( Primitive::Type type )
 {
-  int aNumber( 0 );
+  int aNumber( -1 );
   switch( type )
     {
     case Primitive::SUBSTANCE:
@@ -177,11 +176,11 @@ void System::forAllPrimitives( Primitive::Type type, PrimitiveCallback cb,
 {
   assert( cb );
 
-  SubstanceListIterator si( NULL );
-  ReactorListIterator ri( NULL );
-  SystemListIterator yi( NULL );
+  SubstanceListIterator si( NULLPTR );
+  ReactorListIterator   ri( NULLPTR );
+  SystemListIterator    yi( NULLPTR );
 
-  PrimitivePtr aPrimitivePtr;
+  PrimitivePtr aPrimitivePtr( NULLPTR );
 
   switch(type)
     {
@@ -215,6 +214,8 @@ void System::forAllPrimitives( Primitive::Type type, PrimitiveCallback cb,
 				    + getFqid() + "]: request type invalid" );
     }
 } 
+#endif /* 0 */
+
 
 void System::initialize()
 {
@@ -223,9 +224,9 @@ void System::initialize()
   try{
     if( theVolumeIndexName != NULL )
       {
-	FQPI fqpi( Primitive::REACTOR, *theVolumeIndexName );
-	Primitive aPrimitive( theRootSystem->getPrimitive( fqpi ) );
-	theVolumeIndex = aPrimitive.reactor;
+	FQID fqid( *theVolumeIndexName );
+	//FIXME: recursive search needed
+	theVolumeIndex = theRootSystem->getReactor( fqid );
 	//FIXME: *theMessageWindow << getFqid() << ": volume index is [" 
 	//FIXME: 	  << _volumeIndex->getFqid() << "].\n";
 

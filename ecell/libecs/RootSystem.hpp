@@ -31,7 +31,6 @@
 #ifndef ___ROOTSYSTEM_H___
 #define ___ROOTSYSTEM_H___
 #include "System.hpp"
-#include "Primitive.hpp"
 #include "SubstanceMaker.hpp"
 #include "ReactorMaker.hpp"
 #include "SystemMaker.hpp"
@@ -60,7 +59,7 @@ public:
 
   SystemPtr getSystem( SystemPathCref systempath )
     throw( NotFound, MalformedSystemName );
-  Primitive getPrimitive( FQPICref fqpi ) 
+  Entity getEntity( FQPICref fqpi ) 
     throw( InvalidPrimitiveType, NotFound );
 
   virtual void initialize();

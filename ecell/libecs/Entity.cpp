@@ -79,8 +79,8 @@ const String Entity::getFqid() const
 
 const String Entity::getFqpi() const
 {
-  return Primitive::PrimitiveTypeString( Primitive::ENTITY ) + 
-    ":" + getFqid();
+  //FIXME: slow? use virtual methods
+  return PrimitiveTypeStringOf( *this ) + ":" + getFqid();
 }
 
 const String Entity::getSystemPath() const
@@ -100,6 +100,7 @@ const String Entity::getSystemPath() const
 	}
     }
 
+  //FIXME: suspicious
   aSystemPath += getSuperSystem()->getId();
 
   return aSystemPath;

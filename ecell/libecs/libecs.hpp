@@ -52,7 +52,6 @@ DECLARE_CLASS( FQPI );
 DECLARE_CLASS( Integrator );
 DECLARE_CLASS( Eular1Integrator );
 DECLARE_CLASS( RungeKutta4Integrator );
-DECLARE_CLASS( Primitive );
 DECLARE_CLASS( Reactant );
 DECLARE_CLASS( Reactor );
 DECLARE_CLASS( isRegularReactor );

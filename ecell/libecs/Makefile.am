@@ -16,8 +16,8 @@ Accumulators.cpp\
 Integrators.cpp\
 RootSystem.cpp\
 SubstanceMaker.cpp\
-Primitive.cpp\
 Stepper.cpp\
+PrimitiveType.cpp\
 System.cpp\
 Entity.cpp\
 Reactor.cpp\

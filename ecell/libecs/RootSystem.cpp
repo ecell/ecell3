@@ -29,7 +29,6 @@
 //
 
 #include "RootSystem.hpp"
-#include "Primitive.hpp"
 #include "FQPI.hpp"
 
 RootSystem::RootSystem() 
@@ -95,15 +94,16 @@ SystemPtr RootSystem::getSystem( SystemPathCref systempath )
   return System::getSystem( next );
 }
 
+#if 0
 Primitive RootSystem::getPrimitive( FQPICref fqpi ) 
   throw( InvalidPrimitiveType, NotFound )
 {
   // FIXME: handle exceptions
 
   SystemPtr sys = getSystem( fqpi.SystemPath::getString() );
-  return sys->getPrimitive( fqpi.getId(), fqpi.getType() );
+  return sys->getPrimitive( fqpi.getType(), fqpi.getId() );
 }
-
+#endif /* 0 */
 
 /*
   Do not modify

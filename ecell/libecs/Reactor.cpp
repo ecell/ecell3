@@ -57,22 +57,26 @@ void Reactor::makeSlots()
 
 void Reactor::setSubstrate( MessageCref message )
 {
-  setSubstrate( message.getBody( 0 ), stringTo<Int>( message.getBody( 1 ) ) );
+  appendSubstrate( message.getBody( 0 ), 
+		   stringTo<Int>( message.getBody( 1 ) ) );
 }
 
 void Reactor::setProduct( MessageCref message )
 {
-  setProduct( message.getBody( 0 ), stringTo<Int>( message.getBody( 1 ) ) );
+  appendProduct( message.getBody( 0 ),
+		 stringTo<Int>( message.getBody( 1 ) ) );
 }
 
 void Reactor::setCatalyst( MessageCref message )
 {
-  setCatalyst( message.getBody( 0 ), stringTo<Int>( message.getBody( 1 ) ) );
+  appendCatalyst( message.getBody( 0 ),
+		  stringTo<Int>( message.getBody( 1 ) ) );
 }
 
 void Reactor::setEffector( MessageCref message )
 {
-  setEffector( message.getBody( 0 ), stringTo<Int>( message.getBody( 1 ) ) );
+  appendEffector( message.getBody( 0 ),
+		  stringTo<Int>( message.getBody( 1 ) ) );
 }
 
 void Reactor::setInitialActivity( MessageCref message )
@@ -80,42 +84,65 @@ void Reactor::setInitialActivity( MessageCref message )
   setInitialActivity( stringTo<Float>( message.getBody() ) );
 }
 
+const Message getSubstrate( StringCref )
+{
+  static String aKeyword( "Substrate" );
+  return Message( aKeyword, "not implemented yet" );
+}
+
+const Message getProduct( StringCref )
+{
+  static String aKeyword( "Product" );
+  return Message( aKeyword, "not implemented yet" );
+}
+
+const Message getCatalyst( StringCref )
+{
+  static String aKeyword( "Catalyst" );
+  return Message( aKeyword, "not implemented yet" );
+}
+
+const Message getEffector( StringCref )
+{
+  static String aKeyword( "Effector" );
+  return Message( aKeyword, "not implemented yet" );
+}
+
 const Message Reactor::getInitialActivity( StringCref keyword )
 {
   return Message( keyword, theInitialActivity );
 }
 
-void Reactor::setSubstrate( FQIDCref fqid, int coefficient )
+void Reactor::appendSubstrate( FQIDCref fqid, int coefficient )
 {
-  FQPI fqpi( Primitive::SUBSTANCE, fqid );
-  Primitive aPrimitive = 
-    getSuperSystem()->getRootSystem()->getPrimitive( fqpi );
+  SubstancePtr aSubstance( getSuperSystem()->getRootSystem()->
+			   getSubstance( fqid ) );
+
+  appendSubstrate( *aSubstance, coefficient );
+}
+
+void Reactor::appendProduct( FQIDCref fqid, int coefficient )
+{
+  SubstancePtr aSubstance( getSuperSystem()->getRootSystem()->
+			   getSubstance( fqid ) );
   
-  addSubstrate( *(aPrimitive.substance), coefficient );
+  appendProduct( *aSubstance, coefficient );
 }
 
-void Reactor::setProduct( FQIDCref fqid, int coefficient )
+void Reactor::appendCatalyst( FQIDCref fqid,int coefficient)
 {
-  FQPI fqpi( Primitive::SUBSTANCE, fqid );
-  Primitive aPrimitive = 
-    getSuperSystem()->getRootSystem()->getPrimitive( fqpi );
-  addProduct( *(aPrimitive.substance), coefficient );
+  SubstancePtr aSubstance( getSuperSystem()->getRootSystem()->
+			   getSubstance( fqid ) );
+  
+  appendCatalyst( *aSubstance, coefficient );
 }
 
-void Reactor::setCatalyst( FQIDCref fqid,int coefficient)
+void Reactor::appendEffector( FQIDCref fqid, int coefficient )
 {
-  FQPI fqpi( Primitive::SUBSTANCE, fqid );
-  Primitive aPrimitive = 
-    getSuperSystem()->getRootSystem()->getPrimitive( fqpi );
-  addCatalyst( *(aPrimitive.substance), coefficient );
-}
-
-void Reactor::setEffector( FQIDCref fqid, int coefficient )
-{
-  FQPI fqpi( Primitive::SUBSTANCE, fqid );
-  Primitive aPrimitive = 
-    getSuperSystem()->getRootSystem()->getPrimitive( fqpi );
-  addEffector( *(aPrimitive.substance), coefficient );
+  SubstancePtr aSubstance( getSuperSystem()->getRootSystem()->
+			   getSubstance( fqid ) );
+  
+  appendEffector( *aSubstance, coefficient );
 }
 
 void Reactor::setInitialActivity( Float activity )
@@ -138,29 +165,28 @@ Reactor::Reactor()
 
 const String Reactor::getFqpi() const
 {
-  return Primitive::PrimitiveTypeString( Primitive::REACTOR ) 
-    + ":" + getFqid();
+  return PrimitiveTypeStringOf( *this ) + ":" + getFqid();
 }
 
-void Reactor::addSubstrate( SubstanceRef substrate, int coefficient )
+void Reactor::appendSubstrate( SubstanceRef substrate, int coefficient )
 {
   ReactantPtr reactant = new Reactant( substrate, coefficient );
   theSubstrateList.insert( theSubstrateList.end(), reactant );
 }
 
-void Reactor::addProduct( SubstanceRef product, int coefficient )
+void Reactor::appendProduct( SubstanceRef product, int coefficient )
 {
   ReactantPtr reactant = new Reactant( product, coefficient );
   theProductList.insert( theProductList.end(), reactant );
 }
 
-void Reactor::addCatalyst( SubstanceRef catalyst, int coefficient )
+void Reactor::appendCatalyst( SubstanceRef catalyst, int coefficient )
 {
   ReactantPtr reactant = new Reactant( catalyst, coefficient );
   theCatalystList.insert( theCatalystList.end(), reactant );
 }
 
-void Reactor::addEffector( SubstanceRef effector, int coefficient )
+void Reactor::appendEffector( SubstanceRef effector, int coefficient )
 {
   ReactantPtr reactant = new Reactant( effector, coefficient );
   theEffectorList.insert( theEffectorList.end(), reactant );

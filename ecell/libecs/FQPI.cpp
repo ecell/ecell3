@@ -147,64 +147,49 @@ const String FQID::getFqid() const
 
 ////////////////////////////////  FQPI
 
-FQPI::FQPI( const Primitive::Type type, const FQID& fqid )
+FQPI::FQPI( const PrimitiveType type, const FQID& fqid )
   :
   FQID( fqid ),
-  theType( type )
+  thePrimitiveType( type )
 {
   ; // do nothing
 }
 
+//FIXME: ??
 FQPI::FQPI( StringCref fqpi )
-  : FQID( fqidOf( fqpi ) ),
-  theType( typeOf( fqpi ) )
+  : 
+  FQID( fqidOf( fqpi ) ),
+  thePrimitiveType( PrimitiveTypeOf( PrimitiveTypeStringOf( fqpi ) ) )
 {
   ; // do nothing
 }
 
 const String FQPI::fqidOf( StringCref fqpi )
 {
-  String::size_type aBorder( fqpi.find(':') );
+  String::size_type aBorder( fqpi.find( ':' ) );
 
   if( aBorder == String::npos )
     {
-      throw BadFQPI(__PRETTY_FUNCTION__,
-		    "no \':\' found in \"" + fqpi + "\".");
+      throw BadFQPI( __PRETTY_FUNCTION__,
+		     "no \':\' found in \"" + fqpi + "\"." );
     }
   if( fqpi.find( ':', aBorder + 1 ) == String::npos )
     {
-      throw BadFQPI(__PRETTY_FUNCTION__,
-		    "no enough \':\'s found in \"" + fqpi + "\".");
+      throw BadFQPI( __PRETTY_FUNCTION__,
+		     "no enough \':\'s found in \"" + fqpi + "\"." );
     }
 
   return fqpi.substr( aBorder + 1, String::npos );
 }
 
-Primitive::Type FQPI::typeOf( StringCref fqpi )
-{
-  String::size_type aBorder( fqpi.find(':') );
-
-  if( aBorder == String::npos )
-    {
-      throw BadFQPI(__PRETTY_FUNCTION__,
-		    "no \':\' found in \"" + fqpi + "\".");
-    }
-  if( fqpi.find( ':', aBorder + 1 ) == String::npos )
-    {
-      throw BadFQPI(__PRETTY_FUNCTION__,
-		    "no enough \':\'s found in \"" + fqpi + "\".");
-    }
-  
-  String aTypeString = fqpi.substr( 0, aBorder );
-
-  return Primitive::PrimitiveType( aTypeString );
-}
-
 const String FQPI::getFqpi() const 
 {
-  return Primitive::PrimitiveTypeString( theType ) 
-    + ':' + FQID::getString();
+  String aString( PrimitiveTypeStringOf( thePrimitiveType ) + ':' 
+		  + FQID::getString() );
+  return aString;
 }
+
+
 
 
 #ifdef TEST_FQPI
@@ -224,7 +209,7 @@ main()
 
   FQPI aFQPI( "Substance:/A/B:S" );
   cout << aFQPI.getString() << endl;
-  cout << Primitive::PrimitiveTypeString( aFQPI.getType() ) << endl;
+  cout << getPrimitiveTypeString( aFQPI.getType() ) << endl;
   cout << aFQPI.getSystemPath() << endl;
   cout << aFQPI.getId() << endl;
   cout << aFQPI.getFqid() << endl;

@@ -33,12 +33,15 @@
 #include <stl.h>
 #include <string>
 
-#include "Entity.hpp"
-#include "Primitive.hpp"
-#include "Exceptions.hpp"
 #include "libecs.hpp"
 
+#include "Entity.hpp"
+#include "Exceptions.hpp"
+#include "PrimitiveType.hpp"
+
+
 // Tree data structures used for entry lists
+// for_each performance is very important. other container type?
 typedef map<const String,SubstancePtr> SubstanceList;
 typedef map<const String,ReactorPtr>   ReactorList;
 typedef map<const String,SystemPtr>    SystemList;
@@ -49,9 +52,6 @@ typedef ReactorList::iterator             ReactorListIterator;
 typedef SystemList::iterator              SystemListIterator;
 
 typedef SystemPtr (*SystemAllocatorFunc)();
-
-/// A type for function that gets pointer to a Primitive and data.
-typedef void (*PrimitiveCallback)( PrimitivePtr, void* clientData );
 
 class System : public Entity
 {
@@ -124,6 +124,8 @@ public:
     */
   StepperPtr getStepper() { return theStepper; }
 
+// isn't this redundant?  stl's for_each can be used for this purpose.
+#if 0 
   /**
    Find and get a Primitive of given type and ID.
    The Primitive object must be new'd and deleted by 
@@ -135,7 +137,7 @@ public:
  
    @return true -> success, false -> failed.
    */
-  Primitive getPrimitive( StringCref id, const Primitive::Type type )
+  Primitive getPrimitive( const Primitive::Type type, StringCref id )
     throw( InvalidPrimitiveType, NotFound );
 
   /**
@@ -151,6 +153,7 @@ public:
    */
   void forAllPrimitives( Primitive::Type type, PrimitiveCallback cb,
 			 void* clientData );
+#endif /* 0 */
 
   /**
     Returns the number of Entities of given type this system holds.
@@ -161,7 +164,7 @@ public:
    -1 if the type given is invalid.  0 if this is not a System
    for given type.
    */
-  int getNumberOfPrimitives( Primitive::Type type );
+  int getNumberOfPrimitives( PrimitiveType type );
 
 
   /**
@@ -175,15 +178,14 @@ public:
 
   /**
     This method takes a FQID of a Reactor as a VolumeIndex of this System.
-    The FQID will be used to get a pointer to the VolumeIndex Reactor
-    in initialize().
+    The FQID will be resolved to ReactorPtr at initialize().
 
     @param fqen FQID of a VolumeIndex Reactor for this System.
    */
   void setVolumeIndex( const FQID& fqen );
 
   /**
-    @return a pointer to VolumeIndex Reactor of this System.
+    @return a pointer to the VolumeIndex Reactor of this System.
    */
   ReactorPtr getVolumeIndex() { return theVolumeIndex; }
 
@@ -194,7 +196,6 @@ public:
     @return Volume of this System. Unit is [L].
    */
   virtual Float getVolume();
-
 
   /**
     Add a Reactor object in this RSystem.
@@ -374,10 +375,10 @@ public:
 public: // message interfaces
 
   void setStepper( MessageCref message );
-  const Message getStepper(StringCref keyword);
-
   void setVolumeIndex( MessageCref message );
-  const Message getVolumeIndex(StringCref keyword);
+
+  const Message getStepper( StringCref keyword );
+  const Message getVolumeIndex( StringCref keyword );
 
 protected:
 
