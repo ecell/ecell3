@@ -94,7 +94,7 @@ public:
 	  {
 	    if( aValue > -1.0 ) // round to zero. 
 	      {                 // this is necessary in hybrid simulation.
-		aValue = ceil( aValue );
+		aValue = 0.0;
 	      }
 	    else
 	      {
