@@ -30,7 +30,7 @@ cat << EOT_USAGE
 Compile dynamic modules for E-Cell Simulation Environment Versin 3.
 
 Usage:
-	`basename $0` [ ecell3-dmc options ] sourcefile [ compiler options ]
+	`basename $0` [ options ] sourcefiles...
 	`basename $0` -h|--help
 EOT_USAGE
 }
@@ -40,11 +40,13 @@ help()
 usage
 cat << EOT_HELP
 
-ecell3-dmc options:
+`basename $0` options:
         --no-stdinclude          Don't set standard include file path.
         --no-stdlibdir           Don't set standard include file path.
         --ldflags=[ldflags]      Specify options to the linker.
-        --cxxflags=[cxxflags]    Override the default compiler options.
+        --cxxflags=[cxxflags]    add compiler options.
+        --no-define-cxxflags=[cxxflags]
+                                 Override the default compiler options.
         --dmcompile=[path]       Specify dmcompile path.
         -v or --verbose   	 Be verbose.
         -h or --help		 Print this message.
@@ -106,7 +108,8 @@ while [ -n "$(echo $1 | grep '-')" ]; do
 	--no-stdinclude) NO_STDINCLUDE=yes ; shift ;;
 	--no-stdlibdir) NO_STDLIBDIR=yes ; shift ;;
 	--ldflags=*) LDFLAGS="$LDFLAGS $( echo $1 | cut -d'=' -f2 )"; shift ;;
-	--cxxflags=*) CXXFLAGS="$CXXFLAGS $( echo $1 | cut -d'=' -f2 )"; shift ;;
+	--no-define-cxxflags=*) NO_DEFINE_CXXFLAGS=yes;CXXFLAGS="$CXXFLAGS $( echo $1 | cut -d'=' -f2 )"; shift ;;
+	--cxxflags=*) CXXCOMPILEFLAGS="$CXXFLAGS $( echo $1 | cut -d'=' -f2 )"; shift ;;
 	--dmcompile=*) DMCOMPILE=$( echo $1 | cut -d'=' -f2 )/dmcompile ; shift ;;
 	-v|--verbose) VERBOSE=yes ; shift ;;
 	-h|--help) help ; exit 0 ;;
@@ -120,23 +123,26 @@ done
 
 initialize
 
-SRC=$1 ;shift
-
-if [ -z $SRC ] ; then
-    echo "Error: source file not given."
-    exit 1
-fi
-
-if [ ! -f $SRC ] ; then
-    echo "Error: $SRC not found."
-    exit 1
-fi
 
 
-CLASSNAME=$( echo $SRC | cut -d'.' -f1 ) 
 
-CLASSNAMEDEFINE="-D_ECELL3_DM_CLASSNAME=$CLASSNAME"
-CXXCOMPILEFLAGS="$*"
+for file in $@ ; do
+    
+    #fix me.
+    if [ -z $file ] ; then
+	echo "Error: source file not given."
+	exit 1
+    fi
+
+    if [ ! -f $file ] ; then
+	echo "Error: $file not found."
+	exit 1
+    fi
+
+done
+
+SRC=$@
+
 
 
 if [ $NO_STDINCLUDE ] ; then
@@ -155,7 +161,7 @@ LDFLAGS="$LDFLAGS -lecs"
 
 export LDFLAGS
 
-if [ -n $CXXFLAGS ] ; then
+if [ $NO_DEFINE_CXXFLAGS ] ; then
     export CXXFLAGS
 fi
 
@@ -163,15 +169,20 @@ fi
 #
 #Compile
 #
-command_string="$DMCOMPILE $SRC $INCLUDE $CLASSNAMEDEFINE $CXXCOMPILEFLAGS"
+for cppfile in $SRC; do
+    
+    CLASSNAME=$( echo $cppfile | cut -d'.' -f1 ) 
+    CLASSNAMEDEFINE="-D_ECELL3_DM_CLASSNAME=$CLASSNAME"
+    
+    command_string="$DMCOMPILE $cppfile $INCLUDE $CLASSNAMEDEFINE $CXXCOMPILEFLAGS"
+    run_command $command_string
 
-run_command $command_string
+    exitcode=$?
+    if [ $exitcode -ne 0 ] ; then
+	echo "Error: dmcompile failed."
+	exit $exitcode
+    fi
 
-exitcode=$?
-if [ $exitcode -ne 0 ] ; then
-    echo "Error: dmcompile failed."
-    exit $exitcode
-fi
-
+done
 
 exit 0
