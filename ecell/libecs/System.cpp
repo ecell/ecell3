@@ -36,7 +36,6 @@
 #include "Stepper.hpp"
 #include "FullID.hpp"
 #include "PropertyInterface.hpp"
-#include "PropertySlotMaker.hpp"
 
 #include "System.hpp"
 

@@ -33,7 +33,6 @@
 #include "FullID.hpp"
 #include "Model.hpp"
 #include "EntityType.hpp"
-#include "PropertySlotMaker.hpp"
 
 #include "Variable.hpp"
 

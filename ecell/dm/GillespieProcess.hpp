@@ -9,7 +9,6 @@
 #include <libecs/libecs.hpp>
 #include <libecs/Process.hpp>
 #include <libecs/Stepper.hpp>
-#include <libecs/PropertySlotMaker.hpp>
 #include <libecs/FullID.hpp>
 
 USE_LIBECS;

@@ -45,7 +45,7 @@
 #include "libecs.hpp"
 #include "Variable.hpp"
 #include "PropertyInterface.hpp"
-#include "PropertySlotMaker.hpp"
+
 #include "FullID.hpp"
 
 #include "Process.hpp"

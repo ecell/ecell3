@@ -31,8 +31,6 @@
 // E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
 
-#include "PropertySlotMaker.hpp"
-
 #include "PropertyInterface.hpp"
 
 namespace libecs

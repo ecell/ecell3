@@ -28,8 +28,6 @@
 // E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
 
-//#include "PropertySlotMaker.hpp"
-
 #include "DiscreteTimeStepper.hpp"
 
 

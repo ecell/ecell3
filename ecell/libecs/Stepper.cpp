@@ -38,7 +38,6 @@
 #include "Process.hpp"
 #include "Model.hpp"
 #include "FullID.hpp"
-#include "PropertySlotMaker.hpp"
 #include "Logger.hpp"
 
 #include "Stepper.hpp"

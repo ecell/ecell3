@@ -35,7 +35,6 @@
 #include "VariableProxy.hpp"
 #include "Process.hpp"
 #include "Model.hpp"
-#include "PropertySlotMaker.hpp"
 
 #include "DifferentialStepper.hpp"
 

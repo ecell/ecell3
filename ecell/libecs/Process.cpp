@@ -34,7 +34,6 @@
 #include "FullID.hpp"
 #include "Variable.hpp"
 #include "Model.hpp"
-#include "PropertySlotMaker.hpp"
 
 #include "Process.hpp"
 

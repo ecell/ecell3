@@ -146,19 +146,19 @@ public:\
 
 #define PROPERTYSLOT_SET_GET( TYPE, NAME )\
   PROPERTYSLOT( TYPE, NAME,\
-                       & _LIBECS_CLASS_::set ## NAME,\
-                       & _LIBECS_CLASS_::get ## NAME )
+                & _LIBECS_CLASS_::set ## NAME,\
+                & _LIBECS_CLASS_::get ## NAME )
 
 #define PROPERTYSLOT_SET( TYPE, NAME )\
   PROPERTYSLOT( TYPE, NAME,\
-                       & _LIBECS_CLASS_::set ## NAME,\
-                       NULLPTR )
+                & _LIBECS_CLASS_::set ## NAME,\
+                NULLPTR )
 
 
 #define PROPERTYSLOT_GET( TYPE, NAME )\
   PROPERTYSLOT( TYPE, NAME,\
-                       NULLPTR,\
-                       & _LIBECS_CLASS_::get ## NAME )
+                NULLPTR,\
+                & _LIBECS_CLASS_::get ## NAME )
 
 #define PROPERTYSLOT_SET_GET_NO_LOAD_SAVE( TYPE, NAME )\
   PROPERTYSLOT_NO_LOAD_SAVE( TYPE, NAME,\
@@ -327,6 +327,10 @@ public:\
 
   };
 
+
+
+  // these specializations of nullSet/nullGet are here to avoid spreading
+  // inline copies of them around.  This reduces sizes of DM .so files a bit.
 
 #define NULLSET_SPECIALIZATION( TYPE )\
   template <> void PropertiedClass::nullSet<TYPE>( const TYPE& )

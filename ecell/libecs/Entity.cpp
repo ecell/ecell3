@@ -30,7 +30,6 @@
 
 #include "System.hpp"
 #include "FullID.hpp"
-#include "PropertySlotMaker.hpp"
 
 #include "Entity.hpp"
 

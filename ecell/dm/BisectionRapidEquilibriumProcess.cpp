@@ -4,7 +4,7 @@
 #include "Process.hpp"
 #include "Util.hpp"
 #include "PropertyInterface.hpp"
-#include "PropertySlotMaker.hpp"
+
 #include "System.hpp"
 #include "Stepper.hpp"
 #include "Variable.hpp"
