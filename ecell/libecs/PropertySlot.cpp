@@ -60,7 +60,7 @@ namespace libecs
     theLogger = NULLPTR;
   }
 
-  void PropertySlot::log( Real aTime ) const
+  void PropertySlot::log( const Real aTime ) const
   {
     theLogger->appendData( aTime, getReal() );
   }

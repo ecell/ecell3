@@ -176,7 +176,7 @@ namespace libecs
 
     UnsignedInt aVectorSize( aValue.size() );
     
-    // Require ( tagname, fullid, coefficient ) 3-tuple
+    // Require ( tagname, fullid [ , coefficient ] ) 2,3-tuple
     if( aVectorSize < 2 )
       {
 	THROW_EXCEPTION( ValueError, "Process [" + getFullID().getString()

@@ -123,7 +123,7 @@ namespace libecs
       return theLogger;
     }
 
-    void log( Real aTime ) const;
+    void log( const Real aTime ) const;
 
     virtual PropertyInterfaceCref getPropertyInterface() const = 0;
 
