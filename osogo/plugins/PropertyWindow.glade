@@ -281,7 +281,7 @@
 			      <child>
 				<widget class="GtkLabel" id="labelSystemSize">
 				  <property name="visible">True</property>
-				  <property name="label" translatable="yes">Size(L)</property>
+				  <property name="label" translatable="yes">Size</property>
 				  <property name="use_underline">False</property>
 				  <property name="use_markup">False</property>
 				  <property name="justify">GTK_JUSTIFY_RIGHT</property>
@@ -694,7 +694,7 @@
 					  <child>
 					    <widget class="GtkLabel" id="labelVariableMolar">
 					      <property name="visible">True</property>
-					      <property name="label" translatable="yes">Molar(Value/Size/N_A)</property>
+					      <property name="label" translatable="yes">Molar</property>
 					      <property name="use_underline">False</property>
 					      <property name="use_markup">False</property>
 					      <property name="justify">GTK_JUSTIFY_CENTER</property>
@@ -718,7 +718,7 @@
 					  <child>
 					    <widget class="GtkLabel" id="labelVariableNumber">
 					      <property name="visible">True</property>
-					      <property name="label" translatable="yes">Number(Value/Size)</property>
+					      <property name="label" translatable="yes">Number</property>
 					      <property name="use_underline">False</property>
 					      <property name="use_markup">False</property>
 					      <property name="justify">GTK_JUSTIFY_CENTER</property>

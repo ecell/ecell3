@@ -126,6 +126,12 @@ class PropertyWindow(OsogoPluginWindow):
         self['entryProcessVarRefZero'].set_property( 'xalign', 1 )
         self['entryProcessVarRefNegative'].set_property( 'xalign', 1 )
 
+        self['entryVariableValue'].set_property( 'xalign', 1 )
+        self['entryVariableVelocity'].set_property( 'xalign', 1 )
+        self['entryVariableTotalVelocity'].set_property( 'xalign', 1 )
+        self['entryVariableMolar'].set_property( 'xalign', 1 )
+        self['entryVariableNumber'].set_property( 'xalign', 1 )
+
         if self.theRawFullPNList == ():
             return
         # set default as not to view all properties
