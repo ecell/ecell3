@@ -52,7 +52,7 @@ NOTE: If you get this package via cvs, use ./autogen.sh instead of
 
   == Compilers ==
 
-  We've tested with gcc-3.1 and gcc-3.2.
+  We've tested with gcc-3.2.
 
 
   == Note for RedHat 8.0 users ==
@@ -88,6 +88,11 @@ NOTE: If you get this package via cvs, use ./autogen.sh instead of
 
   I recommend http://www.freshmeat.net for finding the latest URLs for the
   packages.
+
+
+  == Build ecell3 without GUI ==
+
+  Use --disable-gtk configure option.
 
 
 

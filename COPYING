@@ -7,7 +7,7 @@ defined in libecs, which are developed as part of simulation models or
 algorithm modules, are not covered by the license even if resulting
 binary includes code from libecs by inlining, template instantiation,
 and subclassing.  Modifications and additions which are included in
-libecs itself is coverd by GPL.
+libecs itself are coverd by GPL.
 
 
 =========================================================================
