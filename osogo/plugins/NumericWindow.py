@@ -15,27 +15,23 @@ class NumericWindow( PluginWindow ):
                             'decrease_value' :self.decreaseValue } )
 
         self.theFPN = data[0]
-        self.initInterface(self.theFPN)
+        self.initialize(self.theFPN)
         
 
-    def initialize( self ):
-
-        self.theFullID = convertToFullID( self.theFPN )
-        self.theType = str( self.theFullID[TYPE] )
-        self.theID   = str( self.theFullID[ID] )
-        self.thePath = str( self.theFullID[SYSTEMPATH] )
-        
-#        self.update()
-
-    def initInterface( self, fpn ):
+    def initialize( self, fpn ):
 
         self.theFPN = fpn
-        self.initialize()
+        self.theID = str( self.theFPN[ID] )
+        self.theProperty = str( self.theFPN[PROPERTY] )
+        self.theFullID = convertToFullID( self.theFPN )
+        aFullIDString = constructFullIDString(self.theFullID)
+        
         self["id_label"].set_text( self.theID )
-        value = self.theSimulator.getProperty( self.theFPN )
+        value = self.theSimulator.getProperty( (aFullIDString, self.theProperty ))
         self.theCurValue = value[0]
         self["value_frame"].set_text(str(self.theCurValue))
 
+#        self.update()
         
     def update( self ):
 
@@ -73,7 +69,7 @@ if __name__ == "__main__":
 
     class simulator:
 
-        dic={('Substance','/CELL/CYTOPLASM','ATP','quantity') : (1950,),}
+        dic={('Substance:/CELL/CYTOPLASM:ATP','Quantity') : (1950,),}
 
         def getProperty( self, fpn ):
             return simulator.dic[fpn]
@@ -82,7 +78,7 @@ if __name__ == "__main__":
             simulator.dic[fpn] = value
 
 
-    fpn = ('Substance','/CELL/CYTOPLASM','ATP','quantity')
+    fpn = ('Substance','/CELL/CYTOPLASM','ATP','Quantity')
 
     def mainQuit( obj, data ):
         print obj,data
