@@ -31,6 +31,8 @@ class TracerWindow( OsogoPluginWindow ):
 					IDflag = 1
 
         
+		self.theFirstLog = []	
+
 		self.theSession = pluginmanager.theSession
 		aFullPNString = createFullPNString( self.theFullPN() )
 
@@ -41,6 +43,7 @@ class TracerWindow( OsogoPluginWindow ):
 			aValue = self.theSession.theSimulator.getEntityProperty( aFullPNString )
 			#if operator.isNumberType( aValue[0] ):
 			if operator.isNumberType( aValue ):
+				self.openWindow()
 				self.thePluginManager.appendInstance( self )                    
 				#self.initialize()
 				# ------------------------------------------------------
@@ -107,7 +110,10 @@ class TracerWindow( OsogoPluginWindow ):
 				# ------------------------------------------------------
 
 			else:
-				self.thePluginManager.printMessage( "%s: not numerical data\n" % aFullPNString )                    
+
+				aMessage = "Error: (%s) is not numerical data" %aFullPNString 
+				self.thePluginManager.printMessage( aMessage ) 
+				aDialog = ConfirmWindow(0,aMessage,'Error!')
                 
 		else:
 			aClassName = self.__class__.__name__
@@ -117,7 +123,7 @@ class TracerWindow( OsogoPluginWindow ):
 				else:
 					aFullPNString = createFullPNString( self.theFullPN() )     
 					self.theSession.printMessage( "%s: not numerical data\n" % aFullPNString )                    
-		self.addPopupMenu(0,1,0)
+		#self.addPopupMenu(0,1,0)
 
 	# end of __init__
 
@@ -194,27 +200,25 @@ class TracerWindow( OsogoPluginWindow ):
 
 	def updateLoggerDataList(self):
 		self.LoggerDataList =[]
+		#for aLogger in self.theLoggerList:
+		#	aLoggerStub = LoggerStub( self.theSession.theSimulator, aLogger )
+		#	aEndTime = aLoggerStub.getEndTime()
+		#	self.LoggerDataList.append( aLoggerStub.getDataWithStartEndInterval(self.StartTime, aEndTime, 1) )
+
+		#self.StartTime = aEndTime
+
 		for aLogger in self.theLoggerList:
 			aLoggerStub = LoggerStub( self.theSession.theSimulator, aLogger )
 			aEndTime = aLoggerStub.getEndTime()
-			self.LoggerDataList.append( aLoggerStub.getDataWithStartEndInterval(self.StartTime, aEndTime, 1) )
+			if self.StartTime < aEndTime:
+				self.LoggerDataList.append( aLoggerStub.getDataWithStartEndInterval(self.StartTime, aEndTime, 1) )
+			else:
+				aValue = self.theSession.theSimulator.getEntityProperty( createFullPNString(self.theFullPN()) )
+				self.theFirstLog = [[self.StartTime,aValue,aValue,aValue,aValue]]
+				self.LoggerDataList.append( self.theFirstLog )
 
 		self.StartTime = aEndTime
-#            print aLogger.getData()[0]
-            
-#        if self.LoggerDataList[0] != ():
-#            self.datanumber = array(self.LoggerDataList[0]).shape[0]
-#            self.step_size = int(self.datanumber/500)
-#        num = 0
 
-#        self.entry = {}
-#        while num < len(self.theLoggerList):
-#            if self.LoggerDataList[num] == ():
-#                pass
-#            else:
-#                self.LoggerDataList[num] = array( self.LoggerDataList[num])
-#                self.entry['X%s' % str(num+1)] = self.LoggerDataList[num]
-#            num += 1
 
 	def setStateList( self ):
 		aStateList = []
@@ -234,7 +238,8 @@ class TracerWindow( OsogoPluginWindow ):
 			if len(FullDataList_prev) > num :
 				self.FullDataList.append( concatenate( (FullDataList_prev[num], array( LoggerData ))))
 			if num >= len(FullDataList_prev):
-				self.FullDataList.append( array(LoggerData) )
+				if LoggerData != self.theFirstLog:
+					self.FullDataList.append( array(LoggerData) )
                 
 			num += 1
 
@@ -254,128 +259,133 @@ class TracerWindow( OsogoPluginWindow ):
 			theStateList = self.setStateList()
 			self.updateLoggerDataList()
             
-			if self.LoggerDataList[0] == ():
-				pass
-			else:
-				self.updateFullDataList()
-				self.xList = []
-				self.yList = []
-				if self.xaxis == None or self.xaxis == 'time':
-					if self.yaxis == None:
-						for num in range(len(self.LoggerDataList)):
-							self.xList.append(self.FullDataList[num][:,0])
-							self.yList.append(self.FullDataList[num][:,1])
+			try:
+				if self.LoggerDataList[0] == ():
+					pass
+				else:
 
-					else:
-						num = 2
-						for yaxis in self.yaxis:
-							if yaxis == '':
-								self.xList.append (['None'])
-								self.yList.append (['None'])
-							else:
+					self.updateFullDataList()
+					self.xList = []
+					self.yList = []
+					if self.xaxis == None or self.xaxis == 'time':
+						if self.yaxis == None:
+							for num in range(len(self.LoggerDataList)):
+								self.xList.append(self.FullDataList[num][:,0])
+								self.yList.append(self.FullDataList[num][:,1])
+
+						else:
+							num = 2
+							for yaxis in self.yaxis:
+								if yaxis == '':
+									self.xList.append (['None'])
+									self.yList.append (['None'])
+								else:
 ## Must execute interpolation when the caluculated objects don't have the same step intervals
 ## Now I assume they have the same step intervals                        
                                 
-								try:
-									self.xList.append ( self.FullDataList[0][:,0] )    
-									self.yList.append ( eval(yaxis, self.entry)[:,1] )
-								except NameError:
-									self.theSession.printMessage( "name '%s' is not defined \n" % yaxis )
-									self["entry%i"%num].set_text ('')
-									self.changeyaxis( self["entry%i"%num])
-									self.yList.append(['None'])
-								except (SyntaxError,TypeError):
-									self.theSession.printMessage( "'%s' is SyntaxError or TypeError\n" % yaxis )
-									self["entry%i"%num].set_text ('')
-									self.changeyaxis( self["entry%i"%num])
-									self.yList.append(['None'])
-							num += 1
+									try:
+										self.xList.append ( self.FullDataList[0][:,0] )    
+										self.yList.append ( eval(yaxis, self.entry)[:,1] )
+									except NameError:
+										self.theSession.printMessage( "name '%s' is not defined \n" % yaxis )
+										self["entry%i"%num].set_text ('')
+										self.changeyaxis( self["entry%i"%num])
+										self.yList.append(['None'])
+									except (SyntaxError,TypeError):
+										self.theSession.printMessage( "'%s' is SyntaxError or TypeError\n" % yaxis )
+										self["entry%i"%num].set_text ('')
+										self.changeyaxis( self["entry%i"%num])
+										self.yList.append(['None'])
+								num += 1
                                     
-
-				else:
-					if self.yaxis == None:
-						for num in range(len(self.LoggerDataList)):
-							try :
-								self.xList.append ( eval(self.xaxis, self.entry)[:,1] )
-							except NameError:
-								self.theSession.printMessage( "name '%s' is not defined \n" % self.xaxis )
-								self["entry1"].set_text ('time')
-								self.changexaxis( self["entry1"] )
-								self.xList.append(self.FullDataList[0][:,0])
-							except (SyntaxError,TypeError):
-								self.theSession.printMessage( "'%s' is SyntaxError or TypeError\n" % self.xaxis )
-								self["entry1"].set_text ('time')
-								self.changexaxis( self["entry1"] )                                
-								self.xList.append(self.FullDataList[0][:,0]) 
-							self.yList.append ( self.FullDataList[num][:,1] )
 					else:
-						num = 2
-						for yaxis in self.yaxis:
-							if yaxis == '':
-								self.xList.append (['None'])
-								self.yList.append (['None'])
-							else:
-								try:
-									self.xList.append( eval(self.xaxis, self.entry)[:,1])
+						if self.yaxis == None:
+							for num in range(len(self.LoggerDataList)):
+								try :
+									self.xList.append ( eval(self.xaxis, self.entry)[:,1] )
 								except NameError:
 									self.theSession.printMessage( "name '%s' is not defined \n" % self.xaxis )
 									self["entry1"].set_text ('time')
-									self.changexaxis( self["entry1"] )                                    
+									self.changexaxis( self["entry1"] )
 									self.xList.append(self.FullDataList[0][:,0])
 								except (SyntaxError,TypeError):
 									self.theSession.printMessage( "'%s' is SyntaxError or TypeError\n" % self.xaxis )
 									self["entry1"].set_text ('time')
-									self.changexaxis( self["entry1"] )                                    
-									self.xList.append(self.FullDataList[0][:,0])                                    
-
-								try:
-									self.yList.append( eval(yaxis, self.entry)[:,1])
-								except NameError:
-									self.theSession.printMessage( "name '%s' is not defined \n" % yaxis )
-									self["entry%i"%num].set_text ('')
-									self.changeyaxis( self["entry%i"%num] )
-									self.yList.append(['None'])
-								except (SyntaxError,TypeError):
-									self.theSession.printMessage( "'%s' is SyntaxError or TypeError \n" % yaxis )
-									self["entry%i"%num].set_text ('')
-									self.changeyaxis( self["entry%i"%num] )
-									self.yList.append(['None'])
-							num += 1
-            
-			#
-			if self.yaxis == None:
-				num = 0
-				for LoggerData in self.LoggerDataList:
-					if LoggerData == ():
-						pass
-					else:
-						if theStateList[num] == 1:
-							self.theDataList[num].set_points( None, None )
+									self.changexaxis( self["entry1"] )                                
+									self.xList.append(self.FullDataList[0][:,0]) 
+								self.yList.append ( self.FullDataList[num][:,1] )
 						else:
-							if self.scale == "log":
-								if min(array(LoggerData)[:,1]) <= 0:
+							num = 2
+							for yaxis in self.yaxis:
+								if yaxis == '':
+									self.xList.append (['None'])
+									self.yList.append (['None'])
+								else:
+									try:
+										self.xList.append( eval(self.xaxis, self.entry)[:,1])
+									except NameError:
+										self.theSession.printMessage( "name '%s' is not defined \n" % self.xaxis )
+										self["entry1"].set_text ('time')
+										self.changexaxis( self["entry1"] )                                    
+										self.xList.append(self.FullDataList[0][:,0])
+									except (SyntaxError,TypeError):
+										self.theSession.printMessage( "'%s' is SyntaxError or TypeError\n" % self.xaxis )
+										self["entry1"].set_text ('time')
+										self.changexaxis( self["entry1"] )                                    
+										self.xList.append(self.FullDataList[0][:,0])                                    
+
+									try:
+										self.yList.append( eval(yaxis, self.entry)[:,1])
+									except NameError:
+										self.theSession.printMessage( "name '%s' is not defined \n" % yaxis )
+										self["entry%i"%num].set_text ('')
+										self.changeyaxis( self["entry%i"%num] )
+										self.yList.append(['None'])
+									except (SyntaxError,TypeError):
+										self.theSession.printMessage( "'%s' is SyntaxError or TypeError \n" % yaxis )
+										self["entry%i"%num].set_text ('')
+										self.changeyaxis( self["entry%i"%num] )
+										self.yList.append(['None'])
+								num += 1
+           	 
+				#
+				if self.yaxis == None:
+					num = 0
+					for LoggerData in self.LoggerDataList:
+						if LoggerData == ():
+							pass
+						else:
+							if theStateList[num] == 1:
+								self.theDataList[num].set_points( None, None )
+							else:
+								if self.scale == "log":
+									if min(array(LoggerData)[:,1]) <= 0:
+										self.theSession.printMessage( "value is under 0, set yaxis to linear scale\n" )
+										self.plot.set_yscale(PLOT_SCALE_LINEAR)
+										self.scale = "linear"
+								self.theDataList[num].set_points( self.xList[num], self.yList[num] )
+						num += 1
+
+				else:
+					num = 0
+					for yaxis in self.yaxis:
+						if theStateList[num] == 1:
+							self.theDataList[num].set_points(None,None)
+						elif yaxis == '':
+							self.theDataList[num].set_points(None,None)
+						else :
+							if self.scale == 'log':
+								if min(array(LoggerData)[:,1] ) <= 0:
 									self.theSession.printMessage( "value is under 0, set yaxis to linear scale\n" )
 									self.plot.set_yscale(PLOT_SCALE_LINEAR)
-									self.scale = "linear"
-							self.theDataList[num].set_points( self.xList[num], self.yList[num] )
-					num += 1
-
-			else:
-				num = 0
-				for yaxis in self.yaxis:
-					if theStateList[num] == 1:
-						self.theDataList[num].set_points(None,None)
-					elif yaxis == '':
-						self.theDataList[num].set_points(None,None)
-					else :
-						if self.scale == 'log':
-							if min(array(LoggerData)[:,1] ) <= 0:
-								self.theSession.printMessage( "value is under 0, set yaxis to linear scale\n" )
-								self.plot.set_yscale(PLOT_SCALE_LINEAR)
-								self.scale = 'linear'
-						self.theDataList[num].set_points(self.xList[num],self.yList[num])
-					num += 1
+									self.scale = 'linear'
+							self.theDataList[num].set_points(self.xList[num],self.yList[num])
+						num += 1
             
+			except:
+				#print "error"
+				pass
+
 			self.plot.autoscale()
 			self.canvas.paint()
 			self.canvas.refresh()
