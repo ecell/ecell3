@@ -25,11 +25,13 @@ import string ## for convertPath, ModelInterpreter
 class Eml:
     """This class uses Level-1 methods."""
 
-
     def __init__( self, aFile ):
         """read EML file and make domtree as a member value"""
-        self.__theDocument = minidom.parse( aFile )
 
+        aFileObject = open( aFile )
+        aFileList   = aFileObject.readlines()
+        aStringData = string.join( string.join( filelist, '' ).split( '\n' ), '' )
+        self.__theDocument = minidom.parseString( aStringData )
 
 
     def save( self, anOutputFile ):
@@ -330,8 +332,13 @@ class EmlParser:
     def __init__( self, aFile ):
         """read EML file and make Document Object"""
         self.__theFile = aFile
-        self.__theDocument = minidom.parse( self.__theFile )
 
+        aFileObject = open( aFile )
+        aFileList   = aFileObject.readlines()
+        aStringData = string.join( string.join( aFileList, '' ).split( '\n' ), '' )
+        self.__theDocument = minidom.parseString( aStringData )
+
+        
 
     def parse( self ):
         """parse the DOM to the PreModel Object
@@ -356,9 +363,9 @@ class EmlParser:
         ## Temporary Path Convert for 3.0.0, refactor!!
         aPathConverter = ConvertPath( self.__theFile )
         aPathConverter.createPathList( 'None' )
-
+        
         for aTargetEntity in( aPreModel['entity'] ):
-            aTargetEntity[0] = aPathConverter.change( aTargetEntity[0] )
+            aTargetEntity[1] = aPathConverter.change( aTargetEntity[1] )
         for aTargetStepperSystem in( aPreModel['stepper_system'] ):
             aTargetStepperSystem[0] = aPathConverter.change( aTargetStepperSystem[0] )
         ##-----------------------------------------------------------------------------
@@ -448,22 +455,32 @@ class EmlParser:
     
         for aTargetSystem in( aSystemList ):
 
-            anId        = str( aTargetSystem.getAttribute( 'id' ) )
+            aPath     = str( aTargetSystem.getAttribute( 'id' ) )
+            aPathList = aPath.split( '/' )
+
+            aSystemId = aPathList[-1]
+            if not aSystemId:
+                aSystemId = '/'
+
+            aSystemPath = aPath
             aSystemName = str( aTargetSystem.getAttribute( 'name' ) )
             aStepper    = str( aTargetSystem.getAttribute( 'stepper' ) )
-
-            anEntityPreModel.append( [anId,'system',aSystemName] )
             
+            anEntityPreModel.append( [ 'System', aSystemPath, aSystemId, aSystemName ] )
+
 
             for aTargetEntity in( aTargetSystem.childNodes ):
 
                 if aTargetEntity.tagName == 'substance' or \
                    aTargetEntity.tagName == 'reactor':
 
-                    anEntityClass = str( aTargetEntity.tagName )
+
+                    aPath         = aSystemPath
+                    anEntityClass = string.capitalize( str( aTargetEntity.tagName ) )
                     aName         = str( aTargetEntity.getAttribute( 'name' ) )
-                    
-                    anEntityPreModel.append( [ anId, anEntityClass, aName ] )
+                    anId          = str( aTargetEntity.getAttribute( 'id' ) )
+
+                    anEntityPreModel.append( [ anEntityClass, aPath, anId, aName ] )
 
         return anEntityPreModel
 
@@ -475,7 +492,11 @@ class ConvertPath:
 
     def __init__( self, anEmlFile ):
         """initialize self.__thePedigreeList"""
-        self.__theDocument     = minidom.parse( anEmlFile )
+        aFileObject = open( anEmlFile )
+        aFileList   = aFileObject.readlines()
+        aStringData = string.join( string.join( aFileList, '' ).split( '\n' ), '' )
+        self.__theDocument = minidom.parseString( aStringData )
+
         self.__thePedigreeList = []
         
 
