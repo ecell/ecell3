@@ -4,7 +4,7 @@ This is emllib for EML
 __author__     = 'suzuki'
 __email__      = 'suzuki@sfc.keio.ac.jp'
 __startDate__  = '020316'
-__lastUpdate__ = '020706'
+__lastUpdate__ = '020730'
 
 __Memo__ = '\
 '
@@ -45,7 +45,7 @@ class Eml:
         """save domtree as an EML file"""
         
         anEmlString = self.asString()
-
+        
         anOutputFileObject = open( anOutputFile, 'w' )
         anOutputFileObject.write( anEmlString )
 
@@ -116,28 +116,32 @@ class Eml:
     ## Methods for Entity
     ##---------------------------------------------
 
-    def createEntity( self, anEntityType, aClass, anId, aName ):
+    def createEntity( self, anEntityType, aClass, aFullId, aName ):
         """create an entity: system, substance and reactor"""
 
 
-        if self.checkEntityExistence( anId )[0]:
-            print 'already exists'
-            return 'error'
-            ## I want to stop this process here!!!
+        #if self.checkEntityExistence( aFullId )[0]:
+        #    print 'already exists'
+        #    return 'error'
+        #    ## I want to stop this process here!!!
 
         anEntityElement = self.createElement( string.lower( anEntityType ) )
         anEntityElement.setAttribute( 'class', aClass )
-        anEntityElement.setAttribute( 'name', aName )
+        anEntityElement.setAttribute( 'name' , aName )
+
 
         if( anEntityType == 'System' ):
+
+            anId = self.convertSystemFullId2SystemId( aFullId )
             anEntityElement.setAttribute( 'id', anId )
             self.__theDocument.documentElement.appendChild( anEntityElement )
 
-        else:
-            anEntityElement.setAttribute( 'id', anId.split( ':' )[2] )
+        elif( anEntityType == 'Substance' or anEntityType == 'Reactor' ):
 
-            aTargetFullPath = anId.split( ':' )[1]
-            
+            anId = aFullId.split( ':' )[2]
+            anEntityElement.setAttribute( 'id', anId )
+
+            aTargetFullPath = aFullId.split( ':' )[1]
             for aTargetNode in self.__theDocument.documentElement.childNodes:
 
                 if aTargetNode.tagName == 'system':
@@ -219,33 +223,37 @@ class Eml:
     
     def setProperty( self, aFullId, aName, aValueList ):
 
-        aPropertyExistence = self.checkPropertyExistence( aFullId )
-        if self.checkPropertyExistence( aFullId ):
-            print 'already exists'
-            return 'error'
+        #aPropertyExistence = self.checkPropertyExistence( aFullId )
+        #if self.checkPropertyExistence( aFullId ):
+        #    print 'already exists'
+        #    return 'error'
+        aPropertyExistence = 0 ## Temporary [020730]
 
         aTargetEntity = self.asEntityInfo( aFullId )
 
         if aPropertyExistence == 0:
 
             aPropertyElement = self.createPropertyElement( aName, aValueList )
-            
+
             for aTargetNode in self.__theDocument.firstChild.childNodes:
                 if aTargetNode.tagName == 'system':
                     aTargetSystem = aTargetNode
 
-                    aTargetSystemFullId = aTargetSystem.getAttribute( 'id' )
+                    aTargetSystemId     = aTargetSystem.getAttribute( 'id' )
+                    aTargetSystemFullId = self.convertSystemId2SystemFullId( aTargetSystemId )
                     aTargetSystemPath   = self.asSystemPath( aTargetSystem )
+
 
                     ## for System
                     if aTargetEntity[ 'Type' ] == 'System' and \
-                       aTargetSystemFullId == aFullId:
+                           aTargetSystemFullId == aFullId:
                         
                         aTargetSystem.appendChild( aPropertyElement )
 
 
                     ## for Substance or Reactor
                     elif aTargetSystemPath == aTargetEntity[ 'Path' ]:
+
                         for anElement in aTargetSystem.childNodes:
                             if anElement.tagName == string.lower( aTargetEntity[ 'Type' ] ) and \
                                anElement.getAttribute( 'id' ) == aTargetEntity[ 'Id' ]:
@@ -605,6 +613,77 @@ class Eml:
 
 
 
+    def convertSystemFullId2SystemId( self, aSystemFullId ):
+        """
+        aSystemFullId : ex) System:/CELL:CYTOPLASM
+        return -> aSystemId [string] : ex) /CELL/CYTOPLASM
+        """
+
+        aPathToSystem   = aSystemFullId.split( ':' )[1]
+        aSystemSimpleId = aSystemFullId.split( ':' )[2]
+
+        if( aSystemSimpleId == '/' ):
+            aSystemId = '/'
+
+        elif( aPathToSystem == '/' ):
+            aSystemId = '/' +aSystemSimpleId
+
+        else:
+            aSystemId = aPathToSystem + '/' +aSystemSimpleId
+            
+        return aSystemId
+
+
+
+    def convertSystemId2SystemFullId( self, aSystemId ):
+        """
+        aSystemId : ex) /CELL/CYTOPLASM
+        return -> aSystemFullId [string] : ex) System:/CELL:CYTOPLASM
+        """
+
+        aSystemIdArray  = aSystemId.split( '/' )
+        aSystemSimpleId = aSystemIdArray[-1]
+        
+        if ( aSystemId == '/' ):
+            aSystemFullId = 'System::/'
+
+        elif( len( aSystemIdArray ) == 2 ):
+            aSystemFullId = 'System:/:' + aSystemSimpleId
+
+        else:
+            del aSystemIdArray[-1]
+            aPathToSystem = string.join( aSystemIdArray, '/' )
+            aSystemFullId = 'System:' + aPathToSystem + ':' + aSystemSimpleId
+
+        return aSystemFullId
+
+
+
+    def asSystemPath( self, aTargetSystem ):
+        """convert fullid of system to fullpath
+           ex.) System:/CELL:CYTOPLASM -> /CELL/CYTOPLASM
+        """
+
+        aSystemId = aTargetSystem.getAttribute( 'id' )
+        aSystemPath = aSystemId
+        return aSystemPath
+
+
+#        if( aTargetSystem.getAttribute( 'id' ).split( ':' )[1] == '' ):
+#            aSystemPath = '/'
+#            
+#        elif( aTargetSystem.getAttribute( 'id' ).split( ':' )[1] == '/' ):
+#            aSystemPath = aTargetSystem.getAttribute( 'id' ).split( ':' )[1] + \
+#                          aTargetSystem.getAttribute( 'id' ).split( ':' )[2]
+#
+#        else:
+#            aSystemPath = aTargetSystem.getAttribute( 'id' ).split( ':' )[1] + \
+#                          '/' + aTargetSystem.getAttribute( 'id' ).split( ':' )[2]
+#
+#        return aSystemPath
+
+
+
     def asPathToSystem( self, aFullPathOfSystem ):
 
 
@@ -625,31 +704,3 @@ class Eml:
 
         return aPathToTargetSystem
         
-
-
-    def asSystemPath( self, aTargetSystem ):
-        """convert fullid of system to fullpath
-           ex.) System:/CELL:CYTOPLASM -> /CELL/CYTOPLASM
-        """
-
-        aSystemId = aTargetSystem.getAttribute( 'id' )
-
-        aSystemPath = aSystemId
-
-        return aSystemPath
-
-
-#        if( aTargetSystem.getAttribute( 'id' ).split( ':' )[1] == '' ):
-#            aSystemPath = '/'
-#            
-#        elif( aTargetSystem.getAttribute( 'id' ).split( ':' )[1] == '/' ):
-#            aSystemPath = aTargetSystem.getAttribute( 'id' ).split( ':' )[1] + \
-#                          aTargetSystem.getAttribute( 'id' ).split( ':' )[2]
-#
-#        else:
-#            aSystemPath = aTargetSystem.getAttribute( 'id' ).split( ':' )[1] + \
-#                          '/' + aTargetSystem.getAttribute( 'id' ).split( ':' )[2]
-#
-#        return aSystemPath
-
-
