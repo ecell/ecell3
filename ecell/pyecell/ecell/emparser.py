@@ -245,7 +245,7 @@ def p_entity_other_object_decl (t):
 
 def p_propertylist(t):
 	'''
-	propertylist : propertylist property
+	propertylist : property propertylist
 	             | property
                      | empty
         '''
@@ -295,7 +295,7 @@ def p_value(t):
         
 def p_valuelist(t):
         '''
-        valuelist : valuelist value
+        valuelist : value valuelist
                   | value
         '''
 	t[0] =  createList( 'valuelist', t )
@@ -308,7 +308,7 @@ def p_matrix(t):
 	
 def p_matrixlist(t):
         '''
-        matrixlist : matrixlist matrix
+        matrixlist : matrix matrixlist
                    | matrix
         '''
 	t[0] =  createList( 'matrixlist', t )
