@@ -4,7 +4,7 @@ from Window import *
 from main import *
 from Plugin import *
 
-from gtk import *
+import gtk
 from ecssupport import *
 
 import ecs
@@ -123,33 +123,32 @@ class MainWindow(Window):
 
     def startSimulation( self, a ) :
         self.printMessage( "start\n" )
-        self.theTimer = timeout_add(self.theUpdateInterval, self.updateByTimeOut, 0)
+        self.theTimer = gtk.timeout_add(self.theUpdateInterval, self.updateByTimeOut, 0)
         self.theSimulator.run()
-        self.update(0)
+        self.update()
 
     def stopSimulation( self, a ) :
         self.printMessage( "stop\n" )
         self.theSimulator.stop()
-        self.update(0)
-        timeout_remove(self.theTimer)
+        self.update()
+        gtk.timeout_remove(self.theTimer)
 
     def stepSimulation( self, a ) : 
         self.printMessage( "step\n" )
-        self.theTimer = timeout_add(self.theUpdateInterval, self.updateByTimeOut, 0)
+        self.theTimer = gtk.timeout_add( self.theUpdateInterval, self.updateByTimeOut, 0 )
         self.theSimulator.run( self.theStepSize )
-        self.update(0)
-        timeout_remove(self.theTimer)
+        self.update()
+        gtk.timeout_remove( self.theTimer )
 
     def setStepSize( self, obj ):
         self.theStepSize =  string.atoi( obj.get_text() )
-#        print self.theStepSize
 
     def updateByTimeOut( self, a ):
-        timeout_remove(self.theTimer)
-        self.update(0)
-        self.theTimer = timeout_add(self.theUpdateInterval, self.updateByTimeOut, 0)
+        gtk.timeout_remove( self.theTimer )
+        self.update()
+        self.theTimer = gtk.timeout_add( self.theUpdateInterval, self.updateByTimeOut, 0 )
 
-    def update( self , a):
+    def update( self ):
         aTime = self.theSimulator.getProperty( ( SYSTEM, '/', '/', 'CurrentTime') ) 
         self.theCurrentTime = aTime[0]
         self['time_entry'].set_text( str( self.theCurrentTime ) )
