@@ -40,7 +40,9 @@ import gobject
 from os import *
 
 from ecell.ecssupport import *
-import ConfirmWindow
+from ConfirmWindow import *
+import sys
+import traceback
 
 # Constant value of this class
 PROPERTY_INDEX = 0
@@ -48,171 +50,183 @@ VALUE_INDEX = 1
 GET_INDEX = 2
 SET_INDEX = 3
 
-MAX_STRING_NUMBER = 20
+MAX_STRING_NUMBER = 40
 
-# ---------------------------------------------------------------
-# StepperWindow -> OsogoWindow
-#  - displays each stepper's property
-#
-# ---------------------------------------------------------------
+import copy
+
 class StepperWindow(OsogoWindow):
-
+	"""StepperWindow
+	- displayes all stepper property
+	- user can change each stepper property
+	"""
 
 	# ---------------------------------------------------------------
-	# constructor
-	# aSession : the reference of session
-	# aMainWindow : the reference of MainWindow
-	# ---------------------------------------------------------------
+	# ==========================================================================
 	def __init__( self, aSession, aMainWindow ): 
+		"""Constructor
+		aSession     ---  the reference of session
+		aMainWindow  ---  the reference of MainWindow
+		"""
 
+		# calls superclass's constructor
 		OsogoWindow.__init__( self, aMainWindow, 'StepperWindow.glade' )
+
 		self.theSession = aSession
-		self.theStepperIDList = ()
-		self.theStepperIDListItems = []
-		self.theSelectedRowOfPropertyList = None
-		self.theSelectedStepperIDListItem = None
 
-	# end of the __init__
+		# initializes attributes
+		self.theSelectedStepperID = None  # selected stepperID (str)
+		self.theFirstPropertyIter = {}    # key:iter(TreeIter)  value:None
+		self.theSelectedPath = {}         # key:aStepperID(str)  value:Path
 
 
+	# ==========================================================================
 	def openWindow(self):
 
 		OsogoWindow.openWindow(self)
-		self.theStepperIDListWidget = self[ 'stepper_id_list' ]
 		aListStore = gtk.ListStore( gobject.TYPE_STRING )
-		self.theStepperIDListWidget.set_model( aListStore )
+		self['stepper_id_list'].set_model( aListStore )
 		column=gtk.TreeViewColumn('Stepper',gtk.CellRendererText(),text=0)
-		self.theStepperIDListWidget.append_column(column)
+		self['stepper_id_list'].append_column(column)
 
-		self.thePropertyList=self['property_list']
 		aPropertyModel=gtk.ListStore( gobject.TYPE_STRING,
 					 gobject.TYPE_STRING,
 					  gobject.TYPE_STRING,
 					   gobject.TYPE_STRING,
 					    gobject.TYPE_STRING)
-		self.thePropertyList.set_model(aPropertyModel)
+		self['property_list'].set_model(aPropertyModel)
 		column=gtk.TreeViewColumn( 'Property',gtk.CellRendererText(),\
 					   text=PROPERTY_INDEX )
 		column.set_resizable(gtk.TRUE)
-		self.thePropertyList.append_column(column)
+		self['property_list'].append_column(column)
 		column=gtk.TreeViewColumn( 'Value',gtk.CellRendererText(),\
 					   text=VALUE_INDEX )
 		column.set_resizable(gtk.TRUE)
-		self.thePropertyList.append_column(column)
+		self['property_list'].append_column(column)
 		column=gtk.TreeViewColumn( 'Get',gtk.CellRendererText(),\
 					   text=GET_INDEX )
 		column.set_resizable(gtk.TRUE)
-		self.thePropertyList.append_column(column)
+		self['property_list'].append_column(column)
 		column=gtk.TreeViewColumn( 'Set',gtk.CellRendererText(),\
 					   text=SET_INDEX )
 		column.set_resizable(gtk.TRUE)
-		self.thePropertyList.append_column(column)
+		self['property_list'].append_column(column)
 		
-		self.initialize()
 
-		# -----------------------------------------------
-		# Adds handlers
-		# -----------------------------------------------
-
+		# adds handlers
 		self.addHandlers({ \
-
-				# StepperID list
-				'on_stepper_id_list_select'
-				: self.selectStepperID, 
-
-				# Property list
-				'on_property_list_select_row'
-				: self.selectProperty, 
-
-				# update button
-				'on_update_button_clicked'
-				: self.updateProperty, 
-
-				# close button
-	  			'on_close_button_clicked'
-				: self.closeWindow,
+				'on_stepper_id_list_select' : self.selectStepperID,  # StepperID list
+				'on_property_list_select_row' : self.selectProperty, # Property list
+				'on_update_button_clicked' : self.updateProperty,    # update button
+	  			'on_close_button_clicked' : self.deleted,            # close button
 			})
 
 
-	# end of openWindow
+		aModel = self['stepper_id_list'].get_model()
+		aModel.clear()			
+
+		aFirstIter = None
+		#for aValue in self.theStepperIDList: 
+		for aValue in self.theSession.getStepperList():
+			anIter = aModel.append()
+			if aFirstIter == None:
+				aFirstIter = anIter
+			aModel.set( anIter, 0, aValue )
+
+		self[self.__class__.__name__].show_all()
+
+		self['stepper_id_list'].get_selection().select_iter(aFirstIter)
+		self.selectStepperID(None)
 
 
-	# -----------------------------------------------
-	# initializer
-	# return -> None
-	# -----------------------------------------------
-	def initialize( self ):
-		self.update()
+	# ==========================================================================
+	def selectStepperID( self, *arg ):
+		"""selects stepper ID
+		Return None
+		"""
 
-	# end of initialize
-
-	# -----------------------------------------------
-	# selectStepperID
-	# objects : ( stepper_id_list[List], selected_item[Item] )
-	#
-	# return -> None
-	# -----------------------------------------------
-	def selectStepperID( self, *objects ):
-
-		# If Window is closed, do nothing.
-		#if self.isShown == gtk.FALSE:
+		# When window is not created, does nothing.
 		if self.exists() == FALSE:
 			return None
 
 		# --------------------------------------------------
 		# Creates selected StepperSub 
 		# --------------------------------------------------
-		iter = self.theStepperIDListWidget.get_selection().get_selected()[1]
+		iter = self['stepper_id_list'].get_selection().get_selected()[1]
 		# aStepperID is selected stepper id
-		aStepperID = self.theStepperIDListWidget.get_model().get_value(iter,0)
+		aStepperID = self['stepper_id_list'].get_model().get_value(iter,0)
+		
+		# When same StepperID is selected, does nothing
+		if self.theSelectedStepperID != None and aStepperID == self.theSelectedStepperID:
+			return None
+		self.theSelectedStepperID = aStepperID
+
 		# aStepperStub is selected StepperStub of selected stepper
 		aStepperStub = StepperStub( self.theSession.theSimulator, aStepperID )
 
-		PropertyModel=self['property_list'].get_model()
-		PropertyModel.clear()
+		# updates property list
+		aPropertyModel=self['property_list'].get_model()
+		aPropertyModel.clear()
 
-		# aClassName = self.theSession.theSimulator.getStepperClassName( aStepperID )
-		aClassName = aStepperStub.getClassname( )
-
-		# -----------------------
-		# Creates list [aList] to display
-		# ---------------------------------------
-
-		# Sets ClassName row
+		# creats list of ClassName's row
 		aList = [ 'ClassName', ]
-		aList.append( str(aClassName) )
-		aList.append( decodeAttribute( TRUE ) )
-		aList.append( decodeAttribute( FALSE ) )
-		iter = PropertyModel.append( )
-		for i in range(0,4):
-	    	    PropertyModel.set_value(iter,i,aList[i])
-					    
-		# Sets all propertys other than ClassName
 
-		#for aProperty in self.theSession.theSimulator.getStepperPropertyList( aStepperID ):
+		# value
+		aClassName = aStepperStub.getClassname( )
+		aList.append( str(aClassName) )
+
+		# gettable and settable
+		aList.append( decodeAttribute( TRUE ) )   # gettable is '+'
+		aList.append( decodeAttribute( FALSE ) )  # settable is '-'
+
+		# sets this list to TreeModel
+		iter = aPropertyModel.append()
+		for i in range(0,4):
+			aPropertyModel.set_value(iter,i,aList[i])
+					    
+		self.theFirstPropertyIter[aStepperID] = iter
+
+		# --------------------------------------------------
+		# sets all propertys' row other than ClassName
+		# --------------------------------------------------
 		for aProperty in aStepperStub.getPropertyList():
 
+			# property
+			aList = [ aProperty, ]  # first element
+
+			# value
 			aValue =  aStepperStub.getProperty( aProperty )
+			aList.append( shortenString( str(aValue), MAX_STRING_NUMBER) )  # second element
 
-			aList = [ aProperty, ]
-			aList.append( shortenString( str(aValue), MAX_STRING_NUMBER) )
-
+			# gettable and settable
 			anAttribute = aStepperStub.getPropertyAttributes( aProperty )
+			aList.append( decodeAttribute(anAttribute[GETABLE]) )  # third element
+			aList.append( decodeAttribute(anAttribute[SETTABLE]) ) # forth element
 
-			aList.append( decodeAttribute(anAttribute[GETABLE]) )
-			aList.append( decodeAttribute(anAttribute[SETTABLE]) )
-			iter = PropertyModel.append( )
+			# sets this list to TreeModel
+			iter = aPropertyModel.append( )
+			#anIterListElement = [iter]
 			for i in range(0,4):
-				PropertyModel.set_value(iter,i,aList[i])
+				aPropertyModel.set_value(iter,i,aList[i])
+
+		self.update()
+
+		if self.theSelectedPath.has_key(aStepperID) == TRUE:
+			aPath = self.theSelectedPath[aStepperID]
+			self['property_list'].get_selection().select_path(aPath)
+		else:
+			aPath = (0,)
+			self.theSelectedPath[aStepperID] = aPath
+			self['property_list'].get_selection().select_path(aPath)
+
+		self.selectProperty()
 
 
-	# -----------------------------------------------
-	# selectProprety
-	# *objects : the information of selected row (tuple)
-	#
-	# return -> None
-	# -----------------------------------------------
-	def selectProperty( self, *objects ):
+	# ==========================================================================
+	def selectProperty( self, *arg ):
+		"""when a property is selected, calls this method.
+		updates 
+		Returns None
+		"""
 
 		# If Window is closed, do nothing.
 		if self.exists() == FALSE:
@@ -221,24 +235,19 @@ class StepperWindow(OsogoWindow):
 		# --------------------------------------------------
 		# Creates selected StepperSub 
 		# --------------------------------------------------
-		iter = self.theStepperIDListWidget.get_selection().get_selected()[1]
-		aStepperID = self.theStepperIDListWidget.get_model().get_value(iter,0)
+		iter_stepper = self['stepper_id_list'].get_selection().get_selected()[1]
+		aStepperID = self['stepper_id_list'].get_model().get_value(iter_stepper,0)
 		aStepperStub = StepperStub( self.theSession.theSimulator, aStepperID )
 
 		# --------------------------------------------------
-		# gets the number of selected row that is required in updateProprety
-		# method.
+		# gets selected property name
 		# --------------------------------------------------
-		self.theSelectedRowOfPropertyList = self.thePropertyList.get_selection().get_selected()[1]
-
-		# --------------------------------------------------
-		# gets value from proprety_list
-		# --------------------------------------------------
-#		aValue = self['property_list'].get_model().get_value(\
-#			     self.theSelectedRowOfPropertyList, VALUE_INDEX )
-
-		aPropertyName = self['property_list'].get_model().get_value(\
-			     self.theSelectedRowOfPropertyList, PROPERTY_INDEX )
+		iter = self['property_list'].get_selection().get_selected()[1]
+		# When nothing is selected, does nothing.
+		if iter == None:
+			return None
+		aPropertyName = self['property_list'].get_model().get_value( iter, PROPERTY_INDEX )
+		self.theSelectedPath[aStepperID]=self['property_list'].get_model().get_path(iter)
 
 		# --------------------------------------------------
 		# sets value to value_entry
@@ -252,11 +261,6 @@ class StepperWindow(OsogoWindow):
 		# If selected Property is not 'ClassName'
 		else:
 			aValue = aStepperStub.getProperty( aPropertyName )
-	
-
-		#aValue = self.theSession.theSimulator.getStepperProperty(\
-		#	self.theSelectedStepperIDListItem,\
-		#	aPropertyName )
 
 		self['value_entry'].set_text( str( aValue ) )
 
@@ -264,26 +268,19 @@ class StepperWindow(OsogoWindow):
 		# when the selected property is settable, set sensitive value_entry
 		# when not, set unsensitive value_entry
 		# --------------------------------------------------
-		if self['property_list'].get_model().get_value(  self.theSelectedRowOfPropertyList,\
-								 SET_INDEX ) == decodeAttribute(TRUE):
-			self['value_entry'].set_sensitive( gtk.TRUE )
-			self['update_button'].set_sensitive( gtk.TRUE )
+		if self['property_list'].get_model().get_value( iter, SET_INDEX ) == decodeAttribute(TRUE):
+			self['value_entry'].set_sensitive( TRUE )
+			self['update_button'].set_sensitive( TRUE )
 		else:
-			self['value_entry'].set_sensitive( gtk.FALSE )
-			self['update_button'].set_sensitive( gtk.FALSE )
+			self['value_entry'].set_sensitive( FALSE )
+			self['update_button'].set_sensitive( FALSE )
 
 
-	# end of selectProprety
-
-
-	# -----------------------------------------------
-	# updateProprety
-	# This method doesn't deal with 'ClassName' is selected,
-	# but there is no case that this is called with selecting 'ClassName'.
-	#
-	# return -> None
-	# -----------------------------------------------
-	def updateProperty( self, *objects ):
+	# ==========================================================================
+	def updateProperty( self, *arg ):
+		"""updates property
+		Return None
+		"""
 
 		# If Window is closed, do nothing.
 		if self.exists() == FALSE:
@@ -292,17 +289,16 @@ class StepperWindow(OsogoWindow):
 		# --------------------------------------------------
 		# creates selected StepperSub 
 		# --------------------------------------------------
-		iter = self.theStepperIDListWidget.get_selection().get_selected()[1]
-		aStepperID = self.theStepperIDListWidget.get_model().get_value(iter,0)
+		iter = self['stepper_id_list'].get_selection().get_selected()[1]
+		aStepperID = self['stepper_id_list'].get_model().get_value(iter,0)
 		aStepperStub = StepperStub( self.theSession.theSimulator, aStepperID )
 
-		# --------------------------------------------------
 		# gets selected property row
-		# --------------------------------------------------
-		self.theSelectedRowOfPropertyList = self.thePropertyList.get_selection().get_selected()[1]
-		if self.theSelectedRowOfPropertyList == None:
+		iter = self['property_list'].get_selection().get_selected()[1]
+
+		if iter == None:
 			aMessage = 'Select a property.'
-			aDialog = ConfirmWindow.ConfirmWindow(0,aMessage,'Error!')
+			aDialog = ConfirmWindow(OK_MODE,aMessage,'Error!')
 			self['statusbar'].push(1,'property is not selected.')
 			return None
 
@@ -316,35 +312,65 @@ class StepperWindow(OsogoWindow):
 		# -----------------------------------------------------------
 		# get a property name from property list
 		# -----------------------------------------------------------
-		aPropertyName = self['property_list'].get_model().get_value( self.theSelectedRowOfPropertyList,
-		                                                PROPERTY_INDEX )
+		aPropertyName = self['property_list'].get_model().get_value( iter, PROPERTY_INDEX )
 
-		# ------------------------------------
 		# When the property value is scalar
-		# ------------------------------------
 		if type(aValue) != list and type(aValue) != tuple:
 
-			# ---------------------------------------------------
 			# converts value type
-			# ---------------------------------------------------
 			anOldValue = aStepperStub.getProperty( aPropertyName )
 
 			# ---------------------------------------------------
-			# sets new value
+			# checks float and int type of inputted value
+			# does not check str. ( not needed )
 			# ---------------------------------------------------
+			# float
+			if type(anOldValue) == float:
+				try:
+					aValue = string.atof(aValue)
+				except:
+					# displays confirm window
+					anErrorMessage = "Input float value."
+					self['statusbar'].push(1,anErrorMessage)
+					aDialog = ConfirmWindow(OK_MODE,"Can't set property!\n" + anErrorMessage,'Error!')
+					return None
+
+			# int
+			if type(anOldValue) == int:
+				try:
+					aValue = string.atoi(aValue)
+				except:
+					# displays confirm window
+					anErrorMessage = "Input int value."
+					self['statusbar'].push(1,anErrorMessage)
+					aDialog = ConfirmWindow(OK_MODE,"Can't set property!\n" + anErrorMessage,'Error!')
+					return None
+
+			# sets new value
 			try:
 				aStepperStub.setProperty( aPropertyName, aValue )
 			except:
 
-				import sys
-				import traceback
-				anErrorMessage =  string.join( traceback.format_exception(sys.exc_type,sys.exc_value,sys.exc_traceback), '\n' )
+				# displays error message to MessageWindow
+				anErrorMessage = string.join( traceback.format_exception(\
+				                 sys.exc_type,sys.exc_value,sys.exc_traceback), '\n' )
 				self.theSession.message( anErrorMessage )
 
-				anErrorMessage = "Error : refer to the MessageWindow."
-				aDialog = ConfirmWindow.ConfirmWindow(0,aMessage,"Can't set property!\n" + anErrorMessage)
+				# displays confirm window
+				anErrorMessage = "See MessageWindow for details."
 				self['statusbar'].push(1,anErrorMessage)
+				aDialog = ConfirmWindow(OK_MODE,aMessage,"Can't set property!\n" + anErrorMessage)
 				return None
+
+			# when to set property is succeeded,
+			else:
+
+				# refreshs self['property_list']
+				self.update()
+
+				# displays message to status bar
+				aMessage = "Property is changed."
+				self['statusbar'].push(1,aMessage)
 
 		# ------------------------------------
 		# When the property value is tuple
@@ -373,82 +399,54 @@ class StepperWindow(OsogoWindow):
 			# sets new value
 			# -------------------------------------------
 			try:
-				#self.theSession.theSimulator.setStepperProperty( self.theSelectedStepperIDListItem,
-			   	#                                              aPropertyName,
-			   	#                                              aNewValue )
 				aStepperStub.setProperty( aPropertyName, aNewValue )
 
 			except:
 
-				import sys
-				import traceback
-#				self.printMessage(' can\'t load [%s]' %aFileName)
-				anErrorMessage = \
-				  string.join( traceback.format_exception(sys.exc_type,sys.exc_value,sys.exc_traceback), '\n' )
+				# displays error message to MessageWindow
+				anErrorMessage = string.join( traceback.format_exception(\
+				                 sys.exc_type,sys.exc_value,sys.exc_traceback), '\n' )
 				self.theSession.message( aErroeMessage )
 
-				anErrorMessage = "Error : refer to the MessageWindow."
-				aDialog = ConfirmWindow.ConfirmWindow(0,aMessage,"Can't set property!\n" + anErrorMessage)
+				# displays confirm window
+				anErrorMessage = "See MessageWindow for details."
+				aDialog = ConfirmWindow(OK_MODE,aMessage,"Can't set property!\n" + anErrorMessage)
 				self['statusbar'].push(1,anErrorMessage)
 				return None
 
 
-		# -------------------------------------------
-		# updates property_list
-		# -------------------------------------------
-		self.selectStepperID( None)
-
-	# end of updateProprety
-
-
-	# ---------------------------------------------------------------
-	# Updates
-	#
-	# return -> None
-	# ---------------------------------------------------------------
+	# ==========================================================================
 	def update( self ):
+		"""overwrites superclass's method
+		updates the value of self['property_list']
+		"""
 
+		# When this window does not created, does nothing
 		if self.exists() == FALSE:
 			return None
 
+		# clears message on statusbar.
 		self['statusbar'].pop(1)
 
-		# ----------------------------------------------------
-		# When the stepper ID list is changed, update list.
-		# ----------------------------------------------------
-		# get new stepper list
-		self.theStepperIDList = self.theSession.getStepperList()
+		# gets stepperID
+		iter_stepper = self['stepper_id_list'].get_selection().get_selected()[1]
+		aStepperID = self['stepper_id_list'].get_model().get_value(iter_stepper,0)
+		aStepperStub = StepperStub( self.theSession.theSimulator, aStepperID )
 
-                aModel = self.theStepperIDListWidget.get_model()
+		iter = self.theFirstPropertyIter[aStepperID]
 
-		# when this window is shown, clear list
-		#		if self.isShown == gtk.TRUE:
-		#			aModel.clear()
+		# updates all value of self['property_list']
+		while(TRUE):
+			iter = self['property_list'].get_model().iter_next(iter)
+			if iter == None:
+				break
+			aProperty = self['property_list'].get_model().get_value(iter,0)
+			aValue = aStepperStub.getProperty( aProperty )
+			self['property_list'].get_model().set_value(iter,1,aValue)
 
-		aModel.clear()			
-		for aValue in self.theStepperIDList:
-			anIter = aModel.append()
-			aModel.set( anIter, 0, aValue )
+		# updates text
+		self.selectProperty()
 
-		self[self.__class__.__name__].show_all()
-
-	# end of update
-
-	# ---------------------------------------------------------------
-	# Closes this window
-	# return -> None
-	# ---------------------------------------------------------------
-	def closeWindow ( self, obj ):
-
-		self[self.__class__.__name__].iconify()
-
-	#	self[self.__class__.__name__].hide_all()
-	#	self.isShown = FALSE
-	#	self.theMainWindow.toggleStepperWindow()
-
-	# end of closeWindow
-
-			
 
 # end of StepperWindow
 

@@ -38,105 +38,121 @@ import os
 
 import gtk
 import gnome.ui
-#import GDK
 import gtk.gdk
-#import libglade
 import gtk.glade
 
 from ecell.Window import *
 from ConfirmWindow import *
 from OsogoUtil import *
 
-# ---------------------------------------------------------------
-# OsogoWindow -> Window
-#   - has existance status of window widget 
-#     the member theExist is 0 -> Window widget doesn't exist.
-#                            1 -> Window widget exists.
-# ---------------------------------------------------------------
+
+
 class OsogoWindow(Window):
+	"""OsogoWindow
+	- manages existance status.
+	- is iconized when 'delede_event' is catched.
+	"""
 
-	# ---------------------------------------------------------------
-	# Constructor
-	#   - initialize exist parameter
-	#
-	# return -> None
-	# ---------------------------------------------------------------
-	def __init__( self, aMainWindow, aGladeFile=None, aRoot=None ):
+	# ========================================================================
+	def __init__( self, aMainWindow, aGladeFile=None ):
+		"""constructor
+		aMainWindow  -- a reference to MainWindow (MainWindow)
+		aGladeFile   -- a glade file name (str)
+		"""
 
+		# calls superclass's constructor
+		Window.__init__( self, aGladeFile, aRoot=None )
+
+		# saves a reference to MainWindow
 		self.theMainWindow = aMainWindow
-		self.theExist = FALSE
-		Window.__init__( self, aGladeFile, aRoot )
 
-	# end of __init__
+		# initializes exist flag
+		self.__theExist = FALSE
 
 
-	# ---------------------------------------------------------------
-	# getExist
-	#  
-	# return -> exist status  
-	# ---------------------------------------------------------------
-	def getExist( self ):
-		return self.theExist
 
-	# end of getExist
-
+	# ========================================================================
 	def exists( self ):
-		return self.theExist
+		"""Returns TRUE:When glade file is loaded and does not deleted.
+		        FALSE:When glade file is not loaded yet or already deleted.
+		"""
 
+		return self.__theExist
+
+
+
+	# ========================================================================
 	def present( self ):
-		if self.getExist():
+		"""moves this window to the top of desktop.
+		When glade file is not loaded yet or already deleted, does nothing.
+		Returns None
+		"""
+
+	
+		# When glade file is not loaded yet or already deleted, does nothing
+		# calla present() method of Window widget of this window.
+		if self.exists():
+
 			self[self.__class__.__name__].present()
 
 
-	# ---------------------------------------------------------------
-	# destroyWindow
-	#  
-	# *objects : dammy objects
-	#
-	# return -> exist status  
-	# ---------------------------------------------------------------
-	def deleted( self, *arg ):
 
+	# ========================================================================
+	def deleted( self, *arg ):
+		""" When 'delete_event' signal is chatcked( for example, [X] button is clicked ),
+		iconize this window.
+		Returns TRUE
+		[Note]: 'return TRUE' means when 'delete_event' signal is checked, does not 
+		        delete widgets of this class. If you'd like to delete widget, overwrite
+		        this method that returns FALSE. And in the method you must set 
+		        self.__theExist = FASLE.
+		        example of subclass's method.
+
+				def deleted( self, *arg ):
+		            self.__theExist = FALSE
+		            return FALSE
+
+		"""
+
+		# iconizes this window
 		self[self.__class__.__name__].iconify()
+
+		# does not widgets
 		return TRUE
 
-	# end of destroyWindow
 
 
-	# ---------------------------------------------------------------
-	# openWindow
-	#  
-	# return -> None
-	# ---------------------------------------------------------------
+	# ========================================================================
 	def openWindow( self ):
+		"""overwrite super class's method
+		When glade file is not loaded yet or already deleted, calls superclass's
+		openWindow() method and connects 'delete_event' and self.delete() method.
+		Returns None
+		"""
 
-		# --------------------------------------------------
-		# If instance of Window Widget has destroyed,
-		# creates instance of Window Widget.
-		# --------------------------------------------------
-		if self.theExist == gtk.FALSE:
-			self.theExist = TRUE
+		# when glade file is not loaded yet or already deleted.
+		if self.__theExist == gtk.FALSE:
+
+			# sets __theExist flag is TRUE
+			self.__theExist = TRUE
+
+			# calls superclass's method 
 			Window.openWindow(self)
+
+			# connects 'delete_event' and self.delete() method.
 			self[self.__class__.__name__].show_all()
 			self[self.__class__.__name__].connect('delete_event',self.deleted)
 
-		# --------------------------------------------------
-		# If instance of Message Window Widget has destroyed,
-		# calls the show method of Window Widget.
-		# --------------------------------------------------
-
-		# sets signalhander
-		#self[self.__class__.__name__].connect('destroy',self.destroyWindow)
-
-		# sets exist status 'exists'
-		#self.theExist = gtk.TRUE
-		#self.isShown = gtk.TRUE
-
-	# end of openWindow
 
 
+	# ========================================================================
 	def update( self ):
+		"""
+		Returns None
+		"""
+
 		pass
+
 
 # end of OsogoWindow
 

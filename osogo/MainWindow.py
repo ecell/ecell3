@@ -751,6 +751,8 @@ class MainWindow(OsogoWindow):
 		"""
 
 		self.update()
+		self.updateFundamentalWindows()
+
 		self.theTimer = gtk.timeout_add( self.theUpdateInterval, self.updateByTimeOut, 0 )
 
 
