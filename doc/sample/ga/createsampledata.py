@@ -1,6 +1,8 @@
-#!/bin/sh
+#!/bin/env python
 
-cat << EOT
+import os,sys,shutil,popen2
+
+print '''
 ################################################################# 
 #                                                               #
 # This script generates sample input files of ga.esm            #
@@ -17,37 +19,56 @@ cat << EOT
 # The following files and directories are generated.            #
 #                                                               #
 #  simple*.eml    - EML file converted from simple*.em          #
-#  Data*/S.ecd    - observable time-course of simple*.em        #
+#  Data*%sS.ecd    - observable time-course of simple*.em        #
 #  Data*/P.ecd    - observable time-course of simple*.em        #
 #                                                               #
 # [Note] If the path of ecell3-em2eml and ecell3-session is not #
 #       currect, this script could not be executed correctly.   #
 #                                                               #
 ################################################################# 
+''' %( os.sep )
 
-EOT
+if os.path.isdir('Data1'):
+	print "deleting Data1..."
+	shutil.rmtree('Data1')
 
-if [ -d 'Data1' ] ; then
-	rm -rf Data1
-fi
+if os.path.isdir('Data2'):
+	print "deleting Data2..."
+	shutil.rmtree('Data2')
 
-if [ -d 'Data2' ] ; then
-	rm -rf Data2
-fi
+if os.path.isdir('Data3'):
+	print "deleting Data3..."
+	shutil.rmtree('Data3')
 
-if [ -d 'Data3' ] ; then
-	rm -rf Data3
-fi
+print "creating Data1..."
+os.mkdir('Data1')
+print "creating Data2..."
+os.mkdir('Data2')
+print "creating Data3..."
+os.mkdir('Data3')
 
-mkdir Data1
-mkdir Data2
-mkdir Data3
+aCommand ='ecell3-em2eml simple1.em'
+print aCommand
+os.system(aCommand)
 
-ecell3-em2eml simple1.em
-ecell3-em2eml simple2.em
-ecell3-em2eml simple3.em
-ecell3-session -e observable.py --parameters="{'_EML_':'simple1.eml','_KmS_':12.0,'_KcF_':4.0,'_Data_':'Data1'}"
-ecell3-session -e observable.py --parameters="{'_EML_':'simple2.eml','_KmS_':12.0,'_KcF_':4.0,'_Data_':'Data2'}"
-ecell3-session -e observable.py --parameters="{'_EML_':'simple3.eml','_KmS_':12.0,'_KcF_':4.0,'_Data_':'Data3'}"
+aCommand ='ecell3-em2eml simple2.em'
+print aCommand
+os.system(aCommand)
+
+aCommand ='ecell3-em2eml simple3.em'
+print aCommand
+os.system(aCommand)
+
+aCommand = 'ecell3-session -e observable.py --parameters=\"{\'_EML_\':\'simple1.eml\',\'_KmS_\':12.0,\'_KcF_\':4.0,\'_Data_\':\'Data1\'}\"'
+print aCommand
+os.system(aCommand)
+
+aCommand = 'ecell3-session -e observable.py --parameters=\"{\'_EML_\':\'simple2.eml\',\'_KmS_\':12.0,\'_KcF_\':4.0,\'_Data_\':\'Data1\'}\"'
+print aCommand
+os.system(aCommand)
+
+aCommand = 'ecell3-session -e observable.py --parameters=\"{\'_EML_\':\'simple3.eml\',\'_KmS_\':12.0,\'_KcF_\':4.0,\'_Data_\':\'Data1\'}\"'
+print aCommand
+os.system(aCommand)
 
 # end of this script

@@ -37,7 +37,7 @@ simple3.em                  Model file (EM file)
 
 1. Run the script to generate input files
 
-   % ./createsampledata.sh
+   % python createsampledata.py
 
    This script convert em file and execute observable.py.
    The following files and directries are generated.
