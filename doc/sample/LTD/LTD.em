@@ -11,8 +11,9 @@ Stepper ODE45Stepper( DE_1 )
 }
 
 Stepper DiscreteTimeStepper( DT_1 )
+#Stepper PassiveStepper( DT_1 )
 {
-	StepInterval 0.001;
+	StepInterval 0.01;
 }
 
 
@@ -1031,7 +1032,6 @@ System System( /CELL/CYTOPLASM )
 		VariableReferenceList	[ S0 :.:mGluR_Gq -1 ] [ P0 :.:MgluR 1 ] [ P1 :.:Gabc 1 ];
 	}
 	
-
 	Process MakesignalProcess( ADD )
 	{
 		Name	add;
@@ -1068,7 +1068,7 @@ System System( /CELL/CYTOPLASM )
 	
 		VariableReferenceList	[ P0 :.:Glu 1 ];
 	}
-	
+
 	Process PythonProcess( PKC_PKCactive )
 	{
 		Name	PKC_PKC_active;
