@@ -1,0 +1,89 @@
+#!/bin/sh
+#
+# dmgen --- a program to docify dynamic module in 
+#           E-CELL Simulation Environment Version 3
+#
+# author:  Tomoya Kitayama <tomo@e-cell.org>
+#
+
+PACKAGE=@PACKAGE@
+VERSION=@VERSION@
+
+prefix=@prefix@
+exec_prefix=@prefix@
+pythondir=@pythondir@
+
+SHAREDIR="${prefix}/share/ecell/@VERSION@/template"
+BINDIR="${exec_prefix}/bin"
+MUNCHBIN="${pythondir}/ecell/munch.py"
+TMPLDIR="${prefix}/share/ecell/@VERSION@/template"
+
+MUNCHSUFFIX=".mu"
+TMPLSUFFIX=".tmpl"
+
+
+help() 
+{
+cat << EOT_HELP
+
+Usage:
+	`basename $0` <classname> [OPTIONS] files...
+	`basename $0` -h|--help
+Options:
+	-d|--dmfilename)    Specify dmfile
+	-t|--template)      Specify template file
+        -m|--munch)         Specify munch file
+	-h|--help)          Print this massage
+EOT_HELP
+}
+
+#at least one argument is required
+
+if [ -z $1 ] ;then 
+    $1
+    help;
+    echo $1
+    exit 1
+fi
+
+# print help message
+ 
+if [ "$1" = "-h" -o "$1" = "--help" ] ; then
+    help
+    exit 0
+fi
+
+# get dynamic module class
+CLASS=$1
+shift
+
+while [ -n "$(echo $1 | grep '-')" ]; do
+    case "$1" in
+	-d|--dmfile) DMFILE=$2 ; shift 2 ;;
+	-t|--template) DO_TEMPLATE=yes ; TEMPLATEFILE=$2 ; shift 2 ;;
+	-m|--munch) DO_MUNCH=yes ; MUNCHFILE=$2 ; shift 2 ;;
+	-h|--help) help ; exit 0 ;;
+	*) echo "Invalid Option! " ; help ; exit 1 ;;
+    esac
+done
+
+# munch command
+
+base=`basename $DMFILE .dm`
+
+if [ $DO_TEMPLATE ] ; then 
+    TMPLFILE="${TEMPLATEFILE}"
+else
+    TMPLFILE="${TMPLDIR}/${CLASS}/${CLASS}${TMPLSUFFIX}"
+fi
+
+if [ $DO_MUNCH ] ; then 
+    MUNCHFILE="${MUNCHFILE}"
+else
+    MUNCHFILE="${TMPLDIR}/${CLASS}/${CLASS}${MUNCHSUFFIX}"
+fi
+
+python $MUNCHBIN $MUNCHFILE $DMFILE $TMPLFILE > $base.cpp
+
+exit 0
+
