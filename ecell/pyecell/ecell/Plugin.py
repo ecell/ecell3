@@ -191,6 +191,7 @@ class PluginManager:
 	def updateAllPluginWindow( self ):
 	
 		for anInstance in self.theInstanceList:
+
 			anInstance.update()
 
 	# end of updateAllPluginWindow
@@ -206,7 +207,6 @@ class PluginManager:
 	def appendInstance( self, instance ):
 
 		self.theInstanceList.append( instance )
-
 	# end of appendInstance
 
 

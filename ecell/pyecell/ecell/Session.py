@@ -171,6 +171,11 @@ class Session:
     def getLoggerList( self ):
         return self.theSimulator.getLoggerList()
         
+    def createLogger( self, fullpn ):
+        message( 'createLogger method will be deprecated. Use LoggerStub.' )
+        aStub = createLoggerStub( fullpn )
+        aStub.create()
+
     def createLoggerStub( self, fullpn ):
         return LoggerStub( self.theSimulator, fullpn )
 
@@ -319,7 +324,7 @@ class Session:
     def __createScriptContext( self, parameters ):
 
         # theSession == self in the script
-        aContext = { 'theSession': self }
+        aContext = { 'theSession': self, 'self': self }
         
         # flatten class methods and object properties so that
         # 'self.' isn't needed for each method calls in the script

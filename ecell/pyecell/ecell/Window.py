@@ -42,8 +42,8 @@ import os
 
 import gtk
 import gnome.ui
-import GDK
-import libglade
+import gtk.gdk
+import gtk.glade
 
 
 # ---------------------------------------------------------------
@@ -69,6 +69,7 @@ class Window:
 		self.theGladeFile = aGladeFile
 		self.theRoot = aRoot
 		self.theTitle = "self.__name__"
+		self.widgets = None
 		#self.openWindow()
 
 	# end of __init__
@@ -94,10 +95,10 @@ class Window:
 				self.theGladeFile = GLADEFILE_PATH + '/' + self.theGladeFile
 
 		if os.access( os.path.join( GLADEFILE_PATH, self.theGladeFile ), os.R_OK ):
-			self.widgets = libglade.GladeXML( filename=self.theGladeFile, root=self.theRoot )
+			self.widgets = gtk.glade.XML( self.theGladeFile, root=self.theRoot )
 		else:
 			raise IOError( "can't read %s." % self.theGladeFile )
-
+		
 	# end of openWindow
 
 
@@ -112,7 +113,6 @@ class Window:
 	def addHandlers( self, handlers ):
 
 		self.widgets.signal_autoconnect( handlers )
-        
 	# end of addHandlers
 
 
@@ -177,12 +177,20 @@ class Window:
 	def editTitle( self, aTitle ):
 
 		self.theTitle = aTitle
-		self.getWidget( self.theClassName )[ 'title' ] = self.theTitle
+		theWidget=self.getWidget( self.theClassName )
+		if theWidget!=None:
+		    self.theTitle = aTitle
+		    theWidget.set_title( self.theTitle)
 
 	# end of editTitle
 
 	def getTitle( self ):
-		return self.getWidget( self.theClassName )[ 'title' ] 
+	    theWidget=self.getWidget( self.theClassName)
+	    if theWidget==None:
+		theTitle='No Title'
+	    else:
+		theTitle=theWidget.get_title()
+	    return  theTitle
 
 
 # end of Window
