@@ -1,7 +1,7 @@
 /*
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
-//        This file is a part of E-CELL Simulation Environment package
+//        This file is a part of E-Cell Simulation Environment package
 //
 //                Copyright (C) 1996-2001 Keio university
 //   Copyright (C) 1998-2001 Japan Science and Technology Corporation (JST)
@@ -9,31 +9,31 @@
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
 //
-// E-CELL is free software; you can redistribute it and/or
+// E-Cell is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
 // License as published by the Free Software Foundation; either
 // version 2 of the License, or (at your option) any later version.
 // 
-// E-CELL is distributed in the hope that it will be useful,
+// E-Cell is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 // See the GNU General Public License for more details.
 // 
 // You should have received a copy of the GNU General Public
-// License along with E-CELL -- see the file COPYING.
+// License along with E-Cell -- see the file COPYING.
 // If not, write to the Free Software Foundation, Inc.,
 // 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 // 
 //END_HEADER
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-//	This file is a part of E-CELL2.
-//	Original codes of E-CELL1 core were written by Kouichi TAKAHASHI
+//	This file is a part of E-Cell2.
+//	Original codes of E-Cell1 core were written by Kouichi TAKAHASHI
 //	<shafi@e-cell.org>.
-//	Some codes of E-CELL2 core are minor changed from E-CELL1
+//	Some codes of E-Cell2 core are minor changed from E-Cell1
 //	by Naota ISHIKAWA <naota@mag.keio.ac.jp>.
-//	Other codes of E-CELL2 core and all of E-CELL2 UIMAN are newly
+//	Other codes of E-Cell2 core and all of E-Cell2 UIMAN are newly
 //	written by Naota ISHIKAWA.
-//	All codes of E-CELL2 GUI are written by
+//	All codes of E-Cell2 GUI are written by
 //	Mitsui Knowledge Industry Co., Ltd. <http://bio.mki.co.jp/>
 //
 //	Latest version is availabe on <http://bioinformatics.org/>
@@ -45,9 +45,12 @@
  *::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
  *	$Id$
  :	$Log$
+ :	Revision 1.9  2004/06/17 16:55:30  shafi
+ :	copyright updates
+ :
  :	Revision 1.8  2003/08/17 00:15:34  satyanandavel
  :	update for gcc-3.3.1 in mingw
- :
+ :	
  :	Revision 1.7  2003/08/09 07:02:59  satyanandavel
  :	correction of a typo
  :	
