@@ -15,11 +15,11 @@ defineMethod('initialize','''
 
 defineMethod('react',
 '''
-  const Real s0( S0.getVariable()->getQuantity() );
-  const Real s1( S1.getVariable()->getQuantity() );
+  const Real s0( S0.getVariable()->getValue() );
+  const Real s1( S1.getVariable()->getValue() );
   
   const Real p( s0 + s1 );
   
-  P0.getVariable()->setQuantity(p);
+  P0.getVariable()->setValue( p );
 ''')
 

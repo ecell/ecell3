@@ -20,12 +20,12 @@ defineMethod('initialize','''
 
 defineMethod('react',
 '''
-  const Real s0( S0.getVariable()->getQuantity() );
-  const Real s1( S1.getVariable()->getQuantity() );
-  const Real s2( S2.getVariable()->getQuantity() );
-  const Real s3( S3.getVariable()->getQuantity() );
+  const Real s0( S0.getVariable()->getValue() );
+  const Real s1( S1.getVariable()->getValue() );
+  const Real s2( S2.getVariable()->getValue() );
+  const Real s3( S3.getVariable()->getValue() );
 
   const Real p( s0 + s1 + s2 + s3 );
 
-  P0.getVarialbe()->setQuantity(p);
+  P0.getVarialbe()->setValue(p);
 ''')

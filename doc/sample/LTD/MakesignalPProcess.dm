@@ -18,7 +18,7 @@ defineMethod('initialize','''
 
 defineMethod('react',
 '''
-  Real p0( P0.getVariable()->getQuantity() );
+  Real p0( P0.getVariable()->getValue() );
 
   i += 1;
 
@@ -39,5 +39,5 @@ defineMethod('react',
       {
       p0 = 0.00000000000000000001 * getSuperSystem()->getVolume() * N_A;
       }					
-  P0.getVariable()->setQuantity(p0);
+  P0.getVariable()->setValue(p0);
 ''')

@@ -1,6 +1,6 @@
 CLASSNAME = 'MichaelisUniUniProcess'
 BASECLASS = 'FluxProcess'
-PROPERTIES = [('Real','KmS',0.0), ('Real','KcF',0.0)]
+PROPERTIES = [('Real','Km',0.0), ('Real','Kcat',0.0)]
 
 PROTECTED_AUX = '''
   VariableReference S0;
@@ -13,12 +13,9 @@ defineMethod( 'initialize', '''
 ''' )
 
 defineMethod( 'process', '''
-  Real velocity( KcF );
 
-  velocity *= C0.getVariable()->getValue();
   const Real S( S0.getVariable()->getConcentration() );
-  velocity *= S;
-  velocity /= ( KmS + S );
-
+  const Real E( C0.getVariable()->getValue() );
+  Real velocity( (Kcat * E * S /( Km + S)) );
   setFlux( velocity );
 ''' )
