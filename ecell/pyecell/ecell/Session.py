@@ -143,7 +143,7 @@ class Session:
     #
 
 
-    def getStepperList():
+    def getStepperList( self ):
         return self.theSimulator.getStepperList()
 
     def createStepperStub( self, id ):
