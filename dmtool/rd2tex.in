@@ -13,11 +13,7 @@
 
 # if you want to set default directory, please modfy here.
 $output_directory = ".";
-$default_template_directory = @REACTOR_TEMPLATE_DIR@;
-
-$err_mes_td = "\n Command-line rd2tex Users: Specify a template directory with the correct absolute path.\n Makefile Users           : Check the configuration of TEMPLATEDIR in your Makefile.\n";
-
-$err_mes_od = "Specify an output directory with an absolute path.\n";
+$default_template_directory = "@REACTOR_TEMPLATE_DIR@";
 
 &search_template;
 &filename;
@@ -31,16 +27,16 @@ $err_mes_od = "Specify an output directory with an absolute path.\n";
 
 ##############################################################################
 sub search_template{
-#    if (-e 'template') {
-#	if (-d 'template') {
-#	    $template_directory = "./template";
-#	} else {
-#	    print STDERR "Please remove file 'template'.\n";
-#	    exit 1;
-#	}
-#    } else {
+    if (-e 'template') {
+	if (-d 'template') {
+	    $template_directory = "./template";
+	} else {
+	    print STDERR "Please remove file 'template'.\n";
+	    exit 1;
+	}
+    } else {
 	$template_directory = $default_template_directory;
-#    }
+    }
 }
 
 sub filename{
@@ -95,16 +91,14 @@ sub help{
     print "usage: rd2tex filename1\.rd filename2\.rd \.\.\.\n\n"; 
     print "option:   -s             does not change filename.\n";
     print "          -d output_directory\n";
-#    print "          -o ouput_filename\n";
-    print "          -o output_filename\n";
+    print "          -o ouput_filename\n";
     print "          -t template_directory\n";
     exit;
 }
 
-
 sub open_tex{
     open(TEX,">$output_directory/$tex")
-	|| die("$tex: can't open\n$err_mes_od");
+	|| die("$tex: can't open\n");
     print "\n";
     print "writing $tex.\n";
     print "\n";
@@ -112,13 +106,13 @@ sub open_tex{
 
 sub open_template{
     open (TEMPLATE,"$template_directory/$template") 
-	|| die("$template: can't open\n$err_mes_td");
+	|| die("$template: can't open\n");
     print "loading $template.\n\n";
 }
 
 sub write_header{
     open(HEADER,"$template_directory/$header")
-	|| die("$header: can't open\n$err_mes_td");
+	|| die("$header: can't open\n");
     print "loading $header.\n";
     
     while(<HEADER>){
@@ -264,7 +258,7 @@ sub readrd
 
 sub write_footer{
     open(FOOTER,"$template_directory/$footer")
-	|| die("$footer: can't open\n$err_mes_td");    
+	|| die("$footer: can't open\n");    
     print "loading $footer.\n";
     
     while(<FOOTER>){
