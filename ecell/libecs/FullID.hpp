@@ -39,8 +39,8 @@
 namespace libecs
 {
 
-  /** \defgroup identifier The Identifier Module.
-   * The identifier module.
+  /** \defgroup identifier The FullID, FullPN and SystemPath.
+   * The FullID, FullPN and SystemPath.
    * @{ 
    */ 
   

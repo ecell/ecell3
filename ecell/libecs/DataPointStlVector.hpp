@@ -42,15 +42,14 @@
 namespace libecs
 {
 
+  /** \addtogroup logging
+   *@{
+   */
+
   DECLARE_CLASS(DataPointStlVector);
   DECLARE_TYPE(DataPoint,Containee);
   DECLARE_VECTOR(Containee,Container);
 
-
-  /**
-
-  \ingroup logging
-   */
 
   class DataPointStlVector
   {
@@ -190,6 +189,8 @@ namespace libecs
 
 
   };
+
+  //@}
 
 } // namespace libecs
 

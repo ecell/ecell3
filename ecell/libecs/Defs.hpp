@@ -65,11 +65,6 @@
 namespace libecs
 {
 
-  /* *defgroup libecs_module The Libecs Module 
-   * This is the libecs module 
-   * @{ 
-   */ 
-  
   // system constants
 
   const int RANDOM_NUMBER_BUFFER_SIZE( 65535 );
@@ -89,6 +84,8 @@ namespace libecs
 #define DECLARE_QUEUE       CORELINUX_QUEUE     
 #define DECLARE_STACK       CORELINUX_STACK     
 
+
+  
   // from Loki
 
   
@@ -145,6 +142,8 @@ namespace libecs
      Defines the type OriginalType which maps back to T.
      
      taken from loki library.
+
+     \ingroup util
   */
 
   template <typename T>
@@ -153,8 +152,6 @@ namespace libecs
     typedef T OriginalType;
   };
 
-
-  /** @} */ //end of libecs_module 
 
 } // namespace libecs
 

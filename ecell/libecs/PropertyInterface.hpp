@@ -42,8 +42,9 @@
 namespace libecs
 {
 
-  /** \defgroup property The property module
-      The Property module.
+  /** \defgroup property The Inter-object Communication.
+   *  The Interobject Communication.
+   *@{
   */
 
 
@@ -63,7 +64,6 @@ namespace libecs
      \see Message
      \see PropertySlot
 
-     \ingroup property
   */
 
   class PropertyInterface
@@ -144,7 +144,6 @@ namespace libecs
 
 
 
-
     /// \internal 
 
     //FIXME: can be protected?
@@ -187,6 +186,8 @@ namespace libecs
     PropertySlotMap thePropertySlotMap;
 
   };
+
+  /*@}*/
   
 } // namespace libecs
 

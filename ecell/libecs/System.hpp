@@ -40,6 +40,10 @@
 namespace libecs
 {
 
+  /** \addtogroup entities
+   *@{
+   */
+
   // Tree data structures used for entry lists
   DECLARE_MAP( const String, SubstancePtr, 
 	       std::less<const String>, SubstanceMap );
@@ -48,11 +52,6 @@ namespace libecs
   DECLARE_MAP( const String, SystemPtr,    
 	       std::less<const String>, SystemMap );
 
-
-  /**
-
-  \ingroup entities
-  */
 
   class System 
     : 
@@ -288,7 +287,7 @@ namespace libecs
     }
   };
 
-  /** @} */ //end of libecs_module 
+  /*@}*/
 
 } // namespace libecs
 

@@ -41,6 +41,11 @@
 namespace libecs
 {
 
+  /** \addtogroup logging
+   *@{
+   */
+
+
   /**
      LoggerBroker creates and administrates Loggers in a model.
 
@@ -50,7 +55,6 @@ namespace libecs
      \see FullPN
      \see Logger
 
-     \ingroup logging
   */
 
   class LoggerBroker
@@ -132,7 +136,7 @@ namespace libecs
 
   };
 
-  /** @} */ //end of libecs_module
+  //@}
   
 } // namespace libecs
 

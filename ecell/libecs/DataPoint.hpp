@@ -39,10 +39,9 @@
 namespace libecs
 {
 
-  /**
-
-  \ingroup logging 
-  */
+  /** \addtogroup logging
+   *@{
+   */
 
   class DataPoint
   {
@@ -192,7 +191,6 @@ namespace libecs
 
   \internal 
 
-  \ingroup logging
   */
 
   class DataInterval 
@@ -323,7 +321,7 @@ namespace libecs
     };
 
 
-    /** @} */ //end of libecs_module 
+  //@}
 
   } // namespace libecs
 

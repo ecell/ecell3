@@ -44,6 +44,10 @@
 namespace libecs
 {
 
+  /** \addtogroup property
+   *@{
+   */
+
   /**
      A data packet for communication among C++ objects consisting
      of a keyword and a body. The body is a list of UVariables.
@@ -51,7 +55,6 @@ namespace libecs
      \see PropertyInterface
      \see PropertySlot
 
-     \ingroup property
   */
 
   class Message
@@ -109,6 +112,7 @@ namespace libecs
 
   };
 
+  //@}
 
 } // namespace libecs
 

@@ -39,7 +39,7 @@
 namespace libecs
 {
 
-  /** \defgroup exceptions The exceptions
+  /** \defgroup exception The Exceptions
    * The exceptions.
    * @{
   */ 
@@ -96,6 +96,11 @@ if( ! ( EXPRESSION ) )\
     const String theMessage;
   };
 
+  /**
+
+  \internal
+  */
+
 #define DEFINE_EXCEPTION( CLASSNAME, BASECLASS )\
 class CLASSNAME : public BASECLASS\
 {\
@@ -145,7 +150,7 @@ public:\
 		       + ")." )
 
 
-  /** @} */ //end of exceptions module
+  /** @} */ //end of exception module
 
 } // namespace libecs
 

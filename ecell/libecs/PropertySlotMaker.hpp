@@ -11,10 +11,11 @@
 namespace libecs
 {
 
-  /**
-     
-  \ingroup property
-  */
+
+  /** \addtogroup property
+   *@{
+   */
+
 
   class PropertySlotMaker
   {
@@ -53,7 +54,7 @@ namespace libecs
 
 
 
-  /** @} */ //end of libecs_module 
+  /*@}*/
 
 }
 

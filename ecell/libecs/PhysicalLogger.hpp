@@ -42,9 +42,8 @@ namespace libecs
 {
 
 
-  /**
-
-  \ingroup logging
+  /** \addtogroup logging
+   *@{
   */
 
   class PhysicalLogger
@@ -132,7 +131,7 @@ namespace libecs
   DECLARE_TYPE( PhysicalLogger::iterator, PhysicalLoggerIterator );
 
 
-  /** @} */ //end of libecs_module 
+  //@}
 
 } // namespace libecs
 

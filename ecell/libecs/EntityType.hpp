@@ -36,10 +36,13 @@
 namespace libecs
 {
 
+  /** \addtogroup entities
+   *@{
+   */
+
 
   /**
 
-  \ingroup entities
   */
 
   class EntityType
@@ -152,6 +155,8 @@ namespace libecs
     Type theType;
 
   };
+
+  /*@}*/
 
 } // namespace libecs
 

@@ -36,15 +36,16 @@
 namespace libecs
 {
 
-  /* *defgroup libecs_module The Libecs Module 
-   * This is the libecs module 
-   * @{ 
-   */ 
-  
+
+  /** \addtogroup util
+   *@{
+   */
+
 
   /**
      Use this macro if you want to use 
      SomeClassRCPtr instead of RCPtr<SomeClass>.
+
   */
 
 #define DECLARE_RCPTR( type )\
@@ -58,6 +59,7 @@ DECLARE_TYPE( RCPtr<type>, type ## RCPtr )
      (Reference Counting Garbage Collector for C++) taken from
      http://www.fukt.hk-r.se/~per/autorelease/
      written by Per Liden <per@fukt.hk-r.se>.
+
   */
 
 
@@ -213,7 +215,7 @@ DECLARE_TYPE( RCPtr<type>, type ## RCPtr )
 
   };
 
-  /** @} */ //end of libecs_module 
+  //@}
   
 } // namespace libecs
 

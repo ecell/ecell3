@@ -464,7 +464,7 @@ namespace libecs
 
   };
 
-  /** @} */ //end of libecs_module 
+
 
 } // namespace libecs
 

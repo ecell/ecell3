@@ -43,6 +43,11 @@
 namespace libecs
 {
 
+
+  /** \addtogroup property
+   *@{
+   */
+
   template< typename FromType, typename ToType >
   ToType convertTo( const FromType& aValue )
   {
@@ -153,7 +158,6 @@ namespace libecs
      Base class for PropertySlot classes.
 
      \see PropertyInterface
-     \ingroup property
   */
 
   class PropertySlot
@@ -279,10 +283,6 @@ namespace libecs
   }
 
 
-  /**
-
-  \ingroup property
-  */
 
   class ProxyPropertySlot
     :
@@ -360,11 +360,6 @@ namespace libecs
   };
 
 
-
-  /**
-
-  \ingroup property
-  */
 
   template
   < 
@@ -466,11 +461,6 @@ namespace libecs
 
   };
 
-
-  /**
-
-  \ingroup property
-  */
 
   template
   < 
@@ -661,8 +651,7 @@ namespace libecs
 
 
 
-
-  /** @} */ //end of libecs_module 
+  /*@}*/
 
 }
 

@@ -40,10 +40,14 @@
 namespace libecs
 {
 
+  /** \addtogroup entities
+   *@{
+   */
+
+
   /**
      Substance class is used to represent molecular species.
 
-     \ingroup entities
   */
 
   class Substance : public Entity
@@ -270,6 +274,7 @@ namespace libecs
     bool theFixed;
   };
 
+  /*@}*/
 
 } // namespace libecs
 

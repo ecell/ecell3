@@ -41,6 +41,11 @@
 namespace libecs
 {
 
+  /** \addtogroup entities
+   *@{
+   */
+
+
   DECLARE_ASSOCVECTOR( String, Reactant, std::less< const String >, 
 		       ReactantMap  );
 
@@ -48,7 +53,6 @@ namespace libecs
      Reactor class is used to represent chemical and other phenonema which 
      may or may not result in change in quantity of one or more Substances.
 
-     \ingroup entities
   */
 
   class Reactor 
@@ -179,6 +183,8 @@ namespace libecs
 
   typedef ReactorPtr (*ReactorAllocatorFunc)();
 
+
+  /*@}*/
 
 } // namespace libecs
 

@@ -135,7 +135,6 @@ namespace libecs
 
 
     /// \name Properties
-
     //@{
 
     /**
@@ -290,7 +289,7 @@ namespace libecs
     String    theName;
   };
 
-  /** @} */ // entities
+  /*@}*/
 
 } // namespace libecs
 

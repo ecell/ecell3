@@ -39,13 +39,12 @@
 namespace libecs
 {
 
+  /** \addtogroup logging
+   *@{
+   */
+
   DECLARE_TYPE( size_t, DataPointVectorIterator );
 
-
-  /**
-
-  \ingroup logging
-  */
 
   class DataPointVector
   {
@@ -92,6 +91,8 @@ namespace libecs
     DataPoint* theRawArray;
 
   };
+
+  //@}
 
 } // namespace libecs
 

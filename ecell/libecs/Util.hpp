@@ -43,8 +43,8 @@
 namespace libecs
 {
 
-  /* *defgroup libecs_module The Libecs Module 
-   * This is the libecs module 
+  /** \defgroup util The Utilities.
+   * Utilities.
    * @{ 
    */ 
   
@@ -195,7 +195,8 @@ namespace libecs
        i != (SEQ) .end() ; ++i )\
     { (*i).second-> METHOD (); }
 
-  /** @} */ //end of libecs_module 
+
+  //@}
 
 } // namespace libecs
 

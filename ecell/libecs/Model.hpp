@@ -285,7 +285,7 @@ namespace libecs
   };
 
   
-  //@{ 
+  /*@}*/
 
 } // namespace libecs
 

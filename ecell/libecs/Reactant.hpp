@@ -37,10 +37,10 @@
 namespace libecs
 {
 
-  /**
+  /** \addtogroup entities
+   *@{
+   */
 
-  \ingroup entities
-  */
 
   class Reactant
   {
@@ -67,6 +67,7 @@ namespace libecs
 
   };
 
+  //@}
 
 } // namespace libecs
 
