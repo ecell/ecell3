@@ -62,11 +62,12 @@ namespace libecs
     public Entity
   {
 
-    DM_BASECLASS( Variable );
-
     LIBECS_DM_OBJECT( Variable, Variable );
 
   public:
+
+    // this should be put in public.
+    DM_BASECLASS( Variable );
 
     Variable();
     virtual ~Variable();
