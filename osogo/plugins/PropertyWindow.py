@@ -12,8 +12,13 @@ class PropertyWindow(PluginWindow):
         PluginWindow.__init__( self, dirname, data, pluginmanager, root )
 
         self.openWindow()
-        self.thePluginManager.appendInstance( self )        
-        PluginWindow.initialize( self, root )
+        self.thePluginManager.appendInstance( self ) 
+	
+	if root !='top_vbox':
+		self.theTitle = pluginmanager.theInterfaceWindow.theTitle 
+		self.getWidget('PropertyWindow')['title'] = self.theTitle      
+        
+	PluginWindow.initialize( self, root )
         self.initialize()
 
         if len( self.theFullPNList() ) > 1 and root != 'top_vbox':
@@ -31,7 +36,8 @@ class PropertyWindow(PluginWindow):
     def initialize( self ):
 
         self.addHandlers( { 'input_row_pressed'   : self.selectProperty,
-                            'show_button_pressed' : self.show } )
+                            'show_button_pressed' : self.show,
+			    'window_exit'	  : self.exit } )
         
         self.thePropertyClist = self.getWidget( "property_clist" )
         self.theTypeEntry     = self.getWidget( "entry_TYPE" )
@@ -171,6 +177,16 @@ class PropertyWindow(PluginWindow):
 
         print self.theSelected
 
+    def exit( self, obj ):
+	self.thePluginManager.theInterfaceWindow.removeRecord( self )
+	self.thePluginManager.removeInstance( self )
+        self.thePluginManager.theInterfaceWindow.theSelectedRow = -1
+
+    def editTitle( self, aTitle ):
+
+        self.theTitle = aTitle
+        self.getWidget('PropertyWindow')['title'] = self.theTitle
+
 
 
 if __name__ == "__main__":
@@ -203,7 +219,6 @@ if __name__ == "__main__":
 
 
     def mainQuit( obj, data ):
-        print obj,data
         gtk.mainquit()
         
     def mainLoop():

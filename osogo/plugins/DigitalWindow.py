@@ -9,12 +9,14 @@ import GTK
 class DigitalWindow( PluginWindow ):
 
     def __init__( self, dirname, data, pluginmanager, root=None ):
-
+	
         PluginWindow.__init__( self, dirname, data, pluginmanager, root )
-        if self.theDriver.isNumber( self.theFullPN() ):
+        
+	if self.theDriver.isNumber( self.theFullPN() ):
 
             self.openWindow()
             self.thePluginManager.appendInstance( self )
+	    self.theTitle = pluginmanager.theInterfaceWindow.theTitle
             PluginWindow.initialize( self, root )
             self.initialize()
 
@@ -29,13 +31,15 @@ class DigitalWindow( PluginWindow ):
 
     def initialize( self ):
 
-        self['toolbar5'].set_style( GTK.TOOLBAR_ICONS )
+	self.getWidget('DigitalWindow')['title'] = self.theTitle
+	self['toolbar5'].set_style( GTK.TOOLBAR_ICONS )
         self['toolbar5'].set_button_relief( GTK.RELIEF_HALF )
 
         self.addHandlers( { 'input_value'    :self.inputValue,
                             'increase_value' :self.increaseValue,
                             'decrease_value' :self.decreaseValue,
-                            'test' :self.test} )
+          		    'window_exit'    :self.exit,
+                            'test'           :self.test } )
 
         aString = str( self.theFullPN()[ID] )
         aString += ':\n' + str( self.theFullPN()[PROPERTY] )
@@ -44,7 +48,6 @@ class DigitalWindow( PluginWindow ):
         
 
     def update( self ):
-
         self["value_frame"].set_text( str( self.getValue( self.theFullPN() ) ) )
 
 
@@ -65,6 +68,19 @@ class DigitalWindow( PluginWindow ):
     def decreaseValue( self, obj ):
 
         self.setValue( self.theFullPN(), self.getValue( self.theFullPN() ) * 0.5 )
+			
+
+    def exit( self, obj ):
+
+	self.thePluginManager.theInterfaceWindow.removeRecord( self )
+	self.thePluginManager.removeInstance( self )
+        self.thePluginManager.theInterfaceWindow.theSelectedRow = -1
+
+    def editTitle( self, aTitle ):
+
+            self.theTitle = aTitle
+	    self.getWidget('DigitalWindow')['title'] = self.theTitle
+	    
 
     def test( self, obj ):
         print 'you did it'
@@ -87,7 +103,6 @@ if __name__ == "__main__":
     fpn = ('Substance','/CELL/CYTOPLASM','ATP','Quantity')
 
     def mainQuit( obj, data ):
-        print obj,data
         gtk.mainquit()
         
     def mainLoop():

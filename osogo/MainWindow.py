@@ -14,6 +14,7 @@ import MessageWindow
 import PaletteWindow
 import EntryListWindow
 import LoggerWindow
+import InterfaceWindow
 
 import string
 
@@ -22,7 +23,7 @@ import Session
 class MainWindow(Window):
 
     def __init__( self ):
-
+	
         Window.__init__( self )
 
         #### create Message Window ####
@@ -38,12 +39,16 @@ class MainWindow(Window):
                                                 self.theTmpSessionRecordFilename )
         self.theDriver = self.theSession.theDriver
         self.theModelInterpreter = self.theSession.theModelInterpreter
-
+ 
         self.theLoggerWindow = LoggerWindow.LoggerWindow( self.theSession )
         self.theLoggerWindowWindow = self.theLoggerWindow[ 'logger_window' ]
 #        self.theLoggerWindowWindow.hide()
 
-        self.thePluginManager = PluginManager( self.theSession, self.theLoggerWindow )
+	self.theInterfaceWindow = InterfaceWindow.InterfaceWindow( self )
+	self.theInterfaceWindowWindow = self.theInterfaceWindow[ 'interface_window' ]
+#	 self.theInterfaceWindowWindow.hide()
+
+        self.thePluginManager = PluginManager( self.theSession, self.theLoggerWindow, self.theInterfaceWindow )
         self.thePluginManager.loadAll()
 
         self.thePaletteWindow = PaletteWindow.PaletteWindow()
@@ -80,7 +85,7 @@ class MainWindow(Window):
               'logger_togglebutton_toggled'    : self.toggleLoggerWindow ,
               'palette_togglebutton_toggled'   : self.togglePaletteWindow ,
               'message_togglebutton_toggled'   : self.toggleMessageWindow ,
-              'Interface_togglebutton_toggled' : self.toggleInterfaceListWindow ,
+              'interface_togglebutton_toggled' : self.toggleInterfaceListWindow ,
               }
         self.addHandlers( self.theHandlerMap )
 
@@ -240,7 +245,11 @@ class MainWindow(Window):
         else :
             self.thePaletteWindow.hide()
         
-    def toggleInterfaceListWindow( self, a ) : pass
+    def toggleInterfaceListWindow( self, button_obj ) :
+	if button_obj.get_active() : 
+	    self.theInterfaceWindowWindow.show_all()
+        else :
+            self.theInterfaceWindowWindow.hide()
 
     #### these method is not supported in summer GUI project
     def loadCellState( self ) : pass

@@ -17,7 +17,8 @@ class BargraphWindow( PluginWindow ):
         if self.theDriver.isNumber( self.theFullPN() ):
 
             self.openWindow()
-            self.thePluginManager.appendInstance( self )                    
+            self.thePluginManager.appendInstance( self )   
+	    self.theTitle = pluginmanager.theInterfaceWindow.theTitle              
             PluginWindow.initialize( self, root )
             self.initialize()
 
@@ -32,6 +33,7 @@ class BargraphWindow( PluginWindow ):
 
     def initialize( self ):
     
+	self.getWidget('BargraphWindow')['title'] = self.theTitle
         self['toolbar5'].set_style( GTK.TOOLBAR_ICONS )
         self['toolbar6'].set_style( GTK.TOOLBAR_ICONS )
         self['toolbar5'].set_button_relief( GTK.RELIEF_HALF )
@@ -45,11 +47,11 @@ class BargraphWindow( PluginWindow ):
         self.theMultiplier = 0
         
         self.addHandlers( { \
-            'on_add_button_clicked' : self.updateByAddbutton,
+            'on_add_button_clicked'      : self.updateByAddbutton,
             'on_subtract_button_clicked' : self.updateBySubtractbutton,
-            'multiplier_entry_activate' : self.updateByTextentry,
-            'auto_button_toggled': self.updateByAutoButton ,
-            })
+            'multiplier_entry_activate'  : self.updateByTextentry,
+            'auto_button_toggled'        : self.updateByAutoButton ,
+	    'window_exit'                : self.exit })
         
         self.theIDEntry = self.getWidget( "property_id_label" )
         self.theMultiplier1Entry = self.getWidget("multiplier1_label")
@@ -159,7 +161,17 @@ class BargraphWindow( PluginWindow ):
 
     def changeValue( self, value ):
         self.updateByAuto( value )
+
+    def exit( self, obj ):
+	self.thePluginManager.theInterfaceWindow.removeRecord( self )
+	self.thePluginManager.removeInstance( self )
+        self.thePluginManager.theInterfaceWindow.theSelectedRow = -1
     
+    def editTitle( self, aTitle ):
+
+        self.theTitle = aTitle
+        self.getWidget('BargraphWindow')['title'] = self.theTitle  
+
 
 if __name__ == "__main__":
 
@@ -177,7 +189,6 @@ if __name__ == "__main__":
     fpn = ('Substance','/CELL/CYTOPLASM','ATP','quantity')
 
     def mainQuit( obj, data ):
-        print obj,data
         gtk.mainquit()
 
     def mainLoop():

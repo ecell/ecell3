@@ -15,14 +15,12 @@ import copy
 class EntryListWindow(Window):
 
     def __init__( self, aMainWindow ):
-
         self.theSelectedFullPNList = []
 
         Window.__init__( self )
-        self.addHandlers( { 'show_button_clicked' : self.openNewPluginWindow,
+        self.addHandlers( { 'show_button_clicked'           : self.openNewPluginWindow,
                             'system_tree_selection_changed' : self.updateEntryList,
-                            'entry_list_selection_changed' : self.selectEntity
-                            } )
+                            'entry_list_selection_changed'  : self.selectEntity } )
 
         self.theMainWindow = aMainWindow
         self.theDriver = aMainWindow.theDriver
@@ -170,7 +168,8 @@ class EntryListWindow(Window):
         aPluginName = self.thePaletteWindow.getSelectedPluginName()
         aPluginManager = self.theMainWindow.thePluginManager
         aPluginManager.createInstance( aPluginName,
-                                       self.theSelectedFullPNList )
+                                       self.theSelectedFullPNList)
+	
 
 def mainQuit( obj, data ):
     gtk.mainquit()

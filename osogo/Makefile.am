@@ -6,6 +6,8 @@ osogodir=${pkglibdir}
 osogo_DATA=\
 EntryListWindow.glade\
 EntryListWindow.py\
+InterfaceWindow.py\
+InterfaceWindow.glade\
 LoggerWindow.glade\
 LoggerWindow.py\
 MainWindow.glade\

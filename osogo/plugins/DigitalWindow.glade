@@ -16,6 +16,11 @@
   <class>GtkWindow</class>
   <name>DigitalWindow</name>
   <can_focus>True</can_focus>
+  <signal>
+    <name>destroy</name>
+    <handler>window_exit</handler>
+    <last_modification_time>Mon, 25 Feb 2002 02:10:41 GMT</last_modification_time>
+  </signal>
   <title>DigitalWindow</title>
   <type>GTK_WINDOW_TOPLEVEL</type>
   <position>GTK_WIN_POS_NONE</position>

@@ -10,7 +10,7 @@ from config import *
 class PluginModule:
 
     def __init__( self, name, path=PLUGIN_PATH ):
-
+	
         self.theName = name
 
         aFp, aPath, self.theDescription\
@@ -34,36 +34,44 @@ class PluginModule:
         aConstructor = self.theModule.__dict__[self.theName]
         anArgumentTuple = ( self.theDirectoryName,  data, pluginmanager, root )
         return apply( aConstructor, anArgumentTuple )
+	
 
 
 class PluginManager:
 
-    def __init__( self, session, loggerwindow ):
+    def __init__( self, session, loggerwindow, interfacewindow ):
+
         self.thePluginMap = {}
         self.theInstanceList = []
         self.theSession = session
         self.theDriver = self.theSession.theDriver
         self.theLoggerWindow = loggerwindow
+	self.theInterfaceWindow = interfacewindow
         
     def createInstance( self, classname, data, root=None, parent=None ):
+	
         try:
             aPlugin = self.thePluginMap[ classname ]
+	    
         except KeyError:
             self.loadModule( classname )
 
         if root !='top_vbox':
             self.theDriver.record( 'aPluginManager.createInstance( \'%s\', %s )' % (classname, data) )
-
+	    self.theInterfaceWindow.addNewRecord( classname, data )
+	
         anInstance = aPlugin.createInstance( data, self, root, parent )
         self.theDriver.initialize()
         return anInstance
 
 
     def loadModule( self, classname ):
+	
         aPlugin = PluginModule( classname )
         self.thePluginMap[ classname ] = aPlugin
 
     def loadAll( self ):
+	
         for aPath in PLUGIN_PATH:
             aFileList = glob.glob( os.path.join( aPath, '*.glade' ) )
             for aFile in aFileList:
@@ -73,18 +81,36 @@ class PluginManager:
                     self.loadModule( aModuleName )
 
     def updateAllPluginWindow( self ):
+	
         for anInstance in self.theInstanceList:
             anInstance.update()
 
     def appendInstance( self, instance ):
+        
         self.theInstanceList.append( instance )
-
+	
     def removeInstance( self, instance ):
+        
         self.theInstanceList.remove( instance )
 
     def updateLoggerWindow( self ):
+        
         self.theLoggerWindow.update()
+	
+    def showPlugin( self, num, obj ):
 
+        anInstance = self.theInstanceList[ num + 1 ]
+	anInstance.getWidget( anInstance.__class__.__name__ ).hide()	
+	anInstance.getWidget( anInstance.__class__.__name__ ).show_all()
+
+    def getModule( self, aNum, aTitle ):
+        
+	self.theInstanceList[ aNum + 1 ].editTitle( aTitle )
+	
+    def deleteModule( self, num, obj ):
+        
+	anInstance = self.theInstanceList[ num + 1 ]
+	anInstance.getWidget( anInstance.__class__.__name__ ).destroy()
         
 if __name__ == "__main__":
     pass

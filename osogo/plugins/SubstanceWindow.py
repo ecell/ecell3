@@ -13,7 +13,8 @@ class SubstanceWindow( PluginWindow ):
         PluginWindow.__init__( self, dirname, data, pluginmanager, root )
 
         self.openWindow()
-        self.thePluginManager.appendInstance( self )                
+        self.thePluginManager.appendInstance( self )    
+	self.theTitle = pluginmanager.theInterfaceWindow.theTitle           
         PluginWindow.initialize( self, root )
         self.initialize()
 
@@ -34,6 +35,7 @@ class SubstanceWindow( PluginWindow ):
         # 0 : not fixed  1: fixed
         self.theFixFlag = 0
         
+	self.getWidget('SubstanceWindow')['title'] = self.theTitle
         self['toolbar1'].set_style( GTK.TOOLBAR_ICONS )
         self['toolbar1'].set_button_relief( GTK.RELIEF_HALF )
         self['toolbar2'].set_style( GTK.TOOLBAR_ICONS )
@@ -44,13 +46,13 @@ class SubstanceWindow( PluginWindow ):
         self['toolbar4'].set_button_relief( GTK.RELIEF_HALF )        
         
         self.addHandlers( {'button_toggled': self.fix_mode,
-                              'qty_increase_pressed': self.increaseQuantity, 
-                              'qty_decrease_pressed': self.decreaseQuantity,
-                              'concentration_increase_pressed': self.increaseConcentration,
-                              'concentration_decrease_pressed': self.decreaseConcentration,
-                             'input_quantity': self.inputQuantity,
-                             'input_concentration': self.inputConcentration
-                             } )
+                           'qty_increase_pressed': self.increaseQuantity, 
+                           'qty_decrease_pressed': self.decreaseQuantity,
+                           'concentration_increase_pressed': self.increaseConcentration,
+                           'concentration_decrease_pressed': self.decreaseConcentration,
+                           'input_quantity': self.inputQuantity,
+                           'input_concentration': self.inputConcentration,
+				   'window_exit' : self.exit } )
 
         self.theQtyFPN = convertFullIDToFullPN( self.theFullID(), 'Quantity' )
         self.theConcFPN = convertFullIDToFullPN( self.theFullID(), 'Concentration' )
@@ -117,10 +119,20 @@ class SubstanceWindow( PluginWindow ):
         self.theConcValue *= 0.5
         self.setValue( self.theConcFPN, self.theConcValue )
 
+    def exit( self, obj ):
+	self.thePluginManager.theInterfaceWindow.removeRecord( self )
+	self.thePluginManager.removeInstance( self )
+        self.thePluginManager.theInterfaceWindow.theSelectedRow = -1
+        
+    def editTitle( self, aTitle ):
 
-def mainLoop():
-    # FIXME: should be a custom function
-    gtk.mainloop()
+        self.theTitle = aTitle
+        self.getWidget('SubstanceWindow')['title'] = self.theTitle
+
+
+    def mainLoop():
+        # FIXME: should be a custom function
+        gtk.mainloop()
 
 if __name__ == "__main__":
 
@@ -138,7 +150,6 @@ if __name__ == "__main__":
 
 
     def mainQuit( obj, data ):
-        print obj,data
         gtk.mainquit()
          
     def mainLoop():

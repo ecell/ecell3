@@ -17,6 +17,11 @@
   <name>PropertyWindow</name>
   <width>520</width>
   <height>410</height>
+  <signal>
+    <name>destroy</name>
+    <handler>window_exit</handler>
+    <last_modification_time>Mon, 25 Feb 2002 09:36:05 GMT</last_modification_time>
+  </signal>
   <title>PropertyWindow</title>
   <type>GTK_WINDOW_TOPLEVEL</type>
   <position>GTK_WIN_POS_NONE</position>
