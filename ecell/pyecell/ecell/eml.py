@@ -255,7 +255,7 @@ class Eml:
     def getEntityClass( self, aFullID ):
         anEntityNode = self.__getEntityNode( aFullID )
 
-        return anEntityNode.getAttribute( 'class' )
+        return str( anEntityNode.getAttribute( 'class' ) )
         
         
     def setEntityProperty( self, aFullID, aPropertyName, aValueList ):
@@ -370,7 +370,7 @@ class Eml:
                 for aChildNode in aSystemNode.childNodes:
                     aType = string.capwords( aChildNode.nodeName )
 
-                    if  aType == 'Variable' or aType == 'Process':
+                    if  aType in ( 'Variable', 'Process' ):
 
                         anID = aChildNode.getAttribute( 'id' )
                         aFullID = aType + ':' + aSystemPath + ':' + anID
@@ -388,11 +388,14 @@ class Eml:
 
     def __createValueList( self, aValueNode ):
 
-        if aValueNode.firstChild.nodeType == aValueNode.TEXT_NODE:
+        aNode = aValueNode.firstChild
+        aNodeType = aNode.nodeType
 
-            return str( aValueNode.firstChild.nodeValue )
+        if aNodeType == aValueNode.TEXT_NODE:
 
-        elif aValueNode.firstChild.nodeType == aValueNode.ELEMENT_NODE:
+            return str( aNode.nodeValue )
+
+        elif aNodeType == aValueNode.ELEMENT_NODE:
 
             return map( self.__createValueList, aValueNode.childNodes )
 
@@ -521,15 +524,15 @@ class Eml:
 
         aValueNode = self.__createElement( 'value' )
 
-        if type( aValue ) is types.TupleType or \
-               type( aValue ) is types.ListType:    # vector value
-
+        if type( aValue ) in ( types.TupleType, types.ListType ):    # vector value
             map( aValueNode.appendChild,\
                  map( self.__createValueNode, aValue ) )
+
         else:        # scaler value
  
             aValueData = self.__theDocument.createTextNode( aValue )
             aValueNode.appendChild( aValueData )
+
 
         return aValueNode
 

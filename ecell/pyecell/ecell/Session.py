@@ -157,16 +157,6 @@ class Session:
     def message( self, message ):
         self.theMessageMethod( message )
 
-    def setLogMethod( self, aMethod ):
-        print 'setLogMethod() is deprecated. use setMessageMethod instead.'
-        self.theMessageMethod = aMethod
-
-    def log( self, message ):
-        print 'log() is deprecated. use message() instead'
-        self.theMessageMethod( message )
-
-
-
     #
     # Simulator methods
     #
@@ -438,21 +428,19 @@ class Session:
 
             aPropertyList = anEml.getEntityPropertyList( aFullID )
 
-            for aProperty in aPropertyList:
-                aFullPN = aFullID + ':' + aProperty
-                aValue = anEml.getEntityProperty( aFullPN )
-                self.theSimulator.setEntityProperty( aFullPN, aValue )
+            aFullPNList = map( lambda x: aFullID + ':' + x, aPropertyList ) 
+            aValueList = map( anEml.getEntityProperty, aFullPNList )
+            map( self.theSimulator.setEntityProperty, aFullPNList, aValueList )
 
-        
-
+            
     def __loadEntityList( self, anEml, anEntityTypeString,\
                           aSystemPath, anIDList ):
         
-        for anID in anIDList:
+        aPrefix = anEntityTypeString + ':' + aSystemPath + ':'
 
-            aFullID = anEntityTypeString + ':' + aSystemPath + ':' + anID
-            aClassName = anEml.getEntityClass( aFullID )
-            self.theSimulator.createEntity( str( aClassName ), aFullID )
+        aFullIDList = map( lambda x: aPrefix + x, anIDList )
+        aClassNameList = map( anEml.getEntityClass, aFullIDList )
+        map( self.theSimulator.createEntity, aClassNameList, aFullIDList )
 
 
 
