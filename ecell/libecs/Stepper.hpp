@@ -44,7 +44,7 @@ namespace libecs
 
   DECLARE_CLASS( Euler1Stepper );
   DECLARE_CLASS( RungeKutta4Stepper );
-  DECLARE_CLASS( PropertySlotVectorImplementation );
+  //  DECLARE_CLASS( PropertySlotVectorImplementation );
 
 
   typedef IntegratorPtr ( *IntegratorAllocator_ )( SubstanceRef );
@@ -132,11 +132,31 @@ namespace libecs
   };
 
 
+#if 0
 
   // Implementation Class
   class PropertySlotVectorImplementation
   {
   public:
+
+    PropertySlotVectorImplementation()
+      :
+      thePropertySlotVector( new PropertySlotVector )
+    {
+      ; // Do Nothing
+    }
+
+    PropertySlotVectorImplementation( PropertySlotVectorRef aPropertySlotVector )
+      :
+      thePropertySlotVector( &aPropertySlotVector )
+    {
+      ; // Do Nothing
+    }
+
+    virutual ~PropertySlotVectorImplementation()
+    {
+      delete thePropertySlotVector;
+    }
 
     void appendPropertySlot( PropertySlotPtr aPropertySlot )
     {
@@ -153,9 +173,15 @@ namespace libecs
     }
 
   private:
-    PropertySlotVector thePropertySlotVector;
+
+    PropertySlotVectorPtr thePropertySlotVector;
 
   };
+
+#endif
+
+
+
 
   class Stepper
   {
@@ -167,16 +193,6 @@ namespace libecs
 
     void setOwner( SystemPtr owner ) { theOwner = owner; }
     SystemPtr getOwner() const { return theOwner; }
-
-    void setPropertySlotVector( PropertySlotVectorImplementationPtr aVector )
-    {
-      thePropertySlotVector = aVector;
-    }
-    
-    PropertySlotVectorImplementationPtr getPropertySlotVector() const 
-    {
-      return thePropertySlotVector;
-    }
 
     virtual void initialize();
 
@@ -198,7 +214,6 @@ namespace libecs
   protected:
 
     SystemPtr theOwner;
-    PropertySlotVectorImplementationPtr thePropertySlotVector;
 
   };
 
@@ -232,6 +247,7 @@ namespace libecs
 
     virtual void distributeIntegrator( IntegratorAllocator );
     void registerSlaves( SystemPtr );
+    void registerPropertySlot( PropertySlotPtr );
 
     virtual const char* const className() const  { return "MasterStepper"; }
 
@@ -242,6 +258,7 @@ namespace libecs
 
     IntegratorAllocator theAllocator;
     StepperVector       theSlaveStepperVector;
+    PropertySlotVector  thePropertySlotVector;
 
   };
 
@@ -291,7 +308,7 @@ namespace libecs
 
     void push()
     {
-      thePropertySlotVector->pushall();
+      theMaster->push();
     }
 
     virtual void initialize()

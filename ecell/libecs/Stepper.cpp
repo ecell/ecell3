@@ -121,6 +121,12 @@ namespace libecs
       }
   }
 
+
+  void MasterStepper::registerPropertySlot( PropertySlotPtr propertyslot )
+  {
+    thePropertySlotVector.push_back( propertyslot );
+  }
+
   void MasterStepper::setStepInterval( RealCref stepsize )
   {
     theStepInterval = stepsize;
@@ -199,9 +205,8 @@ namespace libecs
 
   void MasterStepper::push()
   {
-    thePropertySlotVector->pushall();
-    for( StepperVectorIterator i( theSlaveStepperVector.begin() );
-	 i != theSlaveStepperVector.end() ; ++i )
+    for( PropertySlotVectorIterator i( thePropertySlotVector.begin() );
+	 i != thePropertySlotVector.end() ; ++i )
       {
 	(*i)->push();
       }
