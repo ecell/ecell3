@@ -11,7 +11,7 @@ Base* ObjectAllocator()
 
 
 
-#define DM_INIT( TYPE, CLASSNAME )\
+#define DM_INIT( CLASSNAME, TYPE )\
   extern "C"\
   {\
     TYPE::AllocatorFuncPtr CreateObject =\
@@ -19,9 +19,10 @@ Base* ObjectAllocator()
   } // 
 
 
-#define DM_OBJECT( TYPE, CLASSNAME )\
+#define DM_OBJECT( CLASSNAME, TYPE )\
  static TYPE* createInstance() { return new CLASSNAME ; }
 
 
 #define DM_BASECLASS( CLASSNAME )\
+public:\
  typedef CLASSNAME * (* AllocatorFuncPtr )()
