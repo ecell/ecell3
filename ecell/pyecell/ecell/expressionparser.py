@@ -177,7 +177,7 @@ def p_expression_system_function(t):
                             t[0] = '(' + aCompartmentID + '*N_A)'
 
                         else:
-                            raise AttributeError, "getSuperSystem attribute must be Size or SizeN_A"
+                            raise AttributeError,"getSuperSystem attribute must be Size or SizeN_A"
 
     else:
         raise TypeError, str( t[1] ) + " doesn't have " + str( t[3] )
@@ -185,7 +185,12 @@ def p_expression_system_function(t):
     		
 def p_expression_function(t):
     'Function : NAME LPAREN arguments RPAREN'
-#    print "function"
+
+    global aDelayFlag
+    
+    if ( t[1] == 'delay' ):
+        aDelayFlag = True
+        
     t[0] = str( t[1] + t[2] + t[3] + t[4] )
 
     
@@ -197,6 +202,13 @@ def p_expression_variablereference(t):
     for aVariableReference in aVariableReferenceList:
 
         if( aVariableReference[0] == t[1] ):
+
+            aFastColon = string.index( aVariableReference[1], ':' )
+            aLastColon = string.rindex( aVariableReference[1], ':' )
+            
+            aSystemPath = aVariableReference[1][aFastColon+1:aLastColon]
+            aVariable = aVariableReference[1][aLastColon+1:]            
+
 
             # --------------------------------------------------------------
             # If there are some VariableReference which call getValue()
@@ -210,89 +222,43 @@ def p_expression_variablereference(t):
             # --------------------------------------------------------------
             
             # VariableReference attribute is Value
-            if ( t[3] == 'Value' ):
+            if ( aSystemPath == '/SBMLParameter' ):
 
-                aFastColon = string.index( aVariableReference[1], ':' )
-                aLastColon = string.rindex( aVariableReference[1], ':' )
-
-                aSystemPath = aVariableReference[1][aFastColon+1:aLastColon]
-
-                if ( aSystemPath == '/SBMLParameter' ):
-
-                    aVariableID.append(
-                        ( aVariableReference[1][aLastColon+1:] ) )
-
-                elif ( aSystemPath == '.' and
-                       aReactionPath == '/SBMLParameter' ):
-
-                    aVariableID.append( 
-                        ( aVariableReference[1][aLastColon+1:] ) )
-
-                else:
-                    aVariableID.append( getVariableReferenceId
-                                        ( aVariableReference[1] ) )
-
-                    if ( aSystemPath == '.' ):
-
-                        aLastSlash = string.rindex( aReactionPath, '/' )
-
-                        if( aVariableReference[1][aLastColon+1:] == 'SIZE' ):
-
-                            if ( aReactionPath == '/' ):
-
-                                aVariableID[0] = 'default'
-
-                            else:
-                                aVariableID[0] = aReactionPath[aLastSlash+1:]
-
-                        else:
-                            if ( aReactionPath == '/' ):
-                                
-                                aVariableID[0] =\
-                                '(' + aVariableID[0]+ '*default*N_A)'
-
-                            else:
-                                aVariableID[0] = '(' + aVariableID[0]+ '*'+ aReactionPath[aLastSlash+1:] + '*N_A)'
-
-
-                    else:
-                        aLastSlash = string.rindex( aSystemPath, '/' )
+                if( ( ( 'SBMLParameter__' + aVariable )\
+                      in theID_Namespace ) == False ):
                         
-                        if( aVariableReference[1][aLastColon+1:] == 'SIZE' ):
+                    aVariableID.append( aVariable )
+                else:
+                    aVariableID.append( 'SBMLParameter__' + aVariable )
 
-                            if ( aSystemPath == '/' ):
+            elif ( aSystemPath == '.' and
+                   aReactionPath == '/SBMLParameter' ):
 
-                                aVariableID[0] = 'default'
-
-                            else:
-                                aVariableID[0] = aSystemPath[aLastSlash+1:]
-                            
-                        else:
-                            if ( aSystemPath == '/' ):
-
-                                aVariableID[0] = '(' + aVariableID[0] + '*default*N_A)'
-
-                            else:
-                                
-                                aVariableID[0] = '(' + aVariableID[0] + '*'+ aSystemPath[aLastSlash+1:] + '*N_A)'
-
-
-            # VariableReference attribute is NumberConc 
-            elif ( t[3] == 'NumberConc' ):
-                
-                aVariableID.append( getVariableReferenceId( aVariableReference[1] ) )
-                aVariableID[0] = '(' + aVariableID[0] + '/N_A)'
-
-
-
-            # VariableReference attribute is MolarConc
-            elif ( t[3] == 'MolarConc' ):
-
-                aVariableID.append( getVariableReferenceId( aVariableReference[1] ) )
+                if( ( ( 'SBMLParameter__' + aVariable )\
+                      in theID_Namespace ) == False ):
+                        
+                    aVariableID.append( aVariable )
+                else:
+                    aVariableID.append( 'SBMLParameter__' + aVariable )
 
             else:
-                raise AttributeError, "VariableReference attribute must be MolarConc, NumberConc and Value"
-                    
+                if ( aSystemPath == '.' ):
+                    if( aReactionPath == '/' ):
+                        aVariableID.append( getVariableID
+                                            ( aVariable, '/', t[3] ) )
+                    else:
+                        aVariableID.append( getVariableID( aVariable,\
+                                                           aReactionPath[1:],\
+                                                           t[3] ) )
+                else:
+                    if( aSystemPath == '/' ):
+                        aVariableID.append( getVariableID
+                                            ( aVariable, '/', t[3] ) )
+                    else:
+                        aVariableID.append( getVariableID( aVariable,\
+                                                           aSystemPath[1:],\
+                                                           t[3] ) )
+                        
     if ( aVariableID == [] ):
         raise NameError, "not find VariableReference ID"
 
@@ -324,49 +290,83 @@ def initializePLY():
     #return yacc.yacc()
 
 
+def isID_Namespace( aVariableID ):
 
-# -------------------------------
-# return the VariableReference ID
-# -------------------------------
+    return ( aVariableID in theID_Namespace )
 
-def getVariableReferenceId( aVariableReference ):
 
-    aFirstColon = string.index( aVariableReference, ':' )
-    aLastColon = string.rindex( aVariableReference, ':' )
+def getVariableID( aVariableID, aPath, aType ):
 
-    # set Species Id to Reactant object
-    if ( aVariableReference[aFirstColon+1:aLastColon] == '.' ):
+    aLastSlash = string.rindex( aPath, '/' )
 
-        # if this VariableReference is in default compartment
-        if ( aReactionPath[1:] == '' ):
-
-            return aVariableReference[aLastColon+1:]
-
-        else:
-            aSpeciesReferencePath = string.replace( aReactionPath[1:], '/', '__' )
-
-    elif ( aVariableReference[aFirstColon+1:aLastColon] == '/' ):
-
-        return aVariableReference[aLastColon+1:]
+    # in case of Compartment
+    if( aVariableID == 'SIZE' ): 
         
+        if ( aPath == '' ): # Root system
+            return 'default'
+
+        else: # other system
+            if( isID_Namespace( 'default__' +\
+                                string.replace( aPath, '/', '__' ) ) ):
+
+                return 'default__' + string.replace( aPath, '/', '__' )
+            else:                                    
+                return aPath[aLastSlash+1:]
+
+    # in case of Species
     else:
-        aSpeciesReferencePath = string.replace( aVariableReference[aFirstColon+2:aLastColon], '/', '__' )
+        if ( aPath == '' ): # Root system
+            
+            if( isID_Namespace( 'default__' + aVariableID ) ):
+                
+                aVariableID = 'default__' + aVariableID
 
-    return  aSpeciesReferencePath + '__' + aVariableReference[aLastColon+1:]
+            aSystem = 'default'
+            
+        else: # other system
+            if( isID_Namespace( string.replace( aPath, '/', '__' ) + '__' +\
+                                aVariableID ) ):
+                
+                aVariableID = string.replace( aPath, '/', '__' ) + '__' +\
+                              aVariableID
+
+            aSystem = aPath[aLastSlash+1:]
 
 
+    if( aType == 'Value' ):
 
-def convertExpression( anExpression, aVariableReferenceListObject, aReactionPathObject, debug=0 ):
+        return '(' + aVariableID + '/' + aSystem + '/N_A)'
+        
+    elif( aType == 'NumberConc' ):
+
+        return '(' + aVariableID + '/N_A)'
+
+    elif( aType == 'MolarConc' ):
+
+        return aVariableID
+
+    else:
+        raise AttributeError,"VariableReference attribute must be MolarConc, NumberConc and Value"
+                    
+
+
+def convertExpression( anExpression, aVariableReferenceListObject, aReactionPathObject, ID_Namespace, debug=0 ):
   
     global aVariableReferenceList
     global aReactionPath
+    global aDelayFlag
+    global theID_Namespace
+    
     aVariableReferenceList = aVariableReferenceListObject
     aReactionPath = aReactionPathObject
+    aDelayFlag = False
+    theID_Namespace = ID_Namespace
     
-    aLexer = lex.lex( lextab="expressionlextab" )
-    
+    aLexer = lex.lex( lextab="expressionlextab" )    
     aParser = yacc.yacc( optimize=1, tabmodule="expressionparsetab" )
-    return aParser.parse( anExpression, lexer=aLexer, debug=debug )
+
+    return [ aParser.parse( anExpression, lexer=aLexer, debug=debug ),
+             aDelayFlag ]
 
 if __name__ == '__main__':
     initializePLY()
