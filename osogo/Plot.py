@@ -312,7 +312,7 @@ class Axis:
             if self.theScaleType == SCALE_LINEAR:
                 ticks=0
                 if self.theFrame[1] == self.theFrame[0]:
-                    self.theFrame[1]=self.theFrame[0] + 1
+                    self.theFrame[1] = self.theFrame[0] + 1
                 exponent = pow( 10, floor( log10( self.theFrame[1] - self.theFrame[0] ) ) )
                
                 while ticks < self.theMaxTicks / 2:

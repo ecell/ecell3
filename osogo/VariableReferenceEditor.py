@@ -9,7 +9,7 @@ from ConfirmWindow import *
 
 VARREF_NAME = 0
 VARREF_FULLID = 1
-VARREF_COEF = 3
+VARREF_COEF = 2
 
 NAME_COLUMN = 0
 FULLID_COLUMN = 1
@@ -80,6 +80,7 @@ class VariableReferenceEditor:
         #redraw whole list
         self.theListStore.clear()
         anIter = None
+
         for aVariableReference in theValue:
             aName = aVariableReference[VARREF_NAME]
             aFullID = aVariableReference[VARREF_FULLID]
