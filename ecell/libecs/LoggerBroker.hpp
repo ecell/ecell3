@@ -46,13 +46,20 @@ namespace libecs
    * @{ 
    */ 
   
+
+  /**
+     LoggerBroker administrates Loggers in the model.
+
+     
+
+  */
+
   class LoggerBroker
   {
 
   public:
 
-    DECLARE_MAP( const FullPN, 
-		 LoggerPtr, std::less<const FullPN>, LoggerMap );
+    DECLARE_MAP( const FullPN, LoggerPtr, std::less<const FullPN>, LoggerMap );
 
     LoggerBroker( ModelRef aModel );
 
@@ -105,7 +112,7 @@ namespace libecs
 
   protected:
     
-    LoggerPtr createLogger( FullPNCref fpn );
+    LoggerPtr createLogger( FullPNCref aFullPN );
     
   private:
 

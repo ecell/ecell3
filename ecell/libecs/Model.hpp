@@ -63,7 +63,7 @@ namespace libecs
 
 
   /**
-     Model class represents the simulation model.
+     Model class represents a simulation model.
 
      Model has a list of Steppers and a pointer to the root system.
 

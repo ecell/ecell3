@@ -63,47 +63,47 @@ namespace libecs
   }
 
 
-  LoggerPtr LoggerBroker::getLogger( FullPNCref aFullID, RealCref anInterval )
+  LoggerPtr LoggerBroker::getLogger( FullPNCref aFullPN, RealCref anInterval )
   {
-    LoggerMapIterator aLoggerMapIterator( theLoggerMap.find( fpn ) );
+    LoggerMapIterator aLoggerMapIterator( theLoggerMap.find( aFullPN ) );
     if( aLoggerMapIterator != theLoggerMap.end() )
       {
 	return aLoggerMapIterator->second;
       }
     else
       {
-	return createLogger( fpn );
+	return createLogger( aFullPN );
       }
   }
 
-  LoggerPtr LoggerBroker::createLogger( FullPNCref fpn )
+  LoggerPtr LoggerBroker::createLogger( FullPNCref aFullPN )
   {
-    EntityPtr anEntityPtr( getModel().getEntity( fpn.getFullID() ) );
+    EntityPtr anEntityPtr( getModel().getEntity( aFullPN.getFullID() ) );
 
-    String aPropertyName( fpn.getPropertyName() );
+    const String aPropertyName( aFullPN.getPropertyName() );
+    PropertySlotMapCref aPropertySlotMap( anEntityPtr->getPropertySlotMap() );
 
     PropertySlotMapConstIterator 
-      aPropertySlotMapIterator( anEntityPtr->getPropertySlotMap().
-				find( aPropertyName ) );
+      aPropertySlotMapIterator( aPropertySlotMap.find( aPropertyName ) );
 
-    if( aPropertySlotMapIterator == anEntityPtr->getPropertySlotMap().end() )
+    if( aPropertySlotMapIterator == aPropertySlotMap.end() )
       {
 	THROW_EXCEPTION( NotFound, "PropertySlot not found" );
       }
 
     PropertySlotPtr aPropertySlotPtr( aPropertySlotMapIterator->second );
+    StepperPtr aStepperPtr( anEntityPtr->getStepper() );
 
-    LoggerPtr aNewLogger( new Logger( *(aPropertySlotPtr),
-				      *(anEntityPtr->getStepper()) ) );
+    LoggerPtr aNewLogger( new Logger( *aPropertySlotPtr, *aStepperPtr ) );
+
     aPropertySlotPtr->connectLogger( aNewLogger );
-    theLoggerMap[fpn] = aNewLogger;
+    theLoggerMap[aFullPN] = aNewLogger;
 
     // don't forget this!
     aPropertySlotPtr->updateLogger();
     aNewLogger->flush();
 
-    anEntityPtr->getSuperSystem()
-      ->getStepper()->registerLoggedPropertySlot( aPropertySlotMapIterator->second );
+    aStepperPtr->registerLoggedPropertySlot( aPropertySlotPtr );
 
     return aNewLogger;
   }

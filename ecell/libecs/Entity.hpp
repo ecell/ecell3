@@ -146,7 +146,7 @@ namespace libecs
 
     void setID( StringCref anID ) 
     { 
-      theID = id; 
+      theID = anID;
     }
 
     /**
@@ -168,7 +168,7 @@ namespace libecs
 
     void setName( StringCref aName ) 
     { 
-      theName = name; 
+      theName = aName;
     }
 
     /**
