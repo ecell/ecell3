@@ -7,6 +7,8 @@
       This section describes how to define your own object classes for use
       in the simulation models.
       </para>
+
+    <para>This section also explains <classname>PropertySlot</classname>.</para>
   </highlights>
   
   <sect1>
@@ -45,76 +47,10 @@
     code file with some special usage of C++ macros.</para>
 
 
-    <sect2>
-      <title>Basic attributes</title>
-
-    <para>First of all you have to decide basic attributes of the
-    class you are going to define; such as class name, base class,
-    and what types of properties it have.  At least you must have
-    the following items filled in before starting to write a DM:</para>
-    <itemizedlist>
-
-      <title>List of common attributes of a DM class.</title>
-
-
-      <listitem>
-	<para><parameter>TYPE</parameter></para> 
-
-	<para>One of DM base classes defined in the system;
-	<classname>Process</classname>,
-	<classname>Stepper</classname>,
-	<classname>Variable</classname>, and
-	<classname>System</classname>.</para>
-      </listitem>
-
-      <listitem>
-	  <para><parameter>CLASSNAME</parameter></para> 
-
-	<para>The name of the object class.</para> 
-
-	<para>This must be a valid C++ class name, and end with the
-	<parameter>TYPE</parameter> name. For example, if you are
-	going to define a new <classname>Process</classname> class and
-	want to name it <classname>Foo</classname>, the class name may
-	look like <classname>FooProcess</classname>.</para>
-      </listitem>
-
-      <listitem>
-	  <para><parameter>BASECLASS</parameter></para>
-
-	<para>The class your class inherits from.</para>
-
-	<para>This may or may not be the same as the <parameter>TYPE
-	</parameter>, depending on whether it is a direct
-	descendant of the DM base class.</para>
-
-      </listitem>
-
-
-      <listitem>
-	<para>Properties</para>
-
-	<para>A list of properties of this class.</para>
-
-	<para>In addition to usual methods and member variables of a
-	C++ class, E-Cell's DM classes can have
-	<classname>PropertySlot</classname>s.  A <classname>PropertySlot</classname> is an interface 
-</para>
-
-
-      </listitem>
-
-</itemizedlist>
-
-    </sect2>
-
-
-    <sect2>
-      <title>Writing a source file</title>
 
     <para>Here is a minimum template of a DM file, with which you
     should feel familiar if you have a C++ experience. Replace
-    <parameter>TYPE</parameter>, <parameter>CLASSNAME</parameter>, and
+    <parameter>DMTYPE</parameter>, <parameter>CLASSNAME</parameter>, and
     <parameter>BASECLASS</parameter> according to your case.
 
     <example>
@@ -129,18 +65,65 @@ class <parameter>CLASSNAME</parameter>
   :
   public <parameter>BASECLASS</parameter>
 {
-  LIBECS_DM_OBJECT( <parameter>TYPE</parameter>, <parameter>CLASSNAME</parameter> );
+  LIBECS_DM_OBJECT( <parameter>DMTYPE</parameter>, <parameter>CLASSNAME</parameter> );
 public:
   <parameter>CLASSNAME</parameter>() {}// A constructor without an argument
   <parameter>~CLASSNAME</parameter>() {}// A destructor
 };
 
-DM_INIT( <parameter>TYPE</parameter>, <parameter>CLASSNAME</parameter> );
+DM_INIT( <parameter>DMTYPE</parameter>, <parameter>CLASSNAME</parameter> );
 </programlisting>
     </example>
 </para>
 
+
+    <sect2>
+      <title>DM Type, Class name and Base class</title>
+
+      <para>First of all you have to decide basic attributes of the
+    class you are going to define; such as a DM type, a class name,
+    and a base class.</para>
+
       <sect3>
+	<title><parameter>DMTYPE</parameter></title>
+
+	<para><parameter>DMTYPE</parameter> is one of DM base classes
+	defined in &app; <classname>Process</classname>,
+	<classname>Stepper</classname>,
+	<classname>Variable</classname>, and
+	<classname>System</classname>.</para>
+      </sect3>
+
+      <sect3>
+	<title><parameter>CLASSNAME</parameter></title>
+
+	<para><parameter>CLASSNAME</parameter> is a name of the
+	object class.</para>
+
+	<para>This must be a valid C++ class name, and should end with the
+	<parameter>DMTYPE</parameter> name. For example, if you are
+	going to define a new <classname>Process</classname> class and
+	want to name it <classname>Foo</classname>, the class name may
+	look like <classname>FooProcess</classname>.</para>
+      </sect3>
+
+      <sect3>
+	<title><parameter>BASECLASS</parameter></title>
+
+	<para>The class your class inherits from.</para>
+
+	<para>This may or may not be the same as the <parameter>DMTYPE
+	</parameter>, depending on whether it is a direct
+	descendant of the DM base class.</para>
+      </sect3>
+
+    </sect2>
+
+
+
+
+
+      <sect2>
 	<title>Filename</title>
 	<para>
 	The name of the source file must be the same as the <parameter>CLASSNAME</parameter>
@@ -153,19 +136,19 @@ DM_INIT( <parameter>TYPE</parameter>, <parameter>CLASSNAME</parameter> );
 	<filename>FooProcess.cpp</filename>), but at least the
 	<function>DM_INIT</function> macro must be placed in the source file
 	of the class (<filename>FooProcess.cpp</filename>).</para>
-      </sect3>
+      </sect2>
 
 
-      <sect3>
+      <sect2>
 	<title>Include files</title> <para>At least the
 	<productname>libecs</productname> header file
 	(<filename>libecs/libecs.hpp</filename>) and a header file of
 	the base class
 	(<filename>libecs/<parameter>BASECLASS</parameter>.hpp</filename>)
 	must be included in the head of the file.</para>
-      </sect3>
+      </sect2>
 
-      <sect3>
+      <sect2>
 	<title>DM macros</title>
 
 	<para>You may notice that it is using three special macros:
@@ -177,7 +160,7 @@ DM_INIT( <parameter>TYPE</parameter>, <parameter>CLASSNAME</parameter> );
          <productname>libecs</productname> library, which is the core
          library of &app, in this file after the line.</para>
 
-	<para><function>LIBECS_DM_OBJECT( <parameter>TYPE</parameter>,
+	<para><function>LIBECS_DM_OBJECT( <parameter>DMTYPE</parameter>,
           <parameter>CLASSNAME</parameter> )</function> should be
           placed on the top of the class definition part (immediately
           after '{' of the class).  This macro declares that this is a
@@ -187,30 +170,221 @@ DM_INIT( <parameter>TYPE</parameter>, <parameter>CLASSNAME</parameter> );
           this macro specifies public: field inside, and thus anything
           comes after this is placed in public.  For clarity it is a
           good idea to always write public: explicitly after this
-          macro.  <programlisting> LIBECS_DM_OBJECT( TYPE, CLASSNAME )
+          macro.  <programlisting> LIBECS_DM_OBJECT( DMTYPE, CLASSNAME )
           public:</programlisting>
 </para>
 
-	<para><function>DM_INIT( <parameter>TYPE</parameter>,
+	<para><function>DM_INIT( <parameter>DMTYPE</parameter>,
 	<parameter>CLASSNAME</parameter> )</function> exports the
 	class <parameter>CLASSNAME</parameter> as a DM class of type
-	<parameter>TYPE</parameter>.  This must come after the
+	<parameter>DMTYPE</parameter>.  This must come after the
 	definition (not just a declaration) of the class to be
 	exported with
 	a <function>LIBECS_DM_OBJECT</function> call.</para>
 
-      </sect3>
+      </sect2>
 
-      <sect3>
+      <sect2>
 	<title>Constructor and destructor</title> 
 
 	<para>DM objects are always instantiated by calling the
 	constructor with no argument.  The destructor is defined virtual
         in the base class.</para>
+      </sect2>
+
+
+    <sect2>
+      <title>Types and declarations</title>
+
+      <sect3>
+	<title>Basic types</title>
+
+	<para>The following four basic types are available to be used in
+      your code if you included <filename>libecs/libecs.hpp</filename>
+      header file and called the <function>USE_LIBECS</function>
+      macro.
+
+      <itemizedlist>
+	    <listitem>
+	      <para><type>Real</type></para>
+
+	      <para>A real number.  Usually implemented as a double
+	      precision floating point number.  It is a 64-bit float
+	      on a Linux/IA32/gcc platform.</para>
+	    </listitem>
+	    <listitem>
+	      <para><type>Int</type></para>
+
+	      <para>A signed integer number.   This is 64-bit <type>long int</type> on Linux/IA32/gcc.</para>
+	    </listitem>
+	    <listitem>
+	      <para><type>UnsignedInt</type></para>
+
+	      <para>An unsigned integer number. This is 64-bit <type>unsigned long int</type> on Linux/IA32/gcc. </para>
+	    </listitem>
+	    <listitem>
+	      <para><classname>String</classname></para>
+
+	      <para>A string equivalent to
+	    <classname>std::string</classname> class of the C++ standard
+	    library.</para>
+	    </listitem>
+	    <listitem>
+	      <para><classname>Polymorph</classname></para>
+
+	      <para><classname>Polymorph</classname> is a sort of
+              universal type (actually a class) which can *become* and
+              *made from* any of <type>Real</type>, <type>Int</type>,
+              <type>String</type>, and <type>PolymorphVector</type>,
+              which is a mixed list of these three types of
+              objects. See the next section for details.</para>
+	    </listitem>
+	  </itemizedlist>
+</para>
+
+	<para>These types are recommended to be used over other C++
+      standard types such as <type>double</type>, <type>int</type> and
+      <type>char*</type>.</para>
+
       </sect3>
 
       <sect3>
-	<title>Other C++ code</title>
+	<title>Pointer and reference types</title>
+
+      <para>For each types, the following typedefs are available.
+<itemizedlist>
+	  <listitem>
+	    <para><type>TYPEPtr</type></para>
+	    <para>Pointer type. (== <type>TYPE*</type>)</para>
+	  </listitem>
+
+	  <listitem>
+	    <para><type>TYPECptr</type></para>
+	    <para>Const pointer type. (== <type>const TYPE*</type>)</para>
+	  </listitem>
+
+	  <listitem>
+	    <para><type>TYPERef</type></para>
+	    <para>Reference type. (== <type>TYPE&</type>)</para>
+	  </listitem>
+
+	  <listitem>
+	    <para><type>TYPECref</type></para>
+	    <para>Const reference type. (== <type>const TYPE&</type>)</para>
+	  </listitem>
+	</itemizedlist>
+
+       For example, <type>RealCref</type> is equivalent to write
+       <type>const Real&</type>.  Using these typedefs are recommended.</para>
+
+       <para>
+       To declare a new type, use <function>DECLARE_TYPE</function>
+       macro.  For example, 
+<programlisting>DECLARE_TYPE( double, Real );</programlisting> 
+
+       is called inside the system so that
+       <type>RealCref</type> can be used as <type>const
+       double&</type>.</para>
+
+      <para>Similary, DECLARE_CLASS can be used to enable the typedefs
+      for a class. Example: 
+
+<programlisting>DECLARE_CLASS( Process );</programlisting> 
+
+      enables <type>ProcessCref</type>
+      <type>ProcessPtr</type> etc..  Most classes defined in
+      <productname>libecs</productname> have these typedefs.</para>
+
+      </sect3>
+
+
+      <sect3>
+	<title>Limits and other attributes of types</title>
+
+	<para>To get limits and precisions of these numeric
+       types, use <classname>std::numeric_limits<></classname>
+       template class in the C++ standard library.  For instance, to
+       get a maximum value that can be represented by the
+       <type>Real</type> type, use the template class like this:
+
+<programlisting>
+#include &lt;limits>
+numeric_limits&lt;Real>::max();
+</programlisting>
+
+See the C++ standard library reference manual for more.</para>
+
+      </sect3>
+
+
+    </sect2>
+
+      <sect2>
+	<title><classname>Polymorph</classname> class</title>
+
+	<para>A <classname>Polymorph</classname> object can be
+	constructed from and converted to any of <type>Real</type>,
+	<type>Int</type>, <type>String</type>, types and
+	<classname>PolymorphVector</classname> class.</para>
+	
+      <sect3>
+	<title>Construct a <classname>Polymorph</classname></title>
+
+	<para>To construct a <classname>Polymorph</classname> object, simply call a constructor with a value:
+
+<programlisting>
+Polymorph aIntPolymorph( 1 );
+Polymorph aRealPolymorph( 3.1 );
+Polymorph aStringPolymorph( "2.13e2" );
+</programlisting>
+
+A <classname>Polymorph</classname> object can be constructed (or
+copied) from a <classname>Polymorph</classname>:
+<programlisting>
+Polymorph aRealPolymorph2( aRealPolymorph );
+</programlisting></para>
+      </sect3>
+
+      <sect3>
+	<title>Getting a value of a <classname>Polymorph</classname></title>
+
+	<para>The value of the <classname>Polymorph</classname>
+	objects can be retrieved in any type by using <methodname>as&lt;></methodname>() template method.
+<programlisting>
+aIntPolymorph.as&lt;Real>();    // == 1.0
+aRealPolymorph.as&lt;String>(); // == "3.1"
+aStringPolymorph.as&lt;Int>();  // == 213
+</programlisting>
+
+<note>
+	    <para>If an overflow occurs when converting a very big <type>Real</type> value to <type>Int</type>, a <exceptionname>ValueError</exceptionname> exception?? is thrown.  (NOT IMPLEMENTED YET)</para>
+	  </note>
+
+
+</para>
+
+      </sect3>
+
+      <sect3>
+	<title>Examining and changing the type of <classname>Polymorph</classname></title>
+
+	<para><methodname>getType</methodname>(), <methodname>changeType</methodname>()</para>
+
+      </sect3>
+
+
+      <sect3>
+	<title><classname>PolymorphVector</classname></title>
+
+	<para><classname>PolymorphVector</classname> is a list of
+	<classname>Polymorph</classname> objects.</para>
+      </sect3>
+
+      </sect2>
+
+
+      <sect2>
+	<title>Other C++ statements</title>
 
 	<para>The only limitation is the <function>DM_INIT</function>
 	macro, which exports a class as a DM class, can appear only
@@ -227,11 +401,7 @@ DM_INIT( <parameter>TYPE</parameter>, <parameter>CLASSNAME</parameter> );
           may want to use private C++ namespaces and static functiont
           when a class or a function declared outside the DM class is
           needed.</para>
-      </sect3>
-
-
-    </sect2>
-
+      </sect2>
 
     </sect1>
 
@@ -241,27 +411,113 @@ DM_INIT( <parameter>TYPE</parameter>, <parameter>CLASSNAME</parameter> );
     <sect2>
       <title>What is <classname>PropertySlot</classname></title>
 
-      <para>All of the DM base classes,
+      <para>All of the four DM base classes,
          <classname>Process</classname>,
          <classname>Variable</classname>,
          <classname>System</classname> and
          <classname>Stepper</classname> are
          <classname>PropertyInterface</classname>s, which means that
-         these classes can hold <classname>PropertySlot</classname>s,
-         or just object <emphasis>properties</emphasis>.</para>
+         these classes can hold a list of
+         <classname>PropertySlot</classname>s, or object
+         <emphasis>properties</emphasis>.</para>
 
-      <para></para>
+      <sect3>
+	<title>What is 
+	<classname>PropertySlot</classname> for?</title>
+
+	<para><classname>PropertySlot</classname>s can be used from
+	model files (such as EM files) as a means of giving parameter
+	values to each objects in the simulation (such as
+	<classname>Entity</classname> and
+	<classname>Stepper</classname> objects). It can also be ways
+	of dynamic inter-object communications during the simulation.</para>
+      </sect3>
+
+      <sect3>
+	<title>Types of <classname>PropertySlot</classname></title>
+
+	<para>A type of a <classname>PropertySlot</classname> is
+	any one of these four types:
+
+<itemizedlist>
+	    <listitem>
+	      <para><type>Real</type></para>
+	    </listitem>
+	    <listitem>
+	      <para><type>Int</type></para>
+	    </listitem>
+	    <listitem>
+	      <para><type>String</type></para>
+	    </listitem>
+	    <listitem>
+	      <para><type>Polymorph</type></para>
+	    </listitem>
+	  </itemizedlist>
+</para>
+
+      </sect3>
+
+
+      <sect3>
+	<title>Set method and get method</title>
+
+	<para>A <classname>PropertySlot</classname> can be viewed as a
+      pair of object methods, <emphasis>set method</emphasis> and
+      <emphasis>get method</emphasis>, associated with a property
+      name.  Either one of the methods can be ommited.  If there is a
+      set method defined for a <classname>PropertySlot</classname>,
+      the <classname>PropertySlot</classname> is said to be
+      <emphasis>setable</emphasis>.  If there is a get method, it is
+      <emphasis>getable.</emphasis></para>
+
+	<para>
+	To be recognized by the system as property methods, a set
+	method must have a signature of:
+
+	<programlisting>void CLASS::* ( const T& )</programlisting>
+
+	and a get method must look like: 
+<programlisting>const T	CLASS::* ( void ) const</programlisting> 
+
+        where <type>T</type>
+	is a <classname>PropertySlot</classname> type and
+	<type>CLASS</type> is the object class that the
+	<classname>PropertySlot</classname> belongs to.
+</para>
+
+      </sect3>
 
     </sect2>
 
     <sect2>
       <title>How to define a <classname>PropertySlot</classname></title>
-      <para></para>
+
+      <para>To define a <classname>PropertySlot</classname> on a
+      object class, you have to:
+<orderedlist>
+	  <listitem>
+	    <para> create a <classname>PropertySlot</classname> in the constructor</para>
+	  </listitem>
+	  <listitem>
+	    <para>define set and/or get method(s)</para>
+	  </listitem>
+	  <listitem>
+	    <para>and optionally, define a member variable to store
+	    the property value.</para>
+	  </listitem>
+	</orderedlist>
+</para>
 
       <sect3>
-	<title>Declaring a <classname>PropertySlot</classname></title>
+	<title>Creating a <classname>PropertySlot</classname></title>
 	
-	<para>CREATE_PROPERTYSLOT</para>
+	<para>To create a <classname>PropertySlot</classname>, use
+	<function>CREATE_PROPERTYSLOT</function> macro in the
+	constructor:
+
+        <programlisting>CREATE_PROPERTYSLOT( NAME, TYPE, </programlisting>
+
+</para>
 
 	<para>
 If <classname>PropertySlot</classname>s with the same name are created
