@@ -41,10 +41,11 @@
 
 
 
+DM_INIT( Stepper, NRStepper );
+
+
 namespace libecs
 {
-
-  DM_INIT( Stepper, NRStepper );
 
   NRStepper::NRStepper()
     :
