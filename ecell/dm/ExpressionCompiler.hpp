@@ -47,7 +47,7 @@
 
 #include "libecs/libecs.hpp"
 #include "libecs/Process.hpp"
-#include "libecs/ObjectMethodProxy.hpp"
+#include "libecs/MethodProxy.hpp"
 
 using namespace boost::spirit;
 

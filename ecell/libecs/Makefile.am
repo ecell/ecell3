@@ -108,7 +108,7 @@ Util.hpp\
 VariableReference.hpp\
 DynamicPriorityQueue.hpp\
 FluxProcess.hpp\
-ObjectMethodProxy.hpp
+MethodProxy.hpp
 
 
 all-local: libecs$(SHLEXT)

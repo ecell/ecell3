@@ -28,10 +28,72 @@
 // E-Cell Project, Institute for Advanced Biosciences, Keio University.
 //
 
-#ifndef __OBJECTMETHODPROXY_HPP
-#define __OBJECTMETHODPROXY_HPP
+#ifndef __METHODPROXY_HPP
+#define __METHODPROXY_HPP
 
 #include "libecs.hpp"
+
+
+template < class CLASS, typename RET, typename ARG1 = void > 
+class MethodProxy;
+
+template < class CLASS, typename RET >
+class MethodProxy<CLASS,RET>
+{
+private:
+
+  typedef const RET (* Invoker )( CLASS* const );
+
+public:
+
+  inline const RET operator()( CLASS* const anObject ) const 
+  { 
+    return theInvoker( anObject ); 
+  }
+
+  inline const RET operator()( const CLASS* const anObject ) const 
+  { 
+    return theInvoker( const_cast<CLASS* const>( anObject ) ); 
+  }
+
+  template < const RET (CLASS::*METHOD)() const >
+  static MethodProxy create()
+  {
+#if defined( LIBECS_USE_PMF_CONVERSIONS )
+    return MethodProxy( Invoker( METHOD ));
+#else  /* defined( LIBECS_USE_PMF_CONVERSIONS ) */
+    return MethodProxy( invoke<CLASS,METHOD> );
+#endif /* defined( LIBECS_USE_PMF_CONVERSIONS ) */
+  }
+
+private:
+
+  MethodProxy()
+    : 
+    theInvoker( 0 )
+  {
+    ; // do nothing
+  }
+    
+  MethodProxy( Invoker anInvoker ) 
+    : 
+    theInvoker( anInvoker )
+  {
+    ; // do nothing
+  }
+
+  template < const RET (CLASS::*METHOD)() const >
+  inline static const RET invoke( CLASS* const anObject )
+  {
+    return ( anObject->*METHOD )();
+  }
+
+private:
+    
+  Invoker   theInvoker;
+
+};
+
 
 
 template < typename RET, typename ARG1 = void > 
@@ -55,7 +117,7 @@ public:
   static ObjectMethodProxy create( T* const anObject )
   {
 #if defined( LIBECS_USE_PMF_CONVERSIONS )
-    return ObjectMethodProxy( Invoker( anObject->*TMethod ), anObject );
+    return ObjectMethodProxy( Invoker( TMethod ), anObject );
 #else  /* defined( LIBECS_USE_PMF_CONVERSIONS ) */
     return ObjectMethodProxy( invoke<T,TMethod>, anObject );
 #endif /* defined( LIBECS_USE_PMF_CONVERSIONS ) */
@@ -87,12 +149,12 @@ private:
 
 private:
     
-  const Invoker   theInvoker;
-  void* const     theObject;
+  Invoker   theInvoker;
+  void*     theObject;
 
 };
 
 
 
 
-#endif /* __OBJECTMETHODPROXY_HPP */
+#endif /* __METHODPROXY_HPP */

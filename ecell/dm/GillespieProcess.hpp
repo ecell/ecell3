@@ -8,6 +8,7 @@
 #include <libecs/libecs.hpp>
 #include <libecs/DiscreteEventProcess.hpp>
 #include <libecs/Stepper.hpp>
+#include <libecs/MethodProxy.hpp>
 
 
 USE_LIBECS;
@@ -23,6 +24,9 @@ LIBECS_DM_CLASS( GillespieProcess, DiscreteEventProcess )
 {
   
   typedef const Real (GillespieProcess::* RealMethodPtr)() const;
+
+  typedef MethodProxy<GillespieProcess,Real> RealMethodProxy;
+  //  typedef const Real (*NewRealMethodPtr)(const GillespieProcess*);
   
  public:
   
@@ -41,7 +45,9 @@ LIBECS_DM_CLASS( GillespieProcess, DiscreteEventProcess )
     :
     theOrder( 0 ),
     k( 0.0 ),
-    theGetPropensity_RMethodPtr( &GillespieProcess::getInf ),
+    //    theGetPropensity_RMethodPtr( &GillespieProcess::getInf ),
+    theGetPropensity_RMethodPtr( RealMethodProxy::
+				 create<&GillespieProcess::getInf>() ),
     theGetMinValueMethodPtr( &GillespieProcess::getZero )
     {
       ; // do nothing
@@ -63,7 +69,8 @@ LIBECS_DM_CLASS( GillespieProcess, DiscreteEventProcess )
 
   GET_METHOD( Real, Propensity_R )
   {
-    return ( this->*theGetPropensity_RMethodPtr )();
+    //    return ( this->*theGetPropensity_RMethodPtr )();
+    return theGetPropensity_RMethodPtr( this );
   }
 
 
@@ -127,7 +134,7 @@ protected:
   const Real getPropensity_R_FirstOrder() const
   {
     const Real 
-      aMultiplicity( trunc( theVariableReferenceVector[0].getValue() ) );
+      aMultiplicity( theVariableReferenceVector[0].getValue() );
 
     if( aMultiplicity > 0.0 )
       {
@@ -144,8 +151,8 @@ protected:
   const Real getPropensity_R_SecondOrder_TwoSubstrates() const
   {
     const Real 
-      aMultiplicity( trunc( theVariableReferenceVector[0].getValue() ) *
-		     trunc( theVariableReferenceVector[1].getValue() ) );
+      aMultiplicity( theVariableReferenceVector[0].getValue() *
+		     theVariableReferenceVector[1].getValue() );
 
     if( aMultiplicity > 0.0 )
       {
@@ -162,7 +169,7 @@ protected:
 
   const Real getPropensity_R_SecondOrder_OneSubstrate() const
   {
-    const Real aValue( trunc( theVariableReferenceVector[0].getValue() ) );
+    const Real aValue( theVariableReferenceVector[0].getValue() );
 
     if( aValue > 1.0 ) // there must be two or more molecules
       {
@@ -203,7 +210,8 @@ protected:
 
   Integer theOrder;
 
-  RealMethodPtr theGetPropensity_RMethodPtr;
+  RealMethodProxy theGetPropensity_RMethodPtr;
+  
   RealMethodPtr theGetMinValueMethodPtr;
 
 };
