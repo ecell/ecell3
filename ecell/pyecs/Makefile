@@ -185,7 +185,7 @@ mostlyclean-am:  mostlyclean-generic
 
 mostlyclean: mostlyclean-am
 
-clean-am:  clean-generic mostlyclean-am
+clean-am:  clean-generic mostlyclean-am clean-local
 
 clean: clean-am
 
@@ -210,6 +210,9 @@ mostlyclean distclean maintainer-clean
 
 all-local:
 	make -f Makefile.python all
+
+clean-local:
+	make -f Makefile.python clean
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

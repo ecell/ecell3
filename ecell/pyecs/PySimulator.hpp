@@ -14,7 +14,7 @@ class PySimulator
 public:
   
   PySimulator();
-  ~PySimulator(){};
+  virtual ~PySimulator(){};
 
   static void init_type();
 
