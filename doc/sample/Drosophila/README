@@ -21,10 +21,10 @@ Drosophila.em:  Model file(em file) for this model
 
 1. (If necessary) Convert the .em file to .eml file.
 
-   % ecell3-em2eml Drosophila.em
-   % ls Drosophila.eml
-   Drosophila.eml
+   % ecell3-em2eml Drosophila(-python).em
+   % ls Drosophila(-python).eml
+   Drosophila(-python).eml
 
-2. Run gecell, File->loadModel and load the Drosophila.eml file.
+2. Run gecell, File->loadModel and load the Drosophila(-python).eml file.
 
 
