@@ -4,7 +4,7 @@
 from PluginWindow import *
 from ecssupport import *
 import GTK
-
+import operator
 
 class DigitalWindow( PluginWindow ):
 
@@ -13,7 +13,7 @@ class DigitalWindow( PluginWindow ):
         PluginWindow.__init__( self, dirname, data, pluginmanager, root )
         
         aValue = self.theSimulator.getProperty( self.theFullPN() )
-	if operator.isNumberType( aValue )
+        if operator.isNumberType( aValue ):
 
             self.openWindow()
             self.thePluginManager.appendInstance( self )
