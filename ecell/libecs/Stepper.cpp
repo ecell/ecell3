@@ -476,10 +476,11 @@ namespace libecs
   void Stepper::log()
   {
     // update loggers
-    std::for_each( theLoggedPropertySlotVector.begin(), 
-		   theLoggedPropertySlotVector.end(),
-		   std::bind2nd( std::mem_fun( &PropertySlot::log ), 
-				 getCurrentTime() ) );
+    const Real aCurrentTime( getCurrentTime() );
+    FOR_ALL( PropertySlotVector, theLoggedPropertySlotVector )
+      {
+	(*i)->log( aCurrentTime );
+      }
   }
 
   const Polymorph Stepper::getWriteVariableList() const
@@ -558,8 +559,10 @@ namespace libecs
 
   void Stepper::process()
   {
-    std::for_each( theProcessVector.begin(), theProcessVector.end(),
-    		   std::mem_fun( &Process::process ) );
+    FOR_ALL( ProcessVector, theProcessVector )
+      {
+	(*i)->process();
+      }
   }
 
 
@@ -568,9 +571,10 @@ namespace libecs
     //
     // Variable::integrate()
     //
-    std::for_each( theVariableVector.begin(), theVariableVector.end(), 
-		   std::bind2nd( std::mem_fun( &Variable::integrate ),
-				 aTime ) );
+    FOR_ALL( VariableVector, theVariableVector )
+      {
+	(*i)->integrate( aTime );
+      }
 
     setCurrentTime( aTime );
   }
@@ -592,9 +596,10 @@ namespace libecs
 
   void Stepper::dispatchInterruptions()
   {
-    std::for_each( theDependentStepperVector.begin(),
-		   theDependentStepperVector.end(),
-		   std::bind2nd( std::mem_fun( &Stepper::interrupt ), this ) );
+    FOR_ALL( StepperVector, theDependentStepperVector )
+      {
+	(*i)->interrupt( this );
+      }
   }
 
   void Stepper::interrupt( StepperPtr const )

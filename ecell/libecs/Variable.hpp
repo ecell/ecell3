@@ -88,7 +88,7 @@ namespace libecs
        Clear phase.
     */
 
-    virtual void clear()
+    void clear()
     { 
       theVelocity = 0.0; 
     }
@@ -109,9 +109,7 @@ namespace libecs
 				     RealCref anInterval ) const
     {
       Real aVelocitySum( 0.0 );
-      for( VariableProxyVectorConstIterator 
-	     i( theVariableProxyVector.begin() );
-	   i != theVariableProxyVector.end(); ++i )
+      FOR_ALL( VariableProxyVector, theVariableProxyVector )
 	{
 	  VariableProxyPtr const anVariableProxyPtr( *i );
 	  aVelocitySum += anVariableProxyPtr->getDifference( aCurrentTime,
@@ -134,10 +132,10 @@ namespace libecs
       const Real aVelocitySum( calculateVelocitySum( aCurrentTime,
 						     anInterval ) );
 
-      loadValue( getValue() + aVelocitySum );
-
       // Give it in per second.
       theTotalVelocity = aVelocitySum / anInterval;
+
+      loadValue( getValue() + aVelocitySum );
 
       theLastTime = aCurrentTime;
     }
