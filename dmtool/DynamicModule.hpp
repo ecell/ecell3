@@ -218,7 +218,17 @@ SharedDynamicModule( const std::string& classname,
 
   if( theHandle == NULL ) 
     {
-      throw DMException( lt_dlerror() );
+      //FIXME: Try again to look for Classname + ".so".
+      //       This is a workaround for buggy libltdl which don't look for
+      //       .so if there is *not* .la (as of libtool-1.4.2)....
+      //       May be this can be eliminated and simplified in the future...
+      filename += ".so";
+      theHandle = lt_dlopen( filename.c_str() );
+
+      if( theHandle == NULL ) 
+	{
+	  throw DMException( lt_dlerror() );
+	}
     }
 
   theAllocator = *((DMAllocator*)( lt_dlsym( theHandle, "CreateObject" ) ));
@@ -241,7 +251,14 @@ SharedDynamicModule<Base,DMAllocator>::~SharedDynamicModule()
 template < class Base, class DMAllocator >
 const std::string& SharedDynamicModule<Base,DMAllocator>::getFileName() const
 {
-  return string( theHandle->filename );
+  lt_dlinfo* aDlInfo = lt_dlgetinfo( theHandle );
+
+  if( aDlInfo == NULL )
+    {
+      throw DMException( "lt_dlgetinfo failed" );
+    }
+
+  return string( aDlInfo->filename );
 }
 
 #endif /* __DYNAMICMODULE_HPP */
