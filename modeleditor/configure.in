@@ -10,6 +10,24 @@ AM_CHECK_PYMOD(pygtk,,,[AC_MSG_ERROR(could not find pygtk module)])
 AM_CHECK_PYMOD(gtk,,,[AC_MSG_ERROR(could not find gtk module)])
 AM_CHECK_PYMOD(gtk.gdk,,,[AC_MSG_ERROR(could not find gtk.gdk module. perhaps pygtk2 is not installed)])
 AM_CHECK_PYMOD(gtk.glade,,,[AC_MSG_ERROR(could not find gtk.glade module. perhaps pygtk2-libglade is not installed)])
+
+dnl check for pygtk>=2.0.0
+prog="
+import sys,gtk
+req=(2,0,0)
+inst=gtk.pygtk_version
+if inst>=req:
+    sys.exit(0)
+sys.exit(1)
+"
+if $PYTHON -c "$prog" 1>&AC_FD_CC 2>&AC_FD_CC
+  then
+      AC_MSG_RESULT(yes)
+  else
+    AC_MSG_ERROR(PyGtk2 version 2.0.0 or greater required for modeleditor)
+fi
+
+
 AM_CHECK_PYMOD(gnome.canvas,,,[AC_MSG_ERROR(could not find gnome.canvas module. )])
 AM_CHECK_PYMOD(xml.dom.minidom,,,[AC_MSG_ERROR(could not find xml.dom.minidom module. )])
 AM_CHECK_PYMOD(gnome.ui,,[AC_SUBST([GNOME_INSTALLED],yes)],[AC_SUBST([GNOME_INSTALLED],no)])
